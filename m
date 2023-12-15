@@ -1,230 +1,342 @@
-Return-Path: <kvm+bounces-4552-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4553-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 873D48141C7
-	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 07:24:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C6D9814382
+	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 09:23:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 384F61C224E2
-	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 06:24:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E36821F24FCE
+	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 08:23:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAAF8DDDD;
-	Fri, 15 Dec 2023 06:23:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4B7A134A2;
+	Fri, 15 Dec 2023 08:23:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jkZptNR7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cZu8S8ow"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4495DDDA8;
-	Fri, 15 Dec 2023 06:23:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702621432; x=1734157432;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=Pn5QYoRhY9nNxRDOW6MNM+szmIfeGMUM5kZB3wMALfs=;
-  b=jkZptNR70XEMTKLpxEvv+A+YW5kyGirorPubD7XTc9w7H/at8kVqVzbf
-   aboJEZ2dglyuG4bj1TBAh3zGeVIwU6RxU0mtHiIFvDBAxrzxBFbtquOtQ
-   /yLdAJv9L6gL1+SmqTE4Gt18Jroh18V98h8sGHlifIsAVnMSNopyVxW2+
-   mNVQQOl19BuLQXnDc5ZfyoXGLHZ0tSmBJscy5eNfassncyQxqtxGkPNyY
-   7yq5/OcxtE7FwTE9fmfGepe3YMW+Dc3f7lqgoidPbMwsIjwjgvjM73uZm
-   7QdzITU5WiPOuHyQjBDNH+z8+60lyEHjaA8xjkTWiKaauynZt78zP1aWV
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10924"; a="2076207"
-X-IronPort-AV: E=Sophos;i="6.04,277,1695711600"; 
-   d="scan'208";a="2076207"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Dec 2023 22:23:51 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10924"; a="898034153"
-X-IronPort-AV: E=Sophos;i="6.04,277,1695711600"; 
-   d="scan'208";a="898034153"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orsmga004.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Dec 2023 22:23:51 -0800
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 14 Dec 2023 22:23:50 -0800
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Thu, 14 Dec 2023 22:23:50 -0800
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.101)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 14 Dec 2023 22:23:50 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=e1M6rm7jUOdos9EWRcsQkX1UBfI7bHAoXPIryZL/F2+S1KCKEdfsxqUqjMIq7qDS8aN2G8iAm0aD0bQNdbGMx+egMDnBNfvEqmAENaIJ5JSp6v4eetAJLYNK4s9Is8FniViRRTncsFLjnLwo6OrER6aiHhS4cjWDP2lYhN0nSZd8FVVXF9F7EymKtuNiPHVDK+ra5b9klGgU5Pp6Ipl/9BzsJ7JJYvT3qAJFu61I+LLLAfLpjoiqQX61uKBsHN4eDnzJVF5Jhr2Jp5M+53ZLLaf9v2JLI6LuzUcWXfeLZlvHZYRQXjkXSh3IgIz33+CiB5rKhuwK5IQesIKceOQUKA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=iAtPL18JzRCrjYccKxvguiNK2d1Pm7r/gvAfudjkjlo=;
- b=DudispkfChSRL1I+kYHqanEpY/QTQURUYIAAHMdh57E/tK591r0Fv9dzYdAv+juTTKbs/ZILULPMdg0a2/OgX61seuBSrQG9u0XOjAnbaGHJgV3TU7SaZeyoHFjsSVz41MApuEnCboL6MTD4eGDWqizH0s3EYLZ7tA0UqCmb8alKwEgpIfFSZtXg87/wAjFcBfflGtpSI37vtSdTufcuzQUSSd46jA54ptQtQEzbp9KEKBMQYU7iH/GVv0jWspJxLswoVlZIjj5wqHzmjmX/lLhJA5sR6oxmj412Bmb8MDZM36NgeZ27JpOh30CgW7LzbvOuToYMH2pAqYyPPUMV6w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by PH0PR11MB5610.namprd11.prod.outlook.com (2603:10b6:510:e9::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.28; Fri, 15 Dec
- 2023 06:23:48 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::e7a4:a757:2f2e:f96a]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::e7a4:a757:2f2e:f96a%3]) with mapi id 15.20.7091.029; Fri, 15 Dec 2023
- 06:23:48 +0000
-From: "Tian, Kevin" <kevin.tian@intel.com>
-To: "Zhao, Yan Y" <yan.y.zhao@intel.com>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "dri-devel@lists.freedesktop.org"
-	<dri-devel@lists.freedesktop.org>
-CC: "pbonzini@redhat.com" <pbonzini@redhat.com>, "seanjc@google.com"
-	<seanjc@google.com>, "olvaffe@gmail.com" <olvaffe@gmail.com>, "Lv, Zhiyuan"
-	<zhiyuan.lv@intel.com>, "Wang, Zhenyu Z" <zhenyu.z.wang@intel.com>, "Ma,
- Yongwei" <yongwei.ma@intel.com>, "vkuznets@redhat.com" <vkuznets@redhat.com>,
-	"wanpengli@tencent.com" <wanpengli@tencent.com>, "jmattson@google.com"
-	<jmattson@google.com>, "joro@8bytes.org" <joro@8bytes.org>,
-	"gurchetansingh@chromium.org" <gurchetansingh@chromium.org>,
-	"kraxel@redhat.com" <kraxel@redhat.com>
-Subject: RE: [RFC PATCH] KVM: Introduce KVM VIRTIO device
-Thread-Topic: [RFC PATCH] KVM: Introduce KVM VIRTIO device
-Thread-Index: AQHaLn1b27525Q6w90S6Q0FOwXgDl7Cp2kUA
-Date: Fri, 15 Dec 2023 06:23:48 +0000
-Message-ID: <BN9PR11MB5276BE04CBB6D07039086D658C93A@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20231214103520.7198-1-yan.y.zhao@intel.com>
-In-Reply-To: <20231214103520.7198-1-yan.y.zhao@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|PH0PR11MB5610:EE_
-x-ms-office365-filtering-correlation-id: 6f6d0069-bfe5-40a2-fddd-08dbfd3665cc
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 0EHlPFZ4sjfDTYaXGNK5loF/BndpmKiDVF4A62iNUCmVoRJBNezcbrW/aUsr5lhRxv8Y5sXJ6a9ztCmYCRKH56HtSvlyMBOKl0J25xFqKOvL3k/2S3KMJBkgYBmiqIGXn1jurAEag1Zv8ajRJhAsuu3H2bVBF2eb9Kx5CW5L6XtRR/bYi5UlsKHc81IieYujvMRT4VOBN6dzg5eIpVFSB6FJXC9Nfg+nTwXBGpEj3P9cS8MP+uS2u3wd+8bSrIb46USlIZKdFMxIWm8kHOZ1r0IpqbLqjoT1yWXTr3rBMZZ8nqDPq9aKyj7VpmkGvIRCaDX/R/HJPIz15DwQgPitLvfMrCR7qxyAsB9Trog1+yUli5uQrVNAkeULgTfGiX6ilm0hyscJcx+lNhuBeeBTDNbqkdDdrYXE2+jQGFMRpnVqv3mOpMkCyOQ+gYR/w6OmjdTXTRYF94vpew37WhqNZe7v5e475GJLDTF9WyvU0kMuB5DvW5NS8k59SkcBmd5D7BKYYG6uxLEwKw7yJWd3Uk+6KjD/vDjoXJiwGsQZ0v722K7AvoVC4HiGuBF8cdOFU8f9h9ZZlcjus4HmjU54NsSpnnGO4m999P5R6wY1ovwNgKr4Ux08DjYbWDDupRM2
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(366004)(396003)(39860400002)(136003)(376002)(230922051799003)(186009)(451199024)(64100799003)(1800799012)(83380400001)(9686003)(7416002)(26005)(122000001)(38100700002)(8676002)(8936002)(4326008)(52536014)(110136005)(316002)(2906002)(71200400001)(5660300002)(41300700001)(64756008)(6506007)(7696005)(66556008)(76116006)(66446008)(66476007)(66946007)(38070700009)(54906003)(478600001)(33656002)(86362001)(55016003)(82960400001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?GmfbtgPxjAbwU24/NfrvrhjiwgGpMgZHrRfMWpnGNcEgVSPduSVY1pyLMp2s?=
- =?us-ascii?Q?OjJa8QGvWItb9MIO38MZbHgL479gTFUJTcyig8Hd/ZtKMudMnsvBGm6YOW5l?=
- =?us-ascii?Q?Ds4wZNQeyzr4syvIm6y/DVvkx3ifDHYbOTI0d1EtEgm3+9no2TV/rPWGplvX?=
- =?us-ascii?Q?gjnK9NEZ2Mucxe6J2E4QKwPcweWIRU1+7KRNTaKaPe8QW+Z38ZqougPEdHfw?=
- =?us-ascii?Q?QGgIH/upFiMApVc/zJTNTi9XFi1Wf/BOOi9i/8K9ll5kEgUA8lzneFOrlXeN?=
- =?us-ascii?Q?OwCUnOtXyZciydcqaj9aSK7GYazc1q8Q2dvRRmk9iktkXfKXYEsighwVLO8Y?=
- =?us-ascii?Q?VIkySE8YQqZYvpB/R6ogpip0gN2y4heYgNqD42vY06/wMF/UjFS1W9xFuU1N?=
- =?us-ascii?Q?3UJrBmuEeledXgk10VHrEUq9yHL3NZdJemPveuyJtwIbpQZgXDccHw3mXK4s?=
- =?us-ascii?Q?2+YK+zkEP0q8vRCzfKHOmEm0FfJ3jd638qL7t0JsVahPyOTOiihdaJFSFDhd?=
- =?us-ascii?Q?LeUBUmfmVtkpgTOfco3wbbgmxtqmuhpRyjk79Z/jhqLfz0LVn0b/yyQQFi65?=
- =?us-ascii?Q?OcopqPBG/JYt2kOL7O6uqTg/yT30N16uRQmejv0EEUVT/0VKhIVpOlGGv9wq?=
- =?us-ascii?Q?E+z86/8UeDMCYA3z3HvgYd5qtB4QXL7S16Q0+057LRcaYVsWY/S3fO2RtlVm?=
- =?us-ascii?Q?5PsdH992dQVAwJWlwkSIodGsvabcN657fxYap+011qD4AzgBUNY4iLPARFP5?=
- =?us-ascii?Q?ZhNPz4615kvUdRK7EgIv5W5LaFpgHZh57qSnRpQZlstreeBFJ2tNKuV85ZvA?=
- =?us-ascii?Q?mGoOu7c6xEDnD49kGc7ja5sY84UTxW4zzkBGLf6tiW24Ih6F3IXPAj8RbBBp?=
- =?us-ascii?Q?FokTnoe7XU7GNfX9ZT5awnFve2c5c3Gdvzr7+2RGyGnVZiRSqqe+4lK4G4ZC?=
- =?us-ascii?Q?aUYYAtMstt5pw0O4yheIn6+Kau7ihX9PUXdixqQ3yDLpAZcA0VdeFYXMqu3I?=
- =?us-ascii?Q?Gzt0uJABkyc1/x+gA0lxNHLTnKY1DNiTAhONckWXDy0yej/8j1dODWw+WMxX?=
- =?us-ascii?Q?YEDXZySlIrFnXiQ74v9Wnyo5SShxAsZIOLgQvIGYD0yam9XpGOmASLnNeuUC?=
- =?us-ascii?Q?Y8a0dulBvKO5jhuYv8AMNpzRo7TbyW4nGZV5KdvJDr/VzyCTR0/711SQTayj?=
- =?us-ascii?Q?8jL0vUoNWtpqw3ndg3d/nnb15bsUvN/Bld8hEhCmIDnjIKLkc/Aiyq5uAfg7?=
- =?us-ascii?Q?rvD0Lq+xzVXpxusPPH3+VfV/iehRPLi4w6SksuAH9Z9AaE/Dtz0tJZUMBn3O?=
- =?us-ascii?Q?w920EhIYuSplQlFHiq+fL/v8OxjNws5TTXYC+nwBOnNnfwzY44i49fMyyUD5?=
- =?us-ascii?Q?A67ClM9kudI4piFSLGk5zvrIFjWmJfSWEMXF4wzwrqzaIXCZk6FKoSNKcUWT?=
- =?us-ascii?Q?tnIVGz5q/cbxX8oes8l3g3sAz+ck2Wmfn2i0IrDHAiPoRlixketGrKmS6O2x?=
- =?us-ascii?Q?k9v0ok3w8osFxvC64KjdLdpkYE4ias86BQT+bhCjjDMSeBU0csgrD65+2euy?=
- =?us-ascii?Q?yHMHweR4YRkuKpU4lE8AW7xgL+/m0tJumLd3KFg2?=
-Content-Type: text/plain; charset="us-ascii"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AAD812E49
+	for <kvm@vger.kernel.org>; Fri, 15 Dec 2023 08:23:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 97B5BC433C9
+	for <kvm@vger.kernel.org>; Fri, 15 Dec 2023 08:23:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702628626;
+	bh=GQkn1lqrVgef3txUYcoRewUO00x6r5u1ulH+JweLScw=;
+	h=From:To:Subject:Date:From;
+	b=cZu8S8owXQF/mi2SWxQHryoeDwtzXWwri+TVwfMZh2Iaw8Br9v8AjhAIbftTQsc2F
+	 2bseMByPaRbdoN2ft5ybki3Sw5XCSHvlcIsjQQKw+zIigXHH+e5bDvpqyubXqfL2Ok
+	 /jRSX0U2Ae7SykcCB4v7LgyCKFr9Kyr/25zu+M30rdw3cN602Gw4xTAvrpQKPJpOji
+	 wHJy6/B0jZEmvjIwZcA+TLXAVxPI5GMkxOxlo4tj5iup+1I86L70YSdLXC+8noXu28
+	 3rswo1iSZQcQlOL0ek7vOToFVuf4aWswe3EdHSF4Q4HUwSLuCWB1KwvMF2vqDAVLe4
+	 IkRSRVY0wWnHw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 8453CC53BD1; Fri, 15 Dec 2023 08:23:46 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: kvm@vger.kernel.org
+Subject: [Bug 218267] New: [Sapphire Rapids][Upstream]Boot up multiple
+ Windows VMs hang
+Date: Fri, 15 Dec 2023 08:23:46 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: qiangx.guo@intel.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
+ op_sys bug_status bug_severity priority component assigned_to reporter
+ cf_regression attachments.created
+Message-ID: <bug-218267-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6f6d0069-bfe5-40a2-fddd-08dbfd3665cc
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Dec 2023 06:23:48.0863
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: TndMqFFhsNlhIKESW7vlHF4aPWymh9wqYDKsSBhPjnzQSToSCvB/ppYLArIJOgQ7S1qExyjWerDO3Xdl8BYzcg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5610
-X-OriginatorOrg: intel.com
 
-> From: Zhao, Yan Y <yan.y.zhao@intel.com>
-> Sent: Thursday, December 14, 2023 6:35 PM
->=20
-> - For host non-MMIO pages,
->   * virtio guest frontend and host backend driver should be synced to use
->     the same memory type to map a buffer. Otherwise, there will be
->     potential problem for incorrect memory data. But this will only impac=
-t
->     the buggy guest alone.
->   * for live migration,
->     as QEMU will read all guest memory during live migration, page aliasi=
-ng
->     could happen.
->     Current thinking is to disable live migration if a virtio device has
->     indicated its noncoherent state.
->     As a follow-up, we can discuss other solutions. e.g.
->     (a) switching back to coherent path before starting live migration.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D218267
 
-both guest/host switching to coherent or host-only?
+            Bug ID: 218267
+           Summary: [Sapphire Rapids][Upstream]Boot up multiple Windows
+                    VMs hang
+           Product: Virtualization
+           Version: unspecified
+          Hardware: Intel
+                OS: Linux
+            Status: NEW
+          Severity: high
+          Priority: P3
+         Component: kvm
+          Assignee: virtualization_kvm@kernel-bugs.osdl.org
+          Reporter: qiangx.guo@intel.com
+        Regression: No
 
-host-only certainly is problematic if guest is still using non-coherent.
+Created attachment 305601
+  --> https://bugzilla.kernel.org/attachment.cgi?id=3D305601&action=3Dedit
+Boot up 8 Windows VM script
 
-on the other hand I'm not sure whether the host/guest gfx stack is
-capable of switching between coherent and non-coherent path in-fly
-when the buffer is right being rendered.
+System Environment
+=3D=3D=3D=3D=3D=3D=3D
 
->     (b) read/write of guest memory with clflush during live migration.
+Platform: Sapphire Rapids Platform
 
-write is irrelevant as it's only done in the resume path where the
-guest is not running.
+Host OS: CentOS Stream 9
 
->=20
-> Implementation Consideration
-> =3D=3D=3D
-> There is a previous series [1] from google to serve the same purpose to
-> let KVM be aware of virtio GPU's noncoherent DMA status. That series
-> requires a new memslot flag, and special memslots in user space.
->=20
-> We don't choose to use memslot flag to request honoring guest memory
-> type.
+Kernel:6.7.0-rc1 (commit:8ed26ab8d59111c2f7b86d200d1eb97d2a458fd1)
+Qemu: QEMU emulator version 8.1.94 (v8.2.0-rc4)
+(commit:039afc5ef7367fbc8fb475580c291c2655e856cb)
 
-memslot flag has the potential to restrict the impact e.g. when using
-clflush-before-read in migration? Of course the implication is to
-honor guest type only for the selected slot in KVM instead of applying
-to the entire guest memory as in previous series (which selects this
-way because vmx_get_mt_mask() is in perf-critical path hence not
-good to check memslot flag?)
+Host Kernel cmdline:BOOT_IMAGE=3D/kvm-vmlinuz root=3D/dev/mapper/cs_spr--2s=
+2-root
+ro crashkernel=3Dauto console=3Dtty0 console=3DttyS0,115200,8n1 3 intel_iom=
+mu=3Don
+disable_mtrr_cleanup
 
-> Instead we hope to make the honoring request to be explicit (not tied to =
-a
-> memslot flag). This is because once guest memory type is honored, not onl=
-y
-> memory used by guest virtio device, but all guest memory is facing page
-> aliasing issue potentially. KVM needs a generic solution to take care of
-> page aliasing issue rather than counting on memory type of a special
-> memslot being aligned in host and guest.
-> (we can discuss what a generic solution to handle page aliasing issue wil=
-l
-> look like in later follow-up series).
->=20
-> On the other hand, we choose to introduce a KVM virtio device rather than
-> just provide an ioctl to wrap kvm_arch_[un]register_noncoherent_dma()
-> directly, which is based on considerations that
+Bug detailed description
+=3D=3D=3D=3D=3D=3D=3D
+We boot up 8 Windows VMs (total vCPUs > pCPUs) in host, random run applicat=
+ion
+on each VM such as WPS editing etc, and wait for a moment, then Some of the
+Windows Guest hang and console reports "KVM internal error. Suberror: 3".
 
-I wonder it's over-engineered for the purpose.
+Tips:We add "-cpu
+host,host-cache-info=3Don,migratable=3Don,hv-time=3Don,hv-relaxed=3Don,hv-v=
+apic=3Don,hv-spinlocks=3D0x1fff"
+in qemu parameters and boot up VMs.Some of VMs easy to hang.
 
-why not just introducing a KVM_CAP and allowing the VMM to enable?
-KVM doesn't need to know the exact source of requiring it...
+
+Reproduce Steps
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+1.Boot up 8 Windows VMs in Host:
+
+for ((i=3D1;i<=3D8;i++));do
+qemu-img create -b /home/guoqiang/win2k16_vdi_local.qcow2 -F qcow2 -f qcow2
+/home/guoqiang/win2016$i.qcow2
+
+sleep 1
+
+qemu-system-x86_64 -accel kvm -cpu
+host,host-cache-info=3Don,migratable=3Don,hv-time=3Don,hv-relaxed=3Don,hv-v=
+apic=3Don,hv-spinlocks=3D0x1fff
+-smp 30 -drive file=3D/home/guoqiang/win2016$i.qcow2,if=3Dnone,id=3Dvirtio-=
+disk0
+-device virtio-blk-pci,drive=3Dvirtio-disk0,bootindex=3D0 -m 4096 -daemoniz=
+e -vnc
+:$i -device virtio-net-pci,netdev=3Dnic0 -netdev
+tap,id=3Dnic0,br=3Dvirbr0,helper=3D/usr/local/libexec/qemu-bridge-helper,vh=
+ost=3Don
+
+sleep 5
+
+done
+
+2.Wait a monent and VMs hang.
+
+Host error log:
+KVM internal error. Suberror: 3
+
+extra data[0]: 0x000000008000002f
+
+extra data[1]: 0x0000000000000020
+
+extra data[2]: 0x0000000000000d83
+
+extra data[3]: 0x0000000000000038
+
+RAX=3D0000000000000000 RBX=3D0000000000000000 RCX=3D0000000040000070
+RDX=3D0000000000000000
+
+RSI=3D0000000000000000 RDI=3Dffffc58dcf552010 RBP=3Dfffff801ed48e100
+RSP=3Dfffff801ed48e060
+
+R8 =3D00000000ffffffff R9 =3D0000000000000000 R10=3D00000000ffffffff
+R11=3D0000000000000000
+
+R12=3D000000133fd128fc R13=3D0000000000000046 R14=3D0000000000000000
+R15=3D0000000000000000
+
+RIP=3Dfffff801eb94fd7c RFL=3D00000046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SMM=
+=3D0 HLT=3D0
+
+ES =3D002b 0000000000000000 ffffffff 00c0f300 DPL=3D3 DS [-WA]
+
+CS =3D0010 0000000000000000 00000000 00209b00 DPL=3D0 CS64 [-RA]
+
+SS =3D0018 0000000000000000 ffffffff 00c09300 DPL=3D0 DS [-WA]
+
+DS =3D002b 0000000000000000 ffffffff 00c0f300 DPL=3D3 DS [-WA]
+
+FS =3D0053 000000000059b000 00003c00 0040f300 DPL=3D3 DS [-WA]
+
+GS =3D002b fffff801ebb3f000 ffffffff 00c0f300 DPL=3D3 DS [-WA]
+
+LDT=3D0000 0000000000000000 ffffffff 00c00000
+
+TR =3D0040 fffff801ed486070 00000067 00008b00 DPL=3D0 TSS64-busy
+
+GDT=3D fffff801ed485000 0000006f
+
+IDT=3D fffff801ed485070 00000fff
+
+CR0=3D80050031 CR2=3D0000000000000030 CR3=3D00000000001aa000 CR4=3D001506f8
+
+DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000
+DR3=3D0000000000000000
+
+DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
+
+EFER=3D0000000000000d01
+
+Code=3D25 88 61 00 00 b9 70 00 00 40 0f ba 32 00 72 06 33 c0 8b d0 <0f> 30 =
+5a 58
+59 c3 cc cc cc cc cc cc 0f 1f 84 00 00 00 00 00 48 81 ec 38 01 00 00 48 8d =
+84
+
+KVM internal error. Suberror: 3
+
+extra data[0]: 0x000000008000002f
+
+extra data[1]: 0x0000000000000020
+
+extra data[2]: 0x0000000000000d81
+
+extra data[3]: 0x00000000000000a2
+
+RAX=3D0000000000000000 RBX=3D0000000000000000 RCX=3D0000000040000070
+RDX=3D0000000000000000
+
+RSI=3D0000000000000000 RDI=3Dffffdf86659d07b0 RBP=3Dffff96806225b100
+RSP=3Dffff96806225b060
+
+R8 =3D00000000ffffffff R9 =3D0000000000000000 R10=3D00000000ffffffff
+R11=3D0000000000000000
+
+R12=3D00000013e153ce49 R13=3D0000000000000046 R14=3D0000000000000000
+R15=3D0000000000000000
+
+RIP=3Dfffff8001f1ddd7c RFL=3D00000046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SMM=
+=3D0 HLT=3D0
+
+ES =3D002b 0000000000000000 ffffffff 00c0f300 DPL=3D3 DS [-WA]
+
+CS =3D0010 0000000000000000 00000000 00209b00 DPL=3D0 CS64 [-RA]
+
+SS =3D0018 0000000000000000 ffffffff 00c09300 DPL=3D0 DS [-WA]
+
+DS =3D002b 0000000000000000 ffffffff 00c0f300 DPL=3D3 DS [-WA]
+
+FS =3D0053 0000000000604000 00007c00 0040f300 DPL=3D3 DS [-WA]
+
+GS =3D002b ffff968062230000 ffffffff 00c0f300 DPL=3D3 DS [-WA]
+
+LDT=3D0000 0000000000000000 ffffffff 00c00000
+
+TR =3D0040 ffff968062236ac0 00000067 00008b00 DPL=3D0 TSS64-busy
+
+GDT=3D ffff96806223db80 0000006f
+
+IDT=3D ffff96806223dbf0 00000fff
+
+CR0=3D80050031 CR2=3D0000000000000030 CR3=3D00000000001aa000 CR4=3D001506f8
+
+DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000
+DR3=3D0000000000000000
+
+DR6=3D00000000fffe07f0 DR7=3D0000000000000400
+
+EFER=3D0000000000000d01
+
+Code=3D25 88 61 00 00 b9 70 00 00 40 0f ba 32 00 72 06 33 c0 8b d0 <0f> 30 =
+5a 58
+59 c3 cc cc cc cc cc cc 0f 1f 84 00 00 00 00 00 48 81 ec 38 01 00 00 48 8d =
+84
+
+KVM internal error. Suberror: 3
+
+extra data[0]: 0x000000008000002f
+
+extra data[1]: 0x0000000000000020
+
+extra data[2]: 0x0000000000000f82
+
+extra data[3]: 0x000000000000004b
+
+KVM internal error. Suberror: 3
+
+extra data[0]: 0x000000008000002f
+
+extra data[1]: 0x0000000000000020
+
+extra data[2]: 0x0000000000000f82
+
+extra data[3]: 0x000000000000004b
+
+RAX=3D0000000000000000 RBX=3D0000000000000000 RCX=3D0000000040000070
+RDX=3D0000000000000000
+
+RSI=3D0000000000000000 RDI=3Dffffe7885a932010 RBP=3Dfffff802a5a8e100
+RSP=3Dfffff802a5a8e060
+
+R8 =3D00000000ffffffff R9 =3D0000000000000000 R10=3D00000000ffffffff
+R11=3D0000000000000000
+
+R12=3D000000144b0a7258 R13=3D0000000000000046 R14=3D0000000000000000
+R15=3D0000000000000000
+
+RIP=3Dfffff802a3f60d7c RFL=3D00000046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SMM=
+=3D0 HLT=3D0
+
+ES =3D002b 0000000000000000 ffffffff 00c0f300 DPL=3D3 DS [-WA]
+
+CS =3D0010 0000000000000000 00000000 00209b00 DPL=3D0 CS64 [-RA]
+
+SS =3D0018 0000000000000000 00000000 00409300 DPL=3D0 DS [-WA]
+
+DS =3D002b 0000000000000000 ffffffff 00c0f300 DPL=3D3 DS [-WA]
+
+FS =3D0053 0000000013b70000 00003c00 0040f300 DPL=3D3 DS [-WA]
+
+GS =3D002b fffff802a4150000 ffffffff 00c0f300 DPL=3D3 DS [-WA]
+
+LDT=3D0000 0000000000000000 ffffffff 00c00000
+
+TR =3D0040 fffff802a5a86070 00000067 00008b00 DPL=3D0 TSS64-busy
+
+GDT=3D fffff802a5a85000 0000006f
+
+IDT=3D fffff802a5a85070 00000fff
+
+CR0=3D80050031 CR2=3D0000000000000030 CR3=3D00000000001aa000 CR4=3D001506f8
+
+DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000
+DR3=3D0000000000000000
+
+DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
+
+EFER=3D0000000000000d01
+
+Code=3D25 88 61 00 00 b9 70 00 00 40 0f ba 32 00 72 06 33 c0 8b d0 <0f> 30 =
+5a 58
+59 c3 cc cc cc cc cc cc 0f 1f 84 00 00 00 00 00 48 81 ec 38 01 00 00 48 8d =
+84
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
 
