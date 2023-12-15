@@ -1,114 +1,188 @@
-Return-Path: <kvm+bounces-4582-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4583-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BA4C814E8B
-	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 18:26:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3D8C814EC3
+	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 18:30:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17DFB286DEA
-	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 17:26:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 98FDC1F25971
+	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 17:30:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 685A382EEF;
-	Fri, 15 Dec 2023 17:14:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D794D34CDC;
+	Fri, 15 Dec 2023 17:26:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="p8psqBNw"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="IKn9mPIl";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="+kWi05ef"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06EAF82EEC
-	for <kvm@vger.kernel.org>; Fri, 15 Dec 2023 17:14:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-5c664652339so588878a12.1
-        for <kvm@vger.kernel.org>; Fri, 15 Dec 2023 09:14:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1702660454; x=1703265254; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=yLtSsXKTCLILvMN16fQqKt8fNEBsG0IfzY2SlDwuhSk=;
-        b=p8psqBNwycEnNShr2A3EEQubP36erNhBxH8ZiniHyPeDmmKSdWyU05v+wEh/pBVABD
-         MPhx+M08UwgW4u1dQOPTUboArBILONOeXAY2TvJoGmY1wm6febN/X2P1yebkMQZ16glk
-         gC9dkX2Lu7TxKVRQWtAGbZSTVotwLWdtQRNisHbmcDzNmqTfYUsDk6o9IlYHaR/5ZBqK
-         2XbckzJEJY0sb5xlnil5CEdWi4z/aVCGLqhSoHAwtpNeUhxQQSrBj/cHf87XTPW1Ugpg
-         H3EdEPUIkSqSQYrUURsQVRes+bLICVAg3U3FgJ7FVeVlhhOLYXciRJxKB7DwBLgzT/kt
-         3Gow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702660454; x=1703265254;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=yLtSsXKTCLILvMN16fQqKt8fNEBsG0IfzY2SlDwuhSk=;
-        b=lku3ngpPkknqvQl5LfPMg1gdU+Hk73Pf6M/zomF9TEOv0lHy8qJcbodI7gKpVPe+3B
-         S2lhqaelNbzcMDiMWGuJIzrfciXbhkJIJoMTv2cvHvzKdNGB5krjgAwhpBB6CsvWVb7a
-         gLxaPHOJk70xyROLsRfCAn0kR4Sk2hOHM3MZ0Q6lDFEd48JO2z2ya8CTOB7T8ux7/q/B
-         kw3RQvaEpai5P86P8krMUQLxRRJ6U80xguF+8BVo4qE7M5aETJ7PGzfEp1cT1XAwIvSS
-         BcIf1NKC+UhgRBAIxqoqPq4BsojjzE78vlD+tqDOEyuEuI3gn1wB8t85X3lL8kf9Ikf7
-         Q0Wg==
-X-Gm-Message-State: AOJu0YzJ0D6/jk4KX788g4cUFffTpMj/yn9/K9pWfsKPBY8HpRuAyONH
-	a9s61VdYXSRkuZ1K3xmrjvk5f1hBYb+0zxWvpE74WQ==
-X-Google-Smtp-Source: AGHT+IEbyKgx6IyVo+O/thicE6ukN038O+ZCGBqab4jLVgs86diNRbcckBMXey0NIT1euua6+wlRDimBw0fjAcalrPk=
-X-Received: by 2002:a05:6a21:8026:b0:18f:97c:825c with SMTP id
- ou38-20020a056a21802600b0018f097c825cmr6008551pzb.102.1702660454232; Fri, 15
- Dec 2023 09:14:14 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71DCE30103;
+	Fri, 15 Dec 2023 17:26:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1702661212;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VYZRdTrUfLSjIbMuwr8q2hB5IoUOm77UOIngwqn7iJU=;
+	b=IKn9mPIlQGHLdLYlt72NR+6gXNAd57/ptU/wmG/+bXyc75gESDFrSFuhOKC+Fd3eSrWNco
+	/mkGCExYeIF5nNf8Acaqio4f5rKehxBjL9KjOZSH2PSru2oCd/58B0jnkppKR64LFFLiFd
+	wxSczyy8IQqz4cHwp2NcbTfegKR2uCzQgqM2ene3gCxZ0PmTNOozw0YEMJORi7XC5lF6tF
+	b3t0OGE29QZSq+RNJXVceX0vOZAp/Vw1jFqLIRGq7ty8G06cYVs4jhiNSeVxQ9+g1f/PjS
+	V6e9iQYPQthSHBGOMC2OzRmP108pPenk6X4RoHbi2mYjSaAsAc1SzBJqltqqZw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1702661212;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VYZRdTrUfLSjIbMuwr8q2hB5IoUOm77UOIngwqn7iJU=;
+	b=+kWi05ef+R91pM1ddNPnVDIOyZmI5bJhC1nemoVwP66Q+Y3daQdLyWxmXjB1BpSmsvh97o
+	t1lywhsYkDEFZLBQ==
+To: "Vineeth Pillai (Google)" <vineeth@bitbyteword.org>, Ben Segall
+ <bsegall@google.com>, Borislav Petkov <bp@alien8.de>, Daniel Bristot de
+ Oliveira <bristot@redhat.com>, Dave Hansen <dave.hansen@linux.intel.com>,
+ Dietmar Eggemann <dietmar.eggemann@arm.com>, "H . Peter Anvin"
+ <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, Juri Lelli
+ <juri.lelli@redhat.com>, Mel Gorman <mgorman@suse.de>, Paolo Bonzini
+ <pbonzini@redhat.com>, Andy Lutomirski <luto@kernel.org>, Peter Zijlstra
+ <peterz@infradead.org>, Sean Christopherson <seanjc@google.com>, Steven
+ Rostedt <rostedt@goodmis.org>, Valentin Schneider <vschneid@redhat.com>,
+ Vincent Guittot <vincent.guittot@linaro.org>, Vitaly Kuznetsov
+ <vkuznets@redhat.com>, Wanpeng Li <wanpengli@tencent.com>
+Cc: "Vineeth Pillai (Google)" <vineeth@bitbyteword.org>, Suleiman Souhlal
+ <suleiman@google.com>, Masami Hiramatsu <mhiramat@google.com>,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org, Joel
+ Fernandes <joel@joelfernandes.org>
+Subject: Re: [RFC PATCH 8/8] irq: boost/unboost in irq/nmi entry/exit and
+ softirq
+In-Reply-To: <20231214024727.3503870-9-vineeth@bitbyteword.org>
+References: <20231214024727.3503870-1-vineeth@bitbyteword.org>
+ <20231214024727.3503870-9-vineeth@bitbyteword.org>
+Date: Fri, 15 Dec 2023 18:26:51 +0100
+Message-ID: <87zfybml5w.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Anup Patel <anup@brainfault.org>
-Date: Fri, 15 Dec 2023 22:44:02 +0530
-Message-ID: <CAAhSdy3Rc+vub65qJ4JNngp5qTgm7YpsJCHZy+ff0=TN_ir03g@mail.gmail.com>
-Subject: [GIT PULL] KVM/riscv fixes for 6.7, take #1
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Palmer Dabbelt <palmer@dabbelt.com>, Palmer Dabbelt <palmer@rivosinc.com>, 
-	Atish Patra <atishp@atishpatra.org>, Atish Patra <atishp@rivosinc.com>, 
-	Andrew Jones <ajones@ventanamicro.com>, 
-	"open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" <kvm-riscv@lists.infradead.org>, KVM General <kvm@vger.kernel.org>, 
-	linux-riscv <linux-riscv@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 
-Hi Paolo,
+On Wed, Dec 13 2023 at 21:47, Vineeth Pillai (Google) wrote:
+> The host proactively boosts the VCPU threads during irq/nmi injection.
+> However, the host is unaware of posted interrupts, and therefore, the
+> guest should request a boost if it has not already been boosted.
+>
+> Similarly, guest should request an unboost on irq/nmi/softirq exit if
+> the vcpu doesn't need the boost any more.
 
-We have two fixes for 6.7. Out of these, one fix is related to
-race condition in updating IMSIC swfile and second fix is
-for default prints in get-reg-list sefltest.
+That's giving a hint but no context for someone who is not familiar with
+the problem which is tried to be solved here.
 
-Please pull.
+> @@ -327,6 +327,13 @@ noinstr irqentry_state_t irqentry_enter(struct pt_regs *regs)
+>  		.exit_rcu = false,
+>  	};
+>  
+> +#ifdef CONFIG_PARAVIRT_SCHED
+> +	instrumentation_begin();
 
-Regards,
-Anup
+Slapping instrumentation_begin() at it silences the objtool checker, but
+that does not make it correct in any way.
 
-The following changes since commit a39b6ac3781d46ba18193c9dbb2110f31e9bffe9:
+You _cannot_ call random code _before_ the kernel has established
+context. It's clearly documented:
 
-  Linux 6.7-rc5 (2023-12-10 14:33:40 -0800)
+  https://www.kernel.org/doc/html/latest/core-api/entry.html
 
-are available in the Git repository at:
+No?
 
-  https://github.com/kvm-riscv/linux.git tags/kvm-riscv-fixes-6.7-1
+> +	if (pv_sched_enabled())
+> +		pv_sched_boost_vcpu_lazy();
+> +	instrumentation_end();
+> +#endif
+> +
+>  	if (user_mode(regs)) {
+>  		irqentry_enter_from_user_mode(regs);
+>  		return ret;
+> @@ -452,6 +459,18 @@ noinstr void irqentry_exit(struct pt_regs *regs, irqentry_state_t state)
+>  		if (state.exit_rcu)
+>  			ct_irq_exit();
+>  	}
+> +
+> +#ifdef CONFIG_PARAVIRT_SCHED
+> +	instrumentation_begin();
 
-for you to fetch changes up to 4ad9843e1ea088bd2529290234c6c4c6374836a7:
+Broken too
 
-  RISCV: KVM: update external interrupt atomically for IMSIC swfile
-(2023-12-13 11:59:52 +0530)
+> +	/*
+> +	 * On irq exit, request a deboost from hypervisor if no softirq pending
+> +	 * and current task is not RT and !need_resched.
+> +	 */
+> +	if (pv_sched_enabled() && !local_softirq_pending() &&
+> +			!need_resched() && !task_is_realtime(current))
+> +		pv_sched_unboost_vcpu();
+> +	instrumentation_end();
+> +#endif
+>  }
+>  
+>  irqentry_state_t noinstr irqentry_nmi_enter(struct pt_regs *regs)
+> @@ -469,6 +488,11 @@ irqentry_state_t noinstr irqentry_nmi_enter(struct pt_regs *regs)
+>  	kmsan_unpoison_entry_regs(regs);
+>  	trace_hardirqs_off_finish();
+>  	ftrace_nmi_enter();
+> +
+> +#ifdef CONFIG_PARAVIRT_SCHED
+> +	if (pv_sched_enabled())
+> +		pv_sched_boost_vcpu_lazy();
+> +#endif
+>  	instrumentation_end();
+>  
+>  	return irq_state;
+> @@ -482,6 +506,12 @@ void noinstr irqentry_nmi_exit(struct pt_regs *regs, irqentry_state_t irq_state)
+>  		trace_hardirqs_on_prepare();
+>  		lockdep_hardirqs_on_prepare();
+>  	}
+> +
+> +#ifdef CONFIG_PARAVIRT_SCHED
+> +	if (pv_sched_enabled() && !in_hardirq() && !local_softirq_pending() &&
+> +			!need_resched() && !task_is_realtime(current))
+> +		pv_sched_unboost_vcpu();
+> +#endif
 
-----------------------------------------------------------------
-KVM/riscv fixes for 6.7, take #1
+Symmetry is overrated. Just pick a spot and slap your hackery in.
 
-- Fix a race condition in updating external interrupt for
-  trap-n-emulated IMSIC swfile
-- Fix print_reg defaults in get-reg-list selftest
+Aside of that this whole #ifdeffery is tasteless at best.
 
-----------------------------------------------------------------
-Andrew Jones (1):
-      KVM: riscv: selftests: Fix get-reg-list print_reg defaults
+>  	instrumentation_end();
 
-Yong-Xuan Wang (1):
-      RISCV: KVM: update external interrupt atomically for IMSIC swfile
+> +#ifdef CONFIG_PARAVIRT_SCHED
+> +	if (pv_sched_enabled())
+> +		pv_sched_boost_vcpu_lazy();
+> +#endif
 
- arch/riscv/kvm/aia_imsic.c                       | 13 +++++++++++++
- tools/testing/selftests/kvm/riscv/get-reg-list.c | 10 ++++++----
- 2 files changed, 19 insertions(+), 4 deletions(-)
+But what's worse is that this is just another approach of sprinkling
+random hints all over the place and see what sticks.
+
+Abusing KVM as the man in the middle to communicate between guest and
+host scheduler is creative, but ill defined.
+
+From the host scheduler POV the vCPU is just a user space thread and
+making the guest special is just the wrong approach.
+
+The kernel has no proper general interface to convey information from a
+user space task to the scheduler.
+
+So instead of adding some ad-hoc KVM hackery the right thing is to solve
+this problem from ground up in a generic way and KVM can just utilize
+that instead of having the special snow-flake hackery which is just a
+maintainability nightmare.
+
+Thanks,
+
+        tglx
 
