@@ -1,152 +1,114 @@
-Return-Path: <kvm+bounces-4581-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4582-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BC98814DC5
-	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 18:02:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BA4C814E8B
+	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 18:26:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC23D285ED1
-	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 17:02:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17DFB286DEA
+	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 17:26:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1B5D3EA9A;
-	Fri, 15 Dec 2023 17:02:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 685A382EEF;
+	Fri, 15 Dec 2023 17:14:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="PQkTfPy1"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="p8psqBNw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E9C93FB28;
-	Fri, 15 Dec 2023 17:02:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BFGwALZ020777;
-	Fri, 15 Dec 2023 17:02:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=B2YPCL9awtaXdHC9oWXUXcPCAxjjCJr0Vn0rYyQXOJo=;
- b=PQkTfPy19H+mSenEhnpAiTSvzh99ikxC/N8xceArJNxfudZcsbS0iOFt+hC3Kj8ja6T8
- UPTff1wKw+WBjX3WrJhILb3ZQ14r22XUASmkpKxeUEQsYdVMco2e6feitgRiI+kTQIZZ
- B8djZ5swFOcvuTSZFpj3MMJQDkE1ClPmW/fmCAhkm7pO/x/xjyys/Zh0zHmMH+HLc+CX
- /SCEsUAPPyX3MBoZYp0tUJOxo7e2lpW+SyN+vnlQ1oow7pFzKfzV7As2MYeNy76kpKjG
- 7jJFh/woJavBz8s9wXz23TkFkX4pRSiLGsIIbFnsnyoDE7l6JbVMDcLZuX44bwbZlFAY gw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v0tft8qpg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 15 Dec 2023 17:02:13 +0000
-Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BFGjUjK006288;
-	Fri, 15 Dec 2023 17:02:12 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v0tft8qnu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 15 Dec 2023 17:02:12 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3BFFXtGX013937;
-	Fri, 15 Dec 2023 17:02:11 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3uw592rwft-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 15 Dec 2023 17:02:11 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3BFH28GG27853434
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 15 Dec 2023 17:02:08 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8CD1B20043;
-	Fri, 15 Dec 2023 17:02:08 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5FF8A20040;
-	Fri, 15 Dec 2023 17:02:08 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.66])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 15 Dec 2023 17:02:08 +0000 (GMT)
-Date: Fri, 15 Dec 2023 18:02:06 +0100
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Christian Borntraeger
- <borntraeger@linux.ibm.com>,
-        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: s390: selftest: memop: Fix undefined behavior
-Message-ID: <20231215180206.740df738@p-imbrenda>
-In-Reply-To: <20231215161125.943551-1-nsg@linux.ibm.com>
-References: <20231215161125.943551-1-nsg@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06EAF82EEC
+	for <kvm@vger.kernel.org>; Fri, 15 Dec 2023 17:14:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-5c664652339so588878a12.1
+        for <kvm@vger.kernel.org>; Fri, 15 Dec 2023 09:14:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1702660454; x=1703265254; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=yLtSsXKTCLILvMN16fQqKt8fNEBsG0IfzY2SlDwuhSk=;
+        b=p8psqBNwycEnNShr2A3EEQubP36erNhBxH8ZiniHyPeDmmKSdWyU05v+wEh/pBVABD
+         MPhx+M08UwgW4u1dQOPTUboArBILONOeXAY2TvJoGmY1wm6febN/X2P1yebkMQZ16glk
+         gC9dkX2Lu7TxKVRQWtAGbZSTVotwLWdtQRNisHbmcDzNmqTfYUsDk6o9IlYHaR/5ZBqK
+         2XbckzJEJY0sb5xlnil5CEdWi4z/aVCGLqhSoHAwtpNeUhxQQSrBj/cHf87XTPW1Ugpg
+         H3EdEPUIkSqSQYrUURsQVRes+bLICVAg3U3FgJ7FVeVlhhOLYXciRJxKB7DwBLgzT/kt
+         3Gow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702660454; x=1703265254;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=yLtSsXKTCLILvMN16fQqKt8fNEBsG0IfzY2SlDwuhSk=;
+        b=lku3ngpPkknqvQl5LfPMg1gdU+Hk73Pf6M/zomF9TEOv0lHy8qJcbodI7gKpVPe+3B
+         S2lhqaelNbzcMDiMWGuJIzrfciXbhkJIJoMTv2cvHvzKdNGB5krjgAwhpBB6CsvWVb7a
+         gLxaPHOJk70xyROLsRfCAn0kR4Sk2hOHM3MZ0Q6lDFEd48JO2z2ya8CTOB7T8ux7/q/B
+         kw3RQvaEpai5P86P8krMUQLxRRJ6U80xguF+8BVo4qE7M5aETJ7PGzfEp1cT1XAwIvSS
+         BcIf1NKC+UhgRBAIxqoqPq4BsojjzE78vlD+tqDOEyuEuI3gn1wB8t85X3lL8kf9Ikf7
+         Q0Wg==
+X-Gm-Message-State: AOJu0YzJ0D6/jk4KX788g4cUFffTpMj/yn9/K9pWfsKPBY8HpRuAyONH
+	a9s61VdYXSRkuZ1K3xmrjvk5f1hBYb+0zxWvpE74WQ==
+X-Google-Smtp-Source: AGHT+IEbyKgx6IyVo+O/thicE6ukN038O+ZCGBqab4jLVgs86diNRbcckBMXey0NIT1euua6+wlRDimBw0fjAcalrPk=
+X-Received: by 2002:a05:6a21:8026:b0:18f:97c:825c with SMTP id
+ ou38-20020a056a21802600b0018f097c825cmr6008551pzb.102.1702660454232; Fri, 15
+ Dec 2023 09:14:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: p_xIXzpWKEXFMQuEJFyjrgTdOUj5Kojn
-X-Proofpoint-GUID: sAFCq5iOnK_QJcqwHmouXldvP6Q9_rtw
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-15_10,2023-12-14_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- suspectscore=0 adultscore=0 mlxscore=0 mlxlogscore=999 spamscore=0
- malwarescore=0 clxscore=1011 impostorscore=0 phishscore=0 bulkscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2312150118
+From: Anup Patel <anup@brainfault.org>
+Date: Fri, 15 Dec 2023 22:44:02 +0530
+Message-ID: <CAAhSdy3Rc+vub65qJ4JNngp5qTgm7YpsJCHZy+ff0=TN_ir03g@mail.gmail.com>
+Subject: [GIT PULL] KVM/riscv fixes for 6.7, take #1
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>, Palmer Dabbelt <palmer@rivosinc.com>, 
+	Atish Patra <atishp@atishpatra.org>, Atish Patra <atishp@rivosinc.com>, 
+	Andrew Jones <ajones@ventanamicro.com>, 
+	"open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" <kvm-riscv@lists.infradead.org>, KVM General <kvm@vger.kernel.org>, 
+	linux-riscv <linux-riscv@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 15 Dec 2023 17:11:25 +0100
-Nina Schoetterl-Glausch <nsg@linux.ibm.com> wrote:
+Hi Paolo,
 
-> If an integer's type has x bits, shifting the integer left by x or more
-> is undefined behavior.
-> This can happen in the rotate function when attempting to do a rotation
-> of the whole value by 0.
+We have two fixes for 6.7. Out of these, one fix is related to
+race condition in updating IMSIC swfile and second fix is
+for default prints in get-reg-list sefltest.
 
-is 0 the only problematic value? because in that case... 
+Please pull.
 
-> 
-> Fixes: 0dd714bfd200 ("KVM: s390: selftest: memop: Add cmpxchg tests")
-> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-> ---
->  tools/testing/selftests/kvm/s390x/memop.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/s390x/memop.c b/tools/testing/selftests/kvm/s390x/memop.c
-> index bb3ca9a5d731..2eba9575828e 100644
-> --- a/tools/testing/selftests/kvm/s390x/memop.c
-> +++ b/tools/testing/selftests/kvm/s390x/memop.c
-> @@ -485,11 +485,13 @@ static bool popcount_eq(__uint128_t a, __uint128_t b)
->  
->  static __uint128_t rotate(int size, __uint128_t val, int amount)
->  {
-> -	unsigned int bits = size * 8;
-> +	unsigned int left, right, bits = size * 8;
->  
+Regards,
+Anup
 
-...why not just:
+The following changes since commit a39b6ac3781d46ba18193c9dbb2110f31e9bffe9:
 
-if (!amount)
-	return val;
+  Linux 6.7-rc5 (2023-12-10 14:33:40 -0800)
 
-?
+are available in the Git repository at:
 
-> -	amount = (amount + bits) % bits;
-> +	right = (amount + bits) % bits;
-> +	/* % 128 prevents left shift UB if size == 16 && right == 0 */
-> +	left = (bits - right) % 128;
->  	val = cut_to_size(size, val);
-> -	return (val << (bits - amount)) | (val >> amount);
-> +	return (val << left) | (val >> right);
->  }
->  
->  const unsigned int max_block = 16;
-> 
-> base-commit: 305230142ae0637213bf6e04f6d9f10bbcb74af8
+  https://github.com/kvm-riscv/linux.git tags/kvm-riscv-fixes-6.7-1
 
+for you to fetch changes up to 4ad9843e1ea088bd2529290234c6c4c6374836a7:
+
+  RISCV: KVM: update external interrupt atomically for IMSIC swfile
+(2023-12-13 11:59:52 +0530)
+
+----------------------------------------------------------------
+KVM/riscv fixes for 6.7, take #1
+
+- Fix a race condition in updating external interrupt for
+  trap-n-emulated IMSIC swfile
+- Fix print_reg defaults in get-reg-list selftest
+
+----------------------------------------------------------------
+Andrew Jones (1):
+      KVM: riscv: selftests: Fix get-reg-list print_reg defaults
+
+Yong-Xuan Wang (1):
+      RISCV: KVM: update external interrupt atomically for IMSIC swfile
+
+ arch/riscv/kvm/aia_imsic.c                       | 13 +++++++++++++
+ tools/testing/selftests/kvm/riscv/get-reg-list.c | 10 ++++++----
+ 2 files changed, 19 insertions(+), 4 deletions(-)
 
