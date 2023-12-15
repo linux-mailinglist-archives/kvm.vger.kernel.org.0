@@ -1,89 +1,148 @@
-Return-Path: <kvm+bounces-4590-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4591-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F068814FEA
-	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 19:54:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26654815000
+	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 20:10:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 62FFB287379
-	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 18:54:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A4061C209A9
+	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 19:10:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EF4D3FE43;
-	Fri, 15 Dec 2023 18:54:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B34D3FE30;
+	Fri, 15 Dec 2023 19:10:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4YbdG9u3"
+	dkim=pass (2048-bit key) header.d=bitbyteword.org header.i=@bitbyteword.org header.b="sjudvEJG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F1603EA6C
-	for <kvm@vger.kernel.org>; Fri, 15 Dec 2023 18:54:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-33644eeb305so734456f8f.1
-        for <kvm@vger.kernel.org>; Fri, 15 Dec 2023 10:54:35 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C7B73F8FE
+	for <kvm@vger.kernel.org>; Fri, 15 Dec 2023 19:10:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bitbyteword.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bitbyteword.org
+Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-6da45aa5549so713416a34.0
+        for <kvm@vger.kernel.org>; Fri, 15 Dec 2023 11:10:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702666473; x=1703271273; darn=vger.kernel.org;
+        d=bitbyteword.org; s=google; t=1702667418; x=1703272218; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=w0yhlLnli9k0VI7KUFKv0npC9sSJh/Clv7rMd6ohVtI=;
-        b=4YbdG9u3epMfTOFMVMhwXMt0FoVjLUFa9bCv4+lm6wnldAGQiHQtDxmPZID9A8qmAd
-         tQsSV6wpSJEnwg03riJLXi6MAANjvzdRjtrjIifZQKITJfqASbQs/5MCfZfm3lpn44K9
-         uhS6fnkd0uHiKmd2ut6tLLFEjmYbZKbn7a1Cv9jpxyQp8cWBoJOdZvpRxnXAzXS6vxN1
-         MB2OY5pRmFsPrtnPB5XkX5Owb8v0O7UtfZYc+FQ6vsDhTQNiaMWhaexfdqoubGpN8Z+b
-         +Nvs3VD4xHexH+8pa52xNwywcRH2QsBrenqfddh7151JMcLIE2TeI/TK1L5Q7mC1m+2h
-         EFGg==
+        bh=LUQt64cxTRekczJujRwSGMZNUaofXXGwCuQbCkI4cV0=;
+        b=sjudvEJG64A78oWCIDBRX5yRdxPFiilOoyNN2ITLeMpg8zuMt1jw1Z/4QzsmvjAA3e
+         JoRTzEJnvBZtELPW7lGxlS97liB3rOgIJP+jcssttyWS9yVvhkXDHbzi3V+AD4KuAmc3
+         OpBnS/Q2PGvM0MmshLLLlgrNlErB7SFp6AXGghzL6+3J1MIjiTUiA43xqCiufrY0NAiT
+         g7qiWCsD9Qk5dSeFBx2H9kVBN9EyOwREbJp+KPLaINgPJ5Tkm14HS8sVkW7S/8rTxNxk
+         jizt1EjIOTKRHtsrm+jn0uqSP48msvEH4ZHG49Mq+iK4T2I10TdJsYotvuIk9KyRrB3G
+         k75Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702666473; x=1703271273;
+        d=1e100.net; s=20230601; t=1702667418; x=1703272218;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=w0yhlLnli9k0VI7KUFKv0npC9sSJh/Clv7rMd6ohVtI=;
-        b=VTmH3QAxtx3grIebCpy2rIVU6wAp/FzsGLemkCJkSlB0x5KNGPb44PuDY7bNctXw9h
-         IZtxAUxy7zQbA/ZhAudFrqGzj2mYHP7sXamPt3TCUIJKO4hn3eiihAt0HDF4YRDuX35t
-         aO+SQ5yYs2g2KeKWK6RFONjczlLFvj/UMKMHIHFafHvxJO5NifDcosi+Qgf2IrzZxfvX
-         d0rppxIassXWYxfpnP+Zi+Mp//u1j4yQYMNqoBZtR0/49ekK5MQd52aJbhWA4qPVuwp4
-         AN5Vu41bqeJ1GE8SU01SdrXHGVs6wRuzSy0QjWCdO9DSs3frB3QXpHijlb6gg5WIQrPh
-         3DjA==
-X-Gm-Message-State: AOJu0YyXLf6tZLgSutUv+b0RRc1tMlHCS3edATPZkutXOrBKhDQrVyBU
-	VycwRPW/0QYelH1e4l4eVHkA51hQw9FemEeugHJltg==
-X-Google-Smtp-Source: AGHT+IE34lQoNeNuvNXj90juk5IJps9k2aIPV/11nY+vSDykIRdGV6J/LHeJFvNMvCa4uco/LdEhELqecQbu4jjOX+U=
-X-Received: by 2002:adf:ce06:0:b0:336:446d:7cc8 with SMTP id
- p6-20020adfce06000000b00336446d7cc8mr2132480wrn.132.1702666473386; Fri, 15
- Dec 2023 10:54:33 -0800 (PST)
+        bh=LUQt64cxTRekczJujRwSGMZNUaofXXGwCuQbCkI4cV0=;
+        b=tzGyOsP4hWQV3B0kk9OjKbZrWVhqsUQ6zIzl/nFdXNQ4ptEspTCUw+x0+OMYbEpYJd
+         DOZ6Tb0K1xhWuI/463ULUBdvKT7QFDCiPciGuDOao3riqB1DdjOqOhngZZylQLapGF5l
+         SQ7d383xG43zcmrbuTUorALea7uzmEB09aIyqlGad6cDOeYHsUhO0QGC099mY5Q/+5va
+         ++QosokW/AIB2tqXFXe2rseCDF8D1iv1EzmuUtNLH/ZAjBPY86pX0HPLThrQHP4m/G3y
+         F1T5EQPCLOoIjb1xEjUWwuv3IlRasZezbvdRx5cf4+7COYFWi2aAti77UNygHdDCs8rZ
+         3B0Q==
+X-Gm-Message-State: AOJu0YyFLIUEtszY9HrtLloCzmepY/mChP6sIccUPSySur5o2PMhgKe6
+	dflIPQ4AmY+GzT9lKSIT+opDPSZMLkpRMffnDZq2Pg==
+X-Google-Smtp-Source: AGHT+IEggW6PgLUr0D4F6at7LeGq7cNUnBzwvFQmAEXQLpk+KIbEII5GosSI41SopHRLHkeCwP7H1/F/pNrFVx39YsY=
+X-Received: by 2002:a9d:6187:0:b0:6d9:e32e:fb0d with SMTP id
+ g7-20020a9d6187000000b006d9e32efb0dmr11579063otk.20.1702667418223; Fri, 15
+ Dec 2023 11:10:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231214001753.779022-1-seanjc@google.com>
-In-Reply-To: <20231214001753.779022-1-seanjc@google.com>
-From: David Matlack <dmatlack@google.com>
-Date: Fri, 15 Dec 2023 10:54:04 -0800
-Message-ID: <CALzav=eFSoW4fWC4uKh3bm--ekzDriA4=jjq6kA5j+Mp=7n_wA@mail.gmail.com>
-Subject: Re: [ANNOUNCE / RFC] PUCK Future Topics
+References: <20231214024727.3503870-1-vineeth@bitbyteword.org>
+ <ZXsvl7mabUuNkWcY@google.com> <CAO7JXPihjjko6qe8tr6e6UE=L7uSR6AACq1Zwg+7n95s5A-yoQ@mail.gmail.com>
+ <ZXth7hu7jaHbJZnj@google.com> <CAO7JXPhQ3zPzsNeuUphLx7o_+DOfJrmCoyRXXjcQMEzrKnGc9g@mail.gmail.com>
+ <ZXuiM7s7LsT5hL3_@google.com> <CAO7JXPik9eMgef6amjCk5JPeEhg66ghDXowWQESBrd_fAaEsCA@mail.gmail.com>
+ <ZXyFWTSU3KRk7EtQ@google.com> <CAO7JXPgH6Z9X5sWXLa_15VMQ-LU6Zy-tArauRowyDNTDWjwA2g@mail.gmail.com>
+ <ZXyS5Xw2J6TBQeK3@google.com>
+In-Reply-To: <ZXyS5Xw2J6TBQeK3@google.com>
+From: Vineeth Remanan Pillai <vineeth@bitbyteword.org>
+Date: Fri, 15 Dec 2023 14:10:06 -0500
+Message-ID: <CAO7JXPgKXv0D3XZzFwgLuSpta6Nou0HZMLEjSpYUYnv9FUphnw@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/8] Dynamic vcpu priority management in kvm
 To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, James Houghton <jthoughton@google.com>, 
-	Peter Xu <peterx@redhat.com>, Axel Rasmussen <axelrasmussen@google.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, Isaku Yamahata <isaku.yamahata@linux.intel.com>, 
-	Yan Zhao <yan.y.zhao@intel.com>, Marc Zyngier <maz@kernel.org>, 
-	Michael Roth <michael.roth@amd.com>, Aaron Lewis <aaronlewis@google.com>
+Cc: Ben Segall <bsegall@google.com>, Borislav Petkov <bp@alien8.de>, 
+	Daniel Bristot de Oliveira <bristot@redhat.com>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	Dietmar Eggemann <dietmar.eggemann@arm.com>, "H . Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, 
+	Juri Lelli <juri.lelli@redhat.com>, Mel Gorman <mgorman@suse.de>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Andy Lutomirski <luto@kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Thomas Gleixner <tglx@linutronix.de>, Valentin Schneider <vschneid@redhat.com>, 
+	Vincent Guittot <vincent.guittot@linaro.org>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
+	Wanpeng Li <wanpengli@tencent.com>, Suleiman Souhlal <suleiman@google.com>, 
+	Masami Hiramatsu <mhiramat@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	x86@kernel.org, Tejun Heo <tj@kernel.org>, Josh Don <joshdon@google.com>, 
+	Barret Rhoden <brho@google.com>, David Vernet <dvernet@meta.com>, 
+	Joel Fernandes <joel@joelfernandes.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 13, 2023 at 4:18=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
+On Fri, Dec 15, 2023 at 12:54=E2=80=AFPM Sean Christopherson <seanjc@google=
+.com> wrote:
 >
-> 2024.01.03 - Post-copy for guest_memfd()
->     Needs: David M, Paolo, Peter Xu, James, Oliver, Aaron
+> On Fri, Dec 15, 2023, Vineeth Remanan Pillai wrote:
+> > > You are basically proposing that KVM bounce-buffer data between guest=
+ and host.
+> > > I'm saying there's no _technical_ reason to use a bounce-buffer, just=
+ do zero copy.
+> > >
+> > I was also meaning zero copy only. The help required from the kvm side =
+is:
+> > - Pass the address of the shared memory to bpf programs/scheduler once
+> > the guest sets it up.
+> > - Invoke scheduler registered callbacks on events like VMEXIT,
+> > VEMENTRY, interrupt injection etc. Its the job of guest and host
+> > paravirt scheduler to interpret the shared memory contents and take
+> > actions.
+> >
+> > I admit current RFC doesn't strictly implement hooks and callbacks -
+> > it calls sched_setscheduler in place of all callbacks that I mentioned
+> > above. I guess this was your strongest objection.
+>
+> Ya, more or less.
+>
+> > As you mentioned in the reply to Joel, if it is fine for kvm to allow
+> > hooks into events (VMEXIT, VMENTRY, interrupt injection etc) then, it
+> > makes it easier to develop the ABI I was mentioning and have the hooks
+> > implemented by a paravirt scheduler. We shall re-design the
+> > architecture based on this for v2.
+>
+> Instead of going straight to a full blown re-design, can you instead post=
+ slightly
+> more incremental RFCs?  E.g. flesh out enough code to get a BPF program a=
+ttached
+> and receiving information, but do NOT wait until you have fully working s=
+etup
+> before posting the next RFC.
+>
+Sure, makes sense.
 
-This works for me. And in case we need to reschedule I can also do any
-of the other Wednesdays in January.
+> There are essentially four-ish things to sort out:
+>
+>  1. Where to insert/modify hooks in KVM
+>  2. How KVM exposes KVM-internal information through said hooks
+>  3. How a BPF program can influence the host scheduler
+>  4. The guest/host ABI
+>
+> #1 and #2 are largely KVM-only, and I think/hope we can get a rough idea =
+of how
+> to address them before moving onto #3 and #4 (assuming #3 isn't already a=
+ solved
+> problem).
 
-Thanks Sean!
+Agreed. Will start with the kvm side and keep you posted on the progress.
+
+Thanks,
+Vineeth
 
