@@ -1,189 +1,374 @@
-Return-Path: <kvm+bounces-4546-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4547-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3F5B813FC8
-	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 03:29:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADF08813FCA
+	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 03:30:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 582131F22CE2
-	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 02:29:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1EBDD1F22DEC
+	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 02:30:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3720D17DB;
-	Fri, 15 Dec 2023 02:28:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D77A2101;
+	Fri, 15 Dec 2023 02:30:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="h1dTzdee"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YdhJWOq7"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2051.outbound.protection.outlook.com [40.107.102.51])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 666EE5677;
-	Fri, 15 Dec 2023 02:28:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 370E0EC9;
+	Fri, 15 Dec 2023 02:30:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702607415; x=1734143415;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=Buhq9whFZdTOyUFKdd6TCRvjnIVUDgnY24z5U2V9J94=;
+  b=YdhJWOq7WeR4VU3KslCwVcZO4dSAIHKA98kyCgwncupuScz0cTWRjHTj
+   vDK1wptylUW5no+DLEUz4ohdxBd45x53EZ1vnrozdOWDuJ3AQ/iyd7Nen
+   qRY4R4b3s1sDvhtywpXDk3KcqJUgSLd4kRCThMOB97IMsEZkhSSuqyBx8
+   3VhPFfTTA/sgAQAGMsiMdRX0NXCXgAoA+u0KvwgxTC2RwCesQQWE7PSC4
+   kpUgoBE6gIW7RQhcsgmk40vEUdFyOWUNz8cjQHwAO30QoAB8OHaGAywuL
+   j/35pougjEEafXuYU9o9XqZQZAHP4rJt8qw3JsmBk/XsGk6Vr2frE4zCS
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10924"; a="2308568"
+X-IronPort-AV: E=Sophos;i="6.04,277,1695711600"; 
+   d="scan'208";a="2308568"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Dec 2023 18:30:11 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10924"; a="918274215"
+X-IronPort-AV: E=Sophos;i="6.04,277,1695711600"; 
+   d="scan'208";a="918274215"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmsmga001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Dec 2023 18:30:10 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 14 Dec 2023 18:30:10 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 14 Dec 2023 18:30:10 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 14 Dec 2023 18:30:09 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UOGESuB72tf/ws5D0yhdmJvO8B+WxQpJySMyeTHqPnqywinVxEoLJ2fRKvnGiQwywpQzDSey1x0UCunXRe5xEMIEGAtgPP4sxuMj91IkM74p7Z3yf1NsQBFT4iMbpiaBNt1l8lFhiEFc9Vv973+02DKinAMop0eH0ycCSzw8Ows4lI/hRLShRz6d5jR2vJolQY7gR4o+9nZXuRutmS5qvE6PFfD66Z5KDEiNZ72zUcfHESipVk4RIX6ZNdXgPwJlqcOjzlPE+lsjd87aMw4x5tx8weL6D6dYRw5KW2LtF4JfMUrefACkQDJwAbvT7L1Ul+/jkGxwxH34D0HhsQmlPQ==
+ b=VMcNjEjLgpHFUqvAoXcXKGO3nckm23EExucvD9kjbKP3Hfx04EjaP5L6Pr0XLJotmUDhqyYASY4g3/w7ZLFmaGjctN6xGhOfeS24qCa10KitcbYbnnedjrCkY2jYZG0NzS7M3fCtQB5sEU2IkYbn3dLdIhJ4YUkoZvX1uD5LYwF0Bl27Y55X2m6k/Muzc1S1Jo21YmNe506YdqYhIEZniGW9rTZ9Xuq4g1+T6wR+uAk6/Elf+/ktr6x+GCIlsLRXOzDLyDVynOn1qvK0wUORF+YV5AdEx2hvt/pB3lDDFRSz7/5Z8U2y+xX2wrr9hfJQihkfpbm8AyZs0Tv6NjSmpg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DXJx2X7/7VnCZmUPtiFwmo3ijKCHE3OHxjfOVVOhuz0=;
- b=DKE8/8DvJT3EGnfACK4A0dBXC8VGxPCG+BAb2h9nK5ZFLejoMux4Ib6FvT8R2inq4VzvaEi22Kv7D9HLDtHGTYcvDR694QDessZH3z7i8qKjPGjdNI8E1lclPSm3RmpBWlMG+0y852oJnBydmsVgVZrvUmn7P+HU7tc4JM+tU/zHLK//ny/Qt8VpUQ7maegV/S7ZTe8etpVtj+r/f7eheUelaqAen/ZJVxi+/IEiiCMFV2DI1REENiYtfw3F3WY75ngMETWwv1hx2Mk53dAOQHtEy9YNtZiR0RXHkuCRRiZfe28DDLmTBVeGTuVOJjSH60bqTiTImMnLod4y6bxjtg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DXJx2X7/7VnCZmUPtiFwmo3ijKCHE3OHxjfOVVOhuz0=;
- b=h1dTzdeeKQyQ+jxzgF64CS3PccsBrFzgkpoaEjB6z2XwZ7Tx4xCxjm2bmNURYqryPxGhxJfctG1jJA7IXSiYRk8kJivakAnCYHbCTicUZ7X2fKBy0mWbXKGyFHeSr94FSQFLuRb8Mk579rU34YRovBV7y3ZNk8WIvAnrBJgFbnFtQ6fPS98IU8ddV7A8mASS/kNvuHatS+jza8Ru69eVR+ngB/6V9BNN8Ze6Y2riWtcZfMWuvdaJdXUg4xwHDy4a1RfSJ+MxtgZw8urYzlCYwjCwM/J2mnVqhM2IcIJatjaAFT/jxcT4wcKMrZPWb7JM8uh0Yy5INy9m3t0tlZ1H9A==
-Received: from SA9PR03CA0023.namprd03.prod.outlook.com (2603:10b6:806:20::28)
- by CY8PR12MB7337.namprd12.prod.outlook.com (2603:10b6:930:53::9) with
+ bh=b1BvXvnYkxFqMagtFb8uxQkRcaconejm9eGUvu52+S0=;
+ b=bGdkpuRc96jZAFx1+uWwS52+zEwVc0GQGfjVUBb9gNSM50sUdoRs91bWAEm/Q9HNts6gqlhA7G7IPHICfYPJbOWLXDuOAjhuTl+eHREHZ7NKIanZ22UYL/kR3v3uW8QDTCze8xOZDANhgswVGaW+00rVYuJYn94n0VwuBfHngEZyiDbGRCKolfZPpZsI6yQT4gS00DWb7SmiWymxEApTZKo0e/SEhSNRDPzWuj7PmNwxDiC54aFudHc/F8KFCWSfv0UNlIfdsiWI3Q6ePtOHggaWFRZ0Im7lliXlaIBQrf/s7l0LZtoAgFr7vXRZ/SEAscNcbEtD+xik+UbPpJ5Lig==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH0PR11MB4965.namprd11.prod.outlook.com (2603:10b6:510:34::7)
+ by IA1PR11MB7919.namprd11.prod.outlook.com (2603:10b6:208:3fa::16) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.31; Fri, 15 Dec
- 2023 02:28:42 +0000
-Received: from SN1PEPF000252A4.namprd05.prod.outlook.com
- (2603:10b6:806:20:cafe::2) by SA9PR03CA0023.outlook.office365.com
- (2603:10b6:806:20::28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.28 via Frontend
- Transport; Fri, 15 Dec 2023 02:28:42 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SN1PEPF000252A4.mail.protection.outlook.com (10.167.242.11) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7091.26 via Frontend Transport; Fri, 15 Dec 2023 02:28:42 +0000
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Thu, 14 Dec
- 2023 18:28:23 -0800
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by rnnvmail204.nvidia.com
- (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Thu, 14 Dec
- 2023 18:28:23 -0800
-Received: from Asurada-Nvidia (10.127.8.9) by mail.nvidia.com (10.129.68.8)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41 via Frontend
- Transport; Thu, 14 Dec 2023 18:28:20 -0800
-Date: Thu, 14 Dec 2023 18:28:18 -0800
-From: Nicolin Chen <nicolinc@nvidia.com>
-To: "Tian, Kevin" <kevin.tian@intel.com>
-CC: "Liu, Yi L" <yi.l.liu@intel.com>, "joro@8bytes.org" <joro@8bytes.org>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>, "jgg@nvidia.com"
-	<jgg@nvidia.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>,
-	"baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>, "cohuck@redhat.com"
-	<cohuck@redhat.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mjrosato@linux.ibm.com"
-	<mjrosato@linux.ibm.com>, "chao.p.peng@linux.intel.com"
-	<chao.p.peng@linux.intel.com>, "yi.y.sun@linux.intel.com"
-	<yi.y.sun@linux.intel.com>, "peterx@redhat.com" <peterx@redhat.com>,
-	"jasowang@redhat.com" <jasowang@redhat.com>,
-	"shameerali.kolothum.thodi@huawei.com"
-	<shameerali.kolothum.thodi@huawei.com>, "lulu@redhat.com" <lulu@redhat.com>,
-	"suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "Duan,
- Zhenzhong" <zhenzhong.duan@intel.com>, "joao.m.martins@oracle.com"
-	<joao.m.martins@oracle.com>, "Zeng, Xin" <xin.zeng@intel.com>, "Zhao, Yan Y"
-	<yan.y.zhao@intel.com>
-Subject: Re: [PATCH v7 1/3] iommufd: Add data structure for Intel VT-d
- stage-1 cache invalidation
-Message-ID: <ZXu5whlIGfiq16wF@Asurada-Nvidia>
-References: <20231117131816.24359-1-yi.l.liu@intel.com>
- <20231117131816.24359-2-yi.l.liu@intel.com>
- <c967e716-9112-4d1a-b6f7-9a005e28202d@intel.com>
- <BN9PR11MB5276D14D2A7FF60B41A6A7B48C93A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.28; Fri, 15 Dec
+ 2023 02:30:07 +0000
+Received: from PH0PR11MB4965.namprd11.prod.outlook.com
+ ([fe80::ea04:122f:f20c:94e8]) by PH0PR11MB4965.namprd11.prod.outlook.com
+ ([fe80::ea04:122f:f20c:94e8%2]) with mapi id 15.20.7091.030; Fri, 15 Dec 2023
+ 02:30:07 +0000
+Message-ID: <9fe42947-3962-49bc-99f4-8b09954fd598@intel.com>
+Date: Fri, 15 Dec 2023 10:29:56 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 00/26] Enable CET Virtualization
+To: <seanjc@google.com>
+CC: <pbonzini@redhat.com>, <dave.hansen@intel.com>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <peterz@infradead.org>, <chao.gao@intel.com>,
+	<rick.p.edgecombe@intel.com>, <mlevitsk@redhat.com>, <john.allen@amd.com>
+References: <20231124055330.138870-1-weijiang.yang@intel.com>
+Content-Language: en-US
+From: "Yang, Weijiang" <weijiang.yang@intel.com>
+In-Reply-To: <20231124055330.138870-1-weijiang.yang@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SI1PR02CA0054.apcprd02.prod.outlook.com
+ (2603:1096:4:1f5::13) To PH0PR11MB4965.namprd11.prod.outlook.com
+ (2603:10b6:510:34::7)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB5276D14D2A7FF60B41A6A7B48C93A@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF000252A4:EE_|CY8PR12MB7337:EE_
-X-MS-Office365-Filtering-Correlation-Id: cd61511f-5548-4b3c-9a38-08dbfd158dfb
+X-MS-TrafficTypeDiagnostic: PH0PR11MB4965:EE_|IA1PR11MB7919:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8639a104-e3b0-478f-d091-08dbfd15c068
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	HUOlvk6Okm8+UBPG+WRaV1WjBGWg7XAKXupDSAPhNp/N9+eo/FOsuqlN/zmynKuZoFfd/GYEiuC23I/XqOMMFVkhPYk40yELyOko88SABD8/YgfrnNX+BmvUrHKKVsjEt7S9hyZxGiAGZE/5rTVsuC4Px/+pGjZmHLYUqb+itIsJwfvnlDSDVOgcueOUofDNMbb3SnFrRYtWINU/ch4QG1SGOqtd2Di44syAOHDPZrODeCvibMt8wPhB+ay73HjS1JsDWQbFzmmhXTdBB34g5KMkD3EgJaqVgfdha1DiTL1PfJnqUkphQ7Zn/HZCw87nCuZED0iN4ChCEhY9nDXluEwbppLyDtgxeD2plo/9bB50AqYxt0lwZ/jJAuVxbMyFlv7ZHry0ayBJSRuHlw8VUP+WH7gvEVteaKhIYMD1fmn0g9lCq87wsMI7f/NFnBEoi1h7udZAUX10wcimIPuzYEeylWbaRK8DuHanT+YYPR20QhRbpP4uZciIozfMKuiBj1Sz5m6cZbRf/SJqlxvF+Ka9jLpCWE8MGSgqlcq4ApCEB7Yv3iZSyUQwxSt0hGn6rcRSaKhVyAET2HnotaIacr1WXC934S4IFrZtJj923tq8aUe88MihQ5IUINFQDrigwucuQ59QSxOboJZFG26ajlJw3RiY0iiR8Vad2prdlI+Bu0H2G84c8w9MXi5dxJfpOL+DefiapbM+AI3Wfshvgjm/6wK9D392kiV7fL+QpfW994J9MgJMqXW5iuA0P//7
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(346002)(396003)(39860400002)(136003)(376002)(230922051799003)(1800799012)(451199024)(186009)(82310400011)(64100799003)(36840700001)(46966006)(40470700004)(5660300002)(9686003)(7416002)(86362001)(33716001)(336012)(426003)(478600001)(36860700001)(47076005)(82740400003)(356005)(83380400001)(7636003)(41300700001)(54906003)(70206006)(70586007)(316002)(2906002)(26005)(6916009)(4326008)(8936002)(8676002)(55016003)(40480700001)(40460700003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Dec 2023 02:28:42.0024
+X-Microsoft-Antispam-Message-Info: ETULNVyEYHJZV/2y3EPsE81s03ZbdUFefoFo4keEkOy4wlSFgeLAgWMt6tkK9gqc3m3MASa1QUcQ1JHWac30+qcOiJCaDvknPY0Gvwbo/8sJvip5C0Il++Eh3b7zfty3kO+c0fLWk06OHIoGwI/ZogUuk8PjODOiQcZN4/CJ9S4yUe3TVgC1msjwZsnAcw9pFa8Bi5Pk8qpFAA1bY1nMfaKEUcb6cGQkLBPrBi5Sh/2X5rUl0agfWE2UQsmkmx80pEP4lSONCZulyloma1kn4LXGBD5RuBNggLd9U0OcAz5rG36HqemWjA4NP7f+okhuHp9ieBt/xZdIosfQUyJ8uOmB59NN0Sfps5ohEEb9QO5GYXsXkQAPvxdZEHe/9eEAoSNMUcBKFcEP+pD+osXXx6KRQd1smMRKEoKIZwu+kmAQwV9B8j5CzVYKwmLSOMNlSFG0n6V70IWnS1sXXcFN6FTGdu52Mu7crX1DaBHFoDjICe8vlm3UywlvsOKGvtRm1WMfTp0EOBLypbIvFoFNg9W4F6P+8EMcw1KQ4XVrLetc2YbynTx3fOqRpGGgSMqWvB5z0Y0PHwKMm+RbQqRF3eECMByREJSUCMU3vK9VsxGKZMiGqei35v7Xu5Es8c9ZWGIanSUMyR3v+9ApFKS7StNVWy3fJsaUL/WRbYQO/lTQv/lnPCdlEz3IPPKtoIJt
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4965.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(366004)(376002)(396003)(39860400002)(230922051799003)(64100799003)(186009)(451199024)(1800799012)(86362001)(8936002)(8676002)(4326008)(316002)(31696002)(966005)(6486002)(478600001)(66946007)(66556008)(66476007)(6916009)(41300700001)(2906002)(5660300002)(36756003)(82960400001)(38100700002)(6512007)(2616005)(26005)(6666004)(53546011)(6506007)(83380400001)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QllHa0x5bkFwN1VQWmhCa2tjbWNaQ1pYZ25PQlhGVXRGem5YVkxqaGpOSDVN?=
+ =?utf-8?B?bnlQVlNWcWNqczBUUzVES25ma1Q2b09FcEZDdUNoSEdIRFdNUE1qSTZUY3Jq?=
+ =?utf-8?B?VG1hcUd3L2htK2RsOU02ZFBuSktCdlI5WVZmcUY5RHUwUVlIZUVPRmFQekcr?=
+ =?utf-8?B?L0xmQjFuZ0twd1VrT3Z4NUN1VElpRGMySGFMa2dJMkhEZEtXN0MydmNTL0c0?=
+ =?utf-8?B?UlV6SFJaUTVQeG9TbzJoY1dJNU1aTnd2VEQxN1VzSEJMQmNvSkVabUpGNSsv?=
+ =?utf-8?B?ZjJVaklPN0I5NkxDcVpMejBTYUg1V2hGZmJ4QkhXT2JKZG4zRmlhZ3R2Uk5I?=
+ =?utf-8?B?QzlzeVN2L3JFdjFXaUdqbUtOQnF4OC9XS2pnVnZpZ0xCbmFEWVV5TWtHdDVO?=
+ =?utf-8?B?ZHhWbVgxbm5JK094aHdJWkZwNGFZMXpHN1h3Tk5oSy94emQ0MEZuS3Bkdk03?=
+ =?utf-8?B?MVI0cnd5KzZQRlVSVDhhS3ptVFBtbG94ZWhiNDlUc0NkelJEVmxrNUtGd0dZ?=
+ =?utf-8?B?enBIdzdIZDZGNkpOaVIrN2YzL0RicjREZmFhMG11NWRVWmZXS3FwbXQrNUVy?=
+ =?utf-8?B?VnhHYUlsMVdQUFZpbjQvU2NJTzhHU1FnRHphZnB3MzEya2pLSGJQY21QaGRX?=
+ =?utf-8?B?citsdkNyQ05uMjhVOFRkaVFzMndpdFA0amJXSlNuUmM3bHZ5STNTSkdjRVlW?=
+ =?utf-8?B?QlNQL3JXN2thSUxFM3lFY3NiU05wZ2F2NXpZM0txbEI5VXVjK2UrTE1nTVdj?=
+ =?utf-8?B?d3hTU1U0MG9FcnJaTXpKVDNPbnpXVUVvZUxLQW44M0VSSlBMeXRPUUhGK3N5?=
+ =?utf-8?B?TjhXR20zUUtNSDlHc3RCYXRsTmRadXhDOWxMR0Q4NkFBMEt5VStWTGNvbHJo?=
+ =?utf-8?B?Ui9rWjNNSE95TUJrd2tDY0RvVjB3TUFDSExudlcwVWt3VEh6dndIc1BNQ2U4?=
+ =?utf-8?B?dEdaalFPdDBSK2JOV051RjJuSEtjVUVldWlsODJHbTE4M3lxemhtSlhTdng5?=
+ =?utf-8?B?THIva0FLT0I3b3dleU40amNXQTBqVUlJd2ZuajFaZUFZOGpURmdLdFBLVEtU?=
+ =?utf-8?B?Qm54RWlnVzBXbU5veFk3dDN2QjlBTWhFQm81d0dtZU5rM25DcVR1aW5VU1Ur?=
+ =?utf-8?B?a2lHOXp2T0FOZjZ4WEVuMTE5TU5WdmNDaU9LSGU0TldjVHdoVEltRyt1Umlk?=
+ =?utf-8?B?amUveG9EbFA5aVFnVk9wWVpwa2w1SHdNMWpDSCtrTEtTS2tJRnRiYkl1U3RU?=
+ =?utf-8?B?N2tveG9idTFJb3pIRmhVZCs2aFl2c3JLWklTV2Z5MHVEVzRvYXlTeUdFbnJi?=
+ =?utf-8?B?VDNDd1ZjOHBFY2F4eWlkNjZXSkN4TGQ5eHNoL2JjM1cwOXI4ZE9hZnY2Uk5r?=
+ =?utf-8?B?aDJUN01IbzRZRDFsSk1SZ1VNejhzeTQ5Ti9TREdZeTR3Mm14UVlkUVF4cUlB?=
+ =?utf-8?B?Q0RpWXBOUW5MWUhjT3hBVi93OGsxbXNac2c2YjI2c2tJb0YvRUpBeHplekpa?=
+ =?utf-8?B?cFpaTkZvT2FCRndPbnhRQ3pzY3pkTHB5SXEvaStWL0FJZzNoZFZ2NHJ4OE5N?=
+ =?utf-8?B?T01GbVFtYkdNa21BTnp5Y1pDMThJZkJ6c1F1Qi9CNXo3MUwxOGMxa2ZTNGcv?=
+ =?utf-8?B?QVlaRnU5K0ZRSDRCSkJCclROTlpaaVZzUW9LMFRTZWphdVFPOEhBYXp4RnVI?=
+ =?utf-8?B?QlI3UHBQbUFUU1JnYmFNL0lhc21lWWFSRWxiK3ZXbDgya3BuL0FBM2R6eldY?=
+ =?utf-8?B?SHBOWnhBVUNkQVRHR0JOQ0pnajZjNDh5bFhjU3N6bGNHZytnSUIvT3MxdW5W?=
+ =?utf-8?B?bm1TeVJaanB6aG90RFZBbi9pZ2FRY0s2OHptU3FoeDByWlFSTWkxWk5lenU0?=
+ =?utf-8?B?OVhoUEpMNjVISFUrMkNyZG1ZSHBYa0tjZkhYRVgweTFYcWJ0OGl6ajU1cEw3?=
+ =?utf-8?B?TTl5VjR1R3I0UCtOUVVhVlM4R04xSEg0c2pGbUFnd2hnQUtXYWNJcW5jb3lR?=
+ =?utf-8?B?TTVLTWxzSE9yTjVsdDhkN3ZDVVcvMkY5T254MEZHQU8zWElZM2VJdEdwdkVN?=
+ =?utf-8?B?UktMNHBZUDBrZ0Q1bW5HWjlzN0NyNGlkbnp2ZnBMRHFFVWw1ZEFiTFVUZ3N5?=
+ =?utf-8?B?NzB5U01XaFdySUlSZ3ZKczVQNEtuOEphMWNPZVIzbEdCWlFJOHJXQlI0NHRm?=
+ =?utf-8?B?SkE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8639a104-e3b0-478f-d091-08dbfd15c068
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4965.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Dec 2023 02:30:07.1032
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: cd61511f-5548-4b3c-9a38-08dbfd158dfb
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF000252A4.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7337
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: coQ5irY5hFokgo09+MwL8kuet4cML8aiAtZiC5WAJWnhDBBYM9c8tCKD+ReZHsdQOLanTogkKtflKktPH6F/bQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB7919
+X-OriginatorOrg: intel.com
 
-On Fri, Dec 15, 2023 at 01:50:07AM +0000, Tian, Kevin wrote:
-> > From: Liu, Yi L <yi.l.liu@intel.com>
-> > Sent: Thursday, December 14, 2023 7:27 PM
-> >
-> > On 2023/11/17 21:18, Yi Liu wrote:> This adds the data structure for
-> > flushing iotlb for the nested domain
-> >
-> > +struct iommu_hwpt_vtd_s1_invalidate {
-> > +     __aligned_u64 addr;
-> > +     __aligned_u64 npages;
-> > +     __u32 flags;
-> > +     __u32 __reserved;
-> > +     __u32 error;
-> > +     __u32 dev_id;
-> > +};
-> >
-> > dev_id is used to report the failed device, userspace should be able to map
-> > it to a vRID, and inject it to VM as part of ITE/ICE error.
-> >
-> > However, I got a problem when trying to get dev_id in cache invalidation
-> > path, since this is filled in intel iommu driver. Seems like there is no
-> > good way for it. I've below alternatives to move forward, wish you have
-> > a look.
+Hi, Sean,
+Do you have additional comments for this version?
+I'll enclose Maxim and Chao's feedback in v8.
 
-> >
-> > - Reuse Nicolin's vRID->pRID mapping. If thevRID->pRID mapping is
-> > maintained, then intel iommu can report a vRID back to user. But intel
-> > iommu driver does not have viommu context, no place to hold the vRID-
-> > >pRID
-> > mapping. TBH. It may require other reasons to introduce it other than the
-> > error reporting need. Anyhow, this requires more thinking and also has
-> > dependency even if it is doable in intel side.
-> 
-> this sounds like a cleaner way to inject knowledge which iommu driver
-> requires to find out the user tag. but yes it's a bit weird to introduce
-> viommu awareness in intel iommu driver when there is no such thing
-> in real hardware.
+And what's your plan for this series? I'd get your direction for the next step.
+I'm appreciated your persistent attention on this series over the past years!
 
-I think a viommu is defined more like a software object representing
-the virtual IOMMU in a VM. Since VT-d has a vIOMMU in a nesting case,
-there could be an object for it too?
+On 11/24/2023 1:53 PM, Yang Weijiang wrote:
+> Control-flow Enforcement Technology (CET) is a kind of CPU feature used
+> to prevent Return/CALL/Jump-Oriented Programming (ROP/COP/JOP) attacks.
+> It provides two sub-features(SHSTK,IBT) to defend against ROP/COP/JOP
+> style control-flow subversion attacks.
+>
+> Shadow Stack (SHSTK):
+>    A shadow stack is a second stack used exclusively for control transfer
+>    operations. The shadow stack is separate from the data/normal stack and
+>    can be enabled individually in user and kernel mode. When shadow stack
+>    is enabled, CALL pushes the return address on both the data and shadow
+>    stack. RET pops the return address from both stacks and compares them.
+>    If the return addresses from the two stacks do not match, the processor
+>    generates a #CP.
+>
+> Indirect Branch Tracking (IBT):
+>    IBT introduces new instruction(ENDBRANCH)to mark valid target addresses of
+>    indirect branches (CALL, JMP etc...). If an indirect branch is executed
+>    and the next instruction is _not_ an ENDBRANCH, the processor generates a
+>    #CP. These instruction behaves as a NOP on platforms that doesn't support
+>    CET.
+>
+> Dependency:
+> --------------------------------------------------------------------------
+> CET native series for user mode shadow stack has already been merged in v6.6
+> mainline kernel.
+>
+> The first 7 kernel patches are prerequisites for this KVM patch series since
+> guest CET user mode and supervisor mode states depends on kernel FPU framework
+> to properly save/restore the states whenever FPU context switch is required,
+> e.g., after VM-Exit and before vCPU thread exits to userspace.
+>
+> In this series, guest supervisor SHSTK mitigation solution isn't introduced
+> for Intel platform therefore guest SSS_CET bit of CPUID(0x7,1):EDX[bit18] is
+> cleared. Check SDM (Vol 1, Section 17.2.3) for details.
+>
+> CET states management:
+> --------------------------------------------------------------------------
+> KVM cooperates with host kernel FPU framework to manage guest CET registers.
+> With CET supervisor mode state support in this series, KVM can save/restore
+> full guest CET xsave-managed states.
+>
+> CET user mode and supervisor mode xstates, i.e., MSR_IA32_{U_CET,PL3_SSP}
+> and MSR_IA32_PL{0,1,2}, depend on host FPU framework to swap guest and host
+> xstates. On VM-Exit, guest CET xstates are saved to guest fpu area and host
+> CET xstates are loaded from task/thread context before vCPU returns to
+> userspace, vice-versa on VM-Entry. See details in kvm_{load,put}_guest_fpu().
+> So guest CET xstates management depends on CET xstate bits(U_CET/S_CET bit)
+> set in host XSS MSR.
+>
+> CET supervisor mode states are grouped into two categories : XSAVE-managed
+> and non-XSAVE-managed, the former includes MSR_IA32_PL{0,1,2}_SSP and are
+> controlled by CET supervisor mode bit(S_CET bit) in XSS, the later consists
+> of MSR_IA32_S_CET and MSR_IA32_INTR_SSP_TBL.
+>
+> VMX introduces new VMCS fields, {GUEST|HOST}_{S_CET,SSP,INTR_SSP_TABL}, to
+> facilitate guest/host non-XSAVES-managed states. When VMX CET entry/exit load
+> bits are set, guest/host MSR_IA32_{S_CET,INTR_SSP_TBL,SSP} are loaded from
+> equivalent fields at VM-Exit/Entry. With these new fields, such supervisor
+> states require no addtional KVM save/reload actions.
+>
+> Tests:
+> --------------------------------------------------------------------------
+> This series passed basic CET user shadow stack test and kernel IBT test in L1
+> and L2 guest.
+> The patch series _has_ impact to existing vmx test cases in KVM-unit-tests,the
+> failures have been fixed here [1].
+> One new selftest app [2] is introduced for testing CET MSRs accessibilities.
+>
+> Note, this series hasn't been tested on AMD platform yet.
+>
+> To run user SHSTK test and kernel IBT test in guest, an CET capable platform
+> is required, e.g., Sapphire Rapids server, and follow below steps to build
+> the binaries:
+>
+> 1. Host kernel: Apply this series to mainline kernel (>= v6.6) and build.
+>
+> 2. Guest kernel: Pull kernel (>= v6.6), opt-in CONFIG_X86_KERNEL_IBT
+> and CONFIG_X86_USER_SHADOW_STACK options. Build with CET enabled gcc versions
+> (>= 8.5.0).
+>
+> 3. Apply CET QEMU patches [3] before build mainline QEMU.
+>
+> Check kernel selftest test_shadow_stack_64 output:
+>
+> [INFO]  new_ssp = 7f8c82100ff8, *new_ssp = 7f8c82101001
+> [INFO]  changing ssp from 7f8c82900ff0 to 7f8c82100ff8
+> [INFO]  ssp is now 7f8c82101000
+> [OK]    Shadow stack pivot
+> [OK]    Shadow stack faults
+> [INFO]  Corrupting shadow stack
+> [INFO]  Generated shadow stack violation successfully
+> [OK]    Shadow stack violation test
+> [INFO]  Gup read -> shstk access success
+> [INFO]  Gup write -> shstk access success
+> [INFO]  Violation from normal write
+> [INFO]  Gup read -> write access success
+> [INFO]  Violation from normal write
+> [INFO]  Gup write -> write access success
+> [INFO]  Cow gup write -> write access success
+> [OK]    Shadow gup test
+> [INFO]  Violation from shstk access
+> [OK]    mprotect() test
+> [SKIP]  Userfaultfd unavailable.
+> [OK]    32 bit test
+>
+>
+> Check kernel IBT with dmesg | grep CET:
+>
+> CET detected: Indirect Branch Tracking enabled
+>
+> --------------------------------------------------------------------------
+> Changes in v7:
+> 1. Introduced guest dedicated config for guest related xstate fixup. [Sean, Maxim]
+> 2. Refined CET supervisor state handling for guest fpstate. [Dave]
+> 3. Enclosed Sean's fixup patch for kernel xstate issue. [Sean]
+> 4. Refined CET MSR read/write handling flow. [Sean, Maxim]
+> 5. Added CET VMCS fields sync between vmcs12 and vmcs02. [Chao, Maxim]
+> 6. Added reset handling for CET xstate-managed MSRs.
+> 7. Other minor changes due to community review feedback. [Sean, Maxim, Chao]
+> 8. Rebased to: https://github.com/kvm-x86/linux tag: kvm-x86-next-2023.11.01
+>
+>
+> [1]: KVM-unit-tests fixup:
+> https://lore.kernel.org/all/20230913235006.74172-1-weijiang.yang@intel.com/
+> [2]: Selftest for CET MSRs:
+> https://lore.kernel.org/all/20230914064201.85605-1-weijiang.yang@intel.com/
+> [3]: QEMU patch:
+> https://lore.kernel.org/all/20230720111445.99509-1-weijiang.yang@intel.com/
+> [4]: v6 patchset:
+> https://lore.kernel.org/all/20230914063325.85503-1-weijiang.yang@intel.com/
+>
+> Patch 1-7:	Fixup patches for kernel xstate and enable CET supervisor xstate.
+> Patch 8-11:	Cleanup patches for KVM.
+> Patch 12-15:	Enable KVM XSS MSR support.
+> Patch 16:	Fault check for CR4.CET setting.
+> Patch 17:	Report CET MSRs to userspace.
+> Patch 18:	Introduce CET VMCS fields.
+> Patch 19:	Add SHSTK/IBT to KVM-governed framework.(to be deprecated)
+> Patch 20:	Emulate CET MSR access.
+> Patch 21:	Handle SSP at entry/exit to SMM.
+> Patch 22:	Set up CET MSR interception.
+> Patch 23:	Initialize host constant supervisor state.
+> Patch 24:	Add CET virtualization settings.
+> Patch 25-26:	Add CET nested support.
+>
+>
+> Sean Christopherson (4):
+>    x86/fpu/xstate: Always preserve non-user xfeatures/flags in
+>      __state_perm
+>    KVM: x86: Rework cpuid_get_supported_xcr0() to operate on vCPU data
+>    KVM: x86: Report XSS as to-be-saved if there are supported features
+>    KVM: x86: Load guest FPU state when access XSAVE-managed MSRs
+>
+> Yang Weijiang (22):
+>    x86/fpu/xstate: Refine CET user xstate bit enabling
+>    x86/fpu/xstate: Add CET supervisor mode state support
+>    x86/fpu/xstate: Introduce XFEATURE_MASK_KERNEL_DYNAMIC xfeature set
+>    x86/fpu/xstate: Introduce fpu_guest_cfg for guest FPU configuration
+>    x86/fpu/xstate: Create guest fpstate with guest specific config
+>    x86/fpu/xstate: Warn if kernel dynamic xfeatures detected in normal fpstate
+>    KVM: x86: Rename kvm_{g,s}et_msr() to menifest emulation operations
+>    KVM: x86: Refine xsave-managed guest register/MSR reset handling
+>    KVM: x86: Add kvm_msr_{read,write}() helpers
+>    KVM: x86: Refresh CPUID on write to guest MSR_IA32_XSS
+>    KVM: x86: Initialize kvm_caps.supported_xss
+>    KVM: x86: Add fault checks for guest CR4.CET setting
+>    KVM: x86: Report KVM supported CET MSRs as to-be-saved
+>    KVM: VMX: Introduce CET VMCS fields and control bits
+>    KVM: x86: Use KVM-governed feature framework to track "SHSTK/IBT enabled"
+>    KVM: VMX: Emulate read and write to CET MSRs
+>    KVM: x86: Save and reload SSP to/from SMRAM
+>    KVM: VMX: Set up interception for CET MSRs
+>    KVM: VMX: Set host constant supervisor states to VMCS fields
+>    KVM: x86: Enable CET virtualization for VMX and advertise to userspace
+>    KVM: nVMX: Introduce new VMX_BASIC bit for event error_code delivery to L1
+>    KVM: nVMX: Enable CET support for nested guest
+>
+>   arch/x86/include/asm/fpu/types.h     |  16 +-
+>   arch/x86/include/asm/fpu/xstate.h    |  11 +-
+>   arch/x86/include/asm/kvm_host.h      |  13 +-
+>   arch/x86/include/asm/msr-index.h     |   1 +
+>   arch/x86/include/asm/vmx.h           |   8 +
+>   arch/x86/include/uapi/asm/kvm_para.h |   1 +
+>   arch/x86/kernel/fpu/core.c           |  62 +++++--
+>   arch/x86/kernel/fpu/xstate.c         |  46 +++--
+>   arch/x86/kernel/fpu/xstate.h         |   4 +
+>   arch/x86/kvm/cpuid.c                 |  69 +++++---
+>   arch/x86/kvm/governed_features.h     |   2 +
+>   arch/x86/kvm/smm.c                   |  12 +-
+>   arch/x86/kvm/smm.h                   |   2 +-
+>   arch/x86/kvm/vmx/capabilities.h      |  10 ++
+>   arch/x86/kvm/vmx/nested.c            |  88 ++++++++--
+>   arch/x86/kvm/vmx/nested.h            |   5 +
+>   arch/x86/kvm/vmx/vmcs12.c            |   6 +
+>   arch/x86/kvm/vmx/vmcs12.h            |  14 +-
+>   arch/x86/kvm/vmx/vmx.c               | 110 +++++++++++-
+>   arch/x86/kvm/vmx/vmx.h               |   6 +-
+>   arch/x86/kvm/x86.c                   | 254 +++++++++++++++++++++++++--
+>   arch/x86/kvm/x86.h                   |  28 +++
+>   22 files changed, 669 insertions(+), 99 deletions(-)
+>
 
-> and for this error reporting case what we actually require is the
-> reverse map i.e. pRID->vRID. Not sure whether we can leverage the
-> same RID mapping uAPI as for ARM/AMD but ignore viommu_id
-> and then store vRID under device_domain_info. a bit tricky on
-> life cycle management and also incompatible with SIOV...
-
-One thing that I am not very clear here: since both vRID and dev_id
-are given by the VMM, shouldn't it already know the mapping if the
-point is to translate (pRID->)dev_id->vRID?
-
-Thanks
-Nicolin
 
