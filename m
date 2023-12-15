@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-4554-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4555-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0CEC814423
-	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 10:07:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D58F3814445
+	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 10:12:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73F0C1F2348B
-	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 09:07:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8AAEB2848E2
+	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 09:12:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA8291B28D;
-	Fri, 15 Dec 2023 09:07:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98C92179A2;
+	Fri, 15 Dec 2023 09:10:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MR1BJh1S"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZbNW5OX/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08B501A710;
-	Fri, 15 Dec 2023 09:07:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 177D62D78C
+	for <kvm@vger.kernel.org>; Fri, 15 Dec 2023 09:10:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-40c317723a8so5051915e9.3;
-        Fri, 15 Dec 2023 01:07:29 -0800 (PST)
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-33642ab735dso306129f8f.0
+        for <kvm@vger.kernel.org>; Fri, 15 Dec 2023 01:10:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702631248; x=1703236048; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:reply-to:user-agent:mime-version:date
+        d=gmail.com; s=20230601; t=1702631444; x=1703236244; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=dCB/Ho7uAkTd2udyIh4uiQfCkhgIrChr0Q/E8CeXzB0=;
-        b=MR1BJh1SAkutx2pwn+vPi7qU5U3CnaJ/FkM4LGVPBGatb/jHSMSWblAbOGqx+xd6sm
-         /IeT30a5y1AxBqbwr8bcF396Z0V0XsmGqZrntbxr9+bo+o0KAsyvX11+fGZ4iewYkfnP
-         aICt+HihFPaHuo+89WAci8Xj9mTlXKDFOCsbxPPQn6vYo1mdLwhp8U0pWsonspKsmzuA
-         FqHx5lnQUXfcfoL+tAtkAcXmcpBtrvOdEldjduiU6r2UN8wLHLfVI+U0/Ry7UJlq2NgU
-         0qP63BHKgvbeT863rDXmb5i1GpuyipPvoMszgwwMFVTXsit4qw8qqUt0nGiFWf7XgVFy
-         C76Q==
+        bh=xyr5TJLNSb1EUEDsHZ/ywW0qW51i7FAN+0eNJUcIkvA=;
+        b=ZbNW5OX/F0xCTPdGV7qUszEXmtmTj+S6iSfkTuEXAzv3G+YKyAIM7FGKgBwWBuDykg
+         xkO0j2TOjWb69AeU995Q0h95N1KoRG73DgNt0G6pXpJztLXh6JNlkGJQiIVKi+tjFln5
+         S6teUUcNOIQgN/C7gIL/9STAjxR2mI3NlHqkTlCND1CcyKXmGmEgZMrBjsPCyfcGXqY9
+         zvIcsmbQwpchKfDPmG8yfXvL3Z86OyNJ0Qlx3dTqi0aqXEkv6FcmtsGOvLr+0xFJI5SI
+         rsgHvXZRS72hrIuPhN/CXncy+2GZ+EWAo1IOUMNVLfVKwaMWRq30naIue9KfgDzQKh/7
+         qDEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702631248; x=1703236048;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:reply-to:user-agent:mime-version:date
+        d=1e100.net; s=20230601; t=1702631444; x=1703236244;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=dCB/Ho7uAkTd2udyIh4uiQfCkhgIrChr0Q/E8CeXzB0=;
-        b=TY0EBTk7bK7ci8o1+i9cWUJEJL0aVl/AFJ//Dgo844y+s+VVY1Yu/j08gXAetX9pS0
-         r/6KeVadywTwGmRXzbxK427i6p/RPF5s6Rg1O6BJkL722jDSW4SYK1oyjt9lkLzbYv6O
-         GwsJodcg6wbmSRmpq0fY0m4fL+J3YSzKiQVzOmdrQ1B4HPAojysXSQVt88HW+CPfVIo0
-         7w9ZbiGRLWQRIkmmXMBoinZ0N1Ktkdt/wEglcglMvlhoE4JYY0fvw0aQx8svZKtu/TYn
-         wPBErXWg2tBm2kKWu8c2S+xKQGl4p5qjxReKHbV5NWt8AStIZhLWTXYuvpyZfW5gxZT4
-         n6Mg==
-X-Gm-Message-State: AOJu0Yx5c8Vj0VVc/e34GDo2thLyCbQVzxcxVLpw7bhCfQdGxlyRIgxo
-	oaCsl+7Jd3wmUa1BW/PrcDA=
-X-Google-Smtp-Source: AGHT+IEcAWWWvrPRTlp2uRL/FzdOScVbLSSaOj/MblGriLKyfJxflbC0gUz6ETYhMFnmtEtIsSsz8A==
-X-Received: by 2002:a05:600c:19c9:b0:40c:6d4b:2fa5 with SMTP id u9-20020a05600c19c900b0040c6d4b2fa5mr110088wmq.63.1702631247860;
-        Fri, 15 Dec 2023 01:07:27 -0800 (PST)
+        bh=xyr5TJLNSb1EUEDsHZ/ywW0qW51i7FAN+0eNJUcIkvA=;
+        b=WQE7wwJ57iqsfNtLny5breDs6an+uuEGpkspCmOr6gIJGfk8ePEDx6dN/GRdrg7i2t
+         s2BHRoJ63oLqQO6Sn+71orbWkUqc914gXlNYzUCZM26uguL5zMwgKmHmZq/eclzW1dyV
+         P8y54tlaGwYHOlQNYCWX2qStk0pF9cH4ofgDyJXSk9k5086499CQH+1A34aGXoFuQ2g4
+         5hBLJlUFDUk9L7FlncDdfGPE62UzRNAArAiCq8Fg2ZCLhCf4GD8Q9z+RKlUHgzZnl377
+         NlUE8XgW9yjmu/1y/bRwZNsBsRcxQ7TppWqLgiIW7ZggVvUhG6m2rZ+qJ5Kw9ypqLhhU
+         r/ww==
+X-Gm-Message-State: AOJu0YyBmzo+XO8fccCn/5HXTgFXSBMVIcp+WfiR9dFvmpXXNZLa5WST
+	7AUWNJGtV7MA5ybQBjr2+0s=
+X-Google-Smtp-Source: AGHT+IFH8ThZBlDiZwIvA7bZGSq08OJQRA8x7iJzDU0CMOm7QfRCv6JE4/Om6fMKh532v5xpgV7w6w==
+X-Received: by 2002:a05:6000:128b:b0:336:3aa2:4458 with SMTP id f11-20020a056000128b00b003363aa24458mr1060771wrx.154.1702631444074;
+        Fri, 15 Dec 2023 01:10:44 -0800 (PST)
 Received: from [192.168.2.124] (54-240-197-233.amazon.com. [54.240.197.233])
-        by smtp.gmail.com with ESMTPSA id h2-20020a05600c350200b0040c6b2c8fa9sm1415680wmq.41.2023.12.15.01.07.26
+        by smtp.gmail.com with ESMTPSA id g6-20020a5d5546000000b003364ee1fcf7sm1327901wrw.19.2023.12.15.01.10.43
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Dec 2023 01:07:27 -0800 (PST)
-Message-ID: <f80753b3-2e68-487c-8304-fe801534748a@gmail.com>
-Date: Fri, 15 Dec 2023 09:07:25 +0000
+        Fri, 15 Dec 2023 01:10:43 -0800 (PST)
+Message-ID: <ff8768e1-5150-4d06-9d6e-eabb7f30aa56@gmail.com>
+Date: Fri, 15 Dec 2023 09:10:42 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -68,92 +68,64 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Reply-To: paul@xen.org
-Subject: Re: [PATCH v3] KVM: x86/xen: improve accuracy of Xen timers
-To: David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org,
- linux-kernel <linux-kernel@vger.kernel.org>
-Cc: Paul Durrant <paul@xen.org>, Sean Christopherson <seanjc@google.com>,
+Subject: Re: [PATCH v2] KVM: x86/xen: Inject vCPU upcall vector when local
+ APIC is enabled
+Content-Language: en-US
+To: David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org
+Cc: Sean Christopherson <seanjc@google.com>,
  Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
  Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
  Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
- "H. Peter Anvin" <hpa@zytor.com>
-References: <afc496b886bc46b956ede716d8db6f208e7bab0a.camel@infradead.org>
-Content-Language: en-US
+ "H. Peter Anvin" <hpa@zytor.com>, Paul Durrant <paul@xen.org>
+References: <884c08981d44f420f2a543276141563d07464f9b.camel@infradead.org>
 From: "Durrant, Paul" <xadimgnik@gmail.com>
-In-Reply-To: <afc496b886bc46b956ede716d8db6f208e7bab0a.camel@infradead.org>
+In-Reply-To: <884c08981d44f420f2a543276141563d07464f9b.camel@infradead.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 14/12/2023 16:54, David Woodhouse wrote:
+On 14/12/2023 16:56, David Woodhouse wrote:
 > From: David Woodhouse <dwmw@amazon.co.uk>
 > 
-> A test program such as http://david.woodhou.se/timerlat.c confirms user
-> reports that timers are increasingly inaccurate as the lifetime of a
-> guest increases. Reporting the actual delay observed when asking for
-> 100µs of sleep, it starts off OK on a newly-launched guest but gets
-> worse over time, giving incorrect sleep times:
+> Linux guests since commit b1c3497e604d ("x86/xen: Add support for
+> HVMOP_set_evtchn_upcall_vector") in v6.0 onwards will use the per-vCPU
+> upcall vector when it's advertised in the Xen CPUID leaves.
 > 
-> root@ip-10-0-193-21:~# ./timerlat -c -n 5
-> 00000000 latency 103243/100000 (3.2430%)
-> 00000001 latency 103243/100000 (3.2430%)
-> 00000002 latency 103242/100000 (3.2420%)
-> 00000003 latency 103245/100000 (3.2450%)
-> 00000004 latency 103245/100000 (3.2450%)
+> This upcall is injected through the local APIC as an MSI, unlike the
+> older system vector which was merely injected by the hypervisor any time
+> the CPU was able to receive an interrupt and the upcall_pending flags is
+> set in its vcpu_info.
 > 
-> The biggest problem is that get_kvmclock_ns() returns inaccurate values
-> when the guest TSC is scaled. The guest sees a TSC value scaled from the
-> host TSC by a mul/shift conversion (hopefully done in hardware). The
-> guest then converts that guest TSC value into nanoseconds using the
-> mul/shift conversion given to it by the KVM pvclock information.
+> Effectively, that makes the per-CPU upcall edge triggered instead of
+> level triggered.
 > 
-> But get_kvmclock_ns() performs only a single conversion directly from
-> host TSC to nanoseconds, giving a different result. A test program at
-> http://david.woodhou.se/tsdrift.c demonstrates the cumulative error
-> over a day.
+> We lose edges.
 > 
-> It's non-trivial to fix get_kvmclock_ns(), although I'll come back to
-> that. The actual guest hv_clock is per-CPU, and *theoretically* each
-> vCPU could be running at a *different* frequency. But this patch is
-> needed anyway because...
+> Specifically, when the local APIC is *disabled*, delivering the MSI
+> will fail. Xen checks the vcpu_info->evtchn_upcall_pending flag when
+> enabling the local APIC for a vCPU and injects the vector immediately
+> if so.
 > 
-> The other issue with Xen timers was that the code would snapshot the
-> host CLOCK_MONOTONIC at some point in time, and then... after a few
-> interrupts may have occurred, some preemption perhaps... would also read
-> the guest's kvmclock. Then it would proceed under the false assumption
-> that those two happened at the *same* time. Any time which *actually*
-> elapsed between reading the two clocks was introduced as inaccuracies
-> in the time at which the timer fired.
+> Since userspace doesn't get to notice when the guest enables a local
+> APIC which is emulated in KVM, KVM needs to do the same.
 > 
-> Fix it to use a variant of kvm_get_time_and_clockread(), which reads the
-> host TSC just *once*, then use the returned TSC value to calculate the
-> kvmclock (making sure to do that the way the guest would instead of
-> making the same mistake get_kvmclock_ns() does).
+> Astute reviewers may note that kvm_xen_inject_vcpu_vector() function has
+> a WARN_ON_ONCE() in the case where kvm_irq_delivery_to_apic_fast() fails
+> and returns false. In the case where the MSI is not delivered due to the
+> local APIC being disabled, kvm_irq_delivery_to_apic_fast() still returns
+> true but the value in *r is zero. So the WARN_ON_ONCE() remains correct,
+> as that case should still never happen.
 > 
-> Sadly, hrtimers based on CLOCK_MONOTONIC_RAW are not supported, so Xen
-> timers still have to use CLOCK_MONOTONIC. In practice the difference
-> between the two won't matter over the timescales involved, as the
-> *absolute* values don't matter; just the delta.
-> 
-> This does mean a new variant of kvm_get_time_and_clockread() is needed;
-> called kvm_get_monotonic_and_clockread() because that's what it does.
-> 
-> Fixes: 536395260582 ("KVM: x86/xen: handle PV timers oneshot mode")
+> Fixes: fde0451be8fb3 ("KVM: x86/xen: Support per-vCPU event channel upcall via local APIC")
 > Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 > ---
-> v3:
->    • Rebase and repost.
-> 
 > v2:
->    • Fall back to get_kvmclock_ns() if vcpu-arch.hv_clock isn't set up
->      yet, with a big comment explaining why that's actually OK.
->    • Fix do_monotonic() *not* to add the boot time offset.
->    • Rename do_monotonic_raw() → do_kvmclock_base() and add a comment
->      to make it clear that it *does* add the boot time offset. That
->      was just left as a bear trap for the unwary developer, wasn't it?
+>   • Add Fixes: tag.
 > 
->   arch/x86/kvm/x86.c |  61 +++++++++++++++++++++--
->   arch/x86/kvm/x86.h |   1 +
->   arch/x86/kvm/xen.c | 121 ++++++++++++++++++++++++++++++++++-----------
->   3 files changed, 149 insertions(+), 34 deletions(-)
+> 
+>   arch/x86/kvm/lapic.c |  5 ++++-
+>   arch/x86/kvm/xen.c   |  2 +-
+>   arch/x86/kvm/xen.h   | 18 ++++++++++++++++++
+>   3 files changed, 23 insertions(+), 2 deletions(-)
 > 
 
 Reviewed-by: Paul Durrant <paul@xen.org>
