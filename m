@@ -1,188 +1,169 @@
-Return-Path: <kvm+bounces-4583-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4584-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3D8C814EC3
-	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 18:30:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9EE7814EFA
+	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 18:40:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 98FDC1F25971
-	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 17:30:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 17C84B22BD2
+	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 17:40:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D794D34CDC;
-	Fri, 15 Dec 2023 17:26:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4572F3011A;
+	Fri, 15 Dec 2023 17:40:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="IKn9mPIl";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="+kWi05ef"
+	dkim=pass (2048-bit key) header.d=bitbyteword.org header.i=@bitbyteword.org header.b="BVtp74CP"
 X-Original-To: kvm@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71DCE30103;
-	Fri, 15 Dec 2023 17:26:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1702661212;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VYZRdTrUfLSjIbMuwr8q2hB5IoUOm77UOIngwqn7iJU=;
-	b=IKn9mPIlQGHLdLYlt72NR+6gXNAd57/ptU/wmG/+bXyc75gESDFrSFuhOKC+Fd3eSrWNco
-	/mkGCExYeIF5nNf8Acaqio4f5rKehxBjL9KjOZSH2PSru2oCd/58B0jnkppKR64LFFLiFd
-	wxSczyy8IQqz4cHwp2NcbTfegKR2uCzQgqM2ene3gCxZ0PmTNOozw0YEMJORi7XC5lF6tF
-	b3t0OGE29QZSq+RNJXVceX0vOZAp/Vw1jFqLIRGq7ty8G06cYVs4jhiNSeVxQ9+g1f/PjS
-	V6e9iQYPQthSHBGOMC2OzRmP108pPenk6X4RoHbi2mYjSaAsAc1SzBJqltqqZw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1702661212;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VYZRdTrUfLSjIbMuwr8q2hB5IoUOm77UOIngwqn7iJU=;
-	b=+kWi05ef+R91pM1ddNPnVDIOyZmI5bJhC1nemoVwP66Q+Y3daQdLyWxmXjB1BpSmsvh97o
-	t1lywhsYkDEFZLBQ==
-To: "Vineeth Pillai (Google)" <vineeth@bitbyteword.org>, Ben Segall
- <bsegall@google.com>, Borislav Petkov <bp@alien8.de>, Daniel Bristot de
- Oliveira <bristot@redhat.com>, Dave Hansen <dave.hansen@linux.intel.com>,
- Dietmar Eggemann <dietmar.eggemann@arm.com>, "H . Peter Anvin"
- <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, Juri Lelli
- <juri.lelli@redhat.com>, Mel Gorman <mgorman@suse.de>, Paolo Bonzini
- <pbonzini@redhat.com>, Andy Lutomirski <luto@kernel.org>, Peter Zijlstra
- <peterz@infradead.org>, Sean Christopherson <seanjc@google.com>, Steven
- Rostedt <rostedt@goodmis.org>, Valentin Schneider <vschneid@redhat.com>,
- Vincent Guittot <vincent.guittot@linaro.org>, Vitaly Kuznetsov
- <vkuznets@redhat.com>, Wanpeng Li <wanpengli@tencent.com>
-Cc: "Vineeth Pillai (Google)" <vineeth@bitbyteword.org>, Suleiman Souhlal
- <suleiman@google.com>, Masami Hiramatsu <mhiramat@google.com>,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org, Joel
- Fernandes <joel@joelfernandes.org>
-Subject: Re: [RFC PATCH 8/8] irq: boost/unboost in irq/nmi entry/exit and
- softirq
-In-Reply-To: <20231214024727.3503870-9-vineeth@bitbyteword.org>
-References: <20231214024727.3503870-1-vineeth@bitbyteword.org>
- <20231214024727.3503870-9-vineeth@bitbyteword.org>
-Date: Fri, 15 Dec 2023 18:26:51 +0100
-Message-ID: <87zfybml5w.ffs@tglx>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D971930105
+	for <kvm@vger.kernel.org>; Fri, 15 Dec 2023 17:40:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bitbyteword.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bitbyteword.org
+Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-6da4893142aso733614a34.0
+        for <kvm@vger.kernel.org>; Fri, 15 Dec 2023 09:40:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bitbyteword.org; s=google; t=1702662036; x=1703266836; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=2xNwxrUoQHabToj/i/64zScVcUx7+IRz98c/crxfGeI=;
+        b=BVtp74CPxjNm5QaKeaSkn2w0WyrHXpP8EKKdjrCHGQgBiDjsFLPXLVku0qk2U0cBiz
+         AlnmI+wgYFgMMt7Ma0YZAkQ/vVCah/5xqW5blOCxVr2c0E4dUAtCXZF7XmA5rZ1jcdzW
+         pfzNyzpMr2qmGlRsVFGOJf8hZUnU4le3FcXa/VKqDaFs0023d3BWv8sfgmAfzE/bD6vj
+         b0i77gmETNiZXcf0MIu10MPp6hNUuAxs/iXxZGmlXbTqz3oQKS6clrhAJEps52CqC6bj
+         QMQVS7GbHbiATPIqi6JrGB89Dg88oUCaTv5EqeZ19hvHg6DtBiOctmtQHd/WlDbAiU/f
+         /v1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702662036; x=1703266836;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2xNwxrUoQHabToj/i/64zScVcUx7+IRz98c/crxfGeI=;
+        b=lfewXz/tDet9THjFyfgGcr7WLlOD35Kiq/tsQMWWKvtGB1coFjYckcPUx+1MvEqvDe
+         1bjsunaxJ+ZGPnG8nXZwtMnUn/q3Q0DiyKfOrzFQALSliFVWa2KY7hZbq7fxVflppl+k
+         mWsuVHU9jQNi2CvcIIh2pm0Kch2HD9xY5yIJgIf0lI/cvGe2EdS1tIrLh4vQfoyc1p9D
+         9feLQltBUGROO4516iaEeHBImDmVn3k6BllpRReKHDYv0jQSBP0nlIl4kgH9irui3SON
+         9Zw175V9ud5yiUo5bjHggT/ZUNYexg7FjWp+VjrnnnoRlO4djQhuxORmRkOw5dl3NnCv
+         K3aA==
+X-Gm-Message-State: AOJu0YzN45j+HAjWANjpvY9RxLGVbzQfOjS8xHpQnrKA1vxJnh2H9KK+
+	/308fR3HwdHt2LhwME1R8M4aXj9WWlFr4kaFPyIGmA==
+X-Google-Smtp-Source: AGHT+IEZFg9Ga9F9cLX+1b4+m4Vq0StxR+3I2Y87jSC/8Vw5HOHVENnoE+BwBn2fZGPSKTAo7P+qKG4Vg3+mLBJAWtg=
+X-Received: by 2002:a9d:7518:0:b0:6d9:ebaf:a5fa with SMTP id
+ r24-20020a9d7518000000b006d9ebafa5famr11871714otk.54.1702662035860; Fri, 15
+ Dec 2023 09:40:35 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20231214024727.3503870-1-vineeth@bitbyteword.org>
+ <ZXsvl7mabUuNkWcY@google.com> <CAO7JXPihjjko6qe8tr6e6UE=L7uSR6AACq1Zwg+7n95s5A-yoQ@mail.gmail.com>
+ <ZXth7hu7jaHbJZnj@google.com> <CAO7JXPhQ3zPzsNeuUphLx7o_+DOfJrmCoyRXXjcQMEzrKnGc9g@mail.gmail.com>
+ <ZXuiM7s7LsT5hL3_@google.com> <CAO7JXPik9eMgef6amjCk5JPeEhg66ghDXowWQESBrd_fAaEsCA@mail.gmail.com>
+ <ZXyFWTSU3KRk7EtQ@google.com>
+In-Reply-To: <ZXyFWTSU3KRk7EtQ@google.com>
+From: Vineeth Remanan Pillai <vineeth@bitbyteword.org>
+Date: Fri, 15 Dec 2023 12:40:24 -0500
+Message-ID: <CAO7JXPgH6Z9X5sWXLa_15VMQ-LU6Zy-tArauRowyDNTDWjwA2g@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/8] Dynamic vcpu priority management in kvm
+To: Sean Christopherson <seanjc@google.com>
+Cc: Ben Segall <bsegall@google.com>, Borislav Petkov <bp@alien8.de>, 
+	Daniel Bristot de Oliveira <bristot@redhat.com>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	Dietmar Eggemann <dietmar.eggemann@arm.com>, "H . Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, 
+	Juri Lelli <juri.lelli@redhat.com>, Mel Gorman <mgorman@suse.de>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Andy Lutomirski <luto@kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Thomas Gleixner <tglx@linutronix.de>, Valentin Schneider <vschneid@redhat.com>, 
+	Vincent Guittot <vincent.guittot@linaro.org>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
+	Wanpeng Li <wanpengli@tencent.com>, Suleiman Souhlal <suleiman@google.com>, 
+	Masami Hiramatsu <mhiramat@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	x86@kernel.org, Tejun Heo <tj@kernel.org>, Josh Don <joshdon@google.com>, 
+	Barret Rhoden <brho@google.com>, David Vernet <dvernet@meta.com>, 
+	Joel Fernandes <joel@joelfernandes.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Dec 13 2023 at 21:47, Vineeth Pillai (Google) wrote:
-> The host proactively boosts the VCPU threads during irq/nmi injection.
-> However, the host is unaware of posted interrupts, and therefore, the
-> guest should request a boost if it has not already been boosted.
+[...snip...]
+> > > IMO, this has a significantly lower ceiling than what is possible with something
+> > > like sched_ext, e.g. it requires a host tick to make scheduling decisions, and
+> > > because it'd require a kernel-defined ABI, would essentially be limited to knobs
+> > > that are broadly useful.  I.e. every bit of information that you want to add to
+> > > the guest/host ABI will need to get approval from at least the affected subsystems
+> > > in the guest, from KVM, and possibly from the host scheduler too.  That's going
+> > > to make for a very high bar.
+> > >
+> > Just thinking out  loud, The ABI could be very simple to start with. A
+> > shared page with dedicated guest and host areas. Guest fills details
+> > about its priority requirements, host fills details about the actions
+> > it took(boost/unboost, priority/sched class etc). Passing this
+> > information could be in-band or out-of-band. out-of-band could be used
+> > by dedicated userland schedulers. If both guest and host agrees on
+> > in-band during guest startup, kvm could hand over the data to
+> > scheduler using a scheduler callback. I feel this small addition to
+> > kvm could be maintainable and by leaving the protocol for interpreting
+> > shared memory to guest and host, this would be very generic and cater
+> > to multiple use cases. Something like above could be used both by
+> > low-end devices and high-end server like systems and guest and host
+> > could have custom protocols to interpret the data and make decisions.
+> >
+> > In this RFC, we have a miniature form of the above, where we have a
+> > shared memory area and the scheduler callback is basically
+> > sched_setscheduler. But it could be made very generic as part of ABI
+> > design. For out-of-band schedulers, this call back could be setup by
+> > sched_ext, a userland scheduler and any similar out-of-band scheduler.
+> >
+> > I agree, getting a consensus and approval is non-trivial. IMHO, this
+> > use case is compelling for such an ABI because out-of-band schedulers
+> > might not give the desired results for low-end devices.
+> >
+> > > > Having a formal paravirt scheduling ABI is something we would want to
+> > > > pursue (as I mentioned in the cover letter) and this could help not
+> > > > only with latencies, but optimal task placement for efficiency, power
+> > > > utilization etc. kvm's role could be to set the stage and share
+> > > > information with minimum delay and less resource overhead.
+> > >
+> > > Making KVM middle-man is most definitely not going to provide minimum delay or
+> > > overhead.  Minimum delay would be the guest directly communicating with the host
+> > > scheduler.  I get that convincing the sched folks to add a bunch of paravirt
+> > > stuff is a tall order (for very good reason), but that's exactly why I Cc'd the
+> > > sched_ext folks.
+> > >
+> > As mentioned above, guest directly talking to host scheduler without
+> > involving kvm would mean an out-of-band scheduler and the
+> > effectiveness depends on how fast the scheduler gets to run.
 >
-> Similarly, guest should request an unboost on irq/nmi/softirq exit if
-> the vcpu doesn't need the boost any more.
+> No, the "host scheduler" could very well be a dedicated in-kernel paravirt
+> scheduler.  It could be a sched_ext BPF program that for all intents and purposes
+> is in-band.
+>
+Yes, if the scheduler is on the same physical cpu and acts on events
+like VMEXIT/VMENTRY etc, this would work perfectly. Having the VM talk
+to a scheduler running on another cpu and making decisions might not
+be quick enough when we do not have enough cpu capacity.
 
-That's giving a hint but no context for someone who is not familiar with
-the problem which is tried to be solved here.
+> You are basically proposing that KVM bounce-buffer data between guest and host.
+> I'm saying there's no _technical_ reason to use a bounce-buffer, just do zero copy.
+>
+I was also meaning zero copy only. The help required from the kvm side is:
+- Pass the address of the shared memory to bpf programs/scheduler once
+the guest sets it up.
+- Invoke scheduler registered callbacks on events like VMEXIT,
+VEMENTRY, interrupt injection etc. Its the job of guest and host
+paravirt scheduler to interpret the shared memory contents and take
+actions.
 
-> @@ -327,6 +327,13 @@ noinstr irqentry_state_t irqentry_enter(struct pt_regs *regs)
->  		.exit_rcu = false,
->  	};
->  
-> +#ifdef CONFIG_PARAVIRT_SCHED
-> +	instrumentation_begin();
+I admit current RFC doesn't strictly implement hooks and callbacks -
+it calls sched_setscheduler in place of all callbacks that I mentioned
+above. I guess this was your strongest objection.
 
-Slapping instrumentation_begin() at it silences the objtool checker, but
-that does not make it correct in any way.
-
-You _cannot_ call random code _before_ the kernel has established
-context. It's clearly documented:
-
-  https://www.kernel.org/doc/html/latest/core-api/entry.html
-
-No?
-
-> +	if (pv_sched_enabled())
-> +		pv_sched_boost_vcpu_lazy();
-> +	instrumentation_end();
-> +#endif
-> +
->  	if (user_mode(regs)) {
->  		irqentry_enter_from_user_mode(regs);
->  		return ret;
-> @@ -452,6 +459,18 @@ noinstr void irqentry_exit(struct pt_regs *regs, irqentry_state_t state)
->  		if (state.exit_rcu)
->  			ct_irq_exit();
->  	}
-> +
-> +#ifdef CONFIG_PARAVIRT_SCHED
-> +	instrumentation_begin();
-
-Broken too
-
-> +	/*
-> +	 * On irq exit, request a deboost from hypervisor if no softirq pending
-> +	 * and current task is not RT and !need_resched.
-> +	 */
-> +	if (pv_sched_enabled() && !local_softirq_pending() &&
-> +			!need_resched() && !task_is_realtime(current))
-> +		pv_sched_unboost_vcpu();
-> +	instrumentation_end();
-> +#endif
->  }
->  
->  irqentry_state_t noinstr irqentry_nmi_enter(struct pt_regs *regs)
-> @@ -469,6 +488,11 @@ irqentry_state_t noinstr irqentry_nmi_enter(struct pt_regs *regs)
->  	kmsan_unpoison_entry_regs(regs);
->  	trace_hardirqs_off_finish();
->  	ftrace_nmi_enter();
-> +
-> +#ifdef CONFIG_PARAVIRT_SCHED
-> +	if (pv_sched_enabled())
-> +		pv_sched_boost_vcpu_lazy();
-> +#endif
->  	instrumentation_end();
->  
->  	return irq_state;
-> @@ -482,6 +506,12 @@ void noinstr irqentry_nmi_exit(struct pt_regs *regs, irqentry_state_t irq_state)
->  		trace_hardirqs_on_prepare();
->  		lockdep_hardirqs_on_prepare();
->  	}
-> +
-> +#ifdef CONFIG_PARAVIRT_SCHED
-> +	if (pv_sched_enabled() && !in_hardirq() && !local_softirq_pending() &&
-> +			!need_resched() && !task_is_realtime(current))
-> +		pv_sched_unboost_vcpu();
-> +#endif
-
-Symmetry is overrated. Just pick a spot and slap your hackery in.
-
-Aside of that this whole #ifdeffery is tasteless at best.
-
->  	instrumentation_end();
-
-> +#ifdef CONFIG_PARAVIRT_SCHED
-> +	if (pv_sched_enabled())
-> +		pv_sched_boost_vcpu_lazy();
-> +#endif
-
-But what's worse is that this is just another approach of sprinkling
-random hints all over the place and see what sticks.
-
-Abusing KVM as the man in the middle to communicate between guest and
-host scheduler is creative, but ill defined.
-
-From the host scheduler POV the vCPU is just a user space thread and
-making the guest special is just the wrong approach.
-
-The kernel has no proper general interface to convey information from a
-user space task to the scheduler.
-
-So instead of adding some ad-hoc KVM hackery the right thing is to solve
-this problem from ground up in a generic way and KVM can just utilize
-that instead of having the special snow-flake hackery which is just a
-maintainability nightmare.
+As you mentioned in the reply to Joel, if it is fine for kvm to allow
+hooks into events (VMEXIT, VMENTRY, interrupt injection etc) then, it
+makes it easier to develop the ABI I was mentioning and have the hooks
+implemented by a paravirt scheduler. We shall re-design the
+architecture based on this for v2.
 
 Thanks,
-
-        tglx
+Vineeth
 
