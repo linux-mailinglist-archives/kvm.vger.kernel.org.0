@@ -1,260 +1,280 @@
-Return-Path: <kvm+bounces-4542-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4543-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5161813EC4
-	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 01:38:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE023813ED2
+	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 01:48:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D85C283EF6
-	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 00:38:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 336C01F22C47
+	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 00:48:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D96D805;
-	Fri, 15 Dec 2023 00:38:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F36A809;
+	Fri, 15 Dec 2023 00:47:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZuTReeXk"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="D/ezQFnb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 939BBA3C;
-	Fri, 15 Dec 2023 00:38:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702600691; x=1734136691;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=1WFzdMInm/n6g6/BbTrqmXbiN1PpBfIQBRnrIiEOGjk=;
-  b=ZuTReeXkiQja5fqkymuc3gj/GH4vAvX/NBDeZf7NkW/hRc32AYF+mhB8
-   J+OA9/JOgxKeSgJq3MNH5qzNBBfJ1C2JKAtXwS67Kvl2RXyyq2YsQEw9t
-   FW14L2aednyI26x364KWRE1bLLZngM18qd11ZI0Zoib9zSZUqW3z029Ek
-   7OuSn4bj3dcdDWTJzUBkcK3+DaybQvrruOVtfrcqzA1BP51+HYYdljn0G
-   eGZVH8qGVuQ1ZscM+tJmAOBvCCLepEN8KqItQKXigpJhqsplVhVbQI4ii
-   hVce0bSpNMgcz9GE85TgrXXumloY5x0b3V7lZZlIVbknknco6uhupb4At
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10924"; a="481399646"
-X-IronPort-AV: E=Sophos;i="6.04,277,1695711600"; 
-   d="scan'208";a="481399646"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Dec 2023 16:38:08 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10924"; a="767786279"
-X-IronPort-AV: E=Sophos;i="6.04,277,1695711600"; 
-   d="scan'208";a="767786279"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orsmga007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Dec 2023 16:37:47 -0800
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 14 Dec 2023 16:37:46 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 14 Dec 2023 16:37:46 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Thu, 14 Dec 2023 16:37:46 -0800
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.40) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 14 Dec 2023 16:37:46 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=N8xR8RFwBPi90Y0Y/ZpW4Iesd2Izt7iswUVzwvsQ2oBdNVUarULQOcWYWjgTYxutw5cJ1jX0sCLbS4pTTtfoHo7/1HRoelffobGGtGodqul3z2eRRmcg6EMfv2Zcc3UW/QDNJvSZHWqxFtIMdcqMjEfK7PKsgTYYTilTJwx4EWMw6UnqFaWsuWkSiAQM5pgM+g9fZWUG+V5Mfyve9Fdw/zTXFHaL5C/36Ixv68NG5QmBt0wMneUhtML08Ppw5RENYRluAAGUSEqNZMLqrAg20isybS3Xjt4vByQO4bTM6xXStPvgEoNcVDwZIfvEDezIrvn+G/WYTYw8en6r/FHu5Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1WFzdMInm/n6g6/BbTrqmXbiN1PpBfIQBRnrIiEOGjk=;
- b=N7e++PDsgJVu8J6k+uwtyOLIx/+YqaFWSPF4wx/C690+DAjvWyNEuUHv20ZUtawZReJtKTemKeSm148TEbAwsI/uRMyZsjoH1EpLkwmI3PjQNLSunvl9SDMNB9olDrziAO/CBVy7kCOLxcDSjtKuM96XowpBiptHGpA1G3sdMP+oqCv0PixOoHzfLhtSlWUPrJeTaPaUANL1iOfLCFOT5NNH1PqU7bFznRde49NNVU+YSP7ajHoZx+GaBHnT56+UymE94ZNfMEPgTntWVI9UpZoPNGRWgxeyTjLtifaVdeJ0QO5GBYuD3FIRJmLPJMEUjIoK+54qI280BY9WLf2o1Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH0PR11MB4965.namprd11.prod.outlook.com (2603:10b6:510:34::7)
- by PH8PR11MB7144.namprd11.prod.outlook.com (2603:10b6:510:22c::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.28; Fri, 15 Dec
- 2023 00:37:44 +0000
-Received: from PH0PR11MB4965.namprd11.prod.outlook.com
- ([fe80::ea04:122f:f20c:94e8]) by PH0PR11MB4965.namprd11.prod.outlook.com
- ([fe80::ea04:122f:f20c:94e8%2]) with mapi id 15.20.7091.030; Fri, 15 Dec 2023
- 00:37:44 +0000
-Message-ID: <97e7a963-1142-4e25-b439-48e5b551f148@intel.com>
-Date: Fri, 15 Dec 2023 08:37:26 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 8/8] iommu/vt-d: Add set_dev_pasid callback for nested
- domain
-To: Baolu Lu <baolu.lu@linux.intel.com>, Yi Liu <yi.l.liu@intel.com>
-CC: <robin.murphy@arm.com>, <kevin.tian@intel.com>, <jgg@nvidia.com>,
-	<alex.williamson@redhat.com>, <joro@8bytes.org>, <cohuck@redhat.com>,
-	<eric.auger@redhat.com>, <nicolinc@nvidia.com>, <kvm@vger.kernel.org>,
-	<mjrosato@linux.ibm.com>, <chao.p.peng@linux.intel.com>,
-	<yi.y.sun@linux.intel.com>, <peterx@redhat.com>, <jasowang@redhat.com>,
-	<shameerali.kolothum.thodi@huawei.com>, <lulu@redhat.com>,
-	<suravee.suthikulpanit@amd.com>, <iommu@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<zhenzhong.duan@intel.com>, <joao.m.martins@oracle.com>,
-	<xin.zeng@intel.com>, <yan.y.zhao@intel.com>
-References: <20231127063428.127436-1-yi.l.liu@intel.com>
- <20231127063428.127436-9-yi.l.liu@intel.com>
- <a19031b0-7c30-45e6-b171-c53e3578b867@intel.com>
- <4e08dc77-82ce-40ce-8a0c-ac9016186c23@linux.intel.com>
-Content-Language: en-US
-From: "Yang, Weijiang" <weijiang.yang@intel.com>
-In-Reply-To: <4e08dc77-82ce-40ce-8a0c-ac9016186c23@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SG2PR01CA0196.apcprd01.prod.exchangelabs.com
- (2603:1096:4:189::23) To PH0PR11MB4965.namprd11.prod.outlook.com
- (2603:10b6:510:34::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA549363
+	for <kvm@vger.kernel.org>; Fri, 15 Dec 2023 00:47:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-db7dd9a8bd6so120700276.1
+        for <kvm@vger.kernel.org>; Thu, 14 Dec 2023 16:47:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1702601269; x=1703206069; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=J/OqsU/wKLZASXzbR9+FvmNwQRC2skgcu27wx2pyGOk=;
+        b=D/ezQFnbztLQk90UqjM6w7qI3F3l3NMP17lxOWt/K12lv4vIlDMTfX7g9LVinyZIdq
+         K2gc70HEs2m6olRfdWuAIqgGbisxEZyDZoezCKarDt3EhTbpxZqDYohpe2xvaaGaKIeC
+         Ve3guYraFNYcDYMKevtSY+AlBS+AaXClmTiNgwHTkhPnqPbm9nQtTXSNC4ImC1vq0WFr
+         FOM5slsTJ38DA6jiy0/Ft9sLfK5MIsTYQUPO3hQ+9hW0S92y4m+TqXMQIxxcgbvseLli
+         zv1u+Q2je8VPkexYe9DLSou5SgTka5wDdeEor436NQ9zXP0I5zJCF5GmyPVuspFdEM+9
+         glmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702601269; x=1703206069;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=J/OqsU/wKLZASXzbR9+FvmNwQRC2skgcu27wx2pyGOk=;
+        b=X6LDRJT9+mzmAwbFAINz13Sa6sw3K017rl1NSWgyAvOarNT92iAjJKNylNSqcOMICi
+         IHH3g2nvEBJqCgGp/OiyOTjKFlB9rHpBz5RdqGYRTRPnwrGiQo6WIRETkscVJQsR6PGl
+         F8yzO2Ert6rNIA22qgT64i9ZPDbH7MeMiI0t9S/U0ApWGAykHVLrr+cNjLT25p5jpH3V
+         y5lpojKFDIbTc4Qx6G2o676gImQaHKaw2tkjEA1wFdMx3KHIOQ2USvd47zLMTqjGnU/a
+         qZc4CkR7f3DC4Se57PJXCg+DPqx8m6vZmc3O2shQQgmzF/CeB71imwRK6IZ67fLare1f
+         wCxw==
+X-Gm-Message-State: AOJu0YxyprG/zX/K/YA4fRIz/62V98WYYRI0e9+/U/04m/q9TlmBa7Vf
+	d1BdX6jhdV0xmMGU87ZogwTM81/gZVE=
+X-Google-Smtp-Source: AGHT+IHCTrULdWUnuMZ3DE3sjKqJ0QjQ3AsQRHIFsQZLGwiEy5A8Nj70e5TPwcElCWV0m7/BeSSDs+5Svmo=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:86ce:0:b0:dbc:d2e9:39e7 with SMTP id
+ y14-20020a2586ce000000b00dbcd2e939e7mr36518ybm.10.1702601268729; Thu, 14 Dec
+ 2023 16:47:48 -0800 (PST)
+Date: Thu, 14 Dec 2023 16:47:47 -0800
+In-Reply-To: <CAO7JXPhQ3zPzsNeuUphLx7o_+DOfJrmCoyRXXjcQMEzrKnGc9g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR11MB4965:EE_|PH8PR11MB7144:EE_
-X-MS-Office365-Filtering-Correlation-Id: dacea726-cf41-4c9d-dcfd-08dbfd060d2b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: farPZn4KuBvoOyGi/qvZa5IIV4facMHHsDlgqTUPPeXqnRsE8flRtODLiAuwccO4sUv6w4JIeFQej6+t6QW8awHDqL13/iruVld1wqHpWDvC7FinOyqTXmVxKlScLcxTCEPQ4oR7BO0WsvYSuTrZbmhiHzOKM0TRIj3DgSwdfI/m4Bhvafn9V0YVv3cShok1nWDIkTve86O92Lonj6vlG/yRTVaGkxF4CP1wJtbKdoQrxYb10ut43EcbMvp0kTVKz8lmQRtHCa2VJk6EpnLyxoJubHp6Pwd2xvDigVh6HZPegAnLYioYK6v9no0a6ju+pPad6z82wwuhtf50S4Yof/oeq3LMf0IzQGBTDtwIyKpk27sQNs4Q+e74aIBo3flO6cdKWa8chUDbcKrb5WI/F+j0NJzY8CAbYWKVHrB1Jg6K8h7a+/BC/Uq3zDRphccOb6BpJ8/RBzhckrzsLTjU8FiGUAjeGkw/Jtt21mqoUEQe8IJzzSzCTlkvPTKRzUJfLAGqtKHD+6NSALWrm7HeCmOfzdmlkLV3G04v62fDMeshE0kmg3RRtcsQK7qSY5eorQCAHtfd9t6LWNdYru0pWFVQkgf+VQAtVcsNwjGWhhtvH+Xq1KJwHRqHZJa4xSx9lfKVq+WimJYcMeVqxnZH+Q==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4965.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(366004)(376002)(39860400002)(136003)(346002)(230922051799003)(186009)(1800799012)(64100799003)(451199024)(38100700002)(26005)(83380400001)(2616005)(86362001)(36756003)(31696002)(31686004)(82960400001)(53546011)(6486002)(6666004)(478600001)(6512007)(6506007)(66476007)(6636002)(316002)(66556008)(8676002)(110136005)(66946007)(4326008)(8936002)(2906002)(7416002)(5660300002)(41300700001)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TlFUZXpaaVpjS05DdXpCUXMxcit1OEJjMnNKT3Erd1QxVHBUdDArakJadWhy?=
- =?utf-8?B?RXFvNHZlNWJzQmlPKzBRMWs0a3AxMm5MN1VLSy9PV1c1VDJKaCt3TWp5TFg2?=
- =?utf-8?B?TzdkWDR2UnJ3OGp3VHE3dUlOZUVJbXo3N2RjREU0L2ZPMWhwSkpKQ2NsVDVQ?=
- =?utf-8?B?NG55Qzg4dnBoZ3NHYk13akhkT2c4ZlNpK2NTcnRWenlka2ZTZmVtZzl4M1E4?=
- =?utf-8?B?MkFIT1Z4OGdXOFIvNEsyYmNURjlEVTJwQVFQY25OMEdFZVFOcUZJM0YxWm0x?=
- =?utf-8?B?WWZEK3hqVGRnWDNRZW43eGxFT2EwclFDRnNEZmV5aGtHY2FCUnFYeWMxalFm?=
- =?utf-8?B?cDFEczM5TVA4cUEvUjBZVHhvcktaaEw4cFlCNXpzdlVWRWFaVitZdytzT1dO?=
- =?utf-8?B?RjVCb1Q3VGNFcTAybVpaRnZLSjdKOVk3czJTWWtGSm03YTE1K2tDTEtsZU92?=
- =?utf-8?B?WEVZOVVQVGtMMEpYRERlb0Z5TmV1VVY5VmRRcUVVWWJFdHBrVjh0TGtQUnVl?=
- =?utf-8?B?VU0xb0ViczY3cGJYUGZYdW5Pb0NOTitiQm9yK0hNS0ZnZlFvYUFZR0RyRXIz?=
- =?utf-8?B?WGsvcmZSMUhzc2dVcXBJcStMSzZ6eWhnNlpSdUx0YTNSeFRyVEYvK091eml6?=
- =?utf-8?B?UjVnZ0M0a0ZTN2xPTjhMWFhKeVBCTzRaTGJSU3RvYTB5eVNTbzhXUEF5QkJW?=
- =?utf-8?B?MW96NGNVTGY1dFZhQTlCVnNILzh1NW5HWjBDTHpmUHhxbEdkM3pZVk5qN2M3?=
- =?utf-8?B?eTNQYk9rMml0ZGs1ejFtNFJaSUUvWitMdEhUdmJpa1I4U3RVbXF6a29RTGNM?=
- =?utf-8?B?ZnVta0hDWjYrc1FueHdWS3FnWlVLR3F5eEpIdEtmSmwzZVZ1LzBtSTBKSHcy?=
- =?utf-8?B?bHpXQmEwRXVxTFExcEF2d1BNYjJVcEJqTDloY1ZiWHovSGs1V0NQYnQ1QWMv?=
- =?utf-8?B?ajNyN2VKYUVXQ21nbG9KcHhJZGlBZDlHTkwyNjYrUlVLbTZDeW1PNFdFTjd3?=
- =?utf-8?B?dzVXb3VxMGM2aEpFaHZTVHN2YnlXa3Zya1ZqOXRmY1VFc3k1MnFua0wzSE1W?=
- =?utf-8?B?Zldnc1JicTRac05OZk15bmFnQ1F3UXVGYW80VWZMeXp4aXRQekljcmhNWDkx?=
- =?utf-8?B?djVGQkFxQ0crT1hGRWZrSDU5Y1ZnV2lGd013MVBQQTFqaGtOOWNaeWpYOE5k?=
- =?utf-8?B?RUpvN3AyUzhtR2k4RnJJK0Q0c0hlNlJRVGlPMTIrbmhXRGJlTHhSYmQ3N2tp?=
- =?utf-8?B?RHByMmZ5UDgweExrdnZhbXIvbVZMUU1lUnRWQ1lwUUJlU2JGUTBqR2hYREd3?=
- =?utf-8?B?N2lnbThEM3M2T2RQL1REeTRaVE8wRWZvNkI0ZDRNUk54REcwVWl4Q1FkQTBw?=
- =?utf-8?B?L0tXSFB4clFGc3dvUXdqZFFOLzBTRXB6R0pRbFJMUVB5bFJnNTE5Sy8xa0Nx?=
- =?utf-8?B?ZWxmbGFYd0oxMW9BSlZSM2ZWWlAwWkRPK2ZBcUhDeWcwdTBKYWtaL3BzNXMx?=
- =?utf-8?B?Z3ZXdklsT0ZHanN0Nm5ZT0lqZ20walZQQW9CdjhFc3hWNzBvVTZhL0d2bnNR?=
- =?utf-8?B?NUtTNE1JSS93UkRFU2dFWldmbnlKYjdDM1dBUVJTSkVkR3JBdGFKdzVtL1FN?=
- =?utf-8?B?NmtHZFJyd29JeHAxQ2FHMFFCYkdVQ0VMajhyMXJqK2pjdUw3RXg5b2FQUHk3?=
- =?utf-8?B?cTMvQWloSUpBQ3R2bGFKak93QTlaNEtnMVNRSFBrSktnekdGTkdWV3AxTnJ6?=
- =?utf-8?B?bTk3UkRKMmh6UGFvTUlHR1F3dlA0SXBzcU5GNjFjUEZHNUg2VFNrb3J1Um94?=
- =?utf-8?B?MnBlSWdCY3JvTUdKUWJ1Qm5NbmZvRHRXSThDRTY5MGVXR1E5TmJqZU5nbDBS?=
- =?utf-8?B?clBwakxPeEM0ZUNUdWpkN2o4MkllMzRGV0lsNkNjcVpZaUZUS0l1bGVmWkF5?=
- =?utf-8?B?czV1Wk5pSDNvYklQSEVlWGl1dTg1THNMZ2ZmOStld0lDekF2SWx4aU5XVUpt?=
- =?utf-8?B?aEk5cmo1NnRVZVMrK1JzYUpGTGVvOHFpOWpCVzNORjdrSmlmY1J6bmhnUnUw?=
- =?utf-8?B?UGR5TDQxZFkrMitLUWcybnZ6REhjdUJkU01wclhSR09GV3dEbTA5WUlWMjhI?=
- =?utf-8?B?M3FnWHNpOXJtTTF5N3ZjVlE3dTJKSk1jdVpUOGQvMWNCVE1FSnFXb3lTeHc3?=
- =?utf-8?B?ZWc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: dacea726-cf41-4c9d-dcfd-08dbfd060d2b
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4965.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Dec 2023 00:37:43.9282
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: CI4rS11T7Wp0tUBpVRJn6EFLyV8hdch0mvR8Ff4h1DCxHY3BNb4NpoIUfnQRiO9bOM6//56CrE8tmyFUpz5GvQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB7144
-X-OriginatorOrg: intel.com
+Mime-Version: 1.0
+References: <20231214024727.3503870-1-vineeth@bitbyteword.org>
+ <ZXsvl7mabUuNkWcY@google.com> <CAO7JXPihjjko6qe8tr6e6UE=L7uSR6AACq1Zwg+7n95s5A-yoQ@mail.gmail.com>
+ <ZXth7hu7jaHbJZnj@google.com> <CAO7JXPhQ3zPzsNeuUphLx7o_+DOfJrmCoyRXXjcQMEzrKnGc9g@mail.gmail.com>
+Message-ID: <ZXuiM7s7LsT5hL3_@google.com>
+Subject: Re: [RFC PATCH 0/8] Dynamic vcpu priority management in kvm
+From: Sean Christopherson <seanjc@google.com>
+To: Vineeth Remanan Pillai <vineeth@bitbyteword.org>
+Cc: Ben Segall <bsegall@google.com>, Borislav Petkov <bp@alien8.de>, 
+	Daniel Bristot de Oliveira <bristot@redhat.com>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	Dietmar Eggemann <dietmar.eggemann@arm.com>, "H . Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, 
+	Juri Lelli <juri.lelli@redhat.com>, Mel Gorman <mgorman@suse.de>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Andy Lutomirski <luto@kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Thomas Gleixner <tglx@linutronix.de>, Valentin Schneider <vschneid@redhat.com>, 
+	Vincent Guittot <vincent.guittot@linaro.org>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
+	Wanpeng Li <wanpengli@tencent.com>, Suleiman Souhlal <suleiman@google.com>, 
+	Masami Hiramatsu <mhiramat@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	x86@kernel.org, Tejun Heo <tj@kernel.org>, Josh Don <joshdon@google.com>, 
+	Barret Rhoden <brho@google.com>, David Vernet <dvernet@meta.com>, 
+	Joel Fernandes <joel@joelfernandes.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 12/14/2023 9:33 PM, Baolu Lu wrote:
-> On 2023/12/14 10:55, Yang, Weijiang wrote:
->> On 11/27/2023 2:34 PM, Yi Liu wrote:
->>> From: Lu Baolu <baolu.lu@linux.intel.com>
->>>
->>> This allows the upper layers to set a nested type domain to a PASID of a
->>> device if the PASID feature is supported by the IOMMU hardware.
->>>
->>> The set_dev_pasid callback for non-nest domain has already be there, so
->>> this only needs to add it for nested domains.
->>>
->>> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
->>> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
->>> ---
->>>   drivers/iommu/intel/nested.c | 47 ++++++++++++++++++++++++++++++++++++
->>>   1 file changed, 47 insertions(+)
->>>
->>> diff --git a/drivers/iommu/intel/nested.c b/drivers/iommu/intel/nested.c
->>> index 44ad48db7ea0..f6f687750104 100644
->>> --- a/drivers/iommu/intel/nested.c
->>> +++ b/drivers/iommu/intel/nested.c
->>> @@ -68,6 +68,52 @@ static int intel_nested_attach_dev(struct iommu_domain *domain,
->>>       return 0;
->>>   }
->>> +static int intel_nested_set_dev_pasid(struct iommu_domain *domain,
->>> +                      struct device *dev, ioasid_t pasid)
->>> +{
->>> +    struct device_domain_info *info = dev_iommu_priv_get(dev);
->>> +    struct dmar_domain *dmar_domain = to_dmar_domain(domain);
->>> +    struct intel_iommu *iommu = info->iommu;
->>> +    struct dev_pasid_info *dev_pasid;
->>> +    unsigned long flags;
->>> +    int ret = 0;
->>> +
->>> +    if (!pasid_supported(iommu))
->>> +        return -EOPNOTSUPP;
->>> +
->>> +    if (iommu->agaw < dmar_domain->s2_domain->agaw)
->>> +        return -EINVAL;
->>> +
->>> +    ret = prepare_domain_attach_device(&dmar_domain->s2_domain->domain, dev);
->>> +    if (ret)
->>> +        return ret;
->>> +
->>> +    dev_pasid = kzalloc(sizeof(*dev_pasid), GFP_KERNEL);
->>> +    if (!dev_pasid)
->>> +        return -ENOMEM;
->>> +
->>> +    ret = domain_attach_iommu(dmar_domain, iommu);
->>> +    if (ret)
->>> +        goto err_free;
->>> +
->>> +    ret = intel_pasid_setup_nested(iommu, dev, pasid, dmar_domain);
->>> +    if (ret)
->>> +        goto err_detach_iommu;
->>> +
->>> +    dev_pasid->dev = dev;
->>> +    dev_pasid->pasid = pasid;
->>> +    spin_lock_irqsave(&dmar_domain->lock, flags);
->>> +    list_add(&dev_pasid->link_domain, &dmar_domain->dev_pasids);
->>> +    spin_unlock_irqrestore(&dmar_domain->lock, flags);
->>
->> ---> list_add(&dev_pasid->link_domain, &dmar_domain->dev_pasids);
->>
->> dev_pasid is linked at later time, this leads to domain->has_iotlb_device is not correctly set, which finally results into a missing of device iotlb flush in iommu_flush_dev_iotlb()when it's called.
->> Check this call path:
->> domain_attach_iommu()->domain_update_iommu_cap()->domain_update_iotlb()->domain->has_iotlb_device = has_iotlb_device; The ugly fixup is to call domain_update_iommu_cap() or domain_update_iotlb() here again before return.
->> The similar issue is in intel_iommu_set_dev_pasid() and intel_nested_attach_dev().
->
-> Yes, domain->has_iotlb_device must be updated whenever a domain is
-> attached to (or removed from) a RID or PASID. I would be grateful if you
-> could post some patches to fix the set_device_pasid and
-> nested_attach_dev paths.
+On Thu, Dec 14, 2023, Vineeth Remanan Pillai wrote:
+> On Thu, Dec 14, 2023 at 3:13=E2=80=AFPM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> >
+> > On Thu, Dec 14, 2023, Vineeth Remanan Pillai wrote:
+> > > On Thu, Dec 14, 2023 at 11:38=E2=80=AFAM Sean Christopherson <seanjc@=
+google.com> wrote:
+> > > Now when I think about it, the implementation seems to
+> > > suggest that we are putting policies in kvm. Ideally, the goal is:
+> > > - guest scheduler communicates the priority requirements of the workl=
+oad
+> > > - kvm applies the priority to the vcpu task.
+> >
+> > Why?  Tasks are tasks, why does KVM need to get involved?  E.g. if the =
+problem
+> > is that userspace doesn't have the right knobs to adjust the priority o=
+f a task
+> > quickly and efficiently, then wouldn't it be better to solve that probl=
+em in a
+> > generic way?
+> >
+> I get your point. A generic way would have been more preferable, but I
+> feel the scenario we are tackling is a bit more time critical and kvm
+> is better equipped to handle this. kvm has control over the VM/vcpu
+> execution and hence it can take action in the most effective way.
 
-Sure, I'll post fixup patches for the paths, thanks for confirmation!
+No, KVM most definitely does not.  Between sched, KVM, and userspace, I wou=
+ld
+rank KVM a very distant third.  Userspace controls when to do KVM_RUN, to w=
+hich
+cgroup(s) a vCPU task is assigned, the affinity of the task, etc.  sched de=
+cides
+when and where to run a vCPU task based on input from userspace.
 
->
-> I assume Yi can fix this series in the next version.
->
-> Best regards,
-> baolu
+Only in some edge cases that are largely unique to overcommitted CPUs does =
+KVM
+have any input on scheduling whatsoever.   And even then, KVM's view is lar=
+gely
+limited to a single VM, e.g. teaching KVM to yield to a vCPU running in a d=
+ifferent
+VM would be interesting, to say the least.
 
+> One example is the place where we handle boost/unboost. By the time
+> you come out of kvm to userspace it would be too late.=20
+
+Making scheduling decisions in userspace doesn't require KVM to exit to use=
+rspace.
+It doesn't even need to require a VM-Exit to KVM.  E.g. if the scheduler (w=
+hether
+it's in kernel or userspace) is running on a different logical CPU(s), then=
+ there's
+no need to trigger a VM-Exit because the scheduler can incorporate informat=
+ion
+about a vCPU in real time, and interrupt the vCPU if and only if something =
+else
+needs to run on that associated CPU.  From the sched_ext cover letter:
+
+ : Google has also experimented with some promising, novel scheduling polic=
+ies.
+ : One example is =E2=80=9Ccentral=E2=80=9D scheduling, wherein a single CP=
+U makes all
+ : scheduling decisions for the entire system. This allows most cores on th=
+e
+ : system to be fully dedicated to running workloads, and can have signific=
+ant
+ : performance improvements for certain use cases. For example, central
+ : scheduling with VCPUs can avoid expensive vmexits and cache flushes, by
+ : instead delegating the responsibility of preemption checks from the tick=
+ to
+ : a single CPU. See scx_central.bpf.c for a simple example of a central
+ : scheduling policy built in sched_ext.
+
+> Currently we apply the boost soon after VMEXIT before enabling preemption=
+ so
+> that the next scheduler entry will consider the boosted priority. As soon=
+ as
+> you enable preemption, the vcpu could be preempted and boosting would not
+> help when it is boosted. This timing correctness is very difficult to ach=
+ieve
+> if we try to do it in userland or do it out-of-band.
+
+Hooking VM-Exit isn't necessarily the fastest and/or best time to make sche=
+duling
+decisions about vCPUs.  Presumably the whole point of this is to allow runn=
+ing
+high priority, latency senstive workloads in the guest.  As above, the idea=
+l scenario
+is that a vCPU running a high priority workload would never exit in the fir=
+st place.
+
+Is it easy to get there?  No.  But it's definitely possible.
+
+> [...snip...]
+> > > > Lastly, if the concern/argument is that userspace doesn't have the =
+right knobs
+> > > > to (quickly) boost vCPU tasks, then the proposed sched_ext function=
+ality seems
+> > > > tailor made for the problems you are trying to solve.
+> > > >
+> > > > https://lkml.kernel.org/r/20231111024835.2164816-1-tj%40kernel.org
+> > > >
+> > > You are right, sched_ext is a good choice to have policies
+> > > implemented. In our case, we would need a communication mechanism as
+> > > well and hence we thought kvm would work best to be a medium between
+> > > the guest and the host.
+> >
+> > Making KVM be the medium may be convenient and the quickest way to get =
+a PoC
+> > out the door, but effectively making KVM a middle-man is going to be a =
+huge net
+> > negative in the long term.  Userspace can communicate with the guest ju=
+st as
+> > easily as KVM, and if you make KVM the middle-man, then you effectively=
+ *must*
+> > define a relatively rigid guest/host ABI.
+> >
+> > If instead the contract is between host userspace and the guest, the AB=
+I can be
+> > much more fluid, e.g. if you (or any setup) can control at least some a=
+mount of
+> > code that runs in the guest, then the contract between the guest and ho=
+st doesn't
+> > even need to be formally defined, it could simply be a matter of bundli=
+ng host
+> > and guest code appropriately.
+> >
+> > If you want to land support for a given contract in upstream repositori=
+es, e.g.
+> > to broadly enable paravirt scheduling support across a variety of users=
+epace VMMs
+> > and/or guests, then yeah, you'll need a formal ABI.  But that's still n=
+ot a good
+> > reason to have KVM define the ABI.  Doing it in KVM might be a wee bit =
+easier because
+> > it's largely just a matter of writing code, and LKML provides a central=
+ized channel
+> > for getting buyin from all parties.  But defining an ABI that's indepen=
+dent of the
+> > kernel is absolutely doable, e.g. see the many virtio specs.
+> >
+> > I'm not saying KVM can't help, e.g. if there is information that is kno=
+wn only
+> > to KVM, but the vast majority of the contract doesn't need to be define=
+d by KVM.
+> >
+> As you mentioned, custom contract between guest and host userspace is
+> really flexible, but I believe tackling scheduling(especially latency)
+> issues is a bit more difficult with generic approaches. Here kvm does
+> have some information known only to kvm(which could be shared - eg:
+> interrupt injection) but more importantly kvm has some unique
+> capabilities when it comes to scheduling. kvm and scheduler are
+> cooperating currently for various cases like, steal time accounting,
+> vcpu preemption state, spinlock handling etc. We could possibly try to
+> extend it a little further in a non-intrusive way.
+
+I'm not too worried about the code being intrusive, I'm worried about the
+maintainability, longevity, and applicability of this approach.
+
+IMO, this has a significantly lower ceiling than what is possible with some=
+thing
+like sched_ext, e.g. it requires a host tick to make scheduling decisions, =
+and
+because it'd require a kernel-defined ABI, would essentially be limited to =
+knobs
+that are broadly useful.  I.e. every bit of information that you want to ad=
+d to
+the guest/host ABI will need to get approval from at least the affected sub=
+systems
+in the guest, from KVM, and possibly from the host scheduler too.  That's g=
+oing
+to make for a very high bar.
+
+> Having a formal paravirt scheduling ABI is something we would want to
+> pursue (as I mentioned in the cover letter) and this could help not
+> only with latencies, but optimal task placement for efficiency, power
+> utilization etc. kvm's role could be to set the stage and share
+> information with minimum delay and less resource overhead.
+
+Making KVM middle-man is most definitely not going to provide minimum delay=
+ or
+overhead.  Minimum delay would be the guest directly communicating with the=
+ host
+scheduler.  I get that convincing the sched folks to add a bunch of paravir=
+t
+stuff is a tall order (for very good reason), but that's exactly why I Cc'd=
+ the
+sched_ext folks.
+
+> We could use schedulers (vanilla, sched_ext, ...) to actually make decisi=
+ons
+> based on the information it receives.
 
