@@ -1,72 +1,76 @@
-Return-Path: <kvm+bounces-4593-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4594-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C28668150FB
-	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 21:18:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7674081533B
+	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 23:09:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 33CA01F24549
-	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 20:18:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D58E5B25302
+	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 22:09:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1932445C0E;
-	Fri, 15 Dec 2023 20:18:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA6ED65EBC;
+	Fri, 15 Dec 2023 22:01:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=joelfernandes.org header.i=@joelfernandes.org header.b="RMJCQD/6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="coibmiha"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C43A4187A
-	for <kvm@vger.kernel.org>; Fri, 15 Dec 2023 20:18:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=joelfernandes.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=joelfernandes.org
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2cc3647bf06so11625731fa.2
-        for <kvm@vger.kernel.org>; Fri, 15 Dec 2023 12:18:35 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11C70675D8
+	for <kvm@vger.kernel.org>; Fri, 15 Dec 2023 22:01:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dbcc50db48cso1262816276.0
+        for <kvm@vger.kernel.org>; Fri, 15 Dec 2023 14:01:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=joelfernandes.org; s=google; t=1702671513; x=1703276313; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=U1iQKTJgbCz5BO8Tz3qnfKksMf7YlJ59LwaYRWahk0s=;
-        b=RMJCQD/6wkxPLj+S6oSrBFW8ByTTPUS0N0cb8p/QmZ2+v/KkPpG4xYNPulDfIXSXIC
-         Z7O3a1TTbrngFz678bcBKfEVklTfIs2LezFfq1EFNzYpyalLT5BpQ0H6sl1hJ6e7wI13
-         g/KiM7gSI9SUc3anJ2h2p20028EJeOZmMPOh8=
+        d=google.com; s=20230601; t=1702677676; x=1703282476; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=q/XgF9D+ghWHUEkU0/9EFhe8biuUdcjJQbYRys6RmOs=;
+        b=coibmiha3XGJaH/fO8bYZr4hVK5r9xdV3z08WKvum2hAT5+M4TSGw+Zy//kFyPMeCu
+         gll1VtNF6lhQ4jwhKrp5rCma0WPdXbQNm1+5iVFi1WJLVuVqtbq/8wdoJQj1vbNppaXJ
+         pK9cbt+TUmLRAITxC+z/IJYmztuRBccbpLu51QvgiGKbEEbxc25VeQpOFa+XMyOhROrw
+         AGgwjAFmU6QGtsOeNKUZJHOKcXkWruDVLyYxUXhASnR6jyQaf+ADPHy9ZtMYtS1NLHu2
+         +yp6n6Fq3wFnYMRSCxuA0SfKtA0duI8Xgj+vzJ+uSgA7RyeSZFKXdQwtlBTNnJLyOCMe
+         GDfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702671513; x=1703276313;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=U1iQKTJgbCz5BO8Tz3qnfKksMf7YlJ59LwaYRWahk0s=;
-        b=vpcGEoSbNue1rK7XdLohMtGRi1vaZG0TBkQsbAt9U3X8VXSTUBQ8X/4sDn7QnxXcvd
-         09NJg4UkPOP+gso1JlW3QclVkmYCyPWGde3J+fqOM9kCt7XI4abBoijd+1R165YNp7wu
-         SsDQ55Q246mEoHbBh9WDt5O+mGax8VmTsqOFfRSP+5T2dmNbCGdDSzL23RPrspzKRLJo
-         HA7BZJ+3S8OAL35qvJyEcgHxFevUVIm8Yhir19+peibUQZrsewqItyBv9ZvS8aJIPgpB
-         /o9ViQzXIRzTv93cKetFtPwN1bEeLkqXASr4KsYmv0gRK2Z4k0DPFhg+uci+oYwcpbmf
-         3m5Q==
-X-Gm-Message-State: AOJu0Yz8YxU85bn9uGzVXi2N5RfaheVM0Zq9927y/IgeIrHgESe4I43I
-	eUtVMPH3dTSByjGjkdK/JK9nSeE1LWt7rmWiEvERjg==
-X-Google-Smtp-Source: AGHT+IEz1a82jWQhUAfQHht//yOUQ4Syec4/v7J6DdgkjCIOCWR9r7KnlSETZKI+wvlp34Vm0/PPzkTDETysYBvUGe0=
-X-Received: by 2002:a2e:a178:0:b0:2c9:fa32:4261 with SMTP id
- u24-20020a2ea178000000b002c9fa324261mr3688100ljl.60.1702671513032; Fri, 15
- Dec 2023 12:18:33 -0800 (PST)
+        d=1e100.net; s=20230601; t=1702677676; x=1703282476;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=q/XgF9D+ghWHUEkU0/9EFhe8biuUdcjJQbYRys6RmOs=;
+        b=sl3EqVMhgG2Inc3fvn0crTgTKOm+atWFsP5VCX7Zctxd1S1TUoWm+F7ytg1HZmfKrd
+         gVUIf6/5kLjSjKwV83ZSlNGfqnkBSnYGH0FUj19liL2+cj3jekb3SHB04dW4OXcU6GwE
+         FLC58SY2KJolc8Uv/IxQpiTrPlfWtido6vvvJtRBtWmkpCTFvvYUDAiPV6/42R5EbLe0
+         QmF1lO5cVUCX0pRV+uOS1JtqnvvL6+SNRfvt8wtJ7WayIOb9XhNAssc2cskfA8SInCqi
+         qhZB4sXy08cIGbROwqlPDH6qS2x5ZI8CMTd+IPVobRV2HG9lnNrFsi1AkU4A4q1cKIcl
+         YHAg==
+X-Gm-Message-State: AOJu0YzfftsevQ9O+ku7T+hdPLBIueagtOpTrl8mpyYUHUARCP3CyYuO
+	dq5rJr4WtFO9vFkxUoofvx68FkzFoYo=
+X-Google-Smtp-Source: AGHT+IFRfifySHfu+x7zocgmttDsEC9d4gRnsz7xikVQGrFLGy2SKg/qdoWft9GPsjmIJAKpi++YUen43Z4=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:134a:b0:dbd:2f0:c763 with SMTP id
+ g10-20020a056902134a00b00dbd02f0c763mr9605ybu.1.1702677675842; Fri, 15 Dec
+ 2023 14:01:15 -0800 (PST)
+Date: Fri, 15 Dec 2023 14:01:14 -0800
+In-Reply-To: <CAEXW_YQ6hVwWrRe-Fgk8bU6BcbwVYoX5ARB8eR+ERZuTuE-wug@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
 References: <20231214024727.3503870-1-vineeth@bitbyteword.org>
  <ZXsvl7mabUuNkWcY@google.com> <CAO7JXPihjjko6qe8tr6e6UE=L7uSR6AACq1Zwg+7n95s5A-yoQ@mail.gmail.com>
  <ZXth7hu7jaHbJZnj@google.com> <CAEXW_YTfgemRBKRv2UNjsOLhokxvvmHbVVj1JLtVmhywKtqeHA@mail.gmail.com>
- <ZXyA-Me-DSmCWr7x@google.com>
-In-Reply-To: <ZXyA-Me-DSmCWr7x@google.com>
-From: Joel Fernandes <joel@joelfernandes.org>
-Date: Fri, 15 Dec 2023 15:18:21 -0500
-Message-ID: <CAEXW_YQ6hVwWrRe-Fgk8bU6BcbwVYoX5ARB8eR+ERZuTuE-wug@mail.gmail.com>
+ <ZXyA-Me-DSmCWr7x@google.com> <CAEXW_YQ6hVwWrRe-Fgk8bU6BcbwVYoX5ARB8eR+ERZuTuE-wug@mail.gmail.com>
+Message-ID: <ZXzMqiGFVe4sepaw@google.com>
 Subject: Re: [RFC PATCH 0/8] Dynamic vcpu priority management in kvm
-To: Sean Christopherson <seanjc@google.com>
+From: Sean Christopherson <seanjc@google.com>
+To: Joel Fernandes <joel@joelfernandes.org>
 Cc: Vineeth Remanan Pillai <vineeth@bitbyteword.org>, Ben Segall <bsegall@google.com>, 
 	Borislav Petkov <bp@alien8.de>, Daniel Bristot de Oliveira <bristot@redhat.com>, 
 	Dave Hansen <dave.hansen@linux.intel.com>, Dietmar Eggemann <dietmar.eggemann@arm.com>, 
@@ -79,341 +83,333 @@ Cc: Vineeth Remanan Pillai <vineeth@bitbyteword.org>, Ben Segall <bsegall@google
 	Masami Hiramatsu <mhiramat@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	x86@kernel.org, Tejun Heo <tj@kernel.org>, Josh Don <joshdon@google.com>, 
 	Barret Rhoden <brho@google.com>, David Vernet <dvernet@meta.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 15, 2023 at 11:38=E2=80=AFAM Sean Christopherson <seanjc@google=
-.com> wrote:
->
-> On Fri, Dec 15, 2023, Joel Fernandes wrote:
-> > Hi Sean,
-> > Nice to see your quick response to the RFC, thanks. I wanted to
-> > clarify some points below:
+On Fri, Dec 15, 2023, Joel Fernandes wrote:
+> On Fri, Dec 15, 2023 at 11:38=E2=80=AFAM Sean Christopherson <seanjc@goog=
+le.com> wrote:
 > >
-> > On Thu, Dec 14, 2023 at 3:13=E2=80=AFPM Sean Christopherson <seanjc@goo=
-gle.com> wrote:
+> > On Fri, Dec 15, 2023, Joel Fernandes wrote:
+> > > Hi Sean,
+> > > Nice to see your quick response to the RFC, thanks. I wanted to
+> > > clarify some points below:
 > > >
-> > > On Thu, Dec 14, 2023, Vineeth Remanan Pillai wrote:
-> > > > On Thu, Dec 14, 2023 at 11:38=E2=80=AFAM Sean Christopherson <seanj=
-c@google.com> wrote:
-> > > > Now when I think about it, the implementation seems to
-> > > > suggest that we are putting policies in kvm. Ideally, the goal is:
-> > > > - guest scheduler communicates the priority requirements of the wor=
-kload
-> > > > - kvm applies the priority to the vcpu task.
+> > > On Thu, Dec 14, 2023 at 3:13=E2=80=AFPM Sean Christopherson <seanjc@g=
+oogle.com> wrote:
+> > > >
+> > > > On Thu, Dec 14, 2023, Vineeth Remanan Pillai wrote:
+> > > > > On Thu, Dec 14, 2023 at 11:38=E2=80=AFAM Sean Christopherson <sea=
+njc@google.com> wrote:
+> > > > > Now when I think about it, the implementation seems to
+> > > > > suggest that we are putting policies in kvm. Ideally, the goal is=
+:
+> > > > > - guest scheduler communicates the priority requirements of the w=
+orkload
+> > > > > - kvm applies the priority to the vcpu task.
+> > > >
+> > > > Why?  Tasks are tasks, why does KVM need to get involved?  E.g. if =
+the problem
+> > > > is that userspace doesn't have the right knobs to adjust the priori=
+ty of a task
+> > > > quickly and efficiently, then wouldn't it be better to solve that p=
+roblem in a
+> > > > generic way?
 > > >
-> > > Why?  Tasks are tasks, why does KVM need to get involved?  E.g. if th=
-e problem
-> > > is that userspace doesn't have the right knobs to adjust the priority=
- of a task
-> > > quickly and efficiently, then wouldn't it be better to solve that pro=
-blem in a
-> > > generic way?
+> > > No, it is not only about tasks. We are boosting anything RT or above
+> > > such as softirq, irq etc as well.
 > >
-> > No, it is not only about tasks. We are boosting anything RT or above
-> > such as softirq, irq etc as well.
->
-> I was talking about the host side of things.  A vCPU is a task, full stop=
-.  KVM
-> *may* have some information that is useful to the scheduler, but KVM does=
- not
-> *need* to initiate adjustments to a vCPU's priority.
-
-Sorry I thought you were referring to guest tasks. You are right, KVM
-does not *need* to change priority. But a vCPU is a container of tasks
-who's priority dynamically changes. Still, I see your point of view
-and that's also why we offer the capability to be selectively enabled
-or disabled per-guest by the VMM (Vineeth will make it default off and
-opt-in in the next series).
-
-> > Could you please see the other patches?
->
-> I already have, see my comments about boosting vCPUs that have received N=
-MIs and
-> IRQs not necessarily being desirable.
-
-Ah, I was not on CC for that email. Seeing it now. I think I don't
-fully buy that argument, hard IRQs are always high priority IMHO. If
-an hrtimer expires on a CPU running a low priority workload, that
-hrtimer might itself wake up a high priority thread. If we don't boost
-the hrtimer interrupt handler, then that will delay the wakeup as
-well. It is always a chain of events and it has to be boosted from the
-first event. If a system does not wish to give an interrupt a high
-priority, then the typical way is to use threaded IRQs and lower the
-priority of the thread. That will give the interrupt handler lower
-priority and the guest is free to do that. We had many POCs before
-where we don't boost at all for interrupts and they all fall apart.
-This is the only POC that works without any issues as far as we know
-(we've been trying to do this for a long time :P).
-
-Regarding perf, I similarly disagree. I think a PMU event is super
-important (example, some versions of the kernel watchdog that depend
-on PMU fail without it). But if some VM does not want this to be
-prioritized, they could just not opt-in for the feature IMO. I can see
-your point of view that not all VMs may want this behavior though.
-
-> > > > > Pushing the scheduling policies to host userspace would allow for=
- far more control
-> > > > > and flexibility.  E.g. a heavily paravirtualized environment wher=
-e host userspace
-> > > > > knows *exactly* what workloads are being run could have wildly di=
-fferent policies
-> > > > > than an environment where the guest is a fairly vanilla Linux VM =
-that has received
-> > > > > a small amount of enlightment.
-> > > > >
-> > > > > Lastly, if the concern/argument is that userspace doesn't have th=
-e right knobs
-> > > > > to (quickly) boost vCPU tasks, then the proposed sched_ext functi=
-onality seems
-> > > > > tailor made for the problems you are trying to solve.
-> > > > >
-> > > > > https://lkml.kernel.org/r/20231111024835.2164816-1-tj%40kernel.or=
-g
-> > > > >
-> > > > You are right, sched_ext is a good choice to have policies
-> > > > implemented. In our case, we would need a communication mechanism a=
-s
-> > > > well and hence we thought kvm would work best to be a medium betwee=
-n
-> > > > the guest and the host.
-> > >
-> > > Making KVM be the medium may be convenient and the quickest way to ge=
-t a PoC
-> > > out the door, but effectively making KVM a middle-man is going to be =
-a huge net
-> > > negative in the long term.  Userspace can communicate with the guest =
-just as
-> > > easily as KVM, and if you make KVM the middle-man, then you effective=
-ly *must*
-> > > define a relatively rigid guest/host ABI.
+> > I was talking about the host side of things.  A vCPU is a task, full st=
+op.  KVM
+> > *may* have some information that is useful to the scheduler, but KVM do=
+es not
+> > *need* to initiate adjustments to a vCPU's priority.
+>=20
+> Sorry I thought you were referring to guest tasks. You are right, KVM
+> does not *need* to change priority. But a vCPU is a container of tasks
+> who's priority dynamically changes. Still, I see your point of view
+> and that's also why we offer the capability to be selectively enabled
+> or disabled per-guest by the VMM (Vineeth will make it default off and
+> opt-in in the next series).
+>=20
+> > > Could you please see the other patches?
 > >
-> > At the moment, the only ABI is a shared memory structure and a custom
-> > MSR. This is no different from the existing steal time accounting
-> > where a shared structure is similarly shared between host and guest,
-> > we could perhaps augment that structure with other fields instead of
-> > adding a new one?
->
-> I'm not concerned about the number of structures/fields, it's the amount/=
-type of
-> information and the behavior of KVM that is problematic.  E.g. boosting t=
-he priority
-> of a vCPU that has a pending NMI is dubious.
+> > I already have, see my comments about boosting vCPUs that have received
+> > NMIs and IRQs not necessarily being desirable.
+>=20
+> Ah, I was not on CC for that email. Seeing it now. I think I don't
+> fully buy that argument, hard IRQs are always high priority IMHO.
 
-I think NMIs have to be treated as high priority, the perf profiling
-interrupt for instance works well on x86 (unlike ARM) because it can
-interrupt any context (other than NMI and possibly the machine check
-ones). On ARM on the other hand, because the perf interrupt is a
-regular non-NMI interrupt, you cannot profile hardirq and IRQ-disable
-regions (this could have changed since pseudo-NMI features). So making
-the NMI a higher priority than IRQ is not dubious AFAICS, it is a
-requirement in many cases IMHO.
+They most definitely are not, and there are undoubtedly tiers of priority, =
+e.g.
+tiers are part and parcel of the APIC architecture.  I agree that *most* IR=
+Qs are
+high-ish priority, but that is not the same that *all* IRQs are high priori=
+ty.
+It only takes one example to disprove the latter, and I can think of severa=
+l off
+the top of my head.
 
-> This RFC has baked in a large
-> number of assumptions that (mostly) fit your specific use case, but do no=
-t
-> necessarily apply to all use cases.
+Nested virtualization is the easy one to demonstrate.
 
-Yes, agreed. We'll make it more generic.
+On AMD, which doesn't have an equivalent to the VMX preemption timer, KVM u=
+ses a
+self-IPI to wrest control back from the guest immediately after VMRUN in so=
+me
+situations (mostly to inject events into L2 while honoring the architectura=
+l
+priority of events).  If the guest is running a nested workload, the result=
+ing
+IRQ in L1 is not at all interesting or high priority, as the L2 workload ha=
+sn't
+suddenly become high priority just because KVM wants to inject an event.
 
-> I'm not even remotely convinced that what's prosed here is optimal for yo=
-ur use case either.
+Anyways, I didn't mean to start a debate over the priority of handling IRQs=
+ and
+NMIs, quite the opposite actually.  The point I'm trying to make is that un=
+der
+no circumstance do I want KVM to be making decisions about whether or not s=
+uch
+things are high priority.  I have no objection to KVM making information av=
+ailable
+to whatever entity is making the actual decisions, it's having policy in KV=
+M that
+I am staunchly opposed to.
 
-We have a data-driven approach. We've tested this with lots of use
-cases and collected metrics with both real and synthetic workloads
-(not just us but many other teams we work with). It might not be
-optimal, but definitely is a step forward IMO. As you can see the
-several-fold reduction in latencies, audio glitches etc. We did wait a
-long time for RFC however that was because we did not want to push out
-something broken. In hind-sight, we should be posting this work
-upstream more quickly (but in our defense, we did present this work at
-2 other conferences this year ;-)).
+> If an hrtimer expires on a CPU running a low priority workload, that
+> hrtimer might itself wake up a high priority thread. If we don't boost
+> the hrtimer interrupt handler, then that will delay the wakeup as
+> well. It is always a chain of events and it has to be boosted from the
+> first event. If a system does not wish to give an interrupt a high
+> priority, then the typical way is to use threaded IRQs and lower the
+> priority of the thread. That will give the interrupt handler lower
+> priority and the guest is free to do that. We had many POCs before
+> where we don't boost at all for interrupts and they all fall apart.
+> This is the only POC that works without any issues as far as we know
+> (we've been trying to do this for a long time :P).
 
-> > On the ABI point, we have deliberately tried to keep it simple (for exa=
-mple,
-> > a few months ago we had hypercalls and we went to great lengths to elim=
-inate
-> > those).
->
-> Which illustrates one of the points I'm trying to make is kind of my poin=
-t.
-> Upstream will never accept anything that's wildly complex or specific bec=
-ause such
-> a thing is unlikely to be maintainable.
-
-TBH, it is not that complex though. But let us know which parts, if
-any, can be further simplified (I saw your suggestions for next steps
-in the reply to Vineeth, those look good to me and we'll plan
-accordingly).
-
-> > > If instead the contract is between host userspace and the guest, the =
-ABI can be
-> > > much more fluid, e.g. if you (or any setup) can control at least some=
- amount of
-> > > code that runs in the guest
-> >
-> > I see your point of view. One way to achieve this is to have a BPF
-> > program run to implement the boosting part, in the VMEXIT path. KVM
-> > then just calls a hook. Would that alleviate some of your concerns?
->
-> Yes, it absolutely would!  I would *love* to build a rich set of BPF util=
-ities
-> and whatnot for KVM[1].
-
-Nice to see it! Definitely interested in this work.
-
-> I have zero objections to KVM making data available to
-> BPF programs, i.e. to host userspace, quite the opposite.  What I am stea=
-dfastedly
-> against is KVM make decisions that are not obviously the "right" decision=
-s in all
-> situations.  And I do not want to end up in a world where KVM has a big p=
-ile of
-> knobs to let userspace control those decisions points, i.e. I don't want =
-to make
-> KVM a de facto paravirt scheduler.
->
-> I think there is far more potential for this direction.  KVM already has =
-hooks
-> for VM-Exit and VM-Entry, they likely just need to be enhanced to make th=
-em more
-> useful for BPF programs.  And adding hooks in other paths shouldn't be to=
-o
-> contentious, e.g. in addition to what you've done in this RFC, adding a h=
-ook to
-> kvm_vcpu_on_spin() could be quite interesting as I would not be at all su=
-rprised
-> if userspace could make far better decisions when selecting the vCPU to y=
-ield to.
->
-> And there are other use cases for KVM making "interesting" data available=
- to
-> userspace, e.g. there's (very early) work[2] to allow userspace to poll()=
- on vCPUs,
-> which likely needs much of the same information that paravirt scheduling =
-would
-> find useful, e.g. whether or not the vCPU has pending events.
->
-> [1] https://lore.kernel.org/all/ZRIf1OPjKV66Y17%2F@google.com
-> [2] https://lore.kernel.org/all/ZR9gATE2NSOOhedQ@google.com
-
-The polling work seems interesting too for what we're doing, shall
-look further as well. Thank you!
-
-> > > then the contract between the guest and host doesn't
-> > > even need to be formally defined, it could simply be a matter of bund=
-ling host
-> > > and guest code appropriately.
-> > >
-> > > If you want to land support for a given contract in upstream reposito=
-ries, e.g.
-> > > to broadly enable paravirt scheduling support across a variety of use=
-rsepace VMMs
-> > > and/or guests, then yeah, you'll need a formal ABI.  But that's still=
- not a good
-> > > reason to have KVM define the ABI.  Doing it in KVM might be a wee bi=
-t easier because
-> > > it's largely just a matter of writing code, and LKML provides a centr=
-alized channel
-> > > for getting buyin from all parties.  But defining an ABI that's indep=
-endent of the
-> > > kernel is absolutely doable, e.g. see the many virtio specs.
-> > >
-> > > I'm not saying KVM can't help, e.g. if there is information that is k=
-nown only
-> > > to KVM, but the vast majority of the contract doesn't need to be defi=
-ned by KVM.
-> >
-> > The key to making this working of the patch is VMEXIT path, that is
-> > only available to KVM. If we do anything later, then it might be too
-> > late.
->
-> Strictly speaking, no, it's not.  It's key if and only if *KVM* boosts th=
-e priority
-> of the task/vCPU (or if KVM provides a hook for a BPF program to do its t=
-hing).
-
-Ok, agreed.
-
-> > We have to intervene *before* the scheduler takes the vCPU thread off t=
+In *your* environment.  The fact that it took multiple months to get a stab=
+le,
+functional set of patches for one use case is *exactly* why I am pushing ba=
+ck on
+this.  Change any number of things about the setup and odds are good that t=
 he
-> > CPU.
->
-> If the host scheduler is directly involved in the paravirt shenanigans, t=
-hen
-> there is no need to hook KVM's VM-Exit path because the scheduler already=
- has the
-> information needed to make an informed decision.
+result would need different tuning.  E.g. the ratio of vCPUs to pCPUs, the =
+number
+of VMs, the number of vCPUs per VM, whether or not the host kernel is preem=
+ptible,
+whether or not the guest kernel is preemptible, the tick rate of the host a=
+nd
+guest kernels, the workload of the VM, the affinity of tasks within the VM,=
+ and
+and so on and so forth.
 
-Just to clarify, we're not making any "decisions" in the VM exit path,
-we're just giving the scheduler enough information (via the
-setscheduler call). The scheduler may just as well "decide" it wants
-to still preempt the vCPU thread -- that's Ok in fact required some
-times. We're just arming it with more information, specifically that
-this is an important thread. We can find another way to pass this
-information along (BPF etc) but I just wanted to mention that KVM is
-not really replacing the functionality or decision-making of the
-scheduler even with this POC.
+It's a catch-22 of sorts.  Anything that is generic enough to land upstream=
+ is
+likely going to be too coarse grained to be universally applicable.
 
-> > Similarly, in the case of an interrupt injected into the guest, we have
-> > to boost the vCPU before the "vCPU run" stage -- anything later might b=
-e too
-> > late.
->
-> Except that this RFC doesn't actually do this.  KVM's relevant function n=
-ames suck
-> and aren't helping you, but these patches boost vCPUs when events are *pe=
-nded*,
-> not when they are actually injected.
+> Regarding perf, I similarly disagree. I think a PMU event is super
+> important (example, some versions of the kernel watchdog that depend
+> on PMU fail without it). But if some VM does not want this to be
+> prioritized, they could just not opt-in for the feature IMO. I can see
+> your point of view that not all VMs may want this behavior though.
 
-We are doing the injection bit in:
-https://lore.kernel.org/all/20231214024727.3503870-5-vineeth@bitbyteword.or=
-g/
+Or a VM may want it conditionally, e.g. only for select tasks.
 
-For instance, in:
+> > > At the moment, the only ABI is a shared memory structure and a custom
+> > > MSR. This is no different from the existing steal time accounting
+> > > where a shared structure is similarly shared between host and guest,
+> > > we could perhaps augment that structure with other fields instead of
+> > > adding a new one?
+> >
+> > I'm not concerned about the number of structures/fields, it's the amoun=
+t/type of
+> > information and the behavior of KVM that is problematic.  E.g. boosting=
+ the priority
+> > of a vCPU that has a pending NMI is dubious.
+>=20
+> I think NMIs have to be treated as high priority, the perf profiling
+> interrupt for instance works well on x86 (unlike ARM) because it can
+> interrupt any context (other than NMI and possibly the machine check
+> ones). On ARM on the other hand, because the perf interrupt is a
+> regular non-NMI interrupt, you cannot profile hardirq and IRQ-disable
+> regions (this could have changed since pseudo-NMI features). So making
+> the NMI a higher priority than IRQ is not dubious AFAICS, it is a
+> requirement in many cases IMHO.
 
- kvm_set_msi ->
-  kvm_irq_delivery_to_apic ->
-     kvm_apic_set_irq ->
-       __apic_accept_irq ->
-            kvm_vcpu_kick_boost();
+Again, many, but not all.  A large part of KVM's success is that KVM has ve=
+ry few
+"opinions" of its own.  Outside of the MMU and a few paravirt paths, KVM mo=
+stly
+just emulates/virtualizes hardware according to the desires of userspace.  =
+This
+has allowed a fairly large variety of use cases to spring up with relativel=
+y few
+changes to KVM.
 
-The patch is a bit out of order because patch 4 depends on 3. Patch 3
-does what you're referring to, which is checking for pending events.
+What I want to avoid is (a) adding something that only works for one use ca=
+se
+and (b) turning KVM into a scheduler of any kind.
 
-Did we miss something? If there is some path that we are missing, your
-help is much appreciated as you're likely much more versed with this
-code than me.  But doing the boosting at injection time is what has
-made all the difference (for instance with cyclictest latencies).
+> > Which illustrates one of the points I'm trying to make is kind of my po=
+int.
+> > Upstream will never accept anything that's wildly complex or specific b=
+ecause such
+> > a thing is unlikely to be maintainable.
+>=20
+> TBH, it is not that complex though.=20
 
-> Boosting the priority of vCPUs at semi-arbitrary points is going to be mu=
-ch more
-> difficult for KVM to "get right".  E.g. why boost the priority of a vCPU =
-that has
-> a pending IRQ, but not a vCPU that is running with IRQs disabled?
+Yet.  Your use case is happy with relatively simple, coarse-grained hooks. =
+ Use
+cases that want to squeeze out maximum performance, e.g. because shaving N%=
+ off
+the runtime saves $$$, are likely willing to take on far more complexity, o=
+r may
+just want to make decisions at a slightly different granularity.
 
-I was actually wanting to boost preempted vCPU threads that were
-preempted in IRQ disabled regions as well. In fact, that is on our
-TODO.. we just haven't done it yet as we notice that usually IRQ is
-disabled while preemption was already disabled and just boosting
-preempt-disabled gets us most of the way there.
+> But let us know which parts, if any, can be further simplified (I saw you=
+r
+> suggestions for next steps in the reply to Vineeth, those look good to me=
+ and
+> we'll plan accordingly).
 
-> The potential
-> for endless twiddling to try and tune KVM's de facto scheduling logic so =
-that it's
-> universally "correct" is what terrifies me.
+It's not a matter of simplifying things, it's a matter of KVM (a) not defin=
+ing
+policy of any kind and (b) KVM not defining a guest/host ABI.
 
-Yes, we can certainly look into BPF to make it a bit more generic for
-our usecase (while getting enough information from the kernel).
+> > > We have to intervene *before* the scheduler takes the vCPU thread off=
+ the
+> > > CPU.
+> >
+> > If the host scheduler is directly involved in the paravirt shenanigans,=
+ then
+> > there is no need to hook KVM's VM-Exit path because the scheduler alrea=
+dy has the
+> > information needed to make an informed decision.
+>=20
+> Just to clarify, we're not making any "decisions" in the VM exit path,
 
-By the way, one other usecase for this patch series is RCU.  I am one
-of the RCU maintainers and I am looking into improving RCU in VMs. For
-instance, boosting preempted RCU readers to RT (CONFIG_RCU_BOOST) does
-not usually work because the vCPU thread on the host is not RT.
-Similarly, other RCU threads which have RT priority don't get to run
-causing issues.
+Yes, you are.
 
-Thanks!
+> we're just giving the scheduler enough information (via the
+> setscheduler call). The scheduler may just as well "decide" it wants
+> to still preempt the vCPU thread -- that's Ok in fact required some
+> times. We're just arming it with more information, specifically that
+> this is an important thread. We can find another way to pass this
+> information along (BPF etc) but I just wanted to mention that KVM is
+> not really replacing the functionality or decision-making of the
+> scheduler even with this POC.
 
- - Joel
+Yes, it is.  kvm_vcpu_kick_boost() *directly* adjusts the priority of the t=
+ask.
+KVM is not just passing a message, KVM is defining a scheduling policy of "=
+boost
+vCPUs with pending IRQs, NMIs, SMIs, and PV unhalt events".
+
+The VM-Exit path also makes those same decisions by boosting a vCPU if the =
+guest
+has requested boost *or* the vCPU has a pending event (but oddly, not pendi=
+ng
+NMIs, SMIs, or PV unhalt events):
+
+	bool pending_event =3D kvm_cpu_has_pending_timer(vcpu) || kvm_cpu_has_inte=
+rrupt(vcpu);
+
+	/*
+	 * vcpu needs a boost if
+	 * - A lazy boost request active or a pending latency sensitive event, and
+	 * - Preemption disabled duration on this vcpu has not crossed the thresho=
+ld.
+	 */
+	return ((schedinfo.boost_req =3D=3D VCPU_REQ_BOOST || pending_event) &&
+			!kvm_vcpu_exceeds_preempt_disabled_duration(&vcpu->arch));
+
+
+Which, by the by is suboptimal.  Detecting for pending events isn't free, s=
+o you
+ideally want to check for pending events if and only if the guest hasn't re=
+quested
+a boost.
+
+> > > Similarly, in the case of an interrupt injected into the guest, we ha=
+ve
+> > > to boost the vCPU before the "vCPU run" stage -- anything later might=
+ be too
+> > > late.
+> >
+> > Except that this RFC doesn't actually do this.  KVM's relevant function=
+ names suck
+> > and aren't helping you, but these patches boost vCPUs when events are *=
+pended*,
+> > not when they are actually injected.
+>=20
+> We are doing the injection bit in:
+> https://lore.kernel.org/all/20231214024727.3503870-5-vineeth@bitbyteword.=
+org/
+>=20
+> For instance, in:
+>=20
+>  kvm_set_msi ->
+>   kvm_irq_delivery_to_apic ->
+>      kvm_apic_set_irq ->
+>        __apic_accept_irq ->
+>             kvm_vcpu_kick_boost();
+>=20
+> The patch is a bit out of order because patch 4 depends on 3. Patch 3
+> does what you're referring to, which is checking for pending events.
+>=20
+> Did we miss something? If there is some path that we are missing, your
+> help is much appreciated as you're likely much more versed with this
+> code than me.  But doing the boosting at injection time is what has
+> made all the difference (for instance with cyclictest latencies).
+
+That accepts in IRQ into the vCPU's local APIC, it does not *inject* the IR=
+Q into
+the vCPU proper.  The actual injection is done by kvm_check_and_inject_even=
+ts().
+A pending IRQ is _usually_ delivered/injected fairly quickly, but not alway=
+s.
+
+E.g. if the guest has IRQs disabled (RFLAGS.IF=3D0), KVM can't immediately =
+inject
+the IRQ (without violating x86 architecture).  In that case, KVM will twidd=
+le
+VMCS/VMCB knobs to detect an IRQ window, i.e. to cause a VM-Exit when IRQs =
+are
+no longer blocked in the guest.
+
+Your PoC actually (mostly) handles this (see above) by keeping the vCPU boo=
+sted
+after EXIT_REASON_INTERRUPT_WINDOW (because the IRQ will obviously still be=
+ pending).
+
+> > Boosting the priority of vCPUs at semi-arbitrary points is going to be =
+much more
+> > difficult for KVM to "get right".  E.g. why boost the priority of a vCP=
+U that has
+> > a pending IRQ, but not a vCPU that is running with IRQs disabled?
+>=20
+> I was actually wanting to boost preempted vCPU threads that were
+> preempted in IRQ disabled regions as well. In fact, that is on our
+> TODO.. we just haven't done it yet as we notice that usually IRQ is
+> disabled while preemption was already disabled and just boosting
+> preempt-disabled gets us most of the way there.
+>=20
+> > The potential for endless twiddling to try and tune KVM's de facto
+> > scheduling logic so that it's universally "correct" is what terrifies m=
+e.
+>=20
+> Yes, we can certainly look into BPF to make it a bit more generic for
+> our usecase (while getting enough information from the kernel).
+>=20
+> By the way, one other usecase for this patch series is RCU.  I am one
+> of the RCU maintainers and I am looking into improving RCU in VMs. For
+> instance, boosting preempted RCU readers to RT (CONFIG_RCU_BOOST) does
+> not usually work because the vCPU thread on the host is not RT.
+> Similarly, other RCU threads which have RT priority don't get to run
+> causing issues.
+>=20
+> Thanks!
+>=20
+>  - Joel
 
