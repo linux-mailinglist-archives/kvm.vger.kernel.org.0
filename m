@@ -1,241 +1,260 @@
-Return-Path: <kvm+bounces-4541-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4542-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 838E1813EBE
-	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 01:36:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5161813EC4
+	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 01:38:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 049351F22C1C
-	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 00:36:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D85C283EF6
+	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 00:38:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25F742574;
-	Fri, 15 Dec 2023 00:36:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D96D805;
+	Fri, 15 Dec 2023 00:38:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kTH8TXIJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZuTReeXk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B38B023A8
-	for <kvm@vger.kernel.org>; Fri, 15 Dec 2023 00:36:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 939BBA3C;
+	Fri, 15 Dec 2023 00:38:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702600582; x=1734136582;
-  h=from:to:cc:subject:date:message-id:references:
+  t=1702600691; x=1734136691;
+  h=message-id:date:subject:to:cc:references:from:
    in-reply-to:content-transfer-encoding:mime-version;
-  bh=m69RW9tleeRYt41ZEUhaXaH27VqfmXwrJvK1uS5fBsk=;
-  b=kTH8TXIJdym4iUt+Mo8845bKrCQd08fA2i9u0fDKRohE0lUBvwVAXY8Z
-   JHA+hoeJfcY3vdIDtOoF1yQt8lU4oiFRZNiHakjLcX7JVXpUHERmAfWgF
-   GHx6pCGwtIPsO4A3Y2l88lyE4xZtSzXqJy1JhrNeWMQM16uTMr5yAUYY4
-   6x4klVMQ2EesO/ELOnSeM3MHLqwuXSxbRQ2v+UCDlGlOEH1iokRfL9wEq
-   0GXh1tX4rX6iRJpULELZ6hoDVH6qC5mbNLN+/87i+UhwWKao0R0Kut4sz
-   mrMT/ZKuCHexiVekrF2BCijlFVds8rbOsGfyoEGP7CIcz6+j6eRTgoD6H
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10924"; a="2030537"
+  bh=1WFzdMInm/n6g6/BbTrqmXbiN1PpBfIQBRnrIiEOGjk=;
+  b=ZuTReeXkiQja5fqkymuc3gj/GH4vAvX/NBDeZf7NkW/hRc32AYF+mhB8
+   J+OA9/JOgxKeSgJq3MNH5qzNBBfJ1C2JKAtXwS67Kvl2RXyyq2YsQEw9t
+   FW14L2aednyI26x364KWRE1bLLZngM18qd11ZI0Zoib9zSZUqW3z029Ek
+   7OuSn4bj3dcdDWTJzUBkcK3+DaybQvrruOVtfrcqzA1BP51+HYYdljn0G
+   eGZVH8qGVuQ1ZscM+tJmAOBvCCLepEN8KqItQKXigpJhqsplVhVbQI4ii
+   hVce0bSpNMgcz9GE85TgrXXumloY5x0b3V7lZZlIVbknknco6uhupb4At
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10924"; a="481399646"
 X-IronPort-AV: E=Sophos;i="6.04,277,1695711600"; 
-   d="scan'208";a="2030537"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Dec 2023 16:36:21 -0800
+   d="scan'208";a="481399646"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Dec 2023 16:38:08 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10924"; a="808779306"
+X-IronPort-AV: E=McAfee;i="6600,9927,10924"; a="767786279"
 X-IronPort-AV: E=Sophos;i="6.04,277,1695711600"; 
-   d="scan'208";a="808779306"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orsmga001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Dec 2023 16:35:48 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+   d="scan'208";a="767786279"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orsmga007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Dec 2023 16:37:47 -0800
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 14 Dec 2023 16:35:48 -0800
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ 15.1.2507.35; Thu, 14 Dec 2023 16:37:46 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Thu, 14 Dec 2023 16:35:48 -0800
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.57.40) by
- edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ 15.1.2507.35; Thu, 14 Dec 2023 16:37:46 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 14 Dec 2023 16:37:46 -0800
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.40) by
+ edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 14 Dec 2023 16:35:46 -0800
+ 15.1.2507.35; Thu, 14 Dec 2023 16:37:46 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aAA2/uDTZK/odbf+kuu0q9geDEfePJEaCnz2Ba4qNJCa8saPu9wz2eK5FKPrlv5A7RWByO5Ke9Nqbb3cKrZEMkvOf43ShTzfGT5dh3HSL2b6RWLEZwiryDvTKDtQTotCCpO42vxX7jIIQLaqT52KTHZB2PyD0BhTdV3qN/vA6RgkrmSRKPW+W/adVVBpBJpaIQQLwKBURaZu82lmxk8mryzl0gRNvgd2bnUnZBLfI14vSU49c2WfqBTIzhHoQBnugSoV7pSu3n4SLSvJWTRsI0Z2RfuMqXZldOhv8ogHfGdzDfxhWMM/MLEeXrXShVz9cKzD/omP7ZqNKKMfbHkyeg==
+ b=N8xR8RFwBPi90Y0Y/ZpW4Iesd2Izt7iswUVzwvsQ2oBdNVUarULQOcWYWjgTYxutw5cJ1jX0sCLbS4pTTtfoHo7/1HRoelffobGGtGodqul3z2eRRmcg6EMfv2Zcc3UW/QDNJvSZHWqxFtIMdcqMjEfK7PKsgTYYTilTJwx4EWMw6UnqFaWsuWkSiAQM5pgM+g9fZWUG+V5Mfyve9Fdw/zTXFHaL5C/36Ixv68NG5QmBt0wMneUhtML08Ppw5RENYRluAAGUSEqNZMLqrAg20isybS3Xjt4vByQO4bTM6xXStPvgEoNcVDwZIfvEDezIrvn+G/WYTYw8en6r/FHu5Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=m69RW9tleeRYt41ZEUhaXaH27VqfmXwrJvK1uS5fBsk=;
- b=avmrByL5BzS2zP95aOFmDlhxEnPezykq9G2aHTaqpXnjH3H9ocpq3YGb8dMQas52ga+pGDWhVmsX/+3CPDhFCS0WIV3sdBZO9NUM7hgUBU7bIKgme0zemqLfGMxUfoPvA0fG092BejrLrW3XBEJnpdpiUQ0xpCeJTlzMLwhH1LARIh1uknsYPVOarqtMuP9qCZIX/qNRZj+uemNZOzCCtgrIZQNbEvDzNa4Rm2o/BmHdNvg5Su2DN42tbZkv/7cOx4m3+qZuGfIX3L9oMnY7aMQl/27STb9/Y0b4zqHYzggwzrNWmR7IcMu465pN7BhnyvQir2QY6VZj2ZJvAWYCpQ==
+ bh=1WFzdMInm/n6g6/BbTrqmXbiN1PpBfIQBRnrIiEOGjk=;
+ b=N7e++PDsgJVu8J6k+uwtyOLIx/+YqaFWSPF4wx/C690+DAjvWyNEuUHv20ZUtawZReJtKTemKeSm148TEbAwsI/uRMyZsjoH1EpLkwmI3PjQNLSunvl9SDMNB9olDrziAO/CBVy7kCOLxcDSjtKuM96XowpBiptHGpA1G3sdMP+oqCv0PixOoHzfLhtSlWUPrJeTaPaUANL1iOfLCFOT5NNH1PqU7bFznRde49NNVU+YSP7ajHoZx+GaBHnT56+UymE94ZNfMEPgTntWVI9UpZoPNGRWgxeyTjLtifaVdeJ0QO5GBYuD3FIRJmLPJMEUjIoK+54qI280BY9WLf2o1Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by BN9PR11MB5243.namprd11.prod.outlook.com (2603:10b6:408:134::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.31; Fri, 15 Dec
- 2023 00:35:44 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::e7a4:a757:2f2e:f96a]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::e7a4:a757:2f2e:f96a%3]) with mapi id 15.20.7091.029; Fri, 15 Dec 2023
- 00:35:44 +0000
-From: "Tian, Kevin" <kevin.tian@intel.com>
-To: Yishai Hadas <yishaih@nvidia.com>, "alex.williamson@redhat.com"
-	<alex.williamson@redhat.com>, "mst@redhat.com" <mst@redhat.com>,
-	"jasowang@redhat.com" <jasowang@redhat.com>, "jgg@nvidia.com"
-	<jgg@nvidia.com>
-CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"virtualization@lists.linux-foundation.org"
-	<virtualization@lists.linux-foundation.org>, "parav@nvidia.com"
-	<parav@nvidia.com>, "feliu@nvidia.com" <feliu@nvidia.com>, "jiri@nvidia.com"
-	<jiri@nvidia.com>, "joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
-	"si-wei.liu@oracle.com" <si-wei.liu@oracle.com>, "leonro@nvidia.com"
-	<leonro@nvidia.com>, "maorg@nvidia.com" <maorg@nvidia.com>
-Subject: RE: [PATCH V8 vfio 9/9] vfio/virtio: Introduce a vfio driver over
- virtio devices
-Thread-Topic: [PATCH V8 vfio 9/9] vfio/virtio: Introduce a vfio driver over
- virtio devices
-Thread-Index: AQHaLoqas2GbVXtrDkCrjuOJsdjKCrCpf97g
-Date: Fri, 15 Dec 2023 00:35:44 +0000
-Message-ID: <BN9PR11MB52765F808AB35422D10846EF8C93A@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20231214123808.76664-1-yishaih@nvidia.com>
- <20231214123808.76664-10-yishaih@nvidia.com>
-In-Reply-To: <20231214123808.76664-10-yishaih@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
+Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|BN9PR11MB5243:EE_
-x-ms-office365-filtering-correlation-id: 171a0f3b-eb7a-4a21-847e-08dbfd05c65e
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: QXoxZ+onh5h8STyrJLJAt9OYOIZmLJKI7tq+yHoBHTtw/rJA7UYAHxOJE1Elarfo0f0U2wiBT1YehFG+pNCCes4jUr9GVyHuplFrqMGZ97ezsxl4Gq07lEoNbnSASt2yZdtcq4+slUtFzEHzKzHFl27fN9wiGHFO/jwP0UjIXJ5CGIBCaIA9B2vrNzLBOAaEos37+PYmr7VZGbZbOkK5kXhgydGgSpE4n2ZmMa27+nW+jbuMwGZWKUvCgVWsuRBoAGP9Ba6aV6Etalb23paV8yxO7DDyae7bF7Up7LKob0Xjpy+m7AgEk0fvuTpoggNqE6F7nqYXScPBXAPP1McXwfAO0pE0jtra1FhzTMhCv5GbobVKnWDe1d2qqsNjglST2Ms+6/v71yvHwUiYPZa5IN6/JrI4Lgd1vgPibE28SmJ9+Bnzu5gqBfY6dM838Fv+GZ7bpvzn2Dhpzxafv6s+i2On9deTX+fc/b+o51BtuH4r3hRtgqUO9WlngNO18EdHAGF4XbrkT7b+zwcHLOza0xlad+BjhUJllBnsN+9UTCzcETWR2XVp6bnSYSfj4xiZAdXY7kW++5OshtkU1Im2hw/c7ZZNY7FoiWo7E8pTmzU=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(396003)(136003)(346002)(376002)(366004)(230922051799003)(64100799003)(1800799012)(451199024)(186009)(4326008)(8936002)(52536014)(8676002)(2906002)(7416002)(5660300002)(478600001)(6506007)(7696005)(9686003)(110136005)(54906003)(64756008)(66446008)(66476007)(66556008)(66946007)(76116006)(316002)(966005)(41300700001)(38100700002)(122000001)(55016003)(33656002)(86362001)(38070700009)(82960400001)(71200400001)(26005)(83380400001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?I8IgqCfFITJSgv9rMmQRyxebxCRTsW3tTA+5ZFMbf/bdIh2WjjG3UmBzhXNr?=
- =?us-ascii?Q?caQB+Nl/lvSZV6/1F8TxhuOYHHjRXC0CSO4kBjCflRh5VdVF5W4NNwqlX6m0?=
- =?us-ascii?Q?Gm/7Ecarx9y6CjKuGFm/U2PdW4egnn+OCH8eu1XbsO30xNbp0r2T1HT6fNS4?=
- =?us-ascii?Q?RxrHSq55/vsJGjd/DUwgfSy102W+DsQU8j83ng2NXcp6OQ7Ix1qStgaFvQyk?=
- =?us-ascii?Q?sjGUQYfJPBy5w+R+MMVBxWfHL8u6ecJVQoxSj8Z/NTAvSu+fVwiYGutFtSki?=
- =?us-ascii?Q?T523ksqPsiGa/wFgQhGDoErguC3r3agFRdvm71+LJrVkba4iTK3XSrqelP5m?=
- =?us-ascii?Q?YdYnqA06drgcAIvMqcCP+NloKUyQkK9a64F3cPR6foOpxodEHBoMi8nII4Sy?=
- =?us-ascii?Q?c5D7vlZpMZgrEM6qo3ZLOgpTkjDIGQUJAZa0aSlBbY/mq0RqXLFVXsa6Ge17?=
- =?us-ascii?Q?dofqXgQar+Y1Cg3fjm+wKCgH0ac5XGMKtrwxXwz6Wgj9hRQmvK/P02vxV/ap?=
- =?us-ascii?Q?J75tEU8X69gAIoFGL9v8QkxmIAVkFARqUUfnmLw4961D8CAqprDB1Q3vAhC5?=
- =?us-ascii?Q?EU9dqlVc7jOOS3QljdfSiiUTD7dFoIfdnTddamUXOCZcMDAvjanxIy1Oek8N?=
- =?us-ascii?Q?lR6/B41W2wtnXy+8weljrQmFNxH80Ia7xtS7GHzIC7izgFySa28SvQFhA7v1?=
- =?us-ascii?Q?BKM5Y/heIfW7BCDtzTr27JMirgjCZBtSqo55xeOpM8Rc6NzN2qMEztWojmbZ?=
- =?us-ascii?Q?22aTQxioWz9ocrEgns6jHB0HiEV4SMPcPL5YdQNhJvoq7KDjgKJEI75W9UD0?=
- =?us-ascii?Q?SQUQdYBH/KCy2Bxgb8LsUepIsjawhhpHM2znSBLPHbPvNJuxlG3FDmg89wWg?=
- =?us-ascii?Q?fM5zygN5+2Rg9TFY/C/r1bWdH3o23a3E5l7avv1dY7AyLBAKsRzl82/x5jNk?=
- =?us-ascii?Q?vDXYxOek1SWzqugPsdE0GTqUABBH9Xxp+EtNR03GR/kl+vfvpowL2ztEOSQ5?=
- =?us-ascii?Q?MoifBeZUC9Za3FKEAIj8Yma2ys8SEqkI1IxSWACjiP2TEd/Y0YmWlxcEc9Dm?=
- =?us-ascii?Q?Te8OWC6bctl+NvmuVkVhUdNBSKfHzKf4NdUBfCYXR9GBIi8YUmAwzYENvbih?=
- =?us-ascii?Q?iwtKV7zdAoZ8zAiS2zMqbguYS7OLOGIozfR73GVKwp8b43L4UJFj3+6AoZRx?=
- =?us-ascii?Q?L/1+0V4KpYDNBIa2Lb7jWNVSOGyVr99pjZhLC0HjQ7ygsXGtViEEpybM5XL+?=
- =?us-ascii?Q?6s5d89tINFTK+2M+Hca8FcV6V9LKoEea9obft1ED5KkKGU6fS9t/SDrSNhup?=
- =?us-ascii?Q?YaSpNuDBqhCqMnH+wB/D5DmpmNfQB+0mt4NzNhiXYSaLpV930RsXUBSic+6G?=
- =?us-ascii?Q?gX/Wsm7gyidQz0BbZg89kfZ+Fs858K+Pcf8o3Osx4fqfpRGQE9Wq3PN6zdt8?=
- =?us-ascii?Q?wi1B003j3+EkqdxyCpMCM6Dbzt0GqoDSViN88ReBUkwXmwXGTvZCTZSJQXLi?=
- =?us-ascii?Q?BVRC3qmKqiBvsSsIu0zOCHyoIIwR7ZfImb1ScJoOZXMsCa+9l16PKNH9CDFl?=
- =?us-ascii?Q?OzQKEncOmYvrSzfRLeIMdkprMNUT/975drZ5Y4ZJ?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Received: from PH0PR11MB4965.namprd11.prod.outlook.com (2603:10b6:510:34::7)
+ by PH8PR11MB7144.namprd11.prod.outlook.com (2603:10b6:510:22c::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.28; Fri, 15 Dec
+ 2023 00:37:44 +0000
+Received: from PH0PR11MB4965.namprd11.prod.outlook.com
+ ([fe80::ea04:122f:f20c:94e8]) by PH0PR11MB4965.namprd11.prod.outlook.com
+ ([fe80::ea04:122f:f20c:94e8%2]) with mapi id 15.20.7091.030; Fri, 15 Dec 2023
+ 00:37:44 +0000
+Message-ID: <97e7a963-1142-4e25-b439-48e5b551f148@intel.com>
+Date: Fri, 15 Dec 2023 08:37:26 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 8/8] iommu/vt-d: Add set_dev_pasid callback for nested
+ domain
+To: Baolu Lu <baolu.lu@linux.intel.com>, Yi Liu <yi.l.liu@intel.com>
+CC: <robin.murphy@arm.com>, <kevin.tian@intel.com>, <jgg@nvidia.com>,
+	<alex.williamson@redhat.com>, <joro@8bytes.org>, <cohuck@redhat.com>,
+	<eric.auger@redhat.com>, <nicolinc@nvidia.com>, <kvm@vger.kernel.org>,
+	<mjrosato@linux.ibm.com>, <chao.p.peng@linux.intel.com>,
+	<yi.y.sun@linux.intel.com>, <peterx@redhat.com>, <jasowang@redhat.com>,
+	<shameerali.kolothum.thodi@huawei.com>, <lulu@redhat.com>,
+	<suravee.suthikulpanit@amd.com>, <iommu@lists.linux.dev>,
+	<linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+	<zhenzhong.duan@intel.com>, <joao.m.martins@oracle.com>,
+	<xin.zeng@intel.com>, <yan.y.zhao@intel.com>
+References: <20231127063428.127436-1-yi.l.liu@intel.com>
+ <20231127063428.127436-9-yi.l.liu@intel.com>
+ <a19031b0-7c30-45e6-b171-c53e3578b867@intel.com>
+ <4e08dc77-82ce-40ce-8a0c-ac9016186c23@linux.intel.com>
+Content-Language: en-US
+From: "Yang, Weijiang" <weijiang.yang@intel.com>
+In-Reply-To: <4e08dc77-82ce-40ce-8a0c-ac9016186c23@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SG2PR01CA0196.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:189::23) To PH0PR11MB4965.namprd11.prod.outlook.com
+ (2603:10b6:510:34::7)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR11MB4965:EE_|PH8PR11MB7144:EE_
+X-MS-Office365-Filtering-Correlation-Id: dacea726-cf41-4c9d-dcfd-08dbfd060d2b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: farPZn4KuBvoOyGi/qvZa5IIV4facMHHsDlgqTUPPeXqnRsE8flRtODLiAuwccO4sUv6w4JIeFQej6+t6QW8awHDqL13/iruVld1wqHpWDvC7FinOyqTXmVxKlScLcxTCEPQ4oR7BO0WsvYSuTrZbmhiHzOKM0TRIj3DgSwdfI/m4Bhvafn9V0YVv3cShok1nWDIkTve86O92Lonj6vlG/yRTVaGkxF4CP1wJtbKdoQrxYb10ut43EcbMvp0kTVKz8lmQRtHCa2VJk6EpnLyxoJubHp6Pwd2xvDigVh6HZPegAnLYioYK6v9no0a6ju+pPad6z82wwuhtf50S4Yof/oeq3LMf0IzQGBTDtwIyKpk27sQNs4Q+e74aIBo3flO6cdKWa8chUDbcKrb5WI/F+j0NJzY8CAbYWKVHrB1Jg6K8h7a+/BC/Uq3zDRphccOb6BpJ8/RBzhckrzsLTjU8FiGUAjeGkw/Jtt21mqoUEQe8IJzzSzCTlkvPTKRzUJfLAGqtKHD+6NSALWrm7HeCmOfzdmlkLV3G04v62fDMeshE0kmg3RRtcsQK7qSY5eorQCAHtfd9t6LWNdYru0pWFVQkgf+VQAtVcsNwjGWhhtvH+Xq1KJwHRqHZJa4xSx9lfKVq+WimJYcMeVqxnZH+Q==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4965.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(366004)(376002)(39860400002)(136003)(346002)(230922051799003)(186009)(1800799012)(64100799003)(451199024)(38100700002)(26005)(83380400001)(2616005)(86362001)(36756003)(31696002)(31686004)(82960400001)(53546011)(6486002)(6666004)(478600001)(6512007)(6506007)(66476007)(6636002)(316002)(66556008)(8676002)(110136005)(66946007)(4326008)(8936002)(2906002)(7416002)(5660300002)(41300700001)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TlFUZXpaaVpjS05DdXpCUXMxcit1OEJjMnNKT3Erd1QxVHBUdDArakJadWhy?=
+ =?utf-8?B?RXFvNHZlNWJzQmlPKzBRMWs0a3AxMm5MN1VLSy9PV1c1VDJKaCt3TWp5TFg2?=
+ =?utf-8?B?TzdkWDR2UnJ3OGp3VHE3dUlOZUVJbXo3N2RjREU0L2ZPMWhwSkpKQ2NsVDVQ?=
+ =?utf-8?B?NG55Qzg4dnBoZ3NHYk13akhkT2c4ZlNpK2NTcnRWenlka2ZTZmVtZzl4M1E4?=
+ =?utf-8?B?MkFIT1Z4OGdXOFIvNEsyYmNURjlEVTJwQVFQY25OMEdFZVFOcUZJM0YxWm0x?=
+ =?utf-8?B?WWZEK3hqVGRnWDNRZW43eGxFT2EwclFDRnNEZmV5aGtHY2FCUnFYeWMxalFm?=
+ =?utf-8?B?cDFEczM5TVA4cUEvUjBZVHhvcktaaEw4cFlCNXpzdlVWRWFaVitZdytzT1dO?=
+ =?utf-8?B?RjVCb1Q3VGNFcTAybVpaRnZLSjdKOVk3czJTWWtGSm03YTE1K2tDTEtsZU92?=
+ =?utf-8?B?WEVZOVVQVGtMMEpYRERlb0Z5TmV1VVY5VmRRcUVVWWJFdHBrVjh0TGtQUnVl?=
+ =?utf-8?B?VU0xb0ViczY3cGJYUGZYdW5Pb0NOTitiQm9yK0hNS0ZnZlFvYUFZR0RyRXIz?=
+ =?utf-8?B?WGsvcmZSMUhzc2dVcXBJcStMSzZ6eWhnNlpSdUx0YTNSeFRyVEYvK091eml6?=
+ =?utf-8?B?UjVnZ0M0a0ZTN2xPTjhMWFhKeVBCTzRaTGJSU3RvYTB5eVNTbzhXUEF5QkJW?=
+ =?utf-8?B?MW96NGNVTGY1dFZhQTlCVnNILzh1NW5HWjBDTHpmUHhxbEdkM3pZVk5qN2M3?=
+ =?utf-8?B?eTNQYk9rMml0ZGs1ejFtNFJaSUUvWitMdEhUdmJpa1I4U3RVbXF6a29RTGNM?=
+ =?utf-8?B?ZnVta0hDWjYrc1FueHdWS3FnWlVLR3F5eEpIdEtmSmwzZVZ1LzBtSTBKSHcy?=
+ =?utf-8?B?bHpXQmEwRXVxTFExcEF2d1BNYjJVcEJqTDloY1ZiWHovSGs1V0NQYnQ1QWMv?=
+ =?utf-8?B?ajNyN2VKYUVXQ21nbG9KcHhJZGlBZDlHTkwyNjYrUlVLbTZDeW1PNFdFTjd3?=
+ =?utf-8?B?dzVXb3VxMGM2aEpFaHZTVHN2YnlXa3Zya1ZqOXRmY1VFc3k1MnFua0wzSE1W?=
+ =?utf-8?B?Zldnc1JicTRac05OZk15bmFnQ1F3UXVGYW80VWZMeXp4aXRQekljcmhNWDkx?=
+ =?utf-8?B?djVGQkFxQ0crT1hGRWZrSDU5Y1ZnV2lGd013MVBQQTFqaGtOOWNaeWpYOE5k?=
+ =?utf-8?B?RUpvN3AyUzhtR2k4RnJJK0Q0c0hlNlJRVGlPMTIrbmhXRGJlTHhSYmQ3N2tp?=
+ =?utf-8?B?RHByMmZ5UDgweExrdnZhbXIvbVZMUU1lUnRWQ1lwUUJlU2JGUTBqR2hYREd3?=
+ =?utf-8?B?N2lnbThEM3M2T2RQL1REeTRaVE8wRWZvNkI0ZDRNUk54REcwVWl4Q1FkQTBw?=
+ =?utf-8?B?L0tXSFB4clFGc3dvUXdqZFFOLzBTRXB6R0pRbFJMUVB5bFJnNTE5Sy8xa0Nx?=
+ =?utf-8?B?ZWxmbGFYd0oxMW9BSlZSM2ZWWlAwWkRPK2ZBcUhDeWcwdTBKYWtaL3BzNXMx?=
+ =?utf-8?B?Z3ZXdklsT0ZHanN0Nm5ZT0lqZ20walZQQW9CdjhFc3hWNzBvVTZhL0d2bnNR?=
+ =?utf-8?B?NUtTNE1JSS93UkRFU2dFWldmbnlKYjdDM1dBUVJTSkVkR3JBdGFKdzVtL1FN?=
+ =?utf-8?B?NmtHZFJyd29JeHAxQ2FHMFFCYkdVQ0VMajhyMXJqK2pjdUw3RXg5b2FQUHk3?=
+ =?utf-8?B?cTMvQWloSUpBQ3R2bGFKak93QTlaNEtnMVNRSFBrSktnekdGTkdWV3AxTnJ6?=
+ =?utf-8?B?bTk3UkRKMmh6UGFvTUlHR1F3dlA0SXBzcU5GNjFjUEZHNUg2VFNrb3J1Um94?=
+ =?utf-8?B?MnBlSWdCY3JvTUdKUWJ1Qm5NbmZvRHRXSThDRTY5MGVXR1E5TmJqZU5nbDBS?=
+ =?utf-8?B?clBwakxPeEM0ZUNUdWpkN2o4MkllMzRGV0lsNkNjcVpZaUZUS0l1bGVmWkF5?=
+ =?utf-8?B?czV1Wk5pSDNvYklQSEVlWGl1dTg1THNMZ2ZmOStld0lDekF2SWx4aU5XVUpt?=
+ =?utf-8?B?aEk5cmo1NnRVZVMrK1JzYUpGTGVvOHFpOWpCVzNORjdrSmlmY1J6bmhnUnUw?=
+ =?utf-8?B?UGR5TDQxZFkrMitLUWcybnZ6REhjdUJkU01wclhSR09GV3dEbTA5WUlWMjhI?=
+ =?utf-8?B?M3FnWHNpOXJtTTF5N3ZjVlE3dTJKSk1jdVpUOGQvMWNCVE1FSnFXb3lTeHc3?=
+ =?utf-8?B?ZWc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: dacea726-cf41-4c9d-dcfd-08dbfd060d2b
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4965.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 171a0f3b-eb7a-4a21-847e-08dbfd05c65e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Dec 2023 00:35:44.7421
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Dec 2023 00:37:43.9282
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: iKdrE09//z1GoesQw2s0kqLxbYhbqyq3PbLJpxhawNMGBXERZZYnVi5uQhu5v7ETbG1i6UqykLAM1wSPKxj7rw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR11MB5243
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: CI4rS11T7Wp0tUBpVRJn6EFLyV8hdch0mvR8Ff4h1DCxHY3BNb4NpoIUfnQRiO9bOM6//56CrE8tmyFUpz5GvQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB7144
 X-OriginatorOrg: intel.com
 
-> From: Yishai Hadas <yishaih@nvidia.com>
-> Sent: Thursday, December 14, 2023 8:38 PM
->=20
-> Introduce a vfio driver over virtio devices to support the legacy
-> interface functionality for VFs.
->=20
-> Background, from the virtio spec [1].
-> --------------------------------------------------------------------
-> In some systems, there is a need to support a virtio legacy driver with
-> a device that does not directly support the legacy interface. In such
-> scenarios, a group owner device can provide the legacy interface
-> functionality for the group member devices. The driver of the owner
-> device can then access the legacy interface of a member device on behalf
-> of the legacy member device driver.
->=20
-> For example, with the SR-IOV group type, group members (VFs) can not
-> present the legacy interface in an I/O BAR in BAR0 as expected by the
-> legacy pci driver. If the legacy driver is running inside a virtual
-> machine, the hypervisor executing the virtual machine can present a
-> virtual device with an I/O BAR in BAR0. The hypervisor intercepts the
-> legacy driver accesses to this I/O BAR and forwards them to the group
-> owner device (PF) using group administration commands.
-> --------------------------------------------------------------------
->=20
-> Specifically, this driver adds support for a virtio-net VF to be exposed
-> as a transitional device to a guest driver and allows the legacy IO BAR
-> functionality on top.
->=20
-> This allows a VM which uses a legacy virtio-net driver in the guest to
-> work transparently over a VF which its driver in the host is that new
-> driver.
->=20
-> The driver can be extended easily to support some other types of virtio
-> devices (e.g virtio-blk), by adding in a few places the specific type
-> properties as was done for virtio-net.
->=20
-> For now, only the virtio-net use case was tested and as such we introduce
-> the support only for such a device.
->=20
-> Practically,
-> Upon probing a VF for a virtio-net device, in case its PF supports
-> legacy access over the virtio admin commands and the VF doesn't have BAR
-> 0, we set some specific 'vfio_device_ops' to be able to simulate in SW a
-> transitional device with I/O BAR in BAR 0.
->=20
-> The existence of the simulated I/O bar is reported later on by
-> overwriting the VFIO_DEVICE_GET_REGION_INFO command and the device
-> exposes itself as a transitional device by overwriting some properties
-> upon reading its config space.
->=20
-> Once we report the existence of I/O BAR as BAR 0 a legacy driver in the
-> guest may use it via read/write calls according to the virtio
-> specification.
->=20
-> Any read/write towards the control parts of the BAR will be captured by
-> the new driver and will be translated into admin commands towards the
-> device.
->=20
-> In addition, any data path read/write access (i.e. virtio driver
-> notifications) will be captured by the driver and forwarded to the
-> physical BAR which its properties were supplied by the admin command
-> VIRTIO_ADMIN_CMD_LEGACY_NOTIFY_INFO upon the probing/init flow.
->=20
-> With that code in place a legacy driver in the guest has the look and
-> feel as if having a transitional device with legacy support for both its
-> control and data path flows.
->=20
-> [1]
-> https://github.com/oasis-tcs/virtio-
-> spec/commit/03c2d32e5093ca9f2a17797242fbef88efe94b8c
->=20
-> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+On 12/14/2023 9:33 PM, Baolu Lu wrote:
+> On 2023/12/14 10:55, Yang, Weijiang wrote:
+>> On 11/27/2023 2:34 PM, Yi Liu wrote:
+>>> From: Lu Baolu <baolu.lu@linux.intel.com>
+>>>
+>>> This allows the upper layers to set a nested type domain to a PASID of a
+>>> device if the PASID feature is supported by the IOMMU hardware.
+>>>
+>>> The set_dev_pasid callback for non-nest domain has already be there, so
+>>> this only needs to add it for nested domains.
+>>>
+>>> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+>>> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+>>> ---
+>>>   drivers/iommu/intel/nested.c | 47 ++++++++++++++++++++++++++++++++++++
+>>>   1 file changed, 47 insertions(+)
+>>>
+>>> diff --git a/drivers/iommu/intel/nested.c b/drivers/iommu/intel/nested.c
+>>> index 44ad48db7ea0..f6f687750104 100644
+>>> --- a/drivers/iommu/intel/nested.c
+>>> +++ b/drivers/iommu/intel/nested.c
+>>> @@ -68,6 +68,52 @@ static int intel_nested_attach_dev(struct iommu_domain *domain,
+>>>       return 0;
+>>>   }
+>>> +static int intel_nested_set_dev_pasid(struct iommu_domain *domain,
+>>> +                      struct device *dev, ioasid_t pasid)
+>>> +{
+>>> +    struct device_domain_info *info = dev_iommu_priv_get(dev);
+>>> +    struct dmar_domain *dmar_domain = to_dmar_domain(domain);
+>>> +    struct intel_iommu *iommu = info->iommu;
+>>> +    struct dev_pasid_info *dev_pasid;
+>>> +    unsigned long flags;
+>>> +    int ret = 0;
+>>> +
+>>> +    if (!pasid_supported(iommu))
+>>> +        return -EOPNOTSUPP;
+>>> +
+>>> +    if (iommu->agaw < dmar_domain->s2_domain->agaw)
+>>> +        return -EINVAL;
+>>> +
+>>> +    ret = prepare_domain_attach_device(&dmar_domain->s2_domain->domain, dev);
+>>> +    if (ret)
+>>> +        return ret;
+>>> +
+>>> +    dev_pasid = kzalloc(sizeof(*dev_pasid), GFP_KERNEL);
+>>> +    if (!dev_pasid)
+>>> +        return -ENOMEM;
+>>> +
+>>> +    ret = domain_attach_iommu(dmar_domain, iommu);
+>>> +    if (ret)
+>>> +        goto err_free;
+>>> +
+>>> +    ret = intel_pasid_setup_nested(iommu, dev, pasid, dmar_domain);
+>>> +    if (ret)
+>>> +        goto err_detach_iommu;
+>>> +
+>>> +    dev_pasid->dev = dev;
+>>> +    dev_pasid->pasid = pasid;
+>>> +    spin_lock_irqsave(&dmar_domain->lock, flags);
+>>> +    list_add(&dev_pasid->link_domain, &dmar_domain->dev_pasids);
+>>> +    spin_unlock_irqrestore(&dmar_domain->lock, flags);
+>>
+>> ---> list_add(&dev_pasid->link_domain, &dmar_domain->dev_pasids);
+>>
+>> dev_pasid is linked at later time, this leads to domain->has_iotlb_device is not correctly set, which finally results into a missing of device iotlb flush in iommu_flush_dev_iotlb()when it's called.
+>> Check this call path:
+>> domain_attach_iommu()->domain_update_iommu_cap()->domain_update_iotlb()->domain->has_iotlb_device = has_iotlb_device; The ugly fixup is to call domain_update_iommu_cap() or domain_update_iotlb() here again before return.
+>> The similar issue is in intel_iommu_set_dev_pasid() and intel_nested_attach_dev().
+>
+> Yes, domain->has_iotlb_device must be updated whenever a domain is
+> attached to (or removed from) a RID or PASID. I would be grateful if you
+> could post some patches to fix the set_device_pasid and
+> nested_attach_dev paths.
 
-aside from the non-x86 discussion:
+Sure, I'll post fixup patches for the paths, thanks for confirmation!
 
-Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+>
+> I assume Yi can fix this series in the next version.
+>
+> Best regards,
+> baolu
+
 
