@@ -1,135 +1,124 @@
-Return-Path: <kvm+bounces-4576-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4577-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3A61814C9C
-	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 17:12:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E38C814CAB
+	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 17:13:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A82601F24A0D
-	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 16:12:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFEF4289275
+	for <lists+kvm@lfdr.de>; Fri, 15 Dec 2023 16:13:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8AB83DBBF;
-	Fri, 15 Dec 2023 16:11:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6B3C3BB24;
+	Fri, 15 Dec 2023 16:13:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="N62UDXB7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rzb0vRMv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FDD33A8FA;
-	Fri, 15 Dec 2023 16:11:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BFFKRBS022046;
-	Fri, 15 Dec 2023 16:11:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=wmAUk/vTF+5Nn1KK9suFd2BGYlSFrE/EsVXvj0c5NBE=;
- b=N62UDXB7gU3t1z6zfhUskS5mDL0zXUYJ87ez/vQTGkUITGkZmYJWpinvO4DVnbQG3Kt2
- XkvqnfL1OPz5G9T/k0hRGudJTIn87UbbqgXe8wdLWCq2CRhn5K2bDAy2qpSg7Yh7+cSK
- 3Ygw0uHBdQpPFqVQ5pkDUpmumGa1CGxh9gYr/z4LOyzZ5k+khKZMq1jn4gaq+zpKw2fI
- XX+81dKWc4dM7p9qA3Nj7tGYr9dn6k8TXJjtlCnwQog6omV9vWAcgq8gURHGRMyInA65
- nS90UVJWK4aJgGYdbWEH4deMOdZ4iEdj1SYrRJwaYuVjAXhihszHUGYW4RqSG3Wz0Q/B 8A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v0reku5qm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 15 Dec 2023 16:11:32 +0000
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BFFlkiX010155;
-	Fri, 15 Dec 2023 16:11:32 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v0reku5qb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 15 Dec 2023 16:11:32 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3BFE9QRF012699;
-	Fri, 15 Dec 2023 16:11:31 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3uw3jph59y-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 15 Dec 2023 16:11:31 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3BFGBSIL42140308
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 15 Dec 2023 16:11:28 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2500020040;
-	Fri, 15 Dec 2023 16:11:28 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D884520043;
-	Fri, 15 Dec 2023 16:11:27 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 15 Dec 2023 16:11:27 +0000 (GMT)
-From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>
-Cc: Nina Schoetterl-Glausch <nsg@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, David Hildenbrand <david@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: s390: selftest: memop: Fix undefined behavior
-Date: Fri, 15 Dec 2023 17:11:25 +0100
-Message-Id: <20231215161125.943551-1-nsg@linux.ibm.com>
-X-Mailer: git-send-email 2.40.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C77F53DB80;
+	Fri, 15 Dec 2023 16:13:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7966C433C7;
+	Fri, 15 Dec 2023 16:13:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702656787;
+	bh=J5U0YPNa7AB26BKYS1W5zmJBF+duoWLKvJ0dL3e/X7E=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=rzb0vRMvSulaJmQCd1WxGCX+vJoa+mxO3N+P3GvoG39ZwEN7JjohfqYCg5Ecy+BXS
+	 +nwpi8PXsAyVjbgxjHz64OD09dRbSH2GXFQYUhIP9a3z3cr21ptpUwZpbqky6aKalt
+	 zNLsGYL4OIza0+xnfGjj5+YA+0j1iGFG4V7H7URQk2rYsCJlUSr4SeGXRy8gauPLxl
+	 aCByVKWNB84vUZwAL17bLSZpBQM7sGzft7WxCTvM6FJ7XyuCPHxF64Zie75hSS9C3Q
+	 dAGP+S7uevpQQ5V4k35JQD7UQxrrrz/tzb5Z4bbvgK4TtJ2RThDjNmkA+X/6fZjcGW
+	 VafUSsfRVrmMg==
+X-Mailer: emacs 29.1 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+To: Vaibhav Jain <vaibhav@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
+	kvm@vger.kernel.org, kvm-ppc@vger.kernel.org
+Cc: mikey@neuling.org, sbhat@linux.ibm.com, amachhiw@linux.vnet.ibm.com,
+	Jordan Niethe <jniethe5@gmail.com>, gautam@linux.ibm.com,
+	Nicholas Piggin <npiggin@gmail.com>, David.Laight@ACULAB.COM,
+	kconsul@linux.vnet.ibm.com,
+	Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>
+Subject: Re: [PATCH 01/12] KVM: PPC: Book3S HV nestedv2: Invalidate RPT
+ before deleting a guest
+In-Reply-To: <87jzpolsen.fsf@vajain21.in.ibm.com>
+References: <20231201132618.555031-1-vaibhav@linux.ibm.com>
+ <20231201132618.555031-2-vaibhav@linux.ibm.com>
+ <878r66xtjt.fsf@kernel.org> <87jzpolsen.fsf@vajain21.in.ibm.com>
+Date: Fri, 15 Dec 2023 21:42:59 +0530
+Message-ID: <87r0jntpf8.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 7IcDHKpNCswVDGbXMLYTUO2nGCw_s9Ta
-X-Proofpoint-GUID: NSSmaOt_irSiAKvDhBsP_AhVSPfMJKHH
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-15_10,2023-12-14_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- priorityscore=1501 mlxlogscore=999 phishscore=0 suspectscore=0 bulkscore=0
- adultscore=0 impostorscore=0 mlxscore=0 lowpriorityscore=0 clxscore=1011
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2312150111
+Content-Type: text/plain
 
-If an integer's type has x bits, shifting the integer left by x or more
-is undefined behavior.
-This can happen in the rotate function when attempting to do a rotation
-of the whole value by 0.
+Vaibhav Jain <vaibhav@linux.ibm.com> writes:
 
-Fixes: 0dd714bfd200 ("KVM: s390: selftest: memop: Add cmpxchg tests")
-Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
----
- tools/testing/selftests/kvm/s390x/memop.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+> Hi Aneesh,
+>
+> Thanks for looking into this patch. My responses inline below:
+>
+> "Aneesh Kumar K.V (IBM)" <aneesh.kumar@kernel.org> writes:
+>
+>> Vaibhav Jain <vaibhav@linux.ibm.com> writes:
+>>
+>>> From: Jordan Niethe <jniethe5@gmail.com>
+>>>
+>>> An L0 must invalidate the L2's RPT during H_GUEST_DELETE if this has not
+>>> already been done. This is a slow operation that means H_GUEST_DELETE
+>>> must return H_BUSY multiple times before completing. Invalidating the
+>>> tables before deleting the guest so there is less work for the L0 to do.
+>>>
+>>> Signed-off-by: Jordan Niethe <jniethe5@gmail.com>
+>>> ---
+>>>  arch/powerpc/include/asm/kvm_book3s.h | 1 +
+>>>  arch/powerpc/kvm/book3s_hv.c          | 6 ++++--
+>>>  arch/powerpc/kvm/book3s_hv_nested.c   | 2 +-
+>>>  3 files changed, 6 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/arch/powerpc/include/asm/kvm_book3s.h b/arch/powerpc/include/asm/kvm_book3s.h
+>>> index 4f527d09c92b..a37736ed3728 100644
+>>> --- a/arch/powerpc/include/asm/kvm_book3s.h
+>>> +++ b/arch/powerpc/include/asm/kvm_book3s.h
+>>> @@ -302,6 +302,7 @@ void kvmhv_nested_exit(void);
+>>>  void kvmhv_vm_nested_init(struct kvm *kvm);
+>>>  long kvmhv_set_partition_table(struct kvm_vcpu *vcpu);
+>>>  long kvmhv_copy_tofrom_guest_nested(struct kvm_vcpu *vcpu);
+>>> +void kvmhv_flush_lpid(u64 lpid);
+>>>  void kvmhv_set_ptbl_entry(u64 lpid, u64 dw0, u64 dw1);
+>>>  void kvmhv_release_all_nested(struct kvm *kvm);
+>>>  long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu);
+>>> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+>>> index 1ed6ec140701..5543e8490cd9 100644
+>>> --- a/arch/powerpc/kvm/book3s_hv.c
+>>> +++ b/arch/powerpc/kvm/book3s_hv.c
+>>> @@ -5691,10 +5691,12 @@ static void kvmppc_core_destroy_vm_hv(struct kvm *kvm)
+>>>  			kvmhv_set_ptbl_entry(kvm->arch.lpid, 0, 0);
+>>>  	}
+>>>  
+>>> -	if (kvmhv_is_nestedv2())
+>>> +	if (kvmhv_is_nestedv2()) {
+>>> +		kvmhv_flush_lpid(kvm->arch.lpid);
+>>>  		plpar_guest_delete(0, kvm->arch.lpid);
+>>>
+>>
+>> I am not sure I follow the optimization here. I would expect the
+>> hypervisor to kill all the translation caches as part of guest_delete.
+>> What is the benefit of doing a lpid flush outside the guest delete?
+>>
+> Thats right. However without this optimization the H_GUEST_DELETE hcall
+> in plpar_guest_delete() returns H_BUSY multiple times resulting in
+> multiple hcalls to the hypervisor until it finishes. Flushing the guest
+> translation cache upfront reduces the number of HCALLs L1 guests has to
+> make to delete a L2 guest via H_GUEST_DELETE.
+>
 
-diff --git a/tools/testing/selftests/kvm/s390x/memop.c b/tools/testing/selftests/kvm/s390x/memop.c
-index bb3ca9a5d731..2eba9575828e 100644
---- a/tools/testing/selftests/kvm/s390x/memop.c
-+++ b/tools/testing/selftests/kvm/s390x/memop.c
-@@ -485,11 +485,13 @@ static bool popcount_eq(__uint128_t a, __uint128_t b)
- 
- static __uint128_t rotate(int size, __uint128_t val, int amount)
- {
--	unsigned int bits = size * 8;
-+	unsigned int left, right, bits = size * 8;
- 
--	amount = (amount + bits) % bits;
-+	right = (amount + bits) % bits;
-+	/* % 128 prevents left shift UB if size == 16 && right == 0 */
-+	left = (bits - right) % 128;
- 	val = cut_to_size(size, val);
--	return (val << (bits - amount)) | (val >> amount);
-+	return (val << left) | (val >> right);
- }
- 
- const unsigned int max_block = 16;
+can we add that as a comment above that kvmhv_flush_lpid()?
 
-base-commit: 305230142ae0637213bf6e04f6d9f10bbcb74af8
--- 
-2.40.1
-
+-aneesh
 
