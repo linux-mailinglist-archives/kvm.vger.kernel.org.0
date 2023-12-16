@@ -1,167 +1,154 @@
-Return-Path: <kvm+bounces-4604-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4605-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9E08815822
-	for <lists+kvm@lfdr.de>; Sat, 16 Dec 2023 08:03:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DD6A7815865
+	for <lists+kvm@lfdr.de>; Sat, 16 Dec 2023 09:16:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 66A551F25900
-	for <lists+kvm@lfdr.de>; Sat, 16 Dec 2023 07:03:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F4631F25C8D
+	for <lists+kvm@lfdr.de>; Sat, 16 Dec 2023 08:16:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E14113AC0;
-	Sat, 16 Dec 2023 07:02:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECC9F15AEA;
+	Sat, 16 Dec 2023 08:15:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lyoqq0er"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="fSQlZQCi"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5548B134AC;
-	Sat, 16 Dec 2023 07:02:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702710164; x=1734246164;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=lOQJTvu9nXAtsh+1v9ZBLjUIH0wLI8goSM/VimYjQg0=;
-  b=lyoqq0erprMjal/lc/LfkIREVN2xRaV/rQKtrMyh8Cms+8N04FCuUKVB
-   TZ7u7S4J5eZ4jA66yiVI5YOp16X0MGqRDQsPkY8SANsZhqcfy3GbRX/G7
-   jEw0VcMppScveAc2OuAm2iWfmNpBNnj1i50TIuJ5AMAY/MotN+KnlG1NG
-   IOL2OjeWrSvzlfTgz8nHqPwPyC/e2QJc9dcl9RVMFejsHEZqbTff7p9ws
-   cIgRF2eGWvyVSKP84XydYhSlbVIl3jw8cwO4L6jx+QsLfYP1VP28gsFU0
-   xJmyb7Nhb8/1FQprP2pTmFoWqAkj8fzX8TczIkpa5kohAE0smF6lUu3mu
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10925"; a="375515993"
-X-IronPort-AV: E=Sophos;i="6.04,281,1695711600"; 
-   d="scan'208";a="375515993"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Dec 2023 23:02:43 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10925"; a="893168964"
-X-IronPort-AV: E=Sophos;i="6.04,281,1695711600"; 
-   d="scan'208";a="893168964"
-Received: from unknown (HELO fred..) ([172.25.112.68])
-  by fmsmga002.fm.intel.com with ESMTP; 15 Dec 2023 23:02:42 -0800
-From: Xin Li <xin3.li@intel.com>
-To: linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-edac@vger.kernel.org,
-	linux-hyperv@vger.kernel.org,
-	kvm@vger.kernel.org,
-	xen-devel@lists.xenproject.org
-Cc: tglx@linutronix.de,
-	mingo@redhat.com,
-	bp@alien8.de,
-	dave.hansen@linux.intel.com,
-	x86@kernel.org,
-	hpa@zytor.com,
-	luto@kernel.org,
-	pbonzini@redhat.com,
-	seanjc@google.com,
-	peterz@infradead.org,
-	jgross@suse.com,
-	ravi.v.shankar@intel.com,
-	mhiramat@kernel.org,
-	andrew.cooper3@citrix.com,
-	jiangshanlai@gmail.com,
-	nik.borisov@suse.com,
-	shan.kang@intel.com
-Subject: [PATCH v13A 24/35] x86/fred: Add a NMI entry stub for FRED
-Date: Fri, 15 Dec 2023 22:31:39 -0800
-Message-ID: <20231216063139.25567-1-xin3.li@intel.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <SA1PR11MB673465C969A6554B8574157EA893A@SA1PR11MB6734.namprd11.prod.outlook.com>
-References: <SA1PR11MB673465C969A6554B8574157EA893A@SA1PR11MB6734.namprd11.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6FA313FEE
+	for <kvm@vger.kernel.org>; Sat, 16 Dec 2023 08:15:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-6d411636a95so27957b3a.0
+        for <kvm@vger.kernel.org>; Sat, 16 Dec 2023 00:15:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1702714547; x=1703319347; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=j34U3DbBJyUmmhCTSIWekoWpOW5ZdWSwa2YWU4yaUK4=;
+        b=fSQlZQCinU0xlc/C7XkWiMFc/n4JnuL0J2BMpN1y8kLXwcdhoph+AlxWeMItVAImiE
+         jM6ABIHhQDEgvbUyrzd0X86wCICqDW0QvnwDyNVUmlW8ad0NDZMuENaA94eOpf7oizEP
+         bDYoM5g04sXrYq6RBCcofqg0ond+33l5i0vzg/PGAo3DUXZcGUqXEDVCqO6Cs2Cgyd+8
+         3XZ+Sn2e9+MB3nRsl1LetszqffjwE/g4YMF7OH5tJCqwkugzCAmwj2hA3oZYRVc8jb3y
+         hGh6UPJHOvtpum9xUHMXBH80bGdJWsu/fBlT2pXpcPZS2i1YXetEGlN4ZOnLjFpAJrP4
+         FKVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702714547; x=1703319347;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=j34U3DbBJyUmmhCTSIWekoWpOW5ZdWSwa2YWU4yaUK4=;
+        b=CIL1EuzvwpO1sGrLtbOl/GZtHlMRtLvjVvnBaGjKlZc0tDAAGj+y1pxZf+IqK5xwOq
+         XtwLORPehcT3GabDhdYOLXCNCh5M1C6bPjCd69ZoV+x1t/82tAgOcCviHCv3nkk3J++0
+         LEl87oPZEdLibpn6FZiwdPAzHS8wpHXwggfitXtxYAv5NpWU/KgOudCdV/OlFTBcW0p5
+         1GaU7ot94SNw0SgBGQ5czX6T0+FUQReTWRVyBNEvF8FyzwNzHD1FX7ieM0YP4vBnJKaH
+         r6iAmZvCl3E2CZgHip4zRlT5PmOjCQ1yRmrYHg7J8m31YHVhC0tD7uAXhAvtBRhGmuXr
+         eofQ==
+X-Gm-Message-State: AOJu0YxzL32fMHzlGMWypmVUjctuzAw4ocHUz76aFO159h87HR0O3GwX
+	AQa8C1zmYM40Skr4+RJOmUyUJw==
+X-Google-Smtp-Source: AGHT+IEeuPfCOabIrvg0uS3E2YqqLjNkgjJjHCcIA2x49ExvIgKwxCgYmGKVjZEUpfIORWU2Bd9Yug==
+X-Received: by 2002:a05:6a00:198b:b0:6ce:78c9:5979 with SMTP id d11-20020a056a00198b00b006ce78c95979mr17324911pfl.18.1702714547181;
+        Sat, 16 Dec 2023 00:15:47 -0800 (PST)
+Received: from [157.82.205.15] ([157.82.205.15])
+        by smtp.gmail.com with ESMTPSA id p18-20020a056a000b5200b006ce835b77d9sm14707733pfo.20.2023.12.16.00.15.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 16 Dec 2023 00:15:46 -0800 (PST)
+Message-ID: <11507101-ca4f-486d-9fb8-a5d4de0b1b85@daynix.com>
+Date: Sat, 16 Dec 2023 17:15:39 +0900
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: Should I add BPF kfuncs for userspace apps? And how?
+Content-Language: en-US
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: Benjamin Tissoires <benjamin.tissoires@redhat.com>,
+ Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+ Jason Wang <jasowang@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, Mykola Lysenko <mykolal@fb.com>,
+ Shuah Khan <shuah@kernel.org>, Yuri Benditovich
+ <yuri.benditovich@daynix.com>, Andrew Melnychenko <andrew@daynix.com>,
+ Benjamin Tissoires <bentiss@kernel.org>, bpf <bpf@vger.kernel.org>,
+ "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, kvm@vger.kernel.org,
+ LKML <linux-kernel@vger.kernel.org>,
+ virtualization@lists.linux-foundation.org,
+ "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
+ Network Development <netdev@vger.kernel.org>
+References: <2f33be45-fe11-4b69-8e89-4d2824a0bf01@daynix.com>
+ <CAO-hwJJhzHtKrUEw0zrjgub3+eapgJG-zsG0HRB=PaPi6BxG+w@mail.gmail.com>
+ <e256c6df-0a66-4f86-ae96-bff17920c2fb@daynix.com>
+ <CAO-hwJKMrWYRNpuprDj9=k87V0yHtLPEJuQ94bpOF3O81=v0kA@mail.gmail.com>
+ <0d68722c-9e29-407b-9ef0-331683c995d2@daynix.com>
+ <20231214094042.75f704f6@hermes.local>
+ <72b8e198-7058-469a-a1e0-17f48330deca@daynix.com>
+ <20231215083644.4dd9a323@hermes.local>
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <20231215083644.4dd9a323@hermes.local>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
+On 2023/12/16 1:36, Stephen Hemminger wrote:
+> On Fri, 15 Dec 2023 14:49:56 +0900
+> Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+> 
+>>>> It is exactly what BPF_PROG_TYPE_SOCKET_FILTER does, but it lacks a
+>>>> mechanism to report hash values so I need to extend it or invent a new
+>>>> method. Extending BPF_PROG_TYPE_SOCKET_FILTER is not a way forward since
+>>>> CO-RE is superior to the context rewrite it relies on. But apparently
+>>>> adopting kfuncs and CO-RE also means to lose the "we don't break user
+>>>> space" contract although I have no intention to expose kernel internals
+>>>> to the eBPF program.
+>>>
+>>> An example is how one part of DPDK recomputes RSS over TAP.
+>>>
+>>> https://git.dpdk.org/dpdk/tree/drivers/net/tap/bpf/tap_bpf_program.c
+>>>
+>>> This feature is likely to be removed, because it is not actively used
+>>> and the changes in BPF program loading broke it on current kernel
+>>> releases.  Which brings up the point that since the kernel does
+>>> not have stable API/ABI for BPF program infrastructure, I would
+>>> avoid it for projects that don't want to deal with that.
+>>
+>> It's unfortunate to hear that, but thanks for the information.
+>> I'll consider more about the option not using BPF (plain ioctl and
+>> in-kernel implementation).
+> 
+> With libbpf, things are much better. It is just that projects like
+> DPDK have to support wide range of kernels including older versions of RHEL.
 
-On a FRED system, NMIs nest both with themselves and faults, transient
-information is saved into the stack frame, and NMI unblocking only
-happens when the stack frame indicates that so should happen.
+I have checked DPDK documentation. It says it supports the oldest LTS 
+kernel:
+https://doc.dpdk.org/guides/linux_gsg/sys_reqs.html#system-software
 
-Thus, the NMI entry stub for FRED is really quite small...
+My use case is QEMU, which has much more relaxed compatibility 
+requirement that refers to recent distribution versions instead of LTS 
+kernels:
+https://qemu.readthedocs.io/en/v8.1.0/about/build-platforms.html
 
-Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
-Tested-by: Shan Kang <shan.kang@intel.com>
-Signed-off-by: Xin Li <xin3.li@intel.com>
----
+That said, I'm not really concerned about the case running QEMU on older 
+kernels. QEMU developers can just pay extra efforts to support those old 
+kernels if necessary.
 
-Changes since v13:
-* Save and restore %cr2 upon entering and leaving the FRED NMI handler
-  (H. Peter Anvin).
-* Remove an unnecessary check "IS_ENABLED(CONFIG_SMP)" (H. Peter Anvin).
-* Sync a microcode change to the IDT NMI handler from 8f849ff63bcbc to
-  the FRED NMI handler.
----
- arch/x86/kernel/nmi.c | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+The more concerning scenario is that a newer kernel breaks compatibility 
+with older QEMU versions; such a scenario has not been considered before 
+AFAIK.
 
-diff --git a/arch/x86/kernel/nmi.c b/arch/x86/kernel/nmi.c
-index 17e955ab69fe..1dd8838e5583 100644
---- a/arch/x86/kernel/nmi.c
-+++ b/arch/x86/kernel/nmi.c
-@@ -35,6 +35,7 @@
- #include <asm/nospec-branch.h>
- #include <asm/microcode.h>
- #include <asm/sev.h>
-+#include <asm/fred.h>
- 
- #define CREATE_TRACE_POINTS
- #include <trace/events/nmi.h>
-@@ -651,6 +652,41 @@ void nmi_backtrace_stall_check(const struct cpumask *btp)
- 
- #endif
- 
-+#ifdef CONFIG_X86_FRED
-+/*
-+ * With FRED, CR2/DR6 is pushed to #PF/#DB stack frame during FRED
-+ * event delivery, i.e., there is no problem of transient states.
-+ * And NMI unblocking only happens when the stack frame indicates
-+ * that so should happen.
-+ *
-+ * Thus, the NMI entry stub for FRED is really straightforward and
-+ * as simple as most exception handlers. As such, #DB is allowed
-+ * during NMI handling.
-+ */
-+DEFINE_FREDENTRY_NMI(exc_nmi)
-+{
-+	irqentry_state_t irq_state;
-+
-+	if (arch_cpu_is_offline(smp_processor_id())) {
-+		if (microcode_nmi_handler_enabled())
-+			microcode_offline_nmi_handler();
-+		return;
-+	}
-+
-+	this_cpu_write(nmi_cr2, read_cr2());
-+
-+	irq_state = irqentry_nmi_enter(regs);
-+
-+	inc_irq_stat(__nmi_count);
-+	default_do_nmi(regs);
-+
-+	irqentry_nmi_exit(regs, irq_state);
-+
-+	if (unlikely(this_cpu_read(nmi_cr2) != read_cr2()))
-+		write_cr2(this_cpu_read(nmi_cr2));
-+}
-+#endif
-+
- void stop_nmi(void)
- {
- 	ignore_nmis++;
--- 
-2.43.0
-
+QEMU already uses libbpf to load a BPF_PROG_TYPE_SOCKET_FILTER program.
 
