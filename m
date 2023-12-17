@@ -1,401 +1,137 @@
-Return-Path: <kvm+bounces-4644-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4645-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0760F815D19
-	for <lists+kvm@lfdr.de>; Sun, 17 Dec 2023 02:49:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40952815DF2
+	for <lists+kvm@lfdr.de>; Sun, 17 Dec 2023 09:09:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2CB831C213F3
-	for <lists+kvm@lfdr.de>; Sun, 17 Dec 2023 01:49:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D0337B2256B
+	for <lists+kvm@lfdr.de>; Sun, 17 Dec 2023 08:09:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DD2EED0;
-	Sun, 17 Dec 2023 01:49:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CC572103;
+	Sun, 17 Dec 2023 08:09:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="Yr+6Iyis"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Hsqj3sjW"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EBFCA35
-	for <kvm@vger.kernel.org>; Sun, 17 Dec 2023 01:49:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-50e34a72660so151988e87.1
-        for <kvm@vger.kernel.org>; Sat, 16 Dec 2023 17:49:12 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 017B61860
+	for <kvm@vger.kernel.org>; Sun, 17 Dec 2023 08:09:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5e56d85fa91so7250407b3.2
+        for <kvm@vger.kernel.org>; Sun, 17 Dec 2023 00:09:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1702777750; x=1703382550; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=a4HpPvrAQcAov+UKzHz5bRRuMIZd7b5qHfmtYd8R7NM=;
-        b=Yr+6Iyisg4c4fvqqe9IuKbuZzmsu9nMyyj9oJe9byuoPJ08t6q6/sQ9MfidBefIpvL
-         xXhapcChm/F9Gcz04uKj0Z3uLHGxS4IyXZsI62WEQDboEv+9i9xVx7U/UvzKJ8DaHqeH
-         UEWhv8p5xWieKSo8iBye+UgputpktCWsWk9ycEduvKX+7/pixI5MIpXlN4tp2X1e/zNO
-         Uc1FwWZ5IsPkXE4N0OyZS4lpC9Pjrnn9cvu/83+KH4cmQgwsgukpCKC0LdTcD7Ziz7zh
-         w4whJnVGh7WFg3FZCILNWpvui2dEJ7qcT+b0nK8fpOHMLx6GX3Q+3iVBgBTmMZ6rX63D
-         EknA==
+        d=google.com; s=20230601; t=1702800558; x=1703405358; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=QsH9QLVPpBb4NCLNFoF1VK/l5bin9axXMtCbklwluC0=;
+        b=Hsqj3sjWLSd3Q3tGXVjtQAQO6Gi0KBz0TlNlTERU89+AMPeq1pRvBQttLfaa6oWPJk
+         l3fbdVabPT9ZMGFWAD+lhdY59gEmkF7dujVHYgPxTwOuoUuJk7x4poKPpGge1TsmsUBD
+         d3Ca0h9PYR6dUfEOgsgWU6p0yt/rnswMNqViOkHH+L+4H8L/gPCNM9BFNVIboWMGw6RT
+         53V6UFu72kwkffDWdX8k09iNX+KnHThaxAIheMscsBMC1CKEm/pEY8nTWpLcZvGCjNXH
+         1Bj0NgeczECeS7/aOtv2XpBVREOUUj6wRK8S5ycUYDe7ueZFHG4OBX6hx42dR9itHCFS
+         JfEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702777750; x=1703382550;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=a4HpPvrAQcAov+UKzHz5bRRuMIZd7b5qHfmtYd8R7NM=;
-        b=dSJR9jay43k6P6lsJjX2mD3aLGGqykFqyqhB4kGki/WYxZ3O/r4zpcwD5BBsd5Em1z
-         YAfc+ieHfjV+PSqc51WUxoFJjhgEZXW/Sy0jj6rFNf+CncRYOBCiOSGax5xOauJ4BW2I
-         OM+gCluAvF4BTXMRhXlwfBxdONQbtWklw7EgttYPDt7vSVnTc91VX/tPDHT1XJFpE2Ds
-         jZDU9V7haNubXGV0Je96MIBA0NK25hhbgyr+0eHcO3c5loMW3xFw4L7KN3wbjpseC4BI
-         tXea014Qifx/wxKKNpZs2QZ8t3FT11Kj2yEGPcKPIZU9O94/D6olZ/PMcHruEBGRYiN3
-         RWVw==
-X-Gm-Message-State: AOJu0Yz3tIHk3wuOdkY3P34t+2giYArzRcXP/I2vLiXGEv9+W/lbdaJs
-	Z96/v2wM+F4Z5aeSrUzWFP3liWEQLRUtG4IdmK2Vng==
-X-Google-Smtp-Source: AGHT+IFoXFganvC6DWAzAaUd1m+h42jphsfH5eJVXVke+eJqG6IskZOS1eB3Hn0j39RBlA1JrjvlnpMYVK61XN2qH14=
-X-Received: by 2002:a05:6512:3713:b0:50e:368f:1f5f with SMTP id
- z19-20020a056512371300b0050e368f1f5fmr3435lfr.75.1702777750458; Sat, 16 Dec
- 2023 17:49:10 -0800 (PST)
+        d=1e100.net; s=20230601; t=1702800558; x=1703405358;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QsH9QLVPpBb4NCLNFoF1VK/l5bin9axXMtCbklwluC0=;
+        b=wNEOVsWaRdv+jgBNSWWqmh5blFV02BxLW28WE2x1T/tTVUL9aC9S7e08fsn3ktkWB+
+         UuWaDS+HRUpWATOkfKuYYRdU7LnWNetLRDsv1VDBIF7GSssH/w55Dsbqrqb1cZlO4P7g
+         6jJNj4a+Hs83o7WAzcImFb0XQMsY9JM2G3+MS2PgRzVPwJvo+MNnV047a9DJ5mwJLle+
+         6LQYq7MgCfgeJrhqDLlVo34FVbNqXbt9e9Zf3PNhFvvEoDWzeMHOWgAsMIp+rr4K2L5X
+         B8qx9SXEMwT2tzoDfKogBX6owYpxaDtquiV2+ZfsXEtF5ktjDhGb/pymfKMO96XjHNWz
+         HuJA==
+X-Gm-Message-State: AOJu0YyPAMO21Fay6mTTb3Ytq2RA9O3BnfJkNDLEb/QpxLw5KLYUTfxZ
+	eNqtSvkikbg5Qqbo7V8ktSrAMHdviIdn+apeIg==
+X-Google-Smtp-Source: AGHT+IFgkSK2rNHEatJQvrQrdr36+TUgi1Z/vuAfdrjxwnBPxU+VrSvy3F8ozm4eK5gFgSf5MjBLCP8BZU+cLVBeyg==
+X-Received: from almasrymina.svl.corp.google.com ([2620:15c:2c4:200:3eb4:e132:f78a:5ba9])
+ (user=almasrymina job=sendgmr) by 2002:a05:690c:e1d:b0:5e4:afdb:a5ff with
+ SMTP id cp29-20020a05690c0e1d00b005e4afdba5ffmr1117521ywb.6.1702800557793;
+ Sun, 17 Dec 2023 00:09:17 -0800 (PST)
+Date: Sun, 17 Dec 2023 00:09:08 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20231205024310.1593100-1-atishp@rivosinc.com> <20231205024310.1593100-9-atishp@rivosinc.com>
- <CAAhSdy3SL4HhXkQ4BVNLgNodfRVGCHb8xxJ7YTs-ANJH5kgXPA@mail.gmail.com>
-In-Reply-To: <CAAhSdy3SL4HhXkQ4BVNLgNodfRVGCHb8xxJ7YTs-ANJH5kgXPA@mail.gmail.com>
-From: Atish Kumar Patra <atishp@rivosinc.com>
-Date: Sat, 16 Dec 2023 17:48:59 -0800
-Message-ID: <CAHBxVyHAwzckxGnjLmaSMO3LGirayjm5jnKoU3PU8j0LzQkr=Q@mail.gmail.com>
-Subject: Re: [RFC 8/9] RISC-V: KVM: Add perf sampling support for guests
-To: Anup Patel <anup@brainfault.org>
-Cc: linux-kernel@vger.kernel.org, Alexandre Ghiti <alexghiti@rivosinc.com>, 
-	Andrew Jones <ajones@ventanamicro.com>, Atish Patra <atishp@atishpatra.org>, 
-	Conor Dooley <conor.dooley@microchip.com>, Guo Ren <guoren@kernel.org>, 
-	Icenowy Zheng <uwu@icenowy.me>, kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, Mark Rutland <mark.rutland@arm.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Will Deacon <will@kernel.org>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
+Message-ID: <20231217080913.2025973-1-almasrymina@google.com>
+Subject: [PATCH net-next v2 0/3] Abstract page from net stack
+From: Mina Almasry <almasrymina@google.com>
+To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev
+Cc: Mina Almasry <almasrymina@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, 
+	Jason Gunthorpe <jgg@nvidia.com>, 
+	"=?UTF-8?q?Christian=20K=C3=B6nig?=" <christian.koenig@amd.com>, Shakeel Butt <shakeelb@google.com>, 
+	Yunsheng Lin <linyunsheng@huawei.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Dec 14, 2023 at 8:02=E2=80=AFAM Anup Patel <anup@brainfault.org> wr=
-ote:
->
-> On Tue, Dec 5, 2023 at 8:13=E2=80=AFAM Atish Patra <atishp@rivosinc.com> =
-wrote:
-> >
-> > KVM enables perf for guest via counter virtualization. However, the
-> > sampling can not be supported as there is no mechanism to enabled
-> > trap/emulate scountovf in ISA yet. Rely on the SBI PMU snapshot
-> > to provide the counter overflow data via the shared memory.
-> >
-> > In case of sampling event, the host first guest the LCOFI interrupt
-> > and injects to the guest via irq filtering mechanism defined in AIA
-> > specification. Thus, ssaia must be enabled in the host in order to
-> > use perf sampling in the guest. No other AIA dpeendancy w.r.t kernel
->
-> s/dpeendancy/dependency/
->
+Changes in v2:
+- Reverted changes to the page_pool. The page pool now retains the same
+  API, so that we don't have to touch many existing drivers. The devmem
+  TCP series will include the changes to the page pool.
 
-Fixed.
+- Addressed comments.
 
-> > is required.
-> >
-> > Signed-off-by: Atish Patra <atishp@rivosinc.com>
-> > ---
-> >  arch/riscv/include/asm/csr.h      |  3 +-
-> >  arch/riscv/include/uapi/asm/kvm.h |  1 +
-> >  arch/riscv/kvm/main.c             |  1 +
-> >  arch/riscv/kvm/vcpu.c             |  8 ++--
-> >  arch/riscv/kvm/vcpu_onereg.c      |  1 +
-> >  arch/riscv/kvm/vcpu_pmu.c         | 69 ++++++++++++++++++++++++++++---
-> >  6 files changed, 73 insertions(+), 10 deletions(-)
-> >
-> > diff --git a/arch/riscv/include/asm/csr.h b/arch/riscv/include/asm/csr.=
-h
-> > index 88cdc8a3e654..bec09b33e2f0 100644
-> > --- a/arch/riscv/include/asm/csr.h
-> > +++ b/arch/riscv/include/asm/csr.h
-> > @@ -168,7 +168,8 @@
-> >  #define VSIP_TO_HVIP_SHIFT     (IRQ_VS_SOFT - IRQ_S_SOFT)
-> >  #define VSIP_VALID_MASK                ((_AC(1, UL) << IRQ_S_SOFT) | \
-> >                                  (_AC(1, UL) << IRQ_S_TIMER) | \
-> > -                                (_AC(1, UL) << IRQ_S_EXT))
-> > +                                (_AC(1, UL) << IRQ_S_EXT) | \
-> > +                                (_AC(1, UL) << IRQ_PMU_OVF))
-> >
-> >  /* AIA CSR bits */
-> >  #define TOPI_IID_SHIFT         16
-> > diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uap=
-i/asm/kvm.h
-> > index 60d3b21dead7..741c16f4518e 100644
-> > --- a/arch/riscv/include/uapi/asm/kvm.h
-> > +++ b/arch/riscv/include/uapi/asm/kvm.h
-> > @@ -139,6 +139,7 @@ enum KVM_RISCV_ISA_EXT_ID {
-> >         KVM_RISCV_ISA_EXT_ZIHPM,
-> >         KVM_RISCV_ISA_EXT_SMSTATEEN,
-> >         KVM_RISCV_ISA_EXT_ZICOND,
-> > +       KVM_RISCV_ISA_EXT_SSCOFPMF,
-> >         KVM_RISCV_ISA_EXT_MAX,
-> >  };
-> >
-> > diff --git a/arch/riscv/kvm/main.c b/arch/riscv/kvm/main.c
-> > index 225a435d9c9a..5a3a4cee0e3d 100644
-> > --- a/arch/riscv/kvm/main.c
-> > +++ b/arch/riscv/kvm/main.c
-> > @@ -43,6 +43,7 @@ int kvm_arch_hardware_enable(void)
-> >         csr_write(CSR_HCOUNTEREN, 0x02);
-> >
-> >         csr_write(CSR_HVIP, 0);
-> > +       csr_write(CSR_HVIEN, 1UL << IRQ_PMU_OVF);
-> >
-> >         kvm_riscv_aia_enable();
-> >
-> > diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> > index e087c809073c..2d9f252356c3 100644
-> > --- a/arch/riscv/kvm/vcpu.c
-> > +++ b/arch/riscv/kvm/vcpu.c
-> > @@ -380,7 +380,8 @@ int kvm_riscv_vcpu_set_interrupt(struct kvm_vcpu *v=
-cpu, unsigned int irq)
-> >         if (irq < IRQ_LOCAL_MAX &&
-> >             irq !=3D IRQ_VS_SOFT &&
-> >             irq !=3D IRQ_VS_TIMER &&
-> > -           irq !=3D IRQ_VS_EXT)
-> > +           irq !=3D IRQ_VS_EXT &&
-> > +           irq !=3D IRQ_PMU_OVF)
-> >                 return -EINVAL;
-> >
-> >         set_bit(irq, vcpu->arch.irqs_pending);
-> > @@ -395,14 +396,15 @@ int kvm_riscv_vcpu_set_interrupt(struct kvm_vcpu =
-*vcpu, unsigned int irq)
-> >  int kvm_riscv_vcpu_unset_interrupt(struct kvm_vcpu *vcpu, unsigned int=
- irq)
-> >  {
-> >         /*
-> > -        * We only allow VS-mode software, timer, and external
-> > +        * We only allow VS-mode software, timer, counter overflow and =
-external
-> >          * interrupts when irq is one of the local interrupts
-> >          * defined by RISC-V privilege specification.
-> >          */
-> >         if (irq < IRQ_LOCAL_MAX &&
-> >             irq !=3D IRQ_VS_SOFT &&
-> >             irq !=3D IRQ_VS_TIMER &&
-> > -           irq !=3D IRQ_VS_EXT)
-> > +           irq !=3D IRQ_VS_EXT &&
-> > +           irq !=3D IRQ_PMU_OVF)
-> >                 return -EINVAL;
-> >
-> >         clear_bit(irq, vcpu->arch.irqs_pending);
-> > diff --git a/arch/riscv/kvm/vcpu_onereg.c b/arch/riscv/kvm/vcpu_onereg.=
-c
-> > index f8c9fa0c03c5..19a0e4eaf0df 100644
-> > --- a/arch/riscv/kvm/vcpu_onereg.c
-> > +++ b/arch/riscv/kvm/vcpu_onereg.c
-> > @@ -36,6 +36,7 @@ static const unsigned long kvm_isa_ext_arr[] =3D {
-> >         /* Multi letter extensions (alphabetically sorted) */
-> >         KVM_ISA_EXT_ARR(SMSTATEEN),
-> >         KVM_ISA_EXT_ARR(SSAIA),
-> > +       KVM_ISA_EXT_ARR(SSCOFPMF),
->
-> Sscofpmf can't be disabled for guest so we should add it to
-> kvm_riscv_vcpu_isa_disable_allowed(), no ?
->
+This series is a prerequisite to the devmem TCP series. For a full
+snapshot of the code which includes these changes, feel free to check:
 
-Just to clarify it can't be disabled from the kvm user space via one
-reg interface if kvm already exposes
-it to the guest. However, Kvm will not expose Sscofpmf to the guest if
-Ssaia is not available.
-I have added these fixes in the next version.
+https://github.com/mina/linux/commits/tcpdevmem-rfcv5/
 
-> >         KVM_ISA_EXT_ARR(SSTC),
-> >         KVM_ISA_EXT_ARR(SVINVAL),
-> >         KVM_ISA_EXT_ARR(SVNAPOT),
-> > diff --git a/arch/riscv/kvm/vcpu_pmu.c b/arch/riscv/kvm/vcpu_pmu.c
-> > index 622c4ee89e7b..86c8e92f92d3 100644
-> > --- a/arch/riscv/kvm/vcpu_pmu.c
-> > +++ b/arch/riscv/kvm/vcpu_pmu.c
-> > @@ -229,6 +229,47 @@ static int kvm_pmu_validate_counter_mask(struct kv=
-m_pmu *kvpmu, unsigned long ct
-> >         return 0;
-> >  }
-> >
-> > +static void kvm_riscv_pmu_overflow(struct perf_event *perf_event,
-> > +                                 struct perf_sample_data *data,
-> > +                                 struct pt_regs *regs)
-> > +{
-> > +       struct kvm_pmc *pmc =3D perf_event->overflow_handler_context;
-> > +       struct kvm_vcpu *vcpu =3D pmc->vcpu;
->
-> Ahh, the "vcpu" field is used here. Move that change from
-> patch7 to this patch.
->
+-----------
 
-done.
+Currently these components in the net stack use the struct page
+directly:
 
-> > +       struct kvm_pmu *kvpmu =3D vcpu_to_pmu(vcpu);
-> > +       struct riscv_pmu *rpmu =3D to_riscv_pmu(perf_event->pmu);
-> > +       u64 period;
-> > +
-> > +       /*
-> > +        * Stop the event counting by directly accessing the perf_event=
-.
-> > +        * Otherwise, this needs to deferred via a workqueue.
-> > +        * That will introduce skew in the counter value because the ac=
-tual
-> > +        * physical counter would start after returning from this funct=
-ion.
-> > +        * It will be stopped again once the workqueue is scheduled
-> > +        */
-> > +       rpmu->pmu.stop(perf_event, PERF_EF_UPDATE);
-> > +
-> > +       /*
-> > +        * The hw counter would start automatically when this function =
-returns.
-> > +        * Thus, the host may continue to interrupts and inject it to t=
-he guest
-> > +        * even without guest configuring the next event. Depending on =
-the hardware
-> > +        * the host may some sluggishness only if privilege mode filter=
-ing is not
-> > +        * available. In an ideal world, where qemu is not the only cap=
-able hardware,
-> > +        * this can be removed.
-> > +        * FYI: ARM64 does this way while x86 doesn't do anything as su=
-ch.
-> > +        * TODO: Should we keep it for RISC-V ?
-> > +        */
-> > +       period =3D -(local64_read(&perf_event->count));
-> > +
-> > +       local64_set(&perf_event->hw.period_left, 0);
-> > +       perf_event->attr.sample_period =3D period;
-> > +       perf_event->hw.sample_period =3D period;
-> > +
-> > +       set_bit(pmc->idx, kvpmu->pmc_overflown);
-> > +       kvm_riscv_vcpu_set_interrupt(vcpu, IRQ_PMU_OVF);
-> > +
-> > +       rpmu->pmu.start(perf_event, PERF_EF_RELOAD);
-> > +}
-> > +
-> >  static int kvm_pmu_create_perf_event(struct kvm_pmc *pmc, struct perf_=
-event_attr *attr,
-> >                                      unsigned long flags, unsigned long=
- eidx, unsigned long evtdata)
-> >  {
-> > @@ -247,7 +288,7 @@ static int kvm_pmu_create_perf_event(struct kvm_pmc=
- *pmc, struct perf_event_attr
-> >          */
-> >         attr->sample_period =3D kvm_pmu_get_sample_period(pmc);
-> >
-> > -       event =3D perf_event_create_kernel_counter(attr, -1, current, N=
-ULL, pmc);
-> > +       event =3D perf_event_create_kernel_counter(attr, -1, current, k=
-vm_riscv_pmu_overflow, pmc);
-> >         if (IS_ERR(event)) {
-> >                 pr_err("kvm pmu event creation failed for eidx %lx: %ld=
-\n", eidx, PTR_ERR(event));
-> >                 return PTR_ERR(event);
-> > @@ -466,6 +507,12 @@ int kvm_riscv_vcpu_pmu_ctr_start(struct kvm_vcpu *=
-vcpu, unsigned long ctr_base,
-> >                 }
-> >         }
-> >
-> > +       /* The guest have serviced the interrupt and starting the count=
-er again */
-> > +       if (test_bit(IRQ_PMU_OVF, vcpu->arch.irqs_pending)) {
-> > +               clear_bit(pmc_index, kvpmu->pmc_overflown);
-> > +               kvm_riscv_vcpu_unset_interrupt(vcpu, IRQ_PMU_OVF);
-> > +       }
-> > +
-> >  out:
-> >         retdata->err_val =3D sbiret;
-> >
-> > @@ -537,7 +584,12 @@ int kvm_riscv_vcpu_pmu_ctr_stop(struct kvm_vcpu *v=
-cpu, unsigned long ctr_base,
-> >                 }
-> >
-> >                 if (bSnapshot && !sbiret) {
-> > -                       //TODO: Add counter overflow support when sscof=
-pmf support is added
-> > +                       /* The counter and overflow indicies in the sna=
-pshot region are w.r.to
-> > +                        * cbase. Modify the set bit in the counter mas=
-k instead of the pmc_index
-> > +                        * which indicates the absolute counter index.
-> > +                        */
->
-> Use a double winged comment block here.
->
-> > +                       if (test_bit(pmc_index, kvpmu->pmc_overflown))
-> > +                               kvpmu->sdata->ctr_overflow_mask |=3D (1=
-UL << i);
-> >                         kvpmu->sdata->ctr_values[i] =3D pmc->counter_va=
-l;
-> >                         kvm_vcpu_write_guest(vcpu, kvpmu->snapshot_addr=
-, kvpmu->sdata,
-> >                                              sizeof(struct riscv_pmu_sn=
-apshot_data));
-> > @@ -546,15 +598,19 @@ int kvm_riscv_vcpu_pmu_ctr_stop(struct kvm_vcpu *=
-vcpu, unsigned long ctr_base,
-> >                 if (flags & SBI_PMU_STOP_FLAG_RESET) {
-> >                         pmc->event_idx =3D SBI_PMU_EVENT_IDX_INVALID;
-> >                         clear_bit(pmc_index, kvpmu->pmc_in_use);
-> > +                       clear_bit(pmc_index, kvpmu->pmc_overflown);
-> >                         if (bSnapshot) {
-> >                                 /* Clear the snapshot area for the upco=
-ming deletion event */
-> >                                 kvpmu->sdata->ctr_values[i] =3D 0;
-> > +                               /* Only clear the given counter as the =
-caller is responsible to
-> > +                                * validate both the overflow mask and =
-configured counters.
-> > +                                */
->
-> Use a double winged comment block here.
->
+1. Drivers.
+2. Page pool.
+3. skb_frag_t.
 
-Fixed all the comment styling.
+To add support for new (non struct page) memory types to the net stack, we
+must first abstract the current memory type.
 
-> > +                               kvpmu->sdata->ctr_overflow_mask &=3D ~(=
-1UL << i);
-> >                                 kvm_vcpu_write_guest(vcpu, kvpmu->snaps=
-hot_addr, kvpmu->sdata,
-> >                                                      sizeof(struct risc=
-v_pmu_snapshot_data));
-> >                         }
-> >                 }
-> >         }
-> > -
-> >  out:
-> >         retdata->err_val =3D sbiret;
-> >
-> > @@ -729,15 +785,16 @@ void kvm_riscv_vcpu_pmu_deinit(struct kvm_vcpu *v=
-cpu)
-> >         if (!kvpmu)
-> >                 return;
-> >
-> > -       for_each_set_bit(i, kvpmu->pmc_in_use, RISCV_MAX_COUNTERS) {
-> > +       for_each_set_bit(i, kvpmu->pmc_in_use, RISCV_KVM_MAX_COUNTERS) =
-{
-> >                 pmc =3D &kvpmu->pmc[i];
-> >                 pmc->counter_val =3D 0;
-> >                 kvm_pmu_release_perf_event(pmc);
-> >                 pmc->event_idx =3D SBI_PMU_EVENT_IDX_INVALID;
-> >         }
-> > -       bitmap_zero(kvpmu->pmc_in_use, RISCV_MAX_COUNTERS);
-> > +       bitmap_zero(kvpmu->pmc_in_use, RISCV_KVM_MAX_COUNTERS);
-> > +       bitmap_zero(kvpmu->pmc_overflown, RISCV_KVM_MAX_COUNTERS);
-> >         memset(&kvpmu->fw_event, 0, SBI_PMU_FW_MAX * sizeof(struct kvm_=
-fw_event));
-> > -       kvpmu->snapshot_addr =3D INVALID_GPA;
-> > +       kvm_pmu_clear_snapshot_area(vcpu);
-> >  }
-> >
-> >  void kvm_riscv_vcpu_pmu_reset(struct kvm_vcpu *vcpu)
-> > --
-> > 2.34.1
-> >
->
-> Regards,
-> Anup
+Originally the plan was to reuse struct page* for the new memory types,
+and to set the LSB on the page* to indicate it's not really a page.
+However, for safe compiler type checking we need to introduce a new type.
+
+struct netmem is introduced to abstract the underlying memory type.
+Currently it's a no-op abstraction that is always a struct page underneath.
+In parallel there is an undergoing effort to add support for devmem to the
+net stack:
+
+https://lore.kernel.org/netdev/20231208005250.2910004-1-almasrymina@google.=
+com/
+
+Cc: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Christian K=C3=B6nig <christian.koenig@amd.com>
+Cc: Shakeel Butt <shakeelb@google.com>
+Cc: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+
+Mina Almasry (3):
+  vsock/virtio: use skb_frag_*() helpers
+  net: introduce abstraction for network memory
+  net: add netmem_t to skb_frag_t
+
+ include/linux/skbuff.h           | 70 ++++++++++++++++++++++++--------
+ include/net/netmem.h             | 35 ++++++++++++++++
+ net/core/skbuff.c                | 22 +++++++---
+ net/kcm/kcmsock.c                | 10 ++++-
+ net/vmw_vsock/virtio_transport.c |  6 +--
+ 5 files changed, 116 insertions(+), 27 deletions(-)
+ create mode 100644 include/net/netmem.h
+
+--=20
+2.43.0.472.g3155946c3a-goog
+
 
