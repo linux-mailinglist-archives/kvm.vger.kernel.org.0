@@ -1,92 +1,100 @@
-Return-Path: <kvm+bounces-4742-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4743-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3ABC817828
-	for <lists+kvm@lfdr.de>; Mon, 18 Dec 2023 18:07:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 493BE81782C
+	for <lists+kvm@lfdr.de>; Mon, 18 Dec 2023 18:07:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FA44284B42
-	for <lists+kvm@lfdr.de>; Mon, 18 Dec 2023 17:07:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E95842837CA
+	for <lists+kvm@lfdr.de>; Mon, 18 Dec 2023 17:07:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2541B5A857;
-	Mon, 18 Dec 2023 17:07:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D49DA5D735;
+	Mon, 18 Dec 2023 17:07:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BMvYL4dJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WwAy4dmM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6DB05BF86
-	for <kvm@vger.kernel.org>; Mon, 18 Dec 2023 17:07:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5e46cbc3d34so34295597b3.3
-        for <kvm@vger.kernel.org>; Mon, 18 Dec 2023 09:07:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702919223; x=1703524023; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rvjqc4EDZ9TpTxZAQcIhZwHGo146B0MzTSnqxkHQUnQ=;
-        b=BMvYL4dJjA4FUjz5ebqhfWvTqNs0WAckoUXYepC2lTlvb83V8U8DCLPQXbkYwYNfuQ
-         Bwl25DBZ7idOTULzqTxTybO1LthgI6pz9dwCA9orDCqt1ytIUgJ0N5rULGJKze7cCmYo
-         KtlkqxptmIiDXwRVo181WTeIYNutDdqHHlBEPJk3bJGIEphYlF1yXkXA0BpoJwP6A5Ov
-         RZ8kKlBXiYHMosFmI9Cp0AL/UuvfzW/DKy8XfyANmqVqN1rKsUeErC/A/fxsvilP/+HV
-         Z8c5QmOe8HtTZBuQTcnOi9bE4yXH4mLSV44mZDk5CZXAJvtoupWCWJSjBY4t6HzKBSPM
-         trKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702919223; x=1703524023;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rvjqc4EDZ9TpTxZAQcIhZwHGo146B0MzTSnqxkHQUnQ=;
-        b=X+12NfZEhwH/iOvYp+24GclEV67UossOKvpH/r5YT+Lq9jlL5XFz5iYCsOLDqy5zKW
-         qRQMC8M/CBwl0q+LDyVDer3miKIDwyUTyvoPeeGW0Azd00iAlld9UaheSudvA96BjEuP
-         OH8/3UNQc4avrpiOhP5VJ5Uuug1ACvN8chrzIl5Q63DHqBu2wJeibP2Oj9ITfqbfssq1
-         veK9eL4xTy32Vfe2lWe52WS41AKzuK4EIv+f+n8BhoMMYTXMV0BV//jmy4cqY236NwAZ
-         kyQl2hyUkQrv2O+nWwV5q0thAXgsvqSKGvWpWs+CFD1ROvi65DXDaxWSyE/Z+0hWRx1I
-         a/9g==
-X-Gm-Message-State: AOJu0YzFe32LZwNLI4jsdBlwaJqpHYzk+6S/wvrQ9+m4hLRcYDe9JHI8
-	oVtSFuAF7g3XatX+MjjBOOXEUzun46Y=
-X-Google-Smtp-Source: AGHT+IH8ENj6IkJWajt1tWoXxCRQVrBdOCRdXBE3aSi8LAqU8mtsiq/WatuiCdvu+SfCCEUVz8i5vu3/G4Q=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:fc2:b0:5e6:bcea:df7a with SMTP id
- dg2-20020a05690c0fc200b005e6bceadf7amr610050ywb.5.1702919222886; Mon, 18 Dec
- 2023 09:07:02 -0800 (PST)
-Date: Mon, 18 Dec 2023 09:07:01 -0800
-In-Reply-To: <bug-218259-28872-UltznLAvHS@https.bugzilla.kernel.org/>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE3B34FF68
+	for <kvm@vger.kernel.org>; Mon, 18 Dec 2023 17:07:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5F0A4C433CB
+	for <kvm@vger.kernel.org>; Mon, 18 Dec 2023 17:07:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702919226;
+	bh=/ZTv56FEw8xRlKF7HJqRmpq1ussyhp64dWBig6cj67E=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=WwAy4dmMdfHVGJzqXgUIurZkyq2OGAW/AGUwgTkBIvsGjMhd36EPYeDl8WDN1qTfT
+	 dCSYjbR72DGBKLPQQgwbqAAmG8MIDbzynMJMvlZ+DPWtmbZICQP1GoMCQh8Z0Pioqq
+	 dHLS/yJtDxP1kqfchxCzb66ZyeziF4fgTJ4nmtBvHoIgBNk2A67MI4LTJJyM8fPWQY
+	 ikGys5rsihQ1rCCR58MykNkBFfd00JmsXdSJD/8CTvwcZn8eeXc2QwkT1BoVMtqMFE
+	 3iLkiIrPlKlQxEs4sNQ26dJIFJlhgtNvPdrsKU17qi0AWzQ/L/uEX6uKY+h7AZPqXj
+	 /M8noE2Hm6h1g==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 4B18BC53BD2; Mon, 18 Dec 2023 17:07:06 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: kvm@vger.kernel.org
+Subject: [Bug 218259] High latency in KVM guests
+Date: Mon, 18 Dec 2023 17:07:06 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: seanjc@google.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-218259-28872-oOlnHKCFQq@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-218259-28872@https.bugzilla.kernel.org/>
+References: <bug-218259-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <bug-218259-28872@https.bugzilla.kernel.org/> <bug-218259-28872-UltznLAvHS@https.bugzilla.kernel.org/>
-Message-ID: <ZYB8NdYscuQfkt7K@google.com>
-Subject: Re: [Bug 218259] High latency in KVM guests
-From: Sean Christopherson <seanjc@google.com>
-To: bugzilla-daemon@kernel.org
-Cc: kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 
+https://bugzilla.kernel.org/show_bug.cgi?id=3D218259
+
+--- Comment #5 from Sean Christopherson (seanjc@google.com) ---
 On Thu, Dec 14, 2023, bugzilla-daemon@kernel.org wrote:
-> https://bugzilla.kernel.org/show_bug.cgi?id=218259
-> 
+> https://bugzilla.kernel.org/show_bug.cgi?id=3D218259
+>=20
 > --- Comment #2 from Joern Heissler (kernelbugs2012@joern-heissler.de) ---
 > Hi,
-> 
+>=20
 > 1. KSM is already disabled. Didn't try to enable it.
-> 2. NUMA autobalancing was enabled on the host (value 1), not in the guest. When
+> 2. NUMA autobalancing was enabled on the host (value 1), not in the guest.
+> When
 > disabled, I can't see the issue anymore.
 
-This is likely/hopefully the same thing Yan encountered[1].  If you are able to
-test patches, the proposed fix[2] applies cleanly on v6.6 (note, I need to post a
-refreshed version of the series regardless), any feedback you can provide would
+This is likely/hopefully the same thing Yan encountered[1].  If you are abl=
+e to
+test patches, the proposed fix[2] applies cleanly on v6.6 (note, I need to =
+post
+a
+refreshed version of the series regardless), any feedback you can provide w=
+ould
 be much appreciated.
 
 KVM changes aside, I highly recommend evaluating whether or not NUMA
-autobalancing is a net positive for your environment.  The interactions between
-autobalancing and KVM are often less than stellar, and disabling autobalancing
+autobalancing is a net positive for your environment.  The interactions bet=
+ween
+autobalancing and KVM are often less than stellar, and disabling autobalanc=
+ing
 is sometimes a completely legitimate option/solution.
 
 [1] https://lore.kernel.org/all/ZNnPF4W26ZbAyGto@yzhao56-desk.sh.intel.com
@@ -94,31 +102,52 @@ is sometimes a completely legitimate option/solution.
 
 > 3. tdp_mmu was "Y", disabling it seems to make no difference.
 
-Hrm, that's odd.  The commit blamed by bisection was purely a TDP MMU change.
-Did you relaunch VMs after disabling the module params?  While the module param
-is writable, it's effectively snapshotted by each VM during creation, i.e. toggling
+Hrm, that's odd.  The commit blamed by bisection was purely a TDP MMU chang=
+e.
+Did you relaunch VMs after disabling the module params?  While the module p=
+aram
+is writable, it's effectively snapshotted by each VM during creation, i.e.
+toggling
 it won't affect running VMs.
 
 > So might be related to NUMA. On older kernels, the flag is 1 as well.
-> 
-> There's one difference in the kernel messages that I hadn't noticed before. The
+>=20
+> There's one difference in the kernel messages that I hadn't noticed befor=
+e.
+> The
 > newer one prints "pci_bus 0000:7f: Unknown NUMA node; performance will be
-> reduced" (same with ff again). The older ones don't. No idea what this means,
+> reduced" (same with ff again). The older ones don't. No idea what this me=
+ans,
 > if it's important, and can't find info on the web regarding it.
 
-That was a new message added by commit ad5086108b9f ("PCI: Warn if no host bridge
-NUMA node info"), which was first released in v5.5.  AFAICT, that warning is only
-complaning about the driver code for PCI devices possibly running on the wrong
+That was a new message added by commit ad5086108b9f ("PCI: Warn if no host
+bridge
+NUMA node info"), which was first released in v5.5.  AFAICT, that warning is
+only
+complaning about the driver code for PCI devices possibly running on the wr=
+ong
 node.
 
-However, if you are seeing that error on v6.1 or v6.6, but not v5.17, i.e. if the
-message started showing up well after the printk was added, then it might be a
-symptom of an underlying problem, e.g. maybe the kernel is botching parsing of
+However, if you are seeing that error on v6.1 or v6.6, but not v5.17, i.e. =
+if
+the
+message started showing up well after the printk was added, then it might b=
+e a
+symptom of an underlying problem, e.g. maybe the kernel is botching parsing=
+ of
 ACPI tables?
 
 > I think the kernel is preemptible:
 
-Ya, not fully preemptible (voluntary only), but the important part is that KVM
-will drop mmu_lock if there is contention (which is a "requirement" for the bug
+Ya, not fully preemptible (voluntary only), but the important part is that =
+KVM
+will drop mmu_lock if there is contention (which is a "requirement" for the=
+ bug
 that Yan encountered).
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
 
