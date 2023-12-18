@@ -1,84 +1,105 @@
-Return-Path: <kvm+bounces-4749-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4750-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 062C7817A77
-	for <lists+kvm@lfdr.de>; Mon, 18 Dec 2023 20:01:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C973817AD7
+	for <lists+kvm@lfdr.de>; Mon, 18 Dec 2023 20:17:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DABAA1C22EE9
-	for <lists+kvm@lfdr.de>; Mon, 18 Dec 2023 19:01:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0C45B1F25D10
+	for <lists+kvm@lfdr.de>; Mon, 18 Dec 2023 19:17:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 503A41DDFC;
-	Mon, 18 Dec 2023 19:00:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA01F5D759;
+	Mon, 18 Dec 2023 19:17:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WbWXJNho"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WfgZ/xOn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D38731EB3F
-	for <kvm@vger.kernel.org>; Mon, 18 Dec 2023 19:00:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-3366af69d4bso1046991f8f.0
-        for <kvm@vger.kernel.org>; Mon, 18 Dec 2023 11:00:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702926039; x=1703530839; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=c+Edgev1I87JalzSn854oenOWC9y7aW6kdAK/idyvHg=;
-        b=WbWXJNhoePROeJTf/4sSWyGOp5Utd7BzsvKh0CHyDrIjwkGy1Yd8C+mQUXTGAMiKAT
-         BnHJ6sMbnMTChxfYp5n90rAJEwlafDmgkRpruZKrStSGPHiKMVVFi/0hlp9TEjPUHd/0
-         AjonF4K/uVtSuHpqYKimrQ0iU2HZ+Y5dJYbzIT8sgrQCrF3yDRmVTGZRM2qEb3jNxmDU
-         xnf17AeUJW5c3dEF+TpPE3uj+/v59BHl9aMZMewnZs7Lwa6AF/ff3Py6c0xzVTt5pgVA
-         5yn6kOJTpGsNOkCDeK3b+1h2bXen+BJ3BhlM9ohOMNAcEaA35BYg5ggSX/tsQfncvR+F
-         X9Tg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702926039; x=1703530839;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=c+Edgev1I87JalzSn854oenOWC9y7aW6kdAK/idyvHg=;
-        b=ufbcju4eLxSvSqkmJA2LtdW4L4p4j73U9fbyfO1/EXCjgm6sIb572E1CVffQNSA5+a
-         sWHsauWDVHryaPfjBxDVn3/ebLUVG5rRsH3SUcc7acGkDKVqHKbXQebe1k5toTBpJZdA
-         8k8U0UGyEBhHXxmFwvvSsK5ThcVBaOxLatRr9Z4BcaV9I8WXf5zb/IAXXjFL3fXvBVNS
-         8BiVHQqPlrZPCTixbrsaMAxrVmb56MV67vLCX6LINAUgdA5+S8sxyIlbnyiRoR6pa50A
-         I1iiFN32YaqUb0yUnTygAl19Gt7HXurPyr1jk9ZzbnfMUndvThz9hGmC+FgthxFQJ8du
-         qmAw==
-X-Gm-Message-State: AOJu0YzvMWZoqynpdNlExLJlr4ZPTOKWgOJLh6C8gCqKbZyMyxFWw3G1
-	IUntCCRWvZSMd1KM4nFjKu30siE8Apd3dAWYlnrpj1BTDQ/uPU6GeFQ=
-X-Google-Smtp-Source: AGHT+IHEEMCktVnjwAlyXA+x+CJM0FQsbADkB6K7dT7/2bi3rlNUq8JuGatgaO8nsXjTv+jyu0cNKJGt1xFtd3iapto=
-X-Received: by 2002:a05:6000:124c:b0:336:5e98:84c2 with SMTP id
- j12-20020a056000124c00b003365e9884c2mr2258829wrx.68.1702926038821; Mon, 18
- Dec 2023 11:00:38 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B350A5BFBC
+	for <kvm@vger.kernel.org>; Mon, 18 Dec 2023 19:17:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Mon, 18 Dec 2023 11:17:24 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1702927050;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=RCNTVgShRnFY0wpkW908oaU4F/q2PRK/4k+6ZuwoIrU=;
+	b=WfgZ/xOnUgyIKurbvPDMQfjl/NVTnT3LQSb7nJoE4uUIP2uUuEsQIqOG3OqQGWDFSGc3mP
+	2De2Mv2bKUQZZH0XH6oZDedQ3DXe+919sAihydqKEgB+sH07rhdk6iMnJHXQD9doM7aw6N
+	yWQ1fOSOoWcpooJlEehHZXWKZ8E7WXo=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, Mark Brown <broonie@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org
+Subject: [GIT PULL] KVM/arm64 fixes for 6.7, part #2
+Message-ID: <ZYCaxOtefkuvBc3Z@thinky-boi>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231218185850.1659570-1-dmatlack@google.com>
-In-Reply-To: <20231218185850.1659570-1-dmatlack@google.com>
-From: David Matlack <dmatlack@google.com>
-Date: Mon, 18 Dec 2023 11:00:09 -0800
-Message-ID: <CALzav=es5MKYFCQe2rRhWghFOa-KtxJZ0NCdOzZRMpf=XFq39g@mail.gmail.com>
-Subject: Re: [PATCH] PRODKERNEL: KVM: Mark a vCPU as preempted/ready iff it's
- scheduled out while running
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Dec 18, 2023 at 10:58=E2=80=AFAM David Matlack <dmatlack@google.com=
-> wrote:
->
-> Mark a vCPU as preempted/ready if-and-only-if it's scheduled out while
-> running. i.e. Do not mark a vCPU preempted/ready if it's scheduled out
-> during a non-KVM_RUN ioctl() or when userspace is doing KVM_RUN with
-> immediate_exit.
+Hi Paolo,
 
-Sigh. I forgot to drop PRODKERNEL: from the subject line. My apologies.
+Here's the second batch of fixes for 6.7. Please note that this pull
+is based on -rc4 instead of my first fixes tag as the KVM selftests
+breakage was introduced by one of my changes that went through the
+perf tree.
+
+Please pull.
+
+-- 
+Thanks,
+Oliver
+
+The following changes since commit 33cc938e65a98f1d29d0a18403dbbee050dcad9a:
+
+  Linux 6.7-rc4 (2023-12-03 18:52:56 +0900)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.7-2
+
+for you to fetch changes up to 0c12e6c8267f831e491ee64ac6f216601cea3eee:
+
+  KVM: selftests: Ensure sysreg-defs.h is generated at the expected path (2023-12-12 16:49:43 +0000)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for 6.7, part #2
+
+ - Ensure a vCPU's redistributor is unregistered from the MMIO bus
+   if vCPU creation fails
+
+ - Fix building KVM selftests for arm64 from the top-level Makefile
+
+----------------------------------------------------------------
+Marc Zyngier (5):
+      KVM: arm64: vgic: Simplify kvm_vgic_destroy()
+      KVM: arm64: vgic: Add a non-locking primitive for kvm_vgic_vcpu_destroy()
+      KVM: arm64: vgic: Force vcpu vgic teardown on vcpu destroy
+      KVM: arm64: vgic: Ensure that slots_lock is held in vgic_register_all_redist_iodevs()
+      KVM: Convert comment into an assertion in kvm_io_bus_register_dev()
+
+Oliver Upton (1):
+      KVM: selftests: Ensure sysreg-defs.h is generated at the expected path
+
+ arch/arm64/kvm/arm.c                 |  2 +-
+ arch/arm64/kvm/vgic/vgic-init.c      | 47 ++++++++++++++++++++++--------------
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c   |  4 ++-
+ arch/arm64/kvm/vgic/vgic.h           |  1 +
+ tools/testing/selftests/kvm/Makefile | 26 ++++++++++++--------
+ virt/kvm/kvm_main.c                  |  3 ++-
+ 6 files changed, 52 insertions(+), 31 deletions(-)
 
