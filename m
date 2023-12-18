@@ -1,152 +1,173 @@
-Return-Path: <kvm+bounces-4746-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4747-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C239E81793C
-	for <lists+kvm@lfdr.de>; Mon, 18 Dec 2023 18:54:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 142CE81796F
+	for <lists+kvm@lfdr.de>; Mon, 18 Dec 2023 19:14:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4646BB21344
-	for <lists+kvm@lfdr.de>; Mon, 18 Dec 2023 17:54:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2CA221C21E7E
+	for <lists+kvm@lfdr.de>; Mon, 18 Dec 2023 18:14:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D97E571451;
-	Mon, 18 Dec 2023 17:54:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70B315D74E;
+	Mon, 18 Dec 2023 18:14:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="azdrmCTu"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BWtF+un6"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 164C54FF98
-	for <kvm@vger.kernel.org>; Mon, 18 Dec 2023 17:54:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 83305C433C9
-	for <kvm@vger.kernel.org>; Mon, 18 Dec 2023 17:54:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702922056;
-	bh=to5iq3TVdf155RlkfsND4jN9/sPqMdYv2Zq7lVuJ6KI=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=azdrmCTujbxoXXO6bX9afEhDl8VcdC0gjZ5OgszTxAiD0K4drkWZsoLxhzoxc6Km+
-	 EqsE4WbZTK4nwURUCzZeTincAd/DL9nhGv88EUJR/sMhLBgW8fh21lgEejwaHqTQUP
-	 Pl3QLr/gSp5qQkVkacJ3jFhoEd8/UTyCVkzrdItVQNcvXN44Z1oliyepz3B54iUyYd
-	 kU9L35jOzWTT3zK4s8iWrXef8kDDFJmKOive0ebL4OXKxdCWw09yyEPCt5mHZBpubh
-	 A9ZbKDTZBq9KtGg9cqSk8dmWLtqCStfqBwkydX1Tm80la+Vpdrrz/jV1++Kk7ErwHD
-	 NgNhTpV2NIBbA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 683CBC53BD2; Mon, 18 Dec 2023 17:54:16 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: kvm@vger.kernel.org
-Subject: [Bug 218267] [Sapphire Rapids][Upstream]Boot up multiple Windows VMs
- hang
-Date: Mon, 18 Dec 2023 17:54:16 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: seanjc@google.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-218267-28872-gONIuYQMJ8@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218267-28872@https.bugzilla.kernel.org/>
-References: <bug-218267-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 171435D732
+	for <kvm@vger.kernel.org>; Mon, 18 Dec 2023 18:14:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-552eaf800abso911a12.0
+        for <kvm@vger.kernel.org>; Mon, 18 Dec 2023 10:14:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1702923263; x=1703528063; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=DPggsM3NCSPNHuDW6MYkybcIgkppTmiteb7qARs7Z58=;
+        b=BWtF+un6752vqmkcElNRbra4G8AL7vWd0Q0/4iFu5IbKRN4M3aJ8E4KjKqp0TS6mE0
+         fjLc2KSlNOzadOiEl3Ik/m6tSwq//QFcSGxxm46KPA65++ucVdv53gDTNF/FRCX8Vq85
+         w6l3TYM6SAkgOkou9Xnes/rwDBDKfYOp3MJy1kI3rHIQE9t0jlRCzcR/dGuNCDEa0xP8
+         ksDXGasI+eaH/WtJTeBFH67Fe8mMsHS0Qsq3tTB33CDYfISQs56zpYZXnTOS/bZwdIvv
+         egQpsHvQAG2WH6hmn9I5+gGBIpBLAxOrc+a0WrCUOclwug3BB+MCxu0N6dKzCyF7fTuF
+         imJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702923263; x=1703528063;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DPggsM3NCSPNHuDW6MYkybcIgkppTmiteb7qARs7Z58=;
+        b=CZd9jC72R7Q4F7GH3OVYrEQExlTeZDf1xdTfWomiVj08LlqRrC7eSEXGlkAy2/3Yl/
+         6uMbzs5x9prKoH9uYhty6GxzWETEX+NNZxQdAA06pyMhp7tgUDQ59U5OpqtZcDwnX3oj
+         d/M7WbKyJqQyP4YspA1BHkRn3Q2CLO/8vpcE+T2Ae1AuDoUEGDUawWl7sSliZUugOYnC
+         q3hEUA4EkwGGtUtVSpkEkabAnhBf7MPc7aHXPgiV2lnyR8GCYY0z1YIc6yqRnIgSFzU8
+         BjZ31+tE5tFFL2dOdJdu/iPA8UcGwkrmH12n+3Fg+1mKWvQdlwjMVC5woM1wCwzNI49T
+         raFA==
+X-Gm-Message-State: AOJu0Yx4auhydn5zZKSMYB4+8RvLy/MLbu/JiLQQ/gutWUm7nqHIE1hm
+	2wRVrdGO+LQWph2aY+l6ulxtAY5zLUnvSPfH8WVjowqXaScjk2IwW8HebHq5
+X-Google-Smtp-Source: AGHT+IEEzb76/Ah4Nlk8QgfziJRiEwlA6qkmZn/0hGHqfDBA43ntvwLYD5q36eVD4juH+vKRnm9fEY94vwSvJAHuo1g=
+X-Received: by 2002:a50:9e49:0:b0:553:62b4:5063 with SMTP id
+ z67-20020a509e49000000b0055362b45063mr16629ede.4.1702923263119; Mon, 18 Dec
+ 2023 10:14:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20231214103520.7198-1-yan.y.zhao@intel.com> <BN9PR11MB5276BE04CBB6D07039086D658C93A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZXzx1zXfZ6GV9TgI@google.com>
+In-Reply-To: <ZXzx1zXfZ6GV9TgI@google.com>
+From: Yiwei Zhang <zzyiwei@google.com>
+Date: Mon, 18 Dec 2023 10:14:09 -0800
+Message-ID: <CAKT=dDnMaX=sxU5i=tdPDB5Wpw6TQUVrUL-JJYD3xrgxEE=acw@mail.gmail.com>
+Subject: Re: [RFC PATCH] KVM: Introduce KVM VIRTIO device
+To: Sean Christopherson <seanjc@google.com>
+Cc: Kevin Tian <kevin.tian@intel.com>, Yan Y Zhao <yan.y.zhao@intel.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>, 
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "olvaffe@gmail.com" <olvaffe@gmail.com>, 
+	Zhiyuan Lv <zhiyuan.lv@intel.com>, Zhenyu Z Wang <zhenyu.z.wang@intel.com>, 
+	Yongwei Ma <yongwei.ma@intel.com>, "vkuznets@redhat.com" <vkuznets@redhat.com>, 
+	"wanpengli@tencent.com" <wanpengli@tencent.com>, "jmattson@google.com" <jmattson@google.com>, 
+	"joro@8bytes.org" <joro@8bytes.org>, 
+	"gurchetansingh@chromium.org" <gurchetansingh@chromium.org>, "kraxel@redhat.com" <kraxel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218267
+> +Yiwei
+>
+> On Fri, Dec 15, 2023, Kevin Tian wrote:
+> > > From: Zhao, Yan Y <yan.y.zhao@intel.com>
+> > > Sent: Thursday, December 14, 2023 6:35 PM
+> > >
+> > > - For host non-MMIO pages,
+> > >   * virtio guest frontend and host backend driver should be synced to use
+> > >     the same memory type to map a buffer. Otherwise, there will be
+> > >     potential problem for incorrect memory data. But this will only impact
+> > >     the buggy guest alone.
+> > >   * for live migration,
+> > >     as QEMU will read all guest memory during live migration, page aliasing
+> > >     could happen.
+> > >     Current thinking is to disable live migration if a virtio device has
+> > >     indicated its noncoherent state.
+> > >     As a follow-up, we can discuss other solutions. e.g.
+> > >     (a) switching back to coherent path before starting live migration.
+> >
+> > both guest/host switching to coherent or host-only?
+> >
+> > host-only certainly is problematic if guest is still using non-coherent.
+> >
+> > on the other hand I'm not sure whether the host/guest gfx stack is
+> > capable of switching between coherent and non-coherent path in-fly
+> > when the buffer is right being rendered.
+> >
+> > >     (b) read/write of guest memory with clflush during live migration.
+> >
+> > write is irrelevant as it's only done in the resume path where the
+> > guest is not running.
+> >
+> > >
+> > > Implementation Consideration
+> > > ===
+> > > There is a previous series [1] from google to serve the same purpose to
+> > > let KVM be aware of virtio GPU's noncoherent DMA status. That series
+> > > requires a new memslot flag, and special memslots in user space.
+> > >
+> > > We don't choose to use memslot flag to request honoring guest memory
+> > > type.
+> >
+> > memslot flag has the potential to restrict the impact e.g. when using
+> > clflush-before-read in migration?
+>
+> Yep, exactly.  E.g. if KVM needs to ensure coherency when freeing memory back to
+> the host kernel, then the memslot flag will allow for a much more targeted
+> operation.
+>
+> > Of course the implication is to honor guest type only for the selected slot
+> > in KVM instead of applying to the entire guest memory as in previous series
+> > (which selects this way because vmx_get_mt_mask() is in perf-critical path
+> > hence not good to check memslot flag?)
+>
+> Checking a memslot flag won't impact performance.  KVM already has the memslot
+> when creating SPTEs, e.g. the sole caller of vmx_get_mt_mask(), make_spte(), has
+> access to the memslot.
+>
+> That isn't coincidental, KVM _must_ have the memslot to construct the SPTE, e.g.
+> to retrieve the associated PFN, update write-tracking for shadow pages, etc.
+>
+> I added Yiwei, who I think is planning on posting another RFC for the memslot
+> idea (I actually completely forgot that the memslot idea had been thought of and
+> posted a few years back).
 
---- Comment #1 from Sean Christopherson (seanjc@google.com) ---
-On Fri, Dec 15, 2023, bugzilla-daemon@kernel.org wrote:
-> Platform: Sapphire Rapids Platform
->=20
-> Host OS: CentOS Stream 9
->=20
-> Kernel:6.7.0-rc1 (commit:8ed26ab8d59111c2f7b86d200d1eb97d2a458fd1)
+We've deferred to Yan (Intel side) to drive the userspace opt-in. So
+it's up to Yan to
+revise the series to be memslot flag based. I'm okay with what
+upstream folks think
+to be safer for the opt-in. Thanks!
 
-...
-
-> Qemu: QEMU emulator version 8.1.94 (v8.2.0-rc4)
-> (commit:039afc5ef7367fbc8fb475580c291c2655e856cb)
->=20
-> Host Kernel cmdline:BOOT_IMAGE=3D/kvm-vmlinuz root=3D/dev/mapper/cs_spr--=
-2s2-root
-> ro crashkernel=3Dauto console=3Dtty0 console=3DttyS0,115200,8n1 3 intel_i=
-ommu=3Don
-> disable_mtrr_cleanup
->=20
-> Bug detailed description
-> =3D=3D=3D=3D=3D=3D=3D
-> We boot up 8 Windows VMs (total vCPUs > pCPUs) in host, random run
-> application
-> on each VM such as WPS editing etc, and wait for a moment, then Some of t=
-he
-> Windows Guest hang and console reports "KVM internal error. Suberror: 3".
-
-...
-
-> Code=3D25 88 61 00 00 b9 70 00 00 40 0f ba 32 00 72 06 33 c0 8b d0 <0f> 3=
-0 5a
-> 58
-> 59 c3 cc cc cc cc cc cc 0f 1f 84 00 00 00 00 00 48 81 ec 38 01 00 00 48 8=
-d 84
->=20
-> KVM internal error. Suberror: 3
-> extra data[0]: 0x000000008000002f  <=3D Vectoring IRQ 47 (decimal)
-> extra data[1]: 0x0000000000000020  <=3D WRMSR VM-Exit
-> extra data[2]: 0x0000000000000f82
-> extra data[3]: 0x000000000000004b
-
-KVM exits with an internal error because the CPU indicates that IRQ 47 was
-being
-delivered/vectored when the VM-Exit occurred, but the VM-Exit is due to WRM=
-SR.
-A WRMSR VM-Exit is supposed to only occur on an instruction boundary, i.e.
-can't
-occur while delivering an IRQ (or any exception/event), and so KVM kicks ou=
-t to
-userspace because something has gone off the rails.
-
-   b9 70 00 00 40          mov    0x40000070, ecx
-   0f ba 32 00             btr    0x0, DWORD PTR [rdx]
-   72 06                   jb     0x16
-   33 c0                   xor    eax,eax
-   8b d0                   mov    eax, edx
-   0f 30                   wrmsr
-
-FWIW, the MSR in question is Hyper-V's synthetic EOI, a.k.a. HV_X64_MSR_EOI,
-though
-I doubt the exact MSR matters.
-
-Have you tried an older host kernel?  If not can you try something like v6.=
-1?
-Note, if you do, use base v6.1, *not* the stable tree in case a bug was
-backported.
-
-There was a recent change to relevant code, commit 50011c2a2457 ("KVM: VMX:
-Refresh
-available regs and IDT vectoring info before NMI handling"), though I don't=
- see
-any obvious bugs.  But I'm pretty sure the only alternative explanation is a
-CPU/ucode bug, so it's definitely worth checking older versions of KVM.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+> > > Instead we hope to make the honoring request to be explicit (not tied to a
+> > > memslot flag). This is because once guest memory type is honored, not only
+> > > memory used by guest virtio device, but all guest memory is facing page
+> > > aliasing issue potentially. KVM needs a generic solution to take care of
+> > > page aliasing issue rather than counting on memory type of a special
+> > > memslot being aligned in host and guest.
+> > > (we can discuss what a generic solution to handle page aliasing issue will
+> > > look like in later follow-up series).
+> > >
+> > > On the other hand, we choose to introduce a KVM virtio device rather than
+> > > just provide an ioctl to wrap kvm_arch_[un]register_noncoherent_dma()
+> > > directly, which is based on considerations that
+> >
+> > I wonder it's over-engineered for the purpose.
+> >
+> > why not just introducing a KVM_CAP and allowing the VMM to enable?
+> > KVM doesn't need to know the exact source of requiring it...
+>
+> Agreed.  If we end up needing to grant the whole VM access for some reason, just
+> give userspace a direct toggle.
 
