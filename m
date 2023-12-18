@@ -1,86 +1,100 @@
-Return-Path: <kvm+bounces-4751-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4752-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE21F817B6A
-	for <lists+kvm@lfdr.de>; Mon, 18 Dec 2023 20:52:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90506817B85
+	for <lists+kvm@lfdr.de>; Mon, 18 Dec 2023 20:58:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E7A51F2202A
-	for <lists+kvm@lfdr.de>; Mon, 18 Dec 2023 19:52:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A440285B54
+	for <lists+kvm@lfdr.de>; Mon, 18 Dec 2023 19:58:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD10471477;
-	Mon, 18 Dec 2023 19:51:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C74C7349E;
+	Mon, 18 Dec 2023 19:56:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mgBTfMCe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RuFXviiD"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC54471450
-	for <kvm@vger.kernel.org>; Mon, 18 Dec 2023 19:51:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Mon, 18 Dec 2023 19:51:15 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1702929081;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MNLDxkyQEIxDaRjSMEFk0lA/gC40y5Szs1CPQAo05zE=;
-	b=mgBTfMCeO2gca9mHwRzBoEND0XJYbbI/9Pc93Ou/hXzyhlMqSSq5J77ufFS/BiVdCjNwn4
-	q+ntjjCG2qC6SpafIkjQmSqRf/gVxeV2zQkz+EveivZBxoooNZTL+tYES5Wjb/qu1HgCwR
-	Xy4ERO89rE9xibo8BeT0+Aour6fMO3A=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Chase Conklin <chase.conklin@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Darren Hart <darren@os.amperecomputing.com>,
-	Jintack Lim <jintack@cs.columbia.edu>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	Miguel Luis <miguel.luis@oracle.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v11 00/43] KVM: arm64: Nested Virtualization support
- (FEAT_NV2 only)
-Message-ID: <ZYCis7lNTYouBQnU@linux.dev>
-References: <20231120131027.854038-1-maz@kernel.org>
- <86sf3zadmp.wl-maz@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A812372047;
+	Mon, 18 Dec 2023 19:56:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26CDEC433CA;
+	Mon, 18 Dec 2023 19:56:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702929400;
+	bh=grKlAQWV5xV5wJkfKbKrDwxqfLJY1vUR6WlZYNNuA/M=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=RuFXviiDAzvfM6oPPwKPeQxhxx0ROEeGABDBXhq8+EgQGsx84/SxCdxu6h2KyALeC
+	 yS18QnDvUZ+3Aa7PQRbyli72gr8maRcPxAkZpL/O6f6wOMUooq3TsDjzodkp50+6iY
+	 sdereDZp7Y5Kf2KTpOaVRw12M7DrO2RRGRO5PDJ1dxeRBZcB9UOCG77XZMA1ZdKQqk
+	 vvIAWPG9koo53krWGRGspu4tFnL2m3PLxMDI9pGKROG1tAkxcXec51DyZZ22fly72U
+	 RNtUB/YNiVzjqBx4cNhX3U/jpz5GKUQxa5WsCIvm7Ckru4YcNE+eNx1hcDTx96lOxx
+	 kYN53AyvKi9dQ==
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-50e384cd6ebso1758627e87.3;
+        Mon, 18 Dec 2023 11:56:40 -0800 (PST)
+X-Gm-Message-State: AOJu0YwAP8U83ZAT1OGBJ3UcXy7vRGMFbsj5JS8RATS3L6epacpwBtYN
+	yKiOOHm9URsaTSeGPdL3SUPqhI38kt04mAugcNw=
+X-Google-Smtp-Source: AGHT+IGRZ13EcavCOorqsgntfK6FaZoWyYwMzNZj5jKJnbQHE7+5oLKfwJj7KjKBJ+wssogvyt5tiMo+CYWeUoo1XBY=
+X-Received: by 2002:a05:6512:96a:b0:50e:1ce0:b510 with SMTP id
+ v10-20020a056512096a00b0050e1ce0b510mr1996591lft.97.1702929398315; Mon, 18
+ Dec 2023 11:56:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86sf3zadmp.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+References: <2f33be45-fe11-4b69-8e89-4d2824a0bf01@daynix.com>
+In-Reply-To: <2f33be45-fe11-4b69-8e89-4d2824a0bf01@daynix.com>
+From: Song Liu <song@kernel.org>
+Date: Mon, 18 Dec 2023 11:56:27 -0800
+X-Gmail-Original-Message-ID: <CAPhsuW6=-FK+ysh_Q1H7ana=A6v9d0Rsn+2hpJpm5n2dB_A1Qg@mail.gmail.com>
+Message-ID: <CAPhsuW6=-FK+ysh_Q1H7ana=A6v9d0Rsn+2hpJpm5n2dB_A1Qg@mail.gmail.com>
+Subject: Re: Should I add BPF kfuncs for userspace apps? And how?
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Jason Wang <jasowang@redhat.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, 
+	Yuri Benditovich <yuri.benditovich@daynix.com>, Andrew Melnychenko <andrew@daynix.com>, 
+	Benjamin Tissoires <bentiss@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, kvm@vger.kernel.org, 
+	LKML <linux-kernel@vger.kernel.org>, virtualization@lists.linux-foundation.org, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 18, 2023 at 12:39:26PM +0000, Marc Zyngier wrote:
-> On Mon, 20 Nov 2023 13:09:44 +0000,
-> Marc Zyngier <maz@kernel.org> wrote:
-> > 
-> > This is the 5th drop of NV support on arm64 for this year, and most
-> > probably the last one for this side of Christmas.
-> 
-> Unless someone objects, I'm planning to take the first 10 patches of
-> this series into 6.8 (with the dependency on ID_AA64MMFR4_EL1.NV_frac
-> in patch #1 removed).
+Hi Akihiko,
 
-For the first 10 patches:
+On Tue, Dec 12, 2023 at 12:05=E2=80=AFAM Akihiko Odaki <akihiko.odaki@dayni=
+x.com> wrote:
+>
+[...]
+> ---
+>
+> I'm working on a new feature that aids virtio-net implementations using
+> tuntap virtual network device. You can see [1] for details, but
+> basically it's to extend BPF_PROG_TYPE_SOCKET_FILTER to report four more
+> bytes.
 
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+AFAICT, [1] adds a new program type, which is really hard to ship. However,
+you mentioned it is basically "extend BPF_PROG_TYPE_SOCKET_FILTER to
+report four more bytes", which confuses me.
 
--- 
+Can we achieve the same goal by extending BPF_PROG_TYPE_SOCKET_FILTER
+(without adding a new program type)? Does this require extending
+__sk_buff, which
+is also not an option any more?
+
 Thanks,
-Oliver
+Song
 
