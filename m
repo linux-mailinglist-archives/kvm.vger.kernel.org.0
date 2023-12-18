@@ -1,165 +1,159 @@
-Return-Path: <kvm+bounces-4727-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4728-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFAA581746F
-	for <lists+kvm@lfdr.de>; Mon, 18 Dec 2023 15:58:58 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2509381747C
+	for <lists+kvm@lfdr.de>; Mon, 18 Dec 2023 15:59:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 664CBB2254C
-	for <lists+kvm@lfdr.de>; Mon, 18 Dec 2023 14:58:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC2B9B23353
+	for <lists+kvm@lfdr.de>; Mon, 18 Dec 2023 14:59:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93CB03A1C1;
-	Mon, 18 Dec 2023 14:58:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 150FA3D57A;
+	Mon, 18 Dec 2023 14:59:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="f7Ico4zk"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="VwOE0JWN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A6EE37881;
-	Mon, 18 Dec 2023 14:58:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 2115840E00A9;
-	Mon, 18 Dec 2023 14:58:41 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id duilsy3bKYSQ; Mon, 18 Dec 2023 14:58:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1702911518; bh=1weCWgHoOtoy2vZBHy2ouJrV4MN1BpD6yK4soKgP07A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=f7Ico4zkVTqrPgNkFulLln5Nn7Rt6hd6Lducnsi8AYtG2bRm1E7fIBe6Agbk2AS6/
-	 FBDdj+dVtsq21L4WCqfqzN77iciza6p2Aazc2xTtVR3SxGuiOp0VPWoYs+A/dgTw5b
-	 FgSNf+naMbhlKqPoTH4nYKt6j/lGJTCzRFDF4XDSqBeJbwFjcBzMZA6eR0ZnvgW5aN
-	 /N2XD1CjVWWNzuNDrtaYPgb/nDgDtai+TfUQDFIVaeu0uSEwHoXEt+3JE6DkHhBz6j
-	 wvXlKb79qjR05I27rf8pvHauSbZPWHvBhI6rsPg1l8zLgirQ22GzSLcHG+dOypn41P
-	 PcoxaCOKIRq+p6J/7+9P+8OePnsL2wBeWwV1cvApZkEYjZhj6gxrQsBbuLgucPLPdh
-	 t8RC4QYZ50vBVCiyindR7gHvpBk9/KtPZSxrkHRhlg3/rkjSjF4p4Z2DMEFrl7ydMC
-	 fmG7msrfTsjutInRMdlsQJBiQI1INizVxWIRhb+u7mGKAarSV0OH67C80Lko5LTDDe
-	 srRrnXx9sapR/7cSRyPEKGogfLs/jNmNHc7T2XI9NAIVSSFtNoxs4tYoSR8TR17OpG
-	 6jEfc1CY0Pj+fXzA549HB2h4pmBSG3wjep4rqzlZPMZqBTnh5l17Nw0wYsSbaICG+w
-	 CkPBR5p/qZQ9y1BnQook8fHg=
-Received: from zn.tnic (pd95304da.dip0.t-ipconnect.de [217.83.4.218])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 9413440E0030;
-	Mon, 18 Dec 2023 14:57:58 +0000 (UTC)
-Date: Mon, 18 Dec 2023 15:57:52 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Michael Roth <michael.roth@amd.com>
-Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
-	linux-crypto@vger.kernel.org, x86@kernel.org,
-	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-	tony.luck@intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-	alpergun@google.com, jarkko@kernel.org, ashish.kalra@amd.com,
-	nikunj.dadhania@amd.com, pankaj.gupta@amd.com,
-	liam.merwick@oracle.com, zhi.a.wang@intel.com,
-	Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH v10 23/50] KVM: SEV: Make AVIC backing, VMSA and VMCB
- memory allocation SNP safe
-Message-ID: <20231218145752.GQZYBd8D1iJBrI3cWs@fat_crate.local>
-References: <20231016132819.1002933-1-michael.roth@amd.com>
- <20231016132819.1002933-24-michael.roth@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42BA13A1D3;
+	Mon, 18 Dec 2023 14:59:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BIDlPlk031382;
+	Mon, 18 Dec 2023 14:59:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=1K/ldSBpqvmUpzKM7qL6iZlu4kgIL+gWWCt58O6ZgKM=;
+ b=VwOE0JWNROqyj9LOc+TF7Vt9mUQFpVPm1dWu0pLtB9T6JejStF5Av3yB1wL7WBY50q8F
+ a1tLbJZC2WvpLYlLYSPqY5PPfDAbysKmuRH5gSk2Xrii2CuZ3IFgUX12oHFfoKxsNKFP
+ hl91OlJhY/jz5wsyIVfM9kaxVdd5ZBs8Y1086dAzng0vOBPt4yhn6xaPZssBzCyuQhij
+ ZfWqQp3GiKUFg7dUMbYgsciJ0ZE0MVFocaBkpGhyWlZW2GQM07tFNev0UmEvseXJ0rru
+ K/nkrlE4aDY2hjNoqfPF/7U+jfF2PY4hBp5bHcItRIykm/Rf3XPU9bKG5sYraWdn7uFH BA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v2q93stwb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 18 Dec 2023 14:59:06 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BIDmYFI001759;
+	Mon, 18 Dec 2023 14:59:06 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v2q93stvv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 18 Dec 2023 14:59:05 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3BIE1JLE027076;
+	Mon, 18 Dec 2023 14:59:05 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3v1rejs3n4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 18 Dec 2023 14:59:04 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3BIEx2NM41812704
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 18 Dec 2023 14:59:02 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1C48020043;
+	Mon, 18 Dec 2023 14:59:02 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9465720040;
+	Mon, 18 Dec 2023 14:59:01 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.171.92.197])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Mon, 18 Dec 2023 14:59:01 +0000 (GMT)
+Date: Mon, 18 Dec 2023 15:58:59 +0100
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Christian Borntraeger
+ <borntraeger@linux.ibm.com>,
+        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: s390: selftest: memop: Fix undefined behavior
+Message-ID: <20231218153358.14acb611@p-imbrenda>
+In-Reply-To: <59621e88c5c29bdff8bc06f68b02b2c7a420a09a.camel@linux.ibm.com>
+References: <20231215161125.943551-1-nsg@linux.ibm.com>
+	<20231215180206.740df738@p-imbrenda>
+	<59621e88c5c29bdff8bc06f68b02b2c7a420a09a.camel@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20231016132819.1002933-24-michael.roth@amd.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: puXqm3mI9E2kD8Nrm3NTqq7KtU-NhgJB
+X-Proofpoint-ORIG-GUID: 6OtjiZE-V-I4wm8dogwuxslZvV8tlwUn
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-18_10,2023-12-14_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
+ phishscore=0 adultscore=0 malwarescore=0 suspectscore=0 bulkscore=0
+ spamscore=0 priorityscore=1501 clxscore=1015 mlxlogscore=857
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2312180109
 
+On Mon, 18 Dec 2023 13:18:14 +0100
+Nina Schoetterl-Glausch <nsg@linux.ibm.com> wrote:
 
-Just typos:
+[...]
 
-On Mon, Oct 16, 2023 at 08:27:52AM -0500, Michael Roth wrote:
-> From: Brijesh Singh <brijesh.singh@amd.com>
+> > > diff --git a/tools/testing/selftests/kvm/s390x/memop.c b/tools/testing/selftests/kvm/s390x/memop.c
+> > > index bb3ca9a5d731..2eba9575828e 100644
+> > > --- a/tools/testing/selftests/kvm/s390x/memop.c
+> > > +++ b/tools/testing/selftests/kvm/s390x/memop.c
+> > > @@ -485,11 +485,13 @@ static bool popcount_eq(__uint128_t a, __uint128_t b)
+> > >  
+> > >  static __uint128_t rotate(int size, __uint128_t val, int amount)
+> > >  {
+> > > -	unsigned int bits = size * 8;
+> > > +	unsigned int left, right, bits = size * 8;
+> > >    
+> > 
+> > ...why not just:
+> > 
+> > if (!amount)
+> > 	return val;
+> > 
+> > ?  
 > 
-> Implement a workaround for an SNP erratum where the CPU will incorrectly
-> signal an RMP violation #PF if a hugepage (2mb or 1gb) collides with the
-> RMP entry of a VMCB, VMSA or AVIC backing page.
+> That works if you move it one statement down (128 would also trigger UB).
+
+oops, yes it has to be after
+
+> % 128 does the trick, is branchless and there is a bit of a symmetry going
+> on between right and left.
+> But I can use an early return if you want.
+
+I think it's more readable, and furthermore...
+
 > 
-> When SEV-SNP is globally enabled, the CPU marks the VMCB, VMSA, and AVIC
-> backing pages as "in-use" via a reserved bit in the corresponding RMP
-> entry after a successful VMRUN. This is done for _all_ VMs, not just
-> SNP-Active VMs.
+> >   
+> > > -	amount = (amount + bits) % bits;
+> > > +	right = (amount + bits) % bits;
+> > > +	/* % 128 prevents left shift UB if size == 16 && right == 0 */
+> > > +	left = (bits - right) % 128;
+> > >  	val = cut_to_size(size, val);
+> > > -	return (val << (bits - amount)) | (val >> amount);
+
+...this is a more idiomatic syntax for a rotate operation 
+
+> > > +	return (val << left) | (val >> right);
+> > >  }
+> > >  
+> > >  const unsigned int max_block = 16;
+> > > 
+> > > base-commit: 305230142ae0637213bf6e04f6d9f10bbcb74af8  
+> >   
 > 
-> If the hypervisor accesses an in-use page through a writable
-> translation, the CPU will throw an RMP violation #PF. On early SNP
-> hardware, if an in-use page is 2mb aligned and software accesses any
-> part of the associated 2mb region with a hupage, the CPU will
 
-"hugepage"
-
-> incorrectly treat the entire 2mb region as in-use and signal a spurious
-> RMP violation #PF.
-> 
-> The recommended is to not use the hugepage for the VMCB, VMSA or
-
-s/recommended/recommendation/
-s/the hugepage/a hugepage/
-
-> AVIC backing page for similar reasons. Add a generic allocator that will
-> ensure that the page returns is not hugepage (2mb or 1gb) and is safe to
-
-"... the page returned is not a hugepage..."
-
-...
-
-> +struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu)
-> +{
-> +	unsigned long pfn;
-> +	struct page *p;
-> +
-> +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-> +		return alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
-> +
-> +	/*
-> +	 * Allocate an SNP safe page to workaround the SNP erratum where
-> +	 * the CPU will incorrectly signal an RMP violation  #PF if a
-> +	 * hugepage (2mb or 1gb) collides with the RMP entry of VMCB, VMSA
-> +	 * or AVIC backing page. The recommeded workaround is to not use the
-
-"recommended"
-
-> +	 * hugepage.
-> +	 *
-> +	 * Allocate one extra page, use a page which is not 2mb aligned
-> +	 * and free the other.
-> +	 */
-> +	p = alloc_pages(GFP_KERNEL_ACCOUNT | __GFP_ZERO, 1);
-> +	if (!p)
-> +		return NULL;
-> +
-> +	split_page(p, 1);
-> +
-> +	pfn = page_to_pfn(p);
-> +	if (IS_ALIGNED(pfn, PTRS_PER_PMD))
-> +		__free_page(p++);
-> +	else
-> +		__free_page(p + 1);
-> +
-> +	return p;
-> +}
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
 
