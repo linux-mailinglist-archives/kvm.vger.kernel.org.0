@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-4668-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4669-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEEF081670C
-	for <lists+kvm@lfdr.de>; Mon, 18 Dec 2023 08:10:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F63B81670D
+	for <lists+kvm@lfdr.de>; Mon, 18 Dec 2023 08:10:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 558D11F214C2
-	for <lists+kvm@lfdr.de>; Mon, 18 Dec 2023 07:10:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D9730B21875
+	for <lists+kvm@lfdr.de>; Mon, 18 Dec 2023 07:10:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 713B179FD;
-	Mon, 18 Dec 2023 07:10:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EB96C8C6;
+	Mon, 18 Dec 2023 07:10:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EbYIwwgQ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JsRG2zCr"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47DC779D2
-	for <kvm@vger.kernel.org>; Mon, 18 Dec 2023 07:10:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6420847F
+	for <kvm@vger.kernel.org>; Mon, 18 Dec 2023 07:10:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702883412; x=1734419412;
+  t=1702883415; x=1734419415;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=R54LxMsKB+OEBZzKzomutHM7mihyKcx+lbYDJJqKEr8=;
-  b=EbYIwwgQHj45CFd4sW/2puM+HSw99N2p9pZPnxPcu4CwV41NhfReOHH9
-   +TMkXiOQn6gwQsEIorVgibKKGIpRHGg/teWfAbsJ7VI+tf99Vryqn0zXF
-   b3dUDaw7p1D/Pvs9XXT2376yrnTPaX9KVE4EI6krM9nVld9DUbLKydr84
-   63mzpqkjZHu+RLupI98lkYNlZBFMittv18571b5bHC5qdTNSkbWNQ9X3T
-   I+FRLiWlb0vHIJame9iEtIGJknkxKBXuM0UBR9o1zx5rvaqD7HksRF7YO
-   UJav3oPAk5CqoaQXRLAmSRrNVSxZWasVLONSiWurSjiY1sl6dvjfcq3vF
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10927"; a="2667821"
+  bh=U+8iOVthzYdReZheZKtjZcb6nb24eBKPqGWDPFjge/8=;
+  b=JsRG2zCro32kXEAJB96TKvoYZO0NTgXyneYVj1yHO5PTXVnCruvIvL/D
+   IzNwJM2weRxKC6X4fP451Crmbf0etG5TXxRLzqBIAkW9EzVLsHShgVQf8
+   NlQWqVg0TuDr1+uVwmNs6K61svGcVZNqaMvYfAlOW60OUEWVFVrb0t2z4
+   F/5pFe/9bpROOnmuNJSU4noAv20uN9eEFrWg6rFcCEPvPItqw6PbAa3Fb
+   uSvJCzkS7CJlvs5CPm/M9GsMjT+PG6Xo2pl212aKsxDmEJ8lsSdZC80uP
+   +zfLVjLkBtzeu1LGUVBXBhaWTHvkjqWjaCb416QgwAsIYS6Jkw1eEAjhl
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10927"; a="2667828"
 X-IronPort-AV: E=Sophos;i="6.04,284,1695711600"; 
-   d="scan'208";a="2667821"
+   d="scan'208";a="2667828"
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Dec 2023 23:10:12 -0800
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Dec 2023 23:10:15 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10927"; a="1106824644"
+X-IronPort-AV: E=McAfee;i="6600,9927,10927"; a="1106824651"
 X-IronPort-AV: E=Sophos;i="6.04,284,1695711600"; 
-   d="scan'208";a="1106824644"
+   d="scan'208";a="1106824651"
 Received: from pc.sh.intel.com ([10.238.200.75])
-  by fmsmga005.fm.intel.com with ESMTP; 17 Dec 2023 23:10:08 -0800
+  by fmsmga005.fm.intel.com with ESMTP; 17 Dec 2023 23:10:12 -0800
 From: Qian Wen <qian.wen@intel.com>
 To: kvm@vger.kernel.org,
 	seanjc@google.com,
@@ -59,9 +59,9 @@ Cc: nikos.nikoleris@arm.com,
 	chenyi.qiang@intel.com,
 	ricarkol@google.com,
 	qian.wen@intel.com
-Subject: [kvm-unit-tests RFC v2 02/18] x86 TDX: Add support functions for TDX framework
-Date: Mon, 18 Dec 2023 15:22:31 +0800
-Message-Id: <20231218072247.2573516-3-qian.wen@intel.com>
+Subject: [kvm-unit-tests RFC v2 03/18] x86 TDX: Add #VE handler
+Date: Mon, 18 Dec 2023 15:22:32 +0800
+Message-Id: <20231218072247.2573516-4-qian.wen@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20231218072247.2573516-1-qian.wen@intel.com>
 References: <20231218072247.2573516-1-qian.wen@intel.com>
@@ -71,140 +71,173 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 From: Zhenzhong Duan <zhenzhong.duan@intel.com>
 
-Detect TDX during at start of efi setup. And define a dummy is_tdx_guest()
-if CONFIG_EFI is undefined as this function will be used globally in the
-future.
+Some instructions execution trigger #VE and are simulated in #VE
+handler.
 
-In addition, it is fine to use the print function even before the #VE
-handler of the unit test has complete configuration.
-
-TDVF provides the default #VE exception handler, which will convert some
-of the forbidden instructions to TDCALL [TDG.VP.VMCALL] <INSTRUCTION>,
-e.g., IO => TDCALL [TDG.VP.VMCALL] <Instruction.IO> (see “10 Exception
-Handling” in TDVF spec [1]).
-
-[1] TDVF spec: https://cdrdv2.intel.com/v1/dl/getContent/733585
+Add such a handler, currently support simulation of IO and MSR
+read/write, cpuid and hlt instructions.
 
 Signed-off-by: Zhenzhong Duan <zhenzhong.duan@intel.com>
 Reviewed-by: Yu Zhang <yu.c.zhang@intel.com>
-Link: https://lore.kernel.org/r/20220303071907.650203-2-zhenzhong.duan@intel.com
+Link: https://lore.kernel.org/r/20220303071907.650203-3-zhenzhong.duan@intel.com
 Co-developed-by: Qian Wen <qian.wen@intel.com>
 Signed-off-by: Qian Wen <qian.wen@intel.com>
 ---
- lib/x86/asm/setup.h |  1 +
- lib/x86/setup.c     |  6 ++++++
- lib/x86/tdx.c       | 39 +++++++++++++++++++++++++++++++++++++++
- lib/x86/tdx.h       |  9 +++++++++
- 4 files changed, 55 insertions(+)
+ lib/x86/desc.c |  6 +++-
+ lib/x86/tdx.c  | 80 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ lib/x86/tdx.h  |  1 +
+ 3 files changed, 85 insertions(+), 2 deletions(-)
 
-diff --git a/lib/x86/asm/setup.h b/lib/x86/asm/setup.h
-index 458eac85..1deed1cd 100644
---- a/lib/x86/asm/setup.h
-+++ b/lib/x86/asm/setup.h
-@@ -15,6 +15,7 @@ unsigned long setup_tss(u8 *stacktop);
- efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo);
- void setup_5level_page_table(void);
- #endif /* CONFIG_EFI */
-+#include "x86/tdx.h"
+diff --git a/lib/x86/desc.c b/lib/x86/desc.c
+index d054899c..5b41549e 100644
+--- a/lib/x86/desc.c
++++ b/lib/x86/desc.c
+@@ -249,6 +249,7 @@ EX(mf, 16);
+ EX_E(ac, 17);
+ EX(mc, 18);
+ EX(xm, 19);
++EX(ve, 20);
+ EX_E(cp, 21);
  
- void save_id(void);
- void bsp_rest_init(void);
-diff --git a/lib/x86/setup.c b/lib/x86/setup.c
-index d509a248..97d9e896 100644
---- a/lib/x86/setup.c
-+++ b/lib/x86/setup.c
-@@ -308,6 +308,12 @@ efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
- 	efi_status_t status;
- 	const char *phase;
+ asm (".pushsection .text \n\t"
+@@ -295,6 +296,7 @@ static void *idt_handlers[32] = {
+ 	[17] = &ac_fault,
+ 	[18] = &mc_fault,
+ 	[19] = &xm_fault,
++	[20] = &ve_fault,
+ 	[21] = &cp_fault,
+ };
  
-+	status = setup_tdx();
-+	if (status != EFI_SUCCESS && status != EFI_UNSUPPORTED) {
-+		printf("INTEL TDX setup failed, error = 0x%lx\n", status);
-+		return status;
-+	}
+@@ -312,7 +314,9 @@ void setup_idt(void)
+ 			continue;
+ 
+                 set_idt_entry(i, idt_handlers[i], 0);
+-                handle_exception(i, check_exception_table);
 +
- 	status = setup_memory_allocator(efi_bootinfo);
- 	if (status != EFI_SUCCESS) {
- 		printf("Failed to set up memory allocator: ");
++		if (!exception_handlers[i])
++			handle_exception(i, check_exception_table);
+ 	}
+ }
+ 
 diff --git a/lib/x86/tdx.c b/lib/x86/tdx.c
-index 1f1abeff..a01bfcbb 100644
+index a01bfcbb..d10e02b9 100644
 --- a/lib/x86/tdx.c
 +++ b/lib/x86/tdx.c
-@@ -276,3 +276,42 @@ static int handle_io(struct ex_regs *regs, struct ve_info *ve)
+@@ -117,7 +117,8 @@ static int handle_halt(struct ex_regs *regs, struct ve_info *ve)
+ 	 * pending, without hanging/breaking the guest.
+ 	 */
+ 	if (__tdx_hypercall(&args))
+-		return -EIO;
++		/* Bypass failed hlt is better than hang */
++		printf("WARNING: HLT instruction emulation failed\n");
  
  	return ve_instr_len(ve);
  }
-+
-+bool is_tdx_guest(void)
+@@ -302,11 +303,88 @@ done:
+ 	return !!tdx_guest;
+ }
+ 
++static bool tdx_get_ve_info(struct ve_info *ve)
 +{
-+	static int tdx_guest = -1;
-+	struct cpuid c;
-+	u32 sig[3];
++	struct tdx_module_args args = {};
++	u64 ret;
 +
-+	if (tdx_guest >= 0)
-+		goto done;
++	if (!ve)
++		return false;
 +
-+	if (cpuid(0).a < TDX_CPUID_LEAF_ID) {
-+		tdx_guest = 0;
-+		goto done;
++	/*
++	 * NMIs and machine checks are suppressed. Before this point any
++	 * #VE is fatal. After this point (TDGETVEINFO call), NMIs and
++	 * additional #VEs are permitted (but it is expected not to
++	 * happen unless kernel panics).
++	 */
++	ret = __tdcall_ret(TDG_VP_VEINFO_GET, &args);
++	if (ret)
++		return false;
++
++	ve->exit_reason = args.rcx;
++	ve->exit_qual	= args.rdx;
++	ve->gla		= args.r8;
++	ve->gpa		= args.r9;
++	ve->instr_len	= args.r10 & UINT_MAX;
++	ve->instr_info	= args.r10 >> 32;
++
++	return true;
++}
++
++static bool tdx_handle_virt_exception(struct ex_regs *regs,
++		struct ve_info *ve)
++{
++	int insn_len = -EIO;
++
++	switch (ve->exit_reason) {
++	case EXIT_REASON_HLT:
++		insn_len = handle_halt(regs, ve);
++		break;
++	case EXIT_REASON_MSR_READ:
++		insn_len = read_msr(regs, ve);
++		break;
++	case EXIT_REASON_MSR_WRITE:
++		insn_len = write_msr(regs, ve);
++		break;
++	case EXIT_REASON_CPUID:
++		insn_len = handle_cpuid(regs, ve);
++		break;
++	case EXIT_REASON_IO_INSTRUCTION:
++		insn_len = handle_io(regs, ve);
++		break;
++	default:
++		printf("WARNING: Unexpected #VE: %ld\n", ve->exit_reason);
++		return false;
++	}
++	if (insn_len < 0)
++		return false;
++
++	/* After successful #VE handling, move the IP */
++	regs->rip += insn_len;
++
++	return true;
++}
++
++/* #VE exception handler. */
++static void tdx_handle_ve(struct ex_regs *regs)
++{
++	struct ve_info ve;
++
++	if (!tdx_get_ve_info(&ve)) {
++		printf("tdx_get_ve_info failed\n");
++		return;
 +	}
 +
-+	c = cpuid(TDX_CPUID_LEAF_ID);
-+	sig[0] = c.b;
-+	sig[1] = c.d;
-+	sig[2] = c.c;
-+
-+	tdx_guest = !memcmp(TDX_IDENT, sig, sizeof(sig));
-+
-+done:
-+	return !!tdx_guest;
++	tdx_handle_virt_exception(regs, &ve);
 +}
 +
-+efi_status_t setup_tdx(void)
-+{
-+	if (!is_tdx_guest())
-+		return EFI_UNSUPPORTED;
+ efi_status_t setup_tdx(void)
+ {
+ 	if (!is_tdx_guest())
+ 		return EFI_UNSUPPORTED;
+ 
++	handle_exception(20, tdx_handle_ve);
 +
-+	/* The printf can work here. Since TDVF default exception handler
-+	 * can handle the #VE caused by IO read/write during printf() before
-+	 * finalizing configuration of the unit test's #VE handler.
-+	 */
-+	printf("Initialized TDX.\n");
-+
-+	return EFI_SUCCESS;
-+}
+ 	/* The printf can work here. Since TDVF default exception handler
+ 	 * can handle the #VE caused by IO read/write during printf() before
+ 	 * finalizing configuration of the unit test's #VE handler.
 diff --git a/lib/x86/tdx.h b/lib/x86/tdx.h
-index cf0fc917..45350b70 100644
+index 45350b70..fe0a4d81 100644
 --- a/lib/x86/tdx.h
 +++ b/lib/x86/tdx.h
-@@ -21,6 +21,9 @@
+@@ -26,6 +26,7 @@
  
- #define TDX_HYPERCALL_STANDARD		0
- 
-+#define TDX_CPUID_LEAF_ID	0x21
-+#define TDX_IDENT		"IntelTDX    "
-+
  /* TDX module Call Leaf IDs */
  #define TDG_VP_VMCALL			0
++#define TDG_VP_VEINFO_GET		3
  
-@@ -136,6 +139,12 @@ struct ve_info {
- 	u32 instr_info;
- };
- 
-+bool is_tdx_guest(void);
-+efi_status_t setup_tdx(void);
-+
-+#else
-+inline bool is_tdx_guest(void) { return false; }
-+
- #endif /* CONFIG_EFI */
- 
- #endif /* _ASM_X86_TDX_H */
+ /*
+  * Bitmasks of exposed registers (with VMM).
 -- 
 2.25.1
 
