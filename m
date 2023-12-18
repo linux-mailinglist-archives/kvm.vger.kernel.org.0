@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-4676-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4677-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E587816714
-	for <lists+kvm@lfdr.de>; Mon, 18 Dec 2023 08:11:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F480816715
+	for <lists+kvm@lfdr.de>; Mon, 18 Dec 2023 08:11:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B56D1F21800
-	for <lists+kvm@lfdr.de>; Mon, 18 Dec 2023 07:11:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D11B5282BA6
+	for <lists+kvm@lfdr.de>; Mon, 18 Dec 2023 07:11:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F7F81078B;
-	Mon, 18 Dec 2023 07:10:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30403107B7;
+	Mon, 18 Dec 2023 07:10:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="f4fiyh36"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KUk8YUtv"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8022D101D3
-	for <kvm@vger.kernel.org>; Mon, 18 Dec 2023 07:10:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9AF91079A
+	for <kvm@vger.kernel.org>; Mon, 18 Dec 2023 07:10:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702883439; x=1734419439;
+  t=1702883444; x=1734419444;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=eoQVcT+O7jp9KKx1NjBwMZmhGMNqL1RJbZqdptwCNkY=;
-  b=f4fiyh36V+Ezj52tpbnWzXIU9HRbutAuUz92rJpZvOr7VqBxf3wbtj3a
-   I1fK+HT1I2ugtX2R1okartuULNROSRtqkcUPXDg1ycrJWwrryooYW028J
-   OZhnljFvofz7eLHAQorfTLxPuI3+cjuFiiPRKiQftuj/wBCKF/sF3MH3F
-   5lESQimZPYvwN6d9iHPZ8bTgSoMbfL8LRsyZMuFlmCV+vokyOF3GhmzRy
-   mpsT/WO3k208iX1MmuaVd8CKaT/1poB3dTvTmmg+SouorLEqpBbn2+sct
-   NiJ2bAiCmSchpjkUClKs3maKa6Bf9oLcWRTUoWWHxOAQi1Ki5r2iwaxmP
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10927"; a="2667923"
+  bh=rRqcyZr82B9E94/pSwiA0CDahJjHnPHqq64b0Pw4OT8=;
+  b=KUk8YUtvkBZmSiRTmGiZvRm2tXePLtQLMWgdA3Aoe2/8+ZiXoUQxZpYF
+   2zagPuqMIMZ0Fcwnjiz/OeeKiccLPZ87nyOQecfaxN5CtPr1ZS/1zLx6k
+   qvEdYFlYBlNfI4juV+pczAByV6JoPWAxcnI5X2rndpslGddNWPL9QcD7u
+   2tY2LJ6nPwFbM5KIKQoAZFym9ED4sflECi4UkoXZjyZxqTOhlg/gJbQsC
+   0mybXiEQBBxgirg5xZLQwHVCUTWOwe78L+2DzB4oYW3TLBfPrarVLv07A
+   RCcOjerRxgpmvv7fNy9Kn3NbwInPui4A7nAUlYYeADOAXigCV+b3CF/R7
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10927"; a="2667940"
 X-IronPort-AV: E=Sophos;i="6.04,284,1695711600"; 
-   d="scan'208";a="2667923"
+   d="scan'208";a="2667940"
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Dec 2023 23:10:39 -0800
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Dec 2023 23:10:43 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10927"; a="1106824728"
+X-IronPort-AV: E=McAfee;i="6600,9927,10927"; a="1106824733"
 X-IronPort-AV: E=Sophos;i="6.04,284,1695711600"; 
-   d="scan'208";a="1106824728"
+   d="scan'208";a="1106824733"
 Received: from pc.sh.intel.com ([10.238.200.75])
-  by fmsmga005.fm.intel.com with ESMTP; 17 Dec 2023 23:10:35 -0800
+  by fmsmga005.fm.intel.com with ESMTP; 17 Dec 2023 23:10:39 -0800
 From: Qian Wen <qian.wen@intel.com>
 To: kvm@vger.kernel.org,
 	seanjc@google.com,
@@ -59,9 +59,9 @@ Cc: nikos.nikoleris@arm.com,
 	chenyi.qiang@intel.com,
 	ricarkol@google.com,
 	qian.wen@intel.com
-Subject: [kvm-unit-tests RFC v2 10/18] acpi: Add MADT table parse code
-Date: Mon, 18 Dec 2023 15:22:39 +0800
-Message-Id: <20231218072247.2573516-11-qian.wen@intel.com>
+Subject: [kvm-unit-tests RFC v2 11/18] x86 TDX: Add multi processor support
+Date: Mon, 18 Dec 2023 15:22:40 +0800
+Message-Id: <20231218072247.2573516-12-qian.wen@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20231218072247.2573516-1-qian.wen@intel.com>
 References: <20231218072247.2573516-1-qian.wen@intel.com>
@@ -75,287 +75,179 @@ Content-Transfer-Encoding: 8bit
 
 From: Zhenzhong Duan <zhenzhong.duan@intel.com>
 
-Support LAPIC, X2APIC and WAKEUP sub-table, other sub-table are ignored
-for now. Also add a wakeup wrapping function which is used by TDX.
+In TD-guest, multiprocessor support is different from normal guest.
 
-The parsed result is stored in id_map[] and acpi_mp_wake_mailbox.
+In normal guest, BSP send startup IPI to all APs to trigger APs starting
+from 16bit real mode.
+
+While in TD-guest, TDVF initializes APs into 64bit mode before pass to
+OS/bootloader. OS enumerates uid/apicid mapping information through MADT
+table and wake up APs one by one through MP wakeup mechanism. So the
+entry code for APs is 64bit.
 
 Signed-off-by: Zhenzhong Duan <zhenzhong.duan@intel.com>
 Reviewed-by: Yu Zhang <yu.c.zhang@intel.com>
-Link: https://lore.kernel.org/r/20220303071907.650203-10-zhenzhong.duan@intel.com
+Link: https://lore.kernel.org/r/20220303071907.650203-11-zhenzhong.duan@intel.com
+Co-developed-by: Qian Wen <qian.wen@intel.com>
 Signed-off-by: Qian Wen <qian.wen@intel.com>
 ---
- lib/acpi.c      | 160 ++++++++++++++++++++++++++++++++++++++++++++++++
- lib/acpi.h      |  59 +++++++++++++++++-
- lib/x86/setup.c |   4 ++
- 3 files changed, 222 insertions(+), 1 deletion(-)
+ lib/x86/setup.c      | 16 +++++++++++----
+ lib/x86/smp.c        | 26 +++++++++++++++++++++++++
+ lib/x86/smp.h        |  2 ++
+ x86/efi/efistart64.S | 46 ++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 86 insertions(+), 4 deletions(-)
 
-diff --git a/lib/acpi.c b/lib/acpi.c
-index 0440cddb..9db32e2a 100644
---- a/lib/acpi.c
-+++ b/lib/acpi.c
-@@ -1,5 +1,7 @@
- #include "libcflat.h"
- #include "acpi.h"
-+#include "errno.h"
-+#include "asm/barrier.h"
- 
- #ifdef CONFIG_EFI
- struct acpi_table_rsdp *efi_rsdp = NULL;
-@@ -127,3 +129,161 @@ int acpi_table_parse_madt(enum acpi_madt_type mtype, acpi_table_handler handler)
- 
- 	return count;
- }
-+
-+struct acpi_madt_multiproc_wakeup_mailbox *acpi_mp_wake_mailbox;
-+
-+#define smp_store_release(p, val)					\
-+do {									\
-+	barrier();							\
-+	WRITE_ONCE(*p, val);						\
-+} while (0)
-+
-+static inline bool test_bit(int nr, const void *addr)
-+{
-+	const u32 *p = (const u32 *)addr;
-+	return ((1UL << (nr & 31)) & (p[nr >> 5])) != 0;
-+}
-+
-+int acpi_wakeup_cpu(int apicid, unsigned long start_ip, unsigned char* cpus)
-+{
-+	u8 timeout = 0xFF;
-+
-+	/*
-+	 * According to the ACPI specification r6.4, sec 5.2.12.19, the
-+	 * mailbox-based wakeup mechanism cannot be used more than once
-+	 * for the same CPU, so skip sending wake commands to already
-+	 * awake CPU.
-+	 */
-+	if (test_bit(apicid, cpus)) {
-+		printf("CPU already awake (APIC ID %x), skipping wakeup\n",
-+		       apicid);
-+		return -EINVAL;
-+	}
-+
-+	/*
-+	 * Mailbox memory is shared between firmware and OS. Firmware will
-+	 * listen on mailbox command address, and once it receives the wakeup
-+	 * command, CPU associated with the given apicid will be booted. So,
-+	 * the value of apic_id and wakeup_vector has to be set before updating
-+	 * the wakeup command. So use smp_store_release to let the compiler know
-+	 * about it and preserve the order of writes.
-+	 */
-+	smp_store_release(&acpi_mp_wake_mailbox->apic_id, apicid);
-+	smp_store_release(&acpi_mp_wake_mailbox->wakeup_vector, start_ip);
-+	smp_store_release(&acpi_mp_wake_mailbox->command,
-+			  ACPI_MP_WAKE_COMMAND_WAKEUP);
-+
-+	/*
-+	 * After writing wakeup command, wait for maximum timeout of 0xFF
-+	 * for firmware to reset the command address back zero to indicate
-+	 * the successful reception of command.
-+	 * NOTE: 255 as timeout value is decided based on our experiments.
-+	 *
-+	 * XXX: Change the timeout once ACPI specification comes up with
-+	 *      standard maximum timeout value.
-+	 */
-+	while (READ_ONCE(acpi_mp_wake_mailbox->command) && timeout--)
-+		cpu_relax();
-+
-+	/* If timed out (timeout == 0), return error.
-+	 * Otherwise, the CPU wakes up successfully.
-+	 */
-+	return timeout == 0 ? -EIO : 0;
-+}
-+
-+static bool parse_madt_table(struct acpi_table *madt, unsigned char* id_map)
-+{
-+	u64 table_start = (unsigned long)madt + sizeof(struct acpi_table_madt);
-+	u64 table_end = (unsigned long)madt + madt->length;
-+	struct acpi_subtable_header *sub_table;
-+	bool failed = false;
-+	u32 uid, apic_id;
-+	u8 enabled;
-+
-+	while (table_start < table_end && !failed) {
-+		struct acpi_madt_local_apic *processor;
-+		struct acpi_madt_local_x2apic *processor2;
-+		struct acpi_madt_multiproc_wakeup *mp_wake;
-+
-+		sub_table = (struct acpi_subtable_header *)table_start;
-+
-+		switch (sub_table->type) {
-+		case ACPI_MADT_TYPE_LOCAL_APIC:
-+			processor = (struct acpi_madt_local_apic *)sub_table;
-+
-+			if (BAD_MADT_ENTRY(processor, table_end)) {
-+				failed = true;
-+				break;
-+			}
-+
-+			uid = processor->processor_id;
-+			apic_id = processor->id;
-+			enabled = processor->lapic_flags & ACPI_MADT_ENABLED;
-+
-+			/* Ignore invalid ID */
-+			if (apic_id == 0xff)
-+				break;
-+			if (enabled)
-+				id_map[uid] = apic_id;
-+
-+			printf("apicid %x uid %x %s\n", apic_id, uid,
-+			       enabled ? "enabled" : "disabled");
-+			break;
-+
-+		case ACPI_MADT_TYPE_LOCAL_X2APIC:
-+			processor2 = (struct acpi_madt_local_x2apic *)sub_table;
-+
-+			if (BAD_MADT_ENTRY(processor2, table_end)) {
-+				failed = true;
-+				break;
-+			}
-+
-+			uid = processor2->uid;
-+			apic_id = processor2->local_apic_id;
-+			enabled = processor2->lapic_flags & ACPI_MADT_ENABLED;
-+
-+			/* Ignore invalid ID */
-+			if (apic_id == 0xffffffff)
-+				break;
-+			if (enabled)
-+				id_map[uid] = apic_id;
-+
-+			printf("x2apicid %x uid %x %s\n", apic_id, uid,
-+			       enabled ? "enabled" : "disabled");
-+			break;
-+		case ACPI_MADT_TYPE_MULTIPROC_WAKEUP:
-+			mp_wake = (struct acpi_madt_multiproc_wakeup *)sub_table;
-+
-+			if (BAD_MADT_ENTRY(mp_wake, table_end)) {
-+				failed = true;
-+				break;
-+			}
-+
-+			if (acpi_mp_wake_mailbox)
-+				printf("WARN: duplicate mailbox %lx\n", (u64)acpi_mp_wake_mailbox);
-+
-+			acpi_mp_wake_mailbox = (void *)mp_wake->base_address;
-+			printf("MP Wake (Mailbox version[%d] base_address[%lx])\n",
-+					mp_wake->mailbox_version, mp_wake->base_address);
-+			break;
-+		default:
-+			/* Ignored currently */
-+			break;
-+		}
-+		if (!failed)
-+			table_start += sub_table->length;
-+	}
-+
-+	return !failed;
-+}
-+
-+bool parse_acpi_table(unsigned char* id_map)
-+{
-+	struct acpi_table *tb;
-+
-+	tb = find_acpi_table_addr(MADT_SIGNATURE);
-+	if (tb)
-+		return parse_madt_table(tb, id_map);
-+
-+	return false;
-+}
-diff --git a/lib/acpi.h b/lib/acpi.h
-index c330c877..311fbb1b 100644
---- a/lib/acpi.h
-+++ b/lib/acpi.h
-@@ -245,9 +245,64 @@ enum acpi_madt_type {
- 	ACPI_MADT_TYPE_GENERIC_MSI_FRAME = 13,
- 	ACPI_MADT_TYPE_GENERIC_REDISTRIBUTOR = 14,
- 	ACPI_MADT_TYPE_GENERIC_TRANSLATOR = 15,
--	ACPI_MADT_TYPE_RESERVED = 16	/* 16 and greater are reserved */
-+	ACPI_MADT_TYPE_MULTIPROC_WAKEUP = 16,
-+	ACPI_MADT_TYPE_RESERVED = 17	/* 17 and greater are reserved */
- };
- 
-+#define BAD_MADT_ENTRY(entry, end) (                                        \
-+		(!entry) || (unsigned long)entry + sizeof(*entry) > end ||  \
-+		((struct acpi_subtable_header *)entry)->length < sizeof(*entry))
-+
-+/*
-+ * MADT Subtables, correspond to Type in struct acpi_subtable_header
-+ */
-+
-+/* 0: Processor Local APIC */
-+
-+struct acpi_madt_local_apic {
-+	struct acpi_subtable_header header;
-+	u8 processor_id;        /* ACPI processor id */
-+	u8 id;                  /* Processor's local APIC id */
-+	u32 lapic_flags;
-+};
-+
-+/* 9: Processor Local X2APIC (ACPI 4.0) */
-+
-+struct acpi_madt_local_x2apic {
-+	struct acpi_subtable_header header;
-+	u16 reserved;           /* reserved - must be zero */
-+	u32 local_apic_id;      /* Processor x2APIC ID  */
-+	u32 lapic_flags;
-+	u32 uid;                /* ACPI processor UID */
-+};
-+
-+/* 16: Multiprocessor wakeup (ACPI 6.4) */
-+
-+struct acpi_madt_multiproc_wakeup {
-+	struct acpi_subtable_header header;
-+	u16 mailbox_version;
-+	u32 reserved;		/* reserved - must be zero */
-+	u64 base_address;
-+};
-+
-+#define ACPI_MULTIPROC_WAKEUP_MB_OS_SIZE        2032
-+#define ACPI_MULTIPROC_WAKEUP_MB_FIRMWARE_SIZE  2048
-+
-+struct acpi_madt_multiproc_wakeup_mailbox {
-+	u16 command;
-+	u16 reserved;		/* reserved - must be zero */
-+	u32 apic_id;
-+	u64 wakeup_vector;
-+	u8 reserved_os[ACPI_MULTIPROC_WAKEUP_MB_OS_SIZE];	/* reserved for OS use */
-+	u8 reserved_firmware[ACPI_MULTIPROC_WAKEUP_MB_FIRMWARE_SIZE];	/* reserved for firmware use */
-+};
-+
-+#define ACPI_MP_WAKE_COMMAND_WAKEUP	1
-+
-+/*
-+ * Common flags fields for MADT subtables
-+ */
-+
- /* MADT Local APIC flags */
- #define ACPI_MADT_ENABLED		(1)	/* 00: Processor is usable if set */
- 
-@@ -298,5 +353,7 @@ struct acpi_table_gtdt {
- void set_efi_rsdp(struct acpi_table_rsdp *rsdp);
- void *find_acpi_table_addr(u32 sig);
- int acpi_table_parse_madt(enum acpi_madt_type mtype, acpi_table_handler handler);
-+int acpi_wakeup_cpu(int apicid, unsigned long start_ip, unsigned char* online_cpus);
-+bool parse_acpi_table(unsigned char* id_map);
- 
- #endif
 diff --git a/lib/x86/setup.c b/lib/x86/setup.c
-index 20807700..406d04e3 100644
+index 406d04e3..82a563a3 100644
 --- a/lib/x86/setup.c
 +++ b/lib/x86/setup.c
-@@ -339,6 +339,10 @@ efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
- 		return status;
- 	}
+@@ -407,17 +407,25 @@ void save_id(void)
+ void ap_start64(void)
+ {
+ 	setup_gdt_tss();
+-	reset_apic();
+ 	load_idt();
+-	save_id();
+-	enable_apic();
++	if (!is_tdx_guest()) {
++		reset_apic();
++		save_id();
++		enable_apic();
++	}
+ 	enable_x2apic();
+ 	ap_online();
+ }
  
-+	/* Parse all acpi tables, currently only MADT table */
-+	if (!parse_acpi_table(id_map))
-+		return EFI_NOT_FOUND;
++extern void tdx_ap_start64(void);
+ void bsp_rest_init(void)
+ {
+-	bringup_aps();
++	if (!is_tdx_guest()) {
++		bringup_aps();
++	} else {
++		/* TDX uses ACPI WAKE UP mechanism to wake up APs instead of SIPI */
++		bringup_aps_acpi((u64)tdx_ap_start64);
++	}
+ 	enable_x2apic();
+ 	smp_init();
+ 	pmu_init();
+diff --git a/lib/x86/smp.c b/lib/x86/smp.c
+index e297016c..7147cf6b 100644
+--- a/lib/x86/smp.c
++++ b/lib/x86/smp.c
+@@ -11,6 +11,7 @@
+ #include "desc.h"
+ #include "alloc_page.h"
+ #include "asm/page.h"
++#include "acpi.h"
+ 
+ #define IPI_VECTOR 0x20
+ 
+@@ -288,3 +289,28 @@ void bringup_aps(void)
+ 	while (_cpu_count != atomic_read(&cpu_online_count))
+ 		cpu_relax();
+ }
 +
- 	phase = "AMD SEV";
- 	status = setup_amd_sev();
++/* wakeup APs by sending the OS commands to ACPI mailbox. */
++efi_status_t bringup_aps_acpi(unsigned long start_ip)
++{
++	u32 i;
++	_cpu_count = fwcfg_get_nb_cpus();
++
++	/* BSP is already online */
++	set_bit(id_map[0], online_cpus);
++
++#ifdef CONFIG_EFI
++	smp_stacktop = ((u64) (&stacktop)) - PAGE_SIZE;
++#endif
++
++	for (i = 1; i < _cpu_count; i++) {
++		if (acpi_wakeup_cpu(id_map[i], start_ip, online_cpus))
++			return EFI_DEVICE_ERROR;
++		set_bit(id_map[i], online_cpus);
++	}
++
++	while (atomic_read(&cpu_online_count) != _cpu_count)
++		cpu_relax();
++
++	return EFI_SUCCESS;
++}
+diff --git a/lib/x86/smp.h b/lib/x86/smp.h
+index 08a440b3..a0a6b3f6 100644
+--- a/lib/x86/smp.h
++++ b/lib/x86/smp.h
+@@ -6,6 +6,7 @@
+ #include "libcflat.h"
+ #include "atomic.h"
+ #include "apic-defs.h"
++#include "efi.h"
+ 
+ /* Address where to store the address of realmode GDT descriptor. */
+ #define REALMODE_GDT_LOWMEM (PAGE_SIZE - 2)
+@@ -86,6 +87,7 @@ void on_cpus(void (*function)(void *data), void *data);
+ void smp_reset_apic(void);
+ void bringup_aps(void);
+ void ap_online(void);
++efi_status_t bringup_aps_acpi(unsigned long start_ip);
+ 
+ extern atomic_t cpu_online_count;
+ extern unsigned char online_cpus[(MAX_TEST_CPUS + 7) / 8];
+diff --git a/x86/efi/efistart64.S b/x86/efi/efistart64.S
+index 3fc16016..e3add79a 100644
+--- a/x86/efi/efistart64.S
++++ b/x86/efi/efistart64.S
+@@ -35,6 +35,52 @@ ptl4:
+ .code64
+ .text
+ 
++.macro load_absolute_addr64, addr, reg
++	call 1f
++1:
++	popq \reg
++	addq \addr - 1b, \reg
++.endm
++
++MSR_GS_BASE = 0xc0000101
++
++.macro setup_percpu_area_64
++	lea -4096(%rsp), %rax
++	movq $0, %rdx
++	movq $MSR_GS_BASE, %rcx
++	wrmsr
++.endm
++
++.macro prepare_td
++	load_absolute_addr64 $gdt_descr, %rdx
++	lgdt (%rdx)
++
++	movq $MSR_GS_BASE, %rcx
++	rdmsr
++
++	/* Update data segments */
++	mov $0x10, %bx
++	mov %bx, %ds
++	mov %bx, %es
++	mov %bx, %fs
++	mov %bx, %gs
++	mov %bx, %ss
++
++	/* restore MSR_GS_BASE */
++	wrmsr
++.endm
++
++.globl tdx_ap_start64
++tdx_ap_start64:
++	movq $-PAGE_SIZE, %rsp
++	lock xadd %rsp, smp_stacktop(%rip)
++	setup_percpu_area_64
++	prepare_td
++	load_absolute_addr64 $ap_start64, %rdx
++	pushq $0x08
++	pushq %rdx
++	lretq
++
+ .code16
+ REALMODE_GDT_LOWMEM = PAGE_SIZE - 2
  
 -- 
 2.25.1
