@@ -1,100 +1,912 @@
-Return-Path: <kvm+bounces-4752-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4753-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90506817B85
-	for <lists+kvm@lfdr.de>; Mon, 18 Dec 2023 20:58:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41E53817B9C
+	for <lists+kvm@lfdr.de>; Mon, 18 Dec 2023 21:13:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A440285B54
-	for <lists+kvm@lfdr.de>; Mon, 18 Dec 2023 19:58:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9BDBEB23CC4
+	for <lists+kvm@lfdr.de>; Mon, 18 Dec 2023 20:13:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C74C7349E;
-	Mon, 18 Dec 2023 19:56:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 416C572069;
+	Mon, 18 Dec 2023 20:12:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RuFXviiD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bBlZUR2/"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A812372047;
-	Mon, 18 Dec 2023 19:56:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26CDEC433CA;
-	Mon, 18 Dec 2023 19:56:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702929400;
-	bh=grKlAQWV5xV5wJkfKbKrDwxqfLJY1vUR6WlZYNNuA/M=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=RuFXviiDAzvfM6oPPwKPeQxhxx0ROEeGABDBXhq8+EgQGsx84/SxCdxu6h2KyALeC
-	 yS18QnDvUZ+3Aa7PQRbyli72gr8maRcPxAkZpL/O6f6wOMUooq3TsDjzodkp50+6iY
-	 sdereDZp7Y5Kf2KTpOaVRw12M7DrO2RRGRO5PDJ1dxeRBZcB9UOCG77XZMA1ZdKQqk
-	 vvIAWPG9koo53krWGRGspu4tFnL2m3PLxMDI9pGKROG1tAkxcXec51DyZZ22fly72U
-	 RNtUB/YNiVzjqBx4cNhX3U/jpz5GKUQxa5WsCIvm7Ckru4YcNE+eNx1hcDTx96lOxx
-	 kYN53AyvKi9dQ==
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-50e384cd6ebso1758627e87.3;
-        Mon, 18 Dec 2023 11:56:40 -0800 (PST)
-X-Gm-Message-State: AOJu0YwAP8U83ZAT1OGBJ3UcXy7vRGMFbsj5JS8RATS3L6epacpwBtYN
-	yKiOOHm9URsaTSeGPdL3SUPqhI38kt04mAugcNw=
-X-Google-Smtp-Source: AGHT+IGRZ13EcavCOorqsgntfK6FaZoWyYwMzNZj5jKJnbQHE7+5oLKfwJj7KjKBJ+wssogvyt5tiMo+CYWeUoo1XBY=
-X-Received: by 2002:a05:6512:96a:b0:50e:1ce0:b510 with SMTP id
- v10-20020a056512096a00b0050e1ce0b510mr1996591lft.97.1702929398315; Mon, 18
- Dec 2023 11:56:38 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D445172067
+	for <kvm@vger.kernel.org>; Mon, 18 Dec 2023 20:12:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702930366;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wxr8blxx5ZqOuubgBI++mWF/rDD+Gt3YIjt4Gbn3Pzk=;
+	b=bBlZUR2/khhLgv+R4nb41CMsxqO3PUZcKg9ssD6fDjAVcUd7jz5o593ZFJsuuINuxemq5r
+	3CBp277VGbFh+sO5Q0RAblfusFUaL5xIeeGZMdg3cZUZRveRRtAppZa7lpXlfAvdhleeq8
+	oISq5OQidBuGcIPgRkgFmaEOkpYT1JY=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-284-r_vye-LMNCW3FR232utM2Q-1; Mon, 18 Dec 2023 15:12:45 -0500
+X-MC-Unique: r_vye-LMNCW3FR232utM2Q-1
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7b7a245dc28so384903739f.3
+        for <kvm@vger.kernel.org>; Mon, 18 Dec 2023 12:12:44 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702930364; x=1703535164;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wxr8blxx5ZqOuubgBI++mWF/rDD+Gt3YIjt4Gbn3Pzk=;
+        b=HJ7z1JM/TRFlccl7V8m8RHUL4Qr8WJ0XC9pUZY/3TTfPupVSl+1eL9BehFWScAB+El
+         uASDqVhuB9isOErpFwfiDGS6t8ipftK2w+Hk/3QpK6PEZ6XxlSMeCGxRiENh3cjEinCC
+         wH+wcASZNjXmNI+BU9IyAIHG9BkbQmK9+E0IwjBD9dLVbOG7FXq4rVIo/PobAJvBvpl0
+         E2Vxs58hyUgKB+OiE1fTZMIoT56LtGvm+nJGd8sK27iBISowXaKWYxd9qpfcQY8pY9lm
+         rhgQ2U3N3ZO0ju25ENLg95cX1AEtkSTNRtmeYbUhUnwTgHhzEk7/brDIRrF9SCjPcwZt
+         tpag==
+X-Gm-Message-State: AOJu0YzuIiJ1Rf097LXJ8g1LHDc6o4MfCoZSlwu+woQ/nRgcdb16stFW
+	SlN6DCRPxoPAvHoPfqSmBdpAO6Jhmrv0hiDxSJqbpo4DrRukT1k6tymfuQtdKp0H4YZRv2Ofb/i
+	OsN8JMlDdfCLW
+X-Received: by 2002:a05:6602:2c53:b0:7b7:3d:6452 with SMTP id x19-20020a0566022c5300b007b7003d6452mr21240045iov.5.1702930363954;
+        Mon, 18 Dec 2023 12:12:43 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFU6iqXQjNk/Kx+GxpCXT5oWdssB1o9FM3f7KaNUepnRSGTT/zD8R0r2ghIEEWJp1kXHeF79Q==
+X-Received: by 2002:a05:6602:2c53:b0:7b7:3d:6452 with SMTP id x19-20020a0566022c5300b007b7003d6452mr21240022iov.5.1702930363522;
+        Mon, 18 Dec 2023 12:12:43 -0800 (PST)
+Received: from redhat.com ([38.15.60.12])
+        by smtp.gmail.com with ESMTPSA id m20-20020a056638409400b004667ed78e90sm5653027jam.14.2023.12.18.12.12.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Dec 2023 12:12:42 -0800 (PST)
+Date: Mon, 18 Dec 2023 13:12:40 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Yishai Hadas <yishaih@nvidia.com>
+Cc: <mst@redhat.com>, <jasowang@redhat.com>, <jgg@nvidia.com>,
+ <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+ <parav@nvidia.com>, <feliu@nvidia.com>, <jiri@nvidia.com>,
+ <kevin.tian@intel.com>, <joao.m.martins@oracle.com>,
+ <si-wei.liu@oracle.com>, <leonro@nvidia.com>, <maorg@nvidia.com>
+Subject: Re: [PATCH V9 vfio 9/9] vfio/virtio: Introduce a vfio driver over
+ virtio devices
+Message-ID: <20231218131240.00602995.alex.williamson@redhat.com>
+In-Reply-To: <20231218083755.96281-10-yishaih@nvidia.com>
+References: <20231218083755.96281-1-yishaih@nvidia.com>
+	<20231218083755.96281-10-yishaih@nvidia.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <2f33be45-fe11-4b69-8e89-4d2824a0bf01@daynix.com>
-In-Reply-To: <2f33be45-fe11-4b69-8e89-4d2824a0bf01@daynix.com>
-From: Song Liu <song@kernel.org>
-Date: Mon, 18 Dec 2023 11:56:27 -0800
-X-Gmail-Original-Message-ID: <CAPhsuW6=-FK+ysh_Q1H7ana=A6v9d0Rsn+2hpJpm5n2dB_A1Qg@mail.gmail.com>
-Message-ID: <CAPhsuW6=-FK+ysh_Q1H7ana=A6v9d0Rsn+2hpJpm5n2dB_A1Qg@mail.gmail.com>
-Subject: Re: Should I add BPF kfuncs for userspace apps? And how?
-To: Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Jason Wang <jasowang@redhat.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, 
-	Yuri Benditovich <yuri.benditovich@daynix.com>, Andrew Melnychenko <andrew@daynix.com>, 
-	Benjamin Tissoires <bentiss@kernel.org>, bpf <bpf@vger.kernel.org>, 
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, kvm@vger.kernel.org, 
-	LKML <linux-kernel@vger.kernel.org>, virtualization@lists.linux-foundation.org, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Akihiko,
+On Mon, 18 Dec 2023 10:37:55 +0200
+Yishai Hadas <yishaih@nvidia.com> wrote:
 
-On Tue, Dec 12, 2023 at 12:05=E2=80=AFAM Akihiko Odaki <akihiko.odaki@dayni=
-x.com> wrote:
->
-[...]
+> Introduce a vfio driver over virtio devices to support the legacy
+> interface functionality for VFs.
+> 
+> Background, from the virtio spec [1].
+> --------------------------------------------------------------------
+> In some systems, there is a need to support a virtio legacy driver with
+> a device that does not directly support the legacy interface. In such
+> scenarios, a group owner device can provide the legacy interface
+> functionality for the group member devices. The driver of the owner
+> device can then access the legacy interface of a member device on behalf
+> of the legacy member device driver.
+> 
+> For example, with the SR-IOV group type, group members (VFs) can not
+> present the legacy interface in an I/O BAR in BAR0 as expected by the
+> legacy pci driver. If the legacy driver is running inside a virtual
+> machine, the hypervisor executing the virtual machine can present a
+> virtual device with an I/O BAR in BAR0. The hypervisor intercepts the
+> legacy driver accesses to this I/O BAR and forwards them to the group
+> owner device (PF) using group administration commands.
+> --------------------------------------------------------------------
+> 
+> Specifically, this driver adds support for a virtio-net VF to be exposed
+> as a transitional device to a guest driver and allows the legacy IO BAR
+> functionality on top.
+> 
+> This allows a VM which uses a legacy virtio-net driver in the guest to
+> work transparently over a VF which its driver in the host is that new
+> driver.
+> 
+> The driver can be extended easily to support some other types of virtio
+> devices (e.g virtio-blk), by adding in a few places the specific type
+> properties as was done for virtio-net.
+> 
+> For now, only the virtio-net use case was tested and as such we introduce
+> the support only for such a device.
+> 
+> Practically,
+> Upon probing a VF for a virtio-net device, in case its PF supports
+> legacy access over the virtio admin commands and the VF doesn't have BAR
+> 0, we set some specific 'vfio_device_ops' to be able to simulate in SW a
+> transitional device with I/O BAR in BAR 0.
+> 
+> The existence of the simulated I/O bar is reported later on by
+> overwriting the VFIO_DEVICE_GET_REGION_INFO command and the device
+> exposes itself as a transitional device by overwriting some properties
+> upon reading its config space.
+> 
+> Once we report the existence of I/O BAR as BAR 0 a legacy driver in the
+> guest may use it via read/write calls according to the virtio
+> specification.
+> 
+> Any read/write towards the control parts of the BAR will be captured by
+> the new driver and will be translated into admin commands towards the
+> device.
+> 
+> In addition, any data path read/write access (i.e. virtio driver
+> notifications) will be captured by the driver and forwarded to the
+> physical BAR which its properties were supplied by the admin command
+> VIRTIO_ADMIN_CMD_LEGACY_NOTIFY_INFO upon the probing/init flow.
+> 
+> With that code in place a legacy driver in the guest has the look and
+> feel as if having a transitional device with legacy support for both its
+> control and data path flows.
+> 
+> [1]
+> https://github.com/oasis-tcs/virtio-spec/commit/03c2d32e5093ca9f2a17797242fbef88efe94b8c
+> 
+> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
 > ---
->
-> I'm working on a new feature that aids virtio-net implementations using
-> tuntap virtual network device. You can see [1] for details, but
-> basically it's to extend BPF_PROG_TYPE_SOCKET_FILTER to report four more
-> bytes.
+>  MAINTAINERS                      |   7 +
+>  drivers/vfio/pci/Kconfig         |   2 +
+>  drivers/vfio/pci/Makefile        |   2 +
+>  drivers/vfio/pci/virtio/Kconfig  |  15 +
+>  drivers/vfio/pci/virtio/Makefile |   4 +
+>  drivers/vfio/pci/virtio/main.c   | 576 +++++++++++++++++++++++++++++++
+>  6 files changed, 606 insertions(+)
+>  create mode 100644 drivers/vfio/pci/virtio/Kconfig
+>  create mode 100644 drivers/vfio/pci/virtio/Makefile
+>  create mode 100644 drivers/vfio/pci/virtio/main.c
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 012df8ccf34e..b246b769092d 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -22872,6 +22872,13 @@ L:	kvm@vger.kernel.org
+>  S:	Maintained
+>  F:	drivers/vfio/pci/mlx5/
+>  
+> +VFIO VIRTIO PCI DRIVER
+> +M:	Yishai Hadas <yishaih@nvidia.com>
+> +L:	kvm@vger.kernel.org
+> +L:	virtualization@lists.linux-foundation.org
+> +S:	Maintained
+> +F:	drivers/vfio/pci/virtio
+> +
+>  VFIO PCI DEVICE SPECIFIC DRIVERS
+>  R:	Jason Gunthorpe <jgg@nvidia.com>
+>  R:	Yishai Hadas <yishaih@nvidia.com>
+> diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
+> index 8125e5f37832..18c397df566d 100644
+> --- a/drivers/vfio/pci/Kconfig
+> +++ b/drivers/vfio/pci/Kconfig
+> @@ -65,4 +65,6 @@ source "drivers/vfio/pci/hisilicon/Kconfig"
+>  
+>  source "drivers/vfio/pci/pds/Kconfig"
+>  
+> +source "drivers/vfio/pci/virtio/Kconfig"
+> +
+>  endmenu
+> diff --git a/drivers/vfio/pci/Makefile b/drivers/vfio/pci/Makefile
+> index 45167be462d8..046139a4eca5 100644
+> --- a/drivers/vfio/pci/Makefile
+> +++ b/drivers/vfio/pci/Makefile
+> @@ -13,3 +13,5 @@ obj-$(CONFIG_MLX5_VFIO_PCI)           += mlx5/
+>  obj-$(CONFIG_HISI_ACC_VFIO_PCI) += hisilicon/
+>  
+>  obj-$(CONFIG_PDS_VFIO_PCI) += pds/
+> +
+> +obj-$(CONFIG_VIRTIO_VFIO_PCI) += virtio/
+> diff --git a/drivers/vfio/pci/virtio/Kconfig b/drivers/vfio/pci/virtio/Kconfig
+> new file mode 100644
+> index 000000000000..a3e5d8ea22a0
+> --- /dev/null
+> +++ b/drivers/vfio/pci/virtio/Kconfig
+> @@ -0,0 +1,15 @@
+> +# SPDX-License-Identifier: GPL-2.0-only
+> +config VIRTIO_VFIO_PCI
+> +        tristate "VFIO support for VIRTIO NET PCI devices"
+> +        depends on X86 && VIRTIO_PCI
 
-AFAICT, [1] adds a new program type, which is really hard to ship. However,
-you mentioned it is basically "extend BPF_PROG_TYPE_SOCKET_FILTER to
-report four more bytes", which confuses me.
+I'd really prefer if this was (X86 || COMPILE_TEST) but the legacy
+admin interfaces are also hard linked to X86, so I think instead the
+following should be factored into the series:
 
-Can we achieve the same goal by extending BPF_PROG_TYPE_SOCKET_FILTER
-(without adding a new program type)? Does this require extending
-__sk_buff, which
-is also not an option any more?
+diff --git a/drivers/vfio/pci/virtio/Kconfig b/drivers/vfio/pci/virtio/Kconfig
+index a3e5d8ea22a0..244b09eff67c 100644
+--- a/drivers/vfio/pci/virtio/Kconfig
++++ b/drivers/vfio/pci/virtio/Kconfig
+@@ -1,7 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ config VIRTIO_VFIO_PCI
+         tristate "VFIO support for VIRTIO NET PCI devices"
+-        depends on X86 && VIRTIO_PCI
++        depends on VIRTIO_PCI_ADMIN_LEGACY
+         select VFIO_PCI_CORE
+         help
+           This provides support for exposing VIRTIO NET VF devices which support
+diff --git a/drivers/virtio/Kconfig b/drivers/virtio/Kconfig
+index 0a53a61231c2..259e7742a442 100644
+--- a/drivers/virtio/Kconfig
++++ b/drivers/virtio/Kconfig
+@@ -60,6 +60,11 @@ config VIRTIO_PCI
+ 
+ 	  If unsure, say M.
+ 
++config VIRTIO_PCI_ADMIN_LEGACY
++	bool
++	depends on VIRTIO_PCI && (X86 || COMPILE_TEST)
++	default y
++
+ config VIRTIO_PCI_LEGACY
+ 	bool "Support for legacy virtio draft 0.9.X and older devices"
+ 	default y
+diff --git a/drivers/virtio/Makefile b/drivers/virtio/Makefile
+index a73358bb4ebb..73ace62af440 100644
+--- a/drivers/virtio/Makefile
++++ b/drivers/virtio/Makefile
+@@ -7,7 +7,7 @@ obj-$(CONFIG_VIRTIO_MMIO) += virtio_mmio.o
+ obj-$(CONFIG_VIRTIO_PCI) += virtio_pci.o
+ virtio_pci-y := virtio_pci_modern.o virtio_pci_common.o
+ virtio_pci-$(CONFIG_VIRTIO_PCI_LEGACY) += virtio_pci_legacy.o
+-virtio_pci-$(CONFIG_X86) += virtio_pci_admin_legacy_io.o
++virtio_pci-$(CONFIG_VIRTIO_PCI_ADMIN_LEGACY) += virtio_pci_admin_legacy_io.o
+ obj-$(CONFIG_VIRTIO_BALLOON) += virtio_balloon.o
+ obj-$(CONFIG_VIRTIO_INPUT) += virtio_input.o
+ obj-$(CONFIG_VIRTIO_VDPA) += virtio_vdpa.o
+diff --git a/drivers/virtio/virtio_pci_common.h b/drivers/virtio/virtio_pci_common.h
+index ff51c8053520..7fef52bee455 100644
+--- a/drivers/virtio/virtio_pci_common.h
++++ b/drivers/virtio/virtio_pci_common.h
+@@ -170,7 +170,7 @@ struct virtio_device *virtio_pci_vf_get_pf_dev(struct pci_dev *pdev);
+  * on ARM, use big endian on PPC, etc. X86 drivers are mostly ok though, more
+  * or less by chance. For now, only support legacy IO on X86.
+  */
+-#ifdef CONFIG_X86
++#ifdef CONFIG_VIRTIO_PCI_ADMIN_LEGACY
+ #define VIRTIO_ADMIN_CMD_BITMAP VIRTIO_LEGACY_ADMIN_CMD_BITMAP
+ #else
+ #define VIRTIO_ADMIN_CMD_BITMAP 0
+diff --git a/include/linux/virtio_pci_admin.h b/include/linux/virtio_pci_admin.h
+index 0c9c1f336d3f..f4a100a0fe2e 100644
+--- a/include/linux/virtio_pci_admin.h
++++ b/include/linux/virtio_pci_admin.h
+@@ -5,7 +5,7 @@
+ #include <linux/types.h>
+ #include <linux/pci.h>
+ 
+-#ifdef CONFIG_X86
++#ifdef CONFIG_VIRTIO_PCI_ADMIN_LEGACY
+ bool virtio_pci_admin_has_legacy_io(struct pci_dev *pdev);
+ int virtio_pci_admin_legacy_common_io_write(struct pci_dev *pdev, u8 offset,
+ 					    u8 size, u8 *buf);
+
+It might even be preferable if virtio_pci_admin_legacy_io were only
+built if VIRTIO_VFIO_PCI were selected, but I can't quickly get that to
+work.
+
+> +        select VFIO_PCI_CORE
+> +        help
+> +          This provides support for exposing VIRTIO NET VF devices which support
+> +          legacy IO access, using the VFIO framework that can work with a legacy
+> +          virtio driver in the guest.
+> +          Based on PCIe spec, VFs do not support I/O Space.
+> +          As of that this driver emulates I/O BAR in software to let a VF be
+> +          seen as a transitional device by its users and let it work with
+> +          a legacy driver.
+> +
+> +          If you don't know what to do here, say N.
+> diff --git a/drivers/vfio/pci/virtio/Makefile b/drivers/vfio/pci/virtio/Makefile
+> new file mode 100644
+> index 000000000000..2039b39fb723
+> --- /dev/null
+> +++ b/drivers/vfio/pci/virtio/Makefile
+> @@ -0,0 +1,4 @@
+> +# SPDX-License-Identifier: GPL-2.0-only
+> +obj-$(CONFIG_VIRTIO_VFIO_PCI) += virtio-vfio-pci.o
+> +virtio-vfio-pci-y := main.o
+> +
+
+Extraneous blank line at the end of this file.
 
 Thanks,
-Song
+Alex
+
+> diff --git a/drivers/vfio/pci/virtio/main.c b/drivers/vfio/pci/virtio/main.c
+> new file mode 100644
+> index 000000000000..291c55b641f1
+> --- /dev/null
+> +++ b/drivers/vfio/pci/virtio/main.c
+> @@ -0,0 +1,576 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved
+> + */
+> +
+> +#include <linux/device.h>
+> +#include <linux/module.h>
+> +#include <linux/mutex.h>
+> +#include <linux/pci.h>
+> +#include <linux/pm_runtime.h>
+> +#include <linux/types.h>
+> +#include <linux/uaccess.h>
+> +#include <linux/vfio.h>
+> +#include <linux/vfio_pci_core.h>
+> +#include <linux/virtio_pci.h>
+> +#include <linux/virtio_net.h>
+> +#include <linux/virtio_pci_admin.h>
+> +
+> +struct virtiovf_pci_core_device {
+> +	struct vfio_pci_core_device core_device;
+> +	u8 *bar0_virtual_buf;
+> +	/* synchronize access to the virtual buf */
+> +	struct mutex bar_mutex;
+> +	void __iomem *notify_addr;
+> +	u64 notify_offset;
+> +	__le32 pci_base_addr_0;
+> +	__le16 pci_cmd;
+> +	u8 bar0_virtual_buf_size;
+> +	u8 notify_bar;
+> +};
+> +
+> +static int
+> +virtiovf_issue_legacy_rw_cmd(struct virtiovf_pci_core_device *virtvdev,
+> +			     loff_t pos, char __user *buf,
+> +			     size_t count, bool read)
+> +{
+> +	bool msix_enabled =
+> +		(virtvdev->core_device.irq_type == VFIO_PCI_MSIX_IRQ_INDEX);
+> +	struct pci_dev *pdev = virtvdev->core_device.pdev;
+> +	u8 *bar0_buf = virtvdev->bar0_virtual_buf;
+> +	bool common;
+> +	u8 offset;
+> +	int ret;
+> +
+> +	common = pos < VIRTIO_PCI_CONFIG_OFF(msix_enabled);
+> +	/* offset within the relevant configuration area */
+> +	offset = common ? pos : pos - VIRTIO_PCI_CONFIG_OFF(msix_enabled);
+> +	mutex_lock(&virtvdev->bar_mutex);
+> +	if (read) {
+> +		if (common)
+> +			ret = virtio_pci_admin_legacy_common_io_read(pdev, offset,
+> +					count, bar0_buf + pos);
+> +		else
+> +			ret = virtio_pci_admin_legacy_device_io_read(pdev, offset,
+> +					count, bar0_buf + pos);
+> +		if (ret)
+> +			goto out;
+> +		if (copy_to_user(buf, bar0_buf + pos, count))
+> +			ret = -EFAULT;
+> +	} else {
+> +		if (copy_from_user(bar0_buf + pos, buf, count)) {
+> +			ret = -EFAULT;
+> +			goto out;
+> +		}
+> +
+> +		if (common)
+> +			ret = virtio_pci_admin_legacy_common_io_write(pdev, offset,
+> +					count, bar0_buf + pos);
+> +		else
+> +			ret = virtio_pci_admin_legacy_device_io_write(pdev, offset,
+> +					count, bar0_buf + pos);
+> +	}
+> +out:
+> +	mutex_unlock(&virtvdev->bar_mutex);
+> +	return ret;
+> +}
+> +
+> +static int
+> +virtiovf_pci_bar0_rw(struct virtiovf_pci_core_device *virtvdev,
+> +		     loff_t pos, char __user *buf,
+> +		     size_t count, bool read)
+> +{
+> +	struct vfio_pci_core_device *core_device = &virtvdev->core_device;
+> +	struct pci_dev *pdev = core_device->pdev;
+> +	u16 queue_notify;
+> +	int ret;
+> +
+> +	if (!(le16_to_cpu(virtvdev->pci_cmd) & PCI_COMMAND_IO))
+> +		return -EIO;
+> +
+> +	if (pos + count > virtvdev->bar0_virtual_buf_size)
+> +		return -EINVAL;
+> +
+> +	ret = pm_runtime_resume_and_get(&pdev->dev);
+> +	if (ret) {
+> +		pci_info_ratelimited(pdev, "runtime resume failed %d\n", ret);
+> +		return -EIO;
+> +	}
+> +
+> +	switch (pos) {
+> +	case VIRTIO_PCI_QUEUE_NOTIFY:
+> +		if (count != sizeof(queue_notify)) {
+> +			ret = -EINVAL;
+> +			goto end;
+> +		}
+> +		if (read) {
+> +			ret = vfio_pci_core_ioread16(core_device, true, &queue_notify,
+> +						     virtvdev->notify_addr);
+> +			if (ret)
+> +				goto end;
+> +			if (copy_to_user(buf, &queue_notify,
+> +					 sizeof(queue_notify))) {
+> +				ret = -EFAULT;
+> +				goto end;
+> +			}
+> +		} else {
+> +			if (copy_from_user(&queue_notify, buf, count)) {
+> +				ret = -EFAULT;
+> +				goto end;
+> +			}
+> +			ret = vfio_pci_core_iowrite16(core_device, true, queue_notify,
+> +						      virtvdev->notify_addr);
+> +		}
+> +		break;
+> +	default:
+> +		ret = virtiovf_issue_legacy_rw_cmd(virtvdev, pos, buf, count,
+> +						   read);
+> +	}
+> +
+> +end:
+> +	pm_runtime_put(&pdev->dev);
+> +	return ret ? ret : count;
+> +}
+> +
+> +static bool range_intersect_range(loff_t range1_start, size_t count1,
+> +				  loff_t range2_start, size_t count2,
+> +				  loff_t *start_offset,
+> +				  size_t *intersect_count,
+> +				  size_t *register_offset)
+> +{
+> +	if (range1_start <= range2_start &&
+> +	    range1_start + count1 > range2_start) {
+> +		*start_offset = range2_start - range1_start;
+> +		*intersect_count = min_t(size_t, count2,
+> +					 range1_start + count1 - range2_start);
+> +		*register_offset = 0;
+> +		return true;
+> +	}
+> +
+> +	if (range1_start > range2_start &&
+> +	    range1_start < range2_start + count2) {
+> +		*start_offset = 0;
+> +		*intersect_count = min_t(size_t, count1,
+> +					 range2_start + count2 - range1_start);
+> +		*register_offset = range1_start - range2_start;
+> +		return true;
+> +	}
+> +
+> +	return false;
+> +}
+> +
+> +static ssize_t virtiovf_pci_read_config(struct vfio_device *core_vdev,
+> +					char __user *buf, size_t count,
+> +					loff_t *ppos)
+> +{
+> +	struct virtiovf_pci_core_device *virtvdev = container_of(
+> +		core_vdev, struct virtiovf_pci_core_device, core_device.vdev);
+> +	loff_t pos = *ppos & VFIO_PCI_OFFSET_MASK;
+> +	size_t register_offset;
+> +	loff_t copy_offset;
+> +	size_t copy_count;
+> +	__le32 val32;
+> +	__le16 val16;
+> +	u8 val8;
+> +	int ret;
+> +
+> +	ret = vfio_pci_core_read(core_vdev, buf, count, ppos);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	if (range_intersect_range(pos, count, PCI_DEVICE_ID, sizeof(val16),
+> +				  &copy_offset, &copy_count, &register_offset)) {
+> +		val16 = cpu_to_le16(VIRTIO_TRANS_ID_NET);
+> +		if (copy_to_user(buf + copy_offset, (void *)&val16 + register_offset, copy_count))
+> +			return -EFAULT;
+> +	}
+> +
+> +	if ((le16_to_cpu(virtvdev->pci_cmd) & PCI_COMMAND_IO) &&
+> +	    range_intersect_range(pos, count, PCI_COMMAND, sizeof(val16),
+> +				  &copy_offset, &copy_count, &register_offset)) {
+> +		if (copy_from_user((void *)&val16 + register_offset, buf + copy_offset,
+> +				   copy_count))
+> +			return -EFAULT;
+> +		val16 |= cpu_to_le16(PCI_COMMAND_IO);
+> +		if (copy_to_user(buf + copy_offset, (void *)&val16 + register_offset,
+> +				 copy_count))
+> +			return -EFAULT;
+> +	}
+> +
+> +	if (range_intersect_range(pos, count, PCI_REVISION_ID, sizeof(val8),
+> +				  &copy_offset, &copy_count, &register_offset)) {
+> +		/* Transional needs to have revision 0 */
+> +		val8 = 0;
+> +		if (copy_to_user(buf + copy_offset, &val8, copy_count))
+> +			return -EFAULT;
+> +	}
+> +
+> +	if (range_intersect_range(pos, count, PCI_BASE_ADDRESS_0, sizeof(val32),
+> +				  &copy_offset, &copy_count, &register_offset)) {
+> +		u32 bar_mask = ~(virtvdev->bar0_virtual_buf_size - 1);
+> +		u32 pci_base_addr_0 = le32_to_cpu(virtvdev->pci_base_addr_0);
+> +
+> +		val32 = cpu_to_le32((pci_base_addr_0 & bar_mask) | PCI_BASE_ADDRESS_SPACE_IO);
+> +		if (copy_to_user(buf + copy_offset, (void *)&val32 + register_offset, copy_count))
+> +			return -EFAULT;
+> +	}
+> +
+> +	if (range_intersect_range(pos, count, PCI_SUBSYSTEM_ID, sizeof(val16),
+> +				  &copy_offset, &copy_count, &register_offset)) {
+> +		/*
+> +		 * Transitional devices use the PCI subsystem device id as
+> +		 * virtio device id, same as legacy driver always did.
+> +		 */
+> +		val16 = cpu_to_le16(VIRTIO_ID_NET);
+> +		if (copy_to_user(buf + copy_offset, (void *)&val16 + register_offset,
+> +				 copy_count))
+> +			return -EFAULT;
+> +	}
+> +
+> +	if (range_intersect_range(pos, count, PCI_SUBSYSTEM_VENDOR_ID, sizeof(val16),
+> +				  &copy_offset, &copy_count, &register_offset)) {
+> +		val16 = cpu_to_le16(PCI_VENDOR_ID_REDHAT_QUMRANET);
+> +		if (copy_to_user(buf + copy_offset, (void *)&val16 + register_offset,
+> +				 copy_count))
+> +			return -EFAULT;
+> +	}
+> +
+> +	return count;
+> +}
+> +
+> +static ssize_t
+> +virtiovf_pci_core_read(struct vfio_device *core_vdev, char __user *buf,
+> +		       size_t count, loff_t *ppos)
+> +{
+> +	struct virtiovf_pci_core_device *virtvdev = container_of(
+> +		core_vdev, struct virtiovf_pci_core_device, core_device.vdev);
+> +	unsigned int index = VFIO_PCI_OFFSET_TO_INDEX(*ppos);
+> +	loff_t pos = *ppos & VFIO_PCI_OFFSET_MASK;
+> +
+> +	if (!count)
+> +		return 0;
+> +
+> +	if (index == VFIO_PCI_CONFIG_REGION_INDEX)
+> +		return virtiovf_pci_read_config(core_vdev, buf, count, ppos);
+> +
+> +	if (index == VFIO_PCI_BAR0_REGION_INDEX)
+> +		return virtiovf_pci_bar0_rw(virtvdev, pos, buf, count, true);
+> +
+> +	return vfio_pci_core_read(core_vdev, buf, count, ppos);
+> +}
+> +
+> +static ssize_t virtiovf_pci_write_config(struct vfio_device *core_vdev,
+> +					 const char __user *buf, size_t count,
+> +					 loff_t *ppos)
+> +{
+> +	struct virtiovf_pci_core_device *virtvdev = container_of(
+> +		core_vdev, struct virtiovf_pci_core_device, core_device.vdev);
+> +	loff_t pos = *ppos & VFIO_PCI_OFFSET_MASK;
+> +	size_t register_offset;
+> +	loff_t copy_offset;
+> +	size_t copy_count;
+> +
+> +	if (range_intersect_range(pos, count, PCI_COMMAND, sizeof(virtvdev->pci_cmd),
+> +				  &copy_offset, &copy_count,
+> +				  &register_offset)) {
+> +		if (copy_from_user((void *)&virtvdev->pci_cmd + register_offset,
+> +				   buf + copy_offset,
+> +				   copy_count))
+> +			return -EFAULT;
+> +	}
+> +
+> +	if (range_intersect_range(pos, count, PCI_BASE_ADDRESS_0,
+> +				  sizeof(virtvdev->pci_base_addr_0),
+> +				  &copy_offset, &copy_count,
+> +				  &register_offset)) {
+> +		if (copy_from_user((void *)&virtvdev->pci_base_addr_0 + register_offset,
+> +				   buf + copy_offset,
+> +				   copy_count))
+> +			return -EFAULT;
+> +	}
+> +
+> +	return vfio_pci_core_write(core_vdev, buf, count, ppos);
+> +}
+> +
+> +static ssize_t
+> +virtiovf_pci_core_write(struct vfio_device *core_vdev, const char __user *buf,
+> +			size_t count, loff_t *ppos)
+> +{
+> +	struct virtiovf_pci_core_device *virtvdev = container_of(
+> +		core_vdev, struct virtiovf_pci_core_device, core_device.vdev);
+> +	unsigned int index = VFIO_PCI_OFFSET_TO_INDEX(*ppos);
+> +	loff_t pos = *ppos & VFIO_PCI_OFFSET_MASK;
+> +
+> +	if (!count)
+> +		return 0;
+> +
+> +	if (index == VFIO_PCI_CONFIG_REGION_INDEX)
+> +		return virtiovf_pci_write_config(core_vdev, buf, count, ppos);
+> +
+> +	if (index == VFIO_PCI_BAR0_REGION_INDEX)
+> +		return virtiovf_pci_bar0_rw(virtvdev, pos, (char __user *)buf, count, false);
+> +
+> +	return vfio_pci_core_write(core_vdev, buf, count, ppos);
+> +}
+> +
+> +static int
+> +virtiovf_pci_ioctl_get_region_info(struct vfio_device *core_vdev,
+> +				   unsigned int cmd, unsigned long arg)
+> +{
+> +	struct virtiovf_pci_core_device *virtvdev = container_of(
+> +		core_vdev, struct virtiovf_pci_core_device, core_device.vdev);
+> +	unsigned long minsz = offsetofend(struct vfio_region_info, offset);
+> +	void __user *uarg = (void __user *)arg;
+> +	struct vfio_region_info info = {};
+> +
+> +	if (copy_from_user(&info, uarg, minsz))
+> +		return -EFAULT;
+> +
+> +	if (info.argsz < minsz)
+> +		return -EINVAL;
+> +
+> +	switch (info.index) {
+> +	case VFIO_PCI_BAR0_REGION_INDEX:
+> +		info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
+> +		info.size = virtvdev->bar0_virtual_buf_size;
+> +		info.flags = VFIO_REGION_INFO_FLAG_READ |
+> +			     VFIO_REGION_INFO_FLAG_WRITE;
+> +		return copy_to_user(uarg, &info, minsz) ? -EFAULT : 0;
+> +	default:
+> +		return vfio_pci_core_ioctl(core_vdev, cmd, arg);
+> +	}
+> +}
+> +
+> +static long
+> +virtiovf_vfio_pci_core_ioctl(struct vfio_device *core_vdev, unsigned int cmd,
+> +			     unsigned long arg)
+> +{
+> +	switch (cmd) {
+> +	case VFIO_DEVICE_GET_REGION_INFO:
+> +		return virtiovf_pci_ioctl_get_region_info(core_vdev, cmd, arg);
+> +	default:
+> +		return vfio_pci_core_ioctl(core_vdev, cmd, arg);
+> +	}
+> +}
+> +
+> +static int
+> +virtiovf_set_notify_addr(struct virtiovf_pci_core_device *virtvdev)
+> +{
+> +	struct vfio_pci_core_device *core_device = &virtvdev->core_device;
+> +	int ret;
+> +
+> +	/*
+> +	 * Setup the BAR where the 'notify' exists to be used by vfio as well
+> +	 * This will let us mmap it only once and use it when needed.
+> +	 */
+> +	ret = vfio_pci_core_setup_barmap(core_device,
+> +					 virtvdev->notify_bar);
+> +	if (ret)
+> +		return ret;
+> +
+> +	virtvdev->notify_addr = core_device->barmap[virtvdev->notify_bar] +
+> +			virtvdev->notify_offset;
+> +	return 0;
+> +}
+> +
+> +static int virtiovf_pci_open_device(struct vfio_device *core_vdev)
+> +{
+> +	struct virtiovf_pci_core_device *virtvdev = container_of(
+> +		core_vdev, struct virtiovf_pci_core_device, core_device.vdev);
+> +	struct vfio_pci_core_device *vdev = &virtvdev->core_device;
+> +	int ret;
+> +
+> +	ret = vfio_pci_core_enable(vdev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	if (virtvdev->bar0_virtual_buf) {
+> +		/*
+> +		 * Upon close_device() the vfio_pci_core_disable() is called
+> +		 * and will close all the previous mmaps, so it seems that the
+> +		 * valid life cycle for the 'notify' addr is per open/close.
+> +		 */
+> +		ret = virtiovf_set_notify_addr(virtvdev);
+> +		if (ret) {
+> +			vfio_pci_core_disable(vdev);
+> +			return ret;
+> +		}
+> +	}
+> +
+> +	vfio_pci_core_finish_enable(vdev);
+> +	return 0;
+> +}
+> +
+> +static int virtiovf_get_device_config_size(unsigned short device)
+> +{
+> +	/* Network card */
+> +	return offsetofend(struct virtio_net_config, status);
+> +}
+> +
+> +static int virtiovf_read_notify_info(struct virtiovf_pci_core_device *virtvdev)
+> +{
+> +	u64 offset;
+> +	int ret;
+> +	u8 bar;
+> +
+> +	ret = virtio_pci_admin_legacy_io_notify_info(virtvdev->core_device.pdev,
+> +				VIRTIO_ADMIN_CMD_NOTIFY_INFO_FLAGS_OWNER_MEM,
+> +				&bar, &offset);
+> +	if (ret)
+> +		return ret;
+> +
+> +	virtvdev->notify_bar = bar;
+> +	virtvdev->notify_offset = offset;
+> +	return 0;
+> +}
+> +
+> +static int virtiovf_pci_init_device(struct vfio_device *core_vdev)
+> +{
+> +	struct virtiovf_pci_core_device *virtvdev = container_of(
+> +		core_vdev, struct virtiovf_pci_core_device, core_device.vdev);
+> +	struct pci_dev *pdev;
+> +	int ret;
+> +
+> +	ret = vfio_pci_core_init_dev(core_vdev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	pdev = virtvdev->core_device.pdev;
+> +	ret = virtiovf_read_notify_info(virtvdev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	virtvdev->bar0_virtual_buf_size = VIRTIO_PCI_CONFIG_OFF(true) +
+> +				virtiovf_get_device_config_size(pdev->device);
+> +	BUILD_BUG_ON(!is_power_of_2(virtvdev->bar0_virtual_buf_size));
+> +	virtvdev->bar0_virtual_buf = kzalloc(virtvdev->bar0_virtual_buf_size,
+> +					     GFP_KERNEL);
+> +	if (!virtvdev->bar0_virtual_buf)
+> +		return -ENOMEM;
+> +	mutex_init(&virtvdev->bar_mutex);
+> +	return 0;
+> +}
+> +
+> +static void virtiovf_pci_core_release_dev(struct vfio_device *core_vdev)
+> +{
+> +	struct virtiovf_pci_core_device *virtvdev = container_of(
+> +		core_vdev, struct virtiovf_pci_core_device, core_device.vdev);
+> +
+> +	kfree(virtvdev->bar0_virtual_buf);
+> +	vfio_pci_core_release_dev(core_vdev);
+> +}
+> +
+> +static const struct vfio_device_ops virtiovf_vfio_pci_tran_ops = {
+> +	.name = "virtio-vfio-pci-trans",
+> +	.init = virtiovf_pci_init_device,
+> +	.release = virtiovf_pci_core_release_dev,
+> +	.open_device = virtiovf_pci_open_device,
+> +	.close_device = vfio_pci_core_close_device,
+> +	.ioctl = virtiovf_vfio_pci_core_ioctl,
+> +	.device_feature = vfio_pci_core_ioctl_feature,
+> +	.read = virtiovf_pci_core_read,
+> +	.write = virtiovf_pci_core_write,
+> +	.mmap = vfio_pci_core_mmap,
+> +	.request = vfio_pci_core_request,
+> +	.match = vfio_pci_core_match,
+> +	.bind_iommufd = vfio_iommufd_physical_bind,
+> +	.unbind_iommufd = vfio_iommufd_physical_unbind,
+> +	.attach_ioas = vfio_iommufd_physical_attach_ioas,
+> +	.detach_ioas = vfio_iommufd_physical_detach_ioas,
+> +};
+> +
+> +static const struct vfio_device_ops virtiovf_vfio_pci_ops = {
+> +	.name = "virtio-vfio-pci",
+> +	.init = vfio_pci_core_init_dev,
+> +	.release = vfio_pci_core_release_dev,
+> +	.open_device = virtiovf_pci_open_device,
+> +	.close_device = vfio_pci_core_close_device,
+> +	.ioctl = vfio_pci_core_ioctl,
+> +	.device_feature = vfio_pci_core_ioctl_feature,
+> +	.read = vfio_pci_core_read,
+> +	.write = vfio_pci_core_write,
+> +	.mmap = vfio_pci_core_mmap,
+> +	.request = vfio_pci_core_request,
+> +	.match = vfio_pci_core_match,
+> +	.bind_iommufd = vfio_iommufd_physical_bind,
+> +	.unbind_iommufd = vfio_iommufd_physical_unbind,
+> +	.attach_ioas = vfio_iommufd_physical_attach_ioas,
+> +	.detach_ioas = vfio_iommufd_physical_detach_ioas,
+> +};
+> +
+> +static bool virtiovf_bar0_exists(struct pci_dev *pdev)
+> +{
+> +	struct resource *res = pdev->resource;
+> +
+> +	return res->flags;
+> +}
+> +
+> +static int virtiovf_pci_probe(struct pci_dev *pdev,
+> +			      const struct pci_device_id *id)
+> +{
+> +	const struct vfio_device_ops *ops = &virtiovf_vfio_pci_ops;
+> +	struct virtiovf_pci_core_device *virtvdev;
+> +	int ret;
+> +
+> +	if (pdev->is_virtfn && virtio_pci_admin_has_legacy_io(pdev) &&
+> +	    !virtiovf_bar0_exists(pdev))
+> +		ops = &virtiovf_vfio_pci_tran_ops;
+> +
+> +	virtvdev = vfio_alloc_device(virtiovf_pci_core_device, core_device.vdev,
+> +				     &pdev->dev, ops);
+> +	if (IS_ERR(virtvdev))
+> +		return PTR_ERR(virtvdev);
+> +
+> +	dev_set_drvdata(&pdev->dev, &virtvdev->core_device);
+> +	ret = vfio_pci_core_register_device(&virtvdev->core_device);
+> +	if (ret)
+> +		goto out;
+> +	return 0;
+> +out:
+> +	vfio_put_device(&virtvdev->core_device.vdev);
+> +	return ret;
+> +}
+> +
+> +static void virtiovf_pci_remove(struct pci_dev *pdev)
+> +{
+> +	struct virtiovf_pci_core_device *virtvdev = dev_get_drvdata(&pdev->dev);
+> +
+> +	vfio_pci_core_unregister_device(&virtvdev->core_device);
+> +	vfio_put_device(&virtvdev->core_device.vdev);
+> +}
+> +
+> +static const struct pci_device_id virtiovf_pci_table[] = {
+> +	/* Only virtio-net is supported/tested so far */
+> +	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_REDHAT_QUMRANET, 0x1041) },
+> +	{}
+> +};
+> +
+> +MODULE_DEVICE_TABLE(pci, virtiovf_pci_table);
+> +
+> +void virtiovf_pci_aer_reset_done(struct pci_dev *pdev)
+> +{
+> +	struct virtiovf_pci_core_device *virtvdev = dev_get_drvdata(&pdev->dev);
+> +
+> +	virtvdev->pci_cmd = 0;
+> +}
+> +
+> +static const struct pci_error_handlers virtiovf_err_handlers = {
+> +	.reset_done = virtiovf_pci_aer_reset_done,
+> +	.error_detected = vfio_pci_core_aer_err_detected,
+> +};
+> +
+> +static struct pci_driver virtiovf_pci_driver = {
+> +	.name = KBUILD_MODNAME,
+> +	.id_table = virtiovf_pci_table,
+> +	.probe = virtiovf_pci_probe,
+> +	.remove = virtiovf_pci_remove,
+> +	.err_handler = &virtiovf_err_handlers,
+> +	.driver_managed_dma = true,
+> +};
+> +
+> +module_pci_driver(virtiovf_pci_driver);
+> +
+> +MODULE_LICENSE("GPL");
+> +MODULE_AUTHOR("Yishai Hadas <yishaih@nvidia.com>");
+> +MODULE_DESCRIPTION(
+> +	"VIRTIO VFIO PCI - User Level meta-driver for VIRTIO NET devices");
+
 
