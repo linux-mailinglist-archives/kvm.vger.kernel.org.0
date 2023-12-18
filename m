@@ -1,233 +1,141 @@
-Return-Path: <kvm+bounces-4684-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4686-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7503C81671D
-	for <lists+kvm@lfdr.de>; Mon, 18 Dec 2023 08:11:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B262D816761
+	for <lists+kvm@lfdr.de>; Mon, 18 Dec 2023 08:29:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4FFF1C22344
-	for <lists+kvm@lfdr.de>; Mon, 18 Dec 2023 07:11:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 903281C2231D
+	for <lists+kvm@lfdr.de>; Mon, 18 Dec 2023 07:29:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1908FD2ED;
-	Mon, 18 Dec 2023 07:11:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A010D8473;
+	Mon, 18 Dec 2023 07:29:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="j6sUmE6B"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n+xiCzQ/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC65DD269
-	for <kvm@vger.kernel.org>; Mon, 18 Dec 2023 07:11:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702883470; x=1734419470;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=HGKj/1fpsSQ7vqgj7Lmbs32WZSTfNzb092RHhg00L04=;
-  b=j6sUmE6BnTs7pGp4/lh2r9XvrzDmywBn3S4XdKthX+nUAuocJHbqqCbs
-   sRP+pYXx83iIng3e3uV0CIz+RVTVt9PjkddK+hsXIvC0j7FHrbydpmb+P
-   yKGR1DzxY2AAikikYadNfveXtbxb/ttriO9qIk9/DatgH6WQPtblTE3Gk
-   WQ9TtLiM6tkSLtqnsSG7+wSGD7067tjUrJxFuuuD0V+7jhB8rS8KwPo2C
-   ALeMUehBxKaAF5SEAlYL9UOrCLtt62gjRf2gn2uD/mBUvoXT6/g+4LKZl
-   ysUuIqdbCECjoUwHB54JT42yUsCwbv/ebfkjQlbYnlpZF2huYBsLHL83Q
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10927"; a="2668017"
-X-IronPort-AV: E=Sophos;i="6.04,284,1695711600"; 
-   d="scan'208";a="2668017"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Dec 2023 23:11:09 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10927"; a="1106824848"
-X-IronPort-AV: E=Sophos;i="6.04,284,1695711600"; 
-   d="scan'208";a="1106824848"
-Received: from pc.sh.intel.com ([10.238.200.75])
-  by fmsmga005.fm.intel.com with ESMTP; 17 Dec 2023 23:11:06 -0800
-From: Qian Wen <qian.wen@intel.com>
-To: kvm@vger.kernel.org,
-	seanjc@google.com,
-	pbonzini@redhat.com
-Cc: nikos.nikoleris@arm.com,
-	shahuang@redhat.com,
-	alexandru.elisei@arm.com,
-	yu.c.zhang@intel.com,
-	zhenzhong.duan@intel.com,
-	isaku.yamahata@intel.com,
-	chenyi.qiang@intel.com,
-	ricarkol@google.com,
-	qian.wen@intel.com
-Subject: [kvm-unit-tests RFC v2 18/18] x86 TDX: Make run_tests.sh work with TDX
-Date: Mon, 18 Dec 2023 15:22:47 +0800
-Message-Id: <20231218072247.2573516-19-qian.wen@intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20231218072247.2573516-1-qian.wen@intel.com>
-References: <20231218072247.2573516-1-qian.wen@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B7079EE;
+	Mon, 18 Dec 2023 07:29:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78E5BC433C8;
+	Mon, 18 Dec 2023 07:29:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702884576;
+	bh=vYhXAXWM2ISVIu88GyMX7e6SpUme8puSMXqUFyuvgBo=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=n+xiCzQ/m+B8O6UEvMX2vXyc/gPwX3CgQitmoSw2xfgwsnepzeq6ktDwZ3D8bk9jP
+	 0hYOBZWNfyCovDlAOKM/6T9y/iiZaaDi4he65hJ1I7kVyi+yp04aUzknyj9dRuW/Jp
+	 HsNkNqXHkoiNlXBXtvSN85Isn8bOICsfz5kJ+ztJ0FYtWUe59wp3r+K5gJECVHEsX7
+	 SvMDsprNEVBveccUIQizYHG2ul4LI6nYzMT5IgOmNbFC3Rc9lh5KY+EerPVrT7GZ2X
+	 VC2VXf21R/UIq8OLTQuY/opA5QWOGL+YT4yx7kocR0Vu2Lb9JlZ7otXlMZUDwbP9dj
+	 mFTZpalSnvp7A==
+X-Mailer: emacs 29.1 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+To: Vaibhav Jain <vaibhav@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
+	kvm@vger.kernel.org, kvm-ppc@vger.kernel.org
+Cc: Nicholas Piggin <npiggin@gmail.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Jordan Niethe <jniethe5@gmail.com>,
+	Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>,
+	mikey@neuling.org, paulus@ozlabs.org, sbhat@linux.ibm.com,
+	gautam@linux.ibm.com, kconsul@linux.vnet.ibm.com,
+	amachhiw@linux.vnet.ibm.com, David.Laight@ACULAB.COM
+Subject: Re: [PATCH 09/12] KVM: PPC: Book3S HV nestedv2: Do not call
+ H_COPY_TOFROM_GUEST
+In-Reply-To: <87zfy89enk.fsf@vajain21.in.ibm.com>
+References: <20231201132618.555031-1-vaibhav@linux.ibm.com>
+ <20231201132618.555031-10-vaibhav@linux.ibm.com>
+ <87sf4dun37.fsf@kernel.org> <87jzplmlx5.fsf@vajain21.in.ibm.com>
+ <086fb48f-ea7c-4b4e-b3b5-c930aa74bbb2@kernel.org>
+ <87zfy89enk.fsf@vajain21.in.ibm.com>
+Date: Mon, 18 Dec 2023 12:59:27 +0530
+Message-ID: <875y0wrmso.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-From: Zhenzhong Duan <zhenzhong.duan@intel.com>
+Vaibhav Jain <vaibhav@linux.ibm.com> writes:
 
-Define a special group 'tdx' for those test cases supported by TDX. So
-that when group 'tdx' specified, these test cases run in TDX protected
-environment if EFI_TDX=y.
+> Hi Aneesh,
+>
+> "Aneesh Kumar K.V" <aneesh.kumar@kernel.org> writes:
+>
+> <snip>
+>>> Yes, Agreed and thats a nice suggestion. However ATM the hypervisor 
+>>> supporting Nestedv2 doesnt have support for this hcall. In future
+>>> once we have support for this hcall for nestedv2 from the hypervisor
+>>> we can replace this branch with a firmware_has_feature() test.
+>>> 
+>>
+>> What I am suggesting is we convert that conditional to firmware_has_feature so that
+>> later when hypervisor supports this hcall all older kernel can make
+>> use of the copy_tofrom_guest without any code change.
+>
+> AFAIK for firmware_has_feature to work we either need:
+> - A way to call this hcall with some invalid args. However lpid/pid for
+> guest arent allocated during boot.
+>
+> - A way for hypervisor to advertise support for this hcall before the L1
+> kernel boots.
+>
+> ATM L0 dosent support for any of these two ways. I can do a follow up
+> patch later when we have a clarity on how we want to advertise support
+> for this hcall. For now current kernel supporting nestedv2 wont be
+> using this hcall assuming its not supported. Future kernels can use one
+> of the two ways above to set the firmware_has_feature flag to take
+> advantage of this hcall.
+>
 
-For example:
-    EFI_TDX=y ./run_tests.sh -g tdx
+We can use the second option and have L0 publish the firmware feature
+when it adds the new hcall. The good part about this is that all
+existing L1 kernels will automatically use the new hcall. Something
+like.
 
-Signed-off-by: Zhenzhong Duan <zhenzhong.duan@intel.com>
-Reviewed-by: Yu Zhang <yu.c.zhang@intel.com>
-Link: https://lore.kernel.org/r/20220303071907.650203-18-zhenzhong.duan@intel.com
-Co-developed-by: Qian Wen <qian.wen@intel.com>
-Signed-off-by: Qian Wen <qian.wen@intel.com>
----
- README.md         |  6 ++++++
- x86/unittests.cfg | 17 ++++++++++++++++-
- 2 files changed, 22 insertions(+), 1 deletion(-)
-
-diff --git a/README.md b/README.md
-index 6e82dc22..a84460e9 100644
---- a/README.md
-+++ b/README.md
-@@ -137,6 +137,12 @@ when the user does not provide an environ, then an environ generated
- from the ./errata.txt file and the host's kernel version is provided to
- all unit tests.
+diff --git a/arch/powerpc/include/asm/firmware.h b/arch/powerpc/include/asm/firmware.h
+index 69ae9cf57d50..0ef97b56f999 100644
+--- a/arch/powerpc/include/asm/firmware.h
++++ b/arch/powerpc/include/asm/firmware.h
+@@ -57,6 +57,7 @@
+ #define FW_FEATURE_ENERGY_SCALE_INFO ASM_CONST(0x0000040000000000)
+ #define FW_FEATURE_WATCHDOG	ASM_CONST(0x0000080000000000)
+ #define FW_FEATURE_PLPKS	ASM_CONST(0x0000100000000000)
++#define FW_FEATURE_H_COPY_TOFROM_GUEST	ASM_CONST(0x0000200000000000)
  
-+# Unit test in TDX environment
+ #ifndef __ASSEMBLY__
+ 
+diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+index 282d1b54b073..8fc598b4767a 100644
+--- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
++++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+@@ -39,6 +39,9 @@ unsigned long __kvmhv_copy_tofrom_guest_radix(int lpid, int pid,
+ 	unsigned long quadrant, ret = n;
+ 	bool is_load = !!to;
+ 
++	if (!firmware_has_feature(FW_FEATURE_H_COPY_TOFROM_GUEST))
++		return H_UNSUPPORTED;
 +
-+    All the test cases supported by TDX belong to 'tdx' group, by this
-+    command: "EFI_TDX=y ./run_tests.sh -g tdx", all these test cases run
-+    in a TDX protected environment.
-+
- # Contributing
+ 	/* Can't access quadrants 1 or 2 in non-HV mode, call the HV to do it */
+ 	if (kvmhv_on_pseries())
+ 		return plpar_hcall_norets(H_COPY_TOFROM_GUEST, lpid, pid, eaddr,
+diff --git a/arch/powerpc/platforms/pseries/firmware.c b/arch/powerpc/platforms/pseries/firmware.c
+index 18447e5fa17d..d49b5c52e7b8 100644
+--- a/arch/powerpc/platforms/pseries/firmware.c
++++ b/arch/powerpc/platforms/pseries/firmware.c
+@@ -69,6 +69,8 @@ hypertas_fw_features_table[] = {
+ 	{FW_FEATURE_ENERGY_SCALE_INFO,	"hcall-energy-scale-info"},
+ 	{FW_FEATURE_WATCHDOG,		"hcall-watchdog"},
+ 	{FW_FEATURE_PLPKS,		"hcall-pks"},
++	{FW_FEATURE_H_COPY_TOFROM_GUEST,
++					"hcall-h-copy_tofrom-guest"},
+ };
  
- ## Directory structure
-diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-index 8a3830d8..ac1f3273 100644
---- a/x86/unittests.cfg
-+++ b/x86/unittests.cfg
-@@ -69,10 +69,12 @@ arch = i386
- [smptest]
- file = smptest.flat
- smp = 2
-+groups = tdx
- 
- [smptest3]
- file = smptest.flat
- smp = 3
-+groups = tdx
- 
- [vmexit_cpuid]
- file = vmexit.flat
-@@ -186,6 +188,7 @@ file = hypercall.flat
- [idt_test]
- file = idt_test.flat
- arch = x86_64
-+groups = tdx
- 
- #[init]
- #file = init.flat
-@@ -194,6 +197,7 @@ arch = x86_64
- file = memory.flat
- extra_params = -cpu max
- arch = x86_64
-+groups = tdx
- 
- [msr]
- # Use GenuineIntel to ensure SYSENTER MSRs are fully preserved, and to test
-@@ -202,6 +206,7 @@ arch = x86_64
- # will fail due to shortcomings in KVM.
- file = msr.flat
- extra_params = -cpu max,vendor=GenuineIntel
-+groups = tdx
- 
- [pmu]
- file = pmu.flat
-@@ -241,6 +246,7 @@ file = s3.flat
- 
- [setjmp]
- file = setjmp.flat
-+groups = tdx
- 
- [sieve]
- file = sieve.flat
-@@ -250,10 +256,12 @@ timeout = 180
- file = syscall.flat
- arch = x86_64
- extra_params = -cpu Opteron_G1,vendor=AuthenticAMD
-+groups = tdx
- 
- [tsc]
- file = tsc.flat
- extra_params = -cpu max
-+groups = tdx
- 
- [tsc_adjust]
- file = tsc_adjust.flat
-@@ -263,10 +271,12 @@ extra_params = -cpu max
- file = xsave.flat
- arch = x86_64
- extra_params = -cpu max
-+groups = tdx
- 
- [rmap_chain]
- file = rmap_chain.flat
- arch = x86_64
-+groups = tdx
- 
- [svm]
- file = svm.flat
-@@ -306,7 +316,7 @@ extra_params = --append "10000000 `date +%s`"
- file = pcid.flat
- extra_params = -cpu qemu64,+pcid,+invpcid
- arch = x86_64
--groups = pcid
-+groups = pcid tdx
- 
- [pcid-disabled]
- file = pcid.flat
-@@ -324,10 +334,12 @@ groups = pcid
- file = rdpru.flat
- extra_params = -cpu max
- arch = x86_64
-+groups = tdx
- 
- [umip]
- file = umip.flat
- extra_params = -cpu qemu64,+umip
-+groups = tdx
- 
- [la57]
- file = la57.flat
-@@ -447,6 +459,7 @@ check = /sys/module/kvm_intel/parameters/allow_smaller_maxphyaddr=Y
- [debug]
- file = debug.flat
- arch = x86_64
-+groups = tdx
- 
- [hyperv_synic]
- file = hyperv_synic.flat
-@@ -485,6 +498,7 @@ extra_params = -M q35,kernel-irqchip=split -device intel-iommu,intremap=on,eim=o
- file = tsx-ctrl.flat
- extra_params = -cpu max
- groups = tsx-ctrl
-+groups = tdx
- 
- [intel_cet]
- file = cet.flat
-@@ -495,3 +509,4 @@ extra_params = -enable-kvm -m 2048 -cpu host
- [intel_tdx]
- file = intel_tdx.flat
- arch = x86_64
-+groups = tdx nodefault
--- 
-2.25.1
+ /* Build up the firmware features bitmask using the contents of
 
 
