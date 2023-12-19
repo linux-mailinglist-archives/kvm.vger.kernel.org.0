@@ -1,71 +1,70 @@
-Return-Path: <kvm+bounces-4764-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4765-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05E0281813A
-	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 06:56:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A344C81813D
+	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 06:58:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECFC21C21F61
-	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 05:55:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1604B1F233D7
+	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 05:58:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 955BE11709;
-	Tue, 19 Dec 2023 05:55:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65E377468;
+	Tue, 19 Dec 2023 05:58:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g1iJqPJ6"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="InSx51Sj"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13CCC1119A
-	for <kvm@vger.kernel.org>; Tue, 19 Dec 2023 05:55:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EC5E6AA2
+	for <kvm@vger.kernel.org>; Tue, 19 Dec 2023 05:58:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702965350;
+	s=mimecast20190719; t=1702965506;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=yl0k5PzfgQPNf1jMqWP9lPYbNGtGdeu4i0Z4qPBCFqY=;
-	b=g1iJqPJ6DETOxr2aYxkxrr2yvMi4EGDbevyBG55rx2KWW0PX0LngAM4lxr+TEUwC4Gtv3P
-	XgCM7qc8Ka6cb18gVjDjYJ7cshBnRFkMaKrGz5WE5bNPdlAU7a/jJ2a7KVo8+WumXlfInt
-	oBAJ8DW+ahkw83A8ZRRgwDijLOdyWO0=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=6mjY6FtOd+1hsi8Ne7rCpA7JmaDnqNk0R9P4YeXVzbo=;
+	b=InSx51SjDJw97YZmawGNtQXha4PjfmLNurp1QFxXkkCDc6AqzdhXy8udxWZ2zCaXlOWnPD
+	a4hrGbXWTBarsGHZqm9oX/6ukCA9RH8MZ+zPUgOQ3ocOQv8nE9jkJKjGuuEU3TG8pj5X9G
+	ZmG/2MvSeyWd/NBZZ9xajAnFG5rTvvY=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-208-OZakdT-2MmWbYTAckZaw5g-1; Tue, 19 Dec 2023 00:55:48 -0500
-X-MC-Unique: OZakdT-2MmWbYTAckZaw5g-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-332ee20a3f0so3196330f8f.0
-        for <kvm@vger.kernel.org>; Mon, 18 Dec 2023 21:55:48 -0800 (PST)
+ us-mta-253-G73VPBHIO0Wsccr6mlk_8w-1; Tue, 19 Dec 2023 00:58:23 -0500
+X-MC-Unique: G73VPBHIO0Wsccr6mlk_8w-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-40c2c568108so32150445e9.1
+        for <kvm@vger.kernel.org>; Mon, 18 Dec 2023 21:58:23 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702965347; x=1703570147;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yl0k5PzfgQPNf1jMqWP9lPYbNGtGdeu4i0Z4qPBCFqY=;
-        b=Yv04aHso/SvVIKVzyj5EUj6gjs0epbzj8foyT2hXNKtcJrPeJh+MiI3SM/N/Teug/Y
-         6tNsSHZYyxIxvjk20cs7Pv+0NKA7hk4r4aaYUJt+oJPf8UynNoNCYZSsqjvincvG/GQ4
-         Z4fbrvqIEfC00iKWx7zOdSvdOPS31uO9dUBMuCDE2IOJlNfuiGYSX5KWdZB17gbxDb1Y
-         aphlWUaVTER5pCzBzZymIo3H+wiFrzoNr4x7aibYcwb3e8GmzbB1kw9aZzZQ1t4aa3f+
-         NzwjSn2UUPgZ/g9FUZeiGfdRAIL/JD8sduLp6sHxrMEn59BH9HXRs+eH4cMjELVQDfp6
-         /C2A==
-X-Gm-Message-State: AOJu0Yx+0tsvP+aavtl5UfGOKJF9lVlW6QdSvmbN/rbNXnkc4PQvzTjQ
-	CVBrqiqtJiQJj55DhbPdLaLe+0WqaVcTckBaj6L9rOOOsOJhu+o2SEaCHDqQiQIpPAfcSWJqTi0
-	vpizj2b2/RIJ1
-X-Received: by 2002:a7b:c456:0:b0:40c:2c0e:3196 with SMTP id l22-20020a7bc456000000b0040c2c0e3196mr5186728wmi.19.1702965347803;
-        Mon, 18 Dec 2023 21:55:47 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHowVO7lKB3MOL+A/CKiLkIv9N8i5/JKlj4/E3wj2xrXir9aL35NyPSezCLZgTgvF9mpsb7tQ==
-X-Received: by 2002:a7b:c456:0:b0:40c:2c0e:3196 with SMTP id l22-20020a7bc456000000b0040c2c0e3196mr5186723wmi.19.1702965347453;
-        Mon, 18 Dec 2023 21:55:47 -0800 (PST)
+        d=1e100.net; s=20230601; t=1702965502; x=1703570302;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6mjY6FtOd+1hsi8Ne7rCpA7JmaDnqNk0R9P4YeXVzbo=;
+        b=jC0hAxCOl7Ho8+cm59e291rXrFqGfYCoOydXhGyCAX4fH2q6VmUUuxR7BWqmhTvqdS
+         Z2Es9AyMlViC5SFIexW8+b822kuYT7K9tiUH5l0ObMn75TESna+dRp+HG+/VlMgycah1
+         aS28Fvqd9eOuyIsKSfesARlxw0cNvuHCESF7oAzmfOKUtIAfbAiwS2Jx6bji9Q8c9/uh
+         GLbFDp7Tn4LQMWyeOwlRhfUsoM8m86aSmFIU2ae7JyoawjIWagGD6VtdY+ci9qgEb327
+         G2Slpna2wbYNgdBwLo4W7tnhu0vefGVDjklmGJtRMlZBGsW9rEsx9wb1g7Xka8j/ZeFb
+         Ik9w==
+X-Gm-Message-State: AOJu0YzNv7tV/diVML/An72KE1n5rpFaRla11UtXhvZkPqs25yfh908F
+	rWtut7xO5P4iIA2IqAVUfCeCgJINjQW77DxA8bekR9vmsS12YpCTOp6+DBj/7sO59tKpLvtSIHD
+	dPtlFmU6ZRMAv
+X-Received: by 2002:a05:600c:b43:b0:40b:5e1e:cf2 with SMTP id k3-20020a05600c0b4300b0040b5e1e0cf2mr9680388wmr.45.1702965502783;
+        Mon, 18 Dec 2023 21:58:22 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFz16+/eFZgiNQVirPh02Ct1LQiSHhmArUBEOKyKs5gBOf73+IW2YYCSBJZse69DGosD/kKFQ==
+X-Received: by 2002:a05:600c:b43:b0:40b:5e1e:cf2 with SMTP id k3-20020a05600c0b4300b0040b5e1e0cf2mr9680377wmr.45.1702965502484;
+        Mon, 18 Dec 2023 21:58:22 -0800 (PST)
 Received: from [192.168.0.6] (ip-109-43-177-45.web.vodafone.de. [109.43.177.45])
-        by smtp.gmail.com with ESMTPSA id bg5-20020a05600c3c8500b0040c6ab53cd2sm1193821wmb.10.2023.12.18.21.55.46
+        by smtp.gmail.com with ESMTPSA id l2-20020a05600c4f0200b003feae747ff2sm1183821wmq.35.2023.12.18.21.58.21
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Dec 2023 21:55:47 -0800 (PST)
-Message-ID: <8969e76e-2fa1-4993-9164-42620a01e7d5@redhat.com>
-Date: Tue, 19 Dec 2023 06:55:45 +0100
+        Mon, 18 Dec 2023 21:58:22 -0800 (PST)
+Message-ID: <7cfe96f8-b483-476c-8d15-746fcdfb23a6@redhat.com>
+Date: Tue, 19 Dec 2023 06:58:20 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -73,15 +72,15 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v5 06/29] powerpc: Quiet QEMU TCG pseries
- capability warnings
+Subject: Re: [kvm-unit-tests PATCH v5 07/29] powerpc: Add a migration stress
+ tester
+Content-Language: en-US
 To: Nicholas Piggin <npiggin@gmail.com>, kvm@vger.kernel.org
 Cc: linuxppc-dev@lists.ozlabs.org, Laurent Vivier <lvivier@redhat.com>,
  Shaoqin Huang <shahuang@redhat.com>, Andrew Jones <andrew.jones@linux.dev>,
  Nico Boehr <nrb@linux.ibm.com>
 References: <20231216134257.1743345-1-npiggin@gmail.com>
- <20231216134257.1743345-7-npiggin@gmail.com>
-Content-Language: en-US
+ <20231216134257.1743345-8-npiggin@gmail.com>
 From: Thomas Huth <thuth@redhat.com>
 Autocrypt: addr=thuth@redhat.com; keydata=
  xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
@@ -125,35 +124,25 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20231216134257.1743345-7-npiggin@gmail.com>
+In-Reply-To: <20231216134257.1743345-8-npiggin@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 16/12/2023 14.42, Nicholas Piggin wrote:
-> Quieten this console spam.
+> This performs 1000 migrations a tight loop to flush out simple issues
+> in the multiple-migration code.
 > 
 > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 > ---
->   powerpc/run | 5 +++++
->   1 file changed, 5 insertions(+)
-> 
-> diff --git a/powerpc/run b/powerpc/run
-> index b353169f..e469f1eb 100755
-> --- a/powerpc/run
-> +++ b/powerpc/run
-> @@ -21,6 +21,11 @@ fi
->   
->   M='-machine pseries'
->   M+=",accel=$ACCEL$ACCEL_PROPS"
-> +
-> +if [[ "$ACCEL" == "tcg" ]] ; then
-> +	M+=",cap-cfpc=broken,cap-sbbc=broken,cap-ibs=broken,cap-ccf-assist=off"
-> +fi
+>   powerpc/Makefile.common |  1 +
+>   powerpc/migrate.c       | 64 +++++++++++++++++++++++++++++++++++++++++
+>   2 files changed, 65 insertions(+)
+>   create mode 100644 powerpc/migrate.c
 
-This also bugs me when I run QEMU with TCG manually and IMHO it should be 
-fixed in QEMU instead (e.g. by providing a different CPU model for TCG mode).
-Anyway, for the time being:
+You should likely add an entry to powerpc/unittests.cfg ...
+also, wouldn't it be better to extend the sprs.elf test for this, so that it 
+e.g. changes some stuff for each migration?
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+  Thomas
 
 
