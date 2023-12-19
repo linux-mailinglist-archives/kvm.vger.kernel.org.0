@@ -1,434 +1,315 @@
-Return-Path: <kvm+bounces-4811-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4812-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C75881891D
-	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 14:57:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAB8B81893D
+	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 15:03:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C660B22FA5
-	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 13:57:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D08D21C241CF
+	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 14:03:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD5E61B288;
-	Tue, 19 Dec 2023 13:57:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 530CB1C29D;
+	Tue, 19 Dec 2023 14:03:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ee+GSLH5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dMzHYC5a"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A70641A728
-	for <kvm@vger.kernel.org>; Tue, 19 Dec 2023 13:57:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B25BB1A5B9
+	for <kvm@vger.kernel.org>; Tue, 19 Dec 2023 14:03:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702994247;
+	s=mimecast20190719; t=1702994588;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=MnEkB3YngTbNnJEADr4KAVUClYyGSXeKM6nM2RaFhVM=;
-	b=Ee+GSLH5WBADBV4n01obUS/Yb8TnIhTlVnnP8Q+NgwLMMYPpQBFpJ2pleMthknWJ1v1dKH
-	cZYYvZv4GWqwtJR65/DcO8GPWQPNe01DWl7ax4+IoXiVzSAysH96sjnUprDyf0fjE2iVR6
-	DKIquzYp2oNFZW56TC+fY4LO9532t6Y=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+	 in-reply-to:in-reply-to:references:references;
+	bh=z7pBhfHOUQ5GeQwzcNE9zvKhjGxyQjhxQqPSb40q/TQ=;
+	b=dMzHYC5aB8lkiqqiiyRz7Y12siFXtU7npRc31OLATXz5kZHd/aUtCEft5OCfQFhvaXtUYz
+	LQ/aVwtr3aq/zXS2eb6ANiOJyUBWphiHusd7u5c3gip6o5em2T9nrKrfL4Ag87plE9wpX6
+	OjLtnwTs2gjZepIxiweGjNYlkg5tLNs=
+Received: from mail-yw1-f199.google.com (mail-yw1-f199.google.com
+ [209.85.128.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-517-kApjmhXFNjqm_6sA4jpFhA-1; Tue, 19 Dec 2023 08:57:26 -0500
-X-MC-Unique: kApjmhXFNjqm_6sA4jpFhA-1
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-77f4b757646so432025285a.2
-        for <kvm@vger.kernel.org>; Tue, 19 Dec 2023 05:57:26 -0800 (PST)
+ us-mta-529-znXBN3mkN7WQfMf85mt7-A-1; Tue, 19 Dec 2023 09:03:04 -0500
+X-MC-Unique: znXBN3mkN7WQfMf85mt7-A-1
+Received: by mail-yw1-f199.google.com with SMTP id 00721157ae682-5e744f7ca3bso19592177b3.2
+        for <kvm@vger.kernel.org>; Tue, 19 Dec 2023 06:03:04 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702994245; x=1703599045;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MnEkB3YngTbNnJEADr4KAVUClYyGSXeKM6nM2RaFhVM=;
-        b=gJHlW34THDRa/TrdcWQgrGQXqu1svwOuXtoKYy9msXVn4sV41fFROglOQQsTINHUq6
-         H9mx1299WKcG7Ljmqwk4Jt3Ldf8Erp6G3Eg1QceZS6M9lwpaI419+KO5pR0GojvBt/pw
-         tTpsgV7FpGpbttRDRZvmpIJhacBA5i/vFJWwd4/RPaVp1sYRyRZObpCGcD9NROmP7ovF
-         IKb6t8EkwPNWIWsDqGd7CQ42bepctyrHD/NRRldjaTakhhyy1W66SEfrzMk3S4oZ7Tbf
-         +uTa9gwY49mbvwUb32rH3gAUtGKZU96lTdOB+KkOrB+SF+Raz0fve34MBrUKV744Oz0y
-         zWFw==
-X-Gm-Message-State: AOJu0YynT5bUN/Adqd41GNfwaFUjY9c9iqS9mGgLr4+289NfLsAlKg91
-	HILfV47YNSfyEBdxSmZdwa4MCCgapeMVPRHf8ynwriTX4Q0ZPwaZYpomO6hn5g2S8IOiNEaXLGF
-	PrImjh/7D4t3j
-X-Received: by 2002:a05:620a:640e:b0:77e:fba3:a7bb with SMTP id pz14-20020a05620a640e00b0077efba3a7bbmr16666929qkn.153.1702994245776;
-        Tue, 19 Dec 2023 05:57:25 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEgT7LhlFykkK+d5SObE8MJ1RW0dahd9/hlzsXLOy7kpOXSaaZZhegEjcCJo2py8dhf/C5vkA==
-X-Received: by 2002:a05:620a:640e:b0:77e:fba3:a7bb with SMTP id pz14-20020a05620a640e00b0077efba3a7bbmr16666919qkn.153.1702994245481;
-        Tue, 19 Dec 2023 05:57:25 -0800 (PST)
-Received: from [192.168.0.6] (ip-109-43-177-45.web.vodafone.de. [109.43.177.45])
-        by smtp.gmail.com with ESMTPSA id oo22-20020a05620a531600b0077703f31496sm9113615qkn.92.2023.12.19.05.57.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Dec 2023 05:57:25 -0800 (PST)
-Message-ID: <feab6612-31f6-41bd-8ee9-89a19aa0e76c@redhat.com>
-Date: Tue, 19 Dec 2023 14:57:20 +0100
+        d=1e100.net; s=20230601; t=1702994584; x=1703599384;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=z7pBhfHOUQ5GeQwzcNE9zvKhjGxyQjhxQqPSb40q/TQ=;
+        b=wMMljweRAujlJr0IUmNihGdGzVubMDFUU3WigayWa7QZ/9EKBFAjfwYlc/gXhCI5od
+         GjCUsLVgRekn45lu/BnjhcccfkJnWj6QxtbZqMX8U8TBBGv2Vf9V8tdCi79yfS8M7l5c
+         qC+V2zZmTGqRsfl3UzNDQt5SIukTo9lPkFOz4O8nq/3jHlvnvFxvrayHH6BVcOayRhlk
+         X6qNV9ut63PVM8D7x/xXKn+3XGwi9crxGI799ttIMtwxsAEgKU+vGUU4jOYhUj8dwOQg
+         cQkoet28LAunh8h39LqEmQ8QXuKHB+6xD3cKl29MwUQP+XpSs7Tls45Bw4XFvSRWKVR2
+         jZlQ==
+X-Gm-Message-State: AOJu0YxkOdC90e4AUqLrF99tkdpfzQppI6Tw9Lu5v1Sn7AxgPYEUCHS0
+	xLRKa75AoszQmOasMIo/VNK1eT0RHIZHhGQqcMBUEd2z5mZJAqofHYRfc+HxGM6W5H/YGDYXVhj
+	BuN3hHZki3PutUPMif0m6Y366wpgp
+X-Received: by 2002:a5b:f81:0:b0:db5:41fe:30c with SMTP id q1-20020a5b0f81000000b00db541fe030cmr10513360ybh.64.1702994584010;
+        Tue, 19 Dec 2023 06:03:04 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEiU0YfzN07Vi8tPeRdLAu3jf0k0Strc/HI4vFI2e/A0/PT/h8UORzxQ4ReAVWzobSeFzElEt/DWZt36c0p7EQ=
+X-Received: by 2002:a5b:f81:0:b0:db5:41fe:30c with SMTP id q1-20020a5b0f81000000b00db541fe030cmr10513339ybh.64.1702994583529;
+ Tue, 19 Dec 2023 06:03:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v5 24/29] powerpc: interrupt tests
-Content-Language: en-US
-To: Nicholas Piggin <npiggin@gmail.com>, kvm@vger.kernel.org
-Cc: linuxppc-dev@lists.ozlabs.org, Laurent Vivier <lvivier@redhat.com>,
- Shaoqin Huang <shahuang@redhat.com>, Andrew Jones <andrew.jones@linux.dev>,
- Nico Boehr <nrb@linux.ibm.com>
-References: <20231216134257.1743345-1-npiggin@gmail.com>
- <20231216134257.1743345-25-npiggin@gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-In-Reply-To: <20231216134257.1743345-25-npiggin@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20231205104609.876194-1-dtatulea@nvidia.com> <20231205104609.876194-5-dtatulea@nvidia.com>
+ <CAJaqyWeEY9LNTE8QEnJgLhgS7HiXr5gJEwwPBrC3RRBsAE4_7Q@mail.gmail.com>
+ <27312106-07b9-4719-970c-b8e1aed7c4eb@oracle.com> <075cf7d1ada0ee4ee30d46b993a1fe21acfe9d92.camel@nvidia.com>
+ <20231214084526-mutt-send-email-mst@kernel.org> <9a6465a3d6c8fde63643fbbdde60d5dd84b921d4.camel@nvidia.com>
+ <CAJaqyWfF9eVehQ+wutMDdwYToMq=G1+War_7wANmnyuONj=18g@mail.gmail.com>
+ <9c387650e7c22118370fa0fe3588ee009ce56f11.camel@nvidia.com>
+ <0bfb42ee1248b82eaedd88bdc9e97e83919f2405.camel@nvidia.com>
+ <CAJaqyWdv5xAXp2jiAj=z+3+Bu+6=sXiE0HtOZrMSSZmvVsHeJw@mail.gmail.com>
+ <161c7e63d9c7f64afc959b1ea4a068ee2ddafa6c.camel@nvidia.com>
+ <CAJaqyWf=ZtoSDGdhYrJdXMQuFvahzF5FtWkdShBmTGaewvQLrw@mail.gmail.com>
+ <7c267819eb52f933251c118ba2d1ceb75043c5b2.camel@nvidia.com>
+ <CAJaqyWccZJFdfww-_vmj4kJvJkWKFt_VBWmujfVTsFxHohkiZg@mail.gmail.com>
+ <8fc4e1f156b075ec3f4c65acc1e10439f767bf81.camel@nvidia.com>
+ <CAJaqyWe-nfb4F2PxTKz3R=fKf6EZzSbKSPm_SwdXjxQCybVmdQ@mail.gmail.com> <60ed697361d5a366a3a9a7ce6c8d3602cba40491.camel@nvidia.com>
+In-Reply-To: <60ed697361d5a366a3a9a7ce6c8d3602cba40491.camel@nvidia.com>
+From: Eugenio Perez Martin <eperezma@redhat.com>
+Date: Tue, 19 Dec 2023 15:02:27 +0100
+Message-ID: <CAJaqyWcRnz5p0QzwbpFzdnpwJaH3JmMFBBV4Pux88yU6A0x5ZA@mail.gmail.com>
+Subject: Re: [PATCH vhost v2 4/8] vdpa/mlx5: Mark vq addrs for modification in
+ hw vq
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: "xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>, Parav Pandit <parav@nvidia.com>, 
+	Gal Pressman <gal@nvidia.com>, 
+	"virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"si-wei.liu@oracle.com" <si-wei.liu@oracle.com>, "mst@redhat.com" <mst@redhat.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, 
+	"jasowang@redhat.com" <jasowang@redhat.com>, "leon@kernel.org" <leon@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 16/12/2023 14.42, Nicholas Piggin wrote:
-> Add basic testing of various kinds of interrupts, machine check,
-> page fault, illegal, decrementer, trace, syscall, etc.
-> 
-> This has a known failure on QEMU TCG pseries machines where MSR[ME]
-> can be incorrectly set to 0.
-> 
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
->   lib/powerpc/asm/ppc_asm.h |  21 +-
->   powerpc/Makefile.common   |   3 +-
->   powerpc/interrupts.c      | 422 ++++++++++++++++++++++++++++++++++++++
->   powerpc/unittests.cfg     |   3 +
->   4 files changed, 445 insertions(+), 4 deletions(-)
->   create mode 100644 powerpc/interrupts.c
-> 
-> diff --git a/lib/powerpc/asm/ppc_asm.h b/lib/powerpc/asm/ppc_asm.h
-> index ef2d91dd..778e78ee 100644
-> --- a/lib/powerpc/asm/ppc_asm.h
-> +++ b/lib/powerpc/asm/ppc_asm.h
-> @@ -35,17 +35,32 @@
->   
->   #endif /* __BYTE_ORDER__ */
->   
-> +#define SPR_DSISR	0x012
-> +#define SPR_DAR		0x013
-> +#define SPR_DEC		0x016
-> +#define SPR_SRR0	0x01A
-> +#define SPR_SRR1	0x01B
-> +#define SPR_FSCR	0x099
-> +#define   FSCR_PREFIX	0x2000
-> +#define SPR_HDEC	0x136
->   #define SPR_HSRR0	0x13A
->   #define SPR_HSRR1	0x13B
-> +#define SPR_LPCR	0x13E
-> +#define   LPCR_HDICE	0x1UL
-> +#define SPR_HEIR	0x153
-> +#define SPR_SIAR	0x31C
->   
->   /* Machine State Register definitions: */
->   #define MSR_LE_BIT	0
->   #define MSR_EE_BIT	15			/* External Interrupts Enable */
->   #define MSR_HV_BIT	60			/* Hypervisor mode */
->   #define MSR_SF_BIT	63			/* 64-bit mode */
-> -#define MSR_ME		0x1000ULL
->   
-> -#define SPR_HSRR0	0x13A
-> -#define SPR_HSRR1	0x13B
-> +#define MSR_DR		0x0010ULL
-> +#define MSR_IR		0x0020ULL
-> +#define MSR_BE		0x0200ULL		/* Branch Trace Enable */
-> +#define MSR_SE		0x0400ULL		/* Single Step Enable */
-> +#define MSR_EE		0x8000ULL
-> +#define MSR_ME		0x1000ULL
->   
->   #endif /* _ASMPOWERPC_PPC_ASM_H */
-> diff --git a/powerpc/Makefile.common b/powerpc/Makefile.common
-> index a7af225b..b340a53b 100644
-> --- a/powerpc/Makefile.common
-> +++ b/powerpc/Makefile.common
-> @@ -11,7 +11,8 @@ tests-common = \
->   	$(TEST_DIR)/rtas.elf \
->   	$(TEST_DIR)/emulator.elf \
->   	$(TEST_DIR)/tm.elf \
-> -	$(TEST_DIR)/sprs.elf
-> +	$(TEST_DIR)/sprs.elf \
-> +	$(TEST_DIR)/interrupts.elf
->   
->   tests-all = $(tests-common) $(tests)
->   all: directories $(TEST_DIR)/boot_rom.bin $(tests-all)
-> diff --git a/powerpc/interrupts.c b/powerpc/interrupts.c
-> new file mode 100644
-> index 00000000..3217b15e
-> --- /dev/null
-> +++ b/powerpc/interrupts.c
-> @@ -0,0 +1,422 @@
-> +/*
-> + * Test interrupts
-> + *
-> + * This work is licensed under the terms of the GNU LGPL, version 2.
-> + */
-> +#include <libcflat.h>
-> +#include <util.h>
-> +#include <migrate.h>
-> +#include <alloc.h>
-> +#include <asm/handlers.h>
-> +#include <asm/hcall.h>
-> +#include <asm/processor.h>
-> +#include <asm/barrier.h>
-> +
-> +#define SPR_LPCR	0x13E
-> +#define LPCR_HDICE	0x1UL
-> +#define SPR_DEC		0x016
-> +#define SPR_HDEC	0x136
-> +
-> +#define MSR_DR		0x0010ULL
-> +#define MSR_IR		0x0020ULL
-> +#define MSR_EE		0x8000ULL
-> +#define MSR_ME		0x1000ULL
+On Tue, Dec 19, 2023 at 12:16=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia.co=
+m> wrote:
+>
+> On Tue, 2023-12-19 at 08:24 +0100, Eugenio Perez Martin wrote:
+> > On Mon, Dec 18, 2023 at 2:58=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia=
+.com> wrote:
+> > >
+> > > On Mon, 2023-12-18 at 13:06 +0100, Eugenio Perez Martin wrote:
+> > > > On Mon, Dec 18, 2023 at 11:52=E2=80=AFAM Dragos Tatulea <dtatulea@n=
+vidia.com> wrote:
+> > > > >
+> > > > > On Mon, 2023-12-18 at 11:16 +0100, Eugenio Perez Martin wrote:
+> > > > > > On Sat, Dec 16, 2023 at 12:03=E2=80=AFPM Dragos Tatulea <dtatul=
+ea@nvidia.com> wrote:
+> > > > > > >
+> > > > > > > On Fri, 2023-12-15 at 18:56 +0100, Eugenio Perez Martin wrote=
+:
+> > > > > > > > On Fri, Dec 15, 2023 at 3:13=E2=80=AFPM Dragos Tatulea <dta=
+tulea@nvidia.com> wrote:
+> > > > > > > > >
+> > > > > > > > > On Fri, 2023-12-15 at 12:35 +0000, Dragos Tatulea wrote:
+> > > > > > > > > > On Thu, 2023-12-14 at 19:30 +0100, Eugenio Perez Martin=
+ wrote:
+> > > > > > > > > > > On Thu, Dec 14, 2023 at 4:51=E2=80=AFPM Dragos Tatule=
+a <dtatulea@nvidia.com> wrote:
+> > > > > > > > > > > >
+> > > > > > > > > > > > On Thu, 2023-12-14 at 08:45 -0500, Michael S. Tsirk=
+in wrote:
+> > > > > > > > > > > > > On Thu, Dec 14, 2023 at 01:39:55PM +0000, Dragos =
+Tatulea wrote:
+> > > > > > > > > > > > > > On Tue, 2023-12-12 at 15:44 -0800, Si-Wei Liu w=
+rote:
+> > > > > > > > > > > > > > >
+> > > > > > > > > > > > > > > On 12/12/2023 11:21 AM, Eugenio Perez Martin =
+wrote:
+> > > > > > > > > > > > > > > > On Tue, Dec 5, 2023 at 11:46=E2=80=AFAM Dra=
+gos Tatulea <dtatulea@nvidia.com> wrote:
+> > > > > > > > > > > > > > > > > Addresses get set by .set_vq_address. hw =
+vq addresses will be updated on
+> > > > > > > > > > > > > > > > > next modify_virtqueue.
+> > > > > > > > > > > > > > > > >
+> > > > > > > > > > > > > > > > > Signed-off-by: Dragos Tatulea <dtatulea@n=
+vidia.com>
+> > > > > > > > > > > > > > > > > Reviewed-by: Gal Pressman <gal@nvidia.com=
+>
+> > > > > > > > > > > > > > > > > Acked-by: Eugenio P=C3=A9rez <eperezma@re=
+dhat.com>
+> > > > > > > > > > > > > > > > I'm kind of ok with this patch and the next=
+ one about state, but I
+> > > > > > > > > > > > > > > > didn't ack them in the previous series.
+> > > > > > > > > > > > > > > >
+> > > > > > > > > > > > > > > > My main concern is that it is not valid to =
+change the vq address after
+> > > > > > > > > > > > > > > > DRIVER_OK in VirtIO, which vDPA follows. On=
+ly memory maps are ok to
+> > > > > > > > > > > > > > > > change at this moment. I'm not sure about v=
+q state in vDPA, but vhost
+> > > > > > > > > > > > > > > > forbids changing it with an active backend.
+> > > > > > > > > > > > > > > >
+> > > > > > > > > > > > > > > > Suspend is not defined in VirtIO at this mo=
+ment though, so maybe it is
+> > > > > > > > > > > > > > > > ok to decide that all of these parameters m=
+ay change during suspend.
+> > > > > > > > > > > > > > > > Maybe the best thing is to protect this wit=
+h a vDPA feature flag.
+> > > > > > > > > > > > > > > I think protect with vDPA feature flag could =
+work, while on the other
+> > > > > > > > > > > > > > > hand vDPA means vendor specific optimization =
+is possible around suspend
+> > > > > > > > > > > > > > > and resume (in case it helps performance), wh=
+ich doesn't have to be
+> > > > > > > > > > > > > > > backed by virtio spec. Same applies to vhost =
+user backend features,
+> > > > > > > > > > > > > > > variations there were not backed by spec eith=
+er. Of course, we should
+> > > > > > > > > > > > > > > try best to make the default behavior backwar=
+d compatible with
+> > > > > > > > > > > > > > > virtio-based backend, but that circles back t=
+o no suspend definition in
+> > > > > > > > > > > > > > > the current virtio spec, for which I hope we =
+don't cease development on
+> > > > > > > > > > > > > > > vDPA indefinitely. After all, the virtio base=
+d vdap backend can well
+> > > > > > > > > > > > > > > define its own feature flag to describe (mino=
+r difference in) the
+> > > > > > > > > > > > > > > suspend behavior based on the later spec once=
+ it is formed in future.
+> > > > > > > > > > > > > > >
+> > > > > > > > > > > > > > So what is the way forward here? From what I un=
+derstand the options are:
+> > > > > > > > > > > > > >
+> > > > > > > > > > > > > > 1) Add a vdpa feature flag for changing device =
+properties while suspended.
+> > > > > > > > > > > > > >
+> > > > > > > > > > > > > > 2) Drop these 2 patches from the series for now=
+. Not sure if this makes sense as
+> > > > > > > > > > > > > > this. But then Si-Wei's qemu device suspend/res=
+ume poc [0] that exercises this
+> > > > > > > > > > > > > > code won't work anymore. This means the series =
+would be less well tested.
+> > > > > > > > > > > > > >
+> > > > > > > > > > > > > > Are there other possible options? What do you t=
+hink?
+> > > > > > > > > > > > > >
+> > > > > > > > > > > > > > [0] https://github.com/siwliu-kernel/qemu/tree/=
+svq-resume-wip
+> > > > > > > > > > > > >
+> > > > > > > > > > > > > I am fine with either of these.
+> > > > > > > > > > > > >
+> > > > > > > > > > > > How about allowing the change only under the follow=
+ing conditions:
+> > > > > > > > > > > >   vhost_vdpa_can_suspend && vhost_vdpa_can_resume &=
+&
+> > > > > > > > > > > > VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK is set
+> > > > > > > > > > > >
+> > > > > > > > > > > > ?
+> > > > > > > > > > >
+> > > > > > > > > > > I think the best option by far is 1, as there is no h=
+int in the
+> > > > > > > > > > > combination of these 3 indicating that you can change=
+ device
+> > > > > > > > > > > properties in the suspended state.
+> > > > > > > > > > >
+> > > > > > > > > > Sure. Will respin a v3 without these two patches.
+> > > > > > > > > >
+> > > > > > > > > > Another series can implement option 2 and add these 2 p=
+atches on top.
+> > > > > > > > > Hmm...I misunderstood your statement and sent a erroneus =
+v3. You said that
+> > > > > > > > > having a feature flag is the best option.
+> > > > > > > > >
+> > > > > > > > > Will add a feature flag in v4: is this similar to the
+> > > > > > > > > VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK flag?
+> > > > > > > > >
+> > > > > > > >
+> > > > > > > > Right, it should be easy to return it from .get_backend_fea=
+tures op if
+> > > > > > > > the FW returns that capability, isn't it?
+> > > > > > > >
+> > > > > > > Yes, that's easy. But I wonder if we need one feature bit for=
+ each type of
+> > > > > > > change:
+> > > > > > > - VHOST_BACKEND_F_CHANGEABLE_VQ_ADDR_IN_SUSPEND
+> > > > > > > - VHOST_BACKEND_F_CHANGEABLE_VQ_STATE_IN_SUSPEND
+> > > > > > >
+> > > > > >
+> > > > > > I'd say yes. Although we could configure SVQ initial state in u=
+serland
+> > > > > > as different than 0 for this first step, it would be needed in =
+the
+> > > > > > long term.
+> > > > > >
+> > > > > > > Or would a big one VHOST_BACKEND_F_CAN_RECONFIG_VQ_IN_SUSPEND=
+ suffice?
+> > > > > > >
+> > > > > >
+> > > > > > I'd say "reconfig vq" is not valid as mlx driver doesn't allow
+> > > > > > changing queue sizes, for example, isn't it?
+> > > > > >
+> > > > > Modifying the queue size for a vq is indeed not supported by the =
+mlx device.
+> > > > >
+> > > > > > To define that it is
+> > > > > > valid to change "all parameters" seems very confident.
+> > > > > >
+> > > > > Ack
+> > > > >
+> > > > > > > To me having individual feature bits makes sense. But it coul=
+d also takes too
+> > > > > > > many bits if more changes are required.
+> > > > > > >
+> > > > > >
+> > > > > > Yes, that's a good point. Maybe it is valid to define a subset =
+of
+> > > > > > features that can be changed., but I think it is way clearer to=
+ just
+> > > > > > check for individual feature bits.
+> > > > > >
+> > > > > I will prepare extra patches with the 2 feature bits approach.
+> > > > >
+> > > > > Is it necessary to add checks in the vdpa core that block changin=
+g these
+> > > > > properties if the state is driver ok and the device doesn't suppo=
+rt the feature?
+> > > > >
+> > > >
+> > > > Yes, I think it is better to protect for changes in vdpa core.
+> > > >
+> > > Hmmm... there is no suspended state available. I would only add check=
+s for the
+> > > DRIVER_OK state of the device because adding a is_suspended state/op =
+seems out
+> > > of scope for this series. Any thoughts?
+> > >
+> >
+> > I can develop it so you can include it in your series for sure, I will
+> > send it ASAP.
+> >
+> If it's a matter of:
+> - Adding a suspended state to struct vhost_vdpa.
+> - Setting it to true on successful device suspend.
+> - Clearing it on successful device resume and device reset.
+>
+> I can add this patch. I'm just not sure about the locking part. But maybe=
+ I can
+> send it and we can debate on the code.
+>
 
-Why don't you use the definitions from ppc_asm.h above?
+Yes, that was the plan basically.
 
-> +static bool cpu_has_heir(void)
-> +{
-> +	uint32_t pvr = mfspr(287);	/* Processor Version Register */
-> +
-> +	if (!machine_is_powernv())
-> +		return false;
-> +
-> +	/* POWER6 has HEIR, but QEMU powernv support does not go that far */
-> +	switch (pvr >> 16) {
-> +	case 0x4b:			/* POWER8E */
-> +	case 0x4c:			/* POWER8NVL */
-> +	case 0x4d:			/* POWER8 */
-> +	case 0x4e:			/* POWER9 */
-> +	case 0x80:			/* POWER10 */
+I think vhost_vdpa_suspend / vhost_vdpa_resume are already called from
+vhost_vdpa_unlocked_ioctl with the lock acquired, is that what you
+mean?
 
-I'd suggest to introduce some #defines for those PVR values instead of using 
-magic numbers all over the place?
-
-> +		return true;
-> +	default:
-> +		return false;
-> +	}
-> +}
-> +
-> +static bool cpu_has_prefix(void)
-> +{
-> +	uint32_t pvr = mfspr(287);	/* Processor Version Register */
-> +	switch (pvr >> 16) {
-> +	case 0x80:			/* POWER10 */
-> +		return true;
-> +	default:
-> +		return false;
-> +	}
-> +}
-> +
-> +static bool cpu_has_lev_in_srr1(void)
-> +{
-> +	uint32_t pvr = mfspr(287);	/* Processor Version Register */
-> +	switch (pvr >> 16) {
-> +	case 0x80:			/* POWER10 */
-> +		return true;
-> +	default:
-> +		return false;
-> +	}
-> +}
-> +
-> +static bool regs_is_prefix(volatile struct pt_regs *regs)
-> +{
-> +	return (regs->msr >> (63-34)) & 1;
-
-You introduced a bunch of new #define MSR_xx statements ... why not for this 
-one, too?
-
-> +}
-> +
-> +static void regs_advance_insn(struct pt_regs *regs)
-> +{
-> +	if (regs_is_prefix(regs))
-> +		regs->nip += 8;
-> +	else
-> +		regs->nip += 4;
-> +}
-> +
-> +static volatile bool got_interrupt;
-> +static volatile struct pt_regs recorded_regs;
-> +
-> +static void mce_handler(struct pt_regs *regs, void *opaque)
-> +{
-> +	got_interrupt = true;
-> +	memcpy((void *)&recorded_regs, regs, sizeof(struct pt_regs));
-> +	regs_advance_insn(regs);
-> +}
-> +
-> +static void test_mce(void)
-> +{
-> +	unsigned long addr = -4ULL;
-> +	uint8_t tmp;
-> +
-> +	handle_exception(0x200, mce_handler, NULL);
-> +
-> +	if (machine_is_powernv()) {
-> +		enable_mcheck();
-> +	} else {
-> +		report(mfmsr() & MSR_ME, "pseries machine has MSR[ME]=1");
-> +		if (!(mfmsr() & MSR_ME)) { /* try to fix it */
-> +			enable_mcheck();
-> +		}
-> +		if (mfmsr() & MSR_ME) {
-> +			disable_mcheck();
-> +			report(mfmsr() & MSR_ME, "pseries is unable to change MSR[ME]");
-> +			if (!(mfmsr() & MSR_ME)) { /* try to fix it */
-> +				enable_mcheck();
-> +			}
-> +		}
-> +	}
-> +
-> +	asm volatile("lbz %0,0(%1)" : "=r"(tmp) : "r"(addr));
-> +
-> +	report(got_interrupt, "MCE on access to invalid real address");
-> +	report(mfspr(SPR_DAR) == addr, "MCE sets DAR correctly");
-> +	got_interrupt = false;
-> +}
-> +
-> +static void dseg_handler(struct pt_regs *regs, void *data)
-> +{
-> +	got_interrupt = true;
-> +	memcpy((void *)&recorded_regs, regs, sizeof(struct pt_regs));
-> +	regs_advance_insn(regs);
-> +	regs->msr &= ~MSR_DR;
-> +}
-> +
-> +static void test_dseg(void)
-> +{
-> +	uint64_t msr, tmp;
-> +
-> +	report_prefix_push("data segment");
-> +
-> +	/* Some HV start in radix mode and need 0x300 */
-> +	handle_exception(0x300, &dseg_handler, NULL);
-> +	handle_exception(0x380, &dseg_handler, NULL);
-> +
-> +	asm volatile(
-> +"		mfmsr	%0		\n \
-> +		ori	%0,%0,%2	\n \
-> +		mtmsrd	%0		\n \
-> +		lbz	%1,0(0)		"
-> +		: "=r"(msr), "=r"(tmp) : "i"(MSR_DR): "memory");
-> +
-> +	report(got_interrupt, "interrupt on NULL dereference");
-> +	got_interrupt = false;
-> +
-> +	handle_exception(0x300, NULL, NULL);
-> +	handle_exception(0x380, NULL, NULL);
-> +
-> +	report_prefix_pop();
-> +}
-> +
-> +static void dec_handler(struct pt_regs *regs, void *data)
-> +{
-> +	got_interrupt = true;
-> +	memcpy((void *)&recorded_regs, regs, sizeof(struct pt_regs));
-> +	regs->msr &= ~MSR_EE;
-> +}
-> +
-> +static void test_dec(void)
-> +{
-> +	uint64_t msr;
-> +
-> +	report_prefix_push("decrementer");
-> +
-> +	handle_exception(0x900, &dec_handler, NULL);
-> +
-> +	asm volatile(
-> +"		mtdec	%1		\n \
-> +		mfmsr	%0		\n \
-> +		ori	%0,%0,%2	\n \
-> +		mtmsrd	%0,1		"
-> +		: "=r"(msr) : "r"(10000), "i"(MSR_EE): "memory");
-> +
-> +	while (!got_interrupt)
-> +		;
-
-Maybe add a timeout (in case the interrupt never fires)?
-
-> +	report(got_interrupt, "interrupt on decrementer underflow");
-> +	got_interrupt = false;
-> +
-> +	handle_exception(0x900, NULL, NULL);
-> +
-> +	if (!machine_is_powernv())
-> +		goto done;
-> +
-> +	handle_exception(0x980, &dec_handler, NULL);
-> +
-> +	mtspr(SPR_LPCR, mfspr(SPR_LPCR) | LPCR_HDICE);
-> +	asm volatile(
-> +"		mtspr	0x136,%1	\n \
-> +		mtdec	%3		\n \
-> +		mfmsr	%0		\n \
-> +		ori	%0,%0,%2	\n \
-> +		mtmsrd	%0,1		"
-> +		: "=r"(msr) : "r"(10000), "i"(MSR_EE), "r"(0x7fffffff): "memory");
-> +
-> +	while (!got_interrupt)
-> +		;
-
-dito?
-
-> +	mtspr(SPR_LPCR, mfspr(SPR_LPCR) & ~LPCR_HDICE);
-> +
-> +	report(got_interrupt, "interrupt on hdecrementer underflow");
-> +	got_interrupt = false;
-> +
-> +	handle_exception(0x980, NULL, NULL);
-> +
-> +done:
-> +	report_prefix_pop();
-> +}
-
-  Thomas
-
+Thanks!
 
 
