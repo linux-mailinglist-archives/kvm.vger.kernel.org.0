@@ -1,152 +1,163 @@
-Return-Path: <kvm+bounces-4761-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4762-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB5F9818042
-	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 04:40:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F414381804D
+	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 04:54:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79B95284210
-	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 03:40:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84EFD285C11
+	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 03:54:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3038B11725;
-	Tue, 19 Dec 2023 03:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20E1DC130;
+	Tue, 19 Dec 2023 03:54:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tg1HrtQT"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="D/4OGzgJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9A5B11709
-	for <kvm@vger.kernel.org>; Tue, 19 Dec 2023 03:40:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5411BE56
+	for <kvm@vger.kernel.org>; Tue, 19 Dec 2023 03:54:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-54744e66d27so8320a12.0
-        for <kvm@vger.kernel.org>; Mon, 18 Dec 2023 19:40:26 -0800 (PST)
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5534180f0e9so5143a12.1
+        for <kvm@vger.kernel.org>; Mon, 18 Dec 2023 19:54:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702957225; x=1703562025; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1702958041; x=1703562841; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=k5FUuLgaGf3Ehy+dGQ0rAjiQIaBVuk5PDJgLlbYNQhA=;
-        b=tg1HrtQTUJr+jmA51KV4kTaaw6bEeT3PaFc1lls55Cda+P5Zdg9M0m4F/iXHht+kVS
-         cHqHw14q1HOR+Pq1SBXXq6qpPXUL0YWzLkfhDcqMesABCX7T4C3Cn5UvdIGhCtKPfh6D
-         tL4w0/a1DY07VKnmy0vVCjgOFUuz5+lIdp2sgUgs6NkRyo6J1HF4zdgFgcr4sMlydCHD
-         0/fmEHuTJp/gxnoe2GnxQ4S2Npp2xaiAAVxWfaT1e5BwM8YJJD9vGzU8+Bpq/ghRhEdd
-         HbhQTQveP/iyzwif/Ami/G7IqQsnSw1cwBgJhsYawoLRmagYAQVlkT+9btblGFTLdlx2
-         o9FA==
+        bh=Iy2IztVRXYniuUXW1tQyYprWZIpRHnU4kupTPbOUIiw=;
+        b=D/4OGzgJRuH+EmHhahDvvXm14xPv9IC6beccImb1Y4tsPaaBu3+4RzhVMXcqQHW/U+
+         AJSugPHkTOX9derzmCWhqaYpFw4OEf0/WuORGH+CTE/l7mrOzSABpzNy3JwfXE7++X9b
+         r0c6ZnbMQOsqJ0ASWdZ9sHF0gRHDPbJPtRbrUfWst25Al+1tbCtE5BpdtCsk52vQ8/eW
+         vUi/A0NPE33p5OJUYtFnNrlI0k/7LwNmEupWI7Eyi7e7XvpynqxxqSulQgZFqMl59jHc
+         Mdn7eJO+sgzE2sBD2ri0p2yDuRafiOZKQbmjHLihfRWqnFO9OdBk+xr31EjlulP73wN/
+         8Qxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702957225; x=1703562025;
+        d=1e100.net; s=20230601; t=1702958041; x=1703562841;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=k5FUuLgaGf3Ehy+dGQ0rAjiQIaBVuk5PDJgLlbYNQhA=;
-        b=AwQSKugbCzMAh6D/cCTW7c85cHy5MGZH9n4a+WrN8GwYtL7lbevVD4jm9NdVutfaRm
-         3Ox9u9HgI2IfcgDD3WSO3MwlLxm0Q1kTbNHcXNfQq3vchzGQS6EQ6djDKe6PPoQynKKV
-         yhaK4Vw9oxBvWvJhuo/SkTXwOh9Cx27a4t4wkHVJDJE8GtIsJ2yQCnN4KQHs8TZ8D0+x
-         lHbPdnCVQ3SBsACOsLhCoEo2L3i3WmV1lwu86uxNIrbWpMLYXSIYCKcmwv8MOa8BIu6i
-         N4RRJ33L99aKlVOnh7RG/lUkT/XCPNdPQ20ON+E5yBRsmwv9aCPZaG7a2fJzqZ+zneL2
-         MgzA==
-X-Gm-Message-State: AOJu0YxtWUwTWQWiPq+9AGD2Zgpj9aqSBz0Ir7cIi/50Z6DjWUtAK+Or
-	qdTTCbVpKzSIzbg+jre+ldXqjQ53LE/aWIy3jnqp9jxWK5lU
-X-Google-Smtp-Source: AGHT+IEqgRZMP0DxMI1ohL2C9I2Lr9A0Ajqd+W8Y92PHxfhD22/wRIhfTj+Idlin9DYhrqQfrw2UgadH4Oz1KMpfaTU=
-X-Received: by 2002:a50:d488:0:b0:553:479c:d9c2 with SMTP id
- s8-20020a50d488000000b00553479cd9c2mr120412edi.4.1702957224903; Mon, 18 Dec
- 2023 19:40:24 -0800 (PST)
+        bh=Iy2IztVRXYniuUXW1tQyYprWZIpRHnU4kupTPbOUIiw=;
+        b=IXOuE6iCdrg2V7tM2R47NoIElniuoHvuwBNfFDV/Va85Ry7Z97D/si/3pDP6dUHFnu
+         J/Cq8tWPt5637EYh3W6dxN2j/YStQXyxKhb5HjvCOceOa/Qt59ud5fpf6Iti5ychrA1t
+         PST6CK5x6pgBbovk9fQ0a397ialL8ohV9SqvjULt9ueHm/psmqkJUIvn0Vibt5nJ5Vut
+         BOWWCmLyMeucc53urwDhk5bHp7LJbAhla4aE/ruYIHOBL+k2hPTW7XjQUecFH44EUusT
+         NcMEyFfTRHkh32nLQL5XHSuIScP5fOqjZhADfpJH4SisMfCDiJQ8AetyLRsZqmLoLSOJ
+         PVJw==
+X-Gm-Message-State: AOJu0YyxXZPQduw/jSqxchY2D4xidFDpMnWvesqT8wXwmvtaf97J1iwz
+	w9s9rcgmnhs5MI0Fc32djF9TVHfpKuPZggiORgGczwaUZSKd
+X-Google-Smtp-Source: AGHT+IEEcf01KRStT8R0i4hzxGzlAiUGsWXmaILFfg25YRZNXMoDFFcG0M3wdkS8X8RotCCvWrJjEr2hrXUssL2tqKw=
+X-Received: by 2002:a50:d613:0:b0:553:44c8:cfc9 with SMTP id
+ x19-20020a50d613000000b0055344c8cfc9mr113134edi.0.1702958040896; Mon, 18 Dec
+ 2023 19:54:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231218140543.870234-1-tao1.su@linux.intel.com>
- <20231218140543.870234-2-tao1.su@linux.intel.com> <ZYBhl200jZpWDqpU@google.com>
- <ZYEFGQBti5DqlJiu@chao-email>
-In-Reply-To: <ZYEFGQBti5DqlJiu@chao-email>
+References: <cover.1699936040.git.isaku.yamahata@intel.com>
+ <1c12f378af7de16d7895f8badb18c3b1715e9271.1699936040.git.isaku.yamahata@intel.com>
+ <938efd3cfcb25d828deab0cc0ba797177cc69602.camel@redhat.com>
+ <ZXo54VNuIqbMsYv-@google.com> <aa7aa5ea5b112a0ec70c6276beb281e19c052f0e.camel@redhat.com>
+ <ZXswR04H9Tl7xlyj@google.com> <20231219014045.GA2639779@ls.amr.corp.intel.com>
+In-Reply-To: <20231219014045.GA2639779@ls.amr.corp.intel.com>
 From: Jim Mattson <jmattson@google.com>
-Date: Mon, 18 Dec 2023 19:40:11 -0800
-Message-ID: <CALMp9eSJT7PajjX==L9eLKEEVuL-tvY0yN1gXmtzW5EUKHX3Yg@mail.gmail.com>
-Subject: Re: [PATCH 1/2] x86: KVM: Limit guest physical bits when 5-level EPT
- is unsupported
-To: Chao Gao <chao.gao@intel.com>
-Cc: Sean Christopherson <seanjc@google.com>, Tao Su <tao1.su@linux.intel.com>, kvm@vger.kernel.org, 
-	pbonzini@redhat.com, eddie.dong@intel.com, xiaoyao.li@intel.com, 
-	yuan.yao@linux.intel.com, yi1.lai@intel.com, xudong.hao@intel.com, 
-	chao.p.peng@intel.com
+Date: Mon, 18 Dec 2023 19:53:45 -0800
+Message-ID: <CALMp9eRgWct3bb5en0=geT0HmMemipkzXkjL9kmEAV+1yJg-pw@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] KVM: x86: Make the hardcoded APIC bus frequency vm variable
+To: Isaku Yamahata <isaku.yamahata@linux.intel.com>
+Cc: Sean Christopherson <seanjc@google.com>, Maxim Levitsky <mlevitsk@redhat.com>, isaku.yamahata@intel.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com, 
+	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com, 
+	Vishal Annapurve <vannapurve@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 18, 2023 at 6:51=E2=80=AFPM Chao Gao <chao.gao@intel.com> wrote=
-:
+On Mon, Dec 18, 2023 at 5:40=E2=80=AFPM Isaku Yamahata
+<isaku.yamahata@linux.intel.com> wrote:
 >
-> On Mon, Dec 18, 2023 at 07:13:27AM -0800, Sean Christopherson wrote:
-> >On Mon, Dec 18, 2023, Tao Su wrote:
-> >> When host doesn't support 5-level EPT, bits 51:48 of the guest physica=
-l
-> >> address must all be zero, otherwise an EPT violation always occurs and
-> >> current handler can't resolve this if the gpa is in RAM region. Hence,
-> >> instruction will keep being executed repeatedly, which causes infinite
-> >> EPT violation.
-> >>
-> >> Six KVM selftests are timeout due to this issue:
-> >>     kvm:access_tracking_perf_test
-> >>     kvm:demand_paging_test
-> >>     kvm:dirty_log_test
-> >>     kvm:dirty_log_perf_test
-> >>     kvm:kvm_page_table_test
-> >>     kvm:memslot_modification_stress_test
-> >>
-> >> The above selftests add a RAM region close to max_gfn, if host has 52
-> >> physical bits but doesn't support 5-level EPT, these will trigger infi=
-nite
-> >> EPT violation when access the RAM region.
-> >>
-> >> Since current Intel CPUID doesn't report max guest physical bits like =
-AMD,
-> >> introduce kvm_mmu_tdp_maxphyaddr() to limit guest physical bits when t=
-dp is
-> >> enabled and report the max guest physical bits which is smaller than h=
-ost.
-> >>
-> >> When guest physical bits is smaller than host, some GPA are illegal fr=
-om
-> >> guest's perspective, but are still legal from hardware's perspective,
-> >> which should be trapped to inject #PF. Current KVM already has a param=
-eter
-> >> allow_smaller_maxphyaddr to support the case when guest.MAXPHYADDR <
-> >> host.MAXPHYADDR, which is disabled by default when EPT is enabled, use=
-r
-> >> can enable it when loading kvm-intel module. When allow_smaller_maxphy=
-addr
-> >> is enabled and guest accesses an illegal address from guest's perspect=
-ive,
-> >> KVM will utilize EPT violation and emulate the instruction to inject #=
-PF
-> >> and determine #PF error code.
+> On Thu, Dec 14, 2023 at 08:41:43AM -0800,
+> Sean Christopherson <seanjc@google.com> wrote:
+>
+> > On Thu, Dec 14, 2023, Maxim Levitsky wrote:
+> > > On Wed, 2023-12-13 at 15:10 -0800, Sean Christopherson wrote:
+> > > > Upstream KVM's non-TDX behavior is fine, because KVM doesn't advert=
+ise support
+> > > > for CPUID 0x15, i.e. doesn't announce to host userspace that it's s=
+afe to expose
+> > > > CPUID 0x15 to the guest.  Because TDX makes exposing CPUID 0x15 man=
+datory, KVM
+> > > > needs to be taught to correctly emulate the guest's APIC bus freque=
+ncy, a.k.a.
+> > > > the TDX guest core crystal frequency of 25Mhz.
+> > >
+> > > I assume that TDX doesn't allow to change the CPUID 0x15 leaf.
 > >
-> >No, fix the selftests, it's not KVM's responsibility to advertise the co=
-rrect
-> >guest.MAXPHYADDR.
+> > Correct.  I meant to call that out below, but left my sentence half-fin=
+ished.  It
+> > was supposed to say:
+> >
+> >   I halfheartedly floated the idea of "fixing" the TDX module/architect=
+ure to either
+> >   use 1Ghz as the base frequency or to allow configuring the base frequ=
+ency
+> >   advertised to the guest.
+> >
+> > > > I halfheartedly floated the idea of "fixing" the TDX module/archite=
+cture to either
+> > > > use 1Ghz as the base frequency (off list), but it definitely isn't =
+a hill worth
+> > > > dying on since the KVM changes are relatively simple.
+> > > >
+> > > > https://lore.kernel.org/all/ZSnIKQ4bUavAtBz6@google.com
+> > > >
+> > >
+> > > Best regards,
+> > >     Maxim Levitsky
 >
-> In this case, host.MAXPHYADDR is 52 and EPT supports 4-level only thus ca=
-n
-> translate up to 48 bits of GPA.
+> The followings are the updated version of the commit message.
+>
+>
+> KVM: x86: Make the hardcoded APIC bus frequency VM variable
+>
+> The TDX architecture hard-codes the APIC bus frequency to 25MHz in the
+> CPUID leaf 0x15.  The
+> TDX mandates it to be exposed and doesn't allow the VMM to override
+> its value.  The KVM APIC timer emulation hard-codes the frequency to
+> 1GHz.  It doesn't unconditionally enumerate it to the guest unless the
+> user space VMM sets the CPUID leaf 0x15 by KVM_SET_CPUID.
+>
+> If the CPUID leaf 0x15 is enumerated, the guest kernel uses it as the
+> APIC bus frequency.  If not, the guest kernel measures the frequency
+> based on other known timers like the ACPI timer or the legacy PIT.
+> The TDX guest kernel gets timer interrupt more times by 1GHz / 25MHz.
+>
+> To ensure that the guest doesn't have a conflicting view of the APIC
+> bus frequency, allow the userspace to tell KVM to use the same
+> frequency that TDX mandates instead of the default 1Ghz.
+>
+> There are several options to address this.
+> 1. Make the KVM able to configure APIC bus frequency (This patch).
+>    Pros: It resembles the existing hardware.  The recent Intel CPUs
+>    adapts 25MHz.
+>    Cons: Require the VMM to emulate the APIC timer at 25MHz.
+> 2. Make the TDX architecture enumerate CPUID 0x15 to configurable
+>    frequency or not enumerate it.
+>    Pros: Any APIC bus frequency is allowed.
+>    Cons: Deviation from the real hardware.
+> 3. Make the TDX guest kernel use 1GHz when it's running on KVM.
+>    Cons: The kernel ignores CPUID leaf 0x15.
 
-There are a number of issues that KVM does not handle when
-guest.MAXPHYADDR < host.MAXPHYADDR. For starters, KVM doesn't raise a
-#GP in PAE mode when one of the address bits above guest.MAXPHYADDR is
-set in one of the PDPTRs.
+4. Change CPUID.15H under TDX to report the crystal clock frequency as 1 GH=
+z.
+Pro: This has been the virtual APIC frequency for KVM guests for 13 years.
+Pro: This requires changing only one hard-coded constant in TDX.
 
-Honestly, I think KVM should just disable EPT if the EPT tables can't
-support the CPU's physical address width.
-
-> Here nothing visible to selftests or QEMU indicates that guest.MAXPHYADDR=
- =3D 52
-> is invalid/incorrect. how can we say selftests are at fault and we should=
- fix
-> them?
-
-In this case, the CPU is at fault, and you should complain to the CPU vendo=
-r.
+I see no compelling reason to complicate KVM with support for
+configurable APIC frequencies, and I see no advantages to doing so.
 
