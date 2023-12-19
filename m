@@ -1,214 +1,230 @@
-Return-Path: <kvm+bounces-4934-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4956-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A43381A0EA
-	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 15:16:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23E8F81A434
+	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 17:17:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 740781F21C45
-	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 14:16:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47F4A1C2493D
+	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 16:17:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E805338F9F;
-	Wed, 20 Dec 2023 14:16:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6102C4C3BA;
+	Wed, 20 Dec 2023 16:12:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B5e6AjFX"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="CvsibWWF"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2042.outbound.protection.outlook.com [40.107.220.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F64238F82;
-	Wed, 20 Dec 2023 14:16:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8FBD3C433C8;
-	Wed, 20 Dec 2023 14:16:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703081803;
-	bh=ZI70D8QvLaWdXr+fAuK9V6XLldoFTfbDeU/tcqCx5Bs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=B5e6AjFXAbuWH87OJt2SncWeCUQNmySRUqIgLbrY1DD0aF0i3otiqnjjhkE24YOOH
-	 KirDF+QUDSsbn1/+/GFIHNzn7bpJchKI/Kjv80eqSoDfN73rVGUASKiJSXJssiJMaA
-	 U/Wjw7zQyNon/FCoPeBP+FTRhhQjRpbn3mgCKt7ZziecilMqhPBKxEhbBDc6PNMPkR
-	 VSbgVwz+AYuDi7upHfRIkKIY+pg/uFvVx+yBwynsT6sTmlY5m5VmKXmRdWrgVOtLZ5
-	 E3X8ParhMu06znMEq2MJhbZY4rsFAME5XHPfeFeguIQTrtXty5naajYcGAbA37405P
-	 xhtVYMji6aRwQ==
-Received: from [104.132.45.104] (helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rFxNJ-005hcv-4T;
-	Wed, 20 Dec 2023 14:16:41 +0000
-Date: Wed, 20 Dec 2023 14:16:40 +0000
-Message-ID: <87v88tt0vr.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: <ankita@nvidia.com>
-Cc: <jgg@nvidia.com>,
-	<oliver.upton@linux.dev>,
-	<suzuki.poulose@arm.com>,
-	<yuzenghui@huawei.com>,
-	<catalin.marinas@arm.com>,
-	<will@kernel.org>,
-	<alex.williamson@redhat.com>,
-	<kevin.tian@intel.com>,
-	<yi.l.liu@intel.com>,
-	<ardb@kernel.org>,
-	<akpm@linux-foundation.org>,
-	<gshan@redhat.com>,
-	<mochs@nvidia.com>,
-	<lpieralisi@kernel.org>,
-	<aniketa@nvidia.com>,
-	<cjia@nvidia.com>,
-	<kwankhede@nvidia.com>,
-	<targupta@nvidia.com>,
-	<vsethi@nvidia.com>,
-	<acurrid@nvidia.com>,
-	<apopple@nvidia.com>,
-	<jhubbard@nvidia.com>,
-	<danw@nvidia.com>,
-	<linux-mm@kvack.org>,
-	<kvmarm@lists.linux.dev>,
-	<kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH v4 2/3] kvm: arm64: set io memory s2 pte as normalnc for vfio pci devices
-In-Reply-To: <20231218090719.22250-3-ankita@nvidia.com>
-References: <20231218090719.22250-1-ankita@nvidia.com>
-	<20231218090719.22250-3-ankita@nvidia.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D416495DA;
+	Wed, 20 Dec 2023 16:12:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FTSS4WeLl6XGS2RmGj3PTqNAQpHYX6120oN8YTm87XzaOQY20IxIK4HDipWQ8uKTncXU4h538zDofQlfTxhWWf4z50/k6F5CC1NKyv/rc0ZKdw+H0vJ/wZHqGdT+9BfOKj7xOUm7JefLrAOz7OVrQcylXtIOY0NducWaaYm/O644tx32SPuiUPmf7CmxGckoYbGMCy79ESi8ED4u77J/Fl8KVqVe0+OaFT53GhM1llZ/04Lixp+Y0XO4TnaWyjdLfcNKrgxd3yYNwuiBMMGHGbgi7Lj/WuCThDptMqVzTYB52rXkyIzZBU9WBeAOx2MU/sBhptHNkPniYm6MH/f8EQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zztFM+6SePAdYVo8ypzTXKKU7fpjrsqPY34SNgTgrFY=;
+ b=TkmVIARLB8S9F5tlI7RlX6qeqJ3A4SyBAx8ovpxK5mKlnrf5sOoEvq/5swC8yQ4XO4ksA4gAtK23DvAgNacYHs/+IX9YCjhLsv8FLdyYntDWNM0jeDJiaLnyefoaQcvaDCxLE+LBKsHrXeJUmySaFXx+t2vhUK4/ZVEuLHcV7oUoPloP79rpzkmHCZRSU0Pg9FiBASENh7UvBs3QE8TMTRI1DP2O5guePzZPoLVq0Jmg6K/oWjQ+Q56NpNk59vYv4MX5MCOg57sJ7owdzHnn2YA1p0aUMukJxE0A7gRpNGC7Qu2zM30aIjkC7E/N9TSoqinZCVDULy4zLy4urhATYA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=alien8.de smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zztFM+6SePAdYVo8ypzTXKKU7fpjrsqPY34SNgTgrFY=;
+ b=CvsibWWFoM4QjBNpUNVqDN0zGcYlsnkpvtkdRr7HV0O/D1SpIde15PV3sIcF5iEhzl5pwcdlM8+Qnj4yYCKkC/N5TaHhVVX/gkVFF1PgNHHpO6UbpOGIQoDi+O1yf2GkToMjhY0jbrXzH89KrsVAvLEUoRxSxWiX+8hKo0Nai7I=
+Received: from SN6PR2101CA0007.namprd21.prod.outlook.com
+ (2603:10b6:805:106::17) by PH8PR12MB7254.namprd12.prod.outlook.com
+ (2603:10b6:510:225::18) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7113.18; Wed, 20 Dec
+ 2023 16:12:08 +0000
+Received: from SA2PEPF00001507.namprd04.prod.outlook.com
+ (2603:10b6:805:106:cafe::43) by SN6PR2101CA0007.outlook.office365.com
+ (2603:10b6:805:106::17) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7113.19 via Frontend
+ Transport; Wed, 20 Dec 2023 16:12:06 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ SA2PEPF00001507.mail.protection.outlook.com (10.167.242.39) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7113.14 via Frontend Transport; Wed, 20 Dec 2023 16:12:05 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Wed, 20 Dec
+ 2023 10:12:00 -0600
+Date: Tue, 19 Dec 2023 17:46:12 -0600
+From: Michael Roth <michael.roth@amd.com>
+To: Borislav Petkov <bp@alien8.de>
+CC: <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+	<linux-crypto@vger.kernel.org>, <x86@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
+	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
+	<ardb@kernel.org>, <pbonzini@redhat.com>, <seanjc@google.com>,
+	<vkuznets@redhat.com>, <jmattson@google.com>, <luto@kernel.org>,
+	<dave.hansen@linux.intel.com>, <slp@redhat.com>, <pgonda@google.com>,
+	<peterz@infradead.org>, <srinivas.pandruvada@linux.intel.com>,
+	<rientjes@google.com>, <dovmurik@linux.ibm.com>, <tobin@ibm.com>,
+	<vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
+	<tony.luck@intel.com>, <sathyanarayanan.kuppuswamy@linux.intel.com>,
+	<alpergun@google.com>, <jarkko@kernel.org>, <ashish.kalra@amd.com>,
+	<nikunj.dadhania@amd.com>, <pankaj.gupta@amd.com>, <liam.merwick@oracle.com>,
+	<zhi.a.wang@intel.com>, Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH v10 17/50] crypto: ccp: Handle the legacy TMR allocation
+ when SNP is enabled
+Message-ID: <20231219234612.qaq6bv54jcgo4f2a@amd.com>
+References: <20231016132819.1002933-1-michael.roth@amd.com>
+ <20231016132819.1002933-18-michael.roth@amd.com>
+ <20231208130520.GFZXMUkKR+aexFpxXf@fat_crate.local>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 104.132.45.104
-X-SA-Exim-Rcpt-To: ankita@nvidia.com, jgg@nvidia.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, alex.williamson@redhat.com, kevin.tian@intel.com, yi.l.liu@intel.com, ardb@kernel.org, akpm@linux-foundation.org, gshan@redhat.com, mochs@nvidia.com, lpieralisi@kernel.org, aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com, vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com, jhubbard@nvidia.com, danw@nvidia.com, linux-mm@kvack.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20231208130520.GFZXMUkKR+aexFpxXf@fat_crate.local>
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA2PEPF00001507:EE_|PH8PR12MB7254:EE_
+X-MS-Office365-Filtering-Correlation-Id: e7c4d304-2869-4127-7563-08dc017668e6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	mSNy81YozXg0UI4icIdEP9j4E+lRFUq1zThrbIaFO75IyhSLqabKqrmRGR2VMx6JmeHp7uLFG93bJa4QJsHe1S/ZJRx1QZ+LYDDfngpxl26nOCwnHNObKb39UIAy1MzwW00jkk/pQJWK6sDQ4azMPbHPjbAngSpjK6T0el5MzzVdusmiC6P9LT1vlO4Xb2tDEMmfiRwSXoRS5SCfe+gicPfFuc0JBFdxKsfXsU7RDnSpWqGZkq/0WY6mEtNJxH0cuReKVqWd/CYDJOslhQ9w9uEbXw4wyiFGRzwRE45VMc/sx0fEbG022YKu12s/V5koElq1gpHyJNHXWblVM5XDFvhKx/8K1CEUoK95wVqKKqtB/5lMXyLESxIx3mixZaJ9UTOOlH4eTL8T9Q9BGDhDJeXXl5cTUtyyqvdouYY29ExsPRdK9vnFxR0xX51qQ/i9MWGdLRy7X5WuGQG37Y3JA/w1Z76U81QyZgeVRpcojfbwycrf9lLA4rlWox7Fg501+HqSRLABNwn20Q0f3z2zdWDeCSQsDgjVjKBGUOinmFIR5GNlZcrY+25eghQDwxfxC0bXyNuix49kJHq44F/egZcchO37mQcvAI5kfxgJifi2j4MD5KuIFc/G9Qc/vzBBZr2xeox9+GjnYZCUAwdLqJzHxvnEcJPVyzJmaE2SkwMIj1a1E4agoW4Jhb71BjGU20PQKRmqOQRD6ssOi9r+uF8RAsIpQeYFX8QiObKjZXYCrmp4XHq86NNNNdJ4j70FqbdvkBxAKrgI+aS2HDKbsw==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(346002)(396003)(39860400002)(136003)(376002)(230922051799003)(1800799012)(186009)(451199024)(64100799003)(82310400011)(36840700001)(40470700004)(46966006)(2616005)(83380400001)(426003)(336012)(1076003)(16526019)(26005)(86362001)(44832011)(36756003)(8676002)(8936002)(41300700001)(2906002)(4326008)(5660300002)(7406005)(7416002)(316002)(70586007)(54906003)(6916009)(70206006)(6666004)(478600001)(966005)(81166007)(47076005)(356005)(36860700001)(82740400003)(40480700001)(40460700003)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Dec 2023 16:12:05.6845
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: e7c4d304-2869-4127-7563-08dc017668e6
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SA2PEPF00001507.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB7254
 
-On Mon, 18 Dec 2023 09:07:18 +0000,
-<ankita@nvidia.com> wrote:
+On Fri, Dec 08, 2023 at 02:05:20PM +0100, Borislav Petkov wrote:
+> On Mon, Oct 16, 2023 at 08:27:46AM -0500, Michael Roth wrote:
+> > From: Brijesh Singh <brijesh.singh@amd.com>
+> > 
+> > The behavior and requirement for the SEV-legacy command is altered when
+> > the SNP firmware is in the INIT state. See SEV-SNP firmware specification
+> > for more details.
+> > 
+> > Allocate the Trusted Memory Region (TMR) as a 2mb sized/aligned region
+> > when SNP is enabled to satisfy new requirements for the SNP. Continue
 > 
-> From: Ankit Agrawal <ankita@nvidia.com>
+> s/the //
 > 
-> To provide VM with the ability to get device IO memory with NormalNC
-> property, map device MMIO in KVM for ARM64 at stage2 as NormalNC.
-> Having NormalNC S2 default puts guests in control (based on [1],
-> "Combining stage 1 and stage 2 memory type attributes") of device
-> MMIO regions memory mappings. The rules are summarized below:
-> ([(S1) - stage1], [(S2) - stage 2])
+> > allocating a 1mb region for !SNP configuration.
+> > 
+> > While at it, provide API that can be used by others to allocate a page
 > 
-> S1           |  S2           | Result
-> NORMAL-WB    |  NORMAL-NC    | NORMAL-NC
-> NORMAL-WT    |  NORMAL-NC    | NORMAL-NC
-> NORMAL-NC    |  NORMAL-NC    | NORMAL-NC
-> DEVICE<attr> |  NORMAL-NC    | DEVICE<attr>
+> "...an API... ... to allocate a firmware page."
 > 
-> Generalizing this to non PCI devices may be problematic. E.g. GICv2
-> vCPU interface, which is effectively a shared peripheral, can allow
-> a guest to affect another guest's interrupt distribution. The issue
-> may be solved by limiting the relaxation to mappings that have a user
-> VMA. Still There is insufficient information and uncertainity in the
-> behavior of non PCI driver. Hence caution is maintained and the change
-> is restricted to the VFIO-PCI devices. PCIe on the other hand is safe
-> because the PCI bridge does not generate errors, and thus do not cause
-> uncontained failures.
+> Simple.
 > 
-> A new flag VM_VFIO_ALLOW_WC to indicate KVM that the device is WC capable.
-> KVM use this flag to activate the code.
+> > that can be used by the firmware.
 > 
-> This could be extended to other devices in the future once that
-> is deemed safe.
+> > The immediate user for this API will be the KVM driver.
 > 
-> [1] section D8.5.5 of DDI0487J_a_a-profile_architecture_reference_manual.pdf
+> Delete that sentence.
 > 
-> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
-> Suggested-by: Catalin Marinas <catalin.marinas@arm.com>
-> Acked-by: Jason Gunthorpe <jgg@nvidia.com>
-> Tested-by: Ankit Agrawal <ankita@nvidia.com>
-> ---
->  arch/arm64/kvm/mmu.c | 18 ++++++++++++++----
->  include/linux/mm.h   | 13 +++++++++++++
->  2 files changed, 27 insertions(+), 4 deletions(-)
+> > The KVM driver to need to allocate a firmware context
 > 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index d14504821b79..e1e6847a793b 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1381,7 +1381,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	int ret = 0;
->  	bool write_fault, writable, force_pte = false;
->  	bool exec_fault, mte_allowed;
-> -	bool device = false;
-> +	bool device = false, vfio_allow_wc = false;
->  	unsigned long mmu_seq;
->  	struct kvm *kvm = vcpu->kvm;
->  	struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
-> @@ -1472,6 +1472,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	gfn = fault_ipa >> PAGE_SHIFT;
->  	mte_allowed = kvm_vma_mte_allowed(vma);
->  
-> +	vfio_allow_wc = (vma->vm_flags & VM_VFIO_ALLOW_WC);
-> +
->  	/* Don't use the VMA after the unlock -- it may have vanished */
->  	vma = NULL;
->  
-> @@ -1557,10 +1559,18 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	if (exec_fault)
->  		prot |= KVM_PGTABLE_PROT_X;
->  
-> -	if (device)
-> -		prot |= KVM_PGTABLE_PROT_DEVICE;
-> -	else if (cpus_have_final_cap(ARM64_HAS_CACHE_DIC))
-> +	if (device) {
-> +		/*
-> +		 * To provide VM with the ability to get device IO memory
-> +		 * with NormalNC property, map device MMIO as NormalNC in S2.
-> +		 */
-> +		if (vfio_allow_wc)
-> +			prot |= KVM_PGTABLE_PROT_NORMAL_NC;
-> +		else
-> +			prot |= KVM_PGTABLE_PROT_DEVICE;
-> +	} else if (cpus_have_final_cap(ARM64_HAS_CACHE_DIC)) {
->  		prot |= KVM_PGTABLE_PROT_X;
-> +	}
->  
->  	/*
->  	 * Under the premise of getting a FSC_PERM fault, we just need to relax
-> diff --git a/include/linux/mm.h b/include/linux/mm.h
-> index 2bea89dc0bdf..d2f0f969875c 100644
-> --- a/include/linux/mm.h
-> +++ b/include/linux/mm.h
-> @@ -391,6 +391,19 @@ extern unsigned int kobjsize(const void *objp);
->  # define VM_UFFD_MINOR		VM_NONE
->  #endif /* CONFIG_HAVE_ARCH_USERFAULTFD_MINOR */
->  
-> +/* This flag is used to connect VFIO to arch specific KVM code. It
-> + * indicates that the memory under this VMA is safe for use with any
-> + * non-cachable memory type inside KVM. Some VFIO devices, on some
-> + * platforms, are thought to be unsafe and can cause machine crashes if
-> + * KVM does not lock down the memory type.
-> + */
+> "The KVM driver needs to allocate ...
+> 
+> > page during the guest creation. The context page need to be updated
+> 
+> "needs"
+> 
+> > by the firmware. See the SEV-SNP specification for further details.
+> > 
+> > Co-developed-by: Ashish Kalra <ashish.kalra@amd.com>
+> > Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> > [mdr: use struct sev_data_snp_page_reclaim instead of passing paddr
+> >       directly to SEV_CMD_SNP_PAGE_RECLAIM]
+> > Signed-off-by: Michael Roth <michael.roth@amd.com>
+> > ---
+> >  drivers/crypto/ccp/sev-dev.c | 151 ++++++++++++++++++++++++++++++++---
+> >  include/linux/psp-sev.h      |   9 +++
+> >  2 files changed, 151 insertions(+), 9 deletions(-)
+> > 
+> > +static int rmp_mark_pages_firmware(unsigned long paddr, unsigned int npages, bool locked)
+> > +{
+> > +	/* Cbit maybe set in the paddr */
+> > +	unsigned long pfn = __sme_clr(paddr) >> PAGE_SHIFT;
+> > +	int rc, n = 0, i;
+> 
+> That n looks like it can be replaced by i.
 
-Comment format.
+Indeed, and for snp_reclaim_pages() too by the looks of it. Will fix that up,
+along with all the other suggestions.
 
-> +#ifdef CONFIG_64BIT
-> +#define VM_VFIO_ALLOW_WC_BIT	39
-> +#define VM_VFIO_ALLOW_WC	BIT(VM_VFIO_ALLOW_WC_BIT)
-> +#else
-> +#define VM_VFIO_ALLOW_WC	VM_NONE
-> +#endif
-> +
->  /* Bits set in the VMA until the stack is in its final location */
->  #define VM_STACK_INCOMPLETE_SETUP (VM_RAND_READ | VM_SEQ_READ | VM_STACK_EARLY)
+> > +
+> > +void *snp_alloc_firmware_page(gfp_t gfp_mask)
+> > +{
+> > +	struct page *page;
+> > +
+> > +	page = __snp_alloc_firmware_pages(gfp_mask, 0, false);
+> > +
+> > +	return page ? page_address(page) : NULL;
+> > +}
+> > +EXPORT_SYMBOL_GPL(snp_alloc_firmware_page);
+> > +
+> > +static void __snp_free_firmware_pages(struct page *page, int order, bool locked)a
+> 
+> This @locked too is always false. It becomes true later in
+> 
+> Subject: [PATCH v10 50/50] crypto: ccp: Add panic notifier for SEV/SNP firmware shutdown on kdump
+> 
+> which talks about some panic notifier running in atomic context. But
+> then you can't take locks in atomic context.
 
-The mm.h change should be standalone, separate from the KVM stuff.
+In that case, the lock isn't actually taken. locked==true is basically
+used to tell the code to not to try to acquire the lock, but the caller
+is relying on the fact that all the other CPUs are stopped at that point
+so there's no need to protect against multiple concurrent firmware
+commands being issued.
 
-	M.
+> 
+> Looks like this whole dance around the locked thing needs a cleanup.
 
--- 
-Without deviation from the norm, progress is not possible.
+There's another case that will be introduced in the next version of this
+series (likely right after this patch) to handle a bug where the buffer used
+to access INIT_EX non-volatile data needs to be transitioned to
+firmware-owned beforehand. In that case, the CCP cleanup path introduces
+another caller of __snp_free_firmware_pages() where locked==true. Maybe this
+can be revisited in that context.
+
+Thanks,
+
+Mike
+
+
+> 
+> ...
+> 
+> 
+> -- 
+> Regards/Gruss,
+>     Boris.
+> 
+> https://people.kernel.org/tglx/notes-about-netiquette
 
