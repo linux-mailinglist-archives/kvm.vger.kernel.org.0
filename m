@@ -1,69 +1,84 @@
-Return-Path: <kvm+bounces-4783-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4785-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A21C81837D
-	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 09:36:58 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91ED8818459
+	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 10:24:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B25EF1C21AA0
-	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 08:36:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 224C2B21AAA
+	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 09:24:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D481514F7E;
-	Tue, 19 Dec 2023 08:35:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2455514288;
+	Tue, 19 Dec 2023 09:23:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UyvDST5G"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="F4EcT8ht"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 391AB12B9E;
-	Tue, 19 Dec 2023 08:35:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1702974920; x=1734510920;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=sp+9xcBrDRa7FSf2M1vCbvXXsVMU/OMOwmsjWVEj29A=;
-  b=UyvDST5GVlpfGzfI0Y+eovq6zTLTAkdsnEZJvZ1V5sJMW/uqPglJoCm+
-   PnfciMp66NGFCw0z4c1X4faQ5kBr4oleMvTPdPQBNZnzcbFlk8Yg88mxU
-   GgmtOYN4+nz5I7fzoV3G9u8S2tBoUp+zWs6Q8NpFuHDXFvs/VyT1f/ufi
-   emfk0UAhs/NA6R6bKeI5OgN/52QOBNYf6BukWjxAvJjjD3EHE6nd+SUzk
-   QQ1GJA+O/U4Em07gr1HvRGTPA2xJiGtPPTo8iqyuySzzUl0HJB8EhOaLQ
-   rk4cu0+mosrZP8pyP0bjGaxrSqdkw225uReDkZmS1Y1zcEa2jFkWiAKrl
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10928"; a="395355772"
-X-IronPort-AV: E=Sophos;i="6.04,287,1695711600"; 
-   d="scan'208";a="395355772"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2023 00:34:56 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10928"; a="725658911"
-X-IronPort-AV: E=Sophos;i="6.04,287,1695711600"; 
-   d="scan'208";a="725658911"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2023 00:34:56 -0800
-From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	erdemaktas@google.com,
-	Sean Christopherson <seanjc@google.com>,
-	Vishal Annapurve <vannapurve@google.com>,
-	Jim Mattson <jmattson@google.com>,
-	Maxim Levitsky <mlevitsk@redhat.com>,
-	Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: isaku.yamahata@intel.com,
-	isaku.yamahata@gmail.com
-Subject: [PATCH v3 4/4] KVM: selftests: Add test case for x86 apic_bus_clock_frequency
-Date: Tue, 19 Dec 2023 00:34:41 -0800
-Message-Id: <f738cb171c6d47b72b5e608777cf64fa3958183a.1702974319.git.isaku.yamahata@intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <cover.1702974319.git.isaku.yamahata@intel.com>
-References: <cover.1702974319.git.isaku.yamahata@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B31E14282;
+	Tue, 19 Dec 2023 09:23:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BJ9HR5l011928;
+	Tue, 19 Dec 2023 09:23:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=VBLVLGidWmqFuH7WIg0j7KnZANsKBlDQID8aBmgWBIc=;
+ b=F4EcT8htAd21fsFB+2BX/oUK1BvTP/8l0jISOBFWFcTGhr0qslpfzB2P3ZXCDHLkE5VG
+ b0maNs6pFUdZc4S0wJJ+VfzLuYdWtR4MoNIVPMD1OKZmi7PVKENZezLCadAAo+EuDRlO
+ me4TCCJRr/eA/njPJAjw6OimYC9+TdSs5efSBsSueG3LCw9E69UquzbYssWoL2MStdi7
+ Mcd4kfhb0OlshuC4DN3StnjaSZ/28bGhnoAZHnLrMfU4zxI2LoeSZ+vlSMvyuYp/F65n
+ Q0VgZSphLnNi3SyYBLU7s9lkLAxdwJEs9ORJrM0ZZFOs0VncEIRMCnqWGo/Uu9yZ5TlV fw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v38djg4nk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 19 Dec 2023 09:23:33 +0000
+Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BJ9JBOK016229;
+	Tue, 19 Dec 2023 09:23:32 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v38djg4mb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 19 Dec 2023 09:23:32 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3BJ6cS6W004798;
+	Tue, 19 Dec 2023 09:23:31 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3v1pkypspe-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 19 Dec 2023 09:23:30 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3BJ9NRXV63242578
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 19 Dec 2023 09:23:27 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A7CE02004B;
+	Tue, 19 Dec 2023 09:23:27 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 324F020043;
+	Tue, 19 Dec 2023 09:23:20 +0000 (GMT)
+Received: from vaibhav?linux.ibm.com (unknown [9.61.137.171])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Tue, 19 Dec 2023 09:23:19 +0000 (GMT)
+Received: by vaibhav@linux.ibm.com (sSMTP sendmail emulation); Tue, 19 Dec 2023 14:53:17 +0530
+From: Vaibhav Jain <vaibhav@linux.ibm.com>
+To: linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org
+Cc: Vaibhav Jain <vaibhav@linux.ibm.com>, Nicholas Piggin <npiggin@gmail.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Jordan Niethe <jniethe5@gmail.com>,
+        Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>, mikey@neuling.org,
+        paulus@ozlabs.org, sbhat@linux.ibm.com, gautam@linux.ibm.com,
+        kconsul@linux.vnet.ibm.com, amachhiw@linux.vnet.ibm.com,
+        David.Laight@ACULAB.COM
+Subject: [PATCH] powerpc/hvcall: Reorder Nestedv2 hcall opcodes
+Date: Tue, 19 Dec 2023 14:52:36 +0530
+Message-ID: <20231219092309.118151-1-vaibhav@linux.ibm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -71,198 +86,70 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: AEpyoGmXzVeDABI26oC8SHcjBQmATCEn
+X-Proofpoint-ORIG-GUID: UUpaRrWN_jBKqsdBrDPaqebb87Zb7f6i
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-19_04,2023-12-14_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
+ bulkscore=0 clxscore=1015 malwarescore=0 impostorscore=0 mlxlogscore=593
+ phishscore=0 adultscore=0 lowpriorityscore=0 priorityscore=1501 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
+ definitions=main-2312190069
 
-Test if the apic bus clock frequency is exptected to the configured value.
-Set APIC TMICT to the maximum value and busy wait for 100 msec (any value
-is okay) with tsc value, and read TMCCT. Calculate apic bus clock frequency
-based on TSC frequency.
+This trivial patch reorders the newly introduced hcall opcodes for Nestedv2
+to follow the increasing-opcode-number convention followed in
+'hvcall.h'. The patch also updates the value for MAX_HCALL_OPCODE which is
+at various places in arch code for range checking.
 
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+Fixes: 19d31c5f1157 ("KVM: PPC: Add support for nestedv2 guests")
+Suggested-by: Michael Ellerman <mpe@ellerman.id.au>
+Signed-off-by: Vaibhav Jain<vaibhav@linux.ibm.com>
 ---
-Changes v3:
-- Use 1.5GHz instead of 1GHz as frequency.
+ arch/powerpc/include/asm/hvcall.h | 21 +++++++++++----------
+ 1 file changed, 11 insertions(+), 10 deletions(-)
 
-Changes v2:
-- Newly added.
----
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/include/x86_64/apic.h       |   7 +
- .../kvm/x86_64/apic_bus_clock_test.c          | 135 ++++++++++++++++++
- 3 files changed, 143 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86_64/apic_bus_clock_test.c
-
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 963435959a92..e07ec9c1dbd1 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -116,6 +116,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/vmx_invalid_nested_guest_state
- TEST_GEN_PROGS_x86_64 += x86_64/vmx_set_nested_state_test
- TEST_GEN_PROGS_x86_64 += x86_64/vmx_tsc_adjust_test
- TEST_GEN_PROGS_x86_64 += x86_64/vmx_nested_tsc_scaling_test
-+TEST_GEN_PROGS_x86_64 += x86_64/apic_bus_clock_test
- TEST_GEN_PROGS_x86_64 += x86_64/xapic_ipi_test
- TEST_GEN_PROGS_x86_64 += x86_64/xapic_state_test
- TEST_GEN_PROGS_x86_64 += x86_64/xcr0_cpuid_test
-diff --git a/tools/testing/selftests/kvm/include/x86_64/apic.h b/tools/testing/selftests/kvm/include/x86_64/apic.h
-index bed316fdecd5..866a58d5fa11 100644
---- a/tools/testing/selftests/kvm/include/x86_64/apic.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/apic.h
-@@ -60,6 +60,13 @@
- #define		APIC_VECTOR_MASK	0x000FF
- #define	APIC_ICR2	0x310
- #define		SET_APIC_DEST_FIELD(x)	((x) << 24)
-+#define APIC_LVT0       0x350
-+#define         APIC_LVT_TIMER_ONESHOT          (0 << 17)
-+#define         APIC_LVT_TIMER_PERIODIC         (1 << 17)
-+#define         APIC_LVT_TIMER_TSCDEADLINE      (2 << 17)
-+#define APIC_TMICT	0x380
-+#define APIC_TMCCT	0x390
-+#define APIC_TDCR	0x3E0
+diff --git a/arch/powerpc/include/asm/hvcall.h b/arch/powerpc/include/asm/hvcall.h
+index ddb99e982917..605ed2b58aff 100644
+--- a/arch/powerpc/include/asm/hvcall.h
++++ b/arch/powerpc/include/asm/hvcall.h
+@@ -349,7 +349,17 @@
+ #define H_GET_ENERGY_SCALE_INFO	0x450
+ #define H_PKS_SIGNED_UPDATE	0x454
+ #define H_WATCHDOG		0x45C
+-#define MAX_HCALL_OPCODE	H_WATCHDOG
++#define H_WATCHDOG		0x45C
++#define H_GUEST_GET_CAPABILITIES 0x460
++#define H_GUEST_SET_CAPABILITIES 0x464
++#define H_GUEST_CREATE		0x470
++#define H_GUEST_CREATE_VCPU	0x474
++#define H_GUEST_GET_STATE	0x478
++#define H_GUEST_SET_STATE	0x47C
++#define H_GUEST_RUN_VCPU	0x480
++#define H_GUEST_COPY_MEMORY	0x484
++#define H_GUEST_DELETE		0x488
++#define MAX_HCALL_OPCODE	H_GUEST_DELETE
  
- void apic_disable(void);
- void xapic_enable(void);
-diff --git a/tools/testing/selftests/kvm/x86_64/apic_bus_clock_test.c b/tools/testing/selftests/kvm/x86_64/apic_bus_clock_test.c
-new file mode 100644
-index 000000000000..e7896d703e7d
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/apic_bus_clock_test.c
-@@ -0,0 +1,135 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+#define _GNU_SOURCE /* for program_invocation_short_name */
-+
-+#include "apic.h"
-+#include "test_util.h"
-+
-+/*
-+ * Pick one convenient value, 1.5Ghz.  No special meaning and different from
-+ * the default value, 1Ghz.
-+ */
-+#define TSC_HZ			(1500 * 1000 * 1000ULL)
-+
-+/* Wait for 100 msec, not too long, not too short value. */
-+#define LOOP_MSEC		100ULL
-+#define TSC_WAIT_DELTA		(TSC_HZ / 1000 * LOOP_MSEC)
-+
-+/* Pick up typical value.  Different enough from the default value, 1GHz.  */
-+#define APIC_BUS_CLOCK_FREQ	(25 * 1000 * 1000ULL)
-+
-+static void guest_code(void)
-+{
-+	/* Possible tdcr values and its divide count. */
-+	struct {
-+		u32 tdcr;
-+		u32 divide_count;
-+	} tdcrs[] = {
-+		{0x0, 2},
-+		{0x1, 4},
-+		{0x2, 8},
-+		{0x3, 16},
-+		{0x8, 32},
-+		{0x9, 64},
-+		{0xa, 128},
-+		{0xb, 1},
-+	};
-+
-+	u32 tmict, tmcct;
-+	u64 tsc0, tsc1;
-+	int i;
-+
-+	asm volatile("cli");
-+
-+	xapic_enable();
-+
-+	/*
-+	 * Setup one-shot timer.  Because we don't fire the interrupt, the
-+	 * vector doesn't matter.
-+	 */
-+	xapic_write_reg(APIC_LVT0, APIC_LVT_TIMER_ONESHOT);
-+
-+	for (i = 0; i < ARRAY_SIZE(tdcrs); i++) {
-+		xapic_write_reg(APIC_TDCR, tdcrs[i].tdcr);
-+
-+		/* Set the largest value to not trigger the interrupt. */
-+		tmict = ~0;
-+		xapic_write_reg(APIC_TMICT, tmict);
-+
-+		/* Busy wait for LOOP_MSEC */
-+		tsc0 = rdtsc();
-+		tsc1 = tsc0;
-+		while (tsc1 - tsc0 < TSC_WAIT_DELTA)
-+			tsc1 = rdtsc();
-+
-+		/* Read apic timer and tsc */
-+		tmcct = xapic_read_reg(APIC_TMCCT);
-+		tsc1 = rdtsc();
-+
-+		/* Stop timer */
-+		xapic_write_reg(APIC_TMICT, 0);
-+
-+		/* Report it. */
-+		GUEST_SYNC_ARGS(tdcrs[i].divide_count, tmict - tmcct,
-+				tsc1 - tsc0, 0, 0);
-+	}
-+
-+	GUEST_DONE();
-+}
-+
-+void test_apic_bus_clock(struct kvm_vcpu *vcpu)
-+{
-+	bool done = false;
-+	struct ucall uc;
-+
-+	while (!done) {
-+		vcpu_run(vcpu);
-+		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
-+
-+		switch (get_ucall(vcpu, &uc)) {
-+		case UCALL_DONE:
-+			done = true;
-+			break;
-+		case UCALL_ABORT:
-+			REPORT_GUEST_ASSERT(uc);
-+			break;
-+		case UCALL_SYNC: {
-+			u32 divide_counter = uc.args[1];
-+			u32 apic_cycles = uc.args[2];
-+			u64 tsc_cycles = uc.args[3];
-+			u64 freq;
-+
-+			TEST_ASSERT(tsc_cycles > 0,
-+				    "tsc cycles must not be zero.");
-+
-+			/* Allow 1% slack. */
-+			freq = apic_cycles * divide_counter * TSC_HZ / tsc_cycles;
-+			TEST_ASSERT(freq < APIC_BUS_CLOCK_FREQ * 101 / 100,
-+				    "APIC bus clock frequency is too large");
-+			TEST_ASSERT(freq > APIC_BUS_CLOCK_FREQ * 99 / 100,
-+				    "APIC bus clock frequency is too small");
-+			break;
-+		}
-+		default:
-+			TEST_FAIL("Unknown ucall %lu", uc.cmd);
-+			break;
-+		}
-+	}
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct kvm_vm *vm;
-+	struct kvm_vcpu *vcpu;
-+
-+	vm = __vm_create(VM_MODE_DEFAULT, 1, 0);
-+	vm_ioctl(vm, KVM_SET_TSC_KHZ, (void *) (TSC_HZ / 1000));
-+	/*  KVM_CAP_X86_BUS_FREQUENCY_CONTROL requires that no vcpu is created. */
-+	vm_enable_cap(vm, KVM_CAP_X86_BUS_FREQUENCY_CONTROL,
-+		      APIC_BUS_CLOCK_FREQ);
-+	vcpu = vm_vcpu_add(vm, 0, guest_code);
-+
-+	virt_pg_map(vm, APIC_DEFAULT_GPA, APIC_DEFAULT_GPA);
-+
-+	test_apic_bus_clock(vcpu);
-+	kvm_vm_free(vm);
-+}
+ /* Scope args for H_SCM_UNBIND_ALL */
+ #define H_UNBIND_SCOPE_ALL (0x1)
+@@ -393,15 +403,6 @@
+ #define H_ENTER_NESTED		0xF804
+ #define H_TLB_INVALIDATE	0xF808
+ #define H_COPY_TOFROM_GUEST	0xF80C
+-#define H_GUEST_GET_CAPABILITIES 0x460
+-#define H_GUEST_SET_CAPABILITIES 0x464
+-#define H_GUEST_CREATE		0x470
+-#define H_GUEST_CREATE_VCPU	0x474
+-#define H_GUEST_GET_STATE	0x478
+-#define H_GUEST_SET_STATE	0x47C
+-#define H_GUEST_RUN_VCPU	0x480
+-#define H_GUEST_COPY_MEMORY	0x484
+-#define H_GUEST_DELETE		0x488
+ 
+ /* Flags for H_SVM_PAGE_IN */
+ #define H_PAGE_IN_SHARED        0x1
 -- 
-2.25.1
+2.43.0
 
 
