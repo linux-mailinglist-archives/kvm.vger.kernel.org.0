@@ -1,177 +1,181 @@
-Return-Path: <kvm+bounces-4824-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4825-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0497818AFA
-	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 16:16:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 287B0818B33
+	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 16:26:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 50AA51F24212
-	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 15:16:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AE598B24E18
+	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 15:26:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8F6A1CA97;
-	Tue, 19 Dec 2023 15:16:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A68F41CA92;
+	Tue, 19 Dec 2023 15:26:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YshL7osj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fOdLkEN6"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F05D1CA80
-	for <kvm@vger.kernel.org>; Tue, 19 Dec 2023 15:16:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A78D5C433C9
-	for <kvm@vger.kernel.org>; Tue, 19 Dec 2023 15:16:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702998968;
-	bh=D1VwdLk59/i70pH9Yp7fpKIgWrbEGAfMpu5g7Vt63MI=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=YshL7osjxW5Etel55qQK7umGhbo6pBwZwqiBQfdbTtRj66VyHiqseagZKBGUbozRu
-	 Gpjb45V/C1Z7omqhzncdirogTzpOKitWAhpntLSL4DCzYN4oWR0sNnt2RhvD/eFtjV
-	 nh7rkNDOx7hvic57Dd6lNM2FAOTAPsDzE9jb7+i7f33fcxexLhWGRVgQ9iQQVCuEDo
-	 PM9QqlOvkcqWHaY6P7TVWrlKQlqCGjbXdl1xBSzOgXhGgAbz/fJ1REjGQlpZh3Kihj
-	 kI15gDWtqOW+/H4XfjsclBIJBvRHq5TGQ6jJxt9KQuNDg/Bjx76ShZgm3SMkVjJ8Cb
-	 y7x67FtlHFtgg==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 93F5CC53BD2; Tue, 19 Dec 2023 15:16:08 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: kvm@vger.kernel.org
-Subject: [Bug 218259] High latency in KVM guests
-Date: Tue, 19 Dec 2023 15:16:08 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: seanjc@google.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-218259-28872-rHHddF6TmR@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218259-28872@https.bugzilla.kernel.org/>
-References: <bug-218259-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75EB41CA83
+	for <kvm@vger.kernel.org>; Tue, 19 Dec 2023 15:26:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dbd73a8b4d4so258124276.0
+        for <kvm@vger.kernel.org>; Tue, 19 Dec 2023 07:26:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1702999561; x=1703604361; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=NchLShD2hgLmbctHMk6jeJYyanAjb3bVNkH/vi4RQjQ=;
+        b=fOdLkEN6Uw9DJiTlPsLPGqB4UN7qDr7HUyynuoeVMHTyK8XXiEi6zYXqINP6dZwRSc
+         MSvdpbbf9qz8F48wIarEvxKJXCm5hUEJS28bgrpnTx4g8SJQT9//zC7VWTmBQMWxUUmB
+         LM0QHwqqqcsgDue993S/LyoeZTtajSBMUAfbFUVYXPsVKo8m/P8VzfwN3GE4X+SWNhGC
+         Mg8Xaei4XQuvI6JwlqP8rHFRIo8VF0LQOt+hRRUYlJ8e3GNOXEdb6RldaaP0HEAvDXzo
+         ZzqFaC0y/0BJKBjDAlE8h/+Z2pWVswhqlLCM8StA1XD4c+1xHPTqUwWocqE7RVOVwT/N
+         l0Tw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702999561; x=1703604361;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NchLShD2hgLmbctHMk6jeJYyanAjb3bVNkH/vi4RQjQ=;
+        b=lVZghsfEQMmB2U6BE4LR207T0NKXrhTEG/yNiQjAWmN16ySiMjlWOxR7FnujYxciub
+         OUtidAtb9HMhwYgtu9tb4T/m4PyALzjDjmzH+qVgHc27SKTmzSzcqNenFFyACbCes1da
+         CovUhCCAkTfOcgpEbeHZAAT3TQJorr62gh+7M+5vuxctfhzx+atGeR4Pu5HSHmwhLk1m
+         6hXYG2RBMffqcJqHFm5WteAx29z5N5ikKUv523nQIym+yaIoQD5A+nuV+gRUD/Z2axa4
+         CSGy087koz2rCMTv3bQ7nYJWFzDza8RpU9peLoIKNQqCqSh9Ux+aq4qEswWpm2YVqhJp
+         Q99w==
+X-Gm-Message-State: AOJu0Yy5F99qTTawHgJrfQKnBLGf6OmPSDQOPOrBWNsTzUA76rrll5fO
+	pRn8Yfitc5GKZgTzjIOonbPelNSyCO0=
+X-Google-Smtp-Source: AGHT+IFe8yf9PXXd7Y/ZYqWD6OCo3rRZmRaDopu9f1++IOKu+CwVY6yz5UGrIuAsjHdiGYRQHPJpNXNwSiE=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:ef0c:0:b0:dbc:d4b6:1c3b with SMTP id
+ g12-20020a25ef0c000000b00dbcd4b61c3bmr255514ybd.13.1702999561553; Tue, 19 Dec
+ 2023 07:26:01 -0800 (PST)
+Date: Tue, 19 Dec 2023 07:26:00 -0800
+In-Reply-To: <ZYFPsISS9K867BU5@chao-email>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+References: <20231218140543.870234-1-tao1.su@linux.intel.com>
+ <20231218140543.870234-2-tao1.su@linux.intel.com> <ZYBhl200jZpWDqpU@google.com>
+ <ZYEFGQBti5DqlJiu@chao-email> <CALMp9eSJT7PajjX==L9eLKEEVuL-tvY0yN1gXmtzW5EUKHX3Yg@mail.gmail.com>
+ <ZYFPsISS9K867BU5@chao-email>
+Message-ID: <ZYG2CDRFlq50siec@google.com>
+Subject: Re: [PATCH 1/2] x86: KVM: Limit guest physical bits when 5-level EPT
+ is unsupported
+From: Sean Christopherson <seanjc@google.com>
+To: Chao Gao <chao.gao@intel.com>
+Cc: Jim Mattson <jmattson@google.com>, Tao Su <tao1.su@linux.intel.com>, kvm@vger.kernel.org, 
+	pbonzini@redhat.com, eddie.dong@intel.com, xiaoyao.li@intel.com, 
+	yuan.yao@linux.intel.com, yi1.lai@intel.com, xudong.hao@intel.com, 
+	chao.p.peng@intel.com
+Content-Type: text/plain; charset="us-ascii"
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218259
+On Tue, Dec 19, 2023, Chao Gao wrote:
+> On Mon, Dec 18, 2023 at 07:40:11PM -0800, Jim Mattson wrote:
+> >Honestly, I think KVM should just disable EPT if the EPT tables can't
+> >support the CPU's physical address width.
+> 
+> Yes, it is an option.
+> But I prefer to allow admin to override this (i.e., admin still can enable EPT
+> via module parameter) because those issues are not new and disabling EPT
+> doesn't prevent QEMU from launching guests w/ smaller MAXPHYADDR.
+> 
+> >> Here nothing visible to selftests or QEMU indicates that guest.MAXPHYADDR = 52
+> >> is invalid/incorrect. how can we say selftests are at fault and we should fix
+> >> them?
+> >
+> >In this case, the CPU is at fault, and you should complain to the CPU vendor.
+> 
+> Yeah, I agree with you and will check with related team inside Intel.
 
---- Comment #7 from Sean Christopherson (seanjc@google.com) ---
-On Tue, Dec 19, 2023, bugzilla-daemon@kernel.org wrote:
-> https://bugzilla.kernel.org/show_bug.cgi?id=3D218259
->=20
-> --- Comment #6 from Joern Heissler (kernelbugs2012@joern-heissler.de) ---
-> (In reply to Sean Christopherson from comment #5)
->=20
-> > This is likely/hopefully the same thing Yan encountered[1].  If you are
-> able
-> > to
-> > test patches, the proposed fix[2] applies cleanly on v6.6 (note, I need=
- to
-> > post a
-> > refreshed version of the series regardless), any feedback you can provi=
-de
-> > would
-> > be much appreciated.
-> >=20
-> > [1] https://lore.kernel.org/all/ZNnPF4W26ZbAyGto@yzhao56-desk.sh.intel.=
-com
-> > [2] https://lore.kernel.org/all/20230825020733.2849862-1-seanjc@google.=
-com
->=20
-> I admit that I don't understand most of what's written in the those threa=
-ds.
+I agree that the CPU is being weird, but this is technically an architecturally
+legal configuration, and KVM has largely committed to supporting weird setups.
+At some point we have to draw a line when things get too ridiculous, but I don't
+think this particular oddity crosses into absurd territory.
 
-LOL, no worries, sometimes none of us understand what's written either ;-)
+> My point was just this isn't a selftest issue because not all information is
+> disclosed to the tests.
 
-> I applied the two patches from [2] (excluding [3]) to v6.6 and it appears=
- to
-> solve the problem.
->=20
-> However I haven't measured how/if any of the changes/flags affect perform=
-ance
-> or if any other problems are caused. After about 1 hour uptime it appears=
- to
-> be
-> okay.
+Ah, right, EPT capabilities are in MSRs that userspace can't read.
 
-Don't worry too much about additional testing.  Barring a straight up bug
-(knock
-wood), the changes in those patches have a very, very low probability of
-introducing unwanted side effects.
+> And I am afraid KVM as L1 VMM may run into this situation, i.e., only 4-level
+> EPT is supported but MAXPHYADDR is 52. So, KVM needs a fix anyway.
 
-> > KVM changes aside, I highly recommend evaluating whether or not NUMA
-> > autobalancing is a net positive for your environment.  The interactions
-> > between
-> > autobalancing and KVM are often less than stellar, and disabling
-> > autobalancing
-> > is sometimes a completely legitimate option/solution.
->=20
-> I'll have to evaluate multiple options for my production environment.
-> Patching+Building the kernel myself would only be a last resort. And it w=
-ill
-> probably take a while until Debian ships a patch for the issue. So maybe
-> disable the NUMA balancing, or perhaps try to pin a VM's memory+cpu to a
-> single
-> NUMA node.
+Yes, but forcing emulation for a funky setup is not a good fix.  KVM can simply
+constrain the advertised MAXPHYADDR, no? 
 
-Another viable option is to disable the TDP MMU, at least until the above
-patches
-land and are picked up by Debian.  You could even reference commit 7e546bd0=
-8943
-("Revert "KVM: x86: enable TDP MMU by default"") from the v5.15 stable tree=
- if
-you want a paper trail that provides some justification as to why it's ok to
-revert
-back to the "old" MMU.
+---
+ arch/x86/kvm/cpuid.c   | 17 +++++++++++++----
+ arch/x86/kvm/mmu.h     |  2 ++
+ arch/x86/kvm/mmu/mmu.c |  5 +++++
+ 3 files changed, 20 insertions(+), 4 deletions(-)
 
-Quoting from that:
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 294e5bd5f8a0..5c346e1a10bd 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -1233,12 +1233,21 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+ 		 *
+ 		 * If TDP is enabled but an explicit guest MAXPHYADDR is not
+ 		 * provided, use the raw bare metal MAXPHYADDR as reductions to
+-		 * the HPAs do not affect GPAs.
++		 * the HPAs do not affect GPAs.  Finally, if TDP is enabled and
++		 * doesn't support 5-level paging, cap guest MAXPHYADDR at 48
++		 * bits as KVM can't install SPTEs for larger GPAs.
+ 		 */
+-		if (!tdp_enabled)
++		if (!tdp_enabled) {
+ 			g_phys_as = boot_cpu_data.x86_phys_bits;
+-		else if (!g_phys_as)
+-			g_phys_as = phys_as;
++		} else {
++			u8 max_tdp_level = kvm_mmu_get_max_tdp_level();
++
++			if (!g_phys_as)
++				g_phys_as = phys_as;
++
++			if (max_tdp_level < 5)
++				g_phys_as = min(g_phys_as, 48);
++		}
+ 
+ 		entry->eax = g_phys_as | (virt_as << 8);
+ 		entry->ecx &= ~(GENMASK(31, 16) | GENMASK(11, 8));
+diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+index 60f21bb4c27b..b410a227c601 100644
+--- a/arch/x86/kvm/mmu.h
++++ b/arch/x86/kvm/mmu.h
+@@ -100,6 +100,8 @@ static inline u8 kvm_get_shadow_phys_bits(void)
+ 	return boot_cpu_data.x86_phys_bits;
+ }
+ 
++u8 kvm_mmu_get_max_tdp_level(void);
++
+ void kvm_mmu_set_mmio_spte_mask(u64 mmio_value, u64 mmio_mask, u64 access_mask);
+ void kvm_mmu_set_me_spte_mask(u64 me_value, u64 me_mask);
+ void kvm_mmu_set_ept_masks(bool has_ad_bits, bool has_exec_only);
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 3c844e428684..b2845f5520b3 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -5267,6 +5267,11 @@ static inline int kvm_mmu_get_tdp_level(struct kvm_vcpu *vcpu)
+ 	return max_tdp_level;
+ }
+ 
++u8 kvm_mmu_get_max_tdp_level(void)
++{
++	return tdp_root_level ? tdp_root_level : max_tdp_level;
++}
++
+ static union kvm_mmu_page_role
+ kvm_calc_tdp_mmu_root_page_role(struct kvm_vcpu *vcpu,
+ 				union kvm_cpu_role cpu_role)
 
-  : As far as what is lost by disabling the TDP MMU, the main selling point=
- of
-  : the TDP MMU is its ability to service page fault VM-Exits in parallel,
-  : i.e. the main benefactors of the TDP MMU are deployments of large VMs
-  : (hundreds of vCPUs), and in particular delployments that live-migrate s=
-uch
-  : VMs and thus need to fault-in huge amounts of memory on many vCPUs after
-  : restarting the VM after migration.
-
-In other words, the old MMU is not broken, e.g. it didn't suddently become
-unusable
-after 15+ years of use.  We enabled the newfangled TDP MMU by default becau=
-se
-it
-is the long-term replacement, e.g. it can scale to support use cases that t=
-he
-old
-MMU falls over on, and we want to put the old MMU into maintenance-only mod=
-e.
-
-But we are still ironing out some wrinkles in the TDP MMU, particularly for
-host
-kernels that support preemption (the kernel has lock contention logic that =
-is
-unique to preemptible kernels).  And in the meantime, for most KVM use case=
-s,
-the
-old MMU is still perfectly servicable.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+base-commit: f2a3fb7234e52f72ff4a38364dbf639cf4c7d6c6
+-- 
 
