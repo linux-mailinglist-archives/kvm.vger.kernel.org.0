@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-4765-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4766-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A344C81813D
-	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 06:58:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F09DB818141
+	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 06:59:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1604B1F233D7
-	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 05:58:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7FEF41F23738
+	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 05:59:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65E377468;
-	Tue, 19 Dec 2023 05:58:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 541C979F5;
+	Tue, 19 Dec 2023 05:59:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="InSx51Sj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dWQcq324"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EC5E6AA2
-	for <kvm@vger.kernel.org>; Tue, 19 Dec 2023 05:58:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC1AD79C2
+	for <kvm@vger.kernel.org>; Tue, 19 Dec 2023 05:59:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702965506;
+	s=mimecast20190719; t=1702965557;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=6mjY6FtOd+1hsi8Ne7rCpA7JmaDnqNk0R9P4YeXVzbo=;
-	b=InSx51SjDJw97YZmawGNtQXha4PjfmLNurp1QFxXkkCDc6AqzdhXy8udxWZ2zCaXlOWnPD
-	a4hrGbXWTBarsGHZqm9oX/6ukCA9RH8MZ+zPUgOQ3ocOQv8nE9jkJKjGuuEU3TG8pj5X9G
-	ZmG/2MvSeyWd/NBZZ9xajAnFG5rTvvY=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=jYoSXCZIKVpq1KRBLPkPUJyhvobqun0ThJvbnoM28S4=;
+	b=dWQcq324TMSY1wJZIQPTnRg0TJSyIx5ce2ckmRzLZM7dHzLHR+/WbWb2Nh2NUpvklLSEVp
+	qbN4+OAbb+hHPyI4NKnQ85Xy48DDJkXSq7EjpzMrHVrLvSOx74cF2G9iiZ+pSCPq9GJDhO
+	G3wP0HaCpAmwH+bvrIQ57eVmcK+3MwA=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-253-G73VPBHIO0Wsccr6mlk_8w-1; Tue, 19 Dec 2023 00:58:23 -0500
-X-MC-Unique: G73VPBHIO0Wsccr6mlk_8w-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-40c2c568108so32150445e9.1
-        for <kvm@vger.kernel.org>; Mon, 18 Dec 2023 21:58:23 -0800 (PST)
+ us-mta-271-4ATAiDfOPj20ggGhll3gFg-1; Tue, 19 Dec 2023 00:59:16 -0500
+X-MC-Unique: 4ATAiDfOPj20ggGhll3gFg-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-40c2c6f0893so30648475e9.3
+        for <kvm@vger.kernel.org>; Mon, 18 Dec 2023 21:59:15 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702965502; x=1703570302;
+        d=1e100.net; s=20230601; t=1702965555; x=1703570355;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6mjY6FtOd+1hsi8Ne7rCpA7JmaDnqNk0R9P4YeXVzbo=;
-        b=jC0hAxCOl7Ho8+cm59e291rXrFqGfYCoOydXhGyCAX4fH2q6VmUUuxR7BWqmhTvqdS
-         Z2Es9AyMlViC5SFIexW8+b822kuYT7K9tiUH5l0ObMn75TESna+dRp+HG+/VlMgycah1
-         aS28Fvqd9eOuyIsKSfesARlxw0cNvuHCESF7oAzmfOKUtIAfbAiwS2Jx6bji9Q8c9/uh
-         GLbFDp7Tn4LQMWyeOwlRhfUsoM8m86aSmFIU2ae7JyoawjIWagGD6VtdY+ci9qgEb327
-         G2Slpna2wbYNgdBwLo4W7tnhu0vefGVDjklmGJtRMlZBGsW9rEsx9wb1g7Xka8j/ZeFb
-         Ik9w==
-X-Gm-Message-State: AOJu0YzNv7tV/diVML/An72KE1n5rpFaRla11UtXhvZkPqs25yfh908F
-	rWtut7xO5P4iIA2IqAVUfCeCgJINjQW77DxA8bekR9vmsS12YpCTOp6+DBj/7sO59tKpLvtSIHD
-	dPtlFmU6ZRMAv
-X-Received: by 2002:a05:600c:b43:b0:40b:5e1e:cf2 with SMTP id k3-20020a05600c0b4300b0040b5e1e0cf2mr9680388wmr.45.1702965502783;
-        Mon, 18 Dec 2023 21:58:22 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFz16+/eFZgiNQVirPh02Ct1LQiSHhmArUBEOKyKs5gBOf73+IW2YYCSBJZse69DGosD/kKFQ==
-X-Received: by 2002:a05:600c:b43:b0:40b:5e1e:cf2 with SMTP id k3-20020a05600c0b4300b0040b5e1e0cf2mr9680377wmr.45.1702965502484;
-        Mon, 18 Dec 2023 21:58:22 -0800 (PST)
+        bh=jYoSXCZIKVpq1KRBLPkPUJyhvobqun0ThJvbnoM28S4=;
+        b=bzOY6o5jbr8C25KXZ/avtgdIY3dkovJYr2awz3SPbeHQw5rsQQVl0q6pnY8BxClsQ8
+         O1oKWGfVzmze9zOTsbr36r4N0KAJFsYtQ3pzls58vVBB4CxGDOdznHACZx3vjK+trBnX
+         86xeCeZlgWnaPfBGqEX3x9CRYDUh1ubq8IV2mp8fB0lGIaGFKmRLeskcoCfVxOC+VVN2
+         JOB3XjMMEUT7Iw7hDJCEXwd6Hj0mg0Jm9j5B6zaxj9VDrbbRfmE/fq0qHC98feCa1XGU
+         i87BxT2lbzq3zZl/dDuhoQiTl/YzYtqUCoGUEDNU59QHS5EesZcAjEgQv5A0pczmLayj
+         9HXQ==
+X-Gm-Message-State: AOJu0Yy7bKtxp+NtLGmBENFhzH77qNB736JghyU1IV6osV102VLAU7xF
+	c5gmiB3F8EupSz+jnW3RnkNeeoGKYAN1L6vB/meW2fefCTOI/fefiSRJqg+t6EHVYvKUasgDIIU
+	pTmJyuVTEal9g
+X-Received: by 2002:a05:600c:548c:b0:40b:54ef:ff07 with SMTP id iv12-20020a05600c548c00b0040b54efff07mr9130508wmb.32.1702965555125;
+        Mon, 18 Dec 2023 21:59:15 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGYJwngycVl+1FPuIOjGNYJd+yeNN7PH8LkZgFnqelYmtAOJfAzxepfQ3UrZAdxqSqAyZxUhA==
+X-Received: by 2002:a05:600c:548c:b0:40b:54ef:ff07 with SMTP id iv12-20020a05600c548c00b0040b54efff07mr9130498wmb.32.1702965554854;
+        Mon, 18 Dec 2023 21:59:14 -0800 (PST)
 Received: from [192.168.0.6] (ip-109-43-177-45.web.vodafone.de. [109.43.177.45])
-        by smtp.gmail.com with ESMTPSA id l2-20020a05600c4f0200b003feae747ff2sm1183821wmq.35.2023.12.18.21.58.21
+        by smtp.gmail.com with ESMTPSA id l2-20020a05600c4f0200b003feae747ff2sm1183821wmq.35.2023.12.18.21.59.13
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Dec 2023 21:58:22 -0800 (PST)
-Message-ID: <7cfe96f8-b483-476c-8d15-746fcdfb23a6@redhat.com>
-Date: Tue, 19 Dec 2023 06:58:20 +0100
+        Mon, 18 Dec 2023 21:59:14 -0800 (PST)
+Message-ID: <84ef54a0-56bd-4fba-9a52-908a8d82b7e2@redhat.com>
+Date: Tue, 19 Dec 2023 06:59:13 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -72,15 +72,15 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v5 07/29] powerpc: Add a migration stress
- tester
+Subject: Re: [kvm-unit-tests PATCH v5 08/29] powerpc: Require KVM for the TM
+ test
 Content-Language: en-US
 To: Nicholas Piggin <npiggin@gmail.com>, kvm@vger.kernel.org
 Cc: linuxppc-dev@lists.ozlabs.org, Laurent Vivier <lvivier@redhat.com>,
  Shaoqin Huang <shahuang@redhat.com>, Andrew Jones <andrew.jones@linux.dev>,
  Nico Boehr <nrb@linux.ibm.com>
 References: <20231216134257.1743345-1-npiggin@gmail.com>
- <20231216134257.1743345-8-npiggin@gmail.com>
+ <20231216134257.1743345-9-npiggin@gmail.com>
 From: Thomas Huth <thuth@redhat.com>
 Autocrypt: addr=thuth@redhat.com; keydata=
  xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
@@ -124,25 +124,31 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20231216134257.1743345-8-npiggin@gmail.com>
+In-Reply-To: <20231216134257.1743345-9-npiggin@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 16/12/2023 14.42, Nicholas Piggin wrote:
-> This performs 1000 migrations a tight loop to flush out simple issues
-> in the multiple-migration code.
+> QEMU TCG does not support TM. Skip this test gracefully when not on KVM.
 > 
 > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 > ---
->   powerpc/Makefile.common |  1 +
->   powerpc/migrate.c       | 64 +++++++++++++++++++++++++++++++++++++++++
->   2 files changed, 65 insertions(+)
->   create mode 100644 powerpc/migrate.c
+>   powerpc/unittests.cfg | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+> diff --git a/powerpc/unittests.cfg b/powerpc/unittests.cfg
+> index dd5f361c..e71140aa 100644
+> --- a/powerpc/unittests.cfg
+> +++ b/powerpc/unittests.cfg
+> @@ -65,6 +65,7 @@ file = emulator.elf
+>   
+>   [h_cede_tm]
+>   file = tm.elf
+> +accel = kvm
+>   smp = 2,threads=2
+>   extra_params = -machine cap-htm=on -append "h_cede_tm"
+>   groups = h_cede_tm
 
-You should likely add an entry to powerpc/unittests.cfg ...
-also, wouldn't it be better to extend the sprs.elf test for this, so that it 
-e.g. changes some stuff for each migration?
-
-  Thomas
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
 
