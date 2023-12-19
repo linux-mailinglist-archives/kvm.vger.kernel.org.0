@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-4806-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4807-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F61B81875F
-	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 13:23:45 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8040818773
+	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 13:27:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B12C52853DE
-	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 12:23:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5E0F1B23ACB
+	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 12:27:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D05A1A59A;
-	Tue, 19 Dec 2023 12:22:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 811D918632;
+	Tue, 19 Dec 2023 12:27:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dKReT4V8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RktIH0eX"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A45E71A58C
-	for <kvm@vger.kernel.org>; Tue, 19 Dec 2023 12:22:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 588FF18645
+	for <kvm@vger.kernel.org>; Tue, 19 Dec 2023 12:27:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702988574;
+	s=mimecast20190719; t=1702988850;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=ScmodmRY1DhWwRsVePjC0/jEg/0Gnr/zqZH69W9QYvo=;
-	b=dKReT4V8sLdiM6zQbn1Dtg1NmwY0BB0Hud4Sp4unjdblHx3NZJhO+jvTku47LgsgBVqaXg
-	Kz6Z22ItTSOZL4u0qg/0ww1yPMSRfObY5mF+Y50GseYn3qca1DMnIUj4VzGQ9cHAWMS8pZ
-	HWzK5FjdUus+jefWfDBGLsp11/fymyA=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=RbbJ5eIrXcjdReDyv3RJBIq3VmDXMbdp/uvztD9DHe4=;
+	b=RktIH0eXVB0GUIa5dRICRtZhSeKhw2c2KDYbJSSvUG+gc2U4Yv8txBdejb+BhNHwk8w7ve
+	O8vjE72Yy8yke2P+QmqK//Hcv5SSRyGL4LVVjzW0k4IlpzvSsebo/AISuf72lwONMeVsF6
+	OLsesS3IsddnthQEh9xL2nEhBTIY+Yo=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-539-AKz6q39EPneHlXJHL5wV5g-1; Tue, 19 Dec 2023 07:22:53 -0500
-X-MC-Unique: AKz6q39EPneHlXJHL5wV5g-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-33671cea96dso400247f8f.3
-        for <kvm@vger.kernel.org>; Tue, 19 Dec 2023 04:22:52 -0800 (PST)
+ us-mta-444-tIIqjDiYO_WfGSYAcNZ5xg-1; Tue, 19 Dec 2023 07:27:28 -0500
+X-MC-Unique: tIIqjDiYO_WfGSYAcNZ5xg-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a2359549fc0so68101566b.0
+        for <kvm@vger.kernel.org>; Tue, 19 Dec 2023 04:27:28 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702988572; x=1703593372;
+        d=1e100.net; s=20230601; t=1702988848; x=1703593648;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ScmodmRY1DhWwRsVePjC0/jEg/0Gnr/zqZH69W9QYvo=;
-        b=NfXZpGiO201mifO3KaxRCEQXrL0SFAawto45HlrL59/Qzv/4p4yOHurZhpC57A91mj
-         zp4f0acy9Tfwrszl8Ob2GA6Oa+8ryEqbmxsbcmutc7w6Fa+qbEgDHIYxz+VbsDYvc78k
-         SUeUk8AzDoqV9zc+aHlsuKJCyvA1r7Elb87rV4TUzZ41ZoI6cXD9sqexxyukziD6ukez
-         FLcG/HK08gyhazCwaOoEMK7n4fDgy1lHuEmfbQq7VwH6RP+JbgMi2D7xcJ05NdEFfNWO
-         G2v8j/fd+n/o5w68U4f69FIREc0Wo01GJ4AcBqQv9KsxMgISlLlb+gqmUY3KayOH/H34
-         twog==
-X-Gm-Message-State: AOJu0YzuOUNBFaJq2PivBQLDM6fee/SYpS/L86oHY5d0VuR+TViJfzuv
-	LxEfxA6VIeYZEUwi3DVP6hFyoC2jrv2KriOLDyKm0Q1Iuc1XOubglnHzLp0kA9+ILNvPhK8Zb5M
-	1n5WJ2is3R9Kr
-X-Received: by 2002:adf:f652:0:b0:336:6d00:8bf8 with SMTP id x18-20020adff652000000b003366d008bf8mr628536wrp.286.1702988571947;
-        Tue, 19 Dec 2023 04:22:51 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHUUrGMNUDo5rUN3K5C3MerqRS07x5oLALxlgd/DLTTqO9GjZx+ekKpkLeF/li84wAv3gFW3w==
-X-Received: by 2002:adf:f652:0:b0:336:6d00:8bf8 with SMTP id x18-20020adff652000000b003366d008bf8mr628531wrp.286.1702988571645;
-        Tue, 19 Dec 2023 04:22:51 -0800 (PST)
+        bh=RbbJ5eIrXcjdReDyv3RJBIq3VmDXMbdp/uvztD9DHe4=;
+        b=a1/aZSGR/FpvK0SB7NGY8kvESSrQFjjBDI2kbxpBFG+hU+Dtx3Z2X3JGUQZ/siXvUW
+         ZckZ8GeIjAHgFgPMMMQ25TYN32wsG5akg1fvdPhotVP8CP2VmyHGjJNLmrivkB5Wdasd
+         pt/e6e/GfusedsDmeqc5NMCCHBrzFGo0YvHqu+PJMpX2cr7gf9xDgqTeEKT6lt501Sde
+         B5fV0yE1AhoH2dtACQzke/r+LQWBG1W1YsPCxwa7sliTo5QNWTnlwZ/Q0JlRO5UoQW/O
+         SoBvYX/XKvAj/oLejCa5Dt+PlG8eLs420j6e1hT8Qj8dZk4xtTkg5cmBU5eabqLHNoZ2
+         9lOA==
+X-Gm-Message-State: AOJu0Ywqarzh0VXeCT+OimcW/5rkhte3ZyiE0kufAi3ck/IrVZHb3/4w
+	A1rygwKdf7a3eP8s58ayufGk2JBfe2aze2QYKPO8pg6pizf/ExnUEUiKDcx0FLSMqokDVTe+UMb
+	2yAMG9KYepvfdgUJNdgLK
+X-Received: by 2002:a17:906:2247:b0:a23:3e76:185 with SMTP id 7-20020a170906224700b00a233e760185mr1933013ejr.35.1702988847889;
+        Tue, 19 Dec 2023 04:27:27 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFG8okK30RHpIsNvh9ix8iaNEcUSaj5RJwS5gVDZAmh7oeeSJc9UX0xdwvdFEFTKfTTm3CP6Q==
+X-Received: by 2002:a17:906:2247:b0:a23:3e76:185 with SMTP id 7-20020a170906224700b00a233e760185mr1933000ejr.35.1702988847399;
+        Tue, 19 Dec 2023 04:27:27 -0800 (PST)
 Received: from [192.168.0.6] (ip-109-43-177-45.web.vodafone.de. [109.43.177.45])
-        by smtp.gmail.com with ESMTPSA id k15-20020a5d628f000000b0033656783e76sm11211070wru.111.2023.12.19.04.22.50
+        by smtp.gmail.com with ESMTPSA id vv8-20020a170907a68800b00a1d2b0d4500sm15273390ejc.168.2023.12.19.04.27.26
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Dec 2023 04:22:51 -0800 (PST)
-Message-ID: <464fccfc-b375-4458-b718-de606e50c61c@redhat.com>
-Date: Tue, 19 Dec 2023 13:22:50 +0100
+        Tue, 19 Dec 2023 04:27:27 -0800 (PST)
+Message-ID: <018c2d8f-b956-4b8e-9741-b4d3d3da1a8d@redhat.com>
+Date: Tue, 19 Dec 2023 13:27:25 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -72,15 +72,15 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v5 18/29] powerpc: Fix stack backtrace
- termination
+Subject: Re: [kvm-unit-tests PATCH v5 19/29] scripts: allow machine option to
+ be specified in unittests.cfg
 Content-Language: en-US
 To: Nicholas Piggin <npiggin@gmail.com>, kvm@vger.kernel.org
 Cc: linuxppc-dev@lists.ozlabs.org, Laurent Vivier <lvivier@redhat.com>,
  Shaoqin Huang <shahuang@redhat.com>, Andrew Jones <andrew.jones@linux.dev>,
  Nico Boehr <nrb@linux.ibm.com>
 References: <20231216134257.1743345-1-npiggin@gmail.com>
- <20231216134257.1743345-19-npiggin@gmail.com>
+ <20231216134257.1743345-20-npiggin@gmail.com>
 From: Thomas Huth <thuth@redhat.com>
 Autocrypt: addr=thuth@redhat.com; keydata=
  xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
@@ -124,52 +124,21 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20231216134257.1743345-19-npiggin@gmail.com>
+In-Reply-To: <20231216134257.1743345-20-npiggin@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 16/12/2023 14.42, Nicholas Piggin wrote:
-> The backtrace handler terminates when it sees a NULL caller address,
-> but the powerpc stack setup does not keep such a NULL caller frame
-> at the start of the stack.
-> 
-> This happens to work on pseries because the memory at 0 is mapped and
-> it contains 0 at the location of the return address pointer if it
-> were a stack frame. But this is fragile, and does not work with powernv
-> where address 0 contains firmware instructions.
-> 
-> Use the existing dummy frame on stack as the NULL caller, and create a
-> new frame on stack for the entry code.
+> This allows different machines with different requirements to be
+> supported by run_tests.sh, similarly to how different accelerators
+> are handled.
 > 
 > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 > ---
->   powerpc/cstart64.S | 12 ++++++++++--
->   1 file changed, 10 insertions(+), 2 deletions(-)
-> 
-> diff --git a/powerpc/cstart64.S b/powerpc/cstart64.S
-> index e18ae9a2..14ab0c6c 100644
-> --- a/powerpc/cstart64.S
-> +++ b/powerpc/cstart64.S
-> @@ -46,8 +46,16 @@ start:
->   	add	r1, r1, r31
->   	add	r2, r2, r31
->   
-> +	/* Zero backpointers in initial stack frame so backtrace() stops */
-> +	li	r0,0
-> +	std	r0,0(r1)
-> +	std	r0,16(r1)
-> +
-> +	/* Create entry frame */
-> +	stdu	r1,-INT_FRAME_SIZE(r1)
+>   scripts/common.bash  |  8 ++++++--
+>   scripts/runtime.bash | 16 ++++++++++++----
+>   2 files changed, 18 insertions(+), 6 deletions(-)
 
-Shouldn't that rather be STACK_FRAME_OVERHEAD instead of INT_FRAME_SIZE...
-
->   	/* save DTB pointer */
-> -	std	r3, 56(r1)
-> +	SAVE_GPR(3,r1)
-
-... since SAVE_GPR uses STACK_FRAME_OVERHEAD (via GPR0), too?
-
-  Thomas
+Acked-by: Thomas Huth <thuth@redhat.com>
 
 
