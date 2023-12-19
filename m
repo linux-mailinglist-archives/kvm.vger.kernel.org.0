@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-4800-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4801-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EF2D818675
-	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 12:34:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 019D9818697
+	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 12:48:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C8C41F23BC7
-	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 11:34:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 085901C23D3D
+	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 11:48:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51FDE15AE6;
-	Tue, 19 Dec 2023 11:34:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F9DF1A723;
+	Tue, 19 Dec 2023 11:48:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SAsRPszc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JqGM8ATi"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4832F156E7
-	for <kvm@vger.kernel.org>; Tue, 19 Dec 2023 11:34:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7E811A286
+	for <kvm@vger.kernel.org>; Tue, 19 Dec 2023 11:47:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702985662;
+	s=mimecast20190719; t=1702986478;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=WAp3//I333KruVNGSong7V6HbVZ8bL6EuOovu7xqHWE=;
-	b=SAsRPszcKn0RxdtWZ8qEN3TR/TobfkfAvLE47ahb2Cdmxk6qxgJ/4MZOT1xNqAqyMxtc6l
-	fGF3/p7jqAS8CdXEYRMfkRexNaS3dQlx6zdU/pVznxhKIjpsjcODl4Y0H85CdmCKoxFcV+
-	lfanO8xByi0OScewoD9dNKCcKK9QifY=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=i1d2Ab31Ee77sG0X3X5fnzN3nw+6wvY9AWMLlM5zpLc=;
+	b=JqGM8ATi8yBo80mCOUYzU+10dlXLAKGOgLe4uhuPvoy06m091NOaVghrWncgE+o1x/vPDk
+	7YhqYdjPfuCJtoIaw3BUe8eXRw+3UlZ3qmZ+uPSaffSMnNWEq0fXvaUiR71onGpPhUoMIv
+	PtbES+9qJk5TrD/aubnPzlTJ/2N6qRY=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-513-NlNuXZNnOpeSG0wftjEQpw-1; Tue, 19 Dec 2023 06:34:20 -0500
-X-MC-Unique: NlNuXZNnOpeSG0wftjEQpw-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3365bc111a5so2909375f8f.1
-        for <kvm@vger.kernel.org>; Tue, 19 Dec 2023 03:34:20 -0800 (PST)
+ us-mta-655-RBI_sICrNNaiTMdLlSjJiA-1; Tue, 19 Dec 2023 06:47:57 -0500
+X-MC-Unique: RBI_sICrNNaiTMdLlSjJiA-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-40d29d4ed7fso3114645e9.1
+        for <kvm@vger.kernel.org>; Tue, 19 Dec 2023 03:47:57 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702985659; x=1703590459;
+        d=1e100.net; s=20230601; t=1702986476; x=1703591276;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WAp3//I333KruVNGSong7V6HbVZ8bL6EuOovu7xqHWE=;
-        b=QFF/U7Bi9UqpvLYSJRrz8dj6McnW/qh19MYR2xfOEwYQkyBzI01e6nnH5juy/SlcFN
-         5Vodapb2nliMEgTwIlnL17Lhc+yNzcoQsT1lfmA0tbYyvHy5HgjNF/QRfpQeWtU4EjSk
-         FhHqMTOtwgiEOEkP8JjuxThhjJ1Sxphkk2IuIHqU/PP+FQmqLlRTFHJN75MHkS3y9Yn2
-         abAJqScZKsi9Yu9V8PxzLlST6Uax+tzCc5FCycvoE1Z7q+tGn5+0CR31m12tGLDcW3qf
-         NDWmBVvnvSILxQ3PRYko01qZkGDv/19QM4YYDXd2lcEX41YdxVV7wuLOSedMXI7cOe55
-         hdGg==
-X-Gm-Message-State: AOJu0Yzp4fYlBY1pBOrzNFmWUkdiLYntlEv4oIOseyxLt0ssIWFUB8qP
-	wZq/89fE0L2G35JZRX83Z1NdiAlpPDgnr2LD7JJFlzRq9BRa7zQ3KuGMuhJsJXjE6WC8fBxn62I
-	FhygT4mDCzBsrxG9Cmxv9
-X-Received: by 2002:a5d:4e05:0:b0:336:6287:1236 with SMTP id p5-20020a5d4e05000000b0033662871236mr1897695wrt.72.1702985659731;
-        Tue, 19 Dec 2023 03:34:19 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFGcxni5+kdh5Rn4ZqsC2WlYIEPkIvSIyoTFDJQg355BpOkdx7EWsChSPU6glkYzgCMjztolw==
-X-Received: by 2002:a5d:4e05:0:b0:336:6287:1236 with SMTP id p5-20020a5d4e05000000b0033662871236mr1897686wrt.72.1702985659451;
-        Tue, 19 Dec 2023 03:34:19 -0800 (PST)
+        bh=i1d2Ab31Ee77sG0X3X5fnzN3nw+6wvY9AWMLlM5zpLc=;
+        b=UjbdX2saKfXOxfICHN0/QYDsLs+nlb9ry3ZzZXM6dZUPowMmcCoOhUNPO1B0khsBbe
+         KnlQ6NOHHVEKk/l71sQAQWyynTV9wY1ppN/LXj8dHp5357XwsM8mPvigfQKUvvZk8wL2
+         5OfivdcBYmD+AjxFD59PFZ9Gtva/mFFQ8vt+NVHG2sI8eL0X2kgqhwn7zojwGqhAOCFY
+         R9zK6VQ+uRQ0D8SUL+GlG1Rk+1Lpyookzq8PswzP/bhPY3TYrI4F/m5cQ4kYj+INad7m
+         JvkpZFQAzJp1BiSaxdLemW8O95VoP4g01b+4pOkWhH3zFQAgWLIIGRdGc4YpIzxP4zV1
+         vh7g==
+X-Gm-Message-State: AOJu0Yw9hTmodlRbbB2PT6C4YO3ZNn6iAsFdwRU78H96dZiKwBigVSLV
+	8A6MfGzUcJyvMOn5vJ7OHses0kmqU7JTsy/A11cb3nGH0A5QiYNubRmv4dfT1ZKV6DBAhUyZ59E
+	n2hgJjn6slrod
+X-Received: by 2002:a05:600c:3502:b0:40c:6a85:e83a with SMTP id h2-20020a05600c350200b0040c6a85e83amr4099242wmq.51.1702986476239;
+        Tue, 19 Dec 2023 03:47:56 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFiFVSJIncyXNQiQCK7FzhlOuTeobBj8bJrrGSExzIOLTjus4qqbQKoGc2WH5915vMigDM4Ug==
+X-Received: by 2002:a05:600c:3502:b0:40c:6a85:e83a with SMTP id h2-20020a05600c350200b0040c6a85e83amr4099235wmq.51.1702986475920;
+        Tue, 19 Dec 2023 03:47:55 -0800 (PST)
 Received: from [192.168.0.6] (ip-109-43-177-45.web.vodafone.de. [109.43.177.45])
-        by smtp.gmail.com with ESMTPSA id h4-20020a05600004c400b0033621fe3a29sm22710668wri.26.2023.12.19.03.34.18
+        by smtp.gmail.com with ESMTPSA id jg7-20020a05600ca00700b0040c46719966sm2452815wmb.25.2023.12.19.03.47.55
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Dec 2023 03:34:19 -0800 (PST)
-Message-ID: <543560d4-522d-4c25-9d18-58a90240e570@redhat.com>
-Date: Tue, 19 Dec 2023 12:34:17 +0100
+        Tue, 19 Dec 2023 03:47:55 -0800 (PST)
+Message-ID: <c06b1cec-8a39-41ff-91e6-ad7bb99b3341@redhat.com>
+Date: Tue, 19 Dec 2023 12:47:54 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -72,15 +72,15 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v5 11/29] powerpc/sprs: Don't fail changed
- SPRs that are used by the test harness
+Subject: Re: [kvm-unit-tests PATCH v5 12/29] powerpc/sprs: Avoid taking async
+ interrupts caused by register fuzzing
 Content-Language: en-US
 To: Nicholas Piggin <npiggin@gmail.com>, kvm@vger.kernel.org
 Cc: linuxppc-dev@lists.ozlabs.org, Laurent Vivier <lvivier@redhat.com>,
  Shaoqin Huang <shahuang@redhat.com>, Andrew Jones <andrew.jones@linux.dev>,
  Nico Boehr <nrb@linux.ibm.com>
 References: <20231216134257.1743345-1-npiggin@gmail.com>
- <20231216134257.1743345-12-npiggin@gmail.com>
+ <20231216134257.1743345-13-npiggin@gmail.com>
 From: Thomas Huth <thuth@redhat.com>
 Autocrypt: addr=thuth@redhat.com; keydata=
  xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
@@ -124,37 +124,61 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20231216134257.1743345-12-npiggin@gmail.com>
+In-Reply-To: <20231216134257.1743345-13-npiggin@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 16/12/2023 14.42, Nicholas Piggin wrote:
-> SPRs annotated with SPR_HARNESS can change between consecutive reads
-> because the test harness code has changed them. Avoid failing the
-> test in this case.
+> Storing certain values in some registers can cause asynchronous
+> interrupts that can crash the test case, for example decrementer
+> or PMU interrupts.
 > 
-> [XER was observed to change after the next changeset to use mdelay.]
+> Change the msleep to mdelay which does not enable MSR[EE] and so
+> avoids the problem. This allows removing some of the SPR special
+> casing.
 > 
 > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 > ---
->   powerpc/sprs.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+>   powerpc/sprs.c | 14 ++------------
+>   1 file changed, 2 insertions(+), 12 deletions(-)
 > 
 > diff --git a/powerpc/sprs.c b/powerpc/sprs.c
-> index cd8b472d..01041912 100644
+> index 01041912..313698e0 100644
 > --- a/powerpc/sprs.c
 > +++ b/powerpc/sprs.c
-> @@ -557,7 +557,7 @@ int main(int argc, char **argv)
->   			if (before[i] >> 32)
->   				pass = false;
->   		}
-> -		if (!(sprs[i].type & SPR_ASYNC) && (before[i] != after[i]))
-> +		if (!(sprs[i].type & (SPR_HARNESS|SPR_ASYNC)) && (before[i] != after[i]))
->   			pass = false;
+> @@ -481,12 +481,7 @@ static void set_sprs(uint64_t val)
+>   			continue;
+>   		if (sprs[i].type & SPR_HARNESS)
+>   			continue;
+> -		if (!strcmp(sprs[i].name, "MMCR0")) {
+> -			/* XXX: could use a comment or better abstraction! */
+> -			__mtspr(i, (val & 0xfffffffffbab3fffULL) | 0xfa0b2070);
+> -		} else {
+> -			__mtspr(i, val);
+> -		}
+> +		__mtspr(i, val);
+>   	}
+>   }
+>   
+> @@ -536,12 +531,7 @@ int main(int argc, char **argv)
+>   	if (pause) {
+>   		migrate_once();
+>   	} else {
+> -		msleep(2000);
+> -
+> -		/* Taking a dec updates SRR0, SRR1, SPRG1, so don't fail. */
+> -		sprs[26].type |= SPR_ASYNC;
+> -		sprs[27].type |= SPR_ASYNC;
+> -		sprs[273].type |= SPR_ASYNC;
+> +		mdelay(2000);
+>   	}
 
-I guess you could even squash this into the previous patch.
+IIRC I used the H_CEDE stuff here on purpose to increase the possibility 
+that the guest gets rescheduled onto another CPU core on the host, and thus 
+that it uncovers sprs that are not saved and restored on the host more 
+easily. So I'd rather keep the msleep() here.
 
-Anyway:
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+  Thomas
+
 
 
