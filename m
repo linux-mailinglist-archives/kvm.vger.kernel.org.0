@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-4801-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4802-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 019D9818697
-	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 12:48:11 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1778C8186B0
+	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 12:54:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 085901C23D3D
-	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 11:48:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 66DE2B21C8E
+	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 11:54:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F9DF1A723;
-	Tue, 19 Dec 2023 11:48:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33B0B18627;
+	Tue, 19 Dec 2023 11:54:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JqGM8ATi"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P26O6kg2"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7E811A286
-	for <kvm@vger.kernel.org>; Tue, 19 Dec 2023 11:47:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3137E18623
+	for <kvm@vger.kernel.org>; Tue, 19 Dec 2023 11:54:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702986478;
+	s=mimecast20190719; t=1702986841;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=i1d2Ab31Ee77sG0X3X5fnzN3nw+6wvY9AWMLlM5zpLc=;
-	b=JqGM8ATi8yBo80mCOUYzU+10dlXLAKGOgLe4uhuPvoy06m091NOaVghrWncgE+o1x/vPDk
-	7YhqYdjPfuCJtoIaw3BUe8eXRw+3UlZ3qmZ+uPSaffSMnNWEq0fXvaUiR71onGpPhUoMIv
-	PtbES+9qJk5TrD/aubnPzlTJ/2N6qRY=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=3ge0vYIMSHofQN40YECeVZ2jR68lUGNh8boj/99SI6g=;
+	b=P26O6kg2TXNe50GBlvXcDnFEO+mtkGZQcoLmNikrE4zLt7MrjvIvpFVRzaMNzXWyS8cKCX
+	z0/G52xu/A45qvBNlO9Vp7QU0r4+1lohk2Qi/f/9RewMVSSwLyy7HmkLNpyB3m9zxSlX4+
+	sX2Wi1bi6xRxMyiE4PUmCNJY26Mdc0k=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-655-RBI_sICrNNaiTMdLlSjJiA-1; Tue, 19 Dec 2023 06:47:57 -0500
-X-MC-Unique: RBI_sICrNNaiTMdLlSjJiA-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-40d29d4ed7fso3114645e9.1
-        for <kvm@vger.kernel.org>; Tue, 19 Dec 2023 03:47:57 -0800 (PST)
+ us-mta-362-1lZUnuF3OCGmQu2RcUcUdA-1; Tue, 19 Dec 2023 06:54:00 -0500
+X-MC-Unique: 1lZUnuF3OCGmQu2RcUcUdA-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-40c42205ed0so35804335e9.2
+        for <kvm@vger.kernel.org>; Tue, 19 Dec 2023 03:54:00 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702986476; x=1703591276;
+        d=1e100.net; s=20230601; t=1702986839; x=1703591639;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=i1d2Ab31Ee77sG0X3X5fnzN3nw+6wvY9AWMLlM5zpLc=;
-        b=UjbdX2saKfXOxfICHN0/QYDsLs+nlb9ry3ZzZXM6dZUPowMmcCoOhUNPO1B0khsBbe
-         KnlQ6NOHHVEKk/l71sQAQWyynTV9wY1ppN/LXj8dHp5357XwsM8mPvigfQKUvvZk8wL2
-         5OfivdcBYmD+AjxFD59PFZ9Gtva/mFFQ8vt+NVHG2sI8eL0X2kgqhwn7zojwGqhAOCFY
-         R9zK6VQ+uRQ0D8SUL+GlG1Rk+1Lpyookzq8PswzP/bhPY3TYrI4F/m5cQ4kYj+INad7m
-         JvkpZFQAzJp1BiSaxdLemW8O95VoP4g01b+4pOkWhH3zFQAgWLIIGRdGc4YpIzxP4zV1
-         vh7g==
-X-Gm-Message-State: AOJu0Yw9hTmodlRbbB2PT6C4YO3ZNn6iAsFdwRU78H96dZiKwBigVSLV
-	8A6MfGzUcJyvMOn5vJ7OHses0kmqU7JTsy/A11cb3nGH0A5QiYNubRmv4dfT1ZKV6DBAhUyZ59E
-	n2hgJjn6slrod
-X-Received: by 2002:a05:600c:3502:b0:40c:6a85:e83a with SMTP id h2-20020a05600c350200b0040c6a85e83amr4099242wmq.51.1702986476239;
-        Tue, 19 Dec 2023 03:47:56 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFiFVSJIncyXNQiQCK7FzhlOuTeobBj8bJrrGSExzIOLTjus4qqbQKoGc2WH5915vMigDM4Ug==
-X-Received: by 2002:a05:600c:3502:b0:40c:6a85:e83a with SMTP id h2-20020a05600c350200b0040c6a85e83amr4099235wmq.51.1702986475920;
-        Tue, 19 Dec 2023 03:47:55 -0800 (PST)
+        bh=3ge0vYIMSHofQN40YECeVZ2jR68lUGNh8boj/99SI6g=;
+        b=tEyLoe9TsfxQVzFGy/io/nv9SLR8xaJHcfg/EWKKf/9p+FBxabDwqWKNRdkKOQm/KP
+         /iTsaVO875aRhTY2P4I/ZB+UcwF9COBjvvmySsH71c7f5rQMxK09/vxWbu0sotTzQXNu
+         UkK78JG8XCff9pLBAu7nRZzGmaM0vAjye3j5MjDEYHPCUPrFqKY5hn8VbDDERyk/G3YJ
+         kE1KGiaHEFQ2QOxlkqIPKGB74NxqoIXRumZHmYkheuPlS5xM23rW0hd2WF47/g/gtpJ0
+         gDik5xz3EZp4IpXg8ZfdHRjGB/FD0bGrKpMsHZE+KEf6B5If8fOKGzVlt5MROdoeYqX1
+         0sTw==
+X-Gm-Message-State: AOJu0Yz9Xy+Qlds8H4cwFEkxEJCnc/CGskvk2mi4h4i2HlBlya0Q5Ka5
+	/2OGYNbuFph0Z8ybCYCaAK/a67dYn+rgANegpnWHVym8qnEv3Q+cfjtiMc0Pi71Rshd5Q5jLayg
+	U9RejTc83/r8G
+X-Received: by 2002:a05:600c:b41:b0:40c:2a41:4a35 with SMTP id k1-20020a05600c0b4100b0040c2a414a35mr9211184wmr.130.1702986839228;
+        Tue, 19 Dec 2023 03:53:59 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEon7eRP8QSZH1EPIYWSwSAKjJ5zsTPbGNJntU7Tfs96CYFYuXsz0XSThXoSnVdydjRt5tPaQ==
+X-Received: by 2002:a05:600c:b41:b0:40c:2a41:4a35 with SMTP id k1-20020a05600c0b4100b0040c2a414a35mr9211180wmr.130.1702986838916;
+        Tue, 19 Dec 2023 03:53:58 -0800 (PST)
 Received: from [192.168.0.6] (ip-109-43-177-45.web.vodafone.de. [109.43.177.45])
-        by smtp.gmail.com with ESMTPSA id jg7-20020a05600ca00700b0040c46719966sm2452815wmb.25.2023.12.19.03.47.55
+        by smtp.gmail.com with ESMTPSA id n6-20020a05600c500600b0040c1d2c6331sm2507312wmr.32.2023.12.19.03.53.57
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Dec 2023 03:47:55 -0800 (PST)
-Message-ID: <c06b1cec-8a39-41ff-91e6-ad7bb99b3341@redhat.com>
-Date: Tue, 19 Dec 2023 12:47:54 +0100
+        Tue, 19 Dec 2023 03:53:58 -0800 (PST)
+Message-ID: <4a42b65c-f65b-41cf-91f6-eeb96519dc2c@redhat.com>
+Date: Tue, 19 Dec 2023 12:53:57 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -72,15 +72,15 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v5 12/29] powerpc/sprs: Avoid taking async
- interrupts caused by register fuzzing
+Subject: Re: [kvm-unit-tests PATCH v5 13/29] powerpc: Make interrupt handler
+ error more readable
 Content-Language: en-US
 To: Nicholas Piggin <npiggin@gmail.com>, kvm@vger.kernel.org
 Cc: linuxppc-dev@lists.ozlabs.org, Laurent Vivier <lvivier@redhat.com>,
  Shaoqin Huang <shahuang@redhat.com>, Andrew Jones <andrew.jones@linux.dev>,
  Nico Boehr <nrb@linux.ibm.com>
 References: <20231216134257.1743345-1-npiggin@gmail.com>
- <20231216134257.1743345-13-npiggin@gmail.com>
+ <20231216134257.1743345-14-npiggin@gmail.com>
 From: Thomas Huth <thuth@redhat.com>
 Autocrypt: addr=thuth@redhat.com; keydata=
  xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
@@ -124,61 +124,39 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20231216134257.1743345-13-npiggin@gmail.com>
+In-Reply-To: <20231216134257.1743345-14-npiggin@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 16/12/2023 14.42, Nicholas Piggin wrote:
-> Storing certain values in some registers can cause asynchronous
-> interrupts that can crash the test case, for example decrementer
-> or PMU interrupts.
-> 
-> Change the msleep to mdelay which does not enable MSR[EE] and so
-> avoids the problem. This allows removing some of the SPR special
-> casing.
+> Installing the same handler twice reports a shifted trap vector
+> address which is hard to decipher. Print the unshifed address.
 > 
 > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 > ---
->   powerpc/sprs.c | 14 ++------------
->   1 file changed, 2 insertions(+), 12 deletions(-)
+>   lib/powerpc/processor.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/powerpc/sprs.c b/powerpc/sprs.c
-> index 01041912..313698e0 100644
-> --- a/powerpc/sprs.c
-> +++ b/powerpc/sprs.c
-> @@ -481,12 +481,7 @@ static void set_sprs(uint64_t val)
->   			continue;
->   		if (sprs[i].type & SPR_HARNESS)
->   			continue;
-> -		if (!strcmp(sprs[i].name, "MMCR0")) {
-> -			/* XXX: could use a comment or better abstraction! */
-> -			__mtspr(i, (val & 0xfffffffffbab3fffULL) | 0xfa0b2070);
-> -		} else {
-> -			__mtspr(i, val);
-> -		}
-> +		__mtspr(i, val);
->   	}
->   }
->   
-> @@ -536,12 +531,7 @@ int main(int argc, char **argv)
->   	if (pause) {
->   		migrate_once();
->   	} else {
-> -		msleep(2000);
-> -
-> -		/* Taking a dec updates SRR0, SRR1, SPRG1, so don't fail. */
-> -		sprs[26].type |= SPR_ASYNC;
-> -		sprs[27].type |= SPR_ASYNC;
-> -		sprs[273].type |= SPR_ASYNC;
-> +		mdelay(2000);
->   	}
+> diff --git a/lib/powerpc/processor.c b/lib/powerpc/processor.c
+> index aaf45b68..b4cd5b4c 100644
+> --- a/lib/powerpc/processor.c
+> +++ b/lib/powerpc/processor.c
+> @@ -26,7 +26,7 @@ void handle_exception(int trap, void (*func)(struct pt_regs *, void *),
+>   	trap >>= 8;
 
-IIRC I used the H_CEDE stuff here on purpose to increase the possibility 
-that the guest gets rescheduled onto another CPU core on the host, and thus 
-that it uncovers sprs that are not saved and restored on the host more 
-easily. So I'd rather keep the msleep() here.
+You only change this to >>= 5 in the next patch...
+
+>   	if (func && handlers[trap].func) {
+> -		printf("exception handler installed twice %#x\n", trap);
+> +		printf("exception handler installed twice %#x\n", trap << 5);
+
+... so I think you should move this patch here after the next one.
 
   Thomas
 
+
+>   		abort();
+>   	}
+>   	handlers[trap].func = func;
 
 
