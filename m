@@ -1,221 +1,133 @@
-Return-Path: <kvm+bounces-4866-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4867-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83BFA818F83
-	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 19:17:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E780818FB9
+	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 19:23:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3AF12285AC1
-	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 18:17:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5039F1C2524D
+	for <lists+kvm@lfdr.de>; Tue, 19 Dec 2023 18:23:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC4A3481BD;
-	Tue, 19 Dec 2023 18:10:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D30C738DF9;
+	Tue, 19 Dec 2023 18:22:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="dwKZsxvI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lJ7TR7dH"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2048.outbound.protection.outlook.com [40.107.244.48])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D7163EA7A;
-	Tue, 19 Dec 2023 18:10:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CYDzmx52GbsOqF8a+KVSazDhdsyjEIDc2d/5D+pGi9Bxu7nFIs7fVpLgvPgdby6YGl9m5us8/vmwrm2pGF/Rd6ujr6o647RKiDFUbf3b1Vt22Cht6GKFlhIRIpnldQZd/wKURjiEu5+WaLlwAfE8/rOGLFysfnGkNouc34sIXt/bbD3D0NXzBIQBEjsh6CCH03OdkfDdj8wQiQ9WbIit8jh/pCqBj42a06TyKQBaOD5BmOHcSnR4amFqy4VkLWE0xteNuYZRb1RZDljloFwIbJ/U+f653ymAlZD8BZjeljasus5D67bwJ/Pm7QEoxKIvQv4AzLltIIpljib3xU/PZQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MKO46lgwXxoc9p1PhLlI2slnpBU+0n8UQO1kpc1S1rY=;
- b=REQnaZ5+5f7rSFoalnvhmNY9V+SD36M2n3ZgMeQrCZA3b8u9L7S10IOn9HvT46D74hzA67zMfAVxyqQHhcDzz+glmRLRXt86cpZKWKLWLSpsdr/3swuD8cSIQWzg36hYdlXHZVT03I/UpCkVsQ6RxjU67nTjUg4+HyxWmR7hFn500q8xTPzGgHZCyvkhIK9eAXNocRfht/BFZO7y+Er6NA+CKh9ZJ9erEMP6hvgFo3NSzic3LhXSwx4ZC17qEKl6DWbqAmBqjECs/0dseyin+M2SVHKBk29dOknp0apOTzLwqOljDIkKYdpb6pqiu0i8rB/lQ3Oi6YianwULITeolA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MKO46lgwXxoc9p1PhLlI2slnpBU+0n8UQO1kpc1S1rY=;
- b=dwKZsxvIf45R6vg6rhgRJhIBlL+JMp+3qErlkXy+k9D+O6+l3vhNK+KB1uORd9Dz8vagfVW6C7S7rpM1UZlFBtY5cmvrTkK6i6vP1F5Bv7pa2RG8Gmvi/p+pc60MiGEHNWN1+Hgq8ZQJQQoRIMennmsz6qyRyGqzLeFAQMTV/FT2zvykFzdj9CuShIN8no4btHMhtYiLJi9f4IvutY/KHqdCwM3ZV3XdgQ0ZB3hEP7hF/uF1wuiF+R7t4T6d7OAtaYU+h2oCDe6pCUGC2su8OnKiQWrqdmRv5tLEp3G3DiEV8TsZOkkYErsL5LRhxTbr/k5ne4Xn839aR9l2Gxn3TQ==
-Received: from BLAPR03CA0129.namprd03.prod.outlook.com (2603:10b6:208:32e::14)
- by DS0PR12MB7996.namprd12.prod.outlook.com (2603:10b6:8:14f::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.38; Tue, 19 Dec
- 2023 18:10:16 +0000
-Received: from BL6PEPF0001AB75.namprd02.prod.outlook.com
- (2603:10b6:208:32e:cafe::b8) by BLAPR03CA0129.outlook.office365.com
- (2603:10b6:208:32e::14) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7091.38 via Frontend
- Transport; Tue, 19 Dec 2023 18:10:16 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- BL6PEPF0001AB75.mail.protection.outlook.com (10.167.242.168) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7113.14 via Frontend Transport; Tue, 19 Dec 2023 18:10:16 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 19 Dec
- 2023 10:10:03 -0800
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 19 Dec
- 2023 10:10:02 -0800
-Received: from c-237-113-220-225.mtl.labs.mlnx (10.127.8.12) by
- mail.nvidia.com (10.129.68.10) with Microsoft SMTP Server id 15.2.986.41 via
- Frontend Transport; Tue, 19 Dec 2023 10:09:59 -0800
-From: Dragos Tatulea <dtatulea@nvidia.com>
-To: "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	Eugenio Perez Martin <eperezma@redhat.com>, Si-Wei Liu
-	<si-wei.liu@oracle.com>, Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky
-	<leon@kernel.org>, <virtualization@lists.linux-foundation.org>, Gal Pressman
-	<gal@nvidia.com>
-CC: Dragos Tatulea <dtatulea@nvidia.com>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Parav Pandit <parav@nvidia.com>, Xuan Zhuo
-	<xuanzhuo@linux.alibaba.com>
-Subject: [PATCH vhost v4 15/15] vdpa/mlx5: Add mkey leak detection
-Date: Tue, 19 Dec 2023 20:08:58 +0200
-Message-ID: <20231219180858.120898-16-dtatulea@nvidia.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231219180858.120898-1-dtatulea@nvidia.com>
-References: <20231219180858.120898-1-dtatulea@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0576638DEB;
+	Tue, 19 Dec 2023 18:22:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78AA1C433C7;
+	Tue, 19 Dec 2023 18:22:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1703010168;
+	bh=DPuOkfzjPhady10Q5o+36I/qim38sfvyYNHfU9o8g4s=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lJ7TR7dHiGeTaDrDcD0P3s9K3/Cy0c5R+1JMsyHoyWSfR09sTOekdWbvT6dGuVtMM
+	 +MApXmtcHV+t2luxAN1lSgKWm++Ahv8W3hdZa37W1zwijBzqvRKv3ogmQQ3lwJtsH8
+	 IeMlSpos+7YynBF91UFPlkwtiaeyVcQL5JGEx9DWDK6ncwFsjZ1IvVPSg9+4aNJNL3
+	 oE03fa8trLY7ghnI0z+tR3HRpqSs+MYJo2GIFMKbAAeJ7/LiCe9FcaRMq2mvI7QGCD
+	 qYfD7Zh7ZWB9MMFX6UtMTZ4bCCpZWw6dKP6hxxwd3z8WAxC1YbU/jqaRGJ5bHb6Ljm
+	 q2fleBZ31mTBg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rFejt-005SbH-35;
+	Tue, 19 Dec 2023 18:22:45 +0000
+Date: Tue, 19 Dec 2023 18:22:44 +0000
+Message-ID: <8734vy832j.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Haibo Xu <haibo1.xu@intel.com>
+Cc: xiaobo55x@gmail.com,
+	ajones@ventanamicro.com,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	Guo Ren <guoren@kernel.org>,
+	Mayuresh Chitale <mchitale@ventanamicro.com>,
+	Greentime Hu <greentime.hu@sifive.com>,
+	wchen <waylingii@gmail.com>,
+	Conor Dooley <conor.dooley@microchip.com>,
+	Heiko Stuebner <heiko@sntech.de>,
+	Minda Chen <minda.chen@starfivetech.com>,
+	Samuel Holland <samuel@sholland.org>,
+	Jisheng Zhang <jszhang@kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Peter Xu <peterx@redhat.com>,
+	Like Xu <likexu@tencent.com>,
+	Vipin Sharma <vipinsh@google.com>,
+	Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>,
+	Aaron Lewis <aaronlewis@google.com>,
+	Thomas Huth <thuth@redhat.com>,
+	linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvm-riscv@lists.infradead.org
+Subject: Re: [PATCH v4 11/11] KVM: selftests: Enable tunning of err_margin_us in arch timer test
+In-Reply-To: <0343a9e4bfa8011fbb6bca0286cee7eab1f17d5d.1702371136.git.haibo1.xu@intel.com>
+References: <cover.1702371136.git.haibo1.xu@intel.com>
+	<0343a9e4bfa8011fbb6bca0286cee7eab1f17d5d.1702371136.git.haibo1.xu@intel.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB75:EE_|DS0PR12MB7996:EE_
-X-MS-Office365-Filtering-Correlation-Id: a8c7a0a5-8d40-424c-4fe3-08dc00bdc11c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	fD3pj2K2/23gktmNY3Dcxb1UftwqDM1kCHqkbjdv7cjLER9zcsgHprv3dp49p/m6RUzGqFa5/p4/hLGCq7MPgknUPz4vFr7UNP0B9TnwKmS2MUg5vQ3BzJLZtQXeY+dw2whzpgwNod50seX39zbdiG5rlaRFp8CixefEoqqZ4S32qvHOFM0JtRVD9dnFviYq+ghjxI6TYXEyZqxpGDOsLZi5ExDs+cDCC0ypK8SUw3wrEoAiuoPvdsz1FYlw3YqrXWPJdcoMAYtDhOM5eBdTHB8gb7EuzxDvlsYBUwfpaY9nT46ILqz4uHr/sst5pTr40Hn7r+UGytL3jFNJlLVpGylQCVOOCz4YCuUqittqdxGDtQd9d14c1m4NRb+GBmpKBTvh2q6JCGjQPetZnunem7ZDpTuovyUwQRPfFkWDwQCTqasz+c41eL1CS7TBFPv22nIRzRTVPuDrsd7lN7+d2lnLG8OPHNho/lRgCqRXIhbJANwrdR7wYkzqEZsTQ2CPehedWThTE7Ye+4cHiMmnXfQGY7i+KB8X3dSPRw5Qh1bysvUczR4wxV2kn1xX/nauJmjNZDFxBoXaFs3YzqipE5YNshTTfpb+WD55ztaWuYXEPPoGVCC7M3nFcPxSf+jjoJpwNrPbD8HXM0caeoQXQIj01OCS/gi83ANw5BmCAoGAC2qTVnWNpzdn3w1fvORejI2l7eajjiE+5Js6ydnuVe56AjS2oEsn1uxDS8BBgu0qxw+weWKRlegSlyi8284muIEp6Q46oQmsmodllLNCQJUZ9YmtCUNm7KJbM59yB5U=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(136003)(346002)(376002)(396003)(230273577357003)(230922051799003)(230173577357003)(1800799012)(82310400011)(451199024)(64100799003)(186009)(36840700001)(40470700004)(46966006)(336012)(26005)(82740400003)(426003)(2616005)(66574015)(1076003)(2906002)(47076005)(36860700001)(5660300002)(83380400001)(4326008)(110136005)(8936002)(8676002)(478600001)(41300700001)(316002)(6636002)(70206006)(54906003)(70586007)(7636003)(356005)(86362001)(36756003)(40480700001)(40460700003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Dec 2023 18:10:16.6413
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a8c7a0a5-8d40-424c-4fe3-08dc00bdc11c
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL6PEPF0001AB75.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7996
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: haibo1.xu@intel.com, xiaobo55x@gmail.com, ajones@ventanamicro.com, paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, pbonzini@redhat.com, shuah@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, anup@brainfault.org, atishp@atishpatra.org, guoren@kernel.org, mchitale@ventanamicro.com, greentime.hu@sifive.com, waylingii@gmail.com, conor.dooley@microchip.com, heiko@sntech.de, minda.chen@starfivetech.com, samuel@sholland.org, jszhang@kernel.org, seanjc@google.com, peterx@redhat.com, likexu@tencent.com, vipinsh@google.com, maciej.wieczor-retman@intel.com, aaronlewis@google.com, thuth@redhat.com, linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Track allocated mrs in a list and show warning when leaks are detected
-on device free or reset.
+On Tue, 12 Dec 2023 09:31:20 +0000,
+Haibo Xu <haibo1.xu@intel.com> wrote:
+> > @@ -216,6 +221,9 @@ static bool parse_args(int argc, char *argv[])
+>  		case 'm':
+>  			test_args.migration_freq_ms = atoi_non_negative("Frequency", optarg);
+>  			break;
+> +		case 'e':
+> +			test_args.timer_err_margin_us = atoi_non_negative("Error Margin", optarg);
+> +			break;
 
-Reviewed-by: Gal Pressman <gal@nvidia.com>
-Acked-by: Eugenio Pérez <eperezma@redhat.com>
-Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
----
- drivers/vdpa/mlx5/core/mlx5_vdpa.h |  2 ++
- drivers/vdpa/mlx5/core/mr.c        | 23 +++++++++++++++++++++++
- drivers/vdpa/mlx5/net/mlx5_vnet.c  |  2 ++
- 3 files changed, 27 insertions(+)
+So your error margin is always unsigned...
 
-diff --git a/drivers/vdpa/mlx5/core/mlx5_vdpa.h b/drivers/vdpa/mlx5/core/mlx5_vdpa.h
-index 1a0d27b6e09a..50aac8fe57ef 100644
---- a/drivers/vdpa/mlx5/core/mlx5_vdpa.h
-+++ b/drivers/vdpa/mlx5/core/mlx5_vdpa.h
-@@ -37,6 +37,7 @@ struct mlx5_vdpa_mr {
- 	bool user_mr;
- 
- 	refcount_t refcount;
-+	struct list_head mr_list;
- };
- 
- struct mlx5_vdpa_resources {
-@@ -95,6 +96,7 @@ struct mlx5_vdpa_dev {
- 	u32 generation;
- 
- 	struct mlx5_vdpa_mr *mr[MLX5_VDPA_NUM_AS];
-+	struct list_head mr_list_head;
- 	/* serialize mr access */
- 	struct mutex mr_mtx;
- 	struct mlx5_control_vq cvq;
-diff --git a/drivers/vdpa/mlx5/core/mr.c b/drivers/vdpa/mlx5/core/mr.c
-index c7dc8914354a..4758914ccf86 100644
---- a/drivers/vdpa/mlx5/core/mr.c
-+++ b/drivers/vdpa/mlx5/core/mr.c
-@@ -508,6 +508,8 @@ static void _mlx5_vdpa_destroy_mr(struct mlx5_vdpa_dev *mvdev, struct mlx5_vdpa_
- 
- 	vhost_iotlb_free(mr->iotlb);
- 
-+	list_del(&mr->mr_list);
-+
- 	kfree(mr);
- }
- 
-@@ -560,12 +562,31 @@ void mlx5_vdpa_update_mr(struct mlx5_vdpa_dev *mvdev,
- 	mutex_unlock(&mvdev->mr_mtx);
- }
- 
-+static void mlx5_vdpa_show_mr_leaks(struct mlx5_vdpa_dev *mvdev)
-+{
-+	struct mlx5_vdpa_mr *mr;
-+
-+	mutex_lock(&mvdev->mr_mtx);
-+
-+	list_for_each_entry(mr, &mvdev->mr_list_head, mr_list) {
-+
-+		mlx5_vdpa_warn(mvdev, "mkey still alive after resource delete: "
-+				      "mr: %p, mkey: 0x%x, refcount: %u\n",
-+				       mr, mr->mkey, refcount_read(&mr->refcount));
-+	}
-+
-+	mutex_unlock(&mvdev->mr_mtx);
-+
-+}
-+
- void mlx5_vdpa_destroy_mr_resources(struct mlx5_vdpa_dev *mvdev)
- {
- 	for (int i = 0; i < MLX5_VDPA_NUM_AS; i++)
- 		mlx5_vdpa_update_mr(mvdev, NULL, i);
- 
- 	prune_iotlb(mvdev->cvq.iotlb);
-+
-+	mlx5_vdpa_show_mr_leaks(mvdev);
- }
- 
- static int _mlx5_vdpa_create_mr(struct mlx5_vdpa_dev *mvdev,
-@@ -592,6 +613,8 @@ static int _mlx5_vdpa_create_mr(struct mlx5_vdpa_dev *mvdev,
- 	if (err)
- 		goto err_iotlb;
- 
-+	list_add_tail(&mr->mr_list, &mvdev->mr_list_head);
-+
- 	return 0;
- 
- err_iotlb:
-diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-index f81968b3f9cf..a783e8bd784d 100644
---- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
-+++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-@@ -3729,6 +3729,8 @@ static int mlx5_vdpa_dev_add(struct vdpa_mgmt_dev *v_mdev, const char *name,
- 	if (err)
- 		goto err_mpfs;
- 
-+	INIT_LIST_HEAD(&mvdev->mr_list_head);
-+
- 	if (MLX5_CAP_GEN(mvdev->mdev, umem_uid_0)) {
- 		err = mlx5_vdpa_create_dma_mr(mvdev);
- 		if (err)
+>  		case 'o':
+>  			test_args.counter_offset = strtol(optarg, NULL, 0);
+>  			test_args.reserved = 0;
+> diff --git a/tools/testing/selftests/kvm/include/timer_test.h b/tools/testing/selftests/kvm/include/timer_test.h
+> index 968257b893a7..b1d405e7157d 100644
+> --- a/tools/testing/selftests/kvm/include/timer_test.h
+> +++ b/tools/testing/selftests/kvm/include/timer_test.h
+> @@ -22,6 +22,7 @@ struct test_args {
+>  	int nr_iter;
+>  	int timer_period_ms;
+>  	int migration_freq_ms;
+> +	int timer_err_margin_us;
+
+... except that you are storing it as a signed value. Some consistency
+wouldn't hurt, really, and would avoid issues when passing large
+values.
+
+	M.
+
 -- 
-2.43.0
-
+Without deviation from the norm, progress is not possible.
 
