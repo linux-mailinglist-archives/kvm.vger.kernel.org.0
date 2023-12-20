@@ -1,122 +1,207 @@
-Return-Path: <kvm+bounces-4874-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4876-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB19F819626
-	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 02:21:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E9A7819636
+	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 02:28:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 195131C2549B
-	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 01:21:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1CD941F25A62
+	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 01:28:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FE145C9D;
-	Wed, 20 Dec 2023 01:21:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A70D6101;
+	Wed, 20 Dec 2023 01:28:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g2HXDFd/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WJdo2omT"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC4705245;
-	Wed, 20 Dec 2023 01:21:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFA5B5252;
+	Wed, 20 Dec 2023 01:28:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703035272; x=1734571272;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=wFf9gNQ2+3Ut7ACKfwtV6t9BoflbnD6Be+0GLfLNHt4=;
-  b=g2HXDFd/53YpaGdsXY39cJqQlUxrr3xNszPcYtd3QghJ+WBAKNw6+pgT
-   Q1VrbjaxOeJ/lueDxQEKmpjqRgnxMDawsJi9jAOtEDwk9az2u7bJr833/
-   751YFzGkJEOmXUGA17ooFA/vvwa5z16IZaDkJnT/lGJOY0kvcZnNaytDV
-   co/2/dm/Xz1oEA5o8wMAHYZ8RR2k2VeBBmU0C9n0zqEHJwZ5YSX075f7l
-   My0G4waQmNNyhU2+pf7sd0fPthhnKbGw6ZC2N50DVlgGFHIXZWYqzkje4
-   y4Etwq8jhdFi9q5YQhj1qW8GTu5Ap+KDUowZftDbLrzkhAh6iKdPpBRka
+  t=1703035712; x=1734571712;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=1aH4PFeRXZv8XYBxr213qu3vMLQdqg4KdWeLBJkjeOA=;
+  b=WJdo2omT/1WWZWK5djbebtucs4ViK4h6Hok46M8Wt9KdyM+O3LCEfhWc
+   88ygKO6NwsYZF5hfpSW3uPWTgz2cnbQ6U/Co9EmlVUan+uFvMpi523MCq
+   zGjo1MgBdZRqxK2HMSvN+u16BcjW0IrJXNGAatcYpR7tPxGMWqcQnmiMb
+   o9sLVtKTFuJyjXsksQiyeYgwnk31uZgNk5LGUPo+GodCYALTz4cEzWDcO
+   3IwHoxjnD7reVoX05pf/qPe2gNglhu4O1Se+cpp1Z2txEJBRX2KL8Ggxk
+   xEyulopdjvbfHGoSw+A2Qfv+SZH1VWnABiznVOcUnsQaCLe/bo3VGrTDl
    Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10929"; a="2964846"
+X-IronPort-AV: E=McAfee;i="6600,9927,10929"; a="2965706"
 X-IronPort-AV: E=Sophos;i="6.04,290,1695711600"; 
-   d="scan'208";a="2964846"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2023 17:20:56 -0800
+   d="scan'208";a="2965706"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2023 17:28:31 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10929"; a="846539196"
+X-IronPort-AV: E=McAfee;i="6600,9927,10929"; a="1023319048"
 X-IronPort-AV: E=Sophos;i="6.04,290,1695711600"; 
-   d="scan'208";a="846539196"
-Received: from ihur-mobl1.amr.corp.intel.com (HELO desk) ([10.209.1.244])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2023 17:20:55 -0800
-Date: Tue, 19 Dec 2023 17:20:45 -0800
-From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To: Josh Poimboeuf <jpoimboe@kernel.org>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Andy Lutomirski <luto@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, tony.luck@intel.com,
-	ak@linux.intel.com, tim.c.chen@linux.intel.com,
-	Andrew Cooper <andrew.cooper3@citrix.com>,
-	Nikolay Borisov <nik.borisov@suse.com>,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+   d="scan'208";a="1023319048"
+Received: from allen-box.sh.intel.com ([10.239.159.127])
+  by fmsmga006.fm.intel.com with ESMTP; 19 Dec 2023 17:28:26 -0800
+From: Lu Baolu <baolu.lu@linux.intel.com>
+To: Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	Nicolin Chen <nicolinc@nvidia.com>
+Cc: Yi Liu <yi.l.liu@intel.com>,
+	Jacob Pan <jacob.jun.pan@linux.intel.com>,
+	Longfang Liu <liulongfang@huawei.com>,
+	Yan Zhao <yan.y.zhao@intel.com>,
+	iommu@lists.linux.dev,
 	kvm@vger.kernel.org,
-	Alyssa Milburn <alyssa.milburn@linux.intel.com>,
-	Daniel Sneddon <daniel.sneddon@linux.intel.com>,
-	antonio.gomez.iglesias@linux.intel.com,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH  v4 4/6] x86/bugs: Use ALTERNATIVE() instead of
- mds_user_clear static key
-Message-ID: <20231220012045.f4i3kafpve4sleyq@desk>
-References: <20231027-delay-verw-v4-0-9a3622d4bcf7@linux.intel.com>
- <20231027-delay-verw-v4-4-9a3622d4bcf7@linux.intel.com>
- <20231201195954.sr3nhvectmtkc47q@treble>
+	linux-kernel@vger.kernel.org,
+	Lu Baolu <baolu.lu@linux.intel.com>
+Subject: [PATCH v9 00/14] iommu: Prepare to deliver page faults to user space
+Date: Wed, 20 Dec 2023 09:23:18 +0800
+Message-Id: <20231220012332.168188-1-baolu.lu@linux.intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231201195954.sr3nhvectmtkc47q@treble>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Dec 01, 2023 at 11:59:54AM -0800, Josh Poimboeuf wrote:
-> On Fri, Oct 27, 2023 at 07:38:59AM -0700, Pawan Gupta wrote:
-> > The VERW mitigation at exit-to-user is enabled via a static branch
-> > mds_user_clear. This static branch is never toggled after boot, and can
-> > be safely replaced with an ALTERNATIVE() which is convenient to use in
-> > asm.
-> > 
-> > Switch to ALTERNATIVE() to use the VERW mitigation late in exit-to-user
-> > path. Also remove the now redundant VERW in exc_nmi() and
-> > arch_exit_to_user_mode().
-> > 
-> > Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-> > ---
-> >  Documentation/arch/x86/mds.rst       | 38 +++++++++++++++++++++++++-----------
-> >  arch/x86/include/asm/entry-common.h  |  1 -
-> >  arch/x86/include/asm/nospec-branch.h | 12 ------------
-> >  arch/x86/kernel/cpu/bugs.c           | 15 ++++++--------
-> >  arch/x86/kernel/nmi.c                |  2 --
-> >  arch/x86/kvm/vmx/vmx.c               |  2 +-
-> >  6 files changed, 34 insertions(+), 36 deletions(-)
-> > 
-> > diff --git a/Documentation/arch/x86/mds.rst b/Documentation/arch/x86/mds.rst
-> > index e73fdff62c0a..a5c5091b9ccd 100644
-> > --- a/Documentation/arch/x86/mds.rst
-> > +++ b/Documentation/arch/x86/mds.rst
-> > @@ -95,6 +95,9 @@ The kernel provides a function to invoke the buffer clearing:
-> >  
-> >      mds_clear_cpu_buffers()
-> >  
-> > +Also macro CLEAR_CPU_BUFFERS is meant to be used in ASM late in exit-to-user
-> > +path. This macro works for cases where GPRs can't be clobbered.
-> 
-> What does this last sentence mean?  Is it trying to say that the macro
-> doesn't clobber registers (other than ZF)?
+When a user-managed page table is attached to an IOMMU, it is necessary
+to deliver IO page faults to user space so that they can be handled
+appropriately. One use case for this is nested translation, which is
+currently being discussed in the mailing list.
 
-Yes. I will rephrase it to say that macro doesn't clobber registers
-other than ZF.
+I have posted a RFC series [1] that describes the implementation of
+delivering page faults to user space through IOMMUFD. This series has
+received several comments on the IOMMU refactoring, which I am trying to
+address in this series.
+
+The major refactoring includes:
+
+- [PATCH 01 ~ 04] Move include/uapi/linux/iommu.h to
+  include/linux/iommu.h. Remove the unrecoverable fault data definition.
+- [PATCH 05 ~ 06] Remove iommu_[un]register_device_fault_handler().
+- [PATCH 07 ~ 10] Separate SVA and IOPF. Make IOPF a generic page fault
+  handling framework.
+- [PATCH 11 ~ 14] Improve iopf framework.
+
+This is also available at github [2].
+
+[1] https://lore.kernel.org/linux-iommu/20230530053724.232765-1-baolu.lu@linux.intel.com/
+[2] https://github.com/LuBaolu/intel-iommu/commits/preparatory-io-pgfault-delivery-v9
+
+Change log:
+
+v9:
+  - Protecting the assignment of dev->iommu->fault_param with RCU.
+  - Extending the fault parameter's lifetime to the entire path of iopf
+    handling.
+  - Since iopf_queue_flush_dev() can only be called before
+    iopf_queue_remove_device(), there's no need to hold a reference
+    count.
+  - Improve iopf_queue_remove_device() as per Jason's comments on the
+    device removal sequence from the iopf queue. This will likely
+    require changes to the iommu drivers, which are supposed to be
+    addressed in separate series.
+  - Track the iopf_group as a whole instead of the last fault within the
+    group to simplify the fault report and response paths.
+  - PATCH 01 ~ 11 are in good shapes now.
+
+v8: https://lore.kernel.org/linux-iommu/20231207064308.313316-1-baolu.lu@linux.intel.com/
+ - Drop PATCH 12/12 as it is no longer necessary to drain page requests
+   page requests during PASID translation changes.
+ - Separate PATCH 11/12 into two distinct patches. The first patch
+   refines locking scheme for protecting per-device fault data, while
+   the second patch replaces mutex with RCU to enhance locking
+   efficiency.
+ - PATCH 01 ~ 10 are in good shapes now.
+
+v7: https://lore.kernel.org/linux-iommu/20231115030226.16700-1-baolu.lu@linux.intel.com/
+ - Rebase to v6.7-rc1.
+ - Export iopf_group_response() for global use.
+ - Release lock when calling iopf handler.
+ - The whole series has been verified to work for SVA case on Intel
+   platforms by Zhao Yan. Add her Tested-by to affected patches.
+
+v6: https://lore.kernel.org/linux-iommu/20230928042734.16134-1-baolu.lu@linux.intel.com/
+ - [PATCH 09/12] Check IS_ERR() against the iommu domain. [Jingqi/Jason]
+ - [PATCH 12/12] Rename the comments and name of iopf_queue_flush_dev(),
+   no functionality changes. [Kevin]
+ - All patches rebased on the latest iommu/core branch.
+
+v5: https://lore.kernel.org/linux-iommu/20230914085638.17307-1-baolu.lu@linux.intel.com/
+ - Consolidate per-device fault data management. (New patch 11)
+ - Improve iopf_queue_flush_dev(). (New patch 12)
+
+v4: https://lore.kernel.org/linux-iommu/20230825023026.132919-1-baolu.lu@linux.intel.com/
+ - Merge iommu_fault_event and iopf_fault. They are duplicate.
+ - Move iommu_report_device_fault() and iommu_page_response() to
+   io-pgfault.c.
+ - Move iommu_sva_domain_alloc() to iommu-sva.c.
+ - Add group->domain and use it directly in sva fault handler.
+ - Misc code refactoring and refining.
+
+v3: https://lore.kernel.org/linux-iommu/20230817234047.195194-1-baolu.lu@linux.intel.com/
+ - Convert the fault data structures from uAPI to kAPI.
+ - Merge iopf_device_param into iommu_fault_param.
+ - Add debugging on domain lifetime for iopf.
+ - Remove patch "iommu: Change the return value of dev_iommu_get()".
+ - Remove patch "iommu: Add helper to set iopf handler for domain".
+ - Misc code refactoring and refining.
+
+v2: https://lore.kernel.org/linux-iommu/20230727054837.147050-1-baolu.lu@linux.intel.com/
+ - Remove unrecoverable fault data definition as suggested by Kevin.
+ - Drop the per-device fault cookie code considering that doesn't make
+   much sense for SVA.
+ - Make the IOMMU page fault handling framework generic. So that it can
+   available for use cases other than SVA.
+
+v1: https://lore.kernel.org/linux-iommu/20230711010642.19707-1-baolu.lu@linux.intel.com/
+
+Lu Baolu (14):
+  iommu: Move iommu fault data to linux/iommu.h
+  iommu/arm-smmu-v3: Remove unrecoverable faults reporting
+  iommu: Remove unrecoverable fault data
+  iommu: Cleanup iopf data structure definitions
+  iommu: Merge iopf_device_param into iommu_fault_param
+  iommu: Remove iommu_[un]register_device_fault_handler()
+  iommu: Merge iommu_fault_event and iopf_fault
+  iommu: Prepare for separating SVA and IOPF
+  iommu: Make iommu_queue_iopf() more generic
+  iommu: Separate SVA and IOPF
+  iommu: Refine locking for per-device fault data management
+  iommu: Use refcount for fault data access
+  iommu: Improve iopf_queue_remove_device()
+  iommu: Track iopf group instead of last fault
+
+ include/linux/iommu.h                         | 265 ++++++++----
+ drivers/iommu/intel/iommu.h                   |   2 +-
+ drivers/iommu/iommu-sva.h                     |  71 ---
+ include/uapi/linux/iommu.h                    | 161 -------
+ .../iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c   |  14 +-
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c   |  51 +--
+ drivers/iommu/intel/iommu.c                   |  28 +-
+ drivers/iommu/intel/svm.c                     |   6 +-
+ drivers/iommu/io-pgfault.c                    | 408 +++++++++++-------
+ drivers/iommu/iommu-sva.c                     |  71 ++-
+ drivers/iommu/iommu.c                         | 233 ----------
+ MAINTAINERS                                   |   1 -
+ drivers/iommu/Kconfig                         |   4 +
+ drivers/iommu/Makefile                        |   3 +-
+ drivers/iommu/intel/Kconfig                   |   1 +
+ 15 files changed, 532 insertions(+), 787 deletions(-)
+ delete mode 100644 drivers/iommu/iommu-sva.h
+ delete mode 100644 include/uapi/linux/iommu.h
+
+-- 
+2.34.1
+
 
