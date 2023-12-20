@@ -1,118 +1,219 @@
-Return-Path: <kvm+bounces-4927-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4928-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F252A819FD4
-	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 14:32:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEBDA819FFF
+	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 14:40:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C0341F22F06
-	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 13:32:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 281EC1C224F2
+	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 13:40:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EF9A347A2;
-	Wed, 20 Dec 2023 13:32:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91C8F38DE0;
+	Wed, 20 Dec 2023 13:40:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fw/7IhDR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QSHCo9ei"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22DD52D633
-	for <kvm@vger.kernel.org>; Wed, 20 Dec 2023 13:32:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1703079159;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VMzfUMpfCRySKV14r2ACq/M+O86IvQcMgWeUukBTaDE=;
-	b=Fw/7IhDRA+57AMeTrk8LZo5kM3Rg7Lf/+v5HcPuYUrxY/HH5nFJn485jT+9qpo399TlduM
-	nLHet7/U2fHlaXbz7vy0JjMaOT9attxDnyAuWzeRk3LkPywjopWt7oVRcGHlsSPYcezfEX
-	3dAf5MKcvtnpxDRULIJ9tNim6yl+GyU=
-Received: from mail-yw1-f199.google.com (mail-yw1-f199.google.com
- [209.85.128.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-679-rAzNkMExOZ-OFZxYcuzcJg-1; Wed, 20 Dec 2023 08:32:37 -0500
-X-MC-Unique: rAzNkMExOZ-OFZxYcuzcJg-1
-Received: by mail-yw1-f199.google.com with SMTP id 00721157ae682-5cf4696e202so76885357b3.2
-        for <kvm@vger.kernel.org>; Wed, 20 Dec 2023 05:32:37 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1966338DD8
+	for <kvm@vger.kernel.org>; Wed, 20 Dec 2023 13:40:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-54744e66d27so13656a12.0
+        for <kvm@vger.kernel.org>; Wed, 20 Dec 2023 05:40:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1703079606; x=1703684406; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3PzhN7R1/MC7JMQD4+uPuwvzd1ldvY1sQfu70nLweY4=;
+        b=QSHCo9einRL/atc+23Jh5mM8sgTznsXY08FrEdiUfEXxMmaK3DpnP/64OiW3dy1oNE
+         35tfPREdIkGBM4GHh3g4Z6rcjtakIklbuM1eLu/HQfGEwHaj+0MZCvRx2soxG5GoWlHE
+         vCLLbA/VYChZA1MFobEBsXcodiNH5iI2cwoQZgxrIVo8RmU7p7+K7jmLSq/9B9XFRuEr
+         e9tZuCOU+exnFKkTZ2qASW6mF5tyt9lbd+qfYT6meyeEW3DrMEQ9Xf23+cr4LQYyhRrs
+         JTkPUdS2Mg6UxjB2FTart5K81vk6OMYBWtRI/ctvk1owl/PlHuie9BFquqzeY89tQJBU
+         w3nQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703079157; x=1703683957;
+        d=1e100.net; s=20230601; t=1703079606; x=1703684406;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=VMzfUMpfCRySKV14r2ACq/M+O86IvQcMgWeUukBTaDE=;
-        b=GHgJVCa48ARdv/5GcN8wvkeHjBxo33A4AjeCRzhvkq9cm/oVYTPekwpAZnK73FDlg0
-         WcnC6WhT5AGkhOX3Jnlddhu84/kNhMhPT0zhW7Pe8N/9Pv6d9rXIDhgvAbr1nq3pTGjY
-         7uAdhMRyzLAHw4jkKWakGUzJbTCupAYote1Q2xYLvIsGtPpXU52Zr1i0dSVD1kZU0yOF
-         mpgmTfIlNpWuHnqebGifCQH70Tn0njGESw7UDQ32Wp9J4ULtAnbwJPVf9F7XAN3eRJGC
-         zG9aEpMMCTkIewLyYzZqfKSOPZuBh8b72nUueSw5A/n/Zb3swNFXp6yBF8paYJUrKkuP
-         XhwQ==
-X-Gm-Message-State: AOJu0Yyn71Z73imoaB6qFsclCV/Rzaz6+q1Q7HJYnx6QDACsDymfzinr
-	jJ7t5OWxDDGIi5R7zmau23vzA4EMM4K0wu3IZNDGscUETdW3pNTUsEVywi6MAbZ70GwGrhw9XrK
-	3t+YXvhLAmOC4u8Azx1G6ChB3PTeL
-X-Received: by 2002:a81:7104:0:b0:5d7:9515:6ae3 with SMTP id m4-20020a817104000000b005d795156ae3mr14296460ywc.33.1703079157224;
-        Wed, 20 Dec 2023 05:32:37 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHBizLEtuC1w25WSPAQRdmgfmzbhlgoBE+Ri28WemJThaBvVsn/cvQCI5dtZtYAosoVwA/ga7C8ipUzBYNV8OQ=
-X-Received: by 2002:a81:7104:0:b0:5d7:9515:6ae3 with SMTP id
- m4-20020a817104000000b005d795156ae3mr14296452ywc.33.1703079157026; Wed, 20
- Dec 2023 05:32:37 -0800 (PST)
+        bh=3PzhN7R1/MC7JMQD4+uPuwvzd1ldvY1sQfu70nLweY4=;
+        b=PiXRfcOWzZno2yPUGCHVx3h12UCzxNLHM/mtI/+I25Rreof7qjriV86hteZcy6Bz9V
+         QJUnKh2J/lbeDeVYy314+edDMbLCbqGW2QaMSMj2w2xVvlIsLjaGXAJpEeMBIpqDlx+t
+         nKwj5e+GwRzr5uuaUJX8r81SdlsdVpC/VaufSKLaw7fH52nsr24FeCVHvlp7+KOFHW20
+         qS7IOtcMdQmMuk2oTks5Wln0XgQyA7+BckZ38gBfXv5SZF//jGIJegncvr9iRqZKpx6y
+         fagmGZQfaAKZQWENZwNWwWsY0AggiNGKTnXf6BZBSUmBdDRFcFL/W8I2+ypuh7SkHBNj
+         /OYQ==
+X-Gm-Message-State: AOJu0Yz6OCGcVHnGsrK/JyavriQyj/hqEVZbyJ4HrP8wT9iTHXuPj/7I
+	NT2tI0A5+AeXaTzvDVHj83phEh8c2uZVCKdtsvtEqSRzbMnv
+X-Google-Smtp-Source: AGHT+IHVTkD/eAhhODqe09INUj/Ol+2fuISfy8ljhvdDNt01Kuumy3ifb9THMD5X/nM5Kk8dORgHFOZf2e1aWWs5rwE=
+X-Received: by 2002:a50:d591:0:b0:553:2840:6aad with SMTP id
+ v17-20020a50d591000000b0055328406aadmr179337edi.2.1703079606083; Wed, 20 Dec
+ 2023 05:40:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231219180858.120898-1-dtatulea@nvidia.com> <20231219180858.120898-3-dtatulea@nvidia.com>
- <CACGkMEv7xQkZYJAgAUK6C3oUrZ9vuUJdTKRzihXcNPb-iWdpJw@mail.gmail.com> <CACGkMEsaaDGi63__YrvsTC1HqgTaEWHvGokK1bJS5+m1XYM-6w@mail.gmail.com>
-In-Reply-To: <CACGkMEsaaDGi63__YrvsTC1HqgTaEWHvGokK1bJS5+m1XYM-6w@mail.gmail.com>
-From: Eugenio Perez Martin <eperezma@redhat.com>
-Date: Wed, 20 Dec 2023 14:32:01 +0100
-Message-ID: <CAJaqyWdoaj8a7q1KrGqWmkYvAw_R_p0utcWvDvkyVm1nUOAxrA@mail.gmail.com>
-Subject: Re: [PATCH vhost v4 02/15] vdpa: Add VHOST_BACKEND_F_CHANGEABLE_VQ_ADDR_IN_SUSPEND
- flag
-To: Jason Wang <jasowang@redhat.com>
-Cc: Dragos Tatulea <dtatulea@nvidia.com>, "Michael S . Tsirkin" <mst@redhat.com>, 
-	Si-Wei Liu <si-wei.liu@oracle.com>, Saeed Mahameed <saeedm@nvidia.com>, 
-	Leon Romanovsky <leon@kernel.org>, virtualization@lists.linux-foundation.org, 
-	Gal Pressman <gal@nvidia.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Parav Pandit <parav@nvidia.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+References: <20231218140543.870234-1-tao1.su@linux.intel.com>
+ <20231218140543.870234-2-tao1.su@linux.intel.com> <ZYBhl200jZpWDqpU@google.com>
+ <ZYEFGQBti5DqlJiu@chao-email> <CALMp9eSJT7PajjX==L9eLKEEVuL-tvY0yN1gXmtzW5EUKHX3Yg@mail.gmail.com>
+ <ZYFPsISS9K867BU5@chao-email> <ZYG2CDRFlq50siec@google.com>
+In-Reply-To: <ZYG2CDRFlq50siec@google.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Wed, 20 Dec 2023 05:39:50 -0800
+Message-ID: <CALMp9eQbLjqLNbg4UAZHDuJ-wAaQAyAv24vWsW2AFKVeuOMYJw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] x86: KVM: Limit guest physical bits when 5-level EPT
+ is unsupported
+To: Sean Christopherson <seanjc@google.com>
+Cc: Chao Gao <chao.gao@intel.com>, Tao Su <tao1.su@linux.intel.com>, kvm@vger.kernel.org, 
+	pbonzini@redhat.com, eddie.dong@intel.com, xiaoyao.li@intel.com, 
+	yuan.yao@linux.intel.com, yi1.lai@intel.com, xudong.hao@intel.com, 
+	chao.p.peng@intel.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 20, 2023 at 5:06=E2=80=AFAM Jason Wang <jasowang@redhat.com> wr=
-ote:
+On Tue, Dec 19, 2023 at 7:26=E2=80=AFAM Sean Christopherson <seanjc@google.=
+com> wrote:
 >
-> On Wed, Dec 20, 2023 at 11:46=E2=80=AFAM Jason Wang <jasowang@redhat.com>=
- wrote:
+> On Tue, Dec 19, 2023, Chao Gao wrote:
+> > On Mon, Dec 18, 2023 at 07:40:11PM -0800, Jim Mattson wrote:
+> > >Honestly, I think KVM should just disable EPT if the EPT tables can't
+> > >support the CPU's physical address width.
 > >
-> > On Wed, Dec 20, 2023 at 2:09=E2=80=AFAM Dragos Tatulea <dtatulea@nvidia=
-.com> wrote:
+> > Yes, it is an option.
+> > But I prefer to allow admin to override this (i.e., admin still can ena=
+ble EPT
+> > via module parameter) because those issues are not new and disabling EP=
+T
+> > doesn't prevent QEMU from launching guests w/ smaller MAXPHYADDR.
+> >
+> > >> Here nothing visible to selftests or QEMU indicates that guest.MAXPH=
+YADDR =3D 52
+> > >> is invalid/incorrect. how can we say selftests are at fault and we s=
+hould fix
+> > >> them?
 > > >
-> > > The virtio spec doesn't allow changing virtqueue addresses after
-> > > DRIVER_OK. Some devices do support this operation when the device is
-> > > suspended. The VHOST_BACKEND_F_CHANGEABLE_VQ_ADDR_IN_SUSPEND flag
-> > > advertises this support as a backend features.
+> > >In this case, the CPU is at fault, and you should complain to the CPU =
+vendor.
 > >
-> > There's an ongoing effort in virtio spec to introduce the suspend state=
-.
-> >
-> > So I wonder if it's better to just allow such behaviour?
+> > Yeah, I agree with you and will check with related team inside Intel.
 >
-> Actually I mean, allow drivers to modify the parameters during suspend
-> without a new feature.
+> I agree that the CPU is being weird, but this is technically an architect=
+urally
+> legal configuration, and KVM has largely committed to supporting weird se=
+tups.
+> At some point we have to draw a line when things get too ridiculous, but =
+I don't
+> think this particular oddity crosses into absurd territory.
 >
+> > My point was just this isn't a selftest issue because not all informati=
+on is
+> > disclosed to the tests.
+>
+> Ah, right, EPT capabilities are in MSRs that userspace can't read.
+>
+> > And I am afraid KVM as L1 VMM may run into this situation, i.e., only 4=
+-level
+> > EPT is supported but MAXPHYADDR is 52. So, KVM needs a fix anyway.
+>
+> Yes, but forcing emulation for a funky setup is not a good fix.  KVM can =
+simply
+> constrain the advertised MAXPHYADDR, no?
 
-That would be ideal, but how do userland checks if it can suspend +
-change properties + resume?
+This is essentially the same as allow_smaller_maxphyaddr, and has the
+same issues:
+1) MOV-to-CR3 must be intercepted in PAE mode, to check the bits above
+guest.MAXPHYADDR in the PDPTRs.
+2) #PF must be intercepted whenever PTEs are 64 bits, to do a software
+page walk of the guest's x86 page tables and check the bits above
+guest.MAXPHYADDR for a terminal page fault that might result in a
+different error code than the one produced by hardware.
+3) EPT violations may require instruction emulation to synthesize an
+appropriate #PF, and this requires the KVM instruction emulator to be
+expanded to understand *all* memory-accessing instructions, not just
+the limited set it understands now.
 
-The only way that comes to my mind is to make sure all parents return
-error if userland tries to do it, and then fallback in userland. I'm
-ok with that, but I'm not sure if the current master & previous kernel
-has a coherent behavior. Do they return error? Or return success
-without changing address / vq state?
+I just don't see how this is even remotely practical.
 
+> ---
+>  arch/x86/kvm/cpuid.c   | 17 +++++++++++++----
+>  arch/x86/kvm/mmu.h     |  2 ++
+>  arch/x86/kvm/mmu/mmu.c |  5 +++++
+>  3 files changed, 20 insertions(+), 4 deletions(-)
+>
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 294e5bd5f8a0..5c346e1a10bd 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -1233,12 +1233,21 @@ static inline int __do_cpuid_func(struct kvm_cpui=
+d_array *array, u32 function)
+>                  *
+>                  * If TDP is enabled but an explicit guest MAXPHYADDR is =
+not
+>                  * provided, use the raw bare metal MAXPHYADDR as reducti=
+ons to
+> -                * the HPAs do not affect GPAs.
+> +                * the HPAs do not affect GPAs.  Finally, if TDP is enabl=
+ed and
+> +                * doesn't support 5-level paging, cap guest MAXPHYADDR a=
+t 48
+> +                * bits as KVM can't install SPTEs for larger GPAs.
+>                  */
+> -               if (!tdp_enabled)
+> +               if (!tdp_enabled) {
+>                         g_phys_as =3D boot_cpu_data.x86_phys_bits;
+> -               else if (!g_phys_as)
+> -                       g_phys_as =3D phys_as;
+> +               } else {
+> +                       u8 max_tdp_level =3D kvm_mmu_get_max_tdp_level();
+> +
+> +                       if (!g_phys_as)
+> +                               g_phys_as =3D phys_as;
+> +
+> +                       if (max_tdp_level < 5)
+> +                               g_phys_as =3D min(g_phys_as, 48);
+> +               }
+>
+>                 entry->eax =3D g_phys_as | (virt_as << 8);
+>                 entry->ecx &=3D ~(GENMASK(31, 16) | GENMASK(11, 8));
+> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+> index 60f21bb4c27b..b410a227c601 100644
+> --- a/arch/x86/kvm/mmu.h
+> +++ b/arch/x86/kvm/mmu.h
+> @@ -100,6 +100,8 @@ static inline u8 kvm_get_shadow_phys_bits(void)
+>         return boot_cpu_data.x86_phys_bits;
+>  }
+>
+> +u8 kvm_mmu_get_max_tdp_level(void);
+> +
+>  void kvm_mmu_set_mmio_spte_mask(u64 mmio_value, u64 mmio_mask, u64 acces=
+s_mask);
+>  void kvm_mmu_set_me_spte_mask(u64 me_value, u64 me_mask);
+>  void kvm_mmu_set_ept_masks(bool has_ad_bits, bool has_exec_only);
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 3c844e428684..b2845f5520b3 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -5267,6 +5267,11 @@ static inline int kvm_mmu_get_tdp_level(struct kvm=
+_vcpu *vcpu)
+>         return max_tdp_level;
+>  }
+>
+> +u8 kvm_mmu_get_max_tdp_level(void)
+> +{
+> +       return tdp_root_level ? tdp_root_level : max_tdp_level;
+> +}
+> +
+>  static union kvm_mmu_page_role
+>  kvm_calc_tdp_mmu_root_page_role(struct kvm_vcpu *vcpu,
+>                                 union kvm_cpu_role cpu_role)
+>
+> base-commit: f2a3fb7234e52f72ff4a38364dbf639cf4c7d6c6
+> --
 
