@@ -1,158 +1,157 @@
-Return-Path: <kvm+bounces-4907-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4908-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EF7281994A
-	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 08:17:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 381E781999A
+	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 08:34:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A21B288852
-	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 07:16:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC40E1F24DAE
+	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 07:34:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07D5616425;
-	Wed, 20 Dec 2023 07:16:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41DA516434;
+	Wed, 20 Dec 2023 07:34:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Vdk78zJ+"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="FiCRL98J"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 882C116417
-	for <kvm@vger.kernel.org>; Wed, 20 Dec 2023 07:16:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703056610; x=1734592610;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=FXniwdFSYiK/07pqlWb+ORaYifrq2h6SLJGdSfZSg2c=;
-  b=Vdk78zJ+W3nbm7gMlxegWo5Y3orNoDDAoBtHPYlUgQUtvKcrDzs3odGP
-   ChfR3yR7E5jnB10hObW60xLUFa7F6VFjUrfR2QbTgbvPPy/Qd7Zwb8mJR
-   Der6Fwl4LyFOKN9ZVu8WFcvTGvMYCzXqNFpdPUhj2rLBrZRVxluIjw87w
-   Cso2QVbUXD98TUn80foW+Xj2m6EWPtvVnx7/8IyUsSJXq56rZ1V5Hz6ub
-   hFrqu2utJVbe3smBLQlue6Qxqlk8fRMVILFmDo6awV3Ikvk8IIbG8143K
-   db7N7HvSzOQ+T5SfS1VdMbbJc+RCHYxzd9FW048x/yIk2SD3Y1RgyiBhO
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10929"; a="462224201"
-X-IronPort-AV: E=Sophos;i="6.04,290,1695711600"; 
-   d="scan'208";a="462224201"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2023 23:16:49 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10929"; a="1107640841"
-X-IronPort-AV: E=Sophos;i="6.04,290,1695711600"; 
-   d="scan'208";a="1107640841"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.8.39]) ([10.93.8.39])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2023 23:16:47 -0800
-Message-ID: <6cfc6f05-7c43-49d9-8e1a-bfa6e34f6b56@intel.com>
-Date: Wed, 20 Dec 2023 15:16:44 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78ABD1CAB8;
+	Wed, 20 Dec 2023 07:34:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BK6DlFT014863;
+	Wed, 20 Dec 2023 07:34:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=RAyJIrFEdM1E1zR7KhwABJaajTgwiicXjDICi085Y84=;
+ b=FiCRL98JoC7a2OZ0bAdtI+GD/wlvTKj9ODhuMTw9Yqch2qplfCMkv3TumdJZOkUIrAgC
+ 8ilM6ZdM6/5ZSbvFZlAKUYk6mHEWUaHxfL0ojO/w0CwB5ufr/01bxgOUl7wSl99IR+u1
+ Y21QKtLvjLSHR1z4mBFz/aVmT6ny8OaYMrQT9xrI3x1iMUyXSPw/izRLuF2Q9vLR122q
+ pL1o1PXp5k6igzvykiN6KfsH3rmvul0eCRhy5mY9t/VzB9kTGH4/JEDRwtuqyMxbh8Ix
+ 1yjMhvlvrUutOOICeAHxMfYhfN0qxt5JAqpqjqzSTPrj0eTlthXWKhBVkQ42v8hzbcuo nQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v3ttd9nme-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 20 Dec 2023 07:34:06 +0000
+Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BK7Rw1x010535;
+	Wed, 20 Dec 2023 07:34:06 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v3ttd9nku-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 20 Dec 2023 07:34:06 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3BK7FKEP004792;
+	Wed, 20 Dec 2023 07:34:05 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3v1pkyw6rc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 20 Dec 2023 07:34:05 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3BK7Y0I841353710
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 20 Dec 2023 07:34:02 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D4DB020043;
+	Wed, 20 Dec 2023 07:34:00 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C2F1120040;
+	Wed, 20 Dec 2023 07:34:00 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Wed, 20 Dec 2023 07:34:00 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
+	id 86F2BE03E5; Wed, 20 Dec 2023 08:34:00 +0100 (CET)
+From: Christian Borntraeger <borntraeger@linux.ibm.com>
+To: KVM <kvm@vger.kernel.org>
+Cc: Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>
+Subject: [PATCH] KVM: s390: vsie: fix race during shadow creation
+Date: Wed, 20 Dec 2023 08:34:00 +0100
+Message-ID: <20231220073400.257813-1-borntraeger@linux.ibm.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] x86: KVM: Limit guest physical bits when 5-level EPT
- is unsupported
-Content-Language: en-US
-To: Sean Christopherson <seanjc@google.com>, Chao Gao <chao.gao@intel.com>
-Cc: Jim Mattson <jmattson@google.com>, Tao Su <tao1.su@linux.intel.com>,
- kvm@vger.kernel.org, pbonzini@redhat.com, eddie.dong@intel.com,
- yuan.yao@linux.intel.com, yi1.lai@intel.com, xudong.hao@intel.com,
- chao.p.peng@intel.com
-References: <20231218140543.870234-1-tao1.su@linux.intel.com>
- <20231218140543.870234-2-tao1.su@linux.intel.com>
- <ZYBhl200jZpWDqpU@google.com> <ZYEFGQBti5DqlJiu@chao-email>
- <CALMp9eSJT7PajjX==L9eLKEEVuL-tvY0yN1gXmtzW5EUKHX3Yg@mail.gmail.com>
- <ZYFPsISS9K867BU5@chao-email> <ZYG2CDRFlq50siec@google.com>
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <ZYG2CDRFlq50siec@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: gkYja45xLKjYBKrSzgtB9y3puMeIS2gf
+X-Proofpoint-ORIG-GUID: OIoBNjeb5EMuqXDxGrTY2Udan2_R4W0B
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-20_02,2023-12-14_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=868 phishscore=0
+ lowpriorityscore=0 impostorscore=0 adultscore=0 bulkscore=0 malwarescore=0
+ suspectscore=0 mlxscore=0 priorityscore=1501 clxscore=1011 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
+ definitions=main-2312200050
 
-On 12/19/2023 11:26 PM, Sean Christopherson wrote:
-> KVM can simply
-> constrain the advertised MAXPHYADDR, no?
+Right now it is possible to see gmap->private being zero in
+kvm_s390_vsie_gmap_notifier resulting in a crash.  This is due to the
+fact that we add gmap->private == kvm after creation:
 
-Sean. It looks you agree with this patch (Patch 1) now.
+static int acquire_gmap_shadow(struct kvm_vcpu *vcpu,
+                               struct vsie_page *vsie_page)
+{
+[...]
+        gmap = gmap_shadow(vcpu->arch.gmap, asce, edat);
+        if (IS_ERR(gmap))
+                return PTR_ERR(gmap);
+        gmap->private = vcpu->kvm;
 
-I think it's better for you to comment the original code from Tao 
-instead of throwing out your own version. Tao needs to know why his 
-version is not OK/correct and what can be improved.
+Instead of tracking kvm in the shadow gmap, simply use the parent one.
 
-Thanks,
--Xiaoyao
+Cc: David Hildenbrand <david@redhat.com>
+Signed-off-by: Christian Borntraeger <borntraeger@linux.ibm.com>
+---
+ arch/s390/kvm/vsie.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-> ---
->   arch/x86/kvm/cpuid.c   | 17 +++++++++++++----
->   arch/x86/kvm/mmu.h     |  2 ++
->   arch/x86/kvm/mmu/mmu.c |  5 +++++
->   3 files changed, 20 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 294e5bd5f8a0..5c346e1a10bd 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -1233,12 +1233,21 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
->   		 *
->   		 * If TDP is enabled but an explicit guest MAXPHYADDR is not
->   		 * provided, use the raw bare metal MAXPHYADDR as reductions to
-> -		 * the HPAs do not affect GPAs.
-> +		 * the HPAs do not affect GPAs.  Finally, if TDP is enabled and
-> +		 * doesn't support 5-level paging, cap guest MAXPHYADDR at 48
-> +		 * bits as KVM can't install SPTEs for larger GPAs.
->   		 */
-> -		if (!tdp_enabled)
-> +		if (!tdp_enabled) {
->   			g_phys_as = boot_cpu_data.x86_phys_bits;
-> -		else if (!g_phys_as)
-> -			g_phys_as = phys_as;
-> +		} else {
-> +			u8 max_tdp_level = kvm_mmu_get_max_tdp_level();
-> +
-> +			if (!g_phys_as)
-> +				g_phys_as = phys_as;
-> +
-> +			if (max_tdp_level < 5)
-> +				g_phys_as = min(g_phys_as, 48);
-> +		}
->   
->   		entry->eax = g_phys_as | (virt_as << 8);
->   		entry->ecx &= ~(GENMASK(31, 16) | GENMASK(11, 8));
-> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-> index 60f21bb4c27b..b410a227c601 100644
-> --- a/arch/x86/kvm/mmu.h
-> +++ b/arch/x86/kvm/mmu.h
-> @@ -100,6 +100,8 @@ static inline u8 kvm_get_shadow_phys_bits(void)
->   	return boot_cpu_data.x86_phys_bits;
->   }
->   
-> +u8 kvm_mmu_get_max_tdp_level(void);
-> +
->   void kvm_mmu_set_mmio_spte_mask(u64 mmio_value, u64 mmio_mask, u64 access_mask);
->   void kvm_mmu_set_me_spte_mask(u64 me_value, u64 me_mask);
->   void kvm_mmu_set_ept_masks(bool has_ad_bits, bool has_exec_only);
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 3c844e428684..b2845f5520b3 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -5267,6 +5267,11 @@ static inline int kvm_mmu_get_tdp_level(struct kvm_vcpu *vcpu)
->   	return max_tdp_level;
->   }
->   
-> +u8 kvm_mmu_get_max_tdp_level(void)
-> +{
-> +	return tdp_root_level ? tdp_root_level : max_tdp_level;
-> +}
-> +
->   static union kvm_mmu_page_role
->   kvm_calc_tdp_mmu_root_page_role(struct kvm_vcpu *vcpu,
->   				union kvm_cpu_role cpu_role)
-> 
-> base-commit: f2a3fb7234e52f72ff4a38364dbf639cf4c7d6c6
-> -- 
+diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
+index 8207a892bbe2..6b06d8ec41b5 100644
+--- a/arch/s390/kvm/vsie.c
++++ b/arch/s390/kvm/vsie.c
+@@ -579,14 +579,17 @@ static int shadow_scb(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
+ void kvm_s390_vsie_gmap_notifier(struct gmap *gmap, unsigned long start,
+ 				 unsigned long end)
+ {
+-	struct kvm *kvm = gmap->private;
+ 	struct vsie_page *cur;
+ 	unsigned long prefix;
+ 	struct page *page;
++	struct kvm *kvm;
+ 	int i;
+ 
+ 	if (!gmap_is_shadow(gmap))
+ 		return;
++
++	kvm = gmap->parent->private;
++
+ 	/*
+ 	 * Only new shadow blocks are added to the list during runtime,
+ 	 * therefore we can safely reference them all the time.
+@@ -1220,7 +1223,6 @@ static int acquire_gmap_shadow(struct kvm_vcpu *vcpu,
+ 	gmap = gmap_shadow(vcpu->arch.gmap, asce, edat);
+ 	if (IS_ERR(gmap))
+ 		return PTR_ERR(gmap);
+-	gmap->private = vcpu->kvm;
+ 	vcpu->kvm->stat.gmap_shadow_create++;
+ 	WRITE_ONCE(vsie_page->gmap, gmap);
+ 	return 0;
+-- 
+2.41.0
 
 
