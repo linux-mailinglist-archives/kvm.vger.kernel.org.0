@@ -1,261 +1,262 @@
-Return-Path: <kvm+bounces-4894-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4893-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B13888196ED
-	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 03:46:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C69A28196E5
+	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 03:43:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A83F1F25D69
-	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 02:46:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2FB431F259DA
+	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 02:43:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07F9CC8CE;
-	Wed, 20 Dec 2023 02:46:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5A228F7D;
+	Wed, 20 Dec 2023 02:43:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PYMwa0c7"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="K2UuTASm"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F195F8BFC;
-	Wed, 20 Dec 2023 02:46:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 348E5BA5E;
+	Wed, 20 Dec 2023 02:43:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703040381; x=1734576381;
-  h=date:from:to:subject:message-id:reply-to:references:
-   in-reply-to:mime-version;
-  bh=CGSo2J67jciP10mMhqA/wEPICQ8MuhtB7YFbhyl67JY=;
-  b=PYMwa0c7soZdPu7LTivk5HUHoYmm4OonzqZ6Di/cSwpHhqH3IoGxaLst
-   9cqLvXV6tActg2SWogn3pz4Itb2lQF5sBX8A9k5Dq5LWe7u3Qe4PHuqgk
-   OKCJE0IrXH+rSieXZOsaCSijZX0j5L6nak/P+N6oMky7hKdm2G87LccZJ
-   k5yUC6l9bo9kI8YEJmOTKBpV7Hen+A8iuwjwx2fU84CzNgcLxLdzihHlD
-   3l6Tr8bxe2YaYxP54IV2Q6q6duK+hGvwkXLwQ5zkhDeFzQNR6K4bsLGSa
-   wVvntSSU6FipPtv3iKfaVqyERBdQbpHAP9l47TTnhM5nFECwd7Q7DWa/R
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10929"; a="395476548"
+  t=1703040191; x=1734576191;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=5KZpWRhE02/YKJt8pKhmik0cSB79JwRv8nivSCwdSvg=;
+  b=K2UuTASmFz/090q/SS3Y2lcmDVPP3EfKnDQAc9Wx5Cr6jIRpl669csVA
+   zsZLg6DcabvUdDwrzHzJxqInxyQdhuoLAeH+qQDmYMqUdjRmt8qa1dxKK
+   sxrioiaaWmJoJh8mYakW6wZag4tiWcvdE0X2HMfmEZl5PorNw4RTk/Xv+
+   878T35KfShlPMW1pKZgrs0TF+GUS9m6FHZCZ3vRtBjzsB7dAgaakbMUTZ
+   e1MV7Hl+Eky8ThTfUvdocKJr9eYZ/U5Cc4Lp8tLxtjn2SGVxjIJBMLiQj
+   LXMWmwaPPKztUD6hcY912RTeMDHQnEGG7y7kW3XuLFnLpGMdDaNEGP0Pp
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10929"; a="17307952"
 X-IronPort-AV: E=Sophos;i="6.04,290,1695711600"; 
-   d="scan'208";a="395476548"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2023 18:45:00 -0800
+   d="scan'208";a="17307952"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2023 18:43:10 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10929"; a="1107577879"
+X-IronPort-AV: E=McAfee;i="6600,9927,10929"; a="776178874"
 X-IronPort-AV: E=Sophos;i="6.04,290,1695711600"; 
-   d="scan'208";a="1107577879"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmsmga005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 19 Dec 2023 18:45:00 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 19 Dec 2023 18:44:59 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Tue, 19 Dec 2023 18:44:59 -0800
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.168)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Tue, 19 Dec 2023 18:44:59 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MIk/SuTA6+HfupD/rxaU2cgtr/2XlmY7gTUGqOC6Jh/Cmpva9XUFRVw/8cKIVcfmeFXOlQAa58utY7zpOVPLiUcRa3CTvoYVrsrz49Uk8vHKa7jFE4A2bnQR5lellOA+YPTzBAMIwOmQAa9+xdvIDFqDp8aAR6eoDvyueyRgReaCi5q9D0un+3q3HP+hdTUy807rRq6i1tyKcPfOIuZYBwChVt1hJfEMF4kMYsAOgnvQR/dpK3yqEs33bYgfe7CAinqgnVst1JOnWO53ry9sEGMhLdbpSMFCp59wc6xFUw1nV5UYOE4ys2/AaTCHzBXL9Ga2Hb82u8uO1NHf4y6TVw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=VRQBzuIGQwz8mgocw1fbVIkQRQkXY8gh7J/kiia1r2w=;
- b=KR63Wf6wy97m4sOZ8/kq/6ddT1OO22uJ5g1dCoJjZWLIhMfOACakVhcYcFZAtscNRLJR2MGSaPWXyRIlapzxfdh7GVUcGXU4Qpduzo6xVF4+IAej70TgCtu19JraywC25o70WKBPvLnd5sPOIhJXgs2ZbbCDpOVa6AztY+IcP9vn9veNz6Va9dXWa2XSzeFwGOt/CiuSmsE9dvERgNVI7ECwOJ5ti+YDX62P5MhQhmDVF+B/6/5AXalKfx0xg3Zg/QI3Wq8j61BTyRnOfFojfcahN3j0fR618oEjJKUtwYaJaHKbsBpREu3RI2MmnlpdtfEPgi3H1NghrvMRjGbYgw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- PH0PR11MB4949.namprd11.prod.outlook.com (2603:10b6:510:31::15) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7091.38; Wed, 20 Dec 2023 02:44:52 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::32a9:54b8:4253:31d4]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::32a9:54b8:4253:31d4%4]) with mapi id 15.20.7091.034; Wed, 20 Dec 2023
- 02:44:52 +0000
-Date: Wed, 20 Dec 2023 10:15:40 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Sean Christopherson <seanjc@google.com>, Kevin Tian
-	<kevin.tian@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "olvaffe@gmail.com"
-	<olvaffe@gmail.com>, Zhiyuan Lv <zhiyuan.lv@intel.com>, Zhenyu Z Wang
-	<zhenyu.z.wang@intel.com>, Yongwei Ma <yongwei.ma@intel.com>,
-	"vkuznets@redhat.com" <vkuznets@redhat.com>, "wanpengli@tencent.com"
-	<wanpengli@tencent.com>, "jmattson@google.com" <jmattson@google.com>,
-	"joro@8bytes.org" <joro@8bytes.org>, "gurchetansingh@chromium.org"
-	<gurchetansingh@chromium.org>, "kraxel@redhat.com" <kraxel@redhat.com>,
-	"Yiwei Zhang" <zzyiwei@google.com>
-Subject: Re: [RFC PATCH] KVM: Introduce KVM VIRTIO device
-Message-ID: <ZYJOTLwreD+8l4gU@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20231214103520.7198-1-yan.y.zhao@intel.com>
- <BN9PR11MB5276BE04CBB6D07039086D658C93A@BN9PR11MB5276.namprd11.prod.outlook.com>
- <ZXzx1zXfZ6GV9TgI@google.com>
- <ZYEbhadnn6+clzX9@yzhao56-desk.sh.intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <ZYEbhadnn6+clzX9@yzhao56-desk.sh.intel.com>
-X-ClientProxiedBy: SG2PR01CA0137.apcprd01.prod.exchangelabs.com
- (2603:1096:4:8f::17) To DS7PR11MB5966.namprd11.prod.outlook.com
- (2603:10b6:8:71::6)
+   d="scan'208";a="776178874"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by orsmga002.jf.intel.com with ESMTP; 19 Dec 2023 18:43:05 -0800
+Date: Wed, 20 Dec 2023 10:40:34 +0800
+From: Xu Yilun <yilun.xu@linux.intel.com>
+To: Paul Durrant <paul@xen.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+	Sean Christopherson <seanjc@google.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v11 08/19] KVM: pfncache: allow a cache to be activated
+ with a fixed (userspace) HVA
+Message-ID: <ZYJUIsQM06mhzOTY@yilunxu-OptiPlex-7050>
+References: <20231219161109.1318-1-paul@xen.org>
+ <20231219161109.1318-9-paul@xen.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|PH0PR11MB4949:EE_
-X-MS-Office365-Filtering-Correlation-Id: 177ed5d8-4e3d-4ca4-05bb-08dc0105a452
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: OgNxGCvY3elerW1DKu2OZYpMWZns5aTvo02bfzh2HztUr3Q/St2FO8LctsKvj1QgE10/Y0ZxsemGiA47L94emAvMqYUsIMjv4d5EkmZMv/E2a6wR+JuUialiucTrngEtlKxpxPCHFcAiRaGglAIBmRrpBE1pfTphxBx1YHbzmDPZpahPqNMoR/qxGZcNzZx4FRsf5RzodKgM4PrtVN5ItCU/6U+6pijL1RT5rqGg3+ZIlBqqwgbZ2FPaBgMK15pKDTsAMnC3f5g+692XLUoMsy49Q5sFk2geuLRCvhJt8DKppYH0D40cqP+LFn39pxtOpdhxS5VkEXQVrz2tRTn6O94l7G7p9jM1cBm6QyqC9br0pPPAFFaIv6qSOW9ltihTfopG6TOa0lgMLOZ/wPqP0r+wY0vDtTTPtmVUd8wEnhzqIHOWafoD5Wbeb3M+IKKiUJ/wyxWDLzRLi7IlS+hxDPpohwIEYzOeFsBCFS9ocx8XIadmZFQXQh8O4lL1JsYclRNRpBxaqPCGSWYDq/OU+FGsvA9FcRgVyKhzFdfepSe4K1QUtotwasXkIANVeDEqKGco8lA//G6xDqEreeARJd5UZT8xSk9q3jVCepTw//N2LdZRYWblC+YaGh+TvWVm
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(39860400002)(396003)(346002)(136003)(230922051799003)(1800799012)(451199024)(64100799003)(186009)(3450700001)(86362001)(2906002)(6666004)(8936002)(8676002)(110136005)(66946007)(66476007)(5660300002)(66556008)(316002)(38100700002)(7416002)(82960400001)(478600001)(6486002)(41300700001)(26005)(921008)(6512007)(83380400001)(6506007)(67856001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?9ob6Uy95xtxFD/NsbpaLB3q74ZlQrEtvdI2wIihFieef03+L6BiPx1clxym1?=
- =?us-ascii?Q?i9+IDH+ezHc/x7DtvlU4HIaiYwr+UcviSo/DWBHYW9wnwFO0IODEYxgtQLtR?=
- =?us-ascii?Q?7XumH8gEkOV2xgauuH4ojtrjZtWBg04kpnuJRFCavStzc/4OJ4lhupvZYV37?=
- =?us-ascii?Q?XMdZrR/luT4GwrK48CBMSUhB8Qagt48M27OwKrhM5MXdLJn4RnM10SGroGtq?=
- =?us-ascii?Q?piQZy7S+xBKYDbmAoAQroAH3DGehy41d53Udq6sc2M7s2Qe7H9fd0zE1FT57?=
- =?us-ascii?Q?knO9WwI74u1rKvAvuFE4RB3G+EEPl1alXSy49mOb9ZozUO52GbYioKma5dcO?=
- =?us-ascii?Q?bqOvuOwEIBdFtQVx0F8fNgF2Pf0WBoxbFtyEFgYAKoqbOqYoLa/jx+EZdYd9?=
- =?us-ascii?Q?uMheFsLTFsR1gIZ0C3prPVrGhUd/aX3DzTy30Ous29qis3jYC7WqRiTuNuM8?=
- =?us-ascii?Q?KaMxCnpYylWavEEsAfOq16YXqSRdBGd+wQoeIous8qe8Ke8dHsrLiU42lqVu?=
- =?us-ascii?Q?/Ny3hQqDWwHIkf292d08ZhDEtpcS05nUjCeDfCUmU/nrtLCChm3fRiXUO0R4?=
- =?us-ascii?Q?oghrOwbl4IEta6s5ZjQLxi7ZD7cmaPyE55xU88Yl4wQ34c7jr6+fo6d4Fcs/?=
- =?us-ascii?Q?OBWCTlWcOXYml7SmoLksqSVwGYyIh6RdZ7q48dHS+sCvE2gzEYwnGs56W5vJ?=
- =?us-ascii?Q?Gj8f6kfRitPLakc3n/eTOGt4fArAAfXgnw7bFZmEa8KcqNC2Mtb5E+rmfe5g?=
- =?us-ascii?Q?nssB015qyiDHKMct6S7VXKoAv36KpSYPfsTKYsVVfKI6THk1kD8U9eeHHNVU?=
- =?us-ascii?Q?uhu7X5O+yvi4Q42qqHjalNU243ruUgpt25PjP/685SwZF8cZJx4rQVQ08SYM?=
- =?us-ascii?Q?AlVNkWdhrY4ADNXyZwcH/8D33/U44FgLZilPRNyvKiS17Cp7qrcL6XpSDdhI?=
- =?us-ascii?Q?025Ak6rDh45gmwAUlHdRXL7MeOZ3hDLhDzP1eJI7ckKrChU/tB5Jxhd7x9Ax?=
- =?us-ascii?Q?/A0NLj90dZQ5rM15FvbRxaqHl5RcYOXxdV68YNCsuP9fYjhTO+6wNKJNxC8p?=
- =?us-ascii?Q?ETB4u/Qx3Uvzm77F9vlcFane/2mvdCSknc/8lJOJm47GJAYYMQW3eJefv7Ol?=
- =?us-ascii?Q?a03IL+xqxPtc+xGWUjB08F2x8ZodH6hrvI7vbMgN2kF7tjs0gEPUjt1pIBdm?=
- =?us-ascii?Q?ek1nPlim0xuDyl68/SqkG8ODuDVaSg4c7w16n5VrgUv9Tpz8OR9WCku4tiIZ?=
- =?us-ascii?Q?iLpHvBK2MXp6JWLHFbKyUPDyU0EyvDh80IkdMIDvsFKK5EufA6hfRO7If/8U?=
- =?us-ascii?Q?ej7jcFfGTntG8cmg/mm0LMuSN2TdPHskjqiTiLlu0TBKNSHhhPaQ7PHiVD5w?=
- =?us-ascii?Q?jOWN0Fyv8xosYFv6U0Q0pzrlGplmglAA6EfZQfwQtW3yZd9fDt8F9Ne9R8zi?=
- =?us-ascii?Q?Ls+WOekQltV0RaIz99qyNhfoE5T5lQA6iuAVZxQ0Zfl1F84UH2qmDNOcmbZo?=
- =?us-ascii?Q?/nq9F7QRBiQ5h30z6/l0D5ZhtpYqIe5k2KoSVQ7PXIMcaTzlskIkdN+ABDHW?=
- =?us-ascii?Q?4eYeXSLh3xHZ4LiBPP9A7CbXFSKuhP6Gh1NEHkjt?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 177ed5d8-4e3d-4ca4-05bb-08dc0105a452
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Dec 2023 02:44:52.4767
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: FLJBZ6Sg7ohQg8JDBw8IvO/4F3dObpMORd+WjjXjr8Ec0lFpL/olhmZcXm6Q2CQ1SP5lfWlzqCaXcJvt0cWe7Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4949
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231219161109.1318-9-paul@xen.org>
 
-On Tue, Dec 19, 2023 at 12:26:45PM +0800, Yan Zhao wrote:
-> On Mon, Dec 18, 2023 at 07:08:51AM -0800, Sean Christopherson wrote:
-> > > > Implementation Consideration
-> > > > ===
-> > > > There is a previous series [1] from google to serve the same purpose to
-> > > > let KVM be aware of virtio GPU's noncoherent DMA status. That series
-> > > > requires a new memslot flag, and special memslots in user space.
-> > > > 
-> > > > We don't choose to use memslot flag to request honoring guest memory
-> > > > type.
-> > > 
-> > > memslot flag has the potential to restrict the impact e.g. when using
-> > > clflush-before-read in migration?
-> > 
-> > Yep, exactly.  E.g. if KVM needs to ensure coherency when freeing memory back to
-> > the host kernel, then the memslot flag will allow for a much more targeted
-> > operation.
-> > 
-> > > Of course the implication is to honor guest type only for the selected slot
-> > > in KVM instead of applying to the entire guest memory as in previous series
-> > > (which selects this way because vmx_get_mt_mask() is in perf-critical path
-> > > hence not good to check memslot flag?)
-> > 
-> > Checking a memslot flag won't impact performance.  KVM already has the memslot
-> > when creating SPTEs, e.g. the sole caller of vmx_get_mt_mask(), make_spte(), has
-> > access to the memslot.
-> > 
-> > That isn't coincidental, KVM _must_ have the memslot to construct the SPTE, e.g.
-> > to retrieve the associated PFN, update write-tracking for shadow pages, etc.
-> > 
-> Hi Sean,
-> Do you prefer to introduce a memslot flag KVM_MEM_DMA or KVM_MEM_WC?
-> For KVM_MEM_DMA, KVM needs to
-> (a) search VMA for vma->vm_page_prot and convert it to page cache mode (with
->     pgprot2cachemode()? ), or
-> (b) look up memtype of the PFN, by calling lookup_memtype(), similar to that in
->     pat_pfn_immune_to_uc_mtrr().
+On Tue, Dec 19, 2023 at 04:10:58PM +0000, Paul Durrant wrote:
+> From: Paul Durrant <pdurrant@amazon.com>
 > 
-> But pgprot2cachemode() and lookup_memtype() are not exported by x86 code now.
+> Some pfncache pages may actually be overlays on guest memory that have a
+> fixed HVA within the VMM. It's pointless to invalidate such cached
+> mappings if the overlay is moved so allow a cache to be activated directly
+> with the HVA to cater for such cases. A subsequent patch will make use
+> of this facility.
 > 
-> For KVM_MEM_WC, it requires user to ensure the memory is actually mapped
-> to WC, right?
+> Signed-off-by: Paul Durrant <pdurrant@amazon.com>
+> Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
+> ---
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: David Woodhouse <dwmw2@infradead.org>
 > 
-> Then, vmx_get_mt_mask() just ignores guest PAT and programs host PAT as EPT type
-> for the special memslot only, as below.
-> Is this understanding correct?
+> v11:
+>  - Fixed kvm_gpc_check() to ignore memslot generation if the cache is not
+>    activated with a GPA. (This breakage occured during the re-work for v8).
 > 
-> static u8 vmx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
-> {
->         if (is_mmio)                                                                           
->                 return MTRR_TYPE_UNCACHABLE << VMX_EPT_MT_EPTE_SHIFT;                          
->                                                                                                
->         if (gfn_in_dma_slot(vcpu->kvm, gfn)) {                                                 
->                 u8 type = MTRR_TYPE_WRCOMB;                                      
->                 //u8 type = pat_pfn_memtype(pfn);                                
->                 return (type << VMX_EPT_MT_EPTE_SHIFT) | VMX_EPT_IPAT_BIT;       
->         }                                                                                      
->                                                                                                
->         if (!kvm_arch_has_noncoherent_dma(vcpu->kvm))                            
->                 return (MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT) | VMX_EPT_IPAT_BIT;         
->                                                                                                
->         if (kvm_read_cr0_bits(vcpu, X86_CR0_CD)) {                                             
->                 if (kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_CD_NW_CLEARED))               
->                         return MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT;                      
->                 else                                                                           
->                         return (MTRR_TYPE_UNCACHABLE << VMX_EPT_MT_EPTE_SHIFT) | 
->                                 VMX_EPT_IPAT_BIT;                                
->         }                                                                        
->                                                                                  
->         return kvm_mtrr_get_guest_memory_type(vcpu, gfn) << VMX_EPT_MT_EPTE_SHIFT;
-> }
+> v9:
+>  - Pass both GPA and HVA into __kvm_gpc_refresh() rather than overloading
+>    the address paraneter and using a bool flag to indicated what it is.
 > 
-> BTW, since the special memslot must be exposed to guest as virtio GPU BAR in
-> order to prevent other guest drivers from access, I wonder if it's better to
-> include some keyword like VIRTIO_GPU_BAR in memslot flag name.
-Another choice is to add a memslot flag KVM_MEM_HONOR_GUEST_PAT, then user
-(e.g. QEMU) does special treatment to this kind of memslots (e.g. skipping
-reading/writing to them in general paths).
+> v8:
+>  - Re-worked to avoid messing with struct gfn_to_pfn_cache.
+> ---
+>  include/linux/kvm_host.h | 20 +++++++++++++++++++-
+>  virt/kvm/pfncache.c      | 40 +++++++++++++++++++++++++++++++---------
+>  2 files changed, 50 insertions(+), 10 deletions(-)
+> 
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 6097f076a7b0..8120674b87b0 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1345,6 +1345,22 @@ void kvm_gpc_init(struct gfn_to_pfn_cache *gpc, struct kvm *kvm);
+>   */
+>  int kvm_gpc_activate(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned long len);
+>  
+> +/**
+> + * kvm_gpc_activate_hva - prepare a cached kernel mapping and HPA for a given HVA.
+> + *
+> + * @gpc:          struct gfn_to_pfn_cache object.
+> + * @hva:          userspace virtual address to map.
+> + * @len:          sanity check; the range being access must fit a single page.
+> + *
+> + * @return:       0 for success.
+> + *                -EINVAL for a mapping which would cross a page boundary.
+> + *                -EFAULT for an untranslatable guest physical address.
+> + *
+> + * The semantics of this function are the same as those of kvm_gpc_activate(). It
+> + * merely bypasses a layer of address translation.
+> + */
+> +int kvm_gpc_activate_hva(struct gfn_to_pfn_cache *gpc, unsigned long hva, unsigned long len);
+> +
+>  /**
+>   * kvm_gpc_check - check validity of a gfn_to_pfn_cache.
+>   *
+> @@ -1399,7 +1415,9 @@ void kvm_gpc_deactivate(struct gfn_to_pfn_cache *gpc);
+>  static inline void kvm_gpc_mark_dirty(struct gfn_to_pfn_cache *gpc)
+>  {
+>  	lockdep_assert_held(&gpc->lock);
+> -	mark_page_dirty_in_slot(gpc->kvm, gpc->memslot, gpc->gpa >> PAGE_SHIFT);
+> +
+> +	if (gpc->gpa != KVM_XEN_INVALID_GPA)
+> +		mark_page_dirty_in_slot(gpc->kvm, gpc->memslot, gpc->gpa >> PAGE_SHIFT);
+>  }
+>  
+>  void kvm_sigset_activate(struct kvm_vcpu *vcpu);
+> diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
+> index 97eec8ee3449..ae822bff812f 100644
+> --- a/virt/kvm/pfncache.c
+> +++ b/virt/kvm/pfncache.c
+> @@ -48,7 +48,10 @@ bool kvm_gpc_check(struct gfn_to_pfn_cache *gpc, unsigned long len)
+>  	if (!gpc->active)
+>  		return false;
+>  
+> -	if (gpc->generation != slots->generation || kvm_is_error_hva(gpc->uhva))
+> +	if (gpc->gpa != KVM_XEN_INVALID_GPA && gpc->generation != slots->generation)
+> +		return false;
+> +
+> +	if (kvm_is_error_hva(gpc->uhva))
+>  		return false;
+>  
+>  	if (offset_in_page(gpc->uhva) + len > PAGE_SIZE)
+> @@ -209,11 +212,13 @@ static kvm_pfn_t hva_to_pfn_retry(struct gfn_to_pfn_cache *gpc)
+>  	return -EFAULT;
+>  }
+>  
+> -static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa,
+> +static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned long uhva,
+>  			     unsigned long len)
+>  {
+>  	struct kvm_memslots *slots = kvm_memslots(gpc->kvm);
+> -	unsigned long page_offset = offset_in_page(gpa);
+> +	unsigned long page_offset = (gpa != KVM_XEN_INVALID_GPA) ?
+> +		offset_in_page(gpa) :
+> +		offset_in_page(uhva);
+>  	bool unmap_old = false;
+>  	unsigned long old_uhva;
+>  	kvm_pfn_t old_pfn;
+> @@ -246,9 +251,15 @@ static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa,
+>  	old_khva = (void *)PAGE_ALIGN_DOWN((uintptr_t)gpc->khva);
+>  	old_uhva = PAGE_ALIGN_DOWN(gpc->uhva);
+>  
+> -	/* Refresh the userspace HVA if necessary */
+> -	if (gpc->gpa != gpa || gpc->generation != slots->generation ||
+> -	    kvm_is_error_hva(gpc->uhva)) {
+> +	if (gpa == KVM_XEN_INVALID_GPA) {
+> +		gpc->gpa = KVM_XEN_INVALID_GPA;
+> +		gpc->uhva = PAGE_ALIGN_DOWN(uhva);
+> +
+> +		if (gpc->uhva != old_uhva)
+> +			hva_change = true;
+> +	} else if (gpc->gpa != gpa ||
+> +		   gpc->generation != slots->generation ||
+> +		   kvm_is_error_hva(gpc->uhva)) {
+>  		gfn_t gfn = gpa_to_gfn(gpa);
+>  
+>  		gpc->gpa = gpa;
+> @@ -319,7 +330,7 @@ static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa,
+>  
+>  int kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, unsigned long len)
+>  {
+> -	return __kvm_gpc_refresh(gpc, gpc->gpa, len);
+> +	return __kvm_gpc_refresh(gpc, gpc->gpa, gpc->uhva, len);
+>  }
+>  
+>  void kvm_gpc_init(struct gfn_to_pfn_cache *gpc, struct kvm *kvm)
+> @@ -332,7 +343,8 @@ void kvm_gpc_init(struct gfn_to_pfn_cache *gpc, struct kvm *kvm)
+>  	gpc->uhva = KVM_HVA_ERR_BAD;
+>  }
+>  
+> -int kvm_gpc_activate(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned long len)
+> +static int __kvm_gpc_activate(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned long uhva,
+> +			      unsigned long len)
+>  {
+>  	struct kvm *kvm = gpc->kvm;
+>  
+> @@ -353,7 +365,17 @@ int kvm_gpc_activate(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned long len)
+>  		gpc->active = true;
+>  		write_unlock_irq(&gpc->lock);
+>  	}
+> -	return __kvm_gpc_refresh(gpc, gpa, len);
+> +	return __kvm_gpc_refresh(gpc, gpa, uhva, len);
+> +}
+> +
+> +int kvm_gpc_activate(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned long len)
+> +{
+> +	return __kvm_gpc_activate(gpc, gpa, KVM_HVA_ERR_BAD, len);
+> +}
+> +
+> +int kvm_gpc_activate_hva(struct gfn_to_pfn_cache *gpc, unsigned long uhva, unsigned long len)
+> +{
+> +	return __kvm_gpc_activate(gpc, KVM_XEN_INVALID_GPA, uhva, len);
+>  }
+>  
+>  void kvm_gpc_deactivate(struct gfn_to_pfn_cache *gpc)
 
-@@ -7589,26 +7589,29 @@ static u8 vmx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
-        if (is_mmio)
-                return MTRR_TYPE_UNCACHABLE << VMX_EPT_MT_EPTE_SHIFT;
+The code looks good to me, but I feel odd that a *gfn*_to_pfn_cache is
+used, but gfn is not taken into account.
 
-+       if (in_slot_honor_guest_pat(vcpu->kvm, gfn))
-+               return kvm_mtrr_get_guest_memory_type(vcpu, gfn) << VMX_EPT_MT_EPTE_SHIFT;
-+
-        if (!kvm_arch_has_noncoherent_dma(vcpu->kvm))
-                return (MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT) | VMX_EPT_IPAT_BIT;
+I think if it is possible we introduce an hva_to_pfn_cache(hpc) that
+actually does most of the job in this file. Xen could directly use hpc,
+and gfn_to_pfn_cache works on top of hpc.
 
-        if (kvm_read_cr0_bits(vcpu, X86_CR0_CD)) {
-                if (kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_CD_NW_CLEARED))
-                        return MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT;
-                else
-                        return (MTRR_TYPE_UNCACHABLE << VMX_EPT_MT_EPTE_SHIFT) |
-                                VMX_EPT_IPAT_BIT;
-        }
 
-        return kvm_mtrr_get_guest_memory_type(vcpu, gfn) << VMX_EPT_MT_EPTE_SHIFT;
- }
+BTW: I also see there is a gfn_to_hva_cache which does pretty much the
+same as gpc's first half job. Is it possible to unify them like:
+
+struct gfn_to_pfn_cache {
+	struct gfn_to_hva_cache ghc;
+	struct hva_to_pfn_cache hpc;
+	...
+}
+
+Just my two cents.
+
+Thanks,
+Yilun
+
+> -- 
+> 2.39.2
+> 
+> 
 
