@@ -1,45 +1,45 @@
-Return-Path: <kvm+bounces-4932-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4933-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBED781A090
-	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 15:02:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE82C81A0DE
+	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 15:12:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96E1628A548
-	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 14:02:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 23D821F2736C
+	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 14:12:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86D1640BF6;
-	Wed, 20 Dec 2023 14:00:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1820A38F8C;
+	Wed, 20 Dec 2023 14:12:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZPEvx5OI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kfFn5Dvb"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4DDD40BE0;
-	Wed, 20 Dec 2023 14:00:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34943C433C7;
-	Wed, 20 Dec 2023 14:00:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 473A938DDD;
+	Wed, 20 Dec 2023 14:12:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEB7DC433C7;
+	Wed, 20 Dec 2023 14:12:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703080807;
-	bh=+UjhavKUNioyCLuYa/eAIifHPzlf8OMi3q4tlY/kIII=;
+	s=k20201202; t=1703081535;
+	bh=omuGEKL0AnBbS+fvO5aEEjVVdipBqKAYv93nwOJV9Ss=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ZPEvx5OIVRGL8qNYDhuCf+Eyhu7N7gGpyxUEJy1Dou5VQ0xUvLUvdlKcCOKQX2h4p
-	 /KAAgyhT2puLegHqGRF4Nc1GkXKYXSvks7uScMpfdKHOs05lOqSjywe8xoNFB5XDdw
-	 VatbHT1lUGuL9F6Rvu189Em9/PrhykJKmqshRe/Dts+wETEQLdXBFrhighSJOxwtj9
-	 O1DJ8lVXBmKBiihBnvyD+S/2zJZ369/oGlKSwpdS6/82III6q37K1oIz2iCt7J/Bpw
-	 kSsOL2AUsKCpMJsl2InL4ERp4DshtE0WqCWYN/tHx+H0cs/QXjatVPEAzGwEPvvUUl
-	 CLoNGOmtYzufw==
+	b=kfFn5Dvbbrr6iPRuNItHtdv6Wg3PZAyXrr95xvGleIi39+oOv90e36Fw7E1LPRtrk
+	 YIPmh5cnnozM0+VqfHkzu0sxLR1qmEAGMcRahaLSd3fvG/HpUsohvAYXNUHHihIPuq
+	 wpz3UEBa/45OpzSRAdrVOgLrwVJAELez9l+J+jyKcY9k6nNPMWYp6Ysoegw8M0X/RP
+	 ig2hn1EO9RCfzUcoq0/LlX5UBTbAkRD5mD/6Tm5taU7mVRmI4KkzNm7SCpi1tWIIsI
+	 KuYSCRF9jMYHZq7o+z3SQPS3dNYSXGJzzIromkeLLnA+vUAZXDmH4Gg1FChTGR7hyg
+	 wUXs6tFD7treQ==
 Received: from [104.132.45.104] (helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rFx7E-005hJ7-Qt;
-	Wed, 20 Dec 2023 14:00:04 +0000
-Date: Wed, 20 Dec 2023 14:00:04 +0000
-Message-ID: <87y1dpt1nf.wl-maz@kernel.org>
+	id 1rFxIz-005haC-Go;
+	Wed, 20 Dec 2023 14:12:13 +0000
+Date: Wed, 20 Dec 2023 14:12:12 +0000
+Message-ID: <87wmt9t137.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: <ankita@nvidia.com>
 Cc: <jgg@nvidia.com>,
@@ -70,9 +70,10 @@ Cc: <jgg@nvidia.com>,
 	<kvm@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>,
 	<linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH v4 0/3] kvm: arm64: allow the VM to select DEVICE_* and NORMAL_NC for IO memory
-In-Reply-To: <20231218090719.22250-1-ankita@nvidia.com>
+Subject: Re: [PATCH v4 1/3] kvm: arm64: introduce new flag for non-cacheable IO memory
+In-Reply-To: <20231218090719.22250-2-ankita@nvidia.com>
 References: <20231218090719.22250-1-ankita@nvidia.com>
+	<20231218090719.22250-2-ankita@nvidia.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -88,17 +89,123 @@ X-SA-Exim-Rcpt-To: ankita@nvidia.com, jgg@nvidia.com, oliver.upton@linux.dev, su
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 18 Dec 2023 09:07:16 +0000,
+On Mon, 18 Dec 2023 09:07:17 +0000,
 <ankita@nvidia.com> wrote:
 > 
 > From: Ankit Agrawal <ankita@nvidia.com>
+> 
+> For various reasons described in the cover letter, and primarily to
 
-[...]
+Well, the cover letter does not end-up in the git tree, so you must
+put some actual information here.
 
-> Applied over next-20231211
+> allow VM get IO memory with NORMALNC properties, it is desired
+> to relax the KVM stage 2 device memory attributes from DEVICE_nGnRE
+> to NormalNC. So set S2 PTE for IO memory as NORMAL_NC.
+> 
+> A Normal-NC flag is not present today. So add a new kvm_pgtable_prot
+> (KVM_PGTABLE_PROT_NORMAL_NC) flag for it, along with its
+> corresponding PTE value 0x5 (0b101) determined from [1].
+> 
+> Lastly, adapt the stage2 PTE property setter function
+> (stage2_set_prot_attr) to handle the NormalNC attribute.
+> 
+> [1] section D8.5.5 of DDI0487J_a_a-profile_architecture_reference_manual.pdf
+> 
+> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
+> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+> Tested-by: Ankit Agrawal <ankita@nvidia.com>
+> ---
+>  arch/arm64/include/asm/kvm_pgtable.h |  2 ++
+>  arch/arm64/include/asm/memory.h      |  2 ++
+>  arch/arm64/kvm/hyp/pgtable.c         | 13 +++++++++++--
+>  3 files changed, 15 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index cfdf40f734b1..19278dfe7978 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -197,6 +197,7 @@ enum kvm_pgtable_stage2_flags {
+>   * @KVM_PGTABLE_PROT_W:		Write permission.
+>   * @KVM_PGTABLE_PROT_R:		Read permission.
+>   * @KVM_PGTABLE_PROT_DEVICE:	Device attributes.
+> + * @KVM_PGTABLE_PROT_NORMAL_NC:	Normal noncacheable attributes.
+>   * @KVM_PGTABLE_PROT_SW0:	Software bit 0.
+>   * @KVM_PGTABLE_PROT_SW1:	Software bit 1.
+>   * @KVM_PGTABLE_PROT_SW2:	Software bit 2.
+> @@ -208,6 +209,7 @@ enum kvm_pgtable_prot {
+>  	KVM_PGTABLE_PROT_R			= BIT(2),
+>  
+>  	KVM_PGTABLE_PROT_DEVICE			= BIT(3),
+> +	KVM_PGTABLE_PROT_NORMAL_NC		= BIT(4),
+>  
+>  	KVM_PGTABLE_PROT_SW0			= BIT(55),
+>  	KVM_PGTABLE_PROT_SW1			= BIT(56),
+> diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
+> index fde4186cc387..c247e5f29d5a 100644
+> --- a/arch/arm64/include/asm/memory.h
+> +++ b/arch/arm64/include/asm/memory.h
+> @@ -147,6 +147,7 @@
+>   * Memory types for Stage-2 translation
+>   */
+>  #define MT_S2_NORMAL		0xf
+> +#define MT_S2_NORMAL_NC		0x5
+>  #define MT_S2_DEVICE_nGnRE	0x1
+>  
+>  /*
+> @@ -154,6 +155,7 @@
+>   * Stage-2 enforces Normal-WB and Device-nGnRE
+>   */
+>  #define MT_S2_FWB_NORMAL	6
+> +#define MT_S2_FWB_NORMAL_NC	5
+>  #define MT_S2_FWB_DEVICE_nGnRE	1
+>  
+>  #ifdef CONFIG_ARM64_4K_PAGES
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index c651df904fe3..0fff079a0ef3 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -718,10 +718,19 @@ static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot p
+>  				kvm_pte_t *ptep)
+>  {
+>  	bool device = prot & KVM_PGTABLE_PROT_DEVICE;
+> -	kvm_pte_t attr = device ? KVM_S2_MEMATTR(pgt, DEVICE_nGnRE) :
+> -			    KVM_S2_MEMATTR(pgt, NORMAL);
+> +	bool normal_nc = prot & KVM_PGTABLE_PROT_NORMAL_NC;
+> +	kvm_pte_t attr;
+>  	u32 sh = KVM_PTE_LEAF_ATTR_LO_S2_SH_IS;
+>  
+> +	WARN_ON_ONCE(device && normal_nc);
+> +
+> +	if (device)
+> +		attr = KVM_S2_MEMATTR(pgt, DEVICE_nGnRE);
+> +	else if (normal_nc)
+> +		attr = KVM_S2_MEMATTR(pgt, NORMAL_NC);
+> +	else
+> +		attr = KVM_S2_MEMATTR(pgt, NORMAL);
+> +
 
-In the future, please post patches that are generated against a tag
-from Linus' tree. The usual wisdom is to use -rc3 as the base.
+This whole thing can be written a bit more elegantly:
+
+	switch (prot & (KVM_PGTABLE_PROT_DEVICE |
+			KVM_PGTABLE_PROT_NORMAL_NC)) {
+	case 0:
+		attr = KVM_S2_MEMATTR(pgt, NORMAL);
+		break;
+	case KVM_PGTABLE_PROT_DEVICE:
+		if (prot & KVM_PGTABLE_PROT_X)
+			return -EINVAL;
+		attr = KVM_S2_MEMATTR(pgt, DEVICE_nGnRE);
+		break;
+	case KVM_PGTABLE_PROT_NORMAL_NC:
+		attr = KVM_S2_MEMATTR(pgt, NORMAL_NC);
+		break;
+	default:
+		WARN_ON_ONCE(1);
+	}
+
+and you can get rid of all of the boolean crud.
 
 	M.
 
