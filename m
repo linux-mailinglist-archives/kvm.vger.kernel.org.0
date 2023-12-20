@@ -1,143 +1,147 @@
-Return-Path: <kvm+bounces-4911-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4912-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63B22819B0F
-	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 10:01:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34B49819BD4
+	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 10:56:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FCFE288086
-	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 09:01:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C8F5BB20340
+	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 09:56:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 104981D6AB;
-	Wed, 20 Dec 2023 09:00:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55F572033A;
+	Wed, 20 Dec 2023 09:56:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KF+fgMS9"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="B1/WCZSa"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E6DF1D6B1;
-	Wed, 20 Dec 2023 09:00:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88D58C433C7;
-	Wed, 20 Dec 2023 09:00:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703062851;
-	bh=aP+or2O2Amx3o066NoYjmEoMeqgvW6u+ehSxtWedg58=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=KF+fgMS9J85VBtFxE6C+CCleuJv2Zec2Xe4q/rr8qCPuNT4X6BnizX1N/UkQkN0Uj
-	 nE3rnBnfP8GJp5JDIKnUtJT1EOslUeIc9Kz5N69A2/7m1+FIVrf69/71oD5mrDBFxI
-	 booZixCOostTgj5lokin2FLDaIOi2WdnoU8GbPtNSt+sF2yj7AclNl2tQftWrRBS7l
-	 JJyJBvH61E1GgPgIUr0Ld2sEUG0nbwpR+ldnI5O8jY1BRUmblOm5PXaKXgqHhgnQVW
-	 mA1nuVNA29MagVh7YGOQLOafINsTUpneKa1N6i2cXp2CD1Sm33c1/4UTrwQyw4bBKL
-	 qt8myFyRPxaTQ==
-Received: from disco-boy.misterjones.org ([217.182.43.188] helo=www.loen.fr)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rFsRc-005chY-Hw;
-	Wed, 20 Dec 2023 09:00:48 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 779C21F616;
+	Wed, 20 Dec 2023 09:56:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BK8Cf66014296;
+	Wed, 20 Dec 2023 09:56:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=C17ZtDNNWsK1aq9JjnwX7tEGI6cd5ViNpeHPvoDQj3E=;
+ b=B1/WCZSacF45dCa32wdOiKQrR4UThxEkjiqR9tcXOcOqi9VmlOfH7Opjii8YYbprY5BK
+ RYFduNvKXd1DRedLmeTPULP+ZkJZzdnBIuRp63KUvsLkISwJqbxVLwG9sKEXVvABgqYI
+ 0jDR+gqconn+L13vRnysscQItvSGYv88XGe8lgph5I+rqPkoUK3qMI4l6dCpSObJzA7V
+ zYPE3Ydq37eJkz/zORECCXka+KvUxTKMzVtvoh7uBD6pwVRNbcuMiRrorIJy2ef9FUh5
+ cPHB2Dp9gCtPpp3SvkpZr+OyyMwlNX+PqwhUd2barrVG5ddIbmyo9XxUiDrZbRFHnqaA 0A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v3vjctdh7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 20 Dec 2023 09:56:22 +0000
+Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BK9YNk9015619;
+	Wed, 20 Dec 2023 09:56:22 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v3vjctdgt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 20 Dec 2023 09:56:22 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3BK6rS39029726;
+	Wed, 20 Dec 2023 09:56:21 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3v1p7snurb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 20 Dec 2023 09:56:21 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3BK9uIE137749338
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 20 Dec 2023 09:56:18 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 85D6C2004B;
+	Wed, 20 Dec 2023 09:56:18 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D9A2920043;
+	Wed, 20 Dec 2023 09:56:17 +0000 (GMT)
+Received: from [9.171.71.20] (unknown [9.171.71.20])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 20 Dec 2023 09:56:17 +0000 (GMT)
+Message-ID: <adaa7efe-b5f7-450b-8dd9-312cefa8fce3@linux.ibm.com>
+Date: Wed, 20 Dec 2023 10:56:17 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Wed, 20 Dec 2023 09:00:48 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Haibo Xu <xiaobo55x@gmail.com>
-Cc: Haibo Xu <haibo1.xu@intel.com>, ajones@ventanamicro.com, Paul Walmsley
- <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
- <aou@eecs.berkeley.edu>, Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan
- <shuah@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, James Morse
- <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, Anup Patel <anup@brainfault.org>, Atish Patra
- <atishp@atishpatra.org>, Guo Ren <guoren@kernel.org>, Mayuresh Chitale
- <mchitale@ventanamicro.com>, Greentime Hu <greentime.hu@sifive.com>, wchen
- <waylingii@gmail.com>, Conor Dooley <conor.dooley@microchip.com>, Heiko
- Stuebner <heiko@sntech.de>, Minda Chen <minda.chen@starfivetech.com>, Samuel
- Holland <samuel@sholland.org>, Jisheng Zhang <jszhang@kernel.org>, Sean
- Christopherson <seanjc@google.com>, Peter Xu <peterx@redhat.com>, Like Xu
- <likexu@tencent.com>, Vipin Sharma <vipinsh@google.com>, Maciej
- Wieczor-Retman <maciej.wieczor-retman@intel.com>, Aaron Lewis
- <aaronlewis@google.com>, Thomas Huth <thuth@redhat.com>,
- linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
- kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH v4 11/11] KVM: selftests: Enable tunning of err_margin_us
- in arch timer test
-In-Reply-To: <CAJve8onc0WN5g98aOVBmJx15wFBAqfBKJ+ufoLY+oqYyVL+=3A@mail.gmail.com>
-References: <cover.1702371136.git.haibo1.xu@intel.com>
- <0343a9e4bfa8011fbb6bca0286cee7eab1f17d5d.1702371136.git.haibo1.xu@intel.com>
- <8734vy832j.wl-maz@kernel.org>
- <CAJve8onc0WN5g98aOVBmJx15wFBAqfBKJ+ufoLY+oqYyVL+=3A@mail.gmail.com>
-User-Agent: Roundcube Webmail/1.4.15
-Message-ID: <f98879dc24f948f7a8a7b5374a32bc04@kernel.org>
-X-Sender: maz@kernel.org
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 217.182.43.188
-X-SA-Exim-Rcpt-To: xiaobo55x@gmail.com, haibo1.xu@intel.com, ajones@ventanamicro.com, paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, pbonzini@redhat.com, shuah@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, anup@brainfault.org, atishp@atishpatra.org, guoren@kernel.org, mchitale@ventanamicro.com, greentime.hu@sifive.com, waylingii@gmail.com, conor.dooley@microchip.com, heiko@sntech.de, minda.chen@starfivetech.com, samuel@sholland.org, jszhang@kernel.org, seanjc@google.com, peterx@redhat.com, likexu@tencent.com, vipinsh@google.com, maciej.wieczor-retman@intel.com, aaronlewis@google.com, thuth@redhat.com, linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 1/4] KVM: s390: vsie: Fix STFLE interpretive execution
+ identification
+To: Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens
+ <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>
+Cc: David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Sven Schnelle <svens@linux.ibm.com>,
+        linux-s390@vger.kernel.org
+References: <20231219140854.1042599-1-nsg@linux.ibm.com>
+ <20231219140854.1042599-2-nsg@linux.ibm.com>
+Content-Language: en-US
+From: Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <20231219140854.1042599-2-nsg@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Zjz3AkNrnVzkl0TyS2yhk3SH93jduN7v
+X-Proofpoint-ORIG-GUID: g-UQ3RHgLfFT7g9FHACBy5bS1Ms86Kbn
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-20_02,2023-12-14_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ mlxlogscore=999 spamscore=0 mlxscore=0 impostorscore=0 phishscore=0
+ malwarescore=0 clxscore=1015 suspectscore=0 priorityscore=1501
+ adultscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2312200069
 
-On 2023-12-20 06:50, Haibo Xu wrote:
-> On Wed, Dec 20, 2023 at 2:22 AM Marc Zyngier <maz@kernel.org> wrote:
->> 
->> On Tue, 12 Dec 2023 09:31:20 +0000,
->> Haibo Xu <haibo1.xu@intel.com> wrote:
->> > > @@ -216,6 +221,9 @@ static bool parse_args(int argc, char *argv[])
->> >               case 'm':
->> >                       test_args.migration_freq_ms = atoi_non_negative("Frequency", optarg);
->> >                       break;
->> > +             case 'e':
->> > +                     test_args.timer_err_margin_us = atoi_non_negative("Error Margin", optarg);
->> > +                     break;
->> 
->> So your error margin is always unsigned...
->> 
+Am 19.12.23 um 15:08 schrieb Nina Schoetterl-Glausch:
+> STFLE can be interpretively executed.
+> This occurs when the facility list designation is unequal to zero.
+> Perform the check before applying the address mask instead of after.
 > 
-> The error margin was supposed to be a non-negative [0, INT_MAX].
-> (May be need to define a Max for the input, instead of INT_MAX)
-> 
->> >               case 'o':
->> >                       test_args.counter_offset = strtol(optarg, NULL, 0);
->> >                       test_args.reserved = 0;
->> > diff --git a/tools/testing/selftests/kvm/include/timer_test.h b/tools/testing/selftests/kvm/include/timer_test.h
->> > index 968257b893a7..b1d405e7157d 100644
->> > --- a/tools/testing/selftests/kvm/include/timer_test.h
->> > +++ b/tools/testing/selftests/kvm/include/timer_test.h
->> > @@ -22,6 +22,7 @@ struct test_args {
->> >       int nr_iter;
->> >       int timer_period_ms;
->> >       int migration_freq_ms;
->> > +     int timer_err_margin_us;
->> 
->> ... except that you are storing it as a signed value. Some consistency
->> wouldn't hurt, really, and would avoid issues when passing large
->> values.
->> 
-> 
-> Yes, it's more proper to use an unsigned int for the non-negative error 
-> margin.
-> Storing as signed here is just to keep the type consistent with that
-> of timer_period_ms
-> since there will be '+' operation in other places.
-> 
->         tools/testing/selftests/kvm/aarch64/arch_timer.c
->         /* Setup a timeout for the interrupt to arrive */
->          udelay(msecs_to_usecs(test_args.timer_period_ms) +
->              test_args.timer_err_margin_us);
+> Fixes: 66b630d5b7f2 ("KVM: s390: vsie: support STFLE interpretation")
+> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Acked-by: David Hildenbrand <david@redhat.com>
+> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 
-But that's exactly why using a signed quantity is wrong.
-What does it mean to have a huge *negative* margin?
+Reviewed-by: Christian Borntraeger <borntraeger@linux.ibm.com>
 
-I don't see how you can justify this.
+this should not matter in reality but maybe some weird guests puts this at address 0.
+Do we want a unit test for that case?
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+> ---
+>   arch/s390/kvm/vsie.c | 7 ++++++-
+>   1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
+> index 8207a892bbe2..35937911724e 100644
+> --- a/arch/s390/kvm/vsie.c
+> +++ b/arch/s390/kvm/vsie.c
+> @@ -984,10 +984,15 @@ static void retry_vsie_icpt(struct vsie_page *vsie_page)
+>   static int handle_stfle(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
+>   {
+>   	struct kvm_s390_sie_block *scb_s = &vsie_page->scb_s;
+> -	__u32 fac = READ_ONCE(vsie_page->scb_o->fac) & 0x7ffffff8U;
+> +	__u32 fac = READ_ONCE(vsie_page->scb_o->fac);
+>   
+>   	if (fac && test_kvm_facility(vcpu->kvm, 7)) {
+>   		retry_vsie_icpt(vsie_page);
+> +		/*
+> +		 * The facility list origin (FLO) is in bits 1 - 28 of the FLD
+> +		 * so we need to mask here before reading.
+> +		 */
+> +		fac = fac & 0x7ffffff8U;
+>   		if (read_guest_real(vcpu, fac, &vsie_page->fac,
+>   				    sizeof(vsie_page->fac)))
+>   			return set_validity_icpt(scb_s, 0x1090U);
 
