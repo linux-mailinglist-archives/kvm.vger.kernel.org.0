@@ -1,111 +1,152 @@
-Return-Path: <kvm+bounces-4905-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4906-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F20BF819786
-	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 05:06:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 317188198D0
+	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 07:50:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F5151C25102
-	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 04:06:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 63FAB1C2199E
+	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 06:50:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2D3010A1E;
-	Wed, 20 Dec 2023 04:06:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AC2B14A8D;
+	Wed, 20 Dec 2023 06:50:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MQHVrLdi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YBtA0US3"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C43DDCA41
-	for <kvm@vger.kernel.org>; Wed, 20 Dec 2023 04:06:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1703045163;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=od6b06R9di1R/4iYBvwR9HNhISJUCGr44+UWNtXtRoc=;
-	b=MQHVrLdiTnYXrw0TsTvqsw7g/+M4/YK//6u5ghkO6uJMkdtWueDTmWOVcYC0+84OnsPtBr
-	CRJlyc3k2ErmsGfxbmvLCd7QsgMEhdsvofSjae84SHOrSeW3rffOP2KvbOaJHVkAiaklLC
-	s+SaepToKj1tfMOCkQaWM2rvIRnM5Mo=
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
- [209.85.167.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-439-AgpXBAXiNJKdRIqynw3OJA-1; Tue, 19 Dec 2023 23:06:01 -0500
-X-MC-Unique: AgpXBAXiNJKdRIqynw3OJA-1
-Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-3b9d731fd1bso6594246b6e.1
-        for <kvm@vger.kernel.org>; Tue, 19 Dec 2023 20:06:01 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 242BB15496;
+	Wed, 20 Dec 2023 06:50:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2cc5e48779aso47440151fa.2;
+        Tue, 19 Dec 2023 22:50:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703055015; x=1703659815; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IloV9gHlRpc9SD2YCXR7E/7T42jMVfD74Pty8sLbHvY=;
+        b=YBtA0US3frW0Vzy5nLl8FnXaHxMswBZmnKrl9G3/uZOQQ4GveJYNLyGsV5+gcDXI9V
+         J+ga22b2F3ZGQbpYEP/cYv+55S06vo6ADryV8pJmAJ66zEGv7wsnB46zF+C6oU0hkYM9
+         /6um/pYXfH4h66Sxhk69FdCqoGrzt7StX6YSTikAk4sWwoZGuF3VP6RLVYXs6t0EBfHJ
+         gU0eU8f+ToLWBTDTpU9GJ1UL1tDiR/eYDkz99GCPc+Xpyc5iQM3Lzxp4VbfXfH3lz/bX
+         gjhEzsKnXFnU5BqR2kyMHk2uZi3rOYtY5ulBxULSFpIAs12cHcJqMLUulTGlKhc7yrJJ
+         3oqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703045161; x=1703649961;
+        d=1e100.net; s=20230601; t=1703055015; x=1703659815;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=od6b06R9di1R/4iYBvwR9HNhISJUCGr44+UWNtXtRoc=;
-        b=OSf9Cg1NQiujZkD2b39yEcBeQSE5H9tP2xiG8ahMbjhN6kTjyXkiSfBmzhlbyL2HOs
-         bzfI3Zl6zaNIqNPGWXgBoNUvNMjuiSaDmExVo22rKyUQCBHKJdrJV5bmOrDj+brtbnCh
-         Xa/TzCFbybqF6/u4Nwf299tFqpbhzGpd/1TyCt/q5GdosfJW1nUMBTVnsrlA1Ox4LMN9
-         dK+zyG9rIg1eCbNMQPbtRuQJbYeGBQhjKOtsAnPFnGvm4p+IjkDqIhvWtpTAQ+3/6s3H
-         MlgBxrDn5OnuJvWZwvVoaokqMYuB6klYqanUgE+8XVXEVdlnwKjCnDRTzQSZNPbYEJVK
-         aKTg==
-X-Gm-Message-State: AOJu0Yys7PE4IDLVW8gyZgviHrR6EVTQoB0XBdHPMn2Od324HA1J80Ef
-	xqLU+4qD8s+0z/xbe+1lTLu+xZ+wIzgiZ8MWFdBDq5CkuKtVVBVA0dcDfg0pduLFRwO5allNrEb
-	ABaphbCVR1wmEdqd/Uw50x9rKlVKS
-X-Received: by 2002:a05:6808:2022:b0:3bb:5f46:fc92 with SMTP id q34-20020a056808202200b003bb5f46fc92mr2662219oiw.32.1703045161219;
-        Tue, 19 Dec 2023 20:06:01 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF7bNzJNP++sajjpkBSvZbj8fBXUFR3JlD7KqetxxL+4FHj3ZcsomiOKSot/CNkMhv11b5giD9zm5wB0LFKSTg=
-X-Received: by 2002:a05:6808:2022:b0:3bb:5f46:fc92 with SMTP id
- q34-20020a056808202200b003bb5f46fc92mr2662209oiw.32.1703045161039; Tue, 19
- Dec 2023 20:06:01 -0800 (PST)
+        bh=IloV9gHlRpc9SD2YCXR7E/7T42jMVfD74Pty8sLbHvY=;
+        b=QwWG5ZTwMoOLKkjbe2c95tg9UihY8ARFMIAVx725A5NT/po8CyfduIUpEmUatEo4ZW
+         f+fNAulBqhF029fFyPjrLP564W9jnlmpv/JuO/VwMJI226OHPgW6apiUqMM3zoKPvA6O
+         C3iwwu7aXwbHmQmRgXWvDs+NZ3BBnhfK4xs/h1cwil4X43lv8yX3MVafTJ9wCbZh3rWu
+         4SF+MHDCJ07wuDhlbLP6Upr0op4nr29zxQuNGi+hwxjU+/6RtDL0tYUZMLSD0LkYPFkf
+         JPmYermAM4gx/vEf97ia0RDTV+e//aJsxGChVtEvTUi0M1Wd6UOtugm/H4mg2ZsV7UuI
+         0XXw==
+X-Gm-Message-State: AOJu0YxvEG9AoYgICe6ozrgI4u2WMrLaOjY5r4fzztBLeid8YDkSPIl9
+	Z2dpEZ6IbIW48YGK6Et9maYIUUwB7n0/Mp8FX/A=
+X-Google-Smtp-Source: AGHT+IGyXIZ1XsWlabej49gCsPyJXlY+x34WunG9S1gzJ848CgF23IrFQFyfhwjo//9JKJAadF2riryatJZtvHVMNgc=
+X-Received: by 2002:a2e:b0dc:0:b0:2cc:895c:5de3 with SMTP id
+ g28-20020a2eb0dc000000b002cc895c5de3mr338259ljl.207.1703055014949; Tue, 19
+ Dec 2023 22:50:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231219180858.120898-1-dtatulea@nvidia.com> <20231219180858.120898-3-dtatulea@nvidia.com>
- <CACGkMEv7xQkZYJAgAUK6C3oUrZ9vuUJdTKRzihXcNPb-iWdpJw@mail.gmail.com>
-In-Reply-To: <CACGkMEv7xQkZYJAgAUK6C3oUrZ9vuUJdTKRzihXcNPb-iWdpJw@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 20 Dec 2023 12:05:50 +0800
-Message-ID: <CACGkMEsaaDGi63__YrvsTC1HqgTaEWHvGokK1bJS5+m1XYM-6w@mail.gmail.com>
-Subject: Re: [PATCH vhost v4 02/15] vdpa: Add VHOST_BACKEND_F_CHANGEABLE_VQ_ADDR_IN_SUSPEND
- flag
-To: Dragos Tatulea <dtatulea@nvidia.com>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Eugenio Perez Martin <eperezma@redhat.com>, 
-	Si-Wei Liu <si-wei.liu@oracle.com>, Saeed Mahameed <saeedm@nvidia.com>, 
-	Leon Romanovsky <leon@kernel.org>, virtualization@lists.linux-foundation.org, 
-	Gal Pressman <gal@nvidia.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Parav Pandit <parav@nvidia.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+References: <cover.1702371136.git.haibo1.xu@intel.com> <0343a9e4bfa8011fbb6bca0286cee7eab1f17d5d.1702371136.git.haibo1.xu@intel.com>
+ <8734vy832j.wl-maz@kernel.org>
+In-Reply-To: <8734vy832j.wl-maz@kernel.org>
+From: Haibo Xu <xiaobo55x@gmail.com>
+Date: Wed, 20 Dec 2023 14:50:03 +0800
+Message-ID: <CAJve8onc0WN5g98aOVBmJx15wFBAqfBKJ+ufoLY+oqYyVL+=3A@mail.gmail.com>
+Subject: Re: [PATCH v4 11/11] KVM: selftests: Enable tunning of err_margin_us
+ in arch timer test
+To: Marc Zyngier <maz@kernel.org>
+Cc: Haibo Xu <haibo1.xu@intel.com>, ajones@ventanamicro.com, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Anup Patel <anup@brainfault.org>, 
+	Atish Patra <atishp@atishpatra.org>, Guo Ren <guoren@kernel.org>, 
+	Mayuresh Chitale <mchitale@ventanamicro.com>, Greentime Hu <greentime.hu@sifive.com>, 
+	wchen <waylingii@gmail.com>, Conor Dooley <conor.dooley@microchip.com>, 
+	Heiko Stuebner <heiko@sntech.de>, Minda Chen <minda.chen@starfivetech.com>, 
+	Samuel Holland <samuel@sholland.org>, Jisheng Zhang <jszhang@kernel.org>, 
+	Sean Christopherson <seanjc@google.com>, Peter Xu <peterx@redhat.com>, Like Xu <likexu@tencent.com>, 
+	Vipin Sharma <vipinsh@google.com>, 
+	Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>, Aaron Lewis <aaronlewis@google.com>, 
+	Thomas Huth <thuth@redhat.com>, linux-kernel@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 20, 2023 at 11:46=E2=80=AFAM Jason Wang <jasowang@redhat.com> w=
-rote:
+On Wed, Dec 20, 2023 at 2:22=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
+:
 >
-> On Wed, Dec 20, 2023 at 2:09=E2=80=AFAM Dragos Tatulea <dtatulea@nvidia.c=
-om> wrote:
-> >
-> > The virtio spec doesn't allow changing virtqueue addresses after
-> > DRIVER_OK. Some devices do support this operation when the device is
-> > suspended. The VHOST_BACKEND_F_CHANGEABLE_VQ_ADDR_IN_SUSPEND flag
-> > advertises this support as a backend features.
+> On Tue, 12 Dec 2023 09:31:20 +0000,
+> Haibo Xu <haibo1.xu@intel.com> wrote:
+> > > @@ -216,6 +221,9 @@ static bool parse_args(int argc, char *argv[])
+> >               case 'm':
+> >                       test_args.migration_freq_ms =3D atoi_non_negative=
+("Frequency", optarg);
+> >                       break;
+> > +             case 'e':
+> > +                     test_args.timer_err_margin_us =3D atoi_non_negati=
+ve("Error Margin", optarg);
+> > +                     break;
 >
-> There's an ongoing effort in virtio spec to introduce the suspend state.
->
-> So I wonder if it's better to just allow such behaviour?
-
-Actually I mean, allow drivers to modify the parameters during suspend
-without a new feature.
-
-Thanks
-
->
-> Thanks
->
+> So your error margin is always unsigned...
 >
 
+The error margin was supposed to be a non-negative [0, INT_MAX].
+(May be need to define a Max for the input, instead of INT_MAX)
+
+> >               case 'o':
+> >                       test_args.counter_offset =3D strtol(optarg, NULL,=
+ 0);
+> >                       test_args.reserved =3D 0;
+> > diff --git a/tools/testing/selftests/kvm/include/timer_test.h b/tools/t=
+esting/selftests/kvm/include/timer_test.h
+> > index 968257b893a7..b1d405e7157d 100644
+> > --- a/tools/testing/selftests/kvm/include/timer_test.h
+> > +++ b/tools/testing/selftests/kvm/include/timer_test.h
+> > @@ -22,6 +22,7 @@ struct test_args {
+> >       int nr_iter;
+> >       int timer_period_ms;
+> >       int migration_freq_ms;
+> > +     int timer_err_margin_us;
+>
+> ... except that you are storing it as a signed value. Some consistency
+> wouldn't hurt, really, and would avoid issues when passing large
+> values.
+>
+
+Yes, it's more proper to use an unsigned int for the non-negative error mar=
+gin.
+Storing as signed here is just to keep the type consistent with that
+of timer_period_ms
+since there will be '+' operation in other places.
+
+        tools/testing/selftests/kvm/aarch64/arch_timer.c
+        /* Setup a timeout for the interrupt to arrive */
+         udelay(msecs_to_usecs(test_args.timer_period_ms) +
+             test_args.timer_err_margin_us);
+
+Thanks,
+Haibo
+
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
 
