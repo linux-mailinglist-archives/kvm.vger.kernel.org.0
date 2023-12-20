@@ -1,77 +1,77 @@
-Return-Path: <kvm+bounces-4903-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4904-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85315819754
-	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 04:49:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A7DA819758
+	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 04:49:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A04CE1C256B5
-	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 03:49:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A1FD1F288F4
+	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 03:49:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08D5D1F602;
-	Wed, 20 Dec 2023 03:47:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9329208A4;
+	Wed, 20 Dec 2023 03:47:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C155imKb"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BoVBXp1a"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9A7D1E516
-	for <kvm@vger.kernel.org>; Wed, 20 Dec 2023 03:47:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A944B1F608
+	for <kvm@vger.kernel.org>; Wed, 20 Dec 2023 03:47:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1703044041;
+	s=mimecast20190719; t=1703044042;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=jXT8y9tlblfV00CjChE7U+F283GXLav1fpyYasxi31k=;
-	b=C155imKbgXEld49gV7jEG0Mhb17lCG8A+4+doNr8c5ceS/KVKyoFaNgJlJPx3ZjF5P6YmL
-	zE4xUwx0RM5hZoObn0rlPZlsFtT63l8Y4itPauMTxGkD2l2BpvFEgslOMqICcE5gBmKCut
-	wF/bOq9WkyjzydW4qPXFqUyGxOpijII=
-Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com
- [209.85.161.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=zeRKaaUGMF/rV1Pw2tqp6lNgEKTL5KPcCr8EDMoKMeM=;
+	b=BoVBXp1aSRuYG6C7ze3k3Yd3ctOJK2iBDudvgG7XHsgESZ+SRzWqki6ANfZuOSGlfdmjLQ
+	MYSmgshA0XmnkBM7WA821on6m8z9qpLuUZXSZWilWv/jALwuctlZY5iUfp+PgmCfs8lIm1
+	FWpZ5eviBUjrsI0bOU0IaVcUoKLPZWI=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-658-YMt3nmXTOquRKcbrI1YeSQ-1; Tue, 19 Dec 2023 22:47:19 -0500
-X-MC-Unique: YMt3nmXTOquRKcbrI1YeSQ-1
-Received: by mail-oo1-f72.google.com with SMTP id 006d021491bc7-591bd047351so3946940eaf.0
-        for <kvm@vger.kernel.org>; Tue, 19 Dec 2023 19:47:19 -0800 (PST)
+ us-mta-610-nIlYnHr3NXa3a-02Z96HPA-1; Tue, 19 Dec 2023 22:47:20 -0500
+X-MC-Unique: nIlYnHr3NXa3a-02Z96HPA-1
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-77f74245de3so858720585a.0
+        for <kvm@vger.kernel.org>; Tue, 19 Dec 2023 19:47:20 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703044038; x=1703648838;
+        d=1e100.net; s=20230601; t=1703044040; x=1703648840;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jXT8y9tlblfV00CjChE7U+F283GXLav1fpyYasxi31k=;
-        b=b6+44rfzadZdFomxtN7frYyAU/yEoOhipsFJmOQYj8SGGQR2bOphP2FCjnW86LLa9O
-         vsd9Mlib5S+cDgvRi9fXpCmkzurVpsOB+whnGo47MJRKrdKbzuq2uQ2k9JxDCQh/DEXe
-         LBEQqUN/RFYypvm5QV31Y3I5wO68jZOkl/M6PkfI1pVesao4KJzCGrJfbOXfl/uhkFke
-         y28vsJ/HVqzdScktD3RGvc9tldnCPKXNI/Z3J9XGw1EFsCtlmys6y0gZbxTHMAaBdIKi
-         r6GsBY878aYYjK/PFnv4hbNC5qp4tmTmsSRBI4TEx4AzVSe2NtiCdpMOGpDfG/1Aq/zY
-         /g4g==
-X-Gm-Message-State: AOJu0YzEQcRjzzWgkkoKHWXBB+yHkyt02FxyKTGC2PvQNn4D7cyh0W1I
-	Zt8g0r6DsuAs6JGiORvG1KgslHEVkhfIQd19F0Lui7SWLJ0mqPWXQooM9mV3Jn9FDlhKRQ2bVH+
-	6emS7evAKbL/YQyWRSSoy0l7ltkH23UrYCh4+xG4=
-X-Received: by 2002:a05:6359:6a6:b0:170:406d:42e7 with SMTP id ei38-20020a05635906a600b00170406d42e7mr18126791rwb.39.1703044038231;
-        Tue, 19 Dec 2023 19:47:18 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEZ0zz4zEAWU43T+4oCW+F/doXzW3xC/zXGOAN1e58DPokWZLVU/waMdMYVR9sY2LCmHpV9lPtvyLyHoo9xicM=
-X-Received: by 2002:a05:6359:6a6:b0:170:406d:42e7 with SMTP id
- ei38-20020a05635906a600b00170406d42e7mr18126783rwb.39.1703044037924; Tue, 19
- Dec 2023 19:47:17 -0800 (PST)
+        bh=zeRKaaUGMF/rV1Pw2tqp6lNgEKTL5KPcCr8EDMoKMeM=;
+        b=AGfciTH/yrWLG2mK2QCqFdkdYvat0koYAkXWjIY/0Cw+8sUmMlCDGhTHecOUZIVpFY
+         UZtM3w18UkErWbwG4OFDxUUh/0vHCva3g68cRYHRvXZsqqa3eU+nAgDN6fNsRG8RrDyj
+         0igxgQZtjkC7Eqe0X/MAKCWtXX8G/+Aw36edxQMm+2V1FWg5E8cAia1MVOQLNNjRcFHL
+         kjScVhncfnK9fhMLPDr+VQkl0CxvFTk+frIrE7wzVrG8yuSVktitV8AkMeGPHsou8pJf
+         fDQsj0cDGFcHeXtayQ/G3QIetlNUzC7L72fu2KrYoriN1RmjZA1dC9TLMuVWK+BlbnK4
+         spGQ==
+X-Gm-Message-State: AOJu0YyogyhNvxk88kuO6cKfix/uGX0KeDZImkzE6cEfuJwCY+5a1cLK
+	H31ZVyOGP4tuEQc2S3rp4kP1D7ooZSF9Ab/jK0BYQp4vUX4lFaitW1urko2t+HXbEZ01VCjqFmZ
+	fCVz7wXb+L6s2lNaSbdJ8uW8Mg4U6
+X-Received: by 2002:a05:620a:1025:b0:781:2e4:a333 with SMTP id a5-20020a05620a102500b0078102e4a333mr1851789qkk.101.1703044040361;
+        Tue, 19 Dec 2023 19:47:20 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF2eu48vysOQiZNwVknIUUkOGzk8lLz1dfUfotvXOLhv6Vyvhvaja8sHuwdb2gwij5dOp0VLjJ8belHFZFJh4k=
+X-Received: by 2002:a05:620a:1025:b0:781:2e4:a333 with SMTP id
+ a5-20020a05620a102500b0078102e4a333mr1851780qkk.101.1703044040147; Tue, 19
+ Dec 2023 19:47:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231219180858.120898-1-dtatulea@nvidia.com> <20231219180858.120898-14-dtatulea@nvidia.com>
-In-Reply-To: <20231219180858.120898-14-dtatulea@nvidia.com>
+References: <20231219180858.120898-1-dtatulea@nvidia.com> <20231219180858.120898-15-dtatulea@nvidia.com>
+In-Reply-To: <20231219180858.120898-15-dtatulea@nvidia.com>
 From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 20 Dec 2023 11:47:05 +0800
-Message-ID: <CACGkMEtbGurh-HUb3eDcH74y7YDnvd06K8=MvRHj+4NLyaJ3Ag@mail.gmail.com>
-Subject: Re: [PATCH vhost v4 13/15] vdpa/mlx5: Use vq suspend/resume during .set_map
+Date: Wed, 20 Dec 2023 11:47:08 +0800
+Message-ID: <CACGkMEtMkjORddUC4x+O9JsDevQBpo0KiJu1XCcvxgKgqfXuGQ@mail.gmail.com>
+Subject: Re: [PATCH vhost v4 14/15] vdpa/mlx5: Introduce reference counting to mrs
 To: Dragos Tatulea <dtatulea@nvidia.com>
 Cc: "Michael S . Tsirkin" <mst@redhat.com>, Eugenio Perez Martin <eperezma@redhat.com>, 
 	Si-Wei Liu <si-wei.liu@oracle.com>, Saeed Mahameed <saeedm@nvidia.com>, 
@@ -84,13 +84,21 @@ Content-Transfer-Encoding: quoted-printable
 On Wed, Dec 20, 2023 at 2:10=E2=80=AFAM Dragos Tatulea <dtatulea@nvidia.com=
 > wrote:
 >
-> Instead of tearing down and setting up vq resources, use vq
-> suspend/resume during .set_map to speed things up a bit.
+> Deleting the old mr during mr update (.set_map) and then modifying the
+> vqs with the new mr is not a good flow for firmware. The firmware
+> expects that mkeys are deleted after there are no more vqs referencing
+> them.
 >
-> The vq mr is updated with the new mapping while the vqs are suspended.
+> Introduce reference counting for mrs to fix this. It is the only way to
+> make sure that mkeys are not in use by vqs.
 >
-> If the device doesn't support resumable vqs, do the old teardown and
-> setup dance.
+> An mr reference is taken when the mr is associated to the mr asid table
+> and when the mr is linked to the vq on create/modify. The reference is
+> released when the mkey is unlinked from the vq (trough modify/destroy)
+> and from the mr asid table.
+>
+> To make things consistent, get rid of mlx5_vdpa_destroy_mr and use
+> get/put semantics everywhere.
 >
 > Reviewed-by: Gal Pressman <gal@nvidia.com>
 > Acked-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
