@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-4888-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4889-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C80FA819650
-	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 02:33:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE3DB819652
+	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 02:33:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F53D1F2583B
-	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 01:33:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97CC7284954
+	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 01:33:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E661FBA46;
-	Wed, 20 Dec 2023 01:29:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88F2C20B1D;
+	Wed, 20 Dec 2023 01:29:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="a4pqoZSa"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iwxlJzof"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 335412033F;
-	Wed, 20 Dec 2023 01:29:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41F1EBE5E;
+	Wed, 20 Dec 2023 01:29:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703035758; x=1734571758;
+  t=1703035762; x=1734571762;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=dNWjTkTwu0fVl5MQ2bItdZlWIfXllntPZIk4DSP0fII=;
-  b=a4pqoZSadMhw0B2vY9cJ05idcmrlcli2DGnb7C/bZwnzC/e4pncAYXmn
-   3kXRx/xfcBTh8WdXBHQGvrW8R5VZVdvlBQvH46OjAAf5GrD1lfV+F/PPo
-   FATcclgYSYqfxjEcaSDARWldNmdy2wgdXTz/9JpfG8SCzrp1BBU8sULRT
-   VxuF8NMZXveOAIc9KH8UAdINuHnHG2y+C7LOpS9qX8OpxAJjmvlE75IQp
-   OLtJSiS0EAVlKoLLyxSB12rmn9Htl06xIEmxFJ0LCjXfhJPhwUdLQYUqL
-   hG66IzmoQ/+y9UnAzrSI5ousrALLrnnoLlXZ6hx7fqMOkvTa647agOoLL
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10929"; a="2965854"
+  bh=WKlKS3p/SZedIro35MaEj5PNDGzsO2BvzmYV3MpEgxg=;
+  b=iwxlJzof1xYp2d/Ne5XERot8F2+PKg/jMrB6Uyy98mwwrIlBtQIjVuom
+   nf9HXQ2zn4oh1p85q4zFgSBTrZM1a8bjU0pUHrkC/XZgHDy2HsyZNYJlA
+   Jcj82AoBZqZPjjy9lds6uJ9h8cYxYDgeTYM0L5NCxoi3l9NN1p80eENoS
+   JUS6fTUmWNbiNt/8La/SLM636QJyaDAWHtldUFCLD2OytLiSohBgyP0or
+   mVhmNnwoCkAVPX8RRpaoFHCcIUG9PzP2Tqu3g23COWWUTwhGM0AFhjlIs
+   14MtwJshDeJvR4d/LZInsrHUEj8UBAt9sJjYdnfQwmO8f3RsrrbfQzm59
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10929"; a="2965864"
 X-IronPort-AV: E=Sophos;i="6.04,290,1695711600"; 
-   d="scan'208";a="2965854"
+   d="scan'208";a="2965864"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2023 17:29:18 -0800
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2023 17:29:22 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10929"; a="1023319199"
+X-IronPort-AV: E=McAfee;i="6600,9927,10929"; a="1023319208"
 X-IronPort-AV: E=Sophos;i="6.04,290,1695711600"; 
-   d="scan'208";a="1023319199"
+   d="scan'208";a="1023319208"
 Received: from allen-box.sh.intel.com ([10.239.159.127])
-  by fmsmga006.fm.intel.com with ESMTP; 19 Dec 2023 17:29:14 -0800
+  by fmsmga006.fm.intel.com with ESMTP; 19 Dec 2023 17:29:17 -0800
 From: Lu Baolu <baolu.lu@linux.intel.com>
 To: Joerg Roedel <joro@8bytes.org>,
 	Will Deacon <will@kernel.org>,
@@ -63,9 +63,9 @@ Cc: Yi Liu <yi.l.liu@intel.com>,
 	linux-kernel@vger.kernel.org,
 	Lu Baolu <baolu.lu@linux.intel.com>,
 	Jason Gunthorpe <jgg@nvidia.com>
-Subject: [PATCH v9 12/14] iommu: Use refcount for fault data access
-Date: Wed, 20 Dec 2023 09:23:30 +0800
-Message-Id: <20231220012332.168188-13-baolu.lu@linux.intel.com>
+Subject: [PATCH v9 13/14] iommu: Improve iopf_queue_remove_device()
+Date: Wed, 20 Dec 2023 09:23:31 +0800
+Message-Id: <20231220012332.168188-14-baolu.lu@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231220012332.168188-1-baolu.lu@linux.intel.com>
 References: <20231220012332.168188-1-baolu.lu@linux.intel.com>
@@ -77,381 +77,162 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The per-device fault data structure stores information about faults
-occurring on a device. Its lifetime spans from IOPF enablement to
-disablement. Multiple paths, including IOPF reporting, handling, and
-responding, may access it concurrently.
+Convert iopf_queue_remove_device() to return void instead of an error code,
+as the return value is never used. This removal helper is designed to be
+never-failed, so there's no need for error handling.
 
-Previously, a mutex protected the fault data from use after free. But
-this is not performance friendly due to the critical nature of IOPF
-handling paths.
+Ack all outstanding page requests from the device with the response code of
+IOMMU_PAGE_RESP_INVALID, indicating device should not attempt any retry.
 
-Refine this with a refcount-based approach. The fault data pointer is
-obtained within an RCU read region with a refcount. The fault data
-pointer is returned for usage only when the pointer is valid and a
-refcount is successfully obtained. The fault data is freed with
-kfree_rcu(), ensuring data is only freed after all RCU critical regions
-complete.
+Add comments to this helper explaining the steps involved in removing a
+device from the iopf queue and disabling its PRI.
 
-An iopf handling work starts once an iopf group is created. The handling
-work continues until iommu_page_response() is called to respond to the
-iopf and the iopf group is freed. During this time, the device fault
-parameter should always be available. Add a pointer to the device fault
-parameter in the iopf_group structure and hold the reference until the
-iopf_group is freed.
-
-Make iommu_page_response() static as it is only used in io-pgfault.c.
-
-Co-developed-by: Jason Gunthorpe <jgg@nvidia.com>
-Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
 Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
 Tested-by: Yan Zhao <yan.y.zhao@intel.com>
 ---
- include/linux/iommu.h      |  17 +++--
- drivers/iommu/io-pgfault.c | 129 +++++++++++++++++++++++--------------
- drivers/iommu/iommu-sva.c  |   2 +-
- 3 files changed, 90 insertions(+), 58 deletions(-)
+ include/linux/iommu.h       |  5 ++--
+ drivers/iommu/intel/iommu.c |  7 +----
+ drivers/iommu/io-pgfault.c  | 59 ++++++++++++++++++++++++-------------
+ 3 files changed, 41 insertions(+), 30 deletions(-)
 
 diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-index dbad2cb9eca2..c2416aa79922 100644
+index c2416aa79922..d8d173309469 100644
 --- a/include/linux/iommu.h
 +++ b/include/linux/iommu.h
-@@ -41,6 +41,7 @@ struct iommu_dirty_ops;
- struct notifier_block;
- struct iommu_sva;
- struct iommu_dma_cookie;
-+struct iommu_fault_param;
+@@ -1465,7 +1465,7 @@ iommu_sva_domain_alloc(struct device *dev, struct mm_struct *mm)
  
- #define IOMMU_FAULT_PERM_READ	(1 << 0) /* read */
- #define IOMMU_FAULT_PERM_WRITE	(1 << 1) /* write */
-@@ -129,8 +130,9 @@ struct iopf_group {
- 	struct iopf_fault last_fault;
- 	struct list_head faults;
- 	struct work_struct work;
--	struct device *dev;
- 	struct iommu_domain *domain;
-+	/* The device's fault data parameter. */
-+	struct iommu_fault_param *fault_param;
- };
- 
- /**
-@@ -602,6 +604,8 @@ struct iommu_device {
- /**
-  * struct iommu_fault_param - per-device IOMMU fault data
-  * @lock: protect pending faults list
-+ * @users: user counter to manage the lifetime of the data
-+ * @ruc: rcu head for kfree_rcu()
-  * @dev: the device that owns this param
-  * @queue: IOPF queue
-  * @queue_list: index into queue->devices
-@@ -611,6 +615,8 @@ struct iommu_device {
-  */
- struct iommu_fault_param {
- 	struct mutex lock;
-+	refcount_t users;
-+	struct rcu_head rcu;
- 
- 	struct device *dev;
- 	struct iopf_queue *queue;
-@@ -638,7 +644,7 @@ struct iommu_fault_param {
-  */
- struct dev_iommu {
- 	struct mutex lock;
--	struct iommu_fault_param	*fault_param;
-+	struct iommu_fault_param __rcu	*fault_param;
- 	struct iommu_fwspec		*fwspec;
- 	struct iommu_device		*iommu_dev;
- 	void				*priv;
-@@ -1466,7 +1472,6 @@ void iopf_queue_free(struct iopf_queue *queue);
- int iopf_queue_discard_partial(struct iopf_queue *queue);
- void iopf_free_group(struct iopf_group *group);
- int iommu_report_device_fault(struct device *dev, struct iopf_fault *evt);
--int iommu_page_response(struct device *dev, struct iommu_page_response *msg);
- int iopf_group_response(struct iopf_group *group,
- 			enum iommu_page_response_code status);
- #else
-@@ -1511,12 +1516,6 @@ iommu_report_device_fault(struct device *dev, struct iopf_fault *evt)
+ #ifdef CONFIG_IOMMU_IOPF
+ int iopf_queue_add_device(struct iopf_queue *queue, struct device *dev);
+-int iopf_queue_remove_device(struct iopf_queue *queue, struct device *dev);
++void iopf_queue_remove_device(struct iopf_queue *queue, struct device *dev);
+ int iopf_queue_flush_dev(struct device *dev);
+ struct iopf_queue *iopf_queue_alloc(const char *name);
+ void iopf_queue_free(struct iopf_queue *queue);
+@@ -1481,10 +1481,9 @@ iopf_queue_add_device(struct iopf_queue *queue, struct device *dev)
  	return -ENODEV;
  }
  
 -static inline int
--iommu_page_response(struct device *dev, struct iommu_page_response *msg)
--{
--	return -ENODEV;
--}
--
- static inline int iopf_group_response(struct iopf_group *group,
- 				      enum iommu_page_response_code status)
++static inline void
+ iopf_queue_remove_device(struct iopf_queue *queue, struct device *dev)
  {
+-	return -ENODEV;
+ }
+ 
+ static inline int iopf_queue_flush_dev(struct device *dev)
+diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
+index 29a12f289e2e..a81a2be9b870 100644
+--- a/drivers/iommu/intel/iommu.c
++++ b/drivers/iommu/intel/iommu.c
+@@ -4455,12 +4455,7 @@ static int intel_iommu_disable_iopf(struct device *dev)
+ 	 */
+ 	pci_disable_pri(to_pci_dev(dev));
+ 	info->pri_enabled = 0;
+-
+-	/*
+-	 * With PRI disabled and outstanding PRQs drained, removing device
+-	 * from iopf queue should never fail.
+-	 */
+-	WARN_ON(iopf_queue_remove_device(iommu->iopf_queue, dev));
++	iopf_queue_remove_device(iommu->iopf_queue, dev);
+ 
+ 	return 0;
+ }
 diff --git a/drivers/iommu/io-pgfault.c b/drivers/iommu/io-pgfault.c
-index 5aea8402be47..3a907bad2fcb 100644
+index 3a907bad2fcb..3221f6387beb 100644
 --- a/drivers/iommu/io-pgfault.c
 +++ b/drivers/iommu/io-pgfault.c
-@@ -13,6 +13,32 @@
- 
- #include "iommu-priv.h"
- 
-+/*
-+ * Return the fault parameter of a device if it exists. Otherwise, return NULL.
-+ * On a successful return, the caller takes a reference of this parameter and
-+ * should put it after use by calling iopf_put_dev_fault_param().
-+ */
-+static struct iommu_fault_param *iopf_get_dev_fault_param(struct device *dev)
-+{
-+	struct dev_iommu *param = dev->iommu;
-+	struct iommu_fault_param *fault_param;
-+
-+	rcu_read_lock();
-+	fault_param = rcu_dereference(param->fault_param);
-+	if (fault_param && !refcount_inc_not_zero(&fault_param->users))
-+		fault_param = NULL;
-+	rcu_read_unlock();
-+
-+	return fault_param;
-+}
-+
-+/* Caller must hold a reference of the fault parameter. */
-+static void iopf_put_dev_fault_param(struct iommu_fault_param *fault_param)
-+{
-+	if (refcount_dec_and_test(&fault_param->users))
-+		kfree_rcu(fault_param, rcu);
-+}
-+
- void iopf_free_group(struct iopf_group *group)
+@@ -449,42 +449,61 @@ EXPORT_SYMBOL_GPL(iopf_queue_add_device);
+  * @queue: IOPF queue
+  * @dev: device to remove
+  *
+- * Caller makes sure that no more faults are reported for this device.
++ * Removing a device from an iopf_queue. It's recommended to follow these
++ * steps when removing a device:
+  *
+- * Return: 0 on success and <0 on error.
++ * - Disable new PRI reception: Turn off PRI generation in the IOMMU hardware
++ *   and flush any hardware page request queues. This should be done before
++ *   calling into this helper.
++ * - Acknowledge all outstanding PRQs to the device: Respond to all outstanding
++ *   page requests with IOMMU_PAGE_RESP_INVALID, indicating the device should
++ *   not retry. This helper function handles this.
++ * - Disable PRI on the device: After calling this helper, the caller could
++ *   then disable PRI on the device.
++ * - Tear down the iopf infrastructure: Calling iopf_queue_remove_device()
++ *   essentially disassociates the device. The fault_param might still exist,
++ *   but iommu_page_response() will do nothing. The device fault parameter
++ *   reference count has been properly passed from iommu_report_device_fault()
++ *   to the fault handling work, and will eventually be released after
++ *   iommu_page_response().
+  */
+-int iopf_queue_remove_device(struct iopf_queue *queue, struct device *dev)
++void iopf_queue_remove_device(struct iopf_queue *queue, struct device *dev)
  {
+-	int ret = 0;
  	struct iopf_fault *iopf, *next;
-@@ -22,6 +48,8 @@ void iopf_free_group(struct iopf_group *group)
- 			kfree(iopf);
- 	}
- 
-+	/* Pair with iommu_report_device_fault(). */
-+	iopf_put_dev_fault_param(group->fault_param);
- 	kfree(group);
- }
- EXPORT_SYMBOL_GPL(iopf_free_group);
-@@ -135,7 +163,7 @@ static int iommu_handle_iopf(struct iommu_fault *fault,
- 		goto cleanup_partial;
- 	}
- 
--	group->dev = dev;
-+	group->fault_param = iopf_param;
- 	group->last_fault.fault = *fault;
- 	INIT_LIST_HEAD(&group->faults);
- 	group->domain = domain;
-@@ -178,64 +206,61 @@ static int iommu_handle_iopf(struct iommu_fault *fault,
-  */
- int iommu_report_device_fault(struct device *dev, struct iopf_fault *evt)
- {
-+	bool last_prq = evt->fault.type == IOMMU_FAULT_PAGE_REQ &&
-+		(evt->fault.prm.flags & IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE);
- 	struct iommu_fault_param *fault_param;
--	struct iopf_fault *evt_pending = NULL;
--	struct dev_iommu *param = dev->iommu;
--	int ret = 0;
-+	struct iopf_fault *evt_pending;
-+	int ret;
- 
--	mutex_lock(&param->lock);
--	fault_param = param->fault_param;
--	if (!fault_param) {
--		mutex_unlock(&param->lock);
-+	fault_param = iopf_get_dev_fault_param(dev);
-+	if (!fault_param)
- 		return -EINVAL;
--	}
- 
- 	mutex_lock(&fault_param->lock);
--	if (evt->fault.type == IOMMU_FAULT_PAGE_REQ &&
--	    (evt->fault.prm.flags & IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE)) {
-+	if (last_prq) {
- 		evt_pending = kmemdup(evt, sizeof(struct iopf_fault),
- 				      GFP_KERNEL);
- 		if (!evt_pending) {
- 			ret = -ENOMEM;
--			goto done_unlock;
-+			goto err_unlock;
- 		}
- 		list_add_tail(&evt_pending->list, &fault_param->faults);
- 	}
- 
- 	ret = iommu_handle_iopf(&evt->fault, fault_param);
--	if (ret && evt_pending) {
-+	if (ret)
-+		goto err_free;
-+
-+	mutex_unlock(&fault_param->lock);
-+	/* The reference count of fault_param is now held by iopf_group. */
-+	if (!last_prq)
-+		iopf_put_dev_fault_param(fault_param);
-+
-+	return 0;
-+err_free:
-+	if (last_prq) {
- 		list_del(&evt_pending->list);
- 		kfree(evt_pending);
- 	}
--done_unlock:
-+err_unlock:
- 	mutex_unlock(&fault_param->lock);
--	mutex_unlock(&param->lock);
-+	iopf_put_dev_fault_param(fault_param);
- 
- 	return ret;
- }
- EXPORT_SYMBOL_GPL(iommu_report_device_fault);
- 
--int iommu_page_response(struct device *dev,
--			struct iommu_page_response *msg)
-+static int iommu_page_response(struct iopf_group *group,
-+			       struct iommu_page_response *msg)
- {
- 	bool needs_pasid;
- 	int ret = -EINVAL;
- 	struct iopf_fault *evt;
- 	struct iommu_fault_page_request *prm;
--	struct dev_iommu *param = dev->iommu;
--	struct iommu_fault_param *fault_param;
-+	struct device *dev = group->fault_param->dev;
- 	const struct iommu_ops *ops = dev_iommu_ops(dev);
- 	bool has_pasid = msg->flags & IOMMU_PAGE_RESP_PASID_VALID;
--
--	if (!ops->page_response)
--		return -ENODEV;
--
--	mutex_lock(&param->lock);
--	fault_param = param->fault_param;
--	if (!fault_param) {
--		mutex_unlock(&param->lock);
--		return -EINVAL;
--	}
-+	struct iommu_fault_param *fault_param = group->fault_param;
- 
- 	/* Only send response if there is a fault report pending */
- 	mutex_lock(&fault_param->lock);
-@@ -276,10 +301,9 @@ int iommu_page_response(struct device *dev,
- 
- done_unlock:
- 	mutex_unlock(&fault_param->lock);
--	mutex_unlock(&param->lock);
-+
- 	return ret;
- }
--EXPORT_SYMBOL_GPL(iommu_page_response);
- 
- /**
-  * iopf_queue_flush_dev - Ensure that all queued faults have been processed
-@@ -295,22 +319,20 @@ EXPORT_SYMBOL_GPL(iommu_page_response);
-  */
- int iopf_queue_flush_dev(struct device *dev)
- {
--	int ret = 0;
- 	struct iommu_fault_param *iopf_param;
--	struct dev_iommu *param = dev->iommu;
- 
--	if (!param)
-+	/*
-+	 * It's a driver bug to be here after iopf_queue_remove_device().
-+	 * Therefore, it's safe to dereference the fault parameter without
-+	 * holding the lock.
-+	 */
-+	iopf_param = rcu_dereference_check(dev->iommu->fault_param, true);
-+	if (WARN_ON(!iopf_param))
- 		return -ENODEV;
- 
--	mutex_lock(&param->lock);
--	iopf_param = param->fault_param;
--	if (iopf_param)
--		flush_workqueue(iopf_param->queue->wq);
--	else
--		ret = -ENODEV;
--	mutex_unlock(&param->lock);
-+	flush_workqueue(iopf_param->queue->wq);
- 
--	return ret;
-+	return 0;
- }
- EXPORT_SYMBOL_GPL(iopf_queue_flush_dev);
- 
-@@ -335,7 +357,7 @@ int iopf_group_response(struct iopf_group *group,
- 	    (iopf->fault.prm.flags & IOMMU_FAULT_PAGE_RESPONSE_NEEDS_PASID))
- 		resp.flags = IOMMU_PAGE_RESP_PASID_VALID;
- 
--	return iommu_page_response(group->dev, &resp);
-+	return iommu_page_response(group, &resp);
- }
- EXPORT_SYMBOL_GPL(iopf_group_response);
- 
-@@ -384,10 +406,15 @@ int iopf_queue_add_device(struct iopf_queue *queue, struct device *dev)
- 	int ret = 0;
++	struct iommu_page_response resp;
  	struct dev_iommu *param = dev->iommu;
  	struct iommu_fault_param *fault_param;
 +	const struct iommu_ops *ops = dev_iommu_ops(dev);
-+
-+	if (!ops->page_response)
-+		return -ENODEV;
  
  	mutex_lock(&queue->lock);
  	mutex_lock(&param->lock);
--	if (param->fault_param) {
-+	if (rcu_dereference_check(param->fault_param,
-+				  lockdep_is_held(&param->lock))) {
- 		ret = -EBUSY;
- 		goto done_unlock;
- 	}
-@@ -402,10 +429,12 @@ int iopf_queue_add_device(struct iopf_queue *queue, struct device *dev)
- 	INIT_LIST_HEAD(&fault_param->faults);
- 	INIT_LIST_HEAD(&fault_param->partial);
- 	fault_param->dev = dev;
-+	refcount_set(&fault_param->users, 1);
-+	init_rcu_head(&fault_param->rcu);
- 	list_add(&fault_param->queue_list, &queue->devices);
- 	fault_param->queue = queue;
+ 	fault_param = rcu_dereference_check(param->fault_param,
+ 					    lockdep_is_held(&param->lock));
+-	if (!fault_param) {
+-		ret = -ENODEV;
+-		goto unlock;
+-	}
+-
+-	if (fault_param->queue != queue) {
+-		ret = -EINVAL;
+-		goto unlock;
+-	}
  
--	param->fault_param = fault_param;
-+	rcu_assign_pointer(param->fault_param, fault_param);
- 
- done_unlock:
- 	mutex_unlock(&param->lock);
-@@ -429,10 +458,12 @@ int iopf_queue_remove_device(struct iopf_queue *queue, struct device *dev)
- 	int ret = 0;
- 	struct iopf_fault *iopf, *next;
- 	struct dev_iommu *param = dev->iommu;
--	struct iommu_fault_param *fault_param = param->fault_param;
-+	struct iommu_fault_param *fault_param;
- 
- 	mutex_lock(&queue->lock);
- 	mutex_lock(&param->lock);
-+	fault_param = rcu_dereference_check(param->fault_param,
-+					    lockdep_is_held(&param->lock));
- 	if (!fault_param) {
- 		ret = -ENODEV;
+-	if (!list_empty(&fault_param->faults)) {
+-		ret = -EBUSY;
++	if (WARN_ON(!fault_param || fault_param->queue != queue))
  		goto unlock;
-@@ -454,8 +485,10 @@ int iopf_queue_remove_device(struct iopf_queue *queue, struct device *dev)
+-	}
+-
+-	list_del(&fault_param->queue_list);
+ 
+-	/* Just in case some faults are still stuck */
++	mutex_lock(&fault_param->lock);
  	list_for_each_entry_safe(iopf, next, &fault_param->partial, list)
  		kfree(iopf);
  
--	param->fault_param = NULL;
--	kfree(fault_param);
-+	/* dec the ref owned by iopf_queue_add_device() */
-+	rcu_assign_pointer(param->fault_param, NULL);
-+	if (refcount_dec_and_test(&fault_param->users))
-+		kfree_rcu(fault_param, rcu);
++	list_for_each_entry_safe(iopf, next, &fault_param->faults, list) {
++		memset(&resp, 0, sizeof(struct iommu_page_response));
++		resp.pasid = iopf->fault.prm.pasid;
++		resp.grpid = iopf->fault.prm.grpid;
++		resp.code = IOMMU_PAGE_RESP_INVALID;
++
++		if (iopf->fault.prm.flags & IOMMU_FAULT_PAGE_RESPONSE_NEEDS_PASID)
++			resp.flags = IOMMU_PAGE_RESP_PASID_VALID;
++
++		ops->page_response(dev, iopf, &resp);
++		list_del(&iopf->list);
++		kfree(iopf);
++	}
++	mutex_unlock(&fault_param->lock);
++
++	list_del(&fault_param->queue_list);
++
+ 	/* dec the ref owned by iopf_queue_add_device() */
+ 	rcu_assign_pointer(param->fault_param, NULL);
+ 	if (refcount_dec_and_test(&fault_param->users))
+@@ -492,8 +511,6 @@ int iopf_queue_remove_device(struct iopf_queue *queue, struct device *dev)
  unlock:
  	mutex_unlock(&param->lock);
  	mutex_unlock(&queue->lock);
-diff --git a/drivers/iommu/iommu-sva.c b/drivers/iommu/iommu-sva.c
-index 9de878e40413..b51995b4fe90 100644
---- a/drivers/iommu/iommu-sva.c
-+++ b/drivers/iommu/iommu-sva.c
-@@ -251,7 +251,7 @@ static void iommu_sva_handle_iopf(struct work_struct *work)
+-
+-	return ret;
+ }
+ EXPORT_SYMBOL_GPL(iopf_queue_remove_device);
  
- static int iommu_sva_iopf_handler(struct iopf_group *group)
- {
--	struct iommu_fault_param *fault_param = group->dev->iommu->fault_param;
-+	struct iommu_fault_param *fault_param = group->fault_param;
- 
- 	INIT_WORK(&group->work, iommu_sva_handle_iopf);
- 	if (!queue_work(fault_param->queue->wq, &group->work))
 -- 
 2.34.1
 
