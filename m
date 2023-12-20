@@ -1,57 +1,56 @@
-Return-Path: <kvm+bounces-4873-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4874-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC954819621
-	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 02:16:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB19F819626
+	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 02:21:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6970928787D
-	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 01:16:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 195131C2549B
+	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 01:21:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDFF1171DC;
-	Wed, 20 Dec 2023 01:15:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FE145C9D;
+	Wed, 20 Dec 2023 01:21:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EtaezQAv"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g2HXDFd/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58EB7168A4;
-	Wed, 20 Dec 2023 01:15:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC4705245;
+	Wed, 20 Dec 2023 01:21:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703034954; x=1734570954;
+  t=1703035272; x=1734571272;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=HLyVwqO30briaKAvjBVfYYf6El0zpVQ8PfDWrML2yQc=;
-  b=EtaezQAvR3uiFmKKbTWDWJyQ2GIdPKMyGR9IeNBJm1cTY/AZB/W8ZeEa
-   FMSTTdwDzeZkA/xgEVolEccDVXkO0Eol6MaSkqmlIHd6e9nRpw0VKPZjw
-   86aU2Y6x+Q3wEzzkLNNDoReNxrK0YWCi9Ro4lY6IuOAraCcUmMK4viSV+
-   kBlL18yq9i83JQDiyk7G8LzOmXbZKBeTBAuEizMG1cmwfxlBcBHy89/un
-   jQsJNkPN+P9rebmcl4oSJO9NGjUbHd2tqRPRUTTarBWgoKVs+vOd4f8Y/
-   mzkmLqgTMxjMK0N09rNxsat2P5XJn04vX/499wKtvrOu2wKUeE5QtCTSY
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10929"; a="394628811"
+  bh=wFf9gNQ2+3Ut7ACKfwtV6t9BoflbnD6Be+0GLfLNHt4=;
+  b=g2HXDFd/53YpaGdsXY39cJqQlUxrr3xNszPcYtd3QghJ+WBAKNw6+pgT
+   Q1VrbjaxOeJ/lueDxQEKmpjqRgnxMDawsJi9jAOtEDwk9az2u7bJr833/
+   751YFzGkJEOmXUGA17ooFA/vvwa5z16IZaDkJnT/lGJOY0kvcZnNaytDV
+   co/2/dm/Xz1oEA5o8wMAHYZ8RR2k2VeBBmU0C9n0zqEHJwZ5YSX075f7l
+   My0G4waQmNNyhU2+pf7sd0fPthhnKbGw6ZC2N50DVlgGFHIXZWYqzkje4
+   y4Etwq8jhdFi9q5YQhj1qW8GTu5Ap+KDUowZftDbLrzkhAh6iKdPpBRka
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10929"; a="2964846"
 X-IronPort-AV: E=Sophos;i="6.04,290,1695711600"; 
-   d="scan'208";a="394628811"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2023 17:15:52 -0800
+   d="scan'208";a="2964846"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2023 17:20:56 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10929"; a="919798002"
+X-IronPort-AV: E=McAfee;i="6600,9927,10929"; a="846539196"
 X-IronPort-AV: E=Sophos;i="6.04,290,1695711600"; 
-   d="scan'208";a="919798002"
+   d="scan'208";a="846539196"
 Received: from ihur-mobl1.amr.corp.intel.com (HELO desk) ([10.209.1.244])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2023 17:15:50 -0800
-Date: Tue, 19 Dec 2023 17:15:35 -0800
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2023 17:20:55 -0800
+Date: Tue, 19 Dec 2023 17:20:45 -0800
 From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 To: Josh Poimboeuf <jpoimboe@kernel.org>
-Cc: Andrew Cooper <andrew.cooper3@citrix.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
 	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
 	"H. Peter Anvin" <hpa@zytor.com>,
 	Peter Zijlstra <peterz@infradead.org>,
@@ -59,21 +58,20 @@ Cc: Andrew Cooper <andrew.cooper3@citrix.com>,
 	Sean Christopherson <seanjc@google.com>,
 	Paolo Bonzini <pbonzini@redhat.com>, tony.luck@intel.com,
 	ak@linux.intel.com, tim.c.chen@linux.intel.com,
+	Andrew Cooper <andrew.cooper3@citrix.com>,
 	Nikolay Borisov <nik.borisov@suse.com>,
 	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
 	kvm@vger.kernel.org,
 	Alyssa Milburn <alyssa.milburn@linux.intel.com>,
 	Daniel Sneddon <daniel.sneddon@linux.intel.com>,
 	antonio.gomez.iglesias@linux.intel.com,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Alyssa Milburn <alyssa.milburn@intel.com>
-Subject: Re: [PATCH v4 1/6] x86/bugs: Add asm helpers for executing VERW
-Message-ID: <20231220011535.cw3smza3kb5resji@desk>
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH  v4 4/6] x86/bugs: Use ALTERNATIVE() instead of
+ mds_user_clear static key
+Message-ID: <20231220012045.f4i3kafpve4sleyq@desk>
 References: <20231027-delay-verw-v4-0-9a3622d4bcf7@linux.intel.com>
- <20231027-delay-verw-v4-1-9a3622d4bcf7@linux.intel.com>
- <20231201193657.mvzslo4nlcbuv2q4@treble>
- <c61402de-c61e-4d7f-a2b1-3eaa13e4ef33@citrix.com>
- <20231201200442.lvyep5uqc6oa7kwj@treble>
+ <20231027-delay-verw-v4-4-9a3622d4bcf7@linux.intel.com>
+ <20231201195954.sr3nhvectmtkc47q@treble>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,30 +80,43 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231201200442.lvyep5uqc6oa7kwj@treble>
+In-Reply-To: <20231201195954.sr3nhvectmtkc47q@treble>
 
-On Fri, Dec 01, 2023 at 12:04:42PM -0800, Josh Poimboeuf wrote:
-> On Fri, Dec 01, 2023 at 07:39:05PM +0000, Andrew Cooper wrote:
-> > On 01/12/2023 7:36 pm, Josh Poimboeuf wrote:
-> > > On Fri, Oct 27, 2023 at 07:38:40AM -0700, Pawan Gupta wrote:
-> > >> +.pushsection .entry.text, "ax"
-> > >> +
-> > >> +.align L1_CACHE_BYTES, 0xcc
-> > >> +SYM_CODE_START_NOALIGN(mds_verw_sel)
-> > >> +	UNWIND_HINT_UNDEFINED
-> > >> +	ANNOTATE_NOENDBR
-> > >> +	.word __KERNEL_DS
-> > >> +.align L1_CACHE_BYTES, 0xcc
-> > >> +SYM_CODE_END(mds_verw_sel);
-> > >> +/* For KVM */
-> > >> +EXPORT_SYMBOL_GPL(mds_verw_sel);
-> > >> +
-> > >> +.popsection
-> > > This is data, so why is it "CODE" in .entry.text?
+On Fri, Dec 01, 2023 at 11:59:54AM -0800, Josh Poimboeuf wrote:
+> On Fri, Oct 27, 2023 at 07:38:59AM -0700, Pawan Gupta wrote:
+> > The VERW mitigation at exit-to-user is enabled via a static branch
+> > mds_user_clear. This static branch is never toggled after boot, and can
+> > be safely replaced with an ALTERNATIVE() which is convenient to use in
+> > asm.
 > > 
-> > Because KPTI.
+> > Switch to ALTERNATIVE() to use the VERW mitigation late in exit-to-user
+> > path. Also remove the now redundant VERW in exc_nmi() and
+> > arch_exit_to_user_mode().
+> > 
+> > Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+> > ---
+> >  Documentation/arch/x86/mds.rst       | 38 +++++++++++++++++++++++++-----------
+> >  arch/x86/include/asm/entry-common.h  |  1 -
+> >  arch/x86/include/asm/nospec-branch.h | 12 ------------
+> >  arch/x86/kernel/cpu/bugs.c           | 15 ++++++--------
+> >  arch/x86/kernel/nmi.c                |  2 --
+> >  arch/x86/kvm/vmx/vmx.c               |  2 +-
+> >  6 files changed, 34 insertions(+), 36 deletions(-)
+> > 
+> > diff --git a/Documentation/arch/x86/mds.rst b/Documentation/arch/x86/mds.rst
+> > index e73fdff62c0a..a5c5091b9ccd 100644
+> > --- a/Documentation/arch/x86/mds.rst
+> > +++ b/Documentation/arch/x86/mds.rst
+> > @@ -95,6 +95,9 @@ The kernel provides a function to invoke the buffer clearing:
+> >  
+> >      mds_clear_cpu_buffers()
+> >  
+> > +Also macro CLEAR_CPU_BUFFERS is meant to be used in ASM late in exit-to-user
+> > +path. This macro works for cases where GPRs can't be clobbered.
 > 
-> Urgh... Pawan please add a comment.
+> What does this last sentence mean?  Is it trying to say that the macro
+> doesn't clobber registers (other than ZF)?
 
-Yes, this place needs a comment, will add.
+Yes. I will rephrase it to say that macro doesn't clobber registers
+other than ZF.
 
