@@ -1,165 +1,387 @@
-Return-Path: <kvm+bounces-4917-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4918-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF3AB819D57
-	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 11:49:37 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35AA9819DF5
+	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 12:24:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00FCE1C259A1
-	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 10:49:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2AEC1B233F0
+	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 11:24:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBD38210FC;
-	Wed, 20 Dec 2023 10:48:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA09121371;
+	Wed, 20 Dec 2023 11:23:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="JytAq/Ck"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="BNloz1m3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B72E20DDD;
-	Wed, 20 Dec 2023 10:48:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BKACgS4027817;
-	Wed, 20 Dec 2023 10:48:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=py09Ii/aCwCGHJewVHJ2kc4SxbhC3k0vo1h0FkMmqtI=;
- b=JytAq/CkUgZ27F4g2NwfB/PoSGhA8MvM9/McQOBpduwQbqVsJvso1Drs1xvf3jz721RU
- sUPoEt1oPyAdkg9DHJVt4xISd1fhpBcTyq4PId9ii0z8tLglHmPjqxXnY1MgFvHU8S8h
- ralFbijAKZOxib4vcbTiHhvZY1UY6GFVPy89RTIhl9txrtj9cjf93r+jOPrAI9ShH2RE
- IQnyteWKrrAxlb6W/kKtjx8JfjGLFWLQ5LBzK9T/knu1RAlRs2NHU+0Pto/Jyvu8unzc
- tAVhAF+SL5hW9Rj6ybeau3VoCVJsvk0eA8rP461YyJ1u8F22Gqcx8+5dlNtZXNT7EnKk Ow== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v3xad8v1e-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 20 Dec 2023 10:48:37 +0000
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BKAI8xr014081;
-	Wed, 20 Dec 2023 10:48:37 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v3xad8v0q-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 20 Dec 2023 10:48:37 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3BK8uxVb027822;
-	Wed, 20 Dec 2023 10:48:35 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3v1rek5h9g-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 20 Dec 2023 10:48:35 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3BKAmWc928770832
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 20 Dec 2023 10:48:32 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A740A20040;
-	Wed, 20 Dec 2023 10:48:32 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id F294320049;
-	Wed, 20 Dec 2023 10:48:31 +0000 (GMT)
-Received: from [9.171.75.175] (unknown [9.171.75.175])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 20 Dec 2023 10:48:31 +0000 (GMT)
-Message-ID: <f41ab6b0-d2e4-481b-b972-99dd9048eafa@linux.ibm.com>
-Date: Wed, 20 Dec 2023 11:48:31 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4B85219F3;
+	Wed, 20 Dec 2023 11:23:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20231220112350euoutp01758346f86096a24c9cfbecdd734e7677~ihnFtyeju1448514485euoutp01K;
+	Wed, 20 Dec 2023 11:23:50 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20231220112350euoutp01758346f86096a24c9cfbecdd734e7677~ihnFtyeju1448514485euoutp01K
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1703071430;
+	bh=4akjfBCJKKXoR+QIu19ue40aOmTNewVIO6wTVVNkKfc=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=BNloz1m3MwyTkjLlOs9VT5InPKxcmE3E+FmMMdknIzAfZAaMAcYYlWQLEGQw8MfkZ
+	 HtX6StQuKqclGUuGUhUqeHuTiWEtmZMG5UO3UNeUcYXXLCXlsfkHredQJClcv/GRvA
+	 zEtLOOsh7paOWaZkWmhWo3KDFTGCsj/hnbTPUUeg=
+Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
+	eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+	20231220112350eucas1p1a8f15635ff432678db8aaf25e560c9be~ihnFf0Dvk0589105891eucas1p1E;
+	Wed, 20 Dec 2023 11:23:50 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+	eusmges1new.samsung.com (EUCPMTA) with SMTP id 57.FC.09539.6CEC2856; Wed, 20
+	Dec 2023 11:23:50 +0000 (GMT)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+	20231220112350eucas1p11c553442f801dbe4c1eed5ba73c4077c~ihnE-rCur0588605886eucas1p1F;
+	Wed, 20 Dec 2023 11:23:50 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+	eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20231220112350eusmtrp14a88447a2572fad2550de4855fd0cfee~ihnE_v-Un2729827298eusmtrp1Q;
+	Wed, 20 Dec 2023 11:23:50 +0000 (GMT)
+X-AuditID: cbfec7f2-515ff70000002543-6c-6582cec6c0c7
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+	eusmgms2.samsung.com (EUCPMTA) with SMTP id F7.85.09274.5CEC2856; Wed, 20
+	Dec 2023 11:23:49 +0000 (GMT)
+Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
+	eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20231220112349eusmtip1d4934d75a4f0003aca49a8bea5304afd~ihnErjRA-3005230052eusmtip1q;
+	Wed, 20 Dec 2023 11:23:49 +0000 (GMT)
+Received: from localhost (106.210.248.220) by CAMSVWEXC02.scsc.local
+	(2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+	Wed, 20 Dec 2023 11:23:48 +0000
+Date: Wed, 20 Dec 2023 12:23:40 +0100
+From: Joel Granados <j.granados@samsung.com>
+To: Yi Liu <yi.l.liu@intel.com>
+CC: <joro@8bytes.org>, <alex.williamson@redhat.com>, <jgg@nvidia.com>,
+	<kevin.tian@intel.com>, <robin.murphy@arm.com>, <baolu.lu@linux.intel.com>,
+	<cohuck@redhat.com>, <eric.auger@redhat.com>, <nicolinc@nvidia.com>,
+	<kvm@vger.kernel.org>, <mjrosato@linux.ibm.com>,
+	<chao.p.peng@linux.intel.com>, <yi.y.sun@linux.intel.com>,
+	<peterx@redhat.com>, <jasowang@redhat.com>,
+	<shameerali.kolothum.thodi@huawei.com>, <lulu@redhat.com>,
+	<suravee.suthikulpanit@amd.com>, <iommu@lists.linux.dev>,
+	<linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+	<zhenzhong.duan@intel.com>, <joao.m.martins@oracle.com>,
+	<xin.zeng@intel.com>, <yan.y.zhao@intel.com>
+Subject: Re: [PATCH v6 0/6] iommufd: Add nesting infrastructure (part 2/2)
+Message-ID: <20231220112340.wtz3scdilr5m3ga6@localhost>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 4/4] KVM: s390: Minor refactor of base/ext facility
- lists
-Content-Language: en-US
-To: Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Vasily Gorbik
- <gor@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>
-Cc: linux-s390@vger.kernel.org, David Hildenbrand <david@redhat.com>,
-        Sven Schnelle <svens@linux.ibm.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20231219140854.1042599-1-nsg@linux.ibm.com>
- <20231219140854.1042599-5-nsg@linux.ibm.com>
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- xsFNBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
- qLqYr+qrG3buymJJRD9xkp4mqgasHdB5WR9MhXWKH08EvtvAMkEJLnqxgbqf8td3pCQ2cEpv
- 15mH49iKSmlTcJ+PvJpGZcq/jE42u9/0YFHhozm8GfQdb9SOI/wBSsOqcXcLTUeAvbdqSBZe
- zuMRBivJQQI1esD9HuADmxdE7c4AeMlap9MvxvUtWk4ZJ/1Z3swMVCGzZb2Xg/9jZpLsyQzb
- lDbbTlEeyBACeED7DYLZI3d0SFKeJZ1SUyMmSOcr9zeSh4S4h4w8xgDDGmeDVygBQZa1HaoL
- Esb8Y4avOYIgYDhgkCh0nol7XQ5i/yKLtnNThubAcxNyryw1xSstnKlxPRoxtqTsxMAiSekk
- 0m3WJwvwd1s878HrQNK0orWd8BzzlSswzjNfQYLF466JOjHPWFOok9pzRs+ucrs6MUwDJj0S
- cITWU9Rxb04XyigY4XmZ8dywaxwi2ZVTEg+MD+sPmRrTw+5F+sU83cUstuymF3w1GmyofgsU
- Z+/ldjToHnq21MNa1wx0lCEipCCyE/8K9B9bg9pUwy5lfx7yORP3JuAUfCYb8DVSHWBPHKNj
- HTOLb2g2UT65AjZEQE95U2AY9iYm5usMqaWD39pAHfhC09/7NQARAQABzSVKYW5vc2NoIEZy
- YW5rIDxmcmFua2phQGxpbnV4LmlibS5jb20+wsF3BBMBCAAhBQJbm6Q+AhsjBQsJCAcCBhUI
- CQoLAgQWAgMBAh4BAheAAAoJEONU5rjiOLn4p9gQALjkdj5euJVI2nNT3/IAxAhQSmRhPEt0
- AmnCYnuTcHRWPujNr5kqgtyER9+EMQ0ZkX44JU2q7OWxTdSNSAN/5Z7qmOR9JySvDOf4d3mS
- bMB5zxL9d8SbnSs1uW96H9ZBTlTQnmLfsiM9TetAjSrR8nUmjGhe2YUhJLR1v1LguME+YseT
- eXnLzIzqqpu311/eYiiIGcmaOjPCE+vFjcXL5oLnGUE73qSYiujwhfPCCUK0850o1fUAYq5p
- CNBCoKT4OddZR+0itKc/cT6NwEDwdokeg0+rAhxb4Rv5oFO70lziBplEjOxu3dqgIKbHbjza
- EXTb+mr7VI9O4tTdqrwJo2q9zLqqOfDBi7NDvZFLzaCewhbdEpDYVu6/WxprAY94hY3F4trT
- rQMHJKQENtF6ZTQc9fcT5I3gAmP+OEvDE5hcTALpWm6Z6SzxO7gEYCnF+qGXqp8sJVrweMub
- UscyLqHoqdZC2UG4LQ1OJ97nzDpIRe0g6oJ9ZIYHKmfw5jjwH6rASTld5MFWajWdNsqK15k/
- RZnHAGICKVIBOBsq26m4EsBlfCdt3b/6emuBjUXR1pyjHMz2awWzCq6/6OWs5eANZ0sdosNq
- dq2v0ULYTazJz2rlCXV89qRa7ukkNwdBSZNEwsD4eEMicj1LSrqWDZMAALw50L4jxaMD7lPL
- jJbazsFNBFubpD4BEADAcUTRqXF/aY53OSH7IwIK9lFKxIm0IoFkOEh7LMfp7FGzaP7ANrZd
- cIzhZi38xyOkcaFY+npGEWvko7rlIAn0JpBO4x3hfhmhBD/WSY8LQIFQNNjEm3vzrMo7b9Jb
- JAqQxfbURY3Dql3GUzeWTG9uaJ00u+EEPlY8zcVShDltIl5PLih20e8xgTnNzx5c110lQSu0
- iZv2lAE6DM+2bJQTsMSYiwKlwTuv9LI9Chnoo6+tsN55NqyMxYqJgElk3VzlTXSr3+rtSCwf
- tq2cinETbzxc1XuhIX6pu/aCGnNfuEkM34b7G1D6CPzDMqokNFbyoO6DQ1+fW6c5gctXg/lZ
- 602iEl4C4rgcr3+EpfoPUWzKeM8JXv5Kpq4YDxhvbitr8Dm8gr38+UKFZKlWLlwhQ56r/zAU
- v6LIsm11GmFs2/cmgD1bqBTNHHcTWwWtRTLgmnqJbVisMJuYJt4KNPqphTWsPY8SEtbufIlY
- HXOJ2lqUzOReTrie2u0qcSvGAbSfec9apTFl2Xko/ddqPcZMpKhBiXmY8tJzSPk3+G4tqur4
- 6TYAm5ouitJsgAR61Cu7s+PNuq/pTLDhK+6/Njmc94NGBcRA4qTuysEGE79vYWP2oIAU4Fv6
- gqaWHZ4MEI2XTqH8wiwzPdCQPYsSE0fXWiYu7ObeErT6iLSTZGx4rQARAQABwsFfBBgBCAAJ
- BQJbm6Q+AhsMAAoJEONU5rjiOLn4DDEP/RuyckW65SZcPG4cMfNgWxZF8rVjeVl/9PBfy01K
- 8R0hajU40bWtXSMiby7j0/dMjz99jN6L+AJHJvrLz4qYRzn2Ys843W+RfXj62Zde4YNBE5SL
- jJweRCbMWKaJLj6499fctxTyeb9+AMLQS4yRSwHuAZLmAb5AyCW1gBcTWZb8ON5BmWnRqeGm
- IgC1EvCnHy++aBnHTn0m+zV89BhTLTUal35tcjUFwluBY39R2ux/HNlBO1GY3Z+WYXhBvq7q
- katThLjaQSmnOrMhzqYmdShP1leFTVbzXUUIYv/GbynO/YrL2gaQpaP1bEUEi8lUAfXJbEWG
- dnHFkciryi092E8/9j89DJg4mmZqOau7TtUxjRMlBcIliXkzSLUk+QvD4LK1kWievJse4mte
- FBdkWHfP4BH/+8DxapRcG1UAheSnSRQ5LiO50annOB7oXF+vgKIaie2TBfZxQNGAs3RQ+bga
- DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
- Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
- phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-In-Reply-To: <20231219140854.1042599-5-nsg@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: SSzTOqZ04RDt2qm1_3qA3iU9DDBhdGRi
-X-Proofpoint-ORIG-GUID: 4OLoqLERnriKbfqg7Q8sKFsmbjMowayq
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-20_02,2023-12-14_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 suspectscore=0
- phishscore=0 priorityscore=1501 bulkscore=0 spamscore=0 lowpriorityscore=0
- impostorscore=0 malwarescore=0 mlxlogscore=812 clxscore=1015 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
- definitions=main-2312200076
+Content-Type: multipart/signed; micalg="pgp-sha512";
+	protocol="application/pgp-signature"; boundary="53wom6cde5fkxq6o"
+Content-Disposition: inline
+In-Reply-To: <c6d88551-c480-4a89-ad2b-b873951fb181@intel.com>
+X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
+	CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
+X-Brightmail-Tracker: H4sIAAAAAAAAA2WSf0xTVxTHc997fX00ljyKi3egc6MwE0CQuYwrgk63ZC+wMMjULW5TuvEC
+	BGi1pRvb4sagutGga4FKyk8RxY6qgPxSByoNo/JLfkgnYQhVa1Sw8hsGERjl4Way/z7ne84n
+	95zkUrionXSj4qRJrFwqSfAgBURt89ytzc23UtktJzrXo5mlDBJVaWtIZCsfIZGmaxiggZ43
+	0PwUQqU9kxjqXawH6OajSRyl51Xw0Vl7DR/l6w6j21fzSZQzMEqitoVWHqooycNRw8MHJKq+
+	PsNHjWM2HqqzpPKQ9u9TAFkMBgzd7R0EqGDuTwJZj9KopL8TvOvG2BoLMeZozwLJnC88DxhV
+	k53HlNQ/wRjN6RuAKWyJZB5X6QFzPO0ZyYw/7CeY0WsWkpm89FrEmv2C4Gg2Ie5rVu6/I0oQ
+	W6kfIg6diExeqH6OpwDNTjVwoiD9NhyZKcPVQECJaAOAVa1jPK6YAvBe1zSfKyYBXLqRx3uh
+	1BmWcAeL6HMADk87/zvU95d51agBMFt7jHRMEbQXzFbXEg4maV/Y+XRgxV5Lb4QdV/oJh4DT
+	xTyoUWVijoYrHQoz5k6vCEI6EM7N/0Zy7AJb9LaVHKeToXnq2TJTy+wOzy1SjtiJDoGVRXaS
+	21QMi7TNfI6PwNbqfszxFqQtAvg4p2y18T4c1FzAOHaFw+bq1Xw9bMvKIDghC8Dri2N8rjAC
+	WPrT9KqxHap6bavGLjirfw4cG0HaGfbZXbhFnWFmbQ7OxUL4yzERN/0mNA4+JTRAnPvSabkv
+	nZb732lc7Af7dNnk/2IfWFo8gnMcAi9eHCVOAX4ZWMcqFYkxrCJAyn7jp5AkKpTSGL+vZImX
+	wPInb1s0T1wGBcPjfiaAUcAEPJfl+xXGLuBGSGVS1mOtsCE9lRUJoyXffsfKZQflygRWYQLu
+	FOGxTugVvZEV0TGSJDaeZQ+x8hddjHJyS8E2dJ9cs6d4q0QWv8PsKrUdlyWndwhjTO+owq5+
+	ZqzcNSP89Xf/gi+97omBqXS2O/JCSXmQKSVV++SuUh1ertncFjj7aNv8p02baM+Acn8vS0uX
+	TnenLArkx6YJeBWGI9mHhypDnMMfHNh+p/WHifbQt7ZFeO/5ONogaPT1/CDUp0EZ+Yp+6x9N
+	pg8J3ZVrvqqo113iFDcPWK1BEcGJ7grZUF7qTrcv5lH75fesSfaO2SF1uLWocmhAaLz9CXE/
+	XjxxUJwZpn41NjD3xzNbNn3fkrPh57SP6ncH4Prx/WgvlWCmgqxhyvzxyGStU93kvmqfM94q
+	C5a1Ozj07Ih399TnsMKDUMRKArxxuULyD4IWDjNfBAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrBKsWRmVeSWpSXmKPExsVy+t/xu7pHzzWlGryabWrx7X8Pm8XmiVvZ
+	LJ6sf81mMeHCK0aLO5cULX59sbBYdukzk8WVf3sYLU48/8xs0Tl7A7vF0rdb2S3mTC20uLxr
+	DpvF9Dvv2SxO/z3FarFh8Wxmi71PH7NZbNn/jd3i4IcnrBbbrzaxWkz8sYDR4uqKFUwWd6/c
+	Y7SY+/Mai8WDVgGLxbfOMzpIeTw5OI/Jo/XSXzaPNfPWMHq0HHnL6rF4z0smjwmLDjB6zDsZ
+	6PFi80xGj97md2weH5/eYvF4v+8qm8fnTXIBPFF6NkX5pSWpChn5xSW2StGGFkZ6hpYWekYm
+	lnqGxuaxVkamSvp2NimpOZllqUX6dgl6GWvfX2Ar6Ams2NR/mKmBsc++i5GTQ0LARGL7iv/M
+	XYxcHEICSxklPh+7zQiRkJHY+OUqK4QtLPHnWhcbRNFHRokr+85BdWxllDg6YzsLSBWLgKrE
+	lK5tYDabgI7E+Td3mEFsEQF5ibM7b7GANDALLGSVmNAyiQkkISzgJdHzcxFYA6+AucTPXyvZ
+	QGwhgTeMEhPu2ULEBSVOznwCVsMsUCZx8MlloJM4gGxpieX/OEDCnAK2Ehvnv2WDuFRZYv7E
+	Y+wQdq3E57/PGCcwCs9CMmkWkkmzECZBhHUkdm69w4YhrC2xbOFrZgjbVmLduvcsCxjZVzGK
+	pJYW56bnFhvpFSfmFpfmpesl5+duYgQms23Hfm7Zwbjy1Ue9Q4xMHIyHGFWAOh9tWH2BUYol
+	Lz8vVUmEd29nU6oQb0piZVVqUX58UWlOavEhRlNgKE5klhJNzgem2bySeEMzA1NDEzNLA1NL
+	M2MlcV7Pgo5EIYH0xJLU7NTUgtQimD4mDk6pBiYB9SAJa+l9BnNEvy8PmLlMQv6BXu8EpqmM
+	+3szTkrf8H1YVbcj1+uo9tMt0zOjE12eHVOcP/n99edPihML5h1Yv+JX/y13/li1pNU8/jWn
+	dj4x+fhHf+uDqrXO9/7ssKy8WfvgYnrgSpVvLLFO9614dy7vVuzMkXnqM0kgNmcJt2XfEiYG
+	v8wltR+iF6/In2PV8HRCayADU9gbhdW1DzuEjsu+CGOXZuk9u8bPx/tLTKCBibtqQs+STp2U
+	tgd7Tp++d6J2BwtPyClxjRS+i4V6EUafjnWH/3oUfP7DE7t3whzGnfYvi1Mlp97e/XbW1Lch
+	GkuSem7MfBJv+dPBoHjjhCuJbU9nhBZH7zKJPajEUpyRaKjFXFScCABmQ0Rb+wMAAA==
+X-CMS-MailID: 20231220112350eucas1p11c553442f801dbe4c1eed5ba73c4077c
+X-Msg-Generator: CA
+X-RootMTR: 20231217215720eucas1p2a590aca62ce8eb5ba81df6bc8b1a785d
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20231217215720eucas1p2a590aca62ce8eb5ba81df6bc8b1a785d
+References: <20231117130717.19875-1-yi.l.liu@intel.com>
+	<CGME20231217215720eucas1p2a590aca62ce8eb5ba81df6bc8b1a785d@eucas1p2.samsung.com>
+	<20231217112101.6mxn42dw62tbj6uw@localhost>
+	<c6d88551-c480-4a89-ad2b-b873951fb181@intel.com>
 
-On 12/19/23 15:08, Nina Schoetterl-Glausch wrote:
-> Directly use the size of the arrays instead of going through the
-> indirection of kvm_s390_fac_size().
-> Don't use magic number for the number of entries in the non hypervisor
-> managed facility bit mask list.
-> Make the constraint of that number on kvm_s390_fac_base obvious.
-> Get rid of implicit double anding of stfle_fac_list.
-> 
-> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+--53wom6cde5fkxq6o
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-@Nina: I'm currently still recovering from a cold and hence I'm not 
-fully able to grasp this patch.
+On Tue, Dec 19, 2023 at 05:26:21PM +0800, Yi Liu wrote:
+> On 2023/12/17 19:21, Joel Granados wrote:
+> > Hey Yi
+> >=20
+> > I have been working with https://protect2.fireeye.com/v1/url?k=3Db58750=
+ce-ea1c9eaa-b586db81-000babda0201-365207d33731a099&q=3D1&e=3Dee73b69d-5c35-=
+49ef-9e62-2355fb797f21&u=3Dhttps%3A%2F%2Fgithub.com%2Fyiliu1765%2Fqemu%2Ftr=
+ee%2Fzhenzhong%2Fwip%2Fiommufd_nesting_rfcv1
+>=20
+> good to know about it.
+>=20
+> > and have some questions regarding one of the commits in that series.
+> > I however cannot find it in lore.kernel.org. Can you please direct me to
+> > where the rfc was posted? If it has not been posted yet, do you have an
+> > alternate place for discussion?
+>=20
+> the qemu series has not been posted yet as kernel side is still changing.
+> It still needs some time to be ready for public review. Zhenzhong Duan
+> is going to post it when it's ready. If you have questions to discuss,
+> you can post your questions to Zhenzhong and me first. I guess it may be
+> fine to cc Alex Williamson, Eric Auger, Nicolin Chen, C=E9dric Le Goater,
+> Kevin Tian, Jason Gunthorpe and qemu mail list as this is discussion
+> something that is going to be posted in public.
+Thx for getting back to me. I'll direct my questions to these
+recipients.
 
-May I drop it and we re-visit it next year for 6.9?
+Best
 
+>=20
+> >=20
+> > Best
+> >=20
+> > On Fri, Nov 17, 2023 at 05:07:11AM -0800, Yi Liu wrote:
+> > > Nested translation is a hardware feature that is supported by many mo=
+dern
+> > > IOMMU hardwares. It has two stages (stage-1, stage-2) address transla=
+tion
+> > > to get access to the physical address. stage-1 translation table is o=
+wned
+> > > by userspace (e.g. by a guest OS), while stage-2 is owned by kernel. =
+Changes
+> > > to stage-1 translation table should be followed by an IOTLB invalidat=
+ion.
+> > >=20
+> > > Take Intel VT-d as an example, the stage-1 translation table is I/O p=
+age
+> > > table. As the below diagram shows, guest I/O page table pointer in GPA
+> > > (guest physical address) is passed to host and be used to perform the=
+ stage-1
+> > > address translation. Along with it, modifications to present mappings=
+ in the
+> > > guest I/O page table should be followed with an IOTLB invalidation.
+> > >=20
+> > >      .-------------.  .---------------------------.
+> > >      |   vIOMMU    |  | Guest I/O page table      |
+> > >      |             |  '---------------------------'
+> > >      .----------------/
+> > >      | PASID Entry |--- PASID cache flush --+
+> > >      '-------------'                        |
+> > >      |             |                        V
+> > >      |             |           I/O page table pointer in GPA
+> > >      '-------------'
+> > > Guest
+> > > ------| Shadow |---------------------------|--------
+> > >        v        v                           v
+> > > Host
+> > >      .-------------.  .------------------------.
+> > >      |   pIOMMU    |  |  FS for GIOVA->GPA     |
+> > >      |             |  '------------------------'
+> > >      .----------------/  |
+> > >      | PASID Entry |     V (Nested xlate)
+> > >      '----------------\.----------------------------------.
+> > >      |             |   | SS for GPA->HPA, unmanaged domain|
+> > >      |             |   '----------------------------------'
+> > >      '-------------'
+> > > Where:
+> > >   - FS =3D First stage page tables
+> > >   - SS =3D Second stage page tables
+> > > <Intel VT-d Nested translation>
+> > >=20
+> > > This series adds the cache invalidation path for the userspace to inv=
+alidate
+> > > cache after modifying the stage-1 page table. This is based on the fi=
+rst part
+> > > of nesting [1]
+> > >=20
+> > > Complete code can be found in [2], QEMU could can be found in [3].
+> > >=20
+> > > At last, this is a team work together with Nicolin Chen, Lu Baolu. Th=
+anks
+> > > them for the help. ^_^. Look forward to your feedbacks.
+> > >=20
+> > > [1] https://lore.kernel.org/linux-iommu/20231026044216.64964-1-yi.l.l=
+iu@intel.com/ - merged
+> > > [2] https://protect2.fireeye.com/v1/url?k=3D38b56f01-672ea165-38b4e44=
+e-000babda0201-469ae350f21411ca&q=3D1&e=3Dee73b69d-5c35-49ef-9e62-2355fb797=
+f21&u=3Dhttps%3A%2F%2Fgithub.com%2Fyiliu1765%2Fiommufd%2Ftree%2Fiommufd_nes=
+ting
+> > > [3] https://protect2.fireeye.com/v1/url?k=3Dd6e01ed1-897bd0b5-d6e1959=
+e-000babda0201-bcf2b26a8dc8b34d&q=3D1&e=3Dee73b69d-5c35-49ef-9e62-2355fb797=
+f21&u=3Dhttps%3A%2F%2Fgithub.com%2Fyiliu1765%2Fqemu%2Ftree%2Fzhenzhong%2Fwi=
+p%2Fiommufd_nesting_rfcv1
+> > >=20
+> > > Change log:
+> > >=20
+> > > v6:
+> > >   - No much change, just rebase on top of 6.7-rc1 as part 1/2 is merg=
+ed
+> > >=20
+> > > v5: https://lore.kernel.org/linux-iommu/20231020092426.13907-1-yi.l.l=
+iu@intel.com/#t
+> > >   - Split the iommufd nesting series into two parts of alloc_user and
+> > >     invalidation (Jason)
+> > >   - Split IOMMUFD_OBJ_HW_PAGETABLE to IOMMUFD_OBJ_HWPT_PAGING/_NESTED=
+, and
+> > >     do the same with the structures/alloc()/abort()/destroy(). Rework=
+ed the
+> > >     selftest accordingly too. (Jason)
+> > >   - Move hwpt/data_type into struct iommu_user_data from standalone op
+> > >     arguments. (Jason)
+> > >   - Rename hwpt_type to be data_type, the HWPT_TYPE to be HWPT_ALLOC_=
+DATA,
+> > >     _TYPE_DEFAULT to be _ALLOC_DATA_NONE (Jason, Kevin)
+> > >   - Rename iommu_copy_user_data() to iommu_copy_struct_from_user() (K=
+evin)
+> > >   - Add macro to the iommu_copy_struct_from_user() to calculate min_s=
+ize
+> > >     (Jason)
+> > >   - Fix two bugs spotted by ZhaoYan
+> > >=20
+> > > v4: https://lore.kernel.org/linux-iommu/20230921075138.124099-1-yi.l.=
+liu@intel.com/
+> > >   - Separate HWPT alloc/destroy/abort functions between user-managed =
+HWPTs
+> > >     and kernel-managed HWPTs
+> > >   - Rework invalidate uAPI to be a multi-request array-based design
+> > >   - Add a struct iommu_user_data_array and a helper for driver to san=
+itize
+> > >     and copy the entry data from user space invalidation array
+> > >   - Add a patch fixing TEST_LENGTH() in selftest program
+> > >   - Drop IOMMU_RESV_IOVA_RANGES patches
+> > >   - Update kdoc and inline comments
+> > >   - Drop the code to add IOMMU_RESV_SW_MSI to kernel-managed HWPT in =
+nested translation,
+> > >     this does not change the rule that resv regions should only be ad=
+ded to the
+> > >     kernel-managed HWPT. The IOMMU_RESV_SW_MSI stuff will be added in=
+ later series
+> > >     as it is needed only by SMMU so far.
+> > >=20
+> > > v3: https://lore.kernel.org/linux-iommu/20230724110406.107212-1-yi.l.=
+liu@intel.com/
+> > >   - Add new uAPI things in alphabetical order
+> > >   - Pass in "enum iommu_hwpt_type hwpt_type" to op->domain_alloc_user=
+ for
+> > >     sanity, replacing the previous op->domain_alloc_user_data_len sol=
+ution
+> > >   - Return ERR_PTR from domain_alloc_user instead of NULL
+> > >   - Only add IOMMU_RESV_SW_MSI to kernel-managed HWPT in nested trans=
+lation (Kevin)
+> > >   - Add IOMMU_RESV_IOVA_RANGES to report resv iova ranges to userspac=
+e hence
+> > >     userspace is able to exclude the ranges in the stage-1 HWPT (e.g.=
+ guest I/O
+> > >     page table). (Kevin)
+> > >   - Add selftest coverage for the new IOMMU_RESV_IOVA_RANGES ioctl
+> > >   - Minor changes per Kevin's inputs
+> > >=20
+> > > v2: https://lore.kernel.org/linux-iommu/20230511143844.22693-1-yi.l.l=
+iu@intel.com/
+> > >   - Add union iommu_domain_user_data to include all user data structu=
+res to avoid
+> > >     passing void * in kernel APIs.
+> > >   - Add iommu op to return user data length for user domain allocation
+> > >   - Rename struct iommu_hwpt_alloc::data_type to be hwpt_type
+> > >   - Store the invalidation data length in iommu_domain_ops::cache_inv=
+alidate_user_data_len
+> > >   - Convert cache_invalidate_user op to be int instead of void
+> > >   - Remove @data_type in struct iommu_hwpt_invalidate
+> > >   - Remove out_hwpt_type_bitmap in struct iommu_hw_info hence drop pa=
+tch 08 of v1
+> > >=20
+> > > v1: https://lore.kernel.org/linux-iommu/20230309080910.607396-1-yi.l.=
+liu@intel.com/
+> > >=20
+> > > Thanks,
+> > > 	Yi Liu
+> > >=20
+> > > Lu Baolu (1):
+> > >    iommu: Add cache_invalidate_user op
+> > >=20
+> > > Nicolin Chen (4):
+> > >    iommu: Add iommu_copy_struct_from_user_array helper
+> > >    iommufd/selftest: Add mock_domain_cache_invalidate_user support
+> > >    iommufd/selftest: Add IOMMU_TEST_OP_MD_CHECK_IOTLB test op
+> > >    iommufd/selftest: Add coverage for IOMMU_HWPT_INVALIDATE ioctl
+> > >=20
+> > > Yi Liu (1):
+> > >    iommufd: Add IOMMU_HWPT_INVALIDATE
+> > >=20
+> > >   drivers/iommu/iommufd/hw_pagetable.c          | 35 ++++++++
+> > >   drivers/iommu/iommufd/iommufd_private.h       |  9 ++
+> > >   drivers/iommu/iommufd/iommufd_test.h          | 22 +++++
+> > >   drivers/iommu/iommufd/main.c                  |  3 +
+> > >   drivers/iommu/iommufd/selftest.c              | 69 +++++++++++++++
+> > >   include/linux/iommu.h                         | 84 ++++++++++++++++=
++++
+> > >   include/uapi/linux/iommufd.h                  | 35 ++++++++
+> > >   tools/testing/selftests/iommu/iommufd.c       | 75 +++++++++++++++++
+> > >   tools/testing/selftests/iommu/iommufd_utils.h | 63 ++++++++++++++
+> > >   9 files changed, 395 insertions(+)
+> > >=20
+> > > --=20
+> > > 2.34.1
+> > >=20
+> >=20
+>=20
+> --=20
+> Regards,
+> Yi Liu
+
+--=20
+
+Joel Granados
+
+--53wom6cde5fkxq6o
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAABCgAdFiEErkcJVyXmMSXOyyeQupfNUreWQU8FAmWCzrsACgkQupfNUreW
+QU8N8gv+JAauQGZJaMEm6OPs/J47+sm+ehXncbnx309pNrvE1VZfO4l6VYwuK0ic
+rGmgZoxQhqZS280dqGWxiyKLsqczKrRkDuyksa618ju7VwcglQybISvv2o324cpw
+snS7XxfqL9zBBkxng7+X/6Kr5/vIQfoiDwQUC9knNGh0zBK8Ldl9vxBwzFF4F5q0
+Kcc9TzozfPUsxHCtyWc0TXx9yAxI2nEo0ed07eQAtby+J4HqNO2HFzUJRydt4Dc0
+tRux4XZTTGdnyMd+fILHGpJGLbjjmG9dfR+gs3Cs4CN1eZEao3b8qkR8LwLGcvkx
+g5uTTyDVyHYTk11Ow6Cfvbo61CDPjl06fVtn54fKzdDB/c1NLuob+zvlk50Ej3MV
+BbZlT3eXohFh1gYvk/BV+5xTH1E6tfx78KO6fMvkYpLHuOWQ2rsyhusQBq7qxo9y
+oA/dcALHVFt8eSeMSaTXqVJtdyhL/xs1QjjyVTLkbI6/2SlrhCcXEjTZUrfQ+vWv
+t8jZDdx3
+=eK/f
+-----END PGP SIGNATURE-----
+
+--53wom6cde5fkxq6o--
 
