@@ -1,111 +1,73 @@
-Return-Path: <kvm+bounces-4875-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4891-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63FA4819634
-	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 02:26:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E8A781965B
+	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 02:34:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 903651C25359
-	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 01:26:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5AE78283896
+	for <lists+kvm@lfdr.de>; Wed, 20 Dec 2023 01:34:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ED906FA9;
-	Wed, 20 Dec 2023 01:26:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6BB71642F;
+	Wed, 20 Dec 2023 01:33:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mgR2rS8W"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Nj9gV0Gk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF6C5567C;
-	Wed, 20 Dec 2023 01:26:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703035567; x=1734571567;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=BB5xrxsz+BnW5YoyU869JFzcyH3wK7pydPymvf+6dm8=;
-  b=mgR2rS8W867+Znl9NISgZMQM9uZBiieLYR3b07Ey7INDjUHqQKa0+n5f
-   9tGJ+TR5TzyBE8IsRaEFb/iNvTb4KWCHLbUsS4UIgXhEnnOJQFymBPxl6
-   gsGlqnOWJHX7nZ3qFaHVYtEsi0CXP5dp+fZxcMfezNaU//30x7vr6WNPT
-   fxa+KEGCzYoruxSzenvJTR0CNpUQk3M/2tiNjz3XCgTRLGUf72HqxYKQ3
-   BqqjeNlxxpWs4J67ZZ0D0CdzUetSBoETqWWni4opH6N2Aw4qAkjigYW/Z
-   wQiYRHpXiBeB9LTsQ+fgNIoWxEL30eFswuApwlqDgMVRW9jX1IMsQs6gI
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10929"; a="9207136"
-X-IronPort-AV: E=Sophos;i="6.04,290,1695711600"; 
-   d="scan'208";a="9207136"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2023 17:26:06 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10929"; a="899553838"
-X-IronPort-AV: E=Sophos;i="6.04,290,1695711600"; 
-   d="scan'208";a="899553838"
-Received: from ihur-mobl1.amr.corp.intel.com (HELO desk) ([10.209.1.244])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2023 17:26:05 -0800
-Date: Tue, 19 Dec 2023 17:25:57 -0800
-From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To: Josh Poimboeuf <jpoimboe@kernel.org>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Andy Lutomirski <luto@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, tony.luck@intel.com,
-	ak@linux.intel.com, tim.c.chen@linux.intel.com,
-	Andrew Cooper <andrew.cooper3@citrix.com>,
-	Nikolay Borisov <nik.borisov@suse.com>,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	kvm@vger.kernel.org,
-	Alyssa Milburn <alyssa.milburn@linux.intel.com>,
-	Daniel Sneddon <daniel.sneddon@linux.intel.com>,
-	antonio.gomez.iglesias@linux.intel.com,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH  v4 6/6] KVM: VMX: Move VERW closer to VMentry for MDS
- mitigation
-Message-ID: <20231220012557.7myc7xy24tveaid6@desk>
-References: <20231027-delay-verw-v4-0-9a3622d4bcf7@linux.intel.com>
- <20231027-delay-verw-v4-6-9a3622d4bcf7@linux.intel.com>
- <20231201200247.vui6enzdj5nzctf4@treble>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F6AD15AF9
+	for <kvm@vger.kernel.org>; Wed, 20 Dec 2023 01:33:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5deda822167so68599617b3.1
+        for <kvm@vger.kernel.org>; Tue, 19 Dec 2023 17:33:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1703035988; x=1703640788; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xcGd8hD1GYbqQmtxD4XTvkSxSTm1ofoM7OB/U5l8jC8=;
+        b=Nj9gV0Gkk6u0HlWrCw2WAqf53As6cdNvKK9QC2tRxqRr6YeWYEZ+FQdhoo8dllnt9A
+         Kk8S9Vwduxji4nm4z5ziLDDyJ/4hbZrfoV7FSykNijy/jRGzg1DCAHJ+LafIyg8agIYq
+         s8epWnTF2+sFVaOKKWXD5OLj40dciuh9cwyiPnm5JG2JcEFsioN57r871CHDWVI0XZ6R
+         cemE/A8OWK1UE9njRG8DCYOriNEq/58X4WXzv3ONXxQk1behsJKPGoy8BzDtzy7wiofF
+         DYJNQhVho4HzXFDjRbhvqtAoT9FCabkFssi3zyI1FfQjwerBHGzFJRPto2JaPB0E9CHo
+         iXzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703035988; x=1703640788;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xcGd8hD1GYbqQmtxD4XTvkSxSTm1ofoM7OB/U5l8jC8=;
+        b=Rk3j7U2q5bArTYUKxPOrz5XRRPxZ5dRwjUG1SOILqdtGx7IQEiNk0GPMs9uLDcE0YH
+         PH0un34dorb0c43QmrgQJA34iJZlSGf17jiR5m0jx1v3Of5vcYf7Md0SvoePqXqf00HE
+         jYqLRlrVyNN+gYPv9ufX2ghdmWYlvH+9dwctipsfP8L6nxxTRMp+PkbfkD4UkncrST9I
+         9iRDip9MAbcWjBLO3xaV5DI7qAjKHEaHzE/PlHibFk7/CcJ7L+Zewqz+Rr4oDqS8bq1U
+         SGNAY/aJJK/B0EAsY3a7mFSC6FrCXtLNDh//NFcas76IKtVpeylzVRLMKXzATNNoQeSP
+         hC8g==
+X-Gm-Message-State: AOJu0Yz5wO4tBkwYv74TN/Sxv9wC6R5pkQgFAZEl2+i6YnKqDG+JFKfP
+	MibGrYG0H6LnOMRQsaHXoE7ICJb4ahU=
+X-Google-Smtp-Source: AGHT+IEzH9EZ2sFvwVybtmtJ9FVuhULztY3h62x7Clm5WLnKWnsW8X46WotbUtagjsVDGqhXc5VyhdfSdk8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1364:b0:dbc:ef63:f134 with SMTP id
+ bt4-20020a056902136400b00dbcef63f134mr2647919ybb.2.1703035988775; Tue, 19 Dec
+ 2023 17:33:08 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Tue, 19 Dec 2023 17:33:06 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231201200247.vui6enzdj5nzctf4@treble>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
+Message-ID: <20231220013306.2300650-1-seanjc@google.com>
+Subject: [ANNOUNCE] PUCK Agenda - 2023.12.20 - CANCELED
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Dec 01, 2023 at 12:02:47PM -0800, Josh Poimboeuf wrote:
-> On Fri, Oct 27, 2023 at 07:39:12AM -0700, Pawan Gupta wrote:
-> > -	vmx_disable_fb_clear(vmx);
-> > +	/*
-> > +	 * Optimize the latency of VERW in guests for MMIO mitigation. Skip
-> > +	 * the optimization when MDS mitigation(later in asm) is enabled.
-> > +	 */
-> > +	if (!cpu_feature_enabled(X86_FEATURE_CLEAR_CPU_BUF))
-> > +		vmx_disable_fb_clear(vmx);
-> >  
-> >  	if (vcpu->arch.cr2 != native_read_cr2())
-> >  		native_write_cr2(vcpu->arch.cr2);
-> > @@ -7248,7 +7256,8 @@ static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
-> >  
-> >  	vmx->idt_vectoring_info = 0;
-> >  
-> > -	vmx_enable_fb_clear(vmx);
-> > +	if (!cpu_feature_enabled(X86_FEATURE_CLEAR_CPU_BUF))
-> > +		vmx_enable_fb_clear(vmx);
-> >  
-> 
-> It may be cleaner to instead check X86_FEATURE_CLEAR_CPU_BUF when
-> setting vmx->disable_fb_clear in the first place, in
-> vmx_update_fb_clear_dis().
-
-Right. Thanks for the review.
+PUCK is officially canceled for tomorrow, see y'all next year!
 
