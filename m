@@ -1,331 +1,194 @@
-Return-Path: <kvm+bounces-4984-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4985-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CEBA81B038
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 09:21:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35D2781B045
+	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 09:27:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D7094285219
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 08:21:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 969971F2301E
+	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 08:27:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1100717745;
-	Thu, 21 Dec 2023 08:21:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6954A1772D;
+	Thu, 21 Dec 2023 08:27:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hvktcVIn"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MT87L8Ao"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7704817728
-	for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 08:21:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31DE6168B4
+	for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 08:27:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703146907; x=1734682907;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=sfR2vwx17YxaFnAF+DpcN18wktDKlBPUMp7piYcYt7E=;
-  b=hvktcVIn0x4LY/I6KH9Mma2HbEWvRnbmCoOfSc5QcN1kLXAlvkgLQbUq
-   0ciSnjYUnk1O14OIDfkVn2Bk2NT6qHc+C5+2vsN6UI3qK81ZKCgrJkB2d
-   UX5aCZQxwSiVYgiJ+o3YdpvvfS/bBQz3GZRVDneUZxf2Pab4fcdjbed69
-   WFCMQjSaHdqEu4dC3MTDlKOyaVemXlgjO7tL/t9grxy2i9hciakAJkRVK
-   Ud+3Nx/am+yIq1GMcXiWEswmdlT7ZoXZTV/CAA9t0hyba+USewmkwAu3b
-   21S+4hAwxUWJfJ+sf7iUQKjNACNe9whIb2BRkv+uiCq201bVrpP52y+gr
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10930"; a="3026890"
+  t=1703147239; x=1734683239;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=amJ3pGjqQctpEaqo2O7VyXbp8+5E/FRealyMvQPL7Z8=;
+  b=MT87L8AoZSzv/oDEMbek067+E40WmPKMLYIazo1mksKNXOdGjW5/46Wx
+   JQxmamrkVTggiszavDW//hsPRULGlLqeq2k3FiyfXXjKl5mjCQ0NbN+x5
+   nxz9ohpJTy+gAlfjt9ir4gp/nk8WfP57hzQ9XFROFdoAS1oD3zc9hl1HC
+   kbuu7yImsN47Kl04NVnXG7qstEiuHGd7XaBd6sscj7P5IhDykCcLrpXOy
+   85TD2mfgyJYQmKyA9zWRxjKehWkdPqiVeOzL9yxBCTr2RlTJkri7mZcPd
+   KKbW3A4nhunlik15x0VNeNDp+PrN1kJ7BpzK7KXzk3aOuxJJCNttS+tuU
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10930"; a="9322915"
 X-IronPort-AV: E=Sophos;i="6.04,293,1695711600"; 
-   d="scan'208";a="3026890"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Dec 2023 00:21:47 -0800
+   d="scan'208";a="9322915"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Dec 2023 00:27:18 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10930"; a="949839800"
+X-IronPort-AV: E=McAfee;i="6600,9927,10930"; a="900013683"
 X-IronPort-AV: E=Sophos;i="6.04,293,1695711600"; 
-   d="scan'208";a="949839800"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by orsmga005.jf.intel.com with ESMTP; 21 Dec 2023 00:21:42 -0800
-Date: Thu, 21 Dec 2023 16:19:10 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Tao Su <tao1.su@linux.intel.com>, kvm@vger.kernel.org,
-	pbonzini@redhat.com, eddie.dong@intel.com, chao.gao@intel.com,
-	xiaoyao.li@intel.com, yuan.yao@linux.intel.com, yi1.lai@intel.com,
-	xudong.hao@intel.com, chao.p.peng@intel.com
-Subject: Re: [PATCH 1/2] x86: KVM: Limit guest physical bits when 5-level EPT
- is unsupported
-Message-ID: <ZYP0/nK/WJgzO1yP@yilunxu-OptiPlex-7050>
-References: <20231218140543.870234-1-tao1.su@linux.intel.com>
- <20231218140543.870234-2-tao1.su@linux.intel.com>
- <ZYMWFhVQ7dCjYegQ@google.com>
+   d="scan'208";a="900013683"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orsmga004.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 21 Dec 2023 00:27:18 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 21 Dec 2023 00:27:18 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 21 Dec 2023 00:27:17 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 21 Dec 2023 00:27:17 -0800
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.100)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 21 Dec 2023 00:27:16 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=g4FaHLvJc+ulLUxewlJULUUISpnN77YXP1Q7q2645wqMrHSqTpUrhAVOyge37ntZ5otR0tlmC/OuV29TXVUqQhgJNYqMjXHYZ0ayK6fYEcqLV4SuJa3cwJhudIlW+H8EWl4YZdO17JAadK2184dX6JvLVOTceknfxR7vYKG3sU27JWRdhH/is4R6jVXubbsoXC3FyxfRqcyNi/5hcTjPP2RV0fPxRCIyJxgnY0oiP+WKEtgjvyvvezPQZWgtmJ5O1RBkkQ655abvfr7cl6nCMox2SOsWRYrkLYtw+n9I9eRYGnPc+xA+rtCCOUHA8c7U3gOoz2QbytL30BTFg9nKBA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=amJ3pGjqQctpEaqo2O7VyXbp8+5E/FRealyMvQPL7Z8=;
+ b=P5Kxl/w4tFHRgD1wHiS2Ge/Sz02f1i0QKhtfvai+1RVEccdZVZpNAxFVAAGFWz3jdwHDERNy8cswCBizYcCJNuqsqNotJ+O108oQen8OKg3lM/pIPCI+aJGfY+0KWe9QganvmYq0UWpEPS7fZzIcnVYo9938Vx+ahj+9blYaaIxrjPevNwza5AVJy5vOKXbraeeoZGy5Q3ObNQALQ5hOZFZmC9tAq4x9nd0miCbxjuZJ00h9geBExkF0naVuj1aV2i9vpTETQpG2DzF5ErSyFpJO4yehQaueidAbrWI+u5tKanq93KB7C8a+q/N/g0iZkJxRCu9AhELy+KVPEtl0DQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from MW4PR11MB6737.namprd11.prod.outlook.com (2603:10b6:303:20d::15)
+ by SA0PR11MB4686.namprd11.prod.outlook.com (2603:10b6:806:97::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7113.21; Thu, 21 Dec
+ 2023 08:27:14 +0000
+Received: from MW4PR11MB6737.namprd11.prod.outlook.com
+ ([fe80::2252:14d:8e00:3b34]) by MW4PR11MB6737.namprd11.prod.outlook.com
+ ([fe80::2252:14d:8e00:3b34%3]) with mapi id 15.20.7091.034; Thu, 21 Dec 2023
+ 08:27:14 +0000
+From: "Li, Xin3" <xin3.li@intel.com>
+To: "Wu, Dan1" <dan1.wu@intel.com>, "qemu-devel@nongnu.org"
+	<qemu-devel@nongnu.org>
+CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "eduardo@habkost.net"
+	<eduardo@habkost.net>, "seanjc@google.com" <seanjc@google.com>, "Gao, Chao"
+	<chao.gao@intel.com>, "hpa@zytor.com" <hpa@zytor.com>, "Li, Xiaoyao"
+	<xiaoyao.li@intel.com>, "Yang, Weijiang" <weijiang.yang@intel.com>
+Subject: RE: [PATCH v3 1/6] target/i386: add support for FRED in CPUID
+ enumeration
+Thread-Topic: [PATCH v3 1/6] target/i386: add support for FRED in CPUID
+ enumeration
+Thread-Index: AQHaEuF9PgUxmhk7ZkW3gGDhXdLhR7CopZUAgAsCidA=
+Date: Thu, 21 Dec 2023 08:27:13 +0000
+Message-ID: <MW4PR11MB6737DC0CCD50B5D3D00521A7A895A@MW4PR11MB6737.namprd11.prod.outlook.com>
+References: <20231109072012.8078-1-xin3.li@intel.com>
+ <20231109072012.8078-2-xin3.li@intel.com>
+ <bfdebf3f-9467-41fe-a09f-ebc4e02465b4@intel.com>
+In-Reply-To: <bfdebf3f-9467-41fe-a09f-ebc4e02465b4@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MW4PR11MB6737:EE_|SA0PR11MB4686:EE_
+x-ms-office365-filtering-correlation-id: b68a1f11-aca1-49d1-a1e8-08dc01fea290
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: p9WNVc6NoqdTtaSCI9ssvt/615P+JetTkSOdg0XpG9YFDOmMqY06f52IBrEgaSsUA2DbTrBkeoQBnUe+WAEjPT5AZf2+9Q6Gh5d5p7ALkXSRKs+8IJMQT6IuU/zNqF9FW9ytNne1O/aWHMmxMV0v/PVyYJKWvB+gK1BQ857mNDpbRGkaymO4TjNruVFlR8AlkLCJTKcAcarUa1LRgb0M8UU1iGxTCaXwQkkkrUNDqCuIS42qKKl2PV3EaJnSqlHHBhmYN9EAUwYjIUT9WnS/ME6ngu17ntTNZa9zXweVkqfZhv6EV+kepZAjn8OyM6iIVgtBRPFxkz+nnpwkiQHUAqebFh0vARVyHY2kMMrXPt366NmemwVKHZVS0ECz9jfJz1F3fKcJMppnhbatXbEC8o1f3GVh60SMdASPYF8/vJv4ciU9lSKNQ1DDe1dUWxnnvf7MzjDJcIGwA3zyN9pLJg95xavcx4wjoN8g38yq9K2c0ZazUAvJYC+xmcwZho3e1Lp0nxuzHIVUG7WMkyHyz6hP1Qz+VjxVCJSxD+GOnsVAWeEXfNuHNser0SDOod3rAPC4yqBCC0E1jCL1Xq2HRhtpwKlJztFJitMrydB36Tif+v6gbeyrlH7Vc5iNJ7C4
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB6737.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(376002)(396003)(366004)(39860400002)(230922051799003)(451199024)(64100799003)(1800799012)(186009)(5660300002)(4744005)(2906002)(86362001)(122000001)(82960400001)(38100700002)(41300700001)(110136005)(66946007)(33656002)(76116006)(66556008)(64756008)(66446008)(66476007)(107886003)(54906003)(26005)(316002)(71200400001)(9686003)(6506007)(7696005)(55016003)(478600001)(52536014)(38070700009)(8936002)(8676002)(4326008);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?RlFSdFJ4N2E1VnlYLzJkRm44VGZxZGRHTkpyczNiQ2lHWElXS2IxWmh4bm4w?=
+ =?utf-8?B?NU1NTkJjL2M0eGRET05xalp2L1JhRWkrMTNTM2JGbmlmcFVZamM2LzZ6NlhH?=
+ =?utf-8?B?b0dKOGIyYlhCWWxyRWN2dm5uVDFoZVlaMzdQTGhyTzNOajlZa2hRc3lPbUdU?=
+ =?utf-8?B?TmFabUsrZ08wdHVWZzVOeW9zVUVKWER2bjRhQlJOWXk5TldhYmkvMmlDbkdH?=
+ =?utf-8?B?K21PYjlMU3NMTEFsSzdGUk52dnlUUFVsOXBiSDR5ZHBIQW1WZ1hrS2dEOTg2?=
+ =?utf-8?B?dE9NRUlsZFJKdm9oM1FOYjhrRndXUXRJbEo3YlNacjdmU3RIdklvbUMvZXFp?=
+ =?utf-8?B?WWFsVEhqSTRCY25RTTcwUUJKSXlYRXN0ZE0yOU0vQlpITWZQVFAvRnU1VVVE?=
+ =?utf-8?B?N3Rsalc3bEhJRFZCSlVoL0dEbU5qS1FzcWlFbEJyZjhud3lRUXdNdEpkWVZH?=
+ =?utf-8?B?ZHhDUVBodjg2NFdVTk1Hdjl1ZVcxS3h5ZEdDd2lkQ2pFL3kzbVMvR0QvQzgz?=
+ =?utf-8?B?RlNIc3cxbXdCbFA1WGg4SVpIVElqaUw2amdlYWFhREt1RnpmQ1lwK1ZzWDZH?=
+ =?utf-8?B?Rjc5OGNoZjJLU3hzR201K2w3SGVPaUN6YzR5U3RMME9yb0lvOVdJNFBWQzA0?=
+ =?utf-8?B?U3dQK1N3c3JONkJPMjNZQWtzSzFOVWI2TlgzWXBvMzB5VHVjVVhOUUEvWFNL?=
+ =?utf-8?B?cjlZaHcwQTlPS2JuVVhjUjhNUndvb1g5T0tScWFpdnlhMmovWjF1bHkwNTNz?=
+ =?utf-8?B?ak5SVitjK3IxVEdRZGI2Z3ZXN2xDTkNyeDF5cXlzbStnbDZQY0gwMDN1YmNh?=
+ =?utf-8?B?dC9BeGtMQnJHVXZwWSszeUtBUnVoQ2IxWHFpNzBGQyt6ejV0M3FDM3p2OTlo?=
+ =?utf-8?B?bG8yK0ozQTFTZHNUY2pqVDFrSWFMU3FYd3ZsT29oMG8rSUpOVDN1bUJRMTk5?=
+ =?utf-8?B?N2YvSTVRR2pYKzltUzlTU203UHF4ejVsTTVNdTM0ODdzQmJpSzhoNEQ5MUJT?=
+ =?utf-8?B?VVg4U29NdWlpWkwyekpIajZXa3l4ZCtvc2xyMWNYKzloaVhWWjNKMTE5ZUJn?=
+ =?utf-8?B?S3A5MHU1QkhQSkVqK2MxZnh3cjhpQWUyV3dIQXBLSkFUNDFnaXVyMmNpclNG?=
+ =?utf-8?B?eFBCdG1ZSGxoSjdhM0JNeUF3d0FqMDZITFZtT1QxMVZzRzVuTmxFL0FwVUJm?=
+ =?utf-8?B?MkMxVWhXZTNvNkpyMVVRRUF2YjR1Tm13T2tleVJBdEhkV2VrMmxiU3NrSEpS?=
+ =?utf-8?B?cDhKd2JaQlVBVzcwSUpaMm5ackd4UU1xTVZONzdDSnhQNnc5Ym5xaXFORGVL?=
+ =?utf-8?B?d3dPeW9zQnRFYlh4QWJxQ2EyOXp4LzV2MW5mNnIyMkNYMzdYd2c1VkZseCtW?=
+ =?utf-8?B?ZWxFa1JmMWhjb2M4Y2s2eGsxdEZEMDhoMVRGSEozYVY3S1ozTG9VSElzRkRk?=
+ =?utf-8?B?ZHEzRVJ2WWdGdWVlZUVUTXVIQnlRV254QmE2Mmlzc3kwSkVqRmFpQ2ZKdXFt?=
+ =?utf-8?B?Uy9abW51cGdEeG1yK0VFUVprVHlBRk9RNlBYQjRoaG5HVXB6UmkwelY0MkNT?=
+ =?utf-8?B?ME56UStyMnBSdVdzb1NvYmZoeWZtY24xNjZNNTNnakxPVkdtVzFPT1EzU29U?=
+ =?utf-8?B?eng1aUNUSGRtOXZIakNGQW5XTXR4RTQwbEhNak1QbEN6dWVwazVuMExYS2Vn?=
+ =?utf-8?B?alhpcmU2a3NVNkxaZUhaL0daQlQxNHA4S3V2cFd2UXlsb2FNajZXbXlpSndH?=
+ =?utf-8?B?a0hrbG1aMThQamo4YzFKaG5EanpRMVlsU1JhaTl1dU80WmRuOWVEbHBmdEow?=
+ =?utf-8?B?UlpLbDY0U0E5Q2RhdlNiczhrSUM5eXFadkNEbjJVNXNhY3NSamp6YVBNdmlx?=
+ =?utf-8?B?K1J4VnZxOXgzaEgzVCtVdWhlRktTZmMzdnRVVHBjd3lwblVUU1oxQXh4dTRD?=
+ =?utf-8?B?SXBXTE1nemZiYklLRnNWeEVLdGhXZTFwZ2llVC9jNGpDZEkxTFo4S0k0TzRS?=
+ =?utf-8?B?TGs4cGVwNG5FWktCcEdyQUJEYWZHeUgrN3NFL044M0hoQUZjVE44djloWkZa?=
+ =?utf-8?B?V0R6eGtGN3VtckI4U1UyUitsSmExdU4rVDRJV0pyRk9Da0I1OWdISDczSUdB?=
+ =?utf-8?Q?8v/o=3D?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZYMWFhVQ7dCjYegQ@google.com>
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB6737.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b68a1f11-aca1-49d1-a1e8-08dc01fea290
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Dec 2023 08:27:13.9999
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: w4SJh6pSaCnjoZ17ttm1RjwyyNarX0LEjpZY9NDpxSrzhtrX8tkNxsymJhWoyreteoMm1hgWG5cd60eDt3Sp9w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR11MB4686
+X-OriginatorOrg: intel.com
 
-On Wed, Dec 20, 2023 at 08:28:06AM -0800, Sean Christopherson wrote:
-> As evidenced by my initial response, the shortlog is a bit misleading.  In non-KVM
-> code it would be perfectly ok to say "limit", but in KVM's split world where
-> *userspace* is mostly responsible for the guest configuration, "limit guest ..."
-> is often going to be read as "limit the capabilities of the guest".
-> 
-> This is also a good example of why shortlogs and changelogs should NOT be play-by-play
-> descriptions of the code change.  The literal code change applies a limit to
-> guest physical bits, but that doesn't capture the net effect of applying said limit.
-> 
-> Something like
-> 
->   KVM: x86: Don't advertise 52-bit MAXPHYADDR if 5-level TDP is unsupported
-> 
-> better captures that the patch affects what KVM advertises to userspace.  Yeah,
-> it's technically inaccurate to say "52-bit", but I think 52-bit MAXPHYADDR is
-> ubiquitous enough that it's worth being technically wrong in order to clearly
-> communicate the net effect.  Alternatively, it could be something like:
-> 
->   KVM: x86: Don't advertise incompatible MAXPHYADDR if 5-level TDP is unsupported
-> 
-> On Mon, Dec 18, 2023, Tao Su wrote:
-> > When host doesn't support 5-level EPT, bits 51:48 of the guest physical
-> > address must all be zero, otherwise an EPT violation always occurs and
-> > current handler can't resolve this if the gpa is in RAM region. Hence,
-> > instruction will keep being executed repeatedly, which causes infinite
-> > EPT violation.
-> > 
-> > Six KVM selftests are timeout due to this issue:
-> >     kvm:access_tracking_perf_test
-> >     kvm:demand_paging_test
-> >     kvm:dirty_log_test
-> >     kvm:dirty_log_perf_test
-> >     kvm:kvm_page_table_test
-> >     kvm:memslot_modification_stress_test
-> > 
-> > The above selftests add a RAM region close to max_gfn, if host has 52
-> > physical bits but doesn't support 5-level EPT, these will trigger infinite
-> > EPT violation when access the RAM region.
-> > 
-> > Since current Intel CPUID doesn't report max guest physical bits like AMD,
-> > introduce kvm_mmu_tdp_maxphyaddr() to limit guest physical bits when tdp is
-> > enabled and report the max guest physical bits which is smaller than host.
-> > 
-> > When guest physical bits is smaller than host, some GPA are illegal from
-> > guest's perspective, but are still legal from hardware's perspective,
-> > which should be trapped to inject #PF. Current KVM already has a parameter
-> > allow_smaller_maxphyaddr to support the case when guest.MAXPHYADDR <
-> > host.MAXPHYADDR, which is disabled by default when EPT is enabled, user
-> > can enable it when loading kvm-intel module. When allow_smaller_maxphyaddr
-> > is enabled and guest accesses an illegal address from guest's perspective,
-> > KVM will utilize EPT violation and emulate the instruction to inject #PF
-> > and determine #PF error code.
-> 
-> There is far too much unnecessary cruft in this changelog.  The entire last
-> paragraph is extraneous information.  Talking in detail about KVM's (flawed)
-> emulation of smaller guest.MAXPHYADDR isn't at all relevant as to whether or not
-> it's correct for KVM to advertise an impossible configuration.
-> 
-> And this is exactly why I dislike the "explain the symptom, then the solution"
-> style for KVM.  The symptoms described above don't actually explain why *KVM* is
-> at fault.
-> 
->   KVM: x86: Don't advertise 52-bit MAXPHYADDR if 5-level TDP is unsupported
-> 
->   Cap the effective guest.MAXPHYADDR that KVM advertises to userspace at
->   48 bits if 5-level TDP isn't supported, as bits 51:49 are consumed by the
->   CPU during a page table walk if and only if 5-level TDP is enabled.  I.e.
->   it's impossible for KVM to actually map GPAs with bits 51:49 set, which
->   results in vCPUs getting stuck on endless EPT violations.
-> 
->   From Intel's SDM:
-> 
->     4-level EPT accesses at most 4 EPT paging-structure entries (an EPT page-
->     walk length of 4) to translate a guest-physical address and uses only
->     bits 47:0 of each guest-physical address. In contrast, 5-level EPT may
->     access up to 5 EPT paging-structure entries (an EPT page-walk length of 5)
->     and uses guest-physical address bits 56:0. [Physical addresses and
->     guest-physical addresses are architecturally limited to 52 bits (e.g.,
->     by paging), so in practice bits 56:52 are zero.]
-> 
->   While it's decidedly odd for a CPU to support a 52-bit MAXPHYADDR but
->   not 5-level EPT, the combination is architecturally legal and such CPUs
->   do exist (and can easily be "created" with nested virtualization).
-> 
->   Note, because EPT capabilities are reported via MSRs, it's impossible
->   for userspace to avoid the funky setup, i.e. advertising a sane MAXPHYADDR
->   is 100% KVM's responsibility.
-> 
-> > Reported-by: Yi Lai <yi1.lai@intel.com>
-> > Signed-off-by: Tao Su <tao1.su@linux.intel.com>
-> > Tested-by: Yi Lai <yi1.lai@intel.com>
-> > Tested-by: Xudong Hao <xudong.hao@intel.com>
-> > ---
-> >  arch/x86/kvm/cpuid.c   | 5 +++--
-> >  arch/x86/kvm/mmu.h     | 1 +
-> >  arch/x86/kvm/mmu/mmu.c | 7 +++++++
-> >  3 files changed, 11 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> > index dda6fc4cfae8..91933ca739ad 100644
-> > --- a/arch/x86/kvm/cpuid.c
-> > +++ b/arch/x86/kvm/cpuid.c
-> > @@ -1212,12 +1212,13 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
-> >  		 *
-> >  		 * If TDP is enabled but an explicit guest MAXPHYADDR is not
-> >  		 * provided, use the raw bare metal MAXPHYADDR as reductions to
-> > -		 * the HPAs do not affect GPAs.
-> > +		 * the HPAs do not affect GPAs, but ensure guest MAXPHYADDR
-> > +		 * doesn't exceed the bits that TDP can translate.
-> >  		 */
-> >  		if (!tdp_enabled)
-> >  			g_phys_as = boot_cpu_data.x86_phys_bits;
-> >  		else if (!g_phys_as)
-> > -			g_phys_as = phys_as;
-> > +			g_phys_as = min(phys_as, kvm_mmu_tdp_maxphyaddr());
-> 
-> I think KVM should be paranoid and cap the advertised MAXPHYADDR even if the CPU
-> advertises guest.MAXPHYADDR.  Advertising a bad guest.MAXPHYADDR is arguably a
-> blatant CPU bug, but being paranoid is cheap in this case.
-> 
-> >  		entry->eax = g_phys_as | (virt_as << 8);
-> >  		entry->ecx &= ~(GENMASK(31, 16) | GENMASK(11, 8));
-> > diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-> > index bb8c86eefac0..1c7d649fcf6b 100644
-> > --- a/arch/x86/kvm/mmu.h
-> > +++ b/arch/x86/kvm/mmu.h
-> > @@ -115,6 +115,7 @@ int kvm_handle_page_fault(struct kvm_vcpu *vcpu, u64 error_code,
-> >  				u64 fault_address, char *insn, int insn_len);
-> >  void __kvm_mmu_refresh_passthrough_bits(struct kvm_vcpu *vcpu,
-> >  					struct kvm_mmu *mmu);
-> > +unsigned int kvm_mmu_tdp_maxphyaddr(void);
-> >  
-> >  int kvm_mmu_load(struct kvm_vcpu *vcpu);
-> >  void kvm_mmu_unload(struct kvm_vcpu *vcpu);
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index c57e181bba21..72634d6b61b2 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -5177,6 +5177,13 @@ void __kvm_mmu_refresh_passthrough_bits(struct kvm_vcpu *vcpu,
-> >  	reset_guest_paging_metadata(vcpu, mmu);
-> >  }
-> >  
-> > +/* guest-physical-address bits limited by TDP */
-> > +unsigned int kvm_mmu_tdp_maxphyaddr(void)
-> > +{
-> > +	return max_tdp_level == 5 ? 57 : 48;
-> 
-> Using "57" is kinda sorta wrong, e.g. the SDM says:
-> 
->   Bits 56:52 of each guest-physical address are necessarily zero because
->   guest-physical addresses are architecturally limited to 52 bits.
-> 
-> Rather than split hairs over something that doesn't matter, I think it makes sense
-> for the CPUID code to consume max_tdp_level directly (I forgot that max_tdp_level
-> is still accurate when tdp_root_level is non-zero).
-
-It is still accurate for now. Only AMD SVM sets tdp_root_level the same as
-max_tdp_level:
-
-	kvm_configure_mmu(npt_enabled, get_npt_level(),
-			  get_npt_level(), PG_LEVEL_1G);
-
-But I wanna doulbe confirm if directly using max_tdp_level is fully
-considered.  In your last proposal, it is:
-
-  u8 kvm_mmu_get_max_tdp_level(void)
-  {
-	return tdp_root_level ? tdp_root_level : max_tdp_level;
-  }
-
-and I think it makes more sense, because EPT setup follows the same
-rule.  If any future architechture sets tdp_root_level smaller than
-max_tdp_level, the issue will happen again.
-
-Thanks,
-Yilun
-
-> 
-> That also avoids confusion with kvm_mmu_max_gfn(), which deliberately uses the
-> *host* MAXPHYADDR.
-> 
-> Making max_tdp_level visible isn't ideal, but tdp_enabled is already visible and
-> used by the CPUID code, so it's not the end of the world.
-> 
-> > +}
-> > +EXPORT_SYMBOL_GPL(kvm_mmu_tdp_maxphyaddr);
-> 
-> This shouldn't be exported, I don't see any reason for vendor code to need access
-> to this helper.  It's essentially a moot point though if we avoid the helper in
-> the first place.
-> 
-> All in all, this?
-> 
-> ---
->  arch/x86/include/asm/kvm_host.h |  1 +
->  arch/x86/kvm/cpuid.c            | 16 ++++++++++++----
->  arch/x86/kvm/mmu/mmu.c          |  2 +-
->  3 files changed, 14 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 7bc1daf68741..29b575b86912 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1932,6 +1932,7 @@ void kvm_fire_mask_notifiers(struct kvm *kvm, unsigned irqchip, unsigned pin,
->  			     bool mask);
->  
->  extern bool tdp_enabled;
-> +extern int max_tdp_level;
->  
->  u64 vcpu_tsc_khz(struct kvm_vcpu *vcpu);
->  
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 294e5bd5f8a0..637a1f388a51 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -1233,12 +1233,20 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
->  		 *
->  		 * If TDP is enabled but an explicit guest MAXPHYADDR is not
->  		 * provided, use the raw bare metal MAXPHYADDR as reductions to
-> -		 * the HPAs do not affect GPAs.
-> +		 * the HPAs do not affect GPAs.  Finally, if TDP is enabled and
-> +		 * doesn't support 5-level TDP, cap guest MAXPHYADDR at 48 bits
-> +		 * as bits 51:49 are used by the CPU if and only if 5-level TDP
-> +		 * is enabled, i.e. KVM can't map such GPAs with 4-level TDP.
->  		 */
-> -		if (!tdp_enabled)
-> +		if (!tdp_enabled) {
->  			g_phys_as = boot_cpu_data.x86_phys_bits;
-> -		else if (!g_phys_as)
-> -			g_phys_as = phys_as;
-> +		} else {
-> +			if (!g_phys_as)
-> +				g_phys_as = phys_as;
-> +
-> +			if (max_tdp_level < 5)
-> +				g_phys_as = min(g_phys_as, 48);
-> +		}
->  
->  		entry->eax = g_phys_as | (virt_as << 8);
->  		entry->ecx &= ~(GENMASK(31, 16) | GENMASK(11, 8));
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 3c844e428684..5036c7eb7dac 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -114,7 +114,7 @@ module_param_named(tdp_mmu, tdp_mmu_enabled, bool, 0444);
->  
->  static int max_huge_page_level __read_mostly;
->  static int tdp_root_level __read_mostly;
-> -static int max_tdp_level __read_mostly;
-> +int max_tdp_level __read_mostly;
->  
->  #define PTE_PREFETCH_NUM		8
->  
-> 
-> base-commit: f2a3fb7234e52f72ff4a38364dbf639cf4c7d6c6
-> -- 
-> 
-> 
+Pj4gQEAgLTE1NTIsNiArMTU1MiwxNCBAQCBzdGF0aWMgRmVhdHVyZURlcCBmZWF0dXJlX2RlcGVu
+ZGVuY2llc1tdID0gew0KPj4gICAgICAgICAgIC5mcm9tID0geyBGRUFUX1ZNWF9TRUNPTkRBUllf
+Q1RMUywgIFZNWF9TRUNPTkRBUllfRVhFQ19FTkFCTEVfVVNFUl9XQUlUX1BBVVNFIH0sDQo+PiAg
+ICAgICAgICAgLnRvID0geyBGRUFUXzdfMF9FQ1gsICAgICAgICAgICAgICAgQ1BVSURfN18wX0VD
+WF9XQUlUUEtHIH0sDQo+PiAgICAgICB9LA0KPj4gKyAgICB7DQo+PiArICAgICAgICAuZnJvbSA9
+IHsgRkVBVF83XzFfRUFYLCAgICAgICAgICAgICBDUFVJRF83XzFfRUFYX0ZSRUQgfSwNCj4+ICsg
+ICAgICAgIC50byA9IHsgRkVBVF83XzFfRUFYLCAgICAgICAgICAgICAgIENQVUlEXzdfMV9FQVhf
+TEtHUyB9LA0KPj4gKyAgICB9LA0KPj4gKyAgICB7DQo+PiArICAgICAgICAuZnJvbSA9IHsgRkVB
+VF83XzFfRUFYLCAgICAgICAgICAgICBDUFVJRF83XzFfRUFYX0ZSRUQgfSwNCj4+ICsgICAgICAg
+IC50byA9IHsgRkVBVF83XzFfRUFYLCAgICAgICAgICAgICAgIENQVUlEXzdfMV9FQVhfV1JNU1JO
+UyB9LA0KPj4gKyAgICB9LA0KPiANCj4gc2luY2UgRlJFRCByZWxpZXMgb24gTEtHUyBhbmQgV1JN
+U1JOUywgaGVyZSBzaG91bGQgYmUgYXMgZm9sbG93Og0KPg0KDQpZb3UncmUgcmlnaHQsIEkgbWVz
+c2VkIGl0IHVwIGluIHRoaXMgdmVyc2lvbi4NClRoYW5rIQ0KICAgIFhpbg0KDQo+ICsgICAgew0K
+PiArICAgICAgICAuZnJvbSA9IHsgRkVBVF83XzFfRUFYLCAgICAgICAgICAgICBDUFVJRF83XzFf
+RUFYX0xLR1MgfSwNCj4gKyAgICAgICAgLnRvID0geyBGRUFUXzdfMV9FQVgsICAgICAgICAgICAg
+ICAgQ1BVSURfN18xX0VBWF9GUkVEIH0sDQo+ICsgICAgfSwNCj4gKyAgICB7DQo+ICsgICAgICAg
+IC5mcm9tID0geyBGRUFUXzdfMV9FQVgsICAgICAgICAgICAgIENQVUlEXzdfMV9FQVhfV1JNU1JO
+UyB9LA0KPiArICAgICAgICAudG8gPSB7IEZFQVRfN18xX0VBWCwgICAgICAgICAgICAgICBDUFVJ
+RF83XzFfRUFYX0ZSRUQgfSwNCj4gKyAgICB9LA0K
 
