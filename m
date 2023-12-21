@@ -1,53 +1,53 @@
-Return-Path: <kvm+bounces-4978-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4979-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB9B881AEA8
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 07:11:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62ED181AEB3
+	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 07:18:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 691362858FB
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 06:11:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1754E2860AE
+	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 06:18:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34232C12B;
-	Thu, 21 Dec 2023 06:11:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64D8EB669;
+	Thu, 21 Dec 2023 06:18:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="n8dw3F0D"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RB5Da6tH"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC87EBE4D
-	for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 06:11:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0094AD5E
+	for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 06:18:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703139080; x=1734675080;
+  t=1703139501; x=1734675501;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=2hA/xn0NG+gy8teTCJK54dPh/Y6wZ10nR1+JUI9HKeE=;
-  b=n8dw3F0DkZDDBIQB5bZhQTUnVL9C9deztL+o/wwq+HDEGJr2XugHb94e
-   LtahrcRHusS43WCr/0X2IBmzU0lXUyWUeL7mXvJrXiQMYWRCQVGtXe8XD
-   y5ws2DMoywZ070BpXULEmAntdpvv0+JNtlK2Pslt3ANUIlLMGmm5J/WkY
-   j85Wlzr/Bs9ER1T2G00tk4CmHFPEzcUaVKZtU0sIngsKDUbkGxtJWTEsH
-   DRev9SoSZ55zF1rwaI9B0ZDqU0VLNzr6gt+6Emmr0Sg+EoAgb5dcAGffc
-   FoP2AELP+iUCnta45UHIDxdDFZ6lgGlN9dNMqat3dnKxQ7jM5lfUewc7M
+  bh=BsYBvZXpNmDxnhkK3p7HJV3JL+6lmwWO8f24hANixYY=;
+  b=RB5Da6tH5gV59ZhWNe1aS4tPNO79pTMDTQTYYKy/+yfxtErpMIsb4CvF
+   fSpTnEuen4ulIvTO1tA57ALcmP51oF0NbQfgKG4Gl/+qWihYfT2ICu1iW
+   aRABeoi4rU1Zlp69scKoZ0aaEhk/spnZtqmIKbJBu+K2l2r2nXfmYqDjI
+   1Kza3E2to0YMltvWJGqi7yefMfe3ArHbd4NlYOLW8t5EkQ5/jH7vwcf7P
+   ZCF4Mv1xVBNyP7Zy7UqlGfq4ymrvn7uZ4Z+Hj2lH2iYbgA15glODyFcS7
+   iY+c74RcdKQBCHnkwb9RuyfEjoDBwM3RugA0/YMQy1nvK2J3Fds6tyqFl
    A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10930"; a="399756792"
+X-IronPort-AV: E=McAfee;i="6600,9927,10930"; a="399757489"
 X-IronPort-AV: E=Sophos;i="6.04,293,1695711600"; 
-   d="scan'208";a="399756792"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2023 22:11:18 -0800
+   d="scan'208";a="399757489"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2023 22:18:20 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10930"; a="1023747379"
+X-IronPort-AV: E=McAfee;i="6600,9927,10930"; a="810867965"
 X-IronPort-AV: E=Sophos;i="6.04,293,1695711600"; 
-   d="scan'208";a="1023747379"
+   d="scan'208";a="810867965"
 Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.12.199]) ([10.93.12.199])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2023 22:11:12 -0800
-Message-ID: <cc568b63-a129-4b23-8ac8-313193ea8126@intel.com>
-Date: Thu, 21 Dec 2023 14:11:09 +0800
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2023 22:18:14 -0800
+Message-ID: <f5f21e2d-b462-4402-b728-46ab4124efb8@intel.com>
+Date: Thu, 21 Dec 2023 14:18:11 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -55,105 +55,170 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 06/70] kvm: Introduce support for memory_attributes
+Subject: Re: [PATCH v3 09/70] physmem: Introduce ram_block_convert_range() for
+ page conversion
 Content-Language: en-US
-To: "Wang, Wei W" <wei.w.wang@intel.com>, Paolo Bonzini
- <pbonzini@redhat.com>, David Hildenbrand <david@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>,
+To: David Hildenbrand <david@redhat.com>,
+ Isaku Yamahata <isaku.yamahata@linux.intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
  Richard Henderson <richard.henderson@linaro.org>,
  Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
  <philmd@linaro.org>, Cornelia Huck <cohuck@redhat.com>,
- =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
  Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- Michael Roth <michael.roth@amd.com>, Sean Christopherson
- <seanjc@google.com>, Claudio Fontana <cfontana@suse.de>,
+ Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
+ kvm@vger.kernel.org, Michael Roth <michael.roth@amd.com>,
+ Sean Christopherson <seanjc@google.com>, Claudio Fontana <cfontana@suse.de>,
  Gerd Hoffmann <kraxel@redhat.com>, Isaku Yamahata
- <isaku.yamahata@gmail.com>, "Qiang, Chenyi" <chenyi.qiang@intel.com>
+ <isaku.yamahata@gmail.com>, Chenyi Qiang <chenyi.qiang@intel.com>,
+ isaku.yamahata@intel.com
 References: <20231115071519.2864957-1-xiaoyao.li@intel.com>
- <20231115071519.2864957-7-xiaoyao.li@intel.com>
- <DS0PR11MB6373D69ABBF4BDF7120438ACDC8EA@DS0PR11MB6373.namprd11.prod.outlook.com>
+ <20231115071519.2864957-10-xiaoyao.li@intel.com>
+ <20231117210304.GC1645850@ls.amr.corp.intel.com>
+ <8f20d060-38fe-49d7-8fea-fe665c3c6c78@intel.com>
+ <0dc03b42-23c3-4e02-868e-289b3fedf6af@redhat.com>
 From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <DS0PR11MB6373D69ABBF4BDF7120438ACDC8EA@DS0PR11MB6373.namprd11.prod.outlook.com>
+In-Reply-To: <0dc03b42-23c3-4e02-868e-289b3fedf6af@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 12/12/2023 9:56 PM, Wang, Wei W wrote:
-> On Wednesday, November 15, 2023 3:14 PM, Xiaoyao Li wrote:
->> Introduce the helper functions to set the attributes of a range of memory to
->> private or shared.
+On 12/8/2023 7:52 PM, David Hildenbrand wrote:
+> On 08.12.23 08:59, Xiaoyao Li wrote:
+>> On 11/18/2023 5:03 AM, Isaku Yamahata wrote:
+>>> On Wed, Nov 15, 2023 at 02:14:18AM -0500,
+>>> Xiaoyao Li <xiaoyao.li@intel.com> wrote:
+>>>
+>>>> It's used for discarding opposite memory after memory conversion, for
+>>>> confidential guest.
+>>>>
+>>>> When page is converted from shared to private, the original shared
+>>>> memory can be discarded via ram_block_discard_range();
+>>>>
+>>>> When page is converted from private to shared, the original private
+>>>> memory is back'ed by guest_memfd. Introduce
+>>>> ram_block_discard_guest_memfd_range() for discarding memory in
+>>>> guest_memfd.
+>>>>
+>>>> Originally-from: Isaku Yamahata <isaku.yamahata@intel.com>
+>>>> Codeveloped-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>>>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>>>> ---
+>>>>    include/exec/cpu-common.h |  2 ++
+>>>>    system/physmem.c          | 50 
+>>>> +++++++++++++++++++++++++++++++++++++++
+>>>>    2 files changed, 52 insertions(+)
+>>>>
+>>>> diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
+>>>> index 41115d891940..de728a18eef2 100644
+>>>> --- a/include/exec/cpu-common.h
+>>>> +++ b/include/exec/cpu-common.h
+>>>> @@ -175,6 +175,8 @@ typedef int (RAMBlockIterFunc)(RAMBlock *rb, 
+>>>> void *opaque);
+>>>>    int qemu_ram_foreach_block(RAMBlockIterFunc func, void *opaque);
+>>>>    int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t 
+>>>> length);
+>>>> +int ram_block_convert_range(RAMBlock *rb, uint64_t start, size_t 
+>>>> length,
+>>>> +                            bool shared_to_private);
+>>>>    #endif
+>>>> diff --git a/system/physmem.c b/system/physmem.c
+>>>> index ddfecddefcd6..cd6008fa09ad 100644
+>>>> --- a/system/physmem.c
+>>>> +++ b/system/physmem.c
+>>>> @@ -3641,6 +3641,29 @@ err:
+>>>>        return ret;
+>>>>    }
+>>>> +static int ram_block_discard_guest_memfd_range(RAMBlock *rb, 
+>>>> uint64_t start,
+>>>> +                                               size_t length)
+>>>> +{
+>>>> +    int ret = -1;
+>>>> +
+>>>> +#ifdef CONFIG_FALLOCATE_PUNCH_HOLE
+>>>> +    ret = fallocate(rb->guest_memfd, FALLOC_FL_PUNCH_HOLE | 
+>>>> FALLOC_FL_KEEP_SIZE,
+>>>> +                    start, length);
+>>>> +
+>>>> +    if (ret) {
+>>>> +        ret = -errno;
+>>>> +        error_report("%s: Failed to fallocate %s:%" PRIx64 " +%zx 
+>>>> (%d)",
+>>>> +                     __func__, rb->idstr, start, length, ret);
+>>>> +    }
+>>>> +#else
+>>>> +    ret = -ENOSYS;
+>>>> +    error_report("%s: fallocate not available %s:%" PRIx64 " +%zx 
+>>>> (%d)",
+>>>> +                 __func__, rb->idstr, start, length, ret);
+>>>> +#endif
+>>>> +
+>>>> +    return ret;
+>>>> +}
+>>>> +
+>>>>    bool ramblock_is_pmem(RAMBlock *rb)
+>>>>    {
+>>>>        return rb->flags & RAM_PMEM;
+>>>> @@ -3828,3 +3851,30 @@ bool ram_block_discard_is_required(void)
+>>>>        return qatomic_read(&ram_block_discard_required_cnt) ||
+>>>>               
+>>>> qatomic_read(&ram_block_coordinated_discard_required_cnt);
+>>>>    }
+>>>> +
+>>>> +int ram_block_convert_range(RAMBlock *rb, uint64_t start, size_t 
+>>>> length,
+>>>> +                            bool shared_to_private)
+>>>> +{
+>>>> +    if (!rb || rb->guest_memfd < 0) {
+>>>> +        return -1;
+>>>> +    }
+>>>> +
+>>>> +    if (!QEMU_PTR_IS_ALIGNED(start, qemu_host_page_size) ||
+>>>> +        !QEMU_PTR_IS_ALIGNED(length, qemu_host_page_size)) {
+>>>> +        return -1;
+>>>> +    }
+>>>> +
+>>>> +    if (!length) {
+>>>> +        return -1;
+>>>> +    }
+>>>> +
+>>>> +    if (start + length > rb->max_length) {
+>>>> +        return -1;
+>>>> +    }
+>>>> +
+>>>> +    if (shared_to_private) {
+>>>> +        return ram_block_discard_range(rb, start, length);
+>>>> +    } else {
+>>>> +        return ram_block_discard_guest_memfd_range(rb, start, length);
+>>>> +    }
+>>>> +}
+>>>
+>>> Originally this function issued KVM_SET_MEMORY_ATTRIBUTES, the 
+>>> function name
+>>> mad sense. But now it doesn't, and it issues only punch hole. We 
+>>> should rename
+>>> it to represent what it actually does. discard_range?
 >>
->> This is necessary to notify KVM the private/shared attribute of each gpa range.
->> KVM needs the information to decide the GPA needs to be mapped at hva-
->> based shared memory or guest_memfd based private memory.
+>> ram_block_discard_range() already exists for non-guest-memfd memory 
+>> discard.
 >>
->> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
->> ---
->>   accel/kvm/kvm-all.c  | 42 ++++++++++++++++++++++++++++++++++++++++++
->>   include/sysemu/kvm.h |  3 +++
->>   2 files changed, 45 insertions(+)
+>> I cannot come up with a proper name. e.g.,
+>> ram_block_discard_opposite_range() while *opposite* seems unclear.
 >>
->> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c index
->> 69afeb47c9c0..76e2404d54d2 100644
->> --- a/accel/kvm/kvm-all.c
->> +++ b/accel/kvm/kvm-all.c
->> @@ -102,6 +102,7 @@ bool kvm_has_guest_debug;  static int kvm_sstep_flags;
->> static bool kvm_immediate_exit;  static bool kvm_guest_memfd_supported;
->> +static uint64_t kvm_supported_memory_attributes;
->>   static hwaddr kvm_max_slot_size = ~0;
->>
->>   static const KVMCapabilityInfo kvm_required_capabilites[] = { @@ -1305,6
->> +1306,44 @@ void kvm_set_max_memslot_size(hwaddr max_slot_size)
->>       kvm_max_slot_size = max_slot_size;
->>   }
->>
->> +static int kvm_set_memory_attributes(hwaddr start, hwaddr size,
->> +uint64_t attr) {
->> +    struct kvm_memory_attributes attrs;
->> +    int r;
->> +
->> +    attrs.attributes = attr;
->> +    attrs.address = start;
->> +    attrs.size = size;
->> +    attrs.flags = 0;
->> +
->> +    r = kvm_vm_ioctl(kvm_state, KVM_SET_MEMORY_ATTRIBUTES, &attrs);
->> +    if (r) {
->> +        warn_report("%s: failed to set memory (0x%lx+%#zx) with attr 0x%lx
->> error '%s'",
->> +                     __func__, start, size, attr, strerror(errno));
->> +    }
->> +    return r;
->> +}
->> +
->> +int kvm_set_memory_attributes_private(hwaddr start, hwaddr size) {
->> +    if (!(kvm_supported_memory_attributes &
->> KVM_MEMORY_ATTRIBUTE_PRIVATE)) {
->> +        error_report("KVM doesn't support PRIVATE memory attribute\n");
->> +        return -EINVAL;
->> +    }
->> +
->> +    return kvm_set_memory_attributes(start, size,
->> +KVM_MEMORY_ATTRIBUTE_PRIVATE); }
->> +
->> +int kvm_set_memory_attributes_shared(hwaddr start, hwaddr size) {
->> +    if (!(kvm_supported_memory_attributes &
->> KVM_MEMORY_ATTRIBUTE_PRIVATE)) {
->> +        error_report("KVM doesn't support PRIVATE memory attribute\n");
->> +        return -EINVAL;
->> +    }
+>> Do you have any better idea?
 > 
-> Duplicate code in kvm_set_memory_attributes_shared/private.
-> Why not move the check into kvm_set_memory_attributes?
+> Having some indication that this is about "guest_memfd" back and forth 
+> switching/conversion will make sense. But I'm also not able to come up 
+> with a better name.
+> 
+> Maybe have two functions:
+> 
+> ram_block_activate_guest_memfd_range
+> ram_block_deactivate_guest_memfd_range
+> 
 
-Because it's not easy to put the check into there.
-
-Both setting and clearing one bit require the capability check. If 
-moving the check into kvm_set_memory_attributes(), the check of 
-KVM_MEMORY_ATTRIBUTE_PRIVATE will have to become unconditionally, which 
-is not aligned to the function name because the name is not restricted 
-to shared/private attribute only.
+finally, I decide to drop this function and expose 
+ram_block_discard_guest_memfd_range() instead. So caller can call the 
+ram_block_discard_*() on its own.
 
