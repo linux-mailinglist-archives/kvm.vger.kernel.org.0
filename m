@@ -1,202 +1,89 @@
-Return-Path: <kvm+bounces-5013-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5017-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5581C81B254
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 10:30:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11E2281B2E4
+	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 10:51:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B31D2B21291
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 09:30:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4BF71F22432
+	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 09:51:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B52C44BAAF;
-	Thu, 21 Dec 2023 09:25:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e+a1SPK9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54CCF4B5B4;
+	Thu, 21 Dec 2023 09:51:24 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC6254B5C9;
-	Thu, 21 Dec 2023 09:25:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CC26C433C7;
-	Thu, 21 Dec 2023 09:25:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703150706;
-	bh=AYGf91U8T/JqQeT9S7bNrsfYGOsBnl13+m+5Z2NMRpE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=e+a1SPK9XQk98t/2P89QLYkpRHBpJS7KY21oexMqyE4ufnNnH1jA60n99byaXUQrG
-	 Whze4kMbMPwcMYcyZxxZthpvZeB86k4WI2aoo5qTNeHpb0hiPYhTvStJ316yvjfq6j
-	 dtlS3klVPy7VJSds3XBKmkSvuP/7RE7bHXFEPyxIYjUUoiWjQ+MzJJ2PQGgJxFGnDy
-	 JglUtTKXGsfwyIxsYSBqcJHYZBf1neH1h3xIwVrp65z5zJTs3+eRYQTEdLTc+zL4H0
-	 Oh8HDT/FEIfnZbhUeAp76Mhb5ygZSOHs3myvlqSoNxw9Mv3cIVXXSMpG/TFhnfbsqA
-	 MM/3QxvCERuTg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rGFIc-005wSL-VG;
-	Thu, 21 Dec 2023 09:25:03 +0000
-Date: Thu, 21 Dec 2023 09:25:02 +0000
-Message-ID: <86plyzaowh.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Haibo Xu <xiaobo55x@gmail.com>
-Cc: Haibo Xu <haibo1.xu@intel.com>,
-	ajones@ventanamicro.com,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Anup Patel <anup@brainfault.org>,
-	Atish Patra <atishp@atishpatra.org>,
-	Guo Ren <guoren@kernel.org>,
-	Mayuresh Chitale <mchitale@ventanamicro.com>,
-	Greentime Hu <greentime.hu@sifive.com>,
-	wchen <waylingii@gmail.com>,
-	Conor Dooley <conor.dooley@microchip.com>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Minda Chen <minda.chen@starfivetech.com>,
-	Samuel Holland <samuel@sholland.org>,
-	Jisheng Zhang <jszhang@kernel.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Peter Xu <peterx@redhat.com>,
-	Like Xu <likexu@tencent.com>,
-	Vipin Sharma <vipinsh@google.com>,
-	Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>,
-	Aaron Lewis <aaronlewis@google.com>,
-	Thomas Huth <thuth@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH v4 11/11] KVM: selftests: Enable tunning of err_margin_us in arch timer test
-In-Reply-To: <CAJve8o=nTsAwwgSib4vOLXjOWSMV2+J+BFsUZ57OdAK7eW8q8A@mail.gmail.com>
-References: <cover.1702371136.git.haibo1.xu@intel.com>
-	<0343a9e4bfa8011fbb6bca0286cee7eab1f17d5d.1702371136.git.haibo1.xu@intel.com>
-	<8734vy832j.wl-maz@kernel.org>
-	<CAJve8onc0WN5g98aOVBmJx15wFBAqfBKJ+ufoLY+oqYyVL+=3A@mail.gmail.com>
-	<f98879dc24f948f7a8a7b5374a32bc04@kernel.org>
-	<CAJve8ona7g=LxW1YeRB_FqGodF973H=A3b2m8054gmzK=Z7_ww@mail.gmail.com>
-	<87zfy5t1qt.wl-maz@kernel.org>
-	<CAJve8o=nTsAwwgSib4vOLXjOWSMV2+J+BFsUZ57OdAK7eW8q8A@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Received: from zg8tndyumtaxlji0oc4xnzya.icoremail.net (zg8tndyumtaxlji0oc4xnzya.icoremail.net [46.101.248.176])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39EC5481BA
+	for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 09:51:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
+Received: from localhost.localdomain (unknown [10.12.130.31])
+	by app1 (Coremail) with SMTP id TAJkCgA3tvsxCoRlVowCAA--.17982S4;
+	Thu, 21 Dec 2023 17:49:37 +0800 (CST)
+From: Chao Du <duchao@eswincomputing.com>
+To: kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	anup@brainfault.org,
+	atishp@atishpatra.org,
+	dbarboza@ventanamicro.com,
+	paul.walmsley@sifive.com,
+	palmer@dabbelt.com,
+	aou@eecs.berkeley.edu
+Subject: [RFC PATCH 0/3] RISC-V: KVM: Guest Debug Support
+Date: Thu, 21 Dec 2023 09:49:59 +0000
+Message-Id: <20231221095002.7404-1-duchao@eswincomputing.com>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID:TAJkCgA3tvsxCoRlVowCAA--.17982S4
+X-Coremail-Antispam: 1UD129KBjvdXoWrZF15uF1ruw43Xr18KryUJrb_yoWfAFb_Cr
+	WfJ3yrJ397XFW0gFZ7C3Z3GFWDGFWrG3W2yr1I9F1UGr43WrW7Gw4kXr15Zr1UAr45Za4k
+	XFn5ZryxZ3429jkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb7xYjsxI4VWkCwAYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I
+	6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM2
+	8CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0
+	cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I
+	8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI
+	64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8Jw
+	Am72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lc2xSY4AK6svPMxAIw28IcxkI
+	7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxV
+	Cjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY
+	6xIIjxv20xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1lIxAIcV
+	CF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
+	c7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07jUfHUUUUUU=
+X-CM-SenderInfo: xgxfxt3r6h245lqf0zpsxwx03jof0z/
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: xiaobo55x@gmail.com, haibo1.xu@intel.com, ajones@ventanamicro.com, paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, pbonzini@redhat.com, shuah@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, anup@brainfault.org, atishp@atishpatra.org, guoren@kernel.org, mchitale@ventanamicro.com, greentime.hu@sifive.com, waylingii@gmail.com, conor.dooley@microchip.com, heiko@sntech.de, minda.chen@starfivetech.com, samuel@sholland.org, jszhang@kernel.org, seanjc@google.com, peterx@redhat.com, likexu@tencent.com, vipinsh@google.com, maciej.wieczor-retman@intel.com, aaronlewis@google.com, thuth@redhat.com, linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 21 Dec 2023 02:58:40 +0000,
-Haibo Xu <xiaobo55x@gmail.com> wrote:
->=20
-> On Wed, Dec 20, 2023 at 9:58=E2=80=AFPM Marc Zyngier <maz@kernel.org> wro=
-te:
-> >
-> > On Wed, 20 Dec 2023 13:51:24 +0000,
-> > Haibo Xu <xiaobo55x@gmail.com> wrote:
-> > >
-> > > On Wed, Dec 20, 2023 at 5:00=E2=80=AFPM Marc Zyngier <maz@kernel.org>=
- wrote:
-> > > >
-> > > > On 2023-12-20 06:50, Haibo Xu wrote:
-> > > > > On Wed, Dec 20, 2023 at 2:22=E2=80=AFAM Marc Zyngier <maz@kernel.=
-org> wrote:
-> > > > >>
-> > > > >> On Tue, 12 Dec 2023 09:31:20 +0000,
-> > > > >> Haibo Xu <haibo1.xu@intel.com> wrote:
-> > > > >> > diff --git a/tools/testing/selftests/kvm/include/timer_test.h =
-b/tools/testing/selftests/kvm/include/timer_test.h
-> > > > >> > index 968257b893a7..b1d405e7157d 100644
-> > > > >> > --- a/tools/testing/selftests/kvm/include/timer_test.h
-> > > > >> > +++ b/tools/testing/selftests/kvm/include/timer_test.h
-> > > > >> > @@ -22,6 +22,7 @@ struct test_args {
-> > > > >> >       int nr_iter;
-> > > > >> >       int timer_period_ms;
-> > > > >> >       int migration_freq_ms;
-> > > > >> > +     int timer_err_margin_us;
-> > > > >>
-> > > > >> ... except that you are storing it as a signed value. Some consi=
-stency
-> > > > >> wouldn't hurt, really, and would avoid issues when passing large
-> > > > >> values.
-> > > > >>
-> > > > >
-> > > > > Yes, it's more proper to use an unsigned int for the non-negative=
- error
-> > > > > margin.
-> > > > > Storing as signed here is just to keep the type consistent with t=
-hat
-> > > > > of timer_period_ms
-> > > > > since there will be '+' operation in other places.
-> > > > >
-> > > > >         tools/testing/selftests/kvm/aarch64/arch_timer.c
-> > > > >         /* Setup a timeout for the interrupt to arrive */
-> > > > >          udelay(msecs_to_usecs(test_args.timer_period_ms) +
-> > > > >              test_args.timer_err_margin_us);
-> > > >
-> > > > But that's exactly why using a signed quantity is wrong.
-> > > > What does it mean to have a huge *negative* margin?
-> > > >
-> > >
-> > > Hi Marc,
-> > >
-> > > I agree that negative values are meaningless for the margin.
-> > > If I understand correctly, the negative margin should be filtered by
-> > > assertion in atoi_non_negative().
-> >
-> > No. Please.
-> >
-> > atoi_non_negative() returns a uint32_t, which is what it should do.
-> > The bug is squarely in the use of an 'int' to store such value, and it
-> > is the *storage* that turns a positive value into a negative one.
-> >
->=20
-> Thanks for the detailed info!
->=20
-> May I understand that your concern is mainly for a platform with
-> 64bit int type, which may trigger the positive to negative convert?
+This series implements KVM Guest Debug on RISC-V. Currently, we can
+debug RISC-V KVM guest from the host side, with software breakpoints.
 
-No. It specifically applies to architectures with a 32bit int type,
-which is... *EVERYTHING*. Here's a basic example:
+A brief test was done on QEMU RISC-V hypervisor emulator.
 
-<quote>
-#include <stdio.h>
+A TODO list which will be added later:
+1. HW breakpoints support
+2. Test cases
 
-int main(int argc, char *argv[])
-{
-	int x =3D 1U << 31;
+This series is based on Linux 6.7-rc6 and is also available at:
+https://github.com/Du-Chao/linux/tree/riscv_gd_sw
 
-	printf("%d (%d)\n", x, sizeof(x));
-	return 0;
-}
-</quote>
+The matched QEMU is available at:
+https://github.com/Du-Chao/qemu/tree/riscv_gd_sw
 
-which returns "-2147483648 (4)" on any platform.
+Chao Du (3):
+  RISC-V: KVM: Enable the KVM_CAP_SET_GUEST_DEBUG capability
+  RISC-V: KVM: Implement kvm_arch_vcpu_ioctl_set_guest_debug()
+  RISC-V: KVM: Handle breakpoint exits for VCPU
 
-This really is basic C, and I am very worried that you don't see the
-issue. I strongly suggest that you go and read about the C type system
-before touching this code.
+ arch/riscv/include/uapi/asm/kvm.h |  1 +
+ arch/riscv/kvm/vcpu.c             | 15 +++++++++++++--
+ arch/riscv/kvm/vcpu_exit.c        |  4 ++++
+ arch/riscv/kvm/vm.c               |  1 +
+ 4 files changed, 19 insertions(+), 2 deletions(-)
 
-	M.
+--
+2.17.1
 
---=20
-Without deviation from the norm, progress is not possible.
 
