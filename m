@@ -1,91 +1,123 @@
-Return-Path: <kvm+bounces-5102-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5103-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE96481C059
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 22:40:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36E5481C1F0
+	for <lists+kvm@lfdr.de>; Fri, 22 Dec 2023 00:25:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D7D51C20B72
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 21:40:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E75CD28AD73
+	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 23:25:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1E6677F16;
-	Thu, 21 Dec 2023 21:40:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C32687B3BF;
+	Thu, 21 Dec 2023 23:23:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NYnt3IW5"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rIee9BHF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7FF577653
-	for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 21:40:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC9517B3AD
+	for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 23:23:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1d3fde109f2so11525ad.1
-        for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 13:40:07 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--shakeelb.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dbd45923230so1749749276.1
+        for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 15:23:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1703194807; x=1703799607; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UB0ZY+nBxKTPkORzoQ6ZJO9teY19uCFlT+Q333mOXAc=;
-        b=NYnt3IW5hHRkfD8SaAK3BwwkgI2mbklrFuDHqiUyR9iTBK47S4nfVjo9F4hMiaBeZ3
-         oM80PLh6pvkTDe/KqWfm/H+XpjaS9DhVJx2WGQ70uHfIqlG7Y4N+4wEhpr4rPpRm5Twj
-         wZTMagxZ+YtIwGQXqXFMH3HP0AY97SHFYWsQUi7nISit4c/HXnwZV7LmM4G80Sg6BIQi
-         zpNHCuk6+p4Xa7GBxNOJqVADfNx5Z6TGi4Nk+U5JzDtU2Xt20juzaSBnxCUsQLpHB5en
-         EomjeeWV7tQ5hSDqdi+8k5BoXWXFJ4R1E7U7dsPK2XB/l9MWA6nmQrRCyCZpV4nEWyAc
-         Uweg==
+        d=google.com; s=20230601; t=1703201025; x=1703805825; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=cU9mOyLPoF6ZxNM7jnDLVtHU9dKeo3lsrx7E6D/L6sI=;
+        b=rIee9BHFH3w3Z9YC28rgKtx4jr66VuXGwN+IQzUx04pSGohOdVOf65JlJd+b4wY7CT
+         mb2d02bNRGYDyjAmCf35ji7Qo5w4J6W+uR4MoHcrA3sFVi28tEvIqu3o/tuL/eMBSSlx
+         TaWrPrRdCXBVUHD5I6urFnQzzUSZvivuA/lTJVfOncmM1YtQxtJrw1vAKIpLQOPwujKu
+         LYs2vQJkbg8cK+SfRZsV9vxpYa8hXE+XQSj1cYSgol5uj8GAPrT59Wdv9tQezatc4EEF
+         xdCeqO6owtLWCZn/5FT8/qdhBI8a2hex6djOc5zW5mtvTPyd1qdJ0symVw27M5UT+I7u
+         EWng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703194807; x=1703799607;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UB0ZY+nBxKTPkORzoQ6ZJO9teY19uCFlT+Q333mOXAc=;
-        b=EQf/Up5mWaxrtDCTzlAHv26AndC+FntVvDqJl2U7VgcUVgxevkS2qY1wQDi0P+zaTW
-         tZ2S3ker75qC5/0Z5qGAWZzNpbvOKn2NuvJbzcoDEMfUby17kvSAckST+maZ8rJwJMKS
-         ZkgSrgDgdNHwc5YGyIvQUpPUZH8YIGzGQOnh/LxpcFM93lS4O7U3uXO91q8hjNwnpFEj
-         TJTDAf//vyvSpOK18wQf+2k98on6qwnVt4hfjcW2cLE1/YJED0h4h0m9QIJ3y+zrsHxp
-         j2wr1zc0vLs5a9FttrrkcNj0Df1CUFkTejVhIBbwNRWnHQcqz0DfQCx7OLyhgVzlgJsq
-         CD/w==
-X-Gm-Message-State: AOJu0Yyu0myeUTgckLROk52XZUNmXjfiOMRXGLTHyFZ1ffN5qMc0TwqK
-	Aojs+n174qYUtW157dXZn6LwNtX7mZ2D4ekI0EhkPp95YHO+
-X-Google-Smtp-Source: AGHT+IF80tZmsHPhE6wyckD/RAEBLEIynH1gwHeElMtN5TBkrj7syIFvBO/ajk9EvH4/NsPHbKo1N7hcl3mhL8zriwA=
-X-Received: by 2002:a17:902:e84b:b0:1d3:a238:77ad with SMTP id
- t11-20020a170902e84b00b001d3a23877admr40283plg.18.1703194806799; Thu, 21 Dec
- 2023 13:40:06 -0800 (PST)
+        d=1e100.net; s=20230601; t=1703201025; x=1703805825;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cU9mOyLPoF6ZxNM7jnDLVtHU9dKeo3lsrx7E6D/L6sI=;
+        b=grL1WBBrkpOi3SBdVcZWV88EdJ8UnEgz/8OyvrNQCgU+VUuysG7kKVDnQY/zt/+8Ru
+         1AmUKpdCiQajZKxIWFBKnWCauL2gWHPUkdxa3xOlCO+bzjMQSo0YOksZ/YAJMOyuhsb4
+         N0dd0YwOxu9VDgLMXp7m9RN0EDykR4dZ7b8FSV02Nw+5iSder0eYPKjtDcAJOGyXyQcX
+         hKV2PXabk09o3wi3zooOmKIlrerbv66k7Wdy3GEZjBD0QuTfbDawa6XaKT2gqDH27QtT
+         jiRjHbwCEODs8fYZgXCQwJ/ACHsIjleiUdqmYO9vZbQLoUWalei52UNLgk23o3rleuV7
+         rOqw==
+X-Gm-Message-State: AOJu0YwuZDhv6+hHytg/6NeNboHj9UdYshf57xJMne8BQI0Lmo4DensK
+	QMqLgWLFbUyT0uDLRjXON0nmBZxYwcEiTW1PiI64
+X-Google-Smtp-Source: AGHT+IHWiT1s/e6el8Gbfa2jmdYfbMdaJTd+pS4T1tXJHPKsVM+5WAmrvhPrUoUOQ5Wk4tJyK70wKIQ5Qx+mgg==
+X-Received: from shakeelb.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:262e])
+ (user=shakeelb job=sendgmr) by 2002:a25:bcc2:0:b0:db5:47c1:e82d with SMTP id
+ l2-20020a25bcc2000000b00db547c1e82dmr189052ybm.6.1703201025720; Thu, 21 Dec
+ 2023 15:23:45 -0800 (PST)
+Date: Thu, 21 Dec 2023 23:23:43 +0000
+In-Reply-To: <20231220214505.2303297-3-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20231220214505.2303297-1-almasrymina@google.com> <20231220214505.2303297-2-almasrymina@google.com>
-In-Reply-To: <20231220214505.2303297-2-almasrymina@google.com>
+Mime-Version: 1.0
+References: <20231220214505.2303297-1-almasrymina@google.com> <20231220214505.2303297-3-almasrymina@google.com>
+Message-ID: <20231221232343.qogdsoavt7z45dfc@google.com>
+Subject: Re: [PATCH net-next v3 2/3] net: introduce abstraction for network memory
 From: Shakeel Butt <shakeelb@google.com>
-Date: Thu, 21 Dec 2023 13:39:55 -0800
-Message-ID: <CALvZod6bwWBuRZ8BCjUiyec2wR6hBSwrdcEzEM6d+9UdmCQBGA@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 1/3] vsock/virtio: use skb_frag_*() helpers
 To: Mina Almasry <almasrymina@google.com>
 Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kvm@vger.kernel.org, 
 	virtualization@lists.linux.dev, "David S. Miller" <davem@davemloft.net>, 
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
 	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, 
 	David Howells <dhowells@redhat.com>, Jason Gunthorpe <jgg@nvidia.com>, 
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Yunsheng Lin <linyunsheng@huawei.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	"Christian =?utf-8?B?S8O2bmln?=" <christian.koenig@amd.com>, Yunsheng Lin <linyunsheng@huawei.com>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Dec 20, 2023 at 1:45=E2=80=AFPM Mina Almasry <almasrymina@google.co=
-m> wrote:
->
-> Minor fix for virtio: code wanting to access the fields inside an skb
-> frag should use the skb_frag_*() helpers, instead of accessing the
-> fields directly. This allows for extensions where the underlying
-> memory is not a page.
->
+On Wed, Dec 20, 2023 at 01:45:01PM -0800, Mina Almasry wrote:
+> Add the netmem_ref type, an abstraction for network memory.
+> 
+> To add support for new memory types to the net stack, we must first
+> abstract the current memory type. Currently parts of the net stack
+> use struct page directly:
+> 
+> - page_pool
+> - drivers
+> - skb_frag_t
+> 
+> Originally the plan was to reuse struct page* for the new memory types,
+> and to set the LSB on the page* to indicate it's not really a page.
+> However, for compiler type checking we need to introduce a new type.
+> 
+> netmem_ref is introduced to abstract the underlying memory type. Currently
+> it's a no-op abstraction that is always a struct page underneath. In
+> parallel there is an undergoing effort to add support for devmem to the
+> net stack:
+> 
+> https://lore.kernel.org/netdev/20231208005250.2910004-1-almasrymina@google.com/
+> 
 > Signed-off-by: Mina Almasry <almasrymina@google.com>
+> 
+> ---
+> 
+> v3:
+> 
+> - Modify struct netmem from a union of struct page + new types to an opaque
+>   netmem_ref type.  I went with:
+> 
+>   +typedef void *__bitwise netmem_ref;
+> 
+>   rather than this that Jakub recommended:
+> 
+>   +typedef unsigned long __bitwise netmem_ref;
+> 
+>   Because with the latter the compiler issues warnings to cast NULL to
+>   netmem_ref. I hope that's ok.
+> 
 
-Reviewed-by: Shakeel Butt <shakeelb@google.com>
+Can you share what the warning was? You might just need __force
+attribute. However you might need this __force a lot. I wonder if you
+can just follow struct encoded_page example verbatim here.
+
 
