@@ -1,64 +1,64 @@
-Return-Path: <kvm+bounces-5022-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5021-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E650381B3C4
+	by mail.lfdr.de (Postfix) with ESMTPS id 5094181B3C3
 	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 11:38:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 15E8A1C23C90
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 10:38:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 828AE1C247F6
+	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 10:38:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E7556A02C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EF676979B;
 	Thu, 21 Dec 2023 10:38:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Gz6b4Duq"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yXAYJR9U"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD0846978F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD2C069799
 	for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 10:38:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-40d31116dbeso7068635e9.3
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3368abe1093so261825f8f.2
         for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 02:38:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google; t=1703155100; x=1703759900; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=RdsiaowAjsV2VhJV7X+uJO6SS3PjKGOvNs318qpxEnc=;
-        b=Gz6b4Duq6sxFGOt4GWtOcBdaYhDMXJKSm8RH/9Aj4I2lSRtTOnIZf7GwPdq3cuLFeu
-         VIxqb11337vVFZMYP3WRAngAhZZCQmU5V7apzKDNq9V0ZzE747mPrDn+jmuOXMEYaB+/
-         /lfcPws/PShudgW7PlheyM8OoC7Fx6rI/LiyEy9WvzfpqmLbywNDLU77wPda9ELuPEi+
-         04sH6OX6pCzTjrlmRNM1N2eocnyo8rL90Bs/IhqRSvnGjfSx0ouV/Og4zmQyGNKgsSLL
-         T3IL2f7xDMEc0W/q9GRIbMl3fkyrMU6Ghv5OO6Am1lIAZh0ZqISyChQdcBNlKloZh4rv
-         updA==
+        bh=qzxoAeOdiga+52AiTCmsWe8ywFNoeoZ5ZVuxsnjrTLU=;
+        b=yXAYJR9Uuq5RwsJOvyVimbLomQmGMGxklrr2yws3pQvQ6pSWFhKeDZRKCNMEaODTKc
+         yu4ogDrDyupTvjjixm/N4xnd4giY2K3o2766+pm+fnIGSnjmdNXnpZLfbBwdsnw0hILH
+         T67Qin1/13QDigt15XAUXq6V1EcqduaPEiYj2AvxDpomGkB7M9RGrsHflsv365c8niBl
+         po6/q0y5BsSBDAtdsMIkFLzfiDOxytzY8B7TW1wk7LjW71bFDXe2KMVwku2Qb/Q75RYJ
+         aNAfiuHzq6OfPxSrdQfSmEH6R8LwBvOEMbhT3IYIe1shIUIMtu46PxaIjYjOeGS2RQdL
+         IDQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1703155100; x=1703759900;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=RdsiaowAjsV2VhJV7X+uJO6SS3PjKGOvNs318qpxEnc=;
-        b=DVLAqpYryD4/4rRI3gFa2eXkSExbaxCH0KO7bKPMzSCP/OOTsCLCorqFAad7ecHmIJ
-         7y4HQ3hv2TT/gQYAtIYQogl5gKWOjlidpgpUqGW+Vn6PKly+S0UKfAa8S/tnwFmKUzmq
-         JlO5XX8QGG6xX+Acy7VPS9jYM4P66Dyk3BIuQt6HAz/1xXNs3QI0Mk6UJWLrzwQSF374
-         294Gm8MZrPW7RCrXa/gq6dkuzjyXfR3D2fyHX/xI0yAuDSK6/w8VkqOQ42Mu//HICBBC
-         SfIQqTkXY5TyPp5sBsmWenJXXoXoYc9Je62N7zjB1fq75w9YJ7Yvf4E4xqfFpFTngXPW
-         8rAQ==
-X-Gm-Message-State: AOJu0Ywn8TIPuPX6W0QzXukCzzE2smbzvcUGXQHjKsmUY2bWJTPt3SQ2
-	wI6Aa9+2MSqwX3IrcS4D59B5vw==
-X-Google-Smtp-Source: AGHT+IGNQvXI1TaGTd5rITt67gBKkdTgtOk28s10TrQMNaMkVZnKYF8g1lcS1QVjmQIWgMwv/uml1w==
-X-Received: by 2002:a05:600c:3108:b0:40c:29fb:2c4b with SMTP id g8-20020a05600c310800b0040c29fb2c4bmr624080wmo.148.1703155099929;
-        Thu, 21 Dec 2023 02:38:19 -0800 (PST)
+        bh=qzxoAeOdiga+52AiTCmsWe8ywFNoeoZ5ZVuxsnjrTLU=;
+        b=lblMIlPDfZOfompj3kmvKfAIjeh29XbMIc7i/2mAFSNTH7Q1L9FYM0exXNqvEfRr9O
+         TB3mVxF3dZvulR+3L3T4WEZ/LV2FUXoB2D1m2rVwlejH7Hg3WntFW6KDMmSEkGtez3K3
+         Iq/B/8B+EaOmLQLr5dqgscxmxREX9krl3K5iWZ9q+WExdRrJpE5c7yg5Tr5ClCPubCX3
+         zZYxPq3gwu6KQRfJQff8jByZ93XLGvFxDHm+ZScSU3CdVyGYFgDpFUrXlAMxRqcZvast
+         Jq40/AAtBBgpqoLIE9Zbpco79XoqlS14Gd99YtKDCx1nIzPaiJyvpnWdMbd/h4LF3Pym
+         6vbQ==
+X-Gm-Message-State: AOJu0YzGmsHhn+xcq+C/9YPhzJUb1XOEysE6yBZyb556SewanQKXL1tq
+	qEEaX5gr0IwiiSm+34NuhDfJBg==
+X-Google-Smtp-Source: AGHT+IGEPtr1hXboAnkM1kRksQtInSnZ2jI35ee+E47oqVqOC7jqs/eRFR/CZjbl0DDaumndGsscIA==
+X-Received: by 2002:adf:e3ce:0:b0:336:751a:70cc with SMTP id k14-20020adfe3ce000000b00336751a70ccmr630653wrm.18.1703155100131;
+        Thu, 21 Dec 2023 02:38:20 -0800 (PST)
 Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id c18-20020a05600c0a5200b0040c6d559490sm2887676wmq.3.2023.12.21.02.38.19
+        by smtp.gmail.com with ESMTPSA id v16-20020adf8b50000000b003366f4406f6sm1699383wra.97.2023.12.21.02.38.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Thu, 21 Dec 2023 02:38:19 -0800 (PST)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 0FE0E5F8AF;
+	by draig.lan (Postfix) with ESMTP id 25CA15F8C3;
 	Thu, 21 Dec 2023 10:38:19 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
@@ -105,9 +105,9 @@ Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
 	=?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
 	Mahmoud Mandour <ma.mandourr@gmail.com>,
 	Bin Meng <bin.meng@windriver.com>
-Subject: [PATCH 01/40] tests/avocado: Add a test for a little-endian microblaze machine
-Date: Thu, 21 Dec 2023 10:37:39 +0000
-Message-Id: <20231221103818.1633766-2-alex.bennee@linaro.org>
+Subject: [PATCH 02/40] tests/avocado: use snapshot=on in kvm_xen_guest
+Date: Thu, 21 Dec 2023 10:37:40 +0000
+Message-Id: <20231221103818.1633766-3-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20231221103818.1633766-1-alex.bennee@linaro.org>
 References: <20231221103818.1633766-1-alex.bennee@linaro.org>
@@ -120,61 +120,27 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Thomas Huth <thuth@redhat.com>
+This ensures the rootfs is never permanently changed as we don't need
+persistence between tests anyway.
 
-We've already got a test for a big endian microblaze machine, but so
-far we lack one for a little endian machine. Now that the QEMU advent
-calendar featured such an image, we can test the little endian mode,
-too.
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20231215161851.71508-1-thuth@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/avocado/machine_microblaze.py | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ tests/avocado/kvm_xen_guest.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/avocado/machine_microblaze.py b/tests/avocado/machine_microblaze.py
-index 8d0efff30d2..807709cd11e 100644
---- a/tests/avocado/machine_microblaze.py
-+++ b/tests/avocado/machine_microblaze.py
-@@ -5,6 +5,8 @@
- # This work is licensed under the terms of the GNU GPL, version 2 or
- # later. See the COPYING file in the top-level directory.
- 
-+import time
-+from avocado_qemu import exec_command, exec_command_and_wait_for_pattern
- from avocado_qemu import QemuSystemTest
- from avocado_qemu import wait_for_console_pattern
- from avocado.utils import archive
-@@ -33,3 +35,27 @@ def test_microblaze_s3adsp1800(self):
-         # The kernel sometimes gets stuck after the "This architecture ..."
-         # message, that's why we don't test for a later string here. This
-         # needs some investigation by a microblaze wizard one day...
-+
-+    def test_microblazeel_s3adsp1800(self):
-+        """
-+        :avocado: tags=arch:microblazeel
-+        :avocado: tags=machine:petalogix-s3adsp1800
-+        """
-+
-+        self.require_netdev('user')
-+        tar_url = ('http://www.qemu-advent-calendar.org/2023/download/'
-+                   'day13.tar.gz')
-+        tar_hash = '6623d5fff5f84cfa8f34e286f32eff6a26546f44'
-+        file_path = self.fetch_asset(tar_url, asset_hash=tar_hash)
-+        archive.extract(file_path, self.workdir)
-+        self.vm.set_console()
-+        self.vm.add_args('-kernel', self.workdir + '/day13/xmaton.bin')
-+        self.vm.add_args('-nic', 'user,tftp=' + self.workdir + '/day13/')
-+        self.vm.launch()
-+        wait_for_console_pattern(self, 'QEMU Advent Calendar 2023')
-+        time.sleep(0.1)
-+        exec_command(self, 'root')
-+        time.sleep(0.1)
-+        exec_command_and_wait_for_pattern(self,
-+                'tftp -g -r xmaton.png 10.0.2.2 ; md5sum xmaton.png',
-+                '821cd3cab8efd16ad6ee5acc3642a8ea')
+diff --git a/tests/avocado/kvm_xen_guest.py b/tests/avocado/kvm_xen_guest.py
+index 5391283113e..f8cb458d5db 100644
+--- a/tests/avocado/kvm_xen_guest.py
++++ b/tests/avocado/kvm_xen_guest.py
+@@ -59,7 +59,7 @@ def common_vm_setup(self):
+     def run_and_check(self):
+         self.vm.add_args('-kernel', self.kernel_path,
+                          '-append', self.kernel_params,
+-                         '-drive',  f"file={self.rootfs},if=none,format=raw,id=drv0",
++                         '-drive',  f"file={self.rootfs},if=none,snapshot=on,format=raw,id=drv0",
+                          '-device', 'xen-disk,drive=drv0,vdev=xvda',
+                          '-device', 'virtio-net-pci,netdev=unet',
+                          '-netdev', 'user,id=unet,hostfwd=:127.0.0.1:0-:22')
 -- 
 2.39.2
 
