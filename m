@@ -1,64 +1,64 @@
-Return-Path: <kvm+bounces-5056-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5059-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CDC481B43C
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 11:48:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E670181B440
+	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 11:48:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5867282741
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 10:48:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 259521C23F13
+	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 10:48:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98096745C6;
-	Thu, 21 Dec 2023 10:47:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B36A5745E8;
+	Thu, 21 Dec 2023 10:47:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JYV/3jvG"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AVAYf33n"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BE5F6EB75
-	for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 10:47:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BEFB7408D
+	for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 10:47:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-40c39ef63d9so6406065e9.3
-        for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 02:47:09 -0800 (PST)
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-33678156e27so545160f8f.1
+        for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 02:47:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1703155627; x=1703760427; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1703155629; x=1703760429; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0sLk9Y6V09YT5mxoKGySQqDe7AUl7PrL/RJQ+Y1wnbw=;
-        b=JYV/3jvGK8jNFQmr3IZUxjfW0IXW2+0GBXVuE+H0atdosRjMUVTuzMR98FchnxmYOl
-         wpRoWwry5Rs1JZ9tzt6DMQdcR8OgUV+iCBM1IDro0AkaSz0RsZ1mmFubaiOWxSJF3wMK
-         cUh1C5kSYdgHSwTuRD5n0Aam7h1xMT18LrirbWK4aqeiIOa52qljdrpeeobV7/nYVCXJ
-         rDjnwTINidLEe22GEDINrGzCck8H2/eLxeZBr3hhjWRHCGFCgVe0fIV/hVyvRaNNT5RL
-         bq8CvO/Zj1Sbult9GN398hXK+8ssEwTZ0S84FQW0QJG3btkHy4gs8R+yvtAuP5oFExRw
-         DNDA==
+        bh=UUTepCaXuSvQff7RpqKHmtGuMDeLUnEdp+0FVQ8ed3M=;
+        b=AVAYf33nzNTBDJCeo8qvutkTENtkXg9W+/g5yx7H4JiEwkAlaxlh/UAljLpc9yEgqD
+         DyNSDYCmE+6/2DXaHSy7jXTXFb2GEdtU/Wc0qtAU4ReMLx4xDlK6pC8huNpH9SVqXtLa
+         IUDoV9iRSs+kMOJA/4BUNiXAfwj8UcaJMG6AL1G4b5kwmjkyQS37WK1lw/dsmuYmmP2T
+         id4B+bwTXZTO8gf1bZu0yVoepp75sYDPYdUCrB5TqhDzYNmY5olhsgoP7LiqyjOC1Hgw
+         y+lO9VaM6wnGCZCPIOIsB7olajrfXLmBqx/h7ADSfkJtaEqr1EZdtAZL71OXEpXlUkZa
+         oPQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703155627; x=1703760427;
+        d=1e100.net; s=20230601; t=1703155629; x=1703760429;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=0sLk9Y6V09YT5mxoKGySQqDe7AUl7PrL/RJQ+Y1wnbw=;
-        b=oyybSe/vCQZEbChkI8thGyWaFeX0sjq6R4fQB+oupXOltT2g1xQsmMs4tTsccmIbsZ
-         zkVwJtedcf1HxGeRk+VuhTBl5dQ4v9LxkU1S0kj0kEHDXRUxpxqYwDKC+iMWZsb/NLJK
-         elFO4CmFkCxJuiBuYyg+l2+dcd8jovg+GgT2rb+DGH5d2Kvuag6MpdZ1wvQzynnhzdwu
-         7wjquhI+JExUiXLM/zzc/gJgtOcEsLWbPCKqVGFlDIxeiU2sESYywHkEdtc1F7WBOdWo
-         AA3KL6PiXFofZDGKBjMnXiUkoQxcFLeA2zjFvHWnaWxvK3w6ZGiezL/ZCn5OQ6y/4ZCm
-         /t5g==
-X-Gm-Message-State: AOJu0Yy577LWqnebDnJeYLBUcYlbjT6iTK2zPz+epl2fYhF7k8gv3z8v
-	OeqdN+QgUmoC/3NfLLhnOZhfmA==
-X-Google-Smtp-Source: AGHT+IEh4A/ofvHjjDxGae4dNp01ycAbrgSKgNLymJ1Ha3Ry/GdnF3Tf0BsMFDRp8ivuX9KZRRwyWg==
-X-Received: by 2002:a05:600c:1682:b0:40c:3984:4977 with SMTP id k2-20020a05600c168200b0040c39844977mr650705wmn.174.1703155627469;
-        Thu, 21 Dec 2023 02:47:07 -0800 (PST)
+        bh=UUTepCaXuSvQff7RpqKHmtGuMDeLUnEdp+0FVQ8ed3M=;
+        b=LI8wSAcM8tpvWMhXrQCpHB6lfTjZZXbsYE05c/SOsojzVGEcq5R3aLUyr9nISJCjdG
+         2IH50u6h+rYWHLCVeg8157aqdTIaFWzG2PbZLYZKdGrW3HIR67u9kPm6jfVAZLN1yQsQ
+         l5lRt1brffRrmHI+jvg0hg0fdmIAGIvMsj7HHDXLX09MFt37UkLL8RXXn6I9WDJh+sY7
+         OuUuQ1zbVZebPIUi2tjtDZH5KBIABlkB2/f9iTiee2EfnawBByFxQe1PZ8o+Fxa9QefA
+         N2i32LTCZQHX4/ER199S14hmJQ2HxMUfNd+po4yvLTiPq0iuotMfGQfDRGI+r4ThQzOU
+         Qz+Q==
+X-Gm-Message-State: AOJu0YwYuQkuyxEVoayQFyU4AxVEjD/M5CHAuqEZ5xKjDirksVZ4sk0e
+	w3zLPrLxZq5E7LluCt9ZHPMoMg==
+X-Google-Smtp-Source: AGHT+IEE4PAyT0ppKhyWQR8C/CCDf6gD5uddgw77/sGyjUuzJA78iyT8JScfYrBXoIsKBK7do/LM6A==
+X-Received: by 2002:adf:f6d2:0:b0:336:763c:c3e5 with SMTP id y18-20020adff6d2000000b00336763cc3e5mr603684wrp.93.1703155629711;
+        Thu, 21 Dec 2023 02:47:09 -0800 (PST)
 Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id b2-20020a05600c4e0200b0040c440f9393sm3526519wmq.42.2023.12.21.02.47.02
+        by smtp.gmail.com with ESMTPSA id w11-20020adfcd0b000000b003367e35abd4sm1742637wrm.71.2023.12.21.02.47.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Thu, 21 Dec 2023 02:47:06 -0800 (PST)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id CEF355F8E3;
+	by draig.lan (Postfix) with ESMTP id E5B975F8E5;
 	Thu, 21 Dec 2023 10:38:20 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
@@ -105,10 +105,10 @@ Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
 	=?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
 	Mahmoud Mandour <ma.mandourr@gmail.com>,
 	Bin Meng <bin.meng@windriver.com>,
-	=?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Subject: [PATCH 20/40] mtest2make: stop disabling meson test timeouts
-Date: Thu, 21 Dec 2023 10:37:58 +0000
-Message-Id: <20231221103818.1633766-21-alex.bennee@linaro.org>
+	Akihiko Odaki <akihiko.odaki@daynix.com>
+Subject: [PATCH 21/40] hw/riscv: Use misa_mxl instead of misa_mxl_max
+Date: Thu, 21 Dec 2023 10:37:59 +0000
+Message-Id: <20231221103818.1633766-22-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20231221103818.1633766-1-alex.bennee@linaro.org>
 References: <20231221103818.1633766-1-alex.bennee@linaro.org>
@@ -121,61 +121,30 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Daniel P. Berrangé <berrange@redhat.com>
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
 
-The mtest2make.py script passes the arg '-t 0' to 'meson test' which
-disables all test timeouts. This is a major source of pain when running
-in GitLab CI and a test gets stuck. It will stall until GitLab kills the
-CI job. This leaves us with little easily consumable information about
-the stalled test. The TAP format doesn't show the test name until it is
-completed, and TAP output from multiple tests it interleaved. So we
-have to analyse the log to figure out what tests had un-finished TAP
-output present and thus infer which test case caused the hang. This is
-very time consuming and error prone.
+The effective MXL value matters when booting.
 
-By allowing meson to kill stalled tests, we get a direct display of what
-test program got stuck, which lets us more directly focus in on what
-specific test case within the test program hung.
-
-The other issue with disabling meson test timeouts by default is that it
-makes it more likely that maintainers inadvertantly introduce slowdowns.
-For example the recent-ish change that accidentally made migrate-test
-take 15-20 minutes instead of around 1 minute.
-
-The main risk of this change is that the individual test timeouts might
-be too short to allow completion in high load scenarios. Thus, there is
-likely to be some short term pain where we have to bump the timeouts for
-certain tests to make them reliable enough. The preceeding few patches
-raised the timeouts for all failures that were immediately apparent
-in GitLab CI.
-
-Even with the possible short term instability, this should still be a
-net win for debuggability of failed CI pipelines over the long term.
-
-Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-Message-ID: <20230717182859.707658-13-berrange@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20231215070357.10888-17-thuth@redhat.com>
+Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+Message-Id: <20231213-riscv-v7-1-a760156a337f@daynix.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- scripts/mtest2make.py | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ hw/riscv/boot.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/scripts/mtest2make.py b/scripts/mtest2make.py
-index 179dd548718..eb01a05ddbd 100644
---- a/scripts/mtest2make.py
-+++ b/scripts/mtest2make.py
-@@ -27,7 +27,8 @@ def names(self, base):
- .speed.slow = $(foreach s,$(sort $(filter-out %-thorough, $1)), --suite $s)
- .speed.thorough = $(foreach s,$(sort $1), --suite $s)
+diff --git a/hw/riscv/boot.c b/hw/riscv/boot.c
+index 0ffca05189f..bc67c0bd189 100644
+--- a/hw/riscv/boot.c
++++ b/hw/riscv/boot.c
+@@ -36,7 +36,7 @@
  
--.mtestargs = --no-rebuild -t 0
-+TIMEOUT_MULTIPLIER = 1
-+.mtestargs = --no-rebuild -t $(TIMEOUT_MULTIPLIER)
- ifneq ($(SPEED), quick)
- .mtestargs += --setup $(SPEED)
- endif
+ bool riscv_is_32bit(RISCVHartArrayState *harts)
+ {
+-    return harts->harts[0].env.misa_mxl_max == MXL_RV32;
++    return harts->harts[0].env.misa_mxl == MXL_RV32;
+ }
+ 
+ /*
 -- 
 2.39.2
 
