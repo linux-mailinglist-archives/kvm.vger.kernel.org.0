@@ -1,472 +1,84 @@
-Return-Path: <kvm+bounces-5041-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5042-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 978D381B3DE
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 11:40:35 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FF5781B423
+	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 11:46:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 093B01F257E8
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 10:40:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 23045B2395A
+	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 10:46:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17D31760A9;
-	Thu, 21 Dec 2023 10:38:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JMYDKKHQ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F20F36979B;
+	Thu, 21 Dec 2023 10:45:55 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 565DE745FD
-	for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 10:38:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-33679c49fe5so508649f8f.3
-        for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 02:38:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1703155118; x=1703759918; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wPcwMe/aQZUfTScU91eR7ZQQA1t73rNFBA5pycMFHXM=;
-        b=JMYDKKHQS8aoeMh2VWoRQzjyoHmWHA49vU6j2600DDA9jkge5Ntb5JCJWOLsQMvOE+
-         S6Afv+3szWFYKpRvoEztM+7C3uHNLVH6eKiI1heBzTOsZxLdVwGIoCZh5hxvVKdaCYSx
-         lbQQzhxjm9w8EdqZ4co+iToqCJQ7MNLmcWpmsGOb6+dnIdQdvevaIIPHsguyUP62QG00
-         lRnPFLvhhZUeerAayHlI88hc8Xlw0+56+wc/Uqfa7RVTnpViLDuYwLpdjicvjPQ5mevp
-         HexaXPyuk8i5lc5pYfwjGXjt/ZP03ueSVgEsSkcTLPg6B4uyXhmAaaQHiWOqBaMVZDgc
-         5z5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703155118; x=1703759918;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wPcwMe/aQZUfTScU91eR7ZQQA1t73rNFBA5pycMFHXM=;
-        b=Nzbk+MPEAf7vVPXwg4vIpAm6TjxgCNAFTxUfAWAytX1LmKFUMs0A/6vjqYd58vjx8W
-         zZplWzEbDbJoc0B9c9stj3uXCmjITIPHAaBXFlK2znWkvP5xerZH94I5tUDuRXyONOIs
-         KII5knpW/jugwz578wu+Bru4BwtSxiyIxvHBkePjH3Np4aTeXAo9ykd9t7XpE03X4R/P
-         CrturEteSR3mKowRLNA14R0l6ELk0YZB6h4FsVLp7JUZ7fHVOhSHfmZJB4XdO3wHEfAB
-         KXI20s59nKqmgwezfeb0rQoGFB0jCPXaqtlJfgERicaQxmdlo7mD9eBd/X/CKvYiEcRA
-         g5rA==
-X-Gm-Message-State: AOJu0YxgcBoIjU/HBKzt9KvmYSij2LXMrQnLQSaDiN5hfU1FeG7q0zJO
-	qtZWZaSMr4fmib+ft49Uc8tZQA==
-X-Google-Smtp-Source: AGHT+IE8546czz735AiZejPhKxdXzg31gVzf4zfjyYmEvLR2oBlGdoqshy94sfwDCknOEIUfoDGEIA==
-X-Received: by 2002:adf:fd87:0:b0:336:817f:4033 with SMTP id d7-20020adffd87000000b00336817f4033mr709218wrr.92.1703155118551;
-        Thu, 21 Dec 2023 02:38:38 -0800 (PST)
-Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id e4-20020a5d6d04000000b003367433118bsm1731768wrq.78.2023.12.21.02.38.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Dec 2023 02:38:34 -0800 (PST)
-Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 10BD25F90F;
-	Thu, 21 Dec 2023 10:38:23 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
-	John Snow <jsnow@redhat.com>,
-	Aurelien Jarno <aurelien@aurel32.net>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Yanan Wang <wangyanan55@huawei.com>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Brian Cain <bcain@quicinc.com>,
-	Laurent Vivier <laurent@vivier.eu>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Cleber Rosa <crosa@redhat.com>,
-	David Hildenbrand <david@redhat.com>,
-	Beraldo Leal <bleal@redhat.com>,
-	Pierrick Bouvier <pierrick.bouvier@linaro.org>,
-	Weiwei Li <liwei1518@gmail.com>,
-	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	Paul Durrant <paul@xen.org>,
-	qemu-s390x@nongnu.org,
-	David Woodhouse <dwmw2@infradead.org>,
-	Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
-	Ilya Leoshkevich <iii@linux.ibm.com>,
-	Wainer dos Santos Moschetta <wainersm@redhat.com>,
-	Michael Rolnik <mrolnik@gmail.com>,
-	Alistair Francis <alistair.francis@wdc.com>,
-	Daniel Henrique Barboza <danielhb413@gmail.com>,
-	Laurent Vivier <lvivier@redhat.com>,
-	kvm@vger.kernel.org,
-	=?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
-	Alexandre Iooss <erdnaxe@crans.org>,
-	Thomas Huth <thuth@redhat.com>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	qemu-ppc@nongnu.org,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	qemu-riscv@nongnu.org,
-	qemu-arm@nongnu.org,
-	Song Gao <gaosong@loongson.cn>,
-	Yoshinori Sato <ysato@users.sourceforge.jp>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
-	=?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
-	Mahmoud Mandour <ma.mandourr@gmail.com>,
-	Bin Meng <bin.meng@windriver.com>
-Subject: [PATCH 40/40] contrib/plugins: optimise the register value tracking
-Date: Thu, 21 Dec 2023 10:38:18 +0000
-Message-Id: <20231221103818.1633766-41-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20231221103818.1633766-1-alex.bennee@linaro.org>
-References: <20231221103818.1633766-1-alex.bennee@linaro.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95F056A011;
+	Thu, 21 Dec 2023 10:45:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4SwnCN0Kd0z4xdZ;
+	Thu, 21 Dec 2023 21:45:52 +1100 (AEDT)
+From: Michael Ellerman <patch-notifications@ellerman.id.au>
+To: linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, Vaibhav Jain <vaibhav@linux.ibm.com>
+Cc: Nicholas Piggin <npiggin@gmail.com>, Jordan Niethe <jniethe5@gmail.com>, Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>, mikey@neuling.org, paulus@ozlabs.org, sbhat@linux.ibm.com, gautam@linux.ibm.com, kconsul@linux.vnet.ibm.com, amachhiw@linux.vnet.ibm.com
+In-Reply-To: <20231201132618.555031-1-vaibhav@linux.ibm.com>
+References: <20231201132618.555031-1-vaibhav@linux.ibm.com>
+Subject: Re: [PATCH 00/12] KVM: PPC: Nested APIv2 : Performance improvements
+Message-Id: <170315547865.2197670.7761512990003222623.b4-ty@ellerman.id.au>
+Date: Thu, 21 Dec 2023 21:44:38 +1100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 
-This adds an additional flag which attempts to optimise the register
-tracking by only instrumenting instructions which are likely to change
-its value. This relies on the disassembler showing up the register
-names in disassembly so is only enabled when asked for.
+On Fri, 01 Dec 2023 18:56:05 +0530, Vaibhav Jain wrote:
+> This patch series introduces series of performance improvements to recently
+> added support for Nested APIv2 PPC64 Guests via [1]. Details for Nested
+> APIv2 for PPC64 Guests is available in Documentation/powerpc/kvm-nested.rst.
+> 
+> This patch series introduces various optimizations for a Nested APIv2
+> guests namely:
+> 
+> [...]
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- docs/devel/tcg-plugins.rst |  10 +-
- contrib/plugins/execlog.c  | 189 ++++++++++++++++++++++++++++++-------
- 2 files changed, 165 insertions(+), 34 deletions(-)
+Applied to powerpc/topic/ppc-kvm.
 
-diff --git a/docs/devel/tcg-plugins.rst b/docs/devel/tcg-plugins.rst
-index 3a0962723d7..fa7421279f5 100644
---- a/docs/devel/tcg-plugins.rst
-+++ b/docs/devel/tcg-plugins.rst
-@@ -503,7 +503,15 @@ registers with multiple ``reg`` options. You can also use glob style matching if
-   $ qemu-system-arm $(QEMU_ARGS) \
-     -plugin ./contrib/plugins/libexeclog.so,reg=\*_el2,reg=sp -d plugin
- 
--Be aware that each additional register to check will slow down execution quite considerably.
-+Be aware that each additional register to check will slow down
-+execution quite considerably. You can optimise the number of register
-+checks done by using the rdisas option. This will only instrument
-+instructions that mention the registers in question in disassembly.
-+This is not foolproof as some instructions implicitly change
-+instructions. You can use the ifilter to catch these cases:
-+
-+  $ qemu-system-arm $(QEMU_ARGS) \
-+    -plugin ./contrib/plugins/libexeclog.so,ifilter=msr,ifilter=blr,reg=x30,reg=\*_el1,rdisas=on
- 
- - contrib/plugins/cache.c
- 
-diff --git a/contrib/plugins/execlog.c b/contrib/plugins/execlog.c
-index 74fbf7c0e60..f88e5acab6c 100644
---- a/contrib/plugins/execlog.c
-+++ b/contrib/plugins/execlog.c
-@@ -27,6 +27,7 @@ typedef struct CPU {
-     GString *last_exec;
-     /* Ptr array of Register */
-     GPtrArray *registers;
-+    int index;
- } CPU;
- 
- QEMU_PLUGIN_EXPORT int qemu_plugin_version = QEMU_PLUGIN_VERSION;
-@@ -38,6 +39,9 @@ static GRWLock expand_array_lock;
- static GPtrArray *imatches;
- static GArray *amatches;
- static GPtrArray *rmatches;
-+static bool disas_assist;
-+static GMutex add_reg_name_lock;
-+static GPtrArray *all_reg_names;
- 
- /**
-  * Add memory read or write information to current instruction log
-@@ -72,9 +76,14 @@ static void vcpu_mem(unsigned int cpu_index, qemu_plugin_meminfo_t info,
- }
- 
- /**
-- * Log instruction execution
-+ * Log instruction execution, outputting the last one.
-+ *
-+ * vcpu_insn_exec() is a copy and paste of vcpu_insn_exec_with_regs()
-+ * without the checking of register values when we've attempted to
-+ * optimise with disas_assist.
-  */
--static void vcpu_insn_exec(unsigned int cpu_index, void *udata)
-+
-+static CPU *get_cpu(int cpu_index)
- {
-     CPU *cpu;
- 
-@@ -83,39 +92,87 @@ static void vcpu_insn_exec(unsigned int cpu_index, void *udata)
-     cpu = &cpus[cpu_index];
-     g_rw_lock_reader_unlock(&expand_array_lock);
- 
-+    return cpu;
-+}
-+
-+static void insn_check_regs(CPU *cpu) {
-+    for (int n = 0; n < cpu->registers->len; n++) {
-+        Register *reg = cpu->registers->pdata[n];
-+        int sz;
-+
-+        g_byte_array_set_size(reg->new, 0);
-+        sz = qemu_plugin_read_register(cpu->index, reg->handle, reg->new);
-+        g_assert(sz == reg->last->len);
-+
-+        if (memcmp(reg->last->data, reg->new->data, sz)) {
-+            GByteArray *temp = reg->last;
-+            g_string_append_printf(cpu->last_exec, ", %s -> ", reg->name);
-+            /* TODO: handle BE properly */
-+            for (int i = sz; i >= 0; i--) {
-+                g_string_append_printf(cpu->last_exec, "%02x",
-+                                       reg->new->data[i]);
-+            }
-+            reg->last = reg->new;
-+            reg->new = temp;
-+        }
-+    }
-+}
-+
-+/* Log last instruction while checking registers */
-+static void vcpu_insn_exec_with_regs(unsigned int cpu_index, void *udata)
-+{
-+    CPU *cpu = get_cpu(cpu_index);
-+
-     /* Print previous instruction in cache */
-     if (cpu->last_exec->len) {
-         if (cpu->registers) {
--            for (int n = 0; n < cpu->registers->len; n++) {
--                Register *reg = cpu->registers->pdata[n];
--                int sz;
--
--                g_byte_array_set_size(reg->new, 0);
--                sz = qemu_plugin_read_register(cpu_index, reg->handle, reg->new);
--                g_assert(sz == reg->last->len);
--
--                if (memcmp(reg->last->data, reg->new->data, sz)) {
--                    GByteArray *temp = reg->last;
--                    g_string_append_printf(cpu->last_exec, ", %s -> ", reg->name);
--                    /* TODO: handle BE properly */
--                    for (int i = sz; i >= 0; i--) {
--                        g_string_append_printf(cpu->last_exec, "%02x",
--                                               reg->new->data[i]);
--                    }
--                    reg->last = reg->new;
--                    reg->new = temp;
--                }
--            }
-+            insn_check_regs(cpu);
-+        }
-+
-+        qemu_plugin_outs(cpu->last_exec->str);
-+        qemu_plugin_outs("\n");
-+    }
-+
-+    /* Store new instruction in cache */
-+    /* vcpu_mem will add memory access information to last_exec */
-+    g_string_printf(cpu->last_exec, "%u, ", cpu_index);
-+    g_string_append(cpu->last_exec, (char *)udata);
-+}
-+
-+/* Log last instruction while checking registers, ignore next */
-+static void vcpu_insn_exec_only_regs(unsigned int cpu_index, void *udata)
-+{
-+    CPU *cpu = get_cpu(cpu_index);
-+
-+    /* Print previous instruction in cache */
-+    if (cpu->last_exec->len) {
-+        if (cpu->registers) {
-+            insn_check_regs(cpu);
-         }
- 
-         qemu_plugin_outs(cpu->last_exec->str);
-         qemu_plugin_outs("\n");
-     }
- 
-+    /* reset */
-+    cpu->last_exec->len = 0;
-+}
-+
-+/* Log last instruction without checking regs, setup next */
-+static void vcpu_insn_exec(unsigned int cpu_index, void *udata)
-+{
-+    CPU *cpu = get_cpu(cpu_index);
-+
-+    /* Print previous instruction in cache */
-+    if (cpu->last_exec->len) {
-+        qemu_plugin_outs(cpu->last_exec->str);
-+        qemu_plugin_outs("\n");
-+    }
-+
-     /* Store new instruction in cache */
-     /* vcpu_mem will add memory access information to last_exec */
--    g_string_printf(cpus[cpu_index].last_exec, "%u, ", cpu_index);
--    g_string_append(cpus[cpu_index].last_exec, (char *)udata);
-+    g_string_printf(cpu->last_exec, "%u, ", cpu_index);
-+    g_string_append(cpu->last_exec, (char *)udata);
- }
- 
- /**
-@@ -128,6 +185,8 @@ static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
- {
-     struct qemu_plugin_insn *insn;
-     bool skip = (imatches || amatches);
-+    bool check_regs_this = rmatches;
-+    bool check_regs_next = false;
- 
-     size_t n = qemu_plugin_tb_n_insns(tb);
-     for (size_t i = 0; i < n; i++) {
-@@ -148,7 +207,8 @@ static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
-         /*
-          * If we are filtering we better check out if we have any
-          * hits. The skip "latches" so we can track memory accesses
--         * after the instruction we care about.
-+         * after the instruction we care about. Also enable register
-+         * checking on the next instruction.
-          */
-         if (skip && imatches) {
-             int j;
-@@ -156,6 +216,7 @@ static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
-                 char *m = g_ptr_array_index(imatches, j);
-                 if (g_str_has_prefix(insn_disas, m)) {
-                     skip = false;
-+                    check_regs_next = rmatches;
-                 }
-             }
-         }
-@@ -170,8 +231,38 @@ static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
-             }
-         }
- 
-+        /*
-+         * Check the disassembly to see if a register we care about
-+         * will be affected by this instruction. This relies on the
-+         * dissembler doing something sensible for the registers we
-+         * care about.
-+         */
-+        if (disas_assist && rmatches) {
-+            check_regs_next = false;
-+            gchar *args = g_strstr_len(insn_disas, -1, " ");
-+            for (int n = 0; n < all_reg_names->len; n++) {
-+                gchar *reg = g_ptr_array_index(all_reg_names, n);
-+                if (g_strrstr(args, reg)) {
-+                    check_regs_next = true;
-+                    skip = false;
-+                }
-+            }
-+        }
-+
-+        /*
-+         * We now have 3 choices:
-+         *
-+         * Log this instruction normally
-+         * Log this instruction checking for register changes
-+         * Don't log this instruction but check for register changes from the last one
-+         */
-+
-         if (skip) {
--            g_free(insn_disas);
-+            if (check_regs_this) {
-+                qemu_plugin_register_vcpu_insn_exec_cb(insn,
-+                                                       vcpu_insn_exec_only_regs,
-+                                                       QEMU_PLUGIN_CB_R_REGS, NULL);
-+            }
-         } else {
-             uint32_t insn_opcode;
-             insn_opcode = *((uint32_t *)qemu_plugin_insn_data(insn));
-@@ -184,15 +275,28 @@ static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
-                                              QEMU_PLUGIN_MEM_RW, NULL);
- 
-             /* Register callback on instruction */
--            qemu_plugin_register_vcpu_insn_exec_cb(
--                insn, vcpu_insn_exec,
--                rmatches ? QEMU_PLUGIN_CB_R_REGS : QEMU_PLUGIN_CB_NO_REGS,
--                output);
-+            if (check_regs_this) {
-+                qemu_plugin_register_vcpu_insn_exec_cb(
-+                    insn, vcpu_insn_exec_with_regs,
-+                    QEMU_PLUGIN_CB_R_REGS,
-+                    output);
-+            } else {
-+                qemu_plugin_register_vcpu_insn_exec_cb(
-+                    insn, vcpu_insn_exec,
-+                    QEMU_PLUGIN_CB_NO_REGS,
-+                    output);
-+            }
- 
-             /* reset skip */
-             skip = (imatches || amatches);
-         }
- 
-+        /* set regs for next */
-+        if (disas_assist && rmatches) {
-+            check_regs_this = check_regs_next;
-+        }
-+
-+        g_free(insn_disas);
-     }
- }
- 
-@@ -200,10 +304,11 @@ static Register *init_vcpu_register(int vcpu_index,
-                                     qemu_plugin_reg_descriptor *desc)
- {
-     Register *reg = g_new0(Register, 1);
-+    g_autofree gchar *lower = g_utf8_strdown(desc->name, -1);
-     int r;
- 
-     reg->handle = desc->handle;
--    reg->name = g_strdup(desc->name);
-+    reg->name = g_intern_string(lower);
-     reg->last = g_byte_array_new();
-     reg->new = g_byte_array_new();
- 
-@@ -213,7 +318,7 @@ static Register *init_vcpu_register(int vcpu_index,
-     return reg;
- }
- 
--static registers_init(int vcpu_index)
-+static void registers_init(int vcpu_index)
- {
-     GPtrArray *registers = g_ptr_array_new();
-     g_autoptr(GArray) reg_list = qemu_plugin_get_registers(vcpu_index);
-@@ -228,9 +333,20 @@ static registers_init(int vcpu_index)
-                 reg_list, qemu_plugin_reg_descriptor, r);
-             for (int p = 0; p < rmatches->len; p++) {
-                 g_autoptr(GPatternSpec) pat = g_pattern_spec_new(rmatches->pdata[p]);
--                if (g_pattern_match_string(pat, rd->name)) {
-+                g_autofree gchar *rd_lower = g_utf8_strdown(rd->name, -1);
-+                if (g_pattern_match_string(pat, rd->name) ||
-+                    g_pattern_match_string(pat, rd_lower)) {
-                     Register *reg = init_vcpu_register(vcpu_index, rd);
-                     g_ptr_array_add(registers, reg);
-+
-+                    /* we need a list of regnames at TB translation time */
-+                    if (disas_assist) {
-+                        g_mutex_lock(&add_reg_name_lock);
-+                        if (!g_ptr_array_find(all_reg_names, reg->name, NULL)) {
-+                            g_ptr_array_add(all_reg_names, reg->name);
-+                        }
-+                        g_mutex_unlock(&add_reg_name_lock);
-+                    }
-                 }
-             }
-         }
-@@ -254,6 +370,7 @@ static void vcpu_init(qemu_plugin_id_t id, unsigned int vcpu_index)
-     if (vcpu_index >= num_cpus) {
-         cpus = g_realloc_n(cpus, vcpu_index + 1, sizeof(*cpus));
-         while (vcpu_index >= num_cpus) {
-+            cpus[num_cpus].index = vcpu_index;
-             cpus[num_cpus].last_exec = g_string_new(NULL);
- 
-             /* Any registers to track? */
-@@ -336,6 +453,12 @@ QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id,
-             parse_vaddr_match(tokens[1]);
-         } else if (g_strcmp0(tokens[0], "reg") == 0) {
-             add_regpat(tokens[1]);
-+        } else if (g_strcmp0(tokens[0], "rdisas") == 0) {
-+            if (!qemu_plugin_bool_parse(tokens[0], tokens[1], &disas_assist)) {
-+                fprintf(stderr, "boolean argument parsing failed: %s\n", opt);
-+                return -1;
-+            }
-+            all_reg_names = g_ptr_array_new();
-         } else {
-             fprintf(stderr, "option parsing failed: %s\n", opt);
-             return -1;
--- 
-2.39.2
+[01/12] KVM: PPC: Book3S HV nestedv2: Invalidate RPT before deleting a guest
+        https://git.kernel.org/powerpc/c/7d370e1812b9a5f5cc68aaa5991bf7d31d8ff52c
+[02/12] KVM: PPC: Book3S HV nestedv2: Avoid reloading the tb offset
+        https://git.kernel.org/powerpc/c/e0d4acbcba3f2d63dc15bc5432c8e26fc9e19675
+[03/12] KVM: PPC: Book3S HV nestedv2: Do not check msr on hcalls
+        https://git.kernel.org/powerpc/c/63ccae78cd88b52fb1d598ae33fa8408ce067b30
+[04/12] KVM: PPC: Book3S HV nestedv2: Get the PID only if needed to copy tofrom a guest
+        https://git.kernel.org/powerpc/c/e678748a8dca5b57041a84a66577f6168587b3f7
+[05/12] KVM: PPC: Book3S HV nestedv2: Ensure LPCR_MER bit is passed to the L0
+        https://git.kernel.org/powerpc/c/ec0f6639fa8853cf6bfdfc3588aada7eeb7e5e37
+[06/12] KVM: PPC: Book3S HV: Handle pending exceptions on guest entry with MSR_EE
+        https://git.kernel.org/powerpc/c/ecd10702baae5c16a91d139bde7eff84ce55daee
+[07/12] KVM: PPC: Book3S HV nestedv2: Do not inject certain interrupts
+        https://git.kernel.org/powerpc/c/df938a5576f3f3b08e1f217c660385c0d58a0b91
+[08/12] KVM: PPC: Book3S HV nestedv2: Avoid msr check in kvmppc_handle_exit_hv()
+        https://git.kernel.org/powerpc/c/a9a3de530d7531bf6cd3f6ccda769cd94c1105a0
+[09/12] KVM: PPC: Book3S HV nestedv2: Do not call H_COPY_TOFROM_GUEST
+        https://git.kernel.org/powerpc/c/4bc8ff6f170c78f64446c5d5f9ef6771eefd3416
+[10/12] KVM: PPC: Book3S HV nestedv2: Register the VPA with the L0
+        https://git.kernel.org/powerpc/c/db1dcfae1dae3c042f348175ac0394e2fc14b1b3
+[11/12] KVM: PPC: Reduce reliance on analyse_instr() in mmio emulation
+        https://git.kernel.org/powerpc/c/797a5af8fc7297b19e5c6b1713956ebf1e6c1cde
+[12/12] KVM: PPC: Book3S HV nestedv2: Do not cancel pending decrementer exception
+        https://git.kernel.org/powerpc/c/180c6b072bf360b686e53d893d8dcf7dbbaec6bb
 
+cheers
 
