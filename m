@@ -1,242 +1,207 @@
-Return-Path: <kvm+bounces-5071-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5072-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19BC581B736
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 14:20:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96BE181B900
+	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 14:58:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4E1128919F
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 13:20:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 542AA28C16B
+	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 13:58:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E67E745F7;
-	Thu, 21 Dec 2023 13:19:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 770DB64A94;
+	Thu, 21 Dec 2023 13:47:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="UnADE8T6"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IvOhgl0Y"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3AF176DA2
-	for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 13:19:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
-Received: by mail-oi1-f177.google.com with SMTP id 5614622812f47-3ba14203a34so634742b6e.1
-        for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 05:19:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1703164776; x=1703769576; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=xwacrzLBpA+7qNqKLKW6P7iJRvrUEffyGirc6Z5p94U=;
-        b=UnADE8T61ICUBTTORvijP9LWhEsZ8TSjqpyMNkwyYEb2hhLSachtssZBbm4QZvPqSa
-         HaxkTJ/IiaG0VSV8G0zbdRD3WLBzujJFnJB2zqzKydInimSmUcZYDCFapMIt/h759pG/
-         sNLUWVQfzHzvzhMnhd3GxCH7zpLkx3FCVZgo9AZTePNh4GXn61D9cA5UHqtFogWnsxD3
-         tOycfl/ye82JzAsCbqQqutFNE6qT/ZToT1bg82XT/Ur/psE6ycBifj1RQJ8BiGvJZRjz
-         C83hBGl30UaAfqQhfTlsd15tShvKgHpIVgW/hyZtNBh6wpSotoj00WOpGHPJkr9oMCha
-         aCiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703164776; x=1703769576;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xwacrzLBpA+7qNqKLKW6P7iJRvrUEffyGirc6Z5p94U=;
-        b=LS1XmWs/8oyey+HoQJqNmwnlusSLvr9a7nrS8v98+4uK8rs2G+QVxNw7Vv6H+G0pUF
-         SvcGwFzDZcIQwRkhLmMj0oAmfLWNQp43vufeIKweAh1QW9V1783PcTbLiqCw7qdAxlcg
-         ZHzZIFoGZjZX7URazKupa7CkxWTjboY2WYKR5sueWUedNHKslRquUyL5hBLXS1bExn9H
-         +aEOrGYo3b+EKFdzf22L/4dfvySNe1SISoSZfxM8gCjnr0xEQXqayBrysuFQUCFuzzkf
-         Xnp0kcrW4ybmQfawcBA5Ajetcd3pHuKIpZoTc68UVwdeoLK/CUq6Didlri6yeiVkpJ6U
-         SDig==
-X-Gm-Message-State: AOJu0YyR8CC50M21bwcf13fUY4CxgwyqOTgUWEI6soR2B23ymV3tWsb8
-	WNOpMBYkT69EtXm19XrywdNRFg==
-X-Google-Smtp-Source: AGHT+IGxbsSZ9PeiiKJkEVFCCUo7LUzl75tIosPOKCu5gnxWVDQqzciwl8Jbemw6CO0IZlVeMEgpvA==
-X-Received: by 2002:a05:6358:7e14:b0:172:bab8:8a51 with SMTP id o20-20020a0563587e1400b00172bab88a51mr1217478rwm.65.1703164775932;
-        Thu, 21 Dec 2023 05:19:35 -0800 (PST)
-Received: from ?IPV6:2400:4050:a840:1e00:9ac7:6d57:2b16:6932? ([2400:4050:a840:1e00:9ac7:6d57:2b16:6932])
-        by smtp.gmail.com with ESMTPSA id w19-20020a63d753000000b005cd78f13608sm1556327pgi.13.2023.12.21.05.19.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Dec 2023 05:19:35 -0800 (PST)
-Message-ID: <a26a55b2-240c-48c3-b341-48c1d7195bd9@daynix.com>
-Date: Thu, 21 Dec 2023 22:19:25 +0900
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0537F62815
+	for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 13:47:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1703166465; x=1734702465;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=P/yUnZ0axFKfH9G9umh5zzxdyPZ7h5lih//1cdpsRJ8=;
+  b=IvOhgl0YRDOx3nw251QTJajZxi+XSDkoaoQplGdebN8MF0o7Otw4UnR/
+   F088c3eFzWknvTC8slTi4cGHwj8b9x6OZ5qk3wnTg5e85+Eew5S7z17qg
+   NXK4j6VQFX2oaBLQqbKgZ6sXoz2xJjXVBeJN5adcCxZ8b+QxmpImBp/O0
+   O7T4JfbUgQSOB7kChgF7IfmHipx8HbHWKe/0rXShTFq8WoRbrbFHdkF0M
+   bV1N5xHKAuuD3LBb/3NG2rJb0YIRIEf6SLiIDRFj8tCuEIfpGML87FEia
+   da8ZWsRODJykxk4wskyQQwksrN6L96lSttGeQA+tEBakU5WTzLixFbOfa
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10930"; a="398760617"
+X-IronPort-AV: E=Sophos;i="6.04,293,1695711600"; 
+   d="scan'208";a="398760617"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Dec 2023 05:47:44 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10930"; a="805608379"
+X-IronPort-AV: E=Sophos;i="6.04,293,1695711600"; 
+   d="scan'208";a="805608379"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orsmga008.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 21 Dec 2023 05:47:43 -0800
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 21 Dec 2023 05:47:43 -0800
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 21 Dec 2023 05:47:43 -0800
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.169)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 21 Dec 2023 05:47:43 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=akpjJeFhvUnNILHWCNqUEZPXq3sjmSOos0IDYoERpw9PURy6oaka+H4TbFwldUf0yuKlg8yhUtXfZsZmoBV7L8WaTeFZ5zzeqNATZ53IB+bW0SuD2ylNC4+APT/TwV0r74kdmA6UoiZwLRDU8qi5ajnBx0+P+7gnY760gtdHYuxagbHQHZDcm2mb5Yg+CqBgz9Qf/944Geky49BQQrLEYaLlivQJrFX8uXirQZh/6SfWbbw2fxqDWbDymssg3jMw003DYaWf1A5YcMNQ5LT63C4cHwpksJQkmDUbSwsKitibNv/j2tbuaqnE5rHgBuwEXKPw9a30Znr8rA6AyE3EJw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=P/yUnZ0axFKfH9G9umh5zzxdyPZ7h5lih//1cdpsRJ8=;
+ b=RcaXSVHgd0/qXa28KsyCxLvjOvit0OE8sPbwZ1LhucP0U5iVbQ0vIdmoby5AFxteaZE4fXI4Oo9UYGJ3fz0JtQ7pWFoisqOHMJL7EZgyA2xhOo5sHQR/LV5b6A9iE+bOfj3jplH1+hL3dB6UuOO/SYKhKaCTENv4wQsbhG2qvXCUY/EUtoi+GxhyEnqFsDYNKDGqxlOkYTRTrFpSzoiUFUOs7QfMiJRCn7bLl5PlubtdCKt4/Tuc6GRS9Qs9b8JRmZEFiQ4IGNrsFwiav0RAxh2VU1Vgad+KN0FfUqUhthS7Uz15JKDhKBjcL4Hl7E1r7u5UiaM+hdmRrpTjcac36Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DS0PR11MB6373.namprd11.prod.outlook.com (2603:10b6:8:cb::20) by
+ DS0PR11MB8688.namprd11.prod.outlook.com (2603:10b6:8:1a0::19) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7113.18; Thu, 21 Dec 2023 13:47:41 +0000
+Received: from DS0PR11MB6373.namprd11.prod.outlook.com
+ ([fe80::9ce6:c8d3:248e:448a]) by DS0PR11MB6373.namprd11.prod.outlook.com
+ ([fe80::9ce6:c8d3:248e:448a%4]) with mapi id 15.20.7113.019; Thu, 21 Dec 2023
+ 13:47:41 +0000
+From: "Wang, Wei W" <wei.w.wang@intel.com>
+To: "Li, Xiaoyao" <xiaoyao.li@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	David Hildenbrand <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum
+	<marcel.apfelbaum@gmail.com>, Richard Henderson
+	<richard.henderson@linaro.org>, Peter Xu <peterx@redhat.com>,
+	=?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@linaro.org>, "Cornelia
+ Huck" <cohuck@redhat.com>, =?utf-8?B?RGFuaWVsIFAgLiBCZXJyYW5nw6k=?=
+	<berrange@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster
+	<armbru@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
+CC: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, Michael Roth <michael.roth@amd.com>, "Sean
+ Christopherson" <seanjc@google.com>, Claudio Fontana <cfontana@suse.de>, Gerd
+ Hoffmann <kraxel@redhat.com>, Isaku Yamahata <isaku.yamahata@gmail.com>,
+	"Qiang, Chenyi" <chenyi.qiang@intel.com>
+Subject: RE: [PATCH v3 06/70] kvm: Introduce support for memory_attributes
+Thread-Topic: [PATCH v3 06/70] kvm: Introduce support for memory_attributes
+Thread-Index: AQHaF5O24VxNhOyFz0ifdu/xEp7Ej7Cl0dCggA2oA4CAAEbrQIAAGMwAgAAVlUA=
+Date: Thu, 21 Dec 2023 13:47:41 +0000
+Message-ID: <DS0PR11MB63730289975875A5B90D078CDC95A@DS0PR11MB6373.namprd11.prod.outlook.com>
+References: <20231115071519.2864957-1-xiaoyao.li@intel.com>
+ <20231115071519.2864957-7-xiaoyao.li@intel.com>
+ <DS0PR11MB6373D69ABBF4BDF7120438ACDC8EA@DS0PR11MB6373.namprd11.prod.outlook.com>
+ <cc568b63-a129-4b23-8ac8-313193ea8126@intel.com>
+ <DS0PR11MB63737AFCA458FA78423C0BB7DC95A@DS0PR11MB6373.namprd11.prod.outlook.com>
+ <a0289f6d-2008-48d7-95fb-492066c38461@intel.com>
+In-Reply-To: <a0289f6d-2008-48d7-95fb-492066c38461@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DS0PR11MB6373:EE_|DS0PR11MB8688:EE_
+x-ms-office365-filtering-correlation-id: 0e1b381b-55bc-4ebd-aa98-08dc022b6730
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: n9+kPkOo4leWtE52gkWIIuqnK8ojA/j7OwTPDUpUukeQjhSuu9LMUorA8AJAvu7KW57XXnqaxPUHGAqJ0WZ5u/7XyGXytMn0cMHIiEC2kLhk8oSR6xzRWrJ3sC1dI6zr9101OnO0ITNRMBblLhxA+x8LOtwH5XaC2QiGYhBSQ1MK1WhQ1HcEAbrKoxufU8nSMMqD97dovmUFXJmIMcS0G+xzwDSaP93CJBOr4ZDt4j9d/gumE69YLkDSg7N8QofBtf7ldnb97kia+STO0Ki/auOampttFIkQvAGXrkQSkS3A96AVpXikslp2albj1hEPzq5tUxB6mCbGUXq7dlf6jdzbrTDXSTFO1vTXbnmk22QeMi2HzoH1u7ItfGnVXIyw0XEd8IevZDbEhp0MW5KmyaVScAoZzZmTyjWj/9QoF4U/H+m5z/FrFyoEp4Q9LIs8eoI5ZBiOOr18PQI782FN/YuWg3jddHR4n1PS3RPZF49/tK0OERXUc/qACT2mhYlx705+IzdLXBWZwkJCkLXzLcxf5Te/WWngC1apo7UJrsqax7HsIUPDohXc3aVyhYRwNFR6A3MA64tQ+V+ogW43uVoQFwAV1qrxJ6rg2cNIwZbhDvjGtsbXHEeP9SyHXwNATL6KGXsddd75zeVbXftKhA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB6373.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(396003)(376002)(136003)(346002)(39860400002)(230922051799003)(186009)(64100799003)(1800799012)(451199024)(8676002)(4326008)(8936002)(26005)(2906002)(478600001)(316002)(52536014)(54906003)(110136005)(66946007)(66446008)(66476007)(64756008)(66556008)(76116006)(71200400001)(6506007)(7696005)(53546011)(55016003)(9686003)(5660300002)(86362001)(38100700002)(33656002)(122000001)(7416002)(107886003)(921008)(38070700009)(41300700001)(82960400001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?RDlBcUtNczZOQ2FYZmVxcSs0RU85SFRlNUMwSTlGZUp5b01xVHZQTzRLY1dJ?=
+ =?utf-8?B?enpvaWVwOG15TGN3QkJZUDFYZldaVStJc25wR1JzZk5oVDhEVUNRVWQ1ZG81?=
+ =?utf-8?B?NHBrY1QzNGVsam5QcENSQytXU2hDeTJNZDc2aG16UGpZMnVWcklaeXViN2ti?=
+ =?utf-8?B?QzB3clNIWkNRY3VPQlRLOXZVWEcrN1VsZnU3NEdEQkdUaEFucU9VWWQ2bGs3?=
+ =?utf-8?B?RjJLZGZaYUlEOW1RUXd2VWVSdVpud3EzTU1EZ0hUU0xXS245SWxQZVc5ckZl?=
+ =?utf-8?B?RjEvVGJ5TmxXcDFma0IvK1JQTG1ETUJqSmpiZ0x1ZGIyWFN6NU0xaGdrTnl2?=
+ =?utf-8?B?N09YOFUxYnJibHFJRzlHNGtzSU1hNUVPNXpxSm9jeFg4OWl5aGhPMVlXcmVo?=
+ =?utf-8?B?eVlsZnZKZHFIcHg4d1BFTTVtSUMzT2ZPcDJSVDl0d2lISHZSaHhaTFlramlH?=
+ =?utf-8?B?NFdhbDJRQ2xxT2ErNHNmN3hIL1RZL1VDdHNOMlk5bmpmZWpDRFRaRHlGcmFs?=
+ =?utf-8?B?RXg0cjJtcWRzQUhTc0poNWFxdXl4MlU0Umg4ZWpEOXNVU2NFbFJxM1RqNitr?=
+ =?utf-8?B?WjYvU0tONWZpQjBZbHNmTkIrQkVpK2dhOVVGRlV1LzBNODQxNVp6c3RJYWdW?=
+ =?utf-8?B?a21rUzlHUEpiTFlmNDB0QVAvOTg1bDAzRnhxMVpoTURCaDhEdzIvSjZuWWJM?=
+ =?utf-8?B?RmNJTWdsNDM5YWxXSXFPWGdoVEppM0lUNkRVRWc2eWFiaE55dGxRTWhnaTQy?=
+ =?utf-8?B?U2pBYmZqUHNVNnVCOG5KUVNycmNlUGEweEg2amNDaFBnajlpYjBoR0JlUFBD?=
+ =?utf-8?B?Yk5KdmJRMUJTYWcrQnYxTHRtZ2VGRWZZbTlVVmwwTTA3YkEwdHhxcDJOOWQ3?=
+ =?utf-8?B?V1U4TTFIcHp1cmNXbVZCOHYxMlIzMHZuYWkxZVk1N0ZjTHl0QThLUHlBYytS?=
+ =?utf-8?B?RVlXSmZtN1ozakRwZ0xYMVJqUzN4MEdhYUg2cHg1M3VLK1Fncko3eS9UQWxD?=
+ =?utf-8?B?SjUzQzNyOUNaQlRnSUFrYU9DWlpFb0x6Q3VGYlNXeTFUYTBpK0ZTR0JoQnZq?=
+ =?utf-8?B?ZkRCdGhhQ3VWaFlBaTZ3TmlLL3BmWTNCRFM3bklQUEpWY3d4NHI0amRveTZt?=
+ =?utf-8?B?dDJWcG93Y0FyVm9iYk0zU0xKWk5BTHdhbE1FeFNwT1h1SVROYWpacGdOQVFB?=
+ =?utf-8?B?OU9kTDQzUzcxWU9KVTBXTmRZZ3E0MHk1MUtoVnFmalI0U0s5ODAwTWtiaTly?=
+ =?utf-8?B?Z05sd0VrdDJnR1prS2VjYzM5dFhwdm85MXhsL1hQZ3hpcUUweC9RMUJCWE9M?=
+ =?utf-8?B?YUNNUFNhakFUbTA5R0FoRkxwUFovWERVRTE0Vnd1S2U0KzFZbERsNEpYTnR5?=
+ =?utf-8?B?bWk2T0Q2OFh4dUhiY0E0eHNabzBTNHBpNzJ1UEpIeFVnYjdLK1lTU080Z2lW?=
+ =?utf-8?B?cUxyYjRmRHhjYkRkblppT1hjR3ZtZXpnRW9jWGFTYXMwaXBJd1dncHQyc2I4?=
+ =?utf-8?B?cHpwZHlTRDhPWE5KVHRaQkR1NjdGaS9NUG9SaEZjS0x4dmxBb1FVVVAxR01G?=
+ =?utf-8?B?VFgzTTNKK0gvYmFPTWxvUGp1aFN1QXpsSWk4ZHhZWlk4Tldnc00wdjBqRTRY?=
+ =?utf-8?B?SUJHdmNYV0dUL3FXc0ZEUk1Kdzg2SFV2VThGY0xZUDB3M29zM3FzVnJhSURV?=
+ =?utf-8?B?V3hKOE5lQWwvOXVQM3NEVml3bjNscnNhSHBCOEorMG53VmRzcmxJUW9heVFT?=
+ =?utf-8?B?VXVkU1hZRk0wVGFLc3hVRm1sckIrc0duanlBTk9DNDZGSGNiRi9NWm45OE9n?=
+ =?utf-8?B?VlRFbHRWVEhHMHM2NEcxVkdSbmFWSXF6eGh1OEQvVzY4NEpkQU9PdTRuajRL?=
+ =?utf-8?B?QkM3U2FxaUxDdURBYTZnRUt6SWVzNU1xKy9LWWkwWXRBbWxqcndsRkw5Nk9I?=
+ =?utf-8?B?OWg2SHUweU5sTEt1NElzYUdiMlRPWG1kcHpKdUg3VGw3WUdXT2JoYk5RRGtX?=
+ =?utf-8?B?RW9ZbFM0K0Q5clB1VDR6Um9ML2tucEwrWTFra0FJSWlnZXNKbkJqSnFPQXdQ?=
+ =?utf-8?B?VkEzdE1pdmtwRVhrbDFKVkxsbi9lU0NsUlFvaEVIU1Y2SXlMcjdwaGhlc2NB?=
+ =?utf-8?Q?o1abI1HRiSyI5QKZGN6gXLDu+?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 37/40] plugins: add an API to read registers
-Content-Language: en-US
-To: =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- John Snow <jsnow@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- Yanan Wang <wangyanan55@huawei.com>, Eduardo Habkost <eduardo@habkost.net>,
- Brian Cain <bcain@quicinc.com>, Laurent Vivier <laurent@vivier.eu>,
- Palmer Dabbelt <palmer@dabbelt.com>, Cleber Rosa <crosa@redhat.com>,
- David Hildenbrand <david@redhat.com>, Beraldo Leal <bleal@redhat.com>,
- Pierrick Bouvier <pierrick.bouvier@linaro.org>,
- Weiwei Li <liwei1518@gmail.com>, Paul Durrant <paul@xen.org>,
- qemu-s390x@nongnu.org, David Woodhouse <dwmw2@infradead.org>,
- Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
- Ilya Leoshkevich <iii@linux.ibm.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Michael Rolnik <mrolnik@gmail.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- Daniel Henrique Barboza <danielhb413@gmail.com>,
- Laurent Vivier <lvivier@redhat.com>, kvm@vger.kernel.org,
- =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
- Alexandre Iooss <erdnaxe@crans.org>, Thomas Huth <thuth@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, qemu-ppc@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Nicholas Piggin <npiggin@gmail.com>, qemu-riscv@nongnu.org,
- qemu-arm@nongnu.org, Song Gao <gaosong@loongson.cn>,
- Yoshinori Sato <ysato@users.sourceforge.jp>,
- Richard Henderson <richard.henderson@linaro.org>,
- Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
- Mahmoud Mandour <ma.mandourr@gmail.com>, Bin Meng <bin.meng@windriver.com>
-References: <20231221103818.1633766-1-alex.bennee@linaro.org>
- <20231221103818.1633766-38-alex.bennee@linaro.org>
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <20231221103818.1633766-38-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB6373.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0e1b381b-55bc-4ebd-aa98-08dc022b6730
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Dec 2023 13:47:41.7322
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: xDfLPjc29rkEyxXaGaRrMdxKCSNa6Bsrt1GerriGS0gkGyo2CBk0NwkRuN4BWB0MdBVUGWWHnoRop59mTPKlBA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB8688
+X-OriginatorOrg: intel.com
 
-On 2023/12/21 19:38, Alex Bennée wrote:
-> We can only request a list of registers once the vCPU has been
-> initialised so the user needs to use either call the get function on
-> vCPU initialisation or during the translation phase.
-> 
-> We don't expose the reg number to the plugin instead hiding it behind
-> an opaque handle. This allows for a bit of future proofing should the
-> internals need to be changed while also being hashed against the
-> CPUClass so we can handle different register sets per-vCPU in
-> hetrogenous situations.
-> 
-> Having an internal state within the plugins also allows us to expand
-> the interface in future (for example providing callbacks on register
-> change if the translator can track changes).
-> 
-> Resolves: https://gitlab.com/qemu-project/qemu/-/issues/1706
-> Cc: Akihiko Odaki <akihiko.odaki@daynix.com>
-> Based-on: <20231025093128.33116-18-akihiko.odaki@daynix.com>
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> 
-> ---
-> v2
->    - use new get whole list api, and expose upwards
-> 
-> vAJB:
-> 
-> The main difference to Akikio's version is hiding the gdb register
-> detail from the plugin for the reasons described above.
-> ---
->   include/qemu/qemu-plugin.h   |  53 +++++++++++++++++-
->   plugins/api.c                | 102 +++++++++++++++++++++++++++++++++++
->   plugins/qemu-plugins.symbols |   2 +
->   3 files changed, 155 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/qemu/qemu-plugin.h b/include/qemu/qemu-plugin.h
-> index 4daab6efd29..e3b35c6ee81 100644
-> --- a/include/qemu/qemu-plugin.h
-> +++ b/include/qemu/qemu-plugin.h
-> @@ -11,6 +11,7 @@
->   #ifndef QEMU_QEMU_PLUGIN_H
->   #define QEMU_QEMU_PLUGIN_H
->   
-> +#include <glib.h>
->   #include <inttypes.h>
->   #include <stdbool.h>
->   #include <stddef.h>
-> @@ -227,8 +228,8 @@ struct qemu_plugin_insn;
->    * @QEMU_PLUGIN_CB_R_REGS: callback reads the CPU's regs
->    * @QEMU_PLUGIN_CB_RW_REGS: callback reads and writes the CPU's regs
->    *
-> - * Note: currently unused, plugins cannot read or change system
-> - * register state.
-> + * Note: currently QEMU_PLUGIN_CB_RW_REGS is unused, plugins cannot change
-> + * system register state.
->    */
->   enum qemu_plugin_cb_flags {
->       QEMU_PLUGIN_CB_NO_REGS,
-> @@ -708,4 +709,52 @@ uint64_t qemu_plugin_end_code(void);
->   QEMU_PLUGIN_API
->   uint64_t qemu_plugin_entry_code(void);
->   
-> +/** struct qemu_plugin_register - Opaque handle for a translated instruction */
-> +struct qemu_plugin_register;
-
-What about identifying a register with an index in an array returned by 
-qemu_plugin_get_registers(). That saves troubles having the handle 
-member in qemu_plugin_reg_descriptor.
-
-> +
-> +/**
-> + * typedef qemu_plugin_reg_descriptor - register descriptions
-> + *
-> + * @name: register name
-> + * @handle: opaque handle for retrieving value with qemu_plugin_read_register
-> + * @feature: optional feature descriptor, can be NULL
-
-Why can it be NULL?
-
-> + */
-> +typedef struct {
-> +    char name[32];
-
-Why not const char *?
-
-> +    struct qemu_plugin_register *handle;
-> +    const char *feature;
-> +} qemu_plugin_reg_descriptor;
-> +
-> +/**
-> + * qemu_plugin_get_registers() - return register list for vCPU
-> + * @vcpu_index: vcpu to query
-> + *
-> + * Returns a GArray of qemu_plugin_reg_descriptor or NULL. Caller
-> + * frees the array (but not the const strings).
-> + *
-> + * As the register set of a given vCPU is only available once
-> + * the vCPU is initialised if you want to monitor registers from the
-> + * start you should call this from a qemu_plugin_register_vcpu_init_cb()
-> + * callback.
-
-Is this note really necessary? You won't know vcpu_index before 
-qemu_plugin_register_vcpu_init_cb() anyway.
-
-> + */
-> +GArray * qemu_plugin_get_registers(unsigned int vcpu_index);
-
-Spurious space after *.
-
-> +
-> +/**
-> + * qemu_plugin_read_register() - read register
-> + *
-> + * @vcpu: vcpu index
-> + * @handle: a @qemu_plugin_reg_handle handle
-> + * @buf: A GByteArray for the data owned by the plugin
-> + *
-> + * This function is only available in a context that register read access is
-> + * explicitly requested.
-> + *
-> + * Returns the size of the read register. The content of @buf is in target byte
-> + * order. On failure returns -1
-> + */
-> +int qemu_plugin_read_register(unsigned int vcpu,
-> +                              struct qemu_plugin_register *handle,
-> +                              GByteArray *buf);
-
-Indention is not correct. docs/devel/style.rst says:
-
- > In case of function, there are several variants:
- >
- > * 4 spaces indent from the beginning
- > * align the secondary lines just after the opening parenthesis of the 
-first
+T24gVGh1cnNkYXksIERlY2VtYmVyIDIxLCAyMDIzIDc6NTQgUE0sIExpLCBYaWFveWFvIHdyb3Rl
+Og0KPiBPbiAxMi8yMS8yMDIzIDY6MzYgUE0sIFdhbmcsIFdlaSBXIHdyb3RlOg0KPiA+IE5vIG5l
+ZWQgdG8gc3BlY2lmaWNhbGx5IGNoZWNrIGZvciBLVk1fTUVNT1JZX0FUVFJJQlVURV9QUklWQVRF
+IHRoZXJlLg0KPiA+IEknbSBzdWdnZXN0aW5nIGJlbG93Og0KPiA+DQo+ID4gZGlmZiAtLWdpdCBh
+L2FjY2VsL2t2bS9rdm0tYWxsLmMgYi9hY2NlbC9rdm0va3ZtLWFsbC5jIGluZGV4DQo+ID4gMmQ5
+YTI0NTVkZS4uNjNiYTc0YjIyMSAxMDA2NDQNCj4gPiAtLS0gYS9hY2NlbC9rdm0va3ZtLWFsbC5j
+DQo+ID4gKysrIGIvYWNjZWwva3ZtL2t2bS1hbGwuYw0KPiA+IEBAIC0xMzc1LDYgKzEzNzUsMTEg
+QEAgc3RhdGljIGludCBrdm1fc2V0X21lbW9yeV9hdHRyaWJ1dGVzKGh3YWRkcg0KPiBzdGFydCwg
+aHdhZGRyIHNpemUsIHVpbnQ2NF90IGF0dHIpDQo+ID4gICAgICAgc3RydWN0IGt2bV9tZW1vcnlf
+YXR0cmlidXRlcyBhdHRyczsNCj4gPiAgICAgICBpbnQgcjsNCj4gPg0KPiA+ICsgICAgaWYgKChh
+dHRyICYga3ZtX3N1cHBvcnRlZF9tZW1vcnlfYXR0cmlidXRlcykgIT0gYXR0cikgew0KPiA+ICsg
+ICAgICAgIGVycm9yX3JlcG9ydCgiS1ZNIGRvZXNuJ3Qgc3VwcG9ydCBtZW1vcnkgYXR0ciAlbHhc
+biIsIGF0dHIpOw0KPiA+ICsgICAgICAgIHJldHVybiAtRUlOVkFMOw0KPiA+ICsgICAgfQ0KPiAN
+Cj4gSW4gdGhlIGNhc2Ugb2Ygc2V0dGluZyBhIHJhbmdlIG9mIG1lbW9yeSB0byBzaGFyZWQgd2hp
+bGUgS1ZNIGRvZXNuJ3Qgc3VwcG9ydA0KPiBwcml2YXRlIG1lbW9yeS4gQWJvdmUgY2hlY2sgZG9l
+c24ndCB3b3JrLiBhbmQgZm9sbG93aW5nIElPQ1RMIGZhaWxzLg0KDQpTSEFSRUQgYXR0cmlidXRl
+IHVzZXMgdGhlIHZhbHVlIDAsIHdoaWNoIGluZGljYXRlcyBpdCdzIGFsd2F5cyBzdXBwb3J0ZWQs
+IG5vPw0KRm9yIHRoZSBpbXBsZW1lbnRhdGlvbiwgY2FuIHlvdSBmaW5kIGluIHRoZSBLVk0gc2lk
+ZSB3aGVyZSB0aGUgaW9jdGwNCndvdWxkIGdldCBmYWlsZWQgaW4gdGhhdCBjYXNlPw0KDQpzdGF0
+aWMgaW50IGt2bV92bV9pb2N0bF9zZXRfbWVtX2F0dHJpYnV0ZXMoc3RydWN0IGt2bSAqa3ZtLA0K
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN0cnVjdCBrdm1fbWVt
+b3J5X2F0dHJpYnV0ZXMgKmF0dHJzKQ0Kew0KICAgICAgICBnZm5fdCBzdGFydCwgZW5kOw0KDQog
+ICAgICAgIC8qIGZsYWdzIGlzIGN1cnJlbnRseSBub3QgdXNlZC4gKi8NCiAgICAgICAgaWYgKGF0
+dHJzLT5mbGFncykNCiAgICAgICAgICAgICAgICByZXR1cm4gLUVJTlZBTDsNCiAgICAgICAgaWYg
+KGF0dHJzLT5hdHRyaWJ1dGVzICYgfmt2bV9zdXBwb3J0ZWRfbWVtX2F0dHJpYnV0ZXMoa3ZtKSkg
+PT0+IDAgaGVyZQ0KICAgICAgICAgICAgICAgIHJldHVybiAtRUlOVkFMOw0KICAgICAgICBpZiAo
+YXR0cnMtPnNpemUgPT0gMCB8fCBhdHRycy0+YWRkcmVzcyArIGF0dHJzLT5zaXplIDwgYXR0cnMt
+PmFkZHJlc3MpDQogICAgICAgICAgICAgICAgcmV0dXJuIC1FSU5WQUw7DQogICAgICAgIGlmICgh
+UEFHRV9BTElHTkVEKGF0dHJzLT5hZGRyZXNzKSB8fCAhUEFHRV9BTElHTkVEKGF0dHJzLT5zaXpl
+KSkNCiAgICAgICAgICAgICAgICByZXR1cm4gLUVJTlZBTDsNCg==
 
