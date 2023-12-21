@@ -1,64 +1,64 @@
-Return-Path: <kvm+bounces-5027-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5024-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F5D681B3C9
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 11:39:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7865481B3C6
+	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 11:38:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73C421C247A0
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 10:39:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AAC991C24AE6
+	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 10:38:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 935B76E2BF;
-	Thu, 21 Dec 2023 10:38:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BBC46BB4A;
+	Thu, 21 Dec 2023 10:38:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Qgo4LhZy"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LluEzNwE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1121C6BB37
-	for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 10:38:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E21926ABAE
+	for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 10:38:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-3365d38dce2so565946f8f.1
-        for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 02:38:26 -0800 (PST)
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-40d05ebe642so10299145e9.0
+        for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 02:38:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1703155105; x=1703759905; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1703155103; x=1703759903; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rOpjk5Xc89URXPry+uTcPrYjjlL9ZRbEnDqtNUUFVo4=;
-        b=Qgo4LhZyGYxLZdzPucOofDbpP4DaeU49BG4bjDIqkSWj38MGfxE3GOQRiuCzI+nr+O
-         nqrI6RS7FR9y4DD+aahw94+uJB8ySjfX2c377L/mFpYFwxNGsOhn+Fz7P+vYiH/Xs1zx
-         QlVzWj70As/W6Klfr8j8O9LOPkzQetHBlQOGNgyOtsAgz2GYPYNhYNm0woYbpzAx74Ca
-         3g+ZUfDRw6UBIk+7V/SvDt7D4NLJ7aO4Gniq1hvBOiC4zk9J+zkgCDjcwBqubpvbOZsn
-         mSaabPBWlfI24zyGSl7wqe3wWvXeh6540mLKX6ppxugTiZAT855YJ9p2mr3yJPNEzco7
-         TVkg==
+        bh=1cgT7e6lhcwn0WzM/v6sP8+3M2uDQNBjem+V+EXl+Sc=;
+        b=LluEzNwEJUdAYm2LLkyh53dCOa0rbkle0vRKlKA4Z2kpr3a+GaEbrd+TSLZuSSn2GL
+         1pM0krbeD3nOHCGj26Ed/G4+ra+BrsYCFnjvLFA9wp14kd/TfGomL5J0fu2V97VByJFB
+         dto316luoSFf2jwh5IzKf6ujzqaTnErF/y3j732paQGZHfqBglVWQYj9bdWCYO/Wxy93
+         QjGmvCRTsJqurLpRPXO6jYRFB9m1H3AdNJJBDjvd+1JMf7uIPeCM8UhfIwxPlfJwdRp3
+         +Jj0BLUiv0feJmqfyhZI7V61Wt3EMEffBDqW1EvmXkV1CHqy/Ga2nbdWPbFoiLSG3I2G
+         voyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703155105; x=1703759905;
+        d=1e100.net; s=20230601; t=1703155103; x=1703759903;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=rOpjk5Xc89URXPry+uTcPrYjjlL9ZRbEnDqtNUUFVo4=;
-        b=cTpEgmV+lWwFa10WjK4oIT5sbM+mnCpfKvrobmK+frm9slphzpH9rxyJ62QVG8xxmE
-         suqDiZ2qwx8r7ZqG2iY/Dkvt4cKHsVqVT2h7t9mZlXn+tsuqaJCNX49AYYg+vHUmpD4Q
-         T5cz7CN/8VbkEsQGI1mZ00iw3x1z+GPYL6zVh8mi+QMoakl8ASTgtzFyhZCg1v2xH6Dh
-         p+BxXJnwulLcNMqk9FvDA2Pds6ZcpA85Cc3jz+Yax7GfRTpCG2yhnuymq2e5bjsQoLgV
-         SZHzxm4kfHAcEGYWJozN9Fs3mkAbubxcr58o2pTJUrY6Umw06A+jLTVBHieJGPByNo5H
-         edog==
-X-Gm-Message-State: AOJu0YwkltZb2zJUJap4Beau0elvgriP/zcHTdsw6r9mux/YwlXvJ60w
-	WDGniFhZ97bIlBTk3WXlQuULgQ==
-X-Google-Smtp-Source: AGHT+IHlhYr5EXfT3dRGXsMcUV7DLzRG+3DIpxleIXcM/4GnHJs35pTv7FZjfYB9dcDkybTHNdnciA==
-X-Received: by 2002:a5d:6449:0:b0:332:e6ec:8306 with SMTP id d9-20020a5d6449000000b00332e6ec8306mr423448wrw.25.1703155105297;
-        Thu, 21 Dec 2023 02:38:25 -0800 (PST)
+        bh=1cgT7e6lhcwn0WzM/v6sP8+3M2uDQNBjem+V+EXl+Sc=;
+        b=cqdIKDT27e0eO4qpr3dVFa8xl3k20KJoLWNV0BqfbFxFeISBNqJ+sWuJvt+cxBnBQ9
+         sLtEEbDj7rcHzoPPPADJ23U85lMW/RN+56TtedrY5IrYy7uUw3iu3Divy7anFj9e5b5L
+         3kiO4OVZVgRjk/Zik9GJBNpp8x9O8QUVma8Y6CSycgu96+LJIIPxEZZC7MWSlKSLwfGk
+         miEj28w7QR30FLqBnHNE5F5ZQOk7eRPtV7F0hpqPjGlo3tuNMS+iI7uXU5Cj8y7LvN/9
+         W4bsoc+U0TsoXyvi5FAH3cPTN2GshUjRyXkL/TMTJr14K/AsjdL+QwAWCIbNuAF5YM8V
+         nLaA==
+X-Gm-Message-State: AOJu0YyZl8AleN2GmDhJDnSeWBvuxOX8t9vNTEz2xhgoyyDUMVsiBsTS
+	Z4nQ7tcLZ8XBEz/zge6mk9khtw==
+X-Google-Smtp-Source: AGHT+IHt6DJEYKfpQux8XnX/Pae/m4+RIj/y0UWX6dLA6GOiTEpo8qd26PDVFX83nnqjF6bFCABiTA==
+X-Received: by 2002:a05:600c:a3a0:b0:40d:2dd9:dac5 with SMTP id hn32-20020a05600ca3a000b0040d2dd9dac5mr323472wmb.97.1703155103125;
+        Thu, 21 Dec 2023 02:38:23 -0800 (PST)
 Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id l15-20020a5d560f000000b0033609584b9dsm1714193wrv.74.2023.12.21.02.38.19
+        by smtp.gmail.com with ESMTPSA id fj8-20020a05600c0c8800b004094e565e71sm2824144wmb.23.2023.12.21.02.38.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Thu, 21 Dec 2023 02:38:22 -0800 (PST)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 557545F8C8;
+	by draig.lan (Postfix) with ESMTP id 6C97E5F8CA;
 	Thu, 21 Dec 2023 10:38:19 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
@@ -104,10 +104,11 @@ Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
 	Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
 	=?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
 	Mahmoud Mandour <ma.mandourr@gmail.com>,
-	Bin Meng <bin.meng@windriver.com>
-Subject: [PATCH 04/40] chardev: use bool for fe_is_open
-Date: Thu, 21 Dec 2023 10:37:42 +0000
-Message-Id: <20231221103818.1633766-5-alex.bennee@linaro.org>
+	Bin Meng <bin.meng@windriver.com>,
+	=?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Subject: [PATCH 05/40] qtest: bump min meson timeout to 60 seconds
+Date: Thu, 21 Dec 2023 10:37:43 +0000
+Message-Id: <20231221103818.1633766-6-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20231221103818.1633766-1-alex.bennee@linaro.org>
 References: <20231221103818.1633766-1-alex.bennee@linaro.org>
@@ -120,142 +121,50 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The function qemu_chr_fe_init already treats be->fe_open as a bool and
-if it acts like a bool it should be one. While we are at it make the
-variable name more descriptive and add kdoc decorations.
+From: Daniel P. Berrangé <berrange@redhat.com>
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+Even some of the relatively fast qtests can sometimes hit the 30 second
+timeout in GitLab CI under high parallelism/load conditions. Bump the
+min to 60 seconds to give a higher margin for reliability.
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+Message-ID: <20230717182859.707658-2-berrange@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20231215070357.10888-2-thuth@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20231211145959.93759-1-alex.bennee@linaro.org>
-
 ---
-v2
-  - rename to fe_is_open at f4bug's request
----
- include/chardev/char-fe.h | 19 ++++++++++++-------
- chardev/char-fe.c         | 16 ++++++++--------
- chardev/char.c            |  2 +-
- 3 files changed, 21 insertions(+), 16 deletions(-)
+ tests/qtest/meson.build | 9 ++-------
+ 1 file changed, 2 insertions(+), 7 deletions(-)
 
-diff --git a/include/chardev/char-fe.h b/include/chardev/char-fe.h
-index 0ff6f875116..ecef1828355 100644
---- a/include/chardev/char-fe.h
-+++ b/include/chardev/char-fe.h
-@@ -7,8 +7,12 @@
- typedef void IOEventHandler(void *opaque, QEMUChrEvent event);
- typedef int BackendChangeHandler(void *opaque);
- 
--/* This is the backend as seen by frontend, the actual backend is
-- * Chardev */
-+/**
-+ * struct CharBackend - back end as seen by front end
-+ * @fe_is_open: the front end is ready for IO
-+ *
-+ * The actual backend is Chardev
-+ */
- struct CharBackend {
-     Chardev *chr;
-     IOEventHandler *chr_event;
-@@ -17,7 +21,7 @@ struct CharBackend {
-     BackendChangeHandler *chr_be_change;
-     void *opaque;
-     int tag;
--    int fe_open;
-+    bool fe_is_open;
- };
- 
- /**
-@@ -156,12 +160,13 @@ void qemu_chr_fe_set_echo(CharBackend *be, bool echo);
- 
- /**
-  * qemu_chr_fe_set_open:
-+ * @be: a CharBackend
-+ * @is_open: the front end open status
-  *
-- * Set character frontend open status.  This is an indication that the
-- * front end is ready (or not) to begin doing I/O.
-- * Without associated Chardev, do nothing.
-+ * This is an indication that the front end is ready (or not) to begin
-+ * doing I/O. Without associated Chardev, do nothing.
-  */
--void qemu_chr_fe_set_open(CharBackend *be, int fe_open);
-+void qemu_chr_fe_set_open(CharBackend *be, bool is_open);
- 
- /**
-  * qemu_chr_fe_printf:
-diff --git a/chardev/char-fe.c b/chardev/char-fe.c
-index 7789f7be9c8..20222a4cad5 100644
---- a/chardev/char-fe.c
-+++ b/chardev/char-fe.c
-@@ -211,7 +211,7 @@ bool qemu_chr_fe_init(CharBackend *b, Chardev *s, Error **errp)
-         }
-     }
- 
--    b->fe_open = false;
-+    b->fe_is_open = false;
-     b->tag = tag;
-     b->chr = s;
-     return true;
-@@ -257,7 +257,7 @@ void qemu_chr_fe_set_handlers_full(CharBackend *b,
-                                    bool sync_state)
- {
-     Chardev *s;
--    int fe_open;
-+    bool fe_open;
- 
-     s = b->chr;
-     if (!s) {
-@@ -265,10 +265,10 @@ void qemu_chr_fe_set_handlers_full(CharBackend *b,
-     }
- 
-     if (!opaque && !fd_can_read && !fd_read && !fd_event) {
--        fe_open = 0;
-+        fe_open = false;
-         remove_fd_in_watch(s);
-     } else {
--        fe_open = 1;
-+        fe_open = true;
-     }
-     b->chr_can_read = fd_can_read;
-     b->chr_read = fd_read;
-@@ -336,7 +336,7 @@ void qemu_chr_fe_set_echo(CharBackend *be, bool echo)
-     }
+diff --git a/tests/qtest/meson.build b/tests/qtest/meson.build
+index 47dabf91d04..366872ed57b 100644
+--- a/tests/qtest/meson.build
++++ b/tests/qtest/meson.build
+@@ -1,12 +1,7 @@
+ slow_qtests = {
+-  'ahci-test' : 60,
+   'bios-tables-test' : 120,
+-  'boot-serial-test' : 60,
+   'migration-test' : 150,
+   'npcm7xx_pwm-test': 150,
+-  'prom-env-test' : 60,
+-  'pxe-test' : 60,
+-  'qos-test' : 60,
+   'qom-test' : 300,
+   'test-hmp' : 120,
  }
- 
--void qemu_chr_fe_set_open(CharBackend *be, int fe_open)
-+void qemu_chr_fe_set_open(CharBackend *be, bool is_open)
- {
-     Chardev *chr = be->chr;
- 
-@@ -344,12 +344,12 @@ void qemu_chr_fe_set_open(CharBackend *be, int fe_open)
-         return;
-     }
- 
--    if (be->fe_open == fe_open) {
-+    if (be->fe_is_open == is_open) {
-         return;
-     }
--    be->fe_open = fe_open;
-+    be->fe_is_open = is_open;
-     if (CHARDEV_GET_CLASS(chr)->chr_set_fe_open) {
--        CHARDEV_GET_CLASS(chr)->chr_set_fe_open(chr, fe_open);
-+        CHARDEV_GET_CLASS(chr)->chr_set_fe_open(chr, is_open);
-     }
- }
- 
-diff --git a/chardev/char.c b/chardev/char.c
-index 996a024c7a2..0653b112e92 100644
---- a/chardev/char.c
-+++ b/chardev/char.c
-@@ -750,7 +750,7 @@ static int qmp_query_chardev_foreach(Object *obj, void *data)
- 
-     value->label = g_strdup(chr->label);
-     value->filename = g_strdup(chr->filename);
--    value->frontend_open = chr->be && chr->be->fe_open;
-+    value->frontend_open = chr->be && chr->be->fe_is_open;
- 
-     QAPI_LIST_PREPEND(*list, value);
- 
+@@ -383,8 +378,8 @@ foreach dir : target_dirs
+          env: qtest_env,
+          args: ['--tap', '-k'],
+          protocol: 'tap',
+-         timeout: slow_qtests.get(test, 30),
+-         priority: slow_qtests.get(test, 30),
++         timeout: slow_qtests.get(test, 60),
++         priority: slow_qtests.get(test, 60),
+          suite: ['qtest', 'qtest-' + target_base])
+   endforeach
+ endforeach
 -- 
 2.39.2
 
