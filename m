@@ -1,26 +1,26 @@
-Return-Path: <kvm+bounces-5017-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5016-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11E2281B2E4
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 10:51:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3379881B2E3
+	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 10:51:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4BF71F22432
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 09:51:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4CC0F1C2397C
+	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 09:51:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54CCF4B5B4;
-	Thu, 21 Dec 2023 09:51:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A0164A986;
+	Thu, 21 Dec 2023 09:51:22 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from zg8tndyumtaxlji0oc4xnzya.icoremail.net (zg8tndyumtaxlji0oc4xnzya.icoremail.net [46.101.248.176])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39EC5481BA
-	for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 09:51:18 +0000 (UTC)
+Received: from zg8tmty3ljk5ljewns4xndka.icoremail.net (zg8tmty3ljk5ljewns4xndka.icoremail.net [167.99.105.149])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45D7D4177B
+	for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 09:51:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
 Received: from localhost.localdomain (unknown [10.12.130.31])
-	by app1 (Coremail) with SMTP id TAJkCgA3tvsxCoRlVowCAA--.17982S4;
-	Thu, 21 Dec 2023 17:49:37 +0800 (CST)
+	by app1 (Coremail) with SMTP id TAJkCgA3tvsxCoRlVowCAA--.17982S5;
+	Thu, 21 Dec 2023 17:49:38 +0800 (CST)
 From: Chao Du <duchao@eswincomputing.com>
 To: kvm@vger.kernel.org,
 	kvm-riscv@lists.infradead.org,
@@ -30,26 +30,29 @@ To: kvm@vger.kernel.org,
 	paul.walmsley@sifive.com,
 	palmer@dabbelt.com,
 	aou@eecs.berkeley.edu
-Subject: [RFC PATCH 0/3] RISC-V: KVM: Guest Debug Support
-Date: Thu, 21 Dec 2023 09:49:59 +0000
-Message-Id: <20231221095002.7404-1-duchao@eswincomputing.com>
+Subject: [RFC PATCH 1/3] RISC-V: KVM: Enable the KVM_CAP_SET_GUEST_DEBUG capability
+Date: Thu, 21 Dec 2023 09:50:00 +0000
+Message-Id: <20231221095002.7404-2-duchao@eswincomputing.com>
 X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID:TAJkCgA3tvsxCoRlVowCAA--.17982S4
-X-Coremail-Antispam: 1UD129KBjvdXoWrZF15uF1ruw43Xr18KryUJrb_yoWfAFb_Cr
-	WfJ3yrJ397XFW0gFZ7C3Z3GFWDGFWrG3W2yr1I9F1UGr43WrW7Gw4kXr15Zr1UAr45Za4k
-	XFn5ZryxZ3429jkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUb7xYjsxI4VWkCwAYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I
-	6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM2
-	8CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0
-	cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I
-	8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI
-	64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8Jw
-	Am72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lc2xSY4AK6svPMxAIw28IcxkI
-	7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxV
-	Cjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY
-	6xIIjxv20xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1lIxAIcV
-	CF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
-	c7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07jUfHUUUUUU=
+In-Reply-To: <20231221095002.7404-1-duchao@eswincomputing.com>
+References: <20231221095002.7404-1-duchao@eswincomputing.com>
+X-CM-TRANSID:TAJkCgA3tvsxCoRlVowCAA--.17982S5
+X-Coremail-Antispam: 1UD129KBjvdXoWrtF1kCFyrZrW3ZrWfury7GFg_yoWDKwb_C3
+	yxGw1xurZ3XayIgFsF9ws3GF1Iqa4FqFWvqrn3XF1UGr9rur47K395JasrAr1UurWFvw40
+	yr95JrWSy34DKjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbf8YjsxI4VWxJwAYFVCjjxCrM7AC8VAFwI0_Xr0_Wr1l1xkIjI8I
+	6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l82xGYIkIc2x26280x7
+	IE14v26r18M28IrcIa0xkI8VCY1x0267AKxVWUCVW8JwA2ocxC64kIII0Yj41l84x0c7CE
+	w4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6x
+	kF7I0E14v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIE
+	c7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I
+	8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCF
+	s4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwCY02Avz4vE-syl42xK82IYc2Ij64vIr4
+	1l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK
+	67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI
+	8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26F4j6r4UJwCI42IY6xAIw20E
+	Y4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267
+	AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8wqXPUUUUU==
 X-CM-SenderInfo: xgxfxt3r6h245lqf0zpsxwx03jof0z/
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -57,33 +60,40 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 
-This series implements KVM Guest Debug on RISC-V. Currently, we can
-debug RISC-V KVM guest from the host side, with software breakpoints.
+To indicate that the hypervisor has the capability for guest debug.
+Also update the uapi header file.
 
-A brief test was done on QEMU RISC-V hypervisor emulator.
+Signed-off-by: Chao Du <duchao@eswincomputing.com>
+---
+ arch/riscv/include/uapi/asm/kvm.h | 1 +
+ arch/riscv/kvm/vm.c               | 1 +
+ 2 files changed, 2 insertions(+)
 
-A TODO list which will be added later:
-1. HW breakpoints support
-2. Test cases
-
-This series is based on Linux 6.7-rc6 and is also available at:
-https://github.com/Du-Chao/linux/tree/riscv_gd_sw
-
-The matched QEMU is available at:
-https://github.com/Du-Chao/qemu/tree/riscv_gd_sw
-
-Chao Du (3):
-  RISC-V: KVM: Enable the KVM_CAP_SET_GUEST_DEBUG capability
-  RISC-V: KVM: Implement kvm_arch_vcpu_ioctl_set_guest_debug()
-  RISC-V: KVM: Handle breakpoint exits for VCPU
-
- arch/riscv/include/uapi/asm/kvm.h |  1 +
- arch/riscv/kvm/vcpu.c             | 15 +++++++++++++--
- arch/riscv/kvm/vcpu_exit.c        |  4 ++++
- arch/riscv/kvm/vm.c               |  1 +
- 4 files changed, 19 insertions(+), 2 deletions(-)
-
---
+diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/asm/kvm.h
+index 60d3b21dead7..288788f5faa0 100644
+--- a/arch/riscv/include/uapi/asm/kvm.h
++++ b/arch/riscv/include/uapi/asm/kvm.h
+@@ -17,6 +17,7 @@
+ 
+ #define __KVM_HAVE_IRQ_LINE
+ #define __KVM_HAVE_READONLY_MEM
++#define __KVM_HAVE_GUEST_DEBUG
+ 
+ #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
+ 
+diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
+index 7e2b50c692c1..235b40ab82ea 100644
+--- a/arch/riscv/kvm/vm.c
++++ b/arch/riscv/kvm/vm.c
+@@ -187,6 +187,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_READONLY_MEM:
+ 	case KVM_CAP_MP_STATE:
+ 	case KVM_CAP_IMMEDIATE_EXIT:
++	case KVM_CAP_SET_GUEST_DEBUG:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_NR_VCPUS:
+-- 
 2.17.1
 
 
