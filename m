@@ -1,163 +1,239 @@
-Return-Path: <kvm+bounces-5074-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5075-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A44581B9B2
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 15:39:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B82B481B9FD
+	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 15:57:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3FB2EB21DAA
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 14:39:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3C8E4B23DE5
+	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 14:57:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12FC736086;
-	Thu, 21 Dec 2023 14:39:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3705E4AF79;
+	Thu, 21 Dec 2023 14:56:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BIeVcr/I"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fvIo4Mjz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5EBD1643D
-	for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 14:39:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-548ae9a5eeaso10384a12.1
-        for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 06:39:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1703169556; x=1703774356; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rjcA0ZHCISKFLd/dhu8u4Y90/L5gD9s8eTEB1hR8ro0=;
-        b=BIeVcr/IKELXEmmHxqDHv6z8zM8YyEmKwR+w9WfKabjsW3PS4/UdM/VkOyY/J34h+0
-         WwI2UtNRq1EFXYzQoSDcTQU2Z5qZ0h3j1914PSAzg/eGhU6mxSwjbxwMETlNpF+TqnmL
-         w79XygQcY0l3eGR9CTEi2dGYiFjta0kkuCv6r4R6WfrednET6XzCvRADfwVmc1Y6PCyq
-         xU3lhC/zU6cGwvT4DUQTbz5kFcuPD00ic+wswanV33xnnAQdh911jYQDRiwWbSqZP8b6
-         T0Xae89ZYODyi0BgnzchWxOxFHRcupH2KzV10Y9JBVMuQHZSg+haHcVIkpRj61QxRj5H
-         jaKw==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDDDA48CCC
+	for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 14:56:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1703170578;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=B8eIz4f9p7CSrHkPxbwx9C5GZwRnjE0R1lz9iIAHGRA=;
+	b=fvIo4MjzA1PlqKOjsRCtwrvXk5qgNfcWsuKqi1O84vqmuLkBhagZYSNlL3ozqCZoOzuszp
+	CaNiF+Vm/Xl/XR2UuqVgxvoEr58hMpmQgF2g69aP9CASUc7ja08tgD0Fx4WSZeBHOlH6cR
+	qD2t7Qw+smbhpa9V2qnfFLAYH3zddaw=
+Received: from mail-yw1-f198.google.com (mail-yw1-f198.google.com
+ [209.85.128.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-483-TYdk89gdNkG5du5xKFhFVw-1; Thu, 21 Dec 2023 09:56:15 -0500
+X-MC-Unique: TYdk89gdNkG5du5xKFhFVw-1
+Received: by mail-yw1-f198.google.com with SMTP id 00721157ae682-5d0c4ba7081so15410927b3.0
+        for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 06:56:15 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703169556; x=1703774356;
+        d=1e100.net; s=20230601; t=1703170575; x=1703775375;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=rjcA0ZHCISKFLd/dhu8u4Y90/L5gD9s8eTEB1hR8ro0=;
-        b=bxgMPYfoPmaMwa2LvsjARADFdVfcEq5WJNROYFlVzxibOUAbMXocCsGo/iSFZcvpoD
-         kaD9AroDwdd57eHPqEqBZVXlDbu7eHgjSRGKlJMiC9ZqOg1tIcNV1v4FstNshoAnIToq
-         WdQ1MDGGftzAzRdYo1aKKy+I9UmSFcBthTQ8NASLivpLm2jIBYIBqDSPxZ8/ZkCtZoGo
-         nsCGWdCWivRbG14hFlAqNaxpHjHSbgMKHrZ9ES7lx4JigfT4GInJanhdUNNRSoS5oPfY
-         fbtZuWV+hczMljOMULDpMxWnirk77yO9brALFTmrHm2H+256c7j3gmOst2tSA3YrPulf
-         ucrg==
-X-Gm-Message-State: AOJu0YzeX5oQDOx7yy4q6Pa1z4E2FDgNAF2WgYlRvflZatcpaUO9Q6hP
-	lagrGR+hG9SaJYLl1rFYcw3sr07P+70ywiFP/V/1LOVB+0N4
-X-Google-Smtp-Source: AGHT+IHadjkxej2zeqN8fIo7mtrLDexZz9HuN8LRIdrgV5tCw5yHEITs55wde2zBc3MpKO0nkT81+bMWqsG0mRCI6U4=
-X-Received: by 2002:a50:c109:0:b0:551:9870:472 with SMTP id
- l9-20020a50c109000000b0055198700472mr78217edf.1.1703169555925; Thu, 21 Dec
- 2023 06:39:15 -0800 (PST)
+        bh=B8eIz4f9p7CSrHkPxbwx9C5GZwRnjE0R1lz9iIAHGRA=;
+        b=e0UIIwgELzh4uGG5T/2bHnEi64JkK1wShA8x9fnhKhlXskuJAIyhKvVZ094y98Vhyj
+         epBX/jbi6X9VDV8cwg2QIcxlMcXolFYP/TxFP7vnJ/MA1gnXkYou0ChP9w4+AQ+9PDdq
+         Hj0rd5eHq7zZ+hdRnEF5KlOwVDjmMcbwVGUgaLtDIzWEaNM4HrUvV/1H0oWpmKw5Gurd
+         s3oFG9RPbmGooZj65ie9VpK1AvTG/75sbbNEIQuOWzd1O0rAsZP0g4OlVHFkgWZ819Bi
+         yy7hvWqfo23bNlSZzK23O6hTffx6XvVVY2uO3brnnbWYNx9TSlEqjdWOwDc104iSpcGE
+         pUlQ==
+X-Gm-Message-State: AOJu0YwyZwD+ag3CxBgR0kTLpAmXFoVlOTE8JxhK7kJ9BpnQmQKHnnmj
+	GPkNUqxkCHRPzqwMXtkb8vyDeH4Cld4xRu/9RcUea5H6vL5ei0XNTsBv2EVgL53T7LeMM53cW30
+	13fA5Ny8RHyGcKZWZ9/CMTZJu9Tp7kaTE9k1f
+X-Received: by 2002:a25:d88b:0:b0:dbd:11:5dee with SMTP id p133-20020a25d88b000000b00dbd00115deemr1311067ybg.37.1703170575141;
+        Thu, 21 Dec 2023 06:56:15 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH8jOlzMv0iYcVNkFXFgLaDs5GWBuNPYA3j97IaAxPd2JpsSU5V8zCmy+j79KFLQR0AlsT/6eD/52Y8Bkd+cQQ=
+X-Received: by 2002:a25:d88b:0:b0:dbd:11:5dee with SMTP id p133-20020a25d88b000000b00dbd00115deemr1311052ybg.37.1703170574842;
+ Thu, 21 Dec 2023 06:56:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1699936040.git.isaku.yamahata@intel.com>
- <1c12f378af7de16d7895f8badb18c3b1715e9271.1699936040.git.isaku.yamahata@intel.com>
- <938efd3cfcb25d828deab0cc0ba797177cc69602.camel@redhat.com>
- <ZXo54VNuIqbMsYv-@google.com> <aa7aa5ea5b112a0ec70c6276beb281e19c052f0e.camel@redhat.com>
- <ZXswR04H9Tl7xlyj@google.com> <20231219014045.GA2639779@ls.amr.corp.intel.com>
- <CALMp9eRgWct3bb5en0=geT0HmMemipkzXkjL9kmEAV+1yJg-pw@mail.gmail.com>
- <20231219081104.GB2639779@ls.amr.corp.intel.com> <ZYNlhKCcOHgjTcFZ@google.com>
- <5cf35021-c81f-43e3-9d0d-69604fc4fa59@intel.com>
-In-Reply-To: <5cf35021-c81f-43e3-9d0d-69604fc4fa59@intel.com>
-From: Jim Mattson <jmattson@google.com>
-Date: Thu, 21 Dec 2023 06:39:04 -0800
-Message-ID: <CALMp9eRqQqOK8n7jSiop9J2NORWVM-0bztbjMmo3npp4W1Tm8Q@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] KVM: x86: Make the hardcoded APIC bus frequency vm variable
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Sean Christopherson <seanjc@google.com>, Isaku Yamahata <isaku.yamahata@linux.intel.com>, 
-	Maxim Levitsky <mlevitsk@redhat.com>, isaku.yamahata@intel.com, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com, 
-	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com, 
-	Vishal Annapurve <vannapurve@google.com>
+References: <20231219180858.120898-1-dtatulea@nvidia.com> <20231219180858.120898-3-dtatulea@nvidia.com>
+ <CACGkMEv7xQkZYJAgAUK6C3oUrZ9vuUJdTKRzihXcNPb-iWdpJw@mail.gmail.com>
+ <CACGkMEsaaDGi63__YrvsTC1HqgTaEWHvGokK1bJS5+m1XYM-6w@mail.gmail.com>
+ <CAJaqyWdoaj8a7q1KrGqWmkYvAw_R_p0utcWvDvkyVm1nUOAxrA@mail.gmail.com>
+ <CACGkMEuM7bXxsxHUs_SodiDQ2+akrLqqzWZBJSZEcnMASUkb+g@mail.gmail.com>
+ <CAJaqyWeBVVcTZEzZK=63Ymk85wnRFd+_wK56UfEHNXBH-qy1Zg@mail.gmail.com>
+ <70adc734331c1289dceb3bcdc991f3da7e4db2f0.camel@nvidia.com>
+ <CAJaqyWeUHiZXMFkNBpinCsJAXojtPkGz+SjzUNDPx5W=qqON1w@mail.gmail.com> <c03eb2bb3ad76e28be2bb9b9e4dee4c3bc062ea7.camel@nvidia.com>
+In-Reply-To: <c03eb2bb3ad76e28be2bb9b9e4dee4c3bc062ea7.camel@nvidia.com>
+From: Eugenio Perez Martin <eperezma@redhat.com>
+Date: Thu, 21 Dec 2023 15:55:38 +0100
+Message-ID: <CAJaqyWevZX5TKpaLiJwu2nD7PHFsHg+TEZ=iPdWvrH4jyPV+cA@mail.gmail.com>
+Subject: Re: [PATCH vhost v4 02/15] vdpa: Add VHOST_BACKEND_F_CHANGEABLE_VQ_ADDR_IN_SUSPEND
+ flag
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: "xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>, Parav Pandit <parav@nvidia.com>, 
+	Gal Pressman <gal@nvidia.com>, 
+	"virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"si-wei.liu@oracle.com" <si-wei.liu@oracle.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"jasowang@redhat.com" <jasowang@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>, 
+	"mst@redhat.com" <mst@redhat.com>, "leon@kernel.org" <leon@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 20, 2023 at 9:44=E2=80=AFPM Xiaoyao Li <xiaoyao.li@intel.com> w=
-rote:
+On Thu, Dec 21, 2023 at 3:38=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia.com=
+> wrote:
 >
-> On 12/21/2023 6:07 AM, Sean Christopherson wrote:
-> > On Tue, Dec 19, 2023, Isaku Yamahata wrote:
-> >> On Mon, Dec 18, 2023 at 07:53:45PM -0800, Jim Mattson <jmattson@google=
+> On Thu, 2023-12-21 at 13:08 +0100, Eugenio Perez Martin wrote:
+> > On Thu, Dec 21, 2023 at 12:52=E2=80=AFPM Dragos Tatulea <dtatulea@nvidi=
+a.com> wrote:
+> > >
+> > > On Thu, 2023-12-21 at 08:46 +0100, Eugenio Perez Martin wrote:
+> > > > On Thu, Dec 21, 2023 at 3:03=E2=80=AFAM Jason Wang <jasowang@redhat=
 .com> wrote:
-> >>>> There are several options to address this.
-> >>>> 1. Make the KVM able to configure APIC bus frequency (This patch).
-> >>>>     Pros: It resembles the existing hardware.  The recent Intel CPUs
-> >>>>     adapts 25MHz.
-> >>>>     Cons: Require the VMM to emulate the APIC timer at 25MHz.
-> >>>> 2. Make the TDX architecture enumerate CPUID 0x15 to configurable
-> >>>>     frequency or not enumerate it.
-> >>>>     Pros: Any APIC bus frequency is allowed.
-> >>>>     Cons: Deviation from the real hardware.
+> > > > >
+> > > > > On Wed, Dec 20, 2023 at 9:32=E2=80=AFPM Eugenio Perez Martin
+> > > > > <eperezma@redhat.com> wrote:
+> > > > > >
+> > > > > > On Wed, Dec 20, 2023 at 5:06=E2=80=AFAM Jason Wang <jasowang@re=
+dhat.com> wrote:
+> > > > > > >
+> > > > > > > On Wed, Dec 20, 2023 at 11:46=E2=80=AFAM Jason Wang <jasowang=
+@redhat.com> wrote:
+> > > > > > > >
+> > > > > > > > On Wed, Dec 20, 2023 at 2:09=E2=80=AFAM Dragos Tatulea <dta=
+tulea@nvidia.com> wrote:
+> > > > > > > > >
+> > > > > > > > > The virtio spec doesn't allow changing virtqueue addresse=
+s after
+> > > > > > > > > DRIVER_OK. Some devices do support this operation when th=
+e device is
+> > > > > > > > > suspended. The VHOST_BACKEND_F_CHANGEABLE_VQ_ADDR_IN_SUSP=
+END flag
+> > > > > > > > > advertises this support as a backend features.
+> > > > > > > >
+> > > > > > > > There's an ongoing effort in virtio spec to introduce the s=
+uspend state.
+> > > > > > > >
+> > > > > > > > So I wonder if it's better to just allow such behaviour?
+> > > > > > >
+> > > > > > > Actually I mean, allow drivers to modify the parameters durin=
+g suspend
+> > > > > > > without a new feature.
+> > > > > > >
+> > > > > >
+> > > > > > That would be ideal, but how do userland checks if it can suspe=
+nd +
+> > > > > > change properties + resume?
+> > > > >
+> > > > > As discussed, it looks to me the only device that supports suspen=
+d is
+> > > > > simulator and it supports change properties.
+> > > > >
+> > > > > E.g:
+> > > > >
+> > > > > static int vdpasim_set_vq_address(struct vdpa_device *vdpa, u16 i=
+dx,
+> > > > >                                   u64 desc_area, u64 driver_area,
+> > > > >                                   u64 device_area)
+> > > > > {
+> > > > >         struct vdpasim *vdpasim =3D vdpa_to_sim(vdpa);
+> > > > >         struct vdpasim_virtqueue *vq =3D &vdpasim->vqs[idx];
+> > > > >
+> > > > >         vq->desc_addr =3D desc_area;
+> > > > >         vq->driver_addr =3D driver_area;
+> > > > >         vq->device_addr =3D device_area;
+> > > > >
+> > > > >         return 0;
+> > > > > }
+> > > > >
+> > > >
+> > > > So in the current kernel master it is valid to set a different vq
+> > > > address while the device is suspended in vdpa_sim. But it is not va=
+lid
+> > > > in mlx5, as the FW will not be updated in resume (Dragos, please
+> > > > correct me if I'm wrong). Both of them return success.
+> > > >
+> > > In the current state, there is no resume. HW Virtqueues will just get=
+ re-created
+> > > with the new address.
+> > >
 > >
-> > I don't buy this as a valid Con.  TDX is one gigantic deviation from re=
-al hardware,
-> > and since TDX obviously can't guarantee the APIC timer is emulated at t=
-he correct
-> > frequency, there can't possibly be any security benefits.  If this were=
- truly a
-> > Con that anyone cared about, we would have gotten patches to "fix" KVM =
-a long time
-> > ago.
+> > Oh, then all of this is effectively transparent to the userspace
+> > except for the time it takes?
 > >
-> > If the TDX module wasn't effectively hardware-defined software, i.e. wa=
-s actually
-> > able to adapt at the speed of software, then fixing this in TDX would b=
-e a complete
-> > no-brainer.
-> >
-> > The KVM uAPI required to play nice is relatively minor, so I'm not tota=
-lly opposed
-> > to adding it.  But I totally agree with Jim that forcing KVM to change =
-13+ years
-> > of behavior just because someone at Intel decided that 25MHz was a good=
- number is
-> > ridiculous.
+> Not quite: mlx5_vdpa_set_vq_address will save the vq address only on the =
+SW vq
+> representation. Only later will it will call into the FW to update the FW=
+. Later
+> means:
+> - On DRIVER_OK state, when the VQs get created.
+> - On .set_map when the VQs get re-created (before this series) / updated =
+(after
+> this series)
+> - On .resume (after this series).
 >
-> I believe 25MHz was chosen because it's the value from hardware that
-> supports TDX and it is not going to change for the following known
-> generations that support TDX.
+> So if the .set_vq_address is called when the VQ is in DRIVER_OK but not
+> suspended those addresses will be set later for later.
 >
-> It's mainly the core crystal frequency. Yes, it also represents the APIC
-> frequency when it's enumerated in CPUID 0x15. However, it also relates
-> other things, like intel-pt MTC Freq. If it is configured to other value
-> different from hardware, I think it will break the correctness of
-> INTEL-PT MTC packets in TDs.
 
-LOL! That suggests that no one is really using KVM's Intel PT virtualizatio=
-n.
+Ouch, that is more in the line of my thoughts :(.
 
-This is certainly a compelling reason for having a variable frequency
-virtual APIC. Thank you!
+> > In that case you're right, we don't need feature flags. But I think it
+> > would be great to also move the error return in case userspace tries
+> > to modify vq parameters out of suspend state.
+> >
+> On the driver side or on the core side?
+>
 
-> >>>> 3. Make the TDX guest kernel use 1GHz when it's running on KVM.
-> >>>>     Cons: The kernel ignores CPUID leaf 0x15.
-> >>>
-> >>> 4. Change CPUID.15H under TDX to report the crystal clock frequency a=
-s 1 GHz.
-> >>> Pro: This has been the virtual APIC frequency for KVM guests for 13 y=
-ears.
-> >>> Pro: This requires changing only one hard-coded constant in TDX.
-> >>>
-> >>> I see no compelling reason to complicate KVM with support for
-> >>> configurable APIC frequencies, and I see no advantages to doing so.
-> >>
-> >> Because TDX isn't specific to KVM, it should work with other VMM techn=
-ologies.
-> >> If we'd like to go for this route, the frequency would be configurable=
-.  What
-> >> frequency should be acceptable securely is obscure.  25MHz has long hi=
-story with
-> >> the real hardware.
+Core side.
+
+It does not have to be part of this series, I meant it can be proposed
+in a separate series and applied before the parent driver one.
+
+> Thanks
+> > Thanks!
+> >
+> >
+> > > > How can we know in the destination QEMU if it is valid to suspend &
+> > > > set address? Should we handle this as a bugfix and backport the
+> > > > change?
+> > > >
+> > > > > >
+> > > > > > The only way that comes to my mind is to make sure all parents =
+return
+> > > > > > error if userland tries to do it, and then fallback in userland=
+.
+> > > > >
+> > > > > Yes.
+> > > > >
+> > > > > > I'm
+> > > > > > ok with that, but I'm not sure if the current master & previous=
+ kernel
+> > > > > > has a coherent behavior. Do they return error? Or return succes=
+s
+> > > > > > without changing address / vq state?
+> > > > >
+> > > > > We probably don't need to worry too much here, as e.g set_vq_addr=
+ess
+> > > > > could fail even without suspend (just at uAPI level).
+> > > > >
+> > > >
+> > > > I don't get this, sorry. I rephrased my point with an example earli=
+er
+> > > > in the mail.
+> > > >
+> > >
 > >
 >
+
 
