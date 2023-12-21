@@ -1,226 +1,174 @@
-Return-Path: <kvm+bounces-4971-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4972-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDB0281AC88
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 03:13:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AEC6381ACD2
+	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 03:59:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73DE9287093
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 02:13:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B277284040
+	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 02:59:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4C054404;
-	Thu, 21 Dec 2023 02:13:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08BA86FB9;
+	Thu, 21 Dec 2023 02:58:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Hz2VW0RL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="epYHyAl7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73594184C
-	for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 02:12:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dbdad99096fso462932276.2
-        for <kvm@vger.kernel.org>; Wed, 20 Dec 2023 18:12:58 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FCB24691;
+	Thu, 21 Dec 2023 02:58:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2cc259392a6so2918521fa.2;
+        Wed, 20 Dec 2023 18:58:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1703124777; x=1703729577; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qZL4eZ6u9CkNNM8zLim6V4IndhkBqKjZUwKwl+b+dig=;
-        b=Hz2VW0RLT2wu1n6xcs1cm6UhLe1h8ll/pa54CAUjY09etFDQyvnmK7L9axYzKKVbCn
-         FlTRemeJ0+MMRmnBbqk0azbkpFEqbCJaIpUGvDc7dMtZ8wsnNauVe8BbjLA+UGlNMchV
-         lmclyOQ0363DR9+77iJFQh6RNapZL5IU3vA9pIXcJTfjrw4gstnQtDktoZX4y3NvOVVt
-         DRwM175xWXPRk4QEOi74mNXThiFTfLBiNhQEH/AwXMob2Awms+3ZBk0lvGtOsCryJ/vc
-         HaPyIESvw7JWjWOOpoqYcbNOzq9adQpkiKJI3acon+2kqXp00mgoWpTvkbvNzD0u59i2
-         B/eg==
+        d=gmail.com; s=20230601; t=1703127533; x=1703732333; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6bBzkO/x8C7pW+ybw+V7AQ5yP+2vx9qyk2y1ClRHSZw=;
+        b=epYHyAl7TiA75ynKga5al2BKz1HG4HUHczes0Xfbr3Z+dTwcBCehybaT4KHMWS10uO
+         yG9alFvIbmjCL64lHfimte6bpdTeyQNQs5S2oMZqS+OVuFJ4+f+1oLvUvUZEMDKtIjpi
+         TSBI10xhk/jW1ddVgR3YG6VUtUJa+TDpzL5FEKgfE9UXdImGQwatqGZG9O0wlmgfol0x
+         vr9GEPdtVRIWpMrEJImxDzIIUmzzVsFBl/iRCre8JdPiakhjPQwNWKsxfZlFU53offK5
+         yEusJCTZ0/ybWG3cepjXmIbxkREi2ipognsGq3yWwFIue1P1/Bfx2IRU6X4IYzWR6gtg
+         e0+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703124777; x=1703729577;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qZL4eZ6u9CkNNM8zLim6V4IndhkBqKjZUwKwl+b+dig=;
-        b=dAdLTlfUpdx/dIjoqQKhSf2KwX9pnmAtqvUV+zRJFwEMNB8/OKq0M40QLlE1BLvalF
-         Wrjxp7RlQt4a8vQFIMGYBr1qD9fch1zm7DCdCHPCfbg99vNNwDlWo+jRxH5J1Tym7sUA
-         r0gQESwLhcXl525uS3dxa5Kqq5tpamTMSiowxL0eX06dUwTbdERc6ImG4U4K7RkwrLcB
-         YgkQ9fMcvdm8G3KkZBC+/pmUT5Q6kzUZ/U+cQ+EN8nWX8Cohk9/J/C58aaD5YOJcmEzi
-         sApBIbLoHvFme5BOuBmo3gnUsqRQYjzM+jPwU9u5CqJGRt2HhEtsgxvXkMsN12LMShSa
-         OhMg==
-X-Gm-Message-State: AOJu0Yyx5d98ii/VnXyWiIDHOqffiDpdjHgbOsu80s2jUWb0Vlf9KUlN
-	WAwuKCmm5hNl9A0sHnzw7+Xe+gCQZiU=
-X-Google-Smtp-Source: AGHT+IHZcmSZfB7sL8/DN2qPbVmszZ2Jby/ac3YVH1l0ZSD4QHL8Y190bGfTeBcn+OFXVpkLGzQYnrzycAs=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:664d:0:b0:dbd:bf0f:6fff with SMTP id
- z13-20020a25664d000000b00dbdbf0f6fffmr260745ybm.1.1703124777494; Wed, 20 Dec
- 2023 18:12:57 -0800 (PST)
-Date: Wed, 20 Dec 2023 18:12:55 -0800
-In-Reply-To: <ZYJOTLwreD+8l4gU@yzhao56-desk.sh.intel.com>
+        d=1e100.net; s=20230601; t=1703127533; x=1703732333;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6bBzkO/x8C7pW+ybw+V7AQ5yP+2vx9qyk2y1ClRHSZw=;
+        b=HYd+ibw9j9lph2x+VxtCKy2IP16IgMlC4D99D8IM8Rs7iPBs/WZThE8djeUr04+R0m
+         sOw5BP47/7Ow2b3biS4CI1UeOttLSCKAuEJ5vupTjXoOjRvp+Rbjna/JPXiJQjlr0acy
+         c4t7/FCPKH76K1En4jmJVfngL+ny1BsQvyVxEcyIVYm0/jBcInAmiENETX3zf5xoO/iv
+         KvSKe8rjdSl39cnAPZpKSZikiAJ/LTCWNevSNssip6gSuWRwXUbAxByYciG3syymNc1n
+         57rRpyNAYfRiyqYTFN4kVPE8sQfCiOSMo5mMjwddo4q9tLl8cqjrs4AWXbI/YOXb4Nol
+         +H9w==
+X-Gm-Message-State: AOJu0YzPRXqDFqHi34JtY0kzBRzx/fQNYO43M1w7Vusm7othV2JUIL5c
+	50bUN/NxwZMejgKrh7DkDUi9Jt1MDwvFG9T8yBI=
+X-Google-Smtp-Source: AGHT+IGJHPrvnGt2Ru34bEuu9VEKW4Ddr4y1BwS+bbHJIUMRrvHhhF9Knr8M3TPrt5vBdMTPh9CciXS8rGxFOeFA2n4=
+X-Received: by 2002:a2e:95d2:0:b0:2cc:7c8c:574b with SMTP id
+ y18-20020a2e95d2000000b002cc7c8c574bmr1956176ljh.77.1703127532313; Wed, 20
+ Dec 2023 18:58:52 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231214103520.7198-1-yan.y.zhao@intel.com> <BN9PR11MB5276BE04CBB6D07039086D658C93A@BN9PR11MB5276.namprd11.prod.outlook.com>
- <ZXzx1zXfZ6GV9TgI@google.com> <ZYEbhadnn6+clzX9@yzhao56-desk.sh.intel.com> <ZYJOTLwreD+8l4gU@yzhao56-desk.sh.intel.com>
-Message-ID: <ZYOfJ_QWG01aL8Hl@google.com>
-Subject: Re: [RFC PATCH] KVM: Introduce KVM VIRTIO device
-From: Sean Christopherson <seanjc@google.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: Kevin Tian <kevin.tian@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "olvaffe@gmail.com" <olvaffe@gmail.com>, 
-	Zhiyuan Lv <zhiyuan.lv@intel.com>, Zhenyu Z Wang <zhenyu.z.wang@intel.com>, 
-	Yongwei Ma <yongwei.ma@intel.com>, "vkuznets@redhat.com" <vkuznets@redhat.com>, 
-	"wanpengli@tencent.com" <wanpengli@tencent.com>, "jmattson@google.com" <jmattson@google.com>, 
-	"joro@8bytes.org" <joro@8bytes.org>, 
-	"gurchetansingh@chromium.org" <gurchetansingh@chromium.org>, "kraxel@redhat.com" <kraxel@redhat.com>, 
-	Yiwei Zhang <zzyiwei@google.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <cover.1702371136.git.haibo1.xu@intel.com> <0343a9e4bfa8011fbb6bca0286cee7eab1f17d5d.1702371136.git.haibo1.xu@intel.com>
+ <8734vy832j.wl-maz@kernel.org> <CAJve8onc0WN5g98aOVBmJx15wFBAqfBKJ+ufoLY+oqYyVL+=3A@mail.gmail.com>
+ <f98879dc24f948f7a8a7b5374a32bc04@kernel.org> <CAJve8ona7g=LxW1YeRB_FqGodF973H=A3b2m8054gmzK=Z7_ww@mail.gmail.com>
+ <87zfy5t1qt.wl-maz@kernel.org>
+In-Reply-To: <87zfy5t1qt.wl-maz@kernel.org>
+From: Haibo Xu <xiaobo55x@gmail.com>
+Date: Thu, 21 Dec 2023 10:58:40 +0800
+Message-ID: <CAJve8o=nTsAwwgSib4vOLXjOWSMV2+J+BFsUZ57OdAK7eW8q8A@mail.gmail.com>
+Subject: Re: [PATCH v4 11/11] KVM: selftests: Enable tunning of err_margin_us
+ in arch timer test
+To: Marc Zyngier <maz@kernel.org>
+Cc: Haibo Xu <haibo1.xu@intel.com>, ajones@ventanamicro.com, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Anup Patel <anup@brainfault.org>, 
+	Atish Patra <atishp@atishpatra.org>, Guo Ren <guoren@kernel.org>, 
+	Mayuresh Chitale <mchitale@ventanamicro.com>, Greentime Hu <greentime.hu@sifive.com>, 
+	wchen <waylingii@gmail.com>, Conor Dooley <conor.dooley@microchip.com>, 
+	Heiko Stuebner <heiko@sntech.de>, Minda Chen <minda.chen@starfivetech.com>, 
+	Samuel Holland <samuel@sholland.org>, Jisheng Zhang <jszhang@kernel.org>, 
+	Sean Christopherson <seanjc@google.com>, Peter Xu <peterx@redhat.com>, Like Xu <likexu@tencent.com>, 
+	Vipin Sharma <vipinsh@google.com>, 
+	Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>, Aaron Lewis <aaronlewis@google.com>, 
+	Thomas Huth <thuth@redhat.com>, linux-kernel@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 20, 2023, Yan Zhao wrote:
-> On Tue, Dec 19, 2023 at 12:26:45PM +0800, Yan Zhao wrote:
-> > On Mon, Dec 18, 2023 at 07:08:51AM -0800, Sean Christopherson wrote:
-> > > > > Implementation Consideration
-> > > > > ===
-> > > > > There is a previous series [1] from google to serve the same purpose to
-> > > > > let KVM be aware of virtio GPU's noncoherent DMA status. That series
-> > > > > requires a new memslot flag, and special memslots in user space.
-> > > > > 
-> > > > > We don't choose to use memslot flag to request honoring guest memory
-> > > > > type.
-> > > > 
-> > > > memslot flag has the potential to restrict the impact e.g. when using
-> > > > clflush-before-read in migration?
-> > > 
-> > > Yep, exactly.  E.g. if KVM needs to ensure coherency when freeing memory back to
-> > > the host kernel, then the memslot flag will allow for a much more targeted
-> > > operation.
-> > > 
-> > > > Of course the implication is to honor guest type only for the selected slot
-> > > > in KVM instead of applying to the entire guest memory as in previous series
-> > > > (which selects this way because vmx_get_mt_mask() is in perf-critical path
-> > > > hence not good to check memslot flag?)
-> > > 
-> > > Checking a memslot flag won't impact performance.  KVM already has the memslot
-> > > when creating SPTEs, e.g. the sole caller of vmx_get_mt_mask(), make_spte(), has
-> > > access to the memslot.
-> > > 
-> > > That isn't coincidental, KVM _must_ have the memslot to construct the SPTE, e.g.
-> > > to retrieve the associated PFN, update write-tracking for shadow pages, etc.
-> > > 
-> > Hi Sean,
-> > Do you prefer to introduce a memslot flag KVM_MEM_DMA or KVM_MEM_WC?
-> > For KVM_MEM_DMA, KVM needs to
-> > (a) search VMA for vma->vm_page_prot and convert it to page cache mode (with
-> >     pgprot2cachemode()? ), or
-> > (b) look up memtype of the PFN, by calling lookup_memtype(), similar to that in
-> >     pat_pfn_immune_to_uc_mtrr().
-> > 
-> > But pgprot2cachemode() and lookup_memtype() are not exported by x86 code now.
-> > 
-> > For KVM_MEM_WC, it requires user to ensure the memory is actually mapped
-> > to WC, right?
-> > 
-> > Then, vmx_get_mt_mask() just ignores guest PAT and programs host PAT as EPT type
-> > for the special memslot only, as below.
-> > Is this understanding correct?
-> > 
-> > static u8 vmx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
-> > {
-> >         if (is_mmio)                                                                           
-> >                 return MTRR_TYPE_UNCACHABLE << VMX_EPT_MT_EPTE_SHIFT;                          
-> >                                                                                                
-> >         if (gfn_in_dma_slot(vcpu->kvm, gfn)) {                                                 
-> >                 u8 type = MTRR_TYPE_WRCOMB;                                      
-> >                 //u8 type = pat_pfn_memtype(pfn);                                
-> >                 return (type << VMX_EPT_MT_EPTE_SHIFT) | VMX_EPT_IPAT_BIT;       
-> >         }                                                                                      
-> >                                                                                                
-> >         if (!kvm_arch_has_noncoherent_dma(vcpu->kvm))                            
-> >                 return (MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT) | VMX_EPT_IPAT_BIT;         
-> >                                                                                                
-> >         if (kvm_read_cr0_bits(vcpu, X86_CR0_CD)) {                                             
-> >                 if (kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_CD_NW_CLEARED))               
-> >                         return MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT;                      
-> >                 else                                                                           
-> >                         return (MTRR_TYPE_UNCACHABLE << VMX_EPT_MT_EPTE_SHIFT) | 
-> >                                 VMX_EPT_IPAT_BIT;                                
-> >         }                                                                        
-> >                                                                                  
-> >         return kvm_mtrr_get_guest_memory_type(vcpu, gfn) << VMX_EPT_MT_EPTE_SHIFT;
-> > }
-> > 
-> > BTW, since the special memslot must be exposed to guest as virtio GPU BAR in
-> > order to prevent other guest drivers from access, I wonder if it's better to
-> > include some keyword like VIRTIO_GPU_BAR in memslot flag name.
-> Another choice is to add a memslot flag KVM_MEM_HONOR_GUEST_PAT, then user
-> (e.g. QEMU) does special treatment to this kind of memslots (e.g. skipping
-> reading/writing to them in general paths).
-> 
-> @@ -7589,26 +7589,29 @@ static u8 vmx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
->         if (is_mmio)
->                 return MTRR_TYPE_UNCACHABLE << VMX_EPT_MT_EPTE_SHIFT;
-> 
-> +       if (in_slot_honor_guest_pat(vcpu->kvm, gfn))
-> +               return kvm_mtrr_get_guest_memory_type(vcpu, gfn) << VMX_EPT_MT_EPTE_SHIFT;
+On Wed, Dec 20, 2023 at 9:58=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote=
+:
+>
+> On Wed, 20 Dec 2023 13:51:24 +0000,
+> Haibo Xu <xiaobo55x@gmail.com> wrote:
+> >
+> > On Wed, Dec 20, 2023 at 5:00=E2=80=AFPM Marc Zyngier <maz@kernel.org> w=
+rote:
+> > >
+> > > On 2023-12-20 06:50, Haibo Xu wrote:
+> > > > On Wed, Dec 20, 2023 at 2:22=E2=80=AFAM Marc Zyngier <maz@kernel.or=
+g> wrote:
+> > > >>
+> > > >> On Tue, 12 Dec 2023 09:31:20 +0000,
+> > > >> Haibo Xu <haibo1.xu@intel.com> wrote:
+> > > >> > diff --git a/tools/testing/selftests/kvm/include/timer_test.h b/=
+tools/testing/selftests/kvm/include/timer_test.h
+> > > >> > index 968257b893a7..b1d405e7157d 100644
+> > > >> > --- a/tools/testing/selftests/kvm/include/timer_test.h
+> > > >> > +++ b/tools/testing/selftests/kvm/include/timer_test.h
+> > > >> > @@ -22,6 +22,7 @@ struct test_args {
+> > > >> >       int nr_iter;
+> > > >> >       int timer_period_ms;
+> > > >> >       int migration_freq_ms;
+> > > >> > +     int timer_err_margin_us;
+> > > >>
+> > > >> ... except that you are storing it as a signed value. Some consist=
+ency
+> > > >> wouldn't hurt, really, and would avoid issues when passing large
+> > > >> values.
+> > > >>
+> > > >
+> > > > Yes, it's more proper to use an unsigned int for the non-negative e=
+rror
+> > > > margin.
+> > > > Storing as signed here is just to keep the type consistent with tha=
+t
+> > > > of timer_period_ms
+> > > > since there will be '+' operation in other places.
+> > > >
+> > > >         tools/testing/selftests/kvm/aarch64/arch_timer.c
+> > > >         /* Setup a timeout for the interrupt to arrive */
+> > > >          udelay(msecs_to_usecs(test_args.timer_period_ms) +
+> > > >              test_args.timer_err_margin_us);
+> > >
+> > > But that's exactly why using a signed quantity is wrong.
+> > > What does it mean to have a huge *negative* margin?
+> > >
+> >
+> > Hi Marc,
+> >
+> > I agree that negative values are meaningless for the margin.
+> > If I understand correctly, the negative margin should be filtered by
+> > assertion in atoi_non_negative().
+>
+> No. Please.
+>
+> atoi_non_negative() returns a uint32_t, which is what it should do.
+> The bug is squarely in the use of an 'int' to store such value, and it
+> is the *storage* that turns a positive value into a negative one.
+>
 
-This is more along the lines of what I was thinking, though the name should be
-something like KVM_MEM_NON_COHERENT_DMA, i.e. not x86 specific and not contradictory
-for AMD (which already honors guest PAT).
+Thanks for the detailed info!
 
-I also vote to deliberately ignore MTRRs, i.e. start us on the path of ripping
-those out.  This is a new feature, so we have the luxury of defining KVM's ABI
-for that feature, i.e. can state that on x86 it honors guest PAT, but not MTRRs.
+May I understand that your concern is mainly for a platform with 64bit int =
+type,
+which may trigger the positive to negative convert?
 
-Like so?
+If so, I think we may need to do a clean up for the test code since
+several other
+places have the same issue.
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index d21f55f323ea..ed527acb2bd3 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7575,7 +7575,8 @@ static int vmx_vm_init(struct kvm *kvm)
-        return 0;
- }
- 
--static u8 vmx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
-+static u8 vmx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio,
-+                         struct kvm_memory_slot *slot)
- {
-        /* We wanted to honor guest CD/MTRR/PAT, but doing so could result in
-         * memory aliases with conflicting memory types and sometimes MCEs.
-@@ -7598,6 +7599,9 @@ static u8 vmx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
-        if (is_mmio)
-                return MTRR_TYPE_UNCACHABLE << VMX_EPT_MT_EPTE_SHIFT;
- 
-+       if (kvm_memslot_has_non_coherent_dma(slot))
-+               return MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT;
-+
-        if (!kvm_arch_has_noncoherent_dma(vcpu->kvm))
-                return (MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT) | VMX_EPT_IPAT_BIT;
+Regards,
+Haibo
 
-I like the idea of pulling the memtype from the host, but if we can make that
-work then I don't see the need for a special memslot flag, i.e. just do it for
-*all* SPTEs on VMX.  I don't think we need a VMA for that, e.g. we should be able
-to get the memtype from the host PTEs, just like we do the page size.
-
-KVM_MEM_WC is a hard "no" for me.  It's far too x86 centric, and as you alluded
-to, it requires coordination from the guest, i.e. is effectively limited to
-paravirt scenarios.
-
-> +
->         if (!kvm_arch_has_noncoherent_dma(vcpu->kvm))
->                 return (MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT) | VMX_EPT_IPAT_BIT;
-> 
->         if (kvm_read_cr0_bits(vcpu, X86_CR0_CD)) {
->                 if (kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_CD_NW_CLEARED))
->                         return MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT;
->                 else
->                         return (MTRR_TYPE_UNCACHABLE << VMX_EPT_MT_EPTE_SHIFT) |
->                                 VMX_EPT_IPAT_BIT;
->         }
-> 
->         return kvm_mtrr_get_guest_memory_type(vcpu, gfn) << VMX_EPT_MT_EPTE_SHIFT;
->  }
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
 
