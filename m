@@ -1,53 +1,72 @@
-Return-Path: <kvm+bounces-5065-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5066-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8409981B551
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 12:54:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6C5B81B566
+	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 12:59:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED1CD1F2536C
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 11:54:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A603C287488
+	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 11:59:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 619596E5A1;
-	Thu, 21 Dec 2023 11:54:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BEF96E2BD;
+	Thu, 21 Dec 2023 11:59:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="h6q7zKJM"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="LdGQMNRg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA91F73184
-	for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 11:53:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703159638; x=1734695638;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=FokxupZMkJ+ad4iSfHL9pdMk49+SE2EcvGK7Aj91dGs=;
-  b=h6q7zKJM2LdptYnVU1UtJegn5DqEzWMt2wsQf7E0kJfbaHRhujQQzgGN
-   P+o0VgrOZUtpar++qQi0hGJeVtl+JxIjv2z/O2aNcvZsRri2YJMhJkSnM
-   c3IhYn6us98NfEZPljXObW8RRutLytaVm9wcuBzdOKs5by49VdaKMyvGy
-   TPXP6fQm0eYUzeZSVzjKxhPuxiUKHqkxsjtdpERwhP5xSI1Dy0sijr063
-   eiuyLiJj+qPtQCCPdwyCvggWj4PKux31+HPvKkUtukEnpCpaaMgFOl3jd
-   HO/ywhssFhU80Gefkt2ilkoGXSjKwliAQZD6sb3l+Q7hQYPkm/hctttAI
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10930"; a="398749448"
-X-IronPort-AV: E=Sophos;i="6.04,293,1695711600"; 
-   d="scan'208";a="398749448"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Dec 2023 03:53:55 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10930"; a="842610547"
-X-IronPort-AV: E=Sophos;i="6.04,293,1695711600"; 
-   d="scan'208";a="842610547"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.12.199]) ([10.93.12.199])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Dec 2023 03:53:49 -0800
-Message-ID: <a0289f6d-2008-48d7-95fb-492066c38461@intel.com>
-Date: Thu, 21 Dec 2023 19:53:44 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE5036AB81;
+	Thu, 21 Dec 2023 11:59:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BLArAvB011054;
+	Thu, 21 Dec 2023 11:59:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Nk22VKzp/TbG9pw9wULPwSdj0KNuNAoBU6vMFTyddq8=;
+ b=LdGQMNRgmVOY3bA4DLgAfnpdk+Y2GcK/9HhrjhY7fCh0UMRVBz8ovo+z+vUAIwMVfiyp
+ 4xrblyOwlpqhlgo0kJqFuNOcMhbox/VgvkToAjyhLBsqOBFfcc8r5mmWm8MI9XQMStAA
+ TZTY4wZjwXzNKJ7ZwSLVtD4VmBSf2S2vLS1hzpXdpbuP+U+kQVzrBLAXkGUkPA8rsic2
+ 7tEupEvWr2n96+NT6towd84moACLNuKdyflHTm0xH3OxRlRIagp1XTQ/dEm0ubH66nBX
+ O5WW+FesXFqwA5wByuvl5ohFlCjs7BK2Wys+1JXyHaws+qV/X9WHkeGYee6Fgg828RPH oQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v4m0d24sj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 21 Dec 2023 11:59:31 +0000
+Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BLBoYVi000979;
+	Thu, 21 Dec 2023 11:59:30 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v4m0d24s5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 21 Dec 2023 11:59:30 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3BLA0lLV010900;
+	Thu, 21 Dec 2023 11:59:30 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3v1q7nvpfh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 21 Dec 2023 11:59:30 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3BLBxQfQ28771020
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 21 Dec 2023 11:59:27 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DB78920049;
+	Thu, 21 Dec 2023 11:59:26 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3FDD420040;
+	Thu, 21 Dec 2023 11:59:26 +0000 (GMT)
+Received: from [9.179.10.86] (unknown [9.179.10.86])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 21 Dec 2023 11:59:26 +0000 (GMT)
+Message-ID: <ad75100a-7892-4f0d-99d9-d086cd0295c5@linux.ibm.com>
+Date: Thu, 21 Dec 2023 12:59:25 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -55,161 +74,59 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 06/70] kvm: Introduce support for memory_attributes
+Subject: Re: [PATCH v2] KVM: s390: vsie: fix race during shadow creation
+To: KVM <kvm@vger.kernel.org>
+Cc: Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        linux-s390
+ <linux-s390@vger.kernel.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens
+ <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Marc Hartmayer <mhartmay@linux.ibm.com>
+References: <20231220125317.4258-1-borntraeger@linux.ibm.com>
 Content-Language: en-US
-To: "Wang, Wei W" <wei.w.wang@intel.com>, Paolo Bonzini
- <pbonzini@redhat.com>, David Hildenbrand <david@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
- <philmd@linaro.org>, Cornelia Huck <cohuck@redhat.com>,
- =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- Michael Roth <michael.roth@amd.com>, Sean Christopherson
- <seanjc@google.com>, Claudio Fontana <cfontana@suse.de>,
- Gerd Hoffmann <kraxel@redhat.com>, Isaku Yamahata
- <isaku.yamahata@gmail.com>, "Qiang, Chenyi" <chenyi.qiang@intel.com>
-References: <20231115071519.2864957-1-xiaoyao.li@intel.com>
- <20231115071519.2864957-7-xiaoyao.li@intel.com>
- <DS0PR11MB6373D69ABBF4BDF7120438ACDC8EA@DS0PR11MB6373.namprd11.prod.outlook.com>
- <cc568b63-a129-4b23-8ac8-313193ea8126@intel.com>
- <DS0PR11MB63737AFCA458FA78423C0BB7DC95A@DS0PR11MB6373.namprd11.prod.outlook.com>
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <DS0PR11MB63737AFCA458FA78423C0BB7DC95A@DS0PR11MB6373.namprd11.prod.outlook.com>
+From: Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <20231220125317.4258-1-borntraeger@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 5N3_bT-id61c4w97XLNLE6wUBbo5Kfiw
+X-Proofpoint-ORIG-GUID: Rs-WF6PzYlFE-078kZbQLa9w4SK-fFVi
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-21_04,2023-12-20_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 clxscore=1015
+ impostorscore=0 mlxlogscore=590 phishscore=0 lowpriorityscore=0 mlxscore=0
+ bulkscore=0 priorityscore=1501 spamscore=0 malwarescore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
+ definitions=main-2312210088
 
-On 12/21/2023 6:36 PM, Wang, Wei W wrote:
-> On Thursday, December 21, 2023 2:11 PM, Li, Xiaoyao wrote:
->> On 12/12/2023 9:56 PM, Wang, Wei W wrote:
->>> On Wednesday, November 15, 2023 3:14 PM, Xiaoyao Li wrote:
->>>> Introduce the helper functions to set the attributes of a range of
->>>> memory to private or shared.
->>>>
->>>> This is necessary to notify KVM the private/shared attribute of each gpa
->> range.
->>>> KVM needs the information to decide the GPA needs to be mapped at
->>>> hva- based shared memory or guest_memfd based private memory.
->>>>
->>>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
->>>> ---
->>>>    accel/kvm/kvm-all.c  | 42
->> ++++++++++++++++++++++++++++++++++++++++++
->>>>    include/sysemu/kvm.h |  3 +++
->>>>    2 files changed, 45 insertions(+)
->>>>
->>>> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c index
->>>> 69afeb47c9c0..76e2404d54d2 100644
->>>> --- a/accel/kvm/kvm-all.c
->>>> +++ b/accel/kvm/kvm-all.c
->>>> @@ -102,6 +102,7 @@ bool kvm_has_guest_debug;  static int
->>>> kvm_sstep_flags; static bool kvm_immediate_exit;  static bool
->>>> kvm_guest_memfd_supported;
->>>> +static uint64_t kvm_supported_memory_attributes;
->>>>    static hwaddr kvm_max_slot_size = ~0;
->>>>
->>>>    static const KVMCapabilityInfo kvm_required_capabilites[] = { @@
->>>> -1305,6
->>>> +1306,44 @@ void kvm_set_max_memslot_size(hwaddr max_slot_size)
->>>>        kvm_max_slot_size = max_slot_size;
->>>>    }
->>>>
->>>> +static int kvm_set_memory_attributes(hwaddr start, hwaddr size,
->>>> +uint64_t attr) {
->>>> +    struct kvm_memory_attributes attrs;
->>>> +    int r;
->>>> +
->>>> +    attrs.attributes = attr;
->>>> +    attrs.address = start;
->>>> +    attrs.size = size;
->>>> +    attrs.flags = 0;
->>>> +
->>>> +    r = kvm_vm_ioctl(kvm_state, KVM_SET_MEMORY_ATTRIBUTES, &attrs);
->>>> +    if (r) {
->>>> +        warn_report("%s: failed to set memory (0x%lx+%#zx) with attr
->>>> + 0x%lx
->>>> error '%s'",
->>>> +                     __func__, start, size, attr, strerror(errno));
->>>> +    }
->>>> +    return r;
->>>> +}
->>>> +
->>>> +int kvm_set_memory_attributes_private(hwaddr start, hwaddr size) {
->>>> +    if (!(kvm_supported_memory_attributes &
->>>> KVM_MEMORY_ATTRIBUTE_PRIVATE)) {
->>>> +        error_report("KVM doesn't support PRIVATE memory attribute\n");
->>>> +        return -EINVAL;
->>>> +    }
->>>> +
->>>> +    return kvm_set_memory_attributes(start, size,
->>>> +KVM_MEMORY_ATTRIBUTE_PRIVATE); }
->>>> +
->>>> +int kvm_set_memory_attributes_shared(hwaddr start, hwaddr size) {
->>>> +    if (!(kvm_supported_memory_attributes &
->>>> KVM_MEMORY_ATTRIBUTE_PRIVATE)) {
->>>> +        error_report("KVM doesn't support PRIVATE memory attribute\n");
->>>> +        return -EINVAL;
->>>> +    }
->>>
->>> Duplicate code in kvm_set_memory_attributes_shared/private.
->>> Why not move the check into kvm_set_memory_attributes?
->>
->> Because it's not easy to put the check into there.
->>
->> Both setting and clearing one bit require the capability check. If moving the
->> check into kvm_set_memory_attributes(), the check of
->> KVM_MEMORY_ATTRIBUTE_PRIVATE will have to become unconditionally,
->> which is not aligned to the function name because the name is not restricted to
->> shared/private attribute only.
-> 
-> No need to specifically check for KVM_MEMORY_ATTRIBUTE_PRIVATE there.
-> I'm suggesting below:
-> 
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index 2d9a2455de..63ba74b221 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -1375,6 +1375,11 @@ static int kvm_set_memory_attributes(hwaddr start, hwaddr size, uint64_t attr)
->       struct kvm_memory_attributes attrs;
->       int r;
-> 
-> +    if ((attr & kvm_supported_memory_attributes) != attr) {
-> +        error_report("KVM doesn't support memory attr %lx\n", attr);
-> +        return -EINVAL;
-> +    }
 
-In the case of setting a range of memory to shared while KVM doesn't 
-support private memory. Above check doesn't work. and following IOCTL fails.
 
->       attrs.attributes = attr;
->       attrs.address = start;
->       attrs.size = size;
-> @@ -1390,21 +1395,11 @@ static int kvm_set_memory_attributes(hwaddr start, hwaddr size, uint64_t attr)
+Am 20.12.23 um 13:53 schrieb Christian Borntraeger:
+> Right now it is possible to see gmap->private being zero in
+> kvm_s390_vsie_gmap_notifier resulting in a crash.  This is due to the
+> fact that we add gmap->private == kvm after creation:
 > 
->   int kvm_set_memory_attributes_private(hwaddr start, hwaddr size)
->   {
-> -    if (!(kvm_supported_memory_attributes & KVM_MEMORY_ATTRIBUTE_PRIVATE)) {
-> -        error_report("KVM doesn't support PRIVATE memory attribute\n");
-> -        return -EINVAL;
-> -    }
-> -
->       return kvm_set_memory_attributes(start, size, KVM_MEMORY_ATTRIBUTE_PRIVATE);
->   }
+> static int acquire_gmap_shadow(struct kvm_vcpu *vcpu,
+>                                 struct vsie_page *vsie_page)
+> {
+> [...]
+>          gmap = gmap_shadow(vcpu->arch.gmap, asce, edat);
+>          if (IS_ERR(gmap))
+>                  return PTR_ERR(gmap);
+>          gmap->private = vcpu->kvm;
 > 
->   int kvm_set_memory_attributes_shared(hwaddr start, hwaddr size)
->   {
-> -    if (!(kvm_supported_memory_attributes & KVM_MEMORY_ATTRIBUTE_PRIVATE)) {
-> -        error_report("KVM doesn't support PRIVATE memory attribute\n");
-> -        return -EINVAL;
-> -    }
-> -
->       return kvm_set_memory_attributes(start, size, 0);
->   }
+> Let children inherit the private field of the parent.
 > 
-> Maybe you don't even need the kvm_set_memory_attributes_shared/private wrappers.
+> Reported-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+> Fixes: a3508fbe9dc6 ("KVM: s390: vsie: initial support for nested virtualization")
+> Cc: <stable@vger.kernel.org>
+> Cc: David Hildenbrand <david@redhat.com>
+> Signed-off-by: Christian Borntraeger <borntraeger@linux.ibm.com>
 
+queue on kvms390/master.
 
