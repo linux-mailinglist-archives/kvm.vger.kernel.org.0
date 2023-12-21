@@ -1,64 +1,64 @@
-Return-Path: <kvm+bounces-5035-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5056-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60EE281B3D3
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 11:39:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CDC481B43C
+	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 11:48:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 116A21F2520A
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 10:39:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5867282741
+	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 10:48:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05C5B745D9;
-	Thu, 21 Dec 2023 10:38:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98096745C6;
+	Thu, 21 Dec 2023 10:47:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="e0vOIGWx"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JYV/3jvG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 967D57319A
-	for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 10:38:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BE5F6EB75
+	for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 10:47:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-40d3f2586d4so3407995e9.0
-        for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 02:38:35 -0800 (PST)
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-40c39ef63d9so6406065e9.3
+        for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 02:47:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1703155114; x=1703759914; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1703155627; x=1703760427; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=oeKurO18PT1xLzL5iQamunNBev09YXep7NV+pG6wspo=;
-        b=e0vOIGWxXRA2TFRndhHY8O/00qcee/G6hMb1eUZMhboPi8ZQWmRzOYoxBANGkBvb3d
-         mMBK1M1gG7LVrNE/Sgok0G2mdL0t9ztEwcAhmLj6DLeB4n4LNy8M+igKSB65LUrb1u9s
-         3KaMjYgjzxd5Ac4sH/2d97ggihf4bDgN81x5ubpzgDwXs9k843nw6lLrS7H7qODD940l
-         iPQn/7YGE0YXq620EbvNukMIdGCl4UORKLJk7Rd5S2KQaxLnHbmeneWzu2sABPQXdTQn
-         h43V71wmM64tWPVGzPa9UeH6mRnns8oT0X+HS7Y5KtHt+dSU4EjmM25DMuFm2d5LsVu3
-         ts4g==
+        bh=0sLk9Y6V09YT5mxoKGySQqDe7AUl7PrL/RJQ+Y1wnbw=;
+        b=JYV/3jvGK8jNFQmr3IZUxjfW0IXW2+0GBXVuE+H0atdosRjMUVTuzMR98FchnxmYOl
+         wpRoWwry5Rs1JZ9tzt6DMQdcR8OgUV+iCBM1IDro0AkaSz0RsZ1mmFubaiOWxSJF3wMK
+         cUh1C5kSYdgHSwTuRD5n0Aam7h1xMT18LrirbWK4aqeiIOa52qljdrpeeobV7/nYVCXJ
+         rDjnwTINidLEe22GEDINrGzCck8H2/eLxeZBr3hhjWRHCGFCgVe0fIV/hVyvRaNNT5RL
+         bq8CvO/Zj1Sbult9GN398hXK+8ssEwTZ0S84FQW0QJG3btkHy4gs8R+yvtAuP5oFExRw
+         DNDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703155114; x=1703759914;
+        d=1e100.net; s=20230601; t=1703155627; x=1703760427;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=oeKurO18PT1xLzL5iQamunNBev09YXep7NV+pG6wspo=;
-        b=UATqc4s86YSRV0mgK4Y7bC/tD5A1uAeaiFbie5INRuaEsuRgmZdSkUDLoXjkZu+FQO
-         XdR9+3laTWbxuheQMTYgN0r619qJDOYA18s/NEjakJupJF9XO+q6iAoNkImb5YoTF519
-         rgFo82cYJcvrqcUqCMsoaj0Ur0wmz3I5m+/CGuGI2VZdVTAgjQiDhgXPAZ/mtE5Ut3e4
-         AbReFoOSxlVRPObRKdWk9JI1F/oQKhqq1zNyer5mIv/pBjV9mt1UM48+jPgNXD5X0KV9
-         BcXSWGdNkVmPSmtEVOPJs7HopI4uP/405hzTHGYSpxmci7XX1pwACwgY+XsUFnb9NdO0
-         XNSw==
-X-Gm-Message-State: AOJu0Yx1RqUlA8j29njFPDzbYIS0TN2961GlDEHFBWwrHHh1d9B3VHpc
-	SV7mel5pHtJ5DXqW/FQa5OB4Hg==
-X-Google-Smtp-Source: AGHT+IEDw9S3TarblsmJZYT54zqBYySCojx04X6aERE08kCaPWULIdSrrrthFqqDkUid6eRtO2RAUg==
-X-Received: by 2002:a1c:7209:0:b0:40d:3823:5e0e with SMTP id n9-20020a1c7209000000b0040d38235e0emr586756wmc.140.1703155113939;
-        Thu, 21 Dec 2023 02:38:33 -0800 (PST)
+        bh=0sLk9Y6V09YT5mxoKGySQqDe7AUl7PrL/RJQ+Y1wnbw=;
+        b=oyybSe/vCQZEbChkI8thGyWaFeX0sjq6R4fQB+oupXOltT2g1xQsmMs4tTsccmIbsZ
+         zkVwJtedcf1HxGeRk+VuhTBl5dQ4v9LxkU1S0kj0kEHDXRUxpxqYwDKC+iMWZsb/NLJK
+         elFO4CmFkCxJuiBuYyg+l2+dcd8jovg+GgT2rb+DGH5d2Kvuag6MpdZ1wvQzynnhzdwu
+         7wjquhI+JExUiXLM/zzc/gJgtOcEsLWbPCKqVGFlDIxeiU2sESYywHkEdtc1F7WBOdWo
+         AA3KL6PiXFofZDGKBjMnXiUkoQxcFLeA2zjFvHWnaWxvK3w6ZGiezL/ZCn5OQ6y/4ZCm
+         /t5g==
+X-Gm-Message-State: AOJu0Yy577LWqnebDnJeYLBUcYlbjT6iTK2zPz+epl2fYhF7k8gv3z8v
+	OeqdN+QgUmoC/3NfLLhnOZhfmA==
+X-Google-Smtp-Source: AGHT+IEh4A/ofvHjjDxGae4dNp01ycAbrgSKgNLymJ1Ha3Ry/GdnF3Tf0BsMFDRp8ivuX9KZRRwyWg==
+X-Received: by 2002:a05:600c:1682:b0:40c:3984:4977 with SMTP id k2-20020a05600c168200b0040c39844977mr650705wmn.174.1703155627469;
+        Thu, 21 Dec 2023 02:47:07 -0800 (PST)
 Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id p2-20020a05600c1d8200b0040596352951sm11263469wms.5.2023.12.21.02.38.25
+        by smtp.gmail.com with ESMTPSA id b2-20020a05600c4e0200b0040c440f9393sm3526519wmq.42.2023.12.21.02.47.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Dec 2023 02:38:29 -0800 (PST)
+        Thu, 21 Dec 2023 02:47:06 -0800 (PST)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id B86145F8E1;
+	by draig.lan (Postfix) with ESMTP id CEF355F8E3;
 	Thu, 21 Dec 2023 10:38:20 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
@@ -104,10 +104,11 @@ Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
 	Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
 	=?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
 	Mahmoud Mandour <ma.mandourr@gmail.com>,
-	Bin Meng <bin.meng@windriver.com>
-Subject: [PATCH 19/40] tests/fp: Bump fp-test-mulAdd test timeout to 3 minutes
-Date: Thu, 21 Dec 2023 10:37:57 +0000
-Message-Id: <20231221103818.1633766-20-alex.bennee@linaro.org>
+	Bin Meng <bin.meng@windriver.com>,
+	=?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Subject: [PATCH 20/40] mtest2make: stop disabling meson test timeouts
+Date: Thu, 21 Dec 2023 10:37:58 +0000
+Message-Id: <20231221103818.1633766-21-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20231221103818.1633766-1-alex.bennee@linaro.org>
 References: <20231221103818.1633766-1-alex.bennee@linaro.org>
@@ -120,32 +121,61 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Thomas Huth <thuth@redhat.com>
+From: Daniel P. Berrangé <berrange@redhat.com>
 
-When running the tests in slow mode with --enable-debug on a very loaded
-system, the  fp-test-mulAdd test can take longer than 2 minutes. Bump the
-timeout to three minutes to make sure it passes in such situations, too.
+The mtest2make.py script passes the arg '-t 0' to 'meson test' which
+disables all test timeouts. This is a major source of pain when running
+in GitLab CI and a test gets stuck. It will stall until GitLab kills the
+CI job. This leaves us with little easily consumable information about
+the stalled test. The TAP format doesn't show the test name until it is
+completed, and TAP output from multiple tests it interleaved. So we
+have to analyse the log to figure out what tests had un-finished TAP
+output present and thus infer which test case caused the hang. This is
+very time consuming and error prone.
 
+By allowing meson to kill stalled tests, we get a direct display of what
+test program got stuck, which lets us more directly focus in on what
+specific test case within the test program hung.
+
+The other issue with disabling meson test timeouts by default is that it
+makes it more likely that maintainers inadvertantly introduce slowdowns.
+For example the recent-ish change that accidentally made migrate-test
+take 15-20 minutes instead of around 1 minute.
+
+The main risk of this change is that the individual test timeouts might
+be too short to allow completion in high load scenarios. Thus, there is
+likely to be some short term pain where we have to bump the timeouts for
+certain tests to make them reliable enough. The preceeding few patches
+raised the timeouts for all failures that were immediately apparent
+in GitLab CI.
+
+Even with the possible short term instability, this should still be a
+net win for debuggability of failed CI pipelines over the long term.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+Message-ID: <20230717182859.707658-13-berrange@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20231215070357.10888-16-thuth@redhat.com>
+Message-Id: <20231215070357.10888-17-thuth@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/fp/meson.build | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/mtest2make.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/tests/fp/meson.build b/tests/fp/meson.build
-index cbc17392d67..3b7fc637499 100644
---- a/tests/fp/meson.build
-+++ b/tests/fp/meson.build
-@@ -124,7 +124,7 @@ test('fp-test-mulAdd', fptest,
-      # no fptest_rounding_args
-      args: fptest_args +
-            ['f16_mulAdd', 'f32_mulAdd', 'f64_mulAdd', 'f128_mulAdd'],
--     suite: ['softfloat-slow', 'softfloat-ops-slow', 'slow'], timeout: 90)
-+     suite: ['softfloat-slow', 'softfloat-ops-slow', 'slow'], timeout: 180)
+diff --git a/scripts/mtest2make.py b/scripts/mtest2make.py
+index 179dd548718..eb01a05ddbd 100644
+--- a/scripts/mtest2make.py
++++ b/scripts/mtest2make.py
+@@ -27,7 +27,8 @@ def names(self, base):
+ .speed.slow = $(foreach s,$(sort $(filter-out %-thorough, $1)), --suite $s)
+ .speed.thorough = $(foreach s,$(sort $1), --suite $s)
  
- executable(
-   'fp-bench',
+-.mtestargs = --no-rebuild -t 0
++TIMEOUT_MULTIPLIER = 1
++.mtestargs = --no-rebuild -t $(TIMEOUT_MULTIPLIER)
+ ifneq ($(SPEED), quick)
+ .mtestargs += --setup $(SPEED)
+ endif
 -- 
 2.39.2
 
