@@ -1,132 +1,197 @@
-Return-Path: <kvm+bounces-5066-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5067-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6C5B81B566
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 12:59:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BDD581B57C
+	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 13:09:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A603C287488
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 11:59:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C873428514B
+	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 12:09:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BEF96E2BD;
-	Thu, 21 Dec 2023 11:59:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E0EB6E5AA;
+	Thu, 21 Dec 2023 12:09:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="LdGQMNRg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P16zovW2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE5036AB81;
-	Thu, 21 Dec 2023 11:59:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BLArAvB011054;
-	Thu, 21 Dec 2023 11:59:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=Nk22VKzp/TbG9pw9wULPwSdj0KNuNAoBU6vMFTyddq8=;
- b=LdGQMNRgmVOY3bA4DLgAfnpdk+Y2GcK/9HhrjhY7fCh0UMRVBz8ovo+z+vUAIwMVfiyp
- 4xrblyOwlpqhlgo0kJqFuNOcMhbox/VgvkToAjyhLBsqOBFfcc8r5mmWm8MI9XQMStAA
- TZTY4wZjwXzNKJ7ZwSLVtD4VmBSf2S2vLS1hzpXdpbuP+U+kQVzrBLAXkGUkPA8rsic2
- 7tEupEvWr2n96+NT6towd84moACLNuKdyflHTm0xH3OxRlRIagp1XTQ/dEm0ubH66nBX
- O5WW+FesXFqwA5wByuvl5ohFlCjs7BK2Wys+1JXyHaws+qV/X9WHkeGYee6Fgg828RPH oQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v4m0d24sj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 21 Dec 2023 11:59:31 +0000
-Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BLBoYVi000979;
-	Thu, 21 Dec 2023 11:59:30 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v4m0d24s5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 21 Dec 2023 11:59:30 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3BLA0lLV010900;
-	Thu, 21 Dec 2023 11:59:30 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3v1q7nvpfh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 21 Dec 2023 11:59:30 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3BLBxQfQ28771020
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 21 Dec 2023 11:59:27 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DB78920049;
-	Thu, 21 Dec 2023 11:59:26 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3FDD420040;
-	Thu, 21 Dec 2023 11:59:26 +0000 (GMT)
-Received: from [9.179.10.86] (unknown [9.179.10.86])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 21 Dec 2023 11:59:26 +0000 (GMT)
-Message-ID: <ad75100a-7892-4f0d-99d9-d086cd0295c5@linux.ibm.com>
-Date: Thu, 21 Dec 2023 12:59:25 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 329AD6E2B3
+	for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 12:09:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1703160547;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=u2zddOQ1qeYa0ve/5dlXq/cgaEaRPGUue1VUy/g3vDE=;
+	b=P16zovW23++TbKf9GYzsdnwGBdVIZT0rtU5lkxXzHqy1IO8Qun2IRYgxL4j7X1ZaiSv2PC
+	bkWxfPxLZm9PCmaJkp7v7eAQ7BGbOKiT57K7+w/daUVV5Ss55w8CMBX54MkaeALLR6NXJA
+	BdItMIiAxIEIJVPpMlDu4ZxnqbBzdr4=
+Received: from mail-yw1-f198.google.com (mail-yw1-f198.google.com
+ [209.85.128.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-226-xr-n7I2YP_i5QIRd3CIaKw-1; Thu, 21 Dec 2023 07:09:05 -0500
+X-MC-Unique: xr-n7I2YP_i5QIRd3CIaKw-1
+Received: by mail-yw1-f198.google.com with SMTP id 00721157ae682-5e76b663ef3so13227767b3.1
+        for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 04:09:05 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703160545; x=1703765345;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=u2zddOQ1qeYa0ve/5dlXq/cgaEaRPGUue1VUy/g3vDE=;
+        b=RMDc79g0QbAsD5fTi+X73GsyD0dPd6J9CeTVfGfk7VnVhgSv6pyk4cxYqm0mo4SPiX
+         nwiD4w2WYXPAVqqAPMeT3OZRfvbnOZhz1fs/IaiTE8fiview0eiiwIDvLZtIMuYCGB+u
+         7UQwo08PuLu5XbZpXPEEc5xJHO/8CxBosTTP4ndgwc/7So3EvfHYW6PtJeC36Fdkffis
+         KGWYApiZuD6KeQwvpqjKzm5csOBPim0L21C6Ia6+zReuPJ7vsZ+z1A+O5XbLhLVde2nU
+         Q80sFhRwLu3knDznFhYTJijtbbNxNPYvcNl09DAmwA202r6Iy84ErLwCSpDb2aLYAChY
+         RtzQ==
+X-Gm-Message-State: AOJu0YwiYWoWklaQSk0PqNHqOvATyvkzDAwJVknDGMnQLkd4hZdIHzoO
+	FVCirdsxBCo9XB6IMSJobkp79Av3qPtWPtQfAe8/O1Pth7AKoc7q7qJ8sw7znfaEfmvU92K9cTL
+	kUktUGyXR8DCrmfHtsF++Lf9C/Kmp
+X-Received: by 2002:a0d:eacc:0:b0:5e8:d7b2:cdcd with SMTP id t195-20020a0deacc000000b005e8d7b2cdcdmr1029740ywe.48.1703160544744;
+        Thu, 21 Dec 2023 04:09:04 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE+wUNNsjF8vEWQGGMpBGoBAUApRdPfu53AYtmvTV2W30g5Q9Sc3RlTNwEHeRRatnR6DBa23ya1wKjB1B+7qt4=
+X-Received: by 2002:a0d:eacc:0:b0:5e8:d7b2:cdcd with SMTP id
+ t195-20020a0deacc000000b005e8d7b2cdcdmr1029718ywe.48.1703160543744; Thu, 21
+ Dec 2023 04:09:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] KVM: s390: vsie: fix race during shadow creation
-To: KVM <kvm@vger.kernel.org>
-Cc: Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        linux-s390
- <linux-s390@vger.kernel.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Heiko Carstens
- <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Marc Hartmayer <mhartmay@linux.ibm.com>
-References: <20231220125317.4258-1-borntraeger@linux.ibm.com>
-Content-Language: en-US
-From: Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <20231220125317.4258-1-borntraeger@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 5N3_bT-id61c4w97XLNLE6wUBbo5Kfiw
-X-Proofpoint-ORIG-GUID: Rs-WF6PzYlFE-078kZbQLa9w4SK-fFVi
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-21_04,2023-12-20_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 clxscore=1015
- impostorscore=0 mlxlogscore=590 phishscore=0 lowpriorityscore=0 mlxscore=0
- bulkscore=0 priorityscore=1501 spamscore=0 malwarescore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
- definitions=main-2312210088
+References: <20231219180858.120898-1-dtatulea@nvidia.com> <20231219180858.120898-3-dtatulea@nvidia.com>
+ <CACGkMEv7xQkZYJAgAUK6C3oUrZ9vuUJdTKRzihXcNPb-iWdpJw@mail.gmail.com>
+ <CACGkMEsaaDGi63__YrvsTC1HqgTaEWHvGokK1bJS5+m1XYM-6w@mail.gmail.com>
+ <CAJaqyWdoaj8a7q1KrGqWmkYvAw_R_p0utcWvDvkyVm1nUOAxrA@mail.gmail.com>
+ <CACGkMEuM7bXxsxHUs_SodiDQ2+akrLqqzWZBJSZEcnMASUkb+g@mail.gmail.com>
+ <CAJaqyWeBVVcTZEzZK=63Ymk85wnRFd+_wK56UfEHNXBH-qy1Zg@mail.gmail.com> <70adc734331c1289dceb3bcdc991f3da7e4db2f0.camel@nvidia.com>
+In-Reply-To: <70adc734331c1289dceb3bcdc991f3da7e4db2f0.camel@nvidia.com>
+From: Eugenio Perez Martin <eperezma@redhat.com>
+Date: Thu, 21 Dec 2023 13:08:27 +0100
+Message-ID: <CAJaqyWeUHiZXMFkNBpinCsJAXojtPkGz+SjzUNDPx5W=qqON1w@mail.gmail.com>
+Subject: Re: [PATCH vhost v4 02/15] vdpa: Add VHOST_BACKEND_F_CHANGEABLE_VQ_ADDR_IN_SUSPEND
+ flag
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: "jasowang@redhat.com" <jasowang@redhat.com>, 
+	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>, Parav Pandit <parav@nvidia.com>, 
+	"virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, Gal Pressman <gal@nvidia.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"si-wei.liu@oracle.com" <si-wei.liu@oracle.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"mst@redhat.com" <mst@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>, "leon@kernel.org" <leon@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Dec 21, 2023 at 12:52=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia.co=
+m> wrote:
+>
+> On Thu, 2023-12-21 at 08:46 +0100, Eugenio Perez Martin wrote:
+> > On Thu, Dec 21, 2023 at 3:03=E2=80=AFAM Jason Wang <jasowang@redhat.com=
+> wrote:
+> > >
+> > > On Wed, Dec 20, 2023 at 9:32=E2=80=AFPM Eugenio Perez Martin
+> > > <eperezma@redhat.com> wrote:
+> > > >
+> > > > On Wed, Dec 20, 2023 at 5:06=E2=80=AFAM Jason Wang <jasowang@redhat=
+.com> wrote:
+> > > > >
+> > > > > On Wed, Dec 20, 2023 at 11:46=E2=80=AFAM Jason Wang <jasowang@red=
+hat.com> wrote:
+> > > > > >
+> > > > > > On Wed, Dec 20, 2023 at 2:09=E2=80=AFAM Dragos Tatulea <dtatule=
+a@nvidia.com> wrote:
+> > > > > > >
+> > > > > > > The virtio spec doesn't allow changing virtqueue addresses af=
+ter
+> > > > > > > DRIVER_OK. Some devices do support this operation when the de=
+vice is
+> > > > > > > suspended. The VHOST_BACKEND_F_CHANGEABLE_VQ_ADDR_IN_SUSPEND =
+flag
+> > > > > > > advertises this support as a backend features.
+> > > > > >
+> > > > > > There's an ongoing effort in virtio spec to introduce the suspe=
+nd state.
+> > > > > >
+> > > > > > So I wonder if it's better to just allow such behaviour?
+> > > > >
+> > > > > Actually I mean, allow drivers to modify the parameters during su=
+spend
+> > > > > without a new feature.
+> > > > >
+> > > >
+> > > > That would be ideal, but how do userland checks if it can suspend +
+> > > > change properties + resume?
+> > >
+> > > As discussed, it looks to me the only device that supports suspend is
+> > > simulator and it supports change properties.
+> > >
+> > > E.g:
+> > >
+> > > static int vdpasim_set_vq_address(struct vdpa_device *vdpa, u16 idx,
+> > >                                   u64 desc_area, u64 driver_area,
+> > >                                   u64 device_area)
+> > > {
+> > >         struct vdpasim *vdpasim =3D vdpa_to_sim(vdpa);
+> > >         struct vdpasim_virtqueue *vq =3D &vdpasim->vqs[idx];
+> > >
+> > >         vq->desc_addr =3D desc_area;
+> > >         vq->driver_addr =3D driver_area;
+> > >         vq->device_addr =3D device_area;
+> > >
+> > >         return 0;
+> > > }
+> > >
+> >
+> > So in the current kernel master it is valid to set a different vq
+> > address while the device is suspended in vdpa_sim. But it is not valid
+> > in mlx5, as the FW will not be updated in resume (Dragos, please
+> > correct me if I'm wrong). Both of them return success.
+> >
+> In the current state, there is no resume. HW Virtqueues will just get re-=
+created
+> with the new address.
+>
+
+Oh, then all of this is effectively transparent to the userspace
+except for the time it takes?
+
+In that case you're right, we don't need feature flags. But I think it
+would be great to also move the error return in case userspace tries
+to modify vq parameters out of suspend state.
+
+Thanks!
 
 
+> > How can we know in the destination QEMU if it is valid to suspend &
+> > set address? Should we handle this as a bugfix and backport the
+> > change?
+> >
+> > > >
+> > > > The only way that comes to my mind is to make sure all parents retu=
+rn
+> > > > error if userland tries to do it, and then fallback in userland.
+> > >
+> > > Yes.
+> > >
+> > > > I'm
+> > > > ok with that, but I'm not sure if the current master & previous ker=
+nel
+> > > > has a coherent behavior. Do they return error? Or return success
+> > > > without changing address / vq state?
+> > >
+> > > We probably don't need to worry too much here, as e.g set_vq_address
+> > > could fail even without suspend (just at uAPI level).
+> > >
+> >
+> > I don't get this, sorry. I rephrased my point with an example earlier
+> > in the mail.
+> >
+>
 
-Am 20.12.23 um 13:53 schrieb Christian Borntraeger:
-> Right now it is possible to see gmap->private being zero in
-> kvm_s390_vsie_gmap_notifier resulting in a crash.  This is due to the
-> fact that we add gmap->private == kvm after creation:
-> 
-> static int acquire_gmap_shadow(struct kvm_vcpu *vcpu,
->                                 struct vsie_page *vsie_page)
-> {
-> [...]
->          gmap = gmap_shadow(vcpu->arch.gmap, asce, edat);
->          if (IS_ERR(gmap))
->                  return PTR_ERR(gmap);
->          gmap->private = vcpu->kvm;
-> 
-> Let children inherit the private field of the parent.
-> 
-> Reported-by: Marc Hartmayer <mhartmay@linux.ibm.com>
-> Fixes: a3508fbe9dc6 ("KVM: s390: vsie: initial support for nested virtualization")
-> Cc: <stable@vger.kernel.org>
-> Cc: David Hildenbrand <david@redhat.com>
-> Signed-off-by: Christian Borntraeger <borntraeger@linux.ibm.com>
-
-queue on kvms390/master.
 
