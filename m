@@ -1,49 +1,49 @@
-Return-Path: <kvm+bounces-4990-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-4995-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F9D881B1CA
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 10:12:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1163681B1D6
+	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 10:14:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CEA6EB268AB
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 09:12:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 444CC1C238C2
+	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 09:14:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B074E4E1D5;
-	Thu, 21 Dec 2023 09:03:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8552E54FA8;
+	Thu, 21 Dec 2023 09:03:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LTJzGaNi"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dRAUm9s9"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E41F4CDF9;
-	Thu, 21 Dec 2023 09:03:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 476234E1AF;
+	Thu, 21 Dec 2023 09:03:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703149428; x=1734685428;
+  t=1703149430; x=1734685430;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=mnzEVlzgWkMulqUCa41he1GtyrHqz8Magus+6evCOOA=;
-  b=LTJzGaNizoqYbxkx2pqnJ0yXqtm8ANr0PCM7x2J0G+kbQE7erB9Egb3+
-   rrMb0nbCWI82+AQg/2Mlm/gf/SucAFsP27wHndt9niAydOqAoseNJPLHt
-   SqQp5IOUVnvqqiAFkNlclWFBBpxfb+8tQSJ+xhUmHkk7H9HCig+ZnsV/X
-   TbGNmiLvOp9fDhYWKllWTcX7l7xzGD3OJT77wa5c6DOKK1dp+3aCuCou7
-   HT/bIp6aVlHbFwDJQGcsGURX5CTpItDuARISmk6F2ODrD6B66eBZKmtbE
-   8uTkgaZZ5zLUtUMaAgBtnsJNmiw9JgD1zKGdbm87vJ1ZeJmJSf4soZxtn
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10930"; a="398729624"
+  bh=cxpPX3Wn0VREKtBeuHc/MZkj33xyM0sqH6UvdE/wBRo=;
+  b=dRAUm9s9l+HdfkPkw6Ny/09VX8iYFOFRjA6Jm6Mhz/xAiryCSGgVvN4F
+   2hPWVA2xre0Qplv9A/PVpemPM8HDJXqrYeKVN0x5Vzs1t7vBisyP4h3u/
+   eGxl6NRJFXdVZmYEAEmY7flK8XlkaqbMnOFZdvdpOJt3MTjyZaMhSDxZL
+   QEeUDCMgMK03gjmSIIDmELiIWb/mf6BcdFpFLa4RBDOSXtX7KGD1teRuX
+   wPibCDDVgIEJwjXH/KZm6QexLFhpPxhZZWAQ7+y8n8vEPDhv6VLCWf/ET
+   Dvcvbmf2CgNmgy0FjWVC6e3PO1E/AEgZB+2jfzBXEFpkp05v/J1/0qk6h
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10930"; a="398729646"
 X-IronPort-AV: E=Sophos;i="6.04,293,1695711600"; 
-   d="scan'208";a="398729624"
+   d="scan'208";a="398729646"
 Received: from orsmga004.jf.intel.com ([10.7.209.38])
   by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Dec 2023 01:03:44 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10930"; a="900028587"
+X-IronPort-AV: E=McAfee;i="6600,9927,10930"; a="900028589"
 X-IronPort-AV: E=Sophos;i="6.04,293,1695711600"; 
-   d="scan'208";a="900028587"
+   d="scan'208";a="900028589"
 Received: from 984fee00a5ca.jf.intel.com (HELO embargo.jf.intel.com) ([10.165.9.183])
   by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Dec 2023 01:03:10 -0800
 From: Yang Weijiang <weijiang.yang@intel.com>
@@ -58,9 +58,9 @@ Cc: peterz@infradead.org,
 	mlevitsk@redhat.com,
 	john.allen@amd.com,
 	weijiang.yang@intel.com
-Subject: [PATCH v8 09/26] KVM: x86: Rename kvm_{g,s}et_msr() to menifest emulation operations
-Date: Thu, 21 Dec 2023 09:02:22 -0500
-Message-Id: <20231221140239.4349-10-weijiang.yang@intel.com>
+Subject: [PATCH v8 10/26] KVM: x86: Refine xsave-managed guest register/MSR reset handling
+Date: Thu, 21 Dec 2023 09:02:23 -0500
+Message-Id: <20231221140239.4349-11-weijiang.yang@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20231221140239.4349-1-weijiang.yang@intel.com>
 References: <20231221140239.4349-1-weijiang.yang@intel.com>
@@ -72,144 +72,57 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Rename kvm_{g,s}et_msr() to kvm_emulate_msr_{read,write}() to make it
-more obvious that KVM uses these helpers to emulate guest behaviors,
-i.e., host_initiated == false in these helpers.
+Tweak the code a bit to facilitate resetting more xstate components in
+the future, e.g., adding CET's xstate-managed MSRs.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
+No functional change intended.
+
 Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/x86/include/asm/kvm_host.h |  4 ++--
- arch/x86/kvm/smm.c              |  4 ++--
- arch/x86/kvm/vmx/nested.c       | 13 +++++++------
- arch/x86/kvm/x86.c              | 10 +++++-----
- 4 files changed, 16 insertions(+), 15 deletions(-)
+ arch/x86/kvm/x86.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 7bc1daf68741..5c665165024c 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -2013,8 +2013,8 @@ void kvm_prepare_emulation_failure_exit(struct kvm_vcpu *vcpu);
- void kvm_enable_efer_bits(u64);
- bool kvm_valid_efer(struct kvm_vcpu *vcpu, u64 efer);
- int __kvm_get_msr(struct kvm_vcpu *vcpu, u32 index, u64 *data, bool host_initiated);
--int kvm_get_msr(struct kvm_vcpu *vcpu, u32 index, u64 *data);
--int kvm_set_msr(struct kvm_vcpu *vcpu, u32 index, u64 data);
-+int kvm_emulate_msr_read(struct kvm_vcpu *vcpu, u32 index, u64 *data);
-+int kvm_emulate_msr_write(struct kvm_vcpu *vcpu, u32 index, u64 data);
- int kvm_emulate_rdmsr(struct kvm_vcpu *vcpu);
- int kvm_emulate_wrmsr(struct kvm_vcpu *vcpu);
- int kvm_emulate_as_nop(struct kvm_vcpu *vcpu);
-diff --git a/arch/x86/kvm/smm.c b/arch/x86/kvm/smm.c
-index dc3d95fdca7d..45c855389ea7 100644
---- a/arch/x86/kvm/smm.c
-+++ b/arch/x86/kvm/smm.c
-@@ -535,7 +535,7 @@ static int rsm_load_state_64(struct x86_emulate_ctxt *ctxt,
- 
- 	vcpu->arch.smbase =         smstate->smbase;
- 
--	if (kvm_set_msr(vcpu, MSR_EFER, smstate->efer & ~EFER_LMA))
-+	if (kvm_emulate_msr_write(vcpu, MSR_EFER, smstate->efer & ~EFER_LMA))
- 		return X86EMUL_UNHANDLEABLE;
- 
- 	rsm_load_seg_64(vcpu, &smstate->tr, VCPU_SREG_TR);
-@@ -626,7 +626,7 @@ int emulator_leave_smm(struct x86_emulate_ctxt *ctxt)
- 
- 		/* And finally go back to 32-bit mode.  */
- 		efer = 0;
--		kvm_set_msr(vcpu, MSR_EFER, efer);
-+		kvm_emulate_msr_write(vcpu, MSR_EFER, efer);
- 	}
- #endif
- 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index db0ad1e6ec4b..b2e9853584b8 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -958,7 +958,7 @@ static u32 nested_vmx_load_msr(struct kvm_vcpu *vcpu, u64 gpa, u32 count)
- 				__func__, i, e.index, e.reserved);
- 			goto fail;
- 		}
--		if (kvm_set_msr(vcpu, e.index, e.value)) {
-+		if (kvm_emulate_msr_write(vcpu, e.index, e.value)) {
- 			pr_debug_ratelimited(
- 				"%s cannot write MSR (%u, 0x%x, 0x%llx)\n",
- 				__func__, i, e.index, e.value);
-@@ -994,7 +994,7 @@ static bool nested_vmx_get_vmexit_msr_value(struct kvm_vcpu *vcpu,
- 		}
- 	}
- 
--	if (kvm_get_msr(vcpu, msr_index, data)) {
-+	if (kvm_emulate_msr_read(vcpu, msr_index, data)) {
- 		pr_debug_ratelimited("%s cannot read MSR (0x%x)\n", __func__,
- 			msr_index);
- 		return false;
-@@ -2686,7 +2686,7 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
- 
- 	if ((vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL) &&
- 	    kvm_pmu_has_perf_global_ctrl(vcpu_to_pmu(vcpu)) &&
--	    WARN_ON_ONCE(kvm_set_msr(vcpu, MSR_CORE_PERF_GLOBAL_CTRL,
-+	    WARN_ON_ONCE(kvm_emulate_msr_write(vcpu, MSR_CORE_PERF_GLOBAL_CTRL,
- 				     vmcs12->guest_ia32_perf_global_ctrl))) {
- 		*entry_failure_code = ENTRY_FAIL_DEFAULT;
- 		return -EINVAL;
-@@ -4568,8 +4568,9 @@ static void load_vmcs12_host_state(struct kvm_vcpu *vcpu,
- 	}
- 	if ((vmcs12->vm_exit_controls & VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL) &&
- 	    kvm_pmu_has_perf_global_ctrl(vcpu_to_pmu(vcpu)))
--		WARN_ON_ONCE(kvm_set_msr(vcpu, MSR_CORE_PERF_GLOBAL_CTRL,
--					 vmcs12->host_ia32_perf_global_ctrl));
-+		WARN_ON_ONCE(kvm_emulate_msr_write(vcpu,
-+					MSR_CORE_PERF_GLOBAL_CTRL,
-+					vmcs12->host_ia32_perf_global_ctrl));
- 
- 	/* Set L1 segment info according to Intel SDM
- 	    27.5.2 Loading Host Segment and Descriptor-Table Registers */
-@@ -4744,7 +4745,7 @@ static void nested_vmx_restore_host_state(struct kvm_vcpu *vcpu)
- 				goto vmabort;
- 			}
- 
--			if (kvm_set_msr(vcpu, h.index, h.value)) {
-+			if (kvm_emulate_msr_write(vcpu, h.index, h.value)) {
- 				pr_debug_ratelimited(
- 					"%s WRMSR failed (%u, 0x%x, 0x%llx)\n",
- 					__func__, j, h.index, h.value);
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 27e23714e960..0e7dc3398293 100644
+index 0e7dc3398293..3671f4868d1b 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -1976,17 +1976,17 @@ static int kvm_set_msr_with_filter(struct kvm_vcpu *vcpu, u32 index, u64 data)
- 	return kvm_set_msr_ignored_check(vcpu, index, data, false);
+@@ -12205,6 +12205,11 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+ 		static_branch_dec(&kvm_has_noapic_vcpu);
  }
  
--int kvm_get_msr(struct kvm_vcpu *vcpu, u32 index, u64 *data)
-+int kvm_emulate_msr_read(struct kvm_vcpu *vcpu, u32 index, u64 *data)
++static inline bool is_xstate_reset_needed(void)
++{
++	return kvm_cpu_cap_has(X86_FEATURE_MPX);
++}
++
+ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
  {
- 	return kvm_get_msr_ignored_check(vcpu, index, data, false);
- }
--EXPORT_SYMBOL_GPL(kvm_get_msr);
-+EXPORT_SYMBOL_GPL(kvm_emulate_msr_read);
+ 	struct kvm_cpuid_entry2 *cpuid_0x1;
+@@ -12262,7 +12267,7 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+ 	kvm_async_pf_hash_reset(vcpu);
+ 	vcpu->arch.apf.halted = false;
  
--int kvm_set_msr(struct kvm_vcpu *vcpu, u32 index, u64 data)
-+int kvm_emulate_msr_write(struct kvm_vcpu *vcpu, u32 index, u64 data)
- {
- 	return kvm_set_msr_ignored_check(vcpu, index, data, false);
- }
--EXPORT_SYMBOL_GPL(kvm_set_msr);
-+EXPORT_SYMBOL_GPL(kvm_emulate_msr_write);
+-	if (vcpu->arch.guest_fpu.fpstate && kvm_mpx_supported()) {
++	if (vcpu->arch.guest_fpu.fpstate && is_xstate_reset_needed()) {
+ 		struct fpstate *fpstate = vcpu->arch.guest_fpu.fpstate;
  
- static void complete_userspace_rdmsr(struct kvm_vcpu *vcpu)
- {
-@@ -8386,7 +8386,7 @@ static int emulator_set_msr_with_filter(struct x86_emulate_ctxt *ctxt,
- static int emulator_get_msr(struct x86_emulate_ctxt *ctxt,
- 			    u32 msr_index, u64 *pdata)
- {
--	return kvm_get_msr(emul_to_vcpu(ctxt), msr_index, pdata);
-+	return kvm_emulate_msr_read(emul_to_vcpu(ctxt), msr_index, pdata);
- }
+ 		/*
+@@ -12272,8 +12277,12 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+ 		if (init_event)
+ 			kvm_put_guest_fpu(vcpu);
  
- static int emulator_check_pmc(struct x86_emulate_ctxt *ctxt,
+-		fpstate_clear_xstate_component(fpstate, XFEATURE_BNDREGS);
+-		fpstate_clear_xstate_component(fpstate, XFEATURE_BNDCSR);
++		if (kvm_cpu_cap_has(X86_FEATURE_MPX)) {
++			fpstate_clear_xstate_component(fpstate,
++						       XFEATURE_BNDREGS);
++			fpstate_clear_xstate_component(fpstate,
++						       XFEATURE_BNDCSR);
++		}
+ 
+ 		if (init_event)
+ 			kvm_load_guest_fpu(vcpu);
 -- 
 2.39.3
 
