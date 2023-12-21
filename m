@@ -1,64 +1,64 @@
-Return-Path: <kvm+bounces-5032-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5034-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 826A081B3CE
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 11:39:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A05B81B3D2
+	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 11:39:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3DF70282009
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 10:39:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A0F3B243FC
+	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 10:39:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21B3F73190;
-	Thu, 21 Dec 2023 10:38:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCAB7745D4;
+	Thu, 21 Dec 2023 10:38:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="m2Oj/rCd"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wrgQId5g"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6A0F6EB75
-	for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 10:38:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C7E473187
+	for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 10:38:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-40c41b43e1eso7594165e9.1
-        for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 02:38:32 -0800 (PST)
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-40d3c4bfe45so6369975e9.1
+        for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 02:38:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1703155111; x=1703759911; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1703155114; x=1703759914; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vqrDXpkh9FjMlfAgHrjndIlqPg75eovfRGnZr9OF3KY=;
-        b=m2Oj/rCdjFlzRDHpWsiIslVEoEcG9y39AXxCDXVmFIKXepdW22+n0tE6KSIRdbbEWO
-         pktgmWQnn5t1nes+vf+sy0nCOgStmPrUgg0v+rrv8c/Ec793trxOZtstteGLHSK5oZKo
-         kCEZ1d0gD3cbSNhvnOpjcYFNanPPzZCRsJD2glDtjPS+3QyPvPvclKqqVjDn0YiTBdk8
-         Mb2cLd0Pc16n70AGH7NzpvsBUcHYMzlPZVnwyOZVyE1XM5BDWHfLpxCmePqk1rvzukSz
-         isAHFaLdKfSHnLVwRR5C5fMrPrDCMEHmPP19f4fPsdgJ+76rIveSoICuXkC+ZwPWJDoa
-         iWOg==
+        bh=NG0GNTBkS5OA4bLgzcXFuNl7bQt30v5WL9SIW527gOo=;
+        b=wrgQId5gpLXZZVr+kp6IJq28nY492udpZKIIQrtNFZDalbt0r98rVHZ5W7YqGvYY41
+         Cw0BVTOnIRGQWZkLVgcssYkvadxVtBL7u8toKSqILkLc6I3Hc909n8LAhMmfpXKjyYTA
+         Gb5eYG3wp3CljY+cBX9cv3po/stxJj/RCJ73Q9bjDLxlsrwxgcnjO/6OcL9trbq7ak9a
+         wzVeIjuInoM28586Y3hXnJu9HWkdwVQLDFvUHSEprIlTK+onAuDsTbOjI0p9vr+gDeZR
+         YNTDKyMSJmPkZf/5+Rjg7On3akqyWY30TM6Ilx5XKoJd/Rtu/+qXyVbXQFPEQ5iIt8w0
+         vdMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703155111; x=1703759911;
+        d=1e100.net; s=20230601; t=1703155114; x=1703759914;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vqrDXpkh9FjMlfAgHrjndIlqPg75eovfRGnZr9OF3KY=;
-        b=WpgDe5zK/g8yCLVOiS+d9zOER2bLgoLCg6GgswKFjVTEh3akE/M1Oz3J0Q5SOzqes4
-         GIiSOreBXkOnJtHlScPIMrUlQMH/smkixDYHmqs2vGg1y4vUFBTbswgiVHBZE4ANx7xn
-         UNiT7wwiCUjcGXwaKULiN5saIU4tqf6xqhk/PzYaTvMRMv4UEUfZDCJbEZ4PcpnDB/jy
-         IqkVvfdm7n19u3YDgTquFP/WsmMmuvr+IekZjRxE6Yr15OwpL+B0AdjqYhNKxxtBr8ct
-         GfZB7ZYAsxfXv1RDVjaceL6iDKKLsfh7Bius4AaMBclgVHsOTJXI+he5nLZpuIjZ45wP
-         NJ+A==
-X-Gm-Message-State: AOJu0Yw2z4V8HbGfVXyoebpjR9dnHaRFw2EP0gy0uYdY1pl3fIEHA9UF
-	PkSAGRl/rzevWm/Rf+nusLkNzA==
-X-Google-Smtp-Source: AGHT+IHbKond3XGMBOiEWjhJNY5ms+cvVejnRJSFH4DyRoMTJUtk09qi4u0EKL7LktfxjVkDvxDH4Q==
-X-Received: by 2002:a05:600c:b8e:b0:40b:36e9:bf4b with SMTP id fl14-20020a05600c0b8e00b0040b36e9bf4bmr591312wmb.41.1703155111042;
-        Thu, 21 Dec 2023 02:38:31 -0800 (PST)
+        bh=NG0GNTBkS5OA4bLgzcXFuNl7bQt30v5WL9SIW527gOo=;
+        b=K7dd7/q/pHyWsXn2w/t8r1Otmkx15bPKsu8XBdUq21zR2rnuk/LuZdGHpjCebGrJOI
+         QAG4zo+jHYY0+aRBJ6E1HTFtvdoNYDpe6bR1Sp49sshSUZBYfKpScmvUUt+XCR7gEIMO
+         NKqDZOnG1v3pw6sWkfjAVSLiHLAzoL8zbp2ryfskJU5CZvuZKoEsAOFJzPCAYqcpnqPH
+         LtJry6Ti5xTAqA5XCDyhBXCXJcY8gIGXTyY99PcfDNlLL6AAfC4zfGIr7gYEFDxV7G/l
+         +8KFU9xqHoxjSXP0zy4kTRuVp12al6R7fliHhXnKG4ug5UAJPTwvCnTuIUxwNlbkOycy
+         ucdA==
+X-Gm-Message-State: AOJu0Yztzwc5qxkvPdyeZBsnfYuCjYDGWbNv2gTcrUhjyLPAQ0mQec2G
+	uN2fnpgHu0ckwtyselMs+moQuw==
+X-Google-Smtp-Source: AGHT+IHtw299z4GcZk4ReQAPdhRPfcJ81XOj4Zsroy61A+dimT3sxJq+bziNhd0DzLsBRbi1nCt9BQ==
+X-Received: by 2002:a05:600c:4583:b0:40d:2e2a:18df with SMTP id r3-20020a05600c458300b0040d2e2a18dfmr324147wmo.213.1703155113719;
+        Thu, 21 Dec 2023 02:38:33 -0800 (PST)
 Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id bi18-20020a05600c3d9200b0040d378623b1sm2793725wmb.22.2023.12.21.02.38.23
+        by smtp.gmail.com with ESMTPSA id r19-20020a05600c459300b0040d128e9c62sm10647702wmo.18.2023.12.21.02.38.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Thu, 21 Dec 2023 02:38:29 -0800 (PST)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 46A945F8C3;
+	by draig.lan (Postfix) with ESMTP id 5ECEB5F8D8;
 	Thu, 21 Dec 2023 10:38:20 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
@@ -106,9 +106,9 @@ Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
 	Mahmoud Mandour <ma.mandourr@gmail.com>,
 	Bin Meng <bin.meng@windriver.com>,
 	=?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Subject: [PATCH 14/40] qtest: bump aspeed_smc-test timeout to 6 minutes
-Date: Thu, 21 Dec 2023 10:37:52 +0000
-Message-Id: <20231221103818.1633766-15-alex.bennee@linaro.org>
+Subject: [PATCH 15/40] qtest: bump bios-table-test timeout to 9 minutes
+Date: Thu, 21 Dec 2023 10:37:53 +0000
+Message-Id: <20231221103818.1633766-16-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20231221103818.1633766-1-alex.bennee@linaro.org>
 References: <20231221103818.1633766-1-alex.bennee@linaro.org>
@@ -123,29 +123,31 @@ Content-Transfer-Encoding: 8bit
 
 From: Daniel P. Berrangé <berrange@redhat.com>
 
-On a loaded system with --enable-debug, this test can take longer than
-5 minutes. Raising the timeout to 6 minutes gives greater headroom for
-such situations.
+This is reliably hitting the current 2 minute timeout in GitLab CI,
+and for the TCI job, it even hits a 6 minute timeout.
 
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
-[thuth: Increase the timeout to 6 minutes for very loaded systems]
+Message-ID: <20230717182859.707658-12-berrange@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20231215070357.10888-11-thuth@redhat.com>
+Message-Id: <20231215070357.10888-12-thuth@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/qtest/meson.build | 1 +
- 1 file changed, 1 insertion(+)
+ tests/qtest/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/tests/qtest/meson.build b/tests/qtest/meson.build
-index b02ca540cff..da53dd66c97 100644
+index da53dd66c97..6e8d00d53cb 100644
 --- a/tests/qtest/meson.build
 +++ b/tests/qtest/meson.build
-@@ -1,4 +1,5 @@
+@@ -1,6 +1,6 @@
  slow_qtests = {
-+  'aspeed_smc-test': 360,
-   'bios-tables-test' : 120,
+   'aspeed_smc-test': 360,
+-  'bios-tables-test' : 120,
++  'bios-tables-test' : 540,
    'migration-test' : 480,
    'npcm7xx_pwm-test': 300,
+   'qom-test' : 900,
 -- 
 2.39.2
 
