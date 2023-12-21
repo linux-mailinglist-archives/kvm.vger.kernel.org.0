@@ -1,64 +1,65 @@
-Return-Path: <kvm+bounces-5020-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5022-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38A3581B3C2
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 11:38:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E650381B3C4
+	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 11:38:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C5291C248C1
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 10:38:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 15E8A1C23C90
+	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 10:38:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26BF76A01F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E7556A02C;
 	Thu, 21 Dec 2023 10:38:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PiFSk4l5"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Gz6b4Duq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D9DF69299
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD0846978F
 	for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 10:38:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-33679c49fe5so508328f8f.3
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-40d31116dbeso7068635e9.3
         for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 02:38:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google; t=1703155100; x=1703759900; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=gkoO3wXiqTI2NxB7hGCZob5xUBPaL3tAx2dwNp2CaZw=;
-        b=PiFSk4l5XW/SrvFynHSb5TxIRRqNHpQru7TJTS7BhKFQonHbQN1F6UqbjWDS5fIr2t
-         WT9EAAg+bO+YPxMlwXOZQGF5ba/KzKl1o6hy+WXOyUIldTkZbGeCEv+QNtgbas1OR1eF
-         QpurO7TgUyxpB/nBGArenvapTS61xNMu+eHwuL4CzdFAka2DsLkuQ1d87kaDfeU+cxW1
-         rA0iE6A41FQTVDR3F5o58mkJAt+JOL+ZA/NYsNrssHhQ9XOnVdhhr5njXx1o+lOrQ2Kx
-         te5aJo0jKsp7T1i//MOsXS4MwCiQaK26StvvXi5pYQRiPNdkdzKI8a5zqijEKQNhbTKo
-         wegA==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RdsiaowAjsV2VhJV7X+uJO6SS3PjKGOvNs318qpxEnc=;
+        b=Gz6b4Duq6sxFGOt4GWtOcBdaYhDMXJKSm8RH/9Aj4I2lSRtTOnIZf7GwPdq3cuLFeu
+         VIxqb11337vVFZMYP3WRAngAhZZCQmU5V7apzKDNq9V0ZzE747mPrDn+jmuOXMEYaB+/
+         /lfcPws/PShudgW7PlheyM8OoC7Fx6rI/LiyEy9WvzfpqmLbywNDLU77wPda9ELuPEi+
+         04sH6OX6pCzTjrlmRNM1N2eocnyo8rL90Bs/IhqRSvnGjfSx0ouV/Og4zmQyGNKgsSLL
+         T3IL2f7xDMEc0W/q9GRIbMl3fkyrMU6Ghv5OO6Am1lIAZh0ZqISyChQdcBNlKloZh4rv
+         updA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1703155100; x=1703759900;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gkoO3wXiqTI2NxB7hGCZob5xUBPaL3tAx2dwNp2CaZw=;
-        b=fxFiNXXNuqlpZFCqqIEVqmdYlTqhEh/NJW/xKRcG2NlTGDMcRUY/pOLVGQwY+KdjLo
-         xZTkzJRw2+mNjVO+QxA26b4h+iiIhp0Y4qZIzKv7sGMozI916jocH7Ny3kP2Geo8XZ6T
-         hNKvwPVAmpbWMhfagNmQa5WiNJfH6X04U9elRYB2bEd9rL+eT1wzXugpYK527uYmMbio
-         gnwMmDO20ZZKE2qO97hPRcTmxKzKh+UsrsTDlI5u+O1+dUucwefQKHOgT1teZ/lBy7Pm
-         c9NUnq6OV39AWFpS6jXoAHBxb9sP7FxUWig8UUWtoOBGWeGhCYcJXjxldqJrAYewLwUX
-         gG2g==
-X-Gm-Message-State: AOJu0YxCvQkAaxGjVr3HQ5zbGyswFTXPaPSuXxfIA5naq2DgnD/PmQr3
-	5RQLyVaPUlP6p0kN17RDw5lbGA==
-X-Google-Smtp-Source: AGHT+IHiVMXfF/xI1b5EktkHAluL3eMpNY86C4FyPfFnImWeNCM0tuUOg02HfxtosXDAxpKu6VLOBQ==
-X-Received: by 2002:adf:fc8d:0:b0:336:8160:cbcb with SMTP id g13-20020adffc8d000000b003368160cbcbmr760131wrr.125.1703155099676;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RdsiaowAjsV2VhJV7X+uJO6SS3PjKGOvNs318qpxEnc=;
+        b=DVLAqpYryD4/4rRI3gFa2eXkSExbaxCH0KO7bKPMzSCP/OOTsCLCorqFAad7ecHmIJ
+         7y4HQ3hv2TT/gQYAtIYQogl5gKWOjlidpgpUqGW+Vn6PKly+S0UKfAa8S/tnwFmKUzmq
+         JlO5XX8QGG6xX+Acy7VPS9jYM4P66Dyk3BIuQt6HAz/1xXNs3QI0Mk6UJWLrzwQSF374
+         294Gm8MZrPW7RCrXa/gq6dkuzjyXfR3D2fyHX/xI0yAuDSK6/w8VkqOQ42Mu//HICBBC
+         SfIQqTkXY5TyPp5sBsmWenJXXoXoYc9Je62N7zjB1fq75w9YJ7Yvf4E4xqfFpFTngXPW
+         8rAQ==
+X-Gm-Message-State: AOJu0Ywn8TIPuPX6W0QzXukCzzE2smbzvcUGXQHjKsmUY2bWJTPt3SQ2
+	wI6Aa9+2MSqwX3IrcS4D59B5vw==
+X-Google-Smtp-Source: AGHT+IGNQvXI1TaGTd5rITt67gBKkdTgtOk28s10TrQMNaMkVZnKYF8g1lcS1QVjmQIWgMwv/uml1w==
+X-Received: by 2002:a05:600c:3108:b0:40c:29fb:2c4b with SMTP id g8-20020a05600c310800b0040c29fb2c4bmr624080wmo.148.1703155099929;
         Thu, 21 Dec 2023 02:38:19 -0800 (PST)
 Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id j9-20020adfb309000000b00336641feb02sm1748375wrd.19.2023.12.21.02.38.19
+        by smtp.gmail.com with ESMTPSA id c18-20020a05600c0a5200b0040c6d559490sm2887676wmq.3.2023.12.21.02.38.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Thu, 21 Dec 2023 02:38:19 -0800 (PST)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id EE01B5F7D4;
-	Thu, 21 Dec 2023 10:38:18 +0000 (GMT)
+	by draig.lan (Postfix) with ESMTP id 0FE0E5F8AF;
+	Thu, 21 Dec 2023 10:38:19 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
@@ -104,149 +105,76 @@ Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
 	=?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
 	Mahmoud Mandour <ma.mandourr@gmail.com>,
 	Bin Meng <bin.meng@windriver.com>
-Subject: [PATCH 00/40] testing and plugin updates for 9.0
-Date: Thu, 21 Dec 2023 10:37:38 +0000
-Message-Id: <20231221103818.1633766-1-alex.bennee@linaro.org>
+Subject: [PATCH 01/40] tests/avocado: Add a test for a little-endian microblaze machine
+Date: Thu, 21 Dec 2023 10:37:39 +0000
+Message-Id: <20231221103818.1633766-2-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20231221103818.1633766-1-alex.bennee@linaro.org>
+References: <20231221103818.1633766-1-alex.bennee@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-This brings in the first batch of testing updates for the next
-release. The main bulk of these is Daniel and Thomas' cleanups of the
-qtest timeouts and allowing meson control them. There are a few minor
-tweaks I've made to some avocado and gitlab tests.
+From: Thomas Huth <thuth@redhat.com>
 
-The big update is support for reading register values in TCG plugins.
-After feedback from Akihiko I've left all the smarts to the plugin and
-made the interface a simple "all the registers" dump. There is a
-follow on patch to make the register code a little more efficient by
-checking disassembly. However we can leave the door open for future
-API enhancements if the translator ever learns to reliably know when
-registers might be touched.
+We've already got a test for a big endian microblaze machine, but so
+far we lack one for a little endian machine. Now that the QEMU advent
+calendar featured such an image, we can test the little endian mode,
+too.
 
-The following still need review:
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20231215161851.71508-1-thuth@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ tests/avocado/machine_microblaze.py | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-  contrib/plugins: optimise the register value tracking
-  contrib/plugins: extend execlog to track register changes
-  contrib/plugins: fix imatch
-  plugins: add an API to read registers
-  gdbstub: expose api to find registers
-  gitlab: include microblazeel in testing
-  tests/avocado: use snapshot=on in kvm_xen_guest
-
-Akihiko Odaki (15):
-  hw/riscv: Use misa_mxl instead of misa_mxl_max
-  target/riscv: Remove misa_mxl validation
-  target/riscv: Move misa_mxl_max to class
-  target/riscv: Validate misa_mxl_max only once
-  target/arm: Use GDBFeature for dynamic XML
-  target/ppc: Use GDBFeature for dynamic XML
-  target/riscv: Use GDBFeature for dynamic XML
-  gdbstub: Use GDBFeature for gdb_register_coprocessor
-  gdbstub: Use GDBFeature for GDBRegisterState
-  gdbstub: Change gdb_get_reg_cb and gdb_set_reg_cb
-  gdbstub: Simplify XML lookup
-  gdbstub: Infer number of core registers from XML
-  hw/core/cpu: Remove gdb_get_dynamic_xml member
-  gdbstub: Add members to identify registers to GDBFeature
-  plugins: Use different helpers when reading registers
-
-Alex Bennée (8):
-  tests/avocado: use snapshot=on in kvm_xen_guest
-  gitlab: include microblazeel in testing
-  chardev: use bool for fe_is_open
-  gdbstub: expose api to find registers
-  plugins: add an API to read registers
-  contrib/plugins: fix imatch
-  contrib/plugins: extend execlog to track register changes
-  contrib/plugins: optimise the register value tracking
-
-Daniel P. Berrangé (12):
-  qtest: bump min meson timeout to 60 seconds
-  qtest: bump migration-test timeout to 8 minutes
-  qtest: bump qom-test timeout to 15 minutes
-  qtest: bump npcm7xx_pwn-test timeout to 5 minutes
-  qtest: bump test-hmp timeout to 4 minutes
-  qtest: bump pxe-test timeout to 10 minutes
-  qtest: bump prom-env-test timeout to 6 minutes
-  qtest: bump boot-serial-test timeout to 3 minutes
-  qtest: bump qos-test timeout to 2 minutes
-  qtest: bump aspeed_smc-test timeout to 6 minutes
-  qtest: bump bios-table-test timeout to 9 minutes
-  mtest2make: stop disabling meson test timeouts
-
-Thomas Huth (5):
-  tests/avocado: Add a test for a little-endian microblaze machine
-  tests/qtest: Bump the device-introspect-test timeout to 12 minutes
-  tests/unit: Bump test-aio-multithread test timeout to 2 minutes
-  tests/unit: Bump test-crypto-block test timeout to 5 minutes
-  tests/fp: Bump fp-test-mulAdd test timeout to 3 minutes
-
- docs/devel/tcg-plugins.rst          |  17 +-
- accel/tcg/plugin-helpers.h          |   3 +-
- include/chardev/char-fe.h           |  19 +-
- include/exec/gdbstub.h              |  62 +++++-
- include/hw/core/cpu.h               |   7 +-
- include/qemu/plugin.h               |   1 +
- include/qemu/qemu-plugin.h          |  53 ++++-
- target/arm/cpu.h                    |  27 +--
- target/arm/internals.h              |  14 +-
- target/hexagon/internal.h           |   4 +-
- target/microblaze/cpu.h             |   4 +-
- target/ppc/cpu-qom.h                |   1 +
- target/ppc/cpu.h                    |   5 +-
- target/riscv/cpu.h                  |   9 +-
- target/s390x/cpu.h                  |   2 -
- accel/tcg/plugin-gen.c              |  43 +++-
- chardev/char-fe.c                   |  16 +-
- chardev/char.c                      |   2 +-
- contrib/plugins/execlog.c           | 322 +++++++++++++++++++++++-----
- gdbstub/gdbstub.c                   | 198 +++++++++++------
- hw/core/cpu-common.c                |   5 +-
- hw/riscv/boot.c                     |   2 +-
- plugins/api.c                       | 114 +++++++++-
- target/arm/cpu.c                    |   2 -
- target/arm/cpu64.c                  |   1 -
- target/arm/gdbstub.c                | 230 ++++++++++----------
- target/arm/gdbstub64.c              | 122 +++++------
- target/avr/cpu.c                    |   1 -
- target/hexagon/cpu.c                |   4 +-
- target/hexagon/gdbstub.c            |  10 +-
- target/i386/cpu.c                   |   2 -
- target/loongarch/cpu.c              |   2 -
- target/loongarch/gdbstub.c          |  13 +-
- target/m68k/cpu.c                   |   1 -
- target/m68k/helper.c                |  26 ++-
- target/microblaze/cpu.c             |   6 +-
- target/microblaze/gdbstub.c         |   9 +-
- target/ppc/cpu_init.c               |   7 -
- target/ppc/gdbstub.c                | 114 +++++-----
- target/riscv/cpu.c                  | 154 ++++++-------
- target/riscv/gdbstub.c              | 151 +++++++------
- target/riscv/kvm/kvm-cpu.c          |  10 +-
- target/riscv/machine.c              |   7 +-
- target/riscv/tcg/tcg-cpu.c          |  44 +---
- target/riscv/translate.c            |   3 +-
- target/rx/cpu.c                     |   1 -
- target/s390x/cpu.c                  |   1 -
- target/s390x/gdbstub.c              | 105 +++++----
- .gitlab-ci.d/buildtest.yml          |   4 +-
- plugins/qemu-plugins.symbols        |   2 +
- scripts/feature_to_c.py             |  14 +-
- scripts/mtest2make.py               |   3 +-
- tests/avocado/kvm_xen_guest.py      |   2 +-
- tests/avocado/machine_microblaze.py |  26 +++
- tests/fp/meson.build                |   2 +-
- tests/qtest/meson.build             |  25 +--
- tests/unit/meson.build              |   2 +
- 57 files changed, 1332 insertions(+), 704 deletions(-)
-
+diff --git a/tests/avocado/machine_microblaze.py b/tests/avocado/machine_microblaze.py
+index 8d0efff30d2..807709cd11e 100644
+--- a/tests/avocado/machine_microblaze.py
++++ b/tests/avocado/machine_microblaze.py
+@@ -5,6 +5,8 @@
+ # This work is licensed under the terms of the GNU GPL, version 2 or
+ # later. See the COPYING file in the top-level directory.
+ 
++import time
++from avocado_qemu import exec_command, exec_command_and_wait_for_pattern
+ from avocado_qemu import QemuSystemTest
+ from avocado_qemu import wait_for_console_pattern
+ from avocado.utils import archive
+@@ -33,3 +35,27 @@ def test_microblaze_s3adsp1800(self):
+         # The kernel sometimes gets stuck after the "This architecture ..."
+         # message, that's why we don't test for a later string here. This
+         # needs some investigation by a microblaze wizard one day...
++
++    def test_microblazeel_s3adsp1800(self):
++        """
++        :avocado: tags=arch:microblazeel
++        :avocado: tags=machine:petalogix-s3adsp1800
++        """
++
++        self.require_netdev('user')
++        tar_url = ('http://www.qemu-advent-calendar.org/2023/download/'
++                   'day13.tar.gz')
++        tar_hash = '6623d5fff5f84cfa8f34e286f32eff6a26546f44'
++        file_path = self.fetch_asset(tar_url, asset_hash=tar_hash)
++        archive.extract(file_path, self.workdir)
++        self.vm.set_console()
++        self.vm.add_args('-kernel', self.workdir + '/day13/xmaton.bin')
++        self.vm.add_args('-nic', 'user,tftp=' + self.workdir + '/day13/')
++        self.vm.launch()
++        wait_for_console_pattern(self, 'QEMU Advent Calendar 2023')
++        time.sleep(0.1)
++        exec_command(self, 'root')
++        time.sleep(0.1)
++        exec_command_and_wait_for_pattern(self,
++                'tftp -g -r xmaton.png 10.0.2.2 ; md5sum xmaton.png',
++                '821cd3cab8efd16ad6ee5acc3642a8ea')
 -- 
 2.39.2
 
