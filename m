@@ -1,81 +1,87 @@
-Return-Path: <kvm+bounces-5093-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5094-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1F9C81BC85
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 18:00:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A131B81BC8B
+	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 18:01:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4EBD01F22535
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 17:00:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3FEC1C25DA8
+	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 17:01:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAA2058231;
-	Thu, 21 Dec 2023 16:59:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ACE0627E0;
+	Thu, 21 Dec 2023 17:01:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VigL3GYq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MOY7DnoZ"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F9E75822E
-	for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 16:59:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E7915991B
+	for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 17:01:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1703177989;
+	s=mimecast20190719; t=1703178072;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ky8oNKjijOb1tIn4ayWtmUKjCWxopvvJegMZ8w2vi34=;
-	b=VigL3GYqVD/EHFP9PD2XY0BKZTIcDu4m3RffBxHPYFmkh4OO7KM0RKDoHWt5g141gZReCD
-	Ychg1gx+kQ3W6m6vr84I6XSQRwGT4lbSilavbvJNJvZZPNX/EUgHYUmwxbTR/qHNyzGtI5
-	myh3tBvrSHigzTqfcUAlWx4P+DD15Bo=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=MTJ5ESIOyUqDB8n0Xz8qCRHr+4/Mt0yPLsVWj0QhBx4=;
+	b=MOY7DnoZ/b4FCXh9kHlVaPLlKuclFCkcs8rUZSDU0W6Is84CQAhj92KZhQARqQUABoObPG
+	k6+q50o6e16WkpnCLGcpmsrL59ETVcye9fwD9O+WUhoIp3EwVk78GjR2RC22ftxhSaaZE9
+	FS1IJWVIVcblQN8y+Tji8jfgfPXc9t8=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-509-Oz9vWOGdMGqe1camdG7uWw-1; Thu, 21 Dec 2023 11:59:47 -0500
-X-MC-Unique: Oz9vWOGdMGqe1camdG7uWw-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a26a096b87fso49724366b.1
-        for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 08:59:47 -0800 (PST)
+ us-mta-341-tZ_eSriBMN-OqGNhoUv-Ww-1; Thu, 21 Dec 2023 12:01:10 -0500
+X-MC-Unique: tZ_eSriBMN-OqGNhoUv-Ww-1
+Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-553ae98aa2fso1110351a12.1
+        for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 09:01:10 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703177986; x=1703782786;
+        d=1e100.net; s=20230601; t=1703178069; x=1703782869;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=ky8oNKjijOb1tIn4ayWtmUKjCWxopvvJegMZ8w2vi34=;
-        b=S4MGwk4HzlosY+K2e7fFguangt24hnnZnob4D93gw1oigQtKJF+/hmoJIqAsCVVrBF
-         xGrccZ8umR3j+U9L3DC19S03SGx3v3FoDwouZ5s6LIDm+SUbMHIafqULM3J1CMrWIx4v
-         Btd/fnXCnkTscuWCKVvYuaZlCbwBVf5N6tpUiSZ6niOJp7oTHIITpyvhHn8GERZgQjeO
-         5URQEhV9NQOGe92CYXg9KAgTyrFyo0mKeb9SpQhZ4TgMeI7EIWDWDSUfy/O8NpOyQUGF
-         zwiF0a/uSSfCdqqJImE63Ip8kyIFatVCAZQf0PLospCsK6EstfYiKNkHnQ2i4gHwLHVL
-         BzPQ==
-X-Gm-Message-State: AOJu0YwQdRcHI4tg89wuUcLoBQKqPr4AFqIH0ALG+9dWLPzugAOQjAFR
-	ruTaYEmtQeiPNRgF7n3eoxIxXvlL482Y97AUbkeCQZBnExbU3DC4mH2ImSMdO590VB5H9Tg6ZKm
-	TaFoZXyfgjY597iMZ//3P
-X-Received: by 2002:a17:906:eb14:b0:a1e:6f75:d9f6 with SMTP id mb20-20020a170906eb1400b00a1e6f75d9f6mr53002ejb.74.1703177986111;
-        Thu, 21 Dec 2023 08:59:46 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEJww3NmjP4GfkogpnV//xBltozl1W6BKERNxb21AASQ3+QDCRv3QeGeoJNUYihJ1w99Z0N+A==
-X-Received: by 2002:a17:906:eb14:b0:a1e:6f75:d9f6 with SMTP id mb20-20020a170906eb1400b00a1e6f75d9f6mr52996ejb.74.1703177985764;
-        Thu, 21 Dec 2023 08:59:45 -0800 (PST)
+        bh=MTJ5ESIOyUqDB8n0Xz8qCRHr+4/Mt0yPLsVWj0QhBx4=;
+        b=LVjGzf8GsBF+MG33L4APfYbJi6QXfNvQZw0YpV7zIiaP9EL6I2ZFTmlM7w1u88B66N
+         MA/rYxRFaIdexGP4LBJYNaSwP3HVMNzGzwY8C+2HJ6E2yeZyc4xX9zye2vfPVcSv1A7N
+         mPOcFUeE+E6OiNweSqc9fCmfAoCDSJNjF4bbZDXmrCGw8AhT21e7KXMBlbz8pwA+9QrK
+         /wxSKKNizYXAdXTLdrUnE8aCUkXhjfyFqL1MAh4y7Q8CiCl61Yh1jxfrsvWs3dke615x
+         5ugRLSRr0MbCmX3t8NtCIdUAE2sfThtT/zSZbpUMml13OQ0noZzBd1WhsGDRScv5Rxtq
+         qRhw==
+X-Gm-Message-State: AOJu0Yyohplx0zA14TfdKUZDqzcOicu+ljk0pPSJ1r3ePVwX7+YQpt48
+	s3aamc2NP3QjE5GdhygDbX3GIOjmosrY7ZPl2D88sjXOkh+yHEjyJS4mPZhH7KmL6u5aup2b1Fa
+	sFb34qa4oKrEU
+X-Received: by 2002:aa7:cf99:0:b0:552:fccb:c3b0 with SMTP id z25-20020aa7cf99000000b00552fccbc3b0mr1154662edx.25.1703178069314;
+        Thu, 21 Dec 2023 09:01:09 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG7+Kx8aYbDCznZCj24KpGmL00NeWvL5EXT10506ac0wUHvn3R/Pf/ORUj9FK42eGybxOZbwA==
+X-Received: by 2002:aa7:cf99:0:b0:552:fccb:c3b0 with SMTP id z25-20020aa7cf99000000b00552fccbc3b0mr1154644edx.25.1703178069009;
+        Thu, 21 Dec 2023 09:01:09 -0800 (PST)
 Received: from starship ([77.137.131.62])
-        by smtp.gmail.com with ESMTPSA id j13-20020a170906254d00b009fea232316bsm1141978ejb.193.2023.12.21.08.59.44
+        by smtp.gmail.com with ESMTPSA id f20-20020a056402195400b005543f50e53asm258311edz.93.2023.12.21.09.01.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Dec 2023 08:59:45 -0800 (PST)
-Message-ID: <daaf098a6219310b6b1c1e3dc147fbb7e48b6f54.camel@redhat.com>
-Subject: Re: [PATCH 3/9] KVM: x86: Initialize guest cpu_caps based on guest
- CPUID
+        Thu, 21 Dec 2023 09:01:08 -0800 (PST)
+Message-ID: <c7fdb72fc8ae79148a7be6c1668f6310f98b468c.camel@redhat.com>
+Subject: Re: [PATCH v2 1/3] KVM: x86: Make the hardcoded APIC bus frequency
+ vm variable
 From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Date: Thu, 21 Dec 2023 18:59:43 +0200
-In-Reply-To: <ZWk8IMZamuemfwXG@google.com>
-References: <20231110235528.1561679-1-seanjc@google.com>
-	 <20231110235528.1561679-4-seanjc@google.com>
-	 <3ad69657ba8e1b19d150db574193619cf0cb34df.camel@redhat.com>
-	 <ZWk8IMZamuemfwXG@google.com>
+To: Isaku Yamahata <isaku.yamahata@linux.intel.com>, Sean Christopherson
+	 <seanjc@google.com>
+Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org,  isaku.yamahata@gmail.com, Paolo Bonzini
+ <pbonzini@redhat.com>,  erdemaktas@google.com, Vishal Annapurve
+ <vannapurve@google.com>, Jim Mattson <jmattson@google.com>
+Date: Thu, 21 Dec 2023 19:01:06 +0200
+In-Reply-To: <20231219014045.GA2639779@ls.amr.corp.intel.com>
+References: <cover.1699936040.git.isaku.yamahata@intel.com>
+	 <1c12f378af7de16d7895f8badb18c3b1715e9271.1699936040.git.isaku.yamahata@intel.com>
+	 <938efd3cfcb25d828deab0cc0ba797177cc69602.camel@redhat.com>
+	 <ZXo54VNuIqbMsYv-@google.com>
+	 <aa7aa5ea5b112a0ec70c6276beb281e19c052f0e.camel@redhat.com>
+	 <ZXswR04H9Tl7xlyj@google.com>
+	 <20231219014045.GA2639779@ls.amr.corp.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
@@ -86,215 +92,84 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-On Thu, 2023-11-30 at 17:51 -0800, Sean Christopherson wrote:
-> On Sun, Nov 19, 2023, Maxim Levitsky wrote:
-> > On Fri, 2023-11-10 at 15:55 -0800, Sean Christopherson wrote:
-> > > +/*
-> > > + * This isn't truly "unsafe", but all callers except kvm_cpu_after_set_cpuid()
-> > > + * should use __cpuid_entry_get_reg(), which provides compile-time validation
-> > > + * of the input.
-> > > + */
-> > > +static u32 cpuid_get_reg_unsafe(struct kvm_cpuid_entry2 *entry, u32 reg)
-> > > +{
-> > > +	switch (reg) {
-> > > +	case CPUID_EAX:
-> > > +		return entry->eax;
-> > > +	case CPUID_EBX:
-> > > +		return entry->ebx;
-> > > +	case CPUID_ECX:
-> > > +		return entry->ecx;
-> > > +	case CPUID_EDX:
-> > > +		return entry->edx;
-> > > +	default:
-> > > +		WARN_ON_ONCE(1);
-> > > +		return 0;
-> > > +	}
-> > > +}
+On Mon, 2023-12-18 at 17:40 -0800, Isaku Yamahata wrote:
+> On Thu, Dec 14, 2023 at 08:41:43AM -0800,
+> Sean Christopherson <seanjc@google.com> wrote:
 > 
-> ...
-> 
-> > >  static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
-> > >  {
-> > >  	struct kvm_lapic *apic = vcpu->arch.apic;
-> > >  	struct kvm_cpuid_entry2 *best;
-> > >  	bool allow_gbpages;
-> > > +	int i;
-> > >  
-> > > -	memset(vcpu->arch.cpu_caps, 0, sizeof(vcpu->arch.cpu_caps));
-> > > +	BUILD_BUG_ON(ARRAY_SIZE(reverse_cpuid) != NR_KVM_CPU_CAPS);
-> > > +
-> > > +	/*
-> > > +	 * Reset guest capabilities to userspace's guest CPUID definition, i.e.
-> > > +	 * honor userspace's definition for features that don't require KVM or
-> > > +	 * hardware management/support (or that KVM simply doesn't care about).
-> > > +	 */
-> > > +	for (i = 0; i < NR_KVM_CPU_CAPS; i++) {
-> > > +		const struct cpuid_reg cpuid = reverse_cpuid[i];
-> > > +
-> > > +		best = kvm_find_cpuid_entry_index(vcpu, cpuid.function, cpuid.index);
-> > > +		if (best)
-> > > +			vcpu->arch.cpu_caps[i] = cpuid_get_reg_unsafe(best, cpuid.reg);
+> > On Thu, Dec 14, 2023, Maxim Levitsky wrote:
+> > > On Wed, 2023-12-13 at 15:10 -0800, Sean Christopherson wrote:
+> > > > Upstream KVM's non-TDX behavior is fine, because KVM doesn't advertise support
+> > > > for CPUID 0x15, i.e. doesn't announce to host userspace that it's safe to expose
+> > > > CPUID 0x15 to the guest.  Because TDX makes exposing CPUID 0x15 mandatory, KVM
+> > > > needs to be taught to correctly emulate the guest's APIC bus frequency, a.k.a.
+> > > > the TDX guest core crystal frequency of 25Mhz.
+> > > 
+> > > I assume that TDX doesn't allow to change the CPUID 0x15 leaf.
 > > 
-> > Why not just use __cpuid_entry_get_reg? 
+> > Correct.  I meant to call that out below, but left my sentence half-finished.  It
+> > was supposed to say:
 > > 
-> > cpuid.reg comes from read/only 'reverse_cpuid' anyway, and in fact
-> > it seems that all callers of __cpuid_entry_get_reg, take the reg value from
-> > x86_feature_cpuid() which also takes it from 'reverse_cpuid'.
+> >   I halfheartedly floated the idea of "fixing" the TDX module/architecture to either
+> >   use 1Ghz as the base frequency or to allow configuring the base frequency
+> >   advertised to the guest.
 > > 
-> > So if the compiler is smart enough to not complain in these cases, I don't
-> > see why this case is different.
+> > > > I halfheartedly floated the idea of "fixing" the TDX module/architecture to either
+> > > > use 1Ghz as the base frequency (off list), but it definitely isn't a hill worth
+> > > > dying on since the KVM changes are relatively simple.
+> > > > 
+> > > > https://lore.kernel.org/all/ZSnIKQ4bUavAtBz6@google.com
+> > > > 
+> > > 
+> > > Best regards,
+> > > 	Maxim Levitsky
 > 
-> It's because the input isn't a compile-time constant, and so the BUILD_BUG() in
-> the default path will fire. 
->  All of the compile-time assertions in reverse_cpuid.h
-> rely on the feature being a constant value, which allows the compiler to optimize
-> away the dead paths, i.e. turn __cpuid_entry_get_reg()'s switch statement into
-> simple pointer arithmetic and thus omit the BUILD_BUG() code.
+> The followings are the updated version of the commit message.
+> 
+> 
+> KVM: x86: Make the hardcoded APIC bus frequency VM variable
+> 
+> The TDX architecture hard-codes the APIC bus frequency to 25MHz in the
+> CPUID leaf 0x15.  The
+> TDX mandates it to be exposed and doesn't allow the VMM to override
+> its value.  The KVM APIC timer emulation hard-codes the frequency to
+> 1GHz.  It doesn't unconditionally enumerate it to the guest unless the
+> user space VMM sets the CPUID leaf 0x15 by KVM_SET_CPUID.
+> 
+> If the CPUID leaf 0x15 is enumerated, the guest kernel uses it as the
+> APIC bus frequency.  If not, the guest kernel measures the frequency
+> based on other known timers like the ACPI timer or the legacy PIT.
+> The TDX guest kernel gets timer interrupt more times by 1GHz / 25MHz.
+> 
+> To ensure that the guest doesn't have a conflicting view of the APIC
+> bus frequency, allow the userspace to tell KVM to use the same
+> frequency that TDX mandates instead of the default 1Ghz.
 
-In the above code, assuming that the compiler really treats the reverse_cpuid as const
-(if that assumption is not true, then all uses of __cpuid_entry_get_reg are also not compile
-time constant either),
-then the 'reg' value depends only on 'i', and therefore for each iteration of the loop,
-the compiler does know the compile time value of the 'reg',
-and so it can easily prove that 'default' case in __cpuid_entry_get_reg can't be reached,
-and thus eliminate that BUILD_BUG().
+Looks great!
 
+In theory this gives me an idea that KVM could parse the guest CPUID leaf
+0x15 and deduce the frequency from it automatically instead of a new capability,
+but I understand that this is (also in theory) not backward compatible assuming
+that some hypervisors already expose this leaf for some reason,
+thus a new capability will be needed anyway.
 
-> 
-> > Also why not to initialize guest_caps = host_caps & userspace_cpuid?
-> > 
-> > If this was the default we won't need any guest_cpu_cap_restrict and such,
-> > instead it will just work.
-> 
-> Hrm, I definitely like the idea.  Unfortunately, unless we do an audit of all
-> ~120 uses of guest_cpuid_has(), restricting those based on kvm_cpu_caps might
-> break userspace.
-
-120 uses is not that bad, IMHO it is worth it - we won't need to deal with that
-in the future.
-
-How about a compromise - you change the patches such as it will be possible to remove
-these cases one by one, and also all new cases will be fully automatic?
-
-
-> 
-> Aside from purging the governed feature nomenclature, the main goal of this series
-> provide a way to do fast lookups of all known guest CPUID bits without needing to
-> opt-in on a feature-by-feature basis, including for features that are fully
-> controlled by userspace.
-
-I'll note that, this makes sense.
-> 
-> It's definitely doable, but I'm not all that confident that the end result would
-> be a net positive, e.g. I believe we would need to special case things like the
-> feature bits that gate MSR_IA32_SPEC_CTRL and MSR_IA32_PRED_CMD.  MOVBE and RDPID
-> are other features that come to mind, where KVM emulates the feature in software
-> but it won't be set in kvm_cpu_caps.
-
-> 
-> Oof, and MONITOR and MWAIT too, as KVM deliberately doesn't advertise those to
-> userspace.
-> 
-> So yeah, I'm not opposed to trying that route at some point, but I really don't
-> want to do that in this series as the risk of subtly breaking something is super
-> high.
-> 
-> > Special code will only be needed in few more complex cases, like forced exposed
-> > of a feature to a guest due to a virtualization hole.
-> > 
-> > 
-> > > +		else
-> > > +			vcpu->arch.cpu_caps[i] = 0;
-> > > +	}
-> > >  
-> > >  	/*
-> > >  	 * If TDP is enabled, let the guest use GBPAGES if they're supported in
-> > > @@ -342,8 +380,7 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
-> > >  	 */
-> > >  	allow_gbpages = tdp_enabled ? boot_cpu_has(X86_FEATURE_GBPAGES) :
-> > >  				      guest_cpuid_has(vcpu, X86_FEATURE_GBPAGES);
-> > > -	if (allow_gbpages)
-> > > -		guest_cpu_cap_set(vcpu, X86_FEATURE_GBPAGES);
-> > > +	guest_cpu_cap_change(vcpu, X86_FEATURE_GBPAGES, allow_gbpages);
-> > 
-> > IMHO the original code was more readable, now I need to look up the
-> > 'guest_cpu_cap_change()' to understand what is going on.
-> 
-> The change is "necessary".  The issue is that with the caps 0-initialied, the
-> !allow_gbpages could simply do nothing.  Now, KVM needs to explicitly clear the
-> flag, i.e. would need to do:
-> 
-> 	if (allow_gbpages)
-> 		guest_cpu_cap_set(vcpu, X86_FEATURE_GBPAGES);
-> 	else
-> 		guest_cpu_cap_clear(vcpu, X86_FEATURE_GBPAGES);
-
-I understand now but I am complaining more about the fact that I like the
-explicit longer version better than calling guest_cpu_cap_change because it's not obvious
-what guest_cpu_cap_change really does. I am not going to fight over this though,
-just saying.
-
-> 
-> I don't much love the name either, but it pairs with cpuid_entry_change() and I
-> want to keep the kvm_cpu_cap, cpuid_entry, and guest_cpu_cap APIs in sync as far
-> as the APIs go.  The only reason kvm_cpu_cap_change() doesn't exist is because
-> there aren't any flows that need to toggle a bit.
-> 
-> > >  static __always_inline bool guest_cpu_cap_has(struct kvm_vcpu *vcpu,
-> > > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > > index 8a99a73b6ee5..5827328e30f1 100644
-> > > --- a/arch/x86/kvm/svm/svm.c
-> > > +++ b/arch/x86/kvm/svm/svm.c
-> > > @@ -4315,14 +4315,14 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
-> > >  	 * XSS on VM-Enter/VM-Exit.  Failure to do so would effectively give
-> > >  	 * the guest read/write access to the host's XSS.
-> > >  	 */
-> > > -	if (boot_cpu_has(X86_FEATURE_XSAVE) &&
-> > > -	    boot_cpu_has(X86_FEATURE_XSAVES) &&
-> > > -	    guest_cpuid_has(vcpu, X86_FEATURE_XSAVE))
-> > > -		guest_cpu_cap_set(vcpu, X86_FEATURE_XSAVES);
-> > > +	guest_cpu_cap_change(vcpu, X86_FEATURE_XSAVES,
-> > > +			     boot_cpu_has(X86_FEATURE_XSAVE) &&
-> > > +			     boot_cpu_has(X86_FEATURE_XSAVES) &&
-> > > +			     guest_cpuid_has(vcpu, X86_FEATURE_XSAVE));
-> > 
-> > In theory this change does change behavior, now the X86_FEATURE_XSAVE will
-> > be set iff the condition is true, but before it was set *if* the condition was true.
-> 
-> No, before it was set if and only if the condition was true, because in that case
-> caps were 0-initialized, i.e. this was/is the only way for XSAVE to be set.
-> 
-> > > -	guest_cpu_cap_check_and_set(vcpu, X86_FEATURE_NRIPS);
-> > > -	guest_cpu_cap_check_and_set(vcpu, X86_FEATURE_TSCRATEMSR);
-> > > -	guest_cpu_cap_check_and_set(vcpu, X86_FEATURE_LBRV);
-> > > +	guest_cpu_cap_restrict(vcpu, X86_FEATURE_NRIPS);
-> > > +	guest_cpu_cap_restrict(vcpu, X86_FEATURE_TSCRATEMSR);
-> > > +	guest_cpu_cap_restrict(vcpu, X86_FEATURE_LBRV);
-> > 
-> > One of the main reasons I don't like governed features is this manual list.
-> 
-> To be fair, the manual lists predate the governed features.
-
-100% agree, however the point of governed features was to simplify this list,
-the point of this patch set is to simplify these lists and yet they still remain,
-more or less untouched, and we will still need to maintain them.
-
-Again I do think that governed features and/or this patchset are better than
-the mess that was there before, but a part of me wants to fully get rid of this mess instead
-of just making it a bit more beautiful. 
-
-> 
-> > I want to reach the point that one won't need to add anything manually,
-> > unless there is a good reason to do so, and there are only a few exceptions
-> > when the guest cap is set, while the host's isn't.
-> 
-> Yeah, agreed.
-
-I am glad that we are on the same page here.
+Thus I have no more complaints, and thanks for addressing my feedback!
 
 Best regards,
 	Maxim Levitsky
 
+> 
+> There are several options to address this.
+> 1. Make the KVM able to configure APIC bus frequency (This patch).
+>    Pros: It resembles the existing hardware.  The recent Intel CPUs
+>    adapts 25MHz.
+>    Cons: Require the VMM to emulate the APIC timer at 25MHz.
+> 2. Make the TDX architecture enumerate CPUID 0x15 to configurable
+>    frequency or not enumerate it.
+>    Pros: Any APIC bus frequency is allowed.
+>    Cons: Deviation from the real hardware.
+> 3. Make the TDX guest kernel use 1GHz when it's running on KVM.
+>    Cons: The kernel ignores CPUID leaf 0x15.
+> 
 > 
 
 
