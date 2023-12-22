@@ -1,124 +1,124 @@
-Return-Path: <kvm+bounces-5127-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5129-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A70F81C6A0
-	for <lists+kvm@lfdr.de>; Fri, 22 Dec 2023 09:29:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B15B181C6B1
+	for <lists+kvm@lfdr.de>; Fri, 22 Dec 2023 09:35:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D406F1F263CB
-	for <lists+kvm@lfdr.de>; Fri, 22 Dec 2023 08:29:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAAF71C21EB8
+	for <lists+kvm@lfdr.de>; Fri, 22 Dec 2023 08:35:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9503ED314;
-	Fri, 22 Dec 2023 08:29:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64AD9DF59;
+	Fri, 22 Dec 2023 08:35:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b4nlJEgg"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Grec/3T0"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E749C8C8
-	for <kvm@vger.kernel.org>; Fri, 22 Dec 2023 08:29:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1703233749;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+1/Sz19OR6XWaD99Hs0XiYIWs6pPYgQ5leaKhAq6DJY=;
-	b=b4nlJEggy78sDx6v1o9eyjy8xlaWS3GpPlvTg0nEjetA01XPv53lY2aQLc+KemGseARCeQ
-	Ten+JzlHR7XyR8WP3+MU5ov8MFPXbzOdKvHd8o4sO+zp2WsLoRzlh3VHMv9qj4Wa7iHeyQ
-	5h0hiRf89qFS83zAk2rvWn/G9You0aY=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-451-WrUnyihzMMSMTdxty7oAuA-1; Fri, 22 Dec 2023 03:29:07 -0500
-X-MC-Unique: WrUnyihzMMSMTdxty7oAuA-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-40d1ffbc3b8so14569035e9.0
-        for <kvm@vger.kernel.org>; Fri, 22 Dec 2023 00:29:07 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703233746; x=1703838546;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+1/Sz19OR6XWaD99Hs0XiYIWs6pPYgQ5leaKhAq6DJY=;
-        b=f11ESR9USyjgMDfhaTTq0EiOG7pwqu3pPPoVQxUhjPg0Pe/hrpLgIKpYfsngs+9Y8z
-         5oG+NvLvZah8HjzAF5+trW7zERetqk2hzp6CK0W9ivrBTKjoE7qf2Qt4ZNjr1yP1T/i3
-         VC/AykkixOnWpmO57r5wVGs7sgPT1E2w1kLWkguYDmBOqcNCutYGIZOjrze0HYp7iAWW
-         sCYJSValH9X8MWeCji1X1Zf+l4rb90IxiwUcImRSz0G1be+dGczIqAE5xKRyCjTney5I
-         KEZkkrEJH4uR3DJL4DpcpSbmgovkFSWZ2Sdt8xL2PwjJW12Q1X/vVON5fBhxEzHfQCdz
-         fMpA==
-X-Gm-Message-State: AOJu0YxlOblbYkIp+G7Q+P/ITMnHcZBHmIfstjpY79XoYzd+M4V5qBzj
-	g6eqpkSBz6jnR8IihvALz5arYsCHGTJfPaujcsb3oQ0Jp7iNykh99NuXlk/n5obriEczunvDrUR
-	u7KHZZHa/eaeEQTfG2z8V
-X-Received: by 2002:a05:600c:5248:b0:40d:494a:cb9 with SMTP id fc8-20020a05600c524800b0040d494a0cb9mr60321wmb.62.1703233746653;
-        Fri, 22 Dec 2023 00:29:06 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGQLIJ3jovK0TTr+qKYudLCC16A8aoY3e2L7y+gdkeb2YLR6dNadO38fME4r6D9zWksyIN5kQ==
-X-Received: by 2002:a05:600c:5248:b0:40d:494a:cb9 with SMTP id fc8-20020a05600c524800b0040d494a0cb9mr60308wmb.62.1703233746369;
-        Fri, 22 Dec 2023 00:29:06 -0800 (PST)
-Received: from redhat.com ([2.55.177.189])
-        by smtp.gmail.com with ESMTPSA id m17-20020adffe51000000b003364a0e6983sm3731542wrs.62.2023.12.22.00.29.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Dec 2023 00:29:05 -0800 (PST)
-Date: Fri, 22 Dec 2023 03:29:02 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Dragos Tatulea <dtatulea@nvidia.com>
-Cc: "eperezma@redhat.com" <eperezma@redhat.com>,
-	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>,
-	Parav Pandit <parav@nvidia.com>, Gal Pressman <gal@nvidia.com>,
-	"virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"si-wei.liu@oracle.com" <si-wei.liu@oracle.com>,
-	"jasowang@redhat.com" <jasowang@redhat.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 225A3DDA3
+	for <kvm@vger.kernel.org>; Fri, 22 Dec 2023 08:35:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1703234109; x=1734770109;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=LoIAA0CvLDyDd2zMRzU7xGB8nmg2Wi0fDASQta4ZIUM=;
+  b=Grec/3T0OJW2w4ihOeaat/A655ZrUJlAwRlo4p6GhJtYkHqwu0Q2uR0w
+   JKKW4LeK2WkHrXQkNIBEGQBboprYx4R5gG3r7HZQ1aNKYceiyfbaOxEwP
+   m7e5oqYVeeX2OtPyMHMLAVkDDQ3AQ/5Qx+KEFMnBGMaxk/KMy5+YQSPRx
+   WcnSRtVUtIUZ7n9/H6trzA5fYFyKry5CeKgg6R0sGRV3tGy2jUswBSeX3
+   6uKfehltL2D330fKzk5dFHUAG9QgW9DF0IcNTGXg20fbH1ne3lP8Ny+r1
+   mmSuDzG18R1yZuG647sp5xbnjsIdqBLx7IU3gWtMb4qwJSADPOo6p5EF5
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10931"; a="393255159"
+X-IronPort-AV: E=Sophos;i="6.04,294,1695711600"; 
+   d="scan'208";a="393255159"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Dec 2023 00:35:08 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10931"; a="753202490"
+X-IronPort-AV: E=Sophos;i="6.04,294,1695711600"; 
+   d="scan'208";a="753202490"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
+  by orsmga006.jf.intel.com with ESMTP; 22 Dec 2023 00:35:00 -0800
+Date: Fri, 22 Dec 2023 16:47:46 +0800
+From: "Liu, Zhao1" <zhao1.liu@intel.com>
+To: "Li, Xin3" <xin3.li@intel.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
 	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	"leon@kernel.org" <leon@kernel.org>
-Subject: Re: [PATCH vhost v4 02/15] vdpa: Add
- VHOST_BACKEND_F_CHANGEABLE_VQ_ADDR_IN_SUSPEND flag
-Message-ID: <20231222032713-mutt-send-email-mst@kernel.org>
-References: <CACGkMEv7xQkZYJAgAUK6C3oUrZ9vuUJdTKRzihXcNPb-iWdpJw@mail.gmail.com>
- <CACGkMEsaaDGi63__YrvsTC1HqgTaEWHvGokK1bJS5+m1XYM-6w@mail.gmail.com>
- <CAJaqyWdoaj8a7q1KrGqWmkYvAw_R_p0utcWvDvkyVm1nUOAxrA@mail.gmail.com>
- <CACGkMEuM7bXxsxHUs_SodiDQ2+akrLqqzWZBJSZEcnMASUkb+g@mail.gmail.com>
- <CAJaqyWeBVVcTZEzZK=63Ymk85wnRFd+_wK56UfEHNXBH-qy1Zg@mail.gmail.com>
- <70adc734331c1289dceb3bcdc991f3da7e4db2f0.camel@nvidia.com>
- <CAJaqyWeUHiZXMFkNBpinCsJAXojtPkGz+SjzUNDPx5W=qqON1w@mail.gmail.com>
- <c03eb2bb3ad76e28be2bb9b9e4dee4c3bc062ea7.camel@nvidia.com>
- <CAJaqyWevZX5TKpaLiJwu2nD7PHFsHg+TEZ=iPdWvrH4jyPV+cA@mail.gmail.com>
- <17abeefd02c843cddf64efbeadde49ad15c365a1.camel@nvidia.com>
+	"richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"eduardo@habkost.net" <eduardo@habkost.net>,
+	"seanjc@google.com" <seanjc@google.com>,
+	"Gao, Chao" <chao.gao@intel.com>, "hpa@zytor.com" <hpa@zytor.com>,
+	"Li, Xiaoyao" <xiaoyao.li@intel.com>,
+	"Yang, Weijiang" <weijiang.yang@intel.com>,
+	"Wu, Dan1" <dan1.wu@intel.com>
+Subject: Re: [PATCH v3A 1/6] target/i386: add support for FRED in CPUID
+ enumeration
+Message-ID: <ZYVNMh4UvogvuRwt@intel.com>
+References: <MW4PR11MB6737DC0CCD50B5D3D00521A7A895A@MW4PR11MB6737.namprd11.prod.outlook.com>
+ <20231222030336.38096-1-xin3.li@intel.com>
+ <ZYU76ipTvj1WIBgm@intel.com>
+ <ZYVFrBvu39X7E1Yf@intel.com>
+ <MW4PR11MB6737937A73F2E0D2752F0835A894A@MW4PR11MB6737.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <17abeefd02c843cddf64efbeadde49ad15c365a1.camel@nvidia.com>
+In-Reply-To: <MW4PR11MB6737937A73F2E0D2752F0835A894A@MW4PR11MB6737.namprd11.prod.outlook.com>
 
-On Thu, Dec 21, 2023 at 03:07:22PM +0000, Dragos Tatulea wrote:
-> > > > In that case you're right, we don't need feature flags. But I think it
-> > > > would be great to also move the error return in case userspace tries
-> > > > to modify vq parameters out of suspend state.
-> > > > 
-> > > On the driver side or on the core side?
-> > > 
+On Fri, Dec 22, 2023 at 08:24:52AM +0000, Li, Xin3 wrote:
+> Date: Fri, 22 Dec 2023 08:24:52 +0000
+> From: "Li, Xin3" <xin3.li@intel.com>
+> Subject: RE: [PATCH v3A 1/6] target/i386: add support for FRED in CPUID
+>  enumeration
+> 
+> 
+> > > >              NULL, NULL, NULL, NULL, @@ -1552,6 +1552,14 @@ static
+> > > > FeatureDep feature_dependencies[] = {
+> > > >          .from = { FEAT_VMX_SECONDARY_CTLS,
+> > VMX_SECONDARY_EXEC_ENABLE_USER_WAIT_PAUSE },
+> > > >          .to = { FEAT_7_0_ECX,               CPUID_7_0_ECX_WAITPKG },
+> > > >      },
+> > > > +    {
+> > > > +        .from = { FEAT_7_1_EAX,             CPUID_7_1_EAX_LKGS },
+> > > > +        .to = { FEAT_7_1_EAX,               CPUID_7_1_EAX_FRED },
+> > > > +    },
+> > > > +    {
+> > > > +        .from = { FEAT_7_1_EAX,             CPUID_7_1_EAX_WRMSRNS },
+> > > > +        .to = { FEAT_7_1_EAX,               CPUID_7_1_EAX_FRED },
+> > > > +    },
 > > 
-> > Core side.
-> > 
-> Checking my understanding: instead of the feature flags there would be a check
-> (for .set_vq_addr and .set_vq_state) to return an error if they are called under
-> DRIVER_OK and not suspended state?
+> > Oh, sorry, one thing that comes to mind, is this dependency required?
+> > Since the FRED spec (v3.0) is all about WRMSR as the example, without
+> > mentioning WRMSRNS, could there be other implementations that depend on
+> > WRMSR instead of WRMSRNS?
+> 
+> This is a community ask from tglx:
+> https://lkml.kernel.org/kvm/87y1h81ht4.ffs@tglx/
+> 
+> Boris had the same question:
+> https://lore.kernel.org/lkml/20231114050201.GAZVL%2FSd%2FyLIdON9la@fat_crate.local/
+> 
+> But it needs to go through a formal approach, which takes time, to reach
+> the FRED public spec.
+> 
 
-Yea this looks much saner, if we start adding feature flags for
-each OPERATION_X_LEGAL_IN_STATE_Y then we will end up with N^2
-feature bits which is not reasonable.
+Thanks Xin! You can add a simple note in the commit message, such as
+FRED's dependency on WRMSRNS will be documented, to avoid confusion
+for later reviewers interested in FRED.
 
--- 
-MST
+Regards,
+Zhao
 
 
