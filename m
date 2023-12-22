@@ -1,232 +1,146 @@
-Return-Path: <kvm+bounces-5156-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5157-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C7A481CAFC
-	for <lists+kvm@lfdr.de>; Fri, 22 Dec 2023 14:52:18 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D43C81CB40
+	for <lists+kvm@lfdr.de>; Fri, 22 Dec 2023 15:21:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D829F2875BE
-	for <lists+kvm@lfdr.de>; Fri, 22 Dec 2023 13:52:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D566EB228BE
+	for <lists+kvm@lfdr.de>; Fri, 22 Dec 2023 14:21:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 276481A5A2;
-	Fri, 22 Dec 2023 13:52:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 491881D52B;
+	Fri, 22 Dec 2023 14:20:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HTxATHhL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c/COoHr+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2394A199B3;
-	Fri, 22 Dec 2023 13:52:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-28c0536806fso756984a91.0;
-        Fri, 22 Dec 2023 05:52:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703253130; x=1703857930; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aeAYbCIRliGvqtaXOLpF2rqcgjxtp1a4iDArca+1VrE=;
-        b=HTxATHhLOUxNgSfsUu/s6A1u1L5MxsaDlhiZGB5RhrckeRL1cccQRm7cCAQgW61ZNZ
-         9pal8QnS06MZXmtYpHyFwJTYq35Vstv/+6qDUVMVcl2sVPFtwsyn8z4bFFWE8b9alp5+
-         8qJZDzG9h5YpQ4n+o+fRVNeOdBxa1fGxadyNanxUwcNnrV9ANbJQOVmatvKqKWYMXcWN
-         SRGZQK8xUHZ0QPVK//Jpv+oj1AoL7NBW6VdHZe7E/czYSw/w2U7WKWIVn1FPTKEKmyf2
-         rsvxcAxNEG+8AuCyd8MNlq+J7b1hgCy/SXlSQir0Eys4yLMrtrMd3P49L1eX5IDsiQWN
-         9k5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703253130; x=1703857930;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aeAYbCIRliGvqtaXOLpF2rqcgjxtp1a4iDArca+1VrE=;
-        b=hDyiLNdt7QWxq8jbJOYHMSm3FNRc3hOu6AWwL7KXynT9FdYF3Uncf/BCWoHAGz7XVJ
-         AEaipyuqP4yI/gtDWutIaSRvgKVHRT7VGH+WUMiE7fiFTODCfIFxpaATzbyJ95xpLRgD
-         JcFXJ+CVEODSIva0E57tsdMe0/35Rd6EX8qO3l9DwU8kDTrUxV+JSDDSWfvbDYyPqlmt
-         yRoq0AFioxuXcDmTlg7uy7IsU/codHgf2/w07bwVH8ZQXyiAKvd6sSxV62v7m3x8obC4
-         GT4fggXRTjvHVxoPLc/+wNOE49LQ0PFC7EjZLg+Om++q9w7DIM86F1mmWvtSeOdhhFIU
-         FCbQ==
-X-Gm-Message-State: AOJu0Yx2tRdKe7q6or0UC6aQ/3sG2R6n355UHvcmwNM6L1LFIApobEDn
-	PeEpc0MwaMJ9htZf9Ycvgi4=
-X-Google-Smtp-Source: AGHT+IExjN9duiOKRKviSE2m6Rk3lPcZdwg4mh/5940CTeHG0yd/WEEfRjEKyjHpXFhQ5zZy8GD3fg==
-X-Received: by 2002:a17:90a:9d8b:b0:28c:1eff:ac4a with SMTP id k11-20020a17090a9d8b00b0028c1effac4amr143403pjp.90.1703253130457;
-        Fri, 22 Dec 2023 05:52:10 -0800 (PST)
-Received: from wheely.local0.net ([203.220.145.68])
-        by smtp.gmail.com with ESMTPSA id n12-20020a17090ac68c00b0028ae54d988esm3629280pjt.48.2023.12.22.05.52.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Dec 2023 05:52:10 -0800 (PST)
-From: Nicholas Piggin <npiggin@gmail.com>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Nicholas Piggin <npiggin@gmail.com>,
-	kvm@vger.kernel.org,
-	Laurent Vivier <lvivier@redhat.com>,
-	"Shaoqin Huang" <shahuang@redhat.com>,
-	Andrew Jones <andrew.jones@linux.dev>,
-	Nico Boehr <nrb@linux.ibm.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AB00199A1;
+	Fri, 22 Dec 2023 14:20:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46A2AC433C8;
+	Fri, 22 Dec 2023 14:20:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1703254856;
+	bh=rpP4r+Mn8Htxn9KN1/5jiebpI8ALkSar9OVBAUjvO5Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=c/COoHr+foveC4IdKnQE5MaeQ06EUZt6zW+JsmerAKOz+SjCm49IzyIF3b77Aog7C
+	 5J5sz0XCDtdKI/mLEH1/SaRrHGcfwrHa41Cby3TyBVfSAhudqwTr1/cL6ew7HLy6j5
+	 FKS/KxkZHpK5OSPeKyYoT1mIjAtwOn7J7DafiMtkjXlR2/JT32WaCqw/TjGzaukxiS
+	 N5QN1LT2/RHpBCjKmS9DroXPhYoDIWZ/w646Wfmra1k1QwsfDZaTMOXgrr8n4gjIm6
+	 Ak9tJWcM1YehKCEeClsYz832ZAgvFrAix7cccMcd9giekbKlUbz1wPpwoHnU6AKyMq
+	 QB7XRpz4qQU3w==
+Date: Fri, 22 Dec 2023 14:20:51 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
 	Paolo Bonzini <pbonzini@redhat.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@redhat.com>,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-s390@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: [kvm-unit-tests PATCH 9/9] migration: add a migration selftest
-Date: Fri, 22 Dec 2023 23:50:48 +1000
-Message-ID: <20231222135048.1924672-10-npiggin@gmail.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231222135048.1924672-1-npiggin@gmail.com>
-References: <20231222135048.1924672-1-npiggin@gmail.com>
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.7, part #2
+Message-ID: <cc920d55-39df-4255-b194-a2db1dec6bb7@sirena.org.uk>
+References: <ZYCaxOtefkuvBc3Z@thinky-boi>
+ <784ab26d-8919-4f08-8440-f66432458492@sirena.org.uk>
+ <69259c81441a57ceebcffb0e16895db1@kernel.org>
+ <ffbca4ce-7386-469b-952c-f33e2ba42a51@sirena.org.uk>
+ <441ff2c753fbfd69a60e93031070b09e@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="qUFkqCBRZLAnhi9H"
+Content-Disposition: inline
+In-Reply-To: <441ff2c753fbfd69a60e93031070b09e@kernel.org>
+X-Cookie: Familiarity breeds attempt.
 
-Add a selftest for migration support in  guest library and test harness
-code. It performs migrations a tight loop to irritate races, and has
-flushed out several bugs in developing in the complicated test harness
-migration code already.
 
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
----
- arm/Makefile.common         |  1 +
- arm/unittests.cfg           |  6 ++++++
- common/selftest-migration.c | 34 ++++++++++++++++++++++++++++++++++
- powerpc/Makefile.common     |  1 +
- powerpc/unittests.cfg       |  4 ++++
- s390x/Makefile              |  1 +
- s390x/unittests.cfg         |  4 ++++
- 7 files changed, 51 insertions(+)
- create mode 100644 common/selftest-migration.c
+--qUFkqCBRZLAnhi9H
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/arm/Makefile.common b/arm/Makefile.common
-index 5214c8ac..d769ae52 100644
---- a/arm/Makefile.common
-+++ b/arm/Makefile.common
-@@ -5,6 +5,7 @@
- #
- 
- tests-common  = $(TEST_DIR)/selftest.$(exe)
-+tests-common += $(TEST_DIR)/selftest-migration.$(exe)
- tests-common += $(TEST_DIR)/spinlock-test.$(exe)
- tests-common += $(TEST_DIR)/pci-test.$(exe)
- tests-common += $(TEST_DIR)/pmu.$(exe)
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index fe601cbb..1ffd9a82 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -55,6 +55,12 @@ smp = $MAX_SMP
- extra_params = -append 'smp'
- groups = selftest
- 
-+# Test migration
-+[selftest-migration]
-+file = selftest-migration.flat
-+groups = selftest migration
-+
-+arch = arm64
- # Test PCI emulation
- [pci-test]
- file = pci-test.flat
-diff --git a/common/selftest-migration.c b/common/selftest-migration.c
-new file mode 100644
-index 00000000..f70c505f
---- /dev/null
-+++ b/common/selftest-migration.c
-@@ -0,0 +1,34 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Machine independent migration tests
-+ *
-+ * This is just a very simple test that is intended to stress the migration
-+ * support in the test harness. This could be expanded to test more guest
-+ * library code, but architecture-specific tests should be used to test
-+ * migration of tricky machine state.
-+ */
-+#include <libcflat.h>
-+#include <migrate.h>
-+
-+#if defined(__arm__) || defined(__aarch64__)
-+/* arm can only call getchar 15 times */
-+#define NR_MIGRATIONS 15
-+#else
-+#define NR_MIGRATIONS 100
-+#endif
-+
-+int main(int argc, char **argv)
-+{
-+	int i = 0;
-+
-+	report_prefix_push("migration");
-+
-+	for (i = 0; i < NR_MIGRATIONS; i++)
-+		migrate_quiet();
-+
-+	report(true, "simple harness stress test");
-+
-+	report_prefix_pop();
-+
-+	return report_summary();
-+}
-diff --git a/powerpc/Makefile.common b/powerpc/Makefile.common
-index f8f47490..0d1a65f7 100644
---- a/powerpc/Makefile.common
-+++ b/powerpc/Makefile.common
-@@ -6,6 +6,7 @@
- 
- tests-common = \
- 	$(TEST_DIR)/selftest.elf \
-+	$(TEST_DIR)/selftest-migration.elf \
- 	$(TEST_DIR)/spapr_hcall.elf \
- 	$(TEST_DIR)/rtas.elf \
- 	$(TEST_DIR)/emulator.elf \
-diff --git a/powerpc/unittests.cfg b/powerpc/unittests.cfg
-index e71140aa..7ce57de0 100644
---- a/powerpc/unittests.cfg
-+++ b/powerpc/unittests.cfg
-@@ -36,6 +36,10 @@ smp = 2
- extra_params = -m 256 -append 'setup smp=2 mem=256'
- groups = selftest
- 
-+[selftest-migration]
-+file = selftest-migration.elf
-+groups = selftest migration
-+
- [spapr_hcall]
- file = spapr_hcall.elf
- 
-diff --git a/s390x/Makefile b/s390x/Makefile
-index 95ef9533..505e5d32 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -1,4 +1,5 @@
- tests = $(TEST_DIR)/selftest.elf
-+tests += $(TEST_DIR)/selftest-migration.elf
- tests += $(TEST_DIR)/intercept.elf
- tests += $(TEST_DIR)/emulator.elf
- tests += $(TEST_DIR)/sieve.elf
-diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-index f5024b6e..a7ad522c 100644
---- a/s390x/unittests.cfg
-+++ b/s390x/unittests.cfg
-@@ -24,6 +24,10 @@ groups = selftest
- # please keep the kernel cmdline in sync with $(TEST_DIR)/selftest.parmfile
- extra_params = -append 'test 123'
- 
-+[selftest-migration]
-+file = selftest-migration.elf
-+groups = selftest migration
-+
- [intercept]
- file = intercept.elf
- 
--- 
-2.42.0
+On Fri, Dec 22, 2023 at 01:34:09PM +0000, Marc Zyngier wrote:
+> On 2023-12-22 13:26, Mark Brown wrote:
+> > On Fri, Dec 22, 2023 at 01:16:41PM +0000, Marc Zyngier wrote:
 
+> > > > Oliver, should your tree be in -next?
+
+> > > No, we don't have the KVM/arm64 fixes in -next.
+
+> > I see it's not, I'm asking if it should be - given the latencies
+> > involved it seems like it'd be helpful for keeping -next working.
+
+> This is on purpose. We use -next for, well, the next release,
+> and not as a band-aid for some other purpose. If you think things
+
+Note that -next includes pending-fixes which is specifically for the
+purpose of getting coverage for fixes intended to go to mainline (indeed
+this issue was found and reported before the original problematic patch
+was sent to mainline, it's not clear to me what went wrong there).  As
+well as the fixes getting coverage through being in -next itself there's
+a bunch of the CI that specifically looks at pending-fixes, trying to
+both prioritise keeping mainline stable and catch things like unintended
+dependencies on things only in -next.
+
+There's also the fact that if mainline is broken and not somehow fixed
+in -next then that does disrupt the use of -next for testing things
+aimed at the next release.
+
+> don't get merged quickly enough, please take it with the person
+> processing the PRs (Paolo).
+
+He is on CC here.  I'm not sure that it's specifically things not
+getting merged (well, modulo this one fixing an issue in mainline) -
+it's a totally reasonable approach to want to give things time to get
+reviewed and tested before they get merged, but if we're doing that then
+it seems sensible to take advantage of the coverage from having things
+in the integration trees.  OTOH if things get merged very quickly then=20
+it's less clear since there's less time for the integration trees to do
+their thing.  It feels like things aren't lining up well here.
+
+> > > And we have another two weeks to release, so ample amount of
+> > > time until Paolo picks up the PR.
+
+> > Sure, but we do also have the holidays and also the fact that it's a
+> > build failure in a configuration used by some of the CIs means that
+> > we've got a bunch of testing that simply hasn't been happening for a
+> > couple of weeks now.
+
+> Given that most of the KVM tests are usually more broken than
+> the kernel itself, I'm not losing much sleep over it.
+
+That's suprising to me, other than this release it doesn't match my
+experiences too well - there is a bit of glitchiness in one of the
+dirty_log tests on some platforms but otherwise the KVM selftests are
+generally rather stable on the systems where I pay attention to the
+results.  They're certainly not a testsuite I expect to have to
+frequently worry about - we might wish for more coverage but that's
+something different to brokenness.
+
+The build issues during this release cycle have been a bit of an
+exception.
+
+--qUFkqCBRZLAnhi9H
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmWFm0IACgkQJNaLcl1U
+h9BAOQf+MuK1oAubpWCwy3b1APTrkRTu0rgC0+peM4sFBuogL7w3o88PZv3lxGsl
+pZNEt55QbXQMwbJAxjqUCt5pz8M2Y0Uf4MzIW5/+il3A2GrJwa0pZeitu/ssDODp
+ed9FPvJL5aO1HjBNINZRCgQXWKi3ZKx68catvht8//wQg1YavAe44lafddkoTSsF
+7mHjMn+qNaEIm95TrVJiNa2CVJPd85XMzWB+G2Q7nxXKd83zLZ8Ggh22K2gHScTv
+W6NQzDU2q3vd4/iZNMAtjACnTUCTebqq/SCR8cHA0jzJseq8pA42Buqw6XX/bt2y
+U+Kk5wLlsjzHNPM1W51MnwlUcRLNGg==
+=vXZQ
+-----END PGP SIGNATURE-----
+
+--qUFkqCBRZLAnhi9H--
 
