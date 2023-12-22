@@ -1,206 +1,271 @@
-Return-Path: <kvm+bounces-5122-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5124-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDCE881C56E
-	for <lists+kvm@lfdr.de>; Fri, 22 Dec 2023 08:12:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 468AF81C582
+	for <lists+kvm@lfdr.de>; Fri, 22 Dec 2023 08:30:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5DA371F23E42
-	for <lists+kvm@lfdr.de>; Fri, 22 Dec 2023 07:12:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6AB001C24F6D
+	for <lists+kvm@lfdr.de>; Fri, 22 Dec 2023 07:30:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E9119470;
-	Fri, 22 Dec 2023 07:12:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64CF19470;
+	Fri, 22 Dec 2023 07:30:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Qn2ulM/a"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JTP6EH1P"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB4EAF9D2;
-	Fri, 22 Dec 2023 07:12:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703229160; x=1734765160;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=/Bcjxgof/w7k4RBsY6qba22HxLNjbDRCMEDFuY9omRM=;
-  b=Qn2ulM/agl0KbJhbkgdx5+pMXCCfC4IhtNlV110G/+wHaAq+fjLdWJD1
-   UwQ49fMvXkr4a+AAbXqW5W7jGGhOmlEim6ay7q+pTr/6FmUKM62DLgY++
-   aIaiE3i7olWmEkFeQ1hcCSBK3wqJrrhE/a96hQ0cvECM58axOEtq7bMPG
-   2xYKqW1jkoLpDPzOngfb1KvomGiAjmi3OW5ESTXOOkXO7d5L3ON+arrBo
-   sAFxpF4GDDllm8Uy2Jnx8QCwlUNA0981hbYGVoXhRjYCa5/Ayy/ROXYnr
-   QrzAC5XLSXsbQj49QNJLVZPM6AsoiHyuwjSkBklOcZuhni7590bGVEYN4
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10931"; a="386510382"
-X-IronPort-AV: E=Sophos;i="6.04,294,1695711600"; 
-   d="scan'208";a="386510382"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Dec 2023 23:12:40 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10931"; a="900343305"
-X-IronPort-AV: E=Sophos;i="6.04,294,1695711600"; 
-   d="scan'208";a="900343305"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orsmga004.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 21 Dec 2023 23:12:40 -0800
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 21 Dec 2023 23:12:39 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 21 Dec 2023 23:12:39 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Thu, 21 Dec 2023 23:12:39 -0800
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.41) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 21 Dec 2023 23:12:39 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bvSg6QRECBQB6fK8dPRQ47++EHsQT040eY9NtqIzNYeM3w+XRrMY1XT15lyumEIkCCkaq1DWFNHlXeqMrsTsrtDYWZhvYI/S0Oby8SM1VJC93a2uP1ytgsyIVxafXxmLfcMIi6tYWuWKwlIuvl3lj750nuYewCaXbwz2TmdcN1XfO/hAsLRZPPCyHwo7a6RGvlFQMIJi3lTQxFi35GeQrnv1o9kjU8D72Go1mSjGvIjues0M8VrAXC5MXyusRiuG37uUI85XNuQQVxqFSg7atZbRq0dB20wAKdMDin8plLs7vzYEsxkG49xGsaCxtKNujGjdTjNPO1JrUIYSREp6tw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/Bcjxgof/w7k4RBsY6qba22HxLNjbDRCMEDFuY9omRM=;
- b=l7+mRMwY8xjY795EDK13VNs+oqxWJOGwBKF83Q0P8lNT2TBNXasXhOzkFCYXivF/DgvGzEQybpwTrnAH5+EzPPqC0L6x/DQ9dXJhkcJ4vo4JvLK8qNq4h0+Umj9Vrej55WQxi41aecRP1wVAyaDByDEM1PKmNjWeSeVXugDXdYZfbbefFhjJhJJFhu2QMD7LOWH0q3xuMsRZtqF6dUGtpmcJnP+SybKHPGwuOiwyNoWhX7KhI+eEzD9GIPvsjLjbWB4cjRAsAHBgF6ZN4l29azV1PIJPqFUjFHG4uLz1X2tnYK5K2K23AtwXtZf98DXheMYI66ReXNqsNUR9kL9RUA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by PH8PR11MB6855.namprd11.prod.outlook.com (2603:10b6:510:22c::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7113.20; Fri, 22 Dec
- 2023 07:12:37 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::e7a4:a757:2f2e:f96a]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::e7a4:a757:2f2e:f96a%3]) with mapi id 15.20.7113.019; Fri, 22 Dec 2023
- 07:12:37 +0000
-From: "Tian, Kevin" <kevin.tian@intel.com>
-To: "Liu, Yi L" <yi.l.liu@intel.com>
-CC: "Yang, Weijiang" <weijiang.yang@intel.com>, "joro@8bytes.org"
-	<joro@8bytes.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"jgg@nvidia.com" <jgg@nvidia.com>, "robin.murphy@arm.com"
-	<robin.murphy@arm.com>, "baolu.lu@linux.intel.com"
-	<baolu.lu@linux.intel.com>, "cohuck@redhat.com" <cohuck@redhat.com>,
-	"eric.auger@redhat.com" <eric.auger@redhat.com>, "nicolinc@nvidia.com"
-	<nicolinc@nvidia.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-	"chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-	"yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>, "peterx@redhat.com"
-	<peterx@redhat.com>, "jasowang@redhat.com" <jasowang@redhat.com>,
-	"shameerali.kolothum.thodi@huawei.com"
-	<shameerali.kolothum.thodi@huawei.com>, "lulu@redhat.com" <lulu@redhat.com>,
-	"suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "Duan,
- Zhenzhong" <zhenzhong.duan@intel.com>, "joao.m.martins@oracle.com"
-	<joao.m.martins@oracle.com>, "Zeng, Xin" <xin.zeng@intel.com>, "Zhao, Yan Y"
-	<yan.y.zhao@intel.com>, "j.granados@samsung.com" <j.granados@samsung.com>
-Subject: RE: [PATCH v7 9/9] iommu/vt-d: Add iotlb flush for nested domain
-Thread-Topic: [PATCH v7 9/9] iommu/vt-d: Add iotlb flush for nested domain
-Thread-Index: AQHaNCP4zqzfCm0YG0WB/drS+mURdLC0rU2AgAAu8lCAAATlAIAAAm9Q
-Date: Fri, 22 Dec 2023 07:12:36 +0000
-Message-ID: <BN9PR11MB527672402F30F701A5EA53028C94A@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20231221153948.119007-1-yi.l.liu@intel.com>
- <20231221153948.119007-10-yi.l.liu@intel.com>
- <f6302d8e-fd5f-45e1-8148-e5812c61f5c0@intel.com>
- <BN9PR11MB52766A289D2CA50F8BD802F18C94A@BN9PR11MB5276.namprd11.prod.outlook.com>
- <D35102EE-F1E8-4888-8A5E-A1A723B3363D@intel.com>
-In-Reply-To: <D35102EE-F1E8-4888-8A5E-A1A723B3363D@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|PH8PR11MB6855:EE_
-x-ms-office365-filtering-correlation-id: 6edbbae7-297d-4ded-6ad2-08dc02bd6075
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: o6OuTa4L9gVhFeAkgnhFAdRdWgYOVwYITWFBrvCXvXO6FtTNS+RJjfpWd9SGcZKbv+DwJSdmbJXEFAoMfH8jmHYKYIEckhGKon4EtdVA+Hrb9CU0WvpTjiXOXvh8nmiVqf0CAVf3MwKuAhLZ0aQKmC884YICSdOaMjNWK8LuK/hamt859pmHoYTe00UmJQYXQ5XDsTulVXMHd0UJjrjj4oQgL1i7R3U2aR3KnUmSSOVVhJMfWxMTPMW7HicFrOXumxEczvXNlVFIPIZDbJiDL0x+kdNm8oo0ieSsLmAtDisO32xjCwo1XTa/cROhDY6D74o4lL7wnZiuQHthzyqnhN4HCQu1zQ0Ypu0nUovTAY6CyHDhJhXU/rCdc8nAw9Uxaid/yF3ifQJaT/I/wr8AnMA3MUljJehHWW78wc0SJfxIoE7Ke3H4ulPNY99FdrK7kRkDg2Fcslkqru47MvU3DAalYZXShh5KtvAcpc7Jl1yrKpIfFBrkJwEC50626EwrQQtYPJ4oWRuLEvfEE09NXZSCx/o2pFPN5gK0hAOwE2NI9vbfZTUdy4hsjfVTjNi4f/KUQGyditkWhuMfUkMC7DokxclnQVT1ex/eUMkq7mhbWpRDPr5WgdTNubVqT07H
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(376002)(396003)(136003)(366004)(346002)(230922051799003)(186009)(64100799003)(451199024)(1800799012)(26005)(55016003)(478600001)(5660300002)(38100700002)(7696005)(71200400001)(6506007)(53546011)(9686003)(66476007)(66556008)(76116006)(66946007)(6862004)(4326008)(66446008)(52536014)(122000001)(8936002)(8676002)(38070700009)(33656002)(41300700001)(2906002)(86362001)(64756008)(54906003)(4744005)(6636002)(316002)(7416002)(82960400001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?eHplZklSZXpHZy95cGdrV0xmZDVvNWFoNXp4R1hYandkZEQ4b1ovd2kzM0Vp?=
- =?utf-8?B?SndOWUpxOTg5cUhMVzBuY0psSjZaazkwaytNemlFZVQ2c1lSWS8vclZiRW1H?=
- =?utf-8?B?UVJuL3ZEMGRtejhLNHFnK0dEWTRic0FxL3VqU0w3dnZ5U3l4Y3pEMmhoVUlt?=
- =?utf-8?B?Zlc5Qkc2WTFQdGwyd05UWThkMEszbEZvS1EwZ01nMXAxWXlhdjVFZXI2WGE1?=
- =?utf-8?B?ZHlBcWZ6RCsxM09Xdk9nb3hLdlc0Ynl5K0U2WG5BaEZlTytDZkJLL3BSSitw?=
- =?utf-8?B?MmZzeXlxM2FkRHJ1c05iSkdhclpvRTN0TldBZWZZdEtsdjdpTUFldkplMkVU?=
- =?utf-8?B?a3Q1K1JmNWR2QVpyb0xaNkNQTWxlMHY5ak9IOVdWaGx5OVZ0Ni9NZVBES29y?=
- =?utf-8?B?WHFMTTFIbDhSZ1pBZzNtak0xV0RaOXAzb1o1NGpQRTdUMXlTZE44YlNRRlNF?=
- =?utf-8?B?aGdFamQxR1l6Tkp4MXMzVzRQSFpOaWE5LzMrSWY3RjZ4OEliZ3Nhc0ozaVNr?=
- =?utf-8?B?RXJyYk5qRVdnS0pvcDBKc3ZnK0RyaktLbndtZVN5N01WQy9NcUJmbldsK2ZT?=
- =?utf-8?B?WW1DeEp6cDdqNU43MkRXYTAxNmg0eVJZWmV4L2hsdjN0VldrWXNTY0VrTmxr?=
- =?utf-8?B?VzIzYWNGY0pmdjFid2VTRjd6OXZaVWFkV2w0OTAyeC9zZmpYN1pGR052Z1Jh?=
- =?utf-8?B?cFNzNXZYUElNUzR4c0lHVjlKNm9CWGVMMzMxbGp4WlVVdndzc1JHRU9ONXFC?=
- =?utf-8?B?RGZVS1pPZGw4ZnFYdVlWVS9QYVNzLzhZbytUN2hxbGhXdXh6N2FPRWIycXY0?=
- =?utf-8?B?WTczM0xOZVVnbE9kczJxQW96NnlpbFRDL2t3VFBCTWphcmVvcldIOHJZSk1n?=
- =?utf-8?B?UWRvYWU0SUV3aWlGSjJ6UEUvYjUyYzh5cURZMXQ1MHEyV01kUlo3OFFVNmN5?=
- =?utf-8?B?VndmbzlrZmFrRGxIbmV4T1J6WWlqQzRqeThxTHNaVXk5eVE3ZHVmYldBd1lh?=
- =?utf-8?B?YU1xdVprdWVQUGRhN0NRTXE5YWt5UWxNbnF4M3Qzc25NQ0MyMlZPSXZDNXZ6?=
- =?utf-8?B?YVhIdVVNRVQ1WEhvMjU0Q1F6Sno5NEIzTzZzRlJWTGMxd3dpQUw2c0NYdEhR?=
- =?utf-8?B?cUZVOE9YbEdldXFaWSsvdHZrWVJwZ0hLRHJFYXJpb0Zub2JtVFk3dnAwdTRH?=
- =?utf-8?B?MXY1eUJJN2YxR3o0M3lCeTJCY2dzcS8yeHhYZEY5cENydTRDVlh6Mi9hRmRh?=
- =?utf-8?B?YTRaZjhkZklubFMzb3RuRGJlbGc3TGUvaG9tNDFCZ1pGWXpkbTdxS3pDSnRY?=
- =?utf-8?B?bG1jQWp3eFdiT1doNThQbTZvWFU1Mkd6QThNKzhuWmxzZUd0SnBmMEV2Rjhh?=
- =?utf-8?B?a25uUk1uRWkySHVhY1VnT1lUYUtiVUhyYXlSOGZYYWVEKy9pcXlweS9QN3Fz?=
- =?utf-8?B?eGFlR1VnV1hqTW9PT0tkbER3V0VPRE1VK1lIT3IrSC9TK3NWTEZTUS96aVBV?=
- =?utf-8?B?bkpoZzJJdzRqSWNCOHZnemV6SENraUxEWFBQRWZPS3lmVUFscUNKekxLbzFx?=
- =?utf-8?B?L3RpV09SOTdLS2QzeUV2UFQ4VVdZVzQxME9zbVMxdFVtRVErY1JVdWY5ejNr?=
- =?utf-8?B?bHYzcjQwWlFlejBNbnZMeEpvc0ZUOXFONC8zbmJRV1JiZWFlNklGWkV1cWJv?=
- =?utf-8?B?Z0p2Z3BvWUlIbE93UkQzWmRXZmRVUU1uOVhEVGY1cmd2eEtDQmE0R1h6Zmht?=
- =?utf-8?B?eDVRZVcxVUF3WnlDY0w5djlIYTF5WG9qNVdody9uWDJRQ2x6QzdEbFgxbE1V?=
- =?utf-8?B?R0dHcjJ6OGg2QzZOMmFvMDJKVWxsY3NqRGdtWStOTUhsTWRiY0NOUXRZMzhI?=
- =?utf-8?B?RzV0bWZaV3hLWmpET2F4bXI0ZkdRTjBRVWlZTWNUUHhQQXV4eUJrdUQ2enJC?=
- =?utf-8?B?b1NlQ3JjajdTQ2Ezc0NQNjI2UDkwb3RHeWxqS2lhbGJVVmczek40OGJ4N1Z2?=
- =?utf-8?B?Y1UxMUJ6Zk9sT1I0M0xqY1JJdHNVS2dLQW9IUll1VytNN2twUzAvS0ErSTZl?=
- =?utf-8?B?R0ZCTGlvaVM0REhwVFhIQXZVSFQvZ2VhckFjaFJGNkp1MjdPOXpveW10RmxB?=
- =?utf-8?Q?+2Zi7dJzpobDsmi/cVPnXgsLB?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BED149449
+	for <kvm@vger.kernel.org>; Fri, 22 Dec 2023 07:30:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1703230241;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+EJav2ollk7Wrw6PZTSNsiC1bKhoPeUSKA1iI5tWpbw=;
+	b=JTP6EH1PR3HggFBzhimqGJX4mGVhDB2UgtloU0cFcmfTtDuMvoXOPQSaMarmiS4a8EtQoG
+	Q6HpVltlP5ov/njaJ66t4A4dnwd9sZc6KIlh9ZwVH7HYwKTK7C12zWSW2jRJ58SVS9ivSW
+	MLPWcdapnXKs/D8rzLje6QKm+01YHQ8=
+Received: from mail-yw1-f200.google.com (mail-yw1-f200.google.com
+ [209.85.128.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-425-Ouvu8ffZPM2OnA46DiNgfQ-1; Fri, 22 Dec 2023 02:30:40 -0500
+X-MC-Unique: Ouvu8ffZPM2OnA46DiNgfQ-1
+Received: by mail-yw1-f200.google.com with SMTP id 00721157ae682-5e73bd9079eso30563467b3.2
+        for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 23:30:39 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703230239; x=1703835039;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+EJav2ollk7Wrw6PZTSNsiC1bKhoPeUSKA1iI5tWpbw=;
+        b=No+xwJixK4wHfI90a+Hu5baMBzCaj+4ff1eDiN28toDL4PssJ9TxX2NeMFslhrxL+B
+         ZGlWezRaggQJeo/gP9x4gx8DVA7RN+fbYinInIqeFG4z0+eSz9mVgYcNGbDqnHOWAOMw
+         jgLNaJ9XqeJfX0PYpYI8UDcLhVRlt0BR5NpvJUg+l0SGRWTJLIcazbqsKA9/+KCZU8s3
+         agI90HLkeYKmZxaG9wzMWpb5DQya5Mk1iFP+cqmpGs/F6TGTXmwt9TV1IHEbyAEuJ/ke
+         +uW6+8F7wDL818hDP7q2bGMFxHFMGKzhMt60ov18qCthfZMofYIwlYG3v2zfmJ3DCMyY
+         YOoQ==
+X-Gm-Message-State: AOJu0Yy4n5kdmDGHjCVKOtYOw6K9YciKL+hi5nk+yd63arVq0TaRASWO
+	mi4N6zDmKS8aL0x2onua8vshk1uNSS0Oa95/YAEiqax5dems2OFOHYNOq9m0tICNXEp+pKzhgIG
+	rinxphvBABFYiL+ZMaC3JjpO1rF/8g97DhRCB
+X-Received: by 2002:a25:9786:0:b0:db7:dacf:6fc7 with SMTP id i6-20020a259786000000b00db7dacf6fc7mr646485ybo.79.1703230239519;
+        Thu, 21 Dec 2023 23:30:39 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH8YItA8gFhGHjgXrx6o4QGUVdd4gv9Xd6JURZ6NcScKFP3OufVhDw9Bxyt1SO5CDJOyWsQvvIkZJ+uz6gfMjA=
+X-Received: by 2002:a25:9786:0:b0:db7:dacf:6fc7 with SMTP id
+ i6-20020a259786000000b00db7dacf6fc7mr646480ybo.79.1703230239234; Thu, 21 Dec
+ 2023 23:30:39 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6edbbae7-297d-4ded-6ad2-08dc02bd6075
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Dec 2023 07:12:37.0009
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Qtqd+9bBr5ZsrER9raHwWrhR7ZMJTvKBwjK8hP4Tq18ajw6btJ26+PVttOje9Lg+2G31VhW/6s5Hx6f8hqWO9w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB6855
-X-OriginatorOrg: intel.com
+References: <20231219180858.120898-1-dtatulea@nvidia.com> <20231219180858.120898-3-dtatulea@nvidia.com>
+ <CACGkMEv7xQkZYJAgAUK6C3oUrZ9vuUJdTKRzihXcNPb-iWdpJw@mail.gmail.com>
+ <CACGkMEsaaDGi63__YrvsTC1HqgTaEWHvGokK1bJS5+m1XYM-6w@mail.gmail.com>
+ <CAJaqyWdoaj8a7q1KrGqWmkYvAw_R_p0utcWvDvkyVm1nUOAxrA@mail.gmail.com>
+ <CACGkMEuM7bXxsxHUs_SodiDQ2+akrLqqzWZBJSZEcnMASUkb+g@mail.gmail.com>
+ <CAJaqyWeBVVcTZEzZK=63Ymk85wnRFd+_wK56UfEHNXBH-qy1Zg@mail.gmail.com>
+ <70adc734331c1289dceb3bcdc991f3da7e4db2f0.camel@nvidia.com>
+ <CAJaqyWeUHiZXMFkNBpinCsJAXojtPkGz+SjzUNDPx5W=qqON1w@mail.gmail.com>
+ <c03eb2bb3ad76e28be2bb9b9e4dee4c3bc062ea7.camel@nvidia.com>
+ <CAJaqyWevZX5TKpaLiJwu2nD7PHFsHg+TEZ=iPdWvrH4jyPV+cA@mail.gmail.com> <17abeefd02c843cddf64efbeadde49ad15c365a1.camel@nvidia.com>
+In-Reply-To: <17abeefd02c843cddf64efbeadde49ad15c365a1.camel@nvidia.com>
+From: Eugenio Perez Martin <eperezma@redhat.com>
+Date: Fri, 22 Dec 2023 08:30:03 +0100
+Message-ID: <CAJaqyWewQgCuZahEzd8ff8tPP=YLUkitEoxTK4GjC-Cd45hj3g@mail.gmail.com>
+Subject: Re: [PATCH vhost v4 02/15] vdpa: Add VHOST_BACKEND_F_CHANGEABLE_VQ_ADDR_IN_SUSPEND
+ flag
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: "xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>, Parav Pandit <parav@nvidia.com>, 
+	Gal Pressman <gal@nvidia.com>, 
+	"virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"si-wei.liu@oracle.com" <si-wei.liu@oracle.com>, "jasowang@redhat.com" <jasowang@redhat.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, 
+	"mst@redhat.com" <mst@redhat.com>, "leon@kernel.org" <leon@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-PiBGcm9tOiBMaXUsIFlpIEwgPHlpLmwubGl1QGludGVsLmNvbT4NCj4gU2VudDogRnJpZGF5LCBE
-ZWNlbWJlciAyMiwgMjAyMyAzOjAyIFBNDQo+IA0KPiANCj4gPiBPbiBEZWMgMjIsIDIwMjMsIGF0
-IDE0OjQ3LCBUaWFuLCBLZXZpbiA8a2V2aW4udGlhbkBpbnRlbC5jb20+IHdyb3RlOg0KPiA+DQo+
-ID4gDQo+ID4+DQo+ID4+IEZyb206IFlhbmcsIFdlaWppYW5nIDx3ZWlqaWFuZy55YW5nQGludGVs
-LmNvbT4NCj4gPj4gU2VudDogRnJpZGF5LCBEZWNlbWJlciAyMiwgMjAyMyAxMTo1NiBBTQ0KPiA+
-Pj4gKw0KPiA+Pj4gKyAgICB4YV9mb3JfZWFjaCgmZG9tYWluLT5pb21tdV9hcnJheSwgaSwgaW5m
-bykgew0KPiA+Pj4gKyAgICAgICAgbmVzdGVkX2ZsdXNoX3Bhc2lkX2lvdGxiKGluZm8tPmlvbW11
-LCBkb21haW4sIGFkZHIsDQo+ID4+IG5wYWdlcywgMCk7DQo+ID4+PiArDQo+ID4+PiArICAgICAg
-ICBpZiAoZG9tYWluLT5oYXNfaW90bGJfZGV2aWNlKQ0KPiA+Pj4gKyAgICAgICAgICAgIGNvbnRp
-bnVlOw0KPiA+Pg0KPiA+PiBTaG91bGRuJ3QgdGhpcyBiZSBpZiAoIWRvbWFpbi0+aGFzX2lvdGxi
-X2RldmljZSk/DQo+ID4NCj4gPiB5ZXMgdGhhdCBpcyB3cm9uZy4NCj4gPg0KPiA+IGFjdHVhbGx5
-IGl0J3Mgd2VpcmQgdG8gcHV0IGRvbWFpbiBjaGVjayBpbiBhIGxvb3Agb2YgZG9tYWluLT5pb21t
-dV9hcnJheS4NCj4gPg0KPiA+IHRoYXQgY2hlY2sgYWxvbmcgd2l0aCBkZXZ0bGIgZmx1c2ggc2hv
-dWxkIGJlIGRvbmUgb3V0IG9mIHRoYXQgbG9vcC4NCj4gDQo+IE1heWJlIGFkZGluZyBhIGJvb2ws
-IHNldCBpdCBvdXQgb2YgdGhlIGxvb3AsIGNoZWNrIHRoZSBib29sIGluIHRoZSBsb29wLg0KDQp0
-aGUgcG9pbnQgaXMgdGhhdCBkZXYgaW90bGIgZG9lc24ndCByZWx5IG9uIGluZm8tPmlvbW11Og0K
-DQoJbmVzdGVkX2ZsdXNoX2Rldl9pb3RsYihkb21haW4sIGFkZHIsIG1hc2ssICZmYXVsdCk7DQoN
-CnRoZW4gd2h5IGRvIGl0IGluIHRoZSBsb29wIG9mIGluZm8tPmlvbW11Pw0KDQo=
+On Thu, Dec 21, 2023 at 4:07=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia.com=
+> wrote:
+>
+> On Thu, 2023-12-21 at 15:55 +0100, Eugenio Perez Martin wrote:
+> > On Thu, Dec 21, 2023 at 3:38=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia=
+.com> wrote:
+> > >
+> > > On Thu, 2023-12-21 at 13:08 +0100, Eugenio Perez Martin wrote:
+> > > > On Thu, Dec 21, 2023 at 12:52=E2=80=AFPM Dragos Tatulea <dtatulea@n=
+vidia.com> wrote:
+> > > > >
+> > > > > On Thu, 2023-12-21 at 08:46 +0100, Eugenio Perez Martin wrote:
+> > > > > > On Thu, Dec 21, 2023 at 3:03=E2=80=AFAM Jason Wang <jasowang@re=
+dhat.com> wrote:
+> > > > > > >
+> > > > > > > On Wed, Dec 20, 2023 at 9:32=E2=80=AFPM Eugenio Perez Martin
+> > > > > > > <eperezma@redhat.com> wrote:
+> > > > > > > >
+> > > > > > > > On Wed, Dec 20, 2023 at 5:06=E2=80=AFAM Jason Wang <jasowan=
+g@redhat.com> wrote:
+> > > > > > > > >
+> > > > > > > > > On Wed, Dec 20, 2023 at 11:46=E2=80=AFAM Jason Wang <jaso=
+wang@redhat.com> wrote:
+> > > > > > > > > >
+> > > > > > > > > > On Wed, Dec 20, 2023 at 2:09=E2=80=AFAM Dragos Tatulea =
+<dtatulea@nvidia.com> wrote:
+> > > > > > > > > > >
+> > > > > > > > > > > The virtio spec doesn't allow changing virtqueue addr=
+esses after
+> > > > > > > > > > > DRIVER_OK. Some devices do support this operation whe=
+n the device is
+> > > > > > > > > > > suspended. The VHOST_BACKEND_F_CHANGEABLE_VQ_ADDR_IN_=
+SUSPEND flag
+> > > > > > > > > > > advertises this support as a backend features.
+> > > > > > > > > >
+> > > > > > > > > > There's an ongoing effort in virtio spec to introduce t=
+he suspend state.
+> > > > > > > > > >
+> > > > > > > > > > So I wonder if it's better to just allow such behaviour=
+?
+> > > > > > > > >
+> > > > > > > > > Actually I mean, allow drivers to modify the parameters d=
+uring suspend
+> > > > > > > > > without a new feature.
+> > > > > > > > >
+> > > > > > > >
+> > > > > > > > That would be ideal, but how do userland checks if it can s=
+uspend +
+> > > > > > > > change properties + resume?
+> > > > > > >
+> > > > > > > As discussed, it looks to me the only device that supports su=
+spend is
+> > > > > > > simulator and it supports change properties.
+> > > > > > >
+> > > > > > > E.g:
+> > > > > > >
+> > > > > > > static int vdpasim_set_vq_address(struct vdpa_device *vdpa, u=
+16 idx,
+> > > > > > >                                   u64 desc_area, u64 driver_a=
+rea,
+> > > > > > >                                   u64 device_area)
+> > > > > > > {
+> > > > > > >         struct vdpasim *vdpasim =3D vdpa_to_sim(vdpa);
+> > > > > > >         struct vdpasim_virtqueue *vq =3D &vdpasim->vqs[idx];
+> > > > > > >
+> > > > > > >         vq->desc_addr =3D desc_area;
+> > > > > > >         vq->driver_addr =3D driver_area;
+> > > > > > >         vq->device_addr =3D device_area;
+> > > > > > >
+> > > > > > >         return 0;
+> > > > > > > }
+> > > > > > >
+> > > > > >
+> > > > > > So in the current kernel master it is valid to set a different =
+vq
+> > > > > > address while the device is suspended in vdpa_sim. But it is no=
+t valid
+> > > > > > in mlx5, as the FW will not be updated in resume (Dragos, pleas=
+e
+> > > > > > correct me if I'm wrong). Both of them return success.
+> > > > > >
+> > > > > In the current state, there is no resume. HW Virtqueues will just=
+ get re-created
+> > > > > with the new address.
+> > > > >
+> > > >
+> > > > Oh, then all of this is effectively transparent to the userspace
+> > > > except for the time it takes?
+> > > >
+> > > Not quite: mlx5_vdpa_set_vq_address will save the vq address only on =
+the SW vq
+> > > representation. Only later will it will call into the FW to update th=
+e FW. Later
+> > > means:
+> > > - On DRIVER_OK state, when the VQs get created.
+> > > - On .set_map when the VQs get re-created (before this series) / upda=
+ted (after
+> > > this series)
+> > > - On .resume (after this series).
+> > >
+> > > So if the .set_vq_address is called when the VQ is in DRIVER_OK but n=
+ot
+> > > suspended those addresses will be set later for later.
+> > >
+> >
+> > Ouch, that is more in the line of my thoughts :(.
+> >
+> > > > In that case you're right, we don't need feature flags. But I think=
+ it
+> > > > would be great to also move the error return in case userspace trie=
+s
+> > > > to modify vq parameters out of suspend state.
+> > > >
+> > > On the driver side or on the core side?
+> > >
+> >
+> > Core side.
+> >
+> Checking my understanding: instead of the feature flags there would be a =
+check
+> (for .set_vq_addr and .set_vq_state) to return an error if they are calle=
+d under
+> DRIVER_OK and not suspended state?
+>
+
+Yes, correct. Per Jason's message, it should be enough with two
+independent series:
+* Patches 6, 7 and 8 of this series, just checking for suspend state
+and not feature flags.
+* Your v2.
+
+Thanks!
+
+> > It does not have to be part of this series, I meant it can be proposed
+> > in a separate series and applied before the parent driver one.
+> >
+> > > Thanks
+> > > > Thanks!
+> > > >
+> > > >
+> > > > > > How can we know in the destination QEMU if it is valid to suspe=
+nd &
+> > > > > > set address? Should we handle this as a bugfix and backport the
+> > > > > > change?
+> > > > > >
+> > > > > > > >
+> > > > > > > > The only way that comes to my mind is to make sure all pare=
+nts return
+> > > > > > > > error if userland tries to do it, and then fallback in user=
+land.
+> > > > > > >
+> > > > > > > Yes.
+> > > > > > >
+> > > > > > > > I'm
+> > > > > > > > ok with that, but I'm not sure if the current master & prev=
+ious kernel
+> > > > > > > > has a coherent behavior. Do they return error? Or return su=
+ccess
+> > > > > > > > without changing address / vq state?
+> > > > > > >
+> > > > > > > We probably don't need to worry too much here, as e.g set_vq_=
+address
+> > > > > > > could fail even without suspend (just at uAPI level).
+> > > > > > >
+> > > > > >
+> > > > > > I don't get this, sorry. I rephrased my point with an example e=
+arlier
+> > > > > > in the mail.
+> > > > > >
+> > > > >
+> > > >
+> > >
+> >
+>
+
 
