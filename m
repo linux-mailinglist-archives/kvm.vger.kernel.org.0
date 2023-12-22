@@ -1,91 +1,128 @@
-Return-Path: <kvm+bounces-5141-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5142-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FD6B81CA83
-	for <lists+kvm@lfdr.de>; Fri, 22 Dec 2023 14:10:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69FC581CA90
+	for <lists+kvm@lfdr.de>; Fri, 22 Dec 2023 14:14:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 747FAB23F4D
-	for <lists+kvm@lfdr.de>; Fri, 22 Dec 2023 13:10:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C4D01C2158B
+	for <lists+kvm@lfdr.de>; Fri, 22 Dec 2023 13:14:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1116B19443;
-	Fri, 22 Dec 2023 13:09:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 972E919465;
+	Fri, 22 Dec 2023 13:14:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gU2VwFGp"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LXPeHUeO"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47A621863F;
-	Fri, 22 Dec 2023 13:09:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFF58C433C7;
-	Fri, 22 Dec 2023 13:09:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703250594;
-	bh=JPi9QFizO6dQFDu6f3b0ceAFOR5lY0Ihptjl/d/q+8U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gU2VwFGp59ErPQDLIzr3fztJK2LcJHYhLvaC7zb0FlZ1Pe9u0rIIATiegZubtwiNA
-	 AKOhNkqXBeVTgQ4ayExj0TTCOITf1IPjEyjUefQmrhnBSJSA1t+tioJ3CZSaqJp7zb
-	 3ChuTmz6VAW1bHKnDK3bCDVYM+kRL3NyqE4B3c1I8bUWdpj1TaqpAdAQsDTdNmzRfW
-	 TSlIi55AMGJXf+wxl8439BXsq1e7MYYwBMhFw6/ALV6NCTqEBq+Qt80WIr3bJBupL/
-	 aNwon/RLwFaSyoqNdl4ywquKK4RLHDnOwUFuch2i1UiucFJvE3HWhEYRwXcLyXyvA5
-	 mUA7gSJgLfHxg==
-Date: Fri, 22 Dec 2023 13:09:49 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.7, part #2
-Message-ID: <784ab26d-8919-4f08-8440-f66432458492@sirena.org.uk>
-References: <ZYCaxOtefkuvBc3Z@thinky-boi>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C71A18B09
+	for <kvm@vger.kernel.org>; Fri, 22 Dec 2023 13:14:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1703250854;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zZjb2qW2npfjBnPlgRmIf+pcDEINjvPrppaJrUN95YI=;
+	b=LXPeHUeOky7C3jmJcfddcB+mSdSimlEnuJjwvmWy9XVRlaal8rlkGcF4B7RvO//e+4/qEL
+	HOLqE9p+fRBlfTSuh3Qg+EIzGslUKwab4pV9PH86nZnJJ8MSsGsIDr2qE8hionysQUR6/+
+	Rf71do5egfMP0iJnmne/W+5bMvZSOM0=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-47-4-ofHTMuODCd_ofaOB-S8A-1; Fri,
+ 22 Dec 2023 08:14:10 -0500
+X-MC-Unique: 4-ofHTMuODCd_ofaOB-S8A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6749D29ABA19;
+	Fri, 22 Dec 2023 13:14:09 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.28.76])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id AFDD5C159B0;
+	Fri, 22 Dec 2023 13:14:06 +0000 (UTC)
+Date: Fri, 22 Dec 2023 13:14:04 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	David Hildenbrand <david@redhat.com>,
+	Igor Mammedov <imammedo@redhat.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Peter Xu <peterx@redhat.com>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Cornelia Huck <cohuck@redhat.com>, Eric Blake <eblake@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
+	kvm@vger.kernel.org, Michael Roth <michael.roth@amd.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Claudio Fontana <cfontana@suse.de>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Isaku Yamahata <isaku.yamahata@gmail.com>,
+	Chenyi Qiang <chenyi.qiang@intel.com>
+Subject: Re: [PATCH v3 52/70] i386/tdx: handle TDG.VP.VMCALL<GetQuote>
+Message-ID: <ZYWLnIfXac_K7EZM@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20231115071519.2864957-1-xiaoyao.li@intel.com>
+ <20231115071519.2864957-53-xiaoyao.li@intel.com>
+ <ZYQb_P6eHokUz9Hh@redhat.com>
+ <5314df8a-4173-46cb-bc7e-984c6b543555@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="t5twuZwSLZu7sEe+"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ZYCaxOtefkuvBc3Z@thinky-boi>
-X-Cookie: Familiarity breeds attempt.
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <5314df8a-4173-46cb-bc7e-984c6b543555@intel.com>
+User-Agent: Mutt/2.2.10 (2023-03-25)
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
 
+On Fri, Dec 22, 2023 at 11:14:12AM +0800, Xiaoyao Li wrote:
+> On 12/21/2023 7:05 PM, Daniel P. Berrangé wrote:
+> > On Wed, Nov 15, 2023 at 02:15:01AM -0500, Xiaoyao Li wrote:
+> > > From: Isaku Yamahata <isaku.yamahata@intel.com>
+> > > 
+> > > For GetQuote, delegate a request to Quote Generation Service.
+> > > Add property "quote-generation-socket" to tdx-guest, whihc is a property
+> > > of type SocketAddress to specify Quote Generation Service(QGS).
+> > > 
+> > > On request, connect to the QGS, read request buffer from shared guest
+> > > memory, send the request buffer to the server and store the response
+> > > into shared guest memory and notify TD guest by interrupt.
+> > > 
+> > > command line example:
+> > >    qemu-system-x86_64 \
+> > >      -object '{"qom-type":"tdx-guest","id":"tdx0","quote-generation-socket":{"type": "vsock", "cid":"2","port":"1234"}}' \
+> > 
+> > Here you're illustrating a VSOCK address.  IIUC, both the 'qgs'
+> > daemon and QEMU will be running in the host. Why would they need
+> > to be using VSOCK, as opposed to a regular UNIX socket connection ?
+> > 
+> 
+> We use vsock here because the QGS server we used for testing exposes the
+> vsock socket.
 
---t5twuZwSLZu7sEe+
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Is this is the server impl you test with:
 
-On Mon, Dec 18, 2023 at 11:17:24AM -0800, Oliver Upton wrote:
+  https://github.com/intel/SGXDataCenterAttestationPrimitives/tree/master/QuoteGeneration/quote_wrapper/qgs
 
-> Here's the second batch of fixes for 6.7. Please note that this pull
-> is based on -rc4 instead of my first fixes tag as the KVM selftests
-> breakage was introduced by one of my changes that went through the
-> perf tree.
+or is there another impl ?
 
-Any news on this?  The KVM selftests are still broken in mainline,
-pending-fixes and -next and the release is getting near.
+With regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
-Oliver, should your tree be in -next?
-
---t5twuZwSLZu7sEe+
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmWFip0ACgkQJNaLcl1U
-h9AyGQf+Jf2jjHDJkXIG6X0m8labz+op6RXGaBaSoP/zNl00m24GfUSoBp1NjZ8U
-F8zMFpvFTNxOG2CaX2UFNUWWST2m4s9Dltm1vmCkvuxGwXRX3HzjKtxhbgghOxzh
-L6AhcYlafcMAW9gc3KcsCUeHpVygySSODpJKPsnian7YzRAZbU3czBqtTclPMB9g
-rclyw7dIztQPFblbKqJ+ttPwn8ww2eRImWXZ7SLbX/ay2eICT/kXOnV/TKzlkm5h
-p6amLmr+2O2keDYNnhcpWRwvlYZcMIgaLS8B0XgDHzdBZHudLZavS4zDFwpNp9Sj
-UXxr3et4ubELmkFvGS+CS39T2hGyLA==
-=CikZ
------END PGP SIGNATURE-----
-
---t5twuZwSLZu7sEe+--
 
