@@ -1,146 +1,139 @@
-Return-Path: <kvm+bounces-5157-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5159-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D43C81CB40
-	for <lists+kvm@lfdr.de>; Fri, 22 Dec 2023 15:21:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 926B581CC10
+	for <lists+kvm@lfdr.de>; Fri, 22 Dec 2023 16:18:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D566EB228BE
-	for <lists+kvm@lfdr.de>; Fri, 22 Dec 2023 14:21:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C46001C21085
+	for <lists+kvm@lfdr.de>; Fri, 22 Dec 2023 15:18:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 491881D52B;
-	Fri, 22 Dec 2023 14:20:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84EA82376E;
+	Fri, 22 Dec 2023 15:18:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c/COoHr+"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="KuM0vInl"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AB00199A1;
-	Fri, 22 Dec 2023 14:20:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46A2AC433C8;
-	Fri, 22 Dec 2023 14:20:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703254856;
-	bh=rpP4r+Mn8Htxn9KN1/5jiebpI8ALkSar9OVBAUjvO5Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=c/COoHr+foveC4IdKnQE5MaeQ06EUZt6zW+JsmerAKOz+SjCm49IzyIF3b77Aog7C
-	 5J5sz0XCDtdKI/mLEH1/SaRrHGcfwrHa41Cby3TyBVfSAhudqwTr1/cL6ew7HLy6j5
-	 FKS/KxkZHpK5OSPeKyYoT1mIjAtwOn7J7DafiMtkjXlR2/JT32WaCqw/TjGzaukxiS
-	 N5QN1LT2/RHpBCjKmS9DroXPhYoDIWZ/w646Wfmra1k1QwsfDZaTMOXgrr8n4gjIm6
-	 Ak9tJWcM1YehKCEeClsYz832ZAgvFrAix7cccMcd9giekbKlUbz1wPpwoHnU6AKyMq
-	 QB7XRpz4qQU3w==
-Date: Fri, 22 Dec 2023 14:20:51 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.7, part #2
-Message-ID: <cc920d55-39df-4255-b194-a2db1dec6bb7@sirena.org.uk>
-References: <ZYCaxOtefkuvBc3Z@thinky-boi>
- <784ab26d-8919-4f08-8440-f66432458492@sirena.org.uk>
- <69259c81441a57ceebcffb0e16895db1@kernel.org>
- <ffbca4ce-7386-469b-952c-f33e2ba42a51@sirena.org.uk>
- <441ff2c753fbfd69a60e93031070b09e@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7E912374D;
+	Fri, 22 Dec 2023 15:17:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3BME67DO010059;
+	Fri, 22 Dec 2023 15:17:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=ZWrJsTYOoV29o/sIVqwxhwxPR262KH+d/Yci05WaoFA=;
+ b=KuM0vInlBUnHa2qLXAc18v7cMikri79roF4vD7og7eHW0FR1lKtrF+35Ld1UfvHApS48
+ uXFhhpZWo1HT9vNY5Y4MhXBZMmrA+CyfsiZsTEyUqyQOF5EoyanmG5gV4z0dhsWY+YXp
+ w9ziYVQNz3PNL9o2/CtdG39EbDSQteTKQ5kvkJXCtueoZ4odFI9+nhCgOVbcEIGoNZHM
+ 9cup5FoINxx7iy4IubPuudXOkwyRHCskmSQDOLoKXWTUNx2sSIyT7v2OWMTrQdrOE7DW
+ wwPc57ZgyCxZBEhAUHGaQy+o/zjp486elZULKlueig197SE/8adznSuYWguAwG3KXHnJ ag== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v5afmkfqx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 22 Dec 2023 15:17:41 +0000
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3BMEEkoQ032205;
+	Fri, 22 Dec 2023 15:17:40 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3v5afmkf61-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 22 Dec 2023 15:17:39 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3BMEk2Fr029718;
+	Fri, 22 Dec 2023 15:16:03 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3v1p7t45k8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 22 Dec 2023 15:16:02 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3BMFG0Xq19005978
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 22 Dec 2023 15:16:00 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1C39C2004F;
+	Fri, 22 Dec 2023 15:16:00 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 49C7320043;
+	Fri, 22 Dec 2023 15:15:59 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.179.5.15])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Fri, 22 Dec 2023 15:15:59 +0000 (GMT)
+Date: Fri, 22 Dec 2023 16:04:14 +0100
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: Nicholas Piggin <npiggin@gmail.com>
+Cc: Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
+        Laurent Vivier
+ <lvivier@redhat.com>,
+        "Shaoqin Huang" <shahuang@redhat.com>,
+        Andrew Jones
+ <andrew.jones@linux.dev>, Nico Boehr <nrb@linux.ibm.com>,
+        Paolo Bonzini
+ <pbonzini@redhat.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Eric
+ Auger <eric.auger@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David
+ Hildenbrand <david@redhat.com>, linuxppc-dev@lists.ozlabs.org,
+        linux-s390@vger.kernel.org, kvmarm@lists.linux.dev
+Subject: Re: [kvm-unit-tests PATCH 1/9] s390x: clean lib/auxinfo.o
+Message-ID: <20231222160414.5175ebba@p-imbrenda>
+In-Reply-To: <20231222135048.1924672-2-npiggin@gmail.com>
+References: <20231222135048.1924672-1-npiggin@gmail.com>
+	<20231222135048.1924672-2-npiggin@gmail.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="qUFkqCBRZLAnhi9H"
-Content-Disposition: inline
-In-Reply-To: <441ff2c753fbfd69a60e93031070b09e@kernel.org>
-X-Cookie: Familiarity breeds attempt.
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: P7Ivpbc0jONApp_ZrCWAo_Kd26CGdaCl
+X-Proofpoint-ORIG-GUID: MmZlGmYa-oSqI4DgF66gFF7_0WpynP8N
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-22_09,2023-12-21_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
+ spamscore=0 lowpriorityscore=0 suspectscore=0 impostorscore=0 adultscore=0
+ phishscore=0 malwarescore=0 clxscore=1015 mlxlogscore=867 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
+ definitions=main-2312220112
 
+On Fri, 22 Dec 2023 23:50:40 +1000
+Nicholas Piggin <npiggin@gmail.com> wrote:
 
---qUFkqCBRZLAnhi9H
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> ---
+>  s390x/Makefile | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index f79fd009..95ef9533 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -227,7 +227,7 @@ $(snippet_asmlib): $$(patsubst %.o,%.S,$$@) $(asm-offsets)
+>  
+>  
+>  arch_clean: asm_offsets_clean
+> -	$(RM) $(TEST_DIR)/*.{o,elf,bin,lds} $(SNIPPET_DIR)/*/*.{o,elf,*bin,*obj,hdr,lds} $(SNIPPET_DIR)/asm/.*.d $(TEST_DIR)/.*.d lib/s390x/.*.d $(comm-key)
+> +	$(RM) $(TEST_DIR)/*.{o,elf,bin,lds} $(SNIPPET_DIR)/*/*.{o,elf,*bin,*obj,hdr,lds} $(SNIPPET_DIR)/asm/.*.d $(TEST_DIR)/.*.d lib/s390x/.*.d lib/auxinfo.o $(comm-key)
 
-On Fri, Dec 22, 2023 at 01:34:09PM +0000, Marc Zyngier wrote:
-> On 2023-12-22 13:26, Mark Brown wrote:
-> > On Fri, Dec 22, 2023 at 01:16:41PM +0000, Marc Zyngier wrote:
+it seems other architectures don't need to do the cleanp? what are we
+doing wrong?
 
-> > > > Oliver, should your tree be in -next?
+>  
+>  generated-files = $(asm-offsets)
+>  $(tests:.elf=.o) $(asmlib) $(cflatobjs): $(generated-files)
 
-> > > No, we don't have the KVM/arm64 fixes in -next.
-
-> > I see it's not, I'm asking if it should be - given the latencies
-> > involved it seems like it'd be helpful for keeping -next working.
-
-> This is on purpose. We use -next for, well, the next release,
-> and not as a band-aid for some other purpose. If you think things
-
-Note that -next includes pending-fixes which is specifically for the
-purpose of getting coverage for fixes intended to go to mainline (indeed
-this issue was found and reported before the original problematic patch
-was sent to mainline, it's not clear to me what went wrong there).  As
-well as the fixes getting coverage through being in -next itself there's
-a bunch of the CI that specifically looks at pending-fixes, trying to
-both prioritise keeping mainline stable and catch things like unintended
-dependencies on things only in -next.
-
-There's also the fact that if mainline is broken and not somehow fixed
-in -next then that does disrupt the use of -next for testing things
-aimed at the next release.
-
-> don't get merged quickly enough, please take it with the person
-> processing the PRs (Paolo).
-
-He is on CC here.  I'm not sure that it's specifically things not
-getting merged (well, modulo this one fixing an issue in mainline) -
-it's a totally reasonable approach to want to give things time to get
-reviewed and tested before they get merged, but if we're doing that then
-it seems sensible to take advantage of the coverage from having things
-in the integration trees.  OTOH if things get merged very quickly then=20
-it's less clear since there's less time for the integration trees to do
-their thing.  It feels like things aren't lining up well here.
-
-> > > And we have another two weeks to release, so ample amount of
-> > > time until Paolo picks up the PR.
-
-> > Sure, but we do also have the holidays and also the fact that it's a
-> > build failure in a configuration used by some of the CIs means that
-> > we've got a bunch of testing that simply hasn't been happening for a
-> > couple of weeks now.
-
-> Given that most of the KVM tests are usually more broken than
-> the kernel itself, I'm not losing much sleep over it.
-
-That's suprising to me, other than this release it doesn't match my
-experiences too well - there is a bit of glitchiness in one of the
-dirty_log tests on some platforms but otherwise the KVM selftests are
-generally rather stable on the systems where I pay attention to the
-results.  They're certainly not a testsuite I expect to have to
-frequently worry about - we might wish for more coverage but that's
-something different to brokenness.
-
-The build issues during this release cycle have been a bit of an
-exception.
-
---qUFkqCBRZLAnhi9H
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmWFm0IACgkQJNaLcl1U
-h9BAOQf+MuK1oAubpWCwy3b1APTrkRTu0rgC0+peM4sFBuogL7w3o88PZv3lxGsl
-pZNEt55QbXQMwbJAxjqUCt5pz8M2Y0Uf4MzIW5/+il3A2GrJwa0pZeitu/ssDODp
-ed9FPvJL5aO1HjBNINZRCgQXWKi3ZKx68catvht8//wQg1YavAe44lafddkoTSsF
-7mHjMn+qNaEIm95TrVJiNa2CVJPd85XMzWB+G2Q7nxXKd83zLZ8Ggh22K2gHScTv
-W6NQzDU2q3vd4/iZNMAtjACnTUCTebqq/SCR8cHA0jzJseq8pA42Buqw6XX/bt2y
-U+Kk5wLlsjzHNPM1W51MnwlUcRLNGg==
-=vXZQ
------END PGP SIGNATURE-----
-
---qUFkqCBRZLAnhi9H--
 
