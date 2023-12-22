@@ -1,240 +1,176 @@
-Return-Path: <kvm+bounces-5136-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5137-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5512F81C82C
-	for <lists+kvm@lfdr.de>; Fri, 22 Dec 2023 11:33:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5A1D81C88C
+	for <lists+kvm@lfdr.de>; Fri, 22 Dec 2023 11:51:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B264284746
-	for <lists+kvm@lfdr.de>; Fri, 22 Dec 2023 10:33:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13CEE1C22234
+	for <lists+kvm@lfdr.de>; Fri, 22 Dec 2023 10:51:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CF4F17998;
-	Fri, 22 Dec 2023 10:32:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5853C168B6;
+	Fri, 22 Dec 2023 10:51:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fWmctpRm"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="BQMWAaD/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2085.outbound.protection.outlook.com [40.107.93.85])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6700017984
-	for <kvm@vger.kernel.org>; Fri, 22 Dec 2023 10:32:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-6d77c6437f0so840091b3a.2
-        for <kvm@vger.kernel.org>; Fri, 22 Dec 2023 02:32:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703241177; x=1703845977; darn=vger.kernel.org;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Poe65Z2yDaErk/4LWhHXog9xzSO4kyIOOR5KpTUL6AQ=;
-        b=fWmctpRm9L8ih3lsnWt4XmpGFMINtKWRdJC8TymgoECk0CD+rrtA3IyEkQRS1mhuly
-         zxGGg+5mQLbLq/xThGdtPqCajjxlrydRULFXj9TsZUv33z4dVU7bc+Pi6DKVsz8bpoVK
-         tyj1vDTLMN3w8M7Hfdrz/atHL5EjAIarcuaTFvTVWrcEXVWaLyAyG6EoPriBojg3cygd
-         sJYEvbecTtU8Oe9uulbFL0u0wIVVFYFsvIDPHdwXeuw/kZlaXqMDTl5zY63KTvIfZevb
-         EI+FbP6YA0QNXR3IBijiIEf2OrA9JgRRt9rfG0YgHf+dDGSftOuXsqaQOUfgv6uWznGi
-         loEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703241177; x=1703845977;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Poe65Z2yDaErk/4LWhHXog9xzSO4kyIOOR5KpTUL6AQ=;
-        b=ZoaQFQ2Rj/yzOJUQy8y2C+BL+mZA0SLcjEnkLxepNGNtYBqeUahJWiSacjWkv5mr93
-         1YoF1N79b0MUcqc+WarSjeLB1ZvLLUvicKHW51aXdaihpLmuQ/RCqbNixFwYmOpQm/2j
-         bK2jxNholZ/c7j4EC+FFnsKz8E7XN8kntEeUahT62nFK33j7vbbhzD7SglVqdXr7C/BY
-         6r1D3AE/p4oGXoOGiEvd79A3y4taFqgCpTLD3/4l4m/w9nFpkWt+NfFCkZmidUkRDQYo
-         iSeQqXLXWcS/1tYNVOHCxul+q/binONk785a7q2ZDyP5vM+2sl8ekzeG9gFgzoKKXfRj
-         VVqg==
-X-Gm-Message-State: AOJu0YzHlgtncSaopUbEPmexmQsF3/RO3eNMUWbU0x7BWg9L3Z8v/Zn2
-	XWMqZ60H8i3Tj/685PCsRag=
-X-Google-Smtp-Source: AGHT+IGvnoH20jMcgBcVZMJvPAKQdE467EA25TN2MUEGXMYmuHqbRdnZibE+be+1Ra73zZ4leCoP1w==
-X-Received: by 2002:a17:902:ce89:b0:1d4:13ca:ab26 with SMTP id f9-20020a170902ce8900b001d413caab26mr885263plg.68.1703241176665;
-        Fri, 22 Dec 2023 02:32:56 -0800 (PST)
-Received: from localhost ([203.220.145.68])
-        by smtp.gmail.com with ESMTPSA id ja22-20020a170902efd600b001d078445059sm3147807plb.143.2023.12.22.02.32.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 22 Dec 2023 02:32:56 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7D48156C4;
+	Fri, 22 Dec 2023 10:51:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=W/AIMpTYZLmP3h8emLpzsUx0RpFCV6mNneVEYeqGuAXU20BWDKngdS1vyv0wahLE8P7lbz/ivPtVF5htOCHCO6RYvo4D5wrugfbLp5+u3wZnGFbOm0jy4lPjXtqEgewbo0DazIi43g4GDfbf0ZKyi8Y72wu2X2q7x29zKhaa9oZhwHCZ7wVc+f8MERg3fNnai/NJP8s/VuvdHzS4N/SIGyXmAeXfqywQ9oq6pZczfVXQk3Ai3PWkD7v54TwrIbQyH8QMuTfPdNKhQBrN9YDTcxLM1ErgVamB6v8YFPcr098i+jn8sEa08VQZMPaiz7AtlR9CtB+KS2Y4CAyjA72Qxg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=1WtLSYfsqPKr1A6/3E13hymlTqkqcqf+qXuh/3dzPeg=;
+ b=jq8hQUsrkSlWCw7LbAGzbsToL6lJHUwOUtkX0wG1KaYndePaUvzlszpfjaeyXMHK87Zv85qvuX6DLUsCPtz/fjj1/TM+pJzjnOkIgiRB1tHnsUrrCmA3yr9XycBda9BWE0u9CVyrkezS0r1SlUzS8dOJ4Zl/K4F44nKC6gzZoQhlRjCn/yXJSxMNRqThfOY9GwGhkKbZtaiyToXsG8/Y8//ndma0WLhx8s1nkjd84NTkW8XiMaO3jSRRMMNqVPtSEwLtKC5ORcm22CD6znOzn9mkBFrSoS6YngZKbb9CvAEq1c9KpvMIvmPihZUvPMcsO9LaWJ21RNySVr6h2ve8dQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1WtLSYfsqPKr1A6/3E13hymlTqkqcqf+qXuh/3dzPeg=;
+ b=BQMWAaD/vs27ls7mUWohGrv2ozc+j25/HwufkC25ZibutLa2m0Znu8gpM+6ZHzEJ/T/RH9G4kihBl5UAF2LUaoZTlEi0Rq4yu/ER6d7xk8woIeq6ywQXeOgvti48LOCz+pDfFS3ntFKYh2igpsMxrtVGYyPMJQLSr0nrT67xvgh5T0Z6rymri02S68MTQ5o2SO06MoSTnOKDqimW2dkxHS8/rKldiWxM5rI9XrtzVbL4ZkYXRWrDQhzevWoXl1Q57ZJhTjIReX8hoiZnqkrkJttvnLGWo5yV0VQTuY5LVIWuvkYhhF+THQTSn7htNou/UD6h7cLxzTWKvf9OUO4hGQ==
+Received: from DM6PR12MB5565.namprd12.prod.outlook.com (2603:10b6:5:1b6::13)
+ by SJ0PR12MB8090.namprd12.prod.outlook.com (2603:10b6:a03:4ea::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7113.21; Fri, 22 Dec
+ 2023 10:51:13 +0000
+Received: from DM6PR12MB5565.namprd12.prod.outlook.com
+ ([fe80::bd76:47ad:38a9:a258]) by DM6PR12MB5565.namprd12.prod.outlook.com
+ ([fe80::bd76:47ad:38a9:a258%5]) with mapi id 15.20.7113.019; Fri, 22 Dec 2023
+ 10:51:13 +0000
+From: Dragos Tatulea <dtatulea@nvidia.com>
+To: "mst@redhat.com" <mst@redhat.com>
+CC: "xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>, Parav Pandit
+	<parav@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	"virtualization@lists.linux-foundation.org"
+	<virtualization@lists.linux-foundation.org>, "eperezma@redhat.com"
+	<eperezma@redhat.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "si-wei.liu@oracle.com"
+	<si-wei.liu@oracle.com>, "jasowang@redhat.com" <jasowang@redhat.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, Saeed Mahameed
+	<saeedm@nvidia.com>, "leon@kernel.org" <leon@kernel.org>
+Subject: Re: [PATCH vhost v4 02/15] vdpa: Add
+ VHOST_BACKEND_F_CHANGEABLE_VQ_ADDR_IN_SUSPEND flag
+Thread-Topic: [PATCH vhost v4 02/15] vdpa: Add
+ VHOST_BACKEND_F_CHANGEABLE_VQ_ADDR_IN_SUSPEND flag
+Thread-Index:
+ AQHaMqaBunnLiYiUz0i03/j7bu1zQ7CxiQYAgAAFTwCAAJ4xgIAA0diAgABf+YCAAES4AIAABHKAgAAp1ICAAATiAIAAA0UAgAEjDACAACe4gA==
+Date: Fri, 22 Dec 2023 10:51:13 +0000
+Message-ID: <a67c3ee375b1ae4aac5cc39539e1a25e23bf4f07.camel@nvidia.com>
+References:
+ <CACGkMEv7xQkZYJAgAUK6C3oUrZ9vuUJdTKRzihXcNPb-iWdpJw@mail.gmail.com>
+	 <CACGkMEsaaDGi63__YrvsTC1HqgTaEWHvGokK1bJS5+m1XYM-6w@mail.gmail.com>
+	 <CAJaqyWdoaj8a7q1KrGqWmkYvAw_R_p0utcWvDvkyVm1nUOAxrA@mail.gmail.com>
+	 <CACGkMEuM7bXxsxHUs_SodiDQ2+akrLqqzWZBJSZEcnMASUkb+g@mail.gmail.com>
+	 <CAJaqyWeBVVcTZEzZK=63Ymk85wnRFd+_wK56UfEHNXBH-qy1Zg@mail.gmail.com>
+	 <70adc734331c1289dceb3bcdc991f3da7e4db2f0.camel@nvidia.com>
+	 <CAJaqyWeUHiZXMFkNBpinCsJAXojtPkGz+SjzUNDPx5W=qqON1w@mail.gmail.com>
+	 <c03eb2bb3ad76e28be2bb9b9e4dee4c3bc062ea7.camel@nvidia.com>
+	 <CAJaqyWevZX5TKpaLiJwu2nD7PHFsHg+TEZ=iPdWvrH4jyPV+cA@mail.gmail.com>
+	 <17abeefd02c843cddf64efbeadde49ad15c365a1.camel@nvidia.com>
+	 <20231222032713-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20231222032713-mutt-send-email-mst@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Evolution 3.50.2 (3.50.2-1.fc39) 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM6PR12MB5565:EE_|SJ0PR12MB8090:EE_
+x-ms-office365-filtering-correlation-id: 2658ff02-b546-477e-12f0-08dc02dbea4f
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ 8DR6Bbk+uxuuxG+xr8FG5JjK47C7zEa2rqCRV8BYDG2gPZXTo/0McHJhiT2k1Pz82JwvWQ8W9HkZMwO/HbOj96xsYVvHl9I+kOuYd4J/gK4gJ02kVefaYopPxA6AsUdD5rKZWJuMQ1Z4654DnoATGpe/Ny9P6AYXcexUjShU0gVP8u144FTQuXCiZtRzfQvigqoJ3JzHFT4+eok+ZosB45Xc1Pc8SNsx5UGFY8+tgPXuHNqkE4ksSBQ9mYkDn0W/whQOdLMRW0+T+Ho1C3vQ+1x0NxDvBv2TqdGtoQuULl0JaSWnFqX7LAuSDX+evvMskzU2KywzpuJJwJXzrRiAglucZF2LuQ9YY07FpQjxq0SJpJ56avsecnhUdOSdKGDpRanAHijawvjhiR81r947HR4nWJPT2MOTKisyZuKb/OOYU7rIoeoVK4M2yj1qLdZaXIdTmOJ2zj3zLukEaaHLI/SU+cYlvL5fyRmCZomzwKjf4HB1S3Tl6e0oAH//H0Loix7ozqCMkWV5LuRz9Q4cQs1Ode0runNpYVF0pfMVkv8t3CMBJdzvVA8HdC8p7aQ/HphfGnge3maFCZOLsS/jCvx7HNV+V52yE5vFrdNi7LRHcg9uBHxKJdSdOYWieLqh
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB5565.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(39860400002)(396003)(376002)(366004)(230922051799003)(186009)(64100799003)(1800799012)(451199024)(6506007)(6512007)(5660300002)(478600001)(71200400001)(6486002)(83380400001)(2616005)(54906003)(316002)(6916009)(64756008)(91956017)(66476007)(66946007)(66556008)(66446008)(76116006)(8676002)(8936002)(122000001)(4326008)(38070700009)(41300700001)(2906002)(86362001)(36756003)(38100700002)(4001150100001)(4744005);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?YUNXclhhZ0g2b2JHSk9QM3M5cTAyYXI4WGJGaXY1NXBwNzVjckdmeWs3cHY0?=
+ =?utf-8?B?eHZzbXFjaFdkekJibk0wSnloVmdwNUJlUHFGS2lqT3Qrd1h1TmxneEVrU1hz?=
+ =?utf-8?B?MXA1dFBGMFFlQW42bVJNeC9ZcnpQUHVQdDlSTGVSTEd0NzRpMmRqVFZOUXdo?=
+ =?utf-8?B?azEzYTR1S3dGUHVmYlBObmxCOU56dmZvbUlUdDBvQnV5U0ZmSzhiMUlHN1VI?=
+ =?utf-8?B?MmJuR3ZHU1RsZkFtbXVOUUUzRlYwVkI0R29lRmNJbFVLN0hKZFlmWmFKeHVH?=
+ =?utf-8?B?clNYcXZjZFErTDBaM0VSL1RPUGxNS0d3b0lhUnFTbG01cGcrV09FcngrVTlx?=
+ =?utf-8?B?QkU2dS9FNE0vQkVkaWpCVnpBYlI5T0U1MXoycmxyZ29qbHIvMkdjaHVmblF6?=
+ =?utf-8?B?aVdUSTF1MHpxT2lQYTYwVjZqUDM5S1dla2dReUNYL3ZvUFhCV0Q0U3gxYWow?=
+ =?utf-8?B?N3EwWkYySSs5bk00ckJTOGpxelJnR2F5SFRMWW85cThFZ3RVbGhlWm5OdFdT?=
+ =?utf-8?B?TU5jZUVnVFp6NktrWmkwNjYrbWhheFg1eHRUaXdvSitzckcxWmdab1RSZjJU?=
+ =?utf-8?B?Z29kUWZKdkVIeVkrVlY2eUo2UXorS3htUU9FdjFDL1VxVkRzMG42SzFuVURj?=
+ =?utf-8?B?a3Ywa2JkSUdJUnpMcjZHQVFSQ2tGc0NLa2ZaK25JMFZsVUVkS292RnlaQU9l?=
+ =?utf-8?B?aVJ1SFFtMVdRMW9nSDJySmJPdFYzdzAzUVRERXVXTWZocm1OQnJiWXJsS05T?=
+ =?utf-8?B?cDhEUDNRdkg5SlZUWi85Qm9hOEZvZlhwbjJWVVF6aTJYY0RFVjlJMWlwd3Z1?=
+ =?utf-8?B?VFZ0SlMrTkJFalh4bko2aU5yQzd0OE1TS0Z2WjNmbVd2dVVnc1U3UmJ3UVpR?=
+ =?utf-8?B?Q1NqV3UxWUYrbXo2cU9sc1BpTHZNa1BxK1k0VTZjUDNDSmdLMHAvZGFMQlk5?=
+ =?utf-8?B?am9hR1pyS3F0L3VTSXlGU1VjU1JvaWpXR2NDY1h1Q0hPSWx6ZnoyRG9yS0Zj?=
+ =?utf-8?B?K1RPSFk3VXZiMVRrdEQvc29NTkRKL2FFaUhvVkx4OWI5WjFhUFBvRW1ZREZu?=
+ =?utf-8?B?WVNlZXpBTDFjbGVEcVAwWmpWQ3RwdU9GK3pxYkd6Z1VQQmtyOFQzclJiMTVo?=
+ =?utf-8?B?MmJCYmFTTW5xNVg0QmU2TktNVk9tN0NIdWtuNFBWS2pxS0NWVi9wUlIySDFD?=
+ =?utf-8?B?dUxURStpZ0VvcjVJV1MzNFVFMGw2blhKWjlud09VLytXTFRibmN2bEtJMU1Y?=
+ =?utf-8?B?RW50UjFQckdMREtTbXJObGdPbllvU0doamZUKytTaWovVy9mM1BpWFVjTjdW?=
+ =?utf-8?B?MU4xTWJGWjA3ZWoxRVFyaUZkei9COWsrWitCVW4rMlJHMnl3NWJaME5CRkxj?=
+ =?utf-8?B?cGF3N2JXd3RzVW1kMVBCQ29leUJUanRCdUV4WWg3MjdpeEFKU2hNMHZmTkxo?=
+ =?utf-8?B?dzVGN2M4VHhQUmZMald6VGtWWDIwMnlYRkR4ZmFHNmNiTFBkbDdsdmVZUGJ6?=
+ =?utf-8?B?ejB2VG4zdFNvNW43c3dKcjAzWUNGM1lmbG0wTGdjZFFCeGZGSWcvak8yVlNq?=
+ =?utf-8?B?TmF2bGdGREZyK2JWbHc2d25odGdFMUk2RXd2S0NsSzdSRGp5OFg1K2p0ZzF6?=
+ =?utf-8?B?QUdLck9UR1BlRmhldFFBVWRObzVITitnRzRySS9Da0F1OEp2Q2c0VWJ6eVgr?=
+ =?utf-8?B?UU9WdFhJSGk4K0p3bmZmSDJTUlovOW9jUjhMU1FTdmhXZ3VzM084Mlg1SjBa?=
+ =?utf-8?B?L1FlVzNDQk1DWHI5LzBBQ1FkQ0JkMUlWM1pLZUFIclhQS1pxOGY1cnJtMkhF?=
+ =?utf-8?B?L1NYTlQ4T0JnWGd0NUluOVJjbnZ4ZStNWk11OXAyell5OGxDMFJHV0t6eW9C?=
+ =?utf-8?B?NWFicHczRmQ4Q1NhSTRBeEc5REw3M2JqVjRqZFB1OWpqNFJCc2xEa3N4WEhw?=
+ =?utf-8?B?SFdJYWxzcWZScVBQVXNCREVEclFFSU5ZY1drSjRqRnFxZTliNE52SERNN25L?=
+ =?utf-8?B?T1dhYWZWYnRTaHlwbnFUV3NHcHA5WkJDZkVFSXEwMzNUZUdHcjNIWkU2U3VS?=
+ =?utf-8?B?RlZKR0pacit4TDJBNDltTzkzUFN2OXlFZkFZNlRPbXErMjVhLzdXMWE4bVli?=
+ =?utf-8?B?VXA1UTd2Uk9NS1dxeW9TR3BIUjRKeGdHUkQ2RUhBWG55dUhYM0EzbkVyTC9K?=
+ =?utf-8?Q?HERuabY0WWUG3w38FdKId1cDABdVZaT3X1keR9naxvVv?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <CFE28502CB9B704BABF255A5A170C879@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Fri, 22 Dec 2023 20:32:51 +1000
-Message-Id: <CXUSLS07KV0L.1YBG3AE5BLHU0@wheely>
-Cc: <linuxppc-dev@lists.ozlabs.org>, "Laurent Vivier" <lvivier@redhat.com>,
- "Shaoqin Huang" <shahuang@redhat.com>, "Andrew Jones"
- <andrew.jones@linux.dev>, "Nico Boehr" <nrb@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v5 10/29] powerpc/sprs: Specify SPRs with
- data rather than code
-From: "Nicholas Piggin" <npiggin@gmail.com>
-To: "Thomas Huth" <thuth@redhat.com>, <kvm@vger.kernel.org>
-X-Mailer: aerc 0.15.2
-References: <20231216134257.1743345-1-npiggin@gmail.com>
- <20231216134257.1743345-11-npiggin@gmail.com>
- <49fe69ad-828e-4ac7-8693-7fd983e5152e@redhat.com>
-In-Reply-To: <49fe69ad-828e-4ac7-8693-7fd983e5152e@redhat.com>
+MIME-Version: 1.0
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB5565.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2658ff02-b546-477e-12f0-08dc02dbea4f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Dec 2023 10:51:13.1562
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: /nCfo33TbbGOci0doQmKpuLIYoELHwgw+n0JV69o/tE8QJTvPpQ+OAn2iO8FNanTWZDkuMtOTQM0QaSzLL5mxw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB8090
 
-On Tue Dec 19, 2023 at 4:14 PM AEST, Thomas Huth wrote:
-> On 16/12/2023 14.42, Nicholas Piggin wrote:
-> > A significant rework that builds an array of 'struct spr', where each
-> > element describes an SPR. This makes various metadata about the SPR
-> > like name and access type easier to carry and use.
-> >=20
-> > Hypervisor privileged registers are described despite not being used
-> > at the moment for completeness, but also the code might one day be
-> > reused for a hypervisor-privileged test.
-> >=20
-> > Acked-by: Thomas Huth <thuth@redhat.com>
-> > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> > ---
-> >   powerpc/sprs.c | 643 ++++++++++++++++++++++++++++++++++--------------=
--
-> >   1 file changed, 450 insertions(+), 193 deletions(-)
-> >=20
-> > diff --git a/powerpc/sprs.c b/powerpc/sprs.c
-> > index 57e487ce..cd8b472d 100644
-> > --- a/powerpc/sprs.c
-> > +++ b/powerpc/sprs.c
-> > @@ -28,231 +28,465 @@
-> >   #include <asm/processor.h>
-> >   #include <asm/barrier.h>
-> >  =20
-> > -uint64_t before[1024], after[1024];
-> > -
-> > -/* Common SPRs for all PowerPC CPUs */
-> > -static void set_sprs_common(uint64_t val)
-> > +/* "Indirect" mfspr/mtspr which accept a non-constant spr number */
-> > +static uint64_t __mfspr(unsigned spr)
-> >   {
-> > -	mtspr(9, val);		/* CTR */
-> > -	// mtspr(273, val);	/* SPRG1 */  /* Used by our exception handler */
-> > -	mtspr(274, val);	/* SPRG2 */
-> > -	mtspr(275, val);	/* SPRG3 */
-> > +	uint64_t tmp;
-> > +	uint64_t ret;
-> > +
-> > +	asm volatile(
-> > +"	bcl	20, 31, 1f		\n"
-> > +"1:	mflr	%0			\n"
-> > +"	addi	%0, %0, (2f-1b)		\n"
-> > +"	add	%0, %0, %2		\n"
-> > +"	mtctr	%0			\n"
-> > +"	bctr				\n"
-> > +"2:					\n"
-> > +".LSPR=3D0				\n"
-> > +".rept 1024				\n"
-> > +"	mfspr	%1, .LSPR		\n"
-> > +"	b	3f			\n"
-> > +"	.LSPR=3D.LSPR+1			\n"
-> > +".endr					\n"
-> > +"3:					\n"
-> > +	: "=3D&r"(tmp),
-> > +	  "=3Dr"(ret)
-> > +	: "r"(spr*8) /* 8 bytes per 'mfspr ; b' block */
-> > +	: "lr", "ctr");
-> > +
-> > +	return ret;
-> >   }
-> >  =20
-> > -/* SPRs from PowerPC Operating Environment Architecture, Book III, Ver=
-s. 2.01 */
-> > -static void set_sprs_book3s_201(uint64_t val)
-> > +static void __mtspr(unsigned spr, uint64_t val)
-> >   {
-> > -	mtspr(18, val);		/* DSISR */
-> > -	mtspr(19, val);		/* DAR */
-> > -	mtspr(152, val);	/* CTRL */
-> > -	mtspr(256, val);	/* VRSAVE */
-> > -	mtspr(786, val);	/* MMCRA */
-> > -	mtspr(795, val);	/* MMCR0 */
-> > -	mtspr(798, val);	/* MMCR1 */
-> > +	uint64_t tmp;
-> > +
-> > +	asm volatile(
-> > +"	bcl	20, 31, 1f		\n"
-> > +"1:	mflr	%0			\n"
-> > +"	addi	%0, %0, (2f-1b)		\n"
-> > +"	add	%0, %0, %2		\n"
-> > +"	mtctr	%0			\n"
-> > +"	bctr				\n"
-> > +"2:					\n"
-> > +".LSPR=3D0				\n"
-> > +".rept 1024				\n"
-> > +"	mtspr	.LSPR, %1		\n"
-> > +"	b	3f			\n"
-> > +"	.LSPR=3D.LSPR+1			\n"
-> > +".endr					\n"
-> > +"3:					\n"
-> > +	: "=3D&r"(tmp)
-> > +	: "r"(val),
-> > +	  "r"(spr*8) /* 8 bytes per 'mfspr ; b' block */
-> > +	: "lr", "ctr", "xer");
-> >   }
-> >  =20
-> > +static uint64_t before[1024], after[1024];
-> > +
-> > +#define SPR_PR_READ	0x0001
-> > +#define SPR_PR_WRITE	0x0002
-> > +#define SPR_OS_READ	0x0010
-> > +#define SPR_OS_WRITE	0x0020
-> > +#define SPR_HV_READ	0x0100
-> > +#define SPR_HV_WRITE	0x0200
-> > +
-> > +#define RW		0x333
-> > +#define RO		0x111
-> > +#define WO		0x222
-> > +#define OS_RW		0x330
-> > +#define OS_RO		0x110
-> > +#define OS_WO		0x220
-> > +#define HV_RW		0x300
-> > +#define HV_RO		0x100
-> > +#define HV_WO		0x200
-> > +
-> > +#define SPR_ASYNC	0x1000	/* May be updated asynchronously */
-> > +#define SPR_INT		0x2000	/* May be updated by synchronous interrupt */
-> > +#define SPR_HARNESS	0x4000	/* Test harness uses the register */
-> > +
-> > +struct spr {
-> > +	const char	*name;
-> > +	uint8_t		width;
-> > +	uint16_t	access;
-> > +	uint16_t	type;
-> > +};
-> > +
-> > +/* SPRs common denominator back to PowerPC Operating Environment Archi=
-tecture */
-> > +static const struct spr sprs_common[1024] =3D {
-> > +  [1] =3D {"XER",		64,	RW,		SPR_HARNESS, }, /* Compiler */
-> > +  [8] =3D {"LR", 		64,	RW,		SPR_HARNESS, }, /* Compiler, mfspr/mtspr *=
-/
-> > +  [9] =3D {"CTR",		64,	RW,		SPR_HARNESS, }, /* Compiler, mfspr/mtspr *=
-/
-> > + [18] =3D {"DSISR",	32,	OS_RW,		SPR_INT, },
-> > + [19] =3D {"DAR",		64,	OS_RW,		SPR_INT, },
-> > + [26] =3D {"SRR0",	64,	OS_RW,		SPR_INT, },
-> > + [27] =3D {"SRR1",	64,	OS_RW,		SPR_INT, },
-> > +[268] =3D {"TB",		64,	RO	,	SPR_ASYNC, },
-> > +[269] =3D {"TBU",		32,	RO,		SPR_ASYNC, },
-> > +[272] =3D {"SPRG0",	64,	OS_RW,		SPR_HARNESS, }, /* Int stack */
-> > +[273] =3D {"SPRG1",	64,	OS_RW,		SPR_HARNESS, }, /* Scratch */
-> > +[274] =3D {"SPRG2",	64,	OS_RW, },
-> > +[275] =3D {"SPRG3",	64,	OS_RW, },
-> > +[287] =3D {"PVR",		32,	OS_RO, },
->
-> Just a little stylish nit: You've got a space before the closing "}", but=
- no=20
-> space after the opening "{". Looks a little bit weird to me. Maybe add a=
-=20
-> space after the "{", too?
-
-Yes that is inconsistent. I'll fix.
-
-Thanks,
-Nick
+T24gRnJpLCAyMDIzLTEyLTIyIGF0IDAzOjI5IC0wNTAwLCBNaWNoYWVsIFMuIFRzaXJraW4gd3Jv
+dGU6DQo+IE9uIFRodSwgRGVjIDIxLCAyMDIzIGF0IDAzOjA3OjIyUE0gKzAwMDAsIERyYWdvcyBU
+YXR1bGVhIHdyb3RlOg0KPiA+ID4gPiA+IEluIHRoYXQgY2FzZSB5b3UncmUgcmlnaHQsIHdlIGRv
+bid0IG5lZWQgZmVhdHVyZSBmbGFncy4gQnV0IEkgdGhpbmsgaXQNCj4gPiA+ID4gPiB3b3VsZCBi
+ZSBncmVhdCB0byBhbHNvIG1vdmUgdGhlIGVycm9yIHJldHVybiBpbiBjYXNlIHVzZXJzcGFjZSB0
+cmllcw0KPiA+ID4gPiA+IHRvIG1vZGlmeSB2cSBwYXJhbWV0ZXJzIG91dCBvZiBzdXNwZW5kIHN0
+YXRlLg0KPiA+ID4gPiA+IA0KPiA+ID4gPiBPbiB0aGUgZHJpdmVyIHNpZGUgb3Igb24gdGhlIGNv
+cmUgc2lkZT8NCj4gPiA+ID4gDQo+ID4gPiANCj4gPiA+IENvcmUgc2lkZS4NCj4gPiA+IA0KPiA+
+IENoZWNraW5nIG15IHVuZGVyc3RhbmRpbmc6wqBpbnN0ZWFkIG9mIHRoZSBmZWF0dXJlIGZsYWdz
+IHRoZXJlIHdvdWxkIGJlIGEgY2hlY2sNCj4gPiAoZm9yIC5zZXRfdnFfYWRkciBhbmQgLnNldF92
+cV9zdGF0ZSkgdG8gcmV0dXJuIGFuIGVycm9yIGlmIHRoZXkgYXJlIGNhbGxlZCB1bmRlcg0KPiA+
+IERSSVZFUl9PSyBhbmQgbm90IHN1c3BlbmRlZCBzdGF0ZT8NCj4gDQo+IFllYSB0aGlzIGxvb2tz
+IG11Y2ggc2FuZXIsIGlmIHdlIHN0YXJ0IGFkZGluZyBmZWF0dXJlIGZsYWdzIGZvcg0KPiBlYWNo
+IE9QRVJBVElPTl9YX0xFR0FMX0lOX1NUQVRFX1kgdGhlbiB3ZSB3aWxsIGVuZCB1cCB3aXRoIE5e
+Mg0KPiBmZWF0dXJlIGJpdHMgd2hpY2ggaXMgbm90IHJlYXNvbmFibGUuDQo+IA0KQWNrLiBJcyB0
+aGUgdjIgZW5vdWdoIG9yIHNob3VsZCBJIHJlc3BpbiBhIHY1IHdpdGggdGhlIHVwZGF0ZWQgQWNr
+ZWQtYnkgdGFncz8NCg0KSSB3aWxsIHByZXBhcmUgdGhlIGNvcmUgcGFydCBhcyBhIGRpZmZlcmVu
+dCBzZXJpZXMgd2l0aG91dCB0aGUgZmxhZ3MuDQoNClRoYW5rcywNCkRyYWdvcw0K
 
