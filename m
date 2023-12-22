@@ -1,140 +1,120 @@
-Return-Path: <kvm+bounces-5187-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5188-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4DFB81D057
-	for <lists+kvm@lfdr.de>; Sat, 23 Dec 2023 00:16:09 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBFD681D071
+	for <lists+kvm@lfdr.de>; Sat, 23 Dec 2023 00:25:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B0E4284C1F
-	for <lists+kvm@lfdr.de>; Fri, 22 Dec 2023 23:16:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 278E3B22E2D
+	for <lists+kvm@lfdr.de>; Fri, 22 Dec 2023 23:25:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5C1535EF4;
-	Fri, 22 Dec 2023 23:15:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1763C33CFE;
+	Fri, 22 Dec 2023 23:25:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O3AfGcec"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EcQQO7Yu"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F0FF33CED
-	for <kvm@vger.kernel.org>; Fri, 22 Dec 2023 23:15:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB80033CEA
+	for <kvm@vger.kernel.org>; Fri, 22 Dec 2023 23:25:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1703286949;
+	s=mimecast20190719; t=1703287525;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=qWoEtrdNPasYMgjNknGsXEce5LCOLCYkYpqGX/DZgy0=;
-	b=O3AfGcecZUoc6T+BsM4Rbz6KFoqvhsRctKKySMl/XCdiprc9y7Jq+5GsQ+8wP+HBGAl+2A
-	bWhf8lmPVVGf/AV7wjEWUZfAv3gLIrGmeiT+hVY+IQW/jECh2Igu+rWM+nE9X16yQTYKMS
-	Eb2sP9oqxnEtAXfwuOSCI1EuD2k+GJY=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-616-MJJUghEpN5mPW4RiWMpvTg-1; Fri,
- 22 Dec 2023 18:15:45 -0500
-X-MC-Unique: MJJUghEpN5mPW4RiWMpvTg-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 73CCE1C0514C;
-	Fri, 22 Dec 2023 23:15:45 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 56FA6492BC6;
-	Fri, 22 Dec 2023 23:15:45 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: torvalds@linux-foundation.org
-Cc: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: [GIT PULL] KVM fixes for Linux 6.7-rc7
-Date: Fri, 22 Dec 2023 18:15:44 -0500
-Message-Id: <20231222231544.3333693-1-pbonzini@redhat.com>
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GkEZ1y+Od8QjwKk+xy23eJw9jvF0tR+So/hQMtnbcFI=;
+	b=EcQQO7Yum9cQYrRQ7QkJGjqxY3bSIp6C5Jq1Iq5jhkrV+lWyL/wiuzUTSszrAHJB/SJYsH
+	THaia+0sEgRXy14PC17sZP2N+cnYDdyV3LynbJVrKtvyTrSibsRsemorZMlixRBk8b1w0u
+	Y/xUEOOYQkulz24V+cwLVkVtaTiayLI=
+Received: from mail-yw1-f198.google.com (mail-yw1-f198.google.com
+ [209.85.128.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-319-DLKZqCBnOTSKbuIYFBlmOA-1; Fri, 22 Dec 2023 18:25:22 -0500
+X-MC-Unique: DLKZqCBnOTSKbuIYFBlmOA-1
+Received: by mail-yw1-f198.google.com with SMTP id 00721157ae682-5e7b49e15c1so34492177b3.1
+        for <kvm@vger.kernel.org>; Fri, 22 Dec 2023 15:25:22 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703287521; x=1703892321;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GkEZ1y+Od8QjwKk+xy23eJw9jvF0tR+So/hQMtnbcFI=;
+        b=qflO3HRBR6/kvNuKz8aJa6gDtE3MTyXvfnbu5H0BdsHBnKSo86mADR04Q9deS3vU5c
+         983cInrKfLF50CwlR+M+c9JejcE4VPq6Cb193MmJfYEotjd6VXIzfD9A7kERdm29e/mS
+         XZUipgtIDj2gYaTGoj7g/4s4wG36CR78qlB1j2tZalHCqd7FmAUYa9HVt+4j0Gh8sf+W
+         8L+AhCYkm9qTSfdhUkap4/osiZeYK73KlBGeigg5p5HHSyA09L7NUQc28zCl856RZnz/
+         Kadt+FXKfRQ4ns6+/rqN99MuXnCC8VVyjfxap6iQ0G5qjNFDJDNDPcZw2wel8O1WLWAS
+         YgBw==
+X-Gm-Message-State: AOJu0YwIxb8Cny0neTIy79sZlxvxHmKugk4FlZzqIlVy/k5LQY5IoZae
+	W9MG86pGiCfYVylfGViTACvqv6ZBhrn12TNv0XDbXVDvw1t0W0Fieyo0a3WOx8zabt2oTdAb4yw
+	eoPNj64kG01oWzT2m9YhBo7oOLISxmS+wxenc
+X-Received: by 2002:a0d:e60f:0:b0:5e7:731f:cbfd with SMTP id p15-20020a0de60f000000b005e7731fcbfdmr2122781ywe.42.1703287521611;
+        Fri, 22 Dec 2023 15:25:21 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF4peG8QFXogPSz9Z8FJhgPYUNNmD67LzVd8kdHknyb1FXrx+tdQwRh4FX14vGlvBNWcvhcSs3HKYyigzXvvr8=
+X-Received: by 2002:a0d:e60f:0:b0:5e7:731f:cbfd with SMTP id
+ p15-20020a0de60f000000b005e7731fcbfdmr2122772ywe.42.1703287521372; Fri, 22
+ Dec 2023 15:25:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
+References: <ZYCaxOtefkuvBc3Z@thinky-boi> <784ab26d-8919-4f08-8440-f66432458492@sirena.org.uk>
+ <69259c81441a57ceebcffb0e16895db1@kernel.org> <ffbca4ce-7386-469b-952c-f33e2ba42a51@sirena.org.uk>
+ <441ff2c753fbfd69a60e93031070b09e@kernel.org> <cc920d55-39df-4255-b194-a2db1dec6bb7@sirena.org.uk>
+In-Reply-To: <cc920d55-39df-4255-b194-a2db1dec6bb7@sirena.org.uk>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Sat, 23 Dec 2023 00:25:09 +0100
+Message-ID: <CABgObfatzu=tV5UfXOnxZ12GgM=013+-teEj_-5NCLTr6Y82Mg@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.7, part #2
+To: Mark Brown <broonie@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Linus,
+On Fri, Dec 22, 2023 at 3:21=E2=80=AFPM Mark Brown <broonie@kernel.org> wro=
+te:
+> > > I see it's not, I'm asking if it should be - given the latencies
+> > > involved it seems like it'd be helpful for keeping -next working.
+>
+> > This is on purpose. We use -next for, well, the next release,
+> > and not as a band-aid for some other purpose. If you think things
+>
+> Note that -next includes pending-fixes which is specifically for the
+> purpose of getting coverage for fixes intended to go to mainline (indeed
+> this issue was found and reported before the original problematic patch
+> was sent to mainline, it's not clear to me what went wrong there).
 
-The following changes since commit a39b6ac3781d46ba18193c9dbb2110f31e9bffe9:
+Indeed most other KVM architectures have a tree included in
+linux-next's pending-fixes and kvm/master is included in there.
 
-  Linux 6.7-rc5 (2023-12-10 14:33:40 -0800)
+Knowing that KVM/ARM does not have a fixes tree included in linux-next
+might make me get those in kvm/master a bit faster, but then I'd let
+them stay in kvm/master, for a day or two of soaking in linux-next.
+It's never happened to me to send broken or conflicting pull requests
+after -rc1, as far as I remember, and it's indeed unlikely, but
+linux-next does provide a little bit of peace of mind.
 
-are available in the Git repository at:
+> He is on CC here.  I'm not sure that it's specifically things not
+> getting merged (well, modulo this one fixing an issue in mainline) -
 
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+I'm indeed not exactly a speed demon, but in this case I specifically
+wanted to make sure to include everything posted before Christmas, as
+this was likely going to be the last PR in the release.
 
-for you to fetch changes up to ef5b28372c565128bdce7a59bc78402a8ce68e1b:
+I also wouldn't have minded a review or tested-by for
+https://www.spinics.net/lists/kvm/msg335755.html :) but in the end I
+included it in the pull request anyway.
 
-  Merge tag 'kvm-riscv-fixes-6.7-1' of https://github.com/kvm-riscv/linux into kvm-master (2023-12-22 18:05:07 -0500)
-
-----------------------------------------------------------------
-RISC-V
-
-- Fix a race condition in updating external interrupt for
-  trap-n-emulated IMSIC swfile
-
-- Fix print_reg defaults in get-reg-list selftest
-
-ARM:
-
-- Ensure a vCPU's redistributor is unregistered from the MMIO bus
-  if vCPU creation fails
-
-- Fix building KVM selftests for arm64 from the top-level Makefile
-
-x86:
-
-- Fix breakage for SEV-ES guests that use XSAVES.
-
-Selftests:
-
-- Fix bad use of strcat(), by not using strcat() at all
-
-----------------------------------------------------------------
-Andrew Jones (1):
-      KVM: riscv: selftests: Fix get-reg-list print_reg defaults
-
-Marc Zyngier (5):
-      KVM: arm64: vgic: Simplify kvm_vgic_destroy()
-      KVM: arm64: vgic: Add a non-locking primitive for kvm_vgic_vcpu_destroy()
-      KVM: arm64: vgic: Force vcpu vgic teardown on vcpu destroy
-      KVM: arm64: vgic: Ensure that slots_lock is held in vgic_register_all_redist_iodevs()
-      KVM: Convert comment into an assertion in kvm_io_bus_register_dev()
-
-Michael Roth (1):
-      KVM: SEV: Do not intercept accesses to MSR_IA32_XSS for SEV-ES guests
-
-Oliver Upton (1):
-      KVM: selftests: Ensure sysreg-defs.h is generated at the expected path
-
-Paolo Bonzini (3):
-      KVM: selftests: Fix dynamic generation of configuration names
-      Merge tag 'kvmarm-fixes-6.7-2' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into kvm-master
-      Merge tag 'kvm-riscv-fixes-6.7-1' of https://github.com/kvm-riscv/linux into kvm-master
-
-Yong-Xuan Wang (1):
-      RISCV: KVM: update external interrupt atomically for IMSIC swfile
-
- arch/arm64/kvm/arm.c                             |  2 +-
- arch/arm64/kvm/vgic/vgic-init.c                  | 55 ++++++++++++++----------
- arch/arm64/kvm/vgic/vgic-mmio-v3.c               |  4 +-
- arch/arm64/kvm/vgic/vgic.h                       |  1 +
- arch/riscv/kvm/aia_imsic.c                       | 13 ++++++
- arch/x86/kvm/svm/sev.c                           | 19 ++++++++
- arch/x86/kvm/svm/svm.c                           |  1 +
- arch/x86/kvm/svm/svm.h                           |  2 +-
- tools/testing/selftests/kvm/Makefile             | 26 ++++++-----
- tools/testing/selftests/kvm/get-reg-list.c       |  9 ++--
- tools/testing/selftests/kvm/riscv/get-reg-list.c | 10 +++--
- virt/kvm/kvm_main.c                              |  3 +-
- 12 files changed, 101 insertions(+), 44 deletions(-)
+Paolo
 
 
