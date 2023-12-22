@@ -1,167 +1,238 @@
-Return-Path: <kvm+bounces-5105-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5106-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F91281C20F
-	for <lists+kvm@lfdr.de>; Fri, 22 Dec 2023 00:44:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56AE581C319
+	for <lists+kvm@lfdr.de>; Fri, 22 Dec 2023 03:30:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E1DB2881A3
-	for <lists+kvm@lfdr.de>; Thu, 21 Dec 2023 23:44:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 488FB1C242F5
+	for <lists+kvm@lfdr.de>; Fri, 22 Dec 2023 02:30:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C57279945;
-	Thu, 21 Dec 2023 23:44:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0545815AA;
+	Fri, 22 Dec 2023 02:30:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UESf6E2n"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="f2Udiv4T"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB4877947F
-	for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 23:44:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a236d77dceeso164159366b.2
-        for <kvm@vger.kernel.org>; Thu, 21 Dec 2023 15:44:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1703202276; x=1703807076; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QYgALaqHaxsIKBoPdNM24Kf+9GYUu7tWwLOH1j6ljO4=;
-        b=UESf6E2nuapnO/93cfBZC6naRm3boMYkXVPonh+ZnJUinJ+lDpZwSCVdeq6CLi3DhW
-         IT1l2KyQMY+m+HME1TJeUiSrERaAZFvty05AmQ/QSTF9E62XAzG0y2iukD3u+TSoUZRS
-         GLWvh2TPZBe4pIR1Os5U14sJlpo/2t/QI4YJlXQFQ7gf63HJb6JwwJdOyB92yB81PrI7
-         I5rhWj/6fKhsL9cTj5CBZd5nFSXAhjsbadmxDMHVvzczXnQZisn3E68Nr5tLddpvg0IR
-         z0qWGIjF2Yxkmoi1oyz+8D+nyihH2gz/ANd/ui49xAn6FelycX3wD4RXuZrAi7KnGjeR
-         m0OQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703202276; x=1703807076;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QYgALaqHaxsIKBoPdNM24Kf+9GYUu7tWwLOH1j6ljO4=;
-        b=M8Ev1wIhHETCWJdRZ0cwn8F6RHgpsZcjcnRMdf4r3OmuD9VabnjnQ6fHcYpRZPPdkM
-         bPN7Tj/X3EsmsNWtVc/LIcvnM7L0WekQftOuj+vqg9hz2za5L3azg1Yu8poGH8oBlDRc
-         AF+UTehRAGHFvgEg3UqL+8kQDUl2UBqIXT+DwQQzya1M+y+6J44ITCtYPsrtWtPgdfFq
-         bOhbSh0MveF+R/Jh4sdrtWUlW+2p+mb6fmED88QXh9jSnGyOf9/2TTkgj/ADiwZw3I+O
-         jpJbRj4+ciKvFbDHs1Sbx08HksY6YKC2oA6XW50py/b/+WFE3el8z62m19JvHO7yOHMe
-         wZtA==
-X-Gm-Message-State: AOJu0YyjtCWk2E4StqCHseklfsCJHoYnIC0kbt0ABs1leETVjywcbUp0
-	/aRL9qcvpDGV53aYs1i+bYzlHp/uE9z88DhSydsh8an2Wqp2
-X-Google-Smtp-Source: AGHT+IF4YnX0GSegTZt10iFN/e+vBJQA9vJmhfDn27MRVIde4Hmgf0/aWtBQ1RkOZ0Yu0ijPN37izKe8CoGFD+mtOmI=
-X-Received: by 2002:a17:906:81d6:b0:a23:526e:4425 with SMTP id
- e22-20020a17090681d600b00a23526e4425mr215040ejx.66.1703202276017; Thu, 21 Dec
- 2023 15:44:36 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFFFF179B2;
+	Fri, 22 Dec 2023 02:30:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1703212243; x=1734748243;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=aQwc/6AH+8eXLpxU1k0LRU2Xq3unMg7R4BPmr6bOZ9c=;
+  b=f2Udiv4TQRxrhhPac+hhYlQWdhoyOjxdAkI6VjoNlsQmfseAmD0ULfLn
+   PjBYR6/58AZDozcTku/8lW+/UEPPIIF44FzD9YHeO0/rA//ka2RtakVfn
+   ZeCLOMlqZRGd94n3N8FtexsS18WsqNy1V7r/3IyEUfscKQRKv4BMRlwGt
+   9gDSieNtwy4ojC4g2baun3lC3VBkxg4ayUPKfnvSlpnSxR2DQz/8/H2iX
+   nKLZM45HrrSlEp2YnvfG4cjQ6FOHT8KQ49zAWRI3cLA7vBJNGqESjAev2
+   5grXYP7t5umb2bLEOQe2B3LtQoyyNc13udx7GDKjpeefrrUSgajTVcQTA
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10931"; a="394961087"
+X-IronPort-AV: E=Sophos;i="6.04,294,1695711600"; 
+   d="scan'208";a="394961087"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Dec 2023 18:30:42 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10931"; a="847316554"
+X-IronPort-AV: E=Sophos;i="6.04,294,1695711600"; 
+   d="scan'208";a="847316554"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmsmga004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 21 Dec 2023 18:30:42 -0800
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 21 Dec 2023 18:30:41 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 21 Dec 2023 18:30:41 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 21 Dec 2023 18:30:41 -0800
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.169)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 21 Dec 2023 18:30:41 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WOSDjlQfpPu+5zzapl6E2xMPCmCvsXC2AvHBfVLQFXNAgXTFEzCnZkEAD0hI6suaGDNdQGPBdIetwb8c1A4xNgXoJtIJrdBRUkFb1Y6Lr5k2dLMbeS1UQH0tif5vUdHm5nsVO08dbPWLITXrSLhF/jkK0HVFyiMEkhKu1lYRrxcc+K22+FaMHURvd6sbGUkUUdRHExm4jKezdQKT1sKZorayYBPeIQx5Xnmed1WL/f54LfESJ+Q14N9/tX8s9K85loDO8swlNKy/uxnC+wYl9XxcN3G74hHYheFUjf15AWaEs/LNJALCvoKeVuIHjwzBuL4+1fvkLTcXvgxT8ncUdA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wIyoyU5pzH6LP7E7QZznJrSZPXhzddKe2OgcxHm6GdM=;
+ b=U8vddERIBY+NhdPARTmfkPP/YqSakg7zkDN+SBb5MIYY59OoA0OiPIZ41TW5IhaztjFyfayrLz/iRM/ElLzUoWumGMJ66PDWaJQX5rResHWN2oL2MRj3BWk4d4sxceOM/figCz0KVtW2SWq1uUjA2XY9zyUKQj28/txzxUYQYp2rCZrcwC9g+wveRWBff5G0lJcVmngqYDLxTqUf+rsMtOIaSpgl5HYg3SM5nTWhUNoO8MXRRhJFwZA0fzjUYLIsM0X8KmoKn5AXI9XAf/HvB0xmobWl7USmfbdVEgiWBEDbRnFm1r4gilrxNDlakgg+F/cKcrqsuLm1lk5XycbdSg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by DM4PR11MB7350.namprd11.prod.outlook.com (2603:10b6:8:105::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7113.21; Fri, 22 Dec
+ 2023 02:30:38 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::e7a4:a757:2f2e:f96a]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::e7a4:a757:2f2e:f96a%3]) with mapi id 15.20.7113.019; Fri, 22 Dec 2023
+ 02:30:38 +0000
+From: "Tian, Kevin" <kevin.tian@intel.com>
+To: "Liu, Yi L" <yi.l.liu@intel.com>, "joro@8bytes.org" <joro@8bytes.org>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>, "jgg@nvidia.com"
+	<jgg@nvidia.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>,
+	"baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>
+CC: "cohuck@redhat.com" <cohuck@redhat.com>, "eric.auger@redhat.com"
+	<eric.auger@redhat.com>, "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mjrosato@linux.ibm.com"
+	<mjrosato@linux.ibm.com>, "chao.p.peng@linux.intel.com"
+	<chao.p.peng@linux.intel.com>, "yi.y.sun@linux.intel.com"
+	<yi.y.sun@linux.intel.com>, "peterx@redhat.com" <peterx@redhat.com>,
+	"jasowang@redhat.com" <jasowang@redhat.com>,
+	"shameerali.kolothum.thodi@huawei.com"
+	<shameerali.kolothum.thodi@huawei.com>, "lulu@redhat.com" <lulu@redhat.com>,
+	"suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "Duan,
+ Zhenzhong" <zhenzhong.duan@intel.com>, "joao.m.martins@oracle.com"
+	<joao.m.martins@oracle.com>, "Zeng, Xin" <xin.zeng@intel.com>, "Zhao, Yan Y"
+	<yan.y.zhao@intel.com>, "j.granados@samsung.com" <j.granados@samsung.com>
+Subject: RE: [PATCH v7 1/9] iommu: Add cache_invalidate_user op
+Thread-Topic: [PATCH v7 1/9] iommu: Add cache_invalidate_user op
+Thread-Index: AQHaNCP0IeMzW8Cr3UyiyyXlg+qo4rC0kdQA
+Date: Fri, 22 Dec 2023 02:30:38 +0000
+Message-ID: <BN9PR11MB5276CE7AE7E2FDA1D8A045298C94A@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20231221153948.119007-1-yi.l.liu@intel.com>
+ <20231221153948.119007-2-yi.l.liu@intel.com>
+In-Reply-To: <20231221153948.119007-2-yi.l.liu@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|DM4PR11MB7350:EE_
+x-ms-office365-filtering-correlation-id: d2602e25-d1e8-4fd7-2e7c-08dc0295fc7a
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: QSDtkjHX3t5oFv3Yr98pGxSImm8mKw2JOZtVKPXV4OkL1QMPx/KfllMGsm2r9a+5j8wkFqfmnLoZM5t8b5KTIDGWp838kwnpbAciK1r2FCuql1C4hmVHrARLGBIIPHWFh01O0GSQrxwnGjOrSAXTpNaGF/T+kuFI6us46yGlk4+hxE+82FR0sKBrx/16gA1X8S21b1jEc2rZMO5QvNWYJ0CVXC3IyitQRvzFB5j+wxzoXp2csJYfXeqFRTGduacg2SVVcdxMSp4lYSIwuzMuTCKoshUKLoeXIUZoCmupS+MK+MjfTJaueMwe2W8PuklItmOVflapAzpPsisi9p2XblO8qkbQLeGGZ62JobVHvqiFELNCUxBeusjcy0yuhbSbGFILfNRcm6ItoFVgmATTIk1xAPmdN2s5iNlxEdwXDgg/kumQnKK+Se+Nm6ruoiay5jbUyM4vkPK+amiigCwyfcwDOLR9owgwXK9zcpXYbm1wU+jyDs33fKX6+fSzK+GSoK63E/xJ5suju1yw7CZCTsctnDakHrLQ0FOW4wpLR+/VD/L6jzQJ2PiRV+mFHArZSqpR3Qt/8FklnDVhLTvTQllOqYfiClYBhy7Lcbud8OoxVRxUTFAO8kt9C1Eq+Zmz
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(39860400002)(396003)(366004)(136003)(376002)(230922051799003)(64100799003)(451199024)(186009)(1800799012)(83380400001)(82960400001)(33656002)(86362001)(41300700001)(122000001)(38100700002)(5660300002)(8676002)(4326008)(8936002)(110136005)(52536014)(316002)(54906003)(64756008)(66556008)(66946007)(76116006)(66446008)(66476007)(9686003)(26005)(478600001)(7416002)(6506007)(7696005)(71200400001)(2906002)(38070700009)(55016003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?zQVFt/ngODD9OLvd6UDBgeKyoy2vw2t2+wqJfzJXkK6L/3kaAA8w2uuJ53t9?=
+ =?us-ascii?Q?MXHhF+MJPcdFNvlAt5jwDe3QMvkKEL5wTieDYXFsOk1vi8uSLXpdF5o5yBb/?=
+ =?us-ascii?Q?SNnzL7sungahGVDfVM3cyGqTBj8MoGfHGtshpgapLsXBoN9YvocqmnxeptyS?=
+ =?us-ascii?Q?HdK3dRRkYBJZD0RHPppg1g+EITc/ZVmOG399rmZ1KJqswCqwvt9llmbynIl3?=
+ =?us-ascii?Q?kUmXMW2JPmxJbW1IW/RJlH/iT3kJK6VQrAmp/5TSTG7uVhau/nVgLX2TtAMp?=
+ =?us-ascii?Q?kVAlYoKX08BtWpIaQV/QxlcCbD6c1sKrjzCice5/4L+w+2F9sa3YTvhtDvSw?=
+ =?us-ascii?Q?URBsr+GVC1tkqH1jBfSXYMdciW3FjOz+QT/NrcdlML815Hxsjjlasd3Hr1tg?=
+ =?us-ascii?Q?p/GAoPJcL/g41Gtmhv+NLpR4I3P1QN3Hq8TlavEeXaYIF296qWJ80dVTyk07?=
+ =?us-ascii?Q?gqCIYHLHx7DARJpt37qD8DXA++L7U8q4kV4t2yNURrxS4aK8PySuZHCgKdA3?=
+ =?us-ascii?Q?laYxZjY3DBsxhte5O0OQ4jAdATf0I2yTDqP4exdG3c3IhH+oXEHcB1W964on?=
+ =?us-ascii?Q?moYJyn5JaGAMVx7o52NWrRqGh+omrBk0xPY4GbCixcntT/Bl1YQU3HsCAClj?=
+ =?us-ascii?Q?sCQVp9t7kW4gpSGyClAma9HklFQRjaEeBprPxVHUO1C/NzvfLu98Tu188X//?=
+ =?us-ascii?Q?MiB92GHtj4b6kcGtwkVdUB3Jw9dbhlVD/jV83R+lVjJIkUSRX9SXLKBjbEDI?=
+ =?us-ascii?Q?YBT/lXmst64iKiSrKFMZSpEDIquWG90nJihKtgaXCy89xpIlxOkZiEjUbVTZ?=
+ =?us-ascii?Q?eAKW1Lt0TbT/dsFijJUGhFfaaWMDWjWlN3uM17TJJ7TIy1CU2E410Ypl5SWr?=
+ =?us-ascii?Q?Jx1AweKSej7gNKBEqthpwnEGFAiGxtxklIgV5S/VRGjdrgmZg8h4TdXMd5cr?=
+ =?us-ascii?Q?JkRB4xH0KRXJfu7fq0tobWTl0uRkiF40wYeMB0zTsdIqpPrTq2gMDe3R//b6?=
+ =?us-ascii?Q?Uzd6QEut8fl0sbhHNj9ArqOwtPdHim+DUtF1W1q5ICx6h0CmHAyUH5aAFOKC?=
+ =?us-ascii?Q?35Fdflu6QCaZiKcWprclQRX3M8FkmwJr6U6/YsuyLIK8QMjvysxrAVh7HB1J?=
+ =?us-ascii?Q?A9bIMGC873rGe5zK7hzHSMv0qDhCQ3k3BUShP90/9batIjVjTDHWyPVk2hjQ?=
+ =?us-ascii?Q?naXgyaDwnE7xqC9CcLT9lpLMb/FXGBzzdw8vfB8vEFVDFWjyym/ELkxUbp65?=
+ =?us-ascii?Q?Q55wElufMoj2IaXP/JXtTiIqdiwHrq5Gehg3PC75SC7npgm6XOjU634MV52r?=
+ =?us-ascii?Q?2XEYyDgYhXp1uAbv98mAB7gEpQKCgLZLpKBOWAuzSZS1RBChP6uN/Uyw2KUL?=
+ =?us-ascii?Q?em/lY0EQgnBUGrLXVI7xe1BuhiDJgnWcINt+VmJxhBwoQaQh0BmzkkcfrgOX?=
+ =?us-ascii?Q?UOyHxHQWa7e+nzvOh3u1l83IZULZf5pf/qlBTGLJP7Ap84n2JONxAjYhnkr6?=
+ =?us-ascii?Q?hfV6ZSzBWPrZ6JBbDyk1qhlrfbpcS/Cuj1v8BaiNI2HPz6v+4JihozTqD71A?=
+ =?us-ascii?Q?EHDVzVmvgPKWvHpdlhX6gsWmhdrFW0HslToUpElU?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231220214505.2303297-1-almasrymina@google.com>
- <20231220214505.2303297-3-almasrymina@google.com> <20231221232343.qogdsoavt7z45dfc@google.com>
-In-Reply-To: <20231221232343.qogdsoavt7z45dfc@google.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 21 Dec 2023 15:44:22 -0800
-Message-ID: <CAHS8izOp_m9SyPjNth-iYBXH2qQQpc9PuZaHbpUL=H0W=CVHgQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 2/3] net: introduce abstraction for network memory
-To: Shakeel Butt <shakeelb@google.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, 
-	David Howells <dhowells@redhat.com>, Jason Gunthorpe <jgg@nvidia.com>, 
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Yunsheng Lin <linyunsheng@huawei.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d2602e25-d1e8-4fd7-2e7c-08dc0295fc7a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Dec 2023 02:30:38.8790
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 77olGAPO1bS/xdDuxGP/9ZexDUIvxujioWM7Ge12G2Sgb2ZC2aaBXmos/7g/k35S47o31H4YC/cTbURTxUFS9Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB7350
+X-OriginatorOrg: intel.com
 
-On Thu, Dec 21, 2023 at 3:23=E2=80=AFPM Shakeel Butt <shakeelb@google.com> =
-wrote:
->
-> On Wed, Dec 20, 2023 at 01:45:01PM -0800, Mina Almasry wrote:
-> > Add the netmem_ref type, an abstraction for network memory.
-> >
-> > To add support for new memory types to the net stack, we must first
-> > abstract the current memory type. Currently parts of the net stack
-> > use struct page directly:
-> >
-> > - page_pool
-> > - drivers
-> > - skb_frag_t
-> >
-> > Originally the plan was to reuse struct page* for the new memory types,
-> > and to set the LSB on the page* to indicate it's not really a page.
-> > However, for compiler type checking we need to introduce a new type.
-> >
-> > netmem_ref is introduced to abstract the underlying memory type. Curren=
-tly
-> > it's a no-op abstraction that is always a struct page underneath. In
-> > parallel there is an undergoing effort to add support for devmem to the
-> > net stack:
-> >
-> > https://lore.kernel.org/netdev/20231208005250.2910004-1-almasrymina@goo=
-gle.com/
-> >
-> > Signed-off-by: Mina Almasry <almasrymina@google.com>
-> >
-> > ---
-> >
-> > v3:
-> >
-> > - Modify struct netmem from a union of struct page + new types to an op=
-aque
-> >   netmem_ref type.  I went with:
-> >
-> >   +typedef void *__bitwise netmem_ref;
-> >
-> >   rather than this that Jakub recommended:
-> >
-> >   +typedef unsigned long __bitwise netmem_ref;
-> >
-> >   Because with the latter the compiler issues warnings to cast NULL to
-> >   netmem_ref. I hope that's ok.
-> >
->
-> Can you share what the warning was? You might just need __force
-> attribute. However you might need this __force a lot. I wonder if you
-> can just follow struct encoded_page example verbatim here.
->
+> From: Liu, Yi L <yi.l.liu@intel.com>
+> Sent: Thursday, December 21, 2023 11:40 PM
+>=20
+> From: Lu Baolu <baolu.lu@linux.intel.com>
+>=20
+> The updates of the PTEs in the nested page table will be propagated to th=
+e
+> hardware caches on both IOMMU (IOTLB) and devices (DevTLB/ATC).
 
-The warning is like so:
+this is incorrect. the scope of this cmd is driver specific.
 
-./include/net/page_pool/helpers.h: In function =E2=80=98page_pool_alloc=E2=
-=80=99:
-./include/linux/stddef.h:8:14: warning: returning =E2=80=98void *=E2=80=99 =
-from a
-function with return type =E2=80=98netmem_ref=E2=80=99 {aka =E2=80=98long u=
-nsigned int=E2=80=99} makes
-integer from pointer without a cast [-Wint-conversion]
-    8 | #define NULL ((void *)0)
-      |              ^
-./include/net/page_pool/helpers.h:132:24: note: in expansion of macro
-=E2=80=98NULL=E2=80=99
-  132 |                 return NULL;
-      |                        ^~~~
+>=20
+> Add a new domain op cache_invalidate_user for the userspace to flush the
+> hardware caches for a nested domain through iommufd. No wrapper for it,
+> as it's only supposed to be used by iommufd. Then, pass in invalidation
+> requests in form of a user data array conatining a number of invalidation
+> data entries.
+>=20
+> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> ---
+>  include/linux/iommu.h | 27 +++++++++++++++++++++++++++
+>  1 file changed, 27 insertions(+)
+>=20
+> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> index 6291aa7b079b..5c4a17f13761 100644
+> --- a/include/linux/iommu.h
+> +++ b/include/linux/iommu.h
+> @@ -284,6 +284,24 @@ struct iommu_user_data {
+>  	size_t len;
+>  };
+>=20
+> +/**
+> + * struct iommu_user_data_array - iommu driver specific user space data
+> array
+> + * @type: The data type of all the entries in the user buffer array
+> + * @uptr: Pointer to the user buffer array for copy_from_user()
 
-And happens in all the code where:
+remove 'for copy_from_user();
 
-netmem_ref func()
-{
-    return NULL;
-}
+> + * @entry_len: The fixed-width length of a entry in the array, in bytes
 
-It's fixable by changing the return to `return (netmem_ref NULL);` or
-`return 0;`, but I feel like netmem_ref should be some type which
-allows a cast from NULL implicitly.
+s/a/an/
 
-Also as you (and patchwork) noticed, __bitwise should not be used with
-void*; it's only meant for integer types. Sorry I missed that in the
-docs and was not running make C=3D2.
+> + * @entry_num: The number of total entries in the array
+> + *
+> + * A array having a @entry_num number of @entry_len sized entries, each
 
---=20
-Thanks,
-Mina
+the first sentence is redundant.
+
+> entry is
+> + * user space data, an uAPI defined in include/uapi/linux/iommufd.h wher=
+e
+> @type
+> + * is also defined as enum iommu_xyz_data_type.
+
+I'd just say:
+
+"The user buffer includes an array of requests with format defined=20
+in include/uapi/linux/iommufd.h"
+
 
