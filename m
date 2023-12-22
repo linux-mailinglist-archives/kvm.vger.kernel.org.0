@@ -1,100 +1,124 @@
-Return-Path: <kvm+bounces-5128-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5127-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFAAD81C6A5
-	for <lists+kvm@lfdr.de>; Fri, 22 Dec 2023 09:30:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A70F81C6A0
+	for <lists+kvm@lfdr.de>; Fri, 22 Dec 2023 09:29:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7286D1F2644F
-	for <lists+kvm@lfdr.de>; Fri, 22 Dec 2023 08:30:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D406F1F263CB
+	for <lists+kvm@lfdr.de>; Fri, 22 Dec 2023 08:29:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DACECCA65;
-	Fri, 22 Dec 2023 08:30:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9503ED314;
+	Fri, 22 Dec 2023 08:29:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b4nlJEgg"
 X-Original-To: kvm@vger.kernel.org
-Received: from sgoci-sdnproxy-4.icoremail.net (sgoci-sdnproxy-4.icoremail.net [129.150.39.64])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C36FD2E0
-	for <kvm@vger.kernel.org>; Fri, 22 Dec 2023 08:30:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
-Received: from duchao$eswincomputing.com ( [123.139.59.82] ) by
- ajax-webmail-app2 (Coremail) ; Fri, 22 Dec 2023 16:28:12 +0800 (GMT+08:00)
-Date: Fri, 22 Dec 2023 16:28:12 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: "Chao Du" <duchao@eswincomputing.com>
-To: "Anup Patel" <apatel@ventanamicro.com>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, anup@brainfault.org, 
-	atishp@atishpatra.org, dbarboza@ventanamicro.com, 
-	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu
-Subject: Re: [RFC PATCH 0/3] RISC-V: KVM: Guest Debug Support
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT6.0.3 build 20220420(169d3f8c)
- Copyright (c) 2002-2023 www.mailtech.cn
- mispb-72143050-eaf5-4703-89e0-86624513b4ce-eswincomputing.com
-In-Reply-To: <CAK9=C2Wfv7=fCitUdjBpC9=0icN82Bb+9p1-Gq5ha8o9v13nEg@mail.gmail.com>
-References: <20231221095002.7404-1-duchao@eswincomputing.com>
- <CAK9=C2Wfv7=fCitUdjBpC9=0icN82Bb+9p1-Gq5ha8o9v13nEg@mail.gmail.com>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E749C8C8
+	for <kvm@vger.kernel.org>; Fri, 22 Dec 2023 08:29:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1703233749;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+1/Sz19OR6XWaD99Hs0XiYIWs6pPYgQ5leaKhAq6DJY=;
+	b=b4nlJEggy78sDx6v1o9eyjy8xlaWS3GpPlvTg0nEjetA01XPv53lY2aQLc+KemGseARCeQ
+	Ten+JzlHR7XyR8WP3+MU5ov8MFPXbzOdKvHd8o4sO+zp2WsLoRzlh3VHMv9qj4Wa7iHeyQ
+	5h0hiRf89qFS83zAk2rvWn/G9You0aY=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-451-WrUnyihzMMSMTdxty7oAuA-1; Fri, 22 Dec 2023 03:29:07 -0500
+X-MC-Unique: WrUnyihzMMSMTdxty7oAuA-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-40d1ffbc3b8so14569035e9.0
+        for <kvm@vger.kernel.org>; Fri, 22 Dec 2023 00:29:07 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703233746; x=1703838546;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+1/Sz19OR6XWaD99Hs0XiYIWs6pPYgQ5leaKhAq6DJY=;
+        b=f11ESR9USyjgMDfhaTTq0EiOG7pwqu3pPPoVQxUhjPg0Pe/hrpLgIKpYfsngs+9Y8z
+         5oG+NvLvZah8HjzAF5+trW7zERetqk2hzp6CK0W9ivrBTKjoE7qf2Qt4ZNjr1yP1T/i3
+         VC/AykkixOnWpmO57r5wVGs7sgPT1E2w1kLWkguYDmBOqcNCutYGIZOjrze0HYp7iAWW
+         sCYJSValH9X8MWeCji1X1Zf+l4rb90IxiwUcImRSz0G1be+dGczIqAE5xKRyCjTney5I
+         KEZkkrEJH4uR3DJL4DpcpSbmgovkFSWZ2Sdt8xL2PwjJW12Q1X/vVON5fBhxEzHfQCdz
+         fMpA==
+X-Gm-Message-State: AOJu0YxlOblbYkIp+G7Q+P/ITMnHcZBHmIfstjpY79XoYzd+M4V5qBzj
+	g6eqpkSBz6jnR8IihvALz5arYsCHGTJfPaujcsb3oQ0Jp7iNykh99NuXlk/n5obriEczunvDrUR
+	u7KHZZHa/eaeEQTfG2z8V
+X-Received: by 2002:a05:600c:5248:b0:40d:494a:cb9 with SMTP id fc8-20020a05600c524800b0040d494a0cb9mr60321wmb.62.1703233746653;
+        Fri, 22 Dec 2023 00:29:06 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGQLIJ3jovK0TTr+qKYudLCC16A8aoY3e2L7y+gdkeb2YLR6dNadO38fME4r6D9zWksyIN5kQ==
+X-Received: by 2002:a05:600c:5248:b0:40d:494a:cb9 with SMTP id fc8-20020a05600c524800b0040d494a0cb9mr60308wmb.62.1703233746369;
+        Fri, 22 Dec 2023 00:29:06 -0800 (PST)
+Received: from redhat.com ([2.55.177.189])
+        by smtp.gmail.com with ESMTPSA id m17-20020adffe51000000b003364a0e6983sm3731542wrs.62.2023.12.22.00.29.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Dec 2023 00:29:05 -0800 (PST)
+Date: Fri, 22 Dec 2023 03:29:02 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: "eperezma@redhat.com" <eperezma@redhat.com>,
+	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>,
+	Parav Pandit <parav@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	"virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"si-wei.liu@oracle.com" <si-wei.liu@oracle.com>,
+	"jasowang@redhat.com" <jasowang@redhat.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	"leon@kernel.org" <leon@kernel.org>
+Subject: Re: [PATCH vhost v4 02/15] vdpa: Add
+ VHOST_BACKEND_F_CHANGEABLE_VQ_ADDR_IN_SUSPEND flag
+Message-ID: <20231222032713-mutt-send-email-mst@kernel.org>
+References: <CACGkMEv7xQkZYJAgAUK6C3oUrZ9vuUJdTKRzihXcNPb-iWdpJw@mail.gmail.com>
+ <CACGkMEsaaDGi63__YrvsTC1HqgTaEWHvGokK1bJS5+m1XYM-6w@mail.gmail.com>
+ <CAJaqyWdoaj8a7q1KrGqWmkYvAw_R_p0utcWvDvkyVm1nUOAxrA@mail.gmail.com>
+ <CACGkMEuM7bXxsxHUs_SodiDQ2+akrLqqzWZBJSZEcnMASUkb+g@mail.gmail.com>
+ <CAJaqyWeBVVcTZEzZK=63Ymk85wnRFd+_wK56UfEHNXBH-qy1Zg@mail.gmail.com>
+ <70adc734331c1289dceb3bcdc991f3da7e4db2f0.camel@nvidia.com>
+ <CAJaqyWeUHiZXMFkNBpinCsJAXojtPkGz+SjzUNDPx5W=qqON1w@mail.gmail.com>
+ <c03eb2bb3ad76e28be2bb9b9e4dee4c3bc062ea7.camel@nvidia.com>
+ <CAJaqyWevZX5TKpaLiJwu2nD7PHFsHg+TEZ=iPdWvrH4jyPV+cA@mail.gmail.com>
+ <17abeefd02c843cddf64efbeadde49ad15c365a1.camel@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <19434eff.1deb.18c90a3a375.Coremail.duchao@eswincomputing.com>
-X-Coremail-Locale: en_US
-X-CM-TRANSID:TQJkCgBX5tScSIVlKrMCAA--.2850W
-X-CM-SenderInfo: xgxfxt3r6h245lqf0zpsxwx03jof0z/1tbiAQENDGWEWng11AACsh
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <17abeefd02c843cddf64efbeadde49ad15c365a1.camel@nvidia.com>
 
-T24gMjAyMy0xMi0yMSAyMTowMSwgQW51cCBQYXRlbCA8YXBhdGVsQHZlbnRhbmFtaWNyby5jb20+
-IHdyb3RlOgo+IAo+IE9uIFRodSwgRGVjIDIxLCAyMDIzIGF0IDM6MjHigK9QTSBDaGFvIER1IDxk
-dWNoYW9AZXN3aW5jb21wdXRpbmcuY29tPiB3cm90ZToKPiA+Cj4gPiBUaGlzIHNlcmllcyBpbXBs
-ZW1lbnRzIEtWTSBHdWVzdCBEZWJ1ZyBvbiBSSVNDLVYuIEN1cnJlbnRseSwgd2UgY2FuCj4gPiBk
-ZWJ1ZyBSSVNDLVYgS1ZNIGd1ZXN0IGZyb20gdGhlIGhvc3Qgc2lkZSwgd2l0aCBzb2Z0d2FyZSBi
-cmVha3BvaW50cy4KPiA+Cj4gPiBBIGJyaWVmIHRlc3Qgd2FzIGRvbmUgb24gUUVNVSBSSVNDLVYg
-aHlwZXJ2aXNvciBlbXVsYXRvci4KPiA+Cj4gPiBBIFRPRE8gbGlzdCB3aGljaCB3aWxsIGJlIGFk
-ZGVkIGxhdGVyOgo+ID4gMS4gSFcgYnJlYWtwb2ludHMgc3VwcG9ydAo+ID4gMi4gVGVzdCBjYXNl
-cwo+IAo+IEhpbWFuc2h1IGhhcyBhbHJlYWR5IGRvbmUgdGhlIGNvbXBsZXRlIEhXIGJyZWFrcG9p
-bnQgaW1wbGVtZW50YXRpb24KPiBpbiBPcGVuU0JJLCBMaW51eCBSSVNDLVYsIGFuZCBLVk0gUklT
-Qy1WLiBUaGlzIGlzIGJhc2VkIG9uIHRoZSB1cGNvbWluZwo+IFNCSSBkZWJ1ZyB0cmlnZ2VyIGV4
-dGVuc2lvbiBkcmFmdCBwcm9wb3NhbC4KPiAoUmVmZXIsIGh0dHBzOi8vbGlzdHMucmlzY3Yub3Jn
-L2cvdGVjaC1kZWJ1Zy9tZXNzYWdlLzEyNjEpCj4gCj4gVGhlcmUgYXJlIGFsc28gUklTRSBwcm9q
-ZWN0cyB0byB0cmFjayB0aGVzZSBlZmZvcnRzOgo+IGh0dHBzOi8vd2lraS5yaXNlcHJvamVjdC5k
-ZXYvcGFnZXMvdmlld3BhZ2UuYWN0aW9uP3BhZ2VJZD0zOTQ1NDEKPiBodHRwczovL3dpa2kucmlz
-ZXByb2plY3QuZGV2L3BhZ2VzL3ZpZXdwYWdlLmFjdGlvbj9wYWdlSWQ9Mzk0NTQ1Cj4gCj4gQ3Vy
-cmVudGx5LCB3ZSBhcmUgaW4gdGhlIHByb2Nlc3Mgb2YgdXBzdHJlYW1pbmcgdGhlIE9wZW5TQkkg
-c3VwcG9ydAo+IGZvciBTQkkgZGVidWcgdHJpZ2dlciBleHRlbnNpb24uIFRoZSBMaW51eCBSSVND
-LVYgYW5kIEtWTSBSSVNDLVYKPiBwYXRjaGVzIHJlcXVpcmUgU0JJIGRlYnVnIHRyaWdnZXIgZXh0
-ZW5zaW9uIGFuZCBTZHRyaWcgZXh0ZW5zaW9uIHRvCj4gYmUgZnJvemVuIHdoaWNoIHdpbGwgaGFw
-cGVuIG5leHQgeWVhciAyMDI0Lgo+IAo+IFJlZ2FyZHMsCj4gQW51cAo+IAoKSGkgQW51cCwKClRo
-YW5rIHlvdSBmb3IgdGhlIGluZm9ybWF0aW9uIGFuZCB5b3VyIGdyZWF0IHdvcmsgb24gdGhlIFNC
-SQpEZWJ1ZyBUcmlnZ2VyIEV4dGVuc2lvbiBwcm9wb3NhbC4KClNvIEkgdGhpbmsgdGhhdCAnSFcg
-YnJlYWtwb2ludHMgc3VwcG9ydCcgaW4gdGhlIGFib3ZlIFRPRE8gbGlzdAp3aWxsIGJlIHRha2Vu
-IGNhcmUgb2YgYnkgSGltYW5zaHUgZm9sbG93aW5nIHRoZSBleHRlbnNpb24gcHJvcG9zYWwuCgpP
-biB0aGUgb3RoZXIgaGFuZCwgaWYgSSB1bmRlcnN0YW5kIGNvcnJlY3RseSwgdGhlIHNvZnR3YXJl
-CmJyZWFrcG9pbnQgcGFydCBvZiBLVk0gR3Vlc3QgRGVidWcgaGFzIG5vIGRlcGVuZGVuY3kgb24g
-dGhlIG5ldwpleHRlbnNpb24gc2luY2UgaXQgZG9lcyBub3QgdXNlIHRoZSB0cmlnZ2VyIG1vZHVs
-ZS4gSnVzdCBhbgplYnJlYWsgc3Vic3RpdHV0aW9uIGlzIG1hZGUuCgpTbyBtYXkgSSBrbm93IHlv
-dXIgc3VnZ2VzdGlvbiBhYm91dCB0aGlzIFJGQz8gQm90aCBpbiBLVk0gYW5kIFFFTVUuCgpSZWdh
-cmRzLApDaGFvCgo+ID4KPiA+IFRoaXMgc2VyaWVzIGlzIGJhc2VkIG9uIExpbnV4IDYuNy1yYzYg
-YW5kIGlzIGFsc28gYXZhaWxhYmxlIGF0Ogo+ID4gaHR0cHM6Ly9naXRodWIuY29tL0R1LUNoYW8v
-bGludXgvdHJlZS9yaXNjdl9nZF9zdwo+ID4KPiA+IFRoZSBtYXRjaGVkIFFFTVUgaXMgYXZhaWxh
-YmxlIGF0Ogo+ID4gaHR0cHM6Ly9naXRodWIuY29tL0R1LUNoYW8vcWVtdS90cmVlL3Jpc2N2X2dk
-X3N3Cj4gPgo+ID4gQ2hhbyBEdSAoMyk6Cj4gPiAgIFJJU0MtVjogS1ZNOiBFbmFibGUgdGhlIEtW
-TV9DQVBfU0VUX0dVRVNUX0RFQlVHIGNhcGFiaWxpdHkKPiA+ICAgUklTQy1WOiBLVk06IEltcGxl
-bWVudCBrdm1fYXJjaF92Y3B1X2lvY3RsX3NldF9ndWVzdF9kZWJ1ZygpCj4gPiAgIFJJU0MtVjog
-S1ZNOiBIYW5kbGUgYnJlYWtwb2ludCBleGl0cyBmb3IgVkNQVQo+ID4KPiA+ICBhcmNoL3Jpc2N2
-L2luY2x1ZGUvdWFwaS9hc20va3ZtLmggfCAgMSArCj4gPiAgYXJjaC9yaXNjdi9rdm0vdmNwdS5j
-ICAgICAgICAgICAgIHwgMTUgKysrKysrKysrKysrKy0tCj4gPiAgYXJjaC9yaXNjdi9rdm0vdmNw
-dV9leGl0LmMgICAgICAgIHwgIDQgKysrKwo+ID4gIGFyY2gvcmlzY3Yva3ZtL3ZtLmMgICAgICAg
-ICAgICAgICB8ICAxICsKPiA+ICA0IGZpbGVzIGNoYW5nZWQsIDE5IGluc2VydGlvbnMoKyksIDIg
-ZGVsZXRpb25zKC0pCj4gPgo+ID4gLS0KPiA+IDIuMTcuMQo+ID4KPiA+Cj4gPiAtLQo+ID4ga3Zt
-LXJpc2N2IG1haWxpbmcgbGlzdAo+ID4ga3ZtLXJpc2N2QGxpc3RzLmluZnJhZGVhZC5vcmcKPiA+
-IGh0dHA6Ly9saXN0cy5pbmZyYWRlYWQub3JnL21haWxtYW4vbGlzdGluZm8va3ZtLXJpc2N2Cg==
+On Thu, Dec 21, 2023 at 03:07:22PM +0000, Dragos Tatulea wrote:
+> > > > In that case you're right, we don't need feature flags. But I think it
+> > > > would be great to also move the error return in case userspace tries
+> > > > to modify vq parameters out of suspend state.
+> > > > 
+> > > On the driver side or on the core side?
+> > > 
+> > 
+> > Core side.
+> > 
+> Checking my understanding: instead of the feature flags there would be a check
+> (for .set_vq_addr and .set_vq_state) to return an error if they are called under
+> DRIVER_OK and not suspended state?
+
+Yea this looks much saner, if we start adding feature flags for
+each OPERATION_X_LEGAL_IN_STATE_Y then we will end up with N^2
+feature bits which is not reasonable.
+
+-- 
+MST
 
 
