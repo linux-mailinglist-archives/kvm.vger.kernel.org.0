@@ -1,98 +1,125 @@
-Return-Path: <kvm+bounces-5195-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5196-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A21F81D6C5
-	for <lists+kvm@lfdr.de>; Sat, 23 Dec 2023 23:16:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD94F81D6C6
+	for <lists+kvm@lfdr.de>; Sat, 23 Dec 2023 23:16:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 963591F21F53
-	for <lists+kvm@lfdr.de>; Sat, 23 Dec 2023 22:16:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88D4A282799
+	for <lists+kvm@lfdr.de>; Sat, 23 Dec 2023 22:16:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F69A18B19;
-	Sat, 23 Dec 2023 22:16:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 198E41D53A;
+	Sat, 23 Dec 2023 22:16:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="Tv16erDt"
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="NKWzPgU2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0007179A1
-	for <kvm@vger.kernel.org>; Sat, 23 Dec 2023 22:16:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 926F118B1E
+	for <kvm@vger.kernel.org>; Sat, 23 Dec 2023 22:16:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1d444cfaf1eso2074435ad.2
-        for <kvm@vger.kernel.org>; Sat, 23 Dec 2023 14:16:19 -0800 (PST)
+Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-35fe8a4b311so5571985ab.1
+        for <kvm@vger.kernel.org>; Sat, 23 Dec 2023 14:16:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1703369778; x=1703974578; darn=vger.kernel.org;
-        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=P7VJMhhbMRf00CrlObhvHa2SrW+r4qHlm+dnHCATGv8=;
-        b=Tv16erDtZYqlrmPhw50DNJ2I6qW9vFcTw3oK94CryQ7uK+Nl4YTZ4tbA1QJhoXsGsD
-         0xT3MNcfZa1tXHcN8WDPDxkcaDdqc1XLx5+w+5YdvhX4+sJwvTkHlg9EISrshrXTALKr
-         tdOQ+IuUU0+BYktidT6QAMUPyAXOM6Nv1qstzrHKxxLnu786w0XIofUXylGxrUaMgb+m
-         i4NSXzFnVeuVfKlzzQv8Xh40XygG4qlsgyoDNOaxnLronTOp8KklJILiqXqVGphzyFRd
-         tVzJeMUXW2xbt6ZRdgbdg3jhie5i+BC1BXygInj0CJTn0KXLyHJ+zMA6pI5RB/WhJnVF
-         p46A==
+        d=purestorage.com; s=google2022; t=1703369781; x=1703974581; darn=vger.kernel.org;
+        h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=1ac2xR3b7E+AlQD1/HjNzYkoX3E0xeS+J4+7zILaP4s=;
+        b=NKWzPgU2rmM9eqcFr95GJlijfQrg0YtoBcQA/14eDBRDa3QemEOgpGIEMo2UtvP0V3
+         b+aPkqoVxMY0NcdZnz6t2c1AY0Kn8QV6UzGPlyV9jVRqsz1C1+UlE9AploQquVXYGHY2
+         +Nmt1DNooJbq3mkGCV9lw85/DyYIGWW4Bp6lKzV1N7AKUnJhl7jQ5w63qVNLGpkJ1QAM
+         unrcQXZ3zRJiAUHlYqxxgcCs+iTVhmj0pBJGZyoGnvVXX6xlfP+0dhrhhKkKeaYa26u/
+         mQjB5jBliMtK/bDDDhApvF4GIZMTxhDVDA4crMv/Dxw6+RxvcNlL7UhWDopBEUE07gp4
+         xZPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703369778; x=1703974578;
-        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=P7VJMhhbMRf00CrlObhvHa2SrW+r4qHlm+dnHCATGv8=;
-        b=d2PI09eeghg45oVhogj7vKY6Ek8FFGKfxD5tIftC5UKCUMeh3saulv0HIotC5DiYl6
-         w8ETxMj4T+8nGOLQvkoIv/Jxmgf1EzaY1O1U3cRia6oLKPt6gax8298Puo9ioubaOHhd
-         DsU1XmYxLYALWhDZbVf4UB3sOf9VjF0CqzemVda+MvgwyLkfFC9viAmvkfO/gZ4jeE6N
-         vOhCjKbVdrVp5yYyVSkmj6jhzTNPF9BqcTyJTb8R9bi2aqA+gHMtMnpZRMHc9wJQw9a+
-         /Lv0EXkLqo/y/lYNU2houNZwekXLMu5N20bhm5HCcwSAtegCD3eDkT0hpOqiWB0v/v+G
-         JiRA==
-X-Gm-Message-State: AOJu0YwBHRvRBx294UziuBgl93mTvwTU3+tB2QcUmUpA/QwhfWv+XirH
-	T4V14ruy97ZMwWKzSVcWlcxm7UT/pF4VFXKD9ME0NXRmbsuPB0QD2BpqzcTXc/yl1pPoJktZUWP
-	tHQy+MeLIo1/pTSlTlAqFww703QUNKeCX9StEgaR31Qcig4mieHjtAz0urFkMNMLOJkejZNEaYk
-	MMf6Nj
-X-Google-Smtp-Source: AGHT+IHbslIRh1roZhPzl2qcJRrr8D/OTWjikaghk+SKPQvS4S/HYLSCuvapBqPtNp8R8a6MbHpJPQ==
-X-Received: by 2002:a17:902:d382:b0:1d3:9060:62a7 with SMTP id e2-20020a170902d38200b001d3906062a7mr3615486pld.35.1703369778158;
-        Sat, 23 Dec 2023 14:16:18 -0800 (PST)
+        d=1e100.net; s=20230601; t=1703369781; x=1703974581;
+        h=references:in-reply-to:message-id:date:subject:cc:to:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1ac2xR3b7E+AlQD1/HjNzYkoX3E0xeS+J4+7zILaP4s=;
+        b=to+F6CSnIaBeHMYH0jPvxzz4iqpV2e/V1gdwYrRtEYZxSNjCIq3ZsSr2kUzH0cue0U
+         KA2yt1LoaXvL9SHmAKsao0+nlslhuv+8qJ/NtnkTZN5a9cu1iz75bNZu4hAD3AG+KBy+
+         4veJ/iDcHHmL0d2M8SKjH+/vfvG5JgYJBoP0zPSh4FM8nF0n8jfFu7hoWBWQh3gR0L3Y
+         EpkAznWtjphbO3a3Ad1YnPLCTLMTDfeNdyOjf7xhgCe2JItBgznNg0e4H7tVHXxu3xRF
+         rNS98uXcevGKZ7+Cd4nKopMOF/vLGDEu93WDhDvhXxF8eRPH/7y8QMBcc+nS+lcGawmz
+         XmXA==
+X-Gm-Message-State: AOJu0YzKndQap25JW//LIkPFG1abGfqIHYs2o9J8ZESAk0wL3b8e9zuz
+	6GKo9TGXVGo26+d4PQzo2wE3YBltiGuvGntjNujknZdOicZ+qTHUYeVKIZ1wkzz8cWbkaSDJAbT
+	vbCdThCZBbkr8oht0cn/mJvYz70MolXTovETfurSf45A8CDTyltWH+Qi+hWBNshCo372K/+Dh6X
+	cuxUjD
+X-Google-Smtp-Source: AGHT+IEo1k26R6WgAaL7ZvhvoX+xx5B7KtTwd6q4UOQqfMNbQgIioQE/5HcAA8Hllpx86c5STlrOUQ==
+X-Received: by 2002:a05:6e02:16ce:b0:35f:a1c8:a6e1 with SMTP id 14-20020a056e0216ce00b0035fa1c8a6e1mr5132328ilx.58.1703369781272;
+        Sat, 23 Dec 2023 14:16:21 -0800 (PST)
 Received: from dev-mattc2.dev.purestorage.com ([208.88.159.129])
-        by smtp.googlemail.com with ESMTPSA id hf17-20020a17090aff9100b0028c2b52d132sm1817925pjb.13.2023.12.23.14.16.17
+        by smtp.googlemail.com with ESMTPSA id hf17-20020a17090aff9100b0028c2b52d132sm1817925pjb.13.2023.12.23.14.16.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 23 Dec 2023 14:16:17 -0800 (PST)
+        Sat, 23 Dec 2023 14:16:20 -0800 (PST)
 From: Matthew W Carlis <mattc@purestorage.com>
 To: kvm@vger.kernel.org,
 	alex.williamson@redhat.com,
 	jgg@nvidia.com
 Cc: Matthew W Carlis <mattc@purestorage.com>
 Subject: [PATCH 1/1] vfio/pci: Log/indicate devices being bound & unbound.
-Date: Sat, 23 Dec 2023 15:16:11 -0700
-Message-Id: <20231223221612.35998-1-mattc@purestorage.com>
+Date: Sat, 23 Dec 2023 15:16:12 -0700
+Message-Id: <20231223221612.35998-2-mattc@purestorage.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20231223221612.35998-1-mattc@purestorage.com>
+References: <20231223221612.35998-1-mattc@purestorage.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 
-Most of my thinking/motivation for this is in the patch notes. The change
-itself is straightforward, we would like to have some record of
-when a device is bound or unbound in order to trace back to the time
-when it happened.
+We often would like to know when a device is unbound or bound
+to vfio. Since I have a belief that such events should be
+infrequent & in low volume; after this change the driver
+will log when it decides to bind and unbind a device.
 
-Example from dmesg on 6.6.1 kernel:
+vfio-pci doesn't log when it binds to a device or is unbound
+from a device. There may be logging from vfio when a device
+is opened or closed by some user process which is good, but
+even when the device is never opened vfio may have taken some
+action as a result of binding. One such example might be
+putting it into D3 low power state.
 
-[    9.935877] vfio-pci 0000:63:00.0: binding to vfio control
-[    9.936890] vfio-pci 0000:e1:00.0: binding to vfio control
-[    9.937616] vfio-pci 0000:63:00.1: binding to vfio control
-[    9.938201] vfio-pci 0000:e1:00.1: binding to vfio control
+Additionally, the lifecycle of some applications that use
+vfio-pci may be infrequent or defered for a significant time.
+We have found that some third party tools or perhaps ignorant
+super-users may choose to bind or unbind devices with a fairly
+inexplicit policy leaving applictions that might have wanted
+to use a device confused about its absence from vfio.
 
-
-Matthew W Carlis (1):
-  vfio/pci: Log/indicate devices being bound & unbound.
-
+Signed-Off-by: Matthew W Carlis <mattc@purestorage.com>
+---
  drivers/vfio/pci/vfio_pci_core.c | 4 ++++
  1 file changed, 4 insertions(+)
 
-
-base-commit: ceb6a6f023fd3e8b07761ed900352ef574010bcb
+diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+index 1929103ee59a..3e463a7d25f9 100644
+--- a/drivers/vfio/pci/vfio_pci_core.c
++++ b/drivers/vfio/pci/vfio_pci_core.c
+@@ -2265,6 +2265,8 @@ int vfio_pci_core_register_device(struct vfio_pci_core_device *vdev)
+ 	ret = vfio_register_group_dev(&vdev->vdev);
+ 	if (ret)
+ 		goto out_power;
++
++	pci_info(pdev, "binding to vfio control\n");
+ 	return 0;
+ 
+ out_power:
+@@ -2291,6 +2293,8 @@ void vfio_pci_core_unregister_device(struct vfio_pci_core_device *vdev)
+ 		pm_runtime_get_noresume(&vdev->pdev->dev);
+ 
+ 	pm_runtime_forbid(&vdev->pdev->dev);
++
++	pci_info(vdev->pdev, "unbinding from vfio control\n");
+ }
+ EXPORT_SYMBOL_GPL(vfio_pci_core_unregister_device);
+ 
 -- 
 2.17.1
 
