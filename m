@@ -1,154 +1,354 @@
-Return-Path: <kvm+bounces-5198-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5199-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDF4F81DB5A
-	for <lists+kvm@lfdr.de>; Sun, 24 Dec 2023 17:27:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 794E581DD77
+	for <lists+kvm@lfdr.de>; Mon, 25 Dec 2023 02:51:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D0921F21598
-	for <lists+kvm@lfdr.de>; Sun, 24 Dec 2023 16:27:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8F169B20DEE
+	for <lists+kvm@lfdr.de>; Mon, 25 Dec 2023 01:51:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4273BCA7B;
-	Sun, 24 Dec 2023 16:27:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 874267F1;
+	Mon, 25 Dec 2023 01:51:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GRdqEg9I"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AuTPV7Pj"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 687ABCA64;
-	Sun, 24 Dec 2023 16:27:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53F83C433C8;
-	Sun, 24 Dec 2023 16:27:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703435236;
-	bh=4ed1q4p7tlBLnSJbNqgVjswznxS7kod3elBEnjU5yxo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GRdqEg9IiABX3469J7q+sQkjwWvIb4y1DPXKHBaYjkuvJZ01mkU2W22sitpqH9mRN
-	 /3NgiHW4ArdsDR5jRuB21ar4nlsMPJp9Mhw3p0tfZSKObn7wULvn2ImIRHg5y4Ievu
-	 fMwQb/mqzlY6gGPz5NyCIfZwyyBOUjC8exN40HEttOerPRyF5CKkteeCUUItnKQf/L
-	 EPqAHC0YxjuwhCnMCqhsxGPwlNTn/HMznD4anYpQ5C8lDGlF1LTwcE+tkiQQfkBF3w
-	 KAn+F/zZgtNKk4LDDcqevr9uzsyXNWkIIoWQeUHD9I7kwXsGJqiiprHEXqR9XOL+Jl
-	 PVAV+FVdVEuNQ==
-Date: Sun, 24 Dec 2023 16:27:09 +0000
-From: Simon Horman <horms@kernel.org>
-To: Peter Hilber <peter.hilber@opensynergy.com>
-Cc: linux-kernel@vger.kernel.org,
-	"D, Lakshmi Sowjanya" <lakshmi.sowjanya.d@intel.com>,
-	Thomas Gleixner <tglx@linutronix.de>, jstultz@google.com,
-	giometti@enneenne.com, corbet@lwn.net,
-	andriy.shevchenko@linux.intel.com,
-	"Dong, Eddie" <eddie.dong@intel.com>,
-	"Hall, Christopher S" <christopher.s.hall@intel.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Wanpeng Li <wanpengli@tencent.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <maz@kernel.org>,
-	Daniel Lezcano <daniel.lezcano@linaro.org>,
-	Richard Cochran <richardcochran@gmail.com>, kvm@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [RFC PATCH v2 2/7] x86/tsc: Add clocksource ID, set
- system_counterval_t.cs_id
-Message-ID: <20231224162709.GA230301@kernel.org>
-References: <20231215220612.173603-1-peter.hilber@opensynergy.com>
- <20231215220612.173603-3-peter.hilber@opensynergy.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4747863F
+	for <kvm@vger.kernel.org>; Mon, 25 Dec 2023 01:51:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1703469090; x=1735005090;
+  h=message-id:date:mime-version:subject:to:references:from:
+   in-reply-to:content-transfer-encoding;
+  bh=/gl5S7F4HLPe1fgVVYMAP/5LhzkQ7VNQEq8B75DzJwI=;
+  b=AuTPV7PjDdlrSJFueFVfT44XNQhgaKXwwXaxP53LHLe4s3jQCgA+uTdo
+   QO8ISmQe/u6QBOgKb7O5+5lTwcOehFCxGWXx6ArnuSFHmhE8g+78YGkEH
+   Zqwh95uU1e5gmaw74tgW5xswCuVv2AB8rpaTn4XL/c9GOrrUn+R0J5/UU
+   4zwfSva4Nv5eGIMG5mM67R1mxmC3XIuOBcbFXv947SgRFmbI8dfck/b+d
+   hT6ACbhRwi6JfxKwwb1uORkVCjs9g6T9mcF279CHmpoJc/GYzfqa5Ec0/
+   wbCxzeqXYrsT9dx+OW7+ykQu/70rxY056LhkRSGA5SzzcgnaqxYGA+cWI
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10934"; a="375753647"
+X-IronPort-AV: E=Sophos;i="6.04,302,1695711600"; 
+   d="scan'208";a="375753647"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Dec 2023 17:51:29 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10934"; a="896204661"
+X-IronPort-AV: E=Sophos;i="6.04,302,1695711600"; 
+   d="scan'208";a="896204661"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.22.149]) ([10.93.22.149])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Dec 2023 17:51:28 -0800
+Message-ID: <f6e3a442-a7b9-48cf-9fc2-b7babfb7004b@intel.com>
+Date: Mon, 25 Dec 2023 09:51:25 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231215220612.173603-3-peter.hilber@opensynergy.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH v2] x86/asyncpf: fix async page fault
+ issues
+To: Dan Wu <dan1.wu@intel.com>, seanjc@google.com, pbonzini@redhat.com,
+ kvm@vger.kernel.org
+References: <20231218071447.1210469-1-dan1.wu@intel.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20231218071447.1210469-1-dan1.wu@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Dec 15, 2023 at 11:06:07PM +0100, Peter Hilber wrote:
-> Add a clocksource ID for TSC and a distinct one for the early TSC.
+On 12/18/2023 3:14 PM, Dan Wu wrote:
+> KVM switched to use interrupt for 'page ready' APF event since Linux v5.10 and
+> the legacy mechanism using #PF was deprecated. Interrupt-based 'page-ready'
+> notification required KVM_ASYNC_PF_DELIVERY_AS_INT to be set as well in
+> MSR_KVM_ASYNC_PF_EN to enable asyncpf.
 > 
-> Use distinct IDs for TSC and early TSC, since those also have distinct
-> clocksource structs. This should help to keep existing semantics when
-> comparing clocksources.
+> This patch tries to update asyncpf.c for the new interrupt-based notification.
+
+please avoid using 'This patch', and just use imperative mood.
+
+> It checks (KVM_FEATURE_ASYNC_PF && KVM_FEATURE_ASYNC_PF_INT) and implements
+> interrupt-based 'page-ready' handler.
 > 
-> Also, set the recently added struct system_counterval_t member cs_id to the
-> TSC ID in the cases where the clocksource member is being set to the TSC
-> clocksource. In the future, this will keep get_device_system_crosststamp()
-> working, when it will compare the clocksource id in struct
-> system_counterval_t, rather than the clocksource.
+> To run this test, add the QEMU option "-cpu host" to check CPUID, since
+> KVM_FEATURE_ASYNC_PF_INT can't be detected without "-cpu host".
 > 
-> For the x86 ART related code, system_counterval_t.cs == NULL corresponds to
-> system_counterval_t.cs_id == CSID_GENERIC (0).
+> Update the usage of how to setup cgroup for different cgroup versions.
 > 
-> Signed-off-by: Peter Hilber <peter.hilber@opensynergy.com>
+> Signed-off-by: Dan Wu <dan1.wu@intel.com>
 
-Hi Peter,
+This patch looks good to me, apart from some nits above and below.
 
-some minor feedback from my side that you may consider for
-a future revision.
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 
-> diff --git a/arch/x86/kernel/tsc.c b/arch/x86/kernel/tsc.c
+> ---
+> The test is based on asyncpf.c and simplifies implementation by reducing the memory
+> access round from 2 to 1.
+> 
+> v2:
+> - removed asyncpf_int.c and asyncpf.h and modified asyncpf.c to use ASYNC_PF_INT.
+> ---
+>   lib/x86/processor.h |   6 ++
+>   x86/asyncpf.c       | 152 +++++++++++++++++++++++++++-----------------
+>   x86/unittests.cfg   |   2 +-
+>   3 files changed, 101 insertions(+), 59 deletions(-)
+> 
+> diff --git a/lib/x86/processor.h b/lib/x86/processor.h
+> index 44f4fd1e..1a0f1243 100644
+> --- a/lib/x86/processor.h
+> +++ b/lib/x86/processor.h
+> @@ -263,6 +263,12 @@ static inline bool is_intel(void)
+>   #define	X86_FEATURE_ARCH_CAPABILITIES	(CPUID(0x7, 0, EDX, 29))
+>   #define	X86_FEATURE_PKS			(CPUID(0x7, 0, ECX, 31))
+>   
+> +/*
+> + * KVM defined leafs
+> + */
+> +#define	KVM_FEATURE_ASYNC_PF		(CPUID(0x40000001, 0, EAX, 4))
+> +#define	KVM_FEATURE_ASYNC_PF_INT	(CPUID(0x40000001, 0, EAX, 14))
+> +
+>   /*
+>    * Extended Leafs, a.k.a. AMD defined
+>    */
+> diff --git a/x86/asyncpf.c b/x86/asyncpf.c
+> index bc515be9..8ae9ea40 100644
+> --- a/x86/asyncpf.c
+> +++ b/x86/asyncpf.c
+> @@ -1,111 +1,147 @@
+>   /*
+>    * Async PF test. For the test to actually do anything it needs to be started
+> - * in memory cgroup with 512M of memory and with more then 1G memory provided
+> + * in memory cgroup with 512M of memory and with more than 1G memory provided
+>    * to the guest.
+>    *
+> + * To identify the cgroup version on Linux:
+> + * stat -fc %T /sys/fs/cgroup/
+> + *
+> + * If the output is tmpfs, your system is using cgroup v1:
+>    * To create cgroup do as root:
+>    * mkdir /dev/cgroup
+>    * mount -t cgroup none -omemory /dev/cgroup
+>    * chmod a+rxw /dev/cgroup/
+> - *
 
-...
+keep this line is better, IMO.
 
-> @@ -1327,12 +1334,15 @@ EXPORT_SYMBOL(convert_art_to_tsc);
->   * that this flag is set before conversion to TSC is attempted.
->   *
->   * Return:
-> - * struct system_counterval_t - system counter value with the pointer to the
-> + * struct system_counterval_t - system counter value with the ID of the
->   *	corresponding clocksource
->   *	@cycles:	System counter value
->   *	@cs:		Clocksource corresponding to system counter value. Used
->   *			by timekeeping code to verify comparability of two cycle
->   *			values.
-> + *	@cs_id:		Clocksource ID corresponding to system counter value.
-> + *			Used by timekeeping code to verify comparability of two
-> + *			cycle values.
+>    * From a shell you will start qemu from:
+>    * mkdir /dev/cgroup/1
+>    * echo $$ >  /dev/cgroup/1/tasks
+>    * echo 512M > /dev/cgroup/1/memory.limit_in_bytes
+>    *
+> + * If the output is cgroup2fs, your system is using cgroup v2:
+> + * mkdir /sys/fs/cgroup/cg1
+> + * echo $$ >  /sys/fs/cgroup/cg1/cgroup.procs
+> + * echo 512M > /sys/fs/cgroup/cg1/memory.max
+> + *
+>    */
+> -#include "x86/msr.h"
+>   #include "x86/processor.h"
+> -#include "x86/apic-defs.h"
+>   #include "x86/apic.h"
+> -#include "x86/desc.h"
+>   #include "x86/isr.h"
+>   #include "x86/vm.h"
+> -
+> -#include "asm/page.h"
+>   #include "alloc.h"
+> -#include "libcflat.h"
+>   #include "vmalloc.h"
+> -#include <stdint.h>
 
-None of the documented parameters to convert_art_ns_to_tsc() above
-correspond to the parameters of convert_art_ns_to_tsc() below.
+maybe it deserves one line mentioning in the commit message, like 
+"cleaning up the include headers"
 
-I would suggest a separate patch to address this.
-And dropping this hunk from this patch.
+>   #define KVM_PV_REASON_PAGE_NOT_PRESENT 1
+> -#define KVM_PV_REASON_PAGE_READY 2
+>   
+>   #define MSR_KVM_ASYNC_PF_EN 0x4b564d02
+> +#define MSR_KVM_ASYNC_PF_INT    0x4b564d06
+> +#define MSR_KVM_ASYNC_PF_ACK    0x4b564d07
+>   
+>   #define KVM_ASYNC_PF_ENABLED                    (1 << 0)
+>   #define KVM_ASYNC_PF_SEND_ALWAYS                (1 << 1)
+> +#define KVM_ASYNC_PF_DELIVERY_AS_INT            (1 << 3)
+> +
+> +#define HYPERVISOR_CALLBACK_VECTOR	0xf3
+> +
+> +struct kvm_vcpu_pv_apf_data {
+> +      /* Used for 'page not present' events delivered via #PF */
+> +      uint32_t  flags;
+> +
+> +      /* Used for 'page ready' events delivered via interrupt notification */
+> +      uint32_t  token;
+> +
+> +      uint8_t  pad[56];
+> +      uint32_t  enabled;
+> +} apf_reason __attribute__((aligned(64)));
 
-The same patch that corrects the kernel doc for convert_art_ns_to_tsc()
-could also correct the kernel doc for tsc_refine_calibration_work()
-by documenting it's work parameter.
+as well, it deserves some words in commit message.
 
->   */
->  
->  struct system_counterval_t convert_art_ns_to_tsc(u64 art_ns)
-> @@ -1347,8 +1357,11 @@ struct system_counterval_t convert_art_ns_to_tsc(u64 art_ns)
->  	do_div(tmp, USEC_PER_SEC);
->  	res += tmp;
->  
-> -	return (struct system_counterval_t) { .cs = art_related_clocksource,
-> -					      .cycles = res};
-> +	return (struct system_counterval_t) {
-> +		.cs = art_related_clocksource,
-> +		.cs_id = have_art ? CSID_X86_TSC : CSID_GENERIC,
-> +		.cycles = res
-> +	};
->  }
->  EXPORT_SYMBOL(convert_art_ns_to_tsc);
->  
-> @@ -1454,8 +1467,10 @@ static void tsc_refine_calibration_work(struct work_struct *work)
->  	if (tsc_unstable)
->  		goto unreg;
->  
-> -	if (boot_cpu_has(X86_FEATURE_ART))
-> +	if (boot_cpu_has(X86_FEATURE_ART)) {
->  		art_related_clocksource = &clocksource_tsc;
-> +		have_art = true;
+> -volatile uint32_t apf_reason __attribute__((aligned(64)));
+>   char *buf;
+> +void* virt;
+>   volatile uint64_t  i;
+>   volatile uint64_t phys;
+> +volatile uint32_t saved_token;
+> +volatile uint32_t asyncpf_num;
+>   
+> -static inline uint32_t get_apf_reason(void)
+> +static inline uint32_t get_and_clear_apf_reason(void)
+>   {
+> -	uint32_t r = apf_reason;
+> -	apf_reason = 0;
+> +	uint32_t r = apf_reason.flags;
+> +	apf_reason.flags = 0;
+>   	return r;
+>   }
+>   
+> -static void pf_isr(struct ex_regs *r)
+> +static void handle_interrupt(isr_regs_t *regs)
+>   {
+> -	void* virt = (void*)((ulong)(buf+i) & ~(PAGE_SIZE-1));
+> -	uint32_t reason = get_apf_reason();
+> +	uint32_t apf_token = apf_reason.token;
+> +
+> +	apf_reason.token = 0;
+> +	wrmsr(MSR_KVM_ASYNC_PF_ACK, 1);
+> +
+> +	if (apf_token == 0xffffffff) {
+> +		report_pass("Wakeup all, got token 0x%x", apf_token);
+> +	} else if (apf_token == saved_token) {
+> +		asyncpf_num++;
+> +		install_pte(phys_to_virt(read_cr3()), 1, virt, phys | PT_PRESENT_MASK | PT_WRITABLE_MASK, 0);
+> +		phys = 0;
+> +	} else {
+> +		report_fail("unexpected async pf int token 0x%x", apf_token);
 > +	}
->  	clocksource_register_khz(&clocksource_tsc, tsc_khz);
->  unreg:
->  	clocksource_unregister(&clocksource_tsc_early);
+> +
+> +	eoi();
+> +}
+>   
+> +static void handle_pf(struct ex_regs *r)
+> +{
+> +	virt = (void*)((ulong)(buf+i) & ~(PAGE_SIZE-1));
+> +	uint32_t reason = get_and_clear_apf_reason();
+>   	switch (reason) {
+> -		case 0:
+> -			report_fail("unexpected #PF at %#lx", read_cr2());
+> -			break;
+> -		case KVM_PV_REASON_PAGE_NOT_PRESENT:
+> -			phys = virt_to_pte_phys(phys_to_virt(read_cr3()), virt);
+> -			install_pte(phys_to_virt(read_cr3()), 1, virt, phys, 0);
+> -			write_cr3(read_cr3());
+> -			report_pass("Got not present #PF token %lx virt addr %p phys addr %#" PRIx64,
+> -				    read_cr2(), virt, phys);
+> -			while(phys) {
+> -				safe_halt(); /* enables irq */
+> -				cli();
+> -			}
+> -			break;
+> -		case KVM_PV_REASON_PAGE_READY:
+> -			report_pass("Got present #PF token %lx", read_cr2());
+> -			if ((uint32_t)read_cr2() == ~0)
+> -				break;
+> -			install_pte(phys_to_virt(read_cr3()), 1, virt, phys | PT_PRESENT_MASK | PT_WRITABLE_MASK, 0);
+> -			write_cr3(read_cr3());
+> -			phys = 0;
+> -			break;
+> -		default:
+> -			report_fail("unexpected async pf reason %" PRId32, reason);
+> -			break;
+> +	case 0:
+> +		report_fail("unexpected #PF at %#lx", read_cr2());
+> +		exit(report_summary());
+> +	case KVM_PV_REASON_PAGE_NOT_PRESENT:
+> +		phys = virt_to_pte_phys(phys_to_virt(read_cr3()), virt);
+> +		install_pte(phys_to_virt(read_cr3()), 1, virt, phys, 0);
+> +		write_cr3(read_cr3());
+> +		saved_token = read_cr2();
+> +		while (phys) {
+> +			safe_halt(); /* enables irq */
+> +		}
+> +		break;
+> +	default:
+> +		report_fail("unexpected async pf with reason 0x%x", reason);
+> +		exit(report_summary());
+>   	}
+>   }
+>   
+> -#define MEM 1ull*1024*1024*1024
+> +#define MEM (1ull*1024*1024*1024)
+>   
+>   int main(int ac, char **av)
+>   {
+> -	int loop = 2;
+> +	if (!this_cpu_has(KVM_FEATURE_ASYNC_PF)) {
+> +		report_skip("KVM_FEATURE_ASYNC_PF is not supported\n");
+> +		return report_summary();
+> +	}
+> +
+> +	if (!this_cpu_has(KVM_FEATURE_ASYNC_PF_INT)) {
+> +		report_skip("KVM_FEATURE_ASYNC_PF_INT is not supported\n");
+> +		return report_summary();
+> +	}
+>   
+>   	setup_vm();
+> -	printf("install handler\n");
+> -	handle_exception(14, pf_isr);
+> -	apf_reason = 0;
+> -	printf("enable async pf\n");
+> +
+> +	handle_exception(PF_VECTOR, handle_pf);
+> +	handle_irq(HYPERVISOR_CALLBACK_VECTOR, handle_interrupt);
+> +	memset(&apf_reason, 0, sizeof(apf_reason));
+> +
+> +	wrmsr(MSR_KVM_ASYNC_PF_INT, HYPERVISOR_CALLBACK_VECTOR);
+>   	wrmsr(MSR_KVM_ASYNC_PF_EN, virt_to_phys((void*)&apf_reason) |
+> -			KVM_ASYNC_PF_SEND_ALWAYS | KVM_ASYNC_PF_ENABLED);
+> -	printf("alloc memory\n");
+> +			KVM_ASYNC_PF_SEND_ALWAYS | KVM_ASYNC_PF_ENABLED | KVM_ASYNC_PF_DELIVERY_AS_INT);
+> +
+>   	buf = malloc(MEM);
+>   	sti();
+> -	while(loop--) {
+> -		printf("start loop\n");
+> -		/* access a lot of memory to make host swap it out */
+> -		for (i=0; i < MEM; i+=4096)
+> -			buf[i] = 1;
+> -		printf("end loop\n");
+> -	}
+> -	cli();
+>   
+> +	/* access a lot of memory to make host swap it out */
+> +	for (i = 0; i < MEM; i += 4096)
+> +		buf[i] = 1;
+> +
+> +	cli();
+> +	report(asyncpf_num > 0, "get %d async pf events ('page not present' #PF event with matched "
+> +		"'page ready' interrupt event )", asyncpf_num);
+>   	return report_summary();
+>   }
+> diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+> index 3fe59449..e3d051bc 100644
+> --- a/x86/unittests.cfg
+> +++ b/x86/unittests.cfg
+> @@ -172,7 +172,7 @@ extra_params = -cpu max
+>   
+>   [asyncpf]
+>   file = asyncpf.flat
+> -extra_params = -m 2048
+> +extra_params = -cpu host -m 2048
+>   
+>   [emulator]
+>   file = emulator.flat
 
-...
 
