@@ -1,106 +1,140 @@
-Return-Path: <kvm+bounces-5200-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5201-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8559881DDAC
-	for <lists+kvm@lfdr.de>; Mon, 25 Dec 2023 03:54:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 631B381DE0E
+	for <lists+kvm@lfdr.de>; Mon, 25 Dec 2023 05:11:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7EC91C214C7
-	for <lists+kvm@lfdr.de>; Mon, 25 Dec 2023 02:54:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1DC802814D0
+	for <lists+kvm@lfdr.de>; Mon, 25 Dec 2023 04:11:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04DCCD517;
-	Mon, 25 Dec 2023 02:54:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3503D3D74;
+	Mon, 25 Dec 2023 04:11:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JbM08b2a"
 X-Original-To: kvm@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [20.231.56.155])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F064CA70
-	for <kvm@vger.kernel.org>; Mon, 25 Dec 2023 02:54:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
-Received: from duchao$eswincomputing.com ( [123.139.59.82] ) by
- ajax-webmail-app2 (Coremail) ; Mon, 25 Dec 2023 10:52:50 +0800 (GMT+08:00)
-Date: Mon, 25 Dec 2023 10:52:50 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: "Chao Du" <duchao@eswincomputing.com>
-To: "Anup Patel" <apatel@ventanamicro.com>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, anup@brainfault.org, 
-	atishp@atishpatra.org, dbarboza@ventanamicro.com, 
-	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu
-Subject: Re: Re: [RFC PATCH 0/3] RISC-V: KVM: Guest Debug Support
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT6.0.3 build 20220420(169d3f8c)
- Copyright (c) 2002-2023 www.mailtech.cn
- mispb-72143050-eaf5-4703-89e0-86624513b4ce-eswincomputing.com
-In-Reply-To: <19434eff.1deb.18c90a3a375.Coremail.duchao@eswincomputing.com>
-References: <20231221095002.7404-1-duchao@eswincomputing.com>
- <CAK9=C2Wfv7=fCitUdjBpC9=0icN82Bb+9p1-Gq5ha8o9v13nEg@mail.gmail.com>
- <19434eff.1deb.18c90a3a375.Coremail.duchao@eswincomputing.com>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2DCB23B0
+	for <kvm@vger.kernel.org>; Mon, 25 Dec 2023 04:11:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1703477502;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PR0rFCSyUG2eR88FaJw5eC09XvCgcCbfqIX9eF5hqEQ=;
+	b=JbM08b2a1y/LrdMZVrfZaPXr72a73RQxp+EzbierX07a3SSZqNeT4WwJAn3FiULWLj0Wer
+	ODJ5QhQZw6BolR80sFc/5sfFCji6zbQuMLk2icLP+hbfent6k5HUohr8Iuryi4igzyQX9b
+	EU2TmH+hG1vNEyLAn8qjDm4Mer+GfYA=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-187-NKAAl-IRO76kQwVUSBZxtQ-1; Sun, 24 Dec 2023 23:11:40 -0500
+X-MC-Unique: NKAAl-IRO76kQwVUSBZxtQ-1
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-28b8f963816so3961578a91.1
+        for <kvm@vger.kernel.org>; Sun, 24 Dec 2023 20:11:40 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703477499; x=1704082299;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PR0rFCSyUG2eR88FaJw5eC09XvCgcCbfqIX9eF5hqEQ=;
+        b=ZVYZFFnlgu3bHzrZlP3i44q0Vb9B2kx+J04A6KniSxFbklAr1kXvjKaf0+XZYtDFGu
+         rHMoTcKporq0ITl0aSiGUXGSajo7jMU1Ek1GFjp0vvELXIymvrVp2D1yBmLJO7GbDvx1
+         MYicELTAQl1hz+PQTCjEzWF5aTAQCljCytcQ8SdduqFHe8TeEAbiXdXT10LOgR8TM7qA
+         pzhowxNdxiLwMe7/Leh7b5Ksg9R+G77VuDmX9GZPSvKtRtf3FWBSpweFqRnCinehhEHj
+         YfmKkP0qre3X3oMLOt0yIRsVKVT4AvREuEgnTO9H9CdIheGjQf4IG8VikIhGFKHSEgdm
+         KPOQ==
+X-Gm-Message-State: AOJu0YySjViBxvjMPkkgfL2tg2OCMWXeybqbSn7HSC81UvMjDJt+1OR0
+	72uGF/TCTQByMrwUluvdWOSbyJbnnr0ahku3m8TB8TUVAQU+0enpJQQUsyeC7MkJ+xwhmFjSTZM
+	4vPu5Pt31z7UbMFFW1x+3zPaG59CVUD0BUvIr
+X-Received: by 2002:a17:90a:428c:b0:28b:dc75:bef8 with SMTP id p12-20020a17090a428c00b0028bdc75bef8mr2579969pjg.22.1703477499379;
+        Sun, 24 Dec 2023 20:11:39 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHtxp8ucWx5dROZrp5JvDri52KPchZd12v9x5kEJ0UPnd0L9ZR0+MGTL1LiOJ9Z1GS7ksafL6q7Xk0IKUseXt0=
+X-Received: by 2002:a17:90a:428c:b0:28b:dc75:bef8 with SMTP id
+ p12-20020a17090a428c00b0028bdc75bef8mr2579959pjg.22.1703477499127; Sun, 24
+ Dec 2023 20:11:39 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <51c6e871.1f32.18c9ee3ae12.Coremail.duchao@eswincomputing.com>
-X-Coremail-Locale: en_US
-X-CM-TRANSID:TQJkCgBX5tSC7ohlUPwCAA--.2988W
-X-CM-SenderInfo: xgxfxt3r6h245lqf0zpsxwx03jof0z/1tbiAgEQDGWITysSfgAAs6
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
+References: <20231219180858.120898-1-dtatulea@nvidia.com> <20231219180858.120898-7-dtatulea@nvidia.com>
+ <CACGkMEs_kf2y9Khr==zY3RRHffaPRwS51XK33Lgv1eeanQdRpg@mail.gmail.com>
+ <65064744954829b844d8a7b23bb09792cb6c2760.camel@nvidia.com> <f54a1037b515d15b24193d96d574b775eb743099.camel@nvidia.com>
+In-Reply-To: <f54a1037b515d15b24193d96d574b775eb743099.camel@nvidia.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Mon, 25 Dec 2023 12:11:27 +0800
+Message-ID: <CACGkMEsCrYY1bYDwOYD=XMPi0b1naJj5dGe8FXH9uMqpsf1b2A@mail.gmail.com>
+Subject: Re: [PATCH vhost v4 06/15] vdpa: Track device suspended state
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: "xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>, Parav Pandit <parav@nvidia.com>, 
+	Gal Pressman <gal@nvidia.com>, "eperezma@redhat.com" <eperezma@redhat.com>, 
+	"virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"si-wei.liu@oracle.com" <si-wei.liu@oracle.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"mst@redhat.com" <mst@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>, "leon@kernel.org" <leon@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-T24gMjAyMy0xMi0yMiAxNjoyOCwgQ2hhbyBEdSA8ZHVjaGFvQGVzd2luY29tcHV0aW5nLmNvbT4g
-d3JvdGU6Cj4gCj4gT24gMjAyMy0xMi0yMSAyMTowMSwgQW51cCBQYXRlbCA8YXBhdGVsQHZlbnRh
-bmFtaWNyby5jb20+IHdyb3RlOgo+ID4gCj4gPiBPbiBUaHUsIERlYyAyMSwgMjAyMyBhdCAzOjIx
-4oCvUE0gQ2hhbyBEdSA8ZHVjaGFvQGVzd2luY29tcHV0aW5nLmNvbT4gd3JvdGU6Cj4gPiA+Cj4g
-PiA+IFRoaXMgc2VyaWVzIGltcGxlbWVudHMgS1ZNIEd1ZXN0IERlYnVnIG9uIFJJU0MtVi4gQ3Vy
-cmVudGx5LCB3ZSBjYW4KPiA+ID4gZGVidWcgUklTQy1WIEtWTSBndWVzdCBmcm9tIHRoZSBob3N0
-IHNpZGUsIHdpdGggc29mdHdhcmUgYnJlYWtwb2ludHMuCj4gPiA+Cj4gPiA+IEEgYnJpZWYgdGVz
-dCB3YXMgZG9uZSBvbiBRRU1VIFJJU0MtViBoeXBlcnZpc29yIGVtdWxhdG9yLgo+ID4gPgo+ID4g
-PiBBIFRPRE8gbGlzdCB3aGljaCB3aWxsIGJlIGFkZGVkIGxhdGVyOgo+ID4gPiAxLiBIVyBicmVh
-a3BvaW50cyBzdXBwb3J0Cj4gPiA+IDIuIFRlc3QgY2FzZXMKPiA+IAo+ID4gSGltYW5zaHUgaGFz
-IGFscmVhZHkgZG9uZSB0aGUgY29tcGxldGUgSFcgYnJlYWtwb2ludCBpbXBsZW1lbnRhdGlvbgo+
-ID4gaW4gT3BlblNCSSwgTGludXggUklTQy1WLCBhbmQgS1ZNIFJJU0MtVi4gVGhpcyBpcyBiYXNl
-ZCBvbiB0aGUgdXBjb21pbmcKPiA+IFNCSSBkZWJ1ZyB0cmlnZ2VyIGV4dGVuc2lvbiBkcmFmdCBw
-cm9wb3NhbC4KPiA+IChSZWZlciwgaHR0cHM6Ly9saXN0cy5yaXNjdi5vcmcvZy90ZWNoLWRlYnVn
-L21lc3NhZ2UvMTI2MSkKPiA+IAo+ID4gVGhlcmUgYXJlIGFsc28gUklTRSBwcm9qZWN0cyB0byB0
-cmFjayB0aGVzZSBlZmZvcnRzOgo+ID4gaHR0cHM6Ly93aWtpLnJpc2Vwcm9qZWN0LmRldi9wYWdl
-cy92aWV3cGFnZS5hY3Rpb24/cGFnZUlkPTM5NDU0MQo+ID4gaHR0cHM6Ly93aWtpLnJpc2Vwcm9q
-ZWN0LmRldi9wYWdlcy92aWV3cGFnZS5hY3Rpb24/cGFnZUlkPTM5NDU0NQo+ID4gCj4gPiBDdXJy
-ZW50bHksIHdlIGFyZSBpbiB0aGUgcHJvY2VzcyBvZiB1cHN0cmVhbWluZyB0aGUgT3BlblNCSSBz
-dXBwb3J0Cj4gPiBmb3IgU0JJIGRlYnVnIHRyaWdnZXIgZXh0ZW5zaW9uLiBUaGUgTGludXggUklT
-Qy1WIGFuZCBLVk0gUklTQy1WCj4gPiBwYXRjaGVzIHJlcXVpcmUgU0JJIGRlYnVnIHRyaWdnZXIg
-ZXh0ZW5zaW9uIGFuZCBTZHRyaWcgZXh0ZW5zaW9uIHRvCj4gPiBiZSBmcm96ZW4gd2hpY2ggd2ls
-bCBoYXBwZW4gbmV4dCB5ZWFyIDIwMjQuCj4gPiAKPiA+IFJlZ2FyZHMsCj4gPiBBbnVwCj4gPiAK
-PiAKPiBIaSBBbnVwLAo+IAo+IFRoYW5rIHlvdSBmb3IgdGhlIGluZm9ybWF0aW9uIGFuZCB5b3Vy
-IGdyZWF0IHdvcmsgb24gdGhlIFNCSQo+IERlYnVnIFRyaWdnZXIgRXh0ZW5zaW9uIHByb3Bvc2Fs
-Lgo+IAo+IFNvIEkgdGhpbmsgdGhhdCAnSFcgYnJlYWtwb2ludHMgc3VwcG9ydCcgaW4gdGhlIGFi
-b3ZlIFRPRE8gbGlzdAo+IHdpbGwgYmUgdGFrZW4gY2FyZSBvZiBieSBIaW1hbnNodSBmb2xsb3dp
-bmcgdGhlIGV4dGVuc2lvbiBwcm9wb3NhbC4KPiAKPiBPbiB0aGUgb3RoZXIgaGFuZCwgaWYgSSB1
-bmRlcnN0YW5kIGNvcnJlY3RseSwgdGhlIHNvZnR3YXJlCj4gYnJlYWtwb2ludCBwYXJ0IG9mIEtW
-TSBHdWVzdCBEZWJ1ZyBoYXMgbm8gZGVwZW5kZW5jeSBvbiB0aGUgbmV3Cj4gZXh0ZW5zaW9uIHNp
-bmNlIGl0IGRvZXMgbm90IHVzZSB0aGUgdHJpZ2dlciBtb2R1bGUuIEp1c3QgYW4KPiBlYnJlYWsg
-c3Vic3RpdHV0aW9uIGlzIG1hZGUuCj4gCj4gU28gbWF5IEkga25vdyB5b3VyIHN1Z2dlc3Rpb24g
-YWJvdXQgdGhpcyBSRkM/IEJvdGggaW4gS1ZNIGFuZCBRRU1VLgo+IAo+IFJlZ2FyZHMsCj4gQ2hh
-bwo+IAoKSGkgQW51cCBhbmQgYWxsLAoKSSdtIHN0aWxsIHdhaXRpbmcgZm9yIHlvdXIgY29tbWVu
-dCBhbmQgc3VnZ2VzdGlvbiBmb3IgdGhlIG5leHQgc3RlcC4KOikKClRoYW5rcwoKPiA+ID4KPiA+
-ID4gVGhpcyBzZXJpZXMgaXMgYmFzZWQgb24gTGludXggNi43LXJjNiBhbmQgaXMgYWxzbyBhdmFp
-bGFibGUgYXQ6Cj4gPiA+IGh0dHBzOi8vZ2l0aHViLmNvbS9EdS1DaGFvL2xpbnV4L3RyZWUvcmlz
-Y3ZfZ2Rfc3cKPiA+ID4KPiA+ID4gVGhlIG1hdGNoZWQgUUVNVSBpcyBhdmFpbGFibGUgYXQ6Cj4g
-PiA+IGh0dHBzOi8vZ2l0aHViLmNvbS9EdS1DaGFvL3FlbXUvdHJlZS9yaXNjdl9nZF9zdwo+ID4g
-Pgo+ID4gPiBDaGFvIER1ICgzKToKPiA+ID4gICBSSVNDLVY6IEtWTTogRW5hYmxlIHRoZSBLVk1f
-Q0FQX1NFVF9HVUVTVF9ERUJVRyBjYXBhYmlsaXR5Cj4gPiA+ICAgUklTQy1WOiBLVk06IEltcGxl
-bWVudCBrdm1fYXJjaF92Y3B1X2lvY3RsX3NldF9ndWVzdF9kZWJ1ZygpCj4gPiA+ICAgUklTQy1W
-OiBLVk06IEhhbmRsZSBicmVha3BvaW50IGV4aXRzIGZvciBWQ1BVCj4gPiA+Cj4gPiA+ICBhcmNo
-L3Jpc2N2L2luY2x1ZGUvdWFwaS9hc20va3ZtLmggfCAgMSArCj4gPiA+ICBhcmNoL3Jpc2N2L2t2
-bS92Y3B1LmMgICAgICAgICAgICAgfCAxNSArKysrKysrKysrKysrLS0KPiA+ID4gIGFyY2gvcmlz
-Y3Yva3ZtL3ZjcHVfZXhpdC5jICAgICAgICB8ICA0ICsrKysKPiA+ID4gIGFyY2gvcmlzY3Yva3Zt
-L3ZtLmMgICAgICAgICAgICAgICB8ICAxICsKPiA+ID4gIDQgZmlsZXMgY2hhbmdlZCwgMTkgaW5z
-ZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkKPiA+ID4KPiA+ID4gLS0KPiA+ID4gMi4xNy4xCj4g
-PiA+Cj4gPiA+Cj4gPiA+IC0tCj4gPiA+IGt2bS1yaXNjdiBtYWlsaW5nIGxpc3QKPiA+ID4ga3Zt
-LXJpc2N2QGxpc3RzLmluZnJhZGVhZC5vcmcKPiA+ID4gaHR0cDovL2xpc3RzLmluZnJhZGVhZC5v
-cmcvbWFpbG1hbi9saXN0aW5mby9rdm0tcmlzY3YK
+On Fri, Dec 22, 2023 at 7:22=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia.com=
+> wrote:
+>
+> On Wed, 2023-12-20 at 13:55 +0100, Dragos Tatulea wrote:
+> > On Wed, 2023-12-20 at 11:46 +0800, Jason Wang wrote:
+> > > On Wed, Dec 20, 2023 at 2:09=E2=80=AFAM Dragos Tatulea <dtatulea@nvid=
+ia.com> wrote:
+> > > >
+> > > > Set vdpa device suspended state on successful suspend. Clear it on
+> > > > successful resume and reset.
+> > > >
+> > > > The state will be locked by the vhost_vdpa mutex. The mutex is take=
+n
+> > > > during suspend, resume and reset in vhost_vdpa_unlocked_ioctl. The
+> > > > exception is vhost_vdpa_open which does a device reset but that sho=
+uld
+> > > > be safe because it can only happen before the other ops.
+> > > >
+> > > > Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+> > > > Suggested-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+> > > > ---
+> > > >  drivers/vhost/vdpa.c | 17 +++++++++++++++--
+> > > >  1 file changed, 15 insertions(+), 2 deletions(-)
+> > > >
+> > > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> > > > index b4e8ddf86485..00b4fa8e89f2 100644
+> > > > --- a/drivers/vhost/vdpa.c
+> > > > +++ b/drivers/vhost/vdpa.c
+> > > > @@ -59,6 +59,7 @@ struct vhost_vdpa {
+> > > >         int in_batch;
+> > > >         struct vdpa_iova_range range;
+> > > >         u32 batch_asid;
+> > > > +       bool suspended;
+> > >
+> > > Any reason why we don't do it in the core vDPA device but here?
+> > >
+> > Not really. I wanted to be safe and not expose it in a header due to lo=
+cking.
+> >
+> A few clearer answers for why the state is not added in struct vdpa_devic=
+e:
+> - All the suspend infrastructure is currently only for vhost.
+> - If the state would be moved to struct vdpa_device then the cf_lock woul=
+d have
+> to be used. This adds more complexity to the code.
+>
+> Thanks,
+> Dragos
+
+Ok, I'm fine with that.
+
+Thanks
+
 
