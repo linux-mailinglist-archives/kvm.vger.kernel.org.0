@@ -1,37 +1,37 @@
-Return-Path: <kvm+bounces-5205-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5206-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4AAB81E085
-	for <lists+kvm@lfdr.de>; Mon, 25 Dec 2023 13:59:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F137381E087
+	for <lists+kvm@lfdr.de>; Mon, 25 Dec 2023 13:59:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 509C11F2206D
-	for <lists+kvm@lfdr.de>; Mon, 25 Dec 2023 12:59:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DC101C219C4
+	for <lists+kvm@lfdr.de>; Mon, 25 Dec 2023 12:59:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01EB251C52;
-	Mon, 25 Dec 2023 12:59:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2355524D1;
+	Mon, 25 Dec 2023 12:59:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o8WFdtZf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n+nyJUPG"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2502D5026B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F244E524AB;
+	Mon, 25 Dec 2023 12:59:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 185F9C433C7;
 	Mon, 25 Dec 2023 12:59:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F704C433C8;
-	Mon, 25 Dec 2023 12:58:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703509143;
-	bh=me1g9HblztxsBmrb/PVT3corizKldTsjfk6ZS3LImJU=;
-	h=From:To:Cc:Subject:Date:From;
-	b=o8WFdtZfThKVy0nwqLvF+M+9jReTczDYnOZy1wL7TYO2xOSCSsDTYag/J5kWhC6V0
-	 1ZzAKPpdFPqECgte7cma56HFB7va2NyG7ER6zAUkqeQb4EeDjK9nSnACZFns1FXbEH
-	 EeVK8UdR+WfqU76dbmJZEnGlSOWkhC473p4SPZhGwdcNXdh0TtozdcttytPGkyIYU1
-	 A8UgAZhZz6k+E/3CQsvbS2Ay0/jes20HDZ0eA9Z2JTsrua9cXI9T1tj4F0etBcmrNs
-	 hSbcQvhkasfZmhXA1gxzqEx8MbrDQd6IIeqZlfiHIrzCWmtmzhz2E+bz/0X3/O+eVU
-	 IeHPfce/m1JCg==
+	s=k20201202; t=1703509148;
+	bh=ZMmYtNcaHujzMHDPJqJVF8Ke5+PSu4QgX2N6pkF5Hmc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=n+nyJUPGwhCAMG2vXPZbv8/PXGXqLPoq02uyeBRIy3TC59BoHvvYnivQgCAeEkei5
+	 9GWSJFxvMWnaUsBZwDOQ/WdmG/NFisPqooUmCzlLbc4F2+C94pYfj9NJFUv+judb67
+	 Ic3Y/ENp1bWTThmG38knHD+84MZonSl8NHqytuwqrprdnplxsx3JrxxbmLTL+fHsJ3
+	 QtEhwnU4S8KeUq2F/kU3O4WV8AkgMg2qS3PfHIRuXYi3SgJvYVAM8g2tZ7pwUPdYNY
+	 vOmPOMvnKb+uVOHc+LTx60l4RXY3pQcKYQV4h91/c4K/T29KSOWRs0/UUtcMh8zIns
+	 nh9f63RS7iQrw==
 From: guoren@kernel.org
 To: paul.walmsley@sifive.com,
 	palmer@dabbelt.com,
@@ -55,11 +55,14 @@ Cc: linux-riscv@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org,
 	virtualization@lists.linux-foundation.org,
-	Guo Ren <guoren@linux.alibaba.com>
-Subject: [PATCH V12 00/14] riscv: Add Native/Paravirt qspinlock support 
-Date: Mon, 25 Dec 2023 07:58:33 -0500
-Message-Id: <20231225125847.2778638-1-guoren@kernel.org>
+	Guo Ren <guoren@linux.alibaba.com>,
+	Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH V12 01/14] asm-generic: ticket-lock: Reuse arch_spinlock_t of qspinlock
+Date: Mon, 25 Dec 2023 07:58:34 -0500
+Message-Id: <20231225125847.2778638-2-guoren@kernel.org>
 X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20231225125847.2778638-1-guoren@kernel.org>
+References: <20231225125847.2778638-1-guoren@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -70,233 +73,102 @@ Content-Transfer-Encoding: 8bit
 
 From: Guo Ren <guoren@linux.alibaba.com>
 
-patch[1 - 8]: Native   qspinlock
-patch[9 -14]: Paravirt qspinlock
+The arch_spinlock_t of qspinlock has contained the atomic_t val, which
+satisfies the ticket-lock requirement. Thus, unify the arch_spinlock_t
+into qspinlock_types.h. This is the preparation for the next combo
+spinlock.
 
-This series based on:
- - v6.7-rc7
- - Rework & improve riscv cmpxchg.h and atomic.h
-   https://lore.kernel.org/linux-riscv/20230810040349.92279-2-leobras@redhat.com/
+Reviewed-by: Leonardo Bras <leobras@redhat.com>
+Suggested-by: Arnd Bergmann <arnd@arndb.de>
+Link: https://lore.kernel.org/linux-riscv/CAK8P3a2rnz9mQqhN6-e0CGUUv9rntRELFdxt_weiD7FxH7fkfQ@mail.gmail.com/
+Signed-off-by: Guo Ren <guoren@kernel.org>
+Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+---
+ include/asm-generic/spinlock.h       | 14 +++++++-------
+ include/asm-generic/spinlock_types.h | 12 ++----------
+ 2 files changed, 9 insertions(+), 17 deletions(-)
 
-You can directly try it:
-https://github.com/guoren83/linux/tree/qspinlock_v12 
-
-Native qspinlock
-================
-
-This time we've proved the qspinlock on th1520 [1] & sg2042 [2], which
-gives stability and performance improvement. All T-HEAD processors have
-a strong LR/SC forward progress guarantee than the requirements of the
-ISA, which could satisfy the xchg_tail of native_qspinlock. Now,
-qspinlock has been run with us for more than 1 year, and we have enough
-confidence to enable it for all the T-HEAD processors. Of causes, we
-found a livelock problem with the qspinlock lock torture test from the
-CPU store merge buffer delay mechanism, which caused the queued spinlock
-becomes a dead ring and RCU warning to come out. We introduce a custom
-WRITE_ONCE to solve this, which will be fixed in the next generation of
-hardware.
-
-We've tested the patch on SOPHGO sg2042 & th1520 and passed the stress
-test on Fedora & Ubuntu & OpenEuler ... Here is the performance
-comparison between qspinlock and ticket_lock on sg2042 (64 cores):
-
-sysbench test=threads threads=32 yields=100 lock=8 (+13.8%):
-  queued_spinlock 0.5109/0.00
-  ticket_spinlock 0.5814/0.00
-
-perf futex/hash (+6.7%):
-  queued_spinlock 1444393 operations/sec (+- 0.09%)
-  ticket_spinlock 1353215 operations/sec (+- 0.15%)
-
-perf futex/wake-parallel (+8.6%):
-  queued_spinlock (waking 1/64 threads) in 0.0253 ms (+-2.90%)
-  ticket_spinlock (waking 1/64 threads) in 0.0275 ms (+-3.12%)
-
-perf futex/requeue (+4.2%):
-  queued_spinlock Requeued 64 of 64 threads in 0.0785 ms (+-0.55%)
-  ticket_spinlock Requeued 64 of 64 threads in 0.0818 ms (+-4.12%)
-
-
-System Benchmarks (+6.4%)
-  queued_spinlock:
-    System Benchmarks Index Values               BASELINE       RESULT    INDEX
-    Dhrystone 2 using register variables         116700.0  628613745.4  53865.8
-    Double-Precision Whetstone                       55.0     182422.8  33167.8
-    Execl Throughput                                 43.0      13116.6   3050.4
-    File Copy 1024 bufsize 2000 maxblocks          3960.0    7762306.2  19601.8
-    File Copy 256 bufsize 500 maxblocks            1655.0    3417556.8  20649.9
-    File Copy 4096 bufsize 8000 maxblocks          5800.0    7427995.7  12806.9
-    Pipe Throughput                               12440.0   23058600.5  18535.9
-    Pipe-based Context Switching                   4000.0    2835617.7   7089.0
-    Process Creation                                126.0      12537.3    995.0
-    Shell Scripts (1 concurrent)                     42.4      57057.4  13456.9
-    Shell Scripts (8 concurrent)                      6.0       7367.1  12278.5
-    System Call Overhead                          15000.0   33308301.3  22205.5
-                                                                       ========
-    System Benchmarks Index Score                                       12426.1
-
-  ticket_spinlock:
-    System Benchmarks Index Values               BASELINE       RESULT    INDEX
-    Dhrystone 2 using register variables         116700.0  626541701.9  53688.2
-    Double-Precision Whetstone                       55.0     181921.0  33076.5
-    Execl Throughput                                 43.0      12625.1   2936.1
-    File Copy 1024 bufsize 2000 maxblocks          3960.0    6553792.9  16550.0
-    File Copy 256 bufsize 500 maxblocks            1655.0    3189231.6  19270.3
-    File Copy 4096 bufsize 8000 maxblocks          5800.0    7221277.0  12450.5
-    Pipe Throughput                               12440.0   20594018.7  16554.7
-    Pipe-based Context Switching                   4000.0    2571117.7   6427.8
-    Process Creation                                126.0      10798.4    857.0
-    Shell Scripts (1 concurrent)                     42.4      57227.5  13497.1
-    Shell Scripts (8 concurrent)                      6.0       7329.2  12215.3
-    System Call Overhead                          15000.0   30766778.4  20511.2
-                                                                       ========
-    System Benchmarks Index Score                                       11670.7
-
-The qspinlock has a significant improvement on SOPHGO SG2042 64
-cores platform than the ticket_lock.
-
-Paravirt qspinlock
-==================
-
-We implemented kvm_kick_cpu/kvm_wait_cpu and add tracepoints to observe
-the behaviors and introduce a new SBI extension SBI_EXT_PVLOCK.
-
-Changlog:
-V12:
- - Remove force thead qspinlock with errata
- - Separate Zicbop patch from this series
- - Remove cpus >= 16 patch
- - Cleanup rebase and move it on v6.7-rc7
- - Reorder the coding struct with the last version's advice.
-
-V11:
-https://lore.kernel.org/linux-riscv/20230910082911.3378782-1-guoren@kernel.org/
- - Based on Leonardo Bras's cmpxchg_small patches v5.
- - Based on Guo Ren's Optimize arch_spin_value_unlocked patch v3.
- - Remove abusing alternative framework and use jump_label instead.
- - Introduce prefetch.w to improve T-HEAD processors' LR/SC forward
-   progress guarantee.
- - Optimize qspinlock xchg_tail when NR_CPUS >= 16K.
-
-V10:
-https://lore.kernel.org/linux-riscv/20230802164701.192791-1-guoren@kernel.org/
- - Using an alternative framework instead of static_key_branch in the
-   asm/spinlock.h.
- - Fixup store merge buffer problem, which causes qspinlock lock
-   torture test livelock.
- - Add paravirt qspinlock support, include KVM backend
- - Add Compact NUMA-awared qspinlock support 
-
-V9:
-https://lore.kernel.org/linux-riscv/20220808071318.3335746-1-guoren@kernel.org/
- - Cleanup generic ticket-lock code, (Using smp_mb__after_spinlock as
-   RCsc)
- - Add qspinlock and combo-lock for riscv
- - Add qspinlock to openrisc
- - Use generic header in csky
- - Optimize cmpxchg & atomic code
-
-V8:
-https://lore.kernel.org/linux-riscv/20220724122517.1019187-1-guoren@kernel.org/
- - Coding convention ticket fixup
- - Move combo spinlock into riscv and simply asm-generic/spinlock.h
- - Fixup xchg16 with wrong return value
- - Add csky qspinlock
- - Add combo & qspinlock & ticket-lock comparison
- - Clean up unnecessary riscv acquire and release definitions
- - Enable ARCH_INLINE_READ*/WRITE*/SPIN* for riscv & csky
-
-V7:
-https://lore.kernel.org/linux-riscv/20220628081946.1999419-1-guoren@kernel.org/
- - Add combo spinlock (ticket & queued) support
- - Rename ticket_spinlock.h
- - Remove unnecessary atomic_read in ticket_spin_value_unlocked  
-
-V6:
-https://lore.kernel.org/linux-riscv/20220621144920.2945595-1-guoren@kernel.org/
- - Fixup Clang compile problem Reported-by: kernel test robot
- - Cleanup asm-generic/spinlock.h
- - Remove changelog in patch main comment part, suggested by
-   Conor.Dooley
- - Remove "default y if NUMA" in Kconfig
-
-V5:
-https://lore.kernel.org/linux-riscv/20220620155404.1968739-1-guoren@kernel.org/
- - Update comment with RISC-V forward guarantee feature.
- - Back to V3 direction and optimize asm code.
-
-V4:
-https://lore.kernel.org/linux-riscv/1616868399-82848-4-git-send-email-guoren@kernel.org/
- - Remove custom sub-word xchg implementation
- - Add ARCH_USE_QUEUED_SPINLOCKS_XCHG32 in locking/qspinlock
-
-V3:
-https://lore.kernel.org/linux-riscv/1616658937-82063-1-git-send-email-guoren@kernel.org/
- - Coding convention by Peter Zijlstra's advices
-
-V2:
-https://lore.kernel.org/linux-riscv/1606225437-22948-2-git-send-email-guoren@kernel.org/
- - Coding convention in cmpxchg.h
- - Re-implement short xchg
- - Remove char & cmpxchg implementations
-
-V1:
-https://lore.kernel.org/linux-riscv/20190211043829.30096-1-michaeljclark@mac.com/
- - Using cmpxchg loop to implement sub-word atomic
-
-Guo Ren (14):
-  asm-generic: ticket-lock: Reuse arch_spinlock_t of qspinlock
-  asm-generic: ticket-lock: Add separate ticket-lock.h
-  riscv: errata: Move errata vendor func-id into vendorid_list.h
-  riscv: qspinlock: errata: Add ERRATA_THEAD_WRITE_ONCE fixup
-  riscv: qspinlock: Add basic queued_spinlock support
-  riscv: qspinlock: Introduce combo spinlock
-  riscv: qspinlock: Add virt_spin_lock() support for VM guest
-  riscv: qspinlock: Force virt_spin_lock for KVM guests
-  RISC-V: paravirt: Add pvqspinlock KVM backend
-  RISC-V: paravirt: Add pvqspinlock frontend skeleton
-  RISC-V: paravirt: pvqspinlock: Add SBI implementation
-  RISC-V: paravirt: pvqspinlock: Add nopvspin kernel parameter
-  RISC-V: paravirt: pvqspinlock: Add kconfig entry
-  RISC-V: paravirt: pvqspinlock: Add trace point for pv_kick/wait
-
- .../admin-guide/kernel-parameters.txt         |   8 +-
- arch/riscv/Kconfig                            |  35 ++++++
- arch/riscv/Kconfig.errata                     |  19 ++++
- arch/riscv/errata/thead/errata.c              |  20 ++++
- arch/riscv/include/asm/Kbuild                 |   3 +-
- arch/riscv/include/asm/errata_list.h          |  18 ---
- arch/riscv/include/asm/kvm_vcpu_sbi.h         |   1 +
- arch/riscv/include/asm/qspinlock.h            |  35 ++++++
- arch/riscv/include/asm/qspinlock_paravirt.h   |  29 +++++
- arch/riscv/include/asm/rwonce.h               |  31 ++++++
- arch/riscv/include/asm/sbi.h                  |  14 +++
- arch/riscv/include/asm/spinlock.h             |  88 +++++++++++++++
- arch/riscv/include/asm/vendorid_list.h        |  19 ++++
- arch/riscv/include/uapi/asm/kvm.h             |   1 +
- arch/riscv/kernel/Makefile                    |   1 +
- arch/riscv/kernel/qspinlock_paravirt.c        |  83 ++++++++++++++
- arch/riscv/kernel/sbi.c                       |   2 +-
- arch/riscv/kernel/setup.c                     |  68 ++++++++++++
- .../kernel/trace_events_filter_paravirt.h     |  60 ++++++++++
- arch/riscv/kvm/Makefile                       |   1 +
- arch/riscv/kvm/vcpu_sbi.c                     |   4 +
- arch/riscv/kvm/vcpu_sbi_pvlock.c              |  57 ++++++++++
- include/asm-generic/qspinlock.h               |   2 +
- include/asm-generic/rwonce.h                  |   2 +
- include/asm-generic/spinlock.h                |  87 +--------------
- include/asm-generic/spinlock_types.h          |  12 +-
- include/asm-generic/ticket_spinlock.h         | 105 ++++++++++++++++++
- 27 files changed, 688 insertions(+), 117 deletions(-)
- create mode 100644 arch/riscv/include/asm/qspinlock.h
- create mode 100644 arch/riscv/include/asm/qspinlock_paravirt.h
- create mode 100644 arch/riscv/include/asm/rwonce.h
- create mode 100644 arch/riscv/include/asm/spinlock.h
- create mode 100644 arch/riscv/kernel/qspinlock_paravirt.c
- create mode 100644 arch/riscv/kernel/trace_events_filter_paravirt.h
- create mode 100644 arch/riscv/kvm/vcpu_sbi_pvlock.c
- create mode 100644 include/asm-generic/ticket_spinlock.h
-
+diff --git a/include/asm-generic/spinlock.h b/include/asm-generic/spinlock.h
+index 90803a826ba0..4773334ee638 100644
+--- a/include/asm-generic/spinlock.h
++++ b/include/asm-generic/spinlock.h
+@@ -32,7 +32,7 @@
+ 
+ static __always_inline void arch_spin_lock(arch_spinlock_t *lock)
+ {
+-	u32 val = atomic_fetch_add(1<<16, lock);
++	u32 val = atomic_fetch_add(1<<16, &lock->val);
+ 	u16 ticket = val >> 16;
+ 
+ 	if (ticket == (u16)val)
+@@ -46,31 +46,31 @@ static __always_inline void arch_spin_lock(arch_spinlock_t *lock)
+ 	 * have no outstanding writes due to the atomic_fetch_add() the extra
+ 	 * orderings are free.
+ 	 */
+-	atomic_cond_read_acquire(lock, ticket == (u16)VAL);
++	atomic_cond_read_acquire(&lock->val, ticket == (u16)VAL);
+ 	smp_mb();
+ }
+ 
+ static __always_inline bool arch_spin_trylock(arch_spinlock_t *lock)
+ {
+-	u32 old = atomic_read(lock);
++	u32 old = atomic_read(&lock->val);
+ 
+ 	if ((old >> 16) != (old & 0xffff))
+ 		return false;
+ 
+-	return atomic_try_cmpxchg(lock, &old, old + (1<<16)); /* SC, for RCsc */
++	return atomic_try_cmpxchg(&lock->val, &old, old + (1<<16)); /* SC, for RCsc */
+ }
+ 
+ static __always_inline void arch_spin_unlock(arch_spinlock_t *lock)
+ {
+ 	u16 *ptr = (u16 *)lock + IS_ENABLED(CONFIG_CPU_BIG_ENDIAN);
+-	u32 val = atomic_read(lock);
++	u32 val = atomic_read(&lock->val);
+ 
+ 	smp_store_release(ptr, (u16)val + 1);
+ }
+ 
+ static __always_inline int arch_spin_value_unlocked(arch_spinlock_t lock)
+ {
+-	u32 val = lock.counter;
++	u32 val = lock.val.counter;
+ 
+ 	return ((val >> 16) == (val & 0xffff));
+ }
+@@ -84,7 +84,7 @@ static __always_inline int arch_spin_is_locked(arch_spinlock_t *lock)
+ 
+ static __always_inline int arch_spin_is_contended(arch_spinlock_t *lock)
+ {
+-	u32 val = atomic_read(lock);
++	u32 val = atomic_read(&lock->val);
+ 
+ 	return (s16)((val >> 16) - (val & 0xffff)) > 1;
+ }
+diff --git a/include/asm-generic/spinlock_types.h b/include/asm-generic/spinlock_types.h
+index 8962bb730945..f534aa5de394 100644
+--- a/include/asm-generic/spinlock_types.h
++++ b/include/asm-generic/spinlock_types.h
+@@ -3,15 +3,7 @@
+ #ifndef __ASM_GENERIC_SPINLOCK_TYPES_H
+ #define __ASM_GENERIC_SPINLOCK_TYPES_H
+ 
+-#include <linux/types.h>
+-typedef atomic_t arch_spinlock_t;
+-
+-/*
+- * qrwlock_types depends on arch_spinlock_t, so we must typedef that before the
+- * include.
+- */
+-#include <asm/qrwlock_types.h>
+-
+-#define __ARCH_SPIN_LOCK_UNLOCKED	ATOMIC_INIT(0)
++#include <asm-generic/qspinlock_types.h>
++#include <asm-generic/qrwlock_types.h>
+ 
+ #endif /* __ASM_GENERIC_SPINLOCK_TYPES_H */
 -- 
 2.40.1
 
