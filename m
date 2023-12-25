@@ -1,168 +1,182 @@
-Return-Path: <kvm+bounces-5228-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5229-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8E9481E141
-	for <lists+kvm@lfdr.de>; Mon, 25 Dec 2023 16:09:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F72781E145
+	for <lists+kvm@lfdr.de>; Mon, 25 Dec 2023 16:12:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E3B21F21D52
-	for <lists+kvm@lfdr.de>; Mon, 25 Dec 2023 15:09:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73AAD1C2193C
+	for <lists+kvm@lfdr.de>; Mon, 25 Dec 2023 15:12:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DF9152F62;
-	Mon, 25 Dec 2023 15:09:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F060352F81;
+	Mon, 25 Dec 2023 15:12:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="MjraoYCp"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="O9jJqXXQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2047.outbound.protection.outlook.com [40.107.92.47])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2076.outbound.protection.outlook.com [40.107.220.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76A815103F;
-	Mon, 25 Dec 2023 15:09:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DD8652F61;
+	Mon, 25 Dec 2023 15:12:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TebvQBDY20dlpreKvi25swg6Uq+maMnMUuHlxMI2C55XPmVfAN+bB7CgZQPIJfXAZfaOWn2KCx4B8aEbcQuB6JElH2vvPr+ex4zHNWIcbp21cb/GUg+nidCYi/rHJkYp3v44tkkC2fsxfLHNIzxdDbE8WYYC3oFTsxONv87M7BygluN//Eor07/3nCFADb8Nw6omORhRPH1PQ0RfzykzxdXIpEricQjH1jsdrtRsmsi//ZkKT3WtRkbk/iJelMaQIMVRReJ/EPGqszcozo7aw3XbP6Qbn1zDBQHjEq0w7bJuvUgo3+fIXec73ooT8dWIHdH3tNu8lWwV+mv8cSPkWQ==
+ b=Q0lpCGLxlPbgXVPtYXJ46TUUU5o2uqzXZF8r6TZ8aXu5m2koZDaD8OMp4InMrAzGVY274A+VX4T6c7VH7rcNgiy8L2tsR8g3O4gm/QMTN0P2oKbU7ZJTsFoRj6fcko/+o60Q0yzm1MVA6P0TKm/ZOxh7GnFR/qI2huJt+TIl4jIEfhqYFj8Js4x0iP8EAJV6J73NA0yaDJemX7UWoLU4bkJpizzXtC77WkmN0IiePGxwfoLhqXntwVy7XoUZwLKC3UlFMA+OhTHh3BRUdOT5++OTKD0niJaYFqy/9Mwd9iQ9XWYqIjhC9jOUwZZD+18l9zYaHCFlZ7HrbYKJdx/5+A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/HpG8+A85gPQklA9yf7Xn/5iGDzlya9N9Jxsy8ipzFI=;
- b=NYM8k7SJm/pJkDET0sgAlkwhC5Chi6/R+pC0b/Mit8KaCdEXkaUsMXpwLeMz+vPTRmnMpCFWSumQpI0avfHjZAF+OzUe00v94/3jN8pMgpNWrH0C5rlNQqwxuSuM0zuyMc8wUCiQnAw7BN+7tsoxmFy2zXva2XVVAfZj1HJVrv3EQmWEfLLORgY7C4ClXewc4bJ8ekrcyXD06wPLIfpGZ03mGWDkCM347qZgc3k/Dj6M+EzILJ7aoh9ki6ObdYjZe7/09zuztuSPej7XL2758tSEKCTN7L0naD1yp1PAlxVHksMQQURQuhQd8lggYU/GJQ0RyiQ0l/ZuIoH13yJrng==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
+ bh=Fdyzga269TON7etIuAsUiwHiZpnBbeXdSusUYxZM3c0=;
+ b=mzg5Uhe6WG4G69aBYhQ35jTfxBSmhANRpOygBWmLU7Qwpopgr2Jxqxitf9jbQ4RUA+gHsz5GtLHWOD9auX5D14AvAJfB1PCy/u+vdwcHR6DrruOdvsr3xsYBTCa9PsMqH+5BBKCzaiK3OvSdb8gnq/Me378Ha7MbJQnYSQrzXWA5AWukEnj7L3mFXZE6AOYa+bP+7m00ma9dflX72KThpgp2kZnBgxv0+u5gkpVFJZliOLuomRxbLcNA69FohZTsO1FKyAsy3fEU3LhgAtXbIi8S2zzIJCHt4CD0XlVMJLU3CXiNowrK9fjjvNuQwNmezc/5Gy/deRgEFEx0xv7nDQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.233) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/HpG8+A85gPQklA9yf7Xn/5iGDzlya9N9Jxsy8ipzFI=;
- b=MjraoYCpsNlLgxJFJ7EDdPZCyOXKg/0AWaAVCZd/rYarS6h4zeFOpXzbrsl5giD0JonAU3IQUDfv8EK202DO0bAHnMD+O4kP7wopBr/sJP2eJTujRoHmJC9Cf7V/PbwfTdmtakWs1gYU3lRDVk5W29St4N1904HlzGc9ai4cdFvfwGOdMw1cJqTeGdwWwF0oCDyxUjuXYKmwdSMQDZiSQw/MaOEkeUpUpad/hRNSV/F2loPQoRLQNBvH+VdMaZwT9PgM030cydE0G+puiMBcg2KY1u+AuXJMC5bbzrxu++iE8/fR7MciLXJb86KedXPjIi9bjO0RK62kO1tpdVNDMA==
-Received: from DM6PR12MB5565.namprd12.prod.outlook.com (2603:10b6:5:1b6::13)
- by PH8PR12MB6700.namprd12.prod.outlook.com (2603:10b6:510:1cf::13) with
+ bh=Fdyzga269TON7etIuAsUiwHiZpnBbeXdSusUYxZM3c0=;
+ b=O9jJqXXQ7zhvWEEq44+BhqOgFycWxe5tYo0pybBZl8wePj536j12EmyG2zEFN+fMImXPeDg1zAv2WpMmQ17Rb8QCBGDbbbe5q0HADakG8RYwePzYwwGZy6XUaWavL+6XU9DGIph7x2gNf7OV5gw+apQV2zwl5uLuw+LfC15pyaXkqVhF/A9wGqz9se4W3h2caMIaKl0ekhb+C18CXKeHYAtDXeAyjjMFHNkZl2H4xrJ5mlVQveVjnrUAAJgP9lRepzrktPDq2M/Rkhy9k1yukTN3vy0l+F28uMcYZzZtOspKYRj/X6XW4zNQtXBQ8eUA5ZWaFrJHUkOxe7vUQ9ygBg==
+Received: from SJ0PR03CA0215.namprd03.prod.outlook.com (2603:10b6:a03:39f::10)
+ by BL1PR12MB5350.namprd12.prod.outlook.com (2603:10b6:208:31d::23) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7113.26; Mon, 25 Dec
- 2023 15:09:23 +0000
-Received: from DM6PR12MB5565.namprd12.prod.outlook.com
- ([fe80::bd76:47ad:38a9:a258]) by DM6PR12MB5565.namprd12.prod.outlook.com
- ([fe80::bd76:47ad:38a9:a258%5]) with mapi id 15.20.7113.026; Mon, 25 Dec 2023
- 15:09:23 +0000
+ 2023 15:12:15 +0000
+Received: from SJ1PEPF00001CE8.namprd03.prod.outlook.com
+ (2603:10b6:a03:39f:cafe::dd) by SJ0PR03CA0215.outlook.office365.com
+ (2603:10b6:a03:39f::10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7113.27 via Frontend
+ Transport; Mon, 25 Dec 2023 15:12:14 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ SJ1PEPF00001CE8.mail.protection.outlook.com (10.167.242.24) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7135.14 via Frontend Transport; Mon, 25 Dec 2023 15:12:14 +0000
+Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 25 Dec
+ 2023 07:12:06 -0800
+Received: from drhqmail203.nvidia.com (10.126.190.182) by
+ drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.41; Mon, 25 Dec 2023 07:12:05 -0800
+Received: from c-237-113-220-225.mtl.labs.mlnx (10.127.8.12) by
+ mail.nvidia.com (10.126.190.182) with Microsoft SMTP Server id 15.2.986.41
+ via Frontend Transport; Mon, 25 Dec 2023 07:12:02 -0800
 From: Dragos Tatulea <dtatulea@nvidia.com>
-To: "mst@redhat.com" <mst@redhat.com>
-CC: "xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>, Parav Pandit
-	<parav@nvidia.com>, Gal Pressman <gal@nvidia.com>, "eperezma@redhat.com"
-	<eperezma@redhat.com>, "virtualization@lists.linux-foundation.org"
-	<virtualization@lists.linux-foundation.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "si-wei.liu@oracle.com"
-	<si-wei.liu@oracle.com>, "jasowang@redhat.com" <jasowang@redhat.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH 0/2] vdpa: Block vq property change in DRIVER_OK
-Thread-Topic: [PATCH 0/2] vdpa: Block vq property change in DRIVER_OK
-Thread-Index: AQHaNzg1RvmJ6ZT7YkSwTjp16iw3eLC6Eh2AgAAIIAA=
-Date: Mon, 25 Dec 2023 15:09:22 +0000
-Message-ID: <5c638566b18c211a2788ca7ce4937a4c727f4e2f.camel@nvidia.com>
-References: <20231225134210.151540-1-dtatulea@nvidia.com>
-	 <20231225093850-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20231225093850-mutt-send-email-mst@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.50.2 (3.50.2-1.fc39) 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM6PR12MB5565:EE_|PH8PR12MB6700:EE_
-x-ms-office365-filtering-correlation-id: 4115f1f8-a4eb-422c-1b5e-08dc055b7a2f
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- K1mSW7iAW5zQWadY7BVkX6i3ZJLBUcVDSjDKO/1CErpsUzomz4dEL/Rdxji/jOAOtU8BbXWKprewCzErNeEkUYTnr5PSUx0ui0JQrwuDp/5u0B6wYPl37QVtu3uVGdCu6JJoX4n6w6cprFTqS8C5wCYDY+zr05aJ98YlnfglowgMd4D3+TlE3Poao5t3VblCIz7CZBX/3JQd3IfF54Jk0lySiMAmVNZXUjR7/751O1CQ7jdThuuIXAnHxyibn0dle7GqkMPVg5yyJkSA7CYuTYJzw0Y0xQZOAti3iGCU0rFqEReA5MPXA6c9o6fKGBXCeAjrZIGjx+PSG6A8b69JZJqo/tcpBXryVfkPW+E6FCefc3mCsowOaGep5gqf5FRsaXpyZ5nGuUqbmlDMg0JcSKffEKdCGEbKA7b1unq1ns3N7lmtbhrcuQvkVyFXg5dRdPxQ+joGRkw6juFLXXuGC5KBM08GRV+FrQaGDcSsPwqhN8cVpW7n/mA5+m/iSabd66Ykbal5stnIV9ddrCq8RGtVefVEYLNkOpfbO+eG5CWSi6qR7eSVXo/hxFZu7kNd/h3Wdhq8wVxu8tYQqWdso4gfuAObm/HrXCIm4vEbOWfGy85hl3MSZOJze6+8uNtpNheDt9H5pevUiywWJGelE4PFKSGh+D6EG1GwqSaX58U=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB5565.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(39860400002)(346002)(376002)(396003)(136003)(230922051799003)(1800799012)(451199024)(64100799003)(186009)(6506007)(4001150100001)(6512007)(86362001)(2906002)(966005)(71200400001)(478600001)(122000001)(83380400001)(38100700002)(41300700001)(2616005)(4326008)(54906003)(316002)(36756003)(66946007)(76116006)(66556008)(6916009)(64756008)(66446008)(66476007)(91956017)(8936002)(6486002)(38070700009)(8676002)(5660300002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?L3d3QVhiTWgrb1hBdEFzbEJkVU16eEdqOW8wRStUZ3JYaHBVMkszdnF1bHlU?=
- =?utf-8?B?YU05Tm1hWXRGYXhQbHdjdTZmdzEzRGpraENmcmVSTXo1MkI1bDhGRjJrTjVD?=
- =?utf-8?B?V011aUdWQVM0cTNvRis1dmszUGx0T2R1M2MwYkhYN0llc2M1ekllbWZiM3lR?=
- =?utf-8?B?WWZEbVV1WmJRdm1PVERlTGRYTjdVQmc3Y25kUS9nREdJdEJkODl0N2Mrdk5v?=
- =?utf-8?B?VllGclQ4WW1QZC9odTllTHhXdE50YzRxNU8velRKcTB6K2ZSRTZCdld5WXBG?=
- =?utf-8?B?NzRUeW5RWnRnN2dVUVAzaFNTN2hoOStRbFRvWlFmTEpJbDljQ0RyeXJpTFJi?=
- =?utf-8?B?dFY2Vmo0ZEZzMERHOGFNYlRHSGZLTjBRTzlmdlQrUEhTU3FuOFN3U0tXRzVN?=
- =?utf-8?B?d2tIby8vZjhrRE13SVFXdDh1ZkFhOERZZDVQTHc1L2hkZ2c0bVo3ZzJrNWFG?=
- =?utf-8?B?QjNCQlVhUjI3ZFIra3laSFk0WjVydEhPdjBxNzd5WDU0U0kzbEdFSWU5ZXdP?=
- =?utf-8?B?UXFMNjZwVUpVU3QzUElwZCtwWmw0T1RYZWZBaldKY1g1aTBrL2V3dkF6SDg2?=
- =?utf-8?B?YmhYdnBZM1FubjEvWkxjZ1dRNXAxTHM0aHQ0Q2wyODVQcW5JYkl6cFVLME5q?=
- =?utf-8?B?YUdxbSt2S05iMk9GUEp2aE91YmtwQWp2Y0dFdFJDQldjQzRoNjhsR3RzTFBW?=
- =?utf-8?B?UllFQmlNMGVnRmEyU0RQUmdWVGxmRjE4WkxLNGRqOXhobVd5cUpYeXVROTdj?=
- =?utf-8?B?UENPUFJoZjFMUHBDU2N3bm9zSjY1LzF2RnJPR1VIWGoyNzFOS0pKYnRkK0tM?=
- =?utf-8?B?NVRhRkM5aHFOOFU0VHNVMW1nbWU4RmpaS3VmSXd0Z2RKRkFyQndrUVZFb1R1?=
- =?utf-8?B?UCtRVm0rREVpdm40RlVJK2VUR1VDVEFsSDkxK2Zpa2ViUDRMdVJHOHZNekxw?=
- =?utf-8?B?WC9rYmFlamdLYUVLeGt3M3VaY3J3YVMxK0pENHprQTF6SkY5UENLRitjN2M2?=
- =?utf-8?B?UExwdExGcXFkTWl6THpoNVN2TnNXOUxESmtpTnJXSEtsc1lydDVEVlI2djdI?=
- =?utf-8?B?V1BwWEU1UWFnZUhZRngxdnM2ZXVKNHFTZUVaKzRLN2NhSlV3WGsxNk1MZEN0?=
- =?utf-8?B?U3B0elplanRzU0VJaFY3cW9VVXZIVytWeHpaWnhjMGt2ZEQ3N0xEb0Y4R1ZS?=
- =?utf-8?B?RmxVajZCL0ZMWkRwb2U2UC9UTmlWZWRaN0l5eXNtRzc5Uk56VFZxVTNHeVRt?=
- =?utf-8?B?cHZJVVYwVDc1UGJzZ3VCcUJPNWhJeUNkS3krSUI2d2luU2dKSmdPQ2o4RHd4?=
- =?utf-8?B?aks0ekh5VzR2Ni9Ebk14YWxzYUk2Q1d2VlcrU1VUL1VCTmVrMUMvTVRSZVh5?=
- =?utf-8?B?WUtYcHFVNkNIVWpsajFyVzF0QlpJWENMWUxMbm5GVW1WL2VpVnZwTUdYcEo2?=
- =?utf-8?B?V3dxdURUNVpFRkNBUmRkVjFhdzBUdzd1V2M5d0NzakpaZ1NyK2k0QmM5UDJF?=
- =?utf-8?B?eG13bmRSelRkQjFpaEtpMjlIMWp1Rzh0T3ZOUjhqY0JtdzlwQ3dHS2ZEWCtN?=
- =?utf-8?B?OGtLaTFDdUkwUW02YzlzSUU0eFRUT2NoOUZNT3YwQkg4VXc3b3loc3dRVFRa?=
- =?utf-8?B?QjcwN0Q1NGxyZ21uWllLOVRlN0d2Q1FRMXRYaGZRY2N6MHk0NmowS3JzTXk3?=
- =?utf-8?B?N1pHeXIyelI4OHlPdFIzQ1QveUVwc2R0enlScFdZS0VxR0VLYUZ1OStuTi9F?=
- =?utf-8?B?Q2Y1T3N0ZmswQnVpTlJFWFY1M1NhbXNJMVhTSjhlcXhwbW9Ib2QvYzhLZjFD?=
- =?utf-8?B?OFBTM0p1UGZHV0xpbGsxdWlXVnljOUNjYkN6S1czQzJGb2hTNG41cWFFWStm?=
- =?utf-8?B?Yk1sVjFyME02QTBOS0RjdGFSbURSWnVYb2JnTTlLSTBsR1BBNUtYdnBST2dW?=
- =?utf-8?B?UHdORUQ4NklPdStjUGVsQUpPQi91TU9rdWkwZ3B0eFJNVThsMHVqWjlRdkh6?=
- =?utf-8?B?aUhXamVhYnJFRWRoc3NkMlpKSEdDRWNXRXZPQXNJSG5qOGU0bmQvYXd3NGkx?=
- =?utf-8?B?REk2OURTaWNyS3U1OFR2Z2pVQ3ZzenZqSmZIT1N2eDMrb0QvV3AyRGd0Zk5M?=
- =?utf-8?B?L3MrbWpJNmJXd2ZLNEgzK1ovL3lpbi9pTnJFdnFlZGdSYklIRzhjRmZJZ1dO?=
- =?utf-8?Q?Ih3vIuBojW2Ob+DOkkCiBCNfp8r0ycr/xYmjLdN7VQt4?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <0FF84A895E80E04ABA3A32EABDE1C833@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+To: "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+	Eugenio Perez Martin <eperezma@redhat.com>, Si-Wei Liu
+	<si-wei.liu@oracle.com>, Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky
+	<leon@kernel.org>, <virtualization@lists.linux-foundation.org>, Gal Pressman
+	<gal@nvidia.com>
+CC: Dragos Tatulea <dtatulea@nvidia.com>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Parav Pandit <parav@nvidia.com>, Xuan Zhuo
+	<xuanzhuo@linux.alibaba.com>
+Subject: [PATCH vhost v5 0/8] vdpa/mlx5: Add support for resumable vqs
+Date: Mon, 25 Dec 2023 17:11:55 +0200
+Message-ID: <20231225151203.152687-1-dtatulea@nvidia.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CE8:EE_|BL1PR12MB5350:EE_
+X-MS-Office365-Filtering-Correlation-Id: d72ebb84-b2fe-4cd5-f9fa-08dc055be061
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	4pbBqzytMsWCGxDa1vwI3V+cfUFdUPkvkQpbM20Mc/V9QzTvtimqfcXoG47nJNiQaElJAtSgiklKD8WtHROsF6dXxHHtV6tGTs2KFNkh1BMuiZZSVdQJGX/FOsfkzP/rFkOtVdMo9yjidpOiKU4k6QzKDJOvyafUB8IJSp0WelGPL4nZEkSo93vNjdxyi1BF4P3otG+nEdSIH+WUwuW4lEvTLyEkKNs1lg1tHtMcoBIcp9wplpQFZ0JU5+G1Ui648YnIa620y2HL2Ae9ZtIoE0XWe7EUM47BK3arqjIBPSy2HG+druj1W7XZtWka96ISs04Ju7o+IqWNP450ZUzjPaYR9j2+VC9NHM7QX+7RRhFwTXVgc0ZHTVuMhVag6/OXf1vHOFwiN0sFzoZIlshlKU087/qDyBGCu+q1ZBtfMYp3MqPVzxfvs0eUUiN5tYJvePtQ7oZb43IHIvlAtjXSTkn45elSmf/hnD/vvWEiApfGju8FweE2pxws3/GLJRhPNPFC8FssfZGHKCcxT2J9wd3SFFRxPHRolMP2I7ABnXPayWxa8U2NP4eCnQbk8Ma/ZNCZ0BULEm3SKlM5kufF5o7xtwnazBBI42PEJd0BCusT6FP1GMEOvkPB12AmsUX15Ygxj6nG2yoZmtl1PY8hlvTi0jJM3aLuj/eq6hcLDxXqCskZyb9pHTjVbD5dlgNXMMcP4dwZuNYfutJAoZQ2oARVmD3Sl/6ur2js7Yglkrp/plmAp/5vfeiHorZc8U0fn75Lc5eO702BNCSDSAngHFfPjh/h019FJCbe2y+b75Y=
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(136003)(346002)(376002)(396003)(39860400002)(230922051799003)(64100799003)(1800799012)(82310400011)(451199024)(186009)(36840700001)(46966006)(40470700004)(8676002)(8936002)(5660300002)(2906002)(4326008)(316002)(478600001)(966005)(6666004)(70206006)(70586007)(54906003)(110136005)(6636002)(41300700001)(36860700001)(47076005)(356005)(7636003)(40480700001)(82740400003)(40460700003)(26005)(2616005)(426003)(336012)(1076003)(36756003)(86362001)(83380400001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB5565.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4115f1f8-a4eb-422c-1b5e-08dc055b7a2f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Dec 2023 15:09:22.9641
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Dec 2023 15:12:14.4291
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: is3Ca0U/wnSsflYoKc7Hx68ONJBJD6iwNXd934AaEJYgJU1O7TDdlcuR0iC11uDg5MYUt4UgeGyx+NjHkrpEPw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB6700
+X-MS-Exchange-CrossTenant-Network-Message-Id: d72ebb84-b2fe-4cd5-f9fa-08dc055be061
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF00001CE8.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5350
 
-T24gTW9uLCAyMDIzLTEyLTI1IGF0IDA5OjQwIC0wNTAwLCBNaWNoYWVsIFMuIFRzaXJraW4gd3Jv
-dGU6DQo+IE9uIE1vbiwgRGVjIDI1LCAyMDIzIGF0IDAzOjQyOjA4UE0gKzAyMDAsIERyYWdvcyBU
-YXR1bGVhIHdyb3RlOg0KPiA+IFRoaXMgc2VyaWVzIHByZXZlbnRzIHRoZSBjaGFuZ2Ugb2Ygdmly
-dHF1ZXVlIGFkZHJlc3Mgb3Igc3RhdGUgd2hlbiBhDQo+ID4gZGV2aWNlIGlzIGluIERSSVZFUl9P
-SyBhbmQgbm90IHN1c3BlbmRlZC4gVGhlIHZpcnRpbyBzcGVjIGRvZXNuJ3QNCj4gPiBhbGxvdyBj
-aGFuZ2luZyB2aXJ0cXVldWUgYWRkcmVzc2VzIGFuZCBzdGF0ZSBpbiBEUklWRVJfT0ssIGJ1dCBz
-b21lIGRldmljZXMNCj4gPiBkbyBzdXBwb3J0IHRoaXMgb3BlcmF0aW9uIHdoZW4gdGhlIGRldmlj
-ZSBpcyBzdXNwZW5kZWQuIFRoZSBzZXJpZXMNCj4gPiBsZWF2ZXMgdGhlIGRvb3Igb3BlbiBmb3Ig
-dGhlc2UgZGV2aWNlcy4NCj4gPiANCj4gPiBUaGUgc2VyaWVzIHdhcyBzdWdnZXN0ZWQgd2hpbGUg
-ZGlzY3Vzc2luZyB0aGUgYWRkaXRpb24gb2YgcmVzdW1hYmxlDQo+ID4gdmlydHVxdWUgc3VwcG9y
-dCBpbiB0aGUgbWx4NV92ZHBhIGRyaXZlciBbMF0uDQo+IA0KPiANCj4gSSBhbSBjb25mdXNlZC4g
-SXNuJ3QgdGhpcyBhbHNvIGluY2x1ZGVkIGluDQo+ICB2ZHBhL21seDU6IEFkZCBzdXBwb3J0IGZv
-ciByZXN1bWFibGUgdnFzDQo+IA0KPiBkbyB5b3Ugbm93IHdhbnQgdGhpcyBtZXJnZWQgc2VwYXJh
-dGVseT8NClRoZSBkaXNjdXNzaW9uIGluIHRoZSBsaW5rZWQgdGhyZWFkIGxlYWQgdG8gaGF2aW5n
-IDIgc2VyaWVzIHRoYXQgYXJlDQppbmRlcGVuZGVudDogdGhpcyBzZXJpZXMgYW5kIHRoZSBvcmln
-aW5hbCB2MiBvZiBvZiB0aGUgInZkcGEvbWx4NTogQWRkIHN1cHBvcnQNCmZvciByZXN1bWFibGUg
-dnFzIiBzZXJpZXMgKGZvciB3aGljaCBJIHdpbGwgc2VuZCBhIHY1IG5vdyB0aGF0IGlzIHNhbWUg
-YXMgdjIgKw0KQWNrZWQtYnkgdGFncykuDQoNCj4gDQo+ID4gWzBdIGh0dHBzOi8vbG9yZS5rZXJu
-ZWwub3JnL3ZpcnR1YWxpemF0aW9uLzIwMjMxMjE5MTgwODU4LjEyMDg5OC0xLWR0YXR1bGVhQG52
-aWRpYS5jb20vVC8jbTA0NGRkZjU0MGQ5OGE2YjAyNWY4MWJmZmEwNThjYTY0N2EzZDAxM2UNCj4g
-PiANCj4gPiBEcmFnb3MgVGF0dWxlYSAoMik6DQo+ID4gICB2ZHBhOiBUcmFjayBkZXZpY2Ugc3Vz
-cGVuZGVkIHN0YXRlDQo+ID4gICB2ZHBhOiBCbG9jayB2cSBwcm9wZXJ0eSBjaGFuZ2VzIGluIERS
-SVZFUl9PSw0KPiA+IA0KPiA+ICBkcml2ZXJzL3Zob3N0L3ZkcGEuYyB8IDIzICsrKysrKysrKysr
-KysrKysrKysrKy0tDQo+ID4gIDEgZmlsZSBjaGFuZ2VkLCAyMSBpbnNlcnRpb25zKCspLCAyIGRl
-bGV0aW9ucygtKQ0KPiA+IA0KPiA+IC0tIA0KPiA+IDIuNDMuMA0KPiANCg0K
+Add support for resumable vqs in the mlx5_vdpa driver. This is a
+firmware feature that can be used for the following benefits:
+- Full device .suspend/.resume.
+- .set_map doesn't need to destroy and create new vqs anymore just to
+  update the map. When resumable vqs are supported it is enough to
+  suspend the vqs, set the new maps, and then resume the vqs.
+
+The first patch exposes relevant bits for the feature in mlx5_ifc.h.
+That means it needs to be applied to the mlx5-vhost tree [0] first. Once
+applied there, the change has to be pulled from mlx5-vhost into the
+vhost tree and only then the remaining patches can be applied. Same flow
+as the vq descriptor mappings patchset [1].
+
+The second part adds support for selectively modifying vq parameters. This
+is needed to be able to use resumable vqs.
+
+The third part adds the actual support for resumable vqs.
+
+The last part of the series introduces reference counting for mrs which
+is necessary to avoid freeing mkeys too early or leaking them.
+
+* Changes in v5:
+- Same as v2 with additional Acked-by tags. Based on review discussion
+  in this thread [0].
+
+* Changes in v4:
+- Added vdpa backend feature support for changing vq properties in
+  DRIVER_OK when device is suspended. Added support in the driver as
+  well.
+- Dropped Acked-by for the patches that had the tag mistakenly
+  added.
+
+* Changes in v3:
+- Faulty version. Please ignore.
+
+* Changes in v2:
+- Added mr refcounting patches.
+- Deleted unnecessary patch: "vdpa/mlx5: Split function into locked and
+  unlocked variants"
+- Small print improvement in "Introduce per vq and device resume"
+  patch.
+- Patch 1/7 has been applied to mlx5-vhost branch.
+
+[0] - https://lore.kernel.org/virtualization/4abd7d516a9e82ebf41b1ea98475341844186568.camel@nvidia.com/T/#mb0433c4f1705fc2cdaa7c926f352c26f6b54444d
+
+Dragos Tatulea (8):
+  vdpa/mlx5: Expose resumable vq capability
+  vdpa/mlx5: Allow modifying multiple vq fields in one modify command
+  vdpa/mlx5: Introduce per vq and device resume
+  vdpa/mlx5: Mark vq addrs for modification in hw vq
+  vdpa/mlx5: Mark vq state for modification in hw vq
+  vdpa/mlx5: Use vq suspend/resume during .set_map
+  vdpa/mlx5: Introduce reference counting to mrs
+  vdpa/mlx5: Add mkey leak detection
+
+ drivers/vdpa/mlx5/core/mlx5_vdpa.h |  10 +-
+ drivers/vdpa/mlx5/core/mr.c        |  69 ++++++++--
+ drivers/vdpa/mlx5/net/mlx5_vnet.c  | 209 ++++++++++++++++++++++++++---
+ include/linux/mlx5/mlx5_ifc.h      |   3 +-
+ include/linux/mlx5/mlx5_ifc_vdpa.h |   4 +
+ 5 files changed, 257 insertions(+), 38 deletions(-)
+
+-- 
+2.43.0
+
 
