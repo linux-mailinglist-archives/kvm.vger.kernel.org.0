@@ -1,37 +1,37 @@
-Return-Path: <kvm+bounces-5216-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5217-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F17E81E0AA
-	for <lists+kvm@lfdr.de>; Mon, 25 Dec 2023 14:03:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA79A81E0AD
+	for <lists+kvm@lfdr.de>; Mon, 25 Dec 2023 14:03:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B80AF1F22263
-	for <lists+kvm@lfdr.de>; Mon, 25 Dec 2023 13:03:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7DD431F222FE
+	for <lists+kvm@lfdr.de>; Mon, 25 Dec 2023 13:03:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D92A55784;
-	Mon, 25 Dec 2023 12:59:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AF1955C23;
+	Mon, 25 Dec 2023 13:00:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WJTNsleJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HHLBBAnp"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEF135576C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C028E55C00;
+	Mon, 25 Dec 2023 13:00:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F47EC433C9;
 	Mon, 25 Dec 2023 12:59:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BCC1C433C8;
-	Mon, 25 Dec 2023 12:59:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703509195;
-	bh=oQr4wuMlEBWYxpaVbDZM0YUteF5WonWqf5vY5cQvc88=;
+	s=k20201202; t=1703509200;
+	bh=ODSRlqemB7gRQiZhfDlWrTaT1uOIIWzSdyDrN4uUjz0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WJTNsleJ/F9oBTs4gL7/Zk38ee+5vDE/bYOTwPr0JtYhW4QSxNI2Pn0dqn1l3Z/hP
-	 47cT03H9LiKUD/fTnGxtz4G3an6tSqHhnSoORwyb4pl46iA/OAe2J++WBEm5X4ighK
-	 icXm6IXo/LkkqAPiHuGRDXNFPAecsDKaeqvEZJmz50J9M/AWIGs0iLYQafmgY9nasl
-	 esVXXomXaQc36WywqFMNqKdTX/bNO5zQBmXzDWvuAEaVOtk3LLsrFEyPnVa2zoOu6p
-	 xm+TQzhc2GFNjG8Ape4hWPCMo3alw/szyUPCQsLrBFsPX4SWrmotqtPUuX/a8LmbA1
-	 v5PU1YhDHV4FQ==
+	b=HHLBBAnppN8o1pDLvfunhLB3Lt7KIVadT3NnTcn5SeCKjvTRQgM4K4iXQOFErew9F
+	 ndXJaJGkSxgn856NCf4OewK7dyrSqkDQlE54srL+wIlNRs7pOZODCz4VUwGa6Xmf6+
+	 bp+vPyCJJZYfGRt569xm7px0kHlXZOtgnipq7eozxtZM4ImLOAEwbhMAAXaRmPEzNq
+	 Rki4RUiNkCK0vHj8j0j1huJYkDKcuGN0Q1v2LP/OGvHeytt2O+/tvNuF2pd6AeGDdb
+	 St1pQ7BXZ7AreXCvnoA6IBJWYdBdFLfdHkFqR/ZEYRAToqSyeIX1YenPa9Dz0T1bpf
+	 NZ6YmbH9G5kTg==
 From: guoren@kernel.org
 To: paul.walmsley@sifive.com,
 	palmer@dabbelt.com,
@@ -56,9 +56,9 @@ Cc: linux-riscv@lists.infradead.org,
 	kvm@vger.kernel.org,
 	virtualization@lists.linux-foundation.org,
 	Guo Ren <guoren@linux.alibaba.com>
-Subject: [PATCH V12 11/14] RISC-V: paravirt: pvqspinlock: Add SBI implementation
-Date: Mon, 25 Dec 2023 07:58:44 -0500
-Message-Id: <20231225125847.2778638-12-guoren@kernel.org>
+Subject: [PATCH V12 12/14] RISC-V: paravirt: pvqspinlock: Add nopvspin kernel parameter
+Date: Mon, 25 Dec 2023 07:58:45 -0500
+Message-Id: <20231225125847.2778638-13-guoren@kernel.org>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20231225125847.2778638-1-guoren@kernel.org>
 References: <20231225125847.2778638-1-guoren@kernel.org>
@@ -72,73 +72,55 @@ Content-Transfer-Encoding: 8bit
 
 From: Guo Ren <guoren@linux.alibaba.com>
 
-Implement pv_kick with SBI guest implementation, and add
-SBI_EXT_PVLOCK extension detection. The backend part is
-in the KVM pvqspinlock patch.
+Disables the qspinlock slow path using PV optimizations which
+allow the hypervisor to 'idle' the guest on lock contention.
 
 Reviewed-by: Leonardo Bras <leobras@redhat.com>
 Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
 Signed-off-by: Guo Ren <guoren@kernel.org>
 ---
- arch/riscv/include/asm/sbi.h           | 6 ++++++
- arch/riscv/kernel/qspinlock_paravirt.c | 7 ++++++-
- 2 files changed, 12 insertions(+), 1 deletion(-)
+ Documentation/admin-guide/kernel-parameters.txt |  2 +-
+ arch/riscv/kernel/qspinlock_paravirt.c          | 13 +++++++++++++
+ 2 files changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/arch/riscv/include/asm/sbi.h b/arch/riscv/include/asm/sbi.h
-index 8f748d9e1b85..318b3dd92958 100644
---- a/arch/riscv/include/asm/sbi.h
-+++ b/arch/riscv/include/asm/sbi.h
-@@ -31,6 +31,7 @@ enum sbi_ext_id {
- 	SBI_EXT_SRST = 0x53525354,
- 	SBI_EXT_PMU = 0x504D55,
- 	SBI_EXT_DBCN = 0x4442434E,
-+	SBI_EXT_PVLOCK = 0xAB0401,
+diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+index b7794c96d91e..4aff81d741e2 100644
+--- a/Documentation/admin-guide/kernel-parameters.txt
++++ b/Documentation/admin-guide/kernel-parameters.txt
+@@ -3927,7 +3927,7 @@
+ 			as generic guest with no PV drivers. Currently support
+ 			XEN HVM, KVM, HYPER_V and VMWARE guest.
  
- 	/* Experimentals extensions must lie within this range */
- 	SBI_EXT_EXPERIMENTAL_START = 0x08000000,
-@@ -250,6 +251,11 @@ enum sbi_ext_dbcn_fid {
- 	SBI_EXT_DBCN_CONSOLE_WRITE_BYTE = 2,
- };
- 
-+/* kick cpu out of wfi */
-+enum sbi_ext_pvlock_fid {
-+	SBI_EXT_PVLOCK_KICK_CPU = 0,
-+};
-+
- #define SBI_SPEC_VERSION_DEFAULT	0x1
- #define SBI_SPEC_VERSION_MAJOR_SHIFT	24
- #define SBI_SPEC_VERSION_MAJOR_MASK	0x7f
+-	nopvspin	[X86,XEN,KVM]
++	nopvspin	[X86,XEN,KVM,RISC-V]
+ 			Disables the qspinlock slow path using PV optimizations
+ 			which allow the hypervisor to 'idle' the guest on lock
+ 			contention.
 diff --git a/arch/riscv/kernel/qspinlock_paravirt.c b/arch/riscv/kernel/qspinlock_paravirt.c
-index 85ff5a3ec234..7d1b99412222 100644
+index 7d1b99412222..4b04c93c4b9b 100644
 --- a/arch/riscv/kernel/qspinlock_paravirt.c
 +++ b/arch/riscv/kernel/qspinlock_paravirt.c
-@@ -11,6 +11,8 @@
+@@ -43,8 +43,21 @@ EXPORT_STATIC_CALL(pv_queued_spin_lock_slowpath);
+ DEFINE_STATIC_CALL(pv_queued_spin_unlock, native_queued_spin_unlock);
+ EXPORT_STATIC_CALL(pv_queued_spin_unlock);
  
- void pv_kick(int cpu)
- {
-+	sbi_ecall(SBI_EXT_PVLOCK, SBI_EXT_PVLOCK_KICK_CPU,
-+		  cpuid_to_hartid_map(cpu), 0, 0, 0, 0, 0);
- 	return;
- }
- 
-@@ -25,7 +27,7 @@ void pv_wait(u8 *ptr, u8 val)
- 	if (READ_ONCE(*ptr) != val)
- 		goto out;
- 
--	/* wait_for_interrupt(); */
-+	wait_for_interrupt();
- out:
- 	local_irq_restore(flags);
- }
-@@ -49,6 +51,9 @@ void __init pv_qspinlock_init(void)
- 	if(sbi_get_firmware_id() != SBI_EXT_BASE_IMPL_ID_KVM)
- 		return;
- 
-+	if (!sbi_probe_extension(SBI_EXT_PVLOCK))
-+		return;
++static bool nopvspin __initdata;
++static __init int parse_nopvspin(char *arg)
++{
++       nopvspin = true;
++       return 0;
++}
++early_param("nopvspin", parse_nopvspin);
 +
- 	pr_info("PV qspinlocks enabled\n");
- 	__pv_init_lock_hash();
+ void __init pv_qspinlock_init(void)
+ {
++	if (nopvspin) {
++		pr_info("PV qspinlocks disabled\n");
++		return;
++	}
++
+ 	if (num_possible_cpus() == 1)
+ 		return;
  
 -- 
 2.40.1
