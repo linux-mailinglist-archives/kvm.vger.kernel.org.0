@@ -1,140 +1,82 @@
-Return-Path: <kvm+bounces-5201-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5202-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 631B381DE0E
-	for <lists+kvm@lfdr.de>; Mon, 25 Dec 2023 05:11:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7279B81DF36
+	for <lists+kvm@lfdr.de>; Mon, 25 Dec 2023 09:42:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1DC802814D0
-	for <lists+kvm@lfdr.de>; Mon, 25 Dec 2023 04:11:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E78152819FD
+	for <lists+kvm@lfdr.de>; Mon, 25 Dec 2023 08:42:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3503D3D74;
-	Mon, 25 Dec 2023 04:11:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JbM08b2a"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5272F3D9C;
+	Mon, 25 Dec 2023 08:42:16 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2DCB23B0
-	for <kvm@vger.kernel.org>; Mon, 25 Dec 2023 04:11:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1703477502;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PR0rFCSyUG2eR88FaJw5eC09XvCgcCbfqIX9eF5hqEQ=;
-	b=JbM08b2a1y/LrdMZVrfZaPXr72a73RQxp+EzbierX07a3SSZqNeT4WwJAn3FiULWLj0Wer
-	ODJ5QhQZw6BolR80sFc/5sfFCji6zbQuMLk2icLP+hbfent6k5HUohr8Iuryi4igzyQX9b
-	EU2TmH+hG1vNEyLAn8qjDm4Mer+GfYA=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-187-NKAAl-IRO76kQwVUSBZxtQ-1; Sun, 24 Dec 2023 23:11:40 -0500
-X-MC-Unique: NKAAl-IRO76kQwVUSBZxtQ-1
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-28b8f963816so3961578a91.1
-        for <kvm@vger.kernel.org>; Sun, 24 Dec 2023 20:11:40 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF361186B
+	for <kvm@vger.kernel.org>; Mon, 25 Dec 2023 08:42:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7ba97338185so392254339f.1
+        for <kvm@vger.kernel.org>; Mon, 25 Dec 2023 00:42:14 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703477499; x=1704082299;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PR0rFCSyUG2eR88FaJw5eC09XvCgcCbfqIX9eF5hqEQ=;
-        b=ZVYZFFnlgu3bHzrZlP3i44q0Vb9B2kx+J04A6KniSxFbklAr1kXvjKaf0+XZYtDFGu
-         rHMoTcKporq0ITl0aSiGUXGSajo7jMU1Ek1GFjp0vvELXIymvrVp2D1yBmLJO7GbDvx1
-         MYicELTAQl1hz+PQTCjEzWF5aTAQCljCytcQ8SdduqFHe8TeEAbiXdXT10LOgR8TM7qA
-         pzhowxNdxiLwMe7/Leh7b5Ksg9R+G77VuDmX9GZPSvKtRtf3FWBSpweFqRnCinehhEHj
-         YfmKkP0qre3X3oMLOt0yIRsVKVT4AvREuEgnTO9H9CdIheGjQf4IG8VikIhGFKHSEgdm
-         KPOQ==
-X-Gm-Message-State: AOJu0YySjViBxvjMPkkgfL2tg2OCMWXeybqbSn7HSC81UvMjDJt+1OR0
-	72uGF/TCTQByMrwUluvdWOSbyJbnnr0ahku3m8TB8TUVAQU+0enpJQQUsyeC7MkJ+xwhmFjSTZM
-	4vPu5Pt31z7UbMFFW1x+3zPaG59CVUD0BUvIr
-X-Received: by 2002:a17:90a:428c:b0:28b:dc75:bef8 with SMTP id p12-20020a17090a428c00b0028bdc75bef8mr2579969pjg.22.1703477499379;
-        Sun, 24 Dec 2023 20:11:39 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHtxp8ucWx5dROZrp5JvDri52KPchZd12v9x5kEJ0UPnd0L9ZR0+MGTL1LiOJ9Z1GS7ksafL6q7Xk0IKUseXt0=
-X-Received: by 2002:a17:90a:428c:b0:28b:dc75:bef8 with SMTP id
- p12-20020a17090a428c00b0028bdc75bef8mr2579959pjg.22.1703477499127; Sun, 24
- Dec 2023 20:11:39 -0800 (PST)
+        d=1e100.net; s=20230601; t=1703493734; x=1704098534;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HNpK7gVVocd6D97UNc/uU33LSZEMZP8thvqp4QD621w=;
+        b=RkU0UUlcs8sBTAt4ZUvWx7k4V3AvU1pSLvqgrK8hHCj/xd6Sow2FovW/CRL3c9ABBU
+         R9Oj0npCCkSGLQIsfCF02sIfnactZdJIhY1BhN9TyUPNXkjkCMDFddZicvUDSHmMlv/A
+         v+UEj4B0O6VUXKHEhRkSdVMQfA5+TzB9LLMhasTvoKzpAmV5m3CXzZhSeGxFZoUAJ5u/
+         ZlXGyiCBYTRJHG29OJIkRSdyfLALgHjTdhLHJ6+x4gjcolcAJpYxYUq3ZSbAcujMfVEM
+         6OXW+ogavCzqZLyZFFAhp4jSpRfp5QO8XHi66e8+kpUXr9dYoeJw51x/vL5zK2NDH/J6
+         AEug==
+X-Gm-Message-State: AOJu0YyqVwu2paOA1ZxQ8kDjuvwu7xRklmn8Dxt9U2vf9UtFiUS94bfL
+	OGl8mnIpoOE4rk8HipsnVxyu/6+27iIr1jh2j3rSFK+EiXwU
+X-Google-Smtp-Source: AGHT+IG3dYA8NKJcN7EVOtfhsfJebVt6ntLuqWhU4s5iyxWjBECkL6g/8PzJsZReEl/yaZ8GUJMt+8bHRF8dIhO+grGV128vuQw/
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231219180858.120898-1-dtatulea@nvidia.com> <20231219180858.120898-7-dtatulea@nvidia.com>
- <CACGkMEs_kf2y9Khr==zY3RRHffaPRwS51XK33Lgv1eeanQdRpg@mail.gmail.com>
- <65064744954829b844d8a7b23bb09792cb6c2760.camel@nvidia.com> <f54a1037b515d15b24193d96d574b775eb743099.camel@nvidia.com>
-In-Reply-To: <f54a1037b515d15b24193d96d574b775eb743099.camel@nvidia.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 25 Dec 2023 12:11:27 +0800
-Message-ID: <CACGkMEsCrYY1bYDwOYD=XMPi0b1naJj5dGe8FXH9uMqpsf1b2A@mail.gmail.com>
-Subject: Re: [PATCH vhost v4 06/15] vdpa: Track device suspended state
-To: Dragos Tatulea <dtatulea@nvidia.com>
-Cc: "xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>, Parav Pandit <parav@nvidia.com>, 
-	Gal Pressman <gal@nvidia.com>, "eperezma@redhat.com" <eperezma@redhat.com>, 
-	"virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"si-wei.liu@oracle.com" <si-wei.liu@oracle.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"mst@redhat.com" <mst@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>, "leon@kernel.org" <leon@kernel.org>
+X-Received: by 2002:a05:6e02:1d87:b0:35f:8652:5ce8 with SMTP id
+ h7-20020a056e021d8700b0035f86525ce8mr619071ila.4.1703493733927; Mon, 25 Dec
+ 2023 00:42:13 -0800 (PST)
+Date: Mon, 25 Dec 2023 00:42:13 -0800
+In-Reply-To: <000000000000ad704b05f8de7e19@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000e355bc060d518a7e@google.com>
+Subject: Re: [v5.15] WARNING in kvm_arch_vcpu_ioctl_run
+From: syzbot <syzbot+412c9ae97b4338c5187e@syzkaller.appspotmail.com>
+To: bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
+	jarkko@kernel.org, jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-sgx@vger.kernel.org, mingo@redhat.com, 
+	pbonzini@redhat.com, seanjc@google.com, syzkaller-lts-bugs@googlegroups.com, 
+	tglx@linutronix.de, usama.anjum@collabora.com, vkuznets@redhat.com, 
+	wanpengli@tencent.com, x86@kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 22, 2023 at 7:22=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia.com=
-> wrote:
->
-> On Wed, 2023-12-20 at 13:55 +0100, Dragos Tatulea wrote:
-> > On Wed, 2023-12-20 at 11:46 +0800, Jason Wang wrote:
-> > > On Wed, Dec 20, 2023 at 2:09=E2=80=AFAM Dragos Tatulea <dtatulea@nvid=
-ia.com> wrote:
-> > > >
-> > > > Set vdpa device suspended state on successful suspend. Clear it on
-> > > > successful resume and reset.
-> > > >
-> > > > The state will be locked by the vhost_vdpa mutex. The mutex is take=
-n
-> > > > during suspend, resume and reset in vhost_vdpa_unlocked_ioctl. The
-> > > > exception is vhost_vdpa_open which does a device reset but that sho=
-uld
-> > > > be safe because it can only happen before the other ops.
-> > > >
-> > > > Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
-> > > > Suggested-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
-> > > > ---
-> > > >  drivers/vhost/vdpa.c | 17 +++++++++++++++--
-> > > >  1 file changed, 15 insertions(+), 2 deletions(-)
-> > > >
-> > > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> > > > index b4e8ddf86485..00b4fa8e89f2 100644
-> > > > --- a/drivers/vhost/vdpa.c
-> > > > +++ b/drivers/vhost/vdpa.c
-> > > > @@ -59,6 +59,7 @@ struct vhost_vdpa {
-> > > >         int in_batch;
-> > > >         struct vdpa_iova_range range;
-> > > >         u32 batch_asid;
-> > > > +       bool suspended;
-> > >
-> > > Any reason why we don't do it in the core vDPA device but here?
-> > >
-> > Not really. I wanted to be safe and not expose it in a header due to lo=
-cking.
-> >
-> A few clearer answers for why the state is not added in struct vdpa_devic=
-e:
-> - All the suspend infrastructure is currently only for vhost.
-> - If the state would be moved to struct vdpa_device then the cf_lock woul=
-d have
-> to be used. This adds more complexity to the code.
->
-> Thanks,
-> Dragos
+This bug is marked as fixed by commit:
+KVM: x86: Remove WARN sanity check on hypervisor timer vs. UNINITIALIZED vCPU
 
-Ok, I'm fine with that.
+But I can't find it in the tested trees[1] for more than 90 days.
+Is it a correct commit? Please update it by replying:
 
-Thanks
+#syz fix: exact-commit-title
 
+Until then the bug is still considered open and new crashes with
+the same signature are ignored.
+
+Kernel: Linux 5.15
+Dashboard link: https://syzkaller.appspot.com/bug?extid=412c9ae97b4338c5187e
+
+---
+[1] I expect the commit to be present in:
+
+1. linux-5.15.y branch of
+git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git
 
