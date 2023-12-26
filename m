@@ -1,360 +1,249 @@
-Return-Path: <kvm+bounces-5240-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5241-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E51681E43A
-	for <lists+kvm@lfdr.de>; Tue, 26 Dec 2023 01:50:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D0F281E488
+	for <lists+kvm@lfdr.de>; Tue, 26 Dec 2023 03:22:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D0531C21BDD
-	for <lists+kvm@lfdr.de>; Tue, 26 Dec 2023 00:50:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E6751F22576
+	for <lists+kvm@lfdr.de>; Tue, 26 Dec 2023 02:22:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA41315A8;
-	Tue, 26 Dec 2023 00:36:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFC4E137B;
+	Tue, 26 Dec 2023 02:21:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rjHlGvwN"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bDQmYslM"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03E3DA29;
-	Tue, 26 Dec 2023 00:36:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74847C433C8;
-	Tue, 26 Dec 2023 00:36:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703550963;
-	bh=NHdbFiqsifSTiK+myGWpMLxahvziN4vk1QnX3vAD/xI=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=rjHlGvwNgTOShocE/QLzg5emLQ8EoLisMuyX5Mgjrb/GFqLxEkjEue17lJevKsl3X
-	 hgUrLrK5jghOZ2/+sGpLcaTF/d81n6XAgpeUDG4gZ8Ra7zq8GxkWhxA0AHHmlp5NsX
-	 jPiGHnLAS05wXQ46MAgD33R9elmbS3hXtN9BZg1WinM1sLokQBzpsAyHTfpePYGc0h
-	 94ys7niwqmjzucsIt7WGfn/HhoztH/u8CZKFkdTD0/mO27U9IXXaUgWKmRgei2sT3V
-	 Bv6hG9gHMon3GM0rBsyXeWk1Dxqt/mM3WGSnbydIUqAGGrX6q3qnr5g1fer6LBh5sY
-	 cs3pS6poIy2Lw==
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-554cffbad2fso1114125a12.1;
-        Mon, 25 Dec 2023 16:36:03 -0800 (PST)
-X-Gm-Message-State: AOJu0YwbMY0BXwwxvzqRxf1OG5Tyo/qpSY6qwr/SiYKyFal5rwXUmfQy
-	22Nkrhqa0Elr3y7x61+1cgZYdFW01fLfULsLON0=
-X-Google-Smtp-Source: AGHT+IE/DGwHcZeEvOZIP8lchNXJdA2d9NxNnD9HVfrcsOGhHd6pzHxvV/RkMgS24DOoBI8q8XuLYEKI8vxwzqF1A68=
-X-Received: by 2002:a50:8e49:0:b0:553:4257:969d with SMTP id
- 9-20020a508e49000000b005534257969dmr3394385edx.66.1703550961867; Mon, 25 Dec
- 2023 16:36:01 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65F6CA32;
+	Tue, 26 Dec 2023 02:21:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1703557304; x=1735093304;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=Jgt4McMDsILSXzzZdA0PrSIGF/N07NA4W7AaZ9zAE+A=;
+  b=bDQmYslMJHLvVuYyGP/jGVVUY7MMVuU7aimJjq5xZuQmLTV/XiqHGSxR
+   4RzM4qPlcWKfbsIn9qj1I4ODUznWtqipVZyWqGjs4ij0n4sKxq9p7lMIO
+   ztZvLvtSZ6ytTsGDFoqiQBf0QZwecEjOz9rqEWf09Njjgkuje80xez9OS
+   GwMVj1UVVwj3ftd8jIEW0y9aJq1jVycx1d+Ksd6BUqg7MgQ3Xh5xb/EtX
+   gf/HJBjmV4arIvykN7ezYfmoqo47yvh03lw9lsPn7uQdRS+O4DkBPl+xz
+   oWk+n+uB1nT3ljOrj+uVRsIUWQxS0Bh/lATzYQ+k1gWtOL8OWzoKpYTJ4
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10934"; a="427480302"
+X-IronPort-AV: E=Sophos;i="6.04,304,1695711600"; 
+   d="scan'208";a="427480302"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Dec 2023 18:21:42 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10934"; a="896450185"
+X-IronPort-AV: E=Sophos;i="6.04,304,1695711600"; 
+   d="scan'208";a="896450185"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmsmga002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 25 Dec 2023 18:21:42 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 25 Dec 2023 18:21:41 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Mon, 25 Dec 2023 18:21:41 -0800
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.100)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 25 Dec 2023 18:21:41 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CdmjO3XtAlnkIZYjs6JoziMFkt2rLG20rwQl9B69afKm46PTtyx6h8PSkOcyIxrmwOe9Q0s0fV1m9q5RFjqXFigiHk0znqlxGFbRjQrvRAoN9euq2PxIY3e9/c3mA13XLLxEuhIx3Jw8vnZiD7e0+FMEeezntGmaMu+LFCZzeLOKOI0nVJp6IFzb65x9x3C69C7tHof6tySeAKyAIOq2ldg3+uK46B4cCNs8aVWCgoR8VtRAIZymboaT1PmAdH26y2kQwcE/Ybs8N77SDlbCqCzbY5CmVzKPtRyQY+YmWl9JpnpVsp9B8QipA01yLcMdVKPrMBCkp9pchuMdcH36FA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=n7UiZYnGHu4jxnqv7d5xlcJdDDcqHbld1G6RXuH1D+o=;
+ b=gGoTWVMbivolPyYn0dG1CNEC6L0IhboJDdyKJqLS4YRQB9vaTGGfBtSe+zOXVVBNjqvxa0+JinNRr/Qiw9HhQ/s82gTHddyiFXOnUMQLYgUZA4zMW7MTe+uwWMEJHCfoX9VV71nAae9aYZlpTQQsFKSU/aL4DolKw84s73VgTecWZBtGu+N+SQPsaN2WXQYSCVQm2JMFoxP0H3lFZaJWlnOF+MnkFTNvWJI51v6BtgzQfvSgeJfGIzxUbdBpanGJ1SfE/X+AtBY+jQZMIySTMu0ukJ0WVEA3HSFNHnIpvN95v74688lNmcsDOM5Cif98WXNls31dtZ/mc7eXCzCqNQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
+ by IA1PR11MB7855.namprd11.prod.outlook.com (2603:10b6:208:3f8::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7113.26; Tue, 26 Dec
+ 2023 02:21:39 +0000
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::e4ae:3948:1f55:547d]) by DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::e4ae:3948:1f55:547d%5]) with mapi id 15.20.7113.027; Tue, 26 Dec 2023
+ 02:21:39 +0000
+Message-ID: <11e17542-75bd-40fc-a630-71842a47fb1b@intel.com>
+Date: Tue, 26 Dec 2023 10:24:25 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 1/9] iommu: Add cache_invalidate_user op
+Content-Language: en-US
+To: "Tian, Kevin" <kevin.tian@intel.com>, "joro@8bytes.org" <joro@8bytes.org>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>, "jgg@nvidia.com"
+	<jgg@nvidia.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>,
+	"baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>
+CC: "cohuck@redhat.com" <cohuck@redhat.com>, "eric.auger@redhat.com"
+	<eric.auger@redhat.com>, "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mjrosato@linux.ibm.com"
+	<mjrosato@linux.ibm.com>, "chao.p.peng@linux.intel.com"
+	<chao.p.peng@linux.intel.com>, "yi.y.sun@linux.intel.com"
+	<yi.y.sun@linux.intel.com>, "peterx@redhat.com" <peterx@redhat.com>,
+	"jasowang@redhat.com" <jasowang@redhat.com>,
+	"shameerali.kolothum.thodi@huawei.com"
+	<shameerali.kolothum.thodi@huawei.com>, "lulu@redhat.com" <lulu@redhat.com>,
+	"suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "Duan,
+ Zhenzhong" <zhenzhong.duan@intel.com>, "joao.m.martins@oracle.com"
+	<joao.m.martins@oracle.com>, "Zeng, Xin" <xin.zeng@intel.com>, "Zhao, Yan Y"
+	<yan.y.zhao@intel.com>, "j.granados@samsung.com" <j.granados@samsung.com>
+References: <20231221153948.119007-1-yi.l.liu@intel.com>
+ <20231221153948.119007-2-yi.l.liu@intel.com>
+ <BN9PR11MB5276CE7AE7E2FDA1D8A045298C94A@BN9PR11MB5276.namprd11.prod.outlook.com>
+From: Yi Liu <yi.l.liu@intel.com>
+In-Reply-To: <BN9PR11MB5276CE7AE7E2FDA1D8A045298C94A@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SGAP274CA0023.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:b6::35)
+ To DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231225125847.2778638-1-guoren@kernel.org>
-In-Reply-To: <20231225125847.2778638-1-guoren@kernel.org>
-From: Guo Ren <guoren@kernel.org>
-Date: Tue, 26 Dec 2023 08:35:50 +0800
-X-Gmail-Original-Message-ID: <CAJF2gTRgd297NZqumBLMV0jmVqn2sQ3xjZ5sRuy9L7HXq+gU5Q@mail.gmail.com>
-Message-ID: <CAJF2gTRgd297NZqumBLMV0jmVqn2sQ3xjZ5sRuy9L7HXq+gU5Q@mail.gmail.com>
-Subject: Re: [PATCH V12 00/14] riscv: Add Native/Paravirt qspinlock support
-To: Waiman Long <longman@redhat.com>, Boqun Feng <boqun.feng@gmail.com>
-Cc: linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	Guo Ren <guoren@linux.alibaba.com>, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	guoren@kernel.org, panqinglin2020@iscas.ac.cn, bjorn@rivosinc.com, 
-	conor.dooley@microchip.com, leobras@redhat.com, peterz@infradead.org, 
-	anup@brainfault.org, keescook@chromium.org, wuwei2016@iscas.ac.cn, 
-	xiaoguang.xing@sophgo.com, chao.wei@sophgo.com, unicorn_wang@outlook.com, 
-	uwu@icenowy.me, jszhang@kernel.org, wefu@redhat.com, atishp@atishpatra.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB7529:EE_|IA1PR11MB7855:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7bf8bbc8-5139-410c-ed33-08dc05b96420
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: DwBPcjB1zWr1+Bg1UDIy0QkYT1maWf7h7xMz+Z9nkx+7Wu5AeYach0vYVD7oZmO6Wb/LTEycsalJ33RoGcF6e2GopLbE5+BenkksA6o/m+RnO56InDrukHg8oyZtoX4ZuYho+0HjRtaoFq9oUpsnCFurOxlh6gB3B50KE29eXxmzlukGDBZDZUVku2pqe6C+Bz8lWn71N3FvcGasiKJQzf5lSWMQLAMgYeaG1PZ76a8UMyXEgjlGovsfjfJbq0hAc2EklaxXVVuQxuDoqx9MGTGEbOhhNtuv3AIdVeqadE8DlaTYf2jmZr8F0tvqvgpdEb/8hfHr0nkfmHmRx5L3/yLx8BMBrOYtmdJDE9IbDK1QWHMXxQ3ZS2NQHdHnX3eyBcMgTw5cgfIfnpYLS8Sfxie3Mf9ofsf3nwgs3GVvCc8SEmUwwAvfliL7whF/HyhtEwseCzjomfwjnDwMP11BWfCxFi+s5DZg8rr2Zc51wiJscIF94fFqMdN0BNzg+rqwkVegZmNakUWarwu0MWZPnKiTL0jkFX9QXXGbJ6/ZL0bSZqF/yS0x559OlUddJQGpKMJOhYphpdjUSiIqwrnVSSawzRP78TJRfv3RRU3eWFAVtzlt98mpUUEetpZCEwcQd3eFyJV1j6xGS8fm1KhGWQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(396003)(346002)(376002)(366004)(136003)(230922051799003)(64100799003)(1800799012)(451199024)(186009)(53546011)(31696002)(86362001)(6512007)(6506007)(478600001)(6666004)(26005)(2616005)(2906002)(66476007)(66946007)(66556008)(8936002)(8676002)(4326008)(316002)(54906003)(110136005)(7416002)(6486002)(5660300002)(41300700001)(82960400001)(38100700002)(83380400001)(36756003)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eFMzYzNTaE40M3NYWkdHd0JreEdmbGhiM2pMUTFYT3lWdTQzamJCclBxUFVN?=
+ =?utf-8?B?cHEybUx2aFF5TWc4R0hERmJwSUhnb3BTR0ZPelBwQmxqMmkrV3Z6ZkFPWGk4?=
+ =?utf-8?B?TkhYUVErRmlZNXJId3VlL2xWVzdsd0hLd2Q5bXdTbzBFdEhGd2t6aG8zSkdi?=
+ =?utf-8?B?NnpBRE05MERmNzJhNU0zTzZWdnBvOW83b3N0U2xGeHVXWGpOZXhGUDk4WWRJ?=
+ =?utf-8?B?bFFJS0c0b0g3eU9SZUVEVVU2NFhEVFV2N0dHSmd4VXFmRStTYytVUnBURWlR?=
+ =?utf-8?B?U2FBclA1VnlkYWMxYm1jejduSHFLYmxMN1VtVXpkS3RHT0FtcEIwaDZTS0NG?=
+ =?utf-8?B?bXZqK0tpTTJCN2grcHkvZ0V5NFYrOEk0Wkk2ODZKWGYxQUZDRG5nV3dGOVMy?=
+ =?utf-8?B?QVlmRDZVOTE4c3hSbUlaYWxzalRscXdDaHRNajEvOEg4UGhicDAvVDlvWFlD?=
+ =?utf-8?B?MStIc2FKM1hzMmlzcU9uWG0reEdvdjdBcXBrNWtabGdRcGRtSURMVVhLc0JG?=
+ =?utf-8?B?b2l0TWsrOTA2K053WUY1ZnNSSnBlc0dsWkZuM1diU2pVNnhmOHBTZkszL2JE?=
+ =?utf-8?B?bDd1NEVEcjA0VlRFcE8wSWxHSUF0VkxxYlhvckJYZGtlU0VZWXBKbnE3K2Jr?=
+ =?utf-8?B?RWF4S21Hd3phY2FIcW10QThwaEZLYTJkbEc4SGUyWlZzTjdOU1JjWkpNOWJj?=
+ =?utf-8?B?OW84VjRIellqOThhT3R4WjhoTFFFMTJxQ05pbVIyekhiN2lDTFd3dmFGMWJY?=
+ =?utf-8?B?QThvY1hMRFQ3VE5lNlVUdTIvY1kxME5tM212N2JGaFJBVnM0clAyZzl2RFVL?=
+ =?utf-8?B?dUhnamliVEhRamFKSlNSQXVqM01Fb1JhVU16di9jeStxQ1NVeGlHdWhKdWl1?=
+ =?utf-8?B?MXpkd3JGOTljQUpvY05way9ackJCTmpMK1B4RUFHTTRUbXdTYTFuUkRpQXpu?=
+ =?utf-8?B?a2IrbmV6VTFlbWdENUhqUExKSy9ycG9ZUHBjNHpvUGNReTNNTTJ2ejFRWDBM?=
+ =?utf-8?B?ZUZDVVp5RTZaMDBFblIyR04yQU8rZmM2WW84M0JGR2dwSUVDVnI0ZWFuYjI4?=
+ =?utf-8?B?ckJTVWdBNTBTL0NLYS9vM2JYek9iS3pHMDFVZU5QS3N3NCtXa0tGRW5hSUly?=
+ =?utf-8?B?TVU4eURUamg4Mnl2aGxhazFTVUtNcEdtRFcxSWMrU2E5TmFxUWxwZWhoZ3pt?=
+ =?utf-8?B?VFYyaWdLWE8veFNUSDRzVzNGcGc3ZmhjUGdXT0NXbFIyUHRQdlZCM09GVUxG?=
+ =?utf-8?B?OHFIK0JLaFhKU0pOUUF0OTRVYlhJYmE4OEdUZ3doV3l3K1RKUDJqZ1FIbzh4?=
+ =?utf-8?B?dkRLaldqZnJpVkNYWHRzeVZ2QXlXUnBuZWVlVDVSMnFyUVEyL2sxM3J3TVFX?=
+ =?utf-8?B?MFVBYjV0bCtGOGUwZHVCMko0bmRSYmhrOW9uYldHbmRybjZLdjRhSlRRV2xZ?=
+ =?utf-8?B?M1QwMVBSMXRGT2xQa29WeDFEV3RRdUNqSXJpTklIY3lkTjRyQjNub05lOWwy?=
+ =?utf-8?B?T2MrS251QTJpN05RNWJHbzVnc3l6TTRMc0kzY0JId25VNWdJSVB2STNmM3FZ?=
+ =?utf-8?B?V3JubHdhNkg2RHBYcFNTSUJxWjk1dXYxYXgraWcrdDl1Qkc2bGxITGlULzdW?=
+ =?utf-8?B?LzVnTlY0WFNmSnlYR0hHVkk0ZTZqVEp0dTlJVHcwaFZDbFVCeGhCamN6TUpI?=
+ =?utf-8?B?NkFVNFJONGNaQ1NTUzBwRkZJM2NvYWJ3Z0V2M25WL0hxZmJZRllBWEx6WVpp?=
+ =?utf-8?B?c0U1OEtURkpNdVNoaElITXNrcWxLMDVUU2doSU9CUW4zRGVqaUUyNTh5QU1j?=
+ =?utf-8?B?L0pQdFpPWUIzbk1HeUVsY2k1cGtJekkyVjByYWQ0K0pFRGdXN0ZnTGNQT2FB?=
+ =?utf-8?B?VjIyc2puaVhZdE5JU2ZTNEFYNkg3SUhoVUpCR2hLNzFrTkNmQ3U3M2k1RVVP?=
+ =?utf-8?B?SDcvWXowakR1Um9DSFl0a0RxSFJLVmFtcTh3VWxCdUpSNDlrUVRNWVFpaFpY?=
+ =?utf-8?B?bndoblhXRTVNMEhpQzhxY2lqYTVjRERvRjlTNDNpVm5LaDBJa1NQb09EZWh2?=
+ =?utf-8?B?d0JJSXlISXJ3aHFHSmxJQ0l4cldRZWFiMWk4MTcwNld3dkE1TmVzeG9GdlM2?=
+ =?utf-8?Q?nV0y09Ut6mH0So8AlX9Niu23j?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7bf8bbc8-5139-410c-ed33-08dc05b96420
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Dec 2023 02:21:39.4792
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 0aXMAksF/V7ggXNSNSyokIQYXUcfpKLzF7JbkZWBkefN4od+t4JK1dLLdUjQUpZuqsd1XTUZlWgBiVXE+ocfiw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB7855
+X-OriginatorOrg: intel.com
 
-Sorry, I missed people on the list.
-F.Y.I
-Waiman Long <longman@redhat.com>
-Boqun Feng <boqun.feng@gmail.com>
+On 2023/12/22 10:30, Tian, Kevin wrote:
+>> From: Liu, Yi L <yi.l.liu@intel.com>
+>> Sent: Thursday, December 21, 2023 11:40 PM
+>>
+>> From: Lu Baolu <baolu.lu@linux.intel.com>
+>>
+>> The updates of the PTEs in the nested page table will be propagated to the
+>> hardware caches on both IOMMU (IOTLB) and devices (DevTLB/ATC).
+> 
+> this is incorrect. the scope of this cmd is driver specific.
 
-Here is Link:
-https://lore.kernel.org/linux-riscv/20231225125847.2778638-1-guoren@kernel.=
-org/
+yes. May just say the hardware caches.
 
+> 
+>>
+>> Add a new domain op cache_invalidate_user for the userspace to flush the
+>> hardware caches for a nested domain through iommufd. No wrapper for it,
+>> as it's only supposed to be used by iommufd. Then, pass in invalidation
+>> requests in form of a user data array conatining a number of invalidation
+>> data entries.
+>>
+>> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+>> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+>> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
+>> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+>> ---
+>>   include/linux/iommu.h | 27 +++++++++++++++++++++++++++
+>>   1 file changed, 27 insertions(+)
+>>
+>> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+>> index 6291aa7b079b..5c4a17f13761 100644
+>> --- a/include/linux/iommu.h
+>> +++ b/include/linux/iommu.h
+>> @@ -284,6 +284,24 @@ struct iommu_user_data {
+>>   	size_t len;
+>>   };
+>>
+>> +/**
+>> + * struct iommu_user_data_array - iommu driver specific user space data
+>> array
+>> + * @type: The data type of all the entries in the user buffer array
+>> + * @uptr: Pointer to the user buffer array for copy_from_user()
+> 
+> remove 'for copy_from_user();
+> 
+>> + * @entry_len: The fixed-width length of a entry in the array, in bytes
+> 
+> s/a/an/
+> 
+>> + * @entry_num: The number of total entries in the array
+>> + *
+>> + * A array having a @entry_num number of @entry_len sized entries, each
+> 
+> the first sentence is redundant.
+> 
+>> entry is
+>> + * user space data, an uAPI defined in include/uapi/linux/iommufd.h where
+>> @type
+>> + * is also defined as enum iommu_xyz_data_type.
+> 
+> I'd just say:
+> 
+> "The user buffer includes an array of requests with format defined
+> in include/uapi/linux/iommufd.h"
 
-On Mon, Dec 25, 2023 at 8:59=E2=80=AFPM <guoren@kernel.org> wrote:
->
-> From: Guo Ren <guoren@linux.alibaba.com>
->
-> patch[1 - 8]: Native   qspinlock
-> patch[9 -14]: Paravirt qspinlock
->
-> This series based on:
->  - v6.7-rc7
->  - Rework & improve riscv cmpxchg.h and atomic.h
->    https://lore.kernel.org/linux-riscv/20230810040349.92279-2-leobras@red=
-hat.com/
->
-> You can directly try it:
-> https://github.com/guoren83/linux/tree/qspinlock_v12
->
-> Native qspinlock
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->
-> This time we've proved the qspinlock on th1520 [1] & sg2042 [2], which
-> gives stability and performance improvement. All T-HEAD processors have
-> a strong LR/SC forward progress guarantee than the requirements of the
-> ISA, which could satisfy the xchg_tail of native_qspinlock. Now,
-> qspinlock has been run with us for more than 1 year, and we have enough
-> confidence to enable it for all the T-HEAD processors. Of causes, we
-> found a livelock problem with the qspinlock lock torture test from the
-> CPU store merge buffer delay mechanism, which caused the queued spinlock
-> becomes a dead ring and RCU warning to come out. We introduce a custom
-> WRITE_ONCE to solve this, which will be fixed in the next generation of
-> hardware.
->
-> We've tested the patch on SOPHGO sg2042 & th1520 and passed the stress
-> test on Fedora & Ubuntu & OpenEuler ... Here is the performance
-> comparison between qspinlock and ticket_lock on sg2042 (64 cores):
->
-> sysbench test=3Dthreads threads=3D32 yields=3D100 lock=3D8 (+13.8%):
->   queued_spinlock 0.5109/0.00
->   ticket_spinlock 0.5814/0.00
->
-> perf futex/hash (+6.7%):
->   queued_spinlock 1444393 operations/sec (+- 0.09%)
->   ticket_spinlock 1353215 operations/sec (+- 0.15%)
->
-> perf futex/wake-parallel (+8.6%):
->   queued_spinlock (waking 1/64 threads) in 0.0253 ms (+-2.90%)
->   ticket_spinlock (waking 1/64 threads) in 0.0275 ms (+-3.12%)
->
-> perf futex/requeue (+4.2%):
->   queued_spinlock Requeued 64 of 64 threads in 0.0785 ms (+-0.55%)
->   ticket_spinlock Requeued 64 of 64 threads in 0.0818 ms (+-4.12%)
->
->
-> System Benchmarks (+6.4%)
->   queued_spinlock:
->     System Benchmarks Index Values               BASELINE       RESULT   =
- INDEX
->     Dhrystone 2 using register variables         116700.0  628613745.4  5=
-3865.8
->     Double-Precision Whetstone                       55.0     182422.8  3=
-3167.8
->     Execl Throughput                                 43.0      13116.6   =
-3050.4
->     File Copy 1024 bufsize 2000 maxblocks          3960.0    7762306.2  1=
-9601.8
->     File Copy 256 bufsize 500 maxblocks            1655.0    3417556.8  2=
-0649.9
->     File Copy 4096 bufsize 8000 maxblocks          5800.0    7427995.7  1=
-2806.9
->     Pipe Throughput                               12440.0   23058600.5  1=
-8535.9
->     Pipe-based Context Switching                   4000.0    2835617.7   =
-7089.0
->     Process Creation                                126.0      12537.3   =
- 995.0
->     Shell Scripts (1 concurrent)                     42.4      57057.4  1=
-3456.9
->     Shell Scripts (8 concurrent)                      6.0       7367.1  1=
-2278.5
->     System Call Overhead                          15000.0   33308301.3  2=
-2205.5
->                                                                        =
-=3D=3D=3D=3D=3D=3D=3D=3D
->     System Benchmarks Index Score                                       1=
-2426.1
->
->   ticket_spinlock:
->     System Benchmarks Index Values               BASELINE       RESULT   =
- INDEX
->     Dhrystone 2 using register variables         116700.0  626541701.9  5=
-3688.2
->     Double-Precision Whetstone                       55.0     181921.0  3=
-3076.5
->     Execl Throughput                                 43.0      12625.1   =
-2936.1
->     File Copy 1024 bufsize 2000 maxblocks          3960.0    6553792.9  1=
-6550.0
->     File Copy 256 bufsize 500 maxblocks            1655.0    3189231.6  1=
-9270.3
->     File Copy 4096 bufsize 8000 maxblocks          5800.0    7221277.0  1=
-2450.5
->     Pipe Throughput                               12440.0   20594018.7  1=
-6554.7
->     Pipe-based Context Switching                   4000.0    2571117.7   =
-6427.8
->     Process Creation                                126.0      10798.4   =
- 857.0
->     Shell Scripts (1 concurrent)                     42.4      57227.5  1=
-3497.1
->     Shell Scripts (8 concurrent)                      6.0       7329.2  1=
-2215.3
->     System Call Overhead                          15000.0   30766778.4  2=
-0511.2
->                                                                        =
-=3D=3D=3D=3D=3D=3D=3D=3D
->     System Benchmarks Index Score                                       1=
-1670.7
->
-> The qspinlock has a significant improvement on SOPHGO SG2042 64
-> cores platform than the ticket_lock.
->
-> Paravirt qspinlock
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->
-> We implemented kvm_kick_cpu/kvm_wait_cpu and add tracepoints to observe
-> the behaviors and introduce a new SBI extension SBI_EXT_PVLOCK.
->
-> Changlog:
-> V12:
->  - Remove force thead qspinlock with errata
->  - Separate Zicbop patch from this series
->  - Remove cpus >=3D 16 patch
->  - Cleanup rebase and move it on v6.7-rc7
->  - Reorder the coding struct with the last version's advice.
->
-> V11:
-> https://lore.kernel.org/linux-riscv/20230910082911.3378782-1-guoren@kerne=
-l.org/
->  - Based on Leonardo Bras's cmpxchg_small patches v5.
->  - Based on Guo Ren's Optimize arch_spin_value_unlocked patch v3.
->  - Remove abusing alternative framework and use jump_label instead.
->  - Introduce prefetch.w to improve T-HEAD processors' LR/SC forward
->    progress guarantee.
->  - Optimize qspinlock xchg_tail when NR_CPUS >=3D 16K.
->
-> V10:
-> https://lore.kernel.org/linux-riscv/20230802164701.192791-1-guoren@kernel=
-.org/
->  - Using an alternative framework instead of static_key_branch in the
->    asm/spinlock.h.
->  - Fixup store merge buffer problem, which causes qspinlock lock
->    torture test livelock.
->  - Add paravirt qspinlock support, include KVM backend
->  - Add Compact NUMA-awared qspinlock support
->
-> V9:
-> https://lore.kernel.org/linux-riscv/20220808071318.3335746-1-guoren@kerne=
-l.org/
->  - Cleanup generic ticket-lock code, (Using smp_mb__after_spinlock as
->    RCsc)
->  - Add qspinlock and combo-lock for riscv
->  - Add qspinlock to openrisc
->  - Use generic header in csky
->  - Optimize cmpxchg & atomic code
->
-> V8:
-> https://lore.kernel.org/linux-riscv/20220724122517.1019187-1-guoren@kerne=
-l.org/
->  - Coding convention ticket fixup
->  - Move combo spinlock into riscv and simply asm-generic/spinlock.h
->  - Fixup xchg16 with wrong return value
->  - Add csky qspinlock
->  - Add combo & qspinlock & ticket-lock comparison
->  - Clean up unnecessary riscv acquire and release definitions
->  - Enable ARCH_INLINE_READ*/WRITE*/SPIN* for riscv & csky
->
-> V7:
-> https://lore.kernel.org/linux-riscv/20220628081946.1999419-1-guoren@kerne=
-l.org/
->  - Add combo spinlock (ticket & queued) support
->  - Rename ticket_spinlock.h
->  - Remove unnecessary atomic_read in ticket_spin_value_unlocked
->
-> V6:
-> https://lore.kernel.org/linux-riscv/20220621144920.2945595-1-guoren@kerne=
-l.org/
->  - Fixup Clang compile problem Reported-by: kernel test robot
->  - Cleanup asm-generic/spinlock.h
->  - Remove changelog in patch main comment part, suggested by
->    Conor.Dooley
->  - Remove "default y if NUMA" in Kconfig
->
-> V5:
-> https://lore.kernel.org/linux-riscv/20220620155404.1968739-1-guoren@kerne=
-l.org/
->  - Update comment with RISC-V forward guarantee feature.
->  - Back to V3 direction and optimize asm code.
->
-> V4:
-> https://lore.kernel.org/linux-riscv/1616868399-82848-4-git-send-email-guo=
-ren@kernel.org/
->  - Remove custom sub-word xchg implementation
->  - Add ARCH_USE_QUEUED_SPINLOCKS_XCHG32 in locking/qspinlock
->
-> V3:
-> https://lore.kernel.org/linux-riscv/1616658937-82063-1-git-send-email-guo=
-ren@kernel.org/
->  - Coding convention by Peter Zijlstra's advices
->
-> V2:
-> https://lore.kernel.org/linux-riscv/1606225437-22948-2-git-send-email-guo=
-ren@kernel.org/
->  - Coding convention in cmpxchg.h
->  - Re-implement short xchg
->  - Remove char & cmpxchg implementations
->
-> V1:
-> https://lore.kernel.org/linux-riscv/20190211043829.30096-1-michaeljclark@=
-mac.com/
->  - Using cmpxchg loop to implement sub-word atomic
->
-> Guo Ren (14):
->   asm-generic: ticket-lock: Reuse arch_spinlock_t of qspinlock
->   asm-generic: ticket-lock: Add separate ticket-lock.h
->   riscv: errata: Move errata vendor func-id into vendorid_list.h
->   riscv: qspinlock: errata: Add ERRATA_THEAD_WRITE_ONCE fixup
->   riscv: qspinlock: Add basic queued_spinlock support
->   riscv: qspinlock: Introduce combo spinlock
->   riscv: qspinlock: Add virt_spin_lock() support for VM guest
->   riscv: qspinlock: Force virt_spin_lock for KVM guests
->   RISC-V: paravirt: Add pvqspinlock KVM backend
->   RISC-V: paravirt: Add pvqspinlock frontend skeleton
->   RISC-V: paravirt: pvqspinlock: Add SBI implementation
->   RISC-V: paravirt: pvqspinlock: Add nopvspin kernel parameter
->   RISC-V: paravirt: pvqspinlock: Add kconfig entry
->   RISC-V: paravirt: pvqspinlock: Add trace point for pv_kick/wait
->
->  .../admin-guide/kernel-parameters.txt         |   8 +-
->  arch/riscv/Kconfig                            |  35 ++++++
->  arch/riscv/Kconfig.errata                     |  19 ++++
->  arch/riscv/errata/thead/errata.c              |  20 ++++
->  arch/riscv/include/asm/Kbuild                 |   3 +-
->  arch/riscv/include/asm/errata_list.h          |  18 ---
->  arch/riscv/include/asm/kvm_vcpu_sbi.h         |   1 +
->  arch/riscv/include/asm/qspinlock.h            |  35 ++++++
->  arch/riscv/include/asm/qspinlock_paravirt.h   |  29 +++++
->  arch/riscv/include/asm/rwonce.h               |  31 ++++++
->  arch/riscv/include/asm/sbi.h                  |  14 +++
->  arch/riscv/include/asm/spinlock.h             |  88 +++++++++++++++
->  arch/riscv/include/asm/vendorid_list.h        |  19 ++++
->  arch/riscv/include/uapi/asm/kvm.h             |   1 +
->  arch/riscv/kernel/Makefile                    |   1 +
->  arch/riscv/kernel/qspinlock_paravirt.c        |  83 ++++++++++++++
->  arch/riscv/kernel/sbi.c                       |   2 +-
->  arch/riscv/kernel/setup.c                     |  68 ++++++++++++
->  .../kernel/trace_events_filter_paravirt.h     |  60 ++++++++++
->  arch/riscv/kvm/Makefile                       |   1 +
->  arch/riscv/kvm/vcpu_sbi.c                     |   4 +
->  arch/riscv/kvm/vcpu_sbi_pvlock.c              |  57 ++++++++++
->  include/asm-generic/qspinlock.h               |   2 +
->  include/asm-generic/rwonce.h                  |   2 +
->  include/asm-generic/spinlock.h                |  87 +--------------
->  include/asm-generic/spinlock_types.h          |  12 +-
->  include/asm-generic/ticket_spinlock.h         | 105 ++++++++++++++++++
->  27 files changed, 688 insertions(+), 117 deletions(-)
->  create mode 100644 arch/riscv/include/asm/qspinlock.h
->  create mode 100644 arch/riscv/include/asm/qspinlock_paravirt.h
->  create mode 100644 arch/riscv/include/asm/rwonce.h
->  create mode 100644 arch/riscv/include/asm/spinlock.h
->  create mode 100644 arch/riscv/kernel/qspinlock_paravirt.c
->  create mode 100644 arch/riscv/kernel/trace_events_filter_paravirt.h
->  create mode 100644 arch/riscv/kvm/vcpu_sbi_pvlock.c
->  create mode 100644 include/asm-generic/ticket_spinlock.h
->
-> --
-> 2.40.1
->
->
+sure.
 
-
---
-Best Regards
- Guo Ren
+-- 
+Regards,
+Yi Liu
 
