@@ -1,362 +1,195 @@
-Return-Path: <kvm+bounces-5249-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5250-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16BAA81E4F5
-	for <lists+kvm@lfdr.de>; Tue, 26 Dec 2023 06:15:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D648481E570
+	for <lists+kvm@lfdr.de>; Tue, 26 Dec 2023 07:11:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B3A71C214D8
-	for <lists+kvm@lfdr.de>; Tue, 26 Dec 2023 05:15:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 63D481F226A1
+	for <lists+kvm@lfdr.de>; Tue, 26 Dec 2023 06:11:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B720A4B142;
-	Tue, 26 Dec 2023 05:15:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91A554C3BE;
+	Tue, 26 Dec 2023 06:11:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HvYvJRrb"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="K40+g9/+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 932E04AF96
-	for <kvm@vger.kernel.org>; Tue, 26 Dec 2023 05:15:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 698484BAA3;
+	Tue, 26 Dec 2023 06:11:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703567728; x=1735103728;
-  h=message-id:date:mime-version:subject:to:references:from:
-   in-reply-to:content-transfer-encoding;
-  bh=sUOzkAjyC8WyNsAiBSgUKx4+y7secVUHxvy+Gru9adM=;
-  b=HvYvJRrb4FFTYTCpBiGz8z3D0Z7j5D0AEcP7DS0ca+iZhoUqvlNhW8Wn
-   E/kzFNui8/JJzLd9ZswTgjYzBbrbc8+JqpX4CnvTFB2+2cu5I1u8DfUya
-   Qc8XtRYASxjHckNFwt+6u+DjXRsk7CfT/JODrT79V8SRDVoT1N6ZRR6kF
-   gY17TU3rqFDk4gHCenaq3DWOny2Hiygsb7qRg1jYsJ+i490mHU5iSIlya
-   wnQOO57RQDRVJPPwIYKC+WYbxDI5eRJraBmBNUHWEffXBZbuaucPLRr0p
-   84ytkn3OtUfMqFmJHCsy2fy49ETMNpm6AeMc3hnRICEPsihUyt8hcTAwQ
+  t=1703571096; x=1735107096;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=gnr6XdVnenHD6rNSMXnyIrj7XnuG2qIP2o7DwrYUWds=;
+  b=K40+g9/+YkqSwaM+0haMAC1/gwLZtpHccUsrNxSKx6j8Zhqbnsf7dsQv
+   E/436jUK2bwB9cc7Sv1Lc03Bi1U8N9Yd+XqJ4dvlPtg3izLZg6FN6POXz
+   iYZRmb3tvHdCmUYROAcV/E1jDiE9WtYisGiUQZ3FW2ktA56LHoWk8gnFI
+   ri6kKkBmzLytQEC4fnHvHLrPIeBX9R/Kf77SGb5ZXNSflwqw33abPofCA
+   LoPC/7p+ERk6F5+VxCc35kOStq/O78RvfcpRshujen38dvXWhKDKLE1Zv
+   r3mPL8uVbkoshCuax7J7GN1aExPFxzRfvBk/8UARsFSNoA2O6uMZPvMF6
    g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10934"; a="386750282"
+X-IronPort-AV: E=McAfee;i="6600,9927,10934"; a="482502780"
 X-IronPort-AV: E=Sophos;i="6.04,304,1695711600"; 
-   d="scan'208";a="386750282"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Dec 2023 21:15:27 -0800
+   d="scan'208";a="482502780"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Dec 2023 22:11:35 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10934"; a="848341899"
+X-IronPort-AV: E=McAfee;i="6600,9927,10934"; a="777869826"
 X-IronPort-AV: E=Sophos;i="6.04,304,1695711600"; 
-   d="scan'208";a="848341899"
-Received: from qiaojin-mobl1.ccr.corp.intel.com (HELO [10.249.169.5]) ([10.249.169.5])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Dec 2023 21:15:26 -0800
-Message-ID: <f8073b10-21a8-4492-a0a7-287b0dad2a65@intel.com>
-Date: Tue, 26 Dec 2023 13:15:23 +0800
+   d="scan'208";a="777869826"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orsmga002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 25 Dec 2023 22:11:35 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 25 Dec 2023 22:11:34 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Mon, 25 Dec 2023 22:11:34 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 25 Dec 2023 22:11:34 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eQAmgLWwpb42GY3Twm0iFGCSzfaIr9/v2wr8JFGaBr46UAXfiRlZolgj4mHbm5wYbQFnp5A+uTB15yHjfpSRfbzcvdktFX4AOpOhnok4q8bF1DOeqAesy8XDMBY4K2FByQoxrrlvJs0H7prJsyM3zuSHQQuOXbBWJlHtlv0uBOzD9i/NHSVVZsxDCWakZkANjUDX+r7T3T/brqBGXobQrClzcNRBoKo9D1cJAA1GxEed2upLhSRjaS+gEqcGc2guMfAL7InUkuUWHIVYLb8Jlqz9GQTxEWDw729V29NFO5RwrnLpzpXvDu7q5BcfwDYoQ9tF4MmKvT6vWOeCL26JeQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=gnr6XdVnenHD6rNSMXnyIrj7XnuG2qIP2o7DwrYUWds=;
+ b=TjSQ9uqcm4kiOdSele2oUx3vXBEDUpGC8v9Oaoz1R4FL1cg3817VV2nZop8qgNRPVkzG1EYBouBvsS50vK+AT1rNVUc7iHi8SnCNEigKcyUtoBwOLccm+/QKPObAmGqTL6tJ9B0CJU1xOjsvHY8X4uPqDbotDcOOqsRAjFOdU4jg/YjLrykBltLQ9LWkg9AmRhhtOQTcWz9otRzeenciTv/H94pz/bllxbnjdlj5SvJivVJjnxkfq0XUzxVTclsflDNgrfmaxMQY3z6WLzHmwFneW5iV4sQE+eaRE+WglrYYwUgBevJ/HNEqkypdYpxV1exTiz8x3Ev0zUiFMnQFhg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by CYYPR11MB8429.namprd11.prod.outlook.com (2603:10b6:930:c2::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7113.27; Tue, 26 Dec
+ 2023 06:11:31 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::e7a4:a757:2f2e:f96a]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::e7a4:a757:2f2e:f96a%3]) with mapi id 15.20.7113.027; Tue, 26 Dec 2023
+ 06:11:31 +0000
+From: "Tian, Kevin" <kevin.tian@intel.com>
+To: "Liu, Yi L" <yi.l.liu@intel.com>, "joro@8bytes.org" <joro@8bytes.org>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>, "jgg@nvidia.com"
+	<jgg@nvidia.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>,
+	"baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>
+CC: "cohuck@redhat.com" <cohuck@redhat.com>, "eric.auger@redhat.com"
+	<eric.auger@redhat.com>, "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mjrosato@linux.ibm.com"
+	<mjrosato@linux.ibm.com>, "chao.p.peng@linux.intel.com"
+	<chao.p.peng@linux.intel.com>, "yi.y.sun@linux.intel.com"
+	<yi.y.sun@linux.intel.com>, "peterx@redhat.com" <peterx@redhat.com>,
+	"jasowang@redhat.com" <jasowang@redhat.com>,
+	"shameerali.kolothum.thodi@huawei.com"
+	<shameerali.kolothum.thodi@huawei.com>, "lulu@redhat.com" <lulu@redhat.com>,
+	"suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "Duan,
+ Zhenzhong" <zhenzhong.duan@intel.com>, "joao.m.martins@oracle.com"
+	<joao.m.martins@oracle.com>, "Zeng, Xin" <xin.zeng@intel.com>, "Zhao, Yan Y"
+	<yan.y.zhao@intel.com>, "j.granados@samsung.com" <j.granados@samsung.com>
+Subject: RE: [PATCH v7 9/9] iommu/vt-d: Add iotlb flush for nested domain
+Thread-Topic: [PATCH v7 9/9] iommu/vt-d: Add iotlb flush for nested domain
+Thread-Index: AQHaNCP4zqzfCm0YG0WB/drS+mURdLC03SewgAYo/YCAABYdcA==
+Date: Tue, 26 Dec 2023 06:11:31 +0000
+Message-ID: <BN9PR11MB5276921496E7EBEC3BAC6EC88C98A@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20231221153948.119007-1-yi.l.liu@intel.com>
+ <20231221153948.119007-10-yi.l.liu@intel.com>
+ <BN9PR11MB5276A45F5355A6DAA8CBE5738C94A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <cbd97b49-37b5-4445-a8b5-717b8ce99f59@intel.com>
+In-Reply-To: <cbd97b49-37b5-4445-a8b5-717b8ce99f59@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|CYYPR11MB8429:EE_
+x-ms-office365-filtering-correlation-id: d2808d7c-916e-4b20-681b-08dc05d9810a
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: zEOb7CZAtFAX0wWRl1q8dV7LonQcIDOo3v8p0I1MO8r4dTuHFpIeW+PJfMcdhhgq7YgosrObmvE6hwXNyYpvGjpBNzZn5UGGmXNBmauOirR6ijiW2aTgMLNZdjhgDX91yzoVYJEsrqkyx/uwL4X6i8U7HSLjZ2uAvlYjaThv38+cz7mdtd0i99FrnEoDyktZ3Zn1IrtJf0Zr9LtT1RZs4JJzGuGD9LdzZC0++iBXKqRKu1xcdScZJI1H6COmQEqVBBtcSfW0FurdTQEW4B+sukTf4cBFzNq3vrDBbFT3dZtPnEv6wf9dk/RoDqeLW5mjmADlB7Fef/G0U0VRMLHanY1RNEO97qiuOMFpOYx3UwKXgEJ7Sge2+V7P2B7wjViG8Xl8XxXA74AYUSVi99NObYXsAvNzPfB2qtnX7+FXVkWQ0dQ953g/1kZRzlxYO9Jw0MucJM34z413XZfDnGnZALpI1qKKCTUJ/QDGnsQ3DK/Jz4y/wwjIOSQkQdo6ZhrClEI0UOVWRWVj6GdgLCXi4Qusczq5nz7QxGAQs6FRyrnyc2oISoGHm/XrsevrgDwoqOe684hHntskNtpHbdBJ8yq5W/uRloiMl1p43gfA2sWtjcEjmrJv2cJZROHiG/NV
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(136003)(39860400002)(346002)(396003)(230922051799003)(64100799003)(1800799012)(451199024)(186009)(2906002)(4744005)(7416002)(5660300002)(76116006)(110136005)(54906003)(64756008)(66446008)(66476007)(66556008)(66946007)(316002)(478600001)(9686003)(6506007)(7696005)(122000001)(52536014)(8936002)(8676002)(4326008)(33656002)(55016003)(38070700009)(41300700001)(71200400001)(83380400001)(82960400001)(38100700002)(26005)(86362001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?WkVpejYrLys0Sy9JR3ZOd3p0ZlRXdjZWZmMyTE5uVlF4NDNPSUlEeGNoNGIx?=
+ =?utf-8?B?Q1YvVXVxYk0wWmNZRzZzYm50QUdsR01Ea0h4ci9qTEZYNE5SbTgzUmg4Qmlq?=
+ =?utf-8?B?TitJTmFWL2hKNzZQRG02MzFKbWduLy94MkM1V1kvbHFGakUwR0ZxOUxKQlpE?=
+ =?utf-8?B?UmoxUm8vQVBBK2pqdDdHK2VEckQxbHpVWDFwejlIUDJxU2xjYU5FdVBzbkgw?=
+ =?utf-8?B?WGMycFFRYnA2ZytBWWJKamdxT2tNUUEwdWY3N2hBNmhPKzc3U09tK2JHK1NG?=
+ =?utf-8?B?RU5HLzFRdnVuRUxjY0Urb3UzdzVXZnc0UDhnRHNkR214aHNOd0NtblhVUTZZ?=
+ =?utf-8?B?UmtPS1FNcXQ1UHRZYllEamZQY24rN0crdlRMby80c1ZNUG9jaVpNVS85VENJ?=
+ =?utf-8?B?TXlZaGVzVS9kOXZuMFY1cTg0bHhWTTFJQkZOYmRTa2VTOFRJZ1JSeWoyZHRH?=
+ =?utf-8?B?N1ZnRVpDdllXYmdYZEE2eHlwa0dacC93U3hLa25LeWdZcElIWVZtWUwxSWxL?=
+ =?utf-8?B?MHlISERCNFdhekFvRXl4MGloS2VMK3NyR29hOEhCSVBxY0FZdnpoVkhYQVVJ?=
+ =?utf-8?B?NVFYVkpWYTJEWmVpNkZoUTBBeVNadllDRnFIOEJPdnlqRnBBZi9LYnc4d3FK?=
+ =?utf-8?B?eVNMMzEvOHBGOEdERTZ3WU5WQk5CNS83eWRtOWswQzRORDlpeTRwMUpPVnJL?=
+ =?utf-8?B?VC9rL1YyKzdSc2JIVExyZUJNRDBLdGFvOHF4cklhSk9KUmRTVDhiZ2pJY2My?=
+ =?utf-8?B?YXRpdjhlL0RrbWRQczIvZ1d0aUtma3AwU29STno0cHBJRGljc0dPWFhmamhl?=
+ =?utf-8?B?QmZNYVZqK1RrQkRDVXAyTC9zTDZ2V2pEYnpXY282d3hWTllhczNZQkg2dTIy?=
+ =?utf-8?B?NzJRMExzaVMxc0FBcHFQc0ErVFZYZGZiVHUzSE4rU0tNQk8wTU9QQXlWN1Bi?=
+ =?utf-8?B?V2pOelhkaktKNEhLOUdDWndZZ3lGZTdmSTRhZENtdFRROWJkeDdUejMrTkVw?=
+ =?utf-8?B?T3R2K2JvRHlIc1cyMzhoSC9McjVOY0ZITm1ZbEY5Rjg4MFpxbUI3bFJ6bXVF?=
+ =?utf-8?B?ZWgrU0tHOFNBdjNnZDhGNVNSZk5wY3E4UXBBRDFkdXNHUDFyKzJpOU5XTThz?=
+ =?utf-8?B?YjkvQ29QNXFuRWlaRUUxbldiWG1qVTdweDZ0WTJoU285ZFZXVXJ4NmdMTy9F?=
+ =?utf-8?B?RUt1RFFuV2FSZm5QaHFVd3VPUmo5NTNaMmxqejJxUktNN3ZCbWx0emRqRGll?=
+ =?utf-8?B?VW9pUUFWQnFzaXJxbkNucHRoYW5TaWV5Y0UxcDc4TUlHY3BlYWZidGVlbC8w?=
+ =?utf-8?B?QzFUU1hhVEhMcXBsT1FqVUFZMHBWeTF0cFJwNTRKeVpQdDNxbE42bW5kVzJE?=
+ =?utf-8?B?MEZyako1OGJFeWJBcjhGQmFBeFZqblJ5K0UySVpMR1JZV1BDODFSZlg2d0hV?=
+ =?utf-8?B?UU5xUHIwMTFXZU1yK3l5amJhQkorZGxnQ1Zhd0I4VUN3WGUvTzBva3NnTWVp?=
+ =?utf-8?B?ZkVWWlN6UHlxZG14MmtVd0RGdWdHOHJjL3hIWm5nZE5pdi9vcCtFMndZOVZx?=
+ =?utf-8?B?WG5yWXNQWm5Yb0VzM1RxMWw3QktlaldyNEJIMk8zU0lnV0oxZ2ZTVmRQanNK?=
+ =?utf-8?B?c29aOGhOckpZSWdsMDJoSzlNbk1VMWQ4RHh3NmtkRGIrMndHZWJvVUVLQk9J?=
+ =?utf-8?B?dGVuN0RwNk9IeU1TNXpENkFWa1ZMZ1pzVWdVeTlGR3VSd0F0ZlN1aU0zTzRV?=
+ =?utf-8?B?T3NoS1FrVzFCM0Y5QkZtT2lKRVFuSW80b2NWTkdXbW16ZEQyd0lMSXRFSFJW?=
+ =?utf-8?B?SXJ2WEFyVEtnbVpUZU5YN0R1Z0t0b1hOSHRFSGF3QXVRU2U5NDlONzlPejYr?=
+ =?utf-8?B?U2ZMVm5BWmlaa2JhNEVWam1NdXUxVEVaYlhlWEFiNVB4NGtiQWtpdi9OT2px?=
+ =?utf-8?B?NFYxakZMVjdhYmlrOUhodFdUTThEekRGTHdVKzFsMnFINENBbTlSODhmSkFs?=
+ =?utf-8?B?MXBzVWRaaUsrbnNLWDFYbzdtU0hzYjRaWkJUUFBWYU52NUZpK0UyUW5odVpT?=
+ =?utf-8?B?d2pJekh0aW9XYy9tYlNsczliSjBoWnk0NTgxTndpRVlraWdKU1ZqZnpWVkM5?=
+ =?utf-8?Q?JMlQjarUN+8q79D2qd5/+3ITh?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v2] x86/asyncpf: fix async page fault
- issues
-To: Xiaoyao Li <xiaoyao.li@intel.com>, seanjc@google.com,
- pbonzini@redhat.com, kvm@vger.kernel.org
-References: <20231218071447.1210469-1-dan1.wu@intel.com>
- <f6e3a442-a7b9-48cf-9fc2-b7babfb7004b@intel.com>
-Content-Language: en-US
-From: "Wu, Dan1" <dan1.wu@intel.com>
-In-Reply-To: <f6e3a442-a7b9-48cf-9fc2-b7babfb7004b@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d2808d7c-916e-4b20-681b-08dc05d9810a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Dec 2023 06:11:31.0586
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 1Gd5lv6KJz8L3u/tHA3momtc/afd3rLvVfCkIgAR43wzogeXtcM1WyMub4fIILTBRgAUOlsPtMyGNi4N0Xpd6w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR11MB8429
+X-OriginatorOrg: intel.com
 
-
-On 12/25/2023 9:51 AM, Xiaoyao Li wrote:
-> On 12/18/2023 3:14 PM, Dan Wu wrote:
->> KVM switched to use interrupt for 'page ready' APF event since Linux 
->> v5.10 and
->> the legacy mechanism using #PF was deprecated. Interrupt-based 
->> 'page-ready'
->> notification required KVM_ASYNC_PF_DELIVERY_AS_INT to be set as well in
->> MSR_KVM_ASYNC_PF_EN to enable asyncpf.
->>
->> This patch tries to update asyncpf.c for the new interrupt-based 
->> notification.
->
-> please avoid using 'This patch', and just use imperative mood.
-thanks for your suggestion.
->
->> It checks (KVM_FEATURE_ASYNC_PF && KVM_FEATURE_ASYNC_PF_INT) and 
->> implements
->> interrupt-based 'page-ready' handler.
->>
->> To run this test, add the QEMU option "-cpu host" to check CPUID, since
->> KVM_FEATURE_ASYNC_PF_INT can't be detected without "-cpu host".
->>
->> Update the usage of how to setup cgroup for different cgroup versions.
->>
->> Signed-off-by: Dan Wu <dan1.wu@intel.com>
->
-> This patch looks good to me, apart from some nits above and below.
-OK, I will modify them in the next version. Thanks for your review.
->
-> Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
->
->> ---
->> The test is based on asyncpf.c and simplifies implementation by 
->> reducing the memory
->> access round from 2 to 1.
->>
->> v2:
->> - removed asyncpf_int.c and asyncpf.h and modified asyncpf.c to use 
->> ASYNC_PF_INT.
->> ---
->>   lib/x86/processor.h |   6 ++
->>   x86/asyncpf.c       | 152 +++++++++++++++++++++++++++-----------------
->>   x86/unittests.cfg   |   2 +-
->>   3 files changed, 101 insertions(+), 59 deletions(-)
->>
->> diff --git a/lib/x86/processor.h b/lib/x86/processor.h
->> index 44f4fd1e..1a0f1243 100644
->> --- a/lib/x86/processor.h
->> +++ b/lib/x86/processor.h
->> @@ -263,6 +263,12 @@ static inline bool is_intel(void)
->>   #define    X86_FEATURE_ARCH_CAPABILITIES    (CPUID(0x7, 0, EDX, 29))
->>   #define    X86_FEATURE_PKS            (CPUID(0x7, 0, ECX, 31))
->>   +/*
->> + * KVM defined leafs
->> + */
->> +#define    KVM_FEATURE_ASYNC_PF        (CPUID(0x40000001, 0, EAX, 4))
->> +#define    KVM_FEATURE_ASYNC_PF_INT    (CPUID(0x40000001, 0, EAX, 14))
->> +
->>   /*
->>    * Extended Leafs, a.k.a. AMD defined
->>    */
->> diff --git a/x86/asyncpf.c b/x86/asyncpf.c
->> index bc515be9..8ae9ea40 100644
->> --- a/x86/asyncpf.c
->> +++ b/x86/asyncpf.c
->> @@ -1,111 +1,147 @@
->>   /*
->>    * Async PF test. For the test to actually do anything it needs to 
->> be started
->> - * in memory cgroup with 512M of memory and with more then 1G memory 
->> provided
->> + * in memory cgroup with 512M of memory and with more than 1G memory 
->> provided
->>    * to the guest.
->>    *
->> + * To identify the cgroup version on Linux:
->> + * stat -fc %T /sys/fs/cgroup/
->> + *
->> + * If the output is tmpfs, your system is using cgroup v1:
->>    * To create cgroup do as root:
->>    * mkdir /dev/cgroup
->>    * mount -t cgroup none -omemory /dev/cgroup
->>    * chmod a+rxw /dev/cgroup/
->> - *
->
-> keep this line is better, IMO.
->
->>    * From a shell you will start qemu from:
->>    * mkdir /dev/cgroup/1
->>    * echo $$ >  /dev/cgroup/1/tasks
->>    * echo 512M > /dev/cgroup/1/memory.limit_in_bytes
->>    *
->> + * If the output is cgroup2fs, your system is using cgroup v2:
->> + * mkdir /sys/fs/cgroup/cg1
->> + * echo $$ >  /sys/fs/cgroup/cg1/cgroup.procs
->> + * echo 512M > /sys/fs/cgroup/cg1/memory.max
->> + *
->>    */
->> -#include "x86/msr.h"
->>   #include "x86/processor.h"
->> -#include "x86/apic-defs.h"
->>   #include "x86/apic.h"
->> -#include "x86/desc.h"
->>   #include "x86/isr.h"
->>   #include "x86/vm.h"
->> -
->> -#include "asm/page.h"
->>   #include "alloc.h"
->> -#include "libcflat.h"
->>   #include "vmalloc.h"
->> -#include <stdint.h>
->
-> maybe it deserves one line mentioning in the commit message, like 
-> "cleaning up the include headers"
->
->>   #define KVM_PV_REASON_PAGE_NOT_PRESENT 1
->> -#define KVM_PV_REASON_PAGE_READY 2
->>     #define MSR_KVM_ASYNC_PF_EN 0x4b564d02
->> +#define MSR_KVM_ASYNC_PF_INT    0x4b564d06
->> +#define MSR_KVM_ASYNC_PF_ACK    0x4b564d07
->>     #define KVM_ASYNC_PF_ENABLED                    (1 << 0)
->>   #define KVM_ASYNC_PF_SEND_ALWAYS                (1 << 1)
->> +#define KVM_ASYNC_PF_DELIVERY_AS_INT            (1 << 3)
->> +
->> +#define HYPERVISOR_CALLBACK_VECTOR    0xf3
->> +
->> +struct kvm_vcpu_pv_apf_data {
->> +      /* Used for 'page not present' events delivered via #PF */
->> +      uint32_t  flags;
->> +
->> +      /* Used for 'page ready' events delivered via interrupt 
->> notification */
->> +      uint32_t  token;
->> +
->> +      uint8_t  pad[56];
->> +      uint32_t  enabled;
->> +} apf_reason __attribute__((aligned(64)));
->
-> as well, it deserves some words in commit message.
->
->> -volatile uint32_t apf_reason __attribute__((aligned(64)));
->>   char *buf;
->> +void* virt;
->>   volatile uint64_t  i;
->>   volatile uint64_t phys;
->> +volatile uint32_t saved_token;
->> +volatile uint32_t asyncpf_num;
->>   -static inline uint32_t get_apf_reason(void)
->> +static inline uint32_t get_and_clear_apf_reason(void)
->>   {
->> -    uint32_t r = apf_reason;
->> -    apf_reason = 0;
->> +    uint32_t r = apf_reason.flags;
->> +    apf_reason.flags = 0;
->>       return r;
->>   }
->>   -static void pf_isr(struct ex_regs *r)
->> +static void handle_interrupt(isr_regs_t *regs)
->>   {
->> -    void* virt = (void*)((ulong)(buf+i) & ~(PAGE_SIZE-1));
->> -    uint32_t reason = get_apf_reason();
->> +    uint32_t apf_token = apf_reason.token;
->> +
->> +    apf_reason.token = 0;
->> +    wrmsr(MSR_KVM_ASYNC_PF_ACK, 1);
->> +
->> +    if (apf_token == 0xffffffff) {
->> +        report_pass("Wakeup all, got token 0x%x", apf_token);
->> +    } else if (apf_token == saved_token) {
->> +        asyncpf_num++;
->> +        install_pte(phys_to_virt(read_cr3()), 1, virt, phys | 
->> PT_PRESENT_MASK | PT_WRITABLE_MASK, 0);
->> +        phys = 0;
->> +    } else {
->> +        report_fail("unexpected async pf int token 0x%x", apf_token);
->> +    }
->> +
->> +    eoi();
->> +}
->>   +static void handle_pf(struct ex_regs *r)
->> +{
->> +    virt = (void*)((ulong)(buf+i) & ~(PAGE_SIZE-1));
->> +    uint32_t reason = get_and_clear_apf_reason();
->>       switch (reason) {
->> -        case 0:
->> -            report_fail("unexpected #PF at %#lx", read_cr2());
->> -            break;
->> -        case KVM_PV_REASON_PAGE_NOT_PRESENT:
->> -            phys = virt_to_pte_phys(phys_to_virt(read_cr3()), virt);
->> -            install_pte(phys_to_virt(read_cr3()), 1, virt, phys, 0);
->> -            write_cr3(read_cr3());
->> -            report_pass("Got not present #PF token %lx virt addr %p 
->> phys addr %#" PRIx64,
->> -                    read_cr2(), virt, phys);
->> -            while(phys) {
->> -                safe_halt(); /* enables irq */
->> -                cli();
->> -            }
->> -            break;
->> -        case KVM_PV_REASON_PAGE_READY:
->> -            report_pass("Got present #PF token %lx", read_cr2());
->> -            if ((uint32_t)read_cr2() == ~0)
->> -                break;
->> -            install_pte(phys_to_virt(read_cr3()), 1, virt, phys | 
->> PT_PRESENT_MASK | PT_WRITABLE_MASK, 0);
->> -            write_cr3(read_cr3());
->> -            phys = 0;
->> -            break;
->> -        default:
->> -            report_fail("unexpected async pf reason %" PRId32, reason);
->> -            break;
->> +    case 0:
->> +        report_fail("unexpected #PF at %#lx", read_cr2());
->> +        exit(report_summary());
->> +    case KVM_PV_REASON_PAGE_NOT_PRESENT:
->> +        phys = virt_to_pte_phys(phys_to_virt(read_cr3()), virt);
->> +        install_pte(phys_to_virt(read_cr3()), 1, virt, phys, 0);
->> +        write_cr3(read_cr3());
->> +        saved_token = read_cr2();
->> +        while (phys) {
->> +            safe_halt(); /* enables irq */
->> +        }
->> +        break;
->> +    default:
->> +        report_fail("unexpected async pf with reason 0x%x", reason);
->> +        exit(report_summary());
->>       }
->>   }
->>   -#define MEM 1ull*1024*1024*1024
->> +#define MEM (1ull*1024*1024*1024)
->>     int main(int ac, char **av)
->>   {
->> -    int loop = 2;
->> +    if (!this_cpu_has(KVM_FEATURE_ASYNC_PF)) {
->> +        report_skip("KVM_FEATURE_ASYNC_PF is not supported\n");
->> +        return report_summary();
->> +    }
->> +
->> +    if (!this_cpu_has(KVM_FEATURE_ASYNC_PF_INT)) {
->> +        report_skip("KVM_FEATURE_ASYNC_PF_INT is not supported\n");
->> +        return report_summary();
->> +    }
->>         setup_vm();
->> -    printf("install handler\n");
->> -    handle_exception(14, pf_isr);
->> -    apf_reason = 0;
->> -    printf("enable async pf\n");
->> +
->> +    handle_exception(PF_VECTOR, handle_pf);
->> +    handle_irq(HYPERVISOR_CALLBACK_VECTOR, handle_interrupt);
->> +    memset(&apf_reason, 0, sizeof(apf_reason));
->> +
->> +    wrmsr(MSR_KVM_ASYNC_PF_INT, HYPERVISOR_CALLBACK_VECTOR);
->>       wrmsr(MSR_KVM_ASYNC_PF_EN, virt_to_phys((void*)&apf_reason) |
->> -            KVM_ASYNC_PF_SEND_ALWAYS | KVM_ASYNC_PF_ENABLED);
->> -    printf("alloc memory\n");
->> +            KVM_ASYNC_PF_SEND_ALWAYS | KVM_ASYNC_PF_ENABLED | 
->> KVM_ASYNC_PF_DELIVERY_AS_INT);
->> +
->>       buf = malloc(MEM);
->>       sti();
->> -    while(loop--) {
->> -        printf("start loop\n");
->> -        /* access a lot of memory to make host swap it out */
->> -        for (i=0; i < MEM; i+=4096)
->> -            buf[i] = 1;
->> -        printf("end loop\n");
->> -    }
->> -    cli();
->>   +    /* access a lot of memory to make host swap it out */
->> +    for (i = 0; i < MEM; i += 4096)
->> +        buf[i] = 1;
->> +
->> +    cli();
->> +    report(asyncpf_num > 0, "get %d async pf events ('page not 
->> present' #PF event with matched "
->> +        "'page ready' interrupt event )", asyncpf_num);
->>       return report_summary();
->>   }
->> diff --git a/x86/unittests.cfg b/x86/unittests.cfg
->> index 3fe59449..e3d051bc 100644
->> --- a/x86/unittests.cfg
->> +++ b/x86/unittests.cfg
->> @@ -172,7 +172,7 @@ extra_params = -cpu max
->>     [asyncpf]
->>   file = asyncpf.flat
->> -extra_params = -m 2048
->> +extra_params = -cpu host -m 2048
->>     [emulator]
->>   file = emulator.flat
->
+PiBGcm9tOiBMaXUsIFlpIEwgPHlpLmwubGl1QGludGVsLmNvbT4NCj4gU2VudDogVHVlc2RheSwg
+RGVjZW1iZXIgMjYsIDIwMjMgMTI6NTIgUE0NCj4gPj4gKw0KPiA+PiArCQlpZiAoIUlTX0FMSUdO
+RUQoaW52X2VudHJ5LmFkZHIsIFZURF9QQUdFX1NJWkUpIHx8DQo+ID4+ICsJCSAgICAoKGludl9l
+bnRyeS5ucGFnZXMgPT0gVTY0X01BWCkgJiYgaW52X2VudHJ5LmFkZHIpKSB7DQo+ID4+ICsJCQly
+ZXQgPSAtRUlOVkFMOw0KPiA+PiArCQkJYnJlYWs7DQo+ID4+ICsJCX0NCj4gPj4gKw0KPiA+DQo+
+ID4gd2h5IGlzIFtub24temVyby1hZGRyLCBVNjRfTUFYXSBhbiBlcnJvcj8gSXMgaXQgZXhwbGlj
+aXRseSBzdGF0ZWQgdG8NCj4gPiBiZSBub3Qgc3VwcG9ydGVkIGJ5IHVuZGVybHlpbmcgaGVscGVy
+cz8NCj4gDQo+IG5vIHN1Y2ggbGltaXRhdGlvbiBieSB1bmRlcmx5aW5nIGhlbHBlcnMuIEJ1dCBp
+biBzdWNoIGNhc2UsIHRoZQ0KPiBhZGRyK25wYWdlcypQQUdFX1NJWkUgd291bGQgZXhjZWVkIFU2
+NF9NQVgsIHRoaXMgc2VlbXMgYSBiaXQNCj4gc3RyYW5nZS4gQnV0IEknbSBmaW5lIHRvIHJlbGF4
+IHRoZSBjaGVjayBzaW5jZSB0aGUgdW5kZXJseWluZyBoZWxwZXINCj4gb25seSBjaGVja3MgbnBh
+Z2VzIHdoZW4gZGV0ZXJtaW5pbmcgcGFpZC1zZWxlY3RpdmUgb3Igbm90Lg0KPiANCg0KSSBvdmVy
+bG9va2VkIG5wYWdlcyBhcyBlbmQuIGxldCdzIGtlZXAgdGhlIGNoZWNrLg0K
 
