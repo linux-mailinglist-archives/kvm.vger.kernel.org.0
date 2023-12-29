@@ -1,208 +1,222 @@
-Return-Path: <kvm+bounces-5321-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5322-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B82AA820101
-	for <lists+kvm@lfdr.de>; Fri, 29 Dec 2023 18:59:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 069BF8201FA
+	for <lists+kvm@lfdr.de>; Fri, 29 Dec 2023 22:50:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46A111F21ECF
-	for <lists+kvm@lfdr.de>; Fri, 29 Dec 2023 17:59:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 22FE51C22421
+	for <lists+kvm@lfdr.de>; Fri, 29 Dec 2023 21:50:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E83D12E48;
-	Fri, 29 Dec 2023 17:59:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DF3914A9D;
+	Fri, 29 Dec 2023 21:50:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VNh3pAeH"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="U7gLqHhi"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f53.google.com (mail-oo1-f53.google.com [209.85.161.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA68112B66
-	for <kvm@vger.kernel.org>; Fri, 29 Dec 2023 17:59:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1703872755;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yeKqaIlvVPoYPC4W0RMtxJ/Ybm4HjQYyUHUu8GgGRhQ=;
-	b=VNh3pAeHrqDP3AeaSnR8jPEDZupvbzYI7MjlxctridVynSQaS8kTudNfi7CpUACF8s/Ev4
-	gVSZRayTTfDwRNUF33/L+OeI5oB5/fmJP3xqD7L3z2NeZ3cCEe4uATJRm6GRe1hcguRo/k
-	gVw1g2IcPlJDKjAhFs+rRJzxOP7x2EQ=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-608-py8S3ZiJMg-SdOVqM8iEZQ-1; Fri, 29 Dec 2023 12:59:14 -0500
-X-MC-Unique: py8S3ZiJMg-SdOVqM8iEZQ-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-40d3f53ca2aso36989715e9.0
-        for <kvm@vger.kernel.org>; Fri, 29 Dec 2023 09:59:13 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73DDD14A85
+	for <kvm@vger.kernel.org>; Fri, 29 Dec 2023 21:50:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-58dd3528497so4324560eaf.3
+        for <kvm@vger.kernel.org>; Fri, 29 Dec 2023 13:50:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1703886599; x=1704491399; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=vu5q4X23PA3gtec4TspOf+EMnf830wRQIwKELSXAAlg=;
+        b=U7gLqHhiuIQYWeGy8p/wVg6RFUiZGuHY2zDoN/Zxrp+EMu2SYYls1SJoVSODfIJCE9
+         DC4fOfeykJZacOxXaEZ6WWXRCS7e8JuExy/za/ar+u5CosiVS/n6Z0qvAD2wduyTbCXA
+         ho8LIPeOggRA+OJDkJOc3R0sNNWf7YLIjON6ajjPI0SFaxRzNiUcgjCegbmxPmWwz+FB
+         a4nsPlQFp2nSA6fvg1LGNp/wAQtUelmBW208l8AMcxWd1XGan/Ac1i8y0FtPW5aytdPm
+         X40tqOPLuFYi3pNh2mqBqIQRY6aa942fUkJYF2ttK/7Ea4QH0jua09SXhqUgvxvDbY5d
+         AZGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703872752; x=1704477552;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1703886599; x=1704491399;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=yeKqaIlvVPoYPC4W0RMtxJ/Ybm4HjQYyUHUu8GgGRhQ=;
-        b=mWoggfyhuQzr1vyZAqwYPT7gZajsVKXmsGPUR8kvJ9FqiX86s5x631HK2SwWyPQRfz
-         xvPqC5VhU5TziPuwFg5huwB61A5u6t8WB/FSKmVgUzWTQ8yhLc3dLlIEmHRkq6+0JyzY
-         jf/YZ+CpIdMKfZDx8gw77W2MWOsL2v2DeRAkRVxeHiCyumW3AuiRKt6oxdri4H9j1Vrr
-         4T9KuIBdygsHoWawK7wlZr6hX9R6EWLnmMwAgB6bkdmIQ4v4ivFUbWYrKctpnRrGrhG+
-         foH83fQNa+i4My66BOCDz9VKLHSor6sRP+yAAJz4a326ZSU/SNgCU/gUMLpqY6dEHjLJ
-         QkuA==
-X-Gm-Message-State: AOJu0YyTTUw/bX8d3l1VkTFKziKUjnLXltmVeKqHLi7uHc/ebujb7BBx
-	mB6p9R0w4rh7N9DYUbYTl3TmcCZUAZcEeFO3XgVeTKTNJTJFzq1qQopUU4DdYBWldXwPis1JMBu
-	BgZuIDYsUEKo49TN5q761bLXrgQzQSWWpzJkQ0xHISw5j
-X-Received: by 2002:a05:600c:4fcc:b0:40d:5166:f08a with SMTP id o12-20020a05600c4fcc00b0040d5166f08amr4881314wmq.134.1703872752404;
-        Fri, 29 Dec 2023 09:59:12 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH4XYAdhzlSJ84JJ/WzhDuQ96mOPSB8f7l3hWPGmgxlugzFemQsCgqo6ZAvHVkBoJdvDXd+2f4GHras+R8DhBc=
-X-Received: by 2002:a05:600c:4fcc:b0:40d:5166:f08a with SMTP id
- o12-20020a05600c4fcc00b0040d5166f08amr4881309wmq.134.1703872752069; Fri, 29
- Dec 2023 09:59:12 -0800 (PST)
+        bh=vu5q4X23PA3gtec4TspOf+EMnf830wRQIwKELSXAAlg=;
+        b=qnxLhWlgB27+JDJrt8qsF0MC+sp75evInzwPtqBigWnKjVphUA48IPMCEnz9Z4sfO8
+         192nhFRfMobS8ROlRf6rSLQsfUpDlVEZOfIxneerIVOBCOYOKa4qRgeruvK/Zd4VoQ02
+         Pa3ID4AM6GoBposraP5tAMMyY27kBbC/Lh3KbMHb1LZ3jKMnD5TSXh167bS12IsRh5zy
+         R+nOAj4dILaHbGcrIrXU7dhV5sqjX8W9h0vGD5p1MWTBacXd5m3TgrNRG+6Vfc4WJqgH
+         PxnhG7RoZ4aiBva4NKgoZo+4y02LtNNTRU01BACM3nxljmjR6hpahDQO2uFFZlIMBQjp
+         K5AQ==
+X-Gm-Message-State: AOJu0Yxp72x6BU5ANBiWiEAbYC3n/zLKPwLCVk14odWWRBllvB1lCLvN
+	BOtbAAOB24Y/EQMEQGrKvIuFa/nWGxgoWA==
+X-Google-Smtp-Source: AGHT+IE4adQTrYfGl0DW+ARqwiPxecQVrJ4ALqtPDiAPRb/B3Ew7k6CVBZfqktu9JrRBtv0ixr8PrA==
+X-Received: by 2002:a4a:5b07:0:b0:595:3fd1:295b with SMTP id g7-20020a4a5b07000000b005953fd1295bmr263275oob.7.1703886599285;
+        Fri, 29 Dec 2023 13:49:59 -0800 (PST)
+Received: from atishp.ba.rivosinc.com ([64.71.180.162])
+        by smtp.gmail.com with ESMTPSA id r126-20020a4a4e84000000b00594e32e4364sm1034751ooa.24.2023.12.29.13.49.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Dec 2023 13:49:58 -0800 (PST)
+From: Atish Patra <atishp@rivosinc.com>
+To: linux-kernel@vger.kernel.org
+Cc: Atish Patra <atishp@rivosinc.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Alexandre Ghiti <alexghiti@rivosinc.com>,
+	Andrew Jones <ajones@ventanamicro.com>,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	Conor Dooley <conor.dooley@microchip.com>,
+	Guo Ren <guoren@kernel.org>,
+	Heiko Stuebner <heiko@sntech.de>,
+	kvm-riscv@lists.infradead.org,
+	kvm@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	Mark Rutland <mark.rutland@arm.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Will Deacon <will@kernel.org>
+Subject: [v2 00/10] RISC-V SBI v2.0 PMU improvements and Perf sampling in KVM guest
+Date: Fri, 29 Dec 2023 13:49:40 -0800
+Message-Id: <20231229214950.4061381-1-atishp@rivosinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAE8KmOw1DzOr-GvQ9E+Y5RCX1GQ1h1Bumk5pB++9=SjMUPHxBg@mail.gmail.com>
- <ZT_HeK7GXdY-6L3t@google.com> <CAE8KmOxKkojqrqWE1RMa4YY3=of1AEFcDth_6b2ZCHJHzb8nng@mail.gmail.com>
- <CAE8KmOxd-Xib+qfiiBepP-ydjSAn32gjOTdLLUqm-i5vgzTv8w@mail.gmail.com>
-In-Reply-To: <CAE8KmOxd-Xib+qfiiBepP-ydjSAn32gjOTdLLUqm-i5vgzTv8w@mail.gmail.com>
-From: Prasad Pandit <ppandit@redhat.com>
-Date: Fri, 29 Dec 2023 23:28:55 +0530
-Message-ID: <CAE8KmOyffXD4k69vRAFwesaqrBGzFY3i+kefbkHcQf4=jNYzOA@mail.gmail.com>
-Subject: Fwd: About patch bdedff263132 - KVM: x86: Route pending NMIs
-To: kvm@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello Sean,
+This series implements SBI PMU improvements done in SBI v2.0[1] i.e. PMU snapshot
+and fw_read_hi() functions. 
 
-On Tue, 31 Oct 2023 at 17:45, Prasad Pandit <ppandit@redhat.com> wrote:
-> On Mon, 30 Oct 2023 at 20:41, Sean Christopherson <seanjc@google.com> wrote:
->>> -               kvm_make_request(KVM_REQ_NMI, vcpu);
->>> +               if (events->nmi.pending)
->>> +                       kvm_make_request(KVM_REQ_NMI, vcpu);
-> >
-> > This looks sane, but it should be unnecessary as KVM_REQ_NMI nmi_queued=0 should
-> > be a (costly) nop.  Hrm, unless the vCPU is in HLT, in which case KVM will treat
-> > a spurious KVM_REQ_NMI as a wake event.  When I made this change, my assumption
-> > was that userspace would set KVM_VCPUEVENT_VALID_NMI_PENDING iff there was
-> > relevant information to process.  But if I'm reading the code correctly, QEMU
-> > invokes KVM_SET_VCPU_EVENTS with KVM_VCPUEVENT_VALID_NMI_PENDING at the end of
-> > machine creation.
-> >
+SBI v2.0 introduced PMU snapshot feature which allows the SBI implementation
+to provide counter information (i.e. values/overflow status) via a shared
+memory between the SBI implementation and supervisor OS. This allows to minimize
+the number of traps in when perf being used inside a kvm guest as it relies on
+SBI PMU + trap/emulation of the counters. 
 
-QEMU:
-qemu_thread_start
- kvm_start_vcpu_thread
-  kvm_vcpu_thread_fn
-   kvm_cpu_exec
-    kvm_arch_put_registers
-     kvm_put_vcpu_events (cpu=..., level=1)
+The current set of ratified RISC-V specification also doesn't allow scountovf
+to be trap/emulated by the hypervisor. The SBI PMU snapshot bridges the gap
+in ISA as well and enables perf sampling in the guest. However, LCOFI in the
+guest only works via IRQ filtering in AIA specification. That's why, AIA
+has to be enabled in the hardware (at least the Ssaia extension) in order to
+use the sampling support in the perf. 
 
-qemu_thread_start (args=0x559fdc852110) at ../util/qemu-thread-posix.c:534
- kvm_vcpu_thread_fn (arg=0x559fdc84cdc0) at ../accel/kvm/kvm-accel-ops.c:56
-  qemu_wait_io_event (cpu=0x559fdc84cdc0) at ../softmmu/cpus.c:435
-   qemu_wait_io_event_common (cpu=0x559fdc84cdc0) at ../softmmu/cpus.c:411
-    process_queued_cpu_work (cpu=0x559fdc84cdc0) at ../cpus-common.c:351
-     do_kvm_cpu_synchronize_post_reset (cpu=0x559fdc84cdc0, arg=...)
-at ../accel/kvm/kvm-all.c:2808
-      kvm_arch_put_registers (cpu=0x559fdc84cdc0, level=2) at
-../target/i386/kvm/kvm.c:4664
-       kvm_put_vcpu_events (cpu=0x559fdc84cdc0, level=2) at
-../target/i386/kvm/kvm.c:4308
+Here are the patch wise implementation details.
 
-qemu_thread_start (args=0x559fdc852110) at ../util/qemu-thread-posix.c:534
- kvm_vcpu_thread_fn (arg=0x559fdc84cdc0) at ../accel/kvm/kvm-accel-ops.c:56
-  qemu_wait_io_event (cpu=0x559fdc84cdc0) at ../softmmu/cpus.c:435
-   qemu_wait_io_event_common (cpu=0x559fdc84cdc0) at ../softmmu/cpus.c:411
-    process_queued_cpu_work (cpu=0x559fdc84cdc0) at ../cpus-common.c:351
-     do_kvm_cpu_synchronize_post_init (cpu=0x559fdc84cdc0, arg=...) at
-../accel/kvm/kvm-all.c:2819
-      kvm_arch_put_registers (cpu=0x559fdc84cdc0, level=3) at
-../target/i386/kvm/kvm.c:4664
-       kvm_put_vcpu_events (cpu=0x559fdc84cdc0, level=3) at
-../target/i386/kvm/kvm.c:4308
+PATCH 1,6,7 : Generic cleanups/improvements.
+PATCH 2,3,10 : FW_READ_HI function implementation
+PATCH 4-5: Add PMU snapshot feature in sbi pmu driver
+PATCH 6-7: KVM implementation for snapshot and sampling in kvm guests
 
-Kernel:
-  kvm_vcpu_ioctl
-   mutex_lock_killable(&vcpu->mutex)
-    kvm_arch_vcpu_ioctl(, KVM_SET_VCPU_EVENTS, ... )
-   mutex_unlock(&vcpu->mutex);
-     -> kvm_vcpu_ioctl_x86_set_vcpu_events()
+The series is based on kvm-next and is available at:
 
-* Above are 3 different ways in which KVM_SET_VCPU_EVENTS ioctl(2) gets called.
-        QEMU/target/i386/kvm/kvm.c: kvm_put_vcpu_events()
-         if (level >= KVM_PUT_RESET_STATE) {
-             events.flags |= KVM_VCPUEVENT_VALID_NMI_PENDING;
-  But KVM_VCPUEVENT_VALID_NMI_PENDING is set only when level >=
-2(KVM_PUT_RESET_STATE). ie. in the first (level=1) case _NMI_PENDING
-is not set.
+https://github.com/atishp04/linux/tree/kvm_pmu_snapshot_v2
 
-* In the real-time host set-up I have, KVM_VCPUEVENT_VALID_NMI_PENDING
-is called twice for each VCPU and after that kernel goes into what
-looks like a lock contention loop. Each time
-KVM_VCPUEVENT_VALID_NMI_PENDING is called with 'cpu->env->nmi_injected
-= 0' and  'cpu->env->nmi_pending = 0'.  ie. for each VCPU two NMI
-events are injected via - kvm_make_request(KVM_REQ_NMI, vcpu), when
-vcpu has no NMIs pending.
+The kvmtool patch is also available at:
+https://github.com/atishp04/kvmtool/tree/sscofpmf
 
-# perf lock report -t
-                Name   acquired  contended     avg wait   total wait
-  max wait     min wait
+It also requires Ssaia ISA extension to be present in the hardware in order to
+get perf sampling support in the guest. In Qemu virt machine, it can be done
+by the following config.
 
-           CPU 3/KVM     154017     154017     62.19 us      9.58 s
- 101.01 us      1.49 us
-           CPU 9/KVM     152796     152796     62.67 us      9.58 s
-  95.92 us      1.49 us
-           CPU 7/KVM     151554     151554     63.16 us      9.57 s
- 102.70 us      1.48 us
-           CPU 1/KVM     151273     151273     65.30 us      9.88 s
-  98.88 us      1.52 us
-           CPU 6/KVM     151107     151107     63.34 us      9.57 s
- 107.64 us      1.50 us
-           CPU 8/KVM     151038     151038     63.37 us      9.57 s
- 102.93 us      1.51 us
-           CPU 2/KVM     150701     150701     63.52 us      9.57 s
-  99.24 us      1.50 us
-           CPU 5/KVM     150695     150695     63.56 us      9.58 s
- 142.15 us      1.50 us
-           CPU 4/KVM     150527     150527     63.60 us      9.57 s
- 102.04 us      1.44 us
-     qemu-system-x86        665        665     65.92 us     43.84 ms
- 100.67 us      1.55 us
-           CPU 0/KVM             2          2    210.46 us    420.92
-us    411.89 us      9.03 us
-     qemu-system-x86          1          1    404.91 us    404.91 us
- 404.91 us    404.91 us
-        TC tc-pc.ram               1          1    414.22 us    414.22
-us    414.22 us    414.22 us
-  === output for debug===
-bad: 10, total: 13
-bad rate: 76.92 %
-histogram of events caused bad sequence
-    acquire: 0
-   acquired: 10
-  contended: 0
-    release: 0
+```
+-cpu rv64,sscofpmf=true,x-ssaia=true
+```
 
+There is no other dependencies on AIA apart from that. Thus, Ssaia must be disabled
+for the guest if AIA patches are not available. Here is the example command.
 
-* VCPU#0 thread seems to wait indefinitely to get
-qemu_mutex_iothread_lock() to make any progress. The proposed patch
-above to check 'events->nmi_pending' for non-zero value helps to fix
-this issue.
+```
+./lkvm-static run -m 256 -c2 --console serial -p "console=ttyS0 earlycon" --disable-ssaia -k ./Image --debug 
+```
 
-...wdyt?
+The series has been tested only in Qemu.
+Here is the snippet of the perf running inside a kvm guest.
 
-Thank you.
----
-  - Prasad
-PS: The kvm_make_request() routine has following comment, I wonder if
-this is what is happening with empty NMI events.
-         Request that don't require vCPU action should never be logged in
-         vcpu->requests.  The vCPU won't clear the request, so it will stay
-         logged indefinitely and prevent the vCPU from entering the guest.
+===================================================
+$ perf record -e cycles -e instructions perf bench sched messaging -g 5
+...
+$ Running 'sched/messaging' benchmark:
+...
+[   45.928723] perf_duration_warn: 2 callbacks suppressed
+[   45.929000] perf: interrupt took too long (484426 > 483186), lowering kernel.perf_event_max_sample_rate to 250
+$ 20 sender and receiver processes per group
+$ 5 groups == 200 processes run
+
+     Total time: 14.220 [sec]
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.117 MB perf.data (1942 samples) ]
+$ perf report --stdio
+$ To display the perf.data header info, please use --header/--header-only optio>
+$
+$
+$ Total Lost Samples: 0
+$
+$ Samples: 943  of event 'cycles'
+$ Event count (approx.): 5128976844
+$
+$ Overhead  Command          Shared Object                Symbol               >
+$ ........  ...............  ...........................  .....................>
+$
+     7.59%  sched-messaging  [kernel.kallsyms]            [k] memcpy
+     5.48%  sched-messaging  [kernel.kallsyms]            [k] percpu_counter_ad>
+     5.24%  sched-messaging  [kernel.kallsyms]            [k] __sbi_rfence_v02_>
+     4.00%  sched-messaging  [kernel.kallsyms]            [k] _raw_spin_unlock_>
+     3.79%  sched-messaging  [kernel.kallsyms]            [k] set_pte_range
+     3.72%  sched-messaging  [kernel.kallsyms]            [k] next_uptodate_fol>
+     3.46%  sched-messaging  [kernel.kallsyms]            [k] filemap_map_pages
+     3.31%  sched-messaging  [kernel.kallsyms]            [k] handle_mm_fault
+     3.20%  sched-messaging  [kernel.kallsyms]            [k] finish_task_switc>
+     3.16%  sched-messaging  [kernel.kallsyms]            [k] clear_page
+     3.03%  sched-messaging  [kernel.kallsyms]            [k] mtree_range_walk
+     2.42%  sched-messaging  [kernel.kallsyms]            [k] flush_icache_pte
+
+===================================================
+
+[1] https://github.com/riscv-non-isa/riscv-sbi-doc
+
+Changes from v1->v2:
+1. Fixed warning/errors from patchwork CI.
+2. Rebased on top of kvm-next.
+3. Added Acked-by tags.
+
+Changes from RFC->v1:
+1. Addressed all the comments on RFC series.
+2. Removed PATCH2 and merged into later patches.
+3. Added 2 more patches for minor fixes.
+4. Fixed KVM boot issue without Ssaia and made sscofpmf in guest dependent on
+   Ssaia in the host.
+
+Atish Patra (10):
+RISC-V: Fix the typo in Scountovf CSR name
+RISC-V: Add FIRMWARE_READ_HI definition
+drivers/perf: riscv: Read upper bits of a firmware counter
+RISC-V: Add SBI PMU snapshot definitions
+drivers/perf: riscv: Implement SBI PMU snapshot function
+RISC-V: KVM: No need to update the counter value during reset
+RISC-V: KVM: No need to exit to the user space if perf event failed
+RISC-V: KVM: Implement SBI PMU Snapshot feature
+RISC-V: KVM: Add perf sampling support for guests
+RISC-V: KVM: Support 64 bit firmware counters on RV32
+
+arch/riscv/include/asm/csr.h          |   5 +-
+arch/riscv/include/asm/errata_list.h  |   2 +-
+arch/riscv/include/asm/kvm_vcpu_pmu.h |  14 +-
+arch/riscv/include/asm/sbi.h          |  12 ++
+arch/riscv/include/uapi/asm/kvm.h     |   1 +
+arch/riscv/kvm/aia.c                  |   5 +
+arch/riscv/kvm/main.c                 |   1 +
+arch/riscv/kvm/vcpu.c                 |   8 +-
+arch/riscv/kvm/vcpu_onereg.c          |   9 +-
+arch/riscv/kvm/vcpu_pmu.c             | 246 ++++++++++++++++++++++++--
+arch/riscv/kvm/vcpu_sbi_pmu.c         |  15 +-
+drivers/perf/riscv_pmu.c              |   1 +
+drivers/perf/riscv_pmu_sbi.c          | 228 ++++++++++++++++++++++--
+include/linux/perf/riscv_pmu.h        |   6 +
+14 files changed, 508 insertions(+), 45 deletions(-)
+
+--
+2.34.1
 
 
