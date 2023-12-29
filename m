@@ -1,352 +1,214 @@
-Return-Path: <kvm+bounces-5313-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5314-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F9AA81FC91
-	for <lists+kvm@lfdr.de>; Fri, 29 Dec 2023 03:30:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 640A081FC9C
+	for <lists+kvm@lfdr.de>; Fri, 29 Dec 2023 03:53:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A1A9A1F240F3
-	for <lists+kvm@lfdr.de>; Fri, 29 Dec 2023 02:30:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CFAAE1F24176
+	for <lists+kvm@lfdr.de>; Fri, 29 Dec 2023 02:53:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FABA3D75;
-	Fri, 29 Dec 2023 02:30:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D58E8257F;
+	Fri, 29 Dec 2023 02:52:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RgJ8KLKa"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WVqLiSNm"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2217E257F
-	for <kvm@vger.kernel.org>; Fri, 29 Dec 2023 02:30:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC7C423DF;
+	Fri, 29 Dec 2023 02:52:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703817025; x=1735353025;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=fnnHxM7eJUg4KGNFZho63Q7y12jetBzLjxk3iGsArao=;
-  b=RgJ8KLKajxORgetjcSryqc+Xa/LUstu4VpAbNTE+zFzPv/XtU/oAn5tP
-   weRYom6KBKfQrzImQmP5hqasmmi28CGyaym9e9d09mKiDpENci3i2gyEH
-   zzoYx63esZzbmPQTpe2BNQ092vhMk75yXc69WT0Z+t9xwu4b9fkJv/pxW
-   nnADaB7/CYfbyt3M5xCCGBQbbPnJkTsCYDhY+xGJaLOt8kdk0l6lFqx3Q
-   AElQw4DhZWqx6IJbVdsmrW25hou+CKHEt7qM9alIv4Dc1SG+FCU+bzqXp
-   OugaibPFZ5UyZxcqoXgLmx7Oxd3j6mVTAjVo/JQEIWikTP/6ivGp3FVIJ
+  t=1703818371; x=1735354371;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=gJn4+vKecDtjEsIKkKJqtHewg27WUoxPjM5iUhe+4LM=;
+  b=WVqLiSNmP1UHhYGOQiz4Sim/Tt4TF5uMQH7OLa9u1pXs92+W/fExBku9
+   Q3LHE9rrQt+3QLQut7mtXy8QSERtHEsMcUd4gDMMxWi9oFd2J+hp5ae4Y
+   fvFix1aQG58T8iEOBq0Rw1+jVmUC2xVGrSu1I30e4Qq6fO6HWVHM5ckgz
+   xO/ikKxyTQuE9FxhykdOp49nE1d87MV4WKAjYyoxk0/SqQ3T/sebmKhX8
+   Q9IepKr10YJz+xt17ND7DgeEpDGPDX5tZgvJJtDIRcGmgliUbCmjTbVto
+   nxhzXsrSderoVbm7x6mpiX9FmxvNot/8N6M0khEQNPn3PQTe7RJ5N7yHz
    A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10937"; a="3908423"
+X-IronPort-AV: E=McAfee;i="6600,9927,10937"; a="3910073"
 X-IronPort-AV: E=Sophos;i="6.04,313,1695711600"; 
-   d="scan'208";a="3908423"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Dec 2023 18:30:24 -0800
+   d="scan'208";a="3910073"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Dec 2023 18:52:50 -0800
 X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10937"; a="897385841"
 X-IronPort-AV: E=Sophos;i="6.04,313,1695711600"; 
-   d="scan'208";a="20750285"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.22.149]) ([10.93.22.149])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Dec 2023 18:30:19 -0800
-Message-ID: <db4330cf-d25a-48d3-b681-cf2326c16912@intel.com>
-Date: Fri, 29 Dec 2023 10:30:15 +0800
+   d="scan'208";a="897385841"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmsmga002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 28 Dec 2023 18:52:49 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 28 Dec 2023 18:52:48 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 28 Dec 2023 18:52:48 -0800
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.100)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 28 Dec 2023 18:52:47 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CtyexUSI5gzemtPVZ0RltHPddufO3D+IzeAvpOadCmiK0pXw3vdl+FGW3ja6WXrT9fWZ0pk/GVZUuffessscqiF7uOu3gXdRlzsdIhHBl4QSz+M8m/TCVo4PhaFS6XmtaUHY84wCKDAw0ndDJ/n4LhqNa56T154O5ONrkU7LymtEE9mJcW6rwpkGhgvBpQPL0V/xtjeYqWF08q6wy5ak3Ml+EEHss9yBviOnhitnrY1lOcXoZOVYXPkvCfMPOeyYwakIdRf1JSyRnDCBr8RpAM2cmWJdcxLBLcE3P7WvPPW/PCGO36owZ+K6HsDphwI0QJMQ+X0ns6EnYJaGhBVz8A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+zRCbQ80xpyHdapo2LerabgaaSPasaE5AcBhYa8whB4=;
+ b=hR2AuzY3gqtXSpWP4vVN1/ikYv8+z1BjH1zZ2EQnv4HeIm+OgI8+szLe1HnebgQNiqXDZlz7/sou0CREwB2ksX9EEUcdnpGpR/ppHKXxFOhgcBIsbE9SfjyZ3ceJqARZlhF6J9RtiggO20cBeD/yEJuKX9WM5xnb8Zw1ucQP32Cwu9QGOvrQTnB5ser5mzam+y9k8Pk+Kz6c8YtAosrV+smbOBZvwJ8nURh/kmzhLBXNtkLy0lNnZYWy+2kGuL1CCRtMZ5IMTZPPBR42p5m6V3aNDWE3onpJRer1/qWFGITou8yzHB8JIDHagSkIV9sSq1vC2kcHKce4lLyedw77sA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by PH8PR11MB7024.namprd11.prod.outlook.com (2603:10b6:510:220::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.19; Fri, 29 Dec
+ 2023 02:52:45 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::a8e9:c80f:9484:f7cb]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::a8e9:c80f:9484:f7cb%3]) with mapi id 15.20.7135.019; Fri, 29 Dec 2023
+ 02:52:45 +0000
+From: "Tian, Kevin" <kevin.tian@intel.com>
+To: "Liu, Yi L" <yi.l.liu@intel.com>, "joro@8bytes.org" <joro@8bytes.org>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>, "jgg@nvidia.com"
+	<jgg@nvidia.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>,
+	"baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>
+CC: "cohuck@redhat.com" <cohuck@redhat.com>, "eric.auger@redhat.com"
+	<eric.auger@redhat.com>, "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mjrosato@linux.ibm.com"
+	<mjrosato@linux.ibm.com>, "chao.p.peng@linux.intel.com"
+	<chao.p.peng@linux.intel.com>, "yi.y.sun@linux.intel.com"
+	<yi.y.sun@linux.intel.com>, "peterx@redhat.com" <peterx@redhat.com>,
+	"jasowang@redhat.com" <jasowang@redhat.com>,
+	"shameerali.kolothum.thodi@huawei.com"
+	<shameerali.kolothum.thodi@huawei.com>, "lulu@redhat.com" <lulu@redhat.com>,
+	"suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "Duan,
+ Zhenzhong" <zhenzhong.duan@intel.com>, "joao.m.martins@oracle.com"
+	<joao.m.martins@oracle.com>, "Zeng, Xin" <xin.zeng@intel.com>, "Zhao, Yan Y"
+	<yan.y.zhao@intel.com>, "j.granados@samsung.com" <j.granados@samsung.com>
+Subject: RE: [PATCH v9 07/10] iommu/vt-d: Allow qi_submit_sync() to return the
+ QI faults
+Thread-Topic: [PATCH v9 07/10] iommu/vt-d: Allow qi_submit_sync() to return
+ the QI faults
+Thread-Index: AQHaOZ99+qkqHFwLlEqW3QiqUnTcO7C/jljg
+Date: Fri, 29 Dec 2023 02:52:45 +0000
+Message-ID: <BN9PR11MB52768F21FE29A81060ACA4AE8C9DA@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20231228150629.13149-1-yi.l.liu@intel.com>
+ <20231228150629.13149-8-yi.l.liu@intel.com>
+In-Reply-To: <20231228150629.13149-8-yi.l.liu@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|PH8PR11MB7024:EE_
+x-ms-office365-filtering-correlation-id: a313c46c-a66d-401d-0bd0-08dc08193c23
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: rgg4Qym+OdlN/JUfMaP89PZqU4cyVEzVBLagwvC0ZbJXs0AUmYVzr3nfV5/gqlBnmP/UxKhhx7gLEbaCx9HdiOZ1P5Z0oh3kJ34JLPyvVfSQQmalnruft5DzF1JOX9H159d7VXTeixCGZ/s0PmVlYkN690kBZAImEv+P0HZWLBNu4mGImdgPkOH9p2BjY4NgHN3ov1cIPuBT7TnPfGqZc90G+XfU8M5/x9tgay1YMuWYKMhR06vbuQZNYbhiQlzqwRVPTTQPzHIftM/N5DSY8yNTdglyRgUD26f4WeYg6/Ou0yO5RVfuFet8DWUyyPBzhV7MC05nzMGA6LaprNX9RcrwkC7XzNQ+VhvTfdIV/VrZGxW5uu/7E4E4Imym/p+OTGoB52Fn0filXt6mynVcUOr3MUSzT5rhKPStGwPAZfBour16yljr3NZOkjt+lxrF6d/A8+kKxtdSF1F8dWnu/CmqqJ0vjeRJxtvI4LnIKz0Gi5L2R1T4bfoU1rRVERM92SxZDsmxO3tPHQOMwvNvnJcxkBAdVlb1U+eT1eJtllh9mOob0jsE+ZrTqTC/zf0xHIcwu53SxnlLpUKFY+wp3zQXL0VxTZ5PG4C8ECf6VT4=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(396003)(136003)(366004)(39860400002)(376002)(230922051799003)(1800799012)(64100799003)(186009)(451199024)(71200400001)(33656002)(82960400001)(478600001)(966005)(6506007)(9686003)(66556008)(110136005)(86362001)(41300700001)(64756008)(66476007)(66446008)(7696005)(54906003)(76116006)(316002)(66946007)(55016003)(38100700002)(8936002)(8676002)(2906002)(52536014)(122000001)(4326008)(38070700009)(5660300002)(26005)(7416002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Bg4o0z4SG5B03P0msZQDprukq8y7LK8iQpNzzi3b0d/VhRK3t3G/p6xIBfKo?=
+ =?us-ascii?Q?qnr442gulO1ll2ObEyCXkfkQFrLgzTdZWmFjsHW4lQbSd5Jmo5RGhb12/+ET?=
+ =?us-ascii?Q?aMHU6ZSN1LMkOoJ44SRp8hFGQZmbaV9cLZl7WMKXlLCjLIFJ/+P4YG9AxBTu?=
+ =?us-ascii?Q?Jx3WOEXKd/aoxAWTocPCf4VgpdUu+E65ZqdhK10O3Uns4iLWfyrCoALdFBzw?=
+ =?us-ascii?Q?9Ra+NBH8sk/wVr4088gdaZHKIN1fchZCuMWyw8tppxlPmidYeNWl1tA2pP/4?=
+ =?us-ascii?Q?CanpOF2YilAVDZKRAZ/C/u61ep+tdfqu3OvT7YaR5u7rcD8oltVCD9pL9f+3?=
+ =?us-ascii?Q?5be2J45UVs4uwGxOnsbn+n/qltyW8BrlOwOoA8Pnegtj06BxNRjLlSyhxjPW?=
+ =?us-ascii?Q?Af1MxyLhVoftzw8/7T45vqtGm062KXpfgdFLFyJghbA3T4jnE2iJgz/1AoM7?=
+ =?us-ascii?Q?cJe8ufLI8/acMa86khDh1h2vT+ou4QtYPnty/EgiZCoz8+96UnXog6ddcZSu?=
+ =?us-ascii?Q?2g9Qp5r8V6asQkZsKZMdaYKuYfSLe685NSr89LdXnb+rA73gjgys1tPlCOQL?=
+ =?us-ascii?Q?d0fFh4r3vwqEt4cSlP1kqkfTxl3i5ehdUutkMiMmPypOBFgLVxqNu0MZGlz4?=
+ =?us-ascii?Q?WlTEths8PKTOh/zAXJ05OdlyY61QQmtxATqWfs8ODxItVcfLcltUc8CE1/sU?=
+ =?us-ascii?Q?sBza9yNRHu4VXR+swL0DPfafyKkC39otHXMMu5iC7vcTqSmqYE9wFMrPu3r0?=
+ =?us-ascii?Q?3bUapI99/Gqqofso5mZMhWGCnhVjDguxZksPIzKs/aRtXyGrRyK9GmRR6UV7?=
+ =?us-ascii?Q?huTz7/0rT4FB0mtgR9D3zcg/zDGcwZF2XcRNrWHPg3YFaBL8d9vzgBhAbIjX?=
+ =?us-ascii?Q?r1OsIeZmzsINIXRuZXXpQKEaLmAtbQuq4kyaAUqGlhEL6hG/9isNWNieD01m?=
+ =?us-ascii?Q?XoLOzkpiWr1NrPK4j7c9+kzXRwSVgbRFcyNDObTBdcduPMZyolH5h770Cybi?=
+ =?us-ascii?Q?kL865tViGyFQ5BpApWPMd9iQo0p5miRvHNjIUoJRYTdKtxXHfM6+uNkyFzKH?=
+ =?us-ascii?Q?MKBDzYLyC04hyy2InJ9WbyFmqDTRMHzN68Ba05VR8sSX72cbsBs6y5+pbGoY?=
+ =?us-ascii?Q?/1Fd3q8jTOMiRMWxozNeNw8TDzoKQbt5yRda7VTUktr25+7ghyowKlGIZIXz?=
+ =?us-ascii?Q?uBknQDTUXw0WpFcNDLmtEC06L8r/EBMApuz+uui8sRWguAddTde8OcWlRK/v?=
+ =?us-ascii?Q?y3Zr4cngyDcyY8v32t0GN68uPlFoDfrJicIybjIAFmn7Drc6xzGnSoiLqiQb?=
+ =?us-ascii?Q?fVXBx4gCzdRFIv5SBTA51L14ALBd8MG1DdZSOozpxHOurdBqZCVqosVjm5us?=
+ =?us-ascii?Q?23wI6/3caHNvmmFihgBY0PRl7JWpg8Mf5tOMRW1ylD9LvCqqdOAXVDA03RWb?=
+ =?us-ascii?Q?IvSr5c+tyQGLlUxIEIFpe88gK7oS+GCKFqD3aC53AAQZxfgl01+ZnvTUOIoE?=
+ =?us-ascii?Q?B8CMvY0TVOYoYhKMCqO55uBQdjWxN7oUZ9gj+8ep51Ava6B9bD2Xw2J1wacS?=
+ =?us-ascii?Q?K5hmGAcHv0M4yFc7/C8K3c92asGT7o+HyLTLusBA?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 52/70] i386/tdx: handle TDG.VP.VMCALL<GetQuote>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, David Hildenbrand
- <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
- <philmd@linaro.org>, Cornelia Huck <cohuck@redhat.com>,
- Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
- kvm@vger.kernel.org, Michael Roth <michael.roth@amd.com>,
- Sean Christopherson <seanjc@google.com>, Claudio Fontana <cfontana@suse.de>,
- Gerd Hoffmann <kraxel@redhat.com>, Isaku Yamahata
- <isaku.yamahata@gmail.com>, Chenyi Qiang <chenyi.qiang@intel.com>
-References: <20231115071519.2864957-1-xiaoyao.li@intel.com>
- <20231115071519.2864957-53-xiaoyao.li@intel.com>
- <ZVUGtpZDTW27F8Um@redhat.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <ZVUGtpZDTW27F8Um@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a313c46c-a66d-401d-0bd0-08dc08193c23
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Dec 2023 02:52:45.5495
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: cKMZC3rPWIew0XP29nosaEDYNH0cMtNJBo0eD+kUAN1WGmJAKSmUuBf62O6cLPL0Nj+YGpxLxYANXF3sqSfWhw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB7024
+X-OriginatorOrg: intel.com
 
-On 11/16/2023 1:58 AM, Daniel P. Berrangé wrote:
-> On Wed, Nov 15, 2023 at 02:15:01AM -0500, Xiaoyao Li wrote:
->> From: Isaku Yamahata <isaku.yamahata@intel.com>
->>
->> For GetQuote, delegate a request to Quote Generation Service.
->> Add property "quote-generation-socket" to tdx-guest, whihc is a property
->> of type SocketAddress to specify Quote Generation Service(QGS).
->>
->> On request, connect to the QGS, read request buffer from shared guest
->> memory, send the request buffer to the server and store the response
->> into shared guest memory and notify TD guest by interrupt.
->>
->> command line example:
->>    qemu-system-x86_64 \
->>      -object '{"qom-type":"tdx-guest","id":"tdx0","quote-generation-socket":{"type": "vsock", "cid":"2","port":"1234"}}' \
->>      -machine confidential-guest-support=tdx0
->>
->> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
->> Codeveloped-by: Chenyi Qiang <chenyi.qiang@intel.com>
->> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
->> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
->> ---
->> Changes in v3:
->> - rename property "quote-generation-service" to "quote-generation-socket";
->> - change the type of "quote-generation-socket" from str to
->>    SocketAddress;
->> - squash next patch into this one;
->> ---
->>   qapi/qom.json         |   5 +-
->>   target/i386/kvm/tdx.c | 430 ++++++++++++++++++++++++++++++++++++++++++
->>   target/i386/kvm/tdx.h |   6 +
->>   3 files changed, 440 insertions(+), 1 deletion(-)
->>
->> +static void tdx_handle_get_quote_connected(QIOTask *task, gpointer opaque)
->> +{
->> +    struct tdx_get_quote_task *t = opaque;
->> +    Error *err = NULL;
->> +    char *in_data = NULL;
->> +    MachineState *ms;
->> +    TdxGuest *tdx;
->> +
->> +    t->hdr.error_code = cpu_to_le64(TDX_VP_GET_QUOTE_ERROR);
->> +    if (qio_task_propagate_error(task, NULL)) {
->> +        t->hdr.error_code = cpu_to_le64(TDX_VP_GET_QUOTE_QGS_UNAVAILABLE);
->> +        goto error;
->> +    }
->> +
->> +    in_data = g_malloc(le32_to_cpu(t->hdr.in_len));
->> +    if (!in_data) {
->> +        goto error;
->> +    }
->> +
->> +    if (address_space_read(&address_space_memory, t->gpa + sizeof(t->hdr),
->> +                           MEMTXATTRS_UNSPECIFIED, in_data,
->> +                           le32_to_cpu(t->hdr.in_len)) != MEMTX_OK) {
->> +        goto error;
->> +    }
->> +
->> +    qio_channel_set_blocking(QIO_CHANNEL(t->ioc), false, NULL);
-> 
-> You've set the channel to non-blocking, but....
-> 
->> +
->> +    if (qio_channel_write_all(QIO_CHANNEL(t->ioc), in_data,
->> +                              le32_to_cpu(t->hdr.in_len), &err) ||
->> +        err) {
-> 
-> ...this method will block execution of this thread, by either
-> sleeping in poll() or doing a coroutine yield.
-> 
-> I don't think this is in coroutine context, so presumably this
-> is just blocking.  So what was the point in marking the channel
-> non-blocking ?
+> From: Liu, Yi L <yi.l.liu@intel.com>
+> Sent: Thursday, December 28, 2023 11:06 PM
+>=20
+> From: Lu Baolu <baolu.lu@linux.intel.com>
+>=20
+> This allows qi_submit_sync() to return back faults to callers.
 
-Hi Dainel,
+this might be useful to add a note that the retry logic itself is being dis=
+cussed
+in a separate thread [1]. Here we keep it intact and just make sure no retr=
+y for
+the newly added user domain cache invalidation.
 
-First of all, I'm not good at socket or qio channel thing. Please 
-correct me and teach me when I'm wrong.
+[1] https://lore.kernel.org/all/20231228001646.587653-6-haifeng.zhao@linux.=
+intel.com/
 
-I'm not the author of this patch. My understanding is that, set it to 
-non-blocking is for the qio_channel_write_all() to proceed immediately?
+>=20
+> -		if (qi->desc_status[wait_index] =3D=3D QI_ABORT)
+> +		if (qi->desc_status[wait_index] =3D=3D QI_ABORT) {
+> +			/*
+> +			 * If the caller is interested in the error, no need
+> +			 * to retry, just return the time out error to the
+> +			 * caller.
+> +			 */
+> +			if (fsts)
+> +				return -ETIMEDOUT;
+> +		}
+>  			return -EAGAIN;
 
-If set non-blocking is not needed, I can remove it.
+indent should be adjusted and it changes the original logic which returns
+-EAGAIN only if QI_ABORT is set for the wait_index.
 
-> You are setting up a background watch to wait for the reply
-> so we don't block this thread, so you seem to want non-blocking
-> behaviour.
+the simpler form is:
 
-Both sending and receiving are in a new thread created by 
-qio_channel_socket_connect_async(). So I think both of then can be 
-blocking and don't need to be in another background thread.
+		/* No need to retry if the caller is interested in the timeout error */
+		if (qi->desc_status[wait_index] =3D=3D QI_ABORT)
+			return fsts ? -ETIMEDOUT : -EAGAIN;
 
-what's your suggestion on it? Make both sending and receiving blocking 
-or non-blocking?
+otherwise,
 
-> Given this, you should not be using qio_channel_write_all()
-> most likely. I think you need to be using qio_channel_add_watch
-> to get notified when it is *writable*, to send 'in_data'
-> incrementally & non-blocking. When that is finished then create
-> another watch to wait for the reply.
-> 
-> 
->> +        t->hdr.error_code = cpu_to_le64(TDX_VP_GET_QUOTE_QGS_UNAVAILABLE);
->> +        goto error;
->> +    }
->> +
->> +    g_free(in_data);
->> +    qemu_set_fd_handler(t->ioc->fd, tdx_get_quote_read, NULL, t);
->> +
->> +    return;
->> +error:
->> +    t->hdr.out_len = cpu_to_le32(0);
->> +
->> +    if (address_space_write(
->> +            &address_space_memory, t->gpa,
->> +            MEMTXATTRS_UNSPECIFIED, &t->hdr, sizeof(t->hdr)) != MEMTX_OK) {
->> +        error_report("TDX: failed to update GetQuote header.\n");
->> +    }
->> +    tdx_td_notify(t);
->> +
->> +    qio_channel_close(QIO_CHANNEL(t->ioc), &err);
->> +    object_unref(OBJECT(t->ioc));
->> +    g_free(t);
->> +    g_free(in_data);
->> +
->> +    /* Maintain the number of in-flight requests. */
->> +    ms = MACHINE(qdev_get_machine());
->> +    tdx = TDX_GUEST(ms->cgs);
->> +    qemu_mutex_lock(&tdx->lock);
->> +    tdx->quote_generation_num--;
->> +    qemu_mutex_unlock(&tdx->lock);
->> +    return;
->> +}
->> +
->> +static void tdx_handle_get_quote(X86CPU *cpu, struct kvm_tdx_vmcall *vmcall)
->> +{
->> +    hwaddr gpa = vmcall->in_r12;
->> +    uint64_t buf_len = vmcall->in_r13;
->> +    struct tdx_get_quote_header hdr;
->> +    MachineState *ms;
->> +    TdxGuest *tdx;
->> +    QIOChannelSocket *ioc;
->> +    struct tdx_get_quote_task *t;
->> +
->> +    vmcall->status_code = TDG_VP_VMCALL_INVALID_OPERAND;
->> +
->> +    /* GPA must be shared. */
->> +    if (!(gpa & tdx_shared_bit(cpu))) {
->> +        return;
->> +    }
->> +    gpa &= ~tdx_shared_bit(cpu);
->> +
->> +    if (!QEMU_IS_ALIGNED(gpa, 4096) || !QEMU_IS_ALIGNED(buf_len, 4096)) {
->> +        vmcall->status_code = TDG_VP_VMCALL_ALIGN_ERROR;
->> +        return;
->> +    }
->> +    if (buf_len == 0) {
->> +        return;
->> +    }
->> +
->> +    if (address_space_read(&address_space_memory, gpa, MEMTXATTRS_UNSPECIFIED,
->> +                           &hdr, sizeof(hdr)) != MEMTX_OK) {
->> +        return;
->> +    }
->> +    if (le64_to_cpu(hdr.structure_version) != TDX_GET_QUOTE_STRUCTURE_VERSION) {
->> +        return;
->> +    }
->> +    /*
->> +     * Paranoid: Guest should clear error_code and out_len to avoid information
->> +     * leak.  Enforce it.  The initial value of them doesn't matter for qemu to
->> +     * process the request.
->> +     */
->> +    if (le64_to_cpu(hdr.error_code) != TDX_VP_GET_QUOTE_SUCCESS ||
->> +        le32_to_cpu(hdr.out_len) != 0) {
->> +        return;
->> +    }
->> +
->> +    /* Only safe-guard check to avoid too large buffer size. */
->> +    if (buf_len > TDX_GET_QUOTE_MAX_BUF_LEN ||
->> +        le32_to_cpu(hdr.in_len) > TDX_GET_QUOTE_MAX_BUF_LEN ||
->> +        le32_to_cpu(hdr.in_len) > buf_len) {
->> +        return;
->> +    }
->> +
->> +    /* Mark the buffer in-flight. */
->> +    hdr.error_code = cpu_to_le64(TDX_VP_GET_QUOTE_IN_FLIGHT);
->> +    if (address_space_write(&address_space_memory, gpa, MEMTXATTRS_UNSPECIFIED,
->> +                            &hdr, sizeof(hdr)) != MEMTX_OK) {
->> +        return;
->> +    }
->> +
->> +    ms = MACHINE(qdev_get_machine());
->> +    tdx = TDX_GUEST(ms->cgs);
->> +    ioc = qio_channel_socket_new();
->> +
->> +    t = g_malloc(sizeof(*t));
->> +    t->apic_id = tdx->event_notify_apic_id;
->> +    t->gpa = gpa;
->> +    t->buf_len = buf_len;
->> +    t->out_data = g_malloc(t->buf_len);
->> +    t->out_len = 0;
->> +    t->hdr = hdr;
->> +    t->ioc = ioc;
->> +
->> +    qemu_mutex_lock(&tdx->lock);
->> +    if (!tdx->quote_generation ||
->> +        /* Prevent too many in-flight get-quote request. */
->> +        tdx->quote_generation_num >= TDX_MAX_GET_QUOTE_REQUEST) {
->> +        qemu_mutex_unlock(&tdx->lock);
->> +        vmcall->status_code = TDG_VP_VMCALL_RETRY;
->> +        object_unref(OBJECT(ioc));
->> +        g_free(t->out_data);
->> +        g_free(t);
->> +        return;
->> +    }
->> +    tdx->quote_generation_num++;
->> +    t->event_notify_interrupt = tdx->event_notify_interrupt;
->> +    qio_channel_socket_connect_async(
->> +        ioc, tdx->quote_generation, tdx_handle_get_quote_connected, t, NULL,
->> +        NULL);
->> +    qemu_mutex_unlock(&tdx->lock);
->> +
->> +    vmcall->status_code = TDG_VP_VMCALL_SUCCESS;
->> +}
->> +
->>   static void tdx_handle_setup_event_notify_interrupt(X86CPU *cpu,
->>                                                       struct kvm_tdx_vmcall *vmcall)
->>   {
->> @@ -1005,6 +1432,9 @@ static void tdx_handle_vmcall(X86CPU *cpu, struct kvm_tdx_vmcall *vmcall)
->>       }
->>   
->>       switch (vmcall->subfunction) {
->> +    case TDG_VP_VMCALL_GET_QUOTE:
->> +        tdx_handle_get_quote(cpu, vmcall);
->> +        break;
->>       case TDG_VP_VMCALL_SETUP_EVENT_NOTIFY_INTERRUPT:
->>           tdx_handle_setup_event_notify_interrupt(cpu, vmcall);
->>           break;
->> diff --git a/target/i386/kvm/tdx.h b/target/i386/kvm/tdx.h
->> index 4a8d67cc9fdb..4a989805493e 100644
->> --- a/target/i386/kvm/tdx.h
->> +++ b/target/i386/kvm/tdx.h
->> @@ -5,8 +5,10 @@
->>   #include CONFIG_DEVICES /* CONFIG_TDX */
->>   #endif
->>   
->> +#include <linux/kvm.h>
->>   #include "exec/confidential-guest-support.h"
->>   #include "hw/i386/tdvf.h"
->> +#include "io/channel-socket.h"
->>   #include "sysemu/kvm.h"
->>   
->>   #define TYPE_TDX_GUEST "tdx-guest"
->> @@ -47,6 +49,10 @@ typedef struct TdxGuest {
->>       /* runtime state */
->>       int event_notify_interrupt;
->>       uint32_t event_notify_apic_id;
->> +
->> +    /* GetQuote */
->> +    int quote_generation_num;
->> +    SocketAddress *quote_generation;
->>   } TdxGuest;
->>   
->>   #ifdef CONFIG_TDX
->> -- 
->> 2.34.1
->>
-> 
-> With regards,
-> Daniel
-
+Reviewed-by: Kevin Tian <kevin.tian@intel.com>
 
