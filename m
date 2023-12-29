@@ -1,227 +1,145 @@
-Return-Path: <kvm+bounces-5308-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5309-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B830881F97A
-	for <lists+kvm@lfdr.de>; Thu, 28 Dec 2023 16:10:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9BDD81FC67
+	for <lists+kvm@lfdr.de>; Fri, 29 Dec 2023 02:45:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7E2C1C23331
-	for <lists+kvm@lfdr.de>; Thu, 28 Dec 2023 15:10:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 335241F2486E
+	for <lists+kvm@lfdr.de>; Fri, 29 Dec 2023 01:45:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCCE112B8B;
-	Thu, 28 Dec 2023 15:06:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A81CF17EF;
+	Fri, 29 Dec 2023 01:44:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BOLZvKdk"
+	dkim=pass (2048-bit key) header.d=dabbelt-com.20230601.gappssmtp.com header.i=@dabbelt-com.20230601.gappssmtp.com header.b="Gvju+amL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8338F125B4;
-	Thu, 28 Dec 2023 15:06:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1703776008; x=1735312008;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=k8MfoxWF1GWpKLv7i4xBh341gPxN5h7L+16xXDYToqk=;
-  b=BOLZvKdkMAnHJj5Nh2WZHs4QgMGD32PaDf2WLI7ozSAd10Glb5szWbGP
-   1R7JZhUoXodM4kGkYS6ry0ZH6X3tLjSforQDBA0HIOse8AuvTRADjTcex
-   b/XS5ldfFdyTlZYPTl/LHF5HMaCEngF8x8p0lYWB2jV/2t8h7V8JcycQY
-   nzNpvzTmNyD8NaueYisrHViGE16+PRxxjmzSt1M84LPwR/Sf8eCw0MF2F
-   o6fYmFdLEgj1evZ1ufiW7+hohjMpkjNTnmCZ3ibDQMxOrXp7pMOBCU15r
-   DOQhnH+jtVZHXT/eL7QGAkloFPsmrws/ETSna+MXs1O7tR1NCWTkSqfWb
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10936"; a="393702038"
-X-IronPort-AV: E=Sophos;i="6.04,312,1695711600"; 
-   d="scan'208";a="393702038"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Dec 2023 07:06:47 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10936"; a="869155189"
-X-IronPort-AV: E=Sophos;i="6.04,312,1695711600"; 
-   d="scan'208";a="869155189"
-Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
-  by FMSMGA003.fm.intel.com with ESMTP; 28 Dec 2023 07:06:46 -0800
-From: Yi Liu <yi.l.liu@intel.com>
-To: joro@8bytes.org,
-	alex.williamson@redhat.com,
-	jgg@nvidia.com,
-	kevin.tian@intel.com,
-	robin.murphy@arm.com,
-	baolu.lu@linux.intel.com
-Cc: cohuck@redhat.com,
-	eric.auger@redhat.com,
-	nicolinc@nvidia.com,
-	kvm@vger.kernel.org,
-	mjrosato@linux.ibm.com,
-	chao.p.peng@linux.intel.com,
-	yi.l.liu@intel.com,
-	yi.y.sun@linux.intel.com,
-	peterx@redhat.com,
-	jasowang@redhat.com,
-	shameerali.kolothum.thodi@huawei.com,
-	lulu@redhat.com,
-	suravee.suthikulpanit@amd.com,
-	iommu@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	zhenzhong.duan@intel.com,
-	joao.m.martins@oracle.com,
-	xin.zeng@intel.com,
-	yan.y.zhao@intel.com,
-	j.granados@samsung.com
-Subject: [PATCH v9 10/10] iommu/vt-d: Add iotlb flush for nested domain
-Date: Thu, 28 Dec 2023 07:06:29 -0800
-Message-Id: <20231228150629.13149-11-yi.l.liu@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231228150629.13149-1-yi.l.liu@intel.com>
-References: <20231228150629.13149-1-yi.l.liu@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 155F11382
+	for <kvm@vger.kernel.org>; Fri, 29 Dec 2023 01:44:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dabbelt.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1d45f182fa2so24253305ad.3
+        for <kvm@vger.kernel.org>; Thu, 28 Dec 2023 17:44:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dabbelt-com.20230601.gappssmtp.com; s=20230601; t=1703814289; x=1704419089; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:to:from:cc
+         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WNCVR8SMHnCHeEQ/yMeXXkUdP9Bs/RTaT2/RSyEx1Tc=;
+        b=Gvju+amLK1SWDCzrmCohjbd3fDyjKYopcQjuln/p70su+MGV689NW/Lpjve1AfMgDZ
+         3Lpnen4voluq9tu3z7SemfGVZeStKrnbWSeIZVNio72MJ0OSLTV7jkC1FB8O5ws9nxLw
+         iNn/Btn1asPDoGzeDxgfy403w2VNqkd3x6KDAciEHFeJEwp2Tq9f5JDlerxNiyb/sltK
+         l0jr7Jh4DMzQW6Vj25Sq1+neQRbbibTq5Ju77TwnUbYA4S5W2YfF+j4lkDfiQAFhkyhe
+         ufVEqgB+gKjq411/BuEYAl7tPMT/m3eWffCqbHRTZ3Q+qvsrwHh4e/HKC1sP1LlR7BNf
+         wERw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703814289; x=1704419089;
+        h=content-transfer-encoding:mime-version:message-id:to:from:cc
+         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WNCVR8SMHnCHeEQ/yMeXXkUdP9Bs/RTaT2/RSyEx1Tc=;
+        b=J5Opy+PO0wd8snT1Wd1NZfNHq2d6gwKWU+62N4zTfcZprqcqp/0gHJKTu7n1/BKA8k
+         BmExnPE5hVZ39NDNyw1ORAECsfFYiajMr+y46zfzNv0Ao0LF2bnpDm61Mm16ZwCzp2TH
+         FcGXXEL4ukxZW2qmBG6leJZRJvnyzhJfh+Z92R6s//NovlrP7LHqtyIkv9q7XI5aQVHz
+         YKkCLp037FHMg58OgPLcofVCcsZ9qvZiCPxzI7F957nfl6JlPf4VAYapj8l4EFHBEMfy
+         3MBMxxYDAtzS3CHZ8k/C6Hr104ivXkaAVthffKJj4ojJoEL/0OHwF+Poy57k2TuaAXn4
+         O7Bg==
+X-Gm-Message-State: AOJu0YzjABHWP0GJUZfUBAh2whll8JYDnRSVLrwgroRWmW6q2H/xSxCu
+	wJD64r68mNfQShNHMcpK7aXjAvd/TtQ1YA==
+X-Google-Smtp-Source: AGHT+IHJ97SDIMc6/L9jYSipHJSv37tASQguwy1/ne3mvPNbcopocbR96EShTn3HW49dMkrd1Sk0UQ==
+X-Received: by 2002:a17:902:f7ca:b0:1d3:f067:a3f0 with SMTP id h10-20020a170902f7ca00b001d3f067a3f0mr11108857plw.107.1703814289238;
+        Thu, 28 Dec 2023 17:44:49 -0800 (PST)
+Received: from localhost ([12.44.203.122])
+        by smtp.gmail.com with ESMTPSA id pl18-20020a17090b269200b0028ae9a419f0sm19000570pjb.44.2023.12.28.17.44.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Dec 2023 17:44:48 -0800 (PST)
+Date: Thu, 28 Dec 2023 17:44:48 -0800 (PST)
+X-Google-Original-Date: Thu, 28 Dec 2023 17:44:25 PST (-0800)
+Subject:     Re: [v1 03/10] drivers/perf: riscv: Read upper bits of a firmware counter
+In-Reply-To: <20231218104107.2976925-4-atishp@rivosinc.com>
+CC: linux-kernel@vger.kernel.org, Atish Patra <atishp@rivosinc.com>,
+  aou@eecs.berkeley.edu, alexghiti@rivosinc.com, ajones@ventanamicro.com, anup@brainfault.org,
+  atishp@atishpatra.org, Conor Dooley <conor.dooley@microchip.com>, guoren@kernel.org, uwu@icenowy.me,
+  kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, linux-riscv@lists.infradead.org,
+  Mark Rutland <mark.rutland@arm.com>, Paul Walmsley <paul.walmsley@sifive.com>, Will Deacon <will@kernel.org>
+From: Palmer Dabbelt <palmer@dabbelt.com>
+To: Atish Patra <atishp@rivosinc.com>
+Message-ID: <mhng-94cdfcf4-01c1-493c-a23e-32bc8b391aad@palmer-ri-x1c9a>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-From: Lu Baolu <baolu.lu@linux.intel.com>
+On Mon, 18 Dec 2023 02:41:00 PST (-0800), Atish Patra wrote:
+> SBI v2.0 introduced a explicit function to read the upper 32 bits
+> for any firmwar counter width that is longer than 32bits.
+> This is only applicable for RV32 where firmware counter can be
+> 64 bit.
+>
+> Signed-off-by: Atish Patra <atishp@rivosinc.com>
+> ---
+>  drivers/perf/riscv_pmu_sbi.c | 20 ++++++++++++++++----
+>  1 file changed, 16 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/perf/riscv_pmu_sbi.c b/drivers/perf/riscv_pmu_sbi.c
+> index 16acd4dcdb96..646604f8c0a5 100644
+> --- a/drivers/perf/riscv_pmu_sbi.c
+> +++ b/drivers/perf/riscv_pmu_sbi.c
+> @@ -35,6 +35,8 @@
+>  PMU_FORMAT_ATTR(event, "config:0-47");
+>  PMU_FORMAT_ATTR(firmware, "config:63");
+>
+> +static bool sbi_v2_available;
+> +
+>  static struct attribute *riscv_arch_formats_attr[] = {
+>  	&format_attr_event.attr,
+>  	&format_attr_firmware.attr,
+> @@ -488,16 +490,23 @@ static u64 pmu_sbi_ctr_read(struct perf_event *event)
+>  	struct hw_perf_event *hwc = &event->hw;
+>  	int idx = hwc->idx;
+>  	struct sbiret ret;
+> -	union sbi_pmu_ctr_info info;
+>  	u64 val = 0;
+> +	union sbi_pmu_ctr_info info = pmu_ctr_list[idx];
+>
+>  	if (pmu_sbi_is_fw_event(event)) {
+>  		ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_FW_READ,
+>  				hwc->idx, 0, 0, 0, 0, 0);
+> -		if (!ret.error)
+> -			val = ret.value;
+> +		if (ret.error)
+> +			return val;
+> +
+> +		val = ret.value;
+> +		if (IS_ENABLED(CONFIG_32BIT) && sbi_v2_available && info.width >= 32) {
+> +			ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_FW_READ_HI,
+> +					hwc->idx, 0, 0, 0, 0, 0);
+> +			if (!ret.error)
+> +				val |= ((u64)ret.value << 32);
+> +		}
+>  	} else {
+> -		info = pmu_ctr_list[idx];
+>  		val = riscv_pmu_ctr_read_csr(info.csr);
+>  		if (IS_ENABLED(CONFIG_32BIT))
+>  			val = ((u64)riscv_pmu_ctr_read_csr(info.csr + 0x80)) << 31 | val;
+> @@ -1108,6 +1117,9 @@ static int __init pmu_sbi_devinit(void)
+>  		return 0;
+>  	}
+>
+> +	if (sbi_spec_version >= sbi_mk_version(2, 0))
+> +		sbi_v2_available = true;
+> +
+>  	ret = cpuhp_setup_state_multi(CPUHP_AP_PERF_RISCV_STARTING,
+>  				      "perf/riscv/pmu:starting",
+>  				      pmu_sbi_starting_cpu, pmu_sbi_dying_cpu);
 
-This implements the .cache_invalidate_user() callback to support iotlb
-flush for nested domain.
-
-Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
-Co-developed-by: Yi Liu <yi.l.liu@intel.com>
-Signed-off-by: Yi Liu <yi.l.liu@intel.com>
----
- drivers/iommu/intel/nested.c | 107 +++++++++++++++++++++++++++++++++++
- 1 file changed, 107 insertions(+)
-
-diff --git a/drivers/iommu/intel/nested.c b/drivers/iommu/intel/nested.c
-index b5a5563ab32c..f1f86437939c 100644
---- a/drivers/iommu/intel/nested.c
-+++ b/drivers/iommu/intel/nested.c
-@@ -73,9 +73,116 @@ static void intel_nested_domain_free(struct iommu_domain *domain)
- 	kfree(to_dmar_domain(domain));
- }
- 
-+static void nested_flush_dev_iotlb(struct dmar_domain *domain, u64 addr,
-+				   unsigned mask, u32 *fault)
-+{
-+	struct device_domain_info *info;
-+	unsigned long flags;
-+	u16 sid, qdep;
-+
-+	spin_lock_irqsave(&domain->lock, flags);
-+	list_for_each_entry(info, &domain->devices, link) {
-+		if (!info->ats_enabled)
-+			continue;
-+		sid = info->bus << 8 | info->devfn;
-+		qdep = info->ats_qdep;
-+		qi_flush_dev_iotlb(info->iommu, sid, info->pfsid,
-+				   qdep, addr, mask, fault);
-+		quirk_extra_dev_tlb_flush(info, addr, mask,
-+					  IOMMU_NO_PASID, qdep);
-+	}
-+	spin_unlock_irqrestore(&domain->lock, flags);
-+}
-+
-+static void intel_nested_flush_cache(struct dmar_domain *domain, u64 addr,
-+				     unsigned long npages, bool ih, u32 *error)
-+{
-+	struct iommu_domain_info *info;
-+	unsigned long i;
-+	unsigned mask;
-+	u32 fault;
-+
-+	xa_for_each(&domain->iommu_array, i, info)
-+		qi_flush_piotlb(info->iommu,
-+				domain_id_iommu(domain, info->iommu),
-+				IOMMU_NO_PASID, addr, npages, ih, NULL);
-+
-+	if (!domain->has_iotlb_device)
-+		return;
-+
-+	if (npages == U64_MAX)
-+		mask = 64 - VTD_PAGE_SHIFT;
-+	else
-+		mask = ilog2(__roundup_pow_of_two(npages));
-+
-+	nested_flush_dev_iotlb(domain, addr, mask, &fault);
-+
-+	*error = 0;
-+	/*
-+	 * Invalidation queue error (i.e. IQE) will not be reported to user
-+	 * as it's caused only by driver internal bug.
-+	 */
-+	if (fault & DMA_FSTS_ICE)
-+		*error |= IOMMU_HWPT_INVALIDATE_VTD_S1_ICE;
-+	if (fault & DMA_FSTS_ITE)
-+		*error |= IOMMU_HWPT_INVALIDATE_VTD_S1_ITE;
-+}
-+
-+static int intel_nested_cache_invalidate_user(struct iommu_domain *domain,
-+					      struct iommu_user_data_array *array)
-+{
-+	struct dmar_domain *dmar_domain = to_dmar_domain(domain);
-+	struct iommu_hwpt_vtd_s1_invalidate inv_entry;
-+	u32 processed = 0;
-+	int ret = 0;
-+	u32 index;
-+
-+	if (array->type != IOMMU_HWPT_INVALIDATE_DATA_VTD_S1) {
-+		ret = -EINVAL;
-+		goto out;
-+	}
-+
-+	for (index = 0; index < array->entry_num; index++) {
-+		ret = iommu_copy_struct_from_user_array(&inv_entry, array,
-+							IOMMU_HWPT_INVALIDATE_DATA_VTD_S1,
-+							index, hw_error);
-+		if (ret)
-+			break;
-+
-+		if (inv_entry.flags & ~IOMMU_VTD_INV_FLAGS_LEAF) {
-+			ret = -EOPNOTSUPP;
-+			break;
-+		}
-+
-+		if (!IS_ALIGNED(inv_entry.addr, VTD_PAGE_SIZE) ||
-+		    ((inv_entry.npages == U64_MAX) && inv_entry.addr)) {
-+			ret = -EINVAL;
-+			break;
-+		}
-+
-+		intel_nested_flush_cache(dmar_domain, inv_entry.addr,
-+					 inv_entry.npages,
-+					 inv_entry.flags & IOMMU_VTD_INV_FLAGS_LEAF,
-+					 &inv_entry.hw_error);
-+
-+		ret = iommu_respond_struct_to_user_array(array, index,
-+							 (void *)&inv_entry,
-+							 sizeof(inv_entry));
-+		if (ret)
-+			break;
-+
-+		processed++;
-+	}
-+
-+out:
-+	array->entry_num = processed;
-+	return ret;
-+}
-+
- static const struct iommu_domain_ops intel_nested_domain_ops = {
- 	.attach_dev		= intel_nested_attach_dev,
- 	.free			= intel_nested_domain_free,
-+	.cache_invalidate_user	= intel_nested_cache_invalidate_user,
- };
- 
- struct iommu_domain *intel_nested_domain_alloc(struct iommu_domain *parent,
--- 
-2.34.1
-
+Acked-by: Palmer Dabbelt <palmer@rivosinc.com>
 
