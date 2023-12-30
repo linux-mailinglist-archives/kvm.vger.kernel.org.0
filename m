@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-5335-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5336-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C99788203F4
-	for <lists+kvm@lfdr.de>; Sat, 30 Dec 2023 09:00:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DA998203F6
+	for <lists+kvm@lfdr.de>; Sat, 30 Dec 2023 09:01:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3373F2822DF
-	for <lists+kvm@lfdr.de>; Sat, 30 Dec 2023 08:00:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 414A71C20AFA
+	for <lists+kvm@lfdr.de>; Sat, 30 Dec 2023 08:01:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AEFA79C2;
-	Sat, 30 Dec 2023 08:00:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EEDA8BE7;
+	Sat, 30 Dec 2023 08:01:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="flLaUQ+i"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="ckBfBUTK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
+Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABC377487
-	for <kvm@vger.kernel.org>; Sat, 30 Dec 2023 08:00:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 128D58BE3
+	for <kvm@vger.kernel.org>; Sat, 30 Dec 2023 08:01:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-7baa8097064so274543539f.3
-        for <kvm@vger.kernel.org>; Sat, 30 Dec 2023 00:00:28 -0800 (PST)
+Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-35fc1a1b52bso28847675ab.2
+        for <kvm@vger.kernel.org>; Sat, 30 Dec 2023 00:01:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1703923228; x=1704528028; darn=vger.kernel.org;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1703923306; x=1704528106; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=CsK9GSl9KoT/t/1u9XM1rWvytVRiMpi1HhinaJeAPjc=;
-        b=flLaUQ+indYQpCSzUm8CKHN0+pXpLX74NWmqVUrbAD/ddiGQGa4YkxZ2A9g0/GkTc+
-         3lqhgomG0h+I7KhQtAwZDcDrkEkUNIXCJ87ghZR85iPs4jGqYmiNV1EBtDVAPlaeBld3
-         ZkS0jTKWb5i3QYAPnk/AUoX1FiQs4BhFDtA0e1pbiAwiMyDqZFT60VvRg3sp0VYJmENX
-         smI85CKUyWbHyi7Z4t1Hj0DuVrJkg83EusnkL+qOFnDybYuC8WXYVXsJCNtSkg8ZrhVV
-         YUNGY0bgCsp43kZeZ1hGYzBGTIGae0d/Z+vn15U2ZOXyWeTda/cX2No16HzN3FuWB2xU
-         hQmA==
+        bh=LPf6Z8tNoGfk9MBYZ1RUJvDaaG9qPZRvtU/U6N7KNnE=;
+        b=ckBfBUTKsPKnbFcdr3E7+Q4lBxFoRTmMzFCEiz4urib9eotQZgmMlP01J8Egb9qkKM
+         7klC0kKQ/ExMWvtdXv5mVvQDZzXTLjCeUZS5BcRxvU28dXf7eAZKzhrl2uslOZOpfODd
+         sgYAjKGgQXbQOiDH9OyUX00EOa0fsx8Al/lMY9pvH/qBU+rSREru3VAOr8iDRYtLcnAD
+         F++WdSBqaI2ssbRzzkl7LFBODmDeKbRwqDltfFNK0jS2XLh38UFYz9qpTuDBYzNM4APm
+         vFaa/ngt0uUtV0dJcrILmlH+uinP880j9pSYZw6DwXt+gI14caXv7khUT7dczByMCiOu
+         sFYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703923228; x=1704528028;
+        d=1e100.net; s=20230601; t=1703923306; x=1704528106;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=CsK9GSl9KoT/t/1u9XM1rWvytVRiMpi1HhinaJeAPjc=;
-        b=Syiic1p9O4L1NH4kwfoDYMufzr9F3qV7QJk/aW0pcghnvBnF/28NRrUrwBa/PNQ9sU
-         YpQ2dseHjwiMf/I339zvl6Kd/rNIQ6FMFxW+pX4buLXJKoQMxQ43gb8VpT69VEispxY2
-         CYSC5Lb/RT2d2D3aXCvKrQi7hyYS41geBzSedfJlqvotNBeSBxG9sHS/4Ecum4YVXDcV
-         IYBMimOS6HniVkxgrsSSj9f4djcA8CFqISJwkfWCXfJvAFIhXPc/C3UZifv8SoF3hhkj
-         0olefL5jLrZBj2LPubAfngyWJiX0dkhVEYL/dRQs8ht9qOwT16lFH46DC1GksBASPGwf
-         z2og==
-X-Gm-Message-State: AOJu0YwM27ERNpHXK9MIoJZuI894afE5DTpjwc0cwT4168AJ8b3L+xpu
-	Tqb87YbJEkK4Gs26zHr0fGnNBDThmvy+cWWES2p2Cd52+OzkSA==
-X-Google-Smtp-Source: AGHT+IGu2cUegqoSzVonPWO03edgnNv/GRIV30A6bBS7SKvohHEYUnxkoxharU9wnyCuzq/VdjOsac56Up2x+iMOOJU=
-X-Received: by 2002:a92:cda6:0:b0:35f:f007:e904 with SMTP id
- g6-20020a92cda6000000b0035ff007e904mr11167470ild.50.1703923227751; Sat, 30
- Dec 2023 00:00:27 -0800 (PST)
+        bh=LPf6Z8tNoGfk9MBYZ1RUJvDaaG9qPZRvtU/U6N7KNnE=;
+        b=SOo1ygrEKDYAOySHCc6EdfLKukrF3KM5+o3vHNEi5HzSo7oJTJCXyzkqlG3bXdaexo
+         Irifp/KUD7IZq+RcL+mfhQBOdQubJ/kXuSut1bSluFvSR58OXguiMnQIwZX8lbHoGfaY
+         gvrzjddhzO+IV/dUSyZ9vFbCAz9omaQNCmyNdIM4D7DijVYEE9zg3mHOdP3+gG2K+eVB
+         hsDj6TQx/akbmKlFtvgrt/8gN6lnm90uGLfckNI0Zb7tUK2NxNguEFw7SQt+G/K2tsWV
+         6/VVeT4a69weiKCzPIRNt5S2vVaKrB9VqZ3hvZ1G1Ooblf7Sefv+NZ6IPaVMh+caqjra
+         MlDw==
+X-Gm-Message-State: AOJu0Yw4ELMWP3j/E2lSu6fsJDmOoBRZDF2cWY7uOMPpXxgbEZNCEa7h
+	PpB0CSAJlvps7k+uAMIv5cCc+KaebRfRRU3WihXWtzgapZ3Qww==
+X-Google-Smtp-Source: AGHT+IG8kNEDveFHvGFklktInOSrh1sA+fL4mwRG4OISbyge3JZk+7FM4QwNXRHrKqUNcK01OLVK5yRqEEzfirj8O3E=
+X-Received: by 2002:a92:c549:0:b0:35f:ee15:742c with SMTP id
+ a9-20020a92c549000000b0035fee15742cmr11876530ilj.7.1703923306083; Sat, 30 Dec
+ 2023 00:01:46 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231229214950.4061381-1-atishp@rivosinc.com> <20231229214950.4061381-7-atishp@rivosinc.com>
-In-Reply-To: <20231229214950.4061381-7-atishp@rivosinc.com>
+References: <20231229214950.4061381-1-atishp@rivosinc.com> <20231229214950.4061381-8-atishp@rivosinc.com>
+In-Reply-To: <20231229214950.4061381-8-atishp@rivosinc.com>
 From: Anup Patel <anup@brainfault.org>
-Date: Sat, 30 Dec 2023 13:30:17 +0530
-Message-ID: <CAAhSdy2sce_joq3g230npQ5mHOL48bekzS2ChTsvtT=wGZVCvw@mail.gmail.com>
-Subject: Re: [v2 06/10] RISC-V: KVM: No need to update the counter value
- during reset
+Date: Sat, 30 Dec 2023 13:31:36 +0530
+Message-ID: <CAAhSdy1cb_bEuE+pHusEoumhteu=Y87+WXpE=Eox1k2ng4pdZg@mail.gmail.com>
+Subject: Re: [v2 07/10] RISC-V: KVM: No need to exit to the user space if perf
+ event failed
 To: Atish Patra <atishp@rivosinc.com>
 Cc: linux-kernel@vger.kernel.org, Albert Ou <aou@eecs.berkeley.edu>, 
 	Alexandre Ghiti <alexghiti@rivosinc.com>, Andrew Jones <ajones@ventanamicro.com>, 
@@ -81,10 +81,12 @@ Content-Transfer-Encoding: quoted-printable
 On Sat, Dec 30, 2023 at 3:20=E2=80=AFAM Atish Patra <atishp@rivosinc.com> w=
 rote:
 >
-> The virtual counter value is updated during pmu_ctr_read. There is no nee=
-d
-> to update it in reset case. Otherwise, it will be counted twice which is
-> incorrect.
+> Currently, we return a linux error code if creating a perf event failed
+> in kvm. That shouldn't be necessary as guest can continue to operate
+> without perf profiling or profiling with firmware counters.
+>
+> Return appropriate SBI error code to indicate that PMU configuration
+> failed. An error message in kvm already describes the reason for failure.
 >
 > Fixes: 0cb74b65d2e5 ("RISC-V: KVM: Implement perf support without samplin=
 g")
@@ -98,33 +100,82 @@ Regards,
 Anup
 
 > ---
->  arch/riscv/kvm/vcpu_pmu.c | 7 ++-----
->  1 file changed, 2 insertions(+), 5 deletions(-)
+>  arch/riscv/kvm/vcpu_pmu.c     | 14 +++++++++-----
+>  arch/riscv/kvm/vcpu_sbi_pmu.c |  6 +++---
+>  2 files changed, 12 insertions(+), 8 deletions(-)
 >
 > diff --git a/arch/riscv/kvm/vcpu_pmu.c b/arch/riscv/kvm/vcpu_pmu.c
-> index 86391a5061dd..8c44f26e754d 100644
+> index 8c44f26e754d..08f561998611 100644
 > --- a/arch/riscv/kvm/vcpu_pmu.c
 > +++ b/arch/riscv/kvm/vcpu_pmu.c
-> @@ -432,12 +432,9 @@ int kvm_riscv_vcpu_pmu_ctr_stop(struct kvm_vcpu *vcp=
-u, unsigned long ctr_base,
->                                 sbiret =3D SBI_ERR_ALREADY_STOPPED;
->                         }
+> @@ -229,8 +229,9 @@ static int kvm_pmu_validate_counter_mask(struct kvm_p=
+mu *kvpmu, unsigned long ct
+>         return 0;
+>  }
 >
-> -                       if (flags & SBI_PMU_STOP_FLAG_RESET) {
-> -                               /* Relase the counter if this is a reset =
-request */
-> -                               pmc->counter_val +=3D perf_event_read_val=
-ue(pmc->perf_event,
-> -                                                                        =
- &enabled, &running);
-> +                       if (flags & SBI_PMU_STOP_FLAG_RESET)
-> +                               /* Release the counter if this is a reset=
- request */
->                                 kvm_pmu_release_perf_event(pmc);
-> -                       }
->                 } else {
->                         sbiret =3D SBI_ERR_INVALID_PARAM;
->                 }
+> -static int kvm_pmu_create_perf_event(struct kvm_pmc *pmc, struct perf_ev=
+ent_attr *attr,
+> -                                    unsigned long flags, unsigned long e=
+idx, unsigned long evtdata)
+> +static long kvm_pmu_create_perf_event(struct kvm_pmc *pmc, struct perf_e=
+vent_attr *attr,
+> +                                     unsigned long flags, unsigned long =
+eidx,
+> +                                     unsigned long evtdata)
+>  {
+>         struct perf_event *event;
+>
+> @@ -455,7 +456,8 @@ int kvm_riscv_vcpu_pmu_ctr_cfg_match(struct kvm_vcpu =
+*vcpu, unsigned long ctr_ba
+>                                      unsigned long eidx, u64 evtdata,
+>                                      struct kvm_vcpu_sbi_return *retdata)
+>  {
+> -       int ctr_idx, ret, sbiret =3D 0;
+> +       int ctr_idx, sbiret =3D 0;
+> +       long ret;
+>         bool is_fevent;
+>         unsigned long event_code;
+>         u32 etype =3D kvm_pmu_get_perf_event_type(eidx);
+> @@ -514,8 +516,10 @@ int kvm_riscv_vcpu_pmu_ctr_cfg_match(struct kvm_vcpu=
+ *vcpu, unsigned long ctr_ba
+>                         kvpmu->fw_event[event_code].started =3D true;
+>         } else {
+>                 ret =3D kvm_pmu_create_perf_event(pmc, &attr, flags, eidx=
+, evtdata);
+> -               if (ret)
+> -                       return ret;
+> +               if (ret) {
+> +                       sbiret =3D SBI_ERR_NOT_SUPPORTED;
+> +                       goto out;
+> +               }
+>         }
+>
+>         set_bit(ctr_idx, kvpmu->pmc_in_use);
+> diff --git a/arch/riscv/kvm/vcpu_sbi_pmu.c b/arch/riscv/kvm/vcpu_sbi_pmu.=
+c
+> index 7eca72df2cbd..b70179e9e875 100644
+> --- a/arch/riscv/kvm/vcpu_sbi_pmu.c
+> +++ b/arch/riscv/kvm/vcpu_sbi_pmu.c
+> @@ -42,9 +42,9 @@ static int kvm_sbi_ext_pmu_handler(struct kvm_vcpu *vcp=
+u, struct kvm_run *run,
+>  #endif
+>                 /*
+>                  * This can fail if perf core framework fails to create a=
+n event.
+> -                * Forward the error to userspace because it's an error w=
+hich
+> -                * happened within the host kernel. The other option woul=
+d be
+> -                * to convert to an SBI error and forward to the guest.
+> +                * No need to forward the error to userspace and exit the=
+ guest
+> +                * operation can continue without profiling. Forward the
+> +                * appropriate SBI error to the guest.
+>                  */
+>                 ret =3D kvm_riscv_vcpu_pmu_ctr_cfg_match(vcpu, cp->a0, cp=
+->a1,
+>                                                        cp->a2, cp->a3, te=
+mp, retdata);
 > --
 > 2.34.1
 >
