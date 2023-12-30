@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-5349-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5350-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE2B1820736
-	for <lists+kvm@lfdr.de>; Sat, 30 Dec 2023 17:25:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C12BA82073A
+	for <lists+kvm@lfdr.de>; Sat, 30 Dec 2023 17:25:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 48C881F21D99
-	for <lists+kvm@lfdr.de>; Sat, 30 Dec 2023 16:25:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 795992816D5
+	for <lists+kvm@lfdr.de>; Sat, 30 Dec 2023 16:25:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63B82C13C;
-	Sat, 30 Dec 2023 16:23:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3CA514AB9;
+	Sat, 30 Dec 2023 16:23:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="QmX/Yjqr"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="nzLcd3/P"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2050.outbound.protection.outlook.com [40.107.100.50])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2087.outbound.protection.outlook.com [40.107.244.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 081BFFBFE;
-	Sat, 30 Dec 2023 16:23:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E4661428F;
+	Sat, 30 Dec 2023 16:23:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=R3wus2I+oZfeiTMGyAW0MKraHBbIyn5xzi+mrdSUcfagUHN+CrTSQf2HQrS/lWEbPRbIUWFQpeb+Wvs8cmr/PPPOPozW60+YX0uvQqMV/jU3m9fp+Va6TehKP87gDBni9ve4EjaZzUiRccj9/wjXidFy//ujervMqcoWQ6HiGI9u9xZ0QtT0d3CncE6V1m/IUoKQ5Z1uyoEIQJdU7KY247ESt3XuPRiJa08LNvgT/qWIgKcuWE3jbCZ4rXf9Hd3QrRzQQdvYs9XUM2BjCvTaiPrz5/wEgUOGo+aCcmHrn0wDJQOgHEIGl06JFdpw/QDjwuYrG+glGW6mWd4hTrpUUg==
+ b=IsGC/hPGNEFBhq09hVKjCcs15yOjTfDY8ZPaYRKDjpJRt56LUCf2xhNPxKbWJ9fwEB/UHROT7qr1S9hhEbiMy+3mfVYE3DklXZIbREhVMNn0IOvgHFQi5cF0K2eDGScodqe/QkLtSR+O8sXA1LPaB45D2/9/gdrfMgd+npGWIMoaK2SocleTra4mWUjeWuy18gWIALbYCfdHILQ8bTN33n+Eg9Ls6mS9cBVv9FjVo7RQw9Q1pP4GDmA+//B281MZOy/ZoO7NPkEnuHV3ZlBgPvS2zKAsGbh6ZLb0da7oS5kWjb5eygLWlyeGwlJ4K/o94VyBaEM+K/GsQDT0xh3RhQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XEk0+IzwZGy9xFQjrjfBF8jkhlEhy3f8QRJ7bygRWC0=;
- b=jbcd08JI8E4VbfsehsUYn54Ma4bJzgcZdzq0qHo1nem+TuSjGV4yp53cC/yFCsuobRrPfAF7kU0rIIXOPhl9+o3/QnBOEp/MclYCx7KPE3tcEpd1P/1AQqy2TXc3cjqpoJiO8dL4Kwi5MR9kPb2cvFvQ1BbZAMVgQbvLjjErxRBT26JBWyKk34WTMxYi9w9wXdig7V394H5F5oVevG+KsIY9kLnxIjxfkFRWMWeLZPzf95UUWZa5dvVWnrWQuFabEPoYBZ/t/H6n6WxSUlhqswZeNqo3mEYXWKBG0hbthTwrX139kHcm57DMofEZvRh0uR+BNQjK3rtWH2kRejd+VA==
+ bh=AiVvp+np7A+xrED5Xr7DhTlkRvWTwZgGfMO/veOUKsM=;
+ b=FNk13BP113SR0fjHAxaOSSm4V+dCaoAAY6IMw66nHW0NxgxQzIV45kbwSKB+VwV+Qj8u45K/5EVPzoVurbJOA+3j8H/nEUWMrYKXHfOL4VtLbMBWYQEnvFOUV9eTtoxY6WhT4gCJdHdLUVVQa4H5DPPzNyFseksiPJk7dW/gTGquxj4ypLq2QI/HNlKn5OCTQZv73HqYGu6uF0zwItXWvU9WosyCkvsf/rx4veNzcIO1mV6tzsT5MMs6YV84SrJo1r1XPwXpjqqgtaW0lrkZRESDGSI5/S2RZ/hXepGXBQp6bQIJtktUe8gk/y+Xxj7J5Uh9Ok2rnb/6W3rOSLVX7g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XEk0+IzwZGy9xFQjrjfBF8jkhlEhy3f8QRJ7bygRWC0=;
- b=QmX/YjqrP7oQvCb8eBeOFlGJ+IshFPV9qshiVhvEAOcKliWeslfnmPEwcwaBIPv3bDhScXt5AIFISAYClNbSVpY4cBYZW1cgnEl104WBcmtu44P0QDyivQvV2uB9lOXijMc0AVBz/sOR68vjJtwC/BJA4rD4ABXBLMJIrejJr6Y=
-Received: from DM6PR13CA0007.namprd13.prod.outlook.com (2603:10b6:5:bc::20) by
- CY5PR12MB6081.namprd12.prod.outlook.com (2603:10b6:930:2b::15) with Microsoft
+ bh=AiVvp+np7A+xrED5Xr7DhTlkRvWTwZgGfMO/veOUKsM=;
+ b=nzLcd3/P30gySK0fWmLGafwBAFElCemdelDCU4GUXVMz60SkdjCFGOJA4XtkKiHydiqiugFzt02oEO8vEuvtWAcrWqAEZzr9SWD+J4Ow0tO7OvTK5TFYCyXffyYGNHLZmTO7lxiMScyucOdb0M0iSuc+BF+WyCtZfJBR6BeV1qw=
+Received: from DM6PR13CA0016.namprd13.prod.outlook.com (2603:10b6:5:bc::29) by
+ CY8PR12MB8411.namprd12.prod.outlook.com (2603:10b6:930:6e::6) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7135.20; Sat, 30 Dec 2023 16:23:30 +0000
+ 15.20.7113.27; Sat, 30 Dec 2023 16:23:51 +0000
 Received: from DS3PEPF000099E2.namprd04.prod.outlook.com
- (2603:10b6:5:bc:cafe::7a) by DM6PR13CA0007.outlook.office365.com
- (2603:10b6:5:bc::20) with Microsoft SMTP Server (version=TLS1_2,
+ (2603:10b6:5:bc:cafe::be) by DM6PR13CA0016.outlook.office365.com
+ (2603:10b6:5:bc::29) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.7 via Frontend
- Transport; Sat, 30 Dec 2023 16:23:30 +0000
+ Transport; Sat, 30 Dec 2023 16:23:51 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -55,11 +55,11 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
  DS3PEPF000099E2.mail.protection.outlook.com (10.167.17.201) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7159.9 via Frontend Transport; Sat, 30 Dec 2023 16:23:30 +0000
+ 15.20.7159.9 via Frontend Transport; Sat, 30 Dec 2023 16:23:51 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Sat, 30 Dec
- 2023 10:23:29 -0600
+ 2023 10:23:50 -0600
 From: Michael Roth <michael.roth@amd.com>
 To: <x86@kernel.org>
 CC: <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
@@ -74,11 +74,10 @@ CC: <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
 	<ak@linux.intel.com>, <tony.luck@intel.com>,
 	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
 	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>,
-	Brijesh Singh <brijesh.singh@amd.com>
-Subject: [PATCH v1 14/26] crypto: ccp: Provide API to issue SEV and SNP commands
-Date: Sat, 30 Dec 2023 10:19:42 -0600
-Message-ID: <20231230161954.569267-15-michael.roth@amd.com>
+	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>
+Subject: [PATCH v1 15/26] x86/sev: Introduce snp leaked pages list
+Date: Sat, 30 Dec 2023 10:19:43 -0600
+Message-ID: <20231230161954.569267-16-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20231230161954.569267-1-michael.roth@amd.com>
 References: <20231230161954.569267-1-michael.roth@amd.com>
@@ -94,100 +93,113 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS3PEPF000099E2:EE_|CY5PR12MB6081:EE_
-X-MS-Office365-Filtering-Correlation-Id: e76e24b9-bb9e-465e-f901-08dc0953a93b
+X-MS-TrafficTypeDiagnostic: DS3PEPF000099E2:EE_|CY8PR12MB8411:EE_
+X-MS-Office365-Filtering-Correlation-Id: 09363be5-f9e1-44a1-c6a8-08dc0953b5a3
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	O6WPOImbkKCsKrgxBHsMsTyxPXaDxeXZuQTCwT/59hI1Lp4/JDQJGg+aW+Y9sv92Ln/al7BL9bureRuxNwmUntnrbMjwpQW9zKy/sIsRviIlw4mGjWzyJjBt2sGmiykv2VdFzTpI3aUHtQRejj8CoRUMeikXC17nkxgX+FbVHvmQd0b3Jz95BI94WgT4GYQEVxZiXM4AQBZb1LFQm2Ilk3xq213oX9wZFT5zqFkShv6y+Hhhy4/O0wJ+CVdnexdOzJrVbY58ZrQAlHJE61zZFSajDLHSfTpJ592Ab4k3hTVluACuqHbwAZNAER6hZJc5t3Dh4brAuGlmglJdn/jy8D/ZBWZ5E3izIZrfCOlqQgmvF2pK7VBZez13dQNsx+8WPNzEt+poNwGKVPH670YCH3cqyOv1bKRXOlWbZVFivyse9Eq06sM2yMIJp3N0hX6ew7hMVjFqiHgc6xWnKVsFsTH0Bo4N9UQ2tECWb2Qkl1RSw9dwHeqXQvjezBV8UJySS6/xu4zYZ9aGVJwHEEbfSvYH66pLo+anVbzz6ZZ4qNi6dU0+esCP9cZqByKzksBKKFzFvkX3/MvQbveK6E5Uxwb9wUqSJy8nDSt3nFvtSDHkT1dZ2FWJXv/4YWjhkc+HeuXcmUXGm8o1/oIeXQJpFugAQIlNngVg2Axm6zCusOA/UEdSqpTVMJGak+hYR6LWup6IvsJ4Yqujtl1zjdjSU3VvZA+jLV05l+kG5MjOsekdAozif99VAb+cde8iPleQJQtw2eedWcVJjYJxyCbot3DV17ncRVgxFmS/tJ7vT+c=
+	dJcooFPE4Nx3IM4yDP3YucBYaZDT6vCL3yXzJgh1HOfYG4x1KxnGWWX/1iZ7QNH5BkH5cWpmFmtvYvjG2ZIHCZljWZf/inSu3vTmufS4799ywsI+qSzRVKfKie4juSxRaEer5MYdQudlBa6Y71mnJDxJdwR+Wg9NWoE+px6o7eJfYVk60oRbvzZicVw8N+H0Xr27EqMPF+nyn5IDYc8dgmJpoBgM2hkNhkYI95x7VBvz9X0s6sz2XN56rl3ibzcxHuS2pb+YeVFHvp31LYgPkronuRYEfzDZunWKI4gT5Isow2hrTg0iQRPlqRh36hjq2cihucPYKQ8iS9wOBaGZpsIG31qjNGnsvURsuOQh9nkzZULCFHRRRVe6Z1Rea49iEIVYKS5y3eKzYzs4PgiuybJYku24Kv30KQOz9S5c0RQCmRQR9fAH5PRW6dYn7F+8+y07+n2d0yc+283WhZ0/ZftUN0JZAHFRUm44oy/EAtoN1i//4eMeegAAjnoaIELjyDulcMeeWrdCAXsxtcikcnCZkT6thcUIQckurKPKgjy4mOi/6lY4UeO2PeNHSQujlg/gWOW0VIPbPQumXRN9CKs6fft46PoZHbEtGhgZwZDcntujbzaFXbUA2jimf+eAZ7ULtM0zDqITe+hFgtDHbJl7NjhPA2swO4zgqTPXd+SQJO7ETPvQVhNx4UGPDXGVNPfm6RZjtcvYyVh15gpp+jmT3pWTVj2PRWfBmjXIBtx5KeF1uX9FRLdh36mvd/caU4xhsM9kOv5n8SjVHxTUig==
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(136003)(376002)(39860400002)(346002)(396003)(230922051799003)(82310400011)(64100799003)(186009)(451199024)(1800799012)(36840700001)(46966006)(40470700004)(36756003)(40480700001)(40460700003)(6916009)(70206006)(70586007)(86362001)(6666004)(1076003)(81166007)(82740400003)(356005)(26005)(8936002)(2616005)(41300700001)(83380400001)(47076005)(426003)(5660300002)(7416002)(2906002)(4326008)(44832011)(7406005)(478600001)(36860700001)(316002)(336012)(8676002)(54906003)(16526019)(36900700001)(134885004);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(136003)(39860400002)(346002)(396003)(376002)(230922051799003)(82310400011)(451199024)(64100799003)(186009)(1800799012)(46966006)(40470700004)(36840700001)(40460700003)(16526019)(426003)(26005)(336012)(1076003)(2616005)(44832011)(83380400001)(5660300002)(4326008)(7416002)(8676002)(36860700001)(8936002)(6666004)(41300700001)(2906002)(70586007)(6916009)(316002)(478600001)(54906003)(70206006)(86362001)(82740400003)(47076005)(7406005)(356005)(81166007)(36756003)(40480700001)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Dec 2023 16:23:30.5201
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Dec 2023 16:23:51.3331
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e76e24b9-bb9e-465e-f901-08dc0953a93b
+X-MS-Exchange-CrossTenant-Network-Message-Id: 09363be5-f9e1-44a1-c6a8-08dc0953b5a3
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	DS3PEPF000099E2.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6081
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB8411
 
-From: Brijesh Singh <brijesh.singh@amd.com>
+From: Ashish Kalra <ashish.kalra@amd.com>
 
-Export sev_do_cmd() as a generic API for the hypervisor to issue
-commands to manage an SEV and SNP guest. The commands for SEV and SNP
-are defined in the SEV and SEV-SNP firmware specifications.
+Pages are unsafe to be released back to the page-allocator, if they
+have been transitioned to firmware/guest state and can't be reclaimed
+or transitioned back to hypervisor/shared state. In this case add
+them to an internal leaked pages list to ensure that they are not freed
+or touched/accessed to cause fatal page faults.
 
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-[mdr: kernel-doc fixups]
+[mdr: relocate to arch/x86/virt/svm/sev.c]
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- drivers/crypto/ccp/sev-dev.c |  3 ++-
- include/linux/psp-sev.h      | 19 +++++++++++++++++++
- 2 files changed, 21 insertions(+), 1 deletion(-)
+ arch/x86/include/asm/sev.h |  2 ++
+ arch/x86/virt/svm/sev.c    | 35 +++++++++++++++++++++++++++++++++++
+ 2 files changed, 37 insertions(+)
 
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 85634d4f8cfe..767f0ec3d5bb 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -431,7 +431,7 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
- 	return ret;
+diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+index d3ccb7a0c7e9..435ba9bc4510 100644
+--- a/arch/x86/include/asm/sev.h
++++ b/arch/x86/include/asm/sev.h
+@@ -264,6 +264,7 @@ void snp_dump_hva_rmpentry(unsigned long address);
+ int psmash(u64 pfn);
+ int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int asid, bool immutable);
+ int rmp_make_shared(u64 pfn, enum pg_level level);
++void snp_leak_pages(u64 pfn, unsigned int npages);
+ #else
+ static inline bool snp_probe_rmptable_info(void) { return false; }
+ static inline int snp_lookup_rmpentry(u64 pfn, bool *assigned, int *level) { return -ENODEV; }
+@@ -275,6 +276,7 @@ static inline int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int as
+ 	return -ENODEV;
  }
+ static inline int rmp_make_shared(u64 pfn, enum pg_level level) { return -ENODEV; }
++static inline void snp_leak_pages(u64 pfn, unsigned int npages) {}
+ #endif
  
--static int sev_do_cmd(int cmd, void *data, int *psp_ret)
-+int sev_do_cmd(int cmd, void *data, int *psp_ret)
- {
- 	int rc;
+ #endif
+diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
+index ee182351d93a..0f2e1ce241b5 100644
+--- a/arch/x86/virt/svm/sev.c
++++ b/arch/x86/virt/svm/sev.c
+@@ -60,6 +60,17 @@ static u64 probed_rmp_base, probed_rmp_size;
+ static struct rmpentry *rmptable __ro_after_init;
+ static u64 rmptable_max_pfn __ro_after_init;
  
-@@ -441,6 +441,7 @@ static int sev_do_cmd(int cmd, void *data, int *psp_ret)
++/* List of pages which are leaked and cannot be reclaimed */
++struct leaked_page {
++	struct page *page;
++	struct list_head list;
++};
++
++static LIST_HEAD(snp_leaked_pages_list);
++static DEFINE_SPINLOCK(snp_leaked_pages_list_lock);
++
++static unsigned long snp_nr_leaked_pages;
++
+ #undef pr_fmt
+ #define pr_fmt(fmt)	"SEV-SNP: " fmt
  
- 	return rc;
+@@ -476,3 +487,27 @@ int rmp_make_shared(u64 pfn, enum pg_level level)
+ 	return rmpupdate(pfn, &state);
  }
-+EXPORT_SYMBOL_GPL(sev_do_cmd);
- 
- static int __sev_init_locked(int *error)
- {
-diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-index a39a9e5b5bc4..0581f194cdd0 100644
---- a/include/linux/psp-sev.h
-+++ b/include/linux/psp-sev.h
-@@ -914,6 +914,22 @@ int sev_guest_df_flush(int *error);
-  */
- int sev_guest_decommission(struct sev_data_decommission *data, int *error);
- 
-+/**
-+ * sev_do_cmd - issue an SEV or an SEV-SNP command
-+ *
-+ * @cmd: SEV or SEV-SNP firmware command to issue
-+ * @data: arguments for firmware command
-+ * @psp_ret: SEV command return code
-+ *
-+ * Returns:
-+ * 0 if the SEV successfully processed the command
-+ * -%ENODEV    if the PSP device is not available
-+ * -%ENOTSUPP  if PSP device does not support SEV
-+ * -%ETIMEDOUT if the SEV command timed out
-+ * -%EIO       if PSP device returned a non-zero return code
-+ */
-+int sev_do_cmd(int cmd, void *data, int *psp_ret);
+ EXPORT_SYMBOL_GPL(rmp_make_shared);
 +
- void *psp_copy_user_blob(u64 uaddr, u32 len);
- 
- #else	/* !CONFIG_CRYPTO_DEV_SP_PSP */
-@@ -929,6 +945,9 @@ sev_guest_deactivate(struct sev_data_deactivate *data, int *error) { return -ENO
- static inline int
- sev_guest_decommission(struct sev_data_decommission *data, int *error) { return -ENODEV; }
- 
-+static inline int
-+sev_do_cmd(int cmd, void *data, int *psp_ret) { return -ENODEV; }
++void snp_leak_pages(u64 pfn, unsigned int npages)
++{
++	struct page *page = pfn_to_page(pfn);
++	struct leaked_page *leak;
 +
- static inline int
- sev_guest_activate(struct sev_data_activate *data, int *error) { return -ENODEV; }
- 
++	pr_debug("%s: leaking PFN range 0x%llx-0x%llx\n", __func__, pfn, pfn + npages);
++
++	spin_lock(&snp_leaked_pages_list_lock);
++	while (npages--) {
++		leak = kzalloc(sizeof(*leak), GFP_KERNEL_ACCOUNT);
++		if (!leak)
++			goto unlock;
++		leak->page = page;
++		list_add_tail(&leak->list, &snp_leaked_pages_list);
++		dump_rmpentry(pfn);
++		snp_nr_leaked_pages++;
++		pfn++;
++		page++;
++	}
++unlock:
++	spin_unlock(&snp_leaked_pages_list_lock);
++}
++EXPORT_SYMBOL_GPL(snp_leak_pages);
 -- 
 2.25.1
 
