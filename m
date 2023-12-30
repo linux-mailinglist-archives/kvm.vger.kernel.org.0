@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-5355-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5356-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A540B820749
-	for <lists+kvm@lfdr.de>; Sat, 30 Dec 2023 17:27:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 516B582074C
+	for <lists+kvm@lfdr.de>; Sat, 30 Dec 2023 17:28:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8CCB1C214BB
-	for <lists+kvm@lfdr.de>; Sat, 30 Dec 2023 16:27:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D09F71F21E96
+	for <lists+kvm@lfdr.de>; Sat, 30 Dec 2023 16:28:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A0AA14A9E;
-	Sat, 30 Dec 2023 16:25:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CE48E57E;
+	Sat, 30 Dec 2023 16:26:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ue7TFx/O"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="VSJi5YLu"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2044.outbound.protection.outlook.com [40.107.220.44])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2060.outbound.protection.outlook.com [40.107.244.60])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C92915484;
-	Sat, 30 Dec 2023 16:25:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FC35D2E1;
+	Sat, 30 Dec 2023 16:25:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bv8o4HKlm4uK0eF9SVRiDrjXosc+kYv7NNm91ATXUiLlEz9mYN8WyDLDB3/ebAcc1XuzK9nm4lvGjOWyLcBjlXI+w1pYPlZ7HHHhB+mble7+zmAAyI/ZkQxDd5pA4YI016612DJB4jT3du1GACzmxZXGzYTdPn3qw3Pk6AwA5mngYS7JVRtBVGFGiEazW1Et4fhksVic1m+Ku5CZ+NEFeBPlBh/5KmMFfoTowBlz/Ix8B6v1koohbTMFcun4O/WWTSqKpv48Xm244ZAS7ZdPIYZzD4skK4g2J+3Bl9DQoRkxxcGg4lLo5AEx4ru8+EWChOPvjdd+4LypZ6oNKnuWXw==
+ b=mUvY+kga3J8En8QkPDOM9UdPREZ3m79rEwHlI4hwelptnnQQpLkZzm17W9vtXSa6lFM/nGkXyMdndRkxBlUOkPHGFVLfIuiNKqddQUGGCkoReRaSi6wiivqZLA5efUfCsbrtD7GiCzpnui6+NwSeSqP5yA2Bx7LKQ+kPnXSRVQy9zQpnyGhgDDuGE2LPWi2tRzOI5oGRT8nUrtJkJ5Y7yIIs1BtKBsFmpFeFEkfFHsYqx8BdlilusSUj3e4RfsOr2uDz6G29jxEjpFfD8cfBB6R/GL2DIbyh1HzepMaN9w69+/yY6uTH+pV7KSko944nmokKpAb3rVp605AzWdo7zg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TnnZAnV/zJlnoSdwRXMjN05tLynu44lZtGj03GoCDQE=;
- b=mc+OvD8S2G2nL6gp5bE+M4gnravyQ47rHyDn4+Wyhefl1Fx8lRofj8V+O0PFNPNVSY1JOo84oqocZZ7rM8oOiFweD8Be1r5y/LcJ9txebqjUJUUuR2Zr6kk/Dzvpoh0SUWBfGoRsyuxk2xeLSzzHVTOxkypkU0OpFjlwsI7TTOW3gxodNm+5EX3tISW7CnNTAXnoUT7PDQqtOwQvJBMHLSv0e6kWCGKwukmhxyW91A28eH2eU80hKG9R/MmEFT14kJsxQ7Cq9AfgG5JPDNxNs3wRAAISoUDPPO/TFAb5T39Qimb7M09g1f3K9U1yLpRR9ZUfgIdsXIyQTOxqmr3wFw==
+ bh=r2LWPNEzXew58/uEUkfHoR1k+7mj67hBVpXN4aUSkY8=;
+ b=VufSR+pD+KNs5ccI6amCOxM2CMRx7sHcEx6SytOv2cA6FIlgtFoWMpYpK6zLHovm9MLEHifhT93TR0nGxu4c4I6giC0gjuah+YmCjXAsJkY+QnfWpfp6wC6cOJT6+Ilm/GDjK9HF2lCfFfLtiI+A2kEtQ5ddvh0ALdOMMX/StoC3UZN2pDdnPVhG6Z6bxu5/p43vQZkVCZuld3a26Jm2OMSUk93WOrU+UhHE26VTnUigpXSLseY2qFBxXKyT3tpDuxa4ysUQoEZxhmFXJLqbsjYOyh/iKnvJWpj/VieuRQ8752OQIPnT6X9fIiXrrlSKUQ1TE6wFmVAAbexYfz3vCA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TnnZAnV/zJlnoSdwRXMjN05tLynu44lZtGj03GoCDQE=;
- b=ue7TFx/Oxv+0wezYlTVXZLWYPisDtnsXtyvrO99OvG6bTUuV2D9ES2KWKruCIysRLXolBtkF/eza5uyXW93rgWT9uTplX0wYk6d2/dZNO0vvaUesiCVx0L7ChfYyWHeK0obhB63/Pvsl8GIgpltzBqX+Mm0BnB9Y8V0+ilTh/tk=
-Received: from DM6PR08CA0056.namprd08.prod.outlook.com (2603:10b6:5:1e0::30)
- by DM6PR12MB4862.namprd12.prod.outlook.com (2603:10b6:5:1b7::13) with
+ bh=r2LWPNEzXew58/uEUkfHoR1k+7mj67hBVpXN4aUSkY8=;
+ b=VSJi5YLu77pkbGwXXd0nv+4Abs4N3Q9VOYsLdtgyPDCkhegb8je2BakcMNzMwByyLg6OpIs4jyOQHGHd+DK1XKVLpMzz/UTCRzOZoZyubRcjEoDMXcDk4iZmzQy4DFtp/jI+x/3RaM598cexkNZ/ESkn6BhPmuzedd6Wj9hSf/I=
+Received: from DS7PR03CA0009.namprd03.prod.outlook.com (2603:10b6:5:3b8::14)
+ by LV2PR12MB5846.namprd12.prod.outlook.com (2603:10b6:408:175::6) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.22; Sat, 30 Dec
- 2023 16:25:35 +0000
-Received: from DS1PEPF0001709B.namprd05.prod.outlook.com
- (2603:10b6:5:1e0:cafe::45) by DM6PR08CA0056.outlook.office365.com
- (2603:10b6:5:1e0::30) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7113.28 via Frontend
- Transport; Sat, 30 Dec 2023 16:25:35 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.19; Sat, 30 Dec
+ 2023 16:25:56 +0000
+Received: from DS1PEPF0001709D.namprd05.prod.outlook.com
+ (2603:10b6:5:3b8:cafe::a1) by DS7PR03CA0009.outlook.office365.com
+ (2603:10b6:5:3b8::14) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.18 via Frontend
+ Transport; Sat, 30 Dec 2023 16:25:56 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -54,13 +54,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DS1PEPF0001709B.mail.protection.outlook.com (10.167.18.105) with Microsoft
+ DS1PEPF0001709D.mail.protection.outlook.com (10.167.18.107) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7159.9 via Frontend Transport; Sat, 30 Dec 2023 16:25:35 +0000
+ 15.20.7159.9 via Frontend Transport; Sat, 30 Dec 2023 16:25:56 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Sat, 30 Dec
- 2023 10:25:34 -0600
+ 2023 10:25:55 -0600
 From: Michael Roth <michael.roth@amd.com>
 To: <x86@kernel.org>
 CC: <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
@@ -75,10 +75,11 @@ CC: <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
 	<ak@linux.intel.com>, <tony.luck@intel.com>,
 	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
 	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>
-Subject: [PATCH v1 19/26] iommu/amd: Clean up RMP entries for IOMMU pages during SNP shutdown
-Date: Sat, 30 Dec 2023 10:19:47 -0600
-Message-ID: <20231230161954.569267-20-michael.roth@amd.com>
+	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>,
+	Brijesh Singh <brijesh.singh@amd.com>
+Subject: [PATCH v1 20/26] crypto: ccp: Add debug support for decrypting pages
+Date: Sat, 30 Dec 2023 10:19:48 -0600
+Message-ID: <20231230161954.569267-21-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20231230161954.569267-1-michael.roth@amd.com>
 References: <20231230161954.569267-1-michael.roth@amd.com>
@@ -94,189 +95,121 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF0001709B:EE_|DM6PR12MB4862:EE_
-X-MS-Office365-Filtering-Correlation-Id: 399e0284-045b-4bd8-80c7-08dc0953f3b8
+X-MS-TrafficTypeDiagnostic: DS1PEPF0001709D:EE_|LV2PR12MB5846:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7580137a-b5c5-4c2d-5624-08dc0954001d
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	8vOf7U2vw1Bh0kDMQsAZmIg63PJhoPGu+l405Kt0Z9qPSJtK2AULvLYVrObXxfXDpeqki5b32qguub9cA97y40oBGBsBQXXgwxjUdTYI1YSUMfCWUsw8pFhqKl+Vap4rDIXk/PGkB9zcb3dhGhI7WSKYwszHlA0f5iS3BLFjtjTJ7X7Gw8pZcw6CQDi8xVH/MPLYiwh7tD/bbYwSdc7cDl/EdSleLqcrTsmV6dq34aHfxb5Tfe6XjYivz2cpburSfIM8dJDf2rx1pdeGOonk1Z8v1SSwC4kNJ5F3ZTmTNjqbq25o3jUCxxdkW+9eSBLOp3yL5weJhRnyyJeocTt9LFKduMmZy6a0bNVHdgfvjfnzULB18ralPL9/8pHCRDxssrHeB98IxO1o14bQbh5K2b3oRIJuJIgeFfyNUjgt3E6L/X66/abKO5gn3dTGDdPbsEX7+lTzMR9aSw0Fld3x/O+i3wBKlGTVbXwMDVcVaYUGzpaKsvY6Prn+QGECt3H0skxa+S3FDK9O7r3zmSrQAGA0BevGfm3zHiv8u3SlEAO8JgzCnkLZ25ntNoIjIiLFOzTFbLjrRqRvlbA0eQwrl1MjE74CJn4aOAaMk+2ojG7DOi/QZkbcrVkR43rz9YDs8UCzW7HW7Y0vBBpIMAIa8HGYFoSL4Z+fGMacN48pNUdbCdy9wptYu/CBkTJfr0sFntjwxLxJmjiEJVq4v09tZ9VNC5xeyjY8OQIZLtBKppvUw/XRzNiI2ZAidk8EklXjlC2Qv1BtZVS65/BnDA7g4A==
+	TQNrNrDGcJlHMZFefXOkUH3NmyibU01QG/2ym/JxRFPOVwrYyxN/Cz9pa4Jv3EdiAF/98l+HacTVhKoPJrtaXuproynaG7F/WWcXA1UboGwa2ClcyOYmBKfNdcpj/WCBFq3WAy/6MqR4P9b1PMtXxT/DJpysniN+Ej2uRh9x2Q33A9kJVAJCt6rjZnthC2gAbny7hPwwphgGxxO2mrZwz3Ywpj078zVPQZkdSyXJh0oIrEC3FQPgB41WYeYHclo3hJ3mt0CbDNQcx4N/cp9zbOkmDwbGr7lyqDbiuXdtGGSvCs347rKwX+VgaJD7BL3qzom5n0+wi6WCgGZ6ez1uP8dmIzYgXhDpx58r9GYbbwLKkU0rn0BnH+bJBGBaUCwZMe4hfvpaA9XkinXJlSONzTx3JbAT2kfvTPGW4pok2nB4p2iqv0r14hHldktSL2760q3P6VWzM9zSOzlWSpoxrkpKgtwrvdRh6nYLWymONqlVT0hd+D+jKPF305733kG9hKUYqGPqxG7kZguytX2L/LO5HZwTlz0UZr2JOL6xItZFqVdUQEDKJKUKklaVGbMDdg1QLpbQBncD4YsDHFQ/g27Fy5FiuFRxn4P7EczkbmSfWLO1DZCT0G+ECQNjB1DvL09ndnD31zZQSl6pX9ih5Bly6iz38dc+9RXamYFlIHOMuX1CKzNF3f4No8r/SFe++fvWmsncEbV4YWyNGegtXYmvbFgYtP/Z4uJHyTz1+vn+R5VZG5T8as+PU+x4sYyd36XggUrqGrHc4BNWCFYrNV24aQG4bF94cckR7ZGmqSIRskYeKpLS/IHvAsVDTspsMoSPW9NSxXevPmhji30+oQ==
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(396003)(376002)(346002)(136003)(39860400002)(230922051799003)(1800799012)(64100799003)(186009)(451199024)(82310400011)(36840700001)(40470700004)(46966006)(47076005)(40480700001)(6916009)(4326008)(54906003)(81166007)(86362001)(316002)(40460700003)(8936002)(8676002)(36756003)(356005)(44832011)(70586007)(70206006)(36860700001)(6666004)(5660300002)(7416002)(7406005)(478600001)(2616005)(41300700001)(1076003)(26005)(16526019)(426003)(336012)(2906002)(83380400001)(82740400003)(36900700001);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(376002)(39860400002)(346002)(136003)(396003)(230173577357003)(230273577357003)(230922051799003)(1800799012)(451199024)(64100799003)(186009)(82310400011)(46966006)(36840700001)(40470700004)(36756003)(40480700001)(40460700003)(2616005)(47076005)(70206006)(86362001)(6916009)(70586007)(2906002)(81166007)(6666004)(82740400003)(356005)(26005)(7416002)(36860700001)(1076003)(83380400001)(5660300002)(8936002)(336012)(7406005)(44832011)(16526019)(316002)(54906003)(4326008)(478600001)(8676002)(41300700001)(426003)(36900700001)(134885004);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Dec 2023 16:25:35.4877
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Dec 2023 16:25:56.2812
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 399e0284-045b-4bd8-80c7-08dc0953f3b8
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7580137a-b5c5-4c2d-5624-08dc0954001d
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DS1PEPF0001709B.namprd05.prod.outlook.com
+	DS1PEPF0001709D.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4862
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5846
 
-From: Ashish Kalra <ashish.kalra@amd.com>
+From: Brijesh Singh <brijesh.singh@amd.com>
 
-Add a new IOMMU API interface amd_iommu_snp_disable() to transition
-IOMMU pages to Hypervisor state from Reclaim state after SNP_SHUTDOWN_EX
-command. Invoke this API from the CCP driver after SNP_SHUTDOWN_EX
-command.
+Add support to decrypt guest encrypted memory. These API interfaces can
+be used for example to dump VMCBs on SNP guest exit.
 
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+[mdr: minor commit fixups]
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- drivers/crypto/ccp/sev-dev.c | 20 +++++++++
- drivers/iommu/amd/init.c     | 79 ++++++++++++++++++++++++++++++++++++
- include/linux/amd-iommu.h    |  6 +++
- 3 files changed, 105 insertions(+)
+ drivers/crypto/ccp/sev-dev.c | 32 ++++++++++++++++++++++++++++++++
+ include/linux/psp-sev.h      | 19 +++++++++++++++++++
+ 2 files changed, 51 insertions(+)
 
 diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 8cfb376ca2e7..47fc58ed9e6a 100644
+index 47fc58ed9e6a..9792c7af3005 100644
 --- a/drivers/crypto/ccp/sev-dev.c
 +++ b/drivers/crypto/ccp/sev-dev.c
-@@ -26,6 +26,7 @@
- #include <linux/fs.h>
- #include <linux/fs_struct.h>
- #include <linux/psp.h>
-+#include <linux/amd-iommu.h>
- 
- #include <asm/smp.h>
- #include <asm/cacheflush.h>
-@@ -1675,6 +1676,25 @@ static int __sev_snp_shutdown_locked(int *error)
- 		return ret;
- 	}
- 
-+	/*
-+	 * SNP_SHUTDOWN_EX with IOMMU_SNP_SHUTDOWN set to 1 disables SNP
-+	 * enforcement by the IOMMU and also transitions all pages
-+	 * associated with the IOMMU to the Reclaim state.
-+	 * Firmware was transitioning the IOMMU pages to Hypervisor state
-+	 * before version 1.53. But, accounting for the number of assigned
-+	 * 4kB pages in a 2M page was done incorrectly by not transitioning
-+	 * to the Reclaim state. This resulted in RMP #PF when later accessing
-+	 * the 2M page containing those pages during kexec boot. Hence, the
-+	 * firmware now transitions these pages to Reclaim state and hypervisor
-+	 * needs to transition these pages to shared state. SNP Firmware
-+	 * version 1.53 and above are needed for kexec boot.
-+	 */
-+	ret = amd_iommu_snp_disable();
-+	if (ret) {
-+		dev_err(sev->dev, "SNP IOMMU shutdown failed\n");
-+		return ret;
-+	}
-+
- 	sev->snp_initialized = false;
- 	dev_dbg(sev->dev, "SEV-SNP firmware shutdown\n");
- 
-diff --git a/drivers/iommu/amd/init.c b/drivers/iommu/amd/init.c
-index 96a1a7fed470..3d95b2e67784 100644
---- a/drivers/iommu/amd/init.c
-+++ b/drivers/iommu/amd/init.c
-@@ -30,6 +30,7 @@
- #include <asm/io_apic.h>
- #include <asm/irq_remapping.h>
- #include <asm/set_memory.h>
-+#include <asm/sev.h>
- 
- #include <linux/crash_dump.h>
- 
-@@ -3797,3 +3798,81 @@ int amd_iommu_pc_set_reg(struct amd_iommu *iommu, u8 bank, u8 cntr, u8 fxn, u64
- 
- 	return iommu_pc_get_set_reg(iommu, bank, cntr, fxn, value, true);
+@@ -2053,6 +2053,38 @@ int sev_guest_df_flush(int *error)
  }
-+
-+#ifdef CONFIG_KVM_AMD_SEV
-+static int iommu_page_make_shared(void *page)
-+{
-+	unsigned long paddr, pfn;
-+
-+	paddr = iommu_virt_to_phys(page);
-+	/* Cbit maybe set in the paddr */
-+	pfn = __sme_clr(paddr) >> PAGE_SHIFT;
-+
-+	if (!(pfn % PTRS_PER_PMD)) {
-+		int ret, level;
-+		bool assigned;
-+
-+		ret = snp_lookup_rmpentry(pfn, &assigned, &level);
-+		if (ret)
-+			pr_warn("IOMMU PFN %lx RMP lookup failed, ret %d\n",
-+				pfn, ret);
-+
-+		if (!assigned)
-+			pr_warn("IOMMU PFN %lx not assigned in RMP table\n",
-+				pfn);
-+
-+		if (level > PG_LEVEL_4K) {
-+			ret = psmash(pfn);
-+			if (ret) {
-+				pr_warn("IOMMU PFN %lx had a huge RMP entry, but attempted psmash failed, ret: %d, level: %d\n",
-+					pfn, ret, level);
-+			}
-+		}
-+	}
-+
-+	return rmp_make_shared(pfn, PG_LEVEL_4K);
-+}
-+
-+static int iommu_make_shared(void *va, size_t size)
-+{
-+	void *page;
-+	int ret;
-+
-+	if (!va)
-+		return 0;
-+
-+	for (page = va; page < (va + size); page += PAGE_SIZE) {
-+		ret = iommu_page_make_shared(page);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+int amd_iommu_snp_disable(void)
-+{
-+	struct amd_iommu *iommu;
-+	int ret;
-+
-+	if (!amd_iommu_snp_en)
-+		return 0;
-+
-+	for_each_iommu(iommu) {
-+		ret = iommu_make_shared(iommu->evt_buf, EVT_BUFFER_SIZE);
-+		if (ret)
-+			return ret;
-+
-+		ret = iommu_make_shared(iommu->ppr_log, PPR_LOG_SIZE);
-+		if (ret)
-+			return ret;
-+
-+		ret = iommu_make_shared((void *)iommu->cmd_sem, PAGE_SIZE);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(amd_iommu_snp_disable);
-+#endif
-diff --git a/include/linux/amd-iommu.h b/include/linux/amd-iommu.h
-index 7365be00a795..2b90c48a6a87 100644
---- a/include/linux/amd-iommu.h
-+++ b/include/linux/amd-iommu.h
-@@ -85,4 +85,10 @@ int amd_iommu_pc_get_reg(struct amd_iommu *iommu, u8 bank, u8 cntr, u8 fxn,
- 		u64 *value);
- struct amd_iommu *get_amd_iommu(unsigned int idx);
+ EXPORT_SYMBOL_GPL(sev_guest_df_flush);
  
-+#ifdef CONFIG_KVM_AMD_SEV
-+int amd_iommu_snp_disable(void);
-+#else
-+static inline int amd_iommu_snp_disable(void) { return 0; }
-+#endif
++int snp_guest_dbg_decrypt_page(u64 gctx_pfn, u64 src_pfn, u64 dst_pfn, int *error)
++{
++	struct sev_data_snp_dbg data = {0};
++	struct sev_device *sev;
++	int ret;
 +
- #endif /* _ASM_X86_AMD_IOMMU_H */
++	if (!psp_master || !psp_master->sev_data)
++		return -ENODEV;
++
++	sev = psp_master->sev_data;
++
++	if (!sev->snp_initialized)
++		return -EINVAL;
++
++	data.gctx_paddr = sme_me_mask | (gctx_pfn << PAGE_SHIFT);
++	data.src_addr = sme_me_mask | (src_pfn << PAGE_SHIFT);
++	data.dst_addr = sme_me_mask | (dst_pfn << PAGE_SHIFT);
++
++	/* The destination page must be in the firmware state. */
++	if (rmp_mark_pages_firmware(data.dst_addr, 1, false))
++		return -EIO;
++
++	ret = sev_do_cmd(SEV_CMD_SNP_DBG_DECRYPT, &data, error);
++
++	/* Restore the page state */
++	if (snp_reclaim_pages(data.dst_addr, 1, false))
++		ret = -EIO;
++
++	return ret;
++}
++EXPORT_SYMBOL_GPL(snp_guest_dbg_decrypt_page);
++
+ static void sev_exit(struct kref *ref)
+ {
+ 	misc_deregister(&misc_dev->misc);
+diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+index 16d0da895680..b14008388a37 100644
+--- a/include/linux/psp-sev.h
++++ b/include/linux/psp-sev.h
+@@ -930,6 +930,20 @@ int sev_guest_decommission(struct sev_data_decommission *data, int *error);
+  */
+ int sev_do_cmd(int cmd, void *data, int *psp_ret);
+ 
++/**
++ * snp_guest_dbg_decrypt_page - perform SEV SNP_DBG_DECRYPT command
++ *
++ * @sev_ret: sev command return code
++ *
++ * Returns:
++ * 0 if the SEV successfully processed the command
++ * -%ENODEV    if the SEV device is not available
++ * -%ENOTSUPP  if the SEV does not support SEV
++ * -%ETIMEDOUT if the SEV command timed out
++ * -%EIO       if the SEV returned a non-zero return code
++ */
++int snp_guest_dbg_decrypt_page(u64 gctx_pfn, u64 src_pfn, u64 dst_pfn, int *error);
++
+ void *psp_copy_user_blob(u64 uaddr, u32 len);
+ void *snp_alloc_firmware_page(gfp_t mask);
+ void snp_free_firmware_page(void *addr);
+@@ -960,6 +974,11 @@ sev_issue_cmd_external_user(struct file *filep, unsigned int id, void *data, int
+ 
+ static inline void *psp_copy_user_blob(u64 __user uaddr, u32 len) { return ERR_PTR(-EINVAL); }
+ 
++static inline int snp_guest_dbg_decrypt_page(u64 gctx_pfn, u64 src_pfn, u64 dst_pfn, int *error)
++{
++	return -ENODEV;
++}
++
+ static inline void *snp_alloc_firmware_page(gfp_t mask)
+ {
+ 	return NULL;
 -- 
 2.25.1
 
