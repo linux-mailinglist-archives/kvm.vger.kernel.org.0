@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-5398-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5399-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B52498207F8
-	for <lists+kvm@lfdr.de>; Sat, 30 Dec 2023 18:35:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E9A28207FB
+	for <lists+kvm@lfdr.de>; Sat, 30 Dec 2023 18:36:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A5E37B21AD3
-	for <lists+kvm@lfdr.de>; Sat, 30 Dec 2023 17:35:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 73EDCB22546
+	for <lists+kvm@lfdr.de>; Sat, 30 Dec 2023 17:36:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C019E14F9F;
-	Sat, 30 Dec 2023 17:34:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECFCDC2FD;
+	Sat, 30 Dec 2023 17:34:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="NxN+tESr"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="dEAGLnKo"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2088.outbound.protection.outlook.com [40.107.94.88])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2089.outbound.protection.outlook.com [40.107.243.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DC8714AA4;
-	Sat, 30 Dec 2023 17:34:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DCBDD29F;
+	Sat, 30 Dec 2023 17:34:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=d6OzabGEefmxWECjGW0+leNgqcr1s8KBLhwHTuoam4jPI7ybaOXVJkaXeB8ve4f1e1A4b6d1MTfaLR/rG9Z4KseXDUfLQ04c7Svn+7unv7o4HHjQSYbA4tyyzPXhYRJeF4+dxrg4oGnXdZcBmKOrRNlnVHuajwKcf4OhOFvjwqs8Xm9LEbLaJcItjWi3yBVHf84MC9tTpJwY9CGh18lMAqEoo7WVzJ2+zpW+wmkKcFDk3Lc7CsRt06a1h10XWzg4bQeU6lYJa08SvAIlbbHL4Lw2zcsVFP28v6qKs9scJqe6N0eTfi9rtBkpphHSmlqsCNaRTtsEobCcZree0ugDHQ==
+ b=NpSyfscAP5ew+obYFDBjAj66rjGsPWXQNmJDz7XXxmvbhbaSVF0sjt+EQghCAqazXuzXxV4psY7560FF9W/KGMPAqStjk3DWhYMuR7urdauK1IV9jSeezlJo85mtmM5q5KVUZnh1kZEXUBWOGt0x7ub5s/9s1luJkYH58NvLJRhpO7+NLStDE+0wEAYabb9xM/njEY8MUBsRbUeHju5iytPTTngLoOSqBA71GfRKLwClamKs4fs/qrfWpWcajA8TJzhEtqKDwkvjfD0Q2wnHkaYHG5kxoZ+dBdwmgUZLpUwr4GQYJ7lb9MEWoeUcBlorJ0RIJveK6voLIw1Y2y0ofA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OBZ+nSrwGeIdfIdDGpvKWJpGg1lN5AAkK8SmiPKEG/8=;
- b=l3ZmjQwvIv15TKHCRK3hc8DxGhCdVAXrWkoVOZfQYQyGdZf3AkLycOO/gXMzLUxgAte+gxKXGLLRDs+E1IOv4AIyQEYfyMeA4eT7SSKLe04W1jnPdD+PDfjUZpdlpTncf3D7X+noSmvalM+Vfs2iuQoBxXNXZhGeHG02lj6wL7s+UeO7qT8JdwPtA4kgGRBfGvpjlQQYPjo85ycWP5zBhHeluLyhIV3NjQfAvo1ADlZ29Ob3p7BraPPZdjIvjqhnF97UUNaMEJkzacoxB/jkFoopAilZzfZjCPfc2ggVLrzAYIYVWjcyBCVZ1HxeTxPgmowFJ3zXobq9wC7npip7QA==
+ bh=FraUpaS9l6U3ZDvNj1uyAcaXSYZFmTy9tuFYu3AMFic=;
+ b=Nds6MSzRtwMcms6RVWzjvlJMT3QbPIGPjbX4S+k+LvwAMwIiBxAf8pNxMuZWlqtoTiJJ87vMM9FYGs4LuG+siUAzf1jMI55PRhQEWPMaJh4cBW/GhZILGLcCGbBJe7gnM3jh6c8rUG3d011szPZNYZQysz46wV0BkmGoEn73eS3ZFZMHYY/hwb18QZTzvUMe3c/Xbdob+UxEk5GdJ/yyoZrXiJ+eLV5ElyZwlZNCImYWEp+++RiE0nAox1HmYitn3Ipk+FFtieFTECkJyhDEzDRlX22OhmSd5kmJx4JD+NzCqdIGy4FrE71G4gApGkCd8PvfDMUgUDLKWNrja93Zwg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OBZ+nSrwGeIdfIdDGpvKWJpGg1lN5AAkK8SmiPKEG/8=;
- b=NxN+tESrp4uTgQ6OeMhwqHOVHasTuTl25y0DThYySnnqr5veDLCpCqNNScGcljEBDqmHVuEsPdoo/j/kYmVFEZdU5BVoixZ2QMDypTiiRrUWaDfi3CFvROSHyiO5IFoXZOBi6iOXkP1tQAvKi13op9gX7Th1R7pIznzHjaxUZ1I=
-Received: from MW4PR03CA0237.namprd03.prod.outlook.com (2603:10b6:303:b9::32)
- by MN0PR12MB6103.namprd12.prod.outlook.com (2603:10b6:208:3c9::19) with
+ bh=FraUpaS9l6U3ZDvNj1uyAcaXSYZFmTy9tuFYu3AMFic=;
+ b=dEAGLnKouXyvBhboReYlHhJBzIFybiGTZ833vRMRI5xCdKYfx6EMz5DS6G0Kz2YGvvhJLVAA9mnPar+lV0fsnDkAc09EHWz6RQIvDvnfkP6KXgMYGOOByoPU27bsZJxqwVDa0TKEMyWvxGNVBm+X4a2gKZLXJANO2jiZpZaCDzU=
+Received: from MW4PR03CA0138.namprd03.prod.outlook.com (2603:10b6:303:8c::23)
+ by IA1PR12MB8190.namprd12.prod.outlook.com (2603:10b6:208:3f2::7) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.23; Sat, 30 Dec
- 2023 17:34:05 +0000
-Received: from CO1PEPF000044F0.namprd05.prod.outlook.com
- (2603:10b6:303:b9:cafe::54) by MW4PR03CA0237.outlook.office365.com
- (2603:10b6:303:b9::32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.21 via Frontend
- Transport; Sat, 30 Dec 2023 17:34:05 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.22; Sat, 30 Dec
+ 2023 17:34:26 +0000
+Received: from CO1PEPF000044F4.namprd05.prod.outlook.com
+ (2603:10b6:303:8c:cafe::91) by MW4PR03CA0138.outlook.office365.com
+ (2603:10b6:303:8c::23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.20 via Frontend
+ Transport; Sat, 30 Dec 2023 17:34:26 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -54,13 +54,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1PEPF000044F0.mail.protection.outlook.com (10.167.241.70) with Microsoft
+ CO1PEPF000044F4.mail.protection.outlook.com (10.167.241.74) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7159.9 via Frontend Transport; Sat, 30 Dec 2023 17:34:04 +0000
+ 15.20.7159.9 via Frontend Transport; Sat, 30 Dec 2023 17:34:25 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Sat, 30 Dec
- 2023 11:34:04 -0600
+ 2023 11:34:24 -0600
 From: Michael Roth <michael.roth@amd.com>
 To: <kvm@vger.kernel.org>
 CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
@@ -77,9 +77,9 @@ CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
 	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
 	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
 	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>
-Subject: [PATCH v11 34/35] crypto: ccp: Add the SNP_SET_CONFIG_{START,END} commands
-Date: Sat, 30 Dec 2023 11:23:50 -0600
-Message-ID: <20231230172351.574091-35-michael.roth@amd.com>
+Subject: [PATCH v11 35/35] KVM: SEV: Provide support for SNP_EXTENDED_GUEST_REQUEST NAE event
+Date: Sat, 30 Dec 2023 11:23:51 -0600
+Message-ID: <20231230172351.574091-36-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20231230172351.574091-1-michael.roth@amd.com>
 References: <20231230172351.574091-1-michael.roth@amd.com>
@@ -95,265 +95,299 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000044F0:EE_|MN0PR12MB6103:EE_
-X-MS-Office365-Filtering-Correlation-Id: b41db981-faa0-4363-fad7-08dc095d852d
+X-MS-TrafficTypeDiagnostic: CO1PEPF000044F4:EE_|IA1PR12MB8190:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9cd22ee4-a4bf-4328-c24b-08dc095d91aa
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	fy5BnvsnP9lk20RkToVZ17q5jBZxN0yvitSwr1RGxpPyg8eaNdMitCTNOeEWiMKnl5+Qo0/gvLGTed5porcv8IVrnIsBEvYIUpkleo6fNdTxVN79lupbM1kdpi08fdCo8lY5RPsSyKs7i4Oi0/Dc1JZ3C8wSxXA4Tx2Pkwo2PJ+/wabMQZsOwpkxKt0csmpoo32UFOpacqDP4pabW8u/HpCY01wXLSyshWXF0VKJKcJK4T00fFGxdNSvqm3MUVwF8taGsyUNK59vG2Ba38JjQ/+8hIT7YGJBNfpreAeVCPI0t3GR1zSGzIRZxBvpsFHmHF8RLI45NIMq+64W3DSMopF+CbtXgmv6PheLxrSNNlze0anrcnU3pKNHJf0s5TZ0SJTkS1senBlV2OHrDELM5lvJ0m3H13d/rYFONEkz6Or/pkYRcfIsiEIXY2mp5tFGb87VNvqKasPGxBShth0kn4ngqEEeolpcsV8NykYBO8UsTULyf2SfwXB56jDmn0YfHdrRvksbAu3smN1VZyjHF2ovNSJkFrEtb5sUsWhmLNf++7kPiFTPxDrTmdbhSRhQnLMZRROVkTRHm588w8X8NjK7cbnIFig9IE810yO0yGxRSN2y/Xzy8GEHRRTmFHrliKOmnG4alm6Y3CxkC0rAYeyEFnmWgclBGz+jeIy2sxKmcaAPdnRgZ9uUuBtfh3chW39Xq8NhkC+GqVZlxIpwLp2wB49gOyRTCvX8FTlwWGP63NAW84OTcoRxuQkhR1v1A5a0JuYSJVpYBdOHJgWtBw==
+	k5yfa+1E6gwKsl/ZyGfXGW4lv+vEtMDIfxiKSVSKnwOqtrks7iC+0f4Z0ejoDqpWUhDXmreILOmv9Ozxz7ASMLBhojrV8QcV3EOsUSTQJZ9lASkwgmChYvSpRt+a8EeFrdWgfLl7pigkiaMMMos+ONtt0eJO6UQCW4gmCD+5maQevVRBD2OJ9gANhopLPqZ2NprXib5/jXqB8HwkwVUue30ef2trvTVTM4Sw1Ne2bxehKgAsNFWFHdHNA9/ypfmIAqWQUIFYbVg2GyTWc7U8P2CSYzuozpUTJQ7gI2ksJNLTkPNnnhjCcUpmd7/MWzcwQn6cLpA8xlHnisirnycU1wEugXYDnELEKFO/IOg+vvhzqJE8cxLkNc2c4fZ/9bm0/C64kvtm7ur3NsGJ+KTIon3VfoczlwERo+xs5tvUbE9uio5c760qP608CR5UqmwAFq35kF3uSRFnceFvtuSIQD9Zg3Wl/yU9A99HMJbISidB0tndQMx5igTnOy9rGLeabWKACeNQL0eLj5o5SlZkjh4nfzTuxouLOQXQFkmnr5Aa8aCdxnTL6IVJJnN0Jn2mvAMEHWGPt7kIszNMYOS1p4olAb22smRIcEV7SXfEqZs8mikoYN0fcflxxjFQxYM/vYiFdOkybaXliDMjoFs2p8zg/qrYwaibbIU31VU6tDJZj+8CwfXl3uoxVPIU0tk100YNrLjc2X1mhHM8VoqDZIQjidrCoOzC5TP//+srAg+2M1RRv+CnBzpgoY3YO/8ltG/Z/YkMJb6w+r7QbeqaNA==
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(376002)(346002)(396003)(39860400002)(136003)(230922051799003)(1800799012)(451199024)(186009)(82310400011)(64100799003)(36840700001)(46966006)(40470700004)(7416002)(7406005)(2906002)(44832011)(5660300002)(41300700001)(356005)(81166007)(478600001)(86362001)(82740400003)(6666004)(36756003)(83380400001)(26005)(1076003)(2616005)(336012)(426003)(16526019)(36860700001)(47076005)(8936002)(8676002)(316002)(4326008)(6916009)(54906003)(70586007)(70206006)(40480700001)(40460700003)(36900700001);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(136003)(39860400002)(376002)(346002)(396003)(230922051799003)(64100799003)(82310400011)(186009)(1800799012)(451199024)(40470700004)(36840700001)(46966006)(40460700003)(40480700001)(16526019)(426003)(336012)(1076003)(26005)(83380400001)(86362001)(36756003)(81166007)(356005)(82740400003)(47076005)(4326008)(44832011)(5660300002)(7416002)(7406005)(2616005)(36860700001)(6666004)(54906003)(8936002)(8676002)(70206006)(70586007)(316002)(6916009)(2906002)(41300700001)(478600001)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Dec 2023 17:34:04.9353
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Dec 2023 17:34:25.8700
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b41db981-faa0-4363-fad7-08dc095d852d
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9cd22ee4-a4bf-4328-c24b-08dc095d91aa
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000044F0.namprd05.prod.outlook.com
+	CO1PEPF000044F4.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6103
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8190
 
-These commands can be used to create a transaction such that commands
-that update the reported TCB, such as SNP_SET_CONFIG/SNP_COMMIT, and
-updates to userspace-supplied certificates, can be handled atomically
-relative to any extended guest requests issued by any SNP guests while
-the updates are taking place.
+Version 2 of GHCB specification added support for the SNP Extended Guest
+Request Message NAE event. This event serves a nearly identical purpose
+to the previously-added SNP_GUEST_REQUEST event, but allows for
+additional certificate data to be supplied via an additional
+guest-supplied buffer to be used mainly for verifying the signature of
+an attestation report as returned by firmware.
 
-Without this interface, there is a risk that a guest will be given
-certificate information that does not correspond to the VCEK/VLEK used
-to sign a particular attestation report unless all the running guests
-are paused in advance, which would cause disruption to all guests in the
-system even if no attestation requests are being made. Even then, care
-is needed to ensure that KVM does not pass along certificate information
-that was fetched from userspace in advance of the guest being paused.
+This certificate data is supplied by userspace, so unlike with
+SNP_GUEST_REQUEST events, SNP_EXTENDED_GUEST_REQUEST events are first
+forwarded to userspace via a KVM_EXIT_VMGEXIT exit type, and then the
+firmware request is made only afterward.
 
-This interface also provides some versatility with how similar firmware
-maintenance activity can be handled in the future without passing
-unnecessary management complexity on to userspace.
+Implement handling for these events.
+
+Since there is a potential for race conditions where the
+userspace-supplied certificate data may be out-of-sync relative to the
+reported TCB that firmware will use when signing attestation reports,
+make use of the transaction/synchronization mechanisms added by the
+SNP_SET_CONFIG_{START,END} SEV device ioctls such that the guest will be
+told to retry the request when an update to reported TCB or
+userspace-supplied certificates may have occurred or is in progress
+while an extended guest request is being processed.
 
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- Documentation/virt/coco/sev-guest.rst | 33 ++++++++++++++++++--
- arch/x86/include/asm/sev.h            |  4 +++
- arch/x86/virt/svm/sev.c               | 31 +++++++++++++++++++
- drivers/crypto/ccp/sev-dev.c          | 44 +++++++++++++++++++++++++++
- include/uapi/linux/psp-sev.h          | 12 ++++++++
- 5 files changed, 122 insertions(+), 2 deletions(-)
+ Documentation/virt/kvm/api.rst | 26 ++++++++++++
+ arch/x86/include/asm/sev.h     |  4 ++
+ arch/x86/kvm/svm/sev.c         | 75 ++++++++++++++++++++++++++++++++++
+ arch/x86/kvm/svm/svm.h         |  3 ++
+ arch/x86/virt/svm/sev.c        | 20 +++++++++
+ include/uapi/linux/kvm.h       |  6 +++
+ 6 files changed, 134 insertions(+)
 
-diff --git a/Documentation/virt/coco/sev-guest.rst b/Documentation/virt/coco/sev-guest.rst
-index 4f696aacc866..0426ebad7671 100644
---- a/Documentation/virt/coco/sev-guest.rst
-+++ b/Documentation/virt/coco/sev-guest.rst
-@@ -127,8 +127,6 @@ the SEV-SNP specification for further details.
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 2a526b4f8e06..960e2153d468 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -7037,6 +7037,7 @@ values in kvm_run even if the corresponding bit in kvm_dirty_regs is not set.
+ 		struct kvm_user_vmgexit {
+ 		#define KVM_USER_VMGEXIT_PSC_MSR	1
+ 		#define KVM_USER_VMGEXIT_PSC		2
++		#define KVM_USER_VMGEXIT_EXT_GUEST_REQ	3
+ 			__u32 type; /* KVM_USER_VMGEXIT_* type */
+ 			union {
+ 				struct {
+@@ -7050,6 +7051,11 @@ values in kvm_run even if the corresponding bit in kvm_dirty_regs is not set.
+ 					__u64 shared_gpa;
+ 					__u64 ret;
+ 				} psc;
++				struct {
++					__u64 data_gpa;
++					__u64 data_npages;
++					__u32 ret;
++				} ext_guest_req;
+ 			};
+ 		};
  
- The SNP_GET_EXT_REPORT ioctl is similar to the SNP_GET_REPORT. The difference is
- related to the additional certificate data that is returned with the report.
--The certificate data returned is being provided by the hypervisor through the
--SNP_SET_EXT_CONFIG.
+@@ -7079,6 +7085,26 @@ private/shared state. Userspace will return a value in 'ret' that is in
+ agreement with the GHCB-defined return values that the guest will expect
+ in the SW_EXITINFO2 field of the GHCB in response to these requests.
  
- The ioctl uses the SNP_GUEST_REQUEST (MSG_REPORT_REQ) command provided by the SEV-SNP
- firmware to get the attestation report.
-@@ -175,6 +173,37 @@ SNP_CONFIG command defined in the SEV-SNP spec. The current values of the
- firmware parameters affected by this command can be queried via
- SNP_PLATFORM_STATUS.
- 
-+2.7 SNP_SET_CONFIG_START / SNP_SET_CONFIG_END
-+---------------------------------------------
-+:Technology: sev-snp
-+:Type: hypervisor ioctl cmd
-+:Parameters (out): struct sev_user_data_snp_config_transaction
-+:Returns (out): 0 on success, -negative on error
++For the KVM_USER_VMGEXIT_EXT_GUEST_REQ type, the ext_guest_req union type
++is used. The kernel will supply in 'data_gpa' the value the guest supplies
++via the RAX field of the GHCB when issued extended guest requests.
++'data_npages' will similarly contain the value the guest supplies in RBX
++denoting the number of shared pages available to write the certificate
++data into.
 +
-+When requesting attestation reports, SNP guests have the option of issuing
-+an extended guest request which allows host userspace to supply additional
-+certificate data that can be used to validate the signature used to sign
-+the attestation report. This signature is generated using a key that is
-+derived from the reported TCB that can be set via the SNP_SET_CONFIG and
-+SNP_COMMIT ioctls, so the accompanying certificate data needs to be kept in
-+sync with the changes made to the reported TCB via these ioctls.
++  - If the supplied number of pages is sufficient, userspace should write
++    the certificate data blob (in the format defined by the GHCB spec) in
++    the address indicated by 'data_gpa' and set 'ret' to 0.
 +
-+To allow for this, SNP_SET_CONFIG_START can be issued prior to performing
-+any updates to the reported TCB or certificate data that will be fetched
-+from userspace. Any attestation report requests via extended guest requests
-+that are in-progress, or received after SNP_SET_CONFIG_START is issued, will
-+result in the guest receiving a GHCB-defined error message instructing it to
-+retry the request. Once the updates are completed on the host,
-+SNP_SET_CONFIG_END must be issued to resume normal servicing of extended
-+guest requests.
++  - If the number of pages supplied is not sufficient, userspace must write
++    the required number of pages in 'data_npages' and then set 'ret' to 1.
 +
-+In general, hosts should avoid having more than 1 outstanding
-+SNP_SET_CONFIG_{START,END} transaction in flight at any point in time, but
-+each ioctl will return a transaction ID in the response so the caller can
-+monitor whether the start/end ID both match. If they don't, the caller
-+should assume the transaction has been invalidated and retry the full update
-+sequence.
++  - If userspace is temporarily unable to handle the request, 'ret' should
++    be set to 2 to inform the guest to retry later.
 +
- 3. SEV-SNP CPUID Enforcement
- ============================
++  - If some other error occurred, userspace should set 'ret' to a non-zero
++    value that is distinct from the specific return values mentioned above.
++
+ 6. Capabilities that can be enabled on vCPUs
+ ============================================
  
 diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
-index e84dd1d2d8ab..925578ad34e6 100644
+index 925578ad34e6..25f533827d62 100644
 --- a/arch/x86/include/asm/sev.h
 +++ b/arch/x86/include/asm/sev.h
-@@ -268,6 +268,8 @@ int psmash(u64 pfn);
- int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int asid, bool immutable);
- int rmp_make_shared(u64 pfn, enum pg_level level);
+@@ -270,6 +270,8 @@ int rmp_make_shared(u64 pfn, enum pg_level level);
  void snp_leak_pages(u64 pfn, unsigned int npages);
-+u64 snp_config_transaction_start(void);
-+u64 snp_config_transaction_end(void);
+ u64 snp_config_transaction_start(void);
+ u64 snp_config_transaction_end(void);
++u64 snp_config_transaction_get_id(void);
++bool snp_config_transaction_is_stale(u64 id);
  #else
  static inline bool snp_probe_rmptable_info(void) { return false; }
  static inline int snp_lookup_rmpentry(u64 pfn, bool *assigned, int *level) { return -ENODEV; }
-@@ -280,6 +282,8 @@ static inline int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int as
- }
- static inline int rmp_make_shared(u64 pfn, enum pg_level level) { return -ENODEV; }
+@@ -284,6 +286,8 @@ static inline int rmp_make_shared(u64 pfn, enum pg_level level) { return -ENODEV
  static inline void snp_leak_pages(u64 pfn, unsigned int npages) {}
-+static inline u64 snp_config_transaction_start(void) { return 0; }
-+static inline u64 snp_config_transaction_end(void) { return 0; }
+ static inline u64 snp_config_transaction_start(void) { return 0; }
+ static inline u64 snp_config_transaction_end(void) { return 0; }
++static inline u64 snp_config_transaction_get_id(void) { return 0; }
++static inline bool snp_config_transaction_is_stale(u64 id) { return false; }
  #endif
  
  #endif
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 05051e36926d..dda195999c42 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -3111,6 +3111,7 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
+ 	case SVM_VMGEXIT_PSC:
+ 	case SVM_VMGEXIT_TERM_REQUEST:
+ 	case SVM_VMGEXIT_GUEST_REQUEST:
++	case SVM_VMGEXIT_EXT_GUEST_REQUEST:
+ 		break;
+ 	default:
+ 		reason = GHCB_ERR_INVALID_EVENT;
+@@ -3618,6 +3619,77 @@ static void snp_handle_guest_req(struct vcpu_svm *svm, gpa_t req_gpa, gpa_t resp
+ 	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, SNP_GUEST_ERR(vmm_ret, fw_err));
+ }
+ 
++static int snp_complete_ext_guest_req(struct kvm_vcpu *vcpu)
++{
++	struct vcpu_svm *svm = to_svm(vcpu);
++	struct vmcb_control_area *control;
++	struct kvm *kvm = vcpu->kvm;
++	sev_ret_code fw_err = 0;
++	int vmm_ret;
++
++	vmm_ret = vcpu->run->vmgexit.ext_guest_req.ret;
++	if (vmm_ret) {
++		if (vmm_ret == SNP_GUEST_VMM_ERR_INVALID_LEN)
++			vcpu->arch.regs[VCPU_REGS_RBX] =
++				vcpu->run->vmgexit.ext_guest_req.data_npages;
++		goto abort_request;
++	}
++
++	control = &svm->vmcb->control;
++
++	if (!__snp_handle_guest_req(kvm, control->exit_info_1, control->exit_info_2,
++				    &fw_err))
++		vmm_ret = SNP_GUEST_VMM_ERR_GENERIC;
++
++	/*
++	 * Give errors related to stale transactions precedence to provide more
++	 * potential options for servicing firmware while guests are running.
++	 */
++	if (snp_config_transaction_is_stale(svm->snp_transaction_id))
++		vmm_ret = SNP_GUEST_VMM_ERR_BUSY;
++
++abort_request:
++	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, SNP_GUEST_ERR(vmm_ret, fw_err));
++
++	return 1; /* resume guest */
++}
++
++static int snp_begin_ext_guest_req(struct kvm_vcpu *vcpu)
++{
++	int vmm_ret = SNP_GUEST_VMM_ERR_GENERIC;
++	struct vcpu_svm *svm = to_svm(vcpu);
++	unsigned long data_npages;
++	sev_ret_code fw_err;
++	gpa_t data_gpa;
++
++	if (!sev_snp_guest(vcpu->kvm))
++		goto abort_request;
++
++	data_gpa = vcpu->arch.regs[VCPU_REGS_RAX];
++	data_npages = vcpu->arch.regs[VCPU_REGS_RBX];
++
++	if (!IS_ALIGNED(data_gpa, PAGE_SIZE))
++		goto abort_request;
++
++	svm->snp_transaction_id = snp_config_transaction_get_id();
++	if (snp_config_transaction_is_stale(svm->snp_transaction_id)) {
++		vmm_ret = SNP_GUEST_VMM_ERR_BUSY;
++		goto abort_request;
++	}
++
++	vcpu->run->exit_reason = KVM_EXIT_VMGEXIT;
++	vcpu->run->vmgexit.type = KVM_USER_VMGEXIT_EXT_GUEST_REQ;
++	vcpu->run->vmgexit.ext_guest_req.data_gpa = data_gpa;
++	vcpu->run->vmgexit.ext_guest_req.data_npages = data_npages;
++	vcpu->arch.complete_userspace_io = snp_complete_ext_guest_req;
++
++	return 0; /* forward request to userspace */
++
++abort_request:
++	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, SNP_GUEST_ERR(vmm_ret, fw_err));
++	return 1; /* resume guest */
++}
++
+ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+ {
+ 	struct vmcb_control_area *control = &svm->vmcb->control;
+@@ -3882,6 +3954,9 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
+ 		snp_handle_guest_req(svm, control->exit_info_1, control->exit_info_2);
+ 		ret = 1;
+ 		break;
++	case SVM_VMGEXIT_EXT_GUEST_REQUEST:
++		ret = snp_begin_ext_guest_req(vcpu);
++		break;
+ 	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
+ 		vcpu_unimpl(vcpu,
+ 			    "vmgexit: unsupported event - exit_info_1=%#llx, exit_info_2=%#llx\n",
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index a56109e100ac..a2ac6dc3a79a 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -307,6 +307,9 @@ struct vcpu_svm {
+ 
+ 	/* Guest GIF value, used when vGIF is not enabled */
+ 	bool guest_gif;
++
++	/* Transaction ID associated with SNP config updates */
++	u64 snp_transaction_id;
+ };
+ 
+ struct svm_cpu_data {
 diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
-index 0f2e1ce241b5..fc9e1b7fc187 100644
+index fc9e1b7fc187..fee273a84030 100644
 --- a/arch/x86/virt/svm/sev.c
 +++ b/arch/x86/virt/svm/sev.c
-@@ -71,6 +71,11 @@ static DEFINE_SPINLOCK(snp_leaked_pages_list_lock);
- 
- static unsigned long snp_nr_leaked_pages;
- 
-+/* For synchronizing TCB updates with extended guest requests */
-+static DEFINE_MUTEX(snp_transaction_lock);
-+static u64 snp_transaction_id;
-+static bool snp_transaction_pending;
-+
- #undef pr_fmt
- #define pr_fmt(fmt)	"SEV-SNP: " fmt
- 
-@@ -511,3 +516,29 @@ void snp_leak_pages(u64 pfn, unsigned int npages)
- 	spin_unlock(&snp_leaked_pages_list_lock);
+@@ -542,3 +542,23 @@ u64 snp_config_transaction_end(void)
+ 	return id;
  }
- EXPORT_SYMBOL_GPL(snp_leak_pages);
+ EXPORT_SYMBOL_GPL(snp_config_transaction_end);
 +
-+u64 snp_config_transaction_start(void)
++u64 snp_config_transaction_get_id(void)
 +{
-+	u64 id;
++	return snp_transaction_id;
++}
++EXPORT_SYMBOL_GPL(snp_config_transaction_get_id);
++
++bool snp_config_transaction_is_stale(u64 id)
++{
++	bool stale = false;
 +
 +	mutex_lock(&snp_transaction_lock);
-+	snp_transaction_pending = true;
-+	id = ++snp_transaction_id;
++	if (snp_transaction_pending ||
++	    id != snp_transaction_id)
++		stale = true;
 +	mutex_unlock(&snp_transaction_lock);
 +
-+	return id;
++	return stale;
 +}
-+EXPORT_SYMBOL_GPL(snp_config_transaction_start);
-+
-+u64 snp_config_transaction_end(void)
-+{
-+	u64 id;
-+
-+	mutex_lock(&snp_transaction_lock);
-+	snp_transaction_pending = false;
-+	id = snp_transaction_id;
-+	mutex_unlock(&snp_transaction_lock);
-+
-+	return id;
-+}
-+EXPORT_SYMBOL_GPL(snp_config_transaction_end);
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index c5b26b3fe7ff..d81f86d2697a 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -2035,6 +2035,44 @@ static int sev_ioctl_do_snp_set_config(struct sev_issue_cmd *argp, bool writable
- 	return __sev_do_cmd_locked(SEV_CMD_SNP_CONFIG, &config, &argp->error);
- }
- 
-+static int sev_ioctl_do_snp_set_config_start(struct sev_issue_cmd *argp, bool writable)
-+{
-+	struct sev_user_data_snp_config_transaction transaction = {0};
-+	struct sev_device *sev = psp_master->sev_data;
-+
-+	if (!sev->snp_initialized || !argp->data)
-+		return -EINVAL;
-+
-+	if (!writable)
-+		return -EPERM;
-+
-+	transaction.id = snp_config_transaction_start();
-+
-+	if (copy_to_user((void __user *)argp->data, &transaction, sizeof(transaction)))
-+		return -EFAULT;
-+
-+	return 0;
-+}
-+
-+static int sev_ioctl_do_snp_set_config_end(struct sev_issue_cmd *argp, bool writable)
-+{
-+	struct sev_user_data_snp_config_transaction transaction = {0};
-+	struct sev_device *sev = psp_master->sev_data;
-+
-+	if (!sev->snp_initialized || !argp->data)
-+		return -EINVAL;
-+
-+	if (!writable)
-+		return -EPERM;
-+
-+	transaction.id = snp_config_transaction_end();
-+
-+	if (copy_to_user((void __user *)argp->data, &transaction, sizeof(transaction)))
-+		return -EFAULT;
-+
-+	return 0;
-+}
-+
- static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
- {
- 	void __user *argp = (void __user *)arg;
-@@ -2095,6 +2133,12 @@ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
- 	case SNP_SET_CONFIG:
- 		ret = sev_ioctl_do_snp_set_config(&input, writable);
- 		break;
-+	case SNP_SET_CONFIG_START:
-+		ret = sev_ioctl_do_snp_set_config_start(&input, writable);
-+		break;
-+	case SNP_SET_CONFIG_END:
-+		ret = sev_ioctl_do_snp_set_config_end(&input, writable);
-+		break;
- 	default:
- 		ret = -EINVAL;
- 		goto out;
-diff --git a/include/uapi/linux/psp-sev.h b/include/uapi/linux/psp-sev.h
-index f28d4fb5bc21..9deacb894b1e 100644
---- a/include/uapi/linux/psp-sev.h
-+++ b/include/uapi/linux/psp-sev.h
-@@ -31,6 +31,8 @@ enum {
- 	SNP_PLATFORM_STATUS,
- 	SNP_COMMIT,
- 	SNP_SET_CONFIG,
-+	SNP_SET_CONFIG_START,
-+	SNP_SET_CONFIG_END,
- 
- 	SEV_MAX,
++EXPORT_SYMBOL_GPL(snp_config_transaction_is_stale);
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index e0599144387b..fe8994b95de9 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -170,6 +170,7 @@ struct kvm_xen_exit {
+ struct kvm_user_vmgexit {
+ #define KVM_USER_VMGEXIT_PSC_MSR	1
+ #define KVM_USER_VMGEXIT_PSC		2
++#define KVM_USER_VMGEXIT_EXT_GUEST_REQ	3
+ 	__u32 type; /* KVM_USER_VMGEXIT_* type */
+ 	union {
+ 		struct {
+@@ -183,6 +184,11 @@ struct kvm_user_vmgexit {
+ 			__u64 shared_gpa;
+ 			__u64 ret;
+ 		} psc;
++		struct {
++			__u64 data_gpa;
++			__u64 data_npages;
++			__u32 ret;
++		} ext_guest_req;
+ 	};
  };
-@@ -214,6 +216,16 @@ struct sev_user_data_snp_config {
- 	__u8 rsvd1[52];
- } __packed;
  
-+/**
-+ * struct sev_user_data_snp_config_transaction - metadata for config transactions
-+ *
-+ * @id: the ID of the transaction started/ended by a call to SNP_SET_CONFIG_START
-+ *	or SNP_SET_CONFIG_END, respectively.
-+ */
-+struct sev_user_data_snp_config_transaction {
-+	__u64 id;		/* Out */
-+} __packed;
-+
- /**
-  * struct sev_issue_cmd - SEV ioctl parameters
-  *
 -- 
 2.25.1
 
