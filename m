@@ -1,120 +1,85 @@
-Return-Path: <kvm+bounces-5411-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5412-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEDD28212EA
-	for <lists+kvm@lfdr.de>; Mon,  1 Jan 2024 04:40:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87D08821580
+	for <lists+kvm@lfdr.de>; Mon,  1 Jan 2024 23:13:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 53483B21BF1
-	for <lists+kvm@lfdr.de>; Mon,  1 Jan 2024 03:40:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B87B5281BC1
+	for <lists+kvm@lfdr.de>; Mon,  1 Jan 2024 22:13:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B1AD1370;
-	Mon,  1 Jan 2024 03:39:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0FACFBF3;
+	Mon,  1 Jan 2024 22:13:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kTZTylDt"
+	dkim=pass (1024-bit key) header.d=epfl.ch header.i=@epfl.ch header.b="O53yJF2O"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp4.epfl.ch (smtp4.epfl.ch [128.178.224.219])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A164A52;
-	Mon,  1 Jan 2024 03:39:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1704080394; x=1735616394;
-  h=message-id:date:mime-version:cc:subject:to:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=TGBXTbeX8tde9ouDg3XSWCKQoZCnrld95jzC7rtlJzQ=;
-  b=kTZTylDtci4r9lxihY/c8bL5EONzJB7/jQJjnW5XZ0ShUTVpJjRp3fvS
-   7+KESNa29noghU2Br+MaPjnFt45fO2lFrf3wt1yfXU1rO16xSGUeIsSGi
-   Md1N5v1Dy+FKoRsd2U3wCG6iLRpXLMHqXFKlooSxZx0E801eqnoHB7X+w
-   78x+d5/lLIoGIChkS4aOI8Lg1oTubKQt2K6g8D4PzNVDqR7VHAZuAUqrN
-   lCC3dXaRjJ9YmpTrDOMi05rF+nKBCWLkLo+AqtTi9upJhiI9+8vCi6Jbm
-   w6XaMYlFkX5etbvdVUNL0l2OPa5wtYWMj1/LX7w8SxZSvb5orZA98f9nw
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10940"; a="15412198"
-X-IronPort-AV: E=Sophos;i="6.04,321,1695711600"; 
-   d="scan'208";a="15412198"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Dec 2023 19:39:54 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10940"; a="902785434"
-X-IronPort-AV: E=Sophos;i="6.04,321,1695711600"; 
-   d="scan'208";a="902785434"
-Received: from allen-box.sh.intel.com (HELO [10.239.159.127]) ([10.239.159.127])
-  by orsmga004.jf.intel.com with ESMTP; 31 Dec 2023 19:39:47 -0800
-Message-ID: <50098edc-2bbb-4c8f-9360-6990f0f5d88a@linux.intel.com>
-Date: Mon, 1 Jan 2024 11:34:45 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D61DFBE2
+	for <kvm@vger.kernel.org>; Mon,  1 Jan 2024 22:12:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=epfl.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=epfl.ch
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=epfl.ch;
+      s=epfl; t=1704146774;
+      h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Transfer-Encoding:Content-Type;
+      bh=PUOJe7vLfSenLa4KQWHHTKDyML/jdyg0YhQXNkcAzDg=;
+      b=O53yJF2OvJICGcze/BAo7ImEoNMMbMNml0yNVcABamxfpfPFBL8RetnsFb4Drq8qy
+        GRT0B5NQYr5phgVaN2at+oF4AM7RvN7T2LCYJfKigIrkm93Z7SBK9WJ/Lp5LpwT62
+        RO/6IkNW84A6nt8YeY+I2QrgLpDew9VIB5gAVbhLQ=
+Received: (qmail 48537 invoked by uid 107); 1 Jan 2024 22:06:14 -0000
+Received: from ax-snat-224-178.epfl.ch (HELO ewa07.intranet.epfl.ch) (192.168.224.178) (TLS, ECDHE-RSA-AES256-GCM-SHA384 (P-256 curve) cipher)
+  by mail.epfl.ch (AngelmatoPhylax SMTP proxy) with ESMTPS; Mon, 01 Jan 2024 23:06:14 +0100
+X-EPFL-Auth: jqf4JdtrReEjLn5WJoQddHkQAVaqqFRVKPHkwKEwGcaifgRjDx8=
+Received: from rs3labsrv2.iccluster.epfl.ch (10.90.46.62) by
+ ewa07.intranet.epfl.ch (128.178.224.178) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Mon, 1 Jan 2024 23:06:13 +0100
+From: Tao Lyu <tao.lyu@epfl.ch>
+To: <akalita@cs.stonybrook.edu>
+CC: <kvm@vger.kernel.org>, <seanjc@google.com>
+Subject: obtain the timestamp counter of physical/host machine inside the VMs.
+Date: Mon, 1 Jan 2024 23:06:01 +0100
+Message-ID: <20240101220601.2828996-1-tao.lyu@epfl.ch>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <CAJGDS+Ez+NpVtaO5_NTdiwrnTTGFbevz+aDUyLMZk6ufie701Q@mail.gmail.com>
+References: <CAJGDS+Ez+NpVtaO5_NTdiwrnTTGFbevz+aDUyLMZk6ufie701Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: baolu.lu@linux.intel.com, "cohuck@redhat.com" <cohuck@redhat.com>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
- "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
- "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
- "peterx@redhat.com" <peterx@redhat.com>,
- "jasowang@redhat.com" <jasowang@redhat.com>,
- "shameerali.kolothum.thodi@huawei.com"
- <shameerali.kolothum.thodi@huawei.com>, "lulu@redhat.com" <lulu@redhat.com>,
- "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
- "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
- "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
- "joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
- "Zeng, Xin" <xin.zeng@intel.com>, "Zhao, Yan Y" <yan.y.zhao@intel.com>,
- "j.granados@samsung.com" <j.granados@samsung.com>
-Subject: Re: [PATCH v8 07/10] iommu/vt-d: Allow qi_submit_sync() to return the
- QI faults
-To: "Tian, Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
- "joro@8bytes.org" <joro@8bytes.org>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "jgg@nvidia.com" <jgg@nvidia.com>,
- "robin.murphy@arm.com" <robin.murphy@arm.com>
-References: <20231227161354.67701-1-yi.l.liu@intel.com>
- <20231227161354.67701-8-yi.l.liu@intel.com>
- <BN9PR11MB5276429906ED56258BB433068C9EA@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Language: en-US
-From: Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <BN9PR11MB5276429906ED56258BB433068C9EA@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: ewa07.intranet.epfl.ch (128.178.224.178) To
+ ewa07.intranet.epfl.ch (128.178.224.178)
 
-On 12/28/23 2:17 PM, Tian, Kevin wrote:
->>   	raw_spin_lock_irqsave(&qi->q_lock, flags);
->>   	/*
->> @@ -1430,7 +1439,7 @@ int qi_submit_sync(struct intel_iommu *iommu,
->> struct qi_desc *desc,
->>   		 * a deadlock where the interrupt context can wait
->> indefinitely
->>   		 * for free slots in the queue.
->>   		 */
->> -		rc = qi_check_fault(iommu, index, wait_index);
->> +		rc = qi_check_fault(iommu, index, wait_index, fault);
->>   		if (rc)
->>   			break;
-> and as replied in another thread let's change qi_check_fault to return
-> -ETIMEDOUT to break the restart loop when fault pointer is valid.
+Hello Arnabjyoti, Sean, and everyone,
 
-It's fine to break the retry loop when fault happens and the fault
-pointer is valid. Please don't forget to add an explanation comment
-around the code. Something like:
+I'm having a similiar but slightly differnt issue about the rdtsc in KVM.
 
-/*
-  * The caller is able to handle the fault by itself. The IOMMU driver
-  * should not attempt to retry this request.
-  */
+I want to obtain the timestamp counter of physical/host machine inside the VMs.
 
-Best regards,
-baolu
+Acccording to the previous threads, I know I need to disable the offsetting, VM exit, and scaling.
+I specify the correspoding parameters in the qemu arguments.
+The booting command is listed below:
+
+qemu-system-x86_64 -m 10240 -smp 4 -chardev socket,id=SOCKSYZ,server=on,nowait,host=localhost,port=3258 -mon chardev=SOCKSYZ,mode=control -display none -serial stdio -device virtio-rng-pci -enable-kvm -cpu host,migratable=off,tsc=on,rdtscp=on,vmx-tsc-offset=off,vmx-rdtsc-exit=off,tsc-scale=off,tsc-adjust=off,vmx-rdtscp-exit=off -netdev bridge,id=hn40 -device virtio-net,netdev=hn40,mac=e6:c8:ff:09:76:38 -hda XXX -kernel XXX -append "root=/dev/sda console=ttyS0"
+
+
+But the rdtsc still returns the adjusted tsc.
+The vmxcap script shows the TSC settings as below:
+  
+  Use TSC offsetting                       no
+  RDTSC exiting                            no
+  Enable RDTSCP                            no
+  TSC scaling                              yes
+
+
+I would really appreciate it if anyone can tell me whether and how I can get the tsc of physical machine insdie the VM.
+
+Thanks a lot.
 
