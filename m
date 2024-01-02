@@ -1,114 +1,91 @@
-Return-Path: <kvm+bounces-5456-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5457-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 100FE8220F3
-	for <lists+kvm@lfdr.de>; Tue,  2 Jan 2024 19:24:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF4B78220F8
+	for <lists+kvm@lfdr.de>; Tue,  2 Jan 2024 19:27:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A253C1F22B79
-	for <lists+kvm@lfdr.de>; Tue,  2 Jan 2024 18:24:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 214921C21643
+	for <lists+kvm@lfdr.de>; Tue,  2 Jan 2024 18:27:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C58DC15ACC;
-	Tue,  2 Jan 2024 18:24:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 229E0156FE;
+	Tue,  2 Jan 2024 18:27:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ApVH9yAQ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VeHJCx+X"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B035815AC0
-	for <kvm@vger.kernel.org>; Tue,  2 Jan 2024 18:24:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704219879;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YGtRjZmMmbNMYMYyioQRov4waYs86YugI8J9gTbyhEE=;
-	b=ApVH9yAQG/TCII7IHBYtOsOPztGjtAl93s3Sfxvt4/47rsY/oQF1QvTYfCDvbSliVu1jMs
-	CgRlZlfrAzrKZp+fgvteAduk21kDCs9HRw7sugXWnSh1OkLPokdiv95syNuj9xojMKr5GU
-	Uf7XvMj5oVpGqMo1dTqJExHUV++1puQ=
-Received: from mail-ua1-f71.google.com (mail-ua1-f71.google.com
- [209.85.222.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-46-HxoiXWAjP5CHJBEavdjTWQ-1; Tue, 02 Jan 2024 13:24:38 -0500
-X-MC-Unique: HxoiXWAjP5CHJBEavdjTWQ-1
-Received: by mail-ua1-f71.google.com with SMTP id a1e0cc1a2514c-7cc3e45ef28so1851900241.2
-        for <kvm@vger.kernel.org>; Tue, 02 Jan 2024 10:24:38 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C731156D6
+	for <kvm@vger.kernel.org>; Tue,  2 Jan 2024 18:27:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1d42ed4cdc7so10255ad.0
+        for <kvm@vger.kernel.org>; Tue, 02 Jan 2024 10:27:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1704220056; x=1704824856; darn=vger.kernel.org;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=b1iJ/PC7NOmh51+I0K/ABUi5e6j/sV3yKrMrNMnzSm4=;
+        b=VeHJCx+XC6NsVNtSDdq4nzwvE5QLApzOSD3LC6QAiks6l6hgrneosAL3sAgaVMOOES
+         8xHWKo0JZEBjfYgcBsaMy18H6oySwAleAgY7IswYQH3DVw8G/rgTtuBvHFgIXevnakL8
+         Qd4GsIICEk5UyprNbn3nuuHBuQXPl61VEtIa9I251HIvtMjat5Qwr3gR01Rthlg5aDvh
+         MP5KZel/e8SAM18eXoS8BJRvF1FGpaxrOQTBQfJCpget5NIcUAVfH7w8J8uDBQQ+YFlL
+         ZrpYAe6VmpVu2quIXJu4qJCrc55WTmabsdBasWnxEXpkc1U+mX6eexIkTmv+biC7oYl7
+         K4Kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704219878; x=1704824678;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YGtRjZmMmbNMYMYyioQRov4waYs86YugI8J9gTbyhEE=;
-        b=l2zfwSprgiERKZ51LG3kcUXD6pNhjpTy0/Jo9xJr/A5pnSZlmL4rOHlDzqgUiizK/I
-         GWyuLB1el13OeAXcodR2juceHPFvuHWnC6Eu34z0DJyplWb4NEjWe5XHpJ+4i1V5rqZS
-         fOCHUXZ5cPPMkLyiudKVrRtVEoOpJkYghRAa+dC8CpKxDL5tDVwuSC5OFJoEoThSIXvk
-         3Bop9Bb+GMZIoFBjk5GWldr/W9QrJPkF4/gFaWzX1aflVvXBFLjk0jVW5t/CFdCst3c9
-         OILsdW13s6LZZYAxD/RPWP9qeB6sZJ/TrRcbYNCiKPT9/JvMEY6dv9KeudD5exmD45/g
-         aBrw==
-X-Gm-Message-State: AOJu0Yynx+B2+F4ReYgoeuPqgYyNLzbGZGgITiwqg/abj5NMPhV60Oqx
-	DiT0yqHOb8jFeiCWwqEmrpQX4+ddlopL3fcF991hOlXyYqkvbu7B4+dtKifiaO2yRkCL2VVKj1u
-	MHfJ1L+E5hkpMChvvFYPDZR7rIU+OxcShiEVm
-X-Received: by 2002:a05:6102:10cd:b0:466:fc84:fc42 with SMTP id t13-20020a05610210cd00b00466fc84fc42mr6218398vsr.61.1704219877813;
-        Tue, 02 Jan 2024 10:24:37 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHcEme0AwBsq2SkjvHwA5uTApX5CHKYtaxllcpJVnvL9RqA3a3vL5jSdm4AW4mhRpHLFagdJZOmrzHqOkhuoVA=
-X-Received: by 2002:a05:6102:10cd:b0:466:fc84:fc42 with SMTP id
- t13-20020a05610210cd00b00466fc84fc42mr6218396vsr.61.1704219877601; Tue, 02
- Jan 2024 10:24:37 -0800 (PST)
+        d=1e100.net; s=20230601; t=1704220056; x=1704824856;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=b1iJ/PC7NOmh51+I0K/ABUi5e6j/sV3yKrMrNMnzSm4=;
+        b=pv+gV3fAuSyAu2d5/ptWjMAiv1Po9Q10FWjJddlemwyo7GoqO36TyEI/PNowvrSApH
+         TtnyOhRQaFbbdJ9kHaLranEo5VggC4Rjr67KbP5gS1UCsQVlwZrqhK2FpvOnPdGy2Uhx
+         gBamS7FvRvm2AHwySbvqKjDlHz+c9ksHSD4/Gnc+xi1XppejFgcwSGFGTgQkWqDp2fUq
+         ddYayVf4dfCfEQ2FDwwLRYFbWBiUxIzXSvZIqgcdPuNDnrazJyu7Qdln38Kb++GhgTtK
+         mBKwRRvGThboxIleVQRh+JVUyQocH17YmaWffYEho4oU3f11V+EU1/GgPF8wF0co6Ta5
+         jfNg==
+X-Gm-Message-State: AOJu0YwaFIQMFLF/HraJz5t9BudsWF69rLYLzAn1RkO+pViId9Yhrfqt
+	CfBBQAmFv4mkXxBesMjbVG86cwK+XAIr
+X-Google-Smtp-Source: AGHT+IHOMqzyTbLqQB4plEq+ftykwfP/uDMXWaZhiDtsDLQcXDc5u4n5HeAdTpYbKpwo+95Zpg48bg==
+X-Received: by 2002:a17:903:1106:b0:1d3:6f65:e332 with SMTP id n6-20020a170903110600b001d36f65e332mr1173410plh.27.1704220056231;
+        Tue, 02 Jan 2024 10:27:36 -0800 (PST)
+Received: from [2620:0:1008:15:c73b:7876:89ec:9102] ([2620:0:1008:15:c73b:7876:89ec:9102])
+        by smtp.gmail.com with ESMTPSA id b24-20020a17090acc1800b0028ce507cd7dsm878217pju.55.2024.01.02.10.27.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jan 2024 10:27:35 -0800 (PST)
+Date: Tue, 2 Jan 2024 10:27:34 -0800 (PST)
+From: David Rientjes <rientjes@google.com>
+To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+cc: Paolo Bonzini <pbonzini@redhat.com>, Wanpeng Li <wanpengli@tencent.com>, 
+    Vitaly Kuznetsov <vkuznets@redhat.com>, 
+    Sean Christopherson <seanjc@google.com>, 
+    Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+    Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
+    Tom Lendacky <thomas.lendacky@amd.com>, x86@kernel.org, 
+    kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] x86/sev: Fix SEV check in sev_map_percpu_data()
+In-Reply-To: <20240102133747.27053-1-kirill.shutemov@linux.intel.com>
+Message-ID: <cb702fe9-11a6-8a0c-925a-179cb3f6c516@google.com>
+References: <20240102133747.27053-1-kirill.shutemov@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAAhSdy1QsMuAmr+DFxjkf3a2Ur91AX9AnddRnBHGM6+exkAn1g@mail.gmail.com>
-In-Reply-To: <CAAhSdy1QsMuAmr+DFxjkf3a2Ur91AX9AnddRnBHGM6+exkAn1g@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 2 Jan 2024 19:24:26 +0100
-Message-ID: <CABgObfZN4_xvOHr8aukZZGZj5teWZ7rt5RJU5Y0YFewQk19FRw@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM/riscv changes for 6.8 part #1
-To: Anup Patel <anup@brainfault.org>
-Cc: Palmer Dabbelt <palmer@dabbelt.com>, Palmer Dabbelt <palmer@rivosinc.com>, 
-	Andrew Jones <ajones@ventanamicro.com>, Atish Patra <atishp@atishpatra.org>, 
-	Atish Patra <atishp@rivosinc.com>, KVM General <kvm@vger.kernel.org>, 
-	"open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" <kvm-riscv@lists.infradead.org>, 
-	linux-riscv <linux-riscv@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
 
-On Sun, Dec 31, 2023 at 6:33=E2=80=AFAM Anup Patel <anup@brainfault.org> wr=
-ote:
->
-> Hi Paolo,
->
-> We have the following KVM RISC-V changes for 6.8:
-> 1) KVM_GET_REG_LIST improvement for vector registers
-> 2) Generate ISA extension reg_list using macros in get-reg-list selftest
-> 3) Steal time account support along with selftest
+On Tue, 2 Jan 2024, Kirill A. Shutemov wrote:
 
-Just one small thing I noticed on (3), do you really need cpu_to_le64
-and le64_to_cpu on RISC-V? It seems that it was copied from aarch64.
-No need to resend the PR anyway, of course.
+> The function sev_map_percpu_data() checks if it is running on an SEV
+> platform by checking the CC_ATTR_GUEST_MEM_ENCRYPT attribute. However,
+> this attribute is also defined for TDX.
+> 
+> To avoid false positives, add a cc_vendor check.
+> 
+> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 
-> Please pull.
->
-> Please note that I will be sending another PR for 6.8 which will
-> include two more changes:
-> 1) KVM RISC-V report more ISA extensions through ONE_REG
-> 2) RISC-V SBI v2.0 PMU improvements and Perf sampling in KVM guest
->
-> Two separate PRs are because #1 (above) depends on a series
-> merged by Palmer for 6.8 and #2 (above) requires little more testing.
-> I hope you are okay with two separate PRs for 6.8.
-
-Yes, sure. The more the merrier. :)  If you want to send only #1, that
-may be better?
-
-Paolo
-
+Acked-by: David Rientjes <rientjes@google.com>
 
