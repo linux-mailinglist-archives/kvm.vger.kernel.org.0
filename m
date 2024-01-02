@@ -1,228 +1,164 @@
-Return-Path: <kvm+bounces-5433-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5434-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC7EF821DFA
-	for <lists+kvm@lfdr.de>; Tue,  2 Jan 2024 15:43:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1308821E5E
+	for <lists+kvm@lfdr.de>; Tue,  2 Jan 2024 16:09:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A6C91F22DBB
-	for <lists+kvm@lfdr.de>; Tue,  2 Jan 2024 14:43:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB6AA1C223C3
+	for <lists+kvm@lfdr.de>; Tue,  2 Jan 2024 15:09:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92EEF171C2;
-	Tue,  2 Jan 2024 14:38:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC38114A82;
+	Tue,  2 Jan 2024 15:09:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="REQ2etLw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EGcEb+FB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BAF916414;
-	Tue,  2 Jan 2024 14:38:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1704206330; x=1735742330;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=NVOmCLUpjiadLIpufkixMz24Btn82kCB3C2V3+0Ea9k=;
-  b=REQ2etLwb2gi5kW0E5jPTrkdWI9qunSdqYYFXJbrPgp04pmhod8/U+Tk
-   NVftdg57DePg1G5Uvtwezn9zah47skegpBG0y9wdm0SsJNkZGZOhKPXQv
-   snKHNbqPHM++pzmFmCotUX0k9d08is5g5Ws+IzhacC14xzC+KTBNPU8L2
-   R6pQ+d3AgxtSmai4zCBVNUuSOT37Ao2twYMp9QynF9BmLasbUgHZH3r5H
-   tJXN+23O0vm91hBDhK6vWd4IG+OVsMbx0VosbMR8O8O6hh1l9KG04jvN2
-   TWRQbgS6s6WdOTItorrxxlrkTkxh6d99IRP/biIAPeDHSkzIOwq01YC20
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10941"; a="10270524"
-X-IronPort-AV: E=Sophos;i="6.04,325,1695711600"; 
-   d="scan'208";a="10270524"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jan 2024 06:38:50 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10941"; a="923234334"
-X-IronPort-AV: E=Sophos;i="6.04,325,1695711600"; 
-   d="scan'208";a="923234334"
-Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
-  by fmsmga001.fm.intel.com with ESMTP; 02 Jan 2024 06:38:48 -0800
-From: Yi Liu <yi.l.liu@intel.com>
-To: joro@8bytes.org,
-	alex.williamson@redhat.com,
-	jgg@nvidia.com,
-	kevin.tian@intel.com,
-	robin.murphy@arm.com,
-	baolu.lu@linux.intel.com
-Cc: cohuck@redhat.com,
-	eric.auger@redhat.com,
-	nicolinc@nvidia.com,
-	kvm@vger.kernel.org,
-	mjrosato@linux.ibm.com,
-	chao.p.peng@linux.intel.com,
-	yi.l.liu@intel.com,
-	yi.y.sun@linux.intel.com,
-	peterx@redhat.com,
-	jasowang@redhat.com,
-	shameerali.kolothum.thodi@huawei.com,
-	lulu@redhat.com,
-	suravee.suthikulpanit@amd.com,
-	iommu@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	zhenzhong.duan@intel.com,
-	joao.m.martins@oracle.com,
-	xin.zeng@intel.com,
-	yan.y.zhao@intel.com,
-	j.granados@samsung.com
-Subject: [PATCH v10 10/10] iommu/vt-d: Add iotlb flush for nested domain
-Date: Tue,  2 Jan 2024 06:38:34 -0800
-Message-Id: <20240102143834.146165-11-yi.l.liu@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240102143834.146165-1-yi.l.liu@intel.com>
-References: <20240102143834.146165-1-yi.l.liu@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE6C3134D0
+	for <kvm@vger.kernel.org>; Tue,  2 Jan 2024 15:09:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1704208179;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JyAp2a63bNUdMnRsj/hhIizx1kpY/IpGl6RFLf7olc0=;
+	b=EGcEb+FBf1SCon9Px0Ou9S1QT3PeXhaZdnve0OngsZuwDvTCRtt1qt2nv9HqHcWBcb9H08
+	XLIDyZCxmmZyNfSnUnCIlOIlOe9fVz02EneNVqiIGBjfDQWzt+sj3e3Ma5rsB39db5d+1f
+	yBUzpFwKGsXkgly/uSlCOl71G3pY0C8=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-130-7UkFOK9fM_-52rScCQqP2g-1; Tue, 02 Jan 2024 10:09:38 -0500
+X-MC-Unique: 7UkFOK9fM_-52rScCQqP2g-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-33677bbd570so7156876f8f.3
+        for <kvm@vger.kernel.org>; Tue, 02 Jan 2024 07:09:38 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704208177; x=1704812977;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JyAp2a63bNUdMnRsj/hhIizx1kpY/IpGl6RFLf7olc0=;
+        b=DdHChlCQnVMiu5SBaiPWAAjV24PtUioxOCfKywyRgCLJNKYjMDQJ24WBQJA1dtVtn+
+         1+MMbUfdRNG4fP40/0tGFThYnf+/ngv8QASa6IAjsY36x8Ex2HhqXoiTD8S3P0EkX5kN
+         noBbrPSwkqpY2WSPQTQ08y8inVQbyR5Ak3CXdsjsxNtJ4koxPc8XKJ4kwnCwJspcfy3u
+         sbNq92c2J8FOIetctOtIt6+cB2QNgHQaE/c6sM2y3Pz6Hy34wDBkepEnqtUeOP0KcXKe
+         w3weL9hlMxYfj+vv+crufp0zdsCYAwXorXIsS+I2yUYMaEcy9kundUpqzWuxFkeik5RC
+         aBgw==
+X-Gm-Message-State: AOJu0YyhG7D5O2J5qwH6EyuTMdg1T9lk0lYCFGchoclLjbAUXUn4oxMI
+	WQLNq+y5b9aaj0ami0jYrHPE4+bcEVJuZVcMKhtZ8w5DabG2drXpVko0iNn1hRBlA/PAseDKgl1
+	/Fy7di+LgqoO0UBIYS2kn
+X-Received: by 2002:a5d:6744:0:b0:336:45cd:6d87 with SMTP id l4-20020a5d6744000000b0033645cd6d87mr10953356wrw.60.1704208177489;
+        Tue, 02 Jan 2024 07:09:37 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEyuXnWxFGu6P2UDRmOMW7+D+oRJwWgKCt7eNeNUUfLIpD6sU5j5lSo6bU7jHHxrb0gagtbQQ==
+X-Received: by 2002:a5d:6744:0:b0:336:45cd:6d87 with SMTP id l4-20020a5d6744000000b0033645cd6d87mr10953332wrw.60.1704208177153;
+        Tue, 02 Jan 2024 07:09:37 -0800 (PST)
+Received: from vschneid-thinkpadt14sgen2i.remote.csb (213-44-141-166.abo.bbox.fr. [213.44.141.166])
+        by smtp.gmail.com with ESMTPSA id a1-20020adfed01000000b0033748f5600csm1610410wro.108.2024.01.02.07.09.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jan 2024 07:09:36 -0800 (PST)
+From: Valentin Schneider <vschneid@redhat.com>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ linux-arch@vger.kernel.org, x86@kernel.org, Thomas Gleixner
+ <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, Josh Poimboeuf
+ <jpoimboe@kernel.org>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+ Ingo Molnar <mingo@redhat.com>, Dave Hansen <dave.hansen@linux.intel.com>,
+ "H. Peter Anvin" <hpa@zytor.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Wanpeng Li <wanpengli@tencent.com>, Vitaly Kuznetsov
+ <vkuznets@redhat.com>, Arnd Bergmann <arnd@arndb.de>, Jason Baron
+ <jbaron@akamai.com>, Steven Rostedt <rostedt@goodmis.org>, Ard Biesheuvel
+ <ardb@kernel.org>, Frederic Weisbecker <frederic@kernel.org>, "Paul E.
+ McKenney" <paulmck@kernel.org>, Feng Tang <feng.tang@intel.com>, Andrew
+ Morton <akpm@linux-foundation.org>, "Mike Rapoport (IBM)"
+ <rppt@kernel.org>, Vlastimil Babka <vbabka@suse.cz>, David Hildenbrand
+ <david@redhat.com>, "ndesaulniers@google.com" <ndesaulniers@google.com>,
+ Michael Kelley <mikelley@microsoft.com>, "Masami Hiramatsu (Google)"
+ <mhiramat@kernel.org>
+Subject: Re: [PATCH 5/5] x86/tsc: Make __use_tsc __ro_after_init
+In-Reply-To: <20231204182043.GB7299@noisy.programming.kicks-ass.net>
+References: <20231120105528.760306-1-vschneid@redhat.com>
+ <20231120105528.760306-6-vschneid@redhat.com>
+ <20231120120553.GU8262@noisy.programming.kicks-ass.net>
+ <xhsmhcyvlc3mi.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
+ <20231204182043.GB7299@noisy.programming.kicks-ass.net>
+Date: Tue, 02 Jan 2024 16:09:35 +0100
+Message-ID: <xhsmhmstnkc0g.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-From: Lu Baolu <baolu.lu@linux.intel.com>
+On 04/12/23 19:20, Peter Zijlstra wrote:
+> On Mon, Dec 04, 2023 at 05:51:49PM +0100, Valentin Schneider wrote:
+>> On 20/11/23 13:05, Peter Zijlstra wrote:
+>> > On Mon, Nov 20, 2023 at 11:55:28AM +0100, Valentin Schneider wrote:
+>> >> __use_tsc is only ever enabled in __init tsc_enable_sched_clock(), so mark
+>> >> it as __ro_after_init.
+>> >>
+>> >> Signed-off-by: Valentin Schneider <vschneid@redhat.com>
+>> >> ---
+>> >>  arch/x86/kernel/tsc.c | 2 +-
+>> >>  1 file changed, 1 insertion(+), 1 deletion(-)
+>> >>
+>> >> diff --git a/arch/x86/kernel/tsc.c b/arch/x86/kernel/tsc.c
+>> >> index 15f97c0abc9d0..f19b42ea40573 100644
+>> >> --- a/arch/x86/kernel/tsc.c
+>> >> +++ b/arch/x86/kernel/tsc.c
+>> >> @@ -44,7 +44,7 @@ EXPORT_SYMBOL(tsc_khz);
+>> >>  static int __read_mostly tsc_unstable;
+>> >>  static unsigned int __initdata tsc_early_khz;
+>> >>
+>> >> -static DEFINE_STATIC_KEY_FALSE(__use_tsc);
+>> >> +static DEFINE_STATIC_KEY_FALSE_RO(__use_tsc);
+>> >
+>> > So sure, we can absolutely do that, but do we want to take this one
+>> > further perhaps? "notsc" on x86_64 makes no sense what so ever. Lets
+>> > drag things into this millennium.
+>> >
+>>
+>> Just to make sure I follow: currently, for the static key to be enabled, we
+>> (mostly) need:
+>> o X86_FEATURE_TSC is in CPUID
+>> o determine_cpu_tsc_frequencies()->pit_hpet_ptimer_calibrate_cpu() passes
+>>
+>> IIUC all X86_64 systems have a TSC, so the CPUID feature should be a given.
+>>
+>> AFAICT pit_hpt_ptimer_calibrate_cpu() relies on having either HPET or the
+>> ACPI PM timer, the latter should be widely available, though X86_PM_TIMER
+>> can be disabled via EXPERT - is that a fringe case we don't care about, or
+>> did I miss something? I don't really know this stuff, and I'm trying to
+>> write a changelog...
+>
+> Ah, I was mostly just going by the fact that all of x86_64 have TSC and
+> disabling it makes no sense.
+>
+> TSC calibration is always 'fun', but I don't know of a system where its
+> failure causes us to not use TSC, Thomas?
 
-This implements the .cache_invalidate_user() callback to support iotlb
-flush for nested domain.
+Having another look at this, it looks like the actual requirements for the
+TSC being used are either of:
+o CPUID accepting 0x16 as eax input (cf. cpu_khz_from_cpuid())
+o MSR_FSB_FREQ being available (cf. cpu_khz_from_msr())
+o pit_hpet_ptimer_calibrate_cpu() doesn't mess up
 
-Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
-Co-developed-by: Yi Liu <yi.l.liu@intel.com>
-Signed-off-by: Yi Liu <yi.l.liu@intel.com>
----
- drivers/iommu/intel/nested.c | 107 +++++++++++++++++++++++++++++++++++
- 1 file changed, 107 insertions(+)
+I couldn't find any guarantees for x86_64 on having the processor frequency
+information CPUID leaf, nor for the FSB_FREQ MSR (both tsc_msr_cpu_ids and
+the SDM seem to point at only a handful of models).
 
-diff --git a/drivers/iommu/intel/nested.c b/drivers/iommu/intel/nested.c
-index b5a5563ab32c..f1f86437939c 100644
---- a/drivers/iommu/intel/nested.c
-+++ b/drivers/iommu/intel/nested.c
-@@ -73,9 +73,116 @@ static void intel_nested_domain_free(struct iommu_domain *domain)
- 	kfree(to_dmar_domain(domain));
- }
- 
-+static void nested_flush_dev_iotlb(struct dmar_domain *domain, u64 addr,
-+				   unsigned mask, u32 *fault)
-+{
-+	struct device_domain_info *info;
-+	unsigned long flags;
-+	u16 sid, qdep;
-+
-+	spin_lock_irqsave(&domain->lock, flags);
-+	list_for_each_entry(info, &domain->devices, link) {
-+		if (!info->ats_enabled)
-+			continue;
-+		sid = info->bus << 8 | info->devfn;
-+		qdep = info->ats_qdep;
-+		qi_flush_dev_iotlb(info->iommu, sid, info->pfsid,
-+				   qdep, addr, mask, fault);
-+		quirk_extra_dev_tlb_flush(info, addr, mask,
-+					  IOMMU_NO_PASID, qdep);
-+	}
-+	spin_unlock_irqrestore(&domain->lock, flags);
-+}
-+
-+static void intel_nested_flush_cache(struct dmar_domain *domain, u64 addr,
-+				     unsigned long npages, bool ih, u32 *error)
-+{
-+	struct iommu_domain_info *info;
-+	unsigned long i;
-+	unsigned mask;
-+	u32 fault;
-+
-+	xa_for_each(&domain->iommu_array, i, info)
-+		qi_flush_piotlb(info->iommu,
-+				domain_id_iommu(domain, info->iommu),
-+				IOMMU_NO_PASID, addr, npages, ih, NULL);
-+
-+	if (!domain->has_iotlb_device)
-+		return;
-+
-+	if (npages == U64_MAX)
-+		mask = 64 - VTD_PAGE_SHIFT;
-+	else
-+		mask = ilog2(__roundup_pow_of_two(npages));
-+
-+	nested_flush_dev_iotlb(domain, addr, mask, &fault);
-+
-+	*error = 0;
-+	/*
-+	 * Invalidation queue error (i.e. IQE) will not be reported to user
-+	 * as it's caused only by driver internal bug.
-+	 */
-+	if (fault & DMA_FSTS_ICE)
-+		*error |= IOMMU_HWPT_INVALIDATE_VTD_S1_ICE;
-+	if (fault & DMA_FSTS_ITE)
-+		*error |= IOMMU_HWPT_INVALIDATE_VTD_S1_ITE;
-+}
-+
-+static int intel_nested_cache_invalidate_user(struct iommu_domain *domain,
-+					      struct iommu_user_data_array *array)
-+{
-+	struct dmar_domain *dmar_domain = to_dmar_domain(domain);
-+	struct iommu_hwpt_vtd_s1_invalidate inv_entry;
-+	u32 processed = 0;
-+	int ret = 0;
-+	u32 index;
-+
-+	if (array->type != IOMMU_HWPT_INVALIDATE_DATA_VTD_S1) {
-+		ret = -EINVAL;
-+		goto out;
-+	}
-+
-+	for (index = 0; index < array->entry_num; index++) {
-+		ret = iommu_copy_struct_from_user_array(&inv_entry, array,
-+							IOMMU_HWPT_INVALIDATE_DATA_VTD_S1,
-+							index, hw_error);
-+		if (ret)
-+			break;
-+
-+		if (inv_entry.flags & ~IOMMU_VTD_INV_FLAGS_LEAF) {
-+			ret = -EOPNOTSUPP;
-+			break;
-+		}
-+
-+		if (!IS_ALIGNED(inv_entry.addr, VTD_PAGE_SIZE) ||
-+		    ((inv_entry.npages == U64_MAX) && inv_entry.addr)) {
-+			ret = -EINVAL;
-+			break;
-+		}
-+
-+		intel_nested_flush_cache(dmar_domain, inv_entry.addr,
-+					 inv_entry.npages,
-+					 inv_entry.flags & IOMMU_VTD_INV_FLAGS_LEAF,
-+					 &inv_entry.hw_error);
-+
-+		ret = iommu_respond_struct_to_user_array(array, index,
-+							 (void *)&inv_entry,
-+							 sizeof(inv_entry));
-+		if (ret)
-+			break;
-+
-+		processed++;
-+	}
-+
-+out:
-+	array->entry_num = processed;
-+	return ret;
-+}
-+
- static const struct iommu_domain_ops intel_nested_domain_ops = {
- 	.attach_dev		= intel_nested_attach_dev,
- 	.free			= intel_nested_domain_free,
-+	.cache_invalidate_user	= intel_nested_cache_invalidate_user,
- };
- 
- struct iommu_domain *intel_nested_domain_alloc(struct iommu_domain *parent,
--- 
-2.34.1
+Also for x86_64 there is this "apicpmtimer" cmdline arg which currently
+disables the TSC. The commit that introduced it [1] suggests there are x86_64
+systems out there with calibration issues, so now I'm not sure whether we
+can kill the static key for x86_64 :(
+
+[1]: 0c3749c41f5e ("[PATCH] x86_64: Calibrate APIC timer using PM timer")
+followed by: 7fd67843b96f ("[PATCH] x86_64: Disable tsc when apicpmtimer is active")
 
 
