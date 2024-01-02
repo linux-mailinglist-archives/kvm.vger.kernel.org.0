@@ -1,36 +1,36 @@
-Return-Path: <kvm+bounces-5443-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5444-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4C7B821F24
-	for <lists+kvm@lfdr.de>; Tue,  2 Jan 2024 17:03:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 08835821F2E
+	for <lists+kvm@lfdr.de>; Tue,  2 Jan 2024 17:05:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 595D61F22CCE
-	for <lists+kvm@lfdr.de>; Tue,  2 Jan 2024 16:03:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A9981F22F61
+	for <lists+kvm@lfdr.de>; Tue,  2 Jan 2024 16:05:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE56014F6B;
-	Tue,  2 Jan 2024 16:02:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21B6214F6A;
+	Tue,  2 Jan 2024 16:05:38 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34E3F14F67
-	for <kvm@vger.kernel.org>; Tue,  2 Jan 2024 16:02:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8537C14F65
+	for <kvm@vger.kernel.org>; Tue,  2 Jan 2024 16:05:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ozlabs.org
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	by gandalf.ozlabs.org (Postfix) with ESMTP id 4T4HgQ2Vxxz4x5h;
-	Wed,  3 Jan 2024 03:02:42 +1100 (AEDT)
+Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+	by gandalf.ozlabs.org (Postfix) with ESMTP id 4T4Hkj6Q1tz4xCg;
+	Wed,  3 Jan 2024 03:05:33 +1100 (AEDT)
 Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
 	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4T4Hfs3GGMz4x23;
-	Wed,  3 Jan 2024 03:02:13 +1100 (AEDT)
-Message-ID: <6fe17c0c-e9c4-46fc-bac0-8e977e531c8c@kaod.org>
-Date: Tue, 2 Jan 2024 17:02:08 +0100
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4T4HkK0K3sz4wcM;
+	Wed,  3 Jan 2024 03:05:12 +1100 (AEDT)
+Message-ID: <5bcc750f-2736-4eca-aec2-f45e56a6fa92@kaod.org>
+Date: Tue, 2 Jan 2024 17:05:09 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -38,7 +38,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 4/5] Replace "iothread lock" with "BQL" in comments
+Subject: Re: [PATCH v3 5/5] Rename "QEMU global mutex" to "BQL" in comments
+ and docs
 Content-Language: en-US
 To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 Cc: Hanna Reitz <hreitz@redhat.com>, qemu-riscv@nongnu.org,
@@ -93,18 +94,19 @@ Cc: Hanna Reitz <hreitz@redhat.com>, qemu-riscv@nongnu.org,
  BALATON Zoltan <balaton@eik.bme.hu>,
  Liu Zhiwei <zhiwei_liu@linux.alibaba.com>
 References: <20240102153529.486531-1-stefanha@redhat.com>
- <20240102153529.486531-5-stefanha@redhat.com>
+ <20240102153529.486531-6-stefanha@redhat.com>
 From: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
-In-Reply-To: <20240102153529.486531-5-stefanha@redhat.com>
+In-Reply-To: <20240102153529.486531-6-stefanha@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 On 1/2/24 16:35, Stefan Hajnoczi wrote:
-> The term "iothread lock" is obsolete. The APIs use Big QEMU Lock (BQL)
-> in their names. Update the code comments to use "BQL" instead of
-> "iothread lock".
+> The term "QEMU global mutex" is identical to the more widely used Big
+> QEMU Lock ("BQL"). Update the code comments and documentation to use
+> "BQL" instead of "QEMU global mutex".
 > 
 > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Acked-by: Markus Armbruster <armbru@redhat.com>
 > Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 
 
@@ -113,7 +115,6 @@ Reviewed-by: Cédric Le Goater <clg@kaod.org>
 Thanks,
 
 C.
-
 
 
 
