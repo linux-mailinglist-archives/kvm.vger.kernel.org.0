@@ -1,79 +1,91 @@
-Return-Path: <kvm+bounces-5448-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5449-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3067A822062
-	for <lists+kvm@lfdr.de>; Tue,  2 Jan 2024 18:26:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A522822094
+	for <lists+kvm@lfdr.de>; Tue,  2 Jan 2024 18:47:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5D3D283EE9
-	for <lists+kvm@lfdr.de>; Tue,  2 Jan 2024 17:26:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6FE9283F9B
+	for <lists+kvm@lfdr.de>; Tue,  2 Jan 2024 17:46:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0B98156D1;
-	Tue,  2 Jan 2024 17:26:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 760E6156D8;
+	Tue,  2 Jan 2024 17:46:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="XnIN+mHJ"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="BtT/bkPn"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2040.outbound.protection.outlook.com [40.107.96.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D3E21549A;
-	Tue,  2 Jan 2024 17:26:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 276E5154B2;
+	Tue,  2 Jan 2024 17:46:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jmM7V/GxrPfddKbHme1NHRjRwHCMHOlmnr8zriuRlBoSe4uLN1p0ko3XtKO10aIThX0U7enhSoDZZDLZ7riS0uuxB3Pf0OyzdyawktM4wtjTkELS9PzAoGHyenHJGjMxbjlNFahcPzfc7uYG4v7/1BLGup3534wd2KV7O5Z0A5d8FnLjfN+bonGolM7anVb7yVpIFkruTr9CB5d7POn6Z2xBeLskMfgeNhjPLcTBXpOXeHVmidlWN4jn/8M3LbxfcTtl/3B9Nknw+e6PdkaW8AigqlFZmQC87tC2w7KuBQP1of2u8DQOytBjNOPmzPwcxUDzJ4H6VAryHl1FnONkaw==
+ b=GbwIJA4jjOXJjxgFPWM1YpJKQljBXNaRoSR+jNy4dFxeye3SG1BObyknjg+639wc7RzRD4IC5/DsZFoTf1LKo9xWCwgBYgutzc5hqd0N/a1iawSOuv2P7Ls+20xMDL8QtjPbVlWrEcSqsmGfzgji/DzOERyojcMza29ZTJm2hH04Ii6eo4XgR+qLOrIQgcoYFuXWWVxszUIpB4zkef9Xo+X4tfGqsPLG6wNyVgI5kJtRND84mv2OwQW6YOtf4PJhN6fUuuoo7qRLHkKHlTbjV6JI0O6bDs2D56tqoj38t55rEiVhUYx2mCxZKn1SnCQQw7MfjKbYwIJ04wZJ0YJMwA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=itx4w3+s+gxpzi9tWG6Yft2RN6S+69GT1GDl+UnqtGo=;
- b=a/kLiPUJxhTi10tCdgGdJZcT6CyTzcRe0F/nTpUbN2LIreB+eBT43xULeeOpF1Dz1kuR7P2sMnfopmfHgtC0L2mr2IopIXkQ3oFeEg5lhPFysSJoRAXGrhdCY8G+cPgBt333Hs5B7vePMGybnSRwTNUWm2PGNedgdwPfvQs7bYtHFV1fAsKdzpQoQcxFK+/ASOjWgZXMlRIZR09KrQeKsHQwsBRlmOkHRca6MdzTF7ukh592p4TDPad60xIECpxSXMVv7IZUSWV1SV7Z4a9F4Xp/CTAFjW5agYP+aqmHstzBplo9AgcrfbWdvWe8P9wJ/lWfa3JEtehQ4ql/NlXrig==
+ bh=eUKDGRnFIPSJ0LRN9R4WG3OzHsTXLIeocX8kxVP6t0g=;
+ b=M0p1c7KVRIAOyTHO0Q63PNMO7V1HHkGjdpTRYZHx85mnekugWkrUnl2d2q+6zVdZMOSqzdNwFtM4lXdOQDZLTe4Tq7ehYcQOnKZfZUlPfDJDtkINIOlbxcPaLdc1LEB1R69zuJDArpjy6gf75rC/HLwpagAyElepzKe7j1OxL8KyAY4Fy+CUfoHdAAxJ9ZEXENjs8RIg9fA43v7gfREzFQ46vl90cWcRK2a72BzyjujjVoJpOFlIaB10ojWSuOKxPvfWc/E6YTFplihAz4kqult4u1UFIEvYvMjYcRAV2eVIDBo25M+zP+wxzaU58w4EkfTs7XqKUDyVmCV94T05cA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=itx4w3+s+gxpzi9tWG6Yft2RN6S+69GT1GDl+UnqtGo=;
- b=XnIN+mHJd3f7x4fWkgie6D4R+974/67OBf12ZCRt7MQPDRlXS4M7sQsuyZQzXBM+X2U4+Wvszwf5aVRyxG6BWll+tQiWzDmvMMG4LolTUX8aUF0VJZjeT2HVEn+QUNwCpMVV6nPCXy/b4Vd3qTkXHKSx+Vt3e+ZLYzEm2xasFQhaKuWdTRvXd/7g2B+W8n9hnqUW8PV55mCrpycwjAWF8v6yvzkMWJy9JYZn5tmZuTxVjhCdjISMVDux8nRz32dQYruThLbYqveYe+32J+h+qwU8xg8KMQq58eoQXBgY1LcCLlVKImHe6NZnpsPlnS7MxIy7eVxShOIKGiCc5k9tbA==
+ bh=eUKDGRnFIPSJ0LRN9R4WG3OzHsTXLIeocX8kxVP6t0g=;
+ b=BtT/bkPnKyzugicjUg2ecLBfYAxGluOZkMyJik3GTBLMHoEDOAT+qn80lTXh9pRGsZds5AK2CIeZmVoYiFi6hGsSOuDEXaG+Jkqys1izs41JgzJwm4uNLNbWgQ4pCtASsqU37Az6tO/DMjrqGMzEvgt+O1+vIsCJOKxNyW8Lrs4JgASYQ4jfTU52m7jUDo9+Mmies21YLER5NWL52c2ZgViHxfDriryxTxq344M+NgAvUmEQA3V8d0IOVv+SiRqIMJ5Bfl/tbIHy3q0h3jiiitMcyY4OF85sAOk3VrMHZPHZ1N63sgzITncxSEMki6H16i94UfW46gRsyF1KZo2mgQ==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by CH3PR12MB7641.namprd12.prod.outlook.com (2603:10b6:610:150::18) with
+ by SJ0PR12MB5405.namprd12.prod.outlook.com (2603:10b6:a03:3af::11) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.13; Tue, 2 Jan
- 2024 17:26:22 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.25; Tue, 2 Jan
+ 2024 17:46:41 +0000
 Received: from LV2PR12MB5869.namprd12.prod.outlook.com
  ([fe80::60d4:c1e3:e1aa:8f93]) by LV2PR12MB5869.namprd12.prod.outlook.com
  ([fe80::60d4:c1e3:e1aa:8f93%4]) with mapi id 15.20.7135.023; Tue, 2 Jan 2024
- 17:26:22 +0000
-Date: Tue, 2 Jan 2024 13:26:21 -0400
+ 17:46:41 +0000
+Date: Tue, 2 Jan 2024 13:46:40 -0400
 From: Jason Gunthorpe <jgg@nvidia.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, ankita@nvidia.com,
-	maz@kernel.org, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	will@kernel.org, alex.williamson@redhat.com, kevin.tian@intel.com,
-	yi.l.liu@intel.com, ardb@kernel.org, akpm@linux-foundation.org,
-	gshan@redhat.com, linux-mm@kvack.org, lpieralisi@kernel.org,
-	aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com,
-	targupta@nvidia.com, vsethi@nvidia.com, acurrid@nvidia.com,
-	apopple@nvidia.com, jhubbard@nvidia.com, danw@nvidia.com,
-	mochs@nvidia.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v3 2/2] kvm: arm64: set io memory s2 pte as normalnc for
- vfio pci devices
-Message-ID: <20240102172621.GH50406@nvidia.com>
-References: <20231208164709.23101-1-ankita@nvidia.com>
- <20231208164709.23101-3-ankita@nvidia.com>
- <ZXicemDzXm8NShs1@arm.com>
- <20231212181156.GO3014157@nvidia.com>
- <ZXoOieQN7rBiLL4A@linux.dev>
+To: "Tian, Kevin" <kevin.tian@intel.com>
+Cc: "Liu, Yi L" <yi.l.liu@intel.com>, "joro@8bytes.org" <joro@8bytes.org>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+	"robin.murphy@arm.com" <robin.murphy@arm.com>,
+	"baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+	"cohuck@redhat.com" <cohuck@redhat.com>,
+	"eric.auger@redhat.com" <eric.auger@redhat.com>,
+	"nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+	"chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+	"yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+	"peterx@redhat.com" <peterx@redhat.com>,
+	"jasowang@redhat.com" <jasowang@redhat.com>,
+	"shameerali.kolothum.thodi@huawei.com" <shameerali.kolothum.thodi@huawei.com>,
+	"lulu@redhat.com" <lulu@redhat.com>,
+	"suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	"Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
+	"joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
+	"Zeng, Xin" <xin.zeng@intel.com>,
+	"Zhao, Yan Y" <yan.y.zhao@intel.com>
+Subject: Re: [PATCH v7 1/3] iommufd: Add data structure for Intel VT-d
+ stage-1 cache invalidation
+Message-ID: <20240102174640.GA171005@nvidia.com>
+References: <20231117131816.24359-1-yi.l.liu@intel.com>
+ <20231117131816.24359-2-yi.l.liu@intel.com>
+ <c967e716-9112-4d1a-b6f7-9a005e28202d@intel.com>
+ <BN9PR11MB5276D14D2A7FF60B41A6A7B48C93A@BN9PR11MB5276.namprd11.prod.outlook.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZXoOieQN7rBiLL4A@linux.dev>
-X-ClientProxiedBy: MN2PR20CA0046.namprd20.prod.outlook.com
- (2603:10b6:208:235::15) To LV2PR12MB5869.namprd12.prod.outlook.com
+In-Reply-To: <BN9PR11MB5276D14D2A7FF60B41A6A7B48C93A@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-ClientProxiedBy: BL1PR13CA0338.namprd13.prod.outlook.com
+ (2603:10b6:208:2c6::13) To LV2PR12MB5869.namprd12.prod.outlook.com
  (2603:10b6:408:176::16)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -82,137 +94,109 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CH3PR12MB7641:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5de10323-dadf-44f3-753f-08dc0bb7f082
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SJ0PR12MB5405:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5c802ba9-64e4-4ed9-200f-08dc0bbac74f
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	xT8/3tFhh2UWmfRfenpezBYHlZW2sjISj59A53LBeEQUeL+9+HDGhHsVl3cZUvw3R9Gh6b1ZlHry7djRQneVHP96dORr7b926xmQMkyYGGUFYbc+ulUxsgsSHBpEMPd4olycG5yL2zF8ZCUfFMism1Ip/qL6SmED52zm/Zi1mq23K1WjceHI2KRmHrLcFXRNMsETCOdcLAyI25FDl0DLUiUPlhZj7KT8zSOaHwvd1nybkCUrsDOPmJ5ab5C6/Z8R1E2++2mcjwTUHJKUxz2BJWJGv8TPuWh9kZJsTfZvzY1tOt+ABg2fr5cmXWQdViXFtp1V5/PnppvQhhMO6599UvBq091w/S3GDxcvyGozQtwdRIY3NkWRbKaNNDSjCtT7MkP+M7wDqbAJg8Dmvt2Tx9+kT1BgHZOJPw955ByizdJCNr3jSVVrTsvTkeKg+LhO0RXjOJwC/ZWGBA1GhoGlvQdqcgNR9Ds5/WOgwf5C76b2E1nbRjUuFtSVU4vseQjkd1zdFcb767Xt5LjgqWx5slxKhYHkifxFXLvhDDE7XwxN6BaQyFoyqQo8KIBfST2Z
+	MABMqP9OROM1UWOalIBn347H0uS0J/lOQC9lJIHoHbSm1KTzNxyibZmsvfrwTfNYPvmQxwGTqpPiYIhB97mBKoM53cZ1MrrdplSN45VBMKFajPjghEfv7Rpr7uJBbNlpYgZOCowb8r+AV3ajS0rNFvJLuUWD3fqxVnZ9dt+ptyuS7LrWaCW+1jkjK4+/X59cj4Vf36rhuPQCpeUWtDT40rT84fUAgTp9WwEONkzdcTvf283XoI+J/9RjkqLgPBqRDLTkZOZucZGJ1Y3MDObEeRVDQTFrvfJ8n5Da6AnOCpXiz+WIguA/z5PzTlTPBJX4BQJiZMyWTHD1feD7SONo7B5hFL9sSQht5tVu+u/6/EO416tIFmmvNaWFf5JE0eP9EZ4rKLZOkB1pv/jlkwLKhRMkqRD0Yb4ikkENdMWK5w5fRSlf9eXWCmXADx8YFNcMn/1qY49OWWE5MA0vIohKOtwAEhN4n2aTlt4R+B8JbRJJ1JkChYu6RH7KVTwbeWo/+nOy2uFcfR34o0xjOsyB2vE9PLerQnUTpj5jIVD6PN8MjxVWFintzQB360Ob/7yZJgOxiVhEki9EWAWhH0aHt941YAiyoD5CNDvzv7+yuFaEq2gbvmY7BU1Ia7DSaGJF
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(396003)(39860400002)(376002)(366004)(346002)(230922051799003)(1800799012)(451199024)(186009)(64100799003)(38100700002)(36756003)(86362001)(6506007)(6512007)(478600001)(83380400001)(4326008)(66556008)(66946007)(66476007)(6486002)(1076003)(26005)(6916009)(316002)(2616005)(8676002)(8936002)(33656002)(41300700001)(7416002)(5660300002)(2906002);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(366004)(376002)(396003)(39860400002)(230922051799003)(1800799012)(64100799003)(186009)(451199024)(33656002)(83380400001)(2616005)(1076003)(26005)(6512007)(6506007)(478600001)(6486002)(41300700001)(66556008)(316002)(6916009)(66476007)(86362001)(54906003)(66946007)(8936002)(36756003)(4326008)(8676002)(38100700002)(2906002)(7416002)(5660300002)(27376004);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?BCiUz9J9/pDYZCzpto5Mg5kpJ5VSIPG/FP8XL2i2BbDTmkhdzU3MFMRY72na?=
- =?us-ascii?Q?/1PaOsWZlOktmM657nPA6vfiBv9t1WCuPl+HKIU8f6PQUf0srompd1hTGU4V?=
- =?us-ascii?Q?94R/vz7muiGJ94n6H1UTWih64IGHuKkmUSB5HcXaDyNUKu8pO0RYSOnj0ShA?=
- =?us-ascii?Q?DxMtHH1eJv96/REGnAPC20a7R5L0liDQ6OBwOque9SqjuExlF7kddzBZvAwy?=
- =?us-ascii?Q?AlGzqhj3Enan4cjAUDsH446AYMHn4q72hX+LTPTToKLS6yjBJBmPvdou+QdA?=
- =?us-ascii?Q?a8MvMxeV4QRzYdkCOLtIago8DtxK5E+Z+cKyEYr4dlET5M4vdMZ181sTo+NR?=
- =?us-ascii?Q?hurmKVKSj0d8qvFe4DG6CQ6fwAH9HgMCdj9R1B7YCrqSy0uFqOfuvvJ60NYl?=
- =?us-ascii?Q?/ky5X/eaaz7ro8K71Bowmu2zeXvnopVLnAO1LCYoaUUa8+hIDHGKnaWrcIVQ?=
- =?us-ascii?Q?7X4v6mo4IcG/Gz9PbbOsY/sSHkg7briTGBo55f4DSCvekcria6Un0t/qzovz?=
- =?us-ascii?Q?+3zy+3AW1MAYZDCmn5xXOYvh2sCTabveP4BSThNBt2ITAswxkd0VOoQwL+uV?=
- =?us-ascii?Q?nXRYeCXgYZ3s/WbEfnoEelf0ug5Tqx/NwAwLASKik8/8OhiKwHDVAyVRGQVA?=
- =?us-ascii?Q?+FkrNpWjZMmRS3kP+3k+uHCxnLkamejO2mWJLByyULQz3BUKqMoYRwMdwCQx?=
- =?us-ascii?Q?qWCUi0kJuEC/fDYy9nlMICOl4SjnY25oTerB4j23hU1NJWrvBMPPNty6tXMN?=
- =?us-ascii?Q?FzbKvnBf2qLgWnb0XqAP/VeVmZxbU63HH7TYgUuQeAdIj+EI58+G9+HJ7lVN?=
- =?us-ascii?Q?BjJ/DF19ArHifjvN6IsiaKFeblVQXD0zeT4tmShRsCsaDmFxHlnFVxNWfb08?=
- =?us-ascii?Q?LsmEKO0NcJ2zhXlzheO2KDLBpl55JjYifoPBMMEplyFXE+IKUQ2R/8UHafoG?=
- =?us-ascii?Q?5cQsNR8Wsu7ZUAdkkUPuQr1lJpvup4KwyhLURafgdeyJ/Wfml68/Fy7JtNsK?=
- =?us-ascii?Q?+XuOavsTUZH/NsiZsR7YYbKN9JXusUpR1E+B0imJcMJtU5Myd/SPcX7LYBaL?=
- =?us-ascii?Q?RpjivtayZzOg5lusncC0/4xr0tVZg8CdOoHtWHxhGcFtzBo766riGqiVHFm7?=
- =?us-ascii?Q?sFBONv3DrObdLdU6HAgpJq+Q+YzEL70I2OVj5P+kncUTAUqJNVc+ciIj8FFC?=
- =?us-ascii?Q?By+/Fv43q2f+qjSxXjPlynnByP/93dz6o2gC79o14SNtFSgXjlkNWQkrc+ld?=
- =?us-ascii?Q?GcvYh4OlfYXBWCE0b1r+D4zSYyEFHyKzVd5w58fQGJCI0BRc2eV57AhaYYxa?=
- =?us-ascii?Q?Q5zpyxWHgDgdsG1WIi74SthyEPFh4aKPTOS9FmtVeQ9K/za32R9ZtutS58s0?=
- =?us-ascii?Q?uPBlUaELjGETjSveNdHKziWDtH3DRNkMYAoEgEA2w8yQNOvjOfbX6ieJAFro?=
- =?us-ascii?Q?nYn83aGj8C3x8dSm/XoB0NoXwgX0j95y7dHBLcUduciAY8COL1KaCDqKUFjN?=
- =?us-ascii?Q?tNSlu6+5iTkwAKbEzPLWRQPDIJtKD/2DVe1463Jkt4Pia8vpYQju5ITPbb4F?=
- =?us-ascii?Q?JG3ByYkf8DEErERNGZU=3D?=
+	=?us-ascii?Q?IzjYOORsvPkkzDpdoRD+Kgi8Q9pD1fyEEsSDGT6YBzIzMfvndtiHLHy/heKN?=
+ =?us-ascii?Q?gj7beS8jRUic5AOny8+FbzerLXjoTJHmnxp8kbwLUFqoNXcl626bNCZV1T1v?=
+ =?us-ascii?Q?XBEsnVBSK7E2IEWhQk1wbPub1IKkRL7nVZ/dm9bzyzqUIVP0ihl7uLkmyKdG?=
+ =?us-ascii?Q?1qEbJTPFFC9B7kmFdPPUmXZpa+D/rgjLSakXNlX66mK+DWQ8e8Sosi7yM3qi?=
+ =?us-ascii?Q?pCF47oGHknTgEn0j3kxjYZpA62xxIAyrq7e7TT31wfeYncxQGjK4WOdkU5US?=
+ =?us-ascii?Q?BcvdWlVRn4JewIiPo8aEGwA/JTccckWOjwuoS/7UDi8Z+n6VE1FDjLZ33vNp?=
+ =?us-ascii?Q?JkZKs6hyc+puDqAMQZKDFUBmPzdwxPwbdO6TbViGbaaHVU2ufyQLQenFVY6T?=
+ =?us-ascii?Q?cyonCVU7nzzGIcspjAzTg7Z+0pcx7/dEaBK6Im0U2GFGKCLBjtg5dmgsceYK?=
+ =?us-ascii?Q?n63LBrpB0d864l3wafgcpU52oBo5c9yfPMW1oElrlncnUPOf00XiMlbw0K2o?=
+ =?us-ascii?Q?pp3YpWFwsuAMegMNhZP/4u7y6Ixax6IBfAT77RdvM9p51ZxoDLN9nlqPFbIu?=
+ =?us-ascii?Q?yP3CbslvLhsn1eU3h8ANkHHDis0WtCWFMseADnaSRWuwbDI84xZ8BAMw8xuY?=
+ =?us-ascii?Q?YXfht/91EbsyZE3mKzayvNm4T1SCw5q0Q6i4M19UMAMygInvjjuQyayPeUcK?=
+ =?us-ascii?Q?AT8cSKvh6mMvZNGxmDpW246uJ1d7LVArpIrGNxpadZ1BJRLrGnWe+S0QzDqX?=
+ =?us-ascii?Q?9j06i06HOMaTkJpOy7LMR+EYtFp2hBsBYQuIPmek9Wk6xihy2izuBLGrKXai?=
+ =?us-ascii?Q?V1xITc9cF6dwqSTmcVn4SNxuIGiT4tvBT3dUYWx6yOYJHGoOkbLZyf0rYtxL?=
+ =?us-ascii?Q?cUCyFF40m/97fVkfTCuJYz8z7Xzhi/qJrrg/5ExIx9k6Z15AEYAR0xuFRxFs?=
+ =?us-ascii?Q?YvP1jzVQAfmmA18Q2KArgPz//s1PSLf36Q4VXQOjuFjPbwoAKzFw1sVdDQwa?=
+ =?us-ascii?Q?wn6e4ySqzdsban3eAUZtAkLE2zmDZoD+XtTJv6S62C++QMfuRvmc+JNwCXOo?=
+ =?us-ascii?Q?FG3OhRjXVD3d6S6sXFo22SbGVEItK6HSfDC6eGiPPOvAWoMa/e11iak/5lPc?=
+ =?us-ascii?Q?AavctH2B8h8r98I5hR94vFSXf+x85WMCu2jPu221MiAfw0Q61aZlGncEz1nN?=
+ =?us-ascii?Q?izvo7xyuG2bLVgy8OGwdu4VxLJCancUO+rW7z2MjtIQtK6FwAlRFl4/6aFYt?=
+ =?us-ascii?Q?uApUOXUETDxFVNGcd2PLkaIbvLGLXhqYEkAgCK/nK3dV7pSNqHhg88BQzwZP?=
+ =?us-ascii?Q?kXG5sz9Es2lV0Ba2qCZ6HLjE55kKAoxLcel8pHdhB2ICXX4jHBounzjJbBHv?=
+ =?us-ascii?Q?7aYpSXDqVk5SbIVBBfimYRTUvaazbVZ5WxxU4W4zF45BYWO5uDPMlCPTROtj?=
+ =?us-ascii?Q?n6Wo0YUBaFzI9C6mcgxLXNnjOM5ArWog2uLcNmIhCwCDVbISlp3hrfikANb/?=
+ =?us-ascii?Q?ZBTvtvIYWt3d7TGNRdvpMkACzslAoUbwHGy/uRaZQF0V0d+JWs5Enns3Ss6P?=
+ =?us-ascii?Q?6hgsNlepFQ1lz05fPeE=3D?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5de10323-dadf-44f3-753f-08dc0bb7f082
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5c802ba9-64e4-4ed9-200f-08dc0bbac74f
 X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jan 2024 17:26:22.3695
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jan 2024 17:46:41.7249
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: MAsGVTdQ9C6AFQZMyu5YaVdVHoa+5PGuF4x4N6Ls4kkDycpS+mYidBn1Oqcg24Lg
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB7641
+X-MS-Exchange-CrossTenant-UserPrincipalName: htsGWAgAth3edLmxdFo3T680mJ/nP+lfCBoa0juL/3I3f2iitjSfdjuVg9vOpz6m
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB5405
 
-On Wed, Dec 13, 2023 at 08:05:29PM +0000, Oliver Upton wrote:
-> Hi,
+On Fri, Dec 15, 2023 at 01:50:07AM +0000, Tian, Kevin wrote:
+
+> > - Reuse Nicolin's vRID->pRID mapping. If thevRID->pRID mapping is
+> > maintained, then intel iommu can report a vRID back to user. But intel
+> > iommu driver does not have viommu context, no place to hold the vRID-
+> > >pRID
+> > mapping. TBH. It may require other reasons to introduce it other than the
+> > error reporting need. Anyhow, this requires more thinking and also has
+> > dependency even if it is doable in intel side.
 > 
-> Sorry, a bit late to the discussion :)
+> this sounds like a cleaner way to inject knowledge which iommu driver
+> requires to find out the user tag. but yes it's a bit weird to introduce
+> viommu awareness in intel iommu driver when there is no such thing
+> in real hardware.
 > 
-> On Tue, Dec 12, 2023 at 02:11:56PM -0400, Jason Gunthorpe wrote:
-> > On Tue, Dec 12, 2023 at 05:46:34PM +0000, Catalin Marinas wrote:
-> > > should know the implications. There's also an expectation that the
-> > > actual driver (KVM guests) or maybe later DPDK can choose the safe
-> > > non-cacheable or write-combine (Linux terminology) attributes for the
-> > > BAR.
-> > 
-> > DPDK won't rely on this interface
+> and for this error reporting case what we actually require is the
+> reverse map i.e. pRID->vRID. Not sure whether we can leverage the
+> same RID mapping uAPI as for ARM/AMD but ignore viommu_id
+> and then store vRID under device_domain_info. a bit tricky on
+> life cycle management and also incompatible with SIOV...
 > 
-> Wait, so what's the expected interface for determining the memory
-> attributes at stage-1? I'm somewhat concerned that we're conflating two
-> things here:
+> let's see whether Jason has a better idea here.
 
-Someday we will have a VFIO ioctl interface to request individual
-pages within a BAR be mmap'd with pgprot_writecombine(). Only
-something like DPDK would call this ioctl, it would not be used by a
-VMM.
+I think v10 is OK
 
->  1) KVM needs to know the memory attributes to use at stage-2, which
->     isn't fundamentally different from what's needed for userspace
->     stage-1 mappings.
-> 
->  2) KVM additionally needs a hint that the device / VFIO can handle
->     mismatched aliases w/o the machine exploding. This goes beyond
->     supporting Normal-NC mappings at stage-2 and is really a bug
->     with our current scheme (nGnRnE at stage-1, nGnRE at stage-2).
+struct iommu_hwpt_invalidate {
+	__u32 size;
+	__u32 hwpt_id;
+	__aligned_u64 data_uptr;
+	__u32 data_type;
+	__u32 entry_len;
+	__u32 entry_num;
+	__u32 __reserved;
+};
 
-Not at all.
+Sends the invalidation to the HWPT which matches what Intel wanted
+where the entire HWPT and all its associated devices are
+invalidated. No seperate per-device invalidation.
 
-This whole issue comes from a fear that some HW will experience an
-uncontained failure if NORMAL_NC is used for access to MMIO memory.
-Marc pointed at some of the GIC registers as a possible concrete
-example of this (though nobody has come with a concrete example in the
-VFIO space).
+For error and event reporting they should be returned to userspace
+with the IOMMU dev_id indicating the originating PCI function.
 
-When KVM sets the S2 memory types it is primarily making a decision
-what memory types the VM is *NOT* permitted to use, which is
-fundamentally based on what kind of physical device is behind that
-memory and if the VMM is able to manage the cache.
+The VMM would have to convert dev_id into vRID according to the vIOMMU
+instance that the device is hooked up.
 
-Ie the purpose of the S2 memory types is to restrict allowed VM memory
-types to protect the integrity of the machine and hypervisor from the
-VM.
+In iommu land we should never have a "RID" but always some kind of
+device-specific "device ID" which is the index into the particular HW
+table, and that ID is naturally scoped to within the IOMMU instance
+that owns the table - so it is very much not a global ID that can be
+used alone in any of the uAPI.
 
-Thus we have what this series does. In most cases KVM will continue to
-do as it does today and restrict MMIO memory to Device_XX. We have a
-new kind of VMA flag that says this physical memory can be safe with
-Device_* and Normal_NC, which causes KVM to stop blocking VM use of
-those memory types.
-
-> I was hoping that (1) could be some 'common' plumbing for both userspace
-> and KVM mappings. And for (2), any case where a device is intolerant of
-> mismatches && KVM cannot force the memory attributes should be rejected.
-
-It has nothing to do with mismatches. Catalin explained this in his
-other email.
-
-> AFAICT, the only reason PCI devices can get the blanket treatment of
-> Normal-NC at stage-2 is because userspace has a Device-* mapping and can't
-> speculatively load from the alias. This feels a bit hacky, and maybe we
-> should prioritize an interface for mapping a device into a VM w/o a
-> valid userspace mapping.
-
-Userspace has a device-* mapping, yes, that is because userspace can't
-know anything better.
-
-> I very much understand that this has been going on for a while, and we
-> need to do *something* to get passthrough working well for devices that
-> like 'WC'. I just want to make sure we don't paint ourselves into a corner
-> that's hard to get out of in the future.
-
-Fundamentally KVM needs to understand the restrictions of the
-underlying physical MMIO, and this has to be a secure indication from
-the kernel component supplying the memory to KVM consuming it. Here we
-are using a VMA flag, but any other behind-the-scenes scheme would
-work in the future.
+The uAPI should use the iommufd device ID to refer to specific
+devices.
 
 Jason
 
