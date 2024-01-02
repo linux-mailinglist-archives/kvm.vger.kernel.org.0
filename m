@@ -1,106 +1,121 @@
-Return-Path: <kvm+bounces-5462-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5463-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6329E822282
-	for <lists+kvm@lfdr.de>; Tue,  2 Jan 2024 21:26:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 774F48222C8
+	for <lists+kvm@lfdr.de>; Tue,  2 Jan 2024 21:59:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 01087B2274C
-	for <lists+kvm@lfdr.de>; Tue,  2 Jan 2024 20:26:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 01E05B2180C
+	for <lists+kvm@lfdr.de>; Tue,  2 Jan 2024 20:59:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3504816417;
-	Tue,  2 Jan 2024 20:25:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67E1016431;
+	Tue,  2 Jan 2024 20:59:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="pWDfKG/b"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3l33vppm"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D432416402
-	for <kvm@vger.kernel.org>; Tue,  2 Jan 2024 20:25:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-55692ad81e3so1041652a12.1
-        for <kvm@vger.kernel.org>; Tue, 02 Jan 2024 12:25:52 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C474168B2
+	for <kvm@vger.kernel.org>; Tue,  2 Jan 2024 20:59:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5e74c97832aso131515357b3.2
+        for <kvm@vger.kernel.org>; Tue, 02 Jan 2024 12:59:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1704227151; x=1704831951; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=NExEDV8tMM90xF5QlyIZ/qRPsBLYQaG4/Qh4/SWZL/Q=;
-        b=pWDfKG/bl8WbtJT6VLUxbhvZmiayGUu8UfH5fJFpEFx53boJ71/9VFNFOOUVaxicdE
-         aM8+1tsF1ssJMOTSGpJM7lniIYpnzAp1iatB8dzt7wvNbEAEdY+RepSv4OKt0DNF6Q7G
-         7j6BmAKeDZ7ry4k5AfZeEYd+fm8TSNC4WpwjqRt2eWlP16EhZBRhZiKVUpiXPUCOwaxB
-         NwV8+TIdhIzA/MT0Th6f/iY0xfZWolV5dlNmcgYNmdFfv665FPPk1MlE7F3opeuT50E3
-         4q+tjxIJNLQ9MgywhKmo3zndXZ1W2MkXMvPf7KMpcPUGuFN40lyqX3taPrvFUx8gCtG8
-         YHpA==
+        d=google.com; s=20230601; t=1704229149; x=1704833949; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=6OrdrWvBDxOQfJ4vcbx726UKsh13Gg6rlqSW8b/m6AQ=;
+        b=3l33vppma/IgX8GqZ/OsBLNrTC+DQFRaN8jbjBtjZFbVKVfGtg+mZUxwgVjiSHhedx
+         JEwM1UbU8arnhvayONYV+yWeB5FSVbH0mN28LW7y7tH5blJ7WnhqRSfgqyZeqe3VI9WO
+         QngELDGoSrrvJGNJFYKmMam1ONjONDCWi6qe4Oh8ZZWjZVEEiy084wqA0zyyCeZxlccP
+         LqjxccfJY6/xw1mr0evvSYTmNiV/qoBJxbST7bWPtUholNL5UrLoIAfY+U0Zvomht6Vm
+         g+LsMJp0jeJy/c2K5G/nfAu4cDDJjaOL2PXpxx9C5IxvuCOlb3JPssl8GdrHo16RIz3/
+         xH4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704227151; x=1704831951;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NExEDV8tMM90xF5QlyIZ/qRPsBLYQaG4/Qh4/SWZL/Q=;
-        b=PES+s8QBM5ex0hWlbUqtHw4v1IVg4RovXbSIQdkR+yVgQ2b/z24m5tSIt+Pgl3vhIr
-         +kPTp5kRATW1TG8AXIjiwXWE3oMHkrA6Y5QfzdC8ekLr1dDg6Z4BcpIQw7RxBNqRSPuX
-         GjCPUV5ORq6ptp8jJhMq30dYcsA+5xwU2KbwwoEPoKGVfiT+BCT2ikX/hgOHEePcz/VM
-         6rsGy4bkxqshaZQQKgGd++NzxjINwQKzjIJGAKK8VVMa1JH+MlTsvcQk+2p/4I8KDoSl
-         N+0bq0lUQBiQgQEOs3vFHO7wxZfb/EpXInao1+iU1uj+t6FtTHBrVFigKzIEQ6uTKFCM
-         9EPA==
-X-Gm-Message-State: AOJu0YxX4hI4Crvhe1tfq+mFQqkEi61lvRtNwjJz0M+hZ6pycYseVp0l
-	5mRcng5/HUOpb05hBP2F+ScI3W3ylXfeCQ==
-X-Google-Smtp-Source: AGHT+IGoZoqDAXnZi0UM3QsliCD4sz5wHpUirjmUAYgkmubdexz5ZCsn37/7027mpZ7WypUu2miOjg==
-X-Received: by 2002:a17:906:1186:b0:a28:2ce:fa93 with SMTP id n6-20020a170906118600b00a2802cefa93mr1527288eja.15.1704227150959;
-        Tue, 02 Jan 2024 12:25:50 -0800 (PST)
-Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
-        by smtp.gmail.com with ESMTPSA id vl8-20020a17090730c800b00a27eddc3dcbsm2463253ejb.198.2024.01.02.12.25.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jan 2024 12:25:50 -0800 (PST)
-Date: Tue, 2 Jan 2024 21:25:49 +0100
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Anup Patel <anup@brainfault.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Palmer Dabbelt <palmer@rivosinc.com>, Atish Patra <atishp@atishpatra.org>, 
-	Atish Patra <atishp@rivosinc.com>, KVM General <kvm@vger.kernel.org>, 
-	"open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" <kvm-riscv@lists.infradead.org>, linux-riscv <linux-riscv@lists.infradead.org>
-Subject: Re: Re: [GIT PULL] KVM/riscv changes for 6.8 part #1
-Message-ID: <20240102-c07d32a585f11ee80bd7b70b@orel>
-References: <CAAhSdy1QsMuAmr+DFxjkf3a2Ur91AX9AnddRnBHGM6+exkAn1g@mail.gmail.com>
- <CABgObfZN4_xvOHr8aukZZGZj5teWZ7rt5RJU5Y0YFewQk19FRw@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1704229149; x=1704833949;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6OrdrWvBDxOQfJ4vcbx726UKsh13Gg6rlqSW8b/m6AQ=;
+        b=P7x+8xmvyrC2rW/fscwJOR8QRxMzIXlj6bc8KxURVNwXYWUxnHvf75uSVnVJqiVoW5
+         5Er5wOLabuy+8qQRJjeYXtWGm5mYwqdQ8pxr+6YyZGiUpr2uFSRacQEPQcNrv5IhzFmV
+         /mnC6AlcAwwfObokOVrsRpFm6RSiuWY0ImkiHaDzyZicJFjX00Mf8zFfCNYMy2+Bnnz5
+         pMqy5L5HuarI126T3iOn8e2S8jUGnN1nZb4zNO5oz3KkJ0nqNPM/X6H/+mzUS0K/85fR
+         XVOOFDAye32OVlzsEy7pzDWrljJVCAVkMzjPkSril+A3yGABGAtgfU8levKwMFJxpSpQ
+         rxyA==
+X-Gm-Message-State: AOJu0YzKP/GW2u2qbaRSefhNnrtMMculJYch3ic+E+ChIzsVjTXSn+Ts
+	fPXnQ3/eXMQdVsW2IGrDa/BW3U8L9Zsh1jS9bd8WZA6p4UOPoPhTdLwV+PiLrRPj/QC5eo0acbw
+	dGucSyOHa5O5IvqXGEXumltkgKewc7VTcV7Njuuo7yiQegC1KrhCC4D91YT9JPuf2WhT0ioiD5S
+	VbNg==
+X-Google-Smtp-Source: AGHT+IEYBVWVkGFDvnDDwSh8ZR1uFwBIdUhOiKNQJdQm7yNcrBncdU6lu+BqxXTaSudF2V5VYA6E0+s7Hmgg6J64Ng==
+X-Received: from almasrymina.svl.corp.google.com ([2620:15c:2c4:200:9a04:c262:c978:d762])
+ (user=almasrymina job=sendgmr) by 2002:a25:b9c1:0:b0:dbd:b7cb:8a6b with SMTP
+ id y1-20020a25b9c1000000b00dbdb7cb8a6bmr513742ybj.1.1704229148829; Tue, 02
+ Jan 2024 12:59:08 -0800 (PST)
+Date: Tue,  2 Jan 2024 12:59:04 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABgObfZN4_xvOHr8aukZZGZj5teWZ7rt5RJU5Y0YFewQk19FRw@mail.gmail.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
+Message-ID: <20240102205905.793738-1-almasrymina@google.com>
+Subject: [PATCH net-next v3] vsock/virtio: use skb_frag_*() helpers
+From: Mina Almasry <almasrymina@google.com>
+To: kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Mina Almasry <almasrymina@google.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
+	Stefano Garzarella <sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Jan 02, 2024 at 07:24:26PM +0100, Paolo Bonzini wrote:
-> On Sun, Dec 31, 2023 at 6:33 AM Anup Patel <anup@brainfault.org> wrote:
-> >
-> > Hi Paolo,
-> >
-> > We have the following KVM RISC-V changes for 6.8:
-> > 1) KVM_GET_REG_LIST improvement for vector registers
-> > 2) Generate ISA extension reg_list using macros in get-reg-list selftest
-> > 3) Steal time account support along with selftest
-> 
-> Just one small thing I noticed on (3), do you really need cpu_to_le64
-> and le64_to_cpu on RISC-V? It seems that it was copied from aarch64.
-> No need to resend the PR anyway, of course.
+Minor fix for virtio: code wanting to access the fields inside an skb
+frag should use the skb_frag_*() helpers, instead of accessing the
+fields directly. This allows for extensions where the underlying
+memory is not a page.
 
-While Linux/KVM is only LE, the arch doesn't prohibit S-mode being
-configured to use BE memory accesses, so I kept the conversions. They
-at least provide some self-documenting of the code. The biggest
-problem with them, though, is that I didn't use __le64 types and now
-sparse is yelling at me. I patched that this morning, but didn't get
-a chance to post yet. I could instead rip out the conversions to
-quiet sparse, if that would be preferred.
+Acked-by: Stefano Garzarella <sgarzare@redhat.com>
+Signed-off-by: Mina Almasry <almasrymina@google.com>
 
-Thanks,
-drew
+---
+
+v3:
+- Applied Stefano's Acked-by.
+- Forked this patch from 'Abstract page from net stack'.
+
+v2:
+
+- Also fix skb_frag_off() + skb_frag_size() (David)
+- Did not apply the reviewed-by from Stefano since the patch changed
+relatively much.
+
+---
+ net/vmw_vsock/virtio_transport.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+index f495b9e5186b..1748268e0694 100644
+--- a/net/vmw_vsock/virtio_transport.c
++++ b/net/vmw_vsock/virtio_transport.c
+@@ -153,10 +153,10 @@ virtio_transport_send_pkt_work(struct work_struct *work)
+ 				 * 'virt_to_phys()' later to fill the buffer descriptor.
+ 				 * We don't touch memory at "virtual" address of this page.
+ 				 */
+-				va = page_to_virt(skb_frag->bv_page);
++				va = page_to_virt(skb_frag_page(skb_frag));
+ 				sg_init_one(sgs[out_sg],
+-					    va + skb_frag->bv_offset,
+-					    skb_frag->bv_len);
++					    va + skb_frag_off(skb_frag),
++					    skb_frag_size(skb_frag));
+ 				out_sg++;
+ 			}
+ 		}
+-- 
+2.43.0.472.g3155946c3a-goog
+
 
