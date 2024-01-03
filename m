@@ -1,112 +1,159 @@
-Return-Path: <kvm+bounces-5489-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5490-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1AAF82275A
-	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 04:06:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 908B6822762
+	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 04:09:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80777284153
-	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 03:06:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A5612284C22
+	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 03:09:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5846D63B7;
-	Wed,  3 Jan 2024 03:06:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C60B1799B;
+	Wed,  3 Jan 2024 03:09:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="J5qYQCGY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RMF0QZJx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC6D317984;
-	Wed,  3 Jan 2024 03:06:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DCCD17980;
+	Wed,  3 Jan 2024 03:09:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1704251189; x=1735787189;
-  h=message-id:date:mime-version:cc:subject:to:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=54mZ8lt3FIE0at3u9CpLbmAD6Xka6IeZtdwSydhjovE=;
-  b=J5qYQCGYYES4vGA0R3GOld6RKKdl+JukQRDUX8uAEnuiNkxxCbItz9k1
-   agEdGzZRkqAKQNkNFm9Fih8lidhufh4q7qyM3BDEyZsdaGkg9Yw+0vvOD
-   XDAwMEGq7bXBMRUiwtSzoRLrjCBXjrr/avvnl93UDAyA6KTu+OFoQYz1u
-   9ijANgwqRdiY/mW+OXgC8Bsp2YE/sSfrGgExWZ3Fi3xtvR/d5zmbSf5bu
-   XpitDnLUc6a4FtAA/PDB3ZZ/w8fpBMp6Q/28lHnrveNZIw5hxSF8K3xi7
-   0m6FTeCkpXZnTKDCNkGHi62/QlvFEWDrYP/HYVRoSLYkvSH5AmY6M+sya
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10941"; a="10578496"
+  t=1704251372; x=1735787372;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=iu8p/P3QhQcocBbNzGCVARnxcO1Moj9wB0O7V477T4A=;
+  b=RMF0QZJxefP8LNeWLB3Xi5Oz0ai7yoM/4QBVkFoP27VZMWxDX12IUDMF
+   6I4gzB4+RBD0guO5n/HlO/fU/WDihD5dWv798n4wp/YMHiKPxKMwo9wyX
+   B+Mso8Jy+DboDM2qthdWJTzgyT5c98uK9WQBKl3gH94TisEAK5uOZ0HzS
+   svKsDPH3gsNKZ7tqpuF16y4/sR2jwJYTsUMobWpwZHwFvsc6zzfrlpfSE
+   qQUNSmdihFX6J6An2PQwwYzt+7f9J8r4XwDqlYeaiy7lQ8W67+QUKwsag
+   HgvlTcKBX2PvQRzZ+Kezcf7puyWeaC+QVo8PMFaDwnexmx1X5OoB8wCbO
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10941"; a="10343114"
 X-IronPort-AV: E=Sophos;i="6.04,326,1695711600"; 
-   d="scan'208";a="10578496"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jan 2024 19:06:28 -0800
+   d="scan'208";a="10343114"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jan 2024 19:09:31 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10941"; a="923403014"
+X-IronPort-AV: E=McAfee;i="6600,9927,10941"; a="729665904"
 X-IronPort-AV: E=Sophos;i="6.04,326,1695711600"; 
-   d="scan'208";a="923403014"
-Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.254.210.107]) ([10.254.210.107])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jan 2024 19:06:22 -0800
-Message-ID: <7486492a-d6ca-425d-9fbe-87107dbbecea@linux.intel.com>
-Date: Wed, 3 Jan 2024 11:06:19 +0800
+   d="scan'208";a="729665904"
+Received: from dmi-pnp-i7.sh.intel.com ([10.239.159.155])
+  by orsmga003.jf.intel.com with ESMTP; 02 Jan 2024 19:09:26 -0800
+From: Dapeng Mi <dapeng1.mi@linux.intel.com>
+To: Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jim Mattson <jmattson@google.com>
+Cc: kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Zhenyu Wang <zhenyuw@linux.intel.com>,
+	Zhang Xiong <xiong.y.zhang@intel.com>,
+	Mingwei Zhang <mizhang@google.com>,
+	Like Xu <like.xu.linux@gmail.com>,
+	Jinrong Liang <cloudliang@tencent.com>,
+	Dapeng Mi <dapeng1.mi@intel.com>,
+	Dapeng Mi <dapeng1.mi@linux.intel.com>
+Subject: [kvm-unit-tests Patch v3 00/11] pmu test bugs fix and improvements
+Date: Wed,  3 Jan 2024 11:13:58 +0800
+Message-Id: <20240103031409.2504051-1-dapeng1.mi@linux.intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: baolu.lu@linux.intel.com, joro@8bytes.org, alex.williamson@redhat.com,
- kevin.tian@intel.com, robin.murphy@arm.com, cohuck@redhat.com,
- eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
- mjrosato@linux.ibm.com, chao.p.peng@linux.intel.com,
- yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com,
- shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
- suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- zhenzhong.duan@intel.com, joao.m.martins@oracle.com, xin.zeng@intel.com,
- yan.y.zhao@intel.com, j.granados@samsung.com
-Subject: Re: [PATCH v10 10/10] iommu/vt-d: Add iotlb flush for nested domain
-To: Yi Liu <yi.l.liu@intel.com>, Jason Gunthorpe <jgg@nvidia.com>
-References: <20240102143834.146165-1-yi.l.liu@intel.com>
- <20240102143834.146165-11-yi.l.liu@intel.com>
- <20240102184422.GI50406@nvidia.com>
- <ae271e08-f390-4ce7-914c-63668a46bc4b@intel.com>
-Content-Language: en-US
-From: Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <ae271e08-f390-4ce7-914c-63668a46bc4b@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 2024/1/3 9:33, Yi Liu wrote:
-> On 2024/1/3 02:44, Jason Gunthorpe wrote:
->> On Tue, Jan 02, 2024 at 06:38:34AM -0800, Yi Liu wrote:
->>
->>> +static void intel_nested_flush_cache(struct dmar_domain *domain, u64 
->>> addr,
->>> +                     unsigned long npages, bool ih, u32 *error)
->>> +{
->>> +    struct iommu_domain_info *info;
->>> +    unsigned long i;
->>> +    unsigned mask;
->>> +    u32 fault;
->>> +
->>> +    xa_for_each(&domain->iommu_array, i, info)
->>> +        qi_flush_piotlb(info->iommu,
->>> +                domain_id_iommu(domain, info->iommu),
->>> +                IOMMU_NO_PASID, addr, npages, ih, NULL);
->>
->> This locking on the xarray is messed up throughout the driver. There
->> could be a concurrent detach at this point which will free info and
->> UAF this.
-> 
-> hmmm, xa_for_each() takes and releases rcu lock, and according to the
-> domain_detach_iommu(), info is freed after xa_erase(). For an existing
-> info stored in xarray, xa_erase() should return after rcu lock is released.
-> is it? Any idea? @Baolu
+When running pmu test on Sapphire Rapids, we found sometimes pmu test
+reports the following failures.
 
-I once thought locking for xarray is self-contained. I need more thought
-on this before taking further action.
+1. FAIL: Intel: all counters
+2. FAIL: Intel: core cycles-0
+3. FAIL: Intel: llc misses-4
 
-Best regards,
-baolu
+Further investigation shows these failures are all false alarms rather
+than real vPMU issues.
+
+The failure 1 is caused by a bug in check_counters_many() which defines
+a cnt[] array with length 10. On Sapphire Rapids KVM supports 8 GP
+counters and 3 fixed counters, obviously the total counter number (11)
+of Sapphire Rapids exceed current cnt[] length 10, it would cause a out
+of memory access and lead to the "all counters" false alarm. Patch
+02~03 would fix this issue.
+
+The failure 2 is caused by pipeline and cache warm-up latency.
+Currently "core cycles" is the first executed event. When the measured
+loop() program is executed at the first time, cache hierarchy and pipeline
+are needed to warm up. All these warm-up work consumes so much cycles
+that it exceeds the predefined upper boundary and cause the failure.
+Patch 04 fixes this issue.
+
+The failure 3 is caused by 0 llc misses count. It's possible and
+reasonable that there is no llc misses happened for such simple loop()
+asm blob especially along with larger and larger LLC size on new
+processors. Patch 09 would fix this issue by introducing clflush
+instruction to force LLC miss.
+
+Besides above bug fixes, this patch series also includes several
+optimizations.
+
+One important optimization (patch 07~08) is to move
+GLOBAL_CTRL enabling/disabling into the loop asm blob, so the precise
+count for instructions and branches events can be measured and the
+verification can be done against the precise count instead of the rough
+count range. This improves the verification accuracy.
+
+Another important optimization (patch 10~11) is to leverage IBPB command
+to force to trigger a branch miss, so the lower boundary of branch miss
+event can be set to 1 instead of the ambiguous 0. This eliminates the
+ambiguity brought from 0.
+
+All these changes are tested on Intel Sapphire Rapids server platform
+and the pmu test passes. Since I have no AMD platforms on my hand, these
+changes are not verified on AMD platforms yet. If someone can help to
+verify these changes on AMD platforms, it's welcome and appreciated.
+
+Changes:
+  v2 -> v3:
+        fix "core cycles" failure,
+        introduce precise verification for instructions/branches,
+        leverage IBPB command to optimize branch misses verification,
+        drop v2 introduced slots event verification
+  v1 -> v2:
+        introduce clflush to optimize llc misses verification
+        introduce rdrand to optimize branch misses verification
+
+History:
+  v2: https://lore.kernel.org/lkml/20231031092921.2885109-1-dapeng1.mi@linux.intel.com/
+  v1: https://lore.kernel.org/lkml/20231024075748.1675382-1-dapeng1.mi@linux.intel.com/
+
+Dapeng Mi (10):
+  x86: pmu: Enlarge cnt[] length to 64 in check_counters_many()
+  x86: pmu: Add asserts to warn inconsistent fixed events and counters
+  x86: pmu: Switch instructions and core cycles events sequence
+  x86: pmu: Refine fixed_events[] names
+  x86: pmu: Remove blank line and redundant space
+  x86: pmu: Enable and disable PMCs in loop() asm blob
+  x86: pmu: Improve instruction and branches events verification
+  x86: pmu: Improve LLC misses event verification
+  x86: pmu: Add IBPB indirect jump asm blob
+  x86: pmu: Improve branch misses event verification
+
+Xiong Zhang (1):
+  x86: pmu: Remove duplicate code in pmu_init()
+
+ lib/x86/pmu.c |   5 --
+ x86/pmu.c     | 201 ++++++++++++++++++++++++++++++++++++++++++--------
+ 2 files changed, 171 insertions(+), 35 deletions(-)
+
+-- 
+2.34.1
+
 
