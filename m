@@ -1,192 +1,229 @@
-Return-Path: <kvm+bounces-5587-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5588-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 132048233DC
-	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 18:52:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 143CD82340D
+	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 19:00:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4FF07286621
-	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 17:52:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 68CAEB235A6
+	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 18:00:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAC191C687;
-	Wed,  3 Jan 2024 17:52:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AF5F1C683;
+	Wed,  3 Jan 2024 18:00:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="uZliAbw1"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y0/+ZMDa"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2054.outbound.protection.outlook.com [40.107.244.54])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BD581C295;
-	Wed,  3 Jan 2024 17:52:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=X5KKa6J0ctcjtPVxjQj/xDUb32zN7o7dUJScZDZ3lP3Ffx0JHYZEXCjy2B+2nqQiSixHZIlPponY5oV6HPtGTt6izG1g6AL2SLr7sqVGsTdz25SOmn4ePmlSuXDxnYSaVpIDCP0vDP+Nhsi1yN24EbpbkDwUodX4H6Ga61fgd7tH/Dt49XKU8ugkyh/6cfsWYcktsunTWR5JVCjddK74icYv8k+p9Wku5KhguDlkQeEJYR91jritMs7pp2BxXAGT/+MFlzISCKpkS0Y1tWlUsQ1PQYc0sIoxHtSwfsObia/16k8te6iQJ/RMrlhCEqqjDfp808xe69Z7PYhEDYJhBg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=suPc+tBWeaNugrLcXXo1ZjAD+XZi7zwZ1E2Uyi3Wo3M=;
- b=C1JB3SzJTfLfS9cWe8SGX334hKVR6mDEq/HR2AmOsEkb0+gRN7hwIp/wzH5121g6oXPOUglLlefEh8FODPl6q1+GU/vNW3keOjgV7korRPv5mV3ViEOBTTGyBxIRFqMICf6PtMbJE+4Q+THtIlrsBl8yILlJilZEQoPS7EFsA45eSF3BR0dzIrWZdtcelX8FSAPChQuTXSM3Qhpf6t3lZgF8Fe72rhaOLm3VdRn8gwv8U0Sg/w4q8Fn0t7MZbAb1COnq0G2HUwyWYemBLTDSu9RG6icztuOk6EinAnCedNnJerZhLsOU+kYOxAIJW0+Pcd9rwdX0LZFjfMaiANlNIg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=suPc+tBWeaNugrLcXXo1ZjAD+XZi7zwZ1E2Uyi3Wo3M=;
- b=uZliAbw1szg8WDSrZIG2oTfW4ALuGDYcni1R5kboufIyFXFRE4jfEtLPauBoriqlfNFTFlVGbevCTthiZllek/FSAp+P0GSLFjFEguHdBiF3tt+kyNsknh/etDz09mUe0vUeNahWGCYjOY++8vOQ6BwVm8o82HSRlrCxRi97gmbTOQqc/lx9lBo08CDaRHEeV6lm6KFpwPaL00y4hg2nlPtZJAc4FiXqzfAXlRTqKJngtp4cCdkBAQEyoOMxf8uvYOzl/x32LslsI7oyyHXOhNDl5MCubLqAQ+n1ykBhcpf01e8t1NhFvMiT4pG8B8sXAKnJk1pz2sx/KV83Noohyw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by LV3PR12MB9355.namprd12.prod.outlook.com (2603:10b6:408:216::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.25; Wed, 3 Jan
- 2024 17:52:02 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93%4]) with mapi id 15.20.7135.023; Wed, 3 Jan 2024
- 17:52:02 +0000
-Date: Wed, 3 Jan 2024 13:52:02 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Nicolin Chen <nicolinc@nvidia.com>
-Cc: Yi Liu <yi.l.liu@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>,
-	"joro@8bytes.org" <joro@8bytes.org>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"robin.murphy@arm.com" <robin.murphy@arm.com>,
-	"baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-	"cohuck@redhat.com" <cohuck@redhat.com>,
-	"eric.auger@redhat.com" <eric.auger@redhat.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-	"chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-	"yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-	"peterx@redhat.com" <peterx@redhat.com>,
-	"jasowang@redhat.com" <jasowang@redhat.com>,
-	"shameerali.kolothum.thodi@huawei.com" <shameerali.kolothum.thodi@huawei.com>,
-	"lulu@redhat.com" <lulu@redhat.com>,
-	"suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	"Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
-	"joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
-	"Zeng, Xin" <xin.zeng@intel.com>,
-	"Zhao, Yan Y" <yan.y.zhao@intel.com>
-Subject: Re: [PATCH v7 1/3] iommufd: Add data structure for Intel VT-d
- stage-1 cache invalidation
-Message-ID: <20240103175202.GT50406@nvidia.com>
-References: <ZXu5whlIGfiq16wF@Asurada-Nvidia>
- <BN9PR11MB52766D7F774510E0181CC89B8C93A@BN9PR11MB5276.namprd11.prod.outlook.com>
- <ZXvI2IiXwwuHRE8V@Asurada-Nvidia>
- <7c398efc-8a2f-479d-bcff-ded8cc1ef3d0@intel.com>
- <20240102233849.GK50406@nvidia.com>
- <c59a780d-4030-4815-a34b-fb2e2f902ab3@intel.com>
- <20240103160108.GP50406@nvidia.com>
- <ZZWP7iBqUtbTRb3s@Asurada-Nvidia>
- <20240103165848.GR50406@nvidia.com>
- <ZZWUD+lCw3mRc/15@Asurada-Nvidia>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZZWUD+lCw3mRc/15@Asurada-Nvidia>
-X-ClientProxiedBy: MN2PR18CA0021.namprd18.prod.outlook.com
- (2603:10b6:208:23c::26) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D53821C28A
+	for <kvm@vger.kernel.org>; Wed,  3 Jan 2024 18:00:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1704304821;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=q48P5QWzofCocco3NZ1i12qdR2cjUhLN4nZ2fO8zD3Y=;
+	b=Y0/+ZMDa83jCTFmx1TFn3J3D/rZtn90CmI2cGGM+e0yer4wYlZ5kSex4hGFwlmcxyx7Lx/
+	2pNB3300kuTocnl2X8HadBdKMWCWzQf5MAeibmfGtj429fBBZtiJPC89EZwX3I4B/cK0wc
+	jyIttyY3Vu4tSjqDxkmkVv969KkYluw=
+Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
+ [209.85.210.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-595-FchHfVrdNjmjibt3BUOiMw-1; Wed, 03 Jan 2024 13:00:20 -0500
+X-MC-Unique: FchHfVrdNjmjibt3BUOiMw-1
+Received: by mail-ot1-f70.google.com with SMTP id 46e09a7af769-6dc0380f07eso6981067a34.0
+        for <kvm@vger.kernel.org>; Wed, 03 Jan 2024 10:00:20 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704304820; x=1704909620;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=q48P5QWzofCocco3NZ1i12qdR2cjUhLN4nZ2fO8zD3Y=;
+        b=qJUgog9Ynj3GeE6+Gn5M7QWYyeNJ77szv6/nYDQH633412eG60FmGSRvaSOSxsnrCl
+         iGTDR27+SZvWjoBO08c4F1vjJH9+OXVaz3n9ojCVTvH811zK60nd7DghExJKzd/dAm/1
+         MSIUVaYLgGH3wIOCmuxgakpz9ZXpbQ7nV7V8l5J1MTvz+CRpUaZh/zJidYd3kPtIM10L
+         7vgd+2ZbGxHXOryhNgpbz4sCB5/FFiPSXn50akXdU2NyuaKsXd2KnS8WwFZ+FTc63+i1
+         YZTt/TzNqF2LL95vdkreHdK/kxcLCPB2/GhGEHKpKnpyhndwNQVnL1TRECqBoYoCfCtb
+         sg+A==
+X-Gm-Message-State: AOJu0YzU7Pp1A9N3XVjVNEwJ/9k1KiBJZB5LbJu7kpHWs5vWRkSBNz4s
+	A01PtEwvixhc6cA9pmAaaSOWnQGy6AKKc7DIf5fi/EjDAEF1p1xrsMZf4jtkOOT2bZzQ1BplcpR
+	8iG5fG8yNZbczIn508Urk
+X-Received: by 2002:a05:6830:349e:b0:6dc:3c65:2a7f with SMTP id c30-20020a056830349e00b006dc3c652a7fmr6003213otu.63.1704304819631;
+        Wed, 03 Jan 2024 10:00:19 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEEnrcYn02XEmEIDEKFS5J+2ENvYFdJ67qmKLK8qDffDVVpRpUZ5pkWF9XzX4EQRd6bhSNjaQ==
+X-Received: by 2002:a05:6830:349e:b0:6dc:3c65:2a7f with SMTP id c30-20020a056830349e00b006dc3c652a7fmr6003182otu.63.1704304819321;
+        Wed, 03 Jan 2024 10:00:19 -0800 (PST)
+Received: from redhat.com ([38.15.60.12])
+        by smtp.gmail.com with ESMTPSA id w5-20020a9d6385000000b006dc0363d57csm2371548otk.6.2024.01.03.10.00.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Jan 2024 10:00:18 -0800 (PST)
+Date: Wed, 3 Jan 2024 11:00:16 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Ankit Agrawal <ankita@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>,
+ "shameerali.kolothum.thodi@huawei.com"
+ <shameerali.kolothum.thodi@huawei.com>, "kevin.tian@intel.com"
+ <kevin.tian@intel.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ "brett.creeley@amd.com" <brett.creeley@amd.com>, "horms@kernel.org"
+ <horms@kernel.org>, Aniket Agashe <aniketa@nvidia.com>, Neo Jia
+ <cjia@nvidia.com>, Kirti Wankhede <kwankhede@nvidia.com>, "Tarun Gupta
+ (SW-GPU)" <targupta@nvidia.com>, Vikram Sethi <vsethi@nvidia.com>, Andy
+ Currid <acurrid@nvidia.com>, Alistair Popple <apopple@nvidia.com>, John
+ Hubbard <jhubbard@nvidia.com>, Dan Williams <danw@nvidia.com>, "Anuj
+ Aggarwal (SW-GPU)" <anuaggarwal@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v15 1/1] vfio/nvgrace-gpu: Add vfio pci variant module
+ for grace hopper
+Message-ID: <20240103110016.5067b42e.alex.williamson@redhat.com>
+In-Reply-To: <20240103165727.GQ50406@nvidia.com>
+References: <20231217191031.19476-1-ankita@nvidia.com>
+	<20231218151717.169f80aa.alex.williamson@redhat.com>
+	<BY5PR12MB3763179CAC0406420AB0C9BAB095A@BY5PR12MB3763.namprd12.prod.outlook.com>
+	<20240102091001.5fcc8736.alex.williamson@redhat.com>
+	<20240103165727.GQ50406@nvidia.com>
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|LV3PR12MB9355:EE_
-X-MS-Office365-Filtering-Correlation-Id: ececa460-de5d-4585-38db-08dc0c84b111
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	+3c2LA8o8wbTkXBW8S7ody/4kdrn1d9JZk5PakzPBv8l6koWxCCDN0rEuylcbD9+FrGJ7QTc3ZWQTt6oPqboSVRDsiWV//h/wHT31N4pEeHtf5BH/sqntduXLMLewp/7MlDopK/PbEV2KJ/uJyNvo1j2O0gEH5lPRagKoJYNP96Hrgv5Im6sP6bn3Q/xrndopyTDuuVZiPhxMaeyx2vuDdrsFyv7ChKk+NhsRm7w9dYFwhdAIIa2guRZU4Muvz8AR4ULFuVaLckEuiNhwE5LvCVn23QNBzc9sQiBLcZlcse53hCZLLFc0jUT8+bWoU6PrCyusmpJWG54qkpgqze1Es7wQRiBHYZULicxjHrTDC3cdBCgcwA9Te3ZhRx8O1Q2Rm95w7qUfu2QDDZO/VIppUZDUF4VvGCAFm0rCe/JG7GEJuDCcjC+BftdpdKo12ooqY2W2eDOSKzvIgqBns96JMlBT/6mEKaPHskVbfEq2ssPIaL9Ur+UV8qmoy/LmIwkRCGC8FXPRx5qI9loLIBEqXBV++iKW0hDIUUVka6BHc94dZ84GzftxiJDNFZomNlS
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(366004)(346002)(39860400002)(136003)(230922051799003)(64100799003)(186009)(451199024)(1800799012)(4326008)(66476007)(66946007)(66556008)(6862004)(6486002)(8676002)(54906003)(6636002)(478600001)(316002)(8936002)(37006003)(83380400001)(6506007)(6512007)(1076003)(26005)(2616005)(7416002)(5660300002)(2906002)(41300700001)(33656002)(36756003)(38100700002)(86362001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?OZPLm9c/cLv964gmLrzEONBk2+JhCey2sBCNGeqxny7IE3PovwEUgOQwCJMk?=
- =?us-ascii?Q?zTnCVxCtuj3aIlTcMoxMTD6LruweyQJAQoxn37B8FuCWgmj+A6DdPHn18Ug5?=
- =?us-ascii?Q?QUaPbWEN5d2UmR4lgGW+ZJAimWdLqkA9Ikw1H+TdbePR3lkkuj6/5UKkBPP6?=
- =?us-ascii?Q?qaV3wT3XcMmNi2iWzOyRB6Rq0vKd0S4aUEha7CwoH1iCrNrfWj1dpNCMMdwU?=
- =?us-ascii?Q?osZgl+2a1vaxNq6cUJsvySmZWw9jzwUBsaNd4H0xoIDFUhKpGb6p7mHDqogl?=
- =?us-ascii?Q?bd6AlOL8yqoVMwD/iqJTbuXw1IUbMFzpfUU1zH48N7Xbyd6RbW80Qs1zwjXb?=
- =?us-ascii?Q?yVE5YMzACS2Ax7HhnWWtSdP3vyv6k7oXvynOMGTYvnqzAylOVkKub66tAwGl?=
- =?us-ascii?Q?2PFgJXtZkpAhGp0ckH43lEdYUegRwNp5yEFdX8TzqQJJWUF1zLavFaGZuyAF?=
- =?us-ascii?Q?lBmQeFygD9UY5G6B/6eVgrj244st4C3lj0flg4SLjSHgCaV9EYCNuQzVsDNV?=
- =?us-ascii?Q?W5JBiYLSsUKh/jQo0RtEQMFiOZwUGhiiVUUQu4pUYT08xwCngoiukVignUDr?=
- =?us-ascii?Q?2ksAGVUhamjWDkewdO2nuO3vOUIrNNd+3AMHAqPMEPIb7F8L/YBwUUw4wIj0?=
- =?us-ascii?Q?kf+iNbN9xHNZRef1MPjhvFl4nLyVl7yovwHPdUoR3s0epRg5YT+f5GtA84fW?=
- =?us-ascii?Q?kJ1igOwMmyNxO7j0pMZ/Le6uI1VoX1m389E8InlsjBj5vi5PlNqXseopXWYb?=
- =?us-ascii?Q?I43P+LkKrPcK+UxF1K1vE+AJ16ijbvCjMKrwgjCuXkL7ILdmgwIt7LTnfLfT?=
- =?us-ascii?Q?EYKAtf/vCMbsLR79oVe5iveXNR2Rlh6IPta4m+izFMy4k/pD/4ykI5SvwhQU?=
- =?us-ascii?Q?CgRUnHojcIgYzBV04hv6E4OtbmBh6epkA/3IT2PzBtX+Wr5FEjTGaafun5VR?=
- =?us-ascii?Q?QunUw2cUcrpdX/cZxkp/hcPhFdIQZQDiE5bjOCVOwZ4fXRLOfaFtAHPKVGwb?=
- =?us-ascii?Q?Pe9aKnpD60vs/02MG+04WAEdrKmVAcwzI8FKnWQq6oNETla4uCmR7Ia71mYH?=
- =?us-ascii?Q?Rf/Dtp8e9X5V2TjJ8ht5zrCfzTSLyMDxiKCeh7TsyzTCb/ePwGhQyp/S+SuA?=
- =?us-ascii?Q?oINth03uSSlp3DOdBwqRCoh38aTVE/3zNiBUk7bV7bnvPyRQlvlaRjegq6o/?=
- =?us-ascii?Q?AWtiM3194jl2jt4Gxoruzx7lRh0bJjSzE0Ev3YRIb/RoXI/zf7Djm/lI9mux?=
- =?us-ascii?Q?+5VWG1Rlba+KLcB0AmhlIgzr7Qo/lSxRUryWQwLIoi0pN193v0zQ8EOrAI8h?=
- =?us-ascii?Q?hUrico2uj7T59jkn9yyOPUTMDZwVjL9Nl1u1No597r2/ZcPIWcyX/KHr6Bvi?=
- =?us-ascii?Q?dfVp9OBmBofevxPzEtelarMXxUQoNvxAPyNavUIHptzEZSr9UGeIZCZtebxG?=
- =?us-ascii?Q?7vQKhcO6fgeY2r2sUbQUhAE43Tq1+wiXn3ym/TcaDYHXWvZvbGEdoCcF15T4?=
- =?us-ascii?Q?8hvUE7PAS/Bc5Srqu8ht7u8gt1YM6VCOFSAeDhVTgin7E1vjFYuSQGnj/ywz?=
- =?us-ascii?Q?NuUslN+Pz2iBtQNPi3Rc6XQy+3Z2mmoUmeuuJ1rl?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ececa460-de5d-4585-38db-08dc0c84b111
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jan 2024 17:52:02.7874
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jFoPtjlpt7n9Pc2gefnnXgoUHHIWZBMlp7aHpVXJMKoAg4YVzZoYzItdbXU0hmBH
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR12MB9355
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jan 03, 2024 at 09:06:23AM -0800, Nicolin Chen wrote:
-> On Wed, Jan 03, 2024 at 12:58:48PM -0400, Jason Gunthorpe wrote:
-> > On Wed, Jan 03, 2024 at 08:48:46AM -0800, Nicolin Chen wrote:
-> > > > You can pass the ctx to the invalidate op, it is already implied
-> > > > because the passed iommu_domain is linked to a single iommufd ctx.
-> > > 
-> > > The device virtual id lookup API needs something similar, yet it
-> > > likely needs a viommu pointer (or its id) instead? As the table
-> > > is attached to a viommu while an ictx can have multiple viommus,
-> > > right?
-> > 
-> > Yes, when we get to an API for that it will have to be some op
-> > 'invalidate_viommu(..)' and it can get the necessary pointers.
+On Wed, 3 Jan 2024 12:57:27 -0400
+Jason Gunthorpe <jgg@nvidia.com> wrote:
+
+> On Tue, Jan 02, 2024 at 09:10:01AM -0700, Alex Williamson wrote:
 > 
-> OK! I will try that first.
+> > Yes, it's possible to add support that these ranges honor the memory
+> > enable bit, but it's not trivial and unfortunately even vfio-pci isn't
+> > a great example of this.  
 > 
-> > The viommu object will have to be some driver object like the
-> > iommu_domain.
+> We talked about this already, the HW architects here confirm there is
+> no issue with reset and memory enable. You will get all 1's on read
+> and NOP on write. It doesn't need to implement VMA zap.
+
+We talked about reset, I don't recall that we discussed that coherent
+and uncached memory ranges masquerading as PCI BARs here honor the
+memory enable bit in the command register.
+
+> > around device reset or relative to the PCI command register.  The
+> > variant driver becomes a trivial implementation that masks BARs 2 & 4
+> > and exposes the ACPI range as a device specific region with only mmap
+> > support.  QEMU can then map the device specific region into VM memory
+> > and create an equivalent ACPI table for the guest.  
 > 
-> I drafted something like this, linking it to struct iommu_device:
+> Well, no, probably not. There is an NVIDIA specification for how the
+> vPCI function should be setup within the VM and it uses the BAR
+> method, not the ACPI.
+
+Is this specification available?  It's a shame we've gotten this far
+without a reference to it.
+
+> There are a lot of VMMs and OSs this needs to support so it must all
+> be consistent. For better or worse the decision was taken for the vPCI
+> spec to use BAR not ACPI, in part due to feedback from the broader VMM
+> ecosystem, and informed by future product plans.
 > 
-> +struct iommufd_viommu {
-> +       struct iommufd_object obj;
-> +       struct iommufd_ctx *ictx;
-> +       struct iommu_device *iommu_dev;
-> +       struct iommufd_hwpt_paging *hwpt;
-> +       /* array of struct iommufd_device, indexed by device virtual id */
-> +       struct xarray device_ids;
-> +};
+> So, if vfio does special regions then qemu and everyone else has to
+> fix it to meet the spec.
 
-The driver would have to create it and there would be some driver
-specific enclosing struct to go with it
+Great, this is the sort of justification and transparency that had not
+been previously provided.  It is curious that only within the past
+couple months the device ABI changed by adding the uncached BAR, so
+this hasn't felt like a firm design.  Also I believe it's been stated
+that the driver supports both the bare metal representation of the
+device and this model where the coherent memory is mapped as a BAR, so
+I'm not sure what obstacles remain or how we're positioned for future
+products if take the bare metal approach.
 
-Perhaps device_ids goes in the driver specific struct, I don't know.
+> > I know Jason had described this device as effectively pre-CXL to
+> > justify the coherent memory mapping, but it seems like there's still a
+> > gap here that we can't simply hand wave that this PCI BAR follows a
+> > different set of semantics.    
+> 
+> I thought all the meaningful differences are fixed now?
+> 
+> The main remaining issue seems to be around the config space
+> emulation?
 
-Not sure it should have hwpt at all, probably vmid should come from
-the driver specific struct in some driver specific way
+In the development of the virtio-vfio-pci variant driver we noted that
+r/w access to the IO BAR didn't honor the IO bit in the command
+register, which was quickly remedied and now returns -EIO if accessed
+while disabled.  We were already adding r/w support to the coherent BAR
+at the time as vfio doesn't have a means to express a region as only
+having mmap support and precedent exists that BAR regions must support
+these accesses.  So it was suggested that r/w accesses should also
+honor the command register memory enable bit, but of course memory BARs
+also support mmap, which snowballs into a much more complicated problem
+than we have in the case of the virtio IO BAR.
 
-Jason
+So where do we go?  Do we continue down the path of emulating full PCI
+semantics relative to these emulated BARs?  Does hardware take into
+account the memory enable bit of the command register?  Do we
+re-evaluate the BAR model for a device specific region?
+
+> > We don't typically endorse complexity in the kernel only for the
+> > purpose of avoiding work in userspace.  The absolute minimum should
+> > be some justification of the design decision and analysis relative
+> > to standard PCI behavior.  Thanks,  
+> 
+> If we strictly took that view in VFIO a lot of stuff wouldn't be here
+> :)
+> 
+> I've made this argument before and gave up - the ecosystem wants to
+> support multiple VMMs and the sanest path to do that is via VFIO
+> kernel drivers that plug into existing vfio-pci support in the VMM
+> ecosystem.
+> 
+> From a HW supplier perspective it is quite vexing to have to support
+> all these different (and often proprietary!) VMM implementations. It
+> is not just top of tree qemu.
+> 
+> If we instead did complex userspace drivers and userspace emulation of
+> config space and so on then things like the IDXD SIOV support would
+> look *very* different and not use VFIO at all. That would probably be
+> somewhat better for security, but I was convinced it is a long and
+> technically complex road.
+> 
+> At least with this approach the only VMM issue is the NUMA nodes, and
+> as we have discussed that hackery is to make up for current Linux
+> kernel SW limitations, not actually reflecting anything about the
+> HW. If some other OS or future Linux doesn't require the ACPI NUMA
+> nodes to create an OS visible NUMA object then the VMM will not
+> require any changes.
+
+Yes, I'm satisfied with where we've landed for the NUMA nodes and
+generic initiator object.  It's an annoying constraint for management
+tools but it's better than the original proposal where nodes
+automatically popped into existence based on a vfio-pci device. 
+
+There's certainly a balancing game of complexity in the driver vs
+deferring the work to userspace.  From my perspective, I don't have a
+good justification for why we're on the emulated BAR path when another
+path looks a lot easier.  With the apparent increasing complexity of
+emulating the memory enable semantics, I felt we needed to get a better
+story there and really look at whether those semantics are worthwhile,
+or perhaps as alluded, HW takes this into account (though I'm not sure
+how).
+
+I'd suggest we take a look at whether we need to continue to pursue
+honoring the memory enable bit for these BARs and make a conscious and
+documented decision if we choose to ignore it.  Ideally we could also
+make this shared spec that we're implementing to available to the
+community to justify the design decisions here.  In the case of
+GPUDirect Cliques we had permission to post the spec to the list so it
+could be archived to provide a stable link for future reference.
+Thanks,
+
+Alex
+
 
