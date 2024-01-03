@@ -1,64 +1,64 @@
-Return-Path: <kvm+bounces-5546-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5547-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D616882334F
-	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 18:35:06 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6E52823350
+	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 18:35:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 88BAF1F24E61
-	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 17:35:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4E1C5B23B16
+	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 17:35:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 654691CF82;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 916F71CF8A;
 	Wed,  3 Jan 2024 17:34:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aPdrhcXo"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kQhqKTsu"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B59D1CAA3
-	for <kvm@vger.kernel.org>; Wed,  3 Jan 2024 17:33:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D02D1CAA8
+	for <kvm@vger.kernel.org>; Wed,  3 Jan 2024 17:33:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-40d604b4b30so4332725e9.1
-        for <kvm@vger.kernel.org>; Wed, 03 Jan 2024 09:33:57 -0800 (PST)
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-40d3352b525so116667405e9.1
+        for <kvm@vger.kernel.org>; Wed, 03 Jan 2024 09:33:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1704303236; x=1704908036; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1704303237; x=1704908037; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=CaH8a0Z2sktOk6HhcvLcaTrwfzviKqp7ItoU8rNpnow=;
-        b=aPdrhcXoSVQyZg84OswK+WZCrAG7S3VuL1pXxz3q3gnrMi2aotoL/1Kfc6o0rdoXIO
-         LM3Kyq91myZHEb4SgsIhats3WSV4mu1vLQsjynxbUCZJdx32y4HmL+junQBPaeE+b6oc
-         B1M5EbiUb8N+gVz8HnJBB3KiZG2LwCWzcsX3mf5m//I8lRetWAclt4iqyrn8QYG6SMxR
-         L8ETSOZj7CbtQEUZeIFQfzlf6/CVeXcbetWnEqb3Pmr0LXX/HtLNLsmK7hpZ+x4SKVO6
-         4k56y4XfwkxgWTCyAZzF4fkYSe0NskFtCoxnbJeWi+22nDf4d4gYW/EFVv6XA6s6oeya
-         YhyA==
+        bh=c7IelmqBfCUiQPJ1PO4YXHkz0msSivdOvYJRQon3tbw=;
+        b=kQhqKTsuxyTJ0vorc5wdhXz8ANjWrkWcA0KloBcoxwBDvSg5voRtaqT2B4e11MIswZ
+         t+OHy/t+/zmt1f3kFLkcMcOzLJiL6RRteH0U4RCahqr5tnFRJfRnxRUujOvGh3t7aunT
+         Fg+B1A6GJ6B2+CQx0vcwSWJWQ77YX1sIJdOXS2YILnp+I4jH9bBcnD6DzC4cmIgQgkPs
+         X5ns+9g6NvQiCmB86QjjHIRg2sXIeyVc6VSL1OjI2HjeM2N09wEH16KO9TbP5T2TxARG
+         /UrK+Z1+uyPKv5FP9r0TXcwB22jTZK58yff62FxDpL/BZtSQLvpTXqkdevTAHIy3qX6v
+         hM8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704303236; x=1704908036;
+        d=1e100.net; s=20230601; t=1704303237; x=1704908037;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=CaH8a0Z2sktOk6HhcvLcaTrwfzviKqp7ItoU8rNpnow=;
-        b=q5p+649s/eIuaHf9fqL6/1mlGauRMEThlDHijofhP+Iy/jQoB+5AvfwZ/XMIyIz8Mr
-         t15m2TZVOxTLmow7kn4KQu6lfaMXMoo/L38dykqoRdw9Uv6SaCPIq1H418L4tYXuoH2T
-         bZTwr7NFazDUUaHSj+Tul88Yet8nrOCN+BV7SL5TW+X6IE5jSBYI1NyPPEWxJnQUuVup
-         hQdhBdTg11oNG9WrPtflthFbGzCH62k/QgQNIrLw2Ltgul6chJL9vnpAipcwmsMddX9x
-         plgzC0JX+fHfNXw4amNrUU5PARrpRQiNVg9FZZZiTDPlquLftzaNtj87ejtUVjOrGcqj
-         tjzw==
-X-Gm-Message-State: AOJu0Yxm7wJMMoBXCTU+Q9saozBjFGGsXzFqy9XttcR4arZ1QSwh/dSO
-	c9P/lwhMGtWWm/DaPe3du/dFbPP7X7Q9tQ==
-X-Google-Smtp-Source: AGHT+IFPEa4trSH1ULMWjrm1Nbo4OaNZJ4jxlMnYzVLmqTz4UW2OpRVflauqqVvOixkorfcQpuqmAQ==
-X-Received: by 2002:a7b:c406:0:b0:40d:77d3:8db8 with SMTP id k6-20020a7bc406000000b0040d77d38db8mr778947wmi.44.1704303236439;
-        Wed, 03 Jan 2024 09:33:56 -0800 (PST)
+        bh=c7IelmqBfCUiQPJ1PO4YXHkz0msSivdOvYJRQon3tbw=;
+        b=gys7X4UzyWM7wmYlqq+7sKehq2O78LPXQ8XtM90nvGg1l6mhEpYwD2unrT/hHlYPVN
+         70/cJlPGHk6TYca3l0I+PRjiCzCCYrlWTq5rg0B05veSeBLPMN2DskjSNunipeW5H9hl
+         K6cGoLce0sSYg/COiecEo50w3aBTgyHmpnnaAt3INIqrTRkpixTAfFVuabAFXt+duX5l
+         yZ9V8fzLIeIP2aAHuu+IyEuPsXToDf+PjQ7kS91GqufqLlZ9qeLVOEiRW1O3jsOiUjF6
+         0rwuPUoBdc2WxJbii2iIjZ0z4lF5UMsVuKUBfldS8Mu3Wgi5NWbuYd3eW7PGEhQ+eR8y
+         ptVA==
+X-Gm-Message-State: AOJu0Yx5Lh5WHpm6dgtkkaIYiiQKJifr3IeSbMv5WEP+w39OlUCFtn4u
+	PByz+hpVIOYhkpGnlWfWPi1w+/2fyWRTcA==
+X-Google-Smtp-Source: AGHT+IESFF9+b5o3/ublAo/jcBFbD7HOqmfsD+g0Mklv3iiREEvayIPCsKKh6n9Wfcqv3HzjL9ElUA==
+X-Received: by 2002:adf:e8c2:0:b0:337:5131:4d71 with SMTP id k2-20020adfe8c2000000b0033751314d71mr1857wrn.40.1704303237615;
+        Wed, 03 Jan 2024 09:33:57 -0800 (PST)
 Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id bg35-20020a05600c3ca300b0040d6ffae526sm2963001wmb.39.2024.01.03.09.33.50
+        by smtp.gmail.com with ESMTPSA id t18-20020a5d4612000000b003367bb8898dsm31262714wrq.66.2024.01.03.09.33.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jan 2024 09:33:53 -0800 (PST)
+        Wed, 03 Jan 2024 09:33:54 -0800 (PST)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 1199A5F93E;
+	by draig.lan (Postfix) with ESMTP id 26B495F93F;
 	Wed,  3 Jan 2024 17:33:50 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
@@ -106,9 +106,9 @@ Cc: qemu-s390x@nongnu.org,
 	qemu-riscv@nongnu.org,
 	Alistair Francis <alistair.francis@wdc.com>,
 	=?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Subject: [PATCH v2 08/43] qtest: bump npcm7xx_pwn-test timeout to 5 minutes
-Date: Wed,  3 Jan 2024 17:33:14 +0000
-Message-Id: <20240103173349.398526-9-alex.bennee@linaro.org>
+Subject: [PATCH v2 09/43] qtest: bump test-hmp timeout to 4 minutes
+Date: Wed,  3 Jan 2024 17:33:15 +0000
+Message-Id: <20240103173349.398526-10-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240103173349.398526-1-alex.bennee@linaro.org>
 References: <20240103173349.398526-1-alex.bennee@linaro.org>
@@ -123,32 +123,33 @@ Content-Transfer-Encoding: 8bit
 
 From: Daniel P. Berrangé <berrange@redhat.com>
 
-The npcm7xx_pwn-test takes 3 & 1/2 minutes in a --enable-debug build.
-Bumping to 5 minutes will give more headroom.
+The hmp test takes just under 3 minutes in a --enable-debug
+build. Bumping to 4 minutes will give more headroom.
 
 Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-ID: <20230717182859.707658-5-berrange@redhat.com>
+Message-ID: <20230717182859.707658-6-berrange@redhat.com>
+[thuth: fix copy-n-paste error in the description]
 Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20231215070357.10888-5-thuth@redhat.com>
+Message-Id: <20231215070357.10888-6-thuth@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
  tests/qtest/meson.build | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/tests/qtest/meson.build b/tests/qtest/meson.build
-index 000ac54b7d6..84cec0a847d 100644
+index 84cec0a847d..7a4160df046 100644
 --- a/tests/qtest/meson.build
 +++ b/tests/qtest/meson.build
-@@ -1,7 +1,7 @@
- slow_qtests = {
-   'bios-tables-test' : 120,
+@@ -3,7 +3,7 @@ slow_qtests = {
    'migration-test' : 480,
--  'npcm7xx_pwm-test': 150,
-+  'npcm7xx_pwm-test': 300,
+   'npcm7xx_pwm-test': 300,
    'qom-test' : 900,
-   'test-hmp' : 120,
+-  'test-hmp' : 120,
++  'test-hmp' : 240,
  }
+ 
+ qtests_generic = [
 -- 
 2.39.2
 
