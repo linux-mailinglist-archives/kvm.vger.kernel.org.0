@@ -1,64 +1,64 @@
-Return-Path: <kvm+bounces-5562-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5557-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C52D823381
-	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 18:39:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B600823362
+	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 18:36:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A0691B22E11
-	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 17:39:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0573286602
+	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 17:36:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67E4C1C683;
-	Wed,  3 Jan 2024 17:39:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BE611DA41;
+	Wed,  3 Jan 2024 17:34:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mUbVyLmr"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JepahAGQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11DFA1C291
-	for <kvm@vger.kernel.org>; Wed,  3 Jan 2024 17:39:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C41E1DA20
+	for <kvm@vger.kernel.org>; Wed,  3 Jan 2024 17:34:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-3368abe1093so9394207f8f.2
-        for <kvm@vger.kernel.org>; Wed, 03 Jan 2024 09:39:07 -0800 (PST)
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-40d2376db79so95778345e9.0
+        for <kvm@vger.kernel.org>; Wed, 03 Jan 2024 09:34:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1704303546; x=1704908346; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1704303247; x=1704908047; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UUTepCaXuSvQff7RpqKHmtGuMDeLUnEdp+0FVQ8ed3M=;
-        b=mUbVyLmry/xceo6Ki5LiQ8pzUUmhHA6qco9vs8ZuAzLS/1c+Jz7RuuUjzfrvcunGX0
-         xWVNPm0H0+syKd94XhUY/eNM1NK+orl5JiR11vTjndynIRX8aZQ+oQp2oR3/sFgRJlaV
-         g15tSOqopOIJXqbrrxO5rb5HrdFE+7QXPwt7hLCFj00gVBnATNsnK9kc1lHTVsXQNzyg
-         cZpC0YCPNaKIE3Uhz8ow3aq22AIxhUeLdniCVi4wnobmSig9cmFQs9mYR5r8U3HfwrkJ
-         lcUjcPccKNsjSfchKkIiZyCWkCs2m6my/T6RZl6V2WMG+OYUb9obZ/C6nDCFspmSEAXY
-         tSbQ==
+        bh=KAYNxNN/VIwn3brnYwBM4da3zygXAIotsdaTZu8xJew=;
+        b=JepahAGQGSAmCTiVc7J3ZmNMZPjgzRr+kGCRzlckxopXZEtH0OpRd11CrU0t/KbGDo
+         puMH/WqW+xetfWFYdTy3kixPmDyQMpCFp3T1oHkqJww/QSSxKbQgzYKnU4bBXCbQvP1i
+         WjqOcwU0Gi69VNNBn2jsgkjP80P0cUtBaHnk0ne71QRKB1G3AwxT2DUKf5UVvH1a5tdn
+         n9eofsGcCL0ps6V9YzTOCiR3kJVm2KviYaedlHHEiGY6wveNvD0wu2iZhdqUC3ZmWknx
+         UCvwwUn+TrxGhEde5QTJ8mkNLejUiLF6Khcegm7Qqt4AJUdt05pic4k4kzj006iIQuwk
+         DOSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704303546; x=1704908346;
+        d=1e100.net; s=20230601; t=1704303247; x=1704908047;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=UUTepCaXuSvQff7RpqKHmtGuMDeLUnEdp+0FVQ8ed3M=;
-        b=Mq1smNMUribJoTVkmQaWATw/XBYJo8TRknI0eaUirS+1yXMi9xKeDCwXV60zQW0liC
-         fB9Z9xyxZmKmYWiPVSWfloDNRqEa43jcG3OsA48KG6ZaV46NX9egfUnXYxvJPURW0IxM
-         mNF0bAM+6J9V0e7Eys6QIntE+IWCLEVb3OomIR5mL57upDjxTiQgYeVrY/PrHgCI9SZw
-         gGJTU+i8M5STmItIZVzjqQQ5ToFzx0Wd4/sIkUrOtTBb2spIRa/ROyvlM9K1PqXQuNzT
-         MmbCPmkkOEMlFtWonVmFIA7nLXmxNSG4Kp3wjqqH3/oQerYx0ofGZL8/6MGe5TGTQEfw
-         crMQ==
-X-Gm-Message-State: AOJu0Yyb6OquTrTzG9rVxidtewHv4IEQemP3vJQtGTVtGYrhgdCB4fKD
-	9y/D+DkyRjRLZs0fqOX3pKn1pPMHwmc11Q==
-X-Google-Smtp-Source: AGHT+IHV3d3uLZOx2ZZIm3V3IDyg+ER70O0YZMaSn1IluGAzIzdge5YqbqU0eBqZOj56X88eutaFJQ==
-X-Received: by 2002:adf:e7c7:0:b0:336:619f:4647 with SMTP id e7-20020adfe7c7000000b00336619f4647mr8666036wrn.108.1704303546236;
-        Wed, 03 Jan 2024 09:39:06 -0800 (PST)
+        bh=KAYNxNN/VIwn3brnYwBM4da3zygXAIotsdaTZu8xJew=;
+        b=jtS/kS8H0SqPrsYNdsnlGxJIQ8jkq/ord5ogLP/fYALGzm7fWktxmFqTs3bakbVTHK
+         B5j6Ip2vaRKPs8QItl5E8/hvHuyTCEMca/v/VIMgVxEr9+OnlZMTMrHUCH6MqP9JDICB
+         s/+TtkbI1EXuASpoezhLie7lVnth97ZYlmzat/iY5Zlk6EBLRCGJF3fKdGfW7ArCkvj2
+         q3TzHcCDrTuXpkhllDBaUBb8DIAwqY64kHlwT0xZR1j0luQmaMwg7WSg2GQqN15bAqGy
+         /Fnu+U2oDjmHVG68fZjMcuZLVUzEkB7Y02V9eqQWC14mDCmLMQY5OB265t7/1Deg72EG
+         4NJQ==
+X-Gm-Message-State: AOJu0Yz+kOYVzBZNU3pyvybTOhDiybG4YDwewQLosipDsn00wL09ueze
+	ItNz7baJh5blQBRlnL8CYSnmo2eWYadNww==
+X-Google-Smtp-Source: AGHT+IEiNtW/AYEnFWgw1kuSIysK4yf5Kl2eOUr965I4B/3sWjOv3kPWjVHIGoC5zO/lkGW9NHvGjQ==
+X-Received: by 2002:a05:600c:3c88:b0:40d:6582:e552 with SMTP id bg8-20020a05600c3c8800b0040d6582e552mr6943624wmb.9.1704303247501;
+        Wed, 03 Jan 2024 09:34:07 -0800 (PST)
 Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id k4-20020a5d5244000000b003368c8d120fsm29995262wrc.7.2024.01.03.09.39.05
+        by smtp.gmail.com with ESMTPSA id o21-20020a05600c511500b0040d86e89abfsm2917164wms.43.2024.01.03.09.33.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jan 2024 09:39:05 -0800 (PST)
+        Wed, 03 Jan 2024 09:34:02 -0800 (PST)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 57CC25F954;
+	by draig.lan (Postfix) with ESMTP id 6E5185F955;
 	Wed,  3 Jan 2024 17:33:51 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
@@ -106,9 +106,9 @@ Cc: qemu-s390x@nongnu.org,
 	qemu-riscv@nongnu.org,
 	Alistair Francis <alistair.francis@wdc.com>,
 	Akihiko Odaki <akihiko.odaki@daynix.com>
-Subject: [PATCH v2 22/43] hw/riscv: Use misa_mxl instead of misa_mxl_max
-Date: Wed,  3 Jan 2024 17:33:28 +0000
-Message-Id: <20240103173349.398526-23-alex.bennee@linaro.org>
+Subject: [PATCH v2 23/43] target/riscv: Remove misa_mxl validation
+Date: Wed,  3 Jan 2024 17:33:29 +0000
+Message-Id: <20240103173349.398526-24-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240103173349.398526-1-alex.bennee@linaro.org>
 References: <20240103173349.398526-1-alex.bennee@linaro.org>
@@ -123,28 +123,69 @@ Content-Transfer-Encoding: 8bit
 
 From: Akihiko Odaki <akihiko.odaki@daynix.com>
 
-The effective MXL value matters when booting.
+It is initialized with a simple assignment and there is little room for
+error. In fact, the validation is even more complex.
 
 Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-Message-Id: <20231213-riscv-v7-1-a760156a337f@daynix.com>
+Acked-by: LIU Zhiwei <zhiwei_liu@linux.alibaba.com>
+Reviewed-by: Daniel Henrique Barboza <dbarboza@ventanamicro.com>
+Acked-by: Alistair Francis <alistair.francis@wdc.com>
+Message-Id: <20231213-riscv-v7-2-a760156a337f@daynix.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- hw/riscv/boot.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ target/riscv/tcg/tcg-cpu.c | 15 +++------------
+ 1 file changed, 3 insertions(+), 12 deletions(-)
 
-diff --git a/hw/riscv/boot.c b/hw/riscv/boot.c
-index 0ffca05189f..bc67c0bd189 100644
---- a/hw/riscv/boot.c
-+++ b/hw/riscv/boot.c
-@@ -36,7 +36,7 @@
- 
- bool riscv_is_32bit(RISCVHartArrayState *harts)
- {
--    return harts->harts[0].env.misa_mxl_max == MXL_RV32;
-+    return harts->harts[0].env.misa_mxl == MXL_RV32;
+diff --git a/target/riscv/tcg/tcg-cpu.c b/target/riscv/tcg/tcg-cpu.c
+index 8a35683a345..ee17f65afb6 100644
+--- a/target/riscv/tcg/tcg-cpu.c
++++ b/target/riscv/tcg/tcg-cpu.c
+@@ -148,7 +148,7 @@ static void riscv_cpu_validate_misa_priv(CPURISCVState *env, Error **errp)
+     }
  }
  
- /*
+-static void riscv_cpu_validate_misa_mxl(RISCVCPU *cpu, Error **errp)
++static void riscv_cpu_validate_misa_mxl(RISCVCPU *cpu)
+ {
+     RISCVCPUClass *mcc = RISCV_CPU_GET_CLASS(cpu);
+     CPUClass *cc = CPU_CLASS(mcc);
+@@ -168,11 +168,6 @@ static void riscv_cpu_validate_misa_mxl(RISCVCPU *cpu, Error **errp)
+     default:
+         g_assert_not_reached();
+     }
+-
+-    if (env->misa_mxl_max != env->misa_mxl) {
+-        error_setg(errp, "misa_mxl_max must be equal to misa_mxl");
+-        return;
+-    }
+ }
+ 
+ static void riscv_cpu_validate_priv_spec(RISCVCPU *cpu, Error **errp)
+@@ -673,7 +668,6 @@ static bool riscv_cpu_is_generic(Object *cpu_obj)
+ static bool tcg_cpu_realize(CPUState *cs, Error **errp)
+ {
+     RISCVCPU *cpu = RISCV_CPU(cs);
+-    Error *local_err = NULL;
+ 
+     if (!riscv_cpu_tcg_compatible(cpu)) {
+         g_autofree char *name = riscv_cpu_get_name(cpu);
+@@ -682,14 +676,11 @@ static bool tcg_cpu_realize(CPUState *cs, Error **errp)
+         return false;
+     }
+ 
+-    riscv_cpu_validate_misa_mxl(cpu, &local_err);
+-    if (local_err != NULL) {
+-        error_propagate(errp, local_err);
+-        return false;
+-    }
++    riscv_cpu_validate_misa_mxl(cpu);
+ 
+ #ifndef CONFIG_USER_ONLY
+     CPURISCVState *env = &cpu->env;
++    Error *local_err = NULL;
+ 
+     CPU(cs)->tcg_cflags |= CF_PCREL;
+ 
 -- 
 2.39.2
 
