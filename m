@@ -1,64 +1,64 @@
-Return-Path: <kvm+bounces-5542-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5540-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02AC482334B
-	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 18:34:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91654823349
+	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 18:34:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9237B285D2A
-	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 17:34:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 05CC91F24DF1
+	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 17:34:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2201A1CA80;
-	Wed,  3 Jan 2024 17:33:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75AC01C6A3;
+	Wed,  3 Jan 2024 17:33:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mJrnuT8k"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="y31RNpyp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C53DA1C68A
-	for <kvm@vger.kernel.org>; Wed,  3 Jan 2024 17:33:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2251C1C290
+	for <kvm@vger.kernel.org>; Wed,  3 Jan 2024 17:33:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-40d88fff7faso24863605e9.3
-        for <kvm@vger.kernel.org>; Wed, 03 Jan 2024 09:33:54 -0800 (PST)
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-40d88fff7faso24863385e9.3
+        for <kvm@vger.kernel.org>; Wed, 03 Jan 2024 09:33:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1704303233; x=1704908033; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1704303231; x=1704908031; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qzxoAeOdiga+52AiTCmsWe8ywFNoeoZ5ZVuxsnjrTLU=;
-        b=mJrnuT8kkI3Mqqh7TGOrb8+QTRmXqdQoZnch6fQUIESDVnnLd4DQ7IqCeYJ1vAISXd
-         LGSuSGi6yL94p1N61avZ3UlXD+cJsoBESUwz096wAC9n+EMpt+VYKlbRXOzYTDLRUouy
-         iZHFEDeWhml7eQ6FkexbM3lFNqNqJ2kIrqDG0JfQTBzWf3/KGVztkJGP1fIz6VESgiYQ
-         TE/Sj/QwXj3hkL1NvjsqMRDuwV6Iiu0EuCCuvRdWp+Irv0oq1RZUdMWtD8zI7+BS2TJr
-         EketPcTQOZqdvnvhO8T3hIm8CnuLK/rojQb4JcjWLh7lYiqR1HCZdaltHdVNduJOvFm+
-         P75g==
+        bh=Aeln3++ASlFUfIwMVf5xyvW2uMLaZ4UxQn5nypBC6DU=;
+        b=y31RNpypWJP08QG+PkfIA/wPXjF6/zGo9ihFLyKM/FNUhnErwB1Gd1QBGBRVIRssnj
+         PysWeoBI0AgPjP+Z2cTV3ouNmqMyOEzcKCG37e6zi5o9nfXQ/QNLwo9KyNf+GmlWNvVH
+         B2LmGZPl3taJTXUlYxAe7UdzdraoOGLe7H9vF230u4Dcpsdv5/Z8jqEAkAO9rxBJJI7j
+         Rx8rgC9DTV3M0mVRUJ8JzrIJUX7jeTJJCJF8exlffj4iwvqtg0+4dR3DnR8Elzbl/MiN
+         CvjX4HsboeWB485dffTObwHYFOfVP9l/+ZqPEcix9o4PcMiST6AvFyU1TImMtNTI8ZpY
+         bpQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704303233; x=1704908033;
+        d=1e100.net; s=20230601; t=1704303231; x=1704908031;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qzxoAeOdiga+52AiTCmsWe8ywFNoeoZ5ZVuxsnjrTLU=;
-        b=Fy6ypTka6rVp2f9bozmOUYvNwFlTXzuyUtWdH/CCLCmgaq31S/GbnCbO6hJlQ2dCgd
-         jKrEtbn1WsCBYgd9jSrjuRAuWtHUjZTvPWLH77hs2v46RcT4Fwqan8jyBUTXFCn51YjG
-         9ofaj9wgEeTjOk7A1XnjUcY3mGiS3Udv32Szc8bBJ4WEjAjtKJOL6mTaSJQ4P1/O52g9
-         F1KcWmOXKymSYIQ0/dFwTWeMjygvcU0ot5JzpJw8guwluxMOS0QTtGvE8q9iAcoyj7Zr
-         x0GUPEa2iRjz1qxTl2rkuns766ACmahEealN0ATzvzfo8xqpm+t/x1ydR75VX7LrSxCi
-         dVsw==
-X-Gm-Message-State: AOJu0YzcRpNC+2l5n4MfAIkVIi/Y0F1UCqPMStLSQKFW3+BNp8P9wJc1
-	KGzXerEzwNiC/L1xjLMn0lwszwKYPxTeJA==
-X-Google-Smtp-Source: AGHT+IGhE7/q82Jf4z4D1OPjoyeetuf4+aSfmg/R61bfYTK6tVdLZR8E2VO87yUiQHcrTBnDAn/iZg==
-X-Received: by 2002:a05:600c:a0b:b0:40d:7da9:8662 with SMTP id z11-20020a05600c0a0b00b0040d7da98662mr2292525wmp.338.1704303233122;
-        Wed, 03 Jan 2024 09:33:53 -0800 (PST)
+        bh=Aeln3++ASlFUfIwMVf5xyvW2uMLaZ4UxQn5nypBC6DU=;
+        b=GKXl2kf/4wsRsQXZlg55Trawnj/JzHj25xH+NmPehha4H82C15G6NhnMxF+mNKqmBU
+         XYctlK/KmrCVF30EoPAJu2iwaT+GqpGxQcri355xhS2MJFLfSA7tyYrXD7WBLOCBybTI
+         vCzu6N3SVEjgbJB9AWN7dU+vhbDf6u3Oz3Ip5qhdd80kUlb8G7+4CNWIL2tRLza+I0wK
+         N9Ubt+DgAlOOXJhV1u61UMfVwdXc9UTYIb6g5WzTwJj4rnj4J1tlKUz/ZbB12x7aH9fk
+         rolaQB5n8T5kiRqj/wJuMaGDDaSLiFoaTZgcvQGKuWuBiSt1bbaaJgybmLhXB1eOyF9l
+         n5EA==
+X-Gm-Message-State: AOJu0YzzU/pjZjrIlyunaqFnfZEToc0sqNArVz3aY2jVBJgZ2x26j1/Y
+	ii6neB/Qv8cxMi2atweI70IFRyfohrSsWQ==
+X-Google-Smtp-Source: AGHT+IHtCR4hmp3Vukr9hzN46Gz71ep8bM3kzLyD4gCRhfkpq3Ia3b7dQ3Ru8mfmCaqnt5tCeWxVgQ==
+X-Received: by 2002:a05:600c:68d7:b0:40d:5941:f16a with SMTP id jd23-20020a05600c68d700b0040d5941f16amr3530996wmb.273.1704303231484;
+        Wed, 03 Jan 2024 09:33:51 -0800 (PST)
 Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id t12-20020adfe10c000000b00336f43fa654sm18186652wrz.22.2024.01.03.09.33.49
+        by smtp.gmail.com with ESMTPSA id je2-20020a05600c1f8200b0040d934f48d3sm750166wmb.32.2024.01.03.09.33.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Wed, 03 Jan 2024 09:33:50 -0800 (PST)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 7EB765F92F;
+	by draig.lan (Postfix) with ESMTP id 93F3B5F932;
 	Wed,  3 Jan 2024 17:33:49 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
@@ -105,9 +105,9 @@ Cc: qemu-s390x@nongnu.org,
 	Pierrick Bouvier <pierrick.bouvier@linaro.org>,
 	qemu-riscv@nongnu.org,
 	Alistair Francis <alistair.francis@wdc.com>
-Subject: [PATCH v2 02/43] tests/avocado: use snapshot=on in kvm_xen_guest
-Date: Wed,  3 Jan 2024 17:33:08 +0000
-Message-Id: <20240103173349.398526-3-alex.bennee@linaro.org>
+Subject: [PATCH v2 03/43] gitlab: include microblazeel in testing
+Date: Wed,  3 Jan 2024 17:33:09 +0000
+Message-Id: <20240103173349.398526-4-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240103173349.398526-1-alex.bennee@linaro.org>
 References: <20240103173349.398526-1-alex.bennee@linaro.org>
@@ -120,27 +120,37 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-This ensures the rootfs is never permanently changed as we don't need
-persistence between tests anyway.
+This reverts aeb5f8f248e (gitlab: build the correct microblaze target)
+now we actually have a little-endian test in avocado thanks to this
+years advent calendar.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/avocado/kvm_xen_guest.py | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ .gitlab-ci.d/buildtest.yml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tests/avocado/kvm_xen_guest.py b/tests/avocado/kvm_xen_guest.py
-index 5391283113e..f8cb458d5db 100644
---- a/tests/avocado/kvm_xen_guest.py
-+++ b/tests/avocado/kvm_xen_guest.py
-@@ -59,7 +59,7 @@ def common_vm_setup(self):
-     def run_and_check(self):
-         self.vm.add_args('-kernel', self.kernel_path,
-                          '-append', self.kernel_params,
--                         '-drive',  f"file={self.rootfs},if=none,format=raw,id=drv0",
-+                         '-drive',  f"file={self.rootfs},if=none,snapshot=on,format=raw,id=drv0",
-                          '-device', 'xen-disk,drive=drv0,vdev=xvda',
-                          '-device', 'virtio-net-pci,netdev=unet',
-                          '-netdev', 'user,id=unet,hostfwd=:127.0.0.1:0-:22')
+diff --git a/.gitlab-ci.d/buildtest.yml b/.gitlab-ci.d/buildtest.yml
+index 91663946de4..ef71dfe8665 100644
+--- a/.gitlab-ci.d/buildtest.yml
++++ b/.gitlab-ci.d/buildtest.yml
+@@ -41,7 +41,7 @@ build-system-ubuntu:
+   variables:
+     IMAGE: ubuntu2204
+     CONFIGURE_ARGS: --enable-docs
+-    TARGETS: alpha-softmmu microblaze-softmmu mips64el-softmmu
++    TARGETS: alpha-softmmu microblazeel-softmmu mips64el-softmmu
+     MAKE_CHECK_ARGS: check-build
+ 
+ check-system-ubuntu:
+@@ -61,7 +61,7 @@ avocado-system-ubuntu:
+   variables:
+     IMAGE: ubuntu2204
+     MAKE_CHECK_ARGS: check-avocado
+-    AVOCADO_TAGS: arch:alpha arch:microblaze arch:mips64el
++    AVOCADO_TAGS: arch:alpha arch:microblazeel arch:mips64el
+ 
+ build-system-debian:
+   extends:
 -- 
 2.39.2
 
