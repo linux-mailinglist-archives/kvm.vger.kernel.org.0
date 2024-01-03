@@ -1,203 +1,151 @@
-Return-Path: <kvm+bounces-5485-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5486-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC0078225F0
-	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 01:30:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0D5B8225FF
+	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 01:35:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 579072846F3
-	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 00:30:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A9961C21B99
+	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 00:35:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 712B8A4C;
-	Wed,  3 Jan 2024 00:30:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7209615AF;
+	Wed,  3 Jan 2024 00:34:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yxD7D2hc"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BkrUK8XI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EBB737E
-	for <kvm@vger.kernel.org>; Wed,  3 Jan 2024 00:30:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15CD71365
+	for <kvm@vger.kernel.org>; Wed,  3 Jan 2024 00:34:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6d9c07b2372so4531422b3a.1
-        for <kvm@vger.kernel.org>; Tue, 02 Jan 2024 16:30:12 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5534180f0e9so2626a12.1
+        for <kvm@vger.kernel.org>; Tue, 02 Jan 2024 16:34:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704241812; x=1704846612; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TDHMClrrYcWpmzuNGOOsVgi0AHu5ZiLUhnNFQeXTWPg=;
-        b=yxD7D2hc2zKAWtRhuf3V9wh/AVYqI6xuERzGuM0pxH3Aeo/PBNU3ydmAswr0Qw36wh
-         ekJ5S+HTZcLJB3L1j+Cq/+3yNm2W/mPdnk8bzf4L939HzQ2Da2FDJow6zUlgmZYfLpQ3
-         1HCThPdoo/rKFNQ65UEzVpnPclSXe0VltoAJeK4JaBQXDcosqnbO335oB/mDWXZeRgf+
-         AwyRU3qWx2fMA88fLuMyg5vmTYuvjLK0WyWzyF+dXM+Y5N6WFa2vgy7Buio+uml/zRgA
-         2Gr8kyHUvvs2OwwIcH/NnJ+Wxw/Mxtzrlx3DpomoIH2TjAzaQb4EsTtOhSFyrzfjwcwR
-         sMPw==
+        d=google.com; s=20230601; t=1704242090; x=1704846890; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MQYSMPbyBC8yrUBHrw/41iVyhb5UQnmyTFPO9vw4t7I=;
+        b=BkrUK8XIXlMs+lPgf2OJKRH/uTQxs3AuH8OicXHnb2Ir3cLdsgxcufuTgr7mKalawc
+         mszP5UAuqbZy57wYCqjc673sP8Grh5gi4O4RQtlQWIrQi7irYECJ8p4Hk6rHujiSLuBI
+         Q19KHod+r4VbPy+CgDxwhcJTp0Z2nmTIGfXQmZLuEj6fSxP3ue+/MPANTnKuEyfMPdWS
+         gKSY/g8chcYVKgYbiAsqsUeiOx0SjxSGfg3K1Jzn9JjEI+WLkrXUPbSzWlO33sAZAlgz
+         jW2T7XkHQU3lDXzEEK1akuoCw8Qv6SIInmgs/618de55Sm+pkFoJ99NRiqLxKX3scX/z
+         pf5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704241812; x=1704846612;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TDHMClrrYcWpmzuNGOOsVgi0AHu5ZiLUhnNFQeXTWPg=;
-        b=dkPy65kCyK3YDRMDx+fHoUWMPd56pCsr5Gn0F7R7PCCfgB0AqVCZuYPF9uL9DsHyLw
-         q5hXc88+zdBRg5i+3rLGDLfRp9IJLvI1lI6YZ4l6jD/AmsHuu3UBFPh7UMJ9bWoQ3mYf
-         DIPqN39pbSo6qHeekhRkbzGrm+0NNd28YQyLHxjGoU4y55O5MYlqZmbNXBY/AUjmhnT7
-         v1Klewkf1XLuikwzdX8/7mYS12gGRuFOboUffZ4Csx5sCpCkbIUKKtRWXlckQQ4AhNJN
-         tnCtnH0qhHiNvZIxFqTPUUNqqy7jhSm3QI/Wct+zhe4PLO8IgB43LplHP7oUdZH0aRhZ
-         qkVQ==
-X-Gm-Message-State: AOJu0Yxa9YfA1N2qbnxF6DJlO3VBR/59+0T0GdT9nObZH/bBrKzLHolx
-	N1XiKtNdc1vDjbfScV4imZwRyWEwqO/oI53EAA==
-X-Google-Smtp-Source: AGHT+IFNrhvfNpEZWbUBRvHPmZg3lwRXupu1adc7E3n9IpEip0cPg1xuPurkZ1lMjOAr5qzmwnsM4j877ko=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:9297:b0:6d9:bcaf:5f16 with SMTP id
- jw23-20020a056a00929700b006d9bcaf5f16mr40479pfb.3.1704241811632; Tue, 02 Jan
- 2024 16:30:11 -0800 (PST)
-Date: Tue, 2 Jan 2024 16:30:10 -0800
-In-Reply-To: <20240102232136.38778-1-Ashish.Kalra@amd.com>
+        d=1e100.net; s=20230601; t=1704242090; x=1704846890;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MQYSMPbyBC8yrUBHrw/41iVyhb5UQnmyTFPO9vw4t7I=;
+        b=X4eFnbVnycS8i1xR0lcxKAGB1o4gluBCn54bpnW/6y3gmy8+Yw+Q88QtT5re9yPt1t
+         zlGnYIJ5pWMr3N4ACE5Wuc1wYTXBwVdCGQnCygKsQDOndG+lkftAGSnKrVjOeMNjTkXf
+         uQwJARVQxRB26+WE5tqCyIbyvu6KUPY2wUf5wW7cq1JsOiCgPNHVI1Z+P0kzg1uEgbhp
+         VmJa5aoV2VhOpg8PtsHVqPTRDuElXtAdHyA3FoFt++bZf301i9I7QfOHQvso7MpNWI6D
+         geWvWZS+R6ZdNVqhgLye6ZBfzmrvbR+a6KJXFOJ85AL1HWhBR7C/BL2i2LmRmbsoNsXe
+         fRRQ==
+X-Gm-Message-State: AOJu0YzdtN+c652i6/LBJJkdivRJfZbazeujDBtc12fVUFILxVls50dN
+	xp6jQlqZ7oMatLxU6GanqRuMMphCqeN7laED5+IofhbqXXfS
+X-Google-Smtp-Source: AGHT+IHox1gLASyYbSselT6JFr/7hB0/DThayseDRT1TrosPwh3p/HwqcFcAuu5xS6cWufxG0TBeapvldhRAPFp9fL8=
+X-Received: by 2002:a50:c191:0:b0:553:ee95:2b4f with SMTP id
+ m17-20020a50c191000000b00553ee952b4fmr22559edf.3.1704242090231; Tue, 02 Jan
+ 2024 16:34:50 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240102232136.38778-1-Ashish.Kalra@amd.com>
-Message-ID: <ZZSqkm5WNEUuuA_h@google.com>
-Subject: Re: [PATCH] x86/sev: Add support for allowing zero SEV ASIDs.
-From: Sean Christopherson <seanjc@google.com>
-To: Ashish Kalra <Ashish.Kalra@amd.com>
-Cc: pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
-	thomas.lendacky@amd.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	joro@8bytes.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20231218140543.870234-1-tao1.su@linux.intel.com>
+ <20231218140543.870234-2-tao1.su@linux.intel.com> <ZYMWFhVQ7dCjYegQ@google.com>
+ <ZYP0/nK/WJgzO1yP@yilunxu-OptiPlex-7050> <ZZSbLUGNNBDjDRMB@google.com>
+In-Reply-To: <ZZSbLUGNNBDjDRMB@google.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Tue, 2 Jan 2024 16:34:38 -0800
+Message-ID: <CALMp9eTutnTxCjQjs-nxP=XC345vTmJJODr+PcSOeaQpBW0Skw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] x86: KVM: Limit guest physical bits when 5-level EPT
+ is unsupported
+To: Sean Christopherson <seanjc@google.com>
+Cc: Xu Yilun <yilun.xu@linux.intel.com>, Tao Su <tao1.su@linux.intel.com>, 
+	kvm@vger.kernel.org, pbonzini@redhat.com, eddie.dong@intel.com, 
+	chao.gao@intel.com, xiaoyao.li@intel.com, yuan.yao@linux.intel.com, 
+	yi1.lai@intel.com, xudong.hao@intel.com, chao.p.peng@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 02, 2024, Ashish Kalra wrote:
-> @@ -2172,8 +2176,10 @@ void sev_vm_destroy(struct kvm *kvm)
->  
->  void __init sev_set_cpu_caps(void)
->  {
-> -	if (!sev_enabled)
-> +	if (!sev_guests_enabled) {
+On Tue, Jan 2, 2024 at 3:24=E2=80=AFPM Sean Christopherson <seanjc@google.c=
+om> wrote:
+>
+> On Thu, Dec 21, 2023, Xu Yilun wrote:
+> > On Wed, Dec 20, 2023 at 08:28:06AM -0800, Sean Christopherson wrote:
+> > > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > > > index c57e181bba21..72634d6b61b2 100644
+> > > > --- a/arch/x86/kvm/mmu/mmu.c
+> > > > +++ b/arch/x86/kvm/mmu/mmu.c
+> > > > @@ -5177,6 +5177,13 @@ void __kvm_mmu_refresh_passthrough_bits(stru=
+ct kvm_vcpu *vcpu,
+> > > >   reset_guest_paging_metadata(vcpu, mmu);
+> > > >  }
+> > > >
+> > > > +/* guest-physical-address bits limited by TDP */
+> > > > +unsigned int kvm_mmu_tdp_maxphyaddr(void)
+> > > > +{
+> > > > + return max_tdp_level =3D=3D 5 ? 57 : 48;
+> > >
+> > > Using "57" is kinda sorta wrong, e.g. the SDM says:
+> > >
+> > >   Bits 56:52 of each guest-physical address are necessarily zero beca=
+use
+> > >   guest-physical addresses are architecturally limited to 52 bits.
+> > >
+> > > Rather than split hairs over something that doesn't matter, I think i=
+t makes sense
+> > > for the CPUID code to consume max_tdp_level directly (I forgot that m=
+ax_tdp_level
+> > > is still accurate when tdp_root_level is non-zero).
+> >
+> > It is still accurate for now. Only AMD SVM sets tdp_root_level the same=
+ as
+> > max_tdp_level:
+> >
+> >       kvm_configure_mmu(npt_enabled, get_npt_level(),
+> >                         get_npt_level(), PG_LEVEL_1G);
+> >
+> > But I wanna doulbe confirm if directly using max_tdp_level is fully
+> > considered.  In your last proposal, it is:
+> >
+> >   u8 kvm_mmu_get_max_tdp_level(void)
+> >   {
+> >       return tdp_root_level ? tdp_root_level : max_tdp_level;
+> >   }
+> >
+> > and I think it makes more sense, because EPT setup follows the same
+> > rule.  If any future architechture sets tdp_root_level smaller than
+> > max_tdp_level, the issue will happen again.
+>
+> Setting tdp_root_level !=3D max_tdp_level would be a blatant bug.  max_td=
+p_level
+> really means "max possible TDP level KVM can use".  If an exact TDP level=
+ is being
+> forced by tdp_root_level, then by definition it's also the max TDP level,=
+ because
+> it's the _only_ TDP level KVM supports.
 
-Ugh, what a mess.  The module param will show sev_enabled=false, but the caps
-and CPUID will show SEV=true.
+This is all just so broken and wrong. The only guest.MAXPHYADDR that
+can be supported under TDP is the host.MAXPHYADDR. If KVM claims to
+support a smaller guest.MAXPHYADDR, then KVM is obligated to intercept
+every #PF, and to emulate the faulting instruction to see if the RSVD
+bit should be set in the error code. Hardware isn't going to do it.
+Since some page faults may occur in CPL3, this means that KVM has to
+be prepared to emulate any memory-accessing instruction. That's not
+practical.
 
-And this is doubly silly because "sev_enabled" is never actually checked, e.g.
-if misc cgroup support is disabled, KVM_SEV_INIT will try to reclaim ASIDs and
-eventually fail with -EBUSY, which is super confusing to users.
-
-The other weirdness is that KVM can cause sev_enabled=false && sev_es_enabled=true,
-but if *userspace* sets sev_enabled=false then sev_es_enabled is also forced off.
-
-In other words, the least awful option seems to be to keep sev_enabled true :-(
-
->  		kvm_cpu_cap_clear(X86_FEATURE_SEV);
-> +		return;
-
-This is blatantly wrong, as it can result in KVM advertising SEV-ES if SEV is
-disabled by the user.
-
-> +	}
->  	if (!sev_es_enabled)
->  		kvm_cpu_cap_clear(X86_FEATURE_SEV_ES);
->  }
-> @@ -2229,9 +2235,11 @@ void __init sev_hardware_setup(void)
->  		goto out;
->  	}
->  
-> -	sev_asid_count = max_sev_asid - min_sev_asid + 1;
-> -	WARN_ON_ONCE(misc_cg_set_capacity(MISC_CG_RES_SEV, sev_asid_count));
-> -	sev_supported = true;
-> +	if (min_sev_asid <= max_sev_asid) {
-> +		sev_asid_count = max_sev_asid - min_sev_asid + 1;
-> +		WARN_ON_ONCE(misc_cg_set_capacity(MISC_CG_RES_SEV, sev_asid_count));
-> +		sev_supported = true;
-> +	}
->  
->  	/* SEV-ES support requested? */
->  	if (!sev_es_enabled)
-> @@ -2262,7 +2270,8 @@ void __init sev_hardware_setup(void)
->  	if (boot_cpu_has(X86_FEATURE_SEV))
->  		pr_info("SEV %s (ASIDs %u - %u)\n",
->  			sev_supported ? "enabled" : "disabled",
-> -			min_sev_asid, max_sev_asid);
-> +			sev_supported ? min_sev_asid : 0,
-> +			sev_supported ? max_sev_asid : 0);
-
-I honestly think we should print the "garbage" values.  The whole point of
-printing the min/max SEV ASIDs was to help users understand why SEV is disabled,
-i.e. printing zeroes is counterproductive.
-
->  	if (boot_cpu_has(X86_FEATURE_SEV_ES))
->  		pr_info("SEV-ES %s (ASIDs %u - %u)\n",
->  			sev_es_supported ? "enabled" : "disabled",
-
-It's all a bit gross, but I think we want something like this (I'm definitely
-open to suggestions though):
-
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index d0c580607f00..bfac6d17462a 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -143,8 +143,20 @@ static void sev_misc_cg_uncharge(struct kvm_sev_info *sev)
- 
- static int sev_asid_new(struct kvm_sev_info *sev)
- {
--       int asid, min_asid, max_asid, ret;
-+       /*
-+        * SEV-enabled guests must use asid from min_sev_asid to max_sev_asid.
-+        * SEV-ES-enabled guest can use from 1 to min_sev_asid - 1.  Note, the
-+        * min ASID can end up larger than the max if basic SEV support is
-+        * effectively disabled by disallowing use of ASIDs for SEV guests.
-+        */
-+       unsigned int min_asid = sev->es_active ? 1 : min_sev_asid;
-+       unsigned int max_asid = sev->es_active ? min_sev_asid - 1 : max_sev_asid;
-+       unsigned int asid;
-        bool retry = true;
-+       int ret;
-+
-+       if (min_asid > max_asid)
-+               return -ENOTTY;
- 
-        WARN_ON(sev->misc_cg);
-        sev->misc_cg = get_current_misc_cg();
-@@ -157,12 +169,6 @@ static int sev_asid_new(struct kvm_sev_info *sev)
- 
-        mutex_lock(&sev_bitmap_lock);
- 
--       /*
--        * SEV-enabled guests must use asid from min_sev_asid to max_sev_asid.
--        * SEV-ES-enabled guest can use from 1 to min_sev_asid - 1.
--        */
--       min_asid = sev->es_active ? 1 : min_sev_asid;
--       max_asid = sev->es_active ? min_sev_asid - 1 : max_sev_asid;
- again:
-        asid = find_next_zero_bit(sev_asid_bitmap, max_asid + 1, min_asid);
-        if (asid > max_asid) {
-@@ -2232,8 +2238,10 @@ void __init sev_hardware_setup(void)
-                goto out;
-        }
- 
--       sev_asid_count = max_sev_asid - min_sev_asid + 1;
--       WARN_ON_ONCE(misc_cg_set_capacity(MISC_CG_RES_SEV, sev_asid_count));
-+       if (min_sev_asid <= max_sev_asid) {
-+               sev_asid_count = max_sev_asid - min_sev_asid + 1;
-+               WARN_ON_ONCE(misc_cg_set_capacity(MISC_CG_RES_SEV, sev_asid_count));
-+       }
-        sev_supported = true;
- 
-        /* SEV-ES support requested? */
-@@ -2264,8 +2272,9 @@ void __init sev_hardware_setup(void)
- out:
-        if (boot_cpu_has(X86_FEATURE_SEV))
-                pr_info("SEV %s (ASIDs %u - %u)\n",
--                       sev_supported ? "enabled" : "disabled",
--                       min_sev_asid, max_sev_asid);
-+                       sev_supported ? (min_sev_asid <= max_sev_asid ? "enabled" : "unusable") : "disabled",
-+                       sev_supported ? min_sev_asid : 0,
-+                       sev_supported ? max_sev_asid : 0);
-        if (boot_cpu_has(X86_FEATURE_SEV_ES))
-                pr_info("SEV-ES %s (ASIDs %u - %u)\n",
-                        sev_es_supported ? "enabled" : "disabled",
+Basically, a CPU with more than 48 bits of physical address that
+doesn't support 5-level EPT really doesn't support EPT at all, except
+perhaps in the context of some new paravirtual pinky-swear from the
+guest that it doesn't care about the RSVD bit in #PF error codes.
 
