@@ -1,510 +1,242 @@
-Return-Path: <kvm+bounces-5507-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5508-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B04D38228DE
-	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 08:18:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C4B28228FA
+	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 08:26:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A18B2851C3
-	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 07:18:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A43C1F23CC9
+	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 07:26:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FFCD18E25;
-	Wed,  3 Jan 2024 07:16:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A52718044;
+	Wed,  3 Jan 2024 07:26:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="P4zAoOrv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D11F21805C;
-	Wed,  3 Jan 2024 07:16:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.2.5.213])
-	by gateway (Coremail) with SMTP id _____8AxjuvBCZVlz3IBAA--.5795S3;
-	Wed, 03 Jan 2024 15:16:17 +0800 (CST)
-Received: from localhost.localdomain (unknown [10.2.5.213])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8Dxqb2_CZVlm1EYAA--.43800S7;
-	Wed, 03 Jan 2024 15:16:17 +0800 (CST)
-From: Bibo Mao <maobibo@loongson.cn>
-To: Huacai Chen <chenhuacai@kernel.org>,
-	Tianrui Zhao <zhaotianrui@loongson.cn>,
-	Juergen Gross <jgross@suse.com>
-Cc: loongarch@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: [PATCH 5/5] LoongArch: Add pv ipi support on LoongArch system
-Date: Wed,  3 Jan 2024 15:16:15 +0800
-Message-Id: <20240103071615.3422264-6-maobibo@loongson.cn>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20240103071615.3422264-1-maobibo@loongson.cn>
-References: <20240103071615.3422264-1-maobibo@loongson.cn>
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 840BB18032;
+	Wed,  3 Jan 2024 07:26:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1704266777; x=1735802777;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=iScjFm5+ojO0LeBbJOkrLVm23Bdjy3tv8Oe2Gdhzty8=;
+  b=P4zAoOrvxXShaIY8dZcliIs5QTTLaoArTtkss0agNKioh2L1tdhomAgS
+   KhsWxOgTZg7pDyblLRlTNkcnTXjq2jZf7T5LXCVGi1aFPzDMSX64WPJH6
+   GHW2wsuACVpzcUoQp7aZJwr8+w5HhUih8jk+HHI+PbuTFB1G/JKb2CBiD
+   DTSBwENe5NKBOEZjBVgiKzUzfIbTUD7HQbLLxDAr80USEkr0iR3k2rSxi
+   d+totwDa/TyEJWzXKLwVhT2HJU8C5ja8xXfz63gzNJ7xrApicMVpHuyhH
+   rcOG+wb9xOFh0Ym1kyWJNi6l8sOoS8stTmRjZv5Znl0G01wBHTZ7VOYIb
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10941"; a="483157021"
+X-IronPort-AV: E=Sophos;i="6.04,327,1695711600"; 
+   d="scan'208";a="483157021"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jan 2024 23:26:16 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10941"; a="773067201"
+X-IronPort-AV: E=Sophos;i="6.04,327,1695711600"; 
+   d="scan'208";a="773067201"
+Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
+  by orsmga007.jf.intel.com with ESMTP; 02 Jan 2024 23:26:11 -0800
+Date: Wed, 3 Jan 2024 15:26:10 +0800
+From: Yuan Yao <yuan.yao@linux.intel.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Michal Wilczynski <michal.wilczynski@intel.com>, pbonzini@redhat.com,
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	zhi.a.wang@intel.com, artem.bityutskiy@linux.intel.com,
+	yuan.yao@intel.com, Zheyu Ma <zheyuma97@gmail.com>,
+	Maxim Levitsky <mlevitsk@redhat.com>
+Subject: Re: [PATCH v1] KVM: nVMX: Fix handling triple fault on RSM
+ instruction
+Message-ID: <20240103072610.q2nqhzfl2yoygaig@yy-desk-7060>
+References: <20231222164543.918037-1-michal.wilczynski@intel.com>
+ <ZZRqptOaukCb7rO_@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8Dxqb2_CZVlm1EYAA--.43800S7
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj9fXoWfGw45Kr1xXr4UZw4xXFyruFX_yoW8JF13uo
-	W3GF4vqw4rW3yruFs0vw1Fqry5XFWakr4DAas3Z3Z8WFn7Jw12gry8Kw43tF17Grs5GF9r
-	C343Xr1ktayftFnxl-sFpf9Il3svdjkaLaAFLSUrUUUUbb8apTn2vfkv8UJUUUU8wcxFpf
-	9Il3svdxBIdaVrn0xqx4xG64xvF2IEw4CE5I8CrVC2j2Jv73VFW2AGmfu7bjvjm3AaLaJ3
-	UjIYCTnIWjp_UUUYs7kC6x804xWl14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI
-	8IcIk0rVWrJVCq3wAFIxvE14AKwVW8JVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4AK67xG
-	Y2AK021l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14
-	v26r4j6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAF
-	wI0_Gr1j6F4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYIkI8VC2zVCFFI
-	0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUtVWrXwAv7VC2z280
-	aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JMxAIw28Icx
-	kI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E
-	5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAV
-	WUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r4j6ryUMIIF0xvE2Ix0cI8IcVCY
-	1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI
-	0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7I
-	UbCzuJUUUUU==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZZRqptOaukCb7rO_@google.com>
+User-Agent: NeoMutt/20171215
 
-On LoongArch system, ipi hw uses iocsr registers, there is one iocsr
-register access on ipi sender and two iocsr access on ipi interrupt
-handler. On VM mode all iocsr registers accessing will trap into
-hypervisor.
+On Tue, Jan 02, 2024 at 11:57:26AM -0800, Sean Christopherson wrote:
+> +Maxim
+>
+> On Fri, Dec 22, 2023, Michal Wilczynski wrote:
+> > Syzkaller found a warning triggered in nested_vmx_vmexit().
+> > vmx->nested.nested_run_pending is non-zero, even though we're in
+> > nested_vmx_vmexit(). Generally, trying  to cancel a pending entry is
+> > considered a bug. However in this particular scenario, the kernel
+> > behavior seems correct.
+> >
+> > Syzkaller scenario:
+> > 1) Set up VCPU's
+> > 2) Run some code with KVM_RUN in L2 as a nested guest
+> > 3) Return from KVM_RUN
+> > 4) Inject KVM_SMI into the VCPU
+> > 5) Change the EFER register with KVM_SET_SREGS to value 0x2501
+> > 6) Run some code on the VCPU using KVM_RUN
+> > 7) Observe following behavior:
+> >
+> > kvm_smm_transition: vcpu 0: entering SMM, smbase 0x30000
+> > kvm_entry: vcpu 0, rip 0x8000
+> > kvm_entry: vcpu 0, rip 0x8000
+> > kvm_entry: vcpu 0, rip 0x8002
+> > kvm_smm_transition: vcpu 0: leaving SMM, smbase 0x30000
+> > kvm_nested_vmenter: rip: 0x0000000000008002 vmcs: 0x0000000000007000
+> >                     nested_rip: 0x0000000000000000 int_ctl: 0x00000000
+> > 		    event_inj: 0x00000000 nested_ept=n guest
+> > 		    cr3: 0x0000000000002000
+> > kvm_nested_vmexit_inject: reason: TRIPLE_FAULT ext_inf1: 0x0000000000000000
+> >                           ext_inf2: 0x0000000000000000 ext_int: 0x00000000
+> > 			  ext_int_err: 0x00000000
+> >
+> > What happened here is an SMI was injected immediately and the handler was
+> > called at address 0x8000; all is good. Later, an RSM instruction is
+> > executed in an emulator to return to the nested VM. em_rsm() is called,
+> > which leads to emulator_leave_smm(). A part of this function calls VMX/SVM
+> > callback, in this case vmx_leave_smm(). It attempts to set up a pending
+> > reentry to guest VM by calling nested_vmx_enter_non_root_mode() and sets
+> > vmx->nested.nested_run_pending to one. Unfortunately, later in
+> > emulator_leave_smm(), rsm_load_state_64() fails to write invalid EFER to
+> > the MSR. This results in em_rsm() calling triple_fault callback. At this
+> > point it's clear that the KVM should call the vmexit, but
+> > vmx->nested.nested_run_pending is left set to 1. To fix this reset the
+> > vmx->nested.nested_run_pending flag in triple_fault handler.
+> >
+> > TL;DR (courtesy of Yuan Yao)
+> > Clear nested_run_pending in case of RSM failure on return from L2 SMM.
+>
+> KVM doesn't emulate SMM for L2.  On an injected SMI, KVM forces a syntethic nested
+> VM-Exit to get from L2 to L1, and then emulates SMM in the context of L1.
 
-This patch adds pv ipi support for VM, hypercall instruction is used
-to ipi sender, and hypervisor will inject SWI on the VM. During SWI
-interrupt handler, only estat CSR register is read and written. Estat
-CSR register access will not trap into hypervisor. So with pv ipi
-supported, pv ipi sender will trap into hypervsor, pv ipi interrupt
-handler will not trap.
+Ah right!
+I was thinking the L1 at that time... Anyway my fault here.
 
-Also this patch adds ipi multicast support, the method is similar with
-x86. With ipi multicast support, ipi notification can be sent to at most
-64 vcpus at a time. And hw cpuid is equal to logic cpuid in LoongArch
-kvm hypervisor now, will add hw cpuid search logic in kvm hypervisor
-in the next patch.
-
-Signed-off-by: Bibo Mao <maobibo@loongson.cn>
----
- arch/loongarch/include/asm/hardirq.h   |   1 +
- arch/loongarch/include/asm/kvm_para.h  | 124 +++++++++++++++++++++++++
- arch/loongarch/include/asm/loongarch.h |   1 +
- arch/loongarch/kernel/irq.c            |   2 +-
- arch/loongarch/kernel/paravirt.c       | 103 ++++++++++++++++++++
- arch/loongarch/kernel/smp.c            |   2 +-
- arch/loongarch/kvm/exit.c              |  66 ++++++++++++-
- 7 files changed, 295 insertions(+), 4 deletions(-)
-
-diff --git a/arch/loongarch/include/asm/hardirq.h b/arch/loongarch/include/asm/hardirq.h
-index 9f0038e19c7f..998011f162d0 100644
---- a/arch/loongarch/include/asm/hardirq.h
-+++ b/arch/loongarch/include/asm/hardirq.h
-@@ -21,6 +21,7 @@ enum ipi_msg_type {
- typedef struct {
- 	unsigned int ipi_irqs[NR_IPI];
- 	unsigned int __softirq_pending;
-+	atomic_t messages;
- } ____cacheline_aligned irq_cpustat_t;
- 
- DECLARE_PER_CPU_SHARED_ALIGNED(irq_cpustat_t, irq_stat);
-diff --git a/arch/loongarch/include/asm/kvm_para.h b/arch/loongarch/include/asm/kvm_para.h
-index 41200e922a82..a25a84e372b9 100644
---- a/arch/loongarch/include/asm/kvm_para.h
-+++ b/arch/loongarch/include/asm/kvm_para.h
-@@ -9,6 +9,10 @@
- #define HYPERVISOR_VENDOR_SHIFT		8
- #define HYPERCALL_CODE(vendor, code)	((vendor << HYPERVISOR_VENDOR_SHIFT) + code)
- 
-+#define KVM_HC_CODE_SERVICE		0
-+#define KVM_HC_SERVICE			HYPERCALL_CODE(HYPERVISOR_KVM, KVM_HC_CODE_SERVICE)
-+#define  KVM_HC_FUNC_IPI		1
-+
- /*
-  * LoongArch hypcall return code
-  */
-@@ -16,6 +20,126 @@
- #define KVM_HC_INVALID_CODE		-1UL
- #define KVM_HC_INVALID_PARAMETER	-2UL
- 
-+/*
-+ * Hypercalls interface for KVM hypervisor
-+ *
-+ * a0: function identifier
-+ * a1-a6: args
-+ * Return value will be placed in v0.
-+ * Up to 6 arguments are passed in a1, a2, a3, a4, a5, a6.
-+ */
-+static __always_inline long kvm_hypercall(u64 fid)
-+{
-+	register long ret asm("v0");
-+	register unsigned long fun asm("a0") = fid;
-+
-+	__asm__ __volatile__(
-+		"hvcl "__stringify(KVM_HC_SERVICE)
-+		: "=r" (ret)
-+		: "r" (fun)
-+		: "memory"
-+		);
-+
-+	return ret;
-+}
-+
-+static __always_inline long kvm_hypercall1(u64 fid, unsigned long arg0)
-+{
-+	register long ret asm("v0");
-+	register unsigned long fun asm("a0") = fid;
-+	register unsigned long a1  asm("a1") = arg0;
-+
-+	__asm__ __volatile__(
-+		"hvcl "__stringify(KVM_HC_SERVICE)
-+		: "=r" (ret)
-+		: "r" (fun), "r" (a1)
-+		: "memory"
-+		);
-+
-+	return ret;
-+}
-+
-+static __always_inline long kvm_hypercall2(u64 fid,
-+		unsigned long arg0, unsigned long arg1)
-+{
-+	register long ret asm("v0");
-+	register unsigned long fun asm("a0") = fid;
-+	register unsigned long a1  asm("a1") = arg0;
-+	register unsigned long a2  asm("a2") = arg1;
-+
-+	__asm__ __volatile__(
-+			"hvcl "__stringify(KVM_HC_SERVICE)
-+			: "=r" (ret)
-+			: "r" (fun), "r" (a1), "r" (a2)
-+			: "memory"
-+			);
-+
-+	return ret;
-+}
-+
-+static __always_inline long kvm_hypercall3(u64 fid,
-+	unsigned long arg0, unsigned long arg1, unsigned long arg2)
-+{
-+	register long ret asm("v0");
-+	register unsigned long fun asm("a0") = fid;
-+	register unsigned long a1  asm("a1") = arg0;
-+	register unsigned long a2  asm("a2") = arg1;
-+	register unsigned long a3  asm("a3") = arg2;
-+
-+	__asm__ __volatile__(
-+		"hvcl "__stringify(KVM_HC_SERVICE)
-+		: "=r" (ret)
-+		: "r" (fun), "r" (a1), "r" (a2), "r" (a3)
-+		: "memory"
-+		);
-+
-+	return ret;
-+}
-+
-+static __always_inline long kvm_hypercall4(u64 fid,
-+		unsigned long arg0, unsigned long arg1, unsigned long arg2,
-+		unsigned long arg3)
-+{
-+	register long ret asm("v0");
-+	register unsigned long fun asm("a0") = fid;
-+	register unsigned long a1  asm("a1") = arg0;
-+	register unsigned long a2  asm("a2") = arg1;
-+	register unsigned long a3  asm("a3") = arg2;
-+	register unsigned long a4  asm("a4") = arg3;
-+
-+	__asm__ __volatile__(
-+		"hvcl "__stringify(KVM_HC_SERVICE)
-+		: "=r" (ret)
-+		: "r"(fun), "r" (a1), "r" (a2), "r" (a3), "r" (a4)
-+		: "memory"
-+		);
-+
-+	return ret;
-+}
-+
-+static __always_inline long kvm_hypercall5(u64 fid,
-+		unsigned long arg0, unsigned long arg1, unsigned long arg2,
-+		unsigned long arg3, unsigned long arg4)
-+{
-+	register long ret asm("v0");
-+	register unsigned long fun asm("a0") = fid;
-+	register unsigned long a1  asm("a1") = arg0;
-+	register unsigned long a2  asm("a2") = arg1;
-+	register unsigned long a3  asm("a3") = arg2;
-+	register unsigned long a4  asm("a4") = arg3;
-+	register unsigned long a5  asm("a5") = arg4;
-+
-+	__asm__ __volatile__(
-+		"hvcl "__stringify(KVM_HC_SERVICE)
-+		: "=r" (ret)
-+		: "r"(fun), "r" (a1), "r" (a2), "r" (a3), "r" (a4), "r" (a5)
-+		: "memory"
-+		);
-+
-+	return ret;
-+}
-+
-+
- static inline unsigned int kvm_arch_para_features(void)
- {
- 	return 0;
-diff --git a/arch/loongarch/include/asm/loongarch.h b/arch/loongarch/include/asm/loongarch.h
-index a03b466555a1..a787b69f6fb0 100644
---- a/arch/loongarch/include/asm/loongarch.h
-+++ b/arch/loongarch/include/asm/loongarch.h
-@@ -167,6 +167,7 @@
- #define CPUCFG_KVM_SIG			CPUCFG_KVM_BASE
- #define  KVM_SIGNATURE			"KVM\0"
- #define CPUCFG_KVM_FEATURE		(CPUCFG_KVM_BASE + 4)
-+#define  KVM_FEATURE_PV_IPI		BIT(1)
- #ifndef __ASSEMBLY__
- 
- /* CSR */
-diff --git a/arch/loongarch/kernel/irq.c b/arch/loongarch/kernel/irq.c
-index 1b58f7c3eed9..b5bd298c981f 100644
---- a/arch/loongarch/kernel/irq.c
-+++ b/arch/loongarch/kernel/irq.c
-@@ -113,5 +113,5 @@ void __init init_IRQ(void)
- 			per_cpu(irq_stack, i), per_cpu(irq_stack, i) + IRQ_STACK_SIZE);
- 	}
- 
--	set_csr_ecfg(ECFGF_IP0 | ECFGF_IP1 | ECFGF_IP2 | ECFGF_IPI | ECFGF_PMC);
-+	set_csr_ecfg(ECFGF_SIP0 | ECFGF_IP0 | ECFGF_IP1 | ECFGF_IP2 | ECFGF_IPI | ECFGF_PMC);
- }
-diff --git a/arch/loongarch/kernel/paravirt.c b/arch/loongarch/kernel/paravirt.c
-index 21d01d05791a..a70eba278607 100644
---- a/arch/loongarch/kernel/paravirt.c
-+++ b/arch/loongarch/kernel/paravirt.c
-@@ -1,6 +1,7 @@
- // SPDX-License-Identifier: GPL-2.0
- #include <linux/export.h>
- #include <linux/types.h>
-+#include <linux/interrupt.h>
- #include <linux/jump_label.h>
- #include <linux/kvm_para.h>
- #include <asm/paravirt.h>
-@@ -16,6 +17,94 @@ static u64 native_steal_clock(int cpu)
- 
- DEFINE_STATIC_CALL(pv_steal_clock, native_steal_clock);
- 
-+#ifdef CONFIG_SMP
-+static void pv_send_ipi_single(int cpu, unsigned int action)
-+{
-+	unsigned int min, old_action;
-+	unsigned long ipi_bitmap = 0;
-+	irq_cpustat_t *info = &per_cpu(irq_stat, cpu);
-+
-+	action = 1UL << action;
-+	old_action = atomic_fetch_or(action, &info->messages);
-+	if (old_action == 0) {
-+		min = cpu_logical_map(cpu);
-+		ipi_bitmap = 1;
-+		kvm_hypercall2(KVM_HC_FUNC_IPI, ipi_bitmap, min);
-+	}
-+}
-+
-+static void pv_send_ipi_mask(const struct cpumask *mask, unsigned int action)
-+{
-+	unsigned int cpu, i, min = 0, max = 0, old_action;
-+	u64 ipi_bitmap = 0;
-+	irq_cpustat_t *info;
-+
-+	if (cpumask_empty(mask))
-+		return;
-+
-+	action = 1UL << action;
-+	for_each_cpu(i, mask) {
-+		cpu = cpu_logical_map(i);
-+		if (!ipi_bitmap) {
-+			min = max = cpu;
-+		} else if (cpu < min && (max - cpu) < BITS_PER_LONG) {
-+			ipi_bitmap <<= min - cpu;
-+			min = cpu;
-+		} else if (cpu > min && cpu < min + BITS_PER_LONG) {
-+			max = cpu < max ? max : cpu;
-+		} else {
-+			kvm_hypercall2(KVM_HC_FUNC_IPI, ipi_bitmap, min);
-+			min = max = cpu;
-+			ipi_bitmap = 0;
-+		}
-+		info = &per_cpu(irq_stat, i);
-+		old_action = atomic_fetch_or(action, &info->messages);
-+		if (old_action == 0)
-+			__set_bit(cpu - min, (unsigned long *)&ipi_bitmap);
-+	}
-+
-+	if (ipi_bitmap)
-+		kvm_hypercall2(KVM_HC_FUNC_IPI, ipi_bitmap, min);
-+}
-+
-+static irqreturn_t loongson_do_swi(int irq, void *dev)
-+{
-+	irq_cpustat_t *info;
-+	long action;
-+
-+	clear_csr_estat(1 << INT_SWI0);
-+
-+	info = this_cpu_ptr(&irq_stat);
-+	do {
-+		action = atomic_xchg(&info->messages, 0);
-+		if (action & SMP_CALL_FUNCTION) {
-+			generic_smp_call_function_interrupt();
-+			info->ipi_irqs[IPI_CALL_FUNCTION]++;
-+		}
-+
-+		if (action & SMP_RESCHEDULE) {
-+			scheduler_ipi();
-+			info->ipi_irqs[IPI_RESCHEDULE]++;
-+		}
-+	} while (action);
-+
-+	return IRQ_HANDLED;
-+}
-+
-+static void pv_ipi_init(void)
-+{
-+	int r, swi0;
-+
-+	swi0 = get_percpu_irq(INT_SWI0);
-+	if (swi0 < 0)
-+		panic("SIP0 IRQ mapping failed\n");
-+	irq_set_percpu_devid(swi0);
-+	r = request_percpu_irq(swi0, loongson_do_swi, "SWI0", &irq_stat);
-+	if (r < 0)
-+		panic("SIP0 IRQ request failed\n");
-+}
-+#endif
-+
- static bool kvm_para_available(void)
- {
- 	static int hypervisor_type;
-@@ -32,10 +121,24 @@ static bool kvm_para_available(void)
- 
- int __init pv_guest_init(void)
- {
-+	int feature;
-+
- 	if (!cpu_has_hypervisor)
- 		return 0;
- 	if (!kvm_para_available())
- 		return 0;
- 
-+	/*
-+	 * check whether KVM hypervisor supports pv_ipi or not
-+	 */
-+#ifdef CONFIG_SMP
-+	feature = read_cpucfg(CPUCFG_KVM_FEATURE);
-+	if (feature & KVM_FEATURE_PV_IPI) {
-+		smp_ops.call_func_single_ipi	= pv_send_ipi_single;
-+		smp_ops.call_func_ipi		= pv_send_ipi_mask;
-+		smp_ops.ipi_init		= pv_ipi_init;
-+	}
-+#endif
-+
- 	return 1;
- }
-diff --git a/arch/loongarch/kernel/smp.c b/arch/loongarch/kernel/smp.c
-index 8cce7839b22f..ebcf2ac8a9c2 100644
---- a/arch/loongarch/kernel/smp.c
-+++ b/arch/loongarch/kernel/smp.c
-@@ -283,7 +283,7 @@ void loongson_boot_secondary(int cpu, struct task_struct *idle)
- void loongson_init_secondary(void)
- {
- 	unsigned int cpu = smp_processor_id();
--	unsigned int imask = ECFGF_IP0 | ECFGF_IP1 | ECFGF_IP2 |
-+	unsigned int imask = ECFGF_SIP0 | ECFGF_IP0 | ECFGF_IP1 | ECFGF_IP2 |
- 			     ECFGF_IPI | ECFGF_PMC | ECFGF_TIMER;
- 
- 	change_csr_ecfg(ECFG0_IM, imask);
-diff --git a/arch/loongarch/kvm/exit.c b/arch/loongarch/kvm/exit.c
-index e233d7b3b76d..bd8a631d8626 100644
---- a/arch/loongarch/kvm/exit.c
-+++ b/arch/loongarch/kvm/exit.c
-@@ -227,6 +227,9 @@ static int kvm_emu_cpucfg(struct kvm_vcpu *vcpu, larch_inst inst)
- 	case CPUCFG_KVM_SIG:
- 		vcpu->arch.gprs[rd] = *(unsigned int *)KVM_SIGNATURE;
- 		break;
-+	case CPUCFG_KVM_FEATURE:
-+		vcpu->arch.gprs[rd] = KVM_FEATURE_PV_IPI;
-+		break;
- 	default:
- 		vcpu->arch.gprs[rd] = 0;
- 		break;
-@@ -664,12 +667,71 @@ static int kvm_handle_fpu_disabled(struct kvm_vcpu *vcpu)
- 	return RESUME_GUEST;
- }
- 
-+static int kvm_pv_send_ipi(struct kvm_vcpu *vcpu, int sgi)
-+{
-+	int ret = 0;
-+	u64 ipi_bitmap;
-+	unsigned int min, cpu;
-+	struct kvm_vcpu *dest;
-+
-+	ipi_bitmap = vcpu->arch.gprs[LOONGARCH_GPR_A1];
-+	min = vcpu->arch.gprs[LOONGARCH_GPR_A2];
-+
-+	if (ipi_bitmap) {
-+		cpu = find_first_bit((void *)&ipi_bitmap, BITS_PER_LONG);
-+		while (cpu < BITS_PER_LONG) {
-+			if ((cpu + min) < KVM_MAX_VCPUS) {
-+				dest = kvm_get_vcpu_by_id(vcpu->kvm, cpu + min);
-+				kvm_queue_irq(dest, sgi);
-+				kvm_vcpu_kick(dest);
-+			}
-+			cpu = find_next_bit((void *)&ipi_bitmap, BITS_PER_LONG, cpu + 1);
-+		}
-+	}
-+
-+	return ret;
-+}
-+
-+/*
-+ * hypcall emulation always return to guest, Caller should check retval.
-+ */
-+static void kvm_handle_pv_hcall(struct kvm_vcpu *vcpu)
-+{
-+	unsigned long func = vcpu->arch.gprs[LOONGARCH_GPR_A0];
-+	long ret;
-+
-+	switch (func) {
-+	case KVM_HC_FUNC_IPI:
-+		kvm_pv_send_ipi(vcpu, INT_SWI0);
-+		ret = KVM_HC_STATUS_SUCCESS;
-+		break;
-+	default:
-+		ret = KVM_HC_INVALID_CODE;
-+		break;
-+	};
-+
-+	vcpu->arch.gprs[LOONGARCH_GPR_A0] = ret;
-+}
-+
- static int kvm_handle_hypcall(struct kvm_vcpu *vcpu)
- {
-+	larch_inst inst;
-+	unsigned int code;
-+
-+	inst.word = vcpu->arch.badi;
-+	code = inst.reg0i15_format.immediate;
- 	update_pc(&vcpu->arch);
- 
--	/* Treat it as noop intruction, only set return value */
--	vcpu->arch.gprs[LOONGARCH_GPR_A0] = KVM_HC_INVALID_CODE;
-+	switch (code) {
-+	case KVM_HC_SERVICE:
-+		kvm_handle_pv_hcall(vcpu);
-+		break;
-+	default:
-+		/* Treat it as noop intruction, only set return value */
-+		vcpu->arch.gprs[LOONGARCH_GPR_A0] = KVM_HC_INVALID_CODE;
-+		break;
-+	}
-+
- 	return RESUME_GUEST;
- }
- 
--- 
-2.39.3
-
+>
+> > The pending VMENTRY to L2 should be cancelled due to such failure leads
+> > to triple fault which should be injected to L1.
+> >
+> > Possible alternative approach:
+> > While the proposed approach works, the concern is that it would be
+> > simpler, and more readable to cancel the nested_run_pending in em_rsm().
+> > This would, however, require introducing new callback e.g,
+> > post_leave_smm(), that would cancel nested_run_pending in case of a
+> > failure to resume from SMM.
+> >
+> > Additionally, while the proposed code fixes VMX specific issue, SVM also
+> > might suffer from similar problem as it also uses it's own
+> > nested_run_pending variable.
+> >
+> > Reported-by: Zheyu Ma <zheyuma97@gmail.com>
+> > Closes: https://lore.kernel.org/all/CAMhUBjmXMYsEoVYw_M8hSZjBMHh24i88QYm-RY6HDta5YZ7Wgw@mail.gmail.com
+>
+> Fixes: 759cbd59674a ("KVM: x86: nSVM/nVMX: set nested_run_pending on VM entry which is a result of RSM")
+>
+> > Signed-off-by: Michal Wilczynski <michal.wilczynski@intel.com>
+> > ---
+> >  arch/x86/kvm/vmx/nested.c | 9 +++++++++
+> >  1 file changed, 9 insertions(+)
+> >
+> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> > index c5ec0ef51ff7..44432e19eea6 100644
+> > --- a/arch/x86/kvm/vmx/nested.c
+> > +++ b/arch/x86/kvm/vmx/nested.c
+> > @@ -4904,7 +4904,16 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
+> >
+> >  static void nested_vmx_triple_fault(struct kvm_vcpu *vcpu)
+> >  {
+> > +	struct vcpu_vmx *vmx = to_vmx(vcpu);
+> > +
+> >  	kvm_clear_request(KVM_REQ_TRIPLE_FAULT, vcpu);
+> > +
+> > +	/* In case of a triple fault, cancel the nested reentry. This may occur
+>
+> 	/*
+> 	 * Multi-line comments should look like this.  Blah blah blab blah blah
+> 	 * blah blah blah blah.
+> 	 */
+>
+> > +	 * when the RSM instruction fails while attempting to restore the state
+> > +	 * from SMRAM.
+> > +	 */
+> > +	vmx->nested.nested_run_pending = 0;
+>
+> Argh.  KVM's handling of SMIs while L2 is active is complete garbage.  As explained
+> by the comment in vmx_enter_smm(), the L2<->SMM transitions should have a completely
+> custom flow and not piggyback/usurp nested VM-Exit/VM-Entry.
+>
+> 	/*
+> 	 * TODO: Implement custom flows for forcing the vCPU out/in of L2 on
+> 	 * SMI and RSM.  Using the common VM-Exit + VM-Enter routines is wrong
+> 	 * SMI and RSM only modify state that is saved and restored via SMRAM.
+> 	 * E.g. most MSRs are left untouched, but many are modified by VM-Exit
+> 	 * and VM-Enter, and thus L2's values may be corrupted on SMI+RSM.
+> 	 */
+>
+> The Fixes: commit above added a hack on top of the hack.  But it's not entirely
+> clear from the changelog exactly what was being fixed.
+>
+>     While RSM induced VM entries are not full VM entries,
+>     they still need to be followed by actual VM entry to complete it,
+>     unlike setting the nested state.
+>
+>     This patch fixes boot of hyperv and SMM enabled
+>     windows VM running nested on KVM, which fail due
+>     to this issue combined with lack of dirty bit setting.
+>
+> My first guess would be event injection, but that shouldn't be relevant to RSM.
+> Architecturally, events (SMIs, NMIs, IRQs, etc.) are recognized at instruction
+> boundaries, but except for SMIs (see below), KVM naturally defers injection until
+> an instruction boundary by virtue of delivering events via the VMCS/VMCB, i.e. by
+> waiting to deliver events until successfully re-entering the guest.
+>
+> Nested VM-Enter is a special snowflake because KVM needs to finish injecting events
+> from vmcs12 before injecting any synthetic events, i.e. nested_run_pending ensures
+> that KVM wouldn't clobber/override an L2 event coming from L1.  In other words,
+> nested_run_pending is much more specific than just needing to wait for an instruction
+> boundary.
+>
+> So while the "wait until the CPU is at an instruction boundary" applies to RSM,
+> it's not immediately obvious to me why setting nested_run_pending is necessary.
+> And setting nested_run_pending *after* calling nested_vmx_enter_non_root_mode()
+> is nasty.  nested_vmx_enter_non_root_mode() and its helpers use nested_run_pending
+> to determine whether or not to enforce various consistency checks and other
+> behaviors.  And a more minor issue is that stat.nested_run will be incorrectly
+> incremented.
+>
+> As a stop gap, something like this patch is not awful, though I would strongly
+> prefer to be more precise and not clear it on all triple faults.  We've had KVM
+> bugs where KVM prematurely synthesizes triple fault on an actual nested VM-Enter,
+> and those would be covered up by this fix.
+>
+> But due to nested_run_pending being (unnecessarily) buried in vendor structs, it
+> might actually be easier to do a cleaner fix.  E.g. add yet another flag to track
+> that a hardware VM-Enter needs to be completed in order to complete instruction
+> emulation.
+>
+> And as alluded to above, there's another bug lurking.  Events that are *emulated*
+> by KVM must not be emulated until KVM knows the vCPU is at an instruction boundary.
+> Specifically, enter_smm() shouldn't be invoked while KVM is in the middle of
+> instruction emulation (even if "emulation" is just setting registers and skipping
+> the instruction).  Theoretically, that could be fixed by honoring the existing
+> at_instruction_boundary flag for SMIs, but that'd be a rather large change and
+> at_instruction_boundary is nowhere near accurate enough to use right now.
+>
+> Anyways, before we do anything, I'd like to get Maxim's input on what exactly was
+> addressed by 759cbd59674a.
+>
 
