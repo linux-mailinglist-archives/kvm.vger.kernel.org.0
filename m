@@ -1,273 +1,203 @@
-Return-Path: <kvm+bounces-5484-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5485-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 339DB8225B6
-	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 00:50:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC0078225F0
+	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 01:30:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCF4728496D
-	for <lists+kvm@lfdr.de>; Tue,  2 Jan 2024 23:50:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 579072846F3
+	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 00:30:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AA171799B;
-	Tue,  2 Jan 2024 23:49:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 712B8A4C;
+	Wed,  3 Jan 2024 00:30:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qQmf0p3Q"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yxD7D2hc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E174617985
-	for <kvm@vger.kernel.org>; Tue,  2 Jan 2024 23:49:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EBB737E
+	for <kvm@vger.kernel.org>; Wed,  3 Jan 2024 00:30:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5534180f0e9so2227a12.1
-        for <kvm@vger.kernel.org>; Tue, 02 Jan 2024 15:49:49 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6d9c07b2372so4531422b3a.1
+        for <kvm@vger.kernel.org>; Tue, 02 Jan 2024 16:30:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704239388; x=1704844188; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GtCri9auB/Q0wVXXcm5aP1kh1WsTIZcHi83DzvjBb0g=;
-        b=qQmf0p3QbELZptVm0RUAqHMRMmldx2Vo0R/L2b0f4eTOFzwWqSqa2GGoT6RaMMJHcL
-         9nkQM8anwMK5glENdDvjWSiXiRXYaCt4+/6jxKThOZFFlZuP69q+/FGTljn6KboUjSzR
-         npOp/+DlMrTgKs3Zzwpzj+5MgTrItX92aowwdRHngeHwerub5EG7ZqDc7FXkc5/d1kUq
-         2h0sXlAf8Zh6qDzSdCZRUlSU654+bIqXbeXNE/nym6g8qxskeL77WB/GOTCy3a1L5Hf+
-         kxfu9I96jPT+AHF2u+xDpL7tvA01BQR59hd4K6KQGrh5CdWzIbnz2Wi/0GL/GvMxTtWD
-         auqw==
+        d=google.com; s=20230601; t=1704241812; x=1704846612; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=TDHMClrrYcWpmzuNGOOsVgi0AHu5ZiLUhnNFQeXTWPg=;
+        b=yxD7D2hc2zKAWtRhuf3V9wh/AVYqI6xuERzGuM0pxH3Aeo/PBNU3ydmAswr0Qw36wh
+         ekJ5S+HTZcLJB3L1j+Cq/+3yNm2W/mPdnk8bzf4L939HzQ2Da2FDJow6zUlgmZYfLpQ3
+         1HCThPdoo/rKFNQ65UEzVpnPclSXe0VltoAJeK4JaBQXDcosqnbO335oB/mDWXZeRgf+
+         AwyRU3qWx2fMA88fLuMyg5vmTYuvjLK0WyWzyF+dXM+Y5N6WFa2vgy7Buio+uml/zRgA
+         2Gr8kyHUvvs2OwwIcH/NnJ+Wxw/Mxtzrlx3DpomoIH2TjAzaQb4EsTtOhSFyrzfjwcwR
+         sMPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704239388; x=1704844188;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GtCri9auB/Q0wVXXcm5aP1kh1WsTIZcHi83DzvjBb0g=;
-        b=pIE8lZ4gou0VPipnVgzzJPHrF51zvYqnwqZZ11W7Rb0jVEX/VHvraGeEtqLAULYTa8
-         bE/NEhK+oYWFNkB8ThnBhAr+fd0NrmxeN540QPZ4kqgfOe6E3Nu+wN2L78Zg8JBzGIXy
-         zaGRrW30gAVAjAdz1iJr5sAB03OKpRQLBZZgu0IismrNiFtS2TwCFYwubqpUYI+4Asz3
-         AGVtv4A5OjyMhlIr+2J6i8/mZZ/XSZx1sZm3m4PYSmVS7Wy4mHGn0iYWHV9wkr/ta34R
-         LfcSd8exUQoNcDiv3NS0ig/3kPMWQJINrvnEiMlWOy0stNuPf13emtoIT1foL8JCu2n4
-         dZJQ==
-X-Gm-Message-State: AOJu0Yxp6fegCnQ9AaIPGhSZbijDdoMwxjXqkvOyNcVPEhwEsMcG/1pg
-	uWRcNsbUMlI9Did8nfsNe8GANCyK5NSNHHl25q5BNTnm+KCQ
-X-Google-Smtp-Source: AGHT+IGLzRfQSuZglF/+kGu5BJRT0gfs0HEEx2DIZYn1v0w0Z07C9waYBqr1tLLRL6Eoju2TMnitTc9n/3zrgF6hBCo=
-X-Received: by 2002:a50:d60b:0:b0:54c:f4fd:3427 with SMTP id
- x11-20020a50d60b000000b0054cf4fd3427mr13814edi.7.1704239387819; Tue, 02 Jan
- 2024 15:49:47 -0800 (PST)
+        d=1e100.net; s=20230601; t=1704241812; x=1704846612;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TDHMClrrYcWpmzuNGOOsVgi0AHu5ZiLUhnNFQeXTWPg=;
+        b=dkPy65kCyK3YDRMDx+fHoUWMPd56pCsr5Gn0F7R7PCCfgB0AqVCZuYPF9uL9DsHyLw
+         q5hXc88+zdBRg5i+3rLGDLfRp9IJLvI1lI6YZ4l6jD/AmsHuu3UBFPh7UMJ9bWoQ3mYf
+         DIPqN39pbSo6qHeekhRkbzGrm+0NNd28YQyLHxjGoU4y55O5MYlqZmbNXBY/AUjmhnT7
+         v1Klewkf1XLuikwzdX8/7mYS12gGRuFOboUffZ4Csx5sCpCkbIUKKtRWXlckQQ4AhNJN
+         tnCtnH0qhHiNvZIxFqTPUUNqqy7jhSm3QI/Wct+zhe4PLO8IgB43LplHP7oUdZH0aRhZ
+         qkVQ==
+X-Gm-Message-State: AOJu0Yxa9YfA1N2qbnxF6DJlO3VBR/59+0T0GdT9nObZH/bBrKzLHolx
+	N1XiKtNdc1vDjbfScV4imZwRyWEwqO/oI53EAA==
+X-Google-Smtp-Source: AGHT+IFNrhvfNpEZWbUBRvHPmZg3lwRXupu1adc7E3n9IpEip0cPg1xuPurkZ1lMjOAr5qzmwnsM4j877ko=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:9297:b0:6d9:bcaf:5f16 with SMTP id
+ jw23-20020a056a00929700b006d9bcaf5f16mr40479pfb.3.1704241811632; Tue, 02 Jan
+ 2024 16:30:11 -0800 (PST)
+Date: Tue, 2 Jan 2024 16:30:10 -0800
+In-Reply-To: <20240102232136.38778-1-Ashish.Kalra@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20c9c21619aa44363c2c7503db1581cb816a1c0f.camel@redhat.com>
- <CALMp9eSy2r+iUzqHV+V2mbPaPWfn=Y=a1aM+9C65PGtE0=nGqA@mail.gmail.com> <481be19e33915804c855a55181c310dd8071b546.camel@redhat.com>
-In-Reply-To: <481be19e33915804c855a55181c310dd8071b546.camel@redhat.com>
-From: Jim Mattson <jmattson@google.com>
-Date: Tue, 2 Jan 2024 15:49:32 -0800
-Message-ID: <CALMp9eQcRF_oS2rc_xF1H3=pfHB7ggts44obZgvh-K03UYJLSQ@mail.gmail.com>
-Subject: Re: RFC: NTP adjustments interfere with KVM emulation of TSC deadline timers
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, 
-	Thomas Gleixner <tglx@linutronix.de>, Vitaly Kuznetsov <vkuznets@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20240102232136.38778-1-Ashish.Kalra@amd.com>
+Message-ID: <ZZSqkm5WNEUuuA_h@google.com>
+Subject: Re: [PATCH] x86/sev: Add support for allowing zero SEV ASIDs.
+From: Sean Christopherson <seanjc@google.com>
+To: Ashish Kalra <Ashish.Kalra@amd.com>
+Cc: pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
+	thomas.lendacky@amd.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	joro@8bytes.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Jan 2, 2024 at 2:21=E2=80=AFPM Maxim Levitsky <mlevitsk@redhat.com>=
- wrote:
->
-> On Thu, 2023-12-21 at 11:09 -0800, Jim Mattson wrote:
-> > On Thu, Dec 21, 2023 at 8:52=E2=80=AFAM Maxim Levitsky <mlevitsk@redhat=
-.com> wrote:
-> > >
-> > > Hi!
-> > >
-> > > Recently I was tasked with triage of the failures of 'vmx_preemption_=
-timer'
-> > > that happen in our kernel CI pipeline.
-> > >
-> > >
-> > > The test usually fails because L2 observes TSC after the
-> > > preemption timer deadline, before the VM exit happens.
-> > >
-> > > This happens because KVM emulates nested preemption timer with HR tim=
-ers,
-> > > so it converts the preemption timer value to nanoseconds, taking in a=
-ccount
-> > > tsc scaling and host tsc frequency, and sets HR timer.
-> > >
-> > > HR timer however as I found out the hard way is bound to CLOCK_MONOTO=
-NIC,
-> > > and thus its rate can be adjusted by NTP, which means that it can run=
- slower or
-> > > faster than KVM expects, which can result in the interrupt arriving e=
-arlier,
-> > > or late, which is what is happening.
-> > >
-> > > This is how you can reproduce it on an Intel machine:
-> > >
-> > >
-> > > 1. stop the NTP daemon:
-> > >       sudo systemctl stop chronyd.service
-> > > 2. introduce a small error in the system time:
-> > >       sudo date -s "$(date)"
-> > >
-> > > 3. start NTP daemon:
-> > >       sudo chronyd -d -n  (for debug) or start the systemd service ag=
-ain
-> > >
-> > > 4. run the vmx_preemption_timer test a few times until it fails:
-> > >
-> > >
-> > > I did some research and it looks like I am not the first to encounter=
- this:
-> > >
-> > > From the ARM side there was an attempt to support CLOCK_MONOTONIC_RAW=
- with
-> > > timer subsystem which was even merged but then reverted due to issues=
-:
-> > >
-> > > https://lore.kernel.org/all/1452879670-16133-3-git-send-email-marc.zy=
-ngier@arm.com/T/#u
-> > >
-> > > It looks like this issue was later worked around in the ARM code:
-> > >
-> > >
-> > > commit 1c5631c73fc2261a5df64a72c155cb53dcdc0c45
-> > > Author: Marc Zyngier <maz@kernel.org>
-> > > Date:   Wed Apr 6 09:37:22 2016 +0100
-> > >
-> > >     KVM: arm/arm64: Handle forward time correction gracefully
-> > >
-> > >     On a host that runs NTP, corrections can have a direct impact on
-> > >     the background timer that we program on the behalf of a vcpu.
-> > >
-> > >     In particular, NTP performing a forward correction will result in
-> > >     a timer expiring sooner than expected from a guest point of view.
-> > >     Not a big deal, we kick the vcpu anyway.
-> > >
-> > >     But on wake-up, the vcpu thread is going to perform a check to
-> > >     find out whether or not it should block. And at that point, the
-> > >     timer check is going to say "timer has not expired yet, go back
-> > >     to sleep". This results in the timer event being lost forever.
-> > >
-> > >     There are multiple ways to handle this. One would be record that
-> > >     the timer has expired and let kvm_cpu_has_pending_timer return
-> > >     true in that case, but that would be fairly invasive. Another is
-> > >     to check for the "short sleep" condition in the hrtimer callback,
-> > >     and restart the timer for the remaining time when the condition
-> > >     is detected.
-> > >
-> > >     This patch implements the latter, with a bit of refactoring in
-> > >     order to avoid too much code duplication.
-> > >
-> > >     Cc: <stable@vger.kernel.org>
-> > >     Reported-by: Alexander Graf <agraf@suse.de>
-> > >     Reviewed-by: Alexander Graf <agraf@suse.de>
-> > >     Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> > >     Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> > >
-> > >
-> > > So to solve this issue there are two options:
-> > >
-> > >
-> > > 1. Have another go at implementing support for CLOCK_MONOTONIC_RAW ti=
-mers.
-> > >    I don't know if that is feasible and I would be very happy to hear=
- a feedback from you.
-> > >
-> > > 2. Also work this around in KVM. KVM does listen to changes in the ti=
-mekeeping system
-> > >   (kernel calls its update_pvclock_gtod), and it even notes rates of =
-both regular and raw clocks.
-> > >
-> > >   When starting a HR timer I can adjust its period for the difference=
- in rates, which will in most
-> > >   cases produce more correct result that what we have now, but will s=
-till fail if the rate
-> > >   is changed at the same time the timer is started or before it expir=
-es.
-> > >
-> > >   Or I can also restart the timer, although that might cause more har=
-m than
-> > >   good to the accuracy.
-> > >
-> > >
-> > > What do you think?
-> >
-> > Is this what the "adaptive tuning" in the local APIC TSC_DEADLINE
-> > timer is all about (lapic_timer_advance_ns =3D -1)?
->
->
-> Hi,
->
-> I don't think that 'lapic_timer_advance' is designed for that but it does
-> mask this problem somewhat.
->
-> The goal of 'lapic_timer_advance' is to decrease time between deadline pa=
-ssing and start
-> of guest timer irq routine by making the deadline happen a bit earlier (b=
-y timer_advance_ns), and then busy-waiting
-> (hopefully only a bit) until the deadline passes, and then immediately do=
- the VM entry.
->
-> This way instead of overhead of VM exit and VM entry that both happen aft=
-er the deadline,
-> only the VM entry happens after the deadline.
->
->
-> In relation to NTP interference: If the deadline happens earlier than exp=
-ected, then
-> KVM will busy wait and decrease the 'timer_advance_ns', and next time the=
- deadline
-> will happen a bit later thus adopting for the NTP adjustment somewhat.
->
-> Note though that 'timer_advance_ns' variable is unsigned and adjust_lapic=
-_timer_advance can underflow
-> it, which can be fixed.
->
-> Now if the deadline happens later than expected, then the guest will see =
-this happen,
-> but at least adjust_lapic_timer_advance should increase the 'timer_advanc=
-e_ns' so next
-> time the deadline will happen earlier which will also eventually hide the=
- problem.
->
-> So overall I do think that implementing the 'lapic_timer_advance' for nes=
-ted VMX preemption timer
-> is a good idea, especially since this feature is not really nested in som=
-e sense - the timer is
-> just delivered as a VM exit but it is always delivered to L1, so VMX pree=
-mption timer can
-> be seen as just an extra L1's deadline timer.
->
-> I do think that nested VMX preemption timer should use its own value of t=
-imer_advance_ns, thus
-> we need to extract the common code and make both timers use it. Does this=
- make sense?
+On Tue, Jan 02, 2024, Ashish Kalra wrote:
+> @@ -2172,8 +2176,10 @@ void sev_vm_destroy(struct kvm *kvm)
+>  
+>  void __init sev_set_cpu_caps(void)
+>  {
+> -	if (!sev_enabled)
+> +	if (!sev_guests_enabled) {
 
-Alternatively, why not just use the hardware VMX-preemption timer to
-deliver the virtual VMX-preemption timer?
+Ugh, what a mess.  The module param will show sev_enabled=false, but the caps
+and CPUID will show SEV=true.
 
-Today, I believe that we only use the hardware VMX-preemption timer to
-deliver the virtual local APIC timer. However, it shouldn't be that
-hard to pick the first deadline of {VMX-preemption timer, local APIC
-timer} at each emulated VM-entry to L2.
+And this is doubly silly because "sev_enabled" is never actually checked, e.g.
+if misc cgroup support is disabled, KVM_SEV_INIT will try to reclaim ASIDs and
+eventually fail with -EBUSY, which is super confusing to users.
 
-> Best regards,
->         Maxim Levitsky
->
->
-> >  If so, can we
-> > leverage that for the VMX-preemption timer as well?
-> > > Best regards,
-> > >         Maxim Levitsky
-> > >
-> > >
-> > >
->
->
->
->
+The other weirdness is that KVM can cause sev_enabled=false && sev_es_enabled=true,
+but if *userspace* sets sev_enabled=false then sev_es_enabled is also forced off.
+
+In other words, the least awful option seems to be to keep sev_enabled true :-(
+
+>  		kvm_cpu_cap_clear(X86_FEATURE_SEV);
+> +		return;
+
+This is blatantly wrong, as it can result in KVM advertising SEV-ES if SEV is
+disabled by the user.
+
+> +	}
+>  	if (!sev_es_enabled)
+>  		kvm_cpu_cap_clear(X86_FEATURE_SEV_ES);
+>  }
+> @@ -2229,9 +2235,11 @@ void __init sev_hardware_setup(void)
+>  		goto out;
+>  	}
+>  
+> -	sev_asid_count = max_sev_asid - min_sev_asid + 1;
+> -	WARN_ON_ONCE(misc_cg_set_capacity(MISC_CG_RES_SEV, sev_asid_count));
+> -	sev_supported = true;
+> +	if (min_sev_asid <= max_sev_asid) {
+> +		sev_asid_count = max_sev_asid - min_sev_asid + 1;
+> +		WARN_ON_ONCE(misc_cg_set_capacity(MISC_CG_RES_SEV, sev_asid_count));
+> +		sev_supported = true;
+> +	}
+>  
+>  	/* SEV-ES support requested? */
+>  	if (!sev_es_enabled)
+> @@ -2262,7 +2270,8 @@ void __init sev_hardware_setup(void)
+>  	if (boot_cpu_has(X86_FEATURE_SEV))
+>  		pr_info("SEV %s (ASIDs %u - %u)\n",
+>  			sev_supported ? "enabled" : "disabled",
+> -			min_sev_asid, max_sev_asid);
+> +			sev_supported ? min_sev_asid : 0,
+> +			sev_supported ? max_sev_asid : 0);
+
+I honestly think we should print the "garbage" values.  The whole point of
+printing the min/max SEV ASIDs was to help users understand why SEV is disabled,
+i.e. printing zeroes is counterproductive.
+
+>  	if (boot_cpu_has(X86_FEATURE_SEV_ES))
+>  		pr_info("SEV-ES %s (ASIDs %u - %u)\n",
+>  			sev_es_supported ? "enabled" : "disabled",
+
+It's all a bit gross, but I think we want something like this (I'm definitely
+open to suggestions though):
+
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index d0c580607f00..bfac6d17462a 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -143,8 +143,20 @@ static void sev_misc_cg_uncharge(struct kvm_sev_info *sev)
+ 
+ static int sev_asid_new(struct kvm_sev_info *sev)
+ {
+-       int asid, min_asid, max_asid, ret;
++       /*
++        * SEV-enabled guests must use asid from min_sev_asid to max_sev_asid.
++        * SEV-ES-enabled guest can use from 1 to min_sev_asid - 1.  Note, the
++        * min ASID can end up larger than the max if basic SEV support is
++        * effectively disabled by disallowing use of ASIDs for SEV guests.
++        */
++       unsigned int min_asid = sev->es_active ? 1 : min_sev_asid;
++       unsigned int max_asid = sev->es_active ? min_sev_asid - 1 : max_sev_asid;
++       unsigned int asid;
+        bool retry = true;
++       int ret;
++
++       if (min_asid > max_asid)
++               return -ENOTTY;
+ 
+        WARN_ON(sev->misc_cg);
+        sev->misc_cg = get_current_misc_cg();
+@@ -157,12 +169,6 @@ static int sev_asid_new(struct kvm_sev_info *sev)
+ 
+        mutex_lock(&sev_bitmap_lock);
+ 
+-       /*
+-        * SEV-enabled guests must use asid from min_sev_asid to max_sev_asid.
+-        * SEV-ES-enabled guest can use from 1 to min_sev_asid - 1.
+-        */
+-       min_asid = sev->es_active ? 1 : min_sev_asid;
+-       max_asid = sev->es_active ? min_sev_asid - 1 : max_sev_asid;
+ again:
+        asid = find_next_zero_bit(sev_asid_bitmap, max_asid + 1, min_asid);
+        if (asid > max_asid) {
+@@ -2232,8 +2238,10 @@ void __init sev_hardware_setup(void)
+                goto out;
+        }
+ 
+-       sev_asid_count = max_sev_asid - min_sev_asid + 1;
+-       WARN_ON_ONCE(misc_cg_set_capacity(MISC_CG_RES_SEV, sev_asid_count));
++       if (min_sev_asid <= max_sev_asid) {
++               sev_asid_count = max_sev_asid - min_sev_asid + 1;
++               WARN_ON_ONCE(misc_cg_set_capacity(MISC_CG_RES_SEV, sev_asid_count));
++       }
+        sev_supported = true;
+ 
+        /* SEV-ES support requested? */
+@@ -2264,8 +2272,9 @@ void __init sev_hardware_setup(void)
+ out:
+        if (boot_cpu_has(X86_FEATURE_SEV))
+                pr_info("SEV %s (ASIDs %u - %u)\n",
+-                       sev_supported ? "enabled" : "disabled",
+-                       min_sev_asid, max_sev_asid);
++                       sev_supported ? (min_sev_asid <= max_sev_asid ? "enabled" : "unusable") : "disabled",
++                       sev_supported ? min_sev_asid : 0,
++                       sev_supported ? max_sev_asid : 0);
+        if (boot_cpu_has(X86_FEATURE_SEV_ES))
+                pr_info("SEV-ES %s (ASIDs %u - %u)\n",
+                        sev_es_supported ? "enabled" : "disabled",
 
