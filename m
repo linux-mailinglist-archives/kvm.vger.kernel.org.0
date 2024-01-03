@@ -1,64 +1,64 @@
-Return-Path: <kvm+bounces-5563-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5581-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1F8C823382
-	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 18:39:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A07FC8233C8
+	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 18:49:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 62EDA1F2133A
-	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 17:39:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2BA611F23268
+	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 17:49:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 911271C68A;
-	Wed,  3 Jan 2024 17:39:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96C731C68E;
+	Wed,  3 Jan 2024 17:49:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ymG/a4gS"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JwS8TueL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 303111C290
-	for <kvm@vger.kernel.org>; Wed,  3 Jan 2024 17:39:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BAF71C296
+	for <kvm@vger.kernel.org>; Wed,  3 Jan 2024 17:49:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-40d88fff7faso24918075e9.3
-        for <kvm@vger.kernel.org>; Wed, 03 Jan 2024 09:39:07 -0800 (PST)
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-33723ad790cso4126822f8f.1
+        for <kvm@vger.kernel.org>; Wed, 03 Jan 2024 09:49:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1704303546; x=1704908346; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1704304146; x=1704908946; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8xNYPWzXiJVejiOzH0lqPZBPc9FMUdMG5VHkvS57+tg=;
-        b=ymG/a4gSaRy8JaljhTTVeFWtrfO25HWC4BBqTT/SdJJd2xowuK8kCaPjMA5U/5wnsv
-         IMnruiYXgrrPlaShiUE6ezqq03D4Uo4MVU8GXK1C3BAUGLE37NjJl0T53Dex4qUKp/uB
-         XgzcTKXeXY/QDDTnv4lZkAF9AcMaxGQv6oSiqYvOoQ3xkuIbscQxYEjE9Q8KjrcpEBNd
-         yoSdTQb6grpJvpPuQYV7WDpyzmLYWwRjL0YWnwS4Rpl753F2CPpjbAgHRcAWLt+I/poI
-         6iNH5DB64wplzoKcGOlRzPAeCAy/OndkMKPmoKfnip6NBm5SI0DhADpV5NWTkjp/6loG
-         SJsA==
+        bh=6SqdFcQlAJfCo/zD79U6TVq3bxpUqFYpwmC4QorajEA=;
+        b=JwS8TueL+UtKELeg5mu79+APQavdn9Z/ZdGQ5TCZ7OuSxV6B7tGxVffN2bypXp5R3Y
+         tDWQLADgoy890HpWTaA/m0hq+9e/Q9Pj8RVgxhiiFLU60Lp1VaxphG1GxUO8IKFutXxB
+         dqo2+QPHTi/a3oz9nL+t5YWZh4ayrXU4po2GHqQX0H/JlTAXXMQqO+qrm1LWwWFMgQga
+         FPyVCT6lRLCtTzMS7OAPS5MFt7Jvw43KQcpdeBq2yhsaHXxd535PnLQ2K0AyrT5zIZRl
+         Xj6MFvsSGb6h1l+rJ0Y4840naFScXWO+H/sASXH+yQ8zs15BF+DBT+BPIgK9o9QM537X
+         Hdww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704303546; x=1704908346;
+        d=1e100.net; s=20230601; t=1704304146; x=1704908946;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=8xNYPWzXiJVejiOzH0lqPZBPc9FMUdMG5VHkvS57+tg=;
-        b=dRMgsAx5BCw+3GaEnG3QNxaec7IgaetNkmz/ltAV8kkGnMX13A/ZH14iJxuedjavpG
-         I6HruVi8X2tyM+jBhWNByZWlljxysNcZDTN/C4pER/IiOFmzFN6pFSW7lHu+iSzTNcJt
-         bmsCR7kAPBbVv7gmBFEbcNe2EhiE0BK1f9WICHfbM9+v//zotX/QCI11pEmqspvtoMOV
-         mEXfWoFcb/w5yAZYEPXVDhpZPygRBiftmUiIsohdMYKk/fN5lVBNvAL4jvRcRmbl1dNV
-         DELgKcqXqKLgFDUP/KUAHwV1rjOqZ1p469ynf7J/yekQWYdT6Pg1IZyhmCS+50d7nBUD
-         S8lA==
-X-Gm-Message-State: AOJu0YzwlyrppRKDllZkMCpoLQxzAYe1ybxg7/CV5IAClzSMNFIxGL/n
-	CCyAfF/denEx71UPurDlrVW3giEl7YSdsg==
-X-Google-Smtp-Source: AGHT+IH6oUVPIjcqWyhSJB2yGsQGHuXcBqAGxA30oE5c9ZUEOh+o9kgjc494ZEeNCFmoTVtGbVsERw==
-X-Received: by 2002:a05:600c:2988:b0:40c:657d:cf12 with SMTP id r8-20020a05600c298800b0040c657dcf12mr5061241wmd.111.1704303546516;
-        Wed, 03 Jan 2024 09:39:06 -0800 (PST)
+        bh=6SqdFcQlAJfCo/zD79U6TVq3bxpUqFYpwmC4QorajEA=;
+        b=AcTnfkfke5Fg0H1UE6pyVkkA0kN+CNRCBxo7JZj8jvSmmNvZmvyC/ex3wu9D0/OoOa
+         oynLxgy6qPjq3mtDhcp1DppJJAP1sdwsOvI5RCkZ1Z2P05RIcDTfGc3mclq8pLXrcKAU
+         EAQvgzDjZpTJgkYhEFNxygZMrhn5emnYtF6sVfbmaPz27zWXlAKgJfY7n0ZHUbw42jWu
+         tLs5o9h7kTTwlbU7U9GwtSfrY0aRfooQUyANYEeunJ9f6PlisY7FVuLuIYNLrfVxUKzx
+         rWaMqVVWI8HRjS/XO9l5IhVinIzm7NrGGZkqeFY4wnL7OW3vRgbSoCLLXocBdPjlDPJS
+         J/KQ==
+X-Gm-Message-State: AOJu0Yw/sWmyG0SiobOjHR4qy28MnnYWRkotdmden5GOFRebDi4n/gzt
+	IUGIDaEgVSyGRBHFx+rrPAeOPBqIbepouw==
+X-Google-Smtp-Source: AGHT+IEJ8pbxuaW2ajiIhIsjZLjKvMEndaRM5euTVk/mz6c4/+Ko8TKlGfHnO3Mdder+FMkZ6TvagA==
+X-Received: by 2002:a5d:47ac:0:b0:337:4a09:b7d8 with SMTP id 12-20020a5d47ac000000b003374a09b7d8mr916886wrb.211.1704304146266;
+        Wed, 03 Jan 2024 09:49:06 -0800 (PST)
 Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id fj7-20020a05600c0c8700b0040d77ebd55csm2974446wmb.13.2024.01.03.09.39.05
+        by smtp.gmail.com with ESMTPSA id b15-20020a5d4b8f000000b00336a0c083easm26789106wrt.53.2024.01.03.09.49.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jan 2024 09:39:05 -0800 (PST)
+        Wed, 03 Jan 2024 09:49:05 -0800 (PST)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 9C6095F9D7;
+	by draig.lan (Postfix) with ESMTP id B41EC5F9D8;
 	Wed,  3 Jan 2024 17:33:53 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
@@ -105,9 +105,9 @@ Cc: qemu-s390x@nongnu.org,
 	Pierrick Bouvier <pierrick.bouvier@linaro.org>,
 	qemu-riscv@nongnu.org,
 	Alistair Francis <alistair.francis@wdc.com>
-Subject: [PATCH v2 42/43] docs/devel: lift example and plugin API sections up
-Date: Wed,  3 Jan 2024 17:33:48 +0000
-Message-Id: <20240103173349.398526-43-alex.bennee@linaro.org>
+Subject: [PATCH v2 43/43] docs/devel: document some plugin assumptions
+Date: Wed,  3 Jan 2024 17:33:49 +0000
+Message-Id: <20240103173349.398526-44-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240103173349.398526-1-alex.bennee@linaro.org>
 References: <20240103173349.398526-1-alex.bennee@linaro.org>
@@ -120,38 +120,75 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-This makes them a bit more visible in the TCG emulation menu rather
-than hiding them away bellow the ToC limit.
+While we attempt to hide implementation details from the plugin we
+shouldn't be totally obtuse. Let the user know what they can and can't
+expect with the various instrumentation options.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- docs/devel/tcg-plugins.rst | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ docs/devel/tcg-plugins.rst | 49 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 49 insertions(+)
 
 diff --git a/docs/devel/tcg-plugins.rst b/docs/devel/tcg-plugins.rst
-index fa7421279f5..535a74684c5 100644
+index 535a74684c5..9cc09d8c3da 100644
 --- a/docs/devel/tcg-plugins.rst
 +++ b/docs/devel/tcg-plugins.rst
-@@ -143,7 +143,7 @@ requested. The plugin isn't completely uninstalled until the safe work
- has executed while all vCPUs are quiescent.
+@@ -112,6 +112,55 @@ details are opaque to plugins. The plugin is able to query select
+ details of instructions and system configuration only through the
+ exported *qemu_plugin* functions.
  
- Example Plugins
-----------------
-+===============
++However the following assumptions can be made:
++
++Translation Blocks
++++++++++++++++++++
++
++All code will go through a translation phase although not all
++translations will be necessarily be executed. You need to instrument
++actual executions to track what is happening.
++
++It is quite normal to see the same address translated multiple times.
++If you want to track the code in system emulation you should examine
++the underlying physical address (``qemu_plugin_insn_haddr``) to take
++into account the effects of virtual memory although if the system does
++paging this will change too.
++
++Not all instructions in a block will always execute so if its
++important to track individual instruction execution you need to
++instrument them directly. However asynchronous interrupts will not
++change control flow mid-block.
++
++Instructions
++++++++++++++
++
++Instruction instrumentation runs before the instruction executes. You
++can be can be sure the instruction will be dispatched, but you can't
++be sure it will complete. Generally this will be because of a
++synchronous exception (e.g. SIGILL) triggered by the instruction
++attempting to execute. If you want to be sure you will need to
++instrument the next instruction as well. See the ``execlog.c`` plugin
++for examples of how to track this and finalise details after execution.
++
++Memory Accesses
+++++++++++++++++
++
++Memory callbacks are called after a successful load or store.
++Unsuccessful operations (i.e. faults) will not be visible to memory
++instrumentation although the execution side effects can be observed
++(e.g. entering a exception handler).
++
++System Idle and Resume States
+++++++++++++++++++++++++++++++
++
++The ``qemu_plugin_register_vcpu_idle_cb`` and
++``qemu_plugin_register_vcpu_resume_cb`` functions can be used to track
++when CPUs go into and return from sleep states when waiting for
++external I/O. Be aware though that these may occur less frequently
++than in real HW due to the inefficiencies of emulation giving less
++chance for the CPU to idle.
++
+ Internals
+ ---------
  
- There are a number of plugins included with QEMU and you are
- encouraged to contribute your own plugins plugins upstream. There is a
-@@ -591,8 +591,8 @@ The plugin has a number of arguments, all of them are optional:
-   configuration arguments implies ``l2=on``.
-   (default: N = 2097152 (2MB), B = 64, A = 16)
- 
--API
-----
-+Plugin API
-+==========
- 
- The following API is generated from the inline documentation in
- ``include/qemu/qemu-plugin.h``. Please ensure any updates to the API
 -- 
 2.39.2
 
