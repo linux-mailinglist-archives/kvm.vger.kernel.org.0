@@ -1,64 +1,64 @@
-Return-Path: <kvm+bounces-5572-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5562-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C60F82338E
-	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 18:40:40 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C52D823381
+	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 18:39:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F6E21C228B1
-	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 17:40:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A0691B22E11
+	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 17:39:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF42D1CFB7;
-	Wed,  3 Jan 2024 17:39:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67E4C1C683;
+	Wed,  3 Jan 2024 17:39:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LHYQRu3m"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mUbVyLmr"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47E921CAB0
-	for <kvm@vger.kernel.org>; Wed,  3 Jan 2024 17:39:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11DFA1C291
+	for <kvm@vger.kernel.org>; Wed,  3 Jan 2024 17:39:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-33674f60184so10729590f8f.1
-        for <kvm@vger.kernel.org>; Wed, 03 Jan 2024 09:39:16 -0800 (PST)
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-3368abe1093so9394207f8f.2
+        for <kvm@vger.kernel.org>; Wed, 03 Jan 2024 09:39:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1704303554; x=1704908354; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1704303546; x=1704908346; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ciRl9sFGERSf23eviyCL0uKOJ2+yOOkqWUqo8JImKW0=;
-        b=LHYQRu3mGG0B8IzRJOVOuwlKvWXy7mPNgxS/NBHFM2JMw6cOvuBJWhgHc/Hf7h67MJ
-         tCvKsa1Y5xAq0FMb3lD3UNDJhevUCkVLoM9z7p1vHH4NHy4egK09ZZ+qyvAQb9bgA2zK
-         dgC+bpgSlz3jbi+RbTknLf6iKqxaUSxCXk1WBtZCz/ynTXmP8WDSITt3p1p6PAp0+0VY
-         V+3+FK91UC3YukKbdXXkSDE4zkHGo+o01wP07DbJ6sm5+WVInMyzPeXeMpyPEXsb7kmT
-         7AnnCAd5ezK5mM+5dHlXUBdSzU3B45QsD4IAQiL5/8M3bBAJKPYXk9RaSG98SnN8Ykyn
-         YS0A==
+        bh=UUTepCaXuSvQff7RpqKHmtGuMDeLUnEdp+0FVQ8ed3M=;
+        b=mUbVyLmry/xceo6Ki5LiQ8pzUUmhHA6qco9vs8ZuAzLS/1c+Jz7RuuUjzfrvcunGX0
+         xWVNPm0H0+syKd94XhUY/eNM1NK+orl5JiR11vTjndynIRX8aZQ+oQp2oR3/sFgRJlaV
+         g15tSOqopOIJXqbrrxO5rb5HrdFE+7QXPwt7hLCFj00gVBnATNsnK9kc1lHTVsXQNzyg
+         cZpC0YCPNaKIE3Uhz8ow3aq22AIxhUeLdniCVi4wnobmSig9cmFQs9mYR5r8U3HfwrkJ
+         lcUjcPccKNsjSfchKkIiZyCWkCs2m6my/T6RZl6V2WMG+OYUb9obZ/C6nDCFspmSEAXY
+         tSbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704303554; x=1704908354;
+        d=1e100.net; s=20230601; t=1704303546; x=1704908346;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ciRl9sFGERSf23eviyCL0uKOJ2+yOOkqWUqo8JImKW0=;
-        b=Q3t0qo1Ua2L4H26LLVeqG8+aEOvjLc6M7YM4NeXaOnHIqNDBBwn6AZVFBNlf+AcUrv
-         lh047SoPtISU8PDsCUJRmkdhTgN8Q1M0t8URLbYJ+cBSja/peyb6ksEk2P3uWWr3H8C7
-         S3qM3wTSP1avXjQfyNz+AEaFC8bS9mLpRS4sdy10O751rWxr2YrlXmKUhBuy9f5DFxR4
-         7DuHpgWIbRaHzaprz0Sm/w66fZVdT83+5UfMX0nXD+osLCq9X3Xs6uHa4VSbnlso3qrD
-         YNT+ukDCaZJPH6UenFc5sTO7L6kHOr9SeUhHDZmCPwvVmWctmYhlM3+2es/C999Ch+/N
-         SXtg==
-X-Gm-Message-State: AOJu0YyejFDEZkqg1egwgq5NViUfl0cZYYIXIEOigcoToSv/9Tyon85Z
-	TqOPs3NdDeUbZFQvfL+JzrN4R+OGWL7lbw==
-X-Google-Smtp-Source: AGHT+IFDLpxCZNS1nZaWXFfbL0Qz+KalAUozXFnUwdorNdWC3gGHXn5UNlLNInmNypjXhCCaw7+rvA==
-X-Received: by 2002:a5d:4849:0:b0:336:8f9f:c69c with SMTP id n9-20020a5d4849000000b003368f9fc69cmr10597659wrs.40.1704303554593;
-        Wed, 03 Jan 2024 09:39:14 -0800 (PST)
+        bh=UUTepCaXuSvQff7RpqKHmtGuMDeLUnEdp+0FVQ8ed3M=;
+        b=Mq1smNMUribJoTVkmQaWATw/XBYJo8TRknI0eaUirS+1yXMi9xKeDCwXV60zQW0liC
+         fB9Z9xyxZmKmYWiPVSWfloDNRqEa43jcG3OsA48KG6ZaV46NX9egfUnXYxvJPURW0IxM
+         mNF0bAM+6J9V0e7Eys6QIntE+IWCLEVb3OomIR5mL57upDjxTiQgYeVrY/PrHgCI9SZw
+         gGJTU+i8M5STmItIZVzjqQQ5ToFzx0Wd4/sIkUrOtTBb2spIRa/ROyvlM9K1PqXQuNzT
+         MmbCPmkkOEMlFtWonVmFIA7nLXmxNSG4Kp3wjqqH3/oQerYx0ofGZL8/6MGe5TGTQEfw
+         crMQ==
+X-Gm-Message-State: AOJu0Yyb6OquTrTzG9rVxidtewHv4IEQemP3vJQtGTVtGYrhgdCB4fKD
+	9y/D+DkyRjRLZs0fqOX3pKn1pPMHwmc11Q==
+X-Google-Smtp-Source: AGHT+IHV3d3uLZOx2ZZIm3V3IDyg+ER70O0YZMaSn1IluGAzIzdge5YqbqU0eBqZOj56X88eutaFJQ==
+X-Received: by 2002:adf:e7c7:0:b0:336:619f:4647 with SMTP id e7-20020adfe7c7000000b00336619f4647mr8666036wrn.108.1704303546236;
+        Wed, 03 Jan 2024 09:39:06 -0800 (PST)
 Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id x18-20020adff0d2000000b003365aa39d30sm30989513wro.11.2024.01.03.09.39.08
+        by smtp.gmail.com with ESMTPSA id k4-20020a5d5244000000b003368c8d120fsm29995262wrc.7.2024.01.03.09.39.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jan 2024 09:39:13 -0800 (PST)
+        Wed, 03 Jan 2024 09:39:05 -0800 (PST)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 3FDAA5F951;
+	by draig.lan (Postfix) with ESMTP id 57CC25F954;
 	Wed,  3 Jan 2024 17:33:51 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
@@ -105,10 +105,10 @@ Cc: qemu-s390x@nongnu.org,
 	Pierrick Bouvier <pierrick.bouvier@linaro.org>,
 	qemu-riscv@nongnu.org,
 	Alistair Francis <alistair.francis@wdc.com>,
-	qemu-stable@nongnu.org
-Subject: [PATCH v2 21/43] readthodocs: fully specify a build environment
-Date: Wed,  3 Jan 2024 17:33:27 +0000
-Message-Id: <20240103173349.398526-22-alex.bennee@linaro.org>
+	Akihiko Odaki <akihiko.odaki@daynix.com>
+Subject: [PATCH v2 22/43] hw/riscv: Use misa_mxl instead of misa_mxl_max
+Date: Wed,  3 Jan 2024 17:33:28 +0000
+Message-Id: <20240103173349.398526-23-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240103173349.398526-1-alex.bennee@linaro.org>
 References: <20240103173349.398526-1-alex.bennee@linaro.org>
@@ -121,61 +121,30 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-This is now expected by rtd so I've expanded using their example as
-22.04 is one of our supported platforms. I tried to work out if there
-was an easy way to re-generate a requirements.txt from our
-pythondeps.toml but in the end went for the easier solution.
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
 
-Cc:  <qemu-stable@nongnu.org>
+The effective MXL value matters when booting.
+
+Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+Message-Id: <20231213-riscv-v7-1-a760156a337f@daynix.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20231221174200.2693694-1-alex.bennee@linaro.org>
 ---
- docs/requirements.txt |  2 ++
- .readthedocs.yml      | 19 ++++++++++++-------
- 2 files changed, 14 insertions(+), 7 deletions(-)
- create mode 100644 docs/requirements.txt
+ hw/riscv/boot.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/docs/requirements.txt b/docs/requirements.txt
-new file mode 100644
-index 00000000000..691e5218ec7
---- /dev/null
-+++ b/docs/requirements.txt
-@@ -0,0 +1,2 @@
-+sphinx==5.3.0
-+sphinx_rtd_theme==1.1.1
-diff --git a/.readthedocs.yml b/.readthedocs.yml
-index 7fb7b8dd61a..0b262469ce6 100644
---- a/.readthedocs.yml
-+++ b/.readthedocs.yml
-@@ -5,16 +5,21 @@
- # Required
- version: 2
+diff --git a/hw/riscv/boot.c b/hw/riscv/boot.c
+index 0ffca05189f..bc67c0bd189 100644
+--- a/hw/riscv/boot.c
++++ b/hw/riscv/boot.c
+@@ -36,7 +36,7 @@
  
-+# Set the version of Python and other tools you might need
-+build:
-+  os: ubuntu-22.04
-+  tools:
-+    python: "3.11"
-+
- # Build documentation in the docs/ directory with Sphinx
- sphinx:
-   configuration: docs/conf.py
+ bool riscv_is_32bit(RISCVHartArrayState *harts)
+ {
+-    return harts->harts[0].env.misa_mxl_max == MXL_RV32;
++    return harts->harts[0].env.misa_mxl == MXL_RV32;
+ }
  
-+# We recommend specifying your dependencies to enable reproducible builds:
-+# https://docs.readthedocs.io/en/stable/guides/reproducible-builds.html
-+python:
-+  install:
-+    - requirements: docs/requirements.txt
-+
- # We want all the document formats
- formats: all
--
--# For consistency, we require that QEMU's Sphinx extensions
--# run with at least the same minimum version of Python that
--# we require for other Python in our codebase (our conf.py
--# enforces this, and some code needs it.)
--python:
--  version: 3.6
+ /*
 -- 
 2.39.2
 
