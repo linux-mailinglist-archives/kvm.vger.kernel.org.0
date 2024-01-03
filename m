@@ -1,64 +1,64 @@
-Return-Path: <kvm+bounces-5561-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5572-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3251E823380
-	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 18:39:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C60F82338E
+	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 18:40:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 357501C23606
-	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 17:39:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F6E21C228B1
+	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 17:40:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39F0C1C2B3;
-	Wed,  3 Jan 2024 17:39:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF42D1CFB7;
+	Wed,  3 Jan 2024 17:39:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jUtREQz5"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LHYQRu3m"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9AB31C28F
-	for <kvm@vger.kernel.org>; Wed,  3 Jan 2024 17:39:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47E921CAB0
+	for <kvm@vger.kernel.org>; Wed,  3 Jan 2024 17:39:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-40d2e56f3a6so4405605e9.1
-        for <kvm@vger.kernel.org>; Wed, 03 Jan 2024 09:39:07 -0800 (PST)
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-33674f60184so10729590f8f.1
+        for <kvm@vger.kernel.org>; Wed, 03 Jan 2024 09:39:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1704303546; x=1704908346; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1704303554; x=1704908354; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0sLk9Y6V09YT5mxoKGySQqDe7AUl7PrL/RJQ+Y1wnbw=;
-        b=jUtREQz5W4WX7PzkqkhyliAuxrjZQMCZQwJRYHRImmCDGgxne0iOXZZpUX7GnvQqra
-         wEvIcCjmtNeNqNFMSpe5AAIH3O3zMxd3CSw2iIM4uTW8njwtbriNNGbnYaPWTn8pfKNQ
-         ymWoSnpkPqM+UumPrf7h+PAi10++kJf3OUR1g39oPRoqzapif3LNT33v0C3uJ1wLCB7o
-         Wh4mZkIzQ7v55biNCdSBEGtCn0ixzfQSC7lqRTHYYuDzeot7DUpIEoFXI7c67nQIP3qu
-         es4Bkns6bwNVInv1w0tffVlNbia3U4XrbC4PHG704qW6xFe9PWrbJ6oG0CXfSCO2wYAR
-         ulNA==
+        bh=ciRl9sFGERSf23eviyCL0uKOJ2+yOOkqWUqo8JImKW0=;
+        b=LHYQRu3mGG0B8IzRJOVOuwlKvWXy7mPNgxS/NBHFM2JMw6cOvuBJWhgHc/Hf7h67MJ
+         tCvKsa1Y5xAq0FMb3lD3UNDJhevUCkVLoM9z7p1vHH4NHy4egK09ZZ+qyvAQb9bgA2zK
+         dgC+bpgSlz3jbi+RbTknLf6iKqxaUSxCXk1WBtZCz/ynTXmP8WDSITt3p1p6PAp0+0VY
+         V+3+FK91UC3YukKbdXXkSDE4zkHGo+o01wP07DbJ6sm5+WVInMyzPeXeMpyPEXsb7kmT
+         7AnnCAd5ezK5mM+5dHlXUBdSzU3B45QsD4IAQiL5/8M3bBAJKPYXk9RaSG98SnN8Ykyn
+         YS0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704303546; x=1704908346;
+        d=1e100.net; s=20230601; t=1704303554; x=1704908354;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=0sLk9Y6V09YT5mxoKGySQqDe7AUl7PrL/RJQ+Y1wnbw=;
-        b=Nw4eKOO+irSQJi4HWehoQVKRO9Axnz8avAV1WiSK+Lax31H1KKPOKJyCGQJXGFMmhe
-         yl3lg1N9ws4qQdBPfEzVhVt4ex9UBSZ6fESgxnB/cLzOpJWk5mAb03gIvT5bkl+w9VCu
-         bZWssLDGVdQkJcxo5q69PGjYOO1rD6XNLHRsUwTF8SpqT5lUs066xOEqozlDz3aoSQJ1
-         0cOUCyFWBJ7i0JJ+i+IrVVsE+2tGunPR9609pNK+TBzMODNKnytAcDQdvSDzjLEzZDX9
-         ZZnW2LflT0BeT9W4md5U6SHEo3llz8g9aElEnjLg8tpaa7mY6Pak/oxvQ9oSWr9Fpwiq
-         iK2g==
-X-Gm-Message-State: AOJu0Ywa6cNx5dHeyXu2qjsnLIzDMKkXWlLstsYYSbaQg7AdFIYu1RR6
-	Uj4hyvmvyUzlBycGEV7agz7dtWyhubngRA==
-X-Google-Smtp-Source: AGHT+IGR8Qb9ZKRyeNjw27aD8Jf1B/xnmHbcoluCD13YEs3zMnsmdYYJyBx3xpWJIG1auhT+vGCdLA==
-X-Received: by 2002:a05:600c:4fc7:b0:40d:3f30:a09e with SMTP id o7-20020a05600c4fc700b0040d3f30a09emr804540wmq.84.1704303546006;
-        Wed, 03 Jan 2024 09:39:06 -0800 (PST)
+        bh=ciRl9sFGERSf23eviyCL0uKOJ2+yOOkqWUqo8JImKW0=;
+        b=Q3t0qo1Ua2L4H26LLVeqG8+aEOvjLc6M7YM4NeXaOnHIqNDBBwn6AZVFBNlf+AcUrv
+         lh047SoPtISU8PDsCUJRmkdhTgN8Q1M0t8URLbYJ+cBSja/peyb6ksEk2P3uWWr3H8C7
+         S3qM3wTSP1avXjQfyNz+AEaFC8bS9mLpRS4sdy10O751rWxr2YrlXmKUhBuy9f5DFxR4
+         7DuHpgWIbRaHzaprz0Sm/w66fZVdT83+5UfMX0nXD+osLCq9X3Xs6uHa4VSbnlso3qrD
+         YNT+ukDCaZJPH6UenFc5sTO7L6kHOr9SeUhHDZmCPwvVmWctmYhlM3+2es/C999Ch+/N
+         SXtg==
+X-Gm-Message-State: AOJu0YyejFDEZkqg1egwgq5NViUfl0cZYYIXIEOigcoToSv/9Tyon85Z
+	TqOPs3NdDeUbZFQvfL+JzrN4R+OGWL7lbw==
+X-Google-Smtp-Source: AGHT+IFDLpxCZNS1nZaWXFfbL0Qz+KalAUozXFnUwdorNdWC3gGHXn5UNlLNInmNypjXhCCaw7+rvA==
+X-Received: by 2002:a5d:4849:0:b0:336:8f9f:c69c with SMTP id n9-20020a5d4849000000b003368f9fc69cmr10597659wrs.40.1704303554593;
+        Wed, 03 Jan 2024 09:39:14 -0800 (PST)
 Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id dr16-20020a5d5f90000000b003373ef060d5sm8567186wrb.113.2024.01.03.09.39.05
+        by smtp.gmail.com with ESMTPSA id x18-20020adff0d2000000b003365aa39d30sm30989513wro.11.2024.01.03.09.39.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jan 2024 09:39:05 -0800 (PST)
+        Wed, 03 Jan 2024 09:39:13 -0800 (PST)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 298A25F950;
+	by draig.lan (Postfix) with ESMTP id 3FDAA5F951;
 	Wed,  3 Jan 2024 17:33:51 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
@@ -105,10 +105,10 @@ Cc: qemu-s390x@nongnu.org,
 	Pierrick Bouvier <pierrick.bouvier@linaro.org>,
 	qemu-riscv@nongnu.org,
 	Alistair Francis <alistair.francis@wdc.com>,
-	=?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Subject: [PATCH v2 20/43] mtest2make: stop disabling meson test timeouts
-Date: Wed,  3 Jan 2024 17:33:26 +0000
-Message-Id: <20240103173349.398526-21-alex.bennee@linaro.org>
+	qemu-stable@nongnu.org
+Subject: [PATCH v2 21/43] readthodocs: fully specify a build environment
+Date: Wed,  3 Jan 2024 17:33:27 +0000
+Message-Id: <20240103173349.398526-22-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240103173349.398526-1-alex.bennee@linaro.org>
 References: <20240103173349.398526-1-alex.bennee@linaro.org>
@@ -121,61 +121,61 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Daniel P. Berrangé <berrange@redhat.com>
+This is now expected by rtd so I've expanded using their example as
+22.04 is one of our supported platforms. I tried to work out if there
+was an easy way to re-generate a requirements.txt from our
+pythondeps.toml but in the end went for the easier solution.
 
-The mtest2make.py script passes the arg '-t 0' to 'meson test' which
-disables all test timeouts. This is a major source of pain when running
-in GitLab CI and a test gets stuck. It will stall until GitLab kills the
-CI job. This leaves us with little easily consumable information about
-the stalled test. The TAP format doesn't show the test name until it is
-completed, and TAP output from multiple tests it interleaved. So we
-have to analyse the log to figure out what tests had un-finished TAP
-output present and thus infer which test case caused the hang. This is
-very time consuming and error prone.
-
-By allowing meson to kill stalled tests, we get a direct display of what
-test program got stuck, which lets us more directly focus in on what
-specific test case within the test program hung.
-
-The other issue with disabling meson test timeouts by default is that it
-makes it more likely that maintainers inadvertantly introduce slowdowns.
-For example the recent-ish change that accidentally made migrate-test
-take 15-20 minutes instead of around 1 minute.
-
-The main risk of this change is that the individual test timeouts might
-be too short to allow completion in high load scenarios. Thus, there is
-likely to be some short term pain where we have to bump the timeouts for
-certain tests to make them reliable enough. The preceeding few patches
-raised the timeouts for all failures that were immediately apparent
-in GitLab CI.
-
-Even with the possible short term instability, this should still be a
-net win for debuggability of failed CI pipelines over the long term.
-
-Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-Message-ID: <20230717182859.707658-13-berrange@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20231215070357.10888-17-thuth@redhat.com>
+Cc:  <qemu-stable@nongnu.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Message-Id: <20231221174200.2693694-1-alex.bennee@linaro.org>
 ---
- scripts/mtest2make.py | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ docs/requirements.txt |  2 ++
+ .readthedocs.yml      | 19 ++++++++++++-------
+ 2 files changed, 14 insertions(+), 7 deletions(-)
+ create mode 100644 docs/requirements.txt
 
-diff --git a/scripts/mtest2make.py b/scripts/mtest2make.py
-index 179dd548718..eb01a05ddbd 100644
---- a/scripts/mtest2make.py
-+++ b/scripts/mtest2make.py
-@@ -27,7 +27,8 @@ def names(self, base):
- .speed.slow = $(foreach s,$(sort $(filter-out %-thorough, $1)), --suite $s)
- .speed.thorough = $(foreach s,$(sort $1), --suite $s)
+diff --git a/docs/requirements.txt b/docs/requirements.txt
+new file mode 100644
+index 00000000000..691e5218ec7
+--- /dev/null
++++ b/docs/requirements.txt
+@@ -0,0 +1,2 @@
++sphinx==5.3.0
++sphinx_rtd_theme==1.1.1
+diff --git a/.readthedocs.yml b/.readthedocs.yml
+index 7fb7b8dd61a..0b262469ce6 100644
+--- a/.readthedocs.yml
++++ b/.readthedocs.yml
+@@ -5,16 +5,21 @@
+ # Required
+ version: 2
  
--.mtestargs = --no-rebuild -t 0
-+TIMEOUT_MULTIPLIER = 1
-+.mtestargs = --no-rebuild -t $(TIMEOUT_MULTIPLIER)
- ifneq ($(SPEED), quick)
- .mtestargs += --setup $(SPEED)
- endif
++# Set the version of Python and other tools you might need
++build:
++  os: ubuntu-22.04
++  tools:
++    python: "3.11"
++
+ # Build documentation in the docs/ directory with Sphinx
+ sphinx:
+   configuration: docs/conf.py
+ 
++# We recommend specifying your dependencies to enable reproducible builds:
++# https://docs.readthedocs.io/en/stable/guides/reproducible-builds.html
++python:
++  install:
++    - requirements: docs/requirements.txt
++
+ # We want all the document formats
+ formats: all
+-
+-# For consistency, we require that QEMU's Sphinx extensions
+-# run with at least the same minimum version of Python that
+-# we require for other Python in our codebase (our conf.py
+-# enforces this, and some code needs it.)
+-python:
+-  version: 3.6
 -- 
 2.39.2
 
