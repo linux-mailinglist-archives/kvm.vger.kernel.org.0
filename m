@@ -1,252 +1,122 @@
-Return-Path: <kvm+bounces-5523-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5524-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44403822ACC
-	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 10:59:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 392DF822BDB
+	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 12:11:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48B561C23348
-	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 09:59:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB5BE285238
+	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 11:11:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7683A199A9;
-	Wed,  3 Jan 2024 09:57:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE19818E1D;
+	Wed,  3 Jan 2024 11:11:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="YKx6rgmb"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E13FF1865C;
-	Wed,  3 Jan 2024 09:57:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4T4lR93hNjz1FHNv;
-	Wed,  3 Jan 2024 17:53:41 +0800 (CST)
-Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
-	by mail.maildlp.com (Postfix) with ESMTPS id 5586B1404F1;
-	Wed,  3 Jan 2024 17:57:40 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.56) by
- dggpemm500005.china.huawei.com (7.185.36.74) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 3 Jan 2024 17:57:27 +0800
-From: Yunsheng Lin <linyunsheng@huawei.com>
-To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
-	<linyunsheng@huawei.com>, Jason Wang <jasowang@redhat.com>, Jeroen de Borst
-	<jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
-	Shailend Chand <shailend@google.com>, Eric Dumazet <edumazet@google.com>,
-	Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>, Sean Wang
-	<sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo
- Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Keith
- Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>, Christoph Hellwig
-	<hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni
-	<kch@nvidia.com>, "Michael S. Tsirkin" <mst@redhat.com>, Andrew Morton
-	<akpm@linux-foundation.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-mediatek@lists.infradead.org>, <linux-nvme@lists.infradead.org>,
-	<kvm@vger.kernel.org>, <virtualization@lists.linux.dev>, <linux-mm@kvack.org>
-Subject: [PATCH net-next 5/6] net: introduce page_frag_cache_drain()
-Date: Wed, 3 Jan 2024 17:56:48 +0800
-Message-ID: <20240103095650.25769-6-linyunsheng@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20240103095650.25769-1-linyunsheng@huawei.com>
-References: <20240103095650.25769-1-linyunsheng@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2716F18EA2;
+	Wed,  3 Jan 2024 11:11:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 3C69140E0198;
+	Wed,  3 Jan 2024 11:11:09 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id r8QeUS3cq4S7; Wed,  3 Jan 2024 11:11:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1704280265; bh=EvFqA3G5zQt9g3fKMcrj1bE1ehqHXcw6mBCV4JtQWIw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YKx6rgmbRhf22e3UsoUMcNKqmDR9RA/CD4yEkGpCYrErsbXxbT093dcqKmHSXdCxP
+	 LkV5RQUGPWUCaejPCF3Kii2sVRFCL6Ife0SQcbk/8riaTljlOgWrHDozGPvhXuMQ2Z
+	 yrL1E2HjpBrhuJW5FL4SxiSpRIYBOe6dJQaJKf6Ey/TH8I8ge5eK0TaF3DTcYUNhDt
+	 oGb9rlDwR0GwE/5PPWN+Os+Yzo7r6DIJhAnt/Sekwu4ny/9UIsed3mK9aY7600geYW
+	 i+seCwzXQuNGD3cYPWTyVS+XXc1d97MVR55ACNC+oaCH3PbfpIMTt+mG4Ijn9mYUnu
+	 VUgjl6O1JRCSGUKJti7cgFoq5U2YRjpSppqv/Osyg6KRB5o2iCzjhDYQgGN7cCiSgZ
+	 8E+iqSF4BwVsT+BC9K+6T9yBaHR1X5L+92QxzXJxMXUpG972F0wzoU58pOCYjAM+Pl
+	 4NS3GqFoyhlzvGRpQld7IsAVbL7dRzLolISmTSe2nb4QprN3lUPKZfn4oQ8e0ArEVN
+	 Z2IAapg2TGR72DOeBBkP3nEIrf13tLIWGJ+k0w6AwCMT+EwZbfpnVHR/ciaBsCsM1C
+	 StHl+kOjaXHS/aeOEPojCmdVHu8iupHgvOTjK3mRe9BVvjET2p1qSAIXIOxXZsKQmK
+	 2dRfDvvHVHlh3jHhVZQrvpkA=
+Received: from zn.tnic (pd9530f8c.dip0.t-ipconnect.de [217.83.15.140])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 5A60640E01C5;
+	Wed,  3 Jan 2024 11:10:42 +0000 (UTC)
+Date: Wed, 3 Jan 2024 12:10:36 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: "Li, Xin3" <xin3.li@intel.com>
+Cc: "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-edac@vger.kernel.org" <linux-edac@vger.kernel.org>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
+	"tglx@linutronix.de" <tglx@linutronix.de>,
+	"mingo@redhat.com" <mingo@redhat.com>,
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+	"x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
+	"Lutomirski, Andy" <luto@kernel.org>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"seanjc@google.com" <seanjc@google.com>,
+	"peterz@infradead.org" <peterz@infradead.org>,
+	"jgross@suse.com" <jgross@suse.com>,
+	"Shankar, Ravi V" <ravi.v.shankar@intel.com>,
+	"mhiramat@kernel.org" <mhiramat@kernel.org>,
+	"andrew.cooper3@citrix.com" <andrew.cooper3@citrix.com>,
+	"jiangshanlai@gmail.com" <jiangshanlai@gmail.com>,
+	"nik.borisov@suse.com" <nik.borisov@suse.com>,
+	"Kang, Shan" <shan.kang@intel.com>
+Subject: Re: [PATCH v13 01/35] x86/cpufeatures,opcode,msr: Add the WRMSRNS
+ instruction support
+Message-ID: <20240103111036.GCZZVArGsoHdPauDFs@fat_crate.local>
+References: <20231205105030.8698-1-xin3.li@intel.com>
+ <20231205105030.8698-2-xin3.li@intel.com>
+ <20240102153426.GBZZQtAiWSdGAgKoIL@fat_crate.local>
+ <SA1PR11MB67348F79B44BE92FD2C8F12DA861A@SA1PR11MB6734.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpemm500005.china.huawei.com (7.185.36.74)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <SA1PR11MB67348F79B44BE92FD2C8F12DA861A@SA1PR11MB6734.namprd11.prod.outlook.com>
 
-When draining a page_frag_cache, most user are doing
-the similar steps, so introduce an API to avoid code
-duplication.
+On Tue, Jan 02, 2024 at 10:06:27PM +0000, Li, Xin3 wrote:
+> Do I need to send an updated patch?
 
-Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-Acked-by: Jason Wang <jasowang@redhat.com>
----
- drivers/net/ethernet/google/gve/gve_main.c | 11 ++---------
- drivers/net/ethernet/mediatek/mtk_wed_wo.c | 17 ++---------------
- drivers/nvme/host/tcp.c                    |  7 +------
- drivers/nvme/target/tcp.c                  |  4 +---
- drivers/vhost/net.c                        |  4 +---
- include/linux/gfp.h                        |  2 ++
- mm/page_alloc.c                            | 10 ++++++++++
- 7 files changed, 19 insertions(+), 36 deletions(-)
+> Or just leave it to the maintainer who is going to take care of it?
 
-diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
-index 619bf63ec935..d976190b0f4d 100644
---- a/drivers/net/ethernet/google/gve/gve_main.c
-+++ b/drivers/net/ethernet/google/gve/gve_main.c
-@@ -1278,17 +1278,10 @@ static void gve_unreg_xdp_info(struct gve_priv *priv)
- 
- static void gve_drain_page_cache(struct gve_priv *priv)
- {
--	struct page_frag_cache *nc;
- 	int i;
- 
--	for (i = 0; i < priv->rx_cfg.num_queues; i++) {
--		nc = &priv->rx[i].page_cache;
--		if (nc->va) {
--			__page_frag_cache_drain(virt_to_page(nc->va),
--						nc->pagecnt_bias);
--			nc->va = NULL;
--		}
--	}
-+	for (i = 0; i < priv->rx_cfg.num_queues; i++)
-+		page_frag_cache_drain(&priv->rx[i].page_cache);
- }
- 
- static int gve_open(struct net_device *dev)
-diff --git a/drivers/net/ethernet/mediatek/mtk_wed_wo.c b/drivers/net/ethernet/mediatek/mtk_wed_wo.c
-index d58b07e7e123..7063c78bd35f 100644
---- a/drivers/net/ethernet/mediatek/mtk_wed_wo.c
-+++ b/drivers/net/ethernet/mediatek/mtk_wed_wo.c
-@@ -286,7 +286,6 @@ mtk_wed_wo_queue_free(struct mtk_wed_wo *wo, struct mtk_wed_wo_queue *q)
- static void
- mtk_wed_wo_queue_tx_clean(struct mtk_wed_wo *wo, struct mtk_wed_wo_queue *q)
- {
--	struct page *page;
- 	int i;
- 
- 	for (i = 0; i < q->n_desc; i++) {
-@@ -301,19 +300,12 @@ mtk_wed_wo_queue_tx_clean(struct mtk_wed_wo *wo, struct mtk_wed_wo_queue *q)
- 		entry->buf = NULL;
- 	}
- 
--	if (!q->cache.va)
--		return;
--
--	page = virt_to_page(q->cache.va);
--	__page_frag_cache_drain(page, q->cache.pagecnt_bias);
--	memset(&q->cache, 0, sizeof(q->cache));
-+	page_frag_cache_drain(&q->cache);
- }
- 
- static void
- mtk_wed_wo_queue_rx_clean(struct mtk_wed_wo *wo, struct mtk_wed_wo_queue *q)
- {
--	struct page *page;
--
- 	for (;;) {
- 		void *buf = mtk_wed_wo_dequeue(wo, q, NULL, true);
- 
-@@ -323,12 +315,7 @@ mtk_wed_wo_queue_rx_clean(struct mtk_wed_wo *wo, struct mtk_wed_wo_queue *q)
- 		skb_free_frag(buf);
- 	}
- 
--	if (!q->cache.va)
--		return;
--
--	page = virt_to_page(q->cache.va);
--	__page_frag_cache_drain(page, q->cache.pagecnt_bias);
--	memset(&q->cache, 0, sizeof(q->cache));
-+	page_frag_cache_drain(&q->cache);
- }
- 
- static void
-diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
-index 08805f027810..c80037a78066 100644
---- a/drivers/nvme/host/tcp.c
-+++ b/drivers/nvme/host/tcp.c
-@@ -1344,7 +1344,6 @@ static int nvme_tcp_alloc_async_req(struct nvme_tcp_ctrl *ctrl)
- 
- static void nvme_tcp_free_queue(struct nvme_ctrl *nctrl, int qid)
- {
--	struct page *page;
- 	struct nvme_tcp_ctrl *ctrl = to_tcp_ctrl(nctrl);
- 	struct nvme_tcp_queue *queue = &ctrl->queues[qid];
- 	unsigned int noreclaim_flag;
-@@ -1355,11 +1354,7 @@ static void nvme_tcp_free_queue(struct nvme_ctrl *nctrl, int qid)
- 	if (queue->hdr_digest || queue->data_digest)
- 		nvme_tcp_free_crypto(queue);
- 
--	if (queue->pf_cache.va) {
--		page = virt_to_head_page(queue->pf_cache.va);
--		__page_frag_cache_drain(page, queue->pf_cache.pagecnt_bias);
--		queue->pf_cache.va = NULL;
--	}
-+	page_frag_cache_drain(&queue->pf_cache);
- 
- 	noreclaim_flag = memalloc_noreclaim_save();
- 	/* ->sock will be released by fput() */
-diff --git a/drivers/nvme/target/tcp.c b/drivers/nvme/target/tcp.c
-index 4cc27856aa8f..11237557cfc5 100644
---- a/drivers/nvme/target/tcp.c
-+++ b/drivers/nvme/target/tcp.c
-@@ -1576,7 +1576,6 @@ static void nvmet_tcp_free_cmd_data_in_buffers(struct nvmet_tcp_queue *queue)
- 
- static void nvmet_tcp_release_queue_work(struct work_struct *w)
- {
--	struct page *page;
- 	struct nvmet_tcp_queue *queue =
- 		container_of(w, struct nvmet_tcp_queue, release_work);
- 
-@@ -1600,8 +1599,7 @@ static void nvmet_tcp_release_queue_work(struct work_struct *w)
- 	if (queue->hdr_digest || queue->data_digest)
- 		nvmet_tcp_free_crypto(queue);
- 	ida_free(&nvmet_tcp_queue_ida, queue->idx);
--	page = virt_to_head_page(queue->pf_cache.va);
--	__page_frag_cache_drain(page, queue->pf_cache.pagecnt_bias);
-+	page_frag_cache_drain(&queue->pf_cache);
- 	kfree(queue);
- }
- 
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index 805e11d598e4..4b2fcb228a0a 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -1386,9 +1386,7 @@ static int vhost_net_release(struct inode *inode, struct file *f)
- 	kfree(n->vqs[VHOST_NET_VQ_RX].rxq.queue);
- 	kfree(n->vqs[VHOST_NET_VQ_TX].xdp);
- 	kfree(n->dev.vqs);
--	if (n->pf_cache.va)
--		__page_frag_cache_drain(virt_to_head_page(n->pf_cache.va),
--					n->pf_cache.pagecnt_bias);
-+	page_frag_cache_drain(&n->pf_cache);
- 	kvfree(n);
- 	return 0;
- }
-diff --git a/include/linux/gfp.h b/include/linux/gfp.h
-index bbd75976541e..03ba079655d3 100644
---- a/include/linux/gfp.h
-+++ b/include/linux/gfp.h
-@@ -316,6 +316,8 @@ extern void *page_frag_alloc_align(struct page_frag_cache *nc,
- 				   unsigned int fragsz, gfp_t gfp_mask,
- 				   unsigned int align);
- 
-+void page_frag_cache_drain(struct page_frag_cache *nc);
-+
- static inline void *page_frag_alloc(struct page_frag_cache *nc,
- 			     unsigned int fragsz, gfp_t gfp_mask)
- {
-diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-index 083e0c38fb62..5a0e68edcb05 100644
---- a/mm/page_alloc.c
-+++ b/mm/page_alloc.c
-@@ -4716,6 +4716,16 @@ void __page_frag_cache_drain(struct page *page, unsigned int count)
- }
- EXPORT_SYMBOL(__page_frag_cache_drain);
- 
-+void page_frag_cache_drain(struct page_frag_cache *nc)
-+{
-+	if (!nc->va)
-+		return;
-+
-+	__page_frag_cache_drain(virt_to_head_page(nc->va), nc->pagecnt_bias);
-+	nc->va = NULL;
-+}
-+EXPORT_SYMBOL(page_frag_cache_drain);
-+
- void *page_frag_alloc_align(struct page_frag_cache *nc,
- 		      unsigned int fragsz, gfp_t gfp_mask,
- 		      unsigned int align)
+While waiting, please take a look at this:
+
+https://kernel.org/doc/html/latest/process/submitting-patches.html#don-t-get-discouraged-or-impatient
+
+Might want to read the whole doc too.
+
+But to answer your question: you wait a few weeks and collect all
+comments and review feedback that you've received and incorporate them
+into the patchset.
+
+Then, after the time passes you send a new revision and explain in the
+0th message what has changed.
+
+Ok?
+
+Thx.
+
 -- 
-2.33.0
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
 
