@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-5494-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5495-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C323F82276C
-	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 04:11:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0605682276D
+	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 04:11:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0DB861F237D5
-	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 03:11:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9170B1C22C4D
+	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 03:11:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2854F18AFA;
-	Wed,  3 Jan 2024 03:09:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4651E18C27;
+	Wed,  3 Jan 2024 03:09:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CF/B0rch"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="D5/T5KqO"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ECD318657;
-	Wed,  3 Jan 2024 03:09:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38A0818B19;
+	Wed,  3 Jan 2024 03:09:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1704251385; x=1735787385;
+  t=1704251388; x=1735787388;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=IFRmYSrTmp2pxalXjLvBMU2+p6f3KOk5hMuD5pr8++o=;
-  b=CF/B0rchhttdHjZIi6qOw6XwO2OQnj34waFacoSZHU83mJQ/gg/Qo2hL
-   dTFIs56Y2FK7+unpkQek2PAX+mrhnCada5UBYZ9VcXw+NPD2bfmTeki25
-   zrkpp7TvR70zI4K9fMoSDgOu1Sdt9BWUoYFSacKtXr0gi/gB48nxU3s6V
-   dC/S5lS7JHUJwBgKZm5+GZpR0UVnvvztEf7WKxhyX5TKrDb5p1ngCJXxr
-   fnO5AiOSQQJUYvqbRcdjz3SduqQtkak5BUsQGTVuZgvJxyWJ30NDzV2wS
-   /661zVJaewB37m3VhBBNKc3N5VuVIWO8cKS6kUYDXWNihB4bIi7kDcV06
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10941"; a="10343137"
+  bh=F3O1AGqo4cde/C+vvkiVvkwpaA4RYdhbUZBoJXM9NzA=;
+  b=D5/T5KqO74nRN2APVdosF+a9fmAEVPzKg/rc49utwVITDt8uC22eFCeI
+   FCH0NnYgYDE1ojSYOzoQTUfGfsgbqGp03HsLiPsh0/VmhHLKOLfNsw1s8
+   B94nZqRwNZjkXxnddxTbDLwre2Rja2MSBb7zTOW3ux/v4scOHPrVQDa6i
+   8eD9ZE3mKnke7iPpsP9SsB/c8u7mfAI90Fsk9eUjrn2vuknZQETs4/9t1
+   GtI04F40G7RlrQ6y1pZbXaqahefGxWjXw+ZT0wyRb7z8jgnA7WoWUGbX9
+   WJdz92Spb61bFQwkUaZrW/60zS8YIhgxoj8h3qmSi+MJQILFL6fDYt096
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10941"; a="10343143"
 X-IronPort-AV: E=Sophos;i="6.04,326,1695711600"; 
-   d="scan'208";a="10343137"
+   d="scan'208";a="10343143"
 Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jan 2024 19:09:44 -0800
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jan 2024 19:09:48 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10941"; a="729665937"
+X-IronPort-AV: E=McAfee;i="6600,9927,10941"; a="729665941"
 X-IronPort-AV: E=Sophos;i="6.04,326,1695711600"; 
-   d="scan'208";a="729665937"
+   d="scan'208";a="729665941"
 Received: from dmi-pnp-i7.sh.intel.com ([10.239.159.155])
-  by orsmga003.jf.intel.com with ESMTP; 02 Jan 2024 19:09:40 -0800
+  by orsmga003.jf.intel.com with ESMTP; 02 Jan 2024 19:09:44 -0800
 From: Dapeng Mi <dapeng1.mi@linux.intel.com>
 To: Sean Christopherson <seanjc@google.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
@@ -59,9 +59,9 @@ Cc: kvm@vger.kernel.org,
 	Jinrong Liang <cloudliang@tencent.com>,
 	Dapeng Mi <dapeng1.mi@intel.com>,
 	Dapeng Mi <dapeng1.mi@linux.intel.com>
-Subject: [kvm-unit-tests Patch v3 04/11] x86: pmu: Switch instructions and core cycles events sequence
-Date: Wed,  3 Jan 2024 11:14:02 +0800
-Message-Id: <20240103031409.2504051-5-dapeng1.mi@linux.intel.com>
+Subject: [kvm-unit-tests Patch v3 05/11] x86: pmu: Refine fixed_events[] names
+Date: Wed,  3 Jan 2024 11:14:03 +0800
+Message-Id: <20240103031409.2504051-6-dapeng1.mi@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240103031409.2504051-1-dapeng1.mi@linux.intel.com>
 References: <20240103031409.2504051-1-dapeng1.mi@linux.intel.com>
@@ -73,126 +73,33 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When running pmu test on SPR, sometimes the following failure is
-reported.
-
-PMU version:         2
-GP counters:         8
-GP counter width:    48
-Mask length:         8
-Fixed counters:      3
-Fixed counter width: 48
-1000000 <= 55109398 <= 50000000
-FAIL: Intel: core cycles-0
-1000000 <= 18279571 <= 50000000
-PASS: Intel: core cycles-1
-1000000 <= 12238092 <= 50000000
-PASS: Intel: core cycles-2
-1000000 <= 7981727 <= 50000000
-PASS: Intel: core cycles-3
-1000000 <= 6984711 <= 50000000
-PASS: Intel: core cycles-4
-1000000 <= 6773673 <= 50000000
-PASS: Intel: core cycles-5
-1000000 <= 6697842 <= 50000000
-PASS: Intel: core cycles-6
-1000000 <= 6747947 <= 50000000
-PASS: Intel: core cycles-7
-
-The count of the "core cycles" on first counter would exceed the upper
-boundary and leads to a failure, and then the "core cycles" count would
-drop gradually and reach a stable state.
-
-That looks reasonable. The "core cycles" event is defined as the 1st
-event in xxx_gp_events[] array and it is always verified at first.
-when the program loop() is executed at the first time it needs to warm
-up the pipeline and cache, such as it has to wait for cache is filled.
-All these warm-up work leads to a quite large core cycles count which
-may exceeds the verification range.
-
-The event "instructions" instead of "core cycles" is a good choice as
-the warm-up event since it would always return a fixed count. Thus
-switch instructions and core cycles events sequence in the
-xxx_gp_events[] array.
+In SDM the fixed counter is numbered from 0 but currently the
+fixed_events names are numbered from 1. It would cause confusion for
+users. So Change the fixed_events[] names to number from 0 as well and
+keep identical with SDM.
 
 Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 ---
- x86/pmu.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ x86/pmu.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/x86/pmu.c b/x86/pmu.c
-index a42fff8d8b36..67ebfbe55b49 100644
+index 67ebfbe55b49..a2c64a1ce95b 100644
 --- a/x86/pmu.c
 +++ b/x86/pmu.c
-@@ -31,16 +31,16 @@ struct pmu_event {
- 	int min;
- 	int max;
- } intel_gp_events[] = {
--	{"core cycles", 0x003c, 1*N, 50*N},
- 	{"instructions", 0x00c0, 10*N, 10.2*N},
-+	{"core cycles", 0x003c, 1*N, 50*N},
- 	{"ref cycles", 0x013c, 1*N, 30*N},
- 	{"llc references", 0x4f2e, 1, 2*N},
- 	{"llc misses", 0x412e, 1, 1*N},
- 	{"branches", 0x00c4, 1*N, 1.1*N},
- 	{"branch misses", 0x00c5, 0, 0.1*N},
- }, amd_gp_events[] = {
--	{"core cycles", 0x0076, 1*N, 50*N},
- 	{"instructions", 0x00c0, 10*N, 10.2*N},
-+	{"core cycles", 0x0076, 1*N, 50*N},
+@@ -44,9 +44,9 @@ struct pmu_event {
  	{"branches", 0x00c2, 1*N, 1.1*N},
  	{"branch misses", 0x00c3, 0, 0.1*N},
  }, fixed_events[] = {
-@@ -307,7 +307,7 @@ static void check_counter_overflow(void)
- 	int i;
- 	pmu_counter_t cnt = {
- 		.ctr = MSR_GP_COUNTERx(0),
--		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[1].unit_sel /* instructions */,
-+		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[0].unit_sel /* instructions */,
- 	};
- 	overflow_preset = measure_for_overflow(&cnt);
+-	{"fixed 1", MSR_CORE_PERF_FIXED_CTR0, 10*N, 10.2*N},
+-	{"fixed 2", MSR_CORE_PERF_FIXED_CTR0 + 1, 1*N, 30*N},
+-	{"fixed 3", MSR_CORE_PERF_FIXED_CTR0 + 2, 0.1*N, 30*N}
++	{"fixed 0", MSR_CORE_PERF_FIXED_CTR0, 10*N, 10.2*N},
++	{"fixed 1", MSR_CORE_PERF_FIXED_CTR0 + 1, 1*N, 30*N},
++	{"fixed 2", MSR_CORE_PERF_FIXED_CTR0 + 2, 0.1*N, 30*N}
+ };
  
-@@ -365,11 +365,11 @@ static void check_gp_counter_cmask(void)
- {
- 	pmu_counter_t cnt = {
- 		.ctr = MSR_GP_COUNTERx(0),
--		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[1].unit_sel /* instructions */,
-+		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[0].unit_sel /* instructions */,
- 	};
- 	cnt.config |= (0x2 << EVNTSEL_CMASK_SHIFT);
- 	measure_one(&cnt);
--	report(cnt.count < gp_events[1].min, "cmask");
-+	report(cnt.count < gp_events[0].min, "cmask");
- }
- 
- static void do_rdpmc_fast(void *ptr)
-@@ -446,7 +446,7 @@ static void check_running_counter_wrmsr(void)
- 	uint64_t count;
- 	pmu_counter_t evt = {
- 		.ctr = MSR_GP_COUNTERx(0),
--		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[1].unit_sel,
-+		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[0].unit_sel,
- 	};
- 
- 	report_prefix_push("running counter wrmsr");
-@@ -455,7 +455,7 @@ static void check_running_counter_wrmsr(void)
- 	loop();
- 	wrmsr(MSR_GP_COUNTERx(0), 0);
- 	stop_event(&evt);
--	report(evt.count < gp_events[1].min, "cntr");
-+	report(evt.count < gp_events[0].min, "cntr");
- 
- 	/* clear status before overflow test */
- 	if (this_cpu_has_perf_global_status())
-@@ -493,7 +493,7 @@ static void check_emulated_instr(void)
- 	pmu_counter_t instr_cnt = {
- 		.ctr = MSR_GP_COUNTERx(1),
- 		/* instructions */
--		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[1].unit_sel,
-+		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[0].unit_sel,
- 	};
- 	report_prefix_push("emulated instruction");
- 
+ char *buf;
 -- 
 2.34.1
 
