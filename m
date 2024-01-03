@@ -1,315 +1,211 @@
-Return-Path: <kvm+bounces-5593-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5594-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29B9D82362C
-	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 21:09:37 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C3F6823670
+	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 21:20:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A1C121F2562F
-	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 20:09:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 02286B23CF5
+	for <lists+kvm@lfdr.de>; Wed,  3 Jan 2024 20:20:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C09EE1D539;
-	Wed,  3 Jan 2024 20:09:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C8551DA2F;
+	Wed,  3 Jan 2024 20:18:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=joelfernandes.org header.i=@joelfernandes.org header.b="iP5B2JSV"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="cudjj8zo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2060.outbound.protection.outlook.com [40.107.101.60])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F76B1D522
-	for <kvm@vger.kernel.org>; Wed,  3 Jan 2024 20:09:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=joelfernandes.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=joelfernandes.org
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-7811c02cfecso708877385a.2
-        for <kvm@vger.kernel.org>; Wed, 03 Jan 2024 12:09:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=joelfernandes.org; s=google; t=1704312551; x=1704917351; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=pM/8dQfYS9UuYC/k2nrRJhStfDT3AcSvNyR2TpRbd0w=;
-        b=iP5B2JSVTUDaFhZSQQ7ubaw5kIOmh2mtr6VMQA9xuaImDIUUcUXslCNF133QBbteJW
-         SgOwsV9PsTa4W0L9a8sr3gqxC2lkx8B9Lp617BOjkwm55OVNS6VVZIZIyc02yS1udIcd
-         eCsv7NjeP0IOG+ExYspPvkmO/9IcMIHFWu9UQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704312551; x=1704917351;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pM/8dQfYS9UuYC/k2nrRJhStfDT3AcSvNyR2TpRbd0w=;
-        b=I59aw7TEv2IXmJk86zP+hvWh/vv9lvuDQYaCBt4/jJeNmciLHLyXjjcJ8esdS6daJS
-         50nEnFWKZuZWAMJ6Ou3y+Mm8OoLeyz1yUBJdJX5t7iCwsKmJ2EXlKrHijsugAdEswK9g
-         n50lR/Myyi7K2iVmKXwrxNclUTAp75jpmt+SJJbTpGGfLkbD/HtQ72Jf6iPZnpKLt6+T
-         x4dn15uuOV6n1h8GIIQCH9hgdDzDusbg9Uv5ph2DhgZ2d/V84sbi7MBvy+E7AA2qOg0w
-         uT0YWQ6ZvMuy0skkRR8fv2FaDZ/+lCxNTXq7rImNr6XrIcQOeXdIGgUBof8wRHF4UTUw
-         Zxtw==
-X-Gm-Message-State: AOJu0Yxtxlyc/CCeY5Cqyf0Zb7gTZqfurYk7c8pTnGnMPbWEt2QPu1A8
-	BICKHubGTfnyfnyRFIRuFIxwsbo3KRSz9A==
-X-Google-Smtp-Source: AGHT+IEDlOVbK+1wecfwRGZEXxfPCLa4shUGFn+dWsCL1mobQgvnwjenM/WmHyzusLqLkKMPH6B53Q==
-X-Received: by 2002:a05:620a:2482:b0:781:3c4b:350 with SMTP id i2-20020a05620a248200b007813c4b0350mr20140060qkn.56.1704312550967;
-        Wed, 03 Jan 2024 12:09:10 -0800 (PST)
-Received: from localhost (c-98-249-43-138.hsd1.va.comcast.net. [98.249.43.138])
-        by smtp.gmail.com with ESMTPSA id x15-20020ae9e90f000000b00781baa4db60sm2808979qkf.66.2024.01.03.12.09.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jan 2024 12:09:10 -0800 (PST)
-Message-ID: <6595bee6.e90a0220.57b35.76e9@mx.google.com>
-X-Google-Original-Message-ID: <20240103200907.GA654520@JoelBox.>
-Date: Wed, 3 Jan 2024 15:09:07 -0500
-From: Joel Fernandes <joel@joelfernandes.org>
-To: David Vernet <void@manifault.com>
-Cc: Sean Christopherson <seanjc@google.com>,
-	"Vineeth Pillai (Google)" <vineeth@bitbyteword.org>,
-	Ben Segall <bsegall@google.com>, Borislav Petkov <bp@alien8.de>,
-	Daniel Bristot de Oliveira <bristot@redhat.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Dietmar Eggemann <dietmar.eggemann@arm.com>,
-	"H . Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-	Juri Lelli <juri.lelli@redhat.com>, Mel Gorman <mgorman@suse.de>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Valentin Schneider <vschneid@redhat.com>,
-	Vincent Guittot <vincent.guittot@linaro.org>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Wanpeng Li <wanpengli@tencent.com>,
-	Suleiman Souhlal <suleiman@google.com>,
-	Masami Hiramatsu <mhiramat@google.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, x86@kernel.org,
-	Tejun Heo <tj@kernel.org>, Josh Don <joshdon@google.com>,
-	Barret Rhoden <brho@google.com>, David Dunn <daviddunn@google.com>,
-	julia.lawall@inria.fr, himadrispandya@gmail.com,
-	jean-pierre.lozi@inria.fr, ast@kernel.org, paulmck@kernel.org
-Subject: Re: [RFC PATCH 0/8] Dynamic vcpu priority management in kvm
-References: <20231214024727.3503870-1-vineeth@bitbyteword.org>
- <ZXsvl7mabUuNkWcY@google.com>
- <20231215181014.GB2853@maniforge>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C32B91DA22;
+	Wed,  3 Jan 2024 20:18:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KIO/LXh92c42RCc8sukOkjKnU8o15Fgadg57OvOI4KDoEvOsaUuU0bi5Det5Z6jOeAfQ+kZEoDewws5WjD2K1rlddhaGLSENSBv8X87trjkRVLPH4EwyGf9aE1LV/bD06BdBRWrw1xOxmsyhuE/zpqrmHDqmA9LkFJV7rq1HeSZ1em/MuvghKS5el/08qd9a969K2x6YlfC3H79Wj/hLB+BS8VMZhNrJ/WrhYkQOteRlCQ1vtdCJBVXmANy2NsLJFJQSCF8CxJuJ1o6U+k4kmJFXv4wkP7Cy8lGP3aIG0+Syv9D7CJfnf7ypbSTrThtz2AnHWX35TH3glQiTPl9vgg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3Jkzvf45R652jTNTistK6FIpzk5K5NTE1x/nlt5KJjg=;
+ b=niCkWzzRyx/9G1ju/rGUeRjHWVv9bwnT8pJ9gcD8RCOZ0kbCSXv7V/RqXuF6EaKHJ0W+JW0z4LMfoOGZP24kVzc5RtOGEYFAJZXNtWD4fW166qZkVhUMk+dj5TOwT+W/rYCDB2Eu7Uad35fcVQ32goyn7sLTcfKa9pGyi/qNGcVQFHCTwW0JZNt+AMVay+IrbVyqfGraFdaIZdWH288K70K8LZQ3/XxnGEbf8ejXxSc2INSdwX83xXzwfwYzvA6a0R/mc4xtyEYmgjk90B+XLU8C1wP10MJjJDeYzfKHJK/C2GakxYdCPzfWow4EMHMOW0zGWYcqg8pSMw4/MNKcgA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=oracle.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3Jkzvf45R652jTNTistK6FIpzk5K5NTE1x/nlt5KJjg=;
+ b=cudjj8zoOGTKywdtHbQ0ZQxegR7VOILFwtnnzRvFyqcJnSffrJCc9UauSvqv2iqPTpftiWGm1gDhdogbe3U1X8c5sE3C1Gl3hzmX5MayHu01K3RV22vlbL2PN28umV5E2Y7ynptCdrj6a9EGkbRbilR1nXkzp6fQS1K9T7Pkoh8o3Sa4ruoJ0pqobQAcZDMVAuKEkSD1duadj63w1nNT5VRpCPSt8kaFEm++9dXHmZ1sh2Ry7TNBI3wcb/Rfi/AIOs+NlfnZHf+YOo18VHDTWyx0lduaxj/3EO97DREenlTyBSnC0YTpD7sykwnaA7ORFTdGO4Wr17gP7nyFvpS6BA==
+Received: from BLAPR03CA0066.namprd03.prod.outlook.com (2603:10b6:208:329::11)
+ by SA1PR12MB5613.namprd12.prod.outlook.com (2603:10b6:806:22b::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.13; Wed, 3 Jan
+ 2024 20:18:48 +0000
+Received: from MN1PEPF0000F0E2.namprd04.prod.outlook.com
+ (2603:10b6:208:329:cafe::8) by BLAPR03CA0066.outlook.office365.com
+ (2603:10b6:208:329::11) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.13 via Frontend
+ Transport; Wed, 3 Jan 2024 20:18:47 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ MN1PEPF0000F0E2.mail.protection.outlook.com (10.167.242.40) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7159.9 via Frontend Transport; Wed, 3 Jan 2024 20:18:47 +0000
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Wed, 3 Jan 2024
+ 12:18:38 -0800
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail204.nvidia.com
+ (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Wed, 3 Jan 2024
+ 12:18:38 -0800
+Received: from Asurada-Nvidia (10.127.8.12) by mail.nvidia.com (10.129.68.9)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41 via Frontend
+ Transport; Wed, 3 Jan 2024 12:18:37 -0800
+Date: Wed, 3 Jan 2024 12:18:35 -0800
+From: Nicolin Chen <nicolinc@nvidia.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+CC: Yi Liu <yi.l.liu@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>,
+	"joro@8bytes.org" <joro@8bytes.org>, "alex.williamson@redhat.com"
+	<alex.williamson@redhat.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>,
+	"baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>, "cohuck@redhat.com"
+	<cohuck@redhat.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mjrosato@linux.ibm.com"
+	<mjrosato@linux.ibm.com>, "chao.p.peng@linux.intel.com"
+	<chao.p.peng@linux.intel.com>, "yi.y.sun@linux.intel.com"
+	<yi.y.sun@linux.intel.com>, "peterx@redhat.com" <peterx@redhat.com>,
+	"jasowang@redhat.com" <jasowang@redhat.com>,
+	"shameerali.kolothum.thodi@huawei.com"
+	<shameerali.kolothum.thodi@huawei.com>, "lulu@redhat.com" <lulu@redhat.com>,
+	"suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "Duan,
+ Zhenzhong" <zhenzhong.duan@intel.com>, "joao.m.martins@oracle.com"
+	<joao.m.martins@oracle.com>, "Zeng, Xin" <xin.zeng@intel.com>, "Zhao, Yan Y"
+	<yan.y.zhao@intel.com>
+Subject: Re: [PATCH v7 1/3] iommufd: Add data structure for Intel VT-d
+ stage-1 cache invalidation
+Message-ID: <ZZXBGw9dJyvb/5r5@Asurada-Nvidia>
+References: <BN9PR11MB52766D7F774510E0181CC89B8C93A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZXvI2IiXwwuHRE8V@Asurada-Nvidia>
+ <7c398efc-8a2f-479d-bcff-ded8cc1ef3d0@intel.com>
+ <20240102233849.GK50406@nvidia.com>
+ <c59a780d-4030-4815-a34b-fb2e2f902ab3@intel.com>
+ <20240103160108.GP50406@nvidia.com>
+ <ZZWP7iBqUtbTRb3s@Asurada-Nvidia>
+ <20240103165848.GR50406@nvidia.com>
+ <ZZWUD+lCw3mRc/15@Asurada-Nvidia>
+ <20240103175202.GT50406@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20231215181014.GB2853@maniforge>
+In-Reply-To: <20240103175202.GT50406@nvidia.com>
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN1PEPF0000F0E2:EE_|SA1PR12MB5613:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7b7a37cf-0c68-447d-36a5-08dc0c993177
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	1JeP9scPdpI5yaSzg1u9k4VBF1pBKy0IMLNohTEOQPy5Cu1W/hy6BTDAM7U8oCO3vSpOseatrrOxKpNa/mZxPMTgj7UqhUm5x/m87O/g7ys4VO0l4lolK9aKN44j4y40pAiFzzOwKKuArEPwMdR+I+oFtJDfPCf34txyGDfooH3oBec3sJK0jDCg+V+4OEk1y6gD0Br7vhvDGqW/jFSQObuxLZXsFqPcX1VvbUthIBgd7LT+HnuEaMD/sukf55wNBZ43Myjj4kogZOBYYu4mKhbrYJ+ikYpWQbg9bk4WKqhAUl4N/0PEYqolqffxoUM1YJdQF92oPDnaNjsM4ZN+IU0b5I4BZEkrzwlD5zUQE57m+Bt5ahdnj4JbVH7jRyMi7JD/3OnMqDOjbfN7uNECbnPbi0U4L1N0+5CpdBM+HaDji27q3flzbJlkMvKmxJ9DV7We6OlfQvFXDW2z9X9AYqJOdLWVpzjEfVK+htLldyRx/23+Hp1Qa51EsE6QsYDIA83riJTtvw6L1TaZ9qpWj+eqdgi+jpw7Fbgi/VmkXOIXszmbxkfskxA42tXsJ9jAgvMcaLtOLHO0scauSeciqZigFhRgezk0mZH9HHLxtHS1HlwfJadiAe0s3njqAF+4kc1Drkqt1tHqBog+H9/g/sgXC9ReMmfdozexbLo/fF4FnUb6E7Ry22IHesvtSE9lY9kMZEkVxxoj+WI1MzoaxciGAOgnxW8Vn3RDbvfeokeiuePdwMSYVwxkZ1uLbD55
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(396003)(39860400002)(136003)(376002)(346002)(230922051799003)(82310400011)(186009)(64100799003)(451199024)(1800799012)(40470700004)(36840700001)(46966006)(55016003)(40480700001)(40460700003)(70206006)(70586007)(336012)(9686003)(86362001)(7636003)(356005)(82740400003)(33716001)(426003)(41300700001)(47076005)(26005)(83380400001)(2906002)(5660300002)(6862004)(7416002)(4326008)(6636002)(478600001)(8676002)(8936002)(316002)(36860700001)(54906003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jan 2024 20:18:47.7318
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7b7a37cf-0c68-447d-36a5-08dc0c993177
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MN1PEPF0000F0E2.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB5613
 
-Hi David,
-
-On Fri, Dec 15, 2023 at 12:10:14PM -0600, David Vernet wrote:
-> On Thu, Dec 14, 2023 at 08:38:47AM -0800, Sean Christopherson wrote:
-> > +sched_ext folks
-> 
-> Thanks for the cc.
-
-Just back from holidays, sorry for the late reply. But it was a good break to
-go over your email in more detail ;-).
-
-> > On Wed, Dec 13, 2023, Vineeth Pillai (Google) wrote:
-> > > Double scheduling is a concern with virtualization hosts where the host
-> > > schedules vcpus without knowing whats run by the vcpu and guest schedules
-> > > tasks without knowing where the vcpu is physically running. This causes
-> > > issues related to latencies, power consumption, resource utilization
-> > > etc. An ideal solution would be to have a cooperative scheduling
-> > > framework where the guest and host shares scheduling related information
-> > > and makes an educated scheduling decision to optimally handle the
-> > > workloads. As a first step, we are taking a stab at reducing latencies
-> > > for latency sensitive workloads in the guest.
+On Wed, Jan 03, 2024 at 01:52:02PM -0400, Jason Gunthorpe wrote:
+> On Wed, Jan 03, 2024 at 09:06:23AM -0800, Nicolin Chen wrote:
+> > On Wed, Jan 03, 2024 at 12:58:48PM -0400, Jason Gunthorpe wrote:
+> > > On Wed, Jan 03, 2024 at 08:48:46AM -0800, Nicolin Chen wrote:
+> > > > > You can pass the ctx to the invalidate op, it is already implied
+> > > > > because the passed iommu_domain is linked to a single iommufd ctx.
+> > > > 
+> > > > The device virtual id lookup API needs something similar, yet it
+> > > > likely needs a viommu pointer (or its id) instead? As the table
+> > > > is attached to a viommu while an ictx can have multiple viommus,
+> > > > right?
 > > > 
-> > > This series of patches aims to implement a framework for dynamically
-> > > managing the priority of vcpu threads based on the needs of the workload
-> > > running on the vcpu. Latency sensitive workloads (nmi, irq, softirq,
-> > > critcal sections, RT tasks etc) will get a boost from the host so as to
-> > > minimize the latency.
-> > > 
-> > > The host can proactively boost the vcpu threads when it has enough
-> > > information about what is going to run on the vcpu - fo eg: injecting
-> > > interrupts. For rest of the case, guest can request boost if the vcpu is
-> > > not already boosted. The guest can subsequently request unboost after
-> > > the latency sensitive workloads completes. Guest can also request a
-> > > boost if needed.
-> > > 
-> > > A shared memory region is used to communicate the scheduling information.
-> > > Guest shares its needs for priority boosting and host shares the boosting
-> > > status of the vcpu. Guest sets a flag when it needs a boost and continues
-> > > running. Host reads this on next VMEXIT and boosts the vcpu thread. For
-> > > unboosting, it is done synchronously so that host workloads can fairly
-> > > compete with guests when guest is not running any latency sensitive
-> > > workload.
+> > > Yes, when we get to an API for that it will have to be some op
+> > > 'invalidate_viommu(..)' and it can get the necessary pointers.
 > > 
-> > Big thumbs down on my end.  Nothing in this RFC explains why this should be done
-> > in KVM.  In general, I am very opposed to putting policy of any kind into KVM,
-> > and this puts a _lot_ of unmaintainable policy into KVM by deciding when to
-> > start/stop boosting a vCPU.
-> 
-> I have to agree, not least of which is because in addition to imposing a
-> severe maintenance tax, these policies are far from exhaustive in terms
-> of what you may want to do for cooperative paravirt scheduling.
-
-Just to clarify the 'policy' we are discussing here, it is not about 'how to
-schedule' but rather 'how/when to boost/unboost'. We want the existing
-scheduler (or whatever it might be in the future) to make the actual decision
-about how to schedule.
-
-In that sense, I agree with Sean that we are probably forcing a singular
-policy on when and how to boost which might not work for everybody (in theory
-anyway). And I am perfectly OK with the BPF route as I mentioned in the other
-email. So perhaps we can use a tracepoint in the VMEXIT path to run a BPF
-program (?). And we still have to figure out how to run BPF programs in the
-interrupt injections patch (I am currently studying those paths more also
-thanks to Sean's email describing them).
-
-> I think
-> something like sched_ext would give you the best of all worlds: no
-> maintenance burden on the KVM maintainers, more options for implementing
-> various types of policies, performant, safe to run on the host, no need
-> to reboot when trying a new policy, etc. More on this below.
-
-I think switching to sched_ext just for this is overkill, we don't want
-to change the scheduler yet which is a much more invasive/involved changed.
-For instance, we want the features of this patchset to work for ARM as well
-which heavily depends on EAS/cpufreq.
-
-[...]
-> > Concretely, boosting vCPUs for most events is far too coarse grained.  E.g. boosting
-> > a vCPU that is running a low priority workload just because the vCPU triggered
-> > an NMI due to PMU counter overflow doesn't make sense.  Ditto for if a guest's
-> > hrtimer expires on a vCPU running a low priority workload.
-> >
-> > And as evidenced by patch 8/8, boosting vCPUs based on when an event is _pending_
-> > is not maintainable.  As hardware virtualizes more and more functionality, KVM's
-> > visilibity into the guest effectively decreases, e.g. Intel and AMD both support
-> > with IPI virtualization.
+> > OK! I will try that first.
 > > 
-> > Boosting the target of a PV spinlock kick is similarly flawed.  In that case, KVM
-> > only gets involved _after_ there is a problem, i.e. after a lock is contended so
-> > heavily that a vCPU stops spinning and instead decided to HLT.  It's not hard to
-> > imagine scenarios where a guest would want to communicate to the host that it's
-> > acquiring a spinlock for a latency sensitive path and so shouldn't be scheduled
-> > out.  And of course that's predicated on the assumption that all vCPUs are subject
-> > to CPU overcommit.
+> > > The viommu object will have to be some driver object like the
+> > > iommu_domain.
 > > 
-> > Initiating a boost from the host is also flawed in the sense that it relies on
-> > the guest to be on the same page as to when it should stop boosting.  E.g. if
-> > KVM boosts a vCPU because an IRQ is pending, but the guest doesn't want to boost
-> > IRQs on that vCPU and thus doesn't stop boosting at the end of the IRQ handler,
-> > then the vCPU could end up being boosted long after its done with the IRQ.
+> > I drafted something like this, linking it to struct iommu_device:
 > > 
-> > Throw nested virtualization into the mix and then all of this becomes nigh
-> > impossible to sort out in KVM.  E.g. if an L1 vCPU is a running an L2 vCPU, i.e.
-> > a nested guest, and L2 is spamming interrupts for whatever reason, KVM will end
-> > repeatedly boosting the L1 vCPU regardless of the priority of the L2 workload.
-> > 
-> > For things that aren't clearly in KVM's domain, I don't think we should implement
-> > KVM-specific functionality until every other option has been tried (and failed).
-> > I don't see any reason why KVM needs to get involved in scheduling, beyond maybe
-> > providing *input* regarding event injection, emphasis on *input* because KVM
-> > providing information to userspace or some other entity is wildly different than
-> > KVM making scheduling decisions based on that information.
-> > 
-> > Pushing the scheduling policies to host userspace would allow for far more control
-> > and flexibility.  E.g. a heavily paravirtualized environment where host userspace
-> > knows *exactly* what workloads are being run could have wildly different policies
-> > than an environment where the guest is a fairly vanilla Linux VM that has received
-> > a small amount of enlightment.
-> > 
-> > Lastly, if the concern/argument is that userspace doesn't have the right knobs
-> > to (quickly) boost vCPU tasks, then the proposed sched_ext functionality seems
-> > tailor made for the problems you are trying to solve.
-> >
-> > https://lkml.kernel.org/r/20231111024835.2164816-1-tj%40kernel.org
+> > +struct iommufd_viommu {
+> > +       struct iommufd_object obj;
+> > +       struct iommufd_ctx *ictx;
+> > +       struct iommu_device *iommu_dev;
+> > +       struct iommufd_hwpt_paging *hwpt;
+> > +       /* array of struct iommufd_device, indexed by device virtual id */
+> > +       struct xarray device_ids;
+> > +};
 > 
-> I very much agree. There are some features missing from BPF that we'd
-> need to add to enable this, but they're on the roadmap, and I don't
-> think they'd be especially difficult to implement.
+> The driver would have to create it and there would be some driver
+> specific enclosing struct to go with it
 > 
-> The main building block that I was considering is a new kptr [0] and set
-> of kfuncs [1] that would allow a BPF program to have one or more R/W
-> shared memory regions with a guest.
+> Perhaps device_ids goes in the driver specific struct, I don't know.
 
-I really like your ideas around sharing memory across virt boundary using
-BPF. The one concern I would have is that, this does require loading a BPF
-program from the guest userspace, versus just having a guest kernel that
-'does the right thing'.
++struct iommufd_viommu {
++	struct iommufd_object obj;
++	struct iommufd_ctx *ictx;
++	struct iommu_device *iommu_dev;
++	struct iommufd_hwpt_paging *hwpt;	/* maybe unneeded */
++
++	int vmid;
++
++	union iommu_driver_user_data {
++		struct iommu_driver_user_vtd;
++		struct iommu_driver_user_arm_smmuv3;
++		struct iommu_driver_user_amd_viommu;
++	};
++};
 
-On the host, I would have no problem loading a BPF program as a one-time
-thing, but on the guest it may be more complex as we don't always control the
-guest userspace and their BPF loading mechanisms. Example, an Android guest
-needs to have its userspace modified to load BPF progs, etc. Not hard
-problems, but flexibility comes with more cost. Last I recall, Android does
-not use a lot of the BPF features that come with the libbpf library because
-they write their own userspace from scratch (due to licensing). OTOH, if this
-was an Android kernel-only change, that would simplify a lot.
+Then iommu_ops would need something like:
+	iommu_user_alloc/free(struct iommu_device *iommu_dev,
+			      union *iommu_driver_user_data, int *vmid);
+	iommu_user_set/unset_dev_id(union iommu_driver_user_data,
+				    struct device* dev. u32/u64 id);
+	iommu_user_invalidate(union iommu_driver_user_data *iommu,
+			      struct iommu_user_data_array *array);
 
-Still there is a lot of merit to sharing memory with BPF and let BPF decide
-the format of the shared memory, than baking it into the kernel... so thanks
-for bringing this up! Lets talk more about it... Oh, and there's my LSFMMBPF
-invitiation request ;-) ;-).
+Comments and ideas on better naming convention?
 
-> This could enable a wide swath of
-> BPF paravirt use cases that are not limited to scheduling, but in terms
-> of sched_ext, the BPF scheduler could communicate with the guest
-> scheduler over this shared memory region in whatever manner was required
-> for that use case.
-> 
-> [0]: https://lwn.net/Articles/900749/
-> [1]: https://lwn.net/Articles/856005/
+> Not sure it should have hwpt at all, probably vmid should come from
+> the driver specific struct in some driver specific way
 
-Thanks, I had no idea about these. I have a question -- would it be possible
-to call the sched_setscheduler() function in core.c via a kfunc? Then we can
-trigger the boost from a BPF program on the host side. We could start simple
-from there.
+The idea having a hwpt pointer is to share the paging hwpt among
+the viommu objects. I don't think it "shouldn't have", yet likely
+we can avoid it depending on whether it will have some use or not
+in the context.
 
-I agree on the rest below. I just wanted to emphasize though that this patch
-series does not care about what the scheduler does. It merely hints the
-scheduler via a priority setting that something is an important task. That's
-a far cry from how to actually schedule and the spirit here is to use
-whatever scheduler the user has to decide how to actually schedule.
-
-thanks,
-
- - Joel
-
-
-> For example, the guest could communicate scheduling intention such as:
-> 
-> - "Don't preempt me and/or boost me (because I'm holding a spinlock, in an
->   NMI region, running some low-latency task, etc)".
-> - "VCPU x prefers to be on a P core", and then later, "Now it prefers an
->   E core". Note that this doesn't require pinning or anything like that.
->   It's just the VCPU requesting some best-effort placement, and allowing
->   that policy to change dynamically depending on what the guest is
->   doing.
-> - "Try to give these VCPUs their own fully idle cores if possible, but
->   these other VCPUs should ideally be run as hypertwins as they're
->   expected to have good cache locality", etc.
-> 
-> In general, some of these policies might be silly and not work well,
-> others might work very well for some workloads / architectures and not
-> as well on others, etc. sched_ext would make it easy to try things out
-> and see what works well, without having to worry about rebooting or
-> crashing the host, and ultimately without having to implement and
-> maintain some scheduling policy directly in KVM. As Sean said, the host
-> knows exactly what workloads are being run and could have very targeted
-> and bespoke policies that wouldn't be appropriate for a vanilla Linux
-> VM.
-> 
-> Finally, while it's not necessarily related to paravirt scheduling
-> specifically, I think it's maybe worth mentioning that sched_ext would
-> have allowed us to implement a core-sched-like policy when L1TF first
-> hit us. It was inevitable that we'd need a core-sched policy build into
-> the core kernel as well, but we could have used sched_ext as a solution
-> until core sched was merged. Tejun implemented something similar in an
-> example scheduler where only tasks in the same cgroup are ever allowed
-> to run as hypertwins [3]. The point is, you can do basically anything
-> you want with sched_ext. For paravirt, I think there are a ton of
-> interesting possibilities, and I think those possibilities are better
-> explored and implemented with sched_ext rather than implementing
-> policies directly in KVM.
-> 
-> [3]: https://lore.kernel.org/lkml/20231111024835.2164816-27-tj@kernel.org/
-
-
+Nicolin
 
