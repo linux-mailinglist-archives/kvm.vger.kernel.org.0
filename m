@@ -1,137 +1,197 @@
-Return-Path: <kvm+bounces-5645-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5646-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45D608241E3
-	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 13:37:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 185878242A0
+	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 14:22:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA1E0286C43
-	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 12:37:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A60762878D0
+	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 13:22:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2AFF219EC;
-	Thu,  4 Jan 2024 12:37:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB44722335;
+	Thu,  4 Jan 2024 13:22:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="mEopR9IX"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="3MXUW490"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65B9821A1D
-	for <kvm@vger.kernel.org>; Thu,  4 Jan 2024 12:37:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a2888d65f1fso54906166b.1
-        for <kvm@vger.kernel.org>; Thu, 04 Jan 2024 04:37:30 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6917922323
+	for <kvm@vger.kernel.org>; Thu,  4 Jan 2024 13:22:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-5ced19f15c3so47095a12.0
+        for <kvm@vger.kernel.org>; Thu, 04 Jan 2024 05:22:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1704371848; x=1704976648; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=b0YjTQ6DAdt/2c3mL0l6eIgN8OTkE75G1dsO8pPOomQ=;
-        b=mEopR9IXAZ8ER49J8Uh++34YDIOVbKN5erpP/wHQxrGUcIhH6DTUSS2g8cEBokav9i
-         A/lEtutWeDCGupSK7OlJH4mldmC3iuDl7iRxGuEzlbfECllUwkBEfZimJrki1xjBqtkm
-         bk6V1yjmESkwv5l/KCjfKGaHNqYF/WZRwFRdNXvx/hLfvdj7uUwnZZhXbmCRjzvDUsfw
-         KEkycmZZU3suE1Pn+x/ApdDpBAAF3T6wqrr15aV6vf2luqt05zKw8GYZHtxf9/JdFeMn
-         es5lO5Dz5tEtTBYrioVFgNKiDrKbYIG3Uz1UwHazFVo3YLrNKKI0jVzXCcmq8XPTvLhK
-         EfkQ==
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1704374568; x=1704979368; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+UaUoSEUxULvKOz2jhQuoYpr4rLktnoBGVluoHHYMOU=;
+        b=3MXUW490lpm1gxsecqvb4zClWYxX4L+gqikjJzj3nodfrtRPMXJkxi9tFeVdMvmnZn
+         WU0jA4DYdbmC3nv9ht+q16QMt3cTFn1Qz/Wb5+8dBS6R0Q6/gVeZhynlAhtQD5vtYY1e
+         YTvSOHFr2s7GaKsKifOC8FwoyzNZVJKZkvkZwrU7hCBOjZK4spszovZv/aaCkJbXwlxM
+         zHkkbBrIg7K3lswR/hcdn2ZxQm0Twqv7Njt3qEHQBWUTdZkEcbBmeUt/62e4yEuhvxpg
+         SAgrMgzXjx8ZgqsJGMGr+uafgX/rV27ZhqDvBUUV4I4QAfVf71OjxBb2vFbQt97QSsW3
+         GWyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704371848; x=1704976648;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=b0YjTQ6DAdt/2c3mL0l6eIgN8OTkE75G1dsO8pPOomQ=;
-        b=oefj1zjaszkUCK2MJ8Z4rX8kp7rOpKNbA/+CDREvD9TgM0h72X3MEShYuefMvwwN0/
-         6oCBMN6WgnvkgUDqNawFJmR76ODh/VGqicH9r8hz76xWffmIjzACg7uvKTrT4yNy6OIx
-         vjcqoBRF63Jvs9r9nsM0Qi7U09np9ChUVZgSuPfH+mv6ZRTshxWgjeIVLbXM+JoHalqz
-         KGW10gZ7SmeVqQWqbOpI0izAKwyfcWYDJPTF4UvTQAMULIO7eKugQy1d0gHaSoXUrQuM
-         SOMfs7m2VWMHPA5HCdb2IcgNV49jmibbdPZxOIjdm7RNCg8m26FHVK+/uIw8dSOEAUtU
-         shNg==
-X-Gm-Message-State: AOJu0YxlLj+2GFroOXJJBFSpUK9edJmFOEilA6nRxqIGhP8NYfH//jNl
-	1A6zIZlsxcskWhUHw/faSHm57IwufwdJ7A==
-X-Google-Smtp-Source: AGHT+IGuKrfQ1OvlUk+ZEceVcHij9CYGgADtdAxpjxUb2xwkyYhUHJZIQ7mR+ZBuQE0/8F7kowQcIw==
-X-Received: by 2002:a17:906:fa90:b0:a26:b71e:f75 with SMTP id lt16-20020a170906fa9000b00a26b71e0f75mr299486ejb.5.1704371848691;
-        Thu, 04 Jan 2024 04:37:28 -0800 (PST)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id gh33-20020a1709073c2100b00a26b3f29f3dsm12649478ejc.43.2024.01.04.04.37.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jan 2024 04:37:28 -0800 (PST)
-From: Andrew Jones <ajones@ventanamicro.com>
-To: linux-riscv@lists.infradead.org,
-	linux-next@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org
-Cc: paul.walmsley@sifive.com,
-	palmer@dabbelt.com,
-	aou@eecs.berkeley.edu,
-	anup@brainfault.org,
-	atishp@atishpatra.org,
-	rdunlap@infradead.org,
-	sfr@canb.auug.org.au,
-	alex@ghiti.fr,
-	mpe@ellerman.id.au,
-	npiggin@gmail.com,
-	linuxppc-dev@lists.ozlabs.org,
-	pbonzini@redhat.com
-Subject: [PATCH -fixes v2] RISC-V: KVM: Require HAVE_KVM
-Date: Thu,  4 Jan 2024 13:37:28 +0100
-Message-ID: <20240104123727.76987-2-ajones@ventanamicro.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1704374568; x=1704979368;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+UaUoSEUxULvKOz2jhQuoYpr4rLktnoBGVluoHHYMOU=;
+        b=wGOIia6TIbSwVCFPzR6/z0B33/fMWhUfyuA5Ffcxr8ilQTVjc1Okue40MtCNOQTke7
+         F/+sQ47bWINXl70G3Ym58iq7mVz6fYsuzqcP6gBX9kdLZxekJFwqRb9IV1CaBKZYDJng
+         6yymj5T+bkqKzpeqNBo3J6Fn5238dP+LdcsrcgcyZ8H4KyFtFJshX4Dl1UxCJ0IcwHbQ
+         +GJQisJ3mg18ZvnnFWPnv0CNXhaahSGRkYkML+jrd80hEX+AO3K4u+ERuBz9P7KBWy9o
+         7auFgmmaFRU8aFOm/9PbPE6xQS8ytCd/aIVN0gpwhG9S0XHxep1r9yvwbufYe9BNN3Ff
+         b4eQ==
+X-Gm-Message-State: AOJu0Ywvcvpu0UgQsUPUB0fMMTKuCIdcjXSX30OziQCK0THLA1dXHePi
+	3VP2uNVhFpHe9NgmsHOyDQF3jFKK4vkryw==
+X-Google-Smtp-Source: AGHT+IFokc8I4M12wpRZbGFseRS03dNmYQJFm1uTthsqLJ9zrTgE2OKJgGw72Fa3MExoY1OmaCb7cA==
+X-Received: by 2002:a05:6a20:1445:b0:199:247a:1044 with SMTP id a5-20020a056a20144500b00199247a1044mr201672pzi.17.1704374568632;
+        Thu, 04 Jan 2024 05:22:48 -0800 (PST)
+Received: from ?IPV6:2400:4050:a840:1e00:9ac7:6d57:2b16:6932? ([2400:4050:a840:1e00:9ac7:6d57:2b16:6932])
+        by smtp.gmail.com with ESMTPSA id a25-20020a634d19000000b005c6617b52e6sm24378620pgb.5.2024.01.04.05.22.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Jan 2024 05:22:48 -0800 (PST)
+Message-ID: <4cf878c6-0adf-4c97-b404-446d8a3dabf1@daynix.com>
+Date: Thu, 4 Jan 2024 22:22:39 +0900
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 38/43] plugins: add an API to read registers
+Content-Language: en-US
+To: =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Song Gao <gaosong@loongson.cn>,
+ =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
+ David Hildenbrand <david@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>,
+ Yanan Wang <wangyanan55@huawei.com>, Bin Meng <bin.meng@windriver.com>,
+ Laurent Vivier <lvivier@redhat.com>, Michael Rolnik <mrolnik@gmail.com>,
+ Alexandre Iooss <erdnaxe@crans.org>, David Woodhouse <dwmw2@infradead.org>,
+ Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>,
+ Brian Cain <bcain@quicinc.com>,
+ Daniel Henrique Barboza <danielhb413@gmail.com>,
+ Beraldo Leal <bleal@redhat.com>, Paul Durrant <paul@xen.org>,
+ Mahmoud Mandour <ma.mandourr@gmail.com>, Thomas Huth <thuth@redhat.com>,
+ Liu Zhiwei <zhiwei_liu@linux.alibaba.com>, Cleber Rosa <crosa@redhat.com>,
+ kvm@vger.kernel.org, Peter Maydell <peter.maydell@linaro.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-arm@nongnu.org,
+ Weiwei Li <liwei1518@gmail.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
+ <philmd@linaro.org>, John Snow <jsnow@redhat.com>,
+ Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
+ Nicholas Piggin <npiggin@gmail.com>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ Ilya Leoshkevich <iii@linux.ibm.com>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?=
+ <clg@kaod.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Eduardo Habkost <eduardo@habkost.net>,
+ Pierrick Bouvier <pierrick.bouvier@linaro.org>, qemu-riscv@nongnu.org,
+ Alistair Francis <alistair.francis@wdc.com>
+References: <20240103173349.398526-1-alex.bennee@linaro.org>
+ <20240103173349.398526-39-alex.bennee@linaro.org>
+ <52cac44e-a467-4748-8c5b-c9c47f5b0f79@daynix.com>
+ <87cyuhguf4.fsf@draig.linaro.org>
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <87cyuhguf4.fsf@draig.linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-KVM requires EVENTFD, which is selected by HAVE_KVM. Other KVM
-supporting architectures select HAVE_KVM and then their KVM
-Kconfigs ensure its there with a depends on HAVE_KVM. Make RISCV
-consistent with that approach which fixes configs which have KVM
-but not EVENTFD, as was discovered with a randconfig test.
+On 2024/01/04 21:22, Alex Bennée wrote:
+> Akihiko Odaki <akihiko.odaki@daynix.com> writes:
+> 
+>> On 2024/01/04 2:33, Alex Bennée wrote:
+>>> We can only request a list of registers once the vCPU has been
+>>> initialised so the user needs to use either call the get function on
+>>> vCPU initialisation or during the translation phase.
+>>> We don't expose the reg number to the plugin instead hiding it
+>>> behind
+>>> an opaque handle. This allows for a bit of future proofing should the
+>>> internals need to be changed while also being hashed against the
+>>> CPUClass so we can handle different register sets per-vCPU in
+>>> hetrogenous situations.
+>>> Having an internal state within the plugins also allows us to expand
+>>> the interface in future (for example providing callbacks on register
+>>> change if the translator can track changes).
+>>> Resolves: https://gitlab.com/qemu-project/qemu/-/issues/1706
+>>> Cc: Akihiko Odaki <akihiko.odaki@daynix.com>
+>>> Based-on: <20231025093128.33116-18-akihiko.odaki@daynix.com>
+>>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>>> ---
+>>> v3
+>>>     - also g_intern_string the register name
+>>>     - make get_registers documentation a bit less verbose
+>>> v2
+>>>     - use new get whole list api, and expose upwards
+>>> vAJB:
+>>> The main difference to Akikio's version is hiding the gdb register
+>>> detail from the plugin for the reasons described above.
+>>> ---
+>>>    include/qemu/qemu-plugin.h   |  51 +++++++++++++++++-
+>>>    plugins/api.c                | 102 +++++++++++++++++++++++++++++++++++
+>>>    plugins/qemu-plugins.symbols |   2 +
+>>>    3 files changed, 153 insertions(+), 2 deletions(-)
+>>> diff --git a/include/qemu/qemu-plugin.h b/include/qemu/qemu-plugin.h
+>>> index 4daab6efd29..95380895f81 100644
+>>> --- a/include/qemu/qemu-plugin.h
+>>> +++ b/include/qemu/qemu-plugin.h
+>>> @@ -11,6 +11,7 @@
+>>>    #ifndef QEMU_QEMU_PLUGIN_H
+>>>    #define QEMU_QEMU_PLUGIN_H
+>>>    +#include <glib.h>
+>>>    #include <inttypes.h>
+>>>    #include <stdbool.h>
+>>>    #include <stddef.h>
+>>> @@ -227,8 +228,8 @@ struct qemu_plugin_insn;
+>>>     * @QEMU_PLUGIN_CB_R_REGS: callback reads the CPU's regs
+>>>     * @QEMU_PLUGIN_CB_RW_REGS: callback reads and writes the CPU's regs
+>>>     *
+>>> - * Note: currently unused, plugins cannot read or change system
+>>> - * register state.
+>>> + * Note: currently QEMU_PLUGIN_CB_RW_REGS is unused, plugins cannot change
+>>> + * system register state.
+>>>     */
+>>>    enum qemu_plugin_cb_flags {
+>>>        QEMU_PLUGIN_CB_NO_REGS,
+>>> @@ -708,4 +709,50 @@ uint64_t qemu_plugin_end_code(void);
+>>>    QEMU_PLUGIN_API
+>>>    uint64_t qemu_plugin_entry_code(void);
+>>>    +/** struct qemu_plugin_register - Opaque handle for register
+>>> access */
+>>> +struct qemu_plugin_register;
+>>
+>> Just in case you missed my comment for the earlier version:
+>>
+>> What about identifying a register with an index in an array returned
+>> by qemu_plugin_get_registers(). That saves troubles having the handle
+>> member in qemu_plugin_reg_descriptor.
+> 
+> The handle gets de-referenced internally in the plugin api and
+> additional checking could be added there. If we pass an index then we'd
+> end up having to track the index assigned during get_registers as well
+> as account for a potential skew in the index value if the register
+> layout varies between vCPUs (although I admit this is future proofing
+> for potential heterogeneous models).
+> 
+> The concept of opaque handle == pointer is fairly common in the QEMU
+> code base. We are not making it hard for a plugin author to bypass this
+> "protection", just making it clear if you do so your violating the
+> principle of the API.
 
-Fixes: 99cdc6c18c2d ("RISC-V: Add initial skeletal KVM support")
-Reported-by: Randy Dunlap <rdunlap@infradead.org>
-Closes: https://lore.kernel.org/all/44907c6b-c5bd-4e4a-a921-e4d3825539d8@infradead.org/
-Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
----
+Now I get the idea. Indeed index values are not guaranteed to be stable 
+across CPUs.
 
-v2:
- - Added Fixes tag and -fixes prefix [Alexandre/Anup]
-
- arch/riscv/Kconfig     | 1 +
- arch/riscv/kvm/Kconfig | 2 +-
- 2 files changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
-index a935a5f736b9..daba06a3b76f 100644
---- a/arch/riscv/Kconfig
-+++ b/arch/riscv/Kconfig
-@@ -128,6 +128,7 @@ config RISCV
- 	select HAVE_KPROBES if !XIP_KERNEL
- 	select HAVE_KPROBES_ON_FTRACE if !XIP_KERNEL
- 	select HAVE_KRETPROBES if !XIP_KERNEL
-+	select HAVE_KVM
- 	# https://github.com/ClangBuiltLinux/linux/issues/1881
- 	select HAVE_LD_DEAD_CODE_DATA_ELIMINATION if !LD_IS_LLD
- 	select HAVE_MOVE_PMD
-diff --git a/arch/riscv/kvm/Kconfig b/arch/riscv/kvm/Kconfig
-index 1fd76aee3b71..36fa8ec9e5ba 100644
---- a/arch/riscv/kvm/Kconfig
-+++ b/arch/riscv/kvm/Kconfig
-@@ -19,7 +19,7 @@ if VIRTUALIZATION
- 
- config KVM
- 	tristate "Kernel-based Virtual Machine (KVM) support (EXPERIMENTAL)"
--	depends on RISCV_SBI && MMU
-+	depends on HAVE_KVM && RISCV_SBI && MMU
- 	select HAVE_KVM_IRQCHIP
- 	select HAVE_KVM_IRQ_ROUTING
- 	select HAVE_KVM_MSI
--- 
-2.43.0
-
+Why don't you pass gdb_reg_num as is then? qemu_plugin_register has the 
+name member, but it's unused so gdb_reg_num is effectively the only 
+member we need. You can even cast gdb_reg_num to (struct 
+qemu_plugin_register *), but I don't think pointers are more opaque or 
+future-proof than integers.
 
