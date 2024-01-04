@@ -1,222 +1,168 @@
-Return-Path: <kvm+bounces-5648-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5649-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29460824343
-	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 15:04:53 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CCF58243EE
+	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 15:37:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A4A951F25387
-	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 14:04:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 52E7FB22B2A
+	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 14:37:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C573F224FE;
-	Thu,  4 Jan 2024 14:03:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52A872374D;
+	Thu,  4 Jan 2024 14:37:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="r8b6jwPu"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="jVrNHJDM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2088.outbound.protection.outlook.com [40.107.212.88])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D578224ED
-	for <kvm@vger.kernel.org>; Thu,  4 Jan 2024 14:03:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-55679552710so10068a12.1
-        for <kvm@vger.kernel.org>; Thu, 04 Jan 2024 06:03:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704377018; x=1704981818; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Fz2ZaPvPegUdCS4R21laN63DmfGYtgiMCRmXD6PbvGY=;
-        b=r8b6jwPuFWUDhgc1plJE6JvEVnYibJIGmR1pQAmdanU0zc897eqjgEI56Kb4/miMLh
-         ETeasnt3PQYF3GW5iUM/stB5nVbG4v5PsT7yNXqYWa8QtA3GzcEVrO1NWm9jQPfYpQqB
-         DZlFuNvmmr+5KKNj9hjUSRdYslT4kLBuRWjR0eX2Qzg/T2B1hH+jlC8y8K/tQ1U7VmO2
-         L9G/e209jupJVrk64T09tXV78jO2nXhrZ/hFEyv4MzHBSSSjtDlk+BYxGo/6p8ySGYUC
-         gleW4oqo2zCAYj7Ofbz+bekvWhk65HfKY6TNc407CZjaPgV9D+U9OCNlEl630C/IWnqa
-         Uy3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704377018; x=1704981818;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Fz2ZaPvPegUdCS4R21laN63DmfGYtgiMCRmXD6PbvGY=;
-        b=c4HAOUNIPWghlc1an07F9FODBqacL5yEkatIxudifcYahabmA2eyQGeMd7Oac1vstX
-         YJVGir19w7PpNveHrW8lSsQZm0K7HxMP+2Yypmt/iUTa0Inlx4kdajC+O4MQLPfh5LFo
-         /5Lvf2swb3PwR2E1YWp3z6ZRT+PsHo1ki3LrCntD84oVcvhPws5YoEECSd7hYIiaXWA1
-         JiXBLAA9M65zT6GddvVbulfvrvDgfi+N8Nv3noNiI7DQbmt1sNUxvygWcIRNTNnz76bT
-         9A/mFxZSI94O3mE9nF5yeJgq/3eCWGUYB+rbIPdyeQV2CUAYmR574ln+eUXzAqumWQKl
-         01iA==
-X-Gm-Message-State: AOJu0YwV32jvHPImL/I9pIojqFIKtZTItRkJw7FBXuRPKOMibyJk+dwp
-	GYNtS5xMEpiXIpry51ZqeHLIJsQCI/8xx9M17t34Y/1193Ve
-X-Google-Smtp-Source: AGHT+IFUY3kCL1zWywR4LXo0jQ4pVLAkiW1jdrb3Czliju8IzhJEx8WlLDM+GjqoNvwFL3CZ12YuROTnYXS3j6nttcw=
-X-Received: by 2002:a05:6402:380c:b0:557:24d:6135 with SMTP id
- es12-20020a056402380c00b00557024d6135mr88369edb.4.1704377018379; Thu, 04 Jan
- 2024 06:03:38 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 102B222F1E;
+	Thu,  4 Jan 2024 14:37:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fMcjyTBTnIlfGFNaRC9rN6m81NznHLLQBhCi6shyv823A2cORR9mt4WEcNI8t+YRQMSwYAxkStqUp0GwNsTvv0iUJFxAew7EPJQvoVRQ55QdZr0Ko7BRwtum9s0d7t40j246uSBqtIgZ/iCYYm6cw1wwltaj1GIbPaC7ipg31zULGASqJPUxfivtK7mddC2Gbhm4GmUIJwkRHOxH9jTQjvsJPpjt4DdmAg01jfy8sbNefiiF75mwEnaTdyfa4CJ8YNu+uHliIxSP5du3tToUs6JJ+wWIbHRDpZeEeNbYERncj4R6p37MbrwdMfBABQPOQ4iCx74GTAH+J4VqpX+Zkw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=I3vHBKP0CN+tFQ/Mi6KsfDwzVYnuKaZemeY+m+2XsP0=;
+ b=ZElp4PI/fBBowkJmYSDQKzu+/PjkxdtEZ3SaA9c3WEpA5xFArvpaUlkg2NaU1tp4iaYFJAybZQs/ZFrY/kL0pJtgcNRSQyCTcYNBSlmeQZGIz+pGm8r5ld1ut8QQvqfUiWPaTAMx0mycwaa2taN+V1XU72a6Nx9tJ5nlNstNH+z5KxdIswCatP6NbbCtQrSTaysfaZORyKM06tzABCv2jS04WejYDfV/cuNRP6cQblXvPkKL8SGUW/ZqgsNZXNfZsj9S5tr3zvd3k8pF9/tY3+E/3r1Va4js4W8HLhIHlpgOOe0TILKPOWLI4QljqtCjlFVk1cES+aaEDcpF+FmO6g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=I3vHBKP0CN+tFQ/Mi6KsfDwzVYnuKaZemeY+m+2XsP0=;
+ b=jVrNHJDM18UokZXbjbk65DL+1M1/WWnxQtHOvlqAvATt9JdB7DaVdnpReZBXnFCTTOm1WafDCQQwVXB1+vb0UUDzrR1OnJ46i2kt8la4JShc+CwKQnHghC9yxCrvi9VWJZiJKo8CRC+JtJFPq/kGRNDrk8jGxpMkyksNzlnUSiylj0xEpU3STwNAhZG4jmQVxS2xzfa9SEBXuN2K8OTz5fSAEBFGb80fWy0hCQ9GiGLnplDGMw29nBD9sXkFedRCoGIGQRtjvWZzfvD8kanJBsvxp7VgrterhTfHFI2V+L4mN0iiOnYd1KzN6r0r1KjAe+4dFwfpt3m+O1yOCTQWnA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by DM4PR12MB5072.namprd12.prod.outlook.com (2603:10b6:5:38b::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.13; Thu, 4 Jan
+ 2024 14:36:59 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::60d4:c1e3:e1aa:8f93]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::60d4:c1e3:e1aa:8f93%4]) with mapi id 15.20.7159.015; Thu, 4 Jan 2024
+ 14:36:59 +0000
+Date: Thu, 4 Jan 2024 10:36:58 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Yi Liu <yi.l.liu@intel.com>
+Cc: joro@8bytes.org, alex.williamson@redhat.com, kevin.tian@intel.com,
+	robin.murphy@arm.com, baolu.lu@linux.intel.com, cohuck@redhat.com,
+	eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
+	mjrosato@linux.ibm.com, chao.p.peng@linux.intel.com,
+	yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com,
+	shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+	suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	zhenzhong.duan@intel.com, joao.m.martins@oracle.com,
+	xin.zeng@intel.com, yan.y.zhao@intel.com
+Subject: Re: [PATCH v7 1/3] iommufd: Add data structure for Intel VT-d
+ stage-1 cache invalidation
+Message-ID: <20240104143658.GX50406@nvidia.com>
+References: <20231117131816.24359-1-yi.l.liu@intel.com>
+ <20231117131816.24359-2-yi.l.liu@intel.com>
+ <c967e716-9112-4d1a-b6f7-9a005e28202d@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c967e716-9112-4d1a-b6f7-9a005e28202d@intel.com>
+X-ClientProxiedBy: BLAPR03CA0053.namprd03.prod.outlook.com
+ (2603:10b6:208:32d::28) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231218140543.870234-1-tao1.su@linux.intel.com>
- <20231218140543.870234-2-tao1.su@linux.intel.com> <ZYMWFhVQ7dCjYegQ@google.com>
- <ZYP0/nK/WJgzO1yP@yilunxu-OptiPlex-7050> <ZZSbLUGNNBDjDRMB@google.com>
- <CALMp9eTutnTxCjQjs-nxP=XC345vTmJJODr+PcSOeaQpBW0Skw@mail.gmail.com>
- <ZZWhuW_hfpwAAgzX@google.com> <ZZYbzzDxPI8gjPu8@chao-email>
- <CALMp9eSg6No9L40kmo7n9BGOz4v1ThA7-e4gD4sgj3KGBJEUzA@mail.gmail.com>
- <CALMp9eRS9o7YDDaOcjBB0QTeF_vRA2LMvQqc2Sb-7XhyDi=1LA@mail.gmail.com> <ZZac2AFdR9YTkhuZ@linux.bj.intel.com>
-In-Reply-To: <ZZac2AFdR9YTkhuZ@linux.bj.intel.com>
-From: Jim Mattson <jmattson@google.com>
-Date: Thu, 4 Jan 2024 06:03:21 -0800
-Message-ID: <CALMp9eQsEUFGJ6G2BMxOuHkFuDRp6LEqSAhmae5d3gA9LpmiQA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] x86: KVM: Limit guest physical bits when 5-level EPT
- is unsupported
-To: Tao Su <tao1.su@linux.intel.com>
-Cc: Chao Gao <chao.gao@intel.com>, Sean Christopherson <seanjc@google.com>, 
-	Xu Yilun <yilun.xu@linux.intel.com>, kvm@vger.kernel.org, pbonzini@redhat.com, 
-	eddie.dong@intel.com, xiaoyao.li@intel.com, yuan.yao@linux.intel.com, 
-	yi1.lai@intel.com, xudong.hao@intel.com, chao.p.peng@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DM4PR12MB5072:EE_
+X-MS-Office365-Filtering-Correlation-Id: dc1e945c-94f6-47c7-9c2a-08dc0d329bd7
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	/w3z8+NA9mpfdavTF0aRzMkZEJqnw5tnhkBKofnO045oEnk8Rh8aP+Z5wz2L+wsNwxMDxUdqFs1s1iNxC9vqVVyiEve2OOfM26COwyp3lygHVzZEDt8wzf1DF89sf/5CldLGLBZJ3fru8baDRO/Rn0cs7Mzfeq056/OIdx19CpscBDmao89o5uKuuMSRfeHkDQn+QRrfjruXYH28gxs5t4ZG/LFJYetjpa0V5+D+lYCUlqLm2K0rMTlh72NbJ7l9/ze21hNTvGUN+svO0KfIUt6eJ9GWCRoIMAIWvKOoTeG9Bzg99velaIw4cILlpykEkJ+pQFpUDjMv0g+hpAQwj+fHPrc7ECSMV8WWsrK8JvTeL/4BLKPZbG2wHuHevzkMPDy7Jkmi4puGlDs6sQGtFbUs/kZprADWIoEg5b8+FCe7HGuJes9j/u3CcyUZvYxz23+cBDtExjlg58jni2Io/VYr5S0JCBv4RAT1CH39rG9yggYHSwKE8mNQBjPdXfMIxFJ62ltIHx6n4reKwONKfFU3Rp2IvMEFE7tWTPQwLWwv4KAW9rqYi9KiLeRBDAry
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(396003)(376002)(366004)(136003)(346002)(230922051799003)(64100799003)(451199024)(1800799012)(186009)(86362001)(36756003)(33656002)(6506007)(6486002)(478600001)(66556008)(66476007)(6916009)(66946007)(6512007)(1076003)(26005)(2616005)(7416002)(5660300002)(2906002)(8676002)(316002)(8936002)(4326008)(38100700002)(83380400001)(41300700001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?8l8o+adqCgJoKsiMLTvfKHMvNfFylr+5bnhR7b1kkqjhzbWGvaWEnkX6tpb6?=
+ =?us-ascii?Q?9HWf0TGlMvUIdFRlbwEvrxAK/qkt5V9d+/iGxsw/z1E0/qjK339DD3JlPXl2?=
+ =?us-ascii?Q?NkehyLkgiFSL4lHOJu0E/zhJnBjOwUYLxfwEzjHulGT9z0MXb4nzYBg119/K?=
+ =?us-ascii?Q?SHYekZjpuzbl8q+4zy4fhUEpaNr802WyM+N8gPExLbSatfI1G7p2LDsm9Q7E?=
+ =?us-ascii?Q?esn9i3aE9SdGW9/3nGeckORjSSy76uCdm7DcHW87b5f0mgHo6hZ0hZrerZE0?=
+ =?us-ascii?Q?pQDioYbjVY9BA9NgdNcyoPPFZnvITaRKfAkfTIu/XEfrVKGyWFgCxpQCeRRi?=
+ =?us-ascii?Q?9HcjCJhWVTuU5HW4RHVo/fkVfay1336VgEkeey9qjLscXpMW8kw/auzmu+GT?=
+ =?us-ascii?Q?kiiM3/7J+1hzcROJ8GTP7teELowDFZ3un/VZ2zyZR3Q5vsqYgM0YF2dEiu/U?=
+ =?us-ascii?Q?GSjlZvcIxkRdnNErdcgFj2BpXpK5aTmek6UpqKUkUzo7zS28bUt0lUWfJprD?=
+ =?us-ascii?Q?vR4fwCOoM60+UN04Sdcgtf7SpNqiiR6FFxJ4ACkpI3fi+RaygfoAgJykvzsk?=
+ =?us-ascii?Q?yNNwRja6oD4KnKC8qmETH9rMRbe5szb9SmvsyESX1JSxN1WnXx5mYmXMYDZA?=
+ =?us-ascii?Q?RHZQpYu4jh1Snc76AXidPe9tSpUHUpg5z7Hur+CclNCghclnwRncbxN4ssfT?=
+ =?us-ascii?Q?NbVjfz5EpNGCuOP3y+BJ2Gb9ubVFBijYv8Jno2fcy7HfxqJP6zzASaKM4rHV?=
+ =?us-ascii?Q?H2Z9QrjXKpH0UNApebE74IlkbJbAdreSUAvQihcFw1IrcJFuErrt3GM0gOzs?=
+ =?us-ascii?Q?omtn7YO1F2Y35gAKHGts1IREOnG7JpjSPwHA8Gc/D5pvYBRksRYoA9H2UV4h?=
+ =?us-ascii?Q?6zMKAOfOwxkxGPbOo5a1M1OXlNFXN4ydWnYwu0TVxGHtCTh19vMPqeNchBF2?=
+ =?us-ascii?Q?yu8pBhLA5yY22SAoYJf2HyD06QQyyKRxqWpHImrcZpSMO/p5s3LBqeARv92L?=
+ =?us-ascii?Q?DJKqcMb1H4YMfObhoX4G8+Gf2hCrDaZC+cGz6uJoE21h+YRj/fgu75j08CQa?=
+ =?us-ascii?Q?GE7FLdgdGCc4vxz9dMae0i2TNM5Gh51v+Gqz0lqNTkEkJpLiO/x8czX8i9n/?=
+ =?us-ascii?Q?LuRXh1mzQ3XGeiiUjkOeoNpyDb35en6UF6HICDBc25B28XPEJSr39UFpDE1I?=
+ =?us-ascii?Q?O21O5xctM/q1Zn+7/StnacNgt1r06cpZiTxlNgxX9gza+WQQymEt1xxB+D1a?=
+ =?us-ascii?Q?fCyrh40HkIlYH8edBBwS6qWpcF8GyrH/a8NDn4XG8UjtNmHuMJiddm9SHIiN?=
+ =?us-ascii?Q?NJBCw/sHzYknkNtrkWv0L6RZa4nhNGDHFgRMzgouTPGS+7Q5dY3BoLVcv7ga?=
+ =?us-ascii?Q?6ZP2jYipCRWJKsvUYY3LgFcUkZ93RZiIdDAP9o2kJkugUHL6C403q796LMoS?=
+ =?us-ascii?Q?5sfaFHbYVaaYHW5TbY2nI69cPf5L58nxOcIPSIUJkyOj54JQsy32JWEXFE38?=
+ =?us-ascii?Q?M+lPHXjkRJ2fJIlpj23fjcs4mbck/a+zouXaiITyNec/6AsgaTQVstbl9VW1?=
+ =?us-ascii?Q?PJFEDROLk+7qMf04XVkqOHnE4xSQ1hMvTOjKUakZ?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: dc1e945c-94f6-47c7-9c2a-08dc0d329bd7
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jan 2024 14:36:59.5578
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: uJxy1/sHJnXVg89OefCFULf6RHk04nfbWkRHb3teoDwQg57gCtVbLua2YNg8rmbB
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5072
 
-On Thu, Jan 4, 2024 at 3:59=E2=80=AFAM Tao Su <tao1.su@linux.intel.com> wro=
-te:
->
-> On Wed, Jan 03, 2024 at 08:34:16PM -0800, Jim Mattson wrote:
-> > On Wed, Jan 3, 2024 at 7:40=E2=80=AFPM Jim Mattson <jmattson@google.com=
-> wrote:
-> > >
-> > > On Wed, Jan 3, 2024 at 6:45=E2=80=AFPM Chao Gao <chao.gao@intel.com> =
-wrote:
-> > > >
-> > > > On Wed, Jan 03, 2024 at 10:04:41AM -0800, Sean Christopherson wrote=
-:
-> > > > >On Tue, Jan 02, 2024, Jim Mattson wrote:
-> > > > >> On Tue, Jan 2, 2024 at 3:24=E2=80=AFPM Sean Christopherson <sean=
-jc@google.com> wrote:
-> > > > >> >
-> > > > >> > On Thu, Dec 21, 2023, Xu Yilun wrote:
-> > > > >> > > On Wed, Dec 20, 2023 at 08:28:06AM -0800, Sean Christopherso=
-n wrote:
-> > > > >> > > > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/m=
-mu.c
-> > > > >> > > > > index c57e181bba21..72634d6b61b2 100644
-> > > > >> > > > > --- a/arch/x86/kvm/mmu/mmu.c
-> > > > >> > > > > +++ b/arch/x86/kvm/mmu/mmu.c
-> > > > >> > > > > @@ -5177,6 +5177,13 @@ void __kvm_mmu_refresh_passthroug=
-h_bits(struct kvm_vcpu *vcpu,
-> > > > >> > > > >   reset_guest_paging_metadata(vcpu, mmu);
-> > > > >> > > > >  }
-> > > > >> > > > >
-> > > > >> > > > > +/* guest-physical-address bits limited by TDP */
-> > > > >> > > > > +unsigned int kvm_mmu_tdp_maxphyaddr(void)
-> > > > >> > > > > +{
-> > > > >> > > > > + return max_tdp_level =3D=3D 5 ? 57 : 48;
-> > > > >> > > >
-> > > > >> > > > Using "57" is kinda sorta wrong, e.g. the SDM says:
-> > > > >> > > >
-> > > > >> > > >   Bits 56:52 of each guest-physical address are necessaril=
-y zero because
-> > > > >> > > >   guest-physical addresses are architecturally limited to =
-52 bits.
-> > > > >> > > >
-> > > > >> > > > Rather than split hairs over something that doesn't matter=
-, I think it makes sense
-> > > > >> > > > for the CPUID code to consume max_tdp_level directly (I fo=
-rgot that max_tdp_level
-> > > > >> > > > is still accurate when tdp_root_level is non-zero).
-> > > > >> > >
-> > > > >> > > It is still accurate for now. Only AMD SVM sets tdp_root_lev=
-el the same as
-> > > > >> > > max_tdp_level:
-> > > > >> > >
-> > > > >> > >       kvm_configure_mmu(npt_enabled, get_npt_level(),
-> > > > >> > >                         get_npt_level(), PG_LEVEL_1G);
-> > > > >> > >
-> > > > >> > > But I wanna doulbe confirm if directly using max_tdp_level i=
-s fully
-> > > > >> > > considered.  In your last proposal, it is:
-> > > > >> > >
-> > > > >> > >   u8 kvm_mmu_get_max_tdp_level(void)
-> > > > >> > >   {
-> > > > >> > >       return tdp_root_level ? tdp_root_level : max_tdp_level=
-;
-> > > > >> > >   }
-> > > > >> > >
-> > > > >> > > and I think it makes more sense, because EPT setup follows t=
-he same
-> > > > >> > > rule.  If any future architechture sets tdp_root_level small=
-er than
-> > > > >> > > max_tdp_level, the issue will happen again.
-> > > > >> >
-> > > > >> > Setting tdp_root_level !=3D max_tdp_level would be a blatant b=
-ug.  max_tdp_level
-> > > > >> > really means "max possible TDP level KVM can use".  If an exac=
-t TDP level is being
-> > > > >> > forced by tdp_root_level, then by definition it's also the max=
- TDP level, because
-> > > > >> > it's the _only_ TDP level KVM supports.
-> > > > >>
-> > > > >> This is all just so broken and wrong. The only guest.MAXPHYADDR =
-that
-> > > > >> can be supported under TDP is the host.MAXPHYADDR. If KVM claims=
- to
-> > > > >> support a smaller guest.MAXPHYADDR, then KVM is obligated to int=
-ercept
-> > > > >> every #PF,
-> > > >
-> > > > in this case (i.e., to support 48-bit guest.MAXPHYADDR when CPU sup=
-ports only
-> > > > 4-level EPT), KVM has no need to intercept #PF because accessing a =
-GPA with
-> > > > RSVD bits 51-48 set leads to EPT violation.
-> > >
-> > > At the completion of the page table walk, if there is a permission
-> > > fault, the data address should not be accessed, so there should not b=
-e
-> > > an EPT violation. Remember Meltdown?
-> > >
-> > > > >> and to emulate the faulting instruction to see if the RSVD
-> > > > >> bit should be set in the error code. Hardware isn't going to do =
-it.
-> > > >
-> > > > Note for EPT violation VM exits, the CPU stores the GPA that caused=
- this exit
-> > > > in "guest-physical address" field of VMCS. so, it is not necessary =
-to emulate
-> > > > the faulting instruction to determine if any RSVD bit is set.
-> > >
-> > > There should not be an EPT violation in the case discussed.
-> >
-> > For intercepted #PF, we can use CR2 to determine the necessary page
-> > walk, and presumably the rest of the bits in the error code are
-> > already set, so emulation is not necessary.
-> >
-> > However, emulation is necessary when synthesizing a #PF from an EPT
-> > violation, and bit 8 of the exit qualification is clear. See
-> > https://lore.kernel.org/kvm/4463f391-0a25-017e-f913-69c297e13c5e@redhat=
-.com/.
->
-> Although not all memory-accessing instructions are emulated, it covers mo=
-st common
-> cases and is always better than KVM hangs anyway. We may probably continu=
-e to
-> improve allow_smaller_maxphyaddr, but KVM should report the maximum physi=
-cal width
-> it supports.
+On Thu, Dec 14, 2023 at 07:26:39PM +0800, Yi Liu wrote:
+> Per the prior discussion[1], we agreed to move the error reporting into the
+> driver specific part. On Intel side, we want to report two devTLB
+> invalidation errors: ICE (invalid completion error) and ITE (invalidation
+> timeout error). Such errors have an additional SID information to tell
+> which device failed the devTLB invalidation. I've got the below structure.
 
-KVM can only support the host MAXPHYADDR. If EPT on the CPU doesn't
-support host MAXPHYADDR, it should be disabled. Shadow paging can
-handle host MAXPHYADDR just fine.
+IMHO all of this complexity is a consequence of the decision to hide
+the devtlb invalidation from the VM..
 
-KVM simply does not work when guest MAXPHYADDR < host MAXPHYADDR.
-Without additional hardware support, no hypervisor can. I asked Intel
-to add hardware support for such configurations about 15 years ago. I
-have yet to see it.
+On the other hand I guess you want to do this because of the SIOV
+troubles where the vPCI function in the VM is entirely virtual and
+can't be trivially mapped to a real PCI function for ATC invalidation
+like ARM and AMD can do (but they also can't support SIOV because of
+this). :(
 
-> Thanks,
-> Tao
->
+However it also makes it very confusing about how the VM would
+perceive an error - eg if it invalidates an SIOV device single PASID
+and that devtlb fails then the error should be connected back to the
+vPCI function for the SIOV's specific PASID and not back to the
+physical PCI function for the SIOV owner.
+
+As the iommu driver itself has no idea about the vPCI functions this
+seems like it is going to get really confusing. The API I suggested in
+the other email is not entirely going to work as the vPCI function for
+SIOV cases will have to be identified by the (struct device, PASID) -
+while it would be easy enough for the iommu driver to provide the
+PASID, I'm not sure how the iommufd core will relate the PASID back to
+the iommu_device to understand SIOV without actually being aware of
+SIOV to some degree :\
+
+(Given SIOVr1 seems on track to be replaced by SIOVr2 so this is all a
+one-off I was hoping to minimize such awareness)
+
+Jason
 
