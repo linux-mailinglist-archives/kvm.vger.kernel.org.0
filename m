@@ -1,176 +1,108 @@
-Return-Path: <kvm+bounces-5639-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5640-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDCEC8240A7
-	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 12:29:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B16C78240B2
+	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 12:33:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 83A7F1F26D33
-	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 11:29:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 449D12835A9
+	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 11:33:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D201621346;
-	Thu,  4 Jan 2024 11:29:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0191621361;
+	Thu,  4 Jan 2024 11:33:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="Q4mocSRp"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="qP8srV68"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
+Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4126321112
-	for <kvm@vger.kernel.org>; Thu,  4 Jan 2024 11:29:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B02721344
+	for <kvm@vger.kernel.org>; Thu,  4 Jan 2024 11:33:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-7ba737ee9b5so17542039f.0
-        for <kvm@vger.kernel.org>; Thu, 04 Jan 2024 03:29:38 -0800 (PST)
+Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3606ac90de0so18555ab.0
+        for <kvm@vger.kernel.org>; Thu, 04 Jan 2024 03:33:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1704367777; x=1704972577; darn=vger.kernel.org;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1704368001; x=1704972801; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3DetrKFz1HozFLUYq3IBWTWL18XuPTYWqXXjIl+V6I4=;
-        b=Q4mocSRpUkuq2xwxtRHjh5FrBaxn25KjnRWoQsHFCWMVV7OUDcr8ukxnQT5SAJwPi0
-         1raY3t0mE8Nqg/Mf4/bGsNPqqY9spoOPgMiwXdd2ozSex36xEGK2hX+yp6+kBSsqNvts
-         SFHlYRW0iyoDeXxceSTkCTsbvqH2Vxx5/xKgHridmTm5ARQq6gMFGyNYQQlvJSuXuYLm
-         6ZBrdaeZJKqhV6AZ0h1hdtD+xYNiDr3Oi6M3zjSWDhFngyWsc/TRhALaOJ16bS0IZvol
-         fN2yRouM3Qgafnebie0qMBfAOacGzRXwXmwmiYkvwQDZmADx+AQ5rNf5IsMB4wqTzU5O
-         5I1w==
+        bh=5Dt7uLNKLulzrg/dNC959xAVcdyKjB2fv5qTZvClME8=;
+        b=qP8srV683Nx5VjKLocNoI3lP4d1WSQwwYemqOPlfTCt9LUKdj1V09Ba2t28qrFgzFc
+         7by1AYbyw0bzfgGrgY+9ZuC8s03kOUUEm/W0ulGTKQFIXtSSgrhuuN9lLJh8XHkYpt7W
+         hk9yUoaYC1EWBgEgkmR06zRTu/3IAurCPUg4zt0A2i/5OqY01n+uPEgeNkuB1bhejEvk
+         Uo43G0mls0vRZTyJhrlqyvjsBNhx0Xrj0YhEtGb0eDbOUpGmpa/F8YOu06DaVHWrN4Dt
+         vmv8TWZgMPepuYRxxehNfddm3MYjqLP9AjCJjznQ2lKgvMb0ioCQCsxP37N7TR80kS8c
+         TLHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704367777; x=1704972577;
+        d=1e100.net; s=20230601; t=1704368001; x=1704972801;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=3DetrKFz1HozFLUYq3IBWTWL18XuPTYWqXXjIl+V6I4=;
-        b=HLdU83QL1chAk92E5aumc5SNWw0E1NDeOEL4OD2YEOu4u83fXuVKCELqMuIRiYDCma
-         7d61y2hSmgMsE1FRsgN2WClwr+VRt5NOEYXDJMDhw+A6nl8XWCy2gqNkLsAvwadlnRN2
-         Vcna2RFO5c/OG8tHrCjdR7Ac68UkLaqwftVVHjloLThMGW/d9CrnM8GT6sKebSY4eTMw
-         FEcR2lqldtvV4h76QJwPRZ+tYprKykNMXKUGLWUq23KWijXeHTFKNJPURYv/AmWDJ21t
-         a8+LIhcMheL2Ykd1IEVDA3mt4lZV+a19V8WUOjal+xoP2qBJUuRTx01UrXVEettyqMxe
-         xvUA==
-X-Gm-Message-State: AOJu0Yzvk/bMbnpdAnNvt/U5RTmJFyz4kkbbU+WOh9WvoAidrj+x1jdJ
-	yVOCMmjc89ZWgtl+I22te8epBAcdZeQ2o7Yz+ly6r7KFxC6FQA==
-X-Google-Smtp-Source: AGHT+IHCeu4Jvokb24tgL2OXFn0C/D4aZOQBaBAHEDlQ872zADqtLfMS8Xss2615C8A+/DgV91umDFOHrk3Z2h2r1w8=
-X-Received: by 2002:a92:cd8f:0:b0:35f:e305:3060 with SMTP id
- r15-20020a92cd8f000000b0035fe3053060mr438677ilb.92.1704367777306; Thu, 04 Jan
- 2024 03:29:37 -0800 (PST)
+        bh=5Dt7uLNKLulzrg/dNC959xAVcdyKjB2fv5qTZvClME8=;
+        b=nqLTDguPOckpNEApbQP4qeWhRRpW48iDksEfF4aA8MWayQ6r2lDxl8K5FOEy5zbB9N
+         +7Ft4DDw/Ng0V1nxOXZJM+81EsO51g08Xl/EUAgjUr/VABANNAh/LOsSWyrzXbfxK0TO
+         V9n+6GWfOJCF+gx8DhcJCklE46rxIwF4qS8sj12/CEkPbSAWfCKXZq9Vr6v7GRlPgzPJ
+         ZbdB5IFQ9Doh9wSyL2fs0Xt5Glfac0r+Jw+n4f7qsGRrlO5vveL1RyPBS6nzbr1Yitx1
+         R41KVqiS1VPlCn6ZOE5nGWnfkACeFQsugfSzpvKpeO2QNXqk0U5ptLTxRoxo/X/2HceA
+         C4hw==
+X-Gm-Message-State: AOJu0YwaO2xzDcwb5fm4rIV7tN2ML7+MiD/bnzR/Wpc2flWNwiku1BIq
+	HvxWEoLQbwDO0MPBqDYEjjszvPnVnnwgKYKaWHEXlTiFFN1Iqg==
+X-Google-Smtp-Source: AGHT+IEiLv7qiits4vk8xdWF1s4r4OiPqhbNMM2mLBiLLO2wGlETEHoIcyBn6dRE3jspd9+Bb4GSzadf5GgKpkLl1DU=
+X-Received: by 2002:a05:6e02:17c9:b0:360:16c7:2d6a with SMTP id
+ z9-20020a056e0217c900b0036016c72d6amr482112ilu.48.1704368001050; Thu, 04 Jan
+ 2024 03:33:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231221095002.7404-1-duchao@eswincomputing.com>
- <CAK9=C2Wfv7=fCitUdjBpC9=0icN82Bb+9p1-Gq5ha8o9v13nEg@mail.gmail.com> <19434eff.1deb.18c90a3a375.Coremail.duchao@eswincomputing.com>
-In-Reply-To: <19434eff.1deb.18c90a3a375.Coremail.duchao@eswincomputing.com>
+References: <20240104104307.16019-2-ajones@ventanamicro.com>
+ <20240104-d5ebb072b91a6f7abbb2ac76@orel> <752c11ea-7172-40ff-a821-c78aeb6c5518@ghiti.fr>
+ <20240104-6a5a59dde14adcaf3ac22a35@orel>
+In-Reply-To: <20240104-6a5a59dde14adcaf3ac22a35@orel>
 From: Anup Patel <anup@brainfault.org>
-Date: Thu, 4 Jan 2024 16:59:26 +0530
-Message-ID: <CAAhSdy0VWxjvKsxiad72JY7_Ottt5S9ymZ3axt=W3-4nf+g4VQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/3] RISC-V: KVM: Guest Debug Support
-To: Chao Du <duchao@eswincomputing.com>
-Cc: Anup Patel <apatel@ventanamicro.com>, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, atishp@atishpatra.org, 
-	dbarboza@ventanamicro.com, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu
+Date: Thu, 4 Jan 2024 17:03:10 +0530
+Message-ID: <CAAhSdy0uVZXsP1_3zZiwXXEXBZGkmWX5ujptirojD8S4nuzQpQ@mail.gmail.com>
+Subject: Re: Re: [PATCH] RISC-V: KVM: Require HAVE_KVM
+To: Andrew Jones <ajones@ventanamicro.com>
+Cc: Alexandre Ghiti <alex@ghiti.fr>, linux-riscv@lists.infradead.org, 
+	linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, atishp@atishpatra.org, rdunlap@infradead.org, 
+	sfr@canb.auug.org.au, mpe@ellerman.id.au, npiggin@gmail.com, 
+	linuxppc-dev@lists.ozlabs.org, pbonzini@redhat.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 22, 2023 at 1:59=E2=80=AFPM Chao Du <duchao@eswincomputing.com>=
- wrote:
+On Thu, Jan 4, 2024 at 4:51=E2=80=AFPM Andrew Jones <ajones@ventanamicro.co=
+m> wrote:
 >
-> On 2023-12-21 21:01, Anup Patel <apatel@ventanamicro.com> wrote:
+> On Thu, Jan 04, 2024 at 12:07:51PM +0100, Alexandre Ghiti wrote:
+> > On 04/01/2024 11:52, Andrew Jones wrote:
+> > > This applies to linux-next, but I forgot to append -next to the PATCH
+> > > prefix.
 > >
-> > On Thu, Dec 21, 2023 at 3:21=E2=80=AFPM Chao Du <duchao@eswincomputing.=
-com> wrote:
-> > >
-> > > This series implements KVM Guest Debug on RISC-V. Currently, we can
-> > > debug RISC-V KVM guest from the host side, with software breakpoints.
-> > >
-> > > A brief test was done on QEMU RISC-V hypervisor emulator.
-> > >
-> > > A TODO list which will be added later:
-> > > 1. HW breakpoints support
-> > > 2. Test cases
 > >
-> > Himanshu has already done the complete HW breakpoint implementation
-> > in OpenSBI, Linux RISC-V, and KVM RISC-V. This is based on the upcoming
-> > SBI debug trigger extension draft proposal.
-> > (Refer, https://lists.riscv.org/g/tech-debug/message/1261)
-> >
-> > There are also RISE projects to track these efforts:
-> > https://wiki.riseproject.dev/pages/viewpage.action?pageId=3D394541
-> > https://wiki.riseproject.dev/pages/viewpage.action?pageId=3D394545
-> >
-> > Currently, we are in the process of upstreaming the OpenSBI support
-> > for SBI debug trigger extension. The Linux RISC-V and KVM RISC-V
-> > patches require SBI debug trigger extension and Sdtrig extension to
-> > be frozen which will happen next year 2024.
-> >
-> > Regards,
-> > Anup
-> >
+> > Shoudn't this go to -fixes instead? With a Fixes tag?
 >
-> Hi Anup,
+> I'm not sure how urgent it is since it's a randconfig thing, but if we
+> think it deserves the -fixes track then I can do that. The Fixes tag isn'=
+t
+> super easy to select since, while it seems like it should be 8132d887a702
+> ("KVM: remove CONFIG_HAVE_KVM_EVENTFD"), it could also be 99cdc6c18c2d
+> ("RISC-V: Add initial skeletal KVM support").
 >
-> Thank you for the information and your great work on the SBI
-> Debug Trigger Extension proposal.
->
-> So I think that 'HW breakpoints support' in the above TODO list
-> will be taken care of by Himanshu following the extension proposal.
->
-> On the other hand, if I understand correctly, the software
-> breakpoint part of KVM Guest Debug has no dependency on the new
-> extension since it does not use the trigger module. Just an
-> ebreak substitution is made.
->
-> So may I know your suggestion about this RFC? Both in KVM and QEMU.
+> I'll leave both the urgency decision and the Fixes tag selection up to
+> the maintainers. Anup? Paolo?
 
-Sorry for the delay in response due to holiday season other
-stuff keeping me busy.
+Lets add
 
-If this is about ebreak instruction virtualization then this series
-needs following changes:
-1) Update cover letter to indicate this series focus on ebreak
-     instruction virtualization
-2) PATCH1 and PATCH2 can be merged into one PATCH1
-3) Include a new patch which adds KVM selftest for ebreak
-    based guest debug. This selftest will test both:
-    A) Taking "ebreak" trap from guest as KVM_EXIT_DEBUG
-         in host user-space
-    B) Taking "ebreak" trap from guest as BREAKPOINT
-        exception in guest
+Fixes: 99cdc6c18c2d ("RISC-V: Add initial skeletal KVM support")
 
 Regards,
 Anup
-
->
-> Regards,
-> Chao
->
-> > >
-> > > This series is based on Linux 6.7-rc6 and is also available at:
-> > > https://github.com/Du-Chao/linux/tree/riscv_gd_sw
-> > >
-> > > The matched QEMU is available at:
-> > > https://github.com/Du-Chao/qemu/tree/riscv_gd_sw
-> > >
-> > > Chao Du (3):
-> > >   RISC-V: KVM: Enable the KVM_CAP_SET_GUEST_DEBUG capability
-> > >   RISC-V: KVM: Implement kvm_arch_vcpu_ioctl_set_guest_debug()
-> > >   RISC-V: KVM: Handle breakpoint exits for VCPU
-> > >
-> > >  arch/riscv/include/uapi/asm/kvm.h |  1 +
-> > >  arch/riscv/kvm/vcpu.c             | 15 +++++++++++++--
-> > >  arch/riscv/kvm/vcpu_exit.c        |  4 ++++
-> > >  arch/riscv/kvm/vm.c               |  1 +
-> > >  4 files changed, 19 insertions(+), 2 deletions(-)
-> > >
-> > > --
-> > > 2.17.1
-> > >
-> > >
-> > > --
-> > > kvm-riscv mailing list
-> > > kvm-riscv@lists.infradead.org
-> > > http://lists.infradead.org/mailman/listinfo/kvm-riscv
 
