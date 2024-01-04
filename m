@@ -1,192 +1,260 @@
-Return-Path: <kvm+bounces-5619-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5620-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1177E823BB1
-	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 06:11:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9E3E823BC5
+	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 06:28:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3B9F1C24CAE
-	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 05:11:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 384441F26037
+	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 05:28:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2064018C31;
-	Thu,  4 Jan 2024 05:11:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5662A18ECC;
+	Thu,  4 Jan 2024 05:28:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WgCPoPf0"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="VX+H1pJ6"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2056.outbound.protection.outlook.com [40.107.220.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 038B21864C
-	for <kvm@vger.kernel.org>; Thu,  4 Jan 2024 05:11:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704345079;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=P1vihmddHtSZ99/zq0fZBdm+zeXPC115N0eCs1YPKg8=;
-	b=WgCPoPf0DHOTInW2th0z9/Eyfddgc6CAnHIgIYJ2tKdFStqtmF5x9UxXwIhCDSJBeySusM
-	02KOkagv9W8K+2qKVynDnZfEqx8vuqpLTXiZuz8ViLjd16NOZfMSU8sPSjpbWe3eVSC4Xa
-	ut93RR8DOONmywNDY7VjrafI9zVjTwg=
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
- [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-361-X-fNQXtCNbGBDfybp30yOw-1; Thu, 04 Jan 2024 00:11:17 -0500
-X-MC-Unique: X-fNQXtCNbGBDfybp30yOw-1
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-1d4a9860225so904905ad.3
-        for <kvm@vger.kernel.org>; Wed, 03 Jan 2024 21:11:17 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704345076; x=1704949876;
-        h=content-transfer-encoding:content-disposition:mime-version
-         :references:in-reply-to:message-id:date:subject:cc:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=P1vihmddHtSZ99/zq0fZBdm+zeXPC115N0eCs1YPKg8=;
-        b=YMEo1L+VyOWQOvopP/tdoTq5JwIWw2FCh7QYI/Sik7moIxrnM0qYeEhru0yEbqRmb6
-         dmdDwlUkJ+x/Am5b7PJcpC7f/QQQ06C52eBl0uJHjbbdJZcGwJi2pEOpkvs1u8UPjiTJ
-         2Q1vbOQpJhmzpHr6WVwE+43ceW2ptp4JbqtVG9Fnl4CZByxOTw8qlWasb/4g+Yl/A9dt
-         P+OUqugrnUE85+OfL3wNX7deJLd3GzKPwRLcgmbAJMHcYBgGJw0z04JtovnH5zbTC6XN
-         oWILAKh8WM2EOFeExpaIvmfzCOWQ4VmJhMXGh4zEwwsCkIW1oPC5O0LhYHYE7BtOezBl
-         p6+A==
-X-Gm-Message-State: AOJu0YxJL5UR+OeFSpaoyOQ7+R/mg3Hjao3MR9A/qhbxI5it9/oAvAkk
-	HxXvJi+Z4fofFVGH4dqafu+XKYIjhcSDSw//dTtRgDNH6RS4KuufOtb4McXNYrOgRRMwGH5gaZ3
-	txq2V67B3d0Jy8f57zQ6L
-X-Received: by 2002:a17:902:da86:b0:1d4:d140:8171 with SMTP id j6-20020a170902da8600b001d4d1408171mr52093plx.41.1704345076618;
-        Wed, 03 Jan 2024 21:11:16 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGpSlvwWfbHMFG7wHdD03jmH2na3W8ssbNhKgAkQNbMSxmoAlh0aAjbmolGPOik5IenAoMbcg==
-X-Received: by 2002:a17:902:da86:b0:1d4:d140:8171 with SMTP id j6-20020a170902da8600b001d4d1408171mr52085plx.41.1704345076326;
-        Wed, 03 Jan 2024 21:11:16 -0800 (PST)
-Received: from LeoBras.redhat.com ([2804:431:c7ec:911:6911:ca60:846:eb46])
-        by smtp.gmail.com with ESMTPSA id u15-20020a17090341cf00b001d3ecbccb52sm24427284ple.213.2024.01.03.21.11.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jan 2024 21:11:15 -0800 (PST)
-From: Leonardo Bras <leobras@redhat.com>
-To: guoren@kernel.org
-Cc: Leonardo Bras <leobras@redhat.com>,
-	paul.walmsley@sifive.com,
-	palmer@dabbelt.com,
-	panqinglin2020@iscas.ac.cn,
-	bjorn@rivosinc.com,
-	conor.dooley@microchip.com,
-	peterz@infradead.org,
-	anup@brainfault.org,
-	keescook@chromium.org,
-	wuwei2016@iscas.ac.cn,
-	xiaoguang.xing@sophgo.com,
-	chao.wei@sophgo.com,
-	unicorn_wang@outlook.com,
-	uwu@icenowy.me,
-	jszhang@kernel.org,
-	wefu@redhat.com,
-	atishp@atishpatra.org,
-	linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	virtualization@lists.linux-foundation.org,
-	Guo Ren <guoren@linux.alibaba.com>
-Subject: Re: [PATCH V12 08/14] riscv: qspinlock: Force virt_spin_lock for KVM guests
-Date: Thu,  4 Jan 2024 02:11:05 -0300
-Message-ID: <ZZY96U3CzvDhu3BL@LeoBras>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20231225125847.2778638-9-guoren@kernel.org>
-References: <20231225125847.2778638-1-guoren@kernel.org> <20231225125847.2778638-9-guoren@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FBE218647;
+	Thu,  4 Jan 2024 05:28:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Ke5ke3RQucadpohcwAcabBt7En+N2cg8Dd3OPkmv8MSnJ/9Iuu7mD6ze43L3mjWmwwYaYahxsfolJ21NRI5TqaeDdczqydKIPu8k4iaVDNR9d3M/9Yfmhyl6utgnxF0G27psmR6XKbIM8BexKx78mnp6vdkGEsSFIoK4AIhaYPNEi4m1ddHOovBVS5TvRYBKwiDqwpYxuuhtvSnsNCuoAdc8ak4YBi8yGyJwcWbneU6co12YE74NVIHxsKsTrKaYxme7LAr/xZhibc4DbUb0WWTusARmt6340qh6HWTVzHT4fUaf5w+S91nV8iScyOx1YFLipmh8BiUuOZmZ2qbuSw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zlBP/YYshUWyymQu9xUqbjsp8zuxwo1euyNF8oPKM8w=;
+ b=fVmHeoiaohzJ/oh5/fdIMexqSSUFXxZtxHxO1/+k5iqJOWHnKZmWQe8Pe8J7mBXpIWvxXlER20pUOcDPabAfL56A3nklHyBMo2v9WhOZMvKCk5CYvEQpDZG5Fe5ulYn/PjblQNcxzvnRmymKzLfhUKq080GGfNvH4Lh4i2AzBA32BZ/roUtNvwqvmL/SOGC/ywEIBi7ioukz01CN9Y0K/MKZj2wzTs6UwF8HDzC58Qa2xEH46MWEDPTPcA5NcP+CWsmNxrfT/VzO/mAnQDx2v9oSxOH0XA+ULT1iCRRSV72hcMzNkGClKCXLVsg3zQmhKCExDmjHkhoFzpKQz74hUw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zlBP/YYshUWyymQu9xUqbjsp8zuxwo1euyNF8oPKM8w=;
+ b=VX+H1pJ6Sir/9EWpHkcS1ftfy6Qz0iqYVAp3Pu7PSW0y/68zGMo4/E880jOrnrSEhm+SGb1yP2x4F+2mNT2rFay7q/rpwZJXmUps6FruK5InnVDt6XVnXobgqix4i7rhtLxseyXC4jbXw5jgY/+Ygh+8/KDr8rKk+QyHd0dOsSA=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BL1PR12MB5732.namprd12.prod.outlook.com (2603:10b6:208:387::17)
+ by CH3PR12MB8331.namprd12.prod.outlook.com (2603:10b6:610:12f::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.25; Thu, 4 Jan
+ 2024 05:28:27 +0000
+Received: from BL1PR12MB5732.namprd12.prod.outlook.com
+ ([fe80::1d68:1eb8:d7dc:4b43]) by BL1PR12MB5732.namprd12.prod.outlook.com
+ ([fe80::1d68:1eb8:d7dc:4b43%6]) with mapi id 15.20.7159.013; Thu, 4 Jan 2024
+ 05:28:27 +0000
+Message-ID: <e0d349f4-0267-b339-313c-09dcafb14a71@amd.com>
+Date: Wed, 3 Jan 2024 23:28:24 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v2] x86/sev: Add support for allowing zero SEV ASIDs.
+To: Ashish Kalra <Ashish.Kalra@amd.com>, pbonzini@redhat.com
+Cc: seanjc@google.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org, joro@8bytes.org
+References: <20240104024656.57821-1-Ashish.Kalra@amd.com>
+Content-Language: en-US
+From: Tom Lendacky <thomas.lendacky@amd.com>
+In-Reply-To: <20240104024656.57821-1-Ashish.Kalra@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN4PR0501CA0027.namprd05.prod.outlook.com
+ (2603:10b6:803:40::40) To BL1PR12MB5732.namprd12.prod.outlook.com
+ (2603:10b6:208:387::17)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5732:EE_|CH3PR12MB8331:EE_
+X-MS-Office365-Filtering-Correlation-Id: c5ffd919-b467-4e7e-2a67-08dc0ce5facf
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	2yhc97CGfOWW4k+VqdaxDNUrZ/Os9Z73MZA7fiMIw6DpTIwZRkS7Fbni4y9rz7B+kuzuWStTbOhsSzvFhUglmCK5FkJSjNMYdfWx/PdKb607CKzMf1Smq36ZDtZGpvBVRlBRmMCk5yD0CA5ebItGcn+x+TnnDrod8MCudLblvOg0yu/5tduxoolLOTcPXMX584Iyq1KbDVAgZR+SjvHRSAprJzWdHhkVu8KuSuDHsV8lf9wADZZn2zjRafGq6+Vq0Wk9umDNUAhqk6TrbvVXz1Ogbx/fSkhN51Cdlwn43Mu5tXFpvbkrLBPd6UPvCZ+tsg00YoapTZM8eaSfYTpkmkThjhEgngAmXI+Vj1HoJmgCCI56Y4Y1kMdhoYjCpILyxRVirGGQpd89Z7t0in4JdynICidDMKjLKxogVGqvN6TF3MJ26IXZ6/AYNcRG6RFGVJOyP7JyuYHc0+FaNwBJ8DqnEANyBau/bs6iKiTWF/qze88WbNIfRtYsCLf4o/xDCmQRY8SfQljbc7txkCPPodGtZ6aiRGbffQMcX7gEYfjMf4XyQxPxZLldyYnnpZ9hcjmWWHIcG2O2/fHB8dc81/OkLCavd/b857WcMyVUwE+ieg/gWpzTzXPLddYO7MhzeIOG6PuAmIVGiuSZuuai0A==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5732.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(346002)(396003)(136003)(39860400002)(230922051799003)(451199024)(1800799012)(186009)(64100799003)(2616005)(26005)(6666004)(478600001)(6506007)(6512007)(53546011)(83380400001)(7416002)(2906002)(5660300002)(41300700001)(66946007)(6486002)(316002)(8676002)(4326008)(66556008)(8936002)(66476007)(31696002)(86362001)(38100700002)(36756003)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?bFlZV1ZUZFcxV3l5VXZIbXZjTnpmeHF3TzBzWFdFcFBCRGs2S3B1S1BheWhD?=
+ =?utf-8?B?M3VXdE5PTEV3TFNKM21yQ0hxZkd5U2RzRUZWNHA3ZUpEMm01YjY0LzNYd0d4?=
+ =?utf-8?B?UVI5VkVxZ0N1UDh3T2MyV2dPaXo1dWVXcUp2MUgwaUx5VFR3L3c4QThxNjBa?=
+ =?utf-8?B?SGZKNUxEWUVEOTU5b2xFQjNmOUNBci9wL01KRkxkdWtpdkNPN0p2bzFMcTI3?=
+ =?utf-8?B?dnRwYk9aWnJXWUNoZnN6WWVpOThpNDFkZXpmNzhkZGptNEh3bFNvakQzSU9K?=
+ =?utf-8?B?SnArYi9GcXYrMHo3RWdGajBFTUtFRnNZUEl1dkZPMWQ4dmRLUGNlZVY3ZTZ0?=
+ =?utf-8?B?Z1pkQjRNaGZzaU5NWWdKaXM0RnZqSkN4NDJjenQyS1FKQjI1bC82Yi9rNkFK?=
+ =?utf-8?B?K1oxQ1ByNm1DY0hhb2lVM3M5cEk3UDRwTC9hSHZJc3Exc09JRjdSM2ZrQ3hO?=
+ =?utf-8?B?SHZTQXJRb2tsQm03bEVHQ084OEdhdER5cjhacGVNcUljeWp4TnIvN0s2VVFw?=
+ =?utf-8?B?aEZYOENGeGpEK1dsd0tJN0JIbGcrb2c3ckhNRWJHMWFiYXZYN3UxWkxoM2NX?=
+ =?utf-8?B?UzRsZ1FJS2tKM283VXJ1YXBudDU0MGY3MWhpNVp6c1drellOREVjQ3FBU2Jz?=
+ =?utf-8?B?MzRSVG1YYklkNGRleStkY1JNVFM3dGUrUFFoMTlDY3lJVmRNSk9tVHJSMDdC?=
+ =?utf-8?B?K0JQQWJRczVBNEhLa3lzTEN3VmN3WHRqWXU3K21TR20rSVlUdXAzbjNaS2dM?=
+ =?utf-8?B?dkFHR0ZyNVpOS0wyWHdmU04zdG1GMVkvS0tYYy9BMUR4VUxlQU5SSGZ0eERZ?=
+ =?utf-8?B?VFJUekhKdkpqaFNkL0k1Y3c4VDNBL1ZrTjdxeXE4SzdBaXg5ZWlVVDVYNFZM?=
+ =?utf-8?B?cnJDeUk5dTIxb0dRazQwTzNMTm90OGFqUnJHWVk5Y1VWY2tvRkFXZStmUHR2?=
+ =?utf-8?B?UElMY3BreDRLekp1bTFCa1BJalE3aXZyYmtFK0VmN2dxaUU2VXh1OURkdGlN?=
+ =?utf-8?B?RzFUNld4ZS9xUEZ3TmVPWkdSY2Y4UDI2WXdRWGRlTG4wV1RldkJUMXFjV1pM?=
+ =?utf-8?B?dk4rb2t4RGJ4VFBkN1JjUUxQS2tHMzNVNWxROERwRnp5QTRiWXZOV3dGdi9p?=
+ =?utf-8?B?ZCtPUC9BT1Axb1NuQ2J3Y2t1R2xrZmZXemFVNkNSYlgvRWlOVStodCtZcjZR?=
+ =?utf-8?B?K3hqdG5paVR1dHBqSHpUKy9MN09LQ1FiZ2xLNVVac0lCcDFpNEpvYUg5bnBB?=
+ =?utf-8?B?OUdVSno0NGQ5SnU4TXY2ZlF1WisxOXMvRXU1ZVRKWW5ZRlNVbkVId2drdjlV?=
+ =?utf-8?B?Nk1ENWo3dVBEaHFlSlRETW5Qb3NEZmNNQ25PQ3hOOG0rK0VDQjhoTVZUUUx1?=
+ =?utf-8?B?WG5pQ2NMRENUZk1OVjRTQ0pXRGI2U0ZneTJCSGV0UHZ4cXFOSXdlczA2ZWJk?=
+ =?utf-8?B?MTdwY0twSUgrQjhaNGF2bzBRZ0FrTUxoY3hxMUVGM0lwQktRdXdHV3FHT0dX?=
+ =?utf-8?B?RmVIWFFyWUlCQklsVVl6SGNFNVBQaGhGSDFZSTlKMkxXOHB5cnFYMjU5d2l4?=
+ =?utf-8?B?R1J2SDlLNzB3bHJOa0theFlUV0ZzRFp4TUVJcUJBU1ZXc1k1Uy9QS3RvT21V?=
+ =?utf-8?B?ZUwxd1BCOUYwSjIyQUF2eVBKMFB1ZVpkTGkzL0wrWlAzT1l3Z3F6SHJpNFNu?=
+ =?utf-8?B?OEdvWTJqL0d1Q21hRENYMkNlTldRaU5FOXg5dTVOSTEveUZKRG9Ld0ZpN2g2?=
+ =?utf-8?B?U0RRRWJrMmNsUHJhb2FURTdweWJPYjUzN0UvLzZvcGNvRmlhelBaN0lkTTkx?=
+ =?utf-8?B?QU1XY0JBV3doT1AwaGcxNkNLZFkyMFpJeUNybXM2SDMrbnN5dVpQU2Q5MDVQ?=
+ =?utf-8?B?dkRheTRHVU9RRk9HQ05oSDAxNzJ2d1JnNlRqdFZNVEs4Kzc1SnlkZGJrTjN5?=
+ =?utf-8?B?MEZkeUM3YW5BQ0JLajE3RXpHQTlCL3A4aGsyZWRSZzlMTlovQVUvS214VWh5?=
+ =?utf-8?B?WC9kd1gyNHpsSnZteG1uQVpXWm5ZQVQvd3FrSk16ZnFMUXRvelAxRzdnY2l3?=
+ =?utf-8?B?bWV1MlpZVVovdUQxYzZNSjBGVFFwM3llMEg0cTZ5Yy96RkphY3FsNmtHMi9i?=
+ =?utf-8?Q?7REMEKDIx4Nk1wXhliD+3KuiS?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c5ffd919-b467-4e7e-2a67-08dc0ce5facf
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5732.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jan 2024 05:28:27.6430
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: PwOL6MPiGurIK1DipN/B6KFeaZ270FKc2E2fZI+dq8VYs27xtBK57C7uop6rGp9ui/EOSB00REgg9jbxVBpWXg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8331
 
-On Mon, Dec 25, 2023 at 07:58:41AM -0500, guoren@kernel.org wrote:
-> From: Guo Ren <guoren@linux.alibaba.com>
+On 1/3/24 20:46, Ashish Kalra wrote:
+> From: Ashish Kalra <ashish.kalra@amd.com>
 > 
-> Force to enable virt_spin_lock when KVM guest, because fair locks
-> have horrible lock 'holder' preemption issues.
+> Some BIOSes allow the end user to set the minimum SEV ASID value
+> (CPUID 0x8000001F_EDX) to be greater than the maximum number of
+> encrypted guests, or maximum SEV ASID value (CPUID 0x8000001F_ECX)
+> in order to dedicate all the SEV ASIDs to SEV-ES or SEV-SNP.
 > 
-> Suggested-by: Leonardo Bras <leobras@redhat.com>
-> Link: https://lkml.kernel.org/kvm/ZQK9-tn2MepXlY1u@redhat.com/
-> Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
-> Signed-off-by: Guo Ren <guoren@kernel.org>
+> The SEV support, as coded, does not handle the case where the minimum
+> SEV ASID value can be greater than the maximum SEV ASID value.
+> As a result, the following confusing message is issued:
+> 
+> [   30.715724] kvm_amd: SEV enabled (ASIDs 1007 - 1006)
+> 
+> Fix the support to properly handle this case.
+> 
+> Fixes: 916391a2d1dc ("KVM: SVM: Add support for SEV-ES capability in KVM")
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> Cc: stable@vger.kernel.org
 > ---
->  arch/riscv/include/asm/sbi.h | 8 ++++++++
->  arch/riscv/kernel/sbi.c      | 2 +-
->  arch/riscv/kernel/setup.c    | 6 +++++-
->  3 files changed, 14 insertions(+), 2 deletions(-)
+>   arch/x86/kvm/svm/sev.c | 41 +++++++++++++++++++++++++----------------
+>   1 file changed, 25 insertions(+), 16 deletions(-)
 > 
-> diff --git a/arch/riscv/include/asm/sbi.h b/arch/riscv/include/asm/sbi.h
-> index 0892f4421bc4..8f748d9e1b85 100644
-> --- a/arch/riscv/include/asm/sbi.h
-> +++ b/arch/riscv/include/asm/sbi.h
-> @@ -51,6 +51,13 @@ enum sbi_ext_base_fid {
->  	SBI_EXT_BASE_GET_MIMPID,
->  };
->  
-> +enum sbi_ext_base_impl_id {
-> +	SBI_EXT_BASE_IMPL_ID_BBL = 0,
-> +	SBI_EXT_BASE_IMPL_ID_OPENSBI,
-> +	SBI_EXT_BASE_IMPL_ID_XVISOR,
-> +	SBI_EXT_BASE_IMPL_ID_KVM,
-> +};
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 4900c078045a..651d671ff8ae 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -143,8 +143,21 @@ static void sev_misc_cg_uncharge(struct kvm_sev_info *sev)
+>   
+>   static int sev_asid_new(struct kvm_sev_info *sev)
+>   {
+> -	int asid, min_asid, max_asid, ret;
+> +	/*
+> +	 * SEV-enabled guests must use asid from min_sev_asid to max_sev_asid.
+> +	 * SEV-ES-enabled guest can use from 1 to min_sev_asid - 1.
+> +	 * Note: min ASID can end up larger than the max if basic SEV support is
+> +	 * effectively disabled by disallowing use of ASIDs for SEV guests.
+> +	 */
+> +	unsigned int min_asid = sev->es_active ? 1 : min_sev_asid;
+> +	unsigned int max_asid = sev->es_active ? min_sev_asid - 1 : max_sev_asid;
+> +	unsigned int asid;
 > +
->  enum sbi_ext_time_fid {
->  	SBI_EXT_TIME_SET_TIMER = 0,
->  };
-> @@ -276,6 +283,7 @@ int sbi_console_getchar(void);
->  long sbi_get_mvendorid(void);
->  long sbi_get_marchid(void);
->  long sbi_get_mimpid(void);
-> +long sbi_get_firmware_id(void);
->  void sbi_set_timer(uint64_t stime_value);
->  void sbi_shutdown(void);
->  void sbi_send_ipi(unsigned int cpu);
-> diff --git a/arch/riscv/kernel/sbi.c b/arch/riscv/kernel/sbi.c
-> index 5a62ed1da453..4330aedf65fd 100644
-> --- a/arch/riscv/kernel/sbi.c
-> +++ b/arch/riscv/kernel/sbi.c
-> @@ -543,7 +543,7 @@ static inline long sbi_get_spec_version(void)
->  	return __sbi_base_ecall(SBI_EXT_BASE_GET_SPEC_VERSION);
->  }
->  
-> -static inline long sbi_get_firmware_id(void)
-> +long sbi_get_firmware_id(void)
->  {
->  	return __sbi_base_ecall(SBI_EXT_BASE_GET_IMP_ID);
->  }
-> diff --git a/arch/riscv/kernel/setup.c b/arch/riscv/kernel/setup.c
-> index 0bafb9fd6ea3..e33430e9d97e 100644
-> --- a/arch/riscv/kernel/setup.c
-> +++ b/arch/riscv/kernel/setup.c
-> @@ -281,6 +281,9 @@ DEFINE_STATIC_KEY_TRUE(virt_spin_lock_key);
->  
->  static void __init virt_spin_lock_init(void)
->  {
-> +	if (sbi_get_firmware_id() != SBI_EXT_BASE_IMPL_ID_KVM)
-> +		no_virt_spin = true;
+
+Remove this blank line.
+
+>   	bool retry = true;
+> +	int ret;
 > +
->  	if (no_virt_spin)
->  		static_branch_disable(&virt_spin_lock_key);
->  	else
-> @@ -290,7 +293,8 @@ static void __init virt_spin_lock_init(void)
->  
->  static void __init riscv_spinlock_init(void)
->  {
-> -	if (!enable_qspinlock) {
-> +	if ((!enable_qspinlock) &&
-> +	    (sbi_get_firmware_id() != SBI_EXT_BASE_IMPL_ID_KVM)) {
->  		static_branch_disable(&combo_qspinlock_key);
->  		pr_info("Ticket spinlock: enabled\n");
->  	} else {
-> -- 
-> 2.40.1
-> 
+> +	if (min_asid > max_asid)
+> +		return -ENOTTY;
+>   
+>   	WARN_ON(sev->misc_cg);
+>   	sev->misc_cg = get_current_misc_cg();
+> @@ -157,12 +170,6 @@ static int sev_asid_new(struct kvm_sev_info *sev)
+>   
+>   	mutex_lock(&sev_bitmap_lock);
+>   
+> -	/*
+> -	 * SEV-enabled guests must use asid from min_sev_asid to max_sev_asid.
+> -	 * SEV-ES-enabled guest can use from 1 to min_sev_asid - 1.
+> -	 */
+> -	min_asid = sev->es_active ? 1 : min_sev_asid;
+> -	max_asid = sev->es_active ? min_sev_asid - 1 : max_sev_asid;
+>   again:
+>   	asid = find_next_zero_bit(sev_asid_bitmap, max_asid + 1, min_asid);
+>   	if (asid > max_asid) {
+> @@ -246,21 +253,20 @@ static void sev_unbind_asid(struct kvm *kvm, unsigned int handle)
+>   static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>   {
+>   	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> -	int asid, ret;
+> +	int ret;
+>   
+>   	if (kvm->created_vcpus)
+>   		return -EINVAL;
+>   
+> -	ret = -EBUSY;
+>   	if (unlikely(sev->active))
+> -		return ret;
+> +		return -EINVAL;
+>   
+>   	sev->active = true;
+>   	sev->es_active = argp->id == KVM_SEV_ES_INIT;
+> -	asid = sev_asid_new(sev);
+> -	if (asid < 0)
+> +	ret = sev_asid_new(sev);
+> +	if (ret < 0)
+>   		goto e_no_asid;
+> -	sev->asid = asid;
+> +	sev->asid = ret;
+>   
+>   	ret = sev_platform_init(&argp->error);
+>   	if (ret)
+> @@ -2229,8 +2235,10 @@ void __init sev_hardware_setup(void)
+>   		goto out;
+>   	}
+>   
+> -	sev_asid_count = max_sev_asid - min_sev_asid + 1;
+> -	WARN_ON_ONCE(misc_cg_set_capacity(MISC_CG_RES_SEV, sev_asid_count));
+> +	if (min_sev_asid > max_sev_asid) {
 
-LGTM:
-Reviewed-by: Leonardo Bras <leobras@redhat.com>
+Shouldn't this be: if (min_sev_asid <= max_sev_asid) ?
 
+You only want to do the misc_cg_set_capactity() call if you can have SEV 
+guests.
+
+Thanks,
+Tom
+
+> +		sev_asid_count = max_sev_asid - min_sev_asid + 1;
+> +		WARN_ON_ONCE(misc_cg_set_capacity(MISC_CG_RES_SEV, sev_asid_count));
+> +	}
+>   	sev_supported = true;
+>   
+>   	/* SEV-ES support requested? */
+> @@ -2261,7 +2269,8 @@ void __init sev_hardware_setup(void)
+>   out:
+>   	if (boot_cpu_has(X86_FEATURE_SEV))
+>   		pr_info("SEV %s (ASIDs %u - %u)\n",
+> -			sev_supported ? "enabled" : "disabled",
+> +			sev_supported ? (min_sev_asid <= max_sev_asid ?  "enabled" : "unusable")
+> +			: "disabled",
+>   			min_sev_asid, max_sev_asid);
+>   	if (boot_cpu_has(X86_FEATURE_SEV_ES))
+>   		pr_info("SEV-ES %s (ASIDs %u - %u)\n",
 
