@@ -1,176 +1,174 @@
-Return-Path: <kvm+bounces-5602-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5603-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48FE9823969
-	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 01:02:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C253823998
+	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 01:24:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 365D01C24A9C
-	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 00:02:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AC83BB222C0
+	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 00:24:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93BC61FBB;
-	Thu,  4 Jan 2024 00:02:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 861911878;
+	Thu,  4 Jan 2024 00:24:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="qlaC8OrB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RFpA8CKw"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2056.outbound.protection.outlook.com [40.107.92.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 171A41F927;
-	Thu,  4 Jan 2024 00:02:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RqHiD7AGXFh9YYSx9fewgGJx7HJCQhcLxx7TuOpsGIQyWMcRaeqQPLgT1RpOAGLAEcZLHeWGMqbVLiExJhC0gFYqAZEWk3P7jUawK0TUfiiLXGS8Dfz9uDHZgVYRE+PorFrN1+ZeK9vW3Il5oRx4uA/vNuTOIZIqcoL1a8T6tNgBj92CPMmV7NrJvLqz1CQ7rQ6eDNb85Ndfe8TfjtKXMKXlS1NW8C3Y3ui9oJK3JP9UStVUcXZjSniUrCH6pKpoxyMFqrPkuCV7It3nJlJuHqzymPl+Mkb1zlTofqpcdLUwvCkro7JR9ko7xa7obJ7fHCQTXeKLUV9+YzAEzWBLkQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=t0nqVUuOQcrMn5KMDE1zBncnqxD5viOFhFu9MdqZuJA=;
- b=SVdObVkG1QLq3p+erRldGbxQRzIy6V4XCpfJSWtQusMapt9vEB30HRAWR8aru/oLTJ8HbVekDReC99q6rsxCfEX/ilVyxRkNXr8ij+3lIY01W8yrAjSkNIXmoec0sbjWcpw6lVH19o7ChSHAXuBPIbSiC3GXy5IiN+BxnSbm8g7IZweo8Px32WCaCXXBdNpIYT5i1BvtpJfYaaydyRCFeiGDxwbOySOKUz+2lwaFn/eHNiecJe163p/cw+zOE46gjncyX7t51BlFAi3mPkB3Q3SIfXyrJ+DTdJv8KvREDfiGqqwfoW8V8vJN2IdJuUGFWDGw/bg0MBWnNWb5f9sdow==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=t0nqVUuOQcrMn5KMDE1zBncnqxD5viOFhFu9MdqZuJA=;
- b=qlaC8OrBTo5mJtXyWbghPidFcZwuAT1yLvUMRINsc2LxfoxdqB3V29VUb4dpCq2dotL+tZt3Gi7uOcHcFDg3E/vcjt3P/FKq8Xd2i/7mlmwfspwfGSv/XObcforn/MEqgRTZAm1ytkhsAeCE899hAYjrPjVRVx6Vdj8AiwGz/0gwmHFKa6Pmreh80t60C4w/unqdZ8Cgzk77HBE9E+0+9Q2Fi/KIgORbYJ2W40wS0pJveas8c9xs9ait3PRq44c1EWK/hoiUtKSrD6dzmi7Eh8NtRewyi/xsE61bMr6eSE0q/35tG03p5W1W0T7kCZEdkZO7UWwktzGQLMB7elwbjw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by CH0PR12MB5235.namprd12.prod.outlook.com (2603:10b6:610:d2::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.27; Thu, 4 Jan
- 2024 00:02:05 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93%4]) with mapi id 15.20.7135.023; Thu, 4 Jan 2024
- 00:02:05 +0000
-Date: Wed, 3 Jan 2024 20:02:04 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Nicolin Chen <nicolinc@nvidia.com>
-Cc: Yi Liu <yi.l.liu@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>,
-	"joro@8bytes.org" <joro@8bytes.org>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"robin.murphy@arm.com" <robin.murphy@arm.com>,
-	"baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-	"cohuck@redhat.com" <cohuck@redhat.com>,
-	"eric.auger@redhat.com" <eric.auger@redhat.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-	"chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-	"yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-	"peterx@redhat.com" <peterx@redhat.com>,
-	"jasowang@redhat.com" <jasowang@redhat.com>,
-	"shameerali.kolothum.thodi@huawei.com" <shameerali.kolothum.thodi@huawei.com>,
-	"lulu@redhat.com" <lulu@redhat.com>,
-	"suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	"Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
-	"joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
-	"Zeng, Xin" <xin.zeng@intel.com>,
-	"Zhao, Yan Y" <yan.y.zhao@intel.com>
-Subject: Re: [PATCH v7 1/3] iommufd: Add data structure for Intel VT-d
- stage-1 cache invalidation
-Message-ID: <20240104000204.GV50406@nvidia.com>
-References: <ZXvI2IiXwwuHRE8V@Asurada-Nvidia>
- <7c398efc-8a2f-479d-bcff-ded8cc1ef3d0@intel.com>
- <20240102233849.GK50406@nvidia.com>
- <c59a780d-4030-4815-a34b-fb2e2f902ab3@intel.com>
- <20240103160108.GP50406@nvidia.com>
- <ZZWP7iBqUtbTRb3s@Asurada-Nvidia>
- <20240103165848.GR50406@nvidia.com>
- <ZZWUD+lCw3mRc/15@Asurada-Nvidia>
- <20240103175202.GT50406@nvidia.com>
- <ZZXBGw9dJyvb/5r5@Asurada-Nvidia>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZZXBGw9dJyvb/5r5@Asurada-Nvidia>
-X-ClientProxiedBy: BL1PR13CA0332.namprd13.prod.outlook.com
- (2603:10b6:208:2c6::7) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 580D81849
+	for <kvm@vger.kernel.org>; Thu,  4 Jan 2024 00:24:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dbe02d0c945so13266276.3
+        for <kvm@vger.kernel.org>; Wed, 03 Jan 2024 16:24:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1704327848; x=1704932648; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=YGoAdMkmn3Mnvumr2fIYY5+6zsbtkTCTOlb0bB43RH8=;
+        b=RFpA8CKw0QT9basRBKCniJs1Un80M1ye9YVQbKW9qNaAM5wVvtrWsapA5Uqe7c2hIY
+         +WJAv9XNkLwkOc3AJyWi7enOcEJFagrCc07G7pTmXxqnTJusTV6N/dsllcxXtAJqC+ys
+         wkeSsMvRNYlCQfQixWCZ4+xYNC/KB+nMehXQwNDggsgBBMb8NK9zKA5oCNEtM97Ezju0
+         3J6wTYq8+Gn/rvAqHPZk1PVgaCjIodkPx+ljVRGPiDoaFsCRypkTHfIRkAl07jQJRBv2
+         Lu1lbzv/0wbhvgEC0uzHMqGxyDioE+QW2dmNfjIZdqWkWUz4OLTsnU7ZzSxDKDJ6/+1D
+         WgCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704327848; x=1704932648;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YGoAdMkmn3Mnvumr2fIYY5+6zsbtkTCTOlb0bB43RH8=;
+        b=CYxPkz9xecLea0X4G4N2cWGjgNDArnXz+6Mg7z7LByxb6F7Qzns7/zF+JtFoJUOIQ1
+         WAz8Evco6XlKjAfYa5TUkRYo2A/UBdGOkcsud4cXDCwa3D2eBFX6SkeV9W9shmtK/31N
+         ioGVnIyeD1xTUDX/SVFbyG+F8DoyaoQPXfOPixvPYgzHSXEEiorf5pqDZxC9wKpX0nBo
+         ++QYl5Hkr7iYZaBVepIn5fXXvI2/bsTTSKesNWoqniE3o4CNucoyGHeZEk/w3hnAok6Z
+         BsjgObttWSSyhXOndzIVc1iMUTjFvSgN9zUXYqjmtGz/VDJsDnf7vBdQ8kdIxLjT23iQ
+         Mupg==
+X-Gm-Message-State: AOJu0Yy6iPTeKeh6bdzB2rP/bviLxFrEFY77DurRQn7q5XWxdFPb9Z5c
+	1Bct0ZR6hl575wjCj5+NuFhscy0iLKgHAVmhsw==
+X-Google-Smtp-Source: AGHT+IF/oqsWgNiKNR618wuHPNv+Itn11kkolYaxoEfHGsUr8PjiJ9wl2bqDgqhJc2D2uuI8GYNIM8pgnKo=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:8142:0:b0:d9c:801c:4230 with SMTP id
+ j2-20020a258142000000b00d9c801c4230mr472209ybm.5.1704327848261; Wed, 03 Jan
+ 2024 16:24:08 -0800 (PST)
+Date: Wed, 3 Jan 2024 16:24:06 -0800
+In-Reply-To: <88f49775-2b56-48cc-81b8-651a940b7d6b@paulmck-laptop>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CH0PR12MB5235:EE_
-X-MS-Office365-Filtering-Correlation-Id: 53cb97a2-c129-457a-3a3c-08dc0cb862a4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	6W7hV+bWHIis00f+LIDuEDawzjkcFgfBotOZp5y20OvMD7hyudPUgCzcWzdpyKcOaOcHD5az+77Q4Y42X7LlqDXjy9d6G7dMLt5+1FiQLkrfPH2KFLmSaR5jcvY/5gygA23ohCutYhE1Y/JYLEVvvwqJ/aSdK1LP8NPPIFbneZyrPzZQxHnbJ+AuLeDQZ1P2rQml5E80kQH7dEYPZ6YQnKKnE1BowFVZ0fjvBjYWDtP55dnO4Ptib8qGxz5tGXzCobLNH5TdO81rx8uPZn/CHJ4i6JtyUTJnRt/HW+6rcItvvQeV+ScOdIWUHjBalStV2rbhGrvykeykXT9G+swyNdl8Xcl6fDH3rMZjj3QldphZiZkX2KN6iJimFh7nKsZOnHqHbavcItYuGHdRpSQR6OOFX3Rv8IxHsuc7G81ynNEQh+VLFHelA4uenhY1MbrwE713xlP4VbDDV6j8TaukHLM5C/cxCHdKEbQy/ttAewMe5Lapm+HzwKmCtJg4QeoKxQ5AV099aFDDXDKXncwAuQaQIDV8KSDUjA2yfQjhGfUhQ9WWfFsLwLkTjrKdlGSI
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(396003)(346002)(39860400002)(136003)(366004)(230922051799003)(186009)(1800799012)(64100799003)(451199024)(8676002)(478600001)(8936002)(54906003)(37006003)(33656002)(41300700001)(1076003)(26005)(6512007)(5660300002)(6506007)(4326008)(6862004)(6486002)(6636002)(66476007)(66556008)(66946007)(316002)(2616005)(4744005)(7416002)(38100700002)(2906002)(36756003)(86362001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?Cx1kRKyQHbZtz+0IG/RqU3Nc3Y24q4ZUt0cyZ1Qv5BUy/b97mtLa1Ri7NTYm?=
- =?us-ascii?Q?kpvPQmOsyAnx6Kya/grPeRHrOdbcD5bFx2EmsMNSi7cW8seoG0Uil8FrRsg0?=
- =?us-ascii?Q?q3B+AyflOXRwp3fn5lE1oQ+HdXV6qD61y5MyTfr3QdMCOJbu07iLAH1whs7v?=
- =?us-ascii?Q?VxPe7fCQaUAKJ+VF/LXlvuaIl7ksyLNn86dsGQQfZcg0coWXHSHIXCkyAeXz?=
- =?us-ascii?Q?iwIYEzoUlTJ39o7CAKNZDvhX+namX4U4xFwGnstwSDNfDFb747X52l5Ty8i7?=
- =?us-ascii?Q?luu0p3HzjcPc1w1UG4sFqnvEPfIBbu6Jp1i8i38dY6gdnVzi5LxFNQbwOF4q?=
- =?us-ascii?Q?iqCV5fGgfV0HzOcY0vDz+SWrymgiw8rLR707uDm4No5epgkZCv9w990A5jwb?=
- =?us-ascii?Q?UjJBlGv+zkupUOhik9cRp5DgUdjMoVitxti5z2VKHTVzickjwpVFol/w4pVS?=
- =?us-ascii?Q?8YRWM6aynuOj0rTzp5slWsa8Ie1wxj+MTWniJ+BHMT+eMKC0f5441WK2OIik?=
- =?us-ascii?Q?3JLQ3ukuQTplrC4oUwrBxhropPFNCJaAxPXO/TaguP3G1rvBE6pp+vjPt/MP?=
- =?us-ascii?Q?lOZcXf8NjQ6Ezjvh/YjmMxEdUD0m/lEY06fWJyNYpqJVziAIPlaL7FaUHE32?=
- =?us-ascii?Q?4LO0lutDbjhsIKq2HIP4Lrd0M2sLIdlHCYQc5zWKRhXZrmMzcDpBTGl2yMFW?=
- =?us-ascii?Q?6s0j9NDSpJAyF6IVuwYoL0AOfQQmdwza2gAOl11syyV/bknelcyJjnN3+B6p?=
- =?us-ascii?Q?DcFlAqHU2b8S57CtRvht8vMYreukCidHSTobI5hquvsv3dib969x8bD/3RDZ?=
- =?us-ascii?Q?N+9IcDUzsDt6R0QIyjt0wXqcCV1TrwxpdEl7/wxDcpdBj8KZ3Ukx9lslzqQP?=
- =?us-ascii?Q?lR0FP2iqzljRF3xH9KF8v5a5lsUMdxEE9YlenGPgXVysb8KGAIglgK+BFpv3?=
- =?us-ascii?Q?i//zvGvebWX490tx6k+pgywH9HuF0FF+tFmle72FVyltIcHO2bYEiKUVkW+i?=
- =?us-ascii?Q?z1lO5qOUCuRSb6SawryLEjrnKTlho9m3nysImC8yjJfDTgIda8k7okSkE36F?=
- =?us-ascii?Q?0Vnt6nvzAV9hv50RYOdweL/7LI0HxU98m11GW1ylSrrT6Lra2TCHqJaIhYLA?=
- =?us-ascii?Q?bJYd4mF2SwyNhyuPCmRDhJGPia4As+CEFcS820i806g97nN8fRHMmoujTWz7?=
- =?us-ascii?Q?6XviSNDtyiWIkfzltO4wfkldLMEcoF2XQ2QrziZB5DWYLjyGwRPAal9m/9iY?=
- =?us-ascii?Q?YwMqGIRSZN8jLPEn58I9B29fscjfBjzqcp1LBeP2UiGHdABX9/kzCs6XplwV?=
- =?us-ascii?Q?WReh3tzfoA/qj+P5MuL8CP1zIzTsGx9lKCUg5PR93lkSjQ0cLJLgRK6ecDjO?=
- =?us-ascii?Q?FS0AubCIHUIVitJa9Tr3rTlo8rKf/GGbh971nI1BPw8rP54AD5owIlrgVfu1?=
- =?us-ascii?Q?/FWm5kHu+BZ1TI2omMbf/ws1lqaqDAL6Ogylw7+ksoqLiHxNGS1gUJZMwpuQ?=
- =?us-ascii?Q?h2v67npldb+tO4Osh7Qcu9QLN8is/YV1UMkBF8RyHqFeuakIfmiMgWUkUHY8?=
- =?us-ascii?Q?ku0em0LW05PBHuuJcfVIa1bybdcvT1DE/6tf5o0x?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 53cb97a2-c129-457a-3a3c-08dc0cb862a4
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jan 2024 00:02:05.0287
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: qlxy1eeinsdx7uSxbkt+DNpKUsdoOPMhUuYH2mz+K7gOspW+eNqKv8FJIvsottq4
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5235
+Mime-Version: 1.0
+References: <3d8f5987-e09c-4dd2-a9c0-8ba22c9e948a@paulmck-laptop> <88f49775-2b56-48cc-81b8-651a940b7d6b@paulmck-laptop>
+Message-ID: <ZZX6pkHnZP777DVi@google.com>
+Subject: Re: [BUG] Guest OSes die simultaneously (bisected)
+From: Sean Christopherson <seanjc@google.com>
+To: "Paul E. McKenney" <paulmck@kernel.org>
+Cc: Like Xu <like.xu@linux.intel.com>, Andi Kleen <ak@linux.intel.com>, 
+	Kan Liang <kan.liang@linux.intel.com>, Luwei Kang <luwei.kang@intel.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, Breno Leitao <leitao@debian.org>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Ingo Molnar <mingo@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Jan 03, 2024 at 12:18:35PM -0800, Nicolin Chen wrote:
-> > The driver would have to create it and there would be some driver
-> > specific enclosing struct to go with it
+On Wed, Jan 03, 2024, Paul E. McKenney wrote:
+> On Wed, Jan 03, 2024 at 02:22:23PM -0800, Paul E. McKenney wrote:
+> > Hello!
 > > 
-> > Perhaps device_ids goes in the driver specific struct, I don't know.
+> > Since some time between v5.19 and v6.4, long-running rcutorture tests
+> > would (rarely but intolerably often) have all guests on a given host die
+> > simultaneously with something like an instruction fault or a segmentation
+> > violation.
+> > 
+> > Each bisection step required 20 hosts running 10 hours each, and
+> > this eventually fingered commit c59a1f106f5c ("KVM: x86/pmu: Add
+> > IA32_PEBS_ENABLE MSR emulation for extended PEBS").  Although this commit
+> > is certainly messing with things that could possibly cause all manner
+> > of mischief, I don't immediately see a smoking gun.  Except that the
+> > commit prior to this one is rock solid.
+> > Just to make things a bit more exciting, bisection in mainline proved
+> > to be problematic due to bugs of various kinds that hid this one.  I was
+> > therefore forced to bisect among the commits backported to the internal
+> > v5.19-based kernel, which fingered the backported version of the patch
+> > called out above.
 > 
-> +struct iommufd_viommu {
-> +	struct iommufd_object obj;
-> +	struct iommufd_ctx *ictx;
-> +	struct iommu_device *iommu_dev;
-> +	struct iommufd_hwpt_paging *hwpt;	/* maybe unneeded */
-> +
-> +	int vmid;
-> +
-> +	union iommu_driver_user_data {
-> +		struct iommu_driver_user_vtd;
-> +		struct iommu_driver_user_arm_smmuv3;
-> +		struct iommu_driver_user_amd_viommu;
-> +	};
+> Ah, and so why do I believe that this is a problem in mainline rather
+> than just (say) a backporting mistake?
+> 
+> Because this issue was first located in v6.4, which already has this
+> commit included.
+> 
+> 							Thanx, Paul
+> 
+> > Please note that this is not (yet) an emergency.  I will just continue
+> > to run rcutorture on v5.19-based hypervisors in the meantime.
+> > 
+> > Any suggestions for debugging or fixing?
 
-Not like that, in the usual container_of way
+This looks suspect:
 
-Jason
++       u64 pebs_mask = cpuc->pebs_enabled & x86_pmu.pebs_capable;
++       int global_ctrl, pebs_enable;
+ 
+-       arr[0].msr = MSR_CORE_PERF_GLOBAL_CTRL;
+-       arr[0].host = intel_ctrl & ~cpuc->intel_ctrl_guest_mask;
+-       arr[0].guest = intel_ctrl & ~cpuc->intel_ctrl_host_mask;
+-       arr[0].guest &= ~(cpuc->pebs_enabled & x86_pmu.pebs_capable);
+-       *nr = 1;
++       *nr = 0;
++       global_ctrl = (*nr)++;
++       arr[global_ctrl] = (struct perf_guest_switch_msr){
++               .msr = MSR_CORE_PERF_GLOBAL_CTRL,
++               .host = intel_ctrl & ~cpuc->intel_ctrl_guest_mask,
++               .guest = intel_ctrl & (~cpuc->intel_ctrl_host_mask | ~pebs_mask),
++       };
+
+
+IIUC (always a big if with this code), the intent is that the guest's version of
+PERF_GLOBAL_CTRL gets bits that are (a) not exclusive to the host and (b) not
+being used for PEBS.  (b) is necessary because PEBS generates records in memory
+using virtual addresses, i.e. the CPU will write to memory using a virtual address
+that is valid for the host but not the guest.  And so PMU counters that are
+configured to generate PEBS records need to be disabled while running the guest.
+
+Before that commit, the logic was:
+
+  guest[PERF_GLOBAL_CTRL] = ctrl & ~host;
+  guest[PERF_GLOBAL_CTRL] &= ~pebs;
+
+But after, it's now:
+
+  guest[PERF_GLOBAL_CTRL] = ctrl & (~host | ~pebs);
+
+I.e. the kernel is enabled counters in the guest that are not host-only OR not
+PEBS.  E.g. if only counter 0 is in use, it's using PEBS, but it's not exclusive
+to the host, then the new code will yield (truncated to a single byte for sanity)
+
+  1 = 1 & (0xf | 0xe)
+
+and thus keep counter 0 enabled, whereas the old code would yield
+
+  1 = 1 & 0xf
+  0 = 1 & 0xe
+
+A bit of a shot in the dark and completed untested, but I think this is the correct
+fix?
+
+diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
+index a08f794a0e79..92d5a3464cb2 100644
+--- a/arch/x86/events/intel/core.c
++++ b/arch/x86/events/intel/core.c
+@@ -4056,7 +4056,7 @@ static struct perf_guest_switch_msr *intel_guest_get_msrs(int *nr, void *data)
+        arr[global_ctrl] = (struct perf_guest_switch_msr){
+                .msr = MSR_CORE_PERF_GLOBAL_CTRL,
+                .host = intel_ctrl & ~cpuc->intel_ctrl_guest_mask,
+-               .guest = intel_ctrl & (~cpuc->intel_ctrl_host_mask | ~pebs_mask),
++               .guest = intel_ctrl & ~(cpuc->intel_ctrl_host_mask | pebs_mask),
+        };
+ 
+        if (!x86_pmu.pebs)
+
 
