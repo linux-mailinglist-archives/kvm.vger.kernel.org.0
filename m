@@ -1,196 +1,389 @@
-Return-Path: <kvm+bounces-5616-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5617-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 730C8823B73
-	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 05:34:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12DD5823B99
+	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 05:57:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0670F2881E6
-	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 04:34:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 828CD1F25F0F
+	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 04:57:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ADC51944E;
-	Thu,  4 Jan 2024 04:34:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC87A1D689;
+	Thu,  4 Jan 2024 04:56:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="evBABDZT"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lp41SNvS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBE1F18EBD
-	for <kvm@vger.kernel.org>; Thu,  4 Jan 2024 04:34:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-54744e66d27so7873a12.0
-        for <kvm@vger.kernel.org>; Wed, 03 Jan 2024 20:34:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704342872; x=1704947672; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+WiduSvz2qwF5XFSa8IPogiKWFeLiNjhMyhNSncPk3c=;
-        b=evBABDZTXvdBVU0yIoLwk1IXMbsjKCYlJjBafOzwDwr+oSbDVFqfZCLeYkpyfsojKG
-         AZlZMXID4NlRhQg1rcHoiMrL516AUuyj2G+gmyr7JPOW3KduW72TQo38E1n0bv5JLQZo
-         0RJVSz6/1AjLE0rlQgW/tM9Y6m3zwo04sXo2PEb3QrIAr7f0/CVipGEyveoTIwGtggtl
-         WEnj0SjamZCIq2Hjd02Lu6hZ1cwH9fXATP9afyLq9dDA8rIN7Aivz4brOwUsUV0iXUtz
-         djQT0mbWidvmfYKrEBWE+uG/YxlF5x3YG1adBiEP3aGj11CZoXepo93LNOzfaZEw+tKQ
-         4qOA==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 710201D68D
+	for <kvm@vger.kernel.org>; Thu,  4 Jan 2024 04:56:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1704344210;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wkxxTkMqNEwpbKHN6am6PA+y1xu5ofQzJ5MjP1uHEUc=;
+	b=Lp41SNvSAkJwyZXSt9EXdaYwMQhDdN8Kn9NBWLdqJlL1yefnW0D271vQXVImHT/2J6je61
+	GtMw+gj2pTTiHxmA5H9Rgmd+6ceu8R4T6yQXAynwTFn9gkgrRt+PmcYcC+bbvGmnuT0j3Y
+	cni2Ge1m1q/ceHyZLlEHSzApEFt5I4o=
+Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com
+ [209.85.210.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-688-6nWIwyLMP9KCIzmTywti_A-1; Wed, 03 Jan 2024 23:56:49 -0500
+X-MC-Unique: 6nWIwyLMP9KCIzmTywti_A-1
+Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-6d9eb5c8d18so118800b3a.0
+        for <kvm@vger.kernel.org>; Wed, 03 Jan 2024 20:56:48 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704342872; x=1704947672;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+WiduSvz2qwF5XFSa8IPogiKWFeLiNjhMyhNSncPk3c=;
-        b=R4coEWdCXfXMTaFGFr0jWbmrqLj9coGD5quaiwohaU+U1eQQkkiMhheQWmG/cKT+9m
-         0j9f3P5s3XUXtc1gtQoOt76Mhle6bd8CHXnKxuSlKN78pzf0DCZs7dICOmL3JSmEk2DL
-         O7E1D9jqS3I6cFGt1rbgZCQfbQqNy4zcSWdRdrzg+N9RCjjBckosxwJLCjKdDWY5reTU
-         zwndTLoUyx6st2dw83Q8Dhf9nTUJnx0z8632rDJBVNXIfCjSJvNZ8P87hoHUjlsuMTbN
-         upTXjZIqVIWijt0/KF8Cl1UYLw8Fs52UihSLG1vPh0wvCqk+ohrpvajh+8SJIeBRxvKs
-         hXXQ==
-X-Gm-Message-State: AOJu0YzrOWATFaWKllBGJP8eyZlDgJZHYUvPjhl4PYt/DNHVBSOk57z9
-	2+gcN2xyTwfFA61etxVLSrQX6+VsrovvM0r2oFrBk/tof4xs
-X-Google-Smtp-Source: AGHT+IHjt+NAeLCTCeEt3O4NCeJAa0EZ21ZtVO4/E9M9pFJJWIyMdd1N8j6RuPV8B0vgrGRoTWdOOFHdbOmrg45V/XQ=
-X-Received: by 2002:a05:6402:380c:b0:557:24d:6135 with SMTP id
- es12-20020a056402380c00b00557024d6135mr26327edb.4.1704342871868; Wed, 03 Jan
- 2024 20:34:31 -0800 (PST)
+        d=1e100.net; s=20230601; t=1704344208; x=1704949008;
+        h=content-transfer-encoding:content-disposition:mime-version
+         :references:in-reply-to:message-id:date:subject:cc:to:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wkxxTkMqNEwpbKHN6am6PA+y1xu5ofQzJ5MjP1uHEUc=;
+        b=qtFlP5ipXOrBe31dsDx3qj92nQ18Fqk1LtRD5xVklOzOqgztqU6+LezmX4Y1csgZWu
+         c+7/jVXRKFsboBAHxXHtu8BlqavfmYskTzqtaiG4DZ4zhCIJba1QUKJxtEXUjgZ2kZcF
+         l9fpWapCEyVt3nX+/wWiTBSygnc5YpF8hfacPkt6mlnbPoT6HF7H/XSqwZr3l7XTzHnh
+         xnytdEQTsx9UVSmP1dCWGBAeYgqnTuRRvkdJY8Cuqlk6iezfCl2c7rnKlhSQEhzpjdgL
+         kM1BOqB0kbf5jZ/cgN62v+AoZ1btfbWfLFJ123n9Kaa8XN8W4DKoAVU5/lI3GtJeTW0t
+         AW+Q==
+X-Gm-Message-State: AOJu0Ywr93K5JNSPBc2prm58hoGPYYLq0fK1Bw0QaeVk6mBRSoVaywA9
+	rDb73vPwV3RNQKHCBogsHHjReJKTAG+PuREOEArUQ96kSeEQvQLTwhsWJ5kt4V8kx72AODhQ6n9
+	Jwvubbh1LhkksUQtBsUq3
+X-Received: by 2002:a05:6a00:2f94:b0:6d9:9ea6:a366 with SMTP id fm20-20020a056a002f9400b006d99ea6a366mr80057pfb.61.1704344208064;
+        Wed, 03 Jan 2024 20:56:48 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFzvdSrrptTX8IcNlJN4p/HszwLZSS5w416eatKHRrDdMIRM5mvP3tOSbw5q+TcRtNtsxNB6g==
+X-Received: by 2002:a05:6a00:2f94:b0:6d9:9ea6:a366 with SMTP id fm20-20020a056a002f9400b006d99ea6a366mr80041pfb.61.1704344207664;
+        Wed, 03 Jan 2024 20:56:47 -0800 (PST)
+Received: from LeoBras.redhat.com ([2804:431:c7ec:911:6911:ca60:846:eb46])
+        by smtp.gmail.com with ESMTPSA id k11-20020a63ff0b000000b005c662e103a1sm23227447pgi.41.2024.01.03.20.56.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Jan 2024 20:56:47 -0800 (PST)
+From: Leonardo Bras <leobras@redhat.com>
+To: guoren@kernel.org
+Cc: Leonardo Bras <leobras@redhat.com>,
+	paul.walmsley@sifive.com,
+	palmer@dabbelt.com,
+	panqinglin2020@iscas.ac.cn,
+	bjorn@rivosinc.com,
+	conor.dooley@microchip.com,
+	peterz@infradead.org,
+	anup@brainfault.org,
+	keescook@chromium.org,
+	wuwei2016@iscas.ac.cn,
+	xiaoguang.xing@sophgo.com,
+	chao.wei@sophgo.com,
+	unicorn_wang@outlook.com,
+	uwu@icenowy.me,
+	jszhang@kernel.org,
+	wefu@redhat.com,
+	atishp@atishpatra.org,
+	linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	virtualization@lists.linux-foundation.org,
+	Guo Ren <guoren@linux.alibaba.com>
+Subject: Re: [PATCH V12 06/14] riscv: qspinlock: Introduce combo spinlock
+Date: Thu,  4 Jan 2024 01:56:33 -0300
+Message-ID: <ZZY6gcFUnGJVVXbg@LeoBras>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20231225125847.2778638-7-guoren@kernel.org>
+References: <20231225125847.2778638-1-guoren@kernel.org> <20231225125847.2778638-7-guoren@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231218140543.870234-1-tao1.su@linux.intel.com>
- <20231218140543.870234-2-tao1.su@linux.intel.com> <ZYMWFhVQ7dCjYegQ@google.com>
- <ZYP0/nK/WJgzO1yP@yilunxu-OptiPlex-7050> <ZZSbLUGNNBDjDRMB@google.com>
- <CALMp9eTutnTxCjQjs-nxP=XC345vTmJJODr+PcSOeaQpBW0Skw@mail.gmail.com>
- <ZZWhuW_hfpwAAgzX@google.com> <ZZYbzzDxPI8gjPu8@chao-email> <CALMp9eSg6No9L40kmo7n9BGOz4v1ThA7-e4gD4sgj3KGBJEUzA@mail.gmail.com>
-In-Reply-To: <CALMp9eSg6No9L40kmo7n9BGOz4v1ThA7-e4gD4sgj3KGBJEUzA@mail.gmail.com>
-From: Jim Mattson <jmattson@google.com>
-Date: Wed, 3 Jan 2024 20:34:16 -0800
-Message-ID: <CALMp9eRS9o7YDDaOcjBB0QTeF_vRA2LMvQqc2Sb-7XhyDi=1LA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] x86: KVM: Limit guest physical bits when 5-level EPT
- is unsupported
-To: Chao Gao <chao.gao@intel.com>
-Cc: Sean Christopherson <seanjc@google.com>, Xu Yilun <yilun.xu@linux.intel.com>, 
-	Tao Su <tao1.su@linux.intel.com>, kvm@vger.kernel.org, pbonzini@redhat.com, 
-	eddie.dong@intel.com, xiaoyao.li@intel.com, yuan.yao@linux.intel.com, 
-	yi1.lai@intel.com, xudong.hao@intel.com, chao.p.peng@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jan 3, 2024 at 7:40=E2=80=AFPM Jim Mattson <jmattson@google.com> wr=
-ote:
->
-> On Wed, Jan 3, 2024 at 6:45=E2=80=AFPM Chao Gao <chao.gao@intel.com> wrot=
-e:
-> >
-> > On Wed, Jan 03, 2024 at 10:04:41AM -0800, Sean Christopherson wrote:
-> > >On Tue, Jan 02, 2024, Jim Mattson wrote:
-> > >> On Tue, Jan 2, 2024 at 3:24=E2=80=AFPM Sean Christopherson <seanjc@g=
-oogle.com> wrote:
-> > >> >
-> > >> > On Thu, Dec 21, 2023, Xu Yilun wrote:
-> > >> > > On Wed, Dec 20, 2023 at 08:28:06AM -0800, Sean Christopherson wr=
-ote:
-> > >> > > > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > >> > > > > index c57e181bba21..72634d6b61b2 100644
-> > >> > > > > --- a/arch/x86/kvm/mmu/mmu.c
-> > >> > > > > +++ b/arch/x86/kvm/mmu/mmu.c
-> > >> > > > > @@ -5177,6 +5177,13 @@ void __kvm_mmu_refresh_passthrough_bi=
-ts(struct kvm_vcpu *vcpu,
-> > >> > > > >   reset_guest_paging_metadata(vcpu, mmu);
-> > >> > > > >  }
-> > >> > > > >
-> > >> > > > > +/* guest-physical-address bits limited by TDP */
-> > >> > > > > +unsigned int kvm_mmu_tdp_maxphyaddr(void)
-> > >> > > > > +{
-> > >> > > > > + return max_tdp_level =3D=3D 5 ? 57 : 48;
-> > >> > > >
-> > >> > > > Using "57" is kinda sorta wrong, e.g. the SDM says:
-> > >> > > >
-> > >> > > >   Bits 56:52 of each guest-physical address are necessarily ze=
-ro because
-> > >> > > >   guest-physical addresses are architecturally limited to 52 b=
-its.
-> > >> > > >
-> > >> > > > Rather than split hairs over something that doesn't matter, I =
-think it makes sense
-> > >> > > > for the CPUID code to consume max_tdp_level directly (I forgot=
- that max_tdp_level
-> > >> > > > is still accurate when tdp_root_level is non-zero).
-> > >> > >
-> > >> > > It is still accurate for now. Only AMD SVM sets tdp_root_level t=
-he same as
-> > >> > > max_tdp_level:
-> > >> > >
-> > >> > >       kvm_configure_mmu(npt_enabled, get_npt_level(),
-> > >> > >                         get_npt_level(), PG_LEVEL_1G);
-> > >> > >
-> > >> > > But I wanna doulbe confirm if directly using max_tdp_level is fu=
-lly
-> > >> > > considered.  In your last proposal, it is:
-> > >> > >
-> > >> > >   u8 kvm_mmu_get_max_tdp_level(void)
-> > >> > >   {
-> > >> > >       return tdp_root_level ? tdp_root_level : max_tdp_level;
-> > >> > >   }
-> > >> > >
-> > >> > > and I think it makes more sense, because EPT setup follows the s=
-ame
-> > >> > > rule.  If any future architechture sets tdp_root_level smaller t=
-han
-> > >> > > max_tdp_level, the issue will happen again.
-> > >> >
-> > >> > Setting tdp_root_level !=3D max_tdp_level would be a blatant bug. =
- max_tdp_level
-> > >> > really means "max possible TDP level KVM can use".  If an exact TD=
-P level is being
-> > >> > forced by tdp_root_level, then by definition it's also the max TDP=
- level, because
-> > >> > it's the _only_ TDP level KVM supports.
-> > >>
-> > >> This is all just so broken and wrong. The only guest.MAXPHYADDR that
-> > >> can be supported under TDP is the host.MAXPHYADDR. If KVM claims to
-> > >> support a smaller guest.MAXPHYADDR, then KVM is obligated to interce=
-pt
-> > >> every #PF,
-> >
-> > in this case (i.e., to support 48-bit guest.MAXPHYADDR when CPU support=
-s only
-> > 4-level EPT), KVM has no need to intercept #PF because accessing a GPA =
-with
-> > RSVD bits 51-48 set leads to EPT violation.
->
-> At the completion of the page table walk, if there is a permission
-> fault, the data address should not be accessed, so there should not be
-> an EPT violation. Remember Meltdown?
->
-> > >> and to emulate the faulting instruction to see if the RSVD
-> > >> bit should be set in the error code. Hardware isn't going to do it.
-> >
-> > Note for EPT violation VM exits, the CPU stores the GPA that caused thi=
-s exit
-> > in "guest-physical address" field of VMCS. so, it is not necessary to e=
-mulate
-> > the faulting instruction to determine if any RSVD bit is set.
->
-> There should not be an EPT violation in the case discussed.
+On Mon, Dec 25, 2023 at 07:58:39AM -0500, guoren@kernel.org wrote:
+> From: Guo Ren <guoren@linux.alibaba.com>
+> 
+> Combo spinlock could support queued and ticket in one Linux Image and
+> select them during boot time via command line. Here is the func
+> size (Bytes) comparison table below:
+> 
+> TYPE			: COMBO | TICKET | QUEUED
+> arch_spin_lock		: 106	| 60     | 50
+> arch_spin_unlock	: 54    | 36     | 26
+> arch_spin_trylock	: 110   | 72     | 54
+> arch_spin_is_locked	: 48    | 34     | 20
+> arch_spin_is_contended	: 56    | 40     | 24
+> rch_spin_value_unlocked	: 48    | 34     | 24
+> 
+> One example of disassemble combo arch_spin_unlock:
+>   <+14>:    nop                # detour slot
+>   <+18>:    fence   rw,w       --+-> queued_spin_unlock
+>   <+22>:    sb      zero,0(a4) --+   (2 instructions)
+>   <+26>:    ld      s0,8(sp)
+>   <+28>:    addi    sp,sp,16
+>   <+30>:    ret
+>   <+32>:    lw      a5,0(a4)   --+-> ticket_spin_unlock
+>   <+34>:    sext.w  a5,a5        |   (7 instructions)
+>   <+36>:    fence   rw,w         |
+>   <+40>:    addiw   a5,a5,1      |
+>   <+42>:    slli    a5,a5,0x30   |
+>   <+44>:    srli    a5,a5,0x30   |
+>   <+46>:    sh      a5,0(a4)   --+
+>   <+50>:    ld      s0,8(sp)
+>   <+52>:    addi    sp,sp,16
+>   <+54>:    ret
+> The qspinlock is smaller and faster than ticket-lock when all are in a
+> fast path.
+> 
+> The combo spinlock could provide a compatible Linux Image for different
+> micro-arch designs that have/haven't forward progress guarantee. Use
+> command line options to select between qspinlock and ticket-lock, and
+> the default is ticket-lock.
+> 
+> Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+> Signed-off-by: Guo Ren <guoren@kernel.org>
+> ---
+>  .../admin-guide/kernel-parameters.txt         |  2 +
+>  arch/riscv/Kconfig                            |  9 +++-
+>  arch/riscv/include/asm/spinlock.h             | 48 +++++++++++++++++++
+>  arch/riscv/kernel/setup.c                     | 34 +++++++++++++
+>  include/asm-generic/qspinlock.h               |  2 +
+>  include/asm-generic/ticket_spinlock.h         |  2 +
+>  6 files changed, 96 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+> index 65731b060e3f..2ac9f1511774 100644
+> --- a/Documentation/admin-guide/kernel-parameters.txt
+> +++ b/Documentation/admin-guide/kernel-parameters.txt
+> @@ -4753,6 +4753,8 @@
+>  			[KNL] Number of legacy pty's. Overwrites compiled-in
+>  			default number.
+>  
+> +	qspinlock	[RISCV] Use native qspinlock.
+> +
+>  	quiet		[KNL] Disable most log messages
+>  
+>  	r128=		[HW,DRM]
+> diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+> index f345df0763b2..b7673c5c0997 100644
+> --- a/arch/riscv/Kconfig
+> +++ b/arch/riscv/Kconfig
+> @@ -434,7 +434,7 @@ config NODES_SHIFT
+>  
+>  choice
+>  	prompt "RISC-V spinlock type"
+> -	default RISCV_TICKET_SPINLOCKS
+> +	default RISCV_COMBO_SPINLOCKS
+>  
+>  config RISCV_TICKET_SPINLOCKS
+>  	bool "Using ticket spinlock"
+> @@ -446,6 +446,13 @@ config RISCV_QUEUED_SPINLOCKS
+>  	help
+>  	  Make sure your micro arch give cmpxchg/xchg forward progress
+>  	  guarantee. Otherwise, stay at ticket-lock.
+> +
+> +config RISCV_COMBO_SPINLOCKS
+> +	bool "Using combo spinlock"
+> +	depends on SMP && MMU
+> +	select ARCH_USE_QUEUED_SPINLOCKS
+> +	help
+> +	  Select queued spinlock or ticket-lock by cmdline.
+>  endchoice
+>  
+>  config RISCV_ALTERNATIVE
+> diff --git a/arch/riscv/include/asm/spinlock.h b/arch/riscv/include/asm/spinlock.h
+> index 98a3da4b1056..d07643c07aae 100644
+> --- a/arch/riscv/include/asm/spinlock.h
+> +++ b/arch/riscv/include/asm/spinlock.h
+> @@ -7,12 +7,60 @@
+>  #define _Q_PENDING_LOOPS	(1 << 9)
+>  #endif
+>  
+> +#ifdef CONFIG_RISCV_COMBO_SPINLOCKS
+> +#define __no_arch_spinlock_redefine
+> +#include <asm/ticket_spinlock.h>
+> +#include <asm/qspinlock.h>
+> +#include <linux/jump_label.h>
+> +
+> +DECLARE_STATIC_KEY_TRUE(combo_qspinlock_key);
+> +
+> +#define COMBO_SPINLOCK_BASE_DECLARE(op)					\
+> +static __always_inline void arch_spin_##op(arch_spinlock_t *lock)	\
+> +{									\
+> +	if (static_branch_likely(&combo_qspinlock_key))			\
+> +		queued_spin_##op(lock);					\
+> +	else								\
+> +		ticket_spin_##op(lock);					\
+> +}
+> +COMBO_SPINLOCK_BASE_DECLARE(lock)
+> +COMBO_SPINLOCK_BASE_DECLARE(unlock)
+> +
+> +#define COMBO_SPINLOCK_IS_DECLARE(op)					\
+> +static __always_inline int arch_spin_##op(arch_spinlock_t *lock)	\
+> +{									\
+> +	if (static_branch_likely(&combo_qspinlock_key))			\
+> +		return queued_spin_##op(lock);				\
+> +	else								\
+> +		return ticket_spin_##op(lock);				\
+> +}
+> +COMBO_SPINLOCK_IS_DECLARE(is_locked)
+> +COMBO_SPINLOCK_IS_DECLARE(is_contended)
+> +
+> +static __always_inline bool arch_spin_trylock(arch_spinlock_t *lock)
+> +{
+> +	if (static_branch_likely(&combo_qspinlock_key))
+> +		return queued_spin_trylock(lock);
+> +	else
+> +		return ticket_spin_trylock(lock);
+> +}
+> +
+> +static __always_inline int arch_spin_value_unlocked(arch_spinlock_t lock)
+> +{
+> +	if (static_branch_likely(&combo_qspinlock_key))
+> +		return queued_spin_value_unlocked(lock);
+> +	else
+> +		return ticket_spin_value_unlocked(lock);
+> +}
+> +
 
-For intercepted #PF, we can use CR2 to determine the necessary page
-walk, and presumably the rest of the bits in the error code are
-already set, so emulation is not necessary.
+Hello Guo Ren,
 
-However, emulation is necessary when synthesizing a #PF from an EPT
-violation, and bit 8 of the exit qualification is clear. See
-https://lore.kernel.org/kvm/4463f391-0a25-017e-f913-69c297e13c5e@redhat.com=
-/.
+The above is much better than v11, but can be improved as I mentioned in 
+my reply in v11. Okay, I noticed there is a type issue: some return int, 
+others return bool while some return void, but it can be improved:
 
-> > >> Since some page faults may occur in CPL3, this means that KVM has to
-> > >> be prepared to emulate any memory-accessing instruction. That's not
-> > >> practical.
-> >
-> > as said above, no need to intercept #PF for this specific case.
->
-> I disagree. See above.
++#define COMBO_SPINLOCK_DECLARE(op, type)                             \
++static __always_inline type arch_spin_##op(arch_spinlock_t *lock)    \
++{                                                                    \
++     if (static_branch_likely(&combo_qspinlock_key))                 \
++             return queued_spin_##op(lock);                          \
++     else                                                            \
++             return ticket_spin_##op(lock);                          \
++}
++
++COMBO_SPINLOCK_DECLARE(lock, void)
++COMBO_SPINLOCK_DECLARE(unlock, void)
++COMBO_SPINLOCK_DECLARE(is_locked, int)
++COMBO_SPINLOCK_DECLARE(is_contended, int)
++COMBO_SPINLOCK_DECLARE(value_unlocked, int)
++COMBO_SPINLOCK_DECLARE(trylock, bool)
+
+===
+IIRC it's legal to return a void f1() from a void f2():
+
+void f1() {}
+
+void f2() {
+	return f1(); /* <- IIRC it's legal :)*/
+}
+===
+
+> +#else /* CONFIG_RISCV_COMBO_SPINLOCKS */
+>  #ifdef CONFIG_QUEUED_SPINLOCKS
+>  #include <asm/qspinlock.h>
+>  #else
+>  #include <asm/ticket_spinlock.h>
+>  #endif
+>  
+> +#endif /* CONFIG_RISCV_COMBO_SPINLOCKS */
+>  #include <asm/qrwlock.h>
+>  
+>  #endif /* __ASM_RISCV_SPINLOCK_H */
+> diff --git a/arch/riscv/kernel/setup.c b/arch/riscv/kernel/setup.c
+> index 535a837de55d..d9072a59831c 100644
+> --- a/arch/riscv/kernel/setup.c
+> +++ b/arch/riscv/kernel/setup.c
+> @@ -246,6 +246,37 @@ static void __init parse_dtb(void)
+>  #endif
+>  }
+>  
+> +#ifdef CONFIG_RISCV_COMBO_SPINLOCKS
+> +static bool enable_qspinlock __ro_after_init;
+> +static int __init queued_spinlock_setup(char *p)
+> +{
+> +	enable_qspinlock = true;
+> +
+> +	return 0;
+> +}
+> +early_param("qspinlock", queued_spinlock_setup);
+> +
+> +/*
+> + * Ticket-lock would dirty the lock value, so force qspinlock at
+> + * first and switch to ticket-lock later.
+> + *  - key is true : qspinlock -> qspinlock (no change)
+> + *  - key is false: qspinlock -> ticket-lock
+> + *    (No ticket-lock -> qspinlock)
+> + */
+> +DEFINE_STATIC_KEY_TRUE(combo_qspinlock_key);
+> +EXPORT_SYMBOL(combo_qspinlock_key);
+> +
+> +static void __init riscv_spinlock_init(void)
+> +{
+> +	if (!enable_qspinlock) {
+> +		static_branch_disable(&combo_qspinlock_key);
+> +		pr_info("Ticket spinlock: enabled\n");
+> +	} else {
+> +		pr_info("Queued spinlock: enabled\n");
+> +	}
+> +}
+> +#endif
+> +
+>  extern void __init init_rt_signal_env(void);
+>  
+>  void __init setup_arch(char **cmdline_p)
+> @@ -297,6 +328,9 @@ void __init setup_arch(char **cmdline_p)
+>  	riscv_set_dma_cache_alignment();
+>  
+>  	riscv_user_isa_enable();
+> +#ifdef CONFIG_RISCV_COMBO_SPINLOCKS
+> +	riscv_spinlock_init();
+> +#endif
+>  }
+>  
+>  static int __init topology_init(void)
+> diff --git a/include/asm-generic/qspinlock.h b/include/asm-generic/qspinlock.h
+> index 0655aa5b57b2..bf47cca2c375 100644
+> --- a/include/asm-generic/qspinlock.h
+> +++ b/include/asm-generic/qspinlock.h
+> @@ -136,6 +136,7 @@ static __always_inline bool virt_spin_lock(struct qspinlock *lock)
+>  }
+>  #endif
+>  
+> +#ifndef __no_arch_spinlock_redefine
+>  /*
+>   * Remapping spinlock architecture specific functions to the corresponding
+>   * queued spinlock functions.
+> @@ -146,5 +147,6 @@ static __always_inline bool virt_spin_lock(struct qspinlock *lock)
+>  #define arch_spin_lock(l)		queued_spin_lock(l)
+>  #define arch_spin_trylock(l)		queued_spin_trylock(l)
+>  #define arch_spin_unlock(l)		queued_spin_unlock(l)
+> +#endif
+>  
+>  #endif /* __ASM_GENERIC_QSPINLOCK_H */
+> diff --git a/include/asm-generic/ticket_spinlock.h b/include/asm-generic/ticket_spinlock.h
+> index cfcff22b37b3..325779970d8a 100644
+> --- a/include/asm-generic/ticket_spinlock.h
+> +++ b/include/asm-generic/ticket_spinlock.h
+> @@ -89,6 +89,7 @@ static __always_inline int ticket_spin_is_contended(arch_spinlock_t *lock)
+>  	return (s16)((val >> 16) - (val & 0xffff)) > 1;
+>  }
+>  
+> +#ifndef __no_arch_spinlock_redefine
+>  /*
+>   * Remapping spinlock architecture specific functions to the corresponding
+>   * ticket spinlock functions.
+> @@ -99,5 +100,6 @@ static __always_inline int ticket_spin_is_contended(arch_spinlock_t *lock)
+>  #define arch_spin_lock(l)		ticket_spin_lock(l)
+>  #define arch_spin_trylock(l)		ticket_spin_trylock(l)
+>  #define arch_spin_unlock(l)		ticket_spin_unlock(l)
+> +#endif
+>  
+>  #endif /* __ASM_GENERIC_TICKET_SPINLOCK_H */
+> -- 
+> 2.40.1
+> 
+
 
