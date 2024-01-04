@@ -1,147 +1,155 @@
-Return-Path: <kvm+bounces-5626-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5627-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6650E823DC5
-	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 09:45:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C7F55823EAC
+	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 10:32:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D6BECB24211
-	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 08:45:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 368EBB21A53
+	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 09:32:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35E2820B00;
-	Thu,  4 Jan 2024 08:44:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D16C2208B9;
+	Thu,  4 Jan 2024 09:31:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="XWcNLihg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PukynblA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB934208CA
-	for <kvm@vger.kernel.org>; Thu,  4 Jan 2024 08:44:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a28005f9b9cso26146466b.3
-        for <kvm@vger.kernel.org>; Thu, 04 Jan 2024 00:44:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1704357850; x=1704962650; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4epjjtWpm5YSGmP4xrJiMs2lpLIiDHgjuHx9R0clTd0=;
-        b=XWcNLihgoPOU5IF0tSPtEphDetwFJv86rqW7qH3B20GNpQvf30nx2qCqc+r1awmw0h
-         dswcM8MiyNuPd8TWv6VbXSgRDFX33czq9n3xRa6ApB3T5aEmKMZjoW4ggYYiE1rGlAef
-         fHX702aIZP1kbuWR7Do1isuPeyGpGRMsdi0wIYEcdI3QHBlroGfXgRs/I5PPyn0GQ15n
-         vCqTZJPvsIhdCeom1cBdp0mEO461sbgg3OXWbMvM1Yg86imhnEn21/TeQkD3Glefz5GR
-         EwypUfskmpOK00xNyGUSVVSSasnkfVnlxf22ErnJJ2N5BHT7hirzjRkaks6rGDpU1K2z
-         hTUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704357850; x=1704962650;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4epjjtWpm5YSGmP4xrJiMs2lpLIiDHgjuHx9R0clTd0=;
-        b=Ce3Gt0btxSZi6EK9JU49CSTC6ZnGVzBNmLw4pomaUsGgAusu7t8DueHY72KKSSjj4r
-         oPFEwNJQ9huU2ouc+U3IIjK77B2G23tqm1AP8Bxg+3tV8U8m2N/lSysyPKY9cOWUL0H1
-         OEM6nD/erKbdwn5g0s38+t/J2NcUNnnF6LRx5KdhaxuTrXIr5TDv52TtExx849uIIpak
-         InqyT7DiDu4ksnfh81UhZutYn1mA6cK3wGNnxSFaghjXxRDtGmBI2yAUf+r/C5ivpOTZ
-         lYIiFUwhEZcTyvh3l+0uGrqMYLM3Snmw12A2ioWHCGdeOTLjMNd36CuQ9isa5m5t+cry
-         /igA==
-X-Gm-Message-State: AOJu0Yw2W2yQYzn6NXyu1FPqZGDtarX03u7/4wFduwjwMMbyRqiEc5dS
-	+DJqQcsBlmsC5TIwmLk0muIq4ARjAQ1DSw==
-X-Google-Smtp-Source: AGHT+IFjo5G9hUEsiOBKeZmfjHqIDoS4qnsJnLjC6+kfhzlYxJE5w3Yd1fDSK0j2mr1dRUuO1P9phQ==
-X-Received: by 2002:a17:906:a3d6:b0:a28:a940:5305 with SMTP id ca22-20020a170906a3d600b00a28a9405305mr122872ejb.6.1704357850151;
-        Thu, 04 Jan 2024 00:44:10 -0800 (PST)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id d3-20020a1709063ec300b00a280944f775sm3460797ejj.153.2024.01.04.00.44.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jan 2024 00:44:09 -0800 (PST)
-Date: Thu, 4 Jan 2024 09:44:08 +0100
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>, 
-	Linux Next Mailing List <linux-next@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-	KVM list <kvm@vger.kernel.org>, linux-riscv <linux-riscv@lists.infradead.org>
-Subject: Re: Re: linux-next: Tree for Jan 2 (riscv & KVM problem)
-Message-ID: <20240104-b82c16721dab11facda797db@orel>
-References: <20240102165725.6d18cc50@canb.auug.org.au>
- <44907c6b-c5bd-4e4a-a921-e4d3825539d8@infradead.org>
- <20240103-d2201c92e97755a4bb438bc3@orel>
- <1ab4ff24-4e67-43d7-90b7-0131182b7e1f@infradead.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EFF4208A8
+	for <kvm@vger.kernel.org>; Thu,  4 Jan 2024 09:31:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1704360712;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zIXKKMqhILxRblSeoztvZ34izwtCDG3gNl+mN+M3Jfw=;
+	b=PukynblAw8rcHitjKMBiqqJPLa9+Sn+9WrZUUw/YzpRyP84rHhG1vX8sPKpOMkAcH7MgT7
+	YvQv+LxAvrvri2lSIMAf6zChXBvUq4bjUm4xTLK0cXHux39+TE9jelwCpZNFLE40OuI1NG
+	jjsw9Dgmh9zcbLDvDs6fAMzjwUzS5kg=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-390-VfOJiDoeMgCX6uAq70exgQ-1; Thu, 04 Jan 2024 04:31:48 -0500
+X-MC-Unique: VfOJiDoeMgCX6uAq70exgQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 288B3863B83;
+	Thu,  4 Jan 2024 09:31:47 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.28.113])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 821551121313;
+	Thu,  4 Jan 2024 09:31:37 +0000 (UTC)
+Date: Thu, 4 Jan 2024 09:31:35 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+Cc: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	qemu-devel@nongnu.org, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Song Gao <gaosong@loongson.cn>,
+	=?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+	David Hildenbrand <david@redhat.com>,
+	Aurelien Jarno <aurelien@aurel32.net>,
+	Yoshinori Sato <ysato@users.sourceforge.jp>,
+	Yanan Wang <wangyanan55@huawei.com>,
+	Bin Meng <bin.meng@windriver.com>,
+	Laurent Vivier <lvivier@redhat.com>,
+	Michael Rolnik <mrolnik@gmail.com>,
+	Alexandre Iooss <erdnaxe@crans.org>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Laurent Vivier <laurent@vivier.eu>,
+	Paolo Bonzini <pbonzini@redhat.com>, Brian Cain <bcain@quicinc.com>,
+	Daniel Henrique Barboza <danielhb413@gmail.com>,
+	Beraldo Leal <bleal@redhat.com>, Paul Durrant <paul@xen.org>,
+	Mahmoud Mandour <ma.mandourr@gmail.com>,
+	Thomas Huth <thuth@redhat.com>,
+	Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
+	Cleber Rosa <crosa@redhat.com>, kvm@vger.kernel.org,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Wainer dos Santos Moschetta <wainersm@redhat.com>,
+	qemu-arm@nongnu.org, Weiwei Li <liwei1518@gmail.com>,
+	John Snow <jsnow@redhat.com>,
+	Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Ilya Leoshkevich <iii@linux.ibm.com>,
+	=?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
+	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	Pierrick Bouvier <pierrick.bouvier@linaro.org>,
+	qemu-riscv@nongnu.org, Alistair Francis <alistair.francis@wdc.com>
+Subject: Re: [PATCH v2 10/43] qtest: bump pxe-test timeout to 10 minutes
+Message-ID: <ZZZ6912gSKasWA3G@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20240103173349.398526-1-alex.bennee@linaro.org>
+ <20240103173349.398526-11-alex.bennee@linaro.org>
+ <6826da51-3b97-4ecf-8517-9e5b5243e91f@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1ab4ff24-4e67-43d7-90b7-0131182b7e1f@infradead.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <6826da51-3b97-4ecf-8517-9e5b5243e91f@linaro.org>
+User-Agent: Mutt/2.2.10 (2023-03-25)
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-On Wed, Jan 03, 2024 at 10:06:52PM -0800, Randy Dunlap wrote:
+On Wed, Jan 03, 2024 at 06:43:52PM +0100, Philippe Mathieu-Daudé wrote:
+> Hi Daniel,
 > 
-> 
-> On 1/3/24 07:18, Andrew Jones wrote:
-> > On Tue, Jan 02, 2024 at 10:07:21AM -0800, Randy Dunlap wrote:
-> >>
-> >>
-> >> On 1/1/24 21:57, Stephen Rothwell wrote:
-> >>> Hi all,
-> >>>
-> >>> Changes since 20231222:
-> >>>
-> >>
-> >> It is possible for a riscv randconfig to create a .config file with
-> >> CONFIG_KVM enabled but CONFIG_HAVE_KVM is not set.
-> >> Is that expected?
-> >>
-> >> CONFIG_HAVE_KVM_IRQCHIP=y
-> >> CONFIG_HAVE_KVM_IRQ_ROUTING=y
-> >> CONFIG_KVM_MMIO=y
-> >> CONFIG_HAVE_KVM_MSI=y
-> >> CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT=y
-> >> CONFIG_HAVE_KVM_VCPU_ASYNC_IOCTL=y
-> >> CONFIG_KVM_XFER_TO_GUEST_WORK=y
-> >> CONFIG_KVM_GENERIC_HARDWARE_ENABLING=y
-> >> CONFIG_KVM_GENERIC_MMU_NOTIFIER=y
-> >> CONFIG_VIRTUALIZATION=y
-> >> CONFIG_KVM=m
-> >>
-> >> Should arch/riscv/kvm/Kconfig: "config KVM" select HAVE_KVM
-> >> along with the other selects there or should that "config KVM"
-> >> depend on HAVE_KVM?
+> On 3/1/24 18:33, Alex Bennée wrote:
+> > From: Daniel P. Berrangé <berrange@redhat.com>
 > > 
-> > We probably should add a patch which makes RISCV select HAVE_KVM and
-> > KVM depend on HAVE_KVM in order for riscv kvm to be consistent with
-> > the other KVM supporting architectures.
+> > The pxe-test uses the boot_sector_test() function, and that already
+> > uses a timeout of 600 seconds. So adjust the timeout on the meson
+> > side accordingly.
+> 
+> IIRC few years ago you said tests running on CI ('Tier-1') should
+> respect a time limit. IMO 10min seems too much for CI, should this
+> test be skipped there?
+
+This isn't going to take 10 minutes in reality. We're setting timeouts
+such that we avoid false-failures in the extreme worst case scenarios.
+
+> 
+> > Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+> > [thuth: Bump timeout to 600s and adjust commit description]
+> > Signed-off-by: Thomas Huth <thuth@redhat.com>
+> > Message-Id: <20231215070357.10888-7-thuth@redhat.com>
+> > Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> > ---
+> >   tests/qtest/meson.build | 1 +
+> >   1 file changed, 1 insertion(+)
 > > 
+> > diff --git a/tests/qtest/meson.build b/tests/qtest/meson.build
+> > index 7a4160df046..ec93d5a384f 100644
+> > --- a/tests/qtest/meson.build
+> > +++ b/tests/qtest/meson.build
+> > @@ -4,6 +4,7 @@ slow_qtests = {
+> >     'npcm7xx_pwm-test': 300,
+> >     'qom-test' : 900,
+> >     'test-hmp' : 240,
+> > +  'pxe-test': 600,
+> >   }
+> >   qtests_generic = [
 > 
-> Yes, I agree.
-> 
-> >>
-> >>
-> >> The problem .config file causes build errors because EVENTFD
-> >> is not set:
-> >>
-> >> ../arch/riscv/kvm/../../../virt/kvm/eventfd.c: In function 'kvm_irqfd_assign':
-> >> ../arch/riscv/kvm/../../../virt/kvm/eventfd.c:335:19: error: implicit declaration of function 'eventfd_ctx_fileget'; did you mean 'eventfd_ctx_fdget'? [-Werror=implicit-function-declaration]
-> >>   335 |         eventfd = eventfd_ctx_fileget(f.file);
-> >>       |                   ^~~~~~~~~~~~~~~~~~~
-> >>       |                   eventfd_ctx_fdget
-> >> ../arch/riscv/kvm/../../../virt/kvm/eventfd.c:335:17: warning: assignment to 'struct eventfd_ctx *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
-> >>   335 |         eventfd = eventfd_ctx_fileget(f.file);
-> >>       |                 ^
-> >>
-> > 
-> > Hmm. riscv kvm selects HAVE_KVM_EVENTFD, which selects EVENTFD. I'm
-> > not sure how the lack of HAVE_KVM is leading to this.
-> 
-> The "select HAVE_KVM_EVENTFD" is gone in linux-next.
 
-Doh, sorry about looking at the wrong tree...
+With regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
-I'll send a patch for riscv kvm now.
-
-Thanks,
-drew
 
