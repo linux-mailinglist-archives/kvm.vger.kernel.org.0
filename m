@@ -1,64 +1,30 @@
-Return-Path: <kvm+bounces-5646-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5647-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 185878242A0
-	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 14:22:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73A178242CC
+	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 14:42:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A60762878D0
-	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 13:22:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D81F1C21E5D
+	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 13:42:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB44722335;
-	Thu,  4 Jan 2024 13:22:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="3MXUW490"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D408020B2C;
+	Thu,  4 Jan 2024 13:42:16 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from proxmox-new.maurer-it.com (proxmox-new.maurer-it.com [94.136.29.106])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6917922323
-	for <kvm@vger.kernel.org>; Thu,  4 Jan 2024 13:22:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
-Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-5ced19f15c3so47095a12.0
-        for <kvm@vger.kernel.org>; Thu, 04 Jan 2024 05:22:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1704374568; x=1704979368; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+UaUoSEUxULvKOz2jhQuoYpr4rLktnoBGVluoHHYMOU=;
-        b=3MXUW490lpm1gxsecqvb4zClWYxX4L+gqikjJzj3nodfrtRPMXJkxi9tFeVdMvmnZn
-         WU0jA4DYdbmC3nv9ht+q16QMt3cTFn1Qz/Wb5+8dBS6R0Q6/gVeZhynlAhtQD5vtYY1e
-         YTvSOHFr2s7GaKsKifOC8FwoyzNZVJKZkvkZwrU7hCBOjZK4spszovZv/aaCkJbXwlxM
-         zHkkbBrIg7K3lswR/hcdn2ZxQm0Twqv7Njt3qEHQBWUTdZkEcbBmeUt/62e4yEuhvxpg
-         SAgrMgzXjx8ZgqsJGMGr+uafgX/rV27ZhqDvBUUV4I4QAfVf71OjxBb2vFbQt97QSsW3
-         GWyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704374568; x=1704979368;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+UaUoSEUxULvKOz2jhQuoYpr4rLktnoBGVluoHHYMOU=;
-        b=wGOIia6TIbSwVCFPzR6/z0B33/fMWhUfyuA5Ffcxr8ilQTVjc1Okue40MtCNOQTke7
-         F/+sQ47bWINXl70G3Ym58iq7mVz6fYsuzqcP6gBX9kdLZxekJFwqRb9IV1CaBKZYDJng
-         6yymj5T+bkqKzpeqNBo3J6Fn5238dP+LdcsrcgcyZ8H4KyFtFJshX4Dl1UxCJ0IcwHbQ
-         +GJQisJ3mg18ZvnnFWPnv0CNXhaahSGRkYkML+jrd80hEX+AO3K4u+ERuBz9P7KBWy9o
-         7auFgmmaFRU8aFOm/9PbPE6xQS8ytCd/aIVN0gpwhG9S0XHxep1r9yvwbufYe9BNN3Ff
-         b4eQ==
-X-Gm-Message-State: AOJu0Ywvcvpu0UgQsUPUB0fMMTKuCIdcjXSX30OziQCK0THLA1dXHePi
-	3VP2uNVhFpHe9NgmsHOyDQF3jFKK4vkryw==
-X-Google-Smtp-Source: AGHT+IFokc8I4M12wpRZbGFseRS03dNmYQJFm1uTthsqLJ9zrTgE2OKJgGw72Fa3MExoY1OmaCb7cA==
-X-Received: by 2002:a05:6a20:1445:b0:199:247a:1044 with SMTP id a5-20020a056a20144500b00199247a1044mr201672pzi.17.1704374568632;
-        Thu, 04 Jan 2024 05:22:48 -0800 (PST)
-Received: from ?IPV6:2400:4050:a840:1e00:9ac7:6d57:2b16:6932? ([2400:4050:a840:1e00:9ac7:6d57:2b16:6932])
-        by smtp.gmail.com with ESMTPSA id a25-20020a634d19000000b005c6617b52e6sm24378620pgb.5.2024.01.04.05.22.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Jan 2024 05:22:48 -0800 (PST)
-Message-ID: <4cf878c6-0adf-4c97-b404-446d8a3dabf1@daynix.com>
-Date: Thu, 4 Jan 2024 22:22:39 +0900
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AE0322313;
+	Thu,  4 Jan 2024 13:42:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proxmox.com
+Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
+	by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 1ACD548CD9;
+	Thu,  4 Jan 2024 14:42:04 +0100 (CET)
+Message-ID: <832697b9-3652-422d-a019-8c0574a188ac@proxmox.com>
+Date: Thu, 4 Jan 2024 14:42:01 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -66,132 +32,293 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 38/43] plugins: add an API to read registers
 Content-Language: en-US
-To: =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org,
- Richard Henderson <richard.henderson@linaro.org>,
- Song Gao <gaosong@loongson.cn>,
- =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
- David Hildenbrand <david@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
- Yoshinori Sato <ysato@users.sourceforge.jp>,
- Yanan Wang <wangyanan55@huawei.com>, Bin Meng <bin.meng@windriver.com>,
- Laurent Vivier <lvivier@redhat.com>, Michael Rolnik <mrolnik@gmail.com>,
- Alexandre Iooss <erdnaxe@crans.org>, David Woodhouse <dwmw2@infradead.org>,
- Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>,
- Brian Cain <bcain@quicinc.com>,
- Daniel Henrique Barboza <danielhb413@gmail.com>,
- Beraldo Leal <bleal@redhat.com>, Paul Durrant <paul@xen.org>,
- Mahmoud Mandour <ma.mandourr@gmail.com>, Thomas Huth <thuth@redhat.com>,
- Liu Zhiwei <zhiwei_liu@linux.alibaba.com>, Cleber Rosa <crosa@redhat.com>,
- kvm@vger.kernel.org, Peter Maydell <peter.maydell@linaro.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-arm@nongnu.org,
- Weiwei Li <liwei1518@gmail.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
- <philmd@linaro.org>, John Snow <jsnow@redhat.com>,
- Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
- Nicholas Piggin <npiggin@gmail.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Ilya Leoshkevich <iii@linux.ibm.com>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?=
- <clg@kaod.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Eduardo Habkost <eduardo@habkost.net>,
- Pierrick Bouvier <pierrick.bouvier@linaro.org>, qemu-riscv@nongnu.org,
- Alistair Francis <alistair.francis@wdc.com>
-References: <20240103173349.398526-1-alex.bennee@linaro.org>
- <20240103173349.398526-39-alex.bennee@linaro.org>
- <52cac44e-a467-4748-8c5b-c9c47f5b0f79@daynix.com>
- <87cyuhguf4.fsf@draig.linaro.org>
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <87cyuhguf4.fsf@draig.linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+To: kvm@vger.kernel.org
+Cc: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org,
+ linux-mm@kvack.org
+From: Friedrich Weber <f.weber@proxmox.com>
+Subject: Temporary KVM guest hangs connected to KSM and NUMA balancer
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 2024/01/04 21:22, Alex Bennée wrote:
-> Akihiko Odaki <akihiko.odaki@daynix.com> writes:
-> 
->> On 2024/01/04 2:33, Alex Bennée wrote:
->>> We can only request a list of registers once the vCPU has been
->>> initialised so the user needs to use either call the get function on
->>> vCPU initialisation or during the translation phase.
->>> We don't expose the reg number to the plugin instead hiding it
->>> behind
->>> an opaque handle. This allows for a bit of future proofing should the
->>> internals need to be changed while also being hashed against the
->>> CPUClass so we can handle different register sets per-vCPU in
->>> hetrogenous situations.
->>> Having an internal state within the plugins also allows us to expand
->>> the interface in future (for example providing callbacks on register
->>> change if the translator can track changes).
->>> Resolves: https://gitlab.com/qemu-project/qemu/-/issues/1706
->>> Cc: Akihiko Odaki <akihiko.odaki@daynix.com>
->>> Based-on: <20231025093128.33116-18-akihiko.odaki@daynix.com>
->>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->>> ---
->>> v3
->>>     - also g_intern_string the register name
->>>     - make get_registers documentation a bit less verbose
->>> v2
->>>     - use new get whole list api, and expose upwards
->>> vAJB:
->>> The main difference to Akikio's version is hiding the gdb register
->>> detail from the plugin for the reasons described above.
->>> ---
->>>    include/qemu/qemu-plugin.h   |  51 +++++++++++++++++-
->>>    plugins/api.c                | 102 +++++++++++++++++++++++++++++++++++
->>>    plugins/qemu-plugins.symbols |   2 +
->>>    3 files changed, 153 insertions(+), 2 deletions(-)
->>> diff --git a/include/qemu/qemu-plugin.h b/include/qemu/qemu-plugin.h
->>> index 4daab6efd29..95380895f81 100644
->>> --- a/include/qemu/qemu-plugin.h
->>> +++ b/include/qemu/qemu-plugin.h
->>> @@ -11,6 +11,7 @@
->>>    #ifndef QEMU_QEMU_PLUGIN_H
->>>    #define QEMU_QEMU_PLUGIN_H
->>>    +#include <glib.h>
->>>    #include <inttypes.h>
->>>    #include <stdbool.h>
->>>    #include <stddef.h>
->>> @@ -227,8 +228,8 @@ struct qemu_plugin_insn;
->>>     * @QEMU_PLUGIN_CB_R_REGS: callback reads the CPU's regs
->>>     * @QEMU_PLUGIN_CB_RW_REGS: callback reads and writes the CPU's regs
->>>     *
->>> - * Note: currently unused, plugins cannot read or change system
->>> - * register state.
->>> + * Note: currently QEMU_PLUGIN_CB_RW_REGS is unused, plugins cannot change
->>> + * system register state.
->>>     */
->>>    enum qemu_plugin_cb_flags {
->>>        QEMU_PLUGIN_CB_NO_REGS,
->>> @@ -708,4 +709,50 @@ uint64_t qemu_plugin_end_code(void);
->>>    QEMU_PLUGIN_API
->>>    uint64_t qemu_plugin_entry_code(void);
->>>    +/** struct qemu_plugin_register - Opaque handle for register
->>> access */
->>> +struct qemu_plugin_register;
->>
->> Just in case you missed my comment for the earlier version:
->>
->> What about identifying a register with an index in an array returned
->> by qemu_plugin_get_registers(). That saves troubles having the handle
->> member in qemu_plugin_reg_descriptor.
-> 
-> The handle gets de-referenced internally in the plugin api and
-> additional checking could be added there. If we pass an index then we'd
-> end up having to track the index assigned during get_registers as well
-> as account for a potential skew in the index value if the register
-> layout varies between vCPUs (although I admit this is future proofing
-> for potential heterogeneous models).
-> 
-> The concept of opaque handle == pointer is fairly common in the QEMU
-> code base. We are not making it hard for a plugin author to bypass this
-> "protection", just making it clear if you do so your violating the
-> principle of the API.
+Hi,
 
-Now I get the idea. Indeed index values are not guaranteed to be stable 
-across CPUs.
+some of our (Proxmox VE) users have been reporting [1] that guests
+occasionally become unresponsive with high CPU usage for some time
+(varying between ~1 and more than 60 seconds). After that time, the
+guests come back and continue running fine. Windows guests seem most
+affected (not responding to pings during the hang, RDP sessions time
+out). But we also got reports about Linux guests. This issue was not
+present while we provided (host) kernel 5.15 and was first reported when
+we rolled out a kernel based on 6.2. The reports seem to concern NUMA
+hosts only. Users reported that the issue becomes easier to trigger the
+more memory is assigned to the guests. Setting mitigations=off was
+reported to alleviate (but not eliminate) the issue. The issue seems to
+disappear after disabling KSM.
 
-Why don't you pass gdb_reg_num as is then? qemu_plugin_register has the 
-name member, but it's unused so gdb_reg_num is effectively the only 
-member we need. You can even cast gdb_reg_num to (struct 
-qemu_plugin_register *), but I don't think pointers are more opaque or 
-future-proof than integers.
+We can reproduce the issue with a Windows guest on a NUMA host, though
+only occasionally and not very reliably. Using a bpftrace script like
+[7] we found the hangs to correlate with long-running invocations of
+`task_numa_work` (more than 500ms), suggesting a connection to the NUMA
+balancer. Indeed, we can't reproduce the issue after disabling the NUMA
+balancer with `echo 0 > /proc/sys/kernel/numa_balancing` [2] and got a
+user confirming this fixes the issue for them [3].
+
+Since the Windows reproducer is not very stable, we tried to find a
+Linux guest reproducer and have found one (described below [0]) that
+triggers a very similar (hopefully the same) issue. The reproducer
+triggers the hangs also if the host is on current Linux 6.7-rc8
+(610a9b8f). A kernel bisect points to the following as the commit
+introducing the issue:
+
+f47e5bbb ("KVM: x86/mmu: Zap only TDP MMU leafs in zap range and
+mmu_notifier unmap")
+
+which is why I cc'ed Sean and Paolo. Because of the possible KSM
+connection I cc'ed Andrew and linux-mm.
+
+Indeed, on f47e5bbb~1 = a80ced6e ("KVM: SVM: fix panic on out-of-bounds
+guest IRQ") the reproducer does not trigger the hang, and on f47e5bbb it
+triggers the hang.
+
+Currently I don't know enough about the KVM/KSM/NUMA balancer code to
+tell how the patch may trigger these issues. Any idea who we could ask
+about this, or how we could further debug this would be greatly appreciated!
+
+Let me know if I can provide any more information.
+
+Best,
+
+Friedrich
+
+[0]
+
+Reproducer (example outputs with the host on f47e5bbb):
+
+* Host with 256GiB memory, 2 NUMA nodes (for output of `numactl -H` see [4])
+* Disable ksmtuned on the host, then manually enable and "boost" KSM:
+
+  echo 1250 > /sys/kernel/mm/ksm/pages_to_scan
+  echo 1 > /sys/kernel/mm/ksm/run
+
+* Create Linux guest (e.g. Debian 12) with 140GiB memory. There is no
+virtio-balloon-pci device, this is to prevent the host from reclaiming
+memory of the guest (this mimics the behavior of Windows guests). See
+[5] for QEMU 8.2 command line.
+* On the guest, run a program that allocates 128 GiB memory in 1 GiB
+chunks, initializes it with an arbitrary byte (ASCII 'A'), sleeps for
+60s and exits (allocate.c [6]):
+
+  ./allocate 128
+
+* Wait until KSM sharing pages are at >30GiB
+(/sys/kernel/mm/ksm/pages_sharing exceeds 7864320), that takes ~20
+minutes for us.
+* Optionally lower KSM pages_to_scan to a reasonable value to rule it
+out as a factor:
+
+  echo 100 > /sys/kernel/mm/ksm/pages_to_scan
+  echo 1 > /sys/kernel/mm/ksm/run
+
+* From a different machine, run a continuous `ping -D` against the guest
+* On the host, run bpftrace to trace `task_numa_work` invocations over
+500ms [7]
+* On the guest, run the allocation program 32 times in parallel, each
+process allocating 4x1 GiB of memory (32 * 4 = 128):
+
+  for i in $(seq 32); do ./allocate 4 & done
+
+* A few seconds later while the processes are still running, the guest
+becomes unresponsive for some time, thus the ping response times greatly
+increase. For example, here the guest does not respond at all for ~100
+seconds:
+
+[1704360680.898427] 64 bytes from 192.168.18.11: icmp_seq=47 ttl=64
+time=0.447 ms
+[1704360681.922522] 64 bytes from 192.168.18.11: icmp_seq=48 ttl=64
+time=0.515 ms
+[1704360710.369961] From 192.168.16.32 icmp_seq=73 Destination Host
+Unreachable
+[1704360713.442023] From 192.168.16.32 icmp_seq=76 Destination Host
+Unreachable
+... repeats ...
+[1704360786.081958] From 192.168.16.32 icmp_seq=147 Destination Host
+Unreachable
+[1704360789.154021] From 192.168.16.32 icmp_seq=151 Destination Host
+Unreachable
+[1704360790.194049] 64 bytes from 192.168.18.11: icmp_seq=49 ttl=64
+time=107244 ms
+[1704360790.196813] 64 bytes from 192.168.18.11: icmp_seq=50 ttl=64
+time=106227 ms
+[1704360790.196998] 64 bytes from 192.168.18.11: icmp_seq=51 ttl=64
+time=105203 ms
+[1704360790.206355] 64 bytes from 192.168.18.11: icmp_seq=52 ttl=64
+time=104188 ms
+[1704360790.206721] 64 bytes from 192.168.18.11: icmp_seq=53 ttl=64
+time=103165 ms
+[1704360790.206837] 64 bytes from 192.168.18.11: icmp_seq=54 ttl=64
+time=102141 ms
+[...]
+[1704360799.307342] 64 bytes from 192.168.18.11: icmp_seq=163 ttl=64
+time=0.335 ms
+[1704360800.322355] 64 bytes from 192.168.18.11: icmp_seq=164 ttl=64
+time=0.360 ms
+[1704360810.481320] 64 bytes from 192.168.18.11: icmp_seq=165 ttl=64
+time=9135 ms
+[1704360810.481331] 64 bytes from 192.168.18.11: icmp_seq=166 ttl=64
+time=8111 ms
+[1704360810.481334] 64 bytes from 192.168.18.11: icmp_seq=167 ttl=64
+time=7083 ms
+[1704360810.481336] 64 bytes from 192.168.18.11: icmp_seq=168 ttl=64
+time=6059 ms
+[1704360810.481339] 64 bytes from 192.168.18.11: icmp_seq=169 ttl=64
+time=5039 ms
+[1704360810.481409] 64 bytes from 192.168.18.11: icmp_seq=170 ttl=64
+time=4015 ms
+[...]
+[1704360827.906610] 64 bytes from 192.168.18.11: icmp_seq=191 ttl=64
+time=0.591 ms
+[1704360828.930570] 64 bytes from 192.168.18.11: icmp_seq=192 ttl=64
+time=0.576 ms
+
+* At the same time, bpftrace logs long-running invocations of
+`task_numa_work`, some examples:
+
+[1704360683] task_numa_work (tid=15476) took 868 ms
+[1704360683] task_numa_work (tid=15457) took 984 ms
+[1704360683] task_numa_work (tid=15480) took 1104 ms
+[...]
+[1704360751] task_numa_work (tid=15462) took 13916 ms
+[1704360753] task_numa_work (tid=15453) took 21708 ms
+[...]
+[1704360805] task_numa_work (tid=15485) took 1029 ms
+[1704360807] task_numa_work (tid=15485) took 1245 ms
+[1704360807] task_numa_work (tid=15446) took 2483 ms
+[1704360808] task_numa_work (tid=15466) took 4149 ms
+[1704360810] task_numa_work (tid=15446) took 3409 ms
+[...]
+[1704360814] task_numa_work (tid=15464) took 1733 ms
+[1704360816] task_numa_work (tid=15464) took 1844 ms
+
+* After some time (~100s in the example above) the guest comes back and
+ping response times go back to normal. The guest journal logs some soft
+lockups, e.g.:
+
+Jan 04 10:33:10 debian kernel: rcu: INFO: rcu_preempt detected stalls on
+CPUs/tasks:
+Jan 04 10:33:10 debian kernel: watchdog: BUG: soft lockup - CPU#10 stuck
+for 101s! [allocate:1169]
+Jan 04 10:33:10 debian kernel: watchdog: BUG: soft lockup - CPU#31 stuck
+for 101s! [allocate:1180]
+
+* We cannot trigger the hangs anymore after disabling the NUMA balancer
+-- ping response times stay under 1ms then.
+
+[1] https://forum.proxmox.com/threads/130727/
+[2] https://forum.proxmox.com/threads/130727/page-7#post-601617
+[3] https://forum.proxmox.com/threads/130727/page-7#post-603096
+[4]
+
+# numactl -H
+available: 2 nodes (0-1)
+node 0 cpus: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 32 33 34 35 36 37 38
+39 40 41 42 43 44 45 46 47
+node 0 size: 128649 MB
+node 0 free: 124293 MB
+node 1 cpus: 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 48 49 50 51
+52 53 54 55 56 57 58 59 60 61 62 63
+node 1 size: 128971 MB
+node 1 free: 126587 MB
+node distances:
+node   0   1
+  0:  10  21
+  1:  21  10
+
+[5]
+
+./qemu-system-x86_64 \
+  -accel kvm \
+  -chardev
+'socket,id=qmp,path=/var/run/qemu-server/101.qmp,server=on,wait=off' \
+  -mon 'chardev=qmp,mode=control' \
+  -chardev 'socket,id=qmp-event,path=/var/run/qmeventd.sock,reconnect=5' \
+  -mon 'chardev=qmp-event,mode=control' \
+  -pidfile /var/run/qemu-server/101.pid \
+  -smp '64,sockets=1,cores=64,maxcpus=64' \
+  -nodefaults \
+  -vnc 'unix:/var/run/qemu-server/101.vnc,password=on' \
+  -cpu qemu64,enforce,+kvm_pv_eoi,+kvm_pv_unhalt \
+  -m 143360 \
+  -device 'pci-bridge,id=pci.3,chassis_nr=3,bus=pci.0,addr=0x5' \
+  -device 'VGA,id=vga,bus=pci.0,addr=0x2' \
+  -device 'virtio-scsi-pci,id=virtioscsi0,bus=pci.3,addr=0x1' \
+  -drive 'file=/dev/pve/vm-101-disk-0,if=none,id=drive-scsi0,format=raw' \
+  -device
+'scsi-hd,bus=virtioscsi0.0,channel=0,scsi-id=0,lun=0,drive=drive-scsi0,id=scsi0,bootindex=100'
+\
+  -netdev
+'type=tap,id=net0,ifname=tap101i0,script=/var/lib/qemu-server/pve-bridge,downscript=/var/lib/qemu-server/pve-bridgedown,vhost=on'
+\
+  -device
+'virtio-net-pci,mac=BC:24:11:09:20:0C,netdev=net0,bus=pci.0,addr=0x12,id=net0,rx_queue_size=1024,tx_queue_size=256,bootindex=102'
+\
+  -machine 'type=pc'
+
+[6]
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <assert.h>
+
+const size_t chunk_size = 1024 * 1024 * 1024; // 1 GiB
+
+void *alloc_chunk(char ch) {
+	size_t init_size = 65536;
+	size_t init_done = 0;
+	void *base = malloc(chunk_size);
+	assert(base);
+
+	while (init_done < chunk_size && init_done + init_size < chunk_size) {
+		memset((char *)base + init_done, ch, init_size);
+		init_done += init_size;
+	}
+
+	return base;
+}
+
+int main(int argc, char *argv[]) {
+	int num_chunks;
+
+	assert(argc == 2);
+	num_chunks = atoi(argv[1]);
+	assert(num_chunks >= 0 && num_chunks <= 1024);
+
+	char **chunks = malloc(num_chunks * sizeof(char *));
+
+	fprintf(stderr, "alloc %d chunks\n", num_chunks);
+	for (int i = 0; i < num_chunks; i++) {
+		fprintf(stderr, "alloc #%d: %c\n", i, 'A');
+		chunks[i] = alloc_chunk('A');
+	}
+	fprintf(stderr, "sleeping 1min\n");
+	sleep(60);
+	return 0;
+}
+
+[7]
+
+kfunc:task_numa_work { @start[tid] = nsecs; }
+kretfunc:task_numa_work /@start[tid]/ {
+	$diff = nsecs - @start[tid];
+	if ($diff > 500000000) { // 500ms
+		time("[%s] ");
+		printf("task_numa_work (tid=%d) took %d ms\n", tid, $diff / 1000000);
+	}
+	delete(@start[tid]);
+}
+
 
