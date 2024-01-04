@@ -1,324 +1,222 @@
-Return-Path: <kvm+bounces-5647-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5648-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73A178242CC
-	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 14:42:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29460824343
+	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 15:04:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D81F1C21E5D
-	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 13:42:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A4A951F25387
+	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 14:04:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D408020B2C;
-	Thu,  4 Jan 2024 13:42:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C573F224FE;
+	Thu,  4 Jan 2024 14:03:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="r8b6jwPu"
 X-Original-To: kvm@vger.kernel.org
-Received: from proxmox-new.maurer-it.com (proxmox-new.maurer-it.com [94.136.29.106])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AE0322313;
-	Thu,  4 Jan 2024 13:42:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proxmox.com
-Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
-	by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 1ACD548CD9;
-	Thu,  4 Jan 2024 14:42:04 +0100 (CET)
-Message-ID: <832697b9-3652-422d-a019-8c0574a188ac@proxmox.com>
-Date: Thu, 4 Jan 2024 14:42:01 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D578224ED
+	for <kvm@vger.kernel.org>; Thu,  4 Jan 2024 14:03:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-55679552710so10068a12.1
+        for <kvm@vger.kernel.org>; Thu, 04 Jan 2024 06:03:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1704377018; x=1704981818; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Fz2ZaPvPegUdCS4R21laN63DmfGYtgiMCRmXD6PbvGY=;
+        b=r8b6jwPuFWUDhgc1plJE6JvEVnYibJIGmR1pQAmdanU0zc897eqjgEI56Kb4/miMLh
+         ETeasnt3PQYF3GW5iUM/stB5nVbG4v5PsT7yNXqYWa8QtA3GzcEVrO1NWm9jQPfYpQqB
+         DZlFuNvmmr+5KKNj9hjUSRdYslT4kLBuRWjR0eX2Qzg/T2B1hH+jlC8y8K/tQ1U7VmO2
+         L9G/e209jupJVrk64T09tXV78jO2nXhrZ/hFEyv4MzHBSSSjtDlk+BYxGo/6p8ySGYUC
+         gleW4oqo2zCAYj7Ofbz+bekvWhk65HfKY6TNc407CZjaPgV9D+U9OCNlEl630C/IWnqa
+         Uy3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704377018; x=1704981818;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Fz2ZaPvPegUdCS4R21laN63DmfGYtgiMCRmXD6PbvGY=;
+        b=c4HAOUNIPWghlc1an07F9FODBqacL5yEkatIxudifcYahabmA2eyQGeMd7Oac1vstX
+         YJVGir19w7PpNveHrW8lSsQZm0K7HxMP+2Yypmt/iUTa0Inlx4kdajC+O4MQLPfh5LFo
+         /5Lvf2swb3PwR2E1YWp3z6ZRT+PsHo1ki3LrCntD84oVcvhPws5YoEECSd7hYIiaXWA1
+         JiXBLAA9M65zT6GddvVbulfvrvDgfi+N8Nv3noNiI7DQbmt1sNUxvygWcIRNTNnz76bT
+         9A/mFxZSI94O3mE9nF5yeJgq/3eCWGUYB+rbIPdyeQV2CUAYmR574ln+eUXzAqumWQKl
+         01iA==
+X-Gm-Message-State: AOJu0YwV32jvHPImL/I9pIojqFIKtZTItRkJw7FBXuRPKOMibyJk+dwp
+	GYNtS5xMEpiXIpry51ZqeHLIJsQCI/8xx9M17t34Y/1193Ve
+X-Google-Smtp-Source: AGHT+IFUY3kCL1zWywR4LXo0jQ4pVLAkiW1jdrb3Czliju8IzhJEx8WlLDM+GjqoNvwFL3CZ12YuROTnYXS3j6nttcw=
+X-Received: by 2002:a05:6402:380c:b0:557:24d:6135 with SMTP id
+ es12-20020a056402380c00b00557024d6135mr88369edb.4.1704377018379; Thu, 04 Jan
+ 2024 06:03:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: kvm@vger.kernel.org
-Cc: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org
-From: Friedrich Weber <f.weber@proxmox.com>
-Subject: Temporary KVM guest hangs connected to KSM and NUMA balancer
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20231218140543.870234-1-tao1.su@linux.intel.com>
+ <20231218140543.870234-2-tao1.su@linux.intel.com> <ZYMWFhVQ7dCjYegQ@google.com>
+ <ZYP0/nK/WJgzO1yP@yilunxu-OptiPlex-7050> <ZZSbLUGNNBDjDRMB@google.com>
+ <CALMp9eTutnTxCjQjs-nxP=XC345vTmJJODr+PcSOeaQpBW0Skw@mail.gmail.com>
+ <ZZWhuW_hfpwAAgzX@google.com> <ZZYbzzDxPI8gjPu8@chao-email>
+ <CALMp9eSg6No9L40kmo7n9BGOz4v1ThA7-e4gD4sgj3KGBJEUzA@mail.gmail.com>
+ <CALMp9eRS9o7YDDaOcjBB0QTeF_vRA2LMvQqc2Sb-7XhyDi=1LA@mail.gmail.com> <ZZac2AFdR9YTkhuZ@linux.bj.intel.com>
+In-Reply-To: <ZZac2AFdR9YTkhuZ@linux.bj.intel.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Thu, 4 Jan 2024 06:03:21 -0800
+Message-ID: <CALMp9eQsEUFGJ6G2BMxOuHkFuDRp6LEqSAhmae5d3gA9LpmiQA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] x86: KVM: Limit guest physical bits when 5-level EPT
+ is unsupported
+To: Tao Su <tao1.su@linux.intel.com>
+Cc: Chao Gao <chao.gao@intel.com>, Sean Christopherson <seanjc@google.com>, 
+	Xu Yilun <yilun.xu@linux.intel.com>, kvm@vger.kernel.org, pbonzini@redhat.com, 
+	eddie.dong@intel.com, xiaoyao.li@intel.com, yuan.yao@linux.intel.com, 
+	yi1.lai@intel.com, xudong.hao@intel.com, chao.p.peng@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Thu, Jan 4, 2024 at 3:59=E2=80=AFAM Tao Su <tao1.su@linux.intel.com> wro=
+te:
+>
+> On Wed, Jan 03, 2024 at 08:34:16PM -0800, Jim Mattson wrote:
+> > On Wed, Jan 3, 2024 at 7:40=E2=80=AFPM Jim Mattson <jmattson@google.com=
+> wrote:
+> > >
+> > > On Wed, Jan 3, 2024 at 6:45=E2=80=AFPM Chao Gao <chao.gao@intel.com> =
+wrote:
+> > > >
+> > > > On Wed, Jan 03, 2024 at 10:04:41AM -0800, Sean Christopherson wrote=
+:
+> > > > >On Tue, Jan 02, 2024, Jim Mattson wrote:
+> > > > >> On Tue, Jan 2, 2024 at 3:24=E2=80=AFPM Sean Christopherson <sean=
+jc@google.com> wrote:
+> > > > >> >
+> > > > >> > On Thu, Dec 21, 2023, Xu Yilun wrote:
+> > > > >> > > On Wed, Dec 20, 2023 at 08:28:06AM -0800, Sean Christopherso=
+n wrote:
+> > > > >> > > > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/m=
+mu.c
+> > > > >> > > > > index c57e181bba21..72634d6b61b2 100644
+> > > > >> > > > > --- a/arch/x86/kvm/mmu/mmu.c
+> > > > >> > > > > +++ b/arch/x86/kvm/mmu/mmu.c
+> > > > >> > > > > @@ -5177,6 +5177,13 @@ void __kvm_mmu_refresh_passthroug=
+h_bits(struct kvm_vcpu *vcpu,
+> > > > >> > > > >   reset_guest_paging_metadata(vcpu, mmu);
+> > > > >> > > > >  }
+> > > > >> > > > >
+> > > > >> > > > > +/* guest-physical-address bits limited by TDP */
+> > > > >> > > > > +unsigned int kvm_mmu_tdp_maxphyaddr(void)
+> > > > >> > > > > +{
+> > > > >> > > > > + return max_tdp_level =3D=3D 5 ? 57 : 48;
+> > > > >> > > >
+> > > > >> > > > Using "57" is kinda sorta wrong, e.g. the SDM says:
+> > > > >> > > >
+> > > > >> > > >   Bits 56:52 of each guest-physical address are necessaril=
+y zero because
+> > > > >> > > >   guest-physical addresses are architecturally limited to =
+52 bits.
+> > > > >> > > >
+> > > > >> > > > Rather than split hairs over something that doesn't matter=
+, I think it makes sense
+> > > > >> > > > for the CPUID code to consume max_tdp_level directly (I fo=
+rgot that max_tdp_level
+> > > > >> > > > is still accurate when tdp_root_level is non-zero).
+> > > > >> > >
+> > > > >> > > It is still accurate for now. Only AMD SVM sets tdp_root_lev=
+el the same as
+> > > > >> > > max_tdp_level:
+> > > > >> > >
+> > > > >> > >       kvm_configure_mmu(npt_enabled, get_npt_level(),
+> > > > >> > >                         get_npt_level(), PG_LEVEL_1G);
+> > > > >> > >
+> > > > >> > > But I wanna doulbe confirm if directly using max_tdp_level i=
+s fully
+> > > > >> > > considered.  In your last proposal, it is:
+> > > > >> > >
+> > > > >> > >   u8 kvm_mmu_get_max_tdp_level(void)
+> > > > >> > >   {
+> > > > >> > >       return tdp_root_level ? tdp_root_level : max_tdp_level=
+;
+> > > > >> > >   }
+> > > > >> > >
+> > > > >> > > and I think it makes more sense, because EPT setup follows t=
+he same
+> > > > >> > > rule.  If any future architechture sets tdp_root_level small=
+er than
+> > > > >> > > max_tdp_level, the issue will happen again.
+> > > > >> >
+> > > > >> > Setting tdp_root_level !=3D max_tdp_level would be a blatant b=
+ug.  max_tdp_level
+> > > > >> > really means "max possible TDP level KVM can use".  If an exac=
+t TDP level is being
+> > > > >> > forced by tdp_root_level, then by definition it's also the max=
+ TDP level, because
+> > > > >> > it's the _only_ TDP level KVM supports.
+> > > > >>
+> > > > >> This is all just so broken and wrong. The only guest.MAXPHYADDR =
+that
+> > > > >> can be supported under TDP is the host.MAXPHYADDR. If KVM claims=
+ to
+> > > > >> support a smaller guest.MAXPHYADDR, then KVM is obligated to int=
+ercept
+> > > > >> every #PF,
+> > > >
+> > > > in this case (i.e., to support 48-bit guest.MAXPHYADDR when CPU sup=
+ports only
+> > > > 4-level EPT), KVM has no need to intercept #PF because accessing a =
+GPA with
+> > > > RSVD bits 51-48 set leads to EPT violation.
+> > >
+> > > At the completion of the page table walk, if there is a permission
+> > > fault, the data address should not be accessed, so there should not b=
+e
+> > > an EPT violation. Remember Meltdown?
+> > >
+> > > > >> and to emulate the faulting instruction to see if the RSVD
+> > > > >> bit should be set in the error code. Hardware isn't going to do =
+it.
+> > > >
+> > > > Note for EPT violation VM exits, the CPU stores the GPA that caused=
+ this exit
+> > > > in "guest-physical address" field of VMCS. so, it is not necessary =
+to emulate
+> > > > the faulting instruction to determine if any RSVD bit is set.
+> > >
+> > > There should not be an EPT violation in the case discussed.
+> >
+> > For intercepted #PF, we can use CR2 to determine the necessary page
+> > walk, and presumably the rest of the bits in the error code are
+> > already set, so emulation is not necessary.
+> >
+> > However, emulation is necessary when synthesizing a #PF from an EPT
+> > violation, and bit 8 of the exit qualification is clear. See
+> > https://lore.kernel.org/kvm/4463f391-0a25-017e-f913-69c297e13c5e@redhat=
+.com/.
+>
+> Although not all memory-accessing instructions are emulated, it covers mo=
+st common
+> cases and is always better than KVM hangs anyway. We may probably continu=
+e to
+> improve allow_smaller_maxphyaddr, but KVM should report the maximum physi=
+cal width
+> it supports.
 
-some of our (Proxmox VE) users have been reporting [1] that guests
-occasionally become unresponsive with high CPU usage for some time
-(varying between ~1 and more than 60 seconds). After that time, the
-guests come back and continue running fine. Windows guests seem most
-affected (not responding to pings during the hang, RDP sessions time
-out). But we also got reports about Linux guests. This issue was not
-present while we provided (host) kernel 5.15 and was first reported when
-we rolled out a kernel based on 6.2. The reports seem to concern NUMA
-hosts only. Users reported that the issue becomes easier to trigger the
-more memory is assigned to the guests. Setting mitigations=off was
-reported to alleviate (but not eliminate) the issue. The issue seems to
-disappear after disabling KSM.
+KVM can only support the host MAXPHYADDR. If EPT on the CPU doesn't
+support host MAXPHYADDR, it should be disabled. Shadow paging can
+handle host MAXPHYADDR just fine.
 
-We can reproduce the issue with a Windows guest on a NUMA host, though
-only occasionally and not very reliably. Using a bpftrace script like
-[7] we found the hangs to correlate with long-running invocations of
-`task_numa_work` (more than 500ms), suggesting a connection to the NUMA
-balancer. Indeed, we can't reproduce the issue after disabling the NUMA
-balancer with `echo 0 > /proc/sys/kernel/numa_balancing` [2] and got a
-user confirming this fixes the issue for them [3].
+KVM simply does not work when guest MAXPHYADDR < host MAXPHYADDR.
+Without additional hardware support, no hypervisor can. I asked Intel
+to add hardware support for such configurations about 15 years ago. I
+have yet to see it.
 
-Since the Windows reproducer is not very stable, we tried to find a
-Linux guest reproducer and have found one (described below [0]) that
-triggers a very similar (hopefully the same) issue. The reproducer
-triggers the hangs also if the host is on current Linux 6.7-rc8
-(610a9b8f). A kernel bisect points to the following as the commit
-introducing the issue:
-
-f47e5bbb ("KVM: x86/mmu: Zap only TDP MMU leafs in zap range and
-mmu_notifier unmap")
-
-which is why I cc'ed Sean and Paolo. Because of the possible KSM
-connection I cc'ed Andrew and linux-mm.
-
-Indeed, on f47e5bbb~1 = a80ced6e ("KVM: SVM: fix panic on out-of-bounds
-guest IRQ") the reproducer does not trigger the hang, and on f47e5bbb it
-triggers the hang.
-
-Currently I don't know enough about the KVM/KSM/NUMA balancer code to
-tell how the patch may trigger these issues. Any idea who we could ask
-about this, or how we could further debug this would be greatly appreciated!
-
-Let me know if I can provide any more information.
-
-Best,
-
-Friedrich
-
-[0]
-
-Reproducer (example outputs with the host on f47e5bbb):
-
-* Host with 256GiB memory, 2 NUMA nodes (for output of `numactl -H` see [4])
-* Disable ksmtuned on the host, then manually enable and "boost" KSM:
-
-  echo 1250 > /sys/kernel/mm/ksm/pages_to_scan
-  echo 1 > /sys/kernel/mm/ksm/run
-
-* Create Linux guest (e.g. Debian 12) with 140GiB memory. There is no
-virtio-balloon-pci device, this is to prevent the host from reclaiming
-memory of the guest (this mimics the behavior of Windows guests). See
-[5] for QEMU 8.2 command line.
-* On the guest, run a program that allocates 128 GiB memory in 1 GiB
-chunks, initializes it with an arbitrary byte (ASCII 'A'), sleeps for
-60s and exits (allocate.c [6]):
-
-  ./allocate 128
-
-* Wait until KSM sharing pages are at >30GiB
-(/sys/kernel/mm/ksm/pages_sharing exceeds 7864320), that takes ~20
-minutes for us.
-* Optionally lower KSM pages_to_scan to a reasonable value to rule it
-out as a factor:
-
-  echo 100 > /sys/kernel/mm/ksm/pages_to_scan
-  echo 1 > /sys/kernel/mm/ksm/run
-
-* From a different machine, run a continuous `ping -D` against the guest
-* On the host, run bpftrace to trace `task_numa_work` invocations over
-500ms [7]
-* On the guest, run the allocation program 32 times in parallel, each
-process allocating 4x1 GiB of memory (32 * 4 = 128):
-
-  for i in $(seq 32); do ./allocate 4 & done
-
-* A few seconds later while the processes are still running, the guest
-becomes unresponsive for some time, thus the ping response times greatly
-increase. For example, here the guest does not respond at all for ~100
-seconds:
-
-[1704360680.898427] 64 bytes from 192.168.18.11: icmp_seq=47 ttl=64
-time=0.447 ms
-[1704360681.922522] 64 bytes from 192.168.18.11: icmp_seq=48 ttl=64
-time=0.515 ms
-[1704360710.369961] From 192.168.16.32 icmp_seq=73 Destination Host
-Unreachable
-[1704360713.442023] From 192.168.16.32 icmp_seq=76 Destination Host
-Unreachable
-... repeats ...
-[1704360786.081958] From 192.168.16.32 icmp_seq=147 Destination Host
-Unreachable
-[1704360789.154021] From 192.168.16.32 icmp_seq=151 Destination Host
-Unreachable
-[1704360790.194049] 64 bytes from 192.168.18.11: icmp_seq=49 ttl=64
-time=107244 ms
-[1704360790.196813] 64 bytes from 192.168.18.11: icmp_seq=50 ttl=64
-time=106227 ms
-[1704360790.196998] 64 bytes from 192.168.18.11: icmp_seq=51 ttl=64
-time=105203 ms
-[1704360790.206355] 64 bytes from 192.168.18.11: icmp_seq=52 ttl=64
-time=104188 ms
-[1704360790.206721] 64 bytes from 192.168.18.11: icmp_seq=53 ttl=64
-time=103165 ms
-[1704360790.206837] 64 bytes from 192.168.18.11: icmp_seq=54 ttl=64
-time=102141 ms
-[...]
-[1704360799.307342] 64 bytes from 192.168.18.11: icmp_seq=163 ttl=64
-time=0.335 ms
-[1704360800.322355] 64 bytes from 192.168.18.11: icmp_seq=164 ttl=64
-time=0.360 ms
-[1704360810.481320] 64 bytes from 192.168.18.11: icmp_seq=165 ttl=64
-time=9135 ms
-[1704360810.481331] 64 bytes from 192.168.18.11: icmp_seq=166 ttl=64
-time=8111 ms
-[1704360810.481334] 64 bytes from 192.168.18.11: icmp_seq=167 ttl=64
-time=7083 ms
-[1704360810.481336] 64 bytes from 192.168.18.11: icmp_seq=168 ttl=64
-time=6059 ms
-[1704360810.481339] 64 bytes from 192.168.18.11: icmp_seq=169 ttl=64
-time=5039 ms
-[1704360810.481409] 64 bytes from 192.168.18.11: icmp_seq=170 ttl=64
-time=4015 ms
-[...]
-[1704360827.906610] 64 bytes from 192.168.18.11: icmp_seq=191 ttl=64
-time=0.591 ms
-[1704360828.930570] 64 bytes from 192.168.18.11: icmp_seq=192 ttl=64
-time=0.576 ms
-
-* At the same time, bpftrace logs long-running invocations of
-`task_numa_work`, some examples:
-
-[1704360683] task_numa_work (tid=15476) took 868 ms
-[1704360683] task_numa_work (tid=15457) took 984 ms
-[1704360683] task_numa_work (tid=15480) took 1104 ms
-[...]
-[1704360751] task_numa_work (tid=15462) took 13916 ms
-[1704360753] task_numa_work (tid=15453) took 21708 ms
-[...]
-[1704360805] task_numa_work (tid=15485) took 1029 ms
-[1704360807] task_numa_work (tid=15485) took 1245 ms
-[1704360807] task_numa_work (tid=15446) took 2483 ms
-[1704360808] task_numa_work (tid=15466) took 4149 ms
-[1704360810] task_numa_work (tid=15446) took 3409 ms
-[...]
-[1704360814] task_numa_work (tid=15464) took 1733 ms
-[1704360816] task_numa_work (tid=15464) took 1844 ms
-
-* After some time (~100s in the example above) the guest comes back and
-ping response times go back to normal. The guest journal logs some soft
-lockups, e.g.:
-
-Jan 04 10:33:10 debian kernel: rcu: INFO: rcu_preempt detected stalls on
-CPUs/tasks:
-Jan 04 10:33:10 debian kernel: watchdog: BUG: soft lockup - CPU#10 stuck
-for 101s! [allocate:1169]
-Jan 04 10:33:10 debian kernel: watchdog: BUG: soft lockup - CPU#31 stuck
-for 101s! [allocate:1180]
-
-* We cannot trigger the hangs anymore after disabling the NUMA balancer
--- ping response times stay under 1ms then.
-
-[1] https://forum.proxmox.com/threads/130727/
-[2] https://forum.proxmox.com/threads/130727/page-7#post-601617
-[3] https://forum.proxmox.com/threads/130727/page-7#post-603096
-[4]
-
-# numactl -H
-available: 2 nodes (0-1)
-node 0 cpus: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 32 33 34 35 36 37 38
-39 40 41 42 43 44 45 46 47
-node 0 size: 128649 MB
-node 0 free: 124293 MB
-node 1 cpus: 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 48 49 50 51
-52 53 54 55 56 57 58 59 60 61 62 63
-node 1 size: 128971 MB
-node 1 free: 126587 MB
-node distances:
-node   0   1
-  0:  10  21
-  1:  21  10
-
-[5]
-
-./qemu-system-x86_64 \
-  -accel kvm \
-  -chardev
-'socket,id=qmp,path=/var/run/qemu-server/101.qmp,server=on,wait=off' \
-  -mon 'chardev=qmp,mode=control' \
-  -chardev 'socket,id=qmp-event,path=/var/run/qmeventd.sock,reconnect=5' \
-  -mon 'chardev=qmp-event,mode=control' \
-  -pidfile /var/run/qemu-server/101.pid \
-  -smp '64,sockets=1,cores=64,maxcpus=64' \
-  -nodefaults \
-  -vnc 'unix:/var/run/qemu-server/101.vnc,password=on' \
-  -cpu qemu64,enforce,+kvm_pv_eoi,+kvm_pv_unhalt \
-  -m 143360 \
-  -device 'pci-bridge,id=pci.3,chassis_nr=3,bus=pci.0,addr=0x5' \
-  -device 'VGA,id=vga,bus=pci.0,addr=0x2' \
-  -device 'virtio-scsi-pci,id=virtioscsi0,bus=pci.3,addr=0x1' \
-  -drive 'file=/dev/pve/vm-101-disk-0,if=none,id=drive-scsi0,format=raw' \
-  -device
-'scsi-hd,bus=virtioscsi0.0,channel=0,scsi-id=0,lun=0,drive=drive-scsi0,id=scsi0,bootindex=100'
-\
-  -netdev
-'type=tap,id=net0,ifname=tap101i0,script=/var/lib/qemu-server/pve-bridge,downscript=/var/lib/qemu-server/pve-bridgedown,vhost=on'
-\
-  -device
-'virtio-net-pci,mac=BC:24:11:09:20:0C,netdev=net0,bus=pci.0,addr=0x12,id=net0,rx_queue_size=1024,tx_queue_size=256,bootindex=102'
-\
-  -machine 'type=pc'
-
-[6]
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <assert.h>
-
-const size_t chunk_size = 1024 * 1024 * 1024; // 1 GiB
-
-void *alloc_chunk(char ch) {
-	size_t init_size = 65536;
-	size_t init_done = 0;
-	void *base = malloc(chunk_size);
-	assert(base);
-
-	while (init_done < chunk_size && init_done + init_size < chunk_size) {
-		memset((char *)base + init_done, ch, init_size);
-		init_done += init_size;
-	}
-
-	return base;
-}
-
-int main(int argc, char *argv[]) {
-	int num_chunks;
-
-	assert(argc == 2);
-	num_chunks = atoi(argv[1]);
-	assert(num_chunks >= 0 && num_chunks <= 1024);
-
-	char **chunks = malloc(num_chunks * sizeof(char *));
-
-	fprintf(stderr, "alloc %d chunks\n", num_chunks);
-	for (int i = 0; i < num_chunks; i++) {
-		fprintf(stderr, "alloc #%d: %c\n", i, 'A');
-		chunks[i] = alloc_chunk('A');
-	}
-	fprintf(stderr, "sleeping 1min\n");
-	sleep(60);
-	return 0;
-}
-
-[7]
-
-kfunc:task_numa_work { @start[tid] = nsecs; }
-kretfunc:task_numa_work /@start[tid]/ {
-	$diff = nsecs - @start[tid];
-	if ($diff > 500000000) { // 500ms
-		time("[%s] ");
-		printf("task_numa_work (tid=%d) took %d ms\n", tid, $diff / 1000000);
-	}
-	delete(@start[tid]);
-}
-
+> Thanks,
+> Tao
+>
 
