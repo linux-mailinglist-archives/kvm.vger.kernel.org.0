@@ -1,118 +1,140 @@
-Return-Path: <kvm+bounces-5665-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5666-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DB0E82481C
-	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 19:23:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FD0582482B
+	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 19:30:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 81F331F22EEE
-	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 18:23:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 44D9E1C225CB
+	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 18:30:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF25728E14;
-	Thu,  4 Jan 2024 18:22:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56F9828E0F;
+	Thu,  4 Jan 2024 18:29:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TcJTE8z4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HLFcI8aF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2BD42C683
-	for <kvm@vger.kernel.org>; Thu,  4 Jan 2024 18:22:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ACAE28E02
+	for <kvm@vger.kernel.org>; Thu,  4 Jan 2024 18:29:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dbeaf21e069so993883276.1
-        for <kvm@vger.kernel.org>; Thu, 04 Jan 2024 10:22:38 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-336897b6bd6so714888f8f.2
+        for <kvm@vger.kernel.org>; Thu, 04 Jan 2024 10:29:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704392558; x=1704997358; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bbDN6W21p6F1EYYykal14M3FBVWLwpCqqmiZbB/3IKE=;
-        b=TcJTE8z4fFZw6YngnDvt/vBExHe+itRApJaM5qfV3Qs5OBOGkLb30/u0hMa4I3+m8y
-         G5fVbAJG7J5ZehQUGVwpM8dc+23488atiBdfwQmI2SSCC9VVggunD3HYNJCD9V9bDrXp
-         1t3v5HkIrN6Y6v6mHFhVhjCt59UlOpRlRWb3U3rW0nMljABwCuBlIO/FWYVYSYm1N2bs
-         fNM9rMDOb4ZrVS8T7q73AWnKuUAlzNeA1J+YpW8BNeO8bTW9S8qIlS5y5d/q0vDvC9uZ
-         7dvg0eW/EZTu+zWoXr1hLw+c8wDVBRtTI0Pkq8JoFdSN7FNQaUdvutWW7atkkSDGgOCx
-         lpwQ==
+        d=google.com; s=20230601; t=1704392993; x=1704997793; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xbjYIxuq4GpjHNJQGMJNaXkZKyDNB4tpT6uaJ84I2fI=;
+        b=HLFcI8aF+ZhWhsLf+GXm6nQiTW+eAS3ia8BOOjONHh1qPvzlBz+JxketHgrAT59gpo
+         8xmJGd5ULLOBGvVU4FRDb4VXWnWLQtHq1B2ZK4ZhIOJAZjck7hJVD/3GEB/wXzS+VTJX
+         xJ/EFkWaqeOXrEV2sjfaz5xQA7o6BmiVBE2ZN0It1UZ1LDFdUcuB0VanNQQAFsOtXcfx
+         hL0xprt3/v1C00XVIFOmFg6ZidNCpVlcX+SJgA5WJoLJmEgNJ6CODTCc6Shod5jAHZU6
+         m5cpuIUD5t4z6A1a83tFvdwOFcqzwQ6k/IODpA19YFZpHLYaLYYoaU5GqSZFgiETxvKw
+         Niow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704392558; x=1704997358;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bbDN6W21p6F1EYYykal14M3FBVWLwpCqqmiZbB/3IKE=;
-        b=LT31cOGBKSH7y1YNi45rtKgA4b9HQJA67kY82Vr/zZD5Mpgm+bXHJgrGk/H55qzzdJ
-         jkF5t5gf160STo5EkmqCgRngIPL2HsS8oO03sXlWt48ilNFp9yn8Ew7mOhFoe/cP4kh1
-         twvGAC+bH/AQmuhGPXRTEyDDk3517EjxImbnpLZd6gZIx9bxDxn/jKT9hn5lPyDzlRrI
-         9A2KCzwaK5ZZZWYTUwphw2nz+LF9mmi3QnSbz0zUSbnTrR+SIVB0c9vznM2hgx8+Dj50
-         YasU4zuE+bLyMFCsq3AEXIl3DoPLycVdz4TGvUTw1SimTzmT7uDrvZsnR9ccEygh2t1r
-         f6jQ==
-X-Gm-Message-State: AOJu0Yy7p+Kd/ypSDflpraLiyAeywdXWYf2n6IiImNH0MMIMsSZ4pmn+
-	PCfyByT0Lu822grtvcMIkPo8LhKyY5wnfEuuVQ==
-X-Google-Smtp-Source: AGHT+IEaMRCHGS38DtQMJCrRm/hEwM4m2ug9DEysF+4xs9/4bbCvrTyBUAjUQhP7cnYM4OHndFKWnJ2AyNQ=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:134e:b0:dbe:a220:68ee with SMTP id
- g14-20020a056902134e00b00dbea22068eemr30231ybu.0.1704392557745; Thu, 04 Jan
- 2024 10:22:37 -0800 (PST)
-Date: Thu, 4 Jan 2024 18:22:36 +0000
-In-Reply-To: <a327286a-36a6-4cdc-92bd-777fb763d88a@linux.intel.com>
+        d=1e100.net; s=20230601; t=1704392993; x=1704997793;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xbjYIxuq4GpjHNJQGMJNaXkZKyDNB4tpT6uaJ84I2fI=;
+        b=KubPta2mQRmIUIcxROi7AFl8WxP8NNhi+x24sDec2fBy1gjgyVwAKe8FoGEErfNida
+         hNPD5BM7L0e00W0cax70rKmmGUurHJDQezMgofP1sWDBZU8t91VPa/oyfX2sDX3SceuO
+         wXV80qK72iw3cK7Gy9gpHDGd5Ua+BAau2zSVr+KGagDXZR/9MejomJYPGoIUEpYVhnuA
+         Fu7qqdqHMUOdGieEMvd35Q3aYqgd8saDmDQpMuQq0iZ3REg3ocKLALWaMNk5KEKhbKLh
+         AKqtdFMGWGQawsamu5Bo7Bc+j8FEB4OJhPrmGDyjWGpr+gf+HB7IlQNxQDYlWkWaJNNN
+         wHBg==
+X-Gm-Message-State: AOJu0Yx7b7yEAH5/Q+Kt/0lrfiS+jgmunL4h9WPxEio6cU7wiEltIWLT
+	+y8zCKnWplUWYiRIGyOl6kFdgajqjnuqtyplZUyVUigakKR6
+X-Google-Smtp-Source: AGHT+IEwnXAETOHlHXjrqQRiM+k251OUQ4PEDmhJXHg+fbwO+fOTCxFZLAovkSsX1Wb174sh7cZsiWni2q94wSXz5PQ=
+X-Received: by 2002:adf:f386:0:b0:337:4916:e1e4 with SMTP id
+ m6-20020adff386000000b003374916e1e4mr493064wro.24.1704392993231; Thu, 04 Jan
+ 2024 10:29:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240104153939.129179-1-pbonzini@redhat.com> <a327286a-36a6-4cdc-92bd-777fb763d88a@linux.intel.com>
-Message-ID: <ZZbuwU8ShrcXWdMY@google.com>
-Subject: Re: [PATCH] KVM: x86/pmu: fix masking logic for MSR_CORE_PERF_GLOBAL_CTRL
-From: Sean Christopherson <seanjc@google.com>
-To: Kan Liang <kan.liang@linux.intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	peterz@infradead.org, linux-perf-users@vger.kernel.org, leitao@debian.org, 
-	acme@kernel.org, mingo@redhat.com, "Paul E . McKenney" <paulmck@kernel.org>, 
-	stable@vger.kernel.org, Like Xu <like.xu.linux@gmail.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20240103123959.46994-1-liangchen.linux@gmail.com>
+ <ZZV8gz7wSCZCX0GZ@google.com> <CAKhg4tJA2TQ_1Zwv2N-PD7dsv_b5OW3Y5uRpnrR2ZOy-63Dsng@mail.gmail.com>
+In-Reply-To: <CAKhg4tJA2TQ_1Zwv2N-PD7dsv_b5OW3Y5uRpnrR2ZOy-63Dsng@mail.gmail.com>
+From: David Matlack <dmatlack@google.com>
+Date: Thu, 4 Jan 2024 10:29:25 -0800
+Message-ID: <CALzav=fKKvKzm6fYUyP4=_uPcFeA3wqBZqGonkz6Rd1+6yuVaw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: count number of zapped pages for tdp_mmu
+To: Liang Chen <liangchen.linux@gmail.com>
+Cc: Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 04, 2024, Liang, Kan wrote:
-> 
-> 
-> On 2024-01-04 10:39 a.m., Paolo Bonzini wrote:
-> > When commit c59a1f106f5c ("KVM: x86/pmu: Add IA32_PEBS_ENABLE
-> > MSR emulation for extended PEBS") switched the initialization of
-> > cpuc->guest_switch_msrs to use compound literals, it screwed up
-> > the boolean logic:
-> > 
-> > +	u64 pebs_mask = cpuc->pebs_enabled & x86_pmu.pebs_capable;
-> > ...
-> > -	arr[0].guest = intel_ctrl & ~cpuc->intel_ctrl_host_mask;
-> > -	arr[0].guest &= ~(cpuc->pebs_enabled & x86_pmu.pebs_capable);
-> > +               .guest = intel_ctrl & (~cpuc->intel_ctrl_host_mask | ~pebs_mask),
-> > 
-> > Before the patch, the value of arr[0].guest would have been intel_ctrl &
-> > ~cpuc->intel_ctrl_host_mask & ~pebs_mask.  The intent is to always treat
-> > PEBS events as host-only because, while the guest runs, there is no way
-> > to tell the processor about the virtual address where to put PEBS records
-> > intended for the host.
-> > 
-> > Unfortunately, the new expression can be expanded to
-> > 
-> > 	(intel_ctrl & ~cpuc->intel_ctrl_host_mask) | (intel_ctrl & ~pebs_mask)
-> > 
-> > which makes no sense; it includes any bit that isn't *both* marked as
-> > exclude_guest and using PEBS.  So, reinstate the old logic.  
-> 
-> I think the old logic will completely disable the PEBS in guest
-> capability. Because the counter which is assigned to a guest PEBS event
-> will also be set in the pebs_mask. The old logic disable the counter in
-> GLOBAL_CTRL in guest. Nothing will be counted.
-> 
-> Like once proposed a fix in the intel_guest_get_msrs().
-> https://lore.kernel.org/lkml/20231129095055.88060-1-likexu@tencent.com/
-> It should work for the issue.
+On Wed, Jan 3, 2024 at 8:14=E2=80=AFPM Liang Chen <liangchen.linux@gmail.co=
+m> wrote:
+>
+> On Wed, Jan 3, 2024 at 11:25=E2=80=AFPM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> >
+> > +David
+> >
+> > On Wed, Jan 03, 2024, Liang Chen wrote:
+> > > Count the number of zapped pages of tdp_mmu for vm stat.
+> >
+> > Why?  I don't necessarily disagree with the change, but it's also not o=
+bvious
+> > that this information is all that useful for the TDP MMU, e.g. the pf_f=
+ixed/taken
+> > stats largely capture the same information.
+> >
+>
+> We are attempting to make zapping specific to a particular memory
+> slot, something like below.
+>
+> void kvm_tdp_zap_pages_in_memslot(struct kvm *kvm, struct kvm_memory_slot=
+ *slot)
+> {
+>         struct kvm_mmu_page *root;
+>         bool shared =3D false;
+>         struct tdp_iter iter;
+>
+>         gfn_t end =3D slot->base_gfn + slot->npages;
+>         gfn_t start =3D slot->base_gfn;
+>
+>         write_lock(&kvm->mmu_lock);
+>         rcu_read_lock();
+>
+>         for_each_tdp_mmu_root_yield_safe(kvm, root, false) {
+>
+>                 for_each_tdp_pte_min_level(iter, root,
+> root->role.level, start, end) {
+>                         if (tdp_mmu_iter_cond_resched(kvm, &iter, false, =
+false))
+>                                 continue;
+>
+>                         if (!is_shadow_present_pte(iter.old_spte))
+>                                 continue;
+>
+>                         tdp_mmu_set_spte(kvm, &iter, 0);
+>                 }
+>         }
+>
+>         kvm_flush_remote_tlbs(kvm);
+>
+>         rcu_read_unlock();
+>         write_unlock(&kvm->mmu_lock);
+> }
+>
+> I noticed that it was previously done to the legacy MMU, but
+> encountered some subtle issues with VFIO. I'm not sure if the issue is
+> still there with TDP_MMU. So we are trying to do more tests and
+> analyses before submitting a patch. This provides me a convenient way
+> to observe the number of pages being zapped.
 
-No, that patch only affects the path where hardware supports enabling PEBS in the
-the guest, i.e. intel_guest_get_msrs() will bail before getting to that code due
-to the lack of x86_pmu.pebs_ept support, which IIUC is all pre-Icelake Intel CPUs.
+Note you could also use the existing tracepoint to observe the number
+of pages being zapped in a given test run. e.g.
 
-	if (!kvm_pmu || !x86_pmu.pebs_ept)
-		return arr;
+  perf stat -e kvmmmu:kvm_mmu_prepare_zap_page -- <cmd>
 
