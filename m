@@ -1,92 +1,78 @@
-Return-Path: <kvm+bounces-5636-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5637-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77EC6824052
-	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 12:09:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EABB82406F
+	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 12:18:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F15341F246EB
-	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 11:09:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7F77286338
+	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 11:18:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A0FA210F4;
-	Thu,  4 Jan 2024 11:09:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EBF121111;
+	Thu,  4 Jan 2024 11:18:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="cBFRrh4E"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="S8vDLPBG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9561210EE
-	for <kvm@vger.kernel.org>; Thu,  4 Jan 2024 11:09:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5570f246310so213060a12.0
-        for <kvm@vger.kernel.org>; Thu, 04 Jan 2024 03:09:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1704366577; x=1704971377; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=74N1Cq913BTRhayzvgQnIcxYARZsluZ7x3qTYNrywUw=;
-        b=cBFRrh4ER7/KcfcXadb4VIA6oojldE/QtRibhYHijxrL0DB4URPcuI62/hKM/Vm49X
-         dO/DiwzIn6y3uRirHRRu3R1Ho10tTpJTOOWe2AsK/HSUhTufLBP0ieCuRI0HMIklYasZ
-         tNyO01R6jO2zQXclnddx4GHTSbAjVD3oVESZ7/NSW+cUuoU08SGFytSDAmBAr/cS6YF+
-         QKtotjJVlg5lkoJOK0KLb5tvFnIQJOaG+6z/pCLctoE/kbWO7WsJElaRaRND7B8YpOnK
-         c0GMK8KDvIP1JyghvBqQxfebuhcX/TDtOOP+NC/YEz6CSsKHZtQ4ERzqPdTNJ4JtXHNs
-         RUFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704366577; x=1704971377;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=74N1Cq913BTRhayzvgQnIcxYARZsluZ7x3qTYNrywUw=;
-        b=VstRTpHYYeJoteI5eh+CigJdQEvJOSE7VmyqbuioYNdxwqR81uskQCYProoMjn9TWl
-         daJzix6w3YGDqlNitaEY0FYc7dO14doWZgWebqO30VZS1cZzKTUNw5bCPnBeKb5sIlKG
-         y4rb+CX+vPr0fuhlcJeIJY57tc6H0eVENa6/5PqeMIzoY0Y5WlEI9qFmPRWeo1bIbypF
-         UDzJ+z9sY5ou1j9Im8HEROAL+YpAMYNDv3W1Wn14FhdQT4mmPaEvrk92KnBcn5YuKtWV
-         pgT4fh8AjoOMCxj5iWMRCYX39XrPnmvW1aiPhgN0Z67fedL8J2Oi4fS/Yy6e3+x4UVXb
-         E7EA==
-X-Gm-Message-State: AOJu0YyCD5lfHXdTNkS9aIZWDVkb8EtiqxtF3uXFUPvacJBu7TXn9/l+
-	At3QbYp1fYQ3N/vcYruuMI0LORF+/G/zdQ==
-X-Google-Smtp-Source: AGHT+IEQCwN9GP2QDGQCOCSlVQdGYcgmdoQnHVO1JwxIhclSNsrhshtNA82sSQCt5a2uS2CNGPMffw==
-X-Received: by 2002:a05:6402:3193:b0:556:b393:7559 with SMTP id di19-20020a056402319300b00556b3937559mr231896edb.23.1704366576957;
-        Thu, 04 Jan 2024 03:09:36 -0800 (PST)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id 8-20020a0564021f4800b005545dffa0bdsm16441289edz.13.2024.01.04.03.09.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jan 2024 03:09:36 -0800 (PST)
-Date: Thu, 4 Jan 2024 12:09:35 +0100
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Haibo Xu <xiaobo55x@gmail.com>
-Cc: Marc Zyngier <maz@kernel.org>, Haibo Xu <haibo1.xu@intel.com>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Guo Ren <guoren@kernel.org>, 
-	Mayuresh Chitale <mchitale@ventanamicro.com>, Greentime Hu <greentime.hu@sifive.com>, 
-	wchen <waylingii@gmail.com>, Conor Dooley <conor.dooley@microchip.com>, 
-	Heiko Stuebner <heiko@sntech.de>, Minda Chen <minda.chen@starfivetech.com>, 
-	Samuel Holland <samuel@sholland.org>, Jisheng Zhang <jszhang@kernel.org>, 
-	Sean Christopherson <seanjc@google.com>, Peter Xu <peterx@redhat.com>, Like Xu <likexu@tencent.com>, 
-	Vipin Sharma <vipinsh@google.com>, Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>, 
-	Aaron Lewis <aaronlewis@google.com>, Thomas Huth <thuth@redhat.com>, linux-kernel@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
-Subject: Re: Re: [PATCH v4 11/11] KVM: selftests: Enable tunning of
- err_margin_us in arch timer test
-Message-ID: <20240104-be1acabe472432f709ee408c@orel>
-References: <cover.1702371136.git.haibo1.xu@intel.com>
- <0343a9e4bfa8011fbb6bca0286cee7eab1f17d5d.1702371136.git.haibo1.xu@intel.com>
- <8734vy832j.wl-maz@kernel.org>
- <CAJve8onc0WN5g98aOVBmJx15wFBAqfBKJ+ufoLY+oqYyVL+=3A@mail.gmail.com>
- <f98879dc24f948f7a8a7b5374a32bc04@kernel.org>
- <CAJve8ona7g=LxW1YeRB_FqGodF973H=A3b2m8054gmzK=Z7_ww@mail.gmail.com>
- <87zfy5t1qt.wl-maz@kernel.org>
- <CAJve8o=nTsAwwgSib4vOLXjOWSMV2+J+BFsUZ57OdAK7eW8q8A@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8786320B28;
+	Thu,  4 Jan 2024 11:17:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 5147D40E00C5;
+	Thu,  4 Jan 2024 11:17:48 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id KGOr19mSjR4J; Thu,  4 Jan 2024 11:17:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1704367065; bh=rWnQdgMEkN3G7K5K3oauO5Dk8faRv4o3tZ5emI76S5Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=S8vDLPBG+v9OUyaP3+Ro45KPEmAb/VZQfjECTPx2xhoJkblHwT9fpWWNX6EWUKsGJ
+	 YEuqyCPmuh7VJd7DcgQcOEyHFq1jx1Ut5FEPLy3e+sonMTUw1bp1U45gWBQqN2mpQM
+	 Cnr/fHnuEAcHPCve+YoeBKGLAqGHgtIqcqgtJWfSGNGDfb2nwBVqViWznq2NadN9ac
+	 gQptVnl7Vbke0ozSfIZPvPq3bsDEnQsLsTOB9hJlSrfRq0nSjCd7Aik6aoacSUWgNj
+	 DLJMbATVAUAkGugV7Vb044aqTChzFodhC796XhX9dhN3Lnmu7OPoBrw1oZK3fQYHOi
+	 kYuneRyqHsd9uKDGXdqx2pbFM7ZAf1EcyZDH5fwO69qzT8VM76ew9Hs2lRDnx2WYdy
+	 jgWqxfXNgT2prcS2c/mmze8g1fobiFHpNVzVVgQlwLCRM7rARkBOu7S/Yn85oIuFxo
+	 jJcjZHDD5VV3bDz38njXksB3V/6HQqsLPV6rTIyrZ6pkMEutwUNU8swpyJqZu2/pMu
+	 3s955RE9bc5rt4q6d5FOGTzQB14BXBeFatuMyBfimymFVuA7My+zGY2dLvDGpVIrZb
+	 3fH37ifRpIcRi0aseZzevA45QaGy44JvDRsQi+/rDHqzVL7XQfwUNlpRrWzDQ4cl5n
+	 /hNWVO1P6LSGdJ+2RpE+qB0g=
+Received: from zn.tnic (pd9530f8c.dip0.t-ipconnect.de [217.83.15.140])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id BCCF240E0196;
+	Thu,  4 Jan 2024 11:17:06 +0000 (UTC)
+Date: Thu, 4 Jan 2024 12:16:59 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Michael Roth <michael.roth@amd.com>
+Cc: x86@kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+	linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+	rientjes@google.com, tobin@ibm.com, vbabka@suse.cz,
+	kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
+	Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH v1 04/26] x86/sev: Add the host SEV-SNP initialization
+ support
+Message-ID: <20240104111659.GEZZaTq1FGUfRzz3lM@fat_crate.local>
+References: <20231230161954.569267-1-michael.roth@amd.com>
+ <20231230161954.569267-5-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -95,80 +81,127 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJve8o=nTsAwwgSib4vOLXjOWSMV2+J+BFsUZ57OdAK7eW8q8A@mail.gmail.com>
+In-Reply-To: <20231230161954.569267-5-michael.roth@amd.com>
 
-On Thu, Dec 21, 2023 at 10:58:40AM +0800, Haibo Xu wrote:
-> On Wed, Dec 20, 2023 at 9:58 PM Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > On Wed, 20 Dec 2023 13:51:24 +0000,
-> > Haibo Xu <xiaobo55x@gmail.com> wrote:
-> > >
-> > > On Wed, Dec 20, 2023 at 5:00 PM Marc Zyngier <maz@kernel.org> wrote:
-> > > >
-> > > > On 2023-12-20 06:50, Haibo Xu wrote:
-> > > > > On Wed, Dec 20, 2023 at 2:22 AM Marc Zyngier <maz@kernel.org> wrote:
-> > > > >>
-> > > > >> On Tue, 12 Dec 2023 09:31:20 +0000,
-> > > > >> Haibo Xu <haibo1.xu@intel.com> wrote:
-> > > > >> > diff --git a/tools/testing/selftests/kvm/include/timer_test.h b/tools/testing/selftests/kvm/include/timer_test.h
-> > > > >> > index 968257b893a7..b1d405e7157d 100644
-> > > > >> > --- a/tools/testing/selftests/kvm/include/timer_test.h
-> > > > >> > +++ b/tools/testing/selftests/kvm/include/timer_test.h
-> > > > >> > @@ -22,6 +22,7 @@ struct test_args {
-> > > > >> >       int nr_iter;
-> > > > >> >       int timer_period_ms;
-> > > > >> >       int migration_freq_ms;
-> > > > >> > +     int timer_err_margin_us;
-> > > > >>
-> > > > >> ... except that you are storing it as a signed value. Some consistency
-> > > > >> wouldn't hurt, really, and would avoid issues when passing large
-> > > > >> values.
-> > > > >>
-> > > > >
-> > > > > Yes, it's more proper to use an unsigned int for the non-negative error
-> > > > > margin.
-> > > > > Storing as signed here is just to keep the type consistent with that
-> > > > > of timer_period_ms
-> > > > > since there will be '+' operation in other places.
-> > > > >
-> > > > >         tools/testing/selftests/kvm/aarch64/arch_timer.c
-> > > > >         /* Setup a timeout for the interrupt to arrive */
-> > > > >          udelay(msecs_to_usecs(test_args.timer_period_ms) +
-> > > > >              test_args.timer_err_margin_us);
-> > > >
-> > > > But that's exactly why using a signed quantity is wrong.
-> > > > What does it mean to have a huge *negative* margin?
-> > > >
-> > >
-> > > Hi Marc,
-> > >
-> > > I agree that negative values are meaningless for the margin.
-> > > If I understand correctly, the negative margin should be filtered by
-> > > assertion in atoi_non_negative().
-> >
-> > No. Please.
-> >
-> > atoi_non_negative() returns a uint32_t, which is what it should do.
-> > The bug is squarely in the use of an 'int' to store such value, and it
-> > is the *storage* that turns a positive value into a negative one.
-> >
+On Sat, Dec 30, 2023 at 10:19:32AM -0600, Michael Roth wrote:
+> From: Brijesh Singh <brijesh.singh@amd.com>
 > 
-> Thanks for the detailed info!
+> The memory integrity guarantees of SEV-SNP are enforced through a new
+> structure called the Reverse Map Table (RMP). The RMP is a single data
+> structure shared across the system that contains one entry for every 4K
+> page of DRAM that may be used by SEV-SNP VMs. APM2 section 15.36 details
+> a number of steps needed to detect/enable SEV-SNP and RMP table support
+> on the host:
 > 
-> May I understand that your concern is mainly for a platform with 64bit int type,
-> which may trigger the positive to negative convert?
+>  - Detect SEV-SNP support based on CPUID bit
+>  - Initialize the RMP table memory reported by the RMP base/end MSR
+>    registers and configure IOMMU to be compatible with RMP access
+>    restrictions
+>  - Set the MtrrFixDramModEn bit in SYSCFG MSR
+>  - Set the SecureNestedPagingEn and VMPLEn bits in the SYSCFG MSR
+>  - Configure IOMMU
 > 
-> If so, I think we may need to do a clean up for the test code since
-> several other
-> places have the same issue.
+> RMP table entry format is non-architectural and it can vary by
+> processor. It is defined by the PPR. Restrict SNP support to CPU
+> models/families which are compatible with the current RMP table entry
+> format to guard against any undefined behavior when running on other
+> system types. Future models/support will handle this through an
+> architectural mechanism to allow for broader compatibility.
+> 
+> SNP host code depends on CONFIG_KVM_AMD_SEV config flag, which may be
+> enabled even when CONFIG_AMD_MEM_ENCRYPT isn't set, so update the
+> SNP-specific IOMMU helpers used here to rely on CONFIG_KVM_AMD_SEV
+> instead of CONFIG_AMD_MEM_ENCRYPT.
 
-Yes, I think we should do that cleanup. While there are probably several
-offenders scattered throughout kvm selftests, we can keep the scope of
-this series focused on arch_timer.c. Let's audit all uses of signed types
-and convert them to unsigned as necessary with some separate patch(es)
-before splitting the test, so both aarch64 and riscv get the cleanups.
+Small fixups to the commit message:
 
-Thanks,
-drew
+    The memory integrity guarantees of SEV-SNP are enforced through a new
+    structure called the Reverse Map Table (RMP). The RMP is a single data
+    structure shared across the system that contains one entry for every 4K
+    page of DRAM that may be used by SEV-SNP VMs. The APM v2 section on
+    Secure Nested Paging (SEV-SNP) details a number of steps needed to
+    detect/enable SEV-SNP and RMP table support on the host:
+    
+     - Detect SEV-SNP support based on CPUID bit
+     - Initialize the RMP table memory reported by the RMP base/end MSR
+       registers and configure IOMMU to be compatible with RMP access
+       restrictions
+     - Set the MtrrFixDramModEn bit in SYSCFG MSR
+     - Set the SecureNestedPagingEn and VMPLEn bits in the SYSCFG MSR
+     - Configure IOMMU
+    
+    The RMP table entry format is non-architectural and it can vary by
+    processor. It is defined by the PPR document for each respective CPU
+    family. Restrict SNP support to CPU models/families which are compatible
+    with the current RMP table entry format to guard against any undefined
+    behavior when running on other system types. Future models/support will
+    handle this through an architectural mechanism to allow for broader
+    compatibility.
+    
+    The SNP host code depends on CONFIG_KVM_AMD_SEV config flag which may
+    be enabled even when CONFIG_AMD_MEM_ENCRYPT isn't set, so update the
+    SNP-specific IOMMU helpers used here to rely on CONFIG_KVM_AMD_SEV
+    instead of CONFIG_AMD_MEM_ENCRYPT.
+
+> diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
+> index f1bd7b91b3c6..15ce1269f270 100644
+> --- a/arch/x86/include/asm/msr-index.h
+> +++ b/arch/x86/include/asm/msr-index.h
+> @@ -599,6 +599,8 @@
+>  #define MSR_AMD64_SEV_ENABLED		BIT_ULL(MSR_AMD64_SEV_ENABLED_BIT)
+>  #define MSR_AMD64_SEV_ES_ENABLED	BIT_ULL(MSR_AMD64_SEV_ES_ENABLED_BIT)
+>  #define MSR_AMD64_SEV_SNP_ENABLED	BIT_ULL(MSR_AMD64_SEV_SNP_ENABLED_BIT)
+> +#define MSR_AMD64_RMP_BASE		0xc0010132
+> +#define MSR_AMD64_RMP_END		0xc0010133
+>  
+>  /* SNP feature bits enabled by the hypervisor */
+>  #define MSR_AMD64_SNP_VTOM			BIT_ULL(3)
+> @@ -709,7 +711,14 @@
+>  #define MSR_K8_TOP_MEM2			0xc001001d
+>  #define MSR_AMD64_SYSCFG		0xc0010010
+>  #define MSR_AMD64_SYSCFG_MEM_ENCRYPT_BIT	23
+> -#define MSR_AMD64_SYSCFG_MEM_ENCRYPT	BIT_ULL(MSR_AMD64_SYSCFG_MEM_ENCRYPT_BIT)
+> +#define MSR_AMD64_SYSCFG_MEM_ENCRYPT		BIT_ULL(MSR_AMD64_SYSCFG_MEM_ENCRYPT_BIT)
+> +#define MSR_AMD64_SYSCFG_SNP_EN_BIT		24
+> +#define MSR_AMD64_SYSCFG_SNP_EN		BIT_ULL(MSR_AMD64_SYSCFG_SNP_EN_BIT)
+> +#define MSR_AMD64_SYSCFG_SNP_VMPL_EN_BIT	25
+> +#define MSR_AMD64_SYSCFG_SNP_VMPL_EN		BIT_ULL(MSR_AMD64_SYSCFG_SNP_VMPL_EN_BIT)
+> +#define MSR_AMD64_SYSCFG_MFDM_BIT		19
+> +#define MSR_AMD64_SYSCFG_MFDM			BIT_ULL(MSR_AMD64_SYSCFG_MFDM_BIT)
+> +
+
+Fix the vertical alignment:
+
+diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
+index 15ce1269f270..f482bc6a5ae7 100644
+--- a/arch/x86/include/asm/msr-index.h
++++ b/arch/x86/include/asm/msr-index.h
+@@ -710,14 +710,14 @@
+ #define MSR_K8_TOP_MEM1			0xc001001a
+ #define MSR_K8_TOP_MEM2			0xc001001d
+ #define MSR_AMD64_SYSCFG		0xc0010010
+-#define MSR_AMD64_SYSCFG_MEM_ENCRYPT_BIT	23
+-#define MSR_AMD64_SYSCFG_MEM_ENCRYPT		BIT_ULL(MSR_AMD64_SYSCFG_MEM_ENCRYPT_BIT)
+-#define MSR_AMD64_SYSCFG_SNP_EN_BIT		24
++#define MSR_AMD64_SYSCFG_MEM_ENCRYPT_BIT 23
++#define MSR_AMD64_SYSCFG_MEM_ENCRYPT	BIT_ULL(MSR_AMD64_SYSCFG_MEM_ENCRYPT_BIT)
++#define MSR_AMD64_SYSCFG_SNP_EN_BIT	24
+ #define MSR_AMD64_SYSCFG_SNP_EN		BIT_ULL(MSR_AMD64_SYSCFG_SNP_EN_BIT)
+-#define MSR_AMD64_SYSCFG_SNP_VMPL_EN_BIT	25
+-#define MSR_AMD64_SYSCFG_SNP_VMPL_EN		BIT_ULL(MSR_AMD64_SYSCFG_SNP_VMPL_EN_BIT)
+-#define MSR_AMD64_SYSCFG_MFDM_BIT		19
+-#define MSR_AMD64_SYSCFG_MFDM			BIT_ULL(MSR_AMD64_SYSCFG_MFDM_BIT)
++#define MSR_AMD64_SYSCFG_SNP_VMPL_EN_BIT 25
++#define MSR_AMD64_SYSCFG_SNP_VMPL_EN	BIT_ULL(MSR_AMD64_SYSCFG_SNP_VMPL_EN_BIT)
++#define MSR_AMD64_SYSCFG_MFDM_BIT	19
++#define MSR_AMD64_SYSCFG_MFDM		BIT_ULL(MSR_AMD64_SYSCFG_MFDM_BIT)
+ 
+ #define MSR_K8_INT_PENDING_MSG		0xc0010055
+ /* C1E active bits in int pending message */
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
