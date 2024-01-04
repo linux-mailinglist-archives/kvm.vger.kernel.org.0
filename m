@@ -1,64 +1,64 @@
-Return-Path: <kvm+bounces-5642-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5643-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D48E824142
-	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 13:05:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42A4E82414E
+	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 13:10:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F18471F24B79
-	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 12:05:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9B361B22EA0
+	for <lists+kvm@lfdr.de>; Thu,  4 Jan 2024 12:10:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0976D21376;
-	Thu,  4 Jan 2024 12:05:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA76821376;
+	Thu,  4 Jan 2024 12:10:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="DqZPVY40"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="OMS+MlJD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5967B21364
-	for <kvm@vger.kernel.org>; Thu,  4 Jan 2024 12:05:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D27AC21352
+	for <kvm@vger.kernel.org>; Thu,  4 Jan 2024 12:10:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-6d9cdd0a5e6so240901b3a.3
-        for <kvm@vger.kernel.org>; Thu, 04 Jan 2024 04:05:32 -0800 (PST)
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1d3eae5c1d7so2631995ad.2
+        for <kvm@vger.kernel.org>; Thu, 04 Jan 2024 04:10:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1704369932; x=1704974732; darn=vger.kernel.org;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1704370243; x=1704975043; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=1JfSYgvG+gN3IuIgW3mKT13qe2Rfz3AaTGl7a0v25sQ=;
-        b=DqZPVY40CvFXGSVW8W+FqAFMsAI65RLlmdTD1JGXg0LLmnf7Eb/qYOBdd8P5uglRBw
-         Of6A2ZaEkTGBqGr5PW1gFCm+sFlfXY7mI7mDP1JEThnlaEyNU0N7DzCQJLFAqdvpdhkK
-         8GcO0QcltUzEfsiMVZVnYZxH62MRZpODICqtTZmJykK+ZqRaVaGS9MUisfySi5byA0Hq
-         KUNrS1eE3MBvs+QjzSAjVf+HLXPOa3LciCDc1b2XZtGTDvY74Xir04Cq3pkC+pFGwkJd
-         yJ5xhk5EPZRNvdhu24Q0N1LQRx/PSSCNRAdcC2Ki6LVPqo/m1DQHB/q+1vwk5MMyi3F7
-         ZkMA==
+        bh=Q23i9yT7yrVEFxnf3fk5D4MyK0KHTuKJKDM3rop1kno=;
+        b=OMS+MlJD7oTp11SRA0ChYf8ILqLyu/T2TOFFtV1qcj6FQnRUWUgiU2osG+ZggmLOOt
+         flZcIGaESGBuN2TSI9V5QrEqUQWlHXfdAg7wW0tiBGCwMIFYB1lAXGePkrfSdbBAeVjm
+         H2N7I/3eLJNyZeVZQ/n4Ayt7IiFtVE8Pjn3BxjUS7jH5BeAMhLoAgoJhedhNQpGCGLbs
+         VQU+79tzS/L3rHzEA0m6HAcRE8kjOLjeVZCO4C6wyunoZm3NhBW2DO251QcUAQJQLUpF
+         eLt2RcTpND7MfigiikNbmabCUkKSwm2U+gghg3Il98PJ6bT4x2pkNbz6o3OmqhoaEZTp
+         lslg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704369932; x=1704974732;
+        d=1e100.net; s=20230601; t=1704370243; x=1704975043;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1JfSYgvG+gN3IuIgW3mKT13qe2Rfz3AaTGl7a0v25sQ=;
-        b=nhBzEd0sIMM3BuoxB/V5NFyeJyFLS3rhOoFOZHeNf1ZoKLYv+G3b6lTFug5mvq80jb
-         zV7uI0KWGil9zVPhXcmR9vfagqQOiLE+rPNM734KAND9wLxzVQixv4YW01XpxqOCbQB0
-         fIlpire96cAflzh1WMwJD9cFgAhe3NxSh7pbDrCKVYCJ/g4FFTwsokOpXHaESElGYTWo
-         ia+5WfE9MuvrnpPNlK7SApGzQKb4Z/dk0VZewLGj3mFHqjbYKgL55jipYnc4gH9ZFIeK
-         LvT6dR/8ka+N0Cd7a6iECSSJjpoWP7ubk3IFEO/qvWyw5VEkG1ZuKn0CtFYPu2c8bvyv
-         gPLw==
-X-Gm-Message-State: AOJu0YzJANv17CsEgj2aHVM9bEzHKZ1ZTbS3PKb3SBBEvArIp7OqKQTr
-	KY0ZuFyrTO29KyCml/jWRVnRbIa7kIOEQQ==
-X-Google-Smtp-Source: AGHT+IF2iS1huYrRTsdmtHUlZNPJuYf+UOYa/O57oEjcrmBp+rJUuvidSwvdw5+1d7IxIqlfD1OWKQ==
-X-Received: by 2002:a05:6a20:430d:b0:198:f146:b2da with SMTP id h13-20020a056a20430d00b00198f146b2damr405894pzk.93.1704369932451;
-        Thu, 04 Jan 2024 04:05:32 -0800 (PST)
+        bh=Q23i9yT7yrVEFxnf3fk5D4MyK0KHTuKJKDM3rop1kno=;
+        b=pc1WJXfVAXoShEZkrAXHYKYMhQhcsLTe674hEIiV0vVvgZPY0d2cV4SMALkT3qIwni
+         sqlqSqxhh+lEVxx8a/KgCSfD+nmjhM91526uxTEColkxQxdvNJZAfbOkZV9ehhXYzfKC
+         2Qx9aeArrYXAYGSMpdbfSlMJmro/SfWK8zh+idN1wtwBjbKUTDbT1duLaoEflmgO4bs/
+         fqOksLNqnvDgsyZu4df9fwRUXvrsDUW97pLQD+D6fTV1vANqjsFDStzgkhMBtnoK0P92
+         FppebGSYsCjaeUbQfGGe1OUSXFOdjiqKF1862Ej69q6wDN9m6xhKSocj0dpksE843byl
+         dPvA==
+X-Gm-Message-State: AOJu0YwUdnvkQe1IL6Vjrhf+4G3yB2uUHuxH9pQxup/ZdDxoYkk0Cxmh
+	qMPrxNW4yehzqMPNUW+tWV4d31dw3D1R0A==
+X-Google-Smtp-Source: AGHT+IEvVniyWW6+pm7fNDiUCukxNFVRQmngQJsY2M7PnvRddXZwN4RLgEaC/QIRqiAw2JDtmofBpQ==
+X-Received: by 2002:a17:903:1d1:b0:1d4:2b5a:9cb7 with SMTP id e17-20020a17090301d100b001d42b5a9cb7mr365235plh.47.1704370243101;
+        Thu, 04 Jan 2024 04:10:43 -0800 (PST)
 Received: from ?IPV6:2400:4050:a840:1e00:9ac7:6d57:2b16:6932? ([2400:4050:a840:1e00:9ac7:6d57:2b16:6932])
-        by smtp.gmail.com with ESMTPSA id c1-20020a63a441000000b005ce472f2d0fsm12383424pgp.66.2024.01.04.04.05.23
+        by smtp.gmail.com with ESMTPSA id x22-20020a170902821600b001cfc1b931a9sm25324308pln.249.2024.01.04.04.10.28
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Jan 2024 04:05:32 -0800 (PST)
-Message-ID: <52cac44e-a467-4748-8c5b-c9c47f5b0f79@daynix.com>
-Date: Thu, 4 Jan 2024 21:05:22 +0900
+        Thu, 04 Jan 2024 04:10:42 -0800 (PST)
+Message-ID: <480302ec-4fb2-4e97-8940-8ec27846efc5@daynix.com>
+Date: Thu, 4 Jan 2024 21:10:26 +0900
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -66,117 +66,86 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 38/43] plugins: add an API to read registers
+Subject: Re: [PATCH v3 0/5] Make Big QEMU Lock naming consistent
 Content-Language: en-US
-To: =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, qemu-ppc@nongnu.org,
- Richard Henderson <richard.henderson@linaro.org>,
- Song Gao <gaosong@loongson.cn>,
- =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
- David Hildenbrand <david@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
- Yoshinori Sato <ysato@users.sourceforge.jp>,
- Yanan Wang <wangyanan55@huawei.com>, Bin Meng <bin.meng@windriver.com>,
- Laurent Vivier <lvivier@redhat.com>, Michael Rolnik <mrolnik@gmail.com>,
- Alexandre Iooss <erdnaxe@crans.org>, David Woodhouse <dwmw2@infradead.org>,
- Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>,
- Brian Cain <bcain@quicinc.com>,
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Hanna Reitz <hreitz@redhat.com>, qemu-riscv@nongnu.org,
+ Roman Bolshakov <rbolshakov@ddn.com>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?=
+ <clg@kaod.org>, Elena Ufimtseva <elena.ufimtseva@oracle.com>,
+ Eduardo Habkost <eduardo@habkost.net>, Thomas Huth <thuth@redhat.com>,
+ qemu-block@nongnu.org, Andrey Smirnov <andrew.smirnov@gmail.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Huacai Chen
+ <chenhuacai@kernel.org>, Fam Zheng <fam@euphon.net>,
+ Gerd Hoffmann <kraxel@redhat.com>, David Gibson
+ <david@gibson.dropbear.id.au>, John Snow <jsnow@redhat.com>,
+ Stafford Horne <shorne@gmail.com>, Weiwei Li <liwei1518@gmail.com>,
+ Jean-Christophe Dubois <jcd@tribudubois.net>,
+ Cameron Esfahani <dirty@apple.com>, Alexander Graf <agraf@csgraf.de>,
+ David Hildenbrand <david@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ Nicholas Piggin <npiggin@gmail.com>, Max Filippov <jcmvbkbc@gmail.com>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
  Daniel Henrique Barboza <danielhb413@gmail.com>,
- Beraldo Leal <bleal@redhat.com>, Paul Durrant <paul@xen.org>,
- Mahmoud Mandour <ma.mandourr@gmail.com>, Thomas Huth <thuth@redhat.com>,
- Liu Zhiwei <zhiwei_liu@linux.alibaba.com>, Cleber Rosa <crosa@redhat.com>,
- kvm@vger.kernel.org, Peter Maydell <peter.maydell@linaro.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-arm@nongnu.org,
- Weiwei Li <liwei1518@gmail.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
- <philmd@linaro.org>, John Snow <jsnow@redhat.com>,
- Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
- Nicholas Piggin <npiggin@gmail.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Ilya Leoshkevich <iii@linux.ibm.com>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?=
- <clg@kaod.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Eduardo Habkost <eduardo@habkost.net>,
- Pierrick Bouvier <pierrick.bouvier@linaro.org>, qemu-riscv@nongnu.org,
- Alistair Francis <alistair.francis@wdc.com>
-References: <20240103173349.398526-1-alex.bennee@linaro.org>
- <20240103173349.398526-39-alex.bennee@linaro.org>
+ Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@yandex-team.ru>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-s390x@nongnu.org,
+ Jiri Slaby <jslaby@suse.cz>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
+ Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Alex_Benn=C3=A9e?=
+ <alex.bennee@linaro.org>, Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ Sunil Muthuswamy <sunilmut@microsoft.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Fabiano Rosas <farosas@suse.de>, Michael Roth <michael.roth@amd.com>,
+ Paul Durrant <paul@xen.org>, Jagannathan Raman <jag.raman@oracle.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ Hyman Huang <yong.huang@smartx.com>,
+ =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
+ xen-devel@lists.xenproject.org, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Song Gao <gaosong@loongson.cn>, Kevin Wolf <kwolf@redhat.com>,
+ Ilya Leoshkevich <iii@linux.ibm.com>, Artyom Tarasenko
+ <atar4qemu@gmail.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ Reinoud Zandijk <reinoud@netbsd.org>, qemu-ppc@nongnu.org,
+ Marcelo Tosatti <mtosatti@redhat.com>, David Woodhouse
+ <dwmw2@infradead.org>, Aurelien Jarno <aurelien@aurel32.net>,
+ Bin Meng <bin.meng@windriver.com>, qemu-arm@nongnu.org,
+ Anthony Perard <anthony.perard@citrix.com>,
+ Leonardo Bras <leobras@redhat.com>,
+ Hailiang Zhang <zhanghailiang@xfusion.com>,
+ Harsh Prateek Bora <harshpb@linux.ibm.com>, kvm@vger.kernel.org,
+ Palmer Dabbelt <palmer@dabbelt.com>, Eric Farman <farman@linux.ibm.com>,
+ BALATON Zoltan <balaton@eik.bme.hu>,
+ Liu Zhiwei <zhiwei_liu@linux.alibaba.com>
+References: <20240102153529.486531-1-stefanha@redhat.com>
 From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <20240103173349.398526-39-alex.bennee@linaro.org>
+In-Reply-To: <20240102153529.486531-1-stefanha@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 2024/01/04 2:33, Alex Bennée wrote:
-> We can only request a list of registers once the vCPU has been
-> initialised so the user needs to use either call the get function on
-> vCPU initialisation or during the translation phase.
+On 2024/01/03 0:35, Stefan Hajnoczi wrote:
+> v3:
+> - Rebase
+> - Define bql_lock() macro on a single line [Akihiko Odaki]
+> v2:
+> - Rename APIs bql_*() [PeterX]
+> - Spell out "Big QEMU Lock (BQL)" in doc comments [PeterX]
+> - Rename "iolock" variables in hw/remote/mpqemu-link.c [Harsh]
+> - Fix bql_auto_lock() indentation in Patch 2 [Ilya]
+> - "with BQL taken" -> "with the BQL taken" [Philippe]
+> - "under BQL" -> "under the BQL" [Philippe]
 > 
-> We don't expose the reg number to the plugin instead hiding it behind
-> an opaque handle. This allows for a bit of future proofing should the
-> internals need to be changed while also being hashed against the
-> CPUClass so we can handle different register sets per-vCPU in
-> hetrogenous situations.
+> The Big QEMU Lock ("BQL") has two other names: "iothread lock" and "QEMU global
+> mutex". The term "iothread lock" is easily confused with the unrelated --object
+> iothread (iothread.c).
 > 
-> Having an internal state within the plugins also allows us to expand
-> the interface in future (for example providing callbacks on register
-> change if the translator can track changes).
-> 
-> Resolves: https://gitlab.com/qemu-project/qemu/-/issues/1706
-> Cc: Akihiko Odaki <akihiko.odaki@daynix.com>
-> Based-on: <20231025093128.33116-18-akihiko.odaki@daynix.com>
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> 
-> ---
-> v3
->    - also g_intern_string the register name
->    - make get_registers documentation a bit less verbose
-> v2
->    - use new get whole list api, and expose upwards
-> 
-> vAJB:
-> 
-> The main difference to Akikio's version is hiding the gdb register
-> detail from the plugin for the reasons described above.
-> ---
->   include/qemu/qemu-plugin.h   |  51 +++++++++++++++++-
->   plugins/api.c                | 102 +++++++++++++++++++++++++++++++++++
->   plugins/qemu-plugins.symbols |   2 +
->   3 files changed, 153 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/qemu/qemu-plugin.h b/include/qemu/qemu-plugin.h
-> index 4daab6efd29..95380895f81 100644
-> --- a/include/qemu/qemu-plugin.h
-> +++ b/include/qemu/qemu-plugin.h
-> @@ -11,6 +11,7 @@
->   #ifndef QEMU_QEMU_PLUGIN_H
->   #define QEMU_QEMU_PLUGIN_H
->   
-> +#include <glib.h>
->   #include <inttypes.h>
->   #include <stdbool.h>
->   #include <stddef.h>
-> @@ -227,8 +228,8 @@ struct qemu_plugin_insn;
->    * @QEMU_PLUGIN_CB_R_REGS: callback reads the CPU's regs
->    * @QEMU_PLUGIN_CB_RW_REGS: callback reads and writes the CPU's regs
->    *
-> - * Note: currently unused, plugins cannot read or change system
-> - * register state.
-> + * Note: currently QEMU_PLUGIN_CB_RW_REGS is unused, plugins cannot change
-> + * system register state.
->    */
->   enum qemu_plugin_cb_flags {
->       QEMU_PLUGIN_CB_NO_REGS,
-> @@ -708,4 +709,50 @@ uint64_t qemu_plugin_end_code(void);
->   QEMU_PLUGIN_API
->   uint64_t qemu_plugin_entry_code(void);
->   
-> +/** struct qemu_plugin_register - Opaque handle for register access */
-> +struct qemu_plugin_register;
+> This series updates the code and documentation to consistently use "BQL". This
+> makes the code easier to understand.
 
-Just in case you missed my comment for the earlier version:
+For the whole series,
+Reviewed-by: Akihiko Odaki <akihiko.odaki@daynix.com>
 
-What about identifying a register with an index in an array returned
-by qemu_plugin_get_registers(). That saves troubles having the handle
-member in qemu_plugin_reg_descriptor.
-
-Regards,
-Akihiko Odaki
+Thank you for sorting this out.
 
