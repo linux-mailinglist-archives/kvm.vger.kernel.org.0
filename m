@@ -1,88 +1,62 @@
-Return-Path: <kvm+bounces-5724-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5725-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACE6A82570E
-	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 16:48:59 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFB3582574C
+	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 16:56:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BB0911C231F4
-	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 15:48:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 55D31B233B0
+	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 15:56:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 882EA2E82F;
-	Fri,  5 Jan 2024 15:48:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XhU4Gg2P"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A72FC2E831;
+	Fri,  5 Jan 2024 15:56:20 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 958D32E64B;
-	Fri,  5 Jan 2024 15:48:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-28be024282bso1245762a91.3;
-        Fri, 05 Jan 2024 07:48:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704469722; x=1705074522; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=oHjuD7i+UA3Qw3m7etGOaevmlRCqaIA5WQMiwQTIlE8=;
-        b=XhU4Gg2PcmI7njWY5cFISo4UwEBpJMRQ0RsEl5xZipS4Te9VNzBI//n8OnUHFxdcj4
-         aap0nncn6bQYrgoMv8bCTAAiKUgRYOlGvReAoL2GIzBP3wHFiAEJU6qhP4A9p2zr1bkD
-         LtvHV2FeTmX+XMwypxncDQ6qXnR1cfommRLTgx4XcgDnFyX9ZUYBY2nTCjptAvXOQhGu
-         lNszmqNvqvgGsDVwWYZrFd0JZ5ikY+ny/0KcrBqdHnMjZhIKDp6HxugfdrgANAqmPCLp
-         y6VoaFLM6lZ78KetCW1uJrVRDHDIPvkFKiBKQnfGkzzaFD8C3cvea3naiidp8otiHkDa
-         JCRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704469722; x=1705074522;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=oHjuD7i+UA3Qw3m7etGOaevmlRCqaIA5WQMiwQTIlE8=;
-        b=ejEAG5MDjgP17fMHaeF2yxdkn6IFDJpps/oRRDOXs+PM/+WyqUK/XRfhdH5IaRr7D5
-         cDg4u1bGARBBHWtRnG3iwAQGUnetOsJwaOYl/6uiFwcUyR/HbiLCxlANdGbZKxj4w+pu
-         dLOVK0EU0D/W+fyAUk367yRL2UU4GXxFyo8RQJnijCh05Q0Bt8qS1NCYIwcQL0gUeB7T
-         8LsdyFejb7uoL6/6ixR6SrqX9DIVGsFsAgg1qPso52jcX4S4t/0Jtd7ZAXG4u2jn2+mP
-         V9HYtLkN/wZmr+B4z71U43gZk+Z9CWzIv5aFGnEEPFtJ52pDelsOmuMNOm3NS2c5fs6f
-         QcNw==
-X-Gm-Message-State: AOJu0YwuRfM2SQiyUzSMB27ku6mSrGkcy4urld7+yNcwmDexgKdXfJjG
-	D8zVcDcfKKGXEljCliiR1Ac=
-X-Google-Smtp-Source: AGHT+IG4JLyKQE+gM4c27FKh73op2FHqLSCwte9ikVSJ5ZEE7F/zmt6FTbncQktxxFKJuFQG75IOqA==
-X-Received: by 2002:a17:90a:5512:b0:28c:ef1a:db1a with SMTP id b18-20020a17090a551200b0028cef1adb1amr1858002pji.35.1704469721772;
-        Fri, 05 Jan 2024 07:48:41 -0800 (PST)
-Received: from ?IPv6:2605:59c8:448:b800:82ee:73ff:fe41:9a02? ([2605:59c8:448:b800:82ee:73ff:fe41:9a02])
-        by smtp.googlemail.com with ESMTPSA id gj9-20020a17090b108900b0028be4f51d2dsm1420897pjb.5.2024.01.05.07.48.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Jan 2024 07:48:41 -0800 (PST)
-Message-ID: <ec7f36ffdb2a76fe5cac7272da07242b3a6296f4.camel@gmail.com>
-Subject: Re: [PATCH net-next 5/6] net: introduce page_frag_cache_drain()
-From: Alexander H Duyck <alexander.duyck@gmail.com>
-To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
- kuba@kernel.org,  pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Jason Wang
- <jasowang@redhat.com>, Jeroen de Borst <jeroendb@google.com>, Praveen
- Kaligineedi <pkaligineedi@google.com>, Shailend Chand
- <shailend@google.com>, Eric Dumazet <edumazet@google.com>, Felix Fietkau
- <nbd@nbd.name>, John Crispin <john@phrozen.org>, Sean Wang
- <sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo
- Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Keith
- Busch <kbusch@kernel.org>,  Jens Axboe <axboe@kernel.dk>, Christoph Hellwig
- <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,  Chaitanya Kulkarni
- <kch@nvidia.com>, "Michael S. Tsirkin" <mst@redhat.com>, Andrew Morton
- <akpm@linux-foundation.org>, linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, linux-nvme@lists.infradead.org, 
- kvm@vger.kernel.org, virtualization@lists.linux.dev, linux-mm@kvack.org
-Date: Fri, 05 Jan 2024 07:48:39 -0800
-In-Reply-To: <20240103095650.25769-6-linyunsheng@huawei.com>
-References: <20240103095650.25769-1-linyunsheng@huawei.com>
-	 <20240103095650.25769-6-linyunsheng@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7DA62E824;
+	Fri,  5 Jan 2024 15:56:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4T67Lr1f5hz1Q6cn;
+	Fri,  5 Jan 2024 23:54:44 +0800 (CST)
+Received: from dggems704-chm.china.huawei.com (unknown [10.3.19.181])
+	by mail.maildlp.com (Postfix) with ESMTPS id 560911800C6;
+	Fri,  5 Jan 2024 23:56:12 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
+ dggems704-chm.china.huawei.com (10.3.19.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 5 Jan 2024 23:56:11 +0800
+Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
+ lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.035;
+ Fri, 5 Jan 2024 15:56:09 +0000
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To: Jason Gunthorpe <jgg@nvidia.com>, "alex.williamson@redhat.com"
+	<alex.williamson@redhat.com>
+CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"yishaih@nvidia.com" <yishaih@nvidia.com>, "kevin.tian@intel.com"
+	<kevin.tian@intel.com>, Linuxarm <linuxarm@huawei.com>, liulongfang
+	<liulongfang@huawei.com>
+Subject: RE: [PATCH] hisi_acc_vfio_pci: Update migration data pointer
+ correctly on saving/resume
+Thread-Topic: [PATCH] hisi_acc_vfio_pci: Update migration data pointer
+ correctly on saving/resume
+Thread-Index: AQHaG5IKSxqx627vikqShB0juPG9VbCDRMsAgEhisBA=
+Date: Fri, 5 Jan 2024 15:56:09 +0000
+Message-ID: <12f92affadf34f048a2eb2e7e9ecd879@huawei.com>
+References: <20231120091406.780-1-shameerali.kolothum.thodi@huawei.com>
+ <20231120142928.GC6083@nvidia.com>
+In-Reply-To: <20231120142928.GC6083@nvidia.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,16 +64,49 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-On Wed, 2024-01-03 at 17:56 +0800, Yunsheng Lin wrote:
-> When draining a page_frag_cache, most user are doing
-> the similar steps, so introduce an API to avoid code
-> duplication.
+Hi Alex,
+
+Just a gentle ping on this.=20
+
+Thanks,
+Shameer
+
+> -----Original Message-----
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Monday, November 20, 2023 2:29 PM
+> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
+> alex.williamson@redhat.com; yishaih@nvidia.com; kevin.tian@intel.com;
+> Linuxarm <linuxarm@huawei.com>; liulongfang <liulongfang@huawei.com>
+> Subject: Re: [PATCH] hisi_acc_vfio_pci: Update migration data pointer cor=
+rectly
+> on saving/resume
 >=20
-> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-> Acked-by: Jason Wang <jasowang@redhat.com>
-
-Looks good to me.
-
-Reviewed-by: Alexander Duyck <alexanderduyck@fb.com>
-
+> On Mon, Nov 20, 2023 at 09:14:06AM +0000, Shameer Kolothum wrote:
+> > When the optional PRE_COPY support was added to speed up the device
+> > compatibility check, it failed to update the saving/resuming data
+> > pointers based on the fd offset. This results in migration data
+> > corruption and when the device gets started on the destination the
+> > following error is reported in some cases,
+> >
+> > [  478.907684] arm-smmu-v3 arm-smmu-v3.2.auto: event 0x10 received:
+> > [  478.913691] arm-smmu-v3 arm-smmu-v3.2.auto:  0x0000310200000010 [
+> > 478.919603] arm-smmu-v3 arm-smmu-v3.2.auto:  0x000002088000007f [
+> > 478.925515] arm-smmu-v3 arm-smmu-v3.2.auto:  0x0000000000000000 [
+> > 478.931425] arm-smmu-v3 arm-smmu-v3.2.auto:  0x0000000000000000 [
+> > 478.947552] hisi_zip 0000:31:00.0: qm_axi_rresp [error status=3D0x1]
+> > found [  478.955930] hisi_zip 0000:31:00.0: qm_db_timeout [error
+> > status=3D0x400] found [  478.955944] hisi_zip 0000:31:00.0: qm sq
+> > doorbell timeout in function 2
+> >
+> > Fixes: d9a871e4a143 ("hisi_acc_vfio_pci: Introduce support for
+> > PRE_COPY state transitions")
+> > Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> > ---
+> >  drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c | 7 +++++--
+> >  1 file changed, 5 insertions(+), 2 deletions(-)
+>=20
+> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+>=20
+> Jason
 
