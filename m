@@ -1,142 +1,93 @@
-Return-Path: <kvm+bounces-5732-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5733-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BFF382582B
-	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 17:30:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 854318258F8
+	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 18:22:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B9D11C23338
-	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 16:30:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F7F0285564
+	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 17:22:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D571032189;
-	Fri,  5 Jan 2024 16:30:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F43C328A7;
+	Fri,  5 Jan 2024 17:21:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ava7DPZ5"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="Ypf8SLvC"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3CFF31725
-	for <kvm@vger.kernel.org>; Fri,  5 Jan 2024 16:30:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704472242;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uZRYev09Q9Q6d9PQHNA+O3Tjdc3b7n9JilQT9ObeK4Q=;
-	b=Ava7DPZ556Kx1cndVgnc+Wmywc7ckr8sFPNJWA/EXBP29rN45z6xGqQCVSsafseDFPRdhk
-	lIQLca+p0oxMYyTDBEekwin3DrMm9GS40rpYk75YPZN2DnSumt1TCYzw7oREtjSYZHlIHf
-	xmV8SN7/hLUogo+2L313lETuEFkcDSU=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-482-Y_21FxepOsWxQvZ15fbgTA-1; Fri, 05 Jan 2024 11:30:39 -0500
-X-MC-Unique: Y_21FxepOsWxQvZ15fbgTA-1
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7b7fdde8b2dso156689739f.3
-        for <kvm@vger.kernel.org>; Fri, 05 Jan 2024 08:30:39 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71040328B4
+	for <kvm@vger.kernel.org>; Fri,  5 Jan 2024 17:21:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-50e67e37661so2191305e87.0
+        for <kvm@vger.kernel.org>; Fri, 05 Jan 2024 09:21:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1704475306; x=1705080106; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=fgUg6yXSGJVGxpWb0GfnpK9ZphsLr10eK/u4ICIM5n8=;
+        b=Ypf8SLvCV1/RY4qsfVKEK2z/GgWcaw4sHot2NqpfFIViPswT52QgXTgOeN+jQaScGS
+         qnINIAjB/t8fVXH9npuSfT3zBwmeA59igznbxJMm5/BMYjnzycCP82HgnM6OqMtDu5on
+         KA9Rdt4UJWFvsjPN2sAlO8uFovmcc1GBMuZXA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704472238; x=1705077038;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=uZRYev09Q9Q6d9PQHNA+O3Tjdc3b7n9JilQT9ObeK4Q=;
-        b=paEM5q1k7u/hREEC7cGnx4yBJdX9klhOKTSsJzzSmJgWrYHU3MFcKlj+CFzcZ/SfiF
-         IoDRj3rE2jq/Wsy2dgXcT58MU7+or9YQHPTqnSCRUyGux+O7KOSeHBn7OHZDByrv0jfL
-         nqkFsx/nFAUiul+/YD96+yb4j9Rykm4SRlUR2HN3PWBO5KWcDWFZv7okphRSwWK+BaBi
-         EO+iT2YtRXbmlcXLfcvaDN1WD4SVfHz1IOgwJJIKmP9HHr9/W0s3Pc8VSKiqWVdVlwAq
-         xX/ZNGsW3OCWIjwvkikrHoRa2MXKWDgZjg0ARBA9BlmEATkFdvqYVPyxb6FhKdoZB4pd
-         JbsQ==
-X-Gm-Message-State: AOJu0Yy0Zt/DkIJMmQDV2jYCtUiQmVW6LAfEQI9YZ3fewTOOxsknXOTS
-	suX49ApX326u89N0qKeNi8OgIgiJFji/VE557d+KUYIaHvX20jaDq2kdSfZ7CeHr2JRR9/CpDvf
-	Lo6GAmminSfYxtTnycCdN
-X-Received: by 2002:a5d:8341:0:b0:7ba:77f3:b7e2 with SMTP id q1-20020a5d8341000000b007ba77f3b7e2mr2539934ior.42.1704472238645;
-        Fri, 05 Jan 2024 08:30:38 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEMpGLWG2gX0Lk0rBvmpfAgzGpXntP7Dx3Aq4mH68sA0m5Is0FmZ/4ELY/VuuZqdTcP+WU1DQ==
-X-Received: by 2002:a5d:8341:0:b0:7ba:77f3:b7e2 with SMTP id q1-20020a5d8341000000b007ba77f3b7e2mr2539931ior.42.1704472238427;
-        Fri, 05 Jan 2024 08:30:38 -0800 (PST)
-Received: from redhat.com ([38.15.60.12])
-        by smtp.gmail.com with ESMTPSA id s15-20020a02ad0f000000b0046df0c7e8f4sm494942jan.87.2024.01.05.08.30.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Jan 2024 08:30:37 -0800 (PST)
-Date: Fri, 5 Jan 2024 09:30:35 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, "kvm@vger.kernel.org"
- <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "yishaih@nvidia.com" <yishaih@nvidia.com>,
- "kevin.tian@intel.com" <kevin.tian@intel.com>, Linuxarm
- <linuxarm@huawei.com>, liulongfang <liulongfang@huawei.com>
-Subject: Re: [PATCH] hisi_acc_vfio_pci: Update migration data pointer
- correctly on saving/resume
-Message-ID: <20240105093035.229f8d29.alex.williamson@redhat.com>
-In-Reply-To: <12f92affadf34f048a2eb2e7e9ecd879@huawei.com>
-References: <20231120091406.780-1-shameerali.kolothum.thodi@huawei.com>
-	<20231120142928.GC6083@nvidia.com>
-	<12f92affadf34f048a2eb2e7e9ecd879@huawei.com>
-Organization: Red Hat
+        d=1e100.net; s=20230601; t=1704475306; x=1705080106;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fgUg6yXSGJVGxpWb0GfnpK9ZphsLr10eK/u4ICIM5n8=;
+        b=PK8An4cB6u7k3tvpSk/5auutg66k7nAhNS9GmW572Kjr9b88y8uUxjMTplPGUybLSL
+         NLZNOTMDjUbiTNGVqmZoTHAp2wm6T1/UiejTPy7DG3JtNBlPBQ/8Rhs2W4xXNh+LqWkR
+         cT+fnB/RakhB5tKzTViJ4CgBnINvrYi+AfylMzUtr+YqIThcFRVd0QEkzAJRkNRbtwzp
+         8L5IG4sptdmbX48pUT22+ybSWq6ZY90C6Lo8V7EXai+739311y2gqVmk5PIqx+c2+Zu+
+         ojKDAsgh0vexMt9c/7vvsnAq1zmpc7Vu/kki0osnZkYd9b7TJ/KgFqgHEB63dxZvAGPL
+         XSEw==
+X-Gm-Message-State: AOJu0YxCpX6K0g8Evq2ozVnqf0fsFZLA0uebQWcUxY+Nr7UOWAR1D2iE
+	mrnRk1HstIe2JNQrBTPj4o7z7v/laMukzJcYXgp02NAmFwTDnP7y
+X-Google-Smtp-Source: AGHT+IGdNZXY25/ikIekiwHfFjcoAhxH7vEEItMrstOLdj74ox4xUMOnDBHTlg7ejNawcMRcCI2LdA==
+X-Received: by 2002:a05:6512:3b0f:b0:50e:7be1:f0e3 with SMTP id f15-20020a0565123b0f00b0050e7be1f0e3mr1688543lfv.83.1704475306329;
+        Fri, 05 Jan 2024 09:21:46 -0800 (PST)
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com. [209.85.218.54])
+        by smtp.gmail.com with ESMTPSA id z13-20020a17090655cd00b00a27d5e9b3ebsm1070091ejp.105.2024.01.05.09.21.45
+        for <kvm@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 05 Jan 2024 09:21:45 -0800 (PST)
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a275b3a1167so214956166b.3
+        for <kvm@vger.kernel.org>; Fri, 05 Jan 2024 09:21:45 -0800 (PST)
+X-Received: by 2002:a17:906:fcc1:b0:a28:c9f:858d with SMTP id
+ qx1-20020a170906fcc100b00a280c9f858dmr1422177ejb.136.1704475305154; Fri, 05
+ Jan 2024 09:21:45 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20240104154844.129586-1-pbonzini@redhat.com>
+In-Reply-To: <20240104154844.129586-1-pbonzini@redhat.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Fri, 5 Jan 2024 09:21:27 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wi-i=YdeKTXOLGwzL+DkP+JTQ=J-oH9fgi2AOSRwmnLXQ@mail.gmail.com>
+Message-ID: <CAHk-=wi-i=YdeKTXOLGwzL+DkP+JTQ=J-oH9fgi2AOSRwmnLXQ@mail.gmail.com>
+Subject: Re: [GIT PULL] Final KVM fix for Linux 6.7
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, peterz@infradead.org, 
+	paulmck@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 5 Jan 2024 15:56:09 +0000
-Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
+On Thu, 4 Jan 2024 at 07:48, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> * Fix Boolean logic in intel_guest_get_msrs
 
-> Hi Alex,
-> 
-> Just a gentle ping on this. 
+I think the intention of the original was to write this as
 
-Thanks for the ping, it seems to have slipped under my radar.  Applied
-to vfio next branch for v6.8.  Thanks,
+        .guest = intel_ctrl & ~(cpuc->intel_ctrl_host_mask | pebs_mask),
 
-Alex
+but your version certainly works too.
 
-> > -----Original Message-----
-> > From: Jason Gunthorpe <jgg@nvidia.com>
-> > Sent: Monday, November 20, 2023 2:29 PM
-> > To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> > Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
-> > alex.williamson@redhat.com; yishaih@nvidia.com; kevin.tian@intel.com;
-> > Linuxarm <linuxarm@huawei.com>; liulongfang <liulongfang@huawei.com>
-> > Subject: Re: [PATCH] hisi_acc_vfio_pci: Update migration data pointer correctly
-> > on saving/resume
-> > 
-> > On Mon, Nov 20, 2023 at 09:14:06AM +0000, Shameer Kolothum wrote:  
-> > > When the optional PRE_COPY support was added to speed up the device
-> > > compatibility check, it failed to update the saving/resuming data
-> > > pointers based on the fd offset. This results in migration data
-> > > corruption and when the device gets started on the destination the
-> > > following error is reported in some cases,
-> > >
-> > > [  478.907684] arm-smmu-v3 arm-smmu-v3.2.auto: event 0x10 received:
-> > > [  478.913691] arm-smmu-v3 arm-smmu-v3.2.auto:  0x0000310200000010 [
-> > > 478.919603] arm-smmu-v3 arm-smmu-v3.2.auto:  0x000002088000007f [
-> > > 478.925515] arm-smmu-v3 arm-smmu-v3.2.auto:  0x0000000000000000 [
-> > > 478.931425] arm-smmu-v3 arm-smmu-v3.2.auto:  0x0000000000000000 [
-> > > 478.947552] hisi_zip 0000:31:00.0: qm_axi_rresp [error status=0x1]
-> > > found [  478.955930] hisi_zip 0000:31:00.0: qm_db_timeout [error
-> > > status=0x400] found [  478.955944] hisi_zip 0000:31:00.0: qm sq
-> > > doorbell timeout in function 2
-> > >
-> > > Fixes: d9a871e4a143 ("hisi_acc_vfio_pci: Introduce support for
-> > > PRE_COPY state transitions")
-> > > Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> > > ---
-> > >  drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c | 7 +++++--
-> > >  1 file changed, 5 insertions(+), 2 deletions(-)  
-> > 
-> > Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-> > 
-> > Jason  
-> 
+Pulled.
 
+           Linus
 
