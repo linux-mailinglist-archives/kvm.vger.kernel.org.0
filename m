@@ -1,203 +1,350 @@
-Return-Path: <kvm+bounces-5737-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5738-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A53B6825973
-	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 18:53:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3744D825978
+	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 18:54:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 18C13B21261
-	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 17:53:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB4621F241ED
+	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 17:54:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52A593589D;
-	Fri,  5 Jan 2024 17:52:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 435A134546;
+	Fri,  5 Jan 2024 17:53:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fkW9U0kp"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="PVIJiCp4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85D523529C;
-	Fri,  5 Jan 2024 17:52:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1704477145; x=1736013145;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=qQ9qSkfe+NOAELUBosiiVzNtLZY6C4+fHUB1QK9Uvgc=;
-  b=fkW9U0kpQlXFtS9te2ZKRhixYMjhSsVOLk8sutLEDqZZANSUsQLhxgwb
-   jboB0XUV5ZIfk6UFCe0BjlvoP49IdHrhxKcTUP7QhsiM/0yII7VJVCCzM
-   s63v/Rn8rgyHAUMI+NFHpvqlMQI5D5KM0S+B3QHgwZVnQvVpBcNJXc4ho
-   nW1EEBX1Bcld0T7qCFLQH5kzawsSsRJk1TnP3OhlLTZIROluIcmX48e1D
-   8pu+x4PVHuc4KnzErtch6TEU4RI3/MUu2GCKoQnUBrQnYBo0+ZJjUxu3d
-   PlE3uDCDk+yFFtjYbcZcmIMlm5JZS7cOWJJJGhK4jEnQCBrt+YafBKfem
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10944"; a="463947062"
-X-IronPort-AV: E=Sophos;i="6.04,334,1695711600"; 
-   d="scan'208";a="463947062"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2024 09:52:24 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10944"; a="1112149834"
-X-IronPort-AV: E=Sophos;i="6.04,334,1695711600"; 
-   d="scan'208";a="1112149834"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmsmga005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Jan 2024 09:52:24 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 5 Jan 2024 09:52:23 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 5 Jan 2024 09:52:23 -0800
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Fri, 5 Jan 2024 09:52:23 -0800
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.168)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 5 Jan 2024 09:52:23 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=THer1HTygJQU2E5KFrk9djnjMy4d0N8WsrTseRA3ppqK0J1ICePc1tv8Bk3Tu/OXVnAzTaXdVvHgnZYsQcYfvkNfWiJbPu7u+Oyhf2eSrnU7jLbnHSjvszPjHDbkaAO/uF8CPafKf+mqWGKMvVwCl7IHCkIHdRCgoahI4+m4QmHOwv3Gj6SCiogto7j0FjfjkU1Tee83FNnOK4HEpZSIsbiCAXIJOmY+Xm7+n8rroDlfdtUBcdDLchfzfVaS7Wk/6lmq65fNU12lx7bPBD5ppjqEe+gw0zH/SQ+Ts5p7kykURoCl5aLv60D+mC1w85/5sG/uFlBgdrYsBWnuvFX7RA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qQ9qSkfe+NOAELUBosiiVzNtLZY6C4+fHUB1QK9Uvgc=;
- b=AMXZww6c0xTt5HgG+yR2m2Zk2QqtjzEkNA0qefaT1Pc9Z/mprNCbJWpEh01rPJjhmJXtJ4w566m3sgUjIBiynLzYA4b/7ZJsb7AwbihfLQ39a331QBmhnFZE7c6bUI6YXm7SvkdSOCgXGsK+A4DEuaohSwPD8Og8pM06WoxjHJaXWu3or5UUaLijhSWUZMrnwRzUAJsD+SRubh0uBvp0Q1hoEY4TZwzKBKenDRHTYJ04aJ5giXUd1/IEAQXEvYZzWpDjk2MdUZIXw+Cc5pY/2tQAKt6moXM1pP6SuGcenaKmwcYy9Dq1L9rjCCKXfHViSDed0E04iaGjGWE954Eb9A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com (2603:10b6:208:372::10)
- by IA0PR11MB7882.namprd11.prod.outlook.com (2603:10b6:208:40f::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.17; Fri, 5 Jan
- 2024 17:52:20 +0000
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::6dc:cee5:b26b:7d93]) by MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::6dc:cee5:b26b:7d93%4]) with mapi id 15.20.7159.015; Fri, 5 Jan 2024
- 17:52:20 +0000
-From: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-To: "Yang, Weijiang" <weijiang.yang@intel.com>, "seanjc@google.com"
-	<seanjc@google.com>
-CC: "Gao, Chao" <chao.gao@intel.com>, "Hansen, Dave" <dave.hansen@intel.com>,
-	"peterz@infradead.org" <peterz@infradead.org>, "john.allen@amd.com"
-	<john.allen@amd.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>
-Subject: Re: [PATCH v8 00/26] Enable CET Virtualization
-Thread-Topic: [PATCH v8 00/26] Enable CET Virtualization
-Thread-Index: AQHaM+ybd3H3II6aZU6KWHt3rvxkNLDIg7MAgADO/oCAAOpTAIAANboAgAADMYCAAAXLgIAAj3+AgABzaACAABlggA==
-Date: Fri, 5 Jan 2024 17:52:20 +0000
-Message-ID: <9abd8400d25835dd2a6fd41b0104e3c666ee8a13.camel@intel.com>
-References: <20231221140239.4349-1-weijiang.yang@intel.com>
-	 <93f118670137933980e9ed263d01afdb532010ed.camel@intel.com>
-	 <5f57ce03-9568-4739-b02d-e9fac6ed381a@intel.com>
-	 <6179ddcb25c683bd178e74e7e2455cee63ba74de.camel@intel.com>
-	 <ZZdLG5W5u19PsnTo@google.com>
-	 <a2344e2143ef2b9eca0d153c86091e58e596709d.camel@intel.com>
-	 <ZZdSSzCqvd-3sdBL@google.com>
-	 <8f070910-2b2e-425d-995e-dfa03a7695de@intel.com>
-	 <ZZgsipXoXTKyvCZT@google.com>
-In-Reply-To: <ZZgsipXoXTKyvCZT@google.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.44.4-0ubuntu2 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MN0PR11MB5963:EE_|IA0PR11MB7882:EE_
-x-ms-office365-filtering-correlation-id: eeecd45b-8b14-43f6-54a5-08dc0e1710bd
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: mImAT5kf6FsfBBezJ/c8fGhfnZo52MBNHGyms1IvNeBWin1Mu4wHJZm953JzHHb+mN2ePME9kAiJYNwjwDD6qxHgWLRncGs7rhyFLj3qKQlygIHUSZV5QxSs8X3HdcqZA0rCQC7Vkes31Rde8VUK+sKTvDnNSLsJdikROOugZoQrKqoaJHFd+S+suLJeWFKTVsY7Zotfw9P9adTgPLD6aDRPaqTSjhtO9H3S/HTJ/iyq3ZgUPyPhxdh+IG3tXD3Lv7IrCE5FqFGhBOQsPRKzf9IMpNbXdzh9t4jhUxS0/enEKtVFY33CXcwq/wXISbCaeKUX+KD6kjqWSCzxdn7+P19/1IrNlhUoX6a+KpqsweUTvxYiyHzBfcrffzWjvbODZmQzIfu4+YCRzsh4DkOpxSmKsG9ujIHcxEpKcc1kgVErgeRNKu9Th4fkVowkOkC6X1X6BqDK9dknwole4dXdOUU7KuGJ93VrCYPSq1DfCdndzqqL3bd0ANIedC7tI8SJMjzhPpAoXwSTLQibceo17K+OsMbvKwA2vCNIu8mfm6Lk2m9B9UZLeVzed9uwxai6vKO5PRlAFYYwYuDiUhXgTCUTs6nPqF4UPIBrHoDMZn95RiWFQIsd2r8VEbn5jz2q
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB5963.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(136003)(346002)(396003)(39860400002)(230922051799003)(1800799012)(451199024)(186009)(64100799003)(38070700009)(83380400001)(26005)(6506007)(6512007)(2616005)(122000001)(38100700002)(71200400001)(5660300002)(54906003)(8676002)(41300700001)(478600001)(2906002)(6486002)(316002)(110136005)(66556008)(4326008)(91956017)(8936002)(76116006)(66476007)(66446008)(64756008)(66946007)(86362001)(36756003)(82960400001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?T2prZ1Z6cFEzUTBVc2ZpVFhiL21BcFE2RkhYbGc2ckMvUlFMWVlCUCtJdldn?=
- =?utf-8?B?MjBOTUl0ZW1LTXBvNFl5Wmp0SVNGUDZjWkhzVlV3ZjVzZWlxbDFvRkpndjd2?=
- =?utf-8?B?bENrdXRqS3Badm4xRTd6UnNBT3gwSFhCTTJZTjZxc3JrSTBNZkdjMlVLendr?=
- =?utf-8?B?SHg3QWJxT2VzUVBHS2ErRWdEWWpGRENEMm5tRXc5SVBmZk45NUNkSWJ2Q2tN?=
- =?utf-8?B?bGovK1Q1Wm5tbjJoeDU4UDJOb1N5NVVxOVRQbnVIQzdrZENNUEFPTzB6dHI3?=
- =?utf-8?B?UlZrcUtDd29rZkNHRWd2T1hXTlpsUEZDT0g2SWk5NGpBeFRkZGd0R09LcXNB?=
- =?utf-8?B?RTdabXVqQVBjc1dQKzdveURZY0o1TFdBb0JkNFNkNERtUUkzeWNtdGVlTk1J?=
- =?utf-8?B?Z0NkZ3ZBczdScUIyWjBCSDNMUkFHQm81S0ZLaG9DL2hDOXJTZjNMVCtab2hx?=
- =?utf-8?B?VDNZSCtNQlZuU1ZaMnp4cC9wbE9rTjNkeGFhS1Z5V3l6azcyUXRMV2FmVWRt?=
- =?utf-8?B?UHFqdEZ4UTBtcVV5NUUwYlQzcllmVEhFVStkeWkxcDZMaXNOYXRmUUJ6dlFT?=
- =?utf-8?B?cVNnQytjSG5SZDNjQ1ppdENwaTRsV2FMV2FiWGt1UGdyT1pwSFRnRGpGVjRI?=
- =?utf-8?B?bzBvaHI1NkllSjVqRVMwRWhXNGl5cnREZ3hSZytGeGhFeDFtSEJyUW1mZi9T?=
- =?utf-8?B?Z2JtWTFheWg1UUpTQWh4Q1ZqSHovZDlPYSt3QVhtb2ZMYnF0QXdPalN3Z3lK?=
- =?utf-8?B?Q29qS1FQeWFxdjI5Qi9xbUVTWUFJY1lQZHJZSVBVeTRMVXJCQ0RyT2NJdGVo?=
- =?utf-8?B?VEpEY1d6d3dTSElvYmNVN3ZVYXRibUtUNExRdmtuTGhrYnhXZWpSMWp4UlQ3?=
- =?utf-8?B?N2gxV09nRkVSQnVKamZoTU8zYkFvOWRTU3lzd2M3b3M0NzJRR0UvazFRTkNa?=
- =?utf-8?B?enJZTXp6SWdGRzEyY2d0VElLZllYak5jMnBDSXhIVm50WGREejRHUSsrL3Ra?=
- =?utf-8?B?bFlsY20zZWVETUFjSXI0bStSZW5lTEFHS1NzZDF2bHN5SDNVeTU2QzUrbFR3?=
- =?utf-8?B?b0Q4VGpXK0N0ckl0L1k0YXNVS2kzdHNadnBCVkhQeUhLcXFaaDFsTEVoRHk2?=
- =?utf-8?B?SW4ybjRBdFpwcGFwMlZjRElRL1kxd20vU1FvNnVNakhYRnlwbFQwL211Z1dE?=
- =?utf-8?B?N2tmOTc0d0xFcWRucU9MenZ0eGU4aklxaGQ2ZFlhVFFXOTlYN1NaeHBWaWhy?=
- =?utf-8?B?b2t2L2pwbUxPNTcrbmdLbWRSVStYWEJsc1hOQllMLzRjNDlyVkFubVlXRmZr?=
- =?utf-8?B?ckxicDNWdHVtZEpVWm9KaWZFa1FWWjYyZUMxZ25TZzViZllHMEdTQjNVa2tE?=
- =?utf-8?B?NWZ1MTlqNlZraFdCbVFHYWtsS01zWENxNklkZXE1OTBuS0pqS3hQSXEyTCs3?=
- =?utf-8?B?RHpvOE9XejlpRkFaK3dMQ1VWeFFIcjQ0VmxCS2c0em9FcW1KRFJjWlM3aWpK?=
- =?utf-8?B?WUVJWGY1SmlQd0pKeU5HbDdmWU12T1h2U0lIdWFWcTlDa3h1YVJncmtTMVVY?=
- =?utf-8?B?ODRkMExSSlA3RFpyTkNOUkVkL1c1WktTR3QydW5vZ05mckxXOHdhU2h0dVJV?=
- =?utf-8?B?NWZEbUJyYjE5ZnlsZDhWWmk0SUlqd0pVNWY4aENWdlpiQndaVTVFNERIRFhm?=
- =?utf-8?B?UXdMUTUwcDBXQ0dIaGdZOEVRRlFHYnQydWRhNXRTZHAvdXhtQUh5R0ZwZkpi?=
- =?utf-8?B?TzFqb0Z6SXJYeU5WVjBVM0FqR1laOVRwOU1ocnRuVFBadzRLSng2ZHdyMkF4?=
- =?utf-8?B?bnZEeGdjdkc3N1Qyd1l1OGtyNlZPcmM4eW1vUWlaZHNnQ3NPNjJWbnBZa0Zk?=
- =?utf-8?B?UCt6RWpuUEp2QWZvT0VEWkprUmZkVVJ6d2dRZlo4WlZnQk5LZ0NjQS9qYWxE?=
- =?utf-8?B?MnpvRWhDMTR6bVo2NlZ6YzRJRjRlYkdvVi82U2xReVpOWHpmUjlnM1IwUHdC?=
- =?utf-8?B?TmpqSWZyVVFvOFBJSmVNNGErUkdlb3dxVEhlengyWkRxaG1ySTVsSGhRRGsr?=
- =?utf-8?B?U2hta09pVjd6aDJHbUpqM2dGK1BibEFiZUhSSFYzL3BZMnViQmJYdGZweTBL?=
- =?utf-8?B?a1phUkNrelBDTzd4QzE1N1ZHUTZKWTdSWjRtQnQyNE0ycG52UlZNaERvbnpo?=
- =?utf-8?B?anc9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <34177FD7D4CAD1489B5697779E1F6B33@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7697B2E85B
+	for <kvm@vger.kernel.org>; Fri,  5 Jan 2024 17:53:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-781be0ccd30so125191585a.1
+        for <kvm@vger.kernel.org>; Fri, 05 Jan 2024 09:53:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1704477221; x=1705082021; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=miRb0rXpWLb9jsTXLzk36Q4Oua5evPe+9mfQTaGdXj0=;
+        b=PVIJiCp4xSU42jvaKzNsEvgcjQ4ZpqrexRntLWYZtSPmH18zdnMaDtd2mgXKnT2JMm
+         vrOLgVXaUR46CGKuwKM107j+x6xG+zrVuVmi4gb+2WYblTzxpF5EYHR1cKoueB7z6l+B
+         2K9AayjS11r17Spl9/CYh4LvnAEckblA5AcF2ngUTRoqXO/Z0h1/yecX79KcdZmETfp0
+         xzVGBcTgSz13cEIeAvAhAgkL3SqD79MD4su0hC4pw/59KKbowIVJJcOg5GRnOQxbk0dZ
+         rU3XUyt56kNgGdAWW6h7BXHlsg1JhNPCrzB8z6rp4EKgAGMx63kTIJwCICsaVv8vbbop
+         cWFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704477221; x=1705082021;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=miRb0rXpWLb9jsTXLzk36Q4Oua5evPe+9mfQTaGdXj0=;
+        b=AjZvWSOLZX/F0rWoiRgHDR24mv2atSEjtLR9mP54Nvj0Bn66d0OdUKNqrYeIL54SHw
+         7F7TrF6b8o9VejuL9yFEym7Jqa8m6PjSW8g/67/UmutmLM4dFDs7Fc6biwpPta8pjOc0
+         14LHwLlELVsPdvRZ0xM+0vKl+upGqex1nG2itW9IKtWXEbV2wN827UQrt7ieBI5omGVT
+         un4dHvNrrUjLokt/qv7Ofk09ZEjCi1Pa/aZeGeK6qXUsVgFZJg2Clt8cEwk9KZA0nxWT
+         H5WE+ZuButPDydkvPuScC883q/zIZPL16Buc18sgzsFCNd74kQs6ck1KFEMGgZpY3mJX
+         a4Rg==
+X-Gm-Message-State: AOJu0YwP+uG/fm+Kh2yQVS5h3/a660+w53WZ4gs3RjZ3Jiuj40q5MxCW
+	pPz9FMjMQVXAO+b/Ec/M150rT49p5EZBJg==
+X-Google-Smtp-Source: AGHT+IGCN+T44qrgo6UkyBazOh1o48d2ZcobTN86dpi+/kaYtJEFnysKgJ7G5TwzHG1++RItZhDUPg==
+X-Received: by 2002:a05:620a:4798:b0:781:1411:9383 with SMTP id dt24-20020a05620a479800b0078114119383mr2669210qkb.94.1704477221299;
+        Fri, 05 Jan 2024 09:53:41 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
+        by smtp.gmail.com with ESMTPSA id c10-20020a37e10a000000b007815a43d297sm746129qkm.40.2024.01.05.09.53.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Jan 2024 09:53:40 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1rLoO3-001UdP-Ju;
+	Fri, 05 Jan 2024 13:53:39 -0400
+Date: Fri, 5 Jan 2024 13:53:39 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Lu Baolu <baolu.lu@linux.intel.com>
+Cc: Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	Nicolin Chen <nicolinc@nvidia.com>, Yi Liu <yi.l.liu@intel.com>,
+	Jacob Pan <jacob.jun.pan@linux.intel.com>,
+	Longfang Liu <liulongfang@huawei.com>,
+	Yan Zhao <yan.y.zhao@intel.com>, iommu@lists.linux.dev,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v9 14/14] iommu: Track iopf group instead of last fault
+Message-ID: <20240105175339.GI50608@ziepe.ca>
+References: <20231220012332.168188-1-baolu.lu@linux.intel.com>
+ <20231220012332.168188-15-baolu.lu@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB5963.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: eeecd45b-8b14-43f6-54a5-08dc0e1710bd
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Jan 2024 17:52:20.7441
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Hiaeew5doJocg4TVj+9QtfIbKi7m7rMXJQbb6DhBlTxG4rJWqWGCs3ZHJwVoHaXgiVRu2AWxcfruAdTop9luY39RvXtm0ZYGHgiE9PfJB/k=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB7882
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231220012332.168188-15-baolu.lu@linux.intel.com>
 
-T24gRnJpLCAyMDI0LTAxLTA1IGF0IDA4OjIxIC0wODAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
-b3RlOg0KPiBObywgZG8gbm90IGluamVjdCAjVUQgb3IgZG8gYW55dGhpbmcgZWxzZSB0aGF0IGRl
-dmlhdGVzIGZyb20NCj4gYXJjaGl0ZWN0dXJhbGx5DQo+IGRlZmluZWQgYmVoYXZpb3IuDQoNCkhl
-cmUgaXMgYSwgYXQgbGVhc3QgcGFydGlhbCwgbGlzdCBvZiBDRVQgdG91Y2ggcG9pbnRzIEkganVz
-dCBjcmVhdGVkIGJ5DQpzZWFyY2hpbmcgdGhlIFNETToNCjEuIFRoZSBlbXVsYXRvciBTVyBmZXRj
-aCB3aXRoIFRSQUNLRVI9MQ0KMi4gQ0FMTCwgUkVULCBKTVAsIElSRVQsIElOVCwgU1lTQ0FMTCwg
-U1lTRU5URVIsIFNZU0VYSVQsIFNZU1JFVA0KMy4gVGFzayBzd2l0Y2hpbmcNCjQuIFRoZSBuZXcg
-Q0VUIGluc3RydWN0aW9ucyAod2hpY2ggSSBndWVzcyBzaG91bGQgYmUgaGFuZGxlZCBieQ0KZGVm
-YXVsdCk6IENMUlNTQlNZLCBJTkNTU1BELCBSU1RPUlNTUCwgU0FWRVBSRVZTU1AsIFNFVFNTQlNZ
-WSwgV1JTUywNCldSVVNTDQoNCk5vdCBhbGwgb2YgdGhvc2UgYXJlIHNlY3VyaXR5IGNoZWNrcywg
-YnV0IHdvdWxkIGhhdmUgc29tZSBmdW5jdGlvbmFsDQppbXBsaWNhdGlvbnMuIEl0J3Mgc3RpbGwg
-bm90IGNsZWFyIHRvIG1lIGlmIHRoaXMgY291bGQgaGFwcGVuIG5hdHVyYWxseQ0KKHRoZSBURFAg
-c2hhZG93aW5nIHN0dWZmKSwgb3Igb25seSB2aWEgc3RyYW5nZSBhdHRhY2tlciBiZWhhdmlvci4g
-SWYgd2UNCm9ubHkgY2FyZSBhYm91dCB0aGUgYXR0YWNrZXIgY2FzZSwgdGhlbiB3ZSBjb3VsZCBo
-YXZlIGEgc21hbGxlciBsaXN0Lg0KDQpJdCBhbHNvIHNvdW5kcyBsaWtlIHRoZSBpbnN0cnVjdGlv
-bnMgaW4gMiBjb3VsZCBtYXliZSBiZSBmaWx0ZXJlZCBieQ0KbW9kZSBpbnN0ZWFkIG9mIGNhcmlu
-ZyBhYm91dCBDRVQgYmVpbmcgZW5hYmxlZC4gQnV0IG1heWJlIGl0J3Mgbm90IGdvb2QNCnRvIG1p
-eCB0aGUgQ0VUIHByb2JsZW0gd2l0aCB0aGUgYmlnZ2VyIGVtdWxhdG9yIGlzc3Vlcy4gRG9uJ3Qg
-a25vdy4NCg==
+On Wed, Dec 20, 2023 at 09:23:32AM +0800, Lu Baolu wrote:
+>  /**
+> - * iommu_handle_iopf - IO Page Fault handler
+> - * @fault: fault event
+> - * @iopf_param: the fault parameter of the device.
+> + * iommu_report_device_fault() - Report fault event to device driver
+> + * @dev: the device
+> + * @evt: fault event data
+>   *
+> - * Add a fault to the device workqueue, to be handled by mm.
+> + * Called by IOMMU drivers when a fault is detected, typically in a threaded IRQ
+> + * handler. When this function fails and the fault is recoverable, it is the
+> + * caller's responsibility to complete the fault.
+
+This patch seems OK for what it does so:
+
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+
+However, this seems like a strange design, surely this function should
+just call ops->page_response() when it can't enqueue the fault?
+
+It is much cleaner that way, so maybe you can take this into a
+following patch (along with the driver fixes to accomodate. (and
+perhaps iommu_report_device_fault() should return void too)
+
+Also iopf_group_response() should return void (another patch!),
+nothing can do anything with the failure. This implies that
+ops->page_response() must also return void - which is consistent with
+what the drivers do, the failure paths are all integrity validations
+of the fault and should be WARN_ON'd not return codes.
+
+diff --git a/drivers/iommu/io-pgfault.c b/drivers/iommu/io-pgfault.c
+index 7d11b74e4048e2..2715e24fd64234 100644
+--- a/drivers/iommu/io-pgfault.c
++++ b/drivers/iommu/io-pgfault.c
+@@ -39,7 +39,7 @@ static void iopf_put_dev_fault_param(struct iommu_fault_param *fault_param)
+ 		kfree_rcu(fault_param, rcu);
+ }
+ 
+-void iopf_free_group(struct iopf_group *group)
++static void __iopf_free_group(struct iopf_group *group)
+ {
+ 	struct iopf_fault *iopf, *next;
+ 
+@@ -50,6 +50,11 @@ void iopf_free_group(struct iopf_group *group)
+ 
+ 	/* Pair with iommu_report_device_fault(). */
+ 	iopf_put_dev_fault_param(group->fault_param);
++}
++
++void iopf_free_group(struct iopf_group *group)
++{
++	__iopf_free_group(group);
+ 	kfree(group);
+ }
+ EXPORT_SYMBOL_GPL(iopf_free_group);
+@@ -97,14 +102,49 @@ static int report_partial_fault(struct iommu_fault_param *fault_param,
+ 	return 0;
+ }
+ 
++static struct iopf_group *iopf_group_alloc(struct iommu_fault_param *iopf_param,
++					   struct iopf_fault *evt,
++					   struct iopf_group *abort_group)
++{
++	struct iopf_fault *iopf, *next;
++	struct iopf_group *group;
++
++	group = kzalloc(sizeof(*group), GFP_KERNEL);
++	if (!group) {
++		/*
++		 * We always need to construct the group as we need it to abort
++		 * the request at the driver if it cfan't be handled.
++		 */
++		group = abort_group;
++	}
++
++	group->fault_param = iopf_param;
++	group->last_fault.fault = evt->fault;
++	INIT_LIST_HEAD(&group->faults);
++	INIT_LIST_HEAD(&group->pending_node);
++	list_add(&group->last_fault.list, &group->faults);
++
++	/* See if we have partial faults for this group */
++	mutex_lock(&iopf_param->lock);
++	list_for_each_entry_safe(iopf, next, &iopf_param->partial, list) {
++		if (iopf->fault.prm.grpid == evt->fault.prm.grpid)
++			/* Insert *before* the last fault */
++			list_move(&iopf->list, &group->faults);
++	}
++	list_add(&group->pending_node, &iopf_param->faults);
++	mutex_unlock(&iopf_param->lock);
++
++	return group;
++}
++
+ /**
+  * iommu_report_device_fault() - Report fault event to device driver
+  * @dev: the device
+  * @evt: fault event data
+  *
+  * Called by IOMMU drivers when a fault is detected, typically in a threaded IRQ
+- * handler. When this function fails and the fault is recoverable, it is the
+- * caller's responsibility to complete the fault.
++ * handler. If this function fails then ops->page_response() was called to
++ * complete evt if required.
+  *
+  * This module doesn't handle PCI PASID Stop Marker; IOMMU drivers must discard
+  * them before reporting faults. A PASID Stop Marker (LRW = 0b100) doesn't
+@@ -143,22 +183,24 @@ int iommu_report_device_fault(struct device *dev, struct iopf_fault *evt)
+ {
+ 	struct iommu_fault *fault = &evt->fault;
+ 	struct iommu_fault_param *iopf_param;
+-	struct iopf_fault *iopf, *next;
+-	struct iommu_domain *domain;
++	struct iopf_group abort_group;
+ 	struct iopf_group *group;
+ 	int ret;
+ 
++/*
++  remove this too, it is pointless. The driver should only invoke this function on page_req faults.
+ 	if (fault->type != IOMMU_FAULT_PAGE_REQ)
+ 		return -EOPNOTSUPP;
++*/
+ 
+ 	iopf_param = iopf_get_dev_fault_param(dev);
+-	if (!iopf_param)
++	if (WARN_ON(!iopf_param))
+ 		return -ENODEV;
+ 
+ 	if (!(fault->prm.flags & IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE)) {
+ 		ret = report_partial_fault(iopf_param, fault);
+ 		iopf_put_dev_fault_param(iopf_param);
+-
++		/* A request that is not the last does not need to be ack'd */
+ 		return ret;
+ 	}
+ 
+@@ -170,56 +212,34 @@ int iommu_report_device_fault(struct device *dev, struct iopf_fault *evt)
+ 	 * will send a response to the hardware. We need to clean up before
+ 	 * leaving, otherwise partial faults will be stuck.
+ 	 */
+-	domain = get_domain_for_iopf(dev, fault);
+-	if (!domain) {
+-		ret = -EINVAL;
+-		goto cleanup_partial;
+-	}
+-
+-	group = kzalloc(sizeof(*group), GFP_KERNEL);
+-	if (!group) {
++	group = iopf_group_alloc(iopf_param, evt, &abort_group);
++	if (group == &abort_group) {
+ 		ret = -ENOMEM;
+-		goto cleanup_partial;
++		goto err_abort;
+ 	}
+ 
+-	group->fault_param = iopf_param;
+-	group->last_fault.fault = *fault;
+-	INIT_LIST_HEAD(&group->faults);
+-	INIT_LIST_HEAD(&group->pending_node);
+-	group->domain = domain;
+-	list_add(&group->last_fault.list, &group->faults);
+-
+-	/* See if we have partial faults for this group */
+-	mutex_lock(&iopf_param->lock);
+-	list_for_each_entry_safe(iopf, next, &iopf_param->partial, list) {
+-		if (iopf->fault.prm.grpid == fault->prm.grpid)
+-			/* Insert *before* the last fault */
+-			list_move(&iopf->list, &group->faults);
++	group->domain = get_domain_for_iopf(dev, fault);
++	if (!group->domain) {
++		ret = -EINVAL;
++		goto err_abort;
+ 	}
+-	list_add(&group->pending_node, &iopf_param->faults);
+-	mutex_unlock(&iopf_param->lock);
+ 
+-	ret = domain->iopf_handler(group);
+-	if (ret) {
+-		mutex_lock(&iopf_param->lock);
+-		list_del_init(&group->pending_node);
+-		mutex_unlock(&iopf_param->lock);
++	/*
++	 * On success iopf_handler must call iopf_group_response() and
++	 * iopf_free_group()
++	 */
++	ret = group->domain->iopf_handler(group);
++	if (ret)
++		goto err_abort;
++	return 0;
++
++err_abort:
++	iopf_group_response(group,
++			    IOMMU_PAGE_RESP_FAILURE); //?? right code?
++	if (group == &abort_group)
++		__iopf_free_group(group);
++	else
+ 		iopf_free_group(group);
+-	}
+-
+-	return ret;
+-
+-cleanup_partial:
+-	mutex_lock(&iopf_param->lock);
+-	list_for_each_entry_safe(iopf, next, &iopf_param->partial, list) {
+-		if (iopf->fault.prm.grpid == fault->prm.grpid) {
+-			list_del(&iopf->list);
+-			kfree(iopf);
+-		}
+-	}
+-	mutex_unlock(&iopf_param->lock);
+-	iopf_put_dev_fault_param(iopf_param);
+-
+ 	return ret;
+ }
+ EXPORT_SYMBOL_GPL(iommu_report_device_fault);
+@@ -262,7 +282,7 @@ EXPORT_SYMBOL_GPL(iopf_queue_flush_dev);
+  *
+  * Return 0 on success and <0 on error.
+  */
+-int iopf_group_response(struct iopf_group *group,
++void iopf_group_response(struct iopf_group *group,
+ 			enum iommu_page_response_code status)
+ {
+ 	struct iommu_fault_param *fault_param = group->fault_param;
+@@ -400,9 +420,9 @@ EXPORT_SYMBOL_GPL(iopf_queue_add_device);
+  */
+ void iopf_queue_remove_device(struct iopf_queue *queue, struct device *dev)
+ {
+-	struct iopf_fault *iopf, *next;
++	struct iopf_fault *partial_iopf;
++	struct iopf_fault *next;
+ 	struct iopf_group *group, *temp;
+-	struct iommu_page_response resp;
+ 	struct dev_iommu *param = dev->iommu;
+ 	struct iommu_fault_param *fault_param;
+ 	const struct iommu_ops *ops = dev_iommu_ops(dev);
+@@ -416,15 +436,16 @@ void iopf_queue_remove_device(struct iopf_queue *queue, struct device *dev)
+ 		goto unlock;
+ 
+ 	mutex_lock(&fault_param->lock);
+-	list_for_each_entry_safe(iopf, next, &fault_param->partial, list)
+-		kfree(iopf);
++	list_for_each_entry_safe(partial_iopf, next, &fault_param->partial, list)
++		kfree(partial_iopf);
+ 
+ 	list_for_each_entry_safe(group, temp, &fault_param->faults, pending_node) {
+-		memset(&resp, 0, sizeof(struct iommu_page_response));
+-		iopf = &group->last_fault;
+-		resp.pasid = iopf->fault.prm.pasid;
+-		resp.grpid = iopf->fault.prm.grpid;
+-		resp.code = IOMMU_PAGE_RESP_INVALID;
++		struct iopf_fault *iopf = &group->last_fault;
++		struct iommu_page_response resp = {
++			.pasid = iopf->fault.prm.pasid,
++			.grpid = iopf->fault.prm.grpid,
++			.code = IOMMU_PAGE_RESP_INVALID
++		};
+ 
+ 		if (iopf->fault.prm.flags & IOMMU_FAULT_PAGE_RESPONSE_NEEDS_PASID)
+ 			resp.flags = IOMMU_PAGE_RESP_PASID_VALID;
 
