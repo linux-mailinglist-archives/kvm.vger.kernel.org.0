@@ -1,348 +1,131 @@
-Return-Path: <kvm+bounces-5755-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5760-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9690825CA3
-	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 23:54:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59253825CFA
+	for <lists+kvm@lfdr.de>; Sat,  6 Jan 2024 00:05:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B2C741C215FF
-	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 22:54:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE7DF284C09
+	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 23:05:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF960360B5;
-	Fri,  5 Jan 2024 22:54:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CB75360B0;
+	Fri,  5 Jan 2024 23:05:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="gW8RtWGa"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dhghbr+s"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EA8936091;
-	Fri,  5 Jan 2024 22:54:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 405Mocsw016553;
-	Fri, 5 Jan 2024 22:54:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=4mD4K6/ZEfsYcFJZ3vk36ZAlJn9QyKmj6VZHAlPNFJY=;
- b=gW8RtWGazVcmAVr8O5OY1A44bpZ1uRsAicAXi4Gt5VmzXXhrtB98jdaCEzoJMpQAjpC/
- NE2S9xBYiQ1EzKxnwZVzrFwNenECUqCQJC7Ia+LCZ05WH02xdHKUuOeWx2nqGP1qMwng
- Nuroy8EAJVYfh/I/vtdAOPJJdbVbYmuBNRiECfTtQQNmNK9T8rjgsghoblh6ZZbq/6mO
- FLyzDKjoH1Arh0yGiLCeKau85FqzdA8YWKVxuQMMqmwAgUBSAHO8yVItKTLdsiOE2maw
- k0bszxW4JhqT4NzILrGcGmBdZ12lL81ATxYM4QnH4aVMQDvF0qKFMImTxCJF8gA+czHc wA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3veqgvmfsy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 05 Jan 2024 22:54:28 +0000
-Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 405MrItN022459;
-	Fri, 5 Jan 2024 22:54:27 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3veqgvmfsp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 05 Jan 2024 22:54:27 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 405KCZNp017991;
-	Fri, 5 Jan 2024 22:54:27 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3vayrm21hf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 05 Jan 2024 22:54:27 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 405MsOUb13894312
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 5 Jan 2024 22:54:24 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 430F220043;
-	Fri,  5 Jan 2024 22:54:24 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0368520040;
-	Fri,  5 Jan 2024 22:54:24 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri,  5 Jan 2024 22:54:23 +0000 (GMT)
-From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To: Janosch Frank <frankja@linux.ibm.com>, Nico Boehr <nrb@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-Cc: David Hildenbrand <david@redhat.com>,
-        Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org,
-        Thomas Huth <thuth@redhat.com>, linux-s390@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v2 5/5] s390x: Add test for STFLE interpretive execution (format-0)
-Date: Fri,  5 Jan 2024 23:54:19 +0100
-Message-Id: <20240105225419.2841310-6-nsg@linux.ibm.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20240105225419.2841310-1-nsg@linux.ibm.com>
-References: <20240105225419.2841310-1-nsg@linux.ibm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69BA036091
+	for <kvm@vger.kernel.org>; Fri,  5 Jan 2024 23:05:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-28cbd4aaf29so61499a91.2
+        for <kvm@vger.kernel.org>; Fri, 05 Jan 2024 15:05:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1704495914; x=1705100714; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=eRvWPDCG4JAZwBNK/6G5GN/cR0tx6Hok+T3LJaZP40Y=;
+        b=dhghbr+s/EyCX2tjONOYAoxmW7JmbqwbBmnY1/KB1UFBry35gTQzxVOe6K+gELbazp
+         a84ZngirZPY6jir7RsODN8p9jCl1na6NO03obzaxZBV04D/v5v/E1620X8dIJqA9T+kj
+         e332/vW81rArpfQ7ERNo16briM+Loxyda1Pp8Vzr5LmEUnf/bgtVBxFKWyTckbi50JWV
+         llRqZP9/tg2mC6Y2YTEZBaegV0o0b8Gf5hasYJ0dOgRA7VJlioW5eK1mLViHIwNARu6M
+         fP3sBaxO+DnAZEE5VOHKMZRuuaCADMvBhgPgqhBDqApgJ/JxU0CBGPavcV/eYqIs1IKZ
+         T+6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704495914; x=1705100714;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=eRvWPDCG4JAZwBNK/6G5GN/cR0tx6Hok+T3LJaZP40Y=;
+        b=VnSJKK8TPWA0fdglR6Ni4sI9RoojLLyC+XICPnkyVosxgTxKO0u0e+99YZDTKmhaYT
+         T40jwcY+1Qy9JdEqwgQ4H8kAGfV0BYAs+UedS6Kk2GgyFRGaEvbUHnkTjDjE6IdFRgO9
+         8r4o27HB0WJZk9gXZmdp8Y6PTTCLHmPh2Uq700q9vnBfuViI69jSfVyuscUiz9yvwfbb
+         oJJtUpLvvvtt3IQ7wKwIF8A43v0wHJ72HuLqopQYwDHVYmC1k6Py7OfaddfzSvkbsInP
+         crosv9Q7pDMwHa2TchQTFQLscjMHDYqCcaLwG9eJyF4GSBySVo1lTd52csS7Lry3a/LF
+         fcAw==
+X-Gm-Message-State: AOJu0YxRy0y59YY8Dlsx6QAOjksywvp2kjbJVUnHVHQM8CkqA4YbdCQ0
+	zkzp8BeHepa3LUUH050dfrrlaxvZyKVRJfjRUw==
+X-Google-Smtp-Source: AGHT+IF/JJByZNwRSzKYk26DF9evJInmWnBhl5gImcO/3d/1Jq4H8t2sm5XmXOpBcIdrUVDpFHDJkzxEV2w=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90b:3b82:b0:28b:7cfa:a8c with SMTP id
+ pc2-20020a17090b3b8200b0028b7cfa0a8cmr1255pjb.2.1704495913633; Fri, 05 Jan
+ 2024 15:05:13 -0800 (PST)
+Date: Fri, 5 Jan 2024 15:05:12 -0800
+In-Reply-To: <7ca4b7af33646e3f5693472b4394ba0179b550e1.1699368322.git.isaku.yamahata@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: eXLLXSUNIj0SLdHmHt8TzuX5JwIacJ8Q
-X-Proofpoint-ORIG-GUID: p59mMyEPj-sTS9QvnNznLH8N8-rJrfxu
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-05_08,2024-01-05_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxlogscore=999
- spamscore=0 suspectscore=0 lowpriorityscore=0 priorityscore=1501
- malwarescore=0 mlxscore=0 bulkscore=0 phishscore=0 impostorscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2401050176
+Mime-Version: 1.0
+References: <cover.1699368322.git.isaku.yamahata@intel.com> <7ca4b7af33646e3f5693472b4394ba0179b550e1.1699368322.git.isaku.yamahata@intel.com>
+Message-ID: <ZZiLKKobVcmvrPmb@google.com>
+Subject: Re: [PATCH v17 092/116] KVM: TDX: Handle TDX PV HLT hypercall
+From: Sean Christopherson <seanjc@google.com>
+To: isaku.yamahata@intel.com
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com, 
+	Sagi Shahar <sagis@google.com>, David Matlack <dmatlack@google.com>, Kai Huang <kai.huang@intel.com>, 
+	Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com, hang.yuan@intel.com, 
+	tina.zhang@intel.com
+Content-Type: text/plain; charset="us-ascii"
 
-The STFLE instruction indicates installed facilities.
-SIE can interpretively execute STFLE.
-Use a snippet guest executing STFLE to get the result of
-interpretive execution and check the result.
+On Tue, Nov 07, 2023, isaku.yamahata@intel.com wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+> 
+> Wire up TDX PV HLT hypercall to the KVM backend function.
+> 
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>  arch/x86/kvm/vmx/tdx.c | 42 +++++++++++++++++++++++++++++++++++++++++-
+>  arch/x86/kvm/vmx/tdx.h |  3 +++
+>  2 files changed, 44 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index 3a1fe74b95c3..4e48989d364f 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -662,7 +662,32 @@ void tdx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>  
+>  bool tdx_protected_apic_has_interrupt(struct kvm_vcpu *vcpu)
+>  {
+> -	return pi_has_pending_interrupt(vcpu);
+> +	bool ret = pi_has_pending_interrupt(vcpu);
+> +	struct vcpu_tdx *tdx = to_tdx(vcpu);
+> +
+> +	if (ret || vcpu->arch.mp_state != KVM_MP_STATE_HALTED)
+> +		return true;
+> +
+> +	if (tdx->interrupt_disabled_hlt)
+> +		return false;
+> +
+> +	/*
+> +	 * This is for the case where the virtual interrupt is recognized,
+> +	 * i.e. set in vmcs.RVI, between the STI and "HLT".  KVM doesn't have
+> +	 * access to RVI and the interrupt is no longer in the PID (because it
+> +	 * was "recognized".  It doesn't get delivered in the guest because the
+> +	 * TDCALL completes before interrupts are enabled.
+> +	 *
+> +	 * TDX modules sets RVI while in an STI interrupt shadow.
+> +	 * - TDExit(typically TDG.VP.VMCALL<HLT>) from the guest to TDX module.
+> +	 *   The interrupt shadow at this point is gone.
+> +	 * - It knows that there is an interrupt that can be delivered
+> +	 *   (RVI > PPR && EFLAGS.IF=1, the other conditions of 29.2.2 don't
+> +	 *    matter)
+> +	 * - It forwards the TDExit nevertheless, to a clueless hypervisor that
+> +	 *   has no way to glean either RVI or PPR.
 
-Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
----
- s390x/Makefile           |   2 +
- lib/s390x/asm/facility.h |  10 ++-
- s390x/snippets/c/stfle.c |  26 ++++++++
- s390x/stfle-sie.c        | 134 +++++++++++++++++++++++++++++++++++++++
- s390x/unittests.cfg      |   3 +
- 5 files changed, 174 insertions(+), 1 deletion(-)
- create mode 100644 s390x/snippets/c/stfle.c
- create mode 100644 s390x/stfle-sie.c
+WTF.  Seriously, what in the absolute hell is going on.  I reported this internally
+four ***YEARS*** ago.  This is not some obscure theoretical edge case, this is core
+functionality and it's completely broken garbage.
 
-diff --git a/s390x/Makefile b/s390x/Makefile
-index a10695a2..12eb3053 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -42,6 +42,7 @@ tests += $(TEST_DIR)/exittime.elf
- tests += $(TEST_DIR)/ex.elf
- tests += $(TEST_DIR)/topology.elf
- tests += $(TEST_DIR)/sie-dat.elf
-+tests += $(TEST_DIR)/stfle-sie.elf
- 
- pv-tests += $(TEST_DIR)/pv-diags.elf
- pv-tests += $(TEST_DIR)/pv-icptcode.elf
-@@ -127,6 +128,7 @@ snippet_lib = $(snippet_asmlib) lib/auxinfo.o
- $(TEST_DIR)/mvpg-sie.elf: snippets = $(SNIPPET_DIR)/c/mvpg-snippet.gbin
- $(TEST_DIR)/sie-dat.elf: snippets = $(SNIPPET_DIR)/c/sie-dat.gbin
- $(TEST_DIR)/spec_ex-sie.elf: snippets = $(SNIPPET_DIR)/c/spec_ex.gbin
-+$(TEST_DIR)/stfle-sie.elf: snippets = $(SNIPPET_DIR)/c/stfle.gbin
- 
- $(TEST_DIR)/pv-diags.elf: pv-snippets += $(SNIPPET_DIR)/asm/pv-diag-yield.gbin
- $(TEST_DIR)/pv-diags.elf: pv-snippets += $(SNIPPET_DIR)/asm/pv-diag-288.gbin
-diff --git a/lib/s390x/asm/facility.h b/lib/s390x/asm/facility.h
-index a66fe56a..2bad05c5 100644
---- a/lib/s390x/asm/facility.h
-+++ b/lib/s390x/asm/facility.h
-@@ -27,12 +27,20 @@ static inline void stfl(void)
- 	asm volatile("	stfl	0(0)\n" : : : "memory");
- }
- 
--static inline void stfle(uint64_t *fac, unsigned int nb_doublewords)
-+static inline unsigned int stfle(uint64_t *fac, unsigned int nb_doublewords)
- {
- 	register unsigned long r0 asm("0") = nb_doublewords - 1;
- 
- 	asm volatile("	.insn	s,0xb2b00000,0(%1)\n"
- 		     : "+d" (r0) : "a" (fac) : "memory", "cc");
-+	return r0 + 1;
-+}
-+
-+static inline unsigned long stfle_size(void)
-+{
-+	uint64_t dummy;
-+
-+	return stfle(&dummy, 1);
- }
- 
- static inline void setup_facilities(void)
-diff --git a/s390x/snippets/c/stfle.c b/s390x/snippets/c/stfle.c
-new file mode 100644
-index 00000000..eb024a6a
---- /dev/null
-+++ b/s390x/snippets/c/stfle.c
-@@ -0,0 +1,26 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright IBM Corp. 2023
-+ *
-+ * Snippet used by the STLFE interpretive execution facilities test.
-+ */
-+#include <libcflat.h>
-+#include <snippet-guest.h>
-+
-+int main(void)
-+{
-+	const unsigned int max_fac_len = 8;
-+	uint64_t res[max_fac_len + 1];
-+
-+	res[0] = max_fac_len - 1;
-+	asm volatile ( "lg	0,%[len]\n"
-+		"	stfle	%[fac]\n"
-+		"	stg	0,%[len]\n"
-+		: [fac] "=QS"(*(uint64_t(*)[max_fac_len])&res[1]),
-+		  [len] "+RT"(res[0])
-+		:
-+		: "%r0", "cc"
-+	);
-+	force_exit_value((uint64_t)&res);
-+	return 0;
-+}
-diff --git a/s390x/stfle-sie.c b/s390x/stfle-sie.c
-new file mode 100644
-index 00000000..a3e7f1c9
---- /dev/null
-+++ b/s390x/stfle-sie.c
-@@ -0,0 +1,134 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright IBM Corp. 2023
-+ *
-+ * SIE with STLFE interpretive execution facilities test.
-+ */
-+#include <libcflat.h>
-+#include <stdlib.h>
-+#include <asm/facility.h>
-+#include <asm/time.h>
-+#include <snippet-host.h>
-+#include <alloc_page.h>
-+#include <sclp.h>
-+#include <rand.h>
-+
-+static struct vm vm;
-+static uint64_t (*fac)[PAGE_SIZE / sizeof(uint64_t)];
-+static prng_state prng_s;
-+
-+static void setup_guest(void)
-+{
-+	extern const char SNIPPET_NAME_START(c, stfle)[];
-+	extern const char SNIPPET_NAME_END(c, stfle)[];
-+
-+	setup_vm();
-+	fac = alloc_pages_flags(0, AREA_DMA31);
-+
-+	snippet_setup_guest(&vm, false);
-+	snippet_init(&vm, SNIPPET_NAME_START(c, stfle),
-+		     SNIPPET_LEN(c, stfle), SNIPPET_UNPACK_OFF);
-+}
-+
-+struct guest_stfle_res {
-+	uint16_t len;
-+	uint64_t reg;
-+	unsigned char *mem;
-+};
-+
-+static struct guest_stfle_res run_guest(void)
-+{
-+	struct guest_stfle_res res;
-+	uint64_t guest_stfle_addr;
-+
-+	sie(&vm);
-+	assert(snippet_is_force_exit_value(&vm));
-+	guest_stfle_addr = snippet_get_force_exit_value(&vm);
-+	res.mem = &vm.guest_mem[guest_stfle_addr];
-+	memcpy(&res.reg, res.mem, sizeof(res.reg));
-+	res.len = (res.reg & 0xff) + 1;
-+	res.mem += sizeof(res.reg);
-+	return res;
-+}
-+
-+static void test_stfle_format_0(void)
-+{
-+	struct guest_stfle_res res;
-+
-+	report_prefix_push("format-0");
-+	for (int j = 0; j < stfle_size(); j++)
-+		WRITE_ONCE((*fac)[j], prng64(&prng_s));
-+	vm.sblk->fac = (uint32_t)(uint64_t)fac;
-+	res = run_guest();
-+	report(res.len == stfle_size(), "stfle len correct");
-+	report(!memcmp(*fac, res.mem, res.len * sizeof(uint64_t)),
-+	       "Guest facility list as specified");
-+	report_prefix_pop();
-+}
-+
-+struct args {
-+	uint64_t seed;
-+};
-+
-+static bool parse_uint64_t(const char *arg, uint64_t *out)
-+{
-+	char *end;
-+	uint64_t num;
-+
-+	if (arg[0] == '\0')
-+		return false;
-+	num = strtoul(arg, &end, 0);
-+	if (end[0] != '\0')
-+		return false;
-+	*out = num;
-+	return true;
-+}
-+
-+static struct args parse_args(int argc, char **argv)
-+{
-+	struct args args;
-+	const char *flag;
-+	unsigned int i;
-+	uint64_t arg;
-+	bool has_arg;
-+
-+	stck(&args.seed);
-+
-+	for (i = 1; i < argc; i++) {
-+		if (i + 1 < argc)
-+			has_arg = parse_uint64_t(argv[i + 1], &arg);
-+		else
-+			has_arg = false;
-+
-+		flag = "--seed";
-+		if (!strcmp(flag, argv[i])) {
-+			if (!has_arg)
-+				report_abort("%s needs an uint64_t parameter", flag);
-+			args.seed = arg;
-+			++i;
-+			continue;
-+		}
-+		report_abort("Unsupported parameter '%s'",
-+			     argv[i]);
-+	}
-+
-+	return args;
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	struct args args = parse_args(argc, argv);
-+
-+	if (!sclp_facilities.has_sief2) {
-+		report_skip("SIEF2 facility unavailable");
-+		goto out;
-+	}
-+
-+	report_info("PRNG seed: 0x%lx", args.seed);
-+	prng_s = prng_init(args.seed);
-+	setup_guest();
-+	if (test_facility(7))
-+		test_stfle_format_0();
-+out:
-+	return report_summary();
-+}
-diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-index f5024b6e..118ffa3c 100644
---- a/s390x/unittests.cfg
-+++ b/s390x/unittests.cfg
-@@ -383,3 +383,6 @@ extra_params = """-cpu max,ctop=on -smp cpus=1,drawers=2,books=2,sockets=2,cores
- 
- [sie-dat]
- file = sie-dat.elf
-+
-+[stfle-sie]
-+file = stfle-sie.elf
--- 
-2.43.0
+NAK.  Hard NAK.  Fix the TDX module, full stop.
 
+Even worse, TDX 1.5 apparently _already_ has the necessary logic for dealing with
+interrupts that are pending in RVI when handling NESTED VM-Enter.  Really!?!?!
+Y'all went and added nested virtualization support of some kind, but can't find
+the time to get the basics right?
 
