@@ -1,79 +1,80 @@
-Return-Path: <kvm+bounces-5754-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5755-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBC82825CA0
-	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 23:54:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9690825CA3
+	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 23:54:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7386F284FDE
-	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 22:54:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B2C741C215FF
+	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 22:54:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15BBC360AC;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF960360B5;
 	Fri,  5 Jan 2024 22:54:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="rAE8JeIu"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="gW8RtWGa"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 016BE36094;
-	Fri,  5 Jan 2024 22:54:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EA8936091;
+	Fri,  5 Jan 2024 22:54:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 405LEd8x011374;
+Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 405Mocsw016553;
 	Fri, 5 Jan 2024 22:54:28 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=jL9WuhB2I9klluRSf1v59LBWX2ZrrXN58UHByaLNpo0=;
- b=rAE8JeIulLgB4wc3EHZftj3UKUE9dYHAf+lhJJ1PQvDkn7rlRyY74rSceWXqw6WDeLtN
- vdzAndJHY2JUCXCfdT58CbH5D//REiZ9nEezb4Pk6QnTt/0azxxIaZtwIDPIYwQiiZKm
- Do/OaUVd4DX9QL7pR8x59hT4MiHo11TIua4dOB6BoNe+wRQqZI+r/vkCUOs0QciAdqes
- WXBdhWRWuUzi/4iY4UtA4heahS3/j71XN4akYZ0cARQDkFW5ICQbxgAXJdFhU8QlxYWt
- Y4UfM6OaUObbq/DkIzoMMalUN9Kynq6m9cj4ZIkAfvoAEzS6cGxvcnEMMWcPObUvE316 8w== 
+ bh=4mD4K6/ZEfsYcFJZ3vk36ZAlJn9QyKmj6VZHAlPNFJY=;
+ b=gW8RtWGazVcmAVr8O5OY1A44bpZ1uRsAicAXi4Gt5VmzXXhrtB98jdaCEzoJMpQAjpC/
+ NE2S9xBYiQ1EzKxnwZVzrFwNenECUqCQJC7Ia+LCZ05WH02xdHKUuOeWx2nqGP1qMwng
+ Nuroy8EAJVYfh/I/vtdAOPJJdbVbYmuBNRiECfTtQQNmNK9T8rjgsghoblh6ZZbq/6mO
+ FLyzDKjoH1Arh0yGiLCeKau85FqzdA8YWKVxuQMMqmwAgUBSAHO8yVItKTLdsiOE2maw
+ k0bszxW4JhqT4NzILrGcGmBdZ12lL81ATxYM4QnH4aVMQDvF0qKFMImTxCJF8gA+czHc wA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3verf3twwb-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3veqgvmfsy-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Fri, 05 Jan 2024 22:54:28 +0000
-Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 405Mq3sA022409;
+Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 405MrItN022459;
 	Fri, 5 Jan 2024 22:54:27 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3verf3twvw-1
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3veqgvmfsp-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Fri, 05 Jan 2024 22:54:27 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 405KRmxA024643;
-	Fri, 5 Jan 2024 22:54:26 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3vb082sumc-1
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 405KCZNp017991;
+	Fri, 5 Jan 2024 22:54:27 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3vayrm21hf-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 05 Jan 2024 22:54:26 +0000
+	Fri, 05 Jan 2024 22:54:27 +0000
 Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 405MsOS928377712
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 405MsOUb13894312
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
 	Fri, 5 Jan 2024 22:54:24 GMT
 Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E103120043;
-	Fri,  5 Jan 2024 22:54:23 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 430F220043;
+	Fri,  5 Jan 2024 22:54:24 +0000 (GMT)
 Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A160620040;
-	Fri,  5 Jan 2024 22:54:23 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 0368520040;
+	Fri,  5 Jan 2024 22:54:24 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
 	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
 	Fri,  5 Jan 2024 22:54:23 +0000 (GMT)
 From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>, Nico Boehr <nrb@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+To: Janosch Frank <frankja@linux.ibm.com>, Nico Boehr <nrb@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-Cc: Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, David Hildenbrand <david@redhat.com>
-Subject: [kvm-unit-tests PATCH v2 4/5] s390x: Use library functions for snippet exit
-Date: Fri,  5 Jan 2024 23:54:18 +0100
-Message-Id: <20240105225419.2841310-5-nsg@linux.ibm.com>
+Cc: David Hildenbrand <david@redhat.com>,
+        Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org,
+        Thomas Huth <thuth@redhat.com>, linux-s390@vger.kernel.org
+Subject: [kvm-unit-tests PATCH v2 5/5] s390x: Add test for STFLE interpretive execution (format-0)
+Date: Fri,  5 Jan 2024 23:54:19 +0100
+Message-Id: <20240105225419.2841310-6-nsg@linux.ibm.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20240105225419.2841310-1-nsg@linux.ibm.com>
 References: <20240105225419.2841310-1-nsg@linux.ibm.com>
@@ -85,91 +86,262 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: fLc0S04-2nOv7NHMO-Z90UnBKRVfxYpA
-X-Proofpoint-ORIG-GUID: 8YnYsq3TgjgVPbV2YaneIPBBL_Zz_dPo
+X-Proofpoint-GUID: eXLLXSUNIj0SLdHmHt8TzuX5JwIacJ8Q
+X-Proofpoint-ORIG-GUID: p59mMyEPj-sTS9QvnNznLH8N8-rJrfxu
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2024-01-05_08,2024-01-05_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
- lowpriorityscore=0 phishscore=0 impostorscore=0 malwarescore=0
- adultscore=0 spamscore=0 mlxlogscore=989 clxscore=1015 bulkscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxlogscore=999
+ spamscore=0 suspectscore=0 lowpriorityscore=0 priorityscore=1501
+ malwarescore=0 mlxscore=0 bulkscore=0 phishscore=0 impostorscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2311290000 definitions=main-2401050176
 
-Replace the existing code for exiting from snippets with the newly
-introduced library functionality.
+The STFLE instruction indicates installed facilities.
+SIE can interpretively execute STFLE.
+Use a snippet guest executing STFLE to get the result of
+interpretive execution and check the result.
 
 Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 ---
- s390x/sie-dat.c            | 11 +++--------
- s390x/snippets/c/sie-dat.c | 19 +------------------
- 2 files changed, 4 insertions(+), 26 deletions(-)
+ s390x/Makefile           |   2 +
+ lib/s390x/asm/facility.h |  10 ++-
+ s390x/snippets/c/stfle.c |  26 ++++++++
+ s390x/stfle-sie.c        | 134 +++++++++++++++++++++++++++++++++++++++
+ s390x/unittests.cfg      |   3 +
+ 5 files changed, 174 insertions(+), 1 deletion(-)
+ create mode 100644 s390x/snippets/c/stfle.c
+ create mode 100644 s390x/stfle-sie.c
 
-diff --git a/s390x/sie-dat.c b/s390x/sie-dat.c
-index 9e60f26e..c8f38220 100644
---- a/s390x/sie-dat.c
-+++ b/s390x/sie-dat.c
-@@ -27,23 +27,18 @@ static void test_sie_dat(void)
- 	uint64_t test_page_gpa, test_page_hpa;
- 	uint8_t *test_page_hva, expected_val;
- 	bool contents_match;
--	uint8_t r1;
+diff --git a/s390x/Makefile b/s390x/Makefile
+index a10695a2..12eb3053 100644
+--- a/s390x/Makefile
++++ b/s390x/Makefile
+@@ -42,6 +42,7 @@ tests += $(TEST_DIR)/exittime.elf
+ tests += $(TEST_DIR)/ex.elf
+ tests += $(TEST_DIR)/topology.elf
+ tests += $(TEST_DIR)/sie-dat.elf
++tests += $(TEST_DIR)/stfle-sie.elf
  
- 	/* guest will tell us the guest physical address of the test buffer */
- 	sie(&vm);
--	assert(vm.sblk->icptcode == ICPT_INST &&
--	       (vm.sblk->ipa & 0xff00) == 0x8300 && vm.sblk->ipb == 0x9c0000);
--
--	r1 = (vm.sblk->ipa & 0xf0) >> 4;
--	test_page_gpa = vm.save_area.guest.grs[r1];
-+	assert(snippet_is_force_exit_value(&vm));
-+	test_page_gpa = snippet_get_force_exit_value(&vm);
- 	test_page_hpa = virt_to_pte_phys(guest_root, (void*)test_page_gpa);
- 	test_page_hva = __va(test_page_hpa);
- 	report_info("test buffer gpa=0x%lx hva=%p", test_page_gpa, test_page_hva);
+ pv-tests += $(TEST_DIR)/pv-diags.elf
+ pv-tests += $(TEST_DIR)/pv-icptcode.elf
+@@ -127,6 +128,7 @@ snippet_lib = $(snippet_asmlib) lib/auxinfo.o
+ $(TEST_DIR)/mvpg-sie.elf: snippets = $(SNIPPET_DIR)/c/mvpg-snippet.gbin
+ $(TEST_DIR)/sie-dat.elf: snippets = $(SNIPPET_DIR)/c/sie-dat.gbin
+ $(TEST_DIR)/spec_ex-sie.elf: snippets = $(SNIPPET_DIR)/c/spec_ex.gbin
++$(TEST_DIR)/stfle-sie.elf: snippets = $(SNIPPET_DIR)/c/stfle.gbin
  
- 	/* guest will now write to the test buffer and we verify the contents */
- 	sie(&vm);
--	assert(vm.sblk->icptcode == ICPT_INST &&
--	       vm.sblk->ipa == 0x8300 && vm.sblk->ipb == 0x440000);
-+	assert(snippet_is_force_exit(&vm));
+ $(TEST_DIR)/pv-diags.elf: pv-snippets += $(SNIPPET_DIR)/asm/pv-diag-yield.gbin
+ $(TEST_DIR)/pv-diags.elf: pv-snippets += $(SNIPPET_DIR)/asm/pv-diag-288.gbin
+diff --git a/lib/s390x/asm/facility.h b/lib/s390x/asm/facility.h
+index a66fe56a..2bad05c5 100644
+--- a/lib/s390x/asm/facility.h
++++ b/lib/s390x/asm/facility.h
+@@ -27,12 +27,20 @@ static inline void stfl(void)
+ 	asm volatile("	stfl	0(0)\n" : : : "memory");
+ }
  
- 	contents_match = true;
- 	for (unsigned int i = 0; i < GUEST_TEST_PAGE_COUNT; i++) {
-diff --git a/s390x/snippets/c/sie-dat.c b/s390x/snippets/c/sie-dat.c
-index ecfcb60e..414afd42 100644
---- a/s390x/snippets/c/sie-dat.c
-+++ b/s390x/snippets/c/sie-dat.c
-@@ -9,28 +9,11 @@
-  */
- #include <libcflat.h>
- #include <asm-generic/page.h>
-+#include <snippet-guest.h>
- #include "sie-dat.h"
- 
- static uint8_t test_pages[GUEST_TEST_PAGE_COUNT * PAGE_SIZE] __attribute__((__aligned__(PAGE_SIZE)));
- 
--static inline void force_exit(void)
--{
--	asm volatile("diag	0,0,0x44\n"
--		     :
--		     :
--		     : "memory"
--	);
--}
--
--static inline void force_exit_value(uint64_t val)
--{
--	asm volatile("diag	%[val],0,0x9c\n"
--		     :
--		     : [val] "d"(val)
--		     : "memory"
--	);
--}
--
- int main(void)
+-static inline void stfle(uint64_t *fac, unsigned int nb_doublewords)
++static inline unsigned int stfle(uint64_t *fac, unsigned int nb_doublewords)
  {
- 	uint8_t *invalid_ptr;
+ 	register unsigned long r0 asm("0") = nb_doublewords - 1;
+ 
+ 	asm volatile("	.insn	s,0xb2b00000,0(%1)\n"
+ 		     : "+d" (r0) : "a" (fac) : "memory", "cc");
++	return r0 + 1;
++}
++
++static inline unsigned long stfle_size(void)
++{
++	uint64_t dummy;
++
++	return stfle(&dummy, 1);
+ }
+ 
+ static inline void setup_facilities(void)
+diff --git a/s390x/snippets/c/stfle.c b/s390x/snippets/c/stfle.c
+new file mode 100644
+index 00000000..eb024a6a
+--- /dev/null
++++ b/s390x/snippets/c/stfle.c
+@@ -0,0 +1,26 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright IBM Corp. 2023
++ *
++ * Snippet used by the STLFE interpretive execution facilities test.
++ */
++#include <libcflat.h>
++#include <snippet-guest.h>
++
++int main(void)
++{
++	const unsigned int max_fac_len = 8;
++	uint64_t res[max_fac_len + 1];
++
++	res[0] = max_fac_len - 1;
++	asm volatile ( "lg	0,%[len]\n"
++		"	stfle	%[fac]\n"
++		"	stg	0,%[len]\n"
++		: [fac] "=QS"(*(uint64_t(*)[max_fac_len])&res[1]),
++		  [len] "+RT"(res[0])
++		:
++		: "%r0", "cc"
++	);
++	force_exit_value((uint64_t)&res);
++	return 0;
++}
+diff --git a/s390x/stfle-sie.c b/s390x/stfle-sie.c
+new file mode 100644
+index 00000000..a3e7f1c9
+--- /dev/null
++++ b/s390x/stfle-sie.c
+@@ -0,0 +1,134 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright IBM Corp. 2023
++ *
++ * SIE with STLFE interpretive execution facilities test.
++ */
++#include <libcflat.h>
++#include <stdlib.h>
++#include <asm/facility.h>
++#include <asm/time.h>
++#include <snippet-host.h>
++#include <alloc_page.h>
++#include <sclp.h>
++#include <rand.h>
++
++static struct vm vm;
++static uint64_t (*fac)[PAGE_SIZE / sizeof(uint64_t)];
++static prng_state prng_s;
++
++static void setup_guest(void)
++{
++	extern const char SNIPPET_NAME_START(c, stfle)[];
++	extern const char SNIPPET_NAME_END(c, stfle)[];
++
++	setup_vm();
++	fac = alloc_pages_flags(0, AREA_DMA31);
++
++	snippet_setup_guest(&vm, false);
++	snippet_init(&vm, SNIPPET_NAME_START(c, stfle),
++		     SNIPPET_LEN(c, stfle), SNIPPET_UNPACK_OFF);
++}
++
++struct guest_stfle_res {
++	uint16_t len;
++	uint64_t reg;
++	unsigned char *mem;
++};
++
++static struct guest_stfle_res run_guest(void)
++{
++	struct guest_stfle_res res;
++	uint64_t guest_stfle_addr;
++
++	sie(&vm);
++	assert(snippet_is_force_exit_value(&vm));
++	guest_stfle_addr = snippet_get_force_exit_value(&vm);
++	res.mem = &vm.guest_mem[guest_stfle_addr];
++	memcpy(&res.reg, res.mem, sizeof(res.reg));
++	res.len = (res.reg & 0xff) + 1;
++	res.mem += sizeof(res.reg);
++	return res;
++}
++
++static void test_stfle_format_0(void)
++{
++	struct guest_stfle_res res;
++
++	report_prefix_push("format-0");
++	for (int j = 0; j < stfle_size(); j++)
++		WRITE_ONCE((*fac)[j], prng64(&prng_s));
++	vm.sblk->fac = (uint32_t)(uint64_t)fac;
++	res = run_guest();
++	report(res.len == stfle_size(), "stfle len correct");
++	report(!memcmp(*fac, res.mem, res.len * sizeof(uint64_t)),
++	       "Guest facility list as specified");
++	report_prefix_pop();
++}
++
++struct args {
++	uint64_t seed;
++};
++
++static bool parse_uint64_t(const char *arg, uint64_t *out)
++{
++	char *end;
++	uint64_t num;
++
++	if (arg[0] == '\0')
++		return false;
++	num = strtoul(arg, &end, 0);
++	if (end[0] != '\0')
++		return false;
++	*out = num;
++	return true;
++}
++
++static struct args parse_args(int argc, char **argv)
++{
++	struct args args;
++	const char *flag;
++	unsigned int i;
++	uint64_t arg;
++	bool has_arg;
++
++	stck(&args.seed);
++
++	for (i = 1; i < argc; i++) {
++		if (i + 1 < argc)
++			has_arg = parse_uint64_t(argv[i + 1], &arg);
++		else
++			has_arg = false;
++
++		flag = "--seed";
++		if (!strcmp(flag, argv[i])) {
++			if (!has_arg)
++				report_abort("%s needs an uint64_t parameter", flag);
++			args.seed = arg;
++			++i;
++			continue;
++		}
++		report_abort("Unsupported parameter '%s'",
++			     argv[i]);
++	}
++
++	return args;
++}
++
++int main(int argc, char **argv)
++{
++	struct args args = parse_args(argc, argv);
++
++	if (!sclp_facilities.has_sief2) {
++		report_skip("SIEF2 facility unavailable");
++		goto out;
++	}
++
++	report_info("PRNG seed: 0x%lx", args.seed);
++	prng_s = prng_init(args.seed);
++	setup_guest();
++	if (test_facility(7))
++		test_stfle_format_0();
++out:
++	return report_summary();
++}
+diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+index f5024b6e..118ffa3c 100644
+--- a/s390x/unittests.cfg
++++ b/s390x/unittests.cfg
+@@ -383,3 +383,6 @@ extra_params = """-cpu max,ctop=on -smp cpus=1,drawers=2,books=2,sockets=2,cores
+ 
+ [sie-dat]
+ file = sie-dat.elf
++
++[stfle-sie]
++file = stfle-sie.elf
 -- 
 2.43.0
 
