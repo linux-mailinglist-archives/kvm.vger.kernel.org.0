@@ -1,51 +1,50 @@
-Return-Path: <kvm+bounces-5712-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5713-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EA56825109
-	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 10:43:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2E94825111
+	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 10:44:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D44D51F23904
-	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 09:43:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0CBDE1C22E98
+	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 09:44:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31B6324B51;
-	Fri,  5 Jan 2024 09:43:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCDF0250E9;
+	Fri,  5 Jan 2024 09:44:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZoIf+xOC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="llifZT+L"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E622524B3A;
-	Fri,  5 Jan 2024 09:43:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8210624B49;
+	Fri,  5 Jan 2024 09:44:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1704447790; x=1735983790;
+  t=1704447854; x=1735983854;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=yLRKvEWofDO1K6stvr9i2IomNOvR/08Zs5+c4O/ibFk=;
-  b=ZoIf+xOCUja/+xF6xyOHlmjoliHWOoFCtn9VtwXxc1nrttUKQz7wnTKt
-   ePIytw3QiiMdUiiu6YH3SeX4krUlFxmjnwEyLwJXMZbCYgwFJcgR+eRdX
-   FlMVlwqictEQ8be4FDr/FQE9+XGB5BwSTMPk+Nygqcx6Vk+6E1FOoqRcK
-   aHcqxXPRM9bmjK/ef7HhTRYYpvnS3m5kVxKJp6jZneecv1mUHl59JEwE7
-   TP9cPzq0E0y6tYSoHkU6X2wP0VSD7jHcDDGbcv6aakpHGNxZl8TqGAPvC
-   C47RzxDfIPf6dOxgV84xnwlXaljEd/QEc3pp39FHhXJQqnSYQ8LvWTI95
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10943"; a="401260554"
+  bh=TAQv9JJR1XqAj6tjxwKS30HsTbZYt1Z095C7qYz5bks=;
+  b=llifZT+LT5JFklPZLtvMD6OSUyLlFZdQAxyVQwUyy85tmICkuc/cqXuU
+   5VbNfepjNfrHPRTF87oa3jb7W8PdQASabjwJ5IY7CQYfNXmO/BME9pRl0
+   Xn8+0gO72RU8Q9jlQWAiJHmgd/5A3pxROn3CqYM6fjK4GSFH4IWcbaZ0m
+   p6g59h/OD3IHe0Vm7DjrXUiOiLIOWGZjTWN8Bc4F2hLZFr/hLjO/b6yfX
+   iDoJ6PyobELrAtjGtVmrR07CmgrZUxqnetHRH/ipB8PiThBy5MubqRyZP
+   bAEc0WKhFl7awk/AilCXHQ8AYrzcuvmRqFWNfR2Ts410s3BeCQvqV++d1
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10943"; a="10842964"
 X-IronPort-AV: E=Sophos;i="6.04,333,1695711600"; 
-   d="scan'208";a="401260554"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2024 01:43:10 -0800
+   d="scan'208";a="10842964"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2024 01:44:13 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10943"; a="814920081"
 X-IronPort-AV: E=Sophos;i="6.04,333,1695711600"; 
-   d="scan'208";a="814920081"
+   d="scan'208";a="22458420"
 Received: from yzhao56-desk.sh.intel.com ([10.239.159.62])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2024 01:43:03 -0800
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2024 01:44:07 -0800
 From: Yan Zhao <yan.y.zhao@intel.com>
 To: kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
@@ -74,9 +73,9 @@ Cc: pbonzini@redhat.com,
 	yuzenghui@huawei.com,
 	Yan Zhao <yan.y.zhao@intel.com>,
 	Zhenyu Wang <zhenyuw@linux.intel.com>
-Subject: [PATCH 1/4] KVM: Introduce a new memslot flag KVM_MEM_NON_COHERENT_DMA
-Date: Fri,  5 Jan 2024 17:13:46 +0800
-Message-Id: <20240105091346.24637-1-yan.y.zhao@intel.com>
+Subject: [PATCH 2/4] KVM: x86: Add a new param "slot" to op get_mt_mask in kvm_x86_ops
+Date: Fri,  5 Jan 2024 17:14:54 +0800
+Message-Id: <20240105091454.24700-1-yan.y.zhao@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20240105091237.24577-1-yan.y.zhao@intel.com>
 References: <20240105091237.24577-1-yan.y.zhao@intel.com>
@@ -86,92 +85,64 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 
-Introduce a new flag KVM_MEM_NON_COHERENT_DMA to provide user space a
-channel to notify KVM that guest memory specified by the memslot may be
-accessed by noncoherent DMA devices.
+Add param "slot" to op get_mt_mask in kvm_x86_ops.
+This is a preparation patch to later honor guest PATs for certain memslots.
 
-KVM can start honoring guest memory type for this range of guest memory in
-platforms that do not always honoring guest PAT, e.g. in Intel's platform.
+No functional change intended.
 
-Previously, the only way to let KVM be aware of noncoherent DMA devices
-is through KVM device for VFIO pass-through devices, in which case, KVM is
-notified that all guest memory may be accessed by noncoherent DMA devices.
-
-To avoid complication, flag KVM_MEM_NON_COHERENT_DMA is not allowed to be
-dynamically modified for a memslot.
-
-A KVM_CAP_USER_CONFIGURE_NONCOHERENT_DMA is added to let user space know if
-this new memslot flag is supported in KVM.
-
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Cc: Kevin Tian <kevin.tian@intel.com>
 Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
 Tested-by: Yongwei Ma <yongwei.ma@intel.com>
 Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
 ---
- include/uapi/linux/kvm.h | 2 ++
- virt/kvm/kvm_main.c      | 8 ++++++--
- 2 files changed, 8 insertions(+), 2 deletions(-)
+ arch/x86/include/asm/kvm_host.h | 3 ++-
+ arch/x86/kvm/mmu/spte.c         | 3 ++-
+ arch/x86/kvm/vmx/vmx.c          | 3 ++-
+ 3 files changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index b1f92a0edc35..4cb615e46488 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -46,6 +46,7 @@ struct kvm_userspace_memory_region2 {
- #define KVM_MEM_LOG_DIRTY_PAGES	(1UL << 0)
- #define KVM_MEM_READONLY	(1UL << 1)
- #define KVM_MEM_GUEST_MEMFD	(1UL << 2)
-+#define KVM_MEM_NON_COHERENT_DMA (1UL << 3)
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index a565a2e70f30..6be0d8ccff65 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1675,7 +1675,8 @@ struct kvm_x86_ops {
+ 	int (*sync_pir_to_irr)(struct kvm_vcpu *vcpu);
+ 	int (*set_tss_addr)(struct kvm *kvm, unsigned int addr);
+ 	int (*set_identity_map_addr)(struct kvm *kvm, u64 ident_addr);
+-	u8 (*get_mt_mask)(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio);
++	u8 (*get_mt_mask)(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio,
++			  const struct kvm_memory_slot *slot);
  
- /* for KVM_IRQ_LINE */
- struct kvm_irq_level {
-@@ -1155,6 +1156,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_MEMORY_ATTRIBUTES 233
- #define KVM_CAP_GUEST_MEMFD 234
- #define KVM_CAP_VM_TYPES 235
-+#define KVM_CAP_USER_CONFIGURE_NONCOHERENT_DMA 236
+ 	void (*load_mmu_pgd)(struct kvm_vcpu *vcpu, hpa_t root_hpa,
+ 			     int root_level);
+diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+index 4a599130e9c9..2c3ede3f27a9 100644
+--- a/arch/x86/kvm/mmu/spte.c
++++ b/arch/x86/kvm/mmu/spte.c
+@@ -191,7 +191,8 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
  
- #ifdef KVM_CAP_IRQ_ROUTING
+ 	if (shadow_memtype_mask)
+ 		spte |= static_call(kvm_x86_get_mt_mask)(vcpu, gfn,
+-							 kvm_is_mmio_pfn(pfn));
++							 kvm_is_mmio_pfn(pfn),
++							 slot);
+ 	if (host_writable)
+ 		spte |= shadow_host_writable_mask;
+ 	else
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 40e3780d73ae..85a23765e506 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7576,7 +7576,8 @@ static int vmx_vm_init(struct kvm *kvm)
+ 	return 0;
+ }
  
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index acd67fb40183..6d44dcf7322d 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -1607,7 +1607,7 @@ static void kvm_replace_memslot(struct kvm *kvm,
-  * only allows these.
-  */
- #define KVM_SET_USER_MEMORY_REGION_V1_FLAGS \
--	(KVM_MEM_LOG_DIRTY_PAGES | KVM_MEM_READONLY)
-+	(KVM_MEM_LOG_DIRTY_PAGES | KVM_MEM_READONLY | KVM_MEM_NON_COHERENT_DMA)
- 
- static int check_memory_region_flags(struct kvm *kvm,
- 				     const struct kvm_userspace_memory_region2 *mem)
-@@ -1625,6 +1625,8 @@ static int check_memory_region_flags(struct kvm *kvm,
- 	valid_flags |= KVM_MEM_READONLY;
- #endif
- 
-+	valid_flags |= KVM_MEM_NON_COHERENT_DMA;
-+
- 	if (mem->flags & ~valid_flags)
- 		return -EINVAL;
- 
-@@ -2095,7 +2097,8 @@ int __kvm_set_memory_region(struct kvm *kvm,
- 			return -EINVAL;
- 		if ((mem->userspace_addr != old->userspace_addr) ||
- 		    (npages != old->npages) ||
--		    ((mem->flags ^ old->flags) & KVM_MEM_READONLY))
-+		    ((mem->flags ^ old->flags) &
-+		     (KVM_MEM_READONLY | KVM_MEM_NON_COHERENT_DMA)))
- 			return -EINVAL;
- 
- 		if (base_gfn != old->base_gfn)
-@@ -4822,6 +4825,7 @@ static int kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
- 	case KVM_CAP_USER_MEMORY2:
- 	case KVM_CAP_DESTROY_MEMORY_REGION_WORKS:
- 	case KVM_CAP_JOIN_MEMORY_REGIONS_WORKS:
-+	case KVM_CAP_USER_CONFIGURE_NONCOHERENT_DMA:
- 	case KVM_CAP_INTERNAL_ERROR_DATA:
- #ifdef CONFIG_HAVE_KVM_MSI
- 	case KVM_CAP_SIGNAL_MSI:
+-static u8 vmx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
++static u8 vmx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio,
++			  const struct kvm_memory_slot *slot)
+ {
+ 	/* We wanted to honor guest CD/MTRR/PAT, but doing so could result in
+ 	 * memory aliases with conflicting memory types and sometimes MCEs.
 -- 
 2.17.1
 
