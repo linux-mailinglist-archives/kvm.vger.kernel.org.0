@@ -1,109 +1,123 @@
-Return-Path: <kvm+bounces-5710-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5714-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E87CE8250F0
-	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 10:37:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C1AB825114
+	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 10:45:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A4BBB24881
-	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 09:37:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B4E411F23A72
+	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 09:45:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82A75249E1;
-	Fri,  5 Jan 2024 09:37:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="jhfbCnyx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56E902CCB2;
+	Fri,  5 Jan 2024 09:44:25 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C8CB241F1
-	for <kvm@vger.kernel.org>; Fri,  5 Jan 2024 09:37:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-556eadd5904so1504234a12.2
-        for <kvm@vger.kernel.org>; Fri, 05 Jan 2024 01:37:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1704447442; x=1705052242; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=T8Qc+DAOtmpEj+ygGinAvQ01y6FiLQ/IoAOtnKnganw=;
-        b=jhfbCnyxDD+caE9biJ1d+jAPwh4HJn9SS9T371H4jpTeYi/Wb943n0RqstVkaVdou5
-         08Za9d8v13m3MFM2XDqdt3ocNd2HMaoTNoEdEa86gCkrHcrabNxBqG5viZYE5+/58joU
-         3oXSJjan+mhOvV26yUFaJ68jnx+MFrnsMFyPXPijy9gaqePdWZIYHeYVC+hgDwAfq0I5
-         JCYNpIXmy4tAtl7pnU+dkW6OwCngUyYF/DpFweqS0m/nyKF7w6tqMKvU6XWFG3bMPfY9
-         Q/7LG1YrNhxLQjEcjo2/RvnC/s/mjbtv5mZvdlDalseIC5rs8aujnmYcQDDkG901j1wK
-         WQmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704447442; x=1705052242;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=T8Qc+DAOtmpEj+ygGinAvQ01y6FiLQ/IoAOtnKnganw=;
-        b=Rtr69hcxkvrQbuLbRy4p8c+hXc96DfM5QlBnPPTme8indr+TTe4XxOMAjABUi7Q9Ui
-         w7vaqaU4biCd69Njox9V9uDMxu5718Sz8ZFREbXhp4L2744Q9mPrP+HxpoSPmF1pN/R/
-         RkRGA0Kp4C5YFduk7aWXVTh83AiU7ji22NhbygZNLbAT7zPSRH0CRSA8ydx3YFwJfXu8
-         K1/HH+rR4IkQbrIr0TomqpWKQ/KhqLB9WZ9XC60Xbn0KmL1IPBfmEP+SlhSpv8lfoi5C
-         tnQcOZiq8Xsvu2bXZgfRrmCswd3rmijTQy3nJg0gcdX/yjfdw5ivyxWFtxy6kTFypbZe
-         z8XQ==
-X-Gm-Message-State: AOJu0YyFUExr7kPBB9nFkO6oZmr7SGJbJ7HQRqojxnrEWhqAjaQ4Z7Z2
-	2qw1jLi+mw7prrngsn1qPexyMWi1r40/wQ==
-X-Google-Smtp-Source: AGHT+IF8fQXbP1BRpg30Hrn1hWWnXwz5MlDf/25VLJggd7Wh/H7izjD31EsFPbs3NtBzMgPs/Zvg8Q==
-X-Received: by 2002:a17:906:54e:b0:a28:b34d:8693 with SMTP id k14-20020a170906054e00b00a28b34d8693mr477120eja.186.1704447442355;
-        Fri, 05 Jan 2024 01:37:22 -0800 (PST)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id u16-20020a170906409000b00a28a7f56dc4sm675313ejj.188.2024.01.05.01.37.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Jan 2024 01:37:22 -0800 (PST)
-Date: Fri, 5 Jan 2024 10:37:21 +0100
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 1/4] KVM: introduce CONFIG_KVM_COMMON
-Message-ID: <20240105-f3084386048af455001fd2e3@orel>
-References: <20240104205959.4128825-1-pbonzini@redhat.com>
- <20240104205959.4128825-2-pbonzini@redhat.com>
+Received: from zg8tmja2lje4os4yms4ymjma.icoremail.net (zg8tmja2lje4os4yms4ymjma.icoremail.net [206.189.21.223])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 323882C684
+	for <kvm@vger.kernel.org>; Fri,  5 Jan 2024 09:44:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
+Received: from duchao$eswincomputing.com ( [112.46.135.130] ) by
+ ajax-webmail-app1 (Coremail) ; Fri, 5 Jan 2024 17:42:11 +0800 (GMT+08:00)
+Date: Fri, 5 Jan 2024 17:42:11 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From: "Chao Du" <duchao@eswincomputing.com>
+To: "Anup Patel" <anup@brainfault.org>
+Cc: "Anup Patel" <apatel@ventanamicro.com>, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, atishp@atishpatra.org, 
+	dbarboza@ventanamicro.com, paul.walmsley@sifive.com, 
+	palmer@dabbelt.com, aou@eecs.berkeley.edu
+Subject: Re: Re: [RFC PATCH 0/3] RISC-V: KVM: Guest Debug Support
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version XT6.0.3 build 20220420(169d3f8c)
+ Copyright (c) 2002-2024 www.mailtech.cn
+ mispb-72143050-eaf5-4703-89e0-86624513b4ce-eswincomputing.com
+In-Reply-To: <CAAhSdy0VWxjvKsxiad72JY7_Ottt5S9ymZ3axt=W3-4nf+g4VQ@mail.gmail.com>
+References: <20231221095002.7404-1-duchao@eswincomputing.com>
+ <CAK9=C2Wfv7=fCitUdjBpC9=0icN82Bb+9p1-Gq5ha8o9v13nEg@mail.gmail.com>
+ <19434eff.1deb.18c90a3a375.Coremail.duchao@eswincomputing.com>
+ <CAAhSdy0VWxjvKsxiad72JY7_Ottt5S9ymZ3axt=W3-4nf+g4VQ@mail.gmail.com>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240104205959.4128825-2-pbonzini@redhat.com>
+Message-ID: <2f1b56a2.686.18cd90066b8.Coremail.duchao@eswincomputing.com>
+X-Coremail-Locale: en_US
+X-CM-TRANSID:TAJkCgAXo_30zpdlJIoEAA--.5150W
+X-CM-SenderInfo: xgxfxt3r6h245lqf0zpsxwx03jof0z/1tbiAQEHDGWWz3kcAgABsR
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
+	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+	daVFxhVjvjDU=
 
-On Thu, Jan 04, 2024 at 03:59:56PM -0500, Paolo Bonzini wrote:
-> CONFIG_HAVE_KVM is currently used by some architectures to either
-> enabled the KVM config proper, or to enable host-side code that is
-> not part of the KVM module.  However, the "select" statement in
-> virt/kvm/Kconfig corresponds to a third meaning, namely to
-> enable common Kconfigs required by all architectures that support
-> KVM.
-> 
-> These three meanings can be replaced respectively by an
-> architecture-specific Kconfig, by IS_ENABLED(CONFIG_KVM), or by
-> a new Kconfig symbol that is in turn selected by the
-> architecture-specific "config KVM".
-> 
-> Start by introducing such a new Kconfig symbol, CONFIG_KVM_COMMON.
-> Unlike CONFIG_HAVE_KVM, it is selected by CONFIG_KVM, not by
-> architecture code.
-> 
-> Fixes: 8132d887a702 ("KVM: remove CONFIG_HAVE_KVM_EVENTFD", 2023-12-08)
-> Cc: Andrew Jones <ajones@ventanamicro.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  arch/arm64/kvm/Kconfig     | 1 +
->  arch/loongarch/kvm/Kconfig | 1 +
->  arch/mips/kvm/Kconfig      | 1 +
->  arch/powerpc/kvm/Kconfig   | 1 +
->  arch/riscv/kvm/Kconfig     | 1 +
->  arch/s390/kvm/Kconfig      | 1 +
->  arch/x86/kvm/Kconfig       | 1 +
->  virt/kvm/Kconfig           | 3 +++
->  8 files changed, 10 insertions(+)
-
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+T24gMjAyNC0wMS0wNCAxOTo1OSwgQW51cCBQYXRlbCA8YW51cEBicmFpbmZhdWx0Lm9yZz4gd3Jv
+dGU6Cj4gCj4gT24gRnJpLCBEZWMgMjIsIDIwMjMgYXQgMTo1OeKAr1BNIENoYW8gRHUgPGR1Y2hh
+b0Blc3dpbmNvbXB1dGluZy5jb20+IHdyb3RlOgo+ID4KPiA+IE9uIDIwMjMtMTItMjEgMjE6MDEs
+IEFudXAgUGF0ZWwgPGFwYXRlbEB2ZW50YW5hbWljcm8uY29tPiB3cm90ZToKPiA+ID4KPiA+ID4g
+T24gVGh1LCBEZWMgMjEsIDIwMjMgYXQgMzoyMeKAr1BNIENoYW8gRHUgPGR1Y2hhb0Blc3dpbmNv
+bXB1dGluZy5jb20+IHdyb3RlOgo+ID4gPiA+Cj4gPiA+ID4gVGhpcyBzZXJpZXMgaW1wbGVtZW50
+cyBLVk0gR3Vlc3QgRGVidWcgb24gUklTQy1WLiBDdXJyZW50bHksIHdlIGNhbgo+ID4gPiA+IGRl
+YnVnIFJJU0MtViBLVk0gZ3Vlc3QgZnJvbSB0aGUgaG9zdCBzaWRlLCB3aXRoIHNvZnR3YXJlIGJy
+ZWFrcG9pbnRzLgo+ID4gPiA+Cj4gPiA+ID4gQSBicmllZiB0ZXN0IHdhcyBkb25lIG9uIFFFTVUg
+UklTQy1WIGh5cGVydmlzb3IgZW11bGF0b3IuCj4gPiA+ID4KPiA+ID4gPiBBIFRPRE8gbGlzdCB3
+aGljaCB3aWxsIGJlIGFkZGVkIGxhdGVyOgo+ID4gPiA+IDEuIEhXIGJyZWFrcG9pbnRzIHN1cHBv
+cnQKPiA+ID4gPiAyLiBUZXN0IGNhc2VzCj4gPiA+Cj4gPiA+IEhpbWFuc2h1IGhhcyBhbHJlYWR5
+IGRvbmUgdGhlIGNvbXBsZXRlIEhXIGJyZWFrcG9pbnQgaW1wbGVtZW50YXRpb24KPiA+ID4gaW4g
+T3BlblNCSSwgTGludXggUklTQy1WLCBhbmQgS1ZNIFJJU0MtVi4gVGhpcyBpcyBiYXNlZCBvbiB0
+aGUgdXBjb21pbmcKPiA+ID4gU0JJIGRlYnVnIHRyaWdnZXIgZXh0ZW5zaW9uIGRyYWZ0IHByb3Bv
+c2FsLgo+ID4gPiAoUmVmZXIsIGh0dHBzOi8vbGlzdHMucmlzY3Yub3JnL2cvdGVjaC1kZWJ1Zy9t
+ZXNzYWdlLzEyNjEpCj4gPiA+Cj4gPiA+IFRoZXJlIGFyZSBhbHNvIFJJU0UgcHJvamVjdHMgdG8g
+dHJhY2sgdGhlc2UgZWZmb3J0czoKPiA+ID4gaHR0cHM6Ly93aWtpLnJpc2Vwcm9qZWN0LmRldi9w
+YWdlcy92aWV3cGFnZS5hY3Rpb24/cGFnZUlkPTM5NDU0MQo+ID4gPiBodHRwczovL3dpa2kucmlz
+ZXByb2plY3QuZGV2L3BhZ2VzL3ZpZXdwYWdlLmFjdGlvbj9wYWdlSWQ9Mzk0NTQ1Cj4gPiA+Cj4g
+PiA+IEN1cnJlbnRseSwgd2UgYXJlIGluIHRoZSBwcm9jZXNzIG9mIHVwc3RyZWFtaW5nIHRoZSBP
+cGVuU0JJIHN1cHBvcnQKPiA+ID4gZm9yIFNCSSBkZWJ1ZyB0cmlnZ2VyIGV4dGVuc2lvbi4gVGhl
+IExpbnV4IFJJU0MtViBhbmQgS1ZNIFJJU0MtVgo+ID4gPiBwYXRjaGVzIHJlcXVpcmUgU0JJIGRl
+YnVnIHRyaWdnZXIgZXh0ZW5zaW9uIGFuZCBTZHRyaWcgZXh0ZW5zaW9uIHRvCj4gPiA+IGJlIGZy
+b3plbiB3aGljaCB3aWxsIGhhcHBlbiBuZXh0IHllYXIgMjAyNC4KPiA+ID4KPiA+ID4gUmVnYXJk
+cywKPiA+ID4gQW51cAo+ID4gPgo+ID4KPiA+IEhpIEFudXAsCj4gPgo+ID4gVGhhbmsgeW91IGZv
+ciB0aGUgaW5mb3JtYXRpb24gYW5kIHlvdXIgZ3JlYXQgd29yayBvbiB0aGUgU0JJCj4gPiBEZWJ1
+ZyBUcmlnZ2VyIEV4dGVuc2lvbiBwcm9wb3NhbC4KPiA+Cj4gPiBTbyBJIHRoaW5rIHRoYXQgJ0hX
+IGJyZWFrcG9pbnRzIHN1cHBvcnQnIGluIHRoZSBhYm92ZSBUT0RPIGxpc3QKPiA+IHdpbGwgYmUg
+dGFrZW4gY2FyZSBvZiBieSBIaW1hbnNodSBmb2xsb3dpbmcgdGhlIGV4dGVuc2lvbiBwcm9wb3Nh
+bC4KPiA+Cj4gPiBPbiB0aGUgb3RoZXIgaGFuZCwgaWYgSSB1bmRlcnN0YW5kIGNvcnJlY3RseSwg
+dGhlIHNvZnR3YXJlCj4gPiBicmVha3BvaW50IHBhcnQgb2YgS1ZNIEd1ZXN0IERlYnVnIGhhcyBu
+byBkZXBlbmRlbmN5IG9uIHRoZSBuZXcKPiA+IGV4dGVuc2lvbiBzaW5jZSBpdCBkb2VzIG5vdCB1
+c2UgdGhlIHRyaWdnZXIgbW9kdWxlLiBKdXN0IGFuCj4gPiBlYnJlYWsgc3Vic3RpdHV0aW9uIGlz
+IG1hZGUuCj4gPgo+ID4gU28gbWF5IEkga25vdyB5b3VyIHN1Z2dlc3Rpb24gYWJvdXQgdGhpcyBS
+RkM/IEJvdGggaW4gS1ZNIGFuZCBRRU1VLgo+IAo+IFNvcnJ5IGZvciB0aGUgZGVsYXkgaW4gcmVz
+cG9uc2UgZHVlIHRvIGhvbGlkYXkgc2Vhc29uIG90aGVyCj4gc3R1ZmYga2VlcGluZyBtZSBidXN5
+LgoKTm8gcHJvYmxlbS4gOikKCj4gCj4gSWYgdGhpcyBpcyBhYm91dCBlYnJlYWsgaW5zdHJ1Y3Rp
+b24gdmlydHVhbGl6YXRpb24gdGhlbiB0aGlzIHNlcmllcwo+IG5lZWRzIGZvbGxvd2luZyBjaGFu
+Z2VzOgo+IDEpIFVwZGF0ZSBjb3ZlciBsZXR0ZXIgdG8gaW5kaWNhdGUgdGhpcyBzZXJpZXMgZm9j
+dXMgb24gZWJyZWFrCj4gICAgICBpbnN0cnVjdGlvbiB2aXJ0dWFsaXphdGlvbgo+IDIpIFBBVENI
+MSBhbmQgUEFUQ0gyIGNhbiBiZSBtZXJnZWQgaW50byBvbmUgUEFUQ0gxCj4gMykgSW5jbHVkZSBh
+IG5ldyBwYXRjaCB3aGljaCBhZGRzIEtWTSBzZWxmdGVzdCBmb3IgZWJyZWFrCj4gICAgIGJhc2Vk
+IGd1ZXN0IGRlYnVnLiBUaGlzIHNlbGZ0ZXN0IHdpbGwgdGVzdCBib3RoOgo+ICAgICBBKSBUYWtp
+bmcgImVicmVhayIgdHJhcCBmcm9tIGd1ZXN0IGFzIEtWTV9FWElUX0RFQlVHCj4gICAgICAgICAg
+aW4gaG9zdCB1c2VyLXNwYWNlCj4gICAgIEIpIFRha2luZyAiZWJyZWFrIiB0cmFwIGZyb20gZ3Vl
+c3QgYXMgQlJFQUtQT0lOVAo+ICAgICAgICAgZXhjZXB0aW9uIGluIGd1ZXN0CgpTdXJlLCBJIHdp
+bGwgcHJlcGFyZSBhIFYyIHNlcmllcy4KClRoYW5rcy4KCj4gCj4gUmVnYXJkcywKPiBBbnVwCj4g
+Cj4gPgo+ID4gUmVnYXJkcywKPiA+IENoYW8KPiA+Cj4gPiA+ID4KPiA+ID4gPiBUaGlzIHNlcmll
+cyBpcyBiYXNlZCBvbiBMaW51eCA2LjctcmM2IGFuZCBpcyBhbHNvIGF2YWlsYWJsZSBhdDoKPiA+
+ID4gPiBodHRwczovL2dpdGh1Yi5jb20vRHUtQ2hhby9saW51eC90cmVlL3Jpc2N2X2dkX3N3Cj4g
+PiA+ID4KPiA+ID4gPiBUaGUgbWF0Y2hlZCBRRU1VIGlzIGF2YWlsYWJsZSBhdDoKPiA+ID4gPiBo
+dHRwczovL2dpdGh1Yi5jb20vRHUtQ2hhby9xZW11L3RyZWUvcmlzY3ZfZ2Rfc3cKPiA+ID4gPgo+
+ID4gPiA+IENoYW8gRHUgKDMpOgo+ID4gPiA+ICAgUklTQy1WOiBLVk06IEVuYWJsZSB0aGUgS1ZN
+X0NBUF9TRVRfR1VFU1RfREVCVUcgY2FwYWJpbGl0eQo+ID4gPiA+ICAgUklTQy1WOiBLVk06IElt
+cGxlbWVudCBrdm1fYXJjaF92Y3B1X2lvY3RsX3NldF9ndWVzdF9kZWJ1ZygpCj4gPiA+ID4gICBS
+SVNDLVY6IEtWTTogSGFuZGxlIGJyZWFrcG9pbnQgZXhpdHMgZm9yIFZDUFUKPiA+ID4gPgo+ID4g
+PiA+ICBhcmNoL3Jpc2N2L2luY2x1ZGUvdWFwaS9hc20va3ZtLmggfCAgMSArCj4gPiA+ID4gIGFy
+Y2gvcmlzY3Yva3ZtL3ZjcHUuYyAgICAgICAgICAgICB8IDE1ICsrKysrKysrKysrKystLQo+ID4g
+PiA+ICBhcmNoL3Jpc2N2L2t2bS92Y3B1X2V4aXQuYyAgICAgICAgfCAgNCArKysrCj4gPiA+ID4g
+IGFyY2gvcmlzY3Yva3ZtL3ZtLmMgICAgICAgICAgICAgICB8ICAxICsKPiA+ID4gPiAgNCBmaWxl
+cyBjaGFuZ2VkLCAxOSBpbnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQo+ID4gPiA+Cj4gPiA+
+ID4gLS0KPiA+ID4gPiAyLjE3LjEKPiA+ID4gPgo+ID4gPiA+Cj4gPiA+ID4gLS0KPiA+ID4gPiBr
+dm0tcmlzY3YgbWFpbGluZyBsaXN0Cj4gPiA+ID4ga3ZtLXJpc2N2QGxpc3RzLmluZnJhZGVhZC5v
+cmcKPiA+ID4gPiBodHRwOi8vbGlzdHMuaW5mcmFkZWFkLm9yZy9tYWlsbWFuL2xpc3RpbmZvL2t2
+bS1yaXNjdgo=
 
