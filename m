@@ -1,331 +1,216 @@
-Return-Path: <kvm+bounces-5704-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5705-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A4BE824E9F
-	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 07:25:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B90E824F44
+	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 08:39:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3FF3285752
-	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 06:25:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3210D284DFA
+	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 07:39:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA85DC2D7;
-	Fri,  5 Jan 2024 06:25:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9523F2031B;
+	Fri,  5 Jan 2024 07:39:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DvBE4kTo"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="aGcGJB2S"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2050.outbound.protection.outlook.com [40.107.223.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75A601DFD1;
-	Fri,  5 Jan 2024 06:25:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1704435930; x=1735971930;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=1lhIJgvpNmrWsoFaDWS8YiGcduUHLJA3usysoBpMoGU=;
-  b=DvBE4kToMTs0EU5CGaPI+yZkWAMOBWC3WATwAL9s8CphW7dEe+JfFc5k
-   BpMB7gSqJqROR84aY2Fc+G89HnF8cDLOtDkhCzYL1PrNtGPBX+lZlPnEZ
-   7KQjyHv9g2eNlQhGuOv03tSxcznRhGcx1hTluPArLVc/9GHhhtnpV+z9w
-   Dk1sqfeYj6+DqDtLwEQtK+hkXWfLG8AraKMylO7tyOWixYvD1uthDOQlC
-   5LuR372fWXhxcB3J5p+gfe0mAPRKJMvUt8M4eShm0TtgsTa8LMMVBfSQZ
-   IRd8jKPLIE1w6FltYeuWKj/RkxQNpdaeTHCaNR/EAOdw5D3T2/MSwVb2h
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10943"; a="387893437"
-X-IronPort-AV: E=Sophos;i="6.04,332,1695711600"; 
-   d="scan'208";a="387893437"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jan 2024 22:25:29 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.04,332,1695711600"; 
-   d="scan'208";a="22750398"
-Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
-  by fmviesa001.fm.intel.com with ESMTP; 04 Jan 2024 22:25:27 -0800
-Date: Fri, 5 Jan 2024 14:25:26 +0800
-From: Yuan Yao <yuan.yao@linux.intel.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
-	seanjc@google.com, shuah@kernel.org, stevensd@chromium.org
-Subject: Re: [RFC PATCH v2 3/3] KVM: selftests: Add set_memory_region_io to
- test memslots for MMIO BARs
-Message-ID: <20240105062526.4nrczazdbn3ysd62@yy-desk-7060>
-References: <20240103084327.19955-1-yan.y.zhao@intel.com>
- <20240103084535.20162-1-yan.y.zhao@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E402B2134A;
+	Fri,  5 Jan 2024 07:39:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=V5+uU29fV7u31KVw5gBnD/ekDwf4a9WGIuDCNZDBzkbQFyJEcYG5uhcRoEG/rx4IT9g52xHaUMzszvbqWJKFHKjZUpB1ZwZH3yk2w9cSFdWY2PRaHll6NLlW7l0Ajz1nsr+NEwjJtmdxByFUNwDEOimHkPyifIwOOBxAuLbxdH74a4+cVKTiZJE2H9wZYehUJc8VhM5LEzpGyoI/kaDNu7Ur1M3tL3ye53178QR6yGNQClQuBNzA3wv6FlLkejzKGYKLpee5jei5hfLW9G87Z4N0PgU6cLnHFrC7ePZ+Dk0V3H+HhA6keQLGxHqFWZYgsYUUnHnUn509V0cEPcnrOg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tVxQdUzaGM4z/PADjmgKO1bLWhVm/seNRf3hqiv/Vk8=;
+ b=LJBisCz5/yMWQPOKAuaiWtyBNPZ5Gl29NnaMmpafIUUyYB7GfiAIvPvps0YPsh8bBxEFSICX1YxOeKH6rRwjhb+IJvwRx9ZfS40TXk25lNvGlB6eRSEP1MPxfZ5E2kxHj98nCFbo/vXAye/EiGjCY0LE0Ol9GURpMO/Yw+UJzcXUN0BanswngWtz2Wrv6MwvwGXpOvDnAASi4HQlCowr1VhczcPLMcrMaIEuxHhCygHUFlJewee7Cmm7AnQ7ub5yfzI8rpJfdaqq6xkKaqX0Hi0e9HQp5l+1T2G6BsbGsgd1cxfkwhHk1rowCfaOC7yMobJA3S6SactSRhcr7oGFBg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=oracle.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tVxQdUzaGM4z/PADjmgKO1bLWhVm/seNRf3hqiv/Vk8=;
+ b=aGcGJB2SdIWnGNUflkUkL7zhkbsznGElyvGtz/AAt8GTz+UdgDQQQOA5t/ldpVt4URhmtvwkE2LZUS9mw+ubgLH/NKcKlSmRJc19/8IYsrauDFKU3YmGBekfb2t1GUJ79ZpzAJyG7ajQP0+ad+PrdaJBtbXTqNyE6V3P4ucoSuB7+kiRyApxJUD0Z4OMaJ5lfyDPgp9tgUAwKZoFCknIdlrL8WPCNDG8xF/jBve4nkSqlgKxNumqozeHyfVpKPAg50uQM3QwtperX6f2ofMxpX/606m4ZknAIWJ2AwdgQgNKwKi4Ia0XBISEWu0HjL/dJqTjliu4rMVHe63Gb9ecOQ==
+Received: from CY5PR19CA0083.namprd19.prod.outlook.com (2603:10b6:930:69::21)
+ by DS7PR12MB8291.namprd12.prod.outlook.com (2603:10b6:8:e6::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.17; Fri, 5 Jan
+ 2024 07:38:56 +0000
+Received: from CY4PEPF0000E9D8.namprd05.prod.outlook.com
+ (2603:10b6:930:69:cafe::e4) by CY5PR19CA0083.outlook.office365.com
+ (2603:10b6:930:69::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.16 via Frontend
+ Transport; Fri, 5 Jan 2024 07:38:56 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CY4PEPF0000E9D8.mail.protection.outlook.com (10.167.241.83) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7159.9 via Frontend Transport; Fri, 5 Jan 2024 07:38:56 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Thu, 4 Jan 2024
+ 23:38:43 -0800
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Thu, 4 Jan 2024
+ 23:38:43 -0800
+Received: from Asurada-Nvidia (10.127.8.12) by mail.nvidia.com (10.129.68.6)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41 via Frontend
+ Transport; Thu, 4 Jan 2024 23:38:41 -0800
+Date: Thu, 4 Jan 2024 23:38:40 -0800
+From: Nicolin Chen <nicolinc@nvidia.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+CC: Yi Liu <yi.l.liu@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>,
+	"joro@8bytes.org" <joro@8bytes.org>, "alex.williamson@redhat.com"
+	<alex.williamson@redhat.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>,
+	"baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>, "cohuck@redhat.com"
+	<cohuck@redhat.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mjrosato@linux.ibm.com"
+	<mjrosato@linux.ibm.com>, "chao.p.peng@linux.intel.com"
+	<chao.p.peng@linux.intel.com>, "yi.y.sun@linux.intel.com"
+	<yi.y.sun@linux.intel.com>, "peterx@redhat.com" <peterx@redhat.com>,
+	"jasowang@redhat.com" <jasowang@redhat.com>,
+	"shameerali.kolothum.thodi@huawei.com"
+	<shameerali.kolothum.thodi@huawei.com>, "lulu@redhat.com" <lulu@redhat.com>,
+	"suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "Duan,
+ Zhenzhong" <zhenzhong.duan@intel.com>, "joao.m.martins@oracle.com"
+	<joao.m.martins@oracle.com>, "Zeng, Xin" <xin.zeng@intel.com>, "Zhao, Yan Y"
+	<yan.y.zhao@intel.com>
+Subject: Re: [PATCH v7 1/3] iommufd: Add data structure for Intel VT-d
+ stage-1 cache invalidation
+Message-ID: <ZZeyAC3c8LJz7nsQ@Asurada-Nvidia>
+References: <7c398efc-8a2f-479d-bcff-ded8cc1ef3d0@intel.com>
+ <20240102233849.GK50406@nvidia.com>
+ <c59a780d-4030-4815-a34b-fb2e2f902ab3@intel.com>
+ <20240103160108.GP50406@nvidia.com>
+ <ZZWP7iBqUtbTRb3s@Asurada-Nvidia>
+ <20240103165848.GR50406@nvidia.com>
+ <ZZWUD+lCw3mRc/15@Asurada-Nvidia>
+ <20240103175202.GT50406@nvidia.com>
+ <ZZXBGw9dJyvb/5r5@Asurada-Nvidia>
+ <20240104000204.GV50406@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20240103084535.20162-1-yan.y.zhao@intel.com>
-User-Agent: NeoMutt/20171215
+In-Reply-To: <20240104000204.GV50406@nvidia.com>
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D8:EE_|DS7PR12MB8291:EE_
+X-MS-Office365-Filtering-Correlation-Id: f6e9e5cd-2b57-4662-2d25-08dc0dc15f83
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	QE+A390BRBr76HFRwrNSbDJqQlOS0Wgbih5aE0ZjSwuuuHOuC/Mbh0S9tBoYM7EE7v6E0A6rFpHHV8AJ0/FM1V43Kzz2ycVNB46VtrSnz2+bt+5cvHONsNkc2Qr/k5pTERSsXRexFxwRQ/1wQdh+oJYXIjxsxL/V78g8zk9UGVXRajT+Pav5cvY5YVzF7eeHAbSqibsm65R8g5g2vygGsDS++6iTGf7wjSMRreZorKQisxpr4eKlJ87FVh5FUFOtu/k4ZEESu7RgqERPx2R+ZlSuyxjT23Icscxu8We56TyV5Ok9ieZp38S35+iV4ajmQZUxXP3oMOPU2q0GgFnIXlBwhA/nWpt/05U0tmkPvVTrHbfms9XAFYfw4SwxQOLPERaSi+3AiC5qJj16rm3kmsOjVBM3OSbYr50CAoang2kZHYtDss92bPr84qdrQt9j9GqujxENCaEZQMgWYqcs3MQ7a3I+K2PTRehx+2hnUvu2AXMlCEwhBX6qsH0aM8UK648NcRVQqO5YuUoOhQwDFY8Qq2H6KokYEeVEo2auFzHffBdNtWqNhiq7+TzcBI7lP/fsBwjKWRBs3VpEFCcZpilLHGe4hA3On57LWIvFgeqmSIhzRoTw9BFy1VcefsmWzeyrYaVzlMKH7ui6TRVWHjitzEWa4S3TID19tuGZ/9IlOKcxUeEji2HiXD7mHZbgwXDUWqm9CW2qxfyEkYSfkv16w4/QdvkBzh7CY+CsAdR5SsH9K+X1yEN+OKmdHHCJ
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(376002)(136003)(346002)(396003)(39860400002)(230922051799003)(451199024)(1800799012)(82310400011)(64100799003)(186009)(46966006)(40470700004)(36840700001)(83380400001)(9686003)(336012)(426003)(26005)(82740400003)(316002)(47076005)(36860700001)(5660300002)(8676002)(8936002)(6862004)(4326008)(7416002)(2906002)(478600001)(33716001)(6636002)(54906003)(70206006)(70586007)(41300700001)(356005)(7636003)(86362001)(40480700001)(55016003)(40460700003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jan 2024 07:38:56.0955
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: f6e9e5cd-2b57-4662-2d25-08dc0dc15f83
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000E9D8.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB8291
 
-On Wed, Jan 03, 2024 at 04:45:35PM +0800, Yan Zhao wrote:
-> Added a selftest set_memory_region_io to test memslots for MMIO BARs.
+On Wed, Jan 03, 2024 at 08:02:04PM -0400, Jason Gunthorpe wrote:
+> On Wed, Jan 03, 2024 at 12:18:35PM -0800, Nicolin Chen wrote:
+> > > The driver would have to create it and there would be some driver
+> > > specific enclosing struct to go with it
+> > > 
+> > > Perhaps device_ids goes in the driver specific struct, I don't know.
+> > 
+> > +struct iommufd_viommu {
+> > +	struct iommufd_object obj;
+> > +	struct iommufd_ctx *ictx;
+> > +	struct iommu_device *iommu_dev;
+> > +	struct iommufd_hwpt_paging *hwpt;	/* maybe unneeded */
+> > +
+> > +	int vmid;
+> > +
+> > +	union iommu_driver_user_data {
+> > +		struct iommu_driver_user_vtd;
+> > +		struct iommu_driver_user_arm_smmuv3;
+> > +		struct iommu_driver_user_amd_viommu;
+> > +	};
+> 
+> Not like that, in the usual container_of way
 
-Emm.. "set_memory_region_io" doesn't represent the real testing purpose,
-but not sure if things like "memory_region_page_refcount_test" become
-better...
+How about this:
 
-> The MMIO BARs' backends are compound/non-compound huge pages serving as
-> device resources allocated by a mock device driver.
->
-> This selftest will assert and report "errno=14 - Bad address" in vcpu_run()
-> if any failure is met to add such MMIO BAR memslots.
-> After MMIO memslots removal, page reference counts of the device resources
-> are also checked.
->
-> As this selftest will interacts with a mock device "/dev/kvm_mock_device",
-> it depends on test driver test_kvm_mock_device.ko in the kernel.
-> CONFIG_TEST_KVM_MOCK_DEVICE=m must be enabled in the kernel.
->
-> Currently, this selftest is only compiled for __x86_64__.
->
-> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> ---
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  .../selftests/kvm/set_memory_region_io.c      | 188 ++++++++++++++++++
->  2 files changed, 189 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/set_memory_region_io.c
->
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index 4412b42d95de..9d39514b6403 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -144,6 +144,7 @@ TEST_GEN_PROGS_x86_64 += memslot_modification_stress_test
->  TEST_GEN_PROGS_x86_64 += memslot_perf_test
->  TEST_GEN_PROGS_x86_64 += rseq_test
->  TEST_GEN_PROGS_x86_64 += set_memory_region_test
-> +TEST_GEN_PROGS_x86_64 += set_memory_region_io
->  TEST_GEN_PROGS_x86_64 += steal_time
->  TEST_GEN_PROGS_x86_64 += kvm_binary_stats_test
->  TEST_GEN_PROGS_x86_64 += system_counter_offset_test
-> diff --git a/tools/testing/selftests/kvm/set_memory_region_io.c b/tools/testing/selftests/kvm/set_memory_region_io.c
-> new file mode 100644
-> index 000000000000..e221103091f4
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/set_memory_region_io.c
-> @@ -0,0 +1,188 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +#define _GNU_SOURCE /* for program_invocation_short_name */
-> +#include <fcntl.h>
-> +#include <pthread.h>
-> +#include <sched.h>
-> +#include <semaphore.h>
-> +#include <signal.h>
-> +#include <stdio.h>
-> +#include <stdlib.h>
-> +#include <string.h>
-> +#include <sys/ioctl.h>
-> +#include <sys/mman.h>
-> +
-> +#include <linux/compiler.h>
-> +
-> +#include <test_util.h>
-> +#include <kvm_util.h>
-> +#include <processor.h>
-> +
-> +#include <../../../../lib/test_kvm_mock_device_uapi.h>
-> +
-> +/*
-> + * Somewhat arbitrary location and slot, intended to not overlap anything.
-> + */
-> +#define MEM_REGION_GPA_BASE	0xc0000000
-> +#define RANDOM_OFFSET		0x1000
-> +#define MEM_REGION_GPA_RANDOM	(MEM_REGION_GPA_BASE + RANDOM_OFFSET)
-> +#define MEM_REGION_SLOT_ID	10
-> +
-> +static const bool non_compound_supported;
-> +
-> +static const uint64_t BASE_VAL = 0x1111;
-> +static const uint64_t RANDOM_VAL = 0x2222;
-> +
-> +static unsigned long bar_size;
-> +
-> +static sem_t vcpu_ready;
-> +
-> +static void guest_code_read_bar(void)
-> +{
-> +	uint64_t val;
-> +
-> +	GUEST_SYNC(0);
-> +
-> +	val = READ_ONCE(*((uint64_t *)MEM_REGION_GPA_RANDOM));
-> +	GUEST_ASSERT_EQ(val, RANDOM_VAL);
-> +
-> +	val = READ_ONCE(*((uint64_t *)MEM_REGION_GPA_BASE));
-> +	GUEST_ASSERT_EQ(val, BASE_VAL);
-> +
-> +	GUEST_DONE();
-> +}
-> +
-> +static void *vcpu_worker(void *data)
-> +{
-> +	struct kvm_vcpu *vcpu = data;
-> +	struct kvm_run *run = vcpu->run;
-> +	struct ucall uc;
-> +	uint64_t cmd;
-> +
-> +	/*
-> +	 * Loop until the guest is done.  Re-enter the guest on all MMIO exits,
-> +	 * which will occur if the guest attempts to access a memslot after it
-> +	 * has been deleted or while it is being moved .
-> +	 */
-> +	while (1) {
-> +		vcpu_run(vcpu);
-> +
-> +		if (run->exit_reason == KVM_EXIT_IO) {
-> +			cmd = get_ucall(vcpu, &uc);
-> +			if (cmd != UCALL_SYNC)
-> +				break;
-> +
-> +			sem_post(&vcpu_ready);
-> +			continue;
-> +		}
-> +
-> +		if (run->exit_reason != KVM_EXIT_MMIO)
-> +			break;
+// iommu.h
+@@ -490,6 +490,16 @@ struct iommu_ops {
++       /* User space instance allocation and freeing by the iommu driver */
++       struct iommu_device_user *(*iommu_alloc_user)(struct iommu_device *iommu);
++       void (*iommu_free_user)(struct iommu_device_user *iommu_user);
++       int (*iommu_user_set_dev_id)(struct iommu_device_user *iommu_user,
++                                    struct device *dev, u64 dev_id);
++       int (*iommu_user_unset_dev_id)(struct iommu_device_user *iommu_user,
++                                      struct device *dev);
++       int (*iommu_cache_invalidate_usewr)(struct iommu_device_user *iommu_user,
++                                           struct iommu_user_data_array *array);
+...
++/**
++ * struct iommu_device_user - IOMMU core representation of one IOMMU virtual
++ *                            instance
++ * @iommu_dev: Underlying IOMMU hardware instance
++ * @id: Virtual instance ID, e.g. a vmid
++ */
++struct iommu_device_user {
++       struct iommu_device *iommu_dev;
++       struct xarray virtual_ids;
++       u32 id;
++};
 
-Can the KVM_EXIT_MMIO happen on x86 ? IIUC the accessed GVAs
-in guest code have 1:1 mapping to MEM_REGION_GPA_BASE, which
-is covered by the memslot, and the memory slot is there
-until the guest code path done.
+// iommufd_private.h
++struct iommufd_viommu {
++       struct iommufd_object obj;
++       struct iommufd_ctx *ictx;
++       struct iommu_device *iommu_dev;
++       struct iommu_device_user *iommu_user;
++       struct iommufd_hwpt_paging *hwpt;
++};
++
++int iommufd_viommu_alloc_ioctl(struct iommufd_ucmd *ucmd);
++void iommufd_viommu_destroy(struct iommufd_object *obj);
 
-> +
-> +		TEST_ASSERT(!run->mmio.is_write, "Unexpected exit mmio write");
-> +		TEST_ASSERT(run->mmio.len == 8,
-> +			    "Unexpected exit mmio size = %u", run->mmio.len);
-> +
-> +		TEST_ASSERT(run->mmio.phys_addr < MEM_REGION_GPA_BASE ||
-> +			    run->mmio.phys_addr >= MEM_REGION_GPA_BASE + bar_size,
-> +			    "Unexpected exit mmio address = 0x%llx",
-> +			    run->mmio.phys_addr);
+So iommu_alloc_user op allocates a driver private structure that
+contains an iommu_device_user and returns &priv->iommu_user.
 
-Ditto, I just think you don't need this part in this testing.
+The set/unset_dev_id ops probably need a type argument if there
+can be a multi-xarray case, then the virtual_ids xarray should
+be moved to the driver private structure too?
 
-> +	}
-> +
-> +	if (run->exit_reason == KVM_EXIT_IO && cmd == UCALL_ABORT)
-> +		REPORT_GUEST_ASSERT(uc);
-> +
-> +	return NULL;
-> +}
-> +
-> +static void wait_for_vcpu(void)
-> +{
-> +	struct timespec ts;
-> +
-> +	TEST_ASSERT(!clock_gettime(CLOCK_REALTIME, &ts),
-> +		    "clock_gettime() failed: %d\n", errno);
-> +
-> +	ts.tv_sec += 2;
-> +	TEST_ASSERT(!sem_timedwait(&vcpu_ready, &ts),
-> +		    "sem_timedwait() failed: %d\n", errno);
-> +
-> +	/* Wait for the vCPU thread to reenter the guest. */
-> +	usleep(100000);
+Also, a 64-bit virtual id in the uAPI was suggested previously.
+But xarray is limited to a 32-bit index? Should we compromise
+the uAPI to 32-bit or is there an alternative for a 64-bit id
+lookup?
 
-In this testing it's not needed.
-Because you only check guest state after guest code path done,
-so pthread_join() is enough there.
-
-> +}
-> +
-> +static void test_kvm_mock_device_bar(bool compound)
-> +{
-> +	struct kvm_vm *vm;
-> +	void *mem;
-> +	struct kvm_vcpu *vcpu;
-> +	pthread_t vcpu_thread;
-> +	int fd, ret;
-> +	u32 param_compound = compound;
-> +	u32 inequal = 0;
-> +
-> +	fd = open("/dev/kvm_mock_device", O_RDWR);
-> +	if (fd < 0) {
-> +		pr_info("Please ensure \"CONFIG_TEST_KVM_MOCK_DEVICE=m\" is enabled in the kernel");
-> +		pr_info(", and execute\n\"modprobe test_kvm_mock_device\n");
-> +	}
-> +	TEST_ASSERT(fd >= 0, "Failed to open kvm mock device.");
-
-Minor:
-May better to move this part into main(), highlight it's a
-must have dependency at beginning.
-
-> +
-> +	ret = ioctl(fd, KVM_MOCK_DEVICE_GET_BAR_SIZE, &bar_size);
-> +	TEST_ASSERT(ret == 0, "Failed to get bar size of kvm mock device");
-> +
-> +	ret = ioctl(fd, KVM_MOCK_DEVICE_PREPARE_RESOURCE, &param_compound);
-> +	TEST_ASSERT(ret == 0, "Failed to prepare resource of kvm mock device");
-> +
-> +	mem = mmap(NULL, (size_t)bar_size, PROT_READ | PROT_WRITE, MAP_SHARED,
-> +		   fd, 0);
-> +	TEST_ASSERT(mem != MAP_FAILED, "Failed to mmap() kvm mock device bar");
-> +
-> +	*(u64 *)mem = BASE_VAL;
-> +	*(u64 *)(mem + RANDOM_OFFSET) = RANDOM_VAL;
-> +
-> +	vm = vm_create_with_one_vcpu(&vcpu, guest_code_read_bar);
-> +
-> +	vm_set_user_memory_region(vm, MEM_REGION_SLOT_ID, 0, MEM_REGION_GPA_BASE,
-> +				  bar_size, mem);
-> +
-> +	virt_map(vm, MEM_REGION_GPA_BASE, MEM_REGION_GPA_BASE,
-> +		 (RANDOM_OFFSET / getpagesize()) + 1);
-> +
-> +	pthread_create(&vcpu_thread, NULL, vcpu_worker, vcpu);
-> +
-> +	/* Ensure the guest thread is spun up. */
-> +	wait_for_vcpu();
-> +
-> +	pthread_join(vcpu_thread, NULL);
-> +
-> +	vm_set_user_memory_region(vm, MEM_REGION_SLOT_ID, 0, 0, 0, 0);
-> +	kvm_vm_free(vm);
-> +
-> +	ret = ioctl(fd, KVM_MOCK_DEVICE_CHECK_BACKEND_REF, &inequal);
-> +	TEST_ASSERT(ret == 0 && inequal == 0, "Incorrect resource ref of KVM device");
-> +
-> +	munmap(mem, bar_size);
-> +	close(fd);
-> +}
-> +
-> +static void test_non_compound_backend(void)
-> +{
-> +	pr_info("Testing non-compound huge page backend for mem slot\n");
-> +	test_kvm_mock_device_bar(false);
-> +}
-> +
-> +static void test_compound_backend(void)
-> +{
-> +	pr_info("Testing compound huge page backend for mem slot\n");
-> +	test_kvm_mock_device_bar(true);
-> +}
-> +
-> +int main(int argc, char *argv[])
-> +{
-> +#ifdef __x86_64__
-> +	test_compound_backend();
-> +	if (non_compound_supported)
-
-Nobody set this, but the mock device looks already supported
-it, so how about just run the 2 testings directly here ?
-
-> +		test_non_compound_backend();
-> +#endif
-> +
-> +	return 0;
-> +}
-> --
-> 2.17.1
->
->
+Thanks
+Nicolin
 
