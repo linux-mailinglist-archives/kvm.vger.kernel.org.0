@@ -1,150 +1,146 @@
-Return-Path: <kvm+bounces-5699-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5700-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91A54824C40
-	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 01:55:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E1CB824CA4
+	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 02:48:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8BB6B1C21AC0
-	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 00:55:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 624FF2866E1
+	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 01:48:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C92E61FB4;
-	Fri,  5 Jan 2024 00:54:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 089E21FC4;
+	Fri,  5 Jan 2024 01:48:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AUB3Y+B1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fwIgTIfo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD59A1845
-	for <kvm@vger.kernel.org>; Fri,  5 Jan 2024 00:54:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-28c35186b09so652646a91.1
-        for <kvm@vger.kernel.org>; Thu, 04 Jan 2024 16:54:54 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBD471FAD
+	for <kvm@vger.kernel.org>; Fri,  5 Jan 2024 01:48:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-555f95cc2e4so1363225a12.3
+        for <kvm@vger.kernel.org>; Thu, 04 Jan 2024 17:48:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704416094; x=1705020894; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Ee/8DoVUu/+3ZRM6tajVkLwvVI4m4v9ZGKpZPXTQPEo=;
-        b=AUB3Y+B1u/AgTlK4AZOl0VltHPrfeFkdx5MqSmME4OJ4OBGlEce0BODcj6e3p1VBcX
-         0AwiDsuLasQPkYrfi5DyabgVfc9KHKuMpOtnnrOi+qXRE+UfcMWsGAIlUZNh1L9Wdo8q
-         y3n90PXhUGS5erqFCkzU9dozEA47CIRswjewkRUhAb3HPAkbV5NzlfxjOdeQGx+AU1MK
-         2Jv0viALWqSuKi4wZlN42P21sfe0uU6OoDRwitkzeS7qzGoTLy0Nqi5BCgyUvIaboKfJ
-         wLjAfnjEeKJmzxHOTWyrTMYBfYfG91FiX9RP0bBNDnNaQx8WNykUlCjbcyQYi2LaXr3q
-         CeIg==
+        d=gmail.com; s=20230601; t=1704419284; x=1705024084; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lpGhd5xP2GOFQkyXd8DRiEp0/yoaDhLygKIg+CA9JJ8=;
+        b=fwIgTIfo+vNb1m46wu72M9BPMQB8fs9dQB1qSmP3G9mF904ogTMHLYNS5oSg+fGssH
+         MDdBigd/brEy3RwSkhWmFSKUHixmhJL8TOaEiu2wQKNUDTpZBqtYl5ccQ33fSXYFEkml
+         p4i8dGTdL/ow6GofUAziPMiwxm1om0NMPa9aj9S+3J1Hshr+DswUg2cy2n8u3F932SZz
+         UXCJ95xGHgNwsol+ebWLrheYoKCa9BRLqFm85G/fbd3MIfPKBekMIVpknF0ohjgvWtFk
+         tbN1n3NhyKSE8QWOpIImMWPhcKFQg2GB1fYFTJ5ZzL3LfGvKPNQ7Uwm7/lRwPk3tnWXI
+         UHYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704416094; x=1705020894;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Ee/8DoVUu/+3ZRM6tajVkLwvVI4m4v9ZGKpZPXTQPEo=;
-        b=J4f299SiAYGJkoZ/8WRlzY2gz9lmJhxiETuswtWmcjpKL8FsolE2bqNlhYp5tbOABW
-         IPzMLr9rwXPIxgUn1SiL+VrGwg+1T9ddTPYiPWKwQ5/PiIo97tVk+gXHryJne8vJ+hrx
-         sBfn+C8gsQSZVhGvsNc1Imrs6xueZY1eLOQmmcZSf5+yziPzSJiYIstrcie/WJO5oM9G
-         praMDxuodMAuX5c1nmBIqlvuHTKYP2hiXK5VfleMLcTGh44YZ7AsHpryCdLGyflCVKnI
-         ea6E/D94Rv1cU69SdKp3hDkNhNHvbP0sBSzoxkHGSP51sAziq5sGi+MBYgE0ARNPCc1S
-         qdxA==
-X-Gm-Message-State: AOJu0Yx8XDUqhGR6MKYf6RhTQrz502W7ci4oiyfayuotiyFMVMsRY2PQ
-	72KpavGXvSAhD85Af61TLzYgOC49vi9RizLguQ==
-X-Google-Smtp-Source: AGHT+IF6f0t2GPlj2yIG+6jI2DtC4qZK/Dt/Sz+kJOphtaSvbettwqJ3T7+DlfuI3bw9WNBRk0L/yn/u+Dc=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:51e5:b0:28d:2d4:4f89 with SMTP id
- u92-20020a17090a51e500b0028d02d44f89mr1236pjh.4.1704416092912; Thu, 04 Jan
- 2024 16:54:52 -0800 (PST)
-Date: Thu, 4 Jan 2024 16:54:51 -0800
-In-Reply-To: <a2344e2143ef2b9eca0d153c86091e58e596709d.camel@intel.com>
+        d=1e100.net; s=20230601; t=1704419284; x=1705024084;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lpGhd5xP2GOFQkyXd8DRiEp0/yoaDhLygKIg+CA9JJ8=;
+        b=bOtmlZjWM6PyWTS6YlL+6KsBeiNAFR1ao7HLAFLAwNAdpRjoup+AmE4w41eec2qGQg
+         6xqhBC0QHUS35YkKo0bSbDGjOj5a/4rmvkYZ+fdNrnSEEgrGWw7MNdpxGoMUR26dq1QD
+         QX7E7NJBLGnXWX1ZSkAjQKAA1XxF8bqpen7uPjc312CCilTQJujqD4PlyGWFjSreWt+E
+         ovYRMeHntYBdZFFlmg58tx8F995v6wpaSYRGz93lYiwk7Z7n7ZfVSDnQ3o+AANW6a6UC
+         PogGxPWVVSuJyhWQYN//CmCGxNM2zXz2F1Mj2zkMCKlAtK4+KpyUj4a7JEDISAa+k0d5
+         +SVw==
+X-Gm-Message-State: AOJu0YzdJZanADONd3tVd8wqkWpD2LU8dM00z8iQCjaBvnaWBnsCGhIi
+	Dn9L/x//0aGSztPJ2m4iHxnk4jzpELN4+rkLNIQ=
+X-Google-Smtp-Source: AGHT+IHO+jlFZC49au0wxufSxJTmoDEZTLiybwuL2sKnI67w9rr67BauGwzCbJawMXOhql2QSlqfLetCX1YnF46mge8=
+X-Received: by 2002:a50:c092:0:b0:557:1e56:c2cb with SMTP id
+ k18-20020a50c092000000b005571e56c2cbmr196552edf.69.1704419283601; Thu, 04 Jan
+ 2024 17:48:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231221140239.4349-1-weijiang.yang@intel.com>
- <93f118670137933980e9ed263d01afdb532010ed.camel@intel.com>
- <5f57ce03-9568-4739-b02d-e9fac6ed381a@intel.com> <6179ddcb25c683bd178e74e7e2455cee63ba74de.camel@intel.com>
- <ZZdLG5W5u19PsnTo@google.com> <a2344e2143ef2b9eca0d153c86091e58e596709d.camel@intel.com>
-Message-ID: <ZZdSSzCqvd-3sdBL@google.com>
-Subject: Re: [PATCH v8 00/26] Enable CET Virtualization
-From: Sean Christopherson <seanjc@google.com>
-To: Rick P Edgecombe <rick.p.edgecombe@intel.com>
-Cc: Chao Gao <chao.gao@intel.com>, Weijiang Yang <weijiang.yang@intel.com>, 
-	Dave Hansen <dave.hansen@intel.com>, "peterz@infradead.org" <peterz@infradead.org>, 
-	"john.allen@amd.com" <john.allen@amd.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+References: <20240103123959.46994-1-liangchen.linux@gmail.com>
+ <ZZV8gz7wSCZCX0GZ@google.com> <CAKhg4tJA2TQ_1Zwv2N-PD7dsv_b5OW3Y5uRpnrR2ZOy-63Dsng@mail.gmail.com>
+ <CALzav=fKKvKzm6fYUyP4=_uPcFeA3wqBZqGonkz6Rd1+6yuVaw@mail.gmail.com>
+In-Reply-To: <CALzav=fKKvKzm6fYUyP4=_uPcFeA3wqBZqGonkz6Rd1+6yuVaw@mail.gmail.com>
+From: Liang Chen <liangchen.linux@gmail.com>
+Date: Fri, 5 Jan 2024 09:47:51 +0800
+Message-ID: <CAKhg4tKDvw9XaG5pDSUKRxSBKWFKAjFndsomdCusd3Z6phcHhw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: count number of zapped pages for tdp_mmu
+To: David Matlack <dmatlack@google.com>
+Cc: Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jan 05, 2024, Rick P Edgecombe wrote:
-> On Thu, 2024-01-04 at 16:22 -0800, Sean Christopherson wrote:
-> > No, the days of KVM making shit up from are done.=C2=A0 IIUC, you're ad=
-vocating
-> > that it's ok for KVM to induce a #CP that architecturally should not
-> > happen.=C2=A0 That is not acceptable, full stop.
->=20
-> Nope, not advocating that at all.
+On Fri, Jan 5, 2024 at 2:29=E2=80=AFAM David Matlack <dmatlack@google.com> =
+wrote:
+>
+> On Wed, Jan 3, 2024 at 8:14=E2=80=AFPM Liang Chen <liangchen.linux@gmail.=
+com> wrote:
+> >
+> > On Wed, Jan 3, 2024 at 11:25=E2=80=AFPM Sean Christopherson <seanjc@goo=
+gle.com> wrote:
+> > >
+> > > +David
+> > >
+> > > On Wed, Jan 03, 2024, Liang Chen wrote:
+> > > > Count the number of zapped pages of tdp_mmu for vm stat.
+> > >
+> > > Why?  I don't necessarily disagree with the change, but it's also not=
+ obvious
+> > > that this information is all that useful for the TDP MMU, e.g. the pf=
+_fixed/taken
+> > > stats largely capture the same information.
+> > >
+> >
+> > We are attempting to make zapping specific to a particular memory
+> > slot, something like below.
+> >
+> > void kvm_tdp_zap_pages_in_memslot(struct kvm *kvm, struct kvm_memory_sl=
+ot *slot)
+> > {
+> >         struct kvm_mmu_page *root;
+> >         bool shared =3D false;
+> >         struct tdp_iter iter;
+> >
+> >         gfn_t end =3D slot->base_gfn + slot->npages;
+> >         gfn_t start =3D slot->base_gfn;
+> >
+> >         write_lock(&kvm->mmu_lock);
+> >         rcu_read_lock();
+> >
+> >         for_each_tdp_mmu_root_yield_safe(kvm, root, false) {
+> >
+> >                 for_each_tdp_pte_min_level(iter, root,
+> > root->role.level, start, end) {
+> >                         if (tdp_mmu_iter_cond_resched(kvm, &iter, false=
+, false))
+> >                                 continue;
+> >
+> >                         if (!is_shadow_present_pte(iter.old_spte))
+> >                                 continue;
+> >
+> >                         tdp_mmu_set_spte(kvm, &iter, 0);
+> >                 }
+> >         }
+> >
+> >         kvm_flush_remote_tlbs(kvm);
+> >
+> >         rcu_read_unlock();
+> >         write_unlock(&kvm->mmu_lock);
+> > }
+> >
+> > I noticed that it was previously done to the legacy MMU, but
+> > encountered some subtle issues with VFIO. I'm not sure if the issue is
+> > still there with TDP_MMU. So we are trying to do more tests and
+> > analyses before submitting a patch. This provides me a convenient way
+> > to observe the number of pages being zapped.
+>
+> Note you could also use the existing tracepoint to observe the number
+> of pages being zapped in a given test run. e.g.
+>
+>   perf stat -e kvmmmu:kvm_mmu_prepare_zap_page -- <cmd>
 
-Heh, wrong "you".  That "you" was directed at Weijiang, who I *think* is sa=
-ying
-that clobbering the shadow stack by emulating CALL+RET and thus inducing a =
-bogus
-#CP in the guest is ok.
-
-> I'm noticing that in this series KVM has special emulator behavior that
-> doesn't match the HW when CET is enabled. That it *skips* emitting #CPs (=
-and
-> other CET behaviors SW depends on), and wondering if it is a problem.
-
-Yes, it's a problem.  But IIUC, as is KVM would also induce bogus #CPs (whi=
-ch is
-probably less of a problem in practice, but still not acceptable).
-
-> I'm worried that there is some way attackers will induce the host to
-> emulate an instruction and skip CET enforcement that the HW would
-> normally do.
-
-Yep.  The best behavior for this is likely KVM's existing behavior, i.e. re=
-try
-the instruction in the guest, and if that doesn't work, kick out to userspa=
-ce and
-let userspace try to sort things out.
-
-> > For CALL/RET (and presumably any branch instructions with IBT?) other
-> > instructions that are directly affected by CET, the simplest thing woul=
-d
-> > probably be to disable those in KVM's emulator if shadow stacks and/or =
-IBT
-> > are enabled, and let KVM's failure paths take it from there.
->=20
-> Right, that is what I was wondering might be the normal solution for
-> situations like this.
-
-If KVM can't emulate something, it either retries the instruction (with som=
-e
-decent logic to guard against infinite retries) or punts to userspace.
-
-Or if the platform owner likes to play with fire and doesn't enable
-KVM_CAP_EXIT_ON_EMULATION_FAILURE, KVM will inject a #UD (and still exit to
-userspace if the emulation happened at CPL0).  And yes, that #UD is 100% KV=
-M
-making shit up, and yes, it has caused problems and confusion. :-)
-=20
-> > Then, *if* a use case comes along where the guest is utilizing CET and
-> > "needs" KVM to emulate affected instructions, we can add the necessary
-> > support the emulator.
-> >=20
-> > Alternatively, if teaching KVM's emulator to play nice with shadow stac=
-ks
-> > and IBT is easy-ish, just do that.
->=20
-> I think it will not be very easy.
-
-Yeah.  As Jim alluded to, I think it's probably time to admit that emulatin=
-g
-instructions for modern CPUs is a fools errand and KVM should simply stop t=
-rying.
+Sure. Thank you!
 
