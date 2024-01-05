@@ -1,119 +1,101 @@
-Return-Path: <kvm+bounces-5744-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5745-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA95C825B08
-	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 20:20:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEED2825B1F
+	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 20:34:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7959128573F
-	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 19:20:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C80641C2350B
+	for <lists+kvm@lfdr.de>; Fri,  5 Jan 2024 19:34:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2E6D35F18;
-	Fri,  5 Jan 2024 19:20:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79A4B35F1F;
+	Fri,  5 Jan 2024 19:34:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="aB0j7KDK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LyEap7yp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2119735EFF;
-	Fri,  5 Jan 2024 19:20:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 4CE2040E0196;
-	Fri,  5 Jan 2024 19:20:09 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id 0HqsHS1C0SBX; Fri,  5 Jan 2024 19:20:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1704482406; bh=/a0UKaTZTMHEDAeTcb9/TUYxxz2I8dAfWxoQjcoX6lk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=aB0j7KDKQj5CmPpTDfG8fpfAgLxkhkEPYfftoiRN375Q2eqjmbXSZoLvE1rkW77ur
-	 PBB7Bhkm7hV1hQ5zqE7y3eiSezd+C2GUrHWdxLKpJpHpKDRTaCVdwrUyJBicvK7y8b
-	 n4xfyrSeqlVW7GPisHaI/41JrTno/0pm91uwlQfYucfSvFu3lIcoHt0v19OfT2Bpk7
-	 6gCCZP0zsZRj0YxlIHFJtx2RHMUgIT7eEb0Bm/RzsR5NE03ncesHWgxCtBXEXDZOI2
-	 CgnqiDwNGwZk8xiO+nVW+VLrYMh72Ol3PSuzDEjl26zuhx8gqXscQJGNHR8BIpe82d
-	 fpJj5Fkn//3ajL6hD+dFCKilsF+JYuFLqu9nI6qEAmio/sCcjgB8foNEgyRkjCJlEk
-	 +GT0bLOv49gpGqT3M3tji45NaKScH5oEnYcAC9+6CGNnz1P9JSThezuZuoL4qINjn8
-	 qaUKvknOiIm8IfGkVPGmohdF4wyw8rwWoEq/dvhO84tm3vYhb12ACwTiqUX+/959h5
-	 h26Lgcl/UzvbK3ECtWX85yXyO1KjvTWvCQqJMeV9MetLGDerh1p2AKYryaJb1hCY2C
-	 o1VJqEql+2MuC/k6EYSHlWU/sx+3wxccHJ3FwwEYYtMGqQwcO7gv59LDp4dCIlNMub
-	 AFpDI4YqDo5B71rG79b35ceM=
-Received: from zn.tnic (pd9530f8c.dip0.t-ipconnect.de [217.83.15.140])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 49A5040E00C5;
-	Fri,  5 Jan 2024 19:19:28 +0000 (UTC)
-Date: Fri, 5 Jan 2024 20:19:21 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Michael Roth <michael.roth@amd.com>
-Cc: x86@kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-	linux-mm@kvack.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-	rientjes@google.com, tobin@ibm.com, vbabka@suse.cz,
-	kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
-	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
-	Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH v1 04/26] x86/sev: Add the host SEV-SNP initialization
- support
-Message-ID: <20240105191921.GHZZhWObgbgXxP/kkB@fat_crate.local>
-References: <20231230161954.569267-1-michael.roth@amd.com>
- <20231230161954.569267-5-michael.roth@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 703BD35F12
+	for <kvm@vger.kernel.org>; Fri,  5 Jan 2024 19:34:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dbdb8e86842so2183711276.1
+        for <kvm@vger.kernel.org>; Fri, 05 Jan 2024 11:34:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1704483246; x=1705088046; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hEJDIB8qOx1bE60qtdVH7cfex36lZT4z+xm74XgRHuE=;
+        b=LyEap7ypE/QS11sJ0FgAFFOTIhmY4IjoHNZGSbVT4nEkrRDVFaOiMNcuHtrP6WKzb4
+         +iKmk9I3oYPS6jMEGHbkl/PTwDIBiM8zPr1Gf0YfRbZ/XcDdS+TSTvB6PNwZrw78+fjt
+         Bggbs3lhMMwyOZ8UFAl4CLI7wbsGQRU9jMr0rx+fuV6qy/19bMDELE10tWJIyALC1HTt
+         FncXHGAhVTp9g3GDvB72uRU8FNSrLvM9yob0YtZSNTrqKBhXVIvLlIOfkuuZ9NYN7acS
+         sBWISYOfMFvawXy2S0vFTGIe9MMzMOHdtofggiBKz9mi90jr1p0zU9iYnwAHmb7tHYtT
+         HXGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704483246; x=1705088046;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hEJDIB8qOx1bE60qtdVH7cfex36lZT4z+xm74XgRHuE=;
+        b=IYJx/AlgVbSlP6qw0qVtbtGWqM2msQeFKivKcPBI8+LLCXUzXBH034xJFi28XbBF05
+         1rQqiMjLs2hlw3wxOR0TqsS8AvWsT+BTMlqfg3UnloF30N+pxvBB/jBWTkJCi/3rje/X
+         sjOr/vP/C3Aztstv+sxk5KMYzS7QoSLahKDA7WK1maI8jJCsvMyMaQp9XBzuX4poz6sp
+         NLSX1gJAaGyOR1rUIOOiKCjjcO1JNLgrx12LOgb10fU+BLqlDAXgx/uCD2MRx1Gvt51e
+         KFLpOQR+xt5FEUgPzckkBR22oFeUWIXX3qnz+/bTcvZ0SACH9GlAf0ZZWFOG9zwCDUSD
+         e+hQ==
+X-Gm-Message-State: AOJu0YzEcBHCJWx7LLCsvf7CnssSMRTKLPzFpJZ60G49VpfZ8gM+/zYm
+	gDMZ34vmXWfyEfL5Es3psAn76IDtduCPWzKPLw==
+X-Google-Smtp-Source: AGHT+IGd2T/rIWNY6+XdfFt1mC9WAJuF1uI08JFUWx+5BfKpWIv4SsIpc3Tn0gLNPBbxSVVTODLuj9c47+4=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1347:b0:dbe:ab5b:c667 with SMTP id
+ g7-20020a056902134700b00dbeab5bc667mr85020ybu.2.1704483246492; Fri, 05 Jan
+ 2024 11:34:06 -0800 (PST)
+Date: Fri, 5 Jan 2024 11:34:05 -0800
+In-Reply-To: <b6ed5961a3a73de532e2ff0610f43ca129151199.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20231230161954.569267-5-michael.roth@amd.com>
+Mime-Version: 1.0
+References: <5f57ce03-9568-4739-b02d-e9fac6ed381a@intel.com>
+ <6179ddcb25c683bd178e74e7e2455cee63ba74de.camel@intel.com>
+ <ZZdLG5W5u19PsnTo@google.com> <a2344e2143ef2b9eca0d153c86091e58e596709d.camel@intel.com>
+ <ZZdSSzCqvd-3sdBL@google.com> <8f070910-2b2e-425d-995e-dfa03a7695de@intel.com>
+ <ZZgsipXoXTKyvCZT@google.com> <9abd8400d25835dd2a6fd41b0104e3c666ee8a13.camel@intel.com>
+ <CALMp9eRMoWOS5oAywQCdEsCuTkDqmsVG=Do11FkthD5amr96WA@mail.gmail.com> <b6ed5961a3a73de532e2ff0610f43ca129151199.camel@intel.com>
+Message-ID: <ZZhVzNb4QHzGJO6W@google.com>
+Subject: Re: [PATCH v8 00/26] Enable CET Virtualization
+From: Sean Christopherson <seanjc@google.com>
+To: Rick P Edgecombe <rick.p.edgecombe@intel.com>
+Cc: "jmattson@google.com" <jmattson@google.com>, Chao Gao <chao.gao@intel.com>, 
+	Weijiang Yang <weijiang.yang@intel.com>, Dave Hansen <dave.hansen@intel.com>, 
+	"peterz@infradead.org" <peterz@infradead.org>, "john.allen@amd.com" <john.allen@amd.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>, 
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
 
-On Sat, Dec 30, 2023 at 10:19:32AM -0600, Michael Roth wrote:
-> +static int __init __snp_rmptable_init(void)
-> +{
-> +	u64 rmptable_size;
-> +	void *rmptable_start;
-> +	u64 val;
+On Fri, Jan 05, 2024, Rick P Edgecombe wrote:
+> On Fri, 2024-01-05 at 10:09 -0800, Jim Mattson wrote:
+> > > 3. Task switching
+> > 
+> > Sigh. KVM is forced to emulate task switch, because the hardware is
+> > incapable of virtualizing it. How hard would it be to make KVM's
+> > task-switch emulation CET-aware?
+> 
+> (I am not too familiar with this part of the arch).
+> 
+> See SDM Vol 3a, chapter 7.3, number 8 and 15. The behavior is around
+> actual task switching. At first glance, it looks annoying at least. It
+> would need to do a CMPXCHG to guest memory at some points and take care
+> to not implement the "Complex Shadow-Stack Updates" behavior.
+> 
+> But, would anyone use it? I'm not aware of any 32 bit supervisor shadow
+> stack support out there. So maybe it is ok to just punt to userspace in
+> this case?
 
-...
-
-Ontop:
-
-diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
-index ce7ede9065ed..566bb6f39665 100644
---- a/arch/x86/virt/svm/sev.c
-+++ b/arch/x86/virt/svm/sev.c
-@@ -150,6 +150,11 @@ bool snp_probe_rmptable_info(void)
- 	return true;
- }
- 
-+/*
-+ * Do the necessary preparations which are verified by the firmware as
-+ * described in the SNP_INIT_EX firmware command description in the SNP
-+ * firmware ABI spec.
-+ */
- static int __init __snp_rmptable_init(void)
- {
- 	u64 rmptable_size;
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Yeah, I think KVM can punt.
 
