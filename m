@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-5803-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5804-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37692826EF0
-	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 13:51:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 693E4826EF3
+	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 13:51:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5BC2D1C22676
-	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 12:51:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 182222812F2
+	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 12:51:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 668784643F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E177846521;
 	Mon,  8 Jan 2024 12:47:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DuyS+/xl"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AkZmCkbE"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09C3D45C05
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4038245C07
 	for <kvm@vger.kernel.org>; Mon,  8 Jan 2024 12:47:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704718064;
+	s=mimecast20190719; t=1704718065;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=w0Q64qRS24vLSDJ2TMtwfrBRVHYfXw6VdqdfXhfOLyM=;
-	b=DuyS+/xlfDFoV5zwOGoUp0Icq+oI9o9Vu6tiwE34klW6TmCP0coknUv5Hf8w3Gay2k7Iea
-	XVwRUwI6VM3UAymvq4uzsrJ+jYBY2F6HBiPquc36htZj11cmDArkNMVlgYt1XlcN7+BzXe
-	afeB50OqXymkjM55f/Bp311B42oN4NI=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-404-XO9vZfuYOtOcTfuPGANvng-1; Mon,
- 08 Jan 2024 07:47:41 -0500
-X-MC-Unique: XO9vZfuYOtOcTfuPGANvng-1
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yQsV5VbU1nY6Q0ik+8LQcW4kfy7u47iFfiDsbqWfVDg=;
+	b=AkZmCkbEDyBolimahOsLVKUosUUqQDFoaogoX5FV8RGjMF67Dypccw8tXSJJ2hJDVybERC
+	EEDJzsw7ZsYJp2eYW3Tx02hoMU5vIAhE4kqPOmX/oUM3klUP21NpBhdo7bGZhkONft5/We
+	gIKr+vhcOin9I/T+tSdHkuRzlPa6sPQ=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-552-yDzpFPFwPU2tYZOR4Pg7-Q-1; Mon, 08 Jan 2024 07:47:41 -0500
+X-MC-Unique: yDzpFPFwPU2tYZOR4Pg7-Q-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 49AA23C2AF72;
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8DF73185A783;
 	Mon,  8 Jan 2024 12:47:41 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id CCCF03C39;
-	Mon,  8 Jan 2024 12:47:40 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 513173C39;
+	Mon,  8 Jan 2024 12:47:41 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org
 Cc: ajones@ventanamicro.com,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	x86@kernel.org,
-	kbingham@kernel.org
-Subject: [PATCH v2 0/5] Replace CONFIG_HAVE_KVM with more appropriate symbols.
-Date: Mon,  8 Jan 2024 07:47:35 -0500
-Message-Id: <20240108124740.114453-1-pbonzini@redhat.com>
+	Randy Dunlap <rdunlap@infradead.org>
+Subject: [PATCH v2 1/5] KVM: introduce CONFIG_KVM_COMMON
+Date: Mon,  8 Jan 2024 07:47:36 -0500
+Message-Id: <20240108124740.114453-2-pbonzini@redhat.com>
+In-Reply-To: <20240108124740.114453-1-pbonzini@redhat.com>
+References: <20240108124740.114453-1-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -66,64 +66,198 @@ Content-Type: text/plain
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
-CONFIG_HAVE_KVM is currently used with three meanings:
+CONFIG_HAVE_KVM is currently used by some architectures to either
+enabled the KVM config proper, or to enable host-side code that is
+not part of the KVM module.  However, CONFIG_KVM's "select" statement
+in virt/kvm/Kconfig corresponds to a third meaning, namely to
+enable common Kconfigs required by all architectures that support
+KVM.
 
-- some architectures use it to enabled the KVM config proper, depending
-  on CPU capabilities (MIPS)
+These three meanings can be replaced respectively by an
+architecture-specific Kconfig, by IS_ENABLED(CONFIG_KVM), or by
+a new Kconfig symbol that is in turn selected by the
+architecture-specific "config KVM".
 
-- some architectures use it to enable host-side code that is not part of
-  the KVM module (x86)
+Start by introducing such a new Kconfig symbol, CONFIG_KVM_COMMON.
+Unlike CONFIG_HAVE_KVM, it is selected by CONFIG_KVM, not by
+architecture code, and it brings in all dependencies of common
+KVM code.  In particular, INTERVAL_TREE was missing in loongarch
+and riscv, so that is another thing that is fixed.
 
-- to enable common Kconfigs required by all architectures that support
-  KVM, currently CONFIG_EVENTFD
+Fixes: 8132d887a702 ("KVM: remove CONFIG_HAVE_KVM_EVENTFD", 2023-12-08)
+Reported-by: Randy Dunlap <rdunlap@infradead.org>
+Closes: https://lore.kernel.org/all/44907c6b-c5bd-4e4a-a921-e4d3825539d8@infradead.org/
+Cc: Andrew Jones <ajones@ventanamicro.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/arm64/kvm/Kconfig     | 3 +--
+ arch/loongarch/kvm/Kconfig | 2 +-
+ arch/mips/kvm/Kconfig      | 3 +--
+ arch/powerpc/kvm/Kconfig   | 3 +--
+ arch/riscv/kvm/Kconfig     | 2 +-
+ arch/s390/kvm/Kconfig      | 3 +--
+ arch/x86/kvm/Kconfig       | 3 +--
+ virt/kvm/Kconfig           | 5 +++++
+ 8 files changed, 12 insertions(+), 12 deletions(-)
 
-These three meanings can be replaced respectively by an architecture-
-specific Kconfig, by IS_ENABLED(CONFIG_KVM), or by a new Kconfig symbol
-that is in turn selected by the architecture-specific "config KVM".
-This is what each of the first three patches does.  After this,
-CONFIG_HAVE_KVM is unused and can be removed.
-
-This fixes architectures (PPC and RISC-V) that do not have CONFIG_HAVE_KVM=y
-and therefore fail to select CONFIG_EVENTFD.  Patch 1, and probably patch 2
-too, will be quickly applied to 6.8 to fix this build failure.  The rest
-can be delayed to the early -rc period, or 6.9 if desired.
-
-Paolo
-
-Paolo Bonzini (5):
-  KVM: introduce CONFIG_KVM_COMMON
-  KVM: fix direction of dependency on MMU notifiers
-  MIPS: introduce Kconfig for MIPS VZ
-  x86, vfio, gdb: replace CONFIG_HAVE_KVM with IS_ENABLED(CONFIG_KVM)
-  treewide: remove CONFIG_HAVE_KVM
-
- arch/arm64/Kconfig                       |  1 -
- arch/arm64/kvm/Kconfig                   |  4 +---
- arch/loongarch/Kconfig                   |  1 -
- arch/loongarch/kvm/Kconfig               |  3 +--
- arch/mips/Kconfig                        | 18 +++++++++---------
- arch/mips/kvm/Kconfig                    |  5 ++---
- arch/powerpc/kvm/Kconfig                 |  3 +--
- arch/riscv/kvm/Kconfig                   |  2 +-
- arch/s390/Kconfig                        |  1 -
- arch/s390/kvm/Kconfig                    |  4 +---
- arch/x86/Kconfig                         |  1 -
- arch/x86/include/asm/hardirq.h           |  2 +-
- arch/x86/include/asm/idtentry.h          |  2 +-
- arch/x86/include/asm/irq.h               |  2 +-
- arch/x86/include/asm/irq_vectors.h       |  2 +-
- arch/x86/kernel/idt.c                    |  2 +-
- arch/x86/kernel/irq.c                    |  4 ++--
- arch/x86/kvm/Kconfig                     |  5 +----
- drivers/vfio/vfio.h                      |  2 +-
- drivers/vfio/vfio_main.c                 |  4 ++--
- scripts/gdb/linux/constants.py.in        |  6 +++++-
- scripts/gdb/linux/interrupts.py          |  2 +-
- tools/arch/x86/include/asm/irq_vectors.h |  2 +-
- virt/kvm/Kconfig                         |  6 ++++--
- 24 files changed, 38 insertions(+), 46 deletions(-)
-
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index b07c60c9737d..6c3c8ca73e7f 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -21,9 +21,9 @@ if VIRTUALIZATION
+ menuconfig KVM
+ 	bool "Kernel-based Virtual Machine (KVM) support"
+ 	depends on HAVE_KVM
++	select KVM_COMMON
+ 	select KVM_GENERIC_HARDWARE_ENABLING
+ 	select KVM_GENERIC_MMU_NOTIFIER
+-	select PREEMPT_NOTIFIERS
+ 	select HAVE_KVM_CPU_RELAX_INTERCEPT
+ 	select KVM_MMIO
+ 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
+@@ -39,7 +39,6 @@ menuconfig KVM
+ 	select HAVE_KVM_VCPU_RUN_PID_CHANGE
+ 	select SCHED_INFO
+ 	select GUEST_PERF_EVENTS if PERF_EVENTS
+-	select INTERVAL_TREE
+ 	select XARRAY_MULTI
+ 	help
+ 	  Support hosting virtualized guest machines.
+diff --git a/arch/loongarch/kvm/Kconfig b/arch/loongarch/kvm/Kconfig
+index daba4cd5e87d..61f7e33b1f95 100644
+--- a/arch/loongarch/kvm/Kconfig
++++ b/arch/loongarch/kvm/Kconfig
+@@ -23,12 +23,12 @@ config KVM
+ 	depends on HAVE_KVM
+ 	select HAVE_KVM_DIRTY_RING_ACQ_REL
+ 	select HAVE_KVM_VCPU_ASYNC_IOCTL
++	select KVM_COMMON
+ 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
+ 	select KVM_GENERIC_HARDWARE_ENABLING
+ 	select KVM_GENERIC_MMU_NOTIFIER
+ 	select KVM_MMIO
+ 	select KVM_XFER_TO_GUEST_WORK
+-	select PREEMPT_NOTIFIERS
+ 	help
+ 	  Support hosting virtualized guest machines using
+ 	  hardware virtualization extensions. You will need
+diff --git a/arch/mips/kvm/Kconfig b/arch/mips/kvm/Kconfig
+index 428141b0b48f..18e7a17d5115 100644
+--- a/arch/mips/kvm/Kconfig
++++ b/arch/mips/kvm/Kconfig
+@@ -20,12 +20,11 @@ config KVM
+ 	depends on HAVE_KVM
+ 	depends on MIPS_FP_SUPPORT
+ 	select EXPORT_UASM
+-	select PREEMPT_NOTIFIERS
++	select KVM_COMMON
+ 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
+ 	select HAVE_KVM_VCPU_ASYNC_IOCTL
+ 	select KVM_MMIO
+ 	select KVM_GENERIC_MMU_NOTIFIER
+-	select INTERVAL_TREE
+ 	select KVM_GENERIC_HARDWARE_ENABLING
+ 	help
+ 	  Support for hosting Guest kernels.
+diff --git a/arch/powerpc/kvm/Kconfig b/arch/powerpc/kvm/Kconfig
+index b47196085a42..074263429faf 100644
+--- a/arch/powerpc/kvm/Kconfig
++++ b/arch/powerpc/kvm/Kconfig
+@@ -19,12 +19,11 @@ if VIRTUALIZATION
+ 
+ config KVM
+ 	bool
+-	select PREEMPT_NOTIFIERS
++	select KVM_COMMON
+ 	select HAVE_KVM_VCPU_ASYNC_IOCTL
+ 	select KVM_VFIO
+ 	select IRQ_BYPASS_MANAGER
+ 	select HAVE_KVM_IRQ_BYPASS
+-	select INTERVAL_TREE
+ 
+ config KVM_BOOK3S_HANDLER
+ 	bool
+diff --git a/arch/riscv/kvm/Kconfig b/arch/riscv/kvm/Kconfig
+index 1fd76aee3b71..d490db943858 100644
+--- a/arch/riscv/kvm/Kconfig
++++ b/arch/riscv/kvm/Kconfig
+@@ -24,12 +24,12 @@ config KVM
+ 	select HAVE_KVM_IRQ_ROUTING
+ 	select HAVE_KVM_MSI
+ 	select HAVE_KVM_VCPU_ASYNC_IOCTL
++	select KVM_COMMON
+ 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
+ 	select KVM_GENERIC_HARDWARE_ENABLING
+ 	select KVM_MMIO
+ 	select KVM_XFER_TO_GUEST_WORK
+ 	select KVM_GENERIC_MMU_NOTIFIER
+-	select PREEMPT_NOTIFIERS
+ 	select SCHED_INFO
+ 	help
+ 	  Support hosting virtualized guest machines.
+diff --git a/arch/s390/kvm/Kconfig b/arch/s390/kvm/Kconfig
+index bb6d90351119..72e9b7dcdf7d 100644
+--- a/arch/s390/kvm/Kconfig
++++ b/arch/s390/kvm/Kconfig
+@@ -20,17 +20,16 @@ config KVM
+ 	def_tristate y
+ 	prompt "Kernel-based Virtual Machine (KVM) support"
+ 	depends on HAVE_KVM
+-	select PREEMPT_NOTIFIERS
+ 	select HAVE_KVM_CPU_RELAX_INTERCEPT
+ 	select HAVE_KVM_VCPU_ASYNC_IOCTL
+ 	select KVM_ASYNC_PF
+ 	select KVM_ASYNC_PF_SYNC
++	select KVM_COMMON
+ 	select HAVE_KVM_IRQCHIP
+ 	select HAVE_KVM_IRQ_ROUTING
+ 	select HAVE_KVM_INVALID_WAKEUPS
+ 	select HAVE_KVM_NO_POLL
+ 	select KVM_VFIO
+-	select INTERVAL_TREE
+ 	select MMU_NOTIFIER
+ 	help
+ 	  Support hosting paravirtualized guest machines using the SIE
+diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+index b07247b0b958..cce3dea27920 100644
+--- a/arch/x86/kvm/Kconfig
++++ b/arch/x86/kvm/Kconfig
+@@ -23,7 +23,7 @@ config KVM
+ 	depends on HAVE_KVM
+ 	depends on HIGH_RES_TIMERS
+ 	depends on X86_LOCAL_APIC
+-	select PREEMPT_NOTIFIERS
++	select KVM_COMMON
+ 	select KVM_GENERIC_MMU_NOTIFIER
+ 	select HAVE_KVM_IRQCHIP
+ 	select HAVE_KVM_PFNCACHE
+@@ -44,7 +44,6 @@ config KVM
+ 	select KVM_XFER_TO_GUEST_WORK
+ 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
+ 	select KVM_VFIO
+-	select INTERVAL_TREE
+ 	select HAVE_KVM_PM_NOTIFIER if PM
+ 	select KVM_GENERIC_HARDWARE_ENABLING
+ 	help
+diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+index 6793211a0b64..ace72be98fb2 100644
+--- a/virt/kvm/Kconfig
++++ b/virt/kvm/Kconfig
+@@ -3,7 +3,12 @@
+ 
+ config HAVE_KVM
+        bool
++
++config KVM_COMMON
++       bool
+        select EVENTFD
++       select INTERVAL_TREE
++       select PREEMPT_NOTIFIERS
+ 
+ config HAVE_KVM_PFNCACHE
+        bool
 -- 
 2.39.1
+
 
 
