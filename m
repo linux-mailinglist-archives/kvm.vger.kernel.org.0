@@ -1,152 +1,175 @@
-Return-Path: <kvm+bounces-5812-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5813-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45C3F826F1A
-	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 13:58:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4ADCE826F1C
+	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 13:59:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EAAF5283B03
-	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 12:58:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E66DE282D72
+	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 12:59:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58CBA41232;
-	Mon,  8 Jan 2024 12:58:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9845A4120F;
+	Mon,  8 Jan 2024 12:58:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AhKsGvVK"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Y5UKS6ye"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BA344121C
-	for <kvm@vger.kernel.org>; Mon,  8 Jan 2024 12:58:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704718708;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lSelulcvnKE/3GrBpLw9pzPjSsB+J8h6YDrw26eu480=;
-	b=AhKsGvVKRqUoTun3R58cTlti/0/yjX5O4UeJB52pe8Hik97VK/8qCrb7xoz5tXB2ldojWR
-	YP+Ig/inD7XZi88Outn9cwewmHJw7Q11MfSgF9MUexvmeALQHZaMlT0wduYOxUb/Vmslut
-	jn9ndA4RQOQGFVy60HPcGn7lnMa25As=
-Received: from mail-vs1-f70.google.com (mail-vs1-f70.google.com
- [209.85.217.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-524-8wRwQ3eTOlC7QSI45ARusw-1; Mon, 08 Jan 2024 07:58:27 -0500
-X-MC-Unique: 8wRwQ3eTOlC7QSI45ARusw-1
-Received: by mail-vs1-f70.google.com with SMTP id ada2fe7eead31-46734fa034cso126363137.2
-        for <kvm@vger.kernel.org>; Mon, 08 Jan 2024 04:58:27 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704718705; x=1705323505;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lSelulcvnKE/3GrBpLw9pzPjSsB+J8h6YDrw26eu480=;
-        b=lu9GMLzedGBlxiPjWi2ExCIqRADp1AKKW8dHaOfdkUUkQNFUleQT96yXwO4jqLIamQ
-         7FCOyFqKLjQ3gjQYd6Y5QrRQO4+t0CobLOp78aJ3PnuM7YvIM/cwRII1AJeYd0xk9Gte
-         z5b0Zwu9RdMLMbKzeua0YqQcRHKFGvASkav4Xbv1TqHIcMNlELNablmLESkprILuAtPe
-         rcq6TEpcOMq4jh//Fj83pLJL0kcjGYplRJGnf91k0O+RIxEob92j/Bz8IPw8i55yVbZV
-         f95IcpjhZ4qhUIz4dlr2XzGzqTy53n8kn9p4viLDRmPBbc6c/CMk+IqjcIMvI/hBK4cx
-         RYbA==
-X-Gm-Message-State: AOJu0Yy8M/EEoaCKJyPPwscMAqaDIWMIp4GCFuFzmQ9M2/gj3vqc5DhB
-	igD6gTpCeyMLz/yNTuJq7uATwFJ04QHniM6nbZ7u8eCDm/OuRRZEjjh4fV7JwPIMIe4hR601Jqq
-	Nr9WxLvG5PhGj65c20RJu3JNxgMHpAdkJXIjyaPMWpARshbc=
-X-Received: by 2002:a05:6102:32c3:b0:467:c620:2ca6 with SMTP id o3-20020a05610232c300b00467c6202ca6mr1052964vss.17.1704718705506;
-        Mon, 08 Jan 2024 04:58:25 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHKSVUGs7BVL3BdtFjy45+2FHYrgGv+oG3o6UXZHhFff0T6HCckIodjFGBXnoZK+FlkGMhwHoRTckhVhLLGoSI=
-X-Received: by 2002:a05:6102:32c3:b0:467:c620:2ca6 with SMTP id
- o3-20020a05610232c300b00467c6202ca6mr1052956vss.17.1704718705195; Mon, 08 Jan
- 2024 04:58:25 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63ADF44C78;
+	Mon,  8 Jan 2024 12:58:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 408CvCXQ021402;
+	Mon, 8 Jan 2024 12:58:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=o/BZdwKio59MpEVALHEdqVrP8YrgB1d2qWjWRvbjbLY=;
+ b=Y5UKS6ye4dDVOjomoF6apwWIMWJc0s7KjzBob0OtCz7qkPParXXlg7RfNlAVC51xY3pE
+ pWLGFkjGFgWvbtv0D2ZuKaRlQDh82sP1JONNMLLmWFgOejQeKF+0/9BbIkZ6BzUxj50q
+ np5OzxeeDAkziTCF7dRsMOWWWNKCXuf8EDJ/REe2MbnDAvlA9I+W13ncowhx6sHBUBeU
+ oufEHknRxTYgpTkTpsfglcmE4w1s8fJv5bi+95qAvw+Rhzb8NbLeqpjZHvGHbfPtVTHl
+ VHvIzri8dDgTL1iOzIvwEL62o9NRlt0i8SXLLvNntYYGBP6NOefvKB8IM1qbI6iGZAmU zQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vghgk01cq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Jan 2024 12:58:41 +0000
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 408CwCC1025290;
+	Mon, 8 Jan 2024 12:58:41 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vghgk01bp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Jan 2024 12:58:41 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 408Ape1I027254;
+	Mon, 8 Jan 2024 12:58:40 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3vfkw1qg6p-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Jan 2024 12:58:40 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 408CwbLN64028944
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 8 Jan 2024 12:58:37 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7A6B820043;
+	Mon,  8 Jan 2024 12:58:37 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E635920040;
+	Mon,  8 Jan 2024 12:58:36 +0000 (GMT)
+Received: from li-978a334c-2cba-11b2-a85c-a0743a31b510.ibm.com (unknown [9.171.24.160])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  8 Jan 2024 12:58:36 +0000 (GMT)
+Message-ID: <00dc269c9a487b4601fc27c97771240e0b407ff6.camel@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v2 3/5] s390x: Add library functions for
+ exiting from snippet
+From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To: Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda
+	 <imbrenda@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>, Nico Boehr
+	 <nrb@linux.ibm.com>
+Cc: Andrew Jones <andrew.jones@linux.dev>, linux-s390@vger.kernel.org,
+        David
+	Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
+Date: Mon, 08 Jan 2024 13:58:36 +0100
+In-Reply-To: <1f78218f-f67b-4d99-83d7-2b18455b2519@linux.ibm.com>
+References: <20240105225419.2841310-1-nsg@linux.ibm.com>
+	 <20240105225419.2841310-4-nsg@linux.ibm.com>
+	 <1f78218f-f67b-4d99-83d7-2b18455b2519@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240104193303.3175844-1-seanjc@google.com> <20240104193303.3175844-5-seanjc@google.com>
-In-Reply-To: <20240104193303.3175844-5-seanjc@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 8 Jan 2024 13:58:12 +0100
-Message-ID: <CABgObfbGtN5AZrqNAhwT7qawuNZA9UW_CoHDULzT191b=eb78Q@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM: x86: Misc changes for 6.8
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 351Nv6W-gIWw5qT9YAvNQoNOAG-8q_VB
+X-Proofpoint-ORIG-GUID: yQjxqPq-4xTgeXNGamDofqmaTHWK5KxL
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-08_04,2024-01-08_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
+ spamscore=0 suspectscore=0 mlxlogscore=787 clxscore=1015
+ priorityscore=1501 bulkscore=0 lowpriorityscore=0 mlxscore=0 adultscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2401080111
 
-On Thu, Jan 4, 2024 at 8:33=E2=80=AFPM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> A variety of one-off changes...
->
-> The following changes since commit e9e60c82fe391d04db55a91c733df4a017c28b=
-2f:
->
->   selftests/kvm: fix compilation on non-x86_64 platforms (2023-11-21 11:5=
-8:25 -0500)
->
-> are available in the Git repository at:
->
->   https://github.com/kvm-x86/linux.git tags/kvm-x86-misc-6.8
->
-> for you to fetch changes up to 15223c4f973a6120665ece9ce1ad17aec0be0e6c:
->
->   KVM: SVM,VMX: Use %rip-relative addressing to access kvm_rebooting (202=
-3-11-30 12:51:54 -0800)
->
-> ----------------------------------------------------------------
-> KVM x86 misc changes for 6.8:
->
->  - Turn off KVM_WERROR by default for all configs so that it's not
->    inadvertantly enabled by non-KVM developers, which can be problematic =
-for
->    subsystems that require no regressions for W=3D1 builds.
->
->  - Advertise all of the host-supported CPUID bits that enumerate IA32_SPE=
-C_CTRL
->    "features".
->
->  - Don't force a masterclock update when a vCPU synchronizes to the curre=
-nt TSC
->    generation, as updating the masterclock can cause kvmclock's time to "=
-jump"
->    unexpectedly, e.g. when userspace hotplugs a pre-created vCPU.
->
->  - Use RIP-relative address to read kvm_rebooting in the VM-Enter fault p=
-aths,
->    partly as a super minor optimization, but mostly to make KVM play nice=
- with
->    position independent executable builds.
->
-> ----------------------------------------------------------------
+On Mon, 2024-01-08 at 13:47 +0100, Janosch Frank wrote:
+> On 1/5/24 23:54, Nina Schoetterl-Glausch wrote:
+> > It is useful to be able to force an exit to the host from the snippet,
+> > as well as do so while returning a value.
+> > Add this functionality, also add helper functions for the host to check
+> > for an exit and get or check the value.
+> > Use diag 0x44 and 0x9c for this.
+> > Add a guest specific snippet header file and rename snippet.h to reflec=
+t
+> > that it is host specific.
+> >=20
+> > Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+> > ---
+> >   s390x/Makefile                          |  1 +
+> >   lib/s390x/asm/arch_def.h                | 13 ++++++++
+> >   lib/s390x/sie.h                         |  1 +
+> >   lib/s390x/snippet-guest.h               | 26 +++++++++++++++
+> >   lib/s390x/{snippet.h =3D> snippet-host.h} | 10 ++++--
+> >   lib/s390x/sie.c                         | 31 ++++++++++++++++++
+> >   lib/s390x/snippet-host.c                | 42 ++++++++++++++++++++++++=
++
+> >   lib/s390x/uv.c                          |  2 +-
+> >   s390x/mvpg-sie.c                        |  2 +-
+> >   s390x/pv-diags.c                        |  2 +-
+> >   s390x/pv-icptcode.c                     |  2 +-
+> >   s390x/pv-ipl.c                          |  2 +-
+> >   s390x/sie-dat.c                         |  2 +-
+> >   s390x/spec_ex-sie.c                     |  2 +-
+> >   s390x/uv-host.c                         |  2 +-
+> >   15 files changed, 129 insertions(+), 11 deletions(-)
+> >   create mode 100644 lib/s390x/snippet-guest.h
+> >   rename lib/s390x/{snippet.h =3D> snippet-host.h} (92%)
+> >   create mode 100644 lib/s390x/snippet-host.c
 
-Pulled, thanks.
+[..]
+=20
+> > +bool sie_is_diag_icpt(struct vm *vm, unsigned int diag)
+> > +{
+> > +	union {
+> > +		struct {
+> > +			uint64_t     : 16;
+> > +			uint64_t ipa : 16;
+> > +			uint64_t ipb : 32;
+> > +		};
+> > +		struct {
+> > +			uint64_t          : 16;
+> > +			uint64_t opcode   :  8;
+> > +			uint64_t r_1      :  4;
+> > +			uint64_t r_2      :  4;
+> > +			uint64_t r_base   :  4;
+> > +			uint64_t displace : 12;
+> > +			uint64_t zero     : 16;
+> > +		};
+> > +	} instr =3D { .ipa =3D vm->sblk->ipa, .ipb =3D vm->sblk->ipb };
+> > +	uint64_t code;
+> > +
+> > +	assert(diag =3D=3D 0x44 || diag =3D=3D 0x9c);
+>=20
+> You're calling it is_diag_icpt and only allow two.
+> Do you have a reason for clamping this down?
 
-Paolo
-
-> Jim Mattson (2):
->       KVM: x86: Advertise CPUID.(EAX=3D7,ECX=3D2):EDX[5:0] to userspace
->       KVM: x86: Use a switch statement and macros in __feature_translate(=
-)
->
-> Sean Christopherson (2):
->       KVM: x86: Turn off KVM_WERROR by default for all configs
->       KVM: x86: Don't unnecessarily force masterclock update on vCPU hotp=
-lug
->
-> Uros Bizjak (1):
->       KVM: SVM,VMX: Use %rip-relative addressing to access kvm_rebooting
->
->  arch/x86/kvm/Kconfig         | 14 +++++++-------
->  arch/x86/kvm/cpuid.c         | 21 ++++++++++++++++++---
->  arch/x86/kvm/reverse_cpuid.h | 33 ++++++++++++++++++++++-----------
->  arch/x86/kvm/svm/vmenter.S   | 10 +++++-----
->  arch/x86/kvm/vmx/vmenter.S   |  2 +-
->  arch/x86/kvm/x86.c           | 29 ++++++++++++++++-------------
->  6 files changed, 69 insertions(+), 40 deletions(-)
->
+I should have left the comment.
+They're just "not implemented".
+The PoP doesn't specify how diags are generally interpreted,
+so I intended that if any other diags are needed whoever needs them
+just checks if the existing logic works or if changes are required.
+>=20
+> I was considering consolidating pv_icptdata_check_diag() into this.
 
 
