@@ -1,77 +1,77 @@
-Return-Path: <kvm+bounces-5811-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5812-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B350826F18
-	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 13:58:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45C3F826F1A
+	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 13:58:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B27BF1C2279F
-	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 12:58:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EAAF5283B03
+	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 12:58:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C334F41752;
-	Mon,  8 Jan 2024 12:58:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58CBA41232;
+	Mon,  8 Jan 2024 12:58:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QUgwJxFn"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AhKsGvVK"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ED0141212
-	for <kvm@vger.kernel.org>; Mon,  8 Jan 2024 12:58:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BA344121C
+	for <kvm@vger.kernel.org>; Mon,  8 Jan 2024 12:58:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704718683;
+	s=mimecast20190719; t=1704718708;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=vZpnq4c+Vs6eiz9gYwBliSB+2qs3HTyiOGVk9N9ZUd4=;
-	b=QUgwJxFnoWv69TsyrMlGs7QGJVUowUIY6HWsitglN8WxW9kL7+MlM27a4QZQcD6aqq6dno
-	lg9fJsjLjHrac4lP/bTowmYIYLCRFVafW1/Hnb2x1zWRkmI6LNrWP5h0ntXuSn/yOSq8fB
-	1Smnw/uaGqx3QBE5nDEIUKTbvqniHvw=
-Received: from mail-ua1-f69.google.com (mail-ua1-f69.google.com
- [209.85.222.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=lSelulcvnKE/3GrBpLw9pzPjSsB+J8h6YDrw26eu480=;
+	b=AhKsGvVKRqUoTun3R58cTlti/0/yjX5O4UeJB52pe8Hik97VK/8qCrb7xoz5tXB2ldojWR
+	YP+Ig/inD7XZi88Outn9cwewmHJw7Q11MfSgF9MUexvmeALQHZaMlT0wduYOxUb/Vmslut
+	jn9ndA4RQOQGFVy60HPcGn7lnMa25As=
+Received: from mail-vs1-f70.google.com (mail-vs1-f70.google.com
+ [209.85.217.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-88-JHVukIpkMSSIDV63_MifXA-1; Mon, 08 Jan 2024 07:58:00 -0500
-X-MC-Unique: JHVukIpkMSSIDV63_MifXA-1
-Received: by mail-ua1-f69.google.com with SMTP id a1e0cc1a2514c-7ce090dc569so466600241.0
-        for <kvm@vger.kernel.org>; Mon, 08 Jan 2024 04:58:00 -0800 (PST)
+ us-mta-524-8wRwQ3eTOlC7QSI45ARusw-1; Mon, 08 Jan 2024 07:58:27 -0500
+X-MC-Unique: 8wRwQ3eTOlC7QSI45ARusw-1
+Received: by mail-vs1-f70.google.com with SMTP id ada2fe7eead31-46734fa034cso126363137.2
+        for <kvm@vger.kernel.org>; Mon, 08 Jan 2024 04:58:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704718679; x=1705323479;
+        d=1e100.net; s=20230601; t=1704718705; x=1705323505;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vZpnq4c+Vs6eiz9gYwBliSB+2qs3HTyiOGVk9N9ZUd4=;
-        b=XDttQNu9Hw5yYc7b5k5vsq4lX1F7ApHXs11K+EC88GiFDvoAmCBQGkxpyS7KdBVNVz
-         8er23LE8vmXWzj5EIv2TSRZZGZ+pLbFr1FUAutmiGrQTmipAegWDdHnUV6zVb9r9ApO+
-         DE9oGjMA/jd4La6qt3v+2UZ0PNbSy2oI5P1GztA0sEn6IvZoCLsS3cGWCaRSW7BNQznX
-         83oiAb7pIBZAXKOMoYcVRuNdLEQIyAezHYXIf6pmCkWvRvJ2gaqv054QCEgKfVlWebJL
-         3J/RMlXVzJ10od3RiA1rZbvtmkVPI7Ppj1YRM+1e19YeZGGYb1lRlmtyDTCc4Hx/+nVj
-         MoPA==
-X-Gm-Message-State: AOJu0YwiB0tWUaNl368QPJgX9lOHTgQEc2afZ4zQmhc1omY3Q55wJtmy
-	DaIyxi3YymFAmrxminIUT4dg87tx++YyMgRZMjMPyriqlbu/cfeFGJg7j5f9hG4fFeYsArjDUGL
-	9/mknpEbLeaoa5vTqzYcgKbARto4xCE24j8TJ
-X-Received: by 2002:a05:6102:510a:b0:467:d9f6:f96c with SMTP id bm10-20020a056102510a00b00467d9f6f96cmr355495vsb.1.1704718679617;
-        Mon, 08 Jan 2024 04:57:59 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEwiRVFSpj6pU2tQle27Wl7LVL2AZ3IiIt2A08Xdq7I2pQsFRN+8eb1bErl+PdqGvbqKPYf+NpZMCnQVZPanp4=
-X-Received: by 2002:a05:6102:510a:b0:467:d9f6:f96c with SMTP id
- bm10-20020a056102510a00b00467d9f6f96cmr355488vsb.1.1704718679357; Mon, 08 Jan
- 2024 04:57:59 -0800 (PST)
+        bh=lSelulcvnKE/3GrBpLw9pzPjSsB+J8h6YDrw26eu480=;
+        b=lu9GMLzedGBlxiPjWi2ExCIqRADp1AKKW8dHaOfdkUUkQNFUleQT96yXwO4jqLIamQ
+         7FCOyFqKLjQ3gjQYd6Y5QrRQO4+t0CobLOp78aJ3PnuM7YvIM/cwRII1AJeYd0xk9Gte
+         z5b0Zwu9RdMLMbKzeua0YqQcRHKFGvASkav4Xbv1TqHIcMNlELNablmLESkprILuAtPe
+         rcq6TEpcOMq4jh//Fj83pLJL0kcjGYplRJGnf91k0O+RIxEob92j/Bz8IPw8i55yVbZV
+         f95IcpjhZ4qhUIz4dlr2XzGzqTy53n8kn9p4viLDRmPBbc6c/CMk+IqjcIMvI/hBK4cx
+         RYbA==
+X-Gm-Message-State: AOJu0Yy8M/EEoaCKJyPPwscMAqaDIWMIp4GCFuFzmQ9M2/gj3vqc5DhB
+	igD6gTpCeyMLz/yNTuJq7uATwFJ04QHniM6nbZ7u8eCDm/OuRRZEjjh4fV7JwPIMIe4hR601Jqq
+	Nr9WxLvG5PhGj65c20RJu3JNxgMHpAdkJXIjyaPMWpARshbc=
+X-Received: by 2002:a05:6102:32c3:b0:467:c620:2ca6 with SMTP id o3-20020a05610232c300b00467c6202ca6mr1052964vss.17.1704718705506;
+        Mon, 08 Jan 2024 04:58:25 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHKSVUGs7BVL3BdtFjy45+2FHYrgGv+oG3o6UXZHhFff0T6HCckIodjFGBXnoZK+FlkGMhwHoRTckhVhLLGoSI=
+X-Received: by 2002:a05:6102:32c3:b0:467:c620:2ca6 with SMTP id
+ o3-20020a05610232c300b00467c6202ca6mr1052956vss.17.1704718705195; Mon, 08 Jan
+ 2024 04:58:25 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240104193303.3175844-1-seanjc@google.com> <20240104193303.3175844-7-seanjc@google.com>
-In-Reply-To: <20240104193303.3175844-7-seanjc@google.com>
+References: <20240104193303.3175844-1-seanjc@google.com> <20240104193303.3175844-5-seanjc@google.com>
+In-Reply-To: <20240104193303.3175844-5-seanjc@google.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 8 Jan 2024 13:57:47 +0100
-Message-ID: <CABgObfYR7a8+YUmLTZs=Wner+mQoEKsgQx4S70nHA2_nvOvNbg@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM: x86: PMU changes for 6.8
+Date: Mon, 8 Jan 2024 13:58:12 +0100
+Message-ID: <CABgObfbGtN5AZrqNAhwT7qawuNZA9UW_CoHDULzT191b=eb78Q@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM: x86: Misc changes for 6.8
 To: Sean Christopherson <seanjc@google.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
@@ -80,21 +80,7 @@ Content-Transfer-Encoding: quoted-printable
 On Thu, Jan 4, 2024 at 8:33=E2=80=AFPM Sean Christopherson <seanjc@google.c=
 om> wrote:
 >
-> PMU fixes and cleanups.  The highlight is a fix for a double-overflow PMI=
- bug
-> when KVM manually emulates counter events, which was made mostly benign b=
-y
-> commit a16eb25b09c0 ("KVM: x86: Mask LVTPC when handling a PMI"), but is =
-still
-> a bug.
->
-> Note, the "Track emulated counter events instead of previous counter" fix
-> breaks the PMU KVM-Unit-Test due to a long-standing "bug" in perf[*].  If=
- need
-> be, it's trivial to fudge around the shortcomings in the KUT code, I just
-> haven't carved out time to push things along.
->
-> [*] https://lore.kernel.org/all/20231107183605.409588-1-seanjc@google.com
+> A variety of one-off changes...
 >
 > The following changes since commit e9e60c82fe391d04db55a91c733df4a017c28b=
 2f:
@@ -104,54 +90,63 @@ still
 >
 > are available in the Git repository at:
 >
->   https://github.com/kvm-x86/linux.git tags/kvm-x86-pmu-6.8
+>   https://github.com/kvm-x86/linux.git tags/kvm-x86-misc-6.8
 >
-> for you to fetch changes up to fd89499a5151d197ba30f7b801f6d8f4646cf446:
+> for you to fetch changes up to 15223c4f973a6120665ece9ce1ad17aec0be0e6c:
 >
->   KVM: x86/pmu: Track emulated counter events instead of previous counter=
- (2023-11-30 12:52:55 -0800)
+>   KVM: SVM,VMX: Use %rip-relative addressing to access kvm_rebooting (202=
+3-11-30 12:51:54 -0800)
+>
+> ----------------------------------------------------------------
+> KVM x86 misc changes for 6.8:
+>
+>  - Turn off KVM_WERROR by default for all configs so that it's not
+>    inadvertantly enabled by non-KVM developers, which can be problematic =
+for
+>    subsystems that require no regressions for W=3D1 builds.
+>
+>  - Advertise all of the host-supported CPUID bits that enumerate IA32_SPE=
+C_CTRL
+>    "features".
+>
+>  - Don't force a masterclock update when a vCPU synchronizes to the curre=
+nt TSC
+>    generation, as updating the masterclock can cause kvmclock's time to "=
+jump"
+>    unexpectedly, e.g. when userspace hotplugs a pre-created vCPU.
+>
+>  - Use RIP-relative address to read kvm_rebooting in the VM-Enter fault p=
+aths,
+>    partly as a super minor optimization, but mostly to make KVM play nice=
+ with
+>    position independent executable builds.
+>
+> ----------------------------------------------------------------
 
 Pulled, thanks.
 
 Paolo
 
-> ----------------------------------------------------------------
-> KVM x86 PMU changes for 6.8:
->
->  - Fix a variety of bugs where KVM fail to stop/reset counters and other =
-state
->    prior to refreshing the vPMU model.
->
->  - Fix a double-overflow PMU bug by tracking emulated counter events usin=
-g a
->    dedicated field instead of snapshotting the "previous" counter.  If th=
-e
->    hardware PMC count triggers overflow that is recognized in the same VM=
--Exit
->    that KVM manually bumps an event count, KVM would pend PMIs for both t=
-he
->    hardware-triggered overflow and for KVM-triggered overflow.
->
-> ----------------------------------------------------------------
-> Sean Christopherson (6):
->       KVM: x86/pmu: Move PMU reset logic to common x86 code
->       KVM: x86/pmu: Reset the PMU, i.e. stop counters, before refreshing
->       KVM: x86/pmu: Stop calling kvm_pmu_reset() at RESET (it's redundant=
+> Jim Mattson (2):
+>       KVM: x86: Advertise CPUID.(EAX=3D7,ECX=3D2):EDX[5:0] to userspace
+>       KVM: x86: Use a switch statement and macros in __feature_translate(=
 )
->       KVM: x86/pmu: Remove manual clearing of fields in kvm_pmu_init()
->       KVM: x86/pmu: Update sample period in pmc_write_counter()
->       KVM: x86/pmu: Track emulated counter events instead of previous cou=
-nter
 >
->  arch/x86/include/asm/kvm-x86-pmu-ops.h |   2 +-
->  arch/x86/include/asm/kvm_host.h        |  17 +++-
->  arch/x86/kvm/pmu.c                     | 140 +++++++++++++++++++++++++++=
-------
->  arch/x86/kvm/pmu.h                     |  47 +----------
->  arch/x86/kvm/svm/pmu.c                 |  17 ----
->  arch/x86/kvm/vmx/pmu_intel.c           |  22 ------
->  arch/x86/kvm/x86.c                     |   1 -
->  7 files changed, 137 insertions(+), 109 deletions(-)
+> Sean Christopherson (2):
+>       KVM: x86: Turn off KVM_WERROR by default for all configs
+>       KVM: x86: Don't unnecessarily force masterclock update on vCPU hotp=
+lug
+>
+> Uros Bizjak (1):
+>       KVM: SVM,VMX: Use %rip-relative addressing to access kvm_rebooting
+>
+>  arch/x86/kvm/Kconfig         | 14 +++++++-------
+>  arch/x86/kvm/cpuid.c         | 21 ++++++++++++++++++---
+>  arch/x86/kvm/reverse_cpuid.h | 33 ++++++++++++++++++++++-----------
+>  arch/x86/kvm/svm/vmenter.S   | 10 +++++-----
+>  arch/x86/kvm/vmx/vmenter.S   |  2 +-
+>  arch/x86/kvm/x86.c           | 29 ++++++++++++++++-------------
+>  6 files changed, 69 insertions(+), 40 deletions(-)
 >
 
 
