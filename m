@@ -1,105 +1,110 @@
-Return-Path: <kvm+bounces-5763-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5765-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56F878267B6
-	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 06:10:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8778826802
+	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 07:32:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C513FB2118F
-	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 05:10:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22588281E1D
+	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 06:32:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F51979C2;
-	Mon,  8 Jan 2024 05:10:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F6478F45;
+	Mon,  8 Jan 2024 06:32:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lZOS4/32"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gg6IyFLV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94BE5522D;
-	Mon,  8 Jan 2024 05:10:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D58D8BE3;
+	Mon,  8 Jan 2024 06:32:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1704690614; x=1736226614;
-  h=date:from:to:cc:subject:message-id:references:
-   content-transfer-encoding:in-reply-to:mime-version;
-  bh=aLdcT2COVtiEIS/6Kvb+02p057yocVIuhX5dT60xI6w=;
-  b=lZOS4/32uUvRuaDH3ocYApb8+qBbaQvrxp/EdVL9bJlie16VNhEqeT6f
-   /cKw0EYDZLKQIiSz3Vqpwz9+23xtFU+B8u3f10LDrjhlEbQcWxEBmldYT
-   C4CxQZmV7RPuTeMHeyOdmLkzYK5p1y8Jii6XYfYwW8y4YW0NTe9XmiHMZ
-   a3g/XMPT6ioph4qdeAwGdvG0nu6Cm9CUq38dEEel0cYckxmyxy9DAwKTY
-   eA5PdF3V8nNd0D7c0VF+X9Aian2nmd0lwXnO1Xpk9BIAomh+XsR6uwEqk
-   Qiop0N+eymgJnxUJqQ/htvnUHo0QFmwJnBoe3V0wGN1wwMmDtyUP0BcFt
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10946"; a="4554422"
+  t=1704695545; x=1736231545;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   in-reply-to:mime-version;
+  bh=knIVwYUdH/U3EoUDFUOg4cooiZ3qNyc5t39UFY0WNHQ=;
+  b=gg6IyFLVQxcB3ViKpX/1zuNvbm1+SXehBm/9PPA3i9F+JQXRasdQ+z1f
+   ve9uooxEZcN58nMiYSLI8XBycWWzWUTglFnJ8VjvTBoNCPFWXx78J6wIt
+   gauRe+Z1hS1wRaR1A7bPQtHaaRpZnkeDfq/wJYjDZZDT8mQsNu6GBfYdX
+   40E11MgNOAhX3s8FOZlqs7kfEQJjuJ2nYApU3ruWUja7m7FbnfEvUU863
+   fELg03OrFgaLYiFteyG/cx1CAyjuICWl+0uF3/ZQVIV/mZobvH2XItjCc
+   KdVzzpPxTdkQqfT7mndFqliH5AcHONWwsJgjuNFjXkl80UsHBcrwPSnGO
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10946"; a="16403048"
 X-IronPort-AV: E=Sophos;i="6.04,340,1695711600"; 
-   d="scan'208";a="4554422"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2024 21:10:13 -0800
+   d="scan'208";a="16403048"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2024 22:32:24 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10946"; a="954529514"
+X-IronPort-AV: E=McAfee;i="6600,9927,10946"; a="900281426"
 X-IronPort-AV: E=Sophos;i="6.04,340,1695711600"; 
-   d="scan'208";a="954529514"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orsmga005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 07 Jan 2024 21:10:12 -0800
-Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+   d="scan'208";a="900281426"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmsmga002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 07 Jan 2024 22:32:24 -0800
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Sun, 7 Jan 2024 21:10:11 -0800
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ 15.1.2507.35; Sun, 7 Jan 2024 22:32:23 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Sun, 7 Jan 2024 21:10:11 -0800
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.41) by
- edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ 15.1.2507.35; Sun, 7 Jan 2024 22:32:23 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Sun, 7 Jan 2024 22:32:23 -0800
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.168)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Sun, 7 Jan 2024 21:10:11 -0800
+ 15.1.2507.35; Sun, 7 Jan 2024 22:32:23 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ERO+iAPDCmXaM/axsCuTbgG+sayuO3uqAeeu2qWTrcXxaKiBGu0QBQOf8gzQvZCG2EJpyfOO94d1MF9rBrVZB5S2zIXk/JIBN5Hmr9PjOM8dy4Sc8Wlol2cQ/Ii/b572f0TaKyX/mpJWGmLmhs5ljCQe4jU31c39GmRGZOuOsdJomfMSotL06+6Eogk1M9p/5uEnqJIybRT5kkz/c0XMkXKf3v8T9Y6fF6QfLzl3oBkvkLtSPpR6GRRH3BHZWalgcQkMSNhzpNnNJD04KefbzYG0QNwCJrWMsrHfuVAcNpljpSc149ZJE7GIhiH0nkFIQobi6TwPFsNEPaSipQRwTg==
+ b=FjRi1z4TaVT1vIFUacFymPKEMTgt4jw/smCS1ogbee9nytsa8HhkBt5Nw8RvmH+W/rdp/mIWV3FdjEx2aFEmGKQD4wJyQQVji3H3N7c6kDhXOQloyVDPYAqwmvKQWNFZH0yzcOaGHXYDqfjXre7KKQo79wI46hhIxL/KHzx0KRfdH8u49nYUlKjtHRjZHhm0zlG+2lauLIZFBAAwuzukz6KZUV6D42NhU56qpLCQ7kPCXqgT3aXIcHnWTqLlUBMJy7gmVMrr5YN32dnDzjatkeUGQ1q9BYSNd+Gtibwcx7M3QlpP4oEN61VvGVbS4PM9igBE7Uxr8qGQkwkQZ0XvYQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UNnm+vihaIQCrPiDXSMc8uMTgvnX/BhKs9jD/QoH4CM=;
- b=fF4gHWwBJfhTbv1py6jnWSPrDeMh5T1dO7LpP4b5/opsU60TWXHFHrmbOz7wPFVz1qlc9VtbM85rTPi9KOGk7dGYCXvXu7iSF9wqV4suLrOAWxHqTDnkxeqIJazOX80yk85CQ+I/AvgBnmo+KQMH2jh0tb39MdXSW/3FugU+3o7HcLNW8SeXp8sQBPYSGtIzVrFokeyfx9UAGCH2BCSfmOOlqLT1OowgFHuOR1YjLWr/I3sq0jxQhDRiMOb9SIIobtTpaLqVeGjjMX0df4d9+xqTec54Pqz5dKmYFZnyvHEH1/EfI9c3PeXZLQZqP5IhDgsUhn1Ktwj/41rogRrRlg==
+ bh=uggCuDlteYTBuOQMfFX9g5AY5oqzo5DL/3OjUDRCKdw=;
+ b=hFd5pycsDS93+8yhkX4yWdz4WNPzRV6o+nkaEDGwZk2l/KHy3n4UCSocXfgXq4/7JK0cRBCqIwZuv6BPXNE/NMrbTg8tUlDHZHojtDOHkdzfEOYPFmibFXC7nmEbQ85KSvHu0xUWbdLFNwWECS4s7XwrtexBvrZ6nwlMnprFId0IjAd8CNELmiGSiTiVbO1xM8zQF407v+szQc4IHmLTQpbztMYL/T0hf38sG+5rWj6FqyTVZnb8JPihfViU+mXp4/rKI5S2t0dxT+X3/tHGBX9Wr5QVpmRdqeKw5R1cuv9HMQZHb7d5RbQs6kKp0laN5x9b/sDR+hEpNzAQpqq1HA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
- by SJ2PR11MB8403.namprd11.prod.outlook.com (2603:10b6:a03:53c::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.21; Mon, 8 Jan
- 2024 05:10:09 +0000
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::66ec:5c08:f169:6038]) by CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::66ec:5c08:f169:6038%3]) with mapi id 15.20.7159.020; Mon, 8 Jan 2024
- 05:10:09 +0000
-Date: Mon, 8 Jan 2024 13:09:59 +0800
-From: Chao Gao <chao.gao@intel.com>
-To: Sean Christopherson <seanjc@google.com>
-CC: <isaku.yamahata@intel.com>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <isaku.yamahata@gmail.com>, Paolo Bonzini
-	<pbonzini@redhat.com>, <erdemaktas@google.com>, Sagi Shahar
-	<sagis@google.com>, David Matlack <dmatlack@google.com>, Kai Huang
-	<kai.huang@intel.com>, Zhi Wang <zhi.wang.linux@gmail.com>,
-	<chen.bo@intel.com>, <hang.yuan@intel.com>, <tina.zhang@intel.com>
-Subject: Re: [PATCH v17 092/116] KVM: TDX: Handle TDX PV HLT hypercall
-Message-ID: <ZZuDp+Pl0BHKEfPt@chao-email>
-References: <cover.1699368322.git.isaku.yamahata@intel.com>
- <7ca4b7af33646e3f5693472b4394ba0179b550e1.1699368322.git.isaku.yamahata@intel.com>
- <ZZiLKKobVcmvrPmb@google.com>
-Content-Type: text/plain; charset="utf-8"
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
+ PH0PR11MB5207.namprd11.prod.outlook.com (2603:10b6:510:32::15) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7159.21; Mon, 8 Jan 2024 06:32:21 +0000
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::32a9:54b8:4253:31d4]) by DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::32a9:54b8:4253:31d4%4]) with mapi id 15.20.7159.020; Mon, 8 Jan 2024
+ 06:32:20 +0000
+Date: Mon, 8 Jan 2024 14:02:57 +0800
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<dri-devel@lists.freedesktop.org>, <pbonzini@redhat.com>,
+	<seanjc@google.com>, <olvaffe@gmail.com>, <kevin.tian@intel.com>,
+	<zhiyuan.lv@intel.com>, <zhenyu.z.wang@intel.com>, <yongwei.ma@intel.com>,
+	<vkuznets@redhat.com>, <wanpengli@tencent.com>, <jmattson@google.com>,
+	<joro@8bytes.org>, <gurchetansingh@chromium.org>, <kraxel@redhat.com>,
+	<zzyiwei@google.com>, <ankita@nvidia.com>, <alex.williamson@redhat.com>,
+	<maz@kernel.org>, <oliver.upton@linux.dev>, <james.morse@arm.com>,
+	<suzuki.poulose@arm.com>, <yuzenghui@huawei.com>
+Subject: Re: [PATCH 0/4] KVM: Honor guest memory types for virtio GPU devices
+Message-ID: <ZZuQEQAVX28v7p9Z@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20240105091237.24577-1-yan.y.zhao@intel.com>
+ <20240105195551.GE50406@nvidia.com>
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZZiLKKobVcmvrPmb@google.com>
-X-ClientProxiedBy: SI1PR02CA0054.apcprd02.prod.outlook.com
- (2603:1096:4:1f5::13) To CH3PR11MB8660.namprd11.prod.outlook.com
- (2603:10b6:610:1ce::13)
+In-Reply-To: <20240105195551.GE50406@nvidia.com>
+X-ClientProxiedBy: SG2PR04CA0198.apcprd04.prod.outlook.com
+ (2603:1096:4:14::36) To DS7PR11MB5966.namprd11.prod.outlook.com
+ (2603:10b6:8:71::6)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -107,141 +112,126 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|SJ2PR11MB8403:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7f8c1e62-a3d7-4328-684a-08dc100815e5
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|PH0PR11MB5207:EE_
+X-MS-Office365-Filtering-Correlation-Id: 671385a7-fa70-4fd6-c9ba-08dc10139142
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 5MUn6BssY+8dPhxex+rlxR2xWES73vZ1mwM/qExrIem/IzGSA7Nv7y+9Ksc8UDKXDgcSLGd6dT0Z4iWNKHYeaxrjvUzWVmEJkV1odZq46XTSaB0a+oGfSzUO7Y/l+spDUqUQImWnbZWT9JCs5A4FhPqlKNMbyJFywXjxuw8eDH59SMxUfIxFT5sVwAjttWEs7mlSe4c0qhrw9tXNWUD0HyoiVbLz+cfGT4KI3F9VZq4LBU3pOJPFj4ABGVBCAjENtj/pQQjTMbTOXiYXW0f9SAydXHLRYQOVOzJH7HuoPvcXxg45ocuM0NtlABPF0YjS4zFCe9krE70TF12uY7gPrb91tE2Jm16UkZ6YVc5zFDe9Qj4AM4tOxUdFteKRtVP6WLTsCIGF4oZBaXb7OHLwR5U/ObRpn1KFQHE28vVYEiYapPvBepp00lZPVlbutf+IK7qAIzWqAvnw3Xdddf/euIRGGOI3qaE79c00HRpIgeEptB1AsA34jAM16Bol/gmcIknj7vOwgQH3QKm9FEsWujh06BCgRMLxcrOU3X8/jsd8hcSwHX+LQHDoiz8XeQWOQbdCHis4TBTq22VbIsSGEwR7LP3nYJxb+61GzJGIkWA=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(136003)(376002)(346002)(366004)(396003)(39860400002)(230922051799003)(451199024)(186009)(1800799012)(64100799003)(66899024)(38100700002)(44832011)(4326008)(5660300002)(2906002)(9686003)(6512007)(478600001)(6666004)(6506007)(966005)(83380400001)(26005)(107886003)(54906003)(316002)(66946007)(66476007)(6916009)(66556008)(8936002)(8676002)(6486002)(33716001)(86362001)(41300700001)(82960400001)(67856001);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info: aS5kg4431Tvl2oYtJIooEbJMQ/TqhrW9lhkzjc+fMQUieD3luoveviRZ9ZsQJ52adaZio5j4BGAW5TgsOg40w+z6CikfXVd8Lhz3oeDnJnOO9kbvuA6cT0bpptQPqi7vHwf6QEvEXfQOCY/UFXvdQumrkCldFzrCADzDkEuQwxbGCyERLV5B6S/iatPKepnRjqJ/MP+wjoOqX7Qa7MPyDJOkuir1g72lWBEYJxS5x924bFd0i9lyjiVDZcYqm80q4YOFIwPJN4JM/5YfyGd9iIcWK996KuZ0vQECP0dKtT3LhHPHzUX+unacazcdhqpQN2y2yX3jCZOujHPvTifLptXJ4KKAFehVT2HX8lrqqI3qnk+HHP+80H6n7SlMH6bRZKLbOTGOsK8NRrGjdwK1Uvd9Pm2Zk1mbKWGYty5uwVtz0vNv+/8tzGYXQB5TeUJ11I1+gzx57zx2vfEcOYIM8dhaOmbe4wFOElikhrU9PBZG102gQoybjqhW6mzteiWt41f4Vwn8TyDJl934GZlhzGrht0yFbrBY2JarAtQ64lL48lc1CKgV9SorxFdyfe+m
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(346002)(39860400002)(396003)(376002)(230922051799003)(1800799012)(451199024)(64100799003)(186009)(6486002)(26005)(478600001)(6506007)(6512007)(6666004)(83380400001)(5660300002)(2906002)(7416002)(41300700001)(66476007)(66556008)(66946007)(6916009)(316002)(54906003)(8936002)(8676002)(4326008)(3450700001)(38100700002)(86362001)(82960400001);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TEIxSlJvaTE5QjhYWVVaeDhCQWQ5VXcrS3RYdG92cjI4QXdYRnZPRUxCQ3dY?=
- =?utf-8?B?b0FQVnZPNHdqcldHbjQ5T1Q5Sjh6WlF5aWlWSFBZbmMwUmc2b3NpQWtSYkx1?=
- =?utf-8?B?VzNwMG9ZQ1BBck5kTXJNZzAweDV5dFBxMmhNWG1XNWF3MDFoZDBnV0V0MzM0?=
- =?utf-8?B?VUp4N1VadWtjQTQybE9YUXJma2NhMTVlUDJrWW5wWG56ZUhUT0Y2NEUxL0pl?=
- =?utf-8?B?V0pKMVlzbldTWWMrWlNvVHNVQUpRdWdPTHhRSURiOWEvSE80b0xqVHVYdVZ0?=
- =?utf-8?B?V0xUeTV3WnUxOWUyQldmcHRUTXVoL3hKTTdUeVVEQ3ppUzZQOE4rY0crYmpk?=
- =?utf-8?B?YXpEMEd1QnE4MnZCRnRTbExvT3Rvc2NzQTU0dldlekVRNjhnbFBZcEJKRnJH?=
- =?utf-8?B?bmJna3JoeEdXWGxJU3JKWHlWQWU5aTJzbjN5NTRIVVFQMUJRM2tBd05RNXJB?=
- =?utf-8?B?bWdFK0Fuc1VIZHhPQk9YRGQ5ZGI5b1RFdGZlTmhsMEZyaHhPZ0VKUVJ1bk1Q?=
- =?utf-8?B?M09YYVVIMW01UG9BSzcxSXp5VDQydUt1TGRGWlRxYUF3YXZmVkdrS3NSMWlo?=
- =?utf-8?B?T0Y0bW1hZzIzekFaV1BrV3VHWHVmay92ZXdWNWRzRHlQbTlPd2FyNUVnVGNp?=
- =?utf-8?B?dVBzK1c1a1B6L29KL3puelZYY1pxREk0Z0xxUFg1WWtkUjdtakJuWjNsQnE5?=
- =?utf-8?B?ZFZ4dG9XTDFSbVBqdTY3TVF1bkNrR0ZrWUovWTFwQzQvSU5sWHNPUDRGd3pM?=
- =?utf-8?B?VTNhTXUrUnV1bU9XZ1JiWkVZZnVwMlJJZVdWWEJwcUgvcEdvVzNtMituNHNo?=
- =?utf-8?B?L0FKdzArejZKd2tHbTFUT2tiaDQvNndjVnUrQTZjTit1ajNiY0NDTjNhSHR3?=
- =?utf-8?B?TFhzU1djbXVYZUhQQ2lPb0RrbW8xaHBOL2tHODMwVDZEUkw5RDA0azlpWlI5?=
- =?utf-8?B?OGFEdnRQazZkZGhNdUVTckZOWVZPRVBlUFZPOEoxUEgyblZ6aTJudmJibzhj?=
- =?utf-8?B?U3MzYytGNGFHVzA2Zk1JTDBMaFN4azJuUWtRWWRxbkVQZzl2YWZWQUY0WWQr?=
- =?utf-8?B?NFNWWFk5d0hEOFZXN2xYOHlUbmMwRkRSSmN3NmJxdHdQakt0aHhDV1pnR0ZI?=
- =?utf-8?B?VHZoRmQyQml2L1JEcFVpSldVUDQ1aFBxS1ErbmJtRjhvaXgzQk1xQUZSWnpZ?=
- =?utf-8?B?YTJ4VTRTeEIwYk1SNC9ncFNseTRSYlZRaG5NUW9nWDFEZ1hCam9aT2dxMlJp?=
- =?utf-8?B?TGovM3pRN0g3TVIwRFc2SEdNNHZzQ0Y1bzI0YTVsVktjaW5nNktFTGY5RFJs?=
- =?utf-8?B?R2JwRE14V2JXT1ZPSWJXWVk5TVdXMnpoaVppMGZVUFA5RmJpTGNIT3cyaTNu?=
- =?utf-8?B?c0FEdGRkUllkSXRNaWZrS1BONFViWDljKzkwVHhZNHdQV1gzVEFrY2lzRXpl?=
- =?utf-8?B?dFlNT3RtRzRlSnc5amU4ZDZtV3hDcXYrNWQ5Y0RtYkJacXpxeTFmM3o4bVBy?=
- =?utf-8?B?UVhWRU9Fd0hIYjhGN1FuTFA2Tm1xWXFjN2pUOFFzNlFpSDFobS84akh6cVVV?=
- =?utf-8?B?cGZzZEJDOEdOcmtCR3pRZW5QWWNpeHVvN0VRZjZESUpoQWppVU11dFp1Y3hS?=
- =?utf-8?B?anNJSnFOQ2hXSmxSK0duSXJoWjVNN2lydVcyeVBxUE5RaGtBazU4UXMvaUhs?=
- =?utf-8?B?SG91alVPZGEzd2lxalFPQlN6TkM2K1NsUFdjbVdGTFpNdFVrb0dySGxicmN5?=
- =?utf-8?B?REQ5MDhUeWwxbXRydElSRnlzaEdzVllWK0JQRHJvTVRKOUVpcFdqZEUxTlBC?=
- =?utf-8?B?bWJwM2Exa285Snp2RjRvSFJEQ0MybHR1bVdyZklYSGpzWm1GMHhLNTd1NTYx?=
- =?utf-8?B?Vm4yLzhsdFpJMElrd3dnTTdCRE9weHpNODdoRjFZR1hPWUV3U1RucHFmWEdZ?=
- =?utf-8?B?SjRyanFCcGtVaFVDalZIUFNHdlg4UDF5YStQY2s3UmxiNHdUK3N4Sm9kUTZs?=
- =?utf-8?B?bnBRVEl0bEIzREFqSWo4dlZjeUhSTXpvNjJvZUJObWFDMGNwOGtnZ1l4WFh6?=
- =?utf-8?B?eFd4dEgvZVVvWm94NWpCQkRJKzZJUzgyQ2gvL0FiblNJeFljNUt3SW9wVThr?=
- =?utf-8?Q?x9gBT8sqRwBWBOZz8JapRzyUg?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7f8c1e62-a3d7-4328-684a-08dc100815e5
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?p6jM7Na2Ia0Q850VhWTEgtg8tLR/cUAw95a/g+R8wa9d0RYrWK1ud2XNAdOS?=
+ =?us-ascii?Q?stc5WBVmZcNHptxTEgwJPMoFGzOh9Baob6XNZr9ioHt7NgqDtY3ivksfE6VJ?=
+ =?us-ascii?Q?G/RCmWwtey6n1F9zIMPGBjKBFClOskBMTBOr0RKQWYmajHk6oO8IOtPTA/tL?=
+ =?us-ascii?Q?5HeCYfR5nItFwCsoer11QIm+Kfef9wWHDSzMTX/QGejnril6m3enQROX9AHX?=
+ =?us-ascii?Q?nCFFaY5v1fyh+qcZqz+TZuYA7hbfhWOIv++BHAJZc/kCQF3dlpxWN6R5pjMc?=
+ =?us-ascii?Q?cTGZwtuNyXs8O3mm0OpbgnPVmQ/Na3PZvbMC3kTdwLSmef25Zv2gt/luqz3k?=
+ =?us-ascii?Q?G8rpZs1Vy+/V4c0lMu675SctwTUYxaI6Im9SZgAdNZpFxO3mOu6MDtrIm3We?=
+ =?us-ascii?Q?K9IobQZHYf692xfRffF/PSpzuRpVZbo4QgEC9JY6n+rAfuo/pfuJvcwkFdT4?=
+ =?us-ascii?Q?4gQ1bMZ/b7FxkuZ37qRUsmAGmbCqIxUv3xAsl08Sn5z1tuXKWZ7ZlylqY7xH?=
+ =?us-ascii?Q?PBHj0IEAuykx+3FO8KFlOMND+rQU0ej+68prePrzUrx4aeTceh5rUaN0Y91A?=
+ =?us-ascii?Q?LDahhlC3qdU3BLDgAhil8AvJMr1Rst3Q+M7LNW6TxHRhEu6JNmU4nqnbBext?=
+ =?us-ascii?Q?MuxrPLsgvt7N9xgFVYhYlh1jUDIgHwn9sHmsagMv9sdfLvyUUacuLrt4B31V?=
+ =?us-ascii?Q?CNg6gS8dSHxxOP2SBfqpHTqcoc3gNlJ6GTi5T/RGLvqJPgdxb151GQS4k1jV?=
+ =?us-ascii?Q?M36PpAgrdVF0mxDjgnS5pHKtRgANoJWZObYtyOLR79fO7cUTL24Pmxogo/Tg?=
+ =?us-ascii?Q?urt3xt07sfOomwmtvbWnPx36U93ItqPZX2QoO/tvYYGTcRfwSPHr2EPnvdcj?=
+ =?us-ascii?Q?Oeo3pn+trlaDvLMd2HhdUe35vxSeFl2mMu+o8AvWkzeqNpQhsb0rpErPXsS2?=
+ =?us-ascii?Q?+o3whNHMaLtNWFQvJMojEA6k96aIBe01snYG1ObH5Lzp4qI0iGzwObaYINVn?=
+ =?us-ascii?Q?FkdamQ6+utGUwXuZ9NABRQJNEWif7vwFntoZPdL1zMpQDg/B/03ztKTRwwVu?=
+ =?us-ascii?Q?NQcPBVWg4E9N927sh1ICsJBzd6zncZAxQe7P2hx1PFyddwAl/Xds8RGrzulY?=
+ =?us-ascii?Q?mSA78UEB2pKhNIAOFWZdM6HNFAroV+J5taXnxkfbXvEpQubwmz9MDMHIjFR2?=
+ =?us-ascii?Q?6DOs9ONDbO7BjdA1pjQB+/ac+cYtaSTZ3q7GgNip+XSupjN372voNybdkjc7?=
+ =?us-ascii?Q?2vUg8lEAAuFf1rET0recWNxz96Jn/d3lOsnGWAWqVn+Wl2tpKfOl29zpOitT?=
+ =?us-ascii?Q?6eE9AXFSPw6cKSBIKOCKiKFUrJ5SXTUzohVTUzQmEMS3GALDvFyIvkkbK9R4?=
+ =?us-ascii?Q?XndIOct4DngzxGJiLaSaKAUR4QmiGUYHxtoO38P5l0TPqvNuG1J166E3fsUg?=
+ =?us-ascii?Q?j+BiZ3s1ibI/cv5bBURlGpc0fqz33M7Y6Rw2L7KdoLjOz32AoPTrRLhTyKYm?=
+ =?us-ascii?Q?Uu5/KPJf9WJUMrHvKhaQOXH0jmbw1hpdnkGoSTC97JzV4/Li9mO+8uXgGein?=
+ =?us-ascii?Q?f9AZ9Ue5y91oXgSvrjIiKh2NDoktyEpaotRU4/Iy?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 671385a7-fa70-4fd6-c9ba-08dc10139142
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jan 2024 05:10:09.6507
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jan 2024 06:32:20.8793
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: NtgFCLBTlZLeCfhKM+w4qz81IrQaNyND6wMONgsOGkQQb+qg6+40A7Y5o+iyLGZNF7PptntTI8XqshbeV7wEnA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB8403
+X-MS-Exchange-CrossTenant-UserPrincipalName: NdgQyTOl8TrdsYL7+2eu5y0Zi/o1bWMS5V40k7b14jDLuLzhg89LWHT1AM88EY5RfJdt133LIr4bE9jL7TF29g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5207
 X-OriginatorOrg: intel.com
 
-On Fri, Jan 05, 2024 at 03:05:12PM -0800, Sean Christopherson wrote:
->On Tue, Nov 07, 2023, isaku.yamahata@intel.com wrote:
->> From: Isaku Yamahata <isaku.yamahata@intel.com>
->> 
->> Wire up TDX PV HLT hypercall to the KVM backend function.
->> 
->> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
->> ---
->>  arch/x86/kvm/vmx/tdx.c | 42 +++++++++++++++++++++++++++++++++++++++++-
->>  arch/x86/kvm/vmx/tdx.h |  3 +++
->>  2 files changed, 44 insertions(+), 1 deletion(-)
->> 
->> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
->> index 3a1fe74b95c3..4e48989d364f 100644
->> --- a/arch/x86/kvm/vmx/tdx.c
->> +++ b/arch/x86/kvm/vmx/tdx.c
->> @@ -662,7 +662,32 @@ void tdx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->>  
->>  bool tdx_protected_apic_has_interrupt(struct kvm_vcpu *vcpu)
->>  {
->> -	return pi_has_pending_interrupt(vcpu);
->> +	bool ret = pi_has_pending_interrupt(vcpu);
->> +	struct vcpu_tdx *tdx = to_tdx(vcpu);
->> +
->> +	if (ret || vcpu->arch.mp_state != KVM_MP_STATE_HALTED)
->> +		return true;
->> +
->> +	if (tdx->interrupt_disabled_hlt)
->> +		return false;
->> +
->> +	/*
->> +	 * This is for the case where the virtual interrupt is recognized,
->> +	 * i.e. set in vmcs.RVI, between the STI and "HLT".  KVM doesn't have
->> +	 * access to RVI and the interrupt is no longer in the PID (because it
->> +	 * was "recognized".  It doesn't get delivered in the guest because the
->> +	 * TDCALL completes before interrupts are enabled.
->> +	 *
->> +	 * TDX modules sets RVI while in an STI interrupt shadow.
->> +	 * - TDExit(typically TDG.VP.VMCALL<HLT>) from the guest to TDX module.
->> +	 *   The interrupt shadow at this point is gone.
->> +	 * - It knows that there is an interrupt that can be delivered
->> +	 *   (RVI > PPR && EFLAGS.IF=1, the other conditions of 29.2.2 don't
->> +	 *    matter)
->> +	 * - It forwards the TDExit nevertheless, to a clueless hypervisor that
->> +	 *   has no way to glean either RVI or PPR.
+On Fri, Jan 05, 2024 at 03:55:51PM -0400, Jason Gunthorpe wrote:
+> On Fri, Jan 05, 2024 at 05:12:37PM +0800, Yan Zhao wrote:
+> > This series allow user space to notify KVM of noncoherent DMA status so as
+> > to let KVM honor guest memory types in specified memory slot ranges.
+> > 
+> > Motivation
+> > ===
+> > A virtio GPU device may want to configure GPU hardware to work in
+> > noncoherent mode, i.e. some of its DMAs do not snoop CPU caches.
+> 
+> Does this mean some DMA reads do not snoop the caches or does it
+> include DMA writes not synchronizing the caches too?
+Both DMA reads and writes are not snooped.
+The virtio host side will mmap the buffer to WC (pgprot_writecombine)
+for CPU access and program the device to access the buffer in uncached
+way.
+Meanwhile, virtio host side will construct a memslot in KVM with the PTR
+returned from the mmap, and notify virtio guest side to mmap the same buffer in
+guest page table with PAT=WC, too.
+
+> 
+> > This is generally for performance consideration.
+> > In certain platform, GFX performance can improve 20+% with DMAs going to
+> > noncoherent path.
+> > 
+> > This noncoherent DMA mode works in below sequence:
+> > 1. Host backend driver programs hardware not to snoop memory of target
+> >    DMA buffer.
+> > 2. Host backend driver indicates guest frontend driver to program guest PAT
+> >    to WC for target DMA buffer.
+> > 3. Guest frontend driver writes to the DMA buffer without clflush stuffs.
+> > 4. Hardware does noncoherent DMA to the target buffer.
+> > 
+> > In this noncoherent DMA mode, both guest and hardware regard a DMA buffer
+> > as not cached. So, if KVM forces the effective memory type of this DMA
+> > buffer to be WB, hardware DMA may read incorrect data and cause misc
+> > failures.
+> 
+> I don't know all the details, but a big concern would be that the
+> caches remain fully coherent with the underlying memory at any point
+> where kvm decides to revoke the page from the VM.
+Ah, you mean, for page migration, the content of the page may not be copied
+correctly, right?
+
+Currently in x86, we have 2 ways to let KVM honor guest memory types:
+1. through KVM memslot flag introduced in this series, for virtio GPUs, in
+   memslot granularity.
+2. through increasing noncoherent dma count, as what's done in VFIO, for
+   Intel GPU passthrough, for all guest memory.
+
+This page migration issue should not be the case for virtio GPU, as both host
+and guest are synced to use the same memory type and actually the pages
+are not anonymous pages.
+For GPU pass-through, though host mmaps with WB, it's still fine for guest to
+use WC because page migration on pages of VMs with pass-through device is not
+allowed.
+
+But I agree, this should be a case if user space sets the memslot flag to honor
+guest memory type to memslots for guest system RAM where non-enlightened guest
+components may cause guest and host to access with different memory types.
+Or simply when the guest is a malicious one.
+
+> If you allow an incoherence of cache != physical then it opens a
+> security attack where the observed content of memory can change when
+> it should not.
+
+In this case, will this security attack impact other guests?
+
+> 
+> ARM64 has issues like this and due to that ARM has to have explict,
+> expensive, cache flushing at certain points.
 >
->WTF.  Seriously, what in the absolute hell is going on.  I reported this internally
->four ***YEARS*** ago.  This is not some obscure theoretical edge case, this is core
->functionality and it's completely broken garbage.
->
->NAK.  Hard NAK.  Fix the TDX module, full stop.
->
->Even worse, TDX 1.5 apparently _already_ has the necessary logic for dealing with
->interrupts that are pending in RVI when handling NESTED VM-Enter.  Really!?!?!
->Y'all went and added nested virtualization support of some kind, but can't find
->the time to get the basics right?
 
-We actually fixed the TDX module. See 11.9.5. Pending Virtual Interrupt
-Delivery Indication in TDX module 1.5 spec [1]
 
-  The host VMM can detect whether a virtual interrupt is pending delivery to a
-  VCPU in the Virtual APIC page, using TDH.VP.RD to read the VCPU_STATE_DETAILS
-  TDVPS field.
-  
-  The typical use case is when the guest TD VCPU indicates to the host VMM, using
-  TDG.VP.VMCALL, that it has no work to do and can be halted. The guest TD is
-  expected to pass an “interrupt blocked” flag. The guest TD is expected to set
-  this flag to 0 if and only if RFLAGS.IF is 1 or the TDCALL instruction that
-  invokes TDG.VP.VMCALL immediately follows an STI instruction. If the “interrupt
-  blocked” flag is 0, the host VMM can determine whether to re-schedule the guest
-  TD VCPU based on VCPU_STATE_DETAILS.
 
-Isaku, this patch didn't read VCPU_STATE_DETAILS. Maybe you missed something
-during rebase? Regarding buggy_hlt_workaround, do you aim to avoid reading
-VCPU_STATE_DETAILS as much as possible (because reading it via SEAMCALL is
-costly, ~3-4K cycles)? if so, please make it clear in the changelog/comment.
-
-[1]: https://cdrdv2.intel.com/v1/dl/getContent/733575
-
->
 
