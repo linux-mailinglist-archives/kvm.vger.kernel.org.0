@@ -1,139 +1,114 @@
-Return-Path: <kvm+bounces-5849-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5850-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2468B8275CB
-	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 17:52:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4BEB8275FF
+	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 18:05:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B62F21F23B30
-	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 16:52:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAAAA1C21116
+	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 17:05:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A232B54657;
-	Mon,  8 Jan 2024 16:52:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9133B5466A;
+	Mon,  8 Jan 2024 17:05:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="SEc1gS/a"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="U/ewXcsS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF4054659;
-	Mon,  8 Jan 2024 16:52:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 408G04EO002580;
-	Mon, 8 Jan 2024 16:52:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : from : to : cc : references : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=6lM1qEBJ4ez92DZuRcV3WtQMWYZTj71I9/AGUweFHuM=;
- b=SEc1gS/aQg8CJsMHb/AtRZbso8s1Iw6wHO30UOCi8A/VhXvvVq+Id7IAxlmTgvje2RIN
- 9ruW9Mfpo0G2NBsb5eDfstsox1FdKN15DFcSWuQJ20O4ICjpYQWifyBRNjjLMb/SEe1P
- FW5eZNAt05DSGf9zcqi/x9q8lG8x7bcRPSG5Lw/WCp7z7478OFtLfJMvnrz8DytYfhac
- WCtMbL1VYqGsyAzTlKrDyb9uM8fecYXb3MC5m9qCtubiuHKWniyxzCpQPSdGgBNkVfW9
- yr2hRI7vgXWuNquTv5L2XLorJMk+ELGbphnCb/vjBr4w9NSpzypYn0eTLeQvww6qpQUa Kw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vgjsrcarb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 08 Jan 2024 16:52:39 +0000
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 408GnsYb012495;
-	Mon, 8 Jan 2024 16:52:38 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vgjsrcaqx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 08 Jan 2024 16:52:38 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 408GVarS000926;
-	Mon, 8 Jan 2024 16:52:37 GMT
-Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3vfkdk0xtk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 08 Jan 2024 16:52:37 +0000
-Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
-	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 408GqaMh65536280
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 8 Jan 2024 16:52:36 GMT
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2DCFD58054;
-	Mon,  8 Jan 2024 16:52:36 +0000 (GMT)
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id F35245805A;
-	Mon,  8 Jan 2024 16:52:34 +0000 (GMT)
-Received: from [9.61.181.127] (unknown [9.61.181.127])
-	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  8 Jan 2024 16:52:34 +0000 (GMT)
-Message-ID: <11ac008c-9bea-4b34-bc4b-e0d7e7ed9bef@linux.ibm.com>
-Date: Mon, 8 Jan 2024 11:52:34 -0500
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E37295465C;
+	Mon,  8 Jan 2024 17:05:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 8DA1C40E016C;
+	Mon,  8 Jan 2024 17:05:06 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id CuKpKJOv0sMx; Mon,  8 Jan 2024 17:05:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1704733504; bh=w1U9JuwWvaJMBjH60Qfm085eTdHCG+21c5u4mrqzaCs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=U/ewXcsSUdD+9SivtyMgsN1CLap1vAi6dgi/nHSjCXg0jJhmbsOPxEmWonINyytCW
+	 yHusPDNEelLb2hSX/YpL86mKhzh6613QmFUDCKyPEVWa+yTwr3xKKYmHYETfOFioHM
+	 UG7wND5TN6SCBiUotmh/m0XPbPDaukfUGTkMy8jnkxzO4SwdfBDEUEnmkTpsGLZIOE
+	 sect88K4iyvL5/WYaCvR73nckuSijcOIQo4dmwfrAlizNGjOyn854a/fvz8K//UgzF
+	 WHkRisFKQ8H6k4WW77iRE/076LW8ZTb2CZJ5Tw71s6Ct6Jj8qJbypu83wz+y5t6xtn
+	 iyzJ67+JsiDecDvJpKCAYW9vOrCoSsUAmnPZCMwZX4Kz7rzgKj5fdwvD6fNyPGt4M0
+	 Wqatg1aOn4oh4LYWIf771GzU8hK1uihaj2XDIN6oLIWQ0iVNt5H/oTMPAW2d50+Jcb
+	 Gp2WStL5TwCP2vpCpWCHmCVAXXECM1pdxg5YQR7YlHrwAzoXgGYnr3TKUZKIclkwWQ
+	 /SVh/PhLwC3rsUUnMSUm+aBtUwi3A7GTVVTadwBTH/Qe3NuvHc677pP2x2yTeqLHPg
+	 pbBP0l6Y/iLEfyEE0WoSxhReJIxxwMk0lxvbvVJDa22IFMtfW8R1HhMLioru2Lyj6A
+	 Mxev4/iCkvm2ibZWTuP9drhI=
+Received: from zn.tnic (pd9530f8c.dip0.t-ipconnect.de [217.83.15.140])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id DC56840E01B0;
+	Mon,  8 Jan 2024 17:04:24 +0000 (UTC)
+Date: Mon, 8 Jan 2024 18:04:18 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+Cc: Michael Roth <michael.roth@amd.com>, x86@kernel.org,
+	kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
+	thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
+	pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+	jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
+	slp@redhat.com, pgonda@google.com, peterz@infradead.org,
+	srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+	tobin@ibm.com, vbabka@suse.cz, kirill@shutemov.name,
+	ak@linux.intel.com, tony.luck@intel.com,
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
+	Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH v1 04/26] x86/sev: Add the host SEV-SNP initialization
+ support
+Message-ID: <20240108170418.GDZZwrEiIaGuMpV0B0@fat_crate.local>
+References: <20231230161954.569267-1-michael.roth@amd.com>
+ <20231230161954.569267-5-michael.roth@amd.com>
+ <f60c5fe0-9909-468d-8160-34d5bae39305@linux.microsoft.com>
+ <20240105160916.GDZZgprE8T6xbbHJ9E@fat_crate.local>
+ <20240105162142.GEZZgslgQCQYI7twat@fat_crate.local>
+ <0c4aac73-10d8-4e47-b6a8-f0c180ba1900@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/6] s390/vfio-ap: reset queues removed from guest's AP
- configuration
-From: Anthony Krowiak <akrowiak@linux.ibm.com>
-To: linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc: jjherne@linux.ibm.com, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        pbonzini@redhat.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com
-References: <20231212212522.307893-1-akrowiak@linux.ibm.com>
-Content-Language: en-US
-In-Reply-To: <20231212212522.307893-1-akrowiak@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: D2899BVSSLB2qjUcFaWZKNwhnb-wl93T
-X-Proofpoint-ORIG-GUID: i4pGCOd2Q0Y1-l_jJSZPbEgYmFsB1Tp9
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-08_06,2024-01-08_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- lowpriorityscore=0 clxscore=1015 priorityscore=1501 impostorscore=0
- adultscore=0 suspectscore=0 phishscore=0 spamscore=0 mlxlogscore=999
- malwarescore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2401080142
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <0c4aac73-10d8-4e47-b6a8-f0c180ba1900@linux.microsoft.com>
 
-PING!
+On Mon, Jan 08, 2024 at 05:49:01PM +0100, Jeremi Piotrowski wrote:
+> What I wrote: "allow for the kernel to allocate the rmptable".
 
-On 12/12/23 4:25 PM, Tony Krowiak wrote:
-> All queues removed from a guest's AP configuration must be reset so when
-> they are subsequently made available again to a guest, they re-appear in a
-> reset state. There are some scenarios where this is not the case. For
-> example, if a queue device that is passed through to a guest is unbound
-> from the vfio_ap device driver, the adapter to which the queue is attached
-> will be removed from the guest's AP configuration. Doing so implicitly
-> removes all queues associated with that adapter because the AP architecture
-> precludes removing a single queue. Those queues also need to be reset.
->
-> This patch series ensures that all queues removed from a guest's AP
-> configuration are reset for all possible scenarios.
->
-> Changelog v1=> v2:
-> -----------------
-> * Restored Halil's Acked-by and Reviewed-by tags (Halil)
->
-> * Restored Halil's code refactor of reset_queues_for_apids function in
->    patch 4
->
-> Tony Krowiak (6):
->    s390/vfio-ap: always filter entire AP matrix
->    s390/vfio-ap: loop over the shadow APCB when filtering guest's AP
->      configuration
->    s390/vfio-ap: let 'on_scan_complete' callback filter matrix and update
->      guest's APCB
->    s390/vfio-ap: reset queues filtered from the guest's AP config
->    s390/vfio-ap: reset queues associated with adapter for queue unbound
->      from driver
->    s390/vfio-ap: do not reset queue removed from host config
->
->   drivers/s390/crypto/vfio_ap_ops.c     | 268 +++++++++++++++++---------
->   drivers/s390/crypto/vfio_ap_private.h |  11 +-
->   2 files changed, 184 insertions(+), 95 deletions(-)
->
+What?!
+
+"15.36.5 Hypervisor RMP Management
+
+...
+
+Because the RMP is initialized by the AMD-SP to prevent direct access to
+the RMP, the hypervisor must use the RMPUPDATE instruction to alter the
+entries of the RMP. RMPUPDATE allows the hypervisor to alter the
+Guest_Physical_Address, Assigned, Page_Size, Immutable, and ASID fields
+of an RMP entry."
+
+What you want is something that you should keep far and away from the
+upstream kernel.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
