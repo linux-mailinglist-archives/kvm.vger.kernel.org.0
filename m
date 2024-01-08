@@ -1,443 +1,266 @@
-Return-Path: <kvm+bounces-5761-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5762-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32BEA825EF5
-	for <lists+kvm@lfdr.de>; Sat,  6 Jan 2024 09:51:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F894826787
+	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 05:07:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D42E1F21557
-	for <lists+kvm@lfdr.de>; Sat,  6 Jan 2024 08:51:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21FE728187D
+	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 04:07:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79F165671;
-	Sat,  6 Jan 2024 08:51:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2752D4C6E;
+	Mon,  8 Jan 2024 04:07:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="BURNqnRc";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="qr0C+1pg"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mu4L6Dfn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F41963A8;
-	Sat,  6 Jan 2024 08:51:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 4068o6qj008409;
-	Sat, 6 Jan 2024 08:51:00 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : content-transfer-encoding : content-type :
- mime-version; s=corp-2023-11-20;
- bh=UaaMLgAHMcw3fpUZxWgDrI0pAaVnYHjE4vMjVkDsCvY=;
- b=BURNqnRcOP9q4ThqTlEfrPZGFRnzccQH0omYvDEmxcfLFPCkFRcmG/xwzoQ5pnEirRu7
- exXdjQYZXlg0NkDZes8imfYI8OoaHIV/6yogUS95Cm0XcCqAbG0KBKpmNBZUEsSnAafo
- tLEMb8/YFGYiLoQBq2kTicSAZ4buMOKJyknycrAtrYi+LalhosZ3NrTVbwWxT1vjxFcm
- CgmMeRhoCYb3oKNhWNd5+XnH4idIrazct29SgW1NqVLeBDAWdZ9RLAIu0OpopfscQRZz
- USBj6Fj9/75XzWSdnJA7tz3gaGwmAhHQ4c8QWGgjyP1oR1OfwCroqVBpZ25RGbNIYVq5 9A== 
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3vf3pjr017-4
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sat, 06 Jan 2024 08:51:00 +0000
-Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 4066XhnP035025;
-	Sat, 6 Jan 2024 08:35:53 GMT
-Received: from nam10-bn7-obe.outbound.protection.outlook.com (mail-bn7nam10lp2100.outbound.protection.outlook.com [104.47.70.100])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3vewa3uft3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sat, 06 Jan 2024 08:35:53 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C5BD7493;
+	Mon,  8 Jan 2024 04:07:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1704686837; x=1736222837;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=1BZxPey4EA+hg+6LDc2ICxtvC2/zLfSZ8i2i96+OmWY=;
+  b=mu4L6DfnLSoLchoST219gTCsUoze7GRw8uKhRHkzgrM39EqMiPhBOOTk
+   3YJI46V9mOXPVv0VS/pdSGmqJZOeksAVudm31wEEOVKtWvALsNWs2SEj2
+   3akiNaIsLG0FwGxoQ5V/Pi8zmwk9HPYNsX3JzzYvNVXn3hync1FHMWkkH
+   2eOhp/2AUrbdHHhTp+YyPcbe6jpNEfbieZ4MEy34LSq0sR9VckARPpp6v
+   9LHhzYo03OD0LZiCZ1rrc3bZvTkb9DmPWFfLb48+Bo6O463OvmDvmihVK
+   NbvKPiB04RFPIaBveHFsDWSxqfg/6Rtc5yD8FV1WRRmq7duGUbqQQsi5L
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10946"; a="464189906"
+X-IronPort-AV: E=Sophos;i="6.04,340,1695711600"; 
+   d="scan'208";a="464189906"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2024 20:07:16 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.04,340,1695711600"; 
+   d="scan'208";a="29654489"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orviesa001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 07 Jan 2024 20:07:16 -0800
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Sun, 7 Jan 2024 20:07:15 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Sun, 7 Jan 2024 20:07:14 -0800
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Sun, 7 Jan 2024 20:07:14 -0800
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.100)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Sun, 7 Jan 2024 20:07:14 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=goG2cHTXsp+zuUlVBujVcHvQ5vqklnP6VvqS6ZHix+2A4Lt/GDqf/I9Ey+1xG7yYsp6BCAlE8fpzKkzV5zs6PboeGs5E4iRljvyOmJK9pnZ8QyAFGkw7/OV2xs18d1/tH4L63M+DwE0gCHVlErNawWB/iOvEFFr/EJgdV01h1SvLdIn8wPcuZFCyxySsqdvYUHF4LECUeArD8ioF7nzY3KSFToTSBA85EN5jmYEsvrZtwWGOtlR4nEEF68Y+p+oatK6Tvc0xtLT1hgf3rk/PUPf3XJnUYDjtS6Q4DEzFE3H2XvFn/WItDEHu1gn3pan/D4zoIOso/2UGMbe4/t/O7Q==
+ b=htlluF+fkWanC9NQe396UB8GjwJAkrsivyQS3yR/SJTXPhzOaCAKDqg5ZFkOccjfg2JcEltlDoJ/UoXt+Wx1v42ehNrKQ0SBbe41C3/a/Sj7UWdO0k+Qffyee8j1U0lpgCUd2yrPUMgRPABfh+U2D/cDdFWGQw0dGMi+RJwGLPUStLIeeNLbrnGDzT8cF4oXrFyZrEuCkR2PTQDYUqxxkkVTy4J8KPb8QAh4fK+jr7yDb5c6hFuJxGFFB0PmL3+lQ4j5FVVDQhzlYsW3VRxp0c4O3R/B1Wq16oaGeVxks3f/4d8ZV2+QZhGtXULjOMdab5rr4hCzeaxpx8SxYVxzxw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UaaMLgAHMcw3fpUZxWgDrI0pAaVnYHjE4vMjVkDsCvY=;
- b=fVxfZIAXZ1U+DWDlXBgQQEsMbXqbsYbJKe2XnPLYvkpwRiMCakVlj/WLVmqrQISZWPu1R/5ATeYV2A3R2ik1CYYIwwS+snm7fHhTRYJXM3doDFqUqg9tYKlYnDCu6IxSnKEarkH/m663Ctuw3RbmH5L+yLVDRkcznyCHG1mMMdOu8BqJ2u5pLVI6c1+Vdhm5aZk0KO/H9qbAn6V2vI1jwGPhVi1cZVPABxQOeRKCqcsmGrl/sao7pT69YjC7yxCNoVFG+jolU0Q7ZtTC9BoeZvHhvcE7pFSttryc1Vk1bZoFuWr1Y1dadCcb5poGxKJOlJKnqCiSIFl7gV7AL1RviA==
+ bh=1BZxPey4EA+hg+6LDc2ICxtvC2/zLfSZ8i2i96+OmWY=;
+ b=c8bBHwq2FD4gi+mAcQnCiGIZpKZ3PhmXyHttatqrPbIZZOglRhYBxsHAdDwfRhELP/8O4Iz2QVmGoWkKlWqmsAtDXBD2VITUiBnJVhFS+nvflcw56q8sz42IbY23akOfKjXINFT23cHpaZNHNpDCLlEBx+bRqBpw2BO4KcBCW7HhoJ5Vf0xilhmTGFtd6/E/AKf3bcRUNN87UM3K9JxKuVvcIWq2agYrMJPtXsNZulay1cSgaHZ3tbH91M7f9FdO1wHXpiJM4Hs2nO0mT/A81g6kimqYIyCiQcjOcVk0qpcsPdSUurTMUe1db/czvwkbnC9eSHsCiEgT+or8yp/iHg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UaaMLgAHMcw3fpUZxWgDrI0pAaVnYHjE4vMjVkDsCvY=;
- b=qr0C+1pgab5TDGWoPSb9bzgtTn8c/2XdEa5JU2tMFNZNMlUq2RUKc1lXjzhBKVAAUu5eb48HpIn/UH4VggxZ0Fo/G0mShA7k7Vb2O2VhljMyF/PlC5Dm2Erek/Vk7wm8wIzn56hB8a5DqKRNSnn+eK5xfmnIdO1TkA2lq1CYVWI=
-Received: from BYAPR10MB2663.namprd10.prod.outlook.com (2603:10b6:a02:a9::20)
- by BLAPR10MB5284.namprd10.prod.outlook.com (2603:10b6:208:333::20) with
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by SA1PR11MB6991.namprd11.prod.outlook.com (2603:10b6:806:2b8::21) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.19; Sat, 6 Jan
- 2024 08:35:49 +0000
-Received: from BYAPR10MB2663.namprd10.prod.outlook.com
- ([fe80::a1c5:b1ad:2955:e7a6]) by BYAPR10MB2663.namprd10.prod.outlook.com
- ([fe80::a1c5:b1ad:2955:e7a6%4]) with mapi id 15.20.7159.015; Sat, 6 Jan 2024
- 08:35:49 +0000
-From: Dongli Zhang <dongli.zhang@oracle.com>
-To: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-Cc: pbonzini@redhat.com, shuah@kernel.org, seanjc@google.com,
-        linux-kernel@vger.kernel.org, joe.jin@oracle.com
-Subject: [PATCH 1/1] KVM: selftests: add kvmclock drift test
-Date: Sat,  6 Jan 2024 00:33:46 -0800
-Message-Id: <20240106083346.29180-1-dongli.zhang@oracle.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BY3PR03CA0024.namprd03.prod.outlook.com
- (2603:10b6:a03:39a::29) To BYAPR10MB2663.namprd10.prod.outlook.com
- (2603:10b6:a02:a9::20)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.21; Mon, 8 Jan
+ 2024 04:07:12 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::a8e9:c80f:9484:f7cb]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::a8e9:c80f:9484:f7cb%3]) with mapi id 15.20.7159.020; Mon, 8 Jan 2024
+ 04:07:12 +0000
+From: "Tian, Kevin" <kevin.tian@intel.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+CC: "Liu, Yi L" <yi.l.liu@intel.com>, "joro@8bytes.org" <joro@8bytes.org>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+	"robin.murphy@arm.com" <robin.murphy@arm.com>, "baolu.lu@linux.intel.com"
+	<baolu.lu@linux.intel.com>, "cohuck@redhat.com" <cohuck@redhat.com>,
+	"eric.auger@redhat.com" <eric.auger@redhat.com>, "nicolinc@nvidia.com"
+	<nicolinc@nvidia.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+	"chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+	"yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>, "peterx@redhat.com"
+	<peterx@redhat.com>, "jasowang@redhat.com" <jasowang@redhat.com>,
+	"shameerali.kolothum.thodi@huawei.com"
+	<shameerali.kolothum.thodi@huawei.com>, "lulu@redhat.com" <lulu@redhat.com>,
+	"suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "Duan,
+ Zhenzhong" <zhenzhong.duan@intel.com>, "joao.m.martins@oracle.com"
+	<joao.m.martins@oracle.com>, "Zeng, Xin" <xin.zeng@intel.com>, "Zhao, Yan Y"
+	<yan.y.zhao@intel.com>
+Subject: RE: [PATCH v7 1/3] iommufd: Add data structure for Intel VT-d stage-1
+ cache invalidation
+Thread-Topic: [PATCH v7 1/3] iommufd: Add data structure for Intel VT-d
+ stage-1 cache invalidation
+Thread-Index: AQHaGViOWXGe59nutU2rEx/0zRDvrrCozh6AgCE2IQCAALd70IAADhuggADPEQCAA/GQIA==
+Date: Mon, 8 Jan 2024 04:07:12 +0000
+Message-ID: <BN9PR11MB52765C91893A28A7D21D324E8C6B2@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20231117131816.24359-1-yi.l.liu@intel.com>
+ <20231117131816.24359-2-yi.l.liu@intel.com>
+ <c967e716-9112-4d1a-b6f7-9a005e28202d@intel.com>
+ <20240104143658.GX50406@nvidia.com>
+ <BN9PR11MB52769EEDAE2783426144E2588C662@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <20240105144516.GC50406@nvidia.com>
+In-Reply-To: <20240105144516.GC50406@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|SA1PR11MB6991:EE_
+x-ms-office365-filtering-correlation-id: 1ff0e0d1-b160-4428-b434-08dc0fff4ab0
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 3bO/ZlxXVEjiuMKR5z1B8qLWl4AadjgCRGb8TS/S/2RwO5nLcQWQw49B4pZT1oij9J4m3ztxcvTTmF/u0shHXppltS68rCSh1C2+NxNJ6EXgUBSJS8hLwedU3wSxFUrh4mZLCD9MVsYE54CgU6GKx/EuShAC86ffWHtOfqGqP481kOZJd8GzfUq9FQeJWo8kGRDe6ydM1HTUhC/gI9tQ9/ziT2PJkR3PKDVGfyw70RlzSRpYovTWMJBud/AzlLxQkHBUl1tkD57LICLhb1xfuHlDTxXXrkmPTfpgUW8NEYixFMUMib6LEkOMLU+V4cwJD9Tl6o/33MJEF4d4H1n4FrN+roj94IVAYseWQcq2bC01KG5xPcgDiCGfZibYBd6ppkdxgNjY2XvbtDZD+c4ZQKE9nqo8/B35RHM5BeTM8Dkxio8B5v5jaZ+ePq2UKSdeHCZciW2R5a5xqv6vpnWJSyBn2rZGHs1AArDazEZ3aZe9Yd5e39wlIrQhhMBMg7lF/4ZN5D533dczK2odhqoRdJeVGqOjzgF2HBYaUg3ZVu32lOzXFy+TCo79+e/xQC9zrUrQVleKNWr0dfDUxxqSD+sFX2kbU4mKXl/zqgPTAsPFxGbf3KedMuL5inY0vwlE
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(376002)(366004)(39860400002)(396003)(230922051799003)(186009)(1800799012)(64100799003)(451199024)(55016003)(26005)(83380400001)(33656002)(7416002)(5660300002)(86362001)(6506007)(7696005)(71200400001)(478600001)(122000001)(38100700002)(9686003)(54906003)(41300700001)(66946007)(66556008)(6916009)(64756008)(66446008)(66476007)(2906002)(38070700009)(52536014)(8936002)(8676002)(4326008)(316002)(82960400001)(76116006);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?PhhxOj7L4ttO1n1gYVkTdxRndAb2YTOKLueHxZDblDmw+hSaxZ8apV5EnMj6?=
+ =?us-ascii?Q?R9iX3OhZ832eOtgond1wNPlwW/vjzspOrFII7sgx5/EE3GWbCPEnT3/3TFH0?=
+ =?us-ascii?Q?n30HuZAZnal/d0ZzUvpW6OOsQ5mlKX/7FbTscjZ1AFUkogT5+9HnC5DY3UHq?=
+ =?us-ascii?Q?ug8AMQxk1UQ29ZyXDefd4YIcy7g/mhctYYX+wyFSRAERdm4oKvYrckqCS/+m?=
+ =?us-ascii?Q?d27F3khMuOkQBOW+ce7jSgDAGaX+7IQtIAfL8qxidaUmp5C+YzFaGlBK0RPJ?=
+ =?us-ascii?Q?jBScKWPppkJt/AGytPC2sx+e4RLhkCajO9m/gjKd3LrBtrxB6Yn25Q6REyz5?=
+ =?us-ascii?Q?XUzNwAN+Krml8KOWFiTeH+HOHfM6MgrIDdDWgt+MbIbMFj5vVQKm3s/ubJRZ?=
+ =?us-ascii?Q?VVT4PJfGEymjj5qP+25f6AR69ngMEe9mvr53S+8PjgnxqCCctHwz73ASnhge?=
+ =?us-ascii?Q?hjxxv5VZaJOWJDmBPKWC881DxOKAWj2iWW75ojnX46ucAfLXtaXRwNZdjMFx?=
+ =?us-ascii?Q?49dD5al5KpMdJikMTpSSbFsyK0vuzHa1KcHiGLuREioRsNy4yRJ6qMWK8P/x?=
+ =?us-ascii?Q?U8vvCplCMoYu8PrwQbKzisI6xePhXQvNnXTPEZoNKA6lzwi+wxnQSmKYyQm+?=
+ =?us-ascii?Q?PnPKiSYQg9JXlfzSahKK2XRbLIbQR//oZ+igK5OOHgTwFv3IHozQ/9wA9NWT?=
+ =?us-ascii?Q?2WXvYzN9irWvbByf/AaNoyFjGGwhH2CBJeOBBrZmsrDOXszjEchdDYiCdb9Z?=
+ =?us-ascii?Q?Z1NmW96RmMQ3cGMW5+ouaLLtAfHB3tQduwKrbQgASJkZcQ6UyU8zaudwjAOb?=
+ =?us-ascii?Q?C4Vm+A5rRvhTZSPqZ++v2c5z51029BaObvYzWkDzxyGhD85fj0Wpj/za6vxp?=
+ =?us-ascii?Q?r3ONc/DZ2lTENYj//37F44qqigP+FmjDrYyUp4nFpLEGzLETrdx5PbrtNcF1?=
+ =?us-ascii?Q?fqh4bihtiu6CjOKSVw2WOqjvTu0ikNDpT8XlAPvAUzGj+GMBfgSzOinK/mEW?=
+ =?us-ascii?Q?bSO5Ns82iUAuteKsWSFebso4y4qqv3GVSJO+4jSr2MAt4pFi3EKrV4I34u73?=
+ =?us-ascii?Q?iQP1PYo+kkUy+fPqhg3dEb3C9CMWTCjdAnP4vBx4Z819LLPKIl+9kp0R93GU?=
+ =?us-ascii?Q?v78fGK96ecIEPpsIpUvNC16K9/x7efP6ITsqLn668q+clW+4jkxpaEKwLTmE?=
+ =?us-ascii?Q?EW9yP7pO/Wxu8IR0R+sV8h4CaLvDj6aswISgI73DqJlD3AbMNNfYkj31YtKo?=
+ =?us-ascii?Q?PrlFQlAIPreBlQXQX7iIN3SCvSCfU+/YPV3o1v+BbR94t9sjXvygosY7vyUB?=
+ =?us-ascii?Q?L53eeSq6OWVMqwPtwe/Amtsjc9e1HZDdmWBRn98KiaYPpqBlfPK6x4f39+Ns?=
+ =?us-ascii?Q?JbDwGPkBs20bMlpIUPVtJ1/dEVUMBN92R3s2NkkMNTjQBFrO1s7Iwnd/i7vp?=
+ =?us-ascii?Q?ojMb1JMGyPCudtG5KQpyQhSHPawteii++0ko8189SrtnZoxY84MQW2iibiEU?=
+ =?us-ascii?Q?36zzwWaSNfIRtcCrv6aGpBKCoqXJOh5c0uqSxCwl3OtUJOn52+TZLSjLKVhQ?=
+ =?us-ascii?Q?hfIO7Bs2SiW6/WrFePfkvET1MiSZW5mTZqD7UXQ4?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR10MB2663:EE_|BLAPR10MB5284:EE_
-X-MS-Office365-Filtering-Correlation-Id: fb7b1e49-b72b-42d7-6a7e-08dc0e927c0c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 
-	fDY7SA5HZ3tiJQbpT62qrumjLxPXCI1y2GVwtpddlfJGH6sy77t62EvqikmkZ7+PJl/X51SXKsWFw2qAqWPVLvRohVliPYTynrjJgxoyOTlJ8bJajjr/LBBwIuCEWDcJXZRyWarSNvQoDmeYJIArtdEYjPudNvt8UwHmcD3J2VZnTnQt72PWpHd3e4+dinFQW88H2dWZAjhK+qWQ1YyKqZT+TSfWkIis3h8zo3WZwxPCuyL9JeepDStTI4Xr//ew5GPmA7ZPev4YFZvEY2d1ozLoH88hqFWPo9o/0EJdJ01TmFusrzljLPfA5uiFUtTeb1VpZdk/bQxs+tYTYQyqvkVmCUFEEVP9UYWlvx847cu7rRIDrQ2BWvZ6H3ocaKmnbvUg0vW4AFEhHtCzonSZm68bkg3oyzqujOTHzesoTpieCVvGsu7YnJMHo8dhiTUBRTc3cnvx00J4VjGbDPIJq6ygrHEbVwHnnO22VXJdWVGxd5NSKpCGupDR+crwJ7dxX8E0KfGZPto5UfZk/1ETU8gOYr2GCG9RC/R8U02ydpEkOcw3YkjnmhWUCI3znq83
-X-Forefront-Antispam-Report: 
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR10MB2663.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(396003)(39860400002)(376002)(346002)(136003)(230922051799003)(186009)(1800799012)(64100799003)(451199024)(107886003)(2616005)(6506007)(6512007)(83380400001)(26005)(1076003)(41300700001)(6486002)(86362001)(4326008)(316002)(8676002)(8936002)(5660300002)(2906002)(44832011)(36756003)(66946007)(66556008)(66476007)(6666004)(478600001)(38100700002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: 
-	=?us-ascii?Q?/bSuaWTKpRG72kpyWNBzVdh2mU3FwL+toNx6pbqucM3AiJ7bAdN3Az0WyVlt?=
- =?us-ascii?Q?rRyWrbfw753BtEPvu+EIL4x9XXuo98F0Dnf0ikSXpOMn8yAjBrUU1cVLmWMD?=
- =?us-ascii?Q?XI8iU7MOfBAYY5jkMSvNzEQ71ihc80JN/GgD6zgkRKyq041lae6d5rHmSxKj?=
- =?us-ascii?Q?Ku6Cg02PCkxhGEBDbkUVSceuF+xUt+IqVjvBLtHZlt1ldP1Eb1soV8xJy7K4?=
- =?us-ascii?Q?1tne7suMIeCR60LCQwMoglRNrv9jRtLaqySdKD6hhScBp8a+kZxdrHMdQGax?=
- =?us-ascii?Q?IFJA18ovsbE+lmG1gPc/6BX82doCQA2SCctdgoplbbUAC/DLSDfrQDGSL6zs?=
- =?us-ascii?Q?s5bJ9QJLnccjKLWgYxEskefw7YrgdTGJk8KD8eR1o+ePAEQYilGkFkHEQzb9?=
- =?us-ascii?Q?d2Gr4btO77sRfzXZcFZZTJ090Rg0AlFYPiFjAy+NHLpJvBds2cP8L35zqoxW?=
- =?us-ascii?Q?NcwZWDxGu6rljfwFvTxuWS0eyNvvEIo4BqlbC15lS6TRKyitBJ7+UyIaOYUN?=
- =?us-ascii?Q?LqlyAVsJsZy/1z+Ri05F6xoKEM9WwcHUwYnadEgv/sf+I6sYmY9gohFwy8W9?=
- =?us-ascii?Q?+77nhT2jVlJsq4aBwsx87CwsQLvdN4HiCiqW42ehUDfA9FtH7IwLJCzPUc2h?=
- =?us-ascii?Q?lWSopdZklHSv1mgKpOpIfVmEMd3JVO2HBNiXL7oaIFKFlZAF4bSwC2dZpZRi?=
- =?us-ascii?Q?qKDRD8sbaUrphzxqErEo2/Q7Rrye4sLh7oZewenw6AUvOHbgoUBLdfKUtx8Z?=
- =?us-ascii?Q?rpBw6V0do+F8yc7j1xuQOOanZ/V3D1QcdPVKeZ3yFNKmOFiyazZQd3DVqHGD?=
- =?us-ascii?Q?AXJUsvFjH2BL8OCMZT65TBiusRMzSYuJ2qWWCXovORSFToat1WNc+FUJbI8F?=
- =?us-ascii?Q?h/12h4RXtCiPd3Qxz40ZZuUZcUZhSL8HFtNiiTIj05r+mrorWY1saqctVjvy?=
- =?us-ascii?Q?ac3lq/+hfENKCSRKpKt5UWO7sUoXtxvYnFV/bvGoy+BTY7SB4OxDqi67FsM2?=
- =?us-ascii?Q?2FevE3Me7BNzxA/81Giz0rYj5aMcmIzqbpNC2To8fiPnAMy3xme3FLZDmXlB?=
- =?us-ascii?Q?le7VsYxyRhGoghnp8Wi1+0HGDzVqVr748DXD6sJDoL5scGPhqRlGh6HdGJ7y?=
- =?us-ascii?Q?hT18VC3qgJhZTihi9id/8f2EsEDU/SahHrqFnhjHAojltc35YxMt9Ar5WVji?=
- =?us-ascii?Q?qwVw6VeHDs8F/4X6aKfOdOBYY/PTD502tslhNd2vm7eXWV51JSpvdM3AGOMi?=
- =?us-ascii?Q?6xX+8K9kdJNJOmaC3achHfG8lWphR52WEKRdxvAwnAJrjnR5MJVvu+E9jstn?=
- =?us-ascii?Q?gXxkgscjEAmueZkQV1PZ+hPE5P2nHE4PTjKJg3V1eIYbtZA+NiUDM6pm9Ogg?=
- =?us-ascii?Q?yu8vAabAykD9OOqIeSkZ/7ESWjsQwytjrvstraKnXSc7qaOlGIC0b6vd2CqW?=
- =?us-ascii?Q?meTplGWGENQm3vCODJW+P5nBTEBbWIz2JGGzojHwPQdUsgtCINP7Y6Mcf6+y?=
- =?us-ascii?Q?F52SXERQdeFj0Vj65dlJTAyYlAkY5D0Puc/JAlB657VYWYmR0eshQLjwVVum?=
- =?us-ascii?Q?SRyX/R+QhzhpZtbJLp45AqSlWcHSGYLH6pP2SLW6qK7TL+z4Ga/moTO13z/m?=
- =?us-ascii?Q?CQ=3D=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	yvVobeyAk0CYpM00e4az67FycbHfA7IO2dmDCcvBhJlTFWaURC27g05Kl0awvZ1Cyst61xbyg3YkHGDDFUURz6Gm3dc4MDRMEHdKxlqS3iEe5ATFxBEqLOBsiroRJmck7CeDSFN/D35yzIsUL4YY4845Q53igl9vkjLlritfv6CNGZRTSODR23dnVFoj16x2EvaH0omba2atHkPZtzTOp+qqK8fgejv52rb6mtb14UCO6jYjfBCAdltfFIC4CX/hC+z3rgf23puSzX0vXf58yY8ij/yhlRc9KUQ+bv70l6JPq4ojTEfpi05nB0MVbKHQPcv2Ux0OHQU7jrFpZPnHAU8CPgIHiKgmoVAXqSJpvKIj7bsu2fbv5utGLTA/NXsZU6Lhpsg7prwOOGg4D6wGLBlR0Jh/CmZ3+pkCn+ghLiiFfQ/OpzpOUz+DsON3BcawuM/akGDY/k5quEGXtNXk7anHtmQTX5PUUy76oZMpGlel1vS88Qm08GZQXbgdqHKtX6JENerqFfoFPnRnShuESer9Zqxd7Vlcs/3WD92mndgsocqgAY3E+RKQCX6AsQRgoMqbephD1/Hyvus+fjTGFdS8M5rsSvzAAM4RRfuh4wY=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fb7b1e49-b72b-42d7-6a7e-08dc0e927c0c
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR10MB2663.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jan 2024 08:35:49.2403
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1ff0e0d1-b160-4428-b434-08dc0fff4ab0
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Jan 2024 04:07:12.3587
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: vTiB0j4pq///0mNwZRStr3JQ13aynFgi0SlxYDw4NqpFQngnc06zjPubAdNXB6c26ifxCfn7uf6rt7fc1ua2sA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BLAPR10MB5284
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-05_08,2024-01-05_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 bulkscore=0 mlxscore=0
- adultscore=0 spamscore=0 phishscore=0 suspectscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
- definitions=main-2401060059
-X-Proofpoint-GUID: iIFJsy4bjSUrYKr8QKe-TF8gH3e6JaPa
-X-Proofpoint-ORIG-GUID: iIFJsy4bjSUrYKr8QKe-TF8gH3e6JaPa
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: GaWzIUXkvHB2qk098pPUkEYw3H7g6RCj5uLe7I5TqdJkXBGgZqlPq+CbRsRl3FQMYFMZ/0GiTYqfqcwgxuqbMg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB6991
+X-OriginatorOrg: intel.com
 
-There is kvmclock drift issue during the vCPU hotplug. It has been fixed by
-the commit c52ffadc65e2 ("KVM: x86: Don't unnecessarily force masterclock
-update on vCPU hotplug").
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Friday, January 5, 2024 10:45 PM
+>=20
+> On Fri, Jan 05, 2024 at 02:52:50AM +0000, Tian, Kevin wrote:
+> > > but in reality the relation could be identified in an easy way due to=
+ a SIOV
+> > > restriction which we discussed before - shared PASID space of PF
+> disallows
+> > > assigning sibling vdev's to a same VM (otherwise no way to identify w=
+hich
+> > > sibling vdev triggering an iopf when a pasid is used on both vdev's).=
+ That
+> > > restriction implies that within an iommufd context every iommufd_devi=
+ce
+> > > object should contain a unique struct device pointer. So PASID can be
+> > > instead ignored in the lookup then just always do iommufd_get_dev_id(=
+)
+> > > using struct device.
+> >
+> > A bit more background.
+> >
+> > Previously we thought this restriction only applies to SIOV+vSVA, as
+> > a guest process may bind to both sibling vdev's, leading to the same
+> > pasid situation.
+> >
+> > In concept w/o vSVA it's still possible to assign sibling vdev's to
+> > a same VM as each vdev is allocated with a unique pasid to mark vRID
+> > so can be differentiated from each other in the fault/error path.
+>=20
+> I thought the SIOV plan was that each "vdev" ie vpci function would
+> get a slice of the pRID's PASID space statically selected at creation?
+>=20
+> So SVA/etc doesn't matter, you reliably get a disjoint set of pRID &
+> pPASID into each VM.
+>=20
+> From that view you can't identify the iommufd dev_id without knowing
+> both the pRID and pPASID which will disambiguate the different SIOV
+> iommufd dev_id instances sharing a rid.
 
-This is to add the test to verify if the master clock is updated when we
-write 0 to MSR_IA32_TSC from the host side.
+true when assigning those instances to different VMs.
 
-Here is the usage example on the KVM with the bugfix reverted.
+Here I was talking about assigning them to a same VM being a problem.
+with rid sharing plus same ENQCMD pPASID potentially used on both
+instances there'd be ambiguity in vSVA e.g. iopf to identify dev_id.
 
-$ ./kvm_clock_drift -v -p 5
-kvmclock based on old pvclock_vcpu_time_info: 5012221999
-  version:           2
-  tsc_timestamp:     3277968
-  system_time:       11849519
-  tsc_to_system_mul: 2152530255
-  tsc_shift:         0
-  flags:             1
+we agreed before on preventing sibling vdev's in one VM for above
+reason, but only as far as vSVA is concerned.
 
-kvmclock based on new pvclock_vcpu_time_info: 5012222411
-  version:           4
-  tsc_timestamp:     9980576184
-  system_time:       5012222411
-  tsc_to_system_mul: 2152530255
-  tsc_shift:         0
-  flags:             1
+then given the new finding in err reporting I wondered whether this
+restriction should be applied to all SIOV scenarios (but irrelevant now
+with below explanation after another thinking)
 
-==== Test Assertion Failure ====
-  x86_64/kvm_clock_drift.c:216: clock_old == clock_new
-  pid=14257 tid=14257 errno=4 - Interrupted system call
-     1	0x000000000040277b: main at kvm_clock_drift.c:216
-     2	0x00007f7766fa7e44: ?? ??:0
-     3	0x000000000040286d: _start at ??:?
-  kvmclock drift detected, old=5012221999, new=5012222411
+>=20
+> > But when looking at this err code issue with Yi closely, we found
+> > there is another gap in the VT-d spec. Upon devtlb invalidation
+> > timeout the hw doesn't report pasid in the error info register. this
+> > makes it impossible to identify the source vdev if a hwpt invalidation
+> > request involves sibling vdev's from a same PF.
+>=20
+> Don't you know which command timed out?
 
-Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
----
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/x86_64/kvm_clock_drift.c    | 223 ++++++++++++++++++
- 2 files changed, 224 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86_64/kvm_clock_drift.c
+unfortunately no.
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 4412b42d95de..c665d0d8d348 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -84,6 +84,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/hyperv_features
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_ipi
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_svm_test
- TEST_GEN_PROGS_x86_64 += x86_64/hyperv_tlb_flush
-+TEST_GEN_PROGS_x86_64 += x86_64/kvm_clock_drift
- TEST_GEN_PROGS_x86_64 += x86_64/kvm_clock_test
- TEST_GEN_PROGS_x86_64 += x86_64/kvm_pv_test
- TEST_GEN_PROGS_x86_64 += x86_64/monitor_mwait_test
-diff --git a/tools/testing/selftests/kvm/x86_64/kvm_clock_drift.c b/tools/testing/selftests/kvm/x86_64/kvm_clock_drift.c
-new file mode 100644
-index 000000000000..324f0dbc5762
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/kvm_clock_drift.c
-@@ -0,0 +1,223 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * The kvmclock drift test. Emulate vCPU hotplug and online to verify if
-+ * there is kvmclock drift.
-+ *
-+ * Adapted from steal_time.c
-+ *
-+ * Copyright (C) 2020, Red Hat, Inc.
-+ * Copyright (C) 2024 Oracle and/or its affiliates.
-+ */
-+
-+#include <asm/kvm_para.h>
-+#include <asm/pvclock.h>
-+#include <asm/pvclock-abi.h>
-+#include <sys/stat.h>
-+
-+#include "kvm_util.h"
-+#include "processor.h"
-+
-+#define NR_VCPUS		2
-+#define NR_SLOTS		2
-+#define KVMCLOCK_SIZE		sizeof(struct pvclock_vcpu_time_info)
-+/*
-+ * KVMCLOCK_GPA is identity mapped
-+ */
-+#define KVMCLOCK_GPA		(1 << 30)
-+
-+static uint64_t kvmclock_gpa = KVMCLOCK_GPA;
-+
-+static void guest_code(int cpu)
-+{
-+	struct pvclock_vcpu_time_info *kvmclock;
-+
-+	/*
-+	 * vCPU#0 is to detect the change of pvclock_vcpu_time_info
-+	 */
-+	if (cpu == 0) {
-+		GUEST_SYNC(0);
-+
-+		kvmclock = (struct pvclock_vcpu_time_info *) kvmclock_gpa;
-+		wrmsr(MSR_KVM_SYSTEM_TIME_NEW, kvmclock_gpa | KVM_MSR_ENABLED);
-+
-+		/*
-+		 * Backup the pvclock_vcpu_time_info before vCPU#1 hotplug
-+		 */
-+		kvmclock[1] = kvmclock[0];
-+
-+		GUEST_SYNC(2);
-+		/*
-+		 * Enter the guest to update pvclock_vcpu_time_info
-+		 */
-+		GUEST_SYNC(4);
-+	}
-+
-+	/*
-+	 * vCPU#1 is to emulate the vCPU hotplug
-+	 */
-+	if (cpu == 1) {
-+		GUEST_SYNC(1);
-+		/*
-+		 * This is after the host side MSR_IA32_TSC
-+		 */
-+		GUEST_SYNC(3);
-+	}
-+}
-+
-+static void run_vcpu(struct kvm_vcpu *vcpu)
-+{
-+	struct ucall uc;
-+
-+	vcpu_run(vcpu);
-+
-+	switch (get_ucall(vcpu, &uc)) {
-+	case UCALL_SYNC:
-+	case UCALL_DONE:
-+		break;
-+	case UCALL_ABORT:
-+		REPORT_GUEST_ASSERT(uc);
-+	default:
-+		TEST_ASSERT(false, "Unexpected exit: %s",
-+			    exit_reason_str(vcpu->run->exit_reason));
-+	}
-+}
-+
-+static void kvmclock_dump(struct pvclock_vcpu_time_info *kvmclock)
-+{
-+	pr_info("  version:           %u\n", kvmclock->version);
-+	pr_info("  tsc_timestamp:     %lu\n", kvmclock->tsc_timestamp);
-+	pr_info("  system_time:       %lu\n", kvmclock->system_time);
-+	pr_info("  tsc_to_system_mul: %u\n", kvmclock->tsc_to_system_mul);
-+	pr_info("  tsc_shift:         %d\n", kvmclock->tsc_shift);
-+	pr_info("  flags:             %u\n", kvmclock->flags);
-+	pr_info("\n");
-+}
-+
-+#define CLOCKSOURCE_PATH "/sys/devices/system/clocksource/clocksource0/current_clocksource"
-+
-+static void check_clocksource(void)
-+{
-+	char *clk_name;
-+	struct stat st;
-+	FILE *fp;
-+
-+	fp = fopen(CLOCKSOURCE_PATH, "r");
-+	if (!fp) {
-+		pr_info("failed to open clocksource file: %d; assuming TSC.\n",
-+			errno);
-+		return;
-+	}
-+
-+	if (fstat(fileno(fp), &st)) {
-+		pr_info("failed to stat clocksource file: %d; assuming TSC.\n",
-+			errno);
-+		goto out;
-+	}
-+
-+	clk_name = malloc(st.st_size);
-+	TEST_ASSERT(clk_name, "failed to allocate buffer to read file\n");
-+
-+	if (!fgets(clk_name, st.st_size, fp)) {
-+		pr_info("failed to read clocksource file: %d; assuming TSC.\n",
-+			ferror(fp));
-+		goto out;
-+	}
-+
-+	TEST_ASSERT(!strncmp(clk_name, "tsc\n", st.st_size),
-+		    "clocksource not supported: %s", clk_name);
-+out:
-+	fclose(fp);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct pvclock_vcpu_time_info *kvmclock;
-+	struct kvm_vcpu *vcpus[NR_VCPUS];
-+	uint64_t clock_old, clock_new;
-+	bool verbose = false;
-+	unsigned int gpages;
-+	struct kvm_vm *vm;
-+	int period = 2;
-+	uint64_t tsc;
-+	int opt;
-+
-+	check_clocksource();
-+
-+	while ((opt = getopt(argc, argv, "p:vh")) != -1) {
-+		switch (opt) {
-+		case 'p':
-+			period = atoi_positive("The period (seconds) between vCPU hotplug",
-+					       optarg);
-+			break;
-+		case 'v':
-+			verbose = true;
-+			break;
-+		case 'h':
-+		default:
-+			pr_info("usage: %s [-p period (seconds)] [-v]\n", argv[0]);
-+			exit(1);
-+		}
-+	}
-+
-+	vm = vm_create_with_vcpus(NR_VCPUS, guest_code, vcpus);
-+	gpages = vm_calc_num_guest_pages(VM_MODE_DEFAULT,
-+					 KVMCLOCK_SIZE * NR_SLOTS);
-+	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-+				    KVMCLOCK_GPA, 1, gpages, 0);
-+	virt_map(vm, KVMCLOCK_GPA, KVMCLOCK_GPA, gpages);
-+
-+	vcpu_args_set(vcpus[0], 1, 0);
-+	vcpu_args_set(vcpus[1], 1, 1);
-+
-+	/*
-+	 * Run vCPU#0 and vCPU#1 to update both pvclock_vcpu_time_info and
-+	 * master clock
-+	 */
-+	run_vcpu(vcpus[0]);
-+	run_vcpu(vcpus[1]);
-+
-+	/*
-+	 * Run vCPU#0 to backup the current pvclock_vcpu_time_info
-+	 */
-+	run_vcpu(vcpus[0]);
-+
-+	sleep(period);
-+
-+	/*
-+	 * Emulate the hotplug of vCPU#1
-+	 */
-+	vcpu_set_msr(vcpus[1], MSR_IA32_TSC, 0);
-+
-+	/*
-+	 * Emulate the online of vCPU#1
-+	 */
-+	run_vcpu(vcpus[1]);
-+
-+	/*
-+	 * Run vCPU#0 to backup the new pvclock_vcpu_time_info to detect
-+	 * if there is any change or kvmclock drift
-+	 */
-+	run_vcpu(vcpus[0]);
-+
-+	kvmclock = addr_gva2hva(vm, kvmclock_gpa);
-+	tsc = kvmclock[0].tsc_timestamp;
-+	clock_old = __pvclock_read_cycles(&kvmclock[1], tsc);
-+	clock_new = __pvclock_read_cycles(&kvmclock[0], tsc);
-+
-+	if (verbose) {
-+		pr_info("kvmclock based on old pvclock_vcpu_time_info: %lu\n",
-+			clock_old);
-+		kvmclock_dump(&kvmclock[1]);
-+		pr_info("kvmclock based on new pvclock_vcpu_time_info: %lu\n",
-+			clock_new);
-+		kvmclock_dump(&kvmclock[0]);
-+	}
-+
-+	TEST_ASSERT(clock_old == clock_new,
-+		    "kvmclock drift detected, old=%lu, new=%lu",
-+		    clock_old, clock_new);
-+
-+	kvm_vm_free(vm);
-+
-+	return 0;
-+}
+for errors related to descriptor fetch the driver can tell the command
+by looking at the head pointer of the invalidation queue.
 
-base-commit: f2a3fb7234e52f72ff4a38364dbf639cf4c7d6c6
--- 
-2.34.1
+command completion is indirectly detected by inserting a wait descriptor
+as fence. completion timeout error is reported in an error register. but
+this register doesn't record pasid, nor does the command location. if there
+are multiple pending devtlb invalidation commands upon timeout=20
+error the spec suggests the driver to treat all of them timeout as the
+register can only record one rid.
 
+this is kind of moot. If the driver submits only one command (plus wait)
+at a time it doesn't need hw's help to identify the timeout command.=20
+If the driver batches invalidation commands it must treat all timeout if
+an timeout error is reported.
+
+from this angle whether to record pasid doesn't really matter.
+
+intel-iommu driver doesn't batch commands. so it's possible for
+the driver to figure out the timeout device itself and identify rid plus
+pasid to find dev_id from iommufd.
+
+Thanks
+Kevin
 
