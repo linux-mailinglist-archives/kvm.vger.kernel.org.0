@@ -1,150 +1,181 @@
-Return-Path: <kvm+bounces-5838-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5839-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B48A82747D
-	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 16:53:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CB578274BE
+	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 17:14:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2CADC1C22E92
-	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 15:53:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 974381F23717
+	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 16:14:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3846951C4D;
-	Mon,  8 Jan 2024 15:53:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74CE652F8E;
+	Mon,  8 Jan 2024 16:14:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ScUJdTf6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MywWNpE/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2075C51037
-	for <kvm@vger.kernel.org>; Mon,  8 Jan 2024 15:53:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5eb6dba1796so33118997b3.1
-        for <kvm@vger.kernel.org>; Mon, 08 Jan 2024 07:53:04 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D758524C7;
+	Mon,  8 Jan 2024 16:14:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-28bc870c540so1755233a91.2;
+        Mon, 08 Jan 2024 08:14:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704729184; x=1705333984; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LXpfvDdR25mi61ZRv+hUGYfziJrbv6+q0uR9W3pdtgw=;
-        b=ScUJdTf6pY1EyzXXhTCOXHjVT97d9to7GQ83OVVOdFBTRhGje7AGwchBSTlrSGUrYQ
-         VFbN4vMFF6Hla0gcX4RSkXf6EB87oabE/uJ0REVkG1YoQnSO9DHgfBiIqpjFeVPpYgzK
-         HXHrCrHGNHHUcptvmkPg86uQDGNIfA4Fh/ldNw7mjAzVqIsfH6Lfsq5tLDEKfe/MjSVD
-         Ejfo41gQFHZtoLFYZpVLtvZAUILVJCvSpfdWYL5sbxmnQCSYpM4snT6X7Do0wUrHWdlt
-         SDtLaa4/o7/jEn/nOJYlnSZIvd4GiuE5MFW8M3iYnzZS699H8VSVAX1CKzzhaTLXF02A
-         Cn7Q==
+        d=gmail.com; s=20230601; t=1704730452; x=1705335252; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=unjvTIPzqvEYfu9k31l2UbfWfPgY7ha+9toKsyi5Vr8=;
+        b=MywWNpE/IlArxpylbISQA9Pp0LCB2F/te/IPXa3KAo8flm6rHDuVXRhSQr7qeWzaov
+         muWoDbnsAOZXHq/SYItqe8GPpK3XoVaEgI7dhMPW0QOHToHXSwXxh7pvJvmZV2HIpCrD
+         CpMnUgLWpndWmeI7JStVej4Wzzc4KKwPL/VTRE7SwkX1CrvbUlYMl2Wa/Me1BWF9Ayph
+         H6Ylzcjr3hYRwAJMAlc2LWoEjr+4dgAllGqL9jhKm9VcNRfdWqhngLHnymObmzVDMVGw
+         Q43Lc0jDLRj3sScYLvF/oHt0dOBH0uCyfQfyHER4XPzTN8azMJWv/X2fiEXOYgzoOlpM
+         5/Og==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704729184; x=1705333984;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LXpfvDdR25mi61ZRv+hUGYfziJrbv6+q0uR9W3pdtgw=;
-        b=YAtrrvx9r8cE4AE6vUoaw0GPgWf7JiHU4aqKMPcgK9mTGM/FzMYr7fT2oqAipV6J76
-         mAZeD+jQcqEZVgyHo9Zvaz2oMqql86y6yuVyOeriUvAHZ1ULm/o/UxQx7IszaVnWBvp8
-         Tu+88cGSeWPUyc00LwbKmRflhXFmPsN3bDMYmymQVZzMKzGLE11uXsc457EbFHZT1LHW
-         q5r7qVPDggH/EI4pYM1xmhE/SIasUs3RbenTFrvbX+Je0BgF4Vo43on0jVt34Q8JyI9i
-         Ncc66wjkXuYhBA+XwB9NroBjGcIyncL65I4mZA53sim5RgZ6cZl1ym2cgscFGRBBZrr3
-         XcSA==
-X-Gm-Message-State: AOJu0YxfD3nnRA0Uvb3CyQUJWnNP/mMxvGb96fqqN2IVKdoRMphpH8Ns
-	SoXFU+eF3KYkjaPMjVRQWgI6DdhkIYrmwlEciw==
-X-Google-Smtp-Source: AGHT+IH6tgug6GZXuthKAIt2m3rWLQls/sRxvnIhe9rTO176GAtStoSNma4aHNycx8stxCAgF2wzux11TeA=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:83d0:0:b0:dbe:a20a:6330 with SMTP id
- v16-20020a2583d0000000b00dbea20a6330mr1497318ybm.9.1704729184054; Mon, 08 Jan
- 2024 07:53:04 -0800 (PST)
-Date: Mon, 8 Jan 2024 07:53:02 -0800
-In-Reply-To: <CAJ5mJ6hpSSVhZ5hbPZ8vfSnmNU6W+g4e=PeLrG7fG2u8KptfHQ@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1704730452; x=1705335252;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=unjvTIPzqvEYfu9k31l2UbfWfPgY7ha+9toKsyi5Vr8=;
+        b=LplKvSuBdOWjc15obiGsfCXIr1vJc7OWyEzdxIWWC3zaXvD7YVFsoyiKvr6VHT/A0w
+         SssLuW+uTsCFT8Iz8SahQYShw+rAh9n7V/5fAAAWuOee2mmWGYl6WSDD4nzdnIXoBIsj
+         Tmgj+F/TqKgNrMLe5sQJpV0TET8eUq1SLtoS9NoR2i4cBoKVgNFy62jn286ZygZd4kU+
+         +ywRVS2YwhSxpw4lm/wQcizcjqxrikLYHmta53blFyXsCHJqt/QAKar1npv4gjWv+3sV
+         KvsUVNXnQXLrJAcPrp/+dQXZYYpAuAre3Ol6pOW4zDZuWHq7EUo82N36sGXuo11vdTPu
+         GdQw==
+X-Gm-Message-State: AOJu0YxMz+mBRabe6dep0LJg5K4pDMROVcH0ftLVkFNTq857GwNGM+P7
+	4lmftSDfpddhDJZs4HOXl4OqLMBhi93T8kTKrdw=
+X-Google-Smtp-Source: AGHT+IGGbd9uEm1HwzeQk0zSJgcIrych+A4ioq0XePO8wLwmpeqipVfchKXfctSdfiFT9SV1RSAuYB49yeFctZANvgM=
+X-Received: by 2002:a17:90a:604e:b0:28d:19d3:8c58 with SMTP id
+ h14-20020a17090a604e00b0028d19d38c58mr1670693pjm.73.1704730452552; Mon, 08
+ Jan 2024 08:14:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231230172351.574091-1-michael.roth@amd.com> <20231230172351.574091-27-michael.roth@amd.com>
- <CAJ5mJ6hpSSVhZ5hbPZ8vfSnmNU6W+g4e=PeLrG7fG2u8KptfHQ@mail.gmail.com>
-Message-ID: <ZZwaXo62DpiBJiWN@google.com>
-Subject: Re: [PATCH v11 26/35] KVM: SEV: Support SEV-SNP AP Creation NAE event
-From: Sean Christopherson <seanjc@google.com>
-To: Jacob Xu <jacobhxu@google.com>
-Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org, linux-coco@lists.linux.dev, 
-	linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org, 
-	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com, 
-	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, 
-	pbonzini@redhat.com, vkuznets@redhat.com, jmattson@google.com, 
-	luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com, 
-	pgonda@google.com, peterz@infradead.org, srinivas.pandruvada@linux.intel.com, 
-	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, 
-	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com, 
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com, 
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
-	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com, 
-	Brijesh Singh <brijesh.singh@amd.com>, Adam Dunlap <acdunlap@google.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20240103095650.25769-1-linyunsheng@huawei.com>
+ <20240103095650.25769-3-linyunsheng@huawei.com> <d4947ef05bca8525d04f9943e92b4e43ec82c583.camel@gmail.com>
+ <1d40427d-78e3-ef40-a63f-206c0697bda2@huawei.com>
+In-Reply-To: <1d40427d-78e3-ef40-a63f-206c0697bda2@huawei.com>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Mon, 8 Jan 2024 08:13:35 -0800
+Message-ID: <CAKgT0UdjsJPNLps+JFgjk89oyB9PDuMkw9pYuBg4ArnGh35Osg@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/6] page_frag: unify gfp bits for order 3 page allocation
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Eric Dumazet <edumazet@google.com>, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jan 05, 2024, Jacob Xu wrote:
-> > +       if (kick) {
-> > +               if (target_vcpu->arch.mp_state == KVM_MP_STATE_UNINITIALIZED)
-> > +                       target_vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
-> > +
-> > +               kvm_make_request(KVM_REQ_UPDATE_PROTECTED_GUEST_STATE, target_vcpu);
-> 
-> I think we should  switch the order of these two statements for
-> setting mp_state and for making the request for
-> KVM_REQ_UPDATE_PROTECTED_GUEST_STATE.
-> There is a race condition I observed when booting with SVSM where:
-> 1. BSP sets target vcpu to KVM_MP_STATE_RUNNABLE
-> 2. AP thread within the loop of arch/x86/kvm.c:vcpu_run() checks
-> vm_vcpu_running()
-> 3. AP enters the guest without having updated the VMSA state from
-> KVM_REQ_UPDATE_PROTECTED_GUEST_STATE
-> 
-> This results in the AP executing on a bad RIP and then crashing.
-> If we set the request first, then we avoid the race condition.
-
-That just introducs a different race, e.g. if this task gets delayed and the
-target vCPU processes KVM_REQ_UPDATE_PROTECTED_GUEST_STATE before its marked
-RUNNABLE, then the target vCPU could end up stuck in the UNINITIALIZED loop.
-
-Reading and writing arch.mp_state across vCPUs is simply not safe.  There's a
-reason why KVM atomically manages INITs and SIPIs and only modifies mp_state when
-processing events on the target vCPU.
-
-> > +               kvm_vcpu_kick(target_vcpu);
-
-...
-
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 87b78d63e81d..df9ec357d538 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -10858,6 +10858,14 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+On Mon, Jan 8, 2024 at 12:25=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.co=
+m> wrote:
+>
+> On 2024/1/5 23:35, Alexander H Duyck wrote:
+> > On Wed, 2024-01-03 at 17:56 +0800, Yunsheng Lin wrote:
+> >> Currently there seems to be three page frag implementions
+> >> which all try to allocate order 3 page, if that fails, it
+> >> then fail back to allocate order 0 page, and each of them
+> >> all allow order 3 page allocation to fail under certain
+> >> condition by using specific gfp bits.
+> >>
+> >> The gfp bits for order 3 page allocation are different
+> >> between different implementation, __GFP_NOMEMALLOC is
+> >> or'd to forbid access to emergency reserves memory for
+> >> __page_frag_cache_refill(), but it is not or'd in other
+> >> implementions, __GFP_DIRECT_RECLAIM is masked off to avoid
+> >> direct reclaim in skb_page_frag_refill(), but it is not
+> >> masked off in __page_frag_cache_refill().
+> >>
+> >> This patch unifies the gfp bits used between different
+> >> implementions by or'ing __GFP_NOMEMALLOC and masking off
+> >> __GFP_DIRECT_RECLAIM for order 3 page allocation to avoid
+> >> possible pressure for mm.
+> >>
+> >> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+> >> CC: Alexander Duyck <alexander.duyck@gmail.com>
+> >> ---
+> >>  drivers/vhost/net.c | 2 +-
+> >>  mm/page_alloc.c     | 4 ++--
+> >>  net/core/sock.c     | 2 +-
+> >>  3 files changed, 4 insertions(+), 4 deletions(-)
+> >>
+> >> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> >> index f2ed7167c848..e574e21cc0ca 100644
+> >> --- a/drivers/vhost/net.c
+> >> +++ b/drivers/vhost/net.c
+> >> @@ -670,7 +670,7 @@ static bool vhost_net_page_frag_refill(struct vhos=
+t_net *net, unsigned int sz,
+> >>              /* Avoid direct reclaim but allow kswapd to wake */
+> >>              pfrag->page =3D alloc_pages((gfp & ~__GFP_DIRECT_RECLAIM)=
+ |
+> >>                                        __GFP_COMP | __GFP_NOWARN |
+> >> -                                      __GFP_NORETRY,
+> >> +                                      __GFP_NORETRY | __GFP_NOMEMALLO=
+C,
+> >>                                        SKB_FRAG_PAGE_ORDER);
+> >>              if (likely(pfrag->page)) {
+> >>                      pfrag->size =3D PAGE_SIZE << SKB_FRAG_PAGE_ORDER;
+> >> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+> >> index 9a16305cf985..1f0b36dd81b5 100644
+> >> --- a/mm/page_alloc.c
+> >> +++ b/mm/page_alloc.c
+> >> @@ -4693,8 +4693,8 @@ static struct page *__page_frag_cache_refill(str=
+uct page_frag_cache *nc,
+> >>      gfp_t gfp =3D gfp_mask;
+> >>
+> >>  #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
+> >> -    gfp_mask |=3D __GFP_COMP | __GFP_NOWARN | __GFP_NORETRY |
+> >> -                __GFP_NOMEMALLOC;
+> >> +    gfp_mask =3D (gfp_mask & ~__GFP_DIRECT_RECLAIM) |  __GFP_COMP |
+> >> +               __GFP_NOWARN | __GFP_NORETRY | __GFP_NOMEMALLOC;
+> >>      page =3D alloc_pages_node(NUMA_NO_NODE, gfp_mask,
+> >>                              PAGE_FRAG_CACHE_MAX_ORDER);
+> >>      nc->size =3D page ? PAGE_FRAG_CACHE_MAX_SIZE : PAGE_SIZE;
+> >> diff --git a/net/core/sock.c b/net/core/sock.c
+> >> index 446e945f736b..d643332c3ee5 100644
+> >> --- a/net/core/sock.c
+> >> +++ b/net/core/sock.c
+> >> @@ -2900,7 +2900,7 @@ bool skb_page_frag_refill(unsigned int sz, struc=
+t page_frag *pfrag, gfp_t gfp)
+> >>              /* Avoid direct reclaim but allow kswapd to wake */
+> >>              pfrag->page =3D alloc_pages((gfp & ~__GFP_DIRECT_RECLAIM)=
+ |
+> >>                                        __GFP_COMP | __GFP_NOWARN |
+> >> -                                      __GFP_NORETRY,
+> >> +                                      __GFP_NORETRY | __GFP_NOMEMALLO=
+C,
+> >>                                        SKB_FRAG_PAGE_ORDER);
+> >>              if (likely(pfrag->page)) {
+> >>                      pfrag->size =3D PAGE_SIZE << SKB_FRAG_PAGE_ORDER;
 > >
-> >                 if (kvm_check_request(KVM_REQ_UPDATE_CPU_DIRTY_LOGGING, vcpu))
-> >                         static_call(kvm_x86_update_cpu_dirty_logging)(vcpu);
-> > +
-> > +               if (kvm_check_request(KVM_REQ_UPDATE_PROTECTED_GUEST_STATE, vcpu)) {
-> > +                       kvm_vcpu_reset(vcpu, true);
-> > +                       if (vcpu->arch.mp_state != KVM_MP_STATE_RUNNABLE) {
-> > +                               r = 1;
-> > +                               goto out;
-> > +                       }
-> > +               }
-> >         }
+> > Looks fine to me.
 > >
-> >         if (kvm_check_request(KVM_REQ_EVENT, vcpu) || req_int_win ||
-> > @@ -13072,6 +13080,9 @@ static inline bool kvm_vcpu_has_events(struct kvm_vcpu *vcpu)
-> >         if (kvm_test_request(KVM_REQ_PMI, vcpu))
-> >                 return true;
-> >
-> > +       if (kvm_test_request(KVM_REQ_UPDATE_PROTECTED_GUEST_STATE, vcpu))
-> > +               return true;
-> > +
-> >         if (kvm_arch_interrupt_allowed(vcpu) &&
-> >             (kvm_cpu_has_interrupt(vcpu) ||
-> >             kvm_guest_apic_has_interrupt(vcpu)))
-> > --
-> > 2.25.1
-> >
-> >
+> > One thing you may want to consider would be to place this all in an
+> > inline function that could just consolidate all the code.
+>
+> Do you think it is possible to further unify the implementations of the
+> 'struct page_frag_cache' and 'struct page_frag', so adding a inline
+> function for above is unnecessary?
+
+Actually the skb_page_frag_refill seems to function more similarly to
+how the Intel drivers do in terms of handling fragments. It is
+basically slicing off pieces until either it runs out of them and
+allocates a new one, or if the page reference count is one without
+pre-allocating the references.
+
+However, with that said many of the core bits are the same so it might
+be possible to look at unifiying at least pieces of this. For example
+the page_frag has the same first 3 members as the page_frag_cache so
+it might be possible to look at refactoring things further to unify
+more of the frag_refill logic.
 
