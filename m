@@ -1,60 +1,40 @@
-Return-Path: <kvm+bounces-5764-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5767-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76869826800
-	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 07:31:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B918D826822
+	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 07:41:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C52B1C20929
-	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 06:31:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A04C1F22981
+	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 06:41:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C3C279EF;
-	Mon,  8 Jan 2024 06:31:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="j94XpyRA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB505946C;
+	Mon,  8 Jan 2024 06:41:03 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75B6C79CD
-	for <kvm@vger.kernel.org>; Mon,  8 Jan 2024 06:31:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1704695469; x=1736231469;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=h8FWpZHWCPafbNTuf8kgyIKcRakdBNkZm+fYrsuu6ps=;
-  b=j94XpyRAGZfLFxdssHgPBd6OHpZIi0ULaStYlESOXg4+UFMh3ra6IGJx
-   S0VtrpXaukU+paj8xutfQLiFfbHFzMIoqYwo3MW52KE4zUFZ4/+30QGvS
-   sgJtb2ccJj2Im230JKrqP6Mm1B7JVYBDrWMaurH0e7/KvSd4M4/q5K/bB
-   wPx4cWQoxrv6POpWoNmmxaLuGCEpCMYEvnEABSQ1AOMBLXtbpl3HKMAwv
-   i4tKmPyEdm0dhN9eLRGUuC0p721pCrOZ8vZjYANIUWiLBRMKMiQBJ8Z4T
-   BkC/d6vJkzybX9jg/abSK7/h/yF90R4+hp8fj5SmioqSXPGcwS7hYJtab
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10946"; a="5175292"
-X-IronPort-AV: E=Sophos;i="6.04,340,1695711600"; 
-   d="scan'208";a="5175292"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2024 22:30:56 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10946"; a="1112653940"
-X-IronPort-AV: E=Sophos;i="6.04,340,1695711600"; 
-   d="scan'208";a="1112653940"
-Received: from spr-bkc-pc.jf.intel.com ([10.165.56.234])
-  by fmsmga005.fm.intel.com with ESMTP; 07 Jan 2024 22:30:55 -0800
-From: Dan Wu <dan1.wu@intel.com>
-To: seanjc@google.com,
-	pbonzini@redhat.com,
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFD9E79DF;
+	Mon,  8 Jan 2024 06:41:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.2.5.213])
+	by gateway (Coremail) with SMTP id _____8AxjOj6mJtl8QsDAA--.1719S3;
+	Mon, 08 Jan 2024 14:40:58 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.2.5.213])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8CxfNz4mJtlNRoHAA--.18591S2;
+	Mon, 08 Jan 2024 14:40:56 +0800 (CST)
+From: Bibo Mao <maobibo@loongson.cn>
+To: Huacai Chen <chenhuacai@kernel.org>,
+	Tianrui Zhao <zhaotianrui@loongson.cn>,
+	Juergen Gross <jgross@suse.com>
+Cc: loongarch@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	virtualization@lists.linux.dev,
 	kvm@vger.kernel.org
-Cc: xiaoyao.li@intel.com,
-	dan1.wu@intel.com
-Subject: [kvm-unit-tests PATCH v3] x86/asyncpf: fix async page fault issues
-Date: Mon,  8 Jan 2024 14:30:14 +0800
-Message-Id: <20240108063014.41117-1-dan1.wu@intel.com>
+Subject: [PATCH v2 0/6] LoongArch: Add pv ipi support on LoongArch VM
+Date: Mon,  8 Jan 2024 14:40:50 +0800
+Message-Id: <20240108064056.232546-1-maobibo@loongson.cn>
 X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -63,280 +43,119 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8CxfNz4mJtlNRoHAA--.18591S2
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoWxCw47WF1kWF1kKw1xtFyktFc_yoWrury3pF
+	W3Crn3GF48Gr93Awn3Kw1Uur98JryxGw1aga1ay3y8CF42vFyUXr4kGrZ5AFykJayrJFy0
+	qr1rG342gF4UJabCm3ZEXasCq-sJn29KB7ZKAUJUUUU5529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUkFb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx
+	1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv
+	67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41l42xK82IYc2
+	Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s02
+	6x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0x
+	vE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE
+	42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6x
+	kF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07j1WlkUUUUU=
 
-KVM switched to use interrupt for 'page ready' APF event since Linux v5.10 and
-the legacy mechanism using #PF was deprecated. Interrupt-based 'page-ready'
-notification requires KVM_ASYNC_PF_DELIVERY_AS_INT to be set as well in
-MSR_KVM_ASYNC_PF_EN to enable asyncpf.
+This patchset adds pv ipi support for VM. On physical machine, ipi HW
+uses IOCSR registers, however there is trap into hypervisor when vcpu
+accesses IOCSR registers if system is in VM mode. SWI is a interrupt
+mechanism like SGI on ARM, software can send interrupt to CPU, only that
+on LoongArch SWI can only be sent to local CPU now. So SWI can not used
+for IPI on real HW system, however it can be used on VM when combined with
+hypercall method. This patch uses SWI interrupt for IPI mechanism, SWI
+injection uses hypercall method. And there is one trap with IPI sending,
+however with SWI interrupt handler there is no trap.
 
-Update asyncpf.c for the new interrupt-based notification.
-It checks (KVM_FEATURE_ASYNC_PF && KVM_FEATURE_ASYNC_PF_INT) and implement
-interrupt-based 'page-ready' handler.
+This patch passes to runltp testcases, and unixbench score is 99% of
+that on physical machine on 3C5000 single way machine. Here is unixbench
+score with 16 cores on 3C5000 single way machine.
 
-To run this test, add the QEMU option "-cpu host" to check CPUID, since
-KVM_FEATURE_ASYNC_PF_INT can't be detected without "-cpu host".
+----------------UnixBench score on 3C5000 machine with 16 cores --------
+Dhrystone 2 using register variables         116700.0  339749961.8  29113.1
+Double-Precision Whetstone                       55.0      57716.9  10494.0
+Execl Throughput                                 43.0      33563.4   7805.4
+File Copy 1024 bufsize 2000 maxblocks          3960.0    1017912.5   2570.5
+File Copy 256 bufsize 500 maxblocks            1655.0     260061.4   1571.4
+File Copy 4096 bufsize 8000 maxblocks          5800.0    3216109.4   5545.0
+Pipe Throughput                               12440.0   18404312.0  14794.5
+Pipe-based Context Switching                   4000.0    3395856.2   8489.6
+Process Creation                                126.0      55684.8   4419.4
+Shell Scripts (1 concurrent)                     42.4      55901.8  13184.4
+Shell Scripts (8 concurrent)                      6.0       7396.5  12327.5
+System Call Overhead                          15000.0    6997351.4   4664.9
+System Benchmarks Index Score                                        7288.6
 
-Based on asyncpf.c, update the usage of how to setup cgroup for different cgroup
-versions, clean up the include headers and add the 'struct kvm_vcpu_pv_apf_data'
-with token information for page-ready notifications.
+----------------UnixBench score on VM with 16 cores -----------------
+Dhrystone 2 using register variables         116700.0  341649555.5  29275.9
+Double-Precision Whetstone                       55.0      57490.9  10452.9
+Execl Throughput                                 43.0      33663.8   7828.8
+File Copy 1024 bufsize 2000 maxblocks          3960.0    1047631.2   2645.5
+File Copy 256 bufsize 500 maxblocks            1655.0     286671.0   1732.2
+File Copy 4096 bufsize 8000 maxblocks          5800.0    3243588.2   5592.4
+Pipe Throughput                               12440.0   16353087.8  13145.6
+Pipe-based Context Switching                   4000.0    3100690.0   7751.7
+Process Creation                                126.0      51502.1   4087.5
+Shell Scripts (1 concurrent)                     42.4      56665.3  13364.4
+Shell Scripts (8 concurrent)                      6.0       7412.1  12353.4
+System Call Overhead                          15000.0    6962239.6   4641.5
+System Benchmarks Index Score                                        7205.8
 
-Signed-off-by: Dan Wu <dan1.wu@intel.com>
-Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 ---
-The test is based on asyncpf.c and simplifies implementation by reducing the memory
-access round from 2 to 1.
-
-Changes:
-  v2 -> v3:
-        modified the commit message.
-  v1 -> v2:
-        removed asyncpf_int.c and asyncpf.h and modified asyncpf.c to use ASYNC_PF_INT.
-History:
- v2: https://lore.kernel.org/all/20231218071447.1210469-1-dan1.wu@intel.com/
- v1: https://lore.kernel.org/all/20231212062708.16509-1-dan1.wu@intel.com/
+Change in V2:
+  1. Add hw cpuid map support since ipi routing uses hw cpuid
+  2. Refine changelog description
+  3. Add hypercall statistic support for vcpu
+  4. Set percpu pv ipi message buffer aligned with cacheline
+  5. Refine pv ipi send logic, do not send ipi message with if there is
+pending ipi message.
 ---
- lib/x86/processor.h |   6 ++
- x86/asyncpf.c       | 151 +++++++++++++++++++++++++++-----------------
- x86/unittests.cfg   |   2 +-
- 3 files changed, 101 insertions(+), 58 deletions(-)
 
-diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-index 44f4fd1e..1a0f1243 100644
---- a/lib/x86/processor.h
-+++ b/lib/x86/processor.h
-@@ -263,6 +263,12 @@ static inline bool is_intel(void)
- #define	X86_FEATURE_ARCH_CAPABILITIES	(CPUID(0x7, 0, EDX, 29))
- #define	X86_FEATURE_PKS			(CPUID(0x7, 0, ECX, 31))
- 
-+/*
-+ * KVM defined leafs
-+ */
-+#define	KVM_FEATURE_ASYNC_PF		(CPUID(0x40000001, 0, EAX, 4))
-+#define	KVM_FEATURE_ASYNC_PF_INT	(CPUID(0x40000001, 0, EAX, 14))
-+
- /*
-  * Extended Leafs, a.k.a. AMD defined
-  */
-diff --git a/x86/asyncpf.c b/x86/asyncpf.c
-index bc515be9..1963c69d 100644
---- a/x86/asyncpf.c
-+++ b/x86/asyncpf.c
-@@ -1,8 +1,12 @@
- /*
-  * Async PF test. For the test to actually do anything it needs to be started
-- * in memory cgroup with 512M of memory and with more then 1G memory provided
-+ * in memory cgroup with 512M of memory and with more than 1G memory provided
-  * to the guest.
-  *
-+ * To identify the cgroup version on Linux:
-+ * stat -fc %T /sys/fs/cgroup/
-+ *
-+ * If the output is tmpfs, your system is using cgroup v1:
-  * To create cgroup do as root:
-  * mkdir /dev/cgroup
-  * mount -t cgroup none -omemory /dev/cgroup
-@@ -13,99 +17,132 @@
-  * echo $$ >  /dev/cgroup/1/tasks
-  * echo 512M > /dev/cgroup/1/memory.limit_in_bytes
-  *
-+ * If the output is cgroup2fs, your system is using cgroup v2:
-+ * mkdir /sys/fs/cgroup/cg1
-+ * echo $$ >  /sys/fs/cgroup/cg1/cgroup.procs
-+ * echo 512M > /sys/fs/cgroup/cg1/memory.max
-+ *
-  */
--#include "x86/msr.h"
- #include "x86/processor.h"
--#include "x86/apic-defs.h"
- #include "x86/apic.h"
--#include "x86/desc.h"
- #include "x86/isr.h"
- #include "x86/vm.h"
--
--#include "asm/page.h"
- #include "alloc.h"
--#include "libcflat.h"
- #include "vmalloc.h"
--#include <stdint.h>
- 
- #define KVM_PV_REASON_PAGE_NOT_PRESENT 1
--#define KVM_PV_REASON_PAGE_READY 2
- 
- #define MSR_KVM_ASYNC_PF_EN 0x4b564d02
-+#define MSR_KVM_ASYNC_PF_INT    0x4b564d06
-+#define MSR_KVM_ASYNC_PF_ACK    0x4b564d07
- 
- #define KVM_ASYNC_PF_ENABLED                    (1 << 0)
- #define KVM_ASYNC_PF_SEND_ALWAYS                (1 << 1)
-+#define KVM_ASYNC_PF_DELIVERY_AS_INT            (1 << 3)
-+
-+#define HYPERVISOR_CALLBACK_VECTOR	0xf3
-+
-+struct kvm_vcpu_pv_apf_data {
-+      /* Used for 'page not present' events delivered via #PF */
-+      uint32_t  flags;
-+
-+      /* Used for 'page ready' events delivered via interrupt notification */
-+      uint32_t  token;
-+
-+      uint8_t  pad[56];
-+      uint32_t  enabled;
-+} apf_reason __attribute__((aligned(64)));
- 
--volatile uint32_t apf_reason __attribute__((aligned(64)));
- char *buf;
-+void* virt;
- volatile uint64_t  i;
- volatile uint64_t phys;
-+volatile uint32_t saved_token;
-+volatile uint32_t asyncpf_num;
- 
--static inline uint32_t get_apf_reason(void)
-+static inline uint32_t get_and_clear_apf_reason(void)
- {
--	uint32_t r = apf_reason;
--	apf_reason = 0;
-+	uint32_t r = apf_reason.flags;
-+	apf_reason.flags = 0;
- 	return r;
- }
- 
--static void pf_isr(struct ex_regs *r)
-+static void handle_interrupt(isr_regs_t *regs)
- {
--	void* virt = (void*)((ulong)(buf+i) & ~(PAGE_SIZE-1));
--	uint32_t reason = get_apf_reason();
-+	uint32_t apf_token = apf_reason.token;
-+
-+	apf_reason.token = 0;
-+	wrmsr(MSR_KVM_ASYNC_PF_ACK, 1);
-+
-+	if (apf_token == 0xffffffff) {
-+		report_pass("Wakeup all, got token 0x%x", apf_token);
-+	} else if (apf_token == saved_token) {
-+		asyncpf_num++;
-+		install_pte(phys_to_virt(read_cr3()), 1, virt, phys | PT_PRESENT_MASK | PT_WRITABLE_MASK, 0);
-+		phys = 0;
-+	} else {
-+		report_fail("unexpected async pf int token 0x%x", apf_token);
-+	}
-+
-+	eoi();
-+}
- 
-+static void handle_pf(struct ex_regs *r)
-+{
-+	virt = (void*)((ulong)(buf+i) & ~(PAGE_SIZE-1));
-+	uint32_t reason = get_and_clear_apf_reason();
- 	switch (reason) {
--		case 0:
--			report_fail("unexpected #PF at %#lx", read_cr2());
--			break;
--		case KVM_PV_REASON_PAGE_NOT_PRESENT:
--			phys = virt_to_pte_phys(phys_to_virt(read_cr3()), virt);
--			install_pte(phys_to_virt(read_cr3()), 1, virt, phys, 0);
--			write_cr3(read_cr3());
--			report_pass("Got not present #PF token %lx virt addr %p phys addr %#" PRIx64,
--				    read_cr2(), virt, phys);
--			while(phys) {
--				safe_halt(); /* enables irq */
--				cli();
--			}
--			break;
--		case KVM_PV_REASON_PAGE_READY:
--			report_pass("Got present #PF token %lx", read_cr2());
--			if ((uint32_t)read_cr2() == ~0)
--				break;
--			install_pte(phys_to_virt(read_cr3()), 1, virt, phys | PT_PRESENT_MASK | PT_WRITABLE_MASK, 0);
--			write_cr3(read_cr3());
--			phys = 0;
--			break;
--		default:
--			report_fail("unexpected async pf reason %" PRId32, reason);
--			break;
-+	case 0:
-+		report_fail("unexpected #PF at %#lx", read_cr2());
-+		exit(report_summary());
-+	case KVM_PV_REASON_PAGE_NOT_PRESENT:
-+		phys = virt_to_pte_phys(phys_to_virt(read_cr3()), virt);
-+		install_pte(phys_to_virt(read_cr3()), 1, virt, phys, 0);
-+		write_cr3(read_cr3());
-+		saved_token = read_cr2();
-+		while (phys) {
-+			safe_halt(); /* enables irq */
-+		}
-+		break;
-+	default:
-+		report_fail("unexpected async pf with reason 0x%x", reason);
-+		exit(report_summary());
- 	}
- }
- 
--#define MEM 1ull*1024*1024*1024
-+#define MEM (1ull*1024*1024*1024)
- 
- int main(int ac, char **av)
- {
--	int loop = 2;
-+	if (!this_cpu_has(KVM_FEATURE_ASYNC_PF)) {
-+		report_skip("KVM_FEATURE_ASYNC_PF is not supported\n");
-+		return report_summary();
-+	}
-+
-+	if (!this_cpu_has(KVM_FEATURE_ASYNC_PF_INT)) {
-+		report_skip("KVM_FEATURE_ASYNC_PF_INT is not supported\n");
-+		return report_summary();
-+	}
- 
- 	setup_vm();
--	printf("install handler\n");
--	handle_exception(14, pf_isr);
--	apf_reason = 0;
--	printf("enable async pf\n");
-+
-+	handle_exception(PF_VECTOR, handle_pf);
-+	handle_irq(HYPERVISOR_CALLBACK_VECTOR, handle_interrupt);
-+	memset(&apf_reason, 0, sizeof(apf_reason));
-+
-+	wrmsr(MSR_KVM_ASYNC_PF_INT, HYPERVISOR_CALLBACK_VECTOR);
- 	wrmsr(MSR_KVM_ASYNC_PF_EN, virt_to_phys((void*)&apf_reason) |
--			KVM_ASYNC_PF_SEND_ALWAYS | KVM_ASYNC_PF_ENABLED);
--	printf("alloc memory\n");
-+			KVM_ASYNC_PF_SEND_ALWAYS | KVM_ASYNC_PF_ENABLED | KVM_ASYNC_PF_DELIVERY_AS_INT);
-+
- 	buf = malloc(MEM);
- 	sti();
--	while(loop--) {
--		printf("start loop\n");
--		/* access a lot of memory to make host swap it out */
--		for (i=0; i < MEM; i+=4096)
--			buf[i] = 1;
--		printf("end loop\n");
--	}
--	cli();
- 
-+	/* access a lot of memory to make host swap it out */
-+	for (i = 0; i < MEM; i += 4096)
-+		buf[i] = 1;
-+
-+	cli();
-+	report(asyncpf_num > 0, "get %d async pf events ('page not present' #PF event with matched "
-+		"'page ready' interrupt event )", asyncpf_num);
- 	return report_summary();
- }
-diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-index 3fe59449..e3d051bc 100644
---- a/x86/unittests.cfg
-+++ b/x86/unittests.cfg
-@@ -172,7 +172,7 @@ extra_params = -cpu max
- 
- [asyncpf]
- file = asyncpf.flat
--extra_params = -m 2048
-+extra_params = -cpu host -m 2048
- 
- [emulator]
- file = emulator.flat
+Bibo Mao (6):
+  LoongArch: KVM: Add hypercall instruction emulation support
+  LoongArch: KVM: Add cpucfg area for kvm hypervisor
+  LoongArch/smp: Refine ipi ops on LoongArch platform
+  LoongArch: Add paravirt interface for guest kernel
+  LoongArch: KVM: Add physical cpuid map support
+  LoongArch: Add pv ipi support on LoongArch system
+
+ arch/loongarch/Kconfig                        |   9 +
+ arch/loongarch/include/asm/Kbuild             |   1 -
+ arch/loongarch/include/asm/hardirq.h          |   5 +
+ arch/loongarch/include/asm/inst.h             |   1 +
+ arch/loongarch/include/asm/irq.h              |  10 +-
+ arch/loongarch/include/asm/kvm_host.h         |  27 +++
+ arch/loongarch/include/asm/kvm_para.h         | 157 ++++++++++++++++++
+ arch/loongarch/include/asm/kvm_vcpu.h         |   1 +
+ arch/loongarch/include/asm/loongarch.h        |  10 ++
+ arch/loongarch/include/asm/paravirt.h         |  27 +++
+ .../include/asm/paravirt_api_clock.h          |   1 +
+ arch/loongarch/include/asm/smp.h              |  31 ++--
+ arch/loongarch/include/uapi/asm/Kbuild        |   2 -
+ arch/loongarch/kernel/Makefile                |   1 +
+ arch/loongarch/kernel/irq.c                   |  24 +--
+ arch/loongarch/kernel/paravirt.c              | 151 +++++++++++++++++
+ arch/loongarch/kernel/perf_event.c            |  14 +-
+ arch/loongarch/kernel/setup.c                 |   2 +
+ arch/loongarch/kernel/smp.c                   |  60 ++++---
+ arch/loongarch/kernel/time.c                  |  12 +-
+ arch/loongarch/kvm/exit.c                     | 122 ++++++++++++--
+ arch/loongarch/kvm/vcpu.c                     |  62 ++++++-
+ arch/loongarch/kvm/vm.c                       |  11 ++
+ 23 files changed, 639 insertions(+), 102 deletions(-)
+ create mode 100644 arch/loongarch/include/asm/kvm_para.h
+ create mode 100644 arch/loongarch/include/asm/paravirt.h
+ create mode 100644 arch/loongarch/include/asm/paravirt_api_clock.h
+ delete mode 100644 arch/loongarch/include/uapi/asm/Kbuild
+ create mode 100644 arch/loongarch/kernel/paravirt.c
+
+
+base-commit: 52b1853b080a082ec3749c3a9577f6c71b1d4a90
 -- 
 2.39.3
 
