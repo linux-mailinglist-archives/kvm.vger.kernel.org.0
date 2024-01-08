@@ -1,181 +1,314 @@
-Return-Path: <kvm+bounces-5839-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5840-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CB578274BE
-	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 17:14:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28DA382755B
+	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 17:36:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 974381F23717
-	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 16:14:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 63AD8B2241F
+	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 16:36:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74CE652F8E;
-	Mon,  8 Jan 2024 16:14:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DE685381E;
+	Mon,  8 Jan 2024 16:36:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MywWNpE/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eSPgHPlo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D758524C7;
-	Mon,  8 Jan 2024 16:14:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-28bc870c540so1755233a91.2;
-        Mon, 08 Jan 2024 08:14:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704730452; x=1705335252; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=unjvTIPzqvEYfu9k31l2UbfWfPgY7ha+9toKsyi5Vr8=;
-        b=MywWNpE/IlArxpylbISQA9Pp0LCB2F/te/IPXa3KAo8flm6rHDuVXRhSQr7qeWzaov
-         muWoDbnsAOZXHq/SYItqe8GPpK3XoVaEgI7dhMPW0QOHToHXSwXxh7pvJvmZV2HIpCrD
-         CpMnUgLWpndWmeI7JStVej4Wzzc4KKwPL/VTRE7SwkX1CrvbUlYMl2Wa/Me1BWF9Ayph
-         H6Ylzcjr3hYRwAJMAlc2LWoEjr+4dgAllGqL9jhKm9VcNRfdWqhngLHnymObmzVDMVGw
-         Q43Lc0jDLRj3sScYLvF/oHt0dOBH0uCyfQfyHER4XPzTN8azMJWv/X2fiEXOYgzoOlpM
-         5/Og==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704730452; x=1705335252;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=unjvTIPzqvEYfu9k31l2UbfWfPgY7ha+9toKsyi5Vr8=;
-        b=LplKvSuBdOWjc15obiGsfCXIr1vJc7OWyEzdxIWWC3zaXvD7YVFsoyiKvr6VHT/A0w
-         SssLuW+uTsCFT8Iz8SahQYShw+rAh9n7V/5fAAAWuOee2mmWGYl6WSDD4nzdnIXoBIsj
-         Tmgj+F/TqKgNrMLe5sQJpV0TET8eUq1SLtoS9NoR2i4cBoKVgNFy62jn286ZygZd4kU+
-         +ywRVS2YwhSxpw4lm/wQcizcjqxrikLYHmta53blFyXsCHJqt/QAKar1npv4gjWv+3sV
-         KvsUVNXnQXLrJAcPrp/+dQXZYYpAuAre3Ol6pOW4zDZuWHq7EUo82N36sGXuo11vdTPu
-         GdQw==
-X-Gm-Message-State: AOJu0YxMz+mBRabe6dep0LJg5K4pDMROVcH0ftLVkFNTq857GwNGM+P7
-	4lmftSDfpddhDJZs4HOXl4OqLMBhi93T8kTKrdw=
-X-Google-Smtp-Source: AGHT+IGGbd9uEm1HwzeQk0zSJgcIrych+A4ioq0XePO8wLwmpeqipVfchKXfctSdfiFT9SV1RSAuYB49yeFctZANvgM=
-X-Received: by 2002:a17:90a:604e:b0:28d:19d3:8c58 with SMTP id
- h14-20020a17090a604e00b0028d19d38c58mr1670693pjm.73.1704730452552; Mon, 08
- Jan 2024 08:14:12 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF097537FE
+	for <kvm@vger.kernel.org>; Mon,  8 Jan 2024 16:36:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1704731794;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RKB+N0/wOsxXAF5xSn+nS3xwiYgd0ai43bmH3YPjDN0=;
+	b=eSPgHPloUrw9hnpcr3hT5axctMD3Lm+2tImcF4VBqg3k3xMV1PRf/eI73t7TFFukKUYGXk
+	2YnILq5ht9Okak2ejHi0qlvjZLtpMLfzu6/JzjOELMctu0Kv+jYP42E06yv28UJ2i84Lrq
+	GO32GOXiHtubBa3xF22Fu4Z41U4eKyE=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-365--ctkhh0DMJKvnopl9wOrew-1; Mon,
+ 08 Jan 2024 11:36:25 -0500
+X-MC-Unique: -ctkhh0DMJKvnopl9wOrew-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4A9DC1C06915;
+	Mon,  8 Jan 2024 16:36:25 +0000 (UTC)
+Received: from localhost (unknown [10.39.194.85])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 30CB62166B35;
+	Mon,  8 Jan 2024 16:36:21 +0000 (UTC)
+Date: Mon, 8 Jan 2024 11:36:19 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Hanna Reitz <hreitz@redhat.com>, qemu-riscv@nongnu.org,
+	Roman Bolshakov <rbolshakov@ddn.com>,
+	=?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
+	Elena Ufimtseva <elena.ufimtseva@oracle.com>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org,
+	Andrey Smirnov <andrew.smirnov@gmail.com>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Huacai Chen <chenhuacai@kernel.org>, Fam Zheng <fam@euphon.net>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	David Gibson <david@gibson.dropbear.id.au>,
+	John Snow <jsnow@redhat.com>, Stafford Horne <shorne@gmail.com>,
+	Weiwei Li <liwei1518@gmail.com>,
+	Jean-Christophe Dubois <jcd@tribudubois.net>,
+	Cameron Esfahani <dirty@apple.com>,
+	Alexander Graf <agraf@csgraf.de>,
+	David Hildenbrand <david@redhat.com>,
+	Juan Quintela <quintela@redhat.com>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Max Filippov <jcmvbkbc@gmail.com>,
+	Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Daniel Henrique Barboza <danielhb413@gmail.com>,
+	Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>,
+	Vladimir Sementsov-Ogievskiy <vsementsov@yandex-team.ru>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	qemu-s390x@nongnu.org, Jiri Slaby <jslaby@suse.cz>,
+	Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
+	Eric Blake <eblake@redhat.com>,
+	Akihiko Odaki <akihiko.odaki@daynix.com>,
+	Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+	Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Jiaxun Yang <jiaxun.yang@flygoat.com>,
+	Sunil Muthuswamy <sunilmut@microsoft.com>,
+	Alistair Francis <alistair.francis@wdc.com>,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+	Fabiano Rosas <farosas@suse.de>,
+	Michael Roth <michael.roth@amd.com>, Paul Durrant <paul@xen.org>,
+	Jagannathan Raman <jag.raman@oracle.com>,
+	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Hyman Huang <yong.huang@smartx.com>,
+	=?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+	xen-devel@lists.xenproject.org, Halil Pasic <pasic@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Song Gao <gaosong@loongson.cn>, Kevin Wolf <kwolf@redhat.com>,
+	Ilya Leoshkevich <iii@linux.ibm.com>,
+	Artyom Tarasenko <atar4qemu@gmail.com>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Reinoud Zandijk <reinoud@netbsd.org>, qemu-ppc@nongnu.org,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Aurelien Jarno <aurelien@aurel32.net>,
+	Bin Meng <bin.meng@windriver.com>, qemu-arm@nongnu.org,
+	Anthony Perard <anthony.perard@citrix.com>,
+	Leonardo Bras <leobras@redhat.com>,
+	Hailiang Zhang <zhanghailiang@xfusion.com>,
+	Harsh Prateek Bora <harshpb@linux.ibm.com>, kvm@vger.kernel.org,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Eric Farman <farman@linux.ibm.com>,
+	BALATON Zoltan <balaton@eik.bme.hu>,
+	Liu Zhiwei <zhiwei_liu@linux.alibaba.com>
+Subject: Re: [PATCH v3 0/5] Make Big QEMU Lock naming consistent
+Message-ID: <20240108163619.GA216787@fedora>
+References: <20240102153529.486531-1-stefanha@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240103095650.25769-1-linyunsheng@huawei.com>
- <20240103095650.25769-3-linyunsheng@huawei.com> <d4947ef05bca8525d04f9943e92b4e43ec82c583.camel@gmail.com>
- <1d40427d-78e3-ef40-a63f-206c0697bda2@huawei.com>
-In-Reply-To: <1d40427d-78e3-ef40-a63f-206c0697bda2@huawei.com>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Mon, 8 Jan 2024 08:13:35 -0800
-Message-ID: <CAKgT0UdjsJPNLps+JFgjk89oyB9PDuMkw9pYuBg4ArnGh35Osg@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/6] page_frag: unify gfp bits for order 3 page allocation
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, Eric Dumazet <edumazet@google.com>, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="yV/dJghpE5D5EHAJ"
+Content-Disposition: inline
+In-Reply-To: <20240102153529.486531-1-stefanha@redhat.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
+
+
+--yV/dJghpE5D5EHAJ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 8, 2024 at 12:25=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.co=
-m> wrote:
->
-> On 2024/1/5 23:35, Alexander H Duyck wrote:
-> > On Wed, 2024-01-03 at 17:56 +0800, Yunsheng Lin wrote:
-> >> Currently there seems to be three page frag implementions
-> >> which all try to allocate order 3 page, if that fails, it
-> >> then fail back to allocate order 0 page, and each of them
-> >> all allow order 3 page allocation to fail under certain
-> >> condition by using specific gfp bits.
-> >>
-> >> The gfp bits for order 3 page allocation are different
-> >> between different implementation, __GFP_NOMEMALLOC is
-> >> or'd to forbid access to emergency reserves memory for
-> >> __page_frag_cache_refill(), but it is not or'd in other
-> >> implementions, __GFP_DIRECT_RECLAIM is masked off to avoid
-> >> direct reclaim in skb_page_frag_refill(), but it is not
-> >> masked off in __page_frag_cache_refill().
-> >>
-> >> This patch unifies the gfp bits used between different
-> >> implementions by or'ing __GFP_NOMEMALLOC and masking off
-> >> __GFP_DIRECT_RECLAIM for order 3 page allocation to avoid
-> >> possible pressure for mm.
-> >>
-> >> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-> >> CC: Alexander Duyck <alexander.duyck@gmail.com>
-> >> ---
-> >>  drivers/vhost/net.c | 2 +-
-> >>  mm/page_alloc.c     | 4 ++--
-> >>  net/core/sock.c     | 2 +-
-> >>  3 files changed, 4 insertions(+), 4 deletions(-)
-> >>
-> >> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> >> index f2ed7167c848..e574e21cc0ca 100644
-> >> --- a/drivers/vhost/net.c
-> >> +++ b/drivers/vhost/net.c
-> >> @@ -670,7 +670,7 @@ static bool vhost_net_page_frag_refill(struct vhos=
-t_net *net, unsigned int sz,
-> >>              /* Avoid direct reclaim but allow kswapd to wake */
-> >>              pfrag->page =3D alloc_pages((gfp & ~__GFP_DIRECT_RECLAIM)=
- |
-> >>                                        __GFP_COMP | __GFP_NOWARN |
-> >> -                                      __GFP_NORETRY,
-> >> +                                      __GFP_NORETRY | __GFP_NOMEMALLO=
-C,
-> >>                                        SKB_FRAG_PAGE_ORDER);
-> >>              if (likely(pfrag->page)) {
-> >>                      pfrag->size =3D PAGE_SIZE << SKB_FRAG_PAGE_ORDER;
-> >> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-> >> index 9a16305cf985..1f0b36dd81b5 100644
-> >> --- a/mm/page_alloc.c
-> >> +++ b/mm/page_alloc.c
-> >> @@ -4693,8 +4693,8 @@ static struct page *__page_frag_cache_refill(str=
-uct page_frag_cache *nc,
-> >>      gfp_t gfp =3D gfp_mask;
-> >>
-> >>  #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
-> >> -    gfp_mask |=3D __GFP_COMP | __GFP_NOWARN | __GFP_NORETRY |
-> >> -                __GFP_NOMEMALLOC;
-> >> +    gfp_mask =3D (gfp_mask & ~__GFP_DIRECT_RECLAIM) |  __GFP_COMP |
-> >> +               __GFP_NOWARN | __GFP_NORETRY | __GFP_NOMEMALLOC;
-> >>      page =3D alloc_pages_node(NUMA_NO_NODE, gfp_mask,
-> >>                              PAGE_FRAG_CACHE_MAX_ORDER);
-> >>      nc->size =3D page ? PAGE_FRAG_CACHE_MAX_SIZE : PAGE_SIZE;
-> >> diff --git a/net/core/sock.c b/net/core/sock.c
-> >> index 446e945f736b..d643332c3ee5 100644
-> >> --- a/net/core/sock.c
-> >> +++ b/net/core/sock.c
-> >> @@ -2900,7 +2900,7 @@ bool skb_page_frag_refill(unsigned int sz, struc=
-t page_frag *pfrag, gfp_t gfp)
-> >>              /* Avoid direct reclaim but allow kswapd to wake */
-> >>              pfrag->page =3D alloc_pages((gfp & ~__GFP_DIRECT_RECLAIM)=
- |
-> >>                                        __GFP_COMP | __GFP_NOWARN |
-> >> -                                      __GFP_NORETRY,
-> >> +                                      __GFP_NORETRY | __GFP_NOMEMALLO=
-C,
-> >>                                        SKB_FRAG_PAGE_ORDER);
-> >>              if (likely(pfrag->page)) {
-> >>                      pfrag->size =3D PAGE_SIZE << SKB_FRAG_PAGE_ORDER;
-> >
-> > Looks fine to me.
-> >
-> > One thing you may want to consider would be to place this all in an
-> > inline function that could just consolidate all the code.
->
-> Do you think it is possible to further unify the implementations of the
-> 'struct page_frag_cache' and 'struct page_frag', so adding a inline
-> function for above is unnecessary?
+On Tue, Jan 02, 2024 at 10:35:24AM -0500, Stefan Hajnoczi wrote:
+> v3:
+> - Rebase
+> - Define bql_lock() macro on a single line [Akihiko Odaki]
+> v2:
+> - Rename APIs bql_*() [PeterX]
+> - Spell out "Big QEMU Lock (BQL)" in doc comments [PeterX]
+> - Rename "iolock" variables in hw/remote/mpqemu-link.c [Harsh]
+> - Fix bql_auto_lock() indentation in Patch 2 [Ilya]
+> - "with BQL taken" -> "with the BQL taken" [Philippe]
+> - "under BQL" -> "under the BQL" [Philippe]
+>=20
+> The Big QEMU Lock ("BQL") has two other names: "iothread lock" and "QEMU =
+global
+> mutex". The term "iothread lock" is easily confused with the unrelated --=
+object
+> iothread (iothread.c).
+>=20
+> This series updates the code and documentation to consistently use "BQL".=
+ This
+> makes the code easier to understand.
+>=20
+> Stefan Hajnoczi (5):
+>   system/cpus: rename qemu_mutex_lock_iothread() to bql_lock()
+>   qemu/main-loop: rename QEMU_IOTHREAD_LOCK_GUARD to BQL_LOCK_GUARD
+>   qemu/main-loop: rename qemu_cond_wait_iothread() to
+>     qemu_cond_wait_bql()
+>   Replace "iothread lock" with "BQL" in comments
+>   Rename "QEMU global mutex" to "BQL" in comments and docs
+>=20
+>  docs/devel/multi-thread-tcg.rst      |   7 +-
+>  docs/devel/qapi-code-gen.rst         |   2 +-
+>  docs/devel/replay.rst                |   2 +-
+>  docs/devel/reset.rst                 |   2 +-
+>  docs/devel/multiple-iothreads.txt    |  14 ++--
+>  hw/display/qxl.h                     |   2 +-
+>  include/block/aio-wait.h             |   2 +-
+>  include/block/blockjob.h             |   6 +-
+>  include/exec/cpu-common.h            |   2 +-
+>  include/exec/memory.h                |   4 +-
+>  include/exec/ramblock.h              |   2 +-
+>  include/io/task.h                    |   2 +-
+>  include/migration/register.h         |   8 +-
+>  include/qemu/coroutine-core.h        |   2 +-
+>  include/qemu/coroutine.h             |   2 +-
+>  include/qemu/main-loop.h             |  68 ++++++++-------
+>  include/qemu/thread.h                |   2 +-
+>  target/arm/internals.h               |   4 +-
+>  accel/accel-blocker.c                |  10 +--
+>  accel/dummy-cpus.c                   |   8 +-
+>  accel/hvf/hvf-accel-ops.c            |   4 +-
+>  accel/kvm/kvm-accel-ops.c            |   4 +-
+>  accel/kvm/kvm-all.c                  |  22 ++---
+>  accel/tcg/cpu-exec.c                 |  26 +++---
+>  accel/tcg/cputlb.c                   |  20 ++---
+>  accel/tcg/tcg-accel-ops-icount.c     |   6 +-
+>  accel/tcg/tcg-accel-ops-mttcg.c      |  12 +--
+>  accel/tcg/tcg-accel-ops-rr.c         |  18 ++--
+>  accel/tcg/tcg-accel-ops.c            |   2 +-
+>  accel/tcg/translate-all.c            |   2 +-
+>  cpu-common.c                         |   4 +-
+>  dump/dump.c                          |   4 +-
+>  hw/block/dataplane/virtio-blk.c      |   8 +-
+>  hw/block/virtio-blk.c                |   2 +-
+>  hw/core/cpu-common.c                 |   6 +-
+>  hw/display/virtio-gpu.c              |   2 +-
+>  hw/i386/intel_iommu.c                |   6 +-
+>  hw/i386/kvm/xen_evtchn.c             |  30 +++----
+>  hw/i386/kvm/xen_gnttab.c             |   2 +-
+>  hw/i386/kvm/xen_overlay.c            |   2 +-
+>  hw/i386/kvm/xen_xenstore.c           |   2 +-
+>  hw/intc/arm_gicv3_cpuif.c            |   2 +-
+>  hw/intc/s390_flic.c                  |  18 ++--
+>  hw/mips/mips_int.c                   |   2 +-
+>  hw/misc/edu.c                        |   4 +-
+>  hw/misc/imx6_src.c                   |   2 +-
+>  hw/misc/imx7_src.c                   |   2 +-
+>  hw/net/xen_nic.c                     |   8 +-
+>  hw/ppc/pegasos2.c                    |   2 +-
+>  hw/ppc/ppc.c                         |   6 +-
+>  hw/ppc/spapr.c                       |   2 +-
+>  hw/ppc/spapr_events.c                |   2 +-
+>  hw/ppc/spapr_rng.c                   |   4 +-
+>  hw/ppc/spapr_softmmu.c               |   4 +-
+>  hw/remote/mpqemu-link.c              |  22 ++---
+>  hw/remote/vfio-user-obj.c            |   2 +-
+>  hw/s390x/s390-skeys.c                |   2 +-
+>  hw/scsi/virtio-scsi-dataplane.c      |   6 +-
+>  migration/block-dirty-bitmap.c       |  14 ++--
+>  migration/block.c                    |  38 ++++-----
+>  migration/colo.c                     |  62 +++++++-------
+>  migration/dirtyrate.c                |  12 +--
+>  migration/migration.c                |  54 ++++++------
+>  migration/ram.c                      |  16 ++--
+>  net/tap.c                            |   2 +-
+>  replay/replay-internal.c             |   2 +-
+>  semihosting/console.c                |   8 +-
+>  stubs/iothread-lock.c                |   6 +-
+>  system/cpu-throttle.c                |   6 +-
+>  system/cpus.c                        |  55 +++++++------
+>  system/dirtylimit.c                  |   4 +-
+>  system/memory.c                      |   2 +-
+>  system/physmem.c                     |  14 ++--
+>  system/runstate.c                    |   2 +-
+>  system/watchpoint.c                  |   4 +-
+>  target/arm/arm-powerctl.c            |  14 ++--
+>  target/arm/helper.c                  |   6 +-
+>  target/arm/hvf/hvf.c                 |   8 +-
+>  target/arm/kvm.c                     |   8 +-
+>  target/arm/ptw.c                     |   6 +-
+>  target/arm/tcg/helper-a64.c          |   8 +-
+>  target/arm/tcg/m_helper.c            |   6 +-
+>  target/arm/tcg/op_helper.c           |  24 +++---
+>  target/arm/tcg/psci.c                |   2 +-
+>  target/hppa/int_helper.c             |   8 +-
+>  target/i386/hvf/hvf.c                |   6 +-
+>  target/i386/kvm/hyperv.c             |   4 +-
+>  target/i386/kvm/kvm.c                |  28 +++----
+>  target/i386/kvm/xen-emu.c            |  16 ++--
+>  target/i386/nvmm/nvmm-accel-ops.c    |   6 +-
+>  target/i386/nvmm/nvmm-all.c          |  20 ++---
+>  target/i386/tcg/sysemu/fpu_helper.c  |   6 +-
+>  target/i386/tcg/sysemu/misc_helper.c |   4 +-
+>  target/i386/whpx/whpx-accel-ops.c    |   6 +-
+>  target/i386/whpx/whpx-all.c          |  24 +++---
+>  target/loongarch/csr_helper.c        |   4 +-
+>  target/mips/kvm.c                    |   4 +-
+>  target/mips/tcg/sysemu/cp0_helper.c  |   4 +-
+>  target/openrisc/sys_helper.c         |  16 ++--
+>  target/ppc/excp_helper.c             |  14 ++--
+>  target/ppc/helper_regs.c             |   2 +-
+>  target/ppc/kvm.c                     |   4 +-
+>  target/ppc/misc_helper.c             |   8 +-
+>  target/ppc/timebase_helper.c         |   8 +-
+>  target/riscv/cpu_helper.c            |   4 +-
+>  target/s390x/kvm/kvm.c               |   4 +-
+>  target/s390x/tcg/misc_helper.c       | 118 +++++++++++++--------------
+>  target/sparc/int32_helper.c          |   2 +-
+>  target/sparc/int64_helper.c          |   6 +-
+>  target/sparc/win_helper.c            |  20 ++---
+>  target/xtensa/exc_helper.c           |   8 +-
+>  ui/spice-core.c                      |   6 +-
+>  util/async.c                         |   2 +-
+>  util/main-loop.c                     |   8 +-
+>  util/qsp.c                           |   6 +-
+>  util/rcu.c                           |  16 ++--
+>  audio/coreaudio.m                    |   8 +-
+>  memory_ldst.c.inc                    |  18 ++--
+>  target/i386/hvf/README.md            |   2 +-
+>  ui/cocoa.m                           |  56 ++++++-------
+>  120 files changed, 641 insertions(+), 643 deletions(-)
+>=20
+> --=20
+> 2.43.0
+>=20
 
-Actually the skb_page_frag_refill seems to function more similarly to
-how the Intel drivers do in terms of handling fragments. It is
-basically slicing off pieces until either it runs out of them and
-allocates a new one, or if the page reference count is one without
-pre-allocating the references.
+Thanks, applied to my block tree:
+https://gitlab.com/stefanha/qemu/commits/block
 
-However, with that said many of the core bits are the same so it might
-be possible to look at unifiying at least pieces of this. For example
-the page_frag has the same first 3 members as the page_frag_cache so
-it might be possible to look at refactoring things further to unify
-more of the frag_refill logic.
+Stefan
+
+--yV/dJghpE5D5EHAJ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmWcJIMACgkQnKSrs4Gr
+c8jzAgf+K9JojAxFS7AKekzLt/hRgAZvp+AQ+YBWFtGLGbQ2QA/PsWuANOgN0oxy
+JV18ZtX4ksyA7VsYErxGbs+yWT4jCdJt3+fJL1GIcObmoUJzHkJe7++4w+3h+9jY
+ZaGgV8E+LkLgopXXDycYoO8TFXot2TGi6TENVr0Cyh7chB/BS6br0ZKwaabUy6TZ
+G/kSFi7Et9BE8mVHzY1/2po7jQJOMnKVY2U/GCvaHVZmvJg2civGxjhufZI6xe4D
+nuAneBhS+/U0OajxzLR8NwLWtF1Drw9Nx149i67EBBpwpqklg0X5k3KKbEM6jHN/
+sK7AKClhVyC96TpYK3WqNBQJYWapAw==
+=sQ9o
+-----END PGP SIGNATURE-----
+
+--yV/dJghpE5D5EHAJ--
+
 
