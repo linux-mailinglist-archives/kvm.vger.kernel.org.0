@@ -1,132 +1,156 @@
-Return-Path: <kvm+bounces-5816-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5817-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 466FB826F3C
-	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 14:06:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8271E826F6D
+	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 14:14:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E928B283935
-	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 13:06:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BDBDAB21FFA
+	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 13:14:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A6F744C78;
-	Mon,  8 Jan 2024 13:06:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3E4A44C88;
+	Mon,  8 Jan 2024 13:13:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a27UhlN+"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="OAoSGY28"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C22844C76
-	for <kvm@vger.kernel.org>; Mon,  8 Jan 2024 13:06:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704719180;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=b+8Lqj6hWE2i7R49OXd/zNqcjNcogl72LCJ21CQyGp4=;
-	b=a27UhlN+Xfmoc2KimiJwrLF+y+s9dkgjYdEgBKUOW5wa5nfw4rEgDl9bqV196o+5dkcKIM
-	5n43Mx2ZQe/zutsOVDQldeCXR4Z699i7sjEAvRibaP/t1ya7XCPL7XxKTShSyZ0nC8Yg06
-	OcLWzlsxgpXqvfcawpah+VKXnuaqflY=
-Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
- [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-690-420Nc1JNPsiRWYxjGIvvkw-1; Mon, 08 Jan 2024 08:06:19 -0500
-X-MC-Unique: 420Nc1JNPsiRWYxjGIvvkw-1
-Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-6dddbda554cso172484a34.2
-        for <kvm@vger.kernel.org>; Mon, 08 Jan 2024 05:06:18 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704719178; x=1705323978;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=b+8Lqj6hWE2i7R49OXd/zNqcjNcogl72LCJ21CQyGp4=;
-        b=DD6EuESkjpHTecw/UNcynMCgl7tY0NP9BgAwOHfgu5gQ6HGY3DFPJUaqXi9V6VaCj0
-         3u4tR3NbleY27gW8snd7hwJGjy9JoBaP2QEsGKCQqwOBJF7uJth3Vu3qn7aXnfvjNXCB
-         YKvve+knnBJIoefDDHzKeESK4uRpcoeuEjJQMTBrTsPmDVb+bA9WpigCgqC22EjWWMT7
-         o7YYjSG0/l/yQuQnLvrS2VYhGWS1SMflPL2tS2cDn1mZs8mvcfhxcuVmQHoUyP+pQBUB
-         96s3eZSXfytown71LGyR1BiWqbabW2/X0P2xj9qBVMxbGVpBOAH11jAjCl7Y8EYaBNIQ
-         YWzg==
-X-Gm-Message-State: AOJu0YxSpOpPg2PSeMvSqPXKgITmAfyFPnuw7NvoDZpuH0mEddD2JXdC
-	4abN7+PX253V8zKgbATZ0k0RHJZzRwqHkmX7Ui5vbrzRx6OnC+1U8zQNC4rcBwWQjcGQIoYcpY1
-	4KxiOAsehGGFMR/gCOO255pV7OaGjJ4g7SmK8
-X-Received: by 2002:a9d:6e18:0:b0:6dc:91b7:ca96 with SMTP id e24-20020a9d6e18000000b006dc91b7ca96mr3101771otr.6.1704719178406;
-        Mon, 08 Jan 2024 05:06:18 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFTBr19IZ9T5r+flE9vk3UxQSRnxjgnfuTD+WjZPThubQVoz63Ho4YxFtB3vHcJK/+dN/27gRc3emkbSLKGkoY=
-X-Received: by 2002:a9d:6e18:0:b0:6dc:91b7:ca96 with SMTP id
- e24-20020a9d6e18000000b006dc91b7ca96mr3101761otr.6.1704719178214; Mon, 08 Jan
- 2024 05:06:18 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A156E4174D;
+	Mon,  8 Jan 2024 13:13:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 408ClkX7008664;
+	Mon, 8 Jan 2024 13:13:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=TUkqyDZU2w0pJe2IADGbbappcrOnCPRNodexsVKjT+8=;
+ b=OAoSGY28pCKHNAjzJrlgLXmSe/AsB4iZf8ugjpTFG0OxcsC9b2DjyRTdaMr24WBfiREm
+ 4hoGrP1gWHyMMPP7SCH1NIqBCGpRlNp2TsgvICA4c111As3MRU+oCMKQl0OlJvj1IDJS
+ zotNXl+5uON9ss4zf/lxkZq6niHLf876crLFvBM2CYHSp55tKW0Pwyr2/eKPi336uqcb
+ vENdCWRGiHzXxgr7Do/B98PTdcVUeca4jYTm5Z4dw3UX2t5E/znGqTRtKiQmZD8Go+L3
+ tYamG7a3JEwQW/j9j5unqnQRcN9O3pfSvVJDa5rMkFsjrCxAyDo7roMwHO/m/72/SRQj qg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vghc3gnh3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Jan 2024 13:13:30 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 408Cm39u009852;
+	Mon, 8 Jan 2024 13:13:30 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vghc3gngk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Jan 2024 13:13:30 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 408B6lwk027006;
+	Mon, 8 Jan 2024 13:13:29 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3vfkw1qjnm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Jan 2024 13:13:29 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 408DDRDV40501792
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 8 Jan 2024 13:13:27 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8327920049;
+	Mon,  8 Jan 2024 13:13:27 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 56CFD20040;
+	Mon,  8 Jan 2024 13:13:27 +0000 (GMT)
+Received: from DESKTOP-2CCOB1S. (unknown [9.171.166.51])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Mon,  8 Jan 2024 13:13:27 +0000 (GMT)
+Date: Mon, 8 Jan 2024 14:13:25 +0100
+From: Tobias Huschle <huschle@linux.ibm.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, Abel Wu <wuyun.abel@bytedance.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        virtualization@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: Re: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6
+ sched/fair: Add lag based placement)
+Message-ID: <ZZv09bLJvA5M/kc7@DESKTOP-2CCOB1S.>
+References: <20231209053443-mutt-send-email-mst@kernel.org>
+ <CACGkMEuSGT-e-i-8U7hum-N_xEnsEKL+_07Mipf6gMLFFhj2Aw@mail.gmail.com>
+ <20231211115329-mutt-send-email-mst@kernel.org>
+ <CACGkMEudZnF7hUajgt0wtNPCxH8j6A3L1DgJj2ayJWhv9Bh1WA@mail.gmail.com>
+ <20231212111433-mutt-send-email-mst@kernel.org>
+ <42870.123121305373200110@us-mta-641.us.mimecast.lan>
+ <20231213061719-mutt-send-email-mst@kernel.org>
+ <25485.123121307454100283@us-mta-18.us.mimecast.lan>
+ <20231213094854-mutt-send-email-mst@kernel.org>
+ <20231214021328-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240104193303.3175844-1-seanjc@google.com> <20240104193303.3175844-9-seanjc@google.com>
-In-Reply-To: <20240104193303.3175844-9-seanjc@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 8 Jan 2024 14:06:06 +0100
-Message-ID: <CABgObfavshc4VZAF0q+EjpXnkA4nVw8NSz_EvNt-iKxoFqgR5w@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM: x86: Xen change for 6.8
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231214021328-mutt-send-email-mst@kernel.org>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: ECAMvZcC_h-gkpU_Pbp9Ecir0gWIPvvz
+X-Proofpoint-GUID: uFGhddQc-GSToOejEHlZ_c_bFqoRBb5C
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-08_04,2024-01-08_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
+ priorityscore=1501 suspectscore=0 bulkscore=0 mlxlogscore=825 phishscore=0
+ clxscore=1011 adultscore=0 spamscore=0 lowpriorityscore=0 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
+ definitions=main-2401080113
 
-On Thu, Jan 4, 2024 at 8:33=E2=80=AFPM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> A single Xen fix (of sorts) to let userspace workaround buggy guests that=
- don't
-> react well to KVM setting the "stable TSC" bit in Xen PV clocks.
->
-> The following changes since commit e9e60c82fe391d04db55a91c733df4a017c28b=
-2f:
->
->   selftests/kvm: fix compilation on non-x86_64 platforms (2023-11-21 11:5=
-8:25 -0500)
->
-> are available in the Git repository at:
->
->   https://github.com/kvm-x86/linux.git tags/kvm-x86-xen-6.8
->
-> for you to fetch changes up to 6d72283526090850274d065cd5d60af732cc5fc8:
->
->   KVM x86/xen: add an override for PVCLOCK_TSC_STABLE_BIT (2023-12-07 15:=
-52:57 -0800)
+On Thu, Dec 14, 2023 at 02:14:59AM -0500, Michael S. Tsirkin wrote:
+> 
+> Peter, would appreciate feedback on this. When is cond_resched()
+> insufficient to give up the CPU? Should Documentation/kernel-hacking/hacking.rst
+> be updated to require schedule() instead?
+> 
 
-Pulled, thanks.
+Happy new year everybody!
 
-Paolo
+I'd like to bring this thread back to life. To reiterate:
 
+- The introduction of the EEVDF scheduler revealed a performance
+  regression in a uperf testcase of ~50%.
+- Tracing the scheduler showed that it takes decisions which are
+  in line with its design.
+- The traces showed as well, that a vhost instance might run
+  excessively long on its CPU in some circumstance. Those cause
+  the performance regression as they cause delay times of 100+ms
+  for a kworker which drives the actual network processing.
+- Before EEVDF, the vhost would always be scheduled off its CPU
+  in favor of the kworker, as the kworker was being woken up and
+  the former scheduler was giving more priority to the woken up
+  task. With EEVDF, the kworker, as a long running process, is
+  able to accumulate negative lag, which causes EEVDF to not
+  prefer it on its wake up, leaving the vhost running.
+- If the kworker is not scheduled when being woken up, the vhost
+  continues looping until it is migrated off the CPU.
+- The vhost offers to be scheduled off the CPU by calling 
+  cond_resched(), but, the the need_resched flag is not set,
+  therefore cond_resched() does nothing.
 
+To solve this, I see the following options 
+  (might not be a complete nor a correct list)
+- Along with the wakeup of the kworker, need_resched needs to
+  be set, such that cond_resched() triggers a reschedule.
+- The vhost calls schedule() instead of cond_resched() to give up
+  the CPU. This would of course be a significantly stricter
+  approach and might limit the performance of vhost in other cases.
+- Preventing the kworker from accumulating negative lag as it is
+  mostly not runnable and if it runs, it only runs for a very short
+  time frame. This might clash with the overall concept of EEVDF.
+- On cond_resched(), verify if the consumed runtime of the caller
+  is outweighing the negative lag of another process (e.g. the 
+  kworker) and schedule the other process. Introduces overhead
+  to cond_resched.
 
-> ----------------------------------------------------------------
-> KVM Xen change for 6.8:
->
-> To workaround Xen guests that don't expect Xen PV clocks to be marked as =
-being
-> based on a stable TSC, add a Xen config knob to allow userspace to opt ou=
-t of
-> KVM setting the "TSC stable" bit in Xen PV clocks.  Note, the "TSC stable=
-" bit
-> was added to the PVCLOCK ABI by KVM without an ack from Xen, i.e. KVM isn=
-'t
-> entirely blameless for the buggy guest behavior.
->
-> ----------------------------------------------------------------
-> Paul Durrant (1):
->       KVM x86/xen: add an override for PVCLOCK_TSC_STABLE_BIT
->
->  Documentation/virt/kvm/api.rst |  6 ++++++
->  arch/x86/kvm/x86.c             | 28 +++++++++++++++++++++++-----
->  arch/x86/kvm/xen.c             |  9 ++++++++-
->  include/uapi/linux/kvm.h       |  1 +
->  4 files changed, 38 insertions(+), 6 deletions(-)
->
-
+I would be curious on feedback on those ideas and interested in
+alternative approaches.
 
