@@ -1,137 +1,150 @@
-Return-Path: <kvm+bounces-5837-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5838-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79B7682746C
-	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 16:47:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B48A82747D
+	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 16:53:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0CAC8B22C7A
-	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 15:47:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2CADC1C22E92
+	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 15:53:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEB5652F70;
-	Mon,  8 Jan 2024 15:46:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3846951C4D;
+	Mon,  8 Jan 2024 15:53:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mKiHVVQk"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ScUJdTf6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85A6F5103E;
-	Mon,  8 Jan 2024 15:46:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-28c2b8d6f2aso1084519a91.2;
-        Mon, 08 Jan 2024 07:46:17 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2075C51037
+	for <kvm@vger.kernel.org>; Mon,  8 Jan 2024 15:53:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5eb6dba1796so33118997b3.1
+        for <kvm@vger.kernel.org>; Mon, 08 Jan 2024 07:53:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704728777; x=1705333577; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6ABIEatGvpONoYLEnM8zujVINLyFvWCQbpURBZGHqyc=;
-        b=mKiHVVQktys16d1/b7MkCrWnZpxoc85LXFsbfPNgCTaSKxzoEVLjYAGOJTC3BJs0Ri
-         gL+zJO9U+OG2jhMKU8xNhWqXKGp8UYZ6Mls75foj0jYdK47r0avg7bNJXwnyasj1ZcrO
-         sPnNK6VpmYnJ2QePsIi/5W3xfqVSTnfKppGBvRi5rTMzDwjGLWZsCcLNmjjiCukNDrrG
-         Xj9LJ2k3ZKNFkc9qGPhV68i2yOQ19fwGsCH71zj6BrM09uNKjdtpMBMgzCBwaQH8abz6
-         uF/B2dNgnZRla6DBZSpbl8NQrlIZ9qMgOf1oCtX4Fe2U0ufnceUG6yZ3wF83rYAXWAWS
-         Nr1g==
+        d=google.com; s=20230601; t=1704729184; x=1705333984; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LXpfvDdR25mi61ZRv+hUGYfziJrbv6+q0uR9W3pdtgw=;
+        b=ScUJdTf6pY1EyzXXhTCOXHjVT97d9to7GQ83OVVOdFBTRhGje7AGwchBSTlrSGUrYQ
+         VFbN4vMFF6Hla0gcX4RSkXf6EB87oabE/uJ0REVkG1YoQnSO9DHgfBiIqpjFeVPpYgzK
+         HXHrCrHGNHHUcptvmkPg86uQDGNIfA4Fh/ldNw7mjAzVqIsfH6Lfsq5tLDEKfe/MjSVD
+         Ejfo41gQFHZtoLFYZpVLtvZAUILVJCvSpfdWYL5sbxmnQCSYpM4snT6X7Do0wUrHWdlt
+         SDtLaa4/o7/jEn/nOJYlnSZIvd4GiuE5MFW8M3iYnzZS699H8VSVAX1CKzzhaTLXF02A
+         Cn7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704728777; x=1705333577;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6ABIEatGvpONoYLEnM8zujVINLyFvWCQbpURBZGHqyc=;
-        b=DRNJ9ccm3E1JS+xYu+dDCA5ArlD9Har8fv3orStiZ+OfN492TEFY6WyC4n8LOU8xku
-         gzD9wxTHLzgCmtITiazSTStFtLfKSPTeoh7kkaHEqXlpfHnN4JdamoZmcA9SIdljWuxZ
-         fysQjfFNNxyBS/aIF2i7VXotREOT0hL/HWKGMrFjFWfBAkJ8eTvqNos2T/ohDkPauiEk
-         Db9uJ19HX2G82pNEahfFADiwgtNxddbsA2fGYWnSg8T8n8Gd4KC6y9FkvTyVqOteDaQq
-         53op73ytnw9V8zsNwz6HOFA7tEIEvBtrVWAtuiIasoOpCThcQORgFchS27I5DGoO0ET9
-         yZFQ==
-X-Gm-Message-State: AOJu0Yx9imv/mZvKyOkJzI1wnz8vrI37Y4ymdzoeaL/4ZjNNZCWipJWC
-	LQ0/3uAZESRxiyj/6jFaIroZDhLxj7gqcCR8Vm37dVqT
-X-Google-Smtp-Source: AGHT+IHZJe1ZY74k1Lg4LUidpgawMu0QAPQhvu8GZrpY+cE2pAX9oNfGVAG8ljK3e18QPKlpOElMC5jvPt+GMAfHuo0=
-X-Received: by 2002:a17:90a:d315:b0:28c:d85:9807 with SMTP id
- p21-20020a17090ad31500b0028c0d859807mr1131248pju.78.1704728776801; Mon, 08
- Jan 2024 07:46:16 -0800 (PST)
+        d=1e100.net; s=20230601; t=1704729184; x=1705333984;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LXpfvDdR25mi61ZRv+hUGYfziJrbv6+q0uR9W3pdtgw=;
+        b=YAtrrvx9r8cE4AE6vUoaw0GPgWf7JiHU4aqKMPcgK9mTGM/FzMYr7fT2oqAipV6J76
+         mAZeD+jQcqEZVgyHo9Zvaz2oMqql86y6yuVyOeriUvAHZ1ULm/o/UxQx7IszaVnWBvp8
+         Tu+88cGSeWPUyc00LwbKmRflhXFmPsN3bDMYmymQVZzMKzGLE11uXsc457EbFHZT1LHW
+         q5r7qVPDggH/EI4pYM1xmhE/SIasUs3RbenTFrvbX+Je0BgF4Vo43on0jVt34Q8JyI9i
+         Ncc66wjkXuYhBA+XwB9NroBjGcIyncL65I4mZA53sim5RgZ6cZl1ym2cgscFGRBBZrr3
+         XcSA==
+X-Gm-Message-State: AOJu0YxfD3nnRA0Uvb3CyQUJWnNP/mMxvGb96fqqN2IVKdoRMphpH8Ns
+	SoXFU+eF3KYkjaPMjVRQWgI6DdhkIYrmwlEciw==
+X-Google-Smtp-Source: AGHT+IH6tgug6GZXuthKAIt2m3rWLQls/sRxvnIhe9rTO176GAtStoSNma4aHNycx8stxCAgF2wzux11TeA=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:83d0:0:b0:dbe:a20a:6330 with SMTP id
+ v16-20020a2583d0000000b00dbea20a6330mr1497318ybm.9.1704729184054; Mon, 08 Jan
+ 2024 07:53:04 -0800 (PST)
+Date: Mon, 8 Jan 2024 07:53:02 -0800
+In-Reply-To: <CAJ5mJ6hpSSVhZ5hbPZ8vfSnmNU6W+g4e=PeLrG7fG2u8KptfHQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240103095650.25769-1-linyunsheng@huawei.com>
- <20240103095650.25769-5-linyunsheng@huawei.com> <1a66f99173de36e1ae639569582feaf76202361d.camel@gmail.com>
- <705e59c2-6f46-5d39-b8da-8e2310904d71@huawei.com>
-In-Reply-To: <705e59c2-6f46-5d39-b8da-8e2310904d71@huawei.com>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Mon, 8 Jan 2024 07:45:40 -0800
-Message-ID: <CAKgT0UdLA820trYGWkgNR8KFX=QbFbiR_AcrWXwFwrmQzaVmKA@mail.gmail.com>
-Subject: Re: [PATCH net-next 4/6] vhost/net: remove vhost_net_page_frag_refill()
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20231230172351.574091-1-michael.roth@amd.com> <20231230172351.574091-27-michael.roth@amd.com>
+ <CAJ5mJ6hpSSVhZ5hbPZ8vfSnmNU6W+g4e=PeLrG7fG2u8KptfHQ@mail.gmail.com>
+Message-ID: <ZZwaXo62DpiBJiWN@google.com>
+Subject: Re: [PATCH v11 26/35] KVM: SEV: Support SEV-SNP AP Creation NAE event
+From: Sean Christopherson <seanjc@google.com>
+To: Jacob Xu <jacobhxu@google.com>
+Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org, linux-coco@lists.linux.dev, 
+	linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org, 
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com, 
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, 
+	pbonzini@redhat.com, vkuznets@redhat.com, jmattson@google.com, 
+	luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com, 
+	pgonda@google.com, peterz@infradead.org, srinivas.pandruvada@linux.intel.com, 
+	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, 
+	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com, 
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com, 
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com, 
+	Brijesh Singh <brijesh.singh@amd.com>, Adam Dunlap <acdunlap@google.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Jan 8, 2024 at 1:06=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.com=
-> wrote:
->
-> On 2024/1/6 0:06, Alexander H Duyck wrote:
-> >>
-> >>  static void handle_tx_copy(struct vhost_net *net, struct socket *sock=
-)
-> >> @@ -1353,8 +1318,7 @@ static int vhost_net_open(struct inode *inode, s=
-truct file *f)
-> >>                      vqs[VHOST_NET_VQ_RX]);
-> >>
-> >>      f->private_data =3D n;
-> >> -    n->page_frag.page =3D NULL;
-> >> -    n->refcnt_bias =3D 0;
-> >> +    n->pf_cache.va =3D NULL;
-> >>
-> >>      return 0;
-> >>  }
-> >> @@ -1422,8 +1386,9 @@ static int vhost_net_release(struct inode *inode=
-, struct file *f)
-> >>      kfree(n->vqs[VHOST_NET_VQ_RX].rxq.queue);
-> >>      kfree(n->vqs[VHOST_NET_VQ_TX].xdp);
-> >>      kfree(n->dev.vqs);
-> >> -    if (n->page_frag.page)
-> >> -            __page_frag_cache_drain(n->page_frag.page, n->refcnt_bias=
-);
-> >> +    if (n->pf_cache.va)
-> >> +            __page_frag_cache_drain(virt_to_head_page(n->pf_cache.va)=
-,
-> >> +                                    n->pf_cache.pagecnt_bias);
-> >>      kvfree(n);
-> >>      return 0;
-> >>  }
+On Fri, Jan 05, 2024, Jacob Xu wrote:
+> > +       if (kick) {
+> > +               if (target_vcpu->arch.mp_state == KVM_MP_STATE_UNINITIALIZED)
+> > +                       target_vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+> > +
+> > +               kvm_make_request(KVM_REQ_UPDATE_PROTECTED_GUEST_STATE, target_vcpu);
+> 
+> I think we should  switch the order of these two statements for
+> setting mp_state and for making the request for
+> KVM_REQ_UPDATE_PROTECTED_GUEST_STATE.
+> There is a race condition I observed when booting with SVSM where:
+> 1. BSP sets target vcpu to KVM_MP_STATE_RUNNABLE
+> 2. AP thread within the loop of arch/x86/kvm.c:vcpu_run() checks
+> vm_vcpu_running()
+> 3. AP enters the guest without having updated the VMSA state from
+> KVM_REQ_UPDATE_PROTECTED_GUEST_STATE
+> 
+> This results in the AP executing on a bad RIP and then crashing.
+> If we set the request first, then we avoid the race condition.
+
+That just introducs a different race, e.g. if this task gets delayed and the
+target vCPU processes KVM_REQ_UPDATE_PROTECTED_GUEST_STATE before its marked
+RUNNABLE, then the target vCPU could end up stuck in the UNINITIALIZED loop.
+
+Reading and writing arch.mp_state across vCPUs is simply not safe.  There's a
+reason why KVM atomically manages INITs and SIPIs and only modifies mp_state when
+processing events on the target vCPU.
+
+> > +               kvm_vcpu_kick(target_vcpu);
+
+...
+
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 87b78d63e81d..df9ec357d538 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -10858,6 +10858,14 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
 > >
-> > I would recommend reordering this patch with patch 5. Then you could
-> > remove the block that is setting "n->pf_cache.va =3D NULL" above and ju=
-st
-> > make use of page_frag_cache_drain in the lower block which would also
-> > return the va to NULL.
->
-> I am not sure if we can as there is no zeroing for 'struct vhost_net' in
-> vhost_net_open().
->
-> If we don't have "n->pf_cache.va =3D NULL", don't we use the uninitialize=
-d data
-> when calling page_frag_alloc_align() for the first time?
-
-I see. So kvmalloc is used instead of kvzalloc when allocating the
-structure. That might be an opportunity to clean things up a bit by
-making that change to reduce the risk of some piece of memory
-initialization being missed.
-
-That said, I still think reordering the two patches might be useful as
-it would help to make it so that the change you make to vhost_net is
-encapsulated in one patch to fully enable the use of the new page pool
-API.
+> >                 if (kvm_check_request(KVM_REQ_UPDATE_CPU_DIRTY_LOGGING, vcpu))
+> >                         static_call(kvm_x86_update_cpu_dirty_logging)(vcpu);
+> > +
+> > +               if (kvm_check_request(KVM_REQ_UPDATE_PROTECTED_GUEST_STATE, vcpu)) {
+> > +                       kvm_vcpu_reset(vcpu, true);
+> > +                       if (vcpu->arch.mp_state != KVM_MP_STATE_RUNNABLE) {
+> > +                               r = 1;
+> > +                               goto out;
+> > +                       }
+> > +               }
+> >         }
+> >
+> >         if (kvm_check_request(KVM_REQ_EVENT, vcpu) || req_int_win ||
+> > @@ -13072,6 +13080,9 @@ static inline bool kvm_vcpu_has_events(struct kvm_vcpu *vcpu)
+> >         if (kvm_test_request(KVM_REQ_PMI, vcpu))
+> >                 return true;
+> >
+> > +       if (kvm_test_request(KVM_REQ_UPDATE_PROTECTED_GUEST_STATE, vcpu))
+> > +               return true;
+> > +
+> >         if (kvm_arch_interrupt_allowed(vcpu) &&
+> >             (kvm_cpu_has_interrupt(vcpu) ||
+> >             kvm_guest_apic_has_interrupt(vcpu)))
+> > --
+> > 2.25.1
+> >
+> >
 
