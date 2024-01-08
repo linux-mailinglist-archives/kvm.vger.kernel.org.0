@@ -1,187 +1,186 @@
-Return-Path: <kvm+bounces-5833-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5834-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 964CB8272FB
-	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 16:25:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BB6B827321
+	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 16:30:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29551282E17
-	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 15:25:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70BA71C2284A
+	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 15:30:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDB3F524C7;
-	Mon,  8 Jan 2024 15:25:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 239E9524B1;
+	Mon,  8 Jan 2024 15:29:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b="EIAl8B2B"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SDBPji52"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59A7751C47
-	for <kvm@vger.kernel.org>; Mon,  8 Jan 2024 15:25:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ffwll.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ffwll.ch
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-50e4e36c09cso134117e87.1
-        for <kvm@vger.kernel.org>; Mon, 08 Jan 2024 07:25:06 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE17A51011
+	for <kvm@vger.kernel.org>; Mon,  8 Jan 2024 15:29:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5eba564eb3fso28687087b3.1
+        for <kvm@vger.kernel.org>; Mon, 08 Jan 2024 07:29:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ffwll.ch; s=google; t=1704727505; x=1705332305; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zJ3EIRKSn5X0NGN+Lowl9P7K2Ny+tJ4mGNydRmUvWrU=;
-        b=EIAl8B2B0plV+Fd4CRAObep5/NzHmfzHghjvMvOOv5g3NFWGHvyqE1/8mPM6nCD3P+
-         1U0inDAvFfqky7fRmiQ6t5rHCZa/ufGtCl0km5FodIYqbSnNitPHdWBxeSiSAf9OCS7a
-         8W6iBx5uYdWowVS5mbjky2Aif2BtM9CTNExCg=
+        d=google.com; s=20230601; t=1704727764; x=1705332564; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OKQ+Vy9dtFXts5pAU9/qPsNuqRhJH0HCsu8ixdtl6Q4=;
+        b=SDBPji52TfFCG5FzoQ2+cMLoCIMRJrhRVLxslvHkDk53uNPcNo1orq+ouAds3vW2gT
+         /OQglr5eSoXVESPGH6QIkjMwL/wmE7gJFNzWcHIIJ1BTKJJvCkP9vWzC5rILOktsl76H
+         KiZWQ+bFHeRwlMAM8p9WLQUK7pBR4Oa4VUG4Xw19plgCB/1xOmnG67xchVB4ihs64Gr8
+         LizVDK1BAkpHIlQbLgJhUJwAaWDd2Jqn23QLqGI1pxZHUIzlfUjUl7pKX8gd6QRUdknP
+         XLgGx53XfdWnq38T3Jbm5PgqjWZnuydPKGq8bJyueeYkHKwqEP0PavYuHUJ6EF1zEyFc
+         nZPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704727505; x=1705332305;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zJ3EIRKSn5X0NGN+Lowl9P7K2Ny+tJ4mGNydRmUvWrU=;
-        b=CWdiAXihHKu2O153NLFI5U1dDARiCtG7TrAN3jOWcdS9GvZm82KoVnFW3cjVnc0V54
-         1IUecFyLM3AbM4tprRNch4y82kxcairt8ZbZmqSNZ6ASZ+crfnnGCJdBr7N4EnEH4Tty
-         b9NF9S5sdpU42njvFnAl64HaHRUu0aEK1ZS/q/GicdO3WEK5ogGqubhzFGqGCzo8ob1b
-         h++Ub7zxf3wig9SoMmiiG52L1LA07+XGEGiv4fiWvsW3zBl2PCtRTKm0G56SpINFxU46
-         6Hcbhy+B4uaIOwHctAodEM4FGYT+hriF4r2TU9HyapELVuL/CRTgW9TpKKfVl6cv0Ye/
-         s0bA==
-X-Gm-Message-State: AOJu0YyF3P3fxh3t/RURs/+PbGvPLmBOs2pQ0AWWV+JaQ2EN9kWmIbdY
-	OW2VdXPcsn8xk+qFDb6+0eeIVA2vfVAP2w==
-X-Google-Smtp-Source: AGHT+IFEZmb84ZsP7WndigoWhVfLIJmu7Z3cqw2RTpxB6wKa9AmlpaVhv3E1Czp2+q+7kFveVkRA7Q==
-X-Received: by 2002:a05:6512:2212:b0:50e:9e95:5290 with SMTP id h18-20020a056512221200b0050e9e955290mr3890677lfu.1.1704727505082;
-        Mon, 08 Jan 2024 07:25:05 -0800 (PST)
-Received: from phenom.ffwll.local ([2a02:168:57f4:0:efd0:b9e5:5ae6:c2fa])
-        by smtp.gmail.com with ESMTPSA id i16-20020a5d5230000000b00333404e9935sm8075814wra.54.2024.01.08.07.25.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jan 2024 07:25:04 -0800 (PST)
-Date: Mon, 8 Jan 2024 16:25:02 +0100
-From: Daniel Vetter <daniel@ffwll.ch>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Yan Zhao <yan.y.zhao@intel.com>, wanpengli@tencent.com,
-	kvm@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linux-kernel@vger.kernel.org, kraxel@redhat.com, maz@kernel.org,
-	joro@8bytes.org, zzyiwei@google.com, yuzenghui@huawei.com,
-	olvaffe@gmail.com, kevin.tian@intel.com, suzuki.poulose@arm.com,
-	alex.williamson@redhat.com, yongwei.ma@intel.com,
-	zhiyuan.lv@intel.com, gurchetansingh@chromium.org,
-	jmattson@google.com, zhenyu.z.wang@intel.com, seanjc@google.com,
-	ankita@nvidia.com, oliver.upton@linux.dev, james.morse@arm.com,
-	pbonzini@redhat.com, vkuznets@redhat.com
-Subject: Re: [PATCH 0/4] KVM: Honor guest memory types for virtio GPU devices
-Message-ID: <ZZwTzsZqx-XSTKma@phenom.ffwll.local>
-Mail-Followup-To: Jason Gunthorpe <jgg@nvidia.com>,
-	Yan Zhao <yan.y.zhao@intel.com>, wanpengli@tencent.com,
-	kvm@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linux-kernel@vger.kernel.org, kraxel@redhat.com, maz@kernel.org,
-	joro@8bytes.org, zzyiwei@google.com, yuzenghui@huawei.com,
-	olvaffe@gmail.com, kevin.tian@intel.com, suzuki.poulose@arm.com,
-	alex.williamson@redhat.com, yongwei.ma@intel.com,
-	zhiyuan.lv@intel.com, gurchetansingh@chromium.org,
-	jmattson@google.com, zhenyu.z.wang@intel.com, seanjc@google.com,
-	ankita@nvidia.com, oliver.upton@linux.dev, james.morse@arm.com,
-	pbonzini@redhat.com, vkuznets@redhat.com
-References: <20240105091237.24577-1-yan.y.zhao@intel.com>
- <20240105195551.GE50406@nvidia.com>
- <ZZuQEQAVX28v7p9Z@yzhao56-desk.sh.intel.com>
- <20240108140250.GJ50406@nvidia.com>
+        d=1e100.net; s=20230601; t=1704727764; x=1705332564;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=OKQ+Vy9dtFXts5pAU9/qPsNuqRhJH0HCsu8ixdtl6Q4=;
+        b=dzoGs1mpKjzMmGb8iT8PO6t8fPTBn5RXndq9HWs224+GfROulbTovNT7cOFtQLfU88
+         kmi30WBwgd5Cz6ZWvzT3N+8rkHs7YP0uQztIPY3IyHQk0G2mD1+W95ssu3YjvXcvKbjc
+         T22L59OY0V/wZcR/hVqCJY9+vnRIM7lfu0ssLW3zkn3YmVuBdULEF4O0crZB4Y+qv1JP
+         HBDm6A92JYOzsStjZlH6ySIRuOXTcIwUyXVujXAuKiTzTEr7b9Py4xdyphIK/+/dR6gd
+         n8hWmrodga+nBtlOm9DJeC0jHAUrjtPLYjZLLZPj7elNxw8OlNQIZATB+bHXpO0OaKvB
+         Endw==
+X-Gm-Message-State: AOJu0Yzev16Lt0501A6xDHnRx1YVRWS3zQA/SjrZpQn3HFqDsWxDPZiB
+	DTv6P4UnoUxbbM4CuLgoVpbcfu51KVG310sJ4g==
+X-Google-Smtp-Source: AGHT+IGepoywKejyAoaQR8xobZotx6Ir6nRuJ6+QsOx4BUGWL/PUX4QE9vS6cBLlZRwYn4HeGALphxbC22U=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:b90:b0:5c9:ed07:22d with SMTP id
+ ck16-20020a05690c0b9000b005c9ed07022dmr2167319ywb.0.1704727763924; Mon, 08
+ Jan 2024 07:29:23 -0800 (PST)
+Date: Mon, 8 Jan 2024 07:29:22 -0800
+In-Reply-To: <ZZv8XA3eUHLaCr8K@linux.bj.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240108140250.GJ50406@nvidia.com>
-X-Operating-System: Linux phenom 6.5.0-4-amd64 
+Mime-Version: 1.0
+References: <ZYP0/nK/WJgzO1yP@yilunxu-OptiPlex-7050> <ZZSbLUGNNBDjDRMB@google.com>
+ <CALMp9eTutnTxCjQjs-nxP=XC345vTmJJODr+PcSOeaQpBW0Skw@mail.gmail.com>
+ <ZZWhuW_hfpwAAgzX@google.com> <ZZYbzzDxPI8gjPu8@chao-email>
+ <CALMp9eSg6No9L40kmo7n9BGOz4v1ThA7-e4gD4sgj3KGBJEUzA@mail.gmail.com>
+ <ZZbJxgyYoEJy+bAj@chao-email> <CALMp9eTf=9VqM=xutOXmgRr+aFz-YhOz6h4B+uLgtFBXtHefPA@mail.gmail.com>
+ <ZZhl4FHcdrzMXoVy@google.com> <ZZv8XA3eUHLaCr8K@linux.bj.intel.com>
+Message-ID: <ZZwU0s8pjthw12Bb@google.com>
+Subject: Re: [PATCH 1/2] x86: KVM: Limit guest physical bits when 5-level EPT
+ is unsupported
+From: Sean Christopherson <seanjc@google.com>
+To: Tao Su <tao1.su@linux.intel.com>
+Cc: Jim Mattson <jmattson@google.com>, Chao Gao <chao.gao@intel.com>, 
+	Xu Yilun <yilun.xu@linux.intel.com>, kvm@vger.kernel.org, pbonzini@redhat.com, 
+	eddie.dong@intel.com, xiaoyao.li@intel.com, yuan.yao@linux.intel.com, 
+	yi1.lai@intel.com, xudong.hao@intel.com, chao.p.peng@intel.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 08, 2024 at 10:02:50AM -0400, Jason Gunthorpe wrote:
-> On Mon, Jan 08, 2024 at 02:02:57PM +0800, Yan Zhao wrote:
-> > On Fri, Jan 05, 2024 at 03:55:51PM -0400, Jason Gunthorpe wrote:
-> > > On Fri, Jan 05, 2024 at 05:12:37PM +0800, Yan Zhao wrote:
-> > > > This series allow user space to notify KVM of noncoherent DMA status so as
-> > > > to let KVM honor guest memory types in specified memory slot ranges.
-> > > > 
-> > > > Motivation
-> > > > ===
-> > > > A virtio GPU device may want to configure GPU hardware to work in
-> > > > noncoherent mode, i.e. some of its DMAs do not snoop CPU caches.
-> > > 
-> > > Does this mean some DMA reads do not snoop the caches or does it
-> > > include DMA writes not synchronizing the caches too?
-> > Both DMA reads and writes are not snooped.
-> 
-> Oh that sounds really dangerous.
+On Mon, Jan 08, 2024, Tao Su wrote:
+> On Fri, Jan 05, 2024 at 12:26:08PM -0800, Sean Christopherson wrote:
+> > On Thu, Jan 04, 2024, Jim Mattson wrote:
+> > > On Thu, Jan 4, 2024 at 7:08=E2=80=AFAM Chao Gao <chao.gao@intel.com> =
+wrote:
+> > > >
+> > > > On Wed, Jan 03, 2024 at 07:40:02PM -0800, Jim Mattson wrote:
+> > > > >On Wed, Jan 3, 2024 at 6:45=E2=80=AFPM Chao Gao <chao.gao@intel.co=
+m> wrote:
+> > > > >>
+> > > > >> On Wed, Jan 03, 2024 at 10:04:41AM -0800, Sean Christopherson wr=
+ote:
+> > > > >> >On Tue, Jan 02, 2024, Jim Mattson wrote:
+> > > > >> >> This is all just so broken and wrong. The only guest.MAXPHYAD=
+DR that
+> > > > >> >> can be supported under TDP is the host.MAXPHYADDR. If KVM cla=
+ims to
+> > > > >> >> support a smaller guest.MAXPHYADDR, then KVM is obligated to =
+intercept
+> > > > >> >> every #PF,
+> > > > >>
+> > > > >> in this case (i.e., to support 48-bit guest.MAXPHYADDR when CPU =
+supports only
+> > > > >> 4-level EPT), KVM has no need to intercept #PF because accessing=
+ a GPA with
+> > > > >> RSVD bits 51-48 set leads to EPT violation.
+> > > > >
+> > > > >At the completion of the page table walk, if there is a permission
+> > > > >fault, the data address should not be accessed, so there should no=
+t be
+> > > > >an EPT violation. Remember Meltdown?
+> > > >
+> > > > You are right. I missed this case. KVM needs to intercept #PF to se=
+t RSVD bit
+> > > > in PFEC.
+> > >=20
+> > > I have no problem with a user deliberately choosing an unsupported
+> > > configuration, but I do have a problem with KVM_GET_SUPPORTED_CPUID
+> > > returning an unsupported configuration.
+> >=20
+> > +1
+> >=20
+> > Advertising guest.MAXPHYADDR < host.MAXPHYADDR in KVM_GET_SUPPORTED_CPU=
+ID simply
+> > isn't viable when TDP is enabled.  I suppose KVM do so when allow_small=
+er_maxphyaddr
+> > is enabled, but that's just asking for confusion, e.g. if userspace ref=
+lects the
+> > CPUID back into the guest, it could unknowingly create a VM that depend=
+s on
+> > allow_smaller_maxphyaddr.
+> >=20
+> > I think the least awful option is to have the kernel expose whether or =
+not the
+> > CPU support 5-level EPT to userspace.  That doesn't even require new uA=
+PI per se,
+> > just a new flag in /proc/cpuinfo.  It'll be a bit gross for userspace t=
+o parse,
+> > but it's not the end of the world.  Alternatively, KVM could add a capa=
+bility to
+> > enumerate the max *addressable* GPA, but userspace would still need to =
+manually
+> > take action when KVM can't address all of memory, i.e. a capability wou=
+ld be less
+> > ugly, but wouldn't meaningfully change userspace's responsibilities.
+>=20
+> Yes, exposing whether the CPU support 5-level EPT is indeed a better solu=
+tion, it
+> not only bypasses the KVM_GET_SUPPORTED_CPUID but also provides the infor=
+mation to
+> userspace.
+>=20
+> I think a new KVM capability to enumerate the max GPA is better since it =
+will be
+> more convenient if userspace wants to use, e.g., automatically limit phys=
+ical bits
+> or the GPA in the user memory region.
 
-So if this is an issue then we might already have a problem, because with
-many devices it's entirely up to the device programming whether the i/o is
-snooping or not. So the moment you pass such a device to a guest, whether
-there's explicit support for non-coherent or not, you have a problem.
+Not really, because "automatically" limiting guest.MAXPHYADDR without setti=
+ng
+allow_smaller_maxphyaddr isn't exactly safe.  I think it's also useful to c=
+apture
+*why* KVM's max addressable GPA is smaller than host.MAXPHYADDR, e.g. if do=
+wn the
+road someone ships a CPU that actually does the right thing when guest.MAXP=
+HYADDR
+is smaller than host.MAXPHYADDR.
 
-_If_ there is a fundamental problem. I'm not sure of that, because my
-assumption was that at most the guest shoots itself and the data
-corruption doesn't go any further the moment the hypervisor does the
-dma/iommu unmapping.
+> But only reporting this capability can=E2=80=99t solve the KVM hang issue=
+, userspace can
+> choose to ignore the max GPA, e.g., six selftests in changelog are still =
+failed.
 
-Also, there's a pile of x86 devices where this very much applies, x86
-being dma-coherent is not really the true ground story.
+I know.  I just have more pressing concerns than making selftests work on f=
+unky
+hardware that AFAIK isn't publicly available.
 
-Cheers, Sima
+> I think we can reconsider patch2 if we don=E2=80=99t advertise
+> guest.MAXPHYADDR < host.MAXPHYADDR in KVM_GET_SUPPORTED_CPUID.
 
-> > > > This is generally for performance consideration.
-> > > > In certain platform, GFX performance can improve 20+% with DMAs going to
-> > > > noncoherent path.
-> > > > 
-> > > > This noncoherent DMA mode works in below sequence:
-> > > > 1. Host backend driver programs hardware not to snoop memory of target
-> > > >    DMA buffer.
-> > > > 2. Host backend driver indicates guest frontend driver to program guest PAT
-> > > >    to WC for target DMA buffer.
-> > > > 3. Guest frontend driver writes to the DMA buffer without clflush stuffs.
-> > > > 4. Hardware does noncoherent DMA to the target buffer.
-> > > > 
-> > > > In this noncoherent DMA mode, both guest and hardware regard a DMA buffer
-> > > > as not cached. So, if KVM forces the effective memory type of this DMA
-> > > > buffer to be WB, hardware DMA may read incorrect data and cause misc
-> > > > failures.
-> > > 
-> > > I don't know all the details, but a big concern would be that the
-> > > caches remain fully coherent with the underlying memory at any point
-> > > where kvm decides to revoke the page from the VM.
-> > Ah, you mean, for page migration, the content of the page may not be copied
-> > correctly, right?
-> 
-> Not just migration. Any point where KVM revokes the page from the
-> VM. Ie just tearing down the VM still has to make the cache coherent
-> with physical or there may be problems.
->  
-> > Currently in x86, we have 2 ways to let KVM honor guest memory types:
-> > 1. through KVM memslot flag introduced in this series, for virtio GPUs, in
-> >    memslot granularity.
-> > 2. through increasing noncoherent dma count, as what's done in VFIO, for
-> >    Intel GPU passthrough, for all guest memory.
-> 
-> And where does all this fixup the coherency problem?
-> 
-> > This page migration issue should not be the case for virtio GPU, as both host
-> > and guest are synced to use the same memory type and actually the pages
-> > are not anonymous pages.
-> 
-> The guest isn't required to do this so it can force the cache to
-> become incoherent.
-> 
-> > > If you allow an incoherence of cache != physical then it opens a
-> > > security attack where the observed content of memory can change when
-> > > it should not.
-> > 
-> > In this case, will this security attack impact other guests?
-> 
-> It impacts the hypervisor potentially. It depends..
-> 
-> Jason
-
--- 
-Daniel Vetter
-Software Engineer, Intel Corporation
-http://blog.ffwll.ch
+Nah, someone just needs to update the selftests if/when the ept_5level flag
+lands.
 
