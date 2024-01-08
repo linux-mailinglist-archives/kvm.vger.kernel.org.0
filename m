@@ -1,252 +1,165 @@
-Return-Path: <kvm+bounces-5855-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5854-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDE2B827BDA
-	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 01:07:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47BC5827BB7
+	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 00:55:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01FAC1C23133
-	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 00:07:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C6C881F22E0E
+	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 23:55:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACB7F631;
-	Tue,  9 Jan 2024 00:07:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F4875674B;
+	Mon,  8 Jan 2024 23:55:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Se8zTy1j"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="CRG1cjwL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2089.outbound.protection.outlook.com [40.107.101.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED26618E;
-	Tue,  9 Jan 2024 00:07:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1704758827; x=1736294827;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   in-reply-to:mime-version;
-  bh=4vloqaXs+FPJLHQb0fKNm42pAlYqbiADqUG+BtXTRT4=;
-  b=Se8zTy1jZihaE8+l7Tob9P/rxLeaDhlOxmOLlyaXdgSCQ0DAntHJM6Jt
-   TCl92oVe0M6O2y8usmn4wvbt5oSsgWlzwkDsobCJh95AD8Yt0Nw73lkAX
-   OvG8sw4xyaZzOV2dobktMw6CvpyCdPO8jJcTnITy7u4tj68Cuj0Kby8Me
-   SQjKlF0FOJeXMqn1y+xkCQgYBxGI76ZKQ46cIm7wB6aFwmWco7nJIuPyQ
-   sJGELrxdgG2dpLWg6GyrzYxyRhTSKFQlKwxnoEAOqFefikade0/HyOF2E
-   POcANF+n5mMuyhhTKWa6301I2VsfJJUjroO98tkx1BYxMd1c66RnwbtId
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10947"; a="5404497"
-X-IronPort-AV: E=Sophos;i="6.04,181,1695711600"; 
-   d="scan'208";a="5404497"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2024 16:07:06 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10947"; a="1028554999"
-X-IronPort-AV: E=Sophos;i="6.04,181,1695711600"; 
-   d="scan'208";a="1028554999"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmsmga006.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 08 Jan 2024 16:06:58 -0800
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 8 Jan 2024 16:06:58 -0800
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 8 Jan 2024 16:06:18 -0800
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Mon, 8 Jan 2024 16:06:18 -0800
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.100)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 8 Jan 2024 16:05:49 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCA4A5645E;
+	Mon,  8 Jan 2024 23:55:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=H6IHROeMcyiFjObnXOOGTN4v1EB+XPGDPIBV3m/wL9x0p7e7JZ64YBy6OVG4vb8Z5ul4v+wuJmCIeqKpaNoxKmGuPGAFq4ITkCPGSz3rIOK/LMitf4llEKGtmHb/31w5ZSkkyvopbwP+B/btfcbAKAICRVGJyRmKMiAdH39Da4Q79f1QlFNqR7kQyPrzeTYHgaxjYqnv5e32Ezk/tiCFiMdIREq54rYyfJBnpblPDCGq7MZpWAa+VY9sB6TRulYCuaJqS0ytYjaA/dN1EzzjH3siIfPT0kiwxAakZApO0dbNBMdWYu5EPd7uEXNHNil2ZjqHHOY4dHxB2kVDcuz4hQ==
+ b=SCEzJaShu1Z3GI+aSvcgT2qJ6gb2PQIeBvJlM58Q6tg8akC+z4H2TbMh6ytwHKyRQc1xvKvHbZSXxUuTn6UiZAEShTU5alx95t4fzMNKtRt3PemfheqE3A9gYoZlz1yeE+jIWcGRLG5YRCxuuTaF2CjO246S4DAwolFr4toc03+Hea6CyX0qU6LJjYzNRaFXbZiGoBCHlfzVRt+UBFXisVmaL516OpixWgAiTK4slwabCEYfoGNkM9Q4Xqvc7Ono2OrD6Iir/5D3An1PaUtZLVNw//rRTCFxoZHfrU3brTOFGYaLEaZPsDk42A3KGIoUX7tXi3V9VhsbhJep0jHLng==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=FjNv/Mx2B7aAHl8tldlnzBwXl6u+4m12lZFBWq7OnkQ=;
- b=FWXEq48lRsGhQAmtMZ1NvDEKw1GJ7JmIqBzIynuj+YTFpnA1hHgoAQdaO2uoqxZb/ZtfUJK5kywnpbCoyaYu5J8wWl1KPmJEoFqcq+PrjeWgNfgLjDjU5FyYgjiU0rtWIULpzvv+LKzD4ArEszx3UwHGejdQ1jTcS6vNZzCX+1PBC0KD8oqGeApx9n2+QO5cQnHwjUPDADY+ysbuS7coeDi24UNy75nzTjCueypQVSLDSKNQeXod0JYMNPMbMBeVXlrJ9Bl/Bo72pjwCRg5Tu0eWflv64cOwrW3G01HFUbSoToUhiYo42zg8g7e192Wm5D3Nyiql8kfT3SE20ope4Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- SJ0PR11MB5005.namprd11.prod.outlook.com (2603:10b6:a03:2d3::21) with
+ bh=ZyWLLs8jbJbR+rLeYXVyLs+FlPBh40GYmb1rYwYC2TE=;
+ b=ME1kJ2JoqSY8mfM1mKWUCiVJvBFrGLMnmp6f2lEN655kWLzPvZZB11YMIB032LN5ArbI847Tgd2xPr65Nq77C9Z2c64i+AkBoAYrf8tjfMSKaaErebGyqabtFCCJYnPD1Iq/bUp7COvamHzv987Q/NBZFhA4yicjQYRemF/c2vSz06QxjF7ovBbWDyUMEx+JWInz/3LCTiijfhm3wr9FWMYXgXwSvhFzP5ye2d0MB5DjI1IiHo4lXOtZ5Vv2gFuE0wkBBPraJc/VGuAiLLur6ECEc0zoxtX9MFWJEoop3mi5FeXo/qI8qZdj1riuSNrl4t2ID5bUv0t0eNugLORwlw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZyWLLs8jbJbR+rLeYXVyLs+FlPBh40GYmb1rYwYC2TE=;
+ b=CRG1cjwLunccynfuPQ9i9VuxCgk3aTCYtzaJrDNqnW6Sfk812PK/107ukSJXz0wXyEdPze5fkbpXpF5TJGHhvNSzgZYBMzts0dxeF3mCMJvTtPHo4telSl/5NYcyBN0iyndATJrD9Uh4cQ5D/Tyb49iwpkxPTDTeFmQdPedTYjM=
+Received: from DS0PR17CA0002.namprd17.prod.outlook.com (2603:10b6:8:191::25)
+ by MN0PR12MB6223.namprd12.prod.outlook.com (2603:10b6:208:3c1::12) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.23; Tue, 9 Jan
- 2024 00:05:47 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::32a9:54b8:4253:31d4]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::32a9:54b8:4253:31d4%4]) with mapi id 15.20.7159.020; Tue, 9 Jan 2024
- 00:05:45 +0000
-Date: Tue, 9 Jan 2024 07:36:22 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<dri-devel@lists.freedesktop.org>, <pbonzini@redhat.com>,
-	<seanjc@google.com>, <olvaffe@gmail.com>, <kevin.tian@intel.com>,
-	<zhiyuan.lv@intel.com>, <zhenyu.z.wang@intel.com>, <yongwei.ma@intel.com>,
-	<vkuznets@redhat.com>, <wanpengli@tencent.com>, <jmattson@google.com>,
-	<joro@8bytes.org>, <gurchetansingh@chromium.org>, <kraxel@redhat.com>,
-	<zzyiwei@google.com>, <ankita@nvidia.com>, <alex.williamson@redhat.com>,
-	<maz@kernel.org>, <oliver.upton@linux.dev>, <james.morse@arm.com>,
-	<suzuki.poulose@arm.com>, <yuzenghui@huawei.com>
-Subject: Re: [PATCH 0/4] KVM: Honor guest memory types for virtio GPU devices
-Message-ID: <ZZyG9n0qZEr6dLlZ@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20240105091237.24577-1-yan.y.zhao@intel.com>
- <20240105195551.GE50406@nvidia.com>
- <ZZuQEQAVX28v7p9Z@yzhao56-desk.sh.intel.com>
- <20240108140250.GJ50406@nvidia.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240108140250.GJ50406@nvidia.com>
-X-ClientProxiedBy: SG2PR03CA0105.apcprd03.prod.outlook.com
- (2603:1096:4:7c::33) To DS7PR11MB5966.namprd11.prod.outlook.com
- (2603:10b6:8:71::6)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.21; Mon, 8 Jan
+ 2024 23:54:58 +0000
+Received: from DS3PEPF000099E1.namprd04.prod.outlook.com
+ (2603:10b6:8:191:cafe::1e) by DS0PR17CA0002.outlook.office365.com
+ (2603:10b6:8:191::25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.23 via Frontend
+ Transport; Mon, 8 Jan 2024 23:54:58 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ DS3PEPF000099E1.mail.protection.outlook.com (10.167.17.196) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7181.13 via Frontend Transport; Mon, 8 Jan 2024 23:54:58 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Mon, 8 Jan
+ 2024 17:54:57 -0600
+Date: Mon, 8 Jan 2024 17:54:39 -0600
+From: Michael Roth <michael.roth@amd.com>
+To: Sean Christopherson <seanjc@google.com>
+CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Paolo Bonzini
+	<pbonzini@redhat.com>, James Houghton <jthoughton@google.com>, Peter Xu
+	<peterx@redhat.com>, Axel Rasmussen <axelrasmussen@google.com>, Oliver Upton
+	<oliver.upton@linux.dev>, Isaku Yamahata <isaku.yamahata@linux.intel.com>,
+	David Matlack <dmatlack@google.com>, Yan Zhao <yan.y.zhao@intel.com>, Marc
+ Zyngier <maz@kernel.org>, Aaron Lewis <aaronlewis@google.com>
+Subject: Re: [ANNOUNCE / RFC] PUCK Future Topics
+Message-ID: <20240108235439.ecb5x2eef2mbccby@amd.com>
+References: <20231214001753.779022-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20231214001753.779022-1-seanjc@google.com>
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|SJ0PR11MB5005:EE_
-X-MS-Office365-Filtering-Correlation-Id: 04712176-8e25-4ecc-99f4-08dc10a6ba37
+X-MS-TrafficTypeDiagnostic: DS3PEPF000099E1:EE_|MN0PR12MB6223:EE_
+X-MS-Office365-Filtering-Correlation-Id: ab4722cc-b5ad-4077-1d6d-08dc10a53874
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ddlkNxDyhExQxVqCfCSCmNwBXwpAm7ZA2mnVn+77E1zsGXrYy+V0RPftRrYK/8QIRWi7Axd6u7Q7agWnGOqI7kVNDVYJK9KKnifOJaZ000C/4AwFRrH+vBupggZnUt9PlvZRl/u9+O95eMNAZm9bBVc82s+/pjw8ubfnEXjKrJr4dv7ojmXTasnuG5Vyw0wCRLxnfEsY/soTfKll9sfDzA1wu+U9YT24hHTWgvIWsSg8Hph/ogWVQBEwBO+7OvW4qOxOsAnejPSVHmQ02FWYuPCTy5AfkrcOglVWc47uMAG3Ih04fCyvaOGjGlCm5ViWo8oPRkJaUByFlI7y4pajti8+02J6spC2LQzcIU+xTKo3aCbHxJfyeiCqf84SEmRID3tZ/KvSWfDgRY2d0tSB3lihbYDu0ii/b47mM4UVYR1K6WIQ+3jsM/ua4qjkdbx1PJZ+xJhQ2FO46CV/fe9wj9yNTLNqN0tLWjb+jTbVNFC9KD02+l/dtEdrnls9kyouup07i8Hd/5B9hUUXXRX3EzEPYhi9UKLsJhkrBlRE0oAQWRNHysVKQSl3grW4U15M
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(136003)(376002)(396003)(366004)(346002)(230922051799003)(64100799003)(1800799012)(186009)(451199024)(38100700002)(7416002)(82960400001)(4326008)(41300700001)(3450700001)(6916009)(2906002)(5660300002)(54906003)(6486002)(86362001)(6666004)(6512007)(6506007)(316002)(8676002)(8936002)(66556008)(66946007)(66476007)(83380400001)(26005)(478600001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?tMWWZQ/9cgMYQZP+dixDdkrkN9jjXKl7D3w3BUh2odfcaGnf42wxInpwKn8m?=
- =?us-ascii?Q?KQINpPKATuXTuT12fwcMtnwiNeurtc43nTVQXredzPii2y9hnV/+TJrbrfaL?=
- =?us-ascii?Q?9g0dAKe9/qCDTnXqM7C5yoPkD4UE/s+oQiTLu/bEDS/O0NAK+G8y3262AZqq?=
- =?us-ascii?Q?iqbEPyKSaVQjSdZBil28QaH3MQX45KnCPXcTb18sVSfNoeI/q2xeP8fK62Rj?=
- =?us-ascii?Q?e2x2+VKDMsIeuWXu77CRumdoU6Qb7u3Bn/yS5EhLQWPvITCQ/x2dt3zmQTbR?=
- =?us-ascii?Q?TBHBaEiOlORglxS+1XbFfZLAt351QdByzDkJjQFXnI6lvVuqoL/u2j7aDPwD?=
- =?us-ascii?Q?cq4bfeVqQk51lTrTmxaRqVbBMdigjtwaxpAE66ZazAAhghO9sZaftPdu13Qp?=
- =?us-ascii?Q?R2N1bqSPo1sh8db3p0o5TgBbm0eqvWOALyiFSZ0m/sc3paeidtYU1sO5dBIR?=
- =?us-ascii?Q?LOADrgQKXmV6GyOMebnxraY+1N7ISDjIa+Bbswgw1oCdv5VtNSA3Wwlznl3q?=
- =?us-ascii?Q?V2A7Qe4zWyCjjpkq9c585a7BdPwftWtD8Z/SXAB01R5YXWrBc8LuVZHlkm+Y?=
- =?us-ascii?Q?fFeBYRxhA2QJ+ufCTwN6ymGFpBJcIvCYTjx7j/rr2787+i6n+YNLiiVLTg3n?=
- =?us-ascii?Q?Eo7feGS5qOm31VLFjlvOKgm7eloqyLf91DvUsZOHRMZOlV5u6We6Y1ppuRju?=
- =?us-ascii?Q?X6N4hnOYl5OPLebl1dyS5qGdwP2Q7F4TMYOnikv0n4Uq7x9y/nbZ7lneJNKt?=
- =?us-ascii?Q?ssh7mrOYxqfePY4SaT8jO9VYDlYqhXecOnEg8GrhL1k9mefPo8uunbYva1wd?=
- =?us-ascii?Q?WLdjAxKyOUzIMTBfcpfc46MS8H6DLo5DaOYnqSVJ1ce3hWpQVCsA9ESEuNdR?=
- =?us-ascii?Q?KrIBRq1qfHnaLc7D4GHH1/4M6DEB9fZLW7L7dGBQGcrPvau5sEae5TsA7CO7?=
- =?us-ascii?Q?zHvCz5cGI4WWNMIX+e+qzb3ASnOdr10jNxHFqh2Vq5uYmcEqsTYTM5yfAJJB?=
- =?us-ascii?Q?4biK6zxudP5WiIyoC+/l9F1MhugFFaKsDdYAPw+PT33eM7ZnxqHYrf1eFF6p?=
- =?us-ascii?Q?2SPpNEm03icdoHGMzLYrd6dm+nvhuo7123bRz3VtLq1Md3tcic7RjXympu3g?=
- =?us-ascii?Q?ZMvaSGtYTOHA3rFk6Hp78nsz+oBhmy1Z84rkzYdj3+ssHIS0Nu5nIVPMqaM/?=
- =?us-ascii?Q?6c/26nxzEWKcqiXcoDa4bi9uBlF50DQjD2dBcjLy8mhpZi5rDa+vTW3+KWDJ?=
- =?us-ascii?Q?apS6aF9hi5E8Lcopl9YAJIeFGpGNJLGDYojkKEDdKXphABM3J8C5mEU9nchw?=
- =?us-ascii?Q?jCYOxsARi5AO0beuuvXqWrpvY33f0bhK3J8IcxWCqXToodDEm4eVmN3OTBto?=
- =?us-ascii?Q?KRecZN/gesGQmB2VdZheWL51oH7ksxr8aSgeMgoqRTc+NV3yRCEh1mW2Fqg5?=
- =?us-ascii?Q?RyvqPpGAG//3e2iO7WBwGiMR54oPCYp+Uj/k7SXlfWqb6yABhAWXox4btDI3?=
- =?us-ascii?Q?j3HyP/K1C5cl/4CqAE9pV73wQENLaxrnBm8bQKo2AJ3JgByas2E6L9TNyenp?=
- =?us-ascii?Q?2+qsqcYHG6IHrFdRHmADopFJ9754MWHK3xYlHgvn?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 04712176-8e25-4ecc-99f4-08dc10a6ba37
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jan 2024 00:05:45.7184
+X-Microsoft-Antispam-Message-Info:
+	UwbO0Vz1cUMhOLRd2k8FZ8BWDSd8qQDkFpScRTRkJ+jJ4HHK08bKleEUR6nZbt0zDdd5JBvtmI0YUYQ85oOQmsLigra86CeCd3jCagYbrtYxfskQjkGEWQHHcZgeDWSsPe7Xu0W3vVyst+RGQeeqWC0CdtAxvvzlgM7zoheHBWyZBuyTlWh2SAyFa7XAeebJuWo0MkPjVXZqrmscGJsCre3My19sZ9ElQ+kt0DPxqOi/kpquMXvpVq7Hu83Y/jAq4frhE2wvTh5HpthYMkE4+Me3OtQ6nM7iOiprKjb0ogZqpNaFdT0s2gCYY4V5FfLjOjmKAoHjBy93JAQFFLSWr92K69IsewImUE48ofaMXN7cIrFf29k78dqSHKTE/J1pV7YngBMuny+F2AGivbOxrhbrRVcSd7GAkjPaF5LXvrpgOxpR7Sxme2LS5u9C/pHQSFNerLKUADps70MYK5JXEY8gwHj7hHYdLfRPem5SpqbQqFlXSPKu4wmGQ2OSVFQ04O7sz7/s1r6eBWBeL6zsN11fg9QHg20u6qWA/S1Hlt5YbwXJ8sMKtzuEuzSdE4/ekWXcLLQppcZwmpJQVjItqeE2R5nzrMnehikk0S1FSyIFpoS/N4/WnbncNQWqVzctHp+ddQP2gOm0426TSZnXTc7nTGURdZ4m+XRQSvascIDSu7C2LT1SIgFKp3AW6gGeEOhZ/B0bNlNR0OqI3jZ3zNWppvgZk5ri7i1o4bEAxWW7+u4r8e6NVTHaPDLytZPvd92OJkcAuil+i1gRBvhBpKIB35kwZB155rg7LiRCVEAcETgNTrq3UytrStFSjKuEFPC6u0/WwFABY7JzHqiI96NR6CRyjuVSVkaWcCQRgQkCkiW+a1ucCtWHkEd6UruU
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(346002)(376002)(396003)(136003)(39860400002)(230173577357003)(230273577357003)(230922051799003)(186009)(451199024)(82310400011)(64100799003)(1800799012)(40470700004)(46966006)(36840700001)(70206006)(70586007)(47076005)(8936002)(8676002)(1076003)(26005)(478600001)(16526019)(426003)(336012)(2616005)(83380400001)(5930299018)(966005)(316002)(2906002)(6916009)(5660300002)(82740400003)(7416002)(81166007)(41300700001)(4326008)(40480700001)(356005)(86362001)(36860700001)(6666004)(36756003)(54906003)(40460700003)(44832011)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jan 2024 23:54:58.1612
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: uc5IoAkvdNXW0EIgdh6hVmh+tY0uNks9dQmZ6arcsOJ3EIE2lOAGfturXaP9KLD5j3Lkwkgl8atg8niL/c8PMQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5005
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ab4722cc-b5ad-4077-1d6d-08dc10a53874
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS3PEPF000099E1.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6223
 
-On Mon, Jan 08, 2024 at 10:02:50AM -0400, Jason Gunthorpe wrote:
-> On Mon, Jan 08, 2024 at 02:02:57PM +0800, Yan Zhao wrote:
-> > On Fri, Jan 05, 2024 at 03:55:51PM -0400, Jason Gunthorpe wrote:
-> > > On Fri, Jan 05, 2024 at 05:12:37PM +0800, Yan Zhao wrote:
-> > > > This series allow user space to notify KVM of noncoherent DMA status so as
-> > > > to let KVM honor guest memory types in specified memory slot ranges.
-> > > > 
-> > > > Motivation
-> > > > ===
-> > > > A virtio GPU device may want to configure GPU hardware to work in
-> > > > noncoherent mode, i.e. some of its DMAs do not snoop CPU caches.
-> > > 
-> > > Does this mean some DMA reads do not snoop the caches or does it
-> > > include DMA writes not synchronizing the caches too?
-> > Both DMA reads and writes are not snooped.
+On Wed, Dec 13, 2023 at 04:17:53PM -0800, Sean Christopherson wrote:
+> Hi all!  There are a handful of PUCK topics that I want to get scheduled, and
+> would like your help/input in confirming attendance to ensure we reach critical
+> mass.
 > 
-> Oh that sounds really dangerous.
->
-But the IOMMU for Intel GPU does not do force-snoop, no matter KVM
-honors guest memory type or not.
+> If you are on the Cc, please confirm that you are willing and able to attend
+> PUCK on the proposed/tentative date for any topics tagged with your name.  Or
+> if you simply don't want to attend, I suppose that's a valid answer too. :-)
+> 
+> If you are not on the Cc but want to ensure that you can be present for a given
+> topic, please speak up asap if you have a conflict.  I will do my best to
+> accomodate everyone's schedules, and the more warning I get the easier that will
+> be.
+> 
+> Note, the proposed schedule is largely arbitrary, I am not wedded to any
+> particular order.  The only known conflict at this time is the guest_memfd()
+> post-copy discussion can't land on Jan 10th.
+> 
+> Thanks!
+> 
+> 
+> 2024.01.03 - Post-copy for guest_memfd()
+>     Needs: David M, Paolo, Peter Xu, James, Oliver, Aaron
+> 
+> 2024.01.10 - Unified uAPI for protected VMs
+>     Needs: Paolo, Isaku, Mike R
 
-> > > > This is generally for performance consideration.
-> > > > In certain platform, GFX performance can improve 20+% with DMAs going to
-> > > > noncoherent path.
-> > > > 
-> > > > This noncoherent DMA mode works in below sequence:
-> > > > 1. Host backend driver programs hardware not to snoop memory of target
-> > > >    DMA buffer.
-> > > > 2. Host backend driver indicates guest frontend driver to program guest PAT
-> > > >    to WC for target DMA buffer.
-> > > > 3. Guest frontend driver writes to the DMA buffer without clflush stuffs.
-> > > > 4. Hardware does noncoherent DMA to the target buffer.
-> > > > 
-> > > > In this noncoherent DMA mode, both guest and hardware regard a DMA buffer
-> > > > as not cached. So, if KVM forces the effective memory type of this DMA
-> > > > buffer to be WB, hardware DMA may read incorrect data and cause misc
-> > > > failures.
-> > > 
-> > > I don't know all the details, but a big concern would be that the
-> > > caches remain fully coherent with the underlying memory at any point
-> > > where kvm decides to revoke the page from the VM.
-> > Ah, you mean, for page migration, the content of the page may not be copied
-> > correctly, right?
-> 
-> Not just migration. Any point where KVM revokes the page from the
-> VM. Ie just tearing down the VM still has to make the cache coherent
-> with physical or there may be problems.
-Not sure what's the mentioned problem during KVM revoking.
-In host,
-- If the memory type is WB, as the case in intel GPU passthrough,
-  the mismatch can only happen when guest memory type is UC/WC/WT/WP, all
-  stronger than WB.
-  So, even after KVM revoking the page, the host will not get delayed
-  data from cache.
-- If the memory type is WC, as the case in virtio GPU, after KVM revoking
-  the page, the page is still hold in the virtio host side.
-  Even though a incooperative guest can cause wrong data in the page,
-  the guest can achieve the purpose in a more straight-forward way, i.e.
-  writing a wrong data directly to the page.
-  So, I don't see the problem in this case too.
+Hi Sean,
 
->  
-> > Currently in x86, we have 2 ways to let KVM honor guest memory types:
-> > 1. through KVM memslot flag introduced in this series, for virtio GPUs, in
-> >    memslot granularity.
-> > 2. through increasing noncoherent dma count, as what's done in VFIO, for
-> >    Intel GPU passthrough, for all guest memory.
-> 
-> And where does all this fixup the coherency problem?
-> 
-> > This page migration issue should not be the case for virtio GPU, as both host
-> > and guest are synced to use the same memory type and actually the pages
-> > are not anonymous pages.
-> 
-> The guest isn't required to do this so it can force the cache to
-> become incoherent.
-> 
-> > > If you allow an incoherence of cache != physical then it opens a
-> > > security attack where the observed content of memory can change when
-> > > it should not.
-> > 
-> > In this case, will this security attack impact other guests?
-> 
-> It impacts the hypervisor potentially. It depends..
-Could you elaborate more on how it will impact hypervisor?
-We can try to fix it if it's really a case.
+I'll be present for this one. Not sure what the specific agenda is, but
+hoping we can cover some of the hooks that were proposed in this RFC
+series and are now part of SNP hypervisor v11 patchset:
 
+  https://lore.kernel.org/kvm/20231016115028.996656-1-michael.roth@amd.com/
+
+-Mike
+
+> 
+> 2024.01.17 - Memtypes for non-coherent MDA
+>     Needs: Paolo, Yan, Oliver, Marc, more ARM folks?
+> 
+> 2024.01.24 - TDP MMU for IOMMU
+>     Needs: Paolo, Yan, Jason, ???
+> 
+> 
+> P.S. if you're wondering, what the puck is PUCK?
+> 
+>   Time:  6am PDT
+>   Video: https://meet.google.com/vdb-aeqo-knk
+>   Phone: https://tel.meet/vdb-aeqo-knk?pin=3003112178656
+> 
+>   Calendar: https://calendar.google.com/calendar/u/0?cid=Y182MWE1YjFmNjQ0NzM5YmY1YmVkN2U1ZWE1ZmMzNjY5Y2UzMmEyNTQ0YzVkYjFjN2M4OTE3MDJjYTUwOTBjN2Q1QGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20
+>   Drive:    https://drive.google.com/drive/folders/1aTqCrvTsQI9T4qLhhLs_l986SngGlhPH?resourcekey=0-FDy0ykM3RerZedI8R-zj4A&usp=drive_link
+> 
+>   https://lore.kernel.org/all/20230512231026.799267-1-seanjc@google.com
 
