@@ -1,94 +1,75 @@
-Return-Path: <kvm+bounces-5828-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5829-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44B3282705B
-	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 14:52:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88867827095
+	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 15:03:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E5941C2296C
-	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 13:52:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09D8B283C14
+	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 14:03:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0645F44C9D;
-	Mon,  8 Jan 2024 13:51:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EE314655B;
+	Mon,  8 Jan 2024 14:03:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="EA06J147"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="q+UC/JV/"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2041.outbound.protection.outlook.com [40.107.223.41])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2070.outbound.protection.outlook.com [40.107.244.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A82B944C99;
-	Mon,  8 Jan 2024 13:51:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4AFC46531;
+	Mon,  8 Jan 2024 14:02:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Lh4Tpzwur/YB3+TvFrHpCSB6XtU7J9q39IXLbuHo0g4p0X10pTg/K9DsuVxr2chjiz5xJ06VYrEcxVmIHE0681bBo9EiOICBB0EYTJm6NPyGqIpta4ZJo/bf3T+9frajxlSDb6Lw1yULvmzG9kdRzoOLEP2C9JIQb3lVOc+CQPsoi93NBfYaUuaesX5g1fD5g9tHTbnNzUe3cv4a3j0Yw8LY2TJUR3T9v9eHhRQQgHV/4VKt887NqO+kHd3Yvq3Hl22/bpGax1g7+Lu9mrV2O6nYBLssrRLIw6jUFwCUs1prB7/rz1k+0hqW/Amor+ylBH2TEBZUoEMxKGEJuMRSkQ==
+ b=HnO9tuj59zffV7oaVyXez4Xv0eQDC89PP979Md9QTDEnCC1hPcOfLZ0dbeLhg6mOsaavJ0yIg8NunKLeU9PrcwBvUANYbjn/GxNisslEiMfWA9UIjAYIEVJoijMqb/6S27OQAH6KCXV3ofXHILqXI7TVTA60m4D5zN5okDEDChujLyXDfyr2xHbJwivEBLc/2jyezPs4GNtEl2JHG8ppi7z3NX/U7zyMPEOSH8SwVj33TqP2Kp60xqCCpJIlc3FDQ2hD9YlKIc+0BvPSPLmqanzq3UJg7GzugdZEUVU0Jnn4M06fhEtvUKKqWfVB9iaDJ0b6Leg/I2whdnWfDbGZGA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TJ5Vi1ZBvCQqoh+E5fmJh5uYInDiBpZ7YJqtfosDNtk=;
- b=DQ3KlZyYIKtznU+UxRQChXQBK8RbxI8ewIcOL01DFDgdvIlN0lU6631APufij9h70iwjDUwVXr1+ffunLn4vMbOsLMgq2Fj1yFq/fZhMrGAJ7CZ9PZM2YFSjxviQNlFrA1xyAk9nNzhK2SvdArvc2N1woFTwdp7bxuanztBvDuC4CpZevpBkqcKwKyBntMpOj43xqhdPqgLNbCrFWFm/V/8cOulSYAxqWjAfEhimqigIlk24j1fXJROPUccYGglAvypJhpV46B5+x8JqaqRGEPfbwV7Dr6QP6slX8BpcqFUrhQCpK42fN0XmYUy7gkcIYxGB99fIIKsxeM8iFqhfiQ==
+ bh=O3H/scIysDbHkCk+GFipvvZr68uuJqZfyJMhhpu6AHo=;
+ b=Az8YMW1erLhFdkJZrsupjL5k7AWQcDdoXDl5rUbH8dMDD2FWOvdfIP8TdoAjuoBIfStFRCQTbSqpTCVbaLOW2HebagHDBkMPeskaDUiesEGTrlQk9ys8xFx/W/xCedeUZFvOGEDAYPvNsXa6IKy1263a7O+wefiEMYcnw0b0POeZQBDU23K4qNVENa42uYHVul9JUF/wJZpmIlm7CksjmJp3Wx/RRwSaokrL6CrwyPODSKeQLY8cXDiaEyQ+78OJ4uZMWlYHjMfHoJxf5tLnTUJpePFxk75lIq5UXadyXsSxXG66bqdWKCIPO6RO1dkSLwLzSECXDJBewS4cSf+bdw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TJ5Vi1ZBvCQqoh+E5fmJh5uYInDiBpZ7YJqtfosDNtk=;
- b=EA06J147aFtQxKE4UYa0ww2TmVVEhW/s9VgVkWEoDenU7CAfTHPQGBmhElSW3GRmI3ecpvgU2G5AZDZzeVlW0nFZalKUHgR+2QvREwPW1djk2gKd/GOQsF0vJu52VBIcdsmOwQqSC4E1iHSmourjK8OtuUQQ90gM+63d7Pmqv8uAZ1HNWggLLpSwHDLN/kUFgSik5v+Q91mcnSMInCK5rsXYB7egAhdbe+F1BDU+AYqNz0zHwBYqmOzU/qeMZ50ZJBsNlN9BkprW9p/J5Urh76Mje7HLt1zuFsicymhETMQ0XF/Q02CmQk1rS8vP4VMnMxu9iuzW2lbix5zMGC5OKQ==
+ bh=O3H/scIysDbHkCk+GFipvvZr68uuJqZfyJMhhpu6AHo=;
+ b=q+UC/JV//GyQO82iHnS6t6n1RrCxsB7JK6Q+wZdrpG7MhWIOUIW4bq5j86d4pUPt6O1+Fqg7XS/tiXfzZP9xlyIxpuFG0NrkGyd8uApSn+PrYPWExC6xCmZGWAr1Vgh6XLgc27gJAKC75kxEuCVrNwsp3W5sUwueJOjWmv66LxeLjDkSQX6of9Nwl3GruSgygNX2LS+pHNqgJ1RrkIe2ZkP0padvzf9PClLR3OvHplI1+pHVnokNtTDQoOZ9Dr7OovV05ZjfCEd6RpfHLoAu4FRmhYjEpqG1X4z3O51GqqbANy0Pz3xTZ3LH3qiLwRmuZ7aI31pjLLQHCBGkcH/ysA==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by SA1PR12MB7443.namprd12.prod.outlook.com (2603:10b6:806:2b7::21) with
+ by CH3PR12MB8850.namprd12.prod.outlook.com (2603:10b6:610:167::18) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.19; Mon, 8 Jan
- 2024 13:51:33 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.23; Mon, 8 Jan
+ 2024 14:02:52 +0000
 Received: from LV2PR12MB5869.namprd12.prod.outlook.com
  ([fe80::60d4:c1e3:e1aa:8f93]) by LV2PR12MB5869.namprd12.prod.outlook.com
  ([fe80::60d4:c1e3:e1aa:8f93%4]) with mapi id 15.20.7159.020; Mon, 8 Jan 2024
- 13:51:33 +0000
-Date: Mon, 8 Jan 2024 09:51:32 -0400
+ 14:02:51 +0000
+Date: Mon, 8 Jan 2024 10:02:50 -0400
 From: Jason Gunthorpe <jgg@nvidia.com>
-To: "Tian, Kevin" <kevin.tian@intel.com>
-Cc: "Liu, Yi L" <yi.l.liu@intel.com>, "joro@8bytes.org" <joro@8bytes.org>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"robin.murphy@arm.com" <robin.murphy@arm.com>,
-	"baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-	"cohuck@redhat.com" <cohuck@redhat.com>,
-	"eric.auger@redhat.com" <eric.auger@redhat.com>,
-	"nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-	"chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-	"yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-	"peterx@redhat.com" <peterx@redhat.com>,
-	"jasowang@redhat.com" <jasowang@redhat.com>,
-	"shameerali.kolothum.thodi@huawei.com" <shameerali.kolothum.thodi@huawei.com>,
-	"lulu@redhat.com" <lulu@redhat.com>,
-	"suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	"Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
-	"joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
-	"Zeng, Xin" <xin.zeng@intel.com>,
-	"Zhao, Yan Y" <yan.y.zhao@intel.com>
-Subject: Re: [PATCH v7 1/3] iommufd: Add data structure for Intel VT-d
- stage-1 cache invalidation
-Message-ID: <20240108135132.GI50406@nvidia.com>
-References: <20231117131816.24359-1-yi.l.liu@intel.com>
- <20231117131816.24359-2-yi.l.liu@intel.com>
- <c967e716-9112-4d1a-b6f7-9a005e28202d@intel.com>
- <20240104143658.GX50406@nvidia.com>
- <BN9PR11MB52769EEDAE2783426144E2588C662@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20240105144516.GC50406@nvidia.com>
- <BN9PR11MB52765C91893A28A7D21D324E8C6B2@BN9PR11MB5276.namprd11.prod.outlook.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, pbonzini@redhat.com,
+	seanjc@google.com, olvaffe@gmail.com, kevin.tian@intel.com,
+	zhiyuan.lv@intel.com, zhenyu.z.wang@intel.com, yongwei.ma@intel.com,
+	vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+	joro@8bytes.org, gurchetansingh@chromium.org, kraxel@redhat.com,
+	zzyiwei@google.com, ankita@nvidia.com, alex.williamson@redhat.com,
+	maz@kernel.org, oliver.upton@linux.dev, james.morse@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com
+Subject: Re: [PATCH 0/4] KVM: Honor guest memory types for virtio GPU devices
+Message-ID: <20240108140250.GJ50406@nvidia.com>
+References: <20240105091237.24577-1-yan.y.zhao@intel.com>
+ <20240105195551.GE50406@nvidia.com>
+ <ZZuQEQAVX28v7p9Z@yzhao56-desk.sh.intel.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <BN9PR11MB52765C91893A28A7D21D324E8C6B2@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-ClientProxiedBy: BL1PR13CA0375.namprd13.prod.outlook.com
- (2603:10b6:208:2c0::20) To LV2PR12MB5869.namprd12.prod.outlook.com
+In-Reply-To: <ZZuQEQAVX28v7p9Z@yzhao56-desk.sh.intel.com>
+X-ClientProxiedBy: MN2PR05CA0021.namprd05.prod.outlook.com
+ (2603:10b6:208:c0::34) To LV2PR12MB5869.namprd12.prod.outlook.com
  (2603:10b6:408:176::16)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -97,109 +78,122 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SA1PR12MB7443:EE_
-X-MS-Office365-Filtering-Correlation-Id: dc05106a-8c1c-4458-299a-08dc1050ecd7
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CH3PR12MB8850:EE_
+X-MS-Office365-Filtering-Correlation-Id: d5470f08-9acf-4ffa-ff62-08dc105280ff
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	88cEMUaLWcsWYEzBxYYFmRCXGkcRauBLzd2twV+cZZrYhBMJB8wNdYTX6WMBU3n0tHHRvNS0P3zpUC21Ar8Gbzppg9iyC07zSCDvMRvGF6xVpdWVaX4Eb/m8BBD5gnX1LjeNZUdyEB5neSmGMvUvklujvroIvvWLl2iOWzeSQwka+r5Hqtpan6zhkWvQw4SsSuChqweqjR/IQ1v9rXeDq9wFDpTXJxTIvL+Ooqq59L9RcV97HHspcAKd/Y4HK9VnzVzCi37Irji/U+oaWtRN/1gJGuSffcHNzqhpKg8kd+bKVFELNP/U3LihyFMnZ/98arWwUcdp3MAmBN+KtcRPnUbZWt2C+6NTcUUsd52yBciOyqzsSTXzWhToPDpM3clwOii8bDLYKX8lO58dPpmwXZO0lKfbW3FptetLeIZOCyF/WkU+PPrI6eTPHP84EFUKLHR30diMUw/XETZdG5KigX4nQMfJunCM2fexGx+DhX6+d+Efgpo8cpN8Oa5OcWbyEyrJwcz+jhdld16Kcm3qC7J/1G5SiL088+pCD2W5NgpJi9bSkqANLlC0aEQ5jAXF
+	kT/puTJLBLM29Q0S9eLOLKwZlVKbblJHmAN8EGWkxkt/5hbMxi3f5PUsKECpfLz60/HEUAMH8rDoeDnzJrf9c2DkPtnKMBgRsn893Oaccgs6rXiDpFWRyU73fEdfKS0bv1cmjg0HH5CKQRUS0nrSd779jG580QE7yKklpuFfCa8FWlqp+7/VtveaLtik0vggvvVcbgpGWBKTbEMEJgoFnL7QQUbAHNAgZrnv2nUXbYdCmHQ71XfI5HzXqr48wCgcXAWrJFUbUAV24l8lo9iDN4rOGVK7w8X+3Ns2WrMBLmcpRcUk+GNicU+P/Y2OKH+e01DHQ/mYRzqalm0taSuG/qWsaH3Zgriy0VCEJRi3d/ofsWAio/xGME5vTmJG5YOBKbQTaWWDQ56OIFc4s3ye/QxL7zL4jUM8Z9rPgkLC2RyT1D6XH1WmBmfSmsvxdAqscGFmmEEeo1zO7k+xmisduGHYfJTv9xPCDHTVlIWJNlzEy9UKGpMIogV7EDbB8LB3w/rfxHrikl2mYTi114vi1zCWW80KSLij88jWgw718SZeLLk+vwib7EmnMUFqWO+y
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(366004)(396003)(39860400002)(136003)(376002)(230922051799003)(64100799003)(451199024)(186009)(1800799012)(6506007)(26005)(1076003)(2616005)(6512007)(478600001)(6486002)(38100700002)(86362001)(33656002)(36756003)(2906002)(41300700001)(7416002)(5660300002)(83380400001)(6916009)(66946007)(8676002)(54906003)(316002)(4326008)(66556008)(8936002)(66476007);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(376002)(346002)(396003)(39860400002)(136003)(230922051799003)(1800799012)(451199024)(186009)(64100799003)(41300700001)(33656002)(1076003)(6506007)(83380400001)(6916009)(66556008)(66476007)(66946007)(6486002)(2906002)(316002)(38100700002)(478600001)(2616005)(6512007)(26005)(86362001)(36756003)(7416002)(5660300002)(4326008)(8676002)(8936002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?9GwLurVp1bsa3b/nxpR89Exp2XSvuPgO1wXVOTqWhgttDISUFRK7VxD0+Pkw?=
- =?us-ascii?Q?jyS4cxpMNh8CRDZzRgrx0LC0ccve1wgK5L1WfhrOgFb2NC7/bdBs1mapUzub?=
- =?us-ascii?Q?RUHTGoLeDpOvzzREcvw0AJOcPa0vylZqyGIpxqCGg0047JssU0uMKLSwcoSy?=
- =?us-ascii?Q?tZNbD41d2tmubORVDNVTxSjs3Ta+nvRvg9Us6xD5ATs7gz2uyI/4nl5jtL3S?=
- =?us-ascii?Q?6ioP1ipm0MZxRqoNt9xFnhGPxBrDMX2PKtx5PVSOfot8dfZP14hU1oXK6UYE?=
- =?us-ascii?Q?HAwO/ktDfTJDkqVZsTadQTfmHot1jO0TPJvebqDyeXXxrmHqaVu8gsjMo9Tb?=
- =?us-ascii?Q?ABvG8r74RoOr/5vunqOy5VxW6Wms8phIJdUcCLiPrE23TATo1wq1U1qKSpav?=
- =?us-ascii?Q?O9MJAD23zxf7xx8ntkgTgLsO+OCX/3iPPUXBX12xJ8ptmk/uer2AacaJNd3B?=
- =?us-ascii?Q?KFlsXklePdP+fL2Tws89zsO+lr7Wf3EjvZCgycHEo3e+74obSiOXEDVrKXl4?=
- =?us-ascii?Q?JSxJy5eskSKbhz6IoKz1cMCMwVQBWfipfUfXk5gi0GAbME2FIdgOEUKvAC1n?=
- =?us-ascii?Q?WdDGRMRwmDfQZQL+zmChJ4enZUkzWWLtsTa5OshDmWEjHHRn9IaY0T4tsE+u?=
- =?us-ascii?Q?8yn/1IL+9LNYl8wR4IMef/DcZPb5shS/a4u2YO7Zj7wH2JQ5UgQojKr3hsRI?=
- =?us-ascii?Q?b1NM9BEorll3pY61H2dGtTBlScvIAv0kv6NWDtSK4C6HY1V3nPgyAhmYMJ7f?=
- =?us-ascii?Q?wPduUYzPCyVJkFR3Ne9OlrwP3i/xkMvJUIe9kaEGugv6RU/rJzQZ6z2fJpBN?=
- =?us-ascii?Q?DW6XygQqO9qwX2M41EXPtpNgT4SrLUy5VhElGM1wqcxCzx8/SVkbngMUMXE1?=
- =?us-ascii?Q?HgxGW7duyw+mDhorWeBQszb4d5KxV7aMsz7mBabmFD8ZROANorM/UTTEf6xp?=
- =?us-ascii?Q?PRUvMobD8qXBxfSLvwPFmx9g753oWVyrxbQrgoPtMF+z7WRSLwSLMadpOQLP?=
- =?us-ascii?Q?hrJDsq6d+x/BAAfxFT3Gb9qAx2eR6Hk2f+xqz0FX5uxp9dUQ7Fx6GC1Yi8tT?=
- =?us-ascii?Q?vJ8WbxexK2ISmA1YtGoeWSRf6f1H2sZm6Z7ZHfUznhyaE8HX9QZ9Tbo7as+3?=
- =?us-ascii?Q?qNHkCMCtqzie9LvAZvFqo9pePCOSj3oUiOsakNJUZxNBOoUbJ1rq54RcdJB4?=
- =?us-ascii?Q?NbiFCyXQ/3UmK1EumqsA6a4EJ76PwfDq/lmvmHCc8QAkHHkD/Mm57j5xCx9d?=
- =?us-ascii?Q?Ff1w6F13u9n3KYNGUwl87LT9yKviExS2Zt33BWK7Fmg59lahHIWWcH6TRhau?=
- =?us-ascii?Q?+z8EGwV9UWEJzUvBd8OP1cG6kd5wS2UkYoSdTx1NnNio678A+2vDvrcuvhe6?=
- =?us-ascii?Q?Yvr+jo9QZ2dknR1kow4gX8p3hs+pimXb/fgr6BDO2U5FAOoZ5GpipDdHSfb+?=
- =?us-ascii?Q?YU8WY3aJ2Js1kHtOvJxYrUZOwmi54keP7A6YZvhZCsd86wGrOCk0TwQCtrnL?=
- =?us-ascii?Q?3CMUzmJ/uEzytwzgMiwy3aoY7UIPieDwM4JILmfCPWwPczp4Kr8aUQd5+kQo?=
- =?us-ascii?Q?8orT8d0qc2PMHH/rUJk=3D?=
+	=?us-ascii?Q?yZdrbHtVdZTlo9p770wHbM5ynm45cNtKRGfI0+EOPpRh0UcxpyHUmDEHPfOI?=
+ =?us-ascii?Q?asDD+k0OMLcXAxP6im4qngoFeedOg4wQWQZB41NGTMIHZohlDrCPxyoaZ8od?=
+ =?us-ascii?Q?PmhPVMe0pWUXjK9Q/tlox2AKQ6MKlo6/z6R0wKP+wRvGPaeTvqNJcD6S0JyM?=
+ =?us-ascii?Q?hmUkG/mUE7XJHPaDzucPCeOwvUNRM14k3teaEEdrKqs6ZUfr2pE+HHJv2yAe?=
+ =?us-ascii?Q?xX65RhDeYY9uPfEupcr6lQ3tamHwPY/wbk32pQMU3JTcSiuFbV44JhhS73CP?=
+ =?us-ascii?Q?MLmSmuEMZef5rN7Fxe0Nh2i3ciiimy58aIsUj8jMegGlVh++y9iE6qDk9af3?=
+ =?us-ascii?Q?pGtDFzoKE2a7IcCZ83fjPaQRlFJehUyEcXRdsmXceoOdMk+VaHnmhzFHc3ep?=
+ =?us-ascii?Q?c0BJ8WzEJ1jyYCKTRw0S0tpjfoO5bajhoHSFXY+MuH17twn0kRDaBaE42Nwz?=
+ =?us-ascii?Q?AOk6LSyYeVr2atr2jSt+v7cNMjN/fHJSXLanQigR2LvR3P5mc27JAfjTLyAa?=
+ =?us-ascii?Q?QcO6JeomoSfL5lNp/Pri7NYRfqv6qab9nMOig0LBWJqM76w+17qRo97WfLr0?=
+ =?us-ascii?Q?AzU4s1PmdX36dcAKdB+mDTkybNDe4c5sH3ULfC5LAFeRC5iVSLEKms1xAUl8?=
+ =?us-ascii?Q?BbJEdviNvWR59AZiusv7mqVDAww2ZeBGe9irTjvAHnMdx62TIEO30PH+lTHu?=
+ =?us-ascii?Q?4vgjNB0+TrtJjZK+VTYcGJEtRq23ipuh4rVK53AUKF/CsUj2694AGH0QrxWe?=
+ =?us-ascii?Q?CZh10xGyLoqWz2kLjrIsl22Nb8xZdPSHyxbUabGVNaQdyGpbKJSIU+CwcrkD?=
+ =?us-ascii?Q?SLG4DtnBaHiOb/rUIuLSSOyv+lXxP2x2h8dlISUhTc+Tk/gXsLnT8uBnmK6R?=
+ =?us-ascii?Q?XQME5QD+u0POWGNFJwvnJV0jmdudjDQ1ReLfDNkDVcGT3bZyXyecP8pw3Oxu?=
+ =?us-ascii?Q?DBq8Ka34Deh8zyeu2cOmw1OWSoONnaFlQUB12VW+Xpe3Hgx65T0OwSaAi4iu?=
+ =?us-ascii?Q?XTCn3K39s3pXiRbpkziLdh/F+NOD8MshcjYtFkjzfH9brf9Dl3BmPA3/tQNq?=
+ =?us-ascii?Q?6xzzSgHHXej1lBZjvyhHpgmatOUzVqy5IWT5oISdZrVudqL5UAbWQxj7AgOt?=
+ =?us-ascii?Q?iac7+2NVGP4UAgG0TA8uPk4W/9Ts/ewl9ZvdDqpyI+kvIzW1BbvontVu4SIx?=
+ =?us-ascii?Q?x3GI7a+g0x5xE49DEwYLoUmE27LBaGdfXPpD+4BBmrWCGH4mA8FmO6EqIx6B?=
+ =?us-ascii?Q?J8PDaKTLDsUzCCVHpZixWMKoh6Q79GOT+BxeyrvqUB7BWdC19WfNp5jjokHp?=
+ =?us-ascii?Q?S67gXXk1f8Z4Bhvt+QXXzck/qoF9reyh3YNPpEyUIFbcdUcT3cBfOpkrk71X?=
+ =?us-ascii?Q?se8ehsENuRWckR2UfI242zGhUMYvJ36iFjRPigcUrmNfRh2mN5Q50R07S+pp?=
+ =?us-ascii?Q?8CLqTf4NXa9KJ7Nx9jmUXZ0qSrRARD+ZOtLEv8bPZKZ9V8zM/4c23HbjjAjD?=
+ =?us-ascii?Q?EoEDspwK3zUuQhI2VFIoDRWeqkLvZPH1wW23Z3DP4WR4lqREk01XQdsILc+9?=
+ =?us-ascii?Q?sWX5PdmphtpmPZA1gAk=3D?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dc05106a-8c1c-4458-299a-08dc1050ecd7
+X-MS-Exchange-CrossTenant-Network-Message-Id: d5470f08-9acf-4ffa-ff62-08dc105280ff
 X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jan 2024 13:51:33.8450
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jan 2024 14:02:51.8568
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: CDY5yDRbDaspQzG0KtbGC7p1xNO3J/QYwAKEzkgcTXqGZGqSZ9BE5kNrHunvpSaU
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7443
+X-MS-Exchange-CrossTenant-UserPrincipalName: quCpi6jGKLPyaxu7749lyKefDo7m3ng9s4njVWLD8Rk8FPdYYzCd/ccP8jG3Wbma
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8850
 
-On Mon, Jan 08, 2024 at 04:07:12AM +0000, Tian, Kevin wrote:
-> > > In concept w/o vSVA it's still possible to assign sibling vdev's to
-> > > a same VM as each vdev is allocated with a unique pasid to mark vRID
-> > > so can be differentiated from each other in the fault/error path.
+On Mon, Jan 08, 2024 at 02:02:57PM +0800, Yan Zhao wrote:
+> On Fri, Jan 05, 2024 at 03:55:51PM -0400, Jason Gunthorpe wrote:
+> > On Fri, Jan 05, 2024 at 05:12:37PM +0800, Yan Zhao wrote:
+> > > This series allow user space to notify KVM of noncoherent DMA status so as
+> > > to let KVM honor guest memory types in specified memory slot ranges.
+> > > 
+> > > Motivation
+> > > ===
+> > > A virtio GPU device may want to configure GPU hardware to work in
+> > > noncoherent mode, i.e. some of its DMAs do not snoop CPU caches.
 > > 
-> > I thought the SIOV plan was that each "vdev" ie vpci function would
-> > get a slice of the pRID's PASID space statically selected at creation?
+> > Does this mean some DMA reads do not snoop the caches or does it
+> > include DMA writes not synchronizing the caches too?
+> Both DMA reads and writes are not snooped.
+
+Oh that sounds really dangerous.
+
+> > > This is generally for performance consideration.
+> > > In certain platform, GFX performance can improve 20+% with DMAs going to
+> > > noncoherent path.
+> > > 
+> > > This noncoherent DMA mode works in below sequence:
+> > > 1. Host backend driver programs hardware not to snoop memory of target
+> > >    DMA buffer.
+> > > 2. Host backend driver indicates guest frontend driver to program guest PAT
+> > >    to WC for target DMA buffer.
+> > > 3. Guest frontend driver writes to the DMA buffer without clflush stuffs.
+> > > 4. Hardware does noncoherent DMA to the target buffer.
+> > > 
+> > > In this noncoherent DMA mode, both guest and hardware regard a DMA buffer
+> > > as not cached. So, if KVM forces the effective memory type of this DMA
+> > > buffer to be WB, hardware DMA may read incorrect data and cause misc
+> > > failures.
 > > 
-> > So SVA/etc doesn't matter, you reliably get a disjoint set of pRID &
-> > pPASID into each VM.
-> > 
-> > From that view you can't identify the iommufd dev_id without knowing
-> > both the pRID and pPASID which will disambiguate the different SIOV
-> > iommufd dev_id instances sharing a rid.
-> 
-> true when assigning those instances to different VMs.
-> 
-> Here I was talking about assigning them to a same VM being a problem.
-> with rid sharing plus same ENQCMD pPASID potentially used on both
-> instances there'd be ambiguity in vSVA e.g. iopf to identify dev_id.
+> > I don't know all the details, but a big concern would be that the
+> > caches remain fully coherent with the underlying memory at any point
+> > where kvm decides to revoke the page from the VM.
+> Ah, you mean, for page migration, the content of the page may not be copied
+> correctly, right?
 
-Oh you imaging sharing the pPASID if things have the same translation?
-I guess I can see why, but given where things are overall I'd say just
-don't do that.
-
-Indeed we can't do that because it makes the vRID unknowable.
-
-(again I continue to think that vt-d cache design is messed up, using
-the PASID for the cache tag is a *terrible* design, and causes exactly
-these kinds of problems)
-
-> for errors related to descriptor fetch the driver can tell the command
-> by looking at the head pointer of the invalidation queue.
-> 
-> command completion is indirectly detected by inserting a wait descriptor
-> as fence. completion timeout error is reported in an error register. but
-> this register doesn't record pasid, nor does the command location. if there
-> are multiple pending devtlb invalidation commands upon timeout 
-> error the spec suggests the driver to treat all of them timeout as the
-> register can only record one rid.
-
-Makes sense, or at least you have to re-issue them one by one
-
-> this is kind of moot. If the driver submits only one command (plus wait)
-> at a time it doesn't need hw's help to identify the timeout command. 
-> If the driver batches invalidation commands it must treat all timeout if
-> an timeout error is reported.
-
-Yes
+Not just migration. Any point where KVM revokes the page from the
+VM. Ie just tearing down the VM still has to make the cache coherent
+with physical or there may be problems.
  
-> from this angle whether to record pasid doesn't really matter.
+> Currently in x86, we have 2 ways to let KVM honor guest memory types:
+> 1. through KVM memslot flag introduced in this series, for virtio GPUs, in
+>    memslot granularity.
+> 2. through increasing noncoherent dma count, as what's done in VFIO, for
+>    Intel GPU passthrough, for all guest memory.
 
-At least for error handling..
- 
+And where does all this fixup the coherency problem?
+
+> This page migration issue should not be the case for virtio GPU, as both host
+> and guest are synced to use the same memory type and actually the pages
+> are not anonymous pages.
+
+The guest isn't required to do this so it can force the cache to
+become incoherent.
+
+> > If you allow an incoherence of cache != physical then it opens a
+> > security attack where the observed content of memory can change when
+> > it should not.
+> 
+> In this case, will this security attack impact other guests?
+
+It impacts the hypervisor potentially. It depends..
+
 Jason
 
