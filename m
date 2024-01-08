@@ -1,216 +1,171 @@
-Return-Path: <kvm+bounces-5825-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5826-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C115826FED
-	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 14:33:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CC1C827031
+	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 14:48:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9441C1C22878
-	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 13:33:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BAF041F232CB
+	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 13:48:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A6A644C83;
-	Mon,  8 Jan 2024 13:33:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C782245BE6;
+	Mon,  8 Jan 2024 13:48:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="U6+1fdBa"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Yfn0tnus"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A150944C86;
-	Mon,  8 Jan 2024 13:33:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 408BkQLU019128;
-	Mon, 8 Jan 2024 13:33:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=1FIsb05A/7CV5T0Bv1gII4COOTZLFXVTCftK299PoHU=;
- b=U6+1fdBa1jxlcnRqBt+QJhMsCBOI0wbLNBD6O3TolJg5BUmkvfTdg+50Q+2PP25+2gFY
- g3I9iJZVUSdHc9/jDZ0+umbq7PkYJFIdwSYzwYfQq+n3iLd3K8yvSk4L4+qbrLPWLqp6
- ax/fQdWFpTA6mFlAWkhkXE+cIl6lNmdV5sh6VIkCB5fABufhpid6IWAapf1NqGURhLo4
- mHuQVZls8cSADK3wulWeQQlNSdlvFnqALFFqcCJCrz8LPDdCs8tpgmkgmzRpjlxMsR2C
- Z+Ou5fhXEBn04qhvNObDhhNGpG6nS1n4CerbRpW6BptD65vEf3zQXDc0w55wLbFStjNI ig== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vf5xbu09a-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 08 Jan 2024 13:33:34 +0000
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 408Cp0p1024499;
-	Mon, 8 Jan 2024 13:33:34 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vf5xbu08g-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 08 Jan 2024 13:33:34 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 408D0FY6022859;
-	Mon, 8 Jan 2024 13:33:33 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3vfj6n83f5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 08 Jan 2024 13:33:33 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 408DXU2G59507022
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 8 Jan 2024 13:33:30 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 36A232004D;
-	Mon,  8 Jan 2024 13:33:30 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B567520043;
-	Mon,  8 Jan 2024 13:33:29 +0000 (GMT)
-Received: from [9.171.48.50] (unknown [9.171.48.50])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  8 Jan 2024 13:33:29 +0000 (GMT)
-Message-ID: <1f818fb8-9d69-43ba-9270-d4f387e7acf4@linux.ibm.com>
-Date: Mon, 8 Jan 2024 14:33:29 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EB1445977
+	for <kvm@vger.kernel.org>; Mon,  8 Jan 2024 13:48:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1704721687; x=1736257687;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=l7IOQjW3e3Pa7PmRmgUkhxOIMvBarMyQKZT3x2OZ4Xo=;
+  b=Yfn0tnusKVR0idG43HfYE0eIrACSi+fF71/jTAS41NXRzX53iWgiYC9y
+   WdufBhdjOe029lM1hiGEtt/gJPjOAVAHoqFIcCvOfo8NJjJ+Wrw3Ap3x0
+   IiR8VwSFXMZGatK4/rV8tRqWDtJGtrHoSorVoqVSkcF0/RK9UbR7+wFh+
+   QK8w3w54+l2v4iM+b5YWzScYcFX40eljYc0ijfBhzq6ChjZTxcged7iKl
+   AI1DhqYpExjtkTvspPTtBH7gKEOrYyKjJp3rdLJR43o/XcrwllnWeJMEn
+   S89ti0yGeDT6jEGohkYR/DXEmW6ege7JMqYLWb8l6BkqaTeBnEQ21zNHG
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10947"; a="464282162"
+X-IronPort-AV: E=Sophos;i="6.04,341,1695711600"; 
+   d="scan'208";a="464282162"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2024 05:48:07 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10947"; a="924872852"
+X-IronPort-AV: E=Sophos;i="6.04,341,1695711600"; 
+   d="scan'208";a="924872852"
+Received: from linux.bj.intel.com ([10.238.157.71])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2024 05:48:03 -0800
+Date: Mon, 8 Jan 2024 21:45:00 +0800
+From: Tao Su <tao1.su@linux.intel.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Jim Mattson <jmattson@google.com>, Chao Gao <chao.gao@intel.com>,
+	Xu Yilun <yilun.xu@linux.intel.com>, kvm@vger.kernel.org,
+	pbonzini@redhat.com, eddie.dong@intel.com, xiaoyao.li@intel.com,
+	yuan.yao@linux.intel.com, yi1.lai@intel.com, xudong.hao@intel.com,
+	chao.p.peng@intel.com
+Subject: Re: [PATCH 1/2] x86: KVM: Limit guest physical bits when 5-level EPT
+ is unsupported
+Message-ID: <ZZv8XA3eUHLaCr8K@linux.bj.intel.com>
+References: <ZYMWFhVQ7dCjYegQ@google.com>
+ <ZYP0/nK/WJgzO1yP@yilunxu-OptiPlex-7050>
+ <ZZSbLUGNNBDjDRMB@google.com>
+ <CALMp9eTutnTxCjQjs-nxP=XC345vTmJJODr+PcSOeaQpBW0Skw@mail.gmail.com>
+ <ZZWhuW_hfpwAAgzX@google.com>
+ <ZZYbzzDxPI8gjPu8@chao-email>
+ <CALMp9eSg6No9L40kmo7n9BGOz4v1ThA7-e4gD4sgj3KGBJEUzA@mail.gmail.com>
+ <ZZbJxgyYoEJy+bAj@chao-email>
+ <CALMp9eTf=9VqM=xutOXmgRr+aFz-YhOz6h4B+uLgtFBXtHefPA@mail.gmail.com>
+ <ZZhl4FHcdrzMXoVy@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v2 3/5] s390x: Add library functions for
- exiting from snippet
-Content-Language: en-US
-To: Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>, Nico Boehr <nrb@linux.ibm.com>
-Cc: Andrew Jones <andrew.jones@linux.dev>, linux-s390@vger.kernel.org,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
-References: <20240105225419.2841310-1-nsg@linux.ibm.com>
- <20240105225419.2841310-4-nsg@linux.ibm.com>
- <1f78218f-f67b-4d99-83d7-2b18455b2519@linux.ibm.com>
- <00dc269c9a487b4601fc27c97771240e0b407ff6.camel@linux.ibm.com>
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- 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
-In-Reply-To: <00dc269c9a487b4601fc27c97771240e0b407ff6.camel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 3ZV9a-zbYYRkgnuUniRgPO2g06YnAx2V
-X-Proofpoint-ORIG-GUID: N9maeJjNLscQuwZXhlYnug_844Xektdz
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-08_04,2024-01-08_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 bulkscore=0
- spamscore=0 priorityscore=1501 mlxscore=0 lowpriorityscore=0
- mlxlogscore=711 suspectscore=0 malwarescore=0 impostorscore=0
- clxscore=1015 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2401080116
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZZhl4FHcdrzMXoVy@google.com>
 
-On 1/8/24 13:58, Nina Schoetterl-Glausch wrote:
-> On Mon, 2024-01-08 at 13:47 +0100, Janosch Frank wrote:
->> On 1/5/24 23:54, Nina Schoetterl-Glausch wrote:
->>> It is useful to be able to force an exit to the host from the snippet,
->>> as well as do so while returning a value.
->>> Add this functionality, also add helper functions for the host to check
->>> for an exit and get or check the value.
->>> Use diag 0x44 and 0x9c for this.
->>> Add a guest specific snippet header file and rename snippet.h to reflect
->>> that it is host specific.
->>>
->>> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
->>> ---
->>>    s390x/Makefile                          |  1 +
->>>    lib/s390x/asm/arch_def.h                | 13 ++++++++
->>>    lib/s390x/sie.h                         |  1 +
->>>    lib/s390x/snippet-guest.h               | 26 +++++++++++++++
->>>    lib/s390x/{snippet.h => snippet-host.h} | 10 ++++--
->>>    lib/s390x/sie.c                         | 31 ++++++++++++++++++
->>>    lib/s390x/snippet-host.c                | 42 +++++++++++++++++++++++++
->>>    lib/s390x/uv.c                          |  2 +-
->>>    s390x/mvpg-sie.c                        |  2 +-
->>>    s390x/pv-diags.c                        |  2 +-
->>>    s390x/pv-icptcode.c                     |  2 +-
->>>    s390x/pv-ipl.c                          |  2 +-
->>>    s390x/sie-dat.c                         |  2 +-
->>>    s390x/spec_ex-sie.c                     |  2 +-
->>>    s390x/uv-host.c                         |  2 +-
->>>    15 files changed, 129 insertions(+), 11 deletions(-)
->>>    create mode 100644 lib/s390x/snippet-guest.h
->>>    rename lib/s390x/{snippet.h => snippet-host.h} (92%)
->>>    create mode 100644 lib/s390x/snippet-host.c
+On Fri, Jan 05, 2024 at 12:26:08PM -0800, Sean Christopherson wrote:
+> On Thu, Jan 04, 2024, Jim Mattson wrote:
+> > On Thu, Jan 4, 2024 at 7:08 AM Chao Gao <chao.gao@intel.com> wrote:
+> > >
+> > > On Wed, Jan 03, 2024 at 07:40:02PM -0800, Jim Mattson wrote:
+> > > >On Wed, Jan 3, 2024 at 6:45 PM Chao Gao <chao.gao@intel.com> wrote:
+> > > >>
+> > > >> On Wed, Jan 03, 2024 at 10:04:41AM -0800, Sean Christopherson wrote:
+> > > >> >On Tue, Jan 02, 2024, Jim Mattson wrote:
+> > > >> >> This is all just so broken and wrong. The only guest.MAXPHYADDR that
+> > > >> >> can be supported under TDP is the host.MAXPHYADDR. If KVM claims to
+> > > >> >> support a smaller guest.MAXPHYADDR, then KVM is obligated to intercept
+> > > >> >> every #PF,
+> > > >>
+> > > >> in this case (i.e., to support 48-bit guest.MAXPHYADDR when CPU supports only
+> > > >> 4-level EPT), KVM has no need to intercept #PF because accessing a GPA with
+> > > >> RSVD bits 51-48 set leads to EPT violation.
+> > > >
+> > > >At the completion of the page table walk, if there is a permission
+> > > >fault, the data address should not be accessed, so there should not be
+> > > >an EPT violation. Remember Meltdown?
+> > >
+> > > You are right. I missed this case. KVM needs to intercept #PF to set RSVD bit
+> > > in PFEC.
+> > 
+> > I have no problem with a user deliberately choosing an unsupported
+> > configuration, but I do have a problem with KVM_GET_SUPPORTED_CPUID
+> > returning an unsupported configuration.
 > 
-> [..]
->   
->>> +bool sie_is_diag_icpt(struct vm *vm, unsigned int diag)
->>> +{
->>> +	union {
->>> +		struct {
->>> +			uint64_t     : 16;
->>> +			uint64_t ipa : 16;
->>> +			uint64_t ipb : 32;
->>> +		};
->>> +		struct {
->>> +			uint64_t          : 16;
->>> +			uint64_t opcode   :  8;
->>> +			uint64_t r_1      :  4;
->>> +			uint64_t r_2      :  4;
->>> +			uint64_t r_base   :  4;
->>> +			uint64_t displace : 12;
->>> +			uint64_t zero     : 16;
->>> +		};
->>> +	} instr = { .ipa = vm->sblk->ipa, .ipb = vm->sblk->ipb };
->>> +	uint64_t code;
->>> +
->>> +	assert(diag == 0x44 || diag == 0x9c);
->>
->> You're calling it is_diag_icpt and only allow two.
->> Do you have a reason for clamping this down?
+> +1
 > 
-> I should have left the comment.
-> They're just "not implemented".
-> The PoP doesn't specify how diags are generally interpreted,
-> so I intended that if any other diags are needed whoever needs them
-> just checks if the existing logic works or if changes are required.
->>
+> Advertising guest.MAXPHYADDR < host.MAXPHYADDR in KVM_GET_SUPPORTED_CPUID simply
+> isn't viable when TDP is enabled.  I suppose KVM do so when allow_smaller_maxphyaddr
+> is enabled, but that's just asking for confusion, e.g. if userspace reflects the
+> CPUID back into the guest, it could unknowingly create a VM that depends on
+> allow_smaller_maxphyaddr.
+> 
+> I think the least awful option is to have the kernel expose whether or not the
+> CPU support 5-level EPT to userspace.  That doesn't even require new uAPI per se,
+> just a new flag in /proc/cpuinfo.  It'll be a bit gross for userspace to parse,
+> but it's not the end of the world.  Alternatively, KVM could add a capability to
+> enumerate the max *addressable* GPA, but userspace would still need to manually
+> take action when KVM can't address all of memory, i.e. a capability would be less
+> ugly, but wouldn't meaningfully change userspace's responsibilities.
 
-Right, but 288, 308 and 500 are being used in the PV sie tests and could 
-be integrated.
+Yes, exposing whether the CPU support 5-level EPT is indeed a better solution, it
+not only bypasses the KVM_GET_SUPPORTED_CPUID but also provides the information to
+userspace.
+
+I think a new KVM capability to enumerate the max GPA is better since it will be
+more convenient if userspace wants to use, e.g., automatically limit physical bits
+or the GPA in the user memory region.
+
+But only reporting this capability can’t solve the KVM hang issue, userspace can
+choose to ignore the max GPA, e.g., six selftests in changelog are still failed. I
+think we can reconsider patch2 if we don’t advertise
+guest.MAXPHYADDR < host.MAXPHYADDR in KVM_GET_SUPPORTED_CPUID.
+
+Thanks,
+Tao
+
+> 
+> I.e.
+> 
+> diff --git a/arch/x86/include/asm/vmxfeatures.h b/arch/x86/include/asm/vmxfeatures.h
+> index c6a7eed03914..266daf5b5b84 100644
+> --- a/arch/x86/include/asm/vmxfeatures.h
+> +++ b/arch/x86/include/asm/vmxfeatures.h
+> @@ -25,6 +25,7 @@
+>  #define VMX_FEATURE_EPT_EXECUTE_ONLY   ( 0*32+ 17) /* "ept_x_only" EPT entries can be execute only */
+>  #define VMX_FEATURE_EPT_AD             ( 0*32+ 18) /* EPT Accessed/Dirty bits */
+>  #define VMX_FEATURE_EPT_1GB            ( 0*32+ 19) /* 1GB EPT pages */
+> +#define VMX_FEATURE_EPT_5LEVEL         ( 0*32+ 20) /* 5-level EPT paging */
+>  
+>  /* Aggregated APIC features 24-27 */
+>  #define VMX_FEATURE_FLEXPRIORITY       ( 0*32+ 24) /* TPR shadow + virt APIC */
+> diff --git a/arch/x86/kernel/cpu/feat_ctl.c b/arch/x86/kernel/cpu/feat_ctl.c
+> index 03851240c3e3..1640ae76548f 100644
+> --- a/arch/x86/kernel/cpu/feat_ctl.c
+> +++ b/arch/x86/kernel/cpu/feat_ctl.c
+> @@ -72,6 +72,8 @@ static void init_vmx_capabilities(struct cpuinfo_x86 *c)
+>                 c->vmx_capability[MISC_FEATURES] |= VMX_F(EPT_AD);
+>         if (ept & VMX_EPT_1GB_PAGE_BIT)
+>                 c->vmx_capability[MISC_FEATURES] |= VMX_F(EPT_1GB);
+> +       if (ept & VMX_EPT_PAGE_WALK_5_BIT)
+> +               c->vmx_capability[MISC_FEATURES] |= VMX_F(EPT_5LEVEL);
+>  
+>         /* Synthetic APIC features that are aggregates of multiple features. */
+>         if ((c->vmx_capability[PRIMARY_CTLS] & VMX_F(VIRTUAL_TPR)) &&
+> 
 
