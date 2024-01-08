@@ -1,50 +1,51 @@
-Return-Path: <kvm+bounces-5841-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5842-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A886C827561
-	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 17:37:54 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D57B882756C
+	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 17:38:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0EB41C21A6F
-	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 16:37:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E346AB2290C
+	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 16:38:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28BFA53E17;
-	Mon,  8 Jan 2024 16:37:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FF7B5467A;
+	Mon,  8 Jan 2024 16:37:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q9WZp2WE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SoCgnFHk"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72CF95381A
-	for <kvm@vger.kernel.org>; Mon,  8 Jan 2024 16:37:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36C8953E3E
+	for <kvm@vger.kernel.org>; Mon,  8 Jan 2024 16:37:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704731862;
+	s=mimecast20190719; t=1704731867;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=rjva5D5HUZRLSUeQ7TC2x2FhyuCk/YO2hvk35Ore6vo=;
-	b=Q9WZp2WEQvuaggzd1Q6EEB5GL/t6lvcu9K06sUA0yv0Q8mYo22fzkUr4xHsnsWQBPO3t/s
-	4mI8mAcf5m8xfrlmcEwsyoJmRBh4cwk4+1nNV4QLy+k6/MecR3VD0jZ+otqlaj1kl9xw/E
-	AhZAHq6L/YHoPAV2iow+zyKOQATGW/I=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8JyAVituzHKzz/zXpAv4OyXDfgV7BDAfn1K6NqR7fpw=;
+	b=SoCgnFHkdt2bGSZhVpbxugzlii7A0UlDJhcSuPqp7weTQdlZ/zMYbxdxit+NTmaa0f3ha9
+	EE8oY5737PSF76e3m0jKjlwCFbNCNDgYRq7ojodaagIi35bH5mWqb162VKXnxVTK9AdeFr
+	IxJYtXTSIGCpJFhfGdse21xe3VnBmCg=
 Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
  by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-481--kLtvrfXP5mrmG7Uj0NylQ-1; Mon,
- 08 Jan 2024 11:37:39 -0500
-X-MC-Unique: -kLtvrfXP5mrmG7Uj0NylQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-93-K2rcKz65PC2__aIEFAB_Tw-1; Mon,
+ 08 Jan 2024 11:37:42 -0500
+X-MC-Unique: K2rcKz65PC2__aIEFAB_Tw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A24AE1C06915;
-	Mon,  8 Jan 2024 16:37:38 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5094B3813BC2;
+	Mon,  8 Jan 2024 16:37:41 +0000 (UTC)
 Received: from localhost (unknown [10.39.194.85])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id F3AF01C060AF;
-	Mon,  8 Jan 2024 16:37:36 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 14E8B2026F95;
+	Mon,  8 Jan 2024 16:37:40 +0000 (UTC)
 From: Stefan Hajnoczi <stefanha@redhat.com>
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org,
@@ -123,173 +124,112 @@ Cc: qemu-s390x@nongnu.org,
 	Fabiano Rosas <farosas@suse.de>,
 	Akihiko Odaki <akihiko.odaki@daynix.com>,
 	David Hildenbrand <david@redhat.com>
-Subject: [PULL 0/6] Block patches
-Date: Mon,  8 Jan 2024 11:37:29 -0500
-Message-ID: <20240108163735.254732-1-stefanha@redhat.com>
+Subject: [PULL 1/6] iothread: Remove unused Error** argument in aio_context_set_aio_params
+Date: Mon,  8 Jan 2024 11:37:30 -0500
+Message-ID: <20240108163735.254732-2-stefanha@redhat.com>
+In-Reply-To: <20240108163735.254732-1-stefanha@redhat.com>
+References: <20240108163735.254732-1-stefanha@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
 
-The following changes since commit ffd454c67e38cc6df792733ebc5d967eee28ac0d:
+From: Philippe Mathieu-Daudé <philmd@linaro.org>
 
-  Merge tag 'pull-vfio-20240107' of https://github.com/legoater/qemu into staging (2024-01-08 10:28:42 +0000)
+aio_context_set_aio_params() doesn't use its undocumented
+Error** argument. Remove it to simplify.
 
-are available in the Git repository at:
+Note this removes a use of "unchecked Error**" in
+iothread_set_aio_context_params().
 
-  https://gitlab.com/stefanha/qemu.git tags/block-pull-request
+Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20231120171806.19361-1-philmd@linaro.org>
+---
+ include/block/aio.h | 3 +--
+ iothread.c          | 3 +--
+ util/aio-posix.c    | 3 +--
+ util/aio-win32.c    | 3 +--
+ util/main-loop.c    | 5 +----
+ 5 files changed, 5 insertions(+), 12 deletions(-)
 
-for you to fetch changes up to 0b2675c473f68f13bc5ca1dd1c43ce421542e7b8:
-
-  Rename "QEMU global mutex" to "BQL" in comments and docs (2024-01-08 10:45:43 -0500)
-
-----------------------------------------------------------------
-Pull request
-
-----------------------------------------------------------------
-
-Philippe Mathieu-Daudé (1):
-  iothread: Remove unused Error** argument in aio_context_set_aio_params
-
-Stefan Hajnoczi (5):
-  system/cpus: rename qemu_mutex_lock_iothread() to bql_lock()
-  qemu/main-loop: rename QEMU_IOTHREAD_LOCK_GUARD to BQL_LOCK_GUARD
-  qemu/main-loop: rename qemu_cond_wait_iothread() to
-    qemu_cond_wait_bql()
-  Replace "iothread lock" with "BQL" in comments
-  Rename "QEMU global mutex" to "BQL" in comments and docs
-
- docs/devel/multi-thread-tcg.rst      |   7 +-
- docs/devel/qapi-code-gen.rst         |   2 +-
- docs/devel/replay.rst                |   2 +-
- docs/devel/reset.rst                 |   2 +-
- docs/devel/multiple-iothreads.txt    |  14 ++--
- hw/display/qxl.h                     |   2 +-
- include/block/aio-wait.h             |   2 +-
- include/block/aio.h                  |   3 +-
- include/block/blockjob.h             |   6 +-
- include/exec/cpu-common.h            |   2 +-
- include/exec/memory.h                |   4 +-
- include/exec/ramblock.h              |   2 +-
- include/io/task.h                    |   2 +-
- include/migration/register.h         |   8 +-
- include/qemu/coroutine-core.h        |   2 +-
- include/qemu/coroutine.h             |   2 +-
- include/qemu/main-loop.h             |  68 ++++++++-------
- include/qemu/thread.h                |   2 +-
- target/arm/internals.h               |   4 +-
- accel/accel-blocker.c                |  10 +--
- accel/dummy-cpus.c                   |   8 +-
- accel/hvf/hvf-accel-ops.c            |   4 +-
- accel/kvm/kvm-accel-ops.c            |   4 +-
- accel/kvm/kvm-all.c                  |  22 ++---
- accel/tcg/cpu-exec.c                 |  26 +++---
- accel/tcg/cputlb.c                   |  20 ++---
- accel/tcg/tcg-accel-ops-icount.c     |   6 +-
- accel/tcg/tcg-accel-ops-mttcg.c      |  12 +--
- accel/tcg/tcg-accel-ops-rr.c         |  18 ++--
- accel/tcg/tcg-accel-ops.c            |   2 +-
- accel/tcg/translate-all.c            |   2 +-
- cpu-common.c                         |   4 +-
- dump/dump.c                          |   4 +-
- hw/block/dataplane/virtio-blk.c      |   8 +-
- hw/block/virtio-blk.c                |   2 +-
- hw/core/cpu-common.c                 |   6 +-
- hw/display/virtio-gpu.c              |   2 +-
- hw/i386/intel_iommu.c                |   6 +-
- hw/i386/kvm/xen_evtchn.c             |  30 +++----
- hw/i386/kvm/xen_gnttab.c             |   2 +-
- hw/i386/kvm/xen_overlay.c            |   2 +-
- hw/i386/kvm/xen_xenstore.c           |   2 +-
- hw/intc/arm_gicv3_cpuif.c            |   2 +-
- hw/intc/s390_flic.c                  |  18 ++--
- hw/mips/mips_int.c                   |   2 +-
- hw/misc/edu.c                        |   4 +-
- hw/misc/imx6_src.c                   |   2 +-
- hw/misc/imx7_src.c                   |   2 +-
- hw/net/xen_nic.c                     |   8 +-
- hw/ppc/pegasos2.c                    |   2 +-
- hw/ppc/ppc.c                         |   6 +-
- hw/ppc/spapr.c                       |   2 +-
- hw/ppc/spapr_events.c                |   2 +-
- hw/ppc/spapr_rng.c                   |   4 +-
- hw/ppc/spapr_softmmu.c               |   4 +-
- hw/remote/mpqemu-link.c              |  22 ++---
- hw/remote/vfio-user-obj.c            |   2 +-
- hw/s390x/s390-skeys.c                |   2 +-
- hw/scsi/virtio-scsi-dataplane.c      |   6 +-
- iothread.c                           |   3 +-
- migration/block-dirty-bitmap.c       |  14 ++--
- migration/block.c                    |  38 ++++-----
- migration/colo.c                     |  62 +++++++-------
- migration/dirtyrate.c                |  12 +--
- migration/migration.c                |  54 ++++++------
- migration/ram.c                      |  16 ++--
- net/tap.c                            |   2 +-
- replay/replay-internal.c             |   2 +-
- semihosting/console.c                |   8 +-
- stubs/iothread-lock.c                |   6 +-
- system/cpu-throttle.c                |   6 +-
- system/cpus.c                        |  55 +++++++------
- system/dirtylimit.c                  |   4 +-
- system/memory.c                      |   2 +-
- system/physmem.c                     |  14 ++--
- system/runstate.c                    |   2 +-
- system/watchpoint.c                  |   4 +-
- target/arm/arm-powerctl.c            |  14 ++--
- target/arm/helper.c                  |   6 +-
- target/arm/hvf/hvf.c                 |   8 +-
- target/arm/kvm.c                     |   8 +-
- target/arm/ptw.c                     |   6 +-
- target/arm/tcg/helper-a64.c          |   8 +-
- target/arm/tcg/m_helper.c            |   6 +-
- target/arm/tcg/op_helper.c           |  24 +++---
- target/arm/tcg/psci.c                |   2 +-
- target/hppa/int_helper.c             |   8 +-
- target/i386/hvf/hvf.c                |   6 +-
- target/i386/kvm/hyperv.c             |   4 +-
- target/i386/kvm/kvm.c                |  28 +++----
- target/i386/kvm/xen-emu.c            |  16 ++--
- target/i386/nvmm/nvmm-accel-ops.c    |   6 +-
- target/i386/nvmm/nvmm-all.c          |  20 ++---
- target/i386/tcg/sysemu/fpu_helper.c  |   6 +-
- target/i386/tcg/sysemu/misc_helper.c |   4 +-
- target/i386/whpx/whpx-accel-ops.c    |   6 +-
- target/i386/whpx/whpx-all.c          |  24 +++---
- target/loongarch/tcg/csr_helper.c    |   4 +-
- target/mips/kvm.c                    |   4 +-
- target/mips/tcg/sysemu/cp0_helper.c  |   4 +-
- target/openrisc/sys_helper.c         |  16 ++--
- target/ppc/excp_helper.c             |  14 ++--
- target/ppc/helper_regs.c             |   2 +-
- target/ppc/kvm.c                     |   4 +-
- target/ppc/misc_helper.c             |   8 +-
- target/ppc/timebase_helper.c         |   8 +-
- target/riscv/cpu_helper.c            |   4 +-
- target/s390x/kvm/kvm.c               |   4 +-
- target/s390x/tcg/misc_helper.c       | 118 +++++++++++++--------------
- target/sparc/int32_helper.c          |   2 +-
- target/sparc/int64_helper.c          |   6 +-
- target/sparc/win_helper.c            |  20 ++---
- target/xtensa/exc_helper.c           |   8 +-
- ui/spice-core.c                      |   6 +-
- util/aio-posix.c                     |   3 +-
- util/aio-win32.c                     |   3 +-
- util/async.c                         |   2 +-
- util/main-loop.c                     |  13 ++-
- util/qsp.c                           |   6 +-
- util/rcu.c                           |  16 ++--
- audio/coreaudio.m                    |   8 +-
- memory_ldst.c.inc                    |  18 ++--
- target/i386/hvf/README.md            |   2 +-
- ui/cocoa.m                           |  56 ++++++-------
- 124 files changed, 646 insertions(+), 655 deletions(-)
-
+diff --git a/include/block/aio.h b/include/block/aio.h
+index af05512a7d..c802a392e5 100644
+--- a/include/block/aio.h
++++ b/include/block/aio.h
+@@ -699,8 +699,7 @@ void aio_context_set_poll_params(AioContext *ctx, int64_t max_ns,
+  * @max_batch: maximum number of requests in a batch, 0 means that the
+  *             engine will use its default
+  */
+-void aio_context_set_aio_params(AioContext *ctx, int64_t max_batch,
+-                                Error **errp);
++void aio_context_set_aio_params(AioContext *ctx, int64_t max_batch);
+ 
+ /**
+  * aio_context_set_thread_pool_params:
+diff --git a/iothread.c b/iothread.c
+index b753286414..6c1fc8c856 100644
+--- a/iothread.c
++++ b/iothread.c
+@@ -170,8 +170,7 @@ static void iothread_set_aio_context_params(EventLoopBase *base, Error **errp)
+     }
+ 
+     aio_context_set_aio_params(iothread->ctx,
+-                               iothread->parent_obj.aio_max_batch,
+-                               errp);
++                               iothread->parent_obj.aio_max_batch);
+ 
+     aio_context_set_thread_pool_params(iothread->ctx, base->thread_pool_min,
+                                        base->thread_pool_max, errp);
+diff --git a/util/aio-posix.c b/util/aio-posix.c
+index 7f2c99729d..266c9dd35f 100644
+--- a/util/aio-posix.c
++++ b/util/aio-posix.c
+@@ -777,8 +777,7 @@ void aio_context_set_poll_params(AioContext *ctx, int64_t max_ns,
+     aio_notify(ctx);
+ }
+ 
+-void aio_context_set_aio_params(AioContext *ctx, int64_t max_batch,
+-                                Error **errp)
++void aio_context_set_aio_params(AioContext *ctx, int64_t max_batch)
+ {
+     /*
+      * No thread synchronization here, it doesn't matter if an incorrect value
+diff --git a/util/aio-win32.c b/util/aio-win32.c
+index 948ef47a4d..d144f9391f 100644
+--- a/util/aio-win32.c
++++ b/util/aio-win32.c
+@@ -438,7 +438,6 @@ void aio_context_set_poll_params(AioContext *ctx, int64_t max_ns,
+     }
+ }
+ 
+-void aio_context_set_aio_params(AioContext *ctx, int64_t max_batch,
+-                                Error **errp)
++void aio_context_set_aio_params(AioContext *ctx, int64_t max_batch)
+ {
+ }
+diff --git a/util/main-loop.c b/util/main-loop.c
+index 797b640c41..63b4cda84a 100644
+--- a/util/main-loop.c
++++ b/util/main-loop.c
+@@ -192,10 +192,7 @@ static void main_loop_update_params(EventLoopBase *base, Error **errp)
+         return;
+     }
+ 
+-    aio_context_set_aio_params(qemu_aio_context, base->aio_max_batch, errp);
+-    if (*errp) {
+-        return;
+-    }
++    aio_context_set_aio_params(qemu_aio_context, base->aio_max_batch);
+ 
+     aio_context_set_thread_pool_params(qemu_aio_context, base->thread_pool_min,
+                                        base->thread_pool_max, errp);
 -- 
 2.43.0
 
