@@ -1,119 +1,125 @@
-Return-Path: <kvm+bounces-5911-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5912-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8288F828F72
-	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 23:08:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EB9E828F9C
+	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 23:17:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 06A29B21AA3
-	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 22:08:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B1DE3B25739
+	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 22:17:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A75703DBBB;
-	Tue,  9 Jan 2024 22:08:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBFBA3E487;
+	Tue,  9 Jan 2024 22:16:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="NCRmx0F1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qB46A5Sp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34DDF3DB98;
-	Tue,  9 Jan 2024 22:08:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 2EB3A40E01B2;
-	Tue,  9 Jan 2024 22:08:34 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id KiOhwCe-g0qp; Tue,  9 Jan 2024 22:08:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1704838112; bh=worxUdT9KOJEranFxZps6GXVgd62mc3IxDyhlGzs0cY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NCRmx0F1AvON411bFZmisI9EYkIitCHfOHXNYd/eCzvNPdZfDISwu7fxP5jInn05r
-	 Y7lHFxA3DeKeTHPE930sls+OiWOCmJluo7488AyOZIeKFkRBkXl2iUXCM8GGAreu2s
-	 nFVP+KSf04QKZX8XUej+18buuwurHIpE5XqekAMmpz6b5D4hIg7C9Vq8JnfDSvK7Sy
-	 qU7lJntAy1iA9V0KB54lFK7akmoJKnPsdVXl5AolCQBWq9w9WIZwHY6WUxvlUroeg0
-	 diJ9wGF38YnE3SZilIAzaW5qNKm2F9v1diPgYGTnNwzJXVyHBtrRIfSRqsapjUEATl
-	 CgmEb2dNA4CxcF/AJXsFTCxWsREDxUH2GiD+OhVGLIRJyKhH66wOWD01MkSsnjfjM5
-	 AkSZF01kqKAu+GP9zgYSV8pKHeGnbktYaoFbibduOXOGpbiutLCXU2O9aHjtJ//yYM
-	 qfekQTSH0ZeRz8qcU6k66AkfK9KgngakBU6iZQwadHQM9UkvyqXiu7tX4RYyPA641c
-	 T+xwcwaFrEkuXAle/ZJdyJlEWyG42lZfjFyclRehF8GfV6jAqmGNWv26aQm0zdHwn4
-	 Cc+99gALtyJcjitB/MLC0x+ZYPEpwh4qBL7mc4fL8Kfm7T4aQubP2IeUc2hPA7eLVs
-	 D5BX6VxTFc2YtIkwtP3VCTyY=
-Received: from zn.tnic (pd9530f8c.dip0.t-ipconnect.de [217.83.15.140])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 7C72340E016C;
-	Tue,  9 Jan 2024 22:07:52 +0000 (UTC)
-Date: Tue, 9 Jan 2024 23:07:46 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Michael Roth <michael.roth@amd.com>
-Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
-	linux-crypto@vger.kernel.org, x86@kernel.org,
-	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-	tony.luck@intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-	alpergun@google.com, jarkko@kernel.org, ashish.kalra@amd.com,
-	nikunj.dadhania@amd.com, pankaj.gupta@amd.com,
-	liam.merwick@oracle.com, zhi.a.wang@intel.com,
-	Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH v10 07/50] x86/sev: Add RMP entry lookup helpers
-Message-ID: <20240109220746.GAZZ3DsouxpiUPeBVN@fat_crate.local>
-References: <20231016132819.1002933-1-michael.roth@amd.com>
- <20231016132819.1002933-8-michael.roth@amd.com>
- <20231114142442.GCZVODKh03BoMFdlmj@fat_crate.local>
- <20231219033150.m4x6yh6udupkdqaa@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1D393C6A4;
+	Tue,  9 Jan 2024 22:16:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA61FC433F1;
+	Tue,  9 Jan 2024 22:16:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704838610;
+	bh=EHvco0VkqOSJGuxdue1TEtXAL00jI8VZrVZxCAuX2+E=;
+	h=From:Subject:Date:To:Cc:From;
+	b=qB46A5SpFD/NpmrZNfvwVgTddKr4FozL/Nm6NTWqjJuavIDeYbyWj8WbTz/AJAYAd
+	 rCq1xH2+lrNbAzymhVqtxXCmJQYKKBtigLbuskx+y07oOM7Fuhn5KtE5lAQldU86ff
+	 zsHlTOsJZDWVdq5RMMJKOsWvG0Sf8ZHgtVjZur4CTnnCh2KmHRiE+g9IYh0N3JSxTK
+	 HD8CBIbqmmGPG+MOnwgxTifgp44rGjZZFXk0l6vXeduRl6TLk9LScel7oWlPR5uz1g
+	 UsvtcwNt/LBd82QaDZxv1VzpZC3HDPVzq86WEch1mZNDSm/ODiPUOVtCeJtXC34hlE
+	 7d2vmCHDFTLIQ==
+From: Nathan Chancellor <nathan@kernel.org>
+Subject: [PATCH 0/3] Update LLVM Phabricator and Bugzilla links
+Date: Tue, 09 Jan 2024 15:16:28 -0700
+Message-Id: <20240109-update-llvm-links-v1-0-eb09b59db071@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20231219033150.m4x6yh6udupkdqaa@amd.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIALzFnWUC/x3MQQqAIBBA0avErBtQi8CuEi0kpxoyCy0JwrsnL
+ d/i/xciBaYIffVCoMSRD18g6wqm1fiFkG0xKKFaIYXG+7TmInQu7ejYbxGtaGZtu1aTJCjdGWj
+ m538OY84fszs+Z2MAAAA=
+To: akpm@linux-foundation.org
+Cc: llvm@lists.linux.dev, patches@lists.linux.dev, 
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, 
+ linux-riscv@lists.infradead.org, linux-trace-kernel@vger.kernel.org, 
+ linux-s390@vger.kernel.org, linux-pm@vger.kernel.org, 
+ linux-crypto@vger.kernel.org, linux-efi@vger.kernel.org, 
+ amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org, 
+ linux-media@vger.kernel.org, linux-arch@vger.kernel.org, 
+ kasan-dev@googlegroups.com, linux-mm@kvack.org, bridge@lists.linux.dev, 
+ netdev@vger.kernel.org, linux-security-module@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, Nathan Chancellor <nathan@kernel.org>, 
+ ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, mykolal@fb.com, 
+ bpf@vger.kernel.org
+X-Mailer: b4 0.13-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2460; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=EHvco0VkqOSJGuxdue1TEtXAL00jI8VZrVZxCAuX2+E=;
+ b=owGbwMvMwCUmm602sfCA1DTG02pJDKlzj17YHOFbeqmmzSTv+Yl3Dvc2pO2+wn2gftPWtOlmz
+ ZFzErc87ShlYRDjYpAVU2Spfqx63NBwzlnGG6cmwcxhZQIZwsDFKQATcYlj+J+VsOtwv+FtLr6v
+ L2ptJLoTJ1xwvPM+afI7W55fz9vnRocyMsxLsi56rXP33S6VMzNvVJ4tXR/xeu4ma9Zvvc8ruWO
+ PdPIDAA==
+X-Developer-Key: i=nathan@kernel.org; a=openpgp;
+ fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-On Mon, Dec 18, 2023 at 09:31:50PM -0600, Michael Roth wrote:
-> I've moved this to sev.h, but it RMP_PG_SIZE_4K is already defined there
-> and used by a bunch of guest code so it's a bit out-of-place to update
-> those as part of this patchset. I can send a follow-up series to clean up
-> some of the naming and get rid of sev-common.h
+This series updates all instances of LLVM Phabricator and Bugzilla links
+to point to GitHub commits directly and LLVM's Bugzilla to GitHub issue
+shortlinks respectively.
 
-Yap, good idea.
+I split up the Phabricator patch into BPF selftests and the rest of the
+kernel in case the BPF folks want to take it separately from the rest of
+the series, there are obviously no dependency issues in that case. The
+Bugzilla change was mechanical enough and should have no conflicts.
 
-> Doesn't seem like it would be an issue, maybe some fallout from any
-> files that previously only included sev-common.h and now need to pull in
-> guest struct definitions as well, but those definitions don't have a lot
-> of external dependencies so don't anticipate any header include
-> hellishness. I'll send that as a separate follow-up, along with some of
-> the renames you suggested above since they'll touch guest code and
-> create unecessary churn for SNP host support.
+I am aiming this at Andrew and CC'ing other lists, in case maintainers
+want to chime in, but I think this is pretty uncontroversial (famous
+last words...).
 
-OTOH, people recently have started looking at including only that stuff
-which is really used so having a single header would cause more
-preprocessing effort. I'm not too crazy about it as the preprocessing
-overhead is barely measurable so might as well have a single header and
-then split it later...
+---
+Nathan Chancellor (3):
+      selftests/bpf: Update LLVM Phabricator links
+      arch and include: Update LLVM Phabricator links
+      treewide: Update LLVM Bugzilla links
 
-Definitely something for the after-burner and not important right now.
+ arch/arm64/Kconfig                                 |  4 +--
+ arch/powerpc/Makefile                              |  4 +--
+ arch/powerpc/kvm/book3s_hv_nested.c                |  2 +-
+ arch/riscv/Kconfig                                 |  2 +-
+ arch/riscv/include/asm/ftrace.h                    |  2 +-
+ arch/s390/include/asm/ftrace.h                     |  2 +-
+ arch/x86/power/Makefile                            |  2 +-
+ crypto/blake2b_generic.c                           |  2 +-
+ drivers/firmware/efi/libstub/Makefile              |  2 +-
+ drivers/gpu/drm/amd/amdgpu/sdma_v4_4_2.c           |  2 +-
+ drivers/media/test-drivers/vicodec/codec-fwht.c    |  2 +-
+ drivers/regulator/Kconfig                          |  2 +-
+ include/asm-generic/vmlinux.lds.h                  |  2 +-
+ include/linux/compiler-clang.h                     |  2 +-
+ lib/Kconfig.kasan                                  |  2 +-
+ lib/raid6/Makefile                                 |  2 +-
+ lib/stackinit_kunit.c                              |  2 +-
+ mm/slab_common.c                                   |  2 +-
+ net/bridge/br_multicast.c                          |  2 +-
+ security/Kconfig                                   |  2 +-
+ tools/testing/selftests/bpf/README.rst             | 32 +++++++++++-----------
+ tools/testing/selftests/bpf/prog_tests/xdpwall.c   |  2 +-
+ .../selftests/bpf/progs/test_core_reloc_type_id.c  |  2 +-
+ 23 files changed, 40 insertions(+), 40 deletions(-)
+---
+base-commit: 0dd3ee31125508cd67f7e7172247f05b7fd1753a
+change-id: 20240109-update-llvm-links-d03f9d649e1e
 
-Thx.
-
+Best regards,
 -- 
-Regards/Gruss,
-    Boris.
+Nathan Chancellor <nathan@kernel.org>
 
-https://people.kernel.org/tglx/notes-about-netiquette
 
