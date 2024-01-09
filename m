@@ -1,103 +1,141 @@
-Return-Path: <kvm+bounces-5898-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5899-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF85C8289E3
-	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 17:23:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0313828A0A
+	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 17:32:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1AFC71C246DC
-	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 16:23:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F6A7284434
+	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 16:32:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E692F3A1CF;
-	Tue,  9 Jan 2024 16:23:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C36493A8CF;
+	Tue,  9 Jan 2024 16:32:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aLy5R4eJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JdSUXQnr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A254F3A8C5
-	for <kvm@vger.kernel.org>; Tue,  9 Jan 2024 16:23:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2cd703e9014so2777021fa.1
-        for <kvm@vger.kernel.org>; Tue, 09 Jan 2024 08:23:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704817419; x=1705422219; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Wsg7zMm5Fdy1jA8s3lcgjoxedub8Q57T3G6fYjwRVq8=;
-        b=aLy5R4eJCtQBcGHlPLkaa7GzgSp+w9xNL8HAoQHWSSbGrme9zy2Z6dpsv1upqdOCEh
-         j6jKDWQP7DOUQ8ISQX+28hEwSlOgo/O0Ky02rl21ed2+HP0d4xykaOv7r57mP4R4GjgH
-         c1nDgUPb5H3ADAN8ZTf5EOZK/InBBK/ntU3cgpcYTHX7FIm0q8bGYJZxZ2OHoZVOprzt
-         chLmyta9CIbd96ZKggKoWA9sBepgDPmhV7iW5hT+SQeFgCu+XJUs3Myt416ZlQ66VEaD
-         eoeZWFqANPy/AoeMSH2qCsWOuE1zfSiitAvNvvDYCeOk1ZZStBI97TwxDPByrek/AwHa
-         n3eQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704817419; x=1705422219;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Wsg7zMm5Fdy1jA8s3lcgjoxedub8Q57T3G6fYjwRVq8=;
-        b=hpDKWJYGHLvidWsLQvAnO3Nd2RcQoxtaliGatBtmXP9QaDbaM155CL1XjZ0PdyI0Bf
-         vTJWyjuPYQ5UxYJ8CiyeRKhmdzFuZ80eHECkHYvL4AW6A4uoS6qBEPNLUyI3LizntQg2
-         V+JBRX/A/AhJQ/i3VcgYgI0yYJxI2S+0/Gbc+o2VcDXNP6eRDNwo46QYmlThaKbTJxEJ
-         jmrGEK9Ox4RaEi33kipSx6xdYrhjRJ3MoUdim6cvnjZblu9ykGZygdg2tXhwc58pIVBL
-         BxZiHktAJXwEn28QmXtGLVnJS20ICRyd8zjSxJi2AhBfPJWA9tYPhEJ+U49UkLyJ7eia
-         vncw==
-X-Gm-Message-State: AOJu0YyOax1NGvPsmPn9Pm/J494JsQW4G2SjFoRDoylSdlbXbjFHtUQH
-	TksU4fyXpodeH7APxfIlBmF1l+0XJPcYcCdmCpOmNoFjp8si
-X-Google-Smtp-Source: AGHT+IENINkHdScslGoH1+e94F8Ik5C9aYB8w1MwoOyMisInkBOG5KStveZ4xiPiBsZa81JjQmBLru7M1qN9QTUClhM=
-X-Received: by 2002:a2e:b712:0:b0:2cc:788a:3d4d with SMTP id
- j18-20020a2eb712000000b002cc788a3d4dmr2530358ljo.51.1704817418515; Tue, 09
- Jan 2024 08:23:38 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F7513A8C1
+	for <kvm@vger.kernel.org>; Tue,  9 Jan 2024 16:32:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1704817952; x=1736353952;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=lq/alh0+QIDMJk8UzRpq0dUPGFZAHpyHNUvoUPsvRgQ=;
+  b=JdSUXQnr09tcB81H/KQJosdXGf1JbXgiSVeuARovJDriJV54yOMj42+Z
+   0RxVEH+HgDMWo33XVui3uUvWNrfGV3P92ZCUjtY8ys4ibm3tqhmxxkAQA
+   ff9+dv8FDhBM5d7D/P2REcACiK+Aah6FsuH2TJbmg8Na0G5gWUHl8cFTh
+   JsVq90ClRq2Cs9m+ibMappPaMFSOVjve3g9YDaL6jGtw6MFG+2usG0Re+
+   FORzPq3d2KTSy5Vyl2zMFNqLa8NlnD2DIk7jP3BHY4gHl0G1phMyecotS
+   G89kc8dyxwxuAve2NVCMSAXJ2mgaOJh9kAtrzfYhS4OHnb1RY7GqzG3J3
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10947"; a="4996533"
+X-IronPort-AV: E=Sophos;i="6.04,183,1695711600"; 
+   d="scan'208";a="4996533"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2024 08:32:30 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10947"; a="872290734"
+X-IronPort-AV: E=Sophos;i="6.04,183,1695711600"; 
+   d="scan'208";a="872290734"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.22.149]) ([10.93.22.149])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2024 08:32:24 -0800
+Message-ID: <bd2679e7-46af-4875-ba42-b4ea413ec0a1@intel.com>
+Date: Wed, 10 Jan 2024 00:32:20 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231011195740.3349631-1-oliver.upton@linux.dev>
- <20231011195740.3349631-6-oliver.upton@linux.dev> <e0facec9-8c50-10cb-fd02-1214f9a49571@redhat.com>
- <ab1337bc-d4a2-0afc-3e26-0d50dff4ea73@huawei.com> <ZZx5y_iy9kXg47SW@linux.dev>
- <CAAdAUtie4GFKAPhk4wDWnEmSOzWF+X-6eHwS79169JRv_=hKdg@mail.gmail.com> <c90a3fb4-62b7-5642-433a-b0cfb41d6992@linux.dev>
-In-Reply-To: <c90a3fb4-62b7-5642-433a-b0cfb41d6992@linux.dev>
-From: Jing Zhang <jingzhangos@google.com>
-Date: Tue, 9 Jan 2024 08:23:26 -0800
-Message-ID: <CAAdAUthgbQ5i8gatF0daa6RPRUtQ79cU3renpBrjkHwroziA9w@mail.gmail.com>
-Subject: Re: [PATCH v3 5/5] KVM: arm64: selftests: Test for setting ID
- register from usersapce
-To: Zenghui Yu <zenghui.yu@linux.dev>
-Cc: Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Eric Auger <eauger@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-perf-users@vger.kernel.org, 
-	Mark Brown <broonie@kernel.org>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	James Morse <james.morse@arm.com>, Marc Zyngier <maz@kernel.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Adrian Hunter <adrian.hunter@intel.com>, 
-	Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>, Jiri Olsa <jolsa@kernel.org>, 
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Mark Rutland <mark.rutland@arm.com>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
-	Peter Zijlstra <peterz@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 06/70] kvm: Introduce support for memory_attributes
+Content-Language: en-US
+To: "Wang, Wei W" <wei.w.wang@intel.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, David Hildenbrand <david@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
+ <philmd@linaro.org>, Cornelia Huck <cohuck@redhat.com>,
+ =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ Michael Roth <michael.roth@amd.com>, Sean Christopherson
+ <seanjc@google.com>, Claudio Fontana <cfontana@suse.de>,
+ Gerd Hoffmann <kraxel@redhat.com>, Isaku Yamahata
+ <isaku.yamahata@gmail.com>, "Qiang, Chenyi" <chenyi.qiang@intel.com>
+References: <20231115071519.2864957-1-xiaoyao.li@intel.com>
+ <20231115071519.2864957-7-xiaoyao.li@intel.com>
+ <DS0PR11MB6373D69ABBF4BDF7120438ACDC8EA@DS0PR11MB6373.namprd11.prod.outlook.com>
+ <cc568b63-a129-4b23-8ac8-313193ea8126@intel.com>
+ <DS0PR11MB63737AFCA458FA78423C0BB7DC95A@DS0PR11MB6373.namprd11.prod.outlook.com>
+ <a0289f6d-2008-48d7-95fb-492066c38461@intel.com>
+ <DS0PR11MB63730289975875A5B90D078CDC95A@DS0PR11MB6373.namprd11.prod.outlook.com>
+ <1bc76559-20e7-4b20-a566-9491711f7a21@intel.com>
+ <DS0PR11MB637348501D03A18EE7C394C4DC6A2@DS0PR11MB6373.namprd11.prod.outlook.com>
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <DS0PR11MB637348501D03A18EE7C394C4DC6A2@DS0PR11MB6373.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Thanks Zenghui.
+On 1/9/2024 10:53 PM, Wang, Wei W wrote:
+> On Tuesday, January 9, 2024 1:47 PM, Li, Xiaoyao wrote:
+>> On 12/21/2023 9:47 PM, Wang, Wei W wrote:
+>>> On Thursday, December 21, 2023 7:54 PM, Li, Xiaoyao wrote:
+>>>> On 12/21/2023 6:36 PM, Wang, Wei W wrote:
+>>>>> No need to specifically check for KVM_MEMORY_ATTRIBUTE_PRIVATE
+>> there.
+>>>>> I'm suggesting below:
+>>>>>
+>>>>> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c index
+>>>>> 2d9a2455de..63ba74b221 100644
+>>>>> --- a/accel/kvm/kvm-all.c
+>>>>> +++ b/accel/kvm/kvm-all.c
+>>>>> @@ -1375,6 +1375,11 @@ static int kvm_set_memory_attributes(hwaddr
+>>>> start, hwaddr size, uint64_t attr)
+>>>>>         struct kvm_memory_attributes attrs;
+>>>>>         int r;
+>>>>>
+>>>>> +    if ((attr & kvm_supported_memory_attributes) != attr) {
+>>>>> +        error_report("KVM doesn't support memory attr %lx\n", attr);
+>>>>> +        return -EINVAL;
+>>>>> +    }
+>>>>
+>>>> In the case of setting a range of memory to shared while KVM doesn't
+>>>> support private memory. Above check doesn't work. and following IOCTL
+>> fails.
+>>>
+>>> SHARED attribute uses the value 0, which indicates it's always supported, no?
+>>> For the implementation, can you find in the KVM side where the ioctl
+>>> would get failed in that case?
+>>
+>> I'm worrying about the future case, that KVM supports other memory attribute
+>> than shared/private. For example, KVM supports RWX bits (bit 0
+>> - 2) but not shared/private bit.
+> 
+> What's the exact issue?
+> +#define KVM_MEMORY_ATTRIBUTE_READ               (1ULL << 2)
+> +#define KVM_MEMORY_ATTRIBUTE_WRITE             (1ULL << 1)
+> +#define KVM_MEMORY_ATTRIBUTE_EXE                  (1ULL << 0)
+> 
+> They are checked via
+> "if ((attr & kvm_supported_memory_attributes) != attr)" shared above in
+> kvm_set_memory_attributes.
+> In the case you described, kvm_supported_memory_attributes will be 0x7.
+> Anything unexpected?
 
-On Tue, Jan 9, 2024 at 7:37=E2=80=AFAM Zenghui Yu <zenghui.yu@linux.dev> wr=
-ote:
->
-> On 2024/1/9 09:31, Jing Zhang wrote:
-> > Hi Zenghui,
-> >
-> > I don't have a Cortex A72 to fully verify the fix. Could you help
-> > verify the following change?
->
-> It works for me (after fixing a compilation error locally ;-) ), thanks!
->
-> Zenghui
+Sorry that I thought for wrong case.
 
-Jing
+It doesn't work on the case that KVM doesn't support memory_attribute, 
+e.g., an old KVM. In this case, 'kvm_supported_memory_attributes' is 0, 
+and 'attr' is 0 as well.
 
