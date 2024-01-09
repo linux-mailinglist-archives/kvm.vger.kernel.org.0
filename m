@@ -1,118 +1,119 @@
-Return-Path: <kvm+bounces-5910-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5911-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 765B4828F60
-	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 23:03:18 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8288F828F72
+	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 23:08:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F6BF288A3E
-	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 22:03:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 06A29B21AA3
+	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 22:08:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF2F33DBA9;
-	Tue,  9 Jan 2024 22:03:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A75703DBBB;
+	Tue,  9 Jan 2024 22:08:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SDICOrhM"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="NCRmx0F1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFF543D99D
-	for <kvm@vger.kernel.org>; Tue,  9 Jan 2024 22:03:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5f874219ff9so29145197b3.0
-        for <kvm@vger.kernel.org>; Tue, 09 Jan 2024 14:03:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704837785; x=1705442585; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HrVZv+MUJLeYZ11n86dHXoyW3l+lTS8ohIoWXN+hW7A=;
-        b=SDICOrhMl+22khoF//KHqgyhBpS19odsoddjkYXAn9nDZqPz1qqSvh2Bg6gKYRp8gd
-         2BS/BhTtgeSM5lBgi9m6D71CzBWAgHOtIXeDgc6HteRAXGseGsMTyYjfmDLdWJs8yFtX
-         p5J3ZZEhJXskiMSpCPpZ1esZsWgySJKPixs4hipQkfq+XkO+wBMD76ejd1hIgkHuqKpS
-         Qn30BnwgtxFFI6zUHnxxoc+e754dgNTNXD+HiaIvE2JSqTpeYk6hEcLovxuHNunbCasl
-         eOkF/0ovk90EpbpGB5gGj/KvHnnWxLCIC+QVAihT8olFODKHrBkxgOPmhgM4iW/huINR
-         q3iw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704837785; x=1705442585;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HrVZv+MUJLeYZ11n86dHXoyW3l+lTS8ohIoWXN+hW7A=;
-        b=WPXXlrvesq4jvJfJM+DHegBn6Q02+gvm54zAqtx17KFNsHavfctd5/1xQuPYG+6Aki
-         dZyi6PghQwJfDfU6Hw1tBCvz0GBJ6brF6ovJs4nDPKcksoUcsX8q562QHq8sm2LM13Ba
-         sIveYxJN4NZiBNF+QYz2/I58CW3ADbYvhBqbbUBKNWqB7gs6IuujbztsWVPXW+zJpkXb
-         AeSLiODX0o9SaDXKzyjumZhy4ONo3CDzT0FX/cXujB07sxzq84+2TwnEvz3jyFeOR86h
-         fKmmqyzpZPq0DqRP3+oOadU9/qS/342Lh8u+yfXJwflVPqvwxN4/r6xHVa1Hsccqn3iR
-         onTQ==
-X-Gm-Message-State: AOJu0YyaD6pDLGfGjKrs05S/9tdGK5Rp5UXcm420paSJD4sxcSCUtVRY
-	Ku08/iQ8TJ0gXtVGbcMCA5nWXIccWSUwk1MCBg==
-X-Google-Smtp-Source: AGHT+IGQ6JSiSvkBHs+zj9h5i2g6UpszdWvJQeKMwoZF0FHD3plsI1CEe7cxVkt/AMMKZi6/6Ei4tRUeoXk=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:4483:b0:5e5:ff2b:3945 with SMTP id
- gr3-20020a05690c448300b005e5ff2b3945mr84393ywb.1.1704837784802; Tue, 09 Jan
- 2024 14:03:04 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue,  9 Jan 2024 14:03:02 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34DDF3DB98;
+	Tue,  9 Jan 2024 22:08:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 2EB3A40E01B2;
+	Tue,  9 Jan 2024 22:08:34 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id KiOhwCe-g0qp; Tue,  9 Jan 2024 22:08:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1704838112; bh=worxUdT9KOJEranFxZps6GXVgd62mc3IxDyhlGzs0cY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NCRmx0F1AvON411bFZmisI9EYkIitCHfOHXNYd/eCzvNPdZfDISwu7fxP5jInn05r
+	 Y7lHFxA3DeKeTHPE930sls+OiWOCmJluo7488AyOZIeKFkRBkXl2iUXCM8GGAreu2s
+	 nFVP+KSf04QKZX8XUej+18buuwurHIpE5XqekAMmpz6b5D4hIg7C9Vq8JnfDSvK7Sy
+	 qU7lJntAy1iA9V0KB54lFK7akmoJKnPsdVXl5AolCQBWq9w9WIZwHY6WUxvlUroeg0
+	 diJ9wGF38YnE3SZilIAzaW5qNKm2F9v1diPgYGTnNwzJXVyHBtrRIfSRqsapjUEATl
+	 CgmEb2dNA4CxcF/AJXsFTCxWsREDxUH2GiD+OhVGLIRJyKhH66wOWD01MkSsnjfjM5
+	 AkSZF01kqKAu+GP9zgYSV8pKHeGnbktYaoFbibduOXOGpbiutLCXU2O9aHjtJ//yYM
+	 qfekQTSH0ZeRz8qcU6k66AkfK9KgngakBU6iZQwadHQM9UkvyqXiu7tX4RYyPA641c
+	 T+xwcwaFrEkuXAle/ZJdyJlEWyG42lZfjFyclRehF8GfV6jAqmGNWv26aQm0zdHwn4
+	 Cc+99gALtyJcjitB/MLC0x+ZYPEpwh4qBL7mc4fL8Kfm7T4aQubP2IeUc2hPA7eLVs
+	 D5BX6VxTFc2YtIkwtP3VCTyY=
+Received: from zn.tnic (pd9530f8c.dip0.t-ipconnect.de [217.83.15.140])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 7C72340E016C;
+	Tue,  9 Jan 2024 22:07:52 +0000 (UTC)
+Date: Tue, 9 Jan 2024 23:07:46 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Michael Roth <michael.roth@amd.com>
+Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
+	linux-crypto@vger.kernel.org, x86@kernel.org,
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+	tony.luck@intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+	alpergun@google.com, jarkko@kernel.org, ashish.kalra@amd.com,
+	nikunj.dadhania@amd.com, pankaj.gupta@amd.com,
+	liam.merwick@oracle.com, zhi.a.wang@intel.com,
+	Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH v10 07/50] x86/sev: Add RMP entry lookup helpers
+Message-ID: <20240109220746.GAZZ3DsouxpiUPeBVN@fat_crate.local>
+References: <20231016132819.1002933-1-michael.roth@amd.com>
+ <20231016132819.1002933-8-michael.roth@amd.com>
+ <20231114142442.GCZVODKh03BoMFdlmj@fat_crate.local>
+ <20231219033150.m4x6yh6udupkdqaa@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
-Message-ID: <20240109220302.399296-1-seanjc@google.com>
-Subject: [PATCH] KVM: selftests: Delete superfluous, unused "stage" variable
- in AMX test
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20231219033150.m4x6yh6udupkdqaa@amd.com>
 
-Delete the AMX's tests "stage" counter, as the counter is no longer used,
-which makes clang unhappy:
+On Mon, Dec 18, 2023 at 09:31:50PM -0600, Michael Roth wrote:
+> I've moved this to sev.h, but it RMP_PG_SIZE_4K is already defined there
+> and used by a bunch of guest code so it's a bit out-of-place to update
+> those as part of this patchset. I can send a follow-up series to clean up
+> some of the naming and get rid of sev-common.h
 
-  x86_64/amx_test.c:224:6: error: variable 'stage' set but not used
-          int stage, ret;
-              ^
-  1 error generated.
+Yap, good idea.
 
-Note, "stage" was never really used, it just happened to be dumped out by
-a (failed) assertion on run->exit_reason, i.e. the AMX test has no concept
-of stages, the code was likely copy+pasted from a different test.
+> Doesn't seem like it would be an issue, maybe some fallout from any
+> files that previously only included sev-common.h and now need to pull in
+> guest struct definitions as well, but those definitions don't have a lot
+> of external dependencies so don't anticipate any header include
+> hellishness. I'll send that as a separate follow-up, along with some of
+> the renames you suggested above since they'll touch guest code and
+> create unecessary churn for SNP host support.
 
-Fixes: c96f57b08012 ("KVM: selftests: Make vCPU exit reason test assertion common")
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- tools/testing/selftests/kvm/x86_64/amx_test.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+OTOH, people recently have started looking at including only that stuff
+which is really used so having a single header would cause more
+preprocessing effort. I'm not too crazy about it as the preprocessing
+overhead is barely measurable so might as well have a single header and
+then split it later...
 
-diff --git a/tools/testing/selftests/kvm/x86_64/amx_test.c b/tools/testing/selftests/kvm/x86_64/amx_test.c
-index 11329e5ff945..309ee5c72b46 100644
---- a/tools/testing/selftests/kvm/x86_64/amx_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/amx_test.c
-@@ -221,7 +221,7 @@ int main(int argc, char *argv[])
- 	vm_vaddr_t amx_cfg, tiledata, xstate;
- 	struct ucall uc;
- 	u32 amx_offset;
--	int stage, ret;
-+	int ret;
- 
- 	/*
- 	 * Note, all off-by-default features must be enabled before anything
-@@ -263,7 +263,7 @@ int main(int argc, char *argv[])
- 	memset(addr_gva2hva(vm, xstate), 0, PAGE_SIZE * DIV_ROUND_UP(XSAVE_SIZE, PAGE_SIZE));
- 	vcpu_args_set(vcpu, 3, amx_cfg, tiledata, xstate);
- 
--	for (stage = 1; ; stage++) {
-+	for (;;) {
- 		vcpu_run(vcpu);
- 		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
- 
+Definitely something for the after-burner and not important right now.
 
-base-commit: 1c6d984f523f67ecfad1083bb04c55d91977bb15
+Thx.
+
 -- 
-2.43.0.472.g3155946c3a-goog
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
 
