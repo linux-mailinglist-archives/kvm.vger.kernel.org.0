@@ -1,145 +1,96 @@
-Return-Path: <kvm+bounces-5917-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5918-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33992828FE9
-	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 23:27:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02A40828FFF
+	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 23:34:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DBCED1F26354
-	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 22:27:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 97BDDB2386B
+	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 22:34:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 149E33DBA8;
-	Tue,  9 Jan 2024 22:27:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7F6D3E486;
+	Tue,  9 Jan 2024 22:33:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jGqcWJl4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="msiBcSjH"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DF4F3DB85
-	for <kvm@vger.kernel.org>; Tue,  9 Jan 2024 22:27:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 10 Jan 2024 07:27:28 +0900
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1704839258;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=//byNdyH4DaDg6zka9544r4yink0BmDgeQDdstjvKWQ=;
-	b=jGqcWJl4jdGTPDn20roC5JC6AemYhbYP9SdCADzwkGkWluW/slwz3mykj9KVcYMMTI0DiQ
-	lCsV/MXA4sqHcTPt1mPqjeCa5hnposboQVW0EtivSq0Ao2hMcm/slKPehGYem0LasrwYwW
-	6WEEdDMSRATkiwt2WQimd2K2SpChJMA=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Itaru Kitayama <itaru.kitayama@linux.dev>
-To: Jing Zhang <jingzhangos@google.com>
-Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
-	ARMLinux <linux-arm-kernel@lists.infradead.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v1] KVM: arm64: selftests: Handle feature fields with
- nonzero minimum value correctly
-Message-ID: <ZZ3IUPwhLKNv98QZ@vm3>
-References: <20240109165622.4104387-1-jingzhangos@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA2F33E46A
+	for <kvm@vger.kernel.org>; Tue,  9 Jan 2024 22:33:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5534180f0e9so1551a12.1
+        for <kvm@vger.kernel.org>; Tue, 09 Jan 2024 14:33:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1704839631; x=1705444431; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dvFkU4oKqZ1l9i2yu4stSdIuhBcnRcmyvuiaJ8Oo4Dc=;
+        b=msiBcSjHXBij+YioAitXdfNOcOQwiGOPiyFlYZo2fqzx8rdKAvoaq7ML2rvCV0Gozb
+         elkZA3OG8uAl09hcBM8WW5rONUMzL5zktg8JPcdANfnBkWlCo1dlxG9FnjVxylBVW6dj
+         fgDQEH4+g+BE7REC5sA4LB7RC9sS/bEcEc8qgoSeKMs8vS02JsgF2jUKd5zI1FSQtWiD
+         +yy5gxsrhXefLPjZJutOAGgMOZ8ah3ZEAsvMp4+qdMW0bSAtysbTEPVyt9dbbox97f3i
+         hiXk5mKnXHURiDZeUdKIAL8QmG86GNqkzmLgtZEjdncddeMUx/JRkTR0zGzMd5E6e+BD
+         uJ8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704839631; x=1705444431;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dvFkU4oKqZ1l9i2yu4stSdIuhBcnRcmyvuiaJ8Oo4Dc=;
+        b=TccBOTfKCRFUzbREKGIzK9TODawJw8Vc92vy0t7pVQ607bin67dWtoVOHGnaZeBeLX
+         wxVLug//2oOjB6RmdLEzYURfVV7T8ti/lkgQbdtNaljgw9/1uYO4htzMTzO21UYUu3yJ
+         8sT03lCsLZ4nZPOS6PWe6qCmuj30BkhitLJbb3C2NOnNk0d81F6vV7tGG8clLksCFEyV
+         wUf/a0ZzyrOMD3/ufw8FzwA7C4Fo85sKYXp1Q/WrXZo4KFqBB6fZaROsgspmdre6H7rs
+         7L1MvgoumX9qPR2WASsUAWy0vN5pIbugzorFjaOgkhXOVWEk4+u0i87RJkFTZ7iH0r2P
+         tkzg==
+X-Gm-Message-State: AOJu0Ywv6h5izHkfC6ujvw89hVRc0zolJ+j7vCV6ItPEyJ8+83VZG2m3
+	U9wp4velj//FrhUTMtP8gRZeWyXdRVDns0H+LWehsXH86xsu
+X-Google-Smtp-Source: AGHT+IGFxflM48pZzfzkW6nRGjsuAemEOAzgI4FfGvhUxRbXVUoNADL5g4qT6TagGC/hyFGQQAb8WRF2Yf7waUyDfZ8=
+X-Received: by 2002:a50:cd89:0:b0:557:1142:d5bb with SMTP id
+ p9-20020a50cd89000000b005571142d5bbmr79955edi.4.1704839631001; Tue, 09 Jan
+ 2024 14:33:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240109165622.4104387-1-jingzhangos@google.com>
-X-Migadu-Flow: FLOW_OUT
+References: <20240109220302.399296-1-seanjc@google.com>
+In-Reply-To: <20240109220302.399296-1-seanjc@google.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Tue, 9 Jan 2024 14:33:32 -0800
+Message-ID: <CALMp9eQTtb9r+Jn5KnrTs1HDkFm0MWSJ5LxW2_3jrRE14TZtUA@mail.gmail.com>
+Subject: Re: [PATCH] KVM: selftests: Delete superfluous, unused "stage"
+ variable in AMX test
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 09, 2024 at 08:56:21AM -0800, Jing Zhang wrote:
-> There are some feature fields with nonzero minimum valid value. Make
-> sure get_safe_value() won't return invalid field values for them.
-> Also fix a bug that wrongly uses the feature bits type as the feature
-> bits sign causing all fields as signed in the get_safe_value() and
-> get_invalid_value().
-> 
-> Fixes: 54a9ea73527d ("KVM: arm64: selftests: Test for setting ID register from usersapce")
-> Reported-by: Zenghui Yu <yuzenghui@huawei.com>
-> Reported-by: Itaru Kitayama <itaru.kitayama@linux.dev>
-> Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> ---
->  .../selftests/kvm/aarch64/set_id_regs.c       | 20 +++++++++++++++----
->  1 file changed, 16 insertions(+), 4 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-> index bac05210b539..f17454dc6d9e 100644
-> --- a/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-> +++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-> @@ -224,13 +224,20 @@ uint64_t get_safe_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
->  {
->  	uint64_t ftr_max = GENMASK_ULL(ARM64_FEATURE_FIELD_BITS - 1, 0);
->  
-> -	if (ftr_bits->type == FTR_UNSIGNED) {
-> +	if (ftr_bits->sign == FTR_UNSIGNED) {
->  		switch (ftr_bits->type) {
->  		case FTR_EXACT:
->  			ftr = ftr_bits->safe_val;
->  			break;
->  		case FTR_LOWER_SAFE:
-> -			if (ftr > 0)
-> +			uint64_t min_safe = 0;
-> +
-> +			if (!strcmp(ftr_bits->name, "ID_AA64DFR0_EL1_DebugVer"))
-> +				min_safe = ID_AA64DFR0_EL1_DebugVer_IMP;
-> +			else if (!strcmp(ftr_bits->name, "ID_DFR0_EL1_CopDbg"))
-> +				min_safe = ID_DFR0_EL1_CopDbg_Armv8;
-> +
-> +			if (ftr > min_safe)
->  				ftr--;
->  			break;
->  		case FTR_HIGHER_SAFE:
-> @@ -252,7 +259,12 @@ uint64_t get_safe_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
->  			ftr = ftr_bits->safe_val;
->  			break;
->  		case FTR_LOWER_SAFE:
-> -			if (ftr > 0)
-> +			uint64_t min_safe = 0;
-> +
-> +			if (!strcmp(ftr_bits->name, "ID_DFR0_EL1_PerfMon"))
-> +				min_safe = ID_DFR0_EL1_PerfMon_PMUv3;
-> +
-> +			if (ftr > min_safe)
->  				ftr--;
->  			break;
->  		case FTR_HIGHER_SAFE:
-> @@ -276,7 +288,7 @@ uint64_t get_invalid_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
->  {
->  	uint64_t ftr_max = GENMASK_ULL(ARM64_FEATURE_FIELD_BITS - 1, 0);
->  
-> -	if (ftr_bits->type == FTR_UNSIGNED) {
-> +	if (ftr_bits->sign == FTR_UNSIGNED) {
->  		switch (ftr_bits->type) {
->  		case FTR_EXACT:
->  			ftr = max((uint64_t)ftr_bits->safe_val + 1, ftr + 1);
-> 
+On Tue, Jan 9, 2024 at 2:03=E2=80=AFPM Sean Christopherson <seanjc@google.c=
+om> wrote:
+>
+> Delete the AMX's tests "stage" counter, as the counter is no longer used,
+> which makes clang unhappy:
+>
+>   x86_64/amx_test.c:224:6: error: variable 'stage' set but not used
+>           int stage, ret;
+>               ^
+>   1 error generated.
+>
+> Note, "stage" was never really used, it just happened to be dumped out by
+> a (failed) assertion on run->exit_reason, i.e. the AMX test has no concep=
+t
+> of stages, the code was likely copy+pasted from a different test.
+>
+> Fixes: c96f57b08012 ("KVM: selftests: Make vCPU exit reason test assertio=
+n common")
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-This fixes the issue seen on an AEM RevC FVP launched via the shrinkwrap
-ns-edk2.yaml config.
-
-[...]
-# ok 79 ID_AA64ZFR0_EL1_SVEver
-# # Totals: pass:79 fail:0 xfail:0 xpass:0 skip:0 error:0
-ok 1 selftests: kvm: set_id_regs
-
-Tested-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
-
-Thanks,
-Itaru.
-
-> base-commit: 0dd3ee31125508cd67f7e7172247f05b7fd1753a
-> -- 
-> 2.43.0.472.g3155946c3a-goog
-> 
+Reviewed-by: Jim Mattson <jmattson@google.com>
 
