@@ -1,122 +1,147 @@
-Return-Path: <kvm+bounces-5900-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5901-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BF4E828A2C
-	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 17:41:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01949828A8A
+	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 17:57:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D86C1C23780
-	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 16:41:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A66FC285FB6
+	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 16:57:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7E193A8C4;
-	Tue,  9 Jan 2024 16:41:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B54EF3A8E8;
+	Tue,  9 Jan 2024 16:56:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="GO3ICfKv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MQRNZ0iB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDD643A26E;
-	Tue,  9 Jan 2024 16:41:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 409GbbS0020661;
-	Tue, 9 Jan 2024 16:41:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=rdy7cRVvDz1ivprbP/Jb3r7TRUspqYk3N6p4pQ6+aSg=;
- b=GO3ICfKv9N9aAtOuM6b0gI0895ZJm4XW/JIOjrPnEoEs4gFYni3OwiAdCSEMoSdwM5uJ
- JgzDeb8PvrwjpE4tzY784+bEAEE2O+q056ilDI6nNU7j3mYKx6jNOZNkT8bP+Nln1KGU
- EqOGWjou4ZK/we/Sm7+Oe0U9rhDsx5d4/Mg5ns+RHrGW72af3vf5Me1g+eQPKZDWsY1a
- XCSuTtpWhI+tntHCtpf+wMqZ2B7OR4RvgSyBDZOOgbvf6CZvyqYux6ew2Pt9JWwL5DB7
- 4gbUeg/Lh9em6f7msNAsQl8WdRyJa76ffzPxQJIH3zhK5v9UjZ3dRn/HjuZ6P9QkkYqa Xg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vh9tt04bm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Jan 2024 16:41:25 +0000
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 409GdnWE029564;
-	Tue, 9 Jan 2024 16:41:24 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vh9tt043v-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Jan 2024 16:41:24 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 409Fsu9E028027;
-	Tue, 9 Jan 2024 16:41:06 GMT
-Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3vgwfsks99-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Jan 2024 16:41:06 +0000
-Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
-	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 409Gf5wB27132596
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 9 Jan 2024 16:41:05 GMT
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0372658053;
-	Tue,  9 Jan 2024 16:41:05 +0000 (GMT)
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D82485805D;
-	Tue,  9 Jan 2024 16:41:03 +0000 (GMT)
-Received: from [9.61.76.57] (unknown [9.61.76.57])
-	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  9 Jan 2024 16:41:03 +0000 (GMT)
-Message-ID: <bc5d11db-fb7a-4975-8896-d1cf271a8f95@linux.ibm.com>
-Date: Tue, 9 Jan 2024 11:41:03 -0500
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97B643A8C5
+	for <kvm@vger.kernel.org>; Tue,  9 Jan 2024 16:56:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jingzhangos.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5efb07ddb0fso42303827b3.0
+        for <kvm@vger.kernel.org>; Tue, 09 Jan 2024 08:56:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1704819411; x=1705424211; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ynJWgyIQTp0mxF1GFOGb+73JwIM0WneWjD70p63cQEA=;
+        b=MQRNZ0iBYKa2MG83YojQ4HurFcILJ4v6RpreGmTVnDeaBHbu11DX614FupgJJOi/7k
+         7wxv0o/IqlFg4Ow8GglKaiIOn0wBZhry+v6tVyy6nS7j/caD+HuMMUw/Gr2JZfEMJ60/
+         /12PJbVLmXndngNsC+aOXCqEp0GrmSnu8GbQ/JhycduZMTf7GN0EW1Zq30ad45uScBHX
+         VZfpQiIgACF5RPQQH+erj6244R4KXbRp4GOmOHGacHVnz+ccbXZQA+Ts7IGNefGpZvJM
+         B9RSXPsLknJ/ybBwobIEk9Wg2IfYpLywgvxdbi7DWyGtpxMLNgpJUPB45AYylpJSg5Ye
+         RxoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704819411; x=1705424211;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ynJWgyIQTp0mxF1GFOGb+73JwIM0WneWjD70p63cQEA=;
+        b=Ab8crV9C/3IiYdtB7p8rgxIsryTEuvq7vFUwaNBhxWtuKBUyHqyb9OjbLtfDQdl/oJ
+         gqf8nPGstn/vxSdwjPglEMI2xVC3XN9n7g88SlEB3s8rWXjB7mwh5c4nadMvhYHtAP13
+         gvtDIsQVBots1Wor52VngfK1EWAVDgn9h/OeLG9iLLUowxWoP3Q0Ct+BK/T6nAFwlZKE
+         AQdLn63xNnJDtl8wshHrkuvbcZFshmj8gMD6BvtjCfLLxbByEPtLqthQuyl95uEXLSd7
+         4CsgZQvLFL+J+y59Q9uxBU7Xx42/+f8fNFT/tlrfZdqX6oyyB38rbxLfLuDXyEHq+5kg
+         cGFg==
+X-Gm-Message-State: AOJu0YzCdIrCUcK70R3rNHVVNZtVo5W90NXu+P+Ktzi9DPlTGW7Msmz+
+	vfg19YEld8R0WLsx0wExxKc05zpjL6uQPbLV7AGpCwCY4+K1Bw4Lv2p5RGuqOMRpdGS2yhBDZdX
+	Eb5x4U3UcEtY2d2ST/zwLzazl7Bwl28ztSudgc/RB/6aDQSwwzctyK8apweM9jJDrpGPMI6RYao
+	rOMg==
+X-Google-Smtp-Source: AGHT+IFJYk3i2RC1bH88fwAuau9C4zuiOPot5e3J0BArmIefW2S8KwtUXxKUu+wt+MEHyKZAdOV1+wsmcKU76wbbYQ==
+X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
+ (user=jingzhangos job=sendgmr) by 2002:a05:6902:1369:b0:dbe:ab5b:c667 with
+ SMTP id bt9-20020a056902136900b00dbeab5bc667mr159057ybb.2.1704819411220; Tue,
+ 09 Jan 2024 08:56:51 -0800 (PST)
+Date: Tue,  9 Jan 2024 08:56:21 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/6] s390/vfio-ap: reset queues removed from guest's AP
- configuration
-To: Janosch Frank <frankja@linux.ibm.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc: jjherne@linux.ibm.com, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        pbonzini@redhat.com, imbrenda@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com
-References: <20231212212522.307893-1-akrowiak@linux.ibm.com>
- <11ac008c-9bea-4b34-bc4b-e0d7e7ed9bef@linux.ibm.com>
- <d5c3d69e-3405-4cf2-a2e7-0dad7d941e0c@linux.ibm.com>
-Content-Language: en-US
-From: Anthony Krowiak <akrowiak@linux.ibm.com>
-In-Reply-To: <d5c3d69e-3405-4cf2-a2e7-0dad7d941e0c@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: gjl9uLGpBX2_lzvNfSlBZCnF4fWKIFNm
-X-Proofpoint-GUID: YBIf8ZPezp6etBNrnQaKK32bBIIS1DOX
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-09_08,2024-01-09_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- malwarescore=0 priorityscore=1501 lowpriorityscore=0 spamscore=0
- adultscore=0 phishscore=0 mlxlogscore=756 clxscore=1015 bulkscore=0
- mlxscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2401090136
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
+Message-ID: <20240109165622.4104387-1-jingzhangos@google.com>
+Subject: [PATCH v1] KVM: arm64: selftests: Handle feature fields with nonzero
+ minimum value correctly
+From: Jing Zhang <jingzhangos@google.com>
+To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
+	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Itaru Kitayama <itaru.kitayama@linux.dev>, Jing Zhang <jingzhangos@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
+There are some feature fields with nonzero minimum valid value. Make
+sure get_safe_value() won't return invalid field values for them.
+Also fix a bug that wrongly uses the feature bits type as the feature
+bits sign causing all fields as signed in the get_safe_value() and
+get_invalid_value().
 
-On 1/9/24 3:27 AM, Janosch Frank wrote:
-> On 1/8/24 17:52, Anthony Krowiak wrote:
->> PING!
->>
-> You're waiting for review of the last patch, right?
+Fixes: 54a9ea73527d ("KVM: arm64: selftests: Test for setting ID register from usersapce")
+Reported-by: Zenghui Yu <yuzenghui@huawei.com>
+Reported-by: Itaru Kitayama <itaru.kitayama@linux.dev>
+Signed-off-by: Jing Zhang <jingzhangos@google.com>
+---
+ .../selftests/kvm/aarch64/set_id_regs.c       | 20 +++++++++++++++----
+ 1 file changed, 16 insertions(+), 4 deletions(-)
 
+diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
+index bac05210b539..f17454dc6d9e 100644
+--- a/tools/testing/selftests/kvm/aarch64/set_id_regs.c
++++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
+@@ -224,13 +224,20 @@ uint64_t get_safe_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
+ {
+ 	uint64_t ftr_max = GENMASK_ULL(ARM64_FEATURE_FIELD_BITS - 1, 0);
+ 
+-	if (ftr_bits->type == FTR_UNSIGNED) {
++	if (ftr_bits->sign == FTR_UNSIGNED) {
+ 		switch (ftr_bits->type) {
+ 		case FTR_EXACT:
+ 			ftr = ftr_bits->safe_val;
+ 			break;
+ 		case FTR_LOWER_SAFE:
+-			if (ftr > 0)
++			uint64_t min_safe = 0;
++
++			if (!strcmp(ftr_bits->name, "ID_AA64DFR0_EL1_DebugVer"))
++				min_safe = ID_AA64DFR0_EL1_DebugVer_IMP;
++			else if (!strcmp(ftr_bits->name, "ID_DFR0_EL1_CopDbg"))
++				min_safe = ID_DFR0_EL1_CopDbg_Armv8;
++
++			if (ftr > min_safe)
+ 				ftr--;
+ 			break;
+ 		case FTR_HIGHER_SAFE:
+@@ -252,7 +259,12 @@ uint64_t get_safe_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
+ 			ftr = ftr_bits->safe_val;
+ 			break;
+ 		case FTR_LOWER_SAFE:
+-			if (ftr > 0)
++			uint64_t min_safe = 0;
++
++			if (!strcmp(ftr_bits->name, "ID_DFR0_EL1_PerfMon"))
++				min_safe = ID_DFR0_EL1_PerfMon_PMUv3;
++
++			if (ftr > min_safe)
+ 				ftr--;
+ 			break;
+ 		case FTR_HIGHER_SAFE:
+@@ -276,7 +288,7 @@ uint64_t get_invalid_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
+ {
+ 	uint64_t ftr_max = GENMASK_ULL(ARM64_FEATURE_FIELD_BITS - 1, 0);
+ 
+-	if (ftr_bits->type == FTR_UNSIGNED) {
++	if (ftr_bits->sign == FTR_UNSIGNED) {
+ 		switch (ftr_bits->type) {
+ 		case FTR_EXACT:
+ 			ftr = max((uint64_t)ftr_bits->safe_val + 1, ftr + 1);
 
-Patch 6/6 does not have an r-b, so yes, that is one thing. The other's 
-have been reviewed internally with some receiving only an acked-by, so I 
-guess I'm looking for a final blessing so they can be merged. If I'm not 
-mistaken, the primary problem for which theses patches were created - 
-i.e., not resetting all queues when an adapter is removed from the guest 
-- will cause unique problems for SE guests that are bound/associated. 
-That being the case, I think these patches need to be merged sooner 
-rather than later.
-
+base-commit: 0dd3ee31125508cd67f7e7172247f05b7fd1753a
+-- 
+2.43.0.472.g3155946c3a-goog
 
 
