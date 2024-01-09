@@ -1,165 +1,205 @@
-Return-Path: <kvm+bounces-5854-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5856-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47BC5827BB7
-	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 00:55:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 505C6827BEC
+	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 01:22:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C6C881F22E0E
-	for <lists+kvm@lfdr.de>; Mon,  8 Jan 2024 23:55:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53DDB1C231C6
+	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 00:22:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F4875674B;
-	Mon,  8 Jan 2024 23:55:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0040658;
+	Tue,  9 Jan 2024 00:22:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="CRG1cjwL"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="BlyOtcTA"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2089.outbound.protection.outlook.com [40.107.101.89])
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2089.outbound.protection.outlook.com [40.107.96.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCA4A5645E;
-	Mon,  8 Jan 2024 23:55:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5997A191;
+	Tue,  9 Jan 2024 00:22:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SCEzJaShu1Z3GI+aSvcgT2qJ6gb2PQIeBvJlM58Q6tg8akC+z4H2TbMh6ytwHKyRQc1xvKvHbZSXxUuTn6UiZAEShTU5alx95t4fzMNKtRt3PemfheqE3A9gYoZlz1yeE+jIWcGRLG5YRCxuuTaF2CjO246S4DAwolFr4toc03+Hea6CyX0qU6LJjYzNRaFXbZiGoBCHlfzVRt+UBFXisVmaL516OpixWgAiTK4slwabCEYfoGNkM9Q4Xqvc7Ono2OrD6Iir/5D3An1PaUtZLVNw//rRTCFxoZHfrU3brTOFGYaLEaZPsDk42A3KGIoUX7tXi3V9VhsbhJep0jHLng==
+ b=ieOFDDmP6dj0UNiQVru06gCEL0F3sPhWZju3peqD8v0S3F+YXZZbI0gKomZWZnxWgvnuY6DdAoMYtogr+xs+FC7VJ4ojz74inLTpe2CoewrBc6Zh0d8zEaiIAo7JIHMs2sKcrPqvxTxuVTEWMexy8CR8PSaN3/m82So/hdgZH2L6tpFeL9OS36uf7m5UByUvE6M3sqv44AmrjJMnt78R82r063wBvk18psifC8P1QSLjJC8SrE35ztUTO8g6zksGvpj9B3KybH1K0ik2JlkN4p1P/oG2YLvUwGEoL6KgbvV9oGKgqewwH/3zvEsO9ApIn4jkWaOMBeM78C8Cxg1OiQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZyWLLs8jbJbR+rLeYXVyLs+FlPBh40GYmb1rYwYC2TE=;
- b=ME1kJ2JoqSY8mfM1mKWUCiVJvBFrGLMnmp6f2lEN655kWLzPvZZB11YMIB032LN5ArbI847Tgd2xPr65Nq77C9Z2c64i+AkBoAYrf8tjfMSKaaErebGyqabtFCCJYnPD1Iq/bUp7COvamHzv987Q/NBZFhA4yicjQYRemF/c2vSz06QxjF7ovBbWDyUMEx+JWInz/3LCTiijfhm3wr9FWMYXgXwSvhFzP5ye2d0MB5DjI1IiHo4lXOtZ5Vv2gFuE0wkBBPraJc/VGuAiLLur6ECEc0zoxtX9MFWJEoop3mi5FeXo/qI8qZdj1riuSNrl4t2ID5bUv0t0eNugLORwlw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ bh=7v8vUzUe3N5nm/qDax4pRPB7aWEazJjnsK+IATlaw6A=;
+ b=EUF97/ukpbR/0DdwJq8B0X/T3p8U3LZo7xHAitCLJAflrbOnPsQ+HyLn2u8za2VF2Q3arRgunPt9lvEdPTMvcn3Rv95d8U/ga5fJJ8UvLCRetxKCbVeBjZiApIf02m49C6TqhYl7/B6gt5ScAXFLc6AI+d3Vjy+KKs8EwRGJ7hymYNB66428zAa2W/s/KOfwynD2+Ey+sj7ClKWrZkxTIb/pi3fSr1JeXeV/8rUj3c0NSFMYe8MznptpghBc0wMQNyOrOMBE3S6SQYFVRowkcfBeuY6YIKBNBR1aBIWKWJZ28RS80ffaat9A6C1xzijPxlS4hik8Vg/Ullw4BuGDnA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZyWLLs8jbJbR+rLeYXVyLs+FlPBh40GYmb1rYwYC2TE=;
- b=CRG1cjwLunccynfuPQ9i9VuxCgk3aTCYtzaJrDNqnW6Sfk812PK/107ukSJXz0wXyEdPze5fkbpXpF5TJGHhvNSzgZYBMzts0dxeF3mCMJvTtPHo4telSl/5NYcyBN0iyndATJrD9Uh4cQ5D/Tyb49iwpkxPTDTeFmQdPedTYjM=
-Received: from DS0PR17CA0002.namprd17.prod.outlook.com (2603:10b6:8:191::25)
- by MN0PR12MB6223.namprd12.prod.outlook.com (2603:10b6:208:3c1::12) with
+ bh=7v8vUzUe3N5nm/qDax4pRPB7aWEazJjnsK+IATlaw6A=;
+ b=BlyOtcTAu8REs4SHVoJieIWYFNAu8h694GJSeHYXRiFLDKa4L2v3cpIphxfptWbz2PEUAA+NqqExlYBNgewnG0006M6R0FkMUfyMXyf+kdPWo5X/XsT+XnPRJhisOlM9Z/fApFC0QvU/yb8cbNn6+YEpenIULRoerk3qHrlCBnvIte47Rrr8ICZyaWM1qJaPmWx1WlPxPDdpJevMvrS6IQw1Wt7TzsrkPclQPFyebyAqc+XHO07n/3rKKD5QjuvD7nTXtggGUeizA1AnWQLV5K1TbAHmBP41O3XSZnvISYnT8f6RqjiHot9O52fRoeJuVGfmvMBKbCGgyvHtiLkvuw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by LV3PR12MB9409.namprd12.prod.outlook.com (2603:10b6:408:21d::16) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.21; Mon, 8 Jan
- 2024 23:54:58 +0000
-Received: from DS3PEPF000099E1.namprd04.prod.outlook.com
- (2603:10b6:8:191:cafe::1e) by DS0PR17CA0002.outlook.office365.com
- (2603:10b6:8:191::25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.23 via Frontend
- Transport; Mon, 8 Jan 2024 23:54:58 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DS3PEPF000099E1.mail.protection.outlook.com (10.167.17.196) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7181.13 via Frontend Transport; Mon, 8 Jan 2024 23:54:58 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Mon, 8 Jan
- 2024 17:54:57 -0600
-Date: Mon, 8 Jan 2024 17:54:39 -0600
-From: Michael Roth <michael.roth@amd.com>
-To: Sean Christopherson <seanjc@google.com>
-CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Paolo Bonzini
-	<pbonzini@redhat.com>, James Houghton <jthoughton@google.com>, Peter Xu
-	<peterx@redhat.com>, Axel Rasmussen <axelrasmussen@google.com>, Oliver Upton
-	<oliver.upton@linux.dev>, Isaku Yamahata <isaku.yamahata@linux.intel.com>,
-	David Matlack <dmatlack@google.com>, Yan Zhao <yan.y.zhao@intel.com>, Marc
- Zyngier <maz@kernel.org>, Aaron Lewis <aaronlewis@google.com>
-Subject: Re: [ANNOUNCE / RFC] PUCK Future Topics
-Message-ID: <20240108235439.ecb5x2eef2mbccby@amd.com>
-References: <20231214001753.779022-1-seanjc@google.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.23; Tue, 9 Jan
+ 2024 00:22:42 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::60d4:c1e3:e1aa:8f93]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::60d4:c1e3:e1aa:8f93%4]) with mapi id 15.20.7159.020; Tue, 9 Jan 2024
+ 00:22:21 +0000
+Date: Mon, 8 Jan 2024 20:22:20 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, pbonzini@redhat.com,
+	seanjc@google.com, olvaffe@gmail.com, kevin.tian@intel.com,
+	zhiyuan.lv@intel.com, zhenyu.z.wang@intel.com, yongwei.ma@intel.com,
+	vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+	joro@8bytes.org, gurchetansingh@chromium.org, kraxel@redhat.com,
+	zzyiwei@google.com, ankita@nvidia.com, alex.williamson@redhat.com,
+	maz@kernel.org, oliver.upton@linux.dev, james.morse@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com
+Subject: Re: [PATCH 0/4] KVM: Honor guest memory types for virtio GPU devices
+Message-ID: <20240109002220.GA439767@nvidia.com>
+References: <20240105091237.24577-1-yan.y.zhao@intel.com>
+ <20240105195551.GE50406@nvidia.com>
+ <ZZuQEQAVX28v7p9Z@yzhao56-desk.sh.intel.com>
+ <20240108140250.GJ50406@nvidia.com>
+ <ZZyG9n0qZEr6dLlZ@yzhao56-desk.sh.intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZZyG9n0qZEr6dLlZ@yzhao56-desk.sh.intel.com>
+X-ClientProxiedBy: BL1P222CA0009.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:208:2c7::14) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20231214001753.779022-1-seanjc@google.com>
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS3PEPF000099E1:EE_|MN0PR12MB6223:EE_
-X-MS-Office365-Filtering-Correlation-Id: ab4722cc-b5ad-4077-1d6d-08dc10a53874
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|LV3PR12MB9409:EE_
+X-MS-Office365-Filtering-Correlation-Id: a9f06772-903f-4c22-a98e-08dc10a90c10
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	UwbO0Vz1cUMhOLRd2k8FZ8BWDSd8qQDkFpScRTRkJ+jJ4HHK08bKleEUR6nZbt0zDdd5JBvtmI0YUYQ85oOQmsLigra86CeCd3jCagYbrtYxfskQjkGEWQHHcZgeDWSsPe7Xu0W3vVyst+RGQeeqWC0CdtAxvvzlgM7zoheHBWyZBuyTlWh2SAyFa7XAeebJuWo0MkPjVXZqrmscGJsCre3My19sZ9ElQ+kt0DPxqOi/kpquMXvpVq7Hu83Y/jAq4frhE2wvTh5HpthYMkE4+Me3OtQ6nM7iOiprKjb0ogZqpNaFdT0s2gCYY4V5FfLjOjmKAoHjBy93JAQFFLSWr92K69IsewImUE48ofaMXN7cIrFf29k78dqSHKTE/J1pV7YngBMuny+F2AGivbOxrhbrRVcSd7GAkjPaF5LXvrpgOxpR7Sxme2LS5u9C/pHQSFNerLKUADps70MYK5JXEY8gwHj7hHYdLfRPem5SpqbQqFlXSPKu4wmGQ2OSVFQ04O7sz7/s1r6eBWBeL6zsN11fg9QHg20u6qWA/S1Hlt5YbwXJ8sMKtzuEuzSdE4/ekWXcLLQppcZwmpJQVjItqeE2R5nzrMnehikk0S1FSyIFpoS/N4/WnbncNQWqVzctHp+ddQP2gOm0426TSZnXTc7nTGURdZ4m+XRQSvascIDSu7C2LT1SIgFKp3AW6gGeEOhZ/B0bNlNR0OqI3jZ3zNWppvgZk5ri7i1o4bEAxWW7+u4r8e6NVTHaPDLytZPvd92OJkcAuil+i1gRBvhBpKIB35kwZB155rg7LiRCVEAcETgNTrq3UytrStFSjKuEFPC6u0/WwFABY7JzHqiI96NR6CRyjuVSVkaWcCQRgQkCkiW+a1ucCtWHkEd6UruU
+	O1/RShumm7KDczdcdIu5YVuSY7VyeCOefYsfG4uLKXekHotnU5DTOl+/4PbKTax+GHbVnffAC/hCmejUFhaiMRdse2v1MbrFIS6cFEfWCE8tPe22yrcZmU9T+ggzcc2qTOC3PFuzn46oXEhhsoRcnxrArO/Gd5jdm2EQKt/2rtfqj+T3cOEo1/nNpJ1b23SLRucfWRBjBED6a9w9+m4c4tqCuSfnQcCofaw1UKPPbk3q0NX75bP91SZCedQGLbsVgydRw1O65XiqhqB/lKJiX3HWTu3NoDpJ3mVRS6cQtaAKmuy5e8hozbjphWdNwisitdv6IxY433ZBtpFeyADoLb6Ti9+q6LD/Z8RVTuyYxlsUKqcRU702ub6qKBttjFqdoq2dsIIBSlGpYPNNk4YkisLSVYq6zMHMiR1L0u+Q2kLOQcBy7AJ9X/pYG7fOGPb6CYfcZG0LzfHj4yCVbBXKg6EcVg8x3M+sNVuJiZQeD4erta3elHVtE2OP57iNCzHzZm5HhfTaFdsDM5I1AsyZOnX4brcT35bSw1BTEGn8//TT/juqsgKIYYnPjZ6BSkYtchnHSyKkyO4ucCZH0uz15Xw5aPW+TgafUgSaT7dq00QwUkQmD1jxAAkYcPrYd4ix
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(346002)(376002)(396003)(136003)(39860400002)(230173577357003)(230273577357003)(230922051799003)(186009)(451199024)(82310400011)(64100799003)(1800799012)(40470700004)(46966006)(36840700001)(70206006)(70586007)(47076005)(8936002)(8676002)(1076003)(26005)(478600001)(16526019)(426003)(336012)(2616005)(83380400001)(5930299018)(966005)(316002)(2906002)(6916009)(5660300002)(82740400003)(7416002)(81166007)(41300700001)(4326008)(40480700001)(356005)(86362001)(36860700001)(6666004)(36756003)(54906003)(40460700003)(44832011)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jan 2024 23:54:58.1612
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(39860400002)(366004)(346002)(136003)(396003)(230922051799003)(451199024)(64100799003)(1800799012)(186009)(2616005)(8676002)(8936002)(1076003)(6512007)(316002)(6506007)(26005)(83380400001)(6486002)(66556008)(66476007)(66946007)(41300700001)(86362001)(478600001)(6916009)(36756003)(5660300002)(7416002)(38100700002)(2906002)(4326008)(33656002)(27376004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?/KpMPlNWNd/6Og0YOleucIlCQXkKZEVhE+LWCCMJnocy3jn9Tdeg1nZPW/zz?=
+ =?us-ascii?Q?K/hGqaHIVxMHdeHqcsre/3Vcart3NZaKGO2F6GKxZ+iWvsUZF4H6DVgIe7q0?=
+ =?us-ascii?Q?owA9Pf978tYVGsBx3j6WDyINcUX6Iw8X9Esspt7TX0ayW/3tQhktCn28HRap?=
+ =?us-ascii?Q?TrKdI/ALr7u/iIWgHw/s7W17/SNEs5L9KDB69ha2mpdvQbfAZPPC5tA+2PZB?=
+ =?us-ascii?Q?JpUuE0x/sCXLRz3p1D7LmKNDLaTuZiLZUTLO2NHRLeA8GDv16C3OCGLlVO+6?=
+ =?us-ascii?Q?mSBuKox0FZX08M2kOIAVLdJ0ASgZMFMf6J/XFhlKFcGAg32wkXh3sDaobOvX?=
+ =?us-ascii?Q?iNOyW49CLPI2UNXsJ8sHnYSqqoe7taEik+uc+xTsV4W7fpOcjHfPqVHTx8Rq?=
+ =?us-ascii?Q?Zf6lIcZj11rumY/R0t5ggWmxarwzoABTfpYHmARumaOMFES76rxUipctiTCs?=
+ =?us-ascii?Q?VDUR6sVVq+Cqtclpm56fM06L81DUGs49dxgOatAYaSRo65SXCSn7gsevih44?=
+ =?us-ascii?Q?6ohEJQv2NJesu70rLMQv6JFr0XV5JNTOgaw5Y/8x6ekdTBDsDanRdBPlMpRm?=
+ =?us-ascii?Q?lGyU98JOw4+O1/mzRxvTl7FLXocPwsO0MT1nqAXkfS3ApIrpRwug9NKW0MeT?=
+ =?us-ascii?Q?nuli12ChRgTu/uQKjj6KUugaSxWQY7UXuxlASxJrYJJgtgtgDNp5Rn2sxND/?=
+ =?us-ascii?Q?IvwEQBekLTKa/+5THLTHyR7xpRzu9Gg6PYdQNpo8Qbp1kf0rqL49tOmvF52O?=
+ =?us-ascii?Q?8c0pZsEZAAVQgfk5kuuG81GrObzjcDJcD/cn63XBf4c9YZAGkRjas4Q8TKal?=
+ =?us-ascii?Q?vZBE/dtpHqmlgKFdEFh8hDFtfX0H64XVJjL9Lfe7gdGHa5Q3WSVDipDxiNYp?=
+ =?us-ascii?Q?SIST9jU/Jl+hyWADMeyTdTmqZzG7W/0u6ndZflsd3Y0YhGAQLkKtg6ffUNZi?=
+ =?us-ascii?Q?sDTzhRPYVC7T3zm61ZlhllsLii7YDcBs69XIbfADFjd+6CrirywQofKto6ON?=
+ =?us-ascii?Q?BFRsATXMQZTHP2+nkTIwBEpQX6y70tmcyjEeobhvdJv93UisR03XG9Bbu0+Y?=
+ =?us-ascii?Q?cEJu5md7Skqt7tZP5RkKyBUf0hzsINsMd05bp1zatM3uqHlP2KIG4ICR5I8l?=
+ =?us-ascii?Q?xco0zjP4/ok/9XPfQ7CkBTNYzSGQ/rB6eNW+8R7ZECYKnd+dW1Zc9D2eYDbj?=
+ =?us-ascii?Q?SxVsXkyGZuNuP1OrIM+BMbkod9WRa7OsYDY+QNvE8Nms2vtkM9jbez3iuGkR?=
+ =?us-ascii?Q?dkwZ4tRimFRF05v8mT0VLpd8RI7/MwsAO26ngp0PAVNVauWqTT+FwF4eKRLx?=
+ =?us-ascii?Q?iTqzHHzJmpH7QuTyzapK1/V2F/qTPbO/11OKaOVYg/I7riIX7VpuXAbOg2yf?=
+ =?us-ascii?Q?J0GjcssOF70YjnSxDwxLfQVbRABXnoxRzWwEQPPx2aqpGVTI/SJCZMoYeQXE?=
+ =?us-ascii?Q?8xE6iu4udFDbkgK7ZA3/rgt1GmlK2xNyA/b5u980Xt4U6fD3HcPU/luFFccJ?=
+ =?us-ascii?Q?LNdyjT4udMIr+NfkXknqhL6rrwqZhal2YUj5PuigHR+ABTzCKPixZf2suvlv?=
+ =?us-ascii?Q?LUIo3yLbZ7qt8BqbuDHLwif0qgnwZxv7fo/JyUb+?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a9f06772-903f-4c22-a98e-08dc10a90c10
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jan 2024 00:22:21.9278
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ab4722cc-b5ad-4077-1d6d-08dc10a53874
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS3PEPF000099E1.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6223
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9s6WDLG+l8RKTw44sZDh4vkVfwVcD1xTEaaLtiAAsgkzy5A8AwYZM5YM6QrybzBQ
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR12MB9409
 
-On Wed, Dec 13, 2023 at 04:17:53PM -0800, Sean Christopherson wrote:
-> Hi all!  There are a handful of PUCK topics that I want to get scheduled, and
-> would like your help/input in confirming attendance to ensure we reach critical
-> mass.
-> 
-> If you are on the Cc, please confirm that you are willing and able to attend
-> PUCK on the proposed/tentative date for any topics tagged with your name.  Or
-> if you simply don't want to attend, I suppose that's a valid answer too. :-)
-> 
-> If you are not on the Cc but want to ensure that you can be present for a given
-> topic, please speak up asap if you have a conflict.  I will do my best to
-> accomodate everyone's schedules, and the more warning I get the easier that will
-> be.
-> 
-> Note, the proposed schedule is largely arbitrary, I am not wedded to any
-> particular order.  The only known conflict at this time is the guest_memfd()
-> post-copy discussion can't land on Jan 10th.
-> 
-> Thanks!
-> 
-> 
-> 2024.01.03 - Post-copy for guest_memfd()
->     Needs: David M, Paolo, Peter Xu, James, Oliver, Aaron
-> 
-> 2024.01.10 - Unified uAPI for protected VMs
->     Needs: Paolo, Isaku, Mike R
+On Tue, Jan 09, 2024 at 07:36:22AM +0800, Yan Zhao wrote:
+> On Mon, Jan 08, 2024 at 10:02:50AM -0400, Jason Gunthorpe wrote:
+> > On Mon, Jan 08, 2024 at 02:02:57PM +0800, Yan Zhao wrote:
+> > > On Fri, Jan 05, 2024 at 03:55:51PM -0400, Jason Gunthorpe wrote:
+> > > > On Fri, Jan 05, 2024 at 05:12:37PM +0800, Yan Zhao wrote:
+> > > > > This series allow user space to notify KVM of noncoherent DMA status so as
+> > > > > to let KVM honor guest memory types in specified memory slot ranges.
+> > > > > 
+> > > > > Motivation
+> > > > > ===
+> > > > > A virtio GPU device may want to configure GPU hardware to work in
+> > > > > noncoherent mode, i.e. some of its DMAs do not snoop CPU caches.
+> > > > 
+> > > > Does this mean some DMA reads do not snoop the caches or does it
+> > > > include DMA writes not synchronizing the caches too?
+> > > Both DMA reads and writes are not snooped.
+> > 
+> > Oh that sounds really dangerous.
+> >
+> But the IOMMU for Intel GPU does not do force-snoop, no matter KVM
+> honors guest memory type or not.
 
-Hi Sean,
+Yes, I know. Sounds dangerous!
 
-I'll be present for this one. Not sure what the specific agenda is, but
-hoping we can cover some of the hooks that were proposed in this RFC
-series and are now part of SNP hypervisor v11 patchset:
+> > Not just migration. Any point where KVM revokes the page from the
+> > VM. Ie just tearing down the VM still has to make the cache coherent
+> > with physical or there may be problems.
+> Not sure what's the mentioned problem during KVM revoking.
+> In host,
+> - If the memory type is WB, as the case in intel GPU passthrough,
+>   the mismatch can only happen when guest memory type is UC/WC/WT/WP, all
+>   stronger than WB.
+>   So, even after KVM revoking the page, the host will not get delayed
+>   data from cache.
+> - If the memory type is WC, as the case in virtio GPU, after KVM revoking
+>   the page, the page is still hold in the virtio host side.
+>   Even though a incooperative guest can cause wrong data in the page,
+>   the guest can achieve the purpose in a more straight-forward way, i.e.
+>   writing a wrong data directly to the page.
+>   So, I don't see the problem in this case too.
 
-  https://lore.kernel.org/kvm/20231016115028.996656-1-michael.roth@amd.com/
+You can't let cache incoherent memory leak back into the hypervisor
+for other uses or who knows what can happen. In many cases something
+will zero the page and you can probably reliably argue that will make
+the cache coherent, but there are still all sorts of cases where pages
+are write protected and then used in the hypervisor context. Eg page
+out or something where the incoherence is a big problem.
 
--Mike
+eg RAID parity and mirror calculations become at-rist of
+malfunction. Storage CRCs stop working reliably, etc, etc.
 
-> 
-> 2024.01.17 - Memtypes for non-coherent MDA
->     Needs: Paolo, Yan, Oliver, Marc, more ARM folks?
-> 
-> 2024.01.24 - TDP MMU for IOMMU
->     Needs: Paolo, Yan, Jason, ???
-> 
-> 
-> P.S. if you're wondering, what the puck is PUCK?
-> 
->   Time:  6am PDT
->   Video: https://meet.google.com/vdb-aeqo-knk
->   Phone: https://tel.meet/vdb-aeqo-knk?pin=3003112178656
-> 
->   Calendar: https://calendar.google.com/calendar/u/0?cid=Y182MWE1YjFmNjQ0NzM5YmY1YmVkN2U1ZWE1ZmMzNjY5Y2UzMmEyNTQ0YzVkYjFjN2M4OTE3MDJjYTUwOTBjN2Q1QGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20
->   Drive:    https://drive.google.com/drive/folders/1aTqCrvTsQI9T4qLhhLs_l986SngGlhPH?resourcekey=0-FDy0ykM3RerZedI8R-zj4A&usp=drive_link
-> 
->   https://lore.kernel.org/all/20230512231026.799267-1-seanjc@google.com
+It is certainly a big enough problem that a generic KVM switch to
+allow incoherence should be trated with alot of skepticism. You can't
+argue that the only use of the generic switch will be with GPUs that
+exclude all the troublesome cases!
+
+> > > In this case, will this security attack impact other guests?
+> > 
+> > It impacts the hypervisor potentially. It depends..
+> Could you elaborate more on how it will impact hypervisor?
+> We can try to fix it if it's really a case.
+
+Well, for instance, when you install pages into the KVM the hypervisor
+will have taken kernel memory, then zero'd it with cachable writes,
+however the VM can read it incoherently with DMA and access the
+pre-zero'd data since the zero'd writes potentially hasn't left the
+cache. That is an information leakage exploit.
+
+Who knows what else you can get up to if you are creative. The whole
+security model assumes there is only one view of memory, not two.
+
+Jason
 
