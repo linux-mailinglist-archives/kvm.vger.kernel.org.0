@@ -1,128 +1,98 @@
-Return-Path: <kvm+bounces-5872-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5873-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BA11827FC5
-	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 08:50:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 97421827FE1
+	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 08:58:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1C4D8B24E90
-	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 07:50:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 26B56B255E9
+	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 07:58:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1D30B66C;
-	Tue,  9 Jan 2024 07:50:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEB872D63A;
+	Tue,  9 Jan 2024 07:57:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jwUqrDO8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Me4pfJh6"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D25225102
-	for <kvm@vger.kernel.org>; Tue,  9 Jan 2024 07:50:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Tue, 9 Jan 2024 16:50:05 +0900
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1704786616;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jC0LcHQAj5sU6xwMTRYWTxbuyexf66+yJ6ABxO0uBs8=;
-	b=jwUqrDO82RRuyPdvS0rbiSFrAaCsnr36tatZfwTSAjpYXF/JsXX4ArfR4ppv7ySIAWpAWJ
-	FVLMSBY8knAInm+HUW82uHpkXvVGvy6W3kgyNYyeKGazDmf+7NKAuNLfaYPmxbfgwEKX5M
-	McDblqfMjuevQgCN5Hz1rstUOV5CBuk=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Itaru Kitayama <itaru.kitayama@linux.dev>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Zenghui Yu <yuzenghui@huawei.com>, Eric Auger <eauger@redhat.com>,
-	kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-perf-users@vger.kernel.org, Mark Brown <broonie@kernel.org>,
-	Jing Zhang <jingzhangos@google.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	James Morse <james.morse@arm.com>, Marc Zyngier <maz@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>
-Subject: Re: [PATCH v3 5/5] KVM: arm64: selftests: Test for setting ID
- register from usersapce
-Message-ID: <ZZz6rfBKsN14GMaq@vm3>
-References: <20231011195740.3349631-1-oliver.upton@linux.dev>
- <20231011195740.3349631-6-oliver.upton@linux.dev>
- <e0facec9-8c50-10cb-fd02-1214f9a49571@redhat.com>
- <ab1337bc-d4a2-0afc-3e26-0d50dff4ea73@huawei.com>
- <ZZx5y_iy9kXg47SW@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE6BEB66B;
+	Tue,  9 Jan 2024 07:57:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DBCAC433C7;
+	Tue,  9 Jan 2024 07:57:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704787056;
+	bh=VLDneZLA6cAnWxtoG7KbCxm8KweXPrrQ2Mn6Ofb6MR8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Me4pfJh6dlkcobjt6Eefwwv0CZqzwIrWh7igIV5Wxk1VrgKQ0L3y2cd3e2iJibOky
+	 w9bIh2oR9cNnIfumWNhOf5GgJyXoFI7NpSALoLeM24wc9ZAAqpPNUMceKug/BANQEO
+	 QY+E+Up/zXp11/IStSHvYzSDlaNCI9aX2TQXo/KsiF6UgM1tlBzqYjFMVNMjaq9w8a
+	 XOFazkm9TgNWSD06qM5FsLAvm2iCG76aS0fG01Gs82wWG7K0GiiDbmEAvmWgwJgsz4
+	 yhbOC2FDCE6Ch8UrSIaOWGbB8Au5fQcsineQXjTsrjz3txvMELmdrK6b6n1lMurQ0L
+	 vgx248eNSPm+w==
+From: Arnd Bergmann <arnd@kernel.org>
+To: Yishai Hadas <yishaih@nvidia.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	kvm@vger.kernel.org,
+	virtualization@lists.linux-foundation.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] vfio: fix virtio-pci dependency
+Date: Tue,  9 Jan 2024 08:57:19 +0100
+Message-Id: <20240109075731.2726731-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZZx5y_iy9kXg47SW@linux.dev>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jan 08, 2024 at 10:40:11PM +0000, Oliver Upton wrote:
-> Hi Zenghui,
-> 
-> On Fri, Jan 05, 2024 at 05:07:08PM +0800, Zenghui Yu wrote:
-> > On 2023/10/19 16:38, Eric Auger wrote:
-> > 
-> > > > +static const struct reg_ftr_bits ftr_id_aa64dfr0_el1[] = {
-> > > > +	S_REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64DFR0_EL1, PMUVer, 0),
-> > >
-> > > Strictly speaking this is not always safe to have a lower value. For
-> > > instance: From Armv8.1, if FEAT_PMUv3 is implemented, the value 0b0001
-> > > is not permitted. But I guess this consistency is to be taken into
-> > > account by the user space. But may be wort a comment. Here and below
-> > > 
-> > > You may at least clarify what does mean 'safe'
-> > >
-> > > > +	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64DFR0_EL1, DebugVer, 0),
-> > 
-> > I've seen the following failure on Cortex A72 where
-> > ID_AA64DFR0_EL1.DebugVer is 6.
-> 
-> Ah, yes, the test is wrong. KVM enforces a minimum value of 0x6 on this
-> field, yet get_safe_value() returns 0x5 for the field.
+From: Arnd Bergmann <arnd@arndb.de>
 
-This is observed with the RevC AEM FVP as well.
+The new vfio-virtio driver already has a dependency on VIRTIO_PCI_ADMIN_LEGACY,
+but that is a bool symbol and allows vfio-virtio to be built-in even if
+virtio-pci itself is a loadable module. This leads to a link failure:
 
-Thanks,
-Itaru.
+aarch64-linux-ld: drivers/vfio/pci/virtio/main.o: in function `virtiovf_pci_probe':
+main.c:(.text+0xec): undefined reference to `virtio_pci_admin_has_legacy_io'
+aarch64-linux-ld: drivers/vfio/pci/virtio/main.o: in function `virtiovf_pci_init_device':
+main.c:(.text+0x260): undefined reference to `virtio_pci_admin_legacy_io_notify_info'
+aarch64-linux-ld: drivers/vfio/pci/virtio/main.o: in function `virtiovf_pci_bar0_rw':
+main.c:(.text+0x6ec): undefined reference to `virtio_pci_admin_legacy_common_io_read'
+aarch64-linux-ld: main.c:(.text+0x6f4): undefined reference to `virtio_pci_admin_legacy_device_io_read'
+aarch64-linux-ld: main.c:(.text+0x7f0): undefined reference to `virtio_pci_admin_legacy_common_io_write'
+aarch64-linux-ld: main.c:(.text+0x7f8): undefined reference to `virtio_pci_admin_legacy_device_io_write'
 
-> 
-> Jing, do you have time to check this test for similar failures and send
-> out a fix for Zenghui's observations?
-> 
-> > # ./aarch64/set_id_regs
-> > TAP version 13
-> > 1..79
-> > ok 1 ID_AA64DFR0_EL1_PMUVer
-> > ==== Test Assertion Failure ====
-> >   include/kvm_util_base.h:553: !ret
-> >   pid=2288505 tid=2288505 errno=22 - Invalid argument
-> >      1	0x0000000000402787: vcpu_set_reg at kvm_util_base.h:553
-> > (discriminator 6)
-> >      2	 (inlined by) test_reg_set_success at set_id_regs.c:342
-> > (discriminator 6)
-> >      3	 (inlined by) test_user_set_reg at set_id_regs.c:413 (discriminator
-> > 6)
-> >      4	0x0000000000401943: main at set_id_regs.c:475
-> >      5	0x0000ffffbdd5d03b: ?? ??:0
-> >      6	0x0000ffffbdd5d113: ?? ??:0
-> >      7	0x0000000000401a2f: _start at ??:?
-> >   KVM_SET_ONE_REG failed, rc: -1 errno: 22 (Invalid argument)
-> 
-> -- 
-> Thanks,
-> Oliver
+Add another explicit dependency on the tristate symbol.
+
+Fixes: eb61eca0e8c3 ("vfio/virtio: Introduce a vfio driver over virtio devices")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ drivers/vfio/pci/virtio/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/vfio/pci/virtio/Kconfig b/drivers/vfio/pci/virtio/Kconfig
+index fc3a0be9d8d4..bd80eca4a196 100644
+--- a/drivers/vfio/pci/virtio/Kconfig
++++ b/drivers/vfio/pci/virtio/Kconfig
+@@ -1,7 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ config VIRTIO_VFIO_PCI
+         tristate "VFIO support for VIRTIO NET PCI devices"
+-        depends on VIRTIO_PCI_ADMIN_LEGACY
++        depends on VIRTIO_PCI && VIRTIO_PCI_ADMIN_LEGACY
+         select VFIO_PCI_CORE
+         help
+           This provides support for exposing VIRTIO NET VF devices which support
+-- 
+2.39.2
+
 
