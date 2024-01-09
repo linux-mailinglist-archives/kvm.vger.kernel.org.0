@@ -1,325 +1,219 @@
-Return-Path: <kvm+bounces-5915-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5916-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 994FF828FC3
-	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 23:19:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F9BD828FCF
+	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 23:21:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B158B1C24F46
-	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 22:19:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F48A1F289BA
+	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 22:21:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 362E4405F6;
-	Tue,  9 Jan 2024 22:16:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C996D3F8CA;
+	Tue,  9 Jan 2024 22:19:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zq8ocN8G"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ipMeTyAW"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2056.outbound.protection.outlook.com [40.107.223.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C8263FB34;
-	Tue,  9 Jan 2024 22:16:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7695CC4163A;
-	Tue,  9 Jan 2024 22:16:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704838614;
-	bh=WEn5lTrzAXiM29oFJTOtG7WGsQHyaE8VVcpnTQ825es=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=Zq8ocN8Gt1fqJMhJwOXYGLVh0X0nGl41KS8W4md+yRdfItGW8fNnP0aRYm/3H6lAl
-	 RS27Py+YNnR5kRSt+po4oAHAEWb8VCZ4plTxJ9tHH89qCRyg2dtoAWNC5e5An5dSZU
-	 +JzvfWbNjxCnZsb1JPhcCIyg8HTq07RwbIKmHE5PbUgHpl62LhEW99qTUmRwlC4XUj
-	 tFxwc5+m00o10eK3MDOXqDhJvrk7QWYLW9omp+MinaN9zQ5+dIOI1juTAcz3K/C2/p
-	 3/ZPyl9rbEDTjpogg6clozkMlc/fZuaj5iit9sPEM6FYdXPBAs73lpQUDVYHldIsnX
-	 4xjPgJS1qq3mQ==
-From: Nathan Chancellor <nathan@kernel.org>
-Date: Tue, 09 Jan 2024 15:16:31 -0700
-Subject: [PATCH 3/3] treewide: Update LLVM Bugzilla links
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDCA73C6A4;
+	Tue,  9 Jan 2024 22:19:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=glZyEfEpxdgF4C+TsUTtFiiiR9Tzp1jBkEn3yr3GlXe6nPDGaH1nv5wAsOk/TJnEMl2etEWj6K/pLnxu6iYLywp/TmhTdWOeWnwgvOa4Qb4qWu53Mi1FzNAjIoz7WSuIWVzR6Kl0MZ9dmWiDNjQxNUscjqyx5fhlk/WoX4cERloejfYob7fskEvgfM2PrtcpbIILyCyrU+87JiOlBI9pv59Obam7KSFpyM3BvKwv1FgBZPyCJM3Xa8hJgbU3aGHg8GAQAiaDL3aN/bVvM9uqaPbOZ/AC70xymt0xXFuqa9doIV4eRG9Lixk9ySPQG3rVe66u1kynO6uZ0vNPrOmsFQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0n6S1IhJFL+vYOedd5EP4plpcRrdfl1wNTTgjL8YbRg=;
+ b=Rx6iUNCBXcmOXDq8aACWmWgGHWMU03okpiTwY33HYs/huCLM7AC99n3Sy0j72pjjhCgzew2R9ybnAkTUc3T+H9NkYKwb+o6O+N/QtWr0op1UCTJAo6LFali0nNJDz1hnrT2DH5qPwFUIv7Y1MfvN1q6A9mRWQLTLONMmlNBtg9BqKgXZFxRJ1DYBo9KvzCSfgXI8GG6yth7QKJS0QgtZysiBHZi9sUk3VpfqJJ3ZUYoXJygzc8j19KNBr3wKhdvT3pPBSDrFfuPQjzLaMGzvWwEZgGt31HbpAs2neQvJYnNpMsZdvOwPTPmnOboNdSNzH1xhpRHIDbmVGE9S1LYBNA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0n6S1IhJFL+vYOedd5EP4plpcRrdfl1wNTTgjL8YbRg=;
+ b=ipMeTyAW+a38uAoKfbajM8/64/Zqpno8KBTunc8/7wwmEelALBoVDYvnZHEJdeou18VcSb1nJworRQJwrTMFVYZxW5OGEfTuDP7BqjTTorYDMhr35ulEh9iuLMGUjyx0H8vSRCAv7hX46pVwSA4/gNuHTFvUdZzt65TkhWYM0Bs=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+ by IA1PR12MB8333.namprd12.prod.outlook.com (2603:10b6:208:3fe::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.23; Tue, 9 Jan
+ 2024 22:19:05 +0000
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::dc71:c26c:a009:49]) by SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::dc71:c26c:a009:49%5]) with mapi id 15.20.7159.020; Tue, 9 Jan 2024
+ 22:19:05 +0000
+Message-ID: <5cdd2093-b007-404d-96a8-89b3aa6e6e4b@amd.com>
+Date: Tue, 9 Jan 2024 16:19:02 -0600
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 15/26] x86/sev: Introduce snp leaked pages list
+Content-Language: en-US
+To: Vlastimil Babka <vbabka@suse.cz>, Michael Roth <michael.roth@amd.com>,
+ x86@kernel.org
+Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
+ linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+ tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
+ thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
+ pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+ jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
+ slp@redhat.com, pgonda@google.com, peterz@infradead.org,
+ srinivas.pandruvada@linux.intel.com, rientjes@google.com, tobin@ibm.com,
+ bp@alien8.de, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+ sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+ jarkko@kernel.org, nikunj.dadhania@amd.com, pankaj.gupta@amd.com,
+ liam.merwick@oracle.com, zhi.a.wang@intel.com
+References: <20231230161954.569267-1-michael.roth@amd.com>
+ <20231230161954.569267-16-michael.roth@amd.com>
+ <f221ad9d-6fc3-466b-bacf-23986b8655f5@suse.cz>
+From: "Kalra, Ashish" <ashish.kalra@amd.com>
+In-Reply-To: <f221ad9d-6fc3-466b-bacf-23986b8655f5@suse.cz>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SN4PR0501CA0057.namprd05.prod.outlook.com
+ (2603:10b6:803:41::34) To SN6PR12MB2767.namprd12.prod.outlook.com
+ (2603:10b6:805:75::23)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240109-update-llvm-links-v1-3-eb09b59db071@kernel.org>
-References: <20240109-update-llvm-links-v1-0-eb09b59db071@kernel.org>
-In-Reply-To: <20240109-update-llvm-links-v1-0-eb09b59db071@kernel.org>
-To: akpm@linux-foundation.org
-Cc: llvm@lists.linux.dev, patches@lists.linux.dev, 
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, 
- linux-riscv@lists.infradead.org, linux-trace-kernel@vger.kernel.org, 
- linux-s390@vger.kernel.org, linux-pm@vger.kernel.org, 
- linux-crypto@vger.kernel.org, linux-efi@vger.kernel.org, 
- amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org, 
- linux-media@vger.kernel.org, linux-arch@vger.kernel.org, 
- kasan-dev@googlegroups.com, linux-mm@kvack.org, bridge@lists.linux.dev, 
- netdev@vger.kernel.org, linux-security-module@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, Nathan Chancellor <nathan@kernel.org>
-X-Mailer: b4 0.13-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=11357; i=nathan@kernel.org;
- h=from:subject:message-id; bh=WEn5lTrzAXiM29oFJTOtG7WGsQHyaE8VVcpnTQ825es=;
- b=owGbwMvMwCUmm602sfCA1DTG02pJDKlzj16w1Pj8I8RGNGpqStpeL/2Ss7Fckxj+MQn8ummhc
- f/e3puMHaUsDGJcDLJiiizVj1WPGxrOOct449QkmDmsTCBDGLg4BWAipzgZ/mcpXDN6n369Z2Vr
- 7IPwnTz2R5dYJN5v++9iM3XOfBYtOU5GhuM55jNe+5/7H/HicGe1b2CLnMlqaZtVrzg+6Dfn1Hg
- YcwMA
-X-Developer-Key: i=nathan@kernel.org; a=openpgp;
- fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2767:EE_|IA1PR12MB8333:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7e0c4860-42cb-4455-bedc-08dc1160fe0c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	jFElfiQML6gAx3uii+bok8dqoPCGUIM6kpw51H1ISdLZXwrvJcl/kl7kcZAaFxDHdIzIMSUSa9144WRy65C8kAS4jPuO7cODA4aEAGH3SUEPl1oYp459ahcAU+KsxxFq/6PKq0Ar6QFfCiWf9Vv8WrIO8jjsgCtrtH4u1dyeRtfd3aQiR03WIgjgKrY8GwryFxwBSogXe+W8+HMe0efusizDBs098GcGnKxlcYTDR/ilxu9ic+DPxZwiwoyEHPs/b/z+PxGtfp3gkAtORUNt0aE27Hlum/M7i00Kum+bfAPzYSda539MyRGDDXLHlaIG47favqj4wcgzvG3atXDbWJ8KPXEOoayBlfQ4IoV6g4dp9DjpeG8ZDiRrd/XXF2VU5yNaOnIHhGHhepc0tLVnF1avQlwAccIsWBNFmi2HlS/K1mlF4h+ktAuvAfl4dD3YyjzHz7LrepYXfjgooqDqYaciQwBLA/hl0V8e0e1tQJtccIn9YHQ82BuOc71kuQzuLyitpow+htLkdanM3DPkAR9uTPBfOy+P0ME5zADD2MfQySbrYMr+RNHxe3KhqeQgjENuE4JJ3rE0YEdRfZ9WbLoyeQ7uMAn6C1d0TvbrKP75SuiaTLpJdB/O195FG42JGzor7HdD+AEq9WDRBdihIEd/JrYbtJvqtdkatZPJpgzfWe6GcIHnLAvqs9HDd8Jp
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(376002)(39860400002)(366004)(396003)(230922051799003)(230273577357003)(230173577357003)(451199024)(186009)(1800799012)(64100799003)(478600001)(6486002)(66556008)(966005)(66946007)(6666004)(316002)(110136005)(4326008)(66476007)(83380400001)(2616005)(26005)(6512007)(53546011)(6506007)(8676002)(8936002)(31686004)(5660300002)(7416002)(7406005)(2906002)(41300700001)(31696002)(86362001)(38100700002)(36756003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?U00vZUFXY05xMUs5aDdhZFZramZTajFmM2FDUGRLNlRLL2ZmYytlVlJ2NlpC?=
+ =?utf-8?B?dVhzTHhMS3ZKQ1pZZTQ1YnM1cTc4TkNNZkZjR0ZEWjBGcVBhbTR3NSswVy9l?=
+ =?utf-8?B?NnowNW9iS3hKYlRWY2hqZW9Sd2tBZHBnT3Y2aU40TlREUEpxS0dHK0c2MEg0?=
+ =?utf-8?B?ZkZ6Vksxb1h4U2tEdW9vVDF0RnJyZjBlZFBXd0dWblF5aG1LRk9HTk5BSU4y?=
+ =?utf-8?B?MnpkTXpaWDBKbG4yLytLNGEyc2RCa0ZHaEhLdFRkcTBhOTIvZXhVelhBQ0Zu?=
+ =?utf-8?B?ZzBBWjVUS2QyZm8rYVJYQUdib3dsVjhYaVVSL2V5bThaSVl1NnVIeEVqQkJP?=
+ =?utf-8?B?azBSbTRGd0lCVVB1QWcwK3lmUUlkcWhKU0RMc1pZTmlHMDdNMy9GWk1jU2JM?=
+ =?utf-8?B?ckYySmNEWS9nV0NmcjVCQTVLVnRYUWJLZnZWQTF4L3dyNFUrRzRlVmsxSGoz?=
+ =?utf-8?B?VlNDLzgxSDB1TThSMDAvRkJPbXZySWljWG44VGpsOVFwK0Z0eE9OSzlzSVlD?=
+ =?utf-8?B?Mk44NXFvK0JaQW9yV3QrVHYrK1BabmsrUzV6SXRydGJic0RtWTNZcnR2TDU3?=
+ =?utf-8?B?RlZmWWswTzJqV1VIS3d0S0Y3dDJhb0JSK04yS25JckxVdU01UHkwbUx4clVu?=
+ =?utf-8?B?bE81QVpydDIzdkgyT252NHpGN0xuK2xQRFZOU0RBaGZvaFkvY25iN2VEcXc3?=
+ =?utf-8?B?MzZ0QzRsYkpsdnFOS3ZVTlMySUZ4MENzdVQzQ05HRVU2KzBCYm1TaC85TWJI?=
+ =?utf-8?B?V0orZFcxUnBzRjhGYXBLNmMyN1laRjhWWkJFZEdEeXVTTEo3cUJPcFRUUUhL?=
+ =?utf-8?B?M3VsWEVrY05DOUFXOGcyWHdTRmJ6L3dFSkJUNDM2akE3QTkxVDNkZzhHNGdm?=
+ =?utf-8?B?RnNnc2JqK3VYTEw2TVA5NUcwaDNtWjU4YU8yTlVldzJ0Zk1mb2lSUERQOUVD?=
+ =?utf-8?B?Q0Z0N2JBeHRIRlBWbSt1M0hUejVTYlY3WjRnRVl1SG9ucjNyMzFpTHpWWlJN?=
+ =?utf-8?B?UWlpamoyTytWVWxkZHFEMWVwbkpWQlBubHFXTVVtWk42WUZPeitmWmhlRmVl?=
+ =?utf-8?B?cSsvNkhNb2lha2MyWDBSZ2RHT3ZidkpLd0x0bTc1T2ViSit4eWhoaksxMmRa?=
+ =?utf-8?B?TXpWeldMTy9RaEhUYUR6SlIxZmlyTlVYYlBBblJIaW9tVTJ0SDJUOW4wQU1a?=
+ =?utf-8?B?Y2FMUWNDOW9EeEJ1cmp6UlhBdDlXWSszMlRYSDEvY09Id21jM0F0MkpITkJk?=
+ =?utf-8?B?OGhBVEk3aXpGY0ZyRllQYkgrY0g1ajgrUW1ueFNDNDMweU9ZMGs0MmllMEU1?=
+ =?utf-8?B?TThZdnBKalp1VHZMSjlzSit1a2ZaN2VRNXRVRzlud0xETVJoK2RPcTVpTm1G?=
+ =?utf-8?B?VTJNSlg5ejlEN2t2enM4d1NOQ3lIbU9JTmVjQW9WaFcwM2tYbDZqQXJKTWY2?=
+ =?utf-8?B?REJ0TkxxLzMzOWpZWUM0QWEzUllQK1ZFVktCSndKVlRjaE45RlNUTnUwRWxK?=
+ =?utf-8?B?RHpKRlM2SER3T25NUVR6K000VkczY1g1WTVFY3VYNmtwWVRvMDRxWVFqc0dk?=
+ =?utf-8?B?dnFuU3RRQ3lWZHoyTXJlRy9IcGFLL0VzbG5YaWttMHZpUUZwaW0weTQvRVdW?=
+ =?utf-8?B?OVhva1RnSXZCK3FMRGdESmVHbllGUVJieHFUNGJvaklKUEJTcHpUZmNtdjRl?=
+ =?utf-8?B?OG1lSXBvcXR4blVHVlg5RnNQZTgvMXhFNHhtdXdQVWxlQlVERGVUS2NQNVpI?=
+ =?utf-8?B?L3NmZCtVaDVwL2xKdzZJTEh1emxZOUllcS80SE1zSE9XQjROY0ZvWGMzQXNE?=
+ =?utf-8?B?N3pRcFVBcTcySWdMdWliYzFYT1QwWUJ3bG1uZWFNaUpzamgzSy9Kak1rWE0y?=
+ =?utf-8?B?VWZ0bXBGeHVpdDNJcVJhL05FWGVWMGdveXhsanU0ZXAvWit4ekkzRTk1bVI0?=
+ =?utf-8?B?cFJnVTJ2dEEzV0loZWsyaWN1QjlUdzhwcExCMXRZQS95WkNVaUZaL0kwTGpq?=
+ =?utf-8?B?S3dLRE12V1R3M1BGV1c1RUFhdW1QMW92NGxvTjdWeDJnbnhiUGEvZjVqK1ZZ?=
+ =?utf-8?B?M0F6OXJQdTJpSTNIbWpmMDVwaGl5bEJUZnZyNm9FaWkxZTZvcnljQ2RzMzJj?=
+ =?utf-8?Q?bvM2OaOt3OioNN0rx2JcyYcmQ?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7e0c4860-42cb-4455-bedc-08dc1160fe0c
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jan 2024 22:19:05.7949
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: rlJmXGWhY5tCxB+ITpClkD1nGrM6lU+uWbxcxs+3cFzJ7sifpwYn74nqzPXJl6Iv82FIb3dQa4l/kzxur22x/A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8333
 
-LLVM moved their issue tracker from their own Bugzilla instance to
-GitHub issues. While all of the links are still valid, they may not
-necessarily show the most up to date information around the issues, as
-all updates will occur on GitHub, not Bugzilla.
+Hello Vlastimil,
 
-Another complication is that the Bugzilla issue number is not always the
-same as the GitHub issue number. Thankfully, LLVM maintains this mapping
-through two shortlinks:
+On 1/8/2024 4:45 AM, Vlastimil Babka wrote:
+> On 12/30/23 17:19, Michael Roth wrote:
+>> From: Ashish Kalra <ashish.kalra@amd.com>
+>>
+>> Pages are unsafe to be released back to the page-allocator, if they
+>> have been transitioned to firmware/guest state and can't be reclaimed
+>> or transitioned back to hypervisor/shared state. In this case add
+>> them to an internal leaked pages list to ensure that they are not freed
+>> or touched/accessed to cause fatal page faults.
+>>
+>> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+>> [mdr: relocate to arch/x86/virt/svm/sev.c]
+>> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> Hi, sorry I didn't respond in time to the last mail discussing previous
+> version in
+> https://lore.kernel.org/all/8c1fd8da-912a-a9ce-9547-107ba8a450fc@amd.com/
+> due to upcoming holidays.
+>
+> I would rather avoid the approach of allocating container objects:
+> - it's allocating memory when effectively losing memory, a dangerous thing
+> - are all the callers and their context ok with GFP_KERNEL?
+> - GFP_KERNEL_ACCOUNT seems wrong, why would we be charging this to the
+> current process, it's probably not its fault the pages are leaked? Also the
+> charging can fail?
+> - given the benefit of having leaked pages on a list is basically just
+> debugging (i.e. crash dump or drgn inspection) this seems too heavy
+>
+> I think it would be better and sufficient to use page->lru for order-0 and
+> head pages, and simply skip tail pages (possibly with adjusted warning
+> message for that case).
+>
+> Vlastimil
+>
+> <snip
 
-  https://llvm.org/bz<num> -> https://bugs.llvm.org/show_bug.cgi?id=<num>
-  https://llvm.org/pr<num> -> https://github.com/llvm/llvm-project/issues/<mapped_num>
+Considering the above thoughts, this is updated version of 
+snp_leak_pages(), looking forward to any review comments/feedback you 
+have on the same:
 
-Switch all "https://bugs.llvm.org/show_bug.cgi?id=<num>" links to the
-"https://llvm.org/pr<num>" shortlink so that the links show the most up
-to date information. Each migrated issue links back to the Bugzilla
-entry, so there should be no loss of fidelity of information here.
+void snp_leak_pages(u64 pfn, unsigned int npages)
+{
+         struct page *page = pfn_to_page(pfn);
 
-Signed-off-by: Nathan Chancellor <nathan@kernel.org>
----
- arch/powerpc/Makefile                           | 4 ++--
- arch/powerpc/kvm/book3s_hv_nested.c             | 2 +-
- arch/s390/include/asm/ftrace.h                  | 2 +-
- arch/x86/power/Makefile                         | 2 +-
- crypto/blake2b_generic.c                        | 2 +-
- drivers/firmware/efi/libstub/Makefile           | 2 +-
- drivers/gpu/drm/amd/amdgpu/sdma_v4_4_2.c        | 2 +-
- drivers/media/test-drivers/vicodec/codec-fwht.c | 2 +-
- drivers/regulator/Kconfig                       | 2 +-
- include/asm-generic/vmlinux.lds.h               | 2 +-
- lib/Kconfig.kasan                               | 2 +-
- lib/raid6/Makefile                              | 2 +-
- lib/stackinit_kunit.c                           | 2 +-
- mm/slab_common.c                                | 2 +-
- net/bridge/br_multicast.c                       | 2 +-
- security/Kconfig                                | 2 +-
- 16 files changed, 17 insertions(+), 17 deletions(-)
+         pr_debug("%s: leaking PFN range 0x%llx-0x%llx\n", __func__, 
+pfn, pfn + npages);
 
-diff --git a/arch/powerpc/Makefile b/arch/powerpc/Makefile
-index f19dbaa1d541..cd6aaa45f355 100644
---- a/arch/powerpc/Makefile
-+++ b/arch/powerpc/Makefile
-@@ -133,11 +133,11 @@ CFLAGS-$(CONFIG_PPC64)	+= $(call cc-option,-mno-pointers-to-nested-functions)
- CFLAGS-$(CONFIG_PPC64)	+= $(call cc-option,-mlong-double-128)
- 
- # Clang unconditionally reserves r2 on ppc32 and does not support the flag
--# https://bugs.llvm.org/show_bug.cgi?id=39555
-+# https://llvm.org/pr39555
- CFLAGS-$(CONFIG_PPC32)	:= $(call cc-option, -ffixed-r2)
- 
- # Clang doesn't support -mmultiple / -mno-multiple
--# https://bugs.llvm.org/show_bug.cgi?id=39556
-+# https://llvm.org/pr39556
- CFLAGS-$(CONFIG_PPC32)	+= $(call cc-option, $(MULTIPLEWORD))
- 
- CFLAGS-$(CONFIG_PPC32)	+= $(call cc-option,-mno-readonly-in-sdata)
-diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/book3s_hv_nested.c
-index 3b658b8696bc..3f5970f74c6b 100644
---- a/arch/powerpc/kvm/book3s_hv_nested.c
-+++ b/arch/powerpc/kvm/book3s_hv_nested.c
-@@ -55,7 +55,7 @@ void kvmhv_save_hv_regs(struct kvm_vcpu *vcpu, struct hv_guest_state *hr)
- 	hr->dawrx1 = vcpu->arch.dawrx1;
- }
- 
--/* Use noinline_for_stack due to https://bugs.llvm.org/show_bug.cgi?id=49610 */
-+/* Use noinline_for_stack due to https://llvm.org/pr49610 */
- static noinline_for_stack void byteswap_pt_regs(struct pt_regs *regs)
- {
- 	unsigned long *addr = (unsigned long *) regs;
-diff --git a/arch/s390/include/asm/ftrace.h b/arch/s390/include/asm/ftrace.h
-index 5a82b08f03cd..621f23d5ae30 100644
---- a/arch/s390/include/asm/ftrace.h
-+++ b/arch/s390/include/asm/ftrace.h
-@@ -9,7 +9,7 @@
- #ifndef __ASSEMBLY__
- 
- #ifdef CONFIG_CC_IS_CLANG
--/* https://bugs.llvm.org/show_bug.cgi?id=41424 */
-+/* https://llvm.org/pr41424 */
- #define ftrace_return_address(n) 0UL
- #else
- #define ftrace_return_address(n) __builtin_return_address(n)
-diff --git a/arch/x86/power/Makefile b/arch/x86/power/Makefile
-index 379777572bc9..e0cd7afd5302 100644
---- a/arch/x86/power/Makefile
-+++ b/arch/x86/power/Makefile
-@@ -5,7 +5,7 @@
- CFLAGS_cpu.o	:= -fno-stack-protector
- 
- # Clang may incorrectly inline functions with stack protector enabled into
--# __restore_processor_state(): https://bugs.llvm.org/show_bug.cgi?id=47479
-+# __restore_processor_state(): https://llvm.org/pr47479
- CFLAGS_REMOVE_cpu.o := $(CC_FLAGS_LTO)
- 
- obj-$(CONFIG_PM_SLEEP)		+= cpu.o
-diff --git a/crypto/blake2b_generic.c b/crypto/blake2b_generic.c
-index 6704c0355889..32e380b714b6 100644
---- a/crypto/blake2b_generic.c
-+++ b/crypto/blake2b_generic.c
-@@ -102,7 +102,7 @@ static void blake2b_compress_one_generic(struct blake2b_state *S,
- 	ROUND(10);
- 	ROUND(11);
- #ifdef CONFIG_CC_IS_CLANG
--#pragma nounroll /* https://bugs.llvm.org/show_bug.cgi?id=45803 */
-+#pragma nounroll /* https://llvm.org/pr45803 */
- #endif
- 	for (i = 0; i < 8; ++i)
- 		S->h[i] = S->h[i] ^ v[i] ^ v[i + 8];
-diff --git a/drivers/firmware/efi/libstub/Makefile b/drivers/firmware/efi/libstub/Makefile
-index 06964a3c130f..a223bd10564b 100644
---- a/drivers/firmware/efi/libstub/Makefile
-+++ b/drivers/firmware/efi/libstub/Makefile
-@@ -105,7 +105,7 @@ lib-y				:= $(patsubst %.o,%.stub.o,$(lib-y))
- # Even when -mbranch-protection=none is set, Clang will generate a
- # .note.gnu.property for code-less object files (like lib/ctype.c),
- # so work around this by explicitly removing the unwanted section.
--# https://bugs.llvm.org/show_bug.cgi?id=46480
-+# https://llvm.org/pr46480
- STUBCOPY_FLAGS-y		+= --remove-section=.note.gnu.property
- 
- STUBCOPY_RELOC-$(CONFIG_X86_32)	:= R_386_32
-diff --git a/drivers/gpu/drm/amd/amdgpu/sdma_v4_4_2.c b/drivers/gpu/drm/amd/amdgpu/sdma_v4_4_2.c
-index 0f24af6f2810..265fa028b121 100644
---- a/drivers/gpu/drm/amd/amdgpu/sdma_v4_4_2.c
-+++ b/drivers/gpu/drm/amd/amdgpu/sdma_v4_4_2.c
-@@ -610,7 +610,7 @@ static uint32_t sdma_v4_4_2_rb_cntl(struct amdgpu_ring *ring, uint32_t rb_cntl)
- 	/* Set ring buffer size in dwords */
- 	uint32_t rb_bufsz = order_base_2(ring->ring_size / 4);
- 
--	barrier(); /* work around https://bugs.llvm.org/show_bug.cgi?id=42576 */
-+	barrier(); /* work around https://llvm.org/pr42576 */
- 	rb_cntl = REG_SET_FIELD(rb_cntl, SDMA_GFX_RB_CNTL, RB_SIZE, rb_bufsz);
- #ifdef __BIG_ENDIAN
- 	rb_cntl = REG_SET_FIELD(rb_cntl, SDMA_GFX_RB_CNTL, RB_SWAP_ENABLE, 1);
-diff --git a/drivers/media/test-drivers/vicodec/codec-fwht.c b/drivers/media/test-drivers/vicodec/codec-fwht.c
-index 1ce682e1b85c..fd75457d03b2 100644
---- a/drivers/media/test-drivers/vicodec/codec-fwht.c
-+++ b/drivers/media/test-drivers/vicodec/codec-fwht.c
-@@ -49,7 +49,7 @@ static const uint8_t zigzag[64] = {
- 
- /*
-  * noinline_for_stack to work around
-- * https://bugs.llvm.org/show_bug.cgi?id=38809
-+ * https://llvm.org/pr38809
-  */
- static int noinline_for_stack
- rlc(const s16 *in, __be16 *output, int blocktype)
-diff --git a/drivers/regulator/Kconfig b/drivers/regulator/Kconfig
-index f3ec24691378..f537e78478ef 100644
---- a/drivers/regulator/Kconfig
-+++ b/drivers/regulator/Kconfig
-@@ -278,7 +278,7 @@ config REGULATOR_CROS_EC
- config REGULATOR_DA903X
- 	tristate "Dialog Semiconductor DA9030/DA9034 regulators"
- 	depends on PMIC_DA903X
--	depends on !CC_IS_CLANG # https://bugs.llvm.org/show_bug.cgi?id=38789
-+	depends on !CC_IS_CLANG # https://llvm.org/pr38789
- 	help
- 	  Say y here to support the BUCKs and LDOs regulators found on
- 	  Dialog Semiconductor DA9030/DA9034 PMIC.
-diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/vmlinux.lds.h
-index bae0fe4d499b..c425a1e2edee 100644
---- a/include/asm-generic/vmlinux.lds.h
-+++ b/include/asm-generic/vmlinux.lds.h
-@@ -977,7 +977,7 @@
-  * -fsanitize=thread produce unwanted sections (.eh_frame
-  * and .init_array.*), but CONFIG_CONSTRUCTORS wants to
-  * keep any .init_array.* sections.
-- * https://bugs.llvm.org/show_bug.cgi?id=46478
-+ * https://llvm.org/pr46478
-  */
- #ifdef CONFIG_UNWIND_TABLES
- #define DISCARD_EH_FRAME
-diff --git a/lib/Kconfig.kasan b/lib/Kconfig.kasan
-index fdca89c05745..de3e9e4803af 100644
---- a/lib/Kconfig.kasan
-+++ b/lib/Kconfig.kasan
-@@ -163,7 +163,7 @@ config KASAN_STACK
- 	  out-of-bounds bugs in stack variables.
- 
- 	  With Clang, stack instrumentation has a problem that causes excessive
--	  stack usage, see https://bugs.llvm.org/show_bug.cgi?id=38809. Thus,
-+	  stack usage, see https://llvm.org/pr38809. Thus,
- 	  with Clang, this option is deemed unsafe.
- 
- 	  This option is always disabled when compile-testing with Clang to
-diff --git a/lib/raid6/Makefile b/lib/raid6/Makefile
-index 1c5420ff254e..385a94aa0b99 100644
---- a/lib/raid6/Makefile
-+++ b/lib/raid6/Makefile
-@@ -21,7 +21,7 @@ altivec_flags += -isystem $(shell $(CC) -print-file-name=include)
- ifdef CONFIG_CC_IS_CLANG
- # clang ppc port does not yet support -maltivec when -msoft-float is
- # enabled. A future release of clang will resolve this
--# https://bugs.llvm.org/show_bug.cgi?id=31177
-+# https://llvm.org/pr31177
- CFLAGS_REMOVE_altivec1.o  += -msoft-float
- CFLAGS_REMOVE_altivec2.o  += -msoft-float
- CFLAGS_REMOVE_altivec4.o  += -msoft-float
-diff --git a/lib/stackinit_kunit.c b/lib/stackinit_kunit.c
-index 05947a2feb93..7a10e1d17258 100644
---- a/lib/stackinit_kunit.c
-+++ b/lib/stackinit_kunit.c
-@@ -404,7 +404,7 @@ static noinline int leaf_switch_2_none(unsigned long sp, bool fill,
-  * These are expected to fail for most configurations because neither
-  * GCC nor Clang have a way to perform initialization of variables in
-  * non-code areas (i.e. in a switch statement before the first "case").
-- * https://bugs.llvm.org/show_bug.cgi?id=44916
-+ * https://llvm.org/pr44916
-  */
- DEFINE_TEST_DRIVER(switch_1_none, uint64_t, SCALAR, ALWAYS_FAIL);
- DEFINE_TEST_DRIVER(switch_2_none, uint64_t, SCALAR, ALWAYS_FAIL);
-diff --git a/mm/slab_common.c b/mm/slab_common.c
-index 8d431193c273..105ba974854c 100644
---- a/mm/slab_common.c
-+++ b/mm/slab_common.c
-@@ -656,7 +656,7 @@ static struct kmem_cache *__init create_kmalloc_cache(const char *name,
- 
- struct kmem_cache *
- kmalloc_caches[NR_KMALLOC_TYPES][KMALLOC_SHIFT_HIGH + 1] __ro_after_init =
--{ /* initialization for https://bugs.llvm.org/show_bug.cgi?id=42570 */ };
-+{ /* initialization for https://llvm.org/pr42570 */ };
- EXPORT_SYMBOL(kmalloc_caches);
- 
- #ifdef CONFIG_RANDOM_KMALLOC_CACHES
-diff --git a/net/bridge/br_multicast.c b/net/bridge/br_multicast.c
-index d7d021af1029..523f72ac9633 100644
---- a/net/bridge/br_multicast.c
-+++ b/net/bridge/br_multicast.c
-@@ -5043,7 +5043,7 @@ void br_multicast_uninit_stats(struct net_bridge *br)
- 	free_percpu(br->mcast_stats);
- }
- 
--/* noinline for https://bugs.llvm.org/show_bug.cgi?id=45802#c9 */
-+/* noinline for https://llvm.org/pr45802#c9 */
- static noinline_for_stack void mcast_stats_add_dir(u64 *dst, u64 *src)
- {
- 	dst[BR_MCAST_DIR_RX] += src[BR_MCAST_DIR_RX];
-diff --git a/security/Kconfig b/security/Kconfig
-index 52c9af08ad35..606a87c29a01 100644
---- a/security/Kconfig
-+++ b/security/Kconfig
-@@ -142,7 +142,7 @@ config HARDENED_USERCOPY
- config FORTIFY_SOURCE
- 	bool "Harden common str/mem functions against buffer overflows"
- 	depends on ARCH_HAS_FORTIFY_SOURCE
--	# https://bugs.llvm.org/show_bug.cgi?id=41459
-+	# https://llvm.org/pr41459
- 	depends on !CC_IS_CLANG || CLANG_VERSION >= 120001
- 	# https://github.com/llvm/llvm-project/issues/53645
- 	depends on !CC_IS_CLANG || !X86_32
+         spin_lock(&snp_leaked_pages_list_lock);
+         while (npages--) {
+                 /*
+                  * Reuse the page's buddy list for chaining into the leaked
+                  * pages list. This page should not be on a free list 
+currently
+                  * and is also unsafe to be added to a free list.
+                  */
+                 if ((likely(!PageCompound(page))) || (PageCompound(page) &&
+                     !PageTail(page) && compound_head(page) == page))
+                         /*
+                          * Skip inserting tail pages of compound page as
+                          * page->buddy_list of tail pages is not usable.
+                          */
+                         list_add_tail(&page->buddy_list, 
+&snp_leaked_pages_list);
+                 sev_dump_rmpentry(pfn);
+                 snp_nr_leaked_pages++;
+                 pfn++;
+                 page++;
+         }
+         spin_unlock(&snp_leaked_pages_list_lock);
+}
 
--- 
-2.43.0
+Thanks, Ashish
 
 
