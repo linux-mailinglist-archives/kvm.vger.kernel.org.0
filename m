@@ -1,53 +1,53 @@
-Return-Path: <kvm+bounces-5863-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5864-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C85DD827D6C
-	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 04:41:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4D35827E61
+	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 06:38:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7742A284C12
-	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 03:41:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D63AA1F246CE
+	for <lists+kvm@lfdr.de>; Tue,  9 Jan 2024 05:38:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15E7353A4;
-	Tue,  9 Jan 2024 03:41:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CB2D6D6FA;
+	Tue,  9 Jan 2024 05:38:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="agEMEu1T"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TSxz0WXb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F02DD3D86;
-	Tue,  9 Jan 2024 03:41:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1A6BEB8
+	for <kvm@vger.kernel.org>; Tue,  9 Jan 2024 05:38:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1704771697; x=1736307697;
-  h=message-id:date:mime-version:cc:subject:to:references:
+  t=1704778709; x=1736314709;
+  h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=0LdLdd5VFFhLorx8pbQnlS22X5wJJoCIwyGO5I6Dq9A=;
-  b=agEMEu1TNril1O3jlbBCjBr6ne98c9odINZ2FWUST+vjAwn6MdnqMiBg
-   xoIp3BdOMd2ziVK14cKmRuEUl4knqkFw4Pz+zyiKKIhgRIFNAhHw2KOxc
-   M/dsnd0sncJkBW/g6C/EX3CTv3ofiXlXNy+70LD9LU2VSovKxjCl6J87T
-   OD0mK1qNC6pZzqRaLUwhc/eTOXy+LHmfbAsswL8hVkELA8QoXUfFxCCuM
-   Hhzw+Doz1zFMwNLmqlhRnxFio93vdumvO1BSenQrprpvkORhCy+pJSDGH
-   0NSANstjXGkJtkfb0hApieXATjvlAQGRsj6Rrbl9E3DG/UetUF+VZ0xJT
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10947"; a="16667563"
+  bh=XrUn2EeNuhQURB9JbWxsm1XG8XAZDv9HlyO2tI0QvME=;
+  b=TSxz0WXbwincbhrx0wZpdg6o1XvrLkF4o4drNVHNXIT0DCXF0q89SOub
+   U45HgdMsYlcq7yzgn2YZ6EnKvGKaybKN81+8ufzykj5WGlsFBiBcE8uh0
+   8FA13j94wLWYSMu6DPoxDy6KScK3Yd0RK6Fg+bvvGFBOs4RZPNHu+Boi4
+   m/CbcV1L5aAkghBE7MICZRCT48a+lobDtTA+oXiJOkOA9E9lEd3Ebkl8P
+   v8+SE+kkSKamOQ0AchgAs+94LGRCvlLzgCAhmYxWTH9QLO4uQRVxLLeR1
+   jUELomyx/3cCdJII9Mhsewxn8knicrFGIpPoYIOlOqis98ty8nbtgs/3/
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10947"; a="4848052"
 X-IronPort-AV: E=Sophos;i="6.04,181,1695711600"; 
-   d="scan'208";a="16667563"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2024 19:41:36 -0800
+   d="scan'208";a="4848052"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2024 21:38:28 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10947"; a="852024581"
+X-IronPort-AV: E=McAfee;i="6600,9927,10947"; a="781664636"
 X-IronPort-AV: E=Sophos;i="6.04,181,1695711600"; 
-   d="scan'208";a="852024581"
-Received: from allen-box.sh.intel.com (HELO [10.239.159.127]) ([10.239.159.127])
-  by fmsmga004.fm.intel.com with ESMTP; 08 Jan 2024 19:41:32 -0800
-Message-ID: <91c2add2-3015-4935-9dd5-d4e42aff473a@linux.intel.com>
-Date: Tue, 9 Jan 2024 11:36:19 +0800
+   d="scan'208";a="781664636"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.22.149]) ([10.93.22.149])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2024 21:38:22 -0800
+Message-ID: <62b421de-33d2-4c2f-81a3-4b5a0abb64c5@intel.com>
+Date: Tue, 9 Jan 2024 13:38:19 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -55,90 +55,139 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Cc: baolu.lu@linux.intel.com, Joerg Roedel <joro@8bytes.org>,
- Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
- Kevin Tian <kevin.tian@intel.com>,
- Jean-Philippe Brucker <jean-philippe@linaro.org>,
- Nicolin Chen <nicolinc@nvidia.com>, Yi Liu <yi.l.liu@intel.com>,
- Jacob Pan <jacob.jun.pan@linux.intel.com>,
- Longfang Liu <liulongfang@huawei.com>, Yan Zhao <yan.y.zhao@intel.com>,
- iommu@lists.linux.dev, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v9 13/14] iommu: Improve iopf_queue_remove_device()
+Subject: Re: [PATCH v3 52/70] i386/tdx: handle TDG.VP.VMCALL<GetQuote>
 Content-Language: en-US
-To: Jason Gunthorpe <jgg@ziepe.ca>
-References: <20231220012332.168188-1-baolu.lu@linux.intel.com>
- <20231220012332.168188-14-baolu.lu@linux.intel.com>
- <20240105162540.GH50608@ziepe.ca>
-From: Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <20240105162540.GH50608@ziepe.ca>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, David Hildenbrand
+ <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
+ <philmd@linaro.org>, Cornelia Huck <cohuck@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
+ kvm@vger.kernel.org, Michael Roth <michael.roth@amd.com>,
+ Sean Christopherson <seanjc@google.com>, Claudio Fontana <cfontana@suse.de>,
+ Gerd Hoffmann <kraxel@redhat.com>, Isaku Yamahata
+ <isaku.yamahata@gmail.com>, Chenyi Qiang <chenyi.qiang@intel.com>
+References: <20231115071519.2864957-1-xiaoyao.li@intel.com>
+ <20231115071519.2864957-53-xiaoyao.li@intel.com>
+ <ZVUGtpZDTW27F8Um@redhat.com>
+ <db4330cf-d25a-48d3-b681-cf2326c16912@intel.com>
+ <ZZwKPH3fVHo9EyBy@redhat.com>
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <ZZwKPH3fVHo9EyBy@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 1/6/24 12:25 AM, Jason Gunthorpe wrote:
-> On Wed, Dec 20, 2023 at 09:23:31AM +0800, Lu Baolu wrote:
->> -int iopf_queue_remove_device(struct iopf_queue *queue, struct device *dev)
->> +void iopf_queue_remove_device(struct iopf_queue *queue, struct device *dev)
->>   {
->> -	int ret = 0;
->>   	struct iopf_fault *iopf, *next;
->> +	struct iommu_page_response resp;
->>   	struct dev_iommu *param = dev->iommu;
->>   	struct iommu_fault_param *fault_param;
->> +	const struct iommu_ops *ops = dev_iommu_ops(dev);
->>   
->>   	mutex_lock(&queue->lock);
->>   	mutex_lock(&param->lock);
->>   	fault_param = rcu_dereference_check(param->fault_param,
->>   					    lockdep_is_held(&param->lock));
->> -	if (!fault_param) {
->> -		ret = -ENODEV;
->> -		goto unlock;
->> -	}
->> -
->> -	if (fault_param->queue != queue) {
->> -		ret = -EINVAL;
->> -		goto unlock;
->> -	}
->>   
->> -	if (!list_empty(&fault_param->faults)) {
->> -		ret = -EBUSY;
->> +	if (WARN_ON(!fault_param || fault_param->queue != queue))
->>   		goto unlock;
->> -	}
->> -
->> -	list_del(&fault_param->queue_list);
->>   
->> -	/* Just in case some faults are still stuck */
->> +	mutex_lock(&fault_param->lock);
->>   	list_for_each_entry_safe(iopf, next, &fault_param->partial, list)
->>   		kfree(iopf);
->>   
->> +	list_for_each_entry_safe(iopf, next, &fault_param->faults, list) {
->> +		memset(&resp, 0, sizeof(struct iommu_page_response));
->> +		resp.pasid = iopf->fault.prm.pasid;
->> +		resp.grpid = iopf->fault.prm.grpid;
->> +		resp.code = IOMMU_PAGE_RESP_INVALID;
+On 1/8/2024 10:44 PM, Daniel P. Berrangé wrote:
+> On Fri, Dec 29, 2023 at 10:30:15AM +0800, Xiaoyao Li wrote:
+>> On 11/16/2023 1:58 AM, Daniel P. Berrangé wrote:
+>>> On Wed, Nov 15, 2023 at 02:15:01AM -0500, Xiaoyao Li wrote:
+>>>> From: Isaku Yamahata <isaku.yamahata@intel.com>
+>>>>
+>>>> For GetQuote, delegate a request to Quote Generation Service.
+>>>> Add property "quote-generation-socket" to tdx-guest, whihc is a property
+>>>> of type SocketAddress to specify Quote Generation Service(QGS).
+>>>>
+>>>> On request, connect to the QGS, read request buffer from shared guest
+>>>> memory, send the request buffer to the server and store the response
+>>>> into shared guest memory and notify TD guest by interrupt.
+>>>>
+>>>> command line example:
+>>>>     qemu-system-x86_64 \
+>>>>       -object '{"qom-type":"tdx-guest","id":"tdx0","quote-generation-socket":{"type": "vsock", "cid":"2","port":"1234"}}' \
+>>>>       -machine confidential-guest-support=tdx0
+>>>>
+>>>> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+>>>> Codeveloped-by: Chenyi Qiang <chenyi.qiang@intel.com>
+>>>> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
+>>>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>>>> ---
+>>>> Changes in v3:
+>>>> - rename property "quote-generation-service" to "quote-generation-socket";
+>>>> - change the type of "quote-generation-socket" from str to
+>>>>     SocketAddress;
+>>>> - squash next patch into this one;
+>>>> ---
+>>>>    qapi/qom.json         |   5 +-
+>>>>    target/i386/kvm/tdx.c | 430 ++++++++++++++++++++++++++++++++++++++++++
+>>>>    target/i386/kvm/tdx.h |   6 +
+>>>>    3 files changed, 440 insertions(+), 1 deletion(-)
+>>>>
+>>>> +static void tdx_handle_get_quote_connected(QIOTask *task, gpointer opaque)
+>>>> +{
+>>>> +    struct tdx_get_quote_task *t = opaque;
+>>>> +    Error *err = NULL;
+>>>> +    char *in_data = NULL;
+>>>> +    MachineState *ms;
+>>>> +    TdxGuest *tdx;
+>>>> +
+>>>> +    t->hdr.error_code = cpu_to_le64(TDX_VP_GET_QUOTE_ERROR);
+>>>> +    if (qio_task_propagate_error(task, NULL)) {
+>>>> +        t->hdr.error_code = cpu_to_le64(TDX_VP_GET_QUOTE_QGS_UNAVAILABLE);
+>>>> +        goto error;
+>>>> +    }
+>>>> +
+>>>> +    in_data = g_malloc(le32_to_cpu(t->hdr.in_len));
+>>>> +    if (!in_data) {
+>>>> +        goto error;
+>>>> +    }
+>>>> +
+>>>> +    if (address_space_read(&address_space_memory, t->gpa + sizeof(t->hdr),
+>>>> +                           MEMTXATTRS_UNSPECIFIED, in_data,
+>>>> +                           le32_to_cpu(t->hdr.in_len)) != MEMTX_OK) {
+>>>> +        goto error;
+>>>> +    }
+>>>> +
+>>>> +    qio_channel_set_blocking(QIO_CHANNEL(t->ioc), false, NULL);
+>>>
+>>> You've set the channel to non-blocking, but....
+>>>
+>>>> +
+>>>> +    if (qio_channel_write_all(QIO_CHANNEL(t->ioc), in_data,
+>>>> +                              le32_to_cpu(t->hdr.in_len), &err) ||
+>>>> +        err) {
+>>>
+>>> ...this method will block execution of this thread, by either
+>>> sleeping in poll() or doing a coroutine yield.
+>>>
+>>> I don't think this is in coroutine context, so presumably this
+>>> is just blocking.  So what was the point in marking the channel
+>>> non-blocking ?
+>>
+>> Hi Dainel,
+>>
+>> First of all, I'm not good at socket or qio channel thing. Please correct me
+>> and teach me when I'm wrong.
+>>
+>> I'm not the author of this patch. My understanding is that, set it to
+>> non-blocking is for the qio_channel_write_all() to proceed immediately?
 > 
-> I would probably move the resp and iopf variables into here:
+> The '_all' suffixed methods are implemented such that they will
+> sleep in poll(), or a coroutine yield when seeing EAGAIN.
 > 
-> 		struct iopf_fault *iopf = &group->last_fault;
-> 		struct iommu_page_response resp = {
-> 			.pasid = iopf->fault.prm.pasid,
-> 			.grpid = iopf->fault.prm.grpid,
-> 			.code = IOMMU_PAGE_RESP_INVALID
-> 		};
+>> If set non-blocking is not needed, I can remove it.
+>>
+>>> You are setting up a background watch to wait for the reply
+>>> so we don't block this thread, so you seem to want non-blocking
+>>> behaviour.
+>>
+>> Both sending and receiving are in a new thread created by
+>> qio_channel_socket_connect_async(). So I think both of then can be blocking
+>> and don't need to be in another background thread.
+>>
+>> what's your suggestion on it? Make both sending and receiving blocking or
+>> non-blocking?
 > 
-> (and call the other one partial_iopf)
+> I think the code /should/ be non-blocking, which would mean
+> using   qio_channel_write, instead of qio_channel_write_all,
+> and using a .
 
-Yours looks better. Done.
+I see. will implement in the next version.
 
-> 
-> But this looks fine either way
-> 
-> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+> With regards,
+> Daniel
 
-Thank you very much!
-
-Best regards,
-baolu
 
