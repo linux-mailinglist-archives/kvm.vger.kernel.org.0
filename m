@@ -1,133 +1,242 @@
-Return-Path: <kvm+bounces-5982-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5983-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C8EC82948B
-	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 08:55:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5AF5829584
+	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 10:00:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E3F01F280E8
-	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 07:55:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A2691F26021
+	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 09:00:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E1743C47B;
-	Wed, 10 Jan 2024 07:55:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C2CB3AC1A;
+	Wed, 10 Jan 2024 08:59:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XHvz8zwR"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="qjBrksVJ";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="RY4cswgs";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="qjBrksVJ";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="RY4cswgs"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D58C364B4;
-	Wed, 10 Jan 2024 07:55:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1704873324; x=1736409324;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=y6Mii2fEJq+LAezalOLGEKnkrctOM7rZFhPVgIL+OZ8=;
-  b=XHvz8zwRrr6DFExfWFPovc/2CO26dL0riCneradj15QPSiGfDddDehiq
-   iZ9h47B4HR0ed9xFXdK6OM5kGiHLzEoJ3Ns2MnXtWaP3cUpWd88Bkribg
-   /uax6uHdm1CfhzzC4t+wKMdTz9xtZQ5o1PLCHDC0SdIeikvReHibMVCtc
-   i/89261ML+RzpO9mXF3ZNRFelPPC/7rXcnl98sPyC9HLkXad+Ebk9PMW0
-   bG1AtmUGBQUP4A6Qfpm/mgt49n079oIWKH4022AAxgjbArHOhqKU0mS41
-   JH6Hqdl6ZX2xBujmbAqu4qo128OStIdkikafaqKSACRM4NVXELYJjrjtz
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10947"; a="398130262"
-X-IronPort-AV: E=Sophos;i="6.04,184,1695711600"; 
-   d="scan'208";a="398130262"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2024 23:55:23 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10947"; a="901054996"
-X-IronPort-AV: E=Sophos;i="6.04,184,1695711600"; 
-   d="scan'208";a="901054996"
-Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
-  by fmsmga002.fm.intel.com with ESMTP; 09 Jan 2024 23:55:21 -0800
-Date: Wed, 10 Jan 2024 15:55:20 +0800
-From: Yuan Yao <yuan.yao@linux.intel.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Like Xu <like.xu.linux@gmail.com>
-Subject: Re: [PATCH 2/4] KVM: x86: Rely solely on preempted_in_kernel flag
- for directed yield
-Message-ID: <20240110075520.psahkt47hoqodqqf@yy-desk-7060>
-References: <20240110003938.490206-1-seanjc@google.com>
- <20240110003938.490206-3-seanjc@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11E243A8C6;
+	Wed, 10 Jan 2024 08:59:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 1F65B21E17;
+	Wed, 10 Jan 2024 08:59:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1704877184; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0GtM+U/m1/8CwPcl+4EBtNE2sj1pzKEolTyiwmoL/Us=;
+	b=qjBrksVJ7ayqtT+hHMQ3E32pBal7nh9Y3++2UcNMq4F1aQ3R606xDvDXyS+8yjW8lBsHyI
+	zAW5/0Mpb1ig+YsUu+Cz467VrCMZ8P/EL0QCo9fUb6+aYrPjF4yCSvFvSD3XKPexpTJLzA
+	+575X+EQKkKnU9eakb6GIjaE4bFTFB4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1704877184;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0GtM+U/m1/8CwPcl+4EBtNE2sj1pzKEolTyiwmoL/Us=;
+	b=RY4cswgsDRFXGOkmPW9cy8ROFg9IKH3nV+B1DI5nTja1CXyN+Fuu1V6t+BKZ6incmHbQow
+	/wczs5i4KHO89nBA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1704877184; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0GtM+U/m1/8CwPcl+4EBtNE2sj1pzKEolTyiwmoL/Us=;
+	b=qjBrksVJ7ayqtT+hHMQ3E32pBal7nh9Y3++2UcNMq4F1aQ3R606xDvDXyS+8yjW8lBsHyI
+	zAW5/0Mpb1ig+YsUu+Cz467VrCMZ8P/EL0QCo9fUb6+aYrPjF4yCSvFvSD3XKPexpTJLzA
+	+575X+EQKkKnU9eakb6GIjaE4bFTFB4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1704877184;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0GtM+U/m1/8CwPcl+4EBtNE2sj1pzKEolTyiwmoL/Us=;
+	b=RY4cswgsDRFXGOkmPW9cy8ROFg9IKH3nV+B1DI5nTja1CXyN+Fuu1V6t+BKZ6incmHbQow
+	/wczs5i4KHO89nBA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id CCB0E13786;
+	Wed, 10 Jan 2024 08:59:43 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id MHKKMX9cnmVXewAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Wed, 10 Jan 2024 08:59:43 +0000
+Message-ID: <7234513d-45c9-4bda-a537-4278387cedc4@suse.cz>
+Date: Wed, 10 Jan 2024 09:59:43 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240110003938.490206-3-seanjc@google.com>
-User-Agent: NeoMutt/20171215
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 15/26] x86/sev: Introduce snp leaked pages list
+To: "Kalra, Ashish" <ashish.kalra@amd.com>,
+ Michael Roth <michael.roth@amd.com>, x86@kernel.org
+Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
+ linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+ tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
+ thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
+ pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+ jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
+ slp@redhat.com, pgonda@google.com, peterz@infradead.org,
+ srinivas.pandruvada@linux.intel.com, rientjes@google.com, tobin@ibm.com,
+ bp@alien8.de, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+ sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+ jarkko@kernel.org, nikunj.dadhania@amd.com, pankaj.gupta@amd.com,
+ liam.merwick@oracle.com, zhi.a.wang@intel.com
+References: <20231230161954.569267-1-michael.roth@amd.com>
+ <20231230161954.569267-16-michael.roth@amd.com>
+ <f221ad9d-6fc3-466b-bacf-23986b8655f5@suse.cz>
+ <5cdd2093-b007-404d-96a8-89b3aa6e6e4b@amd.com>
+Content-Language: en-US
+From: Vlastimil Babka <vbabka@suse.cz>
+In-Reply-To: <5cdd2093-b007-404d-96a8-89b3aa6e6e4b@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Rspamd-Queue-Id: 1F65B21E17
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=qjBrksVJ;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=RY4cswgs
+X-Spam-Score: -4.50
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-4.50 / 50.00];
+	 ARC_NA(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	 XM_UA_NO_VERSION(0.01)[];
+	 FROM_HAS_DN(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 BAYES_HAM(-3.00)[100.00%];
+	 MIME_GOOD(-0.10)[text/plain];
+	 NEURAL_HAM_LONG(-1.00)[-1.000];
+	 R_RATELIMIT(0.00)[to_ip_from(RLisu716frudqkg98kczdd9eac)];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	 DKIM_TRACE(0.00)[suse.cz:+];
+	 MX_GOOD(-0.01)[];
+	 RCPT_COUNT_TWELVE(0.00)[37];
+	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:dkim];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 NEURAL_HAM_SHORT(-0.20)[-1.000];
+	 RCVD_TLS_ALL(0.00)[];
+	 MID_RHS_MATCH_FROM(0.00)[]
 
-On Tue, Jan 09, 2024 at 04:39:36PM -0800, Sean Christopherson wrote:
-> Snapshot preempted_in_kernel using kvm_arch_vcpu_in_kernel() so that the
-> flag is "accurate" (or rather, consistent and deterministic within KVM)
-> for guest with protected state, and explicitly use preempted_in_kernel
-> when checking if a vCPU was preempted in kernel mode instead of bouncing
-> through kvm_arch_vcpu_in_kernel().
->
-> Drop the gnarly logic in kvm_arch_vcpu_in_kernel() that redirects to
-> preempted_in_kernel if the target vCPU is not the "running", i.e. loaded,
-> vCPU, as the only reason that code existed was for the directed yield case
-> where KVM wants to check the CPL of a vCPU that may or may not be loaded
-> on the current pCPU.
->
-> Cc: Like Xu <like.xu.linux@gmail.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/x86.c | 8 ++------
->  1 file changed, 2 insertions(+), 6 deletions(-)
->
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 415509918c7f..77494f9c8d49 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -5062,8 +5062,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->  	int idx;
->
->  	if (vcpu->preempted) {
-> -		if (!vcpu->arch.guest_state_protected)
-> -			vcpu->arch.preempted_in_kernel = !static_call(kvm_x86_get_cpl)(vcpu);
-> +		vcpu->arch.preempted_in_kernel = kvm_arch_vcpu_in_kernel(vcpu);
->
->  		/*
->  		 * Take the srcu lock as memslots will be accessed to check the gfn
-> @@ -13093,7 +13092,7 @@ bool kvm_arch_dy_has_pending_interrupt(struct kvm_vcpu *vcpu)
->
->  bool kvm_arch_vcpu_preempted_in_kernel(struct kvm_vcpu *vcpu)
->  {
-> -	return kvm_arch_vcpu_in_kernel(vcpu);
-> +	return vcpu->arch.preempted_in_kernel;
->  }
->
->  bool kvm_arch_dy_runnable(struct kvm_vcpu *vcpu)
-> @@ -13116,9 +13115,6 @@ bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
->  	if (vcpu->arch.guest_state_protected)
->  		return true;
->
-> -	if (vcpu != kvm_get_running_vcpu())
-> -		return vcpu->arch.preempted_in_kernel;
-> -
+On 1/9/24 23:19, Kalra, Ashish wrote:
+> Hello Vlastimil,
+> 
+> On 1/8/2024 4:45 AM, Vlastimil Babka wrote:
+>> On 12/30/23 17:19, Michael Roth wrote:
+>>> From: Ashish Kalra <ashish.kalra@amd.com>
+>>>
+>>> Pages are unsafe to be released back to the page-allocator, if they
+>>> have been transitioned to firmware/guest state and can't be reclaimed
+>>> or transitioned back to hypervisor/shared state. In this case add
+>>> them to an internal leaked pages list to ensure that they are not freed
+>>> or touched/accessed to cause fatal page faults.
+>>>
+>>> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+>>> [mdr: relocate to arch/x86/virt/svm/sev.c]
+>>> Signed-off-by: Michael Roth <michael.roth@amd.com>
+>> Hi, sorry I didn't respond in time to the last mail discussing previous
+>> version in
+>> https://lore.kernel.org/all/8c1fd8da-912a-a9ce-9547-107ba8a450fc@amd.com/
+>> due to upcoming holidays.
+>>
+>> I would rather avoid the approach of allocating container objects:
+>> - it's allocating memory when effectively losing memory, a dangerous thing
+>> - are all the callers and their context ok with GFP_KERNEL?
+>> - GFP_KERNEL_ACCOUNT seems wrong, why would we be charging this to the
+>> current process, it's probably not its fault the pages are leaked? Also the
+>> charging can fail?
+>> - given the benefit of having leaked pages on a list is basically just
+>> debugging (i.e. crash dump or drgn inspection) this seems too heavy
+>>
+>> I think it would be better and sufficient to use page->lru for order-0 and
+>> head pages, and simply skip tail pages (possibly with adjusted warning
+>> message for that case).
+>>
+>> Vlastimil
+>>
+>> <snip
+> 
+> Considering the above thoughts, this is updated version of 
+> snp_leak_pages(), looking forward to any review comments/feedback you 
+> have on the same:
+> 
+> void snp_leak_pages(u64 pfn, unsigned int npages)
+> {
+>          struct page *page = pfn_to_page(pfn);
+> 
+>          pr_debug("%s: leaking PFN range 0x%llx-0x%llx\n", __func__, 
+> pfn, pfn + npages);
+> 
+>          spin_lock(&snp_leaked_pages_list_lock);
+>          while (npages--) {
+>                  /*
+>                   * Reuse the page's buddy list for chaining into the leaked
+>                   * pages list. This page should not be on a free list 
+> currently
+>                   * and is also unsafe to be added to a free list.
+>                   */
+>                  if ((likely(!PageCompound(page))) || (PageCompound(page) &&
+>                      !PageTail(page) && compound_head(page) == page))
 
-Now this function accepts vcpu parameter but can only get
-information from "current" vcpu loaded on hardware for VMX.
-I'm not sure whether need "WARN_ON(vcpu != kvm_get_running_vcpu())"
-here to guard it. i.e. kvm_guest_state() still
-uses this function (although it did chekcing before).
+This is unnecessarily paranoid wrt that compound_head(page) test, but OTOH
+doesn't handle the weird case when we're leaking less than whole compound
+page (if that can even happen). So I'd suggest:
 
->  	return static_call(kvm_x86_get_cpl)(vcpu) == 0;
->  }
->
-> --
-> 2.43.0.472.g3155946c3a-goog
->
->
+while (npages) {
+
+  if ((likely(!PageCompound(page))) || (PageHead(page) && compound_nr(page)
+<= npages))
+	list_add_tail(&page->buddy_list, ...)
+  }
+
+  ... (no change from yours)
+
+  npages--;
+}
+
+(or an equivalent for()) perhaps
+
+>                          /*
+>                           * Skip inserting tail pages of compound page as
+>                           * page->buddy_list of tail pages is not usable.
+>                           */
+>                          list_add_tail(&page->buddy_list, 
+> &snp_leaked_pages_list);
+>                  sev_dump_rmpentry(pfn);
+>                  snp_nr_leaked_pages++;
+>                  pfn++;
+>                  page++;
+>          }
+>          spin_unlock(&snp_leaked_pages_list_lock);
+> }
+> 
+> Thanks, Ashish
+> 
+
 
