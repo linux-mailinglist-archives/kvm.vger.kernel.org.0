@@ -1,131 +1,119 @@
-Return-Path: <kvm+bounces-6009-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6010-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A9F6829E76
-	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 17:24:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B99A829E92
+	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 17:26:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D01C1F22B05
-	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 16:24:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AAA8D282FCF
+	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 16:26:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 394B24CDF8;
-	Wed, 10 Jan 2024 16:23:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 613B74CDFF;
+	Wed, 10 Jan 2024 16:26:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="TkI/f+tO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SWdmK6B1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE9B14CB55;
-	Wed, 10 Jan 2024 16:23:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40AEtP0A008007;
-	Wed, 10 Jan 2024 16:23:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : in-reply-to : references : date : message-id : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=deC21uqqKb/SJT3z23x6pPD8Grh+2LwgZrfw2splm3s=;
- b=TkI/f+tOiOybAbFDEFmsDx/gUObuoXk5qMYjZ/3XEQNeemwuY3XkSslAIWs1v0n7u1mD
- aeGCBaZgPZdchbLqGoftqPTxJQzytHQcsRZGR+o6U77S9ZqJMI6RhznQhrvPt5vbbKHX
- +P+zvrGRua4ugDRo8y41OGHm3FW2YncSmA9EF0lOQxxlh1rIcn6I/7aU3ppCZzj/SfuF
- mF7PORtq7WP1NWKzIZ7aY/1Bz63UMD1ah04+Evummipaqp270L5RRn6ynXsoD+4kxAdE
- 9Vh9QAcWC1SejiesDmIHluCC8ak+VEG/HIkaM50zUfJf4xRxnfRmH82GkUItURxyjq9p xA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vhuu9n81k-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 10 Jan 2024 16:23:34 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 40AGLLVt004848;
-	Wed, 10 Jan 2024 16:23:33 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vhuu9n7w7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 10 Jan 2024 16:23:33 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 40ADdJSC001339;
-	Wed, 10 Jan 2024 16:23:30 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3vfkdkdy49-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 10 Jan 2024 16:23:30 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 40AGNTI421824128
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 10 Jan 2024 16:23:29 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E6D712004B;
-	Wed, 10 Jan 2024 16:23:28 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 819B720043;
-	Wed, 10 Jan 2024 16:23:28 +0000 (GMT)
-Received: from li-1de7cd4c-3205-11b2-a85c-d27f97db1fe1.ibm.com (unknown [9.171.28.50])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Wed, 10 Jan 2024 16:23:28 +0000 (GMT)
-From: "Marc Hartmayer" <mhartmay@linux.ibm.com>
-To: Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda
- <imbrenda@linux.ibm.com>,
-        Nico Boehr <nrb@linux.ibm.com>, Thomas Huth
- <thuth@redhat.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v1] s390x/Makefile: simplify Secure
- Execution boot image generation
-In-Reply-To: <19cc133f-57a7-45cd-a7e2-a4869bb8c753@linux.ibm.com>
-References: <20231121172338.146006-1-mhartmay@linux.ibm.com>
- <19cc133f-57a7-45cd-a7e2-a4869bb8c753@linux.ibm.com>
-Date: Wed, 10 Jan 2024 17:23:26 +0100
-Message-ID: <87edep5f9d.fsf@linux.ibm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 321F64CDEA
+	for <kvm@vger.kernel.org>; Wed, 10 Jan 2024 16:26:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dbdac466edcso4932839276.2
+        for <kvm@vger.kernel.org>; Wed, 10 Jan 2024 08:26:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1704903987; x=1705508787; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=KFFHpaSTADtH/VEIQF/AhIPKZkXPJShFtYY++SD4R64=;
+        b=SWdmK6B1IFOTm/tk1owjnCf51Y+5eBEJMU15aS5lYr7kuiJmJ4Wv5pYSyCZQ3ipiXy
+         teQ1K9N2wLauvoRiaXGwXtrrreb6Bh3YtWGpz7vy8jQpDlZ03FXqmRv/RmLqFpSfjnIK
+         9cQlhiAcn6YHEWw852toBlxRH7pJbd4/sSPKTgCArw1nneQKLZo0K33+M1ePIWLua6N0
+         IxT6eaZ7fxhbYPmDAFBPm7U9EkJc3CT9lHCHFaUCTSSJG6pePjripc5csD1UDZ+cNoBl
+         uucjTtC2SLM4TfEGWvvsR0pjAeDA23UThrTkrMfHTqu06QrSy5Uf7Ou3+X+Wma2okOlE
+         cHPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704903987; x=1705508787;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KFFHpaSTADtH/VEIQF/AhIPKZkXPJShFtYY++SD4R64=;
+        b=TrVXpbb/F94uvfoNDtV7DK4oxEhDHkPsMM+1z76xU+oV+TsKXKcmWLncngVP+d2BIT
+         FLHVvQ3GyqjYkFqLNkzUf5Uh6wkbhRDAmDvi02OFQ5KAMwjGZlBueyxrwu0/ezBysB+j
+         TSoKK/03G9KInv7PwwstgbCOusXuzq5It5RmkAe4WL5iZywmbFT9gXzXuEWDPqbCtaqQ
+         LW66jqLdUHlcWlGYf/16sXy9ajdtJN8zYQjNrAibkMJvsBXnO8iqRU95wiis/L6ofSbg
+         7WCisk4Tkady+s9vi3NS2kkmxSnuZQwlGF8+vKJgY6szeVJnFB5GB7Ig2XBLC90B5K2E
+         i5hw==
+X-Gm-Message-State: AOJu0YyJJkiSOyLrW9YTEps0nGASCLlj6gxxClAffracFEIZWVbNIere
+	IsdyNG9Q4NQqtNeFDRLCrCOuRUrQYxuA5NiW8g==
+X-Google-Smtp-Source: AGHT+IFCDKSuIqtWoPLDFSC1Mk7wHwWTWUH+fHbn5EAgAxeA4wd/cQeF+PsSB2G0XPvVQ8inC6FLysEAoJU=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:134a:b0:d9a:efcc:42af with SMTP id
+ g10-20020a056902134a00b00d9aefcc42afmr48907ybu.2.1704903987151; Wed, 10 Jan
+ 2024 08:26:27 -0800 (PST)
+Date: Wed, 10 Jan 2024 08:26:25 -0800
+In-Reply-To: <ZZ42Vs3uAPwBmezn@chao-email>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: GXGO9VXDztcz-tR6wV5Pw_qorusOnBvk
-X-Proofpoint-ORIG-GUID: 74AuUekK1T9o9ddwtjYeYlW-Wpafvmiz
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-10_08,2024-01-10_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 malwarescore=0
- adultscore=0 bulkscore=0 impostorscore=0 priorityscore=1501 phishscore=0
- mlxscore=0 mlxlogscore=999 lowpriorityscore=0 suspectscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
- definitions=main-2401100133
+Mime-Version: 1.0
+References: <20240110002340.485595-1-seanjc@google.com> <ZZ42Vs3uAPwBmezn@chao-email>
+Message-ID: <ZZ7FMWuTHOV-_Gn7@google.com>
+Subject: Re: [PATCH] x86/cpu: Add a VMX flag to enumerate 5-level EPT support
+ to userspace
+From: Sean Christopherson <seanjc@google.com>
+To: Chao Gao <chao.gao@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Yi Lai <yi1.lai@intel.com>, 
+	Tao Su <tao1.su@linux.intel.com>, Xudong Hao <xudong.hao@intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Jan 10, 2024 at 11:44 AM +0100, Janosch Frank <frankja@linux.ibm.co=
-m> wrote:
-> On 11/21/23 18:23, Marc Hartmayer wrote:
->> Changes:
->> + merge Makefile rules for the generation of the Secure Execution boot
->>    image
->> + fix `parmfile` dependency for the `selftest.pv.bin` target
->> + rename `genprotimg_pcf` to `GENPROTIMG_PCF` to match the coding style
->>    in the file
->> + always provide a customer communication key - not only for the
->>    confidential dump case. Makes the code little easier and doesn't hurt.
->>=20
->> Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
->
-> Thanks, I've pushed this to devel for CI coverage
->
->
+On Wed, Jan 10, 2024, Chao Gao wrote:
+> On Tue, Jan 09, 2024 at 04:23:40PM -0800, Sean Christopherson wrote:
+> >Add a VMX flag in /proc/cpuinfo, ept_5level, so that userspace can query
+> >whether or not the CPU supports 5-level EPT paging.  EPT capabilities are
+> >enumerated via MSR, i.e. aren't accessible to userspace without help from
+> >the kernel, and knowing whether or not 5-level EPT is supported is sadly
+> >necessary for userspace to correctly configure KVM VMs.
+> 
+> This assumes procfs is enabled in Kconfig and userspace has permission to
+> access /proc/cpuinfo. But it isn't always true. So, I think it is better to
+> advertise max addressable GPA via KVM ioctls.
 
-Thanks.
+Hrm, so the help for PROC_FS says:
 
---=20
-Kind regards / Beste Gr=C3=BC=C3=9Fe
-   Marc Hartmayer
+  Several programs depend on this, so everyone should say Y here.
 
-IBM Deutschland Research & Development GmbH
-Vorsitzender des Aufsichtsrats: Wolfgang Wendt
-Gesch=C3=A4ftsf=C3=BChrung: David Faller
-Sitz der Gesellschaft: B=C3=B6blingen
-Registergericht: Amtsgericht Stuttgart, HRB 243294
+Given that this is working around something that is borderline an erratum, I'm
+inclined to say that userspace shouldn't simply assume the worst if /proc isn't
+available.  Practically speaking, I don't think a "real" VM is likely to be
+affected; AFAIK, there's no reason for QEMU or any other VMM to _need_ to expose
+a memslot at GPA[51:48] unless the VM really has however much memory that is
+(hundreds of terabytes?).  And a if someone is trying to run such a massive VM on
+such a goofy CPU...
+
+I don't think it's unreasonable for KVM selftests to require access to
+/proc/cpuinfo.  Or actually, they can probably do the same thing and self-limit
+to 48-bit addresses if /proc/cpuinfo isn't available.
+
+I'm not totally opposed to adding a more programmatic way for userspace to query
+5-level EPT support, it just seems unnecessary.  E.g. unlike CPUID, userspace
+can't directly influence whether or not KVM uses 5-level EPT.  Even in hindsight,
+I'm not entirely sure KVM should expose such a knob, as it raises questions around
+interactions guest.MAXPHYADDR and memslots that I would rather avoid.
+
+And even if we do add such uAPI, enumerating 5-level EPT in /proc/cpuinfo is
+definitely worthwhile, the only thing that would need to be tweaked is the
+justification in the changelog.
+
+One thing we can do irrespective of feature enumeration is have kvm_mmu_page_fault()
+exit to userspace with an explicit error if the guest faults ona GPA that KVM
+knows it can't map, i.e. exit with KVM_EXIT_INTERNAL_ERROR or maybe even
+KVM_EXIT_MEMORY_FAULT instead of looping indefinitely.
 
