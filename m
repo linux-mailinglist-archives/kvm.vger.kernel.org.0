@@ -1,60 +1,60 @@
-Return-Path: <kvm+bounces-5952-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5953-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E109829181
-	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 01:38:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CB81829185
+	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 01:39:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 512442892D2
-	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 00:38:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 51292288F5C
+	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 00:39:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB74E1C15;
-	Wed, 10 Jan 2024 00:38:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48B3D23D5;
+	Wed, 10 Jan 2024 00:39:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0+T+/toh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B66GLCv0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19320389
-	for <kvm@vger.kernel.org>; Wed, 10 Jan 2024 00:38:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24464186F
+	for <kvm@vger.kernel.org>; Wed, 10 Jan 2024 00:39:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dbeaf21e069so4027589276.1
-        for <kvm@vger.kernel.org>; Tue, 09 Jan 2024 16:38:01 -0800 (PST)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5f8ffd9fb8aso35942717b3.3
+        for <kvm@vger.kernel.org>; Tue, 09 Jan 2024 16:39:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704847080; x=1705451880; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1704847180; x=1705451980; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Dubuu6a5RHKTDSizXfGG9mFtdlp6O0bStYMvscHwBes=;
-        b=0+T+/tohbLWHL3+uQa63dhWLCLKAscpLLxxp5zKqVH6eOGbNnj+FiJvERIdxjtXTxR
-         5lDsJueMXVZX6DwvwjC2jzFz1qOEQLgOhvvkEiIQpqfObwhdshUmbl6cUxri71bx9xFm
-         0tFwYeqyLK24Vf/eushj7AnxIg08xJ6HuPK2rPt7q1Ab3FRXYvvXYTisXE41p1sItbka
-         dMivjcj7E7sEEtGb9253BPlDBosWPz6oFlWjl2j9tk+HZ8zB74dJMgDjmjG1GoDjZVux
-         2m1gKqEefEIgs4JlD2ElON+vamWPYJSqP4ETihmxODHumBPTaNFVq4P9lH+ffhFLb4rt
-         KCVg==
+        bh=LHQh+E98QwgdFrnlGd6RgJxgR303fsUw0Anefm352AA=;
+        b=B66GLCv08sgT4r1YY+xCUUulNTKi6Bx3G8J2aZOBePu4guo6AZ5/x+YWrs+aujWY6v
+         rcMYYWIcxz1lKVAZuQva0ABdJtKlt6N1OX50Ex7LV3/esSz3PTYk2aJEOEfozGuVWK8D
+         og5pt3pnx5OienWVvqcCHLl9nAvOnDmuj6PHttqbTezsx8SdLTo29AISem5GueIZqatN
+         ZCG3jgy+4rGfKz+56ihU6SNDamIssxswKKF8dCqBz6IFT4tEKLEcPVz3AGVwJ2/EetLM
+         h0oFyZe4TVP663WvbeajSWvzBTK+QsFvmsgc9Pn+eryRUJdPOInypUR5NVOSbS7uKpU/
+         fmaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704847080; x=1705451880;
+        d=1e100.net; s=20230601; t=1704847180; x=1705451980;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Dubuu6a5RHKTDSizXfGG9mFtdlp6O0bStYMvscHwBes=;
-        b=nnFfhYT1gh59NePbxs35QDbZZu4dvCXH3wf5KTCFIFdvr6Dc+8xiRNiQwMg42Y7o13
-         qeoN3JnE0Vz8t0kdJnXnFwSFo7jSKuYAJJgWPkdewCWsSzPjNeTDkIow6c1DXZ4Jabxf
-         cgjoJmLhTcheB9KYoMlwKIyfxU0L0PBECu1zkwi7Co/TKyyHDIUBDFy5Y9SgTk5R5n+x
-         MXxGBx7EpQQBqdK91NsZsxxZEATHxEiOCOF2hvpKLSgkxpfiP8S1JF7wZV0T2xwWoSFq
-         W/yYvXsev27nURJMqXWe40fuOrcu89XKs5L5SqPdIeQwKA895t0+njxa80aA+tAowlEH
-         qrdQ==
-X-Gm-Message-State: AOJu0YxbKwr/xQy/1CXh7W0tzb7RQpvpi4cPmH1nI7BHj8yDOjUyy5+Z
-	7ClYnQOUui9P8+LisYTHkFwWqqjzURwpP5oh1w==
-X-Google-Smtp-Source: AGHT+IE58SJtAWoao4lQ3L+CQGDpyiHkisQ7a1GVbOwazTP5MsPQkuMyveEBs2xdo/w5fqoVGzIYh/HuEE4=
+        bh=LHQh+E98QwgdFrnlGd6RgJxgR303fsUw0Anefm352AA=;
+        b=GZrjjqnpvPPMuFXX8dW0NGdGLtOvzTHYJ8gUChCiVDqmpfAnJidTtb3XjmfVVRtde+
+         8qSTlFeZ2WoI4I4IYH/dJ/AGCB8x9+UVEYKcNramZpWcwZlPIwYhgih7QY0HFHJ+ODRN
+         9AMWeYuu67HN9basJRGkbulCZLRavYYOKF627FM+TDdG+DH71DwSoH05LDtE/oC6BTTp
+         /t5tp41xQr6AfUUOUwIlSJjmbK5/oAt64jJY+EdlZDEVlMVjtvm0I/NYY/tGI1kMxJfd
+         SCJloRsURYlzXwCoJ9+NXGpZjdksZ2BVH5cymMA9d16+1pGjzvgxc2919Ve4/aJsJEM/
+         zR5g==
+X-Gm-Message-State: AOJu0YzFAQhs9Yc3Uce5pM5HK+zLyYUuF6jxd3ni51ceAkef5mkZl+pp
+	VdbD0mDxL7kHHnKOy7oAYMdDCDAQCO+nDOelWw==
+X-Google-Smtp-Source: AGHT+IHP62CliFkA96b/wsoXBHQfk8j/9CsO0CFacwbCORasfGjPKUyyyxuM77uw7yuAmCJ/BeVTJxjwd6o=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:5f48:0:b0:dbd:f6e3:19a with SMTP id
- h8-20020a255f48000000b00dbdf6e3019amr6727ybm.11.1704847080291; Tue, 09 Jan
- 2024 16:38:00 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a05:690c:3387:b0:5e6:bcea:df68 with SMTP id
+ fl7-20020a05690c338700b005e6bceadf68mr168367ywb.8.1704847180253; Tue, 09 Jan
+ 2024 16:39:40 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue,  9 Jan 2024 16:37:56 -0800
+Date: Tue,  9 Jan 2024 16:39:34 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -62,30 +62,44 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
-Message-ID: <20240110003756.489861-1-seanjc@google.com>
-Subject: [ANNOUNCE] PUCK Agenda - 2024.01.10 - Unified uAPI for protected VMs
+Message-ID: <20240110003938.490206-1-seanjc@google.com>
+Subject: [PATCH 0/4] KVM: Clean up "preempted in-kernel" logic
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, Isaku Yamahata <isaku.yamahata@linux.intel.com>, 
-	Michael Roth <michael.roth@amd.com>
+	Like Xu <like.xu.linux@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Tomorrow's PUCK topic is unifying KVM's uAPI for protected VMs, courtesy of
-Isaku.  Note, this was originally planned for LPC, but it got moved to PUCK as
-Isaku was unable to attend LPC.
+Provide a dedicated helper to query if a *different* vCPU was preempted
+in-kernel.  x86's VMX is an oddball and can only check if the vCPU is in
+kernel (versus userspace) if the vCPU is loaded on the current pCPU.
 
-https://lpc.events/event/17/contributions/1495
+The existing kvm_arch_vcpu_in_kernel() "works", but it's an ugly mess as
+KVM x86 is forced to check kvm_get_running_vcpu() to effectively undo the
+multiplexing.
 
-Time:     6am PDT
-Video:    https://meet.google.com/vdb-aeqo-knk
-Phone:    https://tel.meet/vdb-aeqo-knk?pin=3003112178656
+Note, I was sorely tempted to eliminate kvm_arch_dy_has_pending_interrupt()
+and bury that logic in VMX code, but I ultimately decided to keep it as an
+arch hook as it's entirely plausible that some other architecture can do
+cross-vCPU IRQ checks, and if KVM is going to have the (somewhat dubious
+IMO) logic, it's probably best to keep it in common code.
 
-Calendar: https://calendar.google.com/calendar/u/0?cid=Y182MWE1YjFmNjQ0NzM5YmY1YmVkN2U1ZWE1ZmMzNjY5Y2UzMmEyNTQ0YzVkYjFjN2M4OTE3MDJjYTUwOTBjN2Q1QGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20
-Drive:    https://drive.google.com/drive/folders/1aTqCrvTsQI9T4qLhhLs_l986SngGlhPH?resourcekey=0-FDy0ykM3RerZedI8R-zj4A&usp=drive_link
+Sean Christopherson (4):
+  KVM: Add dedicated arch hook for querying if vCPU was preempted
+    in-kernel
+  KVM: x86: Rely solely on preempted_in_kernel flag for directed yield
+  KVM: x86: Clean up directed yield API for "has pending interrupt"
+  KVM: Add a comment explaining the directed yield pending interrupt
+    logic
 
-Future Schedule:
-January 17th - TDP MMU for IOMMU
-January 24th - Memtypes for non-coherent DMA
-January 31st - Available!
+ arch/x86/kvm/x86.c       | 16 +++++++---------
+ include/linux/kvm_host.h |  1 +
+ virt/kvm/kvm_main.c      | 22 ++++++++++++++++++++--
+ 3 files changed, 28 insertions(+), 11 deletions(-)
+
+
+base-commit: 1c6d984f523f67ecfad1083bb04c55d91977bb15
+-- 
+2.43.0.472.g3155946c3a-goog
+
 
