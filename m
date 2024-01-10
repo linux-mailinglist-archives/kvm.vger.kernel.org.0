@@ -1,81 +1,91 @@
-Return-Path: <kvm+bounces-5951-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5952-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2763382916F
-	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 01:31:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E109829181
+	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 01:38:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD1081F2193D
-	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 00:31:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 512442892D2
+	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 00:38:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A076BDF5A;
-	Wed, 10 Jan 2024 00:30:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB74E1C15;
+	Wed, 10 Jan 2024 00:38:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="Fs+/wHzk"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0+T+/toh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oo1-f47.google.com (mail-oo1-f47.google.com [209.85.161.47])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B74DF43
-	for <kvm@vger.kernel.org>; Wed, 10 Jan 2024 00:30:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
-Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-59891129fadso251063eaf.0
-        for <kvm@vger.kernel.org>; Tue, 09 Jan 2024 16:30:35 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19320389
+	for <kvm@vger.kernel.org>; Wed, 10 Jan 2024 00:38:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dbeaf21e069so4027589276.1
+        for <kvm@vger.kernel.org>; Tue, 09 Jan 2024 16:38:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1704846635; x=1705451435; darn=vger.kernel.org;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=hydUMmuVdsM+xqnQN7tr5qDIW845G9/kDGXr3I1q0uA=;
-        b=Fs+/wHzkEp6B5xScZUi1zopWGXYbMnbzZyVhHT6xdhgnLMkdaMSUPtt8sHwW3Ybc7Y
-         +l1GySinFdoXArEAEQ8fhFLxGBQCISQ8bUsQO2JYgHMgkmHp2Um83T9Udrq1EanHjJ04
-         h/eVifJhG/LGFWWbP28EyOYPlqyALM/3r5a/Glo9zr6KcsBeOiW9KhRtFZlaHmrmnt5T
-         JQnAbESw1PvXG/64URrWwE903Hr+CsJlD+QFUybu35TY1pGdF9pRVd+dUmKrsYhPCgbh
-         9sM62ZqDWuIlms4+imvy7Tt6aJr22rNHPew2UYS+yGV8NtpcMDE5YgUcJop41GTCNC6+
-         ZNhw==
+        d=google.com; s=20230601; t=1704847080; x=1705451880; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Dubuu6a5RHKTDSizXfGG9mFtdlp6O0bStYMvscHwBes=;
+        b=0+T+/tohbLWHL3+uQa63dhWLCLKAscpLLxxp5zKqVH6eOGbNnj+FiJvERIdxjtXTxR
+         5lDsJueMXVZX6DwvwjC2jzFz1qOEQLgOhvvkEiIQpqfObwhdshUmbl6cUxri71bx9xFm
+         0tFwYeqyLK24Vf/eushj7AnxIg08xJ6HuPK2rPt7q1Ab3FRXYvvXYTisXE41p1sItbka
+         dMivjcj7E7sEEtGb9253BPlDBosWPz6oFlWjl2j9tk+HZ8zB74dJMgDjmjG1GoDjZVux
+         2m1gKqEefEIgs4JlD2ElON+vamWPYJSqP4ETihmxODHumBPTaNFVq4P9lH+ffhFLb4rt
+         KCVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704846635; x=1705451435;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from
+        d=1e100.net; s=20230601; t=1704847080; x=1705451880;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hydUMmuVdsM+xqnQN7tr5qDIW845G9/kDGXr3I1q0uA=;
-        b=GY3/V+wACgzyYH+gIR7l0E2jeknra9m7kDW+0MrKVjnTYS/RzJWrACv66kw5dcmPXx
-         d0T/5jmrT0MkVsGUb1solGb4WGBX6+gm3adWWiBLlp0/Ws8lEVFDINcckoPs3F4k/swh
-         Bqalfnay4bnGxYds+BHp6L2vdvLpKJITs+C0Z419CppMTEwOqtsVFIuDiVFQHwKs9m+W
-         5D59FLMWGfzmqJYtb7FfGWpd/OeGCP4Fp8oyN6lNiAj8KKAOvnu/A8MqojKOXpH97T8T
-         JAw9PIQz2CineSO9T2vg/A0tfs7jWXfmRDLzMBSi79lvlL/FoTiTQkbuuWt+bJk3C5MY
-         vhWw==
-X-Gm-Message-State: AOJu0YwViUz3L3ZS2upEYDyoFa4QmLBgw0WsPg7n4FKCZxj5aHsJRXDI
-	VZ60yeisl1CCrTPDS0jio5dC6j08dJtU6A==
-X-Google-Smtp-Source: AGHT+IGd3/cM7ZrFhiVYvwfc0Y76IaBSzRqPp92itBTH6fQc7rmHNMmxSWmkA8xyVc6ek4bMpmPsBw==
-X-Received: by 2002:a05:6358:338c:b0:170:c91a:b466 with SMTP id i12-20020a056358338c00b00170c91ab466mr196482rwd.23.1704846634679;
-        Tue, 09 Jan 2024 16:30:34 -0800 (PST)
-Received: from dev-mattc2.dev.purestorage.com ([208.88.159.128])
-        by smtp.googlemail.com with ESMTPSA id ln15-20020a056a003ccf00b006db0907e696sm2165649pfb.6.2024.01.09.16.30.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jan 2024 16:30:34 -0800 (PST)
-From: Matthew W Carlis <mattc@purestorage.com>
-To: alex.williamson@redhat.com
-Cc: jgg@nvidia.com,
-	kvm@vger.kernel.org,
-	mattc@purestorage.com
-Subject: [PATCH 1/1] vfio/pci: Log/indicate devices being bound & unbound.
-Date: Tue,  9 Jan 2024 17:30:28 -0700
-Message-Id: <20240110003028.2428-1-mattc@purestorage.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20231223163802.4098b07a.alex.williamson@redhat.com>
-References: <20231223163802.4098b07a.alex.williamson@redhat.com>
+        bh=Dubuu6a5RHKTDSizXfGG9mFtdlp6O0bStYMvscHwBes=;
+        b=nnFfhYT1gh59NePbxs35QDbZZu4dvCXH3wf5KTCFIFdvr6Dc+8xiRNiQwMg42Y7o13
+         qeoN3JnE0Vz8t0kdJnXnFwSFo7jSKuYAJJgWPkdewCWsSzPjNeTDkIow6c1DXZ4Jabxf
+         cgjoJmLhTcheB9KYoMlwKIyfxU0L0PBECu1zkwi7Co/TKyyHDIUBDFy5Y9SgTk5R5n+x
+         MXxGBx7EpQQBqdK91NsZsxxZEATHxEiOCOF2hvpKLSgkxpfiP8S1JF7wZV0T2xwWoSFq
+         W/yYvXsev27nURJMqXWe40fuOrcu89XKs5L5SqPdIeQwKA895t0+njxa80aA+tAowlEH
+         qrdQ==
+X-Gm-Message-State: AOJu0YxbKwr/xQy/1CXh7W0tzb7RQpvpi4cPmH1nI7BHj8yDOjUyy5+Z
+	7ClYnQOUui9P8+LisYTHkFwWqqjzURwpP5oh1w==
+X-Google-Smtp-Source: AGHT+IE58SJtAWoao4lQ3L+CQGDpyiHkisQ7a1GVbOwazTP5MsPQkuMyveEBs2xdo/w5fqoVGzIYh/HuEE4=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:5f48:0:b0:dbd:f6e3:19a with SMTP id
+ h8-20020a255f48000000b00dbdf6e3019amr6727ybm.11.1704847080291; Tue, 09 Jan
+ 2024 16:38:00 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Tue,  9 Jan 2024 16:37:56 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
+Message-ID: <20240110003756.489861-1-seanjc@google.com>
+Subject: [ANNOUNCE] PUCK Agenda - 2024.01.10 - Unified uAPI for protected VMs
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Isaku Yamahata <isaku.yamahata@linux.intel.com>, 
+	Michael Roth <michael.roth@amd.com>
+Content-Type: text/plain; charset="UTF-8"
 
-In my case I was interested in something that would allow a human to triage
-it after the fact and potentially many reboots later. In our use cases we assume
-the correct things will have been bound & its really the exception when they haven't
-been, but stil it was desireable information. In one sense it was just easier to
-add the logging to the kernel than it would be to get from udev. I think the kernel
-log must also be a more familiar source to most than udev.
+Tomorrow's PUCK topic is unifying KVM's uAPI for protected VMs, courtesy of
+Isaku.  Note, this was originally planned for LPC, but it got moved to PUCK as
+Isaku was unable to attend LPC.
+
+https://lpc.events/event/17/contributions/1495
+
+Time:     6am PDT
+Video:    https://meet.google.com/vdb-aeqo-knk
+Phone:    https://tel.meet/vdb-aeqo-knk?pin=3003112178656
+
+Calendar: https://calendar.google.com/calendar/u/0?cid=Y182MWE1YjFmNjQ0NzM5YmY1YmVkN2U1ZWE1ZmMzNjY5Y2UzMmEyNTQ0YzVkYjFjN2M4OTE3MDJjYTUwOTBjN2Q1QGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20
+Drive:    https://drive.google.com/drive/folders/1aTqCrvTsQI9T4qLhhLs_l986SngGlhPH?resourcekey=0-FDy0ykM3RerZedI8R-zj4A&usp=drive_link
+
+Future Schedule:
+January 17th - TDP MMU for IOMMU
+January 24th - Memtypes for non-coherent DMA
+January 31st - Available!
 
