@@ -1,105 +1,157 @@
-Return-Path: <kvm+bounces-6004-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6005-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 175B8829D8F
-	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 16:28:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE98B829DE0
+	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 16:46:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A398228A46A
-	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 15:28:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A1DD1F27FFE
+	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 15:46:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55B794C3C4;
-	Wed, 10 Jan 2024 15:28:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0330A4CB33;
+	Wed, 10 Jan 2024 15:44:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="eTsD0Roa"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Y3uEX2GT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29D054C3AE;
-	Wed, 10 Jan 2024 15:28:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 6730140E01F9;
-	Wed, 10 Jan 2024 15:28:32 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id FUCzeqJ5KG5u; Wed, 10 Jan 2024 15:28:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1704900510; bh=sqSLDTLrGLChVeqpstqSHsw48slxVSeLIba4GiMdj+o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eTsD0Roazi0FSMEkRZ0QUIyEP6/uCZycEzj3PQiprx0zxrnvqzflIIYpU9VyH6pki
-	 btIME/rVbw4hFK6t+sjj4qF+VOxK65ERGXHe9ff8t4zGl7QJeoDrMlxjbK44YMOCGY
-	 5BCr1KDOzOv8aatCOJlyqddC77qPO25s10bdCVpcav31CisL9MVPPWwYF84aJXb4eI
-	 XLkYCGfndhnA/ivM9bnU5DSF8TT1wDy2bPTXzB21e92ou9m7wcB5N5DwXovdmsxh88
-	 5P6nYK/8e+WdOcpx+/JXbJMsuDljVClQxmUwHJaKs/FaLjmfKao+rQvc6lg6W4yB/y
-	 Akr1w0si9UAhJNlu+wzCyJRXGCNmtVfoSj41pb3nru3E4c+VFzV7IQpC5B++YqdcX4
-	 j023bLX4BesExDYRmsW3EwN7ERwUwU2UVrWqDF5TCpKEM+49IMuOlWH5JvWQ7PThMf
-	 NfzvUper7MM+s+2Adj58h7zfvpxOU6B9qTEml+3QogXWeEZIU+kTR1Uqoyyexc3C9a
-	 Au0rWtbvu7aJfhDkSAmgM6LnsNPKSnYVnrsFeKCqVU0XajsiCH1Ubuodw0Fv/cW5fl
-	 3GlTqyo1d3TuL5C1x8F+Eb+4V/7+ejJXr9GHp2Youcny+jGKH/cD9xAMSqoaXtcsRk
-	 RQ4ZKhwEbFV4zvAMlWbg5uH4=
-Received: from zn.tnic (pd9530f8c.dip0.t-ipconnect.de [217.83.15.140])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 74E5A40E016C;
-	Wed, 10 Jan 2024 15:27:51 +0000 (UTC)
-Date: Wed, 10 Jan 2024 16:27:45 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: Michael Roth <michael.roth@amd.com>, x86@kernel.org,
-	kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
-	hpa@zytor.com, ardb@kernel.org, pbonzini@redhat.com,
-	seanjc@google.com, vkuznets@redhat.com, jmattson@google.com,
-	luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
-	pgonda@google.com, peterz@infradead.org,
-	srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-	tobin@ibm.com, vbabka@suse.cz, kirill@shutemov.name,
-	ak@linux.intel.com, tony.luck@intel.com,
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
-	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
-	Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH v1 07/26] x86/fault: Add helper for dumping RMP entries
-Message-ID: <20240110152745.GDZZ63cekYEDqdajjO@fat_crate.local>
-References: <20231230161954.569267-1-michael.roth@amd.com>
- <20231230161954.569267-8-michael.roth@amd.com>
- <20240110111344.GBZZ576DpwHHs997Zl@fat_crate.local>
- <625926f9-6c45-4242-ac62-8f36abfcb099@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 652B74CB21;
+	Wed, 10 Jan 2024 15:44:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40AEtT60007939;
+	Wed, 10 Jan 2024 15:44:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=46davaovqwEtnCcydpQdJJqyzVaiWwhAxC2+wADQOeE=;
+ b=Y3uEX2GTc+BOW/lGynTiqOoi9fhgxYA8FLKgyRVh+7WQC1SBfScL0862Hlsj3ZlMdQO9
+ ZiW6y8KxAOnc+XJcIOKDcs52X7+N+CFvYIZnfwUQVtEHSoOeux2VVOaWgZis6EY5mh1r
+ Xu7bScke2Bz5ex3AEUxhKuOzNiGU+Wm1dxuBf8/C07ng0crWo4F/a9wOrqCmFhe6Ug16
+ Am1LQ8vRQfJgflDi69AbteF6tB3bC/qwXTkrD6jfOi5twDwL5abAUGStNUCU/O4jW/MI
+ bvgTNCYUXxE/PnLcHzEsZIeCcR42fhRwqU3PBuXYJhpja007OG4kbhl6v0Ctlacx83UE yw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vhuu9m3yb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 10 Jan 2024 15:44:46 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 40AFfrYZ016567;
+	Wed, 10 Jan 2024 15:44:45 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vhuu9m3xp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 10 Jan 2024 15:44:45 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 40AEc1JD028030;
+	Wed, 10 Jan 2024 15:44:44 GMT
+Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3vgwfst3bu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 10 Jan 2024 15:44:44 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 40AFiguL11993778
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 10 Jan 2024 15:44:43 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D94FC5805B;
+	Wed, 10 Jan 2024 15:44:42 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4B4C458058;
+	Wed, 10 Jan 2024 15:44:41 +0000 (GMT)
+Received: from [9.61.170.131] (unknown [9.61.170.131])
+	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 10 Jan 2024 15:44:41 +0000 (GMT)
+Message-ID: <41baa1b2-4afd-9adb-2121-b14c8943d9b1@linux.ibm.com>
+Date: Wed, 10 Jan 2024 10:44:40 -0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <625926f9-6c45-4242-ac62-8f36abfcb099@amd.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v2 6/6] s390/vfio-ap: do not reset queue removed from host
+ config
+To: Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc: borntraeger@de.ibm.com, pasic@linux.ibm.com, pbonzini@redhat.com,
+        frankja@linux.ibm.com, imbrenda@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        stable@vger.kernel.org
+References: <20231212212522.307893-1-akrowiak@linux.ibm.com>
+ <20231212212522.307893-7-akrowiak@linux.ibm.com>
+Content-Language: en-US
+From: "Jason J. Herne" <jjherne@linux.ibm.com>
+In-Reply-To: <20231212212522.307893-7-akrowiak@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: IsjIOTzPVQKvr0QmfztB0n_OxtMcN7ET
+X-Proofpoint-ORIG-GUID: 17mlDLuzrl3HOz48TJCLJGVBUouciBuT
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-10_07,2024-01-10_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 malwarescore=0
+ adultscore=0 bulkscore=0 impostorscore=0 priorityscore=1501 phishscore=0
+ mlxscore=0 mlxlogscore=999 lowpriorityscore=0 suspectscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
+ definitions=main-2401100128
 
-On Wed, Jan 10, 2024 at 09:20:44AM -0600, Tom Lendacky wrote:
-> How about saying "... dumping all non-zero entries in the whole ..."
 
-I'm trying not to have long stories in printk statements :)
 
-> and then removing the print below that prints the PFN and "..."
+On 12/12/23 4:25 PM, Tony Krowiak wrote:
+> When a queue is unbound from the vfio_ap device driver, it is reset to
+> ensure its crypto data is not leaked when it is bound to another device
+> driver. If the queue is unbound due to the fact that the adapter or domain
+> was removed from the host's AP configuration, then attempting to reset it
+> will fail with response code 01 (APID not valid) getting returned from the
+> reset command. Let's ensure that the queue is assigned to the host's
+> configuration before resetting it.
+> 
+> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> Fixes: eeb386aeb5b7 ("s390/vfio-ap: handle config changed and scan complete notification")
+> Cc: <stable@vger.kernel.org>
+> ---
+>   drivers/s390/crypto/vfio_ap_ops.c | 14 ++++++++++++--
+>   1 file changed, 12 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+> index e014108067dc..84decb0d5c97 100644
+> --- a/drivers/s390/crypto/vfio_ap_ops.c
+> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+> @@ -2197,6 +2197,8 @@ void vfio_ap_mdev_remove_queue(struct ap_device *apdev)
+>   	q = dev_get_drvdata(&apdev->device);
+>   	get_update_locks_for_queue(q);
+>   	matrix_mdev = q->matrix_mdev;
+> +	apid = AP_QID_CARD(q->apqn);
+> +	apqi = AP_QID_QUEUE(q->apqn);
+>   
+>   	if (matrix_mdev) {
+>   		/* If the queue is assigned to the guest's AP configuration */
+> @@ -2214,8 +2216,16 @@ void vfio_ap_mdev_remove_queue(struct ap_device *apdev)
+>   		}
+>   	}
+>   
+> -	vfio_ap_mdev_reset_queue(q);
+> -	flush_work(&q->reset_work);
+> +	/*
+> +	 * If the queue is not in the host's AP configuration, then resetting
+> +	 * it will fail with response code 01, (APQN not valid); so, let's make
+> +	 * sure it is in the host's config.
+> +	 */
+> +	if (test_bit_inv(apid, (unsigned long *)matrix_dev->info.apm) &&
+> +	    test_bit_inv(apqi, (unsigned long *)matrix_dev->info.aqm)) {
+> +		vfio_ap_mdev_reset_queue(q);
+> +		flush_work(&q->reset_work);
+> +	}
+>   
+>   done:
+>   	if (matrix_mdev)
 
-Why remove the print? You want to print every non-null RMP entry in the
-2M range, no?
-
-And the "..." says that it is a null entry.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Reviewed-by: Jason J. Herne <jjherne@linux.ibm.com>
 
