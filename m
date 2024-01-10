@@ -1,157 +1,235 @@
-Return-Path: <kvm+bounces-5988-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5990-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F08ED8297D0
-	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 11:44:41 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73F63829882
+	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 12:14:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6413F1F2544F
-	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 10:44:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C1556B22A9F
+	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 11:14:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D62C40C12;
-	Wed, 10 Jan 2024 10:44:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6533047796;
+	Wed, 10 Jan 2024 11:14:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="TG1a4vNb"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="DRISGyRR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BFF641773;
-	Wed, 10 Jan 2024 10:44:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40AAWHsK030292;
-	Wed, 10 Jan 2024 10:44:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=0NsM5/dJt9Duy3sSWxM7QYlHFPTygEzH9FNrlbfrf90=;
- b=TG1a4vNbF70pmDYr03d9et8ODFK8/9rdVHYfBl9p+42KpArQDBYEBps806AIA5zJtO18
- DZFzv9x6keTOYwIEbDAx94qejmTQpLj8y8Gh7qMqI9WAKsvCpLWxWq5cTccQJ9Qp5z7X
- wKL1kuE2lFzAe9ukmLoXWo3S67hqbdQXRbhgugd23wYmk6Hiq9GofjFGRffq35Ug2JXt
- Stu/LJ93SP1+iCr2IQy0pDxb/lSh3u66mcYzAav1XmqMHHCANv3XKROhu6Heb7Fm3eMf
- UykggnusOQE5hgxVNVEKB2llTNlifhUmczJFmnNGta6SGcoZuVIPuQP6U8ldecXuDtWn QQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vhsjt09s1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 10 Jan 2024 10:44:19 +0000
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 40AAX5uX000593;
-	Wed, 10 Jan 2024 10:44:18 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vhsjt09rw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 10 Jan 2024 10:44:18 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 40A7pHm5028018;
-	Wed, 10 Jan 2024 10:44:17 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3vgwfsrnpy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 10 Jan 2024 10:44:17 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 40AAiEie35062286
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 10 Jan 2024 10:44:15 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E40EC20043;
-	Wed, 10 Jan 2024 10:44:14 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 82A342004E;
-	Wed, 10 Jan 2024 10:44:14 +0000 (GMT)
-Received: from [9.171.43.233] (unknown [9.171.43.233])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 10 Jan 2024 10:44:14 +0000 (GMT)
-Message-ID: <19cc133f-57a7-45cd-a7e2-a4869bb8c753@linux.ibm.com>
-Date: Wed, 10 Jan 2024 11:44:14 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 138B346BB1;
+	Wed, 10 Jan 2024 11:14:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 2B03040E01A9;
+	Wed, 10 Jan 2024 11:14:30 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id rk1GXipRnNvY; Wed, 10 Jan 2024 11:14:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1704885267; bh=fwWP59DQZ/MSSlZK6nSA8WJmcHMonAP5bkUAu0nzMfE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DRISGyRRH2Yb8ljr7qzKxmjDv5PDR//i1JNCPji2bZmoSqvXC2CEFgz/un4zlwdOd
+	 1gE3QpuxPCOS/AO49UojJngUhe+gslvuDort5mT6YKdB6PxdpW6SSQ6zI36SoQuZR2
+	 j+RNLNTXzjvJQgrviDjXNmGcHbG5Mhmfs3WnhbYXRMEeLIMF9EE/Sfiam/v3lfpkqD
+	 jmyhL1yhBFmtW21wCivpy1KA++k78OC13Jex3T8KKx2xdYeruw7kBahsHOSGi83Nc6
+	 zsmsThRTTmzDRmCRXhyv4Wh7snbFm9Jn0fzha+wd4J2CxbS65LeqhPk/ZyYjL29/bo
+	 uzu+pKOPJQzyhB3gyH2U0vw/1s2cnfvdj8f4glLTntMjkAbIhBlBYRxUu+5LM16j5D
+	 U55MFzVMl22H06LDmtwxnqgrBxOzam7Rf4F2Fu/NM/qSWgrU3fe+/dUsfjXHbxCZ5G
+	 e7qT409qJNtDLgXCJ76zb6Vl1icGQQwZPxoS/Wdei8VQcHsSvz5xp6cU2JEctfs62k
+	 7S7u9Tu+1rKxVl8sIi+n7DFgdXO+dkjJJ2aOKwBMXd4jKb0z/ex7gzelEMo/Qew5t7
+	 pM9QC4FIj9hngIZR138Qa4DFSWnFwdYzXo60YT4dvPw5Je2/cOL9wzPkTcg6JofhE0
+	 8CJKjCNIb4GEyJfUyPXLgMxs=
+Received: from zn.tnic (pd9530f8c.dip0.t-ipconnect.de [217.83.15.140])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 67EAF40E01F9;
+	Wed, 10 Jan 2024 11:13:49 +0000 (UTC)
+Date: Wed, 10 Jan 2024 12:13:44 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Michael Roth <michael.roth@amd.com>
+Cc: x86@kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+	linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+	rientjes@google.com, tobin@ibm.com, vbabka@suse.cz,
+	kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
+	Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH v1 07/26] x86/fault: Add helper for dumping RMP entries
+Message-ID: <20240110111344.GBZZ576DpwHHs997Zl@fat_crate.local>
+References: <20231230161954.569267-1-michael.roth@amd.com>
+ <20231230161954.569267-8-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v1] s390x/Makefile: simplify Secure
- Execution boot image generation
-Content-Language: en-US
-To: Marc Hartmayer <mhartmay@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Nico Boehr <nrb@linux.ibm.com>, Thomas Huth <thuth@redhat.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org
-References: <20231121172338.146006-1-mhartmay@linux.ibm.com>
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- xsFNBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
- qLqYr+qrG3buymJJRD9xkp4mqgasHdB5WR9MhXWKH08EvtvAMkEJLnqxgbqf8td3pCQ2cEpv
- 15mH49iKSmlTcJ+PvJpGZcq/jE42u9/0YFHhozm8GfQdb9SOI/wBSsOqcXcLTUeAvbdqSBZe
- zuMRBivJQQI1esD9HuADmxdE7c4AeMlap9MvxvUtWk4ZJ/1Z3swMVCGzZb2Xg/9jZpLsyQzb
- lDbbTlEeyBACeED7DYLZI3d0SFKeJZ1SUyMmSOcr9zeSh4S4h4w8xgDDGmeDVygBQZa1HaoL
- Esb8Y4avOYIgYDhgkCh0nol7XQ5i/yKLtnNThubAcxNyryw1xSstnKlxPRoxtqTsxMAiSekk
- 0m3WJwvwd1s878HrQNK0orWd8BzzlSswzjNfQYLF466JOjHPWFOok9pzRs+ucrs6MUwDJj0S
- cITWU9Rxb04XyigY4XmZ8dywaxwi2ZVTEg+MD+sPmRrTw+5F+sU83cUstuymF3w1GmyofgsU
- Z+/ldjToHnq21MNa1wx0lCEipCCyE/8K9B9bg9pUwy5lfx7yORP3JuAUfCYb8DVSHWBPHKNj
- HTOLb2g2UT65AjZEQE95U2AY9iYm5usMqaWD39pAHfhC09/7NQARAQABzSVKYW5vc2NoIEZy
- YW5rIDxmcmFua2phQGxpbnV4LmlibS5jb20+wsF3BBMBCAAhBQJbm6Q+AhsjBQsJCAcCBhUI
- CQoLAgQWAgMBAh4BAheAAAoJEONU5rjiOLn4p9gQALjkdj5euJVI2nNT3/IAxAhQSmRhPEt0
- AmnCYnuTcHRWPujNr5kqgtyER9+EMQ0ZkX44JU2q7OWxTdSNSAN/5Z7qmOR9JySvDOf4d3mS
- bMB5zxL9d8SbnSs1uW96H9ZBTlTQnmLfsiM9TetAjSrR8nUmjGhe2YUhJLR1v1LguME+YseT
- eXnLzIzqqpu311/eYiiIGcmaOjPCE+vFjcXL5oLnGUE73qSYiujwhfPCCUK0850o1fUAYq5p
- CNBCoKT4OddZR+0itKc/cT6NwEDwdokeg0+rAhxb4Rv5oFO70lziBplEjOxu3dqgIKbHbjza
- EXTb+mr7VI9O4tTdqrwJo2q9zLqqOfDBi7NDvZFLzaCewhbdEpDYVu6/WxprAY94hY3F4trT
- rQMHJKQENtF6ZTQc9fcT5I3gAmP+OEvDE5hcTALpWm6Z6SzxO7gEYCnF+qGXqp8sJVrweMub
- UscyLqHoqdZC2UG4LQ1OJ97nzDpIRe0g6oJ9ZIYHKmfw5jjwH6rASTld5MFWajWdNsqK15k/
- RZnHAGICKVIBOBsq26m4EsBlfCdt3b/6emuBjUXR1pyjHMz2awWzCq6/6OWs5eANZ0sdosNq
- dq2v0ULYTazJz2rlCXV89qRa7ukkNwdBSZNEwsD4eEMicj1LSrqWDZMAALw50L4jxaMD7lPL
- jJbazsFNBFubpD4BEADAcUTRqXF/aY53OSH7IwIK9lFKxIm0IoFkOEh7LMfp7FGzaP7ANrZd
- cIzhZi38xyOkcaFY+npGEWvko7rlIAn0JpBO4x3hfhmhBD/WSY8LQIFQNNjEm3vzrMo7b9Jb
- JAqQxfbURY3Dql3GUzeWTG9uaJ00u+EEPlY8zcVShDltIl5PLih20e8xgTnNzx5c110lQSu0
- iZv2lAE6DM+2bJQTsMSYiwKlwTuv9LI9Chnoo6+tsN55NqyMxYqJgElk3VzlTXSr3+rtSCwf
- tq2cinETbzxc1XuhIX6pu/aCGnNfuEkM34b7G1D6CPzDMqokNFbyoO6DQ1+fW6c5gctXg/lZ
- 602iEl4C4rgcr3+EpfoPUWzKeM8JXv5Kpq4YDxhvbitr8Dm8gr38+UKFZKlWLlwhQ56r/zAU
- v6LIsm11GmFs2/cmgD1bqBTNHHcTWwWtRTLgmnqJbVisMJuYJt4KNPqphTWsPY8SEtbufIlY
- HXOJ2lqUzOReTrie2u0qcSvGAbSfec9apTFl2Xko/ddqPcZMpKhBiXmY8tJzSPk3+G4tqur4
- 6TYAm5ouitJsgAR61Cu7s+PNuq/pTLDhK+6/Njmc94NGBcRA4qTuysEGE79vYWP2oIAU4Fv6
- gqaWHZ4MEI2XTqH8wiwzPdCQPYsSE0fXWiYu7ObeErT6iLSTZGx4rQARAQABwsFfBBgBCAAJ
- BQJbm6Q+AhsMAAoJEONU5rjiOLn4DDEP/RuyckW65SZcPG4cMfNgWxZF8rVjeVl/9PBfy01K
- 8R0hajU40bWtXSMiby7j0/dMjz99jN6L+AJHJvrLz4qYRzn2Ys843W+RfXj62Zde4YNBE5SL
- jJweRCbMWKaJLj6499fctxTyeb9+AMLQS4yRSwHuAZLmAb5AyCW1gBcTWZb8ON5BmWnRqeGm
- IgC1EvCnHy++aBnHTn0m+zV89BhTLTUal35tcjUFwluBY39R2ux/HNlBO1GY3Z+WYXhBvq7q
- katThLjaQSmnOrMhzqYmdShP1leFTVbzXUUIYv/GbynO/YrL2gaQpaP1bEUEi8lUAfXJbEWG
- dnHFkciryi092E8/9j89DJg4mmZqOau7TtUxjRMlBcIliXkzSLUk+QvD4LK1kWievJse4mte
- FBdkWHfP4BH/+8DxapRcG1UAheSnSRQ5LiO50annOB7oXF+vgKIaie2TBfZxQNGAs3RQ+bga
- DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
- Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
- phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-In-Reply-To: <20231121172338.146006-1-mhartmay@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: gUVeU91Xk8jT1v_4LKgGVwsv3wJphDIS
-X-Proofpoint-ORIG-GUID: w72_zG1akAkc9HN9FMhOfRpALZvTGhh8
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-10_04,2024-01-09_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 impostorscore=0
- clxscore=1015 suspectscore=0 mlxlogscore=999 priorityscore=1501
- malwarescore=0 phishscore=0 bulkscore=0 mlxscore=0 spamscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2401100087
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20231230161954.569267-8-michael.roth@amd.com>
 
-On 11/21/23 18:23, Marc Hartmayer wrote:
-> Changes:
-> + merge Makefile rules for the generation of the Secure Execution boot
->    image
-> + fix `parmfile` dependency for the `selftest.pv.bin` target
-> + rename `genprotimg_pcf` to `GENPROTIMG_PCF` to match the coding style
->    in the file
-> + always provide a customer communication key - not only for the
->    confidential dump case. Makes the code little easier and doesn't hurt.
-> 
-> Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+On Sat, Dec 30, 2023 at 10:19:35AM -0600, Michael Roth wrote:
+> +	while (pfn_current < pfn_end) {
+> +		e = __snp_lookup_rmpentry(pfn_current, &level);
+> +		if (IS_ERR(e)) {
+> +			pfn_current++;
+> +			continue;
+> +		}
+> +
+> +		e_data = (u64 *)e;
+> +		if (e_data[0] || e_data[1]) {
+> +			pr_info("No assigned RMP entry for PFN 0x%llx, but the 2MB region contains populated RMP entries, e.g.: PFN 0x%llx: [high=0x%016llx low=0x%016llx]\n",
+> +				pfn, pfn_current, e_data[1], e_data[0]);
+> +			return;
+> +		}
+> +		pfn_current++;
+> +	}
+> +
+> +	pr_info("No populated RMP entries in the 2MB region containing PFN 0x%llx\n",
+> +		pfn);
+> +}
 
-Thanks, I've pushed this to devel for CI coverage
+Ok, I went and reworked this, see below.
 
+Yes, I think it is important - at least in the beginning - to dump the
+whole 2M PFN region for debugging purposes. If that output starts
+becoming too unwieldy and overflowing terminals or log files, we'd
+shorten it or put it behind a debug option or so.
+
+Thx.
+
+---
+diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
+index a8cf33b7da71..259a1dd655a7 100644
+--- a/arch/x86/virt/svm/sev.c
++++ b/arch/x86/virt/svm/sev.c
+@@ -35,16 +35,21 @@
+  * Family 19h Model 01h, Rev B1 processor.
+  */
+ struct rmpentry {
+-	u64	assigned	: 1,
+-		pagesize	: 1,
+-		immutable	: 1,
+-		rsvd1		: 9,
+-		gpa		: 39,
+-		asid		: 10,
+-		vmsa		: 1,
+-		validated	: 1,
+-		rsvd2		: 1;
+-	u64 rsvd3;
++	union {
++		struct {
++			u64	assigned	: 1,
++				pagesize	: 1,
++				immutable	: 1,
++				rsvd1		: 9,
++				gpa		: 39,
++				asid		: 10,
++				vmsa		: 1,
++				validated	: 1,
++				rsvd2		: 1;
++		};
++		u64 lo;
++	};
++	u64 hi;
+ } __packed;
+ 
+ /*
+@@ -272,22 +277,20 @@ EXPORT_SYMBOL_GPL(snp_lookup_rmpentry);
+  */
+ static void dump_rmpentry(u64 pfn)
+ {
+-	u64 pfn_current, pfn_end;
++	u64 pfn_i, pfn_end;
+ 	struct rmpentry *e;
+-	u64 *e_data;
+ 	int level;
+ 
+ 	e = __snp_lookup_rmpentry(pfn, &level);
+ 	if (IS_ERR(e)) {
+-		pr_info("Failed to read RMP entry for PFN 0x%llx, error %ld\n",
+-			pfn, PTR_ERR(e));
++		pr_err("Error %ld reading RMP entry for PFN 0x%llx\n",
++			PTR_ERR(e), pfn);
+ 		return;
+ 	}
+ 
+-	e_data = (u64 *)e;
+ 	if (e->assigned) {
+-		pr_info("RMP entry for PFN 0x%llx: [high=0x%016llx low=0x%016llx]\n",
+-			pfn, e_data[1], e_data[0]);
++		pr_info("PFN 0x%llx, RMP entry: [0x%016llx - 0x%016llx]\n",
++			pfn, e->lo, e->hi);
+ 		return;
+ 	}
+ 
+@@ -299,27 +302,28 @@ static void dump_rmpentry(u64 pfn)
+ 	 * certain situations, such as when the PFN is being accessed via a 2MB
+ 	 * mapping in the host page table.
+ 	 */
+-	pfn_current = ALIGN(pfn, PTRS_PER_PMD);
+-	pfn_end = pfn_current + PTRS_PER_PMD;
++	pfn_i = ALIGN(pfn, PTRS_PER_PMD);
++	pfn_end = pfn_i + PTRS_PER_PMD;
+ 
+-	while (pfn_current < pfn_end) {
+-		e = __snp_lookup_rmpentry(pfn_current, &level);
++	pr_info("PFN 0x%llx unassigned, dumping the whole 2M PFN region: [0x%llx - 0x%llx]\n",
++		pfn, pfn_i, pfn_end);
++
++	while (pfn_i < pfn_end) {
++		e = __snp_lookup_rmpentry(pfn_i, &level);
+ 		if (IS_ERR(e)) {
+-			pfn_current++;
++			pr_err("Error %ld reading RMP entry for PFN 0x%llx\n",
++				PTR_ERR(e), pfn_i);
++			pfn_i++;
+ 			continue;
+ 		}
+ 
+-		e_data = (u64 *)e;
+-		if (e_data[0] || e_data[1]) {
+-			pr_info("No assigned RMP entry for PFN 0x%llx, but the 2MB region contains populated RMP entries, e.g.: PFN 0x%llx: [high=0x%016llx low=0x%016llx]\n",
+-				pfn, pfn_current, e_data[1], e_data[0]);
+-			return;
+-		}
+-		pfn_current++;
+-	}
++		if (e->lo || e->hi)
++			pr_info("PFN: 0x%llx, [0x%016llx - 0x%016llx]\n", pfn_i, e->lo, e->hi);
++		else
++			pr_info("PFN: 0x%llx ...\n", pfn_i);
+ 
+-	pr_info("No populated RMP entries in the 2MB region containing PFN 0x%llx\n",
+-		pfn);
++		pfn_i++;
++	}
+ }
+ 
+ void snp_dump_hva_rmpentry(unsigned long hva)
+@@ -339,4 +343,3 @@ void snp_dump_hva_rmpentry(unsigned long hva)
+ 
+ 	dump_rmpentry(pte_pfn(*pte));
+ }
+-EXPORT_SYMBOL_GPL(snp_dump_hva_rmpentry);
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
