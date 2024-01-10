@@ -1,373 +1,825 @@
-Return-Path: <kvm+bounces-5979-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5981-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDAB88293B0
-	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 07:27:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 458E5829463
+	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 08:34:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 92D13B25D0C
-	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 06:27:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 508661C25894
+	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 07:34:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0162A360B1;
-	Wed, 10 Jan 2024 06:27:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA1C63A8F5;
+	Wed, 10 Jan 2024 07:34:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HxiSztp7"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kn+J42Zw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68C2BDF56;
-	Wed, 10 Jan 2024 06:27:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 325FD39FC0;
+	Wed, 10 Jan 2024 07:34:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1704868033; x=1736404033;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=iugDvHfNwG8dAREv2UZRL1W+5P3/cnN9oqxxI551/qM=;
-  b=HxiSztp7SRHXnlkinueeF8sfUi491dUYBvT8GcFdvj6n6nF/2+ySB+bD
-   69CtU0v/utatdkIYh4KKF/54PoawRfL7kN64FKnbD8k8Gi/vIKUczYEWN
-   sU0x/JeftKq+sv2xWCARY/LyXs0oKrHZb6naaQjcshUQAK1KtluAYTVwB
-   82+heTnWdbBGoMD4U3CCHfI4o+EdCfjsVTbfcmsqDQQiDQeIwr4Gy3vQ7
-   2wr4K02Zddp3ho3KKXN8rRRVN5O4SCN10KYEUQ7npH/nSSl/w1p6AYjaW
-   QOLSriZcIISF58pgGUb7gQZZFGEdnl8B9sGrdk1+wi6Cr6+pCT+0rpp2u
+  t=1704872058; x=1736408058;
+  h=date:from:to:cc:subject:message-id;
+  bh=mlJF8jp++SLe39s0DK6tQMqZgUcFqm+beDhANEWQzLQ=;
+  b=kn+J42ZwYDURt6vOYy0WNx7PUnx7uVfoL5xxFcou+0O1NVCfTuowSRZY
+   EWXCfSneQotkBNIoyWReb3ZpPbDBeOVP8MBt3arFknj6uRpDRJ0Y4hJci
+   vmFLwxrEztnCkP+mPzFN5av7ajCbgC0hVn4XsNDJZV3cHQMXEFNeWP34R
+   aAkWfBPD7qMJpZMkPXcY40k9MNceDGvDH4H7ksnhIbF+MiTnbIWnBTain
+   VBzKBBvWUJ7MKPGiDBgJQf224lfCVouq+c7mQNbPuJfXlK81lXBP51mku
+   Ex04FnjJGEEu0B/wrMFLQQQ81Mq1e5M511+8k7vsaffB4SJPkA3+BvB3q
    A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10947"; a="5783427"
+X-IronPort-AV: E=McAfee;i="6600,9927,10947"; a="5187354"
 X-IronPort-AV: E=Sophos;i="6.04,184,1695711600"; 
-   d="scan'208";a="5783427"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2024 22:27:12 -0800
+   d="scan'208";a="5187354"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2024 23:34:16 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10947"; a="901029934"
 X-IronPort-AV: E=Sophos;i="6.04,184,1695711600"; 
-   d="scan'208";a="901029934"
-Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
-  by fmsmga002.fm.intel.com with ESMTP; 09 Jan 2024 22:27:08 -0800
-Date: Wed, 10 Jan 2024 14:27:08 +0800
-From: Yuan Yao <yuan.yao@linux.intel.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
-	seanjc@google.com, shuah@kernel.org, stevensd@chromium.org
-Subject: Re: [RFC PATCH v2 2/3] KVM: selftests: add selftest driver for KVM
- to test memory slots for MMIO BARs
-Message-ID: <20240110062708.zf3arjmha5czgpzp@yy-desk-7060>
-References: <20240103084327.19955-1-yan.y.zhao@intel.com>
- <20240103084457.20086-1-yan.y.zhao@intel.com>
- <20240104081604.ab4uurfoennzy5oj@yy-desk-7060>
- <ZZfP3/pYyPnbgL3P@yzhao56-desk.sh.intel.com>
+   d="scan'208";a="16547477"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by fmviesa002.fm.intel.com with ESMTP; 09 Jan 2024 23:34:12 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rNT6A-0006k4-25;
+	Wed, 10 Jan 2024 07:34:09 +0000
+Date: Wed, 10 Jan 2024 15:24:23 +0800
+From: kernel test robot <lkp@intel.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Linux Memory Management List <linux-mm@kvack.org>,
+ alsa-devel@alsa-project.org, amd-gfx@lists.freedesktop.org,
+ dmaengine@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ freedreno@lists.freedesktop.org, kasan-dev@googlegroups.com,
+ kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ linux-bcachefs@vger.kernel.org, linux-hwmon@vger.kernel.org,
+ linux-usb@vger.kernel.org, netdev@vger.kernel.org
+Subject: [linux-next:master] BUILD REGRESSION
+ 0f067394dd3b2af3263339cf7183bdb6ee0ac1f8
+Message-ID: <202401101510.WIXlGTha-lkp@intel.com>
+User-Agent: s-nail v14.9.24
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZZfP3/pYyPnbgL3P@yzhao56-desk.sh.intel.com>
-User-Agent: NeoMutt/20171215
 
-On Fri, Jan 05, 2024 at 05:46:07PM +0800, Yan Zhao wrote:
-> On Thu, Jan 04, 2024 at 04:16:04PM +0800, Yuan Yao wrote:
-> > On Wed, Jan 03, 2024 at 04:44:57PM +0800, Yan Zhao wrote:
-> > > This driver is for testing KVM memory slots for device MMIO BARs that are
-> > > mapped to pages serving as device resources.
-> > >
-> > > This driver implements a mock device whose device resources are pages
-> > > array that can be mmaped into user space. It provides ioctl interface to
-> > > users to configure whether the pages are allocated as a compound huge page
-> > > or not.
-> >
-> > I just think that it can be used in other scenarios, not only KVM.
-> >
-> Right. But I just want to make it to serve only KVM specific tests :)
->
-> > >
-> > > KVM selftest code can then map the mock device resource to KVM memslots
-> > > to check if any error encountered. After VM shutdown, mock device
-> > > resource's page reference counters are checked to ensure KVM does not hold
-> > > extra reference count during memslot add/removal.
-> > >
-> > > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> ...
->
-> > > +struct kvm_mock_device {
-> > > +	bool compound;
-> > > +	struct page *resource;
-> > > +	u64 bar_size;
-> > > +	int order;
-> >
-> > Do you have plan to allow user to change the bar_size via IOCTL ?
-> > If no "order" and "bar_size" can be removed.
-> >
-> Currently no. But this structure is private to the test driver.
-> What the benefit to remove the two?
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
+branch HEAD: 0f067394dd3b2af3263339cf7183bdb6ee0ac1f8  Add linux-next specific files for 20240109
 
-It's useless so remove them makes code more easier to understand.
+Error/Warning reports:
 
->
-> > > +	int *ref_array;
-> > > +	struct mutex lock;
-> > > +	bool prepared;
-> > > +};
-> > > +
-> > > +static bool opened;
-> > > +
-> > > +#define BAR_SIZE 0x200000UL
-> > > +#define DEFAULT_COMPOUND true
-> >
-> > "kmdev->compound = true;" is more easy to understand,
-> > but "kmdev->compound = DEFAULT_COMPOUND;" not.
-> >
-> Ok. But I want to make the state that "default compound state is true"
-> more explicit and configurable by a macro.
->
->
-> > > +
-> > > +static vm_fault_t kvm_mock_device_mmap_fault(struct vm_fault *vmf)
-> > > +{
-> > > +	struct vm_area_struct *vma = vmf->vma;
-> > > +	struct kvm_mock_device *kmdev = vma->vm_private_data;
-> > > +	struct page *p = kmdev->resource;
-> > > +	vm_fault_t ret = VM_FAULT_NOPAGE;
-> > > +	unsigned long addr;
-> > > +	int i;
-> > > +
-> > > +	for (addr = vma->vm_start, i = vma->vm_pgoff; addr < vma->vm_end;
-> > > +	     addr += PAGE_SIZE, i++) {
-> >
-> > Just question:
-> > Will it be enough if only map the accessed page for the testing purpose ?
-> >
-> It should be enough.
-> But as VFIO usually maps the whole BAR in a single fault, I want to
-> keep align with it :)
+https://lore.kernel.org/oe-kbuild-all/202401101414.8GvBGMXw-lkp@intel.com
 
-ah I see, thanks for your answer!
+Error/Warning: (recently discovered and may have been fixed)
 
->
-> > > +
-> > > +		ret = vmf_insert_pfn(vma, addr, page_to_pfn(p + i));
-> > > +		if (ret == VM_FAULT_NOPAGE)
-> > > +			continue;
-> > > +
-> > > +		zap_vma_ptes(vma, vma->vm_start, vma->vm_end - vma->vm_start);
-> > > +		return ret;
-> > > +
-> > > +	}
-> > > +	return ret;
-> > > +}
-...
-> > > +static int kvm_mock_device_check_resource_ref(struct kvm_mock_device *kmdev)
-> > > +{
-> > > +	u32 i, count = 1 << kmdev->order;
-> > > +	struct page *p = kmdev->resource;
-> > > +	int inequal = 0;
-> > > +
-> > > +	mutex_lock(&kmdev->lock);
-> > > +	if (!kmdev->prepared) {
-> > > +		mutex_unlock(&kmdev->lock);
-> > > +		return -ENODEV;
-> > > +	}
-> > > +
-> > > +	for (i = 0; i < count; i++) {
-> > > +		if (kmdev->ref_array[i] == page_ref_count(p + i))
-> > > +			continue;
-> > > +
-> > > +		pr_err("kvm test device check resource page %d old ref=%d new ref=%d\n",
-> > > +			i, kmdev->ref_array[i], page_ref_count(p + i));
-> >
-> > How about just return a bitmap to userspace for each page ineuqal ?
-> > Or if inequal number itself is enough then just remove this output, in worst case
-> > it prints 512 times for 2MB bar case, which looks just useless.
-> >
-> Right, print for 512 times is too much though it will only appear in the
-> worst failure case.
-> But I do think the info of "old ref" and "new ref" are useful for debugging.
-> So, instead of printing bitmap, what about only printing the error message
-> for once for the first error page?
+drivers/net/ethernet/wangxun/libwx/wx_ethtool.c:193:(.text+0x2cc): undefined reference to `phylink_ethtool_nway_reset'
+drivers/net/ethernet/wangxun/libwx/wx_ethtool.c:202:(.text+0x2f0): undefined reference to `phylink_ethtool_ksettings_get'
+drivers/net/ethernet/wangxun/libwx/wx_ethtool.c:211:(.text+0x318): undefined reference to `phylink_ethtool_ksettings_set'
+tools/testing/selftests/net/tcp_ao/bench-lookups.c:202: undefined reference to `sqrt'
 
-For you reference:
-The driver is designed for testing purpose
-so I think just return the inequal should be enough, any one
-who want to debug with this can easily change the source
-code to see what's wrong there.
+Unverified Error/Warning (likely false positive, please contact us if interested):
 
->
-> > > +		inequal++;
-> > > +	}
-> > > +	mutex_unlock(&kmdev->lock);
-> > > +
-> > > +	return inequal;
-> > > +}
-> > > +
-> > > +static int kvm_mock_device_fops_open(struct inode *inode, struct file *filp)
-> > > +{
-> > > +	struct kvm_mock_device *kmdev;
-> > > +
-> > > +	if (opened)
-> > > +		return -EBUSY;
-> >
-> > It can't work in case of 2 who open the device file at *real* same time, at least
-> > you need atomic helpers for that purpose.
-> >
-> Ah, right. Will turn it to atomic.
->
-> > BTW I saw "kvm_mock_devie" instance is per file level, so maybe not hard
-> > to remove this limitation ?
-> Yes, but as it's a test driver, I don't see any needs to complicate the code.
->
-> > > +
-> > > +	kmdev = kzalloc(sizeof(*kmdev), GFP_KERNEL_ACCOUNT);
-> > > +	if (!kmdev)
-> > > +		return -ENOMEM;
-> > > +
-> > > +	kmdev->compound = DEFAULT_COMPOUND;
-> > > +	kmdev->bar_size = BAR_SIZE;
-> > > +	kmdev->order = get_order(kmdev->bar_size);
-> > > +	mutex_init(&kmdev->lock);
-> > > +	filp->private_data = kmdev;
-> > > +
-> > > +	opened = true;
-> > > +	return 0;
-> > > +}
-> > > +
-> > > +static int kvm_mock_device_fops_release(struct inode *inode, struct file *filp)
-> > > +{
-> > > +	struct kvm_mock_device *kmdev = filp->private_data;
-> > > +
-> > > +	if (kmdev->prepared)
-> > > +		__free_pages(kmdev->resource, kmdev->order);
-> > > +	mutex_destroy(&kmdev->lock);
-> > > +	kfree(kmdev->ref_array);
-> > > +	kfree(kmdev);
-> > > +	opened = false;
-> > > +	return 0;
-> > > +}
-> > > +
-> > > +static long kvm_mock_device_fops_unlocked_ioctl(struct file *filp,
-> > > +					unsigned int command,
-> > > +					unsigned long arg)
-> > > +{
-> > > +	struct kvm_mock_device *kmdev = filp->private_data;
-> > > +	int r;
-> > > +
-> > > +	switch (command) {
-> > > +	case KVM_MOCK_DEVICE_GET_BAR_SIZE: {
-> > > +		u64 bar_size;
-> > > +
-> > > +		bar_size = kmdev->bar_size;
-> > > +		r = put_user(bar_size, (u64 __user *)arg);
-> > > +		break;
-> > > +	}
-> > > +	case KVM_MOCK_DEVICE_PREPARE_RESOURCE: {
-> > > +		u32 compound;
-> > > +
-> > > +		r = get_user(compound, (u32 __user *)arg);
-> > > +		if (r)
-> > > +			return r;
-> > > +
-> > > +		kmdev->compound = compound;
-> > > +		r = kvm_mock_device_prepare_resource(kmdev);
-> > > +		break;
-> > > +
-> > > +	}
-> > > +	case KVM_MOCK_DEVICE_CHECK_BACKEND_REF: {
-> > > +		int inequal;
-> > > +
-> > > +		inequal = kvm_mock_device_check_resource_ref(kmdev);
-> > > +
-> > > +		if (inequal < 0)
-> > > +			return inequal;
-> > > +
-> > > +		r = put_user(inequal, (u32 __user *)arg);
-> > > +		break;
-> > > +	}
-> > > +	default:
-> > > +		r = -EOPNOTSUPP;
-> > > +	}
-> > > +
-> > > +	return r;
-> > > +}
-> > > +
-> > > +
-> > > +static const struct file_operations kvm_mock_device_fops = {
-> > > +	.open		= kvm_mock_device_fops_open,
-> > > +	.release	= kvm_mock_device_fops_release,
-> > > +	.mmap		= kvm_mock_device_fops_mmap,
-> > > +	.unlocked_ioctl = kvm_mock_device_fops_unlocked_ioctl,
-> > > +	.llseek		= default_llseek,
-> > > +	.owner		= THIS_MODULE,
-> > > +};
-> > > +
-> > > +
-> > > +static int __init kvm_mock_device_test_init(void)
-> > > +{
-> > > +	int ret;
-> > > +
-> > > +	ret = alloc_chrdev_region(&kvm_mock_dev.devt, 0, 1, "KVM-MOCK-DEVICE");
-> >
-> > How about misc_register() ? Like how KVM create /dev/kvm.
-> > I think that will be more simpler.
-> Ah, right. Will try to use it in next version.
->
-> Thanks!
->
-> > > +	if (ret)
-> > > +		goto out;
-> > > +
-> > > +	cdev_init(&kvm_mock_dev.cdev, &kvm_mock_device_fops);
-> > > +	kvm_mock_dev.cdev.owner = THIS_MODULE;
-> > > +	device_initialize(&kvm_mock_dev.device);
-> > > +	kvm_mock_dev.device.devt =  MKDEV(MAJOR(kvm_mock_dev.devt), 0);
-> > > +	ret = dev_set_name(&kvm_mock_dev.device, "kvm_mock_device");
-> > > +	if (ret)
-> > > +		goto out;
-> > > +
-> > > +	ret = cdev_device_add(&kvm_mock_dev.cdev, &kvm_mock_dev.device);
-> > > +	if (ret)
-> > > +		goto out;
-> > > +
-> > > +out:
-> > > +	return ret;
-> > > +}
-> > > +
-> > > +static void __exit kvm_mock_device_test_exit(void)
-> > > +{
-> > > +	cdev_device_del(&kvm_mock_dev.cdev, &kvm_mock_dev.device);
-> > > +	unregister_chrdev_region(kvm_mock_dev.devt, 1);
-> > > +}
-> > > +
-> > > +module_init(kvm_mock_device_test_init);
-> > > +module_exit(kvm_mock_device_test_exit);
-> > > +MODULE_LICENSE("GPL");
-> > > diff --git a/lib/test_kvm_mock_device_uapi.h b/lib/test_kvm_mock_device_uapi.h
-> > > new file mode 100644
-> > > index 000000000000..227d0bf1d430
-> > > --- /dev/null
-> > > +++ b/lib/test_kvm_mock_device_uapi.h
-> > > @@ -0,0 +1,16 @@
-> > > +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-> > > +/*
-> > > + * This is a module to help test KVM guest access of KVM mock device's BAR,
-> > > + * whose backend is mapped to pages.
-> > > + */
-> > > +#ifndef _LIB_TEST_KVM_MOCK_DEVICE_UAPI_H
-> > > +#define _LIB_TEST_KVM_MOCK_DEVICE_UAPI_H
-> > > +
-> > > +#include <linux/types.h>
-> > > +#include <linux/ioctl.h>
-> > > +
-> > > +#define KVM_MOCK_DEVICE_GET_BAR_SIZE _IOR('M', 0x00, u64)
-> > > +#define KVM_MOCK_DEVICE_PREPARE_RESOURCE _IOWR('M', 0x01, u32)
-> > > +#define KVM_MOCK_DEVICE_CHECK_BACKEND_REF _IOWR('M', 0x02, u32)
-> > > +
-> > > +#endif /* _LIB_TEST_KVM_MOCK_DEVICE_UAPI_H */
-> > > --
-> > > 2.17.1
-> > >
-> > >
+arch/x86/kvm/vmx/hyperv_evmcs.h:133:30: sparse: sparse: cast truncates bits from constant value (120b92 becomes b92)
+arch/x86/kvm/vmx/hyperv_evmcs.h:133:30: sparse: sparse: cast truncates bits from constant value (1a069a becomes 69a)
+arch/x86/kvm/vmx/hyperv_evmcs.h:133:30: sparse: sparse: cast truncates bits from constant value (1b001b becomes 1b)
+arch/x86/kvm/vmx/hyperv_evmcs.h:133:30: sparse: sparse: cast truncates bits from constant value (1b009b becomes 9b)
+arch/x86/kvm/vmx/hyperv_evmcs.h:133:30: sparse: sparse: cast truncates bits from constant value (1b011b becomes 11b)
+arch/x86/kvm/vmx/hyperv_evmcs.h:133:30: sparse: sparse: cast truncates bits from constant value (1b039b becomes 39b)
+arch/x86/kvm/vmx/hyperv_evmcs.h:133:30: sparse: sparse: cast truncates bits from constant value (1b049b becomes 49b)
+arch/x86/kvm/vmx/hyperv_evmcs.h:133:30: sparse: sparse: cast truncates bits from constant value (1b051b becomes 51b)
+arch/x86/kvm/vmx/hyperv_evmcs.h:133:30: sparse: sparse: cast truncates bits from constant value (1b059b becomes 59b)
+arch/x86/kvm/vmx/hyperv_evmcs.h:133:30: sparse: sparse: cast truncates bits from constant value (80a08 becomes a08)
+arch/x86/kvm/vmx/hyperv_evmcs.h:133:30: sparse: sparse: cast truncates bits from constant value (80d08 becomes d08)
+arch/x86/kvm/vmx/hyperv_evmcs.h:133:30: sparse: sparse: cast truncates bits from constant value (b000b becomes b)
+drivers/usb/gadget/function/f_ncm.c:1688:32: sparse: sparse: incorrect type in assignment (different base types)
+{standard input}:50469: Warning: overflow in branch to .L4505; converted into longer instruction sequence
+
+Error/Warning ids grouped by kconfigs:
+
+gcc_recent_errors
+|-- alpha-allyesconfig
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   `-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|-- arc-allmodconfig
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|   `-- drivers-gpu-drm-msm-disp-dpu1-dpu_encoder.c:warning:Excess-struct-member-debugfs_root-description-in-dpu_encoder_virt
+|-- arc-allyesconfig
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|   `-- drivers-gpu-drm-msm-disp-dpu1-dpu_encoder.c:warning:Excess-struct-member-debugfs_root-description-in-dpu_encoder_virt
+|-- arc-randconfig-001-20240109
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   `-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|-- arm-allmodconfig
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|   `-- drivers-gpu-drm-msm-disp-dpu1-dpu_encoder.c:warning:Excess-struct-member-debugfs_root-description-in-dpu_encoder_virt
+|-- arm-allyesconfig
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|   `-- drivers-gpu-drm-msm-disp-dpu1-dpu_encoder.c:warning:Excess-struct-member-debugfs_root-description-in-dpu_encoder_virt
+|-- arm-randconfig-r111-20240109
+|   `-- drivers-usb-gadget-function-f_ncm.c:sparse:sparse:incorrect-type-in-assignment-(different-base-types)-expected-unsigned-short-usertype-max_segment_size-got-restricted-__le16-usertype
+|-- arm64-defconfig
+|   |-- drivers-gpu-drm-imagination-pvr_mmu.c:warning:Excess-struct-member-l0_free_tables-description-in-pvr_mmu_op_context
+|   |-- drivers-gpu-drm-imagination-pvr_mmu.c:warning:Excess-struct-member-l0_prealloc_tables-description-in-pvr_mmu_op_context
+|   |-- drivers-gpu-drm-imagination-pvr_mmu.c:warning:Excess-struct-member-l1_free_tables-description-in-pvr_mmu_op_context
+|   |-- drivers-gpu-drm-imagination-pvr_mmu.c:warning:Excess-struct-member-l1_prealloc_tables-description-in-pvr_mmu_op_context
+|   |-- drivers-gpu-drm-imagination-pvr_mmu.c:warning:Excess-struct-member-pvr_dev-description-in-pvr_mmu_backing_page
+|   |-- drivers-gpu-drm-imagination-pvr_mmu.c:warning:Excess-struct-member-sgt-description-in-pvr_mmu_op_context
+|   |-- drivers-gpu-drm-imagination-pvr_mmu.c:warning:Excess-struct-member-sgt_offset-description-in-pvr_mmu_op_context
+|   `-- drivers-gpu-drm-msm-disp-dpu1-dpu_encoder.c:warning:Excess-struct-member-debugfs_root-description-in-dpu_encoder_virt
+|-- csky-allmodconfig
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   `-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|-- csky-allyesconfig
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   `-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|-- csky-randconfig-002-20240109
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   `-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|-- csky-randconfig-r132-20240109
+|   |-- fs-bcachefs-btree_iter.c:sparse:sparse:incompatible-types-in-comparison-expression-(different-address-spaces):
+|   `-- fs-bcachefs-btree_locking.c:sparse:sparse:incompatible-types-in-comparison-expression-(different-address-spaces):
+|-- i386-randconfig-013-20240109
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   `-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|-- loongarch-allmodconfig
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|   `-- drivers-gpu-drm-msm-disp-dpu1-dpu_encoder.c:warning:Excess-struct-member-debugfs_root-description-in-dpu_encoder_virt
+|-- m68k-allmodconfig
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   `-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|-- m68k-allyesconfig
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   `-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|-- m68k-randconfig-r121-20240109
+|   |-- fs-bcachefs-btree_iter.c:sparse:sparse:incompatible-types-in-comparison-expression-(different-address-spaces):
+|   `-- fs-bcachefs-btree_locking.c:sparse:sparse:incompatible-types-in-comparison-expression-(different-address-spaces):
+|-- m68k-randconfig-r122-20240109
+|   |-- drivers-hwmon-max31827.c:sparse:sparse:dubious:x-y
+|   |-- fs-bcachefs-btree_iter.c:sparse:sparse:incompatible-types-in-comparison-expression-(different-address-spaces):
+|   `-- fs-bcachefs-btree_locking.c:sparse:sparse:incompatible-types-in-comparison-expression-(different-address-spaces):
+|-- microblaze-allmodconfig
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   `-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|-- microblaze-allyesconfig
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   `-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|-- mips-allyesconfig
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|   `-- drivers-gpu-drm-msm-disp-dpu1-dpu_encoder.c:warning:Excess-struct-member-debugfs_root-description-in-dpu_encoder_virt
+|-- nios2-allmodconfig
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   `-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|-- nios2-allyesconfig
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   `-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|-- openrisc-allyesconfig
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   `-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|-- openrisc-randconfig-r112-20240109
+|   |-- drivers-hwmon-max31827.c:sparse:sparse:dubious:x-y
+|   |-- fs-bcachefs-btree_iter.c:sparse:sparse:incompatible-types-in-comparison-expression-(different-address-spaces):
+|   `-- fs-bcachefs-btree_locking.c:sparse:sparse:incompatible-types-in-comparison-expression-(different-address-spaces):
+|-- parisc-allmodconfig
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   `-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|-- parisc-allyesconfig
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   `-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|-- parisc-randconfig-001-20240109
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   `-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|-- parisc-randconfig-002-20240109
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   `-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|-- parisc-randconfig-r002-20221104
+|   |-- drivers-net-ethernet-wangxun-libwx-wx_ethtool.c:(.text):undefined-reference-to-phylink_ethtool_ksettings_get
+|   |-- drivers-net-ethernet-wangxun-libwx-wx_ethtool.c:(.text):undefined-reference-to-phylink_ethtool_ksettings_set
+|   `-- drivers-net-ethernet-wangxun-libwx-wx_ethtool.c:(.text):undefined-reference-to-phylink_ethtool_nway_reset
+|-- powerpc64-randconfig-r131-20240109
+|   |-- drivers-hwmon-max31827.c:sparse:sparse:dubious:x-y
+|   |-- fs-bcachefs-btree_iter.c:sparse:sparse:incompatible-types-in-comparison-expression-(different-address-spaces):
+|   `-- fs-bcachefs-btree_locking.c:sparse:sparse:incompatible-types-in-comparison-expression-(different-address-spaces):
+|-- riscv-allmodconfig
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|   `-- drivers-gpu-drm-msm-disp-dpu1-dpu_encoder.c:warning:Excess-struct-member-debugfs_root-description-in-dpu_encoder_virt
+|-- riscv-allyesconfig
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|   `-- drivers-gpu-drm-msm-disp-dpu1-dpu_encoder.c:warning:Excess-struct-member-debugfs_root-description-in-dpu_encoder_virt
+|-- s390-allmodconfig
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   `-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|-- s390-allyesconfig
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   `-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|-- sh-allmodconfig
+|   |-- include-linux-syscalls.h:internal-compiler-error:in-change_address_1-at-emit-rtl.cc
+|   `-- standard-input:Error:pcrel-too-far
+|-- sh-allnoconfig
+|   |-- standard-input:Error:pcrel-too-far
+|   `-- standard-input:Warning:overflow-in-branch-to-.L1609-converted-into-longer-instruction-sequence
+|-- sh-allyesconfig
+|   |-- include-linux-syscalls.h:internal-compiler-error:in-change_address_1-at-emit-rtl.cc
+|   `-- standard-input:Error:pcrel-too-far
+|-- sh-randconfig-001-20240109
+|   |-- include-linux-syscalls.h:internal-compiler-error:in-change_address_1-at-emit-rtl.cc
+|   `-- standard-input:Error:pcrel-too-far
+|-- sh-randconfig-002-20240109
+|   |-- include-linux-syscalls.h:internal-compiler-error:in-change_address_1-at-emit-rtl.cc
+|   `-- standard-input:Error:pcrel-too-far
+|-- sh-randconfig-r013-20230304
+|   `-- standard-input:Warning:overflow-in-branch-to-.L4505-converted-into-longer-instruction-sequence
+|-- sparc-allmodconfig
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|   `-- drivers-gpu-drm-msm-disp-dpu1-dpu_encoder.c:warning:Excess-struct-member-debugfs_root-description-in-dpu_encoder_virt
+|-- sparc-randconfig-001-20240109
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   `-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|-- sparc64-allmodconfig
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|   `-- drivers-gpu-drm-msm-disp-dpu1-dpu_encoder.c:warning:Excess-struct-member-debugfs_root-description-in-dpu_encoder_virt
+|-- sparc64-allyesconfig
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|   `-- drivers-gpu-drm-msm-disp-dpu1-dpu_encoder.c:warning:Excess-struct-member-debugfs_root-description-in-dpu_encoder_virt
+|-- sparc64-randconfig-001-20240109
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   `-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|-- sparc64-randconfig-002-20240109
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   `-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|-- um-randconfig-r113-20240109
+|   |-- drivers-hwmon-max31827.c:sparse:sparse:dubious:x-y
+|   `-- drivers-usb-gadget-function-f_ncm.c:sparse:sparse:incorrect-type-in-assignment-(different-base-types)-expected-unsigned-short-usertype-max_segment_size-got-restricted-__le16-usertype
+|-- x86_64-allnoconfig
+|   |-- Documentation-usb-gadget-testing.rst:WARNING:Malformed-table.
+|   |-- Warning:file-Documentation-ABI-testing-sysfs-platform-silicom:
+|   |-- Warning:sys-devices-...-hwmon-hwmon-i-curr1_crit-is-defined-times:Documentation-ABI-testing-sysfs-driver-intel-i915-hwmon-Documentation-ABI-testing-sysfs-driver-intel-xe-hwmon
+|   |-- Warning:sys-devices-...-hwmon-hwmon-i-energy1_input-is-defined-times:Documentation-ABI-testing-sysfs-driver-intel-i915-hwmon-Documentation-ABI-testing-sysfs-driver-intel-xe-hwmon
+|   |-- Warning:sys-devices-...-hwmon-hwmon-i-in0_input-is-defined-times:Documentation-ABI-testing-sysfs-driver-intel-i915-hwmon-Documentation-ABI-testing-sysfs-driver-intel-xe-hwmon
+|   |-- Warning:sys-devices-...-hwmon-hwmon-i-power1_crit-is-defined-times:Documentation-ABI-testing-sysfs-driver-intel-i915-hwmon-Documentation-ABI-testing-sysfs-driver-intel-xe-hwmon
+|   |-- Warning:sys-devices-...-hwmon-hwmon-i-power1_max-is-defined-times:Documentation-ABI-testing-sysfs-driver-intel-i915-hwmon-Documentation-ABI-testing-sysfs-driver-intel-xe-hwmon
+|   |-- Warning:sys-devices-...-hwmon-hwmon-i-power1_max_interval-is-defined-times:Documentation-ABI-testing-sysfs-driver-intel-i915-hwmon-Documentation-ABI-testing-sysfs-driver-intel-xe-hwmon
+|   `-- Warning:sys-devices-...-hwmon-hwmon-i-power1_rated_max-is-defined-times:Documentation-ABI-testing-sysfs-driver-intel-i915-hwmon-Documentation-ABI-testing-sysfs-driver-intel-xe-hwmon
+|-- x86_64-randconfig-001-20240109
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   `-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|-- x86_64-randconfig-121-20240109
+|   |-- drivers-hwmon-max31827.c:sparse:sparse:dubious:x-y
+|   `-- mm-kasan-common.c:sparse:sparse:incorrect-type-in-argument-(different-base-types)-expected-restricted-gfp_t-usertype-flags-got-unsigned-long-usertype-size
+|-- x86_64-randconfig-122-20240109
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|   |-- drivers-hwmon-max31827.c:sparse:sparse:dubious:x-y
+|   `-- drivers-usb-cdns3-cdns3-gadget.c:sparse:sparse:restricted-__le32-degrades-to-integer
+|-- x86_64-randconfig-123-20240109
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-core-dc_state.c:sparse:sparse:Using-plain-integer-as-NULL-pointer
+|   `-- drivers-hwmon-max31827.c:sparse:sparse:dubious:x-y
+|-- x86_64-rhel-8.3-bpf
+|   `-- tools-testing-selftests-net-tcp_ao-bench-lookups.c:undefined-reference-to-sqrt
+`-- xtensa-randconfig-001-20240109
+    |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+    |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+    |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+    |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+    `-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+clang_recent_errors
+|-- arm-defconfig
+|   `-- drivers-gpu-drm-msm-disp-dpu1-dpu_encoder.c:warning:Excess-struct-member-debugfs_root-description-in-dpu_encoder_virt
+|-- arm64-allmodconfig
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:operator:has-lower-precedence-than-will-be-evaluated-first
+|   |-- drivers-dma-xilinx-xdma.c:warning:variable-desc-is-uninitialized-when-used-here
+|   |-- drivers-gpu-drm-imagination-pvr_mmu.c:warning:Excess-struct-member-l0_free_tables-description-in-pvr_mmu_op_context
+|   |-- drivers-gpu-drm-imagination-pvr_mmu.c:warning:Excess-struct-member-l0_prealloc_tables-description-in-pvr_mmu_op_context
+|   |-- drivers-gpu-drm-imagination-pvr_mmu.c:warning:Excess-struct-member-l1_free_tables-description-in-pvr_mmu_op_context
+|   |-- drivers-gpu-drm-imagination-pvr_mmu.c:warning:Excess-struct-member-l1_prealloc_tables-description-in-pvr_mmu_op_context
+|   |-- drivers-gpu-drm-imagination-pvr_mmu.c:warning:Excess-struct-member-pvr_dev-description-in-pvr_mmu_backing_page
+|   |-- drivers-gpu-drm-imagination-pvr_mmu.c:warning:Excess-struct-member-sgt-description-in-pvr_mmu_op_context
+|   |-- drivers-gpu-drm-imagination-pvr_mmu.c:warning:Excess-struct-member-sgt_offset-description-in-pvr_mmu_op_context
+|   `-- drivers-gpu-drm-msm-disp-dpu1-dpu_encoder.c:warning:Excess-struct-member-debugfs_root-description-in-dpu_encoder_virt
+|-- arm64-randconfig-004-20240109
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:operator:has-lower-precedence-than-will-be-evaluated-first
+|   `-- drivers-dma-xilinx-xdma.c:warning:variable-desc-is-uninitialized-when-used-here
+|-- arm64-randconfig-r111-20240109
+|   |-- drivers-gpu-drm-msm-disp-dpu1-dpu_encoder.c:warning:Excess-struct-member-debugfs_root-description-in-dpu_encoder_virt
+|   |-- drivers-hwmon-max31827.c:sparse:sparse:dubious:x-y
+|   |-- fs-bcachefs-btree_iter.c:sparse:sparse:incompatible-types-in-comparison-expression-(different-address-spaces):
+|   |-- fs-bcachefs-btree_locking.c:sparse:sparse:incompatible-types-in-comparison-expression-(different-address-spaces):
+|   `-- sound-pci-hda-tas2781_hda_i2c.c:sparse:sparse:incorrect-type-in-assignment-(different-base-types)-expected-unsigned-int-data-got-restricted-__be32-usertype
+|-- hexagon-allmodconfig
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:operator:has-lower-precedence-than-will-be-evaluated-first
+|   `-- drivers-dma-xilinx-xdma.c:warning:variable-desc-is-uninitialized-when-used-here
+|-- hexagon-allyesconfig
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:operator:has-lower-precedence-than-will-be-evaluated-first
+|   `-- drivers-dma-xilinx-xdma.c:warning:variable-desc-is-uninitialized-when-used-here
+|-- hexagon-randconfig-001-20240109
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:operator:has-lower-precedence-than-will-be-evaluated-first
+|   `-- drivers-dma-xilinx-xdma.c:warning:variable-desc-is-uninitialized-when-used-here
+|-- i386-allmodconfig
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:operator:has-lower-precedence-than-will-be-evaluated-first
+|   |-- drivers-dma-xilinx-xdma.c:warning:variable-desc-is-uninitialized-when-used-here
+|   `-- drivers-gpu-drm-msm-disp-dpu1-dpu_encoder.c:warning:Excess-struct-member-debugfs_root-description-in-dpu_encoder_virt
+|-- i386-allyesconfig
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:operator:has-lower-precedence-than-will-be-evaluated-first
+|   |-- drivers-dma-xilinx-xdma.c:warning:variable-desc-is-uninitialized-when-used-here
+|   `-- drivers-gpu-drm-msm-disp-dpu1-dpu_encoder.c:warning:Excess-struct-member-debugfs_root-description-in-dpu_encoder_virt
+|-- i386-buildonly-randconfig-001-20240109
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:operator:has-lower-precedence-than-will-be-evaluated-first
+|   `-- drivers-dma-xilinx-xdma.c:warning:variable-desc-is-uninitialized-when-used-here
+|-- i386-buildonly-randconfig-002-20240109
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:operator:has-lower-precedence-than-will-be-evaluated-first
+|   `-- drivers-dma-xilinx-xdma.c:warning:variable-desc-is-uninitialized-when-used-here
+|-- i386-randconfig-005-20240109
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:operator:has-lower-precedence-than-will-be-evaluated-first
+|   `-- drivers-dma-xilinx-xdma.c:warning:variable-desc-is-uninitialized-when-used-here
+|-- i386-randconfig-006-20240109
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:operator:has-lower-precedence-than-will-be-evaluated-first
+|   `-- drivers-dma-xilinx-xdma.c:warning:variable-desc-is-uninitialized-when-used-here
+|-- i386-randconfig-061-20231217
+|   |-- arch-x86-kvm-vmx-hyperv_evmcs.h:sparse:sparse:cast-truncates-bits-from-constant-value-(120b92-becomes-b92)
+|   |-- arch-x86-kvm-vmx-hyperv_evmcs.h:sparse:sparse:cast-truncates-bits-from-constant-value-(1a069a-becomes-69a)
+|   |-- arch-x86-kvm-vmx-hyperv_evmcs.h:sparse:sparse:cast-truncates-bits-from-constant-value-(1b001b-becomes-1b)
+|   |-- arch-x86-kvm-vmx-hyperv_evmcs.h:sparse:sparse:cast-truncates-bits-from-constant-value-(1b009b-becomes-9b)
+|   |-- arch-x86-kvm-vmx-hyperv_evmcs.h:sparse:sparse:cast-truncates-bits-from-constant-value-(1b011b-becomes-11b)
+|   |-- arch-x86-kvm-vmx-hyperv_evmcs.h:sparse:sparse:cast-truncates-bits-from-constant-value-(1b039b-becomes-39b)
+|   |-- arch-x86-kvm-vmx-hyperv_evmcs.h:sparse:sparse:cast-truncates-bits-from-constant-value-(1b049b-becomes-49b)
+|   |-- arch-x86-kvm-vmx-hyperv_evmcs.h:sparse:sparse:cast-truncates-bits-from-constant-value-(1b051b-becomes-51b)
+|   |-- arch-x86-kvm-vmx-hyperv_evmcs.h:sparse:sparse:cast-truncates-bits-from-constant-value-(1b059b-becomes-59b)
+|   |-- arch-x86-kvm-vmx-hyperv_evmcs.h:sparse:sparse:cast-truncates-bits-from-constant-value-(80a08-becomes-a08)
+|   |-- arch-x86-kvm-vmx-hyperv_evmcs.h:sparse:sparse:cast-truncates-bits-from-constant-value-(80d08-becomes-d08)
+|   `-- arch-x86-kvm-vmx-hyperv_evmcs.h:sparse:sparse:cast-truncates-bits-from-constant-value-(b000b-becomes-b)
+|-- i386-randconfig-061-20240109
+|   |-- drivers-hwmon-max31827.c:sparse:sparse:dubious:x-y
+|   |-- fs-bcachefs-btree_iter.c:sparse:sparse:incompatible-types-in-comparison-expression-(different-address-spaces):
+|   `-- fs-bcachefs-btree_locking.c:sparse:sparse:incompatible-types-in-comparison-expression-(different-address-spaces):
+|-- i386-randconfig-062-20240109
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:operator:has-lower-precedence-than-will-be-evaluated-first
+|   |-- drivers-dma-xilinx-xdma.c:warning:variable-desc-is-uninitialized-when-used-here
+|   `-- drivers-hwmon-max31827.c:sparse:sparse:dubious:x-y
+|-- i386-randconfig-063-20240109
+|   `-- drivers-hwmon-max31827.c:sparse:sparse:dubious:x-y
+|-- i386-randconfig-141-20240110
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:operator:has-lower-precedence-than-will-be-evaluated-first
+|   `-- drivers-dma-xilinx-xdma.c:warning:variable-desc-is-uninitialized-when-used-here
+|-- powerpc-allmodconfig
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:operator:has-lower-precedence-than-will-be-evaluated-first
+|   |-- drivers-dma-xilinx-xdma.c:warning:variable-desc-is-uninitialized-when-used-here
+|   `-- drivers-gpu-drm-msm-disp-dpu1-dpu_encoder.c:warning:Excess-struct-member-debugfs_root-description-in-dpu_encoder_virt
+|-- powerpc-allyesconfig
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:operator:has-lower-precedence-than-will-be-evaluated-first
+|   |-- drivers-dma-xilinx-xdma.c:warning:variable-desc-is-uninitialized-when-used-here
+|   `-- drivers-gpu-drm-msm-disp-dpu1-dpu_encoder.c:warning:Excess-struct-member-debugfs_root-description-in-dpu_encoder_virt
+|-- powerpc-randconfig-003-20240109
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:operator:has-lower-precedence-than-will-be-evaluated-first
+|   `-- drivers-dma-xilinx-xdma.c:warning:variable-desc-is-uninitialized-when-used-here
+|-- powerpc64-randconfig-001-20240109
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:operator:has-lower-precedence-than-will-be-evaluated-first
+|   `-- drivers-dma-xilinx-xdma.c:warning:variable-desc-is-uninitialized-when-used-here
+|-- x86_64-allmodconfig
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:operator:has-lower-precedence-than-will-be-evaluated-first
+|   |-- drivers-dma-xilinx-xdma.c:warning:variable-desc-is-uninitialized-when-used-here
+|   `-- drivers-gpu-drm-msm-disp-dpu1-dpu_encoder.c:warning:Excess-struct-member-debugfs_root-description-in-dpu_encoder_virt
+|-- x86_64-allyesconfig
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:operator:has-lower-precedence-than-will-be-evaluated-first
+|   |-- drivers-dma-xilinx-xdma.c:warning:variable-desc-is-uninitialized-when-used-here
+|   `-- drivers-gpu-drm-msm-disp-dpu1-dpu_encoder.c:warning:Excess-struct-member-debugfs_root-description-in-dpu_encoder_virt
+|-- x86_64-buildonly-randconfig-004-20240109
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:operator:has-lower-precedence-than-will-be-evaluated-first
+|   `-- drivers-dma-xilinx-xdma.c:warning:variable-desc-is-uninitialized-when-used-here
+|-- x86_64-buildonly-randconfig-006-20240109
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:operator:has-lower-precedence-than-will-be-evaluated-first
+|   `-- drivers-dma-xilinx-xdma.c:warning:variable-desc-is-uninitialized-when-used-here
+|-- x86_64-randconfig-012-20240109
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+|   |-- drivers-dma-xilinx-xdma.c:warning:operator:has-lower-precedence-than-will-be-evaluated-first
+|   `-- drivers-dma-xilinx-xdma.c:warning:variable-desc-is-uninitialized-when-used-here
+`-- x86_64-randconfig-075-20240109
+    |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-dst_addr-not-described-in-xdma_fill_descs
+    |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-filled_descs_num-not-described-in-xdma_fill_descs
+    |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-size-not-described-in-xdma_fill_descs
+    |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-src_addr-not-described-in-xdma_fill_descs
+    |-- drivers-dma-xilinx-xdma.c:warning:Function-parameter-or-struct-member-sw_desc-not-described-in-xdma_fill_descs
+    |-- drivers-dma-xilinx-xdma.c:warning:operator:has-lower-precedence-than-will-be-evaluated-first
+    `-- drivers-dma-xilinx-xdma.c:warning:variable-desc-is-uninitialized-when-used-here
+
+elapsed time: 1532m
+
+configs tested: 177
+configs skipped: 3
+
+tested configs:
+alpha                             allnoconfig   gcc  
+alpha                            allyesconfig   gcc  
+alpha                               defconfig   gcc  
+arc                              allmodconfig   gcc  
+arc                               allnoconfig   gcc  
+arc                              allyesconfig   gcc  
+arc                                 defconfig   gcc  
+arc                     haps_hs_smp_defconfig   gcc  
+arc                            hsdk_defconfig   gcc  
+arc                     nsimosci_hs_defconfig   gcc  
+arc                   randconfig-001-20240109   gcc  
+arc                   randconfig-002-20240109   gcc  
+arm                              allmodconfig   gcc  
+arm                               allnoconfig   gcc  
+arm                              allyesconfig   gcc  
+arm                                 defconfig   clang
+arm                           h3600_defconfig   gcc  
+arm                   randconfig-001-20240109   clang
+arm                   randconfig-002-20240109   clang
+arm                   randconfig-003-20240109   clang
+arm                   randconfig-004-20240109   clang
+arm                           tegra_defconfig   gcc  
+arm64                            allmodconfig   clang
+arm64                             allnoconfig   gcc  
+arm64                               defconfig   gcc  
+arm64                 randconfig-001-20240109   clang
+arm64                 randconfig-002-20240109   clang
+arm64                 randconfig-003-20240109   clang
+arm64                 randconfig-004-20240109   clang
+csky                             allmodconfig   gcc  
+csky                              allnoconfig   gcc  
+csky                             allyesconfig   gcc  
+csky                                defconfig   gcc  
+csky                  randconfig-001-20240109   gcc  
+csky                  randconfig-002-20240109   gcc  
+hexagon                          allmodconfig   clang
+hexagon                           allnoconfig   clang
+hexagon                          allyesconfig   clang
+hexagon                             defconfig   clang
+hexagon               randconfig-001-20240109   clang
+hexagon               randconfig-002-20240109   clang
+i386                             alldefconfig   gcc  
+i386                             allmodconfig   clang
+i386                              allnoconfig   clang
+i386                             allyesconfig   clang
+i386         buildonly-randconfig-001-20240109   clang
+i386         buildonly-randconfig-002-20240109   clang
+i386         buildonly-randconfig-003-20240109   clang
+i386         buildonly-randconfig-004-20240109   clang
+i386         buildonly-randconfig-005-20240109   clang
+i386         buildonly-randconfig-006-20240109   clang
+i386                                defconfig   gcc  
+i386                  randconfig-001-20240109   clang
+i386                  randconfig-002-20240109   clang
+i386                  randconfig-003-20240109   clang
+i386                  randconfig-004-20240109   clang
+i386                  randconfig-005-20240109   clang
+i386                  randconfig-006-20240109   clang
+i386                  randconfig-011-20240109   gcc  
+i386                  randconfig-012-20240109   gcc  
+i386                  randconfig-013-20240109   gcc  
+i386                  randconfig-014-20240109   gcc  
+i386                  randconfig-015-20240109   gcc  
+i386                  randconfig-016-20240109   gcc  
+loongarch                        allmodconfig   gcc  
+loongarch                         allnoconfig   gcc  
+loongarch                           defconfig   gcc  
+loongarch             randconfig-001-20240109   gcc  
+loongarch             randconfig-002-20240109   gcc  
+m68k                             allmodconfig   gcc  
+m68k                              allnoconfig   gcc  
+m68k                             allyesconfig   gcc  
+m68k                                defconfig   gcc  
+m68k                       m5208evb_defconfig   gcc  
+microblaze                       allmodconfig   gcc  
+microblaze                        allnoconfig   gcc  
+microblaze                       allyesconfig   gcc  
+microblaze                          defconfig   gcc  
+mips                              allnoconfig   clang
+mips                             allyesconfig   gcc  
+mips                      maltaaprp_defconfig   clang
+mips                       rbtx49xx_defconfig   gcc  
+nios2                            allmodconfig   gcc  
+nios2                             allnoconfig   gcc  
+nios2                            allyesconfig   gcc  
+nios2                               defconfig   gcc  
+nios2                 randconfig-001-20240109   gcc  
+nios2                 randconfig-002-20240109   gcc  
+openrisc                          allnoconfig   gcc  
+openrisc                         allyesconfig   gcc  
+openrisc                            defconfig   gcc  
+parisc                           allmodconfig   gcc  
+parisc                            allnoconfig   gcc  
+parisc                           allyesconfig   gcc  
+parisc                              defconfig   gcc  
+parisc                randconfig-001-20240109   gcc  
+parisc                randconfig-002-20240109   gcc  
+parisc64                            defconfig   gcc  
+powerpc                          allmodconfig   clang
+powerpc                           allnoconfig   gcc  
+powerpc                          allyesconfig   clang
+powerpc                       holly_defconfig   gcc  
+powerpc                    klondike_defconfig   gcc  
+powerpc               randconfig-001-20240109   clang
+powerpc               randconfig-002-20240109   clang
+powerpc               randconfig-003-20240109   clang
+powerpc                     redwood_defconfig   gcc  
+powerpc                        warp_defconfig   gcc  
+powerpc64             randconfig-001-20240109   clang
+powerpc64             randconfig-002-20240109   clang
+powerpc64             randconfig-003-20240109   clang
+riscv                            allmodconfig   gcc  
+riscv                             allnoconfig   clang
+riscv                            allyesconfig   gcc  
+riscv                               defconfig   gcc  
+riscv                 randconfig-001-20240109   clang
+riscv                 randconfig-002-20240109   clang
+s390                             allmodconfig   gcc  
+s390                              allnoconfig   gcc  
+s390                             allyesconfig   gcc  
+s390                                defconfig   gcc  
+s390                  randconfig-001-20240109   gcc  
+s390                  randconfig-002-20240109   gcc  
+sh                               allmodconfig   gcc  
+sh                                allnoconfig   gcc  
+sh                               allyesconfig   gcc  
+sh                        apsh4ad0a_defconfig   gcc  
+sh                                  defconfig   gcc  
+sh                          r7785rp_defconfig   gcc  
+sh                    randconfig-001-20240109   gcc  
+sh                    randconfig-002-20240109   gcc  
+sh                           sh2007_defconfig   gcc  
+sparc                            allmodconfig   gcc  
+sparc64                          allmodconfig   gcc  
+sparc64                          allyesconfig   gcc  
+sparc64                             defconfig   gcc  
+sparc64               randconfig-001-20240109   gcc  
+sparc64               randconfig-002-20240109   gcc  
+um                               allmodconfig   clang
+um                                allnoconfig   clang
+um                               allyesconfig   clang
+um                                  defconfig   gcc  
+um                             i386_defconfig   gcc  
+um                    randconfig-001-20240109   clang
+um                    randconfig-002-20240109   clang
+um                           x86_64_defconfig   gcc  
+x86_64                            allnoconfig   gcc  
+x86_64                           allyesconfig   clang
+x86_64       buildonly-randconfig-001-20240109   clang
+x86_64       buildonly-randconfig-002-20240109   clang
+x86_64       buildonly-randconfig-003-20240109   clang
+x86_64       buildonly-randconfig-004-20240109   clang
+x86_64       buildonly-randconfig-005-20240109   clang
+x86_64       buildonly-randconfig-006-20240109   clang
+x86_64                              defconfig   gcc  
+x86_64                randconfig-001-20240109   gcc  
+x86_64                randconfig-002-20240109   gcc  
+x86_64                randconfig-003-20240109   gcc  
+x86_64                randconfig-004-20240109   gcc  
+x86_64                randconfig-005-20240109   gcc  
+x86_64                randconfig-006-20240109   gcc  
+x86_64                randconfig-011-20240109   clang
+x86_64                randconfig-012-20240109   clang
+x86_64                randconfig-013-20240109   clang
+x86_64                randconfig-014-20240109   clang
+x86_64                randconfig-015-20240109   clang
+x86_64                randconfig-016-20240109   clang
+x86_64                randconfig-071-20240109   clang
+x86_64                randconfig-072-20240109   clang
+x86_64                randconfig-073-20240109   clang
+x86_64                randconfig-074-20240109   clang
+x86_64                randconfig-075-20240109   clang
+x86_64                randconfig-076-20240109   clang
+x86_64                          rhel-8.3-rust   clang
+xtensa                            allnoconfig   gcc  
+xtensa                randconfig-001-20240109   gcc  
+xtensa                randconfig-002-20240109   gcc  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
