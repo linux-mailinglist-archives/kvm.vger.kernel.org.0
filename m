@@ -1,82 +1,84 @@
-Return-Path: <kvm+bounces-6008-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6009-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55091829E0D
-	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 16:56:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A9F6829E76
+	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 17:24:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E9FE11F27A64
-	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 15:56:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D01C1F22B05
+	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 16:24:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F9394CB40;
-	Wed, 10 Jan 2024 15:56:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 394B24CDF8;
+	Wed, 10 Jan 2024 16:23:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="DvO7RhNe"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="TkI/f+tO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D36924CB20;
-	Wed, 10 Jan 2024 15:56:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 0290C40E016C;
-	Wed, 10 Jan 2024 15:56:11 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id jhy-WvyI-ZKl; Wed, 10 Jan 2024 15:56:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1704902168; bh=9AXlWCYHyGlZWoMBjnEdXnJNXAAZdOZ1mMO8CIYljuM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DvO7RhNeuoKySKUfs6PH0zwrctKvn30zN4ZJDSb4SJEyCcf/+ZUAT51AnHdipMAh7
-	 rm0RrWrys+aUa/IzTcaKG3XQZypPVKlUvek2MEpQmkr+NuF5q9tRLpICGdc0/QWziU
-	 MwU/PkCLVGULD/bD5kg83YuJkvlWJO6QsaEenRoEObBox8gQVQvOU+FYNLztanY1Yq
-	 Rg6EiSfJWGaWHw6zbN51AyuRDr+Gta1viaxdbG/MHFJN8DQlIaS0GDhyhpuBGYXiZd
-	 QXHYO3b1r66t6qXOhXGV1ZPN+Ftm4y7/vGYv1NcEhVaqZtGue97HlNS0yT53vMp/+/
-	 o7gi4l2nlH6zVoGaNly8UNIs8TfMAcJxu/jPx6VwPlFgpkLdPWqcg2r1CCH+l9I1vn
-	 IUn3st1d8C838EjqjP+1VkwM0KrZDrQw2voJaJIKrvOM15E1+WhXiIbZBgaHOPcc90
-	 FXp61xtJLgEtlnKTodZAGCn+aXb9dm7jz+fiSKkzJlKzi7V+fiUMnpIsARIk/0FffF
-	 xdLIK8mYSVKwdgB00rWb/VTCt9noXUDjeGEYMbMPWGTF19zJxZNDhLwTBK8Px0bF8u
-	 CXpBdrtdMuIoGpqfvJx9e+EmE4Yrut8ZwqkQGOad2y15r9Q0D4m1gM7uN3plRwBes3
-	 XjO8/dwgOZn6I30W6HVlZEXA=
-Received: from zn.tnic (pd9530f8c.dip0.t-ipconnect.de [217.83.15.140])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 73DF440E01A9;
-	Wed, 10 Jan 2024 15:55:30 +0000 (UTC)
-Date: Wed, 10 Jan 2024 16:55:23 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: Michael Roth <michael.roth@amd.com>, x86@kernel.org,
-	kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
-	hpa@zytor.com, ardb@kernel.org, pbonzini@redhat.com,
-	seanjc@google.com, vkuznets@redhat.com, jmattson@google.com,
-	luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
-	pgonda@google.com, peterz@infradead.org,
-	srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-	tobin@ibm.com, vbabka@suse.cz, kirill@shutemov.name,
-	ak@linux.intel.com, tony.luck@intel.com,
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
-	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
-	Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH v1 07/26] x86/fault: Add helper for dumping RMP entries
-Message-ID: <20240110155523.GEZZ696yxCY-oOvygR@fat_crate.local>
-References: <20231230161954.569267-1-michael.roth@amd.com>
- <20231230161954.569267-8-michael.roth@amd.com>
- <20240110111344.GBZZ576DpwHHs997Zl@fat_crate.local>
- <625926f9-6c45-4242-ac62-8f36abfcb099@amd.com>
- <20240110152745.GDZZ63cekYEDqdajjO@fat_crate.local>
- <9e3a6d33-cc04-46cb-b97d-e903a263800f@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE9B14CB55;
+	Wed, 10 Jan 2024 16:23:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40AEtP0A008007;
+	Wed, 10 Jan 2024 16:23:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : in-reply-to : references : date : message-id : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=deC21uqqKb/SJT3z23x6pPD8Grh+2LwgZrfw2splm3s=;
+ b=TkI/f+tOiOybAbFDEFmsDx/gUObuoXk5qMYjZ/3XEQNeemwuY3XkSslAIWs1v0n7u1mD
+ aeGCBaZgPZdchbLqGoftqPTxJQzytHQcsRZGR+o6U77S9ZqJMI6RhznQhrvPt5vbbKHX
+ +P+zvrGRua4ugDRo8y41OGHm3FW2YncSmA9EF0lOQxxlh1rIcn6I/7aU3ppCZzj/SfuF
+ mF7PORtq7WP1NWKzIZ7aY/1Bz63UMD1ah04+Evummipaqp270L5RRn6ynXsoD+4kxAdE
+ 9Vh9QAcWC1SejiesDmIHluCC8ak+VEG/HIkaM50zUfJf4xRxnfRmH82GkUItURxyjq9p xA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vhuu9n81k-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 10 Jan 2024 16:23:34 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 40AGLLVt004848;
+	Wed, 10 Jan 2024 16:23:33 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vhuu9n7w7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 10 Jan 2024 16:23:33 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 40ADdJSC001339;
+	Wed, 10 Jan 2024 16:23:30 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3vfkdkdy49-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 10 Jan 2024 16:23:30 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 40AGNTI421824128
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 10 Jan 2024 16:23:29 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E6D712004B;
+	Wed, 10 Jan 2024 16:23:28 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 819B720043;
+	Wed, 10 Jan 2024 16:23:28 +0000 (GMT)
+Received: from li-1de7cd4c-3205-11b2-a85c-d27f97db1fe1.ibm.com (unknown [9.171.28.50])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Wed, 10 Jan 2024 16:23:28 +0000 (GMT)
+From: "Marc Hartmayer" <mhartmay@linux.ibm.com>
+To: Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda
+ <imbrenda@linux.ibm.com>,
+        Nico Boehr <nrb@linux.ibm.com>, Thomas Huth
+ <thuth@redhat.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v1] s390x/Makefile: simplify Secure
+ Execution boot image generation
+In-Reply-To: <19cc133f-57a7-45cd-a7e2-a4869bb8c753@linux.ibm.com>
+References: <20231121172338.146006-1-mhartmay@linux.ibm.com>
+ <19cc133f-57a7-45cd-a7e2-a4869bb8c753@linux.ibm.com>
+Date: Wed, 10 Jan 2024 17:23:26 +0100
+Message-ID: <87edep5f9d.fsf@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -84,20 +86,46 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <9e3a6d33-cc04-46cb-b97d-e903a263800f@amd.com>
+Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: GXGO9VXDztcz-tR6wV5Pw_qorusOnBvk
+X-Proofpoint-ORIG-GUID: 74AuUekK1T9o9ddwtjYeYlW-Wpafvmiz
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-10_08,2024-01-10_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 malwarescore=0
+ adultscore=0 bulkscore=0 impostorscore=0 priorityscore=1501 phishscore=0
+ mlxscore=0 mlxlogscore=999 lowpriorityscore=0 suspectscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
+ definitions=main-2401100133
 
-On Wed, Jan 10, 2024 at 09:51:04AM -0600, Tom Lendacky wrote:
-> I'm only suggesting getting rid of the else that prints "..." when the entry
-> is all zeroes. Printing the non-zero entries would still occur.
+On Wed, Jan 10, 2024 at 11:44 AM +0100, Janosch Frank <frankja@linux.ibm.co=
+m> wrote:
+> On 11/21/23 18:23, Marc Hartmayer wrote:
+>> Changes:
+>> + merge Makefile rules for the generation of the Secure Execution boot
+>>    image
+>> + fix `parmfile` dependency for the `selftest.pv.bin` target
+>> + rename `genprotimg_pcf` to `GENPROTIMG_PCF` to match the coding style
+>>    in the file
+>> + always provide a customer communication key - not only for the
+>>    confidential dump case. Makes the code little easier and doesn't hurt.
+>>=20
+>> Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+>
+> Thanks, I've pushed this to devel for CI coverage
+>
+>
 
-Sure, one should be able to to infer that the missing entries are null.
+Thanks.
 
-:-)
+--=20
+Kind regards / Beste Gr=C3=BC=C3=9Fe
+   Marc Hartmayer
 
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+IBM Deutschland Research & Development GmbH
+Vorsitzender des Aufsichtsrats: Wolfgang Wendt
+Gesch=C3=A4ftsf=C3=BChrung: David Faller
+Sitz der Gesellschaft: B=C3=B6blingen
+Registergericht: Amtsgericht Stuttgart, HRB 243294
 
