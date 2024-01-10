@@ -1,73 +1,74 @@
-Return-Path: <kvm+bounces-6001-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6002-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EB2A829D24
-	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 16:11:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1B20829D6A
+	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 16:21:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C53291F228AF
-	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 15:11:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D57911C2240B
+	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 15:21:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D47BE4BAAC;
-	Wed, 10 Jan 2024 15:11:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E111C4BABD;
+	Wed, 10 Jan 2024 15:20:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="jIyyUZW2"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="k9hYfLsg"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2066.outbound.protection.outlook.com [40.107.223.66])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2056.outbound.protection.outlook.com [40.107.243.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A4654B5D2;
-	Wed, 10 Jan 2024 15:10:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82BF94C618;
+	Wed, 10 Jan 2024 15:20:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gmbPGxWHZ8uPLCBVs4tDanhPG2Q64tphqdBufHTpND0PNpbdPEkagG7Dw4LqjeohAl5Vai7O2vgx6Du86/ZkyhUokVaXCh0IwtC5vywx5gTuRVbgvY3T4eXOCKOf07dxxLl5QckAgd8unfz6HJJB17J8ZB0RaocERrJwI6drjpZNHRekdeakWU79XZ9zmDC+kq2ATFacHHnSVo4+tXDWvKpQvnBwFgeM5gA2iYG8jGBbUD0Z3SyCCcqB13yegZjxo31Mn67K60K6om218N88cF+z400GA8GuklsEfJQTPPXOGxEYB1pxfqbZP3LxJ0fv9DSoep5J0c4CbTLfDNxxUA==
+ b=EYp0mGHs0gHyoLYJ8qrUKrgZL4QW5u7wfxl2lCzRLr6hL4Z2gPWWQGBjtedqmDeZj9sxl0mxXQXZf90mH8pXZsdsfJSAH3VfxlMFtEtC+bRAbSiZQuqiQ7NybL9StdorzsOS4C9+Ez89vQKcIkz/TiPJzMOZ1gDmPO7QLdIQea9wIQc7FUs2Bw0Cz0aGY+a6bZJqSKeLJbyyKPRIXWBL4kYCcBqjjugORaaIMWsT+LZgmu6jME03X/QmZ+VafMFVSyMS797kjjcCwg+yIIvnV6AfSiYI/UJC/jLxsSAyHc5LP4EdgxCf/jKBRXBZmKlGOjasvxbcnIOt3LCKc/sKVA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IU92WohF5iMC8RZ2NEtQ5wMPp/iImEBZniX2tHAdRYE=;
- b=kct0YO6I+a/dLEx0VMd2UWty9aVU7QOGmKliiORgMQ+cooJb085lup4xCz0YP4YkqwUgCiJdB4GCtKjosE0V2/4PXblK1Mjl/TssltJz1G3QCk3SQ762f8N3QwCIbhsqV9KqzoUs11TVYBU3EOumm8/lDpqbPCzyZnGcHEX1iXrQoJM0/o/oHFvoQHvt332H4+UkfGSylCOy0qKgBKferO8UDtTCC8z7TZqmXW9m5wKMK5KDYK2kgMOuyKO5t/ZhQodn779wcpN3+smdLbFeXfqxKW6kzvbIreimmLXdwpjPUaEcqJ9YHQ6F59mJXT3g1tVjT7ZnRnE9LNifrqDM5g==
+ bh=aT7VGjWDwqbCTSdMJbcTocUWkii9Loqr6EZRyYeAzaQ=;
+ b=BsJvC8YPdzc75Q+CpMShCF8bCZBqgz7pvh00veDYDqPUKwG1WjvVVfhBZq2kXhUHgPrtunfu0Y/mLfSl+0ljNrNRKeK7r9gi/fV7mSx0Ml9/rEJU3NNHIBioZTSg0F7oH1KdTXS6rvdDVumVrfS3tHFYwuE7/QX6uF0lo3kkQPENtbkBKbkp00DtlQib67QUH/mNyoWbgG5J2J8JXaPzHlGf+fk5H2C2W1H7M3efKDd8DbDMam9K+2r5PVvohyPDjWvrpql2o3fKelz/d3OxQ44p/BAIIILOo25k/zXmEk/FK0bhZQcxZ4Z2ecL/Z8/qDyrVefOmhuf+GFkXchtvAg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IU92WohF5iMC8RZ2NEtQ5wMPp/iImEBZniX2tHAdRYE=;
- b=jIyyUZW2L50ogGNwbsQlGzZEZVnHT09fcSh1QG6l1A9rL8zlMg4847QrnygVebvzfDjIBGhR95VRPdgHtybGLOKudvQyGnIFMhR5YQIyeQnVk3S/P94Toz3kdnV0c2AuO70WJqsV11sQKKgYIuczxqEZDAJeykCxLrteJA/tIR0=
+ bh=aT7VGjWDwqbCTSdMJbcTocUWkii9Loqr6EZRyYeAzaQ=;
+ b=k9hYfLsgaHWoM85gjwoq6xwn5ZRTjbza4Qamw6eXSOpqJMzX1kx8V3A3HYW5mZZaJviZJIeaKYu8mg35xZ1LBX1TQ3q9Xh6dNMBgTqa40SHKvV4/4FDjcB3J1o71IMqv/XYGXiXLWeYBoLW/Px1BdUd8dIchvOqUWGvjtOS1igk=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
 Received: from BL1PR12MB5732.namprd12.prod.outlook.com (2603:10b6:208:387::17)
- by PH0PR12MB5433.namprd12.prod.outlook.com (2603:10b6:510:e1::22) with
+ by MN2PR12MB4486.namprd12.prod.outlook.com (2603:10b6:208:263::23) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7181.17; Wed, 10 Jan
- 2024 15:10:54 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.23; Wed, 10 Jan
+ 2024 15:20:47 +0000
 Received: from BL1PR12MB5732.namprd12.prod.outlook.com
  ([fe80::200:c1d0:b9aa:e16c]) by BL1PR12MB5732.namprd12.prod.outlook.com
  ([fe80::200:c1d0:b9aa:e16c%3]) with mapi id 15.20.7181.018; Wed, 10 Jan 2024
- 15:10:53 +0000
-Message-ID: <e6ce6fac-2824-42d5-a82f-429d36ccda73@amd.com>
-Date: Wed, 10 Jan 2024 09:10:50 -0600
+ 15:20:47 +0000
+Message-ID: <625926f9-6c45-4242-ac62-8f36abfcb099@amd.com>
+Date: Wed, 10 Jan 2024 09:20:44 -0600
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v1 07/26] x86/fault: Add helper for dumping RMP entries
 Content-Language: en-US
-To: Michael Roth <michael.roth@amd.com>, x86@kernel.org
-Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
- tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de, hpa@zytor.com,
- ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
- vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
- dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
- peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
- rientjes@google.com, tobin@ibm.com, bp@alien8.de, vbabka@suse.cz,
- kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
- sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
- jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
- pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
- Brijesh Singh <brijesh.singh@amd.com>
+To: Borislav Petkov <bp@alien8.de>, Michael Roth <michael.roth@amd.com>
+Cc: x86@kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+ linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+ jroedel@suse.de, hpa@zytor.com, ardb@kernel.org, pbonzini@redhat.com,
+ seanjc@google.com, vkuznets@redhat.com, jmattson@google.com,
+ luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
+ pgonda@google.com, peterz@infradead.org,
+ srinivas.pandruvada@linux.intel.com, rientjes@google.com, tobin@ibm.com,
+ vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+ tony.luck@intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+ alpergun@google.com, jarkko@kernel.org, ashish.kalra@amd.com,
+ nikunj.dadhania@amd.com, pankaj.gupta@amd.com, liam.merwick@oracle.com,
+ zhi.a.wang@intel.com, Brijesh Singh <brijesh.singh@amd.com>
 References: <20231230161954.569267-1-michael.roth@amd.com>
  <20231230161954.569267-8-michael.roth@amd.com>
+ <20240110111344.GBZZ576DpwHHs997Zl@fat_crate.local>
 From: Tom Lendacky <thomas.lendacky@amd.com>
 Autocrypt: addr=thomas.lendacky@amd.com; keydata=
  xsFNBFaNZYkBEADxg5OW/ajpUG7zgnUQPsMqWPjeAxtu4YH3lCUjWWcbUgc2qDGAijsLTFv1
@@ -113,11 +114,11 @@ Autocrypt: addr=thomas.lendacky@amd.com; keydata=
  y46PmDPicLjX/srgemvLtHoeVRplL9ATAkmQ7yxXc6wBSwf1BYs9gAiwXbU1vMod0AXXRBym
  0qhojoaSdRP5XTShfvOYdDozraaKx5Wx8X+oZvvjbbHhHGPL2seq97fp3nZ9h8TIQXRhO+aY
  vFkWitqCJg==
-In-Reply-To: <20231230161954.569267-8-michael.roth@amd.com>
+In-Reply-To: <20240110111344.GBZZ576DpwHHs997Zl@fat_crate.local>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA1P222CA0146.NAMP222.PROD.OUTLOOK.COM
- (2603:10b6:806:3c2::28) To BL1PR12MB5732.namprd12.prod.outlook.com
+X-ClientProxiedBy: SA9P221CA0002.NAMP221.PROD.OUTLOOK.COM
+ (2603:10b6:806:25::7) To BL1PR12MB5732.namprd12.prod.outlook.com
  (2603:10b6:208:387::17)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -126,192 +127,153 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5732:EE_|PH0PR12MB5433:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7ddd56d7-ed94-4ecd-d4ec-08dc11ee56d5
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5732:EE_|MN2PR12MB4486:EE_
+X-MS-Office365-Filtering-Correlation-Id: 06d274ac-121a-4df4-de9e-08dc11efb8e1
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	iw5MnI3PL2x6ZozfNP0BzC3keloDAGCRMvQFoXZODFt9CSLeMLufkQUMXEnfB1KLzCvP1zQU7zEVVOXt4pXxqaJNBLEuyGq3D/G+bKCLvg/ctkdWbZgiXMBZTh3RYEhl6Iom+RVSdTw/nWdPljF/u/ot45v0S1dgEf293WlWwNHcCnIkbsj74RzpYDsUCDufSqXhigHuDPLG2/+S/rkbVKoMl4ycdftYD15NRbkqYi4J959q4aAe/qOArApNqbqPY8uLXOfWXfX6fvB0yALSg2cRFFKLmzsgOeIENB1XM6A2MJ1Xr2EqUEdULY54NJNmY4wAncS1caaAsGMNYnrfXELV+gp1q/+pncyjRx3RBKZ1fyz0vrXFP3zkyhG0ui1Bmha35y/DcZeIJ0uGQWINAWs1YHuWk5ATCIJaL7ZuMT3ruG2lntR7kPKMzYDbNZyhCKJrXHiJeMeptqX3m6wPJREcniMvrru/0vjMfUTjwOApXNsQkBAgtblYFFanbe7iQCvLyeOiackg/AfErLwkzX0Ekv4VjR0RMbM3ATWuxsAF5ws87f4DqdNmoVBVhKYc01D4LA2DbU0szaPt4uSEyreZ03TjjdYgQWkR9dd5iL8F/KDkgYsOHLnvt+sZEDF7NLdYD33pscGVCojdBKHhfw==
+	yOluekDxG4EM+cn97+t8l/O2DdHojHqQJLLYh8zDeDnHtEYv34kXPMVcPo8+9oI32be0iG7xM7F+gJ170fBn0yK0Gzd28MFv5j37euHEwo3OhsrtoKo8aTaYyfY55LAeMnL8P8XfzwznYQ+Erf3Cf11u77h6NBk/9glF2YA79xAk/Bw3aCwtMoWbd+KgmKrwBdJTiy6AAq3lub62VsOf7QaX9KfRsCzl2DrV0N8ijBp8SH6c1tkocuXtfgwte7WIYdia5LldYYjutUlbeIDzqj6yrEdh/If5tqI7WK5pzNHdLGTMLYG3oKim6J63Z6U1Ey7jcXEHLYpPVRUTbguI5/0SJYoU2GQ4HUGBlu41yniAFtnauC/U8O7XgdfkC1EOBBCMquBjJVEVQhbLCKJE28biHkInyU8CExJYZEW2021jGVHy1AzzfeCK70T/5SXjPgWQfg2xJWGW9xV++K02Lx56JlF2jKjztpmrLsUOtzd1Y2RSEu0i5u6uISjMWRVUfYBcUKk9sDHJO/JPauOcBRB44ToEJE9MM5sFr/IAL5yv5h3Cdmz2YuWXdch3sOjFebNdzeQaRfZe0TbdoHZ5dFHDwg+rfUNUIkiDvEoauvzcbvsxoQhXQH8WhKNG6qpaBOh5S2HUXdgi66wTR6ywmA==
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5732.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(366004)(136003)(376002)(396003)(346002)(230922051799003)(1800799012)(186009)(451199024)(64100799003)(31686004)(2906002)(7406005)(5660300002)(478600001)(7416002)(4326008)(41300700001)(316002)(8936002)(66946007)(66476007)(36756003)(66556008)(31696002)(6512007)(2616005)(6486002)(6506007)(53546011)(8676002)(86362001)(26005)(83380400001)(38100700002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5732.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(396003)(346002)(366004)(376002)(39860400002)(230922051799003)(451199024)(64100799003)(186009)(1800799012)(7416002)(2906002)(7406005)(5660300002)(6506007)(86362001)(6486002)(2616005)(26005)(53546011)(478600001)(8676002)(6666004)(6512007)(316002)(4326008)(36756003)(6636002)(8936002)(110136005)(66556008)(41300700001)(66946007)(66476007)(38100700002)(31696002)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?eThTRmRRZFNtSzhhVFdKTEs0VENKdmdBNStLN0daMVVZYkZBenRoLzQ1VU9Y?=
- =?utf-8?B?OVloZXBGUTV4MFNPK1dUTWR0S3lzcFVjcSt4YU5sclZaanZQUDEyTGxlUWJl?=
- =?utf-8?B?UGM2dWJkeW85VGZmQXc1U2tWUGRzd2Q4eTZHeThnd0UyaDJYcy84eFNXWXor?=
- =?utf-8?B?bTNaaFlDSUxWcGtBZzhKRlRHZkxGbm1LSlpuS0Z3ZVIzOTRGR3BycGExYk8x?=
- =?utf-8?B?NGduZDRKbVRqMy9NbGVsZkNERzhQb1l3dzh4bnVqREFsODZjakVnOXFXTUdH?=
- =?utf-8?B?anE5eHVHSGxKWFNySCtqTXpISE0raGxtZ1QyQ1RtcEFCK2o0TSswb0VBSkg0?=
- =?utf-8?B?YVJvVkxoL093b2RVYVFxQXJsOWNudmpLZVVPdi80OXJjWVdFTmppcktOaDBo?=
- =?utf-8?B?QXpSRG53aVp1TTRib3ZFRmZQdThoa0RNNVZhWHFGb2V6c1JjY1pCYXFpbXlT?=
- =?utf-8?B?b3l4TzQyWko0Z1VLRkZqU1VOd01MQWY5eUhmekd4aitXRllJRm9PaGdZRmlw?=
- =?utf-8?B?T2RHUzJKdnF2L3BMUEJOUU9SalJxQVdGVEpxZGR6OTRVL1NLa0NVWmNIZzhj?=
- =?utf-8?B?dmJTcGd4VnY0L05oMThKWTdlR2V0UGdOZ0RCS1c3cTY3SXF2TVcxT3l2UVdD?=
- =?utf-8?B?ZTN2MGI0bEVxU0FLSDhrajVRMncrOW85Um9zbUxKWEM5S2EzZGIzRDR5Tmsz?=
- =?utf-8?B?QWdzSHY5U252NmhJMjhIUkV3M3NRSmh5UzFOckUwNGFyUnpObUlPZDh6RCtR?=
- =?utf-8?B?c3hFYitza0l1dVhEWThMZTE5a3BZZnYrdWNCdU9sSWwrMFhncmp1bnE5ODBp?=
- =?utf-8?B?MzBZL1MyUzE1cUVzRzkyV1NZWjRjNGEyTE9WR0laZHViUDZWN1RnL29iZjdC?=
- =?utf-8?B?WmxBNHhhRFYxN2g3NjdkYWRTVjF4OW9nRzdGeGRIUXFMVmNxcTFicmNDeS9R?=
- =?utf-8?B?QU5VTWxuYmkyeDRnaFlhWUt6N2tJb29DV0dmTTVVNVN4S0F1RHFWcC9oZStR?=
- =?utf-8?B?L2YyUGlSSlJ0L1pHSlFldi9IZytUczgzU0YxWHJhbzlEWEZqdVQrU2hQamRE?=
- =?utf-8?B?Z1llNjJjdy9Uc2s3cGJNM3dmZm5IdFRQKzM2d2orRXlMVXd0eEUzaEQweEsx?=
- =?utf-8?B?NDc4UnBTbHFhUElzNFhBRktPSmV4bzFZRVFBRm84Z2d5bUx3YnlmUmFkT0Uz?=
- =?utf-8?B?cmg3Y3FVQVNJeW9NOHIyOE14dXpJa0hpUE52dnhjVVg2VFZ4QmczcDRXTUR3?=
- =?utf-8?B?UjI2akZlK0I5b3lQTkcyR1QzdlRHTlhPSjNsd01jNVFUKy9OSVg2bFJ6djY4?=
- =?utf-8?B?NmhjdStDTlJwSTNVY1BCdjl5TjFab3FZWmNETlFGbDBoLzhidzR5OFpONUkr?=
- =?utf-8?B?NXE5QzVRYnVpYWdNelJsNk8zK1JYRGdCRTdsMUg4Yk1ER3ZyZkl2MUtrWXlJ?=
- =?utf-8?B?Q2VwZ3ZJV2M3cXhFUFhEbWx2WmMvbDczV1J1djhQZDZYMUxDb2NWNms0TjJ0?=
- =?utf-8?B?b0hVZS95SG9ZSDdPTGwzdXlycEs0SjdCSHM1aytDZDNwSUFIWGZ5eW15OENp?=
- =?utf-8?B?M2RxTmdlb3VhcTZwc0dzVGFVZWNwVGNxQ00wVDI0eGFrZlZjTmZrN0duS1Nm?=
- =?utf-8?B?M0dGaEREOEIxSGdXRm9mVnAvMnRreFl5MU9OTGRZTVd2ZEhUNUtaaFp1ODhJ?=
- =?utf-8?B?Z3BxZUNDdzZRK2dyd282djZnL21vT3d6MWovUmpzUzNER2ZUMG51V2owWlRI?=
- =?utf-8?B?YkcxWnREa05yVVV3Y0l0b1BrSkVNTjRVdDN5aXJGYkxzTG9zR1RSLzROOHhD?=
- =?utf-8?B?dGdwTEJpa3JGQnRWd2NqRXVVekcwSzltTktlNlY0MmlEQm5qTVNYbkJWZzlx?=
- =?utf-8?B?bzJXdHJiN1N4cmtEVFo0aXVFRjhhNXVobHZLT3B3WHovbWdsVG5lM1BGa25l?=
- =?utf-8?B?akZaYy90d0VMWHhNU2VOVXEveHBkaDMvMEcyM0V5eFdFajczRUo0M1NGbFBu?=
- =?utf-8?B?YXJhY3lHWUV4b25XcjNnVjYxSVFUbnNtcytuZEdRdEZ4NzlHUlBrSmxGMnRD?=
- =?utf-8?B?dmdOckhkUDNNU3hHTEpEbDdFR05NekRqMTdtcy83dFlJVUhUTXlWeEswajNx?=
- =?utf-8?Q?oNjAQZQPpVp63qJWevx03fNMB?=
+	=?utf-8?B?S3NWNE9kVlpKRXhqYUJJSXNRY0t3SEdudFp2V0gzQ0xHM0ZYMmU2cUsxWHlW?=
+ =?utf-8?B?UklHUFlHaElkdFlsdW9sVjVrSTJpNHAydkZLR2Nvd05lZXZBYzYxRXpCYUxZ?=
+ =?utf-8?B?VHVZL1cwNGlwRzU1WVdndGd5K25NRCtIeDhIbEJaVlJCVThNcnpLOVQ5OU4y?=
+ =?utf-8?B?N3l3L2pmQlJtUkVEMFFQOXhFZmVzTTNzS0pTdTNwRHdWQ00zYzI3TnhHYUhK?=
+ =?utf-8?B?MHFHM2Vtem1tM2Z2dUNnRzRyMnNGeW1rOWZNaWQvVHJIU2F6aUczV3dYelhI?=
+ =?utf-8?B?Y0ptUTFYYUd5SjN4TU5peEd6U3dqbUZkb3o0Q2U5NHBQVzdmMjRIRzc1TWZi?=
+ =?utf-8?B?NUJEZkMvUExha2xuNFp6Tkk5YnhYSlBEVGY4MUx0K3gyL1BiVGRuSjdTdkMv?=
+ =?utf-8?B?bEltbm9CK21JcFFTcnlieWhKWmpzeEliWTNnU21mTmxKV1BEaUl5c2JESlJ5?=
+ =?utf-8?B?U3UxSEwzMVlCNkUrVHM0RS9EMnVScVl1RkM3ZGRXaUFiczA5ejJLem03NjZD?=
+ =?utf-8?B?R29RYTV0cjNYRmFLRDZHaEtLL1FuejFOcjF3TEZsc0MwWlJtVkhhRk5zSXkw?=
+ =?utf-8?B?Yk50bUJWN1QxWG5UQldkTHRrVmJGb1lQMHZUZytGYjFhWU1qNVRLeDRxWHlk?=
+ =?utf-8?B?bm1BaWticldTZ3Jyc3huT2Zqd0o0WjFQSVQvWjBxNzJicDIxa2xUYi96bEF5?=
+ =?utf-8?B?QUNDbmJvVGhXd0hTWTk1MDAyT0VNWHZYZVpJUzJvdE82L1ZCaWJGdzVnRFVr?=
+ =?utf-8?B?N2dMR3Vsc2F3MHV5c0FvYTladTNTcEJzRFRQa05aaUJ4ZmxRTEpwYm8zWUNz?=
+ =?utf-8?B?L0s2ektvUmdhZmNzMnlyMU9aN0ZHcllueSt6MzI2OEpuKzhaUUZmTVVkdEhQ?=
+ =?utf-8?B?RFZMV0N0TUxaV0hrWjhKYnBONXhDREc0NHV5VGphNW51aVlZbzFXMTVRclRl?=
+ =?utf-8?B?QlZpTVJUVEppSzRoMkhYWjR3S1hWa3l4UFlwVXQ1UHFIY3YzQUlXd2M4ek5D?=
+ =?utf-8?B?MHZMVUJpM1Y4cGpCOEViWFR0RDFONUhrcjByTUZGWVFPUG1yUlZ0QUZ1VjFt?=
+ =?utf-8?B?MWtJSkpLY3FtdEJkVEhvYWljdURlOGY4NmEvTkVRQmc1MHJUeExxaWs5QU0z?=
+ =?utf-8?B?RitOZzlpOWNsVGdPOGdMbW9tZExDQ0ZrckNTdkpXcGR0ZXlZRWxUMDBCdCtE?=
+ =?utf-8?B?MkhhYzRMazNER0FwNDhnZVlEc0lGQkFmazFlVStaUWtRcVJBYTgrSTYyMzNl?=
+ =?utf-8?B?MkV6ZXJNOUxHVmRlMEVwNEdNSlVrTzdLaVZaRERlWlk4RkUxQkNwVVZYd3dt?=
+ =?utf-8?B?KzVxOXI5Z3picndlVkRnYnV3VmV4MW1TN0xZcXV0Mk8yVkRoNWVLQ0NlZ3Jt?=
+ =?utf-8?B?NkN6bFhsWnJGUE5kRmk5V1ZTQVZVclFYMjR0MHcyeGRMN0tPZE5iUGNiNVRj?=
+ =?utf-8?B?WisrckJqdUF2SWNIcDN5VkZ3VGFQS3B5Wk9rRER4QmZqR09NbVJld09iNERU?=
+ =?utf-8?B?bWd5OGgyTkxhQ3FGVC91MTIwSEFvUFZxdldyVmJzL2FFZFpYTFlOOVROZ1Na?=
+ =?utf-8?B?RjZPYi9MTzMyM2NpUko4UWVKWGQ1eW1lbTFldG9Oa3ZDZURxL0FKRnl1V0JM?=
+ =?utf-8?B?WTRBdUlCdFdCLzlMWE1LandUeEtjV1lpYWpramZub0FSemlCa3dpUkhkeVM0?=
+ =?utf-8?B?bFRxYSs0Rlo0Rkc1VjA2YXVRTWI1WjZGRUNsZFNoeTVHaUZVZWtma1NBbFFi?=
+ =?utf-8?B?eXQyQlQ5bWtYb2d1NVJ4Y2FRTWN4SlgxWnM3UU80RHZKZkFvMjZXYStqUnBx?=
+ =?utf-8?B?MVZtTk1RVU5WMG5wQ0xsWk1tT3p2cllQNzBMWjhQNVFNNG9sSXNZdUxlN2Vy?=
+ =?utf-8?B?TzZobldrY3FqQTdPZVErTjBRYlZKaHRxSXd2M0llREFzRFMrTmEwSWhtc0do?=
+ =?utf-8?B?UEJhRUhmZ3RDMEVmUC9vYnVpblkreVVTeUlRUWcxclpTamxPNG1HaDlnMjZK?=
+ =?utf-8?B?MXM1UUJBK3ExUGhqSTFiY0lZZG9UK01Qd3FQUWhrTnlhY3pvSVE1REd3UTdE?=
+ =?utf-8?B?V1V6V05QNTlTdFRMNWJYanJBenBlc0hBVDZCM29iamxpRVphMjh1MlBPM2xM?=
+ =?utf-8?Q?UyWTfNJstgv+vS453kBe8u100?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7ddd56d7-ed94-4ecd-d4ec-08dc11ee56d5
+X-MS-Exchange-CrossTenant-Network-Message-Id: 06d274ac-121a-4df4-de9e-08dc11efb8e1
 X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5732.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jan 2024 15:10:53.8055
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jan 2024 15:20:47.7955
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6iLCM2tzsb8yj+/hLrtnHDN3tolyabHm9chCULWfovg7D41tXV/bPJOFqMm35gwj5IC0R92JxbR38kDrkCdNww==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB5433
+X-MS-Exchange-CrossTenant-UserPrincipalName: VyEYWyPvF7+QOBF2DrO3RSgn6sdVRvLO+BHu5nTJG3CgPwklhNoqF9XvdSH2sEMTzXcyzjbDbttqAHJV+J1CcA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4486
 
-On 12/30/23 10:19, Michael Roth wrote:
-> From: Brijesh Singh <brijesh.singh@amd.com>
+On 1/10/24 05:13, Borislav Petkov wrote:
+> On Sat, Dec 30, 2023 at 10:19:35AM -0600, Michael Roth wrote:
+>> +	while (pfn_current < pfn_end) {
+>> +		e = __snp_lookup_rmpentry(pfn_current, &level);
+>> +		if (IS_ERR(e)) {
+>> +			pfn_current++;
+>> +			continue;
+>> +		}
+>> +
+>> +		e_data = (u64 *)e;
+>> +		if (e_data[0] || e_data[1]) {
+>> +			pr_info("No assigned RMP entry for PFN 0x%llx, but the 2MB region contains populated RMP entries, e.g.: PFN 0x%llx: [high=0x%016llx low=0x%016llx]\n",
+>> +				pfn, pfn_current, e_data[1], e_data[0]);
+>> +			return;
+>> +		}
+>> +		pfn_current++;
+>> +	}
+>> +
+>> +	pr_info("No populated RMP entries in the 2MB region containing PFN 0x%llx\n",
+>> +		pfn);
+>> +}
 > 
-> This information will be useful for debugging things like page faults
-> due to RMP access violations and RMPUPDATE failures.
+> Ok, I went and reworked this, see below.
 > 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> [mdr: move helper to standalone patch, rework dump logic to reduce
->        verbosity]
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> Yes, I think it is important - at least in the beginning - to dump the
+> whole 2M PFN region for debugging purposes. If that output starts
+> becoming too unwieldy and overflowing terminals or log files, we'd
+> shorten it or put it behind a debug option or so.
+> 
+> Thx.
+> 
 > ---
->   arch/x86/include/asm/sev.h |  2 +
->   arch/x86/virt/svm/sev.c    | 77 ++++++++++++++++++++++++++++++++++++++
->   2 files changed, 79 insertions(+)
-> 
-> diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
-> index 01ce61b283a3..2c53e3de0b71 100644
-> --- a/arch/x86/include/asm/sev.h
-> +++ b/arch/x86/include/asm/sev.h
-> @@ -247,9 +247,11 @@ static inline u64 sev_get_status(void) { return 0; }
->   #ifdef CONFIG_KVM_AMD_SEV
->   bool snp_probe_rmptable_info(void);
->   int snp_lookup_rmpentry(u64 pfn, bool *assigned, int *level);
-> +void snp_dump_hva_rmpentry(unsigned long address);
->   #else
->   static inline bool snp_probe_rmptable_info(void) { return false; }
->   static inline int snp_lookup_rmpentry(u64 pfn, bool *assigned, int *level) { return -ENODEV; }
-> +static inline void snp_dump_hva_rmpentry(unsigned long address) {}
->   #endif
->   
->   #endif
 > diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
-> index 49fdfbf4e518..7c9ced8911e9 100644
+> index a8cf33b7da71..259a1dd655a7 100644
 > --- a/arch/x86/virt/svm/sev.c
 > +++ b/arch/x86/virt/svm/sev.c
-> @@ -266,3 +266,80 @@ int snp_lookup_rmpentry(u64 pfn, bool *assigned, int *level)
->   	return 0;
->   }
->   EXPORT_SYMBOL_GPL(snp_lookup_rmpentry);
-> +
-> +/*
-> + * Dump the raw RMP entry for a particular PFN. These bits are documented in the
-> + * PPR for a particular CPU model and provide useful information about how a
-> + * particular PFN is being utilized by the kernel/firmware at the time certain
-> + * unexpected events occur, such as RMP faults.
-> + */
-> +static void dump_rmpentry(u64 pfn)
-> +{
-> +	u64 pfn_current, pfn_end;
-> +	struct rmpentry *e;
-> +	u64 *e_data;
-> +	int level;
-> +
-> +	e = __snp_lookup_rmpentry(pfn, &level);
-> +	if (IS_ERR(e)) {
-> +		pr_info("Failed to read RMP entry for PFN 0x%llx, error %ld\n",
-> +			pfn, PTR_ERR(e));
-> +		return;
-> +	}
-> +
-> +	e_data = (u64 *)e;
-> +	if (e->assigned) {
-> +		pr_info("RMP entry for PFN 0x%llx: [high=0x%016llx low=0x%016llx]\n",
-> +			pfn, e_data[1], e_data[0]);
-> +		return;
-> +	}
-> +
-> +	/*
-> +	 * If the RMP entry for a particular PFN is not in an assigned state,
-> +	 * then it is sometimes useful to get an idea of whether or not any RMP
-> +	 * entries for other PFNs within the same 2MB region are assigned, since
-> +	 * those too can affect the ability to access a particular PFN in
-> +	 * certain situations, such as when the PFN is being accessed via a 2MB
-> +	 * mapping in the host page table.
-> +	 */
-> +	pfn_current = ALIGN(pfn, PTRS_PER_PMD);
-> +	pfn_end = pfn_current + PTRS_PER_PMD;
-> +
-> +	while (pfn_current < pfn_end) {
-> +		e = __snp_lookup_rmpentry(pfn_current, &level);
-> +		if (IS_ERR(e)) {
-> +			pfn_current++;
-> +			continue;
-> +		}
-> +
-> +		e_data = (u64 *)e;
-> +		if (e_data[0] || e_data[1]) {
-> +			pr_info("No assigned RMP entry for PFN 0x%llx, but the 2MB region contains populated RMP entries, e.g.: PFN 0x%llx: [high=0x%016llx low=0x%016llx]\n",
-> +				pfn, pfn_current, e_data[1], e_data[0]);
-> +			return;
-> +		}
-> +		pfn_current++;
-> +	}
-> +
-> +	pr_info("No populated RMP entries in the 2MB region containing PFN 0x%llx\n",
-> +		pfn);
-> +}
-> +
-> +void snp_dump_hva_rmpentry(unsigned long hva)
-> +{
-> +	unsigned int level;
-> +	pgd_t *pgd;
-> +	pte_t *pte;
-> +
-> +	pgd = __va(read_cr3_pa());
-> +	pgd += pgd_index(hva);
-> +	pte = lookup_address_in_pgd(pgd, hva, &level);
-> +
-> +	if (!pte) {
-> +		pr_info("Can't dump RMP entry for HVA %lx: no PTE/PFN found\n", hva);
-> +		return;
-> +	}
-> +
-> +	dump_rmpentry(pte_pfn(*pte));
 
-Already worked with Mike offline when I was running into issues using this 
-function. Net of that conversation is that the PFN needs to be adjusted 
-using the address offset if the PTE level indicates a huge page.
+> +	pr_info("PFN 0x%llx unassigned, dumping the whole 2M PFN region: [0x%llx - 0x%llx]\n",
+> +		pfn, pfn_i, pfn_end);
 
-Additionally the loop in dump_rmpentry() needs to use ALIGN_DOWN() in 
-order to get the PFN of the starting 2MB area.
+How about saying "... dumping all non-zero entries in the whole ..."
+
+and then removing the print below that prints the PFN and "..."
+
+> +
+> +	while (pfn_i < pfn_end) {
+> +		e = __snp_lookup_rmpentry(pfn_i, &level);
+>   		if (IS_ERR(e)) {
+> -			pfn_current++;
+> +			pr_err("Error %ld reading RMP entry for PFN 0x%llx\n",
+> +				PTR_ERR(e), pfn_i);
+> +			pfn_i++;
+>   			continue;
+>   		}
+>   
+> -		e_data = (u64 *)e;
+> -		if (e_data[0] || e_data[1]) {
+> -			pr_info("No assigned RMP entry for PFN 0x%llx, but the 2MB region contains populated RMP entries, e.g.: PFN 0x%llx: [high=0x%016llx low=0x%016llx]\n",
+> -				pfn, pfn_current, e_data[1], e_data[0]);
+> -			return;
+> -		}
+> -		pfn_current++;
+> -	}
+> +		if (e->lo || e->hi)
+> +			pr_info("PFN: 0x%llx, [0x%016llx - 0x%016llx]\n", pfn_i, e->lo, e->hi);
+> +		else
+> +			pr_info("PFN: 0x%llx ...\n", pfn_i);
+
+Remove this one.
+
+That should cut down on excess output since you are really only concerned 
+with non-zero RMP entries when the input PFN RMP entry is not assigned.
 
 Thanks,
 Tom
 
-
-> +}
-> +EXPORT_SYMBOL_GPL(snp_dump_hva_rmpentry);
+>   
+> -	pr_info("No populated RMP entries in the 2MB region containing PFN 0x%llx\n",
+> -		pfn);
+> +		pfn_i++;
+> +	}
+>   }
+>   
+>   void snp_dump_hva_rmpentry(unsigned long hva)
+> @@ -339,4 +343,3 @@ void snp_dump_hva_rmpentry(unsigned long hva)
+>   
+>   	dump_rmpentry(pte_pfn(*pte));
+>   }
+> -EXPORT_SYMBOL_GPL(snp_dump_hva_rmpentry);
+> 
 
