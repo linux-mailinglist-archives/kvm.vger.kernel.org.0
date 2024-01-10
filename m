@@ -1,104 +1,164 @@
-Return-Path: <kvm+bounces-5953-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5954-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CB81829185
-	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 01:39:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B099829187
+	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 01:40:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 51292288F5C
-	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 00:39:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44A2D289372
+	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 00:40:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48B3D23D5;
-	Wed, 10 Jan 2024 00:39:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A1C54689;
+	Wed, 10 Jan 2024 00:39:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B66GLCv0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="E6lIprKj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24464186F
-	for <kvm@vger.kernel.org>; Wed, 10 Jan 2024 00:39:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 790F82915
+	for <kvm@vger.kernel.org>; Wed, 10 Jan 2024 00:39:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5f8ffd9fb8aso35942717b3.3
-        for <kvm@vger.kernel.org>; Tue, 09 Jan 2024 16:39:40 -0800 (PST)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-6d9bd2deabfso2094009b3a.0
+        for <kvm@vger.kernel.org>; Tue, 09 Jan 2024 16:39:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704847180; x=1705451980; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LHQh+E98QwgdFrnlGd6RgJxgR303fsUw0Anefm352AA=;
-        b=B66GLCv08sgT4r1YY+xCUUulNTKi6Bx3G8J2aZOBePu4guo6AZ5/x+YWrs+aujWY6v
-         rcMYYWIcxz1lKVAZuQva0ABdJtKlt6N1OX50Ex7LV3/esSz3PTYk2aJEOEfozGuVWK8D
-         og5pt3pnx5OienWVvqcCHLl9nAvOnDmuj6PHttqbTezsx8SdLTo29AISem5GueIZqatN
-         ZCG3jgy+4rGfKz+56ihU6SNDamIssxswKKF8dCqBz6IFT4tEKLEcPVz3AGVwJ2/EetLM
-         h0oFyZe4TVP663WvbeajSWvzBTK+QsFvmsgc9Pn+eryRUJdPOInypUR5NVOSbS7uKpU/
-         fmaA==
+        d=google.com; s=20230601; t=1704847183; x=1705451983; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=ePMAACFe2MrWq1DNaP6F2TM5DnJ2ZLx/mnijbLthbpo=;
+        b=E6lIprKjPCtPRRdwnoIxtEsxJQ8n/4jQgGAXVfiyYDu2sDnAbVzdXlgaDoVRcJxWGf
+         KReekSIarPOLgOw5RU6Wirk3bYpxKqSuFwhy6Ov0n56TeppuG0gtI3kVW6IKgh399gj+
+         qsEgBrTh1azkW892HlSAcYoI0QgQ0zs5ehV3vDtkQYYejAzB2eJNiniMnxfSoNBAZQPB
+         oo0w5jxocV97czR84GLg+4NmEUBN1XwJnFc7Exfzv2Q8iQMvCXWoKf4pcKfHNSfIjo7S
+         ROcPCmLWm0VbnIHz/puEggHHPcFcAwweOtaBgIUMqH7wsKZe08bATIl5SP6ODw/jduKs
+         QuAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704847180; x=1705451980;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LHQh+E98QwgdFrnlGd6RgJxgR303fsUw0Anefm352AA=;
-        b=GZrjjqnpvPPMuFXX8dW0NGdGLtOvzTHYJ8gUChCiVDqmpfAnJidTtb3XjmfVVRtde+
-         8qSTlFeZ2WoI4I4IYH/dJ/AGCB8x9+UVEYKcNramZpWcwZlPIwYhgih7QY0HFHJ+ODRN
-         9AMWeYuu67HN9basJRGkbulCZLRavYYOKF627FM+TDdG+DH71DwSoH05LDtE/oC6BTTp
-         /t5tp41xQr6AfUUOUwIlSJjmbK5/oAt64jJY+EdlZDEVlMVjtvm0I/NYY/tGI1kMxJfd
-         SCJloRsURYlzXwCoJ9+NXGpZjdksZ2BVH5cymMA9d16+1pGjzvgxc2919Ve4/aJsJEM/
-         zR5g==
-X-Gm-Message-State: AOJu0YzFAQhs9Yc3Uce5pM5HK+zLyYUuF6jxd3ni51ceAkef5mkZl+pp
-	VdbD0mDxL7kHHnKOy7oAYMdDCDAQCO+nDOelWw==
-X-Google-Smtp-Source: AGHT+IHP62CliFkA96b/wsoXBHQfk8j/9CsO0CFacwbCORasfGjPKUyyyxuM77uw7yuAmCJ/BeVTJxjwd6o=
+        d=1e100.net; s=20230601; t=1704847183; x=1705451983;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ePMAACFe2MrWq1DNaP6F2TM5DnJ2ZLx/mnijbLthbpo=;
+        b=WDTYY2uJY74RnsEefMMrBUlZ94/5Z6Q9Fv410hKVbP4Y+m429L3RRJAVDCZNteJ4Zb
+         KL/PlD7FKTzwlX3L53W/hBORFg1xkM2RDRJBr/i7/HrbiVUDUwLaQyTQEFS1cVbAqbrF
+         t1urX6s5ccKZXQAZOpDK3GUEG08R3Y1GPLhxcxS/jwkyKRQBb2HNMRIQ7AYpYQA9d2Cc
+         e0BM3aW8/6fJiZ6JgpPbWhQjvyMUWxY1v3+2vv6FLL2gkvgZImTrY6qpfCMhhUc7cBkB
+         p8eyEhW75wa9YRNUvfY/xZTmDVzt1YCgKt1Aaahl3Nb60qahq7vxqKZ406HDLWX8DxcC
+         AGcA==
+X-Gm-Message-State: AOJu0YyfGVlzcuFYiyPTwUvJK09wurVgZYpTaS01138J7TAMbJRMsUUO
+	ZHXufWZJA9Kg7eoKvLsbtkzIfRtYKEfzsRwA0g==
+X-Google-Smtp-Source: AGHT+IHOtJaaLG3E7ais7QPCemsOQWravXElMjvqSYr4650maL97nrx0BDvmc6awukPm55MRPpouDk2C+R0=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:3387:b0:5e6:bcea:df68 with SMTP id
- fl7-20020a05690c338700b005e6bceadf68mr168367ywb.8.1704847180253; Tue, 09 Jan
- 2024 16:39:40 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:902:ce8b:b0:1d3:e449:fb53 with SMTP id
+ f11-20020a170902ce8b00b001d3e449fb53mr1035plg.4.1704847182436; Tue, 09 Jan
+ 2024 16:39:42 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue,  9 Jan 2024 16:39:34 -0800
+Date: Tue,  9 Jan 2024 16:39:35 -0800
+In-Reply-To: <20240110003938.490206-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20240110003938.490206-1-seanjc@google.com>
 X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
-Message-ID: <20240110003938.490206-1-seanjc@google.com>
-Subject: [PATCH 0/4] KVM: Clean up "preempted in-kernel" logic
+Message-ID: <20240110003938.490206-2-seanjc@google.com>
+Subject: [PATCH 1/4] KVM: Add dedicated arch hook for querying if vCPU was
+ preempted in-kernel
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	Like Xu <like.xu.linux@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Provide a dedicated helper to query if a *different* vCPU was preempted
-in-kernel.  x86's VMX is an oddball and can only check if the vCPU is in
-kernel (versus userspace) if the vCPU is loaded on the current pCPU.
+Plumb in a dedicated hook for querying whether or not a vCPU was preempted
+in-kernel.  Unlike literally every other architecture, x86's VMX can check
+if a vCPU is in kernel context if and only if the vCPU is loaded on the
+current pCPU.
 
-The existing kvm_arch_vcpu_in_kernel() "works", but it's an ugly mess as
-KVM x86 is forced to check kvm_get_running_vcpu() to effectively undo the
-multiplexing.
+x86's kvm_arch_vcpu_in_kernel() works around the limitation by querying
+kvm_get_running_vcpu() and redirecting to vcpu->arch.preempted_in_kernel
+as needed.  But that's unnecessary, confusing, and fragile, e.g. x86 has
+had at least one bug where KVM incorrectly used a stale
+preempted_in_kernel.
 
-Note, I was sorely tempted to eliminate kvm_arch_dy_has_pending_interrupt()
-and bury that logic in VMX code, but I ultimately decided to keep it as an
-arch hook as it's entirely plausible that some other architecture can do
-cross-vCPU IRQ checks, and if KVM is going to have the (somewhat dubious
-IMO) logic, it's probably best to keep it in common code.
+No functional change intended.
 
-Sean Christopherson (4):
-  KVM: Add dedicated arch hook for querying if vCPU was preempted
-    in-kernel
-  KVM: x86: Rely solely on preempted_in_kernel flag for directed yield
-  KVM: x86: Clean up directed yield API for "has pending interrupt"
-  KVM: Add a comment explaining the directed yield pending interrupt
-    logic
-
- arch/x86/kvm/x86.c       | 16 +++++++---------
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/x86.c       |  5 +++++
  include/linux/kvm_host.h |  1 +
- virt/kvm/kvm_main.c      | 22 ++++++++++++++++++++--
- 3 files changed, 28 insertions(+), 11 deletions(-)
+ virt/kvm/kvm_main.c      | 15 +++++++++++++--
+ 3 files changed, 19 insertions(+), 2 deletions(-)
 
-
-base-commit: 1c6d984f523f67ecfad1083bb04c55d91977bb15
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 27e23714e960..415509918c7f 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -13091,6 +13091,11 @@ bool kvm_arch_dy_has_pending_interrupt(struct kvm_vcpu *vcpu)
+ 	return false;
+ }
+ 
++bool kvm_arch_vcpu_preempted_in_kernel(struct kvm_vcpu *vcpu)
++{
++	return kvm_arch_vcpu_in_kernel(vcpu);
++}
++
+ bool kvm_arch_dy_runnable(struct kvm_vcpu *vcpu)
+ {
+ 	if (READ_ONCE(vcpu->arch.pv.pv_unhalted))
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 7e7fd25b09b3..28b020404a41 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1505,6 +1505,7 @@ bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu);
+ int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu);
+ bool kvm_arch_dy_runnable(struct kvm_vcpu *vcpu);
+ bool kvm_arch_dy_has_pending_interrupt(struct kvm_vcpu *vcpu);
++bool kvm_arch_vcpu_preempted_in_kernel(struct kvm_vcpu *vcpu);
+ int kvm_arch_post_init_vm(struct kvm *kvm);
+ void kvm_arch_pre_destroy_vm(struct kvm *kvm);
+ int kvm_arch_create_vm_debugfs(struct kvm *kvm);
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 10bfc88a69f7..6326852bfb3d 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -4042,11 +4042,22 @@ static bool vcpu_dy_runnable(struct kvm_vcpu *vcpu)
+ 	return false;
+ }
+ 
++/*
++ * By default, simply query the target vCPU's current mode when checking if a
++ * vCPU was preempted in kernel mode.  All architectures except x86 (or more
++ * specifical, except VMX) allow querying whether or not a vCPU is in kernel
++ * mode even if the vCPU is NOT loaded, i.e. using kvm_arch_vcpu_in_kernel()
++ * directly for cross-vCPU checks is functionally correct and accurate.
++ */
++bool __weak kvm_arch_vcpu_preempted_in_kernel(struct kvm_vcpu *vcpu)
++{
++	return kvm_arch_vcpu_in_kernel(vcpu);
++}
++
+ bool __weak kvm_arch_dy_has_pending_interrupt(struct kvm_vcpu *vcpu)
+ {
+ 	return false;
+ }
+-
+ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
+ {
+ 	struct kvm *kvm = me->kvm;
+@@ -4080,7 +4091,7 @@ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
+ 				continue;
+ 			if (READ_ONCE(vcpu->preempted) && yield_to_kernel_mode &&
+ 			    !kvm_arch_dy_has_pending_interrupt(vcpu) &&
+-			    !kvm_arch_vcpu_in_kernel(vcpu))
++			    !kvm_arch_vcpu_preempted_in_kernel(vcpu))
+ 				continue;
+ 			if (!kvm_vcpu_eligible_for_directed_yield(vcpu))
+ 				continue;
 -- 
 2.43.0.472.g3155946c3a-goog
 
