@@ -1,102 +1,194 @@
-Return-Path: <kvm+bounces-5965-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5966-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01B9982920D
-	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 02:27:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8251C829210
+	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 02:27:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A99871F26B8E
-	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 01:27:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D3DB01F26BB9
+	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 01:27:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E79033E8;
-	Wed, 10 Jan 2024 01:27:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D23F64A3E;
+	Wed, 10 Jan 2024 01:27:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Xzu5YXqt"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GvAwooCE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F3302595
-	for <kvm@vger.kernel.org>; Wed, 10 Jan 2024 01:27:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95EEB33F9
+	for <kvm@vger.kernel.org>; Wed, 10 Jan 2024 01:27:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-28b77ca8807so1975856a91.3
-        for <kvm@vger.kernel.org>; Tue, 09 Jan 2024 17:27:08 -0800 (PST)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-daee86e2d70so3339441276.0
+        for <kvm@vger.kernel.org>; Tue, 09 Jan 2024 17:27:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704850028; x=1705454828; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=h6w363icKNKqhEvrbPXdZyhOPYeC1XcMC/VyRfjkT0w=;
-        b=Xzu5YXqt4hwzHeuanO6gNOdRAtU407RXVA/KCoapNa45RRXH2lFTuyLnc+q2mUYblh
-         Vyj1dE5go+/m9I7I6LuX1qtkQ5i/VlujjEvZjsz4hKqo5garLoX1rHlGZHVVLKkgGH4Q
-         8n6DUC36xw3u7j+EiLtSfRJkA9raOF4XYdtSHVdciWxAlLVP9R+YLtsrKw7RvHM3HIJO
-         GYSMx242P2kSeaYnVTv6Gogo+mTko6T+NiejsD32qWcWj9AzYUgDmTbs4Q2UxBOigmka
-         9b5Bdp2T0QD3/dtLSHObZ55W9Uptn0oqutoWq8317W22FXhEyH803vGOS9gW8V9vZ050
-         M/Hw==
+        d=google.com; s=20230601; t=1704850029; x=1705454829; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=IIQammAHhw1ngHO6ANyDTfr+sZcY4cd5zo+XWlGta08=;
+        b=GvAwooCEBsnM+KrjlD3OO3b/BonedW9mK/7R/QPo+0Atx0zpi/cZ/n32NEKbXx6id+
+         QAl8APSSF5B9opwNEGgdAPC+Wk3/KyLqIC2b02I9ep7isSxIHARNaD9asU20tIfN43aA
+         fSpD5xm7fWEsyT52kRxjk8VZFuQAHbJjXEA2tqgZceoORJVsMYayzktc0TmOO/bSkdGl
+         rEjQKJ+NdZCgDHj2phpA/3eVUQPRpFGk8tIhZ9tOfotZXk3GX8+8tTVX1ZCUWhde7ft4
+         kvnX5HmO2yrQeFLHdkh0ux7ZOYjbZPFR4z+Njri3q+/0ZkYO34OW9lJBT09MCO0zDG92
+         Kd8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704850028; x=1705454828;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=h6w363icKNKqhEvrbPXdZyhOPYeC1XcMC/VyRfjkT0w=;
-        b=m26wgkug/d02bi119a84r3KZD0Tto4rZJBF7wnRiKM7qxi/FnehicOQXOz2jsx1Glq
-         uiQrAxfa7NnlEJUk5ch47fob2jhyTB3wT7meD76bKVYp8b1NgbBwUH220gSWwi7o72yz
-         MFZq4bVn8OpPArPH6hxNvS1iiNhjQTCcmX8PVj/dkuTb9xQrM4DTZPGaiAxoky2SlFf+
-         vboUEL4MzX2ZyMiChCM9YFleIcP2fvWRmzBymS3E5p9mXm83hH3CAL6+0U7WX8kSrDab
-         S3QgL+7VZA0cjBU7WpnouMp/gtKJF27NUdIvgOtyFrbcn1q7unmhpjbuMbOUonpjMYtT
-         kMIA==
-X-Gm-Message-State: AOJu0Yz+J+oDFjkM5adUZe3vSeAQTt7ESvSX+uh4g8NC8zqLmb5rqP5h
-	nxV8fm/XQom2fLCzTofhCeUW2IEbzimJhDuI7g==
-X-Google-Smtp-Source: AGHT+IF+qgk30gHAynG24GncMt3bTSJdUq4PWyW2JAr7K680Sczv/++SAJGg7cxWbcYbgQizNvvkAw12PLg=
+        d=1e100.net; s=20230601; t=1704850029; x=1705454829;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IIQammAHhw1ngHO6ANyDTfr+sZcY4cd5zo+XWlGta08=;
+        b=XBwPnbwvw9FLEKN5rxBsz6LqoS164s+xWqdEuYK0j2uRdZOFqUmwzDR2A1WZXOYlgT
+         IuhQHb0Xg8Lw9uAgDEPocXVl1ap1evesgyaaKbbD1knLG5e+kQ1i6FVDEBbfM82Acv/j
+         CmJJTu86VFuFt756YUZam8EpnzmTeZ0DEudbU9szSbeI3kjd0/BeZRMEi1ib0PJKuNFl
+         b0im1fyhPQaTzFZdkOwW8LbVJp2xspY6knhE3ZTKFni6Zbz2NSlIs/GXc2fTOQCq/aLj
+         vayl7vGA4DHxLNCuZgQ4CbBEwQo4YD056fUgIt6vZpqvIM2L4uxZOoGzZVdGjnRbmR0E
+         vmjg==
+X-Gm-Message-State: AOJu0YwG+yzdgLrXRQUeodGoOWF6+MxcigN8SKgLGLtZnr+TYT+aqDvd
+	jsi7ZBideOZCWZWHYgn2Kitg2QMoUcv6bBO/NA==
+X-Google-Smtp-Source: AGHT+IG7zLpYOzJQoiOqhFIghEXci1Ti8H3tTaRAJgjun4AugcfabivAhkw/qGFXuhcVktgi7U6MJ1WANKU=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:245:b0:1d4:ca30:874d with SMTP id
- j5-20020a170903024500b001d4ca30874dmr1365plh.9.1704850027825; Tue, 09 Jan
- 2024 17:27:07 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a05:6902:136d:b0:dbd:3fff:7c2a with SMTP id
+ bt13-20020a056902136d00b00dbd3fff7c2amr7907ybb.3.1704850029694; Tue, 09 Jan
+ 2024 17:27:09 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue,  9 Jan 2024 17:26:59 -0800
+Date: Tue,  9 Jan 2024 17:27:00 -0800
+In-Reply-To: <20240110012705.506918-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20240110012705.506918-1-seanjc@google.com>
 X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
-Message-ID: <20240110012705.506918-1-seanjc@google.com>
-Subject: [PATCH 0/6] KVM: x86: Clean up "force immediate exit" code
+Message-ID: <20240110012705.506918-2-seanjc@google.com>
+Subject: [PATCH 1/6] KVM: x86: Plumb "force_immediate_exit" into kvm_entry() tracepoint
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	Maxim Levitsky <mlevitsk@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Plumb "force_immediate_exit" into the kvm_entry() tracepoint, as
-suggested by Maxim, and then follow that up with cleanups that are made
-possible by having force_immediate_exit made available to .vcpu_run(),
-e.g. VMX can use the on-stack param instead of what is effectively a
-temporary field in vcpu_vmx.
+Annotate the kvm_entry() tracepoint with "immediate exit" when KVM is
+forcing a VM-Exit immediately after VM-Enter, e.g. when KVM wants to
+inject an event but needs to first complete some other operation.
+Knowing that KVM is (or isn't) forcing an exit is useful information when
+debugging issues related to event injection.
 
-Sean Christopherson (6):
-  KVM: x86: Plumb "force_immediate_exit" into kvm_entry() tracepoint
-  KVM: VMX: Re-enter guest in fastpath for "spurious" preemption timer
-    exits
-  KVM: VMX: Handle forced exit due to preemption timer in fastpath
-  KVM: x86: Move handling of is_guest_mode() into fastpath exit handlers
-  KVM: VMX: Handle KVM-induced preemption timer exits in fastpath for L2
-  KVM: x86: Fully defer to vendor code to decide how to force immediate
-    exit
+Suggested-by: Maxim Levitsky <mlevitsk@redhat.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/include/asm/kvm_host.h | 3 ++-
+ arch/x86/kvm/svm/svm.c          | 5 +++--
+ arch/x86/kvm/trace.h            | 9 ++++++---
+ arch/x86/kvm/vmx/vmx.c          | 4 ++--
+ arch/x86/kvm/x86.c              | 2 +-
+ 5 files changed, 14 insertions(+), 9 deletions(-)
 
- arch/x86/include/asm/kvm-x86-ops.h |  1 -
- arch/x86/include/asm/kvm_host.h    |  6 +--
- arch/x86/kvm/svm/svm.c             | 18 ++++---
- arch/x86/kvm/trace.h               |  9 ++--
- arch/x86/kvm/vmx/vmx.c             | 80 +++++++++++++++++++-----------
- arch/x86/kvm/vmx/vmx.h             |  2 -
- arch/x86/kvm/x86.c                 | 12 +----
- 7 files changed, 72 insertions(+), 56 deletions(-)
-
-
-base-commit: 1c6d984f523f67ecfad1083bb04c55d91977bb15
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 7bc1daf68741..9c90664ef9fb 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1663,7 +1663,8 @@ struct kvm_x86_ops {
+ 	void (*flush_tlb_guest)(struct kvm_vcpu *vcpu);
+ 
+ 	int (*vcpu_pre_run)(struct kvm_vcpu *vcpu);
+-	enum exit_fastpath_completion (*vcpu_run)(struct kvm_vcpu *vcpu);
++	enum exit_fastpath_completion (*vcpu_run)(struct kvm_vcpu *vcpu,
++						  bool force_immediate_exit);
+ 	int (*handle_exit)(struct kvm_vcpu *vcpu,
+ 		enum exit_fastpath_completion exit_fastpath);
+ 	int (*skip_emulated_instruction)(struct kvm_vcpu *vcpu);
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 2171b0cda8d4..f5f3301d2a01 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -4115,12 +4115,13 @@ static noinstr void svm_vcpu_enter_exit(struct kvm_vcpu *vcpu, bool spec_ctrl_in
+ 	guest_state_exit_irqoff();
+ }
+ 
+-static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
++static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu,
++					  bool force_immediate_exit)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 	bool spec_ctrl_intercepted = msr_write_intercepted(vcpu, MSR_IA32_SPEC_CTRL);
+ 
+-	trace_kvm_entry(vcpu);
++	trace_kvm_entry(vcpu, force_immediate_exit);
+ 
+ 	svm->vmcb->save.rax = vcpu->arch.regs[VCPU_REGS_RAX];
+ 	svm->vmcb->save.rsp = vcpu->arch.regs[VCPU_REGS_RSP];
+diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
+index 83843379813e..88659de4d2a7 100644
+--- a/arch/x86/kvm/trace.h
++++ b/arch/x86/kvm/trace.h
+@@ -15,20 +15,23 @@
+  * Tracepoint for guest mode entry.
+  */
+ TRACE_EVENT(kvm_entry,
+-	TP_PROTO(struct kvm_vcpu *vcpu),
+-	TP_ARGS(vcpu),
++	TP_PROTO(struct kvm_vcpu *vcpu, bool force_immediate_exit),
++	TP_ARGS(vcpu, force_immediate_exit),
+ 
+ 	TP_STRUCT__entry(
+ 		__field(	unsigned int,	vcpu_id		)
+ 		__field(	unsigned long,	rip		)
++		__field(	bool,		immediate_exit	)
+ 	),
+ 
+ 	TP_fast_assign(
+ 		__entry->vcpu_id        = vcpu->vcpu_id;
+ 		__entry->rip		= kvm_rip_read(vcpu);
++		__entry->immediate_exit	= force_immediate_exit;
+ 	),
+ 
+-	TP_printk("vcpu %u, rip 0x%lx", __entry->vcpu_id, __entry->rip)
++	TP_printk("vcpu %u, rip 0x%lx%s", __entry->vcpu_id, __entry->rip,
++		  __entry->immediate_exit ? "[immediate exit]" : "")
+ );
+ 
+ /*
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index d21f55f323ea..51d0f3985463 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7268,7 +7268,7 @@ static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
+ 	guest_state_exit_irqoff();
+ }
+ 
+-static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
++static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu, bool force_immediate_exit)
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+ 	unsigned long cr3, cr4;
+@@ -7295,7 +7295,7 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
+ 		return EXIT_FASTPATH_NONE;
+ 	}
+ 
+-	trace_kvm_entry(vcpu);
++	trace_kvm_entry(vcpu, force_immediate_exit);
+ 
+ 	if (vmx->ple_window_dirty) {
+ 		vmx->ple_window_dirty = false;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 27e23714e960..e4523ca3dedf 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -10962,7 +10962,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 		WARN_ON_ONCE((kvm_vcpu_apicv_activated(vcpu) != kvm_vcpu_apicv_active(vcpu)) &&
+ 			     (kvm_get_apic_mode(vcpu) != LAPIC_MODE_DISABLED));
+ 
+-		exit_fastpath = static_call(kvm_x86_vcpu_run)(vcpu);
++		exit_fastpath = static_call(kvm_x86_vcpu_run)(vcpu, req_immediate_exit);
+ 		if (likely(exit_fastpath != EXIT_FASTPATH_REENTER_GUEST))
+ 			break;
+ 
 -- 
 2.43.0.472.g3155946c3a-goog
 
