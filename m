@@ -1,31 +1,53 @@
-Return-Path: <kvm+bounces-5992-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-5993-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5E5582994E
-	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 12:41:47 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9B358299DB
+	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 12:54:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D00371C25957
-	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 11:41:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1E2BCB20C67
+	for <lists+kvm@lfdr.de>; Wed, 10 Jan 2024 11:54:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96F1247F56;
-	Wed, 10 Jan 2024 11:41:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F46348CD1;
+	Wed, 10 Jan 2024 11:52:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RFqGoNKG"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4E75481A0;
-	Wed, 10 Jan 2024 11:41:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E69D92F4;
-	Wed, 10 Jan 2024 03:42:04 -0800 (PST)
-Received: from [10.57.46.83] (unknown [10.57.46.83])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DB2673F64C;
-	Wed, 10 Jan 2024 03:41:11 -0800 (PST)
-Message-ID: <ec8ed5b0-5080-45e9-a4a6-e5dbe48e86d3@arm.com>
-Date: Wed, 10 Jan 2024 11:41:09 +0000
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAC1748CC6
+	for <kvm@vger.kernel.org>; Wed, 10 Jan 2024 11:52:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1704887567; x=1736423567;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=PpTniVRf/mUrjDL1i7K82KKY0DYSCGANpu49oItuHkE=;
+  b=RFqGoNKGG881uyi5XNT7Sm6Ri51Qc/cRse9IacF6Qo9a+fgRBHGP7ChB
+   yC3S39otAKow68HQ7lC1h9V5VMaQw/qwZ+ndvQOvXKaWheEQJuclGDNQj
+   BJTT+C2neHDsdYa9H/K7/JkZN1erisuB3L1FL04fOJp/9BOPhYLvEdZ7Q
+   hggR9dYHYnGh78sN0EwJdhYwTOKmq8ES9xQgTezMHMvKmf0N38qLGq1lC
+   Bf9iOgZ+ijwEDb4rhSs07dKwEbSp/ImRcaH1juZByl3sIQ60IdytlFq4Z
+   zEqfkaDWlMDZ15SuGUO5wKKKQzUPK+OcwXhGpg6rN6DDBuqkak8zhr/Dv
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10948"; a="11977273"
+X-IronPort-AV: E=Sophos;i="6.04,184,1695711600"; 
+   d="scan'208";a="11977273"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2024 03:52:46 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10948"; a="905505974"
+X-IronPort-AV: E=Sophos;i="6.04,184,1695711600"; 
+   d="scan'208";a="905505974"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.22.149]) ([10.93.22.149])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2024 03:52:41 -0800
+Message-ID: <ddb911d0-6054-43ab-a763-242216b9c8d9@intel.com>
+Date: Wed, 10 Jan 2024 19:52:38 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -33,368 +55,192 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC] Support for Arm CCA VMs on Linux
-Content-Language: en-GB
-To: Itaru Kitayama <itaru.kitayama@linux.dev>
-Cc: linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org,
- maz@kernel.org, steven.price@arm.com, alexandru.elisei@arm.com,
- joey.gouly@arm.com, james.morse@arm.com, Jonathan.Cameron@huawei.com,
- dgilbert@redhat.com, jpb@kernel.org, oliver.upton@linux.dev,
- zhi.wang.linux@gmail.com, yuzenghui@huawei.com, salil.mehta@huawei.com,
- Andrew Jones <andrew.jones@linux.dev>,
- Chao Peng <chao.p.peng@linux.intel.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- Jean-Philippe Brucker <jean-philippe@linaro.org>,
- Mark Rutland <mark.rutland@arm.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Quentin Perret <qperret@google.com>, Sean Christopherson
- <seanjc@google.com>, Thomas Huth <thuth@redhat.com>,
- Ryan Roberts <Ryan.Roberts@arm.com>, Sami Mujawar <Sami.Mujawar@arm.com>
-References: <20230127112248.136810-1-suzuki.poulose@arm.com>
- <20231002124311.204614-1-suzuki.poulose@arm.com> <ZZ4tsTQOKOamM+h/@vm3>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <ZZ4tsTQOKOamM+h/@vm3>
+Subject: Re: [PATCH v7 03/16] i386/cpu: Consolidate the use of topo_info in
+ cpu_x86_cpuid()
+Content-Language: en-US
+To: Zhao Liu <zhao1.liu@linux.intel.com>,
+ Eduardo Habkost <eduardo@habkost.net>,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
+ Zhenyu Wang <zhenyu.z.wang@intel.com>,
+ Zhuocheng Ding <zhuocheng.ding@intel.com>, Zhao Liu <zhao1.liu@intel.com>,
+ Robert Hoo <robert.hu@linux.intel.com>, Babu Moger <babu.moger@amd.com>,
+ Yongwei Ma <yongwei.ma@intel.com>
+References: <20240108082727.420817-1-zhao1.liu@linux.intel.com>
+ <20240108082727.420817-4-zhao1.liu@linux.intel.com>
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20240108082727.420817-4-zhao1.liu@linux.intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi Itaru,
-
-On 10/01/2024 05:40, Itaru Kitayama wrote:
-> On Mon, Oct 02, 2023 at 01:43:11PM +0100, Suzuki K Poulose wrote:
->> Hi,
->>
->>
->>> We are happy to announce the early RFC version of the Arm
->>> Confidential Compute Architecture (CCA) support for the Linux
->>> stack. The intention is to seek early feedback in the following areas:
->>>   * KVM integration of the Arm CCA
->>>   * KVM UABI for managing the Realms, seeking to generalise the operations
->>>     wherever possible with other Confidential Compute solutions.
->>>     Note: This version doesn't support Guest Private memory, which will be added
->>>     later (see below).
->>>   * Linux Guest support for Realms
->>>
->>
->> We have updated the stack for Arm CCA Linux support to RMM-v1.0-EAC2 (See links)
->> We are not posting the patches for review yet, as we plan to update our
->> stack to support the latest RMM-v1.0 specification, which includes some
->> functional changes to support PSCI monitoring by the VMM along with other
->> minor changes. All relevant components are updated on a new branch "rmm-v1.0-eac2"
->> Guest-mem support is not included, but is in progress.
->>
->> Change log :
->>   - KVM RMI support updated to v1.0-eac2, with optimisations to stage2 tear down
->>   - Guest (Linux and kvm-unit-test) support for RSI compliant to v1.0-eac2
->>   - SVE, PMU support for Realms
->>
->> kvmtool :
->>    - Dropped no-compat and switched to --loglevel (merged upstream)
->>    - Support for SVE, --sve-vl for vector length
->>
->>> Arm CCA Introduction
->>> =====================
->>>
->>> The Arm CCA is a reference software architecture and implementation that builds
->>> on the Realm Management Extension (RME), enabling the execution of Virtual
->>> machines, while preventing access by more privileged software, such as hypervisor.
->>> The Arm CCA allows the hypervisor to control the VM, but removes the right for
->>> access to the code, register state or data that is used by VM.
->>> More information on the architecture is available here[0].
->>>
->>>      Arm CCA Reference Software Architecture
->>>
->>>          Realm World    ||    Normal World   ||  Secure World  ||
->>>                         ||        |          ||                ||
->>>   EL0 x-------x         || x----x | x------x ||                ||
->>>       | Realm |         || |    | | |      | ||                ||
->>>       |       |         || | VM | | |      | ||                ||
->>>   ----|  VM*  |---------||-|    |---|      |-||----------------||
->>>       |       |         || |    | | |  H   | ||                ||
->>>   EL1 x-------x         || x----x | |      | ||                ||
->>>           ^             ||        | |  o   | ||                ||
->>>           |             ||        | |      | ||                ||
->>>   ------- R*------------------------|  s  -|---------------------
->>>           S             ||          |      | ||                ||
->>>           I             ||          |  t   | ||                ||
->>>           |             ||          |      | ||                ||
->>>           v             ||          x------x ||                ||
->>>   EL2    RMM*           ||              ^    ||                ||
->>>           ^             ||              |    ||                ||
->>>   ========|=============================|========================
->>>           |                             | SMC
->>>           x--------- *RMI* -------------x
->>>
->>>   EL3                   Root World
->>>                         EL3 Firmware
->>>   ===============================================================
->>> Where :
->>>   RMM - Realm Management Monitor
->>>   RMI - Realm Management Interface
->>>   RSI - Realm Service Interface
->>>   SMC - Secure Monitor Call
->>>
->>> RME introduces a new security state "Realm world", in addition to the
->>> traditional Secure and Non-Secure states. The Arm CCA defines a new component,
->>> Realm Management Monitor (RMM) that runs at R-EL2. This is a standard piece of
->>> firmware, verified, installed and loaded by the EL3 firmware (e.g, TF-A), at
->>> system boot.
->>>
->>> The RMM provides standard interfaces - Realm Management Interface (RMI) - to the
->>> Normal world hypervisor to manage the VMs running in the Realm world (also called
->>> Realms in short). These are exposed via SMC and are routed through the EL3
->>> firmwre.
->>> The RMI interface includes:
->>>    - Move a physical page from the Normal world to the Realm world
->>>    - Creating a Realm with requested parameters, tracked via Realm Descriptor (RD)
->>>    - Creating VCPUs aka Realm Execution Context (REC), with initial register state.
->>>    - Create stage2 translation table at any level.
->>>    - Load initial images into Realm Memory from normal world memory
->>>    - Schedule RECs (vCPUs) and handle exits
->>>    - Inject virtual interrupts into the Realm
->>>    - Service stage2 runtime faults with pages (provided by host, scrubbed by RMM).
->>>    - Create "shared" mappings that can be accessed by VMM/Hyp.
->>>    - Reclaim the memory allocated for the RAM and RTTs (Realm Translation Tables)
->>>
->>> However v1.0 of RMM specifications doesn't support:
->>>   - Paging protected memory of a Realm VM. Thus the pages backing the protected
->>>     memory region must be pinned.
->>>   - Live migration of Realms.
->>>   - Trusted Device assignment.
->>>   - Physical interrupt backed Virtual interrupts for Realms
->>>
->>> RMM also provides certain services to the Realms via SMC, called Realm Service
->>> Interface (RSI). These include:
->>>   - Realm Guest Configuration.
->>>   - Attestation & Measurement services
->>>   - Managing the state of an Intermediate Physical Address (IPA aka GPA) page.
->>>   - Host Call service (Communication with the Normal world Hypervisor)
->>>
->>> The specifications for the RMM software is currently at *v1.0-Beta2* and the
->>> latest version is available here [1].
->>>
->>> The Trusted Firmware foundation has an implementation of the RMM - TF-RMM -
->>> available here [3].
->>>
->>> Implementation
->>> =================
->>>
->>> This version of the stack is based on the RMM specification v1.0-Beta0[2], with
->>> following exceptions :
->>>    - TF-RMM/KVM currently doesn't support the optional features of PMU,
->>>       SVE and Self-hosted debug (coming soon).
->>>    - The RSI_HOST_CALL structure alignment requirement is reduced to match
->>>       RMM v1.0 Beta1
->>>    - RMI/RSI version numbers do not match the RMM spec. This will be
->>>      resolved once the spec/implementation is complete, across TF-RMM+Linux stack.
->>>
->>> We plan to update the stack to support the latest version of the RMMv1.0 spec
->>> in the coming revisions.
->>>
->>> This release includes the following components :
->>>
->>>   a) Linux Kernel
->>>       i) Host / KVM support - Support for driving the Realms via RMI. This is
->>>       dependent on running in the Kernel at EL2 (aka VHE mode). Also provides
->>>       UABI for VMMs to manage the Realm VMs. The support is restricted to 4K page
->>>       size, matching the Stage2 granule supported by RMM. The VMM is responsible
->>>       for making sure the guest memory is locked.
->>>
->>>         TODO: Guest Private memory[10] integration - We have been following the
->>>         series and support will be added once it is merged upstream.
->>>       
->>>       ii) Guest support - Support for a Linux Kernel to run in the Realm VM at
->>>       Realm-EL1, using RSI services. This includes virtio support (virtio-v1.0
->>>       only). All I/O are treated as non-secure/shared.
->>>   
->>>   c) kvmtool - VMM changes required to manage Realm VMs. No guest private memory
->>>      as mentioned above.
->>>   d) kvm-unit-tests - Support for running in Realms along with additional tests
->>>      for RSI ABI.
->>>
->>> Running the stack
->>> ====================
->>>
->>> To run/test the stack, you would need the following components :
->>>
->>> 1) FVP Base AEM RevC model with FEAT_RME support [4]
->>> 2) TF-A firmware for EL3 [5]
->>> 3) TF-A RMM for R-EL2 [3]
->>> 4) Linux Kernel [6]
->>> 5) kvmtool [7]
->>> 6) kvm-unit-tests [8]
->>>
->>> Instructions for building the firmware components and running the model are
->>> available here [9]. Once, the host kernel is booted, a Realm can be launched by
->>> invoking the `lkvm` commad as follows:
->>>
->>>   $ lkvm run --realm 				 \
->>> 	 --measurement-algo=["sha256", "sha512"] \
->>> 	 --disable-sve				 \
->>
->> As noted above, this is no longer required.
->>
->>> 	 <normal-vm-options>
->>>
->>> Where:
->>>   * --measurement-algo (Optional) specifies the algorithm selected for creating the
->>>     initial measurements by the RMM for this Realm (defaults to sha256).
->>>   * GICv3 is mandatory for the Realms.
->>>   * SVE is not yet supported in the TF-RMM, and thus must be disabled using
->>>     --disable-sve
->>>
->>> You may also run the kvm-unit-tests inside the Realm world, using the similar
->>> options as above.
->>>
->>>
->>> Links
->>> ============
->>>
->>> [0] Arm CCA Landing page (See Key Resources section for various documentations)
->>>      https://www.arm.com/architecture/security-features/arm-confidential-compute-architecture
->>>
->>> [1] RMM Specification Latest
->>>      https://developer.arm.com/documentation/den0137/latest
->>>
->>> [2] RMM v1.0-Beta0 specification
->>>      https://developer.arm.com/documentation/den0137/1-0bet0/
->>
->>   EAC2 spec: https://developer.arm.com/documentation/den0137/1-0eac2/
->>>
->>> [3] Trusted Firmware RMM - TF-RMM
->>>      https://www.trustedfirmware.org/projects/tf-rmm/
->>>      GIT: https://git.trustedfirmware.org/TF-RMM/tf-rmm.git
->>>
->>> [4] FVP Base RevC AEM Model (available on x86_64 / Arm64 Linux)
->>>      https://developer.arm.com/Tools%20and%20Software/Fixed%20Virtual%20Platforms
->>>
->>> [5] Trusted Firmware for A class
->>>      https://www.trustedfirmware.org/projects/tf-a/ >>>
->>> [6] Linux kernel support for Arm-CCA
->>>      https://gitlab.arm.com/linux-arm/linux-cca
->>>      Host Support branch:	cca-host/rfc-v1
->>
->> Update branch : cca-host/rmm-v1.0-eac2
->>
->>>      Guest Support branch:	cca-guest/rfc-v1
->>
->> Update branch : cca-guest/rmm-v1.0-eac2
->>
->> Combined tree for host and guest is also available at: "cca-full/rmm-v1.0-eac2"
->>
->>>
->>> [7] kvmtool support for Arm CCA
->>>      https://gitlab.arm.com/linux-arm/kvmtool-cca cca/rfc-v1
->>
->> Update branch : cca/rmm-v1.0-eac2
->>
->>>
->>> [8] kvm-unit-tests support for Arm CCA
->>>      https://gitlab.arm.com/linux-arm/kvm-unit-tests-cca  cca/rfc-v1
->>>
->>
->> Update branch : cca/rmm-v1.0-eac2
->>
->>
->> Suzuki
->>
->>> [9] Instructions for Building Firmware components and running the model, see
->>>      section 4.19.2 "Building and running TF-A with RME"
->>>      https://trustedfirmware-a.readthedocs.io/en/latest/components/realm-management-extension.html#building-and-running-tf-a-with-rme
->>>
->>> [10] fd based Guest Private memory for KVM
->>>     https://lkml.kernel.org/r/20221202061347.1070246-1-chao.p.peng@linux.intel.com
->>
->>
->>
->>
->>
->> Cc: Alexandru Elisei <alexandru.elisei@arm.com>
->> Cc: Andrew Jones <andrew.jones@linux.dev>
->> Cc: Catalin Marinas <catalin.marinas@arm.com>
->> Cc: Chao Peng <chao.p.peng@linux.intel.com>
->> Cc: Christoffer Dall <christoffer.dall@arm.com>
->> Cc: Fuad Tabba <tabba@google.com>
->> Cc: Jonathan Cameron <jonathan.cameron@huawei.com>
->> Cc: James Morse <james.morse@arm.com>
->> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
->> Cc: Joey Gouly <Joey.Gouly@arm.com>
->> Cc: Marc Zyngier <maz@kernel.org>
->> Cc: Mark Rutland <mark.rutland@arm.com>
->> Cc: Oliver Upton <oliver.upton@linux.dev>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Cc: Quentin Perret <qperret@google.com>
->> Cc: Sean Christopherson <seanjc@google.com>
->> Cc: Steven Price <steven.price@arm.com>
->> Cc: Thomas Huth <thuth@redhat.com>
->> Cc: Will Deacon <will@kernel.org>
->> Cc: Zenghui Yu <yuzenghui@huawei.com>
->> To: linux-coco@lists.linux.dev
->> To: kvmarm@lists.linux.dev
->> Cc: linux-arm-kernel@lists.infradead.org
->> To: linux-kernel@vger.kernel.org
->> To: kvm@vger.kernel.org
+On 1/8/2024 4:27 PM, Zhao Liu wrote:
+> From: Zhao Liu <zhao1.liu@intel.com>
 > 
-> Suzuki,
-> Any update to the Arm CCA series (v3?) since last October?
+> In cpu_x86_cpuid(), there are many variables in representing the cpu
+> topology, e.g., topo_info, cs->nr_cores/cs->nr_threads.
 
-Yes, we now have a version that supports the final RMM-v1.0
-specification (RMM-v1.0-EAC5). We also have the UEFI EDK2 firmware
-support for Guests in Realm world.
+Please use comma instead of slash. cs->nr_cores/cs->nr_threads looks 
+like one variable.
 
-We are planning to post the changes for review in the v6.8-rc cycle. We
-are trying to integrate the guest_mem support (available in v6.8-rc1) as
-well as reusing some of the arm64 kvm generic interface for configuring
-the Realm parameters (e.g., PMU, SVE_VL etc).
+> Since the names of cs->nr_cores/cs->nr_threads does not accurately
+> represent its meaning, the use of cs->nr_cores/cs->nr_threads is prone
+> to confusion and mistakes.
+> 
+> And the structure X86CPUTopoInfo names its members clearly, thus the
+> variable "topo_info" should be preferred.
+> 
+> In addition, in cpu_x86_cpuid(), to uniformly use the topology variable,
+> replace env->dies with topo_info.dies_per_pkg as well.
+> 
+> Suggested-by: Robert Hoo <robert.hu@linux.intel.com>
+> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
+> Tested-by: Babu Moger <babu.moger@amd.com>
+> Tested-by: Yongwei Ma <yongwei.ma@intel.com>
+> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+> Changes since v3:
+>   * Fix typo. (Babu)
+> 
+> Changes since v1:
+>   * Extract cores_per_socket from the code block and use it as a local
+>     variable for cpu_x86_cpuid(). (Yanan)
+>   * Remove vcpus_per_socket variable and use cpus_per_pkg directly.
+>     (Yanan)
+>   * Replace env->dies with topo_info.dies_per_pkg in cpu_x86_cpuid().
+> ---
+>   target/i386/cpu.c | 31 ++++++++++++++++++-------------
+>   1 file changed, 18 insertions(+), 13 deletions(-)
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index c8d2a585723a..6f8fa772ecf8 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -6017,11 +6017,16 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>       uint32_t limit;
+>       uint32_t signature[3];
+>       X86CPUTopoInfo topo_info;
+> +    uint32_t cores_per_pkg;
+> +    uint32_t cpus_per_pkg;
 
-Here is a version that is missing the items mentioned above, based
-on v6.7-rc4, if anyone would like to try.
+I prefer to lps_per_pkg or threads_per_pkg.
 
-Also, the easiest way to get the components built and model kick started
-is using the shrinkwrap [6] tool, using the cca-3world configuration.
-The tool pulls all the required software components, builds (including
-the buildroot for rootfs) and can run a model using these built
-components.
+Other than it,
 
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 
-
-[0] Linux Repo:
-       Where: git@git.gitlab.arm.com:linux-arm/linux-cca.git
-       KVM Support branch: cca-host/rmm-v1.0-eac5
-       Linux Guest branch: cca-guest/rmm-v1.0-eac5
-       Full stack branch:  cca-full/rmm-v1.0-eac5
-
-[1] kvmtool Repo:
-       Where: git@git.gitlab.arm.com:linux-arm/kvmtool-cca.git
-       Branch: cca/rmm-v1.0-eac5
-
-[2] kvm-unit-tests Repo:
-       Where: git@git.gitlab.arm.com:linux-arm/kvm-unit-tests-cca.git
-       Branch: cca/rmm-v1.0-eac5
-
-[3] UEFI Guest firmware:
-       edk2:     https://git.gitlab.arm.com/linux-arm/edk2-cca.git
-       revision: 2802_arm_cca_rmm-v1.0-eac5
-
-       edk2-platforms: 
-https://git.gitlab.arm.com/linux-arm/edk2-platforms-cca.git
-       revision:       2802_arm_cca_rmm-v1.0-eac5
-
-
-[4] RMM Repo:
-       Where: https://git.trustedfirmware.org/TF-RMM/tf-rmm.git
-       tag : tf-rmm-v0.4.0
-
-[5] TF-A repo:
-       Where: https://git.trustedfirmware.org/TF-A/trusted-firmware-a.git
-       Tag: v2.10
-
-
-[6] https://shrinkwrap.docs.arm.com/en/latest/
-     config: cca-3world.yaml
-
-Kind regards
-Suzuki
-
+>   
+>       topo_info.dies_per_pkg = env->nr_dies;
+>       topo_info.cores_per_die = cs->nr_cores / env->nr_dies;
+>       topo_info.threads_per_core = cs->nr_threads;
+>   
+> +    cores_per_pkg = topo_info.cores_per_die * topo_info.dies_per_pkg;
+> +    cpus_per_pkg = cores_per_pkg * topo_info.threads_per_core;
+> +
+>       /* Calculate & apply limits for different index ranges */
+>       if (index >= 0xC0000000) {
+>           limit = env->cpuid_xlevel2;
+> @@ -6057,8 +6062,8 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>               *ecx |= CPUID_EXT_OSXSAVE;
+>           }
+>           *edx = env->features[FEAT_1_EDX];
+> -        if (cs->nr_cores * cs->nr_threads > 1) {
+> -            *ebx |= (cs->nr_cores * cs->nr_threads) << 16;
+> +        if (cpus_per_pkg > 1) {
+> +            *ebx |= cpus_per_pkg << 16;
+>               *edx |= CPUID_HT;
+>           }
+>           if (!cpu->enable_pmu) {
+> @@ -6095,8 +6100,8 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>                */
+>               if (*eax & 31) {
+>                   int host_vcpus_per_cache = 1 + ((*eax & 0x3FFC000) >> 14);
+> -                int vcpus_per_socket = cs->nr_cores * cs->nr_threads;
+> -                if (cs->nr_cores > 1) {
+> +
+> +                if (cores_per_pkg > 1) {
+>                       int addressable_cores_offset =
+>                                                   apicid_pkg_offset(&topo_info) -
+>                                                   apicid_core_offset(&topo_info);
+> @@ -6104,7 +6109,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>                       *eax &= ~0xFC000000;
+>                       *eax |= (1 << (addressable_cores_offset - 1)) << 26;
+>                   }
+> -                if (host_vcpus_per_cache > vcpus_per_socket) {
+> +                if (host_vcpus_per_cache > cpus_per_pkg) {
+>                       int pkg_offset = apicid_pkg_offset(&topo_info);
+>   
+>                       *eax &= ~0x3FFC000;
+> @@ -6249,12 +6254,12 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>           switch (count) {
+>           case 0:
+>               *eax = apicid_core_offset(&topo_info);
+> -            *ebx = cs->nr_threads;
+> +            *ebx = topo_info.threads_per_core;
+>               *ecx |= CPUID_TOPOLOGY_LEVEL_SMT;
+>               break;
+>           case 1:
+>               *eax = apicid_pkg_offset(&topo_info);
+> -            *ebx = cs->nr_cores * cs->nr_threads;
+> +            *ebx = cpus_per_pkg;
+>               *ecx |= CPUID_TOPOLOGY_LEVEL_CORE;
+>               break;
+>           default:
+> @@ -6274,7 +6279,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>           break;
+>       case 0x1F:
+>           /* V2 Extended Topology Enumeration Leaf */
+> -        if (env->nr_dies < 2) {
+> +        if (topo_info.dies_per_pkg < 2) {
+>               *eax = *ebx = *ecx = *edx = 0;
+>               break;
+>           }
+> @@ -6284,7 +6289,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>           switch (count) {
+>           case 0:
+>               *eax = apicid_core_offset(&topo_info);
+> -            *ebx = cs->nr_threads;
+> +            *ebx = topo_info.threads_per_core;
+>               *ecx |= CPUID_TOPOLOGY_LEVEL_SMT;
+>               break;
+>           case 1:
+> @@ -6294,7 +6299,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>               break;
+>           case 2:
+>               *eax = apicid_pkg_offset(&topo_info);
+> -            *ebx = cs->nr_cores * cs->nr_threads;
+> +            *ebx = cpus_per_pkg;
+>               *ecx |= CPUID_TOPOLOGY_LEVEL_DIE;
+>               break;
+>           default:
+> @@ -6518,7 +6523,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>            * discards multiple thread information if it is set.
+>            * So don't set it here for Intel to make Linux guests happy.
+>            */
+> -        if (cs->nr_cores * cs->nr_threads > 1) {
+> +        if (cpus_per_pkg > 1) {
+>               if (env->cpuid_vendor1 != CPUID_VENDOR_INTEL_1 ||
+>                   env->cpuid_vendor2 != CPUID_VENDOR_INTEL_2 ||
+>                   env->cpuid_vendor3 != CPUID_VENDOR_INTEL_3) {
+> @@ -6584,7 +6589,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>                *eax |= (cpu_x86_virtual_addr_width(env) << 8);
+>           }
+>           *ebx = env->features[FEAT_8000_0008_EBX];
+> -        if (cs->nr_cores * cs->nr_threads > 1) {
+> +        if (cpus_per_pkg > 1) {
+>               /*
+>                * Bits 15:12 is "The number of bits in the initial
+>                * Core::X86::Apic::ApicId[ApicId] value that indicate
+> @@ -6592,7 +6597,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>                * Bits 7:0 is "The number of threads in the package is NC+1"
+>                */
+>               *ecx = (apicid_pkg_offset(&topo_info) << 12) |
+> -                   ((cs->nr_cores * cs->nr_threads) - 1);
+> +                   (cpus_per_pkg - 1);
+>           } else {
+>               *ecx = 0;
+>           }
 
 
