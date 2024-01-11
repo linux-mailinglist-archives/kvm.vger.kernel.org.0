@@ -1,147 +1,110 @@
-Return-Path: <kvm+bounces-6108-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6109-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A71382B5A7
-	for <lists+kvm@lfdr.de>; Thu, 11 Jan 2024 21:01:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CFA182B5AB
+	for <lists+kvm@lfdr.de>; Thu, 11 Jan 2024 21:02:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6514287FC2
-	for <lists+kvm@lfdr.de>; Thu, 11 Jan 2024 20:01:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 41C021F23E07
+	for <lists+kvm@lfdr.de>; Thu, 11 Jan 2024 20:02:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7887856B81;
-	Thu, 11 Jan 2024 20:01:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AECC56775;
+	Thu, 11 Jan 2024 20:02:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yjw9k24/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bYEsWHEd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1548C4CDE9;
-	Thu, 11 Jan 2024 20:01:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-40e5521dab6so23923475e9.1;
-        Thu, 11 Jan 2024 12:01:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705003262; x=1705608062; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HAL60ZiXYTrQWwc6XvTjBF7mU0s/R7MUfIaHS38evWw=;
-        b=Yjw9k24/aZTgNRl5he5a0Vg8/Yy0jMdXZhoAoSPnfwwvUeMA4Qn31c1XiLN+UPgtQ1
-         WAqFFGlMxMdz6CvMXVfYXdZjGEUbjbODFAZ/3WnesaHK6Qip6LgxG1+n1CEFQoG5UFbR
-         Qo7LLWAHQPG+H3feGi+VlGRPq5PHJKsp2OnM/PVDW9My+47hbJbJHPkJZekb8rvIxxOb
-         9oFUGl5Yck2WXBPkm+D9OVI/k/zj90X5IrV8oysRtblRZwep3WUf+sIUye8RFv7070XP
-         m7yTGU4XXn4jSoac3RZCUdLraX2PgLIxAClGpmm9d4SHIE2KGyZZ7GW9hS36UM1CMBtU
-         CVlg==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 654CC537E4
+	for <kvm@vger.kernel.org>; Thu, 11 Jan 2024 20:02:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1705003353;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YQwwxKRUEjSXUAuYik8yvl11rO3m+mqgyAXUo3DD30s=;
+	b=bYEsWHEdAthB8SSUWbs5VZhDFh1/7aA+AXDw/OTtgIyLD7T0pNsxieR/ibeh8I2uwAMC9X
+	OOvalu+UTkc7pPBmpYQWpqTtytBWJWFR2X+6/XP1ZORFLYdutphA/odT+sbjK7wDltYFzC
+	fY1SajGf0tE1Zcs/duZl4Xq05srUbb0=
+Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com
+ [209.85.210.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-45-LWqgtWybPty5uhltg2yqQw-1; Thu, 11 Jan 2024 15:02:32 -0500
+X-MC-Unique: LWqgtWybPty5uhltg2yqQw-1
+Received: by mail-ot1-f69.google.com with SMTP id 46e09a7af769-6de5c255ce7so2033524a34.0
+        for <kvm@vger.kernel.org>; Thu, 11 Jan 2024 12:02:32 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705003262; x=1705608062;
+        d=1e100.net; s=20230601; t=1705003351; x=1705608151;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=HAL60ZiXYTrQWwc6XvTjBF7mU0s/R7MUfIaHS38evWw=;
-        b=rkKohqDrUywf2Jd0QPkLqApPa7xT6SM4Y+8RZtjHoQsEMbINVfyAEyM+lxuf/glYBP
-         MCcXC3lqP6j3TGDYF8r0dGaat+vUZC2/4+yWTOdabmDHfyaBvDxX3HqqNf7dpss8O0df
-         WYXL1cueeisGe52zeElZ05TSGHBHOnQ5QgxPY/p+WjjLHiHEb8r/5EwBhqsQMBckyn0o
-         lv4pxCbDypMlVyNvH7MkwpMCD0p1QQPkdAGnYx/XG1cSWdC0tvHjGERQLbXMD+UY2Bb1
-         fgJGCoei9nFslllazNysPeIIi/tOWxEU9UdXtpTNtxSZTvL+jW/LJ2l1uAsG81v8Y5f7
-         RKeQ==
-X-Gm-Message-State: AOJu0YwHN1EVUHNOdmfd/DgEwfvWBYKvTWjr+L9yjgzlWTg5cwTXIWLy
-	WEhcs3pgJzZ+9h36uWki82ckH2MvBYn192NgLqQ=
-X-Google-Smtp-Source: AGHT+IEuD70YW9odmSJBW0ovp3CIEuHoCB7eupgpN0U69zefCCa6AEpsUHBsIEtkfYtc2dUZae2qy6ZzWQ5YfFTTiDA=
-X-Received: by 2002:a05:600c:6548:b0:40e:52a7:ac58 with SMTP id
- dn8-20020a05600c654800b0040e52a7ac58mr243439wmb.65.1705003261872; Thu, 11 Jan
- 2024 12:01:01 -0800 (PST)
+        bh=YQwwxKRUEjSXUAuYik8yvl11rO3m+mqgyAXUo3DD30s=;
+        b=h1UV8rllxtu7wx2/Feba6Z9pOu4e2o/O3swSgU/LTKHWyN5SsA6BLHhhu4OJiPNaPz
+         9eQa/ir2T5WiGYG82dY7b/AYEd3bLJZmKgYUhN1EJHJhrj2EHkbwsO4QBCy282QlElXE
+         XVJUZMOpUxEt5TevmIxoNU//3dEJCbK1XvYWEeLNj6MRh22PM91L8ASvyQywehDhxLGn
+         QHf3AMl22yGauSnKT4eS4mnsRJTk1ughiPRwwEYfLladruIbP4AzRCXM7a2VRemBMmPB
+         pHvkXLTjRU0cF7LlqekI72snItdjellw4bsi/A7rMnLLS3GKT7bp1+iV0sK29wotS5ni
+         FEzg==
+X-Gm-Message-State: AOJu0YxyyIdEAbbuu9iQ+1nq3zqyANc0rbt8iZVtaY3rSXor6vBX6RSq
+	kpAxZDAQif4Uj7zLwiihXhWuBIq5sPEj+K+A5fSoBNRbMbIrJ+sMhGAUAEk2PYZtO9bHa88sZZL
+	fRgcGx07Ojt8QrgVwhw5pTdCbAvCiZ0V87I+j
+X-Received: by 2002:a05:6830:60d:b0:6dd:e445:343a with SMTP id w13-20020a056830060d00b006dde445343amr361437oti.53.1705003351129;
+        Thu, 11 Jan 2024 12:02:31 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFEX89gfNTm81lC2Thkf3eJddP/I1IjgxceIV72oM8yYWfsbcRAdVZpCSx9qP+mrcPlYSo8Md7WXith8unGJeU=
+X-Received: by 2002:a05:6830:60d:b0:6dd:e445:343a with SMTP id
+ w13-20020a056830060d00b006dde445343amr361422oti.53.1705003350916; Thu, 11 Jan
+ 2024 12:02:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240109-update-llvm-links-v1-0-eb09b59db071@kernel.org>
- <20240109-update-llvm-links-v1-1-eb09b59db071@kernel.org> <6a655e9f-9878-4292-9d16-f988c4bdfc73@linux.dev>
- <20240111194001.GA3805856@dev-arch.thelio-3990X>
-In-Reply-To: <20240111194001.GA3805856@dev-arch.thelio-3990X>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Thu, 11 Jan 2024 12:00:50 -0800
-Message-ID: <CAADnVQKFv2DKE=Um=+kcEzSWYCp9USQT_VpTawzNY6eRaUdu5g@mail.gmail.com>
-Subject: Re: [PATCH 1/3] selftests/bpf: Update LLVM Phabricator links
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Yonghong Song <yonghong.song@linux.dev>, Andrew Morton <akpm@linux-foundation.org>, 
-	clang-built-linux <llvm@lists.linux.dev>, patches@lists.linux.dev, 
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, LKML <linux-kernel@vger.kernel.org>, 
-	ppc-dev <linuxppc-dev@lists.ozlabs.org>, kvm@vger.kernel.org, 
-	linux-riscv <linux-riscv@lists.infradead.org>, linux-trace-kernel@vger.kernel.org, 
-	linux-s390 <linux-s390@vger.kernel.org>, 
-	Linux Power Management <linux-pm@vger.kernel.org>, 
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, linux-efi <linux-efi@vger.kernel.org>, 
-	amd-gfx list <amd-gfx@lists.freedesktop.org>, dri-devel@lists.freedesktop.org, 
-	linux-media@vger.kernel.org, linux-arch <linux-arch@vger.kernel.org>, 
-	kasan-dev <kasan-dev@googlegroups.com>, linux-mm <linux-mm@kvack.org>, bridge@lists.linux.dev, 
-	Network Development <netdev@vger.kernel.org>, LSM List <linux-security-module@vger.kernel.org>, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Mykola Lysenko <mykolal@fb.com>, bpf <bpf@vger.kernel.org>
+References: <20240110002340.485595-1-seanjc@google.com> <ZZ42Vs3uAPwBmezn@chao-email>
+ <ZZ7FMWuTHOV-_Gn7@google.com> <ZZ9X5anB/HGS8JR6@linux.bj.intel.com> <ZaAWXSvMgIMkxr50@google.com>
+In-Reply-To: <ZaAWXSvMgIMkxr50@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 11 Jan 2024 21:02:18 +0100
+Message-ID: <CABgObfaByKFKRtLpY1yAJFmcY1WxWcn3tpeVw7Nho+qk0PFUbQ@mail.gmail.com>
+Subject: Re: [PATCH] x86/cpu: Add a VMX flag to enumerate 5-level EPT support
+ to userspace
+To: Sean Christopherson <seanjc@google.com>
+Cc: Tao Su <tao1.su@linux.intel.com>, Chao Gao <chao.gao@intel.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Yi Lai <yi1.lai@intel.com>, 
+	Xudong Hao <xudong.hao@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 11, 2024 at 11:40=E2=80=AFAM Nathan Chancellor <nathan@kernel.o=
-rg> wrote:
+On Thu, Jan 11, 2024 at 5:25=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
+> > It is unusual to assign a huge RAM to guest, but passthrough a device a=
+lso may trigger
+> > this issue which we have met, i.e. alloc memslot for the 64bit BAR whic=
+h can set
+> > bits[51:48]. BIOS can control the BAR address, e.g. seabios moved 64bit=
+ pci window
+> > to end of address space by using advertised physical bits[1].
 >
-> Hi Yonghong,
->
-> On Wed, Jan 10, 2024 at 08:05:36PM -0800, Yonghong Song wrote:
-> >
-> > On 1/9/24 2:16 PM, Nathan Chancellor wrote:
-> > > reviews.llvm.org was LLVM's Phabricator instances for code review. It
-> > > has been abandoned in favor of GitHub pull requests. While the majori=
-ty
-> > > of links in the kernel sources still work because of the work Fangrui
-> > > has done turning the dynamic Phabricator instance into a static archi=
-ve,
-> > > there are some issues with that work, so preemptively convert all the
-> > > links in the kernel sources to point to the commit on GitHub.
-> > >
-> > > Most of the commits have the corresponding differential review link i=
-n
-> > > the commit message itself so there should not be any loss of fidelity=
- in
-> > > the relevant information.
-> > >
-> > > Additionally, fix a typo in the xdpwall.c print ("LLMV" -> "LLVM") wh=
-ile
-> > > in the area.
-> > >
-> > > Link: https://discourse.llvm.org/t/update-on-github-pull-requests/715=
-40/172
-> > > Signed-off-by: Nathan Chancellor <nathan@kernel.org>
-> >
-> > Ack with one nit below.
-> >
-> > Acked-by: Yonghong Song <yonghong.song@linux.dev>
->
-> <snip>
->
-> > > @@ -304,6 +304,6 @@ from running test_progs will look like:
-> > >   .. code-block:: console
-> > > -  test_xdpwall:FAIL:Does LLVM have https://reviews.llvm.org/D109073?=
- unexpected error: -4007
-> > > +  test_xdpwall:FAIL:Does LLVM have https://github.com/llvm/llvm-proj=
-ect/commit/ea72b0319d7b0f0c2fcf41d121afa5d031b319d5? unexpected error: -400=
-7
-> > > -__ https://reviews.llvm.org/D109073
-> > > +__ https://github.com/llvm/llvm-project/commit/ea72b0319d7b0f0c2fcf4=
-1d121afa5d031b319d
-> >
-> > To be consistent with other links, could you add the missing last alnum=
- '5' to the above link?
->
-> Thanks a lot for catching this and providing an ack. Andrew, could you
-> squash this update into selftests-bpf-update-llvm-phabricator-links.patch=
-?
+> Drat.  Do you know if these CPUs are going to be productized?  We'll stil=
+l need
+> something in KVM either way, but whether or not the problems are more or =
+less
+> limited to funky software setups might influence how we address this.
 
-Please send a new patch.
-We'd like to take all bpf patches through the bpf tree to avoid conflicts.
+Wait, we do have an API for guest physical address size. It's
+KVM_GET_SUPPORTED_CPUID2: the # of bits is in leaf 0x80000008, bits
+0:7 of EAX. In fact that leaf is what firmware uses to place the BARs.
+So it just needs to be adjusted for VMX in __do_cpuid_func, and looked
+up in selftests.
+
+Paolo
+
 
