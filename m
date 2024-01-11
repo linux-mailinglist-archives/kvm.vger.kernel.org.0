@@ -1,149 +1,139 @@
-Return-Path: <kvm+bounces-6032-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6033-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 208CB82A5B5
-	for <lists+kvm@lfdr.de>; Thu, 11 Jan 2024 03:01:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84B3882A5B8
+	for <lists+kvm@lfdr.de>; Thu, 11 Jan 2024 03:01:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10EA11C21E68
-	for <lists+kvm@lfdr.de>; Thu, 11 Jan 2024 02:01:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33CC028B9B6
+	for <lists+kvm@lfdr.de>; Thu, 11 Jan 2024 02:01:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6B5DA44;
-	Thu, 11 Jan 2024 02:00:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01F1C1FD6;
+	Thu, 11 Jan 2024 02:00:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LRgSy5UF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LRTDMAfG"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80F6C7EA
-	for <kvm@vger.kernel.org>; Thu, 11 Jan 2024 02:00:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86226814
+	for <kvm@vger.kernel.org>; Thu, 11 Jan 2024 02:00:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5ecfd153ccfso84405357b3.2
-        for <kvm@vger.kernel.org>; Wed, 10 Jan 2024 18:00:53 -0800 (PST)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5e898eb4432so73589497b3.0
+        for <kvm@vger.kernel.org>; Wed, 10 Jan 2024 18:00:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704938452; x=1705543252; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HzOU3SyoPVJ6Dww3XOn2Ne2tHVPGDMAiBtAU3lr6VwM=;
-        b=LRgSy5UFAFUcGu2SaZfg7qp5wXkBcbAN8sb4Qvaiyr8XmZXhZLhIvSo4ox7udaCJ5N
-         TnIS/6lrntKL6pN02SOBOEIRUJnjI7qEn11LObq7TqdU4dUMyjZi5UU1IbasjANLWIxt
-         x7K70I3csgrdyBbkxK4AtqPO+yKw48JCie7Rwk6FidCWsvw4Fk5lUV07UvqbMbpyuVqZ
-         wonrgfdlrDYLVvtiSFaf3hPqXZgPQ/JJNnzwnBcesBoa2lmr7JZ9MyyPYgDehHqFPCCB
-         aOT9JSm5mw/dF6zVXx3xU+yeiT/qTIcS35wtW5w/JvsF5Z8YbzeK4hbrJ9UCndWDmqH+
-         s6dg==
+        d=google.com; s=20230601; t=1704938454; x=1705543254; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=D95IJiOspZnkXY3ro8lL9La7I4fTbWFlMXjetLW2U0s=;
+        b=LRTDMAfGbmk6wSsgJk8RgPAcPhkjdO8tzDe6nFux9W+Dn3Y2UYoHS/4BcAWIFD0zb+
+         WRryUaxYeI32zfmVPpEvBF2zVWFPHMfnuIhuhWbLY73wYWdA5rYg0eWVBMC0PsgTr/wv
+         pbRmHSTlcRou01ntV8Wlg/+ghcW5CYTLIN7h6aP4p740NDvosyVGN2A5d3IwydG0r1ju
+         Z7m/2nVXlBt6HAOjnnrFWFIydloE06r5ME2emWUAz61aSEPWzUBdrQ2bFLxdMRoZ6XO4
+         gVdbCaH+XII7yXcs0mTH9Qcabpb2AjGLD1Jbog65LjoYxqVPLjnZTrSe6QrUnvgq9Vr5
+         bacg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704938452; x=1705543252;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HzOU3SyoPVJ6Dww3XOn2Ne2tHVPGDMAiBtAU3lr6VwM=;
-        b=pbvVshjE7y7JYoOY9EXE1UvkqnrFa4v3so8fAkn3CHM47c04oGJKyMUteXWwOtO1oU
-         HZEGp2qYTqUQfFbcs4FX5B8Maf+wNJ6vVN4CMz4X7MpcNb19vJncZ7vnMwVTV89cYMZ8
-         6lwUz/5DAmWtDMYL8ki7FO+1bZBVV9Vs5vlBbKHSAMPcNvXvHHsB28JSfjr/ue5tYwAG
-         NJ/VzRksWG+sRxjnPXdV+3osH3AStjzDvUJJpd+54fv5wpl/KLwnL9IJIsJghq+zyuUU
-         p/Zlv646tGNem43Dch0e/XnaTpBFuYn5LrF9rHlsxR2idrkLMS+H+pSf/RmJChlYVPan
-         f0sw==
-X-Gm-Message-State: AOJu0Yw8Iyw5Kqup/OipdlkKSvlu1sKY58VbDY/uOm4gyw1bmXu5+94f
-	S8TRwBGan4VFx+i+WabA+jF/wiu+Z0n8Fiqrvw==
-X-Google-Smtp-Source: AGHT+IFsBiQQOb+e4YvDeAqxVv4bZiqvjH7FaF7AN/tnvugHNZDSEcFWL/8rNIK1XhXSy0giwLh7EMuDJw8=
+        d=1e100.net; s=20230601; t=1704938454; x=1705543254;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=D95IJiOspZnkXY3ro8lL9La7I4fTbWFlMXjetLW2U0s=;
+        b=bd9D2sxDMbDqWtm/g3ZhyVfX2BD6V9cYf+W9o7dsWdS0aPV4Kgg/IjXNSvImJVco04
+         VcRSGi6L9yDxKPtx835Tf/8ft2GuO6NyLmSmaW2WJollzFknnBWcugI34NatNm3gItFk
+         rTCYUbmctbCbyYvlnEZBKvpCCivEcB3Mq7w7FZUDRtlsMoQrzIiPSHry+TcN11JZgVkk
+         76ulzbsKmkv9Va6vbmJewpAAnRE7cy/PuWNh5Zd8tTY18KN9KTkagoA4/xQfGoxr5h1H
+         PcnkdcMsKYM2xZM7NIkHJZnLPl92DtTuHpMihofvQas3Pt/SR5zXbUJTASK3Q7g38iTQ
+         ujog==
+X-Gm-Message-State: AOJu0YzEeno8S9fuDfzv/uXTaYNZAs5qc79gra/6BdXraZdF41faLEL1
+	Ed36tikZVRMO2/XOJDPf3eMm4jrVJuZ6kKoFaQ==
+X-Google-Smtp-Source: AGHT+IHU2L3AWsqg+VKFxa07fDe5pTrj2AA3wwqdZdelomTt1akVCSN2W4ZaypRmqaBHpCR2z17RoF67hKE=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:dd12:0:b0:5e8:4440:c52e with SMTP id
- e18-20020a81dd12000000b005e84440c52emr311775ywn.7.1704938452584; Wed, 10 Jan
- 2024 18:00:52 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a0d:efc3:0:b0:5d7:a8b2:327 with SMTP id
+ y186-20020a0defc3000000b005d7a8b20327mr248962ywe.7.1704938454524; Wed, 10 Jan
+ 2024 18:00:54 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 10 Jan 2024 18:00:40 -0800
+Date: Wed, 10 Jan 2024 18:00:41 -0800
+In-Reply-To: <20240111020048.844847-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20240111020048.844847-1-seanjc@google.com>
 X-Mailer: git-send-email 2.43.0.275.g3460e3d667-goog
-Message-ID: <20240111020048.844847-1-seanjc@google.com>
-Subject: [PATCH 0/8] KVM: x86/mmu: Allow TDP MMU (un)load to run in parallel
+Message-ID: <20240111020048.844847-2-seanjc@google.com>
+Subject: [PATCH 1/8] KVM: x86/mmu: Zap invalidated TDP MMU roots at 4KiB granularity
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	David Matlack <dmatlack@google.com>, Pattara Teerapong <pteerapong@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-This series is the result of digging into why deleting a memslot, which on
-x86 forces all vCPUs to reload a new MMU root, causes noticeably more jitter
-in vCPUs and other tasks when running with the TDP MMU than the Shadow MMU
-(with TDP enabled).
+Zap invalidated TDP MMU roots at maximum granularity, i.e. with more
+frequent conditional resched checkpoints, in order to avoid running for an
+extended duration (milliseconds, or worse) without honoring a reschedule
+request.  And for kernels running with full or real-time preempt models,
+zapping at 4KiB granularity also provides significantly reduced latency
+for other tasks that are contending for mmu_lock (which isn't necessarily
+an overall win for KVM, but KVM should do its best to honor the kernel's
+preemption model).
 
-Patch 1 addresses the most obvious issue by simply zapping at a finer
-granularity so that if a different task, e.g. a vCPU, wants to run on the
-pCPU doing the zapping, it doesn't have to wait for KVM to zap an entire
-1GiB region, which can take a hundreds of microseconds (or more).  The
-shadow MMU checks for need_resched() (and mmu_lock contention, see below)
-every 10 zaps, which is why the shadow MMU doesn't induce the same level
-of jitter.
+To keep KVM's assertion that zapping at 1GiB granularity is functionally
+ok, which is the main reason 1GiB was selected in the past, skip straight
+to zapping at 1GiB if KVM is configured to prove the MMU.  Zapping roots
+is far more common than a vCPU replacing a 1GiB page table with a hugepage,
+e.g. generally happens multiple times during boot, and so keeping the test
+coverage provided by root zaps is desirable, just not for production.
 
-On preemptible kernels, zapping at 4KiB granularity will also cause the
-zapping task to yield mmu_lock much more aggressively if a writer comes
-along.  That _sounds_ like a good thing, and most of the time it is, but
-sometimes bouncing mmu_lock can be a big net negative:
-https://lore.kernel.org/all/20240110012045.505046-1-seanjc@google.com
+Cc: David Matlack <dmatlack@google.com>
+Cc: Pattara Teerapong <pteerapong@google.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/mmu/tdp_mmu.c | 25 ++++++++++++++++++-------
+ 1 file changed, 18 insertions(+), 7 deletions(-)
 
-While trying to figure out whether or not frequently yielding mmu_lock
-would be a negative or positive, I ran into extremely high latencies for
-loading TDP MMU roots on VMs with large-ish numbers of vCPUs, e.g. a vCPU
-could end up taking more than a second to 
-
-Long story short, the issue is that the TDP MMU acquires mmu_lock for
-write when unloading roots, and again when loading a "new" root (in quotes
-because most vCPUs end up loading an existing root).  With a decent number
-of vCPUs, that results in a _lot_ mmu_lock contention, as every vCPU will
-take and release mmu_lock for write to unload its roots, and then again to
-load a new root.  Due to rwlock's fairness (waiting writers block new
-readers), the contention can result in rather nasty worst case scenarios.
-
-Patches 6-8 fix the issues by taking mmu_lock for read.  The free path is
-very straightforward and doesn't require any new protection (IIRC, the only
-reason we didn't pursue this when reworking the TDP MMU zapping back at the
-end of 2021 was because we had bigger issues to solve).  Allocating a new
-root with mmu_lock held for read is a little harder, but still fairly easy.
-KVM only needs to ensure that it doesn't create duplicate roots, because
-everything that needs mmu_lock to ensure ordering must take mmu_lock for
-write, i.e. is still mutually exclusive with new roots coming along.
-
-Patches 2-5 are small cleanups to avoid doing work for invalid roots, e.g.
-when zapping SPTEs purely to affect guest behavior, there's no need to zap
-invalid roots because they are unreachable from the guest.
-
-All told, this significantly reduces mmu_lock contention when doing a fast
-zap, i.e. when deleting memslots, and takes the worst case latency for a
-vCPU to load a new root from >3ms to <100us for large-ish VMs (100+ vCPUs)
-For small and medium sized VMs (<24 vCPUs), the vast majority of loads
-takes less than 1us, with the worst case being <10us, versus >200us without
-this series.
-
-Note, I did all of the latency testing before the holidays, and then
-managed to lose almost all of my notes, which is why I don't have more
-precise data on the exact setups and latency bins.  /facepalm
-
-Sean Christopherson (8):
-  KVM: x86/mmu: Zap invalidated TDP MMU roots at 4KiB granularity
-  KVM: x86/mmu: Don't do TLB flush when zappings SPTEs in invalid roots
-  KVM: x86/mmu: Allow passing '-1' for "all" as_id for TDP MMU iterators
-  KVM: x86/mmu: Skip invalid roots when zapping leaf SPTEs for GFN range
-  KVM: x86/mmu: Skip invalid TDP MMU roots when write-protecting SPTEs
-  KVM: x86/mmu: Check for usable TDP MMU root while holding mmu_lock for
-    read
-  KVM: x86/mmu: Alloc TDP MMU roots while holding mmu_lock for read
-  KVM: x86/mmu: Free TDP MMU roots while holding mmy_lock for read
-
- arch/x86/kvm/mmu/mmu.c     |  33 +++++++---
- arch/x86/kvm/mmu/tdp_mmu.c | 124 ++++++++++++++++++++++++++-----------
- arch/x86/kvm/mmu/tdp_mmu.h |   2 +-
- 3 files changed, 111 insertions(+), 48 deletions(-)
-
-
-base-commit: 1c6d984f523f67ecfad1083bb04c55d91977bb15
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 6ae19b4ee5b1..372da098d3ce 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -734,15 +734,26 @@ static void tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
+ 	rcu_read_lock();
+ 
+ 	/*
+-	 * To avoid RCU stalls due to recursively removing huge swaths of SPs,
+-	 * split the zap into two passes.  On the first pass, zap at the 1gb
+-	 * level, and then zap top-level SPs on the second pass.  "1gb" is not
+-	 * arbitrary, as KVM must be able to zap a 1gb shadow page without
+-	 * inducing a stall to allow in-place replacement with a 1gb hugepage.
++	 * Zap roots in multiple passes of decreasing granularity, i.e. zap at
++	 * 4KiB=>2MiB=>1GiB=>root, in order to better honor need_resched() (all
++	 * preempt models) or mmu_lock contention (full or real-time models).
++	 * Zapping at finer granularity marginally increases the total time of
++	 * the zap, but in most cases the zap itself isn't latency sensitive.
+ 	 *
+-	 * Because zapping a SP recurses on its children, stepping down to
+-	 * PG_LEVEL_4K in the iterator itself is unnecessary.
++	 * If KVM is configured to prove the MMU, skip the 4KiB and 2MiB zaps
++	 * in order to mimic the page fault path, which can replace a 1GiB page
++	 * table with an equivalent 1GiB hugepage, i.e. can get saddled with
++	 * zapping a 1GiB region that's fully populated with 4KiB SPTEs.  This
++	 * allows verifying that KVM can safely zap 1GiB regions, e.g. without
++	 * inducing RCU stalls, without relying on a relatively rare event
++	 * (zapping roots is orders of magnitude more common).  Note, because
++	 * zapping a SP recurses on its children, stepping down to PG_LEVEL_4K
++	 * in the iterator itself is unnecessary.
+ 	 */
++	if (!IS_ENABLED(CONFIG_KVM_PROVE_MMU)) {
++		__tdp_mmu_zap_root(kvm, root, shared, PG_LEVEL_4K);
++		__tdp_mmu_zap_root(kvm, root, shared, PG_LEVEL_2M);
++	}
+ 	__tdp_mmu_zap_root(kvm, root, shared, PG_LEVEL_1G);
+ 	__tdp_mmu_zap_root(kvm, root, shared, root->role.level);
+ 
 -- 
 2.43.0.275.g3460e3d667-goog
 
