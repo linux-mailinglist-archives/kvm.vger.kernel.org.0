@@ -1,74 +1,74 @@
-Return-Path: <kvm+bounces-6072-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6073-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1A4C82AD94
-	for <lists+kvm@lfdr.de>; Thu, 11 Jan 2024 12:34:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B249A82ADAA
+	for <lists+kvm@lfdr.de>; Thu, 11 Jan 2024 12:37:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F182A1C23476
-	for <lists+kvm@lfdr.de>; Thu, 11 Jan 2024 11:34:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47E07283CD8
+	for <lists+kvm@lfdr.de>; Thu, 11 Jan 2024 11:37:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 942E2156F4;
-	Thu, 11 Jan 2024 11:32:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28A43154BF;
+	Thu, 11 Jan 2024 11:36:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=opensynergy.com header.i=@opensynergy.com header.b="YQYjAlT0"
+	dkim=pass (2048-bit key) header.d=opensynergy.com header.i=@opensynergy.com header.b="YuM4JmWf"
 X-Original-To: kvm@vger.kernel.org
-Received: from refb01.tmes.trendmicro.eu (refb01.tmes.trendmicro.eu [18.185.115.54])
+Received: from refb02.tmes.trendmicro.eu (refb02.tmes.trendmicro.eu [18.185.115.60])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1409A16439
-	for <kvm@vger.kernel.org>; Thu, 11 Jan 2024 11:32:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 030D1EEDB
+	for <kvm@vger.kernel.org>; Thu, 11 Jan 2024 11:36:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=opensynergy.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensynergy.com
-Received: from 104.47.7.168_.trendmicro.com (unknown [172.21.19.56])
-	by refb01.tmes.trendmicro.eu (Postfix) with ESMTPS id DD56A10CBB641;
-	Thu, 11 Jan 2024 11:32:21 +0000 (UTC)
-Received: from 104.47.7.168_.trendmicro.com (unknown [172.21.176.220])
-	by repost01.tmes.trendmicro.eu (Postfix) with SMTP id C64E510000951;
-	Thu, 11 Jan 2024 11:32:13 +0000 (UTC)
-X-TM-MAIL-RECEIVED-TIME: 1704972732.759000
-X-TM-MAIL-UUID: d0cff788-5a05-4cee-9f45-92795e46d5f4
-Received: from DEU01-BE0-obe.outbound.protection.outlook.com (unknown [104.47.7.168])
-	by repre01.tmes.trendmicro.eu (Trend Micro Email Security) with ESMTPS id B97D310000318;
-	Thu, 11 Jan 2024 11:32:12 +0000 (UTC)
+Received: from 104.47.11.168_.trendmicro.com (unknown [172.21.10.134])
+	by refb02.tmes.trendmicro.eu (Postfix) with ESMTPS id 7C2E3101CE76F;
+	Thu, 11 Jan 2024 11:35:08 +0000 (UTC)
+Received: from 104.47.11.168_.trendmicro.com (unknown [172.21.165.80])
+	by repost01.tmes.trendmicro.eu (Postfix) with SMTP id 1BEF810001FC1;
+	Thu, 11 Jan 2024 11:35:01 +0000 (UTC)
+X-TM-MAIL-RECEIVED-TIME: 1704972900.518000
+X-TM-MAIL-UUID: e2589c17-a7a0-496b-8fe4-d2ccfd8d5875
+Received: from DEU01-FR2-obe.outbound.protection.outlook.com (unknown [104.47.11.168])
+	by repre01.tmes.trendmicro.eu (Trend Micro Email Security) with ESMTPS id 7E9CA10000E54;
+	Thu, 11 Jan 2024 11:35:00 +0000 (UTC)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DXhJBST69fEc4MZdzz1Llzz3x2W/OAaqYqeOBLGtnq/jc9/mz1CyGZxe1fWpjPLJRIgLt8Tf0MQuwxPS9vqkA5I3sUWquOsuSkGYy7Lcvpq6F5ukUZm5d8mMV8L9kcxKIPJxCwaxDXpdo2gZtmcYcJx/wclfCo+72Dwfhqch/WR1sHbXwflmXNcsxxijECr2fAP7Bcy1LUAa/2Xt7hHh5AdX0kbCdWbZJziv1OfHRYEkAfblLb6gV14MuxDsO4IZGm6eVe7Og96tsCzAcNuHwuvrtF3/SdM/RK9/2ShyWdA1OElSjZnv5GPWTsACYEGuRsICEhSI+NKVQwi/mzmoHw==
+ b=i5/8ByuaM4RRmY+mLSSVBD9raS9j/cE2Ei7TrDwvnmYGbwhReshKD0Op0URwH9W0pKDz3SUqV5GNj2k1gwhzQiX3qty65KxRkWn0JMAAYNFl8Evj5BpXWwA23HV2uyN2/967YVCsptgsTemPOOBCVmHONWtSeefM3yK8/liUNP0c+g4jGAw2fHIH8f9IW+NJgS0+tRi3xoVffhqSTItqiWzJ0+GW8953d5au1zZWtzlZ/C3du33MzFTQHImHr26bbMp1i+/Ek2mCEU8nOnQwaeQoEAe5lP3pMj3eNSmPrRI2IbjGBE62NREpbVwWA4CIMqL2TCfBSVLFQ/FAgVBZXg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AGOO7Xl7O/XphM/c0jlLv1sk25ZMgG0QYDDsieubI/Y=;
- b=PmNRKTBcsx86e4BTPzalOfre+KeCixWL+VuiLIzIuAl+Cfxtff6Ti4CVhQOhfk4iL3WPM5xeDFenteNwdMeXA88Ew63HbPzk7rcDLPADUROV5rDBzow727qL+I5z2U22Q3cAiVNr7+9xeaX+MnOCJNVggOaQLEeHvqB5s41Oefi/M6g/o3/ZLzgiDyFE4adnZK/1a2Nsa836lCguaP7sAUF+Nr2hrulmMf+llsOtrZ/8G3Na/whdeWMeuied0eBga2W0tPVwEL/O7GCTCkg2BVxAEffPOPkgtBnRPHHKC36nDKt0H3aBeG6ZVW4lb+j++IobUc4ZDNUgikn/2t457w==
+ bh=fJfbe+QLg7WEQ5j2KCoXWBewKp+g+yPqTxXDxqwPDDQ=;
+ b=Gj/b1kcgugq/hvAJnMadGzVXh5h6IAbmcu1BJuKkY+B/m+uk1Enh6mQLMPtrud/0OT7SxzDTAj6etvRpn6rg7KE6DMePu9mD2COXuExXOsK0QdLGW5c6JEzd/LRyn2gGY52QL68o+rtFUQaP9sK9TmbsBNp4KIY7OluT6R1LRZ8igZrZrUR3P3zte6bF0q+FzuX1HH6xglOxgSb4aSH5Yyrmz9mNX5XuteL/Y5vl/wza3FjS1cknl1ovfWAyRnW2v+LnILfX+eK4OD0KK94wJ0BJXD53gq15KEgg/j19pkGXYjTU13u23WbW1wOBvw+L2sDAvp4VjH51TKzsso8cxQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=opensynergy.com; dmarc=pass action=none
  header.from=opensynergy.com; dkim=pass header.d=opensynergy.com; arc=none
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=opensynergy.com;
-Message-ID: <97c53faf-2eeb-43e7-a146-b53da8ea14c2@opensynergy.com>
-Date: Thu, 11 Jan 2024 12:32:09 +0100
+Message-ID: <03b8e9d3-ef57-4883-b02c-94b003398b61@opensynergy.com>
+Date: Thu, 11 Jan 2024 12:34:57 +0100
 From: Peter Hilber <peter.hilber@opensynergy.com>
-Subject: Re: [RFC PATCH v2 3/7] x86/kvm, ptp/kvm: Add clocksource ID, set
+Subject: Re: [RFC PATCH v2 2/7] x86/tsc: Add clocksource ID, set
  system_counterval_t.cs_id
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Simon Horman <horms@kernel.org>
 Cc: linux-kernel@vger.kernel.org,
  "D, Lakshmi Sowjanya" <lakshmi.sowjanya.d@intel.com>,
  Thomas Gleixner <tglx@linutronix.de>, jstultz@google.com,
- giometti@enneenne.com, corbet@lwn.net, "Dong, Eddie" <eddie.dong@intel.com>,
+ giometti@enneenne.com, corbet@lwn.net, andriy.shevchenko@linux.intel.com,
+ "Dong, Eddie" <eddie.dong@intel.com>,
  "Hall, Christopher S" <christopher.s.hall@intel.com>,
- Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
  Sean Christopherson <seanjc@google.com>, Paolo Bonzini
  <pbonzini@redhat.com>, Ingo Molnar <mingo@redhat.com>,
  Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
  x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
  Wanpeng Li <wanpengli@tencent.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
- Mark Rutland <mark.rutland@arm.com>,
+ Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <maz@kernel.org>,
  Daniel Lezcano <daniel.lezcano@linaro.org>,
  Richard Cochran <richardcochran@gmail.com>, kvm@vger.kernel.org,
  netdev@vger.kernel.org
 References: <20231215220612.173603-1-peter.hilber@opensynergy.com>
- <20231215220612.173603-4-peter.hilber@opensynergy.com>
- <ZYAdpPfFa2jlmZ44@smile.fi.intel.com>
+ <20231215220612.173603-3-peter.hilber@opensynergy.com>
+ <20231224162709.GA230301@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=peter.hilber@opensynergy.com; keydata=
  xsDNBFuyHTIBDAClsxKaykR7WINWbw2hd8SjAU5Ft7Vx2qOyRR3guringPRMDvc5sAQeDPP4
@@ -104,11 +104,11 @@ Autocrypt: addr=peter.hilber@opensynergy.com; keydata=
  wHFeXHw4NXR7mYeX/eftz/9GFMVU29c72NTw8UihOy9qJgNo19wroRYKHLz1eWtMVcqS3hbX
  m0/QcrG9+C9qCPXVxpC/L0YLAtmdvEIyaFtXWRyW7UQ3us6klHh4XUvSpsQhOgzLHFJ1Lpfc
  upeBYECJQdxgIYyhgFAwRHeLGIPxjlvUmk22C0ualbekkuPTQs/m
-In-Reply-To: <ZYAdpPfFa2jlmZ44@smile.fi.intel.com>
+In-Reply-To: <20231224162709.GA230301@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR4P281CA0042.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:c7::12) To BEZP281MB3267.DEUP281.PROD.OUTLOOK.COM
+X-ClientProxiedBy: FR3P281CA0097.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:a1::15) To BEZP281MB3267.DEUP281.PROD.OUTLOOK.COM
  (2603:10a6:b10:77::8)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -117,125 +117,159 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BEZP281MB3267:EE_|BEVP281MB3569:EE_
-X-MS-Office365-Filtering-Correlation-Id: bacb97ab-69b2-4576-e09b-08dc1298f378
+X-MS-TrafficTypeDiagnostic: BEZP281MB3267:EE_|FR3P281MB2252:EE_
+X-MS-Office365-Filtering-Correlation-Id: 41aff268-be22-44c7-e2c2-08dc129957e5
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	fWQ43VhpOiWp5Cu90HRAwvOkGIZF2zKYbWhytwSK9PtDFKu4GMR9Os7xWeZ8sonexoWBKGiy0lBZduIrllZdNxfBbqMUEd8oln3LzENTogNzDdKCfptMe/mc4rxNCuUrPpx7QTpB7QmnJGuDL2UFgNfAZJh9IllLqxWqqh66QkIGmev2Y/YR7XvF6af8Kw8Y192QSLhCCw2Xs5+ol04wfrpc+qoj4lAtxDxWr5SzTxPlsTW3OGLG2vsLPtSdWSNhRCJT1J8mPtUw+f8d1B0o4upZGpnKWMCks20pm+bkqdYf+3TKAVzxFCkXaXjaLtu8YZYdSTYabEsSw2BVgsg+46c9XaZaoTPltarql3Isj/Vvc1QKNOeTJQgt/eLY7W+JTs/QRUHfd5EKRlyo8Gl2/J6tn28TGoM9mpjFP3dt88UWiBBEKzR9f7jQqC0BqK+aT3eC7nnKgyudd1JN/3OKNp+jIfTz+BWxNFq7hjo60Jxrpo2LZ7YbF/lXxRa9lP5k5TDPI+Lpw6Y/OQGMQRuN61/ZzwIaAfgbCZ3z6uogk3eydtymK5rMeKDWyaJFCHoqas77zRd11aDhCwJLcqrUwkybMQlgfZ8+7mPaD9jpDuw=
+	tbQAPoC7DcA0i+OcZcXP0dT/fHg1xtAxduQ26y8Bdf9HLyUlC3MY7dDQFMLALyo5erMgn2GR2t5WLB47RwwzbMGlnZwufdNsF7eJUqBWPuWqRPtJkVKa2aWVS3DEz/dgxlSf/u7pO3vGwbFJTydMLZOh5DIOjaXUonOil40JW8JpkvixDewp0CZ7VHVJzsHmwQB9amqNrr9R321pG4CXVZA8f9P1OLQL9y3P30biBPiR+HsS/dy4K41OU+5JcxvLAuTRNwG2/nGHEmlk+/oTdSeTybfZ3uJfG9FfVkd1DqbqT0rtiWsrky4HUd9icFR47ZAy8Hg7hIQ/6Tbz8NWSVlK//sfir7PFUskiqzRxbbwnN6kVQEm9+bGSC0ioyO5i1oAEYWt3AJn5TwcsQfkhBWw0SXcGco+d/Z7Ox/ayYRoBCyRwyEPicLDn+iUtTcqGUR92D3Gnd2mTrXI3fqCWBmfVcGBVfL6tvYCVWgrB7PSxpjwFyW72BshnqvWLwqT2rif4zavJihU9X5GHnTMithMCKR9qNlOg1U8i30UVHJNnitQE8wWEVH5FP4CpcGJDG6zOBJTQDulhoQCMnyrG+QFc/Sd+YNdze3RBLyWEbPA=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BEZP281MB3267.DEUP281.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(366004)(346002)(396003)(376002)(136003)(39840400004)(230922051799003)(186009)(1800799012)(451199024)(64100799003)(83380400001)(31696002)(53546011)(478600001)(2616005)(26005)(41300700001)(4326008)(8676002)(8936002)(44832011)(86362001)(38100700002)(2906002)(7416002)(31686004)(36756003)(5660300002)(316002)(6916009)(42186006)(54906003)(66946007)(66556008)(66476007);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BEZP281MB3267.DEUP281.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(39840400004)(396003)(366004)(346002)(376002)(136003)(230922051799003)(1800799012)(64100799003)(451199024)(186009)(316002)(8676002)(8936002)(2906002)(7416002)(5660300002)(38100700002)(44832011)(4326008)(31686004)(83380400001)(2616005)(478600001)(26005)(53546011)(66476007)(41300700001)(66946007)(66556008)(6916009)(86362001)(31696002)(42186006)(54906003)(36756003);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?YlltSUhTTmY1SjlFUkowaFA3enM2MFVrU1JuR0craXdmTVIyTWVNeVM0ZEZv?=
- =?utf-8?B?cHpmY0swZ1hCZGdablRURGRubGdJTGFjYmpNaERabFlyQXFtRi80MFNncFY3?=
- =?utf-8?B?ait5NmRRZnhhbm8rOW9mZkw2TkpSbm1uSHdqcm1XVWpjZ1lRWXppR2g4b1gx?=
- =?utf-8?B?UGxMRVhuaEFnZUlKMDZ1N3lCMDhEWUsrdXJoNVhrOHhOWUxyMUZpanBZV2dv?=
- =?utf-8?B?UW1mN3UxcTByZzhycHZ1d01veVJSWXhNZWpIZ2dvYnB0ZlREcW4xMW1TYm5R?=
- =?utf-8?B?SmhxYVRyMGhydEFRMkplekZYa2UyV08zT0szVFEzODJ6TjcvTU92YmtBbmxK?=
- =?utf-8?B?c0o5eVM2RHg0Rjl2VEFodFFtenpHVnRpdTZVNUZmWkZpRlFRQjZYMDBQQWdj?=
- =?utf-8?B?YStlNDBKVWNiS2RMM1RaT0RNRHhDUDVNQi9LN1g2YWlKNlNSenNlVGwxam45?=
- =?utf-8?B?Rk5xVytvMnBjTWFMaFFZN3NZNWs1dEdydVdXQUNGazg5a29ZeGEvUE5WYzlY?=
- =?utf-8?B?WTJNR2p5M3lKWTRuQ2ZqYU40Z3kwcXNESWwrTk0zNG1IcVkxeURwT2FNNE5v?=
- =?utf-8?B?OU4vZ2tSZjJlb2hobmJFZzJFUzk3VldEUXk0QXYwVE8wbVNhaU9KK2hlejlU?=
- =?utf-8?B?Q01RSHlONGFWWC85UkhwbjRvcktEc3JobENhUU5UK1RqNzZLTklYbG9HN3Np?=
- =?utf-8?B?c2IrU1BDKzlQR3pJclNoT1ZYZmtReVduckc2MGtoeGpnZE1yM3FKek40UHAv?=
- =?utf-8?B?ZmNaelZjcEE0SG9CZldMak11MU1NaTVuOFhDaVhYL2dxTlN5T2VDRmVTRlhH?=
- =?utf-8?B?VzNWcmdSaWtPQUVhSzYvSmF6Vk9TK0d3Kzd4ZXVoOXpReHA2cXZsc1ZrS210?=
- =?utf-8?B?MXNKOXdzUlFWaE1ENkx3MGxFUHZ6eDhsdkNJZkRtTlBYUlNDWlZ1OERHb1Nj?=
- =?utf-8?B?RldKV2tqdGdiYjVVYzUzWG5xMHFDSTRkVDgyUVBEYkpubWI1bmhtbHFTWmc0?=
- =?utf-8?B?eUJYbUR6cHAyYlNZNkdpd1JIOFFhQ2ZyR3duaWkzWHl2OEpRV2VUeU5SSSty?=
- =?utf-8?B?OWMvTkpLWkVDQ1poTWk3V1U3cVJOaUhWM0Eyb2hoSkdPK0syRDdsQmc5dEl2?=
- =?utf-8?B?azRDOGtoL1FHTHhkTVRaMjl4bktlb3RsdzBMZW1INkx2UXl1MHBkMnZ1MHdx?=
- =?utf-8?B?Yk5Sbjlsb3ZSTzRYalRzQVhNc2k2NnJBZ2ZBZDN1aUdPcS9Ma1ZpZHZjWEd3?=
- =?utf-8?B?d2IweURUcHNLSTFURzBocDkvcWlCQUZ0a0owWmp1ODdIekVORzg5Y2hNT3hM?=
- =?utf-8?B?eU80UWdOc1dRakM4ck4xeUhmT2g3cHdFTEtwREF3ZG1laS9JbFpVVG12S253?=
- =?utf-8?B?WXM1dGR6SjBPWk1Sc1lRWDFWamREV0ZveStnU1ZUMVEyUFRWZ08rcXNTN2tp?=
- =?utf-8?B?cnYweTlpSFFFbFhVRk9NYUZLb2Y0ZzVaaHdMWmFGK1dPRERLN0QwZi9QRW56?=
- =?utf-8?B?SENWUGhpU2NIQ0FGMVBrTnBiK3pkWUJQdmxwcVBhRzZGNkJ2V2xNMzd6dkFI?=
- =?utf-8?B?WFlteDBiYWt6TUxXOHZVK05VZkFZQ285cVVncWVNZ1E4ZktNcDRma20weHNt?=
- =?utf-8?B?UU1UWUhLdkdIcEYvMXJ3eGVZYzVQb3h4TU9FcTI0VXZHblJYaC8xMjNtMzdk?=
- =?utf-8?B?bDBvNjVjUlRqZ2IzT25zUmFwdVU0T2swc3RUekNnZW1nMUZMUlhvRXhaRGoz?=
- =?utf-8?B?N0pFRHY3cGJhQ09NTEpWaVExTjRHT1VxZ3E5aVZRU2tlVG1LSGZST0FsSFUz?=
- =?utf-8?B?RmxXVGVqbGN2VGZYaFFBRHhZaGlqY2hmdFhtMVFCK3poMUEySGZMR1FVTkNC?=
- =?utf-8?B?SDNpQ2EvVXIwdmhNM2FJRVYzY1NTeFV3ZURQZGVlSWY4c3dRbnNsMFBhNGFz?=
- =?utf-8?B?MlFMNHhmcFQ1ZFFOZ1RoOVF3VlAwWkc4eGtxU0s4c216REtIZXVVY2xmOU9k?=
- =?utf-8?B?a0gwWHhBZkd2N1FDT3BpMm90MWM0VUtEZGZ6Q1owMWNhQ2RNS3UrM1NMb2d2?=
- =?utf-8?B?aTN3ZTZEMHlUOFRMczRlMHA2aFYzS0YzVHpCVTQ2MkU1MGpRNlJVZnZvYUli?=
- =?utf-8?Q?sYkL9w2LjvUydc/4rJ7fGnGgW?=
+	=?utf-8?B?WVhXbnhreHlkTHFwRXQ2Y2pOR3pZTTc0SlBSMkdjTVRha2lIeFk1MDZHTlZw?=
+ =?utf-8?B?eEpIZ2dyMDBCVXNoajBBTldRWUpMYzJiaHJYeDU1NlBZaGJ2WjhFc2ZSMFF6?=
+ =?utf-8?B?czdqeVJvc3J5ekQvd1FBOEx0TVJsUHpsVU0zRE5kUml2Z2JNVEZPTmFmOXFn?=
+ =?utf-8?B?RzZxMjZ6bWZ5UXVCa0p2d082cXZLYVk0djVsQ1M4UTJBcUphbHFKM1hFcFNJ?=
+ =?utf-8?B?TEluU2VkWXVYdCtieGQxUnVaZ3VYaWN4ek5nMWhkUVVFYk9QSXljOGFnM3Ew?=
+ =?utf-8?B?dGJuUERxMEhYaWtmMy9zeXlsVGppTGhlVy9oUGhYTDI3NFcvMXk5TWlSSmVx?=
+ =?utf-8?B?TXUyaldJMjhaTmdWbXRCQ0FwRWt1MkRLM2ZadDRYc2V0S25CTmZxSmtlRmZ1?=
+ =?utf-8?B?cEh6WFE2bEJ3bGhBQUZSaThlcDhMcHZlRCsxd3Y1ZUVYRkYwRVZ5NlB4MldL?=
+ =?utf-8?B?SnF4ckNWTnpzbWxDZUk5Tm42eURFK1pkaG9UNi9CaW9ubUZMZEhrY2lKL2Fm?=
+ =?utf-8?B?WG1QKzhEUFRNT2lRampiaE1ScmtYZVpWOFFVaCtoUElhTHgwbDlTejF0eHpS?=
+ =?utf-8?B?ek9xa01EQTRmZ0NLWG5ad0xLNlp2ZGZkOUgyakJDemdJZDcwZk9LYVAzczdo?=
+ =?utf-8?B?Q29Dd1Y4UkVjK2tzR1dHK25zZThJVnZpTVZ3bzBqT0UxRGhoZUdnSkM5K1dz?=
+ =?utf-8?B?dWYwaUl4b0JjaW80ZjdBaS9VeDdkYWlLT2RzQ2NrdDgzaHRWKzVEOHRIdUZx?=
+ =?utf-8?B?dzhaNnhHR3Q3eUtvZlVjb3lyMXhyWEttMGk5SDZpaVQ0RDEyYUtQbG1OWWwx?=
+ =?utf-8?B?K0hpYWpEdEpxM3FVM1BURG9FQTVQN3lNZ25ybnRkSnVLaUtHQzRnOFFNeFVU?=
+ =?utf-8?B?dk03VDNnSWU2NGtCUDAraWNkSWNDcmdLQ3FxSUpLVmtnM2RVT3crWWF6a2Y5?=
+ =?utf-8?B?bVhaNzFtR1Y4eTd6d0prY3p6YWhDZDUvVEdGL280a3BwL0JnRUk2aUlDZ3lZ?=
+ =?utf-8?B?aVY0cWR4SUsxeFZUV2s4aXhsb2E2aTZNQ2YzYkphbGQzVUtxVkNIenFHeU1F?=
+ =?utf-8?B?Z2VJUHZKeDFlN1lrNUliVWlHYjZzQ09NN2RlWkJNYmN5NTBCbm5zaEpXdkZa?=
+ =?utf-8?B?VTNueFd3OU5ZREpaOTdDY3pvNmxvUitJR3pRdWRLVEwrYmFLN3pIQTJ0Z3RZ?=
+ =?utf-8?B?ZjRZd0pxU0NrNzlSNXBoNUJsdkM4V2hEUkRSaUVONGpYZDNKb3pjMjh6K3dh?=
+ =?utf-8?B?WERZQm5RL09rZStrRXZxdk01WUtETkhmUUNhUVl4UHhCSEswcDZ0eXBVVmlw?=
+ =?utf-8?B?N3VaSEpUQ2V4ZkFDSisxeHBZc0xsblRpb0g0N2k2eUNKMmdSckxMcmUvczB1?=
+ =?utf-8?B?ZHZQTU15SmhpVkoxMUk5MXVDUWxqaXdRRlVRL2ljeCt2ajNEbVNGWkNDanUw?=
+ =?utf-8?B?UnBnUWkrWVNrSUtKZFpXQnJnR0xoL3hndXI5dkVuYWM0bnZhL0Y5T0VscjV2?=
+ =?utf-8?B?YVBLNWVROHRJWFRoRkZ1dkdQaytxbVc0VHJmS01Lb3pTVS9PSithRmJDWXFo?=
+ =?utf-8?B?am9qUHNiMGV0RXVBMW1kWmdRdXBXdGxZWDk5eGtaRm1KaDRHYUE1YWpGSmFX?=
+ =?utf-8?B?VmYvWXZWZnhCbGtvemlySlJ3aXlGaFg3MkxOUmhhYnEzOTg4ODNUd2JuNklv?=
+ =?utf-8?B?ZXQ3UndqZ0p0SjJacTNQdHBlaTNmMkJqNlZqcUpNYk41Y0M2YVQ1WTdkeU8r?=
+ =?utf-8?B?YUs1NDl1SUVTWWVZUDV4MmtVQXRIMnNCVW9JOWZaYXdsZW40YXdQOUpIaVlV?=
+ =?utf-8?B?cHVUTzRhdlQwalJnaEgzUkVPczRsd054VXFoVitZYzhMV2Z4T0swbUtwNGpj?=
+ =?utf-8?B?aEdSaDJyK3dFclorMGlRc0djNnNibm9WeFlYV01QdElpSi8wbUcwRE96TlVl?=
+ =?utf-8?B?cUdxTWVaQU1nWjB0eFFWRGhKL2ZwRDllYmh5TjBJNU9rYmF4c3NKcm1LekVF?=
+ =?utf-8?B?WGRlMlVQTXJLY3gyWW1Qa3BFY3NPZzg1eC9WdTZvOXl5S3NsYmRSSk5tMmM5?=
+ =?utf-8?B?VjI5ckpZQm9wTXBzejdjbEN2eWZEZjhFN3MxQ0lpdytsL2dFZUZBVjRrbTJk?=
+ =?utf-8?Q?TEfpXkLBFSsARanSl0neifrRW?=
 X-OriginatorOrg: opensynergy.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bacb97ab-69b2-4576-e09b-08dc1298f378
+X-MS-Exchange-CrossTenant-Network-Message-Id: 41aff268-be22-44c7-e2c2-08dc129957e5
 X-MS-Exchange-CrossTenant-AuthSource: BEZP281MB3267.DEUP281.PROD.OUTLOOK.COM
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jan 2024 11:32:11.0773
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jan 2024 11:34:59.5041
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 800fae25-9b1b-4edc-993d-c939c4e84a64
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: KOkSSMI7F/ys/sy9o7wtrVmsH9q9sBws4+WYiWUd4f9n5zzMbVplJgJf0NmWPqaFJWjE3By/NvthGL+5vc7ibg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BEVP281MB3569
-X-TM-AS-ERS: 104.47.7.168-0.0.0.0
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6QR0eqdOmKY/+zLv6f/NO1WBQBHbPRuz/GEtIlfAVFKOmdMH2TMKsCI/1O9dQVSSozTTYG9uatRZ5OvPPITaOg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: FR3P281MB2252
+X-TM-AS-ERS: 104.47.11.168-0.0.0.0
 X-TMASE-Version: StarCloud-1.3-9.1.1015-28112.006
-X-TMASE-Result: 10--6.754200-4.000000
-X-TMASE-MatchedRID: zGP2F0O7j/v5ETspAEX/ngw4DIWv1jSVbU+XbFYs1xLtLmKv+xcD1YHs
-	r+Lk3p/gC2QDPheido9iBl6ePEpdZRIModjUeZCSiHUmvUOLMwX2dS5FWFU6LsYppFvP5T5CUo0
-	7kZMcJurqUJy7ghq44IOamxs197YArFT8/8buivWSHQtEOSQwHPhwJOI9xff0aWT+OhT1YFFPQF
-	Fk0j5jBsA2iDfbpfy+jX3M0aFmhUOwz/eb2SjfKGB6KL0WmlgVXFAIRSIiEKJxg7svMtapLmspz
-	GEY2FM+ZDDVZwtwCCzhSU284lmHb0vU4MkBkIL19YzNdaonZeA=
-X-TMASE-XGENCLOUD: 9fe72cc4-4976-4983-9d62-fcb15f3b14ad-0-0-200-0
-X-TM-Deliver-Signature: DF442A7D045259E13B961E4ADC7EE8ED
-X-TM-Addin-Auth: pq3sHyz+MuhDPjJXIZiK0MFY5ybrydV/xu1JsAEoHC8gWPQT5xklx+qSMnK
-	ECQ2r+IcMmIKKQYWShAsjPd8I4OLumTPUv4Thqa2cYOPCnZq1Hr8W5CrVBfYv92iUcy3IhikuIR
-	JAMuOnC1rb7QvWdYQzpyqj1En6P7CESFdwtPYmlN2I6dsZsEFZ+8+rWetReYKy9gDK2EmCVNJS6
-	Qpb0fszy1dRNVWv+KgjLCzKl8pvGPiyL3dpWYDWRzDk2Wf6mA26NMwA7AW9TXoqe0dB2byHDdMl
-	yHBNU7fzcuHaH0c=.LrFOj08vFg05VZqX1AFN/mULmHBEWFmUoQ+x4EkGsMpllF4bduzvxs8+89
-	NUDGhw/uqyIs/7Ns7d5QpoXyFQ194Dg7ZIXcy5z9fDlS2B3nVwFiv+5ecoTwQy7lSxVUPdShRmW
-	K0hUbKF5mknso3BRj9TrIe79x2Jjlm6GFT27O1ir5hWyH6HdzjbSK6OUbr1bst+DiC3JG6AfzGT
-	wtCb4k7S45RKaqhcEx4fCO0HdDEuV3+vEWqyTR8L4g+gGjnZz8FhsVEIKkcQOFL03m1K1IreoXH
-	js4t4TcSD52bSjVkCUwI5l01mu8DXdaQWr6Buc6IKl7z/xzs1DR6nXJUU9Q==
+X-TMASE-Result: 10--19.927500-4.000000
+X-TMASE-MatchedRID: hls5oAVArl/5ETspAEX/ngw4DIWv1jSVbU+XbFYs1xK9i+/f9tLGG9T8
+	nzhI7jct08q4PMUbAPinyNbHJWoNRSbbwRdGbc5Ehi2C7dlNKWoSRRLwSueD2gHzrV7k27Q/P1b
+	i6L5FWkPf3jJm6h2Ae5uIb9c3VdbGmisT+ybs5MYI1pqhes/vCcEYnQj44hfD86dFkmAkYZ+ECn
+	xZMJxvURqoqV74MuLyPkO5+0gZtdsM177w97hxZmwEEr52PwDFm5eMQpabFXYhkL0gCMh6Ds+c7
+	BOZ9lQf31w1NnIhFDLCoxkUJ0PNYWiJ+5GHGsyDJPlTeUnhPwqs0m4CN4NCDVo7GmCOJYd1AqYB
+	E3k9Mpw=
+X-TMASE-XGENCLOUD: 49bc9f4c-0eb1-4a58-b079-7d4ed6cb64c6-0-0-200-0
+X-TM-Deliver-Signature: 74113D733E3B975245E7D4B75044E1C8
+X-TM-Addin-Auth: Xk7WKXqnBn1/Y+8jl1AOGBP9KgPVZrLdC2d9+GIrP6Fgoe6DkztInLjsm0g
+	ISfth25SzfbRedBKRZj3phNL6nlW/XtyUu275rfqGyjQ6uH2mM8ff7YFyvReOj/a8V4Coqs0Czc
+	oNmTWUWZhiScrdx0N+PTzn51KfCL9/4i7jW++qMWtSFS0KEeFqY2O7mgJZksRB37nQjyJc6oStT
+	e6WohBq3VyB9pHkhvKAPmBWegcPu0glqa+RKEVRriGiLZX1BGhy+0OMH9kl+xg0+hIF+symmHDi
+	O71V7F5V4bxNaX8=.F2DcIaIW9hEWHO8iAPI4p1W0L5uXtVGLXjRiwSXj9gnImF57fPGAhm9ROy
+	rTMroWsnLKamR7AuVgSYdx/PpiLb9EsCmGThumEnO36zaVj0gzDdngrfNQg08v3AEC91J8qK7BX
+	hIMdxb3ydF5fHlmn/PmNCGYrjxAXodWajQZyUB9k5bnft6x+aIDCgIA/QGxtRgp2D/OFerkVjLg
+	eyMFuIiaNcplTG6C1j2/u66/7MsVZKptGACGQUywsGgWXSISFI+se56tF+RgwWq4nF7O2Fnie3/
+	ANgeOPd9jITBgnvLoynEC5u9rKKYEgAQuewY9jOKbCNOTzpEi2TQ3pjQQig==
 X-TM-Addin-ProductCode: EMS
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=opensynergy.com;
-	s=TM-DKIM-20210503141657; t=1704972733;
-	bh=0bKxh4Rwn8dh6cAE+Jo1d2BYfdyVGfyJ2bQ7zTCUuEs=; l=1129;
+	s=TM-DKIM-20210503141657; t=1704972900;
+	bh=eW+fpyWlizLYaNIzPsjX8SDD0TLigdxu7I2fvM0OzlI=; l=2533;
 	h=Date:From:To;
-	b=YQYjAlT0FBygM9z38TdcgC0u+nIObDKTzrvfeH/Fa/KNqBQPuSxvONtA6jqgy6TAw
-	 GLGzuw8//pTS0hMAwLvPp0vTaBe/6BURi53gPvpyRoRADj3wUqS4KS/vxKNuk1eUbA
-	 mFnqOVklTFI9/Hze1gOlRQSAWeTfz0I1mIhj52idYkDgVwlSv0pAWRuTGY3JiNr0Bk
-	 H/SRcmNZZJ17AnkY+Ch+pvbNVgZy6ryJnLTgUv7Rh+58AyQdfur4UKfOu0IEOyogY1
-	 ++KwhadmYnpvZgtUhyN8L0ozGku+NehjjA+v8qMNbrTlbNqciOnK17NA7MRpr5xquu
-	 Uyr6z7PjpF9Zg==
+	b=YuM4JmWfmZUSW/R0Mpa2WnlCRSC/ZbHvM4hPbLd0hdmBhzbuuMstL2lYn98Ylvx5b
+	 qrb/agEkjwSOL/c3So01eIyiNx7prAKxvubS8uoHRupMDlslYKFVGikPXlShasTmjk
+	 9xVCmJn9dw0Kd2aa7CGpf7c7yutJYwBPJYv+5pTZ8uzYEPHg0ddbZfudp4fqmYMSAX
+	 CRUXlbLecSHBPuvfa9fwZeylO7hwpCZiSpP0t4A2ynSgzru8m0tQ6vvsWaY9wUnLrM
+	 lg+4yyNnklvfHFLLQ6rfkIRFrbB0aag0NpNN++Rl45cI5Rj26rlDjanXldekc+FdtQ
+	 U2DKEWhYtlIaQ==
 
-On 18.12.23 11:23, Andy Shevchenko wrote:
-> On Fri, Dec 15, 2023 at 11:06:08PM +0100, Peter Hilber wrote:
->> Add a clocksource ID for the x86 kvmclock.
+On 24.12.23 17:27, Simon Horman wrote:
+> On Fri, Dec 15, 2023 at 11:06:07PM +0100, Peter Hilber wrote:
+>> Add a clocksource ID for TSC and a distinct one for the early TSC.
 >>
->> Also, for ptp_kvm, set the recently added struct system_counterval_t member
->> cs_id to the clocksource ID (x86 kvmclock or Arm Generic Timer). In the
->> future, this will keep get_device_system_crosststamp() working, when it
->> will compare the clocksource id in struct system_counterval_t, rather than
->> the clocksource.
+>> Use distinct IDs for TSC and early TSC, since those also have distinct
+>> clocksource structs. This should help to keep existing semantics when
+>> comparing clocksources.
 >>
->> For now, to avoid touching too many subsystems at once, extract the
->> clocksource ID from the clocksource. The clocksource dereference will be
->> removed in the following.
+>> Also, set the recently added struct system_counterval_t member cs_id to the
+>> TSC ID in the cases where the clocksource member is being set to the TSC
+>> clocksource. In the future, this will keep get_device_system_crosststamp()
+>> working, when it will compare the clocksource id in struct
+>> system_counterval_t, rather than the clocksource.
+>>
+>> For the x86 ART related code, system_counterval_t.cs == NULL corresponds to
+>> system_counterval_t.cs_id == CSID_GENERIC (0).
+>>
+>> Signed-off-by: Peter Hilber <peter.hilber@opensynergy.com>
+> 
+> Hi Peter,
+> 
+> some minor feedback from my side that you may consider for
+> a future revision.
+> 
+>> diff --git a/arch/x86/kernel/tsc.c b/arch/x86/kernel/tsc.c
 > 
 > ...
 > 
->>  #include <linux/clocksource.h>
->> +#include <linux/clocksource_ids.h>
+>> @@ -1327,12 +1334,15 @@ EXPORT_SYMBOL(convert_art_to_tsc);
+>>   * that this flag is set before conversion to TSC is attempted.
+>>   *
+>>   * Return:
+>> - * struct system_counterval_t - system counter value with the pointer to the
+>> + * struct system_counterval_t - system counter value with the ID of the
+>>   *	corresponding clocksource
+>>   *	@cycles:	System counter value
+>>   *	@cs:		Clocksource corresponding to system counter value. Used
+>>   *			by timekeeping code to verify comparability of two cycle
+>>   *			values.
+>> + *	@cs_id:		Clocksource ID corresponding to system counter value.
+>> + *			Used by timekeeping code to verify comparability of two
+>> + *			cycle values.
 > 
-> It's the second file that includes both.
+> None of the documented parameters to convert_art_ns_to_tsc() above
+> correspond to the parameters of convert_art_ns_to_tsc() below.
 > 
-> I'm just wondering if it makes sense to always (?) include the latter into
-> the former.
+> I would suggest a separate patch to address this.
+> And dropping this hunk from this patch.
 > 
 
-Actually, clocksource.h already includes clocksource_ids.h, always since
-the latter was created. So I'll just omit the unnecessary clocksource_ids.h
-includes in other files.
+In the quoted documentation, @cycles, @cs and @cs_id document members of
+the return type struct system_counterval_t (not parameters). I will just
+drop the members documentation, since they are documented at the struct
+definition site anyway.
 
-Thanks for the comment,
+> The same patch that corrects the kernel doc for convert_art_ns_to_tsc()
+> could also correct the kernel doc for tsc_refine_calibration_work()
+> by documenting it's work parameter.
+> 
+
+OK.
+
+Thanks for the comments,
 
 Peter
 
