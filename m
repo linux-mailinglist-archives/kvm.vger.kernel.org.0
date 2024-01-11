@@ -1,130 +1,144 @@
-Return-Path: <kvm+bounces-6101-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6102-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1994682B338
-	for <lists+kvm@lfdr.de>; Thu, 11 Jan 2024 17:45:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B37782B354
+	for <lists+kvm@lfdr.de>; Thu, 11 Jan 2024 17:51:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7DA592836C3
-	for <lists+kvm@lfdr.de>; Thu, 11 Jan 2024 16:45:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 91D591C22E41
+	for <lists+kvm@lfdr.de>; Thu, 11 Jan 2024 16:51:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E6BA5100A;
-	Thu, 11 Jan 2024 16:45:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64BAC5100A;
+	Thu, 11 Jan 2024 16:50:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XLFKwGH6"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="GqoYB0PR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2088.outbound.protection.outlook.com [40.107.220.88])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9746C5025B
-	for <kvm@vger.kernel.org>; Thu, 11 Jan 2024 16:45:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-6da10578363so3260140b3a.3
-        for <kvm@vger.kernel.org>; Thu, 11 Jan 2024 08:45:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704991515; x=1705596315; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=X3a/8dzRGzGQbYICPGv6PuVABrUUIpNjNThOnReQ0ZI=;
-        b=XLFKwGH6N6dD8NmTG1o07sFcyLwc6XSuqVkhRsmi3mlaM0m2FO4wuLcEyrheP/4tRT
-         GhqMIszxjsGvfj4kRi80bjUIRVqoHKPU+ccPflrkrKHuHh/yhUWI51s8UHd3o3pIxDjO
-         DB5N/hORE/S4DOOoIq0hsfAzj7hAnWAdPeQYzaxGiIYetQkrqyzYadIN6O/wKXmQTpHD
-         4BkqWc+QRBN3duk4tOdC/+NAQY9NwuHB9fuzQc4YwFjRuD9aZscQkRopCtFgcr1DxVZz
-         POArObcIrnz62jvCsGgsTQzlnfs5je4jup2WpYeXC+xYQILCPfyuk6k2HOQFwM2EtfN5
-         UAbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704991515; x=1705596315;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=X3a/8dzRGzGQbYICPGv6PuVABrUUIpNjNThOnReQ0ZI=;
-        b=KT2ii6JjtZpKHbyxNbj4DnuGL0059ctndx9I2UvYhMaLyBvWnNkQGXXdkhbGkBjV0G
-         cTt3Ihbie+67RyjDl/p/tdUN3J0PRJiCgvatoDd10T17/+mt8XuO17Uq4TONLfJ6AGDy
-         /x/1jHSBKVn2oQ2d5JuCm8hsJUmwTf+WFCxj5wAcmzGLIDgmDXFGJh0QnFNIZbTGGXl/
-         xb0YCYE4VMIMLnHXHT/ToHnClUS7p9JHVXzhTWnnVnugy3iclO7tOjBoc/imNniRtIoj
-         v1kvnKfvg5ehDDZjIcomF48w/hSjefy6c4wb86Lqb36w23XoDtrgYonSb+SjvZ2KybYk
-         L0eg==
-X-Gm-Message-State: AOJu0YyXgo6miFNGawAykbAfwTXYNdbECAAILTF092xsqa/NDPzJ9923
-	Mo5rpCrPLixbezp1Cw1fMU9WqbgI+iUHDAk8JQ==
-X-Google-Smtp-Source: AGHT+IG2qKhuxADLHLULVl08q1kzqk8hzzdyklLmMAIhQSW6HtOJbi3k59IN0IlWDxnxRbBzk9xsbsI4HtU=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:2d29:b0:6d9:975e:b360 with SMTP id
- fa41-20020a056a002d2900b006d9975eb360mr191082pfb.4.1704991514780; Thu, 11 Jan
- 2024 08:45:14 -0800 (PST)
-Date: Thu, 11 Jan 2024 08:45:13 -0800
-In-Reply-To: <20240111-delay-verw-v5-6-a3b234933ea6@linux.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2EA55026B;
+	Thu, 11 Jan 2024 16:50:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Tv5+9/2B8rXt/viSX/MawHWJnqgjz+/DIcwxFI2mYV2kkxI9O97luJkQCvNgZxfS4+I+JgQVjp/8czFcUnvqztwYTRuxAr2X9t5M7Wqi/kv6QpKruhLWu8aBQxaW7pviw5xo/mZbWvWSW3gIeTjajYLpx+2CvamwN9qcDfQMsuBSnpo8yWOdPjUS6+SgjpTH/Ut7ogKjeMOaB3LyWrjLGjp9Ot0GgyF7EyHUqs8fxlRqX31X/FzwNgTsJxJDLJVbigS/BKB7UK34RTIJCi0GEKCuOvgFGGi583b9mFfGwRbTbsk8XhoElhH56Jfp+Aelb6MyS+Sa8cayGFU8PlK7yA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=43LlNCtu65PZ0WtH5CDq3vnqa74slCEv4Qab7RgO2NM=;
+ b=QhfNNEiZz+8n0Tgj3q2F3rTS9S9kMISFJCNPbQ16O1TwbBWztnyNzc5bBkD866RO8a9Ot1UIiJWmCjWy1M6vLmnDvk0M6r09WVw/FVd1Caw1umSONlb8mQoH2uiun1EzfA5+b8lpoVncutQ+n57UgSQzcBNRK7BPSKWf+l9wdjHY+Sraq47dXM8COV3iSoyHWwgt7QgnHbRyu6mb5H/QzsKRwP4Su5Mq829vjDvyawGKLnLfv8HtbIwD6f8TpezH7c9lTO5SESXNIfAhpYh5d8CnYDURqs48xu0IqL4JRagCW/Xk5nlCJz9/OBl3+IuulLmaGX3EXYksjdJh+r7jNw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.232) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=43LlNCtu65PZ0WtH5CDq3vnqa74slCEv4Qab7RgO2NM=;
+ b=GqoYB0PRrRk+QkJkzSYuVoHkngwAxlOtUCBSMxL7j89XLn/BUWrXD4QZkpgGsvz/aMFNKXT+y63EMjQZRrBAtTfWXmGiEaMXd8Vje5AGO80wpE5yhMOczJXcT4XyWXVUSbPCtV4S48lrEuU7Qpe1xzNHFElIT4yeGWp42oBtXKT5QbB0yt7csZyvZ+1TxXILssyHfzZ8TK2NgR9c/O5sAwoGaU8UVEy8zB6FYH2NR452exfVANRmJk42eYyBwzsIl6EC8NOGRL2YFVw7S4haz45OPyeVFsyWrupvWJKACOGc0iZdSWfSgFha4Q1mxosB66LBP3aUlXU3kjlZLNy+rw==
+Received: from DM5PR07CA0075.namprd07.prod.outlook.com (2603:10b6:4:ad::40) by
+ DS0PR12MB8246.namprd12.prod.outlook.com (2603:10b6:8:de::19) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7181.17; Thu, 11 Jan 2024 16:50:54 +0000
+Received: from DS3PEPF000099D3.namprd04.prod.outlook.com
+ (2603:10b6:4:ad:cafe::10) by DM5PR07CA0075.outlook.office365.com
+ (2603:10b6:4:ad::40) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7181.18 via Frontend
+ Transport; Thu, 11 Jan 2024 16:50:54 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.232) by
+ DS3PEPF000099D3.mail.protection.outlook.com (10.167.17.4) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7181.14 via Frontend Transport; Thu, 11 Jan 2024 16:50:54 +0000
+Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
+ (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Thu, 11 Jan
+ 2024 08:50:47 -0800
+Received: from drhqmail202.nvidia.com (10.126.190.181) by
+ drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.41; Thu, 11 Jan 2024 08:50:47 -0800
+Received: from Asurada-Nvidia (10.127.8.9) by mail.nvidia.com (10.126.190.181)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41 via Frontend
+ Transport; Thu, 11 Jan 2024 08:50:46 -0800
+Date: Thu, 11 Jan 2024 08:50:45 -0800
+From: Nicolin Chen <nicolinc@nvidia.com>
+To: Yi Liu <yi.l.liu@intel.com>
+CC: <joro@8bytes.org>, <alex.williamson@redhat.com>, <jgg@nvidia.com>,
+	<kevin.tian@intel.com>, <robin.murphy@arm.com>, <baolu.lu@linux.intel.com>,
+	<cohuck@redhat.com>, <eric.auger@redhat.com>, <kvm@vger.kernel.org>,
+	<mjrosato@linux.ibm.com>, <chao.p.peng@linux.intel.com>,
+	<yi.y.sun@linux.intel.com>, <peterx@redhat.com>, <jasowang@redhat.com>,
+	<shameerali.kolothum.thodi@huawei.com>, <lulu@redhat.com>,
+	<suravee.suthikulpanit@amd.com>, <iommu@lists.linux.dev>,
+	<linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+	<zhenzhong.duan@intel.com>, <joao.m.martins@oracle.com>,
+	<xin.zeng@intel.com>, <yan.y.zhao@intel.com>, <j.granados@samsung.com>,
+	<binbin.wu@linux.intel.com>
+Subject: Re: [PATCH v11 6/8] iommufd/selftest: Add coverage for
+ IOMMU_HWPT_INVALIDATE ioctl
+Message-ID: <ZaAcZXrhhQPhKTHq@Asurada-Nvidia>
+References: <20240111041015.47920-1-yi.l.liu@intel.com>
+ <20240111041015.47920-7-yi.l.liu@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240111-delay-verw-v5-0-a3b234933ea6@linux.intel.com> <20240111-delay-verw-v5-6-a3b234933ea6@linux.intel.com>
-Message-ID: <ZaAbGWFEfUt1PX66@google.com>
-Subject: Re: [PATCH  v5 6/6] KVM: VMX: Move VERW closer to VMentry for MDS mitigation
-From: Sean Christopherson <seanjc@google.com>
-To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Josh Poimboeuf <jpoimboe@kernel.org>, Andy Lutomirski <luto@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Paolo Bonzini <pbonzini@redhat.com>, tony.luck@intel.com, ak@linux.intel.com, 
-	tim.c.chen@linux.intel.com, Andrew Cooper <andrew.cooper3@citrix.com>, 
-	Nikolay Borisov <nik.borisov@suse.com>, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, kvm@vger.kernel.org, 
-	Alyssa Milburn <alyssa.milburn@linux.intel.com>, 
-	Daniel Sneddon <daniel.sneddon@linux.intel.com>, antonio.gomez.iglesias@linux.intel.com
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240111041015.47920-7-yi.l.liu@intel.com>
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS3PEPF000099D3:EE_|DS0PR12MB8246:EE_
+X-MS-Office365-Filtering-Correlation-Id: add25741-69e0-4c84-54d6-08dc12c579f8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	r1H9MrnJuAxe7xQinXwmTWAstQk9OXCVLjPEGuXQWuX5Plb6YCp3eIHIU8YgnaRmhICHsnjwT9/ZiKTrzrhSO1YrJpApU0aou/PS+E6sAuLPCh6IJTzPIZkKH0xWhzDbNjDU9VdPLqKfPpgShL+uepPVK1ylDr+If98+5mKZyDJNMy+8Wb2BE7AzHOX7SWqEOdVMM77XPsTdu5e+M3CLkctwmWh6OIzZ2QYHGwdVjMcyuu75h5BAfm1bLJj+JP1BSPhLCE27CUPeHX5NnPP2PtJoQeKZAeNPMLU0b7LytsOV9b2oGLf2ZDiBEJV8vVlFqAzhwdXaLQHTPZJdPcQyOdLp4hZKckdCZ/830gYxhBz6nCDEbh0DwweL1nCS+LOwrpZKsqcXNmVGZRDNNPbdjqnIeGoDwngCgfqwXn6ZRfoBHOpIetzioVD/h8StI7uesC7SrEyE+wod3KBCGSnJSeey9x5UuGp3Usd83kYx9ZgrfVN/Q207jbhFeJgWMdguQCbLED8arjRbjgRsVF624c88ohKrNlIK8vGdRee7rPC5U1aAoSSehrK4NQ79tbEeee1dX4EpPMfWNKx4btxjxRb6UbyC/s5iX3k8p5cc6dLSTB1lU7yx9ifUlFOHVcizAHYVIjbDMx0Y5Yv7qZe1dkh6osAu3N/HVEWkWM+tvMT2VcRrFqk1Dtl9gsZgLM2+fPfVcHO3uBm7oqV0F5gVjFZNqNoN9BC23w7esf+U7pWSCTzKdl+3c0OdMAe1cxat
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(346002)(376002)(136003)(39860400002)(396003)(230922051799003)(451199024)(186009)(82310400011)(64100799003)(1800799012)(46966006)(36840700001)(40470700004)(55016003)(40480700001)(40460700003)(83380400001)(9686003)(26005)(336012)(426003)(86362001)(7636003)(356005)(5660300002)(4326008)(47076005)(4744005)(7416002)(82740400003)(36860700001)(8936002)(6916009)(316002)(8676002)(70206006)(70586007)(41300700001)(33716001)(478600001)(54906003)(2906002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jan 2024 16:50:54.2536
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: add25741-69e0-4c84-54d6-08dc12c579f8
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS3PEPF000099D3.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8246
 
-On Thu, Jan 11, 2024, Pawan Gupta wrote:
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index bdcf2c041e0c..8defba8e417b 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -387,6 +387,17 @@ static __always_inline void vmx_enable_fb_clear(struct vcpu_vmx *vmx)
->  
->  static void vmx_update_fb_clear_dis(struct kvm_vcpu *vcpu, struct vcpu_vmx *vmx)
->  {
-> +	/*
-> +	 * FB_CLEAR_CTRL is to optimize VERW latency in guests when host is
-> +	 * affected by MMIO Stale Data, but not by MDS/TAA. When
-> +	 * X86_FEATURE_CLEAR_CPU_BUF is enabled, system is likely affected by
-> +	 * MDS/TAA. Skip the optimization for such a case.
+On Wed, Jan 10, 2024 at 08:10:13PM -0800, Yi Liu wrote:
+> +#define test_cmd_hwpt_invalidate(hwpt_id, reqs, data_type, lreq, nreqs)        \
+> +       ({                                                                    \
+> +               ASSERT_EQ(0,                                                  \
+> +                         _test_cmd_hwpt_invalidate(self->fd, hwpt_id, reqs,  \
+> +                                                   data_type,                 \
+> +                                                   lreq, nreqs));            \
+> +       })
+> +#define test_err_hwpt_invalidate(_errno, hwpt_id, reqs, data_type, lreq,    \
+> +                                nreqs)                                    \
+> +       ({                                                                 \
+> +               EXPECT_ERRNO(_errno,                                       \
+> +                            _test_cmd_hwpt_invalidate(self->fd, hwpt_id,  \
+> +                                                      reqs, data_type,     \
+> +                                                      lreq, nreqs));      \
+> +       })
 
-This is unnecessary speculation (ha!), and it'll also be confusing for many readers
-as the code below explicitly checks for MDS/TAA.  We have no idea why the host
-admin forced the mitigation to be enabled, and it doesn't matter.  The important
-thing to capture is that the intent is to keep the mitigation enabled when it
-was forcefully enabled, that should be self-explanatory and doesn't require
-speculating on _why_ the mitigation was forced on.
-
-> +	 */
-> +	if (cpu_feature_enabled(X86_FEATURE_CLEAR_CPU_BUF)) {
-> +		vmx->disable_fb_clear = false;
-> +		return;
-> +	}
-> +
->  	vmx->disable_fb_clear = (host_arch_capabilities & ARCH_CAP_FB_CLEAR_CTRL) &&
->  				!boot_cpu_has_bug(X86_BUG_MDS) &&
->  				!boot_cpu_has_bug(X86_BUG_TAA);
-
-I would rather include the X86_FEATURE_CLEAR_CPU_BUF check along with all the
-other checks, and then add a common early return. E.g.
-
-	/*
-	 * Disable VERW's behavior of clearing CPU buffers for the guest if the
-	 * CPU isn't affected MDS/TAA, and the host hasn't forcefully enabled
-	 * the mitigation.  Disabing the clearing provides a performance boost
-	 * for guests that aren't aware that manually clearing CPU buffers is
-	 * unnecessary, at the cost of MSR accesses on VM-Entry and VM-Exit.
-	 */
-	vmx->disable_fb_clear = !cpu_feature_enabled(X86_FEATURE_CLEAR_CPU_BUF) &&
-				(host_arch_capabilities & ARCH_CAP_FB_CLEAR_CTRL) &&
-				!boot_cpu_has_bug(X86_BUG_MDS) &&
-				!boot_cpu_has_bug(X86_BUG_TAA);
-
-	if (!vmx->disable_fb_clear)
-		return;
+Nit: spaces at the end of the four lines above that have string
+"data_type" are all misaligned, probably because of the previous
+replacement of "req_type".
 
