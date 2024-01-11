@@ -1,322 +1,237 @@
-Return-Path: <kvm+bounces-6043-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6044-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 101ED82A668
-	for <lists+kvm@lfdr.de>; Thu, 11 Jan 2024 04:19:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E3CF82A6C5
+	for <lists+kvm@lfdr.de>; Thu, 11 Jan 2024 05:06:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B3EF28BD8D
-	for <lists+kvm@lfdr.de>; Thu, 11 Jan 2024 03:19:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A5588287C44
+	for <lists+kvm@lfdr.de>; Thu, 11 Jan 2024 04:06:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 183B0ECD;
-	Thu, 11 Jan 2024 03:19:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8945446A0;
+	Thu, 11 Jan 2024 04:05:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CVZpfW6x"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="q90eKb7K"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F14EEBB
-	for <kvm@vger.kernel.org>; Thu, 11 Jan 2024 03:19:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1704943181; x=1736479181;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=NVh/3cv2dwof8sh7cNZVWD2gD5Xl6mpN/Th2e4lYKic=;
-  b=CVZpfW6x8QiyOdzD3XVONC8ld9CAvEElgoKkFCQ2g56qMH838ncfI43K
-   t/DDHl9mhu6FiKkEyV1IOwPKd9Jj0xgs1QYqIlVqOaUXj3bi3EkOCGtbs
-   eEQ1+OYWALKEBoEtKaM116FoTrft8V9R0lBqkAl7Gx4oYKgtcTZigx/s4
-   aWuafKD/vH492blwC4hvz7/9gFLOoqcg2P6EAheBuoPj0x8OukImpWGlB
-   9JVd/NO/fW0cldwZ8zz2YOoLpnO5lVISMQiKlsapFjGZibmsPcDEwUT3f
-   bIr3nw5/ynq/uelXfSejvTJeGDGQy+MYCCTkjWZyHM/8GLFNp7sT8yKgr
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10949"; a="12212843"
-X-IronPort-AV: E=Sophos;i="6.04,185,1695711600"; 
-   d="scan'208";a="12212843"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2024 19:19:40 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10949"; a="1029383508"
-X-IronPort-AV: E=Sophos;i="6.04,185,1695711600"; 
-   d="scan'208";a="1029383508"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.22.149]) ([10.93.22.149])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2024 19:19:37 -0800
-Message-ID: <cb75fcea-7e3a-4062-8d1c-3067f5e53bcc@intel.com>
-Date: Thu, 11 Jan 2024 11:19:34 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA3131110;
+	Thu, 11 Jan 2024 04:05:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <6a655e9f-9878-4292-9d16-f988c4bdfc73@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1704945949;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oe8y6rx2nxJCVb5v6A3KEWIfmf39eOlQDxZDCZDQpSs=;
+	b=q90eKb7K7E7fJPyeOkcWuuQTXMX/wft3oCBjOBhlyiFmrgkyKMUJJweJzGZ7ubFNp8EHyV
+	GcPbNwdLXwLn7SNydULG8Gy/XrORJnr8NctjugZkNqq03qyefn2lSAbUGAAVNkmDZdUytt
+	a026lbDO23xBpkhnXEJJxhDMfDKiHMo=
+Date: Wed, 10 Jan 2024 20:05:36 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 05/16] i386: Decouple CPUID[0x1F] subleaf with specific
- topology level
-Content-Language: en-US
-To: Zhao Liu <zhao1.liu@linux.intel.com>,
- Eduardo Habkost <eduardo@habkost.net>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- "Michael S . Tsirkin" <mst@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
- Zhenyu Wang <zhenyu.z.wang@intel.com>,
- Zhuocheng Ding <zhuocheng.ding@intel.com>, Zhao Liu <zhao1.liu@intel.com>,
- Babu Moger <babu.moger@amd.com>, Yongwei Ma <yongwei.ma@intel.com>
-References: <20240108082727.420817-1-zhao1.liu@linux.intel.com>
- <20240108082727.420817-6-zhao1.liu@linux.intel.com>
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20240108082727.420817-6-zhao1.liu@linux.intel.com>
+Subject: Re: [PATCH 1/3] selftests/bpf: Update LLVM Phabricator links
+Content-Language: en-GB
+To: Nathan Chancellor <nathan@kernel.org>, akpm@linux-foundation.org
+Cc: llvm@lists.linux.dev, patches@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+ linux-riscv@lists.infradead.org, linux-trace-kernel@vger.kernel.org,
+ linux-s390@vger.kernel.org, linux-pm@vger.kernel.org,
+ linux-crypto@vger.kernel.org, linux-efi@vger.kernel.org,
+ amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+ linux-media@vger.kernel.org, linux-arch@vger.kernel.org,
+ kasan-dev@googlegroups.com, linux-mm@kvack.org, bridge@lists.linux.dev,
+ netdev@vger.kernel.org, linux-security-module@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, mykolal@fb.com, bpf@vger.kernel.org
+References: <20240109-update-llvm-links-v1-0-eb09b59db071@kernel.org>
+ <20240109-update-llvm-links-v1-1-eb09b59db071@kernel.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yonghong Song <yonghong.song@linux.dev>
+In-Reply-To: <20240109-update-llvm-links-v1-1-eb09b59db071@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On 1/8/2024 4:27 PM, Zhao Liu wrote:
-> From: Zhao Liu <zhao1.liu@intel.com>
-> 
-> At present, the subleaf 0x02 of CPUID[0x1F] is bound to the "die" level.
-> 
-> In fact, the specific topology level exposed in 0x1F depends on the
-> platform's support for extension levels (module, tile and die).
-> 
-> To help expose "module" level in 0x1F, decouple CPUID[0x1F] subleaf
-> with specific topology level.
-> 
-> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
-> Tested-by: Babu Moger <babu.moger@amd.com>
-> Tested-by: Yongwei Ma <yongwei.ma@intel.com>
-> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+
+On 1/9/24 2:16 PM, Nathan Chancellor wrote:
+> reviews.llvm.org was LLVM's Phabricator instances for code review. It
+> has been abandoned in favor of GitHub pull requests. While the majority
+> of links in the kernel sources still work because of the work Fangrui
+> has done turning the dynamic Phabricator instance into a static archive,
+> there are some issues with that work, so preemptively convert all the
+> links in the kernel sources to point to the commit on GitHub.
+>
+> Most of the commits have the corresponding differential review link in
+> the commit message itself so there should not be any loss of fidelity in
+> the relevant information.
+>
+> Additionally, fix a typo in the xdpwall.c print ("LLMV" -> "LLVM") while
+> in the area.
+>
+> Link: https://discourse.llvm.org/t/update-on-github-pull-requests/71540/172
+> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+
+Ack with one nit below.
+
+Acked-by: Yonghong Song <yonghong.song@linux.dev>
+
 > ---
-> Changes since v3:
->   * New patch to prepare to expose module level in 0x1F.
->   * Move the CPUTopoLevel enumeration definition from "i386: Add cache
->     topology info in CPUCacheInfo" to this patch. Note, to align with
->     topology types in SDM, revert the name of CPU_TOPO_LEVEL_UNKNOW to
->     CPU_TOPO_LEVEL_INVALID.
+> Cc: ast@kernel.org
+> Cc: daniel@iogearbox.net
+> Cc: andrii@kernel.org
+> Cc: mykolal@fb.com
+> Cc: bpf@vger.kernel.org
+> Cc: linux-kselftest@vger.kernel.org
 > ---
->   target/i386/cpu.c | 136 +++++++++++++++++++++++++++++++++++++---------
->   target/i386/cpu.h |  15 +++++
->   2 files changed, 126 insertions(+), 25 deletions(-)
-> 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index bc440477d13d..5c295c9a9e2d 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -269,6 +269,116 @@ static void encode_cache_cpuid4(CPUCacheInfo *cache,
->              (cache->complex_indexing ? CACHE_COMPLEX_IDX : 0);
+>   tools/testing/selftests/bpf/README.rst             | 32 +++++++++++-----------
+>   tools/testing/selftests/bpf/prog_tests/xdpwall.c   |  2 +-
+>   .../selftests/bpf/progs/test_core_reloc_type_id.c  |  2 +-
+>   3 files changed, 18 insertions(+), 18 deletions(-)
+>
+> diff --git a/tools/testing/selftests/bpf/README.rst b/tools/testing/selftests/bpf/README.rst
+> index cb9b95702ac6..b9a493f66557 100644
+> --- a/tools/testing/selftests/bpf/README.rst
+> +++ b/tools/testing/selftests/bpf/README.rst
+> @@ -115,7 +115,7 @@ the insn 20 undoes map_value addition. It is currently impossible for the
+>   verifier to understand such speculative pointer arithmetic.
+>   Hence `this patch`__ addresses it on the compiler side. It was committed on llvm 12.
+>   
+> -__ https://reviews.llvm.org/D85570
+> +__ https://github.com/llvm/llvm-project/commit/ddf1864ace484035e3cde5e83b3a31ac81e059c6
+>   
+>   The corresponding C code
+>   
+> @@ -165,7 +165,7 @@ This is due to a llvm BPF backend bug. `The fix`__
+>   has been pushed to llvm 10.x release branch and will be
+>   available in 10.0.1. The patch is available in llvm 11.0.0 trunk.
+>   
+> -__  https://reviews.llvm.org/D78466
+> +__  https://github.com/llvm/llvm-project/commit/3cb7e7bf959dcd3b8080986c62e10a75c7af43f0
+>   
+>   bpf_verif_scale/loop6.bpf.o test failure with Clang 12
+>   ======================================================
+> @@ -204,7 +204,7 @@ r5(w5) is eventually saved on stack at insn #24 for later use.
+>   This cause later verifier failure. The bug has been `fixed`__ in
+>   Clang 13.
+>   
+> -__  https://reviews.llvm.org/D97479
+> +__  https://github.com/llvm/llvm-project/commit/1959ead525b8830cc8a345f45e1c3ef9902d3229
+>   
+>   BPF CO-RE-based tests and Clang version
+>   =======================================
+> @@ -221,11 +221,11 @@ failures:
+>   - __builtin_btf_type_id() [0_, 1_, 2_];
+>   - __builtin_preserve_type_info(), __builtin_preserve_enum_value() [3_, 4_].
+>   
+> -.. _0: https://reviews.llvm.org/D74572
+> -.. _1: https://reviews.llvm.org/D74668
+> -.. _2: https://reviews.llvm.org/D85174
+> -.. _3: https://reviews.llvm.org/D83878
+> -.. _4: https://reviews.llvm.org/D83242
+> +.. _0: https://github.com/llvm/llvm-project/commit/6b01b465388b204d543da3cf49efd6080db094a9
+> +.. _1: https://github.com/llvm/llvm-project/commit/072cde03aaa13a2c57acf62d79876bf79aa1919f
+> +.. _2: https://github.com/llvm/llvm-project/commit/00602ee7ef0bf6c68d690a2bd729c12b95c95c99
+> +.. _3: https://github.com/llvm/llvm-project/commit/6d218b4adb093ff2e9764febbbc89f429412006c
+> +.. _4: https://github.com/llvm/llvm-project/commit/6d6750696400e7ce988d66a1a00e1d0cb32815f8
+>   
+>   Floating-point tests and Clang version
+>   ======================================
+> @@ -234,7 +234,7 @@ Certain selftests, e.g. core_reloc, require support for the floating-point
+>   types, which was introduced in `Clang 13`__. The older Clang versions will
+>   either crash when compiling these tests, or generate an incorrect BTF.
+>   
+> -__  https://reviews.llvm.org/D83289
+> +__  https://github.com/llvm/llvm-project/commit/a7137b238a07d9399d3ae96c0b461571bd5aa8b2
+>   
+>   Kernel function call test and Clang version
+>   ===========================================
+> @@ -248,7 +248,7 @@ Without it, the error from compiling bpf selftests looks like:
+>   
+>     libbpf: failed to find BTF for extern 'tcp_slow_start' [25] section: -2
+>   
+> -__ https://reviews.llvm.org/D93563
+> +__ https://github.com/llvm/llvm-project/commit/886f9ff53155075bd5f1e994f17b85d1e1b7470c
+>   
+>   btf_tag test and Clang version
+>   ==============================
+> @@ -264,8 +264,8 @@ Without them, the btf_tag selftest will be skipped and you will observe:
+>   
+>     #<test_num> btf_tag:SKIP
+>   
+> -.. _0: https://reviews.llvm.org/D111588
+> -.. _1: https://reviews.llvm.org/D111199
+> +.. _0: https://github.com/llvm/llvm-project/commit/a162b67c98066218d0d00aa13b99afb95d9bb5e6
+> +.. _1: https://github.com/llvm/llvm-project/commit/3466e00716e12e32fdb100e3fcfca5c2b3e8d784
+>   
+>   Clang dependencies for static linking tests
+>   ===========================================
+> @@ -274,7 +274,7 @@ linked_vars, linked_maps, and linked_funcs tests depend on `Clang fix`__ to
+>   generate valid BTF information for weak variables. Please make sure you use
+>   Clang that contains the fix.
+>   
+> -__ https://reviews.llvm.org/D100362
+> +__ https://github.com/llvm/llvm-project/commit/968292cb93198442138128d850fd54dc7edc0035
+>   
+>   Clang relocation changes
+>   ========================
+> @@ -292,7 +292,7 @@ Here, ``type 2`` refers to new relocation type ``R_BPF_64_ABS64``.
+>   To fix this issue, user newer libbpf.
+>   
+>   .. Links
+> -.. _clang reloc patch: https://reviews.llvm.org/D102712
+> +.. _clang reloc patch: https://github.com/llvm/llvm-project/commit/6a2ea84600ba4bd3b2733bd8f08f5115eb32164b
+>   .. _kernel llvm reloc: /Documentation/bpf/llvm_reloc.rst
+>   
+>   Clang dependencies for the u32 spill test (xdpwall)
+> @@ -304,6 +304,6 @@ from running test_progs will look like:
+>   
+>   .. code-block:: console
+>   
+> -  test_xdpwall:FAIL:Does LLVM have https://reviews.llvm.org/D109073? unexpected error: -4007
+> +  test_xdpwall:FAIL:Does LLVM have https://github.com/llvm/llvm-project/commit/ea72b0319d7b0f0c2fcf41d121afa5d031b319d5? unexpected error: -4007
+>   
+> -__ https://reviews.llvm.org/D109073
+> +__ https://github.com/llvm/llvm-project/commit/ea72b0319d7b0f0c2fcf41d121afa5d031b319d
+
+To be consistent with other links, could you add the missing last alnum '5' to the above link?
+
+> diff --git a/tools/testing/selftests/bpf/prog_tests/xdpwall.c b/tools/testing/selftests/bpf/prog_tests/xdpwall.c
+> index f3927829a55a..4599154c8e9b 100644
+> --- a/tools/testing/selftests/bpf/prog_tests/xdpwall.c
+> +++ b/tools/testing/selftests/bpf/prog_tests/xdpwall.c
+> @@ -9,7 +9,7 @@ void test_xdpwall(void)
+>   	struct xdpwall *skel;
+>   
+>   	skel = xdpwall__open_and_load();
+> -	ASSERT_OK_PTR(skel, "Does LLMV have https://reviews.llvm.org/D109073?");
+> +	ASSERT_OK_PTR(skel, "Does LLVM have https://github.com/llvm/llvm-project/commit/ea72b0319d7b0f0c2fcf41d121afa5d031b319d5?");
+>   
+>   	xdpwall__destroy(skel);
 >   }
->   
-> +static uint32_t num_cpus_by_topo_level(X86CPUTopoInfo *topo_info,
-> +                                       enum CPUTopoLevel topo_level)
-> +{
-> +    switch (topo_level) {
-> +    case CPU_TOPO_LEVEL_SMT:
-> +        return 1;
-> +    case CPU_TOPO_LEVEL_CORE:
-> +        return topo_info->threads_per_core;
-> +    case CPU_TOPO_LEVEL_DIE:
-> +        return topo_info->threads_per_core * topo_info->cores_per_die;
-> +    case CPU_TOPO_LEVEL_PACKAGE:
-> +        return topo_info->threads_per_core * topo_info->cores_per_die *
-> +               topo_info->dies_per_pkg;
-> +    default:
-> +        g_assert_not_reached();
-> +    }
-> +    return 0;
-> +}
-> +
-> +static uint32_t apicid_offset_by_topo_level(X86CPUTopoInfo *topo_info,
-> +                                            enum CPUTopoLevel topo_level)
-> +{
-> +    switch (topo_level) {
-> +    case CPU_TOPO_LEVEL_SMT:
-> +        return 0;
-> +    case CPU_TOPO_LEVEL_CORE:
-> +        return apicid_core_offset(topo_info);
-> +    case CPU_TOPO_LEVEL_DIE:
-> +        return apicid_die_offset(topo_info);
-> +    case CPU_TOPO_LEVEL_PACKAGE:
-> +        return apicid_pkg_offset(topo_info);
-> +    default:
-> +        g_assert_not_reached();
-> +    }
-> +    return 0;
-> +}
-> +
-> +static uint32_t cpuid1f_topo_type(enum CPUTopoLevel topo_level)
-> +{
-> +    switch (topo_level) {
-> +    case CPU_TOPO_LEVEL_INVALID:
-> +        return CPUID_1F_ECX_TOPO_LEVEL_INVALID;
-> +    case CPU_TOPO_LEVEL_SMT:
-> +        return CPUID_1F_ECX_TOPO_LEVEL_SMT;
-> +    case CPU_TOPO_LEVEL_CORE:
-> +        return CPUID_1F_ECX_TOPO_LEVEL_CORE;
-> +    case CPU_TOPO_LEVEL_DIE:
-> +        return CPUID_1F_ECX_TOPO_LEVEL_DIE;
-> +    default:
-> +        /* Other types are not supported in QEMU. */
-> +        g_assert_not_reached();
-> +    }
-> +    return 0;
-> +}
-> +
-> +static void encode_topo_cpuid1f(CPUX86State *env, uint32_t count,
-> +                                X86CPUTopoInfo *topo_info,
-> +                                uint32_t *eax, uint32_t *ebx,
-> +                                uint32_t *ecx, uint32_t *edx)
-> +{
-> +    static DECLARE_BITMAP(topo_bitmap, CPU_TOPO_LEVEL_MAX);
-> +    X86CPU *cpu = env_archcpu(env);
-> +    unsigned long level, next_level;
-> +    uint32_t num_cpus_next_level, offset_next_level;
-
-again, I dislike the name of cpus to represent the logical process or 
-thread. we can call it, num_lps_next_level, or num_threads_next_level;
-
-> +
-> +    /*
-> +     * Initialize the bitmap to decide which levels should be
-> +     * encoded in 0x1f.
-> +     */
-> +    if (!count) {
-
-using static bitmap and initialize the bitmap on (count == 0), looks bad 
-to me. It highly relies on the order of how encode_topo_cpuid1f() is 
-called, and fragile.
-
-Instead, we can maintain an array in CPUX86State, e.g.,
-
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1904,6 +1904,8 @@ typedef struct CPUArchState {
-
-      /* Number of dies within this CPU package. */
-      unsigned nr_dies;
-+
-+    unint8_t valid_cpu_topo[CPU_TOPO_LEVEL_MAX];
-  } CPUX86State;
-
-
-and initialize it as below, when initializing the env
-
-env->valid_cpu_topo[0] = CPU_TOPO_LEVEL_SMT;
-env->valid_cpu_topo[1] = CPU_TOPO_LEVEL_CORE;
-if (env->nr_dies > 1) {
-	env->valid_cpu_topo[2] = CPU_TOPO_LEVEL_DIE;
-}
-
-then in encode_topo_cpuid1f(), we can get level and next_level as
-
-level = env->valid_cpu_topo[count];
-next_level = env->valid_cpu_topo[count + 1];
-
-
-> +        /* SMT and core levels are exposed in 0x1f leaf by default. */
-> +        set_bit(CPU_TOPO_LEVEL_SMT, topo_bitmap);
-> +        set_bit(CPU_TOPO_LEVEL_CORE, topo_bitmap);
-> +
-> +        if (env->nr_dies > 1) {
-> +            set_bit(CPU_TOPO_LEVEL_DIE, topo_bitmap);
-> +        }
-> +    }
-> +
-> +    *ecx = count & 0xff;
-> +    *edx = cpu->apic_id;
-> +
-> +    level = find_first_bit(topo_bitmap, CPU_TOPO_LEVEL_MAX);
-> +    if (level == CPU_TOPO_LEVEL_MAX) {
-> +        num_cpus_next_level = 0;
-> +        offset_next_level = 0;
-> +
-> +        /* Encode CPU_TOPO_LEVEL_INVALID into the last subleaf of 0x1f. */
-> +        level = CPU_TOPO_LEVEL_INVALID;
-> +    } else {
-> +        next_level = find_next_bit(topo_bitmap, CPU_TOPO_LEVEL_MAX, level + 1);
-> +        if (next_level == CPU_TOPO_LEVEL_MAX) {
-> +            next_level = CPU_TOPO_LEVEL_PACKAGE;
-> +        }
-> +
-> +        num_cpus_next_level = num_cpus_by_topo_level(topo_info, next_level);
-> +        offset_next_level = apicid_offset_by_topo_level(topo_info, next_level);
-> +    }
-> +
-> +    *eax = offset_next_level;
-> +    *ebx = num_cpus_next_level;
-> +    *ecx |= cpuid1f_topo_type(level) << 8;
-> +
-> +    assert(!(*eax & ~0x1f));
-> +    *ebx &= 0xffff; /* The count doesn't need to be reliable. */
-> +    if (level != CPU_TOPO_LEVEL_MAX) {
-> +        clear_bit(level, topo_bitmap);
-> +    }
-> +}
-> +
->   /* Encode cache info for CPUID[0x80000005].ECX or CPUID[0x80000005].EDX */
->   static uint32_t encode_cache_cpuid80000005(CPUCacheInfo *cache)
->   {
-> @@ -6284,31 +6394,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
->               break;
->           }
->   
-> -        *ecx = count & 0xff;
-> -        *edx = cpu->apic_id;
-> -        switch (count) {
-> -        case 0:
-> -            *eax = apicid_core_offset(&topo_info);
-> -            *ebx = topo_info.threads_per_core;
-> -            *ecx |= CPUID_1F_ECX_TOPO_LEVEL_SMT << 8;
-> -            break;
-> -        case 1:
-> -            *eax = apicid_die_offset(&topo_info);
-> -            *ebx = topo_info.cores_per_die * topo_info.threads_per_core;
-> -            *ecx |= CPUID_1F_ECX_TOPO_LEVEL_CORE << 8;
-> -            break;
-> -        case 2:
-> -            *eax = apicid_pkg_offset(&topo_info);
-> -            *ebx = cpus_per_pkg;
-> -            *ecx |= CPUID_1F_ECX_TOPO_LEVEL_DIE << 8;
-> -            break;
-> -        default:
-> -            *eax = 0;
-> -            *ebx = 0;
-> -            *ecx |= CPUID_1F_ECX_TOPO_LEVEL_INVALID << 8;
-> -        }
-> -        assert(!(*eax & ~0x1f));
-> -        *ebx &= 0xffff; /* The count doesn't need to be reliable. */
-> +        encode_topo_cpuid1f(env, count, &topo_info, eax, ebx, ecx, edx);
->           break;
->       case 0xD: {
->           /* Processor Extended State */
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index f47bad46db5e..9c78cfc3f322 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -1008,6 +1008,21 @@ uint64_t x86_cpu_get_supported_feature_word(FeatureWord w,
->   #define CPUID_MWAIT_IBE     (1U << 1) /* Interrupts can exit capability */
->   #define CPUID_MWAIT_EMX     (1U << 0) /* enumeration supported */
->   
-> +/*
-> + * CPUTopoLevel is the general i386 topology hierarchical representation,
-> + * ordered by increasing hierarchical relationship.
-> + * Its enumeration value is not bound to the type value of Intel (CPUID[0x1F])
-> + * or AMD (CPUID[0x80000026]).
-> + */
-> +enum CPUTopoLevel {
-> +    CPU_TOPO_LEVEL_INVALID,
-> +    CPU_TOPO_LEVEL_SMT,
-> +    CPU_TOPO_LEVEL_CORE,
-> +    CPU_TOPO_LEVEL_DIE,
-> +    CPU_TOPO_LEVEL_PACKAGE,
-> +    CPU_TOPO_LEVEL_MAX,
-> +};
-> +
->   /* CPUID[0xB].ECX level types */
->   #define CPUID_B_ECX_TOPO_LEVEL_INVALID  0
->   #define CPUID_B_ECX_TOPO_LEVEL_SMT      1
-
+> diff --git a/tools/testing/selftests/bpf/progs/test_core_reloc_type_id.c b/tools/testing/selftests/bpf/progs/test_core_reloc_type_id.c
+> index 22aba3f6e344..6fc8b9d66e34 100644
+> --- a/tools/testing/selftests/bpf/progs/test_core_reloc_type_id.c
+> +++ b/tools/testing/selftests/bpf/progs/test_core_reloc_type_id.c
+> @@ -80,7 +80,7 @@ int test_core_type_id(void *ctx)
+>   	 * to detect whether this test has to be executed, however strange
+>   	 * that might look like.
+>   	 *
+> -	 *   [0] https://reviews.llvm.org/D85174
+> +	 *   [0] https://github.com/llvm/llvm-project/commit/00602ee7ef0bf6c68d690a2bd729c12b95c95c99
+>   	 */
+>   #if __has_builtin(__builtin_preserve_type_info)
+>   	struct core_reloc_type_id_output *out = (void *)&data.out;
+>
 
