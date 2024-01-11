@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-6039-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6040-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 890D882A5C3
-	for <lists+kvm@lfdr.de>; Thu, 11 Jan 2024 03:03:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 466F182A5C6
+	for <lists+kvm@lfdr.de>; Thu, 11 Jan 2024 03:04:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F1CC61F22900
-	for <lists+kvm@lfdr.de>; Thu, 11 Jan 2024 02:03:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9698CB27409
+	for <lists+kvm@lfdr.de>; Thu, 11 Jan 2024 02:04:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B8F4DF61;
-	Thu, 11 Jan 2024 02:01:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CFBBF515;
+	Thu, 11 Jan 2024 02:01:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1EX4g/8o"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mrAA3av0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B371D298
-	for <kvm@vger.kernel.org>; Thu, 11 Jan 2024 02:01:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCBCFDDDA
+	for <kvm@vger.kernel.org>; Thu, 11 Jan 2024 02:01:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6d9b266183eso3125148b3a.1
-        for <kvm@vger.kernel.org>; Wed, 10 Jan 2024 18:01:05 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-28cb44ab1cbso3234727a91.3
+        for <kvm@vger.kernel.org>; Wed, 10 Jan 2024 18:01:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704938465; x=1705543265; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1704938467; x=1705543267; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=1yded+bpmAK7QB4V7SI1S7JIiv7Mm++nYuN9zOqBzwE=;
-        b=1EX4g/8oJpSk4+xYbfSN1ML93P8YbI0VWrU8dwBgDvYtTwx/zRG+iL2zvn2PhUNPCC
-         N8ER6kn4Xx/MnkeW2J+IbI1dU0iSeyQsBylKf++jj/y4xgnMo5hvCDfYg10TsUfOXewm
-         rHQabi7SVhyhG/oicwowxqBjmPSI2tj55dybM2Pj89WchlptNluwgCtd7/pZlVHeEPIP
-         z/Kr3QrsW5Mw7OVWblROPr2ZLCX6UszT5Klk4zKIgrU/eVG7zJbHtaLXxo34h/vuJckE
-         QghmpWmE+vUhWZtzJ+2uqg/4lGoehj/GYYDT08qGMd/TV4HEhw1ytuk7l+Ljttk/Wic8
-         1iuA==
+        bh=jlRZWhcWzn+fD2gGlO5tUrHHod5m3bTS9lxlAjC7rqo=;
+        b=mrAA3av08b+1wU9XXI6KJBfPy9It8WVJVAkoqCHGd2dC+6xdLo8mtXh+26raYQgPqx
+         1LOP0tqzcxtccxpEBRclGRh89lbpB8RRWzZMM7WHBfq3H8Cxv8zWoODBU27sz16RV79u
+         +Q8fKqETL8k4mC9v12Dv6VSKlAxJ0h1nq/hHs8e9uzbhkNLyEA7H/2Mto6Y9fK3sAqDq
+         luMZPUvHVIKXfb9WcgrlOAuH1CInLo7Lx/YGM34prPMt0qAmMRCPVnppNEC8+g+FZ2Md
+         k/W9xJqTopLRZQyW//coFpTh2mXeHl6LScWtlbh/8hJ4lpBwxIqIKcIak0ki2qr2CKGh
+         nR3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704938465; x=1705543265;
+        d=1e100.net; s=20230601; t=1704938467; x=1705543267;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=1yded+bpmAK7QB4V7SI1S7JIiv7Mm++nYuN9zOqBzwE=;
-        b=jkjLZEFmH4uhnTlRZ0MGCWA5QMUMXdpIT2fz4gJjqoP784+/4M5evcdhXyfEICyXqO
-         SGpV70GhQLHTPRFnDlpQBv5729h5YLRYDBhdtL5mpM7LdGgUbvgpu+b2hiv0AYePTI4j
-         BqSoppTIgHrUsmdJGj/++XjWOU9zLdqhpfIfdr/a8KysPmSilcM1tcg0OcwSSWSk/e/D
-         rgNvK273rLu906QIilgO6fXOShLSK9fJE48HpM4F8NecsJpZ0zgqHDD6kjhp7ETDfu7C
-         JjskePz9g+n7c23URwFbE1BcHTQv9r0e/MxbxDeKoL4iourK83x0xxDBHcfa6pBIfeLz
-         Y1Ng==
-X-Gm-Message-State: AOJu0YyViC1zcBXz807bP1slEdcGtfDo1uLUoND40ITJcMhZf+AxzC0t
-	JcGSPZi7ZZBrlqgWx2d/T39E+L8or7vR9K6cXA==
-X-Google-Smtp-Source: AGHT+IFvq58twADSMJm+6d/S+IGe2SEDfp86/oaj1BjXVD6hOjWWQD6324p/9p6gR2+0tHp36tMWsUDDvVw=
+        bh=jlRZWhcWzn+fD2gGlO5tUrHHod5m3bTS9lxlAjC7rqo=;
+        b=C2CQe6NpUzsVN+XT5X0rkKBIdTn8Hi826/PVqgS4eN3mFBjPWLnp+M6pv9pkRap8tI
+         l/5W3slGWg8hB1mwrRM0jMWqUChs0sTjh+XhnMEz8tz65ltRVup7ubxNpskzdFPYoCUf
+         V8D+aQSg6+CaPbnLNCipqFCAxAuo6UTYvJcq/GLhQVb8zWuADW45miuELwFtDb89OqK1
+         JOrWgSpU0mGpcwxwEWxcgaRH5Xf6jsDlszxEqfZme19HZIzvwBYluM6L4eK84aaJHLQ7
+         m+KVkNKjuTp/LPGnuSzzX+JlGX3CFggEe3idWMZiLmaDufgwyL7mrWuE8eVx+dUVUoPD
+         6oNQ==
+X-Gm-Message-State: AOJu0YzitVpTlxZ7VFSJ/2L8RkSFqGZe34BgVAkFerLOCH75J9uwjs38
+	FwJE/N6rZEt9tVKZClO+3PuO5S3d1R0SH/Awug==
+X-Google-Smtp-Source: AGHT+IGljudK2WkxjvCUXom4s/baTziit1tp1cV/SDZ+pOowIaMwxm7n0RoCWyaSi/GHX1x6iql700kjaSA=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:3905:b0:6d9:a971:9685 with SMTP id
- fh5-20020a056a00390500b006d9a9719685mr64912pfb.6.1704938465257; Wed, 10 Jan
- 2024 18:01:05 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:90b:2e04:b0:28d:c7ba:c44d with SMTP id
+ sl4-20020a17090b2e0400b0028dc7bac44dmr2389pjb.9.1704938467174; Wed, 10 Jan
+ 2024 18:01:07 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 10 Jan 2024 18:00:47 -0800
+Date: Wed, 10 Jan 2024 18:00:48 -0800
 In-Reply-To: <20240111020048.844847-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -65,8 +65,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240111020048.844847-1-seanjc@google.com>
 X-Mailer: git-send-email 2.43.0.275.g3460e3d667-goog
-Message-ID: <20240111020048.844847-8-seanjc@google.com>
-Subject: [PATCH 7/8] KVM: x86/mmu: Alloc TDP MMU roots while holding mmu_lock
+Message-ID: <20240111020048.844847-9-seanjc@google.com>
+Subject: [PATCH 8/8] KVM: x86/mmu: Free TDP MMU roots while holding mmy_lock
  for read
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
@@ -74,120 +74,79 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	David Matlack <dmatlack@google.com>, Pattara Teerapong <pteerapong@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Allocate TDP MMU roots while holding mmu_lock for read, and instead use
-tdp_mmu_pages_lock to guard against duplicate roots.  This allows KVM to
-create new roots without forcing kvm_tdp_mmu_zap_invalidated_roots() to
-yield, e.g. allows vCPUs to load new roots after memslot deletion without
-forcing the zap thread to detect contention and yield (or complete if the
-kernel isn't preemptible).
+Free TDP MMU roots from vCPU context while holding mmu_lock for read, it
+is completely legal to invoke kvm_tdp_mmu_put_root() as a reader.  This
+eliminates the last mmu_lock writer in the TDP MMU's "fast zap" path
+after requesting vCPUs to reload roots, i.e. allows KVM to zap invalidated
+roots, free obsolete roots, and allocate new roots in parallel.
 
-Note, creating a new TDP MMU root as an mmu_lock reader is safe for two
-reasons: (1) paths that must guarantee all roots/SPTEs are *visited* take
-mmu_lock for write and so are still mutually exclusive, e.g. mmu_notifier
-invalidations, and (2) paths that require all roots/SPTEs to *observe*
-some given state without holding mmu_lock for write must ensure freshness
-through some other means, e.g. toggling dirty logging must first wait for
-SRCU readers to recognize the memslot flags change before processing
-existing roots/SPTEs.
+On large VMs, e.g. 100+ vCPUs, allowing the bulk of the "fast zap"
+operation to run in parallel with freeing and allocating roots reduces the
+worst case latency for a vCPU to reload a root from 2-3ms to <100us.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/tdp_mmu.c | 55 +++++++++++++++-----------------------
- 1 file changed, 22 insertions(+), 33 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 25 +++++++++++++++++++------
+ 1 file changed, 19 insertions(+), 6 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 9a8250a14fc1..d078157e62aa 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -223,51 +223,42 @@ static void tdp_mmu_init_child_sp(struct kvm_mmu_page *child_sp,
- 	tdp_mmu_init_sp(child_sp, iter->sptep, iter->gfn, role);
- }
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index ea18aca23196..90773cdb73bb 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3575,10 +3575,14 @@ static void mmu_free_root_page(struct kvm *kvm, hpa_t *root_hpa,
+ 	if (WARN_ON_ONCE(!sp))
+ 		return;
  
--static struct kvm_mmu_page *kvm_tdp_mmu_try_get_root(struct kvm_vcpu *vcpu)
--{
--	union kvm_mmu_page_role role = vcpu->arch.mmu->root_role;
--	int as_id = kvm_mmu_role_as_id(role);
--	struct kvm *kvm = vcpu->kvm;
--	struct kvm_mmu_page *root;
--
--	for_each_valid_tdp_mmu_root_yield_safe(kvm, root, as_id) {
--		if (root->role.word == role.word)
--			return root;
--	}
--
--	return NULL;
--}
--
- int kvm_tdp_mmu_alloc_root(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_mmu *mmu = vcpu->arch.mmu;
- 	union kvm_mmu_page_role role = mmu->root_role;
-+	int as_id = kvm_mmu_role_as_id(role);
- 	struct kvm *kvm = vcpu->kvm;
- 	struct kvm_mmu_page *root;
- 
- 	/*
--	 * Check for an existing root while holding mmu_lock for read to avoid
-+	 * Check for an existing root before acquiring the pages lock to avoid
- 	 * unnecessary serialization if multiple vCPUs are loading a new root.
- 	 * E.g. when bringing up secondary vCPUs, KVM will already have created
- 	 * a valid root on behalf of the primary vCPU.
- 	 */
- 	read_lock(&kvm->mmu_lock);
--	root = kvm_tdp_mmu_try_get_root(vcpu);
--	read_unlock(&kvm->mmu_lock);
- 
--	if (root)
--		goto out;
-+	for_each_valid_tdp_mmu_root_yield_safe(kvm, root, as_id) {
-+		if (root->role.word == role.word)
-+			goto out_read_unlock;
+-	if (is_tdp_mmu_page(sp))
++	if (is_tdp_mmu_page(sp)) {
++		lockdep_assert_held_read(&kvm->mmu_lock);
+ 		kvm_tdp_mmu_put_root(kvm, sp);
+-	else if (!--sp->root_count && sp->role.invalid)
+-		kvm_mmu_prepare_zap_page(kvm, sp, invalid_list);
++	} else {
++		lockdep_assert_held_write(&kvm->mmu_lock);
++		if (!--sp->root_count && sp->role.invalid)
++			kvm_mmu_prepare_zap_page(kvm, sp, invalid_list);
 +	}
+ 
+ 	*root_hpa = INVALID_PAGE;
+ }
+@@ -3587,6 +3591,7 @@ static void mmu_free_root_page(struct kvm *kvm, hpa_t *root_hpa,
+ void kvm_mmu_free_roots(struct kvm *kvm, struct kvm_mmu *mmu,
+ 			ulong roots_to_free)
+ {
++	bool is_tdp_mmu = tdp_mmu_enabled && mmu->root_role.direct;
+ 	int i;
+ 	LIST_HEAD(invalid_list);
+ 	bool free_active_root;
+@@ -3609,7 +3614,10 @@ void kvm_mmu_free_roots(struct kvm *kvm, struct kvm_mmu *mmu,
+ 			return;
+ 	}
  
 -	write_lock(&kvm->mmu_lock);
-+	spin_lock(&kvm->arch.tdp_mmu_pages_lock);
++	if (is_tdp_mmu)
++		read_lock(&kvm->mmu_lock);
++	else
++		write_lock(&kvm->mmu_lock);
  
- 	/*
--	 * Recheck for an existing root after acquiring mmu_lock for write.  It
--	 * is possible a new usable root was created between dropping mmu_lock
--	 * (for read) and acquiring it for write.
-+	 * Recheck for an existing root after acquiring the pages lock, another
-+	 * vCPU may have raced ahead and created a new usable root.  Manually
-+	 * walk the list of roots as the standard macros assume that the pages
-+	 * lock is *not* held.  WARN if grabbing a reference to a usable root
-+	 * fails, as the last reference to a root can only be put *after* the
-+	 * root has been invalidated, which requires holding mmu_lock for write.
- 	 */
--	root = kvm_tdp_mmu_try_get_root(vcpu);
--	if (root)
--		goto out_unlock;
-+	list_for_each_entry(root, &kvm->arch.tdp_mmu_roots, link) {
-+		if (root->role.word == role.word &&
-+		    !WARN_ON_ONCE(!kvm_tdp_mmu_get_root(root)))
-+			goto out_spin_unlock;
-+	}
+ 	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++)
+ 		if (roots_to_free & KVM_MMU_ROOT_PREVIOUS(i))
+@@ -3635,8 +3643,13 @@ void kvm_mmu_free_roots(struct kvm *kvm, struct kvm_mmu *mmu,
+ 		mmu->root.pgd = 0;
+ 	}
  
- 	root = tdp_mmu_alloc_sp(vcpu);
- 	tdp_mmu_init_sp(root, NULL, 0, role);
-@@ -280,14 +271,12 @@ int kvm_tdp_mmu_alloc_root(struct kvm_vcpu *vcpu)
- 	 * is ultimately put by kvm_tdp_mmu_zap_invalidated_roots().
- 	 */
- 	refcount_set(&root->tdp_mmu_root_count, 2);
--
--	spin_lock(&kvm->arch.tdp_mmu_pages_lock);
- 	list_add_rcu(&root->link, &kvm->arch.tdp_mmu_roots);
--	spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
- 
--out_unlock:
+-	kvm_mmu_commit_zap_page(kvm, &invalid_list);
 -	write_unlock(&kvm->mmu_lock);
--out:
-+out_spin_unlock:
-+	spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
-+out_read_unlock:
-+	read_unlock(&kvm->mmu_lock);
- 	/*
- 	 * Note, KVM_REQ_MMU_FREE_OBSOLETE_ROOTS will prevent entering the guest
- 	 * and actually consuming the root if it's invalidated after dropping
++	if (is_tdp_mmu) {
++		read_unlock(&kvm->mmu_lock);
++		WARN_ON_ONCE(!list_empty(&invalid_list));
++	} else {
++		kvm_mmu_commit_zap_page(kvm, &invalid_list);
++		write_unlock(&kvm->mmu_lock);
++	}
+ }
+ EXPORT_SYMBOL_GPL(kvm_mmu_free_roots);
+ 
 -- 
 2.43.0.275.g3460e3d667-goog
 
