@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-6036-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6037-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81E9482A5BE
-	for <lists+kvm@lfdr.de>; Thu, 11 Jan 2024 03:02:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 61D3682A5BF
+	for <lists+kvm@lfdr.de>; Thu, 11 Jan 2024 03:02:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32DF028B9D6
-	for <lists+kvm@lfdr.de>; Thu, 11 Jan 2024 02:02:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 129C628BA11
+	for <lists+kvm@lfdr.de>; Thu, 11 Jan 2024 02:02:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17BCF6D39;
-	Thu, 11 Jan 2024 02:01:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FDB4C8FD;
+	Thu, 11 Jan 2024 02:01:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EGCWAu/R"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KsyZc9+X"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB8024C70
-	for <kvm@vger.kernel.org>; Thu, 11 Jan 2024 02:01:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C6A763A9
+	for <kvm@vger.kernel.org>; Thu, 11 Jan 2024 02:01:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5f69158f32eso64427597b3.2
-        for <kvm@vger.kernel.org>; Wed, 10 Jan 2024 18:01:00 -0800 (PST)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-5cdacf76cb0so1499179a12.0
+        for <kvm@vger.kernel.org>; Wed, 10 Jan 2024 18:01:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704938460; x=1705543260; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1704938462; x=1705543262; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=rqBadYBCjb9CMnJD46FFXiqodKZoyoy85BjKjELucac=;
-        b=EGCWAu/RoLW5bBt2zCHMnoPeZXE+ZUo7T4XO7g9D9PzcGx42PlKKRO3zAc2XgsgXG0
-         4YlVgaWoyOOxieQoHrof0fLfqTUh1+DkbELePUrShMEh2nrpDsJ8CFTrOAS9i65K6kQZ
-         st9peNN9CWJd2Mi1LoDjRn2t+dVG6l3yqyZZVhkkR0z4+EItI1V3YBlrGM1MB3grPDCC
-         2xMi8RsIOPLD7YBkBE8BUQEG2sWN5cyHrINhFNnWo+k5IuP5imfjRYHcL1WT5/ASp/uj
-         RQYNQgbFFpUpctcDDcSwRPnscYuWB/+NXZfsWr/K20sGxKFgWeDr6nH8YhXO8TSCMr9p
-         fpjQ==
+        bh=MERWwVvejuOoLKFvXvHDQW4SBfvZPExzmuJgrpmkPtA=;
+        b=KsyZc9+X753QEbMYIxIFHgh2aSpt1CIkEbAzz4Gc+jChvwQU96S3a9W6Enby7BQD/z
+         BaqVCAGI9HujSMaaKdCbJTFetadmlmI+M20+kqOquSeFibmGd3qqvk7/dPMU4Rry+1X9
+         6gsfoBc1TZlboafJSMMWgiwh76fB4hU94l36MRUeD7sZJd5z4yCNKDcEYOpzK4xapGYg
+         ABTaIQ8eX3WRMDbEAiJPNoJaUW/sLIUb1YBUbMLQpFGPtF5owgev6/JVBhRo2fS2opJ9
+         AysvSTtSGsuAHM9HXt9LkbcRmk5JufHD/zTto1KxysEIe8jxQcOfUhP7Dp7/uw/O4Y0W
+         rSKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704938460; x=1705543260;
+        d=1e100.net; s=20230601; t=1704938462; x=1705543262;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=rqBadYBCjb9CMnJD46FFXiqodKZoyoy85BjKjELucac=;
-        b=ny7PhsHJnGWhQAaq4fMNeie//KJTNk+Gbwe1V2sN0Nv7iUkTz50y9GfcyJomUEM0De
-         TKGrZOvNUvFuNpG+wiEQn/fhQuQSAWYmjCIPyUH8zZW+qck9wc1WroIggAj3CJYzsThj
-         uGvx1WwbyaPTJ9I4d/iuIDrw6su6XGVLayZ/+wm7b82lajaeJzAp4YvH5zqwWY79orfu
-         UTubkKK3hAthYS9h0NZrD2DtijiQKfoKHEOTGlzzAluTqmtsDCsZ5bpNgIHP35Ej2IcM
-         W4mmgPqx4y3o8l/55GmQmSIM33FLuI//yFI+dRPOpENzDm1vq7BJvH4LJEm2pYMYHfFE
-         WTmA==
-X-Gm-Message-State: AOJu0Yz1VrhK4oliuDSTaFASTx9aI6YtHGHR9+Acmeq51XI04KHaqOVK
-	jMwx0PGpKfMD9iQFQ6ptPXfJaHm4Q9Io249DKA==
-X-Google-Smtp-Source: AGHT+IHfVtQseKKaCaqrvm06WnOcOa35Fgo35eG5hbD17jp+kZ/ViXCrRFzICGPMEErgkHJRcVy+SZx9Mgc=
+        bh=MERWwVvejuOoLKFvXvHDQW4SBfvZPExzmuJgrpmkPtA=;
+        b=Pkjk1EYOACn7uUUhlPXd5I5QjR36Lfe9aF24NzF+cpIgQaIk7QruKJDGa8pDJzGlZD
+         8usp9xvAsQOfooCfA1J4fuVQ2yBQpxhojxF/KPPZbhVEvLPQJpICwxGFBiCJAyJiH6wX
+         OiNXfVk6TLBZDkZ39IOkKxObu6X4KCcH5S3PeHSFvpC/+UYnczvOEv31UA9XWXvlC1BI
+         OBc0WTFMa9josVFXXuoVEwuPs1wQPzoaHApV0QT+ahGBBckCjBzNAqJ240pHYejgfMZ5
+         RPXoiqg0pw9qSg3Qn1hlEeV/SAAGolBMN1ndHh7LbsvD1uBGUIT0m6KShdfcTlBvExuo
+         O9xQ==
+X-Gm-Message-State: AOJu0YyQPvpm1ZpRlHtS4Sy+a+BZ5ZA6AYRdSGR7i5DJShGp9bUcyEzB
+	Th1lryejluPK7i3oU5S6o+sMXqgecvpXYZBciQ==
+X-Google-Smtp-Source: AGHT+IEOXGSNva7+1Hjq8n3roSHCuS96MuRgZ5O0CIDTBvuo6MOx+0GOvFC6l2NkE5Z2+nycZJZ4g32dEtU=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a0d:fac4:0:b0:5f9:7737:d9a8 with SMTP id
- k187-20020a0dfac4000000b005f97737d9a8mr228905ywf.7.1704938460020; Wed, 10 Jan
- 2024 18:01:00 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:902:f68f:b0:1d4:c27a:db7d with SMTP id
+ l15-20020a170902f68f00b001d4c27adb7dmr2556plg.0.1704938461751; Wed, 10 Jan
+ 2024 18:01:01 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 10 Jan 2024 18:00:44 -0800
+Date: Wed, 10 Jan 2024 18:00:45 -0800
 In-Reply-To: <20240111020048.844847-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -65,52 +65,95 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240111020048.844847-1-seanjc@google.com>
 X-Mailer: git-send-email 2.43.0.275.g3460e3d667-goog
-Message-ID: <20240111020048.844847-5-seanjc@google.com>
-Subject: [PATCH 4/8] KVM: x86/mmu: Skip invalid roots when zapping leaf SPTEs
- for GFN range
+Message-ID: <20240111020048.844847-6-seanjc@google.com>
+Subject: [PATCH 5/8] KVM: x86/mmu: Skip invalid TDP MMU roots when
+ write-protecting SPTEs
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	David Matlack <dmatlack@google.com>, Pattara Teerapong <pteerapong@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-When zapping a GFN in response to an APICv or MTRR change, don't zap SPTEs
-for invalid roots as KVM only needs to ensure the guest can't use stale
-mappings for the GFN.  Unlike kvm_tdp_mmu_unmap_gfn_range(), which must
-zap "unreachable" SPTEs to ensure KVM doesn't mark a page accessed/dirty,
-kvm_tdp_mmu_zap_leafs() isn't used (and isn't intended to be used) to
-handle freeing of host memory.
+When write-protecting SPTEs, don't process invalid roots as invalid roots
+are unreachable, i.e. can't be used to access guest memory and thus don't
+need to be write-protected.
+
+Note, this is *almost* a nop for kvm_tdp_mmu_clear_dirty_pt_masked(),
+which is called under slots_lock, i.e. is mutually exclusive with
+kvm_mmu_zap_all_fast().  But it's possible for something other than the
+"fast zap" thread to grab a reference to an invalid root and thus keep a
+root alive (but completely empty) after kvm_mmu_zap_all_fast() completes.
+
+The kvm_tdp_mmu_write_protect_gfn() case is more interesting as KVM write-
+protects SPTEs for reasons other than dirty logging, e.g. if a KVM creates
+a SPTE for a nested VM while a fast zap is in-progress.
+
+Add another TDP MMU iterator to visit only valid roots, and
+opportunistically convert kvm_tdp_mmu_get_vcpu_root_hpa() to said iterator.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/tdp_mmu.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ arch/x86/kvm/mmu/tdp_mmu.c | 22 +++++++++++++---------
+ 1 file changed, 13 insertions(+), 9 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 60fff2aad59e..1a9c16e5c287 100644
+index 1a9c16e5c287..e0a8343f66dc 100644
 --- a/arch/x86/kvm/mmu/tdp_mmu.c
 +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -830,16 +830,16 @@ static bool tdp_mmu_zap_leafs(struct kvm *kvm, struct kvm_mmu_page *root,
- }
- 
- /*
-- * Zap leaf SPTEs for the range of gfns, [start, end), for all roots. Returns
-- * true if a TLB flush is needed before releasing the MMU lock, i.e. if one or
-- * more SPTEs were zapped since the MMU lock was last acquired.
-+ * Zap leaf SPTEs for the range of gfns, [start, end), for all *VALID** roots.
-+ * Returns true if a TLB flush is needed before releasing the MMU lock, i.e. if
-+ * one or more SPTEs were zapped since the MMU lock was last acquired.
+@@ -171,12 +171,19 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
+  * Holding mmu_lock for write obviates the need for RCU protection as the list
+  * is guaranteed to be stable.
   */
- bool kvm_tdp_mmu_zap_leafs(struct kvm *kvm, gfn_t start, gfn_t end, bool flush)
+-#define for_each_tdp_mmu_root(_kvm, _root, _as_id)				\
++#define __for_each_tdp_mmu_root(_kvm, _root, _as_id, _only_valid)		\
+ 	list_for_each_entry(_root, &_kvm->arch.tdp_mmu_roots, link)		\
+ 		if (kvm_lockdep_assert_mmu_lock_held(_kvm, false) &&		\
+-		    _as_id >= 0 && kvm_mmu_page_as_id(_root) != _as_id) {	\
++		    ((_as_id >= 0 && kvm_mmu_page_as_id(_root) != _as_id) ||	\
++		     ((_only_valid) && (_root)->role.invalid))) {		\
+ 		} else
+ 
++#define for_each_tdp_mmu_root(_kvm, _root, _as_id)			\
++	__for_each_tdp_mmu_root(_kvm, _root, _as_id, false)
++
++#define for_each_valid_tdp_mmu_root(_kvm, _root, _as_id)		\
++	__for_each_tdp_mmu_root(_kvm, _root, _as_id, true)
++
+ static struct kvm_mmu_page *tdp_mmu_alloc_sp(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_mmu_page *sp;
+@@ -224,11 +231,8 @@ hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
+ 
+ 	lockdep_assert_held_write(&kvm->mmu_lock);
+ 
+-	/*
+-	 * Check for an existing root before allocating a new one.  Note, the
+-	 * role check prevents consuming an invalid root.
+-	 */
+-	for_each_tdp_mmu_root(kvm, root, kvm_mmu_role_as_id(role)) {
++	/* Check for an existing root before allocating a new one. */
++	for_each_valid_tdp_mmu_root(kvm, root, kvm_mmu_role_as_id(role)) {
+ 		if (root->role.word == role.word &&
+ 		    kvm_tdp_mmu_get_root(root))
+ 			goto out;
+@@ -1639,7 +1643,7 @@ void kvm_tdp_mmu_clear_dirty_pt_masked(struct kvm *kvm,
  {
  	struct kvm_mmu_page *root;
  
- 	lockdep_assert_held_write(&kvm->mmu_lock);
--	for_each_tdp_mmu_root_yield_safe(kvm, root)
-+	for_each_valid_tdp_mmu_root_yield_safe(kvm, root, -1)
- 		flush = tdp_mmu_zap_leafs(kvm, root, start, end, true, flush);
+-	for_each_tdp_mmu_root(kvm, root, slot->as_id)
++	for_each_valid_tdp_mmu_root(kvm, root, slot->as_id)
+ 		clear_dirty_pt_masked(kvm, root, gfn, mask, wrprot);
+ }
  
- 	return flush;
+@@ -1757,7 +1761,7 @@ bool kvm_tdp_mmu_write_protect_gfn(struct kvm *kvm,
+ 	bool spte_set = false;
+ 
+ 	lockdep_assert_held_write(&kvm->mmu_lock);
+-	for_each_tdp_mmu_root(kvm, root, slot->as_id)
++	for_each_valid_tdp_mmu_root(kvm, root, slot->as_id)
+ 		spte_set |= write_protect_gfn(kvm, root, gfn, min_level);
+ 
+ 	return spte_set;
 -- 
 2.43.0.275.g3460e3d667-goog
 
