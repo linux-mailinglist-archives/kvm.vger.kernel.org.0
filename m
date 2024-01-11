@@ -1,146 +1,135 @@
-Return-Path: <kvm+bounces-6029-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6030-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E243182A554
-	for <lists+kvm@lfdr.de>; Thu, 11 Jan 2024 01:46:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1364D82A56C
+	for <lists+kvm@lfdr.de>; Thu, 11 Jan 2024 01:53:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 90C43289B7D
-	for <lists+kvm@lfdr.de>; Thu, 11 Jan 2024 00:46:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C66E1C22FD6
+	for <lists+kvm@lfdr.de>; Thu, 11 Jan 2024 00:53:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78641ECD;
-	Thu, 11 Jan 2024 00:46:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CAE2A3C;
+	Thu, 11 Jan 2024 00:53:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="iLYMN66F"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="kzsProZ9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2048.outbound.protection.outlook.com [40.107.94.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 291A038F
-	for <kvm@vger.kernel.org>; Thu, 11 Jan 2024 00:46:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6daa822be30so2220176b3a.0
-        for <kvm@vger.kernel.org>; Wed, 10 Jan 2024 16:46:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1704933967; x=1705538767; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gueNhZrbsNiJzCN2gb4yLrjECQBWf6cwwXnoTcfXIT4=;
-        b=iLYMN66FKBdyLftqxvShVV6YPPjxaiH0A4bEAzAFXUh07Rtw7cg392gFExYv4aTjPp
-         8ZhTs0xsPpn6Xt3z7ZSCx9+l33aZXrNwfon+LzcPDHf5jEjnvZK8v7t2AiI8yLH+ugI3
-         SAixjT3vhp/BZBahYdq2dQahnHiGSuF9qMJow=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704933967; x=1705538767;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gueNhZrbsNiJzCN2gb4yLrjECQBWf6cwwXnoTcfXIT4=;
-        b=nKl2Z4dD1MRmk7XRrUd5XskscFPYVUuwWN8RzhIozvuSrly7z4Mt80sYA4nf+Hd6il
-         pPM+d9URwNCL16DJ6eMPP9MFQMC3gx//Cz5YUvbjAk87y51WeLdE/YeFE1+AN0pshg76
-         Of2ZFnVqDNyd/WfSvM/9eUidKKw1gGRSxp1XXmwOOx796+pOCifhMl9ZHhMJDJ7NsQEn
-         Yga20XdXUvXLFPcSZXGeUQUgeMMWyzW21WlubiGaNpBmikHObC02ixZCFxBfrDH1ObTp
-         1NcYIc3oyj7SDYCD4mJI7gwJp5F+Q1q0FUnjHegjNIV9bFIPoayWA4lCojABmbBaW5qY
-         Mp4w==
-X-Gm-Message-State: AOJu0YxKnljIsKElkFq/P3H+ze8MNIVSDzNpJaPyVDBU4tJQojoOM7lS
-	DxNMTHN5y2A8V632h7LWirHSOXu2YTFt
-X-Google-Smtp-Source: AGHT+IGkiZ1hknB2+0UC/gxIH8jrVZxWAA/1vUWxP929828CA6Qm4M9e8Oxn46aJ8qOxkFFVf4GTPg==
-X-Received: by 2002:aa7:90d3:0:b0:6d9:a64c:c5d1 with SMTP id k19-20020aa790d3000000b006d9a64cc5d1mr504196pfk.26.1704933967538;
-        Wed, 10 Jan 2024 16:46:07 -0800 (PST)
-Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id y2-20020a62b502000000b006dac91d6da5sm4071344pfe.68.2024.01.10.16.46.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Jan 2024 16:46:06 -0800 (PST)
-Date: Wed, 10 Jan 2024 16:46:06 -0800
-From: Kees Cook <keescook@chromium.org>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: akpm@linux-foundation.org, llvm@lists.linux.dev,
-	patches@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	kvm@vger.kernel.org, linux-riscv@lists.infradead.org,
-	linux-trace-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-	linux-pm@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-efi@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-	dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
-	linux-arch@vger.kernel.org, kasan-dev@googlegroups.com,
-	linux-mm@kvack.org, bridge@lists.linux.dev, netdev@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, ast@kernel.org,
-	daniel@iogearbox.net, andrii@kernel.org, mykolal@fb.com,
-	bpf@vger.kernel.org
-Subject: Re: [PATCH 0/3] Update LLVM Phabricator and Bugzilla links
-Message-ID: <202401101645.ED161519BA@keescook>
-References: <20240109-update-llvm-links-v1-0-eb09b59db071@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5CCC38F;
+	Thu, 11 Jan 2024 00:53:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DjmRCLUHVNu7RwBzqJwsTU4e09FmZPjX6kbyIDEoq5fNc6aZRgo2p6skr8/lIDSOlekJwb5S5zbEHwjl6mXOYOILILd/rzftM0NUlIn5X18mxUfiMfUP0T0pM46xDajIQ56MFlvJ83pLJZPBpavfy8rnM9PPtuI0tVxPwr6MCiCaWmmpv9dvYUpf4gXgWKy/+JaMKxYhblR5cNIxQkwkfBpYM3ymF04vWx2lmQao1WZALE+mKxfKOazkPbuiwBSfBekJ4+zfQpdBnM3Z79brNHSrwYeJ4wMmuLT3znwFvS1GErwmPrBeu1n1RtL3gYVdfNGzeCc0NgCRtjyECnQ1SA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LiNlmQy+50+ICzRXNELbWcAURNWZ1VKkvoXSysP8eOU=;
+ b=PM2bJY9U6Slth2rEhy4MmAQWchqysF7cywXHt5U0qpF+LukADVzo5fTqWzNm9y0u4fZ7cE3GsMz7EGn6GMjt1ElPFPr99i668QdBmfbvY707aiphD42GBnFEALdj5sIbr1cfunorS4nQJcg1Oyeaes3FERpRXVLdHWPN9+987dqa8+lT4AoiJWzXc0wb3y/uCxYkdlGac+dSnCAQy2yva8iJETCb3beG94lH0JTXToECYqhZ/OBZU828Il/bdSz/8Q6VkXXh1JJ9YeGQjKhUx64/9nRbPvLnXvS7T4zIaq4NhO85W+Mivuj+uDaTDLwf7SMIeOsnCcTnDfMbSNZa3A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LiNlmQy+50+ICzRXNELbWcAURNWZ1VKkvoXSysP8eOU=;
+ b=kzsProZ9u1w0PHXS19stiCKoOw2khbS/+EWZGnNJ74oMK6bfk0g4M2/vTbK3vopo72IIYxKj92SPvTkaYOY8Vs31+b+v7UaAVe8wd7QNdSHY0owbKVJknrWsLi8N/9jXiqNTYB2lpomSFCbgjOoBfwbTe1Py1CCDigUYKz94VHo=
+Received: from CY8PR11CA0008.namprd11.prod.outlook.com (2603:10b6:930:48::20)
+ by SA3PR12MB7878.namprd12.prod.outlook.com (2603:10b6:806:31e::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.23; Thu, 11 Jan
+ 2024 00:53:31 +0000
+Received: from CY4PEPF0000E9D9.namprd05.prod.outlook.com
+ (2603:10b6:930:48:cafe::5c) by CY8PR11CA0008.outlook.office365.com
+ (2603:10b6:930:48::20) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7181.18 via Frontend
+ Transport; Thu, 11 Jan 2024 00:53:31 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CY4PEPF0000E9D9.mail.protection.outlook.com (10.167.241.77) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7181.14 via Frontend Transport; Thu, 11 Jan 2024 00:53:31 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Wed, 10 Jan
+ 2024 18:53:30 -0600
+Date: Wed, 10 Jan 2024 18:50:03 -0600
+From: Michael Roth <michael.roth@amd.com>
+To: Sean Christopherson <seanjc@google.com>
+CC: <x86@kernel.org>, <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
+	<linux-mm@kvack.org>, <linux-crypto@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
+	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
+	<ardb@kernel.org>, <pbonzini@redhat.com>, <vkuznets@redhat.com>,
+	<jmattson@google.com>, <luto@kernel.org>, <dave.hansen@linux.intel.com>,
+	<slp@redhat.com>, <pgonda@google.com>, <peterz@infradead.org>,
+	<srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
+	<tobin@ibm.com>, <bp@alien8.de>, <vbabka@suse.cz>, <kirill@shutemov.name>,
+	<ak@linux.intel.com>, <tony.luck@intel.com>,
+	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
+	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
+	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>,
+	Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH v1 20/26] crypto: ccp: Add debug support for decrypting
+ pages
+Message-ID: <20240111005003.7mq74gfabis2ssjq@amd.com>
+References: <20231230161954.569267-1-michael.roth@amd.com>
+ <20231230161954.569267-21-michael.roth@amd.com>
+ <ZZ6w7A8SYz3_VT3u@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20240109-update-llvm-links-v1-0-eb09b59db071@kernel.org>
+In-Reply-To: <ZZ6w7A8SYz3_VT3u@google.com>
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D9:EE_|SA3PR12MB7878:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2111ca72-f091-44f4-9343-08dc123fbb45
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	1XNNrkgYVTMoEIHMCx8fw+j4I3jAL6KZMddHOjN6DjweQFTIM3XuMC+0+eV3xQRuSUlT+XTznzdnwsklk2a26bAm55eYs56L8ScXB+VOAtdUEJ6L/ALAKwREURRcTJiSmE4RBdOT489zHub5T8R85DuPokoJtb4hL/fuiq/8cmRc07skmDKm/tPcEGPLGHwFE2wo5k8kXTKoz65YDF3Iw/oQ2Gc24e4k0K4htP975CzowYyDqvfmBmYD/K2iqEMebJ2Viq6IYUmJj+Jnew/NHiVBGmI8zBiy1AOCz4ihvZ0Yfx6EI6uYp+dNa5keAC/KC2D5a7l23pSvP7XopVaLsfsQ9e1JGv4QC0YIqfS38RL+2agLP32w2uFiwtkg+VhzcJ+fzmSdUK+CoJpyeRWS6QI7ITrnEkk0A4FU+RAoMUyGjWvpU33s5OQN0MdF6uf0aC90AzfzRf3xU1Cpb8tA8n7VjDLBc7z7tz3un+i5zDB2YI2EnWP1gEVD3UgnNCLqlgbaZCvn5N+AUu6kUr6FWClXd/ikyqzL1e+nXVBJyz1Q+BRasEwC/Ls2jk7IjOoXmAU/Re6TrZqhUsK1tQ1+meEzdhD/Jo8rwUCXGRH+wjWgWxolTzDjhmCIAq9D4peOoXNQKDfTeyIBdJQ91TQ7A/zdVEqkLb+UUKD70O+ySClfBTr7a0PAHNIEx0s5JqzqzZn9fosVxprkjyjXgvDO8cHqGpGrFxovjrkpYBzUYXtAuXVHLYwvUdQeMrafQvE28LY5Gq4Ejx5COYuueCtvrQ==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(346002)(376002)(396003)(39860400002)(136003)(230922051799003)(64100799003)(186009)(1800799012)(451199024)(82310400011)(46966006)(36840700001)(40470700004)(40480700001)(40460700003)(41300700001)(82740400003)(70206006)(70586007)(356005)(81166007)(86362001)(316002)(36756003)(36860700001)(16526019)(47076005)(426003)(1076003)(336012)(26005)(2616005)(6916009)(6666004)(478600001)(2906002)(8676002)(5660300002)(54906003)(4326008)(8936002)(4744005)(7416002)(44832011)(7406005)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jan 2024 00:53:31.2969
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2111ca72-f091-44f4-9343-08dc123fbb45
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000E9D9.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB7878
 
-On Tue, Jan 09, 2024 at 03:16:28PM -0700, Nathan Chancellor wrote:
-> This series updates all instances of LLVM Phabricator and Bugzilla links
-> to point to GitHub commits directly and LLVM's Bugzilla to GitHub issue
-> shortlinks respectively.
+On Wed, Jan 10, 2024 at 06:59:56AM -0800, Sean Christopherson wrote:
+> On Sat, Dec 30, 2023, Michael Roth wrote:
+> > From: Brijesh Singh <brijesh.singh@amd.com>
+> > 
+> > Add support to decrypt guest encrypted memory. These API interfaces can
+> > be used for example to dump VMCBs on SNP guest exit.
 > 
-> I split up the Phabricator patch into BPF selftests and the rest of the
-> kernel in case the BPF folks want to take it separately from the rest of
-> the series, there are obviously no dependency issues in that case. The
-> Bugzilla change was mechanical enough and should have no conflicts.
-> 
-> I am aiming this at Andrew and CC'ing other lists, in case maintainers
-> want to chime in, but I think this is pretty uncontroversial (famous
-> last words...).
-> 
-> ---
-> Nathan Chancellor (3):
->       selftests/bpf: Update LLVM Phabricator links
->       arch and include: Update LLVM Phabricator links
->       treewide: Update LLVM Bugzilla links
-> 
->  arch/arm64/Kconfig                                 |  4 +--
->  arch/powerpc/Makefile                              |  4 +--
->  arch/powerpc/kvm/book3s_hv_nested.c                |  2 +-
->  arch/riscv/Kconfig                                 |  2 +-
->  arch/riscv/include/asm/ftrace.h                    |  2 +-
->  arch/s390/include/asm/ftrace.h                     |  2 +-
->  arch/x86/power/Makefile                            |  2 +-
->  crypto/blake2b_generic.c                           |  2 +-
->  drivers/firmware/efi/libstub/Makefile              |  2 +-
->  drivers/gpu/drm/amd/amdgpu/sdma_v4_4_2.c           |  2 +-
->  drivers/media/test-drivers/vicodec/codec-fwht.c    |  2 +-
->  drivers/regulator/Kconfig                          |  2 +-
->  include/asm-generic/vmlinux.lds.h                  |  2 +-
->  include/linux/compiler-clang.h                     |  2 +-
->  lib/Kconfig.kasan                                  |  2 +-
->  lib/raid6/Makefile                                 |  2 +-
->  lib/stackinit_kunit.c                              |  2 +-
->  mm/slab_common.c                                   |  2 +-
->  net/bridge/br_multicast.c                          |  2 +-
->  security/Kconfig                                   |  2 +-
->  tools/testing/selftests/bpf/README.rst             | 32 +++++++++++-----------
->  tools/testing/selftests/bpf/prog_tests/xdpwall.c   |  2 +-
->  .../selftests/bpf/progs/test_core_reloc_type_id.c  |  2 +-
->  23 files changed, 40 insertions(+), 40 deletions(-)
-> ---
-> base-commit: 0dd3ee31125508cd67f7e7172247f05b7fd1753a
-> change-id: 20240109-update-llvm-links-d03f9d649e1e
-> 
-> Best regards,
-> -- 
-> Nathan Chancellor <nathan@kernel.org>
-> 
+> By who?  Nothing in this series, or the KVM series, ever invokes
+> snp_guest_dbg_decrypt_page().
 
-Excellent! Thanks for doing this. I spot checked a handful I was
-familiar with and everything looks good to me.
+There's a VMSA dump patch we've been using internally, but yah, this should
+be dropped from the series until that patch is actually submitted upstream.
 
-Reviewed-by: Kees Cook <keescook@chromium.org>
-
--- 
-Kees Cook
+-Mike
 
