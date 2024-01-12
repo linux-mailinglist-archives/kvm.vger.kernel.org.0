@@ -1,204 +1,138 @@
-Return-Path: <kvm+bounces-6115-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6116-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0124282B80C
-	for <lists+kvm@lfdr.de>; Fri, 12 Jan 2024 00:29:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECFAC82B864
+	for <lists+kvm@lfdr.de>; Fri, 12 Jan 2024 01:02:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6B07A1F264C2
-	for <lists+kvm@lfdr.de>; Thu, 11 Jan 2024 23:29:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 010551C234DB
+	for <lists+kvm@lfdr.de>; Fri, 12 Jan 2024 00:02:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0F955A0E8;
-	Thu, 11 Jan 2024 23:29:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAE24EC6;
+	Fri, 12 Jan 2024 00:02:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PxjappVJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iNitxEDG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A38465A0E1
-	for <kvm@vger.kernel.org>; Thu, 11 Jan 2024 23:29:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-dae7cc31151so4694943276.3
-        for <kvm@vger.kernel.org>; Thu, 11 Jan 2024 15:29:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705015783; x=1705620583; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=du1IavJIWBdDP20xh4ONlQiRPjaJ1D2XqOF3jy6wAQc=;
-        b=PxjappVJG3nTn0E8uB9l+dJQdL21JAgqlRGH75DvquWDqr8DG/mYkHNjRTGO3lWB4m
-         UUhs9cAzZ/sbh0VPnCObjj2rspevRwNal/947ykqUiPvem42LiA/ptiuOk6phcPKNb7K
-         M7LOucuKVNJHv13ptfPOtzthSvsAzCbuYK2GE2E/4Mih2JaxUr4AH/p4hXHulBGgMKeh
-         3S4oHhMrzl6KUIvfDu6cry0inyycz/ehml5I3YrmSD8zfyGrm15A2CjoACF6DtxNCz8G
-         6UaFp5D7h8sGJ9LhePacGIv1B/xUNyHlNDctOvL2CWcy0m4Nlt9iBED/K4ODDEsflnxp
-         D85Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705015783; x=1705620583;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=du1IavJIWBdDP20xh4ONlQiRPjaJ1D2XqOF3jy6wAQc=;
-        b=gAFVZOh28OVNqXM12vpI0pQ4Zgzb3mnN5XFg0ewwN5G4I/8dAxJaxUzKUL/3sK1qf1
-         IEuQigzU5eLtMxnidryOYXRhtL30S7Qc29MekWLYXFHpcFvOVpik52W0Fv1mUIusWtRu
-         2rrPkaxaHvFvL0ivgMeHOcr4NVFfBnRjIKBI8beQ7Fl7PiPZqRXtzg9BwZfz6M2xA0Ja
-         sMOTPLDixsGyQTBEfF1kjP74S8WcXRazvqqBhYse7nKkgd2IgxYygpXkzO9Fi1F0nx3I
-         NmRBalbrs+BvLNV+aMVOXLGgNz+RsKiP48zr0wIppachaphyFuYg2fPVnRlHtxLqfAAl
-         UZbw==
-X-Gm-Message-State: AOJu0YzKv1vU3iVR6qZ1h3xdg2NnKVBRIXxeGC2VS1k0ULS2xMVFosoN
-	DuyXiQ0LIZrQJH/Nr4rlAXYP5yg7iCM2dXQ9n/0=
-X-Google-Smtp-Source: AGHT+IHBbOhzbyunGMknfXiMMQitbHDlBWritE8c6YY3dLnEUY/sdXf9eyO4l64E/4J5cTd0z270xybVnE8JxuI3mU4=
-X-Received: by 2002:a25:dccf:0:b0:dbc:b48e:6426 with SMTP id
- y198-20020a25dccf000000b00dbcb48e6426mr2837ybe.110.1705015783478; Thu, 11 Jan
- 2024 15:29:43 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D76563F;
+	Fri, 12 Jan 2024 00:02:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1705017739; x=1736553739;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Idr2q7bMY9FM4vtt/eAt2b8/L8zbVhXJW9vHdLjzwjI=;
+  b=iNitxEDGNKPLShmRY0MUu1XMoIv/ZOF4oIszuMV3lhg3XZ3NwWwtUXtr
+   ZQ299ASUoZMbHriYGnAY3s9k+/qJpnUPSVrj5hCQpo/vybWAUxGSF5lDD
+   PHXXgKhdgfJkn6GRI/c8n5BIHnBKsT4Ar2tBuZoSygo6o7nj3kYyuzN/s
+   LBRahpFHH9V6jD5Bhap1PCUWD/GwAzjMhZ4TFf9s+Kf8EjlR+sDNS7qtp
+   FGwvMJMTjh2OmIKPANYQoAF6Zecyn0YykXoT09w6gVdTloEJbeUttNCxr
+   RfHqCc7VgdgH7HBu6f7D3um7DLfUzShp+Oi2N7L5NstYV4LX1s5N2mUjj
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10950"; a="6399394"
+X-IronPort-AV: E=Sophos;i="6.04,187,1695711600"; 
+   d="scan'208";a="6399394"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2024 16:02:18 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10950"; a="1029737238"
+X-IronPort-AV: E=Sophos;i="6.04,187,1695711600"; 
+   d="scan'208";a="1029737238"
+Received: from tungyenc-mobl.amr.corp.intel.com (HELO desk) ([10.209.69.66])
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2024 16:02:15 -0800
+Date: Thu, 11 Jan 2024 16:02:06 -0800
+From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Andy Lutomirski <luto@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Paolo Bonzini <pbonzini@redhat.com>, tony.luck@intel.com,
+	ak@linux.intel.com, tim.c.chen@linux.intel.com,
+	Andrew Cooper <andrew.cooper3@citrix.com>,
+	Nikolay Borisov <nik.borisov@suse.com>,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	kvm@vger.kernel.org,
+	Alyssa Milburn <alyssa.milburn@linux.intel.com>,
+	Daniel Sneddon <daniel.sneddon@linux.intel.com>,
+	antonio.gomez.iglesias@linux.intel.com
+Subject: Re: [PATCH  v5 6/6] KVM: VMX: Move VERW closer to VMentry for MDS
+ mitigation
+Message-ID: <20240112000206.ur5ub5bf5noesvc3@desk>
+References: <20240111-delay-verw-v5-0-a3b234933ea6@linux.intel.com>
+ <20240111-delay-verw-v5-6-a3b234933ea6@linux.intel.com>
+ <ZaAbGWFEfUt1PX66@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240103173349.398526-1-alex.bennee@linaro.org> <20240103173349.398526-26-alex.bennee@linaro.org>
-In-Reply-To: <20240103173349.398526-26-alex.bennee@linaro.org>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 12 Jan 2024 09:29:17 +1000
-Message-ID: <CAKmqyKMLTLw37HzHhEdmQdd+WRYs603jm7w30k5HLNmZNYGacA@mail.gmail.com>
-Subject: Re: [PATCH v2 25/43] target/riscv: Validate misa_mxl_max only once
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, 
-	Richard Henderson <richard.henderson@linaro.org>, Song Gao <gaosong@loongson.cn>, 
-	=?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, 
-	David Hildenbrand <david@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, 
-	Yoshinori Sato <ysato@users.sourceforge.jp>, Yanan Wang <wangyanan55@huawei.com>, 
-	Bin Meng <bin.meng@windriver.com>, Laurent Vivier <lvivier@redhat.com>, 
-	Michael Rolnik <mrolnik@gmail.com>, Alexandre Iooss <erdnaxe@crans.org>, 
-	David Woodhouse <dwmw2@infradead.org>, Laurent Vivier <laurent@vivier.eu>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Brian Cain <bcain@quicinc.com>, 
-	Daniel Henrique Barboza <danielhb413@gmail.com>, Beraldo Leal <bleal@redhat.com>, Paul Durrant <paul@xen.org>, 
-	Mahmoud Mandour <ma.mandourr@gmail.com>, Thomas Huth <thuth@redhat.com>, 
-	Liu Zhiwei <zhiwei_liu@linux.alibaba.com>, Cleber Rosa <crosa@redhat.com>, kvm@vger.kernel.org, 
-	Peter Maydell <peter.maydell@linaro.org>, 
-	Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-arm@nongnu.org, Weiwei Li <liwei1518@gmail.com>, 
-	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>, 
-	John Snow <jsnow@redhat.com>, Daniel Henrique Barboza <dbarboza@ventanamicro.com>, 
-	Nicholas Piggin <npiggin@gmail.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Ilya Leoshkevich <iii@linux.ibm.com>, 
-	=?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, 
-	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Eduardo Habkost <eduardo@habkost.net>, 
-	Pierrick Bouvier <pierrick.bouvier@linaro.org>, qemu-riscv@nongnu.org, 
-	Alistair Francis <alistair.francis@wdc.com>, Akihiko Odaki <akihiko.odaki@daynix.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZaAbGWFEfUt1PX66@google.com>
 
-On Thu, Jan 4, 2024 at 5:04=E2=80=AFAM Alex Benn=C3=A9e <alex.bennee@linaro=
-.org> wrote:
->
-> From: Akihiko Odaki <akihiko.odaki@daynix.com>
->
-> misa_mxl_max is now a class member and initialized only once for each
-> class. This also moves the initialization of gdb_core_xml_file which
-> will be referenced before realization in the future.
->
-> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-> Message-Id: <20231213-riscv-v7-4-a760156a337f@daynix.com>
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+On Thu, Jan 11, 2024 at 08:45:13AM -0800, Sean Christopherson wrote:
+> On Thu, Jan 11, 2024, Pawan Gupta wrote:
+> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > index bdcf2c041e0c..8defba8e417b 100644
+> > --- a/arch/x86/kvm/vmx/vmx.c
+> > +++ b/arch/x86/kvm/vmx/vmx.c
+> > @@ -387,6 +387,17 @@ static __always_inline void vmx_enable_fb_clear(struct vcpu_vmx *vmx)
+> >  
+> >  static void vmx_update_fb_clear_dis(struct kvm_vcpu *vcpu, struct vcpu_vmx *vmx)
+> >  {
+> > +	/*
+> > +	 * FB_CLEAR_CTRL is to optimize VERW latency in guests when host is
+> > +	 * affected by MMIO Stale Data, but not by MDS/TAA. When
+> > +	 * X86_FEATURE_CLEAR_CPU_BUF is enabled, system is likely affected by
+> > +	 * MDS/TAA. Skip the optimization for such a case.
+> 
+> This is unnecessary speculation (ha!), and it'll also be confusing for many readers
+> as the code below explicitly checks for MDS/TAA.  We have no idea why the host
+> admin forced the mitigation to be enabled, and it doesn't matter.  The important
+> thing to capture is that the intent is to keep the mitigation enabled when it
+> was forcefully enabled, that should be self-explanatory and doesn't require
+> speculating on _why_ the mitigation was forced on.
 
-Acked-by: Alistair Francis <alistair.francis@wdc.com>
+Agree.
 
-Alistair
+> > +	 */
+> > +	if (cpu_feature_enabled(X86_FEATURE_CLEAR_CPU_BUF)) {
+> > +		vmx->disable_fb_clear = false;
+> > +		return;
+> > +	}
+> > +
+> >  	vmx->disable_fb_clear = (host_arch_capabilities & ARCH_CAP_FB_CLEAR_CTRL) &&
+> >  				!boot_cpu_has_bug(X86_BUG_MDS) &&
+> >  				!boot_cpu_has_bug(X86_BUG_TAA);
+> 
+> I would rather include the X86_FEATURE_CLEAR_CPU_BUF check along with all the
+> other checks, and then add a common early return. E.g.
+> 
+> 	/*
+> 	 * Disable VERW's behavior of clearing CPU buffers for the guest if the
+> 	 * CPU isn't affected MDS/TAA, and the host hasn't forcefully enabled
+> 	 * the mitigation.  Disabing the clearing provides a performance boost
+> 	 * for guests that aren't aware that manually clearing CPU buffers is
+> 	 * unnecessary, at the cost of MSR accesses on VM-Entry and VM-Exit.
+> 	 */
+> 	vmx->disable_fb_clear = !cpu_feature_enabled(X86_FEATURE_CLEAR_CPU_BUF) &&
+> 				(host_arch_capabilities & ARCH_CAP_FB_CLEAR_CTRL) &&
+> 				!boot_cpu_has_bug(X86_BUG_MDS) &&
+> 				!boot_cpu_has_bug(X86_BUG_TAA);
+> 
+> 	if (!vmx->disable_fb_clear)
+> 		return;
 
-> ---
->  target/riscv/cpu.c         | 21 +++++++++++++++++++++
->  target/riscv/tcg/tcg-cpu.c | 23 -----------------------
->  2 files changed, 21 insertions(+), 23 deletions(-)
->
-> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-> index 2ab61df2217..b799f133604 100644
-> --- a/target/riscv/cpu.c
-> +++ b/target/riscv/cpu.c
-> @@ -1247,6 +1247,26 @@ static const MISAExtInfo misa_ext_info_arr[] =3D {
->      MISA_EXT_INFO(RVG, "g", "General purpose (IMAFD_Zicsr_Zifencei)"),
->  };
->
-> +static void riscv_cpu_validate_misa_mxl(RISCVCPUClass *mcc)
-> +{
-> +    CPUClass *cc =3D CPU_CLASS(mcc);
-> +
-> +    /* Validate that MISA_MXL is set properly. */
-> +    switch (mcc->misa_mxl_max) {
-> +#ifdef TARGET_RISCV64
-> +    case MXL_RV64:
-> +    case MXL_RV128:
-> +        cc->gdb_core_xml_file =3D "riscv-64bit-cpu.xml";
-> +        break;
-> +#endif
-> +    case MXL_RV32:
-> +        cc->gdb_core_xml_file =3D "riscv-32bit-cpu.xml";
-> +        break;
-> +    default:
-> +        g_assert_not_reached();
-> +    }
-> +}
-> +
->  static int riscv_validate_misa_info_idx(uint32_t bit)
->  {
->      int idx;
-> @@ -1695,6 +1715,7 @@ static void riscv_cpu_class_init(ObjectClass *c, vo=
-id *data)
->      RISCVCPUClass *mcc =3D RISCV_CPU_CLASS(c);
->
->      mcc->misa_mxl_max =3D (uint32_t)(uintptr_t)data;
-> +    riscv_cpu_validate_misa_mxl(mcc);
->  }
->
->  static void riscv_isa_string_ext(RISCVCPU *cpu, char **isa_str,
-> diff --git a/target/riscv/tcg/tcg-cpu.c b/target/riscv/tcg/tcg-cpu.c
-> index 7f6712c81a4..eb243e011ca 100644
-> --- a/target/riscv/tcg/tcg-cpu.c
-> +++ b/target/riscv/tcg/tcg-cpu.c
-> @@ -148,27 +148,6 @@ static void riscv_cpu_validate_misa_priv(CPURISCVSta=
-te *env, Error **errp)
->      }
->  }
->
-> -static void riscv_cpu_validate_misa_mxl(RISCVCPU *cpu)
-> -{
-> -    RISCVCPUClass *mcc =3D RISCV_CPU_GET_CLASS(cpu);
-> -    CPUClass *cc =3D CPU_CLASS(mcc);
-> -
-> -    /* Validate that MISA_MXL is set properly. */
-> -    switch (mcc->misa_mxl_max) {
-> -#ifdef TARGET_RISCV64
-> -    case MXL_RV64:
-> -    case MXL_RV128:
-> -        cc->gdb_core_xml_file =3D "riscv-64bit-cpu.xml";
-> -        break;
-> -#endif
-> -    case MXL_RV32:
-> -        cc->gdb_core_xml_file =3D "riscv-32bit-cpu.xml";
-> -        break;
-> -    default:
-> -        g_assert_not_reached();
-> -    }
-> -}
-> -
->  static void riscv_cpu_validate_priv_spec(RISCVCPU *cpu, Error **errp)
->  {
->      CPURISCVState *env =3D &cpu->env;
-> @@ -676,8 +655,6 @@ static bool tcg_cpu_realize(CPUState *cs, Error **err=
-p)
->          return false;
->      }
->
-> -    riscv_cpu_validate_misa_mxl(cpu);
-> -
->  #ifndef CONFIG_USER_ONLY
->      CPURISCVState *env =3D &cpu->env;
->      Error *local_err =3D NULL;
-> --
-> 2.39.2
->
->
+This is better. Thanks.
 
