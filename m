@@ -1,172 +1,152 @@
-Return-Path: <kvm+bounces-6118-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6117-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B9EB82B8C6
-	for <lists+kvm@lfdr.de>; Fri, 12 Jan 2024 01:51:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB2DB82B8BA
+	for <lists+kvm@lfdr.de>; Fri, 12 Jan 2024 01:44:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25F2F2846AB
-	for <lists+kvm@lfdr.de>; Fri, 12 Jan 2024 00:51:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 709E11F24F88
+	for <lists+kvm@lfdr.de>; Fri, 12 Jan 2024 00:44:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4601ED1;
-	Fri, 12 Jan 2024 00:50:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D62EEED7;
+	Fri, 12 Jan 2024 00:44:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Gtdi3aGa"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ITV8y+JE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BEF11848;
-	Fri, 12 Jan 2024 00:50:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1705020654; x=1736556654;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   in-reply-to:mime-version;
-  bh=QetwigVW2wf5W5943vSyP2gmDcqUxzHatOKBz7szc3Y=;
-  b=Gtdi3aGabXEFT4kQt0Q4PXreC3gjkbmfFNSXZaZQrCd6ZYqYhIVHp4nx
-   MMPX7cvdLLj6ntKptca94VxLnZuNpk1f9KmobzQRCda7DlnIgEHNZEQYE
-   Dek9c2xsuKhUoUGvjiGFuZbbhgSMPO0XzPRgew8j2hTMPD+Y4tVKhHhcI
-   XuTq8aLuNsTUIkEpRwzaQ9G6vjOeDHq81aqgvb9CfttgqTq4diJFqIute
-   24RNonq6MBvRWui9XmuFNfSSoA/c3KKXExdDnwBT1dkUAWBzT1goIjLLW
-   9A1vG96L+M8Eqrta/wd59YsV6vQEt3rXSc3LSGUaHzh5sQkGK0AZ/ZzOz
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10950"; a="396193143"
-X-IronPort-AV: E=Sophos;i="6.04,187,1695711600"; 
-   d="scan'208";a="396193143"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2024 16:50:53 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10950"; a="782836483"
-X-IronPort-AV: E=Sophos;i="6.04,187,1695711600"; 
-   d="scan'208";a="782836483"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by orsmga002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 11 Jan 2024 16:50:53 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 11 Jan 2024 16:50:52 -0800
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 11 Jan 2024 16:50:52 -0800
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Thu, 11 Jan 2024 16:50:52 -0800
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.169)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 11 Jan 2024 16:50:51 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TXxxJxEpB3ji3tCXd6fsdN/fsETKjgCtza1Qtpspi8tLsJ09h0SWzIRj5cJfKp7d9NCmPe6zVKvnUtlyQUC9jGXhr7Wz5VMRBB8PYI8sG9V8LabEo7ifgQEHSFHNttlnHsZ2qT+fQT8DLCajWSYtenixDc5P+GNBkEtYyuq9JfdYGJqg2wJz9PI/p05B6TbCuerBN8YDQGcwTcKlRxcD8ct9PwauAP1pfjXS6WflnhyrRdJpLHFT6QRk3exKISCWGqOs0v65cXBEIvHidgOrXRdrHp1bqAUVIfQlmXlO3RAO6Xw04iDIIcpQUCFYgp7PmcO1VpaTLtwndxUaGyS3BA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UzqsMVJpQYacC/eg2j/sO9aCQE+R16XCCFkIF0J7nFo=;
- b=RVh2OCaZOQZ4rdWqcF2pZGDJrRdyMqFvzSfaNaiiSlgvDz2Oa4VKKdCxOwYwL1GSeIdeVk3vefiaFR0tW3eKCL6yBdYg9PaeACPcpNQDkUctYgXW+IvRh5Q1FZ84eSBAuQ/sSDbf62KSGJ4FbzDOfR9wYyHD07zsAhkF6Hrb4IKo2tH4yvR6PtTOAF3V6q+nENacqXY93aa3j6HoWA1kNdfM10QDlasF//RVS4TWtlfKhVPgba7csOarEn55I2fXYlPjxv2YY+6hUm+Cab+Yr3Qw3G8JfyU0YoBgXkL/p4lAPoftNsgSkpK9AGaoRmJKJ0AVu3C1rmZ2ymAiFJreaw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- PH0PR11MB7564.namprd11.prod.outlook.com (2603:10b6:510:288::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7159.24; Fri, 12 Jan
- 2024 00:50:50 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::32a9:54b8:4253:31d4]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::32a9:54b8:4253:31d4%4]) with mapi id 15.20.7159.026; Fri, 12 Jan 2024
- 00:50:49 +0000
-Date: Fri, 12 Jan 2024 08:21:29 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Yuan Yao <yuan.yao@linux.intel.com>
-CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>, <pbonzini@redhat.com>,
-	<seanjc@google.com>, <shuah@kernel.org>, <stevensd@chromium.org>
-Subject: Re: [RFC PATCH v2 2/3] KVM: selftests: add selftest driver for KVM
- to test memory slots for MMIO BARs
-Message-ID: <ZaCGCS6xY2KXubf8@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20240103084327.19955-1-yan.y.zhao@intel.com>
- <20240103084457.20086-1-yan.y.zhao@intel.com>
- <20240104081604.ab4uurfoennzy5oj@yy-desk-7060>
- <ZZfP3/pYyPnbgL3P@yzhao56-desk.sh.intel.com>
- <20240110062708.zf3arjmha5czgpzp@yy-desk-7060>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240110062708.zf3arjmha5czgpzp@yy-desk-7060>
-X-ClientProxiedBy: SG2PR01CA0178.apcprd01.prod.exchangelabs.com
- (2603:1096:4:28::34) To DS7PR11MB5966.namprd11.prod.outlook.com
- (2603:10b6:8:71::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9683812
+	for <kvm@vger.kernel.org>; Fri, 12 Jan 2024 00:44:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-28c391d255dso4091229a91.2
+        for <kvm@vger.kernel.org>; Thu, 11 Jan 2024 16:44:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1705020285; x=1705625085; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=sN2es8KlQfgJlHIGj5HF3V4E8vkTP0blruT0KN91HgE=;
+        b=ITV8y+JEIUqkHd2L5nkGpuraOPsGYiKofNUDKqTrVUKpCJWdD6+yepTBNKJ8EwDa7I
+         w32qqS8VeB0X1CMgNY2GOnkEygG4c9qiv56cFdBldoJLUg66WMHO76/qlyCkF1H9u6Kf
+         pKO3uuhGz/lgGouJ4OTwwJSbRUcPZMzwv6uiQOguBy++g+40Ww0jAWN+a32ocB3V6Ikf
+         6Y1rUo9Lw1sUc8gadVB/Ua1Z+6FjerNRdAanFhqnCI3nyXV7WiD9AaZ2EYM/2+KMm8Xn
+         bQFteOE+kRvMWY+0gvIs6qOCn0nZWHQYpFSddMY6egO2aHhoB9IyZuDGK2+rICcIcuB1
+         s3MQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705020285; x=1705625085;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=sN2es8KlQfgJlHIGj5HF3V4E8vkTP0blruT0KN91HgE=;
+        b=SuQvLTsoauuGl2jdrEAIhCpgnNIg17r0pgJ2pDLusFUMLbJZ27I6yVVjpnPTrrE4pX
+         5cjnyacH6GjpFhGpRjmSTfurW+lP+18Scnwfj7ERERvqPM4rFX8SFP3GEZ2c9vsZ5px2
+         xHLuleXJG/kbxmfnaL0Ny1+hoTEKsV6BpPdyQs2W9aM11kQ6JTsSkCxmf5qtkcTh8p8i
+         ijGDQQqP+YbWhpqs9NhjsyaCM4yyNQ3zHt2YLVv3R7mhXT5kxpCYlNg/k6TRo5GaxyKK
+         YsVqelaDsadllQeQxEfirFeqREuurqFW2kqhSALsIhCx86yEPBDmClfKJ+uinxIRE+gy
+         cTsQ==
+X-Gm-Message-State: AOJu0YwKVh7BdT6mfr8hG/8KgxdSUDLaL8cncpB4ikb0LR2lFWVp//dD
+	LK9IUPLAt2Fp90VORpGiFTZeNeD3kDrsqOQ9SA==
+X-Google-Smtp-Source: AGHT+IG5ommWT719Fl7J9iZ+Wiaz9wxUw0BgdIsI4EBsqWk43AnLBHzc1JTU7N4YI/8UprhBryXp0Cn89eA=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90b:5209:b0:28e:272:4e18 with SMTP id
+ sg9-20020a17090b520900b0028e02724e18mr2054pjb.2.1705020284924; Thu, 11 Jan
+ 2024 16:44:44 -0800 (PST)
+Date: Thu, 11 Jan 2024 16:44:43 -0800
+In-Reply-To: <ZZdlt2Dm36VF4WL6@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|PH0PR11MB7564:EE_
-X-MS-Office365-Filtering-Correlation-Id: b555edb9-21c2-42fc-7f51-08dc13088537
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: OACtlKQnJT41bOv+5nlgjM0Zo4jqHWnMVPRVQ4QlvRnrchSCel5p6iHUb7INJHdHw1MZxwzrrQGdGrmG2kt9CLk/r4XziYiBmnr4JVg47JC9rFGgjAxcHl8xJbDxsIjVw7zeqcqYPcqEeTfV+ZicPaF7zqZFJkILug7x0WcmaTx4LpigQ4zMYILpx+5V3BRBPqUQGxwBHSCDRuhZ7XnRohyL++cfhhI06LuU8uMKex2bMYgNekHQNPlvX56G7LOCI4z/XRy4sZMYV2C1Sz5SfBhtBaum9SelIa6ItvZ1vjqnIChrmKE4AUoP8xSMqwNCFTX4ABpWP//exduWmXwbnnsKO4QmMJoXnpEYzYFdDu/O9QyMgapNBMP2e+1SHbgCnirBtF7/XeRQG46z3v3Q1cBoyUMSyE+17TL8wcQMTgjO4QKzdrC2HLlClfsgAK2kIjTBME74wUbuhSYp9CMVL1rZQbcLWe875cc3QQ2giyXgJ7h5ZKm4Lxia82jo1/oyeFr6VepMGoc49Nlvw4LfOG5Ubg9XHAEtGsx7KmhtQk6ACikpYAOy7xCvcZyLzB53
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(396003)(346002)(39860400002)(136003)(366004)(230922051799003)(186009)(1800799012)(64100799003)(451199024)(26005)(6512007)(83380400001)(86362001)(38100700002)(82960400001)(4744005)(4326008)(6666004)(6506007)(5660300002)(8936002)(316002)(8676002)(66476007)(41300700001)(66556008)(6916009)(2906002)(54906003)(6486002)(478600001)(66946007)(3450700001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?vlA9cW6ltydo8btp//STjeaXdYNVmdAjeN8fxKg8GySM55v8JUKIbggBuA2L?=
- =?us-ascii?Q?Ak8fiqSaC8rMXRsNcQyRO5REnw503KOxrsShtJyntOv/PI0w1pesgCVNDyBB?=
- =?us-ascii?Q?hP7paftITX9Tf4XOgo578gAxPyDOZc/VlnqE7e/+WcgclKiVWTN0c2EIKjPu?=
- =?us-ascii?Q?fD0yCnCfRSUgOT1OQjpHl/iEzYKwvoRoNrO9vO5NBc9Xm/4KcpJzuP/+HTE7?=
- =?us-ascii?Q?mSfliTpr0qNBYci7NHocma2zEFGtACpXwMzYglaSbmsazR/SaMP1PQhfKWXO?=
- =?us-ascii?Q?9sZFZYIUZM60ZrJ777EsvxwU7hL+ADCy4uDK65NOOmljh89zwu2FdWIPozVb?=
- =?us-ascii?Q?YAscS7j+6x7sjsuE8p6tnXeGxIj2h+BHGvOybvHj9daplsUeLBhRGhQuEEZ1?=
- =?us-ascii?Q?MBPE/SjN201j6b9rcnObpcFkhUgdHfw4js15bFyNLH2j2NqSzgnJ/QA8Wa2v?=
- =?us-ascii?Q?1pssJl9slPaN112tVGx2NVXAuHJNAa40WrDYngIDPS9v+pPm802AP5nSAFxB?=
- =?us-ascii?Q?cI2dj17uAwqYGiIBKWsOh2TUAgKbyB/kXSm1CjFqjNEwp/SZo9fBjt7h9mQc?=
- =?us-ascii?Q?JtR261KrmTT33dIJRqofKOtwneESl7bmMtygINAqcjoBiIkV7mDo7/1Ro5Wj?=
- =?us-ascii?Q?NHKOnNAG7VOGGYzRS4Xh+9SVZoa7VYcWTyoxAXcqIUpQP2DWCJKA25U9C94Q?=
- =?us-ascii?Q?rEdIbWH98qgyUl5sLAHxIS6flN+jsly4jMG45WMlMnBRYcJcnpYUMdoU1/8M?=
- =?us-ascii?Q?HjQSsARWjRrbZx+sqK7IM46NqHAgyUsXMiD0fSBemmhm3aqTqifGINL93DUR?=
- =?us-ascii?Q?SNszjbP1HM0pXITvgnxOfwn26NKQNInar4YGuDnDW5PSfuP/ZoSYUdz3Dtmo?=
- =?us-ascii?Q?DOOYTMy7vKACpUbEuenGjpYPNAPzRxnrG8JKP+s5b142B5UxPrJ5qj3HBGSZ?=
- =?us-ascii?Q?S4KCoFoP1lhmCKTV3WFs6R+usDY0xA+gz4sLqLnC/ZY85kLjIX/LKL/hLiaf?=
- =?us-ascii?Q?WtgZz9VMILC7/6Sx9FjgLggLh7dZANh9L1PgyGUhv7kBgXpma4Gtn1clxO4k?=
- =?us-ascii?Q?5ylTPVmJ+QMO9v5HK8zhVMzxVjqT9y3cvV/mM7J1AXS9JwwyZN+65wyY2ATx?=
- =?us-ascii?Q?nPRaDp9oakwv6ttRn3E9pSWDNZFYaekgCBtKhSEBOBOa/m3MWcSJK0+p3ZBL?=
- =?us-ascii?Q?X0R2Qe1c99mbO+A8Ls8RFdmjPDpLzhkaBccEvTfzIvF/Vzuioe+oRUGNV5Ei?=
- =?us-ascii?Q?6SshZvkBpogl83YIYoQvnHC1xL25CIo/C4WTW8nX2xi1Ap+ICT/ExAWwEh+l?=
- =?us-ascii?Q?w8tqervkdW2P3GKQI8K8YKo0boaikz8mJeugn8GyK8pIo/IlAgNI7UWmwVSt?=
- =?us-ascii?Q?10EP7wU6FZ4BdGA/VGAnb7Z3OJh8bnYWYsBMrHcqbyV7THWMxxMmTsQqrR6h?=
- =?us-ascii?Q?gzkiLIpejpTWVXN8056z3+WtGgaPhf7JqSlU+t7uXPD+NSf3roK90r7KKbpY?=
- =?us-ascii?Q?kZSOMGQUTTI6WYaIFlfJmzh5lTp8NaN63Xs+a/V+pCYCCPKydDGJlDdqctXM?=
- =?us-ascii?Q?z/HaaqWzjgIrNx/wydqZ9cHWqxHbQMCNkQ2wvjoU?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: b555edb9-21c2-42fc-7f51-08dc13088537
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jan 2024 00:50:49.7046
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3z84rSleI6nlPgFfZSqD9yYdQnRtCDg8Zny+JaJcVEQxWxF32Muj19WDUA8W1F/Wh4l8M8s5EcNwQPxaINmvUg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB7564
-X-OriginatorOrg: intel.com
+Mime-Version: 1.0
+References: <20231110235528.1561679-1-seanjc@google.com> <20231110235528.1561679-4-seanjc@google.com>
+ <3ad69657ba8e1b19d150db574193619cf0cb34df.camel@redhat.com>
+ <ZWk8IMZamuemfwXG@google.com> <daaf098a6219310b6b1c1e3dc147fbb7e48b6f54.camel@redhat.com>
+ <ZZdlt2Dm36VF4WL6@google.com>
+Message-ID: <ZaCLe4UdDgLuT21S@google.com>
+Subject: Re: [PATCH 3/9] KVM: x86: Initialize guest cpu_caps based on guest CPUID
+From: Sean Christopherson <seanjc@google.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Jan 10, 2024 at 02:27:08PM +0800, Yuan Yao wrote:
-> > > Do you have plan to allow user to change the bar_size via IOCTL ?
-> > > If no "order" and "bar_size" can be removed.
-> > >
-> > Currently no. But this structure is private to the test driver.
-> > What the benefit to remove the two?
+On Thu, Jan 04, 2024, Sean Christopherson wrote:
+> On Thu, Dec 21, 2023, Maxim Levitsky wrote:
+> > On Thu, 2023-11-30 at 17:51 -0800, Sean Christopherson wrote:
+> > > On Sun, Nov 19, 2023, Maxim Levitsky wrote:
+> > > > On Fri, 2023-11-10 at 15:55 -0800, Sean Christopherson wrote:
+ 
+> > > > Also why not to initialize guest_caps = host_caps & userspace_cpuid?
+> > > > 
+> > > > If this was the default we won't need any guest_cpu_cap_restrict and such,
+> > > > instead it will just work.
+> > > 
+> > > Hrm, I definitely like the idea.  Unfortunately, unless we do an audit of all
+> > > ~120 uses of guest_cpuid_has(), restricting those based on kvm_cpu_caps might
+> > > break userspace.
+> > 
+> > 120 uses is not that bad, IMHO it is worth it - we won't need to deal with that
+> > in the future.
+> > 
+> > How about a compromise - you change the patches such as it will be possible
+> > to remove these cases one by one, and also all new cases will be fully
+> > automatic?
 > 
-> It's useless so remove them makes code more easier to understand.
-Just my two cents:
-Keeping bar_size & order in a device structure is better than spreading
-macro BAR_SIZE everywhere and the code is more scalable.
+> Hrm, I'm not necessarily opposed to that, but I don't think we should go partway
+> unless we are 100% confident that changing the default to "use guest CPUID ANDed
+> with KVM capabilities" is the best end state, *and* that someone will actually
+> have the bandwidth to do the work soon-ish so that KVM isn't in a half-baked
+> state for months on end.  Even then, my preference would definitely be to switch
+> everything in one go.
+> 
+> And automatically handling new features would only be feasible for entirely new
+> leafs.  E.g. X86_FEATURE_RDPID is buried in CPUID.0x7.0x0.ECX, so to automatically
+> handle new features KVM would need to set the default guest_caps for all bits
+> *except* RDPID, at which point we're again building a set of features that need
+> to opt-out.
+> 
+> > > To be fair, the manual lists predate the governed features.
+> > 
+> > 100% agree, however the point of governed features was to simplify this list,
+> > the point of this patch set is to simplify these lists and yet they still remain,
+> > more or less untouched, and we will still need to maintain them.
+> > 
+> > Again I do think that governed features and/or this patchset are better than
+> > the mess that was there before, but a part of me wants to fully get rid of
+> > this mess instead of just making it a bit more beautiful. 
+> 
+> Oh, I would love to get rid of the mess too, I _completely_ getting rid of the
+> mess isn't realistic.  There are guaranteed to be exceptions to the rule, whether
+> the rule is "use guest CPUID by default" or "use guest CPUID constrained by KVM
+> capabilities by default".
+> 
+> I.e. there will always be some amount of manual messiness, the question is which
+> default behavior would yield the smallest mess.  My gut agrees with you, that
+> defaulting to "guest & KVM" would yield the fewest exceptions.  But as above,
+> I think we're better off doing the switch as an all-or-nothing things (where "all"
+> means within a single series, not within a single patch).
+
+Ok, the idea of having vcpu->arch.cpu_caps default to a KVM & GUEST is growing
+on me.  There's a lurking bug in KVM that in some ways is due to lack of a per-vCPU,
+KVM-enforced set of a features.  The bug is relatively benign (VMX passes through
+CR4.FSGSBASE when it's not supported in the host), and easy to fix (incorporate
+KVM-reserved CR4 bits into vcpu->arch.cr4_guest_rsvd_bits), but it really is
+something that just shouldn't happen.  E.g. KVM's handling of EFER has a similar
+lurking problem where __kvm_valid_efer() is unsafe to use without also consulting
+efer_reserved_bits.
+
+And after digging a bit more, I think I'm just being overly paranoid.  I'm fairly
+certain the only exceptions are literally the few that I've called out (RDPID,
+MOVBE, and MWAIT (which is only a problem because of a stupid quirk)).  I don't
+yet have a firm plan on how to deal with the exceptions in a clean way, e.g. I'd
+like to somehow have the "opt-out" code share the set of emulated features with
+__do_cpuid_func_emulated().  One thought would be to add kvm_emulated_cpu_caps,
+which would be *comically* wasteful, but might be worth the 90 bytes.
+
+For v2, what if I post this more or less as-is, with a "convert to KVM & GUEST"
+patch thrown in at the end as an RFC?  I want to do a lot more testing (and staring)
+before committing to the conversion, and sadly I don't have anywhere near enough
+cycles to do that right now.
 
