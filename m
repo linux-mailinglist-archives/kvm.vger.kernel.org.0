@@ -1,204 +1,139 @@
-Return-Path: <kvm+bounces-6156-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6157-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C49E82C5E5
-	for <lists+kvm@lfdr.de>; Fri, 12 Jan 2024 20:32:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 161E082C603
+	for <lists+kvm@lfdr.de>; Fri, 12 Jan 2024 20:49:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8C1D3B238D5
-	for <lists+kvm@lfdr.de>; Fri, 12 Jan 2024 19:32:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E4641C248F1
+	for <lists+kvm@lfdr.de>; Fri, 12 Jan 2024 19:49:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EEA516429;
-	Fri, 12 Jan 2024 19:31:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05BE916416;
+	Fri, 12 Jan 2024 19:49:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HrVLB5sh"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="DX0FsTFd"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6C9416419
-	for <kvm@vger.kernel.org>; Fri, 12 Jan 2024 19:31:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1705087899;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=qARUiNn2Jrx1KvihHVdfIiteTOrgQb9MKbdKKhl244M=;
-	b=HrVLB5shDNrEeq4NhRWb9vmEkdTTNYyv8RxrBoefv/tkLsJbc28j5+QP88K+cc9mUI6opf
-	/9CDP+398/rOBIFuFYWKDEKnb9n+ug2BsXYdQdwsGcF8kMykCEt1l69KhVHYsP89gxe5i6
-	7EY9CXr3W8KIq7C3AFd4RhO/E6kQL8o=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-237-yDft8DbJOAGGRU1Kn2_EYA-1; Fri, 12 Jan 2024 14:31:37 -0500
-X-MC-Unique: yDft8DbJOAGGRU1Kn2_EYA-1
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7bee3ad7bcfso395148639f.1
-        for <kvm@vger.kernel.org>; Fri, 12 Jan 2024 11:31:37 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705087897; x=1705692697;
-        h=content-transfer-encoding:mime-version:message-id:subject:cc:to
-         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qARUiNn2Jrx1KvihHVdfIiteTOrgQb9MKbdKKhl244M=;
-        b=exN5hnR2gCF27kcoiflEvnRiZXh2KuhfLWtYMBjlTvSsX2/LwwDLkapbilAsdIKhrA
-         /fCWaIyDA5jIJke6KaHLUPTKG0hb6AmGKMMxp/JrUax8CuPih3shlSyuAS3RKvN65WzR
-         p3/OjRWkACf2+zLb9BksZUDkoqXbXV64vffK9O+Ct7ziZzB8WKLqT1tC3OCg3sIfmK2q
-         P3X2MTkNSzwot6SEFaJPNhx7w33W8SIOAbOHknn/TB4l4JB01zJleQF2O0VIfzXrQj4V
-         z/klHH/tqFJoIDj8pLXPYezG8iKcLa9/50Z7pnm7tfZC6ne16v1NloLaRvJIHLLncWXD
-         6nlQ==
-X-Gm-Message-State: AOJu0YzEk/XtnKY/RN+LViWqKGRB0TV1mubviP+qJIYPMVWNhHedd45U
-	0A4X1lGZnQOf7ZxJoEBFkdMXoIxhG+QjTWFyNOrBsypFVnUerr4xPphq8bpswR6yFBtUmWbmHfa
-	ELsE0ldd2eFVGwaXoP3PR
-X-Received: by 2002:a6b:e919:0:b0:7bf:2b94:5cc1 with SMTP id u25-20020a6be919000000b007bf2b945cc1mr818547iof.7.1705087896810;
-        Fri, 12 Jan 2024 11:31:36 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEsgUtGzSjQB4EJc5YO3yWNR79/7QpPWBImRh6SQMbd/m8WXcEDug1AZhFYJnmepx/TIhlvjA==
-X-Received: by 2002:a6b:e919:0:b0:7bf:2b94:5cc1 with SMTP id u25-20020a6be919000000b007bf2b945cc1mr818538iof.7.1705087896477;
-        Fri, 12 Jan 2024 11:31:36 -0800 (PST)
-Received: from redhat.com ([38.15.60.12])
-        by smtp.gmail.com with ESMTPSA id a1-20020a0566380b0100b0046d9e290a74sm1045304jab.7.2024.01.12.11.31.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Jan 2024 11:31:35 -0800 (PST)
-Date: Fri, 12 Jan 2024 12:31:34 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org"
- <kvm@vger.kernel.org>, mst@redhat.com
-Subject: [GIT PULL] VFIO updates for v6.8-rc1
-Message-ID: <20240112123134.2deb3896.alex.williamson@redhat.com>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9150015AFA;
+	Fri, 12 Jan 2024 19:49:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id A48A040E01B2;
+	Fri, 12 Jan 2024 19:49:36 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id imhhkVXVMXrF; Fri, 12 Jan 2024 19:49:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1705088974; bh=i7t/gbr0Sua0zSEsqr5ie7pHsjRKCUl3wglMN7YEUCs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DX0FsTFd61uczDuI00EEc8hfZRLb8OsM3do0ibe0SGqXXPj3x93TQ/l37EENsnPgV
+	 EFzlm393Z3Oi4Za9/TN04A52JCzCLtwzDhe9YeXA+8TRmUHRHP3JIRXKdu7wgJvVw9
+	 2unwjYWMvVBew2/YgRhTqM00hDSSVRhYEvNvCIQ8kN2wUdYl82l70w6u9BBbUNHHm4
+	 ihez0Gw1ET0zJt5gVIATaNJsjLKxFj0+0/TwjITurvaKtpkqBir3qd6F4B3MNlSWnB
+	 XnfRZuieaBPnRB8pLcH7AUT/HIdxfhacJS09zdyknlJob1/dvkp6dqX3Z/tiJurmfc
+	 O6Kx5ZLcyX0Xknu1pvIKnviTBX/S6Tdlt7VY9ff5EYA5dU2N+tyL02UFfrdMgYBNE8
+	 9NcVSYT1EtWupp3EEiedDG7Zsu4Uo+KXIXQJL/wHtyv3xwEtiO5MA+TF6FkBTHGOcH
+	 /8ALP4anxGJRe2VWygfdFWtdbBzQHX5AbVmAYBcwAZmhVu+buvUKt5O6pcMcltkTQU
+	 Fx1F2jvdZe0so2aEJ+IJC13J2BBnFYd+4TbmeL+qKsC9TI94YsvE3rgV1zHpFP/uDr
+	 rUWevP4bgdkcJAZwHsloCvi6ZL3hAPoimXjCyCK11iKGQtgdpr2+VJJDfu8+1ScK2p
+	 rI4SZ1VuDPxVKdP+P3pHuNN8=
+Received: from zn.tnic (pd9530f8c.dip0.t-ipconnect.de [217.83.15.140])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 9E43B40E00C5;
+	Fri, 12 Jan 2024 19:48:55 +0000 (UTC)
+Date: Fri, 12 Jan 2024 20:48:49 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Michael Roth <michael.roth@amd.com>
+Cc: x86@kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+	linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+	rientjes@google.com, tobin@ibm.com, vbabka@suse.cz,
+	kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
+	Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH v1 11/26] x86/sev: Invalidate pages from the direct map
+ when adding them to the RMP table
+Message-ID: <20240112194849.GDZaGXoTeYkx3GYSsQ@fat_crate.local>
+References: <20231230161954.569267-1-michael.roth@amd.com>
+ <20231230161954.569267-12-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20231230161954.569267-12-michael.roth@amd.com>
 
-Hi Linus,
+On Sat, Dec 30, 2023 at 10:19:39AM -0600, Michael Roth wrote:
+>  static int rmpupdate(u64 pfn, struct rmp_state *state)
+>  {
+>  	unsigned long paddr = pfn << PAGE_SHIFT;
+> -	int ret;
+> +	int ret, level, npages;
+>  
+>  	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+>  		return -ENODEV;
+>  
+> +	level = RMP_TO_PG_LEVEL(state->pagesize);
+> +	npages = page_level_size(level) / PAGE_SIZE;
+> +
+> +	/*
+> +	 * If the kernel uses a 2MB directmap mapping to write to an address,
+> +	 * and that 2MB range happens to contain a 4KB page that set to private
+> +	 * in the RMP table, an RMP #PF will trigger and cause a host crash.
+> +	 *
+> +	 * Prevent this by removing pages from the directmap prior to setting
+> +	 * them as private in the RMP table.
+> +	 */
+> +	if (state->assigned && invalidate_direct_map(pfn, npages))
+> +		return -EFAULT;
 
-The following changes since commit 33cc938e65a98f1d29d0a18403dbbee050dcad9a:
+Well, the comment says one thing but the code does not do quite what the
+text says:
 
-  Linux 6.7-rc4 (2023-12-03 18:52:56 +0900)
+* where is the check that pfn is part of the kernel direct map?
 
-are available in the Git repository at:
+* where is the check that this address is part of a 2M PMD in the direct
+map so that the situation is even given that you can have a 4K private
+PTE there?
 
-  https://github.com/awilliam/linux-vfio.git tags/vfio-v6.8-rc1
+What this does is simply invalidate @npages unconditionally.
 
-for you to fetch changes up to 78f70c02bdbccb5e9b0b0c728185d4aeb7044ace:
+Then, __set_pages_np() already takes a number of pages and a start
+address. Why is this thing iterating instead of sending *all* npages in
+one go?
 
-  vfio/virtio: fix virtio-pci dependency (2024-01-10 15:10:41 -0700)
+Yes, you'd need two new helpers, something like:
 
-----------------------------------------------------------------
-VFIO updates for v6.8-rc1
+set_pages_present(struct page *page, int numpages)
+set_pages_non_present(struct page *page, int numpages)
 
- - Add debugfs support, initially used for reporting device migration
-   state. (Longfang Liu)
+which call the lowlevel counterparts.
 
- - Fixes and support for migration dirty tracking across multiple IOVA
-   regions in the pds-vfio-pci driver. (Brett Creeley)
+For some reason I remember asking this a while ago...
 
- - Improved IOMMU allocation accounting visibility. (Pasha Tatashin)
+-- 
+Regards/Gruss,
+    Boris.
 
- - Virtio infrastructure and a new virtio-vfio-pci variant driver, which
-   provides emulation of a legacy virtio interfaces on modern virtio
-   hardware for virtio-net VF devices where the PF driver exposes
-   support for legacy admin queues, ie. an emulated IO BAR on an SR-IOV
-   VF to provide driver ABI compatibility to legacy devices.
-   (Yishai Hadas & Feng Liu)
-
- - Migration fixes for the hisi-acc-vfio-pci variant driver.
-   (Shameer Kolothum)
-
- - Kconfig dependency fix for new virtio-vfio-pci variant driver.
-   (Arnd Bergmann)
-
-----------------------------------------------------------------
-Alex Williamson (2):
-      Merge branches 'v6.8/vfio/debugfs', 'v6.8/vfio/pds' and 'v6.8/vfio/type1-account' into v6.8/vfio/next
-      Merge branch 'v6.8/vfio/virtio' into v6.8/vfio/next
-
-Arnd Bergmann (1):
-      vfio/virtio: fix virtio-pci dependency
-
-Brett Creeley (6):
-      vfio/pds: Fix calculations in pds_vfio_dirty_sync
-      vfio/pds: Only use a single SGL for both seq and ack
-      vfio/pds: Move and rename region specific info
-      vfio/pds: Pass region info to relevant functions
-      vfio/pds: Move seq/ack bitmaps into region struct
-      vfio/pds: Add multi-region support
-
-Feng Liu (4):
-      virtio: Define feature bit for administration virtqueue
-      virtio-pci: Introduce admin virtqueue
-      virtio-pci: Introduce admin command sending function
-      virtio-pci: Introduce admin commands
-
-Longfang Liu (3):
-      vfio/migration: Add debugfs to live migration driver
-      Documentation: add debugfs description for vfio
-      MAINTAINERS: Add vfio debugfs interface doc link
-
-Pasha Tatashin (1):
-      vfio/type1: account iommu allocations
-
-Shameer Kolothum (1):
-      hisi_acc_vfio_pci: Update migration data pointer correctly on saving/resume
-
-Yishai Hadas (6):
-      virtio-pci: Initialize the supported admin commands
-      virtio-pci: Introduce APIs to execute legacy IO admin commands
-      vfio/pci: Expose vfio_pci_core_setup_barmap()
-      vfio/pci: Expose vfio_pci_core_iowrite/read##size()
-      vfio/virtio: Introduce a vfio driver over virtio devices
-      vfio/virtio: Declare virtiovf_pci_aer_reset_done() static
-
- Documentation/ABI/testing/debugfs-vfio         |  25 ++
- MAINTAINERS                                    |   8 +
- drivers/vfio/Kconfig                           |  10 +
- drivers/vfio/Makefile                          |   1 +
- drivers/vfio/debugfs.c                         |  92 ++++
- drivers/vfio/pci/Kconfig                       |   2 +
- drivers/vfio/pci/Makefile                      |   2 +
- drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c |   7 +-
- drivers/vfio/pci/pds/dirty.c                   | 309 ++++++++-----
- drivers/vfio/pci/pds/dirty.h                   |  18 +-
- drivers/vfio/pci/vfio_pci_rdwr.c               |  57 +--
- drivers/vfio/pci/virtio/Kconfig                |  15 +
- drivers/vfio/pci/virtio/Makefile               |   3 +
- drivers/vfio/pci/virtio/main.c                 | 576 +++++++++++++++++++++++++
- drivers/vfio/vfio.h                            |  14 +
- drivers/vfio/vfio_iommu_type1.c                |   8 +-
- drivers/vfio/vfio_main.c                       |   4 +
- drivers/virtio/Kconfig                         |   5 +
- drivers/virtio/Makefile                        |   1 +
- drivers/virtio/virtio.c                        |  37 +-
- drivers/virtio/virtio_pci_admin_legacy_io.c    | 244 +++++++++++
- drivers/virtio/virtio_pci_common.c             |  14 +
- drivers/virtio/virtio_pci_common.h             |  42 +-
- drivers/virtio/virtio_pci_modern.c             | 259 ++++++++++-
- drivers/virtio/virtio_pci_modern_dev.c         |  24 +-
- include/linux/vfio.h                           |   7 +
- include/linux/vfio_pci_core.h                  |  20 +
- include/linux/virtio.h                         |   8 +
- include/linux/virtio_config.h                  |   4 +
- include/linux/virtio_pci_admin.h               |  23 +
- include/linux/virtio_pci_modern.h              |   2 +
- include/uapi/linux/vfio.h                      |   1 +
- include/uapi/linux/virtio_config.h             |   8 +-
- include/uapi/linux/virtio_pci.h                |  68 +++
- 34 files changed, 1754 insertions(+), 164 deletions(-)
- create mode 100644 Documentation/ABI/testing/debugfs-vfio
- create mode 100644 drivers/vfio/debugfs.c
- create mode 100644 drivers/vfio/pci/virtio/Kconfig
- create mode 100644 drivers/vfio/pci/virtio/Makefile
- create mode 100644 drivers/vfio/pci/virtio/main.c
- create mode 100644 drivers/virtio/virtio_pci_admin_legacy_io.c
- create mode 100644 include/linux/virtio_pci_admin.h
-
+https://people.kernel.org/tglx/notes-about-netiquette
 
