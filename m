@@ -1,527 +1,750 @@
-Return-Path: <kvm+bounces-6164-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6165-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D48C982C665
-	for <lists+kvm@lfdr.de>; Fri, 12 Jan 2024 21:38:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8529282C6AF
+	for <lists+kvm@lfdr.de>; Fri, 12 Jan 2024 22:30:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8BFAF1C22441
-	for <lists+kvm@lfdr.de>; Fri, 12 Jan 2024 20:38:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3DFCB24539
+	for <lists+kvm@lfdr.de>; Fri, 12 Jan 2024 21:30:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 446D8168C4;
-	Fri, 12 Jan 2024 20:38:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8839917730;
+	Fri, 12 Jan 2024 21:30:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="sMqwBKNo"
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="fCT9yDvM"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 698F91641B
-	for <kvm@vger.kernel.org>; Fri, 12 Jan 2024 20:38:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazon201209; t=1705091906; x=1736627906;
-  h=from:to:cc:subject:date:message-id;
-  bh=UaZM85RDimVOlVytaQFs2RRgRiISe4jM4WTMQcBZEsM=;
-  b=sMqwBKNoYBFaNoOG1tWRlztu24zQlfas6VR4VVyWFd2YVHyOP+74oFuf
-   zUcL9WjQUlh0/j7EwxXyZqSGNsZppq5+Wxawd4lPX7Rk8v5VO4tmUY6rC
-   iswxoug6cot8MCGZCWhLkHWmxl9ZLnixIx3i0kUE03kkLuOq6/sgbmqhc
-   w=;
-X-Amazon-filename: smime.p7s
-X-IronPort-AV: E=Sophos;i="6.04,190,1695686400"; 
-   d="p7s'?scan'208";a="57992307"
-Content-Type: multipart/mixed; boundary="===============6231862153601125174=="
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F371C171D8;
+	Fri, 12 Jan 2024 21:30:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=salutedevices.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
+Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id B2EA5120002;
+	Sat, 13 Jan 2024 00:30:03 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru B2EA5120002
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1705095003;
+	bh=Orr+8pQCj9w9tZ7vpvYVcKAP7cJ4B2uVNjRXKEdlhj4=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
+	b=fCT9yDvMSwdkTK3LeVjBdnHOBXnHPirzwWCvcmssk46yvFJct+qSBECci8voK9OAG
+	 pMG4Qth6HA9hibRAIZ4mATAlSiNAQRFU5UFAXyMmp7fcfpJPVFZuVhfHSoozzDNbKj
+	 ieEKlSFSjD2IWYdO5HwrlxI1kr8xCFkR7JHYJ9qUV2YK011Vb3BdMhEc2iJJ+N/Eql
+	 9WvlUDqpNG5JSAD6zzf5dxNrrgQ9Duc6wy6cE+kweCkv0xbnFhZr4/mG8uSCZBB8Fh
+	 YcOpcDnV5ShG3NRG15ym57LLKuDbGEw6sTiSF3VoCi1lB3OFjkwAmXjJdXLIyrxY3m
+	 aR54vOGhkNiWA==
+Received: from smtp.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Sat, 13 Jan 2024 00:30:03 +0300 (MSK)
+Received: from localhost.localdomain (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Sat, 13 Jan 2024 00:30:03 +0300
+From: Arseniy Krasnov <avkrasnov@salutedevices.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
+	<sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
+	<jasowang@redhat.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>
+CC: <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<kernel@sberdevices.ru>, <oxffffaa@gmail.com>, <avkrasnov@salutedevices.com>
+Subject: [RFC PATCH v1] vsock/test: add '--peer-port' input argument
+Date: Sat, 13 Jan 2024 00:21:10 +0300
+Message-ID: <20240112212110.1906150-1-avkrasnov@salutedevices.com>
+X-Mailer: git-send-email 2.35.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-25ac6bd5.us-east-1.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2024 20:38:24 +0000
-Received: from smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan2.iad.amazon.com [10.32.235.34])
-	by email-inbound-relay-iad-1d-m6i4x-25ac6bd5.us-east-1.amazon.com (Postfix) with ESMTPS id 7E64249EB6;
-	Fri, 12 Jan 2024 20:38:23 +0000 (UTC)
-Received: from EX19MTAEUC001.ant.amazon.com [10.0.10.100:52631]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.14.24:2525] with esmtp (Farcaster)
- id 3e3b97ba-86e9-46e8-83e1-daf4e018fa7e; Fri, 12 Jan 2024 20:38:22 +0000 (UTC)
-X-Farcaster-Flow-ID: 3e3b97ba-86e9-46e8-83e1-daf4e018fa7e
-Received: from EX19D032EUC001.ant.amazon.com (10.252.61.222) by
- EX19MTAEUC001.ant.amazon.com (10.252.51.155) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Fri, 12 Jan 2024 20:38:22 +0000
-Received: from EX19D008UEC001.ant.amazon.com (10.252.135.232) by
- EX19D032EUC001.ant.amazon.com (10.252.61.222) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Fri, 12 Jan 2024 20:38:21 +0000
-Received: from EX19D008UEC001.ant.amazon.com ([fe80::4702:5d1a:c556:797]) by
- EX19D008UEC001.ant.amazon.com ([fe80::4702:5d1a:c556:797%3]) with mapi id
- 15.02.1118.040; Fri, 12 Jan 2024 20:38:21 +0000
-From: "Woodhouse, David" <dwmw@amazon.co.uk>
-To: "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC: "pbonzini@redhat.com" <pbonzini@redhat.com>, "seanjc@google.com"
-	<seanjc@google.com>, "Durrant, Paul" <pdurrant@amazon.co.uk>
-Subject: [PATCH] KVM: pfncache: rework __kvm_gpc_refresh() to fix locking
- issues
-Thread-Topic: [PATCH] KVM: pfncache: rework __kvm_gpc_refresh() to fix locking
- issues
-Thread-Index: AQHaRZdH/5R5foK5Dkq2EmfI7zjsew==
-Date: Fri, 12 Jan 2024 20:38:20 +0000
-Message-ID: <9a82db197449bdb97ee889d2f3cdd7998abd9692.camel@amazon.co.uk>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: yes
-X-MS-TNEF-Correlator: 
-MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 182617 [Jan 12 2024]
+X-KSMG-AntiSpam-Version: 6.1.0.3
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a, {Tracking_from_domain_doesnt_match_to}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;salutedevices.com:7.1.1;smtp.sberdevices.ru:7.1.1,5.0.1;100.64.160.123:7.1.2;127.0.0.199:7.1.2, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2024/01/12 18:46:00 #23122211
+X-KSMG-AntiVirus-Status: Clean, skipped
 
---===============6231862153601125174==
-Content-Language: en-US
-Content-Type: multipart/signed; micalg=sha-256;
-	protocol="application/pkcs7-signature"; boundary="=-rMsI5vJzYoVwInb9zXKQ"
+Implement port for given CID as input argument instead of using
+hardcoded value '1234'. This allows to run different test instances
+on a single CID. Port argument is not required parameter and if it is
+not set, then default value will be '1234' - thus we preserve previous
+behaviour.
 
---=-rMsI5vJzYoVwInb9zXKQ
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
+Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+---
+ tools/testing/vsock/util.c                | 17 +++-
+ tools/testing/vsock/util.h                |  4 +
+ tools/testing/vsock/vsock_diag_test.c     | 18 ++++-
+ tools/testing/vsock/vsock_test.c          | 96 +++++++++++++----------
+ tools/testing/vsock/vsock_test_zerocopy.c | 12 +--
+ tools/testing/vsock/vsock_uring_test.c    | 16 +++-
+ 6 files changed, 107 insertions(+), 56 deletions(-)
 
-VGhpcyBmdW5jdGlvbiBjYW4gcmFjZSB3aXRoIGt2bV9ncGNfZGVhY3RpdmF0ZSgpLiBTaW5jZSB0
-aGF0IGZ1bmN0aW9uCmRvZXMgbm90IHRha2UgdGhlIC0+cmVmcmVzaF9sb2NrLCBpdCBjYW4gd2lw
-ZSBhbmQgdW5tYXAgdGhlIHBmbiBhbmQKa2h2YSB3aGlsZSBodmFfdG9fcGZuX3JldHJ5KCkgaGFz
-IGRyb3BwZWQgaXRzIHdyaXRlIGxvY2sgb24gZ3BjLT5sb2NrLgoKVGhlbiBpZiBodmFfdG9fcGZu
-X3JldHJ5KCkgZGV0ZXJtaW5lcyB0aGF0IHRoZSBQRk4gaGFzbid0IGNoYW5nZWQgYW5kCnRoYXQg
-aXQgY2FuIHJlLXVzZSB0aGUgb2xkIHBmbiBhbmQga2h2YSwgdGhleSBnZXQgYXNzaWduZWQgYmFj
-ayB0bwpncGMtPnBmbiBhbmQgZ3BjLT5raHZhIGV2ZW4gdGhvdWdoIHRoZSBraHZhIHdhcyBhbHJl
-YWR5IHVubWFwcGVkIGJ5Cmt2bV9ncGNfZGVhY3RpdmF0ZSgpLiBUaGlzIGxlYXZlcyB0aGUgY2Fj
-aGUgaW4gYW4gYXBwYXJlbnRseSB2YWxpZApzdGF0ZSBidXQgd2l0aCAtPmtodmEgcG9pbnRpbmcg
-dG8gYW4gYWRkcmVzcyB3aGljaCBoYXMgYmVlbiB1bm1hcHBlZC4KV2hpY2ggaW4gdHVybiBsZWFk
-cyB0byBvb3BzZXMgaW4gZS5nLiBfX2t2bV94ZW5faGFzX2ludGVycnVwdCgpIGFuZApzZXRfc2hp
-bmZvX2V2dGNobl9wZW5kaW5nKCkuCgpJdCBtYXkgYmUgcG9zc2libGUgdG8gZml4IHRoaXMganVz
-dCBieSBtYWtpbmcga3ZtX2dwY19kZWFjdGl2YXRlKCkKdGFrZSB0aGUgLT5yZWZyZXNoX2xvY2ss
-IGJ1dCB0aGF0IHN0aWxsIGxlYXZlcyAtPnJlZnJlc2hfbG9jayBiZWluZwpiYXNpY2FsbHkgcmVk
-dW5kYW50IHdpdGggdGhlIHdyaXRlIGxvY2sgb24gLT5sb2NrLCB3aGljaCBmcmFua2x5Cm1ha2Vz
-IG15IHNraW4gaXRjaCwgd2l0aCB0aGUgd2F5IHRoYXQgcGZuX3RvX2h2YV9yZXRyeSgpIG9wZXJh
-dGVzIG9uCmZpZWxkcyBpbiB0aGUgZ3BjIHdpdGhvdXQgaG9sZGluZyAtPmxvY2suCgpJbnN0ZWFk
-LCBmaXggaXQgYnkgY2xlYW5pbmcgdXAgdGhlIHNlbWFudGlzIG9mIGh2YV90b19wZm5fcmV0cnko
-KS4gSXQKbm8gbG9uZ2VyIG9wZXJhdGVzIG9uIHRoZSBncGMgb2JqZWN0IGF0IGFsbDsgaXQncyBj
-YWxsZWQgd2l0aCBhIHVodmEKYW5kIHJldHVybnMgdGhlIGNvcnJlc3BvbmRpbmcgcGZuIChwaW5u
-ZWQpLCBhbmQgYSBtYXBwZWQga2h2YSBmb3IgaXQuCgpUaGUgY2FsbGluZyBmdW5jdGlvbiBfX2t2
-bV9ncGNfcmVmcmVzaCgpIG5vdyBkcm9wcyAtPmxvY2sgYmVmb3JlIGNhbGxpbmcKaHZhX3RvX3Bm
-bl9yZXRyeSgpLCB0aGVuIHJldGFrZXMgdGhlIGxvY2sgYmVmb3JlIGNoZWNraW5nIGZvciBjaGFu
-Z2VzLAphbmQgZGlzY2FyZHMgdGhlIG5ldyBtYXBwaW5nIGlmIGl0IGxvc3QgYSByYWNlLiBBbmQg
-d2lsbCBjb3JyZWN0bHkKbm90ZSB0aGUgb2xkIHBmbi9raHZhIHRvIGJlIHVubWFwcGVkIGF0IHRo
-ZSByaWdodCB0aW1lLCBpbnN0ZWFkIG9mCnByZXNlcnZpbmcgdGhlbSBpbiBhIGxvY2FsIHZhcmlh
-YmxlIHdoaWxlIGRyb3BwaW5nIHRoZSBsb2NrLgoKVGhlIG9wdGltaXNhdGlvbiBpbiBodmFfdG9f
-cGZuX3JldHJ5KCkgd2hlcmUgaXQgYXR0ZW1wdHMgdG8gdXNlIHRoZQpvbGQgbWFwcGluZyBpZiB0
-aGUgcGZuIGRvZXNuJ3QgY2hhbmdlIGlzIGRyb3BwZWQsIHNpbmNlIGl0IG1ha2VzIHRoZQpwaW5u
-aW5nIG1vcmUgY29tcGxleC4gSXQncyBhIHBvaW50bGVzcyBvcHRpbWlzYXRpb24gYW55d2F5LCBz
-aW5jZSB0aGUKb2RkcyBvZiB0aGUgcGZuIGVuZGluZyB1cCB0aGUgc2FtZSB3aGVuIHRoZSB1aHZh
-IGhhcyBjaGFuZ2VkIChpLmUuCnRoZSBvZGRzIG9mIHRoZSB0d28gdXNlcnNwYWNlIGFkZHJlc3Nl
-cyBib3RoIHBvaW50aW5nIHRvIHRoZSBzYW1lCnVuZGVybHlpbmcgcGh5c2ljYWwgcGFnZSkgYXJl
-IG5lZ2xpZ2libGUsCgpJIHJlbWFpbiBzbGlnaHRseSBjb25mdXNlZCBiZWNhdXNlIGFsdGhvdWdo
-IHRoaXMgaXMgY2xlYXJseSBhIHJhY2UgaW4KdGhlIGdmbl90b19wZm5fY2FjaGUgY29kZSwgSSBk
-b24ndCBxdWl0ZSBrbm93IGhvdyB0aGUgWGVuIHN1cHBvcnQgY29kZQphY3R1YWxseSBtYW5hZ2Vk
-IHRvIHRyaWdnZXIgaXQuIFdlJ3ZlIHNlZW4gb29wc2VzIGZyb20gZGVyZWZlcmVuY2luZyBhCnZh
-bGlkLWxvb2tpbmcgLT5raHZhIGluIGJvdGggX19rdm1feGVuX2hhc19pbnRlcnJ1cHQoKSAodGhl
-IHZjcHVfaW5mbykKYW5kIGluIHNldF9zaGluZm9fZXZ0Y2huX3BlbmRpbmcoKSAodGhlIHNoYXJl
-ZF9pbmZvKS4gQnV0IHN1cmVseSB0aGUKcmFjZSBzaG91bGRuJ3QgaGFwcGVuIGZvciB0aGUgdmNw
-dV9pbmZvIGdwYyBiZWNhdXNlIGFsbCBjYWxscyB0byBib3RoCnJlZnJlc2ggYW5kIGRlYWN0aXZh
-dGUgaG9sZCB0aGUgdmNwdSBtdXRleCwgYW5kIGl0IHNob3VsZG4ndCBoYXBwZW4KZm9yIHRoZSBz
-aGFyZWRfaW5mbyBncGMgYmVjYXVzZSBhbGwgY2FsbHMgdG8gYm90aCB3aWxsIGhvbGQgdGhlCmt2
-bS0+YXJjaC54ZW4ueGVuX2xvY2sgbXV0ZXguCgpTaWduZWQtb2ZmLWJ5OiBEYXZpZCBXb29kaG91
-c2UgPGR3bXdAYW1hem9uLmNvLnVrPgotLS0KClRoaXMgaXMgYmFzZWQgb24gKGFuZCBpbikgbXkg
-dHJlZSBhdApodHRwczovL2dpdC5pbmZyYWRlYWQub3JnL3VzZXJzL2R3bXcyL2xpbnV4LmdpdC9z
-aG9ydGxvZy9yZWZzL2hlYWRzL3hlbmZ2CndoaWNoIGhhcyBhbGwgdGhlIG90aGVyIG91dHN0YW5k
-aW5nIEtWTS9YZW4gZml4ZXMuCgrCoHZpcnQva3ZtL3BmbmNhY2hlLmMgfCAxODEgKysrKysrKysr
-KysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KwqAxIGZpbGUgY2hhbmdlZCwgODUg
-aW5zZXJ0aW9ucygrKSwgOTYgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvdmlydC9rdm0vcGZu
-Y2FjaGUuYyBiL3ZpcnQva3ZtL3BmbmNhY2hlLmMKaW5kZXggNzAzOTRkN2M5YTM4Li5hZGNhNzA5
-YTU4ODQgMTAwNjQ0Ci0tLSBhL3ZpcnQva3ZtL3BmbmNhY2hlLmMKKysrIGIvdmlydC9rdm0vcGZu
-Y2FjaGUuYwpAQCAtMTM1LDExMCArMTM1LDY3IEBAIHN0YXRpYyBpbmxpbmUgYm9vbCBtbXVfbm90
-aWZpZXJfcmV0cnlfY2FjaGUoc3RydWN0IGt2bSAqa3ZtLCB1bnNpZ25lZCBsb25nIG1tdV9zCsKg
-wqDCoMKgwqDCoMKgwqByZXR1cm4ga3ZtLT5tbXVfaW52YWxpZGF0ZV9zZXEgIT0gbW11X3NlcTsK
-wqB9CsKgCi1zdGF0aWMga3ZtX3Bmbl90IGh2YV90b19wZm5fcmV0cnkoc3RydWN0IGdmbl90b19w
-Zm5fY2FjaGUgKmdwYykKKy8qCisgKiBHaXZlbiBhIHVzZXIgdmlydHVhbCBhZGRyZXNzLCBvYnRh
-aW4gYSBwaW5uZWQgaG9zdCBQRk4gYW5kIGtlcm5lbCBtYXBwaW5nCisgKiBmb3IgaXQuIFRoZSBj
-YWxsZXIgd2lsbCByZWxlYXNlIHRoZSBQRk4gYWZ0ZXIgaW5zdGFsbGluZyBpdCBpbnRvIHRoZSBH
-UEMKKyAqIHNvIHRoYXQgdGhlIE1NVSBub3RpZmllciBpbnZhbGlkYXRpb24gbWVjaGFuaXNtIGlz
-IGFjdGl2ZS4KKyAqLworc3RhdGljIGt2bV9wZm5fdCBodmFfdG9fcGZuX3JldHJ5KHN0cnVjdCBr
-dm0gKmt2bSwgdW5zaWduZWQgbG9uZyB1aHZhLAorwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBrdm1fcGZuX3QgKnBmbiwgdm9p
-ZCAqKmtodmEpCsKgewrCoMKgwqDCoMKgwqDCoMKgLyogTm90ZSwgdGhlIG5ldyBwYWdlIG9mZnNl
-dCBtYXkgYmUgZGlmZmVyZW50IHRoYW4gdGhlIG9sZCEgKi8KLcKgwqDCoMKgwqDCoMKgdm9pZCAq
-b2xkX2todmEgPSAodm9pZCAqKVBBR0VfQUxJR05fRE9XTigodWludHB0cl90KWdwYy0+a2h2YSk7
-CsKgwqDCoMKgwqDCoMKgwqBrdm1fcGZuX3QgbmV3X3BmbiA9IEtWTV9QRk5fRVJSX0ZBVUxUOwrC
-oMKgwqDCoMKgwqDCoMKgdm9pZCAqbmV3X2todmEgPSBOVUxMOwrCoMKgwqDCoMKgwqDCoMKgdW5z
-aWduZWQgbG9uZyBtbXVfc2VxOwrCoAotwqDCoMKgwqDCoMKgwqBsb2NrZGVwX2Fzc2VydF9oZWxk
-KCZncGMtPnJlZnJlc2hfbG9jayk7Ci0KLcKgwqDCoMKgwqDCoMKgbG9ja2RlcF9hc3NlcnRfaGVs
-ZF93cml0ZSgmZ3BjLT5sb2NrKTsKLQotwqDCoMKgwqDCoMKgwqAvKgotwqDCoMKgwqDCoMKgwqAg
-KiBJbnZhbGlkYXRlIHRoZSBjYWNoZSBwcmlvciB0byBkcm9wcGluZyBncGMtPmxvY2ssIHRoZSBn
-cGE9PnVodmEKLcKgwqDCoMKgwqDCoMKgICogYXNzZXRzIGhhdmUgYWxyZWFkeSBiZWVuIHVwZGF0
-ZWQgYW5kIHNvIGEgY29uY3VycmVudCBjaGVjaygpIGZyb20gYQotwqDCoMKgwqDCoMKgwqAgKiBk
-aWZmZXJlbnQgdGFzayBtYXkgbm90IGZhaWwgdGhlIGdwYS91aHZhL2dlbmVyYXRpb24gY2hlY2tz
-LgotwqDCoMKgwqDCoMKgwqAgKi8KLcKgwqDCoMKgwqDCoMKgZ3BjLT52YWxpZCA9IGZhbHNlOwot
-Ci3CoMKgwqDCoMKgwqDCoGRvIHsKLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoG1tdV9z
-ZXEgPSBncGMtPmt2bS0+bW11X2ludmFsaWRhdGVfc2VxOworwqDCoMKgwqDCoMKgwqBmb3IgKDs7
-KSB7CivCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBtbXVfc2VxID0ga3ZtLT5tbXVfaW52
-YWxpZGF0ZV9zZXE7CsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgc21wX3JtYigpOwrC
-oAotwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgd3JpdGVfdW5sb2NrX2lycSgmZ3BjLT5s
-b2NrKTsKLQotwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgLyoKLcKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoCAqIElmIHRoZSBwcmV2aW91cyBpdGVyYXRpb24gImZhaWxlZCIgZHVl
-IHRvIGFuIG1tdV9ub3RpZmllcgotwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICogZXZl
-bnQsIHJlbGVhc2UgdGhlIHBmbiBhbmQgdW5tYXAgdGhlIGtlcm5lbCB2aXJ0dWFsIGFkZHJlc3MK
-LcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAqIGZyb20gdGhlIHByZXZpb3VzIGF0dGVt
-cHQuwqAgVW5tYXBwaW5nIG1pZ2h0IHNsZWVwLCBzbyB0aGlzCi3CoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqAgKiBuZWVkcyB0byBiZSBkb25lIGFmdGVyIGRyb3BwaW5nIHRoZSBsb2NrLsKg
-IE9wcG9ydHVuaXN0aWNhbGx5Ci3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKiBjaGVj
-ayBmb3IgcmVzY2hlZCB3aGlsZSB0aGUgbG9jayBpc24ndCBoZWxkLgotwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgICovCi3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBpZiAobmV3
-X3BmbiAhPSBLVk1fUEZOX0VSUl9GQVVMVCkgewotwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoC8qCi3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgICogS2VlcCB0aGUgbWFwcGluZyBpZiB0aGUgcHJldmlvdXMgaXRlcmF0aW9u
-IHJldXNlZAotwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAq
-IHRoZSBleGlzdGluZyBtYXBwaW5nIGFuZCBkaWRuJ3QgY3JlYXRlIGEgbmV3IG9uZS4KLcKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKi8KLcKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBpZiAobmV3X2todmEgIT0gb2xkX2to
-dmEpCi3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoGdwY191bm1hcChuZXdfcGZuLCBuZXdfa2h2YSk7Ci0KLcKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBrdm1fcmVsZWFzZV9wZm5fY2xlYW4obmV3
-X3Bmbik7Ci0KLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBj
-b25kX3Jlc2NoZWQoKTsKLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoH0KLQrCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoC8qIFdlIGFsd2F5cyByZXF1ZXN0IGEgd3JpdGVhYmxl
-IG1hcHBpbmcgKi8KLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoG5ld19wZm4gPSBodmFf
-dG9fcGZuKGdwYy0+dWh2YSwgZmFsc2UsIGZhbHNlLCBOVUxMLCB0cnVlLCBOVUxMKTsKK8KgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoG5ld19wZm4gPSBodmFfdG9fcGZuKHVodmEsIGZhbHNl
-LCBmYWxzZSwgTlVMTCwgdHJ1ZSwgTlVMTCk7CsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgaWYgKGlzX2Vycm9yX25vc2xvdF9wZm4obmV3X3BmbikpCi3CoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgZ290byBvdXRfZXJyb3I7CivCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgcmV0dXJuIC1FRkFVTFQ7CsKgCsKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgLyoKLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoCAqIE9idGFpbiBhIG5ldyBrZXJuZWwgbWFwcGluZyBpZiBLVk0gaXRzZWxmIHdpbGwgYWNj
-ZXNzIHRoZQotwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICogcGZuLsKgIE5vdGUsIGtt
-YXAoKSBhbmQgbWVtcmVtYXAoKSBjYW4gYm90aCBzbGVlcCwgc28gdGhpcwotwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgICogdG9vIG11c3QgYmUgZG9uZSBvdXRzaWRlIG9mIGdwYy0+bG9j
-ayEKK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAqIEFsd2F5cyBvYnRhaW4gYSBuZXcg
-a2VybmVsIG1hcHBpbmcuIFRyeWluZyB0byByZXVzZSBhbgorwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgICogZXhpc3Rpbmcgb25lIGlzIG1vcmUgY29tcGxleCB0aGFuIGl0J3Mgd29ydGgu
-CsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICovCi3CoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqBpZiAobmV3X3BmbiA9PSBncGMtPnBmbikKLcKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBuZXdfa2h2YSA9IG9sZF9raHZhOwotwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgZWxzZQotwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoG5ld19raHZhID0gZ3BjX21hcChuZXdfcGZuKTsKLQorwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgbmV3X2todmEgPSBncGNfbWFwKG5ld19wZm4pOwrCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGlmICghbmV3X2todmEpIHsKwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKga3ZtX3JlbGVhc2VfcGZuX2NsZWFuKG5l
-d19wZm4pOwotwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGdv
-dG8gb3V0X2Vycm9yOworwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoHJldHVybiAtRUZBVUxUOwrCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoH0KwqAK
-LcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHdyaXRlX2xvY2tfaXJxKCZncGMtPmxvY2sp
-OworwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgaWYgKCFtbXVfbm90aWZpZXJfcmV0cnlf
-Y2FjaGUoa3ZtLCBtbXVfc2VxKSkKK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqBicmVhazsKwqAKwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAvKgot
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICogT3RoZXIgdGFza3MgbXVzdCB3YWl0IGZv
-ciBfdGhpc18gcmVmcmVzaCB0byBjb21wbGV0ZSBiZWZvcmUKLcKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoCAqIGF0dGVtcHRpbmcgdG8gcmVmcmVzaC4KK8KgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoCAqIElmIHRoaXMgaXRlcmF0aW9uICJmYWlsZWQiIGR1ZSB0byBhbiBtbXVfbm90
-aWZpZXIgZXZlbnQsCivCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKiByZWxlYXNlIHRo
-ZSBwZm4gYW5kIHVubWFwIHRoZSBrZXJuZWwgdmlydHVhbCBhZGRyZXNzLCBhbmQKK8KgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAqIGxvb3AgYXJvdW5kIGFnYWluLgrCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoCAqLwotwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgV0FS
-Tl9PTl9PTkNFKGdwYy0+dmFsaWQpOwotwqDCoMKgwqDCoMKgwqB9IHdoaWxlIChtbXVfbm90aWZp
-ZXJfcmV0cnlfY2FjaGUoZ3BjLT5rdm0sIG1tdV9zZXEpKTsKLQotwqDCoMKgwqDCoMKgwqBncGMt
-PnZhbGlkID0gdHJ1ZTsKLcKgwqDCoMKgwqDCoMKgZ3BjLT5wZm4gPSBuZXdfcGZuOwotwqDCoMKg
-wqDCoMKgwqBncGMtPmtodmEgPSBuZXdfa2h2YSArIG9mZnNldF9pbl9wYWdlKGdwYy0+dWh2YSk7
-CivCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBpZiAobmV3X3BmbiAhPSBLVk1fUEZOX0VS
-Ul9GQVVMVCkgeworwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oGdwY191bm1hcChuZXdfcGZuLCBuZXdfa2h2YSk7CivCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKga3ZtX3JlbGVhc2VfcGZuX2NsZWFuKG5ld19wZm4pOworwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgfQorwqDCoMKgwqDCoMKgwqB9CsKgCi3CoMKgwqDC
-oMKgwqDCoC8qCi3CoMKgwqDCoMKgwqDCoCAqIFB1dCB0aGUgcmVmZXJlbmNlIHRvIHRoZSBfbmV3
-XyBwZm4uwqAgVGhlIHBmbiBpcyBub3cgdHJhY2tlZCBieSB0aGUKLcKgwqDCoMKgwqDCoMKgICog
-Y2FjaGUgYW5kIGNhbiBiZSBzYWZlbHkgbWlncmF0ZWQsIHN3YXBwZWQsIGV0Yy4uLiBhcyB0aGUg
-Y2FjaGUgd2lsbAotwqDCoMKgwqDCoMKgwqAgKiBpbnZhbGlkYXRlIGFueSBtYXBwaW5ncyBpbiBy
-ZXNwb25zZSB0byByZWxldmFudCBtbXVfbm90aWZpZXIgZXZlbnRzLgotwqDCoMKgwqDCoMKgwqAg
-Ki8KLcKgwqDCoMKgwqDCoMKga3ZtX3JlbGVhc2VfcGZuX2NsZWFuKG5ld19wZm4pOworwqDCoMKg
-wqDCoMKgwqAqcGZuID0gbmV3X3BmbjsKK8KgwqDCoMKgwqDCoMKgKmtodmEgPSBuZXdfa2h2YTsK
-wqAKwqDCoMKgwqDCoMKgwqDCoHJldHVybiAwOwotCi1vdXRfZXJyb3I6Ci3CoMKgwqDCoMKgwqDC
-oHdyaXRlX2xvY2tfaXJxKCZncGMtPmxvY2spOwotCi3CoMKgwqDCoMKgwqDCoHJldHVybiAtRUZB
-VUxUOwrCoH0KwqAKLXN0YXRpYyBpbnQgX19rdm1fZ3BjX3JlZnJlc2goc3RydWN0IGdmbl90b19w
-Zm5fY2FjaGUgKmdwYywgZ3BhX3QgZ3BhLCB1bnNpZ25lZCBsb25nIHVodmEsCi3CoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgdW5zaWduZWQgbG9u
-ZyBsZW4pCitzdGF0aWMgaW50IF9fa3ZtX2dwY19yZWZyZXNoKHN0cnVjdCBnZm5fdG9fcGZuX2Nh
-Y2hlICpncGMsIGdwYV90IGdwYSwKK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoCB1bnNpZ25lZCBsb25nIHVodmEsIHVuc2lnbmVkIGxvbmcgbGVu
-KQrCoHsKwqDCoMKgwqDCoMKgwqDCoHN0cnVjdCBrdm1fbWVtc2xvdHMgKnNsb3RzID0ga3ZtX21l
-bXNsb3RzKGdwYy0+a3ZtKTsKwqDCoMKgwqDCoMKgwqDCoHVuc2lnbmVkIGxvbmcgcGFnZV9vZmZz
-ZXQgPSAoZ3BhICE9IEtWTV9YRU5fSU5WQUxJRF9HUEEpID8KwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqBvZmZzZXRfaW5fcGFnZShncGEpIDoKwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqBvZmZzZXRfaW5fcGFnZSh1aHZhKTsKLcKgwqDCoMKgwqDCoMKgYm9vbCB1bm1hcF9v
-bGQgPSBmYWxzZTsKwqDCoMKgwqDCoMKgwqDCoHVuc2lnbmVkIGxvbmcgb2xkX3VodmE7Ci3CoMKg
-wqDCoMKgwqDCoGt2bV9wZm5fdCBvbGRfcGZuOwotwqDCoMKgwqDCoMKgwqBib29sIGh2YV9jaGFu
-Z2UgPSBmYWxzZTsKK8KgwqDCoMKgwqDCoMKga3ZtX3Bmbl90IG9sZF9wZm4gPSBLVk1fUEZOX0VS
-Ul9GQVVMVDsKwqDCoMKgwqDCoMKgwqDCoHZvaWQgKm9sZF9raHZhOwrCoMKgwqDCoMKgwqDCoMKg
-aW50IHJldDsKwqAKQEAgLTI1MSw4ICsyMDgsOSBAQCBzdGF0aWMgaW50IF9fa3ZtX2dwY19yZWZy
-ZXNoKHN0cnVjdCBnZm5fdG9fcGZuX2NhY2hlICpncGMsIGdwYV90IGdwYSwgdW5zaWduZWQgbArC
-oArCoMKgwqDCoMKgwqDCoMKgLyoKwqDCoMKgwqDCoMKgwqDCoCAqIElmIGFub3RoZXIgdGFzayBp
-cyByZWZyZXNoaW5nIHRoZSBjYWNoZSwgd2FpdCBmb3IgaXQgdG8gY29tcGxldGUuCi3CoMKgwqDC
-oMKgwqDCoCAqIFRoZXJlIGlzIG5vIGd1YXJhbnRlZSB0aGF0IGNvbmN1cnJlbnQgcmVmcmVzaGVz
-IHdpbGwgc2VlIHRoZSBzYW1lCi3CoMKgwqDCoMKgwqDCoCAqIGdwYSwgbWVtc2xvdHMgZ2VuZXJh
-dGlvbiwgZXRjLi4uLCBzbyB0aGV5IG11c3QgYmUgZnVsbHkgc2VyaWFsaXplZC4KK8KgwqDCoMKg
-wqDCoMKgICogVGhpcyBpcyBwdXJlbHkgYW4gb3B0aW1pc2F0aW9uLCB0byBhdm9pZCBjb25jdXJy
-ZW50IG1hcHBpbmdzIGZyb20KK8KgwqDCoMKgwqDCoMKgICogaHZhX3RvX3Bmbl9yZXRyeSgpLCBh
-bGwgYnV0IG9uZSBvZiB3aGljaCB3aWxsIGJlIGRpc2NhcmRlZCBhZnRlcgorwqDCoMKgwqDCoMKg
-wqAgKiBsb3NpbmcgYSByYWNlIHRvIGluc3RhbGwgdGhlbSBpbiB0aGUgR1BDLgrCoMKgwqDCoMKg
-wqDCoMKgICovCsKgwqDCoMKgwqDCoMKgwqBtdXRleF9sb2NrKCZncGMtPnJlZnJlc2hfbG9jayk7
-CsKgCkBAIC0yNzIsNyArMjMwLDcgQEAgc3RhdGljIGludCBfX2t2bV9ncGNfcmVmcmVzaChzdHJ1
-Y3QgZ2ZuX3RvX3Bmbl9jYWNoZSAqZ3BjLCBncGFfdCBncGEsIHVuc2lnbmVkIGwKwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBncGMtPnVodmEgPSBQQUdFX0FMSUdOX0RPV04odWh2YSk7
-CsKgCsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgaWYgKGdwYy0+dWh2YSAhPSBvbGRf
-dWh2YSkKLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBodmFf
-Y2hhbmdlID0gdHJ1ZTsKK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqBncGMtPnZhbGlkID0gZmFsc2U7CsKgwqDCoMKgwqDCoMKgwqB9IGVsc2UgaWYgKGdwYy0+
-Z3BhICE9IGdwYSB8fArCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgZ3BjLT5n
-ZW5lcmF0aW9uICE9IHNsb3RzLT5nZW5lcmF0aW9uIHx8CsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoCBrdm1faXNfZXJyb3JfaHZhKGdwYy0+dWh2YSkpIHsKQEAgLTI4NSw3ICsy
-NDMsMTEgQEAgc3RhdGljIGludCBfX2t2bV9ncGNfcmVmcmVzaChzdHJ1Y3QgZ2ZuX3RvX3Bmbl9j
-YWNoZSAqZ3BjLCBncGFfdCBncGEsIHVuc2lnbmVkIGwKwqAKwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqBpZiAoa3ZtX2lzX2Vycm9yX2h2YShncGMtPnVodmEpKSB7CsKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHJldCA9IC1FRkFVTFQ7Ci3CoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgZ290byBvdXQ7CisKK8Kg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBncGMtPnZhbGlkID0g
-ZmFsc2U7CivCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgZ3Bj
-LT5wZm4gPSBLVk1fUEZOX0VSUl9GQVVMVDsKK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqBncGMtPmtodmEgPSBOVUxMOworwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGdvdG8gb3V0X3VubG9jazsKwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqB9CsKgCsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgLyoK
-QEAgLTI5Myw3ICsyNTUsNyBAQCBzdGF0aWMgaW50IF9fa3ZtX2dwY19yZWZyZXNoKHN0cnVjdCBn
-Zm5fdG9fcGZuX2NhY2hlICpncGMsIGdwYV90IGdwYSwgdW5zaWduZWQgbArCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoCAqIEhWQSBtYXkgc3RpbGwgYmUgdGhlIHNhbWUuCsKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICovCsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgaWYgKGdwYy0+dWh2YSAhPSBvbGRfdWh2YSkKLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqBodmFfY2hhbmdlID0gdHJ1ZTsKK8KgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBncGMtPnZhbGlkID0gZmFsc2U7CsKgwqDCoMKg
-wqDCoMKgwqB9IGVsc2UgewrCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGdwYy0+dWh2
-YSA9IG9sZF91aHZhOwrCoMKgwqDCoMKgwqDCoMKgfQpAQCAtMzA1LDkgKzI2Nyw3IEBAIHN0YXRp
-YyBpbnQgX19rdm1fZ3BjX3JlZnJlc2goc3RydWN0IGdmbl90b19wZm5fY2FjaGUgKmdwYywgZ3Bh
-X3QgZ3BhLCB1bnNpZ25lZCBsCsKgwqDCoMKgwqDCoMKgwqAgKiBJZiB0aGUgdXNlcnNwYWNlIEhW
-QSBjaGFuZ2VkIG9yIHRoZSBQRk4gd2FzIGFscmVhZHkgaW52YWxpZCwKwqDCoMKgwqDCoMKgwqDC
-oCAqIGRyb3AgdGhlIGxvY2sgYW5kIGRvIHRoZSBIVkEgdG8gUEZOIGxvb2t1cCBhZ2Fpbi4KwqDC
-oMKgwqDCoMKgwqDCoCAqLwotwqDCoMKgwqDCoMKgwqBpZiAoIWdwYy0+dmFsaWQgfHwgaHZhX2No
-YW5nZSkgewotwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgcmV0ID0gaHZhX3RvX3Bmbl9y
-ZXRyeShncGMpOwotwqDCoMKgwqDCoMKgwqB9IGVsc2UgeworwqDCoMKgwqDCoMKgwqBpZiAoZ3Bj
-LT52YWxpZCkgewrCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoC8qCsKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgICogSWYgdGhlIEhWQeKGklBGTiBtYXBwaW5nIHdhcyBhbHJl
-YWR5IHZhbGlkLCBkb24ndCB1bm1hcCBpdC4KwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqAgKiBCdXQgZG8gdXBkYXRlIGdwYy0+a2h2YSBiZWNhdXNlIHRoZSBvZmZzZXQgd2l0aGluIHRo
-ZSBwYWdlCkBAIC0zMTUsMzAgKzI3NSw1OSBAQCBzdGF0aWMgaW50IF9fa3ZtX2dwY19yZWZyZXNo
-KHN0cnVjdCBnZm5fdG9fcGZuX2NhY2hlICpncGMsIGdwYV90IGdwYSwgdW5zaWduZWQgbArCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAqLwrCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoGdwYy0+a2h2YSA9IG9sZF9raHZhICsgcGFnZV9vZmZzZXQ7CsKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgcmV0ID0gMDsKLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oGdvdG8gb3V0X3VubG9jazsKLcKgwqDCoMKgwqDCoMKgfQrCoAotIG91dDoKLcKgwqDCoMKgwqDC
-oMKgLyoKLcKgwqDCoMKgwqDCoMKgICogSW52YWxpZGF0ZSB0aGUgY2FjaGUgYW5kIHB1cmdlIHRo
-ZSBwZm4va2h2YSBpZiB0aGUgcmVmcmVzaCBmYWlsZWQuCi3CoMKgwqDCoMKgwqDCoCAqIFNvbWUv
-YWxsIG9mIHRoZSB1aHZhLCBncGEsIGFuZCBtZW1zbG90IGdlbmVyYXRpb24gaW5mbyBtYXkgc3Rp
-bGwgYmUKLcKgwqDCoMKgwqDCoMKgICogdmFsaWQsIGxlYXZlIGl0IGFzIGlzLgotwqDCoMKgwqDC
-oMKgwqAgKi8KLcKgwqDCoMKgwqDCoMKgaWYgKHJldCkgeworwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgLyogb2xkX3BmbiBtdXN0IG5vdCBiZSB1bm1hcHBlZCBiZWNhdXNlIGl0IHdhcyBy
-ZXVzZWQuICovCivCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBvbGRfcGZuID0gS1ZNX1BG
-Tl9FUlJfRkFVTFQ7CivCoMKgwqDCoMKgwqDCoH0gZWxzZSB7CivCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqBrdm1fcGZuX3QgbmV3X3BmbiA9IEtWTV9QRk5fRVJSX0ZBVUxUOworwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgdW5zaWduZWQgbG9uZyBuZXdfdWh2YSA9IGdwYy0+dWh2
-YTsKK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHZvaWQgKm5ld19raHZhID0gTlVMTDsK
-KworwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgLyoKK8KgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoCAqIEludmFsaWRhdGUgdGhlIGNhY2hlIHByaW9yIHRvIGRyb3BwaW5nIGdwYy0+
-bG9jazsgdGhlCivCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKiBncGE9PnVodmEgYXNz
-ZXRzIGhhdmUgYWxyZWFkeSBiZWVuIHVwZGF0ZWQgYW5kIHNvIGEKK8KgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoCAqIGNvbmN1cnJlbnQgY2hlY2soKSBmcm9tIGEgZGlmZmVyZW50IHRhc2sg
-bWF5IG5vdCBmYWlsCivCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKiB0aGUgZ3BhL3Vo
-dmEvZ2VuZXJhdGlvbiBjaGVja3MgYXMgaXQgc2hvdWxkLgorwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgICovCsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgZ3BjLT52YWxpZCA9
-IGZhbHNlOwotwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgZ3BjLT5wZm4gPSBLVk1fUEZO
-X0VSUl9GQVVMVDsKLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGdwYy0+a2h2YSA9IE5V
-TEw7Ci3CoMKgwqDCoMKgwqDCoH0KwqAKLcKgwqDCoMKgwqDCoMKgLyogRGV0ZWN0IGEgcGZuIGNo
-YW5nZSBiZWZvcmUgZHJvcHBpbmcgdGhlIGxvY2shICovCi3CoMKgwqDCoMKgwqDCoHVubWFwX29s
-ZCA9IChvbGRfcGZuICE9IGdwYy0+cGZuKTsKK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oHdyaXRlX3VubG9ja19pcnEoJmdwYy0+bG9jayk7CisKK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoHJldCA9IGh2YV90b19wZm5fcmV0cnkoZ3BjLT5rdm0sIG5ld191aHZhLCAmbmV3X3Bm
-biwgJm5ld19raHZhKTsKKworwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgd3JpdGVfbG9j
-a19pcnEoJmdwYy0+bG9jayk7CisKK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGlmIChy
-ZXQgfHwgZ3BjLT51aHZhICE9IG5ld191aHZhKSB7CivCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgLyoKK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqAgKiBPbiBmYWlsdXJlIG9yIGlmIGFub3RoZXIgdXBkYXRlIG9jY3VycmVk
-IHdoaWxlIHRoZQorwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oCAqIGxvY2sgd2FzIGRyb3BwZWQsIGp1c3QgcHVyZ2UgdGhlIG5ldyBtYXBwaW5nLiAqLworwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoG9sZF9wZm4gPSBuZXdf
-cGZuOworwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoG9sZF9r
-aHZhID0gbmV3X2todmE7CivCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqB9IGVsc2Ugewor
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoG9sZF9wZm4gPSBn
-cGMtPnBmbjsKK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBv
-bGRfa2h2YSA9IGdwYy0+a2h2YTsKKworwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoGdwYy0+cGZuID0gbmV3X3BmbjsKK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBncGMtPmtodmEgPSBuZXdfa2h2YSArIG9mZnNldF9pbl9w
-YWdlKGdwYy0+dWh2YSk7CivCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgZ3BjLT52YWxpZCA9IHRydWU7CivCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqB9
-CisKK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoC8qCivCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqAgKiBQdXQgdGhlIHJlZmVyZW5jZSB0byB0aGUgX25ld18gcGZuLiBPbiBzdWNj
-ZXNzLCB0aGUKK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAqIHBmbiBpcyBub3cgdHJh
-Y2tlZCBieSB0aGUgY2FjaGUgYW5kIGNhbiBzYWZlbHkgYmUKK8KgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoCAqIG1pZ3JhdGVkLCBzd2FwcGVkLCBldGMuIGFzIHRoZSBjYWNoZSB3aWxsIGlu
-dmFsaWRhdGUKK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAqIGFueSBtYXBwaW5ncyBp
-biByZXNwb25zZSB0byByZWxldmFudCBtbXVfbm90aWZpZXIKK8KgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoCAqIGV2ZW50cy4KK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAqLwor
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKga3ZtX3JlbGVhc2VfcGZuX2NsZWFuKG5ld19w
-Zm4pOworwqDCoMKgwqDCoMKgwqB9CsKgCsKgb3V0X3VubG9jazoKwqDCoMKgwqDCoMKgwqDCoHdy
-aXRlX3VubG9ja19pcnEoJmdwYy0+bG9jayk7CsKgCsKgwqDCoMKgwqDCoMKgwqBtdXRleF91bmxv
-Y2soJmdwYy0+cmVmcmVzaF9sb2NrKTsKwqAKLcKgwqDCoMKgwqDCoMKgaWYgKHVubWFwX29sZCkK
-K8KgwqDCoMKgwqDCoMKgaWYgKG9sZF9wZm4gIT0gS1ZNX1BGTl9FUlJfRkFVTFQpCsKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgZ3BjX3VubWFwKG9sZF9wZm4sIG9sZF9raHZhKTsKwqAK
-wqDCoMKgwqDCoMKgwqDCoHJldHVybiByZXQ7Ci0tIAoyLjQxLjAKCgo=
+diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
+index ae2b33c21c45..554b290fefdc 100644
+--- a/tools/testing/vsock/util.c
++++ b/tools/testing/vsock/util.c
+@@ -33,8 +33,7 @@ void init_signals(void)
+ 	signal(SIGPIPE, SIG_IGN);
+ }
+ 
+-/* Parse a CID in string representation */
+-unsigned int parse_cid(const char *str)
++static unsigned int parse_uint(const char *str, const char *err_str)
+ {
+ 	char *endptr = NULL;
+ 	unsigned long n;
+@@ -42,12 +41,24 @@ unsigned int parse_cid(const char *str)
+ 	errno = 0;
+ 	n = strtoul(str, &endptr, 10);
+ 	if (errno || *endptr != '\0') {
+-		fprintf(stderr, "malformed CID \"%s\"\n", str);
++		fprintf(stderr, "malformed %s \"%s\"\n", err_str, str);
+ 		exit(EXIT_FAILURE);
+ 	}
+ 	return n;
+ }
+ 
++/* Parse a CID in string representation */
++unsigned int parse_cid(const char *str)
++{
++	return parse_uint(str, "CID");
++}
++
++/* Parse a port in string representation */
++unsigned int parse_port(const char *str)
++{
++	return parse_uint(str, "port");
++}
++
+ /* Wait for the remote to close the connection */
+ void vsock_wait_remote_close(int fd)
+ {
+diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
+index 03c88d0cb861..e95e62485959 100644
+--- a/tools/testing/vsock/util.h
++++ b/tools/testing/vsock/util.h
+@@ -12,10 +12,13 @@ enum test_mode {
+ 	TEST_MODE_SERVER
+ };
+ 
++#define DEFAULT_PEER_PORT	1234
++
+ /* Test runner options */
+ struct test_opts {
+ 	enum test_mode mode;
+ 	unsigned int peer_cid;
++	unsigned int peer_port;
+ };
+ 
+ /* A test case definition.  Test functions must print failures to stderr and
+@@ -35,6 +38,7 @@ struct test_case {
+ 
+ void init_signals(void);
+ unsigned int parse_cid(const char *str);
++unsigned int parse_port(const char *str);
+ int vsock_stream_connect(unsigned int cid, unsigned int port);
+ int vsock_bind_connect(unsigned int cid, unsigned int port,
+ 		       unsigned int bind_port, int type);
+diff --git a/tools/testing/vsock/vsock_diag_test.c b/tools/testing/vsock/vsock_diag_test.c
+index fa927ad16f8a..5e6049226b77 100644
+--- a/tools/testing/vsock/vsock_diag_test.c
++++ b/tools/testing/vsock/vsock_diag_test.c
+@@ -342,7 +342,7 @@ static void test_listen_socket_server(const struct test_opts *opts)
+ 	} addr = {
+ 		.svm = {
+ 			.svm_family = AF_VSOCK,
+-			.svm_port = 1234,
++			.svm_port = opts->peer_port,
+ 			.svm_cid = VMADDR_CID_ANY,
+ 		},
+ 	};
+@@ -378,7 +378,7 @@ static void test_connect_client(const struct test_opts *opts)
+ 	LIST_HEAD(sockets);
+ 	struct vsock_stat *st;
+ 
+-	fd = vsock_stream_connect(opts->peer_cid, 1234);
++	fd = vsock_stream_connect(opts->peer_cid, opts->peer_port);
+ 	if (fd < 0) {
+ 		perror("connect");
+ 		exit(EXIT_FAILURE);
+@@ -403,7 +403,7 @@ static void test_connect_server(const struct test_opts *opts)
+ 	LIST_HEAD(sockets);
+ 	int client_fd;
+ 
+-	client_fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
++	client_fd = vsock_stream_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
+ 	if (client_fd < 0) {
+ 		perror("accept");
+ 		exit(EXIT_FAILURE);
+@@ -461,6 +461,11 @@ static const struct option longopts[] = {
+ 		.has_arg = required_argument,
+ 		.val = 'p',
+ 	},
++	{
++		.name = "peer-port",
++		.has_arg = required_argument,
++		.val = 'q',
++	},
+ 	{
+ 		.name = "list",
+ 		.has_arg = no_argument,
+@@ -481,7 +486,7 @@ static const struct option longopts[] = {
+ 
+ static void usage(void)
+ {
+-	fprintf(stderr, "Usage: vsock_diag_test [--help] [--control-host=<host>] --control-port=<port> --mode=client|server --peer-cid=<cid> [--list] [--skip=<test_id>]\n"
++	fprintf(stderr, "Usage: vsock_diag_test [--help] [--control-host=<host>] --control-port=<port> --mode=client|server --peer-cid=<cid> [--peer-port=<port>] [--list] [--skip=<test_id>]\n"
+ 		"\n"
+ 		"  Server: vsock_diag_test --control-port=1234 --mode=server --peer-cid=3\n"
+ 		"  Client: vsock_diag_test --control-host=192.168.0.1 --control-port=1234 --mode=client --peer-cid=2\n"
+@@ -503,6 +508,7 @@ static void usage(void)
+ 		"  --control-port <port>  Server port to listen on/connect to\n"
+ 		"  --mode client|server   Server or client mode\n"
+ 		"  --peer-cid <cid>       CID of the other side\n"
++		"  --peer-port <port>     Port of the other side\n"
+ 		"  --list                 List of tests that will be executed\n"
+ 		"  --skip <test_id>       Test ID to skip;\n"
+ 		"                         use multiple --skip options to skip more tests\n"
+@@ -517,6 +523,7 @@ int main(int argc, char **argv)
+ 	struct test_opts opts = {
+ 		.mode = TEST_MODE_UNSET,
+ 		.peer_cid = VMADDR_CID_ANY,
++		.peer_port = DEFAULT_PEER_PORT
+ 	};
+ 
+ 	init_signals();
+@@ -544,6 +551,9 @@ int main(int argc, char **argv)
+ 		case 'p':
+ 			opts.peer_cid = parse_cid(optarg);
+ 			break;
++		case 'q':
++			opts.peer_port = parse_port(optarg);
++			break;
+ 		case 'P':
+ 			control_port = optarg;
+ 			break;
+diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+index 66246d81d654..58574f4d1fe1 100644
+--- a/tools/testing/vsock/vsock_test.c
++++ b/tools/testing/vsock/vsock_test.c
+@@ -34,7 +34,7 @@ static void test_stream_connection_reset(const struct test_opts *opts)
+ 	} addr = {
+ 		.svm = {
+ 			.svm_family = AF_VSOCK,
+-			.svm_port = 1234,
++			.svm_port = opts->peer_port,
+ 			.svm_cid = opts->peer_cid,
+ 		},
+ 	};
+@@ -70,7 +70,7 @@ static void test_stream_bind_only_client(const struct test_opts *opts)
+ 	} addr = {
+ 		.svm = {
+ 			.svm_family = AF_VSOCK,
+-			.svm_port = 1234,
++			.svm_port = opts->peer_port,
+ 			.svm_cid = opts->peer_cid,
+ 		},
+ 	};
+@@ -112,7 +112,7 @@ static void test_stream_bind_only_server(const struct test_opts *opts)
+ 	} addr = {
+ 		.svm = {
+ 			.svm_family = AF_VSOCK,
+-			.svm_port = 1234,
++			.svm_port = opts->peer_port,
+ 			.svm_cid = VMADDR_CID_ANY,
+ 		},
+ 	};
+@@ -138,7 +138,7 @@ static void test_stream_client_close_client(const struct test_opts *opts)
+ {
+ 	int fd;
+ 
+-	fd = vsock_stream_connect(opts->peer_cid, 1234);
++	fd = vsock_stream_connect(opts->peer_cid, opts->peer_port);
+ 	if (fd < 0) {
+ 		perror("connect");
+ 		exit(EXIT_FAILURE);
+@@ -152,7 +152,7 @@ static void test_stream_client_close_server(const struct test_opts *opts)
+ {
+ 	int fd;
+ 
+-	fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
++	fd = vsock_stream_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
+ 	if (fd < 0) {
+ 		perror("accept");
+ 		exit(EXIT_FAILURE);
+@@ -173,7 +173,7 @@ static void test_stream_server_close_client(const struct test_opts *opts)
+ {
+ 	int fd;
+ 
+-	fd = vsock_stream_connect(opts->peer_cid, 1234);
++	fd = vsock_stream_connect(opts->peer_cid, opts->peer_port);
+ 	if (fd < 0) {
+ 		perror("connect");
+ 		exit(EXIT_FAILURE);
+@@ -194,7 +194,7 @@ static void test_stream_server_close_server(const struct test_opts *opts)
+ {
+ 	int fd;
+ 
+-	fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
++	fd = vsock_stream_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
+ 	if (fd < 0) {
+ 		perror("accept");
+ 		exit(EXIT_FAILURE);
+@@ -215,7 +215,7 @@ static void test_stream_multiconn_client(const struct test_opts *opts)
+ 	int i;
+ 
+ 	for (i = 0; i < MULTICONN_NFDS; i++) {
+-		fds[i] = vsock_stream_connect(opts->peer_cid, 1234);
++		fds[i] = vsock_stream_connect(opts->peer_cid, opts->peer_port);
+ 		if (fds[i] < 0) {
+ 			perror("connect");
+ 			exit(EXIT_FAILURE);
+@@ -239,7 +239,7 @@ static void test_stream_multiconn_server(const struct test_opts *opts)
+ 	int i;
+ 
+ 	for (i = 0; i < MULTICONN_NFDS; i++) {
+-		fds[i] = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
++		fds[i] = vsock_stream_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
+ 		if (fds[i] < 0) {
+ 			perror("accept");
+ 			exit(EXIT_FAILURE);
+@@ -267,9 +267,9 @@ static void test_msg_peek_client(const struct test_opts *opts,
+ 	int i;
+ 
+ 	if (seqpacket)
+-		fd = vsock_seqpacket_connect(opts->peer_cid, 1234);
++		fd = vsock_seqpacket_connect(opts->peer_cid, opts->peer_port);
+ 	else
+-		fd = vsock_stream_connect(opts->peer_cid, 1234);
++		fd = vsock_stream_connect(opts->peer_cid, opts->peer_port);
+ 
+ 	if (fd < 0) {
+ 		perror("connect");
+@@ -295,9 +295,9 @@ static void test_msg_peek_server(const struct test_opts *opts,
+ 	int fd;
+ 
+ 	if (seqpacket)
+-		fd = vsock_seqpacket_accept(VMADDR_CID_ANY, 1234, NULL);
++		fd = vsock_seqpacket_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
+ 	else
+-		fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
++		fd = vsock_stream_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
+ 
+ 	if (fd < 0) {
+ 		perror("accept");
+@@ -363,7 +363,7 @@ static void test_seqpacket_msg_bounds_client(const struct test_opts *opts)
+ 	int msg_count;
+ 	int fd;
+ 
+-	fd = vsock_seqpacket_connect(opts->peer_cid, 1234);
++	fd = vsock_seqpacket_connect(opts->peer_cid, opts->peer_port);
+ 	if (fd < 0) {
+ 		perror("connect");
+ 		exit(EXIT_FAILURE);
+@@ -434,7 +434,7 @@ static void test_seqpacket_msg_bounds_server(const struct test_opts *opts)
+ 	struct msghdr msg = {0};
+ 	struct iovec iov = {0};
+ 
+-	fd = vsock_seqpacket_accept(VMADDR_CID_ANY, 1234, NULL);
++	fd = vsock_seqpacket_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
+ 	if (fd < 0) {
+ 		perror("accept");
+ 		exit(EXIT_FAILURE);
+@@ -505,7 +505,7 @@ static void test_seqpacket_msg_trunc_client(const struct test_opts *opts)
+ 	int fd;
+ 	char buf[MESSAGE_TRUNC_SZ];
+ 
+-	fd = vsock_seqpacket_connect(opts->peer_cid, 1234);
++	fd = vsock_seqpacket_connect(opts->peer_cid, opts->peer_port);
+ 	if (fd < 0) {
+ 		perror("connect");
+ 		exit(EXIT_FAILURE);
+@@ -524,7 +524,7 @@ static void test_seqpacket_msg_trunc_server(const struct test_opts *opts)
+ 	struct msghdr msg = {0};
+ 	struct iovec iov = {0};
+ 
+-	fd = vsock_seqpacket_accept(VMADDR_CID_ANY, 1234, NULL);
++	fd = vsock_seqpacket_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
+ 	if (fd < 0) {
+ 		perror("accept");
+ 		exit(EXIT_FAILURE);
+@@ -575,7 +575,7 @@ static void test_seqpacket_timeout_client(const struct test_opts *opts)
+ 	time_t read_enter_ns;
+ 	time_t read_overhead_ns;
+ 
+-	fd = vsock_seqpacket_connect(opts->peer_cid, 1234);
++	fd = vsock_seqpacket_connect(opts->peer_cid, opts->peer_port);
+ 	if (fd < 0) {
+ 		perror("connect");
+ 		exit(EXIT_FAILURE);
+@@ -620,7 +620,7 @@ static void test_seqpacket_timeout_server(const struct test_opts *opts)
+ {
+ 	int fd;
+ 
+-	fd = vsock_seqpacket_accept(VMADDR_CID_ANY, 1234, NULL);
++	fd = vsock_seqpacket_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
+ 	if (fd < 0) {
+ 		perror("accept");
+ 		exit(EXIT_FAILURE);
+@@ -639,7 +639,7 @@ static void test_seqpacket_bigmsg_client(const struct test_opts *opts)
+ 
+ 	len = sizeof(sock_buf_size);
+ 
+-	fd = vsock_seqpacket_connect(opts->peer_cid, 1234);
++	fd = vsock_seqpacket_connect(opts->peer_cid, opts->peer_port);
+ 	if (fd < 0) {
+ 		perror("connect");
+ 		exit(EXIT_FAILURE);
+@@ -671,7 +671,7 @@ static void test_seqpacket_bigmsg_server(const struct test_opts *opts)
+ {
+ 	int fd;
+ 
+-	fd = vsock_seqpacket_accept(VMADDR_CID_ANY, 1234, NULL);
++	fd = vsock_seqpacket_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
+ 	if (fd < 0) {
+ 		perror("accept");
+ 		exit(EXIT_FAILURE);
+@@ -692,7 +692,7 @@ static void test_seqpacket_invalid_rec_buffer_client(const struct test_opts *opt
+ 	unsigned char *buf2;
+ 	int buf_size = getpagesize() * 3;
+ 
+-	fd = vsock_seqpacket_connect(opts->peer_cid, 1234);
++	fd = vsock_seqpacket_connect(opts->peer_cid, opts->peer_port);
+ 	if (fd < 0) {
+ 		perror("connect");
+ 		exit(EXIT_FAILURE);
+@@ -732,7 +732,7 @@ static void test_seqpacket_invalid_rec_buffer_server(const struct test_opts *opt
+ 	int flags = MAP_PRIVATE | MAP_ANONYMOUS;
+ 	int i;
+ 
+-	fd = vsock_seqpacket_accept(VMADDR_CID_ANY, 1234, NULL);
++	fd = vsock_seqpacket_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
+ 	if (fd < 0) {
+ 		perror("accept");
+ 		exit(EXIT_FAILURE);
+@@ -808,7 +808,7 @@ static void test_stream_poll_rcvlowat_server(const struct test_opts *opts)
+ 	int fd;
+ 	int i;
+ 
+-	fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
++	fd = vsock_stream_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
+ 	if (fd < 0) {
+ 		perror("accept");
+ 		exit(EXIT_FAILURE);
+@@ -839,7 +839,7 @@ static void test_stream_poll_rcvlowat_client(const struct test_opts *opts)
+ 	short poll_flags;
+ 	int fd;
+ 
+-	fd = vsock_stream_connect(opts->peer_cid, 1234);
++	fd = vsock_stream_connect(opts->peer_cid, opts->peer_port);
+ 	if (fd < 0) {
+ 		perror("connect");
+ 		exit(EXIT_FAILURE);
+@@ -906,9 +906,9 @@ static void test_inv_buf_client(const struct test_opts *opts, bool stream)
+ 	int fd;
+ 
+ 	if (stream)
+-		fd = vsock_stream_connect(opts->peer_cid, 1234);
++		fd = vsock_stream_connect(opts->peer_cid, opts->peer_port);
+ 	else
+-		fd = vsock_seqpacket_connect(opts->peer_cid, 1234);
++		fd = vsock_seqpacket_connect(opts->peer_cid, opts->peer_port);
+ 
+ 	if (fd < 0) {
+ 		perror("connect");
+@@ -941,9 +941,9 @@ static void test_inv_buf_server(const struct test_opts *opts, bool stream)
+ 	int fd;
+ 
+ 	if (stream)
+-		fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
++		fd = vsock_stream_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
+ 	else
+-		fd = vsock_seqpacket_accept(VMADDR_CID_ANY, 1234, NULL);
++		fd = vsock_seqpacket_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
+ 
+ 	if (fd < 0) {
+ 		perror("accept");
+@@ -986,7 +986,7 @@ static void test_stream_virtio_skb_merge_client(const struct test_opts *opts)
+ {
+ 	int fd;
+ 
+-	fd = vsock_stream_connect(opts->peer_cid, 1234);
++	fd = vsock_stream_connect(opts->peer_cid, opts->peer_port);
+ 	if (fd < 0) {
+ 		perror("connect");
+ 		exit(EXIT_FAILURE);
+@@ -1015,7 +1015,7 @@ static void test_stream_virtio_skb_merge_server(const struct test_opts *opts)
+ 	unsigned char buf[64];
+ 	int fd;
+ 
+-	fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
++	fd = vsock_stream_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
+ 	if (fd < 0) {
+ 		perror("accept");
+ 		exit(EXIT_FAILURE);
+@@ -1108,7 +1108,7 @@ static void test_stream_shutwr_client(const struct test_opts *opts)
+ 
+ 	sigaction(SIGPIPE, &act, NULL);
+ 
+-	fd = vsock_stream_connect(opts->peer_cid, 1234);
++	fd = vsock_stream_connect(opts->peer_cid, opts->peer_port);
+ 	if (fd < 0) {
+ 		perror("connect");
+ 		exit(EXIT_FAILURE);
+@@ -1130,7 +1130,7 @@ static void test_stream_shutwr_server(const struct test_opts *opts)
+ {
+ 	int fd;
+ 
+-	fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
++	fd = vsock_stream_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
+ 	if (fd < 0) {
+ 		perror("accept");
+ 		exit(EXIT_FAILURE);
+@@ -1151,7 +1151,7 @@ static void test_stream_shutrd_client(const struct test_opts *opts)
+ 
+ 	sigaction(SIGPIPE, &act, NULL);
+ 
+-	fd = vsock_stream_connect(opts->peer_cid, 1234);
++	fd = vsock_stream_connect(opts->peer_cid, opts->peer_port);
+ 	if (fd < 0) {
+ 		perror("connect");
+ 		exit(EXIT_FAILURE);
+@@ -1170,7 +1170,7 @@ static void test_stream_shutrd_server(const struct test_opts *opts)
+ {
+ 	int fd;
+ 
+-	fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
++	fd = vsock_stream_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
+ 	if (fd < 0) {
+ 		perror("accept");
+ 		exit(EXIT_FAILURE);
+@@ -1193,7 +1193,7 @@ static void test_double_bind_connect_server(const struct test_opts *opts)
+ 	struct sockaddr_vm sa_client;
+ 	socklen_t socklen_client = sizeof(sa_client);
+ 
+-	listen_fd = vsock_stream_listen(VMADDR_CID_ANY, 1234);
++	listen_fd = vsock_stream_listen(VMADDR_CID_ANY, opts->peer_port);
+ 
+ 	for (i = 0; i < 2; i++) {
+ 		control_writeln("LISTENING");
+@@ -1226,7 +1226,13 @@ static void test_double_bind_connect_client(const struct test_opts *opts)
+ 		/* Wait until server is ready to accept a new connection */
+ 		control_expectln("LISTENING");
+ 
+-		client_fd = vsock_bind_connect(opts->peer_cid, 1234, 4321, SOCK_STREAM);
++		/* We use 'peer_port + 1' as "some" port for the 'bind()'
++		 * call. It is safe for overflow, but must be considered,
++		 * when running multiple test applications simultaneously
++		 * where 'peer-port' argument differs by 1.
++		 */
++		client_fd = vsock_bind_connect(opts->peer_cid, opts->peer_port,
++					       opts->peer_port + 1, SOCK_STREAM);
+ 
+ 		close(client_fd);
+ 	}
+@@ -1246,7 +1252,7 @@ static void test_stream_rcvlowat_def_cred_upd_client(const struct test_opts *opt
+ 	void *buf;
+ 	int fd;
+ 
+-	fd = vsock_stream_connect(opts->peer_cid, 1234);
++	fd = vsock_stream_connect(opts->peer_cid, opts->peer_port);
+ 	if (fd < 0) {
+ 		perror("connect");
+ 		exit(EXIT_FAILURE);
+@@ -1282,7 +1288,7 @@ static void test_stream_credit_update_test(const struct test_opts *opts,
+ 	void *buf;
+ 	int fd;
+ 
+-	fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
++	fd = vsock_stream_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
+ 	if (fd < 0) {
+ 		perror("accept");
+ 		exit(EXIT_FAILURE);
+@@ -1542,6 +1548,11 @@ static const struct option longopts[] = {
+ 		.has_arg = required_argument,
+ 		.val = 'p',
+ 	},
++	{
++		.name = "peer-port",
++		.has_arg = required_argument,
++		.val = 'q',
++	},
+ 	{
+ 		.name = "list",
+ 		.has_arg = no_argument,
+@@ -1562,7 +1573,7 @@ static const struct option longopts[] = {
+ 
+ static void usage(void)
+ {
+-	fprintf(stderr, "Usage: vsock_test [--help] [--control-host=<host>] --control-port=<port> --mode=client|server --peer-cid=<cid> [--list] [--skip=<test_id>]\n"
++	fprintf(stderr, "Usage: vsock_test [--help] [--control-host=<host>] --control-port=<port> --mode=client|server --peer-cid=<cid> [--peer-port=<port>] [--list] [--skip=<test_id>]\n"
+ 		"\n"
+ 		"  Server: vsock_test --control-port=1234 --mode=server --peer-cid=3\n"
+ 		"  Client: vsock_test --control-host=192.168.0.1 --control-port=1234 --mode=client --peer-cid=2\n"
+@@ -1584,6 +1595,7 @@ static void usage(void)
+ 		"  --control-port <port>  Server port to listen on/connect to\n"
+ 		"  --mode client|server   Server or client mode\n"
+ 		"  --peer-cid <cid>       CID of the other side\n"
++		"  --peer-port <port>     Port of the other side\n"
+ 		"  --list                 List of tests that will be executed\n"
+ 		"  --skip <test_id>       Test ID to skip;\n"
+ 		"                         use multiple --skip options to skip more tests\n"
+@@ -1598,6 +1610,7 @@ int main(int argc, char **argv)
+ 	struct test_opts opts = {
+ 		.mode = TEST_MODE_UNSET,
+ 		.peer_cid = VMADDR_CID_ANY,
++		.peer_port = DEFAULT_PEER_PORT
+ 	};
+ 
+ 	srand(time(NULL));
+@@ -1626,6 +1639,9 @@ int main(int argc, char **argv)
+ 		case 'p':
+ 			opts.peer_cid = parse_cid(optarg);
+ 			break;
++		case 'q':
++			opts.peer_port = parse_port(optarg);
++			break;
+ 		case 'P':
+ 			control_port = optarg;
+ 			break;
+diff --git a/tools/testing/vsock/vsock_test_zerocopy.c b/tools/testing/vsock/vsock_test_zerocopy.c
+index a16ff76484e6..04c376b6937f 100644
+--- a/tools/testing/vsock/vsock_test_zerocopy.c
++++ b/tools/testing/vsock/vsock_test_zerocopy.c
+@@ -152,9 +152,9 @@ static void test_client(const struct test_opts *opts,
+ 	int fd;
+ 
+ 	if (sock_seqpacket)
+-		fd = vsock_seqpacket_connect(opts->peer_cid, 1234);
++		fd = vsock_seqpacket_connect(opts->peer_cid, opts->peer_port);
+ 	else
+-		fd = vsock_stream_connect(opts->peer_cid, 1234);
++		fd = vsock_stream_connect(opts->peer_cid, opts->peer_port);
+ 
+ 	if (fd < 0) {
+ 		perror("connect");
+@@ -248,9 +248,9 @@ static void test_server(const struct test_opts *opts,
+ 	int fd;
+ 
+ 	if (sock_seqpacket)
+-		fd = vsock_seqpacket_accept(VMADDR_CID_ANY, 1234, NULL);
++		fd = vsock_seqpacket_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
+ 	else
+-		fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
++		fd = vsock_stream_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
+ 
+ 	if (fd < 0) {
+ 		perror("accept");
+@@ -323,7 +323,7 @@ void test_stream_msgzcopy_empty_errq_client(const struct test_opts *opts)
+ 	ssize_t res;
+ 	int fd;
+ 
+-	fd = vsock_stream_connect(opts->peer_cid, 1234);
++	fd = vsock_stream_connect(opts->peer_cid, opts->peer_port);
+ 	if (fd < 0) {
+ 		perror("connect");
+ 		exit(EXIT_FAILURE);
+@@ -347,7 +347,7 @@ void test_stream_msgzcopy_empty_errq_server(const struct test_opts *opts)
+ {
+ 	int fd;
+ 
+-	fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
++	fd = vsock_stream_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
+ 	if (fd < 0) {
+ 		perror("accept");
+ 		exit(EXIT_FAILURE);
+diff --git a/tools/testing/vsock/vsock_uring_test.c b/tools/testing/vsock/vsock_uring_test.c
+index d976d35f0ba9..4e363c6d6e4d 100644
+--- a/tools/testing/vsock/vsock_uring_test.c
++++ b/tools/testing/vsock/vsock_uring_test.c
+@@ -66,7 +66,7 @@ static void vsock_io_uring_client(const struct test_opts *opts,
+ 	struct msghdr msg;
+ 	int fd;
+ 
+-	fd = vsock_stream_connect(opts->peer_cid, 1234);
++	fd = vsock_stream_connect(opts->peer_cid, opts->peer_port);
+ 	if (fd < 0) {
+ 		perror("connect");
+ 		exit(EXIT_FAILURE);
+@@ -120,7 +120,7 @@ static void vsock_io_uring_server(const struct test_opts *opts,
+ 	void *data;
+ 	int fd;
+ 
+-	fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
++	fd = vsock_stream_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
+ 	if (fd < 0) {
+ 		perror("accept");
+ 		exit(EXIT_FAILURE);
+@@ -247,6 +247,11 @@ static const struct option longopts[] = {
+ 		.has_arg = required_argument,
+ 		.val = 'p',
+ 	},
++	{
++		.name = "peer-port",
++		.has_arg = required_argument,
++		.val = 'q',
++	},
+ 	{
+ 		.name = "help",
+ 		.has_arg = no_argument,
+@@ -257,7 +262,7 @@ static const struct option longopts[] = {
+ 
+ static void usage(void)
+ {
+-	fprintf(stderr, "Usage: vsock_uring_test [--help] [--control-host=<host>] --control-port=<port> --mode=client|server --peer-cid=<cid>\n"
++	fprintf(stderr, "Usage: vsock_uring_test [--help] [--control-host=<host>] --control-port=<port> --mode=client|server --peer-cid=<cid> [--peer-port=<port>]\n"
+ 		"\n"
+ 		"  Server: vsock_uring_test --control-port=1234 --mode=server --peer-cid=3\n"
+ 		"  Client: vsock_uring_test --control-host=192.168.0.1 --control-port=1234 --mode=client --peer-cid=2\n"
+@@ -271,6 +276,7 @@ static void usage(void)
+ 		"  --control-port <port>  Server port to listen on/connect to\n"
+ 		"  --mode client|server   Server or client mode\n"
+ 		"  --peer-cid <cid>       CID of the other side\n"
++		"  --peer-port <port>     Port of the other side\n"
+ 		);
+ 	exit(EXIT_FAILURE);
+ }
+@@ -282,6 +288,7 @@ int main(int argc, char **argv)
+ 	struct test_opts opts = {
+ 		.mode = TEST_MODE_UNSET,
+ 		.peer_cid = VMADDR_CID_ANY,
++		.peer_port = DEFAULT_PEER_PORT
+ 	};
+ 
+ 	init_signals();
+@@ -309,6 +316,9 @@ int main(int argc, char **argv)
+ 		case 'p':
+ 			opts.peer_cid = parse_cid(optarg);
+ 			break;
++		case 'q':
++			opts.peer_port = parse_port(optarg);
++			break;
+ 		case 'P':
+ 			control_port = optarg;
+ 			break;
+-- 
+2.25.1
 
-
---=-rMsI5vJzYoVwInb9zXKQ
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEjww
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhAwggT4oAMCAQICEQC/QgfpbUT3q2fHshU/ReqfMA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowIjEgMB4GCSqGSIb3DQEJARYRZHdtd0BhbWF6b24uY28udWsw
-ggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIKAoICAQCZgnzd4h6STv/MQcUPixvDN/dNtp4yVSdc
-xz9mB1OcA7HXd4WdPyYagmkcH0WguDYaQnOszkSdElI+2XRFSlGXhY7U9tktvdWuY1zAY1UWES8e
-3BUHqSKbIKx4SX6GuctCcPnyagVZ9Hk21YUElx9cdmrqt0bGoydgxAspEx56J9Q5a48WfvFYjLBF
-NL1dw+P1eUeAljco30+Xggf5faawKfPArUX0cmU4VIh5DMUyv4d0xxfNN6cK1GMj/HGUg2T9OTHW
-nbTdq+OHJwHGi/37mCWx1O3uV0hbZzA1fNklaqlsr1Acg0elPeCFXLb8dSkMgQZHNJVjn+mBvG4d
-MG4FS3ntipApytA+a5IaMP3LNAo0EoBd5/xVy0M6TXbiYesYLq9rhnrLgO1qcw7+if0jH9YoEJ6a
-Je1m7omfEXh2XpospSLaohmAqaBKlyhXDXbTnUVnIf79zU5ohHZof0cP2amnnvYUVD72iuf9qe7X
-4L1Rj589qEWYROKiMil5X7l/smE1dAmxhKxx6YWvWkXH9u7JOcmLGdKST0voaY7j3Wk0lxK3NKsk
-q0G3BpqbPz3P8BYtn38BvbkFnwVW7F7Qzus3KZJgP62eN25QHxoFj44x3sppx4I5WlYG4lxdFZsY
-smQdj64c7MaJ7cp8RJN+eO32RKrkndEkihzxevl11wIDAQABo4IByjCCAcYwHwYDVR0jBBgwFoAU
-CcDy/AvalNtf/ivfqJlCz8ngrQAwHQYDVR0OBBYEFJ418HpIgZaPnwpWdCNSvm4XgH/lMA4GA1Ud
-DwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUFBwMEBggrBgEFBQcDAjBA
-BgNVHSAEOTA3MDUGDCsGAQQBsjEBAgEBATAlMCMGCCsGAQUFBwIBFhdodHRwczovL3NlY3RpZ28u
-Y29tL0NQUzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3JsLnNlY3RpZ28uY29tL1NlY3RpZ29S
-U0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3JsMIGKBggrBgEFBQcBAQR+
-MHwwVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1
-dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwIwYIKwYBBQUHMAGGF2h0dHA6Ly9vY3Nw
-LnNlY3RpZ28uY29tMBwGA1UdEQQVMBOBEWR3bXdAYW1hem9uLmNvLnVrMA0GCSqGSIb3DQEBCwUA
-A4IBAQCSez7gtf1wlWJr568crX21nm6QFWRdJ/YxMOReeqYtGs8QZf2zm2vIEFab61MrgJFJcFJL
-sRhVHwnH/hvax3ZldDpUhM0ODpA9soUjYsvKJ0boFAHPtI1BL0yrZNCBdsUGxMv0t64Acj2ovxQ+
-OxPd5ngHu0MzYIKLDvTSehxkh/qW23X7Ey/fPR0sgnAK4IV7clidmuWBbrqX+WKEyEP2kaEvLsRg
-8plzYbVVFJl37rX2waKnGaWYnJ3BrvcMMgDSQCuoxMThWAOr7wxOh0ni0K3rW7CwDIAjUSk+fFmS
-2EacUvIv/0xUW1nXzGJ12/Qyi+Mw65m0qE776qfcftg3MIIGEDCCBPigAwIBAgIRAL9CB+ltRPer
-Z8eyFT9F6p8wDQYJKoZIhvcNAQELBQAwgZYxCzAJBgNVBAYTAkdCMRswGQYDVQQIExJHcmVhdGVy
-IE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGDAWBgNVBAoTD1NlY3RpZ28gTGltaXRlZDE+
-MDwGA1UEAxM1U2VjdGlnbyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
-aWwgQ0EwHhcNMjIwMTA3MDAwMDAwWhcNMjUwMTA2MjM1OTU5WjAiMSAwHgYJKoZIhvcNAQkBFhFk
-d213QGFtYXpvbi5jby51azCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBAJmCfN3iHpJO
-/8xBxQ+LG8M39022njJVJ1zHP2YHU5wDsdd3hZ0/JhqCaRwfRaC4NhpCc6zORJ0SUj7ZdEVKUZeF
-jtT22S291a5jXMBjVRYRLx7cFQepIpsgrHhJfoa5y0Jw+fJqBVn0eTbVhQSXH1x2auq3RsajJ2DE
-CykTHnon1DlrjxZ+8ViMsEU0vV3D4/V5R4CWNyjfT5eCB/l9prAp88CtRfRyZThUiHkMxTK/h3TH
-F803pwrUYyP8cZSDZP05MdadtN2r44cnAcaL/fuYJbHU7e5XSFtnMDV82SVqqWyvUByDR6U94IVc
-tvx1KQyBBkc0lWOf6YG8bh0wbgVLee2KkCnK0D5rkhow/cs0CjQSgF3n/FXLQzpNduJh6xgur2uG
-esuA7WpzDv6J/SMf1igQnpol7WbuiZ8ReHZemiylItqiGYCpoEqXKFcNdtOdRWch/v3NTmiEdmh/
-Rw/Zqaee9hRUPvaK5/2p7tfgvVGPnz2oRZhE4qIyKXlfuX+yYTV0CbGErHHpha9aRcf27sk5yYsZ
-0pJPS+hpjuPdaTSXErc0qySrQbcGmps/Pc/wFi2ffwG9uQWfBVbsXtDO6zcpkmA/rZ43blAfGgWP
-jjHeymnHgjlaVgbiXF0VmxiyZB2PrhzsxontynxEk3547fZEquSd0SSKHPF6+XXXAgMBAAGjggHK
-MIIBxjAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUnjXwekiBlo+f
-ClZ0I1K+bheAf+UwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYB
-BQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEW
-F2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2Vj
-dGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5j
-cmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9T
-ZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEF
-BQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHAYDVR0RBBUwE4ERZHdtd0BhbWF6b24uY28u
-dWswDQYJKoZIhvcNAQELBQADggEBAJJ7PuC1/XCVYmvnrxytfbWebpAVZF0n9jEw5F56pi0azxBl
-/bOba8gQVpvrUyuAkUlwUkuxGFUfCcf+G9rHdmV0OlSEzQ4OkD2yhSNiy8onRugUAc+0jUEvTKtk
-0IF2xQbEy/S3rgByPai/FD47E93meAe7QzNggosO9NJ6HGSH+pbbdfsTL989HSyCcArghXtyWJ2a
-5YFuupf5YoTIQ/aRoS8uxGDymXNhtVUUmXfutfbBoqcZpZicncGu9wwyANJAK6jExOFYA6vvDE6H
-SeLQretbsLAMgCNRKT58WZLYRpxS8i//TFRbWdfMYnXb9DKL4zDrmbSoTvvqp9x+2DcxggTHMIIE
-wwIBATCBrDCBljELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4G
-A1UEBxMHU2FsZm9yZDEYMBYGA1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdv
-IFJTQSBDbGllbnQgQXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAL9CB+ltRPer
-Z8eyFT9F6p8wDQYJYIZIAWUDBAIBBQCgggHrMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJ
-KoZIhvcNAQkFMQ8XDTI0MDExMjIwMzgxOVowLwYJKoZIhvcNAQkEMSIEIJ31d8jnWe5cAdmrUMhj
-oZVVgx/hz5904jTYPE0jvzS7MIG9BgkrBgEEAYI3EAQxga8wgawwgZYxCzAJBgNVBAYTAkdCMRsw
-GQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGDAWBgNVBAoTD1Nl
-Y3RpZ28gTGltaXRlZDE+MDwGA1UEAxM1U2VjdGlnbyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9u
-IGFuZCBTZWN1cmUgRW1haWwgQ0ECEQC/QgfpbUT3q2fHshU/ReqfMIG/BgsqhkiG9w0BCRACCzGB
-r6CBrDCBljELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UE
-BxMHU2FsZm9yZDEYMBYGA1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJT
-QSBDbGllbnQgQXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAL9CB+ltRPerZ8ey
-FT9F6p8wDQYJKoZIhvcNAQEBBQAEggIALTzdeNWG8pRd7POHOxdJJW2MbNAi4N0UyPTAJmdOW2yw
-jGkp5ApHQCdnTdrIPxXx1bjahtEQLRKgvw436xeBmsl+YeNe3oqnBCzdf4UxqPHD7x1G4ZaXq9oO
-ZIVfol+cCiV7qcR+tsGc42gL5PO//gj4QdOTXC2Nh4sGW36VDrFsnUROV3wSRxWUgsj1Xbl2LD8y
-ZEuq20IncfRXKwHnA5v0ZKkCB++rKbO5VL211ys2ymVHGIp4c80AZ1T6Q5clIG45xayg1Iwyn7ef
-eiaKOdzCxJxqc/m3xkyl4EQeFTMu1bj9c5/J5KYmu5DzEM1pklN8+RBgR4dCSCceLHwVURQ7AA5r
-+xpxjhu2XoMZ0Il4iBT8fr47/Fw1dkjDNYFAAfJf1C7YIsU9syavbuVF6kWWeiT4u7IVEWpBurrD
-IhPa0tViFkphpmoFMtRKATxhp4okMZi0XAoa3aQk+jJTbV2inQcbIgaPVJ4FfvtFHlVbGLpQifJS
-S8SPWyGFAbKNvQT0nC84EaL43KDi253QR1K9GABsl2DfKhUA3SyTZ9JsXEcupNXK4GZYp2ZPsUab
-S26F2bTuwMKYKoN2PDt1zMiMIdA7V7R0jBJjgyDIIpsFFEKD1RjJc8KcC3i11sjn2mVorIhJrtaV
-1HVtsvSdIj0Yv8QM8JNtSvyXS4v2OLQAAAAAAAA=
-
-
---=-rMsI5vJzYoVwInb9zXKQ--
-
---===============6231862153601125174==
-Content-Type: multipart/alternative; boundary="===============8717904259100258372=="
-MIME-Version: 1.0
-Content-Disposition: inline
-
---===============8717904259100258372==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-
-
-
-
-Amazon Development Centre (London) Ltd. Registered in England and Wales wit=
-h registration number 04543232 with its registered office at 1 Principal Pl=
-ace, Worship Street, London EC2A 2FA, United Kingdom.
-
-
-
---===============8717904259100258372==
-Content-Type: text/html; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-
-<br><br><br>Amazon Development Centre (London) Ltd.Registered in England an=
-d Wales with registration number 04543232 with its registered office at 1 P=
-rincipal Place, Worship Street, London EC2A 2FA, United Kingdom.<br><br><br>
-
---===============8717904259100258372==--
---===============6231862153601125174==--
 
