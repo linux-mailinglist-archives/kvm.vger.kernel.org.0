@@ -1,76 +1,155 @@
-Return-Path: <kvm+bounces-6160-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6161-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A8F582C645
-	for <lists+kvm@lfdr.de>; Fri, 12 Jan 2024 21:13:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E93D082C658
+	for <lists+kvm@lfdr.de>; Fri, 12 Jan 2024 21:28:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A407928A3EB
-	for <lists+kvm@lfdr.de>; Fri, 12 Jan 2024 20:13:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80617285D51
+	for <lists+kvm@lfdr.de>; Fri, 12 Jan 2024 20:28:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B81216426;
-	Fri, 12 Jan 2024 20:13:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB988168A4;
+	Fri, 12 Jan 2024 20:27:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mxcqXYQe"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="XqjvDXAE";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="c+Wl162U";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="KD4RU5Hn";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="6pI6985H"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D20C15AFD
-	for <kvm@vger.kernel.org>; Fri, 12 Jan 2024 20:13:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1d3f3ee00a2so36255085ad.3
-        for <kvm@vger.kernel.org>; Fri, 12 Jan 2024 12:13:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705090394; x=1705695194; darn=vger.kernel.org;
-        h=to:date:message-id:subject:mime-version:content-transfer-encoding
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=nGDHMJYfkL4nju2+is+kww5uk6KkuyZpMB47n2TaaUU=;
-        b=mxcqXYQeOB9ITBNboNB5nhd7iiaUvAfmskFdpFeG3zrxMqD7G337xqU0/N25dV0B+P
-         iYnBIViI/2OJA3y1wMLbc6EMVnmNYX7SFipujOklV0tVyFYW+o0Ugxu40QRUuKeyLBKO
-         6rsE39ABwOlX2pJnDXC6WsguBamC7cdSyQhabF1cnKkzAGyo6TgdSz4bSvhFBSM3E/el
-         LG7vfFWc/Pg4q5ebUg4WNbpdwM5S2VCnbicKFO84nzmsTzIvprEjSwIr14agr4WsCh9r
-         UiVuLyjAAjPF5rlDYOVx0V9mVhNE2gUGJTdIcFW+6VtPyUbuQ5aOh+freZDdq4W11CEI
-         aIkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705090394; x=1705695194;
-        h=to:date:message-id:subject:mime-version:content-transfer-encoding
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nGDHMJYfkL4nju2+is+kww5uk6KkuyZpMB47n2TaaUU=;
-        b=Urj1DBrYZ37PagCbbdDxRPHUlfcroqAaGEE5Yy1hIWCE+CXn61dvwwZmqWfWVdLSnH
-         GOJ1yD7UY/SFVO+sUrjvGn9urG3vyWkVK7F934U+Glk2KCyWs3VwjFA3m6AjXunx4H74
-         EQMH+HeYout/ExRRIJBNX+4Ps8uuStpwoKSn6a8Opa/ZMLUZeAmi3PSskywZ3gTnjnp+
-         5GaSk4R+NiXUva5DqeHBSwbzSiLxwndnM8ZeiU0BG9NecMmGntmR6yZIZDldj8UJHnhm
-         vktAB+cZJkXC+0Kw3FQ9tFtN+bZKrqHJDE4lQy/sPXV5JH2w4wr2c/qxid+rP3rMSAoE
-         hx2Q==
-X-Gm-Message-State: AOJu0Yw5E8Zto+GzE0SvO5FLsOn2acCiIyM7ejNJEJuSf13lf6e1ohO2
-	v0Diq+5asiitCpGVXwTg8CWDujvlx4M=
-X-Google-Smtp-Source: AGHT+IEtngkUzoEND038XmH9RZI1gcFq6kqKS0vkQph2KQaCA2yYkvEy0unEKKOcrUBcMqrR0mgxtQ==
-X-Received: by 2002:a17:902:ee15:b0:1d4:8db0:ab0d with SMTP id z21-20020a170902ee1500b001d48db0ab0dmr1330229plb.48.1705090394174;
-        Fri, 12 Jan 2024 12:13:14 -0800 (PST)
-Received: from smtpclient.apple ([47.156.165.72])
-        by smtp.gmail.com with ESMTPSA id qd5-20020a17090b3cc500b0028ca92ab09asm4578788pjb.56.2024.01.12.12.13.13
-        for <kvm@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 12 Jan 2024 12:13:13 -0800 (PST)
-From: Adrian Zankich <adzankich@gmail.com>
-Content-Type: text/plain;
-	charset=us-ascii
-Content-Transfer-Encoding: 7bit
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15D0416408;
+	Fri, 12 Jan 2024 20:27:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 482C61FCE8;
+	Fri, 12 Jan 2024 20:27:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1705091267; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=l3HZdlUOpp8hqp5kkH50U1gvSbJXr0EkR5CiO7uJ5Bo=;
+	b=XqjvDXAESEoED/GxVyl76H3g3dEIog8jVndW2K0atDj+8mC4aP8G7wiR+/6kazHZKB6XuU
+	KWYqaeNyVuip583KceuYvSKPthEXx11bSNcZ+wdWokCSp5fYlAzjPJ7v8zE7Q9hS3iZ0Yo
+	t/qgF3E2gYVsYkTLhI/EXhhzUWfiNkg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1705091267;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=l3HZdlUOpp8hqp5kkH50U1gvSbJXr0EkR5CiO7uJ5Bo=;
+	b=c+Wl162UZcJ7GFS100RcrMYBULVzDNA35vwem9fOrK1g++F4R7bQxU/Jj0LhpR1n7WmI3k
+	IpLf9iPhDLqZr6AA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1705091266; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=l3HZdlUOpp8hqp5kkH50U1gvSbJXr0EkR5CiO7uJ5Bo=;
+	b=KD4RU5HnqQTllTTeFhkd42GxQ1p6pnytJRa77cY7f/Pty+gouCgfc2FZJz8tsGke/cJFcy
+	+9rVUuObcFm6ZLR/cM3odQ47IhgZCgqnwa1PNHlx8eAW0oYqGIKFK8VBjW6BsBCK02vO9a
+	MiLVD9WQeDOXNgBwBsgCt7ThLYI/OoI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1705091266;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=l3HZdlUOpp8hqp5kkH50U1gvSbJXr0EkR5CiO7uJ5Bo=;
+	b=6pI6985HznZHcmxFVZiB+UZNtYi0j27rwz1nFMh6tHx5yuPVBWfdu8qae9/Yy+xz3KsT8z
+	seqO6XK28FWD+FCA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id ED9E113782;
+	Fri, 12 Jan 2024 20:27:45 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id +bhPOcGgoWVWYwAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Fri, 12 Jan 2024 20:27:45 +0000
+Message-ID: <f0f44280-799a-4bf8-bf88-d423a2bd41ec@suse.cz>
+Date: Fri, 12 Jan 2024 21:27:45 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.300.61.1.2\))
-Subject: 
-Message-Id: <0DA23D59-EA65-438E-BD6D-C85AD3206580@gmail.com>
-Date: Fri, 12 Jan 2024 12:12:42 -0800
-To: kvm@vger.kernel.org
-X-Mailer: Apple Mail (2.3774.300.61.1.2)
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 11/26] x86/sev: Invalidate pages from the direct map
+ when adding them to the RMP table
+To: Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@intel.com>
+Cc: Michael Roth <michael.roth@amd.com>, x86@kernel.org, kvm@vger.kernel.org,
+ linux-coco@lists.linux.dev, linux-mm@kvack.org,
+ linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+ tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
+ thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
+ pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+ jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
+ slp@redhat.com, pgonda@google.com, peterz@infradead.org,
+ srinivas.pandruvada@linux.intel.com, rientjes@google.com, tobin@ibm.com,
+ kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+ sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+ jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+ pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
+ Brijesh Singh <brijesh.singh@amd.com>
+References: <20231230161954.569267-1-michael.roth@amd.com>
+ <20231230161954.569267-12-michael.roth@amd.com>
+ <cb604c37-aeb5-45bd-b6db-246ae724e4ca@intel.com>
+ <20240112200751.GHZaGcF0-OZVJiIB7y@fat_crate.local>
+Content-Language: en-US
+From: Vlastimil Babka <vbabka@suse.cz>
+In-Reply-To: <20240112200751.GHZaGcF0-OZVJiIB7y@fat_crate.local>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Authentication-Results: smtp-out2.suse.de;
+	none
+X-Spamd-Result: default: False [-0.09 / 50.00];
+	 ARC_NA(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 XM_UA_NO_VERSION(0.01)[];
+	 FROM_HAS_DN(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 BAYES_HAM(-0.00)[20.32%];
+	 MIME_GOOD(-0.10)[text/plain];
+	 R_RATELIMIT(0.00)[to_ip_from(RL81e5qggtdx371s8ik49ru6xr)];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	 RCPT_COUNT_TWELVE(0.00)[39];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 RCVD_TLS_ALL(0.00)[];
+	 MID_RHS_MATCH_FROM(0.00)[]
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spam-Score: -0.09
 
-Unsubscribe 
+On 1/12/24 21:07, Borislav Petkov wrote:
+> On Fri, Jan 12, 2024 at 12:00:01PM -0800, Dave Hansen wrote:
+>> On 12/30/23 08:19, Michael Roth wrote:
+>> > If the kernel uses a 2MB directmap mapping to write to an address, and
+>> > that 2MB range happens to contain a 4KB page that set to private in the
+>> > RMP table, that will also lead to a page-fault exception.
+>> 
+>> I thought we agreed long ago to just demote the whole direct map to 4k
+>> on kernels that might need to act as SEV-SNP hosts.  That should be step
+>> one and this can be discussed as an optimization later.
+> 
+> What would be the disadvantage here? Higher TLB pressure when running
+> kernel code I guess...
+
+Yeah and last LSF/MM we concluded that it's not as a big disadvantage as we
+previously thought https://lwn.net/Articles/931406/
 
