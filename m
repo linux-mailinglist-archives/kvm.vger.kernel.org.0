@@ -1,89 +1,184 @@
-Return-Path: <kvm+bounces-6125-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6126-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F32182BAE7
-	for <lists+kvm@lfdr.de>; Fri, 12 Jan 2024 06:35:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DD4482BB16
+	for <lists+kvm@lfdr.de>; Fri, 12 Jan 2024 06:54:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D5CC11F22F9A
-	for <lists+kvm@lfdr.de>; Fri, 12 Jan 2024 05:35:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8196328A20F
+	for <lists+kvm@lfdr.de>; Fri, 12 Jan 2024 05:54:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB0E15B5DA;
-	Fri, 12 Jan 2024 05:34:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 337DB5C8FE;
+	Fri, 12 Jan 2024 05:54:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="n8dcbZV4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HLV487+N"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D3C95B5C6;
-	Fri, 12 Jan 2024 05:34:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1705037690; x=1736573690;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=+D2V+TmU64uAjVM3eOUsnNLgN7TXw+iA4jUZDqS1rPI=;
-  b=n8dcbZV4NpW6fR1kGVjAYLofnDfZNaIO8/fR+F0dACcLh+l0K4O8TJea
-   2u9DaKLCLhqZ4SmDOqY1bMoK/F7SM+hVJjY0i5alCg5VMCZJHouODQ0yP
-   LngNtbkM6sq6t5uCZp8nbxgdpb8Wag+etPQQQJ6eRKgTLYweqwWM4DX/v
-   n/PNLP3e9Kp1/SociQ7iy/tZHJl+YVw4kQ89d+jws62t6Tky8ECvk+y0v
-   PtaFPvkzOsqgIm4HwT69NipNcPErmvWMvXrtJL3rB/FKJazXJzcXjTTwD
-   /tj5oZrX6hBXoNfrl57IsVll3edSZ46s1JtMZk1zg4Ni1q9Ha8xCr/PJj
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10950"; a="6173688"
-X-IronPort-AV: E=Sophos;i="6.04,188,1695711600"; 
-   d="scan'208";a="6173688"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2024 21:34:48 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.04,188,1695711600"; 
-   d="scan'208";a="24599545"
-Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
-  by orviesa002.jf.intel.com with ESMTP; 11 Jan 2024 21:34:48 -0800
-Date: Fri, 12 Jan 2024 13:34:46 +0800
-From: Yuan Yao <yuan.yao@linux.intel.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
-	seanjc@google.com, shuah@kernel.org, stevensd@chromium.org
-Subject: Re: [RFC PATCH v2 2/3] KVM: selftests: add selftest driver for KVM
- to test memory slots for MMIO BARs
-Message-ID: <20240112053446.cywurmvjebuavsf6@yy-desk-7060>
-References: <20240103084327.19955-1-yan.y.zhao@intel.com>
- <20240103084457.20086-1-yan.y.zhao@intel.com>
- <20240104081604.ab4uurfoennzy5oj@yy-desk-7060>
- <ZZfP3/pYyPnbgL3P@yzhao56-desk.sh.intel.com>
- <20240110062708.zf3arjmha5czgpzp@yy-desk-7060>
- <ZaCGCS6xY2KXubf8@yzhao56-desk.sh.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E2E05C8E0
+	for <kvm@vger.kernel.org>; Fri, 12 Jan 2024 05:54:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1705038855;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=GP1qDRaGGYNkvm0KV8/GWSP2DF/3SQkemClyjrO5cH0=;
+	b=HLV487+NzSsBjIfOkTb7gWLs4XhclLkzE8SMgkZowmv7R+qviZoqrbHYcfTOjD3jZbI9dp
+	qmQsYs7Roex4TYIwUrstcvj8jAwCeqr50t+Qnviil5Ew1/G5hpCOxin+cqjyIWWg08mnJ6
+	tWEQmb4N3K2HQmQebKoF2JFrs/Snqxg=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-91-nYBvnK9GMumwfMd65qae7A-1; Fri, 12 Jan 2024 00:53:46 -0500
+X-MC-Unique: nYBvnK9GMumwfMd65qae7A-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E5F6B85A588;
+	Fri, 12 Jan 2024 05:53:45 +0000 (UTC)
+Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id CA8BE2026D66;
+	Fri, 12 Jan 2024 05:53:45 +0000 (UTC)
+From: Shaoqin Huang <shahuang@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Marc Zyngier <maz@kernel.org>,
+	Peter Xu <peterx@redhat.com>,
+	kvmarm@lists.linux.dev,
+	Shaoqin Huang <shahuang@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2] KVM: selftests: Fix the dirty_log_test semaphore imbalance
+Date: Fri, 12 Jan 2024 00:53:39 -0500
+Message-Id: <20240112055340.19372-1-shahuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZaCGCS6xY2KXubf8@yzhao56-desk.sh.intel.com>
-User-Agent: NeoMutt/20171215
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
 
-On Fri, Jan 12, 2024 at 08:21:29AM +0800, Yan Zhao wrote:
-> On Wed, Jan 10, 2024 at 02:27:08PM +0800, Yuan Yao wrote:
-> > > > Do you have plan to allow user to change the bar_size via IOCTL ?
-> > > > If no "order" and "bar_size" can be removed.
-> > > >
-> > > Currently no. But this structure is private to the test driver.
-> > > What the benefit to remove the two?
-> >
-> > It's useless so remove them makes code more easier to understand.
-> Just my two cents:
-> Keeping bar_size & order in a device structure is better than spreading
-> macro BAR_SIZE everywhere and the code is more scalable.
+When execute the dirty_log_test on some aarch64 machine, it sometimes
+trigger the ASSERT:
 
-yeah, that depends on the perspective, no big deal to me.
-You can wait other's input.
+==== Test Assertion Failure ====
+  dirty_log_test.c:384: dirty_ring_vcpu_ring_full
+  pid=14854 tid=14854 errno=22 - Invalid argument
+     1  0x00000000004033eb: dirty_ring_collect_dirty_pages at dirty_log_test.c:384
+     2  0x0000000000402d27: log_mode_collect_dirty_pages at dirty_log_test.c:505
+     3   (inlined by) run_test at dirty_log_test.c:802
+     4  0x0000000000403dc7: for_each_guest_mode at guest_modes.c:100
+     5  0x0000000000401dff: main at dirty_log_test.c:941 (discriminator 3)
+     6  0x0000ffff9be173c7: ?? ??:0
+     7  0x0000ffff9be1749f: ?? ??:0
+     8  0x000000000040206f: _start at ??:?
+  Didn't continue vcpu even without ring full
+
+The dirty_log_test fails when execute the dirty-ring test, this is
+because the sem_vcpu_cont and the sem_vcpu_stop is non-zero value when
+execute the dirty_ring_collect_dirty_pages() function. When those two
+sem_t variables are non-zero, the dirty_ring_wait_vcpu() at the
+beginning of the dirty_ring_collect_dirty_pages() will not wait for the
+vcpu to stop, but continue to execute the following code. In this case,
+before vcpu stop, if the dirty_ring_vcpu_ring_full is true, and the
+dirty_ring_collect_dirty_pages() has passed the check for the
+dirty_ring_vcpu_ring_full but hasn't execute the check for the
+continued_vcpu, the vcpu stop, and set the dirty_ring_vcpu_ring_full to
+false. Then dirty_ring_collect_dirty_pages() will trigger the ASSERT.
+
+Why sem_vcpu_cont and sem_vcpu_stop can be non-zero value? It's because
+the dirty_ring_before_vcpu_join() execute the sem_post(&sem_vcpu_cont)
+at the end of each dirty-ring test. It can cause two cases:
+
+1. sem_vcpu_cont be non-zero. When we set the host_quit to be true,
+   the vcpu_worker directly see the host_quit to be true, it quit. So
+   the log_mode_before_vcpu_join() function will set the sem_vcpu_cont
+   to 1, since the vcpu_worker has quit, it won't consume it.
+2. sem_vcpu_stop be non-zero. When we set the host_quit to be true,
+   the vcpu_worker has entered the guest state, the next time it exit
+   from guest state, it will set the sem_vcpu_stop to 1, and then see
+   the host_quit, no one will consume the sem_vcpu_stop.
+
+When execute more and more dirty-ring tests, the sem_vcpu_cont and
+sem_vcpu_stop can be larger and larger, which makes many code paths
+don't wait for the sem_t. Thus finally cause the problem.
+
+To fix this problem, we can wait a while before set the host_quit to
+true, which gives the vcpu time to enter the guest state, so it will
+exit again. Then we can wait the vcpu to exit, and let it continue
+again, then the vcpu will see the host_quit. Thus the sem_vcpu_cont and
+sem_vcpu_stop will be both zero when test finished.
+
+Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
+---
+v1->v2:
+  - Fix the real logic bug, not just fresh the context.
+
+v1: https://lore.kernel.org/all/20231116093536.22256-1-shahuang@redhat.com/
+---
+ tools/testing/selftests/kvm/dirty_log_test.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
+
+diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
+index 936f3a8d1b83..a6e0ff46a07c 100644
+--- a/tools/testing/selftests/kvm/dirty_log_test.c
++++ b/tools/testing/selftests/kvm/dirty_log_test.c
+@@ -417,7 +417,8 @@ static void dirty_ring_after_vcpu_run(struct kvm_vcpu *vcpu, int ret, int err)
+ 
+ static void dirty_ring_before_vcpu_join(void)
+ {
+-	/* Kick another round of vcpu just to make sure it will quit */
++	/* Wait vcpu exit, and let it continue to see the host_quit. */
++	dirty_ring_wait_vcpu();
+ 	sem_post(&sem_vcpu_cont);
+ }
+ 
+@@ -719,6 +720,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 	struct kvm_vm *vm;
+ 	unsigned long *bmap;
+ 	uint32_t ring_buf_idx = 0;
++	int sem_val;
+ 
+ 	if (!log_mode_supported()) {
+ 		print_skip("Log mode '%s' not supported",
+@@ -726,6 +728,11 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 		return;
+ 	}
+ 
++	sem_getvalue(&sem_vcpu_stop, &sem_val);
++	assert(sem_val == 0);
++	sem_getvalue(&sem_vcpu_cont, &sem_val);
++	assert(sem_val == 0);
++
+ 	/*
+ 	 * We reserve page table for 2 times of extra dirty mem which
+ 	 * will definitely cover the original (1G+) test range.  Here
+@@ -825,6 +832,13 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 		sync_global_to_guest(vm, iteration);
+ 	}
+ 
++	/*
++	 *
++	 * Before we set the host_quit, let the vcpu has time to run, to make
++	 * sure we consume the sem_vcpu_stop and the vcpu consume the
++	 * sem_vcpu_cont, to keep the semaphore balance.
++	 */
++	usleep(p->interval * 1000);
+ 	/* Tell the vcpu thread to quit */
+ 	host_quit = true;
+ 	log_mode_before_vcpu_join();
+-- 
+2.40.1
+
 
