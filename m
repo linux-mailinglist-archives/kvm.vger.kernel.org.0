@@ -1,53 +1,53 @@
-Return-Path: <kvm+bounces-6167-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6168-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B533382D078
-	for <lists+kvm@lfdr.de>; Sun, 14 Jan 2024 13:09:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9C5D82D097
+	for <lists+kvm@lfdr.de>; Sun, 14 Jan 2024 13:42:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60615282589
-	for <lists+kvm@lfdr.de>; Sun, 14 Jan 2024 12:09:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12C702828C9
+	for <lists+kvm@lfdr.de>; Sun, 14 Jan 2024 12:42:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2285E2107;
-	Sun, 14 Jan 2024 12:09:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D757F2114;
+	Sun, 14 Jan 2024 12:42:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gvRmZ1QF"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IsHZI+Qd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90B641EEE8
-	for <kvm@vger.kernel.org>; Sun, 14 Jan 2024 12:09:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D44CE20EE
+	for <kvm@vger.kernel.org>; Sun, 14 Jan 2024 12:42:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1705234158; x=1736770158;
+  t=1705236128; x=1736772128;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=0hibwSD1PQ4vDgip1K/Sx6DPnqV9+de/ew2mFMg5AVY=;
-  b=gvRmZ1QFERM+BQj9yMFaRowHbDQngaiQDkXyOu1YyMzpQ5C4lGMWCaXL
-   XqQxQ2tH1iJN/sWiNXDAc+c51pYgDcpmpu1+6OsERlTuZUSoCXjOKyywn
-   7sZLQNKQ7m6E3NCs2p99t5hU3kGlB/McabTUX9tQmJ3Ubql8E+WKaIEkr
-   S6fmxORQ6r64JYUcNSUSrfHWtL36HZn0nz//x01F1ZETxCKf2WFTH2hzX
-   dHiLJUupfTY9jk9ORJ/dF3PEhE1M11sLf2qeUW0SSd9quzPxyJQtE2MOK
-   AY8P8SFOeL4Jqrhs2Oa8CMpNepwk0n3K1siTcukGm8U23rKxoNDZvRGxS
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10952"; a="399133646"
+  bh=OZWDrXewF8MtC/kb9j01WL/a8ou0hazpkHKjaBK9OCA=;
+  b=IsHZI+QdkJikhDWH3ZmOccsAA4WV5FuheXuJYgsrfEZ/ln3DO48xna11
+   +WJ+daXfw3Tg10IdlMAj+XGUb59oi0ewabjl6T2QzVU75r1VS5iEuMxGd
+   6OcK6pfnYRXjyK7FmTx5NKtJcYUE0aUHyaZnCQXdSa3n/uYvvXdE8HCM3
+   63PoZXFsQfnXlwQilqph4bVoO6qhn9mJMhbhZA/Gvs8AwtrAVdAIyr+uf
+   fpj2gvz0Mycv7QsD5FaqXzzbegv7Hr4vi54I9ye2RQ4c7a3hq4TLzrWYC
+   N6NmRoCeA3wgmzFc/hUjG54WRqvfGO2sSamrJI7RjVDNh3TjYFu1urAnF
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10952"; a="12940710"
 X-IronPort-AV: E=Sophos;i="6.04,194,1695711600"; 
-   d="scan'208";a="399133646"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2024 04:09:17 -0800
+   d="scan'208";a="12940710"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2024 04:42:07 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10952"; a="926860982"
+X-IronPort-AV: E=McAfee;i="6600,9927,10952"; a="786835381"
 X-IronPort-AV: E=Sophos;i="6.04,194,1695711600"; 
-   d="scan'208";a="926860982"
+   d="scan'208";a="786835381"
 Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.22.149]) ([10.93.22.149])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2024 04:09:15 -0800
-Message-ID: <cf6d5c3a-384b-41c9-aa5f-04b2dd0e8c6d@intel.com>
-Date: Sun, 14 Jan 2024 20:09:13 +0800
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2024 04:42:03 -0800
+Message-ID: <1b2dd718-5968-4036-8b80-fd456058dce6@intel.com>
+Date: Sun, 14 Jan 2024 20:42:00 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -55,100 +55,172 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 2/2] target/i386: add control bits support for LAM
+Subject: Re: [PATCH v7 09/16] i386: Support module_id in X86CPUTopoIDs
 Content-Language: en-US
-To: Binbin Wu <binbin.wu@linux.intel.com>, qemu-devel@nongnu.org,
- kvm@vger.kernel.org
-Cc: pbonzini@redhat.com, chao.gao@intel.com, robert.hu@linux.intel.com
-References: <20240112060042.19925-1-binbin.wu@linux.intel.com>
- <20240112060042.19925-3-binbin.wu@linux.intel.com>
+To: Zhao Liu <zhao1.liu@linux.intel.com>,
+ Eduardo Habkost <eduardo@habkost.net>,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
+ Zhenyu Wang <zhenyu.z.wang@intel.com>,
+ Zhuocheng Ding <zhuocheng.ding@intel.com>, Zhao Liu <zhao1.liu@intel.com>,
+ Babu Moger <babu.moger@amd.com>, Yongwei Ma <yongwei.ma@intel.com>
+References: <20240108082727.420817-1-zhao1.liu@linux.intel.com>
+ <20240108082727.420817-10-zhao1.liu@linux.intel.com>
 From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20240112060042.19925-3-binbin.wu@linux.intel.com>
+In-Reply-To: <20240108082727.420817-10-zhao1.liu@linux.intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 1/12/2024 2:00 PM, Binbin Wu wrote:
-> LAM uses CR3[61] and CR3[62] to configure/enable LAM on user pointers.
-> LAM uses CR4[28] to configure/enable LAM on supervisor pointers.
+On 1/8/2024 4:27 PM, Zhao Liu wrote:
+> From: Zhuocheng Ding <zhuocheng.ding@intel.com>
 > 
-> For CR3 LAM bits, no additional handling needed:
-> - TCG
->    LAM is not supported for TCG of target-i386.  helper_write_crN() and
->    helper_vmrun() check max physical address bits before calling
->    cpu_x86_update_cr3(), no change needed, i.e. CR3 LAM bits are not allowed
->    to be set in TCG.
-> - gdbstub
->    x86_cpu_gdb_write_register() will call cpu_x86_update_cr3() to update cr3.
->    Allow gdb to set the LAM bit(s) to CR3, if vcpu doesn't support LAM,
->    KVM_SET_SREGS will fail as other reserved bits.
+> Add module_id member in X86CPUTopoIDs.
 > 
-> For CR4 LAM bit, its reservation depends on vcpu supporting LAM feature or
-> not.
-> - TCG
->    LAM is not supported for TCG of target-i386.  helper_write_crN() and
->    helper_vmrun() check CR4 reserved bit before calling cpu_x86_update_cr4(),
->    i.e. CR4 LAM bit is not allowed to be set in TCG.
-> - gdbstub
->    x86_cpu_gdb_write_register() will call cpu_x86_update_cr4() to update cr4.
->    Mask out LAM bit on CR4 if vcpu doesn't support LAM.
-> - x86_cpu_reset_hold() doesn't need special handling.
+> module_id can be parsed from APIC ID, so also update APIC ID parsing
+> rule to support module level. With this support, the conversions with
+> module level between X86CPUTopoIDs, X86CPUTopoInfo and APIC ID are
+> completed.
 > 
-> Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
-> Tested-by: Xuelian Guo <xuelian.guo@intel.com>
-
-Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
-
+> module_id can be also generated from cpu topology, and before i386
+> supports "clusters" in smp, the default "clusters per die" is only 1,
+> thus the module_id generated in this way is 0, so that it will not
+> conflict with the module_id generated by APIC ID.
+> 
+> Signed-off-by: Zhuocheng Ding <zhuocheng.ding@intel.com>
+> Co-developed-by: Zhao Liu <zhao1.liu@intel.com>
+> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
+> Tested-by: Babu Moger <babu.moger@amd.com>
+> Tested-by: Yongwei Ma <yongwei.ma@intel.com>
+> Acked-by: Michael S. Tsirkin <mst@redhat.com>
 > ---
->   target/i386/cpu.h    | 7 ++++++-
->   target/i386/helper.c | 4 ++++
->   2 files changed, 10 insertions(+), 1 deletion(-)
+> Changes since v1:
+>   * Merge the patch "i386: Update APIC ID parsing rule to support module
+>     level" into this one. (Yanan)
+>   * Move the apicid_module_width() and apicid_module_offset() support
+>     into the previous modules_per_die related patch. (Yanan)
+> ---
+>   hw/i386/x86.c              | 28 +++++++++++++++++++++-------
+>   include/hw/i386/topology.h | 17 +++++++++++++----
+>   2 files changed, 34 insertions(+), 11 deletions(-)
 > 
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index 18ea755644..598a3fa140 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -261,6 +261,7 @@ typedef enum X86Seg {
->   #define CR4_SMAP_MASK   (1U << 21)
->   #define CR4_PKE_MASK   (1U << 22)
->   #define CR4_PKS_MASK   (1U << 24)
-> +#define CR4_LAM_SUP_MASK (1U << 28)
+> diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+> index 85b847ac7914..5269aae3a5c2 100644
+> --- a/hw/i386/x86.c
+> +++ b/hw/i386/x86.c
+> @@ -315,11 +315,11 @@ void x86_cpu_pre_plug(HotplugHandler *hotplug_dev,
 >   
->   #define CR4_RESERVED_MASK \
->   (~(target_ulong)(CR4_VME_MASK | CR4_PVI_MASK | CR4_TSD_MASK \
-> @@ -269,7 +270,8 @@ typedef enum X86Seg {
->                   | CR4_OSFXSR_MASK | CR4_OSXMMEXCPT_MASK | CR4_UMIP_MASK \
->                   | CR4_LA57_MASK \
->                   | CR4_FSGSBASE_MASK | CR4_PCIDE_MASK | CR4_OSXSAVE_MASK \
-> -                | CR4_SMEP_MASK | CR4_SMAP_MASK | CR4_PKE_MASK | CR4_PKS_MASK))
-> +                | CR4_SMEP_MASK | CR4_SMAP_MASK | CR4_PKE_MASK | CR4_PKS_MASK \
-> +                | CR4_LAM_SUP_MASK))
+>       /*
+>        * If APIC ID is not set,
+> -     * set it based on socket/die/core/thread properties.
+> +     * set it based on socket/die/cluster/core/thread properties.
+>        */
+>       if (cpu->apic_id == UNASSIGNED_APIC_ID) {
+> -        int max_socket = (ms->smp.max_cpus - 1) /
+> -                                smp_threads / smp_cores / ms->smp.dies;
+> +        int max_socket = (ms->smp.max_cpus - 1) / smp_threads / smp_cores /
+> +                                ms->smp.clusters / ms->smp.dies;
 >   
->   #define DR6_BD          (1 << 13)
->   #define DR6_BS          (1 << 14)
-> @@ -2522,6 +2524,9 @@ static inline uint64_t cr4_reserved_bits(CPUX86State *env)
->       if (!(env->features[FEAT_7_0_ECX] & CPUID_7_0_ECX_PKS)) {
->           reserved_bits |= CR4_PKS_MASK;
->       }
-> +    if (!(env->features[FEAT_7_1_EAX] & CPUID_7_1_EAX_LAM)) {
-> +        reserved_bits |= CR4_LAM_SUP_MASK;
-> +    }
->       return reserved_bits;
->   }
->   
-> diff --git a/target/i386/helper.c b/target/i386/helper.c
-> index 2070dd0dda..1da7a7d315 100644
-> --- a/target/i386/helper.c
-> +++ b/target/i386/helper.c
-> @@ -219,6 +219,10 @@ void cpu_x86_update_cr4(CPUX86State *env, uint32_t new_cr4)
->           new_cr4 &= ~CR4_PKS_MASK;
->       }
->   
-> +    if (!(env->features[FEAT_7_1_EAX] & CPUID_7_1_EAX_LAM)) {
-> +        new_cr4 &= ~CR4_LAM_SUP_MASK;
-> +    }
+>           /*
+>            * die-id was optional in QEMU 4.0 and older, so keep it optional
+> @@ -366,17 +366,27 @@ void x86_cpu_pre_plug(HotplugHandler *hotplug_dev,
+>           topo_ids.die_id = cpu->die_id;
+>           topo_ids.core_id = cpu->core_id;
+>           topo_ids.smt_id = cpu->thread_id;
 > +
->       env->cr[4] = new_cr4;
->       env->hflags = hflags;
+> +        /*
+> +         * TODO: This is the temporary initialization for topo_ids.module_id to
+> +         * avoid "maybe-uninitialized" compilation errors. Will remove when
+> +         * X86CPU supports cluster_id.
+> +         */
+> +        topo_ids.module_id = 0;
+> 
+
+if you put patch 10 before this patch, then we don't need this trick.
+
+>           cpu->apic_id = x86_apicid_from_topo_ids(&topo_info, &topo_ids);
+>       }
 >   
+>       cpu_slot = x86_find_cpu_slot(MACHINE(x86ms), cpu->apic_id, &idx);
+>       if (!cpu_slot) {
+>           x86_topo_ids_from_apicid(cpu->apic_id, &topo_info, &topo_ids);
+> +
+>           error_setg(errp,
+> -            "Invalid CPU [socket: %u, die: %u, core: %u, thread: %u] with"
+> -            " APIC ID %" PRIu32 ", valid index range 0:%d",
+> -            topo_ids.pkg_id, topo_ids.die_id, topo_ids.core_id, topo_ids.smt_id,
+> -            cpu->apic_id, ms->possible_cpus->len - 1);
+> +            "Invalid CPU [socket: %u, die: %u, module: %u, core: %u, thread: %u]"
+> +            " with APIC ID %" PRIu32 ", valid index range 0:%d",
+> +            topo_ids.pkg_id, topo_ids.die_id, topo_ids.module_id,
+> +            topo_ids.core_id, topo_ids.smt_id, cpu->apic_id,
+> +            ms->possible_cpus->len - 1);
+>           return;
+>       }
+>   
+> @@ -502,6 +512,10 @@ const CPUArchIdList *x86_possible_cpu_arch_ids(MachineState *ms)
+>               ms->possible_cpus->cpus[i].props.has_die_id = true;
+>               ms->possible_cpus->cpus[i].props.die_id = topo_ids.die_id;
+>           }
+> +        if (ms->smp.clusters > 1) {
+> +            ms->possible_cpus->cpus[i].props.has_cluster_id = true;
+> +            ms->possible_cpus->cpus[i].props.cluster_id = topo_ids.module_id;
+> +        }
+>           ms->possible_cpus->cpus[i].props.has_core_id = true;
+>           ms->possible_cpus->cpus[i].props.core_id = topo_ids.core_id;
+>           ms->possible_cpus->cpus[i].props.has_thread_id = true;
+> diff --git a/include/hw/i386/topology.h b/include/hw/i386/topology.h
+> index 517e51768c13..ed1f3d6c1d5e 100644
+> --- a/include/hw/i386/topology.h
+> +++ b/include/hw/i386/topology.h
+> @@ -50,6 +50,7 @@ typedef uint32_t apic_id_t;
+>   typedef struct X86CPUTopoIDs {
+>       unsigned pkg_id;
+>       unsigned die_id;
+> +    unsigned module_id;
+>       unsigned core_id;
+>       unsigned smt_id;
+>   } X86CPUTopoIDs;
+> @@ -127,6 +128,7 @@ static inline apic_id_t x86_apicid_from_topo_ids(X86CPUTopoInfo *topo_info,
+>   {
+>       return (topo_ids->pkg_id  << apicid_pkg_offset(topo_info)) |
+>              (topo_ids->die_id  << apicid_die_offset(topo_info)) |
+> +           (topo_ids->module_id << apicid_module_offset(topo_info)) |
+>              (topo_ids->core_id << apicid_core_offset(topo_info)) |
+>              topo_ids->smt_id;
+>   }
+> @@ -140,12 +142,16 @@ static inline void x86_topo_ids_from_idx(X86CPUTopoInfo *topo_info,
+>                                            X86CPUTopoIDs *topo_ids)
+>   {
+>       unsigned nr_dies = topo_info->dies_per_pkg;
+> -    unsigned nr_cores = topo_info->cores_per_module *
+> -                        topo_info->modules_per_die;
+> +    unsigned nr_modules = topo_info->modules_per_die;
+> +    unsigned nr_cores = topo_info->cores_per_module;
+>       unsigned nr_threads = topo_info->threads_per_core;
+>   
+> -    topo_ids->pkg_id = cpu_index / (nr_dies * nr_cores * nr_threads);
+> -    topo_ids->die_id = cpu_index / (nr_cores * nr_threads) % nr_dies;
+> +    topo_ids->pkg_id = cpu_index / (nr_dies * nr_modules *
+> +                       nr_cores * nr_threads);
+> +    topo_ids->die_id = cpu_index / (nr_modules * nr_cores *
+> +                       nr_threads) % nr_dies;
+> +    topo_ids->module_id = cpu_index / (nr_cores * nr_threads) %
+> +                          nr_modules;
+>       topo_ids->core_id = cpu_index / nr_threads % nr_cores;
+>       topo_ids->smt_id = cpu_index % nr_threads;
+>   }
+> @@ -163,6 +169,9 @@ static inline void x86_topo_ids_from_apicid(apic_id_t apicid,
+>       topo_ids->core_id =
+>               (apicid >> apicid_core_offset(topo_info)) &
+>               ~(0xFFFFFFFFUL << apicid_core_width(topo_info));
+> +    topo_ids->module_id =
+> +            (apicid >> apicid_module_offset(topo_info)) &
+> +            ~(0xFFFFFFFFUL << apicid_module_width(topo_info));
+>       topo_ids->die_id =
+>               (apicid >> apicid_die_offset(topo_info)) &
+>               ~(0xFFFFFFFFUL << apicid_die_width(topo_info));
 
 
