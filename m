@@ -1,152 +1,231 @@
-Return-Path: <kvm+bounces-6226-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6227-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D191D82D8FD
-	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 13:44:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0957A82D950
+	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 13:59:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 054A11C2161A
-	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 12:44:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 300521C2186E
+	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 12:59:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08CB9154B1;
-	Mon, 15 Jan 2024 12:44:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38C39171A2;
+	Mon, 15 Jan 2024 12:58:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qkSTBs3V"
+	dkim=pass (1024-bit key) header.d=xen.org header.i=@xen.org header.b="dpMcEDtG"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-185.mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
+Received: from mail.xenproject.org (mail.xenproject.org [104.130.215.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEE9EF4E6
-	for <kvm@vger.kernel.org>; Mon, 15 Jan 2024 12:44:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Mon, 15 Jan 2024 13:44:17 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1705322660;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MwtEWLAXam/IycH3fliQdB9hc+Fa+3tIJSxCSLpGklg=;
-	b=qkSTBs3VJnpyVeSfr53o+AUoEBfoa5dlIRd+6kIoAVDl8WIuSCQd77yD7dHnO6r3aksh+g
-	OtddvsEWRILNOTNVjzpmeGn50EtxIftBx+29mCVpTVmGAxMBvvQQJrm1s9MV2LwKdIhhk5
-	XxQ2ie+A3NvnwIF2Tfp5s7zyl1rQIV8=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Shaoqin Huang <shahuang@redhat.com>
-Cc: kvmarm@lists.linux.dev, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Nikos Nikoleris <nikos.nikoleris@arm.com>, Eric Auger <eric.auger@redhat.com>, 
-	Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, Nico Boehr <nrb@linux.ibm.com>, 
-	David Woodhouse <dwmw@amazon.co.uk>, Nadav Amit <namit@vmware.com>, kvm@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org
-Subject: Re: [kvm-unit-tests PATCH v1 01/18] Makefile: Define __ASSEMBLY__
- for assembly files
-Message-ID: <20240115-0c41f7d4aa09b7b82613faa8@orel>
-References: <20231130090722.2897974-1-shahuang@redhat.com>
- <20231130090722.2897974-2-shahuang@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1721F175AB;
+	Mon, 15 Jan 2024 12:58:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xen.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xen.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=xen.org;
+	s=20200302mail; h=Content-Transfer-Encoding:MIME-Version:References:
+	In-Reply-To:Message-Id:Date:Subject:To:From;
+	bh=JUiDe6hOaIy+4uee/fAnBCB3ywCyITQC8m671brMaTc=; b=dpMcEDtG7nb+ErCgJ/rncMoljY
+	vuxrqgCEb9Dy5nunHKYECPU7jeMoUDFKmt88j4f0OqytKqIk2G/4EW7EQA+7OCsw3O7e8tfhzbgN6
+	xTgopbE+lD4IiKDnYJpbay7lgK7qNVwJoqizFhkpfvSMX3bdIgSTLy6F4/rmu3Cs9dkU=;
+Received: from xenbits.xenproject.org ([104.239.192.120])
+	by mail.xenproject.org with esmtp (Exim 4.92)
+	(envelope-from <paul@xen.org>)
+	id 1rPMXI-0002kY-Np; Mon, 15 Jan 2024 12:57:52 +0000
+Received: from 54-240-197-231.amazon.com ([54.240.197.231] helo=REM-PW02S00X.ant.amazon.com)
+	by xenbits.xenproject.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <paul@xen.org>)
+	id 1rPMXI-0002kM-Et; Mon, 15 Jan 2024 12:57:52 +0000
+From: Paul Durrant <paul@xen.org>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Sean Christopherson <seanjc@google.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Paul Durrant <paul@xen.org>,
+	Shuah Khan <shuah@kernel.org>,
+	kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH v12 08/20] KVM: pfncache: allow a cache to be activated with a fixed (userspace) HVA
+Date: Mon, 15 Jan 2024 12:56:55 +0000
+Message-Id: <20240115125707.1183-9-paul@xen.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240115125707.1183-1-paul@xen.org>
+References: <20240115125707.1183-1-paul@xen.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231130090722.2897974-2-shahuang@redhat.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-On Thu, Nov 30, 2023 at 04:07:03AM -0500, Shaoqin Huang wrote:
-> From: Alexandru Elisei <alexandru.elisei@arm.com>
-> 
-> There are 25 header files today (found with grep -r "#ifndef __ASSEMBLY__)
-> with functionality relies on the __ASSEMBLY__ prepocessor constant being
-> correctly defined to work correctly. So far, kvm-unit-tests has relied on
-> the assembly files to define the constant before including any header
-> files which depend on it.
-> 
-> Let's make sure that nobody gets this wrong and define it as a compiler
-> constant when compiling assembly files. __ASSEMBLY__ is now defined for all
-> .S files, even those that didn't set it explicitely before.
-> 
-> Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
-> Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
-> ---
->  Makefile           | 5 ++++-
->  arm/cstart.S       | 1 -
->  arm/cstart64.S     | 1 -
->  powerpc/cstart64.S | 1 -
->  4 files changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index 602910dd..27ed14e6 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -92,6 +92,9 @@ CFLAGS += -Woverride-init -Wmissing-prototypes -Wstrict-prototypes
->  
->  autodepend-flags = -MMD -MP -MF $(dir $*).$(notdir $*).d
->  
-> +AFLAGS  = $(CFLAGS)
-> +AFLAGS += -D__ASSEMBLY__
-> +
->  LDFLAGS += -nostdlib $(no_pie) -z noexecstack
->  
->  $(libcflat): $(cflatobjs)
-> @@ -113,7 +116,7 @@ directories:
->  	@mkdir -p $(OBJDIRS)
->  
->  %.o: %.S
-> -	$(CC) $(CFLAGS) -c -nostdlib -o $@ $<
-> +	$(CC) $(AFLAGS) -c -nostdlib -o $@ $<
+From: Paul Durrant <pdurrant@amazon.com>
 
-I think we can drop the two hunks above from this patch and just rely on
-the compiler to add __ASSEMBLY__ for us when compiling assembly files.
+Some pfncache pages may actually be overlays on guest memory that have a
+fixed HVA within the VMM. It's pointless to invalidate such cached
+mappings if the overlay is moved so allow a cache to be activated directly
+with the HVA to cater for such cases. A subsequent patch will make use
+of this facility.
 
-Thanks,
-drew
+Signed-off-by: Paul Durrant <pdurrant@amazon.com>
+Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
+---
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: David Woodhouse <dwmw2@infradead.org>
 
->  
->  -include */.*.d */*/.*.d
->  
-> diff --git a/arm/cstart.S b/arm/cstart.S
-> index 3dd71ed9..b24ecabc 100644
-> --- a/arm/cstart.S
-> +++ b/arm/cstart.S
-> @@ -5,7 +5,6 @@
->   *
->   * This work is licensed under the terms of the GNU LGPL, version 2.
->   */
-> -#define __ASSEMBLY__
->  #include <auxinfo.h>
->  #include <asm/assembler.h>
->  #include <asm/thread_info.h>
-> diff --git a/arm/cstart64.S b/arm/cstart64.S
-> index bc2be45a..a8ad6dc8 100644
-> --- a/arm/cstart64.S
-> +++ b/arm/cstart64.S
-> @@ -5,7 +5,6 @@
->   *
->   * This work is licensed under the terms of the GNU GPL, version 2.
->   */
-> -#define __ASSEMBLY__
->  #include <auxinfo.h>
->  #include <asm/asm-offsets.h>
->  #include <asm/assembler.h>
-> diff --git a/powerpc/cstart64.S b/powerpc/cstart64.S
-> index 34e39341..fa32ef24 100644
-> --- a/powerpc/cstart64.S
-> +++ b/powerpc/cstart64.S
-> @@ -5,7 +5,6 @@
->   *
->   * This work is licensed under the terms of the GNU LGPL, version 2.
->   */
-> -#define __ASSEMBLY__
->  #include <asm/hcall.h>
->  #include <asm/ppc_asm.h>
->  #include <asm/rtas.h>
-> -- 
-> 2.40.1
-> 
+v11:
+ - Fixed kvm_gpc_check() to ignore memslot generation if the cache is not
+   activated with a GPA. (This breakage occured during the re-work for v8).
+
+v9:
+ - Pass both GPA and HVA into __kvm_gpc_refresh() rather than overloading
+   the address paraneter and using a bool flag to indicated what it is.
+
+v8:
+ - Re-worked to avoid messing with struct gfn_to_pfn_cache.
+---
+ include/linux/kvm_host.h | 20 +++++++++++++++++++-
+ virt/kvm/pfncache.c      | 40 +++++++++++++++++++++++++++++++---------
+ 2 files changed, 50 insertions(+), 10 deletions(-)
+
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index f2354f808d04..7994c4d16783 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1344,6 +1344,22 @@ void kvm_gpc_init(struct gfn_to_pfn_cache *gpc, struct kvm *kvm);
+  */
+ int kvm_gpc_activate(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned long len);
+ 
++/**
++ * kvm_gpc_activate_hva - prepare a cached kernel mapping and HPA for a given HVA.
++ *
++ * @gpc:          struct gfn_to_pfn_cache object.
++ * @hva:          userspace virtual address to map.
++ * @len:          sanity check; the range being access must fit a single page.
++ *
++ * @return:       0 for success.
++ *                -EINVAL for a mapping which would cross a page boundary.
++ *                -EFAULT for an untranslatable guest physical address.
++ *
++ * The semantics of this function are the same as those of kvm_gpc_activate(). It
++ * merely bypasses a layer of address translation.
++ */
++int kvm_gpc_activate_hva(struct gfn_to_pfn_cache *gpc, unsigned long hva, unsigned long len);
++
+ /**
+  * kvm_gpc_check - check validity of a gfn_to_pfn_cache.
+  *
+@@ -1398,7 +1414,9 @@ void kvm_gpc_deactivate(struct gfn_to_pfn_cache *gpc);
+ static inline void kvm_gpc_mark_dirty(struct gfn_to_pfn_cache *gpc)
+ {
+ 	lockdep_assert_held(&gpc->lock);
+-	mark_page_dirty_in_slot(gpc->kvm, gpc->memslot, gpc->gpa >> PAGE_SHIFT);
++
++	if (gpc->gpa != KVM_XEN_INVALID_GPA)
++		mark_page_dirty_in_slot(gpc->kvm, gpc->memslot, gpc->gpa >> PAGE_SHIFT);
+ }
+ 
+ void kvm_sigset_activate(struct kvm_vcpu *vcpu);
+diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
+index 97eec8ee3449..ae822bff812f 100644
+--- a/virt/kvm/pfncache.c
++++ b/virt/kvm/pfncache.c
+@@ -48,7 +48,10 @@ bool kvm_gpc_check(struct gfn_to_pfn_cache *gpc, unsigned long len)
+ 	if (!gpc->active)
+ 		return false;
+ 
+-	if (gpc->generation != slots->generation || kvm_is_error_hva(gpc->uhva))
++	if (gpc->gpa != KVM_XEN_INVALID_GPA && gpc->generation != slots->generation)
++		return false;
++
++	if (kvm_is_error_hva(gpc->uhva))
+ 		return false;
+ 
+ 	if (offset_in_page(gpc->uhva) + len > PAGE_SIZE)
+@@ -209,11 +212,13 @@ static kvm_pfn_t hva_to_pfn_retry(struct gfn_to_pfn_cache *gpc)
+ 	return -EFAULT;
+ }
+ 
+-static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa,
++static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned long uhva,
+ 			     unsigned long len)
+ {
+ 	struct kvm_memslots *slots = kvm_memslots(gpc->kvm);
+-	unsigned long page_offset = offset_in_page(gpa);
++	unsigned long page_offset = (gpa != KVM_XEN_INVALID_GPA) ?
++		offset_in_page(gpa) :
++		offset_in_page(uhva);
+ 	bool unmap_old = false;
+ 	unsigned long old_uhva;
+ 	kvm_pfn_t old_pfn;
+@@ -246,9 +251,15 @@ static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa,
+ 	old_khva = (void *)PAGE_ALIGN_DOWN((uintptr_t)gpc->khva);
+ 	old_uhva = PAGE_ALIGN_DOWN(gpc->uhva);
+ 
+-	/* Refresh the userspace HVA if necessary */
+-	if (gpc->gpa != gpa || gpc->generation != slots->generation ||
+-	    kvm_is_error_hva(gpc->uhva)) {
++	if (gpa == KVM_XEN_INVALID_GPA) {
++		gpc->gpa = KVM_XEN_INVALID_GPA;
++		gpc->uhva = PAGE_ALIGN_DOWN(uhva);
++
++		if (gpc->uhva != old_uhva)
++			hva_change = true;
++	} else if (gpc->gpa != gpa ||
++		   gpc->generation != slots->generation ||
++		   kvm_is_error_hva(gpc->uhva)) {
+ 		gfn_t gfn = gpa_to_gfn(gpa);
+ 
+ 		gpc->gpa = gpa;
+@@ -319,7 +330,7 @@ static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa,
+ 
+ int kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, unsigned long len)
+ {
+-	return __kvm_gpc_refresh(gpc, gpc->gpa, len);
++	return __kvm_gpc_refresh(gpc, gpc->gpa, gpc->uhva, len);
+ }
+ 
+ void kvm_gpc_init(struct gfn_to_pfn_cache *gpc, struct kvm *kvm)
+@@ -332,7 +343,8 @@ void kvm_gpc_init(struct gfn_to_pfn_cache *gpc, struct kvm *kvm)
+ 	gpc->uhva = KVM_HVA_ERR_BAD;
+ }
+ 
+-int kvm_gpc_activate(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned long len)
++static int __kvm_gpc_activate(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned long uhva,
++			      unsigned long len)
+ {
+ 	struct kvm *kvm = gpc->kvm;
+ 
+@@ -353,7 +365,17 @@ int kvm_gpc_activate(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned long len)
+ 		gpc->active = true;
+ 		write_unlock_irq(&gpc->lock);
+ 	}
+-	return __kvm_gpc_refresh(gpc, gpa, len);
++	return __kvm_gpc_refresh(gpc, gpa, uhva, len);
++}
++
++int kvm_gpc_activate(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned long len)
++{
++	return __kvm_gpc_activate(gpc, gpa, KVM_HVA_ERR_BAD, len);
++}
++
++int kvm_gpc_activate_hva(struct gfn_to_pfn_cache *gpc, unsigned long uhva, unsigned long len)
++{
++	return __kvm_gpc_activate(gpc, KVM_XEN_INVALID_GPA, uhva, len);
+ }
+ 
+ void kvm_gpc_deactivate(struct gfn_to_pfn_cache *gpc)
+-- 
+2.39.2
+
 
