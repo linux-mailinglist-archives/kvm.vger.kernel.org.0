@@ -1,113 +1,118 @@
-Return-Path: <kvm+bounces-6200-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6203-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB4EC82D46F
-	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 08:07:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9ACC882D4BE
+	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 08:56:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 791081F20FBC
-	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 07:07:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F5C61F217B6
+	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 07:56:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3366763C5;
-	Mon, 15 Jan 2024 07:07:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iwIhfe0b"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFD836FAD;
+	Mon, 15 Jan 2024 07:56:36 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 222A063AA
-	for <kvm@vger.kernel.org>; Mon, 15 Jan 2024 07:07:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1705302464; x=1736838464;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=o7qZxhaRG6s2AdoDhlfCwW2RkcbUaQCrovplsa+bUjw=;
-  b=iwIhfe0bOflrE/u7zZuUeZU3JAeMAjlvZe9tR1SMJ0MSBKqzolT3aLbV
-   WHErzBU4R8+7+9Z1jQ/nDhvWGoaLrunzoe+qI2lFFJ/TMnWBin5bG1Ra/
-   /5owGe6Trcych3BgJxCRFGAgtT6RveTk1A73+7iRZtOTC34Ef53pcx9A4
-   T8g0KNhs/H/E38v85KyvQvbRTfljDko1QEZjpDUho3wdXcSYFVbfu5gMi
-   /mTkLjJtYlG3QqPEJwT5/EMZdKSkDcRmpAOQZsAPmy3QhtL43UarsO3/1
-   hDmxwyjIgnSS9n8Pc3/BUV1Um3tQ8Rkf5qoLUWDhtruEjdxkSS3NCfueM
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10953"; a="6918406"
-X-IronPort-AV: E=Sophos;i="6.04,196,1695711600"; 
-   d="scan'208";a="6918406"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2024 23:07:44 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10953"; a="1114855357"
-X-IronPort-AV: E=Sophos;i="6.04,196,1695711600"; 
-   d="scan'208";a="1114855357"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
-  by fmsmga005.fm.intel.com with ESMTP; 14 Jan 2024 23:07:39 -0800
-Date: Mon, 15 Jan 2024 15:20:37 +0800
-From: Zhao Liu <zhao1.liu@linux.intel.com>
-To: Yuan Yao <yuan.yao@linux.intel.com>
-Cc: Xiaoyao Li <xiaoyao.li@intel.com>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
-	kvm@vger.kernel.org, Zhenyu Wang <zhenyu.z.wang@intel.com>,
-	Zhuocheng Ding <zhuocheng.ding@intel.com>,
-	Zhao Liu <zhao1.liu@intel.com>, Babu Moger <babu.moger@amd.com>,
-	Yongwei Ma <yongwei.ma@intel.com>
-Subject: Re: [PATCH v7 08/16] i386: Expose module level in CPUID[0x1F]
-Message-ID: <ZaTcxVGHhQtLC/Ki@intel.com>
-References: <20240108082727.420817-1-zhao1.liu@linux.intel.com>
- <20240108082727.420817-9-zhao1.liu@linux.intel.com>
- <20240115032524.44q5ygb25ieut44c@yy-desk-7060>
- <ZaSv51/5Eokkv5Rr@intel.com>
- <336a4816-966d-42b0-b34b-47be3e41446d@intel.com>
- <20240115052022.xbv6exhm4af7kai7@yy-desk-7060>
- <ZaTOpCFZRu6/py/J@intel.com>
- <20240115065730.ezwpd3sjoycc57rm@yy-desk-7060>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56AF95380
+	for <kvm@vger.kernel.org>; Mon, 15 Jan 2024 07:56:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4TD3vd5TZLz1Q7tp;
+	Mon, 15 Jan 2024 15:40:13 +0800 (CST)
+Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
+	by mail.maildlp.com (Postfix) with ESMTPS id 71D8718006D;
+	Mon, 15 Jan 2024 15:41:04 +0800 (CST)
+Received: from [10.174.185.179] (10.174.185.179) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 15 Jan 2024 15:41:03 +0800
+Subject: Re: [PATCH v1] KVM: arm64: selftests: Handle feature fields with
+ nonzero minimum value correctly
+To: Jing Zhang <jingzhangos@google.com>
+CC: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, ARMLinux
+	<linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, Oliver
+ Upton <oliver.upton@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, James
+ Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Itaru
+ Kitayama <itaru.kitayama@linux.dev>
+References: <20240109165622.4104387-1-jingzhangos@google.com>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <05e504bb-9aec-6026-1ea8-bca59ad439bf@huawei.com>
+Date: Mon, 15 Jan 2024 15:41:02 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240115065730.ezwpd3sjoycc57rm@yy-desk-7060>
+In-Reply-To: <20240109165622.4104387-1-jingzhangos@google.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
 
-On Mon, Jan 15, 2024 at 02:57:30PM +0800, Yuan Yao wrote:
-> Date: Mon, 15 Jan 2024 14:57:30 +0800
-> From: Yuan Yao <yuan.yao@linux.intel.com>
-> Subject: Re: [PATCH v7 08/16] i386: Expose module level in CPUID[0x1F]
+Hi Jing,
+
+On 2024/1/10 0:56, Jing Zhang wrote:
+> There are some feature fields with nonzero minimum valid value. Make
+> sure get_safe_value() won't return invalid field values for them.
+> Also fix a bug that wrongly uses the feature bits type as the feature
+> bits sign causing all fields as signed in the get_safe_value() and
+> get_invalid_value().
 > 
-> On Mon, Jan 15, 2024 at 02:20:20PM +0800, Zhao Liu wrote:
-> > On Mon, Jan 15, 2024 at 01:20:22PM +0800, Yuan Yao wrote:
-> > > Date: Mon, 15 Jan 2024 13:20:22 +0800
-> > > From: Yuan Yao <yuan.yao@linux.intel.com>
-> > > Subject: Re: [PATCH v7 08/16] i386: Expose module level in CPUID[0x1F]
-> > >
-> > > Ah, so my understanding is incorrect on this.
-> > >
-> > > I tried on one raptor lake i5-i335U, which also hybrid soc but doesn't have
-> > > module level, in this case 0x1f and 0xb have same values in core/lp level.
-> >
-> > Some socs have modules/dies but they don't expose them in 0x1f.
+> Fixes: 54a9ea73527d ("KVM: arm64: selftests: Test for setting ID register from usersapce")
+> Reported-by: Zenghui Yu <yuzenghui@huawei.com>
+> Reported-by: Itaru Kitayama <itaru.kitayama@linux.dev>
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+>  .../selftests/kvm/aarch64/set_id_regs.c       | 20 +++++++++++++++----
+>  1 file changed, 16 insertions(+), 4 deletions(-)
 > 
-> Here they don't expose because from hardware level they can't or possible
-> software level configuration (i.e. disable some cores in bios) ?
->
+> diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
+> index bac05210b539..f17454dc6d9e 100644
+> --- a/tools/testing/selftests/kvm/aarch64/set_id_regs.c
+> +++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
+> @@ -224,13 +224,20 @@ uint64_t get_safe_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
+>  {
+>  	uint64_t ftr_max = GENMASK_ULL(ARM64_FEATURE_FIELD_BITS - 1, 0);
+>   
+> -	if (ftr_bits->type == FTR_UNSIGNED) {
+> +	if (ftr_bits->sign == FTR_UNSIGNED) {
+>  		switch (ftr_bits->type) {
+>  		case FTR_EXACT:
+>  			ftr = ftr_bits->safe_val;
+>  			break;
+>  		case FTR_LOWER_SAFE:
+> -			if (ftr > 0)
+> +			uint64_t min_safe = 0;
+> +
+> +			if (!strcmp(ftr_bits->name, "ID_AA64DFR0_EL1_DebugVer"))
+> +				min_safe = ID_AA64DFR0_EL1_DebugVer_IMP;
+> +			else if (!strcmp(ftr_bits->name, "ID_DFR0_EL1_CopDbg"))
+> +				min_safe = ID_DFR0_EL1_CopDbg_Armv8;
+> +
+> +			if (ftr > min_safe)
 
-This leaf is decided at hardware level. Whether or not which levels are exposed
-sometimes depends if there is the topology-related feature, but there is no clear
-rule (just as in the ADL family neither ADL-S/P exposes modules, while ADL-N
-exposes modules).
+As I mentioned in my previous reply, there is a compilation error with
+gcc-10.3.1.
 
-Regards,
-Zhao
+| aarch64/set_id_regs.c: In function 'get_safe_value':
+| aarch64/set_id_regs.c:233:4: error: a label can only be part of a 
+statement and a declaration is not a statement
+|   233 |    uint64_t min_safe = 0;
+|       |    ^~~~~~~~
+| aarch64/set_id_regs.c:262:4: error: a label can only be part of a 
+statement and a declaration is not a statement
+|   262 |    uint64_t min_safe = 0;
+|       |    ^~~~~~~~
 
+Please fix it.
+
+Zenghui
 
