@@ -1,84 +1,74 @@
-Return-Path: <kvm+bounces-6278-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6280-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C3B882E058
-	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 19:56:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 747A982E0F3
+	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 20:49:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 17EB1B21D98
-	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 18:56:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26CFD1F22D51
+	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 19:49:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D631E199DB;
-	Mon, 15 Jan 2024 18:54:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9057619473;
+	Mon, 15 Jan 2024 19:48:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ZPj8HwLa"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="HemtMeWo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9B5919469;
-	Mon, 15 Jan 2024 18:54:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40FHx79q018410;
-	Mon, 15 Jan 2024 18:54:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=QiVXsK0Tbzx56s4STPzPtbC2hmLhKdcNXHSamhEQq70=;
- b=ZPj8HwLa3VoR0c/sCGeTbjvwAqDpd3uCEcwcp8xNXMliBAEBi/erMyS4nqk4R0eBVFfu
- C1iZrZeGJN/Qt/kXACRvizuEhJOLZo/4tEuGxEhAAYOuwE3+xOmGFv1qKzkK92+nb0zv
- AftTsJDlb1NN06upxt7bP9Xst4S06tJDqUK7LDnvri4muUgCTkPF8dQvgWoMAVmGgGas
- aEJL+PGYEu9YEYummBP1Fmpwm7Yea2/9lWwCGArcFFxAsMt9IXhdAyxGR2ChbBlVJs9y
- /WOjf3KUQMhCs2tlWXtGvFHod75CdzKnba4/tCi+8FhCwIMDshAN2C2v8fFP8CSMEpjt 5w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vn7x8u3js-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 15 Jan 2024 18:54:52 +0000
-Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 40FIqGRP028552;
-	Mon, 15 Jan 2024 18:54:51 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vn7x8u3jh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 15 Jan 2024 18:54:51 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 40FHFEws014779;
-	Mon, 15 Jan 2024 18:54:50 GMT
-Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3vm4usj7rh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 15 Jan 2024 18:54:50 +0000
-Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
-	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 40FIsnIU21758594
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 15 Jan 2024 18:54:49 GMT
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7E52A58056;
-	Mon, 15 Jan 2024 18:54:49 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 791D35805A;
-	Mon, 15 Jan 2024 18:54:48 +0000 (GMT)
-Received: from li-2c1e724c-2c76-11b2-a85c-ae42eaf3cb3d.ibm.com.com (unknown [9.61.164.202])
-	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 15 Jan 2024 18:54:48 +0000 (GMT)
-From: Tony  Krowiak <akrowiak@linux.ibm.com>
-To: linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc: jjherne@linux.ibm.com, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        pbonzini@redhat.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        agordeev@linux.ibm.com, gor@linux.ibm.com,
-        Tony Krowiak <akrowiak@linux.ibm.com>, stable@vger.kernel.org
-Subject: [PATCH v4 6/6] s390/vfio-ap: do not reset queue removed from host config
-Date: Mon, 15 Jan 2024 13:54:36 -0500
-Message-ID: <20240115185441.31526-7-akrowiak@linux.ibm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6437518E1E
+	for <kvm@vger.kernel.org>; Mon, 15 Jan 2024 19:48:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-40d6b4e2945so104024805e9.0
+        for <kvm@vger.kernel.org>; Mon, 15 Jan 2024 11:48:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1705348127; x=1705952927; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6DEN/kfezDxdwFbQ4SlzRu09sYlvOCv1vm2x8xUmb78=;
+        b=HemtMeWocBGHigv5CK6ei0VxS9B0jmgBOg9VBzmfQYmJCIGtykUzzuB/h4IIyZI9Zp
+         rTpPoP4XL/N34DDq8PbY8/5SJD9OWF9TDwHygCkttyCldmNG+7d4jCONFURTPl1g/9mc
+         dU9abDVoQYEYg8l0+ZMpgG7NskgsDYScciPEPSYLhfycO1EalPhb+/s8SjtTs2uEM3Y4
+         ylG4bn8zHppI/7sJ4TwKYF0VjrWSsWN5zf3DJdyYW0JFZRm9zkwgUTKyzhJcnhOeETpB
+         l5a7siGZdV1y9KZJANv05uMqXTdJRYBx8UgKoNsCmT6Sd+JIC8vs8r226uTYL2lFe76A
+         ixzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705348127; x=1705952927;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6DEN/kfezDxdwFbQ4SlzRu09sYlvOCv1vm2x8xUmb78=;
+        b=m3djPgIA7/tCpKH9tL20Mw62nhLASr9hPAfwRnnHwp7O80EVPPE4v3dslsL1350pK2
+         Q9J/PZzE4ehQSe9sicSy4HYh8i/3hTNB9lp39V+LDUiyVrf6plXNLEdJMbUkNb0x9JBs
+         CEP3hWMCbKJCycyhsKw3cJacz5Mck1kTinE/k3MZ1vSBJ1cEljCoI6nqHVH0j64l7HnI
+         NJpMTgI3/MDoRMZddZW2kWgt/dyBTnn0HigYk0jP6R3vFMnDe9rXKpu5yZGSqTsJSlPi
+         MXu17WPaXV78qJSU3cSl4pGH0f9dH2YA7iUOCnCgeqLw1HxeqKAyFkqD1H9FdEqwy0bx
+         F8jQ==
+X-Gm-Message-State: AOJu0YwluVIIQA/Gw1MSIqaL9RPI4RqYROw/5XhnhNSttDweukmYLV37
+	yxc43DdCD8LaaFEPSl6MTbu5SeDCzE4BJA==
+X-Google-Smtp-Source: AGHT+IGHQvohHr6QjMCI0MT7RoVWkT+LEI7gQrcEtT0MX+h3XouC2orBPtN6UWXuW+i4Otwhj4e9ug==
+X-Received: by 2002:a05:600c:450f:b0:40e:66e0:976e with SMTP id t15-20020a05600c450f00b0040e66e0976emr2021293wmo.89.1705348127562;
+        Mon, 15 Jan 2024 11:48:47 -0800 (PST)
+Received: from navi.cosmonova.net.ua ([95.67.24.131])
+        by smtp.gmail.com with ESMTPSA id fg7-20020a056402548700b005593c83bdafsm1957377edb.45.2024.01.15.11.48.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Jan 2024 11:48:47 -0800 (PST)
+From: Andrew Melnychenko <andrew@daynix.com>
+To: mst@redhat.com,
+	jasowang@redhat.com,
+	kvm@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: yuri.benditovich@daynix.com,
+	yan@daynix.com
+Subject: [PATCH 1/1] vhost: Added pad cleanup if vnet_hdr is not present.
+Date: Mon, 15 Jan 2024 21:48:40 +0200
+Message-ID: <20240115194840.1183077-1-andrew@daynix.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240115185441.31526-1-akrowiak@linux.ibm.com>
-References: <20240115185441.31526-1-akrowiak@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -86,73 +76,38 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: SG7HXdSgvtvmNDZ9uJ8dl18B9P1je-BJ
-X-Proofpoint-ORIG-GUID: RBacV-aimrM4LLgK1zIi9ncj-JgXn7_Z
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-15_13,2024-01-15_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- malwarescore=0 bulkscore=0 lowpriorityscore=0 mlxscore=0 adultscore=0
- suspectscore=0 phishscore=0 priorityscore=1501 mlxlogscore=999 spamscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2401150139
 
-From: Tony Krowiak <akrowiak@linux.ibm.com>
+When the Qemu launched with vhost but without tap vnet_hdr,
+vhost tries to copy vnet_hdr from socket iter with size 0
+to the page that may contain some trash.
+That trash can be interpreted as unpredictable values for
+vnet_hdr.
+That leads to dropping some packets and in some cases to
+stalling vhost routine when the vhost_net tries to process
+packets and fails in a loop.
 
-When a queue is unbound from the vfio_ap device driver, it is reset to
-ensure its crypto data is not leaked when it is bound to another device
-driver. If the queue is unbound due to the fact that the adapter or domain
-was removed from the host's AP configuration, then attempting to reset it
-will fail with response code 01 (APID not valid) getting returned from the
-reset command. Let's ensure that the queue is assigned to the host's
-configuration before resetting it.
+Qemu options:
+  -netdev tap,vhost=on,vnet_hdr=off,...
 
-Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-Reviewed-by: Jason J. Herne <jjherne@linux.ibm.com>
-Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
-Fixes: eeb386aeb5b7 ("s390/vfio-ap: handle config changed and scan complete notification")
-Cc: <stable@vger.kernel.org>
+Signed-off-by: Andrew Melnychenko <andrew@daynix.com>
 ---
- drivers/s390/crypto/vfio_ap_ops.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
+ drivers/vhost/net.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-index 550c936c413d..983b3b16196c 100644
---- a/drivers/s390/crypto/vfio_ap_ops.c
-+++ b/drivers/s390/crypto/vfio_ap_ops.c
-@@ -2215,10 +2215,10 @@ void vfio_ap_mdev_remove_queue(struct ap_device *apdev)
- 	q = dev_get_drvdata(&apdev->device);
- 	get_update_locks_for_queue(q);
- 	matrix_mdev = q->matrix_mdev;
-+	apid = AP_QID_CARD(q->apqn);
-+	apqi = AP_QID_QUEUE(q->apqn);
+diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+index f2ed7167c848..57411ac2d08b 100644
+--- a/drivers/vhost/net.c
++++ b/drivers/vhost/net.c
+@@ -735,6 +735,9 @@ static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
+ 	hdr = buf;
+ 	gso = &hdr->gso;
  
- 	if (matrix_mdev) {
--		apid = AP_QID_CARD(q->apqn);
--		apqi = AP_QID_QUEUE(q->apqn);
- 		/* If the queue is assigned to the guest's AP configuration */
- 		if (test_bit_inv(apid, matrix_mdev->shadow_apcb.apm) &&
- 		    test_bit_inv(apqi, matrix_mdev->shadow_apcb.aqm)) {
-@@ -2234,8 +2234,16 @@ void vfio_ap_mdev_remove_queue(struct ap_device *apdev)
- 		}
- 	}
- 
--	vfio_ap_mdev_reset_queue(q);
--	flush_work(&q->reset_work);
-+	/*
-+	 * If the queue is not in the host's AP configuration, then resetting
-+	 * it will fail with response code 01, (APQN not valid); so, let's make
-+	 * sure it is in the host's config.
-+	 */
-+	if (test_bit_inv(apid, (unsigned long *)matrix_dev->info.apm) &&
-+	    test_bit_inv(apqi, (unsigned long *)matrix_dev->info.aqm)) {
-+		vfio_ap_mdev_reset_queue(q);
-+		flush_work(&q->reset_work);
-+	}
- 
- done:
- 	if (matrix_mdev)
++	if (!sock_hlen)
++		memset(buf, 0, pad);
++
+ 	if ((gso->flags & VIRTIO_NET_HDR_F_NEEDS_CSUM) &&
+ 	    vhost16_to_cpu(vq, gso->csum_start) +
+ 	    vhost16_to_cpu(vq, gso->csum_offset) + 2 >
 -- 
 2.43.0
 
