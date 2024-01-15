@@ -1,134 +1,159 @@
-Return-Path: <kvm+bounces-6265-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6266-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32EDB82DD9C
-	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 17:29:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9362382DDA1
+	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 17:31:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ADF52B21B45
-	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 16:29:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BF2E282B5C
+	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 16:31:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8245D17BC9;
-	Mon, 15 Jan 2024 16:28:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66F1C17BC1;
+	Mon, 15 Jan 2024 16:30:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PkmLG2NR"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="BAdpsCh5"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2042.outbound.protection.outlook.com [40.107.100.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD5A417BAE
-	for <kvm@vger.kernel.org>; Mon, 15 Jan 2024 16:28:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1705336125;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xeFxX+daWDMSkrH7ZOnVTZoSM9dN+DP2BZ6PwiIA2qo=;
-	b=PkmLG2NRJAc9a0AIjZf7fie3YJ/+A0I2SGf4oaDPQdDzFQ7kVc4BhYd7YXH7tvQuEaesAi
-	STxUjdH2t9Dkuc7qFQEnXSf9iNUEkxtONKmR7SbcwVwc1DYQZx9WMFI9/hQq9ZfdflkDSW
-	iPOuvBbM6hlTeqNMi9tD9pcFOkxxfgA=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-617-puMWeaFiPhGxJTUP1aAWJA-1; Mon, 15 Jan 2024 11:28:44 -0500
-X-MC-Unique: puMWeaFiPhGxJTUP1aAWJA-1
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7bef780be70so434193139f.0
-        for <kvm@vger.kernel.org>; Mon, 15 Jan 2024 08:28:44 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705336123; x=1705940923;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xeFxX+daWDMSkrH7ZOnVTZoSM9dN+DP2BZ6PwiIA2qo=;
-        b=mJpWlKVKIQfLZhpQGo1PyakX9/7bnHUmcFK7jbb2261z3v1UbQe6eyOStALidCyyy6
-         YFNqBKRYhXoWO6mdoY0mFz4i7+N5RuG8Fh+ey0im+i7Sz4UJDspFXrww9Kbn3FnjLxN3
-         nYxTT0euJgtHeAhZ17M4/bSZhTlmzFIrlsjr1C55VlZeUwDwT5vDWjlLeOwj+Ua8e9H0
-         S/IZaFUTrGmreUt3SLtzD0kYHhWWLAeniDm7Z5H2I4wMlmBiRSt7ZsycLlfi5H1m5Woz
-         i9V1mKEj1vBbEZjf02u6cgLHg/ZcRqOS2mMFiSoC6q2i0475OUqOl3OoL75F6Iu2CFEc
-         Ywxw==
-X-Gm-Message-State: AOJu0Yx1+kyLrf1O7zeICd4wRcPXDFU2ynomOsigSFRRs/AYL9HkeRTJ
-	s3LPRgUvrpmD+AFixlA6ly7vLZUZyTlFokZYewMliMbwv+KnEG2bpfq0cYdWgKTJ6BNpupe2G4+
-	E4RzYSyP/n25+r4rYhgb7DJLrT5cO
-X-Received: by 2002:a5e:c745:0:b0:7bf:444a:1ac with SMTP id g5-20020a5ec745000000b007bf444a01acmr1850342iop.43.1705336123292;
-        Mon, 15 Jan 2024 08:28:43 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFb5zNWdn3eaZ1y+CeTf8VwTR+AfnhjZIvIzBsaZ7tYdGNeAwEtzXRKfbGWez3YXRA9BZyJEQ==
-X-Received: by 2002:a5e:c745:0:b0:7bf:444a:1ac with SMTP id g5-20020a5ec745000000b007bf444a01acmr1850336iop.43.1705336122981;
-        Mon, 15 Jan 2024 08:28:42 -0800 (PST)
-Received: from redhat.com ([38.15.60.12])
-        by smtp.gmail.com with ESMTPSA id t9-20020a02c489000000b0046e7235c740sm1367316jam.106.2024.01.15.08.28.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Jan 2024 08:28:42 -0800 (PST)
-Date: Mon, 15 Jan 2024 09:28:41 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: "Wang, Wei W" <wei.w.wang@intel.com>
-Cc: Kunwu Chan <chentao@kylinos.cn>, "kvm@vger.kernel.org"
- <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2] vfio: Use WARN_ON for low-probability allocation
- failure issue in vfio_pci_bus_notifier
-Message-ID: <20240115092841.19dc32f6.alex.williamson@redhat.com>
-In-Reply-To: <DS0PR11MB6373BAF9CFEC4D67DEAAB1F7DC6C2@DS0PR11MB6373.namprd11.prod.outlook.com>
-References: <20240115063434.20278-1-chentao@kylinos.cn>
-	<DS0PR11MB6373BAF9CFEC4D67DEAAB1F7DC6C2@DS0PR11MB6373.namprd11.prod.outlook.com>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E752A186A;
+	Mon, 15 Jan 2024 16:30:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NMClHZXrGSLQKjsHsvzFjtzIMOZcH80ClF1dJ810NuaW1xaUuKt8hdjcoQSfAXz5Hmbq6b/fxMnNgh60FsFE7PS2q2ODOoxA8w3nfUrSEBJGPQGf0cuJsQ7BWpX2VaSw887VFT+4p5QBeFOPGQNTDm26VHafcmAWqHgPPpKiUWbCLpzoz5Mv1+EBljuB2vxhF0kBtceCdHorFukdLJGxHMx1McHouFwWRigAcFGCPX1cYOhTQDKwFNy3b1d1x6B8jGs681eyuWSV3tmJKlcO3xEyGHWdCT/bVUinR4AGReEruqujk6Suhm8ULZF4Ec5EI9JxrGnHAdC0OcIVDqZlvw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=HtUxJGnUrbhTgqdW7Bd5yQ3shGHdFp388jP+R+TJBn4=;
+ b=Rhd3l6gbhj77zA0IDXddIFiIX+wdw4IWSE8Qfcv4SrA7WpU7tUU9yQQgB4JFS9oz894F8yBhPmQUw1myB/1RijkfM1GBtSzDapmhOZTv7Kv/hIfupT2+TGGy98O+UBCuWfVUt/e0GEt5M4KzQx6SH5Jq7gsHUwH+b3bWRhJNXCX40wOl5doRxQ7w1mrMDIQuswQBpf8voOpMs6eYZkeqvTYe+/2wqSc8L/MWpCvrVTQgcSVStbwG3SgUW7SQbDc/9rKgwEKeTtIrDFFnfqmlcGvailojnlU7TcABlB2f9iRZ1z6qZPOAC+tYD8U5KLufBT0FXChMZiwY6B+JGXnc9w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HtUxJGnUrbhTgqdW7Bd5yQ3shGHdFp388jP+R+TJBn4=;
+ b=BAdpsCh5GjbejgyCHRb79rOyww5hHoMNsJdGjQeFp1S0I7Bc/FqBB1ySKZ1W5cWf0/VZLlxg1+y0JDwsK6vX3HVh4JlJX17KoCWvxc/NI/BdhzkrbVKMvgyPNyOYNJBZ3j9ED06vYR58JSTVreICOvSN5Ru/Uevvc4lvFACEl7iGcy+IobijzXPBkUenRXpP/fEUnMBf9JhAYUOPqaK8RAb2+asW3n/YaT+qVouL9aa43rql3yzzw+yI0xRvc9eOcKr+V5IaJCRHBg/ogLHs8SGC9ycokomy+WZp2JyaP0/0OEQiZJte32GAd6cP5lALoI6xZddKcM4GmHTLmi67LA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by SJ1PR12MB6121.namprd12.prod.outlook.com (2603:10b6:a03:45c::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7181.23; Mon, 15 Jan
+ 2024 16:30:51 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::96dd:1160:6472:9873]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::96dd:1160:6472:9873%6]) with mapi id 15.20.7181.020; Mon, 15 Jan 2024
+ 16:30:51 +0000
+Date: Mon, 15 Jan 2024 12:30:50 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, pbonzini@redhat.com,
+	seanjc@google.com, olvaffe@gmail.com, kevin.tian@intel.com,
+	zhiyuan.lv@intel.com, zhenyu.z.wang@intel.com, yongwei.ma@intel.com,
+	vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+	joro@8bytes.org, gurchetansingh@chromium.org, kraxel@redhat.com,
+	zzyiwei@google.com, ankita@nvidia.com, alex.williamson@redhat.com,
+	maz@kernel.org, oliver.upton@linux.dev, james.morse@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com
+Subject: Re: [PATCH 0/4] KVM: Honor guest memory types for virtio GPU devices
+Message-ID: <20240115163050.GI734935@nvidia.com>
+References: <20240105091237.24577-1-yan.y.zhao@intel.com>
+ <20240105195551.GE50406@nvidia.com>
+ <ZZuQEQAVX28v7p9Z@yzhao56-desk.sh.intel.com>
+ <20240108140250.GJ50406@nvidia.com>
+ <ZZyG9n0qZEr6dLlZ@yzhao56-desk.sh.intel.com>
+ <20240109002220.GA439767@nvidia.com>
+ <ZZyrS4RiHvktDZXb@yzhao56-desk.sh.intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZZyrS4RiHvktDZXb@yzhao56-desk.sh.intel.com>
+X-ClientProxiedBy: BL6PEPF00013E12.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:22e:400:0:1001:0:16) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SJ1PR12MB6121:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5c5c896e-532e-48ff-446d-08dc15e75641
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	hRAdsLZuMsxMPY7uVqdV0sc5fJbYOvRTWj7P7Sye7OPd//JaK44iyAzdBxM7HwxxCNK8y1OUO8k8TqTeqgS9JFNDVHdcrXnYg8zrsR02mlg2lfKcM/yrSa7PkKHCWisy5tz1t711iVEZRcOkeOaiyEJYgU3smxpWVsKMa70j0Lw7A7IzL8dxAjRhj+fe7sE1g4Z7Il7yRDV//dX8CLZ41Y5y1I8LsjRBGAtb7WZ6LTC5vleJLoLqUmbbBArjyeHSTTmu2Ez0JtMIpiMZIosMjeRORWaRggScy+ajVEN+j+9vDFWJGUnWcn7HJWpQ+8nJtyf/DEaLJZa9wBNqBDg/xXBF/KhRYPVzfDHb8du/Nbo5Rho1SQDwYNSyJBOqAofP816jwdVC+1LzVomsAxw2e2x3DIsZssh56dZ3g6Lg84Dchcq7OcCrKZYzZBg7FPUeWts450aFKmArpvX/YaHagXu0ch4yfWZnJRqGq/iL1HuwDOcsJHNl86MeOiMFJCaSGUnsIU2GS+NuxWjZT+GvgwC3iLoVMHsaVTDwKlkXOF8QGqS3sTT9HxW6ZqVpwntHbvUWeofR/bKbn2l0qFtp0cZc/3AG2+su+mG14lmMej64pCqufmhfpzRCc8Apeoem
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(346002)(136003)(396003)(366004)(376002)(230922051799003)(64100799003)(1800799012)(451199024)(186009)(7416002)(2906002)(8676002)(4326008)(8936002)(5660300002)(316002)(6506007)(6512007)(66556008)(66476007)(6486002)(6916009)(66946007)(478600001)(41300700001)(38100700002)(86362001)(26005)(83380400001)(33656002)(36756003)(2616005)(1076003)(27376004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?H3q3n5AEbJ46yj8W9v4c3wGHygdVGb0qNtsm49bLALtlY8jJmEIV57iRnMT4?=
+ =?us-ascii?Q?JjH5VvrIRoOdDBypeyTNtVjCuVHNa1laP/THKf/a/ptuj5Gsrcq9dUWNypB3?=
+ =?us-ascii?Q?lbsIXrWAV6COficJiSxiDFckA9HKwA6q2mTXx2AZS9IKzbdcaOF7dpASn8Jb?=
+ =?us-ascii?Q?Vqnrau5aKg8+FVwVkIo9OdxgE1U0/ndpraEOfZ6qcWKd0d8RBQp2cMBTkiD7?=
+ =?us-ascii?Q?9mEy4amQhKmVnhz5/gl99ZjXbyQdmJXlvyjl3VXf11hEwYThqDHfuWQ0A+b3?=
+ =?us-ascii?Q?PmEJtoR5AFm4gO2jw9MA3NgklS3PGwV4z40vcnTY+sZpYJ9LkSwsdLSgcGtV?=
+ =?us-ascii?Q?9sMUzvVzG0YIFZDGEav6Miv2geEWUgNGcy3N+gdIaosvJUuukYhuOjLLHiAR?=
+ =?us-ascii?Q?zWFmuhILvhTHD/PBdnsSPRAXbIM9xIhMASm3z+uBFuzxb5Yvz1moQq9v5j2Y?=
+ =?us-ascii?Q?2m35LAd6AvgnASaswO6xHJg2DXUYlbOpbJAaB8LjcDK7t9rb8ARtsCuGisKV?=
+ =?us-ascii?Q?rCzxhIn9jdzlRreYzTfE3omihfy1aVVP75l3fB4IGMxe0sDh3ySUBmrM1Jf/?=
+ =?us-ascii?Q?rhLgQrttFk2FKbLcgd3ieZeI1SN/TRk5EiLVOEhekk9kqFO46FN4e3PPaFHE?=
+ =?us-ascii?Q?jV+kV81pjm6nylHN6syXK/kgiLXe5k8eKV8XQUbOXBLC0YhPQkjA01oVo3nT?=
+ =?us-ascii?Q?Uu26oBXpOlxuUftClOusyw1iDHtKlUbE7UFGNAoObgtT5LiLggKRwtMwEWXI?=
+ =?us-ascii?Q?ycil3YjodWkBNTfEzNcmeCL2Ga7Ghx4lNrCyDlJn3toxNqHOGgrocFTO+nmU?=
+ =?us-ascii?Q?ztk67WySrhiEC10Nh0tNz7EEgCTpbupKVV8cu5LhkJNRSZl5OI2s1gmkOmhe?=
+ =?us-ascii?Q?lPrHen2IbWCd7zyLtyVEvtXSPwBqJMzHjhE5NwGgu/YSQ91+wybWJcRvHdko?=
+ =?us-ascii?Q?XZ5oQd5xzXSOGlAqeV4Cf/6hqQXwUSu/tVWTVGkYvsziBSEyW+ygRU3v/ENs?=
+ =?us-ascii?Q?SV1I/V9TI4QXCO+BXCK6z4pRxk6NEQQt3yKD3pqwftMFl765jvM2c2V3i9a2?=
+ =?us-ascii?Q?NFqoadlbG27fTiZB9sClNTVprv4uaYpWtQHkZeQlGRAV49ns1SMECagI82sE?=
+ =?us-ascii?Q?KYZb5Fa4R2xbQjPjRWuONXaJPWwNRq6nHbhfN4idC5P6Q/tPpv9A13QD67kz?=
+ =?us-ascii?Q?96xgtWrd7ubwpl3dytZDoMW17Fh/XmeOjXqUYnRvrvXUvH2/IzXEQZ9FeQNX?=
+ =?us-ascii?Q?5wzcErzknGi24il6BuU5s/iuefB2qUzer/xotmsBS9P7bz6713Lru4qVt2vb?=
+ =?us-ascii?Q?xXNWHDveYaAQkL4oMraTv73cDVsXOvQDqLJvGSjO6jw7/SELfNXhNpH002Uk?=
+ =?us-ascii?Q?ghWg5tODPF6ge5ZyguhlTWjHqMBOC7P7Ql+52OnR4EGSfVs4yzgtuZClE5T1?=
+ =?us-ascii?Q?8giKRBPN3+e2swhIGGCJwor3HW0Pok+ZlUWgokfSidmWZEaqpHFdt2jqwjCn?=
+ =?us-ascii?Q?CeBGjZaUXa1VfggF7PqsLmTEeGWB3aIE7FcdsLpQKMwNS6FTTfI9ZH3Yl1pM?=
+ =?us-ascii?Q?ls1TIRmeyPupuu17nGNowy1Lo7LeXlmJck3AMNVK?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5c5c896e-532e-48ff-446d-08dc15e75641
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jan 2024 16:30:51.2101
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7AIHJwb71f8rhhBjwWloZUpy8nJwJnUKouE+dKUDacEXUY8nQEFSHBPDbiDj5qa6
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6121
 
-On Mon, 15 Jan 2024 15:41:02 +0000
-"Wang, Wei W" <wei.w.wang@intel.com> wrote:
+On Tue, Jan 09, 2024 at 10:11:23AM +0800, Yan Zhao wrote:
 
-> On Monday, January 15, 2024 2:35 PM, Kunwu Chan wrote:
-> > kasprintf() returns a pointer to dynamically allocated memory which can be
-> > NULL upon failure.
-> > 
-> > This is a blocking notifier callback, so errno isn't a proper return value. Use
-> > WARN_ON to small allocation failures.
-> > 
-> > Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
-> > ---
-> > v2: Use WARN_ON instead of return errno
-> > ---
-> >  drivers/vfio/pci/vfio_pci_core.c | 1 +
-> >  1 file changed, 1 insertion(+)
-> > 
-> > diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> > index 1cbc990d42e0..61aa19666050 100644
-> > --- a/drivers/vfio/pci/vfio_pci_core.c
-> > +++ b/drivers/vfio/pci/vfio_pci_core.c
-> > @@ -2047,6 +2047,7 @@ static int vfio_pci_bus_notifier(struct notifier_block
-> > *nb,
-> >  			 pci_name(pdev));
-> >  		pdev->driver_override = kasprintf(GFP_KERNEL, "%s",
-> >  						  vdev->vdev.ops->name);
-> > +		WARN_ON(!pdev->driver_override);  
-> 
-> Saw Alex's comments on v1. Curious why not return "NOTIFY_BAD" on errors though
-> less likely? Similar examples could be found in kvm_pm_notifier_call, kasan_mem_notifier etc.
+> > Well, for instance, when you install pages into the KVM the hypervisor
+> > will have taken kernel memory, then zero'd it with cachable writes,
+> > however the VM can read it incoherently with DMA and access the
+> > pre-zero'd data since the zero'd writes potentially hasn't left the
+> > cache. That is an information leakage exploit.
+>
+> This makes sense.
+> How about KVM doing cache flush before installing/revoking the
+> page if guest memory type is honored?
 
-If the statement is that there are notifier call chains that return
-NOTIFY_BAD, I would absolutely agree, but the return value needs to be
-examined from the context of the caller.  BUS_NOTIFY_ADD_DEVICE is
-notified via bus_notify() in device_add().  What does it accomplish to
-return NOTIFY_BAD in a chain that ignores the return value?  At best
-we're preventing callbacks further down the chain from being called.
-That doesn't seem obviously beneficial either.
+I think if you are going to allow the guest to bypass the cache in any
+way then KVM should fully flush the cache before allowing the guest to
+access memory and it should fully flush the cache after removing
+memory from the guest.
 
-The scenario here is similar to that in fail_iommu_bus_notify() where
-they've chosen to trigger a pr_warn() if they're unable to crease sysfs
-entries.  In fact, a pci_warn(), maybe even pci_err() might be a better
-alternative here than a WARN_ON().  Thanks,
+Noting that fully removing the memory now includes VFIO too, which is
+going to be very hard to co-ordinate between KVM and VFIO.
 
-Alex
+ARM has the hooks for most of this in the common code already, so it
+should not be outrageous to do, but slow I suspect.
 
+Jason
 
