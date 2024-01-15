@@ -1,317 +1,212 @@
-Return-Path: <kvm+bounces-6204-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6205-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B5AE82D4D8
-	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 09:02:06 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEA5782D4E7
+	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 09:18:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7C556B20819
-	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 08:02:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5B0D6B20F74
+	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 08:18:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B67C6FBB;
-	Mon, 15 Jan 2024 08:01:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54C8463AE;
+	Mon, 15 Jan 2024 08:18:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YdXAgisB"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YbvBnjoM"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 944566FA4
-	for <kvm@vger.kernel.org>; Mon, 15 Jan 2024 08:01:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1705305712;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=ImySdM6rVLcpykjYKF0CY09VSeZgLPq5jeZ421owvpE=;
-	b=YdXAgisB1SwC9SqMXoFk+aR8oEGxJSOOHFyxeLE1YM/OUJ/8hOu+xpsSn/Emnwox9XczrW
-	Ml7+Cfv9UXPOH+vEyEDS0pSsLSM0fi6tEnSVOmQILAf8xWwmAURjiNLifusIgionJkQ6eb
-	GP5PX9mYADsLAeCON2qfQC2R2ek2xho=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-36-W9tPWVHqOrGi1YlGmT-Fng-1; Mon, 15 Jan 2024 03:01:48 -0500
-X-MC-Unique: W9tPWVHqOrGi1YlGmT-Fng-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9422388CDCD;
-	Mon, 15 Jan 2024 08:01:46 +0000 (UTC)
-Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 876AF1121306;
-	Mon, 15 Jan 2024 08:01:46 +0000 (UTC)
-From: Shaoqin Huang <shahuang@redhat.com>
-To: qemu-arm@nongnu.org
-Cc: Eric Auger <eauger@redhat.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shaoqin Huang <shahuang@redhat.com>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	qemu-devel@nongnu.org,
-	kvm@vger.kernel.org
-Subject: [PATCH v5] arm/kvm: Enable support for KVM_ARM_VCPU_PMU_V3_FILTER
-Date: Mon, 15 Jan 2024 03:01:44 -0500
-Message-Id: <20240115080144.44944-1-shahuang@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4F4E5244;
+	Mon, 15 Jan 2024 08:18:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1705306691; x=1736842691;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=mPYaKGlOSyU/7cQz4snASnIsSEBhkIK5U54BIPPNRjs=;
+  b=YbvBnjoMDIP4Roem1x5emPB/whLuh7EyCWI23uZLIM/CQ3W5sYM8A5ID
+   WBFle/HH7Upw0muVkXQwsh2ZFP8nm542Y10o5dcRlAz5f94CpKRiASZ3Y
+   CSAd2tdcQL8MIVoj9q2hK2MbnbhrgsvsP/Wz448BvsXZbYSFM6PiOzkYH
+   CUTGdKyKkfhiKnR6kSeJd7mN/VyW5pnhxhwTro3zmsDJTMOtzuKxRp92p
+   Wk06g4GcyimVl9Qi2f3iP7WbQ4KGgzQ6RCyK8aEfei64Ip+QcHrhGe3u9
+   yMrYDfkstRkqGkWguc6i/SvNoW0cohqH+itwKnnnuWR4aDt6U67UQhNiO
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10953"; a="6283165"
+X-IronPort-AV: E=Sophos;i="6.04,196,1695711600"; 
+   d="scan'208";a="6283165"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2024 00:17:55 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10953"; a="874030556"
+X-IronPort-AV: E=Sophos;i="6.04,196,1695711600"; 
+   d="scan'208";a="874030556"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by FMSMGA003.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 15 Jan 2024 00:17:51 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 15 Jan 2024 00:17:51 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Mon, 15 Jan 2024 00:17:51 -0800
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.41) by
+ edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 15 Jan 2024 00:17:50 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mN9XLqOk7dcetwPgQM9V58srJUL5562k3hAy/TVY1y9MY0qViGijR4SXfU68mr+83PFOT87O1cmBAxzQzzbuNFSZBDkqeMesVe8VNE3++4Y96JJvVGs8ezo+tonrWIbPACTgSjzzZijohqHLPmVELWmvG79rZlRoi5SMmslxT0rRm+rhF7u090LICgPBn1z+bIuAXnfxLiMgWO6syxzJME+RpGMPXDiTXReuAxPKlNRMBIkxw1odoWZqNrQ97CT1qONwTO2Ec6F5I2fEz5kpUfR1pV4ayNDt6jqRFf4Cx7uGhFMr4WGPhmML1xhRAynPasygZOsryklDMIJd7eBlEw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Xp7V0gr7XBinuS9SoE8rIE4B2pp1CsvdbaarqG+Adjo=;
+ b=I21wm3HE546/NlG1tgzvBdLamKn3lLt/iaJj4ivf+wlUj6Mb/tuTsEeXhm5+kZD0/EL8RbCLRviCxKr+SHFixEvcnqT4ESbC3G16vJgQOxLfisneZuj7Wpnyp2efqmE1HlaYWH+WBLHolV8pScXvgyWyb5Nst+zOqYl/9a9ZlyQzmHhiS0cLCpdO944wCq+dZ4lTF9Y0aOd0gupGIif9jTNlv2PPy8Wq3RQ/OjIfdPoxxp5lTjJtrv/IUlf1goYQwsdCtKLaKsUtrWGgK02t7bPEPcrRTvvJ/qVeh16zuTj9dWO5JFMatoW5lvRQVWAPNet4BO/LWrgcCjlk8SfKHQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SN7PR11MB7540.namprd11.prod.outlook.com (2603:10b6:806:340::7)
+ by PH7PR11MB7027.namprd11.prod.outlook.com (2603:10b6:510:20a::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7181.17; Mon, 15 Jan
+ 2024 08:17:49 +0000
+Received: from SN7PR11MB7540.namprd11.prod.outlook.com
+ ([fe80::142b:924e:5300:e004]) by SN7PR11MB7540.namprd11.prod.outlook.com
+ ([fe80::142b:924e:5300:e004%6]) with mapi id 15.20.7159.020; Mon, 15 Jan 2024
+ 08:17:49 +0000
+Message-ID: <00742a4d-c7aa-42b9-b851-e6ead0f7a29b@intel.com>
+Date: Mon, 15 Jan 2024 16:20:47 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/3] vfio: Report PASID capability via VFIO_DEVICE_FEATURE
+ ioctl
+Content-Language: en-US
+To: Jason Gunthorpe <jgg@nvidia.com>, Alex Williamson
+	<alex.williamson@redhat.com>
+CC: "Duan, Zhenzhong" <zhenzhong.duan@intel.com>, "joro@8bytes.org"
+	<joro@8bytes.org>, "Tian, Kevin" <kevin.tian@intel.com>,
+	"robin.murphy@arm.com" <robin.murphy@arm.com>, "baolu.lu@linux.intel.com"
+	<baolu.lu@linux.intel.com>, "cohuck@redhat.com" <cohuck@redhat.com>,
+	"eric.auger@redhat.com" <eric.auger@redhat.com>, "nicolinc@nvidia.com"
+	<nicolinc@nvidia.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+	"chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+	"yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>, "peterx@redhat.com"
+	<peterx@redhat.com>, "jasowang@redhat.com" <jasowang@redhat.com>,
+	"shameerali.kolothum.thodi@huawei.com"
+	<shameerali.kolothum.thodi@huawei.com>, "lulu@redhat.com" <lulu@redhat.com>,
+	"suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	"joao.m.martins@oracle.com" <joao.m.martins@oracle.com>, "Zeng, Xin"
+	<xin.zeng@intel.com>, "Zhao, Yan Y" <yan.y.zhao@intel.com>
+References: <20231127063909.129153-1-yi.l.liu@intel.com>
+ <20231127063909.129153-4-yi.l.liu@intel.com>
+ <20231211110345.1b4526c6.alex.williamson@redhat.com>
+ <SJ0PR11MB674458A8B7319F30A67FE55F928EA@SJ0PR11MB6744.namprd11.prod.outlook.com>
+ <20231211203946.35552183.alex.williamson@redhat.com>
+ <20231212152725.GJ3014157@nvidia.com>
+From: Yi Liu <yi.l.liu@intel.com>
+In-Reply-To: <20231212152725.GJ3014157@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SG2PR01CA0159.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:28::15) To SN7PR11MB7540.namprd11.prod.outlook.com
+ (2603:10b6:806:340::7)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN7PR11MB7540:EE_|PH7PR11MB7027:EE_
+X-MS-Office365-Filtering-Correlation-Id: d4da294d-447c-49c5-9885-08dc15a275ed
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 8zRwI8E0KlAv9Vp4iC49xiqIX/pF2v88IFncbcEGnksFzpCUlEtrPOHitmnVpdmoBDNQqGqABhbfNaOQm3GvkIjNB37J1OgRFudmZhbhjjeBAGXSvSvz3I7cKfIETRU02tZt2UPQFgXtTLPzr3pzxoW0BXrNHF0WDeKST/WuvzJjPQZcVWi/67du9n7tu/JavUH6KbQmESFxnal9HLelIDKmKUzzIgqXpHRZEmgPgfeetX6hbSuoN4M20A/tYRkaBAXwvynl9+vulA4vm3eHAK4oBYvfyQeXKoQ6kPOkvvNnAnbuJHXLiglmQ7nfvdj5a4zOYOiJCn9nV/TjbYPL80v8fN72FyD8oHsOeBgNcTqzknuSNGQ6ULUPnsnuQjTrP2nupd7ufui89k5ZqjLxBbh2xRGTN+0M8VrbWt0eNHrgdrFQ36MYGwcaPhpibP+eY1KTvOH3lz5Jx/tMQrnwXzc5IMjFyl58krLVdWfbfzNE4nO+kEIMWa6TAcW71VQKEkpkg7w6/GtsUixeTbo1voJMJQmnXP6ajisc/U698OU7p3/wuf+Lj+pRvEh0FGk8kObOqaj2/tqnGXSPQQ9ouzxq+upj8olfLGHmCbeIxlsS3O/iMpk5WQBZSNAR8ymgvUkzraO/BCvr0ncWQYKxBQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7540.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(346002)(136003)(366004)(39860400002)(396003)(230922051799003)(1800799012)(451199024)(64100799003)(186009)(478600001)(83380400001)(26005)(2616005)(316002)(110136005)(5660300002)(8676002)(6512007)(8936002)(66946007)(4326008)(7416002)(2906002)(53546011)(66556008)(6506007)(6486002)(38100700002)(66476007)(54906003)(36756003)(41300700001)(82960400001)(31696002)(86362001)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NWhMbS9GMWJMRUFFbGZDM2Uwck9MSSt5cjJxVU8yQnoxZGt5M1AxNmdJeUdl?=
+ =?utf-8?B?cmlLZU45c2JCaEcvclpDUVljek85NVU0NXI2YzVkY1l4U3RxdnpSVU55Unla?=
+ =?utf-8?B?aFlVdWxoT1BBNHhmeHFBZTF4bmVjSlJXM09SNjZYUnMyM1Z3bW5yWENmMlZL?=
+ =?utf-8?B?Zld0N3BMR3NlR2FOU05xL0QzZXNNdkRqUzhWWDQ5VU9nV1paekFiR3g4a2RE?=
+ =?utf-8?B?Z1ptZ084Z3ZvUUJRR2t0MXVsd21jcTVPWFRNN3hIaHJOb3F1QldXakltTDNm?=
+ =?utf-8?B?YXQ2SCtVL0tvZHpENFllRzZPcW54TUtsMmNBRmtQUE4xT3FQVUVjcHJIYTJw?=
+ =?utf-8?B?QXlmMVU3ZVFwaDhaeXVZbisvQk5aa1BZRDlWZU1TWWRxUEZtaC8xVjFFTUEy?=
+ =?utf-8?B?Smw1RjNYUWZIOGROVlZnbnVwTVdZSlZabmNGQlN1bDVZOGRSZHpYQW43L2FQ?=
+ =?utf-8?B?aFJIQlZxYzh3UGMyS1VaMFBqUmNXQUpHc2hpeUczSTZiZEM1YTdhb2F0NFM3?=
+ =?utf-8?B?NUlNME1mb3RxNXNta3cwQ2ZqRVhpR29WaUFGUkQ0S1E2L25uekZUTjVLc1Nq?=
+ =?utf-8?B?dkxvTVJkY2Qyb0UrdFFZTHdiSURVQVVsSFpGS2VXVEhtUVpIeEdLQUhsMVBD?=
+ =?utf-8?B?RGhLbzRiVzRaUUNZSTlmRUNkZk1OdW9Xd1lBdmFXeWljTitjTEtuMG0vdnha?=
+ =?utf-8?B?NnhhSzFkQ3E4WEZCY2FremdQV3JjV2dqZDVVZEhsMmRydTVtN2JONTdIRXZi?=
+ =?utf-8?B?MlB4b3hxMjhLclBUOU5HM1BwT0UrTjFWc29iYitGU3p2bW5UZ1JhM2NZRE5w?=
+ =?utf-8?B?cTVCT3gza09zR0hFOVRTMmd5RmlrcDY1dkdia2VvdnZpa2ZSVUdCbzFYTWZJ?=
+ =?utf-8?B?ZkkyRjA2aDA2VlZCRCtBRjBrbTI5M3YrRFdpWVM2bHFHQzNrSGVJNWVPRU54?=
+ =?utf-8?B?dG1nZnphaEtrRlNieDVWcVVIVkIzcXZ4VjBDRXJCZEJjQkZDYktXdmpTcENJ?=
+ =?utf-8?B?MiszSzRheEVXeHVNeHJxeklvVnBQUHZPSGtaejFQVmdlSzRFdnFmN1dJMkVU?=
+ =?utf-8?B?TnlZMlp6U2hBQmM1YUF0YkxaVC9IbFcycVdaemVrZVV5Z0ljR3JNSnFJODRK?=
+ =?utf-8?B?K1J2bzIyZ0xQN202TzVmMmJzeit6YWRyTFhOTDhNb3dwcmNBNTdFa25obDFZ?=
+ =?utf-8?B?ZUVRYW9tVENEWTI0amRIK3VuMWgvVUttNXUrYTI2WW9SN2QvcUVTZjJXRGYw?=
+ =?utf-8?B?bWptRGNIYWw4OWkvNDVmd0ZvSjRSTEhsQmQxNG9Jam9MSktrbHJSOWNuL3Rv?=
+ =?utf-8?B?UHd0VmpETGdWazhoa2JXaDVRV294N2JEaXJ6Ukd1RVYzVlp2N0x6MHNTK1B6?=
+ =?utf-8?B?dm1EaXNnQWZUaFY4R2FzM3doUFlSVDVTRE5xaXpSbVJLYTVyTW9RSk15RS9U?=
+ =?utf-8?B?dk9wM1doS2t1dVBUMm5NM2ZCS2dFbHpyKzErbkdueUJDZ0FHRmErRzY3dm1O?=
+ =?utf-8?B?RXpKTUkwdUZQQjUrS01Rb0ZFcGpuaXAzYkx0MS92eDl3eXIzQWFuaStBNks0?=
+ =?utf-8?B?UnNDUlFJNGFSMGl4cGNxWWJkZFhvTDZmRzRGOUxNTExkUnhodVBBc1RaMS9O?=
+ =?utf-8?B?c0h6ZWdqZEN0TVNjUnhhK2FXblUwTWpFUnUyV1pNN3B6STVuSFhaTFNJNVNQ?=
+ =?utf-8?B?RENlazFpUW9RWnlGWUhoc1NPQkFPT0pWSmhUbTgrU2xieGQxRHQxRi9pZHJU?=
+ =?utf-8?B?U0pSczIvc1kraG5yV1I2QWpzeEk0OXA0ZWxOaVFScXNzUUZwamhtUTlQTkZt?=
+ =?utf-8?B?UWY1YjFkazJNaml3dXU2NG41UDhVSkVDUHA4VlVtZ2thQVBySFFNbkF1aFA2?=
+ =?utf-8?B?eDFHM3F0T01xRG1IL242WlBqdU94aENHb1NGQU85NG11cmV1NUFjeVFNK2pq?=
+ =?utf-8?B?TENQbzYveHVtZ3ViTkVXRTk4ZUMxVm0yNHkra0JiM3dWcy9GVjdoRDluQWFo?=
+ =?utf-8?B?L1lCUkJtU05uSktMb00rUHEzaDVHRU0rOWErSGloMjlQOFZwZFVvdHJFQmla?=
+ =?utf-8?B?VUtNUHpERXk1dHZjNmQvTDEwYy9lN3M3WTluOC8wVXVuZzBFYmNYWnNML2pJ?=
+ =?utf-8?Q?ebMqtCCJbvAFP78G3aJ1swUw0?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: d4da294d-447c-49c5-9885-08dc15a275ed
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7540.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jan 2024 08:17:49.0186
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: DhdFY9u2CoO+hyhsXV4CeqiQCY2Nq9zNePyStA+zskroZCX/+npM6vIxYOxIQhm8xpiOX8REKPvchPF+NgZwzA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7027
+X-OriginatorOrg: intel.com
 
-The KVM_ARM_VCPU_PMU_V3_FILTER provides the ability to let the VMM decide
-which PMU events are provided to the guest. Add a new option
-`kvm-pmu-filter` as -cpu sub-option to set the PMU Event Filtering.
-Without the filter, all PMU events are exposed from host to guest by
-default. The usage of the new sub-option can be found from the updated
-document (docs/system/arm/cpu-features.rst).
+On 2023/12/12 23:27, Jason Gunthorpe wrote:
+> On Mon, Dec 11, 2023 at 08:39:46PM -0700, Alex Williamson wrote:
+> 
+>> So how do we keep up with PCIe spec updates relative to the PASID
+>> capability with this proposal?  Would it make more sense to report the
+>> raw capability register and capability version rather that a translated
+>> copy thereof?  Perhaps just masking the fields we're currently prepared
+>> to expose.
+> 
+> I think the VMM must always create a cap based on the PCIe version it
+> understands. We don't know what future specs will put there so it
+> seems risky to forward it if we don't know that any possible
+> hypervisor support is present.
 
-Here is an example shows how to use the PMU Event Filtering, when
-we launch a guest by use kvm, add such command line:
+This series parses the capability register and reports the known caps
+to user. While this does not include the version number, userspace should
+decide the proper version number. Seems like what you suggests here.
 
-  # qemu-system-aarch64 \
-        -accel kvm \
-        -cpu host,kvm-pmu-filter="D:0x11-0x11"
+> 
+> We have this problem on and off where stuff in PCI config space needs
+> explicit hypervisor support or it doesn't work in the VM and things
+> get confusing.
+> 
+> Jason
 
-Since the first action is deny, we have a global allow policy. This
-disables the filtering of the cycle counter (event 0x11 being CPU_CYCLES).
-
-And then in guest, use the perf to count the cycle:
-
-  # perf stat sleep 1
-
-   Performance counter stats for 'sleep 1':
-
-              1.22 msec task-clock                       #    0.001 CPUs utilized
-                 1      context-switches                 #  820.695 /sec
-                 0      cpu-migrations                   #    0.000 /sec
-                55      page-faults                      #   45.138 K/sec
-   <not supported>      cycles
-           1128954      instructions
-            227031      branches                         #  186.323 M/sec
-              8686      branch-misses                    #    3.83% of all branches
-
-       1.002492480 seconds time elapsed
-
-       0.001752000 seconds user
-       0.000000000 seconds sys
-
-As we can see, the cycle counter has been disabled in the guest, but
-other pmu events are still work.
-
-Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
----
-v4->v5:
-  - Change the kvm-pmu-filter as a -cpu sub-option.     [Eric]
-  - Comment tweak.                                      [Gavin]
-  - Rebase to the latest branch.
-
-v3->v4:
-  - Fix the wrong check for pmu_filter_init.            [Sebastian]
-  - Fix multiple alignment issue.                       [Gavin]
-  - Report error by warn_report() instead of error_report(), and don't use
-  abort() since the PMU Event Filter is an add-on and best-effort feature.
-                                                        [Gavin]
-  - Add several missing {  } for single line of code.   [Gavin]
-  - Use the g_strsplit() to replace strtok().           [Gavin]
-
-v2->v3:
-  - Improve commits message, use kernel doc wording, add more explaination on
-    filter example, fix some typo error.                [Eric]
-  - Add g_free() in kvm_arch_set_pmu_filter() to prevent memory leak. [Eric]
-  - Add more precise error message report.              [Eric]
-  - In options doc, add pmu-filter rely on KVM_ARM_VCPU_PMU_V3_FILTER support in
-    KVM.                                                [Eric]
-
-v1->v2:
-  - Add more description for allow and deny meaning in 
-    commit message.                                     [Sebastian]
-  - Small improvement.                                  [Sebastian]
-
- docs/system/arm/cpu-features.rst | 23 ++++++++++
- include/sysemu/kvm_int.h         |  1 +
- target/arm/cpu.h                 |  3 ++
- target/arm/kvm.c                 | 78 ++++++++++++++++++++++++++++++++
- 4 files changed, 105 insertions(+)
-
-diff --git a/docs/system/arm/cpu-features.rst b/docs/system/arm/cpu-features.rst
-index a5fb929243..44a797c50e 100644
---- a/docs/system/arm/cpu-features.rst
-+++ b/docs/system/arm/cpu-features.rst
-@@ -204,6 +204,29 @@ the list of KVM VCPU features and their descriptions.
-   the guest scheduler behavior and/or be exposed to the guest
-   userspace.
- 
-+``kvm-pmu-filter``
-+  By default kvm-pmu-filter is disabled. This means that by default all pmu
-+  events will be exposed to guest.
-+
-+  KVM implements PMU Event Filtering to prevent a guest from being able to
-+  sample certain events. It depends on the KVM_ARM_VCPU_PMU_V3_FILTER
-+  attribute supported in KVM. It has the following format:
-+
-+  kvm-pmu-filter="{A,D}:start-end[;{A,D}:start-end...]"
-+
-+  The A means "allow" and D means "deny", start is the first event of the
-+  range and the end is the last one. The first registered range defines
-+  the global policy(global ALLOW if the first @action is DENY, global DENY
-+  if the first @action is ALLOW). The start and end only support hexadecimal
-+  format now. For example:
-+
-+  kvm-pmu-filter="A:0x11-0x11;A:0x23-0x3a;D:0x30-0x30"
-+
-+  Since the first action is allow, we have a global deny policy. It
-+  will allow event 0x11 (The cycle counter), events 0x23 to 0x3a is
-+  also allowed except the event 0x30 is denied, and all the other events
-+  are disallowed.
-+
- TCG VCPU Features
- =================
- 
-diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
-index fd846394be..8f4601474f 100644
---- a/include/sysemu/kvm_int.h
-+++ b/include/sysemu/kvm_int.h
-@@ -120,6 +120,7 @@ struct KVMState
-     uint32_t xen_caps;
-     uint16_t xen_gnttab_max_frames;
-     uint16_t xen_evtchn_max_pirq;
-+    char *kvm_pmu_filter;
- };
- 
- void kvm_memory_listener_register(KVMState *s, KVMMemoryListener *kml,
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 8c3ca2e231..1be7dca4aa 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -971,6 +971,9 @@ struct ArchCPU {
- 
-     /* KVM steal time */
-     OnOffAuto kvm_steal_time;
-+
-+    /* KVM PMU Filter */
-+    char *kvm_pmu_filter;
- #endif /* CONFIG_KVM */
- 
-     /* Uniprocessor system with MP extensions */
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index c5a3183843..413ee2720e 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -495,6 +495,22 @@ static void kvm_steal_time_set(Object *obj, bool value, Error **errp)
-     ARM_CPU(obj)->kvm_steal_time = value ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
- }
- 
-+static char *kvm_pmu_filter_get(Object *obj, Error **errp)
-+{
-+    ARMCPU *cpu = ARM_CPU(obj);
-+
-+    return g_strdup(cpu->kvm_pmu_filter);
-+}
-+
-+static void kvm_pmu_filter_set(Object *obj, const char *pmu_filter,
-+                               Error **errp)
-+{
-+    ARMCPU *cpu = ARM_CPU(obj);
-+
-+    g_free(cpu->kvm_pmu_filter);
-+    cpu->kvm_pmu_filter = g_strdup(pmu_filter);
-+}
-+
- /* KVM VCPU properties should be prefixed with "kvm-". */
- void kvm_arm_add_vcpu_properties(ARMCPU *cpu)
- {
-@@ -516,6 +532,12 @@ void kvm_arm_add_vcpu_properties(ARMCPU *cpu)
-                              kvm_steal_time_set);
-     object_property_set_description(obj, "kvm-steal-time",
-                                     "Set off to disable KVM steal time.");
-+
-+    object_property_add_str(obj, "kvm-pmu-filter", kvm_pmu_filter_get,
-+                            kvm_pmu_filter_set);
-+    object_property_set_description(obj, "kvm-pmu-filter",
-+                                    "PMU Event Filtering description for "
-+                                    "guest PMU. (default: NULL, disabled)");
- }
- 
- bool kvm_arm_pmu_supported(void)
-@@ -1705,6 +1727,60 @@ static bool kvm_arm_set_device_attr(ARMCPU *cpu, struct kvm_device_attr *attr,
-     return true;
- }
- 
-+static void kvm_arm_pmu_filter_init(ARMCPU *cpu)
-+{
-+    static bool pmu_filter_init;
-+    struct kvm_pmu_event_filter filter;
-+    struct kvm_device_attr attr = {
-+        .group      = KVM_ARM_VCPU_PMU_V3_CTRL,
-+        .attr       = KVM_ARM_VCPU_PMU_V3_FILTER,
-+        .addr       = (uint64_t)&filter,
-+    };
-+    int i;
-+    gchar **event_filters;
-+
-+    if (!cpu->kvm_pmu_filter) {
-+        return;
-+    }
-+    if (kvm_vcpu_ioctl(CPU(cpu), KVM_HAS_DEVICE_ATTR, &attr)) {
-+        warn_report("The KVM doesn't support the PMU Event Filter!");
-+        return;
-+    }
-+
-+    /*
-+     * The filter only needs to be initialized through one vcpu ioctl and it
-+     * will affect all other vcpu in the vm.
-+     */
-+    if (pmu_filter_init) {
-+        return;
-+    } else {
-+        pmu_filter_init = true;
-+    }
-+
-+    event_filters = g_strsplit(cpu->kvm_pmu_filter, ";", -1);
-+    for (i = 0; event_filters[i]; i++) {
-+        unsigned short start = 0, end = 0;
-+        char act;
-+
-+        sscanf(event_filters[i], "%c:%hx-%hx", &act, &start, &end);
-+        if ((act != 'A' && act != 'D') || (!start && !end)) {
-+            warn_report("Skipping invalid PMU filter %s", event_filters[i]);
-+            continue;
-+        }
-+
-+        filter.base_event = start;
-+        filter.nevents = end - start + 1;
-+        filter.action = (act == 'A') ? KVM_PMU_EVENT_ALLOW :
-+                                       KVM_PMU_EVENT_DENY;
-+
-+        if (!kvm_arm_set_device_attr(cpu, &attr, "PMU Event Filter")) {
-+            break;
-+        }
-+    }
-+
-+    g_strfreev(event_filters);
-+}
-+
- void kvm_arm_pmu_init(ARMCPU *cpu)
- {
-     struct kvm_device_attr attr = {
-@@ -1715,6 +1791,8 @@ void kvm_arm_pmu_init(ARMCPU *cpu)
-     if (!cpu->has_pmu) {
-         return;
-     }
-+
-+    kvm_arm_pmu_filter_init(cpu);
-     if (!kvm_arm_set_device_attr(cpu, &attr, "PMU")) {
-         error_report("failed to init PMU");
-         abort();
 -- 
-2.40.1
-
+Regards,
+Yi Liu
 
