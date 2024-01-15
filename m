@@ -1,106 +1,156 @@
-Return-Path: <kvm+bounces-6209-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6210-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19F2982D593
-	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 10:10:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50FBC82D5A1
+	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 10:15:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC543281DAA
-	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 09:10:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4524C1C213AA
+	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 09:14:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7447C2D2;
-	Mon, 15 Jan 2024 09:10:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8D3BC2D2;
+	Mon, 15 Jan 2024 09:14:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="AJiodlRV"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="WzPYgiJp";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="6G5cl+sS";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="WzPYgiJp";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="6G5cl+sS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B8A7C123;
-	Mon, 15 Jan 2024 09:10:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id AB29140E016C;
-	Mon, 15 Jan 2024 09:10:31 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id TTazglQcC3xF; Mon, 15 Jan 2024 09:10:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1705309828; bh=gJlM2Kv3+3MOq/kI/Vq1T5vWHhg6n3QBRVvBSciq/WM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=AJiodlRVfuq8IL4OHlBKxL2GoRaWKRVgTApjGmeEVcOopb1jey77jYuYcnHjEG9hs
-	 9Y8JDPi12IdkJPFc+u7c3MyF3w7JwGPoC/KXy/hBMFRXJ00bxOISgsBXHUajYBBLvF
-	 YvT7l8r/nlQJ2LgbjsCMBpM8SmuW4PQaKpCIayRZLnL++k5HEBKilYQicld0Hj/gNB
-	 4loDnAwYb+gG0CL7YDj8ZQza5lRVHGc2gS0z6fBJJ06T0A1Yz2yC8TUZ3k8nZNorc/
-	 TEDMrEy6lvqrCL3GLTa9UBnnSKggfQHTvuT3bHIvPiagueLZZXxsQRKd168I2jZwXo
-	 CrUnOK96Qir8twcfZB06NaDJo6R4tELtpgqGbp3Gc3+NzObAC2Pqig+mTcLvNnvtni
-	 kxZEiAZ1fKxZYf3EDox8h8rzVKhv117TmBbrs0RJ6XXbhDVelisPjjr8tVBNnogcaK
-	 5rpcvQ4Fay4l29JWGGPtemJ4xPUmk9zF2GHN2/8wsvDel0Akf6mNo+YR32A9fm2wyn
-	 AV1XWM13uhGnhx37NHy8a9rP7EV68Xl8Cb/vJTH9jABr1FHEbiaYv/OeKN0X/afP5e
-	 IoDyKqdaQQ+vq0/cKkkqoegLmw1PCWjliSOOTlBDWh2KOqkmjDpdOy+OlU96hBOgL6
-	 UfeeTNaMV22VtaRAJThDiia4=
-Received: from zn.tnic (pd9530f8c.dip0.t-ipconnect.de [217.83.15.140])
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF48FE549;
+	Mon, 15 Jan 2024 09:14:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id A643940E01A9;
-	Mon, 15 Jan 2024 09:09:49 +0000 (UTC)
-Date: Mon, 15 Jan 2024 10:09:48 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Dave Hansen <dave.hansen@intel.com>
-Cc: Michael Roth <michael.roth@amd.com>, x86@kernel.org,
-	kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
-	thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
-	pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
-	jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
-	slp@redhat.com, pgonda@google.com, peterz@infradead.org,
-	srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-	tobin@ibm.com, vbabka@suse.cz, kirill@shutemov.name,
-	ak@linux.intel.com, tony.luck@intel.com,
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
-	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
-	Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH v1 11/26] x86/sev: Invalidate pages from the direct map
- when adding them to the RMP table
-Message-ID: <20240115090948.GBZaT2XKw00PokD-WJ@fat_crate.local>
-References: <20231230161954.569267-1-michael.roth@amd.com>
- <20231230161954.569267-12-michael.roth@amd.com>
- <cb604c37-aeb5-45bd-b6db-246ae724e4ca@intel.com>
+	by smtp-out1.suse.de (Postfix) with ESMTPS id B057122121;
+	Mon, 15 Jan 2024 09:14:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1705310084; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fHTwtWRUMbzJbkPU8ujlV+TwJJ5tFpEqWRiuHnBIR/0=;
+	b=WzPYgiJp7tAFqYBECaA+5RH558zK6vDVc6wzspSy1oNXvm5UCJi5N/3j0bSrCZUgWrcc4Y
+	0iufOnBKVwmLowDk1c5EBh+M2X3U1HGVbyc3HcUNlhYle4LSUN+zuJ+aNz928lOrtrv5uE
+	6Y99oKVdt6RivVr7s6/1NH9ORr/K5To=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1705310084;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fHTwtWRUMbzJbkPU8ujlV+TwJJ5tFpEqWRiuHnBIR/0=;
+	b=6G5cl+sSsgMtJMDdfHYqYFwcWbKFLCnnyDDMtH0GeV5dpIu0r20bVfSwLfusmqppaoVeT0
+	EW6vmvKcZu4LPCDg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1705310084; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fHTwtWRUMbzJbkPU8ujlV+TwJJ5tFpEqWRiuHnBIR/0=;
+	b=WzPYgiJp7tAFqYBECaA+5RH558zK6vDVc6wzspSy1oNXvm5UCJi5N/3j0bSrCZUgWrcc4Y
+	0iufOnBKVwmLowDk1c5EBh+M2X3U1HGVbyc3HcUNlhYle4LSUN+zuJ+aNz928lOrtrv5uE
+	6Y99oKVdt6RivVr7s6/1NH9ORr/K5To=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1705310084;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fHTwtWRUMbzJbkPU8ujlV+TwJJ5tFpEqWRiuHnBIR/0=;
+	b=6G5cl+sSsgMtJMDdfHYqYFwcWbKFLCnnyDDMtH0GeV5dpIu0r20bVfSwLfusmqppaoVeT0
+	EW6vmvKcZu4LPCDg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 6158013712;
+	Mon, 15 Jan 2024 09:14:44 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id /dHXFIT3pGWtEAAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Mon, 15 Jan 2024 09:14:44 +0000
+Message-ID: <4b8b38cd-f5c1-43e8-8b38-90f69d8d2b6d@suse.cz>
+Date: Mon, 15 Jan 2024 10:14:43 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <cb604c37-aeb5-45bd-b6db-246ae724e4ca@intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 11/26] x86/sev: Invalidate pages from the direct map
+ when adding them to the RMP table
+To: Borislav Petkov <bp@alien8.de>, Mike Rapoport <rppt@kernel.org>
+Cc: Dave Hansen <dave.hansen@intel.com>, Michael Roth <michael.roth@amd.com>,
+ x86@kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+ linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+ jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
+ pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+ jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
+ slp@redhat.com, pgonda@google.com, peterz@infradead.org,
+ srinivas.pandruvada@linux.intel.com, rientjes@google.com, tobin@ibm.com,
+ kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+ sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+ jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+ pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
+ Brijesh Singh <brijesh.singh@amd.com>
+References: <20231230161954.569267-1-michael.roth@amd.com>
+ <20231230161954.569267-12-michael.roth@amd.com>
+ <cb604c37-aeb5-45bd-b6db-246ae724e4ca@intel.com>
+ <20240112200751.GHZaGcF0-OZVJiIB7y@fat_crate.local>
+ <f0f44280-799a-4bf8-bf88-d423a2bd41ec@suse.cz>
+ <20240115090639.GAZaT1nx4C4xJuF8IA@fat_crate.local>
+Content-Language: en-US
+From: Vlastimil Babka <vbabka@suse.cz>
+In-Reply-To: <20240115090639.GAZaT1nx4C4xJuF8IA@fat_crate.local>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Authentication-Results: smtp-out1.suse.de;
+	none
+X-Spamd-Result: default: False [-0.11 / 50.00];
+	 ARC_NA(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 XM_UA_NO_VERSION(0.01)[];
+	 FROM_HAS_DN(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 BAYES_HAM(-0.02)[54.29%];
+	 MIME_GOOD(-0.10)[text/plain];
+	 R_RATELIMIT(0.00)[to_ip_from(RL81e5qggtdx371s8ik49ru6xr)];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	 RCPT_COUNT_TWELVE(0.00)[40];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 RCVD_TLS_ALL(0.00)[];
+	 MID_RHS_MATCH_FROM(0.00)[]
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spam-Score: -0.11
 
-On Fri, Jan 12, 2024 at 12:00:01PM -0800, Dave Hansen wrote:
-> I thought we agreed long ago to just demote the whole direct map to 4k
-> on kernels that might need to act as SEV-SNP hosts.  That should be step
-> one and this can be discussed as an optimization later.
+On 1/15/24 10:06, Borislav Petkov wrote:
+> On Fri, Jan 12, 2024 at 09:27:45PM +0100, Vlastimil Babka wrote:
+>> Yeah and last LSF/MM we concluded that it's not as a big disadvantage as we
+>> previously thought https://lwn.net/Articles/931406/
+> 
+> How nice, thanks for that!
+> 
+> Do you have some refs to Mike's tests so that we could run them here too
+> with SNP guests to see how big - if any - the fragmentation has.
 
-Do we have a link to that agreement somewhere?
+Let me Cc him...
 
-I'd like to read why we agreed. And looking at Mike's talk:
-https://lwn.net/Articles/931406/ - what do we wanna do in general with
-the direct map granularity?
+> Thx.
+> 
 
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
 
