@@ -1,101 +1,136 @@
-Return-Path: <kvm+bounces-6282-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6283-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91C2882E1DA
-	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 21:36:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E41DB82E1E2
+	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 21:38:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 30C271F22D36
-	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 20:36:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 95FFB1F22DF6
+	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 20:38:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C0EF1AACE;
-	Mon, 15 Jan 2024 20:36:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEF121B29A;
+	Mon, 15 Jan 2024 20:38:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="crIDZxkV"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YyEvjTKB"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-23.smtpout.orange.fr [80.12.242.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFB431A716
-	for <kvm@vger.kernel.org>; Mon, 15 Jan 2024 20:36:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from fedora.home ([92.140.202.140])
-	by smtp.orange.fr with ESMTPA
-	id PTgYrIbDj9TFdPTgYrCsdD; Mon, 15 Jan 2024 21:35:58 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1705350958;
-	bh=RzPoGp/tpKwUV6J2m7F/ChKKY33YyoyaYVUsLe/NOrA=;
-	h=From:To:Cc:Subject:Date;
-	b=crIDZxkVsvRRgoM4QE6wFLEjnsbeL4mCoTxXi0nzroXsopuYsC9MuN7/SMLzMDMl+
-	 +ONLtm6NaS1G2zYyR4T8yHq83QNwAkOV1dcTCWdhiFXWMXM71PUkmTuk0xsublfOXR
-	 CQF3Xer8zFOUn7MxW+CP3/g5wu4tRDlAN4eczas4tkT+4eYvi1/+7xmoTZj+SfFJt9
-	 eD4UUstx3So1LO55nB2mSnMA/wRuie20L3w7RuJzmjLlU6Qjkq7Ssun78WiSz0rXGS
-	 NDEq98gNbu3W4UjnZ5yBSutr7Vh+/jqXULenRmKLdaNSt73dIDwkefstUFPHEeQeAy
-	 agWlTIKpET0lQ==
-X-ME-Helo: fedora.home
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Mon, 15 Jan 2024 21:35:58 +0100
-X-ME-IP: 92.140.202.140
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To: "Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>
-Cc: linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	kvm@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	netdev@vger.kernel.org
-Subject: [PATCH] vhost-vdpa: Remove usage of the deprecated ida_simple_xx() API
-Date: Mon, 15 Jan 2024 21:35:50 +0100
-Message-ID: <bd27d4066f7749997a75cf4111fbf51e11d5898d.1705350942.git.christophe.jaillet@wanadoo.fr>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFC951AAC4
+	for <kvm@vger.kernel.org>; Mon, 15 Jan 2024 20:38:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1705351080;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tdbLbZGCFdT/pJ96oyVgdplymFRW8cUQXiKLAs/70qI=;
+	b=YyEvjTKBVOvq1LR+fTA0WgG2dKhEAm6SK85MlbNV8p2VEywpy08gRgPOqPHfmQ8XwzPx8y
+	WxdS2a0YZ6+RdDGaOqSWXsyHfGMPpv/0NkWppMv/xqIUQv3g9RRmYrEGx3eqeaVy5Ubkdu
+	cUGHafF0QhdFLyb5NubjxaJVXBlligU=
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
+ [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-186-7f5iS_XFOgyjziKRNxjC7Q-1; Mon, 15 Jan 2024 15:37:59 -0500
+X-MC-Unique: 7f5iS_XFOgyjziKRNxjC7Q-1
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7bedddd00d5so489407039f.3
+        for <kvm@vger.kernel.org>; Mon, 15 Jan 2024 12:37:59 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705351078; x=1705955878;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tdbLbZGCFdT/pJ96oyVgdplymFRW8cUQXiKLAs/70qI=;
+        b=bk4IWglNFVBCcKNSP66Gz6l6eLzpXkiP7Bk9MxzJDqXwyD0XtlZOZUysEkqgddnfN/
+         K0Ddfzd0geAydv4brEq/dPDAP7C7GV7dXJnPrVHsPahlfBNB+ZqtKOwz7chPj/iB3quN
+         XoABrw80hlHcAeRIVnOh0nkHvU0qzlBOaiDQyjGAnzOvONWImBqtS7CiJLvP4iHn8r1f
+         8Bn28SpEEAwLAPWDaYZi0Y3Zd/V1qXE5U+sutOuGyy0y1a3dd5hA2d/gBB4yAKGBYtNN
+         0+dt9L+opCjrsVXR2rXSWZXpYCA0+KB5BclBKgl9kNd4l0uBS0wf9fyOOCuepnDQ/NkX
+         U/3A==
+X-Gm-Message-State: AOJu0YzLiIfivPAiRyX4953jeX88lUVi2ipSmPuXkmT85M1i61rN6kVp
+	t7rmAFOaZ531p2wFnCEU7BRXIKtK1MpF01591B33H3JQuUjFSZbL44C8wqKPqNQzqfOSV9o+e7c
+	+wWKhxHd3ztwWAjifmD2d
+X-Received: by 2002:a05:6602:3314:b0:7bc:4687:1ed8 with SMTP id b20-20020a056602331400b007bc46871ed8mr6898925ioz.9.1705351078512;
+        Mon, 15 Jan 2024 12:37:58 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFWgF5ntIzVAiwiT64aLreUvO9r+NxKori8y1zLFYuh9zE8If5wQKqh2q7i6RL4bwKXdCE8pg==
+X-Received: by 2002:a05:6602:3314:b0:7bc:4687:1ed8 with SMTP id b20-20020a056602331400b007bc46871ed8mr6898920ioz.9.1705351078213;
+        Mon, 15 Jan 2024 12:37:58 -0800 (PST)
+Received: from redhat.com ([38.15.60.12])
+        by smtp.gmail.com with ESMTPSA id gi12-20020a05663869cc00b0046ce54fea8bsm2467315jab.131.2024.01.15.12.37.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Jan 2024 12:37:57 -0800 (PST)
+Date: Mon, 15 Jan 2024 13:37:56 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Markus Elfring <Markus.Elfring@web.de>
+Cc: kvm@vger.kernel.org, kernel-janitors@vger.kernel.org, Eric Auger
+ <eric.auger@redhat.com>, LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] vfio/platform: Use common error handling code in
+ vfio_set_trigger()
+Message-ID: <20240115133756.674ae019.alex.williamson@redhat.com>
+In-Reply-To: <f1977c1c-1c55-4194-9f72-f77120b2e4e5@web.de>
+References: <f1977c1c-1c55-4194-9f72-f77120b2e4e5@web.de>
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-ida_alloc() and ida_free() should be preferred to the deprecated
-ida_simple_get() and ida_simple_remove().
+On Mon, 15 Jan 2024 18:16:01 +0100
+Markus Elfring <Markus.Elfring@web.de> wrote:
 
-Note that the upper limit of ida_simple_get() is exclusive, buInputt the one of
-ida_alloc_max() is inclusive. So a -1 has been added when needed.
+> From: Markus Elfring <elfring@users.sourceforge.net>
+> Date: Mon, 15 Jan 2024 18:08:29 +0100
+> 
+> Add a jump target so that a bit of exception handling can be better reused
+> in an if branch of this function.
+> 
+> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+> ---
+>  drivers/vfio/platform/vfio_platform_irq.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/vfio/platform/vfio_platform_irq.c b/drivers/vfio/platform/vfio_platform_irq.c
+> index 61a1bfb68ac7..8604ce4f3fee 100644
+> --- a/drivers/vfio/platform/vfio_platform_irq.c
+> +++ b/drivers/vfio/platform/vfio_platform_irq.c
+> @@ -193,8 +193,8 @@ static int vfio_set_trigger(struct vfio_platform_device *vdev, int index,
+> 
+>  	trigger = eventfd_ctx_fdget(fd);
+>  	if (IS_ERR(trigger)) {
+> -		kfree(irq->name);
+> -		return PTR_ERR(trigger);
+> +		ret = PTR_ERR(trigger);
+> +		goto free_name;
+>  	}
+> 
+>  	irq->trigger = trigger;
+> @@ -202,9 +202,10 @@ static int vfio_set_trigger(struct vfio_platform_device *vdev, int index,
+>  	irq_set_status_flags(irq->hwirq, IRQ_NOAUTOEN);
+>  	ret = request_irq(irq->hwirq, handler, 0, irq->name, irq);
+>  	if (ret) {
+> -		kfree(irq->name);
+>  		eventfd_ctx_put(trigger);
+>  		irq->trigger = NULL;
+> +free_name:
+> +		kfree(irq->name);
+>  		return ret;
+>  	}
+> 
 
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
----
- drivers/vhost/vdpa.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+TBH, this doesn't seem like a worthwhile exit point consolidation.  A
+change like this might be justified if there were some common unlock
+code that could be shared, but for a simple free and return errno by
+jumping to a different exception block, rather than even a common exit
+block, I don't see the value.  Thanks,
 
-diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-index bc4a51e4638b..849b9d2dd51f 100644
---- a/drivers/vhost/vdpa.c
-+++ b/drivers/vhost/vdpa.c
-@@ -1534,7 +1534,7 @@ static void vhost_vdpa_release_dev(struct device *device)
- 	struct vhost_vdpa *v =
- 	       container_of(device, struct vhost_vdpa, dev);
- 
--	ida_simple_remove(&vhost_vdpa_ida, v->minor);
-+	ida_free(&vhost_vdpa_ida, v->minor);
- 	kfree(v->vqs);
- 	kfree(v);
- }
-@@ -1557,8 +1557,8 @@ static int vhost_vdpa_probe(struct vdpa_device *vdpa)
- 	if (!v)
- 		return -ENOMEM;
- 
--	minor = ida_simple_get(&vhost_vdpa_ida, 0,
--			       VHOST_VDPA_DEV_MAX, GFP_KERNEL);
-+	minor = ida_alloc_max(&vhost_vdpa_ida, VHOST_VDPA_DEV_MAX - 1,
-+			      GFP_KERNEL);
- 	if (minor < 0) {
- 		kfree(v);
- 		return minor;
--- 
-2.43.0
+Alex
 
 
