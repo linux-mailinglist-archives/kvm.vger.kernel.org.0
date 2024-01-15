@@ -1,48 +1,48 @@
-Return-Path: <kvm+bounces-6224-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6225-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E41FE82D8E2
-	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 13:25:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30F8082D8E3
+	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 13:26:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D9051F221C9
-	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 12:25:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5929282504
+	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 12:26:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E7002C6A8;
-	Mon, 15 Jan 2024 12:25:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59B5A2C6A8;
+	Mon, 15 Jan 2024 12:26:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AF41lebR"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gdhd4I4d"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E163D2C68C
-	for <kvm@vger.kernel.org>; Mon, 15 Jan 2024 12:25:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51B652C68C
+	for <kvm@vger.kernel.org>; Mon, 15 Jan 2024 12:26:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Mon, 15 Jan 2024 13:25:42 +0100
+Date: Mon, 15 Jan 2024 13:26:15 +0100
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1705321544;
+	t=1705321577;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=zTO6g2LZko5JQeKkqhwsTGJjM1futr0zuRouqeNssfM=;
-	b=AF41lebRoozawPhyxq/N23Ao82JgiD8OE83bbDaP3CrY91/LVCu4JoN44/sIResMsAcbkN
-	mQKLOCdUn11V16PCj9Mrpvq8e7Wl7vY9U2/chLgjlJv9oMSDpmAKEQy72hb5a2ZX82H1jB
-	hR3YbjkPQHqIqB+QjfV9hiaRI35x5Wk=
+	bh=WDfsB57fdrpRjyDNya3EtxYb0I/brPhBeMXt0+IM3MI=;
+	b=gdhd4I4dlLj4Sg+b1pAPM+1VwoeFQ5rG7HCPDRZbxS1Mn+679/EABCU1OW42kCReD4Kzle
+	iLwDjIdShXAV3LBr+4TKwyB4Q3uBgu3bHUNpVHqtbLcp0k0udHOOrALmqURmaj5gnS4NI7
+	Qcec1Pj10VtfidRhCyHFYJfKKa0DH+E=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Andrew Jones <andrew.jones@linux.dev>
 To: Shaoqin Huang <shahuang@redhat.com>
-Cc: kvmarm@lists.linux.dev, Thomas Huth <thuth@redhat.com>, 
-	Nico Boehr <nrb@linux.ibm.com>, Colton Lewis <coltonlewis@google.com>, 
-	Nina Schoetterl-Glausch <nsg@linux.ibm.com>, Nikos Nikoleris <nikos.nikoleris@arm.com>, kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v2 2/3] runtime: arm64: Skip the migration
- tests when run on EFI
-Message-ID: <20240115-92ecda86253ec8b52f348eda@orel>
+Cc: kvmarm@lists.linux.dev, Nico Boehr <nrb@linux.ibm.com>, 
+	Thomas Huth <thuth@redhat.com>, Ricardo Koller <ricarkol@google.com>, 
+	Sean Christopherson <seanjc@google.com>, Colton Lewis <coltonlewis@google.com>, 
+	Nikos Nikoleris <nikos.nikoleris@arm.com>, Nina Schoetterl-Glausch <nsg@linux.ibm.com>, kvm@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v2 1/3] runtime: Fix the missing last_line
+Message-ID: <20240115-8d47914acc8339f2fcc20807@orel>
 References: <20231130032940.2729006-1-shahuang@redhat.com>
- <20231130032940.2729006-3-shahuang@redhat.com>
+ <20231130032940.2729006-2-shahuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -51,45 +51,36 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231130032940.2729006-3-shahuang@redhat.com>
+In-Reply-To: <20231130032940.2729006-2-shahuang@redhat.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Wed, Nov 29, 2023 at 10:29:39PM -0500, Shaoqin Huang wrote:
-> When running the migration tests on EFI, the migration will always fail
-> since the efi/run use the vvfat format to run test, but the vvfat format
-> does not support live migration. So those migration tests will always
-> fail.
+On Wed, Nov 29, 2023 at 10:29:38PM -0500, Shaoqin Huang wrote:
+> The last_line is deleted by the 2607d2d6 ("arm64: Add an efi/run script").
+> This lead to when SKIP test, the reason is missing. Fix the problem by
+> adding last_line back.
 > 
-> Instead of waiting for fail everytime when run migration tests on EFI,
-> skip those tests if running on EFI.
-> 
+> Fixes: 2607d2d6 ("arm64: Add an efi/run script")
 > Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
 > ---
->  scripts/runtime.bash | 4 ++++
->  1 file changed, 4 insertions(+)
+>  scripts/runtime.bash | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
 > diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-> index c73fb024..64d223e8 100644
+> index fc156f2f..c73fb024 100644
 > --- a/scripts/runtime.bash
 > +++ b/scripts/runtime.bash
-> @@ -156,6 +156,10 @@ function run()
+> @@ -149,7 +149,7 @@ function run()
+>          fi
 >  
->      cmdline=$(get_cmdline $kernel)
->      if find_word "migration" "$groups"; then
-> +        if [ "{CONFIG_EFI}" == "y" ]; then
-> +            print_result "SKIP" $testname "" "migration tests are not supported with efi"
-> +            return 2
-> +        fi
->          cmdline="MIGRATION=yes $cmdline"
->      fi
->      if find_word "panic" "$groups"; then
+>          if [ ${skip} == true ]; then
+> -            print_result "SKIP" $testname "" "$last_line"
+> +            print_result "SKIP" $testname "" "$(tail -1 <<<"$log")"
+>              return 77
+>          fi
+>      }
 > -- 
 > 2.40.1
-> 
+>
 
-This isn't arm-specific, so we should drop the arm64 prefix from the patch
-summary and get an ack from x86 people.
-
-Thanks,
-drew
+Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
 
