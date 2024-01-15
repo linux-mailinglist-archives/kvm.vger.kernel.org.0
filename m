@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-6175-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6177-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74B7682D32E
-	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 03:51:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76FD282D34F
+	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 04:25:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CE992815E9
-	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 02:51:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7834C2813D8
+	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 03:25:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEDCB1FAA;
-	Mon, 15 Jan 2024 02:51:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01D201FAA;
+	Mon, 15 Jan 2024 03:25:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UWqVxCnG"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cxLZt2xG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED7F71841
-	for <kvm@vger.kernel.org>; Mon, 15 Jan 2024 02:51:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE8ED1841
+	for <kvm@vger.kernel.org>; Mon, 15 Jan 2024 03:25:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1705287101; x=1736823101;
+  t=1705289131; x=1736825131;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=6KPKQAgbFXVSMg9dnA78N6o6Brh6TM9vT/SyPEY/1QY=;
-  b=UWqVxCnG+n7NJV1ginErZllnPkIoapJ0LYqeQMAxSiCHDFxfsVJkiwHs
-   qkYtN4Wmbjw+x4J42glDMk+Ip6K31nstsY0JZwL1lLAKDXzIBKfuXIBaa
-   oJjzhGlkntx0XKPdGAzlCK+w+OhxBhjGeVoB31sn3AkuCiHuemsmUrXpk
-   5fbbYeyePWjku8svWd4fX3q0hgd6Pxh5tdDDy14OV4NS99ztW4w7l5rAt
-   w3TT2F4axeOwgRGuTGfwBA2ebTrvitkB4Ebtcics9F8T/MiHl/4l9SGCZ
-   ZiJlxzX9qpJ5uwxZ2+9YHIixyplQxE6CkSYRTaXP5HbcI2kxW9fZo5uVB
+  bh=DKxDl1ECvVivKU1OaKxlJGfRcdw0SpmIJUkRbrBx430=;
+  b=cxLZt2xGIbB7qkTc0CzS8xhee25uZYLANxdAYq9uhTYo/LSosy7ytRzu
+   2zGqPgUwrCB4uaoK3+o/w3M1+hOd3MOjF71W6gOuXlXFXitzPg2LcsZFr
+   Fob3qHojjXBXd5v6jfsnYtKogTW1OMx5gBr9DCOodQtMBjtS7+nUlOqIB
+   a2SiCmQwv7B6X+7hjiDYjXl3qH6t5dMVqmJlfkRDUxgtu2kR2/b8fGJvE
+   eEYOuJt4JT5lGsgCy9xb8swto8qeeunTNkixTG9UeqmhvopCql1XCnubW
+   qtUN7rZDrJfh6SNU5XUSSQl9mL4Pgtd4W3J2G9mz30br12hS4z0zYKXKB
    w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10953"; a="18124839"
+X-IronPort-AV: E=McAfee;i="6600,9927,10953"; a="6281613"
 X-IronPort-AV: E=Sophos;i="6.04,195,1695711600"; 
-   d="scan'208";a="18124839"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2024 18:51:40 -0800
+   d="scan'208";a="6281613"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2024 19:25:30 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10953"; a="817679805"
+X-IronPort-AV: E=McAfee;i="6600,9927,10953"; a="783678728"
 X-IronPort-AV: E=Sophos;i="6.04,195,1695711600"; 
-   d="scan'208";a="817679805"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
-  by orsmga001.jf.intel.com with ESMTP; 14 Jan 2024 18:51:36 -0800
-Date: Mon, 15 Jan 2024 11:04:33 +0800
-From: Zhao Liu <zhao1.liu@linux.intel.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
+   d="scan'208";a="783678728"
+Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
+  by orsmga002.jf.intel.com with ESMTP; 14 Jan 2024 19:25:25 -0800
+Date: Mon, 15 Jan 2024 11:25:24 +0800
+From: Yuan Yao <yuan.yao@linux.intel.com>
+To: Zhao Liu <zhao1.liu@linux.intel.com>
 Cc: Eduardo Habkost <eduardo@habkost.net>,
 	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
 	"Michael S . Tsirkin" <mst@redhat.com>,
@@ -57,17 +57,12 @@ Cc: Eduardo Habkost <eduardo@habkost.net>,
 	Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
 	kvm@vger.kernel.org, Zhenyu Wang <zhenyu.z.wang@intel.com>,
 	Zhuocheng Ding <zhuocheng.ding@intel.com>,
-	Zhao Liu <zhao1.liu@intel.com>,
-	Robert Hoo <robert.hu@linux.intel.com>,
-	Babu Moger <babu.moger@amd.com>, Yongwei Ma <yongwei.ma@intel.com>
-Subject: Re: [PATCH v7 02/16] i386/cpu: Use APIC ID offset to encode cache
- topo in CPUID[4]
-Message-ID: <ZaSgwWPm31MHzGyU@intel.com>
+	Zhao Liu <zhao1.liu@intel.com>, Babu Moger <babu.moger@amd.com>,
+	Yongwei Ma <yongwei.ma@intel.com>
+Subject: Re: [PATCH v7 08/16] i386: Expose module level in CPUID[0x1F]
+Message-ID: <20240115032524.44q5ygb25ieut44c@yy-desk-7060>
 References: <20240108082727.420817-1-zhao1.liu@linux.intel.com>
- <20240108082727.420817-3-zhao1.liu@linux.intel.com>
- <f5202ebd-6bc8-44b1-b22b-f3a033e0f283@intel.com>
- <ZZ+qGfykupOEFPA2@intel.com>
- <a2ee40c0-a198-41cd-86af-7ef52e6d591f@intel.com>
+ <20240108082727.420817-9-zhao1.liu@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -76,251 +71,154 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a2ee40c0-a198-41cd-86af-7ef52e6d591f@intel.com>
+In-Reply-To: <20240108082727.420817-9-zhao1.liu@linux.intel.com>
+User-Agent: NeoMutt/20171215
 
-Hi Xiaoyao,
+On Mon, Jan 08, 2024 at 04:27:19PM +0800, Zhao Liu wrote:
+> From: Zhao Liu <zhao1.liu@intel.com>
+>
+> Linux kernel (from v6.4, with commit edc0a2b595765 ("x86/topology: Fix
+> erroneous smp_num_siblings on Intel Hybrid platforms") is able to
+> handle platforms with Module level enumerated via CPUID.1F.
+>
+> Expose the module level in CPUID[0x1F] if the machine has more than 1
+> modules.
+>
+> (Tested CPU topology in CPUID[0x1F] leaf with various die/cluster
+> configurations in "-smp".)
+>
+> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
+> Tested-by: Babu Moger <babu.moger@amd.com>
+> Tested-by: Yongwei Ma <yongwei.ma@intel.com>
+> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+> Changes since v3:
+>  * New patch to expose module level in 0x1F.
+>  * Add Tested-by tag from Yongwei.
+> ---
+>  target/i386/cpu.c     | 12 +++++++++++-
+>  target/i386/cpu.h     |  2 ++
+>  target/i386/kvm/kvm.c |  2 +-
+>  3 files changed, 14 insertions(+), 2 deletions(-)
+>
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 294ca6b8947a..a2d39d2198b6 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -277,6 +277,8 @@ static uint32_t num_cpus_by_topo_level(X86CPUTopoInfo *topo_info,
+>          return 1;
+>      case CPU_TOPO_LEVEL_CORE:
+>          return topo_info->threads_per_core;
+> +    case CPU_TOPO_LEVEL_MODULE:
+> +        return topo_info->threads_per_core * topo_info->cores_per_module;
+>      case CPU_TOPO_LEVEL_DIE:
+>          return topo_info->threads_per_core * topo_info->cores_per_module *
+>                 topo_info->modules_per_die;
+> @@ -297,6 +299,8 @@ static uint32_t apicid_offset_by_topo_level(X86CPUTopoInfo *topo_info,
+>          return 0;
+>      case CPU_TOPO_LEVEL_CORE:
+>          return apicid_core_offset(topo_info);
+> +    case CPU_TOPO_LEVEL_MODULE:
+> +        return apicid_module_offset(topo_info);
+>      case CPU_TOPO_LEVEL_DIE:
+>          return apicid_die_offset(topo_info);
+>      case CPU_TOPO_LEVEL_PACKAGE:
+> @@ -316,6 +320,8 @@ static uint32_t cpuid1f_topo_type(enum CPUTopoLevel topo_level)
+>          return CPUID_1F_ECX_TOPO_LEVEL_SMT;
+>      case CPU_TOPO_LEVEL_CORE:
+>          return CPUID_1F_ECX_TOPO_LEVEL_CORE;
+> +    case CPU_TOPO_LEVEL_MODULE:
+> +        return CPUID_1F_ECX_TOPO_LEVEL_MODULE;
+>      case CPU_TOPO_LEVEL_DIE:
+>          return CPUID_1F_ECX_TOPO_LEVEL_DIE;
+>      default:
+> @@ -347,6 +353,10 @@ static void encode_topo_cpuid1f(CPUX86State *env, uint32_t count,
+>          if (env->nr_dies > 1) {
+>              set_bit(CPU_TOPO_LEVEL_DIE, topo_bitmap);
+>          }
+> +
+> +        if (env->nr_modules > 1) {
+> +            set_bit(CPU_TOPO_LEVEL_MODULE, topo_bitmap);
+> +        }
+>      }
+>
+>      *ecx = count & 0xff;
+> @@ -6394,7 +6404,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>          break;
+>      case 0x1F:
+>          /* V2 Extended Topology Enumeration Leaf */
+> -        if (topo_info.dies_per_pkg < 2) {
+> +        if (topo_info.modules_per_die < 2 && topo_info.dies_per_pkg < 2) {
 
-On Sun, Jan 14, 2024 at 10:11:59PM +0800, Xiaoyao Li wrote:
-> Date: Sun, 14 Jan 2024 22:11:59 +0800
-> From: Xiaoyao Li <xiaoyao.li@intel.com>
-> Subject: Re: [PATCH v7 02/16] i386/cpu: Use APIC ID offset to encode cache
->  topo in CPUID[4]
-> 
-> On 1/11/2024 4:43 PM, Zhao Liu wrote:
-> > Hi Xiaoyao,
-> > 
-> > On Wed, Jan 10, 2024 at 05:31:28PM +0800, Xiaoyao Li wrote:
-> > > Date: Wed, 10 Jan 2024 17:31:28 +0800
-> > > From: Xiaoyao Li <xiaoyao.li@intel.com>
-> > > Subject: Re: [PATCH v7 02/16] i386/cpu: Use APIC ID offset to encode cache
-> > >   topo in CPUID[4]
-> > > 
-> > > On 1/8/2024 4:27 PM, Zhao Liu wrote:
-> > > > From: Zhao Liu <zhao1.liu@intel.com>
-> > > > 
-> > > > Refer to the fixes of cache_info_passthrough ([1], [2]) and SDM, the
-> > > > CPUID.04H:EAX[bits 25:14] and CPUID.04H:EAX[bits 31:26] should use the
-> > > > nearest power-of-2 integer.
-> > > > 
-> > > > The nearest power-of-2 integer can be calculated by pow2ceil() or by
-> > > > using APIC ID offset (like L3 topology using 1 << die_offset [3]).
-> > > > 
-> > > > But in fact, CPUID.04H:EAX[bits 25:14] and CPUID.04H:EAX[bits 31:26]
-> > > > are associated with APIC ID. For example, in linux kernel, the field
-> > > > "num_threads_sharing" (Bits 25 - 14) is parsed with APIC ID.
-> > > 
-> > > And for
-> > > > another example, on Alder Lake P, the CPUID.04H:EAX[bits 31:26] is not
-> > > > matched with actual core numbers and it's calculated by:
-> > > > "(1 << (pkg_offset - core_offset)) - 1".
-> > > 
-> > > could you elaborate it more? what is the value of actual core numbers on
-> > > Alder lake P? and what is the pkg_offset and core_offset?
-> > 
-> > For example, the following's the CPUID dump of an ADL-S machine:
-> > 
-> > CPUID.04H:
-> > 
-> > 0x00000004 0x00: eax=0xfc004121 ebx=0x01c0003f ecx=0x0000003f edx=0x00000000
-> > 0x00000004 0x01: eax=0xfc004122 ebx=0x01c0003f ecx=0x0000007f edx=0x00000000
-> > 0x00000004 0x02: eax=0xfc01c143 ebx=0x03c0003f ecx=0x000007ff edx=0x00000000
-> > 0x00000004 0x03: eax=0xfc1fc163 ebx=0x0240003f ecx=0x00009fff edx=0x00000004
-> > 0x00000004 0x04: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
-> > 
-> > 
-> > CPUID.1FH:
-> > 
-> > 0x0000001f 0x00: eax=0x00000001 ebx=0x00000001 ecx=0x00000100 edx=0x0000004c
-> > 0x0000001f 0x01: eax=0x00000007 ebx=0x00000014 ecx=0x00000201 edx=0x0000004c
-> > 0x0000001f 0x02: eax=0x00000000 ebx=0x00000000 ecx=0x00000002 edx=0x0000004c
-> > 
-> > The CPUID.04H:EAX[bits 31:26] is 63.
-> >  From CPUID.1FH.00H:EAX[bits 04:00], the core_offset is 1, and from
-> > CPUID.1FH.01H:EAX[bits 04:00], the pkg_offset is 7.
-> > 
-> > Thus we can verify that the above equation as:
-> > 
-> > 1 << (0x7 - 0x1) - 1 = 63.
-> > 
-> > "Maximum number of addressable IDs" refers to the maximum number of IDs
-> > that can be enumerated in the APIC ID's topology layout, which does not
-> > necessarily correspond to the actual number of topology domains.
-> > 
-> > > 
-> > > > Therefore the offset of APIC ID should be preferred to calculate nearest
-> > > > power-of-2 integer for CPUID.04H:EAX[bits 25:14] and CPUID.04H:EAX[bits
-> > > > 31:26]:
-> > > > 1. d/i cache is shared in a core, 1 << core_offset should be used
-> > > >      instand of "cs->nr_threads" in encode_cache_cpuid4() for
-> > > 
-> > > /s/instand/instead
-> > 
-> > Thanks!
-> > 
-> > > 
-> > > >      CPUID.04H.00H:EAX[bits 25:14] and CPUID.04H.01H:EAX[bits 25:14].
-> > > > 2. L2 cache is supposed to be shared in a core as for now, thereby
-> > > >      1 << core_offset should also be used instand of "cs->nr_threads" in
-> > > 
-> > > ditto
-> > 
-> > Okay.
-> > 
-> > > 
-> > > >      encode_cache_cpuid4() for CPUID.04H.02H:EAX[bits 25:14].
-> > > > 3. Similarly, the value for CPUID.04H:EAX[bits 31:26] should also be
-> > > >      calculated with the bit width between the Package and SMT levels in
-> > > >      the APIC ID (1 << (pkg_offset - core_offset) - 1).
-> > > > 
-> > > > In addition, use APIC ID offset to replace "pow2ceil()" for
-> > > > cache_info_passthrough case.
-> > > > 
-> > > > [1]: efb3934adf9e ("x86: cpu: make sure number of addressable IDs for processor cores meets the spec")
-> > > > [2]: d7caf13b5fcf ("x86: cpu: fixup number of addressable IDs for logical processors sharing cache")
-> > > > [3]: d65af288a84d ("i386: Update new x86_apicid parsing rules with die_offset support")
-> > > > 
-> > > > Fixes: 7e3482f82480 ("i386: Helpers to encode cache information consistently")
-> > > > Suggested-by: Robert Hoo <robert.hu@linux.intel.com>
-> > > > Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
-> > > > Tested-by: Babu Moger <babu.moger@amd.com>
-> > > > Tested-by: Yongwei Ma <yongwei.ma@intel.com>
-> > > > Acked-by: Michael S. Tsirkin <mst@redhat.com>
-> > > > ---
-> > > > Changes since v3:
-> > > >    * Fix compile warnings. (Babu)
-> > > >    * Fix spelling typo.
-> > > > 
-> > > > Changes since v1:
-> > > >    * Use APIC ID offset to replace "pow2ceil()" for cache_info_passthrough
-> > > >      case. (Yanan)
-> > > >    * Split the L1 cache fix into a separate patch.
-> > > >    * Rename the title of this patch (the original is "i386/cpu: Fix number
-> > > >      of addressable IDs in CPUID.04H").
-> > > > ---
-> > > >    target/i386/cpu.c | 30 +++++++++++++++++++++++-------
-> > > >    1 file changed, 23 insertions(+), 7 deletions(-)
-> > > > 
-> > > > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> > > > index 5a3678a789cf..c8d2a585723a 100644
-> > > > --- a/target/i386/cpu.c
-> > > > +++ b/target/i386/cpu.c
-> > > > @@ -6014,7 +6014,6 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-> > > >    {
-> > > >        X86CPU *cpu = env_archcpu(env);
-> > > >        CPUState *cs = env_cpu(env);
-> > > > -    uint32_t die_offset;
-> > > >        uint32_t limit;
-> > > >        uint32_t signature[3];
-> > > >        X86CPUTopoInfo topo_info;
-> > > > @@ -6098,39 +6097,56 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-> > > >                    int host_vcpus_per_cache = 1 + ((*eax & 0x3FFC000) >> 14);
-> > > >                    int vcpus_per_socket = cs->nr_cores * cs->nr_threads;
-> > > >                    if (cs->nr_cores > 1) {
-> > > > +                    int addressable_cores_offset =
-> > > > +                                                apicid_pkg_offset(&topo_info) -
-> > > > +                                                apicid_core_offset(&topo_info);
-> > > > +
-> > > >                        *eax &= ~0xFC000000;
-> > > > -                    *eax |= (pow2ceil(cs->nr_cores) - 1) << 26;
-> > > > +                    *eax |= (1 << (addressable_cores_offset - 1)) << 26;
-> > > 
-> > > it should be ((1 << addressable_cores_offset) - 1) << 26
-> > 
-> > Good catch! The helper wrapped in a subsequent patch masks the error here.
-> > 
-> > > 
-> > > I think naming it addressable_cores_width is better than
-> > > addressable_cores_offset. It's not offset because offset means the bit
-> > > position from bit 0.
-> > 
-> > I agree, "width" is better.
-> > 
-> > > 
-> > > And we can get the width by another algorithm:
-> > > 
-> > > int addressable_cores_width = apicid_core_width(&topo_info) +
-> > > apicid_die_width(&topo_info);
-> > > *eax |= ((1 << addressable_cores_width) - 1)) << 26;
-> > 
-> > This algorithm lacks flexibility because there will be more topology
-> > levels between package and core, such as the cluster being introduced...
-> > 
-> > Using "addressable_cores_width" is clear enough.
-> > 
-> > > 		
-> > > >                    }
-> > > >                    if (host_vcpus_per_cache > vcpus_per_socket) {
-> > > > +                    int pkg_offset = apicid_pkg_offset(&topo_info);
-> > > > +
-> > > >                        *eax &= ~0x3FFC000;
-> > > > -                    *eax |= (pow2ceil(vcpus_per_socket) - 1) << 14;
-> > > > +                    *eax |= (1 << (pkg_offset - 1)) << 14;
-> > > 
-> > > Ditto, ((1 << pkg_offset) - 1) << 14
-> > 
-> > Thanks!
-> > 
-> > > 
-> > > For this one, I think pow2ceil(vcpus_per_socket) is better. Because it's
-> > > intuitive that when host_vcpus_per_cache > vcpus_per_socket, we expose
-> > > vcpus_per_cache (configured by users) to VM.
-> > 
-> > I tend to use a uniform calculation that is less confusing and easier to
-> > maintain.
-> 
-> less confusing?
-> 
-> the original code is
-> 
-> 	if (host_vcpus_per_cache > vcpus_per_socket) {
-> 		*eax |= (pow2ceil(vcpus_per_socket) - 1) << 14;
-> 	}
-> 
-> and this patch is going to change it to
-> 
-> 	if (host_vcpus_per_cache > vcpus_per_socket) {
-> 		int pkg_offset = apicid_pkg_offset(&topo_info);
-> 		*eax |= (1 << pkg_offset - 1)) << 14;
-> 	}
-> 
-> Apparently, the former is clearer that everyone knows what is wants to do is
-> "when guest's total vcpus_per_socket is even smaller than host's
-> vcpu_per_cache, using guest's configuration". While the latter is more
-> confusing.
+A question:
+Is the original checking necessary ?
+The 0x1f exists even on cpu w/o modules/dies topology on bare metal, I tried
+on EMR:
 
-IMO, the only differences are the variable naming and the way the
-details are encoded, what is actually trying to be expressed is the
-same - both set the cache topology at the package level.
+// leaf 0
+0x00000000 0x00: eax=0x00000020 ebx=0x756e6547 ecx=0x6c65746e edx=0x49656e69
 
-There is no reason to use two encoding ways for the same field, and
-it'll be a code maintenance disaster.
+// leaf 0x1f
+0x0000001f 0x00: eax=0x00000001 ebx=0x00000002 ecx=0x00000100 edx=0x00000004
+0x0000001f 0x01: eax=0x00000007 ebx=0x00000080 ecx=0x00000201 edx=0x00000004
+0x0000001f 0x02: eax=0x00000000 ebx=0x00000000 ecx=0x00000002 edx=0x00000004
 
-I can add comment here to allay your concern.
+// leaf 0xb
+0x0000000b 0x00: eax=0x00000001 ebx=0x00000002 ecx=0x00000100 edx=0x00000004
+0x0000000b 0x01: eax=0x00000007 ebx=0x00000080 ecx=0x00000201 edx=0x00000004
+0x0000000b 0x02: eax=0x00000000 ebx=0x00000000 ecx=0x00000002 edx=0x00000004
 
-> 
-> > Since this field encodes "Maximum number of addressable IDs",
-> > OS can't get the exact number of CPUs/vCPUs sharing L3 from here, it can
-> > only know that L3 is shared at the package level.
-> 
-> It doesn't matter with L3. What the code want to fulfill is that,
+So here leads to different cpu behavior from bare metal, even in case
+of "-cpu host".
 
-Yes, I misremembered here.
+In SDM Vol2, cpudid instruction section:
 
-> 
-> host_vcpus_per_cache is the actual number of LPs that share this level of
-> cache. While vcpus_per_socket is the maximum numbere of LPs that can share a
-> cache (at any level) in guest. When guest's maximum number is even smaller
-> than host's, use guest's value.
-> 
+" CPUID leaf 1FH is a preferred superset to leaf 0BH. Intel
+recommends using leaf 1FH when available rather than leaf
+0BH and ensuring that any leaf 0BH algorithms are updated to
+support leaf 1FH. "
 
-From the Guest's view, the cache is shared at package level. In hardware,
-this one field only reflects the topology level and does not accurately
-reflect the number of sharing CPUs.
+My understanding: if 0x1f is existed (leaf 0.eax >= 0x1f)
+then it should have same values in lp/core level as 0xb.
 
-So, we just need to make it clear that in this case the Guest cache
-topology level is package.
-
-Thanks,
-Zhao
-
+>              *eax = *ebx = *ecx = *edx = 0;
+>              break;
+>          }
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index eecd30bde92b..97b290e10576 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -1018,6 +1018,7 @@ enum CPUTopoLevel {
+>      CPU_TOPO_LEVEL_INVALID,
+>      CPU_TOPO_LEVEL_SMT,
+>      CPU_TOPO_LEVEL_CORE,
+> +    CPU_TOPO_LEVEL_MODULE,
+>      CPU_TOPO_LEVEL_DIE,
+>      CPU_TOPO_LEVEL_PACKAGE,
+>      CPU_TOPO_LEVEL_MAX,
+> @@ -1032,6 +1033,7 @@ enum CPUTopoLevel {
+>  #define CPUID_1F_ECX_TOPO_LEVEL_INVALID  CPUID_B_ECX_TOPO_LEVEL_INVALID
+>  #define CPUID_1F_ECX_TOPO_LEVEL_SMT      CPUID_B_ECX_TOPO_LEVEL_SMT
+>  #define CPUID_1F_ECX_TOPO_LEVEL_CORE     CPUID_B_ECX_TOPO_LEVEL_CORE
+> +#define CPUID_1F_ECX_TOPO_LEVEL_MODULE   3
+>  #define CPUID_1F_ECX_TOPO_LEVEL_DIE      5
+>
+>  /* MSR Feature Bits */
+> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+> index 4ce80555b45c..e5ddb214cb36 100644
+> --- a/target/i386/kvm/kvm.c
+> +++ b/target/i386/kvm/kvm.c
+> @@ -1913,7 +1913,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>              break;
+>          }
+>          case 0x1f:
+> -            if (env->nr_dies < 2) {
+> +            if (env->nr_modules < 2 && env->nr_dies < 2) {
+>                  break;
+>              }
+>              /* fallthrough */
+> --
+> 2.34.1
+>
+>
 
