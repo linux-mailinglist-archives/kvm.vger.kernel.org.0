@@ -1,84 +1,31 @@
-Return-Path: <kvm+bounces-6213-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6214-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3924F82D5C7
-	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 10:23:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19E9182D60B
+	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 10:34:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 408181C2142D
-	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 09:23:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCE33281EDC
+	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 09:34:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A64FBCA7A;
-	Mon, 15 Jan 2024 09:23:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="DwSRoxEo";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="kA3Crk0x";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="DwSRoxEo";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="kA3Crk0x"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30098F4F8;
+	Mon, 15 Jan 2024 09:34:30 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66885F4E4;
-	Mon, 15 Jan 2024 09:23:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 989B722150;
-	Mon, 15 Jan 2024 09:23:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1705310598; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cAvAmgb/jPWg9AlkaccrOmdOwRCSsdippzeZcx291nI=;
-	b=DwSRoxEoiZW4TfXc4fF+UH6GBBSvPVkAmEhT07+0QAIj26qFIMksxaCur1+5JSJLMCy7B9
-	v/+ZtmjzRhoLXPTBMYfF7KkuOR4oUwo4FvTnzlWfoZYjRVF/+xJDTtAu0wCtGtMrm6GudZ
-	TGjumFbt6AdFGn0Zl8gyqMwqvWBBzVo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1705310598;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cAvAmgb/jPWg9AlkaccrOmdOwRCSsdippzeZcx291nI=;
-	b=kA3Crk0xZEfgJb4J6mqAN5ZS7yw5zCilj6ACcSSlpobTV6Exuk6q44u8bK9neKpLGTIakg
-	UM2XD+NvPvgehlAg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1705310598; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cAvAmgb/jPWg9AlkaccrOmdOwRCSsdippzeZcx291nI=;
-	b=DwSRoxEoiZW4TfXc4fF+UH6GBBSvPVkAmEhT07+0QAIj26qFIMksxaCur1+5JSJLMCy7B9
-	v/+ZtmjzRhoLXPTBMYfF7KkuOR4oUwo4FvTnzlWfoZYjRVF/+xJDTtAu0wCtGtMrm6GudZ
-	TGjumFbt6AdFGn0Zl8gyqMwqvWBBzVo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1705310598;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cAvAmgb/jPWg9AlkaccrOmdOwRCSsdippzeZcx291nI=;
-	b=kA3Crk0xZEfgJb4J6mqAN5ZS7yw5zCilj6ACcSSlpobTV6Exuk6q44u8bK9neKpLGTIakg
-	UM2XD+NvPvgehlAg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 4DD7713712;
-	Mon, 15 Jan 2024 09:23:18 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id OHGxEob5pGXdEwAAD6G6ig
-	(envelope-from <vbabka@suse.cz>); Mon, 15 Jan 2024 09:23:18 +0000
-Message-ID: <91f54c39-a8f4-4186-9a5b-83dcbc5c929c@suse.cz>
-Date: Mon, 15 Jan 2024 10:23:18 +0100
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ED38F4E7
+	for <kvm@vger.kernel.org>; Mon, 15 Jan 2024 09:34:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 316782F4;
+	Mon, 15 Jan 2024 01:35:14 -0800 (PST)
+Received: from [10.57.46.55] (unknown [10.57.46.55])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 58FCD3F6C4;
+	Mon, 15 Jan 2024 01:34:26 -0800 (PST)
+Message-ID: <4e3c051b-ccdb-47d4-9a29-5c92f5101a06@arm.com>
+Date: Mon, 15 Jan 2024 09:34:24 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -86,84 +33,98 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 11/26] x86/sev: Invalidate pages from the direct map
- when adding them to the RMP table
-Content-Language: en-US
-To: Dave Hansen <dave.hansen@intel.com>,
- Tom Lendacky <thomas.lendacky@amd.com>, Borislav Petkov <bp@alien8.de>
-Cc: Michael Roth <michael.roth@amd.com>, x86@kernel.org, kvm@vger.kernel.org,
- linux-coco@lists.linux.dev, linux-mm@kvack.org,
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
- tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de, hpa@zytor.com,
- ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
- vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
- dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
- peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
- rientjes@google.com, tobin@ibm.com, kirill@shutemov.name,
- ak@linux.intel.com, tony.luck@intel.com,
- sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
- jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
- pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
- Brijesh Singh <brijesh.singh@amd.com>
-References: <20231230161954.569267-1-michael.roth@amd.com>
- <20231230161954.569267-12-michael.roth@amd.com>
- <cb604c37-aeb5-45bd-b6db-246ae724e4ca@intel.com>
- <20240112200751.GHZaGcF0-OZVJiIB7y@fat_crate.local>
- <63297d29-bb24-ac5e-0b47-35e22bb1a2f8@amd.com>
- <336b55f9-c7e6-4ec9-806b-cb3659dbfdc3@intel.com>
-From: Vlastimil Babka <vbabka@suse.cz>
-In-Reply-To: <336b55f9-c7e6-4ec9-806b-cb3659dbfdc3@intel.com>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH v1] KVM: arm64: selftests: Handle feature fields with
+ nonzero minimum value correctly
+Content-Language: en-GB
+To: Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
+ KVMARM <kvmarm@lists.linux.dev>,
+ ARMLinux <linux-arm-kernel@lists.infradead.org>,
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, James Morse <james.morse@arm.com>,
+ Zenghui Yu <yuzenghui@huawei.com>, Itaru Kitayama <itaru.kitayama@linux.dev>
+References: <20240109165622.4104387-1-jingzhangos@google.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20240109165622.4104387-1-jingzhangos@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=DwSRoxEo;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=kA3Crk0x
-X-Spamd-Result: default: False [-2.30 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	 XM_UA_NO_VERSION(0.01)[];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 BAYES_HAM(-0.00)[34.26%];
-	 MIME_GOOD(-0.10)[text/plain];
-	 SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	 RCVD_DKIM_ARC_DNSWL_HI(-1.00)[];
-	 R_RATELIMIT(0.00)[to_ip_from(RLisu716frudqkg98kczdd9eac)];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	 DKIM_TRACE(0.00)[suse.cz:+];
-	 MX_GOOD(-0.01)[];
-	 RCPT_COUNT_TWELVE(0.00)[39];
-	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:dkim];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 RCVD_IN_DNSWL_HI(-1.00)[2a07:de40:b281:106:10:150:64:167:received,2a07:de40:b281:104:10:150:64:97:from];
-	 RCVD_TLS_ALL(0.00)[];
-	 MID_RHS_MATCH_FROM(0.00)[]
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Rspamd-Queue-Id: 989B722150
-X-Spam-Level: 
-X-Spam-Score: -2.30
-X-Spam-Flag: NO
 
-On 1/12/24 21:37, Dave Hansen wrote:
-> On 1/12/24 12:28, Tom Lendacky wrote:
->> I thought there was also a desire to remove the direct map for any pages
->> assigned to a guest as private, not just the case that the comment says.
->> So updating the comment would probably the best action.
+On 09/01/2024 16:56, Jing Zhang wrote:
+> There are some feature fields with nonzero minimum valid value. Make
+> sure get_safe_value() won't return invalid field values for them.
+> Also fix a bug that wrongly uses the feature bits type as the feature
+> bits sign causing all fields as signed in the get_safe_value() and
+> get_invalid_value().
 > 
-> I'm not sure who desires that.
+> Fixes: 54a9ea73527d ("KVM: arm64: selftests: Test for setting ID register from usersapce")
+> Reported-by: Zenghui Yu <yuzenghui@huawei.com>
+> Reported-by: Itaru Kitayama <itaru.kitayama@linux.dev>
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+>   .../selftests/kvm/aarch64/set_id_regs.c       | 20 +++++++++++++++----
+>   1 file changed, 16 insertions(+), 4 deletions(-)
 > 
-> It's sloooooooow to remove things from the direct map.  There's almost
-> certainly a frequency cutoff where running the whole direct mapping as
-> 4k is better than the cost of mapping/unmapping.
-> 
-> Actually, where _is_ the TLB flushing here?
+> diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
+> index bac05210b539..f17454dc6d9e 100644
+> --- a/tools/testing/selftests/kvm/aarch64/set_id_regs.c
+> +++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
+> @@ -224,13 +224,20 @@ uint64_t get_safe_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
+>   {
+>   	uint64_t ftr_max = GENMASK_ULL(ARM64_FEATURE_FIELD_BITS - 1, 0);
+>   
+> -	if (ftr_bits->type == FTR_UNSIGNED) {
+> +	if (ftr_bits->sign == FTR_UNSIGNED) {
+>   		switch (ftr_bits->type) {
+>   		case FTR_EXACT:
+>   			ftr = ftr_bits->safe_val;
+>   			break;
+>   		case FTR_LOWER_SAFE:
+> -			if (ftr > 0)
+> +			uint64_t min_safe = 0;
+> +
+> +			if (!strcmp(ftr_bits->name, "ID_AA64DFR0_EL1_DebugVer"))
+> +				min_safe = ID_AA64DFR0_EL1_DebugVer_IMP;
+> +			else if (!strcmp(ftr_bits->name, "ID_DFR0_EL1_CopDbg"))
+> +				min_safe = ID_DFR0_EL1_CopDbg_Armv8;
 
-Hm yeah it seems to be using the _noflush version? Maybe the RMP issues this
-avoids are only triggered with actual page tables and a stray outdated TLB
-hit doesn't trigger it? Needs documenting though if that's the case.
+Instead of hardcoding the safe value here in the code, why not "fix" the 
+safe value in the ftr_id table and use ftr_bits->safe_val for both the
+above cases ?
+
+> +
+> +			if (ftr > min_safe)
+>   				ftr--;
+>   			break;
+>   		case FTR_HIGHER_SAFE:
+> @@ -252,7 +259,12 @@ uint64_t get_safe_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
+>   			ftr = ftr_bits->safe_val;
+>   			break;
+>   		case FTR_LOWER_SAFE:
+> -			if (ftr > 0)
+> +			uint64_t min_safe = 0;
+> +
+> +			if (!strcmp(ftr_bits->name, "ID_DFR0_EL1_PerfMon"))
+> +				min_safe = ID_DFR0_EL1_PerfMon_PMUv3;
+> +
+> +			if (ftr > min_safe)
+>   				ftr--;
+
+Also, here, don't we need to type case both "ftr" and min_safe to 
+int64_t for signed features ?
+
+Suzuki
+
+>   			break;
+>   		case FTR_HIGHER_SAFE:
+> @@ -276,7 +288,7 @@ uint64_t get_invalid_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
+>   {
+>   	uint64_t ftr_max = GENMASK_ULL(ARM64_FEATURE_FIELD_BITS - 1, 0);
+>   
+> -	if (ftr_bits->type == FTR_UNSIGNED) {
+> +	if (ftr_bits->sign == FTR_UNSIGNED) {
+>   		switch (ftr_bits->type) {
+>   		case FTR_EXACT:
+>   			ftr = max((uint64_t)ftr_bits->safe_val + 1, ftr + 1);
+> 
+> base-commit: 0dd3ee31125508cd67f7e7172247f05b7fd1753a
+
 
