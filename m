@@ -1,172 +1,124 @@
-Return-Path: <kvm+bounces-6292-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6293-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B234582E269
-	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 23:03:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B41A082E2A0
+	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 23:32:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6715C1F22DFA
-	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 22:03:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35AE5283B82
+	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 22:32:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4A4D1B59C;
-	Mon, 15 Jan 2024 22:02:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A75DB1B7E5;
+	Mon, 15 Jan 2024 22:32:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DvEclCSz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ELe42d9B"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A343A1B594
-	for <kvm@vger.kernel.org>; Mon, 15 Jan 2024 22:02:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jingzhangos.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5f38d676cecso108127437b3.0
-        for <kvm@vger.kernel.org>; Mon, 15 Jan 2024 14:02:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1705356173; x=1705960973; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fs5plhdODh5O3jwOa02ZCAJ9LDrZDHKVjydsmrZKIRI=;
-        b=DvEclCSzmhlKqqsDSH1J2iuHrLzgtlNcd/IxNUW0vfZVUMvCOQoSLTzZOyYvaySYFx
-         7b4rDDNYWEmaWTag9wUsQ+2vr1EvHwUWETTMMHKyT9UeMshr522JIGLAN5B76FkRy1nn
-         qbmnCHEgMgJlJjzWK2RecJrWXs+pIXfHfyX0ajJvtOjr6eE4LP8tZtOjvEr0zXR3eCvm
-         S0Iyo/OWpSjPhwBMXw1n4t0As8eA2jwd2inH/0qcnHFuIcbZD3VECkqG+AxWfJCgfIZC
-         WUURRTASO1rDrB4kEL3ftR7zRLG+OnXGEjS0zM+/t18XaQ0/ziJRMk1jeq2jtsUkNX0u
-         dc8g==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 601051B5AC
+	for <kvm@vger.kernel.org>; Mon, 15 Jan 2024 22:32:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1705357954;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eP0VxXSEEil+R0UNdZpa6aVY75gYpHAxm/3u1ydWXpo=;
+	b=ELe42d9BO1osfbZLNLWsEYtf5i1mpiwfXQbiQ/6DUxuWSF0hPSLy28mNyZvBbjllMzwqK5
+	bwhdyatxAvWAahC2gRuc1BUjzt9sTK6pWoP/lOySDCw9Ze7cTvAF82vnwMwRi9PvDoR1tp
+	BANsi7a9Xzo6FoIMiC55MaycQfjf0tc=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-550-A1660ACcOeyd3IrY6f45Iw-1; Mon, 15 Jan 2024 17:32:27 -0500
+X-MC-Unique: A1660ACcOeyd3IrY6f45Iw-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-33753ac460bso6197512f8f.3
+        for <kvm@vger.kernel.org>; Mon, 15 Jan 2024 14:32:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705356173; x=1705960973;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fs5plhdODh5O3jwOa02ZCAJ9LDrZDHKVjydsmrZKIRI=;
-        b=IiwmmIlhvjPTI2+tLq8TArQ5mgE1++txqe2tPTCgAEA6pO+jfiqf/jugwS6D47M1zB
-         17JeeeiRU966UpVWmCc/eJ30Y4wMnRVFPgwZIPuZ/FtarvkvrnhVMGOhkV9T/uCCJZgs
-         Ub3Kb/jdNFxDXjq/rojufuBbCSeLl1okPcq/g52dOR2usxtzEpkEC0iLy1vzSnlFCFz+
-         EGtHGWvb7x4S7amSkytt1LEaCNwgUhSpG/T/buV1HU9ByrfSwuUEbsbAQkrb5rhbaIN4
-         SFG8LisbDa4NeDycPjjvKMFJ72TN6A7AlWGK3rTDuu9W7ZKZLwxEOoAiltcuPgP5JOp7
-         1gTw==
-X-Gm-Message-State: AOJu0Yzu7UO2A4fCTfzbflwwQXn7nVixGwhbVosV2vc1w5grPfRl+0Cq
-	YM9EnMjNQdnSGQLLpBRz+8j+XRO8XMGA0CxCrYx4bI59lIbmAxEl8jrc3+KXlMm+RwrfCPZ4lzP
-	JW403k3DWp15/4D2+mtXDZi5dqMQo0pXxcWO+3x3/KZPVBzR87na/E3CM7UdIANyRSW17BHnSvF
-	2poA==
-X-Google-Smtp-Source: AGHT+IF+fzRJLAXxL6I3qdWZEbC2fAkyfSI5O2l3h7Gnd5rTDrziaodY8En22xaBj29yb4KDWgcqegBtA+/+HIEKgQ==
-X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a25:aac7:0:b0:dc2:232b:5cf1 with SMTP
- id t65-20020a25aac7000000b00dc2232b5cf1mr57299ybi.1.1705356173573; Mon, 15
- Jan 2024 14:02:53 -0800 (PST)
-Date: Mon, 15 Jan 2024 14:02:09 -0800
-In-Reply-To: <20240115220210.3966064-1-jingzhangos@google.com>
+        d=1e100.net; s=20230601; t=1705357946; x=1705962746;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eP0VxXSEEil+R0UNdZpa6aVY75gYpHAxm/3u1ydWXpo=;
+        b=U7NLviIsxL4m2HeOjUq7pWaXHCeobcomddng8VJihLfy1N9MiCVI4r9UrM2ba9uld1
+         6jz96DtdwyBjEw3ty3xPVacYu3vrR81zTbHG9ifNuSog1RkCPvLLtj7cvicc6lax4bDC
+         kayZ9CR9/LgrB8MAt8mkdpUe7ljJW/NmbS2lGdV3r0s2FLQQw7eN1xE8j4v1QkDtRo5C
+         p5zKKA+1qWOJtPR0ofHim9DlEMQflBwC7/9sVOkgzSxcMUIg4yqcqcjF39uvnokG03yD
+         gyQJSYebDEJYDOatuCegTWmip6c5LNydM6XgG0B1uAZ1/gzf9tCP7CoSwVICWw4EHxq7
+         C2Fw==
+X-Gm-Message-State: AOJu0YxLc5lhe3UG5w3lrLucYMa1EFsX4WiDixrtdSdIfDntlctdN9nK
+	4dlP0vbm/QceO4IzmYLRyh90gR8YSoVnThohjvF3Hw3Y+r5/p0u4TdHBylRKTDpqZLVCDuRyp/O
+	tGhin1I7VWflQpYH66knWkDe+pVa3
+X-Received: by 2002:a05:600c:4a9b:b0:40e:57f2:5948 with SMTP id b27-20020a05600c4a9b00b0040e57f25948mr2946995wmp.72.1705357946073;
+        Mon, 15 Jan 2024 14:32:26 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEkeJKqYDhM/whQk/nCZZw+VXl4wzetnaox4MjVkcLxDiSEjq0eYyRMgzXTkyhuF5WMBxlqJQ==
+X-Received: by 2002:a05:600c:4a9b:b0:40e:57f2:5948 with SMTP id b27-20020a05600c4a9b00b0040e57f25948mr2946992wmp.72.1705357945790;
+        Mon, 15 Jan 2024 14:32:25 -0800 (PST)
+Received: from redhat.com ([2.52.29.192])
+        by smtp.gmail.com with ESMTPSA id m8-20020adfe948000000b00336710ddea0sm12980913wrn.59.2024.01.15.14.32.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Jan 2024 14:32:25 -0800 (PST)
+Date: Mon, 15 Jan 2024 17:32:21 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Andrew Melnychenko <andrew@daynix.com>
+Cc: jasowang@redhat.com, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, yuri.benditovich@daynix.com,
+	yan@daynix.com
+Subject: Re: [PATCH 1/1] vhost: Added pad cleanup if vnet_hdr is not present.
+Message-ID: <20240115172837-mutt-send-email-mst@kernel.org>
+References: <20240115194840.1183077-1-andrew@daynix.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240115220210.3966064-1-jingzhangos@google.com>
-X-Mailer: git-send-email 2.43.0.381.gb435a96ce8-goog
-Message-ID: <20240115220210.3966064-2-jingzhangos@google.com>
-Subject: [PATCH v2] KVM: arm64: selftests: Handle feature fields with nonzero
- minimum value correctly
-From: Jing Zhang <jingzhangos@google.com>
-To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
-	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Itaru Kitayama <itaru.kitayama@linux.dev>, Jing Zhang <jingzhangos@google.com>, 
-	Itaru Kitayama <itaru.kitayama@fujitsu.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240115194840.1183077-1-andrew@daynix.com>
 
-There are some feature fields with nonzero minimum valid value. Make
-sure get_safe_value() won't return invalid field values for them.
-Also fix a bug that wrongly uses the feature bits type as the feature
-bits sign causing all fields as signed in the get_safe_value() and
-get_invalid_value().
+On Mon, Jan 15, 2024 at 09:48:40PM +0200, Andrew Melnychenko wrote:
+> When the Qemu launched with vhost but without tap vnet_hdr,
+> vhost tries to copy vnet_hdr from socket iter with size 0
+> to the page that may contain some trash.
+> That trash can be interpreted as unpredictable values for
+> vnet_hdr.
+> That leads to dropping some packets and in some cases to
+> stalling vhost routine when the vhost_net tries to process
+> packets and fails in a loop.
+> 
+> Qemu options:
+>   -netdev tap,vhost=on,vnet_hdr=off,...
+> 
+> Signed-off-by: Andrew Melnychenko <andrew@daynix.com>
+> ---
+>  drivers/vhost/net.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> index f2ed7167c848..57411ac2d08b 100644
+> --- a/drivers/vhost/net.c
+> +++ b/drivers/vhost/net.c
+> @@ -735,6 +735,9 @@ static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
+>  	hdr = buf;
+>  	gso = &hdr->gso;
+>  
+> +	if (!sock_hlen)
+> +		memset(buf, 0, pad);
+> +
+>  	if ((gso->flags & VIRTIO_NET_HDR_F_NEEDS_CSUM) &&
+>  	    vhost16_to_cpu(vq, gso->csum_start) +
+>  	    vhost16_to_cpu(vq, gso->csum_offset) + 2 >
 
-Fixes: 54a9ea73527d ("KVM: arm64: selftests: Test for setting ID register from usersapce")
-Reported-by: Zenghui Yu <yuzenghui@huawei.com>
-Reported-by: Itaru Kitayama <itaru.kitayama@linux.dev>
-Tested-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
-Signed-off-by: Jing Zhang <jingzhangos@google.com>
 
----
-* v1 -> v2:
-  - Use ftr_bits->safe_val for minimal safe value for type FTR_LOWER_SAFE.
-  - Fix build error reported by Zenghui with gcc-10.3.1.
----
- .../selftests/kvm/aarch64/set_id_regs.c        | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-index bac05210b539..16e2338686c1 100644
---- a/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-+++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-@@ -32,6 +32,10 @@ struct reg_ftr_bits {
- 	enum ftr_type type;
- 	uint8_t shift;
- 	uint64_t mask;
-+	/*
-+	 * For FTR_EXACT, safe_val is used as the exact safe value.
-+	 * For FTR_LOWER_SAFE, safe_val is used as the minimal safe value.
-+	 */
- 	int64_t safe_val;
- };
- 
-@@ -65,13 +69,13 @@ struct test_feature_reg {
- 
- static const struct reg_ftr_bits ftr_id_aa64dfr0_el1[] = {
- 	S_REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64DFR0_EL1, PMUVer, 0),
--	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64DFR0_EL1, DebugVer, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64DFR0_EL1, DebugVer, ID_AA64DFR0_EL1_DebugVer_IMP),
- 	REG_FTR_END,
- };
- 
- static const struct reg_ftr_bits ftr_id_dfr0_el1[] = {
--	S_REG_FTR_BITS(FTR_LOWER_SAFE, ID_DFR0_EL1, PerfMon, 0),
--	REG_FTR_BITS(FTR_LOWER_SAFE, ID_DFR0_EL1, CopDbg, 0),
-+	S_REG_FTR_BITS(FTR_LOWER_SAFE, ID_DFR0_EL1, PerfMon, ID_DFR0_EL1_PerfMon_PMUv3),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_DFR0_EL1, CopDbg, ID_DFR0_EL1_CopDbg_Armv8),
- 	REG_FTR_END,
- };
- 
-@@ -224,13 +228,13 @@ uint64_t get_safe_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
- {
- 	uint64_t ftr_max = GENMASK_ULL(ARM64_FEATURE_FIELD_BITS - 1, 0);
- 
--	if (ftr_bits->type == FTR_UNSIGNED) {
-+	if (ftr_bits->sign == FTR_UNSIGNED) {
- 		switch (ftr_bits->type) {
- 		case FTR_EXACT:
- 			ftr = ftr_bits->safe_val;
- 			break;
- 		case FTR_LOWER_SAFE:
--			if (ftr > 0)
-+			if (ftr > ftr_bits->safe_val)
- 				ftr--;
- 			break;
- 		case FTR_HIGHER_SAFE:
-@@ -252,7 +256,7 @@ uint64_t get_safe_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
- 			ftr = ftr_bits->safe_val;
- 			break;
- 		case FTR_LOWER_SAFE:
--			if (ftr > 0)
-+			if (ftr > ftr_bits->safe_val)
- 				ftr--;
- 			break;
- 		case FTR_HIGHER_SAFE:
-@@ -276,7 +280,7 @@ uint64_t get_invalid_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
- {
- 	uint64_t ftr_max = GENMASK_ULL(ARM64_FEATURE_FIELD_BITS - 1, 0);
- 
--	if (ftr_bits->type == FTR_UNSIGNED) {
-+	if (ftr_bits->sign == FTR_UNSIGNED) {
- 		switch (ftr_bits->type) {
- 		case FTR_EXACT:
- 			ftr = max((uint64_t)ftr_bits->safe_val + 1, ftr + 1);
-
-base-commit: 0dd3ee31125508cd67f7e7172247f05b7fd1753a
--- 
-2.43.0.381.gb435a96ce8-goog
+Hmm need to analyse it to make sure there are no cases where we leak
+some data to guest here in case where sock_hlen is set ...
+> -- 
+> 2.43.0
 
 
