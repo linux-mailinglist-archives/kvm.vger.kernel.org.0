@@ -1,130 +1,143 @@
-Return-Path: <kvm+bounces-6214-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6215-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19E9182D60B
-	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 10:34:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65EFC82D63A
+	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 10:42:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCE33281EDC
-	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 09:34:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 751BE1C214D5
+	for <lists+kvm@lfdr.de>; Mon, 15 Jan 2024 09:42:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30098F4F8;
-	Mon, 15 Jan 2024 09:34:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDBE5101DB;
+	Mon, 15 Jan 2024 09:42:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="kZq7oIgp"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ED38F4E7
-	for <kvm@vger.kernel.org>; Mon, 15 Jan 2024 09:34:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 316782F4;
-	Mon, 15 Jan 2024 01:35:14 -0800 (PST)
-Received: from [10.57.46.55] (unknown [10.57.46.55])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 58FCD3F6C4;
-	Mon, 15 Jan 2024 01:34:26 -0800 (PST)
-Message-ID: <4e3c051b-ccdb-47d4-9a29-5c92f5101a06@arm.com>
-Date: Mon, 15 Jan 2024 09:34:24 +0000
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04EF9F9D3;
+	Mon, 15 Jan 2024 09:42:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 367D240E016C;
+	Mon, 15 Jan 2024 09:41:59 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id gbcYK8KndIZR; Mon, 15 Jan 2024 09:41:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1705311716; bh=XBIKxlNsZUJPRPkrxlOi1GzgwTad37xoV2mYozz4U4g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kZq7oIgpoPYNJEFRmQ9JE48d2cPjKOwShniYdb8svdbjNuXaCXgkI4vm7t9jN3tk3
+	 0SyquZx6f4o+581UG8SQEF/a5JXBrhlewfKVgs0DWSPD7Xhu3x7KPorhxYHOrW/ZkW
+	 /WkS4JM23S0qQa6J6k/PMJ9/UFQC3c3EAtxAAudXnxy2OfmMr6GryU5ieNcRB0VUqF
+	 Kk56gR6BWxDGFlGlKPXEkv3AS1x2RjKgRjF4rN71FCEKHAR7JQV8a9ePmr0epXg4nr
+	 +K8OUef+fdVPdl9dDUwxnKAIEtAaEqwy5hTxtLcpu+fZI3TyrfY91wAV77MqGaQJX+
+	 I9TV8Vr7MDR6A+XR2gzKocxtwZwUaUPYPtI71n52jydUwNRUFbuLfcJmGPHLs6vmCc
+	 GT15I5hrWJ5oS44BqXuvuQz7Gn+RxvthADl5Xqp7KraalD4OGnhM3sIkHtrlPoA+SP
+	 ElIlzTj3x2wO4UdsT9YEgQcRKXep+r2BCZohCYiRrppaZJ8uagtla5VglupvrYmOSB
+	 Uz8ExwhjAP5m15h1O0Q7sQH1RYxDEBqFCXtAiJLE2g5DCXhPEhpyNgmdJIGvMFTeRG
+	 6p+xjuV3jBjkoXBYS7fHf89rG4lL2UmaOvBIU5i6yOHaa7F3eHhKV/VzYkAGlTfiYe
+	 I7Bqk/56DF97nG5LMUix8SaU=
+Received: from zn.tnic (pd9530f8c.dip0.t-ipconnect.de [217.83.15.140])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id AC6A940E01A9;
+	Mon, 15 Jan 2024 09:41:19 +0000 (UTC)
+Date: Mon, 15 Jan 2024 10:41:12 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Michael Roth <michael.roth@amd.com>
+Cc: x86@kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+	linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+	rientjes@google.com, tobin@ibm.com, vbabka@suse.cz,
+	kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+	pankaj.gupta@amd.com,
+	"liam.merwick@oracle.com Brijesh Singh" <brijesh.singh@amd.com>
+Subject: Re: [PATCH v1 12/26] crypto: ccp: Define the SEV-SNP commands
+Message-ID: <20240115094103.GFZaT9r4zX8V_ax8lv@fat_crate.local>
+References: <20231230161954.569267-1-michael.roth@amd.com>
+ <20231230161954.569267-13-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] KVM: arm64: selftests: Handle feature fields with
- nonzero minimum value correctly
-Content-Language: en-GB
-To: Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
- KVMARM <kvmarm@lists.linux.dev>,
- ARMLinux <linux-arm-kernel@lists.infradead.org>,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, James Morse <james.morse@arm.com>,
- Zenghui Yu <yuzenghui@huawei.com>, Itaru Kitayama <itaru.kitayama@linux.dev>
-References: <20240109165622.4104387-1-jingzhangos@google.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20240109165622.4104387-1-jingzhangos@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20231230161954.569267-13-michael.roth@amd.com>
 
-On 09/01/2024 16:56, Jing Zhang wrote:
-> There are some feature fields with nonzero minimum valid value. Make
-> sure get_safe_value() won't return invalid field values for them.
-> Also fix a bug that wrongly uses the feature bits type as the feature
-> bits sign causing all fields as signed in the get_safe_value() and
-> get_invalid_value().
+On Sat, Dec 30, 2023 at 10:19:40AM -0600, Michael Roth wrote:
+> From: Brijesh Singh <brijesh.singh@amd.com>
 > 
-> Fixes: 54a9ea73527d ("KVM: arm64: selftests: Test for setting ID register from usersapce")
-> Reported-by: Zenghui Yu <yuzenghui@huawei.com>
-> Reported-by: Itaru Kitayama <itaru.kitayama@linux.dev>
-> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> AMD introduced the next generation of SEV called SEV-SNP (Secure Nested
+> Paging). SEV-SNP builds upon existing SEV and SEV-ES functionality
+> while adding new hardware security protection.
+> 
+> Define the commands and structures used to communicate with the AMD-SP
+> when creating and managing the SEV-SNP guests. The SEV-SNP firmware spec
+> is available at developer.amd.com/sev.
+> 
+> Co-developed-by: Ashish Kalra <ashish.kalra@amd.com>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> [mdr: update SNP command list and SNP status struct based on current
+>       spec, use C99 flexible arrays, fix kernel-doc issues]
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
 > ---
->   .../selftests/kvm/aarch64/set_id_regs.c       | 20 +++++++++++++++----
->   1 file changed, 16 insertions(+), 4 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-> index bac05210b539..f17454dc6d9e 100644
-> --- a/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-> +++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-> @@ -224,13 +224,20 @@ uint64_t get_safe_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
->   {
->   	uint64_t ftr_max = GENMASK_ULL(ARM64_FEATURE_FIELD_BITS - 1, 0);
->   
-> -	if (ftr_bits->type == FTR_UNSIGNED) {
-> +	if (ftr_bits->sign == FTR_UNSIGNED) {
->   		switch (ftr_bits->type) {
->   		case FTR_EXACT:
->   			ftr = ftr_bits->safe_val;
->   			break;
->   		case FTR_LOWER_SAFE:
-> -			if (ftr > 0)
-> +			uint64_t min_safe = 0;
-> +
-> +			if (!strcmp(ftr_bits->name, "ID_AA64DFR0_EL1_DebugVer"))
-> +				min_safe = ID_AA64DFR0_EL1_DebugVer_IMP;
-> +			else if (!strcmp(ftr_bits->name, "ID_DFR0_EL1_CopDbg"))
-> +				min_safe = ID_DFR0_EL1_CopDbg_Armv8;
+>  drivers/crypto/ccp/sev-dev.c |  16 +++
+>  include/linux/psp-sev.h      | 264 +++++++++++++++++++++++++++++++++++
+>  include/uapi/linux/psp-sev.h |  56 ++++++++
+>  3 files changed, 336 insertions(+)
 
-Instead of hardcoding the safe value here in the code, why not "fix" the 
-safe value in the ftr_id table and use ftr_bits->safe_val for both the
-above cases ?
+More ignored feedback:
 
-> +
-> +			if (ftr > min_safe)
->   				ftr--;
->   			break;
->   		case FTR_HIGHER_SAFE:
-> @@ -252,7 +259,12 @@ uint64_t get_safe_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
->   			ftr = ftr_bits->safe_val;
->   			break;
->   		case FTR_LOWER_SAFE:
-> -			if (ftr > 0)
-> +			uint64_t min_safe = 0;
-> +
-> +			if (!strcmp(ftr_bits->name, "ID_DFR0_EL1_PerfMon"))
-> +				min_safe = ID_DFR0_EL1_PerfMon_PMUv3;
-> +
-> +			if (ftr > min_safe)
->   				ftr--;
+https://lore.kernel.org/r/20231124143630.GKZWC07hjqxkf60ni4@fat_crate.local
 
-Also, here, don't we need to type case both "ftr" and min_safe to 
-int64_t for signed features ?
+Lemme send it to you as a diff then - it'll work then perhaps.
 
-Suzuki
+diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+index 983d314b5ff5..1a76b5297f03 100644
+--- a/include/linux/psp-sev.h
++++ b/include/linux/psp-sev.h
+@@ -104,7 +104,7 @@ enum sev_cmd {
+ 	SEV_CMD_SNP_PAGE_RECLAIM	= 0x0C7,
+ 	SEV_CMD_SNP_PAGE_UNSMASH	= 0x0C8,
+ 	SEV_CMD_SNP_CONFIG		= 0x0C9,
+-	SEV_CMD_SNP_DOWNLOAD_FIRMWARE_EX	= 0x0CA,
++	SEV_CMD_SNP_DOWNLOAD_FIRMWARE_EX = 0x0CA,
+ 	SEV_CMD_SNP_COMMIT		= 0x0CB,
+ 	SEV_CMD_SNP_VLEK_LOAD		= 0x0CD,
+ 
+@@ -624,7 +624,8 @@ enum {
+  * @gctx_paddr: system physical address of guest context page
+  * @page_size: page size 0 indicates 4K and 1 indicates 2MB page
+  * @page_type: encoded page type
+- * @imi_page: indicates that this page is part of the IMI of the guest
++ * @imi_page: indicates that this page is part of the IMI (Incoming
++ * Migration Image) of the guest
+  * @rsvd: reserved
+  * @rsvd2: reserved
+  * @address: system physical address of destination page to encrypt
 
->   			break;
->   		case FTR_HIGHER_SAFE:
-> @@ -276,7 +288,7 @@ uint64_t get_invalid_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
->   {
->   	uint64_t ftr_max = GENMASK_ULL(ARM64_FEATURE_FIELD_BITS - 1, 0);
->   
-> -	if (ftr_bits->type == FTR_UNSIGNED) {
-> +	if (ftr_bits->sign == FTR_UNSIGNED) {
->   		switch (ftr_bits->type) {
->   		case FTR_EXACT:
->   			ftr = max((uint64_t)ftr_bits->safe_val + 1, ftr + 1);
-> 
-> base-commit: 0dd3ee31125508cd67f7e7172247f05b7fd1753a
+-- 
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
 
