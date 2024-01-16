@@ -1,147 +1,138 @@
-Return-Path: <kvm+bounces-6351-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6352-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AAFB82F317
-	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 18:21:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A3B482F3B0
+	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 19:09:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1534128561C
-	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 17:21:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39C2D28654B
+	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 18:09:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02ACB1CD05;
-	Tue, 16 Jan 2024 17:20:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BFB21CD2A;
+	Tue, 16 Jan 2024 18:08:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="grBawxMW"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Ve8Faakb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 194AE1CA92
-	for <kvm@vger.kernel.org>; Tue, 16 Jan 2024 17:20:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA32F6ABA;
+	Tue, 16 Jan 2024 18:08:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705425647; cv=none; b=Nad8qg+zgVI4K4owhkf+0+G7a0MylCKR5M7rrd3cQ7zmYdKuKWA40rtJIC3JU7dxoOzr2y11ie6hNep2LmXxregh1RE4SQiFJkTGvtM6RQsm2kQe+HC2t1VUUrqO+63nODfEwg/CoBM+yeH+wxRsX1v5yA4TfZBVsM7JoEsTjao=
+	t=1705428527; cv=none; b=SmNLEq0GY7bzhp92E+sIMQwHflG5zVfHKa65A65rtmYdjymCf5f0XV0mH36Q4j3wPxeDTpb1rtnX3fBcZDfY6i0urVC7biTSi0wk0yaMhZ2mWTcdZ8kQyctN/NxJ/qAhWPY7/Eg4jzLdUZvXpiQfXuUsGcQNz65n7yK9F4CtA3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705425647; c=relaxed/simple;
-	bh=tnRy3jWG4+OwIbi8OFvCp/HqFPWFwcstEM2fzjh9K0E=;
-	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Date:
-	 In-Reply-To:Mime-Version:References:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=a8rFEpyGswsYDmb40+sOC7U+KQKcmbubgYDMjApqVtoUM8IJGb51b2yb+lZvENHCmJcbtRsvCbsUf4LYa6rDIpiUc0a3U+2KPZhectIod/2DCTA2xeIaeWaXfLRU6uRnXs7urd5okoMn0h6bpjxONKdlfZcSgXhMsbOpp2dGxLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=grBawxMW; arc=none smtp.client-ip=209.85.128.201
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5e9de9795dfso189573317b3.0
-        for <kvm@vger.kernel.org>; Tue, 16 Jan 2024 09:20:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1705425641; x=1706030441; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=clNdxL3spBiROjgCSpV36akIqm7jAf49yzjKH1UtjfE=;
-        b=grBawxMWJiqgfnZmk0IxICqeOhfuMbvdhweSYKny+6e2nUK2KbssCihhckAkhMqZEd
-         t+ikpkvzKqnNpp1ECzKCtujPhxawZYDoWZVlqRQSDWlh5OgV2d9qtX3GWTv7IKMGe+dh
-         uIsVw//Qx0RD50BtbiaATKfyeocjJZBy/RMEPXaNEgO4PuddfM568X/TpNDEkUlrYMEO
-         KzBP9Auszx7fiqpQfUuHpPMejdo7q/i+OrQxUW9x1dzVtO33K5x1S4JKrGb8eV3EINGF
-         IBFq/nJFB8jl/rEQob+zOmJ82oPvQgMTc3Akg+hyHBWMO6+PW8TtGKGNN2ue9M8SytvO
-         SpMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705425641; x=1706030441;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=clNdxL3spBiROjgCSpV36akIqm7jAf49yzjKH1UtjfE=;
-        b=FliieHtUlyA5AYE4NqHvxZqcbEDmmmz44KQF5tYa3dw8jhcEwrKESFr+YZ1iXpMRa4
-         LMwcnl7JN3Tld4ubV3gT8E/XKkr3VajmiRCcBY6l2Aq7qKque3PK89/4JRTOaDfpYXln
-         ZZowTWDkmhHXpzkqzzmrxg/hsveXqXz3olg8m4XYJN5kNwYVqbCSE6GqtSsRWJZYIAYL
-         +6HzUAkJ61Uf2ADr/Wu6NdE3cSrRNtTbawsi+chwCURrZXZZhLx1DG6d6k9bZk/vkDiY
-         Qkz3RCI3QNf47ZAnYMsS/Sl4DsPYVGBYAIskDtsqTG/D8abdNblsY0kJO5j59p7wMP3S
-         SVvA==
-X-Gm-Message-State: AOJu0YxPZ+GwBCVAOSPYBDRRH3a5W/pN05eWz4n48eavkGwwEhhMQ86l
-	vAAzpCdxNMoAv61+GSJSl6uRdAx3yrJ5QX3EtA==
-X-Google-Smtp-Source: AGHT+IEa8FYhTZbg1Grsnfnbe1lAtRLd0Lu5zVL6RIJlU788VzmSGiCHMQ/3GdhuUMVq+NOCaEYXe+qYFyU=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:564:b0:dc2:26f8:91f with SMTP id
- a4-20020a056902056400b00dc226f8091fmr479444ybt.8.1705425641075; Tue, 16 Jan
- 2024 09:20:41 -0800 (PST)
-Date: Tue, 16 Jan 2024 09:20:39 -0800
-In-Reply-To: <ef81ff36-64bb-4cfe-ae9b-e3acf47bff24@proxmox.com>
+	s=arc-20240116; t=1705428527; c=relaxed/simple;
+	bh=CGsnDROhCodxiCvYY3JgqSrViuyF9ZSQMhYlWQDj+aA=;
+	h=Received:DKIM-Signature:Received:Received:Received:Received:
+	 Received:Received:Received:Received:Received:Date:From:To:Cc:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To:X-TM-AS-GCONF:
+	 X-Proofpoint-ORIG-GUID:X-Proofpoint-GUID:
+	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details; b=u59nnEeHSGdssjaGoRXpvNs9Q/gUMe49AjVhlgyao06LayAa/WzZB95yC2gIL9Y9VoWS7jroIwhIUqLpYpQUNv8mf1nu7JWWXGJX11h5oBkvuB0eR1OenmqrQe0j6SZdH2Y2w0FCbVd6hKIeioV8k67x2s3ks9rTNNQsjZNttIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Ve8Faakb; arc=none smtp.client-ip=148.163.156.1
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40GI79xW013088;
+	Tue, 16 Jan 2024 18:08:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=VMRRoZGEbNDKMzcsIuD608LUrCeDX/CHVCbe+ZNWqug=;
+ b=Ve8FaakbyzKYUs1fwZqy6sK8N2oaMzasCMvWb3IoNbY+vWWjmvXIPF+L/MaRnVL47vCY
+ 27Jige9DiFs99GqKmHrc2WSZF3pxvwJyrlWfesNHPN9ajoF6Hm4jv/LoNBp5Jl+trsZk
+ yglL1b8wpGLYG7FwQi4xVXhlRnzKxHzexdu5pVW/scLhdnrUMo3g/NcV64ZTXXs6P6qj
+ 48yKPQZ2qxM3ZC2JNISKkiI3dglznLQSdZc7UaRHTuLBNguXCV8Cq/IsDF59mklX/vW1
+ 04x89KAzXbILEC4bkLKOG1wmBB9weeqfOroflNMUOznrPt8Gycx3ErT10TKcqan5Mcnf 9Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vnxswr58v-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 16 Jan 2024 18:08:41 +0000
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 40GI7NTO014282;
+	Tue, 16 Jan 2024 18:08:27 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vnxswr431-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 16 Jan 2024 18:08:26 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 40GGSV6H019884;
+	Tue, 16 Jan 2024 18:08:11 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3vm72jyw89-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 16 Jan 2024 18:08:11 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 40GI86sD18875094
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 16 Jan 2024 18:08:06 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6BF1220043;
+	Tue, 16 Jan 2024 18:08:06 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 53E5720040;
+	Tue, 16 Jan 2024 18:08:05 +0000 (GMT)
+Received: from li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com (unknown [9.171.88.12])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Tue, 16 Jan 2024 18:08:05 +0000 (GMT)
+Date: Tue, 16 Jan 2024 19:08:03 +0100
+From: Alexander Gordeev <agordeev@linux.ibm.com>
+To: Tony Krowiak <akrowiak@linux.ibm.com>
+Cc: linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, jjherne@linux.ibm.com, borntraeger@de.ibm.com,
+        pasic@linux.ibm.com, pbonzini@redhat.com, frankja@linux.ibm.com,
+        imbrenda@linux.ibm.com, alex.williamson@redhat.com,
+        kwankhede@nvidia.com, gor@linux.ibm.com, stable@vger.kernel.org
+Subject: Re: [PATCH v4 4/6] s390/vfio-ap: reset queues filtered from the
+ guest's AP config
+Message-ID: <ZabGAx5BpIiYW+b3@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+References: <20240115185441.31526-1-akrowiak@linux.ibm.com>
+ <20240115185441.31526-5-akrowiak@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <832697b9-3652-422d-a019-8c0574a188ac@proxmox.com>
- <ZaAQhc13IbWk5j5D@google.com> <ef81ff36-64bb-4cfe-ae9b-e3acf47bff24@proxmox.com>
-Message-ID: <Zaa654hwFKba_7pf@google.com>
-Subject: Re: Temporary KVM guest hangs connected to KSM and NUMA balancer
-From: Sean Christopherson <seanjc@google.com>
-To: Friedrich Weber <f.weber@proxmox.com>
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240115185441.31526-5-akrowiak@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: qr-HNzAfCi4ZJhU7UfWPkVpaO4WRdxRE
+X-Proofpoint-GUID: KpFaRAXl_1zNmYew_c9e92rP3dK_QZU6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-16_10,2024-01-16_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
+ mlxscore=0 suspectscore=0 clxscore=1011 spamscore=0 phishscore=0
+ priorityscore=1501 impostorscore=0 malwarescore=0 mlxlogscore=875
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2401160143
 
-On Tue, Jan 16, 2024, Friedrich Weber wrote:
-> Hi Sean,
-> 
-> On 11/01/2024 17:00, Sean Christopherson wrote:
-> > This is a known issue.  It's mostly a KVM bug[...] (fix posted[...]), but I suspect
-> > that a bug in the dynamic preemption model logic[...] is also contributing to the
-> > behavior by causing KVM to yield on preempt models where it really shouldn't.
-> 
-> I tried the following variants now, each applied on top of 6.7 (0dd3ee31):
-> 
-> * [1], the initial patch series mentioned in the bugreport ("[PATCH 0/2]
-> KVM: Pre-check mmu_notifier retry on x86")
-> * [2], its v2 that you linked above ("[PATCH v2] KVM: x86/mmu: Retry
-> fault before acquiring mmu_lock if mapping is changing")
-> * [3], the scheduler patch you linked above ("[PATCH] sched/core: Drop
-> spinlocks on contention iff kernel is preemptible")
-> * both [2] & [3]
-> 
-> My kernel is PREEMPT_DYNAMIC and, according to
-> /sys/kernel/debug/sched/preempt, defaults to preempt=voluntary. For case
-> [3], I additionally tried manually switching to preempt=full.
-> 
-> Provided I did not mess up, I get the following results for the
-> reproducer I posted:
-> 
-> * [1] (the initial patch series): no hangs
-> * [2] (its v2): hangs
-> * [3] (the scheduler patch) with preempt=voluntary: no hangs
-> * [3] (the scheduler patch) with preempt=full: hangs
-> * [2] & [3]: no hangs
-> 
-> So it seems like:
-> 
-> * [1] (the initial patch series) fixes the hangs, which is consistent
-> with the feedback in the bugreport [4].
-> * But weirdly, its v2 [2] does not fix the hangs.
-> * As long as I stay with preempt=voluntary, [3] (the scheduler patch)
-> alone is already enough to fix the hangs in my case -- this I did not
-> expect :)
-> 
-> Does this make sense to you? Happy to double-check or run more tests if
-> anything seems off.
- 
-Ha!  It too me a few minutes to realize what went sideways with v2.  KVM has an
-in-flight change that switches from host virtual addresses (HVA) to guest physical
-frame numbers (GFN) for the retry check, commit 8569992d64b8 ("KVM: Use gfn instead
-of hva for mmu_notifier_retry").
+On Mon, Jan 15, 2024 at 01:54:34PM -0500, Tony Krowiak wrote:
+> From: Tony Krowiak <akrowiak@linux.ibm.com>
+...
+> diff --git a/drivers/s390/crypto/vfio_ap_private.h b/drivers/s390/crypto/vfio_ap_private.h
+> index 88aff8b81f2f..20eac8b0f0b9 100644
+> --- a/drivers/s390/crypto/vfio_ap_private.h
+> +++ b/drivers/s390/crypto/vfio_ap_private.h
+> @@ -83,10 +83,10 @@ struct ap_matrix {
+>  };
+>  
+>  /**
+> - * struct ap_queue_table - a table of queue objects.
+> - *
+> - * @queues: a hashtable of queues (struct vfio_ap_queue).
+> - */
+> +  * struct ap_queue_table - a table of queue objects.
+> +  *
+> +  * @queues: a hashtable of queues (struct vfio_ap_queue).
+> +  */
+>  struct ap_queue_table {
+>  	DECLARE_HASHTABLE(queues, 8);
+>  };
 
-That commit is in the KVM pull request for 6.8, and so v2 is based on top of a
-branch that contains said commit.  But for better or worse (probably worse), the
-switch from HVA=GFN didn't change the _names_ of mmu_invalidate_range_{start,end},
-only the type.  So v2 applies and compiles cleanly on 6.7, but it's subtly broken
-because checking for a GFN match against an HVA range is all but guaranteed to get
-false negatives.
-
-If you can try v2 on top of `git://git.kernel.org/pub/scm/virt/kvm/kvm.git next`,
-that would be helpful to confirm that I didn't screw up something else.
-
-Thanks very much for reporting back!  I'm pretty sure we would have missed the
-semantic conflict when backporting the fix to 6.7 and earlier, i.e. you likely
-saved us from another round of bug reports for various stable trees.
+If this change is intended?
 
