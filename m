@@ -1,53 +1,56 @@
-Return-Path: <kvm+bounces-6330-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6331-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5325882ED85
-	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 12:16:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40C0582ED8B
+	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 12:17:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B841F1F23DF0
-	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 11:16:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C86CE28452E
+	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 11:17:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 741B11B7FC;
-	Tue, 16 Jan 2024 11:16:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B2D41B950;
+	Tue, 16 Jan 2024 11:17:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Y0DhfoSl"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="VXjeM15G"
 X-Original-To: kvm@vger.kernel.org
 Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F24DD1B7F2
-	for <kvm@vger.kernel.org>; Tue, 16 Jan 2024 11:16:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 394F91B940;
+	Tue, 16 Jan 2024 11:17:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:Date:Cc:To:
-	From:Subject:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=N8T6WV+pzDSIO9X58e2KVRAd1AXK1q3a8AOiVLfu/TY=; b=Y0DhfoSlCYzr1kWYWVmUnlYHSy
-	hdugokVKa4JAsRuF9+MPQqZ51Y0CBT25NHDhPhi6JOK/th6Jrmipb4nXcK310PO7RBwbIwVpG/WRt
-	Ygmj4JjZu+j6ziI2AH4NFCWq3LfUxl07dl0oIR2cC/U0CjRUEmf7jh+VpaZoIxKd5QMmmB56GOyd8
-	kKkkJ6XD6R5jsDdOxPfXlcpLgegxyH/0UYYjslkP56W9wy0GZ+OYiwnfovCip4AhfwdAPM9ynqN1D
-	V/l03IK7QUPVxoXc/uxqLkhWWnJxQCBWGmhxxCoY6qk5eqxzqpuayoP9dg9CrpvwjKE92LbwLrim4
-	appUx3dQ==;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=SK6gx6g0O9JSiWmXP/5FPXcIdBR9uH8U+TuquhAIE+w=; b=VXjeM15GPpqINP9mSZ7arMsL4Z
+	kI6v3hxZvNUoxsKkkdrfsbVFAOuFg6Qxk1/y7/c8pZpnz3S64DwGX8vwQ+9T5rbEtnaDK11r6emGQ
+	AzSsQFu9runRzOcORRmKdthQ6abRkQgt7LUHIc/CQzk9ySM55oQa02BA+c1RHzltY61tZgvGl1Zy4
+	6vuqnTYAkPAPuFBjOqyrFpeohCP6X97YhqcYWG9rIeenbi8G7Ns468g46ZIFre+Cin8kwrtrcoXUs
+	ByOOIN7ARBwoDnJ3Eimu9pHOUFEob3Zp2AtNksZVaJK7jAqeGBGM+nQ1TtwPVKs7DibXnCotgll7+
+	nD72MZyw==;
 Received: from [54.239.6.184] (helo=daas-dns-lhr50-9.e-lhr50.amazon.com)
 	by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-	id 1rPhQo-00Cmjv-4r; Tue, 16 Jan 2024 11:16:34 +0000
-Message-ID: <0717051e9379614721483aaef29572e0356cd347.camel@infradead.org>
-Subject: [PATCH v3] KVM: x86/xen: Inject vCPU upcall vector when local APIC
- is enabled
+	id 1rPhRv-00Cmmx-IP; Tue, 16 Jan 2024 11:17:43 +0000
+Message-ID: <78d43f46d3a0e6368cdcc28a67a102da8599034f.camel@infradead.org>
+Subject: Re: [PATCH v3] KVM: x86/xen: improve accuracy of Xen timers
 From: David Woodhouse <dwmw2@infradead.org>
-To: kvm <kvm@vger.kernel.org>
+To: paul@xen.org, kvm@vger.kernel.org, linux-kernel
+ <linux-kernel@vger.kernel.org>
 Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
  <pbonzini@redhat.com>,  Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar
  <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
  <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin"
- <hpa@zytor.com>,  Paul Durrant <paul@xen.org>
-Date: Tue, 16 Jan 2024 12:16:33 +0100
+ <hpa@zytor.com>
+Date: Tue, 16 Jan 2024 12:17:42 +0100
+In-Reply-To: <f80753b3-2e68-487c-8304-fe801534748a@gmail.com>
+References: <afc496b886bc46b956ede716d8db6f208e7bab0a.camel@infradead.org>
+	 <f80753b3-2e68-487c-8304-fe801534748a@gmail.com>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-8mYdEa4ia2RmOgvCVsno"
+	boundary="=-wBkOHYCZim5yjylDsUJB"
 User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -58,163 +61,103 @@ MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
 
---=-8mYdEa4ia2RmOgvCVsno
+--=-wBkOHYCZim5yjylDsUJB
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-From: David Woodhouse <dwmw@amazon.co.uk>
+On Fri, 2023-12-15 at 09:07 +0000, Durrant, Paul wrote:
+> On 14/12/2023 16:54, David Woodhouse wrote:
+> > From: David Woodhouse <dwmw@amazon.co.uk>
+> >=20
+> > A test program such as http://david.woodhou.se/timerlat.c=C2=A0confirms=
+ user
+> > reports that timers are increasingly inaccurate as the lifetime of a
+> > guest increases. Reporting the actual delay observed when asking for
+> > 100=C2=B5s of sleep, it starts off OK on a newly-launched guest but get=
+s
+> > worse over time, giving incorrect sleep times:
+> >=20
+> > root@ip-10-0-193-21:~# ./timerlat -c -n 5
+> > 00000000 latency 103243/100000 (3.2430%)
+> > 00000001 latency 103243/100000 (3.2430%)
+> > 00000002 latency 103242/100000 (3.2420%)
+> > 00000003 latency 103245/100000 (3.2450%)
+> > 00000004 latency 103245/100000 (3.2450%)
+> >=20
+> > The biggest problem is that get_kvmclock_ns() returns inaccurate values
+> > when the guest TSC is scaled. The guest sees a TSC value scaled from th=
+e
+> > host TSC by a mul/shift conversion (hopefully done in hardware). The
+> > guest then converts that guest TSC value into nanoseconds using the
+> > mul/shift conversion given to it by the KVM pvclock information.
+> >=20
+> > But get_kvmclock_ns() performs only a single conversion directly from
+> > host TSC to nanoseconds, giving a different result. A test program at
+> > http://david.woodhou.se/tsdrift.c=C2=A0demonstrates the cumulative erro=
+r
+> > over a day.
+> >=20
+> > It's non-trivial to fix get_kvmclock_ns(), although I'll come back to
+> > that. The actual guest hv_clock is per-CPU, and *theoretically* each
+> > vCPU could be running at a *different* frequency. But this patch is
+> > needed anyway because...
+> >=20
+> > The other issue with Xen timers was that the code would snapshot the
+> > host CLOCK_MONOTONIC at some point in time, and then... after a few
+> > interrupts may have occurred, some preemption perhaps... would also rea=
+d
+> > the guest's kvmclock. Then it would proceed under the false assumption
+> > that those two happened at the *same* time. Any time which *actually*
+> > elapsed between reading the two clocks was introduced as inaccuracies
+> > in the time at which the timer fired.
+> >=20
+> > Fix it to use a variant of kvm_get_time_and_clockread(), which reads th=
+e
+> > host TSC just *once*, then use the returned TSC value to calculate the
+> > kvmclock (making sure to do that the way the guest would instead of
+> > making the same mistake get_kvmclock_ns() does).
+> >=20
+> > Sadly, hrtimers based on CLOCK_MONOTONIC_RAW are not supported, so Xen
+> > timers still have to use CLOCK_MONOTONIC. In practice the difference
+> > between the two won't matter over the timescales involved, as the
+> > *absolute* values don't matter; just the delta.
+> >=20
+> > This does mean a new variant of kvm_get_time_and_clockread() is needed;
+> > called kvm_get_monotonic_and_clockread() because that's what it does.
+> >=20
+> > Fixes: 536395260582 ("KVM: x86/xen: handle PV timers oneshot mode")
+> > Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+> > ---
+> > v3:
+> > =C2=A0=C2=A0=C2=A0 =E2=80=A2 Rebase and repost.
+> >=20
+> > v2:
+> > =C2=A0=C2=A0=C2=A0 =E2=80=A2 Fall back to get_kvmclock_ns() if vcpu-arc=
+h.hv_clock isn't set up
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 yet, with a big comment explaining why t=
+hat's actually OK.
+> > =C2=A0=C2=A0=C2=A0 =E2=80=A2 Fix do_monotonic() *not* to add the boot t=
+ime offset.
+> > =C2=A0=C2=A0=C2=A0 =E2=80=A2 Rename do_monotonic_raw() =E2=86=92 do_kvm=
+clock_base() and add a comment
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 to make it clear that it *does* add the =
+boot time offset. That
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 was just left as a bear trap for the unw=
+ary developer, wasn't it?
+> >=20
+> > =C2=A0 =C2=A0arch/x86/kvm/x86.c |=C2=A0 61 +++++++++++++++++++++--
+> > =C2=A0 =C2=A0arch/x86/kvm/x86.h |=C2=A0=C2=A0 1 +
+> > =C2=A0 =C2=A0arch/x86/kvm/xen.c | 121 +++++++++++++++++++++++++++++++++=
++-----------
+> > =C2=A0 =C2=A03 files changed, 149 insertions(+), 34 deletions(-)
+> >=20
+>=20
+> Reviewed-by: Paul Durrant <paul@xen.org>
 
-Linux guests since commit b1c3497e604d ("x86/xen: Add support for
-HVMOP_set_evtchn_upcall_vector") in v6.0 onwards will use the per-vCPU
-upcall vector when it's advertised in the Xen CPUID leaves.
-
-This upcall is injected through the local APIC as an MSI, unlike the
-older system vector which was merely injected by the hypervisor any time
-the CPU was able to receive an interrupt and the upcall_pending flags is
-set in its vcpu_info.
-
-Effectively, that makes the per-CPU upcall edge triggered instead of
-level triggered.
-
-We lose edges.
-
-Specifically, when the local APIC is *disabled*, delivering the MSI
-will fail. Xen checks the vcpu_info->evtchn_upcall_pending flag when
-enabling the local APIC for a vCPU and injects the vector immediately
-if so.
-
-Since userspace doesn't get to notice when the guest enables a local
-APIC which is emulated in KVM, KVM needs to do the same.
-
-Astute reviewers may note that kvm_xen_inject_vcpu_vector() function has
-a WARN_ON_ONCE() in the case where kvm_irq_delivery_to_apic_fast() fails
-and returns false. In the case where the MSI is not delivered due to the
-local APIC being disabled, kvm_irq_delivery_to_apic_fast() still returns
-true but the value in *r is zero. So the WARN_ON_ONCE() remains correct,
-as that case should still never happen.
-
-Fixes: fde0451be8fb3 ("KVM: x86/xen: Support per-vCPU event channel upcall =
-via local APIC")
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-Reviewed-by: Paul Durrant <paul@xen.org>
-Cc: stable@vger.kernel.org
----
- v3: Repost, add Cc:stable
- v2: Add Fixes: tag.
-
-=C2=A0arch/x86/kvm/lapic.c |=C2=A0 5 ++++-
-=C2=A0arch/x86/kvm/xen.c=C2=A0=C2=A0 |=C2=A0 2 +-
-=C2=A0arch/x86/kvm/xen.h=C2=A0=C2=A0 | 18 ++++++++++++++++++
-=C2=A03 files changed, 23 insertions(+), 2 deletions(-)
-
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 3242f3da2457..1e715ca717bc 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -41,6 +41,7 @@
-=C2=A0#include "ioapic.h"
-=C2=A0#include "trace.h"
-=C2=A0#include "x86.h"
-+#include "xen.h"
-=C2=A0#include "cpuid.h"
-=C2=A0#include "hyperv.h"
-=C2=A0#include "smm.h"
-@@ -499,8 +500,10 @@ static inline void apic_set_spiv(struct kvm_lapic *api=
-c, u32 val)
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-=C2=A0
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* Check if there are APF p=
-age ready requests pending */
--=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (enabled)
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (enabled) {
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0kvm_make_request(KVM_REQ_APF_READY, apic->vcpu);
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0kvm_xen_enable_lapic(apic->vcpu);
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-=C2=A0}
-=C2=A0
-=C2=A0static inline void kvm_apic_set_xapic_id(struct kvm_lapic *apic, u8 i=
-d)
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index 972098ec4f6a..7a0e3f7a9d20 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -483,7 +483,7 @@ void kvm_xen_update_runstate(struct kvm_vcpu *v, int st=
-ate)
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0kvm_xen_update_runstate_guest(v, state =3D=3D RUNSTATE=
-_runnable);
-=C2=A0}
-=C2=A0
--static void kvm_xen_inject_vcpu_vector(struct kvm_vcpu *v)
-+void kvm_xen_inject_vcpu_vector(struct kvm_vcpu *v)
-=C2=A0{
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct kvm_lapic_irq irq =
-=3D { };
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int r;
-diff --git a/arch/x86/kvm/xen.h b/arch/x86/kvm/xen.h
-index f8f1fe22d090..8eba3943b246 100644
---- a/arch/x86/kvm/xen.h
-+++ b/arch/x86/kvm/xen.h
-@@ -18,6 +18,7 @@ extern struct static_key_false_deferred kvm_xen_enabled;
-=C2=A0
-=C2=A0int __kvm_xen_has_interrupt(struct kvm_vcpu *vcpu);
-=C2=A0void kvm_xen_inject_pending_events(struct kvm_vcpu *vcpu);
-+void kvm_xen_inject_vcpu_vector(struct kvm_vcpu *vcpu);
-=C2=A0int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_=
-attr *data);
-=C2=A0int kvm_xen_vcpu_get_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_=
-attr *data);
-=C2=A0int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *da=
-ta);
-@@ -36,6 +37,19 @@ int kvm_xen_setup_evtchn(struct kvm *kvm,
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 const=
- struct kvm_irq_routing_entry *ue);
-=C2=A0void kvm_xen_update_tsc_info(struct kvm_vcpu *vcpu);
-=C2=A0
-+static inline void kvm_xen_enable_lapic(struct kvm_vcpu *vcpu)
-+{
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/*
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * The local APIC is being enabl=
-ed. If the per-vCPU upcall vector is
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * set and the vCPU's evtchn_upc=
-all_pending flag is set, inject the
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * interrupt.
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (static_branch_unlikely(&kvm_=
-xen_enabled.key) &&
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vcpu->arch.xe=
-n.vcpu_info_cache.active &&
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vcpu->arch.xe=
-n.upcall_vector && __kvm_xen_has_interrupt(vcpu))
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0kvm_xen_inject_vcpu_vector(vcpu);
-+}
-+
-=C2=A0static inline bool kvm_xen_msr_enabled(struct kvm *kvm)
-=C2=A0{
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return static_branch_unlike=
-ly(&kvm_xen_enabled.key) &&
-@@ -101,6 +115,10 @@ static inline void kvm_xen_destroy_vcpu(struct kvm_vcp=
-u *vcpu)
-=C2=A0{
-=C2=A0}
-=C2=A0
-+static inline void kvm_xen_enable_lapic(struct kvm_vcpu *vcpu)
-+{
-+}
-+
-=C2=A0static inline bool kvm_xen_msr_enabled(struct kvm *kvm)
-=C2=A0{
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return false;
---=20
-2.34.1
+Ping?
 
 
-
---=-8mYdEa4ia2RmOgvCVsno
+--=-wBkOHYCZim5yjylDsUJB
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -306,25 +249,25 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwMTE2MTExNjMzWjAvBgkqhkiG9w0BCQQxIgQgKwkzCbnx
-SJcSONP1g+wsBeEwzjN6QsWEEJMOGXARU3Awgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwMTE2MTExNzQyWjAvBgkqhkiG9w0BCQQxIgQg9BTjuXnY
+p5Iin267dpz0Z4hCzyHDp35CEDLHjvDPwLQwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgB4UdpYFyhScQbO8u0fqzZGMC3ORy8P60c4
-gX2tLbhBHqcyexLuFTopZBB6Crfut2PjH5PxFq89MGKsuuupNeOQyM96xdu49XUpev19/oM+o0ZM
-45UQTYa0oKvsmgrEehM1YZHcXlXZcT+abnCseTXrKwLInWIRLm/wxsoqdBtr9pLAqW8uOM4dhX73
-sa0CAFtnXWfci78tVKpYfRjTFGPzf3hmEJbLNkxEG80jup1mawbmeelY2Ye0fVwZkO2stQtslOE7
-EF+MvvQtdFfadbLoCojARg5puqfWUuFTuxjGi0Nb4Mdavihr5s0TRpH9Pke5bME3YFf7mn++deBI
-zyPHVN51hJLx14NgK9/SeaYfy6NMwHOFt8Ysi9hLlsENBDqvg/aIpkpPI4b3g5AfJi5ybavwK1EH
-+zca2xRa1HR0chx5uYgggb6pjHHVi9iCcL6o5GcEl1luRq8iyilok5kU/HHXwAqH/eEtV/ZBRZHY
-nTnnI6xsH6KhPl8fXaBd3G6bvQK4WNH4y7kn8ZhxVN06vpXDJeEwKjrnbB+wxfdpm0zJtKh1V+6b
-RGmNazrgUIEEOoxAZbumXRSYDdI+ppc1M1A6E+ojZz5jrQ6xd3pW1jxOlx0MXMiTWiAGwmSW5D6T
-zY9wOlaIoPdVneKczk6xYWCxpFRaWP4gg/mZXv/vpAAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBXwCMXIx6ktsiS5gw8Bw6s4riFGYPeRTsu
+v81aV7MghC8eKCzSFLFNwEyTMhUqaaVdFJVy+wY+4Z6Vxz2osLyvG3+8Oa8WRURgYoxdzHXEcKBi
+HPB8LoxzwhjczxTtJWyi1XKOV07MLVuxfN4bqaNEiWNAVCy+K9S3gTtSV83gKXJPe0I/Mu1l34ev
+mQE7ijM8B9OEiohWoWL27yp2XNjKObdWsxDx7U+tdgqELF9dmY3Jc2Qahe8LaugPG4TSVMtqoVld
+zjwS8vQlQVDee5STD5LdyOJq5PEeDiVbRdQoLxb7Fq3253Xc8CzFNC6alKlq9RWOZCD3Ro9o8L9p
+EAPJYzlhEXezDj0l5VwK+D2EiO63G2J1UAGpseoK7UqM0cR8QLU8FFeL+6TRZg33Nuk2DUsxeLPJ
+/O3UlZbPYKa1BAdreTYKIv4p867J95ZOXH0PyDVAvZtIAxhLcG9hLku8NQ6gKaGfmmmJpAHapMwo
+sXEzXDVUT4lZrB+cETTXsOnq+7gTF/JExtPB1LMyq+VVN1V6pzbw/T4cCwUu3Q163ApBz6ec54DY
+hVainVoeBizlu8EoJ2vM4CNLbpjQcbF31MsVgcYDTBVpQZPkI4Zs2hLCMqJugML18//GVZ3Uk7PP
+FmvugLx3sKyhv9jmydimy/NELhHUbq82MTxd8Xxo+gAAAAAAAA==
 
 
---=-8mYdEa4ia2RmOgvCVsno--
+--=-wBkOHYCZim5yjylDsUJB--
 
