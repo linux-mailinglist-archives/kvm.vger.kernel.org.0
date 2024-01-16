@@ -1,37 +1,37 @@
-Return-Path: <kvm+bounces-6302-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6303-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F3BE82E766
-	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 02:45:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51E2B82E791
+	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 02:50:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A8CDC1F23957
-	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 01:45:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96F5C284D73
+	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 01:49:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8977C35F1A;
-	Tue, 16 Jan 2024 01:08:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8309445971;
+	Tue, 16 Jan 2024 01:08:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f2Zhybog"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k12VwZU7"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5C4B35EFB;
-	Tue, 16 Jan 2024 01:08:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 130D6C433A6;
-	Tue, 16 Jan 2024 01:08:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD9D845033;
+	Tue, 16 Jan 2024 01:08:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8811C43141;
+	Tue, 16 Jan 2024 01:08:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705367306;
-	bh=oeMf3VUx8WQUb7JBKD9kWyOk/wGmCpSrwycd/tDKREQ=;
+	s=k20201202; t=1705367329;
+	bh=3iYdslzpkXnRHuYnBqf0hdYgFBmOQwoJSadwT1oJERA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=f2ZhybogP44jtWF7W0eBznPRl07aWoEta/c6RB44nCFqUoEWIYUfrwiSmos8q/Zj4
-	 yu5qP5allSJdyadyHas+iOpXTk78HSIuX+8a/UlyO0tu5bcOz6WcU30yYZrO3JkljP
-	 bJ/EFeEUjX4aqn/RRLVguj6a7IfqaBANOzrJmoGDFjfWfGle5jHcOsLvJ1cSQKytT6
-	 ylwoeDvPqoNCfJnZg2ZdDoKwGiZ90fMocHBNCYdslNTtp07/SQMvJVeBK74+Cf0UW6
-	 uqVNJ65RCq7hp6JMNjKu7O+4eVHBo14d0/Pexh7K+e1vrG6LFi+al4tp4nAykayOMf
-	 EixEk5Vz4MxsA==
+	b=k12VwZU7Qcpes4QQfnzooOgkWs7kP3Iirws4uXjzRqD/Cbr7It7NGHlHSbCsCx8bD
+	 lzh1uwJ8dokhd4EoXVxIUNNWq0nn8NrBh+GqUo2yqTiI7tXTE/woXj5zQhMFHTUH5w
+	 Arc0ZwpIOCO28zhpqX8kVChR5S6S+G2dOwfSjvk8yUJQT/A7B5FkECD0i1By4gj3dx
+	 BkZt4JqGyuCCduTJFRER+5lv1+mQGmrb/HLgvsZrWcJAS/JYJNvn+h91eVfAQizQNi
+	 HwYeNJOvqJMzaknfOgejdIkXvVKNLtcU3dHf9LQADXRnALeUsRcNoXW94Sm+N7aeUM
+	 8e5bdc9XlfnFw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -44,12 +44,12 @@ Cc: Heiko Carstens <hca@linux.ibm.com>,
 	gor@linux.ibm.com,
 	kvm@vger.kernel.org,
 	linux-s390@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 3/9] KVM: s390: fix setting of fpc register
-Date: Mon, 15 Jan 2024 20:08:09 -0500
-Message-ID: <20240116010819.219701-3-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 3/8] KVM: s390: fix setting of fpc register
+Date: Mon, 15 Jan 2024 20:08:33 -0500
+Message-ID: <20240116010842.219925-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240116010819.219701-1-sashal@kernel.org>
-References: <20240116010819.219701-1-sashal@kernel.org>
+In-Reply-To: <20240116010842.219925-1-sashal@kernel.org>
+References: <20240116010842.219925-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -58,7 +58,7 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.4.267
+X-stable-base: Linux 4.19.305
 Content-Transfer-Encoding: 8bit
 
 From: Heiko Carstens <hca@linux.ibm.com>
@@ -101,10 +101,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 5 deletions(-)
 
 diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index b11eb11e2f49..6a1b46e85dac 100644
+index 92041d442d2e..bc700cb9fc53 100644
 --- a/arch/s390/kvm/kvm-s390.c
 +++ b/arch/s390/kvm/kvm-s390.c
-@@ -3348,10 +3348,6 @@ int kvm_arch_vcpu_ioctl_set_fpu(struct kvm_vcpu *vcpu, struct kvm_fpu *fpu)
+@@ -2995,10 +2995,6 @@ int kvm_arch_vcpu_ioctl_set_fpu(struct kvm_vcpu *vcpu, struct kvm_fpu *fpu)
  
  	vcpu_load(vcpu);
  
@@ -115,7 +115,7 @@ index b11eb11e2f49..6a1b46e85dac 100644
  	vcpu->run->s.regs.fpc = fpu->fpc;
  	if (MACHINE_HAS_VX)
  		convert_fp_to_vx((__vector128 *) vcpu->run->s.regs.vrs,
-@@ -3359,7 +3355,6 @@ int kvm_arch_vcpu_ioctl_set_fpu(struct kvm_vcpu *vcpu, struct kvm_fpu *fpu)
+@@ -3006,7 +3002,6 @@ int kvm_arch_vcpu_ioctl_set_fpu(struct kvm_vcpu *vcpu, struct kvm_fpu *fpu)
  	else
  		memcpy(vcpu->run->s.regs.fprs, &fpu->fprs, sizeof(fpu->fprs));
  
