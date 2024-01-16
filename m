@@ -1,156 +1,159 @@
-Return-Path: <kvm+bounces-6343-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6344-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E468D82F257
-	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 17:21:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4DB582F261
+	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 17:29:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 57715B22D9C
-	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 16:21:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 999B11F2459F
+	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 16:29:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D26091CAA5;
-	Tue, 16 Jan 2024 16:21:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FFD11CA95;
+	Tue, 16 Jan 2024 16:28:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cV86R+xU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AFshD34x"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DC8D1CA81;
-	Tue, 16 Jan 2024 16:21:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1705422076; x=1736958076;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=2S8o4427ICdntXjuzvT3BCbeU7w7/gzUNz8aWeymDrQ=;
-  b=cV86R+xUJQdrsolkBa2CkvHJ1iwfPUkZs3C5h4oufQN2nx65aS5BpOJy
-   n4Ar3z2qXu3XDj537SZy5bmNbBfrodIT+17m1BQw+ovQOKgMjZvsWunSo
-   FWRQX4jmBfdEz781XL/hCHTzfudxA839dbGShCGDmt8Spp2bAgUlOId1M
-   iQdelk7EO1cCpgYku8wlkqOsuJiH+of2C+zrAp/dEhYI065YyzgLsYdml
-   sxMdqGk0PVWi6q04eJ/opY1+GSBz9BJBzKA3fRaeMwoOXUNp9OG65kJQz
-   xs5S0tsqp5ko65qi1XRXL6vtABQOAYn8ZG9mKbp+CFBOASrmKy2c+sf5s
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10955"; a="13410039"
-X-IronPort-AV: E=Sophos;i="6.05,199,1701158400"; 
-   d="scan'208";a="13410039"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2024 08:21:14 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10955"; a="1031027297"
-X-IronPort-AV: E=Sophos;i="6.05,199,1701158400"; 
-   d="scan'208";a="1031027297"
-Received: from aegarcia-mobl1.amr.corp.intel.com (HELO [10.212.31.16]) ([10.212.31.16])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2024 08:21:11 -0800
-Message-ID: <6ecc4517-9a4f-4d7e-a630-2b8357b7be05@intel.com>
-Date: Tue, 16 Jan 2024 08:21:09 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA6041C6A4
+	for <kvm@vger.kernel.org>; Tue, 16 Jan 2024 16:28:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1705422515;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=OF/f9SqDfQjcSElQnS0yY6s/dBYlZKzDcj9s0+Wh2f8=;
+	b=AFshD34x282Vr2XmVuuol3SNpEAG6rMqPLhY8aAXX/LlXI8gfsXuMOHjA3525reUltdZzN
+	HypDg1CmjjPSN/eso24bvkIXSex0LpHfCQNjpL/SqBEHlYhPeUAn74QGRZw9OKZX0kdo9e
+	scVvruX6mK1zQAkbBJVDABMYsWtEhYM=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-621-tKmqRuXQNY2kxVuxPIjRdg-1; Tue, 16 Jan 2024 11:28:33 -0500
+X-MC-Unique: tKmqRuXQNY2kxVuxPIjRdg-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-40e863cb806so4132105e9.2
+        for <kvm@vger.kernel.org>; Tue, 16 Jan 2024 08:28:33 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705422512; x=1706027312;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OF/f9SqDfQjcSElQnS0yY6s/dBYlZKzDcj9s0+Wh2f8=;
+        b=nfAqJjP2PIzuK6fJcbuuIdMvbUZhp5eMoOxDQoexikaqrRHVHovK5gLbJK77nuSoiL
+         udxPKpilHi1gx+1HgwJdONcGFX4RxLK7gVOfbF2B3ZSLBNYQxmuK2RnLCQmQRiY+/wty
+         yqN3042DCPi7V2Bk86jWfxORXJjNxTkCd1FVRIOQLq5+41UW9SGzIsZJpOAP0zV5ujgs
+         61UK9eozDlUhBxn/WjqtpJ3ZOsirUAlD3KlmKI5tCRz1H3HoKHXR7lxojLjb1MRkcoot
+         SbHFzv/TpKrBDEDjGAJIRwEnY3EKtbUic9IS0TaK5y9Mo7LEUKO2S9X1XjbNe82U0kTm
+         x0rw==
+X-Gm-Message-State: AOJu0YwSU/qqIizbaoTOHCYE0derbEEU/G9zipNpgidDC1GJtxSeG2sC
+	baqpBOdWKwgeiR5A8yoF0+Wlr1PGgJsEnZOj+jYQkIhy0dM1DLQ2DVTsCU9voKB1YlKqJ+kRDjt
+	PdEm6E3TUFJU+Ma0BKzDv
+X-Received: by 2002:a05:600c:257:b0:40e:7e40:10c6 with SMTP id 23-20020a05600c025700b0040e7e4010c6mr739602wmj.182.1705422512706;
+        Tue, 16 Jan 2024 08:28:32 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG4EwY4rnvc1dXkvUnzrtlQb0sW9f8GFlzYKtabODe5zsH9sA7U7cGUZRKyhXjVGQXqLCiWCQ==
+X-Received: by 2002:a05:600c:257:b0:40e:7e40:10c6 with SMTP id 23-20020a05600c025700b0040e7e4010c6mr739594wmj.182.1705422512444;
+        Tue, 16 Jan 2024 08:28:32 -0800 (PST)
+Received: from redhat.com ([2.52.29.192])
+        by smtp.gmail.com with ESMTPSA id bg42-20020a05600c3caa00b0040e3733a32bsm23560519wmb.41.2024.01.16.08.28.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Jan 2024 08:28:31 -0800 (PST)
+Date: Tue, 16 Jan 2024 11:28:28 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	changyuanl@google.com, christophe.jaillet@wanadoo.fr,
+	dtatulea@nvidia.com, eperezma@redhat.com, jasowang@redhat.com,
+	michael.christie@oracle.com, mst@redhat.com,
+	pasha.tatashin@soleen.com, rientjes@google.com,
+	stevensd@chromium.org, tytso@mit.edu, xuanzhuo@linux.alibaba.com
+Subject: [GIT PULL] virtio: features, fixes
+Message-ID: <20240116112828-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 11/26] x86/sev: Invalidate pages from the direct map
- when adding them to the RMP table
-Content-Language: en-US
-To: Borislav Petkov <bp@alien8.de>
-Cc: Michael Roth <michael.roth@amd.com>, x86@kernel.org, kvm@vger.kernel.org,
- linux-coco@lists.linux.dev, linux-mm@kvack.org,
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
- tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
- thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
- pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
- jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
- slp@redhat.com, pgonda@google.com, peterz@infradead.org,
- srinivas.pandruvada@linux.intel.com, rientjes@google.com, tobin@ibm.com,
- vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
- tony.luck@intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
- alpergun@google.com, jarkko@kernel.org, ashish.kalra@amd.com,
- nikunj.dadhania@amd.com, pankaj.gupta@amd.com, liam.merwick@oracle.com,
- zhi.a.wang@intel.com, Brijesh Singh <brijesh.singh@amd.com>
-References: <20231230161954.569267-1-michael.roth@amd.com>
- <20231230161954.569267-12-michael.roth@amd.com>
- <cb604c37-aeb5-45bd-b6db-246ae724e4ca@intel.com>
- <20240115090948.GBZaT2XKw00PokD-WJ@fat_crate.local>
-From: Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- xsFNBE6HMP0BEADIMA3XYkQfF3dwHlj58Yjsc4E5y5G67cfbt8dvaUq2fx1lR0K9h1bOI6fC
- oAiUXvGAOxPDsB/P6UEOISPpLl5IuYsSwAeZGkdQ5g6m1xq7AlDJQZddhr/1DC/nMVa/2BoY
- 2UnKuZuSBu7lgOE193+7Uks3416N2hTkyKUSNkduyoZ9F5twiBhxPJwPtn/wnch6n5RsoXsb
- ygOEDxLEsSk/7eyFycjE+btUtAWZtx+HseyaGfqkZK0Z9bT1lsaHecmB203xShwCPT49Blxz
- VOab8668QpaEOdLGhtvrVYVK7x4skyT3nGWcgDCl5/Vp3TWA4K+IofwvXzX2ON/Mj7aQwf5W
- iC+3nWC7q0uxKwwsddJ0Nu+dpA/UORQWa1NiAftEoSpk5+nUUi0WE+5DRm0H+TXKBWMGNCFn
- c6+EKg5zQaa8KqymHcOrSXNPmzJuXvDQ8uj2J8XuzCZfK4uy1+YdIr0yyEMI7mdh4KX50LO1
- pmowEqDh7dLShTOif/7UtQYrzYq9cPnjU2ZW4qd5Qz2joSGTG9eCXLz5PRe5SqHxv6ljk8mb
- ApNuY7bOXO/A7T2j5RwXIlcmssqIjBcxsRRoIbpCwWWGjkYjzYCjgsNFL6rt4OL11OUF37wL
- QcTl7fbCGv53KfKPdYD5hcbguLKi/aCccJK18ZwNjFhqr4MliQARAQABzUVEYXZpZCBDaHJp
- c3RvcGhlciBIYW5zZW4gKEludGVsIFdvcmsgQWRkcmVzcykgPGRhdmUuaGFuc2VuQGludGVs
- LmNvbT7CwXgEEwECACIFAlQ+9J0CGwMGCwkIBwMCBhUIAgkKCwQWAgMBAh4BAheAAAoJEGg1
- lTBwyZKwLZUP/0dnbhDc229u2u6WtK1s1cSd9WsflGXGagkR6liJ4um3XCfYWDHvIdkHYC1t
- MNcVHFBwmQkawxsYvgO8kXT3SaFZe4ISfB4K4CL2qp4JO+nJdlFUbZI7cz/Td9z8nHjMcWYF
- IQuTsWOLs/LBMTs+ANumibtw6UkiGVD3dfHJAOPNApjVr+M0P/lVmTeP8w0uVcd2syiaU5jB
- aht9CYATn+ytFGWZnBEEQFnqcibIaOrmoBLu2b3fKJEd8Jp7NHDSIdrvrMjYynmc6sZKUqH2
- I1qOevaa8jUg7wlLJAWGfIqnu85kkqrVOkbNbk4TPub7VOqA6qG5GCNEIv6ZY7HLYd/vAkVY
- E8Plzq/NwLAuOWxvGrOl7OPuwVeR4hBDfcrNb990MFPpjGgACzAZyjdmYoMu8j3/MAEW4P0z
- F5+EYJAOZ+z212y1pchNNauehORXgjrNKsZwxwKpPY9qb84E3O9KYpwfATsqOoQ6tTgr+1BR
- CCwP712H+E9U5HJ0iibN/CDZFVPL1bRerHziuwuQuvE0qWg0+0SChFe9oq0KAwEkVs6ZDMB2
- P16MieEEQ6StQRlvy2YBv80L1TMl3T90Bo1UUn6ARXEpcbFE0/aORH/jEXcRteb+vuik5UGY
- 5TsyLYdPur3TXm7XDBdmmyQVJjnJKYK9AQxj95KlXLVO38lczsFNBFRjzmoBEACyAxbvUEhd
- GDGNg0JhDdezyTdN8C9BFsdxyTLnSH31NRiyp1QtuxvcqGZjb2trDVuCbIzRrgMZLVgo3upr
- MIOx1CXEgmn23Zhh0EpdVHM8IKx9Z7V0r+rrpRWFE8/wQZngKYVi49PGoZj50ZEifEJ5qn/H
- Nsp2+Y+bTUjDdgWMATg9DiFMyv8fvoqgNsNyrrZTnSgoLzdxr89FGHZCoSoAK8gfgFHuO54B
- lI8QOfPDG9WDPJ66HCodjTlBEr/Cwq6GruxS5i2Y33YVqxvFvDa1tUtl+iJ2SWKS9kCai2DR
- 3BwVONJEYSDQaven/EHMlY1q8Vln3lGPsS11vSUK3QcNJjmrgYxH5KsVsf6PNRj9mp8Z1kIG
- qjRx08+nnyStWC0gZH6NrYyS9rpqH3j+hA2WcI7De51L4Rv9pFwzp161mvtc6eC/GxaiUGuH
- BNAVP0PY0fqvIC68p3rLIAW3f97uv4ce2RSQ7LbsPsimOeCo/5vgS6YQsj83E+AipPr09Caj
- 0hloj+hFoqiticNpmsxdWKoOsV0PftcQvBCCYuhKbZV9s5hjt9qn8CE86A5g5KqDf83Fxqm/
- vXKgHNFHE5zgXGZnrmaf6resQzbvJHO0Fb0CcIohzrpPaL3YepcLDoCCgElGMGQjdCcSQ+Ci
- FCRl0Bvyj1YZUql+ZkptgGjikQARAQABwsFfBBgBAgAJBQJUY85qAhsMAAoJEGg1lTBwyZKw
- l4IQAIKHs/9po4spZDFyfDjunimEhVHqlUt7ggR1Hsl/tkvTSze8pI1P6dGp2XW6AnH1iayn
- yRcoyT0ZJ+Zmm4xAH1zqKjWplzqdb/dO28qk0bPso8+1oPO8oDhLm1+tY+cOvufXkBTm+whm
- +AyNTjaCRt6aSMnA/QHVGSJ8grrTJCoACVNhnXg/R0g90g8iV8Q+IBZyDkG0tBThaDdw1B2l
- asInUTeb9EiVfL/Zjdg5VWiF9LL7iS+9hTeVdR09vThQ/DhVbCNxVk+DtyBHsjOKifrVsYep
- WpRGBIAu3bK8eXtyvrw1igWTNs2wazJ71+0z2jMzbclKAyRHKU9JdN6Hkkgr2nPb561yjcB8
- sIq1pFXKyO+nKy6SZYxOvHxCcjk2fkw6UmPU6/j/nQlj2lfOAgNVKuDLothIxzi8pndB8Jju
- KktE5HJqUUMXePkAYIxEQ0mMc8Po7tuXdejgPMwgP7x65xtfEqI0RuzbUioFltsp1jUaRwQZ
- MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
- hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
- vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <20240115090948.GBZaT2XKw00PokD-WJ@fat_crate.local>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mutt-Fcc: =sent
 
-On 1/15/24 01:09, Borislav Petkov wrote:
-> On Fri, Jan 12, 2024 at 12:00:01PM -0800, Dave Hansen wrote:
->> I thought we agreed long ago to just demote the whole direct map to 4k
->> on kernels that might need to act as SEV-SNP hosts.  That should be step
->> one and this can be discussed as an optimization later.
-> 
-> Do we have a link to that agreement somewhere?
+The following changes since commit b8e0792449928943c15d1af9f63816911d139267:
 
-I seem to be remembering it wrong.  I have some memory of disabling 2M
-mappings in the same spots that debug_pagealloc_enabled() does, but I
-must have hallucinated it.
+  virtio_blk: fix snprintf truncation compiler warning (2023-12-04 09:43:53 -0500)
 
-> https://lore.kernel.org/lkml/535400b4-0593-a7ca-1548-532ee1fefbd7@intel.com/
+are available in the Git repository at:
 
-The original approach tried to fix up the page faults by doing the
-demotion there and didn't seem to work with hugetlbfs at all.
+  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
 
-> I'd like to read why we agreed. And looking at Mike's talk:
-> https://lwn.net/Articles/931406/ - what do we wanna do in general with
-> the direct map granularity?
+for you to fetch changes up to f16d65124380ac6de8055c4a8e5373a1043bb09b:
 
-I think fracturing it is much less of a problem than we once thought it
-was.  There are _definitely_ people that will pay the cost for added
-security.
+  vdpa/mlx5: Add mkey leak detection (2024-01-10 13:01:38 -0500)
 
-The problem will be the first time someone sees a regression when their
-direct-map-fracturing kernel feature (secret pages, SNP host, etc...)
-collides with some workload that's sensitive to kernel TLB pressure.
+----------------------------------------------------------------
+virtio: features, fixes
+
+vdpa/mlx5: support for resumable vqs
+virtio_scsi: mq_poll support
+3virtio_pmem: support SHMEM_REGION
+virtio_balloon: stay awake while adjusting balloon
+virtio: support for no-reset virtio PCI PM
+
+Fixes, cleanups.
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+----------------------------------------------------------------
+Changyuan Lyu (1):
+      virtio_pmem: support feature SHMEM_REGION
+
+Christophe JAILLET (2):
+      vdpa: Fix an error handling path in eni_vdpa_probe()
+      vdpa: Remove usage of the deprecated ida_simple_xx() API
+
+David Stevens (2):
+      virtio: Add support for no-reset virtio PCI PM
+      virtio_balloon: stay awake while adjusting balloon
+
+Dragos Tatulea (10):
+      vdpa: Track device suspended state
+      vdpa: Block vq property changes in DRIVER_OK
+      vdpa/mlx5: Expose resumable vq capability
+      vdpa/mlx5: Allow modifying multiple vq fields in one modify command
+      vdpa/mlx5: Introduce per vq and device resume
+      vdpa/mlx5: Mark vq addrs for modification in hw vq
+      vdpa/mlx5: Mark vq state for modification in hw vq
+      vdpa/mlx5: Use vq suspend/resume during .set_map
+      vdpa/mlx5: Introduce reference counting to mrs
+      vdpa/mlx5: Add mkey leak detection
+
+Mike Christie (1):
+      scsi: virtio_scsi: Add mq_poll support
+
+Pasha Tatashin (1):
+      vhost-vdpa: account iommu allocations
+
+Xuan Zhuo (1):
+      virtio_net: fix missing dma unmap for resize
+
+ drivers/net/virtio_net.c           |  60 +++++------
+ drivers/nvdimm/virtio_pmem.c       |  36 ++++++-
+ drivers/scsi/virtio_scsi.c         |  78 +++++++++++++-
+ drivers/vdpa/alibaba/eni_vdpa.c    |   6 +-
+ drivers/vdpa/mlx5/core/mlx5_vdpa.h |  10 +-
+ drivers/vdpa/mlx5/core/mr.c        |  73 ++++++++++---
+ drivers/vdpa/mlx5/net/mlx5_vnet.c  | 209 +++++++++++++++++++++++++++++++++----
+ drivers/vdpa/vdpa.c                |   4 +-
+ drivers/vhost/vdpa.c               |  26 ++++-
+ drivers/virtio/virtio_balloon.c    |  57 ++++++++--
+ drivers/virtio/virtio_pci_common.c |  34 +++++-
+ include/linux/mlx5/mlx5_ifc.h      |   3 +-
+ include/linux/mlx5/mlx5_ifc_vdpa.h |   4 +
+ include/uapi/linux/virtio_pmem.h   |   7 ++
+ 14 files changed, 510 insertions(+), 97 deletions(-)
+
 
