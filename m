@@ -1,99 +1,113 @@
-Return-Path: <kvm+bounces-6340-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6341-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F37E982F1AE
-	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 16:37:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3838682F1ED
+	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 16:54:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 92B631F2477A
-	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 15:37:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 68F441C23360
+	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 15:54:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4F241C2BB;
-	Tue, 16 Jan 2024 15:37:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37AEE1CA85;
+	Tue, 16 Jan 2024 15:54:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ihMJO76X"
 X-Original-To: kvm@vger.kernel.org
-Received: from proxmox-new.maurer-it.com (proxmox-new.maurer-it.com [94.136.29.106])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B6E31C284;
-	Tue, 16 Jan 2024 15:37:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proxmox.com
-Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
-	by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 495D549183;
-	Tue, 16 Jan 2024 16:37:20 +0100 (CET)
-Message-ID: <ef81ff36-64bb-4cfe-ae9b-e3acf47bff24@proxmox.com>
-Date: Tue, 16 Jan 2024 16:37:19 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0D3C1C6BA;
+	Tue, 16 Jan 2024 15:54:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40GFb9bl000351;
+	Tue, 16 Jan 2024 15:54:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=97MHNMQvroPsQ7l3OcwOf2G2VgJ3sRCWBpF6Bp8pnCo=;
+ b=ihMJO76X9sC7gXQ75gCE7ALl+v0NiMS7MG1VFOooSMQ0b1xynvW4PSoD2gjr+jLpUjW/
+ RYOH41b55L6ngLbPb9sFTIVIEUqD+k2xSDs4QETqxgK3h3C60kEZgvIZ2Aj7w4qlYw47
+ 3Wc4V1PcL/dZi0ed5DSaFiRHxv137/Vpc3RBniwz7FjDQ7FtRpHjV4XbcXCQrA0HAJGs
+ ZHkFUvD+bJwFwcLSoU/8mWrKizSBzAFqX7/RTmbkzkLTooUUJ/C3zkbxZRSLoLhIxJkA
+ jkYLtCSqalTBj++VVWW0+sSFVjQ23c+fAFumCTPnDu2TVuT1VybZ1J1fxtI4+7EKJK1R bQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vnvkn8j7v-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 16 Jan 2024 15:54:04 +0000
+Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 40GFblO9004401;
+	Tue, 16 Jan 2024 15:54:04 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vnvkn8j79-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 16 Jan 2024 15:54:04 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 40GDTMK6023421;
+	Tue, 16 Jan 2024 15:54:03 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3vm6bkfbu0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 16 Jan 2024 15:54:03 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 40GFrw7I42467798
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 16 Jan 2024 15:53:58 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0DE2F2004B;
+	Tue, 16 Jan 2024 15:53:58 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0E80F20040;
+	Tue, 16 Jan 2024 15:53:57 +0000 (GMT)
+Received: from li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com (unknown [9.171.49.101])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Tue, 16 Jan 2024 15:53:56 +0000 (GMT)
+Date: Tue, 16 Jan 2024 16:53:55 +0100
+From: Alexander Gordeev <agordeev@linux.ibm.com>
+To: Tony Krowiak <akrowiak@linux.ibm.com>
+Cc: linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, jjherne@linux.ibm.com, borntraeger@de.ibm.com,
+        pasic@linux.ibm.com, pbonzini@redhat.com, frankja@linux.ibm.com,
+        imbrenda@linux.ibm.com, alex.williamson@redhat.com,
+        kwankhede@nvidia.com, gor@linux.ibm.com
+Subject: Re: [PATCH v4 3/6] s390/vfio-ap: let 'on_scan_complete' callback
+ filter matrix and update guest's APCB
+Message-ID: <ZaamkyuOET+1rOSm@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+References: <20240115185441.31526-1-akrowiak@linux.ibm.com>
+ <20240115185441.31526-4-akrowiak@linux.ibm.com>
+ <ZaY/fGxUMx2z4OQH@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+ <4eb35fab-eb85-487d-90cd-c4b10b8410ec@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Temporary KVM guest hangs connected to KSM and NUMA balancer
-Content-Language: en-US
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org
-References: <832697b9-3652-422d-a019-8c0574a188ac@proxmox.com>
- <ZaAQhc13IbWk5j5D@google.com>
-From: Friedrich Weber <f.weber@proxmox.com>
-In-Reply-To: <ZaAQhc13IbWk5j5D@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4eb35fab-eb85-487d-90cd-c4b10b8410ec@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Qe49cQtLJH46-BX-ssslh2WAuKu3_Qae
+X-Proofpoint-ORIG-GUID: L92aSjxdJRR6io0SwljeFoGIcqZgHe8d
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-16_08,2024-01-16_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
+ malwarescore=0 impostorscore=0 bulkscore=0 adultscore=0 priorityscore=1501
+ suspectscore=0 clxscore=1015 mlxlogscore=542 phishscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
+ definitions=main-2401160125
 
-Hi Sean,
+On Tue, Jan 16, 2024 at 09:57:25AM -0500, Tony Krowiak wrote:
+> This patch is more of an enhancement as opposed to a bug, so no Fixes.
 
-On 11/01/2024 17:00, Sean Christopherson wrote:
-> This is a known issue.  It's mostly a KVM bug[...] (fix posted[...]), but I suspect
-> that a bug in the dynamic preemption model logic[...] is also contributing to the
-> behavior by causing KVM to yield on preempt models where it really shouldn't.
+The preceding and rest of this series CCs stable@vger.kernel.org and
+would not apply without this patch. So I guess backporting the whole
+series would be difficult.
 
-I tried the following variants now, each applied on top of 6.7 (0dd3ee31):
+Whether propagating the prevous patches' Fixes/stable makes any sense?
 
-* [1], the initial patch series mentioned in the bugreport ("[PATCH 0/2]
-KVM: Pre-check mmu_notifier retry on x86")
-* [2], its v2 that you linked above ("[PATCH v2] KVM: x86/mmu: Retry
-fault before acquiring mmu_lock if mapping is changing")
-* [3], the scheduler patch you linked above ("[PATCH] sched/core: Drop
-spinlocks on contention iff kernel is preemptible")
-* both [2] & [3]
-
-My kernel is PREEMPT_DYNAMIC and, according to
-/sys/kernel/debug/sched/preempt, defaults to preempt=voluntary. For case
-[3], I additionally tried manually switching to preempt=full.
-
-Provided I did not mess up, I get the following results for the
-reproducer I posted:
-
-* [1] (the initial patch series): no hangs
-* [2] (its v2): hangs
-* [3] (the scheduler patch) with preempt=voluntary: no hangs
-* [3] (the scheduler patch) with preempt=full: hangs
-* [2] & [3]: no hangs
-
-So it seems like:
-
-* [1] (the initial patch series) fixes the hangs, which is consistent
-with the feedback in the bugreport [4].
-* But weirdly, its v2 [2] does not fix the hangs.
-* As long as I stay with preempt=voluntary, [3] (the scheduler patch)
-alone is already enough to fix the hangs in my case -- this I did not
-expect :)
-
-Does this make sense to you? Happy to double-check or run more tests if
-anything seems off.
-
-Best wishes,
-
-Friedrich
-
-[1] https://lore.kernel.org/all/20230825020733.2849862-1-seanjc@google.com/
-[2] https://lore.kernel.org/all/20240110012045.505046-1-seanjc@google.com/
-[3] https://lore.kernel.org/all/20240110214723.695930-1-seanjc@google.com/
-[4] https://bugzilla.kernel.org/show_bug.cgi?id=218259#c6
-
+Thanks!
 
