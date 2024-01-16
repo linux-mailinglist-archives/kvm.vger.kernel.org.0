@@ -1,179 +1,147 @@
-Return-Path: <kvm+bounces-6350-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6351-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D543C82F2C0
-	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 17:58:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AAFB82F317
+	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 18:21:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 873971F25AA7
-	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 16:58:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1534128561C
+	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 17:21:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D5991CABC;
-	Tue, 16 Jan 2024 16:58:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02ACB1CD05;
+	Tue, 16 Jan 2024 17:20:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BcKDiB1w"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="grBawxMW"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 360011CA87
-	for <kvm@vger.kernel.org>; Tue, 16 Jan 2024 16:58:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 194AE1CA92
+	for <kvm@vger.kernel.org>; Tue, 16 Jan 2024 17:20:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dbce2a8d700so11716204276.1
-        for <kvm@vger.kernel.org>; Tue, 16 Jan 2024 08:58:12 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1705425647; cv=none; b=Nad8qg+zgVI4K4owhkf+0+G7a0MylCKR5M7rrd3cQ7zmYdKuKWA40rtJIC3JU7dxoOzr2y11ie6hNep2LmXxregh1RE4SQiFJkTGvtM6RQsm2kQe+HC2t1VUUrqO+63nODfEwg/CoBM+yeH+wxRsX1v5yA4TfZBVsM7JoEsTjao=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1705425647; c=relaxed/simple;
+	bh=tnRy3jWG4+OwIbi8OFvCp/HqFPWFwcstEM2fzjh9K0E=;
+	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Date:
+	 In-Reply-To:Mime-Version:References:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=a8rFEpyGswsYDmb40+sOC7U+KQKcmbubgYDMjApqVtoUM8IJGb51b2yb+lZvENHCmJcbtRsvCbsUf4LYa6rDIpiUc0a3U+2KPZhectIod/2DCTA2xeIaeWaXfLRU6uRnXs7urd5okoMn0h6bpjxONKdlfZcSgXhMsbOpp2dGxLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=grBawxMW; arc=none smtp.client-ip=209.85.128.201
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5e9de9795dfso189573317b3.0
+        for <kvm@vger.kernel.org>; Tue, 16 Jan 2024 09:20:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1705424292; x=1706029092; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=iVWfZWnnweCon4Kq5ddDNFgrUnMdPNHcYUHJ92vD+fM=;
-        b=BcKDiB1weZXUJwMlaTv/EgPOVKRTt8dZPbbdEATc3se1Um22mq+4h8H+JG9Ef/GN4Y
-         hdFbgH0sfTz8U+NUIpnvfBR+ygWYu3B/RA7eOxq5fStU6dpFkqjzYAicPuuOetDyDmZU
-         qZJJjaOs6m/vQp/G+gcGUC6DZFfHQ4RP0X8VCBorCiwY6JBzWY17KfkAQpgTqeFT2gX6
-         xvDQ7amljxoqf28GJSg//qlDDGSxso2Bxe/gMtxcvEwIHsesF8sj9AHS6sJwskzRA1tT
-         zVE1wEV/3CPCMyEEvSuVzWxUvPjPT7+zE5ZEaZ0CjRU5m44lrQg9ZUu/nqn0Vy4ldBTt
-         GGoA==
+        d=google.com; s=20230601; t=1705425641; x=1706030441; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=clNdxL3spBiROjgCSpV36akIqm7jAf49yzjKH1UtjfE=;
+        b=grBawxMWJiqgfnZmk0IxICqeOhfuMbvdhweSYKny+6e2nUK2KbssCihhckAkhMqZEd
+         t+ikpkvzKqnNpp1ECzKCtujPhxawZYDoWZVlqRQSDWlh5OgV2d9qtX3GWTv7IKMGe+dh
+         uIsVw//Qx0RD50BtbiaATKfyeocjJZBy/RMEPXaNEgO4PuddfM568X/TpNDEkUlrYMEO
+         KzBP9Auszx7fiqpQfUuHpPMejdo7q/i+OrQxUW9x1dzVtO33K5x1S4JKrGb8eV3EINGF
+         IBFq/nJFB8jl/rEQob+zOmJ82oPvQgMTc3Akg+hyHBWMO6+PW8TtGKGNN2ue9M8SytvO
+         SpMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705424292; x=1706029092;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=iVWfZWnnweCon4Kq5ddDNFgrUnMdPNHcYUHJ92vD+fM=;
-        b=GKzxHWQ8qk7jj9uuaP1r3U02ajJ+bLDOT24JmH3sEiUb066esr3r9h42HDTcNC48Yf
-         5cKaByekBxQUNNju5iUasXZC0NsZuA4XtXszC3lAPGhbnUfr9wkgzpj9V38oD4KN82/c
-         6kjLqv//a9TCj63NR55oejWBNpJNQtmm3p/rotKB6Ujj2HGJeqA12JvV3Ix5R1iCZN00
-         qdMgtgik9wsDWcUYckj1sgsfJ0pIvBbbgw+aq0ekycGZKiihx9/7Qf0ya6nDjVA5QxjN
-         nDvVsZAHcBBs3/6zdMhOVisqErLLYsmquYEFP5wKkZ+fpJu5oeuukjiym2/AxTCwkvte
-         x/Tg==
-X-Gm-Message-State: AOJu0YzcN8Evx9sS5ie9YSu/EZpjF5EKmQ2jhHzjb/MVKLaIX/3txAo2
-	cgX1sut9X8fsQKqqXunys9ZjkqU0cpuhAN7sfA==
-X-Google-Smtp-Source: AGHT+IE1nNWckKzVXkEfyiJOevcVb97W+XKPvrnyDZ0rTYxlLX73urn1E9g8V7tpxUADNAsDNPFxeA2opfI=
+        d=1e100.net; s=20230601; t=1705425641; x=1706030441;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=clNdxL3spBiROjgCSpV36akIqm7jAf49yzjKH1UtjfE=;
+        b=FliieHtUlyA5AYE4NqHvxZqcbEDmmmz44KQF5tYa3dw8jhcEwrKESFr+YZ1iXpMRa4
+         LMwcnl7JN3Tld4ubV3gT8E/XKkr3VajmiRCcBY6l2Aq7qKque3PK89/4JRTOaDfpYXln
+         ZZowTWDkmhHXpzkqzzmrxg/hsveXqXz3olg8m4XYJN5kNwYVqbCSE6GqtSsRWJZYIAYL
+         +6HzUAkJ61Uf2ADr/Wu6NdE3cSrRNtTbawsi+chwCURrZXZZhLx1DG6d6k9bZk/vkDiY
+         Qkz3RCI3QNf47ZAnYMsS/Sl4DsPYVGBYAIskDtsqTG/D8abdNblsY0kJO5j59p7wMP3S
+         SVvA==
+X-Gm-Message-State: AOJu0YxPZ+GwBCVAOSPYBDRRH3a5W/pN05eWz4n48eavkGwwEhhMQ86l
+	vAAzpCdxNMoAv61+GSJSl6uRdAx3yrJ5QX3EtA==
+X-Google-Smtp-Source: AGHT+IEa8FYhTZbg1Grsnfnbe1lAtRLd0Lu5zVL6RIJlU788VzmSGiCHMQ/3GdhuUMVq+NOCaEYXe+qYFyU=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1002:b0:dbe:ae9c:ee49 with SMTP id
- w2-20020a056902100200b00dbeae9cee49mr351073ybt.6.1705424292219; Tue, 16 Jan
- 2024 08:58:12 -0800 (PST)
-Date: Tue, 16 Jan 2024 08:58:10 -0800
-In-Reply-To: <72edaedc-50d7-415e-9c45-f17ffe0c1c23@linux.ibm.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:564:b0:dc2:26f8:91f with SMTP id
+ a4-20020a056902056400b00dc226f8091fmr479444ybt.8.1705425641075; Tue, 16 Jan
+ 2024 09:20:41 -0800 (PST)
+Date: Tue, 16 Jan 2024 09:20:39 -0800
+In-Reply-To: <ef81ff36-64bb-4cfe-ae9b-e3acf47bff24@proxmox.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240112091128.3868059-1-foxywang@tencent.com>
- <ZaFor2Lvdm4O2NWa@google.com> <CAN35MuSkQf0XmBZ5ZXGhcpUCGD-kKoyTv9G7ya4QVD1xiqOxLg@mail.gmail.com>
- <72edaedc-50d7-415e-9c45-f17ffe0c1c23@linux.ibm.com>
-Message-ID: <Zaa1omCaDQOxxy2j@google.com>
-Subject: Re: [PATCH] KVM: irqchip: synchronize srcu only if needed
+References: <832697b9-3652-422d-a019-8c0574a188ac@proxmox.com>
+ <ZaAQhc13IbWk5j5D@google.com> <ef81ff36-64bb-4cfe-ae9b-e3acf47bff24@proxmox.com>
+Message-ID: <Zaa654hwFKba_7pf@google.com>
+Subject: Re: Temporary KVM guest hangs connected to KSM and NUMA balancer
 From: Sean Christopherson <seanjc@google.com>
-To: Christian Borntraeger <borntraeger@linux.ibm.com>
-Cc: Yi Wang <up2wing@gmail.com>, pbonzini@redhat.com, tglx@linutronix.de, 
-	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
-	hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	wanpengli@tencent.com, Yi Wang <foxywang@tencent.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, 
-	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To: Friedrich Weber <f.weber@proxmox.com>
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Jan 16, 2024, Christian Borntraeger wrote:
->=20
->=20
-> Am 15.01.24 um 17:01 schrieb Yi Wang:
-> > Many thanks for your such kind and detailed reply, Sean!
-> >=20
-> > On Sat, Jan 13, 2024 at 12:28=E2=80=AFAM Sean Christopherson <seanjc@go=
-ogle.com> wrote:
-> > >=20
-> > > +other KVM maintainers
-> > >=20
-> > > On Fri, Jan 12, 2024, Yi Wang wrote:
-> > > > From: Yi Wang <foxywang@tencent.com>
-> > > >=20
-> > > > We found that it may cost more than 20 milliseconds very accidental=
-ly
-> > > > to enable cap of KVM_CAP_SPLIT_IRQCHIP on a host which has many vms
-> > > > already.
-> > > >=20
-> > > > The reason is that when vmm(qemu/CloudHypervisor) invokes
-> > > > KVM_CAP_SPLIT_IRQCHIP kvm will call synchronize_srcu_expedited() an=
-d
-> > > > might_sleep and kworker of srcu may cost some delay during this per=
-iod.
-> > >=20
-> > > might_sleep() yielding is not justification for changing KVM.  That's=
- more or
-> > > less saying "my task got preempted and took longer to run".  Well, ye=
-ah.
-> >=20
-> > Agree. But I suppose it may be one of the reasons that makes  time of
-> > KVM_CAP_SPLIT_IRQCHIP delayed, of course, the kworker has the biggest
-> > suspicion :)
-> >=20
-> > >=20
-> > > > Since this happens during creating vm, it's no need to synchronize =
-srcu
-> > > > now 'cause everything is not ready(vcpu/irqfd) and none uses irq_sr=
-cu now.
-> >=20
-> > ....
-> >=20
-> > > And on x86, I'm pretty sure as of commit 654f1f13ea56 ("kvm: Check ir=
-qchip mode
-> > > before assign irqfd"), which added kvm_arch_irqfd_allowed(), it's imp=
-ossible for
-> > > kvm_irq_map_gsi() to encounter a NULL irq_routing _on x86_.
-> > >=20
-> > > But I strongly suspect other architectures can reach kvm_irq_map_gsi(=
-) with a
-> > > NULL irq_routing, e.g. RISC-V dynamically configures its interrupt co=
-ntroller,
-> > > yet doesn't implement kvm_arch_intc_initialized().
-> > >=20
-> > > So instead of special casing x86, what if we instead have KVM setup a=
-n empty
-> > > IRQ routing table during kvm_create_vm(), and then avoid this mess en=
-tirely?
-> > > That way x86 and s390 no longer need to set empty/dummy routing when =
-creating
-> > > an IRQCHIP, and the worst case scenario of userspace misusing an ioct=
-l() is no
-> > > longer a NULL pointer deref.
->=20
-> Sounds like a good idea. This should also speedup guest creation on s390 =
-since
-> it would avoid one syncronize_irq.
-> >=20
-> > To setup an empty IRQ routing table during kvm_create_vm() sounds a goo=
-d idea,
-> > at this time vCPU have not been created and kvm->lock is held so skippi=
-ng
-> > synchronization is safe here.
-> >=20
-> > However, there is one drawback, if vmm wants to emulate irqchip itself,
-> > e.g. qemu with command line '-machine kernel-irqchip=3Doff' may not nee=
-d
-> > irqchip in kernel. How do we handle this issue?
->=20
-> I would be fine with wasted memory.
+On Tue, Jan 16, 2024, Friedrich Weber wrote:
+> Hi Sean,
+> 
+> On 11/01/2024 17:00, Sean Christopherson wrote:
+> > This is a known issue.  It's mostly a KVM bug[...] (fix posted[...]), but I suspect
+> > that a bug in the dynamic preemption model logic[...] is also contributing to the
+> > behavior by causing KVM to yield on preempt models where it really shouldn't.
+> 
+> I tried the following variants now, each applied on top of 6.7 (0dd3ee31):
+> 
+> * [1], the initial patch series mentioned in the bugreport ("[PATCH 0/2]
+> KVM: Pre-check mmu_notifier retry on x86")
+> * [2], its v2 that you linked above ("[PATCH v2] KVM: x86/mmu: Retry
+> fault before acquiring mmu_lock if mapping is changing")
+> * [3], the scheduler patch you linked above ("[PATCH] sched/core: Drop
+> spinlocks on contention iff kernel is preemptible")
+> * both [2] & [3]
+> 
+> My kernel is PREEMPT_DYNAMIC and, according to
+> /sys/kernel/debug/sched/preempt, defaults to preempt=voluntary. For case
+> [3], I additionally tried manually switching to preempt=full.
+> 
+> Provided I did not mess up, I get the following results for the
+> reproducer I posted:
+> 
+> * [1] (the initial patch series): no hangs
+> * [2] (its v2): hangs
+> * [3] (the scheduler patch) with preempt=voluntary: no hangs
+> * [3] (the scheduler patch) with preempt=full: hangs
+> * [2] & [3]: no hangs
+> 
+> So it seems like:
+> 
+> * [1] (the initial patch series) fixes the hangs, which is consistent
+> with the feedback in the bugreport [4].
+> * But weirdly, its v2 [2] does not fix the hangs.
+> * As long as I stay with preempt=voluntary, [3] (the scheduler patch)
+> alone is already enough to fix the hangs in my case -- this I did not
+> expect :)
+> 
+> Does this make sense to you? Happy to double-check or run more tests if
+> anything seems off.
+ 
+Ha!  It too me a few minutes to realize what went sideways with v2.  KVM has an
+in-flight change that switches from host virtual addresses (HVA) to guest physical
+frame numbers (GFN) for the retry check, commit 8569992d64b8 ("KVM: Use gfn instead
+of hva for mmu_notifier_retry").
 
-+1.  If we really, really want to avoid the negligible memory overhead, we =
-could
-pre-configure a static global table and directly use that as the dummy tabl=
-e (and
-exempt it from being freed by free_irq_routing_table()).
+That commit is in the KVM pull request for 6.8, and so v2 is based on top of a
+branch that contains said commit.  But for better or worse (probably worse), the
+switch from HVA=GFN didn't change the _names_ of mmu_invalidate_range_{start,end},
+only the type.  So v2 applies and compiles cleanly on 6.7, but it's subtly broken
+because checking for a GFN match against an HVA range is all but guaranteed to get
+false negatives.
 
-> The only question is does it have a functional impact or can we simply ig=
-nore
-> the dummy routing.
+If you can try v2 on top of `git://git.kernel.org/pub/scm/virt/kvm/kvm.git next`,
+that would be helpful to confirm that I didn't screw up something else.
 
-Given the lack of sanity checks on kvm->irq_routing, I'm pretty sure the on=
-ly way
-for there to be functional impact is if there's a latent NULL pointer deref=
- hiding
-somewhere.
+Thanks very much for reporting back!  I'm pretty sure we would have missed the
+semantic conflict when backporting the fix to 6.7 and earlier, i.e. you likely
+saved us from another round of bug reports for various stable trees.
 
