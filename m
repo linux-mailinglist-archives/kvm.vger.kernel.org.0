@@ -1,138 +1,143 @@
-Return-Path: <kvm+bounces-6352-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6353-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A3B482F3B0
-	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 19:09:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B761D82F424
+	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 19:23:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39C2D28654B
-	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 18:09:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD8791C2389A
+	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 18:23:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BFB21CD2A;
-	Tue, 16 Jan 2024 18:08:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 781B81CF8B;
+	Tue, 16 Jan 2024 18:23:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Ve8Faakb"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="iT/Igi1V"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA32F6ABA;
-	Tue, 16 Jan 2024 18:08:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2F8E1CF80;
+	Tue, 16 Jan 2024 18:23:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705428527; cv=none; b=SmNLEq0GY7bzhp92E+sIMQwHflG5zVfHKa65A65rtmYdjymCf5f0XV0mH36Q4j3wPxeDTpb1rtnX3fBcZDfY6i0urVC7biTSi0wk0yaMhZ2mWTcdZ8kQyctN/NxJ/qAhWPY7/Eg4jzLdUZvXpiQfXuUsGcQNz65n7yK9F4CtA3E=
+	t=1705429384; cv=none; b=LDkZelu93ZkOr3yvzeuy7LkbqaEMPY3YkAo97Mbhk/DQ4KCK/+2Vqp5vYVukqP4oPfE0bd/+J6NIPW/NlHZald5YQ1SJVXVBiaYBrV9JpaSOtgoyaxWoVkRjAco9I+Gvo00ws9HDSFnmoMvCW2FnGG1d7e7xByfoYcWQ1wXf5nQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705428527; c=relaxed/simple;
-	bh=CGsnDROhCodxiCvYY3JgqSrViuyF9ZSQMhYlWQDj+aA=;
-	h=Received:DKIM-Signature:Received:Received:Received:Received:
-	 Received:Received:Received:Received:Received:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To:X-TM-AS-GCONF:
-	 X-Proofpoint-ORIG-GUID:X-Proofpoint-GUID:
-	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details; b=u59nnEeHSGdssjaGoRXpvNs9Q/gUMe49AjVhlgyao06LayAa/WzZB95yC2gIL9Y9VoWS7jroIwhIUqLpYpQUNv8mf1nu7JWWXGJX11h5oBkvuB0eR1OenmqrQe0j6SZdH2Y2w0FCbVd6hKIeioV8k67x2s3ks9rTNNQsjZNttIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Ve8Faakb; arc=none smtp.client-ip=148.163.156.1
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40GI79xW013088;
-	Tue, 16 Jan 2024 18:08:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=VMRRoZGEbNDKMzcsIuD608LUrCeDX/CHVCbe+ZNWqug=;
- b=Ve8FaakbyzKYUs1fwZqy6sK8N2oaMzasCMvWb3IoNbY+vWWjmvXIPF+L/MaRnVL47vCY
- 27Jige9DiFs99GqKmHrc2WSZF3pxvwJyrlWfesNHPN9ajoF6Hm4jv/LoNBp5Jl+trsZk
- yglL1b8wpGLYG7FwQi4xVXhlRnzKxHzexdu5pVW/scLhdnrUMo3g/NcV64ZTXXs6P6qj
- 48yKPQZ2qxM3ZC2JNISKkiI3dglznLQSdZc7UaRHTuLBNguXCV8Cq/IsDF59mklX/vW1
- 04x89KAzXbILEC4bkLKOG1wmBB9weeqfOroflNMUOznrPt8Gycx3ErT10TKcqan5Mcnf 9Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vnxswr58v-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 16 Jan 2024 18:08:41 +0000
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 40GI7NTO014282;
-	Tue, 16 Jan 2024 18:08:27 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vnxswr431-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 16 Jan 2024 18:08:26 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 40GGSV6H019884;
-	Tue, 16 Jan 2024 18:08:11 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3vm72jyw89-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 16 Jan 2024 18:08:11 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 40GI86sD18875094
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 16 Jan 2024 18:08:06 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6BF1220043;
-	Tue, 16 Jan 2024 18:08:06 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 53E5720040;
-	Tue, 16 Jan 2024 18:08:05 +0000 (GMT)
-Received: from li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com (unknown [9.171.88.12])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Tue, 16 Jan 2024 18:08:05 +0000 (GMT)
-Date: Tue, 16 Jan 2024 19:08:03 +0100
-From: Alexander Gordeev <agordeev@linux.ibm.com>
-To: Tony Krowiak <akrowiak@linux.ibm.com>
-Cc: linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, jjherne@linux.ibm.com, borntraeger@de.ibm.com,
-        pasic@linux.ibm.com, pbonzini@redhat.com, frankja@linux.ibm.com,
-        imbrenda@linux.ibm.com, alex.williamson@redhat.com,
-        kwankhede@nvidia.com, gor@linux.ibm.com, stable@vger.kernel.org
-Subject: Re: [PATCH v4 4/6] s390/vfio-ap: reset queues filtered from the
- guest's AP config
-Message-ID: <ZabGAx5BpIiYW+b3@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
-References: <20240115185441.31526-1-akrowiak@linux.ibm.com>
- <20240115185441.31526-5-akrowiak@linux.ibm.com>
+	s=arc-20240116; t=1705429384; c=relaxed/simple;
+	bh=vOgqF5Zcc8Ylq6RHqZfJs1o320FusJ0JBsfhr/+0YmU=;
+	h=Received:X-Virus-Scanned:Received:DKIM-Signature:Received:Date:
+	 From:To:Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=HmPA4ohNw6qHuvujiuWZB4FSGo+W9ae8HDb0VSEfx4n9bRn9GVq59c03u6z1sBoa0IXZn0M8e4zrotK8Kf85EkqQIrWnD1+xW0514YPcXvI+pw3d5B2vAmUo08rtwNrpThfG7ylBNm6itLmX7XtU24ewoML9xEz5kRfig6EbPtM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=iT/Igi1V; arc=none smtp.client-ip=65.109.113.108
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 0579F40E01B2;
+	Tue, 16 Jan 2024 18:22:58 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id 3FYGSk50diAZ; Tue, 16 Jan 2024 18:22:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1705429375; bh=UZ6G+J6ye64gzMjmC6lSx1WhjVghiKPeCR0bIv9HV54=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=iT/Igi1VvZ6a4grjasUBsQ3NdbxVO1LZMf2kXl82VNfinMdUS0Ec9PcrPGaD1XYXR
+	 YdA48WrCcriSh2e1xb52ISkIy8H1Rrm524EZxg9aoINEgy9OXUaWhXGJa1lV94hImP
+	 YaODpfGf/w+A/eInOmc3DpCH5vcKshzQ9Mg3VBfLUNHhIWpa8jsF9ZzU5wtjD6WPhn
+	 DAIloOlghiaeyvEcwwen2OpIDhV0kjqSYj1GWUQm+vN63O24M4KXlaRkaruNlOwWGo
+	 h6tUDG57RTqsPMq+wIcj6Z+Z9NZ0DRB624YhMEin4N8pz2z7AbqUUiuXPHv878xWwL
+	 xULI9qMNlhWlYjI0zUTMS4dOnss7cKROp32wMTohATsxLHoXcYZR7FvUImvS6ECkrh
+	 CHT7ArPtEgM1vD2isJU2OhQk9QnEo9ikZJUhZDBpg2E9bK66pHThR7OpdEhIrDCpy6
+	 GthkzXZNIYojH/h4s6yJMI6OwM4NHagRA0EuKgVwLbu2rXVZIybUYjMnw3NLd+1bXM
+	 Ujlxrws7Vk6QaiuBPnZ8+jgrI1UrwQm2aN9MZWjwjp8Zd9ZnOKPKTi/CovQK0x5Wu/
+	 AuGWt9P+gEXnoQ0GUpRPlDUDUkghNjB1kzTfdx1ZoDopAUpzAca3zMaweDB0gIZUZr
+	 sFqXK/o7GqQGyHT5mb3FRkRU=
+Received: from zn.tnic (pd9530f8c.dip0.t-ipconnect.de [217.83.15.140])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id EA5AD40E01A9;
+	Tue, 16 Jan 2024 18:22:15 +0000 (UTC)
+Date: Tue, 16 Jan 2024 19:22:10 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Michael Roth <michael.roth@amd.com>
+Cc: Dave Hansen <dave.hansen@intel.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>, x86@kernel.org,
+	kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
+	hpa@zytor.com, ardb@kernel.org, pbonzini@redhat.com,
+	seanjc@google.com, vkuznets@redhat.com, jmattson@google.com,
+	luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
+	pgonda@google.com, peterz@infradead.org,
+	srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+	tobin@ibm.com, vbabka@suse.cz, kirill@shutemov.name,
+	ak@linux.intel.com, tony.luck@intel.com,
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+	pankaj.gupta@amd.com, liam.merwick@oracle.com,
+	Brijesh Singh <brijesh.singh@amd.com>, rppt@kernel.org
+Subject: Re: [PATCH v1 11/26] x86/sev: Invalidate pages from the direct map
+ when adding them to the RMP table
+Message-ID: <20240116182158.GHZabJRqUMAEidcee1@fat_crate.local>
+References: <20231230161954.569267-1-michael.roth@amd.com>
+ <20231230161954.569267-12-michael.roth@amd.com>
+ <cb604c37-aeb5-45bd-b6db-246ae724e4ca@intel.com>
+ <20240112200751.GHZaGcF0-OZVJiIB7y@fat_crate.local>
+ <63297d29-bb24-ac5e-0b47-35e22bb1a2f8@amd.com>
+ <336b55f9-c7e6-4ec9-806b-cb3659dbfdc3@intel.com>
+ <20240116161909.msbdwiyux7wsxw2i@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240115185441.31526-5-akrowiak@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: qr-HNzAfCi4ZJhU7UfWPkVpaO4WRdxRE
-X-Proofpoint-GUID: KpFaRAXl_1zNmYew_c9e92rP3dK_QZU6
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-16_10,2024-01-16_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
- mlxscore=0 suspectscore=0 clxscore=1011 spamscore=0 phishscore=0
- priorityscore=1501 impostorscore=0 malwarescore=0 mlxlogscore=875
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2401160143
+In-Reply-To: <20240116161909.msbdwiyux7wsxw2i@amd.com>
 
-On Mon, Jan 15, 2024 at 01:54:34PM -0500, Tony Krowiak wrote:
-> From: Tony Krowiak <akrowiak@linux.ibm.com>
-...
-> diff --git a/drivers/s390/crypto/vfio_ap_private.h b/drivers/s390/crypto/vfio_ap_private.h
-> index 88aff8b81f2f..20eac8b0f0b9 100644
-> --- a/drivers/s390/crypto/vfio_ap_private.h
-> +++ b/drivers/s390/crypto/vfio_ap_private.h
-> @@ -83,10 +83,10 @@ struct ap_matrix {
->  };
->  
->  /**
-> - * struct ap_queue_table - a table of queue objects.
-> - *
-> - * @queues: a hashtable of queues (struct vfio_ap_queue).
-> - */
-> +  * struct ap_queue_table - a table of queue objects.
-> +  *
-> +  * @queues: a hashtable of queues (struct vfio_ap_queue).
-> +  */
->  struct ap_queue_table {
->  	DECLARE_HASHTABLE(queues, 8);
->  };
+On Tue, Jan 16, 2024 at 10:19:09AM -0600, Michael Roth wrote:
+> So at the very least, if we went down this path, we would be worth
+> investigating the following areas in addition to general perf testing:
+> 
+>   1) Only splitting directmap regions corresponding to kernel-allocatable
+>      *data* (hopefully that's even feasible...)
+>   2) Potentially deferring the split until an SNP guest is actually
+>      run, so there isn't any impact just from having SNP enabled (though
+>      you still take a hit from RMP checks in that case so maybe it's not
+>      worthwhile, but that itself has been noted as a concern for users
+>      so it would be nice to not make things even worse).
 
-If this change is intended?
+So the gist of this whole explanation why we end up doing what we end up
+doing eventually should be in the commit message so that it is clear
+*why* we did it. 
+
+> After further discussion I think we'd concluded it wasn't necessary. Maybe
+> that's worth revisiting though. If it is necessary, then that would be
+> another reason to just pre-split the directmap because the above-mentioned
+> lazy acceptance workload/bottleneck would likely get substantially worse.
+
+The reason for that should also be in the commit message.
+
+And to answer:
+
+https://lore.kernel.org/linux-mm/20221219150026.bltiyk72pmdc2ic3@amd.com/
+
+yes, you should add a @npages variant.
+
+See if you could use/extend this, for example:
+
+https://lore.kernel.org/r/20240116022008.1023398-3-mhklinux@outlook.com
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
