@@ -1,100 +1,330 @@
-Return-Path: <kvm+bounces-6329-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6330-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2363F82EC9D
-	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 11:11:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5325882ED85
+	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 12:16:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B6003B22478
-	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 10:11:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B841F1F23DF0
+	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 11:16:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4020413AC2;
-	Tue, 16 Jan 2024 10:11:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 741B11B7FC;
+	Tue, 16 Jan 2024 11:16:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Y0DhfoSl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69188134BE;
-	Tue, 16 Jan 2024 10:11:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: a22905cd170d4ee9805d32e1eec18322-20240116
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.35,REQID:16592e3b-7f91-4805-b226-df76d2b3ec8f,IP:10,
-	URL:0,TC:0,Content:0,EDM:25,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTI
-	ON:release,TS:30
-X-CID-INFO: VERSION:1.1.35,REQID:16592e3b-7f91-4805-b226-df76d2b3ec8f,IP:10,UR
-	L:0,TC:0,Content:0,EDM:25,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:30
-X-CID-META: VersionHash:5d391d7,CLOUDID:17af677f-4f93-4875-95e7-8c66ea833d57,B
-	ulkID:240116180031ZL8M7VE6,BulkQuantity:0,Recheck:0,SF:19|38|24|100|101|74
-	|66|17|42|102,TC:nil,Content:0,EDM:5,IP:-2,URL:0,File:nil,Bulk:nil,QS:nil,
-	BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI,TF_CID_SPAM_SNR
-X-UUID: a22905cd170d4ee9805d32e1eec18322-20240116
-Received: from mail.kylinos.cn [(39.156.73.10)] by mailgw
-	(envelope-from <chentao@kylinos.cn>)
-	(Generic MTA)
-	with ESMTP id 1885945740; Tue, 16 Jan 2024 18:00:29 +0800
-Received: from mail.kylinos.cn (localhost [127.0.0.1])
-	by mail.kylinos.cn (NSMail) with SMTP id 5C6A3E000EB9;
-	Tue, 16 Jan 2024 18:00:29 +0800 (CST)
-X-ns-mid: postfix-65A653BD-152262411
-Received: from kernel.. (unknown [172.20.15.234])
-	by mail.kylinos.cn (NSMail) with ESMTPA id 43C6EE000EB9;
-	Tue, 16 Jan 2024 18:00:27 +0800 (CST)
-From: Kunwu Chan <chentao@kylinos.cn>
-To: seanjc@google.com,
-	pbonzini@redhat.com,
-	tglx@linutronix.de,
-	mingo@redhat.com,
-	bp@alien8.de,
-	dave.hansen@linux.intel.com,
-	x86@kernel.org,
-	hpa@zytor.com
-Cc: kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Kunwu Chan <chentao@kylinos.cn>
-Subject: [PATCH] KVM: x86/mmu: Use KMEM_CACHE instead of kmem_cache_create()
-Date: Tue, 16 Jan 2024 18:00:25 +0800
-Message-Id: <20240116100025.95702-1-chentao@kylinos.cn>
-X-Mailer: git-send-email 2.39.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F24DD1B7F2
+	for <kvm@vger.kernel.org>; Tue, 16 Jan 2024 11:16:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:Date:Cc:To:
+	From:Subject:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=N8T6WV+pzDSIO9X58e2KVRAd1AXK1q3a8AOiVLfu/TY=; b=Y0DhfoSlCYzr1kWYWVmUnlYHSy
+	hdugokVKa4JAsRuF9+MPQqZ51Y0CBT25NHDhPhi6JOK/th6Jrmipb4nXcK310PO7RBwbIwVpG/WRt
+	Ygmj4JjZu+j6ziI2AH4NFCWq3LfUxl07dl0oIR2cC/U0CjRUEmf7jh+VpaZoIxKd5QMmmB56GOyd8
+	kKkkJ6XD6R5jsDdOxPfXlcpLgegxyH/0UYYjslkP56W9wy0GZ+OYiwnfovCip4AhfwdAPM9ynqN1D
+	V/l03IK7QUPVxoXc/uxqLkhWWnJxQCBWGmhxxCoY6qk5eqxzqpuayoP9dg9CrpvwjKE92LbwLrim4
+	appUx3dQ==;
+Received: from [54.239.6.184] (helo=daas-dns-lhr50-9.e-lhr50.amazon.com)
+	by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+	id 1rPhQo-00Cmjv-4r; Tue, 16 Jan 2024 11:16:34 +0000
+Message-ID: <0717051e9379614721483aaef29572e0356cd347.camel@infradead.org>
+Subject: [PATCH v3] KVM: x86/xen: Inject vCPU upcall vector when local APIC
+ is enabled
+From: David Woodhouse <dwmw2@infradead.org>
+To: kvm <kvm@vger.kernel.org>
+Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>,  Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar
+ <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+ <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin"
+ <hpa@zytor.com>,  Paul Durrant <paul@xen.org>
+Date: Tue, 16 Jan 2024 12:16:33 +0100
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-8mYdEa4ia2RmOgvCVsno"
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+
+
+--=-8mYdEa4ia2RmOgvCVsno
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
-to simplify the creation of SLAB caches.
+From: David Woodhouse <dwmw@amazon.co.uk>
 
-Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
+Linux guests since commit b1c3497e604d ("x86/xen: Add support for
+HVMOP_set_evtchn_upcall_vector") in v6.0 onwards will use the per-vCPU
+upcall vector when it's advertised in the Xen CPUID leaves.
+
+This upcall is injected through the local APIC as an MSI, unlike the
+older system vector which was merely injected by the hypervisor any time
+the CPU was able to receive an interrupt and the upcall_pending flags is
+set in its vcpu_info.
+
+Effectively, that makes the per-CPU upcall edge triggered instead of
+level triggered.
+
+We lose edges.
+
+Specifically, when the local APIC is *disabled*, delivering the MSI
+will fail. Xen checks the vcpu_info->evtchn_upcall_pending flag when
+enabling the local APIC for a vCPU and injects the vector immediately
+if so.
+
+Since userspace doesn't get to notice when the guest enables a local
+APIC which is emulated in KVM, KVM needs to do the same.
+
+Astute reviewers may note that kvm_xen_inject_vcpu_vector() function has
+a WARN_ON_ONCE() in the case where kvm_irq_delivery_to_apic_fast() fails
+and returns false. In the case where the MSI is not delivered due to the
+local APIC being disabled, kvm_irq_delivery_to_apic_fast() still returns
+true but the value in *r is zero. So the WARN_ON_ONCE() remains correct,
+as that case should still never happen.
+
+Fixes: fde0451be8fb3 ("KVM: x86/xen: Support per-vCPU event channel upcall =
+via local APIC")
+Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+Reviewed-by: Paul Durrant <paul@xen.org>
+Cc: stable@vger.kernel.org
 ---
- arch/x86/kvm/mmu/mmu.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ v3: Repost, add Cc:stable
+ v2: Add Fixes: tag.
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index d59e3ba5d646..5f0d8148cf6e 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -6997,9 +6997,7 @@ int kvm_mmu_vendor_module_init(void)
-=20
- 	kvm_mmu_reset_all_pte_masks();
-=20
--	pte_list_desc_cache =3D kmem_cache_create("pte_list_desc",
--					    sizeof(struct pte_list_desc),
--					    0, SLAB_ACCOUNT, NULL);
-+	pte_list_desc_cache =3D KMEM_CACHE(pte_list_desc, SLAB_ACCOUNT);
- 	if (!pte_list_desc_cache)
- 		goto out;
-=20
+=C2=A0arch/x86/kvm/lapic.c |=C2=A0 5 ++++-
+=C2=A0arch/x86/kvm/xen.c=C2=A0=C2=A0 |=C2=A0 2 +-
+=C2=A0arch/x86/kvm/xen.h=C2=A0=C2=A0 | 18 ++++++++++++++++++
+=C2=A03 files changed, 23 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 3242f3da2457..1e715ca717bc 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -41,6 +41,7 @@
+=C2=A0#include "ioapic.h"
+=C2=A0#include "trace.h"
+=C2=A0#include "x86.h"
++#include "xen.h"
+=C2=A0#include "cpuid.h"
+=C2=A0#include "hyperv.h"
+=C2=A0#include "smm.h"
+@@ -499,8 +500,10 @@ static inline void apic_set_spiv(struct kvm_lapic *api=
+c, u32 val)
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+=C2=A0
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* Check if there are APF p=
+age ready requests pending */
+-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (enabled)
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (enabled) {
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0kvm_make_request(KVM_REQ_APF_READY, apic->vcpu);
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0kvm_xen_enable_lapic(apic->vcpu);
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+=C2=A0}
+=C2=A0
+=C2=A0static inline void kvm_apic_set_xapic_id(struct kvm_lapic *apic, u8 i=
+d)
+diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+index 972098ec4f6a..7a0e3f7a9d20 100644
+--- a/arch/x86/kvm/xen.c
++++ b/arch/x86/kvm/xen.c
+@@ -483,7 +483,7 @@ void kvm_xen_update_runstate(struct kvm_vcpu *v, int st=
+ate)
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0kvm_xen_update_runstate_guest(v, state =3D=3D RUNSTATE=
+_runnable);
+=C2=A0}
+=C2=A0
+-static void kvm_xen_inject_vcpu_vector(struct kvm_vcpu *v)
++void kvm_xen_inject_vcpu_vector(struct kvm_vcpu *v)
+=C2=A0{
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct kvm_lapic_irq irq =
+=3D { };
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int r;
+diff --git a/arch/x86/kvm/xen.h b/arch/x86/kvm/xen.h
+index f8f1fe22d090..8eba3943b246 100644
+--- a/arch/x86/kvm/xen.h
++++ b/arch/x86/kvm/xen.h
+@@ -18,6 +18,7 @@ extern struct static_key_false_deferred kvm_xen_enabled;
+=C2=A0
+=C2=A0int __kvm_xen_has_interrupt(struct kvm_vcpu *vcpu);
+=C2=A0void kvm_xen_inject_pending_events(struct kvm_vcpu *vcpu);
++void kvm_xen_inject_vcpu_vector(struct kvm_vcpu *vcpu);
+=C2=A0int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_=
+attr *data);
+=C2=A0int kvm_xen_vcpu_get_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_=
+attr *data);
+=C2=A0int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *da=
+ta);
+@@ -36,6 +37,19 @@ int kvm_xen_setup_evtchn(struct kvm *kvm,
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 const=
+ struct kvm_irq_routing_entry *ue);
+=C2=A0void kvm_xen_update_tsc_info(struct kvm_vcpu *vcpu);
+=C2=A0
++static inline void kvm_xen_enable_lapic(struct kvm_vcpu *vcpu)
++{
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/*
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * The local APIC is being enabl=
+ed. If the per-vCPU upcall vector is
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * set and the vCPU's evtchn_upc=
+all_pending flag is set, inject the
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * interrupt.
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (static_branch_unlikely(&kvm_=
+xen_enabled.key) &&
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vcpu->arch.xe=
+n.vcpu_info_cache.active &&
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vcpu->arch.xe=
+n.upcall_vector && __kvm_xen_has_interrupt(vcpu))
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0kvm_xen_inject_vcpu_vector(vcpu);
++}
++
+=C2=A0static inline bool kvm_xen_msr_enabled(struct kvm *kvm)
+=C2=A0{
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return static_branch_unlike=
+ly(&kvm_xen_enabled.key) &&
+@@ -101,6 +115,10 @@ static inline void kvm_xen_destroy_vcpu(struct kvm_vcp=
+u *vcpu)
+=C2=A0{
+=C2=A0}
+=C2=A0
++static inline void kvm_xen_enable_lapic(struct kvm_vcpu *vcpu)
++{
++}
++
+=C2=A0static inline bool kvm_xen_msr_enabled(struct kvm *kvm)
+=C2=A0{
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return false;
 --=20
-2.39.2
+2.34.1
 
+
+
+--=-8mYdEa4ia2RmOgvCVsno
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwMTE2MTExNjMzWjAvBgkqhkiG9w0BCQQxIgQgKwkzCbnx
+SJcSONP1g+wsBeEwzjN6QsWEEJMOGXARU3Awgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgB4UdpYFyhScQbO8u0fqzZGMC3ORy8P60c4
+gX2tLbhBHqcyexLuFTopZBB6Crfut2PjH5PxFq89MGKsuuupNeOQyM96xdu49XUpev19/oM+o0ZM
+45UQTYa0oKvsmgrEehM1YZHcXlXZcT+abnCseTXrKwLInWIRLm/wxsoqdBtr9pLAqW8uOM4dhX73
+sa0CAFtnXWfci78tVKpYfRjTFGPzf3hmEJbLNkxEG80jup1mawbmeelY2Ye0fVwZkO2stQtslOE7
+EF+MvvQtdFfadbLoCojARg5puqfWUuFTuxjGi0Nb4Mdavihr5s0TRpH9Pke5bME3YFf7mn++deBI
+zyPHVN51hJLx14NgK9/SeaYfy6NMwHOFt8Ysi9hLlsENBDqvg/aIpkpPI4b3g5AfJi5ybavwK1EH
++zca2xRa1HR0chx5uYgggb6pjHHVi9iCcL6o5GcEl1luRq8iyilok5kU/HHXwAqH/eEtV/ZBRZHY
+nTnnI6xsH6KhPl8fXaBd3G6bvQK4WNH4y7kn8ZhxVN06vpXDJeEwKjrnbB+wxfdpm0zJtKh1V+6b
+RGmNazrgUIEEOoxAZbumXRSYDdI+ppc1M1A6E+ojZz5jrQ6xd3pW1jxOlx0MXMiTWiAGwmSW5D6T
+zY9wOlaIoPdVneKczk6xYWCxpFRaWP4gg/mZXv/vpAAAAAAAAA==
+
+
+--=-8mYdEa4ia2RmOgvCVsno--
 
