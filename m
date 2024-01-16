@@ -1,66 +1,62 @@
-Return-Path: <kvm+bounces-6355-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6356-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A55A182F479
-	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 19:40:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBFF282F4C8
+	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 20:00:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1918E1F24B7E
-	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 18:40:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF40F1C236FB
+	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 19:00:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3848B1CF82;
-	Tue, 16 Jan 2024 18:39:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 670141D528;
+	Tue, 16 Jan 2024 19:00:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="GrmdhbQP"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ipxoBMWE"
 X-Original-To: kvm@vger.kernel.org
 Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EDD01CD32
-	for <kvm@vger.kernel.org>; Tue, 16 Jan 2024 18:39:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC90C1D520
+	for <kvm@vger.kernel.org>; Tue, 16 Jan 2024 19:00:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705430389; cv=none; b=Y0fb4odfLtvEwW/SKZhnTb88OaK/rb+4LGKCWAm4FeinDOu05EJzh9FzKRHbw82yHCDzQmVLFVGOHLUzjIAd/CcaTM+SmQrL2w0+OyTqVcou2goALA+bH2wRqpWyrO3gnjnli8vi7oragVcRPLQjZXjugIpoR9BIIXNPku/0DsM=
+	t=1705431621; cv=none; b=lx+mCF6X+K7daBTyF/BKnu+bsd86o9hU2pg5V0TP7J3yLcZWN3KcCw1awzBsQzP+aD3eEg7+DUb5INb2zQAJApVi3hnWkg8/+/GMqHep/bscQ7RYZ0K5fgFryEVucY3uadqQcmC1rz0JbZCAeTPstV2RQhu0aK6pq3VexOVwkHo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705430389; c=relaxed/simple;
-	bh=AUV20qTGAXjp2NV3v5ckLXRSakUO2sN8w/CIb8IDS8A=;
+	s=arc-20240116; t=1705431621; c=relaxed/simple;
+	bh=I/B1Rb4QKBzj2FKjN8c30plCxufX4d/hoLPTQr5CT0w=;
 	h=DKIM-Signature:Received:Message-ID:Subject:From:To:Cc:Date:
-	 In-Reply-To:References:Content-Type:User-Agent:MIME-Version:
-	 X-SRS-Rewrite; b=Ry86lT7pWm9/0zG1AFixceYPZrDFADsGQdsrYrw5OM+lxFvshiybz2t+WUWuh17/4ULOgiDuKHjZU6/PtTvD0Xel7pegHDzSGd4fvy2wMC2lnEhaz6ozU2nPRSBq3CifiTGg7F2x+IFJhONcEjHXNFec9v56K5j7SNM/+5prEf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=GrmdhbQP; arc=none smtp.client-ip=90.155.50.34
+	 Content-Type:User-Agent:MIME-Version:X-SRS-Rewrite; b=XNTZU9Tt8auF5xz8VK8IwE9VRZU7kQbMT9cY7KhKXcMiuxR49grSAWV5uw/hwTOK9ie+rrMbfxQW/C1bDa9lQidGv5tLKwl+Eb3D5K3i1m63WKSp5bieTZgbV/WlDTx7e5qHfYs/v1nc8fbvK6YPLDOw/+QwdDMytnE2MbdIo+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ipxoBMWE; arc=none smtp.client-ip=90.155.50.34
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=AUV20qTGAXjp2NV3v5ckLXRSakUO2sN8w/CIb8IDS8A=; b=GrmdhbQPQfwSJeqiN1D02HXszB
-	kJkFHT4/qTNm07uJPDWCE4AbavkmGz4RGs59VBwbTuD6uWMW0rZmZacXPTtko+u0tuUp+j29scwU9
-	3nSwPtI/lZINE3+XnCa6M1ApgrEvV/60BbTzuflQu4dWkuG43n2ugvb87N3aTGIVVV9Dw8sGTQHdf
-	4tHbyJIPVPdzz59zbrfqYo8R3cbaaJUTXwDIPh1dnRheVZQEyCqckGth0jP53ydaVCmEPOG1kQxON
-	RQwyMSwTAGz/VdiTCcRwRQVcRSnwhsPhUaf0aOi04+845pmxE+JRKVvlNLn8sIKbLlD2SKkKyW3J0
-	Bqb88AzQ==;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:Date:Cc:To:
+	From:Subject:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=wSh6S/huFsWR3yb4sOLAdwF0qi/MuTayzbcZT74UPkg=; b=ipxoBMWEgg7EOkX1nTg8F4A0Uo
+	wJbgQutiP3OybWYAuv0Japy1MfRkaVIrz3fngsfruaDshZ42qsxrVYLiZC3hu0GgARr9rw8hYcPf6
+	lc9UM/nGHyEiUZw/DoX3erK99+lyVVQSIlyZbbmO0rXCiEwm53NBW7S8V9Ljc6AWkUwY9G1VYfz0j
+	VVSu2/ENIt+PFvG0UTVwFAaYQKcV3clWfGhIutOUvGSMwK/DNogd9jofDYyxSsqs5UdXGB731ZbeF
+	W+ojFfhh+uWC2LSbUUxBakjTWkeibIKORDm2cQjmFnujfe74DcadKM29uUcDhKu8zjbbH/fJMa0C8
+	k9Y27UcA==;
 Received: from [54.239.6.188] (helo=u3832b3a9db3152.ant.amazon.com)
 	by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-	id 1rPoLf-00Dt4C-Te; Tue, 16 Jan 2024 18:39:44 +0000
-Message-ID: <bf5f9bd15a72e2cee3062b369cbfda72d943b6e5.camel@infradead.org>
-Subject: Re: [PATCH v3] KVM: x86/xen: Inject vCPU upcall vector when local
- APIC is enabled
+	id 1rPofX-00Dw1A-Gz; Tue, 16 Jan 2024 19:00:16 +0000
+Message-ID: <6150a0a8c3d911c6c2ada23c0b9c8b35991bd235.camel@infradead.org>
+Subject: [PATCH v4] KVM: x86/xen: Inject vCPU upcall vector when local APIC
+ is enabled
 From: David Woodhouse <dwmw2@infradead.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Thomas
- Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav
- Petkov <bp@alien8.de>,  Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, Paul Durrant
- <paul@xen.org>
-Date: Tue, 16 Jan 2024 19:39:41 +0100
-In-Reply-To: <Zaa0Oi5lgH1UFVdv@google.com>
-References: <0717051e9379614721483aaef29572e0356cd347.camel@infradead.org>
-	 <Zaa0Oi5lgH1UFVdv@google.com>
+To: kvm <kvm@vger.kernel.org>
+Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>,  Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar
+ <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+ <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin"
+ <hpa@zytor.com>,  Paul Durrant <paul@xen.org>
+Date: Tue, 16 Jan 2024 20:00:14 +0100
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-0jqAt6h+Gzst2YGlk7vn"
+	boundary="=-letNDauIfC95gE157Gkf"
 User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -71,98 +67,162 @@ MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
 
---=-0jqAt6h+Gzst2YGlk7vn
+--=-letNDauIfC95gE157Gkf
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2024-01-16 at 08:52 -0800, Sean Christopherson wrote:
-> On Tue, Jan 16, 2024, David Woodhouse wrote:
-> > From: David Woodhouse <dwmw@amazon.co.uk>
-> >=20
-> > Linux guests since commit b1c3497e604d ("x86/xen: Add support for
-> > HVMOP_set_evtchn_upcall_vector") in v6.0 onwards will use the per-vCPU
-> > upcall vector when it's advertised in the Xen CPUID leaves.
-> >=20
-> > This upcall is injected through the local APIC as an MSI, unlike the
-> > older system vector which was merely injected by the hypervisor any tim=
-e
-> > the CPU was able to receive an interrupt and the upcall_pending flags i=
-s
-> > set in its vcpu_info.
-> >=20
-> > Effectively, that makes the per-CPU upcall edge triggered instead of
-> > level triggered.
-> >=20
-> > We lose edges.
->=20
-> Pronouns.=C2=A0 And losing edges isn't wrong in and of itself.=C2=A0 The =
-only thing that
-> is "wrong" is that KVM doesn't exactly follow Xen's behavior.=C2=A0 How a=
-bout smushing
-> the above sentence and the next two paragraphs into:
->=20
-> =C2=A0 Effectively, that makes the per-CPU upcall edge triggered instead =
-of
-> =C2=A0 level triggered, which results in the upcall being lost if the MSI=
- is
-> =C2=A0 delivered when the local APIC is *disabled*.
->=20
-> =C2=A0 Xen checks the vcpu_info->evtchn_upcall_pending flag when enabling=
- the
-> =C2=A0 local APIC for a vCPU and injects the vector immediately if so.=C2=
-=A0 Do the
-> =C2=A0 same in KVM since KVM doesn't provide a way for userspace to notic=
-e when
-> =C2=A0 the guest software enables a local APIC.
+From: David Woodhouse <dwmw@amazon.co.uk>
 
-Yep, that works.
+Linux guests since commit b1c3497e604d ("x86/xen: Add support for
+HVMOP_set_evtchn_upcall_vector") in v6.0 onwards will use the per-vCPU
+upcall vector when it's advertised in the Xen CPUID leaves.
 
-> > @@ -499,8 +500,10 @@ static inline void apic_set_spiv(struct kvm_lapic =
-*apic, u32 val)
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> > =C2=A0
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* Check if there are A=
-PF page ready requests pending */
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (enabled)
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (enabled) {
->=20
-> Argh, not your code, but there's really no reason this check needs to be =
-outside
-> of the "if (enabled !=3D apic->sw_enabled)" block.=C2=A0 I don't care abo=
-ut optimizing
-> anything, I just don't like that it implies that KVM always needs to take=
- action
-> if SPIV is written.=C2=A0 Probably not worth trying to "fix" at this poin=
-t though :-(
->=20
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0kvm_make_request(KVM_REQ_APF_READY, apic->vcpu);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0kvm_xen_enable_lapic(apic->vcpu);
->=20
-> I think we should name the Xen helper kvm_xen_sw_enable_lapic(), to make =
-it clear
-> that the behavior doesn't apply to the APIC being hardware enabled via MS=
-R.
-> Unless it does apply to that path?
+This upcall is injected through the guest's local APIC as an MSI, unlike
+the older system vector which was merely injected by the hypervisor any
+time the CPU was able to receive an interrupt and the upcall_pending
+flags is set in its vcpu_info.
 
-I believe Xen only injects the interrupts when the SPIV register is
-written with bit 8 set (i.e. not SW disabled). It doesn't look like a
-HW disable/enable will reinject the vector. So yes, renaming it makes
-some sense.=20
+Effectively, that makes the per-CPU upcall edge triggered instead of
+level triggered, which results in the upcall being lost if the MSI is
+delivered when the local APIC is *disabled*.
 
-It *shouldn't* be moved inside the 'if (enabled !=3D apic->sw_enabled)'
-block, if it's to emulate the Xen behaviour faithfully. With an upcall
-pending, I believe that a HW enable followed by *any* write to the SPIV
-register will inject the vector.=20
+Xen checks the vcpu_info->evtchn_upcall_pending flag when the local APIC
+for a vCPU is software enabled (in fact, on any write to the SPIV
+register which doesn't disable the APIC). Do the same in KVM since KVM
+doesn't provide a way for userspace to intervene and trap accesses to
+the SPIV register of a local APIC emulated by KVM.
 
-(The APIC starts up with the software bit in SPIV *enabled*).
+Astute reviewers may note that kvm_xen_inject_vcpu_vector() function has
+a WARN_ON_ONCE() in the case where kvm_irq_delivery_to_apic_fast() fails
+and returns false. In the case where the MSI is not delivered due to the
+local APIC being disabled, kvm_irq_delivery_to_apic_fast() still returns
+true but the value in *r is zero. So the WARN_ON_ONCE() remains correct,
+as that case should still never happen.
 
-I'll send a new version with updated commit message and that name
-change. Thanks.
+Fixes: fde0451be8fb3 ("KVM: x86/xen: Support per-vCPU event channel upcall =
+via local APIC")
+Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+Reviewed-by: Paul Durrant <paul@xen.org>
+Cc: stable@vger.kernel.org
+---
+ v4: Reword commit message,
+     rename kvm_xen_enable_lapic() =E2=86=92 kvm_xen_sw_enable_lapic().
+ v3: Repost, add Cc:stable.
+ v2: Add Fixes: tag.
+
+=C2=A0arch/x86/kvm/lapic.c |=C2=A0 5 ++++-
+=C2=A0arch/x86/kvm/xen.c=C2=A0=C2=A0 |=C2=A0 2 +-
+=C2=A0arch/x86/kvm/xen.h=C2=A0=C2=A0 | 18 ++++++++++++++++++
+=C2=A03 files changed, 23 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 3242f3da2457..75bc7d3f0022 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -41,6 +41,7 @@
+=C2=A0#include "ioapic.h"
+=C2=A0#include "trace.h"
+=C2=A0#include "x86.h"
++#include "xen.h"
+=C2=A0#include "cpuid.h"
+=C2=A0#include "hyperv.h"
+=C2=A0#include "smm.h"
+@@ -499,8 +500,10 @@ static inline void apic_set_spiv(struct kvm_lapic *api=
+c, u32 val)
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+=C2=A0
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* Check if there are APF p=
+age ready requests pending */
+-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (enabled)
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (enabled) {
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0kvm_make_request(KVM_REQ_APF_READY, apic->vcpu);
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0kvm_xen_sw_enable_lapic(apic->vcpu);
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+=C2=A0}
+=C2=A0
+=C2=A0static inline void kvm_apic_set_xapic_id(struct kvm_lapic *apic, u8 i=
+d)
+diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+index 8ef668922340..7c602037b596 100644
+--- a/arch/x86/kvm/xen.c
++++ b/arch/x86/kvm/xen.c
+@@ -568,7 +568,7 @@ void kvm_xen_update_runstate(struct kvm_vcpu *v, int st=
+ate)
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0kvm_xen_update_runstate_guest(v, state =3D=3D RUNSTATE=
+_runnable);
+=C2=A0}
+=C2=A0
+-static void kvm_xen_inject_vcpu_vector(struct kvm_vcpu *v)
++void kvm_xen_inject_vcpu_vector(struct kvm_vcpu *v)
+=C2=A0{
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct kvm_lapic_irq irq =
+=3D { };
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int r;
+diff --git a/arch/x86/kvm/xen.h b/arch/x86/kvm/xen.h
+index f8f1fe22d090..f5841d9000ae 100644
+--- a/arch/x86/kvm/xen.h
++++ b/arch/x86/kvm/xen.h
+@@ -18,6 +18,7 @@ extern struct static_key_false_deferred kvm_xen_enabled;
+=C2=A0
+=C2=A0int __kvm_xen_has_interrupt(struct kvm_vcpu *vcpu);
+=C2=A0void kvm_xen_inject_pending_events(struct kvm_vcpu *vcpu);
++void kvm_xen_inject_vcpu_vector(struct kvm_vcpu *vcpu);
+=C2=A0int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_=
+attr *data);
+=C2=A0int kvm_xen_vcpu_get_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_=
+attr *data);
+=C2=A0int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *da=
+ta);
+@@ -36,6 +37,19 @@ int kvm_xen_setup_evtchn(struct kvm *kvm,
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 const=
+ struct kvm_irq_routing_entry *ue);
+=C2=A0void kvm_xen_update_tsc_info(struct kvm_vcpu *vcpu);
+=C2=A0
++static inline void kvm_xen_sw_enable_lapic(struct kvm_vcpu *vcpu)
++{
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/*
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * The local APIC is being enabl=
+ed. If the per-vCPU upcall vector is
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * set and the vCPU's evtchn_upc=
+all_pending flag is set, inject the
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * interrupt.
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (static_branch_unlikely(&kvm_=
+xen_enabled.key) &&
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vcpu->arch.xe=
+n.vcpu_info_cache.active &&
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vcpu->arch.xe=
+n.upcall_vector && __kvm_xen_has_interrupt(vcpu))
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0kvm_xen_inject_vcpu_vector(vcpu);
++}
++
+=C2=A0static inline bool kvm_xen_msr_enabled(struct kvm *kvm)
+=C2=A0{
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return static_branch_unlike=
+ly(&kvm_xen_enabled.key) &&
+@@ -101,6 +115,10 @@ static inline void kvm_xen_destroy_vcpu(struct kvm_vcp=
+u *vcpu)
+=C2=A0{
+=C2=A0}
+=C2=A0
++static inline void kvm_xen_sw_enable_lapic(struct kvm_vcpu *vcpu)
++{
++}
++
+=C2=A0static inline bool kvm_xen_msr_enabled(struct kvm *kvm)
+=C2=A0{
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return false;
+--=20
+2.34.1
 
 
---=-0jqAt6h+Gzst2YGlk7vn
+
+--=-letNDauIfC95gE157Gkf
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -254,25 +314,25 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwMTE2MTgzOTQxWjAvBgkqhkiG9w0BCQQxIgQgBEs5Jqlh
-Nqon3u+xgKuzhLbiX5ifyQl/3Iq4Q0Z73Dwwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwMTE2MTkwMDE0WjAvBgkqhkiG9w0BCQQxIgQgxeXrtIG9
+r/wgMmeMzqbRdh3lXvt7Vo8oa65ae2QzW78wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCPOnhGZy3gFZzA0e54OZ3y5RHuq222wNBA
-viev1eHYgZO0G7+kQxd6gASdyOKcFCQfEpGW4Z8S34xVoJTv4OhEvTfaZRBz84GCyUOfOMpUYe1r
-1waJHzIZ6yqQUcK+M9xzxn+Oh1lyeEMTrQH5bk0g7rCWQ+thqOQj7fB02LmAnQ/UiGMkvheMwNeg
-u+SvBMvoGbEj0OV4oVBQWZFAQ0+nXucgyKzMHQF6+km15mrKedRUDdxw13tSXAocaJuR6kr2RA67
-I9So70WIkeElP95T5GWciZ+m5n1WYn4A+Ku/+KCr+OxYFuo1rZ+aZY9W/jq1fpK3U4fmrv02vNaz
-jI5r/Taw13vTF07UZQyBN7cf8PEKfLTrpfC0Rr29pMlDU4PwfFtGktSQN+1Sz4zBbLfymTCBSMLB
-Hh/GZGiAto/OINmj0Awh5oqESvm2uFqkV56JZGjqitpfJdamVGB0UiuGEIENnfEjWU2X/+jW3U+N
-T0suiW8xQfSIeZGU2HkKOk+EeblO+oSomBYFz4U2KZcb2/IXgKtTrhl7V1YL4IsDVmjiP4sp2AEA
-c2XQdJ4ZcQvqHQVI4ux+cYA+4VndRShYsHAjKrESGNEck2AUFO4f0PQJ15IUyOICkA6ooMgtmUgv
-OKP5EuPx+QgqcNEuW9eJlwyJ5llwYMo7xq8XZdc51AAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAc5FM+8i+zh8IX45xZopZgErzN9372+jUc
+PqhHGPAmEBa3GvC2WxLTfSSi8XbtOXBZwOghrDuJuinIlseL7ppsdyRz4YDo2FU/cUaKWgjAHBnF
+ekfLPCiu+lWpoVliMy+WyfVh/qloiQgAUT+5bBJP3cUp5eskK46f+/2P0ocbDeC9/y6Jmc16bpD+
+aVe7dT2up0S+39BxfZyT/7Mbewxi4efAi9eJvwA8SR0zNmZsO+KNn2nnj5gOeT9DU9Mghl6wBTIh
+BshWajqWXp8TugWCzC54mGuixFtBylgsPwTxGK49MvBXjJYrN1MsjzJ+7NzFvuWR0I5M3fmSdC3x
+SZUnRkb+cdBbQG3X0nawBqnZRffemYHT8aHtUIEFth1X3MVFcpJat1+hXfEJ6fY2wU27yHV/v5k8
+DPhgHiyOn/1jFidzi3qtPjGecxqUVC0NiT2mOcC5NczxtrZtU23suG9+CjlUqAuFyHR3RDjsRs4Q
+X5QgZ2q/0UfQOpQ6mlhg1AoOtYWujGxXSq6rHMJJYAh026pueQ6hC4akEMrqZ0Ifvd7K0SxoMN6i
+rVY/yvuZDp+/sZlC6F/ymJbF9ZMUZa49QyZdn64qlbUGT/AnXjmVfzaKqOuq1QrV9WV71qvuGdnE
+LYDSj0jbaanosk1FXuBcKA9ttAxFL1zktbaa/RRV3AAAAAAAAA==
 
 
---=-0jqAt6h+Gzst2YGlk7vn--
+--=-letNDauIfC95gE157Gkf--
 
