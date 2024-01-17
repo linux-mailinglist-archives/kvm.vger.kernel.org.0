@@ -1,104 +1,115 @@
-Return-Path: <kvm+bounces-6382-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6383-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CDB4830178
-	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 09:46:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D972D830262
+	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 10:35:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB01F287D97
-	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 08:46:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B7451C2128E
+	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 09:35:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B233312B99;
-	Wed, 17 Jan 2024 08:46:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A187E1401F;
+	Wed, 17 Jan 2024 09:34:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tcEa+KR/"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="KdAVQFGo"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB1CA12B6F
-	for <kvm@vger.kernel.org>; Wed, 17 Jan 2024 08:46:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 742F867C6E;
+	Wed, 17 Jan 2024 09:34:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705481177; cv=none; b=kBRFwQNFAv/3n7rN0dsIsyaA+QC5XYTR5yXmc0aM76RbtmBuW5/7kpYrsl7VmRvjAZAe/+0ZyTo26xPVLHi60lenc0tri6KPptGHzCM9UcYCyrhYf6+vpVuwEJARvFjafUc3eeatRmt0LU8+P9kKKTNR77sT252D6dGbPAXg5d0=
+	t=1705484091; cv=none; b=C043eFWyUWSCUdHTpCtFrrtUB73pER1HwM99YlvxWi3CsA5KVv1OoRVYdh1r8kgbWbBFmoJbNgrsPJc22XhWu9xMIszAxSMHZiVTuGrMvmYCx69+Z3CXx2LrK/u6WkdEENNyLkHnj5KfJlxT4gNLiEFhVNDuGpY3hMk2FlZ5AXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705481177; c=relaxed/simple;
-	bh=MkBgEMAMHfAqC3Z0N5flWiKbqS4K2pwm5sNJNtYXq7M=;
-	h=Received:DKIM-Signature:Received:From:To:Subject:Date:
-	 X-Bugzilla-Reason:X-Bugzilla-Type:X-Bugzilla-Watch-Reason:
-	 X-Bugzilla-Product:X-Bugzilla-Component:X-Bugzilla-Version:
-	 X-Bugzilla-Keywords:X-Bugzilla-Severity:X-Bugzilla-Who:
-	 X-Bugzilla-Status:X-Bugzilla-Resolution:X-Bugzilla-Priority:
-	 X-Bugzilla-Assigned-To:X-Bugzilla-Flags:X-Bugzilla-Changed-Fields:
-	 Message-ID:In-Reply-To:References:Content-Type:
-	 Content-Transfer-Encoding:X-Bugzilla-URL:Auto-Submitted:
-	 MIME-Version; b=MUjmSj5lvf6bPWyq6H25dTveVykPTjdi5gM2jIIiP3D7f2KWM3Z6kM9FycJ9HCM66OYhUELQlxsm6FAWR3JoU69Hm5j9VJi+K9irsV2YXuGWFFUpAudkeIXw4BLfZf2D+8rFzOXqVcMMQn/4NGB50dxa4KeXbz8h2ua6c9Psqq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tcEa+KR/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6DA79C43394
-	for <kvm@vger.kernel.org>; Wed, 17 Jan 2024 08:46:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705481177;
-	bh=MkBgEMAMHfAqC3Z0N5flWiKbqS4K2pwm5sNJNtYXq7M=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=tcEa+KR/6AcwyHiLarDl5AgV5gDOVpJWSJj2Z0Lv+TNX5HskOSNhNRXis13ViviNa
-	 wP2LyKC0kS8+KX9/zeyzAVnMSksbyVPrgwng/0Xky2BWeiFU4G1B3ZkSSEnu5/6GsY
-	 fmLOGBMSAcdnTVECwQUG0rfi+OqEC8Da7oO6rd6xlEgtAJbWHryG1OGklWlC1+vOiR
-	 lRk2MpvZ2SsgrBxoNn13AFlj/aIu/4ULrDxu/zJ26wKq0c6oHDow5R4+PY/pJxoJtO
-	 MDQPo6ulHcomL+wC14I0Mr1nRvlxES7Jb3Mbupn5ef2WeFJLhgCnk+eBZ7r4BgTnND
-	 xxWv3md6o4SrQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 5F0E6C53BC6; Wed, 17 Jan 2024 08:46:17 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: kvm@vger.kernel.org
-Subject: [Bug 218386] "kvm: enabling virtualization on CPUx failed" on
- "Ubuntu 22.04.03 with kernel 6.5.0-14-generic"
-Date: Wed, 17 Jan 2024 08:46:17 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: blocking
-X-Bugzilla-Who: antonio.petricca@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: short_desc
-Message-ID: <bug-218386-28872-LyrVQvbkdl@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218386-28872@https.bugzilla.kernel.org/>
-References: <bug-218386-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=arc-20240116; t=1705484091; c=relaxed/simple;
+	bh=orkT7LXixbgsPn4N1XEWMynXnZfNfGpgiHmaG+54rCs=;
+	h=Received:X-Virus-Scanned:Received:DKIM-Signature:Received:Date:
+	 From:To:Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=kLy1m08iwpaMEXHfgRaZOUhNMnKuhr3fjldNW+Ed/I+CrCxJyzbf0XUQOOfcMHVWlfgT22bFO5LHx/n2fv7bcLPs6UNC06Dea1aO4xgm9ucder047xDWGHQfzf4TgRdWCCVQ5/GnYEJp9tAjGp3IS79z4l5YzHPk1RNnxXD/BS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=KdAVQFGo; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 74C1F40E01B2;
+	Wed, 17 Jan 2024 09:34:45 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id 99Y-ZDDsaapm; Wed, 17 Jan 2024 09:34:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1705484083; bh=g7EGo61gChdLMP36XWtArwGzH5MicsbmHMpZGITpmKE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KdAVQFGoTvsWN62JBRPJezAYAZfo8NF2KyS2AonnfT+RG0XFDyq8MfgsErfXeU7Gt
+	 Bui+OlYhX5nd4ek3sMMd5eV68mrnAAcrZ1s5ql4H3gbIdld/MM1RzveihPFqHbSBwv
+	 7MFY2oSU7CDbVvkO3n0x4Sv2VBi4PrnmrID92Cm35IWGgYlKIYJ/YIV1bdkoHDFRB4
+	 8DDYPJhsWmJ63kdlCdCgj2SPftoE7SlpSPcxFkSd3MlmFn0UpgOy6csxSIho7jV0WH
+	 6W9HI2eoa3bOc3cXkQ885tvXh8YCaInBNjKf0dLufJkzHROHFQ46Kub2WsGCvV/yDg
+	 Iu5gb2nJ9sKw+XXGwpAgVC1EHo7OHdEinBfVwTVmpphvYSW8eS+pyauYU/ci6ot50a
+	 pdXVqm2/SU1fJWxsn1x2tA0+aZagIqflybxH7Atsy5sIpvpefJBHs4JNo1iJzpgdoO
+	 bEyD0iN3pQ7t7gy+ysHcO8iOTGyQwROfItCc1G8CKRnDD+h6ZqwE5jjadlj2z8hqr0
+	 K79POhg4+w0lNuYjeLHanEmPGI5HkRvoCHLSnIdW5j9pmV5Svhf3ypTWJk4UXg1rSh
+	 OSeS9wz5SVZtC0oefYlC+s5GGubs3hVSMb9nBVWbM7poXtsAc4F1jNGrGo1cvb9tzi
+	 EuzDPL1X0OBKUl4NwVtIQyH4=
+Received: from zn.tnic (pd9530f8c.dip0.t-ipconnect.de [217.83.15.140])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 9122640E0177;
+	Wed, 17 Jan 2024 09:34:05 +0000 (UTC)
+Date: Wed, 17 Jan 2024 10:34:00 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Dave Hansen <dave.hansen@intel.com>
+Cc: Michael Roth <michael.roth@amd.com>, x86@kernel.org,
+	kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
+	thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
+	pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+	jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
+	slp@redhat.com, pgonda@google.com, peterz@infradead.org,
+	srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+	tobin@ibm.com, vbabka@suse.cz, kirill@shutemov.name,
+	ak@linux.intel.com, tony.luck@intel.com,
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+	pankaj.gupta@amd.com, liam.merwick@oracle.com
+Subject: Re: [PATCH v1 11/26] x86/sev: Invalidate pages from the direct map
+ when adding them to the RMP table
+Message-ID: <20240117093341.GBZaee9f614RSBhXi0@fat_crate.local>
+References: <20231230161954.569267-1-michael.roth@amd.com>
+ <20231230161954.569267-12-michael.roth@amd.com>
+ <cb604c37-aeb5-45bd-b6db-246ae724e4ca@intel.com>
+ <20240115090948.GBZaT2XKw00PokD-WJ@fat_crate.local>
+ <6ecc4517-9a4f-4d7e-a630-2b8357b7be05@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <6ecc4517-9a4f-4d7e-a630-2b8357b7be05@intel.com>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218386
+On Tue, Jan 16, 2024 at 08:21:09AM -0800, Dave Hansen wrote:
+> The problem will be the first time someone sees a regression when their
+> direct-map-fracturing kernel feature (secret pages, SNP host, etc...)
+> collides with some workload that's sensitive to kernel TLB pressure.
 
-Antonio Petricca (antonio.petricca@gmail.com) changed:
+Yeah, and that "workload" will be some microbenchmark crap which people
+would pay too much attention to, without it having any relevance to
+real-world scenarios. Completely hypothetically speaking, ofc.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-            Summary|kvm: enabling               |"kvm: enabling
-                   |virtualization on CPUx      |virtualization on CPUx
-                   |failed on "Ubuntu 22.04.03  |failed" on "Ubuntu 22.04.03
-                   |with kernel                 |with kernel
-                   |6.5.0-14-generic"           |6.5.0-14-generic"
+:-)
 
---=20
-You may reply to this email to add a comment.
+-- 
+Regards/Gruss,
+    Boris.
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+https://people.kernel.org/tglx/notes-about-netiquette
 
