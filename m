@@ -1,130 +1,121 @@
-Return-Path: <kvm+bounces-6402-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6403-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D8A3830B68
-	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 17:46:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D907B830B7A
+	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 17:51:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 11947B2437B
-	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 16:46:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7C88DB23B4F
+	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 16:51:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27BB321A01;
-	Wed, 17 Jan 2024 16:46:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 733FE224E7;
+	Wed, 17 Jan 2024 16:51:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="etD+PZoj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VanpWu13"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 146B3224DC
-	for <kvm@vger.kernel.org>; Wed, 17 Jan 2024 16:46:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F825224D6
+	for <kvm@vger.kernel.org>; Wed, 17 Jan 2024 16:51:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705509988; cv=none; b=OkhhuMthvXvpWB+zfR0mqAtH/Z4pG4VGLjaODlgqGsSgC+hrupVP+G5hNHVBpbPup4P2ikiI8JacOsne7fAoW7QgNEUN/7LhMg0YPiKblUawiViq749NtIyXuKNctigK+lw5LlyiWiPBynwJTv+1w0h4enmSG1xf9K762bYKf1Q=
+	t=1705510303; cv=none; b=pSgXtsvMxQT+phvwNEgHUeqia9NJkK8JcIySQjHgL8hEhR3iWA9PgbHx+hxj+l4jZRUKQormB7eKMRXGhlCWIXDLzTW64jmjMxnle4DLzft9cQjJBTcYIXyx1jCbZA2ryEElH4jy/cJzHpQLwu60lkGtSLIXZuWQo81OwTDoMqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705509988; c=relaxed/simple;
-	bh=QuYROdC3cn0wquxPzQpVjZ5p7a1GBIucWN4OwSVJfTk=;
-	h=DKIM-Signature:Received:X-MC-Unique:Received:
-	 X-Google-DKIM-Signature:X-Gm-Message-State:X-Received:
-	 X-Google-Smtp-Source:X-Received:Received:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:Content-Language:To:Cc:References:
-	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding; b=P4ykUissge+6XsbhtFWi6UvG++aVzpwm8o1ma360U+frZ3zO8Sa3gnH+B93EiCssSieUhO7ir7516lKr6GKgy/Q928QYl6KNGGat9QCWzuH7krCISCruZhEazaDKtpn/tELhb93JohlmhKEfNhK/Wv+OzHTgPGvs91LhDjX/5vY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=etD+PZoj; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1705509985;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Cd3Ose77j/HJBnKN6w+dtcgDO0iKk1wmfevfCIa9z2M=;
-	b=etD+PZojtdf6V5vh8DKTJJt5jdfCeBt/NNDzbeReFhvdvjnQqtkEi6LgPC88WaHv0E64hj
-	qY2QOk7TcTQRPZrqFrahz3Gx35RYX49H35jxAAaCaAA42ZtQUqYPEMIuGQLqPuZ0LYcrAU
-	mhe39gWm8niZUJcinKoctkdyjEVmHHg=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-615-4Q18lO9sPTKyY5QiID1lhw-1; Wed, 17 Jan 2024 11:46:21 -0500
-X-MC-Unique: 4Q18lO9sPTKyY5QiID1lhw-1
-Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-42987be5d14so149499331cf.1
-        for <kvm@vger.kernel.org>; Wed, 17 Jan 2024 08:46:21 -0800 (PST)
+	s=arc-20240116; t=1705510303; c=relaxed/simple;
+	bh=Flpoh3ReMa+f01zkWdwyPUtfMDQc8awDAoOZ7kl2Rbk=;
+	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Date:
+	 In-Reply-To:Mime-Version:References:Message-ID:Subject:From:To:Cc:
+	 Content-Type:Content-Transfer-Encoding; b=UPTmoqKDnr13NduH53TXnvvn8kHFj23dekZeaTpMEq1yy4JgoqLdSYIfqpoZPwkGqZtZMeTuD1NkrfrxporR5SlztUjttFiesBUn6v/q/UhMUYG7EJ7saDibt5Dpu5QzPVh4DSuOak8Ryl5eyO+ClYdWuJQTqkBPpNuLayveiNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VanpWu13; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-5c659339436so3962067a12.2
+        for <kvm@vger.kernel.org>; Wed, 17 Jan 2024 08:51:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1705510302; x=1706115102; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=AQfvIeCd7zUSaSSlAixj7/WQFqRLxQS0winR/4uznmc=;
+        b=VanpWu13vIna6wEt4PzaaiRGCj3DkoS1qk64yt4n2uf93GrWFHGwatws8u4X2a3hQU
+         YfEHUAf4tgIfWcy8m/ltSakMBOw4FQ96KN5pm57DvPk7wKrV/Ru22vEk4ovgoRTgjXOQ
+         +mk+zHjUBGQIUcKLJlTuCa+J9Hg8WT+U2uJoOEANB6kEAcIAyDxWtcrpbcRYmz3Vo9hM
+         l2smlAHaSEUlPS5rqISbObES4dw9iYr8Zuyuqe+vnCyIEupSzV0d9qvZp7dkE1k51Wdg
+         cHKny6kGpBFuI+oyvtw7vb6l1NPAeobcssSf/F+BWdvxVX0IlXy1jymVjNEdfS0nk+9Z
+         82Cg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705509981; x=1706114781;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Cd3Ose77j/HJBnKN6w+dtcgDO0iKk1wmfevfCIa9z2M=;
-        b=XYdBB6c4dqQhwh/reR6fBihl1mJFvfctJ9/9QU+ICALu9NvWHxNHbjN55GZnSDWBNs
-         nsti550BGAEB4eF6u+/L9vBozs9pbWmlcTPkUARiwnGLrt121E3txzUujldQBAC8Xwlk
-         2F2rvUy07HM1ugjKgMQuCMKFWy3/Mxry4/CzIK045fPw6tfapVq/zhet2VqNjb/4qLqo
-         UdkiWMAXOKgtHl7p2lsvWX0ajYJ66WAUhPs3Ov/Gyczu+bvwlJx9J17fPyeS4oMgpNBq
-         drIc+rAcFgGHi9jV9Enjn9P9ukPcGE6JpFHeDGh4geWuQo4dnMTggCXCMrCwnZqc1pYH
-         4CKA==
-X-Gm-Message-State: AOJu0YxDPF567SuHuMV6ITjKyCaqLnMddLq6O7ok09nZiLakdSNMtsPG
-	UTvhbSpuG2fHPBMOiBlC2VUD2YYe1f1OqMR10lQ1gml9YNuVb4EURcoRkIpWSgUobY0RPr7+jo7
-	BTcVD9usLVmUfh/pgdxUh
-X-Received: by 2002:ac8:5a8f:0:b0:42a:1553:cff6 with SMTP id c15-20020ac85a8f000000b0042a1553cff6mr220654qtc.126.1705509981281;
-        Wed, 17 Jan 2024 08:46:21 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGW8fkE05FBmJaoynz/aIXVHHUcHQ3Pr6KAGIwSnuZA15bWET+UbtWEv7wkEEnwLU9Ap7PbBw==
-X-Received: by 2002:ac8:5a8f:0:b0:42a:1553:cff6 with SMTP id c15-20020ac85a8f000000b0042a1553cff6mr220640qtc.126.1705509981068;
-        Wed, 17 Jan 2024 08:46:21 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id bq9-20020a05622a1c0900b00429940c13a8sm5928765qtb.34.2024.01.17.08.46.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Jan 2024 08:46:20 -0800 (PST)
-Message-ID: <00336880-d380-4c64-a0dc-67d7ca6fedbd@redhat.com>
-Date: Wed, 17 Jan 2024 17:46:16 +0100
+        d=1e100.net; s=20230601; t=1705510302; x=1706115102;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=AQfvIeCd7zUSaSSlAixj7/WQFqRLxQS0winR/4uznmc=;
+        b=Az6u3yIJvGnopgcNzadKLfmQziCWA3e+b+yJ91TKyK89cEF/CCKk7Pz9RLpxBT0Bwx
+         6ZmdljuRWLVkdnTbqLgJOOPNVRXT5aWISlwPIHQB/pUb2epj+/Klsja5S7f2rD9Wdid6
+         sKgixU4PW3GXnfFVx7NH/KC/kfHIRw8WCaHHGpEcByRC9VgYgrCnw1lsVoZHAGoFf4Se
+         M41qIdGeEj1CMeJ2jOTMw/Wpi7iHN0IjzRjw0Ye9KjUHWASKjZj1rLkcyoD1skewGcdY
+         npO/r/5Io+bnkklvy7wlApTBry1kvVy+LYappVdbkUg8A6Ar1mveq9szyCPIOyZd0bwG
+         6AuA==
+X-Gm-Message-State: AOJu0Yw1/uBjEBZRmcdU0rtNilfqUNetVG8ihI7AfUkPCR5J8JWafv0b
+	QV1+8YqhN86ND5W5DA2a6SWhjEneO6Vr8q2iwQ==
+X-Google-Smtp-Source: AGHT+IGL0PWq2TGf0nDbHAhvadJ9D0G0DOckQIs3hyNL6KMra58JOuh2T6rxa7GPWAK/WmbxX74/DQfVVp0=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90b:3d4e:b0:28d:337:1281 with SMTP id
+ qn14-20020a17090b3d4e00b0028d03371281mr273612pjb.2.1705510301071; Wed, 17 Jan
+ 2024 08:51:41 -0800 (PST)
+Date: Wed, 17 Jan 2024 08:51:39 -0800
+In-Reply-To: <ef60725c38faa30132ab45cf14ee0af86e885596.camel@amazon.co.uk>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5] arm/kvm: Enable support for KVM_ARM_VCPU_PMU_V3_FILTER
-Content-Language: en-US
-To: Sebastian Ott <sebott@redhat.com>
-Cc: Shaoqin Huang <shahuang@redhat.com>, qemu-arm@nongnu.org,
- Gavin Shan <gshan@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
- kvm@vger.kernel.org
-References: <20240115080144.44944-1-shahuang@redhat.com>
- <852ee2a3-b69f-4480-a6f4-f2b274f5e01c@redhat.com>
- <36a1efb3-2538-c339-d627-843e7d2b6541@redhat.com>
-From: Eric Auger <eauger@redhat.com>
-In-Reply-To: <36a1efb3-2538-c339-d627-843e7d2b6541@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <9a82db197449bdb97ee889d2f3cdd7998abd9692.camel@amazon.co.uk>
+ <Zaf7yCYt8XFuMhAd@google.com> <ef60725c38faa30132ab45cf14ee0af86e885596.camel@amazon.co.uk>
+Message-ID: <ZagFm0tmZ4_nWf9L@google.com>
+Subject: Re: [PATCH] KVM: pfncache: rework __kvm_gpc_refresh() to fix locking issues
+From: Sean Christopherson <seanjc@google.com>
+To: David Woodhouse <dwmw@amazon.co.uk>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	Paul Durrant <pdurrant@amazon.co.uk>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Sebastian,
+On Wed, Jan 17, 2024, David Woodhouse wrote:
+> On Wed, 2024-01-17 at 08:09 -0800, Sean Christopherson wrote:
+> > On Fri, Jan 12, 2024, David Woodhouse wrote:
+> > As you note above, some other mutex _should_ be held.=C2=A0 I think we =
+should lean
+> > into that.=C2=A0 E.g.
+>=20
+> I don't. I'd like this code to stand alone *without* making the caller
+> depend on "some other lock" just for its own internal consistency.
 
-On 1/17/24 17:29, Sebastian Ott wrote:
-> On Wed, 17 Jan 2024, Eric Auger wrote:
->> On 1/15/24 09:01, Shaoqin Huang wrote:
->>> +    /*
->>> +     * The filter only needs to be initialized through one vcpu
->>> ioctl and it
->>> +     * will affect all other vcpu in the vm.
->>> +     */
->>> +    if (pmu_filter_init) {
->> I think I commented on that on the v4. Maybe I missed your reply. You
->> sure you don't need to call it for each vcpu?
-> 
-> From (kernel) commit d7eec2360e3 ("KVM: arm64: Add PMU event filtering
-> infrastructure"):
->   Note that although the ioctl is per-vcpu, the map of allowed events is
->   global to the VM (it can be setup from any vcpu until the vcpu PMU is
->   initialized).
-Ah OK. I forgot that specificity.
+Hmm, I get where you're coming from, but protecting a per-vCPU asset with
+vcpu->mutex is completely sane/reasonable.  Xen's refresh from a completely
+different task is the oddball.  And unnecessarily taking multiple mutexes m=
+uddies
+the water, e.g. it's not clear what role kvm->arch.xen.xen_lock plays when =
+it's
+acquired by kvm_xen_set_evtchn().
 
-Thanks!
-
-Eric
-> 
-> Sebastian
-> 
-
+> > =C2=A0 1. Pass in the guarding mutex to kvm_gpc_init() and assert that =
+said mutex is
+> > =C2=A0=C2=A0=C2=A0=C2=A0 held for __refresh(), activate(), and deactiva=
+te().
+> > =C2=A0 2. Fix the cases where that doesn't hold true.
+> > =C2=A0 3. Drop refresh_mutex
+> >=20
+>=20
+> I'll go for (3) but I disagree about (1) and (2). Just let the rwlock
+> work as $DEITY intended, which is what this patch is doing. It's a
+> cleanup.
+>=20
+> (And I didn't drop refresh_lock so far partly because it wants to be
+> done in a separate commit, but also because it does provide an
+> optimisation, as noted.
 
