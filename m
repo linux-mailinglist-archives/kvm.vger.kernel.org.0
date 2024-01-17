@@ -1,130 +1,100 @@
-Return-Path: <kvm+bounces-6366-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6367-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AA8282FE20
-	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 01:57:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8784482FE28
+	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 02:05:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 258FAB222C7
-	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 00:57:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19EC0286BE9
+	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 01:05:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBBD84404;
-	Wed, 17 Jan 2024 00:57:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 272D54A2C;
+	Wed, 17 Jan 2024 01:05:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E64mj0od"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sHwMgMgi"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7BFE1864;
-	Wed, 17 Jan 2024 00:57:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC1ED4683
+	for <kvm@vger.kernel.org>; Wed, 17 Jan 2024 01:05:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705453023; cv=none; b=kWf7Mphq2AwAg14/8O0mq7R+U8YjjLNgllCU53HCOChaMLNVp6Af7mwBP7voGTu20/ljn2pYzaisMsPBPR1ExQCjBchVP+L16xBWsjZKVPgBRVulGijwyNT6Gn4Sh38FN9ugjDC4Hn4mFOUyfJ/G7dlwfMZ/s50TnMXV1ntl46M=
+	t=1705453518; cv=none; b=OJcREofB9o7/YRca1PnJltR4q/sqiWIFEVQtJ4tDraSluPiamMZKB/ZSBIlOSTEitB6jZbo6+0aaFblNhzZpxcEoEipMtOOSKK3uNC5Z2HFXayPicmLCeN2tF9qAtN4VExEJJYUJ20a0/EkXC+3XVaCLgx5JJaoJ79ZER44WztE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705453023; c=relaxed/simple;
-	bh=7UnTX34HgoTW8uGNTwh9hFEKB90kOA7xqoZPARdreAs=;
+	s=arc-20240116; t=1705453518; c=relaxed/simple;
+	bh=ivMZlPL10wMiuh5RI8lMpyWcINCSV4uJPhcMAtLj8Zw=;
 	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:MIME-Version:
-	 References:In-Reply-To:From:Date:Message-ID:Subject:To:Cc:
-	 Content-Type:Content-Transfer-Encoding; b=IXk3SPeE29CpdgYnVzmzo8CMwgn7MVnNnNE6uEcmNyLP78UwO4Y3zJl23rPEffHBb63KneqeK4JOeHFBdnoTPsvsKv7wUIezwtiUef5ExurfAIGtfysNy/6uZX0WGIni2T4vWqMTyGgu6kt9W+IdAyhGNEZHcFeJYH3JlW4ivy0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E64mj0od; arc=none smtp.client-ip=209.85.128.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-5ff45c65e60so16507697b3.0;
-        Tue, 16 Jan 2024 16:57:01 -0800 (PST)
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Date:
+	 In-Reply-To:Mime-Version:References:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=H/yunnIad2L6mK/4c6mBGSFhXwTeCC+xIFkAHxNag+AQx/2wvrUeGUHzyAD0XYkIw8/MwgjGb3V1u/l0bwrPKJ+NcicRfV0X2sotD6656F8rcZ0Jq8LAeXFbN80nxmmedVBukqAQ9d00BK+iww0Bc8t6K3eI/OSl6mDlsMwmE3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sHwMgMgi; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6d9c7de0620so8954109b3a.1
+        for <kvm@vger.kernel.org>; Tue, 16 Jan 2024 17:05:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705453020; x=1706057820; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TVfHRGPq7HAXiyMA7XV/TGLk0DnxIq01kbXRuv/O/ow=;
-        b=E64mj0odq9ZBqTkTh8TQMf68Xyo6yDo7sVGvvmTCgTNQNtgVDEIfb3T7KuIaXEmAXd
-         zdO9jAEqhb5eC2Qmx6QFBYT4IcW5/WhedTStI9KBA/KrDZvFd1rBfBMqm6Ncv6z/+769
-         einTNwQKUCKoFSxahCzYjkAJbudM9AwNVNdoi1IV1KB5ovb2LVmlj3b4SUc3szxX8hmy
-         ciCRBIvI1jAFHMVLlByy/tg/fbG/ADsEmEU+ADkkXsmt70zI8GVyf8ysI5zlNHimIGzk
-         0EGbkWXeasqWt6eTRyUTKiDMTsts65w60agbmz77KdMpxjtJl6y97he1yi7xcGqcKvrt
-         h8QQ==
+        d=google.com; s=20230601; t=1705453516; x=1706058316; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=IKB8mSNKRsRlec2vx6K4+40UUB3h48mLOZFSolotTL0=;
+        b=sHwMgMgiQ6ubuSV2pZE2qnFWzjAqY9ONUAFytbjm0J4ofFkzNfkmdd2PseZN7aHPql
+         o6z0guX98Rc4gUFp+j1LLka7CzHupqMacCBIxsH/ctn3i54fGdw84ZO72Ee0cxiS7OnX
+         6ugKrUz/wnFz27vNht5N3xtMkwlQo6LHs8uN8jj32HZNkg67Uv7qXgJZZdhYqsAYooKF
+         6xYVaL1kw7Y3SMyn1R0bT1VSnLG2duBVO+tWNbWwP8pquchu3ny4bfhvrvhmwJb2HZ3E
+         GvChz8EM1h6eiaS83jZz818PO5bJF3vL0VdgLWKG7m5BCTQv6TMsaKJ7WR9JSqg/gahF
+         jBCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705453020; x=1706057820;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TVfHRGPq7HAXiyMA7XV/TGLk0DnxIq01kbXRuv/O/ow=;
-        b=CFyURjkLnaeK2r/MPqRFquQrRj9iR4p3/ER7bDEiktdNDzJh1ijm6zvwcr6IoE8h0o
-         Ofyn6ONUOjrnNpNTfUpAjnyYRaYGZL5qB6DKYPHXJ6HAMNrMoyz+QJcZNxao2z1IuhC9
-         XC7GdRZXHnrsBRruGZsFkGq6JF4x2+YgQ24FtaXyIAvrB/rvk0MT/lC3aUba4NfckkAN
-         eA1CD01DCqcdrsDmfgqghr8/LDhWOfLWxZj1WxgXcdawnrOgkP5aOKyNzrnnylo8f76y
-         vf4+q+z6GneMV4HkWnR9rKT2wl4qbsTV+H9fd5Id5UZtaMIt9+OkfFGbDzkN8PvFfRMl
-         pLnQ==
-X-Gm-Message-State: AOJu0YxFeKHZWghbxUG7+t2yFx8KwoabjwRHQGXcNhIDZBGx+Nj9yG59
-	xVpFJGPgyyENDzh+1QZWKOTNRFkA1gyvyvECKhc=
-X-Google-Smtp-Source: AGHT+IGigEhBpdfQpWMLnXZuKaV0ImQrIyAxLwoEGhEwLq+Lx9fsG0/tSS2wEL2dcx7AgQau4oPFzlb0JKuXXrhP7q4=
-X-Received: by 2002:a05:690c:fd5:b0:5f8:420e:468b with SMTP id
- dg21-20020a05690c0fd500b005f8420e468bmr5417368ywb.45.1705453020659; Tue, 16
- Jan 2024 16:57:00 -0800 (PST)
+        d=1e100.net; s=20230601; t=1705453516; x=1706058316;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IKB8mSNKRsRlec2vx6K4+40UUB3h48mLOZFSolotTL0=;
+        b=UgA0iuKD9iSB5lcWI2R+TiabjXw4QwAniGdJIySgz2XnwAKuRqcHrF69Ha85UkfNCe
+         hWvcL5x/6s3BY3au2rV5JQs+z1fcUDlXqgr8aMHtA0fy4e9JMa/0HJCdtAh2omh+eihC
+         QkuNqynZ+6gb++srW9rQWvKW+r+Q0jrvPIjiIF50cmofju4Sd0UqeUEb042ZvTNtr7HT
+         NAc54Y7qqeAhkrEnrRfoHIw0UBuPavOTDwxVPIeObZ9ami/+rzlEQAaXDcLGdXZeT6yI
+         daHIBxWnWznjpOEAgfJeFPFmINyqg1HEQzocbky/TeFLh/YuFPwRGUxxmx+FJlE5EX7/
+         E5Tw==
+X-Gm-Message-State: AOJu0YyCd/iDV/uaIH0prf8UWCzJQK/2azltJjTwL7FMFX+lp9fKNvvE
+	7Nq0VLjqcDDHuN7zXnZcs0ABylb8C3kvB9QUXEJZpJZ0IohYcNpReErr9rBO4NLxwaIuWGK1/HO
+	ihQ==
+X-Google-Smtp-Source: AGHT+IFoCXDD5PFg72UkfAOt6YI4Gjj6J6lS+S11t9VLKUwIvungIJioTt+tHYbdfewkkVWlaUPbt8PtnwY=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:8916:b0:6da:3fa7:d79c with SMTP id
+ hw22-20020a056a00891600b006da3fa7d79cmr204pfb.1.1705453515949; Tue, 16 Jan
+ 2024 17:05:15 -0800 (PST)
+Date: Tue, 16 Jan 2024 17:05:14 -0800
+In-Reply-To: <bug-218259-28872-qkES9Kx8Zg@https.bugzilla.kernel.org/>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240112091128.3868059-1-foxywang@tencent.com>
- <ZaFor2Lvdm4O2NWa@google.com> <CAN35MuSkQf0XmBZ5ZXGhcpUCGD-kKoyTv9G7ya4QVD1xiqOxLg@mail.gmail.com>
- <72edaedc-50d7-415e-9c45-f17ffe0c1c23@linux.ibm.com> <Zaa1omCaDQOxxy2j@google.com>
-In-Reply-To: <Zaa1omCaDQOxxy2j@google.com>
-From: Yi Wang <up2wing@gmail.com>
-Date: Wed, 17 Jan 2024 08:56:49 +0800
-Message-ID: <CAN35MuRKMW+-qrf0Sv-tsiZ71_-C_DJAMhu=HhtP8RnTVW-PsA@mail.gmail.com>
-Subject: Re: [PATCH] KVM: irqchip: synchronize srcu only if needed
-To: Sean Christopherson <seanjc@google.com>
-Cc: Christian Borntraeger <borntraeger@linux.ibm.com>, pbonzini@redhat.com, tglx@linutronix.de, 
-	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
-	hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	wanpengli@tencent.com, Yi Wang <foxywang@tencent.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, 
-	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <bug-218259-28872@https.bugzilla.kernel.org/> <bug-218259-28872-qkES9Kx8Zg@https.bugzilla.kernel.org/>
+Message-ID: <ZacnyvMmPS4m4SD7@google.com>
+Subject: Re: [Bug 218259] High latency in KVM guests
+From: Sean Christopherson <seanjc@google.com>
+To: bugzilla-daemon@kernel.org
+Cc: kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Jan 17, 2024 at 12:58=E2=80=AFAM Sean Christopherson <seanjc@google=
-.com> wrote:
->
-> On Tue, Jan 16, 2024, Christian Borntraeger wrote:
-> >
-> >
+On Tue, Jan 16, 2024, bugzilla-daemon@kernel.org wrote:
+> https://bugzilla.kernel.org/show_bug.cgi?id=218259
+> 
+> --- Comment #9 from Joern Heissler (kernelbugs2012@joern-heissler.de) ---
+> (In reply to Sean Christopherson from comment #5)
+> > On Thu, Dec 14, 2023, bugzilla-daemon@kernel.org wrote:
+> 
+> > While the [tdp_mmu] module param is writable, it's effectively snapshotted by
+> > each VM during creation, i.e. toggling it won't affect running VMs.
+> 
+> How can I see which MMU a running VM is using?
 
-....
-
-> >
-> > I would be fine with wasted memory.
->
-> +1.  If we really, really want to avoid the negligible memory overhead, w=
-e could
-> pre-configure a static global table and directly use that as the dummy ta=
-ble (and
-> exempt it from being freed by free_irq_routing_table()).
-
-Thanks for the suggestion! Well, in my opinion it may be better to fix
-the current issue
-and I'm glad to send another patch to optimize this.
-
-> > The only question is does it have a functional impact or can we simply =
-ignore
-> > the dummy routing.
->
-> Given the lack of sanity checks on kvm->irq_routing, I'm pretty sure the =
-only way
-> for there to be functional impact is if there's a latent NULL pointer der=
-ef hiding
-> somewhere.
-
-
---=20
----
-Best wishes
-Yi Wang
+You can't, which in hindsight was a rather stupid thing for us to not make visible
+somewhere.  As of v6.3, the module param is read-only, i.e. it's either enable or
+disabled for all VMs, so sadly it's unlikely that older kernels will see any kind
+of "fix".
 
