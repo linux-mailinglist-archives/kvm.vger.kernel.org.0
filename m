@@ -1,288 +1,169 @@
-Return-Path: <kvm+bounces-6394-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6395-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5174083080E
-	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 15:29:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F1C88308D8
+	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 15:55:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED8A82878D8
-	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 14:29:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D7ED288616
+	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 14:55:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63E6320339;
-	Wed, 17 Jan 2024 14:29:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="JfUgai4A"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FCD32136A;
+	Wed, 17 Jan 2024 14:53:33 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43E632032B
-	for <kvm@vger.kernel.org>; Wed, 17 Jan 2024 14:29:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A246D21103
+	for <kvm@vger.kernel.org>; Wed, 17 Jan 2024 14:53:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705501746; cv=none; b=ln2srC9JI9PfbPSspAsLQNhoO/8fNZNl4zGQPi+4nt2uhLaMc4fiiLIqueiaPD2ZnsLxTlaERDATjHRwi6gYQNYc48TLl0qweVU4qGxf80lGSEqQfT9JyTPzPoG1RVG8d96/OzvrAtNeMPacyQqRxYxKtR2pwKwFhlSMTfiPiDo=
+	t=1705503212; cv=none; b=dOcgesuquz7VcGYYSaqOfA3k7cSyWkSU+NfvOz5TvC7RzLZE1JV9jqL1NEgzYnNRg/r1kQTz1V1pDkiNgIcEH8LkQNqfF1l2ZcYKjaRxMIJtQUtWtY9mhlxCiW15JoJiQg/23dNupxU4JrgvaUNrEKXlMva0uopv3QlSg5TaT1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705501746; c=relaxed/simple;
-	bh=w5g12fXLPh8tqMSeXyS+4XKME2jBgC6ScosSz+ZmhU8=;
-	h=DKIM-Signature:Received:Message-ID:Subject:From:To:Cc:Date:
-	 In-Reply-To:References:Content-Type:User-Agent:MIME-Version:
-	 X-SRS-Rewrite; b=TeoBxiKk64x7MfpsvzfxvTuhPoHKvU4i6EqIJJ8tmvTtSqqZ3vORnhN697/A+n/jAhexoj5iLJwFHiqCwYiY7zOpQipmlMuIEddpKqwmgtewHrir0euMKkFBmaKTl5F0zrv7FCGr9Q+uUDsPunjS+rIvCPrMYrykBj0bkBt5kCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=JfUgai4A; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=EEVNRY6PDY+bQuzaDZRUnGEbQeJ5JrxyjnQDbcCxel0=; b=JfUgai4AQLyBFggrYiiLJVJ/TP
-	0J1Iq0yeBK5haQPnVaCmjQ1q2tJzp+HYr2k0GUshx8JvCScjHXqceo0FMtBgq0fsVebd06NHz5SpB
-	oTFIjFIgkch5IEwvq8hipy4oZZ2UrMrq1WDK6vCPmsRBMOhqH2tiRWL0A/HaXqTOomo3b9Btm1fyG
-	WlKCvAQ4+Yc6P/YGgzpe+5wAj7cQTjEGlaVNRs44q/Z4crm+XEF5oy7DgqJJLN2VIwwWLACgU4q3q
-	fOAMdTH5NSqV6uEGuwBi3/tEMD491H45QvcI2/e1jS6S+scNhr7XWEBffGYtgzDA3rpG3IS3QzzgE
-	Xo8To/TA==;
-Received: from [54.239.6.188] (helo=u3832b3a9db3152.ant.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rQ6uU-000000009d0-37Ol;
-	Wed, 17 Jan 2024 14:28:54 +0000
-Message-ID: <efc0a84f2498c47579620ccdf53c7ccd93ca981e.camel@infradead.org>
-Subject: Re: [PATCH v8 4/7] KVM: x86: Report host tsc and realtime values in
- KVM_GET_CLOCK
-From: David Woodhouse <dwmw2@infradead.org>
-To: Oliver Upton <oupton@google.com>, kvm@vger.kernel.org, 
-	kvmarm@lists.cs.columbia.edu
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson
- <seanjc@google.com>,  Marc Zyngier <maz@kernel.org>, Peter Shier
- <pshier@google.com>, Jim Mattson <jmattson@google.com>, David Matlack
- <dmatlack@google.com>, Ricardo Koller <ricarkol@google.com>, Jing Zhang
- <jingzhangos@google.com>, Raghavendra Rao Anata <rananta@google.com>, James
- Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- linux-arm-kernel@lists.infradead.org, Andrew Jones <drjones@redhat.com>,
- Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>
-Date: Wed, 17 Jan 2024 15:28:51 +0100
-In-Reply-To: <20210916181538.968978-5-oupton@google.com>
-References: <20210916181538.968978-1-oupton@google.com>
-	 <20210916181538.968978-5-oupton@google.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-T5uXFjtqSDR15CW778H7"
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	s=arc-20240116; t=1705503212; c=relaxed/simple;
+	bh=UQZv9R5R44pjsYklVFLVGdfBf8OGFpGGbP7oXjVdzdg=;
+	h=Received:Received:Date:From:To:Cc:Subject:Message-ID:References:
+	 MIME-Version:Content-Type:Content-Disposition:In-Reply-To; b=SNg1UP8nBY+apLYWuFWrTKfY+ovWG/dDBAxKhyA3DYs+duUOxj9L6ZpySGdkvajYsajk39OMUD+Y35JJPUQbQ/K7MFSJMRRqapvwRi1tJCEYi8r8mVoJW+utgWcffuppuIiHgWW3P4eYAtu9oRc/oN8Ppa2Dx708dfwpQ+mwG5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 586A111FB;
+	Wed, 17 Jan 2024 06:54:10 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 28EB93F5A1;
+	Wed, 17 Jan 2024 06:53:22 -0800 (PST)
+Date: Wed, 17 Jan 2024 14:53:16 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Chase Conklin <chase.conklin@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Darren Hart <darren@os.amperecomputing.com>,
+	Jintack Lim <jintack@cs.columbia.edu>,
+	Russell King <rmk+kernel@armlinux.org.uk>,
+	Miguel Luis <miguel.luis@oracle.com>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v11 19/43] KVM: arm64: nv: Handle shadow stage 2 page
+ faults
+Message-ID: <20240117145316.GA398843@e124191.cambridge.arm.com>
+References: <20231120131027.854038-1-maz@kernel.org>
+ <20231120131027.854038-20-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231120131027.854038-20-maz@kernel.org>
 
+Hi Marc,
 
---=-T5uXFjtqSDR15CW778H7
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Drive by thing I spotted.
 
-On Thu, 2021-09-16 at 18:15 +0000, Oliver Upton wrote:
->=20
-> @@ -5878,11 +5888,21 @@ static int kvm_vm_ioctl_set_clock(struct kvm *kvm=
-, void __user *argp)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * is slightly ahead) her=
-e we risk going negative on unsigned
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * 'system_time' when 'da=
-ta.clock' is very small.
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (kvm->arch.use_master_clock=
-)
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0now_ns =3D ka->master_kernel_ns;
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (data.flags & KVM_CLOCK_REA=
-LTIME) {
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0u64 now_real_ns =3D ktime_get_real_ns();
+On Mon, Nov 20, 2023 at 01:10:03PM +0000, Marc Zyngier wrote:
+> If we are faulting on a shadow stage 2 translation, we first walk the
+> guest hypervisor's stage 2 page table to see if it has a mapping. If
+> not, we inject a stage 2 page fault to the virtual EL2. Otherwise, we
+> create a mapping in the shadow stage 2 page table.
+> 
+> Note that we have to deal with two IPAs when we got a shadow stage 2
+> page fault. One is the address we faulted on, and is in the L2 guest
+> phys space. The other is from the guest stage-2 page table walk, and is
+> in the L1 guest phys space.  To differentiate them, we rename variables
+> so that fault_ipa is used for the former and ipa is used for the latter.
+> 
+> Co-developed-by: Christoffer Dall <christoffer.dall@linaro.org>
+> Co-developed-by: Jintack Lim <jintack.lim@linaro.org>
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+> [maz: rewrote this multiple times...]
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_emulate.h |  7 +++
+>  arch/arm64/include/asm/kvm_nested.h  | 19 ++++++
+>  arch/arm64/kvm/mmu.c                 | 89 ++++++++++++++++++++++++----
+>  arch/arm64/kvm/nested.c              | 48 +++++++++++++++
+>  4 files changed, 153 insertions(+), 10 deletions(-)
+> 
+[.. snip ..]
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 588ce46c0ad0..41de7616b735 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1412,14 +1412,16 @@ static bool kvm_vma_mte_allowed(struct vm_area_struct *vma)
+>  }
+>  
+>  static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> -			  struct kvm_memory_slot *memslot, unsigned long hva,
+> -			  unsigned long fault_status)
+> +			  struct kvm_s2_trans *nested,
+> +			  struct kvm_memory_slot *memslot,
+> +			  unsigned long hva, unsigned long fault_status)
+>  {
+>  	int ret = 0;
+>  	bool write_fault, writable, force_pte = false;
+>  	bool exec_fault, mte_allowed;
+>  	bool device = false;
+>  	unsigned long mmu_seq;
+> +	phys_addr_t ipa = fault_ipa;
+>  	struct kvm *kvm = vcpu->kvm;
+>  	struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
+>  	struct vm_area_struct *vma;
+> @@ -1504,10 +1506,38 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	}
+>  
+>  	vma_pagesize = 1UL << vma_shift;
 > +
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0/*
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 * Avoid stepping the kvmclock backwards.
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 */
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0if (now_real_ns > data.realtime)
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0data.cloc=
-k +=3D now_real_ns - data.realtime;
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+> +	if (nested) {
+> +		unsigned long max_map_size;
 > +
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (ka->use_master_clock)
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0now_raw_ns =3D ka->master_kernel_ns;
+> +		max_map_size = force_pte ? PUD_SIZE : PAGE_SIZE;
 
-This looks wrong to me.
+This seems like the wrong way around, presumably you want PAGE_SIZE for force_pte?
 
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0else
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0now_ns =3D get_kvmclock_base_ns();
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ka->kvmclock_offset =3D data.c=
-lock - now_ns;
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0now_raw_ns =3D get_kvmclock_base_ns();
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ka->kvmclock_offset =3D data.c=
-lock - now_raw_ns;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0kvm_end_pvclock_update(kv=
-m);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return 0;
-> =C2=A0}
+> +
+> +		ipa = kvm_s2_trans_output(nested);
+> +
+> +		/*
+> +		 * If we're about to create a shadow stage 2 entry, then we
+> +		 * can only create a block mapping if the guest stage 2 page
+> +		 * table uses at least as big a mapping.
+> +		 */
+> +		max_map_size = min(kvm_s2_trans_size(nested), max_map_size);
+> +
+> +		/*
+> +		 * Be careful that if the mapping size falls between
+> +		 * two host sizes, take the smallest of the two.
+> +		 */
+> +		if (max_map_size >= PMD_SIZE && max_map_size < PUD_SIZE)
+> +			max_map_size = PMD_SIZE;
+> +		else if (max_map_size >= PAGE_SIZE && max_map_size < PMD_SIZE)
+> +			max_map_size = PAGE_SIZE;
+> +
+> +		force_pte = (max_map_size == PAGE_SIZE);
+> +		vma_pagesize = min(vma_pagesize, (long)max_map_size);
+> +	}
+> +
+>  	if (vma_pagesize == PMD_SIZE || vma_pagesize == PUD_SIZE)
+>  		fault_ipa &= ~(vma_pagesize - 1);
+>  
+> -	gfn = fault_ipa >> PAGE_SHIFT;
+> +	gfn = ipa >> PAGE_SHIFT;
+>  	mte_allowed = kvm_vma_mte_allowed(vma);
+>  
+>  	/* Don't use the VMA after the unlock -- it may have vanished */
+[.. snip ..]
 
-We use the host CLOCK_MONOTONIC_RAW plus the boot offset, as a
-'kvmclock base clock', and get_kvmclock_base_ns() returns that. The KVM
-clocks for each VMs are based on this 'kvmclock base clock', each
-offset by a ka->kvmclock_offset which represents the time at which that
-VM was started =E2=80=94 so each VM's clock starts from zero.
-
-The values of ka->master_kernel_ns and ka->master_cycle_now represent a
-single point in time, the former being the value of
-get_kvmclock_base_ns() at that moment and the latter being the host TSC
-value. In pvclock_update_vm_gtod_copy(), kvm_get_time_and_clockread()
-is used to return both values at precisely the same moment, from the
-*same* rdtsc().
-
-This allows the current 'kvmclock base clock' to be calculated at any
-moment by reading the TSC, calculating a delta to that reading from
-ka->master_cycle_now to determine how much time has elapsed since
-ka->master_kernel_ns. We can then add ka->kvmclock_offset to get the
-kvmclock for this particular VM.
-
-Now, looking at the code quoted above. It's given a kvm_clock_data
-struct which contains a value of the KVM clock which is to be set as
-the time "now", and all it does is adjust ka->kvmclock_offset
-accordingly. Which is really simple:
-
-		now_raw_ns =3D get_kvmclock_base_ns();
-	ka->kvmclock_offset =3D data.clock - now_raw_ns;
-
-Et voil=C3=A0, now get_kvmclock_base_ns() + ka->kvmclock_offset at any give=
-n
-moment in time will result in a kvmclock value according to what was
-just set. Yay!
-
-Except... in the case where the TSC is constant, we actually set
-'now_raw_ns' to a value that doesn't represent *now*. Instead, we set
-it to ka->master_kernel_ns which represents some point in the *past*.
-We should add the number of TSC ticks since ka->master_cycle_now if
-we're going to use that, surely?
-
-
-
---=-T5uXFjtqSDR15CW778H7
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwMTE3MTQyODUxWjAvBgkqhkiG9w0BCQQxIgQg7Q2N+P0G
-NXcSvPRsIqdbC4+3tegsGCPx+LtbI0lX5KYwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAlxeOxlLyDzn/kZlOkEWZRKuanWCei5XYh
-/c2qm2QkWfCnV8PivQ1AmZ6kLMrIOo+Gfw3/6wtUlMGmgEJLhamCvoaP77jvukrcS/06Qxih1e7c
-v/wTRumVSzTuNxCXqz+SUxSdyxWbSumjdaB2SjsNsOucKGDdpz/8rrg5VFB82gWIkdxr8ooLRmmB
-sYNnD377pD/t+RQMsbpaL9KrWIQeImARNLrCNDtaumTMANHtDi1+ZNYOk1L/zVAzt7a2yzxG0FiU
-Sn4lT2XUB4eBu9vBINDgr/oDKpN1v2HhhHhvpUm/B1hJxWSui05XhsuUdH/HE3g6mOHROXPMl8xk
-4hfe3MHiBah4XOmFpDvQUV/IyUcMlv25BLhgbWFHpahB2wG11jOJ7tLj1myMWTRfZVcbTwgJuVT8
-KN2MmNf4nBoSMPBTYS4Eo4HyKvAOCEh9vCO1ptorIeVdLP2pGS/MMA/d5U5CQ2utLOk2MIHLonc5
-+TNCniItZD+hjU8KMpho/7w7cz7nyr8AtaCSrvBpHSQec5UR30Cx0QOfRzPzNbB0o3xte9c7ronv
-oFpV4svPzudukVwTsqh/ChMkYseIz1QV6+MveD5SzSnAttbU2vrS+Juvt911LKIRPKUnxHAl3CL7
-1ALHGNC63TcF2b/OV81Jc2+dZ4NQiIis4KwRUA71MQAAAAAAAA==
-
-
---=-T5uXFjtqSDR15CW778H7--
+Thanks,
+Joey
 
