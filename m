@@ -1,115 +1,104 @@
-Return-Path: <kvm+bounces-6383-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6384-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D972D830262
-	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 10:35:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 875C3830275
+	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 10:40:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B7451C2128E
-	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 09:35:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B6DD1C22736
+	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 09:40:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A187E1401F;
-	Wed, 17 Jan 2024 09:34:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AF1414271;
+	Wed, 17 Jan 2024 09:40:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="KdAVQFGo"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ML4F4cbz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 742F867C6E;
-	Wed, 17 Jan 2024 09:34:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09C0A14264
+	for <kvm@vger.kernel.org>; Wed, 17 Jan 2024 09:39:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705484091; cv=none; b=C043eFWyUWSCUdHTpCtFrrtUB73pER1HwM99YlvxWi3CsA5KVv1OoRVYdh1r8kgbWbBFmoJbNgrsPJc22XhWu9xMIszAxSMHZiVTuGrMvmYCx69+Z3CXx2LrK/u6WkdEENNyLkHnj5KfJlxT4gNLiEFhVNDuGpY3hMk2FlZ5AXc=
+	t=1705484401; cv=none; b=e5NUFYgUhKC978C5imGtoVCRiMBRDXFWGUW0C7gXhd5Cs3DRXpwASAQDdRGpWFC3YqQVuoe/4PaUe1dJnxYW1LZuikiJCKm1ptWiDCv0AGk35+5FdzIAMUoICoBG+Zbp3jaExxkozEfU21ADoCso3DT6v7mRkB3UVTagZ6mP82Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705484091; c=relaxed/simple;
-	bh=orkT7LXixbgsPn4N1XEWMynXnZfNfGpgiHmaG+54rCs=;
-	h=Received:X-Virus-Scanned:Received:DKIM-Signature:Received:Date:
-	 From:To:Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=kLy1m08iwpaMEXHfgRaZOUhNMnKuhr3fjldNW+Ed/I+CrCxJyzbf0XUQOOfcMHVWlfgT22bFO5LHx/n2fv7bcLPs6UNC06Dea1aO4xgm9ucder047xDWGHQfzf4TgRdWCCVQ5/GnYEJp9tAjGp3IS79z4l5YzHPk1RNnxXD/BS0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=KdAVQFGo; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 74C1F40E01B2;
-	Wed, 17 Jan 2024 09:34:45 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id 99Y-ZDDsaapm; Wed, 17 Jan 2024 09:34:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1705484083; bh=g7EGo61gChdLMP36XWtArwGzH5MicsbmHMpZGITpmKE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KdAVQFGoTvsWN62JBRPJezAYAZfo8NF2KyS2AonnfT+RG0XFDyq8MfgsErfXeU7Gt
-	 Bui+OlYhX5nd4ek3sMMd5eV68mrnAAcrZ1s5ql4H3gbIdld/MM1RzveihPFqHbSBwv
-	 7MFY2oSU7CDbVvkO3n0x4Sv2VBi4PrnmrID92Cm35IWGgYlKIYJ/YIV1bdkoHDFRB4
-	 8DDYPJhsWmJ63kdlCdCgj2SPftoE7SlpSPcxFkSd3MlmFn0UpgOy6csxSIho7jV0WH
-	 6W9HI2eoa3bOc3cXkQ885tvXh8YCaInBNjKf0dLufJkzHROHFQ46Kub2WsGCvV/yDg
-	 Iu5gb2nJ9sKw+XXGwpAgVC1EHo7OHdEinBfVwTVmpphvYSW8eS+pyauYU/ci6ot50a
-	 pdXVqm2/SU1fJWxsn1x2tA0+aZagIqflybxH7Atsy5sIpvpefJBHs4JNo1iJzpgdoO
-	 bEyD0iN3pQ7t7gy+ysHcO8iOTGyQwROfItCc1G8CKRnDD+h6ZqwE5jjadlj2z8hqr0
-	 K79POhg4+w0lNuYjeLHanEmPGI5HkRvoCHLSnIdW5j9pmV5Svhf3ypTWJk4UXg1rSh
-	 OSeS9wz5SVZtC0oefYlC+s5GGubs3hVSMb9nBVWbM7poXtsAc4F1jNGrGo1cvb9tzi
-	 EuzDPL1X0OBKUl4NwVtIQyH4=
-Received: from zn.tnic (pd9530f8c.dip0.t-ipconnect.de [217.83.15.140])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 9122640E0177;
-	Wed, 17 Jan 2024 09:34:05 +0000 (UTC)
-Date: Wed, 17 Jan 2024 10:34:00 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Dave Hansen <dave.hansen@intel.com>
-Cc: Michael Roth <michael.roth@amd.com>, x86@kernel.org,
-	kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
-	thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
-	pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
-	jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
-	slp@redhat.com, pgonda@google.com, peterz@infradead.org,
-	srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-	tobin@ibm.com, vbabka@suse.cz, kirill@shutemov.name,
-	ak@linux.intel.com, tony.luck@intel.com,
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
-	pankaj.gupta@amd.com, liam.merwick@oracle.com
-Subject: Re: [PATCH v1 11/26] x86/sev: Invalidate pages from the direct map
- when adding them to the RMP table
-Message-ID: <20240117093341.GBZaee9f614RSBhXi0@fat_crate.local>
-References: <20231230161954.569267-1-michael.roth@amd.com>
- <20231230161954.569267-12-michael.roth@amd.com>
- <cb604c37-aeb5-45bd-b6db-246ae724e4ca@intel.com>
- <20240115090948.GBZaT2XKw00PokD-WJ@fat_crate.local>
- <6ecc4517-9a4f-4d7e-a630-2b8357b7be05@intel.com>
+	s=arc-20240116; t=1705484401; c=relaxed/simple;
+	bh=fj2HpoInJ1LDcTmb47YOWZDGESUO6+XO9QHljF3gn84=;
+	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:
+	 Message-ID:Date:MIME-Version:User-Agent:Subject:Content-Language:
+	 To:Cc:References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding; b=Ovcyp1JSpLW3RLri/2QjIckLDAIq+1msc4oHq/7HdWUv7pqgDmrw8O8+wyFtS0ahPn2iEEfMdCdMJJ8Xd9fGo8N/fBuWARxevItQePI3GF8/p5XfIbJSI0kWbACCBP2a3WPgg1wzuODJ8t063gxwxR65KliNJjbfK8Ew6IzL4D0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ML4F4cbz; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-40e7065b7bdso37095255e9.3
+        for <kvm@vger.kernel.org>; Wed, 17 Jan 2024 01:39:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1705484398; x=1706089198; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xmYDWnl8dTqsrDQj2YhUBjlV25jNbeQ7ObR2DibyeoA=;
+        b=ML4F4cbzCSrATOpu0AF2zj8I4u2Ic+30hCngDJv9zIZUpA/IJINYqzVf561dHpZ6RP
+         SRtJ/V62Kq/HJtD7b2YnlNjHdqzo0vV1X+henAQJpxGyk66eCHQUmu5up39FnNfINj5u
+         cixg9uryxEafY16zKDNcIZzD63g+kLEzEpG2A8FRcajPIr1UDxousw84DFmL+hx6pVrk
+         nrsgNTFCqjtNFfxO0kh162ZjovMVdg4VX9qkHlTkvr+klh618/SMC/XmwRxCRmAbWPMD
+         gRX56gvDvhbj7ONflmO555PQFjmyba45a881FvmxjHtUraneO/70R9zgPii9wRInOw4B
+         2NzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705484398; x=1706089198;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xmYDWnl8dTqsrDQj2YhUBjlV25jNbeQ7ObR2DibyeoA=;
+        b=GWjz8Jn6HcKoDjlRpqN2oL/GDSzyAQAhxm0hV/WJO8c4LVg6sQq+nRGY8UEupYRgmh
+         6bSVXWR/V6K5xriRmAPlI+0L/mFiFr75mPR/96XKZy8Dy8vTAXBnNktxb7aJ/g8Y6r/1
+         7AhA/2lNNEBl+Pt+blARyArr5Y3TIVSosNNYaStciPBMnTSqbgirp6ZnczzAxObuE/0U
+         O96mepyVjO9lNxhapBYEq1Oqxm3I3oOfGGlxIU/Npyw87TZeszGew7Gdrfkkiz/wx1f2
+         6A58MeZN07JSMb/GBHBdMnPNwdTFpTFCtI34tbuVDYKA/tpYpxXsPA/wxnO2XOlcl9CW
+         Nfcg==
+X-Gm-Message-State: AOJu0Yw+BtpGuagkka1fNSHYYao9wMbonZlBmVcty/BJmYVzXthkP2s5
+	j3Szl8odlsvtfcd7l881dXdZZIzgtVs1mQ==
+X-Google-Smtp-Source: AGHT+IFBrcEeQrmmn7TjIuwnPOuNkld5cdjzyHfmIIbVrYYCuAqRVRKzyKECnEpnS/yA6LjWMHmnzQ==
+X-Received: by 2002:a05:600c:3799:b0:40e:6812:2bd0 with SMTP id o25-20020a05600c379900b0040e68122bd0mr2619023wmr.267.1705484398269;
+        Wed, 17 Jan 2024 01:39:58 -0800 (PST)
+Received: from [192.168.69.100] ([176.176.156.199])
+        by smtp.gmail.com with ESMTPSA id k20-20020a05600c1c9400b0040e54f15d3dsm25655095wms.31.2024.01.17.01.39.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 17 Jan 2024 01:39:57 -0800 (PST)
+Message-ID: <bd2e30cd-4723-4b7d-b12e-c4b329aed18b@linaro.org>
+Date: Wed, 17 Jan 2024 10:39:55 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <6ecc4517-9a4f-4d7e-a630-2b8357b7be05@intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] accel: Do not set CPUState::can_do_io in non-TCG accels
+Content-Language: en-US
+To: qemu-devel@nongnu.org
+Cc: Cameron Esfahani <dirty@apple.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Roman Bolshakov <rbolshakov@ddn.com>, kvm@vger.kernel.org
+References: <20231129205037.16849-1-philmd@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+In-Reply-To: <20231129205037.16849-1-philmd@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jan 16, 2024 at 08:21:09AM -0800, Dave Hansen wrote:
-> The problem will be the first time someone sees a regression when their
-> direct-map-fracturing kernel feature (secret pages, SNP host, etc...)
-> collides with some workload that's sensitive to kernel TLB pressure.
+On 29/11/23 21:50, Philippe Mathieu-Daudé wrote:
+> 'can_do_io' is specific to TCG. Having it set in non-TCG
+> code is confusing, so remove it from QTest / HVF / KVM.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+> ---
+>   accel/dummy-cpus.c        | 1 -
+>   accel/hvf/hvf-accel-ops.c | 1 -
+>   accel/kvm/kvm-accel-ops.c | 1 -
+>   3 files changed, 3 deletions(-)
 
-Yeah, and that "workload" will be some microbenchmark crap which people
-would pay too much attention to, without it having any relevance to
-real-world scenarios. Completely hypothetically speaking, ofc.
-
-:-)
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Patch queued.
 
