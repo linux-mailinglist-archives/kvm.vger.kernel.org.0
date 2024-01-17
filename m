@@ -1,138 +1,122 @@
-Return-Path: <kvm+bounces-6385-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6386-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91B098302C2
-	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 10:49:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23C778303C9
+	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 11:41:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE296286FFD
-	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 09:49:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 32D9D1C24967
+	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 10:41:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF59B14A8D;
-	Wed, 17 Jan 2024 09:49:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95F291DA4C;
+	Wed, 17 Jan 2024 10:41:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="AUPVTfrH"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="W8njSpKI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49B1C1429A;
-	Wed, 17 Jan 2024 09:49:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68E021D550;
+	Wed, 17 Jan 2024 10:41:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705484970; cv=none; b=JfonRDNpQM+vPDXLpjp1FE+VYn3BoI1EAH74VnOUNOBosLYHnNG4Fj793k5CTX1xD+ingI6EOImzJXZJfc+ZKhOGHLT4dxb5+RViF0IrQWYagweJf6KzT6HGB80ZUw6IDQ6jGakubGWqmlSCITsTeIvFWZheTOc7C5itW4xbYmw=
+	t=1705488088; cv=none; b=btklVCe+vzHOKQ4cNpEoikk6h0cFd1K808wYu7czRIA8CRNTpqt1BWIeKN/u9WN6uA3FoJPXONoj5B3uPf7wTYFEGOE5UuF96azodaOtF0jnovkXqTYrPgMoQuxG6srOQbzKzpDQ8diMOT/DKrDw3Nkf7k+ti3A2rWYDrUu1Jss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705484970; c=relaxed/simple;
-	bh=NeXbzY9+OZVSrlATeMXiaBJzHoo1NhZn/JV7MllYRi0=;
-	h=Received:X-Virus-Scanned:Received:DKIM-Signature:Received:Date:
-	 From:To:Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=cFJfRmgDWlRHNWoG7VsDScRnYrE4kirxXFhq55QepTOcHCi6LN1k74KAIhVDzwoK9jCdSeGzyik0XI2+wNtV4Nw1nFB74n6xOADLTZRoNl2YW1jkWD8BNy5iyCS7bybQPkBLUi6mNZBP3JpZ/myeJozV1dG7HtlRCHqoZHhOQys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=AUPVTfrH; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 8DE3840E0177;
-	Wed, 17 Jan 2024 09:49:24 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id 73h8eGAiSvco; Wed, 17 Jan 2024 09:49:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1705484962; bh=CjSLyfAbv41XmX0Cv5sZW7YHSOKxGuGf033WvhzwPIg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=AUPVTfrHiTingPKZFsEqLYK+TO00Iy3wbEj0fI4XxjUUpFdFJlDE/XHGxTyF8nNo4
-	 VVarO1oPMsXUftLhWvSIRZLQ47Bo2voFTP1gEo4+hhuX7kAFqnYkYo7+NqfLY/uV7x
-	 w3KOTxa1iOIkskfSCrMQde/2pRbzPQuY69h+gNahEfptdViN4dIKJ1W6FCleIgSWEe
-	 CUkAZBF1by7UteEN7U2wuUWNo/W22/k1TU4LbMVGxvVzMHFBJjvdcbChVzoBZhNb36
-	 oTgykRuhLSJ9UI7ECrukEUA0afo/IfqgN3GdaptmgQgdedHpMQto+oM4zz67TmD10h
-	 PYsXe+s1aGs1umDN8NlMjTYJBJQZXugAMHwhoeRPfhEUaYo+eYxIkcZDyJyOHmOPGo
-	 WTNGuznm7QQ+70yycVYpQhWrGOVDGcBljzDDbQVoc7cDjD0KV0tKRVohIfoR++sWx/
-	 Ff/nNR578eIa8XaX2HnSPfonK33YzATVzjQbPgsbzjOUYtXpMPu0yp98yegOQonIcC
-	 rKkr85aYezQJWaYLAV7mG2gdRRW2FPECtlw+FMAoDg/o9K/FCOLPr65iTRc8vorClb
-	 8HZJsWJHOZ2wNwTGoo59jdcsMfyhyvXm6PSAW7yKHhBfnOlPLypb2vQ7Vi4wlTzBY+
-	 ITa9H0uT9nSwrrTWtNdFtXec=
-Received: from zn.tnic (pd9530f8c.dip0.t-ipconnect.de [217.83.15.140])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id BA00240E01B2;
-	Wed, 17 Jan 2024 09:48:43 +0000 (UTC)
-Date: Wed, 17 Jan 2024 10:48:37 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Michael Roth <michael.roth@amd.com>
-Cc: x86@kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-	linux-mm@kvack.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-	rientjes@google.com, tobin@ibm.com, vbabka@suse.cz,
-	kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
-	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com,
-	Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH v1 14/26] crypto: ccp: Provide API to issue SEV and SNP
- commands
-Message-ID: <20240117094837.GIZaeidSVUPFF7792g@fat_crate.local>
-References: <20231230161954.569267-1-michael.roth@amd.com>
- <20231230161954.569267-15-michael.roth@amd.com>
+	s=arc-20240116; t=1705488088; c=relaxed/simple;
+	bh=E3rwFhaOl2j+zeAfDeJ2luuN6OVjKJV3WlO+QINndKM=;
+	h=Received:DKIM-Signature:Received:Received:Received:Received:
+	 Received:Received:Received:Received:Received:Date:From:To:Cc:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To:X-TM-AS-GCONF:
+	 X-Proofpoint-ORIG-GUID:X-Proofpoint-GUID:
+	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details; b=PleJi30lWxtijR04BntWI50NeYLiTebvWtC3yxisKm1Tc02odk03zNix/1SiustUiZm/eWRwMJLEZStb9ywA3Cif1qUylYk+0DRWoEfF30Y7kRt3OtSjvv9XWZb+2rj7QeRyID9ZyGQdrZLkscwj9pAqndpTT+zBrqR12QS9TJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=W8njSpKI; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40HA7DHs015455;
+	Wed, 17 Jan 2024 10:41:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=YHdck/Ra38gjgZwkdUhVLlxKWwPrh4c3UuG1hGT5OpQ=;
+ b=W8njSpKIL/nBQLJyZtQ1x8Iy982B3uxg+9t8ay4kxBeQZj4wUnrmHcgSkevlS6NcCMyy
+ mp5BuWGZ131/NSCbcxFALgv788yKAT6dPcvgpFsqMstLxoulqeOlCqYUIXaVA87D5y9U
+ n+wGl/H7oHF34TaF9VvJ2+YHsYAQiSAh3/aFNbZzSlcce+T9FhAnVA6gZWxFfSYnQetS
+ myK3WWROwmuiE/gvgJ2ttF3zVX8qGG67DL8NJCeznz+3HghfonbSjZclX3fw37lYRPDl
+ ROzwMmhgLrXO1IOxLr6co/gEPv/eIbQfKVTKFqGN1uv9VrMnhLh3VBPVpiAFitCIQrhQ 5w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vpcuy913d-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 17 Jan 2024 10:41:20 +0000
+Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 40HA86NG018155;
+	Wed, 17 Jan 2024 10:41:19 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vpcuy912p-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 17 Jan 2024 10:41:19 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 40H8a3sP004908;
+	Wed, 17 Jan 2024 10:41:18 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3vm7j1v74m-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 17 Jan 2024 10:41:18 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 40HAfDIv27787934
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 17 Jan 2024 10:41:13 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8287020043;
+	Wed, 17 Jan 2024 10:41:13 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id BBD612004B;
+	Wed, 17 Jan 2024 10:41:12 +0000 (GMT)
+Received: from li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com (unknown [9.171.88.12])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Wed, 17 Jan 2024 10:41:12 +0000 (GMT)
+Date: Wed, 17 Jan 2024 11:41:11 +0100
+From: Alexander Gordeev <agordeev@linux.ibm.com>
+To: Tony Krowiak <akrowiak@linux.ibm.com>
+Cc: linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, jjherne@linux.ibm.com, borntraeger@de.ibm.com,
+        pasic@linux.ibm.com, pbonzini@redhat.com, frankja@linux.ibm.com,
+        imbrenda@linux.ibm.com, alex.williamson@redhat.com,
+        kwankhede@nvidia.com, gor@linux.ibm.com
+Subject: Re: [PATCH v4 0/6] s390/vfio-ap: reset queues removed from guest's
+ AP configuration
+Message-ID: <Zaeuxz6+3eqg84+H@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+References: <20240115185441.31526-1-akrowiak@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231230161954.569267-15-michael.roth@amd.com>
+In-Reply-To: <20240115185441.31526-1-akrowiak@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Q-VG3TmEKG8OUGkj0jJx4uRmquyQhxs9
+X-Proofpoint-GUID: KmINsdUnpHFeaTKRaqBd64el_x2kS-X-
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-17_05,2024-01-17_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
+ priorityscore=1501 clxscore=1015 bulkscore=0 phishscore=0 suspectscore=0
+ mlxlogscore=728 adultscore=0 lowpriorityscore=0 impostorscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2401170075
 
-On Sat, Dec 30, 2023 at 10:19:42AM -0600, Michael Roth wrote:
-> +/**
-> + * sev_do_cmd - issue an SEV or an SEV-SNP command
-> + *
-> + * @cmd: SEV or SEV-SNP firmware command to issue
-> + * @data: arguments for firmware command
-> + * @psp_ret: SEV command return code
-> + *
-> + * Returns:
-> + * 0 if the SEV successfully processed the command
+On Mon, Jan 15, 2024 at 01:54:30PM -0500, Tony Krowiak wrote:
+...
+>  drivers/s390/crypto/vfio_ap_ops.c     | 268 +++++++++++++++++---------
+>  drivers/s390/crypto/vfio_ap_private.h |  11 +-
+>  2 files changed, 184 insertions(+), 95 deletions(-)
 
-More forgotten feedback:
+Applied with fixups to patches 4 and 5.
 
----
-diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-index 0581f194cdd0..a356a7b7408e 100644
---- a/include/linux/psp-sev.h
-+++ b/include/linux/psp-sev.h
-@@ -922,7 +922,7 @@ int sev_guest_decommission(struct sev_data_decommission *data, int *error);
-  * @psp_ret: SEV command return code
-  *
-  * Returns:
-- * 0 if the SEV successfully processed the command
-+ * 0 if the SEV device successfully processed the command
-  * -%ENODEV    if the PSP device is not available
-  * -%ENOTSUPP  if PSP device does not support SEV
-  * -%ETIMEDOUT if the SEV command timed out
-
----
-
-Also, pls add it to your TODO list as a very low prio item to fixup all
-this complains about:
-
-./scripts/kernel-doc -none include/linux/psp-sev.h
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Thanks!
 
