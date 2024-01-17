@@ -1,117 +1,105 @@
-Return-Path: <kvm+bounces-6368-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6369-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71BA882FE29
-	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 02:05:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE5DD82FE2B
+	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 02:07:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 753141C24003
-	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 01:05:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9027C1F25E4C
+	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 01:07:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2D536119;
-	Wed, 17 Jan 2024 01:05:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 134FB79DE;
+	Wed, 17 Jan 2024 01:06:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f47PlKZM"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ln9B+pq0"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E3F1524F
-	for <kvm@vger.kernel.org>; Wed, 17 Jan 2024 01:05:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D64A4747C
+	for <kvm@vger.kernel.org>; Wed, 17 Jan 2024 01:06:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705453520; cv=none; b=ppZsywMj7KTO/QkZpVPzGTqfGmSkBi7igMGoU75QJ84sMt5Rvw7dUgpZFgOQPePKAsBQxsvAtoccl3inXeg6nRUzjsv7eZS2qAq4QQALWmEHTcJvYKcSFSAC/WU6/8+k36EvUYglZuqyfGPeEqM2NFFaD0J4odNUWlo069dUpT8=
+	t=1705453616; cv=none; b=clFYZLjJdCvLnpD2xls8lWbfr42UipbK+NcmY6fYSEInryahOJ+1cgEujdaWmrr3m0MT346CZKaKIoOoYvpS4DYEr51sKkTmgjAdZmWtp9zJ/jC+A8JcoXEyAlICx5YJ6hGE/ddPCj6mFibEM0nsVomMK+id05L+7rPsYJCegaA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705453520; c=relaxed/simple;
-	bh=/9SP4gVE658v9YfGwNONAmmBxsrhpmUg1lullqfLtEY=;
-	h=Received:DKIM-Signature:Received:From:To:Subject:Date:
-	 X-Bugzilla-Reason:X-Bugzilla-Type:X-Bugzilla-Watch-Reason:
-	 X-Bugzilla-Product:X-Bugzilla-Component:X-Bugzilla-Version:
-	 X-Bugzilla-Keywords:X-Bugzilla-Severity:X-Bugzilla-Who:
-	 X-Bugzilla-Status:X-Bugzilla-Resolution:X-Bugzilla-Priority:
-	 X-Bugzilla-Assigned-To:X-Bugzilla-Flags:X-Bugzilla-Changed-Fields:
-	 Message-ID:In-Reply-To:References:Content-Type:
-	 Content-Transfer-Encoding:X-Bugzilla-URL:Auto-Submitted:
-	 MIME-Version; b=NvUrgInAHzWulo1MoVYlbd1FxOxrw4VtVjfqlaRDpUW4p84fp0ERILgfQxNXYfH99UR9yHpkbS75BL+gmd3jauScdJObKdSpPA9OKRWHxKCmTMs5FAVXuaqO2oS0EmR3X4tu9ZUyGIoL6vMd2kyTXVYAXhXtbUNqv8nN6s3Wyj8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f47PlKZM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 95C9BC43390
-	for <kvm@vger.kernel.org>; Wed, 17 Jan 2024 01:05:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705453519;
-	bh=/9SP4gVE658v9YfGwNONAmmBxsrhpmUg1lullqfLtEY=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=f47PlKZMRlXTNXvyL0mhAbajohJ1JxdsJVowbvaTFrPUPeOe9rb8ksSNF+wNKxg18
-	 c8DUoZdgE7TNKoO9TbaFBqFR2/PFPPBJL+dB+WqHTOfMEYwTGdO/C8ZhnAe5Kc8WS3
-	 DUxmvfMdC45O6gb9iVFhdIQAY1lyRIo4c88x/wvhCNcH9A0yaEaJiKsH7qgbWXarEO
-	 A2aBSmcD8tKECPQ9c6GefUU89xBkThMYQbhiceQIw5PX/JtzZV0hYrVg8ngeZiT7Al
-	 79EpUUTlYsxxPWZ2iX1tQlzYkMtJO4MXGgmQCcubnlRbE56/LiAat/ZS0i+rh/6Hb/
-	 0XWruUm6BhTAg==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 80885C53BD3; Wed, 17 Jan 2024 01:05:19 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: kvm@vger.kernel.org
-Subject: [Bug 218259] High latency in KVM guests
-Date: Wed, 17 Jan 2024 01:05:19 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: seanjc@google.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-218259-28872-m1wKQYWfTH@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218259-28872@https.bugzilla.kernel.org/>
-References: <bug-218259-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=arc-20240116; t=1705453616; c=relaxed/simple;
+	bh=Qy7kil3Qz0HpaVX84PRDZORIBmiRQDrGfGfkinmFmJ0=;
+	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Reply-To:Date:
+	 Mime-Version:X-Mailer:Message-ID:Subject:From:To:Cc:Content-Type;
+	b=GsluRTzRs+t2Tra7oTJ8zs++Gpw0VWhu/A1nTJdJ9lzaE9ZGzyz+5SviAHTBrELXy62yNzIHS8z7xssQmE8X4mMk821eccYV1XTUhle59AePR+sWQexx3epFaaQGivouVlfv7QlJI8QGH+ZPALtXyzgHbZ6+nuenWWHQQ8nYS4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ln9B+pq0; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5ecfd153ccfso190145057b3.2
+        for <kvm@vger.kernel.org>; Tue, 16 Jan 2024 17:06:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1705453614; x=1706058414; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ikC7FbZyy7GSsL/x82/6qd52zjjlU7XwgDYBsI/nFBI=;
+        b=Ln9B+pq03l5lMYX9AZQhVwTJTZagjeXRXcb6CmZzcVOAYI9kHi/B2WGMgurZaiU2S4
+         ytNy059MaxKJN4UAUXW212Ir7qKmdguFeqUsvOgWL7z94bXKtLa/qwYHwQf5hkWuoZ49
+         DbmRIubgRcJOr2CMzY4LqLbdskjdUjUqn+XoCsxdxrvxjBlFZaYK8TrvqQz2Ky2HdEBf
+         fvabpwDyItxkccEb7rwKcFIgO3uhejahVb2DDluP8AG8uatJR1MshGmc05BGpFHbYvd2
+         KYVpM/KCGaQjOPzv9yhhBoDb192fJ+4CzseAqpmPTioof0DLI4eQn5Z0/h5njxSZGkmy
+         AyWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705453614; x=1706058414;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ikC7FbZyy7GSsL/x82/6qd52zjjlU7XwgDYBsI/nFBI=;
+        b=h1fZtlu3GFmSSeI2kloXkHvjeSGm797LeuFC+X/qhsghF9Y7x/RLcBwJRsmeduPupC
+         BAvmyVCFYcoifSxv0KlBZGI0nrf5ShXBqGvOHxl+SqBj6TGzx+ZtAJVb8mPw4SJNGOzI
+         R4cLslR/Ju7xxURWE5RSFktwbgvt9KchXQtJLO/qxiDKKhEueoIyxPfx7BL4orPncZEl
+         +knTIDdv9u7gwTGm8mymJRf6aZo6fkqkjLsautpo2MNYkRm1hoOfzfG+J8AAoUj6kAuK
+         2hA20Dwf3Revwrm+vHjKCUIbQvLzeR7UrC3wsAPFrw08W74ZVpd3gkkmIJNgWGc6E2PX
+         YLtw==
+X-Gm-Message-State: AOJu0Yzsup/Euq//h+if0W+XXSDH+A28VdeLNKZBNOyl4/muAjL4l7v4
+	QC5AV8okFm9VJ14QCFjp5ce5QM3sgtipj1xnhA==
+X-Google-Smtp-Source: AGHT+IFn0XXp2m0IheTO1rC8gIwvoWh529EXPcRpuLpYjuG1IPky1DX58vEbv0iiSThvh0GtUSYoDudON0I=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:6044:0:b0:5e8:f507:6f8a with SMTP id
+ u65-20020a816044000000b005e8f5076f8amr4277219ywb.9.1705453613932; Tue, 16 Jan
+ 2024 17:06:53 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Tue, 16 Jan 2024 17:06:44 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.381.gb435a96ce8-goog
+Message-ID: <20240117010644.1534332-1-seanjc@google.com>
+Subject: [ANNOUNCE] PUCK Agenda - 2024.01.17 - TDP MMU for IOMMU
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Jason Gunthorpe <jgg@nvidia.com>, Yan Zhao <yan.y.zhao@intel.com>, 
+	David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218259
+Tomorrow's PUCK topic is utilizing KVM's TDP MMU for IOMMU page tables.
 
---- Comment #10 from Sean Christopherson (seanjc@google.com) ---
-On Tue, Jan 16, 2024, bugzilla-daemon@kernel.org wrote:
-> https://bugzilla.kernel.org/show_bug.cgi?id=3D218259
->=20
-> --- Comment #9 from Joern Heissler (kernelbugs2012@joern-heissler.de) ---
-> (In reply to Sean Christopherson from comment #5)
-> > On Thu, Dec 14, 2023, bugzilla-daemon@kernel.org wrote:
->=20
-> > While the [tdp_mmu] module param is writable, it's effectively snapshot=
-ted
-> by
-> > each VM during creation, i.e. toggling it won't affect running VMs.
->=20
-> How can I see which MMU a running VM is using?
+FYI, I am currently without my normal internet (hooray tethering), and we're
+supposed to get a healthy dose of freezing rain tonight, i.e. I might lose power
+too.  I expect to be able to join even if that happens, but I apologize in
+advance if I end up being a no-show.
 
-You can't, which in hindsight was a rather stupid thing for us to not make
-visible
-somewhere.  As of v6.3, the module param is read-only, i.e. it's either ena=
-ble
-or
-disabled for all VMs, so sadly it's unlikely that older kernels will see any
-kind
-of "fix".
+https://lore.kernel.org/all/20231202091211.13376-1-yan.y.zhao@intel.com
 
---=20
-You may reply to this email to add a comment.
+Time:     6am PDT
+Video:    https://meet.google.com/vdb-aeqo-knk
+Phone:    https://tel.meet/vdb-aeqo-knk?pin=3003112178656
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+Calendar: https://calendar.google.com/calendar/u/0?cid=Y182MWE1YjFmNjQ0NzM5YmY1YmVkN2U1ZWE1ZmMzNjY5Y2UzMmEyNTQ0YzVkYjFjN2M4OTE3MDJjYTUwOTBjN2Q1QGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20
+Drive:    https://drive.google.com/drive/folders/1aTqCrvTsQI9T4qLhhLs_l986SngGlhPH?resourcekey=0-FDy0ykM3RerZedI8R-zj4A&usp=drive_link
+
+Future Schedule:
+January 24th - Memtypes for non-coherent DMA
+January 31st - Available!
+February     - Available!
 
