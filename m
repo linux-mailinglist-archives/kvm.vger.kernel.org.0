@@ -1,101 +1,69 @@
-Return-Path: <kvm+bounces-6408-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6409-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECCC4830D47
-	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 20:28:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EAFE8830E78
+	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 22:19:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B5361C21D79
-	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 19:28:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 284C81C21FE5
+	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 21:19:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72286249F9;
-	Wed, 17 Jan 2024 19:27:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rwsPXFvb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5144925573;
+	Wed, 17 Jan 2024 21:19:10 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from gentwo.org (gentwo.org [62.72.0.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A75B249F2
-	for <kvm@vger.kernel.org>; Wed, 17 Jan 2024 19:27:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3793250E8;
+	Wed, 17 Jan 2024 21:19:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.72.0.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705519671; cv=none; b=hu2Xph/Zd+EIZoBfSdzFyRlNMmRfiHV5NeI1soODMb+pR6d4b8KZ1pf7HtDidsBaPPy51IGaqg5eifwqpeCwnn24ja9yp+R/jEE4FK6atZM9cq2XuW8HdNm4IJC5ubAkHDhQZziJks3JWjDuOnMJfnxe+bY/p2Gx7Q1tAar/9nE=
+	t=1705526349; cv=none; b=EAFZVareZa3T/NEMOL+B7CDwI1yrNd2YBddexNI4gV0GbZ/ddq9dJ6WsnXeFgmLaEzFsZ+WCFRPyXa3dXeqv0ab43vqgyO3TpfUo83qVpi0P1ePuY8BrI+vM0cb8WlvwAy4ksWG5jxkc8tEY8NTqdnK64hnP6+6ue/9tHwhoD1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705519671; c=relaxed/simple;
-	bh=OeaNVVnq8AcJMw42KwUVaszfHHwGayct/t6qKGN+rCg=;
-	h=Received:DKIM-Signature:Received:From:To:Subject:Date:
-	 X-Bugzilla-Reason:X-Bugzilla-Type:X-Bugzilla-Watch-Reason:
-	 X-Bugzilla-Product:X-Bugzilla-Component:X-Bugzilla-Version:
-	 X-Bugzilla-Keywords:X-Bugzilla-Severity:X-Bugzilla-Who:
-	 X-Bugzilla-Status:X-Bugzilla-Resolution:X-Bugzilla-Priority:
-	 X-Bugzilla-Assigned-To:X-Bugzilla-Flags:X-Bugzilla-Changed-Fields:
-	 Message-ID:In-Reply-To:References:Content-Type:
-	 Content-Transfer-Encoding:X-Bugzilla-URL:Auto-Submitted:
-	 MIME-Version; b=nTnGjbuEyV02Z8yQJuNmXQJfWMmV5W9FTkB+kh2XRjFpvHqQilvqaIW0d0aoy7OdtwvsWLlnNop0MqeFm0p5BM6zTee9vXqAzE3Kyoq0x7zQVOwrajyGT/3ash0W6I2OOoH+DZECpl1BnINvpM/xillgmVh2oOfBv5qd9FVBxtE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rwsPXFvb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 151B7C43399
-	for <kvm@vger.kernel.org>; Wed, 17 Jan 2024 19:27:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705519671;
-	bh=OeaNVVnq8AcJMw42KwUVaszfHHwGayct/t6qKGN+rCg=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=rwsPXFvb3VeeCuV2crBGqhdYsBlyvAzeBMGGHMp/OQ/C0vYUwZ4FmCd9+OuI1ReSv
-	 ZqS0amLh/iieS9N7TQIAVyvCovrWmTo6N9wzRE9MbNPlrCUGKTQF4DluDB/qzn+SVT
-	 ukXZjutFhTrFv2NcKU0w14mxqEXwfAFBJcgEKgaeBXE+5QFxXVYLFCn7g7I7SeSLVD
-	 zIsA/FhL62ILLM5rYnfCjm/8x+QhBaNSQn3y9kThNaWd5aAcg6nM38EhjaVqfO7EiE
-	 xEuCvc9ScsTw0oU72Pg7KUbUv44gO4Ie1glpIHHhHU+pav90/BWdV758G+DhbS3htP
-	 Ss/3giIUNPzKA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 047CFC53BD1; Wed, 17 Jan 2024 19:27:51 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: kvm@vger.kernel.org
-Subject: [Bug 218386] "kvm: enabling virtualization on CPUx failed" on
- "Ubuntu 22.04.03 with kernel 6.5.0-14-generic"
-Date: Wed, 17 Jan 2024 19:27:50 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: blocking
-X-Bugzilla-Who: aros@gmx.com
-X-Bugzilla-Status: RESOLVED
-X-Bugzilla-Resolution: ANSWERED
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_status resolution
-Message-ID: <bug-218386-28872-RdsMhE7cld@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218386-28872@https.bugzilla.kernel.org/>
-References: <bug-218386-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=arc-20240116; t=1705526349; c=relaxed/simple;
+	bh=ttyDCLNNMgQEc8e9KdahxH70xGwli3IpEIEtIx9HpG4=;
+	h=Received:Received:Date:From:To:cc:Subject:In-Reply-To:Message-ID:
+	 References:MIME-Version:Content-Type; b=kTf2ERbQvhj4Hv6od3qD7zwvk/sQ1GXKcyJl8kfLvthqEbVli3SPRfWZo/4b1qi2pNueQc7oxG1/hM1e//jzvWozJSiJQ/EgSt+5R3vcm8Epr2P4FszZEoKATYC9fnVbVNtUxPJH2Z7YVpSzunxhlzYnycxjmg1X5tiZjh8uRrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com; spf=fail smtp.mailfrom=linux.com; arc=none smtp.client-ip=62.72.0.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=linux.com
+Received: by gentwo.org (Postfix, from userid 1003)
+	id 99A0E40A8B; Wed, 17 Jan 2024 13:19:06 -0800 (PST)
+Received: from localhost (localhost [127.0.0.1])
+	by gentwo.org (Postfix) with ESMTP id 972ED40A85;
+	Wed, 17 Jan 2024 13:19:06 -0800 (PST)
+Date: Wed, 17 Jan 2024 13:19:06 -0800 (PST)
+From: "Christoph Lameter (Ampere)" <cl@linux.com>
+To: Mihai Carabas <mihai.carabas@oracle.com>
+cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, 
+    linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+    catalin.marinas@arm.com, will@kernel.org, tglx@linutronix.de, 
+    mingo@redhat.com, bp@alien8.de, x86@kernel.org, hpa@zytor.com, 
+    pbonzini@redhat.com, wanpengli@tencent.com, vkuznets@redhat.com, 
+    rafael@kernel.org, daniel.lezcano@linaro.org, akpm@linux-foundation.org, 
+    pmladek@suse.com, peterz@infradead.org, dianders@chromium.org, 
+    npiggin@gmail.com, rick.p.edgecombe@intel.com, joao.m.martins@oracle.com, 
+    juerg.haefliger@canonical.com, mic@digikod.net, arnd@arndb.de, 
+    ankur.a.arora@oracle.com
+Subject: Re: [PATCH v2] Enable haltpoll for arm64
+In-Reply-To: <1700488898-12431-1-git-send-email-mihai.carabas@oracle.com>
+Message-ID: <96ed7928-b979-672c-9551-1739e00ca148@linux.com>
+References: <1700488898-12431-1-git-send-email-mihai.carabas@oracle.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218386
+On Mon, 20 Nov 2023, Mihai Carabas wrote:
 
-Artem S. Tashkinov (aros@gmx.com) changed:
+> This patchset enables the usage of haltpoll governer on arm64. This is
+> specifically interesting for KVM guests by reducing the IPC latencies.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-             Status|NEW                         |RESOLVED
-         Resolution|---                         |ANSWERED
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+Any updates on this one? We see good improvements with this patchset using 
+a variety of loads on Ampere platforms.
 
