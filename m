@@ -1,368 +1,259 @@
-Return-Path: <kvm+bounces-6400-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6401-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AB07830B18
-	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 17:32:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60CAA830B20
+	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 17:35:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B29731F2A0ED
-	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 16:32:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08B5128BF84
+	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 16:35:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C808224CE;
-	Wed, 17 Jan 2024 16:32:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFBFF219F0;
+	Wed, 17 Jan 2024 16:34:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="fDJcpzlz"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QrIihL2S"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8F501E875
-	for <kvm@vger.kernel.org>; Wed, 17 Jan 2024 16:32:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705509171; cv=none; b=BoxGVetlxK+K5c3HidMrGI1Bm4iVvkTrorw+BGAmW+gGwx8qC+TPtWn2nTSu2vaeIlN7LIFeUWwnnLG8cWcrwx6VfBpVBDJ6o4hOOnVGgy/CYbjfl3IwC7A6Ejh+e1ZWWsl5fKovLnI90n1U3brxhggilRkhC+BQL06kfodMD6I=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705509171; c=relaxed/simple;
-	bh=kZF29l971OEze4fp9GcdEgD5AgXyDq4yWBaJB2rL4O0=;
-	h=DKIM-Signature:X-Amazon-filename:X-IronPort-AV:Content-Type:
-	 MIME-Version:Received:Received:Received:X-Farcaster-Flow-ID:
-	 Received:Received:Received:From:To:CC:Subject:Thread-Topic:
-	 Thread-Index:Date:Message-ID:References:In-Reply-To:
-	 Accept-Language:X-MS-Has-Attach:X-MS-TNEF-Correlator:
-	 x-originating-ip:MIME-Version; b=QpSQM/qD2XvVGeXK34Lg+ieOFeYTG1p0yHEQVaDf8AoELUYWgGp2UtBzivoGQvdTcdNwTtuZktovZ1vpCBgjLkB/mUwXU1ukTYqvmR0V/LMMxQACcH6OJY2CWupII9/RlsKM8S/HSYw0wObvKsWyeJr6GtsSWdHIDu5+NWt9GqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=fDJcpzlz; arc=none smtp.client-ip=99.78.197.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazon201209; t=1705509169; x=1737045169;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EC3512B96;
+	Wed, 17 Jan 2024 16:34:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1705509296; cv=fail; b=WbO/BVs46slcfzzKd8A4U8yMi8cD6Ccicmvlfdtzs+VYcEFRWmaNoL54abfioO1F98o21VQGbihk842qs8HJIPDfn7kLhOCGBOAy/1C8aGdg8RQtBC9hYX068YgkHYMxzt8iwneG5z6zxBkbnisukTjTz3/UR1Dwa5aGnjdG9hQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1705509296; c=relaxed/simple;
+	bh=ukXvCvcHCkD/0WF/tKr1bbTWLhK0w5MtUQfTuxjRUbM=;
+	h=DKIM-Signature:X-IronPort-AV:X-IronPort-AV:Received:X-ExtLoop1:
+	 X-IronPort-AV:Received:Received:Received:Received:Received:
+	 ARC-Message-Signature:ARC-Authentication-Results:Received:Received:
+	 From:To:CC:Subject:Thread-Topic:Thread-Index:Date:Message-ID:
+	 References:In-Reply-To:Accept-Language:Content-Language:
+	 X-MS-Has-Attach:X-MS-TNEF-Correlator:x-ms-publictraffictype:
+	 x-ms-traffictypediagnostic:x-ms-office365-filtering-correlation-id:
+	 x-ms-exchange-senderadcheck:x-ms-exchange-antispam-relay:
+	 x-microsoft-antispam:x-microsoft-antispam-message-info:
+	 x-forefront-antispam-report:
+	 x-ms-exchange-antispam-messagedata-chunkcount:
+	 x-ms-exchange-antispam-messagedata-0:Content-Type:
+	 Content-Transfer-Encoding:MIME-Version:
+	 X-MS-Exchange-CrossTenant-AuthAs:
+	 X-MS-Exchange-CrossTenant-AuthSource:
+	 X-MS-Exchange-CrossTenant-Network-Message-Id:
+	 X-MS-Exchange-CrossTenant-originalarrivaltime:
+	 X-MS-Exchange-CrossTenant-fromentityheader:
+	 X-MS-Exchange-CrossTenant-id:X-MS-Exchange-CrossTenant-mailboxtype:
+	 X-MS-Exchange-CrossTenant-userprincipalname:
+	 X-MS-Exchange-Transport-CrossTenantHeadersStamped:X-OriginatorOrg;
+	b=UmwOD7QZneome+IvUaf9qbJj/9LxeOpua2g1VhrEvAZjEPpNl9lcxhjP4Ve515r3PIHK016FxwJdK/Wq4u27Ci9UPbSEgJVA0/e5wFpPr7qCTuV74tOhoiiJnfi1bYyExfW9yrkBDUkQwrl4a1o/jzH+OBtDH4Lnqnsd+9cgzpI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QrIihL2S; arc=fail smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1705509294; x=1737045294;
   h=from:to:cc:subject:date:message-id:references:
-   in-reply-to;
-  bh=P+H+MP3pAB0zmqLqoXhHUEwHm7PtG9sVA0Hc27l9hjE=;
-  b=fDJcpzlzL4w8ht/TRAjkF6+luG8g7qWKiEmCyqWQNPaz4AOgeX2KGga5
-   PAxvHDjUJ8O+nfBadaHa/FsAO/sopHQ9jekF41jD4nw1Wi71K0Rqm6eHH
-   vXpzE9ipLSaP6ytCgWp42S2q92P430QJ53/elCu+j4LG7yUgEcXhZSesQ
-   s=;
-X-Amazon-filename: smime.p7s
-X-IronPort-AV: E=Sophos;i="6.05,200,1701129600"; 
-   d="p7s'?scan'208";a="58962778"
-Content-Type: multipart/mixed; boundary="===============8175054459963755501=="
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=ukXvCvcHCkD/0WF/tKr1bbTWLhK0w5MtUQfTuxjRUbM=;
+  b=QrIihL2SJfisjqKsuDAPVPgH6Azk60onvXG8SlyTSNbLNUT2CKIwaLEX
+   E1oQhgQ1th8DLS9xjs/zKCRIlmfghg+Hj2jRx7HfUu2savouY6vaXsND5
+   zRm3HvwSQOkRJ7Rzm3VubYACtMhNSr2X/elHee0YPpUPRs51g/iQErdtw
+   BPtp8dmR9CfVCSL8/kcR/npIRRBnWSQkNOukg4YxDnJSeWCv7P1qGlOqS
+   4nF393Tz9Iksv5g54SjwTFJLWuwR86V4ssGaKFTyWcB/0YEgZ3eRON9O6
+   dCTgnO0/1tDE8EjlvKppc22qjRubRV44VMx3j9fSYS993MmVo5oTbhrgO
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10956"; a="102106"
+X-IronPort-AV: E=Sophos;i="6.05,200,1701158400"; 
+   d="scan'208";a="102106"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jan 2024 08:34:54 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,200,1701158400"; 
+   d="scan'208";a="32852503"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orviesa001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 17 Jan 2024 08:34:54 -0800
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 17 Jan 2024 08:34:53 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 17 Jan 2024 08:34:52 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Wed, 17 Jan 2024 08:34:52 -0800
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.168)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 17 Jan 2024 08:34:51 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=EGdh81jHviwp3tda5PO9SR9a5qvTtQcajJdNiUdeyrguxhejTAcH385rqqpv9WDi9gNfphCl3jHWbfKE/vs03t9pUZYEA/s0FerjyzLzCELWtl37m81J7oQqD65XzcjthsQj4qgOQp03Z074Gw8I01rsZ4CE/Rg8stIx6o3KxmFp71kCRWm1MqiIcKt1+jjGniV0icchxvD+3Lbvn3bnr87vR+4flMESIOza87MUkcvRQ2QS5wFkIWEpuvhvfTfvTDn9ieC6poGkSGO+l4E3W5+Fe6UEMMIyvwJeJ3hKPKT+hEDI9hfsezQ9OpjhqTn2oDQj7ZG4I7VUaJytWQ0CHg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=B8ga3Wng9QqZcE2QTizg2MCLVYjZCMsKhbNNxbr9mJU=;
+ b=EShndH6GeH7Y4/4VLBcPL6PcxrFN47qsQ4XgtV1neA5Y+ZcyldUC3KgSQAt8sFOvpM/vJLQl9w3UkQVJPXYuO4QYru02+BUddSqsLAjBRA9LdJyeAvQnza6hYDPkLxe3CmKUhXYXEMg1ckVEQPC0FEx/Q+dsji5tskrpMAuT4hONxn+c+30he5X8Tm9mlsEhlaw5rySzhSPYBHok6DyKNEyRcl0TeI94EHCXhtEQfYrTmDwgwcOLfUOOh+XlspqsYBOFmVLT0yCUCPwR47gdIhiFfbxwwccO2ffIy66refaOlNC2OmrKkrdCcdM38oy2ceo95/3piDMNRBcr88DUNg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from SA1PR11MB6734.namprd11.prod.outlook.com (2603:10b6:806:25d::22)
+ by MW3PR11MB4571.namprd11.prod.outlook.com (2603:10b6:303:59::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7181.26; Wed, 17 Jan
+ 2024 16:34:49 +0000
+Received: from SA1PR11MB6734.namprd11.prod.outlook.com
+ ([fe80::8ccb:4e83:8802:c277]) by SA1PR11MB6734.namprd11.prod.outlook.com
+ ([fe80::8ccb:4e83:8802:c277%4]) with mapi id 15.20.7202.020; Wed, 17 Jan 2024
+ 16:34:49 +0000
+From: "Li, Xin3" <xin3.li@intel.com>
+To: "Gao, Chao" <chao.gao@intel.com>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "seanjc@google.com"
+	<seanjc@google.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"tglx@linutronix.de" <tglx@linutronix.de>, "mingo@redhat.com"
+	<mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "x86@kernel.org"
+	<x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>, "Yang, Weijiang"
+	<weijiang.yang@intel.com>, "Huang, Kai" <kai.huang@intel.com>
+Subject: RE: [PATCH v4 1/2] KVM: VMX: Cleanup VMX basic information defines
+ and usages
+Thread-Topic: [PATCH v4 1/2] KVM: VMX: Cleanup VMX basic information defines
+ and usages
+Thread-Index: AQHaRT8NfyvFkqdAjk6/fSX6qVKXsrDcFbiAgAIkzVA=
+Date: Wed, 17 Jan 2024 16:34:49 +0000
+Message-ID: <SA1PR11MB67340002B67910588EE335B1A8722@SA1PR11MB6734.namprd11.prod.outlook.com>
+References: <20240112093449.88583-1-xin3.li@intel.com>
+ <ZaY0UbFjwCYh4u/r@chao-email>
+In-Reply-To: <ZaY0UbFjwCYh4u/r@chao-email>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA1PR11MB6734:EE_|MW3PR11MB4571:EE_
+x-ms-office365-filtering-correlation-id: ead5bef0-c596-4d75-a76d-08dc177a393c
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: CtLZ6K5P8MMs3mgjbj9M3ypVg3uFg399Q2r/hRCUYng+9biqClVcnxcU43Jh/fLiEvzehmkbRDtn5lZ5iJtNDyibgwEoFbQUFLwvKJBljU3zJHusfHihrWiH5+C052tub4033ZZJLieGSHQvXb2iYGeC4FJZVbhT+x4ZY5U7WbI4bJt7Le6jzUiyf8sKx6OxK2lQHObnkcp86P0BzxGk3T39W59wBePIL5dcZRpX0t2UgyuPpkItKRaZNguLxM0qoNwxSyNLuRIxZM/cATr5spgrivw8uxFLRjbAWJ0CJ+V29VPaFmBHr8auEec/UGiGvYHv0X6KAf7jX4xfWfe6N8sgj9G0witdbBpfVoHSpwV6NYmxK6Sywa7LvVTNTFVLCBBGmBPWK3XaZKqSPALksErHL+DCFYNrTzCXrUUPFo/sktu8KBVidHtl6zIDpjDemhPcScwvUYHlcVI4DPESo7cEcVuLvINPkdIJgcIwlWzQ1TEQ22q93h6DD/ANZjA+Rs/iZ8HUe7gvH2L6AppmsuZB8OVZTMm/KVJj5BR4i8dscCXZX4arvMfvNVrzLHG+/F1D+NgX6WkPBceykn2f21LNQaj/gw/vJqhXQs92i43y+Xz1FYkByQ89/N8wnOBM
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR11MB6734.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(39860400002)(376002)(366004)(346002)(396003)(230922051799003)(1800799012)(186009)(64100799003)(451199024)(71200400001)(82960400001)(6506007)(7696005)(122000001)(54906003)(316002)(64756008)(9686003)(66446008)(66946007)(66476007)(66556008)(41300700001)(6636002)(76116006)(38070700009)(478600001)(38100700002)(7416002)(5660300002)(55016003)(2906002)(86362001)(83380400001)(8936002)(8676002)(6862004)(52536014)(4326008)(33656002)(26005);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?1HYcYvwZm5bLQcnCZvIc47JNlPwhf+eC1ynKkJebmu3dtYtkoxcSQlJKoZdv?=
+ =?us-ascii?Q?PApat4kM6pXlYcx4b6c6QErw/oLuPAo6GqLgYHgdERZiGbOgPwLqOlv8bYGQ?=
+ =?us-ascii?Q?+K6xh29Df0AKpkntAAu4IkxKC15XXibKSKWJ8KOZmDoIeD756uODn0Vjo7tF?=
+ =?us-ascii?Q?NNoJZpQGbnxoOB36zWfkx2sQQ2/kFi2Ji2C2+Fky8VYYGo0qIxzxGg2qLaJJ?=
+ =?us-ascii?Q?JIqV+/95i85CiSewlgdAlFfHP98Faol2+27uE066EmjiBasxsjc6bIDh51jQ?=
+ =?us-ascii?Q?TbmbNiq7WknoX8JRMjLFRruiKpUU9oFWCFevdvEvo2fZ4ch65ottf8zv78eK?=
+ =?us-ascii?Q?a5ilQNVhLBf3TR+MKTh1fxUw7YwCNx6mJ2BSpd5rAz4qh9O1Ayv+ZKkna+RF?=
+ =?us-ascii?Q?2jRHkT4g0Ucb84sDCaSs1hobAF7nrfl3zzdL0rvPZWk9THULz9hDkSiA0MLT?=
+ =?us-ascii?Q?bti1Gy2RGjaQ92i7fuyBcO0z4GeTdEHedbOI8OEfPQpEfEROUH905fNg8eOz?=
+ =?us-ascii?Q?k0lL9HYwsfIbnm8x4fKvdr0uvybE7sfTHCiwWJfH1cHYZxPQE56H7v7DleH1?=
+ =?us-ascii?Q?VxHmxtD2gBIB3cnItQc3nyRswcEHUDwPSlRdsrBSCKe/hFpFM64YQhi0s8Jy?=
+ =?us-ascii?Q?ri0jp79JVrBEE3u75hmjbPHGO4hUNsOYWFKauOAmtb+mIOjpK84RJcy/Oina?=
+ =?us-ascii?Q?8yehUObLEfqf6WIaE896it8YKIjfAXhJzQUGgI1ZMXijK8+roiVb+5nCv4FL?=
+ =?us-ascii?Q?8X3+uhq7yf4jid8GchCvVCUoLMWyVInGezD28+KI+XkLBxZoknjxs6p7mu9F?=
+ =?us-ascii?Q?eXdbPf3hX8vcxNsa10O7yu/t4nst05MRoItD88Q27PDmE4bLuGuLEnqo9/Hz?=
+ =?us-ascii?Q?CVLIZOjFyAGzilcxtpmhXY0ArVDTBFbIiEfAFH8aVMG6e2j7rRrwLI9DGjEU?=
+ =?us-ascii?Q?K/3mqXWxRF11KEbtqD/C/ZnUl6NavpgjqMihog+syUKKJfzIr2hRyisMtXDm?=
+ =?us-ascii?Q?5XEoI9V6TNccx9JeeJ9deUw23RvKv5uqdvBbCLVsFq7LiOrDwJrVVdZjkS2B?=
+ =?us-ascii?Q?TD0EvU6Uj/gOKytS0AxNXUpp+ZXPfHOG5+ph5Rf6+dDW7pFDo1QbHR0XY/c/?=
+ =?us-ascii?Q?Obmhka7Hen3iHOLDEiOz6rKgxutpPw0bI3cwbLwLu2CB4NkBKGR6mjKvJeem?=
+ =?us-ascii?Q?NSeDNo8BCAjEdokcFaPqr4LP7Yl5Wfguz5cdUAuGLOQZx59agYjUuwki6LC9?=
+ =?us-ascii?Q?+nT7PXtAcYWFRlLrw0tT4eOyrPuKpQdMmeMG9LCos5+hkV95aty0hEFHZFLA?=
+ =?us-ascii?Q?AKl4+mVYS6erOEykKBSIFQNmX0XVyVwmnPX6KiafJ5akUCKpOpdL7ZGuxWYs?=
+ =?us-ascii?Q?1Ip/eTcTzOEfaMoH/CKw2gLhyHEWr5qtsbyQiDiPjQKfXAWGrUG1cO+xkZdr?=
+ =?us-ascii?Q?UtqFs3zIIfBTkQtpxHkNEcy6I6299U8YlMN8ninGsTIA2fklJnw/+l/ReRVY?=
+ =?us-ascii?Q?jACI6p5XKm9mp89AXQNOfO4NKKAya4uQy5vuuz3VQbZQozOj6LPtBS3FCNxp?=
+ =?us-ascii?Q?00dcbLXNwDQJvDGluzU=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-f7c754c9.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jan 2024 16:32:39 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan3.pdx.amazon.com [10.39.38.70])
-	by email-inbound-relay-pdx-2c-m6i4x-f7c754c9.us-west-2.amazon.com (Postfix) with ESMTPS id 79E2240E6A;
-	Wed, 17 Jan 2024 16:32:39 +0000 (UTC)
-Received: from EX19MTAEUB002.ant.amazon.com [10.0.10.100:58516]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.41.56:2525] with esmtp (Farcaster)
- id d6789a5a-5aad-4d3b-a921-248da66414df; Wed, 17 Jan 2024 16:32:38 +0000 (UTC)
-X-Farcaster-Flow-ID: d6789a5a-5aad-4d3b-a921-248da66414df
-Received: from EX19D032EUC002.ant.amazon.com (10.252.61.185) by
- EX19MTAEUB002.ant.amazon.com (10.252.51.59) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Wed, 17 Jan 2024 16:32:37 +0000
-Received: from EX19D008UEC001.ant.amazon.com (10.252.135.232) by
- EX19D032EUC002.ant.amazon.com (10.252.61.185) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Wed, 17 Jan 2024 16:32:36 +0000
-Received: from EX19D008UEC001.ant.amazon.com ([fe80::4702:5d1a:c556:797]) by
- EX19D008UEC001.ant.amazon.com ([fe80::4702:5d1a:c556:797%3]) with mapi id
- 15.02.1118.040; Wed, 17 Jan 2024 16:32:36 +0000
-From: "Woodhouse, David" <dwmw@amazon.co.uk>
-To: "seanjc@google.com" <seanjc@google.com>
-CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com"
-	<pbonzini@redhat.com>, "Durrant, Paul" <pdurrant@amazon.co.uk>
-Subject: Re: [PATCH] KVM: pfncache: rework __kvm_gpc_refresh() to fix locking
- issues
-Thread-Topic: [PATCH] KVM: pfncache: rework __kvm_gpc_refresh() to fix locking
- issues
-Thread-Index: AQHaSWLHnrMuqpEfr06LffYPpxRRow==
-Date: Wed, 17 Jan 2024 16:32:35 +0000
-Message-ID: <ef60725c38faa30132ab45cf14ee0af86e885596.camel@amazon.co.uk>
-References: <9a82db197449bdb97ee889d2f3cdd7998abd9692.camel@amazon.co.uk>
-	 <Zaf7yCYt8XFuMhAd@google.com>
-In-Reply-To: <Zaf7yCYt8XFuMhAd@google.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: yes
-X-MS-TNEF-Correlator: 
-MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR11MB6734.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ead5bef0-c596-4d75-a76d-08dc177a393c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jan 2024 16:34:49.3322
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: zyYxAHmNVUK7fTidJNyiWCXXz2Zh76x1ESDBbQetAv3vLJy0aI1w2ihJNGAftKMogfgpbMGAiyW/7qKl/na1yw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR11MB4571
+X-OriginatorOrg: intel.com
 
---===============8175054459963755501==
-Content-Language: en-US
-Content-Type: multipart/signed; micalg=sha-256;
-	protocol="application/pkcs7-signature"; boundary="=-kMgXPlGUuGOSoLwtVVe0"
-
---=-kMgXPlGUuGOSoLwtVVe0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, 2024-01-17 at 08:09 -0800, Sean Christopherson wrote:
-> On Fri, Jan 12, 2024, David Woodhouse wrote:
-> > This function can race with kvm_gpc_deactivate(). Since that function
-> > does not take the ->refresh_lock, it can wipe and unmap the pfn and
-> > khva while hva_to_pfn_retry() has dropped its write lock on gpc->lock.
-> >=20
-> > Then if hva_to_pfn_retry() determines that the PFN hasn't changed and
-> > that it can re-use the old pfn and khva, they get assigned back to
-> > gpc->pfn and gpc->khva even though the khva was already unmapped by
-> > kvm_gpc_deactivate(). This leaves the cache in an apparently valid
-> > state but with ->khva pointing to an address which has been unmapped.
-> > Which in turn leads to oopses in e.g. __kvm_xen_has_interrupt() and
-> > set_shinfo_evtchn_pending().
-> >=20
-> > It may be possible to fix this just by making kvm_gpc_deactivate()
-> > take the ->refresh_lock, but that still leaves ->refresh_lock being
-> > basically redundant with the write lock on ->lock, which frankly
-> > makes my skin itch, with the way that pfn_to_hva_retry() operates on
-> > fields in the gpc without holding ->lock.
-> >=20
-> > Instead, fix it by cleaning up the semantis of hva_to_pfn_retry(). It
-> > no longer operates on the gpc object at all; it's called with a uhva
-> > and returns the corresponding pfn (pinned), and a mapped khva for it.
-> >=20
-> > The calling function __kvm_gpc_refresh() now drops ->lock before callin=
-g
-> > hva_to_pfn_retry(), then retakes the lock before checking for changes,
-> > and discards the new mapping if it lost a race. And will correctly
-> > note the old pfn/khva to be unmapped at the right time, instead of
-> > preserving them in a local variable while dropping the lock.
-> >=20
-> > The optimisation in hva_to_pfn_retry() where it attempts to use the
-> > old mapping if the pfn doesn't change is dropped, since it makes the
-> > pinning more complex. It's a pointless optimisation anyway, since the
-> > odds of the pfn ending up the same when the uhva has changed (i.e.
-> > the odds of the two userspace addresses both pointing to the same
-> > underlying physical page) are negligible,
-> >=20
-> > I remain slightly confused because although this is clearly a race in
-> > the gfn_to_pfn_cache code, I don't quite know how the Xen support code
-> > actually managed to trigger it. We've seen oopses from dereferencing a
-> > valid-looking ->khva in both __kvm_xen_has_interrupt() (the vcpu_info)
-> > and in set_shinfo_evtchn_pending() (the shared_info). But surely the
-> > race shouldn't happen for the vcpu_info gpc because all calls to both
-> > refresh and deactivate hold the vcpu mutex, and it shouldn't happen
+> >+#define VMX_BASIC_FEATURES_MASK			\
+> >+	(VMX_BASIC_DUAL_MONITOR_TREATMENT |	\
+> >+	 VMX_BASIC_INOUT |			\
+> >+	 VMX_BASIC_TRUE_CTLS)
+> >+
+> >+#define VMX_BASIC_RESERVED_BITS			\
+> >+	(GENMASK_ULL(63, 56) | GENMASK_ULL(47, 45) | BIT_ULL(31))
 >=20
-> FWIW, neither kvm_xen_destroy_vcpu() nor kvm_xen_destroy_vm() holds the a=
-ppropriate
-> mutex.=C2=A0=20
+> When we add a new feature (e.g., in CET series, bit 56 is added), the abo=
+ve
+> two macros need to be modified.
+>=20
+> Would it be better to use a macro for bits exempt from the bitwise check =
+below
+> e.g.,
+>=20
+> #define VMX_BASIC_MULTI_BITS_FEATURES_MASK
+>=20
+> 	(GENMASK_ULL(53, 50) | GENMASK_ULL(44, 32) | GENMASK_ULL(30, 0))
+>=20
+> and do
+> 	if (!is_bitwise_subset(vmx_basic, data,
+> 			       ~VMX_BASIC_MULTI_BITS_FEATURES_MASK)
+>=20
+> then we don't need to change the macro when adding new features.
 
-Those shouldn't be implicated in the cases where we've seen it happen.
-And I think it needs the GPC to be left in !active,valid state due to
-the race and then *reactivated*, while still marked 'valid'. Which
-can't happen after the destroy paths.
+Sounds a good idea to me, and just need to add comments about why.
 
 >=20
-> > for the shared_info gpc because all calls to both will hold the
-> > kvm->arch.xen.xen_lock mutex.
-> >=20
-> > Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> > ---
-> >=20
-> > This is based on (and in) my tree at
-> > https://git.infradead.org/users/dwmw2/linux.git/shortlog/refs/heads/xen=
-fv
-> > which has all the other outstanding KVM/Xen fixes.
-> >=20
-> > =C2=A0virt/kvm/pfncache.c | 181 +++++++++++++++++++++------------------=
------
-> > =C2=A01 file changed, 85 insertions(+), 96 deletions(-)
+> >+
+> > static int vmx_restore_vmx_basic(struct vcpu_vmx *vmx, u64 data)
+> > {
+> >-	const u64 feature_and_reserved =3D
+> >-		/* feature (except bit 48; see below) */
+> >-		BIT_ULL(49) | BIT_ULL(54) | BIT_ULL(55) |
+> >-		/* reserved */
+> >-		BIT_ULL(31) | GENMASK_ULL(47, 45) | GENMASK_ULL(63, 56);
+> > 	u64 vmx_basic =3D vmcs_config.nested.basic;
+> >
+> >-	if (!is_bitwise_subset(vmx_basic, data, feature_and_reserved))
+> >+	static_assert(!(VMX_BASIC_FEATURES_MASK &
+> VMX_BASIC_RESERVED_BITS));
+> >+
+> >+	if (!is_bitwise_subset(vmx_basic, data,
+> >+			       VMX_BASIC_FEATURES_MASK |
+> VMX_BASIC_RESERVED_BITS))
+> > 		return -EINVAL;
+> >
+> > 	/*
+> > 	 * KVM does not emulate a version of VMX that constrains physical
+> > 	 * addresses of VMX structures (e.g. VMCS) to 32-bits.
+> > 	 */
+> >-	if (data & BIT_ULL(48))
+> >+	if (data & VMX_BASIC_32BIT_PHYS_ADDR_ONLY)
+> > 		return -EINVAL;
 >=20
-> NAK, at least as a bug fix.=C2=A0 We've already shuffled deck chairs on t=
-he Titanic
-> several times, I have zero confidence that doing so one more time is goin=
-g to
-> truly solve the underlying mess.
-
-Agreed, but as it stands, especially with refresh_lock, this is just
-overly complex. We should make the rwlock stand alone, and not have
-code which drops the lock and then makes assumptions that things won't
-change.
-
-
-> The contract with the gfn_to_pfn_cache, or rather the lack thereof, is al=
-l kinds
-> of screwed up.=C2=A0 E.g. I added the mutex in commit 93984f19e7bc ("KVM:=
- Fully serialize
-> gfn=3D>pfn cache refresh via mutex") to guard against concurrent unmap(),=
- but the
-> unmap() API has since been removed.=C2=A0 We need to define an actual con=
-tract instead
-> of continuing to throw noodles as the wall in the hope that something sti=
-cks.
+> Side topic:
 >=20
-> As you note above, some other mutex _should_ be held.=C2=A0 I think we sh=
-ould lean
-> into that.=C2=A0 E.g.
+> Actually, there is no need to handle bit 48 as a special case. If we add =
+bit 48
+> to VMX_BASIC_FEATURES_MASK, the bitwise check will fail if bit 48 of @dat=
+a is 1.
 
-I don't. I'd like this code to stand alone *without* making the caller
-depend on "some other lock" just for its own internal consistency.
+Good point!  This is also what you suggested above.
 
-
-> =C2=A0 1. Pass in the guarding mutex to kvm_gpc_init() and assert that sa=
-id mutex is
-> =C2=A0=C2=A0=C2=A0=C2=A0 held for __refresh(), activate(), and deactivate=
-().
-> =C2=A0 2. Fix the cases where that doesn't hold true.
-> =C2=A0 3. Drop refresh_mutex
->=20
-
-I'll go for (3) but I disagree about (1) and (2). Just let the rwlock
-work as $DEITY intended, which is what this patch is doing. It's a
-cleanup.
-
-(And I didn't drop refresh_lock so far partly because it wants to be
-done in a separate commit, but also because it does provide an
-optimisation, as noted.
-
---=-kMgXPlGUuGOSoLwtVVe0
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEjww
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhAwggT4oAMCAQICEQC/QgfpbUT3q2fHshU/ReqfMA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowIjEgMB4GCSqGSIb3DQEJARYRZHdtd0BhbWF6b24uY28udWsw
-ggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIKAoICAQCZgnzd4h6STv/MQcUPixvDN/dNtp4yVSdc
-xz9mB1OcA7HXd4WdPyYagmkcH0WguDYaQnOszkSdElI+2XRFSlGXhY7U9tktvdWuY1zAY1UWES8e
-3BUHqSKbIKx4SX6GuctCcPnyagVZ9Hk21YUElx9cdmrqt0bGoydgxAspEx56J9Q5a48WfvFYjLBF
-NL1dw+P1eUeAljco30+Xggf5faawKfPArUX0cmU4VIh5DMUyv4d0xxfNN6cK1GMj/HGUg2T9OTHW
-nbTdq+OHJwHGi/37mCWx1O3uV0hbZzA1fNklaqlsr1Acg0elPeCFXLb8dSkMgQZHNJVjn+mBvG4d
-MG4FS3ntipApytA+a5IaMP3LNAo0EoBd5/xVy0M6TXbiYesYLq9rhnrLgO1qcw7+if0jH9YoEJ6a
-Je1m7omfEXh2XpospSLaohmAqaBKlyhXDXbTnUVnIf79zU5ohHZof0cP2amnnvYUVD72iuf9qe7X
-4L1Rj589qEWYROKiMil5X7l/smE1dAmxhKxx6YWvWkXH9u7JOcmLGdKST0voaY7j3Wk0lxK3NKsk
-q0G3BpqbPz3P8BYtn38BvbkFnwVW7F7Qzus3KZJgP62eN25QHxoFj44x3sppx4I5WlYG4lxdFZsY
-smQdj64c7MaJ7cp8RJN+eO32RKrkndEkihzxevl11wIDAQABo4IByjCCAcYwHwYDVR0jBBgwFoAU
-CcDy/AvalNtf/ivfqJlCz8ngrQAwHQYDVR0OBBYEFJ418HpIgZaPnwpWdCNSvm4XgH/lMA4GA1Ud
-DwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUFBwMEBggrBgEFBQcDAjBA
-BgNVHSAEOTA3MDUGDCsGAQQBsjEBAgEBATAlMCMGCCsGAQUFBwIBFhdodHRwczovL3NlY3RpZ28u
-Y29tL0NQUzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3JsLnNlY3RpZ28uY29tL1NlY3RpZ29S
-U0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3JsMIGKBggrBgEFBQcBAQR+
-MHwwVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1
-dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwIwYIKwYBBQUHMAGGF2h0dHA6Ly9vY3Nw
-LnNlY3RpZ28uY29tMBwGA1UdEQQVMBOBEWR3bXdAYW1hem9uLmNvLnVrMA0GCSqGSIb3DQEBCwUA
-A4IBAQCSez7gtf1wlWJr568crX21nm6QFWRdJ/YxMOReeqYtGs8QZf2zm2vIEFab61MrgJFJcFJL
-sRhVHwnH/hvax3ZldDpUhM0ODpA9soUjYsvKJ0boFAHPtI1BL0yrZNCBdsUGxMv0t64Acj2ovxQ+
-OxPd5ngHu0MzYIKLDvTSehxkh/qW23X7Ey/fPR0sgnAK4IV7clidmuWBbrqX+WKEyEP2kaEvLsRg
-8plzYbVVFJl37rX2waKnGaWYnJ3BrvcMMgDSQCuoxMThWAOr7wxOh0ni0K3rW7CwDIAjUSk+fFmS
-2EacUvIv/0xUW1nXzGJ12/Qyi+Mw65m0qE776qfcftg3MIIGEDCCBPigAwIBAgIRAL9CB+ltRPer
-Z8eyFT9F6p8wDQYJKoZIhvcNAQELBQAwgZYxCzAJBgNVBAYTAkdCMRswGQYDVQQIExJHcmVhdGVy
-IE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGDAWBgNVBAoTD1NlY3RpZ28gTGltaXRlZDE+
-MDwGA1UEAxM1U2VjdGlnbyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
-aWwgQ0EwHhcNMjIwMTA3MDAwMDAwWhcNMjUwMTA2MjM1OTU5WjAiMSAwHgYJKoZIhvcNAQkBFhFk
-d213QGFtYXpvbi5jby51azCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBAJmCfN3iHpJO
-/8xBxQ+LG8M39022njJVJ1zHP2YHU5wDsdd3hZ0/JhqCaRwfRaC4NhpCc6zORJ0SUj7ZdEVKUZeF
-jtT22S291a5jXMBjVRYRLx7cFQepIpsgrHhJfoa5y0Jw+fJqBVn0eTbVhQSXH1x2auq3RsajJ2DE
-CykTHnon1DlrjxZ+8ViMsEU0vV3D4/V5R4CWNyjfT5eCB/l9prAp88CtRfRyZThUiHkMxTK/h3TH
-F803pwrUYyP8cZSDZP05MdadtN2r44cnAcaL/fuYJbHU7e5XSFtnMDV82SVqqWyvUByDR6U94IVc
-tvx1KQyBBkc0lWOf6YG8bh0wbgVLee2KkCnK0D5rkhow/cs0CjQSgF3n/FXLQzpNduJh6xgur2uG
-esuA7WpzDv6J/SMf1igQnpol7WbuiZ8ReHZemiylItqiGYCpoEqXKFcNdtOdRWch/v3NTmiEdmh/
-Rw/Zqaee9hRUPvaK5/2p7tfgvVGPnz2oRZhE4qIyKXlfuX+yYTV0CbGErHHpha9aRcf27sk5yYsZ
-0pJPS+hpjuPdaTSXErc0qySrQbcGmps/Pc/wFi2ffwG9uQWfBVbsXtDO6zcpkmA/rZ43blAfGgWP
-jjHeymnHgjlaVgbiXF0VmxiyZB2PrhzsxontynxEk3547fZEquSd0SSKHPF6+XXXAgMBAAGjggHK
-MIIBxjAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUnjXwekiBlo+f
-ClZ0I1K+bheAf+UwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYB
-BQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEW
-F2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2Vj
-dGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5j
-cmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9T
-ZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEF
-BQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHAYDVR0RBBUwE4ERZHdtd0BhbWF6b24uY28u
-dWswDQYJKoZIhvcNAQELBQADggEBAJJ7PuC1/XCVYmvnrxytfbWebpAVZF0n9jEw5F56pi0azxBl
-/bOba8gQVpvrUyuAkUlwUkuxGFUfCcf+G9rHdmV0OlSEzQ4OkD2yhSNiy8onRugUAc+0jUEvTKtk
-0IF2xQbEy/S3rgByPai/FD47E93meAe7QzNggosO9NJ6HGSH+pbbdfsTL989HSyCcArghXtyWJ2a
-5YFuupf5YoTIQ/aRoS8uxGDymXNhtVUUmXfutfbBoqcZpZicncGu9wwyANJAK6jExOFYA6vvDE6H
-SeLQretbsLAMgCNRKT58WZLYRpxS8i//TFRbWdfMYnXb9DKL4zDrmbSoTvvqp9x+2DcxggTHMIIE
-wwIBATCBrDCBljELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4G
-A1UEBxMHU2FsZm9yZDEYMBYGA1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdv
-IFJTQSBDbGllbnQgQXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAL9CB+ltRPer
-Z8eyFT9F6p8wDQYJYIZIAWUDBAIBBQCgggHrMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJ
-KoZIhvcNAQkFMQ8XDTI0MDExNzE2MzIzNFowLwYJKoZIhvcNAQkEMSIEIOP4rayvmS6Xq3XSizTa
-Ks/+yY5id6ryLampuPvvBvdjMIG9BgkrBgEEAYI3EAQxga8wgawwgZYxCzAJBgNVBAYTAkdCMRsw
-GQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGDAWBgNVBAoTD1Nl
-Y3RpZ28gTGltaXRlZDE+MDwGA1UEAxM1U2VjdGlnbyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9u
-IGFuZCBTZWN1cmUgRW1haWwgQ0ECEQC/QgfpbUT3q2fHshU/ReqfMIG/BgsqhkiG9w0BCRACCzGB
-r6CBrDCBljELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UE
-BxMHU2FsZm9yZDEYMBYGA1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJT
-QSBDbGllbnQgQXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAL9CB+ltRPerZ8ey
-FT9F6p8wDQYJKoZIhvcNAQEBBQAEggIAc714GA9+GaxxUkO7+SqGG4vds2dObYeoO7hEjAC9nOPd
-MM+hueFWElhUQ9zUMuCNqCbbxx8BE3RoLzBtdNRSyEGp8axxYr3KJYzIkHK90ln9/o2x7BiMMO8/
-VEU0zOqETO7wMQW2ccy6ZJXmI/t24Z2KPx9OL6VA6INJrcbFKGFkfvlOUgzFklhQ10/RhVhNuIuW
-UTWLcxvwBtSRoEInnkPl4CA79EdhMrbf/ZuZvtQBaT/C8CAZxGK4+Ne7cizkGQDUMuH+lFdp4peA
-A6/m0/OcupxABUlGWshxF8MG0It9xPKBvxNVEoEUm514eVRjal2MJfQLWRRO0LvcvY23RU6fvK3a
-C0W6Om3zrZLBExZ4ORX85jHsXL8tH8btcIxB/60KDPR68zfvEKEjZ1E+rl4II8oCSH6rlymAY+hm
-nkLs3srTxGtMKJC4oA29l6Gv4K1p5CiOotcMS5xqJLhSqfN05ID52lA9agmcedhx2VIBeaF4IVGD
-6nxbi9mzwxhNMUpDHN7Ive4XjIZyEELxXVQc3798vVteZ+/vxNgW6wQlCR5uZE35du7LMs1FUvC6
-JVVBW40ovjwa7UXdlHJ2gGExjG6fQNVbLmQw3mej/tPseX7uQupBwumboedu3pv9dyvEpdRlcgFU
-J8bC0GQ2zn/lBOZDmqGEO43p8OR5NSEAAAAAAAA=
-
-
---=-kMgXPlGUuGOSoLwtVVe0--
-
---===============8175054459963755501==
-Content-Type: multipart/alternative; boundary="===============0833964598395082214=="
-MIME-Version: 1.0
-Content-Disposition: inline
-
---===============0833964598395082214==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-
-
-
-
-Amazon Development Centre (London) Ltd. Registered in England and Wales wit=
-h registration number 04543232 with its registered office at 1 Principal Pl=
-ace, Worship Street, London EC2A 2FA, United Kingdom.
-
-
-
---===============0833964598395082214==
-Content-Type: text/html; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-
-<br><br><br>Amazon Development Centre (London) Ltd.Registered in England an=
-d Wales with registration number 04543232 with its registered office at 1 P=
-rincipal Place, Worship Street, London EC2A 2FA, United Kingdom.<br><br><br>
-
---===============0833964598395082214==--
---===============8175054459963755501==--
 
