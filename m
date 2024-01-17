@@ -1,159 +1,147 @@
-Return-Path: <kvm+bounces-6377-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6379-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6662283003A
-	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 07:44:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DB38830137
+	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 09:23:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF35D2876E5
-	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 06:44:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C68831F25603
+	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 08:23:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 602009463;
-	Wed, 17 Jan 2024 06:44:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD081111BD;
+	Wed, 17 Jan 2024 08:23:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SJAD+R8z"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UsKxdxpb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 262168F47
-	for <kvm@vger.kernel.org>; Wed, 17 Jan 2024 06:44:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.134.136.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA2CAD26B;
+	Wed, 17 Jan 2024 08:23:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705473887; cv=none; b=kD7OY48eYzMlkfcaszng69bI9KYOmtlejVkhtyypB55bpzP/KJoGa4u0qoswtTGVjCGiOlMIb1XZnCncUXHJybDxp+xM5C3pGccK5Hlz01Z8GFB1HnXUARLXPEam2H+dKuVcOTPnz/UPNqvdk5QAiwmtxbnWQ4H6txThvNT6fts=
+	t=1705479796; cv=none; b=QoRQgexRLJkoh04OwToJZ3MuGAmecqPNKkFKixDj6RM7GZ1Eb/Aa9Cfgr+3wkks4eeFvu2kQh5pA74rL0UArezxyS5k3UPnAXtcqNjocIdvRVD7Izloj9AdZcBeU7gZeo5oUHWdnY46Gpln5vWjMjTlMpAf/fTJNovoAwR3Xu/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705473887; c=relaxed/simple;
-	bh=LJGVG1IZRygTtRQiQlJ4BibpMvhe1rKZ3KxDm6yteMg=;
+	s=arc-20240116; t=1705479796; c=relaxed/simple;
+	bh=dTAKx/WvnyQYbWUeQpGK8e4j06ZQKp/QZZb2qlq8/9Q=;
 	h=DKIM-Signature:X-IronPort-AV:X-IronPort-AV:Received:X-ExtLoop1:
-	 X-IronPort-AV:X-IronPort-AV:Received:From:To:Cc:Subject:Date:
-	 Message-Id:X-Mailer:MIME-Version:Content-Transfer-Encoding; b=hXuzrPaLdN7BymrD9LLensoAc35XcoLwou0VoXZBFdjaGxUo+ltEy8bUgMCC/qGhKYhwEBAlVYIORaHoRZixJPLjrDXOs3R1iDPoUc4bb00GfvCZhLeqTyMre4oY0pjIouOaAlLFkhOdW81n6f4JfoYVtf9bJxMbRljHJjgC3l0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SJAD+R8z; arc=none smtp.client-ip=134.134.136.20
+	 X-IronPort-AV:X-IronPort-AV:Received:Message-ID:Date:MIME-Version:
+	 User-Agent:Cc:Subject:Content-Language:To:References:From:
+	 In-Reply-To:Content-Type:Content-Transfer-Encoding; b=iRj22gSkgoKv8KzNgAcduBzItdb9MSATUwflRo53fL/igpUz78Wdg9ExZ9eHmV+9//u9PW6UWbtQXfievrPH7qvdBtk9KKIwvf5gR2o74DgKj1fVgfyTtEWoueB88u42t23GFOqrlAQpax2y6CY4j3AHjZzUMZRYW/a4j2necDM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UsKxdxpb; arc=none smtp.client-ip=192.198.163.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1705473886; x=1737009886;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=LJGVG1IZRygTtRQiQlJ4BibpMvhe1rKZ3KxDm6yteMg=;
-  b=SJAD+R8z2CiqCbiuBRBTfn8tHNAt9tDox0Ykz3Y36N0BjvJHoVE10hSS
-   cXe2weECaaVxvk5RVii4WV4ChrWlxHHHEVOmT/2egdi02XQlYe7P8APvO
-   FepJnG2NV/llyF9BeXEfaBT39g2Aqu03Ik+SXPNB165GvKvbOdzqk7jj1
-   rUKsf3ZcTa6PE7lR5nPdqafNJeOkRFIEHE0MkWcrpEAqdWSLPsyKLFp5p
-   f9EIiL9kRGnZ+bhEtNPbzZw+h7yZTLMIbPEYuCUSpk3rjFx4hqIMxt/kt
-   epTEUExt2LhoosUQ4tIsprQparVpvTu8UoAhfuw2xT58gamb8sCY74JWx
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10955"; a="390539358"
+  t=1705479795; x=1737015795;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=dTAKx/WvnyQYbWUeQpGK8e4j06ZQKp/QZZb2qlq8/9Q=;
+  b=UsKxdxpbfwEuSqYha0f0hCigfSsTTZu1EUZolvW8KRDrDnm1MJ5tQJp8
+   9xvVpKmel2vPZXvGEBNsZVvQd2vENJf6F0OScV6CN5Lyw0A80V9UZYdyN
+   1frNDWOc8pluQbieJF+OImizrWFu7ZMXWGZrRNrJ2/I+YfoPclXf/dOLZ
+   1aryYQyaw+7Tki4hXc6TQdpABIz+3AAPdofY0GB7Q0Prs6Xt3sjqhmRvY
+   z9MMQqt0M9MmAIBcadSGfzGZKsNmiHBL9cZkZ8F2e9a/rVfVdImK6ZzmT
+   s3oL8DEK1iMzLGCCaHXQ5fDI07g7nTKs0qTTsuv3HZ80oA3XHDuO9wlZN
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10955"; a="6863985"
 X-IronPort-AV: E=Sophos;i="6.05,200,1701158400"; 
-   d="scan'208";a="390539358"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2024 22:44:45 -0800
+   d="scan'208";a="6863985"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jan 2024 00:21:02 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10955"; a="1031246168"
+X-IronPort-AV: E=McAfee;i="6600,9927,10955"; a="777373768"
 X-IronPort-AV: E=Sophos;i="6.05,200,1701158400"; 
-   d="scan'208";a="1031246168"
-Received: from st-server.bj.intel.com ([10.240.193.102])
-  by fmsmga006.fm.intel.com with ESMTP; 16 Jan 2024 22:44:43 -0800
-From: Tao Su <tao1.su@linux.intel.com>
-To: kvm@vger.kernel.org
-Cc: seanjc@google.com,
-	pbonzini@redhat.com,
-	shuah@kernel.org,
-	yi1.lai@intel.com,
-	tao1.su@linux.intel.com
-Subject: [PATCH] KVM: selftests: Add a requirement for disabling numa balancing
-Date: Wed, 17 Jan 2024 14:44:41 +0800
-Message-Id: <20240117064441.2633784-1-tao1.su@linux.intel.com>
-X-Mailer: git-send-email 2.34.1
+   d="scan'208";a="777373768"
+Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.249.171.146]) ([10.249.171.146])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jan 2024 00:20:52 -0800
+Message-ID: <880545b0-82ae-4d3c-b9e5-e623a4c79c5d@linux.intel.com>
+Date: Wed, 17 Jan 2024 16:20:50 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Cc: baolu.lu@linux.intel.com, joro@8bytes.org, alex.williamson@redhat.com,
+ kevin.tian@intel.com, robin.murphy@arm.com, cohuck@redhat.com,
+ eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
+ mjrosato@linux.ibm.com, chao.p.peng@linux.intel.com,
+ yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com,
+ shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+ suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ zhenzhong.duan@intel.com, joao.m.martins@oracle.com, xin.zeng@intel.com,
+ yan.y.zhao@intel.com
+Subject: Re: [PATCH 8/8] iommu/vt-d: Add set_dev_pasid callback for nested
+ domain
+Content-Language: en-US
+To: Jason Gunthorpe <jgg@nvidia.com>, Yi Liu <yi.l.liu@intel.com>
+References: <20231127063428.127436-1-yi.l.liu@intel.com>
+ <20231127063428.127436-9-yi.l.liu@intel.com>
+ <20240115172213.GM734935@nvidia.com>
+From: Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <20240115172213.GM734935@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-In dirty_log_page_splitting_test, vm_get_stat(vm, "pages_4k") has
-probability of gradually reducing to 0 after vm exit. The reason is that
-the host triggers numa balancing and unmaps the related spte. So, the
-number of pages currently mapped in EPT (kvm->stat.pages) is not equal
-to the pages touched by the guest, which causes stats_populated.pages_4k
-and stats_repopulated.pages_4k in this test are not same, resulting in
-failure.
+On 2024/1/16 1:22, Jason Gunthorpe wrote:
+> On Sun, Nov 26, 2023 at 10:34:28PM -0800, Yi Liu wrote:
+> 
+>> +static int intel_nested_set_dev_pasid(struct iommu_domain *domain,
+>> +				      struct device *dev, ioasid_t pasid)
+>> +{
+>> +	struct device_domain_info *info = dev_iommu_priv_get(dev);
+>> +	struct dmar_domain *dmar_domain = to_dmar_domain(domain);
+>> +	struct intel_iommu *iommu = info->iommu;
+>> +	struct dev_pasid_info *dev_pasid;
+>> +	unsigned long flags;
+>> +	int ret = 0;
+>> +
+>> +	if (!pasid_supported(iommu))
+>> +		return -EOPNOTSUPP;
+>> +
+>> +	if (iommu->agaw < dmar_domain->s2_domain->agaw)
+>> +		return -EINVAL;
+>> +
+>> +	ret = prepare_domain_attach_device(&dmar_domain->s2_domain->domain, dev);
+>> +	if (ret)
+>> +		return ret;
+>> +
+>> +	dev_pasid = kzalloc(sizeof(*dev_pasid), GFP_KERNEL);
+>> +	if (!dev_pasid)
+>> +		return -ENOMEM;
+>> +
+>> +	ret = domain_attach_iommu(dmar_domain, iommu);
+>> +	if (ret)
+>> +		goto err_free;
+>> +
+>> +	ret = intel_pasid_setup_nested(iommu, dev, pasid, dmar_domain);
+>> +	if (ret)
+>> +		goto err_detach_iommu;
+>> +
+>> +	dev_pasid->dev = dev;
+>> +	dev_pasid->pasid = pasid;
+>> +	spin_lock_irqsave(&dmar_domain->lock, flags);
+>> +	list_add(&dev_pasid->link_domain, &dmar_domain->dev_pasids);
+>> +	spin_unlock_irqrestore(&dmar_domain->lock, flags);
+>> +
+>> +	return 0;
+>> +err_detach_iommu:
+>> +	domain_detach_iommu(dmar_domain, iommu);
+>> +err_free:
+>> +	kfree(dev_pasid);
+>> +	return ret;
+>> +}
+> This seems alot longer than I'd think it should be, why isn't it
+> exactly the same code as the other set_dev_pasid's?
 
-The calltrace of unmapping spte triggered by numa balancing:
-	handle_changed_spte+0x64b/0x830 [kvm]
-	tdp_mmu_zap_leafs+0x159/0x290 [kvm]
-	kvm_tdp_mmu_unmap_gfn_range+0x7b/0xa0 [kvm]
-	kvm_unmap_gfn_range+0x10f/0x130 [kvm]
-	? _raw_spin_unlock+0x1d/0x40
-	? hugetlb_follow_page_mask+0x1ba/0x400
-	? preempt_count_add+0x86/0xd0
-	kvm_mmu_notifier_invalidate_range_start+0x14d/0x380 [kvm]
-	__mmu_notifier_invalidate_range_start+0x89/0x1f0
-	change_protection+0xce1/0x1490
-	? __pfx_tlb_is_not_lazy+0x10/0x10
-	change_prot_numa+0x5d/0xb0
-	? kmalloc_trace+0x2e/0xa0
-	task_numa_work+0x364/0x550
-	task_work_run+0x62/0xa0
-	xfer_to_guest_mode_handle_work+0xc3/0xd0
-	kvm_arch_vcpu_ioctl_run+0xe8e/0x1b90 [kvm]
-	kvm_vcpu_ioctl+0x282/0x710 [kvm]
+Yes. It should be. The only difference is how to configure the pasid
+entry.
 
-dirty_log_page_splitting_test assumes that kvm->stat.pages and the pages
-touched by the guest are the same, but the assumption is no longer true
-if numa balancing is enabled. Add a requirement for disabling
-numa_balancing to avoid confusing due to test failure.
-
-Actually, all page migration (including numa balancing) will trigger this
-issue, e.g. running script:
-	./x86_64/dirty_log_page_splitting_test &
-	PID=$!
-	sleep 1
-	migratepages $PID 0 1
-It is unusual to create above test environment intentionally, but numa
-balancing initiated by the kernel will most likely be triggered, at
-least in dirty_log_page_splitting_test.
-
-Reported-by: Yi Lai <yi1.lai@intel.com>
-Signed-off-by: Tao Su <tao1.su@linux.intel.com>
-Tested-by: Yi Lai <yi1.lai@intel.com>
----
- .../kvm/x86_64/dirty_log_page_splitting_test.c        | 11 +++++++++++
- 1 file changed, 11 insertions(+)
-
-diff --git a/tools/testing/selftests/kvm/x86_64/dirty_log_page_splitting_test.c b/tools/testing/selftests/kvm/x86_64/dirty_log_page_splitting_test.c
-index 634c6bfcd572..f2c796111d83 100644
---- a/tools/testing/selftests/kvm/x86_64/dirty_log_page_splitting_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/dirty_log_page_splitting_test.c
-@@ -212,10 +212,21 @@ static void help(char *name)
- 
- int main(int argc, char *argv[])
- {
-+	FILE *f;
- 	int opt;
-+	int ret, numa_balancing;
- 
- 	TEST_REQUIRE(get_kvm_param_bool("eager_page_split"));
- 	TEST_REQUIRE(get_kvm_param_bool("tdp_mmu"));
-+	f = fopen("/proc/sys/kernel/numa_balancing", "r");
-+	if (f) {
-+		ret = fscanf(f, "%d", &numa_balancing);
-+		TEST_ASSERT(ret == 1, "Error reading numa_balancing");
-+		TEST_ASSERT(!numa_balancing, "please run "
-+			    "'echo 0 > /proc/sys/kernel/numa_balancing'");
-+		fclose(f);
-+		f = NULL;
-+	}
- 
- 	while ((opt = getopt(argc, argv, "b:hs:")) != -1) {
- 		switch (opt) {
-
-base-commit: 052d534373b7ed33712a63d5e17b2b6cdbce84fd
--- 
-2.34.1
-
+Best regards,
+baolu
 
