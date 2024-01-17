@@ -1,143 +1,143 @@
-Return-Path: <kvm+bounces-6363-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6364-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2281782FCA2
-	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 23:25:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8519882FE15
+	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 01:47:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AFDFB1F2C5DB
-	for <lists+kvm@lfdr.de>; Tue, 16 Jan 2024 22:25:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D27328A57F
+	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 00:47:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6185120308;
-	Tue, 16 Jan 2024 21:25:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C00179EE;
+	Wed, 17 Jan 2024 00:47:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dQdkxY48"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gpq6a7hR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE04A200D2
-	for <kvm@vger.kernel.org>; Tue, 16 Jan 2024 21:25:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 667407493;
+	Wed, 17 Jan 2024 00:47:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705440305; cv=none; b=RbB7/JZZ4GUtrUvPXDF3QrfnP/1RCDLkWbSogFfPWt1lQ8jza2KNzgDblcav8nE+4L4ZFNrquSn6BwlxIgn5VKNz8GPSLvATKybYqyBOVq5QSNDLOQU5T8tSRehM8Dn3TOUBDS7MSCE3oxYrPXG9TkEu9nv8q7DOmqMOde5JdF8=
+	t=1705452422; cv=none; b=Eb2NPvxdxDxp6KG6GjVjpqav3hTYzox1VkR5GU1KWblK9ofZ2bggb25EKO3scFNqEUYpgiIYl/hRg/Pra2IGchb/mkDZyFwF4jh8NkFJedPhHbFBtyAMSPV3Vqjt4viVjAxA+kU15SOAsPKRCePONBhU2LZJbr1ruPTJH593RqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705440305; c=relaxed/simple;
-	bh=AVb5hw8D6pm03KLXXwnYRHlS+TwexVs8u4nvXbsceEQ=;
+	s=arc-20240116; t=1705452422; c=relaxed/simple;
+	bh=X9InlawFstBGxNScZTHkILj/mXtio6Yl4UfO0dHueu4=;
 	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:
-	 Message-ID:Date:MIME-Version:User-Agent:Subject:Content-Language:
-	 To:Cc:References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding; b=AVrKbpJN3hqhx36lod4ROaG8Fp7irgPzlm0z/2EuSlz9zfpvnAy9AFQOsdxSjSELDoM8Ccv/0a+3WDfrNDFJblgQOE7WgzVIQGro8pn1rHEX+7ftIwfG9zwwFbF450bt66IDRXFbvs7dcdIQpvDP0VhWQqptYZeQkoZY9kU/gJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=dQdkxY48; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-555e07761acso12472318a12.0
-        for <kvm@vger.kernel.org>; Tue, 16 Jan 2024 13:25:03 -0800 (PST)
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:MIME-Version:
+	 References:In-Reply-To:From:Date:Message-ID:Subject:To:Cc:
+	 Content-Type:Content-Transfer-Encoding; b=fh/QTbW4NHehQaDB5eXbW8DzYLbFiHpiBwc/zAi2F4sVY1bo6pT4QTm3dH8pLawAdzFxXKzR/cGxpMcEz0N/aNjPaZMGRLuNNDokntr7QEzauog/Aj12dt8AZuYZiDbhIufkv2c79S0w4ExfNVb+XI00hmUE39MwC/CXlsIHdLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gpq6a7hR; arc=none smtp.client-ip=209.85.219.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-db3fa47c2f7so8768080276.0;
+        Tue, 16 Jan 2024 16:47:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1705440302; x=1706045102; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZN3rSoSrU0V0ck0j3mERKVXOmSU7KwpwWf+gkqOG714=;
-        b=dQdkxY48UVbNfMlf176N2PX1klfQwLjf4J9sP9dipBrb0SiETgUd49z7kQ0x3vlPzL
-         iAnKB4hJv1fl5vzgOylAnJS18AHnjAibNo7iCWSGU5R7NYfHDUf2cvqdQ7zh1FAL9sPn
-         WTj7uSJQjJbhB9s5UbKOnPO84fyAe/d+sMrnKfI81KAnGw9Ru1F15J9j1MGPk+ia8Y8K
-         H7sSqRXaTeH7yQ84wqWo2NtIJCj8SsRuOuzl+n3qI+NBx1I5DejhNLQJmgQ+bKrWdsXA
-         sP9U4UvwBH+ZBw/u+TWb0qtfz1m0JZvN5xkK7dLnlRxSJI+lzOEMzFQhyUksBel5EgYC
-         KQDA==
+        d=gmail.com; s=20230601; t=1705452420; x=1706057220; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=X9InlawFstBGxNScZTHkILj/mXtio6Yl4UfO0dHueu4=;
+        b=gpq6a7hR9WGiBRE/p+rqQqYbiOSOQ0J5th/r5IPsIyA5FRWcFyS7vgrCNWcgtKol1/
+         V5BDHUcfS6PQKIN/1GjXKtIW5TYfvDO0h9ndpmuotsKN6+v7HnZU/tIXRo4dFuPlW7ki
+         bU5HelT1yLRpSb1hcXIGyzPlYBqwZyesFuAZB+W3spylyKYVx6v/kTzFfB1dXV6j6V59
+         zhhteSVzEZt2tTuRP6UZDkDFzRFw+bLVodd7yr+wlQGcC5eXVpysOE9OtckH2a5fPs7u
+         4HvziCbwb4PbvEUOYCNvxjWrPJPW38zJv2RNA62AjFqHNOacovacS/hFqFR4b2eQYe8y
+         AOIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705440302; x=1706045102;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZN3rSoSrU0V0ck0j3mERKVXOmSU7KwpwWf+gkqOG714=;
-        b=Ia1euYZoKDyRhSzspP3PbnIha2D1ItHWUBqeAk5hOhirnEGQOsR95qkXWx7Tj6MmxY
-         E+HCxoApNTNG/PBjVmiL4QkoWW15fSJI4i+NxoEQNX3mqMaKlpQbCc6qo5dSmjBjTje0
-         pL6UJVaROAnCrQLgGziYrUbRtZf12VSMWDphltwTIqBaj6ByQFUB19zBke+C+oMy+54d
-         rHQJIcGa750v61vwvepvPfss60hN8FhhpPyh/MN6hDEVVPMZMtem6TA0lf4aI69K2P8D
-         hW7YQH3w4j6smqqeD3PrSRa2S+uCL8IZA5yLJrUqFQSIGaO1sLJ5IsV/5GD/rOp1akCs
-         m0fQ==
-X-Gm-Message-State: AOJu0YyZDUZKm8om59iTOt1aruNl5uo3HFDod7OKz2dQRMhuo1StZHGv
-	Ml6PQPBjeihF3gYWsgsAagDnUoC5BLxrjg==
-X-Google-Smtp-Source: AGHT+IEDlw9MPQzSdcVoslf9gA/QzgnvDUvpiGEyz2CDoV5J1bcF6E9Z/d+JqTkiMfdkBYk6eiF8aA==
-X-Received: by 2002:aa7:c59a:0:b0:558:cd71:eed9 with SMTP id g26-20020aa7c59a000000b00558cd71eed9mr2680586edq.90.1705440301985;
-        Tue, 16 Jan 2024 13:25:01 -0800 (PST)
-Received: from [192.168.69.100] ([176.176.156.199])
-        by smtp.gmail.com with ESMTPSA id ck4-20020a0564021c0400b00559cad6fc46sm282746edb.49.2024.01.16.13.25.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 16 Jan 2024 13:25:01 -0800 (PST)
-Message-ID: <b15f4eab-f4aa-4007-81b0-4a710af80a98@linaro.org>
-Date: Tue, 16 Jan 2024 22:24:59 +0100
+        d=1e100.net; s=20230601; t=1705452420; x=1706057220;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=X9InlawFstBGxNScZTHkILj/mXtio6Yl4UfO0dHueu4=;
+        b=lO9kqxHznQnCsMRrx3Z1gBWZ9d2NkX1PPZo3rKUMVE3HW6EagnsAa8V2q63t8VGd2p
+         8IjH5G4Uw0J2h8tumYA2NBAfYyY/shKOytH429TolfMwt6asQhVJ82RstdxbRbVOfzm8
+         qbUU6/x+o3KjuaA5+7F1chHKsxIjpDg5YAbzmtXgFKySKvyrboVylEHuL2Rol2qUm3JZ
+         3gqx4UwvI/I2v3pgiYP0yuFlpmm3smo3mCtqkCmnuxJPBslSXy6D2p10/Oty50rflBQz
+         74xUFl6I3JpTunlPAx6UlzNqQ4O9lfcgq29JSdWfpkE4bFJIbcjqRWnwQbeOw6tU7sqL
+         8uPw==
+X-Gm-Message-State: AOJu0YwvFxBr9dn6MC7q2SKqJGtA/gCLMsbYJIxVAb0ENGRCcQQIeXZh
+	Q8KLExe5TsEvO30kY+0hRoidRDtX+vbYVXLhPnM=
+X-Google-Smtp-Source: AGHT+IHasD2VICwcJnewF3FZn++RvMvk9+/28DJTYBgl/i5H2vkxSLI7WTuDY778nK6zGKQ2is+V4DrZRbgFczBi0f8=
+X-Received: by 2002:a25:4686:0:b0:dbc:bff8:5228 with SMTP id
+ t128-20020a254686000000b00dbcbff85228mr4438870yba.31.1705452420251; Tue, 16
+ Jan 2024 16:47:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] accel: Do not set CPUState::can_do_io in non-TCG accels
-Content-Language: en-US
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-Cc: Cameron Esfahani <dirty@apple.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Roman Bolshakov <rbolshakov@ddn.com>, kvm@vger.kernel.org
-References: <20231129205037.16849-1-philmd@linaro.org>
- <768e7409-62a7-441c-960d-dc99ab89c7d0@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-In-Reply-To: <768e7409-62a7-441c-960d-dc99ab89c7d0@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20240112091128.3868059-1-foxywang@tencent.com>
+ <ZaFor2Lvdm4O2NWa@google.com> <CAN35MuSkQf0XmBZ5ZXGhcpUCGD-kKoyTv9G7ya4QVD1xiqOxLg@mail.gmail.com>
+ <72edaedc-50d7-415e-9c45-f17ffe0c1c23@linux.ibm.com>
+In-Reply-To: <72edaedc-50d7-415e-9c45-f17ffe0c1c23@linux.ibm.com>
+From: Yi Wang <up2wing@gmail.com>
+Date: Wed, 17 Jan 2024 08:46:49 +0800
+Message-ID: <CAN35MuTOWYvboZtk_dQXEQ_+vDEO+ao9pzxLSkJj3x8RboAsSw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: irqchip: synchronize srcu only if needed
+To: Christian Borntraeger <borntraeger@linux.ibm.com>
+Cc: Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com, tglx@linutronix.de, 
+	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
+	hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	wanpengli@tencent.com, Yi Wang <foxywang@tencent.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 30/11/23 14:51, Richard Henderson wrote:
-> On 11/29/23 14:50, Philippe Mathieu-Daudé wrote:
->> 'can_do_io' is specific to TCG. Having it set in non-TCG
->> code is confusing, so remove it from QTest / HVF / KVM.
->>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
->> ---
->>   accel/dummy-cpus.c        | 1 -
->>   accel/hvf/hvf-accel-ops.c | 1 -
->>   accel/kvm/kvm-accel-ops.c | 1 -
->>   3 files changed, 3 deletions(-)
->>
->> diff --git a/accel/dummy-cpus.c b/accel/dummy-cpus.c
->> index b75c919ac3..1005ec6f56 100644
->> --- a/accel/dummy-cpus.c
->> +++ b/accel/dummy-cpus.c
->> @@ -27,7 +27,6 @@ static void *dummy_cpu_thread_fn(void *arg)
->>       qemu_mutex_lock_iothread();
->>       qemu_thread_get_self(cpu->thread);
->>       cpu->thread_id = qemu_get_thread_id();
->> -    cpu->neg.can_do_io = true;
->>       current_cpu = cpu;
-> 
-> I expect this is ok...
-> 
-> When I was moving this variable around just recently, 464dacf6, I 
-> wondered about these other settings, and I wondered if they used to be 
-> required for implementing some i/o on behalf of hw accel.  Something 
-> that has now been factored out to e.g. kvm_handle_io, which now uses 
-> address_space_rw directly.
+On Wed, Jan 17, 2024 at 12:50=E2=80=AFAM Christian Borntraeger
+<borntraeger@linux.ibm.com> wrote:
+>
+>
+>
+> Am 15.01.24 um 17:01 schrieb Yi Wang:
+> > Many thanks for your such kind and detailed reply, Sean!
+> >
 
-It was added by mistake in commit 99df7dce8a ("cpu: Move can_do_io
-field from CPU_COMMON to CPUState", 2013) to cpu_common_reset() and
-commit 626cf8f4c6 ("icount: set can_do_io outside TB execution", 2014),
-then moved in commits 57038a92bb ("cpus: extract out kvm-specific code
-to accel/kvm"), b86f59c715 ("accel: replace struct CpusAccel with
-AccelOpsClass") and the one you mentioned, 464dacf609 ("accel/tcg: Move
-can_do_io to CPUNegativeOffsetState").
+....
 
-The culprit is 626cf8f4c6 I guess, so maybe:
-Fixes: 626cf8f4c6 ("icount: set can_do_io outside TB execution")
+> >>
+> >> So instead of special casing x86, what if we instead have KVM setup an=
+ empty
+> >> IRQ routing table during kvm_create_vm(), and then avoid this mess ent=
+irely?
+> >> That way x86 and s390 no longer need to set empty/dummy routing when c=
+reating
+> >> an IRQCHIP, and the worst case scenario of userspace misusing an ioctl=
+() is no
+> >> longer a NULL pointer deref.
+>
+> Sounds like a good idea. This should also speedup guest creation on s390 =
+since
+> it would avoid one syncronize_irq.
+> >
+> > To setup an empty IRQ routing table during kvm_create_vm() sounds a goo=
+d idea,
+> > at this time vCPU have not been created and kvm->lock is held so skippi=
+ng
+> > synchronization is safe here.
+> >
+> > However, there is one drawback, if vmm wants to emulate irqchip
+> > itself, e.g. qemu
+> > with command line '-machine kernel-irqchip=3Doff' may not need irqchip
+> > in kernel. How
+> > do we handle this issue?
+>
+> I would be fine with wasted memory. The only question is does it have a f=
+unctional
+> impact or can we simply ignore the dummy routing.
+>
 
-> I see 3 reads of can_do_io: accel/tcg/{cputlb.c, icount-common.c} and 
-> system/watchpoint.c.  The final one is nested within 
-> replay_running_debug(), which implies icount and tcg.
-> 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Thanks for your reply, I will update the patch.
 
-Thanks!
+
+--=20
+---
+Best wishes
+Yi Wang
 
