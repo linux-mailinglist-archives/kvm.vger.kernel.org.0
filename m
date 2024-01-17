@@ -1,122 +1,140 @@
-Return-Path: <kvm+bounces-6386-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6387-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23C778303C9
-	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 11:41:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C9E98304A4
+	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 12:39:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 32D9D1C24967
-	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 10:41:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6F10288F90
+	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 11:39:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95F291DA4C;
-	Wed, 17 Jan 2024 10:41:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCED11DFCC;
+	Wed, 17 Jan 2024 11:39:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="W8njSpKI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O99Y2TUi"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68E021D550;
-	Wed, 17 Jan 2024 10:41:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41BBD1DFC3
+	for <kvm@vger.kernel.org>; Wed, 17 Jan 2024 11:39:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705488088; cv=none; b=btklVCe+vzHOKQ4cNpEoikk6h0cFd1K808wYu7czRIA8CRNTpqt1BWIeKN/u9WN6uA3FoJPXONoj5B3uPf7wTYFEGOE5UuF96azodaOtF0jnovkXqTYrPgMoQuxG6srOQbzKzpDQ8diMOT/DKrDw3Nkf7k+ti3A2rWYDrUu1Jss=
+	t=1705491573; cv=none; b=OFsxV8afkjFis5b5Ww1Ji6p80c0F0BgsiwTYSoMPVpWrodJXJj+90EN2EVFhm5WW6ClPfFcIgY43RVkIsk7negeCXqZ1ZjtHJ6YbeupPhdKhvAQfELxOjfXCU64HhaTybLtdR0Vo3poIGRI3N1Qf29yhNUnabWSsd0zVzVQ+ZnQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705488088; c=relaxed/simple;
-	bh=E3rwFhaOl2j+zeAfDeJ2luuN6OVjKJV3WlO+QINndKM=;
-	h=Received:DKIM-Signature:Received:Received:Received:Received:
-	 Received:Received:Received:Received:Received:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To:X-TM-AS-GCONF:
-	 X-Proofpoint-ORIG-GUID:X-Proofpoint-GUID:
-	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details; b=PleJi30lWxtijR04BntWI50NeYLiTebvWtC3yxisKm1Tc02odk03zNix/1SiustUiZm/eWRwMJLEZStb9ywA3Cif1qUylYk+0DRWoEfF30Y7kRt3OtSjvv9XWZb+2rj7QeRyID9ZyGQdrZLkscwj9pAqndpTT+zBrqR12QS9TJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=W8njSpKI; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40HA7DHs015455;
-	Wed, 17 Jan 2024 10:41:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=YHdck/Ra38gjgZwkdUhVLlxKWwPrh4c3UuG1hGT5OpQ=;
- b=W8njSpKIL/nBQLJyZtQ1x8Iy982B3uxg+9t8ay4kxBeQZj4wUnrmHcgSkevlS6NcCMyy
- mp5BuWGZ131/NSCbcxFALgv788yKAT6dPcvgpFsqMstLxoulqeOlCqYUIXaVA87D5y9U
- n+wGl/H7oHF34TaF9VvJ2+YHsYAQiSAh3/aFNbZzSlcce+T9FhAnVA6gZWxFfSYnQetS
- myK3WWROwmuiE/gvgJ2ttF3zVX8qGG67DL8NJCeznz+3HghfonbSjZclX3fw37lYRPDl
- ROzwMmhgLrXO1IOxLr6co/gEPv/eIbQfKVTKFqGN1uv9VrMnhLh3VBPVpiAFitCIQrhQ 5w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vpcuy913d-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 17 Jan 2024 10:41:20 +0000
-Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 40HA86NG018155;
-	Wed, 17 Jan 2024 10:41:19 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vpcuy912p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 17 Jan 2024 10:41:19 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 40H8a3sP004908;
-	Wed, 17 Jan 2024 10:41:18 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3vm7j1v74m-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 17 Jan 2024 10:41:18 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 40HAfDIv27787934
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 17 Jan 2024 10:41:13 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8287020043;
-	Wed, 17 Jan 2024 10:41:13 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BBD612004B;
-	Wed, 17 Jan 2024 10:41:12 +0000 (GMT)
-Received: from li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com (unknown [9.171.88.12])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Wed, 17 Jan 2024 10:41:12 +0000 (GMT)
-Date: Wed, 17 Jan 2024 11:41:11 +0100
-From: Alexander Gordeev <agordeev@linux.ibm.com>
-To: Tony Krowiak <akrowiak@linux.ibm.com>
-Cc: linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, jjherne@linux.ibm.com, borntraeger@de.ibm.com,
-        pasic@linux.ibm.com, pbonzini@redhat.com, frankja@linux.ibm.com,
-        imbrenda@linux.ibm.com, alex.williamson@redhat.com,
-        kwankhede@nvidia.com, gor@linux.ibm.com
-Subject: Re: [PATCH v4 0/6] s390/vfio-ap: reset queues removed from guest's
- AP configuration
-Message-ID: <Zaeuxz6+3eqg84+H@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
-References: <20240115185441.31526-1-akrowiak@linux.ibm.com>
+	s=arc-20240116; t=1705491573; c=relaxed/simple;
+	bh=T9KRxSQfE72TxGPGf27x1G5s84+vet0cu6P/7fWj8hA=;
+	h=DKIM-Signature:Received:X-MC-Unique:Received:
+	 X-Google-DKIM-Signature:X-Gm-Message-State:X-Received:
+	 X-Google-Smtp-Source:X-Received:Received:Date:From:To:cc:Subject:
+	 In-Reply-To:Message-ID:References:MIME-Version:Content-Type; b=j0TNO3iYNZE7VndEjjcnDEE4E9RshB63OEUTA13AtI7Fe5beqqZ4CYy6BepuoVscLQ+IvTFhiwIXugZyz801RO1ARSpc0+oDcGiCViMploLBh8DRX9Y38cPdhdksMoXUD+mj7/TGC+I0MtU1d2cvgwZLj0RCEDGMVGnnc7TrleE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O99Y2TUi; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1705491569;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CH626pSqKFSD+Kp2qukzp0Y/x3O//9WPmqfkQBgYC4E=;
+	b=O99Y2TUiP+PIn5ZPGgAbsRxA08SEm9TbLspHF2zKI7Ow9NgZgLb+9HRou5wQC6Vw4P1iyW
+	sGYwzN0YVJ4uCxr7SFBYz3xM8K1m5tPKsBLuI33wuQBd16rvFaTQyEx2DT3O49f1XclOcn
+	0uLu8xyVgiGLHqTJNR4iG5DdywHjv2Y=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-259-kaI5fTgiO0mHhcTU-XUNGA-1; Wed, 17 Jan 2024 06:39:28 -0500
+X-MC-Unique: kaI5fTgiO0mHhcTU-XUNGA-1
+Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-428205848e9so161648001cf.2
+        for <kvm@vger.kernel.org>; Wed, 17 Jan 2024 03:39:27 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705491566; x=1706096366;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CH626pSqKFSD+Kp2qukzp0Y/x3O//9WPmqfkQBgYC4E=;
+        b=B9xbhkoRII1GVxVUCnZMh3Z94wQnLWgurECABgVYlssKwh+4WY6FEZ45AfVZW7hB4g
+         f5OJ86Z62Bv3DSt7Ok44zTnp0uFLGL4es90ohhDZkpcxPH66zT0061CHYpw6DvUWkrhB
+         rehupUBLbXIKIN7JBlblGlFJ8/NTNSLwe2rHHmFa+f3SJOCfOg0in8jinPZACdsmo2xP
+         c1LnsRNg1gvFlkGwRFIq99RfrR12oSJkEkIFoHnWKBZx42B2sL9AX9om70OirixMVKRS
+         LtueD78vmO5M4FkMTLsOhlYLWKcAVlAcBwqNo5ZSLG13Xcf3E49lKScUHBElRskAes4u
+         8BRw==
+X-Gm-Message-State: AOJu0YwTpQT98sGAos5iD/kSUs27nvcOldXVNJQCeO4uKFos2Q05STki
+	4iXOFyB3R1HA/Gt7F9wVF0oa+D2zVpMQJ4Hq7xYddTE0Ni99cMddLHNXa3vRn+wvapjA2cbz56A
+	6lhmo8U2Q3AzjAh0zR7qB
+X-Received: by 2002:a05:622a:1045:b0:429:7536:60a with SMTP id f5-20020a05622a104500b004297536060amr11218306qte.9.1705491566764;
+        Wed, 17 Jan 2024 03:39:26 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFjyYd7TVFZ9RUZ/mmwqBFGqktSN/tkqg9ofBVdteqCohddRy4jWXtee54vCY5ApDEycDKOJQ==
+X-Received: by 2002:a05:622a:1045:b0:429:7536:60a with SMTP id f5-20020a05622a104500b004297536060amr11218298qte.9.1705491566541;
+        Wed, 17 Jan 2024 03:39:26 -0800 (PST)
+Received: from rh (p200300c93f0273004f0fe90936098834.dip0.t-ipconnect.de. [2003:c9:3f02:7300:4f0f:e909:3609:8834])
+        by smtp.gmail.com with ESMTPSA id h7-20020ac87767000000b004260b65b4f7sm5677357qtu.97.2024.01.17.03.39.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Jan 2024 03:39:26 -0800 (PST)
+Date: Wed, 17 Jan 2024 12:39:21 +0100 (CET)
+From: Sebastian Ott <sebott@redhat.com>
+To: Shaoqin Huang <shahuang@redhat.com>
+cc: qemu-arm@nongnu.org, Eric Auger <eauger@redhat.com>, 
+    Gavin Shan <gshan@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, 
+    Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, 
+    kvm@vger.kernel.org
+Subject: Re: [PATCH v5] arm/kvm: Enable support for
+ KVM_ARM_VCPU_PMU_V3_FILTER
+In-Reply-To: <20240115080144.44944-1-shahuang@redhat.com>
+Message-ID: <71625f0a-da2d-92aa-0055-72140257b665@redhat.com>
+References: <20240115080144.44944-1-shahuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240115185441.31526-1-akrowiak@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Q-VG3TmEKG8OUGkj0jJx4uRmquyQhxs9
-X-Proofpoint-GUID: KmINsdUnpHFeaTKRaqBd64el_x2kS-X-
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-17_05,2024-01-17_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
- priorityscore=1501 clxscore=1015 bulkscore=0 phishscore=0 suspectscore=0
- mlxlogscore=728 adultscore=0 lowpriorityscore=0 impostorscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2401170075
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 
-On Mon, Jan 15, 2024 at 01:54:30PM -0500, Tony Krowiak wrote:
-...
->  drivers/s390/crypto/vfio_ap_ops.c     | 268 +++++++++++++++++---------
->  drivers/s390/crypto/vfio_ap_private.h |  11 +-
->  2 files changed, 184 insertions(+), 95 deletions(-)
+On Mon, 15 Jan 2024, Shaoqin Huang wrote:
+> The KVM_ARM_VCPU_PMU_V3_FILTER provides the ability to let the VMM decide
+> which PMU events are provided to the guest. Add a new option
+> `kvm-pmu-filter` as -cpu sub-option to set the PMU Event Filtering.
+> Without the filter, all PMU events are exposed from host to guest by
+> default. The usage of the new sub-option can be found from the updated
+> document (docs/system/arm/cpu-features.rst).
+>
+> Here is an example shows how to use the PMU Event Filtering, when
+> we launch a guest by use kvm, add such command line:
+>
+>  # qemu-system-aarch64 \
+>        -accel kvm \
+>        -cpu host,kvm-pmu-filter="D:0x11-0x11"
+>
+> Since the first action is deny, we have a global allow policy. This
+> disables the filtering of the cycle counter (event 0x11 being CPU_CYCLES).
+>
+> And then in guest, use the perf to count the cycle:
+>
+>  # perf stat sleep 1
+>
+>   Performance counter stats for 'sleep 1':
+>
+>              1.22 msec task-clock                       #    0.001 CPUs utilized
+>                 1      context-switches                 #  820.695 /sec
+>                 0      cpu-migrations                   #    0.000 /sec
+>                55      page-faults                      #   45.138 K/sec
+>   <not supported>      cycles
+>           1128954      instructions
+>            227031      branches                         #  186.323 M/sec
+>              8686      branch-misses                    #    3.83% of all branches
+>
+>       1.002492480 seconds time elapsed
+>
+>       0.001752000 seconds user
+>       0.000000000 seconds sys
+>
+> As we can see, the cycle counter has been disabled in the guest, but
+> other pmu events are still work.
+>
+> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
 
-Applied with fixups to patches 4 and 5.
+Reviewed-by: Sebastian Ott <sebott@redhat.com>
 
-Thanks!
 
