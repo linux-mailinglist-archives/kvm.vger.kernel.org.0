@@ -1,169 +1,163 @@
-Return-Path: <kvm+bounces-6395-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6396-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F1C88308D8
-	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 15:55:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4744B830949
+	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 16:12:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D7ED288616
-	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 14:55:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B1351C219F9
+	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 15:12:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FCD32136A;
-	Wed, 17 Jan 2024 14:53:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1111D22321;
+	Wed, 17 Jan 2024 15:12:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lI3/Z8+3"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A246D21103
-	for <kvm@vger.kernel.org>; Wed, 17 Jan 2024 14:53:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF3EC22305
+	for <kvm@vger.kernel.org>; Wed, 17 Jan 2024 15:12:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705503212; cv=none; b=dOcgesuquz7VcGYYSaqOfA3k7cSyWkSU+NfvOz5TvC7RzLZE1JV9jqL1NEgzYnNRg/r1kQTz1V1pDkiNgIcEH8LkQNqfF1l2ZcYKjaRxMIJtQUtWtY9mhlxCiW15JoJiQg/23dNupxU4JrgvaUNrEKXlMva0uopv3QlSg5TaT1Y=
+	t=1705504332; cv=none; b=YzOj5kxS9Miqh47U0D3Q3VZNKTUYarwizXJCDwkiIN9QPQyS15R3J+sfion21YcKoHijNwDelsLy4OLUkceuKw8cKnddo557R88GZLbfypC1+eh3fNXr/MsZUFpi2qYByx5W3EQoBKd7IpGBOHMgdGiMm9Af07v9CEzzsMq7Jrs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705503212; c=relaxed/simple;
-	bh=UQZv9R5R44pjsYklVFLVGdfBf8OGFpGGbP7oXjVdzdg=;
-	h=Received:Received:Date:From:To:Cc:Subject:Message-ID:References:
-	 MIME-Version:Content-Type:Content-Disposition:In-Reply-To; b=SNg1UP8nBY+apLYWuFWrTKfY+ovWG/dDBAxKhyA3DYs+duUOxj9L6ZpySGdkvajYsajk39OMUD+Y35JJPUQbQ/K7MFSJMRRqapvwRi1tJCEYi8r8mVoJW+utgWcffuppuIiHgWW3P4eYAtu9oRc/oN8Ppa2Dx708dfwpQ+mwG5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 586A111FB;
-	Wed, 17 Jan 2024 06:54:10 -0800 (PST)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 28EB93F5A1;
-	Wed, 17 Jan 2024 06:53:22 -0800 (PST)
-Date: Wed, 17 Jan 2024 14:53:16 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Chase Conklin <chase.conklin@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Darren Hart <darren@os.amperecomputing.com>,
-	Jintack Lim <jintack@cs.columbia.edu>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	Miguel Luis <miguel.luis@oracle.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v11 19/43] KVM: arm64: nv: Handle shadow stage 2 page
- faults
-Message-ID: <20240117145316.GA398843@e124191.cambridge.arm.com>
-References: <20231120131027.854038-1-maz@kernel.org>
- <20231120131027.854038-20-maz@kernel.org>
+	s=arc-20240116; t=1705504332; c=relaxed/simple;
+	bh=75vbpDsoAcKuunxIpZQCSNEMzm0YJW7388b+nIzg5GU=;
+	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Date:
+	 In-Reply-To:Mime-Version:References:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=VqMvpmVLivwENI8/bdtN2l87CRH2cP+4WEy1qaU6GXizuC9bFvWPQ2Lknazurmeq5jwtTZwV+DtdcB490qGC3cft7v3vjOnD7udPwfTxXmdAxSzp3uEqTK69zR5C7tkVBtMShe7LdEOwuSQ8YB3qSY4jOKr+a6WFLOs73nulUIk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lI3/Z8+3; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5e6f42b1482so167628967b3.3
+        for <kvm@vger.kernel.org>; Wed, 17 Jan 2024 07:12:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1705504330; x=1706109130; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=l0YJIsKmr+pmUu1PHG5HX0Tr0h5ouB2GP2FXSLWbYDU=;
+        b=lI3/Z8+3c5DFNB5NO8wVnTworZUpIiZm0bw5IQCJqU1HzqoG28uqMT2HpEKuq/kbh4
+         QkiaUpZOxNVN0N0US4c1L8GFLVJqXt1ngJb28y6SOOPRgLVkT/N+olEt0xG+HhVG+MWY
+         rH9Ay4OAZmqtdbJVrczDT/EmVQ6V91+FjsosNiFQQ0YQLLzmjstwEZA/crX5nYAx9x9E
+         oAjmHaddSHqTktfTdrvdNVV61nutNstUjM7eHRUyXze/RSBWFkBEzWcJJNgdaQKglOtf
+         FKxy4CC0iMhBxZQjE6BuV+OBkX8870aGKSiGJ5rE/QhL1IBSrBCa9D9BQ1ohS5CPQOQq
+         vddg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705504330; x=1706109130;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=l0YJIsKmr+pmUu1PHG5HX0Tr0h5ouB2GP2FXSLWbYDU=;
+        b=Wo1gncBtNMI+Ldua/X8wn8iyY2TjfaNYQFkA/7mS/ZqecfOlg2nf7q+AlaP7fiY71C
+         GB1hMh1xZSoW4IQgwteXC3hSt0HwLCWVU88sRWdn0yNiAhx1hqr0a+LyHdGochYB/8x7
+         c61rq3BT2AXnneHPa9jTvqJBs8DCfgkpTVGaTdFlPK3o3+to7gEO+hFZSccKbR6wqA0+
+         bOeHWOe9MgXYH+1VrbEEGDDfBuybL5YW5i5VWY9QCCTgwKFtrI0ZBDmnmvMQs68iqD/T
+         tL8AtGh5Iz34JytQ1ju9/YZ2nJD0ehqnLuZvJSSkvSHDUu9/QVTu5Dp4RL2yNIwPGkmU
+         S3Qg==
+X-Gm-Message-State: AOJu0YzlzGYIuKbmRP73Z/zt9LCGuXCTgd+9UEoutPEuYG1gd56anHKX
+	fEgI2+OSlgtImvSCXZTeIAdkrKACqE4m8Dwz3A==
+X-Google-Smtp-Source: AGHT+IHLINH20oLOsKxHQFk+Am7brJ1C7Bq8De1VlhInw3/wj2JwfOm0e94bSGMl7mHkpqiE5WeNET/LonQ=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:fd5:b0:5ff:416c:24c4 with SMTP id
+ dg21-20020a05690c0fd500b005ff416c24c4mr1337698ywb.10.1705504329807; Wed, 17
+ Jan 2024 07:12:09 -0800 (PST)
+Date: Wed, 17 Jan 2024 07:12:08 -0800
+In-Reply-To: <20240117064441.2633784-1-tao1.su@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231120131027.854038-20-maz@kernel.org>
+Mime-Version: 1.0
+References: <20240117064441.2633784-1-tao1.su@linux.intel.com>
+Message-ID: <ZafuSNu3ThHY8rfG@google.com>
+Subject: Re: [PATCH] KVM: selftests: Add a requirement for disabling numa balancing
+From: Sean Christopherson <seanjc@google.com>
+To: Tao Su <tao1.su@linux.intel.com>
+Cc: kvm@vger.kernel.org, pbonzini@redhat.com, shuah@kernel.org, 
+	yi1.lai@intel.com
+Content-Type: text/plain; charset="us-ascii"
 
-Hi Marc,
+On Wed, Jan 17, 2024, Tao Su wrote:
+> In dirty_log_page_splitting_test, vm_get_stat(vm, "pages_4k") has
+> probability of gradually reducing to 0 after vm exit. The reason is that
+> the host triggers numa balancing and unmaps the related spte. So, the
+> number of pages currently mapped in EPT (kvm->stat.pages) is not equal
+> to the pages touched by the guest, which causes stats_populated.pages_4k
+> and stats_repopulated.pages_4k in this test are not same, resulting in
+> failure.
 
-Drive by thing I spotted.
+...
 
-On Mon, Nov 20, 2023 at 01:10:03PM +0000, Marc Zyngier wrote:
-> If we are faulting on a shadow stage 2 translation, we first walk the
-> guest hypervisor's stage 2 page table to see if it has a mapping. If
-> not, we inject a stage 2 page fault to the virtual EL2. Otherwise, we
-> create a mapping in the shadow stage 2 page table.
+> dirty_log_page_splitting_test assumes that kvm->stat.pages and the pages
+> touched by the guest are the same, but the assumption is no longer true
+> if numa balancing is enabled. Add a requirement for disabling
+> numa_balancing to avoid confusing due to test failure.
 > 
-> Note that we have to deal with two IPAs when we got a shadow stage 2
-> page fault. One is the address we faulted on, and is in the L2 guest
-> phys space. The other is from the guest stage-2 page table walk, and is
-> in the L1 guest phys space.  To differentiate them, we rename variables
-> so that fault_ipa is used for the former and ipa is used for the latter.
+> Actually, all page migration (including numa balancing) will trigger this
+> issue, e.g. running script:
+> 	./x86_64/dirty_log_page_splitting_test &
+> 	PID=$!
+> 	sleep 1
+> 	migratepages $PID 0 1
+> It is unusual to create above test environment intentionally, but numa
+> balancing initiated by the kernel will most likely be triggered, at
+> least in dirty_log_page_splitting_test.
 > 
-> Co-developed-by: Christoffer Dall <christoffer.dall@linaro.org>
-> Co-developed-by: Jintack Lim <jintack.lim@linaro.org>
-> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
-> [maz: rewrote this multiple times...]
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Reported-by: Yi Lai <yi1.lai@intel.com>
+> Signed-off-by: Tao Su <tao1.su@linux.intel.com>
+> Tested-by: Yi Lai <yi1.lai@intel.com>
 > ---
->  arch/arm64/include/asm/kvm_emulate.h |  7 +++
->  arch/arm64/include/asm/kvm_nested.h  | 19 ++++++
->  arch/arm64/kvm/mmu.c                 | 89 ++++++++++++++++++++++++----
->  arch/arm64/kvm/nested.c              | 48 +++++++++++++++
->  4 files changed, 153 insertions(+), 10 deletions(-)
+>  .../kvm/x86_64/dirty_log_page_splitting_test.c        | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
 > 
-[.. snip ..]
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 588ce46c0ad0..41de7616b735 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1412,14 +1412,16 @@ static bool kvm_vma_mte_allowed(struct vm_area_struct *vma)
->  }
+> diff --git a/tools/testing/selftests/kvm/x86_64/dirty_log_page_splitting_test.c b/tools/testing/selftests/kvm/x86_64/dirty_log_page_splitting_test.c
+> index 634c6bfcd572..f2c796111d83 100644
+> --- a/tools/testing/selftests/kvm/x86_64/dirty_log_page_splitting_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/dirty_log_page_splitting_test.c
+> @@ -212,10 +212,21 @@ static void help(char *name)
 >  
->  static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> -			  struct kvm_memory_slot *memslot, unsigned long hva,
-> -			  unsigned long fault_status)
-> +			  struct kvm_s2_trans *nested,
-> +			  struct kvm_memory_slot *memslot,
-> +			  unsigned long hva, unsigned long fault_status)
+>  int main(int argc, char *argv[])
 >  {
->  	int ret = 0;
->  	bool write_fault, writable, force_pte = false;
->  	bool exec_fault, mte_allowed;
->  	bool device = false;
->  	unsigned long mmu_seq;
-> +	phys_addr_t ipa = fault_ipa;
->  	struct kvm *kvm = vcpu->kvm;
->  	struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
->  	struct vm_area_struct *vma;
-> @@ -1504,10 +1506,38 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	}
+> +	FILE *f;
+>  	int opt;
+> +	int ret, numa_balancing;
 >  
->  	vma_pagesize = 1UL << vma_shift;
-> +
-> +	if (nested) {
-> +		unsigned long max_map_size;
-> +
-> +		max_map_size = force_pte ? PUD_SIZE : PAGE_SIZE;
+>  	TEST_REQUIRE(get_kvm_param_bool("eager_page_split"));
+>  	TEST_REQUIRE(get_kvm_param_bool("tdp_mmu"));
+> +	f = fopen("/proc/sys/kernel/numa_balancing", "r");
+> +	if (f) {
+> +		ret = fscanf(f, "%d", &numa_balancing);
+> +		TEST_ASSERT(ret == 1, "Error reading numa_balancing");
+> +		TEST_ASSERT(!numa_balancing, "please run "
+> +			    "'echo 0 > /proc/sys/kernel/numa_balancing'");
 
-This seems like the wrong way around, presumably you want PAGE_SIZE for force_pte?
+If we go this route, this should be a TEST_REQUIRE(), not a TEST_ASSERT().  The
+test hasn't failed, rather it has detected an incompatible setup.
 
-> +
-> +		ipa = kvm_s2_trans_output(nested);
-> +
-> +		/*
-> +		 * If we're about to create a shadow stage 2 entry, then we
-> +		 * can only create a block mapping if the guest stage 2 page
-> +		 * table uses at least as big a mapping.
-> +		 */
-> +		max_map_size = min(kvm_s2_trans_size(nested), max_map_size);
-> +
-> +		/*
-> +		 * Be careful that if the mapping size falls between
-> +		 * two host sizes, take the smallest of the two.
-> +		 */
-> +		if (max_map_size >= PMD_SIZE && max_map_size < PUD_SIZE)
-> +			max_map_size = PMD_SIZE;
-> +		else if (max_map_size >= PAGE_SIZE && max_map_size < PMD_SIZE)
-> +			max_map_size = PAGE_SIZE;
-> +
-> +		force_pte = (max_map_size == PAGE_SIZE);
-> +		vma_pagesize = min(vma_pagesize, (long)max_map_size);
-> +	}
-> +
->  	if (vma_pagesize == PMD_SIZE || vma_pagesize == PUD_SIZE)
->  		fault_ipa &= ~(vma_pagesize - 1);
->  
-> -	gfn = fault_ipa >> PAGE_SHIFT;
-> +	gfn = ipa >> PAGE_SHIFT;
->  	mte_allowed = kvm_vma_mte_allowed(vma);
->  
->  	/* Don't use the VMA after the unlock -- it may have vanished */
-[.. snip ..]
+Something isn't right though.  The test defaults to HugeTLB, and the invocation
+in the changelog doesn't override the backing source.  That suggests that NUMA
+auto-balancing is zapping HugeTLB VMAs, which AFAIK shouldn't happen, e.g. this
+code in task_numa_work() should cause such VMAs to be skipped:
 
-Thanks,
-Joey
+		if (!vma_migratable(vma) || !vma_policy_mof(vma) ||
+			is_vm_hugetlb_page(vma) || (vma->vm_flags & VM_MIXEDMAP)) {
+			trace_sched_skip_vma_numa(mm, vma, NUMAB_SKIP_UNSUITABLE);
+			continue;
+		}
+
+And the test already warns the user if they opt to use something other than
+HugeTLB.
+
+	if (!is_backing_src_hugetlb(backing_src)) {
+		pr_info("This test will only work reliably with HugeTLB memory. "
+			"It can work with THP, but that is best effort.\n");
+	}
+
+If the test is defaulting to something other than HugeTLB, then we should fix
+that in the test.  If the kernel is doing NUMA balancing on HugeTLB VMAs, then
+we should fix that in the kernel.
 
