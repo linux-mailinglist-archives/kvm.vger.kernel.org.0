@@ -1,104 +1,108 @@
-Return-Path: <kvm+bounces-6390-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6391-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41FD78306A7
-	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 14:09:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 63643830788
+	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 15:04:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 581C71C22800
-	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 13:09:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A2871C21433
+	for <lists+kvm@lfdr.de>; Wed, 17 Jan 2024 14:04:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 523C61EB43;
-	Wed, 17 Jan 2024 13:09:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21DB620312;
+	Wed, 17 Jan 2024 14:04:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TJbDLewz"
 X-Original-To: kvm@vger.kernel.org
-Received: from proxmox-new.maurer-it.com (proxmox-new.maurer-it.com [94.136.29.106])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 040A614A87;
-	Wed, 17 Jan 2024 13:09:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.136.29.106
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4722A200DD
+	for <kvm@vger.kernel.org>; Wed, 17 Jan 2024 14:04:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705496975; cv=none; b=p5VF2LDxI0Hj2HIez3jnKW74HzCWBvroXWzmI40+wbgQeSss7sjnk1/OUWIfRDD8NLOBuVVQWNqYxv9ZprB2kPH4ibAOzU0oMDkItoYS4eQ2hFcAK8Jb6OPnWcp1KZVd+zd9ZKw9FY2QCrZB56JQVXhAivzWA0Sf50jwd1POqpA=
+	t=1705500294; cv=none; b=XFxaXKzScrmhYg/gxqEi7K/LbBtAEV7U4SILU+w7DBd3soNfwEu3KMSgVSloHjMx0lwYzYN27dyixLbFiZeHZ3xR4qijpUZ+wo6ry1O8FDG/hXm3KGzsyYdqkRL++DnBFTypTolWnbGtop5EHtgSp7HAtdyctdeloLk0vZV0v5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705496975; c=relaxed/simple;
-	bh=fYYHB0VyLbRkjnGemOOKTFx4j4HGmAk7y1tiXw6SEAk=;
-	h=Received:Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:
-	 References:Content-Language:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding; b=q2ilyCGk44g9BHxFuNN22jFfb08b9mGGtGMS4YqPoRXy74+JhkcEkV6wh/ifPiXhAdBUTc+DkwuvyMSD1CtNFJtHYTvP4O4WbrntnTmfzVPya91EUh5uYrGLYbvWGHTbimHfjxz1EsaAIFxaKG0SYdN9MlqS/uLmSQZhh9rnM1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com; spf=pass smtp.mailfrom=proxmox.com; arc=none smtp.client-ip=94.136.29.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proxmox.com
-Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
-	by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 69F82457C2;
-	Wed, 17 Jan 2024 14:09:29 +0100 (CET)
-Message-ID: <e8f6bc21-c4e6-40de-838a-d374adb4e888@proxmox.com>
-Date: Wed, 17 Jan 2024 14:09:28 +0100
+	s=arc-20240116; t=1705500294; c=relaxed/simple;
+	bh=fOKrHUGu8kLnE4tSTOiVzAgIRoXkUzEACT6PQCzj4yQ=;
+	h=Received:DKIM-Signature:Received:From:To:Subject:Date:
+	 X-Bugzilla-Reason:X-Bugzilla-Type:X-Bugzilla-Watch-Reason:
+	 X-Bugzilla-Product:X-Bugzilla-Component:X-Bugzilla-Version:
+	 X-Bugzilla-Keywords:X-Bugzilla-Severity:X-Bugzilla-Who:
+	 X-Bugzilla-Status:X-Bugzilla-Resolution:X-Bugzilla-Priority:
+	 X-Bugzilla-Assigned-To:X-Bugzilla-Flags:X-Bugzilla-Changed-Fields:
+	 Message-ID:In-Reply-To:References:Content-Type:
+	 Content-Transfer-Encoding:X-Bugzilla-URL:Auto-Submitted:
+	 MIME-Version; b=WVxxeUOMe1bEP4c4VzAVGD3nMC+HCP5FiSc8Urou8Z+MPmyUvmDqN+rg37B2Yr0Dq6Jd0AXmFH2SLB4i8P3FYs34brqaMY3zFIsH4JwvbGCASLHKIJp3LQ/U3XvklfDBJq0xiB4ev5RL8ZrWjVdt5aDQy9UwwnE6wEJXqdPO6+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TJbDLewz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C185CC43399
+	for <kvm@vger.kernel.org>; Wed, 17 Jan 2024 14:04:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705500293;
+	bh=fOKrHUGu8kLnE4tSTOiVzAgIRoXkUzEACT6PQCzj4yQ=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=TJbDLewzMO3pregGIW2Qkdch8cesUCzW4zntA48vjJWggPhqebu8UgQPq8gEO9G3I
+	 1kuyPexHL4nqg7oL+6Tv200DbnrAxMTA2InOcHRhnDkEQYblI73e2TVuHHw/A+rne9
+	 nv1nQ1Y2qWCVbkOjJLgekbIQprIdDrnc2IgJnY2H/LEeDA2x51ksSekDyOV108dIBn
+	 fLImlqIp5zM0i/t4aKVqLzNkX9TckYVSBpBnSxILikeI+bN9ldyVkyuzxQ5imBeHj1
+	 mHh9L6Qapyb0La9/X5pUC6Y0u9wynC5We0YPV2M96sLcb3Z6NKMEy3Y7mZhGdRM+ut
+	 ANwpyH2JswgcQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id ABB4FC53BC6; Wed, 17 Jan 2024 14:04:53 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: kvm@vger.kernel.org
+Subject: [Bug 218259] High latency in KVM guests
+Date: Wed, 17 Jan 2024 14:04:53 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: f.weber@proxmox.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-218259-28872-1bq9x6eX7E@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-218259-28872@https.bugzilla.kernel.org/>
+References: <bug-218259-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Temporary KVM guest hangs connected to KSM and NUMA balancer
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org
-References: <832697b9-3652-422d-a019-8c0574a188ac@proxmox.com>
- <ZaAQhc13IbWk5j5D@google.com>
- <ef81ff36-64bb-4cfe-ae9b-e3acf47bff24@proxmox.com>
- <Zaa654hwFKba_7pf@google.com>
-Content-Language: en-US
-From: Friedrich Weber <f.weber@proxmox.com>
-In-Reply-To: <Zaa654hwFKba_7pf@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-On 16/01/2024 18:20, Sean Christopherson wrote:
->> Does this make sense to you? Happy to double-check or run more tests if
->> anything seems off.
->  
-> Ha!  It too me a few minutes to realize what went sideways with v2.  KVM has an
-> in-flight change that switches from host virtual addresses (HVA) to guest physical
-> frame numbers (GFN) for the retry check, commit 8569992d64b8 ("KVM: Use gfn instead
-> of hva for mmu_notifier_retry").
-> 
-> That commit is in the KVM pull request for 6.8, and so v2 is based on top of a
-> branch that contains said commit.  But for better or worse (probably worse), the
-> switch from HVA=GFN didn't change the _names_ of mmu_invalidate_range_{start,end},
-> only the type.  So v2 applies and compiles cleanly on 6.7, but it's subtly broken
-> because checking for a GFN match against an HVA range is all but guaranteed to get
-> false negatives.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D218259
 
-Oof, that's nifty, good catch! I'll pay more attention to the
-base-commit when testing next time. :)
+Friedrich Weber (f.weber@proxmox.com) changed:
 
-> If you can try v2 on top of `git://git.kernel.org/pub/scm/virt/kvm/kvm.git next`,
-> that would be helpful to confirm that I didn't screw up something else.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |f.weber@proxmox.com
 
-Pulled that repository and can confirm:
+--- Comment #11 from Friedrich Weber (f.weber@proxmox.com) ---
+For the record: I was seeing a variant of this issue in combination with KS=
+M,
+see [1] for more details and reproducer.
 
-* 1c6d984f ("x86/kvm: Do not try to disable kvmclock if it was not
-enabled", current `next`): reproducer hangs
-* v2 [1] ("KVM: x86/mmu: Retry fault before acquiring mmu_lock if
-mapping is changing") applied on top of 1c6d984f: no hangs anymore
+[1]
+https://lore.kernel.org/kvm/832697b9-3652-422d-a019-8c0574a188ac@proxmox.co=
+m/
 
-If I understand the discussion on [1] correctly, there might be a v3 --
-if so, I'll happily test that too.
+--=20
+You may reply to this email to add a comment.
 
-> Thanks very much for reporting back!  I'm pretty sure we would have missed the
-> semantic conflict when backporting the fix to 6.7 and earlier, i.e. you likely
-> saved us from another round of bug reports for various stable trees.
-
-Sure! Thanks a lot for taking a look at this!
-
-Best wishes,
-
-Friedrich
-
-[1] https://lore.kernel.org/all/20240110012045.505046-1-seanjc@google.com/
-
+You are receiving this mail because:
+You are watching the assignee of the bug.=
 
