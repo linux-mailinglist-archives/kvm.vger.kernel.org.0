@@ -1,179 +1,117 @@
-Return-Path: <kvm+bounces-6429-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6430-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20AB1831E72
-	for <lists+kvm@lfdr.de>; Thu, 18 Jan 2024 18:33:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5221831E92
+	for <lists+kvm@lfdr.de>; Thu, 18 Jan 2024 18:40:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A56171F22377
-	for <lists+kvm@lfdr.de>; Thu, 18 Jan 2024 17:33:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 75A521F224F0
+	for <lists+kvm@lfdr.de>; Thu, 18 Jan 2024 17:40:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E1E42D786;
-	Thu, 18 Jan 2024 17:33:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 578922D60B;
+	Thu, 18 Jan 2024 17:40:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qC+PgI3e"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="olk/jPcO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D85E82D788
-	for <kvm@vger.kernel.org>; Thu, 18 Jan 2024 17:33:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30AA32D04A
+	for <kvm@vger.kernel.org>; Thu, 18 Jan 2024 17:40:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705599213; cv=none; b=omxn1d7kq6+x6nnAJf4AY/rVnUGkUALbXczexv3K6K9QYNmk1uLN7QycdhjE2Mf+Z3PUhomuHRWdc6/i9rBySNYd4nrSIw6f/rejmqGJcrs9lYjL7JpNa/B3Y6s5lzVTalnECUNaUxH0++7VEqFRr23F69rUkOmjwPENRmri7Ec=
+	t=1705599640; cv=none; b=UcLfyG1X3GTeEHId7hVaAMGu21Qt+k2mq4cRkIULVgLwN6lpyeelFj2/vBuxL7B9Ma/HFIIsdCqeROsmVxuX0DsoBFFX+tXoHVwray+XHjQBu4mW8TuNGgRK/mZjHbSKnyF4TSHlg5YS0Y8B6beVjZTHkZkFikd3v01v8nvWbhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705599213; c=relaxed/simple;
-	bh=g2ihxYR0jMFIfw024Hzp+NZffZG3sqLyR4dYxJC9+8c=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=eSLaUdIqTfPoBxVP4NV6+hhByV5Iea/bOkOXpeoKEyMayCafKpFAupimge7CqqumE03J4jqyGG3cIFAdyARDDXX48lOuAc8f7ILXGQWXzF1ALeNCVhj0OHQZ1xxY3jsvlSVQl/PieamtAyOS/AGjgeJFWGwVI/Ay6Huksllq4j0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qC+PgI3e; arc=none smtp.client-ip=209.85.219.202
+	s=arc-20240116; t=1705599640; c=relaxed/simple;
+	bh=ltTdpIF83mD4FLWoP8ES+hjgX7H5akmsbH+KpszV1Tw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=gDyJJ88zAMbUq+FPmU0MGRIAxm5pQRCVW9kIJlaBlFpxge9CZeGYqw4FCHXcOKDxJNhlQ3toJvfgteIAHKpWyHJ1sk7WGXN8mWn4Xeo6jQknWQUKF2DV3SwNzEmVbdZUNzIx+BwFrmbQ1Q4CQA0ud8WWGWj1s9Jch1ll/b1zFi4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=olk/jPcO; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc221ed88d9so4967719276.3
-        for <kvm@vger.kernel.org>; Thu, 18 Jan 2024 09:33:31 -0800 (PST)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5cdfd47de98so7455450a12.1
+        for <kvm@vger.kernel.org>; Thu, 18 Jan 2024 09:40:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1705599211; x=1706204011; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1705599637; x=1706204437; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=oBJZf1LE/5X4g4KhTT5Os40N2yCWBiph02v2+TzxgRE=;
-        b=qC+PgI3eZhE4ts3ZRAsuaW1USeHvjwSMpk913Z4qyHNrv0nhjORwlrviiyc6qtoDA+
-         G4ov0dUvlvW6W0I/Ux33jSITBllvfbUf2yxLd276U5t7/mG6i1iUZuTINLXeoZK/WUL3
-         NVCmMNL+O3L2YpPgJi+GTtHQ2TJr/oWbyk2bdkbDuSNWZg/c45CSpc6XDxP1D6pCHkhS
-         Sv+HgWdEeVG/0VEnoWt9bxS2YvyUQVN4Ykf8A6HP9EDTmYR9olsKxRoPbpwkWgFFsVdV
-         PnAHyuloYGKykddnnPAsbblzDkQBy5M0afMR5lC2zhPlejzLV3K+8YrypH536rUfLRBu
-         F6tQ==
+        bh=5Q3C3WGrieoJdAKFaeIZlXobOygHM9XDpw7BX2KbOhI=;
+        b=olk/jPcOL4P18CmMZSUtVuZLS1/hmMykvKVXtE47UIUdOVpEC43luKhwfj9E/nsUGX
+         syyfL4xpvdeuuSQTA7VZ6oem8PxUpEMwLzj3+7biCEhfkdZR+XMqFfK6FGoyhhu67y3r
+         26q9AfNAgS2BkoqzObqM78oMFvm3n/+OYBcUOXguw5reox20j8ZIM7lgj/82kpoX3raa
+         Wm2iIwLJjpNp2XCGM0MpPVO+2v5SeUhohXFKvaHD8noAunKUwzUDKGJBK7u62lwoT6r1
+         okP6bJyvaTrIPoJYYoDIwae7f0RatLauOG0sdKEXuIoyguvDMxuEXYeeKIeaTiWNADae
+         4YfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705599211; x=1706204011;
+        d=1e100.net; s=20230601; t=1705599637; x=1706204437;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=oBJZf1LE/5X4g4KhTT5Os40N2yCWBiph02v2+TzxgRE=;
-        b=Y9ivNUDOpxAN14Ec5B+2oTNQBgb0RF9/3ltUZ8AoFgjj+9S0nrC2HmofoTSR5AqOkn
-         rMEAZtYqCW5f4kMoLlWktOy4Vn0sKc1vn/b4PKNJ5Eay/9jpoLhZeu9UwBziVumWCPGU
-         cylMjxhaOFQsKGolSAjwDSdRiTm7xC4yWbgtao65bp3ctjsLeS961gpLb6P8z6C5+iVE
-         9FTBwiLvS6hhFfN1+tUuvPcuC7hj7BnIYHIrJa1JKBbU1LMmUQVl1TeaJj1ZXDFKe66W
-         pj8iSI6LLKJ9iGlYCmdWny8NYMXrEC+w6NCEWGGgGKtntx9ijtH8SxbGkTjdNMySd4Za
-         onbA==
-X-Gm-Message-State: AOJu0YxOtnfpAVxMgn6JXlkWVtmhcHBL+C/CiPNlnOboYg+GYaTcS3wG
-	gZiNSKan2tvk80Wqr1gfRKzJVGkLHe7A15Osz/nSnNovmF7ULYtmtiSkU7A6iVNEzyytiwUzlSw
-	Qpg==
-X-Google-Smtp-Source: AGHT+IEvyLNJgiC1Ob51GHOPvh3eIxRdUFAu33JenRa2llkKRTJk79qMN6F87V6uETIf5u5Is3/jgjvHSdU=
+        bh=5Q3C3WGrieoJdAKFaeIZlXobOygHM9XDpw7BX2KbOhI=;
+        b=Oq7zbyXagdmn15gwmxe2LjedebZ+3ICPB8BNfnF2jfRWHrzwkqEmM2wsM7G/KIt2TB
+         iEiijvpcwEGTLem0DdiDf06Mj+XK8g2NOeMhU7jGZ4vZAAuD+o5LRlByk8UZ1T9qLwWg
+         mWfxnHY1oP5veyNRBAr8HqIkkZ6fRQj3yqupqFL/2S0jJYCnNtVbYNoOS6iFjsWjqE3N
+         YJclOYYK+tRsXfP/vljmJXw9Pre1PRs+VA7LB1MJxOB31LGr2uqK4bjN9QywfwuUSutp
+         90RFOxnbHGiN6PD/z5wZjmOdhDyIMDgnl1hfrbNWjm9C+rJv+VBmzHTmwtHXt5GIiXp7
+         193A==
+X-Gm-Message-State: AOJu0YzQXqvLPgLSWWtC/+Z6a5q3HygDbG5aItE55IP9mFmlOkV6zoJH
+	qtus7pf4KU/ZylYzK4NMKXCXAkbm687ucGqKoE6dhJLLwOrlO2kz580OWk8JywJC5gstVJwAkPd
+	h2g==
+X-Google-Smtp-Source: AGHT+IHQno7PAwboCP87bGIkYG2fH+s8EoDNQ4sFTOlwoU3XmXeAa1RkI+vnnDxRDet8Cr9UHVnWumLJcOM=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:f08:b0:dbe:a0c2:df25 with SMTP id
- et8-20020a0569020f0800b00dbea0c2df25mr71287ybb.8.1705599210927; Thu, 18 Jan
- 2024 09:33:30 -0800 (PST)
-Date: Thu, 18 Jan 2024 09:33:29 -0800
-In-Reply-To: <Zai6hJgTRegDaSfx@linux.bj.intel.com>
+ (user=seanjc job=sendgmr) by 2002:a65:63c3:0:b0:5ce:1891:dfac with SMTP id
+ n3-20020a6563c3000000b005ce1891dfacmr6154pgv.4.1705599637554; Thu, 18 Jan
+ 2024 09:40:37 -0800 (PST)
+Date: Thu, 18 Jan 2024 09:40:36 -0800
+In-Reply-To: <CAAhSdy0SxZWdCHQVW0Bki+bHpg4qrHWV0aFzJq8V2xYtwsMWhw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240117064441.2633784-1-tao1.su@linux.intel.com>
- <ZafuSNu3ThHY8rfG@google.com> <Zai6hJgTRegDaSfx@linux.bj.intel.com>
-Message-ID: <Zalg6UGBrCe68P-i@google.com>
-Subject: Re: [PATCH] KVM: selftests: Add a requirement for disabling numa balancing
+References: <20240104123727.76987-2-ajones@ventanamicro.com> <CAAhSdy0SxZWdCHQVW0Bki+bHpg4qrHWV0aFzJq8V2xYtwsMWhw@mail.gmail.com>
+Message-ID: <ZalilFSHBa_XHolD@google.com>
+Subject: Re: [PATCH -fixes v2] RISC-V: KVM: Require HAVE_KVM
 From: Sean Christopherson <seanjc@google.com>
-To: Tao Su <tao1.su@linux.intel.com>
-Cc: kvm@vger.kernel.org, pbonzini@redhat.com, shuah@kernel.org, 
-	yi1.lai@intel.com, David Matlack <dmatlack@google.com>
+To: Anup Patel <anup@brainfault.org>
+Cc: Andrew Jones <ajones@ventanamicro.com>, linux-riscv@lists.infradead.org, 
+	linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, atishp@atishpatra.org, rdunlap@infradead.org, 
+	sfr@canb.auug.org.au, alex@ghiti.fr, mpe@ellerman.id.au, npiggin@gmail.com, 
+	linuxppc-dev@lists.ozlabs.org, pbonzini@redhat.com
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-+David
+On Thu, Jan 18, 2024, Anup Patel wrote:
+> On Thu, Jan 4, 2024 at 6:07=E2=80=AFPM Andrew Jones <ajones@ventanamicro.=
+com> wrote:
+> >
+> > KVM requires EVENTFD, which is selected by HAVE_KVM. Other KVM
+> > supporting architectures select HAVE_KVM and then their KVM
+> > Kconfigs ensure its there with a depends on HAVE_KVM. Make RISCV
+> > consistent with that approach which fixes configs which have KVM
+> > but not EVENTFD, as was discovered with a randconfig test.
+> >
+> > Fixes: 99cdc6c18c2d ("RISC-V: Add initial skeletal KVM support")
+> > Reported-by: Randy Dunlap <rdunlap@infradead.org>
+> > Closes: https://lore.kernel.org/all/44907c6b-c5bd-4e4a-a921-e4d3825539d=
+8@infradead.org/
+> > Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
+>=20
+> Queued this patch for Linux-6.8
 
-On Thu, Jan 18, 2024, Tao Su wrote:
-> On Wed, Jan 17, 2024 at 07:12:08AM -0800, Sean Christopherson wrote:
->=20
-> [...]
->=20
-> > > diff --git a/tools/testing/selftests/kvm/x86_64/dirty_log_page_splitt=
-ing_test.c b/tools/testing/selftests/kvm/x86_64/dirty_log_page_splitting_te=
-st.c
-> > > index 634c6bfcd572..f2c796111d83 100644
-> > > --- a/tools/testing/selftests/kvm/x86_64/dirty_log_page_splitting_tes=
-t.c
-> > > +++ b/tools/testing/selftests/kvm/x86_64/dirty_log_page_splitting_tes=
-t.c
-> > > @@ -212,10 +212,21 @@ static void help(char *name)
-> > > =20
-> > >  int main(int argc, char *argv[])
-> > >  {
-> > > +	FILE *f;
-> > >  	int opt;
-> > > +	int ret, numa_balancing;
-> > > =20
-> > >  	TEST_REQUIRE(get_kvm_param_bool("eager_page_split"));
-> > >  	TEST_REQUIRE(get_kvm_param_bool("tdp_mmu"));
-> > > +	f =3D fopen("/proc/sys/kernel/numa_balancing", "r");
-> > > +	if (f) {
-> > > +		ret =3D fscanf(f, "%d", &numa_balancing);
-> > > +		TEST_ASSERT(ret =3D=3D 1, "Error reading numa_balancing");
-> > > +		TEST_ASSERT(!numa_balancing, "please run "
-> > > +			    "'echo 0 > /proc/sys/kernel/numa_balancing'");
-> >=20
-> > If we go this route, this should be a TEST_REQUIRE(), not a TEST_ASSERT=
-().  The
-> > test hasn't failed, rather it has detected an incompatible setup.
->=20
-> Yes, previously I wanted to print a more user-friendly prompt, but TEST_R=
-EQUIRE()
-> can=E2=80=99t customize the output=E2=80=A6
+That should be unnecessary.  Commit caadf876bb74 ("KVM: introduce CONFIG_KV=
+M_COMMON"),
+which is in Paolo's pull request for 6.8, addresses the EVENTFD issue.  And=
+ the
+rest of Paolo's series[*], which presumably will get queued for 6.9, elimin=
+ates
+HAVE_KVM entirely.
 
-__TEST_REQUIRE()
-
-> > Something isn't right though.  The test defaults to HugeTLB, and the in=
-vocation
-> > in the changelog doesn't override the backing source.  That suggests th=
-at NUMA
-> > auto-balancing is zapping HugeTLB VMAs, which AFAIK shouldn't happen, e=
-.g. this
-> > code in task_numa_work() should cause such VMAs to be skipped:
-> >=20
-> > 		if (!vma_migratable(vma) || !vma_policy_mof(vma) ||
-> > 			is_vm_hugetlb_page(vma) || (vma->vm_flags & VM_MIXEDMAP)) {
-> > 			trace_sched_skip_vma_numa(mm, vma, NUMAB_SKIP_UNSUITABLE);
-> > 			continue;
-> > 		}
-> >=20
-> > And the test already warns the user if they opt to use something other =
-than
-> > HugeTLB.
-> >=20
-> > 	if (!is_backing_src_hugetlb(backing_src)) {
-> > 		pr_info("This test will only work reliably with HugeTLB memory. "
-> > 			"It can work with THP, but that is best effort.\n");
-> > 	}
-> >=20
-> > If the test is defaulting to something other than HugeTLB, then we shou=
-ld fix
-> > that in the test.  If the kernel is doing NUMA balancing on HugeTLB VMA=
-s, then
-> > we should fix that in the kernel.
->=20
-> HugeTLB VMAs are not affected by NUMA auto-balancing through my observati=
-on, but
-> the backing sources of the test code and per-vCPU stacks are not Huge TLB=
-, e.g.
-> __vm_create() invokes
->=20
->         vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, 0, 0, nr_pa=
-ges, 0);
->=20
-> So, some pages are possible to be migrated.
-
-Ah, hmm.  Requiring NUMA balancing be disabled isn't going to fix the under=
-lying
-issue, it's just guarding against one of the more likely culprits.  The bes=
-t fix
-is likely to have the test precisely validate _only_ the test data pages.  =
-E.g.
-if we double down on requiring HugeTLB, then the test should be able to ass=
-ert
-that it has at least N hugepages when dirty logging is disabled, and at lea=
-st M
-4KiB pages when dirty logging is enabled.
+[*] https://lore.kernel.org/all/20240108124740.114453-6-pbonzini@redhat.com
 
