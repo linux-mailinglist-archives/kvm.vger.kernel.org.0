@@ -1,109 +1,112 @@
-Return-Path: <kvm+bounces-6426-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6427-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22A63831DB7
-	for <lists+kvm@lfdr.de>; Thu, 18 Jan 2024 17:42:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5E3B831E0F
+	for <lists+kvm@lfdr.de>; Thu, 18 Jan 2024 18:00:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B7F251F25A73
-	for <lists+kvm@lfdr.de>; Thu, 18 Jan 2024 16:42:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23B591C2539D
+	for <lists+kvm@lfdr.de>; Thu, 18 Jan 2024 17:00:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5004B2C688;
-	Thu, 18 Jan 2024 16:41:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF2112C852;
+	Thu, 18 Jan 2024 16:58:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HkIoxE7D"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AXAHcms6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 278D22C194;
-	Thu, 18 Jan 2024 16:41:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.55.52.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2F312C6BB
+	for <kvm@vger.kernel.org>; Thu, 18 Jan 2024 16:58:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705596110; cv=none; b=eKvHW9JQ315kdNS4WjqKNJN0dN/Hd1RlkN8EVp+oceQ4MkEeMhz8Tl+UxeZyERnAkucpgxVAxocTx+X2pnrBGUEq0hJMOQV/eK7YIIDHor5h7viG8d6dp8F3bcqXdXeRrVq1JR6PwoDyybUWwIaEYfFKu2qBaci3sJGIn9DbCIU=
+	t=1705597125; cv=none; b=EQb+FXrRhz9dJ+rqj8fD4e36qEIFOLdutrImFTKORUwimlPCUz1HukMEs39QWa6YpeBX5WKQt6gHSpmc21fifoktvHprpbyprRIgORk5fwOB7hf2W9S1x+UZkvLw/2LLBpbvBFYvl9Y324wp40Va85PDDVxPmJy047KwOPpjico=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705596110; c=relaxed/simple;
-	bh=8ZoeWyhYJAXsI3uEm8LqP0ONHfsUFdg+kjcwc5JHX1o=;
-	h=DKIM-Signature:X-IronPort-AV:X-IronPort-AV:Received:X-ExtLoop1:
-	 X-IronPort-AV:Received:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:
-	 In-Reply-To; b=BzbMUSsO9Kreovj1QBtJC+rwbJeABQJqNDCvDpzYDw5/7S/0HNgoZcEbvQqPGXC8rQjOcQPg/qquYXrbK6ILkhIMtXh7c4Ut3Q5uu27F2gYsZUJKCK2vIdmM99yOvuAIgr39JjKm7ryA3ug3KT30RmbTf+5iksUJQaRlz9CNRmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HkIoxE7D; arc=none smtp.client-ip=192.55.52.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1705596108; x=1737132108;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=8ZoeWyhYJAXsI3uEm8LqP0ONHfsUFdg+kjcwc5JHX1o=;
-  b=HkIoxE7DPgJUQqsN5lLnsT3OBRDBUETfzqVHTa4SYWkLTwXJsAq/Ot8P
-   7FeQDCEc0XdRPwUXE7vum6wQODM9/+fEwMpjUBat7+ufKuLB8NErVbNkM
-   RApnaL9CsyvYl9YCK12qTKh7i1VWlflSL9GTAR8L4Pb7HqE0h6C48cFIF
-   GXKzXl2+l8B1BXSmADT7NXOA9QdGz4rEbweGHdOGN5urxG0j78VU9PLyZ
-   Lmg7tx1Sp5Ndr79EKu4GmTBSr8T5wJRs7Ncr2d4W3oHtWYatoRqYZMrnc
-   5CNrXXaDaVCKO0wM/lG4Vw/7fEjyCBpWNSrzNGOghqiLIqI+bz3eVJ0m2
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10956"; a="399376808"
-X-IronPort-AV: E=Sophos;i="6.05,203,1701158400"; 
-   d="scan'208";a="399376808"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jan 2024 08:41:48 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,203,1701158400"; 
-   d="scan'208";a="405234"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by fmviesa004.fm.intel.com with ESMTP; 18 Jan 2024 08:41:47 -0800
-Date: Fri, 19 Jan 2024 00:38:36 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Yan Zhao <yan.y.zhao@intel.com>,
-	Kai Huang <kai.huang@intel.com>
-Subject: Re: [PATCH v2] KVM: x86/mmu: Retry fault before acquiring mmu_lock
- if mapping is changing
-Message-ID: <ZalUDLVJSVN/rEf2@yilunxu-OptiPlex-7050>
-References: <20240110012045.505046-1-seanjc@google.com>
+	s=arc-20240116; t=1705597125; c=relaxed/simple;
+	bh=Z5thKj8FdeMPyV5/0e6dgRb4ppMPY94gIbrMAFviSyo=;
+	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Reply-To:Date:
+	 Mime-Version:X-Mailer:Message-ID:Subject:From:To:Cc:Content-Type;
+	b=WEXoK1FLaVDliVfAvUEHXDpEMbFrGle/e6kvcqjVID11dyd24wJ9OuC5JDGMbBdpz2k80O68On6DoAcdUu4xabOLxVvlBqaZULW5PCM77L80zRnYbW3ZzqXOEiP6YtJ/8If1j4msQObKKeZ5EkuoetvzLahLrwXvgJNOqVsC5X8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AXAHcms6; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-5cec090b2bdso11031322a12.0
+        for <kvm@vger.kernel.org>; Thu, 18 Jan 2024 08:58:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1705597123; x=1706201923; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qOJj2c9xW4mty6RVL8pJG7rPEgOg5AXdEBigC3Y4jtY=;
+        b=AXAHcms6dIN13GnNTUE4FzFUwDA+eem9NXCDkkP1Od/czzNHTQr5OhOGk3QX0KEonr
+         NFd962j41sNkyewHIRD2Pm8NuJ7Z9pSIC4YT5VAZHsNCzfr8w3UUtbiNs2ExsTKyMgCY
+         VPP22Ti95YqC1gsjrIuJDDCdljmhHYMv/YSgrGox2+0Dd0pcidQqrQmHBKcGdqSRad9z
+         W9gFvyUKaU7nAS7+3lDqzzr6LMANTRMi4pJ1hBq4g6SFR2+vQlGsqC4054u9TYqLwB7z
+         Kw8ZvoyFNt29tMdbe+C/uhbzCIhoyWBLVxslky0kROZFzx4jGyj7dK8sMxfVr8sEh0xX
+         Jzsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705597123; x=1706201923;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qOJj2c9xW4mty6RVL8pJG7rPEgOg5AXdEBigC3Y4jtY=;
+        b=hdVGBvkOnTdQplIR7xmLXSHN8wTfbEI39IRSXfc46ZRPdQivvu06CqVfMM47KTEkqS
+         2Jz4Bwi/b1XhCyLiEYZH4r12IlvGK7CTnQsPw2Zn5LphhLqcPb46lrxEPTODnw/RfcFZ
+         D6GnUNVzUJJe84P4jfmRhwup+KC85EvvwxBYWSxsn0L50ps1tDTse6SJ3BfqvVDpcD6Z
+         fd4Ri+7ryKFV/ejNbF3YUDMu/Vy/PhWNBAoUn4dD3gmQIpIVQFrT1cj+FziN/IGwF6xj
+         73L6lB7E9lGINzOLsPzzJBJrMxWPdaBj/gqGee7Fmd22RauiQGUKZ+HGpYVAnIv+rBwR
+         jKAw==
+X-Gm-Message-State: AOJu0YzfgK4REYLzL8OVi94k38m9Dzc0i5kpLiUkIzN2knVtKoJsNbYx
+	msJ24OwuKc/sIFBDD+V1kKmbdK0/J43budwKzLrQPoAam36j26LjiL7tHxjZGza3gZFIwgrEbKq
+	fCQ==
+X-Google-Smtp-Source: AGHT+IGe39iSbo3pp4Oh1OoPuJaAYSL8rktRk+jxW6UtZTirBf1ZCu2iYHNI0H7nbbmWrSXesSiYDaEUb0M=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:2fc1:0:b0:5ca:3e8f:6d6a with SMTP id
+ v184-20020a632fc1000000b005ca3e8f6d6amr6924pgv.12.1705597123202; Thu, 18 Jan
+ 2024 08:58:43 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Thu, 18 Jan 2024 08:58:38 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240110012045.505046-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.381.gb435a96ce8-goog
+Message-ID: <20240118165838.1934853-1-seanjc@google.com>
+Subject: [ANNOUNCE] PUCK Notes - 2024.01.17 - TDP MMU for IOMMU
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Jason Gunthorpe <jgg@nvidia.com>, Yan Zhao <yan.y.zhao@intel.com>, 
+	David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Jan 09, 2024 at 05:20:45PM -0800, Sean Christopherson wrote:
-> Retry page faults without acquiring mmu_lock if the resolved gfn is covered
-> by an active invalidation.  Contending for mmu_lock is especially
-> problematic on preemptible kernels as the mmu_notifier invalidation task
-> will yield mmu_lock (see rwlock_needbreak()), delay the in-progress
+Recording and slides:
 
-Is it possible fault-in task avoids contending mmu_lock by using _trylock()?
-Like:
+  https://drive.google.com/corp/drive/folders/1sSr_8FE5KjjGGnpX7_QlHAX3QGoRnck7?resourcekey=0-UB_vbXfpY4Dezo9xI_-6iA
 
-	while (!read_trylock(&vcpu->kvm->mmu_lock))
-		cpu_relax();
+Key Takeways:
 
-	if (is_page_fault_stale(vcpu, fault))
-		goto out_unlock;
-  
-	r = kvm_tdp_mmu_map(vcpu, fault);
+ - Having KVM notify (or install PTEs in) the IOMMU page tables for _all_ PTEs
+   created by KVM may not be necessary to achieve the desired performance, e.g.
+   proactively mapping in the IOMMU may only be necessary when swapping in
+   memory for oversubscribed VMs.
 
-out_unlock:
-	read_unlock(&vcpu->kvm->mmu_lock)
+ - Synchronously notifying/installing could be a net negative for guest
+   performance, e.g. could add significant latency in KVM's page fault path if
+   a PTE operation necessitates an IOMMU TLB invalidation.
 
-> invalidation, and ultimately increase the latency of resolving the page
-> fault.  And in the worst case scenario, yielding will be accompanied by a
-> remote TLB flush, e.g. if the invalidation covers a large range of memory
-> and vCPUs are accessing addresses that were already zapped.
+ - Despite hardware vendors' intentions/claims, CPU and IOMMU page table entries
+   aren't 100% interchangeable.  E.g. even on Intel, where the formats are
+   compatible, it's still possible to create EPT PTEs (CPU) that are not usable
+   in the IOMMU.
 
-This case covers all usage of mmu_invalidate_retry_gfn(), is it? Should
-we also consider vmx_set_apic_access_page_addr()?
+ - Given the above, having KVM manage and/or notify IOMMU Page tables would be
+   a premature optimization.
 
-Thanks,
-Yilun
+ - Recommended next step is to explore using heterogeneous memory management
+   (HMM) to manage IOMMU page tables and coordinate with mmu_notifiers, and see
+   if HMM can be optimized to meet the performance goals without involving KVM.
 
