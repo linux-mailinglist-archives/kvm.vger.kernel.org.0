@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-6440-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6441-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD1F383202B
-	for <lists+kvm@lfdr.de>; Thu, 18 Jan 2024 21:08:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B153983202C
+	for <lists+kvm@lfdr.de>; Thu, 18 Jan 2024 21:08:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 42CE5B26C24
-	for <lists+kvm@lfdr.de>; Thu, 18 Jan 2024 20:08:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60F5C28B769
+	for <lists+kvm@lfdr.de>; Thu, 18 Jan 2024 20:08:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0A502E836;
-	Thu, 18 Jan 2024 20:07:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E7CB2E843;
+	Thu, 18 Jan 2024 20:07:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UaqLemxN"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ag0mp1nK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 641292E826
-	for <kvm@vger.kernel.org>; Thu, 18 Jan 2024 20:07:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB99F2E826
+	for <kvm@vger.kernel.org>; Thu, 18 Jan 2024 20:07:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705608461; cv=none; b=HKFOqdgFB7goi5NAC761NS7yTGZVAx46FXy8kojBBJdG2cPM0N+PpgFFwTicT8gtEUc3bLrN947r2l1zvgWFUNB69z8ueGEHOAjwldb+bRoIOaIGOKopr/XdhaoBL+MEalSig1qG26PmmRUVuUNhRQ95zw7LafHk2DNmgOHWW5c=
+	t=1705608466; cv=none; b=NZBZS/ektaA8QXfFJ5SfNxJBswLZ0TM4Ic8e+zHjB/jHo6U7FzbGZ/yhIXeBXkw4ehsXV8QXNhgYkIZxqFC2BL7A7EARNpfWZtxiMtrbK1rJD+z9VOEhlNWjiX/XTcQNw2Gne0ZYv59sl7waJ7cCohPjOW5exdHjZ/7ppceeVZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705608461; c=relaxed/simple;
-	bh=/qV+glV9bKFxPzor5MRukAyNlVVBZyPDloBrgGh4i4U=;
+	s=arc-20240116; t=1705608466; c=relaxed/simple;
+	bh=P35Szeh3Xj8gBxBeWbYbnrY26jukSIkzUJx/t1uU2Kg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NpDU0fwDCIFh1hFWg2qlRsThkG8zpqz9hqN8y9tYdizf2ggpfBHQWtf9EAsJf5XnoVHwYY/nNEyLcxhGPEml4dfQo3EcYG+w+9E8K0PsNuTHvHFHCpOJa3F15AGCVbg8H8bF9nDRqOLYMUmiNBYjs6MGZKJ6h9iLIBPa3RRjgu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=UaqLemxN; arc=none smtp.client-ip=209.85.128.52
+	 MIME-Version:Content-Type; b=jJ0NEsqYOZ4iLku4UeEzRZi/0bhxPwXDxGxUBmB9f+Y4uibL0/MlTYmC9nvTcsfuueqnnAE1/seVD5XxIjgfpML6fjdgFLfE7DjN7t0bc+3tC+fUJN511p8FuePaoPcSP4wUPYyFvwQSVABx097YMSe+DIAN/p+OrXDu+At+cC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ag0mp1nK; arc=none smtp.client-ip=209.85.128.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-40e959b1867so303735e9.1
-        for <kvm@vger.kernel.org>; Thu, 18 Jan 2024 12:07:39 -0800 (PST)
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-40e884ac5c8so247475e9.2
+        for <kvm@vger.kernel.org>; Thu, 18 Jan 2024 12:07:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1705608457; x=1706213257; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1705608463; x=1706213263; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=X/ejlWr/vr3IWLu/MuGvfyfJuGNUVTGyi/ukONUd4RY=;
-        b=UaqLemxNEF3ltafe4BRSsomFgCI3pRqMbnbvAuUZPtHWCCd/yrApoJ3aOHgg+kkjCN
-         u9qGRELIFVjTb7TkUc0SQzOTz+zjvLCylC1a3e5B4vB4jhBAPQFswCkfk6lpmff3UPBg
-         x2ZJDK8Z+P9bHhfHEqk1fclhq3BHmKJWri42Q+0MMER+rVDNcmVyvJzk2XqA64gukmpO
-         4wxGOfPhLCeMd9W54gV+hWtaHW8Uy3hPUy/XdRcNNEzPs5zYpEajehvWeoIZkIKWqwId
-         ZGhwpY9uddMn/ZBuF2TFPOSE5xs7/LSXa83TKPvjPdSiH45ucNNRkarhQK9+j98ryJ5F
-         52Dw==
+        bh=6w1iFT2RaAu4CDh7Rs92padfv2CQrVGTqWTSowRX6NU=;
+        b=ag0mp1nK4ggc3TSuZo/4qxhE10GI2x+hA4Y7ABgDq8+t+jLYRHOkVhYy4UMAeofF2G
+         DQ8wu9j87eQ6AwHS+73zksmJf4UI4p0dDkY/lgArz/+/9kA3+8KUfFGassyERCmEAEhK
+         jCDvzJLfI8ioEcqVMZer21k/J+h5lyv7eGd5yQlPt8WU2VN93hdeuOBdxIGE/mOGBIdF
+         /IjYtwti3Fhb2LyA3KJCTyrEV7FWHOIh7Ir041vTviEJEUbVhbN1SUl0Cs0wfEr+FW/0
+         awEogWWB/uaJf6e4y+pB1wv+xOt1QF4SsWUH1cxbKy0yCD/HHYtP9xxgj9C7cfdJlsJL
+         ekVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705608457; x=1706213257;
+        d=1e100.net; s=20230601; t=1705608463; x=1706213263;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=X/ejlWr/vr3IWLu/MuGvfyfJuGNUVTGyi/ukONUd4RY=;
-        b=hTYpa1BvmMCLbok2gAFvrqYtZYgbye9KTPFFJvP2pkfY39qWDdIkYroo7By6XvqyfU
-         b8ccCwcN+dEBUFaL5WVKBDP11Y5G59qqTLxDU1cZ3+luBHAYVBO8QgrvGWTqme9gj/PO
-         bNkpcLH5Pd4yltyYaOqBxfMqyKoirUNKfUpMH4uMPj42S+/yl1IIRPLPBmrmPa9wdGay
-         wlkpqQySu+XeWQMOQHkTpHsAIQjqXVTvK5l3h/s9mbFIlZR8u8+XqrZyITLq9RYmSUSt
-         FwnWnINzy8YTNjTCvnTfLErrd/GjGAq6vDOQL54EYw2QUjfiBPeyT45kSh/bW6wD1C30
-         n7Qg==
-X-Gm-Message-State: AOJu0YxnUbNz/MJCRekIawTcc0fbBQcduAsruAMVU280tx60oq1yK3Ac
-	uRE3jBeCd7AVUCRJ1FdADVm+uHObami0EalvlsUod8LLz7Jk43e5rLVBYRHiru0=
-X-Google-Smtp-Source: AGHT+IH48LYCm5FvvdfIRtPDEmtB/JkgBtRiKzuU74C3lUeA8vSv4dmG9wi39anX1f9TeL29iIfhIg==
-X-Received: by 2002:a05:600c:63d7:b0:40e:71e7:b2e4 with SMTP id dx23-20020a05600c63d700b0040e71e7b2e4mr900948wmb.60.1705608457713;
-        Thu, 18 Jan 2024 12:07:37 -0800 (PST)
+        bh=6w1iFT2RaAu4CDh7Rs92padfv2CQrVGTqWTSowRX6NU=;
+        b=V3OXf+MeVLDeZebPQ3MBA1DBQDb+lpPWIofhKoCzNuKRmeAyqXB8GrMCJVLO7O6jqA
+         hozPTXBLeGyXvG5+duWMMn4/JXgNtHisi3Hag7juheWcOWl9qYdGmpLh2Z+v+Y3S86T/
+         +CERClloUVpAzmUTkDRoI4nmCbUaQNf7IyePmqE90URN06OgCob6BUJOD4wMesjHGd6i
+         mOuKoyVtgI3Tj3iAU+IjdzGLkgyp96HVmJ8VDMLT+aKPbbXdmaz/21kRCy7M1jvr2JIe
+         GU6nsUj/A5SyyxZbID3vORuVcDgcHvDa+EhXKxIYGzM56+8Vfc4vQgGIYxvCxfI0WcIj
+         zyjw==
+X-Gm-Message-State: AOJu0YwH0DwpVmKlFerhjNgWoxy9wdRyu9GG0NwlQhSOuGfk5//Ya6/+
+	nB7EqP7N2kKTvT0SjsoIttyUkf/tEhWIcspB3JJPshFy/vpYFSJwzRzhX9XwShI=
+X-Google-Smtp-Source: AGHT+IGQufmtnUbC5TaYe/skrc2byrkECD8RNfnBzhK5eV/iYB6W5CLJ7ZFQRf8tXYUyzihV/oaQjw==
+X-Received: by 2002:a05:600c:331b:b0:40e:5f01:6209 with SMTP id q27-20020a05600c331b00b0040e5f016209mr464662wmp.37.1705608463223;
+        Thu, 18 Jan 2024 12:07:43 -0800 (PST)
 Received: from localhost.localdomain ([78.196.4.158])
-        by smtp.gmail.com with ESMTPSA id u6-20020a05600c138600b0040d5a9d6b68sm30919468wmf.6.2024.01.18.12.07.36
+        by smtp.gmail.com with ESMTPSA id je14-20020a05600c1f8e00b0040e3635ca65sm30698740wmb.2.2024.01.18.12.07.41
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 18 Jan 2024 12:07:37 -0800 (PST)
+        Thu, 18 Jan 2024 12:07:42 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>,
@@ -96,11 +96,10 @@ Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>,
 	Jean-Christophe Dubois <jcd@tribudubois.net>,
 	Joel Stanley <joel@jms.id.au>,
 	Hao Wu <wuhaotsh@google.com>,
-	kvm@vger.kernel.org,
-	Richard Henderson <richard.henderson@linaro.org>
-Subject: [PATCH 09/20] target/arm: Create arm_cpu_mp_affinity
-Date: Thu, 18 Jan 2024 21:06:30 +0100
-Message-ID: <20240118200643.29037-10-philmd@linaro.org>
+	kvm@vger.kernel.org
+Subject: [PATCH 10/20] target/arm: Expose arm_cpu_mp_affinity() in 'multiprocessing.h' header
+Date: Thu, 18 Jan 2024 21:06:31 +0100
+Message-ID: <20240118200643.29037-11-philmd@linaro.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20240118200643.29037-1-philmd@linaro.org>
 References: <20240118200643.29037-1-philmd@linaro.org>
@@ -113,156 +112,176 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Richard Henderson <richard.henderson@linaro.org>
+Declare arm_cpu_mp_affinity() prototype in the new
+ "target/arm/multiprocessing.h" header so units in
+hw/arm/ can use it without having to include the huge
+target-specific "cpu.h".
 
-Wrapper to return the mp affinity bits from the cpu.
+File list to include the new header generated using:
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+  $ git grep -lw arm_cpu_mp_affinity
+
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- target/arm/cpu.h          | 5 +++++
- hw/arm/virt-acpi-build.c  | 2 +-
- hw/arm/virt.c             | 6 +++---
- hw/arm/xlnx-versal-virt.c | 3 ++-
- hw/misc/xlnx-versal-crl.c | 4 ++--
- target/arm/arm-powerctl.c | 2 +-
- target/arm/hvf/hvf.c      | 4 ++--
- target/arm/tcg/psci.c     | 2 +-
- 8 files changed, 17 insertions(+), 11 deletions(-)
+ target/arm/cpu.h             |  6 +-----
+ target/arm/multiprocessing.h | 16 ++++++++++++++++
+ hw/arm/virt-acpi-build.c     |  1 +
+ hw/arm/virt.c                |  1 +
+ hw/arm/xlnx-versal-virt.c    |  1 +
+ hw/misc/xlnx-versal-crl.c    |  1 +
+ target/arm/arm-powerctl.c    |  1 +
+ target/arm/cpu.c             |  5 +++++
+ target/arm/hvf/hvf.c         |  1 +
+ target/arm/tcg/psci.c        |  1 +
+ 10 files changed, 29 insertions(+), 5 deletions(-)
+ create mode 100644 target/arm/multiprocessing.h
 
 diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 55a19e8539..d1584bdb3b 100644
+index d1584bdb3b..cecac4c0a1 100644
 --- a/target/arm/cpu.h
 +++ b/target/arm/cpu.h
-@@ -1173,6 +1173,11 @@ void arm_cpu_post_init(Object *obj);
+@@ -26,6 +26,7 @@
+ #include "cpu-qom.h"
+ #include "exec/cpu-defs.h"
+ #include "qapi/qapi-types-common.h"
++#include "target/arm/multiprocessing.h"
+ 
+ /* ARM processors have a weak memory model */
+ #define TCG_GUEST_DEFAULT_MO      (0)
+@@ -1173,11 +1174,6 @@ void arm_cpu_post_init(Object *obj);
  
  uint64_t arm_build_mp_affinity(int idx, uint8_t clustersz);
  
-+static inline uint64_t arm_cpu_mp_affinity(ARMCPU *cpu)
+-static inline uint64_t arm_cpu_mp_affinity(ARMCPU *cpu)
+-{
+-    return cpu->mp_affinity;
+-}
+-
+ #ifndef CONFIG_USER_ONLY
+ extern const VMStateDescription vmstate_arm_cpu;
+ 
+diff --git a/target/arm/multiprocessing.h b/target/arm/multiprocessing.h
+new file mode 100644
+index 0000000000..81715d345c
+--- /dev/null
++++ b/target/arm/multiprocessing.h
+@@ -0,0 +1,16 @@
++/*
++ * ARM multiprocessor CPU helpers
++ *
++ *  Copyright (c) 2003 Fabrice Bellard
++ *
++ * SPDX-License-Identifier: LGPL-2.1-or-later
++ */
++
++#ifndef TARGET_ARM_MULTIPROCESSING_H
++#define TARGET_ARM_MULTIPROCESSING_H
++
++#include "target/arm/cpu-qom.h"
++
++uint64_t arm_cpu_mp_affinity(ARMCPU *cpu);
++
++#endif
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 2127778c1e..43ccc60f43 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -59,6 +59,7 @@
+ #include "hw/acpi/ghes.h"
+ #include "hw/acpi/viot.h"
+ #include "hw/virtio/virtio-acpi.h"
++#include "target/arm/multiprocessing.h"
+ 
+ #define ARM_SPI_BASE 32
+ 
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 34cba9ebd8..beba151620 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -74,6 +74,7 @@
+ #include "hw/arm/smmuv3.h"
+ #include "hw/acpi/acpi.h"
+ #include "target/arm/internals.h"
++#include "target/arm/multiprocessing.h"
+ #include "hw/mem/pc-dimm.h"
+ #include "hw/mem/nvdimm.h"
+ #include "hw/acpi/generic_event_device.h"
+diff --git a/hw/arm/xlnx-versal-virt.c b/hw/arm/xlnx-versal-virt.c
+index 841ef69df6..29f4d2c2dc 100644
+--- a/hw/arm/xlnx-versal-virt.c
++++ b/hw/arm/xlnx-versal-virt.c
+@@ -20,6 +20,7 @@
+ #include "hw/qdev-properties.h"
+ #include "hw/arm/xlnx-versal.h"
+ #include "hw/arm/boot.h"
++#include "target/arm/multiprocessing.h"
+ #include "qom/object.h"
+ 
+ #define TYPE_XLNX_VERSAL_VIRT_MACHINE MACHINE_TYPE_NAME("xlnx-versal-virt")
+diff --git a/hw/misc/xlnx-versal-crl.c b/hw/misc/xlnx-versal-crl.c
+index 9bfa9baa15..1f1762ef16 100644
+--- a/hw/misc/xlnx-versal-crl.c
++++ b/hw/misc/xlnx-versal-crl.c
+@@ -19,6 +19,7 @@
+ #include "hw/resettable.h"
+ 
+ #include "target/arm/arm-powerctl.h"
++#include "target/arm/multiprocessing.h"
+ #include "hw/misc/xlnx-versal-crl.h"
+ 
+ #ifndef XLNX_VERSAL_CRL_ERR_DEBUG
+diff --git a/target/arm/arm-powerctl.c b/target/arm/arm-powerctl.c
+index 6c86e90102..2b2055c6ac 100644
+--- a/target/arm/arm-powerctl.c
++++ b/target/arm/arm-powerctl.c
+@@ -16,6 +16,7 @@
+ #include "qemu/log.h"
+ #include "qemu/main-loop.h"
+ #include "sysemu/tcg.h"
++#include "target/arm/multiprocessing.h"
+ 
+ #ifndef DEBUG_ARM_POWERCTL
+ #define DEBUG_ARM_POWERCTL 0
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 0bbba48faa..89e44a31fd 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -1314,6 +1314,11 @@ uint64_t arm_build_mp_affinity(int idx, uint8_t clustersz)
+     return (Aff1 << ARM_AFF1_SHIFT) | Aff0;
+ }
+ 
++uint64_t arm_cpu_mp_affinity(ARMCPU *cpu)
 +{
 +    return cpu->mp_affinity;
 +}
 +
- #ifndef CONFIG_USER_ONLY
- extern const VMStateDescription vmstate_arm_cpu;
- 
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index a22a2f43a5..2127778c1e 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -720,7 +720,7 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-         build_append_int_noprefix(table_data, vgic_interrupt, 4);
-         build_append_int_noprefix(table_data, 0, 8);    /* GICR Base Address*/
-         /* MPIDR */
--        build_append_int_noprefix(table_data, armcpu->mp_affinity, 8);
-+        build_append_int_noprefix(table_data, arm_cpu_mp_affinity(armcpu), 8);
-         /* Processor Power Efficiency Class */
-         build_append_int_noprefix(table_data, 0, 1);
-         /* Reserved */
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 3fc144236b..34cba9ebd8 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -370,7 +370,7 @@ static void fdt_add_cpu_nodes(const VirtMachineState *vms)
-     for (cpu = 0; cpu < smp_cpus; cpu++) {
-         ARMCPU *armcpu = ARM_CPU(qemu_get_cpu(cpu));
- 
--        if (armcpu->mp_affinity & ARM_AFF3_MASK) {
-+        if (arm_cpu_mp_affinity(armcpu) & ARM_AFF3_MASK) {
-             addr_cells = 2;
-             break;
-         }
-@@ -397,10 +397,10 @@ static void fdt_add_cpu_nodes(const VirtMachineState *vms)
- 
-         if (addr_cells == 2) {
-             qemu_fdt_setprop_u64(ms->fdt, nodename, "reg",
--                                 armcpu->mp_affinity);
-+                                 arm_cpu_mp_affinity(armcpu));
-         } else {
-             qemu_fdt_setprop_cell(ms->fdt, nodename, "reg",
--                                  armcpu->mp_affinity);
-+                                  arm_cpu_mp_affinity(armcpu));
-         }
- 
-         if (ms->possible_cpus->cpus[cs->cpu_index].props.has_node_id) {
-diff --git a/hw/arm/xlnx-versal-virt.c b/hw/arm/xlnx-versal-virt.c
-index 537118224f..841ef69df6 100644
---- a/hw/arm/xlnx-versal-virt.c
-+++ b/hw/arm/xlnx-versal-virt.c
-@@ -107,7 +107,8 @@ static void fdt_add_cpu_nodes(VersalVirt *s, uint32_t psci_conduit)
-         ARMCPU *armcpu = ARM_CPU(qemu_get_cpu(i));
- 
-         qemu_fdt_add_subnode(s->fdt, name);
--        qemu_fdt_setprop_cell(s->fdt, name, "reg", armcpu->mp_affinity);
-+        qemu_fdt_setprop_cell(s->fdt, name, "reg",
-+                              arm_cpu_mp_affinity(armcpu));
-         if (psci_conduit != QEMU_PSCI_CONDUIT_DISABLED) {
-             qemu_fdt_setprop_string(s->fdt, name, "enable-method", "psci");
-         }
-diff --git a/hw/misc/xlnx-versal-crl.c b/hw/misc/xlnx-versal-crl.c
-index ac6889fcf2..9bfa9baa15 100644
---- a/hw/misc/xlnx-versal-crl.c
-+++ b/hw/misc/xlnx-versal-crl.c
-@@ -67,9 +67,9 @@ static void crl_reset_cpu(XlnxVersalCRL *s, ARMCPU *armcpu,
-                           bool rst_old, bool rst_new)
+ static void arm_cpu_initfn(Object *obj)
  {
-     if (rst_new) {
--        arm_set_cpu_off(armcpu->mp_affinity);
-+        arm_set_cpu_off(arm_cpu_mp_affinity(armcpu));
-     } else {
--        arm_set_cpu_on_and_reset(armcpu->mp_affinity);
-+        arm_set_cpu_on_and_reset(arm_cpu_mp_affinity(armcpu));
-     }
- }
- 
-diff --git a/target/arm/arm-powerctl.c b/target/arm/arm-powerctl.c
-index 8850381565..6c86e90102 100644
---- a/target/arm/arm-powerctl.c
-+++ b/target/arm/arm-powerctl.c
-@@ -37,7 +37,7 @@ CPUState *arm_get_cpu_by_id(uint64_t id)
-     CPU_FOREACH(cpu) {
-         ARMCPU *armcpu = ARM_CPU(cpu);
- 
--        if (armcpu->mp_affinity == id) {
-+        if (arm_cpu_mp_affinity(armcpu) == id) {
-             return cpu;
-         }
-     }
+     ARMCPU *cpu = ARM_CPU(obj);
 diff --git a/target/arm/hvf/hvf.c b/target/arm/hvf/hvf.c
-index a537a5bc94..659401e12c 100644
+index 659401e12c..71a26db188 100644
 --- a/target/arm/hvf/hvf.c
 +++ b/target/arm/hvf/hvf.c
-@@ -1016,7 +1016,7 @@ static void hvf_raise_exception(CPUState *cpu, uint32_t excp,
+@@ -28,6 +28,7 @@
+ #include "arm-powerctl.h"
+ #include "target/arm/cpu.h"
+ #include "target/arm/internals.h"
++#include "target/arm/multiprocessing.h"
+ #include "trace/trace-target_arm_hvf.h"
+ #include "migration/vmstate.h"
  
- static void hvf_psci_cpu_off(ARMCPU *arm_cpu)
- {
--    int32_t ret = arm_set_cpu_off(arm_cpu->mp_affinity);
-+    int32_t ret = arm_set_cpu_off(arm_cpu_mp_affinity(arm_cpu));
-     assert(ret == QEMU_ARM_POWERCTL_RET_SUCCESS);
- }
- 
-@@ -1045,7 +1045,7 @@ static bool hvf_handle_psci_call(CPUState *cpu)
-     int32_t ret = 0;
- 
-     trace_hvf_psci_call(param[0], param[1], param[2], param[3],
--                        arm_cpu->mp_affinity);
-+                        arm_cpu_mp_affinity(arm_cpu));
- 
-     switch (param[0]) {
-     case QEMU_PSCI_0_2_FN_PSCI_VERSION:
 diff --git a/target/arm/tcg/psci.c b/target/arm/tcg/psci.c
-index 9080a91d9c..50d4b23d26 100644
+index 50d4b23d26..51d2ca3d30 100644
 --- a/target/arm/tcg/psci.c
 +++ b/target/arm/tcg/psci.c
-@@ -215,7 +215,7 @@ err:
-     return;
+@@ -24,6 +24,7 @@
+ #include "sysemu/runstate.h"
+ #include "internals.h"
+ #include "arm-powerctl.h"
++#include "target/arm/multiprocessing.h"
  
- cpu_off:
--    ret = arm_set_cpu_off(cpu->mp_affinity);
-+    ret = arm_set_cpu_off(arm_cpu_mp_affinity(cpu));
-     /* notreached */
-     /* sanity check in case something failed */
-     assert(ret == QEMU_ARM_POWERCTL_RET_SUCCESS);
+ bool arm_is_psci_call(ARMCPU *cpu, int excp_type)
+ {
 -- 
 2.41.0
 
