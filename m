@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-6433-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6434-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4DC5832024
-	for <lists+kvm@lfdr.de>; Thu, 18 Jan 2024 21:07:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0C4B832025
+	for <lists+kvm@lfdr.de>; Thu, 18 Jan 2024 21:07:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0BE61C24C51
-	for <lists+kvm@lfdr.de>; Thu, 18 Jan 2024 20:07:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 694A0285315
+	for <lists+kvm@lfdr.de>; Thu, 18 Jan 2024 20:07:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4CA12E63C;
-	Thu, 18 Jan 2024 20:07:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94D2C2E648;
+	Thu, 18 Jan 2024 20:07:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="w7zDKMc1"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ga3/pHlI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57D6C2E62A
-	for <kvm@vger.kernel.org>; Thu, 18 Jan 2024 20:07:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34C6D2E641
+	for <kvm@vger.kernel.org>; Thu, 18 Jan 2024 20:07:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705608422; cv=none; b=UReM1Jvpt+4pes0B/4IZMGmCv2ty86+FqdHJSlrM1FGpqEfOLAR9z5grdqtZuw4WCyQt4JSsAFEO7id537uVv1ioE1wCzbGt5f1bm+a3dcXvIx5bHHdAR08+0aXZu5+TISJ/k0RfN1ToZFq5kXqr6IGdCl5WUso7DWRIUIiG8WI=
+	t=1705608427; cv=none; b=QyhvEVxb+j4k9LGPNSLy2WJP0j2hOXlsL6Cy6+0aGTQPpNxyifEcs5lZziBNCLyhaynL0azOn6It77uu4cG+FzByApgTlIKsQHTw5eebpkwxevWw6maxpbXlNI5C8W57F8mmmzuJxuB8WNPXQFrONDD9a3nd8T88vVucSbYGQnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705608422; c=relaxed/simple;
-	bh=gLomlSi8LgyeMv1miaxbAAFi+OJvA8xaDbLDEuVzDGg=;
+	s=arc-20240116; t=1705608427; c=relaxed/simple;
+	bh=tv4vAiOcp6184qBhbcUf5afz5+FGGf+V6gkBDL5kRR0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EowBpqKoTc8kAV6Lvj/rh/o8NMLSZ3nxj3rJiCNxfQOGPAT+V+i+rOfDCmuN1yGqn/JUregNnt0QOs5vlny6HG9OfNvmwcSKm7G1pvchU2Z9DXl5z5zPh38sFArtv4lUS8AFXNZYNFDOceUB92XaaNxbDxvz6Pzpf8QcYYLpQRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=w7zDKMc1; arc=none smtp.client-ip=209.85.128.44
+	 MIME-Version:Content-Type; b=Xid532NVacbgjznMePN0QBOo7EhiJNLp4rrb3gGsCa/FEW6PfB7ZZWDX1Es8cGXeaomNn3zqhtFGe6+XvYpxyhAJYeGMrhcHRg8N5S6IY9/0Ewq0jQ9Fq+pzQhnbfvsLJUSCVudSqZ7YuVQdh4iFgwL9+RpHuiT+zcTm5Z7kK34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Ga3/pHlI; arc=none smtp.client-ip=209.85.128.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-40e7065b692so105125e9.3
-        for <kvm@vger.kernel.org>; Thu, 18 Jan 2024 12:07:00 -0800 (PST)
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-40e958cd226so125725e9.2
+        for <kvm@vger.kernel.org>; Thu, 18 Jan 2024 12:07:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1705608418; x=1706213218; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1705608424; x=1706213224; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=htALVQYUd7tctCm3cf8P5ZcYUk/HKeiXOxSFOuNuC8A=;
-        b=w7zDKMc1t3w60DfWg0Yk73ETsRpskLOEhe7YyDJrP4iIgddPZxc+dTXKVvmKuGre8R
-         c76QujSwFnY4jfzVWRG+tqQIbEK4MJSnUAAgh/rRRgX28WzrvZXz2+amNB6sXKQIElxG
-         ukJoeVZq2FkPqwArfTofdIwdDkq1pL9uq5ZA2KlKFm44lBPa7e9eXswAdU20htX2W7Uf
-         osexnXkcYPYk5YkKOuBW2bmwJxjVx6gGrco+wNryMEqiaVXcZiGoalFN8L28kB/0Tw7/
-         gFIv3ORo4Yl4Ky5qeGkj3yMIYj6pG0cEtA8dB1RIUarW20OsNE9FG1HcZse4ciQT00mD
-         jlnA==
+        bh=5DV0gjEvxVYdSUXbSGfE0SOvd3u+uIvvVQeLb8GJ57M=;
+        b=Ga3/pHlInLDyujuWCjy7x6StVO9rTvf/uxu2H/Wyx1wl+aX2mwoyKyFffWsbivtqtt
+         Gb7WHgjzBAYVjH9tax2xBXcHfE+vTX77XxES5Y0ym2nu8g1B4keM6VmmTvdHoLEbT2PK
+         SdZrmFT+wCkq/1XzUuVJBiQbJ24X/Lx5oP+zAS5o6uRIYKon0nQZT+3HYRjN+jxqXjE/
+         pu4AW1Hf/702Lxku+T6QbI1s/obfskkoEXyUK4WTD9cV38OmRMysBh2JFRujQMoLJ4kv
+         nwRXiPZx2VVQw/WONbWlbAHrTXRnwrevp8hAkG3tvldQZJFtja6L2ZxpTu+AAdxlmzAz
+         60aQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705608418; x=1706213218;
+        d=1e100.net; s=20230601; t=1705608424; x=1706213224;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=htALVQYUd7tctCm3cf8P5ZcYUk/HKeiXOxSFOuNuC8A=;
-        b=TFqUnLFD9px+K1R64/7Ae+K9ylAf8Gex6C6fyO1r3ZflG0SfhuexPZkpfzuOLkxas8
-         ytlEr1QWEIfft31ezjPeh90J4j1cpy/D3tJ+vITpfxOn3EW35P0w5NsIspy5sO6XSq4L
-         e8Sw1fUj/NYQXMjfmTGUm+WDEdLxfGqk9704aZ7eZO6Aqfsz2N/cvaIzbChdI8/KgtSi
-         3s1BJfqKuwrNsQph41mxqRV+ogAOhC7xTpC+F5O2ueInbvbu0koP0KAXYEKSHmoKWJt9
-         SLxgC/3MfAYPcDPXix5fFqdADk3TmgWEdLIBPOg/alEvNpxnxJly4ue10DewaJI2FdEV
-         0tSQ==
-X-Gm-Message-State: AOJu0YzYaXGw5hDANRecHDHOhxvFRqMn+mdZ5wTfj2uBOWAOsvi4pFnl
-	x7U589cqXPMlyeLXeuowa2twfLFQBZT/NiKAdxSdq/H+fhLbTGBvk3JQmPIC8xw=
-X-Google-Smtp-Source: AGHT+IG8bYbFqhoBk8yTqNa3Tvhld4ys4sIRX15x3ny/K7+1KUY5t+dQIHR21Z/0Xv/O+nHkSVXnDQ==
-X-Received: by 2002:a7b:cbcc:0:b0:40c:416c:d99b with SMTP id n12-20020a7bcbcc000000b0040c416cd99bmr862981wmi.47.1705608418664;
-        Thu, 18 Jan 2024 12:06:58 -0800 (PST)
+        bh=5DV0gjEvxVYdSUXbSGfE0SOvd3u+uIvvVQeLb8GJ57M=;
+        b=AgDJYd8dc/STDxLpEwOBmNafX62ur4dEAYUnIp8eiqBtadXCH40NzU6Gv510xcziI2
+         FW6cJN2L9UCsHGkvHtm0wPSCizNzDk8gHNFUgqnbaiXVgZ1XFgTYgtshieQrOjo+n/Xp
+         RvTJew1U2DXykvei/XVVJtKzFY7o/mKf73rgfboDwhLuTszEesMiA95SOI7xg9dyVTh5
+         6VqlgjuxIU4e1pAgM8+wFqF3IBzPvMIjWbp8qecJGB2ZJ0U3LE8eLdWx7P8OxO6cu+aF
+         GOA1KtrQSVZcBhqnJZKr7t8NhI8aRxL4gswZ9DG9gZ28pjBLisUwnxNskw2hmSP1DoGS
+         pfjQ==
+X-Gm-Message-State: AOJu0Yyitn0xAToAV60hYrJDf6sVcb4t4TgXYC4V/OgeSbrseYudON7U
+	nbYL+2vRT9dSGh6PcbrVtPQw4jIma6MH1/Ktp7kQyps6yXhx9fdKGPZHEUSdwjk=
+X-Google-Smtp-Source: AGHT+IGyZXtCLkCvO+pPKnbG3scB5k1GCK313QwzV6L9kDFDYVagNopPUzfRy36YI8Alv8WDgVLOLg==
+X-Received: by 2002:a05:600c:2981:b0:40e:954d:1a1a with SMTP id r1-20020a05600c298100b0040e954d1a1amr749105wmd.76.1705608424346;
+        Thu, 18 Jan 2024 12:07:04 -0800 (PST)
 Received: from localhost.localdomain ([78.196.4.158])
-        by smtp.gmail.com with ESMTPSA id k20-20020a05600c1c9400b0040e54f15d3dsm30578929wms.31.2024.01.18.12.06.57
+        by smtp.gmail.com with ESMTPSA id c11-20020a05600c0a4b00b0040d53588d94sm30769470wmq.46.2024.01.18.12.07.02
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 18 Jan 2024 12:06:58 -0800 (PST)
+        Thu, 18 Jan 2024 12:07:04 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>,
@@ -97,9 +97,9 @@ Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>,
 	Joel Stanley <joel@jms.id.au>,
 	Hao Wu <wuhaotsh@google.com>,
 	kvm@vger.kernel.org
-Subject: [PATCH 02/20] hw/arm/xilinx_zynq: Include missing 'exec/tswap.h' header
-Date: Thu, 18 Jan 2024 21:06:23 +0100
-Message-ID: <20240118200643.29037-3-philmd@linaro.org>
+Subject: [PATCH 03/20] hw/arm/smmuv3: Include missing 'hw/registerfields.h' header
+Date: Thu, 18 Jan 2024 21:06:24 +0100
+Message-ID: <20240118200643.29037-4-philmd@linaro.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20240118200643.29037-1-philmd@linaro.org>
 References: <20240118200643.29037-1-philmd@linaro.org>
@@ -112,32 +112,35 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-hw/arm/xilinx_zynq.c calls tswap32() which is declared
-in "exec/tswap.h". Include it in order to avoid when
-refactoring unrelated headers:
+hw/arm/smmuv3-internal.h uses the REG32() and FIELD()
+macros defined in "hw/registerfields.h". Include it in
+order to avoid when refactoring unrelated headers:
 
-  hw/arm/xilinx_zynq.c:103:31: error: call to undeclared function 'tswap32';
-  ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-          board_setup_blob[n] = tswap32(board_setup_blob[n]);
-                                ^
+  In file included from ../../hw/arm/smmuv3.c:34:
+  hw/arm/smmuv3-internal.h:36:28: error: expected identifier
+  REG32(IDR0,                0x0)
+                             ^
+  hw/arm/smmuv3-internal.h:37:5: error: expected function body after function declarator
+      FIELD(IDR0, S2P,         0 , 1)
+      ^
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- hw/arm/xilinx_zynq.c | 1 +
+ hw/arm/smmuv3-internal.h | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
-index dbb9793aa1..d4c817ecdc 100644
---- a/hw/arm/xilinx_zynq.c
-+++ b/hw/arm/xilinx_zynq.c
-@@ -37,6 +37,7 @@
- #include "hw/qdev-clock.h"
- #include "sysemu/reset.h"
- #include "qom/object.h"
-+#include "exec/tswap.h"
+diff --git a/hw/arm/smmuv3-internal.h b/hw/arm/smmuv3-internal.h
+index 6076025ad6..e987bc4686 100644
+--- a/hw/arm/smmuv3-internal.h
++++ b/hw/arm/smmuv3-internal.h
+@@ -21,6 +21,7 @@
+ #ifndef HW_ARM_SMMUV3_INTERNAL_H
+ #define HW_ARM_SMMUV3_INTERNAL_H
  
- #define TYPE_ZYNQ_MACHINE MACHINE_TYPE_NAME("xilinx-zynq-a9")
- OBJECT_DECLARE_SIMPLE_TYPE(ZynqMachineState, ZYNQ_MACHINE)
++#include "hw/registerfields.h"
+ #include "hw/arm/smmu-common.h"
+ 
+ typedef enum SMMUTranslationStatus {
 -- 
 2.41.0
 
