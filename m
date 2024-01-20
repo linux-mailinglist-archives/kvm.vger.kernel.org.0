@@ -1,113 +1,177 @@
-Return-Path: <kvm+bounces-6474-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6475-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88EB4832EA3
-	for <lists+kvm@lfdr.de>; Fri, 19 Jan 2024 19:09:40 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E565D8331EC
+	for <lists+kvm@lfdr.de>; Sat, 20 Jan 2024 01:44:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B03E51C247BA
-	for <lists+kvm@lfdr.de>; Fri, 19 Jan 2024 18:09:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8773EB22900
+	for <lists+kvm@lfdr.de>; Sat, 20 Jan 2024 00:44:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6534A5644C;
-	Fri, 19 Jan 2024 18:09:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C7D0A4A;
+	Sat, 20 Jan 2024 00:44:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Y4hAd+3s"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="gd1zjiaQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3E2756447
-	for <kvm@vger.kernel.org>; Fri, 19 Jan 2024 18:09:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BE9039F;
+	Sat, 20 Jan 2024 00:44:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705687775; cv=none; b=csfYEc7RUi1505JoLrd3YlGr7PeoPW2/1E8iAxj6coinhbzASTRMj2N/WvW25P+hP+tUJl3fqQG85ElO+eRnoqCG6Ox0coltLIlq/y/H45t+CSVaZOWwLC+t5YBKo/znhks8nilPnWg7UOuRVuQ+Oi2RMTW2bhSud+/6slu0hR4=
+	t=1705711467; cv=none; b=HTSIh5O1WDRRGDSl4c+bcDAcwnvWFofqoUKNBaGAA5OZvV63OhshnxS/GYwwpTfB1Nk2A7IxXWkjwyLJaBkTFl9CE1teg02Evb2b+gHVYuFrfXn2c69mBaGSKYfTRlOYVzRVmm4RT6ZkHVDI6i6NOSWYLmTMYNF1JrV5X7Zt5uM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705687775; c=relaxed/simple;
-	bh=ka+tZ98I4RebCKjSaYFNELphOPWKiUktZA8UV6N1nR4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Vny5VYtWEOUp6j7ZUsvdlARffQBRB4e6x+as4BjJDmfjRcNJEYA6Dj5ZZCrqMD6Cgwp2ZAGYzGYfaDjGX2GnRQ2rS/Dii7ZTEFcPNZO/5jDwP8LxztSWGvRtApuLMYKM32l1pgT7H8BcAmum4T4r8g2h+55OXn0Ce2+UmoSALnI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Y4hAd+3s; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-559cef15db5so4028026a12.0
-        for <kvm@vger.kernel.org>; Fri, 19 Jan 2024 10:09:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1705687772; x=1706292572; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ka+tZ98I4RebCKjSaYFNELphOPWKiUktZA8UV6N1nR4=;
-        b=Y4hAd+3s236W+CRbXbaawhVl8xrFUXXnTkipUQuAdmxPGPxW+1pRV51eYF46R13ywZ
-         Qk486Xk4E4S9LS+GYn5FdiW4ocRJS94624JZFK9ejOjuNuixv36vg6YgVbVu9Bh6/6gW
-         /7gfjSrFdfQH/DWIvNd0ppO4Ixtawi/YgH5zqJVso9ewHR5LFSVNNpQHLt2cCfAq8/ni
-         x/fAYr16YIDjx9cUe3KYoz4hQx3EsdIrjCp91JyBjJ+4ss+IaXwqRI87H3nvYBxHHI9o
-         xG3ImQHCKQbnV2ai2jpO9E9FonTlFa/TSyfpUqxtcx+pLhe+Qe9mkPvXHasdSxYka8/o
-         Bc8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705687772; x=1706292572;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ka+tZ98I4RebCKjSaYFNELphOPWKiUktZA8UV6N1nR4=;
-        b=bJLCk4khhX0NRWJDlyaG8qGwOTqKOV4YmQTsePbKu9ysohbkP7CIQE/5ro9H1w6mBt
-         li10vz87JWGY9C+2NJ2KUpTAOjS9YAqx9fQm8E5Bj6Mx83W09891zrcYSIol4foOxeH8
-         +VIL0LJeOKCy5jggCNEHY/jqBY9+6ALjnPaxGA/axgck/UtfLLcbIrWznzdCbZyCX70Q
-         x8uQaA2nF10xTXM6FybyJ5G1nIuwxHnUKuucM/4XZrhtHF/ExqqkgiZK87l4VmRDmi+l
-         ez3QE9FZU6Ywjl4n2LPEL2K4Ah7eUmTVz4RnGD/Y+/WDoMm+7gmMjTFZtwX11iulBeW+
-         ZZ7w==
-X-Gm-Message-State: AOJu0YwuWkbWwEJHgrxqOzVi99twdCFy5x/8aGOB4fYOIDZGDiPEwOHA
-	kefgwuhVJMXkdNa4m6jqlEKXbKFnoyMvUSdPvaJFBFK1aarSLTJjvJ6/xeaggUS00MprNfVJzF0
-	OP8aIWIt3oITcCHg2GRbiiGo81eOsAHAaioGTnw==
-X-Google-Smtp-Source: AGHT+IH6YCYWaUoOMDt7utojgTHGk9T2jLCxk9qdIrGqALHUenS/OCV61NvN4WF17TmlRNIUHK2XlkjcdCmhWASsuu0=
-X-Received: by 2002:aa7:da43:0:b0:558:f2db:1ce7 with SMTP id
- w3-20020aa7da43000000b00558f2db1ce7mr1586459eds.12.1705687772017; Fri, 19 Jan
- 2024 10:09:32 -0800 (PST)
+	s=arc-20240116; t=1705711467; c=relaxed/simple;
+	bh=mLAwfTqW3JqPYfITefySSYIm5jxOBfJIzaZejnA2Hek=;
+	h=Date:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JWAt7ImX+Q0/KrmE1XKa7mjkt7JWNRD7MFSWQjRf2hMh5MgqaUQPmx/EqWfhof0SlsaqzIwFFWmamW4UTAZ+VvSPl8p80L2w8xLCJmvSvWksU6uL8KG5YhLncUVi+VrJmuCubZFaZ5XJi5Wfbp3f8/1nZRIpaM1ggDmkE/Wtuvg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=gd1zjiaQ; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1705711456;
+	bh=5EXJu33TqPCGL2xgGmr1B8pslMsApecSKH/SB8e0KQk=;
+	h=Date:From:Cc:Subject:In-Reply-To:References:From;
+	b=gd1zjiaQujA9BHI56crV1tmzzoTM2Bw2H+aMihqyVyYmiaL5RclU6TVkXzNM/IphG
+	 2BBJMFqiPJvSPWhAhAqCxDTMmAk7CUQCWO2GKyPweGROkN3AIojHuYS+EcRvuGCyy6
+	 Q+gpG9twBAPkdJ1J/estXqii4zlgwaCrZRsAk/9WvA1lSUzdHoZ/DHzGiKi1DoxOuX
+	 SCE+6dq+qApJduNW8b66JPI3+tyRfJcjylsQcHlv1kGJ93hW1yblC0wVBq1IoFiXAd
+	 edw+zfl8DBesIaM3k/FF5WbDPK1MzzO8HFu/8TjQ3ECpGsDHKzsa9WabQvxkYsYfQG
+	 Gj+rC253P0adg==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4TGyRM1LtBz4wx8;
+	Sat, 20 Jan 2024 11:44:15 +1100 (AEDT)
+Date: Sat, 20 Jan 2024 11:44:12 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Randy Dunlap
+ <rdunlap@infradead.org>, Huacai Chen <chenhuacai@loongson.cn>, Huacai Chen
+ <chenhuacai@kernel.org>, Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao
+ <maobibo@loongson.cn>, kvm@vger.kernel.org, loongarch@lists.linux.dev,
+ linux-kernel@vger.kernel.org, Xuerui Wang <kernel@xen0n.name>, Jiaxun Yang
+ <jiaxun.yang@flygoat.com>
+Subject: Re: [PATCH] LoongArch: KVM: Fix build due to API changes
+Message-ID: <20240120114412.2208a8c1@canb.auug.org.au>
+In-Reply-To: <20231220144024.7d9fd46b@canb.auug.org.au>
+References: <20231115090735.2404866-1-chenhuacai@loongson.cn>
+	<15ba5868-42de-4563-9903-ccd0297e2075@infradead.org>
+	<20231220144024.7d9fd46b@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240118200643.29037-1-philmd@linaro.org>
-In-Reply-To: <20240118200643.29037-1-philmd@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 19 Jan 2024 18:09:20 +0000
-Message-ID: <CAFEAcA93c0aq3wN8zXG9C8tb8JdDVOwxjQaFcs8MxPtGRDE=Rg@mail.gmail.com>
-Subject: Re: [PATCH 00/20] arm: Rework target/ headers to build various hw/
- files once
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>
-Cc: qemu-devel@nongnu.org, Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-arm@nongnu.org, 
-	Strahinja Jankovic <strahinja.p.jankovic@gmail.com>, 
-	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Igor Mammedov <imammedo@redhat.com>, 
-	=?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, 
-	Eric Auger <eric.auger@redhat.com>, Niek Linnenbank <nieklinnenbank@gmail.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jan Kiszka <jan.kiszka@web.de>, 
-	Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>, Alistair Francis <alistair@alistair23.me>, 
-	Radoslaw Biernacki <rad@semihalf.com>, Andrew Jeffery <andrew@codeconstruct.com.au>, 
-	Andrey Smirnov <andrew.smirnov@gmail.com>, Rob Herring <robh@kernel.org>, 
-	Shannon Zhao <shannon.zhaosl@gmail.com>, Tyrone Ting <kfting@nuvoton.com>, 
-	Beniamino Galvani <b.galvani@gmail.com>, Alexander Graf <agraf@csgraf.de>, 
-	Leif Lindholm <quic_llindhol@quicinc.com>, Ani Sinha <anisinha@redhat.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Jean-Christophe Dubois <jcd@tribudubois.net>, Joel Stanley <joel@jms.id.au>, 
-	Hao Wu <wuhaotsh@google.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="Sig_/Uo2ujjpjD/I=Dix6LsNA.i+";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+
+--Sig_/Uo2ujjpjD/I=Dix6LsNA.i+
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, 18 Jan 2024 at 20:06, Philippe Mathieu-Daud=C3=A9 <philmd@linaro.or=
-g> wrote:
->
-> Hi,
->
-> In order to fix a bug noticed [*] by C=C3=A9dric and Fabiano in my
-> "Remove one use of qemu_get_cpu() in A7/A15 MPCore priv" series,
-> I ended reusing commits from other branches and it grew quite
-> a lot. This is the first "cleanup" part, unrelated on MPCorePriv.
->
-> Please review,
+Hi all,
 
-Applied to target-arm.next, thanks.
+On Wed, 20 Dec 2023 14:40:24 +1100 Stephen Rothwell <sfr@canb.auug.org.au> =
+wrote:
+>
+> On Fri, 15 Dec 2023 21:08:06 -0800 Randy Dunlap <rdunlap@infradead.org> w=
+rote:
+> >
+> > Someone please merge this patch... =20
+>=20
+> I have applied it to my merge of the kvm tree today and will keep
+> applying it until it is applied to the kvm tree ...
+>=20
+> It looks like this:
+>=20
+> From: Huacai Chen <chenhuacai@loongson.cn>
+> To: Paolo Bonzini <pbonzini@redhat.com>,
+> 	Huacai Chen <chenhuacai@kernel.org>,
+> 	Tianrui Zhao <zhaotianrui@loongson.cn>,
+> 	Bibo Mao <maobibo@loongson.cn>
+> Cc: kvm@vger.kernel.org,
+> 	loongarch@lists.linux.dev,
+> 	linux-kernel@vger.kernel.org,
+> 	Xuerui Wang <kernel@xen0n.name>,
+> 	Jiaxun Yang <jiaxun.yang@flygoat.com>,
+> 	Huacai Chen <chenhuacai@loongson.cn>
+> Subject: [PATCH] LoongArch: KVM: Fix build due to API changes
+> Date: Wed, 15 Nov 2023 17:07:35 +0800
+>=20
+> Commit 8569992d64b8f750e34b7858eac ("KVM: Use gfn instead of hva for
+> mmu_notifier_retry") replaces mmu_invalidate_retry_hva() usage with
+> mmu_invalidate_retry_gfn() for X86, LoongArch also need similar changes
+> to fix build.
+>=20
+> Fixes: 8569992d64b8 ("KVM: Use gfn instead of hva for mmu_notifier_retry")
+> Signed-off-by: Huacai Chen <chenhuacai@loongson.cn>
+> Reported-by: Randy Dunlap <rdunlap@infradead.org>
+> Tested-by: Randy Dunlap <rdunlap@infradead.org> # build-tested
+> Acked-by: Randy Dunlap <rdunlap@infradead.org>
+> Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
+> ---
+>  arch/loongarch/kvm/mmu.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/arch/loongarch/kvm/mmu.c b/arch/loongarch/kvm/mmu.c
+> index 80480df5f550..9463ebecd39b 100644
+> --- a/arch/loongarch/kvm/mmu.c
+> +++ b/arch/loongarch/kvm/mmu.c
+> @@ -627,7 +627,7 @@ static bool fault_supports_huge_mapping(struct kvm_me=
+mory_slot *memslot,
+>   *
+>   * There are several ways to safely use this helper:
+>   *
+> - * - Check mmu_invalidate_retry_hva() after grabbing the mapping level, =
+before
+> + * - Check mmu_invalidate_retry_gfn() after grabbing the mapping level, =
+before
+>   *   consuming it.  In this case, mmu_lock doesn't need to be held durin=
+g the
+>   *   lookup, but it does need to be held while checking the MMU notifier.
+>   *
+> @@ -807,7 +807,7 @@ static int kvm_map_page(struct kvm_vcpu *vcpu, unsign=
+ed long gpa, bool write)
+> =20
+>  	/* Check if an invalidation has taken place since we got pfn */
+>  	spin_lock(&kvm->mmu_lock);
+> -	if (mmu_invalidate_retry_hva(kvm, mmu_seq, hva)) {
+> +	if (mmu_invalidate_retry_gfn(kvm, mmu_seq, gfn)) {
+>  		/*
+>  		 * This can happen when mappings are changed asynchronously, but
+>  		 * also synchronously if a COW is triggered by
+> --=20
+> 2.39.3
+>=20
+> Though my Signed-off-by is not necessary if it applied to the kvm tree.
 
--- PMM
+OK, so it needed to be applied to the merge commit when the loongarch
+tree was merged by Linus, but appears to have been forgotten. :-(
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/Uo2ujjpjD/I=Dix6LsNA.i+
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmWrF1wACgkQAVBC80lX
+0GznHwf+J9OteK9Y4TvrZARvcVljc/vhMzpH0IOshhkyHVBuTKd4HGZC+feioXt8
+wrw0wYaXqR6UvcOl0ZRbhpIHPjgM5nvDC/YKgmR7i7Mpf+ui7OZ3GtXiOl2VjKWN
+68beXUCalkCnl60EhVVYDHhQhzPn4nCOcfcV7iNAcUcahDHwliglktfsQHL2nB1/
+iCoxmeHjplk/LoeFpe4Vrez+bRfoPxp/xvVaWy5TbtvUpkKb90XuLxnpRyA9CkTt
+0p4BZpGbEaqMh8KLyqu9r4vLfN8pQqrQeTXbpM2Kyz5dSZfQ9hVwvWdcHU3So1lr
+QCKupRyJOOwEpP7m3icFsf7qJz9Kqg==
+=Aan9
+-----END PGP SIGNATURE-----
+
+--Sig_/Uo2ujjpjD/I=Dix6LsNA.i+--
 
