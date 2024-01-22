@@ -1,34 +1,34 @@
-Return-Path: <kvm+bounces-6580-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6582-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F3978379A6
-	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 01:44:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8634837995
+	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 01:42:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1421CB29A01
-	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 00:41:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7688128F33B
+	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 00:42:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A727C50A8B;
-	Mon, 22 Jan 2024 23:54:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B1DB5102F;
+	Mon, 22 Jan 2024 23:55:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WpMiXcCJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Mnj/zLJx"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D95C4F889;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44CFD4F897;
 	Mon, 22 Jan 2024 23:54:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705967698; cv=none; b=sc7znzbiRsRCVe0O1VtMgBzWRqaBoZnt/4eNSVRTVlBLmxdU43N4qGmmnYh2ZRCNCITpVnkX7k64h0f2M5JmvbTLX4rWneCBAkNVT8QW4e1A+IfthDDfZRNgKH3X4ea6BTC74evsZy1tz5lHtZdOq500wuW1bkssYZtW9uRJOGg=
+	t=1705967699; cv=none; b=pR2hJFoSA50l9yFeHa8ihMMm5LrzIF3efnX6JFbIMP3XARoeW0ElOe6JB+qh1aAh6D2XCug74NArWZQbL9lYL/XmhmVYUSwZtixzfsnbXN/qglxB3YqzCWPv2kxv8S8n9tmMg8d8iEVE0VucctLvdguhHz3XSsn8uOijiu4u8uI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705967698; c=relaxed/simple;
-	bh=S2Wa8bd7Tpz6POIIKRT24KexX0AuVDEX8O8T80IsTQo=;
+	s=arc-20240116; t=1705967699; c=relaxed/simple;
+	bh=E0vdis4b+ufttVkH77KTfBZATmw5lvhWlGxIIMKiLdA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=VyFWgaRa86SDDqEJdk9jS27mQSCJp+O7qbiJGzP2Nqsui4kzrHq051i+Fg3AyQlu0C+404BwTr8S3lkNXEGInXl9/x5c7Yk/DRM5lI8KWvRB5vql1u5w3wfByZcePuUkDliDMR0WKTX5vtytXgGKyoVcqWrvBLhvUnxVHSDWqaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WpMiXcCJ; arc=none smtp.client-ip=192.198.163.12
+	 MIME-Version; b=kIHCf/3jMN8WjqZJzNMqprTT7vqyPbYLubhsjvdFVTyRzbopK8+vr+4mo7CyaMnO6ZGdCYUyQ45QimGIZKB5aMEVi43vMiT4W5DeQkabx35dTC2duu87kqFSloYCMCKemDK4OMuHJfilGQpShZzbLfN2LEyMnq6QCpHbNGEF624=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Mnj/zLJx; arc=none smtp.client-ip=192.198.163.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -36,24 +36,24 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1705967697; x=1737503697;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=S2Wa8bd7Tpz6POIIKRT24KexX0AuVDEX8O8T80IsTQo=;
-  b=WpMiXcCJ3gr5C6CwYFm9/PnlH78aHLHazrphu0zOpMtzAm/Tpfk7ga+v
-   AaPQj8hmgW+zQqHwfZhE2AkUKQtJxL1E3expvsLve6Hn9OUqM/o7QLjhL
-   aIpq62HmcTIod+PpJrSRjh+hFlx4V5fLm12WxH0IoNOTBs8m6czvGWf84
-   citOC21108Ut86Zbnl+2wUlTb9mYi+H5+kXkUqtdXh2HhFRtqot13TX2h
-   07t3QiNZWHIvl2jST//qjKOh8d2ek2NZ5WYXBZ+yJBHA7IouUyReZ/ldV
-   V+ROPbQ1JYYxSmNjyXV9ibTFe7Omrx8P+0kB44iMp8DgzBwV8Rxip58TP
+  bh=E0vdis4b+ufttVkH77KTfBZATmw5lvhWlGxIIMKiLdA=;
+  b=Mnj/zLJxxX0eKLLXFuDyDzHsh6SRno1wdXTD3ugDm7YlnhSOLLiLnFNa
+   lvv9BChwGQHpJ5bJyOxjIZBMc8Bw8v0hhzXUaZrEgslanU32WV12kwkBh
+   KzPNyjtydLtkEkcA6XaKDX5x9cafhcoyqr3T0UigY7Y33CVtreTKUjW3D
+   HLZqsur/ERdFPVfSYBPC5AVZV1/8035mxpRHyKr4537gcVMwOhQHRFvd0
+   R0cd5ZBhslMG8eNWFRIRaWaJgJtcbSBX8M98AS0PjNchXejme6jYkfWu+
+   o7+fzGPfqytaK47Tqm3iQADLQDliOu9j92jAhUcdqTQMOYjmWA/p/HLhi
    Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10961"; a="1217826"
+X-IronPort-AV: E=McAfee;i="6600,9927,10961"; a="1217833"
 X-IronPort-AV: E=Sophos;i="6.05,212,1701158400"; 
-   d="scan'208";a="1217826"
+   d="scan'208";a="1217833"
 Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 15:54:55 -0800
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 15:54:56 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.05,212,1701158400"; 
-   d="scan'208";a="1350130"
+   d="scan'208";a="1350135"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 15:54:55 -0800
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 15:54:56 -0800
 From: isaku.yamahata@intel.com
 To: kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
@@ -67,9 +67,9 @@ Cc: isaku.yamahata@intel.com,
 	chen.bo@intel.com,
 	hang.yuan@intel.com,
 	tina.zhang@intel.com
-Subject: [PATCH v18 007/121] KVM: VMX: Reorder vmx initialization with kvm vendor initialization
-Date: Mon, 22 Jan 2024 15:52:43 -0800
-Message-Id: <411a0b38c1a6f420a88b51cabf16ee871d6ca80d.1705965634.git.isaku.yamahata@intel.com>
+Subject: [PATCH v18 008/121] KVM: TDX: Initialize the TDX module when loading the KVM intel kernel module
+Date: Mon, 22 Jan 2024 15:52:44 -0800
+Message-Id: <9804cc9409d6773115e70bbb3bdc4adb67234cd6.1705965634.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1705965634.git.isaku.yamahata@intel.com>
 References: <cover.1705965634.git.isaku.yamahata@intel.com>
@@ -83,107 +83,232 @@ Content-Transfer-Encoding: 8bit
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-To match vmx_exit cleanup.  Now vmx_init() is before kvm_x86_vendor_init(),
-vmx_init() can initialize loaded_vmcss_on_cpu.  Oppertunistically move it
-back into vmx_init().
+TDX requires several initialization steps for KVM to create guest TDs.
+Detect CPU feature, enable VMX (TDX is based on VMX) on all online CPUs,
+detect the TDX module availability, initialize it and disable VMX.
 
+To enable/disable VMX on all online CPUs, utilize
+vmx_hardware_enable/disable().  The method also initializes each CPU for
+TDX.  TDX requires calling a TDX initialization function per logical
+processor (LP) before the LP uses TDX.  When the CPU is becoming online,
+call the TDX LP initialization API.  If it fails to initialize TDX, refuse
+CPU online for simplicity instead of TDX avoiding the failed LP.
+
+There are several options on when to initialize the TDX module.  A.) kernel
+module loading time, B.) the first guest TD creation time.  A.) was chosen.
+With B.), a user may hit an error of the TDX initialization when trying to
+create the first guest TD.  The machine that fails to initialize the TDX
+module can't boot any guest TD further.  Such failure is undesirable and a
+surprise because the user expects that the machine can accommodate guest
+TD, but not.  So A.) is better than B.).
+
+Introduce a module parameter, kvm_intel.tdx, to explicitly enable TDX KVM
+support.  It's off by default to keep the same behavior for those who don't
+use TDX.  Implement hardware_setup method to detect TDX feature of CPU and
+initialize TDX module.
+
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
 v18:
-- move the loaded_vmcss_on_cpu initialization to vmx_init().
-- fix error path of vt_init(). by Chao and Binbin
+- Added comment in vt_hardware_enable() by Binbin.
 ---
- arch/x86/kvm/vmx/main.c    | 17 +++++++----------
- arch/x86/kvm/vmx/vmx.c     |  6 ++++--
- arch/x86/kvm/vmx/x86_ops.h |  2 --
- 3 files changed, 11 insertions(+), 14 deletions(-)
+ arch/x86/kvm/Makefile      |  1 +
+ arch/x86/kvm/vmx/main.c    | 38 ++++++++++++++++-
+ arch/x86/kvm/vmx/tdx.c     | 84 ++++++++++++++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/x86_ops.h |  8 ++++
+ 4 files changed, 129 insertions(+), 2 deletions(-)
+ create mode 100644 arch/x86/kvm/vmx/tdx.c
 
+diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
+index 274df24b647f..5b85ef84b2e9 100644
+--- a/arch/x86/kvm/Makefile
++++ b/arch/x86/kvm/Makefile
+@@ -24,6 +24,7 @@ kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
+ 
+ kvm-intel-$(CONFIG_X86_SGX_KVM)	+= vmx/sgx.o
+ kvm-intel-$(CONFIG_KVM_HYPERV)	+= vmx/hyperv.o vmx/hyperv_evmcs.o
++kvm-intel-$(CONFIG_INTEL_TDX_HOST)	+= vmx/tdx.o
+ 
+ kvm-amd-y		+= svm/svm.o svm/vmenter.o svm/pmu.o svm/nested.o svm/avic.o \
+ 			   svm/sev.o
 diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index 18cecf12c7c8..443db8ec5cd5 100644
+index 443db8ec5cd5..1e1feaacac59 100644
 --- a/arch/x86/kvm/vmx/main.c
 +++ b/arch/x86/kvm/vmx/main.c
-@@ -171,7 +171,7 @@ struct kvm_x86_init_ops vt_init_ops __initdata = {
- static int __init vt_init(void)
- {
- 	unsigned int vcpu_size, vcpu_align;
--	int cpu, r;
-+	int r;
+@@ -6,6 +6,40 @@
+ #include "nested.h"
+ #include "pmu.h"
  
- 	if (!kvm_is_vmx_supported())
- 		return -EOPNOTSUPP;
-@@ -182,18 +182,14 @@ static int __init vt_init(void)
- 	 */
- 	hv_init_evmcs();
- 
--	/* vmx_hardware_disable() accesses loaded_vmcss_on_cpu. */
--	for_each_possible_cpu(cpu)
--		INIT_LIST_HEAD(&per_cpu(loaded_vmcss_on_cpu, cpu));
--
--	r = kvm_x86_vendor_init(&vt_init_ops);
--	if (r)
--		return r;
--
- 	r = vmx_init();
- 	if (r)
- 		goto err_vmx_init;
- 
-+	r = kvm_x86_vendor_init(&vt_init_ops);
-+	if (r)
-+		goto err_vendor_init;
++static bool enable_tdx __ro_after_init;
++module_param_named(tdx, enable_tdx, bool, 0444);
 +
- 	/*
- 	 * Common KVM initialization _must_ come last, after this, /dev/kvm is
- 	 * exposed to userspace!
-@@ -207,9 +203,10 @@ static int __init vt_init(void)
- 	return 0;
++static int vt_hardware_enable(void)
++{
++	int ret;
++
++	ret = vmx_hardware_enable();
++	if (ret || !enable_tdx)
++		return ret;
++
++	ret = tdx_cpu_enable();
++	if (ret)
++		/*
++		 * In error case, we keep the CPU offline in error case.  So
++		 * need to revert VMXON.
++		 */
++		vmx_hardware_disable();
++	return ret;
++}
++
++static __init int vt_hardware_setup(void)
++{
++	int ret;
++
++	ret = vmx_hardware_setup();
++	if (ret)
++		return ret;
++
++	enable_tdx = enable_tdx && !tdx_hardware_setup(&vt_x86_ops);
++
++	return 0;
++}
++
+ #define VMX_REQUIRED_APICV_INHIBITS				\
+ 	(BIT(APICV_INHIBIT_REASON_DISABLE)|			\
+ 	 BIT(APICV_INHIBIT_REASON_ABSENT) |			\
+@@ -22,7 +56,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
  
- err_kvm_init:
-+	kvm_x86_vendor_exit();
-+err_vendor_init:
- 	vmx_exit();
- err_vmx_init:
--	kvm_x86_vendor_exit();
- 	return r;
- }
- module_init(vt_init);
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 8efb956591d5..3f4dad3acb13 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -477,7 +477,7 @@ DEFINE_PER_CPU(struct vmcs *, current_vmcs);
-  * We maintain a per-CPU linked-list of VMCS loaded on that CPU. This is needed
-  * when a CPU is brought down, and we need to VMCLEAR all VMCSs loaded on it.
-  */
--DEFINE_PER_CPU(struct list_head, loaded_vmcss_on_cpu);
-+static DEFINE_PER_CPU(struct list_head, loaded_vmcss_on_cpu);
+ 	.hardware_unsetup = vmx_hardware_unsetup,
  
- static DECLARE_BITMAP(vmx_vpid_bitmap, VMX_NR_VPIDS);
- static DEFINE_SPINLOCK(vmx_vpid_lock);
-@@ -8528,8 +8528,10 @@ int __init vmx_init(void)
- 	if (r)
- 		return r;
+-	.hardware_enable = vmx_hardware_enable,
++	.hardware_enable = vt_hardware_enable,
+ 	.hardware_disable = vmx_hardware_disable,
+ 	.has_emulated_msr = vmx_has_emulated_msr,
  
--	for_each_possible_cpu(cpu)
-+	for_each_possible_cpu(cpu) {
-+		INIT_LIST_HEAD(&per_cpu(loaded_vmcss_on_cpu, cpu));
- 		pi_init_cpu(cpu);
+@@ -161,7 +195,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ };
+ 
+ struct kvm_x86_init_ops vt_init_ops __initdata = {
+-	.hardware_setup = vmx_hardware_setup,
++	.hardware_setup = vt_hardware_setup,
+ 	.handle_intel_pt_intr = NULL,
+ 
+ 	.runtime_ops = &vt_x86_ops,
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+new file mode 100644
+index 000000000000..8a378fb6f1d4
+--- /dev/null
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -0,0 +1,84 @@
++// SPDX-License-Identifier: GPL-2.0
++#include <linux/cpu.h>
++
++#include <asm/tdx.h>
++
++#include "capabilities.h"
++#include "x86_ops.h"
++#include "x86.h"
++
++#undef pr_fmt
++#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
++
++static int __init tdx_module_setup(void)
++{
++	int ret;
++
++	ret = tdx_enable();
++	if (ret) {
++		pr_info("Failed to initialize TDX module.\n");
++		return ret;
 +	}
- 
- 	cpu_emergency_register_virt_callback(vmx_emergency_disable);
- 
++
++	return 0;
++}
++
++struct vmx_tdx_enabled {
++	cpumask_var_t vmx_enabled;
++	atomic_t err;
++};
++
++static void __init vmx_tdx_on(void *_vmx_tdx)
++{
++	struct vmx_tdx_enabled *vmx_tdx = _vmx_tdx;
++	int r;
++
++	r = vmx_hardware_enable();
++	if (!r) {
++		cpumask_set_cpu(smp_processor_id(), vmx_tdx->vmx_enabled);
++		r = tdx_cpu_enable();
++	}
++	if (r)
++		atomic_set(&vmx_tdx->err, r);
++}
++
++static void __init vmx_off(void *_vmx_enabled)
++{
++	cpumask_var_t *vmx_enabled = (cpumask_var_t *)_vmx_enabled;
++
++	if (cpumask_test_cpu(smp_processor_id(), *vmx_enabled))
++		vmx_hardware_disable();
++}
++
++int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
++{
++	struct vmx_tdx_enabled vmx_tdx = {
++		.err = ATOMIC_INIT(0),
++	};
++	int r = 0;
++
++	if (!enable_ept) {
++		pr_warn("Cannot enable TDX with EPT disabled\n");
++		return -EINVAL;
++	}
++
++	if (!zalloc_cpumask_var(&vmx_tdx.vmx_enabled, GFP_KERNEL)) {
++		r = -ENOMEM;
++		goto out;
++	}
++
++	/* tdx_enable() in tdx_module_setup() requires cpus lock. */
++	cpus_read_lock();
++	on_each_cpu(vmx_tdx_on, &vmx_tdx, true);	/* TDX requires vmxon. */
++	r = atomic_read(&vmx_tdx.err);
++	if (!r)
++		r = tdx_module_setup();
++	else
++		r = -EIO;
++	on_each_cpu(vmx_off, &vmx_tdx.vmx_enabled, true);
++	cpus_read_unlock();
++	free_cpumask_var(vmx_tdx.vmx_enabled);
++
++out:
++	return r;
++}
 diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-index b936388853ab..bca2d27b3dfd 100644
+index bca2d27b3dfd..b44cb681f74d 100644
 --- a/arch/x86/kvm/vmx/x86_ops.h
 +++ b/arch/x86/kvm/vmx/x86_ops.h
-@@ -14,8 +14,6 @@ static inline __init void hv_init_evmcs(void) {}
- static inline void hv_reset_evmcs(void) {}
- #endif /* IS_ENABLED(CONFIG_HYPERV) */
- 
--DECLARE_PER_CPU(struct list_head, loaded_vmcss_on_cpu);
--
- bool kvm_is_vmx_supported(void);
+@@ -18,6 +18,8 @@ bool kvm_is_vmx_supported(void);
  int __init vmx_init(void);
  void vmx_exit(void);
+ 
++__init int vmx_hardware_setup(void);
++
+ extern struct kvm_x86_ops vt_x86_ops __initdata;
+ extern struct kvm_x86_init_ops vt_init_ops __initdata;
+ 
+@@ -133,4 +135,10 @@ void vmx_cancel_hv_timer(struct kvm_vcpu *vcpu);
+ #endif
+ void vmx_setup_mce(struct kvm_vcpu *vcpu);
+ 
++#ifdef CONFIG_INTEL_TDX_HOST
++int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops);
++#else
++static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return -EOPNOTSUPP; }
++#endif
++
+ #endif /* __KVM_X86_VMX_X86_OPS_H */
 -- 
 2.25.1
 
