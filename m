@@ -1,34 +1,34 @@
-Return-Path: <kvm+bounces-6575-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6576-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF25D8377E0
-	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 00:55:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC40F8377E2
+	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 00:55:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7825928B02B
-	for <lists+kvm@lfdr.de>; Mon, 22 Jan 2024 23:55:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 258101F26B56
+	for <lists+kvm@lfdr.de>; Mon, 22 Jan 2024 23:55:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 403FC4F5F1;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68FE14F5FE;
 	Mon, 22 Jan 2024 23:54:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DfwPEh5h"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LuJkFLEJ"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3B544EB2E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4A314EB2F;
 	Mon, 22 Jan 2024 23:54:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705967695; cv=none; b=nq0+k7YZFXMmDZTUDKfD0hCF3EfyqrOlsLdc6/F+Fw8rKHqqsEXylBiC928nlFhbWk+MdKT9jvaL+WLnj62k0AhifpBB93U7cq5mE/U5iCjlDNvtopjZU5EQAsp7GEVVBWNGwiAfG3XLYJLlKg3/3o6GBzyYQ0liaNbB1xJBoE8=
+	t=1705967695; cv=none; b=axeBqCeMr622CE6JUMbRN4IMe5xUJOgzpLLLupuBMLkuEqHRyl0ljmb616YqXzahlnjnIdwlqchDi9jWzv+HIQWxGfaJpi+J+Ku8QINLfSUOT7poMVwFwB3Xpcz5v6ge1XvwTYj2mH1PxMQ5X4xal7XGY4OVBQwJksMpO1WHQyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1705967695; c=relaxed/simple;
-	bh=MY4i1eRsMR25nJn5OI9pQXWHMolnb8eFBdBk5/3evCo=;
+	bh=05ZsgaNAc7U+yJCBsaFYoxu/eSpKDP3oSZy/RpYWQFQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=AOrIVX8RctngUvRAgu38JMfydBUJuYrtatFwmcjdZyi+QjqRO3dq9LVugIsNoydljrtz3AQST2zl5KHwOw0qjyXQh5MBy/NeQknZrr8FuK+jdsXostIXlPuIH02xcUEWrRmrcMF44kJc9PNccRjaT5sCuwag7uHwd/r5ghExCVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DfwPEh5h; arc=none smtp.client-ip=192.198.163.12
+	 MIME-Version; b=lHK8yc4unuhVRd0d1kWo1D7Dm74DS8UpMCNDEBQLbiLeJSyQRpEFqexAlqozLV1KeLZ9p278H7nGhGdJSHIRCXjMkjrWuuSgOBA/mKN84usv5biLL1ORrD+w+Rvj5pP34zgljCNu/gGClKtlr8mkHVKzFiYqZaCGCHv1UUnYxyY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LuJkFLEJ; arc=none smtp.client-ip=192.198.163.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -36,24 +36,24 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1705967694; x=1737503694;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=MY4i1eRsMR25nJn5OI9pQXWHMolnb8eFBdBk5/3evCo=;
-  b=DfwPEh5hsidFfczzYW40SmiW8UUwZfsNoNWLm+7ztteonc+wCCtnoKoy
-   M7QxKIeMDYpzck39L9qgPnOMniSYvTXQlcrGJ2zQflJspAa1e/1dvCDFv
-   sBKQuf5n6FDYY6XAcLROysWJmQunZBlFaRP5i3NCavflcq54WbT88UM+L
-   qZ8Mox2moAr031uf830dHaKoherGz9bZ33Rdhqt67vOtQ+HL5FLlFMUSB
-   4y4diROze/DRLRSxn1TV2LcCLcpGo4NRRE3mxW21NNo/+cgiaDNgSAokF
-   /ONRV8HhCW5np819uBIAybBSq80yAwY3OS+5SUzGvQuPj9CuJ/HUhZ4Ss
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10961"; a="1217795"
+  bh=05ZsgaNAc7U+yJCBsaFYoxu/eSpKDP3oSZy/RpYWQFQ=;
+  b=LuJkFLEJJSbB1bLz642mwnRB4sIYtAWMcMPLhHoBYAwxtLAfqxSZf3iG
+   fgJHGwpWotekIxB3skQfOYER4QYLHyOwN7PVgZQ3VvO6LMOosz6ucKP4V
+   MmkI0PrFZVvM2R05tI2Iz/H/PaxGmVkLRkOl9bH64o3WDf/JOK63kUu7M
+   Q7pk5DSjxSs1h42P+6IiJ53aTjY5OL4OXAj2SqGym8J536BL58aqleRHb
+   T4wP0uM1s7R0BlLJM4CNCvGkHjMeWrmqeqsFcgBqFcSI3wWQ4wD2G+Qw2
+   /6MDnQU6x0EhPFl9Bt3dYGJ7tkQlO/5E8kBHxt3BwzLq4qd15ksdcuY9E
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10961"; a="1217799"
 X-IronPort-AV: E=Sophos;i="6.05,212,1701158400"; 
-   d="scan'208";a="1217795"
+   d="scan'208";a="1217799"
 Received: from orviesa005.jf.intel.com ([10.64.159.145])
   by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 15:54:51 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.05,212,1701158400"; 
-   d="scan'208";a="1350104"
+   d="scan'208";a="1350110"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 15:54:51 -0800
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 15:54:52 -0800
 From: isaku.yamahata@intel.com
 To: kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
@@ -67,9 +67,9 @@ Cc: isaku.yamahata@intel.com,
 	chen.bo@intel.com,
 	hang.yuan@intel.com,
 	tina.zhang@intel.com
-Subject: [PATCH v18 002/121] x86/virt/tdx: Export SEAMCALL functions
-Date: Mon, 22 Jan 2024 15:52:38 -0800
-Message-Id: <88bcf53760c42dafb14cd9a92bf4f9243f597bbe.1705965634.git.isaku.yamahata@intel.com>
+Subject: [PATCH v18 003/121] KVM: x86: Add is_vm_type_supported callback
+Date: Mon, 22 Jan 2024 15:52:39 -0800
+Message-Id: <d46b8e7cd9f2f529142b195e856f710327eb2997.1705965634.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1705965634.git.isaku.yamahata@intel.com>
 References: <cover.1705965634.git.isaku.yamahata@intel.com>
@@ -81,64 +81,170 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Kai Huang <kai.huang@intel.com>
+From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-KVM will need to make SEAMCALLs to create and run TDX guests.  Export
-SEAMCALL functions for KVM to use.
+For TDX, allow the backend can override the supported vm type.  Add
+KVM_X86_TDX_VM to reserve the bit.
 
-Also add declaration of SEAMCALL functions to <asm/asm-prototypes.h> to
-support CONFIG_MODVERSIONS=y.
+Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Signed-off-by: Kai Huang <kai.huang@intel.com>
 ---
- arch/x86/include/asm/asm-prototypes.h | 1 +
- arch/x86/virt/vmx/tdx/seamcall.S      | 4 ++++
- 2 files changed, 5 insertions(+)
+v18:
+- include into TDX KVM patch series v18
 
-diff --git a/arch/x86/include/asm/asm-prototypes.h b/arch/x86/include/asm/asm-prototypes.h
-index b1a98fa38828..0ec572ad75f1 100644
---- a/arch/x86/include/asm/asm-prototypes.h
-+++ b/arch/x86/include/asm/asm-prototypes.h
-@@ -13,6 +13,7 @@
- #include <asm/preempt.h>
- #include <asm/asm.h>
- #include <asm/gsseg.h>
-+#include <asm/tdx.h>
+Changes v3 -> v4:
+- Added KVM_X86_SNP_VM
+
+Changes v2 -> v3:
+- no change
+- didn't bother to rename KVM_X86_PROTECTED_VM to KVM_X86_SW_PROTECTED_VM
+
+Changes v1 -> v2
+- no change
+---
+ arch/x86/include/asm/kvm-x86-ops.h |  1 +
+ arch/x86/include/asm/kvm_host.h    |  1 +
+ arch/x86/include/uapi/asm/kvm.h    |  2 ++
+ arch/x86/kvm/svm/svm.c             |  7 +++++++
+ arch/x86/kvm/vmx/vmx.c             |  7 +++++++
+ arch/x86/kvm/x86.c                 | 12 +++++++++++-
+ arch/x86/kvm/x86.h                 |  2 ++
+ 7 files changed, 31 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+index 378ed944b849..e6b1763b041d 100644
+--- a/arch/x86/include/asm/kvm-x86-ops.h
++++ b/arch/x86/include/asm/kvm-x86-ops.h
+@@ -20,6 +20,7 @@ KVM_X86_OP(hardware_disable)
+ KVM_X86_OP(hardware_unsetup)
+ KVM_X86_OP(has_emulated_msr)
+ KVM_X86_OP(vcpu_after_set_cpuid)
++KVM_X86_OP(is_vm_type_supported)
+ KVM_X86_OP(vm_init)
+ KVM_X86_OP_OPTIONAL(vm_destroy)
+ KVM_X86_OP_OPTIONAL_RET0(vcpu_precreate)
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 8011bc668d79..26f4668b0273 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1601,6 +1601,7 @@ struct kvm_x86_ops {
+ 	bool (*has_emulated_msr)(struct kvm *kvm, u32 index);
+ 	void (*vcpu_after_set_cpuid)(struct kvm_vcpu *vcpu);
  
- #ifndef CONFIG_X86_CMPXCHG64
- extern void cmpxchg8b_emu(void);
-diff --git a/arch/x86/virt/vmx/tdx/seamcall.S b/arch/x86/virt/vmx/tdx/seamcall.S
-index 5b1f2286aea9..e32cf82ed47e 100644
---- a/arch/x86/virt/vmx/tdx/seamcall.S
-+++ b/arch/x86/virt/vmx/tdx/seamcall.S
-@@ -1,5 +1,6 @@
- /* SPDX-License-Identifier: GPL-2.0 */
- #include <linux/linkage.h>
-+#include <linux/export.h>
- #include <asm/frame.h>
++	bool (*is_vm_type_supported)(unsigned long vm_type);
+ 	unsigned int vm_size;
+ 	int (*vm_init)(struct kvm *kvm);
+ 	void (*vm_destroy)(struct kvm *kvm);
+diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+index a448d0964fc0..aa7a56a47564 100644
+--- a/arch/x86/include/uapi/asm/kvm.h
++++ b/arch/x86/include/uapi/asm/kvm.h
+@@ -564,5 +564,7 @@ struct kvm_pmu_event_filter {
  
- #include "tdxcall.S"
-@@ -21,6 +22,7 @@
- SYM_FUNC_START(__seamcall)
- 	TDX_MODULE_CALL host=1
- SYM_FUNC_END(__seamcall)
-+EXPORT_SYMBOL_GPL(__seamcall);
+ #define KVM_X86_DEFAULT_VM	0
+ #define KVM_X86_SW_PROTECTED_VM	1
++#define KVM_X86_TDX_VM		2
++#define KVM_X86_SNP_VM		3
  
- /*
-  * __seamcall_ret() - Host-side interface functions to SEAM software
-@@ -40,6 +42,7 @@ SYM_FUNC_END(__seamcall)
- SYM_FUNC_START(__seamcall_ret)
- 	TDX_MODULE_CALL host=1 ret=1
- SYM_FUNC_END(__seamcall_ret)
-+EXPORT_SYMBOL_GPL(__seamcall_ret);
+ #endif /* _ASM_X86_KVM_H */
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index e90b429c84f1..f76dd52d29ba 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -4886,6 +4886,12 @@ static void svm_vm_destroy(struct kvm *kvm)
+ 	sev_vm_destroy(kvm);
+ }
  
- /*
-  * __seamcall_saved_ret() - Host-side interface functions to SEAM software
-@@ -59,3 +62,4 @@ SYM_FUNC_END(__seamcall_ret)
- SYM_FUNC_START(__seamcall_saved_ret)
- 	TDX_MODULE_CALL host=1 ret=1 saved=1
- SYM_FUNC_END(__seamcall_saved_ret)
-+EXPORT_SYMBOL_GPL(__seamcall_saved_ret);
++static bool svm_is_vm_type_supported(unsigned long type)
++{
++	/* FIXME: Check if CPU is capable of SEV-SNP. */
++	return __kvm_is_vm_type_supported(type);
++}
++
+ static int svm_vm_init(struct kvm *kvm)
+ {
+ 	if (!pause_filter_count || !pause_filter_thresh)
+@@ -4914,6 +4920,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+ 	.vcpu_free = svm_vcpu_free,
+ 	.vcpu_reset = svm_vcpu_reset,
+ 
++	.is_vm_type_supported = svm_is_vm_type_supported,
+ 	.vm_size = sizeof(struct kvm_svm),
+ 	.vm_init = svm_vm_init,
+ 	.vm_destroy = svm_vm_destroy,
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index e262bc2ba4e5..8fad7bba6d5f 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7541,6 +7541,12 @@ static int vmx_vcpu_create(struct kvm_vcpu *vcpu)
+ 	return err;
+ }
+ 
++static bool vmx_is_vm_type_supported(unsigned long type)
++{
++	/* TODO: Check if TDX is supported. */
++	return __kvm_is_vm_type_supported(type);
++}
++
+ #define L1TF_MSG_SMT "L1TF CPU bug present and SMT on, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.\n"
+ #define L1TF_MSG_L1D "L1TF CPU bug present and virtualization mitigation disabled, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.\n"
+ 
+@@ -8263,6 +8269,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
+ 	.hardware_disable = vmx_hardware_disable,
+ 	.has_emulated_msr = vmx_has_emulated_msr,
+ 
++	.is_vm_type_supported = vmx_is_vm_type_supported,
+ 	.vm_size = sizeof(struct kvm_vmx),
+ 	.vm_init = vmx_vm_init,
+ 	.vm_destroy = vmx_vm_destroy,
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 363b1c080205..1b1045dc8e7a 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -4577,12 +4577,18 @@ static int kvm_ioctl_get_supported_hv_cpuid(struct kvm_vcpu *vcpu,
+ }
+ #endif
+ 
+-static bool kvm_is_vm_type_supported(unsigned long type)
++bool __kvm_is_vm_type_supported(unsigned long type)
+ {
+ 	return type == KVM_X86_DEFAULT_VM ||
+ 	       (type == KVM_X86_SW_PROTECTED_VM &&
+ 		IS_ENABLED(CONFIG_KVM_SW_PROTECTED_VM) && tdp_enabled);
+ }
++EXPORT_SYMBOL_GPL(__kvm_is_vm_type_supported);
++
++static bool kvm_is_vm_type_supported(unsigned long type)
++{
++	return static_call(kvm_x86_is_vm_type_supported)(type);
++}
+ 
+ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ {
+@@ -4784,6 +4790,10 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 		r = BIT(KVM_X86_DEFAULT_VM);
+ 		if (kvm_is_vm_type_supported(KVM_X86_SW_PROTECTED_VM))
+ 			r |= BIT(KVM_X86_SW_PROTECTED_VM);
++		if (kvm_is_vm_type_supported(KVM_X86_TDX_VM))
++			r |= BIT(KVM_X86_TDX_VM);
++		if (kvm_is_vm_type_supported(KVM_X86_SNP_VM))
++			r |= BIT(KVM_X86_SNP_VM);
+ 		break;
+ 	default:
+ 		break;
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index 2f7e19166658..4e40c23d66ed 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -9,6 +9,8 @@
+ #include "kvm_cache_regs.h"
+ #include "kvm_emulate.h"
+ 
++bool __kvm_is_vm_type_supported(unsigned long type);
++
+ struct kvm_caps {
+ 	/* control of guest tsc rate supported? */
+ 	bool has_tsc_control;
 -- 
 2.25.1
 
