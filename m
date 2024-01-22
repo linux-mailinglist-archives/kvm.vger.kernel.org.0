@@ -1,34 +1,34 @@
-Return-Path: <kvm+bounces-6683-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6684-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86121837873
-	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 01:19:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6410E837875
+	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 01:19:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B99111C26921
-	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 00:19:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 04C601F22A25
+	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 00:19:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 709207FBCA;
-	Mon, 22 Jan 2024 23:56:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C1FD80051;
+	Mon, 22 Jan 2024 23:56:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WMtblFXD"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZLpk6URk"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C495A7E783;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C467F7E782;
 	Mon, 22 Jan 2024 23:56:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.55.52.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705967772; cv=none; b=CR2Sf75HkPkhh5I8VFzBe7mHp8jCyRXmh8irpqJ5UMwX22Yu4R7xYslSyPtm+fyWYnZmYR8MWBUzAYmXy9i+u9M5wOZBj5F3V9wXswu1Y/BXRFfR4VB+tFgw/0fIS7dAl5odxmxHbrwCTo8Nm5yCyjb3CuVKNg5tr5HX8AMbiFA=
+	t=1705967773; cv=none; b=aKhjqHtxVMPVZwePH3TBOajgsJsKI6EdXqVJ6LZE9R9eI+56mcpH7rKTFk9Lz7JUhbAl4oYE5ZqFGOqULFrJc39R4e+TGC+iQWswI7hjptnSfL5vyw/KmAIoE+U5RguZF+OoREpqFCX/eu2MmpD3HUH9pEFnJwtgR6bUOmgc7ck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705967772; c=relaxed/simple;
-	bh=fWkG+QnbDV5OyHOrKYrSw9rXQ9AWwBja2tgCFwvWsXs=;
+	s=arc-20240116; t=1705967773; c=relaxed/simple;
+	bh=b4HChfS3CX9Tl5Kt2Ghy8PbdVyNqBLVx0mpCgM8SJc0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=kX7gYwbAawW4Iw2tWgnee2ix3tZU/waLrlaf0IzRZrb1nDsHR0fHuqx2StfiQJyqsGrakGLnf9Q2h6NQ0BZNoDqhHaecHAYcTgg95FeK2pczSO/lfBMdsu3vVwFAK4ct4vE8T1mpk6abM/ecc51IZamExs81c0C+T7Z5nBSd9u0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WMtblFXD; arc=none smtp.client-ip=192.55.52.120
+	 MIME-Version; b=nRU3O/oBX/hgNE6e6hoKUT0M8wv4lrVhQvIzmg5CkMy5DHKMTsgxZpYr9d1rbW/3HloFZ1gFbJtIQG05kMcB+Ti9Kpn8PmWxnT4tAjR8wMvJAuDOOURHWqSsYdSkunF7yAoyebfa/cxiP0Am+8G7OwsKtE2zQS/cfCYjkTF6HaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZLpk6URk; arc=none smtp.client-ip=192.55.52.120
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -36,24 +36,24 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1705967770; x=1737503770;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=fWkG+QnbDV5OyHOrKYrSw9rXQ9AWwBja2tgCFwvWsXs=;
-  b=WMtblFXDu28kZEZxZg1whk5O1amcW58/5UBqI34VyzyUeGH0ubtRfPCW
-   /8TEiL7JH8xdTbYTrqtTMoxbfS7Rnr1yGO2epkVmjLsARmXuh5KjO0uB7
-   3pGTVCDdQzigvnmY95yhCJCRi9hV0gIbMJs8gsAcnUFEQmxlvgYTfaD8y
-   Bgm8mpjRaYxXYpJQKl5YmqVFKYgzloetnb4wbC/yo5rS/8aFwkdhmB43r
-   f+b1HX7QOczKA5KwDef6WY3CHaG6/VcCMAApRfSYC/WyhV/EoXaSrR1SF
-   Ai38Poq8JR/ja5uKRDC5bMRoSaWHQzzrzIlkktj27bJolybHBgPiK8dVq
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10961"; a="400217917"
+  bh=b4HChfS3CX9Tl5Kt2Ghy8PbdVyNqBLVx0mpCgM8SJc0=;
+  b=ZLpk6URk9lVRrpt9ubH0HngVuyMHnPCTwZ3TX8boQt7rABAX5efrtN2F
+   fEoEVKa+45tYRjzANhKnNz9wBSL8lqscZ7BDOgdTuSt0YUKfE8fYFlQbx
+   YawNBbifUy4ro8IkfpxiPb1kiubNWceOumdKmJ1nJtHf1UA/F095+ll9z
+   awnLbrPLBpEH9a0sGPFBhpBVyMBt0qXFMHNRG2IJg+Fh/NhiwanYVQaFD
+   e7KbGZy8JrCJn/d+CtFyeZ81DwqqHdTWis7gafFevF2eDbKEITTgUgnV4
+   XhUlkDf2XgxZOcEXHQkHe8twiQFTTN3WN5qcDsnbzkJE5BRZVJXgLLE5J
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10961"; a="400217921"
 X-IronPort-AV: E=Sophos;i="6.05,212,1701158400"; 
-   d="scan'208";a="400217917"
+   d="scan'208";a="400217921"
 Received: from fmviesa001.fm.intel.com ([10.60.135.141])
   by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 15:55:56 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.05,212,1701158400"; 
-   d="scan'208";a="27818011"
+   d="scan'208";a="27818014"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 15:55:55 -0800
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 15:55:56 -0800
 From: isaku.yamahata@intel.com
 To: kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
@@ -67,9 +67,9 @@ Cc: isaku.yamahata@intel.com,
 	chen.bo@intel.com,
 	hang.yuan@intel.com,
 	tina.zhang@intel.com
-Subject: [PATCH v18 108/121] KVM: TDX: Add methods to ignore guest instruction emulation
-Date: Mon, 22 Jan 2024 15:54:24 -0800
-Message-Id: <a05c85cf4bb9c75becb1ef0606823f540570e205.1705965635.git.isaku.yamahata@intel.com>
+Subject: [PATCH v18 109/121] KVM: TDX: Add a method to ignore dirty logging
+Date: Mon, 22 Jan 2024 15:54:25 -0800
+Message-Id: <d843f2cb62a2ffa2631dce9afa47e53707424551.1705965635.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1705965634.git.isaku.yamahata@intel.com>
 References: <cover.1705965634.git.isaku.yamahata@intel.com>
@@ -83,67 +83,42 @@ Content-Transfer-Encoding: 8bit
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Because TDX protects TDX guest state from VMM, instructions in guest memory
-cannot be emulated.  Implement methods to ignore guest instruction
-emulator.
+Currently TDX KVM doesn't support tracking dirty pages (yet).  Implement a
+method to ignore it.  Because the flag for kvm memory slot to enable dirty
+logging isn't accepted for TDX, warn on the method is called for TDX.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/vmx/main.c | 28 ++++++++++++++++++++++++++--
- 1 file changed, 26 insertions(+), 2 deletions(-)
+ arch/x86/kvm/vmx/main.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index 335b94301e2a..420c68330e61 100644
+index 420c68330e61..c9f72c383eee 100644
 --- a/arch/x86/kvm/vmx/main.c
 +++ b/arch/x86/kvm/vmx/main.c
-@@ -335,6 +335,30 @@ static void vt_enable_smi_window(struct kvm_vcpu *vcpu)
+@@ -847,6 +847,14 @@ static u8 vt_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
+ 	return vmx_get_mt_mask(vcpu, gfn, is_mmio);
  }
- #endif
  
-+static int vt_check_emulate_instruction(struct kvm_vcpu *vcpu, int emul_type,
-+					void *insn, int insn_len)
++static void vt_update_cpu_dirty_logging(struct kvm_vcpu *vcpu)
 +{
-+	if (is_td_vcpu(vcpu))
-+		return X86EMUL_RETRY_INSTR;
-+
-+	return vmx_check_emulate_instruction(vcpu, emul_type, insn, insn_len);
-+}
-+
-+static int vt_check_intercept(struct kvm_vcpu *vcpu,
-+				 struct x86_instruction_info *info,
-+				 enum x86_intercept_stage stage,
-+				 struct x86_exception *exception)
-+{
-+	/*
-+	 * This call back is triggered by the x86 instruction emulator. TDX
-+	 * doesn't allow guest memory inspection.
-+	 */
 +	if (KVM_BUG_ON(is_td_vcpu(vcpu), vcpu->kvm))
-+		return X86EMUL_UNHANDLEABLE;
++		return;
 +
-+	return vmx_check_intercept(vcpu, info, stage, exception);
++	vmx_update_cpu_dirty_logging(vcpu);
 +}
 +
- static bool vt_apic_init_signal_blocked(struct kvm_vcpu *vcpu)
+ static int vt_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
  {
- 	if (is_td_vcpu(vcpu))
-@@ -958,7 +982,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	if (!is_td(kvm))
+@@ -990,7 +998,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.sched_in = vt_sched_in,
  
- 	.load_mmu_pgd = vt_load_mmu_pgd,
+ 	.cpu_dirty_log_size = PML_ENTITY_NUM,
+-	.update_cpu_dirty_logging = vmx_update_cpu_dirty_logging,
++	.update_cpu_dirty_logging = vt_update_cpu_dirty_logging,
  
--	.check_intercept = vmx_check_intercept,
-+	.check_intercept = vt_check_intercept,
- 	.handle_exit_irqoff = vt_handle_exit_irqoff,
- 
- 	.request_immediate_exit = vt_request_immediate_exit,
-@@ -987,7 +1011,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- 	.enable_smi_window = vt_enable_smi_window,
- #endif
- 
--	.check_emulate_instruction = vmx_check_emulate_instruction,
-+	.check_emulate_instruction = vt_check_emulate_instruction,
- 	.apic_init_signal_blocked = vt_apic_init_signal_blocked,
- 	.migrate_timers = vmx_migrate_timers,
+ 	.nested_ops = &vmx_nested_ops,
  
 -- 
 2.25.1
