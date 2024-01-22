@@ -1,152 +1,165 @@
-Return-Path: <kvm+bounces-6570-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6571-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 640AC836EBC
-	for <lists+kvm@lfdr.de>; Mon, 22 Jan 2024 19:01:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68AB28372B2
+	for <lists+kvm@lfdr.de>; Mon, 22 Jan 2024 20:36:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4CA38B29186
-	for <lists+kvm@lfdr.de>; Mon, 22 Jan 2024 17:23:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B2EB1C26F05
+	for <lists+kvm@lfdr.de>; Mon, 22 Jan 2024 19:36:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06FEE54BE5;
-	Mon, 22 Jan 2024 16:25:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DA613F8EE;
+	Mon, 22 Jan 2024 19:36:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="bi+v3KXA"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="VuewseJL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2071.outbound.protection.outlook.com [40.107.244.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C08E254663;
-	Mon, 22 Jan 2024 16:25:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705940739; cv=none; b=auynNEIuiZ5ttqdiIz+aK1WMDNmN24X0wyv5HuEh5Pbj3CCz7cUaoEpwaLfQkki9d12UliCEq6Ys7DflajqpiXzwwkp2Wu4wy8jUlK8JQH5h6LzY70Y0YxgQx2Ykr0yh6spg95jMzQdB0ycZ21NBok74zGQPBxiAMA9DSN8ZOYI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705940739; c=relaxed/simple;
-	bh=GXfpiZy75DQjR//caZM/AN4ckEsyL2pXpAfiknNV99w=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hxFuyWvywDeG4Lu+TO63ekKxPYhBy9G0bUmydz/IXtKEvnuakXHGZwy2NY0iSHxopbT2InBTmuUNHRTeEiqDHC7Y51CK0U1ro97N71iB2QMYrPTYk4wdZyAmUX+9ly1yR7SXYG7PA0V8zdHk7FVgyanuv4JW77CGYlvwjMvzJbg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=bi+v3KXA; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40MGOUFT014744;
-	Mon, 22 Jan 2024 16:25:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : content-transfer-encoding
- : mime-version; s=pp1; bh=pcbyBJfYRoPozlsdcR2+q6C9REjLiGGGvZ0jXXJvEEs=;
- b=bi+v3KXAmAMPuas+Hg0S6KycquuGy/nAmFZilBAKjJWJPRAiDJSD+yZSPMgz3rX24S2A
- RxCWmLHgkpemdu/1VaNQgAYyoKjjBZ/OmNcV+foBVehb1bCbFswZRnLJlTd4Nrputmrq
- jkZ0C6jFFn2Ia8mbsxd319p3+EdM9QCKggaMOOE5mVSorWpSRa0A7IQwqXSawO2smvhh
- HIhCqkFuNvTg7UoeLPfgJ7b/1uCuKGbHgjlrVXxhxJoNkpXpitqPBDdJ5zXTX0OlGUlK
- GkoyTtMnkZ6CF6GBaIiaI1uqSyfhoue5AZa8dyRhfMjTO1dioxpqqKQkRD5RJrpVx9Xh uw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vstjtu1ax-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 22 Jan 2024 16:25:36 +0000
-Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 40MGP2nJ018511;
-	Mon, 22 Jan 2024 16:25:36 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vstjtu19p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 22 Jan 2024 16:25:36 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 40MG3Cxu025892;
-	Mon, 22 Jan 2024 16:25:34 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3vrsgnsshu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 22 Jan 2024 16:25:34 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 40MGPV2Q41812592
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 22 Jan 2024 16:25:31 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0A7B320043;
-	Mon, 22 Jan 2024 16:25:31 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8F9A320040;
-	Mon, 22 Jan 2024 16:25:30 +0000 (GMT)
-Received: from li-9fd7f64c-3205-11b2-a85c-df942b00d78d.ibm.com.com (unknown [9.171.78.16])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 22 Jan 2024 16:25:30 +0000 (GMT)
-From: Janosch Frank <frankja@linux.ibm.com>
-To: pbonzini@redhat.com
-Cc: kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
-        borntraeger@linux.ibm.com, cohuck@redhat.com,
-        linux-s390@vger.kernel.org, imbrenda@linux.ibm.com
-Subject: [GIT PULL 2/2] KVM: s390: fix cc for successful PQAP
-Date: Mon, 22 Jan 2024 17:22:31 +0100
-Message-ID: <20240122162445.107260-3-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240122162445.107260-1-frankja@linux.ibm.com>
-References: <20240122162445.107260-1-frankja@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 4S5hFnxMaOQHeUumhKdyUDKXYw65E6Zt
-X-Proofpoint-GUID: g2u_ia_O3cBsUcaxWIjknEjjbr-p_J4V
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3417D3EA8E;
+	Mon, 22 Jan 2024 19:36:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.71
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1705952188; cv=fail; b=s3jm/7mPDJ3Uri0pjElKzPQ/KPkcaLXsgSi7GPlIeXJ/nXtdptyo80m/4PJQmqBJ6ZJ16vXaM1xB4jLkLQ2twrPTqyBjCU0o0v48Svtkzmr+RQDSnfu2gSlxKN5wPbpVTlzGazINVEgmZJEww/Vx1ggagUcPVO+vf/arT5T8ZUc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1705952188; c=relaxed/simple;
+	bh=EiwLJiONOjICkONn6vC6zd+LFeXkuIinHMZuV4Xz9/c=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WvdYBk+Jicx2f8l/Epv65CfrL9VHigQyVZm3+Aahm+ewgh3usC0IEjF5hu/f4euTBgnWU1GFSv6YY+c8hpHIQzxOcFs7M/jZdD7Y5lLwbfYWN1IdDmYjGitpekptdZgOskueXF45bNVLxK4OwEn4nYFoQD0aOjk1QwIdlVuMxug=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=VuewseJL; arc=fail smtp.client-ip=40.107.244.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GkZLJbXCrIDNJ+BgRjeylsM4SfKTmRjwf8H45Fff7w5nXK1BPYNws6asRKi/NXLIjMv/WxZMAFTTBVh5r+Q8CLljUdDsJourCuk8ah3eK3bZy4ywzZxkozyC7xPuAlUoo/JIPwHzwEL776ZDTZOXpOqWwAqpf3qDTK9os8zwMCUCqdfzV1dVNkxyJJz38rVFNtPJg26I0tgeQaKp/dvKdohiiLLdNh3F/fDloH3qfGC9px3FbfF0OBTW4wbs947RKsDIzrRaBrqTc6ucms2GXv0RUdiIaISnYHe7hUnv30+5bgKY1qN3ut3xqqBs+ICf/PHW/RadkQzCFgQRYZySZw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9J67aKMrNnialZKW5vkCL4VA8MOc58CJ1I61ltEVCCw=;
+ b=CIXN9uCfiOLuWgNhmtgKHJZGW21SKpQZ5I7C1KYhLpH8QW7plG3xyfdpZjh9UGmQDGZQ4SuNTuBw1Z+04MJYOm4yqgjPfQkm7alI5letSIK3khSRd03xeqYGupZuL4y8ORyisrAr0x55tA3pamsEYZVauSpuGk5+NmhnPjXBE2euou/6v55A9oQ75NeKNj/UxW8XCsWJ1Xef4v+SYR8tVjActmezUp/2ZJUSGl2ZoplxwD/Cj4ia/iFI2I9XqF9YdCDMocEvZTNJNgzwku7+Lh2z1X7s8iYeBi+6lPh5A+Xk7RKEOZUROCbqMDvJK6SZ8TWASI7j5Ph81cdL6nEa1w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9J67aKMrNnialZKW5vkCL4VA8MOc58CJ1I61ltEVCCw=;
+ b=VuewseJL6qwwskg0YUIun7Ze81kEoIiBv189XpIOyaw4S2lU44l+9GbjS8G3kQB2xdwfqrxGHMPFDNodh/Yv2K8Nmxe2Np6RsFTsjUSTq8XeLzu2HoMQAdKfyIcE144q0M/5L7ji2mmSom4b8PSghs1K14Mai58pm5zwLDYalDI=
+Received: from DS7PR06CA0006.namprd06.prod.outlook.com (2603:10b6:8:2a::7) by
+ SJ1PR12MB6148.namprd12.prod.outlook.com (2603:10b6:a03:459::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7202.31; Mon, 22 Jan 2024 19:36:23 +0000
+Received: from CY4PEPF0000EE30.namprd05.prod.outlook.com
+ (2603:10b6:8:2a:cafe::b2) by DS7PR06CA0006.outlook.office365.com
+ (2603:10b6:8:2a::7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.32 via Frontend
+ Transport; Mon, 22 Jan 2024 19:36:23 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CY4PEPF0000EE30.mail.protection.outlook.com (10.167.242.36) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7202.16 via Frontend Transport; Mon, 22 Jan 2024 19:36:23 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Mon, 22 Jan
+ 2024 13:36:22 -0600
+Date: Mon, 22 Jan 2024 13:36:05 -0600
+From: Michael Roth <michael.roth@amd.com>
+To: Sean Christopherson <seanjc@google.com>
+CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Jason Gunthorpe
+	<jgg@nvidia.com>, Yan Zhao <yan.y.zhao@intel.com>, David Matlack
+	<dmatlack@google.com>, <pbonzini@redhat.com>, <isaku.yamahata@intel.com>
+Subject: Re: [ANNOUNCE] PUCK Agenda - 2024.01.17 - TDP MMU for IOMMU
+Message-ID: <20240122193605.7riyd7q5rs2i4xez@amd.com>
+References: <20240117010644.1534332-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-22_07,2024-01-22_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=859
- impostorscore=0 phishscore=0 adultscore=0 lowpriorityscore=0 spamscore=0
- mlxscore=0 bulkscore=0 suspectscore=0 clxscore=1015 malwarescore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2401220112
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240117010644.1534332-1-seanjc@google.com>
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE30:EE_|SJ1PR12MB6148:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7c5c9863-af1e-4a13-f14e-08dc1b816aac
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	g0SzN631iC5F1hX9DTd6JfqacufXRkD/bSrtiY/t0T1anYkUbfOXQbVxtCGCe9ZarTt/tZkWSYt3M530XD8LrVlCtoe0Yofrl8VtnpjKG1RYOAW/cVb5dLXD3SmiRVf+1g6dO4NNtbA4C9VhOsQy5Qu1UfMjPMbX8fM38asMLx6pkepcjd5YJ70A2wXVh3CownzUJ8+owebi5GqfCVpB1MLrLngVVbw+85pXNwyDa7qYYlfyxmeSM8a8hTNdEEsr6sUeE1iSSv3w24Hjg9URhQRdcyToBGp7Dm7GtFdZszmAgr+Av7gN95omysM1xXu4sJ5JN8wVbk3a0ytKWH+gZ0Ybmos1R+7D4/p+IBTCPR0alic0tH1YPEy8Hszk405uH5pO3sG1pASUVfIicA+8uI/YijG8oOwQ3LCP8NThChFMPNmsC3TabAatjyn4Xy0K82QwyxT5mZqJjelp/0PK7IU+ea060ze+xyjK64qfdwrkrzEBijx3/EL8DLjaqnU+nqlDbI1rLNCVYhGjSqrLLjsOBxyQVpmYtL4PDRP1Ra6p9pgKPdlUiua5VRAwZ+FclcaT1H6/ZIZhKX3qCCNdUR28dHvbpJ4vMXbQ/2EKO7/Aw/lXrexGcBnZMbkMlVVt2veGIIIE/OE/Si5b62+5e5+Kc+MV3nypqpXcPaNxsUvaMRzJrmxRTnDcNiNv3d1cKjEqJu7CxU/vU0YGBo0gvdkQP9QlTzXvKYOfBFuaUSlVMchK0epbjb7scA7Cgqoa90kR6RUPvInPfusGQ3+BW9vwc/BoMHMT518VI1hO8/H47Wdy0Djl5mBINIBJBDsyAJqW3rfZ26Bj/pRrRt1sYA==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(376002)(346002)(39860400002)(396003)(136003)(230922051799003)(186009)(64100799003)(1800799012)(82310400011)(451199024)(40470700004)(46966006)(36840700001)(40480700001)(40460700003)(5930299018)(26005)(1076003)(36860700001)(66574015)(2616005)(426003)(336012)(16526019)(81166007)(356005)(36756003)(82740400003)(83380400001)(86362001)(6666004)(8676002)(4326008)(5660300002)(8936002)(2906002)(47076005)(966005)(316002)(41300700001)(44832011)(478600001)(6916009)(70586007)(70206006)(54906003)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jan 2024 19:36:23.2811
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7c5c9863-af1e-4a13-f14e-08dc1b816aac
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000EE30.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6148
 
-From: Eric Farman <farman@linux.ibm.com>
+On Tue, Jan 16, 2024 at 05:06:44PM -0800, Sean Christopherson wrote:
+> Tomorrow's PUCK topic is utilizing KVM's TDP MMU for IOMMU page tables.
+> 
+> FYI, I am currently without my normal internet (hooray tethering), and we're
+> supposed to get a healthy dose of freezing rain tonight, i.e. I might lose power
+> too.  I expect to be able to join even if that happens, but I apologize in
+> advance if I end up being a no-show.
+> 
+> https://lore.kernel.org/all/20231202091211.13376-1-yan.y.zhao@intel.com
+> 
+> Time:     6am PDT
+> Video:    https://meet.google.com/vdb-aeqo-knk
+> Phone:    https://tel.meet/vdb-aeqo-knk?pin=3003112178656
+> 
+> Calendar: https://calendar.google.com/calendar/u/0?cid=Y182MWE1YjFmNjQ0NzM5YmY1YmVkN2U1ZWE1ZmMzNjY5Y2UzMmEyNTQ0YzVkYjFjN2M4OTE3MDJjYTUwOTBjN2Q1QGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20
+> Drive:    https://drive.google.com/drive/folders/1aTqCrvTsQI9T4qLhhLs_l986SngGlhPH?resourcekey=0-FDy0ykM3RerZedI8R-zj4A&usp=drive_link
+> 
+> Future Schedule:
+> January 24th - Memtypes for non-coherent DMA
+> January 31st - Available!
 
-The various errors that are possible when processing a PQAP
-instruction (the absence of a driver hook, an error FROM that
-hook), all correctly set the PSW condition code to 3. But if
-that processing works successfully, CC0 needs to be set to
-convey that everything was fine.
+Hi Sean,
 
-Fix the check so that the guest can examine the condition code
-to determine whether GPR1 has meaningful data.
+I'd like to propose the following topic for the next available slot:
 
-Fixes: e5282de93105 ("s390: ap: kvm: add PQAP interception for AQIC")
-Signed-off-by: Eric Farman <farman@linux.ibm.com>
-Reviewed-by: Tony Krowiak <akrowiak@linux.ibm.com>
-Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
-Link: https://lore.kernel.org/r/20231201181657.1614645-1-farman@linux.ibm.com
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Message-Id: <20231201181657.1614645-1-farman@linux.ibm.com>
-Signed-off-by: Christian Borntraeger <borntraeger@linux.ibm.com>
----
- arch/s390/kvm/priv.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+  "Finalizing internal guest_memfd APIs needed for SNP (TDX?) upstreaming"
 
-diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
-index 621a17fd1a1b..f875a404a0a0 100644
---- a/arch/s390/kvm/priv.c
-+++ b/arch/s390/kvm/priv.c
-@@ -676,8 +676,12 @@ static int handle_pqap(struct kvm_vcpu *vcpu)
- 	if (vcpu->kvm->arch.crypto.pqap_hook) {
- 		pqap_hook = *vcpu->kvm->arch.crypto.pqap_hook;
- 		ret = pqap_hook(vcpu);
--		if (!ret && vcpu->run->s.regs.gprs[1] & 0x00ff0000)
--			kvm_s390_set_psw_cc(vcpu, 3);
-+		if (!ret) {
-+			if (vcpu->run->s.regs.gprs[1] & 0x00ff0000)
-+				kvm_s390_set_psw_cc(vcpu, 3);
-+			else
-+				kvm_s390_set_psw_cc(vcpu, 0);
-+		}
- 		up_read(&vcpu->kvm->arch.crypto.pqap_hook_rwsem);
- 		return ret;
- 	}
--- 
-2.43.0
+There's 2 existing interfaces, gmem_prepare, gmem_invalidate, that are
+needed by the current SNP patches, and there's some additional background
+about the design decisions here:
 
+  https://lore.kernel.org/kvm/20231016115028.996656-1-michael.roth@amd.com/
+
+There's also another gmem interface that you recently proposed for handling
+setting up the initial launch image of SNP guests here that seems like it
+would have a lot of potential overlap with how gmem_prepare is implemented:
+
+  https://lore.kernel.org/lkml/ZZ67oJwzAsSvui5U@google.com/
+
+I'd like to try to get some clarity on what these should look like in order
+to be considered acceptable for upstreaming of SNP, and potentially any
+considerations that need to be taken into account for other users like
+TDX/pKVM/etc.
+
+Thanks,
+
+Mike
+
+> February     - Available!
+> 
 
