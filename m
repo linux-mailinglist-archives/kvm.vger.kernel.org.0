@@ -1,34 +1,34 @@
-Return-Path: <kvm+bounces-6603-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6604-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B39D83799F
-	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 01:43:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B04883796F
+	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 01:39:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 296A9281B1A
-	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 00:43:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E11BD1F27D71
+	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 00:39:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 703F75D741;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 870215D745;
 	Mon, 22 Jan 2024 23:55:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZvflswwI"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ya2UD6q7"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1F0F5BAFE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F09455C5EE;
 	Mon, 22 Jan 2024 23:55:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705967720; cv=none; b=Jj1HrWKC61AXQabrHZytlmwxFys9Vxyl3gPlLVBCX+lbfjiMuGvHQ6W4TxRpgHBFqqhYgQKwbMvK+jtxJWIxSng8Zi6wTOKvZyGYIoK8fePG0wo90Xcz8Sqiqw2LSOLkbuoZYFc3sa4+HWF5iBBfwFHeAuVW5AYVmmu+iqiiKmI=
+	t=1705967720; cv=none; b=qMj9gMOaeU/BeGFRLxOjMm1sT/Wz/3182fyDViyVXR2BZS4uOFEmL322H+yxPEEAKYyWhPpCKuRoeiADJjPuvFdJ+mEaDRv+ABBXxuz3KW6I2czJPSmi7jmyZyL2Tc18WJ9f5n0WZ4/yOFfMtops53AQ35JJGp4iAIsHl45ZKQQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1705967720; c=relaxed/simple;
-	bh=qR+t/XcWKybaTGgCQ8eFhQ0Hh6YDSxuuv18z6x9ecqs=;
+	bh=ESlsFtK7TCNNodzGvNFsc1Y94K335DvZHywlXfgF6Fc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=dzwcMw6tFd8fdcQrrIdmWa+0Qp5waQliYOZgguz4WWEQMqMkLpxm9cIBRNHPZOBeh/QoFsgrLX79WipvZAnQVkWkk9CC0W5E8oQfDtWlX3nnUpSqdUGuTbqMwU8Jz9ENnfyhia6EGIteFqRuWbjGzda0m8YsuiLHK0uj4X0HEbo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZvflswwI; arc=none smtp.client-ip=198.175.65.15
+	 MIME-Version; b=AfOPzdJVPnaIy5ibJ5PWtxdY+QbQ2T+cddTsZFw/XOT8Fiz5KChN851NVYvCSB/g8g2e8pG01RaDi33J+fYjbfnXuxo9+YG7mwacInSxJaqppL2xQxxYmNOGgyWrXE/FqUl6p9Hp1wHnoSL6PC75A96qDICEmqC76sd3PEl1siQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ya2UD6q7; arc=none smtp.client-ip=198.175.65.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -36,25 +36,25 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1705967719; x=1737503719;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=qR+t/XcWKybaTGgCQ8eFhQ0Hh6YDSxuuv18z6x9ecqs=;
-  b=ZvflswwIV1ur3Z8/F71pCCfKmfv37Cmx9ycQfWkQVh5nV6F2Jrq7upxR
-   hym7GZ9+JNaz+/GFGVKV6DP/1rfqyUf2knwR3uDChMvS7DVORSac303w8
-   m9U5JhQM2o0VSADU00GYuyrdgb40rqJOgobNnSXKyCv7/P5Nu+DP+yjr0
-   CHPiHmO7UwOsmoUyUVHwnXnMpbnd1OSI5SOKJrjBXbluoB1eGOq1wmHtC
-   Yx9xYpAw4eRIznSrqKzvB7QJEpV32pkiomwInl3XXANEoJRLoEmqgMILG
-   UKo6TZ8rARabWsuE2E/PHIy/XFUwRUA0Dli6vavmpslJqBkVhToWXwZfs
+  bh=ESlsFtK7TCNNodzGvNFsc1Y94K335DvZHywlXfgF6Fc=;
+  b=Ya2UD6q7zo6JN1DrUxwwtNpx0dsvq76jAJ2dOSdAcUBj7mukIFXfix6G
+   OmSBiSA5b4NremiWahdplXw4onJGH2JfcqXOmG29tJjfFLIKCxQpI2sUt
+   KElJvXl+/Y2n6jjTgpchM/sJVr3U8HSZgQHpYdtuJ/KaZdwWu5jEURLW5
+   FCNUkqEMYmZuzS2HoVRTNmnU8FyM+Wn0NpAJzjoMdtbFWEsE676Kuhww4
+   IQSl02LUmnb0FodIWGiMxs/oOa9B0309gUIW86jGd7RCTN2adsid32rHz
+   yTRe5tOjV2sMehu1nkL6vzfNtceKP9D0KNSLCVBd2B5TGmut3/ZmEv/1G
    w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10961"; a="1243842"
+X-IronPort-AV: E=McAfee;i="6600,9927,10961"; a="1243846"
 X-IronPort-AV: E=Sophos;i="6.05,212,1701158400"; 
-   d="scan'208";a="1243842"
+   d="scan'208";a="1243846"
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 15:55:18 -0800
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 15:55:19 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10961"; a="819888596"
+X-IronPort-AV: E=McAfee;i="6600,9927,10961"; a="819888600"
 X-IronPort-AV: E=Sophos;i="6.05,212,1701158400"; 
-   d="scan'208";a="819888596"
+   d="scan'208";a="819888600"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 15:55:17 -0800
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 15:55:18 -0800
 From: isaku.yamahata@intel.com
 To: kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
@@ -67,11 +67,10 @@ Cc: isaku.yamahata@intel.com,
 	Kai Huang <kai.huang@intel.com>,
 	chen.bo@intel.com,
 	hang.yuan@intel.com,
-	tina.zhang@intel.com,
-	Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [PATCH v18 030/121] KVM: TDX: Do TDX specific vcpu initialization
-Date: Mon, 22 Jan 2024 15:53:06 -0800
-Message-Id: <9ac6ab3979a477d4a40e0655208248b70bb43ebb.1705965635.git.isaku.yamahata@intel.com>
+	tina.zhang@intel.com
+Subject: [PATCH v18 031/121] [MARKER] The start of TDX KVM patch series: KVM MMU GPA shared bits
+Date: Mon, 22 Jan 2024 15:53:07 -0800
+Message-Id: <f3e57eeb755b72696cfd0ab5178c3a71d1d73bcf.1705965635.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1705965634.git.isaku.yamahata@intel.com>
 References: <cover.1705965634.git.isaku.yamahata@intel.com>
@@ -85,401 +84,41 @@ Content-Transfer-Encoding: 8bit
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-TD guest vcpu needs TDX specific initialization before running.  Repurpose
-KVM_MEMORY_ENCRYPT_OP to vcpu-scope, add a new sub-command
-KVM_TDX_INIT_VCPU, and implement the callback for it.
+This empty commit is to mark the start of patch series of KVM MMU GPA
+shared bits.
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
-v18:
-- Use tdh_sys_rd() instead of struct tdsysinfo_struct.
-- Rename tdx_reclaim_td_page() => tdx_reclaim_control_page()
-- Remove the change of tools/arch/x86/include/uapi/asm/kvm.h.
----
- arch/x86/include/asm/kvm-x86-ops.h |   1 +
- arch/x86/include/asm/kvm_host.h    |   1 +
- arch/x86/include/uapi/asm/kvm.h    |   1 +
- arch/x86/kvm/vmx/main.c            |   9 ++
- arch/x86/kvm/vmx/tdx.c             | 184 ++++++++++++++++++++++++++++-
- arch/x86/kvm/vmx/tdx.h             |   8 ++
- arch/x86/kvm/vmx/x86_ops.h         |   4 +
- arch/x86/kvm/x86.c                 |   6 +
- 8 files changed, 211 insertions(+), 3 deletions(-)
+ Documentation/virt/kvm/intel-tdx-layer-status.rst | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-index 1b8fe1502bde..cfa505dd7a98 100644
---- a/arch/x86/include/asm/kvm-x86-ops.h
-+++ b/arch/x86/include/asm/kvm-x86-ops.h
-@@ -129,6 +129,7 @@ KVM_X86_OP(leave_smm)
- KVM_X86_OP(enable_smi_window)
- #endif
- KVM_X86_OP(mem_enc_ioctl)
-+KVM_X86_OP_OPTIONAL(vcpu_mem_enc_ioctl)
- KVM_X86_OP_OPTIONAL(mem_enc_register_region)
- KVM_X86_OP_OPTIONAL(mem_enc_unregister_region)
- KVM_X86_OP_OPTIONAL(vm_copy_enc_context_from)
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index ba68f63958db..b54e0bdb77eb 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1776,6 +1776,7 @@ struct kvm_x86_ops {
- #endif
+diff --git a/Documentation/virt/kvm/intel-tdx-layer-status.rst b/Documentation/virt/kvm/intel-tdx-layer-status.rst
+index 25082e9c0b20..8b8186e7bfeb 100644
+--- a/Documentation/virt/kvm/intel-tdx-layer-status.rst
++++ b/Documentation/virt/kvm/intel-tdx-layer-status.rst
+@@ -10,6 +10,7 @@ What qemu can do
+ ----------------
+ - TDX VM TYPE is exposed to Qemu.
+ - Qemu can create/destroy guest of TDX vm type.
++- Qemu can create/destroy vcpu of TDX vm type.
  
- 	int (*mem_enc_ioctl)(struct kvm *kvm, void __user *argp);
-+	int (*vcpu_mem_enc_ioctl)(struct kvm_vcpu *vcpu, void __user *argp);
- 	int (*mem_enc_register_region)(struct kvm *kvm, struct kvm_enc_region *argp);
- 	int (*mem_enc_unregister_region)(struct kvm *kvm, struct kvm_enc_region *argp);
- 	int (*vm_copy_enc_context_from)(struct kvm *kvm, unsigned int source_fd);
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index 9ac0246bd974..4000a2e087a8 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -571,6 +571,7 @@ struct kvm_pmu_event_filter {
- enum kvm_tdx_cmd_id {
- 	KVM_TDX_CAPABILITIES = 0,
- 	KVM_TDX_INIT_VM,
-+	KVM_TDX_INIT_VCPU,
+ Patch Layer status
+ ------------------
+@@ -18,12 +19,12 @@ Patch Layer status
+ * TDX, VMX coexistence:                 Applied
+ * TDX architectural definitions:        Applied
+ * TD VM creation/destruction:           Applied
+-* TD vcpu creation/destruction:         Applying
++* TD vcpu creation/destruction:         Applied
+ * TDX EPT violation:                    Not yet
+ * TD finalization:                      Not yet
+ * TD vcpu enter/exit:                   Not yet
+ * TD vcpu interrupts/exit/hypercall:    Not yet
  
- 	KVM_TDX_CMD_NR_MAX,
- };
-diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index c2f1dc2000c5..de4b6f924a36 100644
---- a/arch/x86/kvm/vmx/main.c
-+++ b/arch/x86/kvm/vmx/main.c
-@@ -146,6 +146,14 @@ static int vt_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
- 	return tdx_vm_ioctl(kvm, argp);
- }
- 
-+static int vt_vcpu_mem_enc_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
-+{
-+	if (!is_td_vcpu(vcpu))
-+		return -EINVAL;
-+
-+	return tdx_vcpu_ioctl(vcpu, argp);
-+}
-+
- #define VMX_REQUIRED_APICV_INHIBITS				\
- 	(BIT(APICV_INHIBIT_REASON_DISABLE)|			\
- 	 BIT(APICV_INHIBIT_REASON_ABSENT) |			\
-@@ -305,6 +313,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- 	.get_untagged_addr = vmx_get_untagged_addr,
- 
- 	.mem_enc_ioctl = vt_mem_enc_ioctl,
-+	.vcpu_mem_enc_ioctl = vt_vcpu_mem_enc_ioctl,
- };
- 
- struct kvm_x86_init_ops vt_init_ops __initdata = {
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 8330f448ab8e..245be29721b4 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -93,6 +93,7 @@ struct tdx_info {
- 	u64 xfam_fixed1;
- 
- 	u8 nr_tdcs_pages;
-+	u8 nr_tdvpx_pages;
- 
- 	u16 num_cpuid_config;
- 	/* This must the last member. */
-@@ -148,6 +149,11 @@ static __always_inline hpa_t set_hkid_to_hpa(hpa_t pa, u16 hkid)
- 	return pa | ((hpa_t)hkid << boot_cpu_data.x86_phys_bits);
- }
- 
-+static inline bool is_td_vcpu_created(struct vcpu_tdx *tdx)
-+{
-+	return tdx->td_vcpu_created;
-+}
-+
- static inline bool is_td_created(struct kvm_tdx *kvm_tdx)
- {
- 	return kvm_tdx->tdr_pa;
-@@ -165,6 +171,11 @@ static inline bool is_hkid_assigned(struct kvm_tdx *kvm_tdx)
- 	return kvm_tdx->hkid > 0;
- }
- 
-+static inline bool is_td_finalized(struct kvm_tdx *kvm_tdx)
-+{
-+	return kvm_tdx->finalized;
-+}
-+
- static void tdx_clear_page(unsigned long page_pa)
- {
- 	const void *zero_page = (const void *) __va(page_to_phys(ZERO_PAGE(0)));
-@@ -447,7 +458,32 @@ int tdx_vcpu_create(struct kvm_vcpu *vcpu)
- 
- void tdx_vcpu_free(struct kvm_vcpu *vcpu)
- {
--	/* This is stub for now.  More logic will come. */
-+	struct vcpu_tdx *tdx = to_tdx(vcpu);
-+	int i;
-+
-+	/*
-+	 * This methods can be called when vcpu allocation/initialization
-+	 * failed. So it's possible that hkid, tdvpx and tdvpr are not assigned
-+	 * yet.
-+	 */
-+	if (is_hkid_assigned(to_kvm_tdx(vcpu->kvm))) {
-+		WARN_ON_ONCE(tdx->tdvpx_pa);
-+		WARN_ON_ONCE(tdx->tdvpr_pa);
-+		return;
-+	}
-+
-+	if (tdx->tdvpx_pa) {
-+		for (i = 0; i < tdx_info->nr_tdvpx_pages; i++) {
-+			if (tdx->tdvpx_pa[i])
-+				tdx_reclaim_control_page(tdx->tdvpx_pa[i]);
-+		}
-+		kfree(tdx->tdvpx_pa);
-+		tdx->tdvpx_pa = NULL;
-+	}
-+	if (tdx->tdvpr_pa) {
-+		tdx_reclaim_control_page(tdx->tdvpr_pa);
-+		tdx->tdvpr_pa = 0;
-+	}
- }
- 
- void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
-@@ -456,8 +492,13 @@ void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
- 	/* Ignore INIT silently because TDX doesn't support INIT event. */
- 	if (init_event)
- 		return;
-+	if (KVM_BUG_ON(is_td_vcpu_created(to_tdx(vcpu)), vcpu->kvm))
-+		return;
- 
--	/* This is stub for now. More logic will come here. */
-+	/*
-+	 * Don't update mp_state to runnable because more initialization
-+	 * is needed by TDX_VCPU_INIT.
-+	 */
- }
- 
- static int tdx_get_capabilities(struct kvm_tdx_cmd *cmd)
-@@ -951,15 +992,147 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
- 	return r;
- }
- 
-+/* VMM can pass one 64bit auxiliary data to vcpu via RCX for guest BIOS. */
-+static int tdx_td_vcpu_init(struct kvm_vcpu *vcpu, u64 vcpu_rcx)
-+{
-+	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
-+	struct vcpu_tdx *tdx = to_tdx(vcpu);
-+	unsigned long *tdvpx_pa = NULL;
-+	unsigned long tdvpr_pa;
-+	unsigned long va;
-+	int ret, i;
-+	u64 err;
-+
-+	if (is_td_vcpu_created(tdx))
-+		return -EINVAL;
-+
-+	/*
-+	 * vcpu_free method frees allocated pages.  Avoid partial setup so
-+	 * that the method can't handle it.
-+	 */
-+	va = __get_free_page(GFP_KERNEL_ACCOUNT);
-+	if (!va)
-+		return -ENOMEM;
-+	tdvpr_pa = __pa(va);
-+
-+	tdvpx_pa = kcalloc(tdx_info->nr_tdvpx_pages, sizeof(*tdx->tdvpx_pa),
-+			   GFP_KERNEL_ACCOUNT);
-+	if (!tdvpx_pa) {
-+		ret = -ENOMEM;
-+		goto free_tdvpr;
-+	}
-+	for (i = 0; i < tdx_info->nr_tdvpx_pages; i++) {
-+		va = __get_free_page(GFP_KERNEL_ACCOUNT);
-+		if (!va) {
-+			ret = -ENOMEM;
-+			goto free_tdvpx;
-+		}
-+		tdvpx_pa[i] = __pa(va);
-+	}
-+
-+	err = tdh_vp_create(kvm_tdx->tdr_pa, tdvpr_pa);
-+	if (KVM_BUG_ON(err, vcpu->kvm)) {
-+		ret = -EIO;
-+		pr_tdx_error(TDH_VP_CREATE, err, NULL);
-+		goto free_tdvpx;
-+	}
-+	tdx->tdvpr_pa = tdvpr_pa;
-+
-+	tdx->tdvpx_pa = tdvpx_pa;
-+	for (i = 0; i < tdx_info->nr_tdvpx_pages; i++) {
-+		err = tdh_vp_addcx(tdx->tdvpr_pa, tdvpx_pa[i]);
-+		if (KVM_BUG_ON(err, vcpu->kvm)) {
-+			pr_tdx_error(TDH_VP_ADDCX, err, NULL);
-+			for (; i < tdx_info->nr_tdvpx_pages; i++) {
-+				free_page((unsigned long)__va(tdvpx_pa[i]));
-+				tdvpx_pa[i] = 0;
-+			}
-+			/* vcpu_free method frees TDVPX and TDR donated to TDX */
-+			return -EIO;
-+		}
-+	}
-+
-+	err = tdh_vp_init(tdx->tdvpr_pa, vcpu_rcx);
-+	if (KVM_BUG_ON(err, vcpu->kvm)) {
-+		pr_tdx_error(TDH_VP_INIT, err, NULL);
-+		return -EIO;
-+	}
-+
-+	vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
-+	tdx->td_vcpu_created = true;
-+	return 0;
-+
-+free_tdvpx:
-+	for (i = 0; i < tdx_info->nr_tdvpx_pages; i++) {
-+		if (tdvpx_pa[i])
-+			free_page((unsigned long)__va(tdvpx_pa[i]));
-+		tdvpx_pa[i] = 0;
-+	}
-+	kfree(tdvpx_pa);
-+	tdx->tdvpx_pa = NULL;
-+free_tdvpr:
-+	if (tdvpr_pa)
-+		free_page((unsigned long)__va(tdvpr_pa));
-+	tdx->tdvpr_pa = 0;
-+
-+	return ret;
-+}
-+
-+int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
-+{
-+	struct msr_data apic_base_msr;
-+	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
-+	struct vcpu_tdx *tdx = to_tdx(vcpu);
-+	struct kvm_tdx_cmd cmd;
-+	int ret;
-+
-+	if (tdx->initialized)
-+		return -EINVAL;
-+
-+	if (!is_hkid_assigned(kvm_tdx) || is_td_finalized(kvm_tdx))
-+		return -EINVAL;
-+
-+	if (copy_from_user(&cmd, argp, sizeof(cmd)))
-+		return -EFAULT;
-+
-+	if (cmd.error)
-+		return -EINVAL;
-+
-+	/* Currently only KVM_TDX_INTI_VCPU is defined for vcpu operation. */
-+	if (cmd.flags || cmd.id != KVM_TDX_INIT_VCPU)
-+		return -EINVAL;
-+
-+	/*
-+	 * As TDX requires X2APIC, set local apic mode to X2APIC.  User space
-+	 * VMM, e.g. qemu, is required to set CPUID[0x1].ecx.X2APIC=1 by
-+	 * KVM_SET_CPUID2.  Otherwise kvm_set_apic_base() will fail.
-+	 */
-+	apic_base_msr = (struct msr_data) {
-+		.host_initiated = true,
-+		.data = APIC_DEFAULT_PHYS_BASE | LAPIC_MODE_X2APIC |
-+		(kvm_vcpu_is_reset_bsp(vcpu) ? MSR_IA32_APICBASE_BSP : 0),
-+	};
-+	if (kvm_set_apic_base(vcpu, &apic_base_msr))
-+		return -EINVAL;
-+
-+	ret = tdx_td_vcpu_init(vcpu, (u64)cmd.data);
-+	if (ret)
-+		return ret;
-+
-+	tdx->initialized = true;
-+	return 0;
-+}
-+
- static int __init tdx_module_setup(void)
- {
--	u16 num_cpuid_config, tdcs_base_size;
-+	u16 num_cpuid_config, tdcs_base_size, tdvps_base_size;
- 	int ret;
- 	u32 i;
- 
- 	struct tdx_md_map mds[] = {
- 		TDX_MD_MAP(NUM_CPUID_CONFIG, &num_cpuid_config),
- 		TDX_MD_MAP(TDCS_BASE_SIZE, &tdcs_base_size),
-+		TDX_MD_MAP(TDVPS_BASE_SIZE, &tdvps_base_size),
- 	};
- 
- #define TDX_INFO_MAP(_field_id, _member)			\
-@@ -1015,6 +1188,11 @@ static int __init tdx_module_setup(void)
- 	}
- 
- 	tdx_info->nr_tdcs_pages = tdcs_base_size / PAGE_SIZE;
-+	/*
-+	 * TDVPS = TDVPR(4K page) + TDVPX(multiple 4K pages).
-+	 * -1 for TDVPR.
-+	 */
-+	tdx_info->nr_tdvpx_pages = tdvps_base_size / PAGE_SIZE - 1;
- 
- 	return 0;
- 
-diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-index 173ed19207fb..d3077151252c 100644
---- a/arch/x86/kvm/vmx/tdx.h
-+++ b/arch/x86/kvm/vmx/tdx.h
-@@ -17,12 +17,20 @@ struct kvm_tdx {
- 	u64 xfam;
- 	int hkid;
- 
-+	bool finalized;
-+
- 	u64 tsc_offset;
- };
- 
- struct vcpu_tdx {
- 	struct kvm_vcpu	vcpu;
- 
-+	unsigned long tdvpr_pa;
-+	unsigned long *tdvpx_pa;
-+	bool td_vcpu_created;
-+
-+	bool initialized;
-+
- 	/*
- 	 * Dummy to make pmu_intel not corrupt memory.
- 	 * TODO: Support PMU for TDX.  Future work.
-diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-index 1ea532dfaf2a..5f8ee1c93cd1 100644
---- a/arch/x86/kvm/vmx/x86_ops.h
-+++ b/arch/x86/kvm/vmx/x86_ops.h
-@@ -150,6 +150,8 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp);
- int tdx_vcpu_create(struct kvm_vcpu *vcpu);
- void tdx_vcpu_free(struct kvm_vcpu *vcpu);
- void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event);
-+
-+int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp);
- #else
- static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return -EOPNOTSUPP; }
- static inline void tdx_hardware_unsetup(void) {}
-@@ -169,6 +171,8 @@ static inline int tdx_vm_ioctl(struct kvm *kvm, void __user *argp) { return -EOP
- static inline int tdx_vcpu_create(struct kvm_vcpu *vcpu) { return -EOPNOTSUPP; }
- static inline void tdx_vcpu_free(struct kvm_vcpu *vcpu) {}
- static inline void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event) {}
-+
-+static inline int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp) { return -EOPNOTSUPP; }
- #endif
- 
- #endif /* __KVM_X86_VMX_X86_OPS_H */
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index e0027134454c..eee63b08f14f 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -6248,6 +6248,12 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 	case KVM_SET_DEVICE_ATTR:
- 		r = kvm_vcpu_ioctl_device_attr(vcpu, ioctl, argp);
- 		break;
-+	case KVM_MEMORY_ENCRYPT_OP:
-+		r = -ENOTTY;
-+		if (!kvm_x86_ops.vcpu_mem_enc_ioctl)
-+			goto out;
-+		r = kvm_x86_ops.vcpu_mem_enc_ioctl(vcpu, argp);
-+		break;
- 	default:
- 		r = -EINVAL;
- 	}
+-* KVM MMU GPA shared bits:              Not yet
++* KVM MMU GPA shared bits:              Applying
+ * KVM TDP refactoring for TDX:          Not yet
+ * KVM TDP MMU hooks:                    Not yet
 -- 
 2.25.1
 
