@@ -1,60 +1,60 @@
-Return-Path: <kvm+bounces-6607-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6608-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7524E83794E
-	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 01:36:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBDC8837972
+	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 01:39:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DF861B25482
-	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 00:36:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 72C7F1F27DFD
+	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 00:39:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C4A65EE84;
-	Mon, 22 Jan 2024 23:55:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 821DA5F845;
+	Mon, 22 Jan 2024 23:55:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eY8mJY2z"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ThgubnJG"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8D9E5D90F;
-	Mon, 22 Jan 2024 23:55:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3367B5DF37;
+	Mon, 22 Jan 2024 23:55:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705967724; cv=none; b=dPGWTQzLDsNgUqubau25zUzGCYwXfmjAbzTByJBpDvfceUaqRV8R3m3no5EwPoCsH6r2avj2ZSV2ITCnq+oPT6feIvx3pBRWkDZJAMGliDRLdq2GRYw5vsI8f6noSMCTgMwfylEYacafq+n+xfm7Dk95ba4OEb2Xfp9MN4fm/ak=
+	t=1705967726; cv=none; b=ktdvyuAhTC6laO01I88MeRA5aFR51xlmybCy07DzfYsUfD5VtrRbw1suhDGqvnoTRlEfeQyq0dV2bh5wPR6rpgwRlhuKktorJhKbpnB4PM/Tzy/5UaMQ3SmUrp5AAcXmVedsoe4pnVzmJHBu+Eag2w2spgIiTtJ3q52CfS+qtKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705967724; c=relaxed/simple;
-	bh=zdJ2GT4ARrSNbJp3F6eaxutpQ4DdrmPtIT6M7sepMRw=;
+	s=arc-20240116; t=1705967726; c=relaxed/simple;
+	bh=X12gjPfxFcHpNF/9VdlNSg3UYlpyaeeatnJUN8+oq0M=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=rm20eqVYhZJeX7P1ZRHTSP05QKfQn5zfnUmMXbkFHVd3oKKvIil7k61JBq6+JGg0zBtPPXBBRNm2Jcoji/tL0eDq8ZmdoHgy05LAH3cgjUkitHkIrvilPkyquscIF9FzQDaPLXR59Lt9LuRyRrGRGDmsFwBo52eLh5ofQVDEiNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eY8mJY2z; arc=none smtp.client-ip=198.175.65.15
+	 MIME-Version; b=BEj4wQjMlOgXAq+3I8BT9cD0Pdiy3hOl6qqSWoBO9OCiUzWtLE7Sd7nGq+trT4c3lHlcBNNWrt/g//6XPyTduvU//ViRj8VdHj51Kf9Ul9+9He5BtCsOJHnsfDGekF+ZThU1YFXD4Par89iwu5C2t1fs8uYH355slvlyFSbzMEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ThgubnJG; arc=none smtp.client-ip=198.175.65.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1705967723; x=1737503723;
+  t=1705967724; x=1737503724;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=zdJ2GT4ARrSNbJp3F6eaxutpQ4DdrmPtIT6M7sepMRw=;
-  b=eY8mJY2zOCPLikNmbPCkwyquo7u/d1vOOUi717MV3RZ49IqCm+VCKeih
-   fTuEdKdWlxT91N1rx9b4P4WPC1u3aNGoo1oi+0ZDia+Vfaw34RxhotQeI
-   n/LQnUtFvyTS7ZZ5BQT6KSn+3oWJ09zJsCQOB9SKECUWKekY/Gu1s8JAo
-   lfVK/C+JYSKMkrkZwQ76J3taaZiFcv4Cue6xes7DD2e95bo3zhjN2Udl9
-   0Kr790xE1+rSzuPq+gNaO6DRnSR6LHI2Ekrj7EkciriCx3EiD2luAYYdJ
-   +lVNj4vkPxwVFyhd/IqI+l7zCi56/FhBVKDLvTh2/roS0S3kdfoLKmXF2
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10961"; a="1243863"
+  bh=X12gjPfxFcHpNF/9VdlNSg3UYlpyaeeatnJUN8+oq0M=;
+  b=ThgubnJGXBXxDFyGlD6Cu9YCW1H1IdikQpiJ+f2DvgoWBymP4ELeCOhN
+   e619DnARUOb6SY8a8wDUNBHyyfwOb6su+4xt38Q9VTVJ3PoX0Wp+n5LpQ
+   QsktpLQ+di1RcMYGweIY4B8BAtlS53qyY/bLzioo7J6Tz7fWIlc/M0pPH
+   LmVjuAX6z2eE2CaVFqMlw5hEMMMO+aW6lkSFXVnpl0Z/nLK5OuRRbLwmp
+   30qsf0mVh4VQ72RiwC7h3I1lQRCDSQrWhy3AxXqA1QhCT30Mda263oKh0
+   jRlkSv8M3QhQqDexaCFsRYODMKcFsnjVZRGCwaE5Nqxc0v0dQZfU8picK
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10961"; a="1243870"
 X-IronPort-AV: E=Sophos;i="6.05,212,1701158400"; 
-   d="scan'208";a="1243863"
+   d="scan'208";a="1243870"
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 15:55:23 -0800
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 15:55:24 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10961"; a="819888629"
+X-IronPort-AV: E=McAfee;i="6600,9927,10961"; a="819888642"
 X-IronPort-AV: E=Sophos;i="6.05,212,1701158400"; 
-   d="scan'208";a="819888629"
+   d="scan'208";a="819888642"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 15:55:22 -0800
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 15:55:23 -0800
 From: isaku.yamahata@intel.com
 To: kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
@@ -68,9 +68,9 @@ Cc: isaku.yamahata@intel.com,
 	chen.bo@intel.com,
 	hang.yuan@intel.com,
 	tina.zhang@intel.com
-Subject: [PATCH v18 034/121] [MARKER] The start of TDX KVM patch series: KVM TDP refactoring for TDX
-Date: Mon, 22 Jan 2024 15:53:10 -0800
-Message-Id: <c897a0fb9a3b4dc2138d7dc99531f057b9623d5c.1705965635.git.isaku.yamahata@intel.com>
+Subject: [PATCH v18 035/121] KVM: Allow page-sized MMU caches to be initialized with custom 64-bit values
+Date: Mon, 22 Jan 2024 15:53:11 -0800
+Message-Id: <5919f685f109a1b0ebc6bd8fc4536ee94bcc172d.1705965635.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1705965634.git.isaku.yamahata@intel.com>
 References: <cover.1705965634.git.isaku.yamahata@intel.com>
@@ -82,29 +82,73 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+From: Sean Christopherson <seanjc@google.com>
 
-This empty commit is to mark the start of patch series of KVM TDP
-refactoring for TDX.
+Add support to MMU caches for initializing a page with a custom 64-bit
+value, e.g. to pre-fill an entire page table with non-zero PTE values.
+The functionality will be used by x86 to support Intel's TDX, which needs
+to set bit 63 in all non-present PTEs in order to prevent !PRESENT page
+faults from getting reflected into the guest (Intel's EPT Violation #VE
+architecture made the less than brilliant decision of having the per-PTE
+behavior be opt-out instead of opt-in).
 
+Signed-off-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- Documentation/virt/kvm/intel-tdx-layer-status.rst | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ include/linux/kvm_types.h |  1 +
+ virt/kvm/kvm_main.c       | 16 ++++++++++++++--
+ 2 files changed, 15 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/virt/kvm/intel-tdx-layer-status.rst b/Documentation/virt/kvm/intel-tdx-layer-status.rst
-index 8b8186e7bfeb..e893a3d714c7 100644
---- a/Documentation/virt/kvm/intel-tdx-layer-status.rst
-+++ b/Documentation/virt/kvm/intel-tdx-layer-status.rst
-@@ -25,6 +25,6 @@ Patch Layer status
- * TD vcpu enter/exit:                   Not yet
- * TD vcpu interrupts/exit/hypercall:    Not yet
+diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+index 9d1f7835d8c1..60c8d5c9eab9 100644
+--- a/include/linux/kvm_types.h
++++ b/include/linux/kvm_types.h
+@@ -94,6 +94,7 @@ struct gfn_to_pfn_cache {
+ struct kvm_mmu_memory_cache {
+ 	gfp_t gfp_zero;
+ 	gfp_t gfp_custom;
++	u64 init_value;
+ 	struct kmem_cache *kmem_cache;
+ 	int capacity;
+ 	int nobjs;
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 48f2086a627f..0a0f3b131ea2 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -401,12 +401,17 @@ static void kvm_flush_shadow_all(struct kvm *kvm)
+ static inline void *mmu_memory_cache_alloc_obj(struct kvm_mmu_memory_cache *mc,
+ 					       gfp_t gfp_flags)
+ {
++	void *page;
++
+ 	gfp_flags |= mc->gfp_zero;
  
--* KVM MMU GPA shared bits:              Applying
--* KVM TDP refactoring for TDX:          Not yet
-+* KVM MMU GPA shared bits:              Applied
-+* KVM TDP refactoring for TDX:          Applying
- * KVM TDP MMU hooks:                    Not yet
+ 	if (mc->kmem_cache)
+ 		return kmem_cache_alloc(mc->kmem_cache, gfp_flags);
+-	else
+-		return (void *)__get_free_page(gfp_flags);
++
++	page = (void *)__get_free_page(gfp_flags);
++	if (page && mc->init_value)
++		memset64(page, mc->init_value, PAGE_SIZE / sizeof(mc->init_value));
++	return page;
+ }
+ 
+ int __kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int capacity, int min)
+@@ -421,6 +426,13 @@ int __kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int capacity,
+ 		if (WARN_ON_ONCE(!capacity))
+ 			return -EIO;
+ 
++		/*
++		 * Custom init values can be used only for page allocations,
++		 * and obviously conflict with __GFP_ZERO.
++		 */
++		if (WARN_ON_ONCE(mc->init_value && (mc->kmem_cache || mc->gfp_zero)))
++			return -EIO;
++
+ 		mc->objects = kvmalloc_array(sizeof(void *), capacity, gfp);
+ 		if (!mc->objects)
+ 			return -ENOMEM;
 -- 
 2.25.1
 
