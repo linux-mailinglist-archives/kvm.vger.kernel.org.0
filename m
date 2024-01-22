@@ -1,57 +1,57 @@
-Return-Path: <kvm+bounces-6670-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6671-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B49BF837857
-	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 01:15:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 360CF83785A
+	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 01:15:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 616BC28CA01
-	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 00:15:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C9D5A1F23F7B
+	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 00:15:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B08A17691A;
-	Mon, 22 Jan 2024 23:56:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04F4477631;
+	Mon, 22 Jan 2024 23:56:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gGt7wZox"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QWvZdbVG"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C85056DD01;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 093BA6DD1C;
 	Mon, 22 Jan 2024 23:56:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.55.52.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705967764; cv=none; b=O/Gk97tmmrEzQ+i97ndbtR7cX9Tr9qhgoRKHjV5d1UM8x0BgHdUgzBde9/VgrjSxG2EkdMr7BvR3BkcAvzdPHQEa+PkohvuG4NNC6Vp0953TywX+kCxF5RZLq6WMiO3ArIt71lzloSuha2JyqKQ0R6W1Sz/SH9yK09rrHSPSPRk=
+	t=1705967764; cv=none; b=QQFX33nNkp/Iyvaid3eE8AnUFZeI4yYtNiMgaI38NtticTyCu4yUBYoxRPuHB6GnPq3B4nZrIZucIR4bhkS8fxBMYNlU/5SPIgbLyHoa4DY6OLF/P6DRM/Ue3SzK9EYQynViRr4w0F+PY9btT1dh/afq41LYpP+oJdcLKU8hlLI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1705967764; c=relaxed/simple;
-	bh=ecW1HuB58giFSejI1GX+Wd1u8QBXoYN9OtMr5VLrR8c=;
+	bh=7mL7xnz9vwulESCO11rlmOjEDuZMNOvUZdFeDQ4Cjk0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=rtR4pDS7Jjl+ejdF8oUOFTkXGwsuAn6aJmKgmcWxcpxUeAX3Y9EQb/wOR+LMzKTW5tNEbnieEhkSVCoP4sAa8/6LzoqV/czTbRwuFqLoQYNXN0sByG0jPazPkPJkGg2UNj9xwzx76KJn0QoQ/V3vDevjmgXAnD3/msSryCSIJbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gGt7wZox; arc=none smtp.client-ip=192.55.52.120
+	 MIME-Version; b=sM2CtkCHwWlsnN42p8lUEDHq0iSiY7q2A3lh18FxMOmRcl5nfWgiHJjiUTg+eJMjcbUA90U7Lv25B8RoBvS9x4GYV6ctntuRhEG2GfD7wOmZzBUV0Tf5VtnqoAxAVVUc3Yyk5aYsFasAHCLvoLBnzbKeN2gXJeiU07bB+hD0tjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QWvZdbVG; arc=none smtp.client-ip=192.55.52.120
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1705967761; x=1737503761;
+  t=1705967762; x=1737503762;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=ecW1HuB58giFSejI1GX+Wd1u8QBXoYN9OtMr5VLrR8c=;
-  b=gGt7wZoxhUCEmMNHDptYDeR5jpq/o0vKosbQaHvjaQy3JKsAcCELwJX0
-   GODs/czvrh8d3YLRxtr1taWaKbanB9fasVZoAi+bmk1MSzVo1xa8bY/sQ
-   8nv3uxueczazcDgN+EoQyBbejEX4bOdwor5Ek+el6vq4hAhsi1cJQZW2e
-   BgVL0x8xZucQeVZYo6QfEVeUp2G7aUwmfJhBaobtRouO+SmR7oZcIE4cz
-   mHGbcQ1jVmnouh2lIalGnNc3KjEDtptMs2fXExOekcWfyUlpzINm+dHhL
-   cyL0elhDsaMUdHerXCgCWWw832krJGd24fs8302N7zDciYr3G1vKsmLL4
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10961"; a="400217859"
+  bh=7mL7xnz9vwulESCO11rlmOjEDuZMNOvUZdFeDQ4Cjk0=;
+  b=QWvZdbVGFYb6mNtnHPWR/EbXqxhj44tXAPuC6Gm0I3DVZB9YybfiwuRq
+   KfsuEUfQpe0qmmwvh7GxF5uAidRe00/X9eh3ks547WsX+cL1b/LcNAVfu
+   K4WZa/eu1efYayiqXPh4ib04bkQ6CbrVmUa7LonPlFFaRkFIiojILWww7
+   xJvKK+1h856nhodlBbMXBz43l3vUxb2bLaIVusqzOuTiTMCse6hSeQ+nT
+   Z2n7RqA7XPVXGRfpkVkq2CxpsaV9XF3twhOaPhmSQkAYRdqz7XNf95VqN
+   7BHl9XlRpJO7YrcQOM2d3ERmtXU+JpS5lQPKVgKIAsgnm+JIRQsj0xRIy
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10961"; a="400217863"
 X-IronPort-AV: E=Sophos;i="6.05,212,1701158400"; 
-   d="scan'208";a="400217859"
+   d="scan'208";a="400217863"
 Received: from fmviesa001.fm.intel.com ([10.60.135.141])
   by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 15:55:51 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.05,212,1701158400"; 
-   d="scan'208";a="27817977"
+   d="scan'208";a="27817980"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
   by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 15:55:51 -0800
 From: isaku.yamahata@intel.com
@@ -67,9 +67,9 @@ Cc: isaku.yamahata@intel.com,
 	chen.bo@intel.com,
 	hang.yuan@intel.com,
 	tina.zhang@intel.com
-Subject: [PATCH v18 097/121] KVM: TDX: Handle TDX PV HLT hypercall
-Date: Mon, 22 Jan 2024 15:54:13 -0800
-Message-Id: <5682a09f9a81e612e88cc7021d4741f180742d53.1705965635.git.isaku.yamahata@intel.com>
+Subject: [PATCH v18 098/121] KVM: TDX: Handle TDX PV port io hypercall
+Date: Mon, 22 Jan 2024 15:54:14 -0800
+Message-Id: <06a142259ea1d80ae54161e18e8d4983d4d11210.1705965635.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1705965634.git.isaku.yamahata@intel.com>
 References: <cover.1705965634.git.isaku.yamahata@intel.com>
@@ -83,89 +83,103 @@ Content-Transfer-Encoding: 8bit
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Wire up TDX PV HLT hypercall to the KVM backend function.
+Wire up TDX PV port IO hypercall to the KVM backend function.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
 v18:
-- drop buggy_hlt_workaround and use TDH.VP.RD(TD_VCPU_STATE_DETAILS)
+- Fix out case to set R10 and R11 correctly when user space handled port
+  out.
 ---
- arch/x86/kvm/vmx/tdx.c | 26 +++++++++++++++++++++++++-
- arch/x86/kvm/vmx/tdx.h |  3 +++
- 2 files changed, 28 insertions(+), 1 deletion(-)
+ arch/x86/kvm/vmx/tdx.c | 67 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 67 insertions(+)
 
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index f952a95e493d..4628c7eb3002 100644
+index 4628c7eb3002..71c444cfbc9e 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -738,7 +738,18 @@ void tdx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 
- bool tdx_protected_apic_has_interrupt(struct kvm_vcpu *vcpu)
- {
--	return pi_has_pending_interrupt(vcpu);
-+	bool ret = pi_has_pending_interrupt(vcpu);
-+	union tdx_vcpu_state_details details;
-+	struct vcpu_tdx *tdx = to_tdx(vcpu);
-+
-+	if (ret || vcpu->arch.mp_state != KVM_MP_STATE_HALTED)
-+		return true;
-+
-+	if (tdx->interrupt_disabled_hlt)
-+		return false;
-+
-+	details.full = td_state_non_arch_read64(tdx, TD_VCPU_STATE_DETAILS_NON_ARCH);
-+	return !!details.vmxip;
+@@ -1202,6 +1202,71 @@ static int tdx_emulate_hlt(struct kvm_vcpu *vcpu)
+ 	return kvm_emulate_halt_noskip(vcpu);
  }
  
- void tdx_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
-@@ -1180,6 +1191,17 @@ static int tdx_emulate_cpuid(struct kvm_vcpu *vcpu)
- 	return 1;
- }
- 
-+static int tdx_emulate_hlt(struct kvm_vcpu *vcpu)
++static int tdx_complete_pio_out(struct kvm_vcpu *vcpu)
 +{
-+	struct vcpu_tdx *tdx = to_tdx(vcpu);
++	tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_SUCCESS);
++	tdvmcall_set_return_val(vcpu, 0);
++	return 1;
++}
 +
-+	/* See tdx_protected_apic_has_interrupt() to avoid heavy seamcall */
-+	tdx->interrupt_disabled_hlt = tdvmcall_a0_read(vcpu);
++static int tdx_complete_pio_in(struct kvm_vcpu *vcpu)
++{
++	struct x86_emulate_ctxt *ctxt = vcpu->arch.emulate_ctxt;
++	unsigned long val = 0;
++	int ret;
++
++	WARN_ON_ONCE(vcpu->arch.pio.count != 1);
++
++	ret = ctxt->ops->pio_in_emulated(ctxt, vcpu->arch.pio.size,
++					 vcpu->arch.pio.port, &val, 1);
++	WARN_ON_ONCE(!ret);
 +
 +	tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_SUCCESS);
-+	return kvm_emulate_halt_noskip(vcpu);
++	tdvmcall_set_return_val(vcpu, val);
++
++	return 1;
++}
++
++static int tdx_emulate_io(struct kvm_vcpu *vcpu)
++{
++	struct x86_emulate_ctxt *ctxt = vcpu->arch.emulate_ctxt;
++	unsigned long val = 0;
++	unsigned int port;
++	int size, ret;
++	bool write;
++
++	++vcpu->stat.io_exits;
++
++	size = tdvmcall_a0_read(vcpu);
++	write = tdvmcall_a1_read(vcpu);
++	port = tdvmcall_a2_read(vcpu);
++
++	if (size != 1 && size != 2 && size != 4) {
++		tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_INVALID_OPERAND);
++		return 1;
++	}
++
++	if (write) {
++		val = tdvmcall_a3_read(vcpu);
++		ret = ctxt->ops->pio_out_emulated(ctxt, size, port, &val, 1);
++
++		/* No need for a complete_userspace_io callback. */
++		vcpu->arch.pio.count = 0;
++	} else
++		ret = ctxt->ops->pio_in_emulated(ctxt, size, port, &val, 1);
++
++	if (ret)
++		tdvmcall_set_return_val(vcpu, val);
++	else {
++		if (write)
++			vcpu->arch.complete_userspace_io = tdx_complete_pio_out;
++		else
++			vcpu->arch.complete_userspace_io = tdx_complete_pio_in;
++	}
++
++	return ret;
 +}
 +
  static int handle_tdvmcall(struct kvm_vcpu *vcpu)
  {
  	if (tdvmcall_exit_type(vcpu))
-@@ -1188,6 +1210,8 @@ static int handle_tdvmcall(struct kvm_vcpu *vcpu)
- 	switch (tdvmcall_leaf(vcpu)) {
- 	case EXIT_REASON_CPUID:
+@@ -1212,6 +1277,8 @@ static int handle_tdvmcall(struct kvm_vcpu *vcpu)
  		return tdx_emulate_cpuid(vcpu);
-+	case EXIT_REASON_HLT:
-+		return tdx_emulate_hlt(vcpu);
+ 	case EXIT_REASON_HLT:
+ 		return tdx_emulate_hlt(vcpu);
++	case EXIT_REASON_IO_INSTRUCTION:
++		return tdx_emulate_io(vcpu);
  	default:
  		break;
  	}
-diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-index 14926394f0a5..21cf9cafdf69 100644
---- a/arch/x86/kvm/vmx/tdx.h
-+++ b/arch/x86/kvm/vmx/tdx.h
-@@ -102,6 +102,8 @@ struct vcpu_tdx {
- 	bool host_state_need_restore;
- 	u64 msr_host_kernel_gs_base;
- 
-+	bool interrupt_disabled_hlt;
-+
- 	/*
- 	 * Dummy to make pmu_intel not corrupt memory.
- 	 * TODO: Support PMU for TDX.  Future work.
-@@ -225,6 +227,7 @@ TDX_BUILD_TDVPS_ACCESSORS(32, VMCS, vmcs);
- TDX_BUILD_TDVPS_ACCESSORS(64, VMCS, vmcs);
- 
- TDX_BUILD_TDVPS_ACCESSORS(8, MANAGEMENT, management);
-+TDX_BUILD_TDVPS_ACCESSORS(64, STATE_NON_ARCH, state_non_arch);
- 
- static __always_inline u64 td_tdcs_exec_read64(struct kvm_tdx *kvm_tdx, u32 field)
- {
 -- 
 2.25.1
 
