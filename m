@@ -1,92 +1,92 @@
-Return-Path: <kvm+bounces-6569-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6570-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36439836D12
-	for <lists+kvm@lfdr.de>; Mon, 22 Jan 2024 18:23:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 640AC836EBC
+	for <lists+kvm@lfdr.de>; Mon, 22 Jan 2024 19:01:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D917128D9D9
-	for <lists+kvm@lfdr.de>; Mon, 22 Jan 2024 17:23:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4CA38B29186
+	for <lists+kvm@lfdr.de>; Mon, 22 Jan 2024 17:23:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BF8154747;
-	Mon, 22 Jan 2024 16:25:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06FEE54BE5;
+	Mon, 22 Jan 2024 16:25:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="RcP7aiuU"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="bi+v3KXA"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0747354646;
-	Mon, 22 Jan 2024 16:25:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C08E254663;
+	Mon, 22 Jan 2024 16:25:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705940737; cv=none; b=NHLMyKkLMk5Kn77CutiBy4oo419LbPIVJS7TcQS02uzvPKwKN6r2FLt2ulFr0cjz1S6lgj4bYQ9YLNVyk2Mii+8rmP1C4Vilodgs9BSK+5i5IlhdQSom0U5aRWh9Yti/W8k3ZuRFBXAXfHzxpWtwlFnWDdTxVMpHhLW/1ul4J/o=
+	t=1705940739; cv=none; b=auynNEIuiZ5ttqdiIz+aK1WMDNmN24X0wyv5HuEh5Pbj3CCz7cUaoEpwaLfQkki9d12UliCEq6Ys7DflajqpiXzwwkp2Wu4wy8jUlK8JQH5h6LzY70Y0YxgQx2Ykr0yh6spg95jMzQdB0ycZ21NBok74zGQPBxiAMA9DSN8ZOYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705940737; c=relaxed/simple;
-	bh=Ktrs3W+Ub4KsThPzYf163CbJ3v1UIwNj0jh9Fg21jpM=;
+	s=arc-20240116; t=1705940739; c=relaxed/simple;
+	bh=GXfpiZy75DQjR//caZM/AN4ckEsyL2pXpAfiknNV99w=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=N3bP7Ep9v+sEDOpWTChQ3xbk/C1cxE15kgqrKhZ7PgLnnvS6KYpu5huorcSdxjwmNOUkBcCEdKt8Id0tey7DoimIWtH1YIS29ZlQvewd8vk+foETiIinrmqf+5W64C4U9BU7qq3cfspjgzu/FI1rPMg6dyaJgu+XvYfZW5U8T+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=RcP7aiuU; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=hxFuyWvywDeG4Lu+TO63ekKxPYhBy9G0bUmydz/IXtKEvnuakXHGZwy2NY0iSHxopbT2InBTmuUNHRTeEiqDHC7Y51CK0U1ro97N71iB2QMYrPTYk4wdZyAmUX+9ly1yR7SXYG7PA0V8zdHk7FVgyanuv4JW77CGYlvwjMvzJbg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=bi+v3KXA; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40MGOUPd014755;
-	Mon, 22 Jan 2024 16:25:35 GMT
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40MGOUFT014744;
+	Mon, 22 Jan 2024 16:25:37 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : content-transfer-encoding
- : mime-version; s=pp1; bh=lUz7ctGQSK0szEwam6QFQQLP0nvpddLV34QbEyGkGuA=;
- b=RcP7aiuU9sLI9l8uWpRv5vHNE/9jagTimPyXpr0lSxYYQSTwhFNE5RnBN7eLMTXWxhHM
- VKz422Nn/PCsOhLeA/pfO7AhjN5JejvB1yoLR3luWL6mf+c8+E9ziDnoP0zpkJvJ3hDG
- t1J2xzs021lZpVJcSwAYgOOi/MTlyyTtQr4MzgphJU3LN6bMcPZt4nU3bZmCCiJ1CpO9
- GjlYEZ+8Wps/Gx6cSnQEGERLUItty9raLVmvWMqHdI6i50KzR/HWwrraU4hv2ym5T57/
- jzib8a02e6VGtpMS6tI3NtfmIeL2w62sHWt4fHzt53HCwK9ETCWc40gcfDoGhUhfV4w5 Lw== 
+ : mime-version; s=pp1; bh=pcbyBJfYRoPozlsdcR2+q6C9REjLiGGGvZ0jXXJvEEs=;
+ b=bi+v3KXAmAMPuas+Hg0S6KycquuGy/nAmFZilBAKjJWJPRAiDJSD+yZSPMgz3rX24S2A
+ RxCWmLHgkpemdu/1VaNQgAYyoKjjBZ/OmNcV+foBVehb1bCbFswZRnLJlTd4Nrputmrq
+ jkZ0C6jFFn2Ia8mbsxd319p3+EdM9QCKggaMOOE5mVSorWpSRa0A7IQwqXSawO2smvhh
+ HIhCqkFuNvTg7UoeLPfgJ7b/1uCuKGbHgjlrVXxhxJoNkpXpitqPBDdJ5zXTX0OlGUlK
+ GkoyTtMnkZ6CF6GBaIiaI1uqSyfhoue5AZa8dyRhfMjTO1dioxpqqKQkRD5RJrpVx9Xh uw== 
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vstjtu19j-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vstjtu1ax-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 22 Jan 2024 16:25:34 +0000
+	Mon, 22 Jan 2024 16:25:36 +0000
 Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 40MGOiJK016543;
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 40MGP2nJ018511;
+	Mon, 22 Jan 2024 16:25:36 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vstjtu19p-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 22 Jan 2024 16:25:36 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 40MG3Cxu025892;
 	Mon, 22 Jan 2024 16:25:34 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vstjtu18t-1
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3vrsgnsshu-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Mon, 22 Jan 2024 16:25:34 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 40MFnBFT026505;
-	Mon, 22 Jan 2024 16:25:33 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3vrrgt21u3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 22 Jan 2024 16:25:33 +0000
 Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 40MGPUVI56754494
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 40MGPV2Q41812592
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 22 Jan 2024 16:25:30 GMT
+	Mon, 22 Jan 2024 16:25:31 GMT
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7AC3D20043;
-	Mon, 22 Jan 2024 16:25:30 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 0A7B320043;
+	Mon, 22 Jan 2024 16:25:31 +0000 (GMT)
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0ACC120040;
+	by IMSVA (Postfix) with ESMTP id 8F9A320040;
 	Mon, 22 Jan 2024 16:25:30 +0000 (GMT)
 Received: from li-9fd7f64c-3205-11b2-a85c-df942b00d78d.ibm.com.com (unknown [9.171.78.16])
 	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 22 Jan 2024 16:25:29 +0000 (GMT)
+	Mon, 22 Jan 2024 16:25:30 +0000 (GMT)
 From: Janosch Frank <frankja@linux.ibm.com>
 To: pbonzini@redhat.com
 Cc: kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
         borntraeger@linux.ibm.com, cohuck@redhat.com,
         linux-s390@vger.kernel.org, imbrenda@linux.ibm.com
-Subject: [GIT PULL 1/2] KVM: s390: vsie: fix race during shadow creation
-Date: Mon, 22 Jan 2024 17:22:30 +0100
-Message-ID: <20240122162445.107260-2-frankja@linux.ibm.com>
+Subject: [GIT PULL 2/2] KVM: s390: fix cc for successful PQAP
+Date: Mon, 22 Jan 2024 17:22:31 +0100
+Message-ID: <20240122162445.107260-3-frankja@linux.ibm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240122162445.107260-1-frankja@linux.ibm.com>
 References: <20240122162445.107260-1-frankja@linux.ibm.com>
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: itrhcmiwGiP3u3Fdd5KZ3kzIXi79yX7l
-X-Proofpoint-GUID: UjKLSnSAdbKOv_lus_ZX81O9CKIfq1Xz
+X-Proofpoint-ORIG-GUID: 4S5hFnxMaOQHeUumhKdyUDKXYw65E6Zt
+X-Proofpoint-GUID: g2u_ia_O3cBsUcaxWIjknEjjbr-p_J4V
 Content-Transfer-Encoding: 8bit
 X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
@@ -98,68 +98,54 @@ MIME-Version: 1.0
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2024-01-22_07,2024-01-22_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=897
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=859
  impostorscore=0 phishscore=0 adultscore=0 lowpriorityscore=0 spamscore=0
  mlxscore=0 bulkscore=0 suspectscore=0 clxscore=1015 malwarescore=0
  priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2311290000 definitions=main-2401220112
 
-From: Christian Borntraeger <borntraeger@linux.ibm.com>
+From: Eric Farman <farman@linux.ibm.com>
 
-Right now it is possible to see gmap->private being zero in
-kvm_s390_vsie_gmap_notifier resulting in a crash.  This is due to the
-fact that we add gmap->private == kvm after creation:
+The various errors that are possible when processing a PQAP
+instruction (the absence of a driver hook, an error FROM that
+hook), all correctly set the PSW condition code to 3. But if
+that processing works successfully, CC0 needs to be set to
+convey that everything was fine.
 
-static int acquire_gmap_shadow(struct kvm_vcpu *vcpu,
-                               struct vsie_page *vsie_page)
-{
-[...]
-        gmap = gmap_shadow(vcpu->arch.gmap, asce, edat);
-        if (IS_ERR(gmap))
-                return PTR_ERR(gmap);
-        gmap->private = vcpu->kvm;
+Fix the check so that the guest can examine the condition code
+to determine whether GPR1 has meaningful data.
 
-Let children inherit the private field of the parent.
-
-Reported-by: Marc Hartmayer <mhartmay@linux.ibm.com>
-Fixes: a3508fbe9dc6 ("KVM: s390: vsie: initial support for nested virtualization")
-Cc: <stable@vger.kernel.org>
-Cc: David Hildenbrand <david@redhat.com>
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Signed-off-by: Christian Borntraeger <borntraeger@linux.ibm.com>
-Link: https://lore.kernel.org/r/20231220125317.4258-1-borntraeger@linux.ibm.com
+Fixes: e5282de93105 ("s390: ap: kvm: add PQAP interception for AQIC")
+Signed-off-by: Eric Farman <farman@linux.ibm.com>
+Reviewed-by: Tony Krowiak <akrowiak@linux.ibm.com>
+Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
+Link: https://lore.kernel.org/r/20231201181657.1614645-1-farman@linux.ibm.com
 Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+Message-Id: <20231201181657.1614645-1-farman@linux.ibm.com>
+Signed-off-by: Christian Borntraeger <borntraeger@linux.ibm.com>
 ---
- arch/s390/kvm/vsie.c | 1 -
- arch/s390/mm/gmap.c  | 1 +
- 2 files changed, 1 insertion(+), 1 deletion(-)
+ arch/s390/kvm/priv.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
-index 8207a892bbe2..db9a180de65f 100644
---- a/arch/s390/kvm/vsie.c
-+++ b/arch/s390/kvm/vsie.c
-@@ -1220,7 +1220,6 @@ static int acquire_gmap_shadow(struct kvm_vcpu *vcpu,
- 	gmap = gmap_shadow(vcpu->arch.gmap, asce, edat);
- 	if (IS_ERR(gmap))
- 		return PTR_ERR(gmap);
--	gmap->private = vcpu->kvm;
- 	vcpu->kvm->stat.gmap_shadow_create++;
- 	WRITE_ONCE(vsie_page->gmap, gmap);
- 	return 0;
-diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
-index 6f96b5a71c63..8da39deb56ca 100644
---- a/arch/s390/mm/gmap.c
-+++ b/arch/s390/mm/gmap.c
-@@ -1691,6 +1691,7 @@ struct gmap *gmap_shadow(struct gmap *parent, unsigned long asce,
- 		return ERR_PTR(-ENOMEM);
- 	new->mm = parent->mm;
- 	new->parent = gmap_get(parent);
-+	new->private = parent->private;
- 	new->orig_asce = asce;
- 	new->edat_level = edat_level;
- 	new->initialized = false;
+diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
+index 621a17fd1a1b..f875a404a0a0 100644
+--- a/arch/s390/kvm/priv.c
++++ b/arch/s390/kvm/priv.c
+@@ -676,8 +676,12 @@ static int handle_pqap(struct kvm_vcpu *vcpu)
+ 	if (vcpu->kvm->arch.crypto.pqap_hook) {
+ 		pqap_hook = *vcpu->kvm->arch.crypto.pqap_hook;
+ 		ret = pqap_hook(vcpu);
+-		if (!ret && vcpu->run->s.regs.gprs[1] & 0x00ff0000)
+-			kvm_s390_set_psw_cc(vcpu, 3);
++		if (!ret) {
++			if (vcpu->run->s.regs.gprs[1] & 0x00ff0000)
++				kvm_s390_set_psw_cc(vcpu, 3);
++			else
++				kvm_s390_set_psw_cc(vcpu, 0);
++		}
+ 		up_read(&vcpu->kvm->arch.crypto.pqap_hook_rwsem);
+ 		return ret;
+ 	}
 -- 
 2.43.0
 
