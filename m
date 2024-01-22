@@ -1,162 +1,122 @@
-Return-Path: <kvm+bounces-6519-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6520-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7A22835D6B
-	for <lists+kvm@lfdr.de>; Mon, 22 Jan 2024 09:57:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1DD1835D70
+	for <lists+kvm@lfdr.de>; Mon, 22 Jan 2024 09:57:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1EAB11C22F39
-	for <lists+kvm@lfdr.de>; Mon, 22 Jan 2024 08:57:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42EF71F24DA5
+	for <lists+kvm@lfdr.de>; Mon, 22 Jan 2024 08:57:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C63253A1C7;
-	Mon, 22 Jan 2024 08:54:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 130E139AC8;
+	Mon, 22 Jan 2024 08:55:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LxLNmZ2F"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nf23aZpl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F79B3A1BA
-	for <kvm@vger.kernel.org>; Mon, 22 Jan 2024 08:54:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A055A39859
+	for <kvm@vger.kernel.org>; Mon, 22 Jan 2024 08:55:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.55.52.93
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705913651; cv=none; b=Rr57KZoyFIbaPyez9TCG4UrnFd9jSD00QQV9Mpsf7tLO8VgCZmP3nrk855u7u6xKkqJLDlWBtS6DuN9RfwTc5PSAN3si4rHSHEJsxOvpQSHU9k5IFhO+Udktld6yEyDeqTRVlWpVQXi5f9bSWXHntppPZ0Zx+N4vhaRjcf+qfpA=
+	t=1705913724; cv=none; b=m45vhNHpGFNYxwgBbtdriLBqaFAR7T1Fwrn9r0CZS/HAakVEGMORwVX36du+7/zdGHsr8SGlaKdgM1PR8FgCXDKA1A9nybMwwRA28ugNJ8agDH/uLJpx1ra3Fz3dAQYGDq6q4r0wWl5iyNKW6dtq90AYRCPyvD5UDa4e6JFrpyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705913651; c=relaxed/simple;
-	bh=zcz9i0X15s3PV0duA+ICGHzuXb7jOBap7F3wzrHILgQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=G1ZUfkW6itaBbDdpCiaByiO7do3a1HlhMe2N4NFnJfhvVUC7/AxIrul4fNE60yvlQcAetJ9PzMJ9JC1avLk0dkyx9AxKc3oJ3iDihMoBZ4TAwQtcRduki3C3FV2IaJJhKFi5tlhyA++YxVTNOXs8mjof2uupYwQwglcEy86u5eg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LxLNmZ2F; arc=none smtp.client-ip=192.198.163.10
+	s=arc-20240116; t=1705913724; c=relaxed/simple;
+	bh=wUdT4fRB5Nf5lr+Hx1LVC2U0RFqx5arh4ZtYweAoHYI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=On66FCd9Br57GHiHNaidOGqXlKQbKimXd10jClmxKosJDtVDtiDOTkYV4/xeelMc5xvleXxZu36Eqgo5pa1Fz//++oPwW0nXD2tfQCBzGPRzOTySp0LQF1eZWzNQdTIU3YunsKzn6hAdA+BqexQ5ISKLFdSpAjNx3j3MoK5Ntmw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nf23aZpl; arc=none smtp.client-ip=192.55.52.93
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1705913650; x=1737449650;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=zcz9i0X15s3PV0duA+ICGHzuXb7jOBap7F3wzrHILgQ=;
-  b=LxLNmZ2F70SjpnT6eztezmA6vWRmNqDIM6qQIPyhx9zkmC0oR1pxG1+T
-   XwqkLHl+xrkzBf9+cQlnqQLETYunAGQx7LTcHORSsjb3bTD6DzxC6qU2Z
-   PRMf3Z5rRXm8S7YzcFOhbhTpn4adw5i6lJmHjyIMlRA44dLNlsNqQkyrM
-   Srb58UWsAztxEQvf+LDlZ8jQNihjeYPmJre3lROgy3ny8bIbqTik5sf6C
-   qE5gjVHzdwlrVRWhPCoHNx9AVJ5wy1ehRnTrkSzyW5bb1/Kvb4WpbQFGZ
-   F4OETEe6HBMpA0r/8vs8H9ixEOflb3AVvgFBkbmwDX9V2X3pnsGEV2uZT
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10960"; a="8536178"
+  t=1705913722; x=1737449722;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=wUdT4fRB5Nf5lr+Hx1LVC2U0RFqx5arh4ZtYweAoHYI=;
+  b=nf23aZpl5L6vSO5L1uriPyBe75TVxLSWhgYCz+TZAg4JBLtnIlqr4CyC
+   s+gpXhveyhUUHEcP9vr49U3qa9V5DmvV7Hyca3kTxY4gKSHtyQZAClSwC
+   MJlGg8gCSmgnCN6zPBg7RECT0wiXYGdH/uvIxKXydOJpMYGRe4PeMZPGv
+   M7ER2UgrkQEohekJQyY2ppJqKVbkxw/2ZkxqNgrhPUQwYurRMHQfLlor+
+   jj7g5xEc6+XZDcQdLL7VT7JUCMbq2lyPEvJKCg2wvA66030merIKAFrIJ
+   A5CCcUP1glanl7fMqbJBTF9kBpLjBeAcFMT8q+1GpYJ3YAiJzgxJiFuGC
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10960"; a="398301307"
 X-IronPort-AV: E=Sophos;i="6.05,211,1701158400"; 
-   d="scan'208";a="8536178"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 00:54:09 -0800
+   d="scan'208";a="398301307"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 00:55:22 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10960"; a="785611618"
+X-IronPort-AV: E=McAfee;i="6600,9927,10960"; a="928932124"
 X-IronPort-AV: E=Sophos;i="6.05,211,1701158400"; 
-   d="scan'208";a="785611618"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO binbinwu-mobl.sh.intel.com) ([10.238.10.49])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 00:54:06 -0800
-From: Binbin Wu <binbin.wu@linux.intel.com>
-To: kvm@vger.kernel.org
-Cc: seanjc@google.com,
-	pbonzini@redhat.com,
-	chao.gao@intel.com,
-	robert.hu@linux.intel.com,
-	binbin.wu@linux.intel.com
-Subject: [kvm-unit-tests PATCH v6 4/4] x86: Add test case for INVVPID with LAM
-Date: Mon, 22 Jan 2024 16:53:54 +0800
-Message-Id: <20240122085354.9510-5-binbin.wu@linux.intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240122085354.9510-1-binbin.wu@linux.intel.com>
-References: <20240122085354.9510-1-binbin.wu@linux.intel.com>
+   d="scan'208";a="928932124"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.10.49]) ([10.238.10.49])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 00:55:20 -0800
+Message-ID: <d424a315-1b20-47bf-a88e-394f576c3cc1@linux.intel.com>
+Date: Mon, 22 Jan 2024 16:55:17 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 0/2] Add support for LAM in QEMU
+To: qemu-devel@nongnu.org, kvm@vger.kernel.org, pbonzini@redhat.com
+Cc: xiaoyao.li@intel.com, chao.gao@intel.com, robert.hu@linux.intel.com,
+ binbin.wu@linux.intel.com
+References: <20240112060042.19925-1-binbin.wu@linux.intel.com>
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20240112060042.19925-1-binbin.wu@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-LAM applies to the linear address of INVVPID operand, however,
-it doesn't apply to the linear address in the INVVPID descriptor.
+Gentle ping...
+Please help to review and consider applying the patch series. (The KVM
+part has been merged).
 
-The added cases use tagged operand or tagged target invalidation
-address to make sure the behaviors are expected when LAM is on.
 
-Also, INVVPID case using tagged operand can be used as the common
-test cases for VMX instruction VMExits.
-
-Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
-Reviewed-by: Chao Gao <chao.gao@intel.com>
----
- x86/vmx_tests.c | 46 +++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 45 insertions(+), 1 deletion(-)
-
-diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index 63080361..a855bdcb 100644
---- a/x86/vmx_tests.c
-+++ b/x86/vmx_tests.c
-@@ -3220,6 +3220,48 @@ static void invvpid_test_not_in_vmx_operation(void)
- 	TEST_ASSERT(!vmx_on());
- }
- 
-+/* LAM doesn't apply to the linear address inside the descriptor of invvpid */
-+static void invvpid_test_lam(void)
-+{
-+	void *vaddr;
-+	struct invvpid_operand *operand;
-+	u64 lam_mask = LAM48_MASK;
-+	bool fault;
-+
-+	if (!this_cpu_has(X86_FEATURE_LAM)) {
-+		report_skip("LAM is not supported, skip INVVPID with LAM");
-+		return;
-+	}
-+	write_cr4(read_cr4() | X86_CR4_LAM_SUP);
-+
-+	if (this_cpu_has(X86_FEATURE_LA57) && read_cr4() & X86_CR4_LA57)
-+		lam_mask = LAM57_MASK;
-+
-+	vaddr = alloc_vpage();
-+	install_page(current_page_table(), virt_to_phys(alloc_page()), vaddr);
-+	/*
-+	 * Since the stack memory address in KUT doesn't follow kernel address
-+	 * space partition rule, reuse the memory address for descriptor and
-+	 * the target address in the descriptor of invvpid.
-+	 */
-+	operand = (struct invvpid_operand *)vaddr;
-+	operand->vpid = 0xffff;
-+	operand->gla = (u64)vaddr;
-+	operand = (struct invvpid_operand *)set_la_non_canonical((u64)operand,
-+								 lam_mask);
-+	fault = test_for_exception(GP_VECTOR, ds_invvpid, operand);
-+	report(!fault, "INVVPID (LAM on): tagged operand");
-+
-+	/*
-+	 * Verify that LAM doesn't apply to the address inside the descriptor
-+	 * even when LAM is enabled. i.e., the address in the descriptor should
-+	 * be canonical.
-+	 */
-+	try_invvpid(INVVPID_ADDR, 0xffff, (u64)operand);
-+
-+	write_cr4(read_cr4() & ~X86_CR4_LAM_SUP);
-+}
-+
- /*
-  * This does not test real-address mode, virtual-8086 mode, protected mode,
-  * or CPL > 0.
-@@ -3269,8 +3311,10 @@ static void invvpid_test(void)
- 	/*
- 	 * The gla operand is only validated for single-address INVVPID.
- 	 */
--	if (types & (1u << INVVPID_ADDR))
-+	if (types & (1u << INVVPID_ADDR)) {
- 		try_invvpid(INVVPID_ADDR, 0xffff, NONCANONICAL);
-+		invvpid_test_lam();
-+	}
- 
- 	invvpid_test_gp();
- 	invvpid_test_ss();
--- 
-2.25.1
+On 1/12/2024 2:00 PM, Binbin Wu wrote:
+> Linear-address masking (LAM) [1], modifies the checking that is applied to
+> *64-bit* linear addresses, allowing software to use of the untranslated
+> address bits for metadata and masks the metadata bits before using them as
+> linear addresses to access memory.
+>
+> When the feature is virtualized and exposed to guest, it can be used for
+> efficient
+> address sanitizers (ASAN) implementation and for optimizations in JITs and
+> virtual machines.
+>
+> The KVM patch series can be found in [2].
+>
+> [1] Intel ISE https://cdrdv2.intel.com/v1/dl/getContent/671368
+>      Chapter Linear Address Masking (LAM)
+> [2] https://lore.kernel.org/kvm/20230913124227.12574-1-binbin.wu@linux.intel.com
+>
+> ---
+> Changelog
+> v4:
+> - Add a reviewed-by from Xiaoyao for patch 1.
+> - Mask out LAM bit on CR4 if vcpu doesn't support LAM in cpu_x86_update_cr4() (Xiaoyao)
+>
+> v3:
+> - https://lists.gnu.org/archive/html/qemu-devel/2023-07/msg04160.html
+>
+> Binbin Wu (1):
+>    target/i386: add control bits support for LAM
+>
+> Robert Hoo (1):
+>    target/i386: add support for LAM in CPUID enumeration
+>
+>   target/i386/cpu.c    | 2 +-
+>   target/i386/cpu.h    | 9 ++++++++-
+>   target/i386/helper.c | 4 ++++
+>   3 files changed, 13 insertions(+), 2 deletions(-)
+>
+>
+> base-commit: f614acb7450282a119d85d759f27eae190476058
 
 
