@@ -1,73 +1,73 @@
-Return-Path: <kvm+bounces-6567-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6563-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EFDA836819
-	for <lists+kvm@lfdr.de>; Mon, 22 Jan 2024 16:27:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75AC5836812
+	for <lists+kvm@lfdr.de>; Mon, 22 Jan 2024 16:26:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E046228754C
-	for <lists+kvm@lfdr.de>; Mon, 22 Jan 2024 15:27:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 054531F269BB
+	for <lists+kvm@lfdr.de>; Mon, 22 Jan 2024 15:26:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 400E95EE82;
-	Mon, 22 Jan 2024 15:01:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20CAF5D918;
+	Mon, 22 Jan 2024 15:01:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hdPM5csf"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Lgzn3/+2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C79C15DF24
-	for <kvm@vger.kernel.org>; Mon, 22 Jan 2024 15:01:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 989A645C1D
+	for <kvm@vger.kernel.org>; Mon, 22 Jan 2024 15:01:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705935696; cv=none; b=bw+FM9SyzQKS6EulDnVuCTiwHu1YfYNi6+W+U4n7aGI7wAzGTzGW4AfejvfyA4RNIydKlLz0x5N9FE0PWnuUBD6IsNI7ivzUqatkYTR7ev/TdBJiRB6s5/82bkQ1F2BDncF1VjUg5HXZuni8jjnY272FUzaanmMX/bj/LX4pRho=
+	t=1705935692; cv=none; b=R84kVX9rrz/+J+cmD5Bk0EI7gK43Jr0xV4JGCBMJ+qoB6G1nrIjgEEB/qutcg8YkIAJi1UqnAACwuGZ+C89agHOOIlrUIyyvvmc5R5ACJhk3nXBR+AK9I+Ds/pnhwb/uqysFk8nzaO7SwVyXAGuLX+gpasFLuE+LsZWr03NDSws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705935696; c=relaxed/simple;
-	bh=qk9Fc4n+yThTQUr/IY5f6fw8mfY0PIL0MImGk4TIDlQ=;
+	s=arc-20240116; t=1705935692; c=relaxed/simple;
+	bh=I9heYG1ZCRndjP2m4FuccJ3EDDRfFtvTj6b9pH35Gms=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JwaqQFDjth+ZFW1LZFCkUQ+BD1gzRzZRaAUVqVoHC/CcN6Blzmx120pmr0MBWVVH2B+neyg0u1pZ0/rb3z/z56EJDhERN7cegguqewBmCB7XKjsFvCW0C3h4dzk588HLCVap00+mpJauVkgOHwMFagSkT4HB96iOalUcnnz/2Oo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=hdPM5csf; arc=none smtp.client-ip=209.85.221.44
+	 MIME-Version:Content-Type; b=bnM+CstrD3BnsWTfEL12mj5AfomSrFo0IqdmyyBP3kIp5hZszroMe1/vGFEwDYlmV6fY3E1CL6gan5YV2QwKU2fJofJRgQmG1uIQaQAYzXCUQ7pR+jyzcGAmxQMLmf3j/os5Eig8eaz7GuJNZcFJZofnA/zh9k02qzdjntJQtQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Lgzn3/+2; arc=none smtp.client-ip=209.85.128.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-33924df7245so2162496f8f.0
-        for <kvm@vger.kernel.org>; Mon, 22 Jan 2024 07:01:34 -0800 (PST)
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-40e8fec0968so42340005e9.1
+        for <kvm@vger.kernel.org>; Mon, 22 Jan 2024 07:01:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1705935693; x=1706540493; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1705935689; x=1706540489; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=t+Lu1aUTzILJv+8PeOqcfRU9ypZOJg6L0bg1/V/uBfw=;
-        b=hdPM5csfwzX3Ylww/36RyitwnXmcADgctxEjsL0tmEQTLA26NOte4xFvoht0PuoWwj
-         vckpAlDCuz7LkUe8e741n0Lu5ZGjmiuT7UC+xcIOtYxlLZCO/3RYZjNjKizaG7uGUrWN
-         /OdNT11NizRFheH0kyPhbu2QqnVGNfZQ732hQtGOZKJ/qpBugOiG/xAB+haJ1lfHYwIY
-         kY1Me3sQfchNOgSr1NcU5FTrFcSDIoQf2bmvYR0y7SxcM56oeeTaGLKouSF+4ewjvwUj
-         /XXlFQOCy9Zot1aT9/2lKZrhIjZDujc9HvLIMCJmeIKDPiPGLim7lYILxjw93hjWt62A
-         itWg==
+        bh=zMZ+pFdg1P4n/cHnfp4DZXoxUsYEnk+lXnRUtGdShK8=;
+        b=Lgzn3/+2RL+/jTMGBHmPCLf9rxPQaKOlBFhLjSidaJJMxKhs70CH/qlfXPTI+E5yvE
+         5K7STa64T9Cuos0iRCt13kX25XkEDZhGy092qUre/kGR6xTXlT0UI18euhO2gUlRwoFA
+         MqppjeF9VgOqbdckjYmoGz8EGviNmWnLSMJxO1x6w5oTHEqqgkMmGBns8zm53hOSYNG7
+         nszsvs296EUiOCDDykRkfS/wwC8AspkDJWIArVHziMdyZ8TN3vmX01KBYc72r+s9IfwV
+         8VrMKcV6R+o+9E/xjwsTeBgbd5FjF33pbkztYTdqdc3nvDPox+3vikWIRWfX/br9AwZz
+         21NQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705935693; x=1706540493;
+        d=1e100.net; s=20230601; t=1705935689; x=1706540489;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=t+Lu1aUTzILJv+8PeOqcfRU9ypZOJg6L0bg1/V/uBfw=;
-        b=DDhRpgjzhWLEnxeuww3gPpRWmH7CF6KaDKldwCgZvMe5lMxRftAYb4eeybmFhV7P3n
-         wnqoMdWPcX9svDZb/Jcxu17HtS06qYtQc2ap7yOasdZeTrAPNQx0MW2slJEzR76tX2Gb
-         m77wh1j34mrx/oZG9RkTzlwl/QFxSecW04/ygt2YU9gJXBwEaYwKLBJgJaSquYmrooXS
-         OvzWjc7aO72Ya6Vp1vIwcZLhlaANOhqWSl5u5TD214sCENvgdJg3sYb987HeIqCEiz8u
-         mVSl8xQ6j6/57ncDncP642Oe78q2H6xZDosktP1I3Qd1Jv5UqOzHFH4rPYoWqTdfBqjJ
-         QdNA==
-X-Gm-Message-State: AOJu0Yz4BLJIc7J5HyXmeoc2Ox7qWCPAFzt4TGpLp50crrmKfDmJywiT
-	z4xyRz3P4RAaIcW1aT3fqsoAf/15/EO5dk4mwBOJPXIJQ2cNUN6gJ6rmX3QqEqA=
-X-Google-Smtp-Source: AGHT+IHRTiofbHHbDcY7uv6w4qbyhJzpWSu85QzckhLtxFm+BHNGyxBTpaRUgd7Z2Eylz9B6B5o7cg==
-X-Received: by 2002:a05:600c:4fc7:b0:40e:60a3:b3e6 with SMTP id o7-20020a05600c4fc700b0040e60a3b3e6mr2319898wmq.170.1705935692106;
-        Mon, 22 Jan 2024 07:01:32 -0800 (PST)
+        bh=zMZ+pFdg1P4n/cHnfp4DZXoxUsYEnk+lXnRUtGdShK8=;
+        b=h2/h7jjj0/mzUoo5UDQxCG8s9WaVb9tI3huJXUgOx53ThIu5hxp8m+jfHItPHuDy2h
+         7oSj0RFRzqBiQHXw97BAWltu9CC6X9DmMzeqXW+PLmOb6QPkm94hdI78A9TGiRkxVweI
+         1On9kzWVbbd8rdxMVp/qEuGCA6aR3ucx/3na3fXpgZuMXeNIg+UxiU+TEspgMbdrm8q9
+         yhC5qxSDMExn1jHpcD6T1OypIOy/4sZ+kj77O92DENkfVTqCgDsvaDcu3xAWNaxuwsKB
+         CUp+vKNcAVOJ5vbeRR0b2oN3iNTlJCVLuFB4aRL3kde3AhjWNDz7amFxJzDGgJpiguhE
+         KGjg==
+X-Gm-Message-State: AOJu0YwL11I9+3ktKW4UTGU6ak8vvHXOn4DQRE6u6xknfuAp4Iq6Nrd2
+	TBEvHBWIjfHLkzTo4X/v1pIa1hs2w10EB4vjbfa0b3pj1s65a6aYfzfmYAxwIbk=
+X-Google-Smtp-Source: AGHT+IFPIr2Ee0y73303g5cCda6EprIxJ9AwU9+gItZXvCJzsVuJi+g6jnLnWq7qRPmBEAJUswV1Ew==
+X-Received: by 2002:a05:600c:4f10:b0:40e:b0ec:e98c with SMTP id l16-20020a05600c4f1000b0040eb0ece98cmr456950wmq.139.1705935688372;
+        Mon, 22 Jan 2024 07:01:28 -0800 (PST)
 Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id u6-20020a05600c138600b0040d5a9d6b68sm43621458wmf.6.2024.01.22.07.01.27
+        by smtp.gmail.com with ESMTPSA id t18-20020a05600c199200b0040e5951f199sm39123604wmq.34.2024.01.22.07.01.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jan 2024 07:01:31 -0800 (PST)
+        Mon, 22 Jan 2024 07:01:27 -0800 (PST)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 1D9245F9D4;
+	by draig.lan (Postfix) with ESMTP id 3642F5F9D5;
 	Mon, 22 Jan 2024 14:56:13 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
@@ -114,9 +114,9 @@ Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
 	Eduardo Habkost <eduardo@habkost.net>,
 	Brian Cain <bcain@quicinc.com>,
 	Paul Durrant <paul@xen.org>
-Subject: [PATCH v3 20/21] docs/devel: lift example and plugin API sections up
-Date: Mon, 22 Jan 2024 14:56:09 +0000
-Message-Id: <20240122145610.413836-21-alex.bennee@linaro.org>
+Subject: [PATCH v3 21/21] docs/devel: document some plugin assumptions
+Date: Mon, 22 Jan 2024 14:56:10 +0000
+Message-Id: <20240122145610.413836-22-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240122145610.413836-1-alex.bennee@linaro.org>
 References: <20240122145610.413836-1-alex.bennee@linaro.org>
@@ -129,41 +129,77 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-This makes them a bit more visible in the TCG emulation menu rather
-than hiding them away bellow the ToC limit.
+While we attempt to hide implementation details from the plugin we
+shouldn't be totally obtuse. Let the user know what they can and can't
+expect with the various instrumentation options.
 
-Message-Id: <20240103173349.398526-43-alex.bennee@linaro.org>
+Message-Id: <20240103173349.398526-44-alex.bennee@linaro.org>
 Reviewed-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- docs/devel/tcg-plugins.rst | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ docs/devel/tcg-plugins.rst | 49 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 49 insertions(+)
 
 diff --git a/docs/devel/tcg-plugins.rst b/docs/devel/tcg-plugins.rst
-index fa7421279f5..535a74684c5 100644
+index 535a74684c5..9cc09d8c3da 100644
 --- a/docs/devel/tcg-plugins.rst
 +++ b/docs/devel/tcg-plugins.rst
-@@ -143,7 +143,7 @@ requested. The plugin isn't completely uninstalled until the safe work
- has executed while all vCPUs are quiescent.
+@@ -112,6 +112,55 @@ details are opaque to plugins. The plugin is able to query select
+ details of instructions and system configuration only through the
+ exported *qemu_plugin* functions.
  
- Example Plugins
-----------------
-+===============
++However the following assumptions can be made:
++
++Translation Blocks
++++++++++++++++++++
++
++All code will go through a translation phase although not all
++translations will be necessarily be executed. You need to instrument
++actual executions to track what is happening.
++
++It is quite normal to see the same address translated multiple times.
++If you want to track the code in system emulation you should examine
++the underlying physical address (``qemu_plugin_insn_haddr``) to take
++into account the effects of virtual memory although if the system does
++paging this will change too.
++
++Not all instructions in a block will always execute so if its
++important to track individual instruction execution you need to
++instrument them directly. However asynchronous interrupts will not
++change control flow mid-block.
++
++Instructions
++++++++++++++
++
++Instruction instrumentation runs before the instruction executes. You
++can be can be sure the instruction will be dispatched, but you can't
++be sure it will complete. Generally this will be because of a
++synchronous exception (e.g. SIGILL) triggered by the instruction
++attempting to execute. If you want to be sure you will need to
++instrument the next instruction as well. See the ``execlog.c`` plugin
++for examples of how to track this and finalise details after execution.
++
++Memory Accesses
+++++++++++++++++
++
++Memory callbacks are called after a successful load or store.
++Unsuccessful operations (i.e. faults) will not be visible to memory
++instrumentation although the execution side effects can be observed
++(e.g. entering a exception handler).
++
++System Idle and Resume States
+++++++++++++++++++++++++++++++
++
++The ``qemu_plugin_register_vcpu_idle_cb`` and
++``qemu_plugin_register_vcpu_resume_cb`` functions can be used to track
++when CPUs go into and return from sleep states when waiting for
++external I/O. Be aware though that these may occur less frequently
++than in real HW due to the inefficiencies of emulation giving less
++chance for the CPU to idle.
++
+ Internals
+ ---------
  
- There are a number of plugins included with QEMU and you are
- encouraged to contribute your own plugins plugins upstream. There is a
-@@ -591,8 +591,8 @@ The plugin has a number of arguments, all of them are optional:
-   configuration arguments implies ``l2=on``.
-   (default: N = 2097152 (2MB), B = 64, A = 16)
- 
--API
-----
-+Plugin API
-+==========
- 
- The following API is generated from the inline documentation in
- ``include/qemu/qemu-plugin.h``. Please ensure any updates to the API
 -- 
 2.39.2
 
