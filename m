@@ -1,163 +1,223 @@
-Return-Path: <kvm+bounces-6494-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6495-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50883835746
-	for <lists+kvm@lfdr.de>; Sun, 21 Jan 2024 19:45:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2BBD835A73
+	for <lists+kvm@lfdr.de>; Mon, 22 Jan 2024 06:48:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DFDFE1F210C7
-	for <lists+kvm@lfdr.de>; Sun, 21 Jan 2024 18:44:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE39B283186
+	for <lists+kvm@lfdr.de>; Mon, 22 Jan 2024 05:48:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 466FA383A0;
-	Sun, 21 Jan 2024 18:44:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A925953A7;
+	Mon, 22 Jan 2024 05:48:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fkwIE3fs"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NUAUTkct"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E498F381D3
-	for <kvm@vger.kernel.org>; Sun, 21 Jan 2024 18:44:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44A424C8B;
+	Mon, 22 Jan 2024 05:48:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.134.136.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705862684; cv=none; b=pCRt2tvrDnNo+xcYO668mneIWEqPjCn6SQ4Gj0QJjY9td9QZy5MUyFLFLkUGJ79tDltIJRMAECViltPAwoW0jif0yBcxrEpROrfeEUjA0RDswHIdbJAdP+52JzY8bLR6Z9kcPdsSzqLCyIlfpmgj6vFtczVrxc+uv+jiRP0Lfhw=
+	t=1705902515; cv=none; b=nyFZEoC2fDtKEFoNSSHGLSmrQLzEZjOrMKU2G833BmyIMRXQBCannoTUrB3MbonBTXDBKoT1RqGuP7wosZhizvQIpbdKfgT4oGTAhfOKjcur830Wmj3SFeKXwVl9y7Hx+rHROc+10xbc8HfXXRSBFuRmHGsrv2k1BPjDV1g5+X8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705862684; c=relaxed/simple;
-	bh=pAwTTU33ri9CTWjjk66csXD8pbCteqoL4Oh7bntQT0k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LuzD52A4/J4N7MUVPofjgioyOvcJwOd6CXL3osGOL6mLTJ6pT7AKRdzcilOjPhNLext5McEgiumwksV8lw+2V51ZJ0aE922ImhL3lS/aqcos2I/4wuuBY7J1n6Q8sBDavGYxblO2x8IZ1zfD4rMdyx0OsDljKHXrte7MjFu1FTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fkwIE3fs; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1705862681;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=guMoP2TLsfEqj1Hggx/w0+mwdRN+95oChUYRB7tzFcY=;
-	b=fkwIE3fsYqPUJrAUjl/tXGq68rAl7Is2LgnmQT94mPow7aPsiz9QIDCKW08gu7AoDjNiO5
-	WDA+4mrh+nEVrDj0eBzAd8z9x1WqOCXd630FHrNQdBWMb+9fLltDtoNcz5Qzw7OEeMHF1k
-	/hHWlipsDOq8Qq4rAFJ47NcjdfJAqc0=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-2-aI-wvekSOlKmHXvbT2SBfQ-1; Sun, 21 Jan 2024 13:44:39 -0500
-X-MC-Unique: aI-wvekSOlKmHXvbT2SBfQ-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-40e8d72e1b3so25999765e9.2
-        for <kvm@vger.kernel.org>; Sun, 21 Jan 2024 10:44:39 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705862678; x=1706467478;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=guMoP2TLsfEqj1Hggx/w0+mwdRN+95oChUYRB7tzFcY=;
-        b=CQIU8pCYpuE/6GpmrS1xViV087MqkEVcWk9p/CkeuEdQDJ6WN5UNMrDlBCmnzQrkdE
-         jeLdPsDjI5yU+JQPudWEcnDwD8jHJ8sKVJFR3HloF9Uu/NY/6ObC/K8wCcoprZNoI1WK
-         d81EJsjHZqbXTT6IJdtxkT5l/i34VYX5Vq/JlLQX77kkTNQ5GH1onkMUduACiYKwps+y
-         6PAL35yibC2Z9UrNSKykoYwPdpL5b8GjVXrnG7bWlZRUzU9yQTxyYR6GN78j4mgRco+q
-         Bmh32xm7mMnYxZhud+ygc2DMHbTEcPpiUoLILY0ixVVdDzO7hRgPK4modF6skzcCd9I5
-         GpIw==
-X-Gm-Message-State: AOJu0YyrqqexicHYuBlx3TM/bopWMRH1O3dtmv99hhMXP+2skFKt5T64
-	KAVrx3nFXXGMNWTW6+GvqtiTD+JNIK56lEkLhiR7kbqMe+m0FYVRbHza5ZyrXUPeYUV/WKDpoBU
-	1poQqkXQXrdS+CPQ53wUbqoVi53qQ3zp7JeV3xqMYslC4S8SO2w==
-X-Received: by 2002:a05:600c:1c85:b0:40e:4789:7842 with SMTP id k5-20020a05600c1c8500b0040e47897842mr1857738wms.236.1705862678258;
-        Sun, 21 Jan 2024 10:44:38 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE1bzkFTUa/tUGQacRJtg45xo0chZy5yADvcP07PoL9frmkMFBtGIdedbJbDN6aNNam0c94GQ==
-X-Received: by 2002:a05:600c:1c85:b0:40e:4789:7842 with SMTP id k5-20020a05600c1c8500b0040e47897842mr1857731wms.236.1705862677920;
-        Sun, 21 Jan 2024 10:44:37 -0800 (PST)
-Received: from redhat.com ([2.52.14.57])
-        by smtp.gmail.com with ESMTPSA id t18-20020a05600c199200b0040e5951f199sm36202366wmq.34.2024.01.21.10.44.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Jan 2024 10:44:36 -0800 (PST)
-Date: Sun, 21 Jan 2024 13:44:32 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Tobias Huschle <huschle@linux.ibm.com>
-Cc: Jason Wang <jasowang@redhat.com>, Abel Wu <wuyun.abel@bytedance.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org
-Subject: Re: Re: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6
- sched/fair: Add lag based placement)
-Message-ID: <20240121134311-mutt-send-email-mst@kernel.org>
-References: <CACGkMEuSGT-e-i-8U7hum-N_xEnsEKL+_07Mipf6gMLFFhj2Aw@mail.gmail.com>
- <20231211115329-mutt-send-email-mst@kernel.org>
- <CACGkMEudZnF7hUajgt0wtNPCxH8j6A3L1DgJj2ayJWhv9Bh1WA@mail.gmail.com>
- <20231212111433-mutt-send-email-mst@kernel.org>
- <42870.123121305373200110@us-mta-641.us.mimecast.lan>
- <20231213061719-mutt-send-email-mst@kernel.org>
- <25485.123121307454100283@us-mta-18.us.mimecast.lan>
- <20231213094854-mutt-send-email-mst@kernel.org>
- <20231214021328-mutt-send-email-mst@kernel.org>
- <92916.124010808133201076@us-mta-622.us.mimecast.lan>
+	s=arc-20240116; t=1705902515; c=relaxed/simple;
+	bh=SO0RHtQCOC3xp0CtyqMmrD9hwnjhTL3VDf64B4nYOnA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=JHxsB/obH3HhfSQ8baktycT195bdr1IhzKgz8MkTASjJaPh4M6zlwD7vjeezeN+ouKSCA7zhP8CQ+IzEYjraXaHxPElxaWEIkTBbQZxbpFDXx2YeGAUS21j1wewbSQPqpoGVsSh0ACGFX+XBJHyszXU0oDM5w9tLpwMW1t+oAPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NUAUTkct; arc=none smtp.client-ip=134.134.136.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1705902514; x=1737438514;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=SO0RHtQCOC3xp0CtyqMmrD9hwnjhTL3VDf64B4nYOnA=;
+  b=NUAUTkcth0ZRge3MKn0qLsPTUHpmm9oAkAiAa/fP9V3SjHuSamFxQlzZ
+   qB+uiLUZR6XuzaoOPlSfra3BQTO6baUIgpDArrrLO5/5qKcVd4i/yifx0
+   1Vp+srfKPjji1AnIbg3Ba+pZSWloy8N4z+RdtSSGb7SAX5E0Rv3vbf+n6
+   twr/V3arkmTKtOjkUKP6DaJE+kH5mpCSJB33AYU98DbWSf86oDDjcMjgo
+   N4zwcTvQe1IVQ8OcgetWluzXO5C1FQwojvydWAnistqgadi7/3kWweF8c
+   60h8JpXOMa0QgtQ7kQuXOxwSOlL89m6VWH5afpgT87qOZ7MWVdvj6H04H
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10960"; a="467487003"
+X-IronPort-AV: E=Sophos;i="6.05,211,1701158400"; 
+   d="scan'208";a="467487003"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2024 21:48:33 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10960"; a="1116763830"
+X-IronPort-AV: E=Sophos;i="6.05,211,1701158400"; 
+   d="scan'208";a="1116763830"
+Received: from allen-box.sh.intel.com ([10.239.159.127])
+  by fmsmga005.fm.intel.com with ESMTP; 21 Jan 2024 21:48:29 -0800
+From: Lu Baolu <baolu.lu@linux.intel.com>
+To: Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	Nicolin Chen <nicolinc@nvidia.com>
+Cc: Yi Liu <yi.l.liu@intel.com>,
+	Jacob Pan <jacob.jun.pan@linux.intel.com>,
+	Longfang Liu <liulongfang@huawei.com>,
+	Yan Zhao <yan.y.zhao@intel.com>,
+	iommu@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Lu Baolu <baolu.lu@linux.intel.com>
+Subject: [PATCH v10 00/16] iommu: Prepare to deliver page faults to user space
+Date: Mon, 22 Jan 2024 13:42:52 +0800
+Message-Id: <20240122054308.23901-1-baolu.lu@linux.intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <92916.124010808133201076@us-mta-622.us.mimecast.lan>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jan 08, 2024 at 02:13:25PM +0100, Tobias Huschle wrote:
-> On Thu, Dec 14, 2023 at 02:14:59AM -0500, Michael S. Tsirkin wrote:
-> > 
-> > Peter, would appreciate feedback on this. When is cond_resched()
-> > insufficient to give up the CPU? Should Documentation/kernel-hacking/hacking.rst
-> > be updated to require schedule() instead?
-> > 
-> 
-> Happy new year everybody!
-> 
-> I'd like to bring this thread back to life. To reiterate:
-> 
-> - The introduction of the EEVDF scheduler revealed a performance
->   regression in a uperf testcase of ~50%.
-> - Tracing the scheduler showed that it takes decisions which are
->   in line with its design.
-> - The traces showed as well, that a vhost instance might run
->   excessively long on its CPU in some circumstance. Those cause
->   the performance regression as they cause delay times of 100+ms
->   for a kworker which drives the actual network processing.
-> - Before EEVDF, the vhost would always be scheduled off its CPU
->   in favor of the kworker, as the kworker was being woken up and
->   the former scheduler was giving more priority to the woken up
->   task. With EEVDF, the kworker, as a long running process, is
->   able to accumulate negative lag, which causes EEVDF to not
->   prefer it on its wake up, leaving the vhost running.
-> - If the kworker is not scheduled when being woken up, the vhost
->   continues looping until it is migrated off the CPU.
-> - The vhost offers to be scheduled off the CPU by calling 
->   cond_resched(), but, the the need_resched flag is not set,
->   therefore cond_resched() does nothing.
-> 
-> To solve this, I see the following options 
->   (might not be a complete nor a correct list)
-> - Along with the wakeup of the kworker, need_resched needs to
->   be set, such that cond_resched() triggers a reschedule.
+When a user-managed page table is attached to an IOMMU, it is necessary
+to deliver IO page faults to user space so that they can be handled
+appropriately. One use case for this is nested translation, which is
+currently being discussed in the mailing list.
 
-Let's try this? Does not look like discussing vhost itself will
-draw attention from scheduler guys but posting a scheduling
-patch probably will? Can you post a patch?
+I have posted a RFC series [1] that describes the implementation of
+delivering page faults to user space through IOMMUFD. This series has
+received several comments on the IOMMU refactoring, which I am trying to
+address in this series.
 
-> - The vhost calls schedule() instead of cond_resched() to give up
->   the CPU. This would of course be a significantly stricter
->   approach and might limit the performance of vhost in other cases.
-> - Preventing the kworker from accumulating negative lag as it is
->   mostly not runnable and if it runs, it only runs for a very short
->   time frame. This might clash with the overall concept of EEVDF.
-> - On cond_resched(), verify if the consumed runtime of the caller
->   is outweighing the negative lag of another process (e.g. the 
->   kworker) and schedule the other process. Introduces overhead
->   to cond_resched.
+The major refactoring includes:
 
-Or this last one.
+- [PATCH 01 ~ 04] Move include/uapi/linux/iommu.h to
+  include/linux/iommu.h. Remove the unrecoverable fault data definition.
+- [PATCH 05 ~ 06] Remove iommu_[un]register_device_fault_handler().
+- [PATCH 07 ~ 10] Separate SVA and IOPF. Make IOPF a generic page fault
+  handling framework.
+- [PATCH 11 ~ 16] Improve iopf framework.
 
+This is also available at github [2].
 
-> 
-> I would be curious on feedback on those ideas and interested in
-> alternative approaches.
+[1] https://lore.kernel.org/linux-iommu/20230530053724.232765-1-baolu.lu@linux.intel.com/
+[2] https://github.com/LuBaolu/intel-iommu/commits/preparatory-io-pgfault-delivery-v10
+
+Change log:
+v10:
+  - Make iopf_group_response() return void, as nobody can do anything
+    with the failure.
+  - Make iommu_report_device_fault() automatically respond to
+    unhandleable faults and change its return type to void.
+  - PATCH 01 ~ 14 are in good shapes now.
+
+v9: https://lore.kernel.org/linux-iommu/20231220012332.168188-1-baolu.lu@linux.intel.com/
+  - Protecting the assignment of dev->iommu->fault_param with RCU.
+  - Extending the fault parameter's lifetime to the entire path of iopf
+    handling.
+  - Since iopf_queue_flush_dev() can only be called before
+    iopf_queue_remove_device(), there's no need to hold a reference
+    count.
+  - Improve iopf_queue_remove_device() as per Jason's comments on the
+    device removal sequence from the iopf queue. This will likely
+    require changes to the iommu drivers, which are supposed to be
+    addressed in separate series.
+  - Track the iopf_group as a whole instead of the last fault within the
+    group to simplify the fault report and response paths.
+  - PATCH 01 ~ 11 are in good shapes now.
+
+v8: https://lore.kernel.org/linux-iommu/20231207064308.313316-1-baolu.lu@linux.intel.com/
+ - Drop PATCH 12/12 as it is no longer necessary to drain page requests
+   page requests during PASID translation changes.
+ - Separate PATCH 11/12 into two distinct patches. The first patch
+   refines locking scheme for protecting per-device fault data, while
+   the second patch replaces mutex with RCU to enhance locking
+   efficiency.
+ - PATCH 01 ~ 10 are in good shapes now.
+
+v7: https://lore.kernel.org/linux-iommu/20231115030226.16700-1-baolu.lu@linux.intel.com/
+ - Rebase to v6.7-rc1.
+ - Export iopf_group_response() for global use.
+ - Release lock when calling iopf handler.
+ - The whole series has been verified to work for SVA case on Intel
+   platforms by Zhao Yan. Add her Tested-by to affected patches.
+
+v6: https://lore.kernel.org/linux-iommu/20230928042734.16134-1-baolu.lu@linux.intel.com/
+ - [PATCH 09/12] Check IS_ERR() against the iommu domain. [Jingqi/Jason]
+ - [PATCH 12/12] Rename the comments and name of iopf_queue_flush_dev(),
+   no functionality changes. [Kevin]
+ - All patches rebased on the latest iommu/core branch.
+
+v5: https://lore.kernel.org/linux-iommu/20230914085638.17307-1-baolu.lu@linux.intel.com/
+ - Consolidate per-device fault data management. (New patch 11)
+ - Improve iopf_queue_flush_dev(). (New patch 12)
+
+v4: https://lore.kernel.org/linux-iommu/20230825023026.132919-1-baolu.lu@linux.intel.com/
+ - Merge iommu_fault_event and iopf_fault. They are duplicate.
+ - Move iommu_report_device_fault() and iommu_page_response() to
+   io-pgfault.c.
+ - Move iommu_sva_domain_alloc() to iommu-sva.c.
+ - Add group->domain and use it directly in sva fault handler.
+ - Misc code refactoring and refining.
+
+v3: https://lore.kernel.org/linux-iommu/20230817234047.195194-1-baolu.lu@linux.intel.com/
+ - Convert the fault data structures from uAPI to kAPI.
+ - Merge iopf_device_param into iommu_fault_param.
+ - Add debugging on domain lifetime for iopf.
+ - Remove patch "iommu: Change the return value of dev_iommu_get()".
+ - Remove patch "iommu: Add helper to set iopf handler for domain".
+ - Misc code refactoring and refining.
+
+v2: https://lore.kernel.org/linux-iommu/20230727054837.147050-1-baolu.lu@linux.intel.com/
+ - Remove unrecoverable fault data definition as suggested by Kevin.
+ - Drop the per-device fault cookie code considering that doesn't make
+   much sense for SVA.
+ - Make the IOMMU page fault handling framework generic. So that it can
+   available for use cases other than SVA.
+
+v1: https://lore.kernel.org/linux-iommu/20230711010642.19707-1-baolu.lu@linux.intel.com/
+
+Lu Baolu (16):
+  iommu: Move iommu fault data to linux/iommu.h
+  iommu/arm-smmu-v3: Remove unrecoverable faults reporting
+  iommu: Remove unrecoverable fault data
+  iommu: Cleanup iopf data structure definitions
+  iommu: Merge iopf_device_param into iommu_fault_param
+  iommu: Remove iommu_[un]register_device_fault_handler()
+  iommu: Merge iommu_fault_event and iopf_fault
+  iommu: Prepare for separating SVA and IOPF
+  iommu: Make iommu_queue_iopf() more generic
+  iommu: Separate SVA and IOPF
+  iommu: Refine locking for per-device fault data management
+  iommu: Use refcount for fault data access
+  iommu: Improve iopf_queue_remove_device()
+  iommu: Track iopf group instead of last fault
+  iommu: Make iopf_group_response() return void
+  iommu: Make iommu_report_device_fault() reutrn void
+
+ include/linux/iommu.h                         | 266 +++++++---
+ drivers/iommu/intel/iommu.h                   |   4 +-
+ drivers/iommu/iommu-sva.h                     |  71 ---
+ include/uapi/linux/iommu.h                    | 161 ------
+ .../iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c   |  14 +-
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c   | 103 ++--
+ drivers/iommu/intel/iommu.c                   |  28 +-
+ drivers/iommu/intel/svm.c                     |  41 +-
+ drivers/iommu/io-pgfault.c                    | 480 +++++++++++-------
+ drivers/iommu/iommu-sva.c                     |  71 ++-
+ drivers/iommu/iommu.c                         | 233 ---------
+ MAINTAINERS                                   |   1 -
+ drivers/iommu/Kconfig                         |   4 +
+ drivers/iommu/Makefile                        |   3 +-
+ drivers/iommu/intel/Kconfig                   |   1 +
+ 15 files changed, 596 insertions(+), 885 deletions(-)
+ delete mode 100644 drivers/iommu/iommu-sva.h
+ delete mode 100644 include/uapi/linux/iommu.h
+
+-- 
+2.34.1
 
 
