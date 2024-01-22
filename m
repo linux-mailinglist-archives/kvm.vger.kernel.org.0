@@ -1,73 +1,73 @@
-Return-Path: <kvm+bounces-6559-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6560-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4C6B83669F
-	for <lists+kvm@lfdr.de>; Mon, 22 Jan 2024 16:05:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 82FCF8366A1
+	for <lists+kvm@lfdr.de>; Mon, 22 Jan 2024 16:05:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6357B287BC3
-	for <lists+kvm@lfdr.de>; Mon, 22 Jan 2024 15:05:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 310902879C8
+	for <lists+kvm@lfdr.de>; Mon, 22 Jan 2024 15:05:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BE7848788;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84C4048795;
 	Mon, 22 Jan 2024 14:56:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GkPRlpCH"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="O+pGQx7R"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 764FC481DB
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE28A47A6A
 	for <kvm@vger.kernel.org>; Mon, 22 Jan 2024 14:56:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705935387; cv=none; b=pCAY4ONhpkna4K5RkUXxTOUsYhQW4Npdjr5oKBQTblvIFCylrsD2cM6W4x14ayuiNL34Af3KoYGm7Yah1F/9wsVa9XvOXz5vgPSSOeeQ2e/3zv9I3Wfv/ErTfwUTf5kw8c+KvX25gmgisjThkcsJqI5BUZ0HwN6hWwtuftfY3ck=
+	t=1705935387; cv=none; b=drWxghq5re5p3bTfCAyTl0g8JeseRASOYyw7ssq0ciZ7vIDry+FWa79tTXBi6cI79paEKDolA+QLfr8xTzO5karTI13hLQHvRs0hf1krwlOkghJ9rANfkhcad04beeqd7NnngOM/ThEX8H+EZiwqzd80ZoXTKK+x3jpCd92WVTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1705935387; c=relaxed/simple;
-	bh=3h6eCmYIatSKyxVCRygBZpdZyaTGz355IWQk8GtFqoo=;
+	bh=tR0nakBW8JzFWIcSrJdjrciKJn6HWW8j93ZV/QQMXNQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MPLcMb02Xn1DhI8aZQrOSh+o3KkNxCezv3hfuSLn9wHJQAUl64958lBf0UO5UW0aHar6f5wrL3TwFF5K25ebDYsmca2olXt5XNruwqTC/mfcnXB6Yr15mOLy8Rle1HGCsj8qcs6zDDoTL0iS6AJ/0Y+FMastIx214s1rErQ63ic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=GkPRlpCH; arc=none smtp.client-ip=209.85.221.45
+	 MIME-Version:Content-Type; b=Q/pLByxaNPGCgkoDMWHA5eoDqizxMnrhWMslpiC5ATQDIETrNQgBQnt7vm7jqS+VgSvSQtYJtDNHXaTgrDEimUIAfiYRNrTJAq7Ij6AtuGjpSx+U+58TeXvxQx57Hk5Q1BNrY6dCwNUp/4RsSc78w+WeP5xU1nU6ZZ7oPkozqqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=O+pGQx7R; arc=none smtp.client-ip=209.85.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3367a304091so3607300f8f.3
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-40e86a9fbd9so36072355e9.1
         for <kvm@vger.kernel.org>; Mon, 22 Jan 2024 06:56:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google; t=1705935384; x=1706540184; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3KOWdwJWZtoTWqDMqrzzZRyWBV4iieoAaX695nl5QEU=;
-        b=GkPRlpCH63djNjDVDzfhOorOcjEDPiyHwe2JjclftgSYa7nicPoOZHshWTgTSqn9ti
-         gOrH+pxawaou79SUGIXs40mJB2qBGCzF4yZHfSQTsZGbpXT8a8p0FmdNJ6ZFdHeAY3zz
-         be7luU7l6mxmsUl91htXHstXujUkpB9XR36K+mW/qQeJDzP7Kw8P6nIrUuyeVZamVSk9
-         SdgSxoxw5ZAZ/TpBJpVTdGgxkXhzki3gtjVyIuhXfm+eZIg8WAmC66XyGIqAVaC4eEqw
-         r5z5pbadLXZ7RdThb7c46jkAXcMiS/dgI4/9icMuK9tSVvyOSTWrWSpvm9l8o8TeEAdz
-         AoTg==
+        bh=W2fjpQGWIVdaUhrKBxzpHv8KWPTJS+XO5n/dS9EIjS4=;
+        b=O+pGQx7R539YroEvVYCTA3fbnMpTQ2AWPoZZDKEpzhNtTRaACmOWsGG6GEXNfA+0Um
+         iCCG4zjjq0b9HSDP+hUMw2V6OCQodkasY8jRSpP9fKfSGhncZsMTXw3LEj5DxoJhDMXD
+         fQcZgNJYgjfiomWD+7LRtl2gPFU+58PBjQT/wWNahB52yut2ySqNxLQ60zDEqioDmjP4
+         m5XZs1XEOLYubwsfub+AMmMheEVO3LedV1kftRUgT6732ocaynAs2X6bwdoH+HmjtD7s
+         b8g5m2UNX3t1btGnE79bSrX4phQyYhNL1weik/ZEFL4xBV6P5DU2Ntcaw5pP47oJs9jZ
+         K/8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1705935384; x=1706540184;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=3KOWdwJWZtoTWqDMqrzzZRyWBV4iieoAaX695nl5QEU=;
-        b=iPIkLnNAK0d8gbtTkNqlW7xaTLUbVg+k0T9WyguDGuffpwR0i34UJp4r7StHLnk1Lp
-         z0kmiL7T/uG31XMP/plfHRUZT5ZcyUB1Fa47mSAQEugcH0Q2yS3tZ7o2gqJYHi7y/uhS
-         4P5P0UuVBpZfh4io+haSsPHkWDswOK8Z9GUozE/YK0awRPybuOQBq1FgmFOrTVyXsvLO
-         O2tfDTv3WvUUYxplRnCUYa96Z881/O7myPMpCPvVJQXBWhqkn9DFC1Ff4vBV+G2pVmHN
-         BAUd7ttan93MnaTWZXKVsDo1a+bzCwD5+QrTX5NqKGQjozVQVG9TbJYVOp0xG7j/NX8L
-         gLIg==
-X-Gm-Message-State: AOJu0YwRvUYKvjdp8aEYDppZhvNX0tFvlL+Kfp4SS6oVJS0UXjVF1T3S
-	LN6S1PYgNh80/1vtGl66L1B/P4J42M+VEqLCzqpaey+OBMyRyOcYfeaGIeBNpEY=
-X-Google-Smtp-Source: AGHT+IHYdWbJ3oJ8yxGR3dSKr3DfBPsGhNRpkZOVjh0y9b4fwfaSBiz2ySUSvfsKhK3QnGLayw/0nQ==
-X-Received: by 2002:adf:f20e:0:b0:337:bfe1:16f3 with SMTP id p14-20020adff20e000000b00337bfe116f3mr1368564wro.13.1705935383847;
-        Mon, 22 Jan 2024 06:56:23 -0800 (PST)
+        bh=W2fjpQGWIVdaUhrKBxzpHv8KWPTJS+XO5n/dS9EIjS4=;
+        b=vAXvg6vV5OtGi5uPAX2S3sRjgZlZ4DGlxzxrYkcKxruVM2w2IzphDJaZEs0ZOEbz7y
+         DLhKw4AzGH0K4e6HG3+W8alKcf7HGd2MnY4IdiCXOy5Jyqn5xaU/x3oaoR3x/oisMZM2
+         QgQ6ToEM17CWzB4+Th+n/xG1Uuad9PnWX1OGH6X44W2MpdXRTxyfvywAjKTlB5/OhnfM
+         7W86s2nMZb7tC+WyzKTVRHCdYE0SZYHLR5PCDO04dpq2tO5guueYu+G0nnD+7+ZTQUJp
+         LbKx9mjSDk464VaZdxFVWjIgEje9dzUOGhWN23wKvzTWyMtmWpZw2G1SXyx6/PaTTUks
+         SeAA==
+X-Gm-Message-State: AOJu0YwBc4D0FfSZMmU312JHrdp4P4Qv4giNBsDWtXGq12FK5cEKmYL5
+	alsv7is3clBox67bPAE3dgDG///e1jn+ppqNdv+1p/eOWzYp+5kws2oQCkh+Jh8=
+X-Google-Smtp-Source: AGHT+IEScfjWXUyT+16NGhk84eBOICncw64aNoX0grPWv47lGKOLuB6g+dkWFaG3Q/r849LZP0XdZg==
+X-Received: by 2002:a05:600c:54cc:b0:40d:87b7:24c7 with SMTP id iw12-20020a05600c54cc00b0040d87b724c7mr2387732wmb.125.1705935384148;
+        Mon, 22 Jan 2024 06:56:24 -0800 (PST)
 Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id k2-20020a5d6282000000b0033838c2c169sm9307734wru.108.2024.01.22.06.56.14
+        by smtp.gmail.com with ESMTPSA id i19-20020a05600c355300b0040e76b60235sm28316321wmq.8.2024.01.22.06.56.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jan 2024 06:56:19 -0800 (PST)
+        Mon, 22 Jan 2024 06:56:21 -0800 (PST)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 7D83E5F932;
+	by draig.lan (Postfix) with ESMTP id 971625F933;
 	Mon, 22 Jan 2024 14:56:12 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
@@ -115,9 +115,9 @@ Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
 	Brian Cain <bcain@quicinc.com>,
 	Paul Durrant <paul@xen.org>,
 	Akihiko Odaki <akihiko.odaki@daynix.com>
-Subject: [PATCH v3 14/21] gdbstub: Add members to identify registers to GDBFeature
-Date: Mon, 22 Jan 2024 14:56:03 +0000
-Message-Id: <20240122145610.413836-15-alex.bennee@linaro.org>
+Subject: [PATCH v3 15/21] plugins: Use different helpers when reading registers
+Date: Mon, 22 Jan 2024 14:56:04 +0000
+Message-Id: <20240122145610.413836-16-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240122145610.413836-1-alex.bennee@linaro.org>
 References: <20240122145610.413836-1-alex.bennee@linaro.org>
@@ -132,138 +132,189 @@ Content-Transfer-Encoding: 8bit
 
 From: Akihiko Odaki <akihiko.odaki@daynix.com>
 
-These members will be used to help plugins to identify registers.
-The added members in instances of GDBFeature dynamically generated by
-CPUs will be filled in later changes.
+This avoids optimizations incompatible when reading registers.
 
 Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-Message-Id: <20240103173349.398526-36-alex.bennee@linaro.org>
-Message-Id: <20231213-gdb-v17-10-777047380591@daynix.com>
+Reviewed-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+Message-Id: <20240103173349.398526-37-alex.bennee@linaro.org>
+Message-Id: <20231213-gdb-v17-12-777047380591@daynix.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/exec/gdbstub.h  |  3 +++
- gdbstub/gdbstub.c       | 12 +++++++++---
- target/riscv/gdbstub.c  |  4 +---
- scripts/feature_to_c.py | 14 +++++++++++++-
- 4 files changed, 26 insertions(+), 7 deletions(-)
+ accel/tcg/plugin-helpers.h |  3 ++-
+ include/qemu/plugin.h      |  1 +
+ accel/tcg/plugin-gen.c     | 43 ++++++++++++++++++++++++++++++++++----
+ plugins/api.c              | 12 +++++++++--
+ 4 files changed, 52 insertions(+), 7 deletions(-)
 
-diff --git a/include/exec/gdbstub.h b/include/exec/gdbstub.h
-index 82a8afa237f..da9ddfe54c5 100644
---- a/include/exec/gdbstub.h
-+++ b/include/exec/gdbstub.h
-@@ -13,12 +13,15 @@
- typedef struct GDBFeature {
-     const char *xmlname;
-     const char *xml;
-+    const char *name;
-+    const char * const *regs;
-     int num_regs;
- } GDBFeature;
+diff --git a/accel/tcg/plugin-helpers.h b/accel/tcg/plugin-helpers.h
+index 8e685e06545..11796436f35 100644
+--- a/accel/tcg/plugin-helpers.h
++++ b/accel/tcg/plugin-helpers.h
+@@ -1,4 +1,5 @@
+ #ifdef CONFIG_PLUGIN
+-DEF_HELPER_FLAGS_2(plugin_vcpu_udata_cb, TCG_CALL_NO_RWG | TCG_CALL_PLUGIN, void, i32, ptr)
++DEF_HELPER_FLAGS_2(plugin_vcpu_udata_cb_no_wg, TCG_CALL_NO_WG | TCG_CALL_PLUGIN, void, i32, ptr)
++DEF_HELPER_FLAGS_2(plugin_vcpu_udata_cb_no_rwg, TCG_CALL_NO_RWG | TCG_CALL_PLUGIN, void, i32, ptr)
+ DEF_HELPER_FLAGS_4(plugin_vcpu_mem_cb, TCG_CALL_NO_RWG | TCG_CALL_PLUGIN, void, i32, i32, i64, ptr)
+ #endif
+diff --git a/include/qemu/plugin.h b/include/qemu/plugin.h
+index 7fdc3a4849f..b0c5ac68293 100644
+--- a/include/qemu/plugin.h
++++ b/include/qemu/plugin.h
+@@ -73,6 +73,7 @@ enum plugin_dyn_cb_type {
  
- typedef struct GDBFeatureBuilder {
-     GDBFeature *feature;
-     GPtrArray *xml;
-+    GPtrArray *regs;
-     int base_reg;
- } GDBFeatureBuilder;
+ enum plugin_dyn_cb_subtype {
+     PLUGIN_CB_REGULAR,
++    PLUGIN_CB_REGULAR_R,
+     PLUGIN_CB_INLINE,
+     PLUGIN_N_CB_SUBTYPES,
+ };
+diff --git a/accel/tcg/plugin-gen.c b/accel/tcg/plugin-gen.c
+index 78b331b2510..b37ce7683e6 100644
+--- a/accel/tcg/plugin-gen.c
++++ b/accel/tcg/plugin-gen.c
+@@ -79,6 +79,7 @@ enum plugin_gen_from {
  
-diff --git a/gdbstub/gdbstub.c b/gdbstub/gdbstub.c
-index 801eba9a0b0..420ab2a3766 100644
---- a/gdbstub/gdbstub.c
-+++ b/gdbstub/gdbstub.c
-@@ -419,9 +419,10 @@ void gdb_feature_builder_init(GDBFeatureBuilder *builder, GDBFeature *feature,
-     builder->feature = feature;
-     builder->xml = g_ptr_array_new();
-     g_ptr_array_add(builder->xml, header);
-+    builder->regs = g_ptr_array_new();
-     builder->base_reg = base_reg;
-     feature->xmlname = xmlname;
--    feature->num_regs = 0;
-+    feature->name = name;
- }
+ enum plugin_gen_cb {
+     PLUGIN_GEN_CB_UDATA,
++    PLUGIN_GEN_CB_UDATA_R,
+     PLUGIN_GEN_CB_INLINE,
+     PLUGIN_GEN_CB_MEM,
+     PLUGIN_GEN_ENABLE_MEM_HELPER,
+@@ -90,7 +91,10 @@ enum plugin_gen_cb {
+  * These helpers are stubs that get dynamically switched out for calls
+  * direct to the plugin if they are subscribed to.
+  */
+-void HELPER(plugin_vcpu_udata_cb)(uint32_t cpu_index, void *udata)
++void HELPER(plugin_vcpu_udata_cb_no_wg)(uint32_t cpu_index, void *udata)
++{ }
++
++void HELPER(plugin_vcpu_udata_cb_no_rwg)(uint32_t cpu_index, void *udata)
+ { }
  
- void gdb_feature_builder_append_tag(const GDBFeatureBuilder *builder,
-@@ -440,10 +441,12 @@ void gdb_feature_builder_append_reg(const GDBFeatureBuilder *builder,
-                                     const char *type,
-                                     const char *group)
+ void HELPER(plugin_vcpu_mem_cb)(unsigned int vcpu_index,
+@@ -98,7 +102,7 @@ void HELPER(plugin_vcpu_mem_cb)(unsigned int vcpu_index,
+                                 void *userdata)
+ { }
+ 
+-static void gen_empty_udata_cb(void)
++static void gen_empty_udata_cb(void (*gen_helper)(TCGv_i32, TCGv_ptr))
  {
--    if (builder->feature->num_regs < regnum) {
--        builder->feature->num_regs = regnum;
-+    if (builder->regs->len <= regnum) {
-+        g_ptr_array_set_size(builder->regs, regnum + 1);
-     }
+     TCGv_i32 cpu_index = tcg_temp_ebb_new_i32();
+     TCGv_ptr udata = tcg_temp_ebb_new_ptr();
+@@ -106,12 +110,22 @@ static void gen_empty_udata_cb(void)
+     tcg_gen_movi_ptr(udata, 0);
+     tcg_gen_ld_i32(cpu_index, tcg_env,
+                    -offsetof(ArchCPU, env) + offsetof(CPUState, cpu_index));
+-    gen_helper_plugin_vcpu_udata_cb(cpu_index, udata);
++    gen_helper(cpu_index, udata);
  
-+    builder->regs->pdata[regnum] = (gpointer *)name;
-+
-     if (group) {
-         gdb_feature_builder_append_tag(
-             builder,
-@@ -469,6 +472,9 @@ void gdb_feature_builder_end(const GDBFeatureBuilder *builder)
-     }
- 
-     g_ptr_array_free(builder->xml, TRUE);
-+
-+    builder->feature->num_regs = builder->regs->len;
-+    builder->feature->regs = (void *)g_ptr_array_free(builder->regs, FALSE);
+     tcg_temp_free_ptr(udata);
+     tcg_temp_free_i32(cpu_index);
  }
  
- const GDBFeature *gdb_find_static_feature(const char *xmlname)
-diff --git a/target/riscv/gdbstub.c b/target/riscv/gdbstub.c
-index 68d0fdc1fd6..d9b52ffd09b 100644
---- a/target/riscv/gdbstub.c
-+++ b/target/riscv/gdbstub.c
-@@ -266,11 +266,9 @@ static GDBFeature *riscv_gen_dynamic_csr_feature(CPUState *cs, int base_reg)
-         }
-         predicate = csr_ops[i].predicate;
-         if (predicate && (predicate(env, i) == RISCV_EXCP_NONE)) {
--            g_autofree char *dynamic_name = NULL;
-             name = csr_ops[i].name;
-             if (!name) {
--                dynamic_name = g_strdup_printf("csr%03x", i);
--                name = dynamic_name;
-+                name = g_strdup_printf("csr%03x", i);
-             }
- 
-             gdb_feature_builder_append_reg(&builder, name, bitsize, i,
-diff --git a/scripts/feature_to_c.py b/scripts/feature_to_c.py
-index e04d6b2df7f..807af0e685c 100644
---- a/scripts/feature_to_c.py
-+++ b/scripts/feature_to_c.py
-@@ -50,7 +50,9 @@ def writeliteral(indent, bytes):
-         sys.stderr.write(f'unexpected start tag: {element.tag}\n')
-         exit(1)
- 
-+    feature_name = element.attrib['name']
-     regnum = 0
-+    regnames = []
-     regnums = []
-     tags = ['feature']
-     for event, element in events:
-@@ -67,6 +69,7 @@ def writeliteral(indent, bytes):
-                 if 'regnum' in element.attrib:
-                     regnum = int(element.attrib['regnum'])
- 
-+                regnames.append(element.attrib['name'])
-                 regnums.append(regnum)
-                 regnum += 1
- 
-@@ -85,6 +88,15 @@ def writeliteral(indent, bytes):
-     writeliteral(8, bytes(os.path.basename(input), 'utf-8'))
-     sys.stdout.write(',\n')
-     writeliteral(8, read)
--    sys.stdout.write(f',\n        {num_regs},\n    }},\n')
-+    sys.stdout.write(',\n')
-+    writeliteral(8, bytes(feature_name, 'utf-8'))
-+    sys.stdout.write(',\n        (const char * const []) {\n')
++static void gen_empty_udata_cb_no_wg(void)
++{
++    gen_empty_udata_cb(gen_helper_plugin_vcpu_udata_cb_no_wg);
++}
 +
-+    for index, regname in enumerate(regnames):
-+        sys.stdout.write(f'            [{regnums[index] - base_reg}] =\n')
-+        writeliteral(16, bytes(regname, 'utf-8'))
-+        sys.stdout.write(',\n')
++static void gen_empty_udata_cb_no_rwg(void)
++{
++    gen_empty_udata_cb(gen_helper_plugin_vcpu_udata_cb_no_rwg);
++}
 +
-+    sys.stdout.write(f'        }},\n        {num_regs},\n    }},\n')
+ /*
+  * For now we only support addi_i64.
+  * When we support more ops, we can generate one empty inline cb for each.
+@@ -192,7 +206,8 @@ static void plugin_gen_empty_callback(enum plugin_gen_from from)
+                     gen_empty_mem_helper);
+         /* fall through */
+     case PLUGIN_GEN_FROM_TB:
+-        gen_wrapped(from, PLUGIN_GEN_CB_UDATA, gen_empty_udata_cb);
++        gen_wrapped(from, PLUGIN_GEN_CB_UDATA, gen_empty_udata_cb_no_rwg);
++        gen_wrapped(from, PLUGIN_GEN_CB_UDATA_R, gen_empty_udata_cb_no_wg);
+         gen_wrapped(from, PLUGIN_GEN_CB_INLINE, gen_empty_inline_cb);
+         break;
+     default:
+@@ -588,6 +603,12 @@ static void plugin_gen_tb_udata(const struct qemu_plugin_tb *ptb,
+     inject_udata_cb(ptb->cbs[PLUGIN_CB_REGULAR], begin_op);
+ }
  
- sys.stdout.write('    { NULL }\n};\n')
++static void plugin_gen_tb_udata_r(const struct qemu_plugin_tb *ptb,
++                                  TCGOp *begin_op)
++{
++    inject_udata_cb(ptb->cbs[PLUGIN_CB_REGULAR_R], begin_op);
++}
++
+ static void plugin_gen_tb_inline(const struct qemu_plugin_tb *ptb,
+                                  TCGOp *begin_op)
+ {
+@@ -602,6 +623,14 @@ static void plugin_gen_insn_udata(const struct qemu_plugin_tb *ptb,
+     inject_udata_cb(insn->cbs[PLUGIN_CB_INSN][PLUGIN_CB_REGULAR], begin_op);
+ }
+ 
++static void plugin_gen_insn_udata_r(const struct qemu_plugin_tb *ptb,
++                                    TCGOp *begin_op, int insn_idx)
++{
++    struct qemu_plugin_insn *insn = g_ptr_array_index(ptb->insns, insn_idx);
++
++    inject_udata_cb(insn->cbs[PLUGIN_CB_INSN][PLUGIN_CB_REGULAR_R], begin_op);
++}
++
+ static void plugin_gen_insn_inline(const struct qemu_plugin_tb *ptb,
+                                    TCGOp *begin_op, int insn_idx)
+ {
+@@ -721,6 +750,9 @@ static void plugin_gen_inject(struct qemu_plugin_tb *plugin_tb)
+                 case PLUGIN_GEN_CB_UDATA:
+                     plugin_gen_tb_udata(plugin_tb, op);
+                     break;
++                case PLUGIN_GEN_CB_UDATA_R:
++                    plugin_gen_tb_udata_r(plugin_tb, op);
++                    break;
+                 case PLUGIN_GEN_CB_INLINE:
+                     plugin_gen_tb_inline(plugin_tb, op);
+                     break;
+@@ -737,6 +769,9 @@ static void plugin_gen_inject(struct qemu_plugin_tb *plugin_tb)
+                 case PLUGIN_GEN_CB_UDATA:
+                     plugin_gen_insn_udata(plugin_tb, op, insn_idx);
+                     break;
++                case PLUGIN_GEN_CB_UDATA_R:
++                    plugin_gen_insn_udata_r(plugin_tb, op, insn_idx);
++                    break;
+                 case PLUGIN_GEN_CB_INLINE:
+                     plugin_gen_insn_inline(plugin_tb, op, insn_idx);
+                     break;
+diff --git a/plugins/api.c b/plugins/api.c
+index 5521b0ad36c..ac39cdea0b3 100644
+--- a/plugins/api.c
++++ b/plugins/api.c
+@@ -89,7 +89,11 @@ void qemu_plugin_register_vcpu_tb_exec_cb(struct qemu_plugin_tb *tb,
+                                           void *udata)
+ {
+     if (!tb->mem_only) {
+-        plugin_register_dyn_cb__udata(&tb->cbs[PLUGIN_CB_REGULAR],
++        int index = flags == QEMU_PLUGIN_CB_R_REGS ||
++                    flags == QEMU_PLUGIN_CB_RW_REGS ?
++                    PLUGIN_CB_REGULAR_R : PLUGIN_CB_REGULAR;
++
++        plugin_register_dyn_cb__udata(&tb->cbs[index],
+                                       cb, flags, udata);
+     }
+ }
+@@ -109,7 +113,11 @@ void qemu_plugin_register_vcpu_insn_exec_cb(struct qemu_plugin_insn *insn,
+                                             void *udata)
+ {
+     if (!insn->mem_only) {
+-        plugin_register_dyn_cb__udata(&insn->cbs[PLUGIN_CB_INSN][PLUGIN_CB_REGULAR],
++        int index = flags == QEMU_PLUGIN_CB_R_REGS ||
++                    flags == QEMU_PLUGIN_CB_RW_REGS ?
++                    PLUGIN_CB_REGULAR_R : PLUGIN_CB_REGULAR;
++
++        plugin_register_dyn_cb__udata(&insn->cbs[PLUGIN_CB_INSN][index],
+                                       cb, flags, udata);
+     }
+ }
 -- 
 2.39.2
 
