@@ -1,122 +1,166 @@
-Return-Path: <kvm+bounces-6520-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6521-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1DD1835D70
-	for <lists+kvm@lfdr.de>; Mon, 22 Jan 2024 09:57:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A37E6835E73
+	for <lists+kvm@lfdr.de>; Mon, 22 Jan 2024 10:45:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42EF71F24DA5
-	for <lists+kvm@lfdr.de>; Mon, 22 Jan 2024 08:57:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5657B1F25436
+	for <lists+kvm@lfdr.de>; Mon, 22 Jan 2024 09:45:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 130E139AC8;
-	Mon, 22 Jan 2024 08:55:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E89A39FC8;
+	Mon, 22 Jan 2024 09:45:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nf23aZpl"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JMQnyxl9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A055A39859
-	for <kvm@vger.kernel.org>; Mon, 22 Jan 2024 08:55:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.55.52.93
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 155B93A1A2;
+	Mon, 22 Jan 2024 09:45:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705913724; cv=none; b=m45vhNHpGFNYxwgBbtdriLBqaFAR7T1Fwrn9r0CZS/HAakVEGMORwVX36du+7/zdGHsr8SGlaKdgM1PR8FgCXDKA1A9nybMwwRA28ugNJ8agDH/uLJpx1ra3Fz3dAQYGDq6q4r0wWl5iyNKW6dtq90AYRCPyvD5UDa4e6JFrpyk=
+	t=1705916703; cv=none; b=DGVciwSUFHnngmfTRbRBLueSKWoSZVLAagVxdlN5q00p4bBtQlHdofGPiU8Qb9SoucVwQfktfdVq+fXRm5nyJOxu0yR5Zsxwzu8MAe6ZpNUq0Qrmt8WriJPjn9hqR4f5wGXbFHOzq0QjpOjZNwCZ2gWrnVNE3vAzQJU5atTTWWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705913724; c=relaxed/simple;
-	bh=wUdT4fRB5Nf5lr+Hx1LVC2U0RFqx5arh4ZtYweAoHYI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=On66FCd9Br57GHiHNaidOGqXlKQbKimXd10jClmxKosJDtVDtiDOTkYV4/xeelMc5xvleXxZu36Eqgo5pa1Fz//++oPwW0nXD2tfQCBzGPRzOTySp0LQF1eZWzNQdTIU3YunsKzn6hAdA+BqexQ5ISKLFdSpAjNx3j3MoK5Ntmw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nf23aZpl; arc=none smtp.client-ip=192.55.52.93
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1705916703; c=relaxed/simple;
+	bh=t4I3ga6CJht5tl0WmnhE1Xni4i5mXbwGq8WdKx7/4Ag=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=forTIN2kpKzIkzIdR0C8qkR1z1ddZt5sFmNt/eu/A+NMvA73d+dkzqMNE9KBDwSEdClDQazVTfQtTFuWn3AY7XseQz9ta3vt7wJ621tulFioEiynLXnabuOsAy8nuIJPVMmcUfAY/ZqugueJLTAIiJ13eR7g9jDvjdrSXPnSSac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JMQnyxl9; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1705913722; x=1737449722;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=wUdT4fRB5Nf5lr+Hx1LVC2U0RFqx5arh4ZtYweAoHYI=;
-  b=nf23aZpl5L6vSO5L1uriPyBe75TVxLSWhgYCz+TZAg4JBLtnIlqr4CyC
-   s+gpXhveyhUUHEcP9vr49U3qa9V5DmvV7Hyca3kTxY4gKSHtyQZAClSwC
-   MJlGg8gCSmgnCN6zPBg7RECT0wiXYGdH/uvIxKXydOJpMYGRe4PeMZPGv
-   M7ER2UgrkQEohekJQyY2ppJqKVbkxw/2ZkxqNgrhPUQwYurRMHQfLlor+
-   jj7g5xEc6+XZDcQdLL7VT7JUCMbq2lyPEvJKCg2wvA66030merIKAFrIJ
-   A5CCcUP1glanl7fMqbJBTF9kBpLjBeAcFMT8q+1GpYJ3YAiJzgxJiFuGC
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10960"; a="398301307"
+  t=1705916702; x=1737452702;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=t4I3ga6CJht5tl0WmnhE1Xni4i5mXbwGq8WdKx7/4Ag=;
+  b=JMQnyxl927QdETq8CXDQp3cJIojE1tLvAR8vTFmHn7wAzcjd5s8u1jOF
+   bodUgC9+EwrZA9nm6NC+uHHYsEUnRZZS3vFdriz4eBl4golC+1tsMeZaS
+   AV1l6T/YTWRDnhEzTR36Cu8kDWGFXzlxHSl8xz+4DTRbyF8qVLwhW9ymY
+   sC8XGi0beKISd0AVX9LS+O5FZeDAJO30BtbTtNeFASy4LudGNe8tYUzzf
+   MP88YtnkcsnlJE6zDId+wnyrgKIYL7rNnwUqMFkopp+baGKi3o9YRbgu+
+   q5rkC+8fPJFNFk3xAS8eKW2ZVJzvJwLYGaMfDQmYJUBCrCC4TYYTKCyLE
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10960"; a="22641468"
 X-IronPort-AV: E=Sophos;i="6.05,211,1701158400"; 
-   d="scan'208";a="398301307"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 00:55:22 -0800
+   d="scan'208";a="22641468"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 01:45:00 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10960"; a="928932124"
+X-IronPort-AV: E=McAfee;i="6600,9927,10960"; a="778535212"
 X-IronPort-AV: E=Sophos;i="6.05,211,1701158400"; 
-   d="scan'208";a="928932124"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.10.49]) ([10.238.10.49])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 00:55:20 -0800
-Message-ID: <d424a315-1b20-47bf-a88e-394f576c3cc1@linux.intel.com>
-Date: Mon, 22 Jan 2024 16:55:17 +0800
+   d="scan'208";a="778535212"
+Received: from haibo-optiplex-7090.sh.intel.com ([10.239.159.132])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 01:44:50 -0800
+From: Haibo Xu <haibo1.xu@intel.com>
+To: 
+Cc: xiaobo55x@gmail.com,
+	ajones@ventanamicro.com,
+	Haibo Xu <haibo1.xu@intel.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	Guo Ren <guoren@kernel.org>,
+	Conor Dooley <conor.dooley@microchip.com>,
+	Mayuresh Chitale <mchitale@ventanamicro.com>,
+	wchen <waylingii@gmail.com>,
+	Greentime Hu <greentime.hu@sifive.com>,
+	Jisheng Zhang <jszhang@kernel.org>,
+	Samuel Holland <samuel@sholland.org>,
+	Minda Chen <minda.chen@starfivetech.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Peter Xu <peterx@redhat.com>,
+	Like Xu <likexu@tencent.com>,
+	Vipin Sharma <vipinsh@google.com>,
+	Thomas Huth <thuth@redhat.com>,
+	Aaron Lewis <aaronlewis@google.com>,
+	Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>,
+	linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvm-riscv@lists.infradead.org
+Subject: [PATCH v5 00/12] RISCV: Add kvm Sstc timer selftests
+Date: Mon, 22 Jan 2024 17:58:30 +0800
+Message-Id: <cover.1705916069.git.haibo1.xu@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 0/2] Add support for LAM in QEMU
-To: qemu-devel@nongnu.org, kvm@vger.kernel.org, pbonzini@redhat.com
-Cc: xiaoyao.li@intel.com, chao.gao@intel.com, robert.hu@linux.intel.com,
- binbin.wu@linux.intel.com
-References: <20240112060042.19925-1-binbin.wu@linux.intel.com>
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20240112060042.19925-1-binbin.wu@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Gentle ping...
-Please help to review and consider applying the patch series. (The KVM
-part has been merged).
+The RISC-V arch_timer selftests is used to validate Sstc timer
+functionality in a guest, which sets up periodic timer interrupts
+and check the basic interrupt status upon its receipt.
 
+This KVM selftests was ported from aarch64 arch_timer and tested
+with Linux v6.7-rc8 on a Qemu riscv64 virt machine.
 
-On 1/12/2024 2:00 PM, Binbin Wu wrote:
-> Linear-address masking (LAM) [1], modifies the checking that is applied to
-> *64-bit* linear addresses, allowing software to use of the untranslated
-> address bits for metadata and masks the metadata bits before using them as
-> linear addresses to access memory.
->
-> When the feature is virtualized and exposed to guest, it can be used for
-> efficient
-> address sanitizers (ASAN) implementation and for optimizations in JITs and
-> virtual machines.
->
-> The KVM patch series can be found in [2].
->
-> [1] Intel ISE https://cdrdv2.intel.com/v1/dl/getContent/671368
->      Chapter Linear Address Masking (LAM)
-> [2] https://lore.kernel.org/kvm/20230913124227.12574-1-binbin.wu@linux.intel.com
->
-> ---
-> Changelog
-> v4:
-> - Add a reviewed-by from Xiaoyao for patch 1.
-> - Mask out LAM bit on CR4 if vcpu doesn't support LAM in cpu_x86_update_cr4() (Xiaoyao)
->
-> v3:
-> - https://lists.gnu.org/archive/html/qemu-devel/2023-07/msg04160.html
->
-> Binbin Wu (1):
->    target/i386: add control bits support for LAM
->
-> Robert Hoo (1):
->    target/i386: add support for LAM in CPUID enumeration
->
->   target/i386/cpu.c    | 2 +-
->   target/i386/cpu.h    | 9 ++++++++-
->   target/i386/helper.c | 4 ++++
->   3 files changed, 13 insertions(+), 2 deletions(-)
->
->
-> base-commit: f614acb7450282a119d85d759f27eae190476058
+---
+Changed since v4:
+  * Rebased to Linux 6.7-rc8
+  * Added new patch(2/12) to clean up the data type in struct test_args
+  * Re-ordered patch(11/11) in v4 to patch(3/12)
+  * Changed the timer_err_margin_us type from int to uint32_t
+
+Haibo Xu (11):
+  KVM: arm64: selftests: Data type cleanup for arch_timer test
+  KVM: arm64: selftests: Enable tuning of error margin in arch_timer
+    test
+  KVM: arm64: selftests: Split arch_timer test code
+  KVM: selftests: Add CONFIG_64BIT definition for the build
+  tools: riscv: Add header file csr.h
+  tools: riscv: Add header file vdso/processor.h
+  KVM: riscv: selftests: Switch to use macro from csr.h
+  KVM: riscv: selftests: Add exception handling support
+  KVM: riscv: selftests: Add guest helper to get vcpu id
+  KVM: riscv: selftests: Change vcpu_has_ext to a common function
+  KVM: riscv: selftests: Add sstc timer test
+
+Paolo Bonzini (1):
+  selftests/kvm: Fix issues with $(SPLIT_TESTS)
+
+ tools/arch/riscv/include/asm/csr.h            | 541 ++++++++++++++++++
+ tools/arch/riscv/include/asm/vdso/processor.h |  32 ++
+ tools/testing/selftests/kvm/Makefile          |  27 +-
+ .../selftests/kvm/aarch64/arch_timer.c        | 295 +---------
+ tools/testing/selftests/kvm/arch_timer.c      | 259 +++++++++
+ .../selftests/kvm/include/aarch64/processor.h |   4 -
+ .../selftests/kvm/include/kvm_util_base.h     |   9 +
+ .../selftests/kvm/include/riscv/arch_timer.h  |  71 +++
+ .../selftests/kvm/include/riscv/processor.h   |  65 ++-
+ .../testing/selftests/kvm/include/test_util.h |   2 +
+ .../selftests/kvm/include/timer_test.h        |  45 ++
+ .../selftests/kvm/lib/riscv/handlers.S        | 101 ++++
+ .../selftests/kvm/lib/riscv/processor.c       |  87 +++
+ .../testing/selftests/kvm/riscv/arch_timer.c  | 111 ++++
+ .../selftests/kvm/riscv/get-reg-list.c        |  11 +-
+ 15 files changed, 1353 insertions(+), 307 deletions(-)
+ create mode 100644 tools/arch/riscv/include/asm/csr.h
+ create mode 100644 tools/arch/riscv/include/asm/vdso/processor.h
+ create mode 100644 tools/testing/selftests/kvm/arch_timer.c
+ create mode 100644 tools/testing/selftests/kvm/include/riscv/arch_timer.h
+ create mode 100644 tools/testing/selftests/kvm/include/timer_test.h
+ create mode 100644 tools/testing/selftests/kvm/lib/riscv/handlers.S
+ create mode 100644 tools/testing/selftests/kvm/riscv/arch_timer.c
+
+-- 
+2.34.1
 
 
