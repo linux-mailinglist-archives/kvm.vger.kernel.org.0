@@ -1,60 +1,60 @@
-Return-Path: <kvm+bounces-6609-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6610-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EEBD837985
-	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 01:41:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA67083794F
+	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 01:36:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E27B1F27997
-	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 00:41:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F4D2284B5D
+	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 00:36:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CDA25F847;
-	Mon, 22 Jan 2024 23:55:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 035685F87A;
+	Mon, 22 Jan 2024 23:55:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fWJAf2LJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="E+RetZok"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38B0A5EE96;
-	Mon, 22 Jan 2024 23:55:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9334A5F55B;
+	Mon, 22 Jan 2024 23:55:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705967726; cv=none; b=ZHK65deIMjmK3cAn2dJMYqDaxucHGmzJ9phuyEZ98AwSyxsWj5gvG+LKqgei5Qtrvku1JoH5Z17S2xXRzDJGjO2llE0ixFnhUlYDW+cvjWOKmYqKG5sjDhOuAB6fKy8D6siT+wa8uxkaE/5rxgkBFF3kw2ujHmjJ0khSEOzudWg=
+	t=1705967728; cv=none; b=Kwe8AaQvFLAY+tK1Hy+Xs+n8/4ThYU4RRll1/jcdbIHZU6NoyoRzporYnWlkz5pdW6/tE9OqULxna72uuBnVxPWl5FXSeJOB+lUJO/mbtLmCCDXYQwIJ5Ahizmi9cmMJt0WbnjUtxnfiCnGNoHEMTREoChflPgrpFrdSRzVSsp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705967726; c=relaxed/simple;
-	bh=W7n8vjIkmQn8VO13mPbVo91HBk6Ha/DtEnjVAt/VXjw=;
+	s=arc-20240116; t=1705967728; c=relaxed/simple;
+	bh=fq9sl/Hvu6AYyJ20Nrfcvuiz9xnZGWqLLJDKXzXZMyU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=TcIBLcGiscNWcsED5DR7ReFD4HJd0wdSUmM9zQYMmhip+hn+2+LmwgfEORPb9GpZFhzIX7+QohaB7jgKl6c89JzCbPt9X9HsDkp833Jg5xnLadCcF/OpvjSQOboipC7tJu69mldHAqLYxUcqh3+PxqV+rENvu1jid4LZvIFTMAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fWJAf2LJ; arc=none smtp.client-ip=198.175.65.15
+	 MIME-Version; b=JVCcss0eRZg0c4qOROJngGdL5zc9gjdNGFBmIH9+9cNKRDktNm386Y6mQP5S0gzOTLJMTG/cNQdQA6Dk7UE4eE9gh52RIoP2tvHo19TPJV6wtuu5Nt+3TnRP4EljAAIjnxKQRH/gZjNECYBXUHVjVUUU5JJRYN/NAxCxqOovZNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=E+RetZok; arc=none smtp.client-ip=198.175.65.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1705967725; x=1737503725;
+  t=1705967727; x=1737503727;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=W7n8vjIkmQn8VO13mPbVo91HBk6Ha/DtEnjVAt/VXjw=;
-  b=fWJAf2LJ2AM4Glhh0SoRZzJoe7otcoy+6ZaZZrv1MEFR3Pg1XPe3KUfD
-   5ip9/GcPG1rZZIi64c5Vjki2HpZwUTrhbSnuQYxt/pQSzeMBWtk5ICVtZ
-   9Uu6Lstrlm++QaAubCI2DEyWcg352n+Tw0cXG/ZPWPnAi7SvKlbhd3GDw
-   1npl9GU92JR665ADFtYxDimGkysb3cz8W1jE68RBu02X1gxNCvPus5TNo
-   emLkVm5TGsRezw2uKOQb1/ld7KDc+NQvGREDvHykn7cW1H5Zq0SiE/eiC
-   9eQIshQM0XhOvMII5hMrvl1CixMzQRfuVdgCdFuakpAB3xUF5aFBUmZvw
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10961"; a="1243878"
+  bh=fq9sl/Hvu6AYyJ20Nrfcvuiz9xnZGWqLLJDKXzXZMyU=;
+  b=E+RetZokezWKhD3ptLyyS7KaQfNCT2yxslHL0N9j8+fwD9nZ1R1DT2eX
+   xEKHGOjPo3zonVJgMbI67hRxaXw1SxZkHcnv1aSU5ycVJ1NqjKom2JvgH
+   Ef6tLNrcAmbd46raF2goatHwmX44Wia1EDDpFJ47iaFgp3iLtx1pu0icj
+   4oOwpqvmL94p6ChZgNJ9patzDi8v9g4u2a3xPPiVXoTn7WXUz9YbwSMB6
+   qfjrTZC1x1Hy2FjupnQ+kC84x6MOnifLXGQ0LI65ghXQRqQQ1oUWFOixr
+   AVGu7IG87MAwyVT+6BgYixddugDd5PddBtXQfHaifle5VmOiTohIzEg2q
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10961"; a="1243884"
 X-IronPort-AV: E=Sophos;i="6.05,212,1701158400"; 
-   d="scan'208";a="1243878"
+   d="scan'208";a="1243884"
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 15:55:25 -0800
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 15:55:26 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10961"; a="819888652"
+X-IronPort-AV: E=McAfee;i="6600,9927,10961"; a="819888665"
 X-IronPort-AV: E=Sophos;i="6.05,212,1701158400"; 
-   d="scan'208";a="819888652"
+   d="scan'208";a="819888665"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 15:55:24 -0800
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 15:55:25 -0800
 From: isaku.yamahata@intel.com
 To: kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
@@ -69,9 +69,9 @@ Cc: isaku.yamahata@intel.com,
 	hang.yuan@intel.com,
 	tina.zhang@intel.com,
 	Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [PATCH v18 036/121] KVM: x86/mmu: Replace hardcoded value 0 for the initial value for SPTE
-Date: Mon, 22 Jan 2024 15:53:12 -0800
-Message-Id: <acdf09bf60cad12c495005bf3495c54f6b3069c9.1705965635.git.isaku.yamahata@intel.com>
+Subject: [PATCH v18 037/121] KVM: x86/mmu: Allow non-zero value for non-present SPTE and removed SPTE
+Date: Mon, 22 Jan 2024 15:53:13 -0800
+Message-Id: <a99cb866897c7083430dce7f24c63b17d7121134.1705965635.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1705965634.git.isaku.yamahata@intel.com>
 References: <cover.1705965634.git.isaku.yamahata@intel.com>
@@ -83,161 +83,70 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-The TDX support will need the "suppress #VE" bit (bit 63) set as the
-initial value for SPTE.  To reduce code change size, introduce a new macro
-SHADOW_NONPRESENT_VALUE for the initial value for the shadow page table
-entry (SPTE) and replace hard-coded value 0 for it.  Initialize shadow page
-tables with their value.
+For TD guest, the current way to emulate MMIO doesn't work any more, as KVM
+is not able to access the private memory of TD guest and do the emulation.
+Instead, TD guest expects to receive #VE when it accesses the MMIO and then
+it can explicitly make hypercall to KVM to get the expected information.
 
-The plan is to unconditionally set the "suppress #VE" bit for both AMD and
-Intel as: 1) AMD hardware uses the bit 63 as NX for present SPTE and
-ignored for non-present SPTE; 2) for conventional VMX guests, KVM never
-enables the "EPT-violation #VE" in VMCS control and "suppress #VE" bit is
-ignored by hardware.
+To achieve this, the TDX module always enables "EPT-violation #VE" in the
+VMCS control.  And accordingly, for the MMIO spte for the shared GPA,
+1. KVM needs to set "suppress #VE" bit for the non-present SPTE so that EPT
+violation happens on TD accessing MMIO range.  2. On EPT violation, KVM
+sets the MMIO spte to clear "suppress #VE" bit so the TD guest can receive
+the #VE instead of EPT misconfigration unlike VMX case.  For the shared GPA
+that is not populated yet, EPT violation need to be triggered when TD guest
+accesses such shared GPA.  The non-present SPTE value for shared GPA should
+set "suppress #VE" bit.
+
+Add "suppress #VE" bit (bit 63) to SHADOW_NONPRESENT_VALUE and
+REMOVED_SPTE.  Unconditionally set the "suppress #VE" bit (which is bit 63)
+for both AMD and Intel as: 1) AMD hardware doesn't use this bit when
+present bit is off; 2) for normal VMX guest, KVM never enables the
+"EPT-violation #VE" in VMCS control and "suppress #VE" bit is ignored by
+hardware.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/mmu/mmu.c         | 20 +++++++++++++++-----
- arch/x86/kvm/mmu/paging_tmpl.h |  2 +-
- arch/x86/kvm/mmu/spte.h        |  2 ++
- arch/x86/kvm/mmu/tdp_mmu.c     | 14 +++++++-------
- 4 files changed, 25 insertions(+), 13 deletions(-)
+ arch/x86/kvm/mmu/spte.h | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index fa57db06f322..f1cec0f8e3d6 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -567,9 +567,9 @@ static u64 mmu_spte_clear_track_bits(struct kvm *kvm, u64 *sptep)
- 
- 	if (!is_shadow_present_pte(old_spte) ||
- 	    !spte_has_volatile_bits(old_spte))
--		__update_clear_spte_fast(sptep, 0ull);
-+		__update_clear_spte_fast(sptep, SHADOW_NONPRESENT_VALUE);
- 	else
--		old_spte = __update_clear_spte_slow(sptep, 0ull);
-+		old_spte = __update_clear_spte_slow(sptep, SHADOW_NONPRESENT_VALUE);
- 
- 	if (!is_shadow_present_pte(old_spte))
- 		return old_spte;
-@@ -603,7 +603,7 @@ static u64 mmu_spte_clear_track_bits(struct kvm *kvm, u64 *sptep)
-  */
- static void mmu_spte_clear_no_track(u64 *sptep)
- {
--	__update_clear_spte_fast(sptep, 0ull);
-+	__update_clear_spte_fast(sptep, SHADOW_NONPRESENT_VALUE);
- }
- 
- static u64 mmu_spte_get_lockless(u64 *sptep)
-@@ -1950,7 +1950,8 @@ static bool kvm_sync_page_check(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
- 
- static int kvm_sync_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp, int i)
- {
--	if (!sp->spt[i])
-+	/* sp->spt[i] has initial value of shadow page table allocation */
-+	if (sp->spt[i] == SHADOW_NONPRESENT_VALUE)
- 		return 0;
- 
- 	return vcpu->arch.mmu->sync_spte(vcpu, sp, i);
-@@ -6129,7 +6130,16 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
- 	vcpu->arch.mmu_page_header_cache.kmem_cache = mmu_page_header_cache;
- 	vcpu->arch.mmu_page_header_cache.gfp_zero = __GFP_ZERO;
- 
--	vcpu->arch.mmu_shadow_page_cache.gfp_zero = __GFP_ZERO;
-+	/*
-+	 * When X86_64, initial SEPT entries are initialized with
-+	 * SHADOW_NONPRESENT_VALUE.  Otherwise zeroed.  See
-+	 * mmu_memory_cache_alloc_obj().
-+	 */
-+	if (IS_ENABLED(CONFIG_X86_64))
-+		vcpu->arch.mmu_shadow_page_cache.init_value =
-+			SHADOW_NONPRESENT_VALUE;
-+	if (!vcpu->arch.mmu_shadow_page_cache.init_value)
-+		vcpu->arch.mmu_shadow_page_cache.gfp_zero = __GFP_ZERO;
- 
- 	vcpu->arch.mmu = &vcpu->arch.root_mmu;
- 	vcpu->arch.walk_mmu = &vcpu->arch.root_mmu;
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 4d4e98fe4f35..bebd73cd61bb 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -911,7 +911,7 @@ static int FNAME(sync_spte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp, int
- 	gpa_t pte_gpa;
- 	gfn_t gfn;
- 
--	if (WARN_ON_ONCE(!sp->spt[i]))
-+	if (WARN_ON_ONCE(sp->spt[i] == SHADOW_NONPRESENT_VALUE))
- 		return 0;
- 
- 	first_pte_gpa = FNAME(get_level1_sp_gpa)(sp);
 diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-index a129951c9a88..4d1799ba2bf8 100644
+index 4d1799ba2bf8..26bc95bbc962 100644
 --- a/arch/x86/kvm/mmu/spte.h
 +++ b/arch/x86/kvm/mmu/spte.h
-@@ -149,6 +149,8 @@ static_assert(MMIO_SPTE_GEN_LOW_BITS == 8 && MMIO_SPTE_GEN_HIGH_BITS == 11);
+@@ -149,7 +149,20 @@ static_assert(MMIO_SPTE_GEN_LOW_BITS == 8 && MMIO_SPTE_GEN_HIGH_BITS == 11);
  
  #define MMIO_SPTE_GEN_MASK		GENMASK_ULL(MMIO_SPTE_GEN_LOW_BITS + MMIO_SPTE_GEN_HIGH_BITS - 1, 0)
  
-+#define SHADOW_NONPRESENT_VALUE	0ULL
-+
++/*
++ * Non-present SPTE value for both VMX and SVM for TDP MMU.
++ * For SVM NPT, for non-present spte (bit 0 = 0), other bits are ignored.
++ * For VMX EPT, bit 63 is ignored if #VE is disabled. (EPT_VIOLATION_VE=0)
++ *              bit 63 is #VE suppress if #VE is enabled. (EPT_VIOLATION_VE=1)
++ * For TDX:
++ *   TDX module sets EPT_VIOLATION_VE for Secure-EPT and conventional EPT
++ */
++#ifdef CONFIG_X86_64
++#define SHADOW_NONPRESENT_VALUE	BIT_ULL(63)
++static_assert(!(SHADOW_NONPRESENT_VALUE & SPTE_MMU_PRESENT_MASK));
++#else
+ #define SHADOW_NONPRESENT_VALUE	0ULL
++#endif
+ 
  extern u64 __read_mostly shadow_host_writable_mask;
  extern u64 __read_mostly shadow_mmu_writable_mask;
- extern u64 __read_mostly shadow_nx_mask;
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 6ae19b4ee5b1..bdeb23ff9e71 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -570,7 +570,7 @@ static inline int tdp_mmu_zap_spte_atomic(struct kvm *kvm,
- 	 * here since the SPTE is going from non-present to non-present.  Use
- 	 * the raw write helper to avoid an unnecessary check on volatile bits.
- 	 */
--	__kvm_tdp_mmu_write_spte(iter->sptep, 0);
-+	__kvm_tdp_mmu_write_spte(iter->sptep, SHADOW_NONPRESENT_VALUE);
+@@ -196,7 +209,7 @@ extern u64 __read_mostly shadow_nonpresent_or_rsvd_mask;
+  *
+  * Only used by the TDP MMU.
+  */
+-#define REMOVED_SPTE	0x5a0ULL
++#define REMOVED_SPTE	(SHADOW_NONPRESENT_VALUE | 0x5a0ULL)
  
- 	return 0;
- }
-@@ -707,8 +707,8 @@ static void __tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
- 			continue;
- 
- 		if (!shared)
--			tdp_mmu_iter_set_spte(kvm, &iter, 0);
--		else if (tdp_mmu_set_spte_atomic(kvm, &iter, 0))
-+			tdp_mmu_iter_set_spte(kvm, &iter, SHADOW_NONPRESENT_VALUE);
-+		else if (tdp_mmu_set_spte_atomic(kvm, &iter, SHADOW_NONPRESENT_VALUE))
- 			goto retry;
- 	}
- }
-@@ -764,8 +764,8 @@ bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
- 	if (WARN_ON_ONCE(!is_shadow_present_pte(old_spte)))
- 		return false;
- 
--	tdp_mmu_set_spte(kvm, kvm_mmu_page_as_id(sp), sp->ptep, old_spte, 0,
--			 sp->gfn, sp->role.level + 1);
-+	tdp_mmu_set_spte(kvm, kvm_mmu_page_as_id(sp), sp->ptep, old_spte,
-+			 SHADOW_NONPRESENT_VALUE, sp->gfn, sp->role.level + 1);
- 
- 	return true;
- }
-@@ -799,7 +799,7 @@ static bool tdp_mmu_zap_leafs(struct kvm *kvm, struct kvm_mmu_page *root,
- 		    !is_last_spte(iter.old_spte, iter.level))
- 			continue;
- 
--		tdp_mmu_iter_set_spte(kvm, &iter, 0);
-+		tdp_mmu_iter_set_spte(kvm, &iter, SHADOW_NONPRESENT_VALUE);
- 		flush = true;
- 	}
- 
-@@ -1226,7 +1226,7 @@ static bool set_spte_gfn(struct kvm *kvm, struct tdp_iter *iter,
- 	 * invariant that the PFN of a present * leaf SPTE can never change.
- 	 * See handle_changed_spte().
- 	 */
--	tdp_mmu_iter_set_spte(kvm, iter, 0);
-+	tdp_mmu_iter_set_spte(kvm, iter, SHADOW_NONPRESENT_VALUE);
- 
- 	if (!pte_write(range->arg.pte)) {
- 		new_spte = kvm_mmu_changed_pte_notifier_make_spte(iter->old_spte,
+ /* Removed SPTEs must not be misconstrued as shadow present PTEs. */
+ static_assert(!(REMOVED_SPTE & SPTE_MMU_PRESENT_MASK));
 -- 
 2.25.1
 
