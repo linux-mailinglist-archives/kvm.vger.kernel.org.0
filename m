@@ -1,173 +1,102 @@
-Return-Path: <kvm+bounces-6710-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6714-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55832837CEB
-	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 02:21:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8ECF68381AE
+	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 03:10:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CCEBE1F25AA2
-	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 01:21:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E9A41F24809
+	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 02:10:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D31E15B96F;
-	Tue, 23 Jan 2024 00:29:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="U+XngC5y"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF79C2C680;
+	Tue, 23 Jan 2024 01:13:42 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22B1815B0F7
-	for <kvm@vger.kernel.org>; Tue, 23 Jan 2024 00:29:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 492E3BE71;
+	Tue, 23 Jan 2024 01:13:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705969754; cv=none; b=FSaLvaTFNR5nrV6Bxk70U6c33ByNNvqTV1uu38j9YrLVtDKCeSsCe/eXk9A5zXxvMLkcAGFNlexOUXzH80aAz6qhS5OMqV30G2QUdmLi9Nioi3NDv57iTb4bwKkyXAzKHvLHkHyEEXNGiK5PS0h7kuiXVY3+oLQX+QVcdWK5WAk=
+	t=1705972422; cv=none; b=gIAVwbxDTtHEjCMDvRbHp4Quh7m+pads84CKd/IIEY/2flMBeKrKWJHl30u0kEE6eujJ2Sgd1cwcyGiYimhVXUzYZmAC0rFbZzwnw0NseckWBbcZJCut66FMluHx76svvqkfcg8Lx8xzKC1h7X+EEgxUIcq+mqeRjuMWLO1+3Zk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705969754; c=relaxed/simple;
-	bh=DQU4joanXRgd1mS+gxXcm4BfbB4iNwIjQJ9FPFqx45U=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=NFUGVGxF8VDeV6Ykcyxx692z2g6AOu3NIrhm9YWRPWTSEc8k0AfglrRet8J18SstKBir6aqU4jCfYstC4g4Pbm4g/dzQIoWuZ1gTpg7aoMAsbqk0Y7gqYz8gB66EYHGwkxGLKundDjw4POk4ZDGSamuiTKW9kI16y/d/GZkd8Ck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=U+XngC5y; arc=none smtp.client-ip=209.85.215.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-5ce74ea4bf2so2384183a12.0
-        for <kvm@vger.kernel.org>; Mon, 22 Jan 2024 16:29:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1705969752; x=1706574552; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TvywcYW77f9W0/EEawC9chQVSlmM/wYw9WuZ4ujpaBk=;
-        b=U+XngC5yhwSHfcAeXyiKIAwlBnviRYdrjm9mQAGzkrE04I/qggNqJ7EXr6byRqOOHS
-         RmbMa0p+/7TquRmbrl5UNm3nscRJCeaXDVPqkkNj2ZepvzB7PK7Fmg8preYvpKu/jeVU
-         lB0rngG+suGF/wLnhpOTqz7mvo8OZO5rKUGSk=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705969752; x=1706574552;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TvywcYW77f9W0/EEawC9chQVSlmM/wYw9WuZ4ujpaBk=;
-        b=iaiuLYk4wJfZmIS6+98oVQDZXfrDRTaXxNGTZYrjVxNR22iKppIvDB81FM34DaSDAF
-         de7jdXKdSW9LedBKHYDE0FwVe7xp5vRghLLJt0fT6i0ywd5MunLIFbfhtX4Dn+KDHirR
-         LiUthKRwuc2W85vtXrM78rvBkUoyWMqv9Dz9AvlGRKvclEnT6mv7btks5YgWLXLZU0dp
-         ssUeGGzsjHmC23zpJSqQay9ATSm/bLmedWXOVQP0JVVKEl3EPQz+XNUocYZrbj91Co6Q
-         Un9USsqz2iPxQMMrGGeBcNFMvQgO5VCEl5GZoV8Y+n29kgUMrG7irlZqTj8JrNd5zDWU
-         NR2w==
-X-Gm-Message-State: AOJu0YwkcsSFzBzOAHzgnzuqJIyjIZ7GoY8oVrc3C35Gu/v2hNRcn7Sn
-	eXBXmKS+YcUcY27NwI71v2YW1m1fu+KSc7kWh82sJY3IJY8L+ZlQDt65nXuIiA==
-X-Google-Smtp-Source: AGHT+IFj6nXDFRwAngJViBctccMejN1t3BelBA34ipms9cwPh9gV9+T4jqVADGchm5OGinfbn3pAmw==
-X-Received: by 2002:a17:90b:607:b0:290:5246:beb3 with SMTP id gb7-20020a17090b060700b002905246beb3mr7402551pjb.37.1705969752595;
-        Mon, 22 Jan 2024 16:29:12 -0800 (PST)
-Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id 4-20020a170902e9c400b001d706e373a9sm7559865plk.292.2024.01.22.16.28.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jan 2024 16:29:02 -0800 (PST)
-From: Kees Cook <keescook@chromium.org>
-To: linux-hardening@vger.kernel.org
-Cc: Kees Cook <keescook@chromium.org>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@redhat.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
+	s=arc-20240116; t=1705972422; c=relaxed/simple;
+	bh=eswOY/7LacnPItq2MBgGY1hsNbWUj9aRuO7FiWkWpZs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kZtWCilkPuXxosJTqPrGvCg+6Ozm7ytYS8lSOPCknsK0P66iD4VsQCIYdj0Xg2w1Jnn89QEvnjI/N0IojoFNGfvZEHf1quYVFy5rXlJx567lkfedFl39PVFf3uv72whZJ1tW0dxf8oxD7u+OGm0IoSiDM6EpSF7u5b7kdv+358U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 725ac9349c914a659c5fe5d0b26b1356-20240123
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.35,REQID:d72e2702-ade4-47e0-8027-c05a7342ce5f,IP:10,
+	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+	ON:release,TS:-5
+X-CID-INFO: VERSION:1.1.35,REQID:d72e2702-ade4-47e0-8027-c05a7342ce5f,IP:10,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:-5
+X-CID-META: VersionHash:5d391d7,CLOUDID:ee268a8e-e2c0-40b0-a8fe-7c7e47299109,B
+	ulkID:240123091336YQ1JJ9EN,BulkQuantity:0,Recheck:0,SF:66|38|24|17|19|44|1
+	02,TC:nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,Bulk:nil,QS:nil,BEC:nil,CO
+	L:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI
+X-UUID: 725ac9349c914a659c5fe5d0b26b1356-20240123
+X-User: liucong2@kylinos.cn
+Received: from localhost.localdomain [(116.128.244.171)] by mailgw
+	(envelope-from <liucong2@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 1484640778; Tue, 23 Jan 2024 09:13:33 +0800
+From: Cong Liu <liucong2@kylinos.cn>
+To: Brett Creeley <brett.creeley@amd.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>
+Cc: Cong Liu <liucong2@kylinos.cn>,
 	kvm@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 58/82] s390/mm: Refactor intentional wrap-around test
-Date: Mon, 22 Jan 2024 16:27:33 -0800
-Message-Id: <20240123002814.1396804-58-keescook@chromium.org>
+Subject: [PATCH] vfio/pds: Potential memory leak in pds_vfio_dirty_enable()
+Date: Tue, 23 Jan 2024 09:13:19 +0800
+Message-Id: <20240123011319.6954-1-liucong2@kylinos.cn>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240122235208.work.748-kees@kernel.org>
-References: <20240122235208.work.748-kees@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2557; i=keescook@chromium.org;
- h=from:subject; bh=DQU4joanXRgd1mS+gxXcm4BfbB4iNwIjQJ9FPFqx45U=;
- b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBlrwgKR1fdbTlXCSNHaLsraY4kCN0NXjk4wrN/9
- ptrTecUkUCJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCZa8ICgAKCRCJcvTf3G3A
- Juo/D/0Rijh7xs7t+z0k5sUC01Phuw7CfMgDm7ealxIpjEnqcPeKLdz3mD2xMlnLAWp8AQgMX7x
- UsVZepQBCW+mbZNcyaU8P17kkR/DVc7kuurh6A9/qg0Doo0FWrmPWygvxpM4QDhE0BWg+HnMgku
- n6+MLAW3qZ38qFK2TNKcR1VOhVuLWxTkckPN8Nec/7/x4EA/IrvviqK5ppVmcCCP1kkU6yqRS9V
- GLUxRZfvGVuFMMnb0GKhKAWo7DZdHEZR5LzYBFF10XJes46hmqVlAymMFxiN7EIxv0ywKkw+/jo
- nLiBSpXgpdEeNMvEbekQ9g18cBvZowM9RckCdGzvVuhqEE8wlYliS3Cl6xZFQKeDcLXNaS5Iddd
- l6LypkhXu8RsRGFMSTTeST3NLd2MV50Ak5N7MwlYwztrZhji/SUmMGdL6wI/FRsTLYy80nbrjy8
- fyZyR3PPt/w66FT/FbS1YpSxHVHI4lBm2rBauWi2Lt61XzIBNU5xedEqaQEl1dEb4INlRI7CV64
- nbqMv8Q+wAg8JFTpkVL0iRqSD8sKKxtAw4q49K9wuS9FmVtOcyDAcXkG7QMZPbW6fnyVYVPSPbY
- tEhStv2vcp7DGK/BOSTiwcIMprY0XAIyqKXaQ77rYBqq5JxZIOFNPSPAu/upxkCHl+TQQK0n5j7 tszHYawERVCbBMA==
-X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 
-In an effort to separate intentional arithmetic wrap-around from
-unexpected wrap-around, we need to refactor places that depend on this
-kind of math. One of the most common code patterns of this is:
+the patch releases the region_info memory if the interval_tree_iter_first()
+function fails.
 
-	VAR + value < VAR
-
-Notably, this is considered "undefined behavior" for signed and pointer
-types, which the kernel works around by using the -fno-strict-overflow
-option in the build[1] (which used to just be -fwrapv). Regardless, we
-want to get the kernel source to the position where we can meaningfully
-instrument arithmetic wrap-around conditions and catch them when they
-are unexpected, regardless of whether they are signed[2], unsigned[3],
-or pointer[4] types.
-
-Refactor open-coded wrap-around addition test to use add_would_overflow().
-This paves the way to enabling the wrap-around sanitizers in the future.
-
-Link: https://git.kernel.org/linus/68df3755e383e6fecf2354a67b08f92f18536594 [1]
-Link: https://github.com/KSPP/linux/issues/26 [2]
-Link: https://github.com/KSPP/linux/issues/27 [3]
-Link: https://github.com/KSPP/linux/issues/344 [4]
-Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
-Cc: Janosch Frank <frankja@linux.ibm.com>
-Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: David Hildenbrand <david@redhat.com>
-Cc: Alexander Gordeev <agordeev@linux.ibm.com>
-Cc: Gerald Schaefer <gerald.schaefer@linux.ibm.com>
-Cc: Heiko Carstens <hca@linux.ibm.com>
-Cc: Vasily Gorbik <gor@linux.ibm.com>
-Cc: Sven Schnelle <svens@linux.ibm.com>
-Cc: kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org
-Signed-off-by: Kees Cook <keescook@chromium.org>
+Signed-off-by: Cong Liu <liucong2@kylinos.cn>
 ---
- arch/s390/mm/gmap.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/vfio/pci/pds/dirty.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
-index 6f96b5a71c63..977b61ab59f2 100644
---- a/arch/s390/mm/gmap.c
-+++ b/arch/s390/mm/gmap.c
-@@ -411,7 +411,7 @@ int gmap_unmap_segment(struct gmap *gmap, unsigned long to, unsigned long len)
- 	BUG_ON(gmap_is_shadow(gmap));
- 	if ((to | len) & (PMD_SIZE - 1))
- 		return -EINVAL;
--	if (len == 0 || to + len < to)
-+	if (len == 0 || add_would_overflow(to, len))
- 		return -EINVAL;
+diff --git a/drivers/vfio/pci/pds/dirty.c b/drivers/vfio/pci/pds/dirty.c
+index 8ddf4346fcd5..67919b5db127 100644
+--- a/drivers/vfio/pci/pds/dirty.c
++++ b/drivers/vfio/pci/pds/dirty.c
+@@ -291,8 +291,11 @@ static int pds_vfio_dirty_enable(struct pds_vfio_pci_device *pds_vfio,
+ 	len = num_ranges * sizeof(*region_info);
  
- 	flush = 0;
-@@ -443,7 +443,7 @@ int gmap_map_segment(struct gmap *gmap, unsigned long from,
- 	BUG_ON(gmap_is_shadow(gmap));
- 	if ((from | to | len) & (PMD_SIZE - 1))
- 		return -EINVAL;
--	if (len == 0 || from + len < from || to + len < to ||
-+	if (len == 0 || add_would_overflow(from, len) || add_would_overflow(to, len) ||
- 	    from + len - 1 > TASK_SIZE_MAX || to + len - 1 > gmap->asce_end)
- 		return -EINVAL;
- 
+ 	node = interval_tree_iter_first(ranges, 0, ULONG_MAX);
+-	if (!node)
+-		return -EINVAL;
++	if (!node) {
++		err = -EINVAL;
++		goto out_free_region_info;
++	}
++
+ 	for (int i = 0; i < num_ranges; i++) {
+ 		struct pds_lm_dirty_region_info *ri = &region_info[i];
+ 		u64 region_size = node->last - node->start + 1;
 -- 
 2.34.1
 
