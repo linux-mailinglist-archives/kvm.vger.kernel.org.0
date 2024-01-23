@@ -1,376 +1,139 @@
-Return-Path: <kvm+bounces-6728-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6730-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47228838A83
-	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 10:43:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E431838C54
+	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 11:44:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C81321F23290
-	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 09:43:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6757D1C231E3
+	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 10:44:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1EBD5BAF1;
-	Tue, 23 Jan 2024 09:43:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Hes+WLoh"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E0465C914;
+	Tue, 23 Jan 2024 10:44:09 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 377F25BAE1
-	for <kvm@vger.kernel.org>; Tue, 23 Jan 2024 09:43:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33E1D5C8F6;
+	Tue, 23 Jan 2024 10:44:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706003012; cv=none; b=KquCB5R1nOTgWQpTFxrBfA4uzQFFLwRYGt49BRpx1d97xzC1tdP+lD41FitZxsYcBoeUrxeOkKBMVA/KPVJGw7OiyT3tpcImdfRoLbAVQyFEEjqk4htWEWJ9Ly9kQKisCPyzRIYRperKQF8pZcyFy/K1+ZAJXAbo33vesSs0t+g=
+	t=1706006649; cv=none; b=fO1YEu+N51uNSs3AWlf/rOZuaz8roNwo9Fa1OG7FX1OSZnwWOVszBWjgq2SBHEwVqfDqUSXHl5oUUEgeMXwPHF1aglhe75w3qq1v56tgWYFrx4J4uyA7IBoJ/Xa7XJJMg2DERFBR5ODEvbT2w+kC+ioW5Y6BF2ZV1wGSObQT/PQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706003012; c=relaxed/simple;
-	bh=wU64uHlR52rNEzdKGKovUXzpWZVCS6qVw80l/VHg/G4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r6PQ3MPrSPzjXeKjIbQ9cHwGjdObK4pbM5BJ38ADkNudYmJJDZuzQeVucR5H+XWkPoKYihvqAAK7G7snY55X1DXP+6KlT4QyOwsCaSLwEv2V+SPHWKA8/4TnwCctTZlC66rbYIpcW84yJ+JuSFldaGsYMIRC1QHBYc4p3pAXTt0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Hes+WLoh; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706003010; x=1737539010;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=wU64uHlR52rNEzdKGKovUXzpWZVCS6qVw80l/VHg/G4=;
-  b=Hes+WLohbmkFahJe5YRQ5lzy1ZUKlPy14peUFgmuCNB8kZH5FJsdrNal
-   PDWHxzSYax9PovGvHGt0eZ7FVl2FbSs89Klt/V3CHc+py3k1qmUndrEzG
-   bnWwymLA2MLUdZD/Sh0LVYOYljPJjePvAQz6n028H9wNuKDP0cre0HIXc
-   bsdgnYp9YqAS01UsfabM5nplOeeODcQFCRJU/jM4NEm2cCI6XnbwDaPgf
-   DE7RIK4oXkMNHSrnP5iZApXMjA7euL3iRxQliRga9h/d4B1tgSP0EKB7r
-   +H+Gnjwu+5XS44azCWlW3DjTwzAK9yxPGhZUazIGkRxtyhNOn0bxWpx3n
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10961"; a="8838337"
-X-IronPort-AV: E=Sophos;i="6.05,214,1701158400"; 
-   d="scan'208";a="8838337"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2024 01:43:29 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10961"; a="735514573"
-X-IronPort-AV: E=Sophos;i="6.05,214,1701158400"; 
-   d="scan'208";a="735514573"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
-  by orsmga003.jf.intel.com with ESMTP; 23 Jan 2024 01:43:25 -0800
-Date: Tue, 23 Jan 2024 17:56:27 +0800
-From: Zhao Liu <zhao1.liu@linux.intel.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Eduardo Habkost <eduardo@habkost.net>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
-	kvm@vger.kernel.org, Zhenyu Wang <zhenyu.z.wang@intel.com>,
-	Zhuocheng Ding <zhuocheng.ding@intel.com>,
-	Zhao Liu <zhao1.liu@intel.com>, Babu Moger <babu.moger@amd.com>,
-	Yongwei Ma <yongwei.ma@intel.com>
-Subject: Re: [PATCH v7 05/16] i386: Decouple CPUID[0x1F] subleaf with
- specific topology level
-Message-ID: <Za+NS1OneKg7IHOj@intel.com>
-References: <20240108082727.420817-1-zhao1.liu@linux.intel.com>
- <20240108082727.420817-6-zhao1.liu@linux.intel.com>
- <cb75fcea-7e3a-4062-8d1c-3067f5e53bcc@intel.com>
+	s=arc-20240116; t=1706006649; c=relaxed/simple;
+	bh=FrFxf73uzHkT6S2ikGi0LCQhmYLQu2afl4OSVxrrdOM=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Xn2FeA7XASZhT/EFPoLgKi5YO4tWJonFzidq56W4+K/LSza8f7mYP/1HcubvcfiRE6fsD0IncUYjXllmIpxqgogYuYz3Jqvi2hCwv58SmomZZ5GwNO/2nh7iqcuY4Z5vqDvbKVaMIGqENfzkPwOQ2WNKykhWpZgoQ7ZfCI1tqr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4TK3Z422B9z29kHr;
+	Tue, 23 Jan 2024 18:42:20 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
+	by mail.maildlp.com (Postfix) with ESMTPS id B05A8140153;
+	Tue, 23 Jan 2024 18:43:48 +0800 (CST)
+Received: from localhost.localdomain (10.69.192.56) by
+ dggpemm500005.china.huawei.com (7.185.36.74) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 23 Jan 2024 18:43:35 +0800
+From: Yunsheng Lin <linyunsheng@huawei.com>
+To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
+	<linyunsheng@huawei.com>, Alexander Duyck <alexanderduyck@fb.com>, Alexander
+ Duyck <alexander.duyck@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>, Andrew Morton <akpm@linux-foundation.org>,
+	Eric Dumazet <edumazet@google.com>, <kvm@vger.kernel.org>,
+	<virtualization@lists.linux.dev>, <linux-mm@kvack.org>
+Subject: [PATCH net-next v3 2/5] page_frag: unify gfp bits for order 3 page allocation
+Date: Tue, 23 Jan 2024 18:42:47 +0800
+Message-ID: <20240123104250.9103-3-linyunsheng@huawei.com>
+X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20240123104250.9103-1-linyunsheng@huawei.com>
+References: <20240123104250.9103-1-linyunsheng@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cb75fcea-7e3a-4062-8d1c-3067f5e53bcc@intel.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 
-Hi Xiaoyao,
+Currently there seems to be three page frag implementions
+which all try to allocate order 3 page, if that fails, it
+then fail back to allocate order 0 page, and each of them
+all allow order 3 page allocation to fail under certain
+condition by using specific gfp bits.
 
-On Thu, Jan 11, 2024 at 11:19:34AM +0800, Xiaoyao Li wrote:
-> Date: Thu, 11 Jan 2024 11:19:34 +0800
-> From: Xiaoyao Li <xiaoyao.li@intel.com>
-> Subject: Re: [PATCH v7 05/16] i386: Decouple CPUID[0x1F] subleaf with
->  specific topology level
-> 
-> On 1/8/2024 4:27 PM, Zhao Liu wrote:
-> > From: Zhao Liu <zhao1.liu@intel.com>
-> > 
-> > At present, the subleaf 0x02 of CPUID[0x1F] is bound to the "die" level.
-> > 
-> > In fact, the specific topology level exposed in 0x1F depends on the
-> > platform's support for extension levels (module, tile and die).
-> > 
-> > To help expose "module" level in 0x1F, decouple CPUID[0x1F] subleaf
-> > with specific topology level.
-> > 
-> > Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
-> > Tested-by: Babu Moger <babu.moger@amd.com>
-> > Tested-by: Yongwei Ma <yongwei.ma@intel.com>
-> > Acked-by: Michael S. Tsirkin <mst@redhat.com>
-> > ---
-> > Changes since v3:
-> >   * New patch to prepare to expose module level in 0x1F.
-> >   * Move the CPUTopoLevel enumeration definition from "i386: Add cache
-> >     topology info in CPUCacheInfo" to this patch. Note, to align with
-> >     topology types in SDM, revert the name of CPU_TOPO_LEVEL_UNKNOW to
-> >     CPU_TOPO_LEVEL_INVALID.
-> > ---
-> >   target/i386/cpu.c | 136 +++++++++++++++++++++++++++++++++++++---------
-> >   target/i386/cpu.h |  15 +++++
-> >   2 files changed, 126 insertions(+), 25 deletions(-)
-> > 
-> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> > index bc440477d13d..5c295c9a9e2d 100644
-> > --- a/target/i386/cpu.c
-> > +++ b/target/i386/cpu.c
-> > @@ -269,6 +269,116 @@ static void encode_cache_cpuid4(CPUCacheInfo *cache,
-> >              (cache->complex_indexing ? CACHE_COMPLEX_IDX : 0);
-> >   }
-> > +static uint32_t num_cpus_by_topo_level(X86CPUTopoInfo *topo_info,
-> > +                                       enum CPUTopoLevel topo_level)
-> > +{
-> > +    switch (topo_level) {
-> > +    case CPU_TOPO_LEVEL_SMT:
-> > +        return 1;
-> > +    case CPU_TOPO_LEVEL_CORE:
-> > +        return topo_info->threads_per_core;
-> > +    case CPU_TOPO_LEVEL_DIE:
-> > +        return topo_info->threads_per_core * topo_info->cores_per_die;
-> > +    case CPU_TOPO_LEVEL_PACKAGE:
-> > +        return topo_info->threads_per_core * topo_info->cores_per_die *
-> > +               topo_info->dies_per_pkg;
-> > +    default:
-> > +        g_assert_not_reached();
-> > +    }
-> > +    return 0;
-> > +}
-> > +
-> > +static uint32_t apicid_offset_by_topo_level(X86CPUTopoInfo *topo_info,
-> > +                                            enum CPUTopoLevel topo_level)
-> > +{
-> > +    switch (topo_level) {
-> > +    case CPU_TOPO_LEVEL_SMT:
-> > +        return 0;
-> > +    case CPU_TOPO_LEVEL_CORE:
-> > +        return apicid_core_offset(topo_info);
-> > +    case CPU_TOPO_LEVEL_DIE:
-> > +        return apicid_die_offset(topo_info);
-> > +    case CPU_TOPO_LEVEL_PACKAGE:
-> > +        return apicid_pkg_offset(topo_info);
-> > +    default:
-> > +        g_assert_not_reached();
-> > +    }
-> > +    return 0;
-> > +}
-> > +
-> > +static uint32_t cpuid1f_topo_type(enum CPUTopoLevel topo_level)
-> > +{
-> > +    switch (topo_level) {
-> > +    case CPU_TOPO_LEVEL_INVALID:
-> > +        return CPUID_1F_ECX_TOPO_LEVEL_INVALID;
-> > +    case CPU_TOPO_LEVEL_SMT:
-> > +        return CPUID_1F_ECX_TOPO_LEVEL_SMT;
-> > +    case CPU_TOPO_LEVEL_CORE:
-> > +        return CPUID_1F_ECX_TOPO_LEVEL_CORE;
-> > +    case CPU_TOPO_LEVEL_DIE:
-> > +        return CPUID_1F_ECX_TOPO_LEVEL_DIE;
-> > +    default:
-> > +        /* Other types are not supported in QEMU. */
-> > +        g_assert_not_reached();
-> > +    }
-> > +    return 0;
-> > +}
-> > +
-> > +static void encode_topo_cpuid1f(CPUX86State *env, uint32_t count,
-> > +                                X86CPUTopoInfo *topo_info,
-> > +                                uint32_t *eax, uint32_t *ebx,
-> > +                                uint32_t *ecx, uint32_t *edx)
-> > +{
-> > +    static DECLARE_BITMAP(topo_bitmap, CPU_TOPO_LEVEL_MAX);
-> > +    X86CPU *cpu = env_archcpu(env);
-> > +    unsigned long level, next_level;
-> > +    uint32_t num_cpus_next_level, offset_next_level;
-> 
-> again, I dislike the name of cpus to represent the logical process or
-> thread. we can call it, num_lps_next_level, or num_threads_next_level;
-> 
-> > +
-> > +    /*
-> > +     * Initialize the bitmap to decide which levels should be
-> > +     * encoded in 0x1f.
-> > +     */
-> > +    if (!count) {
-> 
-> using static bitmap and initialize the bitmap on (count == 0), looks bad to
-> me. It highly relies on the order of how encode_topo_cpuid1f() is called,
-> and fragile.
-> 
-> Instead, we can maintain an array in CPUX86State, e.g.,
+The gfp bits for order 3 page allocation are different
+between different implementation, __GFP_NOMEMALLOC is
+or'd to forbid access to emergency reserves memory for
+__page_frag_cache_refill(), but it is not or'd in other
+implementions, __GFP_DIRECT_RECLAIM is masked off to avoid
+direct reclaim in skb_page_frag_refill(), but it is not
+masked off in __page_frag_cache_refill().
 
-In my practice, I have found this way to be rather tricky since...
+This patch unifies the gfp bits used between different
+implementions by or'ing __GFP_NOMEMALLOC and masking off
+__GFP_DIRECT_RECLAIM for order 3 page allocation to avoid
+possible pressure for mm.
 
-> 
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -1904,6 +1904,8 @@ typedef struct CPUArchState {
-> 
->      /* Number of dies within this CPU package. */
->      unsigned nr_dies;
-> +
-> +    unint8_t valid_cpu_topo[CPU_TOPO_LEVEL_MAX];
->  } CPUX86State;
-> 
+Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+Reviewed-by: Alexander Duyck <alexanderduyck@fb.com>
+CC: Alexander Duyck <alexander.duyck@gmail.com>
+---
+ drivers/vhost/net.c | 2 +-
+ mm/page_alloc.c     | 4 ++--
+ net/core/sock.c     | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-this array actually pre-binds the 0x1f subleaf to the topology level,
-so this way brings difficulties to the array initialization stage...
+diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+index f2ed7167c848..e574e21cc0ca 100644
+--- a/drivers/vhost/net.c
++++ b/drivers/vhost/net.c
+@@ -670,7 +670,7 @@ static bool vhost_net_page_frag_refill(struct vhost_net *net, unsigned int sz,
+ 		/* Avoid direct reclaim but allow kswapd to wake */
+ 		pfrag->page = alloc_pages((gfp & ~__GFP_DIRECT_RECLAIM) |
+ 					  __GFP_COMP | __GFP_NOWARN |
+-					  __GFP_NORETRY,
++					  __GFP_NORETRY | __GFP_NOMEMALLOC,
+ 					  SKB_FRAG_PAGE_ORDER);
+ 		if (likely(pfrag->page)) {
+ 			pfrag->size = PAGE_SIZE << SKB_FRAG_PAGE_ORDER;
+diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+index c0f7e67c4250..636145c29f70 100644
+--- a/mm/page_alloc.c
++++ b/mm/page_alloc.c
+@@ -4685,8 +4685,8 @@ static struct page *__page_frag_cache_refill(struct page_frag_cache *nc,
+ 	gfp_t gfp = gfp_mask;
+ 
+ #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
+-	gfp_mask |= __GFP_COMP | __GFP_NOWARN | __GFP_NORETRY |
+-		    __GFP_NOMEMALLOC;
++	gfp_mask = (gfp_mask & ~__GFP_DIRECT_RECLAIM) |  __GFP_COMP |
++		   __GFP_NOWARN | __GFP_NORETRY | __GFP_NOMEMALLOC;
+ 	page = alloc_pages_node(NUMA_NO_NODE, gfp_mask,
+ 				PAGE_FRAG_CACHE_MAX_ORDER);
+ 	nc->size = page ? PAGE_FRAG_CACHE_MAX_SIZE : PAGE_SIZE;
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 158dbdebce6a..d4bc4269d7d7 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -2908,7 +2908,7 @@ bool skb_page_frag_refill(unsigned int sz, struct page_frag *pfrag, gfp_t gfp)
+ 		/* Avoid direct reclaim but allow kswapd to wake */
+ 		pfrag->page = alloc_pages((gfp & ~__GFP_DIRECT_RECLAIM) |
+ 					  __GFP_COMP | __GFP_NOWARN |
+-					  __GFP_NORETRY,
++					  __GFP_NORETRY | __GFP_NOMEMALLOC,
+ 					  SKB_FRAG_PAGE_ORDER);
+ 		if (likely(pfrag->page)) {
+ 			pfrag->size = PAGE_SIZE << SKB_FRAG_PAGE_ORDER;
+-- 
+2.33.0
 
-> 
-> and initialize it as below, when initializing the env
-> 
-> env->valid_cpu_topo[0] = CPU_TOPO_LEVEL_SMT;
-> env->valid_cpu_topo[1] = CPU_TOPO_LEVEL_CORE;
-> if (env->nr_dies > 1) {
-> 	env->valid_cpu_topo[2] = CPU_TOPO_LEVEL_DIE;
-> }
-
-... as here.
-
-Based on 1f encoding rule, with module, we may need this logic like
-this:
-
-// If there's module, encode the module level at ECX=2.
-if (env->nr_modules > 1) {
-       env->valid_cpu_topo[2] = CPU_TOPO_LEVEL_MODULE;
-       if (env->nr_dies > 1) {
-       		env->valid_cpu_topo[3] = CPU_TOPO_LEVEL_DIE;
-       }
-} else if (env->nr_dies > 1) { // Otherwise, encode die directly.
-       env->valid_cpu_topo[2] = CPU_TOPO_LEVEL_DIE;
-}
-
-Such case-by-case checking lacks scalability, and if more levels are
-supported in the future, such as tiles, the whole checking becomes
-unclean. Am I understanding you correctly?
-
-About the static bitmap, declaring it as static is an optimization.
-Because the count (ECX, e.g., ECX=N) means the Nth topology levels,
-if we didn't use static virable, we would need to iterate each time
-to find the Nth level.
-
-Since we know that the subleaf of 0x1f must be sequentially encoded,
-the logic of this static code is always in effect.
-
-What do you think?
-
-Thanks,
-Zhao
-
-> 
-> then in encode_topo_cpuid1f(), we can get level and next_level as
-> 
-> level = env->valid_cpu_topo[count];
-> next_level = env->valid_cpu_topo[count + 1];
-> 
-> 
-> > +        /* SMT and core levels are exposed in 0x1f leaf by default. */
-> > +        set_bit(CPU_TOPO_LEVEL_SMT, topo_bitmap);
-> > +        set_bit(CPU_TOPO_LEVEL_CORE, topo_bitmap);
-> > +
-> > +        if (env->nr_dies > 1) {
-> > +            set_bit(CPU_TOPO_LEVEL_DIE, topo_bitmap);
-> > +        }
-> > +    }
-> > +
-> > +    *ecx = count & 0xff;
-> > +    *edx = cpu->apic_id;
-> > +
-> > +    level = find_first_bit(topo_bitmap, CPU_TOPO_LEVEL_MAX);
-> > +    if (level == CPU_TOPO_LEVEL_MAX) {
-> > +        num_cpus_next_level = 0;
-> > +        offset_next_level = 0;
-> > +
-> > +        /* Encode CPU_TOPO_LEVEL_INVALID into the last subleaf of 0x1f. */
-> > +        level = CPU_TOPO_LEVEL_INVALID;
-> > +    } else {
-> > +        next_level = find_next_bit(topo_bitmap, CPU_TOPO_LEVEL_MAX, level + 1);
-> > +        if (next_level == CPU_TOPO_LEVEL_MAX) {
-> > +            next_level = CPU_TOPO_LEVEL_PACKAGE;
-> > +        }
-> > +
-> > +        num_cpus_next_level = num_cpus_by_topo_level(topo_info, next_level);
-> > +        offset_next_level = apicid_offset_by_topo_level(topo_info, next_level);
-> > +    }
-> > +
-> > +    *eax = offset_next_level;
-> > +    *ebx = num_cpus_next_level;
-> > +    *ecx |= cpuid1f_topo_type(level) << 8;
-> > +
-> > +    assert(!(*eax & ~0x1f));
-> > +    *ebx &= 0xffff; /* The count doesn't need to be reliable. */
-> > +    if (level != CPU_TOPO_LEVEL_MAX) {
-> > +        clear_bit(level, topo_bitmap);
-> > +    }
-> > +}
-> > +
-> >   /* Encode cache info for CPUID[0x80000005].ECX or CPUID[0x80000005].EDX */
-> >   static uint32_t encode_cache_cpuid80000005(CPUCacheInfo *cache)
-> >   {
-> > @@ -6284,31 +6394,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-> >               break;
-> >           }
-> > -        *ecx = count & 0xff;
-> > -        *edx = cpu->apic_id;
-> > -        switch (count) {
-> > -        case 0:
-> > -            *eax = apicid_core_offset(&topo_info);
-> > -            *ebx = topo_info.threads_per_core;
-> > -            *ecx |= CPUID_1F_ECX_TOPO_LEVEL_SMT << 8;
-> > -            break;
-> > -        case 1:
-> > -            *eax = apicid_die_offset(&topo_info);
-> > -            *ebx = topo_info.cores_per_die * topo_info.threads_per_core;
-> > -            *ecx |= CPUID_1F_ECX_TOPO_LEVEL_CORE << 8;
-> > -            break;
-> > -        case 2:
-> > -            *eax = apicid_pkg_offset(&topo_info);
-> > -            *ebx = cpus_per_pkg;
-> > -            *ecx |= CPUID_1F_ECX_TOPO_LEVEL_DIE << 8;
-> > -            break;
-> > -        default:
-> > -            *eax = 0;
-> > -            *ebx = 0;
-> > -            *ecx |= CPUID_1F_ECX_TOPO_LEVEL_INVALID << 8;
-> > -        }
-> > -        assert(!(*eax & ~0x1f));
-> > -        *ebx &= 0xffff; /* The count doesn't need to be reliable. */
-> > +        encode_topo_cpuid1f(env, count, &topo_info, eax, ebx, ecx, edx);
-> >           break;
-> >       case 0xD: {
-> >           /* Processor Extended State */
-> > diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> > index f47bad46db5e..9c78cfc3f322 100644
-> > --- a/target/i386/cpu.h
-> > +++ b/target/i386/cpu.h
-> > @@ -1008,6 +1008,21 @@ uint64_t x86_cpu_get_supported_feature_word(FeatureWord w,
-> >   #define CPUID_MWAIT_IBE     (1U << 1) /* Interrupts can exit capability */
-> >   #define CPUID_MWAIT_EMX     (1U << 0) /* enumeration supported */
-> > +/*
-> > + * CPUTopoLevel is the general i386 topology hierarchical representation,
-> > + * ordered by increasing hierarchical relationship.
-> > + * Its enumeration value is not bound to the type value of Intel (CPUID[0x1F])
-> > + * or AMD (CPUID[0x80000026]).
-> > + */
-> > +enum CPUTopoLevel {
-> > +    CPU_TOPO_LEVEL_INVALID,
-> > +    CPU_TOPO_LEVEL_SMT,
-> > +    CPU_TOPO_LEVEL_CORE,
-> > +    CPU_TOPO_LEVEL_DIE,
-> > +    CPU_TOPO_LEVEL_PACKAGE,
-> > +    CPU_TOPO_LEVEL_MAX,
-> > +};
-> > +
-> >   /* CPUID[0xB].ECX level types */
-> >   #define CPUID_B_ECX_TOPO_LEVEL_INVALID  0
-> >   #define CPUID_B_ECX_TOPO_LEVEL_SMT      1
-> 
 
