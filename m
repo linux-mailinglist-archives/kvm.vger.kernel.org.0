@@ -1,103 +1,76 @@
-Return-Path: <kvm+bounces-6714-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6715-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8ECF68381AE
-	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 03:10:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F9E18385CA
+	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 03:56:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E9A41F24809
-	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 02:10:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82A1B1C29876
+	for <lists+kvm@lfdr.de>; Tue, 23 Jan 2024 02:56:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF79C2C680;
-	Tue, 23 Jan 2024 01:13:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84D261102;
+	Tue, 23 Jan 2024 02:56:27 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 492E3BE71;
-	Tue, 23 Jan 2024 01:13:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+Received: from zg8tndyumtaxlji0oc4xnzya.icoremail.net (zg8tndyumtaxlji0oc4xnzya.icoremail.net [46.101.248.176])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEB1C810
+	for <kvm@vger.kernel.org>; Tue, 23 Jan 2024 02:56:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.101.248.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705972422; cv=none; b=gIAVwbxDTtHEjCMDvRbHp4Quh7m+pads84CKd/IIEY/2flMBeKrKWJHl30u0kEE6eujJ2Sgd1cwcyGiYimhVXUzYZmAC0rFbZzwnw0NseckWBbcZJCut66FMluHx76svvqkfcg8Lx8xzKC1h7X+EEgxUIcq+mqeRjuMWLO1+3Zk=
+	t=1705978587; cv=none; b=e5qsmUSE9EOHbh4T6F5UzzdJitfyienuA50c6xjnoc7razvyhImD1ylvHvkorGSDQ7JiWP156a1EDTSPObRY4T5zUmPCZ/gQAAL1MRu/Em+FdrgJZVcbpt70qDCljreJy1AznbRuU3MVBXbAPno51DoLD5hRy85KCX5wvuLezIY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705972422; c=relaxed/simple;
-	bh=eswOY/7LacnPItq2MBgGY1hsNbWUj9aRuO7FiWkWpZs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kZtWCilkPuXxosJTqPrGvCg+6Ozm7ytYS8lSOPCknsK0P66iD4VsQCIYdj0Xg2w1Jnn89QEvnjI/N0IojoFNGfvZEHf1quYVFy5rXlJx567lkfedFl39PVFf3uv72whZJ1tW0dxf8oxD7u+OGm0IoSiDM6EpSF7u5b7kdv+358U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 725ac9349c914a659c5fe5d0b26b1356-20240123
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.35,REQID:d72e2702-ade4-47e0-8027-c05a7342ce5f,IP:10,
-	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
-	ON:release,TS:-5
-X-CID-INFO: VERSION:1.1.35,REQID:d72e2702-ade4-47e0-8027-c05a7342ce5f,IP:10,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:-5
-X-CID-META: VersionHash:5d391d7,CLOUDID:ee268a8e-e2c0-40b0-a8fe-7c7e47299109,B
-	ulkID:240123091336YQ1JJ9EN,BulkQuantity:0,Recheck:0,SF:66|38|24|17|19|44|1
-	02,TC:nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,Bulk:nil,QS:nil,BEC:nil,CO
-	L:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI
-X-UUID: 725ac9349c914a659c5fe5d0b26b1356-20240123
-X-User: liucong2@kylinos.cn
-Received: from localhost.localdomain [(116.128.244.171)] by mailgw
-	(envelope-from <liucong2@kylinos.cn>)
-	(Generic MTA)
-	with ESMTP id 1484640778; Tue, 23 Jan 2024 09:13:33 +0800
-From: Cong Liu <liucong2@kylinos.cn>
-To: Brett Creeley <brett.creeley@amd.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>
-Cc: Cong Liu <liucong2@kylinos.cn>,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] vfio/pds: Potential memory leak in pds_vfio_dirty_enable()
-Date: Tue, 23 Jan 2024 09:13:19 +0800
-Message-Id: <20240123011319.6954-1-liucong2@kylinos.cn>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1705978587; c=relaxed/simple;
+	bh=8RyX1FMeq4gj1VC4buYen3xH7DsH2q46t1Wh/+dVfU0=;
+	h=Date:From:To:Cc:Subject:Content-Type:MIME-Version:Message-ID; b=iSQNaTXIpciuwoRQND5XZ3GjPyX76Ks/PbLoWt+6GUfFJTNWZxS5/afoIR3kok965gA5BDhGe/ogtAur1CyBWhCG6XjoHxKkPblFlS/ll84qXkBIj6ngaFEXkYj1vl8Fjo9qINqdY2OPZgbJfcLhDxVZiDgMvmz6t3XJbuAyNas=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bosc.ac.cn; spf=pass smtp.mailfrom=bosc.ac.cn; arc=none smtp.client-ip=46.101.248.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bosc.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bosc.ac.cn
+Received: from qinshaoqing$bosc.ac.cn ( [123.114.53.210] ) by
+ ajax-webmail-mail (Coremail) ; Tue, 23 Jan 2024 10:55:51 +0800 (GMT+08:00)
+Date: Tue, 23 Jan 2024 10:55:51 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From: =?UTF-8?B?56em5bCR6Z2S?= <qinshaoqing@bosc.ac.cn>
+To: Deacon <will@kernel.org>, julien.thierry.kdev@gmail.com, maz@kernel.org
+Cc: Bonzini <pbonzini@redhat.com>, Patra <atishp@atishpatra.org>, 
+	Jones <ajones@ventanamicro.com>, Patel <anup@brainfault.org>, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	Patel <apatel@ventanamicro.com>, 
+	=?UTF-8?B?546L54S2?= <wangran@bosc.ac.cn>, 
+	=?UTF-8?B?5byg5YGl?= <zhangjian@bosc.ac.cn>
+Subject: [kvmtool PATCH 0/1] riscv: Add zacas extension
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version 2023.1-cmXT5 build
+ 20230627(00751abc) Copyright (c) 2002-2024 www.mailtech.cn
+ mispb-76b96e3b-3ecc-44d5-9200-de81e6d4c242-
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Message-ID: <5b92b0c6.94.18d343eddde.Coremail.qinshaoqing@bosc.ac.cn>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:AQAAfwBX8Ea3Kq9lA26sAA--.987W
+X-CM-SenderInfo: ptlq2xpdrtx03j6e02nfoduhdfq/1tbiAQAGAWWukV4CHgAAse
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
+	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+	daVFxhVjvjDU=
 
-the patch releases the region_info memory if the interval_tree_iter_first()
-function fails.
-
-Signed-off-by: Cong Liu <liucong2@kylinos.cn>
----
- drivers/vfio/pci/pds/dirty.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/vfio/pci/pds/dirty.c b/drivers/vfio/pci/pds/dirty.c
-index 8ddf4346fcd5..67919b5db127 100644
---- a/drivers/vfio/pci/pds/dirty.c
-+++ b/drivers/vfio/pci/pds/dirty.c
-@@ -291,8 +291,11 @@ static int pds_vfio_dirty_enable(struct pds_vfio_pci_device *pds_vfio,
- 	len = num_ranges * sizeof(*region_info);
- 
- 	node = interval_tree_iter_first(ranges, 0, ULONG_MAX);
--	if (!node)
--		return -EINVAL;
-+	if (!node) {
-+		err = -EINVAL;
-+		goto out_free_region_info;
-+	}
-+
- 	for (int i = 0; i < num_ranges; i++) {
- 		struct pds_lm_dirty_region_info *ri = &region_info[i];
- 		u64 region_size = node->last - node->start + 1;
--- 
-2.34.1
-
+Cj4gVGhlIGZ1bmN0aW9uYWxpdHkgaGFzIGJlZW4gdGVzdGVkIG9uIFFFTVUsIHRoZSB0ZXN0cyBy
+ZWx5IG9uIGtlcm5lbCBhbmQgcWVtdQo+IHN1cHBvcnQgZm9yIHphY2FzLgo+IEN1cnJlbnRseSwg
+dGhlcmUgaXMgbm8gcGF0Y2ggZm9yIHphY2FzIG9uIHRoZSB1cHN0cmVhbS4KPiBJZiB5b3Ugd2Fu
+dCB0byB0ZXN0LCB5b3UgY291bGQgdXNlIHRoZSBmb2xsb3dpbmcgdmVyc2lvbiB3ZSByZWxlYXNl
+ZCBmb3IgdGVzdGluZy4KCkFib3V0IGFvYnZlIG1lc3NhZ2UgYWJvdXQ6CgpUaGlzIHBhdGNoIGlz
+IHRvIGVuYWJsZSBaYWNhcyBJU0EgZXh0ZW5zaW9uIGZvciBWTS4KCllvdSBjb3VsZCB0cnkgdGhp
+cyBwYXRjaCB3aXRoIGJlbG93IGRlcGVuZGVuY2llczoKCmtlcm5lbDogCmh0dHBzOi8vZ2l0aHVi
+LmNvbS9PcGVuWGlhbmdTaGFuL3Jpc2N2LWxpbnV4L3RyZWUvcmlzY3YtemFjYXMKcWVtdToKaHR0
+cHM6Ly9naXRodWIuY29tL09wZW5YaWFuZ1NoYW4vcWVtdS90cmVlL3Jpc2N2LXphY2FzCgpxaW5z
+aGFvcWluZyAoMSk6CiAgQWRkIHN1cHBvcnQgZm9yIChyYXRpZmllZCkgWmFjYXMgZXh0ZW5zaW9u
+CgogcmlzY3YvZmR0LmMgICAgICAgICAgICAgICAgICAgICAgICAgfCAxICsKIHJpc2N2L2luY2x1
+ZGUvYXNtL2t2bS5oICAgICAgICAgICAgIHwgMSArCiByaXNjdi9pbmNsdWRlL2t2bS9rdm0tY29u
+ZmlnLWFyY2guaCB8IDMgKysrCiAzIGZpbGVzIGNoYW5nZWQsIDUgaW5zZXJ0aW9ucygrKQoKLS0g
+CjIuNDMuMAo=
 
