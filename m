@@ -1,163 +1,125 @@
-Return-Path: <kvm+bounces-6843-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6844-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB21A83AE6C
-	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 17:34:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 554B983AE7A
+	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 17:38:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D5453B2B83E
-	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 16:25:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 43B5CB2B17B
+	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 16:32:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8B327CF3C;
-	Wed, 24 Jan 2024 16:25:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF74A77620;
+	Wed, 24 Jan 2024 16:32:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kyUHQEMO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TN1vD+8M"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80C561869
-	for <kvm@vger.kernel.org>; Wed, 24 Jan 2024 16:25:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1C8BC2D5
+	for <kvm@vger.kernel.org>; Wed, 24 Jan 2024 16:32:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706113522; cv=none; b=gou/gXbc/zFho9TPTK8ojHqs5jLXVjSKbXqqHBOOFZYpf6sPc4VDaRjrmfhT37H4iCph0HvKaMeJAwhgTWjMdLoIpchQhquR4UEebi5r+O5zx90FF7I4mZ9ZENO90pS4pPHbff+ziJKhxlN908m9j+kynxGk3RPT54rYSuOOuL4=
+	t=1706113941; cv=none; b=Jtgnfb5SnaeaCNgOczCOcbgMROBh8a3k1mQ4cAe3b3KTQyUQfJXQU6iEPU29YumNDtY3d1NHd9rdm2nGhLas2DlsNxwej60Yhx9+JFfv2jQi/bfoWvDlPVBKY61J9h/7lSe6zigTrpMA670MSk9tQ+gARxAjC7xESjOC7XrcQJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706113522; c=relaxed/simple;
-	bh=V8c2cPcx8qXCwYKsBCzYFb0VJkAo5lBKil3rUqnEWMM=;
+	s=arc-20240116; t=1706113941; c=relaxed/simple;
+	bh=+zqCmFWMLWHr8Gkc0x56tIkqc6LdU6Qb3vc+IyEL5iA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=C8r9fIfKnemGun0rLnbf8gwqCjjcYYisxXsGh0/xX4oakOeYe8AXOAsopIddcAY0kugKjGe1gaTJRrKbd3AkqgGToN7JnR8c7PClfznmzzD2dmELALtmfMcJaeZvshnzb+krIszQto4qPPOi2w4ANyHFHSmMlyt7R/aa4PT5rlI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kyUHQEMO; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=nZ+TgbpeGjaMd/4DcDRBYKT/v3iOQz30O2JrMxzrk9AcBiEI3VBJ84puLt9eGmlC7pxYozR+KpA5CQ3oasioj9VUOzIUIIppcjfRj+pDt3qJ/EGeWSwK61+MNdFNDU32xeSzPAOvbzJ/+/d9taKfTi5oIocTXlwTD1k7Q61aCXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TN1vD+8M; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc365b303abso3497507276.3
-        for <kvm@vger.kernel.org>; Wed, 24 Jan 2024 08:25:20 -0800 (PST)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-d9a541b720aso8383646276.0
+        for <kvm@vger.kernel.org>; Wed, 24 Jan 2024 08:32:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706113519; x=1706718319; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1706113938; x=1706718738; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0CB9g0UuS73iITu6tgKIcBT+b0p2dqCHOybX6/OUmJA=;
-        b=kyUHQEMOV/wR1EpynmH7BVnL1Rw+Yzq9mQzH//pfaBbRpfe2hYYxppGHM/t6CqebA+
-         I8YOVL+a4A1HIwiNu5u2MNGhtvxlbVhhavIuoY0UxZuFf7A9lYZ4i1jBFdYrGdtlRX0V
-         tn94O8LuSOJF4POXyprE+fatIBQUoNVOTL4WIIfDDn1BbtjnF6i6NqX4FgczZC+47LQP
-         H/rPQQg2kSh9dhlux7qR6/uUffv8TKeZ+4FZ1PWvZFh/3iwefLaxl9SQjWlBz5lvnJr4
-         XbScWzxptsTKZOnyantKW+8LZc2neF2kNriab6AAL8xNVGshChqVNqRvIGrUz6vgDVG3
-         Xx5w==
+        bh=g82foanF1CJTmaDLSQP4Ghn9FVcWHiz28lTGASp7l48=;
+        b=TN1vD+8MPZC6fnYjgQZlBEbZ3eBtbBn096XKshKSkcci03jMpdy4KMMGHZ+mOQy7BL
+         29RXIlgX0bA03ia5Hm6chxI2PrQ7NqtXKfO8k0a3zXn10ZKmsEmqmpuq/dxTj6nTnP4Y
+         RePx1/3ZJEaAQNlbLh/lv5FgDi/VdCEYhk8r9pHM4zmZ+CytG6DTc1b51n9jZlIjrb6L
+         96RokG7ut7qBNGHmyLD6m2GDLILecD41NWgASmVeuhmlOvxWUisXhq+4DjZ89sB+6RqW
+         Ur6AbzijwYqNzzgGD2vG+jBfMewBXy1L5A6EKtQBBjtHaMusxWsSf0cXxGu0icuR/fty
+         UbDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706113519; x=1706718319;
+        d=1e100.net; s=20230601; t=1706113938; x=1706718738;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0CB9g0UuS73iITu6tgKIcBT+b0p2dqCHOybX6/OUmJA=;
-        b=mDzJPPpT5U3Z/N1j0uju4+Rbvsd1QBhbtunK9lTZZPtj/B/gbH3XEPsKmwh4uryc8R
-         FvjyKtHJedlpZDSvfVhPdx6vsheQnx8yc6/ZhfIzKHsIlAd81pSPqp5FaZ7zklUJZ2lZ
-         Uk1x4JjsBlVJBHq6b5PGd1ydgF0Dv3bk+AEPkpU+BOtXsgFZ+MTpvwkGxzZlBZlSRyx2
-         gwOS4exDpsC4mszFpyCAI9Y3ogX1Fvx513yIML6zcM2fB4osl6E9od5nPzDupyfgmRTv
-         C5kOhtpetwfZK4nZJCzFf9VchYcPEO9P99WTt88ZPxDbHyOuioDgngyJ85qswT/o7uhf
-         sszw==
-X-Gm-Message-State: AOJu0YwgicFIBPILfFfznQJiPyphkQHg3ft0mZFTSgUMeORGewB8Jypg
-	4Lk+LHeJATHcEwUxD1EOv1+jboawAU26D/qK/jUTimRPGhpozENAEFoKyRTiTE8WJvqchhfHigG
-	MOw==
-X-Google-Smtp-Source: AGHT+IGr252szjH4g93wKVz1RH9JVWutpvTNlX80OC1R2PWsKKKTzftdwudbTd4do344yYpgughZEK+Q9gk=
+        bh=g82foanF1CJTmaDLSQP4Ghn9FVcWHiz28lTGASp7l48=;
+        b=Mpcn2S2oZ6qvfERUB6LBGQ/wWLI82AfOaBPhp2skYdzYfwYVJv7P80mJnLyhkb4XS4
+         VkYRcKWP0NKc8pqbQJRfuUGvLcecHF+OFUjKuYAhbDfwq33UO0YiUp2JnjMRTheBp+XF
+         W98EigDD0L9yPKusa448IY1gqJxAPP872pepu2futWX/Twvqc76zd9DLMK0CFdgIUag9
+         I0UdgMzSDM6SEAg6Yl1Osd2GOTYqGVtSXsYZlLSRx9e/au+1JR3ASSQufZiJFj6Pwju3
+         aOZEP3zxb+rHBKMvYgUrwXq5y7NjVueN73D9UHWEFTnOyTwZgvfmokc+8pzcdQkV65uz
+         8qiA==
+X-Gm-Message-State: AOJu0YxOcrGjM+S6lZ+Y+RzOilCxlXWj+PFz9otNw0jjlUnoWdUWhg6u
+	f7f7sfjUFffE2fjegW+0LydNruxCLi+kWlwivhdGt/rlSob1aVf94jXV1gH990I+4SCrBW7AsAI
+	X6w==
+X-Google-Smtp-Source: AGHT+IGm+X2BYZPWf+ByTxMEw+p1Jyx19F3jDSILRZ/fuxnNRR0npnBrb0S8PZ9zL6t3gEdep8RITYwr6nI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:ab4e:0:b0:dc2:4921:cc0 with SMTP id
- u72-20020a25ab4e000000b00dc249210cc0mr48970ybi.5.1706113519660; Wed, 24 Jan
- 2024 08:25:19 -0800 (PST)
-Date: Wed, 24 Jan 2024 08:25:18 -0800
-In-Reply-To: <20240123002814.1396804-23-keescook@chromium.org>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:989:b0:dc2:2f33:bc28 with SMTP id
+ bv9-20020a056902098900b00dc22f33bc28mr453003ybb.6.1706113938754; Wed, 24 Jan
+ 2024 08:32:18 -0800 (PST)
+Date: Wed, 24 Jan 2024 08:32:17 -0800
+In-Reply-To: <20240124160248.3077-1-moehanabichan@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240122235208.work.748-kees@kernel.org> <20240123002814.1396804-23-keescook@chromium.org>
-Message-ID: <ZbE57k4gCYZb9h0H@google.com>
-Subject: Re: [PATCH 23/82] KVM: Refactor intentional wrap-around calculation
+References: <20240124160248.3077-1-moehanabichan@gmail.com>
+Message-ID: <ZbE7kd9W8csPRjvU@google.com>
+Subject: Re: [PATCH] KVM: x86: Check irqchip mode before create PIT
 From: Sean Christopherson <seanjc@google.com>
-To: Kees Cook <keescook@chromium.org>
-Cc: linux-hardening@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
-	kvm@vger.kernel.org, "Gustavo A. R. Silva" <gustavoars@kernel.org>, 
-	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, linux-kernel@vger.kernel.org
+To: Brilliant Hanabi <moehanabichan@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Jan 22, 2024, Kees Cook wrote:
-> In an effort to separate intentional arithmetic wrap-around from
-> unexpected wrap-around, we need to refactor places that depend on this
-> kind of math. One of the most common code patterns of this is:
+On Thu, Jan 25, 2024, Brilliant Hanabi wrote:
+> As the kvm api(https://docs.kernel.org/virt/kvm/api.html) reads,
+> KVM_CREATE_PIT2 call is only valid after enabling in-kernel irqchip
+> support via KVM_CREATE_IRQCHIP.
 > 
-> 	VAR + value < VAR
-> 
-> Notable, this is considered "undefined behavior" for signed and pointer
-> types, which the kernel works around by using the -fno-strict-overflow
-> option in the build[1] (which used to just be -fwrapv). Regardless, we
-> want to get the kernel source to the position where we can meaningfully
-> instrument arithmetic wrap-around conditions and catch them when they
-> are unexpected, regardless of whether they are signed, unsigned, or
-> pointer types.
-> 
-> Refactor open-coded unsigned wrap-around addition test to use
-> check_add_overflow(), retaining the result for later usage (which removes
-> the redundant open-coded addition). This paves the way to enabling the
-> unsigned wrap-around sanitizer[2] in the future.
-> 
-> Link: https://git.kernel.org/linus/68df3755e383e6fecf2354a67b08f92f18536594 [1]
-> Link: https://github.com/KSPP/linux/issues/27 [2]
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: kvm@vger.kernel.org
-> Signed-off-by: Kees Cook <keescook@chromium.org>
+> Without this check, I can create PIT first and enable irqchip-split
+> then, which may cause the PIT invalid because of lacking of in-kernel
+> PIC to inject the interrupt.
+
+Does this cause actual problems beyond the PIT not working for the guest?  E.g.
+does it put the host kernel at risk?  If the only problem is that the PIT doesn't
+work as expected, I'm tempted to tweak the docs to say that KVM's PIT emulation
+won't work without an in-kernel I/O APIC.  Rejecting the ioctl could theoertically
+break misconfigured setups that happen to work, e.g. because the guest never uses
+the PIT.
+
+> Signed-off-by: Brilliant Hanabi <moehanabichan@gmail.com>
 > ---
->  virt/kvm/coalesced_mmio.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
+>  arch/x86/kvm/x86.c | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
-> diff --git a/virt/kvm/coalesced_mmio.c b/virt/kvm/coalesced_mmio.c
-> index 1b90acb6e3fe..0a3b706fbf4c 100644
-> --- a/virt/kvm/coalesced_mmio.c
-> +++ b/virt/kvm/coalesced_mmio.c
-> @@ -25,17 +25,19 @@ static inline struct kvm_coalesced_mmio_dev *to_mmio(struct kvm_io_device *dev)
->  static int coalesced_mmio_in_range(struct kvm_coalesced_mmio_dev *dev,
->  				   gpa_t addr, int len)
->  {
-> +	gpa_t sum;
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 27e23714e960..3edc8478310f 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -7016,6 +7016,8 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
+>  		r = -EEXIST;
+>  		if (kvm->arch.vpit)
+>  			goto create_pit_unlock;
+> +		if (!pic_in_kernel(kvm))
+> +			goto create_pit_unlock;
 
-s/sum/end?
+-EEXIST is not an appropriate errno.
 
-Also, given that your're fixing a gpa_t, which is a u64, presumably that means
-that this code in __kvm_set_memory_region() also needs to be fixed:
-
-	if (mem->guest_phys_addr + mem->memory_size < mem->guest_phys_addr)
-		return -EINVAL; 
-
-and for that one I'd really like to avoid an ignored output parameter (KVM
-converts the incoming mem->memory_size to pages, so the "sum" is never used
-directly).
-
-Would it make sense to add an API that feeds a dummy "sum" value?  I assume UBSAN
-won't fire on the usage of the known good value, i.e. using the output parameter
-isn't necessary for functional correctness.  Having an API that does just the
-check would trim down the size of many of these patches and avoid having to come
-up with names for the local variables.  And IMO, the existing code is a wee bit
-more intuitive, it'd be nice to give developers the flexibility to choose which
-flavor yields the "best" code on a case-by-case basis.
-
-> +
->  	/* is it in a batchable area ?
->  	 * (addr,len) is fully included in
->  	 * (zone->addr, zone->size)
->  	 */
->  	if (len < 0)
->  		return 0;
-> -	if (addr + len < addr)
-> +	if (check_add_overflow(addr, len, &sum))
->  		return 0;
->  	if (addr < dev->zone.addr)
->  		return 0;
-> -	if (addr + len > dev->zone.addr + dev->zone.size)
-> +	if (sum > dev->zone.addr + dev->zone.size)
->  		return 0;
->  	return 1;
->  }
+>  		r = -ENOMEM;
+>  		kvm->arch.vpit = kvm_create_pit(kvm, u.pit_config.flags);
+>  		if (kvm->arch.vpit)
 > -- 
-> 2.34.1
+> 2.39.3
 > 
 
