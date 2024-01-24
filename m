@@ -1,155 +1,229 @@
-Return-Path: <kvm+bounces-6858-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6859-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D2A083B1B6
-	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 20:02:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C581283B1C0
+	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 20:05:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E8A11C238AB
-	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 19:02:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E923A1C21FA8
+	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 19:05:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80944131E46;
-	Wed, 24 Jan 2024 19:02:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8BAB131E39;
+	Wed, 24 Jan 2024 19:05:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kBZmiRAv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nd4nM82Z"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62A8812AADA;
-	Wed, 24 Jan 2024 19:02:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABFA9131E41
+	for <kvm@vger.kernel.org>; Wed, 24 Jan 2024 19:04:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706122932; cv=none; b=Hu3J9LNTwysJ02sfsuPRQIiIFwr+RUKQg293GDAKkFxj/gI6cVIrHDu+K5/Ql6PyflRL4Wo9h2sCvrNGbRJu26H6smCy3dg3+KqVGHkBnM2V4Vxe0x1AJCQXTsJQpIkqTDZdQhZwtYGTvZ11gKYwSEX3MjP6RKQlYOMCN31xqUo=
+	t=1706123099; cv=none; b=NChc8YbQc39AC9+oQlI3RpF6tXQHWnfz+g5rwlbB179+1HX3uZAAIkaX2bHJaE0zVsUx0VgSE5pNRiYRCxLJrOEh/Rpa/bsYaREt3jEI+2K3pcM8g4mPKwZAQeY9o3beXgPXgAwAMSImGYiJGAB+nbYVYX1YIMxVbNQeGkgcTE8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706122932; c=relaxed/simple;
-	bh=Z5LHA3KO/IElNz60krWfZQZYfSUzZ5zOKhAj36Daqa8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=SwUt9I9G5XTFdcUQCkKpsjsk6+h7YCmQCom/ujIFLsJeuo2Rqsgihp6iM9eEYzJZnu96ZFF1Zf8+AfojhdwosGH6wGAnmDF6m0109qwMXnbUonViO/rtqd7BA/8jYfP91BKfacfHp9U+HsSDWPASBPak6eXM1BAppR52FrsTKcU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kBZmiRAv; arc=none smtp.client-ip=209.85.216.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-290b1e19101so2402931a91.0;
-        Wed, 24 Jan 2024 11:02:11 -0800 (PST)
+	s=arc-20240116; t=1706123099; c=relaxed/simple;
+	bh=c5btgQrk1BDhz/0vTxGV7Vcu8tvNas/9Lb+j0KERx10=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=blec8pCKvlfrlP/AwzKiaBzcYy3ND8cwrQyjAIfwukJ3CQ5uqhrskKOx80wU3aEavtzksyPzcsegNj4w6wtt6n4daasF2kAki6emuHitCAgw4PeEEZ6n7+hmx8Gq7T3xXVyFCTaNfzWQENw0Wzgzv6JmIRt1Pw5h2lcOS21ktUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nd4nM82Z; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dbe9e13775aso8518272276.1
+        for <kvm@vger.kernel.org>; Wed, 24 Jan 2024 11:04:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706122931; x=1706727731; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/YL70uPYw3iC0KrQMlpVNvFT6gCBu7Ww1Ci4N5SVbXQ=;
-        b=kBZmiRAvftDKZhaQxiW4p8cSbNTkjdyCEQFzx37Wlz3J4MSwcVdfbEu9SR7E9NF/za
-         2Z0DB5CHvsKxpHuPgcJtNzzW45+3IuxtKOemt8IEy3WoK8DMJGMxJEh91NDrWniYMVS1
-         o5NoPMUjk/CwcPpBx7E1CXbuLcFvb68BxHstYLbxuhpCIYnWP1ocXDdWOhj20faTNLWh
-         la6FMpzFqQRcYuRRKbywahgMKI2YFSHWeQdWfoKuJ5Pdb53AkmmhAB7Ll/cxZFmH37kK
-         ZSfEBHPvQ581G6M+jAwrU8RoM5vsksPXTILXWRBociARmSrksRYgoQaE08O6HQyS3bKJ
-         8RHA==
+        d=google.com; s=20230601; t=1706123096; x=1706727896; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vAZqoNc/Roso568VdStpsH9vQUOsPSWPM9DJObD4iWg=;
+        b=nd4nM82ZFy1Tli6eLc6CJpF0bSJt++yYIN2UoFzDC/31k1d3sU9MXdcb1HgYgpbdb5
+         AUJkjyVe1uxYSMnyXIdaczdBkoBnzG4zpXrvTZzMTg1EtInSm0JxnGqaUtruaLuUU4+b
+         zzOUE4/ZXK1NzHwCWwoKCU2XPD+zjl8iSLHATpu8ARaLTNFGz/ygBTraXC48spZ1dRae
+         C4UjDvFzJGqvwWD0VqK5I1HLYNKl5CnCE+7Pz9B6Fj5hidqpwjJDSIv/j5AyrYDZ3fHD
+         rwws4uHJSEWtM+NbeofCn8GYrnQKLreJHN+uHiVkKn5I0/IF6jrr/dPOpj2xHzTIXYJK
+         aggw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706122931; x=1706727731;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/YL70uPYw3iC0KrQMlpVNvFT6gCBu7Ww1Ci4N5SVbXQ=;
-        b=Nd6fkqJ0k4KrthoC387ZNb2XICN2O192rDXkV/5fYh2HQ03PG7nWECdSliLdMv1/pn
-         0MPeS7P5xUmxKdc4bJMT0RiwhXPLDYArTFLjKfSGZ8Yh9RhPmEHxVmvMJM9vmqIQTDNA
-         7eps5b3C9nFMdQvuJUqiN4tlG47cI+CaiAK5ehmnH+xTSXXjeaApm9bAPpYy3fIk31nN
-         L4YCmduDMPxpYu4LBVqrIQ/5JhZVYkG4CTlVTdFNwbDmgVnDS/5i9NW+1yjl0LM8DpnT
-         GDFf4wzCG0Y7pnsQpcFmU4AsKa8wcVtroM2jaTOP1ixjPqWXOHBWeMDWdDKJijvuIt15
-         e5cg==
-X-Gm-Message-State: AOJu0Yz/Vqx5yG4W8QV/N0TEA4XTmQ/de2kFseyQ7Ala6BV0WJdNiy7g
-	BQlW4ZmtolTckp03Qx9sEKWbk19yPQ+5pVnDZPIUzmrZFWY7f8a8
-X-Google-Smtp-Source: AGHT+IGoiiFDiz3y6/A5EPti1fn5hvZGCgFJ+K1iBr935lLKy1llsoOUvq4GOcK+jq6iIYVM0gLnmw==
-X-Received: by 2002:a17:90a:38a3:b0:28d:a535:ca23 with SMTP id x32-20020a17090a38a300b0028da535ca23mr107433pjb.20.1706122930641;
-        Wed, 24 Jan 2024 11:02:10 -0800 (PST)
-Received: from localhost.localdomain ([117.177.61.99])
-        by smtp.gmail.com with ESMTPSA id sc2-20020a17090b510200b0028ce12f8cdasm14174138pjb.10.2024.01.24.11.02.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jan 2024 11:02:10 -0800 (PST)
-From: Brilliant Hanabi <moehanabichan@gmail.com>
-X-Google-Original-From: Brilliant Hanabi <moehanabichan@outlook.com>
-To: seanjc@google.com
-Cc: bp@alien8.de,
-	dave.hansen@linux.intel.com,
-	hpa@zytor.com,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	mingo@redhat.com,
-	moehanabichan@gmail.com,
-	pbonzini@redhat.com,
-	tglx@linutronix.de,
-	x86@kernel.org
-Subject: Re: Re: Re: [PATCH] KVM: x86: Check irqchip mode before create PIT
-Date: Thu, 25 Jan 2024 03:01:58 +0800
-Message-Id: <20240124190158.230-1-moehanabichan@outlook.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <ZbFMXtGmtIMavZKW@google.com>
-References: <ZbFMXtGmtIMavZKW@google.com>
+        d=1e100.net; s=20230601; t=1706123096; x=1706727896;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vAZqoNc/Roso568VdStpsH9vQUOsPSWPM9DJObD4iWg=;
+        b=wO8uNWMt928K4u74rIZhe9yXR+NSpXAzS/owVFLAr5kz8v3BNvQHjkqzG1xqVbAhWZ
+         09p5IlGf0IgRD7M0VjWqOY1FCpGiiNuHvXzBVjZEpbEx9qtJoQfSt43VTPJfYpL/6m9W
+         NDtzDDuOYzNTKfgWnkl/aiQkYGmGUMnTuxyT05Mf8Va7p9DlB13to0ap28ARGMHm5I+T
+         NB5utbtcuEdrDfHM+LcLHKgTrlZJr7ZkSpBEQK1jEy25JilMb+zRO15Nd/hsEI57edcN
+         u8JK36wh5XctnE73DpQFjOIn0xYsMBKasAF4a7KSD+PaSWlLsssgtsew8OiWUGxJtHc4
+         JCUA==
+X-Gm-Message-State: AOJu0YxKP6gDCd5buDj+FcjmI1jCc0nwJe7aQcKV/NjnfPfx/LeK0aBv
+	6R80DPcao/K4CcFbvLbwm1OH9cI6CpLEdcHgz7Mhgf28mU2zVH8eo2mnO+PzpmM0BXHN5Qp7NzT
+	ziA==
+X-Google-Smtp-Source: AGHT+IGZ3P+g0NZG3xrH3V796G8tgabmal0b44HFtxDWLHT5kAGUC452wzMacuHtyluNxa94X5PkM/QEFGo=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:d6cb:0:b0:dc2:4d7e:23e4 with SMTP id
+ n194-20020a25d6cb000000b00dc24d7e23e4mr545467ybg.4.1706123096765; Wed, 24 Jan
+ 2024 11:04:56 -0800 (PST)
+Date: Wed, 24 Jan 2024 11:04:55 -0800
+In-Reply-To: <Zau/VQ0B5MCwoqZT@yilunxu-OptiPlex-7050>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20240110011533.503302-1-seanjc@google.com> <20240110011533.503302-2-seanjc@google.com>
+ <Zau/VQ0B5MCwoqZT@yilunxu-OptiPlex-7050>
+Message-ID: <ZbFfVxp76qoBstul@google.com>
+Subject: Re: [PATCH 1/4] KVM: Always flush async #PF workqueue when vCPU is
+ being destroyed
+From: Sean Christopherson <seanjc@google.com>
+To: Xu Yilun <yilun.xu@linux.intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="us-ascii"
 
-> On Thu, Jan 25, 2024, moehanabi wrote:
-> > > On Thu, Jan 25, 2024, Brilliant Hanabi wrote:
-> > > > As the kvm api(https://docs.kernel.org/virt/kvm/api.html) reads,
-> > > > KVM_CREATE_PIT2 call is only valid after enabling in-kernel irqchip
-> > > > support via KVM_CREATE_IRQCHIP.
-> > > > 
-> > > > Without this check, I can create PIT first and enable irqchip-split
-> > > > then, which may cause the PIT invalid because of lacking of in-kernel
-> > > > PIC to inject the interrupt.
-> > > 
-> > > Does this cause actual problems beyond the PIT not working for the guest?  E.g.
-> > > does it put the host kernel at risk?  If the only problem is that the PIT doesn't
-> > > work as expected, I'm tempted to tweak the docs to say that KVM's PIT emulation
-> > > won't work without an in-kernel I/O APIC.  Rejecting the ioctl could theoertically
-> > > break misconfigured setups that happen to work, e.g. because the guest never uses
-> > > the PIT.
+On Sat, Jan 20, 2024, Xu Yilun wrote:
+> On Tue, Jan 09, 2024 at 05:15:30PM -0800, Sean Christopherson wrote:
+> > Always flush the per-vCPU async #PF workqueue when a vCPU is clearing its
+> > completion queue, e.g. when a VM and all its vCPUs is being destroyed.
+> > KVM must ensure that none of its workqueue callbacks is running when the
+> > last reference to the KVM _module_ is put.  Gifting a reference to the
+> > associated VM prevents the workqueue callback from dereferencing freed
+> > vCPU/VM memory, but does not prevent the KVM module from being unloaded
+> > before the callback completes.
 > > 
-> > I don't think it will put the host kernel at risk. But that's exactly what
-> > kvmtool does: it creates in-kernel PIT first and set KVM_CREATE_IRQCHIP then.
+> > Drop the misguided VM refcount gifting, as calling kvm_put_kvm() from
+> > async_pf_execute() if kvm_put_kvm() flushes the async #PF workqueue will
+> > result in deadlock.  async_pf_execute() can't return until kvm_put_kvm()
+> > finishes, and kvm_put_kvm() can't return until async_pf_execute() finishes:
+> > 
+> >  WARNING: CPU: 8 PID: 251 at virt/kvm/kvm_main.c:1435 kvm_put_kvm+0x2d/0x320 [kvm]
+> >  Modules linked in: vhost_net vhost vhost_iotlb tap kvm_intel kvm irqbypass
+> >  CPU: 8 PID: 251 Comm: kworker/8:1 Tainted: G        W          6.6.0-rc1-e7af8d17224a-x86/gmem-vm #119
+> >  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
+> >  Workqueue: events async_pf_execute [kvm]
+> >  RIP: 0010:kvm_put_kvm+0x2d/0x320 [kvm]
+> >  Call Trace:
+> >   <TASK>
+> >   async_pf_execute+0x198/0x260 [kvm]
+> >   process_one_work+0x145/0x2d0
+> >   worker_thread+0x27e/0x3a0
+> >   kthread+0xba/0xe0
+> >   ret_from_fork+0x2d/0x50
+> >   ret_from_fork_asm+0x11/0x20
+> >   </TASK>
+> >  ---[ end trace 0000000000000000 ]---
+> >  INFO: task kworker/8:1:251 blocked for more than 120 seconds.
+> >        Tainted: G        W          6.6.0-rc1-e7af8d17224a-x86/gmem-vm #119
+> >  "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> >  task:kworker/8:1     state:D stack:0     pid:251   ppid:2      flags:0x00004000
+> >  Workqueue: events async_pf_execute [kvm]
+> >  Call Trace:
+> >   <TASK>
+> >   __schedule+0x33f/0xa40
+> >   schedule+0x53/0xc0
+> >   schedule_timeout+0x12a/0x140
+> >   __wait_for_common+0x8d/0x1d0
+> >   __flush_work.isra.0+0x19f/0x2c0
+> >   kvm_clear_async_pf_completion_queue+0x129/0x190 [kvm]
+> >   kvm_arch_destroy_vm+0x78/0x1b0 [kvm]
+> >   kvm_put_kvm+0x1c1/0x320 [kvm]
+> >   async_pf_execute+0x198/0x260 [kvm]
+> >   process_one_work+0x145/0x2d0
+> >   worker_thread+0x27e/0x3a0
+> >   kthread+0xba/0xe0
+> >   ret_from_fork+0x2d/0x50
+> >   ret_from_fork_asm+0x11/0x20
+> >   </TASK>
+> > 
+> > If kvm_clear_async_pf_completion_queue() actually flushes the workqueue,
+> > then there's no need to gift async_pf_execute() a reference because all
+> > invocations of async_pf_execute() will be forced to complete before the
+> > vCPU and its VM are destroyed/freed.  And that in turn fixes the module
+> > unloading bug as __fput() won't do module_put() on the last vCPU reference
+> > until the vCPU has been freed, e.g. if closing the vCPU file also puts the
 > 
-> Right.  My concern, which could be unfounded paranoia, is that rejecting an ioctl()
-> that used to succeed could break existing setups.  E.g. if a userspace VMM creates
-> a PIT and checks the ioctl() result, but its guest(s) never actually use the PIT
-> and so don't care that the PIT is busted.
-
-Thanks for your review. In my opinion, it is better to avoid
-potential bugs which is difficult to detect, as long as you can
-return errors to let developers know about them in advance, although
-the kernel is not to blame for this bug.
-
-> > I found this problem because I was working on implementing a userspace PIC
-> > and PIT in kvmtool. As I planned, I'm going to commit a related patch to 
-> > kvmtool if this patch will be applied.
-> > 
-> > > > Signed-off-by: Brilliant Hanabi <moehanabichan@gmail.com>
-> > > > ---
-> > > >  arch/x86/kvm/x86.c | 2 ++
-> > > >  1 file changed, 2 insertions(+)
-> > > > 
-> > > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > > > index 27e23714e960..3edc8478310f 100644
-> > > > --- a/arch/x86/kvm/x86.c
-> > > > +++ b/arch/x86/kvm/x86.c
-> > > > @@ -7016,6 +7016,8 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
-> > > >  		r = -EEXIST;
-> > > >  		if (kvm->arch.vpit)
-> > > >  			goto create_pit_unlock;
-> > > > +		if (!pic_in_kernel(kvm))
-> > > > +			goto create_pit_unlock;
-> > > 
-> > > -EEXIST is not an appropriate errno.
-> > 
-> > Which errno do you think is better?
+> I'm not sure why __fput() of vCPU fd should be mentioned here. I assume
+> we just need to say that vCPUs are freed before module_put(KVM the module)
+> in kvm_destroy_vm(), then the whole logic for module unloading fix is:
 > 
-> Maybe ENOENT?
->
+>   1. All workqueue callbacks complete when kvm_clear_async_pf_completion_queue(vcpu)
+>   2. kvm_clear_async_pf_completion_queue(vcpu) must be executed before vCPU free.
+>   3. vCPUs must be freed before module_put(KVM the module).
+> 
+>   So all workqueue callbacks complete before module_put(KVM the module).
+> 
+> 
+> __fput() of vCPU fd is not the only trigger of kvm_destroy_vm(), that
+> makes me distracted from reason of the fix.
 
-I'm glad to send a new version patch if you're willing to accept the
-patch.
+My goal was to call out that (a) the vCPU file descriptor is what ensures kvm.ko
+is alive at this point and (b) that __fput() very deliberately ensures module_put()
+is called after all module function callbacks/hooks complete, as there was quite
+a bit of confusion around who/what can safely do module_put().
+
+> > last reference to the KVM module.
+> > 
+> > Note that kvm_check_async_pf_completion() may also take the work item off
+> > the completion queue and so also needs to flush the work queue, as the
+> > work will not be seen by kvm_clear_async_pf_completion_queue().  Waiting
+> > on the workqueue could theoretically delay a vCPU due to waiting for the
+> > work to complete, but that's a very, very small chance, and likely a very
+> > small delay.  kvm_arch_async_page_present_queued() unconditionally makes a
+> > new request, i.e. will effectively delay entering the guest, so the
+> > remaining work is really just:
+> > 
+> >         trace_kvm_async_pf_completed(addr, cr2_or_gpa);
+> > 
+> >         __kvm_vcpu_wake_up(vcpu);
+> > 
+> >         mmput(mm);
+> > 
+> > and mmput() can't drop the last reference to the page tables if the vCPU is
+> > still alive, i.e. the vCPU won't get stuck tearing down page tables.
+> > 
+> > Add a helper to do the flushing, specifically to deal with "wakeup all"
+> > work items, as they aren't actually work items, i.e. are never placed in a
+> > workqueue.  Trying to flush a bogus workqueue entry rightly makes
+> > __flush_work() complain (kudos to whoever added that sanity check).
+> > 
+> > Note, commit 5f6de5cbebee ("KVM: Prevent module exit until all VMs are
+> > freed") *tried* to fix the module refcounting issue by having VMs grab a
+> > reference to the module, but that only made the bug slightly harder to hit
+> > as it gave async_pf_execute() a bit more time to complete before the KVM
+> > module could be unloaded.
+> > 
+> > Fixes: af585b921e5d ("KVM: Halt vcpu if page it tries to access is swapped out")
+> > Cc: stable@vger.kernel.org
+> > Cc: David Matlack <dmatlack@google.com>
+> > Cc: Xu Yilun <yilun.xu@linux.intel.com>
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  virt/kvm/async_pf.c | 37 ++++++++++++++++++++++++++++++++-----
+> >  1 file changed, 32 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/virt/kvm/async_pf.c b/virt/kvm/async_pf.c
+> > index e033c79d528e..876927a558ad 100644
+> > --- a/virt/kvm/async_pf.c
+> > +++ b/virt/kvm/async_pf.c
+> > @@ -87,7 +87,25 @@ static void async_pf_execute(struct work_struct *work)
+> >  	__kvm_vcpu_wake_up(vcpu);
+> >  
+> >  	mmput(mm);
+> > -	kvm_put_kvm(vcpu->kvm);
+> > +}
+> > +
+> > +static void kvm_flush_and_free_async_pf_work(struct kvm_async_pf *work)
+> > +{
+> > +	/*
+> > +	 * The async #PF is "done", but KVM must wait for the work item itself,
+> > +	 * i.e. async_pf_execute(), to run to completion.  If KVM is a module,
+> > +	 * KVM must ensure *no* code owned by the KVM (the module) can be run
+> > +	 * after the last call to module_put(), i.e. after the last reference
+> > +	 * to the last vCPU's file is put.
+> 
+> Maybe drop the i.e? It is not exactly true, other components like VFIO
+> may also be the last one to put KVM reference?
+
+Ah, yeah, agreed.  I'll drop that last snippet, it doesn't and much value.
 
