@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-6821-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6822-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D63E83A5CB
-	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 10:46:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AA30983A5FD
+	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 10:53:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 432BC1C28677
-	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 09:46:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CFF811C28AC6
+	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 09:53:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 927DF18038;
-	Wed, 24 Jan 2024 09:46:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6840918E3A;
+	Wed, 24 Jan 2024 09:52:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FprsDxqi"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fTebNFXb"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 986E51802A
-	for <kvm@vger.kernel.org>; Wed, 24 Jan 2024 09:46:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B18118E10
+	for <kvm@vger.kernel.org>; Wed, 24 Jan 2024 09:52:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706089575; cv=none; b=ShxyeMZaXaCK0iMXGggGrcV0DiGcwKU0NBS+QKHd2a1FDU7npk80Wy0+zpCaV9iDSDHAStYvbVi7eIBf5osWScCGISGxY9plAO5OCpw+4FFWpkMJIjCaC7mE+w+e3c4JBK4faIKOhpea8PwLsFi75Yaotr6qWNywGSzBs1+WI2g=
+	t=1706089977; cv=none; b=KkBiqvFWWXnA50U60rvMnP5EDzJlXmef/wW3L5h+pdQWnxuTZiHIQaGWF3AGJqat8L8jRSiZRWh+w2I2BOdXum0TCNMNiLdJFEIaBQGT+VUrhQSMJHSxKQOJKvyTvJzTFKxR6G0US2cL4ezUzp5jwS6Voe93cYT6dovw+vIk7Yk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706089575; c=relaxed/simple;
-	bh=LX0wtveYeNNpy0IYLnI6Un6vYkcXYDvdsMhO5MfguRc=;
+	s=arc-20240116; t=1706089977; c=relaxed/simple;
+	bh=fL7xsFAPf6mLm5AqWXPAvpgnkwrwuTjyDCASZ1m7eZU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VrKucSrbEFQny2RfASWJlc0HtpP+4d8cZyUkyudB1SAW88VS7jPl11F58j7totM1CnsnBXYEMqfNLbaaMlAjhS8PAS0aqASXwwtObJkRzhIjL/Ag8GV+FbOnvhcrnZOAu7RXNfDz6tPW9iwBwnhEnZBARdEOvAaxZ/BGPSBx0QI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FprsDxqi; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=P81p1t/T6cWG6Mdn9jGxXYhSRpmjbPOzT1CmoCL+ggnZcXTEhvSg2kA515/kujbni4BnTnnGAy1uOpkt5A+cjliyH4zR13X+61rEUHrUVyMKkQIO+08TwtsNdfW4IKu9e8Z9sfSFS82RKSLPRYNpwBviC6vGUP0VeeBXNihe88E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fTebNFXb; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706089572;
+	s=mimecast20190719; t=1706089975;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=pFN7ypEuub1SUNjprLw16LHSKAbY43NwwfYcGZ0HYJU=;
-	b=FprsDxqiffRKATSM/39T3+lFRcYWdqZXSM9JQFEhVZxOPnukpL80iSCpTdZQzHlhLfR55j
-	mrvXWQY/R50ku7i3Zog/iXsIPQjv4fHGZtioIQGJ/ExmyuZJsG/1ABJlIWI+V1gIuY3BBa
-	eMZ6pOIS1q8esYB/xUGycKXH3cgnm5c=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=3Em1vhfyXKT1LEE01SdpLdKpgsNPtBUovozPrXlkUAI=;
+	b=fTebNFXbDHRVD7MrB2QfFauS8vf1kySDLHZY4Awrb1gyax0gx3765GmH/BE2PlhMXwxd7w
+	ycq9RTNdibV4GFOgGIjzn5JsDxn4upvSD7cJgc8Edrq7MWhMN7ry+cfl2blUmh9ZscBzhV
+	VooT5cFFJk6Z4kYpDImDHHaQ5IstjfE=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-296-4Gp_5SqLMh6T_xAMIrGDIA-1; Wed, 24 Jan 2024 04:46:10 -0500
-X-MC-Unique: 4Gp_5SqLMh6T_xAMIrGDIA-1
-Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-681998847b0so101806846d6.0
-        for <kvm@vger.kernel.org>; Wed, 24 Jan 2024 01:46:10 -0800 (PST)
+ us-mta-66-aW9_CSVtPFG4UOiw_3lYkQ-1; Wed, 24 Jan 2024 04:52:53 -0500
+X-MC-Unique: aW9_CSVtPFG4UOiw_3lYkQ-1
+Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-42a3cd0db31so35234911cf.0
+        for <kvm@vger.kernel.org>; Wed, 24 Jan 2024 01:52:52 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706089570; x=1706694370;
+        d=1e100.net; s=20230601; t=1706089971; x=1706694771;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pFN7ypEuub1SUNjprLw16LHSKAbY43NwwfYcGZ0HYJU=;
-        b=SpsiPHjikA/keFvJLJkgXWwCjbk91e57VqxOoamBvPPAvbciomvt1lidsPXKrLECOG
-         JcEC4I5rHgr7gLykT942ZGtifi/Rgm5VeJ6vW44x96WyDaWJnX98nc7ydNGhtDCPUApz
-         Q/BqaY5kv0JVsH3RrgBoYldGqQ/Iv9Kxff18XaXOzLNHiMbX9VY/BXUxpq5MCd9fu5qQ
-         +0ZCF1prTZCvB37ndnh4C9j/egsIRrbr3dfjnbEY0gfwkOJzNMNY1nD87o48m9yWJOeD
-         xMj5ARXvXtg7OTuvJ9q6+W071SIAD18u4cSPCRQGho7netdEaqUwRN11TJkBZYkHg3i+
-         Lyqg==
-X-Gm-Message-State: AOJu0Yx4VoY1szFeledWh4GFtRRnNE/JGUgDmEhejb/iPtHFEDgwhHhp
-	hitVCbhQLdIKnGseaWg37u783Ho5sKXvW2il5/KQ+S2aWW3YDWcbkk/EDqgmPY2WPSMWnzgZ8dT
-	WGe9hTGNI99lfCXLXC3Emb8GMv3wth4SQPavVVAubTcozSwB2Ew==
-X-Received: by 2002:ad4:5bc9:0:b0:686:ad62:807a with SMTP id t9-20020ad45bc9000000b00686ad62807amr1195913qvt.30.1706089570413;
-        Wed, 24 Jan 2024 01:46:10 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHjDgzjNdw0jWlTHxDlL6wZ74MNLP68V032ZI0/mgEhSfHsnSSYXBV3bRAWunzJA7DcAWO8Bg==
-X-Received: by 2002:ad4:5bc9:0:b0:686:ad62:807a with SMTP id t9-20020ad45bc9000000b00686ad62807amr1195904qvt.30.1706089570206;
-        Wed, 24 Jan 2024 01:46:10 -0800 (PST)
+        bh=3Em1vhfyXKT1LEE01SdpLdKpgsNPtBUovozPrXlkUAI=;
+        b=VJZDeEfDN7+zabmL/uehDa8GnW47A+iiV/QYneSkJh5yTQSomeMglC4Wfq1BIPmSSz
+         BPpP1YZogUufT0pO6iRukMO29X38MxuFfG7xM/7/cut2K+Qn10YLcVELjGxITk4OZwEV
+         vDT8iFnTCGZyN5AVmQjGi9DQ2tCI9ELwiIZ5JP/mViymDABavwAKq+08JoSkxzXla/p6
+         qU3fvHOwvxbSY4lhus+feTsA42yy1DNH0z6ZRCfVm0Oo8xIk5BG6ic6zGIRuKZd9+a1M
+         Eo9he2wJKm3viONwk06h46xeWLQaOMmeNiniB56ROKT0kKbMLLdyTirZIF+YjswpmWr5
+         eqlQ==
+X-Gm-Message-State: AOJu0YzG1ROXZ2/KdRocorSdv75xPRkYw0TIMmPFaYgHmOBwTCHCHsdT
+	vZx4zKm4IW0Hezu6M5EAoAxHnrnbOXA2XFw9I9FxCLZ78NR6gg5lFEnOqfyOEddbp8mJHFUZ0gI
+	oXKhDsuuoF2462mZyssaeOqX2FmgSsaAuBvj+OHK8EHJSbFCsxQ==
+X-Received: by 2002:a05:622a:288:b0:42a:5b85:32ca with SMTP id z8-20020a05622a028800b0042a5b8532camr862560qtw.11.1706089971535;
+        Wed, 24 Jan 2024 01:52:51 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGH/1IaQQCpdnGnKzLipGmiYfUhmKC7+77PPGsSQdq692kdDR2DfILIz56aG7RtlIcdHEFhOA==
+X-Received: by 2002:a05:622a:288:b0:42a:5b85:32ca with SMTP id z8-20020a05622a028800b0042a5b8532camr862549qtw.11.1706089971305;
+        Wed, 24 Jan 2024 01:52:51 -0800 (PST)
 Received: from [192.168.0.9] (ip-109-43-177-121.web.vodafone.de. [109.43.177.121])
-        by smtp.gmail.com with ESMTPSA id me17-20020a0562145d1100b00686ac6401fdsm664081qvb.13.2024.01.24.01.46.08
+        by smtp.gmail.com with ESMTPSA id x3-20020ac81203000000b00427e0e9c22dsm4222908qti.54.2024.01.24.01.52.49
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Jan 2024 01:46:09 -0800 (PST)
-Message-ID: <e50d0124-230d-4720-bded-b2ae9eb2e128@redhat.com>
-Date: Wed, 24 Jan 2024 10:46:08 +0100
+        Wed, 24 Jan 2024 01:52:51 -0800 (PST)
+Message-ID: <1284c5bd-8c2d-4228-b2db-915548672eac@redhat.com>
+Date: Wed, 24 Jan 2024 10:52:47 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -81,14 +81,15 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH 24/24] MAINTAINERS: Add riscv
+Subject: Re: [kvm-unit-tests PATCH 03/24] arm/arm64: Move cpumask.h to common
+ lib
 Content-Language: en-US
 To: Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org,
  kvm-riscv@lists.infradead.org, kvmarm@lists.linux.dev
 Cc: ajones@ventanamicro.com, anup@brainfault.org, atishp@atishpatra.org,
  pbonzini@redhat.com, alexandru.elisei@arm.com, eric.auger@redhat.com
 References: <20240124071815.6898-26-andrew.jones@linux.dev>
- <20240124071815.6898-50-andrew.jones@linux.dev>
+ <20240124071815.6898-29-andrew.jones@linux.dev>
 From: Thomas Huth <thuth@redhat.com>
 Autocrypt: addr=thuth@redhat.com; keydata=
  xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
@@ -132,19 +133,29 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20240124071815.6898-50-andrew.jones@linux.dev>
+In-Reply-To: <20240124071815.6898-29-andrew.jones@linux.dev>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 24/01/2024 08.18, Andrew Jones wrote:
-> Most of the support for riscv is now in place. Let's make it official
-> and start adding tests!
+> RISC-V will also make use of cpumask.h, so move it to the arch-common
+> directory.
 > 
 > Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 > ---
->   MAINTAINERS | 8 ++++++++
->   1 file changed, 8 insertions(+)
+>   lib/arm/asm/gic-v2.h        | 2 +-
+>   lib/arm/asm/gic-v3.h        | 2 +-
+>   lib/arm/asm/gic.h           | 2 +-
+>   lib/arm/asm/smp.h           | 2 +-
+>   lib/arm/mmu.c               | 2 +-
+>   lib/arm/smp.c               | 2 +-
+>   lib/arm64/asm/cpumask.h     | 1 -
+>   lib/{arm/asm => }/cpumask.h | 9 ++++-----
+>   8 files changed, 10 insertions(+), 12 deletions(-)
+>   delete mode 100644 lib/arm64/asm/cpumask.h
+>   rename lib/{arm/asm => }/cpumask.h (94%)
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
+
 
 
