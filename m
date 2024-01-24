@@ -1,130 +1,134 @@
-Return-Path: <kvm+bounces-6852-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6853-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC09683AFF2
-	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 18:31:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D268C83B046
+	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 18:44:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF6CC1C27AA8
-	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 17:31:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 88A811F2220E
+	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 17:44:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06F3585C7C;
-	Wed, 24 Jan 2024 17:30:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F054785C66;
+	Wed, 24 Jan 2024 17:44:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oYt2OUOW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ucR4+2gD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD0F285C54
-	for <kvm@vger.kernel.org>; Wed, 24 Jan 2024 17:30:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8DD07F7CE
+	for <kvm@vger.kernel.org>; Wed, 24 Jan 2024 17:44:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706117439; cv=none; b=BHEFspjCFnlYF2YNXswPf6WArQ0Qb2TUx7pPn2GC6kNoK016Srsd/LEKkCBA4E+GqtBrShNcx9BmIuVVCZclhberc7Ve/QppyyR6vGSgrgWyVNrrcpYTaSj9zeLq4VG5ANdBddSTFwIgY4MrPty//GyrEsnWmr5aByWU/8Mv1pc=
+	t=1706118242; cv=none; b=ImM4W0RKpQljz4YdJ3VKTzp+/iY559Iaba5b+zl+fEeYSMhQfcPSojAlS05fDQykulTP2MZZwocsQMhJvMT+2TllObi/uMQ5Ud1+dZibzHZt/A3NfVmEKRf6UcIQX8ulZQL6Qqhy0+Q5CIfF6wKS8CgCHvqFZTvrk0TDcu2yVLI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706117439; c=relaxed/simple;
-	bh=iH0MchTyiKSEd6BXJ2oEXudcHoxwgVYZCOiKge+w8Mk=;
+	s=arc-20240116; t=1706118242; c=relaxed/simple;
+	bh=MZHuAtNiL03oEoJHa6bf7Od5Fg8D8o9NBf7iVEHZ9ag=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Fi80ulTAERYj++viS36+zcZDrI+UsXIyjXDOqzI3EjqcFblehLE5vWTUxxnZGQIQ8ded8y8UttvfSNSdDMX6OBQizjQe4hjzThCl9VP289T7Ya/pLu/L+eXqQn06geXUzu38KcTAzmE1q2RThvGiSrAwbZX88bvHviD5uSRYk9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oYt2OUOW; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=UMJfBKOLYAJO/F5ipTAcxhzWacmHf5qBY30iIH6r1msWvb8juFQ6CMOEnBgaR1pVxBG/vCEBsZ1cb98ZSHRpSlmfx0pPr+DNaXXKCpENJDTfrSCyGX1Am5Rev7jhmaarhMvpBIjKiCw2uKHGeMFoo2Yczup6hM17WAV+NYQVimA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ucR4+2gD; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5ffa2bb4810so48624367b3.0
-        for <kvm@vger.kernel.org>; Wed, 24 Jan 2024 09:30:37 -0800 (PST)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-5cfda2f4716so1607626a12.3
+        for <kvm@vger.kernel.org>; Wed, 24 Jan 2024 09:44:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706117437; x=1706722237; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1706118240; x=1706723040; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4XBmMUxfyNNPeoo/A2vYJ+fv7wX+k30y8Lmqm0OE8QM=;
-        b=oYt2OUOW6FA1ivx95OvEAr4D7Z4iZTw3ir34MJho2zhXUXT0CwMHwGJ5dS0n9PVHM6
-         tuyMapWiXFE/mbW/ni18+5sn4emQtEwSkcyXuwVr6P8YxP1YglO0bBAT4f3HKJnrxHmt
-         ggq4eBN/c8fPRze8r3w8VRiv5YyjaSwYgo4m4HU020V8HUQiS0/Osxrgf4IbqZ1rpFb2
-         fYAeBoNBmQF8HMPmtbFOY8jR6JG9xojEVG5Bl6KG8RWH6K7f2AH51anj3VWahmDzGkuz
-         XPNsed6VuPGl/Xktw9TySeCjprXLJ9uMTkILTMQc8pOT9uTWo/TjNR+YgzWlypggqFm+
-         zHMA==
+        bh=phLGUzO1dl3tbnC30bhE9/nw1oePNjTydqU1ZrBpVgU=;
+        b=ucR4+2gDmiF/NDBhyFKzVAnIRpM6+RRFEjKVocLTvKqe+S3ZNF3WKjQHdcr8Tsln5w
+         bwJ6d2E9h1LPkW4JGqW7aOcfI3yBXFoIjH7sZY+ui+S6roMemn00rIaIyBYogcW+z67X
+         r5Ya3XFPCIx6/ynmJhG/PuXNcx8ev3vU96oIHU/7f0Gg65fi1dQdRRkmRvWBM1pWh4m5
+         4ZnT/YUZg0SWL1OgkHfXt53o4D3ybfuhnC5pkdokeRTqNYN0PaHE8i3TulN3WUl0D11T
+         1SyPH9wLB+sz6AVWUi1XcXqgaR8jOmwSbKEE8QYcI45i4XAQ+5S0AqF0txU3SSv5QOsD
+         lhQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706117437; x=1706722237;
+        d=1e100.net; s=20230601; t=1706118240; x=1706723040;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4XBmMUxfyNNPeoo/A2vYJ+fv7wX+k30y8Lmqm0OE8QM=;
-        b=VlloSWHdLnSp2EyJmz4D+jcPm0XAmQSUbNyFdvx49V+fpZbQpWZxaTOas8BQbMcKza
-         zXoQDIFNJpbhR1GyOXhjXLZchAyAbWlpO777kkE7eASc++EtwdMtO7km/xoiwtLMthy/
-         KIZv5wP9WfhtUl5b7E5tLbjfqCi9qIWvy6LbEQreFlWjX+WtTELauj/IQGbGEgJQa+jt
-         CKjUCFHbqGuQ7kmrK9uFTf07VPzNK0axW7BKxNB5j9tKoqv1v7HYgrjCAAXekpGQV5Sa
-         QMf/t6dEP5anTZhhi3/uIULkYYPZD8AGS1+biu014XH5n3HNYw+dRXsfvBdUhyT+8WNH
-         qbCg==
-X-Gm-Message-State: AOJu0Yy1VKOcW1dPSuTU/SH8JUQ6u8XPmtoLUPjedSCY8NWtYYvLwmnp
-	sQa8fRi0JP1jt/Ylje+6voFIDdCp9X9LHJedUqJROIPvMIeSgnWhoQ7vppqOArefyYkWj6ZgmG0
-	+Gg==
-X-Google-Smtp-Source: AGHT+IGEWXyawuzyp81/wDfi3Iy9A571RkMiRToyJDanBsf/3shix6eGHoFXOR8E1W1QHA6QBXUB2ddk3kw=
+        bh=phLGUzO1dl3tbnC30bhE9/nw1oePNjTydqU1ZrBpVgU=;
+        b=IsxNbMbsv7nTQ0wmkMevmYBF8A0IyHAqjQSjXT/zXN8XMe5ygbkVPnCG1FkhmRpA5s
+         1ObsiXGWomc5C9SIgKv1qDC7jddHl1Z3JIQi74+jqg2utlKXDXAVOhFzdO0VrWUbkmF7
+         yJypSBuGoZODhD2ZImY71/hjJJTIWVvdaYrWECzLiaS6oLMqK6FmrVDHnvEqi3HMPi6p
+         Y1UCUYSMDpaz51KS4CDjwbCnavfFhFUo5XZSn1s9cdQPh/NDBWGE2z2M48HFduhlPEji
+         7/6AqTqFDOxEnV0GPxsgtuaTjdvRtMnxuHl46hI0h6mj6UL7PbBbnEaQA9EWKlm25Le7
+         wW3Q==
+X-Gm-Message-State: AOJu0YyIdur24fu7VgthFIAhXX9gMinYZDhR72kRxT5IkEf90iQTdweP
+	abAoHeWOuW+RBeeGPEaeqFZ2mNqiU+Juw+m8a++zhz8jgoSLXw3p8mNJ37RAFLhRRVynOv9Qn56
+	tHA==
+X-Google-Smtp-Source: AGHT+IH50wrWLE+dOd9vXG84ZvByuwmloXUXoNDIkK2WvQj7QWsB8hpAZLXMXP/PyBpBzNHdQEpsB43YjN8=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1786:b0:dc2:3a02:4fc8 with SMTP id
- ca6-20020a056902178600b00dc23a024fc8mr66666ybb.6.1706117436822; Wed, 24 Jan
- 2024 09:30:36 -0800 (PST)
-Date: Wed, 24 Jan 2024 09:30:35 -0800
-In-Reply-To: <20240122193605.7riyd7q5rs2i4xez@amd.com>
+ (user=seanjc job=sendgmr) by 2002:a63:5652:0:b0:5ca:31a3:c70c with SMTP id
+ g18-20020a635652000000b005ca31a3c70cmr42150pgm.3.1706118239933; Wed, 24 Jan
+ 2024 09:43:59 -0800 (PST)
+Date: Wed, 24 Jan 2024 09:43:58 -0800
+In-Reply-To: <20240124170243.93-1-moehanabichan@outlook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240117010644.1534332-1-seanjc@google.com> <20240122193605.7riyd7q5rs2i4xez@amd.com>
-Message-ID: <ZbFJOyGb21UX6qXn@google.com>
-Subject: Re: [ANNOUNCE] PUCK Agenda - 2024.01.17 - TDP MMU for IOMMU
+References: <ZbE7kd9W8csPRjvU@google.com> <20240124170243.93-1-moehanabichan@outlook.com>
+Message-ID: <ZbFMXtGmtIMavZKW@google.com>
+Subject: Re: Re: [PATCH] KVM: x86: Check irqchip mode before create PIT
 From: Sean Christopherson <seanjc@google.com>
-To: Michael Roth <michael.roth@amd.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Jason Gunthorpe <jgg@nvidia.com>, Yan Zhao <yan.y.zhao@intel.com>, 
-	David Matlack <dmatlack@google.com>, pbonzini@redhat.com, isaku.yamahata@intel.com
+To: moehanabi <moehanabichan@gmail.com>
+Cc: bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, mingo@redhat.com, 
+	pbonzini@redhat.com, tglx@linutronix.de, x86@kernel.org
 Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Jan 22, 2024, Michael Roth wrote:
-> On Tue, Jan 16, 2024 at 05:06:44PM -0800, Sean Christopherson wrote:
-> > Tomorrow's PUCK topic is utilizing KVM's TDP MMU for IOMMU page tables.
+On Thu, Jan 25, 2024, moehanabi wrote:
+> > On Thu, Jan 25, 2024, Brilliant Hanabi wrote:
+> > > As the kvm api(https://docs.kernel.org/virt/kvm/api.html) reads,
+> > > KVM_CREATE_PIT2 call is only valid after enabling in-kernel irqchip
+> > > support via KVM_CREATE_IRQCHIP.
+> > > 
+> > > Without this check, I can create PIT first and enable irqchip-split
+> > > then, which may cause the PIT invalid because of lacking of in-kernel
+> > > PIC to inject the interrupt.
 > > 
-> > FYI, I am currently without my normal internet (hooray tethering), and we're
-> > supposed to get a healthy dose of freezing rain tonight, i.e. I might lose power
-> > too.  I expect to be able to join even if that happens, but I apologize in
-> > advance if I end up being a no-show.
-> > 
-> > https://lore.kernel.org/all/20231202091211.13376-1-yan.y.zhao@intel.com
-> > 
-> > Time:     6am PDT
-> > Video:    https://meet.google.com/vdb-aeqo-knk
-> > Phone:    https://tel.meet/vdb-aeqo-knk?pin=3003112178656
-> > 
-> > Calendar: https://calendar.google.com/calendar/u/0?cid=Y182MWE1YjFmNjQ0NzM5YmY1YmVkN2U1ZWE1ZmMzNjY5Y2UzMmEyNTQ0YzVkYjFjN2M4OTE3MDJjYTUwOTBjN2Q1QGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20
-> > Drive:    https://drive.google.com/drive/folders/1aTqCrvTsQI9T4qLhhLs_l986SngGlhPH?resourcekey=0-FDy0ykM3RerZedI8R-zj4A&usp=drive_link
-> > 
-> > Future Schedule:
-> > January 24th - Memtypes for non-coherent DMA
-> > January 31st - Available!
+> > Does this cause actual problems beyond the PIT not working for the guest?  E.g.
+> > does it put the host kernel at risk?  If the only problem is that the PIT doesn't
+> > work as expected, I'm tempted to tweak the docs to say that KVM's PIT emulation
+> > won't work without an in-kernel I/O APIC.  Rejecting the ioctl could theoertically
+> > break misconfigured setups that happen to work, e.g. because the guest never uses
+> > the PIT.
 > 
-> Hi Sean,
-> 
-> I'd like to propose the following topic for the next available slot:
-> 
->   "Finalizing internal guest_memfd APIs needed for SNP (TDX?) upstreaming"
-> 
-> There's 2 existing interfaces, gmem_prepare, gmem_invalidate, that are
-> needed by the current SNP patches, and there's some additional background
-> about the design decisions here:
-> 
->   https://lore.kernel.org/kvm/20231016115028.996656-1-michael.roth@amd.com/
-> 
-> There's also another gmem interface that you recently proposed for handling
-> setting up the initial launch image of SNP guests here that seems like it
-> would have a lot of potential overlap with how gmem_prepare is implemented:
-> 
->   https://lore.kernel.org/lkml/ZZ67oJwzAsSvui5U@google.com/
-> 
-> I'd like to try to get some clarity on what these should look like in order
-> to be considered acceptable for upstreaming of SNP, and potentially any
-> considerations that need to be taken into account for other users like
-> TDX/pKVM/etc.
+> I don't think it will put the host kernel at risk. But that's exactly what
+> kvmtool does: it creates in-kernel PIT first and set KVM_CREATE_IRQCHIP then.
 
-I penciled this in for the 31st, let me know if that works for you.
+Right.  My concern, which could be unfounded paranoia, is that rejecting an ioctl()
+that used to succeed could break existing setups.  E.g. if a userspace VMM creates
+a PIT and checks the ioctl() result, but its guest(s) never actually use the PIT
+and so don't care that the PIT is busted.
+
+> I found this problem because I was working on implementing a userspace PIC
+> and PIT in kvmtool. As I planned, I'm going to commit a related patch to 
+> kvmtool if this patch will be applied.
+> 
+> > > Signed-off-by: Brilliant Hanabi <moehanabichan@gmail.com>
+> > > ---
+> > >  arch/x86/kvm/x86.c | 2 ++
+> > >  1 file changed, 2 insertions(+)
+> > > 
+> > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > > index 27e23714e960..3edc8478310f 100644
+> > > --- a/arch/x86/kvm/x86.c
+> > > +++ b/arch/x86/kvm/x86.c
+> > > @@ -7016,6 +7016,8 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
+> > >  		r = -EEXIST;
+> > >  		if (kvm->arch.vpit)
+> > >  			goto create_pit_unlock;
+> > > +		if (!pic_in_kernel(kvm))
+> > > +			goto create_pit_unlock;
+> > 
+> > -EEXIST is not an appropriate errno.
+> 
+> Which errno do you think is better?
+
+Maybe ENOENT?
 
