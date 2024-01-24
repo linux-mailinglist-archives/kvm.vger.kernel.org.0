@@ -1,34 +1,34 @@
-Return-Path: <kvm+bounces-6775-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6776-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 801E0839F89
-	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 03:51:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B2D1839F8C
+	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 03:52:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB18F1F2C733
-	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 02:51:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B89B1C22BFA
+	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 02:52:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3F7B45026;
-	Wed, 24 Jan 2024 02:42:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B3684F203;
+	Wed, 24 Jan 2024 02:42:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Vi1EJz+x"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CSXHSVNq"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2A752BAFD;
-	Wed, 24 Jan 2024 02:42:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A60842C69B;
+	Wed, 24 Jan 2024 02:42:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.55.52.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706064172; cv=none; b=aIaKU028MiFTEHcq+9H9w0VQ+gNDtAL1g0lyU28o10sGP+du5RxH/Ka8CKscz+1JXy8kROb+VAJwG17D8GCWsh1d1YYcQD4Cg0OlpsHWWdvuJBYEQvTJQ4yeGxIF3S0lYpNQ0/vJO6oOKWnGzapbtsCO+0CddNpxtgn8gH9BFFc=
+	t=1706064173; cv=none; b=APp/7gek0pGzFMcOUhZ5P67vqSzYDPYcb59y9BMBljM2AQclc0fz+wtq0aRmPSi9U/o/YEjumTxxmsZfkyhsh1vx9YMEQF7uPPXsDM8lQnuJ5BQ6SKTDPZd65Acet+fY37iwtzy49ip6eSOp0PUhAMaRH0Kw4c6cuCY1Q8ejC+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706064172; c=relaxed/simple;
-	bh=Y2iZ/863z0AfxrDmZWFmP7SSubY9D1G8VEP8bgNpmyw=;
+	s=arc-20240116; t=1706064173; c=relaxed/simple;
+	bh=UwRtvVNhqC9a4CUwgibiSghyasJhQAcBvz9o6nhR8wU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=aYNgukmnOjKE8NzjFwPe6L7SXAY2rsXXl9TSL42Kz8SNfJwOKNhIpqC6YA0PNh+K48RYoxt4eq5QmHD/QEqPIslUwrdShQzVh+38lr3XOUYlDj2OLEfSf+Pw20G74gCxmXb8oIoIIxqdhp2JiqdWAz6vPB9r/jZj7S7gMVrEIks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Vi1EJz+x; arc=none smtp.client-ip=192.55.52.120
+	 MIME-Version; b=naZyBYLth+/LAvOk3HS71kHwHwT6eRbJua3cV7pLdpFx9wAlflt+PWt7Tkg+e2Lvz8mfgCQRIxv6xTKDhyKmDAYrNo9AdbYwY8LgZYbFU/S2wBbrvEekORl2YxRrl2anL+I5dYyI9BH/fJ8wC8n/K1UosPZ9K5z+CwRxSJe5EZ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CSXHSVNq; arc=none smtp.client-ip=192.55.52.120
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -36,22 +36,22 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1706064171; x=1737600171;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Y2iZ/863z0AfxrDmZWFmP7SSubY9D1G8VEP8bgNpmyw=;
-  b=Vi1EJz+xsxHpQdjn5QYRDXl0NzsrlFygl4LkwhuMhQjp+5nGioykIThl
-   yZ1n8asx8YaEMwDWtUwwuv7Z1HxNeC4U6oqbu6hrTTismdxZ4Q8qxNBBJ
-   P/XIGxQUkQVvNgn9YZUfJw8orl1haP6UyD+BOa7A1+QpXT+JT21YokxtM
-   qf3Aij6Uv4mLi0q5V+f08pcR9stnN02NPF64L9fRaVzajze9torkYL3fh
-   zSxYtKIBMQyy27UsZzydBIpDZA/nDkvlUyHRb+3UkYzDJFvuRkRxODVuK
-   cARU/eGG8PA39FY/Ezim8DL14b1Cka/Lub3CU83DRl+k9TVnSNYiOutOW
+  bh=UwRtvVNhqC9a4CUwgibiSghyasJhQAcBvz9o6nhR8wU=;
+  b=CSXHSVNq7Y5/fnoT+ZxQSv2cOsDsoqnXwePOoYu9WpBy7fi57rkZ34oE
+   0V6bN/J3Q8TlJVo1AHK7YWfkLN1Noyz3tetksL6TuqSJVEIUozZO8ZR2c
+   o90teJ8/jf0VGzJc6SwVSi+vlHE6voEUDIPZ8B0FR8N4Fm3C2KK5CVO+N
+   +3P0HNHzPHt6dxchYz0vsCx9pwUAoq5T8CI50Ejb9Q5JwK446HiRXjkEN
+   9+nI/Oz6DeYn/mnN87n7fKD6QDXeaE7RohILVm9KPvLVdv5XE8gaGgKQX
+   xxaOBBK0QuSzDXVRhto/a8Udz6O/j9wpIQI7jiYkgF4R2gUxKY2V+yo7a
    w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="400586592"
+X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="400586599"
 X-IronPort-AV: E=Sophos;i="6.05,215,1701158400"; 
-   d="scan'208";a="400586592"
+   d="scan'208";a="400586599"
 Received: from fmviesa003.fm.intel.com ([10.60.135.143])
   by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2024 18:42:45 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.05,215,1701158400"; 
-   d="scan'208";a="1825936"
+   d="scan'208";a="1825939"
 Received: from 984fee00a5ca.jf.intel.com ([10.165.9.183])
   by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2024 18:42:45 -0800
 From: Yang Weijiang <weijiang.yang@intel.com>
@@ -68,9 +68,9 @@ Cc: peterz@infradead.org,
 	mlevitsk@redhat.com,
 	john.allen@amd.com,
 	weijiang.yang@intel.com
-Subject: [PATCH v9 26/27] KVM: nVMX: Enable CET support for nested guest
-Date: Tue, 23 Jan 2024 18:41:59 -0800
-Message-Id: <20240124024200.102792-27-weijiang.yang@intel.com>
+Subject: [PATCH v9 27/27] KVM: x86: Stop emulating for CET protected branch instructions
+Date: Tue, 23 Jan 2024 18:42:00 -0800
+Message-Id: <20240124024200.102792-28-weijiang.yang@intel.com>
 X-Mailer: git-send-email 2.39.3
 In-Reply-To: <20240124024200.102792-1-weijiang.yang@intel.com>
 References: <20240124024200.102792-1-weijiang.yang@intel.com>
@@ -82,193 +82,103 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Set up CET MSRs, related VM_ENTRY/EXIT control bits and fixed CR4 setting
-to enable CET for nested VM.
+Don't emulate the branch instructions, e.g., CALL/RET/JMP etc., when CET
+is active in guest, return KVM_INTERNAL_ERROR_EMULATION to userspace to
+handle it.
 
-vmcs12 and vmcs02 needs to be synced when L2 exits to L1 or when L1 wants
-to resume L2, that way correct CET states can be observed by one another.
+KVM doesn't emulate CPU behaviors to check CET protected stuffs while
+emulating guest instructions, instead it stops emulation on detecting
+the instructions in process are CET protected. By doing so, it can avoid
+generating bogus #CP in guest and preventing CET protected execution flow
+subversion from guest side.
 
 Suggested-by: Chao Gao <chao.gao@intel.com>
 Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/x86/kvm/vmx/nested.c | 57 +++++++++++++++++++++++++++++++++++++--
- arch/x86/kvm/vmx/vmcs12.c |  6 +++++
- arch/x86/kvm/vmx/vmcs12.h | 14 +++++++++-
- arch/x86/kvm/vmx/vmx.c    |  2 ++
- 4 files changed, 76 insertions(+), 3 deletions(-)
+ arch/x86/kvm/emulate.c | 27 ++++++++++++++++-----------
+ 1 file changed, 16 insertions(+), 11 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 468a7cf75035..e330897a7e5e 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -691,6 +691,28 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
- 	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
- 					 MSR_IA32_FLUSH_CMD, MSR_TYPE_W);
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index e223043ef5b2..ad15ce055a1d 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -178,6 +178,7 @@
+ #define IncSP       ((u64)1 << 54)  /* SP is incremented before ModRM calc */
+ #define TwoMemOp    ((u64)1 << 55)  /* Instruction has two memory operand */
+ #define IsBranch    ((u64)1 << 56)  /* Instruction is considered a branch. */
++#define IsProtected ((u64)1 << 57)  /* Instruction is protected by CET. */
  
-+	/* Pass CET MSRs to nested VM if L0 and L1 are set to pass-through. */
-+	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
-+					 MSR_IA32_U_CET, MSR_TYPE_RW);
-+
-+	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
-+					 MSR_IA32_S_CET, MSR_TYPE_RW);
-+
-+	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
-+					 MSR_IA32_PL0_SSP, MSR_TYPE_RW);
-+
-+	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
-+					 MSR_IA32_PL1_SSP, MSR_TYPE_RW);
-+
-+	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
-+					 MSR_IA32_PL2_SSP, MSR_TYPE_RW);
-+
-+	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
-+					 MSR_IA32_PL3_SSP, MSR_TYPE_RW);
-+
-+	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
-+					 MSR_IA32_INT_SSP_TAB, MSR_TYPE_RW);
-+
- 	kvm_vcpu_unmap(vcpu, &vmx->nested.msr_bitmap_map, false);
+ #define DstXacc     (DstAccLo | SrcAccHi | SrcWrite)
  
- 	vmx->nested.force_msr_bitmap_recalc = false;
-@@ -2506,6 +2528,17 @@ static void prepare_vmcs02_rare(struct vcpu_vmx *vmx, struct vmcs12 *vmcs12)
- 		if (kvm_mpx_supported() && vmx->nested.nested_run_pending &&
- 		    (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS))
- 			vmcs_write64(GUEST_BNDCFGS, vmcs12->guest_bndcfgs);
-+
-+		if (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_CET_STATE) {
-+			if (guest_can_use(&vmx->vcpu, X86_FEATURE_SHSTK)) {
-+				vmcs_writel(GUEST_SSP, vmcs12->guest_ssp);
-+				vmcs_writel(GUEST_INTR_SSP_TABLE,
-+					    vmcs12->guest_ssp_tbl);
-+			}
-+			if (guest_can_use(&vmx->vcpu, X86_FEATURE_SHSTK) ||
-+			    guest_can_use(&vmx->vcpu, X86_FEATURE_IBT))
-+				vmcs_writel(GUEST_S_CET, vmcs12->guest_s_cet);
-+		}
- 	}
- 
- 	if (nested_cpu_has_xsaves(vmcs12))
-@@ -4344,6 +4377,15 @@ static void sync_vmcs02_to_vmcs12_rare(struct kvm_vcpu *vcpu,
- 	vmcs12->guest_pending_dbg_exceptions =
- 		vmcs_readl(GUEST_PENDING_DBG_EXCEPTIONS);
- 
-+	if (guest_can_use(&vmx->vcpu, X86_FEATURE_SHSTK)) {
-+		vmcs12->guest_ssp = vmcs_readl(GUEST_SSP);
-+		vmcs12->guest_ssp_tbl = vmcs_readl(GUEST_INTR_SSP_TABLE);
-+	}
-+	if (guest_can_use(&vmx->vcpu, X86_FEATURE_SHSTK) ||
-+	    guest_can_use(&vmx->vcpu, X86_FEATURE_IBT)) {
-+		vmcs12->guest_s_cet = vmcs_readl(GUEST_S_CET);
-+	}
-+
- 	vmx->nested.need_sync_vmcs02_to_vmcs12_rare = false;
- }
- 
-@@ -4569,6 +4611,16 @@ static void load_vmcs12_host_state(struct kvm_vcpu *vcpu,
- 	if (vmcs12->vm_exit_controls & VM_EXIT_CLEAR_BNDCFGS)
- 		vmcs_write64(GUEST_BNDCFGS, 0);
- 
-+	if (vmcs12->vm_exit_controls & VM_EXIT_LOAD_CET_STATE) {
-+		if (guest_can_use(vcpu, X86_FEATURE_SHSTK)) {
-+			vmcs_writel(GUEST_SSP, vmcs12->host_ssp);
-+			vmcs_writel(GUEST_INTR_SSP_TABLE, vmcs12->host_ssp_tbl);
-+		}
-+		if (guest_can_use(vcpu, X86_FEATURE_SHSTK) ||
-+		    guest_can_use(vcpu, X86_FEATURE_IBT))
-+			vmcs_writel(GUEST_S_CET, vmcs12->host_s_cet);
-+	}
-+
- 	if (vmcs12->vm_exit_controls & VM_EXIT_LOAD_IA32_PAT) {
- 		vmcs_write64(GUEST_IA32_PAT, vmcs12->host_ia32_pat);
- 		vcpu->arch.pat = vmcs12->host_ia32_pat;
-@@ -6840,7 +6892,7 @@ static void nested_vmx_setup_exit_ctls(struct vmcs_config *vmcs_conf,
- 		VM_EXIT_HOST_ADDR_SPACE_SIZE |
- #endif
- 		VM_EXIT_LOAD_IA32_PAT | VM_EXIT_SAVE_IA32_PAT |
--		VM_EXIT_CLEAR_BNDCFGS;
-+		VM_EXIT_CLEAR_BNDCFGS | VM_EXIT_LOAD_CET_STATE;
- 	msrs->exit_ctls_high |=
- 		VM_EXIT_ALWAYSON_WITHOUT_TRUE_MSR |
- 		VM_EXIT_LOAD_IA32_EFER | VM_EXIT_SAVE_IA32_EFER |
-@@ -6862,7 +6914,8 @@ static void nested_vmx_setup_entry_ctls(struct vmcs_config *vmcs_conf,
- #ifdef CONFIG_X86_64
- 		VM_ENTRY_IA32E_MODE |
- #endif
--		VM_ENTRY_LOAD_IA32_PAT | VM_ENTRY_LOAD_BNDCFGS;
-+		VM_ENTRY_LOAD_IA32_PAT | VM_ENTRY_LOAD_BNDCFGS |
-+		VM_ENTRY_LOAD_CET_STATE;
- 	msrs->entry_ctls_high |=
- 		(VM_ENTRY_ALWAYSON_WITHOUT_TRUE_MSR | VM_ENTRY_LOAD_IA32_EFER |
- 		 VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL);
-diff --git a/arch/x86/kvm/vmx/vmcs12.c b/arch/x86/kvm/vmx/vmcs12.c
-index 106a72c923ca..4233b5ca9461 100644
---- a/arch/x86/kvm/vmx/vmcs12.c
-+++ b/arch/x86/kvm/vmx/vmcs12.c
-@@ -139,6 +139,9 @@ const unsigned short vmcs12_field_offsets[] = {
- 	FIELD(GUEST_PENDING_DBG_EXCEPTIONS, guest_pending_dbg_exceptions),
- 	FIELD(GUEST_SYSENTER_ESP, guest_sysenter_esp),
- 	FIELD(GUEST_SYSENTER_EIP, guest_sysenter_eip),
-+	FIELD(GUEST_S_CET, guest_s_cet),
-+	FIELD(GUEST_SSP, guest_ssp),
-+	FIELD(GUEST_INTR_SSP_TABLE, guest_ssp_tbl),
- 	FIELD(HOST_CR0, host_cr0),
- 	FIELD(HOST_CR3, host_cr3),
- 	FIELD(HOST_CR4, host_cr4),
-@@ -151,5 +154,8 @@ const unsigned short vmcs12_field_offsets[] = {
- 	FIELD(HOST_IA32_SYSENTER_EIP, host_ia32_sysenter_eip),
- 	FIELD(HOST_RSP, host_rsp),
- 	FIELD(HOST_RIP, host_rip),
-+	FIELD(HOST_S_CET, host_s_cet),
-+	FIELD(HOST_SSP, host_ssp),
-+	FIELD(HOST_INTR_SSP_TABLE, host_ssp_tbl),
+@@ -4098,9 +4099,9 @@ static const struct opcode group4[] = {
+ static const struct opcode group5[] = {
+ 	F(DstMem | SrcNone | Lock,		em_inc),
+ 	F(DstMem | SrcNone | Lock,		em_dec),
+-	I(SrcMem | NearBranch | IsBranch,       em_call_near_abs),
+-	I(SrcMemFAddr | ImplicitOps | IsBranch, em_call_far),
+-	I(SrcMem | NearBranch | IsBranch,       em_jmp_abs),
++	I(SrcMem | NearBranch | IsBranch | IsProtected, em_call_near_abs),
++	I(SrcMemFAddr | ImplicitOps | IsBranch | IsProtected, em_call_far),
++	I(SrcMem | NearBranch | IsBranch | IsProtected, em_jmp_abs),
+ 	I(SrcMemFAddr | ImplicitOps | IsBranch, em_jmp_far),
+ 	I(SrcMem | Stack | TwoMemOp,		em_push), D(Undefined),
  };
- const unsigned int nr_vmcs12_fields = ARRAY_SIZE(vmcs12_field_offsets);
-diff --git a/arch/x86/kvm/vmx/vmcs12.h b/arch/x86/kvm/vmx/vmcs12.h
-index 01936013428b..3884489e7f7e 100644
---- a/arch/x86/kvm/vmx/vmcs12.h
-+++ b/arch/x86/kvm/vmx/vmcs12.h
-@@ -117,7 +117,13 @@ struct __packed vmcs12 {
- 	natural_width host_ia32_sysenter_eip;
- 	natural_width host_rsp;
- 	natural_width host_rip;
--	natural_width paddingl[8]; /* room for future expansion */
-+	natural_width host_s_cet;
-+	natural_width host_ssp;
-+	natural_width host_ssp_tbl;
-+	natural_width guest_s_cet;
-+	natural_width guest_ssp;
-+	natural_width guest_ssp_tbl;
-+	natural_width paddingl[2]; /* room for future expansion */
- 	u32 pin_based_vm_exec_control;
- 	u32 cpu_based_vm_exec_control;
- 	u32 exception_bitmap;
-@@ -292,6 +298,12 @@ static inline void vmx_check_vmcs12_offsets(void)
- 	CHECK_OFFSET(host_ia32_sysenter_eip, 656);
- 	CHECK_OFFSET(host_rsp, 664);
- 	CHECK_OFFSET(host_rip, 672);
-+	CHECK_OFFSET(host_s_cet, 680);
-+	CHECK_OFFSET(host_ssp, 688);
-+	CHECK_OFFSET(host_ssp_tbl, 696);
-+	CHECK_OFFSET(guest_s_cet, 704);
-+	CHECK_OFFSET(guest_ssp, 712);
-+	CHECK_OFFSET(guest_ssp_tbl, 720);
- 	CHECK_OFFSET(pin_based_vm_exec_control, 744);
- 	CHECK_OFFSET(cpu_based_vm_exec_control, 748);
- 	CHECK_OFFSET(exception_bitmap, 752);
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index ef7aca954228..5e5ec8b0223b 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7731,6 +7731,8 @@ static void nested_vmx_cr_fixed1_bits_update(struct kvm_vcpu *vcpu)
- 	cr4_fixed1_update(X86_CR4_PKE,        ecx, feature_bit(PKU));
- 	cr4_fixed1_update(X86_CR4_UMIP,       ecx, feature_bit(UMIP));
- 	cr4_fixed1_update(X86_CR4_LA57,       ecx, feature_bit(LA57));
-+	cr4_fixed1_update(X86_CR4_CET,	      ecx, feature_bit(SHSTK));
-+	cr4_fixed1_update(X86_CR4_CET,	      edx, feature_bit(IBT));
+@@ -4362,11 +4363,11 @@ static const struct opcode opcode_table[256] = {
+ 	/* 0xC8 - 0xCF */
+ 	I(Stack | SrcImmU16 | Src2ImmByte | IsBranch, em_enter),
+ 	I(Stack | IsBranch, em_leave),
+-	I(ImplicitOps | SrcImmU16 | IsBranch, em_ret_far_imm),
+-	I(ImplicitOps | IsBranch, em_ret_far),
+-	D(ImplicitOps | IsBranch), DI(SrcImmByte | IsBranch, intn),
++	I(ImplicitOps | SrcImmU16 | IsBranch | IsProtected, em_ret_far_imm),
++	I(ImplicitOps | IsBranch | IsProtected, em_ret_far),
++	D(ImplicitOps | IsBranch), DI(SrcImmByte | IsBranch | IsProtected, intn),
+ 	D(ImplicitOps | No64 | IsBranch),
+-	II(ImplicitOps | IsBranch, em_iret, iret),
++	II(ImplicitOps | IsBranch | IsProtected, em_iret, iret),
+ 	/* 0xD0 - 0xD7 */
+ 	G(Src2One | ByteOp, group2), G(Src2One, group2),
+ 	G(Src2CL | ByteOp, group2), G(Src2CL, group2),
+@@ -4382,7 +4383,7 @@ static const struct opcode opcode_table[256] = {
+ 	I2bvIP(SrcImmUByte | DstAcc, em_in,  in,  check_perm_in),
+ 	I2bvIP(SrcAcc | DstImmUByte, em_out, out, check_perm_out),
+ 	/* 0xE8 - 0xEF */
+-	I(SrcImm | NearBranch | IsBranch, em_call),
++	I(SrcImm | NearBranch | IsBranch | IsProtected, em_call),
+ 	D(SrcImm | ImplicitOps | NearBranch | IsBranch),
+ 	I(SrcImmFAddr | No64 | IsBranch, em_jmp_far),
+ 	D(SrcImmByte | ImplicitOps | NearBranch | IsBranch),
+@@ -4401,7 +4402,7 @@ static const struct opcode opcode_table[256] = {
+ static const struct opcode twobyte_table[256] = {
+ 	/* 0x00 - 0x0F */
+ 	G(0, group6), GD(0, &group7), N, N,
+-	N, I(ImplicitOps | EmulateOnUD | IsBranch, em_syscall),
++	N, I(ImplicitOps | EmulateOnUD | IsBranch | IsProtected, em_syscall),
+ 	II(ImplicitOps | Priv, em_clts, clts), N,
+ 	DI(ImplicitOps | Priv, invd), DI(ImplicitOps | Priv, wbinvd), N, N,
+ 	N, D(ImplicitOps | ModRM | SrcMem | NoAccess), N, N,
+@@ -4432,8 +4433,8 @@ static const struct opcode twobyte_table[256] = {
+ 	IIP(ImplicitOps, em_rdtsc, rdtsc, check_rdtsc),
+ 	II(ImplicitOps | Priv, em_rdmsr, rdmsr),
+ 	IIP(ImplicitOps, em_rdpmc, rdpmc, check_rdpmc),
+-	I(ImplicitOps | EmulateOnUD | IsBranch, em_sysenter),
+-	I(ImplicitOps | Priv | EmulateOnUD | IsBranch, em_sysexit),
++	I(ImplicitOps | EmulateOnUD | IsBranch | IsProtected, em_sysenter),
++	I(ImplicitOps | Priv | EmulateOnUD | IsBranch | IsProtected, em_sysexit),
+ 	N, N,
+ 	N, N, N, N, N, N, N, N,
+ 	/* 0x40 - 0x4F */
+@@ -4971,6 +4972,10 @@ int x86_decode_insn(struct x86_emulate_ctxt *ctxt, void *insn, int insn_len, int
+ 	if (ctxt->d == 0)
+ 		return EMULATION_FAILED;
  
- 	entry = kvm_find_cpuid_entry_index(vcpu, 0x7, 1);
- 	cr4_fixed1_update(X86_CR4_LAM_SUP,    eax, feature_bit(LAM));
++	if ((opcode.flags & IsProtected) &&
++	    (ctxt->ops->get_cr(ctxt, 4) & X86_CR4_CET))
++		return EMULATION_FAILED;
++
+ 	ctxt->execute = opcode.u.execute;
+ 
+ 	if (unlikely(emulation_type & EMULTYPE_TRAP_UD) &&
 -- 
 2.39.3
 
