@@ -1,233 +1,145 @@
-Return-Path: <kvm+bounces-6826-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6827-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCBC783A738
-	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 11:52:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8048E83A7FD
+	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 12:35:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4A2A2B2A716
-	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 10:51:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 222461F22F35
+	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 11:35:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA6111A27D;
-	Wed, 24 Jan 2024 10:50:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B28D4F60C;
+	Wed, 24 Jan 2024 11:35:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="n0U1IJKK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EVZPvN+v"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com [209.85.167.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 769BD18EBB;
-	Wed, 24 Jan 2024 10:50:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 585DB4F5E9;
+	Wed, 24 Jan 2024 11:35:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706093454; cv=none; b=kffOEbliCaA+0dxSsCxJqRF0fKiSVoZVcf5dtF6/Beh9BJgV2atKvpNPo1ZZwoieg1+7GdA8B6kI7CKZBNGztMJH1CdpxHUFTCcPWqlJDNGKu3mKyAnSvYVdUi/T1CZK6HfIGJdgENAjbeg1OHFOlQZoSxKIkIMwREkwkptGugw=
+	t=1706096107; cv=none; b=uxiIYoXDLFTeM/mYxphh/7Un9SkJ/AbA03tW62R2Czw0MoPagY89qWSLZVSDGsOILQ41VS9yi0PPABKSTtKMPIA0yEwK0uleJCddHFe5apg+lCX3Apl47h5uytk7VGRZ3TmZ44B7IcyH/5CxWKnoq5FBFelgjbKu+TDCkRVCPgQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706093454; c=relaxed/simple;
-	bh=84MVVmbTH/C8W3safTbo5bn7FIroCOF8HfRHVUg0sUQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ADIwRLnp1sI0WReEws6DAsQN542ESAaITBG9GcHO/p2Dd+eLOFeb4Vv7rWcNRdO0iEAuMb8EXnuriBIhQG3ZDN6KDX3o9bTWdbQOzQ2LY09L4s4c0PsAhT6snPbhLm0OJU+xBTxVRyCmDCliGRnb0FnpkcbmcvFlbzKcoHyYhCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=n0U1IJKK; arc=none smtp.client-ip=93.104.207.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
+	s=arc-20240116; t=1706096107; c=relaxed/simple;
+	bh=P87B/NJmEx20+ry47oVcoCNzd+QWvtcpba/ysVCMEEc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=CP4JKz856rC99QC2iy2fwQIMCKqi8RtXzF05t5D5ICjGGjsJd7UHbEjOW5eS2VE5zoM7wdQjeUhS8xuIS6iNsINrIYXkT6puwW1SDO8uto3oOIwWbp5WUwjQKVsXzHchqY+cOIQadXNcjSHN2PP7ODzPqipYPIVcnJ4SKI3htk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EVZPvN+v; arc=none smtp.client-ip=209.85.167.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f175.google.com with SMTP id 5614622812f47-3bd9030d68fso3264249b6e.3;
+        Wed, 24 Jan 2024 03:35:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1706093450; x=1737629450;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=aTuEXSlYOiNHEuFuSlJtP0lQIoUAMibD41RptAODArc=;
-  b=n0U1IJKKumuZGyRsgy0/s8GzTc9ZlShsTdueJIct2gQC4XhX7J9WwCOE
-   tRtcZQSyp10JVYASr8gLq5/0AoF1Xh7Y1l+4y2TdFJgGfByOzutUJsgD6
-   3kQXvyfedcjHo4v3ZvImUMqjEtAQO5PRRIL1IbycNaSEmoHfG7dBltZuX
-   ZAebqeviwdFe2Wjs1wraJRYa2GZzZMhnjU5WzrrZrioSe5jtpTgBaMZ6h
-   KtS5jXyQIA90n/PHbXyjVyrKQBC56pTk+lqZJQIl+EpZeLXEM+F2LwFn9
-   PmyVJqI7wM5CMcr6bkjAXuO8iWFJrAbeg2WjYhfWdfbDpRiNJXsPDCEcX
-   A==;
-X-IronPort-AV: E=Sophos;i="6.05,216,1701126000"; 
-   d="scan'208";a="35052777"
-Received: from vtuxmail01.tq-net.de ([10.115.0.20])
-  by mx1.tq-group.com with ESMTP; 24 Jan 2024 11:50:47 +0100
-Received: from schifferm-ubuntu.tq-net.de (SCHIFFERM-M3.tq-net.de [10.121.49.135])
-	by vtuxmail01.tq-net.de (Postfix) with ESMTPA id EB5A2280075;
-	Wed, 24 Jan 2024 11:50:46 +0100 (CET)
-From: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-To: Michael Ellerman <mpe@ellerman.id.au>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: Nicholas Piggin <npiggin@gmail.com>,
-	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-kernel@vger.kernel.org,
+        d=gmail.com; s=20230601; t=1706096105; x=1706700905; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=C9dLmB1UBk2lcc6K0p3fcasn7wjRUeWpHrr479fQHwU=;
+        b=EVZPvN+vjkGSqbk0xy1pNd30FiFLn+wCMmNxaisov4PUYZO0M651jiQU+1Yp+pZCIM
+         EuL0YppZ2NVcuDDr+mpQrwVYugUD3lU/klLM4Fj3rKw6O8oVZZ0ZoQ6ZMQCsZsakk1SB
+         5niPPIvwOjzdf4mWbj+0VarasTrLv0kzXvAAWOoJCRkQbw6a3cHyXXmwmxww3mp6sc7+
+         8PRL4lNAj01ZaQLeImX2i/Lvc4k6tMaF7m8FLsTmNznLFd2124a6kliyl8TVt2thezE0
+         44EGqsrsGZocF3BE/eEIjqOs/68cVa8+4PfTuAHSuVJP09cWEmgJAEdzIey7ih8o50G/
+         77yA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706096105; x=1706700905;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=C9dLmB1UBk2lcc6K0p3fcasn7wjRUeWpHrr479fQHwU=;
+        b=WK46SV7WhWJ912BAVJERSbFahNE66UoNFz9jIVEizkLVefyMfzTdtdXSx/NjA4SoE6
+         bqgVO4nztkh4G3AbojeXm+WN6sy3zc9eBYbG4pW8jgO6M2jfz3/wlSgrxmEcslbxtwzM
+         wWdeqCta8uCQGSiZ2XUnvIWtJkA+6FNE7rq5aVJEh4UgCet9O+1koSjkpml41Oin2Y6C
+         WwPSMEJwEK7aJ2Iik1x6RAnrlsE2nNWKGzC1zwN8p7wxJHTKg1U2PT8VCLvOpUupPDYB
+         +3wZ7qIOsgHNQwlQ4WQxhDU8eKLP39lB3ZHoAKV5SYccT+6cFPYsT4FRla/j+tzGGw88
+         Q5YQ==
+X-Gm-Message-State: AOJu0YwamzmT651cOwdhYP1a540I6f+O5JB6DgOcYEme8TOHRGJEPIfn
+	lA0Qy/qKWXszp0EQiw0xYkkfVjdcx62nam+lywT78qIzzAoyfvBH
+X-Google-Smtp-Source: AGHT+IEt3aCxUIfMjDOEuHL1g4y3s4edufzn/iCQAQWHFDxaD8a0GWx+ZQUtTyZrxSqIBvLi9y7ivA==
+X-Received: by 2002:a05:6808:3a09:b0:3bd:4df7:db85 with SMTP id gr9-20020a0568083a0900b003bd4df7db85mr1859788oib.69.1706096105325;
+        Wed, 24 Jan 2024 03:35:05 -0800 (PST)
+Received: from localhost.localdomain ([43.132.141.3])
+        by smtp.gmail.com with ESMTPSA id c15-20020a63d50f000000b00578b8fab907sm11727820pgg.73.2024.01.24.03.35.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Jan 2024 03:35:04 -0800 (PST)
+From: Yi Wang <up2wing@gmail.com>
+X-Google-Original-From: Yi Wang <foxywang@tencent.com>
+To: seanjc@google.com,
+	pbonzini@redhat.com,
+	tglx@linutronix.de,
+	mingo@redhat.com,
+	bp@alien8.de,
+	dave.hansen@linux.intel.com,
+	x86@kernel.org,
+	hpa@zytor.com,
 	kvm@vger.kernel.org,
-	linux-pm@vger.kernel.org,
-	linux@ew.tq-group.com,
-	Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-Subject: [PATCH] powerpc: rename SPRN_HID2 define to SPRN_HID2_750FX
-Date: Wed, 24 Jan 2024 11:50:31 +0100
-Message-ID: <20240124105031.45734-1-matthias.schiffer@ew.tq-group.com>
-X-Mailer: git-send-email 2.43.0
+	linux-kernel@vger.kernel.org,
+	wanpengli@tencent.com,
+	foxywang@tencent.com,
+	oliver.upton@linux.dev,
+	maz@kernel.org,
+	anup@brainfault.org,
+	atishp@atishpatra.org,
+	borntraeger@linux.ibm.com,
+	frankja@linux.ibm.com,
+	imbrenda@linux.ibm.com
+Cc: up2wing@gmail.com
+Subject: [v3 0/3] KVM: irqchip: synchronize srcu only if needed
+Date: Wed, 24 Jan 2024 19:34:43 +0800
+Message-Id: <20240124113446.2977003-1-foxywang@tencent.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-This register number is hardware-specific, rename it for clarity.
+From: Yi Wang <foxywang@tencent.com>
 
-FIXME comments are added in a few places where it seems like the wrong
-register is used. As I can't test this, only the rename is done with no
-functional change.
+We found that it may cost more than 20 milliseconds very accidentally
+to enable cap of KVM_CAP_SPLIT_IRQCHIP on a host which has many vms
+already.
 
-Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
----
- arch/powerpc/include/asm/reg.h               | 2 +-
- arch/powerpc/kernel/cpu_setup_6xx.S          | 4 ++--
- arch/powerpc/kvm/book3s_emulate.c            | 4 ++--
- arch/powerpc/platforms/52xx/lite5200_sleep.S | 6 ++++--
- arch/powerpc/platforms/83xx/suspend-asm.S    | 6 ++++--
- drivers/cpufreq/pmac32-cpufreq.c             | 8 ++++----
- 6 files changed, 17 insertions(+), 13 deletions(-)
+The reason is that when vmm(qemu/CloudHypervisor) invokes
+KVM_CAP_SPLIT_IRQCHIP kvm will call synchronize_srcu_expedited() and
+might_sleep and kworker of srcu may cost some delay during this period.
+One way makes sence is setup empty irq routing when creating vm and
+so that x86/s390 don't need to setup empty/dummy irq routing.
 
-diff --git a/arch/powerpc/include/asm/reg.h b/arch/powerpc/include/asm/reg.h
-index 4ae4ab9090a2..994dfefba98b 100644
---- a/arch/powerpc/include/asm/reg.h
-+++ b/arch/powerpc/include/asm/reg.h
-@@ -615,7 +615,7 @@
- #define HID1_ABE	(1<<10)		/* 7450 Address Broadcast Enable */
- #define HID1_PS		(1<<16)		/* 750FX PLL selection */
- #endif
--#define SPRN_HID2	0x3F8		/* Hardware Implementation Register 2 */
-+#define SPRN_HID2_750FX	0x3F8		/* IBM 750FX HID2 Register */
- #define SPRN_HID2_GEKKO	0x398		/* Gekko HID2 Register */
- #define SPRN_IABR	0x3F2	/* Instruction Address Breakpoint Register */
- #define SPRN_IABR2	0x3FA		/* 83xx */
-diff --git a/arch/powerpc/kernel/cpu_setup_6xx.S b/arch/powerpc/kernel/cpu_setup_6xx.S
-index f29ce3dd6140..4f4a4ce34861 100644
---- a/arch/powerpc/kernel/cpu_setup_6xx.S
-+++ b/arch/powerpc/kernel/cpu_setup_6xx.S
-@@ -382,7 +382,7 @@ _GLOBAL(__save_cpu_setup)
- 	andi.	r3,r3,0xff00
- 	cmpwi	cr0,r3,0x0200
- 	bne	1f
--	mfspr	r4,SPRN_HID2
-+	mfspr	r4,SPRN_HID2_750FX
- 	stw	r4,CS_HID2(r5)
- 1:
- 	mtcr	r7
-@@ -477,7 +477,7 @@ _GLOBAL(__restore_cpu_setup)
- 	bne	4f
- 	lwz	r4,CS_HID2(r5)
- 	rlwinm	r4,r4,0,19,17
--	mtspr	SPRN_HID2,r4
-+	mtspr	SPRN_HID2_750FX,r4
- 	sync
- 4:
- 	lwz	r4,CS_HID1(r5)
-diff --git a/arch/powerpc/kvm/book3s_emulate.c b/arch/powerpc/kvm/book3s_emulate.c
-index 5bbfb2eed127..de126d153328 100644
---- a/arch/powerpc/kvm/book3s_emulate.c
-+++ b/arch/powerpc/kvm/book3s_emulate.c
-@@ -714,7 +714,7 @@ int kvmppc_core_emulate_mtspr_pr(struct kvm_vcpu *vcpu, int sprn, ulong spr_val)
- 	case SPRN_HID1:
- 		to_book3s(vcpu)->hid[1] = spr_val;
- 		break;
--	case SPRN_HID2:
-+	case SPRN_HID2_750FX:
- 		to_book3s(vcpu)->hid[2] = spr_val;
- 		break;
- 	case SPRN_HID2_GEKKO:
-@@ -900,7 +900,7 @@ int kvmppc_core_emulate_mfspr_pr(struct kvm_vcpu *vcpu, int sprn, ulong *spr_val
- 	case SPRN_HID1:
- 		*spr_val = to_book3s(vcpu)->hid[1];
- 		break;
--	case SPRN_HID2:
-+	case SPRN_HID2_750FX:
- 	case SPRN_HID2_GEKKO:
- 		*spr_val = to_book3s(vcpu)->hid[2];
- 		break;
-diff --git a/arch/powerpc/platforms/52xx/lite5200_sleep.S b/arch/powerpc/platforms/52xx/lite5200_sleep.S
-index 0b12647e7b42..0ec2522ee4ad 100644
---- a/arch/powerpc/platforms/52xx/lite5200_sleep.S
-+++ b/arch/powerpc/platforms/52xx/lite5200_sleep.S
-@@ -203,7 +203,8 @@ lite5200_wakeup:
- 
- 	/* HIDs, MSR */
- 	LOAD_SPRN(HID1, 0x19)
--	LOAD_SPRN(HID2, 0x1a)
-+	/* FIXME: Should this use HID2_G2_LE? */
-+	LOAD_SPRN(HID2_750FX, 0x1a)
- 
- 
- 	/* address translation is tricky (see turn_on_mmu) */
-@@ -283,7 +284,8 @@ SYM_FUNC_START_LOCAL(save_regs)
- 
- 	SAVE_SPRN(HID0, 0x18)
- 	SAVE_SPRN(HID1, 0x19)
--	SAVE_SPRN(HID2, 0x1a)
-+	/* FIXME: Should this use HID2_G2_LE? */
-+	SAVE_SPRN(HID2_750FX, 0x1a)
- 	mfmsr	r10
- 	stw	r10, (4*0x1b)(r4)
- 	/*SAVE_SPRN(LR, 0x1c) have to save it before the call */
-diff --git a/arch/powerpc/platforms/83xx/suspend-asm.S b/arch/powerpc/platforms/83xx/suspend-asm.S
-index bc6bd4d0ae96..6a62ed6082c9 100644
---- a/arch/powerpc/platforms/83xx/suspend-asm.S
-+++ b/arch/powerpc/platforms/83xx/suspend-asm.S
-@@ -68,7 +68,8 @@ _GLOBAL(mpc83xx_enter_deep_sleep)
- 
- 	mfspr	r5, SPRN_HID0
- 	mfspr	r6, SPRN_HID1
--	mfspr	r7, SPRN_HID2
-+	/* FIXME: Should this use SPRN_HID2_G2_LE? */
-+	mfspr	r7, SPRN_HID2_750FX
- 
- 	stw	r5, SS_HID+0(r3)
- 	stw	r6, SS_HID+4(r3)
-@@ -396,7 +397,8 @@ mpc83xx_deep_resume:
- 
- 	mtspr	SPRN_HID0, r5
- 	mtspr	SPRN_HID1, r6
--	mtspr	SPRN_HID2, r7
-+	/* FIXME: Should this use SPRN_HID2_G2_LE? */
-+	mtspr	SPRN_HID2_750FX, r7
- 
- 	lwz	r4, SS_IABR+0(r3)
- 	lwz	r5, SS_IABR+4(r3)
-diff --git a/drivers/cpufreq/pmac32-cpufreq.c b/drivers/cpufreq/pmac32-cpufreq.c
-index df3567c1e93b..6c9f0888a2a7 100644
---- a/drivers/cpufreq/pmac32-cpufreq.c
-+++ b/drivers/cpufreq/pmac32-cpufreq.c
-@@ -120,9 +120,9 @@ static int cpu_750fx_cpu_speed(int low_speed)
- 
- 		/* tweak L2 for high voltage */
- 		if (has_cpu_l2lve) {
--			hid2 = mfspr(SPRN_HID2);
-+			hid2 = mfspr(SPRN_HID2_750FX);
- 			hid2 &= ~0x2000;
--			mtspr(SPRN_HID2, hid2);
-+			mtspr(SPRN_HID2_750FX, hid2);
- 		}
- 	}
- #ifdef CONFIG_PPC_BOOK3S_32
-@@ -131,9 +131,9 @@ static int cpu_750fx_cpu_speed(int low_speed)
- 	if (low_speed == 1) {
- 		/* tweak L2 for low voltage */
- 		if (has_cpu_l2lve) {
--			hid2 = mfspr(SPRN_HID2);
-+			hid2 = mfspr(SPRN_HID2_750FX);
- 			hid2 |= 0x2000;
--			mtspr(SPRN_HID2, hid2);
-+			mtspr(SPRN_HID2_750FX, hid2);
- 		}
- 
- 		/* ramping down, set voltage last */
+Note: I have no s390 machine so the s390 patch has not been tested.
+
+Changelog:
+----------
+v3:
+  - squash setup empty routing function and use of that into one commit
+  - drop the comment in s390 part
+
+v2:
+  - setup empty irq routing in kvm_create_vm
+  - don't setup irq routing in x86 KVM_CAP_SPLIT_IRQCHIP
+  - don't setup irq routing in s390 KVM_CREATE_IRQCHIP
+
+v1: https://lore.kernel.org/kvm/20240112091128.3868059-1-foxywang@tencent.com/
+
+Yi Wang (3):
+  KVM: setup empty irq routing when create vm
+  KVM: x86: don't setup empty irq routing when KVM_CAP_SPLIT_IRQCHIP
+  KVM: s390: don't setup dummy routing when KVM_CREATE_IRQCHIP
+
+ arch/s390/kvm/kvm-s390.c |  9 +--------
+ arch/x86/kvm/irq.h       |  1 -
+ arch/x86/kvm/irq_comm.c  |  5 -----
+ arch/x86/kvm/x86.c       |  3 ---
+ include/linux/kvm_host.h |  1 +
+ virt/kvm/irqchip.c       | 19 +++++++++++++++++++
+ virt/kvm/kvm_main.c      |  4 ++++
+ 7 files changed, 25 insertions(+), 17 deletions(-)
+
 -- 
-TQ-Systems GmbH | Mühlstraße 2, Gut Delling | 82229 Seefeld, Germany
-Amtsgericht München, HRB 105018
-Geschäftsführer: Detlef Schneider, Rüdiger Stahl, Stefan Schneider
-https://www.tq-group.com/
+2.39.3
 
 
