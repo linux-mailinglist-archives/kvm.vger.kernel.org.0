@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-6788-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6789-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B70F383A2B5
-	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 08:19:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6982B83A2B7
+	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 08:19:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB4F11C24598
-	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 07:19:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D22C1C245BF
+	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 07:19:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 380B5168AC;
-	Wed, 24 Jan 2024 07:18:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35377168CE;
+	Wed, 24 Jan 2024 07:18:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cYtBtS3D"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="r3qCMNbe"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16F5717586
-	for <kvm@vger.kernel.org>; Wed, 24 Jan 2024 07:18:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A93A41642F
+	for <kvm@vger.kernel.org>; Wed, 24 Jan 2024 07:18:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706080726; cv=none; b=EvrrykYET1etPo0lgpleMHa4GcSNIS+A18hXx+sX+o2RrKCY2nbtDEQD6e9TimO17fCdH96xT0BGtIIKHLU72LrdLH3H/NB+DBNOZuo9CegKWz4j7HpuQgk4jK+bZO0Ja1wx4wxPTIqNd/77g4r9yvf6oq4ma79gzSPPirUe1Pg=
+	t=1706080728; cv=none; b=gL/4/ppaWQJIu2SEr2rgZwV4LyBMAQb369MovTw3+px/g3+9nkb8lsBHIEF0j+ANPntE0Cel80E2tzYA7XUOy3LrgI6dVl/PkDqXDn24aXV81lkeM2JTPqlGz0UtXNlP4Fpoz2RZEhhtHJWJ5ro+3rE8rKyACNfGG4JHrEBX3WA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706080726; c=relaxed/simple;
-	bh=grwaTIIe7nnkP0bCzLP5FG2/P/ylZrUvfW8W34gkKY0=;
+	s=arc-20240116; t=1706080728; c=relaxed/simple;
+	bh=IN4KDvowCe3MO9rkYJNYvtUV5oiLR52aCvOB2p8kqH4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-type; b=RLqAhfLnVueMQQuQjDRawozsnKkMYQjxoY7KNFuZNS0rT//sxPt6Dh5VtvSLwH4p5KWeO6lUcK5JppbdsN9xsKgagQ6roLVIvtDjrmMVUIAKxCI7L9CDFp0vaUFeiCG73XpXL+NIbleWlaSltJvM298wkn9pu2H/yxH1NFE4L8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cYtBtS3D; arc=none smtp.client-ip=91.218.175.186
+	 MIME-Version:Content-type; b=mUI5OSsgYqZ+URz598+VHX7KBMQxn/PU1utOq1BtpydzcQtLHuKq5BzU7YrY+fqA2cqmt/nUtEtpS7C7p+8hGVe5SxbzJk5b/4imX6zmjktjmSUHVV1q2U0/zRTNSrF7B6v8iGZgBpQKr5JvNkeJwGWZREn4dDilmgRhbBEYRCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=r3qCMNbe; arc=none smtp.client-ip=91.218.175.189
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706080722;
+	t=1706080725;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ZfWvLevBDQDj+ieq3wUN1O7dSTEN+VNr/2V718829eA=;
-	b=cYtBtS3DnkVbSgGt4M70De8PC3MciVPC/Q/vn4QS39yzaDmuRvTkCkmSp5o8Cd/Z6eLVCs
-	JukbCPirwCRXyyEMjvDiiWyzywJm9O5GcHm9FNAoEuUEc2f0yNe3ZSDe6jQbDYySj1pSk7
-	alEo+EpjZxns/waqDj+6CRn6wcdOABM=
+	bh=r/ajjahsx2Nrd2/mL5O1tszPf4Vqor3QjjtEx7SCtlA=;
+	b=r3qCMNbeX8fIkl46iwk53h9zb/5qgrTc4mDj2YhDzj87QhRfn2oLGrWXS4mVDj2hWJ6R5P
+	i4ltH/23vENg9pkD25kcn707aVURKhvRJxxxyWyq8AyuuMGxz03pwd/AHPGh+UUvGkqJvH
+	jJGfUqU12wM4BFdtNGiQQCKbySXNLGU=
 From: Andrew Jones <andrew.jones@linux.dev>
 To: kvm@vger.kernel.org,
 	kvm-riscv@lists.infradead.org,
@@ -53,9 +53,9 @@ Cc: ajones@ventanamicro.com,
 	thuth@redhat.com,
 	alexandru.elisei@arm.com,
 	eric.auger@redhat.com
-Subject: [kvm-unit-tests PATCH 09/24] riscv: Add exception handling
-Date: Wed, 24 Jan 2024 08:18:25 +0100
-Message-ID: <20240124071815.6898-35-andrew.jones@linux.dev>
+Subject: [kvm-unit-tests PATCH 10/24] riscv: Add backtrace support
+Date: Wed, 24 Jan 2024 08:18:26 +0100
+Message-ID: <20240124071815.6898-36-andrew.jones@linux.dev>
 In-Reply-To: <20240124071815.6898-26-andrew.jones@linux.dev>
 References: <20240124071815.6898-26-andrew.jones@linux.dev>
 Precedence: bulk
@@ -68,542 +68,135 @@ Content-type: text/plain
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Steal more code from Linux to implement exception handling, but with
-the same kvm-unit-tests API that Arm has. Also introduce struct
-thread_info like Arm has in order to hold the handler pointers.
-Finally, as usual, extend the selftest to make sure it all works.
+Enable stack unwinding, even when going through an exception, by
+implementing backtrace() and pushing a frame pointer on the stack
+in exception_vectors.
 
 Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 ---
- lib/riscv/asm-offsets.c   |  38 +++++++++++++
- lib/riscv/asm/bug.h       |  20 +++++++
- lib/riscv/asm/csr.h       |  12 ++++
- lib/riscv/asm/processor.h |  26 +++++++++
- lib/riscv/asm/ptrace.h    |  46 +++++++++++++++
- lib/riscv/asm/setup.h     |   3 +-
- lib/riscv/processor.c     |  60 ++++++++++++++++++++
- lib/riscv/setup.c         |   9 ++-
- riscv/Makefile            |   1 +
- riscv/cstart.S            | 116 +++++++++++++++++++++++++++++++++++++-
- riscv/selftest.c          |  20 ++++++-
- 11 files changed, 343 insertions(+), 8 deletions(-)
- create mode 100644 lib/riscv/asm/bug.h
- create mode 100644 lib/riscv/asm/processor.h
- create mode 100644 lib/riscv/asm/ptrace.h
- create mode 100644 lib/riscv/processor.c
+ lib/riscv/asm/stack.h |  3 +++
+ lib/riscv/stack.c     | 32 ++++++++++++++++++++++++++++++++
+ riscv/Makefile        |  1 +
+ riscv/cstart.S        | 28 ++++++++++++++++++++++++++--
+ 4 files changed, 62 insertions(+), 2 deletions(-)
+ create mode 100644 lib/riscv/stack.c
 
-diff --git a/lib/riscv/asm-offsets.c b/lib/riscv/asm-offsets.c
-index eb337b7547b8..7b88d16fd0e4 100644
---- a/lib/riscv/asm-offsets.c
-+++ b/lib/riscv/asm-offsets.c
-@@ -1,6 +1,7 @@
- // SPDX-License-Identifier: GPL-2.0-only
- #include <kbuild.h>
- #include <elf.h>
-+#include <asm/ptrace.h>
- 
- int main(void)
- {
-@@ -13,5 +14,42 @@ int main(void)
- 	OFFSET(ELF_RELA_ADDEND, elf64_rela, r_addend);
- 	DEFINE(ELF_RELA_SIZE, sizeof(struct elf64_rela));
+diff --git a/lib/riscv/asm/stack.h b/lib/riscv/asm/stack.h
+index d081d0716d7b..f003ca37c913 100644
+--- a/lib/riscv/asm/stack.h
++++ b/lib/riscv/asm/stack.h
+@@ -6,4 +6,7 @@
+ #error Do not directly include <asm/stack.h>. Just use <stack.h>.
  #endif
-+	OFFSET(PT_EPC, pt_regs, epc);
-+	OFFSET(PT_RA, pt_regs, ra);
-+	OFFSET(PT_SP, pt_regs, sp);
-+	OFFSET(PT_GP, pt_regs, gp);
-+	OFFSET(PT_TP, pt_regs, tp);
-+	OFFSET(PT_T0, pt_regs, t0);
-+	OFFSET(PT_T1, pt_regs, t1);
-+	OFFSET(PT_T2, pt_regs, t2);
-+	OFFSET(PT_S0, pt_regs, s0);
-+	OFFSET(PT_S1, pt_regs, s1);
-+	OFFSET(PT_A0, pt_regs, a0);
-+	OFFSET(PT_A1, pt_regs, a1);
-+	OFFSET(PT_A2, pt_regs, a2);
-+	OFFSET(PT_A3, pt_regs, a3);
-+	OFFSET(PT_A4, pt_regs, a4);
-+	OFFSET(PT_A5, pt_regs, a5);
-+	OFFSET(PT_A6, pt_regs, a6);
-+	OFFSET(PT_A7, pt_regs, a7);
-+	OFFSET(PT_S2, pt_regs, s2);
-+	OFFSET(PT_S3, pt_regs, s3);
-+	OFFSET(PT_S4, pt_regs, s4);
-+	OFFSET(PT_S5, pt_regs, s5);
-+	OFFSET(PT_S6, pt_regs, s6);
-+	OFFSET(PT_S7, pt_regs, s7);
-+	OFFSET(PT_S8, pt_regs, s8);
-+	OFFSET(PT_S9, pt_regs, s9);
-+	OFFSET(PT_S10, pt_regs, s10);
-+	OFFSET(PT_S11, pt_regs, s11);
-+	OFFSET(PT_T3, pt_regs, t3);
-+	OFFSET(PT_T4, pt_regs, t4);
-+	OFFSET(PT_T5, pt_regs, t5);
-+	OFFSET(PT_T6, pt_regs, t6);
-+	OFFSET(PT_STATUS, pt_regs, status);
-+	OFFSET(PT_BADADDR, pt_regs, badaddr);
-+	OFFSET(PT_CAUSE, pt_regs, cause);
-+	OFFSET(PT_ORIG_A0, pt_regs, orig_a0);
-+	DEFINE(PT_SIZE, sizeof(struct pt_regs));
- 	return 0;
- }
-diff --git a/lib/riscv/asm/bug.h b/lib/riscv/asm/bug.h
+ 
++#define HAVE_ARCH_BACKTRACE_FRAME
++#define HAVE_ARCH_BACKTRACE
++
+ #endif
+diff --git a/lib/riscv/stack.c b/lib/riscv/stack.c
 new file mode 100644
-index 000000000000..a6f4136ba1b6
+index 000000000000..712a5478d547
 --- /dev/null
-+++ b/lib/riscv/asm/bug.h
-@@ -0,0 +1,20 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+#ifndef _ASMRISCV_BUG_H_
-+#define _ASMRISCV_BUG_H_
-+
-+#ifndef __ASSEMBLY__
-+
-+static inline void bug(void)
-+{
-+	asm volatile("ebreak");
-+}
-+
-+#else
-+
-+.macro bug
-+	ebreak
-+.endm
-+
-+#endif
-+
-+#endif /* _ASMRISCV_BUG_H_ */
-diff --git a/lib/riscv/asm/csr.h b/lib/riscv/asm/csr.h
-index 356ae054bfff..eeddd1fb448a 100644
---- a/lib/riscv/asm/csr.h
-+++ b/lib/riscv/asm/csr.h
-@@ -3,7 +3,19 @@
- #define _ASMRISCV_CSR_H_
- #include <linux/const.h>
- 
-+#define CSR_SSTATUS		0x100
-+#define CSR_STVEC		0x105
- #define CSR_SSCRATCH		0x140
-+#define CSR_SEPC		0x141
-+#define CSR_SCAUSE		0x142
-+#define CSR_STVAL		0x143
-+
-+/* Exception cause high bit - is an interrupt if set */
-+#define CAUSE_IRQ_FLAG		(_AC(1, UL) << (__riscv_xlen - 1))
-+
-+/* Exception causes */
-+#define EXC_INST_ILLEGAL	2
-+#define EXC_BREAKPOINT		3
- 
- #ifndef __ASSEMBLY__
- 
-diff --git a/lib/riscv/asm/processor.h b/lib/riscv/asm/processor.h
-new file mode 100644
-index 000000000000..d8b7018c9102
---- /dev/null
-+++ b/lib/riscv/asm/processor.h
-@@ -0,0 +1,26 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+#ifndef _ASMRISCV_PROCESSOR_H_
-+#define _ASMRISCV_PROCESSOR_H_
-+#include <asm/csr.h>
-+#include <asm/ptrace.h>
-+
-+#define EXCEPTION_CAUSE_MAX	16
-+
-+typedef void (*exception_fn)(struct pt_regs *);
-+
-+struct thread_info {
-+	int cpu;
-+	unsigned long hartid;
-+	exception_fn exception_handlers[EXCEPTION_CAUSE_MAX];
-+};
-+
-+static inline struct thread_info *current_thread_info(void)
-+{
-+	return (struct thread_info *)csr_read(CSR_SSCRATCH);
-+}
-+
-+void install_exception_handler(unsigned long cause, void (*handler)(struct pt_regs *));
-+void do_handle_exception(struct pt_regs *regs);
-+void thread_info_init(void);
-+
-+#endif /* _ASMRISCV_PROCESSOR_H_ */
-diff --git a/lib/riscv/asm/ptrace.h b/lib/riscv/asm/ptrace.h
-new file mode 100644
-index 000000000000..0873a8ae749f
---- /dev/null
-+++ b/lib/riscv/asm/ptrace.h
-@@ -0,0 +1,46 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+#ifndef _ASMRISCV_PTRACE_H_
-+#define _ASMRISCV_PTRACE_H_
-+
-+struct pt_regs {
-+	unsigned long epc;
-+	unsigned long ra;
-+	unsigned long sp;
-+	unsigned long gp;
-+	unsigned long tp;
-+	unsigned long t0;
-+	unsigned long t1;
-+	unsigned long t2;
-+	unsigned long s0;
-+	unsigned long s1;
-+	unsigned long a0;
-+	unsigned long a1;
-+	unsigned long a2;
-+	unsigned long a3;
-+	unsigned long a4;
-+	unsigned long a5;
-+	unsigned long a6;
-+	unsigned long a7;
-+	unsigned long s2;
-+	unsigned long s3;
-+	unsigned long s4;
-+	unsigned long s5;
-+	unsigned long s6;
-+	unsigned long s7;
-+	unsigned long s8;
-+	unsigned long s9;
-+	unsigned long s10;
-+	unsigned long s11;
-+	unsigned long t3;
-+	unsigned long t4;
-+	unsigned long t5;
-+	unsigned long t6;
-+	/* Supervisor/Machine CSRs */
-+	unsigned long status;
-+	unsigned long badaddr;
-+	unsigned long cause;
-+	/* a0 value before the syscall */
-+	unsigned long orig_a0;
-+};
-+
-+#endif /* _ASMRISCV_PTRACE_H_ */
-diff --git a/lib/riscv/asm/setup.h b/lib/riscv/asm/setup.h
-index c8cfebb4f2c1..e58dd53071ae 100644
---- a/lib/riscv/asm/setup.h
-+++ b/lib/riscv/asm/setup.h
-@@ -2,9 +2,10 @@
- #ifndef _ASMRISCV_SETUP_H_
- #define _ASMRISCV_SETUP_H_
- #include <libcflat.h>
-+#include <asm/processor.h>
- 
- #define NR_CPUS 16
--extern unsigned long cpus[NR_CPUS];       /* per-cpu IDs (hartids) */
-+extern struct thread_info cpus[NR_CPUS];
- extern int nr_cpus;
- int hartid_to_cpu(unsigned long hartid);
- 
-diff --git a/lib/riscv/processor.c b/lib/riscv/processor.c
-new file mode 100644
-index 000000000000..3790349aadd1
---- /dev/null
-+++ b/lib/riscv/processor.c
-@@ -0,0 +1,60 @@
++++ b/lib/riscv/stack.c
+@@ -0,0 +1,32 @@
 +// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2023, Ventana Micro Systems Inc., Andrew Jones <ajones@ventanamicro.com>
-+ */
 +#include <libcflat.h>
-+#include <asm/csr.h>
-+#include <asm/processor.h>
-+#include <asm/setup.h>
++#include <stack.h>
 +
-+extern unsigned long _text;
-+
-+static void show_regs(struct pt_regs *regs)
++int backtrace_frame(const void *frame, const void **return_addrs, int max_depth)
 +{
-+	uintptr_t text = (uintptr_t)&_text;
-+	unsigned int w = __riscv_xlen / 4;
++	static bool walking;
++	const unsigned long *fp = (unsigned long *)frame;
++	int depth;
 +
-+	printf("Load address: %" PRIxPTR "\n", text);
-+	printf("status : %.*lx\n", w, regs->status);
-+	printf("cause  : %.*lx\n", w, regs->cause);
-+	printf("badaddr: %.*lx\n", w, regs->badaddr);
-+	printf("pc: %.*lx ra: %.*lx\n", w, regs->epc, w, regs->ra);
-+	printf("sp: %.*lx gp: %.*lx tp : %.*lx\n", w, regs->sp, w, regs->gp, w, regs->tp);
-+	printf("a0: %.*lx a1: %.*lx a2 : %.*lx a3 : %.*lx\n", w, regs->a0, w, regs->a1, w, regs->a2, w, regs->a3);
-+	printf("a4: %.*lx a5: %.*lx a6 : %.*lx a7 : %.*lx\n", w, regs->a4, w, regs->a5, w, regs->a6, w, regs->a7);
-+	printf("t0: %.*lx t1: %.*lx t2 : %.*lx t3 : %.*lx\n", w, regs->t0, w, regs->t1, w, regs->t2, w, regs->t3);
-+	printf("t4: %.*lx t5: %.*lx t6 : %.*lx\n", w, regs->t4, w, regs->t5, w, regs->t6);
-+	printf("s0: %.*lx s1: %.*lx s2 : %.*lx s3 : %.*lx\n", w, regs->s0, w, regs->s1, w, regs->s2, w, regs->s3);
-+	printf("s4: %.*lx s5: %.*lx s6 : %.*lx s7 : %.*lx\n", w, regs->s4, w, regs->s5, w, regs->s6, w, regs->s7);
-+	printf("s8: %.*lx s9: %.*lx s10: %.*lx s11: %.*lx\n", w, regs->s8, w, regs->s9, w, regs->s10, w, regs->s11);
-+}
++	if (walking) {
++		printf("RECURSIVE STACK WALK!!!\n");
++		return 0;
++	}
++	walking = true;
 +
-+void do_handle_exception(struct pt_regs *regs)
-+{
-+	struct thread_info *info = current_thread_info();
-+
-+	assert(regs->cause < EXCEPTION_CAUSE_MAX);
-+	if (info->exception_handlers[regs->cause]) {
-+		info->exception_handlers[regs->cause](regs);
-+		return;
++	for (depth = 0; fp && depth < max_depth; ++depth) {
++		return_addrs[depth] = (void *)fp[-1];
++		if (return_addrs[depth] == 0)
++			break;
++		fp = (unsigned long *)fp[-2];
 +	}
 +
-+	show_regs(regs);
-+	assert(0);
++	walking = false;
++	return depth;
 +}
 +
-+void install_exception_handler(unsigned long cause, void (*handler)(struct pt_regs *))
++int backtrace(const void **return_addrs, int max_depth)
 +{
-+	struct thread_info *info = current_thread_info();
-+
-+	assert(cause < EXCEPTION_CAUSE_MAX);
-+	info->exception_handlers[cause] = handler;
++	return backtrace_frame(__builtin_frame_address(0),
++			       return_addrs, max_depth);
 +}
-+
-+void thread_info_init(void)
-+{
-+	unsigned long hartid = csr_read(CSR_SSCRATCH);
-+	int cpu = hartid_to_cpu(hartid);
-+
-+	csr_write(CSR_SSCRATCH, &cpus[cpu]);
-+}
-diff --git a/lib/riscv/setup.c b/lib/riscv/setup.c
-index 44c26b125a27..57eb4797f798 100644
---- a/lib/riscv/setup.c
-+++ b/lib/riscv/setup.c
-@@ -12,12 +12,13 @@
- #include <devicetree.h>
- #include <asm/csr.h>
- #include <asm/page.h>
-+#include <asm/processor.h>
- #include <asm/setup.h>
- 
- char *initrd;
- u32 initrd_size;
- 
--unsigned long cpus[NR_CPUS] = { [0 ... NR_CPUS - 1] = ~0UL };
-+struct thread_info cpus[NR_CPUS];
- int nr_cpus;
- 
- int hartid_to_cpu(unsigned long hartid)
-@@ -25,7 +26,7 @@ int hartid_to_cpu(unsigned long hartid)
- 	int cpu;
- 
- 	for_each_present_cpu(cpu)
--		if (cpus[cpu] == hartid)
-+		if (cpus[cpu].hartid == hartid)
- 			return cpu;
- 	return -1;
- }
-@@ -36,7 +37,8 @@ static void cpu_set_fdt(int fdtnode __unused, u64 regval, void *info __unused)
- 
- 	assert_msg(cpu < NR_CPUS, "Number cpus exceeds maximum supported (%d).", NR_CPUS);
- 
--	cpus[cpu] = regval;
-+	cpus[cpu].cpu = cpu;
-+	cpus[cpu].hartid = regval;
- 	set_cpu_present(cpu, true);
- }
- 
-@@ -104,6 +106,7 @@ void setup(const void *fdt, phys_addr_t freemem_start)
- 
- 	mem_init(PAGE_ALIGN((unsigned long)freemem));
- 	cpu_init();
-+	thread_info_init();
- 	io_init();
- 
- 	ret = dt_get_bootargs(&bootargs);
 diff --git a/riscv/Makefile b/riscv/Makefile
-index fb97e678a456..1243be125c00 100644
+index 1243be125c00..4a83f27f7df2 100644
 --- a/riscv/Makefile
 +++ b/riscv/Makefile
-@@ -26,6 +26,7 @@ cflatobjs += lib/alloc_phys.o
- cflatobjs += lib/devicetree.o
- cflatobjs += lib/riscv/bitops.o
- cflatobjs += lib/riscv/io.o
-+cflatobjs += lib/riscv/processor.o
+@@ -30,6 +30,7 @@ cflatobjs += lib/riscv/processor.o
  cflatobjs += lib/riscv/sbi.o
  cflatobjs += lib/riscv/setup.o
  cflatobjs += lib/riscv/smp.o
++cflatobjs += lib/riscv/stack.o
+ ifeq ($(ARCH),riscv32)
+ cflatobjs += lib/ldiv32.o
+ endif
 diff --git a/riscv/cstart.S b/riscv/cstart.S
-index 6ec2231e5812..ac7858ef398f 100644
+index ac7858ef398f..9bdf2e3b17dd 100644
 --- a/riscv/cstart.S
 +++ b/riscv/cstart.S
-@@ -37,8 +37,9 @@
- .global start
- start:
- 	/*
--	 * Stash the hartid in scratch and shift the dtb
--	 * address into a0
-+	 * Stash the hartid in scratch and shift the dtb address into a0.
-+	 * thread_info_init() will later promote scratch to point at thread
-+	 * local storage.
- 	 */
- 	csrw	CSR_SSCRATCH, a0
- 	mv	a0, a1
-@@ -74,7 +75,8 @@ start:
+@@ -17,6 +17,22 @@
+ 
+ #define REG_L	__REG_SEL(ld, lw)
+ #define REG_S	__REG_SEL(sd, sw)
++#define SZREG	__REG_SEL(8, 4)
++
++#define FP_SIZE 16
++
++.macro push_fp, ra=ra
++	addi	sp, sp, -FP_SIZE
++	REG_S	\ra, (FP_SIZE - SZREG)(sp)
++	REG_S	fp, (FP_SIZE - 2*SZREG)(sp)
++	addi	fp, sp, FP_SIZE
++.endm
++
++.macro pop_fp
++	REG_L	ra, (FP_SIZE - SZREG)(sp)
++	REG_L	fp, (FP_SIZE - 2*SZREG)(sp)
++	addi	sp, sp, FP_SIZE
++.endm
+ 
+ .macro zero_range, tmp1, tmp2
+ 9998:	beq	\tmp1, \tmp2, 9997f
+@@ -73,6 +89,7 @@ start:
+ 	li	a1, -8192
+ 	add	a1, sp, a1
  	zero_range a1, sp
++	mv	fp, zero			// Ensure fp starts out as zero
  
  	/* set up exception handling */
--	//TODO
-+	la	a1, exception_vectors
-+	csrw	CSR_STVEC, a1
- 
- 	/* complete setup */
- 	la	a1, stacktop			// a1 is the base of free memory
-@@ -97,3 +99,111 @@ start:
- halt:
- 1:	wfi
- 	j	1b
-+
-+/*
-+ * Save context to address in a0.
-+ * For a0, sets PT_A0(a0) to the contents of PT_ORIG_A0(a0).
-+ * Clobbers a1.
-+ */
-+.macro save_context
-+	REG_S	ra, PT_RA(a0)			// x1
-+	REG_S	sp, PT_SP(a0)			// x2
-+	REG_S	gp, PT_GP(a0)			// x3
-+	REG_S	tp, PT_TP(a0)			// x4
-+	REG_S	t0, PT_T0(a0)			// x5
-+	REG_S	t1, PT_T1(a0)			// x6
-+	REG_S	t2, PT_T2(a0)			// x7
-+	REG_S	s0, PT_S0(a0)			// x8 / fp
-+	REG_S	s1, PT_S1(a0)			// x9
-+	/* a0 */				// x10
-+	REG_S   a1, PT_A1(a0)			// x11
-+	REG_S	a2, PT_A2(a0)			// x12
-+	REG_S	a3, PT_A3(a0)			// x13
-+	REG_S	a4, PT_A4(a0)			// x14
-+	REG_S	a5, PT_A5(a0)			// x15
-+	REG_S	a6, PT_A6(a0)			// x16
-+	REG_S	a7, PT_A7(a0)			// x17
-+	REG_S	s2, PT_S2(a0)			// x18
-+	REG_S	s3, PT_S3(a0)			// x19
-+	REG_S	s4, PT_S4(a0)			// x20
-+	REG_S	s5, PT_S5(a0)			// x21
-+	REG_S	s6, PT_S6(a0)			// x22
-+	REG_S	s7, PT_S7(a0)			// x23
-+	REG_S	s8, PT_S8(a0)			// x24
-+	REG_S	s9, PT_S9(a0)			// x25
-+	REG_S	s10, PT_S10(a0)			// x26
-+	REG_S	s11, PT_S11(a0)			// x27
-+	REG_S	t3, PT_T3(a0)			// x28
-+	REG_S	t4, PT_T4(a0)			// x29
-+	REG_S	t5, PT_T5(a0)			// x30
-+	REG_S	t6, PT_T6(a0)			// x31
-+	csrr	a1, CSR_SEPC
-+	REG_S	a1, PT_EPC(a0)
-+	csrr	a1, CSR_SSTATUS
-+	REG_S	a1, PT_STATUS(a0)
-+	csrr	a1, CSR_STVAL
-+	REG_S	a1, PT_BADADDR(a0)
-+	csrr	a1, CSR_SCAUSE
-+	REG_S	a1, PT_CAUSE(a0)
-+	REG_L	a1, PT_ORIG_A0(a0)
-+	REG_S	a1, PT_A0(a0)
-+.endm
-+
-+/*
-+ * Restore context from address in a0.
-+ * Also restores a0.
-+ */
-+.macro restore_context
-+	REG_L	ra, PT_RA(a0)			// x1
-+	REG_L	sp, PT_SP(a0)			// x2
-+	REG_L	gp, PT_GP(a0)			// x3
-+	REG_L	tp, PT_TP(a0)			// x4
-+	REG_L	t0, PT_T0(a0)			// x5
-+	REG_L	t1, PT_T1(a0)			// x6
-+	REG_L	t2, PT_T2(a0)			// x7
-+	REG_L	s0, PT_S0(a0)			// x8 / fp
-+	REG_L	s1, PT_S1(a0)			// x9
-+	/* a0 */				// x10
-+	/* a1 */				// x11
-+	REG_L	a2, PT_A2(a0)			// x12
-+	REG_L	a3, PT_A3(a0)			// x13
-+	REG_L	a4, PT_A4(a0)			// x14
-+	REG_L	a5, PT_A5(a0)			// x15
-+	REG_L	a6, PT_A6(a0)			// x16
-+	REG_L	a7, PT_A7(a0)			// x17
-+	REG_L	s2, PT_S2(a0)			// x18
-+	REG_L	s3, PT_S3(a0)			// x19
-+	REG_L	s4, PT_S4(a0)			// x20
-+	REG_L	s5, PT_S5(a0)			// x21
-+	REG_L	s6, PT_S6(a0)			// x22
-+	REG_L	s7, PT_S7(a0)			// x23
-+	REG_L	s8, PT_S8(a0)			// x24
-+	REG_L	s9, PT_S9(a0)			// x25
-+	REG_L	s10, PT_S10(a0)			// x26
-+	REG_L	s11, PT_S11(a0)			// x27
-+	REG_L	t3, PT_T3(a0)			// x28
-+	REG_L	t4, PT_T4(a0)			// x29
-+	REG_L	t5, PT_T5(a0)			// x30
-+	REG_L	t6, PT_T6(a0)			// x31
+ 	la	a1, exception_vectors
+@@ -200,9 +217,16 @@ halt:
+ .balign 4
+ .global exception_vectors
+ exception_vectors:
+-	REG_S	a0, (-PT_SIZE + PT_ORIG_A0)(sp)
+-	addi	a0, sp, -PT_SIZE
++	REG_S	a0, (-PT_SIZE - FP_SIZE + PT_ORIG_A0)(sp)
++	addi	a0, sp, -PT_SIZE - FP_SIZE
+ 	save_context
++	/*
++	 * Set a frame pointer "ra" which points to the last instruction.
++	 * Add 1 to it, because pretty_print_stacks.py subtracts 1.
++	 */
 +	REG_L	a1, PT_EPC(a0)
-+	csrw	CSR_SEPC, a1
-+	REG_L	a1, PT_STATUS(a0)
-+	csrw	CSR_SSTATUS, a1
-+	REG_L	a1, PT_BADADDR(a0)
-+	csrw	CSR_STVAL, a1
-+	REG_L	a1, PT_CAUSE(a0)
-+	csrw	CSR_SCAUSE, a1
-+	REG_L	a1, PT_A1(a0)
-+	REG_L	a0, PT_A0(a0)
-+.endm
-+
-+.balign 4
-+.global exception_vectors
-+exception_vectors:
-+	REG_S	a0, (-PT_SIZE + PT_ORIG_A0)(sp)
-+	addi	a0, sp, -PT_SIZE
-+	save_context
-+	mv	sp, a0
-+	call	do_handle_exception
-+	restore_context
-+	sret
-diff --git a/riscv/selftest.c b/riscv/selftest.c
-index d3b269cf6255..219093489b62 100644
---- a/riscv/selftest.c
-+++ b/riscv/selftest.c
-@@ -6,6 +6,7 @@
-  */
- #include <libcflat.h>
- #include <cpumask.h>
-+#include <asm/processor.h>
- #include <asm/setup.h>
- 
- static void check_cpus(void)
-@@ -13,7 +14,23 @@ static void check_cpus(void)
- 	int cpu;
- 
- 	for_each_present_cpu(cpu)
--		report_info("CPU%3d: hartid=%08lx", cpu, cpus[cpu]);
-+		report_info("CPU%3d: hartid=%08lx", cpu, cpus[cpu].hartid);
-+}
-+
-+static bool exceptions_work;
-+
-+static void handler(struct pt_regs *regs)
-+{
-+	exceptions_work = true;
-+	regs->epc += 2;
-+}
-+
-+static void check_exceptions(void)
-+{
-+	install_exception_handler(EXC_INST_ILLEGAL, handler);
-+	asm volatile(".4byte 0");
-+	install_exception_handler(EXC_INST_ILLEGAL, NULL);
-+	report(exceptions_work, "exceptions");
- }
- 
- int main(int argc, char **argv)
-@@ -45,6 +62,7 @@ int main(int argc, char **argv)
- 		report_skip("environ parsing");
- 	}
- 
-+	check_exceptions();
- 	check_cpus();
- 
- 	return report_summary();
++	addi	a1, a1, 1
++	push_fp	a1
+ 	mv	sp, a0
+ 	call	do_handle_exception
+ 	restore_context
 -- 
 2.43.0
 
