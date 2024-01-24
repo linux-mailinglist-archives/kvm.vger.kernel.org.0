@@ -1,152 +1,284 @@
-Return-Path: <kvm+bounces-6748-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6749-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD194839E9D
-	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 03:16:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D30B839F52
+	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 03:43:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C58C1F26EBB
-	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 02:16:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B7968B2891F
+	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 02:42:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 130F51874;
-	Wed, 24 Jan 2024 02:16:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB175AD4F;
+	Wed, 24 Jan 2024 02:42:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nZ4s/fnj"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JjrMMR8K"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com [209.85.219.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D09781FAA;
-	Wed, 24 Jan 2024 02:16:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 834C3BE69;
+	Wed, 24 Jan 2024 02:42:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.55.52.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706062590; cv=none; b=g6Yo/KTQ9gfCmFl89IznwHsuQnrQDFknz+KW/wGOHhR+Ri589ipbOC65mrYV3yaJGJFcNqzCeu9fQokHFRcEYFf5Y1dLQMif+X1RxxBk3gqQr+ITjZt76hyadOFSJskPp7hOEOa1SryL4TJ5Hoe65FB3vuYHtujJkMGsyheeLlY=
+	t=1706064153; cv=none; b=pxk1o9KE1TGMfoATIsXc/DMsXcnElFyfWMz1BUbeLvrm8QdlzhKgVE+4M/NtOjSm8uQwZ5cAFT+fp2H3T90gIJ8iG6MppImASp8n1bhI57nyUlle4jd5ED9yp3hpP+iC711AQxtYbzDKwt7xuMvemIWldRnl15NS7vjZs0Kbqc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706062590; c=relaxed/simple;
-	bh=8pMbtIOoXJMol0Vc+8Ttda6UFgII52v3WUVdIlQZpY0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CJQL3QQ46EdiJeAxd0v1OdsZ2MbymZFIxKIe3JdnqlQiMnXEI6ABibDliagUHY53qc4wXPOQ1EIOQFV8GJnW8WSDYCxPdKqi4vY7bPIFr9hVAu+/JZ5muu8pyy9bfZt0x8/nOAU7d8yPJGtwm68lK7feZj0fGhaTbjnpOOU5dW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nZ4s/fnj; arc=none smtp.client-ip=209.85.219.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f181.google.com with SMTP id 3f1490d57ef6-dc24f395c84so4096252276.1;
-        Tue, 23 Jan 2024 18:16:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706062587; x=1706667387; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=26UUWP5FsT7ts1M8733toiraR59N3yxGAjQ5B/FLR/s=;
-        b=nZ4s/fnjTR4fAw2DXTjt49ArbqY5yG8hShfBNpwA6XtG7Dd3CtMmhYcwAIKKJPvyvb
-         11eRvzCNpRfMEjsBQejwj3O1Nb0xYGdcf075rPVSMD1juCm1A2dwxtiepYxb/qgxlWuT
-         /DISAiwIv1lrUWOcMgmiGj+Xc+TCwFueSZyUWqNN4vJbKp51xyepaa9HM9HanSndmANF
-         chvczHx3c6SyJnjX9+bDKiceb2YUe5U94/eyVypTnCfi+FFq+i/5CsacansFPV9OKcnn
-         X5VFMbwxFX+HIzrWxyBPCE3prwOPt4uRE3oMOAEDJ4G+jbXAH6PAhgW8+DWuVHDeDKsu
-         QWrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706062587; x=1706667387;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=26UUWP5FsT7ts1M8733toiraR59N3yxGAjQ5B/FLR/s=;
-        b=GPKkFm4Xul8atU0aEaXgs2uwgugR7F0B0VaxMOuZHjRMa9p0v8rMB8fsuwOTwKu0bD
-         bKanzp2Npjw00HDLr5zGi2yi/Yrj07vQzXeQUxb/BAg289OuB80y4anD/RJWUn1YCN0o
-         tyNZcb1PhQceTpzGQPZddWKewuOygthdK8/PVF0NolPUMYVdTpPA5DkYHc/z3u49OKfW
-         bMORB7UL2AYODyCOauIEPeMKsW/p/tk6xRdNkXgBOSlYftWHXcw+9pAne179D9cTfav7
-         35BX3psnb42V0VDZPPSa08ccgf99Sg+ceku69XtuzSIzdYIxE4z/yg2WrFsE+WTRIQJR
-         2AKg==
-X-Gm-Message-State: AOJu0YxdEqG6h+dgxGPCGHVX96pRWKTq+IbORInloopSjjL5x/m6I0S8
-	DEmzxbRdYznlOcHqhFo3mO3FyXjhwRH8fXShxZTosclHFCnym1YiiREq57lmePTBGF1oHn+8gyv
-	/AGHfGjs/GySAR/wPSV2ytqTQWhbWARuVDaeUtI8r
-X-Google-Smtp-Source: AGHT+IEAcYqR78xGgiKBzWF5d/9cH5/Q3UuTa5TaWRbR62SNrkPoDs6WlA9ZfRikGvWbbls/kUxwscWIPi9JJBku6xQ=
-X-Received: by 2002:a25:df12:0:b0:dc2:4c43:6e6a with SMTP id
- w18-20020a25df12000000b00dc24c436e6amr90965ybg.57.1706062586692; Tue, 23 Jan
- 2024 18:16:26 -0800 (PST)
+	s=arc-20240116; t=1706064153; c=relaxed/simple;
+	bh=WaqxUJCK85qlfNElaIcJ1pliCUvXZOZBnBl2qxM5QuM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ITF6DIKaS92zdegWJ//Sn3vIOqIvKCiccjY/xrVZroAmPDTPCK6+INXhXdIWYZbKAzwRURTbUgw1WEZlMKlJfpBckLIVklYZZjVLpamSbBPQ5U/FcaZFdsWiAIv/5mPuPx0joSjvNokmKJk1YLjd2WpYVnXK/9+L2L9EioRFm2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JjrMMR8K; arc=none smtp.client-ip=192.55.52.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706064151; x=1737600151;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=WaqxUJCK85qlfNElaIcJ1pliCUvXZOZBnBl2qxM5QuM=;
+  b=JjrMMR8KiqIwmlYE1mRXp+pxEASd9j241wSvOgtfKPYrVCZGZcLpi/Vb
+   ctkBV/1tZ8N6ac9wgMBX4lU1YnZsU+rd78qqwpGFC9yGiJLZ/ocsCqfi+
+   UGe+eRgzHYIxubZeqYcTBmWWwZuYpmc1ppQRxXNN9BPOlYeJ5WaSWhwin
+   YZkPrtMefgtw+j5SvoP+y7D4DY78fHAZdGQzsdX60zXcdExUVl1raI+zz
+   qviPMV9lZtidHDbQwXv60uo3qF0qgmFbkOXjcn1QOBnq72Wg1rxPFS2J4
+   h8fSfHa6axgg7p+CO8T3yVDm7R7Iab+Y2D93dSmsqJsXAZ8OeFK/2GmWE
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="400586412"
+X-IronPort-AV: E=Sophos;i="6.05,215,1701158400"; 
+   d="scan'208";a="400586412"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2024 18:42:30 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,215,1701158400"; 
+   d="scan'208";a="1825808"
+Received: from 984fee00a5ca.jf.intel.com ([10.165.9.183])
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2024 18:42:29 -0800
+From: Yang Weijiang <weijiang.yang@intel.com>
+To: seanjc@google.com,
+	pbonzini@redhat.com,
+	dave.hansen@intel.com,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	x86@kernel.org,
+	yuan.yao@linux.intel.com
+Cc: peterz@infradead.org,
+	chao.gao@intel.com,
+	rick.p.edgecombe@intel.com,
+	mlevitsk@redhat.com,
+	john.allen@amd.com,
+	weijiang.yang@intel.com
+Subject: [PATCH v9 00/27] Enable CET Virtualization
+Date: Tue, 23 Jan 2024 18:41:33 -0800
+Message-Id: <20240124024200.102792-1-weijiang.yang@intel.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240121111730.262429-1-foxywang@tencent.com> <20240121111730.262429-5-foxywang@tencent.com>
- <ZbALemDF9sAYS2AM@linux.dev>
-In-Reply-To: <ZbALemDF9sAYS2AM@linux.dev>
-From: Yi Wang <up2wing@gmail.com>
-Date: Wed, 24 Jan 2024 10:16:15 +0800
-Message-ID: <CAN35MuR-t0THwSQa5ye8inLon3hMCZiHWnu5ofVNxmPJQ6+izg@mail.gmail.com>
-Subject: Re: [v2 4/4] KVM: s390: don't setup dummy routing when KVM_CREATE_IRQCHIP
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de, 
-	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
-	hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	wanpengli@tencent.com, foxywang@tencent.com, maz@kernel.org, 
-	anup@brainfault.org, atishp@atishpatra.org, borntraeger@linux.ibm.com, 
-	frankja@linux.ibm.com, imbrenda@linux.ibm.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jan 24, 2024 at 2:54=E2=80=AFAM Oliver Upton <oliver.upton@linux.de=
-v> wrote:
->
-> On Sun, Jan 21, 2024 at 07:17:30PM +0800, Yi Wang wrote:
-> > As we have setup empty irq routing in kvm_create_vm(), there's
-> > no need to setup dummy routing when KVM_CREATE_IRQCHIP.
-> >
-> > Signed-off-by: Yi Wang <foxywang@tencent.com>
-> > ---
-> >  arch/s390/kvm/kvm-s390.c | 13 +++++--------
-> >  1 file changed, 5 insertions(+), 8 deletions(-)
-> >
-> > diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> > index acc81ca6492e..7c836c973b75 100644
-> > --- a/arch/s390/kvm/kvm-s390.c
-> > +++ b/arch/s390/kvm/kvm-s390.c
-> > @@ -2999,14 +2999,11 @@ int kvm_arch_vm_ioctl(struct file *filp, unsign=
-ed int ioctl, unsigned long arg)
-> >               break;
-> >       }
-> >       case KVM_CREATE_IRQCHIP: {
-> > -             struct kvm_irq_routing_entry routing;
-> > -
-> > -             r =3D -EINVAL;
-> > -             if (kvm->arch.use_irqchip) {
-> > -                     /* Set up dummy routing. */
-> > -                     memset(&routing, 0, sizeof(routing));
-> > -                     r =3D kvm_set_irq_routing(kvm, &routing, 0, 0);
-> > -             }
-> > +             /*
-> > +              * As we have set up empty routing, there is no need to
-> > +              * setup dummy routing here.
-> > +              */
->
-> Where exactly?
->
-> In the context of this patch series it is rather obvious, but this
-> comment does not stand on its own. You can either throw the reader a
-> bone by mentioning where the dummy routing is created or just drop the
-> comment altogether.
+Control-flow Enforcement Technology (CET) is a kind of CPU feature used
+to prevent Return/CALL/Jump-Oriented Programming (ROP/COP/JOP) attacks.
+It provides two sub-features(SHSTK,IBT) to defend against ROP/COP/JOP
+style control-flow subversion attacks.
 
-Yeap, you are right. I will drop this in the upcoming patch.
+Shadow Stack (SHSTK):
+  A shadow stack is a second stack used exclusively for control transfer
+  operations. The shadow stack is separate from the data/normal stack and
+  can be enabled individually in user and kernel mode. When shadow stack
+  is enabled, CALL pushes the return address on both the data and shadow
+  stack. RET pops the return address from both stacks and compares them.
+  If the return addresses from the two stacks do not match, the processor
+  generates a #CP.
 
->
-> > +             r =3D 0;
-> >               break;
-> >       }
-> >       case KVM_SET_DEVICE_ATTR: {
-> > --
-> > 2.39.3
-> >
->
-> --
-> Thanks,
-> Oliver
+Indirect Branch Tracking (IBT):
+  IBT introduces new instruction(ENDBRANCH)to mark valid target addresses of
+  indirect branches (CALL, JMP etc...). If an indirect branch is executed
+  and the next instruction is _not_ an ENDBRANCH, the processor generates a
+  #CP. These instruction behaves as a NOP on platforms that doesn't support
+  CET.
+
+Dependency:
+=====================
+CET native series for user mode shadow stack has already been merged in v6.6
+mainline kernel.
+
+The first 7 kernel patches are prerequisites for this KVM patch series since
+guest CET user mode and supervisor mode states depends on kernel FPU framework
+to properly save/restore the states whenever FPU context switch is required,
+e.g., after VM-Exit and before vCPU thread exits to userspace.
+
+In this series, guest supervisor SHSTK mitigation solution isn't introduced
+for Intel platform therefore guest SSS_CET bit of CPUID(0x7,1):EDX[bit18] is
+cleared. Check SDM (Vol 1, Section 17.2.3) for details.
+
+CET states management:
+======================
+KVM cooperates with host kernel FPU framework to manage guest CET registers.
+With CET supervisor mode state support in this series, KVM can save/restore
+full guest CET xsave-managed states.
+
+CET user mode and supervisor mode xstates, i.e., MSR_IA32_{U_CET,PL3_SSP}
+and MSR_IA32_PL{0,1,2}, depend on host FPU framework to swap guest and host
+xstates. On VM-Exit, guest CET xstates are saved to guest fpu area and host
+CET xstates are loaded from task/thread context before vCPU returns to
+userspace, vice-versa on VM-Entry. See details in kvm_{load,put}_guest_fpu().
+So guest CET xstates management depends on CET xstate bits(U_CET/S_CET bit)
+set in host XSS MSR.
+
+CET supervisor mode states are grouped into two categories : XSAVE-managed
+and non-XSAVE-managed, the former includes MSR_IA32_PL{0,1,2}_SSP and are
+controlled by CET supervisor mode bit(S_CET bit) in XSS, the later consists
+of MSR_IA32_S_CET and MSR_IA32_INTR_SSP_TBL.
+
+VMX introduces new VMCS fields, {GUEST|HOST}_{S_CET,SSP,INTR_SSP_TABL}, to
+facilitate guest/host non-XSAVES-managed states. When VMX CET entry/exit load
+bits are set, guest/host MSR_IA32_{S_CET,INTR_SSP_TBL,SSP} are loaded from
+equivalent fields at VM-Exit/Entry. With these new fields, such supervisor
+states require no addtional KVM save/reload actions.
+
+Tests:
+======================
+This series passed basic CET user shadow stack test and kernel IBT test in L1
+and L2 guest.
+The patch series _has_ impact to existing vmx test cases in KVM-unit-tests,the
+failures have been fixed here[1].
+One new selftest app[2] is introduced for testing CET MSRs accessibilities.
+
+Note, this series hasn't been tested on AMD platform yet.
+
+To run user SHSTK test and kernel IBT test in guest, an CET capable platform
+is required, e.g., Sapphire Rapids server, and follow below steps to build
+the binaries:
+
+1. Host kernel: Apply this series to mainline kernel (>= v6.6) and build.
+
+2. Guest kernel: Pull kernel (>= v6.6), opt-in CONFIG_X86_KERNEL_IBT
+and CONFIG_X86_USER_SHADOW_STACK options. Build with CET enabled gcc versions
+(>= 8.5.0).
+
+3. Apply CET QEMU patches[3] before build mainline QEMU.
+
+Check kernel selftest test_shadow_stack_64 output:
+[INFO]  new_ssp = 7f8c82100ff8, *new_ssp = 7f8c82101001
+[INFO]  changing ssp from 7f8c82900ff0 to 7f8c82100ff8
+[INFO]  ssp is now 7f8c82101000
+[OK]    Shadow stack pivot
+[OK]    Shadow stack faults
+[INFO]  Corrupting shadow stack
+[INFO]  Generated shadow stack violation successfully
+[OK]    Shadow stack violation test
+[INFO]  Gup read -> shstk access success
+[INFO]  Gup write -> shstk access success
+[INFO]  Violation from normal write
+[INFO]  Gup read -> write access success
+[INFO]  Violation from normal write
+[INFO]  Gup write -> write access success
+[INFO]  Cow gup write -> write access success
+[OK]    Shadow gup test
+[INFO]  Violation from shstk access
+[OK]    mprotect() test
+[SKIP]  Userfaultfd unavailable.
+[OK]    32 bit test
 
 
+Check kernel IBT with dmesg | grep CET:
+CET detected: Indirect Branch Tracking enabled
 
---=20
----
-Best wishes
-Yi Wang
+Changes in v9:
+=====================
+1. Add Reviewed-by tags from Maxim and Rick. [Maxim, Rick]
+2. Stop branch instruction emulation when CET is active in guest. [Rick, Sean, Jim]
+3. Fixed a few issues per review feedback. [Rick, Maxim, Yuan, Chao]
+4. The latest upstream kernels seem broken in guest on my platform, still rebased on
+   https://github.com/kvm-x86/linux tag:kvm-x86-next-2023.11.30
+
+
+[1]: KVM-unit-tests fixup:
+https://lore.kernel.org/all/20230913235006.74172-1-weijiang.yang@intel.com/
+[2]: Selftest for CET MSRs:
+https://lore.kernel.org/all/20230914064201.85605-1-weijiang.yang@intel.com/
+[3]: QEMU patch:
+https://lore.kernel.org/all/20230720111445.99509-1-weijiang.yang@intel.com/
+[4]: v8 patchset:
+https://lore.kernel.org/all/20231221140239.4349-1-weijiang.yang@intel.com/
+
+
+Patch 1-7:	Fixup patches for kernel xstate and enable CET supervisor xstate.
+Patch 8-11:	Cleanup patches for KVM.
+Patch 12-15:	Enable KVM XSS MSR support.
+Patch 16:	Fault check for CR4.CET setting.
+Patch 17:	Report CET MSRs to userspace.
+Patch 18:	Introduce CET VMCS fields.
+Patch 19:	Add SHSTK/IBT to KVM-governed framework.(to be deprecated)
+Patch 20:	Emulate CET MSR access.
+Patch 21:	Handle SSP at entry/exit to SMM.
+Patch 22:	Set up CET MSR interception.
+Patch 23:	Initialize host constant supervisor state.
+Patch 24:	Enable CET virtualization settings.
+Patch 25-26:	Add CET nested support.
+Patch 27:	KVM emulation handling for branch instructions
+
+
+Sean Christopherson (4):
+  x86/fpu/xstate: Always preserve non-user xfeatures/flags in __state_perm
+  KVM: x86: Rework cpuid_get_supported_xcr0() to operate on vCPU data
+  KVM: x86: Report XSS as to-be-saved if there are supported features
+  KVM: x86: Load guest FPU state when access XSAVE-managed MSRs
+
+Yang Weijiang (23):
+  x86/fpu/xstate: Refine CET user xstate bit enabling
+  x86/fpu/xstate: Add CET supervisor mode state support
+  x86/fpu/xstate: Introduce XFEATURE_MASK_KERNEL_DYNAMIC xfeature set
+  x86/fpu/xstate: Introduce fpu_guest_cfg for guest FPU configuration
+  x86/fpu/xstate: Create guest fpstate with guest specific config
+  x86/fpu/xstate: Warn if kernel dynamic xfeatures detected in normal fpstate
+  KVM: x86: Rename kvm_{g,s}et_msr() to menifest emulation operations
+  KVM: x86: Refine xsave-managed guest register/MSR reset handling
+  KVM: x86: Add kvm_msr_{read,write}() helpers
+  KVM: x86: Refresh CPUID on write to guest MSR_IA32_XSS
+  KVM: x86: Initialize kvm_caps.supported_xss
+  KVM: x86: Add fault checks for guest CR4.CET setting
+  KVM: x86: Report KVM supported CET MSRs as to-be-saved
+  KVM: VMX: Introduce CET VMCS fields and control bits
+  KVM: x86: Use KVM-governed feature framework to track "SHSTK/IBT enabled"
+  KVM: VMX: Emulate read and write to CET MSRs
+  KVM: x86: Save and reload SSP to/from SMRAM
+  KVM: VMX: Set up interception for CET MSRs
+  KVM: VMX: Set host constant supervisor states to VMCS fields
+  KVM: x86: Enable CET virtualization for VMX and advertise to userspace
+  KVM: nVMX: Introduce new VMX_BASIC bit for event error_code delivery to L1
+  KVM: nVMX: Enable CET support for nested guest
+  KVM: x86: Stop emulating for CET protected branch instructions
+
+ arch/x86/include/asm/fpu/types.h     |  16 +-
+ arch/x86/include/asm/fpu/xstate.h    |  11 +-
+ arch/x86/include/asm/kvm_host.h      |  12 +-
+ arch/x86/include/asm/msr-index.h     |   1 +
+ arch/x86/include/asm/vmx.h           |   8 +
+ arch/x86/include/uapi/asm/kvm_para.h |   1 +
+ arch/x86/kernel/fpu/core.c           |  58 ++++--
+ arch/x86/kernel/fpu/xstate.c         |  44 ++++-
+ arch/x86/kernel/fpu/xstate.h         |   3 +
+ arch/x86/kvm/cpuid.c                 |  80 ++++++---
+ arch/x86/kvm/emulate.c               |  27 +--
+ arch/x86/kvm/governed_features.h     |   2 +
+ arch/x86/kvm/smm.c                   |  12 +-
+ arch/x86/kvm/smm.h                   |   2 +-
+ arch/x86/kvm/vmx/capabilities.h      |  10 ++
+ arch/x86/kvm/vmx/nested.c            |  97 ++++++++--
+ arch/x86/kvm/vmx/nested.h            |   5 +
+ arch/x86/kvm/vmx/vmcs12.c            |   6 +
+ arch/x86/kvm/vmx/vmcs12.h            |  14 +-
+ arch/x86/kvm/vmx/vmx.c               | 108 ++++++++++-
+ arch/x86/kvm/vmx/vmx.h               |   6 +-
+ arch/x86/kvm/x86.c                   | 259 +++++++++++++++++++++++++--
+ arch/x86/kvm/x86.h                   |  28 +++
+ 23 files changed, 702 insertions(+), 108 deletions(-)
+
+-- 
+2.39.3
+
 
