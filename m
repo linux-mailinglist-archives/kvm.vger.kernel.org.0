@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-6796-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6797-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80F3783A2BE
-	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 08:20:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95A5583A2BF
+	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 08:20:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A71791C256D7
-	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 07:20:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0EACB1F276B1
+	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 07:20:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9F9117985;
-	Wed, 24 Jan 2024 07:19:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5FE01799C;
+	Wed, 24 Jan 2024 07:19:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lD9IQu8d"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="p8vPGzct"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F32F17752
-	for <kvm@vger.kernel.org>; Wed, 24 Jan 2024 07:19:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D73817745
+	for <kvm@vger.kernel.org>; Wed, 24 Jan 2024 07:19:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706080746; cv=none; b=XxjClid3RbAsiFS2A+ZCN4mUgavqzcgUSRJZxkgK6fssabhA7KTQ7ob0YRIeuRb/0k7hzXc2n7LJW8XT9/H6kiBrQUCb13sLTzAtCEjStLSDrWSmjXz6fvalZ6JQLHlrcPMpDHRItWJqsE2bKjQhmfLeQx8hLzAwtOMBE7Wpx0I=
+	t=1706080748; cv=none; b=IHMq2p2KtKs2elUVNZyFYUMZV6BQoYodihBFQFZSz6LTlqGbjBSwf6Jc2tPdOMPrRehABcxQe5QSSCEPyFf/ZL7KfTkaShS6TMyOp1neRLBStJpCbf8IaHDWSW5J18TGUPUVyKOlfq9yuiaVhqFenKkwvFQBHZnsKCHHlqq7bus=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706080746; c=relaxed/simple;
-	bh=Nw8HzYpp81iwd1Up1q56UYdNoPXd6MK56s4C6EggVqU=;
+	s=arc-20240116; t=1706080748; c=relaxed/simple;
+	bh=S4dNU2whaIwdjWcbUYKD/6+DWFEl1TMCCAoAPmR/syY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-type; b=GiKLkxzYrm0N6VrmmDNU7TtE2azwoufzPTr7VOrBp3TnntDVOpQ75dOLdWEqSub0MA9A6tSEJuxO3i89svQlJG815uXJhAtPEDI/fMa+KBlFrCAtYYbmQaEm8qq2n9wpA07j19xjrmao549jI+qXCm71SZa2LwZMvw+bf+onUbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lD9IQu8d; arc=none smtp.client-ip=91.218.175.181
+	 MIME-Version:Content-type; b=raHU3fhWAVFhsnSzQhymo69gSllKHxqHqNQkyvHrGr5zhJG1Ng7XWsiYLVP4EcvNozDs5vLpzYTw9RMkWqFK/bHDVhIh2s6RxxGoB/bD2WPrg4plHRsfTv5RWDvO69WvVzl7iQ4PSr38eh6nvcVnzm3XlvLypanA/nwNoIHP0wY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=p8vPGzct; arc=none smtp.client-ip=91.218.175.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706080742;
+	t=1706080744;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Ad85rv8uoTjpCnNqcda1d8moggW5XED13BqFM4Q8Hg8=;
-	b=lD9IQu8d2ToRfpveL3WNbHEyJvn/kIB2dzMHFugB2i1yWgARk9laxj9UoEL7OqgQa/sUxH
-	y4WkUdie/wVj9SAhr1ShjOn2P617928EWzxkWDfxK5TdLnc4ISW0fCzqrz9FSmPI2VTZ4b
-	x4F9c0eM/c9h1HWEmCCd2Cxt44okWu4=
+	bh=0MnhmUFEuzjDk5By8mR2jCWGP+glQNdPUjiDdhXMQ7A=;
+	b=p8vPGzctC7AMEbGXn+IPqCwpAiIUWDBZq7NlnrHbm5a5VmlKHXTWJQh4wQCFGeiri21huI
+	bBgyTJDXtNTYfBmgNZjMw9/ReL/a6lZlDfAlhKPduxe+E/AzuWuUIE54j6nVZcKQodZawm
+	qo0FmZ46xJLJptxK0umMDcAbmmH56kk=
 From: Andrew Jones <andrew.jones@linux.dev>
 To: kvm@vger.kernel.org,
 	kvm-riscv@lists.infradead.org,
@@ -53,9 +53,9 @@ Cc: ajones@ventanamicro.com,
 	thuth@redhat.com,
 	alexandru.elisei@arm.com,
 	eric.auger@redhat.com
-Subject: [kvm-unit-tests PATCH 17/24] riscv: Populate memregions and switch to page allocator
-Date: Wed, 24 Jan 2024 08:18:33 +0100
-Message-ID: <20240124071815.6898-43-andrew.jones@linux.dev>
+Subject: [kvm-unit-tests PATCH 18/24] riscv: Add MMU support
+Date: Wed, 24 Jan 2024 08:18:34 +0100
+Message-ID: <20240124071815.6898-44-andrew.jones@linux.dev>
 In-Reply-To: <20240124071815.6898-26-andrew.jones@linux.dev>
 References: <20240124071815.6898-26-andrew.jones@linux.dev>
 Precedence: bulk
@@ -68,139 +68,332 @@ Content-type: text/plain
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Get the memory regions from the DT rather than just assuming we have
-enough. Getting memory regions and setting their flags is also a
-first step to enabling the MMU. Also switch to the page allocator,
-which is a second step to enabling the MMU.
+Add minimal page table defines and functions in order to build page
+tables and enable the MMU.
 
 Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 ---
- lib/riscv/asm/memory_areas.h |  1 +
- lib/riscv/setup.c            | 55 ++++++++++++++++++++++++++++++++++--
- riscv/Makefile               |  2 ++
- 3 files changed, 55 insertions(+), 3 deletions(-)
- create mode 100644 lib/riscv/asm/memory_areas.h
+ lib/riscv/asm/csr.h     |   1 +
+ lib/riscv/asm/io.h      |   3 +
+ lib/riscv/asm/mmu.h     |  28 ++++++++
+ lib/riscv/asm/page.h    |  11 ++++
+ lib/riscv/asm/pgtable.h |  42 ++++++++++++
+ lib/riscv/mmu.c         | 140 ++++++++++++++++++++++++++++++++++++++++
+ lib/riscv/setup.c       |   3 +
+ riscv/Makefile          |   1 +
+ 8 files changed, 229 insertions(+)
+ create mode 100644 lib/riscv/asm/mmu.h
+ create mode 100644 lib/riscv/asm/pgtable.h
+ create mode 100644 lib/riscv/mmu.c
 
-diff --git a/lib/riscv/asm/memory_areas.h b/lib/riscv/asm/memory_areas.h
+diff --git a/lib/riscv/asm/csr.h b/lib/riscv/asm/csr.h
+index eeddd1fb448a..88c816c68d09 100644
+--- a/lib/riscv/asm/csr.h
++++ b/lib/riscv/asm/csr.h
+@@ -9,6 +9,7 @@
+ #define CSR_SEPC		0x141
+ #define CSR_SCAUSE		0x142
+ #define CSR_STVAL		0x143
++#define CSR_SATP		0x180
+ 
+ /* Exception cause high bit - is an interrupt if set */
+ #define CAUSE_IRQ_FLAG		(_AC(1, UL) << (__riscv_xlen - 1))
+diff --git a/lib/riscv/asm/io.h b/lib/riscv/asm/io.h
+index d2eb3acc9fda..6fe111289102 100644
+--- a/lib/riscv/asm/io.h
++++ b/lib/riscv/asm/io.h
+@@ -73,6 +73,9 @@ static inline u64 __raw_readq(const volatile void __iomem *addr)
+ }
+ #endif
+ 
++#define ioremap ioremap
++void __iomem *ioremap(phys_addr_t phys_addr, size_t size);
++
+ #include <asm-generic/io.h>
+ 
+ #endif /* _ASMRISCV_IO_H_ */
+diff --git a/lib/riscv/asm/mmu.h b/lib/riscv/asm/mmu.h
 new file mode 100644
-index 000000000000..2b34e63502dd
+index 000000000000..02703f607511
 --- /dev/null
-+++ b/lib/riscv/asm/memory_areas.h
-@@ -0,0 +1 @@
-+#include <asm-generic/memory_areas.h>
++++ b/lib/riscv/asm/mmu.h
+@@ -0,0 +1,28 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++#ifndef _ASMRISCV_MMU_H_
++#define _ASMRISCV_MMU_H_
++#include <libcflat.h>
++#include <asm/csr.h>
++#include <asm/page.h>
++#include <asm/pgtable.h>
++
++static inline pgd_t *current_pgtable(void)
++{
++	return (pgd_t *)((csr_read(CSR_SATP) & SATP_PPN) << PAGE_SHIFT);
++}
++
++void mmu_set_range_ptes(pgd_t *pgtable, uintptr_t virt_offset,
++			phys_addr_t phys_start, phys_addr_t phys_end,
++			pgprot_t prot, bool flush);
++void __mmu_enable(unsigned long satp);
++void mmu_enable(unsigned long mode, pgd_t *pgtable);
++void mmu_disable(void);
++
++void setup_mmu(void);
++
++static inline void local_flush_tlb_page(unsigned long addr)
++{
++	asm volatile("sfence.vma %0" : : "r" (addr) : "memory");
++}
++
++#endif /* _ASMRISCV_MMU_H_ */
+diff --git a/lib/riscv/asm/page.h b/lib/riscv/asm/page.h
+index 7d7c9191605a..9801b4d1b9c1 100644
+--- a/lib/riscv/asm/page.h
++++ b/lib/riscv/asm/page.h
+@@ -2,6 +2,17 @@
+ #ifndef _ASMRISCV_PAGE_H_
+ #define _ASMRISCV_PAGE_H_
+ 
++#ifndef __ASSEMBLY__
++
++typedef unsigned long pgd_t;
++typedef unsigned long pte_t;
++typedef unsigned long pgprot_t;
++typedef unsigned long pteval_t;
++
++#define __pgprot(x)		((pgprot_t)(x))
++
++#endif /* !__ASSEMBLY__ */
++
+ #include <asm-generic/page.h>
+ 
+ #endif /* _ASMRISCV_PAGE_H_ */
+diff --git a/lib/riscv/asm/pgtable.h b/lib/riscv/asm/pgtable.h
+new file mode 100644
+index 000000000000..98d41ff9f661
+--- /dev/null
++++ b/lib/riscv/asm/pgtable.h
+@@ -0,0 +1,42 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++#ifndef _ASMRISCV_PGTABLE_H_
++#define _ASMRISCV_PGTABLE_H_
++#include <linux/const.h>
++
++#if __riscv_xlen == 32
++#define SATP_PPN		_AC(0x003FFFFF, UL)
++#define SATP_MODE_32		_AC(0x80000000, UL)
++#define SATP_MODE_SHIFT		31
++#define NR_LEVELS		2
++#define PGDIR_BITS		10
++#define PGDIR_MASK		_AC(0x3FF, UL)
++#define PTE_PPN			_AC(0xFFFFFC00, UL)
++
++#define SATP_MODE_DEFAULT	SATP_MODE_32
++
++#else
++#define SATP_PPN		_AC(0x00000FFFFFFFFFFF, UL)
++#define SATP_MODE_39		_AC(0x8000000000000000, UL)
++#define SATP_MODE_SHIFT		60
++#define NR_LEVELS		3
++#define PGDIR_BITS		9
++#define PGDIR_MASK		_AC(0x1FF, UL)
++#define PTE_PPN			_AC(0x3FFFFFFFFFFC00, UL)
++
++#define SATP_MODE_DEFAULT	SATP_MODE_39
++
++#endif
++
++#define PPN_SHIFT		10
++
++#define _PAGE_PRESENT		(1 << 0)
++#define _PAGE_READ		(1 << 1)
++#define _PAGE_WRITE		(1 << 2)
++#define _PAGE_EXEC		(1 << 3)
++#define _PAGE_USER		(1 << 4)
++#define _PAGE_GLOBAL		(1 << 5)
++#define _PAGE_ACCESSED		(1 << 6)
++#define _PAGE_DIRTY		(1 << 7)
++#define _PAGE_SOFT		(3 << 8)
++
++#endif /* _ASMRISCV_PGTABLE_H_ */
+diff --git a/lib/riscv/mmu.c b/lib/riscv/mmu.c
+new file mode 100644
+index 000000000000..6b1af518ddd8
+--- /dev/null
++++ b/lib/riscv/mmu.c
+@@ -0,0 +1,140 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright (C) 2023, Ventana Micro Systems Inc., Andrew Jones <ajones@ventanamicro.com>
++ */
++#include <libcflat.h>
++#include <alloc_page.h>
++#include <memregions.h>
++#include <asm/csr.h>
++#include <asm/io.h>
++#include <asm/mmu.h>
++#include <asm/page.h>
++
++static pgd_t *__initial_pgtable;
++
++static int pte_index(uintptr_t vaddr, int level)
++{
++	return (vaddr >> (PGDIR_BITS * level + PAGE_SHIFT)) & PGDIR_MASK;
++}
++
++static pte_t *pte_to_ptep(pte_t pte)
++{
++	return (pte_t *)(((pte & PTE_PPN) >> PPN_SHIFT) << PAGE_SHIFT);
++}
++
++static pte_t ptep_to_pte(pte_t *ptep)
++{
++	return ((pte_t)ptep >> PAGE_SHIFT) << PPN_SHIFT;
++}
++
++static pteval_t *__install_page(pgd_t *pgtable, phys_addr_t paddr,
++				uintptr_t vaddr, pgprot_t prot, bool flush)
++{
++	phys_addr_t ppn = (paddr >> PAGE_SHIFT) << PPN_SHIFT;
++	pte_t pte = (pte_t)ppn;
++	pte_t *ptep = pgtable;
++
++	assert(pgtable && !((uintptr_t)pgtable & ~PAGE_MASK));
++	assert(!(ppn & ~PTE_PPN));
++
++	for (int level = NR_LEVELS - 1; level > 0; --level) {
++		pte_t *next = &ptep[pte_index(vaddr, level)];
++		if (!*next) {
++			void *page = alloc_page();
++			*next = ptep_to_pte(page) | _PAGE_PRESENT;
++		}
++		ptep = pte_to_ptep(*next);
++	}
++	ptep = &ptep[pte_index(vaddr, 0)];
++	*ptep = pte | prot | _PAGE_PRESENT;
++
++	if (flush)
++		local_flush_tlb_page(vaddr);
++
++	return (pteval_t *)ptep;
++}
++
++void mmu_set_range_ptes(pgd_t *pgtable, uintptr_t virt_offset,
++			phys_addr_t phys_start, phys_addr_t phys_end,
++			pgprot_t prot, bool flush)
++{
++	phys_addr_t paddr = phys_start & PAGE_MASK;
++	uintptr_t vaddr = virt_offset & PAGE_MASK;
++	uintptr_t virt_end = phys_end - paddr + vaddr;
++
++	assert(phys_start < phys_end);
++
++	for (; vaddr < virt_end; vaddr += PAGE_SIZE, paddr += PAGE_SIZE)
++		__install_page(pgtable, paddr, vaddr, prot, flush);
++}
++
++void mmu_disable(void)
++{
++	__asm__ __volatile__ (
++	"	csrw	" xstr(CSR_SATP) ", zero\n"
++	"	sfence.vma\n"
++	: : : "memory");
++}
++
++void __mmu_enable(unsigned long satp)
++{
++	__asm__ __volatile__ (
++	"	sfence.vma\n"
++	"	csrw	" xstr(CSR_SATP) ", %0\n"
++	: : "r" (satp) : "memory");
++}
++
++void mmu_enable(unsigned long mode, pgd_t *pgtable)
++{
++	unsigned long ppn = (unsigned long)pgtable >> PAGE_SHIFT;
++	unsigned long satp = mode | ppn;
++
++	assert(!(ppn & ~SATP_PPN));
++	__mmu_enable(satp);
++}
++
++void setup_mmu(void)
++{
++	struct mem_region *r;
++	pgd_t *pgtable;
++
++	if (!__initial_pgtable)
++		__initial_pgtable = alloc_page();
++	pgtable = __initial_pgtable;
++
++	for (r = mem_regions; r->end; ++r) {
++		if (r->flags & (MR_F_IO | MR_F_RESERVED))
++			continue;
++		if (r->flags & MR_F_CODE) {
++			mmu_set_range_ptes(pgtable, r->start, r->start, r->end,
++					   __pgprot(_PAGE_READ | _PAGE_EXEC), false);
++		} else {
++			mmu_set_range_ptes(pgtable, r->start, r->start, r->end,
++					   __pgprot(_PAGE_READ | _PAGE_WRITE), false);
++		}
++	}
++
++	mmu_enable(SATP_MODE_DEFAULT, pgtable);
++}
++
++void __iomem *ioremap(phys_addr_t phys_addr, size_t size)
++{
++	phys_addr_t start = phys_addr & PAGE_MASK;
++	phys_addr_t end = PAGE_ALIGN(phys_addr + size);
++	pgd_t *pgtable = current_pgtable();
++	bool flush = true;
++
++	assert(sizeof(long) == 8 || !(phys_addr >> 32));
++
++	if (!pgtable) {
++		if (!__initial_pgtable)
++			__initial_pgtable = alloc_page();
++		pgtable = __initial_pgtable;
++		flush = false;
++	}
++
++	mmu_set_range_ptes(pgtable, start, start, end,
++			   __pgprot(_PAGE_READ | _PAGE_WRITE), flush);
++
++	return (void __iomem *)(unsigned long)phys_addr;
++}
 diff --git a/lib/riscv/setup.c b/lib/riscv/setup.c
-index 9ff446b5e171..848ec8e83496 100644
+index 848ec8e83496..c4c1bd58b337 100644
 --- a/lib/riscv/setup.c
 +++ b/lib/riscv/setup.c
-@@ -6,22 +6,31 @@
-  */
- #include <libcflat.h>
- #include <alloc.h>
-+#include <alloc_page.h>
- #include <alloc_phys.h>
- #include <argv.h>
- #include <cpumask.h>
- #include <devicetree.h>
-+#include <memregions.h>
+@@ -14,6 +14,7 @@
+ #include <memregions.h>
  #include <on-cpus.h>
  #include <asm/csr.h>
++#include <asm/mmu.h>
  #include <asm/page.h>
  #include <asm/processor.h>
  #include <asm/setup.h>
+@@ -171,5 +172,7 @@ void setup(const void *fdt, phys_addr_t freemem_start)
+ 		setup_env(env, initrd_size);
+ 	}
  
-+#define VA_BASE			((phys_addr_t)3 * SZ_1G)
++	setup_mmu();
 +
-+#define MAX_DT_MEM_REGIONS	16
-+#define NR_MEM_REGIONS		(MAX_DT_MEM_REGIONS + 16)
-+
- char *initrd;
- u32 initrd_size;
- 
- struct thread_info cpus[NR_CPUS];
- int nr_cpus;
- 
-+static struct mem_region riscv_mem_regions[NR_MEM_REGIONS + 1];
-+
- int hartid_to_cpu(unsigned long hartid)
- {
- 	int cpu;
-@@ -64,10 +73,50 @@ static void cpu_init(void)
- 	cpu0_calls_idle = true;
+ 	banner();
  }
- 
-+extern unsigned long _etext;
-+
- static void mem_init(phys_addr_t freemem_start)
- {
--	//TODO - for now just assume we've got some memory available
--	phys_alloc_init(freemem_start, 16 * SZ_1M);
-+	struct mem_region *freemem, *code, *data;
-+	phys_addr_t freemem_end, base, top;
-+
-+	memregions_init(riscv_mem_regions, NR_MEM_REGIONS);
-+	memregions_add_dt_regions(MAX_DT_MEM_REGIONS);
-+
-+	/* Split the region with the code into two regions; code and data */
-+	memregions_split((unsigned long)&_etext, &code, &data);
-+	assert(code);
-+	code->flags |= MR_F_CODE;
-+
-+	freemem = memregions_find(freemem_start);
-+	assert(freemem && !(freemem->flags & (MR_F_IO | MR_F_CODE)));
-+
-+	freemem_end = freemem->end & PAGE_MASK;
-+
-+	/*
-+	 * The assert below is mostly checking that the free memory doesn't
-+	 * start in the 3G-4G range, which is reserved for virtual addresses,
-+	 * but it also confirms that there is some free memory (the amount
-+	 * is arbitrarily selected, but should be sufficient for a unit test)
-+	 *
-+	 * TODO: Allow the VA range to shrink and move.
-+	 */
-+	if (freemem_end > VA_BASE)
-+		freemem_end = VA_BASE;
-+	assert(freemem_end - freemem_start >= SZ_1M * 16);
-+
-+	/*
-+	 * TODO: Remove the need for this phys allocator dance, since, as we
-+	 * can see with the assert, we could have gone straight to the page
-+	 * allocator.
-+	 */
-+	phys_alloc_init(freemem_start, freemem_end - freemem_start);
-+	phys_alloc_set_minimum_alignment(PAGE_SIZE);
-+	phys_alloc_get_unused(&base, &top);
-+	assert(base == freemem_start && top == freemem_end);
-+
-+	page_alloc_init_area(0, freemem_start >> PAGE_SHIFT, freemem_end >> PAGE_SHIFT);
-+	page_alloc_ops_enable();
- }
- 
- static void banner(void)
-@@ -86,7 +135,7 @@ void setup(const void *fdt, phys_addr_t freemem_start)
- 	u32 fdt_size;
- 	int ret;
- 
--	assert(sizeof(long) == 8 || freemem_start < (3ul << 30));
-+	assert(sizeof(long) == 8 || freemem_start < VA_BASE);
- 	freemem = (void *)(unsigned long)freemem_start;
- 
- 	/* Move the FDT to the base of free memory */
 diff --git a/riscv/Makefile b/riscv/Makefile
-index 932f3378264c..ed1a14025ed2 100644
+index ed1a14025ed2..821891b719e7 100644
 --- a/riscv/Makefile
 +++ b/riscv/Makefile
-@@ -22,8 +22,10 @@ $(TEST_DIR)/sieve.elf: AUXFLAGS = 0x1
- cstart.o = $(TEST_DIR)/cstart.o
- 
- cflatobjs += lib/alloc.o
-+cflatobjs += lib/alloc_page.o
- cflatobjs += lib/alloc_phys.o
- cflatobjs += lib/devicetree.o
-+cflatobjs += lib/memregions.o
+@@ -29,6 +29,7 @@ cflatobjs += lib/memregions.o
  cflatobjs += lib/on-cpus.o
  cflatobjs += lib/riscv/bitops.o
  cflatobjs += lib/riscv/io.o
++cflatobjs += lib/riscv/mmu.o
+ cflatobjs += lib/riscv/processor.o
+ cflatobjs += lib/riscv/sbi.o
+ cflatobjs += lib/riscv/setup.o
 -- 
 2.43.0
 
