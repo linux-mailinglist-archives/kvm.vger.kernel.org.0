@@ -1,125 +1,120 @@
-Return-Path: <kvm+bounces-6850-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6851-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0485E83B029
-	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 18:38:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0FF883AFEB
+	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 18:30:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B578AB2F7D2
-	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 17:27:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F398F1C272F3
+	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 17:30:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83CCC1272A5;
-	Wed, 24 Jan 2024 17:24:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FFC98613E;
+	Wed, 24 Jan 2024 17:28:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OZJtCBiL"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 089837CF18;
-	Wed, 24 Jan 2024 17:24:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B23181AC9
+	for <kvm@vger.kernel.org>; Wed, 24 Jan 2024 17:28:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706117048; cv=none; b=uMi+S0USr3KrBYEB8zgkoZt2ErsKnzTgWwSEVje7ZPfRzl2kyQHzb/GGI2yFGA3WY8J4un9SnDwpgLOMArm9lhzVAGi1caawGluVCogopqyN/kHWG32a1bgCkLHQ542MXv5sGn7e1GT464M8iSuAmA63Fpq+63cY6rqQrYxsBvk=
+	t=1706117318; cv=none; b=AV5AB0yNAtC4+PA57Kwdj5dDangEy94m9S4S0NBFQLAoXwg5IryCGMYhRXRQj2GxxAtFxgpgKzlfOGOeu6A3YGalCKA6k83E7FZ/dfk9iia4skGSxP2p48fX0169q8vajiyMAiKOv/69tX9FdBAyZBCwvLbmURazObva2A9m1wo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706117048; c=relaxed/simple;
-	bh=Nel1C4fahRSLksyTQGpvXQXEvhkmWvAfgHn6lsWzUdE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BvJpRX7DIa9SC39n3p3LYXup8jFoJZklmflEPV7xDjpniGjoL7crGGpKPz+cd7pWrZ5XJ7/IUm1RVlNxJsUUubEfYE3nVhWaYaN/KNOe44YkQyDT3MePBsXtoYrOLWi/Ah16EEH7ds0U0axLI/nxnm5iF1Pm0vWXIKyvOs6jKfM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E06A71FB;
-	Wed, 24 Jan 2024 09:24:49 -0800 (PST)
-Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.1.197.1])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 0AF5A3F762;
-	Wed, 24 Jan 2024 09:24:03 -0800 (PST)
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-To: linux-kernel@vger.kernel.org
-Cc: kvm@vger.kernel.org,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Feng Liu <feliu@nvidia.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>
-Subject: [PATCH] virtio: uapi: Drop __packed attribute in linux/virtio_pci.h:
-Date: Wed, 24 Jan 2024 17:23:45 +0000
-Message-Id: <20240124172345.853129-1-suzuki.poulose@arm.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1706117318; c=relaxed/simple;
+	bh=YZUoq4gXQ8SwxSgpga+ErXb9tt/oiDZ/4vATgGxnJV8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=LW80wxWCjvpEy9YptKLIBBgAnYyaGcjNEKcaOrRVAUu8kv426YDe/9HYGY2KAofgVyn7SmIw6Pztsp0/ZZTUWBzPqWbhoT/e0BpxVV/NhQOUTyyh9TnhNg1N57vZzqxRxn1XZLDh9N+2jviEl7Tgw/zg+afYd6FosQFbtjWmya0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OZJtCBiL; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6002a655cc1so42593587b3.1
+        for <kvm@vger.kernel.org>; Wed, 24 Jan 2024 09:28:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1706117316; x=1706722116; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ynH78JY911w9hOfeq2os2brIlYFhSAYv5WM0x8QaxUs=;
+        b=OZJtCBiLn6kfjpXOc+LveC8d+p4RPa7mAhpyDNV3TbCQOxgB/Q7DUlbPUlz3mCNbwJ
+         s/8ZFu9xlu/7pL3IyEm/OOCx+8qucSELi2Ccb2orTP8Nvvd17rxWNJ+RXpnAMvCoLeJ4
+         UKJr53kjZgNsf04YFtMvO/n6eTZiSmbQwMwQ6auF1ydLMCyVCmVgf4TBsx3OGolFkaBO
+         YMzuhOg81EjdOMad5doW+dIoTIbWduns605hPnZl943pAOME1Q8vzu9hT26+0ELuRwqk
+         FHgHTKSODCyhRkFASi4KJh0O8XmCDPVYIQ3iS1ujDyzSNSWhoEsuMT/YWV9yPvxvTAGc
+         r0tA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706117316; x=1706722116;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ynH78JY911w9hOfeq2os2brIlYFhSAYv5WM0x8QaxUs=;
+        b=FFvRHS5QDrVASqmOENtDIMtC4c1z/5fb9lYgbSUTc5ysoqUYUZ8aUtj+EaQgxleDC2
+         YrTMljOrNHpqpKwoYwZOeST462sq/y54rIyjPSeQ1gME9DxHv+B/Z7kAYffaKbBH1K2m
+         h/PjS2UmqhveLj0/S4aPJKpjiAYnJFBt2flelh0KJAdqb208FGgwCwA5W9uFtsI/uoib
+         yNG17yxYCh2mhlIeRUhmbKAfKK/viJacBvVGGkcoqm28r4jSA5BAMd9FwGjutDM8FxBI
+         i9psdXUsjGscUrQ7yYWT4vp+RviTMTXebNs8xQgulosV8Ye4rvLNwtdrdvPgAwpTLOh/
+         uRJA==
+X-Gm-Message-State: AOJu0Yx3t936BVVGpGZt5Cg+ifGj+kNFYiHIC4zMmsyTJq9EdWDYbJhD
+	jGn+KQGtREnRugrCUAXxMTliO8SZwsblfv1hTfv0nb+KDEipKLPIDYS712PxDIP9AidRuBgF4bc
+	Ylg==
+X-Google-Smtp-Source: AGHT+IG6AhaBMl0R3V0mmvcHm5xaarazZI2n6QvBq0gL/rH7W0bSjyhUFqLUOEoiJzneuXN8Ao3qxMEyVW0=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:98c2:0:b0:5e7:12cc:a60f with SMTP id
+ p185-20020a8198c2000000b005e712cca60fmr380883ywg.6.1706117316349; Wed, 24 Jan
+ 2024 09:28:36 -0800 (PST)
+Date: Wed, 24 Jan 2024 09:28:34 -0800
+In-Reply-To: <20240124164855.2564824-2-vkuznets@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20240124164855.2564824-1-vkuznets@redhat.com> <20240124164855.2564824-2-vkuznets@redhat.com>
+Message-ID: <ZbFIwjfgWiv9XrDO@google.com>
+Subject: Re: [PATCH 2/2] KVM: selftests: Fail tests when open() fails with !ENOENT
+From: Sean Christopherson <seanjc@google.com>
+To: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Commit 92792ac752aa ("virtio-pci: Introduce admin command sending function")
-added "__packed" structures to UAPI header linux/virtio_pci.h. This triggers
-build failures in the consumer userspace applications without proper "definition"
-of __packed (e.g., kvmtool build fails).
+On Wed, Jan 24, 2024, Vitaly Kuznetsov wrote:
+> open_path_or_exit() is used for '/dev/kvm', '/dev/sev', and
+> '/sys/module/%s/parameters/%s' and skipping test when the entry is missing
+> is completely reasonable. Other errors, however, may indicate a real issue
+> which is easy to miss. E.g. when 'hyperv_features' test was entering an
+> infinite loop the output was:
+> 
+> ./hyperv_features
+> Testing access to Hyper-V specific MSRs
+> 1..0 # SKIP - /dev/kvm not available (errno: 24)
+> 
+> and this can easily get overlooked.
+> 
+> Keep ENOENT case 'special' for skipping tests and fail when open() results
+> in any other errno.
+> 
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>  tools/testing/selftests/kvm/lib/kvm_util.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index e066d584c656..f3dfd0d38b7f 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -27,7 +27,8 @@ int open_path_or_exit(const char *path, int flags)
+>  	int fd;
+>  
+>  	fd = open(path, flags);
+> -	__TEST_REQUIRE(fd >= 0, "%s not available (errno: %d)", path, errno);
+> +	__TEST_REQUIRE(fd >= 0 || errno != ENOENT, "%s not present", path);
 
-Moreover, the structures are already packed well, and doesn't need explicit
-packing, similar to the rest of the structures in all virtio_* headers. Remove
-the __packed attribute.
+Rather than make up our own error messages, can we use strerror()?
 
-Fixes: commit 92792ac752aa ("virtio-pci: Introduce admin command sending function")
-Cc: Feng Liu <feliu@nvidia.com>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Yishai Hadas <yishaih@nvidia.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>
-Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
-Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
----
- include/uapi/linux/virtio_pci.h | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+> +	TEST_ASSERT(fd >= 0, "%s not available (errno: %d)", path, errno);
 
-diff --git a/include/uapi/linux/virtio_pci.h b/include/uapi/linux/virtio_pci.h
-index ef3810dee7ef..a8208492e822 100644
---- a/include/uapi/linux/virtio_pci.h
-+++ b/include/uapi/linux/virtio_pci.h
-@@ -240,7 +240,7 @@ struct virtio_pci_cfg_cap {
- #define VIRTIO_ADMIN_CMD_LEGACY_DEV_CFG_READ		0x5
- #define VIRTIO_ADMIN_CMD_LEGACY_NOTIFY_INFO		0x6
- 
--struct __packed virtio_admin_cmd_hdr {
-+struct virtio_admin_cmd_hdr {
- 	__le16 opcode;
- 	/*
- 	 * 1 - SR-IOV
-@@ -252,20 +252,20 @@ struct __packed virtio_admin_cmd_hdr {
- 	__le64 group_member_id;
- };
- 
--struct __packed virtio_admin_cmd_status {
-+struct virtio_admin_cmd_status {
- 	__le16 status;
- 	__le16 status_qualifier;
- 	/* Unused, reserved for future extensions. */
- 	__u8 reserved2[4];
- };
- 
--struct __packed virtio_admin_cmd_legacy_wr_data {
-+struct virtio_admin_cmd_legacy_wr_data {
- 	__u8 offset; /* Starting offset of the register(s) to write. */
- 	__u8 reserved[7];
- 	__u8 registers[];
- };
- 
--struct __packed virtio_admin_cmd_legacy_rd_data {
-+struct virtio_admin_cmd_legacy_rd_data {
- 	__u8 offset; /* Starting offset of the register(s) to read. */
- };
- 
-@@ -275,7 +275,7 @@ struct __packed virtio_admin_cmd_legacy_rd_data {
- 
- #define VIRTIO_ADMIN_CMD_MAX_NOTIFY_INFO 4
- 
--struct __packed virtio_admin_cmd_notify_info_data {
-+struct virtio_admin_cmd_notify_info_data {
- 	__u8 flags; /* 0 = end of list, 1 = owner device, 2 = member device */
- 	__u8 bar; /* BAR of the member or the owner device */
- 	__u8 padding[6];
--- 
-2.34.1
-
+And then here just say "Failed to open '%s'" and let test_assert() fill in the
+strerror() information.
 
