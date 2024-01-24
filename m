@@ -1,144 +1,105 @@
-Return-Path: <kvm+bounces-6847-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6848-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 302EF83AF0D
-	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 18:03:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6470983AF22
+	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 18:05:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5BD81F21360
-	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 17:03:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C7A928581D
+	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 17:05:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31D047E78F;
-	Wed, 24 Jan 2024 17:03:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C0F21E86A;
+	Wed, 24 Jan 2024 17:04:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J+Qpv4s+"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="lUzNe8Zi"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [217.72.192.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DD887E76D;
-	Wed, 24 Jan 2024 17:03:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF57B7E777;
+	Wed, 24 Jan 2024 17:04:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706115782; cv=none; b=kG41VGOvogts2SEAF5qb0wEM08ncXba4q1JA/etyZgAXRB1faM2NPM5Lp1j2GCMmNGV2GmiK5DX3DOhGuucjgyYYwIlw8LP7c+3rb3EJiuOqSKEIF9Ndo5GBXRLB/wLUszy29Vpc4lZFFxwJhpHMSQbKcbpmMmVg30EioWBbPAo=
+	t=1706115897; cv=none; b=gqV19nY2Ums5KZ7qY6fX+0rVd3dKpvYvtZDswwMuDAgYzWoSmLiTB4zKUF4maPng4UlKgbw9Gywr3b1JU5SRF7E5vseYvrDqq/16DQHck/yuTFQJAs5CgP0k+e4uAbodkj863ShZn9gJLGtnOedY+0FSatLDEDvLoPNbBr/yokg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706115782; c=relaxed/simple;
-	bh=R38dR4MQyuR1txvccH1LWaFn1VVJMCDJwuazqCZJ7Vg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ql4gOgncX7CxpzYkzPojt68WgtTQnRfXmf/lVUm9P+huM14FVOuaUi7NywhzHkQPyyuyLmf+goFHS+BFZpS3S3zH8IHYHQwtjsyuvVrfLes+SCt0dbb6U8pTOthoMbLbLM6Dz2PKubSxvaoivB9q0OdAIZgJM6kCf3DrA4ANYbg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J+Qpv4s+; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6dd7b525cd6so1588641b3a.2;
-        Wed, 24 Jan 2024 09:03:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706115780; x=1706720580; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6JwMgDweZYejySMnkRfBGOCwhQQ8zuB1aX2MpP5io2I=;
-        b=J+Qpv4s+2g3LjFHGknhPNKBgP9r5k9+lIvANLo2G0wCycs2g0dYmdBh5lEgq8jtXVF
-         uLfLk5CCEr5rfPiq+0PKw21kunhmgTsWaeXi/qv4GyRTwCZOTQyWEHDSlxbYdpjTJCHr
-         QkNKDO73Rn4mEstN/jyjlLUTgvc639zw87FfTjIqlydEt/XnpgFnRbZ+TgK1o+nTmTWw
-         UfDbXz2iZp1nGnrOoZpM1rC2wMpaPnHRy20AaIxLbs3OcAoWXxVQboU9H28rwhwq/J6/
-         zWMeaehETnsdobrr23P7pRi0LZAqc25NvwhqpbJFCejNFjOo2NFEuH8Z5qWJUpIhxeug
-         VmWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706115780; x=1706720580;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6JwMgDweZYejySMnkRfBGOCwhQQ8zuB1aX2MpP5io2I=;
-        b=GwtUWlx43AXTSu0Fj5f4byLP8gyv54QkOMfkFQHcuRCxqAwGbs1LSQz0O0szoeVfjs
-         WUL/C3vbAshP6GeGBBBAK86f0Zzyc/ErxOyKNSJtNTeV6R9XrE9jita2FamwoHQPo860
-         MU5f5WJSgLmumzcCuvvJ1ypNlznx4ovuRTZ/Cq1kORXuvLlSEr6PTdHCp+FRlV7h7SnR
-         OFwfhB/HMwppdTkQBZl9AyxYrjzaR/WsYm7LaA+3xweuZxMh9ajp4idblJq2/Nq7Oadn
-         aNy4/3kRM2KRBRii4A2Nlgvv3vUWbUEaiutz42upXMCbF2pbk6VyvTgLt7JafJr0I+Go
-         jQpw==
-X-Gm-Message-State: AOJu0YxCRVE1YNlY4xT+do7BnUcZzF6dmP25VV9ks+lZ22s6MgX0A0z0
-	3rJS+6zGJA0XbxU9VTrJLekLcgpKZm6cwdo5zQ9XKwIKqbTHeAK6
-X-Google-Smtp-Source: AGHT+IGKROj+Zo82c0TZfWf/0QNfpFmDncoPMVAhwkvFyahTHEXxoFPkaf5QQqYYh38qW2tS+Jecfg==
-X-Received: by 2002:a62:6544:0:b0:6d9:8f4f:5526 with SMTP id z65-20020a626544000000b006d98f4f5526mr4306348pfb.36.1706115780307;
-        Wed, 24 Jan 2024 09:03:00 -0800 (PST)
-Received: from localhost.localdomain ([117.177.61.99])
-        by smtp.gmail.com with ESMTPSA id fd30-20020a056a002e9e00b006d9c0dd1b26sm14408014pfb.15.2024.01.24.09.02.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jan 2024 09:02:59 -0800 (PST)
-From: moehanabi <moehanabichan@gmail.com>
-X-Google-Original-From: moehanabi <moehanabichan@outlook.com>
-To: seanjc@google.com
-Cc: bp@alien8.de,
-	dave.hansen@linux.intel.com,
-	hpa@zytor.com,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	mingo@redhat.com,
-	moehanabichan@gmail.com,
-	pbonzini@redhat.com,
-	tglx@linutronix.de,
-	x86@kernel.org
-Subject: Re: Re: [PATCH] KVM: x86: Check irqchip mode before create PIT
-Date: Thu, 25 Jan 2024 01:02:43 +0800
-Message-Id: <20240124170243.93-1-moehanabichan@outlook.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <ZbE7kd9W8csPRjvU@google.com>
-References: <ZbE7kd9W8csPRjvU@google.com>
+	s=arc-20240116; t=1706115897; c=relaxed/simple;
+	bh=eZik0NQgHnxRTjoOGVz1jiYozSbIVj3TpK7roxu/iQA=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=a6XIrilOIWNpl23bt/VGhkiNDcv/5ZbkJAa6Hxoo6WawTfdVjyL+nKo+c8qCU0pu3cHZhhdFSMIMLldK9Kf0l2a26m/KCzyVE2ATg+DbK1KUqddR9OMpn+Bt/amHhN0IOb78vG2KwjhpqY4Jatpd4SsEgwX+9snzhdNr03YJ9OA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=lUzNe8Zi; arc=none smtp.client-ip=217.72.192.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
+	t=1706115865; x=1706720665; i=markus.elfring@web.de;
+	bh=eZik0NQgHnxRTjoOGVz1jiYozSbIVj3TpK7roxu/iQA=;
+	h=X-UI-Sender-Class:Date:To:Cc:References:Subject:From:
+	 In-Reply-To;
+	b=lUzNe8ZiAq2MtvUEprmZ7EUvfWha/ciK83fW1jtjO1KG97cq8HD7DEUVcrJ6UMY5
+	 Qs4Hwls5hj8t2jZzEw5N0WFMfg/6nUVICxOecQB7277thIoQ9UVHKnvD7SzBynOI7
+	 pCp/xfGzh9HsvjxlEvR212xtgwuwNHWwthS5fYHP+Fll0DobrSso+oc3S9k2bvc0z
+	 hGROvaEH6gI52kZci6kko+X8kJPZrqsQMAYtGN1xyAToYeyeKiZyN6R89dlfGaLDq
+	 3qa/7zQ2CO5cAmpZ/qaicC7/SGIlZTrW4cNlIvsPqhLj3flC+cUuvalspifrIBYwh
+	 VdnF1Qjam4AZ3d7NLw==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.81.95]) by smtp.web.de (mrweb105
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1MrwwJ-1qhJAi0Kl3-00nxrY; Wed, 24
+ Jan 2024 18:04:25 +0100
+Message-ID: <791da036-5c0d-4c96-b252-24726bc7f2f7@web.de>
+Date: Wed, 24 Jan 2024 18:04:20 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+To: Kunwu Chan <chentao@kylinos.cn>, kvm@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, kernel-janitors@vger.kernel.org,
+ "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+ Nicholas Piggin <npiggin@gmail.com>, Michael Ellerman <mpe@ellerman.id.au>
+Cc: LKML <linux-kernel@vger.kernel.org>
+References: <20240124093647.479176-1-chentao@kylinos.cn>
+Subject: Re: [PATCH] KVM: PPC: code cleanup for kvmppc_book3s_irqprio_deliver
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20240124093647.479176-1-chentao@kylinos.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:G0go2dhXVu0Sv5YnVpAY+1uRg0zK0HLp5MnOCn5FVZtO4VRVTPf
+ k9q/daeBYgsA02NjvmzAn4KOMTlyCurrP5801Mdn4mKysomJU90WRw7ePlw6upIqpTkv7NZ
+ hx/J7+hpeY2aNw8FtxcAp9ZkhAB5CRqbr5+4a8zmkttepfuC0gyOPkIB8mqwSrMnlOyi3gS
+ ZF2+m+O5P1khKJKI0Qlvg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:1oU2Xjxbha8=;At8CAKPHdhpSpJ4OpBdIp3LKFLr
+ vOfrhGBmQDuZg4cInC8Ro6jNNr4L6V730p0jo2gsRI1198t3VOaCBw7A3/PHuI7c+R7fOGhbU
+ 1ar5VdgTdbK8i7XYXxAl5+Xh40qMGejjJFlbLMIWWSvV8q9MdQDbaIl/1OCrAyYF3WZ7raAmT
+ HTLSwwQ5HCG5oHdbcJmJxUxPvyjiGvprh0qpsu8pGzXUHpZunBZyo1oIDpJGpIXMC7h91snfu
+ FIHXwHnrsNcILE8MV2e7drcq6hemITAFrMuHn4mBMTsbnwCH3p1wEIMBw6C9c4cIjE1xlrsNQ
+ vU8l9J/G0G+p21hquVCSI17cKB3HJESWAA/2BGWVEhkgPCnQp+l83rvWBX3n2ZVBQzSehIEvR
+ IOaaNPIGX4dfLTcbsdMHkcFI6CilYiKUwO0HJVutXHKrIT3ZShB6iu6FFQHdgPWGh2cLNnJP5
+ nTW4+At2h4n/dUdG7iOTVeJbH7F5P4ZOAdYPbQBJkUfYvgJJuIJXKm5TBvbWN9ESXjaoBHM33
+ LXNCxZ54wO+26YV7ju5g4pADhA43EgL+irNEdeg7KUiGmkzG2VDuA0/VkLt1FTdkL/shD0NdW
+ CqxzWj4siqs/N07Xet8xHSUpcafqGAwRn7K5irlsLYtTd24BFquP1+lyIhHyHo4tPqHPKV4Bo
+ /BTlN4lG7oCQDET9qdcgCOieffkWSqHCu/+gBGX5zcIrIcf4WsJfI2J84Mc/Es+vT0MZEm3Qp
+ PebXQtt2Oh4GuwXRoZJGw9RAm80CyY2PqcXhbUbGJp7GXGgQNonDF+e3Y5UDVpOweJsskRiN7
+ jv7vTAOcKlT9HtMFpQCcxJskmy/kBO2CQj7OwmFflVIJ4COI6nv+Z3QEGWPdt01Y8pJwXtP+k
+ yxnEgDix+ycFKqxEgW00L7TXQIB7tjZVDCTJ4gHNNvIL5TdCkA+TwPr3HNtML7UR+e0QbTGSe
+ 2TJaAQhtU+C2QwwlhvUcOjK4qOU=
 
-> On Thu, Jan 25, 2024, Brilliant Hanabi wrote:
-> > As the kvm api(https://docs.kernel.org/virt/kvm/api.html) reads,
-> > KVM_CREATE_PIT2 call is only valid after enabling in-kernel irqchip
-> > support via KVM_CREATE_IRQCHIP.
-> > 
-> > Without this check, I can create PIT first and enable irqchip-split
-> > then, which may cause the PIT invalid because of lacking of in-kernel
-> > PIC to inject the interrupt.
-> 
-> Does this cause actual problems beyond the PIT not working for the guest?  E.g.
-> does it put the host kernel at risk?  If the only problem is that the PIT doesn't
-> work as expected, I'm tempted to tweak the docs to say that KVM's PIT emulation
-> won't work without an in-kernel I/O APIC.  Rejecting the ioctl could theoertically
-> break misconfigured setups that happen to work, e.g. because the guest never uses
-> the PIT.
+> If there are no plans to enable this part code in the future,
 
-I don't think it will put the host kernel at risk. But that's exactly what
-kvmtool does: it creates in-kernel PIT first and set KVM_CREATE_IRQCHIP then.
-I found this problem because I was working on implementing a userspace PIC
-and PIT in kvmtool. As I planned, I'm going to commit a related patch to 
-kvmtool if this patch will be applied.
+Will the word combination =E2=80=9Ccode part=E2=80=9D become preferred for
+a subsequent change description?
 
-> > Signed-off-by: Brilliant Hanabi <moehanabichan@gmail.com>
-> > ---
-> >  arch/x86/kvm/x86.c | 2 ++
-> >  1 file changed, 2 insertions(+)
-> > 
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 27e23714e960..3edc8478310f 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -7016,6 +7016,8 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
-> >  		r = -EEXIST;
-> >  		if (kvm->arch.vpit)
-> >  			goto create_pit_unlock;
-> > +		if (!pic_in_kernel(kvm))
-> > +			goto create_pit_unlock;
-> 
-> -EEXIST is not an appropriate errno.
 
-Which errno do you think is better?
+> we can remove this dead code.
 
-> >  		r = -ENOMEM;
-> >  		kvm->arch.vpit = kvm_create_pit(kvm, u.pit_config.flags);
-> >  		if (kvm->arch.vpit)
-> > -- 
-> > 2.39.3
-> > 
+And omit another blank line accordingly?
+
+Regards,
+Markus
 
