@@ -1,169 +1,162 @@
-Return-Path: <kvm+bounces-6854-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6855-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FD8E83B0C9
-	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 19:14:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C298683B102
+	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 19:22:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 850E4B36E90
-	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 18:02:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7958F2865B8
+	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 18:22:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2695A129A98;
-	Wed, 24 Jan 2024 18:02:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23D3912AAE9;
+	Wed, 24 Jan 2024 18:22:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="wnytdPGk"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Y21U/Jzy"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2062.outbound.protection.outlook.com [40.107.94.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDC357A73E;
-	Wed, 24 Jan 2024 18:02:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.62
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706119335; cv=fail; b=WOt7LcwPjmmB2fr8u46MXGG4FDrzff1IR2STNZNG0WuUVPE5QnjmUX1+oY5kKp9tfPzUSPGMuOYVfRlFL3vJg1frYXwCrKUOXG8bb0IhZoE8BWnorR6cCOESHWwqNLHpRWSv2OpQwsMIHrIIzw+RbfAv4hBzKq7E5z5OGChqZE0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706119335; c=relaxed/simple;
-	bh=Jb0m4Eovt0lCtDOnJUmbTVQ95GM1fhfaI4A/7B0DcnM=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DoptPy9Uk5U/7b9CS3fMOgDhw+q9h4HJNW//EXE7OrS2t9W9IrldyQdJ5tGELNLIBy3cuLWNr4dYsGdOFtBd705fy871JKuGm47DaVrXWHip02g1DkSXRqQc3Y4cv+mkJ3dJf8t8D/ZJrjSjndKyViChGHS1Nhiz1o+e9qfZIA8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=wnytdPGk; arc=fail smtp.client-ip=40.107.94.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aWcGLzHpmMVDYtRCHd1N5ctX+dYaa2SrnC9PsSQd9btK7M0CPbmYOdxgGwoGeV0w9VXI0LuTz8kw6R17o//gCWnAQsqyfDe/DSy/CSb8pmYphl+Ne4zzVkas1VmEL6cd08/fI3yexfHRAcF5BNISm1QyKXpv0YT0Uj3sLIrvYaYYS9hq/6L9G/LKOf1ogclrQeiqOCisRHc+WbtAuu0sHzrTIPPAjQB49yqk5G1+7E1y3NVlHHkcLkslicHit45wjwHpli41uRRLq5t66cz+uVPFVd0atelIeNFa4CS4kuUX2BbgYUDD8kgc7SCgiTIomThoLoFuE6ls9SVRYuR9+w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=e5olHOcLBAPEOg21Cz46OrlKpmKwzO/UrMKkeTSSSQ8=;
- b=SKEFvTWuSvLmJnqnrHEfWVudjhk+cmX0isL10wMJdVLXHPByZFPZBDrylZRpQQcC2jfLXWEjNu0zLhtH7KQD11fGY6haFMxPJNe7b5ND13qaYG+RvNSBTiCmMWqIrrbdW7AEzPUfsMiSZNv2GVH/FaYpsX/DLqHee298znmDWXyq2UvAJUMcq/Rrf+kJ7D8DQSMdzFPnNYqBPzb80/wDzyq1mewKlO/922EmzGRzumdEWIy+olMZuRlaqwtgTkeNzJK/4HUNIL7juFHFBjE9TIDAB88NsWPy9BmpHgiLyUBPng/HkjKPUfVcbihKvWhv1KNpz5ASbOFzmCZWLkvB/Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=e5olHOcLBAPEOg21Cz46OrlKpmKwzO/UrMKkeTSSSQ8=;
- b=wnytdPGkMC1UD3j3MrtQKmRGKv9t5eoI6gx9ndap6KQ4Q1TAASCUPf8fL892DF0+Kbzf9n4gNeXmezEQ2O0br2bLw1tW/xO1WY23RWchfS5R+mcoH9qFm5TqDZ9XyjEgLKaySVofmzrLneWs5/vx8LaeSRVjujyoBI6JakNs5TE=
-Received: from SA1PR04CA0007.namprd04.prod.outlook.com (2603:10b6:806:2ce::12)
- by DS0PR12MB8270.namprd12.prod.outlook.com (2603:10b6:8:fe::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.24; Wed, 24 Jan
- 2024 18:02:11 +0000
-Received: from SN1PEPF00026369.namprd02.prod.outlook.com
- (2603:10b6:806:2ce:cafe::d) by SA1PR04CA0007.outlook.office365.com
- (2603:10b6:806:2ce::12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.22 via Frontend
- Transport; Wed, 24 Jan 2024 18:02:11 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SN1PEPF00026369.mail.protection.outlook.com (10.167.241.134) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7202.16 via Frontend Transport; Wed, 24 Jan 2024 18:02:11 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Wed, 24 Jan
- 2024 12:02:10 -0600
-Date: Wed, 24 Jan 2024 12:01:50 -0600
-From: Michael Roth <michael.roth@amd.com>
-To: Sean Christopherson <seanjc@google.com>
-CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Jason Gunthorpe
-	<jgg@nvidia.com>, Yan Zhao <yan.y.zhao@intel.com>, David Matlack
-	<dmatlack@google.com>, <pbonzini@redhat.com>, <isaku.yamahata@intel.com>
-Subject: Re: [ANNOUNCE] PUCK Agenda - 2024.01.17 - TDP MMU for IOMMU
-Message-ID: <20240124180150.blms3z7fqseioult@amd.com>
-References: <20240117010644.1534332-1-seanjc@google.com>
- <20240122193605.7riyd7q5rs2i4xez@amd.com>
- <ZbFJOyGb21UX6qXn@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2387B1272DD
+	for <kvm@vger.kernel.org>; Wed, 24 Jan 2024 18:22:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706120541; cv=none; b=jaBmRzAJcdlDFr4iuc8Y6ybdJ4oH6HUe9pMmGfzLCurRQRfdxyN0/3T/TNmL1isVI+FVRwIOeHkbx8vNOdNiAmZFlAHJzYgIRyyY6G1StcsX/yM92ltADQ1xiReznMX2wIjqyl7nMCn5RWqJE4Fz6jZuLDHvOAckTxOoMM7Pjfw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706120541; c=relaxed/simple;
+	bh=wbZWmGrWH8JcJ771piCTg/bWVpmwahSuzv7Z+Mj+J1k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lKYryB4TCad6/UnVlRdWCuzy+Dyv4oaeHLtu4+uTvcq5EH3f2LbzhTNwZzIUL49HnUWOkHyyi9ZgQh0b0olps4RfhTx2WGnSOQO8W4KAivDJeDE6wvw6folpkQm5kGBONsx3oJBr9o1/k8V53PrQ03az4VKQig8P+oBWuVlq6cM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Y21U/Jzy; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-338aca547d9so4613142f8f.0
+        for <kvm@vger.kernel.org>; Wed, 24 Jan 2024 10:22:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1706120537; x=1706725337; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=pnIYdN+laIAJSsus1mByKQQs+4v4u+0ydG/KXxGrtlA=;
+        b=Y21U/JzyBLQRL1nCHZW5/jA/X2nh1EqyrqXEd9iivneEjsIQ+76eO7Yj1Qnh8WN1SJ
+         /EGXnCDwg41+om+vv9X/aSQDEjkp8Xzv+n7tgvWqAsH4pWr0JkD4X/Z6WiH1v+5rMNog
+         B8yb9RERpZzRNdFHuI3pHLZfMH3Vtc/RYIobxZ3Rzc+Nd5TkTlq34C2YurtyRYY7m/cD
+         SReIz0ynLQMdSbjsUcfGuKg30+TGzbSlTYNZl4Knsq09O4gIv3ruY15jMwsu1yyqHHMk
+         /ZyO+A6fIT4Ar2rcN8V3POsSoYbRaSDQjRDiSkqGPINkwdAhSO5EmslCkkwgK9tO/MDy
+         EGkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706120537; x=1706725337;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pnIYdN+laIAJSsus1mByKQQs+4v4u+0ydG/KXxGrtlA=;
+        b=O2pUyiPVq+hldjdCx5bW3AokOmlVkB8+tZnNrl3ZrnOscGHHpklzeCwwDIFZA4BKet
+         ml3yiByjcD7Z7Slk1ZVAh8wU950Im7sNbMS+j4k4i7UMIllLlYTvOV+oYVSGN9wRj+Ut
+         EFSR+Qphj0hPIDa3hbl/WUgNBfHHiQWmN2bliyaCv8oJ+bacY1VrZrPUPHJs99OQRTUq
+         AOhz6+9ylKNTlfn/S+ZWXugJ6fVXVbmk1SZSzZDnMIOwOFAj66l+Os3pYWIJr5wvXdsZ
+         8Es9SJSt2q5YiccMUHPZSg6vVaHluw7xcPph4sWsEN+6Q8U5+atTU8q8WaQ4/xPpn66L
+         h9yA==
+X-Gm-Message-State: AOJu0YzXNNw/zB9SoKMt7udq7cW+ePQpGMW0CM50e3l5UfDIHP6UEm0z
+	CvUuJtQMyP3YDs2EtSH2E690T+2GdWiY3EmqBoAkCmLSmjopU3k8OkeIeOAT4+c=
+X-Google-Smtp-Source: AGHT+IHRmPShxmMLc/LTRITs/dmQsYbYRl3PA6qkdxRGGoc4nhXoojgy4gjjuy51N7s47SgWWFbo9g==
+X-Received: by 2002:adf:f5c6:0:b0:337:cd6a:2952 with SMTP id k6-20020adff5c6000000b00337cd6a2952mr388281wrp.245.1706120537342;
+        Wed, 24 Jan 2024 10:22:17 -0800 (PST)
+Received: from myrica ([2.221.137.100])
+        by smtp.gmail.com with ESMTPSA id w14-20020a5d404e000000b00337d9a717bcsm14779739wrp.52.2024.01.24.10.22.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Jan 2024 10:22:16 -0800 (PST)
+Date: Wed, 24 Jan 2024 18:22:23 +0000
+From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	Feng Liu <feliu@nvidia.com>, "Michael S . Tsirkin" <mst@redhat.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [PATCH] virtio: uapi: Drop __packed attribute in
+ linux/virtio_pci.h:
+Message-ID: <20240124182223.GA3941090@myrica>
+References: <20240124172345.853129-1-suzuki.poulose@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZbFJOyGb21UX6qXn@google.com>
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF00026369:EE_|DS0PR12MB8270:EE_
-X-MS-Office365-Filtering-Correlation-Id: d3ae71ae-a188-41c9-bf2f-08dc1d0696b7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	d20HQg9LAUpVwUfrty8RU0DMXR+C1pLbN05QqJ+1flCAl9dy/0pWxy5B5mHNewwa4p9XA6cFMLmrsxNeVomCtz8MlOEqBVOkmGVy/7Vx4MPUohokv0KULdNYnI/wxB3CWIQkbKczwFRN5hroPWol5aDj+FTpIADh3+Z/dnxpB+h9lgLTl2w8adyjW3zdr0uSpoQ9ASx3RyQA3VOcvJNLxzh5mg61EElTrAZyvCiijiCfkPqcxn5iBj2JEXlcykfHlnBfg2IQIra1kOB6bh9jsqLS8dPE/dZaK0SMykoVpn5pl2wqB5YweLZLfthYNNjQJbvkM5R1jz0S3c7Sm2dspoYJlCrv1fRPNk+y4MZkJMZ347jYN8K+8aUJMlyHaxwmA5qbhOBP6p+mRHZKBbDP6ZXLJHrTG907DZ57f67vSo6ULb4SisINj2d4id2rRGh/w26yp65hM4pyJGKk8e04QvC7jgNlW1M6kY8YeOpS0q3FFpqEMslz7AaxwgGTVjHbuCKNF4wcsBhIu6h/6x12cEqJT8ijw668lKkvYdkKc20ZOUho2HXXFwRPy3jb2MKak97Fha56X+bR3yg58W1DSr8J29BwGyviBmSrtt2A4ladPMHZN/PrSCHsrAe3t3Tb4mXnkzEzRTXVBk40iNf/4Ll9rD1OOQAqBEn+9uylBDBNUJ28okul+T1IUzH5Bk6JM7cHOOmKSaQPxzI8RufnjGDAJPBM9mXrz9JxAHp6c9sBSvTvMWvelpQq+qVaqnFC0IwkOckMx1TBT7KD64dfYU0duvun+22C6/PG0qpbleSDJZ1xlCpVJ74aLT6d4YVuxxTHHoA+z7JEi8wadVYzTw==
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(346002)(396003)(376002)(136003)(39860400002)(230922051799003)(82310400011)(186009)(64100799003)(1800799012)(451199024)(36840700001)(46966006)(40470700004)(86362001)(316002)(36860700001)(70586007)(54906003)(966005)(70206006)(6916009)(478600001)(82740400003)(81166007)(356005)(2616005)(6666004)(16526019)(1076003)(26005)(4326008)(8676002)(44832011)(83380400001)(426003)(336012)(8936002)(66574015)(40460700003)(40480700001)(36756003)(5660300002)(2906002)(47076005)(41300700001)(5930299018)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jan 2024 18:02:11.4620
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d3ae71ae-a188-41c9-bf2f-08dc1d0696b7
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF00026369.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8270
+In-Reply-To: <20240124172345.853129-1-suzuki.poulose@arm.com>
 
-On Wed, Jan 24, 2024 at 09:30:35AM -0800, Sean Christopherson wrote:
-> On Mon, Jan 22, 2024, Michael Roth wrote:
-> > On Tue, Jan 16, 2024 at 05:06:44PM -0800, Sean Christopherson wrote:
-> > > Tomorrow's PUCK topic is utilizing KVM's TDP MMU for IOMMU page tables.
-> > > 
-> > > FYI, I am currently without my normal internet (hooray tethering), and we're
-> > > supposed to get a healthy dose of freezing rain tonight, i.e. I might lose power
-> > > too.  I expect to be able to join even if that happens, but I apologize in
-> > > advance if I end up being a no-show.
-> > > 
-> > > https://lore.kernel.org/all/20231202091211.13376-1-yan.y.zhao@intel.com
-> > > 
-> > > Time:     6am PDT
-> > > Video:    https://meet.google.com/vdb-aeqo-knk
-> > > Phone:    https://tel.meet/vdb-aeqo-knk?pin=3003112178656
-> > > 
-> > > Calendar: https://calendar.google.com/calendar/u/0?cid=Y182MWE1YjFmNjQ0NzM5YmY1YmVkN2U1ZWE1ZmMzNjY5Y2UzMmEyNTQ0YzVkYjFjN2M4OTE3MDJjYTUwOTBjN2Q1QGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20
-> > > Drive:    https://drive.google.com/drive/folders/1aTqCrvTsQI9T4qLhhLs_l986SngGlhPH?resourcekey=0-FDy0ykM3RerZedI8R-zj4A&usp=drive_link
-> > > 
-> > > Future Schedule:
-> > > January 24th - Memtypes for non-coherent DMA
-> > > January 31st - Available!
-> > 
-> > Hi Sean,
-> > 
-> > I'd like to propose the following topic for the next available slot:
-> > 
-> >   "Finalizing internal guest_memfd APIs needed for SNP (TDX?) upstreaming"
-> > 
-> > There's 2 existing interfaces, gmem_prepare, gmem_invalidate, that are
-> > needed by the current SNP patches, and there's some additional background
-> > about the design decisions here:
-> > 
-> >   https://lore.kernel.org/kvm/20231016115028.996656-1-michael.roth@amd.com/
-> > 
-> > There's also another gmem interface that you recently proposed for handling
-> > setting up the initial launch image of SNP guests here that seems like it
-> > would have a lot of potential overlap with how gmem_prepare is implemented:
-> > 
-> >   https://lore.kernel.org/lkml/ZZ67oJwzAsSvui5U@google.com/
-> > 
-> > I'd like to try to get some clarity on what these should look like in order
-> > to be considered acceptable for upstreaming of SNP, and potentially any
-> > considerations that need to be taken into account for other users like
-> > TDX/pKVM/etc.
+On Wed, Jan 24, 2024 at 05:23:45PM +0000, Suzuki K Poulose wrote:
+> Commit 92792ac752aa ("virtio-pci: Introduce admin command sending function")
+> added "__packed" structures to UAPI header linux/virtio_pci.h. This triggers
+> build failures in the consumer userspace applications without proper "definition"
+> of __packed (e.g., kvmtool build fails).
 > 
-> I penciled this in for the 31st, let me know if that works for you.
+> Moreover, the structures are already packed well, and doesn't need explicit
+> packing, similar to the rest of the structures in all virtio_* headers. Remove
+> the __packed attribute.
+> 
+> Fixes: commit 92792ac752aa ("virtio-pci: Introduce admin command sending function")
+> Cc: Feng Liu <feliu@nvidia.com>
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Cc: Yishai Hadas <yishaih@nvidia.com>
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-That would be perfect. Thanks!
+Reviewed-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 
--Mike
+> ---
+>  include/uapi/linux/virtio_pci.h | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/include/uapi/linux/virtio_pci.h b/include/uapi/linux/virtio_pci.h
+> index ef3810dee7ef..a8208492e822 100644
+> --- a/include/uapi/linux/virtio_pci.h
+> +++ b/include/uapi/linux/virtio_pci.h
+> @@ -240,7 +240,7 @@ struct virtio_pci_cfg_cap {
+>  #define VIRTIO_ADMIN_CMD_LEGACY_DEV_CFG_READ		0x5
+>  #define VIRTIO_ADMIN_CMD_LEGACY_NOTIFY_INFO		0x6
+>  
+> -struct __packed virtio_admin_cmd_hdr {
+> +struct virtio_admin_cmd_hdr {
+>  	__le16 opcode;
+>  	/*
+>  	 * 1 - SR-IOV
+> @@ -252,20 +252,20 @@ struct __packed virtio_admin_cmd_hdr {
+>  	__le64 group_member_id;
+>  };
+>  
+> -struct __packed virtio_admin_cmd_status {
+> +struct virtio_admin_cmd_status {
+>  	__le16 status;
+>  	__le16 status_qualifier;
+>  	/* Unused, reserved for future extensions. */
+>  	__u8 reserved2[4];
+>  };
+>  
+> -struct __packed virtio_admin_cmd_legacy_wr_data {
+> +struct virtio_admin_cmd_legacy_wr_data {
+>  	__u8 offset; /* Starting offset of the register(s) to write. */
+>  	__u8 reserved[7];
+>  	__u8 registers[];
+>  };
+>  
+> -struct __packed virtio_admin_cmd_legacy_rd_data {
+> +struct virtio_admin_cmd_legacy_rd_data {
+>  	__u8 offset; /* Starting offset of the register(s) to read. */
+>  };
+>  
+> @@ -275,7 +275,7 @@ struct __packed virtio_admin_cmd_legacy_rd_data {
+>  
+>  #define VIRTIO_ADMIN_CMD_MAX_NOTIFY_INFO 4
+>  
+> -struct __packed virtio_admin_cmd_notify_info_data {
+> +struct virtio_admin_cmd_notify_info_data {
+>  	__u8 flags; /* 0 = end of list, 1 = owner device, 2 = member device */
+>  	__u8 bar; /* BAR of the member or the owner device */
+>  	__u8 padding[6];
+> -- 
+> 2.34.1
+> 
 
