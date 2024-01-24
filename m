@@ -1,185 +1,168 @@
-Return-Path: <kvm+bounces-6776-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6777-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B2D1839F8C
-	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 03:52:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03824839FF2
+	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 04:08:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B89B1C22BFA
-	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 02:52:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 96FE81F2C964
+	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 03:08:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B3684F203;
-	Wed, 24 Jan 2024 02:42:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42780539E;
+	Wed, 24 Jan 2024 03:08:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CSXHSVNq"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="n5yGbGCt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A60842C69B;
-	Wed, 24 Jan 2024 02:42:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.55.52.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBFCF5392
+	for <kvm@vger.kernel.org>; Wed, 24 Jan 2024 03:08:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706064173; cv=none; b=APp/7gek0pGzFMcOUhZ5P67vqSzYDPYcb59y9BMBljM2AQclc0fz+wtq0aRmPSi9U/o/YEjumTxxmsZfkyhsh1vx9YMEQF7uPPXsDM8lQnuJ5BQ6SKTDPZd65Acet+fY37iwtzy49ip6eSOp0PUhAMaRH0Kw4c6cuCY1Q8ejC+g=
+	t=1706065725; cv=none; b=EOF2/gQtnp+EOAW0xcFM2j2cvM1AqK1yG8hINrri6JEhFW4NCzPRYjFsETKd7fK4e7Ba0mu9IXCubizzq+RbrBe8zyBv/ihM3OxzRPoISWAl2vmp4ZcGqR5BiYA7otvkOmIdWNrBJlxUlfz5BvFqrIBcJ58wGdehQz4dWjkWrBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706064173; c=relaxed/simple;
-	bh=UwRtvVNhqC9a4CUwgibiSghyasJhQAcBvz9o6nhR8wU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=naZyBYLth+/LAvOk3HS71kHwHwT6eRbJua3cV7pLdpFx9wAlflt+PWt7Tkg+e2Lvz8mfgCQRIxv6xTKDhyKmDAYrNo9AdbYwY8LgZYbFU/S2wBbrvEekORl2YxRrl2anL+I5dYyI9BH/fJ8wC8n/K1UosPZ9K5z+CwRxSJe5EZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CSXHSVNq; arc=none smtp.client-ip=192.55.52.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706064171; x=1737600171;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=UwRtvVNhqC9a4CUwgibiSghyasJhQAcBvz9o6nhR8wU=;
-  b=CSXHSVNq7Y5/fnoT+ZxQSv2cOsDsoqnXwePOoYu9WpBy7fi57rkZ34oE
-   0V6bN/J3Q8TlJVo1AHK7YWfkLN1Noyz3tetksL6TuqSJVEIUozZO8ZR2c
-   o90teJ8/jf0VGzJc6SwVSi+vlHE6voEUDIPZ8B0FR8N4Fm3C2KK5CVO+N
-   +3P0HNHzPHt6dxchYz0vsCx9pwUAoq5T8CI50Ejb9Q5JwK446HiRXjkEN
-   9+nI/Oz6DeYn/mnN87n7fKD6QDXeaE7RohILVm9KPvLVdv5XE8gaGgKQX
-   xxaOBBK0QuSzDXVRhto/a8Udz6O/j9wpIQI7jiYkgF4R2gUxKY2V+yo7a
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="400586599"
-X-IronPort-AV: E=Sophos;i="6.05,215,1701158400"; 
-   d="scan'208";a="400586599"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2024 18:42:45 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,215,1701158400"; 
-   d="scan'208";a="1825939"
-Received: from 984fee00a5ca.jf.intel.com ([10.165.9.183])
-  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2024 18:42:45 -0800
-From: Yang Weijiang <weijiang.yang@intel.com>
-To: seanjc@google.com,
-	pbonzini@redhat.com,
-	dave.hansen@intel.com,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	x86@kernel.org,
-	yuan.yao@linux.intel.com
-Cc: peterz@infradead.org,
-	chao.gao@intel.com,
-	rick.p.edgecombe@intel.com,
-	mlevitsk@redhat.com,
-	john.allen@amd.com,
-	weijiang.yang@intel.com
-Subject: [PATCH v9 27/27] KVM: x86: Stop emulating for CET protected branch instructions
-Date: Tue, 23 Jan 2024 18:42:00 -0800
-Message-Id: <20240124024200.102792-28-weijiang.yang@intel.com>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20240124024200.102792-1-weijiang.yang@intel.com>
-References: <20240124024200.102792-1-weijiang.yang@intel.com>
+	s=arc-20240116; t=1706065725; c=relaxed/simple;
+	bh=SKTN3Bke7HunQNGVCzoxHL9wIhe07jUBks3xSkRRgp0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=biemtl7t+CKyisbtOuSppXEVDNJfh2e4mhyEl1PC+i52gP2rGkyIJZgd+SZ3eb+V0PeFK3eO5H0nbHGx1q/2sdecGLyZhrQA7V7or+JBJ60rjqW1OIKlmxNkP8b+7H6N5mP2gC3B2n/DeBR7UnYuJDAmQzF63H5MUmawG+sPeGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=none smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=n5yGbGCt; arc=none smtp.client-ip=209.85.215.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-5ce6b5e3c4eso2624767a12.2
+        for <kvm@vger.kernel.org>; Tue, 23 Jan 2024 19:08:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1706065723; x=1706670523; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VFo8VE/oCNQcg7y+0hi3tk0ijg8Jc1j7rMhdDApnhJI=;
+        b=n5yGbGCto4yYtnkCBJxQMUPDbOXKgB33jhPCiuc2a/+UIcy3O0rCLcPnf9TlF9evgl
+         T2rAvjDabtMUrj3nKTplgtlLFWGglY0sQx1+5oPidgxWTSoCG2di5hQOb0H06Zt/2Zj+
+         hnhxvsAm+lPOGcVdzYu9xGhbC1P5IjBSSGQ/aUx4WDDRgFd+dQsHXjHNJgtKsUeIRhcX
+         eokwffIFScgVS0uN7i4YfZxx704xQ9PjvO6cga5Q4VeSJxrzi/4+GctYdkBiwoGuy3O2
+         G/7nV8fvU/2Ea/aXVlIVRSjLqHKy/GYNqiS4iriAUInFafTxQQtbMuNtfHEDl+/GS4XI
+         vQWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706065723; x=1706670523;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VFo8VE/oCNQcg7y+0hi3tk0ijg8Jc1j7rMhdDApnhJI=;
+        b=YduoyTtibo06DOgazWKiWmINmox+mF5FoneBI+IBJK0cHxrWsIr0Ay9BfVKNd4f7Eo
+         rdMuJJIJ3u1I6+70Q+8RnnWzqYe9sX7gwmJe44qBP/Mqhl61QfQ9CYsVUrA980/E3axN
+         tukHvQGBC7BldlcfFUg6wSYmns0iZD/h4xu4cuVjjPp3LYNCj4lTWxXWsEb1rOH622VA
+         o8GEI8OV5SkGvxwv8ZYL0tooCGSuOGhaMR4vkF/lchgoJCR2N3T2R/eOtA6+VvaAzs7C
+         ORGbs6OjANYe3UfuWszM4q0yBGI/ro0i9c4ff6TAN3c0rMbRX5HEocs7XlCPEjvmGO7D
+         LAig==
+X-Gm-Message-State: AOJu0YzRnwznfddWbcXUt4PVOeU3bZH0Awa/RjKuURCJH2hbR6H+QGAE
+	+vf1U943tvxge96u1/4fJrKg6hUtjDaOx774JRdW2xwNPJTP/Hmdgk8yKBDLGFs=
+X-Google-Smtp-Source: AGHT+IHfntglvY7cr85OSIKd+heawzghHZglxVkz5tGKJB42nnuYpbxcKdH1C6I7IIHf5nsB+5FoRQ==
+X-Received: by 2002:a05:6a20:7284:b0:19c:53aa:53dd with SMTP id o4-20020a056a20728400b0019c53aa53ddmr210373pzk.42.1706065722914;
+        Tue, 23 Jan 2024 19:08:42 -0800 (PST)
+Received: from [157.82.200.138] ([157.82.200.138])
+        by smtp.gmail.com with ESMTPSA id q12-20020a170902c9cc00b001d7267934c7sm7127456pld.298.2024.01.23.19.08.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 Jan 2024 19:08:42 -0800 (PST)
+Message-ID: <15d2f958-a51e-4b87-9a70-28edf3b55491@daynix.com>
+Date: Wed, 24 Jan 2024 12:08:33 +0900
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 01/21] hw/riscv: Use misa_mxl instead of misa_mxl_max
+To: =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Andrew Jones <ajones@ventanamicro.com>
+Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Michael Rolnik <mrolnik@gmail.com>,
+ =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
+ Laurent Vivier <lvivier@redhat.com>, kvm@vger.kernel.org,
+ Yoshinori Sato <ysato@users.sourceforge.jp>,
+ Pierrick Bouvier <pierrick.bouvier@linaro.org>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ Liu Zhiwei <zhiwei_liu@linux.alibaba.com>, Laurent Vivier
+ <laurent@vivier.eu>, Yanan Wang <wangyanan55@huawei.com>,
+ qemu-ppc@nongnu.org, Weiwei Li <liwei1518@gmail.com>, qemu-s390x@nongnu.org,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
+ Peter Maydell <peter.maydell@linaro.org>, Alexandre Iooss
+ <erdnaxe@crans.org>, John Snow <jsnow@redhat.com>,
+ Mahmoud Mandour <ma.mandourr@gmail.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Ilya Leoshkevich <iii@linux.ibm.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ David Woodhouse <dwmw2@infradead.org>, Cleber Rosa <crosa@redhat.com>,
+ Beraldo Leal <bleal@redhat.com>, Bin Meng <bin.meng@windriver.com>,
+ Nicholas Piggin <npiggin@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>,
+ Daniel Henrique Barboza <danielhb413@gmail.com>,
+ Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
+ Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>,
+ qemu-riscv@nongnu.org, qemu-arm@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Song Gao <gaosong@loongson.cn>,
+ Eduardo Habkost <eduardo@habkost.net>, Brian Cain <bcain@quicinc.com>,
+ Paul Durrant <paul@xen.org>
+References: <20240122145610.413836-1-alex.bennee@linaro.org>
+ <20240122145610.413836-2-alex.bennee@linaro.org>
+ <20240123-b8d1c55688885bfc9125c42b@orel>
+Content-Language: en-US
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <20240123-b8d1c55688885bfc9125c42b@orel>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Don't emulate the branch instructions, e.g., CALL/RET/JMP etc., when CET
-is active in guest, return KVM_INTERNAL_ERROR_EMULATION to userspace to
-handle it.
+On 2024/01/23 17:20, Andrew Jones wrote:
+> On Mon, Jan 22, 2024 at 02:55:50PM +0000, Alex Bennée wrote:
+>> From: Akihiko Odaki <akihiko.odaki@daynix.com>
+>>
+>> The effective MXL value matters when booting.
+> 
+> I'd prefer this commit message get some elaboration. riscv_is_32bit()
+> is used in a variety of contexts, some where it should be reporting
+> the max misa.mxl. However, when used for booting an S-mode kernel it
+> should indeed report the effective mxl. I think we're fine with the
+> change, though, because at init and on reset the effective mxl is set
+> to the max mxl, so, in those contexts, where riscv_is_32bit() should
+> be reporting the max, it does.
+> 
+>>
+>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+>> Message-Id: <20240103173349.398526-23-alex.bennee@linaro.org>
+>> Message-Id: <20231213-riscv-v7-1-a760156a337f@daynix.com>
+>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>> ---
+>>   hw/riscv/boot.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/hw/riscv/boot.c b/hw/riscv/boot.c
+>> index 0ffca05189f..bc67c0bd189 100644
+>> --- a/hw/riscv/boot.c
+>> +++ b/hw/riscv/boot.c
+>> @@ -36,7 +36,7 @@
+>>   
+>>   bool riscv_is_32bit(RISCVHartArrayState *harts)
+>>   {
+>> -    return harts->harts[0].env.misa_mxl_max == MXL_RV32;
+>> +    return harts->harts[0].env.misa_mxl == MXL_RV32;
+>>   }
+> 
+> Assuming everyone agrees with what I've written above, then maybe we
+> should write something similar in a comment above this function.
+> 
+> Thanks,
+> drew
 
-KVM doesn't emulate CPU behaviors to check CET protected stuffs while
-emulating guest instructions, instead it stops emulation on detecting
-the instructions in process are CET protected. By doing so, it can avoid
-generating bogus #CP in guest and preventing CET protected execution flow
-subversion from guest side.
+The corresponding commit in my series has a more elaborated message:
+https://patchew.org/QEMU/20240115-riscv-v9-0-ff171e1aedc8@daynix.com/20240115-riscv-v9-1-ff171e1aedc8@daynix.com/
 
-Suggested-by: Chao Gao <chao.gao@intel.com>
-Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
----
- arch/x86/kvm/emulate.c | 27 ++++++++++++++++-----------
- 1 file changed, 16 insertions(+), 11 deletions(-)
+Alex, can you pull it?
 
-diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-index e223043ef5b2..ad15ce055a1d 100644
---- a/arch/x86/kvm/emulate.c
-+++ b/arch/x86/kvm/emulate.c
-@@ -178,6 +178,7 @@
- #define IncSP       ((u64)1 << 54)  /* SP is incremented before ModRM calc */
- #define TwoMemOp    ((u64)1 << 55)  /* Instruction has two memory operand */
- #define IsBranch    ((u64)1 << 56)  /* Instruction is considered a branch. */
-+#define IsProtected ((u64)1 << 57)  /* Instruction is protected by CET. */
- 
- #define DstXacc     (DstAccLo | SrcAccHi | SrcWrite)
- 
-@@ -4098,9 +4099,9 @@ static const struct opcode group4[] = {
- static const struct opcode group5[] = {
- 	F(DstMem | SrcNone | Lock,		em_inc),
- 	F(DstMem | SrcNone | Lock,		em_dec),
--	I(SrcMem | NearBranch | IsBranch,       em_call_near_abs),
--	I(SrcMemFAddr | ImplicitOps | IsBranch, em_call_far),
--	I(SrcMem | NearBranch | IsBranch,       em_jmp_abs),
-+	I(SrcMem | NearBranch | IsBranch | IsProtected, em_call_near_abs),
-+	I(SrcMemFAddr | ImplicitOps | IsBranch | IsProtected, em_call_far),
-+	I(SrcMem | NearBranch | IsBranch | IsProtected, em_jmp_abs),
- 	I(SrcMemFAddr | ImplicitOps | IsBranch, em_jmp_far),
- 	I(SrcMem | Stack | TwoMemOp,		em_push), D(Undefined),
- };
-@@ -4362,11 +4363,11 @@ static const struct opcode opcode_table[256] = {
- 	/* 0xC8 - 0xCF */
- 	I(Stack | SrcImmU16 | Src2ImmByte | IsBranch, em_enter),
- 	I(Stack | IsBranch, em_leave),
--	I(ImplicitOps | SrcImmU16 | IsBranch, em_ret_far_imm),
--	I(ImplicitOps | IsBranch, em_ret_far),
--	D(ImplicitOps | IsBranch), DI(SrcImmByte | IsBranch, intn),
-+	I(ImplicitOps | SrcImmU16 | IsBranch | IsProtected, em_ret_far_imm),
-+	I(ImplicitOps | IsBranch | IsProtected, em_ret_far),
-+	D(ImplicitOps | IsBranch), DI(SrcImmByte | IsBranch | IsProtected, intn),
- 	D(ImplicitOps | No64 | IsBranch),
--	II(ImplicitOps | IsBranch, em_iret, iret),
-+	II(ImplicitOps | IsBranch | IsProtected, em_iret, iret),
- 	/* 0xD0 - 0xD7 */
- 	G(Src2One | ByteOp, group2), G(Src2One, group2),
- 	G(Src2CL | ByteOp, group2), G(Src2CL, group2),
-@@ -4382,7 +4383,7 @@ static const struct opcode opcode_table[256] = {
- 	I2bvIP(SrcImmUByte | DstAcc, em_in,  in,  check_perm_in),
- 	I2bvIP(SrcAcc | DstImmUByte, em_out, out, check_perm_out),
- 	/* 0xE8 - 0xEF */
--	I(SrcImm | NearBranch | IsBranch, em_call),
-+	I(SrcImm | NearBranch | IsBranch | IsProtected, em_call),
- 	D(SrcImm | ImplicitOps | NearBranch | IsBranch),
- 	I(SrcImmFAddr | No64 | IsBranch, em_jmp_far),
- 	D(SrcImmByte | ImplicitOps | NearBranch | IsBranch),
-@@ -4401,7 +4402,7 @@ static const struct opcode opcode_table[256] = {
- static const struct opcode twobyte_table[256] = {
- 	/* 0x00 - 0x0F */
- 	G(0, group6), GD(0, &group7), N, N,
--	N, I(ImplicitOps | EmulateOnUD | IsBranch, em_syscall),
-+	N, I(ImplicitOps | EmulateOnUD | IsBranch | IsProtected, em_syscall),
- 	II(ImplicitOps | Priv, em_clts, clts), N,
- 	DI(ImplicitOps | Priv, invd), DI(ImplicitOps | Priv, wbinvd), N, N,
- 	N, D(ImplicitOps | ModRM | SrcMem | NoAccess), N, N,
-@@ -4432,8 +4433,8 @@ static const struct opcode twobyte_table[256] = {
- 	IIP(ImplicitOps, em_rdtsc, rdtsc, check_rdtsc),
- 	II(ImplicitOps | Priv, em_rdmsr, rdmsr),
- 	IIP(ImplicitOps, em_rdpmc, rdpmc, check_rdpmc),
--	I(ImplicitOps | EmulateOnUD | IsBranch, em_sysenter),
--	I(ImplicitOps | Priv | EmulateOnUD | IsBranch, em_sysexit),
-+	I(ImplicitOps | EmulateOnUD | IsBranch | IsProtected, em_sysenter),
-+	I(ImplicitOps | Priv | EmulateOnUD | IsBranch | IsProtected, em_sysexit),
- 	N, N,
- 	N, N, N, N, N, N, N, N,
- 	/* 0x40 - 0x4F */
-@@ -4971,6 +4972,10 @@ int x86_decode_insn(struct x86_emulate_ctxt *ctxt, void *insn, int insn_len, int
- 	if (ctxt->d == 0)
- 		return EMULATION_FAILED;
- 
-+	if ((opcode.flags & IsProtected) &&
-+	    (ctxt->ops->get_cr(ctxt, 4) & X86_CR4_CET))
-+		return EMULATION_FAILED;
-+
- 	ctxt->execute = opcode.u.execute;
- 
- 	if (unlikely(emulation_type & EMULTYPE_TRAP_UD) &&
--- 
-2.39.3
-
+Regards,
+Akihiko Odaki
 
