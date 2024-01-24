@@ -1,280 +1,119 @@
-Return-Path: <kvm+bounces-6745-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6746-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EF6C839E1C
-	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 02:17:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97A7E839E93
+	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 03:12:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E6E6288B93
-	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 01:17:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B9D81F27A24
+	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 02:12:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15CE317F6;
-	Wed, 24 Jan 2024 01:17:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBB5C1FAE;
+	Wed, 24 Jan 2024 02:12:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ihbeHqJ3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HowgVxr5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDE441FAE;
-	Wed, 24 Jan 2024 01:17:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A42321841;
+	Wed, 24 Jan 2024 02:12:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706059044; cv=none; b=UsYHM0lgbxjL4iyzfLtvy2UI+aPXua5/GsF99kDml46c5R4rHwVOfymnK6r7ugyqZMhDCc82uohlvcB1fGCX1EWfjL/fa4z0wAkF5kkLTVFBVsUPzgTyIMFN4S3OBzrJlziLyR5zhq1SVmYC9oIZYMs+//eEYRln4OCJYtVIRuM=
+	t=1706062337; cv=none; b=FWEm2iuVTkgzbUSBpFvmoy/cYgx+428g4S2t30eumz5d5x9w/IQi6vIUUntC434tBdl6OII+BWvvuZlXnOv5EpAKh/ImkfVQ4GvgPdqQzC78B2fnukxyhP3CuMEKSBAzEZCmGxqtAgKzHhqCmPBviWc1TYS1yL6QVBUcZjSrqWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706059044; c=relaxed/simple;
-	bh=yf/C8zWO8pYJeNeDwU13LG1tKl8LbfCbMbVHrALRRMo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=I8Opux5h/blIBImybQT9t8CQStgJo9S0+VICQ7ZjXT9GOtsojvi9tVvu4ix76kKOkGTeZIk9LQv88hYV+fWdVpCniX54+fLNrwPIYjOGmQVLs9S15qWcY9+wOGQpJqYS7RqZeaKEtwcz3cRO/ck4+sps+sJWrNiLIBPOogGs2as=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ihbeHqJ3; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706059043; x=1737595043;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=yf/C8zWO8pYJeNeDwU13LG1tKl8LbfCbMbVHrALRRMo=;
-  b=ihbeHqJ3rAO9Blw8VFkEfrk99dD+/qQwhxt5LvCF3NPJoGs391+AeTTF
-   asYHCAuOtmlKUrzyhxZDQ31UhijZDSxvMcZSsYnQsVYDxT0VNiF8f7zfI
-   FTYhkBw9fOowJzDukSlboWDlMejr8OcwN5dxQRWgmVJBFQhVYabjyCXGD
-   of35OrshJPtM8jzAvAMCjWC2cqo0UgkT9VacpYbROlyfRKsltiQ+JuDZ9
-   V/H/rulTraa1r6yz2QuFw8WsFF3L8ZSNq0slULpJVxnY7hI/0fy++/7vR
-   Cq4IEuB8OYiT+23S/qpPPypIGccdQasKJATfzD2BthEZ5ESR+z3p5L35Y
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="20263051"
-X-IronPort-AV: E=Sophos;i="6.05,215,1701158400"; 
-   d="scan'208";a="20263051"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2024 17:17:22 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="1117463617"
-X-IronPort-AV: E=Sophos;i="6.05,215,1701158400"; 
-   d="scan'208";a="1117463617"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.10.49]) ([10.238.10.49])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2024 17:17:17 -0800
-Message-ID: <7cc28677-f7d1-4aba-8557-66c685115074@linux.intel.com>
-Date: Wed, 24 Jan 2024 09:17:15 +0800
+	s=arc-20240116; t=1706062337; c=relaxed/simple;
+	bh=+noc2+uSy6VReg2VCfZFuy2Sz/9+swXstnlgtSSnyBU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uVBO/PB8xOgHTzExWI6w49Tf8YWHfBxeyz3WEE6ll2FteP9Y3ak8G1Gp/amuyBumf9vN7jdGZOtV2QTtATk630NnlUjUS3YoX1tsAc9/uiJok6kWsT2J8ABRMogULUlQ0BpxieZIIqjP/QOQB3VJ5BOGiIl9YJOXPyrNJD87+Bk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HowgVxr5; arc=none smtp.client-ip=209.85.128.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-60036bfdbfeso15179567b3.3;
+        Tue, 23 Jan 2024 18:12:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706062334; x=1706667134; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+noc2+uSy6VReg2VCfZFuy2Sz/9+swXstnlgtSSnyBU=;
+        b=HowgVxr5tklpFJRKNJXSk4phh0soXJ+Btp6JVtU2tcaozWNLv61NFENlJx1aauApkm
+         hSmWEUVQzrd7ADR2bVImMN3MytQMUKaHgUZdX+8wjeO6HsH29/V6vf71iqrbqW8e0eVi
+         CtNINVMGajkkL4NRdjfv6HD8rvNCwknfQjhWS3LaSVV4p3YhBJrWp5XmE79V2Y37CVIM
+         XaKZxIj0y15qUZxCMtvLezty3oTARcGi7Jp2ndzZxVA4JQlPQS0Pm9j6b+J83eQIJBdY
+         kyKhpOC1F/ckc1SxME2Qk0fw/Tqzofml38uVrOhpxk7qBoaTww1b95CexRwuDSWSI1/Y
+         FPDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706062334; x=1706667134;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+noc2+uSy6VReg2VCfZFuy2Sz/9+swXstnlgtSSnyBU=;
+        b=IiExojiCAYGyVlMDQb5iuTiEcGqjLzygpLZqdYQww42H/LuS8q9xPFA4cM7MadMBvO
+         pUoIOLcBJwUMDMcncYppUsvuCMtE2qkcGDdkLYJJ5QUAvXsSxB3Iii2PYPw7lIgKQ/C3
+         WzEZP7lR4SEqhYa1vfdhBlGds9PCGmW52KLsvdQdO6HqxU8qyJgWcn0FBtzryPQV0iMS
+         N6g+eElff8PoBnhMNcvqX0YxeIm3OzWo0mSEKb78xECl2s4yBvOL2DuGxMhgso1Q+rfz
+         YqjJhXqSWlMzNX7yqPmwnK2gvxTM+S9TNf/ifhtkZ92OCzcKMbEtckKUiOUduMd735N/
+         QnHw==
+X-Gm-Message-State: AOJu0YzCHsvXvQFcT40LfJL3QizssLBK6kgLyml5uh1+AcPOSePp0Zjo
+	NKegqxUvSkfLUn3yAOLmR1zMqbrc1oc5ugpV0M4+B3uz+GSgDEuckvsBbejGQQlKtAjSt5ZurSw
+	RigQ28ljSKZdPNEhbIuJhmL4eYtA=
+X-Google-Smtp-Source: AGHT+IGKW1PDMQnZ4BPz2wV/i0Wzu8Ia11wLP0fSGupx2u4rWFGfUXjyWtxC097tDViEqY4T4pNMLEa1ay1WWW4sJlA=
+X-Received: by 2002:a81:7782:0:b0:5ff:9bb9:5478 with SMTP id
+ s124-20020a817782000000b005ff9bb95478mr145075ywc.45.1706062334544; Tue, 23
+ Jan 2024 18:12:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v18 023/121] KVM: TDX: Make KVM_CAP_MAX_VCPUS backend
- specific
-To: isaku.yamahata@intel.com
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
- erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
- Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
- chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com
-References: <cover.1705965634.git.isaku.yamahata@intel.com>
- <ed33ebe29b231e8e657cd610a983fa603b10f530.1705965634.git.isaku.yamahata@intel.com>
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <ed33ebe29b231e8e657cd610a983fa603b10f530.1705965634.git.isaku.yamahata@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20240121111730.262429-1-foxywang@tencent.com> <20240121111730.262429-2-foxywang@tencent.com>
+ <ZbAJzFeRa_6NQznQ@linux.dev>
+In-Reply-To: <ZbAJzFeRa_6NQznQ@linux.dev>
+From: Yi Wang <up2wing@gmail.com>
+Date: Wed, 24 Jan 2024 10:12:03 +0800
+Message-ID: <CAN35MuRwrQ3D6TZLsE0a0zKqRajpB9vfonxm9dQX67wSV0i84g@mail.gmail.com>
+Subject: Re: [v2 1/4] KVM: irqchip: add setup empty irq routing function
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de, 
+	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
+	hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	wanpengli@tencent.com, foxywang@tencent.com, maz@kernel.org, 
+	anup@brainfault.org, atishp@atishpatra.org, borntraeger@linux.ibm.com, 
+	frankja@linux.ibm.com, imbrenda@linux.ibm.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-
-On 1/23/2024 7:52 AM, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
+On Wed, Jan 24, 2024 at 2:47=E2=80=AFAM Oliver Upton <oliver.upton@linux.de=
+v> wrote:
 >
-> TDX has its own limitation on the maximum number of vcpus that the guest
-> can accommodate.  Allow x86 kvm backend to implement its own KVM_ENABLE_CAP
-> handler and implement TDX backend for KVM_CAP_MAX_VCPUS.  user space VMM,
-> e.g. qemu, can specify its value instead of KVM_MAX_VCPUS.
-For legacy VM, KVM just provides the interface to query the max_vcpus.
-Why TD needs to provide a interface for userspace to set the limitation?
-What's the scenario?
+> On Sun, Jan 21, 2024 at 07:17:27PM +0800, Yi Wang wrote:
+> > Add a new function to setup empty irq routing in kvm path, which
+> > can be invoded in non-architecture-specific functions. The difference
+> > compared to the kvm_setup_empty_irq_routing() is this function just
+> > alloc the empty irq routing and does not need synchronize srcu, as
+> > we will call it in kvm_create_vm().
+> >
+> > This patch is a preparatory step for an upcoming patch to avoid
+> > delay in KVM_CAP_SPLIT_IRQCHIP ioctl.
+>
+> Adding a function in a separate patch from its callsites is never
+> useful. Please squash this into the second patch.
 
+Thanks for your review and suggestion. I will update this patch ASAP.
 
 >
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
-> v18:
-> - use TDX instead of "x86, tdx" in subject
-> - use min(max_vcpu, TDX_MAX_VCPU) instead of
->    min3(max_vcpu, KVM_MAX_VCPU, TDX_MAX_VCPU)
-> - make "if (KVM_MAX_VCPU) and if (TDX_MAX_VCPU)" into one if statement
-> ---
->   arch/x86/include/asm/kvm-x86-ops.h |  2 ++
->   arch/x86/include/asm/kvm_host.h    |  2 ++
->   arch/x86/kvm/vmx/main.c            | 22 ++++++++++++++++++++++
->   arch/x86/kvm/vmx/tdx.c             | 29 +++++++++++++++++++++++++++++
->   arch/x86/kvm/vmx/x86_ops.h         |  5 +++++
->   arch/x86/kvm/x86.c                 |  4 ++++
->   6 files changed, 64 insertions(+)
->
-> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-> index 943b21b8b106..2f976c0f3116 100644
-> --- a/arch/x86/include/asm/kvm-x86-ops.h
-> +++ b/arch/x86/include/asm/kvm-x86-ops.h
-> @@ -21,6 +21,8 @@ KVM_X86_OP(hardware_unsetup)
->   KVM_X86_OP(has_emulated_msr)
->   KVM_X86_OP(vcpu_after_set_cpuid)
->   KVM_X86_OP(is_vm_type_supported)
-> +KVM_X86_OP_OPTIONAL(max_vcpus);
-> +KVM_X86_OP_OPTIONAL(vm_enable_cap)
->   KVM_X86_OP(vm_init)
->   KVM_X86_OP_OPTIONAL(vm_destroy)
->   KVM_X86_OP_OPTIONAL_RET0(vcpu_precreate)
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 26f4668b0273..db44a92e5659 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1602,7 +1602,9 @@ struct kvm_x86_ops {
->   	void (*vcpu_after_set_cpuid)(struct kvm_vcpu *vcpu);
->   
->   	bool (*is_vm_type_supported)(unsigned long vm_type);
-> +	int (*max_vcpus)(struct kvm *kvm);
->   	unsigned int vm_size;
-> +	int (*vm_enable_cap)(struct kvm *kvm, struct kvm_enable_cap *cap);
->   	int (*vm_init)(struct kvm *kvm);
->   	void (*vm_destroy)(struct kvm *kvm);
->   
-> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-> index 50da807d7aea..4611f305a450 100644
-> --- a/arch/x86/kvm/vmx/main.c
-> +++ b/arch/x86/kvm/vmx/main.c
-> @@ -6,6 +6,7 @@
->   #include "nested.h"
->   #include "pmu.h"
->   #include "tdx.h"
-> +#include "tdx_arch.h"
->   
->   static bool enable_tdx __ro_after_init;
->   module_param_named(tdx, enable_tdx, bool, 0444);
-> @@ -16,6 +17,17 @@ static bool vt_is_vm_type_supported(unsigned long type)
->   		(enable_tdx && tdx_is_vm_type_supported(type));
->   }
->   
-> +static int vt_max_vcpus(struct kvm *kvm)
-> +{
-> +	if (!kvm)
-> +		return KVM_MAX_VCPUS;
-> +
-> +	if (is_td(kvm))
-> +		return min(kvm->max_vcpus, TDX_MAX_VCPUS);
-> +
-> +	return kvm->max_vcpus;
-> +}
-> +
->   static int vt_hardware_enable(void)
->   {
->   	int ret;
-> @@ -54,6 +66,14 @@ static void vt_hardware_unsetup(void)
->   	vmx_hardware_unsetup();
->   }
->   
-> +static int vt_vm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
-> +{
-> +	if (is_td(kvm))
-> +		return tdx_vm_enable_cap(kvm, cap);
-> +
-> +	return -EINVAL;
-> +}
-> +
->   static int vt_vm_init(struct kvm *kvm)
->   {
->   	if (is_td(kvm))
-> @@ -91,7 +111,9 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
->   	.has_emulated_msr = vmx_has_emulated_msr,
->   
->   	.is_vm_type_supported = vt_is_vm_type_supported,
-> +	.max_vcpus = vt_max_vcpus,
->   	.vm_size = sizeof(struct kvm_vmx),
-> +	.vm_enable_cap = vt_vm_enable_cap,
->   	.vm_init = vt_vm_init,
->   	.vm_destroy = vmx_vm_destroy,
->   
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index 8c463407f8a8..876ad7895b88 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -100,6 +100,35 @@ struct tdx_info {
->   /* Info about the TDX module. */
->   static struct tdx_info *tdx_info;
->   
-> +int tdx_vm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
-> +{
-> +	int r;
-> +
-> +	switch (cap->cap) {
-> +	case KVM_CAP_MAX_VCPUS: {
-> +		if (cap->flags || cap->args[0] == 0)
-> +			return -EINVAL;
-> +		if (cap->args[0] > KVM_MAX_VCPUS ||
-> +		    cap->args[0] > TDX_MAX_VCPUS)
-> +			return -E2BIG;
-> +
-> +		mutex_lock(&kvm->lock);
-> +		if (kvm->created_vcpus)
-> +			r = -EBUSY;
-> +		else {
-> +			kvm->max_vcpus = cap->args[0];
-> +			r = 0;
-> +		}
-> +		mutex_unlock(&kvm->lock);
-> +		break;
-> +	}
-> +	default:
-> +		r = -EINVAL;
-> +		break;
-> +	}
-> +	return r;
-> +}
-> +
->   static int tdx_get_capabilities(struct kvm_tdx_cmd *cmd)
->   {
->   	struct kvm_tdx_capabilities __user *user_caps;
-> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-> index 6e238142b1e8..3a3be66888da 100644
-> --- a/arch/x86/kvm/vmx/x86_ops.h
-> +++ b/arch/x86/kvm/vmx/x86_ops.h
-> @@ -139,12 +139,17 @@ int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops);
->   void tdx_hardware_unsetup(void);
->   bool tdx_is_vm_type_supported(unsigned long type);
->   
-> +int tdx_vm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap);
->   int tdx_vm_ioctl(struct kvm *kvm, void __user *argp);
->   #else
->   static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return -EOPNOTSUPP; }
->   static inline void tdx_hardware_unsetup(void) {}
->   static inline bool tdx_is_vm_type_supported(unsigned long type) { return false; }
->   
-> +static inline int tdx_vm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
-> +{
-> +	return -EINVAL;
-> +};
->   static inline int tdx_vm_ioctl(struct kvm *kvm, void __user *argp) { return -EOPNOTSUPP; }
->   #endif
->   
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index dd3a23d56621..a1389ddb1b33 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -4726,6 +4726,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   		break;
->   	case KVM_CAP_MAX_VCPUS:
->   		r = KVM_MAX_VCPUS;
-> +		if (kvm_x86_ops.max_vcpus)
-> +			r = static_call(kvm_x86_max_vcpus)(kvm);
->   		break;
->   	case KVM_CAP_MAX_VCPU_ID:
->   		r = KVM_MAX_VCPU_IDS;
-> @@ -6683,6 +6685,8 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
->   		break;
->   	default:
->   		r = -EINVAL;
-> +		if (kvm_x86_ops.vm_enable_cap)
-> +			r = static_call(kvm_x86_vm_enable_cap)(kvm, cap);
->   		break;
->   	}
->   	return r;
+> --
+> Thanks,
+> Oliver
 
+
+
+--=20
+---
+Best wishes
+Yi Wang
 
