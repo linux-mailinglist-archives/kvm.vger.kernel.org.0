@@ -1,114 +1,144 @@
-Return-Path: <kvm+bounces-6846-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6847-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 053B483AEB0
-	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 17:49:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 302EF83AF0D
+	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 18:03:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 352261C20F2E
-	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 16:49:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5BD81F21360
+	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 17:03:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C3197E580;
-	Wed, 24 Jan 2024 16:49:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31D047E78F;
+	Wed, 24 Jan 2024 17:03:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="elIUKdpP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J+Qpv4s+"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B9647E570
-	for <kvm@vger.kernel.org>; Wed, 24 Jan 2024 16:49:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DD887E76D;
+	Wed, 24 Jan 2024 17:03:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706114946; cv=none; b=QTIPLjeRGE6iVwicp0Q3GelRzHBs+NM4oOZ5tfyb07uk6CrxXGIRVu/9Rl2SjtvNTH+xy5igUPt2IGCwb4JeHplXodtAfopOlBiAuY5TkzTPtG8FIyvctCzVqc3Fjs/8A9P9C14X2xeWY9f332TbPKOXDevv8PRs6zs908ge+Fc=
+	t=1706115782; cv=none; b=kG41VGOvogts2SEAF5qb0wEM08ncXba4q1JA/etyZgAXRB1faM2NPM5Lp1j2GCMmNGV2GmiK5DX3DOhGuucjgyYYwIlw8LP7c+3rb3EJiuOqSKEIF9Ndo5GBXRLB/wLUszy29Vpc4lZFFxwJhpHMSQbKcbpmMmVg30EioWBbPAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706114946; c=relaxed/simple;
-	bh=s9KRXH9pAqJym9VChh3bZmkDlYyWfd9kBPwlf56Kdvg=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sv/6ufxp4jT/wTukRPI5inkeE7VUyLKGTF2fvbXDMnNxSeKGkDtuCBAwBaBZXmJsS4BFtv5nEhehY5GsFaZprL9QNF4D+MZ23trUEf+fEngdH/WgLpFmP9FucHtG0T+PoyurzXUBGe9NiBBBmRFH5vTcoPOzj7xJbyfFHyRJIdw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=elIUKdpP; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706114944;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=x1KzYBefZJni0FCDP73spKMgvjNuzgWQ5eAFD4yX/Vg=;
-	b=elIUKdpP4PqwPWAFnxg3I5692VAE21ALODnLRAl3YJbjglhHMdQ/L7sKd2hB6YtfdjNNmv
-	JwXOVjl2MjDaoi7Eaqid7XxmISzgK9qsqy0Itiwoa4Vwep0Rh/yoXzH5AaSBJlspKVl84q
-	7wSht3cRX7l79AlcipvIQxMj2+WIzEE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-547-vw52FaqIOo6FU3af-du6_g-1; Wed, 24 Jan 2024 11:49:00 -0500
-X-MC-Unique: vw52FaqIOo6FU3af-du6_g-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 53B17108BF31;
-	Wed, 24 Jan 2024 16:48:57 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.45.224.249])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 9CD161C060B1;
-	Wed, 24 Jan 2024 16:48:56 +0000 (UTC)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: kvm@vger.kernel.org,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>
-Subject: [PATCH 2/2] KVM: selftests: Fail tests when open() fails with !ENOENT
-Date: Wed, 24 Jan 2024 17:48:55 +0100
-Message-ID: <20240124164855.2564824-2-vkuznets@redhat.com>
-In-Reply-To: <20240124164855.2564824-1-vkuznets@redhat.com>
-References: <20240124164855.2564824-1-vkuznets@redhat.com>
+	s=arc-20240116; t=1706115782; c=relaxed/simple;
+	bh=R38dR4MQyuR1txvccH1LWaFn1VVJMCDJwuazqCZJ7Vg=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=ql4gOgncX7CxpzYkzPojt68WgtTQnRfXmf/lVUm9P+huM14FVOuaUi7NywhzHkQPyyuyLmf+goFHS+BFZpS3S3zH8IHYHQwtjsyuvVrfLes+SCt0dbb6U8pTOthoMbLbLM6Dz2PKubSxvaoivB9q0OdAIZgJM6kCf3DrA4ANYbg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J+Qpv4s+; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6dd7b525cd6so1588641b3a.2;
+        Wed, 24 Jan 2024 09:03:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706115780; x=1706720580; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6JwMgDweZYejySMnkRfBGOCwhQQ8zuB1aX2MpP5io2I=;
+        b=J+Qpv4s+2g3LjFHGknhPNKBgP9r5k9+lIvANLo2G0wCycs2g0dYmdBh5lEgq8jtXVF
+         uLfLk5CCEr5rfPiq+0PKw21kunhmgTsWaeXi/qv4GyRTwCZOTQyWEHDSlxbYdpjTJCHr
+         QkNKDO73Rn4mEstN/jyjlLUTgvc639zw87FfTjIqlydEt/XnpgFnRbZ+TgK1o+nTmTWw
+         UfDbXz2iZp1nGnrOoZpM1rC2wMpaPnHRy20AaIxLbs3OcAoWXxVQboU9H28rwhwq/J6/
+         zWMeaehETnsdobrr23P7pRi0LZAqc25NvwhqpbJFCejNFjOo2NFEuH8Z5qWJUpIhxeug
+         VmWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706115780; x=1706720580;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6JwMgDweZYejySMnkRfBGOCwhQQ8zuB1aX2MpP5io2I=;
+        b=GwtUWlx43AXTSu0Fj5f4byLP8gyv54QkOMfkFQHcuRCxqAwGbs1LSQz0O0szoeVfjs
+         WUL/C3vbAshP6GeGBBBAK86f0Zzyc/ErxOyKNSJtNTeV6R9XrE9jita2FamwoHQPo860
+         MU5f5WJSgLmumzcCuvvJ1ypNlznx4ovuRTZ/Cq1kORXuvLlSEr6PTdHCp+FRlV7h7SnR
+         OFwfhB/HMwppdTkQBZl9AyxYrjzaR/WsYm7LaA+3xweuZxMh9ajp4idblJq2/Nq7Oadn
+         aNy4/3kRM2KRBRii4A2Nlgvv3vUWbUEaiutz42upXMCbF2pbk6VyvTgLt7JafJr0I+Go
+         jQpw==
+X-Gm-Message-State: AOJu0YxCRVE1YNlY4xT+do7BnUcZzF6dmP25VV9ks+lZ22s6MgX0A0z0
+	3rJS+6zGJA0XbxU9VTrJLekLcgpKZm6cwdo5zQ9XKwIKqbTHeAK6
+X-Google-Smtp-Source: AGHT+IGKROj+Zo82c0TZfWf/0QNfpFmDncoPMVAhwkvFyahTHEXxoFPkaf5QQqYYh38qW2tS+Jecfg==
+X-Received: by 2002:a62:6544:0:b0:6d9:8f4f:5526 with SMTP id z65-20020a626544000000b006d98f4f5526mr4306348pfb.36.1706115780307;
+        Wed, 24 Jan 2024 09:03:00 -0800 (PST)
+Received: from localhost.localdomain ([117.177.61.99])
+        by smtp.gmail.com with ESMTPSA id fd30-20020a056a002e9e00b006d9c0dd1b26sm14408014pfb.15.2024.01.24.09.02.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Jan 2024 09:02:59 -0800 (PST)
+From: moehanabi <moehanabichan@gmail.com>
+X-Google-Original-From: moehanabi <moehanabichan@outlook.com>
+To: seanjc@google.com
+Cc: bp@alien8.de,
+	dave.hansen@linux.intel.com,
+	hpa@zytor.com,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	mingo@redhat.com,
+	moehanabichan@gmail.com,
+	pbonzini@redhat.com,
+	tglx@linutronix.de,
+	x86@kernel.org
+Subject: Re: Re: [PATCH] KVM: x86: Check irqchip mode before create PIT
+Date: Thu, 25 Jan 2024 01:02:43 +0800
+Message-Id: <20240124170243.93-1-moehanabichan@outlook.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <ZbE7kd9W8csPRjvU@google.com>
+References: <ZbE7kd9W8csPRjvU@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
-open_path_or_exit() is used for '/dev/kvm', '/dev/sev', and
-'/sys/module/%s/parameters/%s' and skipping test when the entry is missing
-is completely reasonable. Other errors, however, may indicate a real issue
-which is easy to miss. E.g. when 'hyperv_features' test was entering an
-infinite loop the output was:
+> On Thu, Jan 25, 2024, Brilliant Hanabi wrote:
+> > As the kvm api(https://docs.kernel.org/virt/kvm/api.html) reads,
+> > KVM_CREATE_PIT2 call is only valid after enabling in-kernel irqchip
+> > support via KVM_CREATE_IRQCHIP.
+> > 
+> > Without this check, I can create PIT first and enable irqchip-split
+> > then, which may cause the PIT invalid because of lacking of in-kernel
+> > PIC to inject the interrupt.
+> 
+> Does this cause actual problems beyond the PIT not working for the guest?  E.g.
+> does it put the host kernel at risk?  If the only problem is that the PIT doesn't
+> work as expected, I'm tempted to tweak the docs to say that KVM's PIT emulation
+> won't work without an in-kernel I/O APIC.  Rejecting the ioctl could theoertically
+> break misconfigured setups that happen to work, e.g. because the guest never uses
+> the PIT.
 
-./hyperv_features
-Testing access to Hyper-V specific MSRs
-1..0 # SKIP - /dev/kvm not available (errno: 24)
+I don't think it will put the host kernel at risk. But that's exactly what
+kvmtool does: it creates in-kernel PIT first and set KVM_CREATE_IRQCHIP then.
+I found this problem because I was working on implementing a userspace PIC
+and PIT in kvmtool. As I planned, I'm going to commit a related patch to 
+kvmtool if this patch will be applied.
 
-and this can easily get overlooked.
+> > Signed-off-by: Brilliant Hanabi <moehanabichan@gmail.com>
+> > ---
+> >  arch/x86/kvm/x86.c | 2 ++
+> >  1 file changed, 2 insertions(+)
+> > 
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 27e23714e960..3edc8478310f 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -7016,6 +7016,8 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
+> >  		r = -EEXIST;
+> >  		if (kvm->arch.vpit)
+> >  			goto create_pit_unlock;
+> > +		if (!pic_in_kernel(kvm))
+> > +			goto create_pit_unlock;
+> 
+> -EEXIST is not an appropriate errno.
 
-Keep ENOENT case 'special' for skipping tests and fail when open() results
-in any other errno.
+Which errno do you think is better?
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- tools/testing/selftests/kvm/lib/kvm_util.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index e066d584c656..f3dfd0d38b7f 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -27,7 +27,8 @@ int open_path_or_exit(const char *path, int flags)
- 	int fd;
- 
- 	fd = open(path, flags);
--	__TEST_REQUIRE(fd >= 0, "%s not available (errno: %d)", path, errno);
-+	__TEST_REQUIRE(fd >= 0 || errno != ENOENT, "%s not present", path);
-+	TEST_ASSERT(fd >= 0, "%s not available (errno: %d)", path, errno);
- 
- 	return fd;
- }
--- 
-2.43.0
-
+> >  		r = -ENOMEM;
+> >  		kvm->arch.vpit = kvm_create_pit(kvm, u.pit_config.flags);
+> >  		if (kvm->arch.vpit)
+> > -- 
+> > 2.39.3
+> > 
 
