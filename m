@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-6823-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6824-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A53F83A5FE
-	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 10:54:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91C1D83A61F
+	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 10:59:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FACD1C286F3
-	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 09:54:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6B018B223E9
+	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 09:59:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD82E1946F;
-	Wed, 24 Jan 2024 09:53:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B99BB18C08;
+	Wed, 24 Jan 2024 09:58:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hbXPiyFd"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g9M+fU8u"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 905AA18EBB
-	for <kvm@vger.kernel.org>; Wed, 24 Jan 2024 09:53:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DFDB18AF9
+	for <kvm@vger.kernel.org>; Wed, 24 Jan 2024 09:58:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706090028; cv=none; b=dux+Idi4bCWQivZ5J7MDZtOLfA/p30NwefQgpW9MysKOID6E4Oosty8cZIK4soDeQFghHzcTPrxe07q5vqsbqpOA3QArL95zSTO9qTjIeVYbafA/XsAHdXHCPEimsE8r6QEIH4h9nfdoNRed9kAA76RAGecWp8YQKZ/yTKahLQ4=
+	t=1706090323; cv=none; b=YJ0daFjAkNxG/OvnZuTMvhGy/4Bv2ZP7UpXcDvI7toMMrkU2XjlHmKhkDjaluqXrIbdlN+FIlJoG4cA+LgLFurnOTB4JjeF42lqTr2Uq7zaMI42C1CCINTxtbHbpCzvRnyWgO2P3bmwseGEmVxcSNR2LbEUnqMoKEkjwlCJknws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706090028; c=relaxed/simple;
-	bh=sACghkZxrCGdD+bmf2513GOL2CscMwlQTEgZavQ5I0s=;
+	s=arc-20240116; t=1706090323; c=relaxed/simple;
+	bh=bkjO83ib1M9eZUG4pgKQCIucEcIhujihnVXwfWPVEdM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jquz/t3rRwlDdXoEzgaL3kyrJQmLHeiPEqKmwmXpUPLHEEJ6tWuAIyuA/1YDj3OxxCNpCP5tw0UGaEXx6lPMs1uW9lTMa+Jgdhv0/Lj3/tw/zWUqtyXWkgZ9myNqadQvre44KrK7nvGqBhjIxku45IwqZt0uF9BnrMQsYbPEPVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hbXPiyFd; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=q9x/9G3Kcz1p4Q48kzvw2d7FpsEVDrOkJAILsPmRwKr4tY/F2vrBsqZaL0WD2LJ3AdpZfjeQCgPm6EV6SJ+YE/qiprSjcyTVqNE5FmLm10P4Q4hJ9jLLwhQLv0JaJSgEriZ+Mb2XX60D+IRGzxVM/Kma79U6udKHPAFkTk2Xgdg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=g9M+fU8u; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706090025;
+	s=mimecast20190719; t=1706090320;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=ZkwvXal/KAMqXLfXXytyuttWp6UL1StXerAsIaraFfo=;
-	b=hbXPiyFda0JfqWyXjZwZ8SgOaDyx9Uv2ACjSXVl8d19n/ZpnRkF13I9XHoTHO/p+75sv5Q
-	vt+GdDCn/mCTu9v1IiFyzWpSIePSl0aSr1rKCuoTLkQn13rqdSZ9pGgENoTPbM/XIMsTEL
-	cbtoktg05d247/nKGvLq1dlLqSl85W4=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=Yfq210ULOE/BqFwEQD11cQ/YT9iyvMnRT2vGiFHcUJM=;
+	b=g9M+fU8uekJmJ7XJMzN2QF/CVdhdty2GZPQ+bEucKYxn0oqORb66A7eTUVjemPmgu3EMta
+	VhT9FcOtNfj8sglugg9n4VaMc0NepogcbZPVK7yGXL+FcZjv0OazaAEQ5224yTCsMWItzF
+	fsaNcGLGSfdbs/I2KDVdGEhxnouR1ys=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-302-zj3_WUKIPIii9jYhhHldUQ-1; Wed, 24 Jan 2024 04:53:43 -0500
-X-MC-Unique: zj3_WUKIPIii9jYhhHldUQ-1
-Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-42a1ca15f88so87338141cf.1
-        for <kvm@vger.kernel.org>; Wed, 24 Jan 2024 01:53:43 -0800 (PST)
+ us-mta-120-Leq_mWjdOVSiOkNW77qbkA-1; Wed, 24 Jan 2024 04:58:38 -0500
+X-MC-Unique: Leq_mWjdOVSiOkNW77qbkA-1
+Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-429d0905823so98305741cf.0
+        for <kvm@vger.kernel.org>; Wed, 24 Jan 2024 01:58:38 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706090023; x=1706694823;
+        d=1e100.net; s=20230601; t=1706090318; x=1706695118;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZkwvXal/KAMqXLfXXytyuttWp6UL1StXerAsIaraFfo=;
-        b=o5G2vLeIaivJBeZRvIcucJw3dNNTuGqvvKpLoUGehK57qaIXXmLV/qPNZv8eb3o81w
-         ETGtRF8GFdnhVjN1PYXFa2LkO9kXj0jJlngFMI8lpjF/NCYeMS119sUpp6u5W7Q1k9eD
-         MEjf2lVeE4gGALdLLibt8STEf8YQWvIskJbYNhNGfBq2Cb740ZK2BmtlAgaqTLb7Fnzh
-         Ji0bz94Yo6aZi2zBrsuPSe3QcM4ykMLA+Tp50zSFOuv+34N9QeSNANS0umVIgloFdQV6
-         N/6lou7/MOpjEXNULsZj/wP13QBSnszRpasC93dqnxBIa/OLHEA89V5SPei814zeBHFJ
-         7ymw==
-X-Gm-Message-State: AOJu0YzLB1ltSRfq3kGYLd16AdUZpXb8neybn2JRK5M0WIKjQBf046gg
-	M0LxqOI2EoA/aw8x9W/YAcEaf+vfNS9YKKeq4hAUyKWgik0o0qfzHPQzAznCMItqikq3/eLqHxg
-	fbTRjNXi6JFEtIvvTJbTD9FeKniDm9snqD5nwNOo+I+SDDOqUKg==
-X-Received: by 2002:ac8:7ee1:0:b0:42a:50ce:7f2d with SMTP id r1-20020ac87ee1000000b0042a50ce7f2dmr1786828qtc.40.1706090023111;
-        Wed, 24 Jan 2024 01:53:43 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFWJ+kowFPFKIFjdAmASnnEBIgkk2WV6XXBfzZRq4s/iZXJI/CuhESvGFDtfTKqOusjl4gzCw==
-X-Received: by 2002:ac8:7ee1:0:b0:42a:50ce:7f2d with SMTP id r1-20020ac87ee1000000b0042a50ce7f2dmr1786820qtc.40.1706090022900;
-        Wed, 24 Jan 2024 01:53:42 -0800 (PST)
+        bh=Yfq210ULOE/BqFwEQD11cQ/YT9iyvMnRT2vGiFHcUJM=;
+        b=ErtlgMkrxA3cGOPB+u2IGmuFa2OQQIVaOe7Z7BqAEN++OmtFFsZHEcOXRfq61m4lOl
+         8ZzpT8WkN7B48cEm9fuaJVU849CqnmAwiNo+UicTk5VViz0K9RFsDE3WfvskxATSnqaC
+         i8VblKX0ORZmK0/JJXlalpXKEHVRKfSSVnK6kH31dn++3Rp5RNhSF3JtyT+MtrqJEM3x
+         nUduS3+EL+oRBlIfPAzb1mnR+7neasJ1kM3wrV96BYvdXZbacqKEFPSEBrya/koavkQy
+         4uSGC44zGxGnStYZbgwqBQZ5DQMPW5v375n3TS/LG46imMTHjPi/WsMz8jIrxvJUrjWP
+         9ntQ==
+X-Gm-Message-State: AOJu0YxIStP7DQA7t1jweyv1RNe4wdEr0MCH59PO0K6faiimZrOONTK3
+	oSZ2kcxcDyfEZOmXgmfbZCwASmTCQkQTop9HXXsMVm5wePmJTpxzXe5PeHgkpdpVfF0FWm7zBYH
+	lIHtIUxZRbvmeYj6JDYkqwokIrsb/0QbEkK8MyB8gsCmTqpYOpw==
+X-Received: by 2002:ac8:5f81:0:b0:42a:3aca:3715 with SMTP id j1-20020ac85f81000000b0042a3aca3715mr1450608qta.39.1706090317891;
+        Wed, 24 Jan 2024 01:58:37 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFKQVZrvUmul3dbpKl5GFlQj49CP/5V+rS5rM8g76PTxlM0YEFyIhqvZqrMU0stMjOYim0ELw==
+X-Received: by 2002:ac8:5f81:0:b0:42a:3aca:3715 with SMTP id j1-20020ac85f81000000b0042a3aca3715mr1450597qta.39.1706090317662;
+        Wed, 24 Jan 2024 01:58:37 -0800 (PST)
 Received: from [192.168.0.9] (ip-109-43-177-121.web.vodafone.de. [109.43.177.121])
-        by smtp.gmail.com with ESMTPSA id x3-20020ac81203000000b00427e0e9c22dsm4222908qti.54.2024.01.24.01.53.40
+        by smtp.gmail.com with ESMTPSA id dq2-20020a05622a520200b00428346b88bfsm4231931qtb.65.2024.01.24.01.58.35
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Jan 2024 01:53:42 -0800 (PST)
-Message-ID: <5f0ba946-8771-4f8a-965a-a454cba86c57@redhat.com>
-Date: Wed, 24 Jan 2024 10:53:40 +0100
+        Wed, 24 Jan 2024 01:58:37 -0800 (PST)
+Message-ID: <5f8a77b9-1b6b-4319-b4b8-ea11ede43cb9@redhat.com>
+Date: Wed, 24 Jan 2024 10:58:34 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -81,15 +81,13 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH 04/24] arm/arm64: Share cpu online, present
- and idle masks
+Subject: Re: [kvm-unit-tests PATCH 00/24] Introduce RISC-V
 Content-Language: en-US
 To: Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org,
  kvm-riscv@lists.infradead.org, kvmarm@lists.linux.dev
 Cc: ajones@ventanamicro.com, anup@brainfault.org, atishp@atishpatra.org,
  pbonzini@redhat.com, alexandru.elisei@arm.com, eric.auger@redhat.com
 References: <20240124071815.6898-26-andrew.jones@linux.dev>
- <20240124071815.6898-30-andrew.jones@linux.dev>
 From: Thomas Huth <thuth@redhat.com>
 Autocrypt: addr=thuth@redhat.com; keydata=
  xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
@@ -133,22 +131,36 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20240124071815.6898-30-andrew.jones@linux.dev>
+In-Reply-To: <20240124071815.6898-26-andrew.jones@linux.dev>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 24/01/2024 08.18, Andrew Jones wrote:
-> RISC-V will also use Arm's three cpumasks. These were in smp.h,
-> but they can be in cpumask.h instead, so move them there, which
-> is now shared.
+> This series adds another architecture to kvm-unit-tests (RISC-V, both
+> 32-bit and 64-bit). Much of the code is borrowed from arm/arm64 by
+> mimicking its patterns or by first making the arm code more generic
+> and moving it to the common lib.
 > 
-> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
-> ---
->   lib/arm/asm/smp.h | 33 ---------------------------------
->   lib/cpumask.h     | 33 +++++++++++++++++++++++++++++++++
->   2 files changed, 33 insertions(+), 33 deletions(-)
+> This series brings UART, SMP, MMU, and exception handling support.
+> One should be able to start writing CPU validation tests in a mix
+> of C and asm as well as write SBI tests, as is the plan for the SBI
+> verification framework. kvm-unit-tests provides backtraces on asserts
+> and input can be given to the tests through command line arguments,
+> environment variables, and the DT (there's already an ISA string
+> parser for extension detection).
+> 
+> This series only targets QEMU TCG and KVM, but OpenSBI may be replaced
+> with other SBI implementations, such as RustSBI. It's a goal to target
+> bare-metal as soon as possible, so EFI support is already in progress
+> and will be posted soon. More follow on series will come as well,
+> bringing interrupt controller support for timer and PMU testing,
+> support to run tests in usermode, and whatever else people need for
+> their tests.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+I can't say much about the riscv details, but I very quickly skimmed through 
+the series and I'm fine if we add that to the k-u-t, so FWIW:
 
+Series
+Acked-by: Thomas Huth <thuth@redhat.com>
 
 
