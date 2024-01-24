@@ -1,138 +1,107 @@
-Return-Path: <kvm+bounces-6830-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6831-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC89F83A803
-	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 12:36:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D84E83A949
+	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 13:13:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 82F6F1F2352D
-	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 11:36:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E3901F217E2
+	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 12:13:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AD952C6A0;
-	Wed, 24 Jan 2024 11:35:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 366A364CC4;
+	Wed, 24 Jan 2024 12:11:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h8cWIliy"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dg6AgLYY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0D442C689;
-	Wed, 24 Jan 2024 11:35:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D706B64CC2
+	for <kvm@vger.kernel.org>; Wed, 24 Jan 2024 12:11:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706096121; cv=none; b=BCVlgDj7e4oJXtd6Vs3h4DkCbgtXfz7pqoAJ4M+EJ7lrCP9rC5KwF5OWEvS1RxS37vcQ2xbOsgW35XkJAiGVV9Qv/PvNO5QsZb+1u4nkVDCyvjb8Q8pSoyue0ZXAkf0JgN6IsHdUa9qZ+9Jv1a/Ox996c8vlPEc0JGJpr06pBF4=
+	t=1706098308; cv=none; b=nt3i/zCCe02QsCTroHAfpAdY/Qxu8AlPvdpqyTtRAx4FMHoDflPozuKqdkdKE742vXnfxxgKCBSvLGmZZ2PNpSP1p2ABeEfvvz6gyRS1w4ff3vv57pIvlCXw0qRp+U1g33g3AGPoVW+iwksarQYurOxdY75DvIX5GdI7OVmcvWM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706096121; c=relaxed/simple;
-	bh=RW46AqXVXgdtflxt/tkQwZU7j0j/bAs5uWwQ7lFOUZk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=LOaWMQyWWe7oTx5TKw8SiYd/Xm61rSdrNeoNGpvU+EeDhNzVWLIVS4LcTrMoenCSpri550wVG4Fby6s1WXbX3Ax/xcqDfcLLChdhZnHnGdJTCjEqFsfVCd1jrfGIwjqFU53xTkoAOkNJtN+NcSvvaxh8bbvRNfwiU8L5ZbulTBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h8cWIliy; arc=none smtp.client-ip=209.85.160.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-2148e793e12so1029551fac.1;
-        Wed, 24 Jan 2024 03:35:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706096119; x=1706700919; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8UmsTcmfc8pcbPs6rRpAkpag+IwA6bQ9uQr+vxsTK1Q=;
-        b=h8cWIliyHpkcopGan7yha/HSFel/Peei8kr0PXMtTagEbV2949Gu9tjm+RKLxyHVuP
-         kUH4OlfwiXEBEIiM/2j3pO7adKFH2jnO65pMDdEo7vy6vpayZrgiK42rZM8ukPonpggU
-         B2vQPyYyhZW/jMGvwBhpP7oFGgHDF7AlmNq1rMZPxk/Hj/DkAPckddQMmTMPU4jqZ2We
-         iXqJ9EIhUsf3OKmxEtuBVNkBIMFuyyppQmbqWVb0wegy04q1I7XZYnl+fWMDyGbCfrxd
-         ++WWC9hjECgKHTeRtgHXmHBgC5fD5OKzOElEh+URibx840lFiwQEHcCn5+uB8+taK4P8
-         S+jQ==
+	s=arc-20240116; t=1706098308; c=relaxed/simple;
+	bh=FeyRThOronAlYOrnGzWBi0dwkjLppglmgzxF28JQrx8=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=VLsuLUgfctB4LDmFNGMeE9mOQGmLJLrjcUVKZyKHXw58z7/31SNB+PxgXZwsH8+8tPs86H3mopSuMrfyCitna1GEZ9MSHruEklQenysIkInYssW5/xYpMmGt93D8kc33PoX1+3rXp2bV97Sq2NHcZjMqs8M3M3H6INaFpPOLw8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Dg6AgLYY; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706098305;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vPYy6OgGxo1KTZycWmlXZinDwTH9UJLEcdQjGlemE08=;
+	b=Dg6AgLYYjQCnBfvDy4oKMTscwYLcfkMHVPJYLJ88K76O4p4h8hNVCbDW8kvZpHKj83vhJU
+	jpKLEHPXo6EetkCUJ6d7DZqo489rh50uIlnFMWYYxJiz7gcf5tMo9blrf+2XijiPtAHDft
+	+w02/wsQPPxlpt/5GA8nEYVkWCQ21+o=
+Received: from mail-vk1-f197.google.com (mail-vk1-f197.google.com
+ [209.85.221.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-373-q52_WQV9NeqpH7RSdwlb7Q-1; Wed, 24 Jan 2024 07:11:44 -0500
+X-MC-Unique: q52_WQV9NeqpH7RSdwlb7Q-1
+Received: by mail-vk1-f197.google.com with SMTP id 71dfb90a1353d-4b92015b9dcso1498434e0c.2
+        for <kvm@vger.kernel.org>; Wed, 24 Jan 2024 04:11:44 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706096119; x=1706700919;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8UmsTcmfc8pcbPs6rRpAkpag+IwA6bQ9uQr+vxsTK1Q=;
-        b=s6U4SUOsl6H1N51df6Npep15ZYA2gtEp8j+Bw9h4/DCavJ+3V4soHfa7JbWExX1vrv
-         H7UoZVsG8r0dsKYZSmrXuePDaqDyAjW72ZHYp03Jv2fKyQPuxIueU8R/CIfjmgl/1H2s
-         wjP13/hX7UJ9jWViGfhCjpU69dpsXCaZ+dfGr2g1N0cK+e4NT8oVlliMyVhrbm4e/mtH
-         XmG60okmY4JHAZyXwQGhKqukYQx053/HelX587Lp7nWw5Mzf6ghoOtxR7q/3j7iXgeOu
-         faAMpmLwzF7Xx0ZxDkwMUkTS4RMLcPOiFe4R0PF2DtWnN9isgV4JjeoJBkpKdcrQqq9k
-         UZ5A==
-X-Gm-Message-State: AOJu0YwyktjMBxqdhmxz0E08fcSwgM0QXpjkjKoeuk8fhe59xRyhHF61
-	5Xj2RjKvbiAjX5WuLxBloipGywFEYJcSpp90b0JqgJ+8wgQ/jFlN
-X-Google-Smtp-Source: AGHT+IHFSZ4s7KNHUdwSzt9UuvcmiZa9gk9u/RzQP7n/d8l0ivf24HCuX8/5YDYLpIePfxpC0YTbsQ==
-X-Received: by 2002:a05:6870:1603:b0:1fb:d89:48c3 with SMTP id b3-20020a056870160300b001fb0d8948c3mr3178545oae.27.1706096119122;
-        Wed, 24 Jan 2024 03:35:19 -0800 (PST)
-Received: from localhost.localdomain ([43.132.141.3])
-        by smtp.gmail.com with ESMTPSA id c15-20020a63d50f000000b00578b8fab907sm11727820pgg.73.2024.01.24.03.35.14
+        d=1e100.net; s=20230601; t=1706098304; x=1706703104;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vPYy6OgGxo1KTZycWmlXZinDwTH9UJLEcdQjGlemE08=;
+        b=UOeaftOkgWNv6/hPHDMWFZUOQa1UM0YVBbazk4Xcktl9w9VFn59o6pF5pGWaVZV1tt
+         0PDMhfz/EphHW2+aeqNU0vdJEeEtqJlue8eu4hjJPkCXT+sRwCU7MY+k2Q1noliWHCqV
+         bzswMaQg0H/NHtqRD8iC0dk8kQOojGfdn9LlTU3hbmMqrI5F10J7mdWHydFWsdQ1Pldh
+         JLjPUFfLq2sAzcCaM3rxVS9DYw4EvkYli/Bz4frzHIOScvKVOn21CQZYZ/d6bqsqjErM
+         kmPOrq4UU0ORA13lOPtOYcYQ6tUZXii1aTGQBr210LZ7km4+w/CPBCKd8Hp+PDcdTbO5
+         aVtA==
+X-Gm-Message-State: AOJu0YwCheWyBrzsqcO/fBgDj+XWxhsq7+ofJv1S5FFHrzpFWW9KV9Sj
+	2OiQV3P7dY+Aw9iknqVZWiwxv6PVmTwrAfa9Fl8JP61ktt4v1SD0znWDm2zdRG6diO5qfHRK7R+
+	uyibpkWStlzygh4jarpMk+f7FNryS7NWYE3kKSPY67w1fRjazLk/rHLlpxw==
+X-Received: by 2002:a05:6122:613:b0:4b6:dbad:e78f with SMTP id u19-20020a056122061300b004b6dbade78fmr3389120vkp.31.1706098303514;
+        Wed, 24 Jan 2024 04:11:43 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFbpAaQMFM6ZMBjluXMgs5opNAOR2c3PR1nLM3duKLKamQwkakCV7yXYIHtrm68ntTwc8lqFw==
+X-Received: by 2002:a05:6122:613:b0:4b6:dbad:e78f with SMTP id u19-20020a056122061300b004b6dbade78fmr3389116vkp.31.1706098303291;
+        Wed, 24 Jan 2024 04:11:43 -0800 (PST)
+Received: from fedora (g2.ign.cz. [91.219.240.8])
+        by smtp.gmail.com with ESMTPSA id s8-20020ac5cb48000000b004bd771a697bsm53292vkl.44.2024.01.24.04.11.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jan 2024 03:35:18 -0800 (PST)
-From: Yi Wang <up2wing@gmail.com>
-X-Google-Original-From: Yi Wang <foxywang@tencent.com>
-To: seanjc@google.com,
-	pbonzini@redhat.com,
-	tglx@linutronix.de,
-	mingo@redhat.com,
-	bp@alien8.de,
-	dave.hansen@linux.intel.com,
-	x86@kernel.org,
-	hpa@zytor.com,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	wanpengli@tencent.com,
-	foxywang@tencent.com,
-	oliver.upton@linux.dev,
-	maz@kernel.org,
-	anup@brainfault.org,
-	atishp@atishpatra.org,
-	borntraeger@linux.ibm.com,
-	frankja@linux.ibm.com,
-	imbrenda@linux.ibm.com
-Cc: up2wing@gmail.com
-Subject: [v3 3/3] KVM: s390: don't setup dummy routing when KVM_CREATE_IRQCHIP
-Date: Wed, 24 Jan 2024 19:34:46 +0800
-Message-Id: <20240124113446.2977003-4-foxywang@tencent.com>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20240124113446.2977003-1-foxywang@tencent.com>
-References: <20240124113446.2977003-1-foxywang@tencent.com>
+        Wed, 24 Jan 2024 04:11:42 -0800 (PST)
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+To: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Sean
+ Christopherson <seanjc@google.com>
+Cc: Maxim Levitsky <mlevitsk@redhat.com>
+Subject: Re: [PATCH kvm-unit-tests 0/4] x86: hyper-v: Add support for
+ CONFIG_KVM_HYPERV
+In-Reply-To: <20231025152915.1879661-1-vkuznets@redhat.com>
+References: <20231025152915.1879661-1-vkuznets@redhat.com>
+Date: Wed, 24 Jan 2024 13:11:40 +0100
+Message-ID: <87jznz9bib.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-From: Yi Wang <foxywang@tencent.com>
+Vitaly Kuznetsov <vkuznets@redhat.com> writes:
 
-As we have setup empty irq routing in kvm_create_vm(), there's
-no need to setup dummy routing when KVM_CREATE_IRQCHIP.
+> With the introduction of CONFIG_KVM_HYPERV:
+> https://lore.kernel.org/kvm/20231025152406.1879274-1-vkuznets@redhat.com/
+>
+> it becomes possible to build KVM without Hyper-V emulation support. Make
+> Hyper-V tests in kvm-unit-tests handle such case with dignity.
+>
 
-Signed-off-by: Yi Wang <foxywang@tencent.com>
----
- arch/s390/kvm/kvm-s390.c | 9 +--------
- 1 file changed, 1 insertion(+), 8 deletions(-)
+Ping) CONFIG_KVM_HYPERV is merged in 6.8 and kvm-unit-tests fail
+miserably when !CONFIG_KVM_HYPERV without these changes. Patches still
+apply cleanly.
 
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index acc81ca6492e..dec3c026a6c1 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -2999,14 +2999,7 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
- 		break;
- 	}
- 	case KVM_CREATE_IRQCHIP: {
--		struct kvm_irq_routing_entry routing;
--
--		r = -EINVAL;
--		if (kvm->arch.use_irqchip) {
--			/* Set up dummy routing. */
--			memset(&routing, 0, sizeof(routing));
--			r = kvm_set_irq_routing(kvm, &routing, 0, 0);
--		}
-+		r = 0;
- 		break;
- 	}
- 	case KVM_SET_DEVICE_ATTR: {
 -- 
-2.39.3
+Vitaly
 
 
