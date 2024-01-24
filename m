@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-6797-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6798-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95A5583A2BF
-	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 08:20:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C420B83A2C0
+	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 08:20:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0EACB1F276B1
-	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 07:20:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CA9728C80C
+	for <lists+kvm@lfdr.de>; Wed, 24 Jan 2024 07:20:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5FE01799C;
-	Wed, 24 Jan 2024 07:19:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C38D179AB;
+	Wed, 24 Jan 2024 07:19:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="p8vPGzct"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Oom3th1Z"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D73817745
-	for <kvm@vger.kernel.org>; Wed, 24 Jan 2024 07:19:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 440B717996
+	for <kvm@vger.kernel.org>; Wed, 24 Jan 2024 07:19:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706080748; cv=none; b=IHMq2p2KtKs2elUVNZyFYUMZV6BQoYodihBFQFZSz6LTlqGbjBSwf6Jc2tPdOMPrRehABcxQe5QSSCEPyFf/ZL7KfTkaShS6TMyOp1neRLBStJpCbf8IaHDWSW5J18TGUPUVyKOlfq9yuiaVhqFenKkwvFQBHZnsKCHHlqq7bus=
+	t=1706080749; cv=none; b=l2gyRAyhCzXBOqdegKudrBFgPw301Uf/kHvtpwijhf33DDzhTJvovH4/mfwkUXHbPFUUtBe73TUc05iduEEHPHoPEuaoeREYTAiL+Rrcvr9WYDOljQ5rym8AX1ymF1+Wa+i2WyxbLV9cakSYn8QyfGwOBwshBasfhE08T4xbwWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706080748; c=relaxed/simple;
-	bh=S4dNU2whaIwdjWcbUYKD/6+DWFEl1TMCCAoAPmR/syY=;
+	s=arc-20240116; t=1706080749; c=relaxed/simple;
+	bh=m60uDdPImC6rpNMPUvAiXNIi+HOrTC+6Pb81bECFi7E=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-type; b=raHU3fhWAVFhsnSzQhymo69gSllKHxqHqNQkyvHrGr5zhJG1Ng7XWsiYLVP4EcvNozDs5vLpzYTw9RMkWqFK/bHDVhIh2s6RxxGoB/bD2WPrg4plHRsfTv5RWDvO69WvVzl7iQ4PSr38eh6nvcVnzm3XlvLypanA/nwNoIHP0wY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=p8vPGzct; arc=none smtp.client-ip=91.218.175.178
+	 MIME-Version:Content-type; b=UO+b9mi6zO/zLojmS4bEJfFGXpXYoCApYRfoEpzfX06/X0p5gczXKfD5MTXGUeyDiugZ3E/adFmvhqepLUnNeE3aQD/O2WhtZl9HBC3CH6X1b4mfSXjNwZ22hTD0h5vSCn5bzmY0QP3N0XyUY8JLSLptOKtuGDCZ18PfPn4N9Ys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Oom3th1Z; arc=none smtp.client-ip=95.215.58.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706080744;
+	t=1706080746;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=0MnhmUFEuzjDk5By8mR2jCWGP+glQNdPUjiDdhXMQ7A=;
-	b=p8vPGzctC7AMEbGXn+IPqCwpAiIUWDBZq7NlnrHbm5a5VmlKHXTWJQh4wQCFGeiri21huI
-	bBgyTJDXtNTYfBmgNZjMw9/ReL/a6lZlDfAlhKPduxe+E/AzuWuUIE54j6nVZcKQodZawm
-	qo0FmZ46xJLJptxK0umMDcAbmmH56kk=
+	bh=W5ER7zGbWaZyAzUw+ka7UlCkT928S+9fT/vtRRe0CWE=;
+	b=Oom3th1ZdlbFeciRdA8JC9HShXEx9JE21xyagN5Fz+caCeVEuAU1q3Fx4hJv/5GMdXokM1
+	RdbG/vOu109JqOoO//e6EN+H2l3Uad/ZV3rEb7UG4xj1zAEbcUtQmvExqeT38r1Uo1P5vu
+	liXR15bRH6/HM0GHaiX4MSANW9KFAYw=
 From: Andrew Jones <andrew.jones@linux.dev>
 To: kvm@vger.kernel.org,
 	kvm-riscv@lists.infradead.org,
@@ -53,9 +53,9 @@ Cc: ajones@ventanamicro.com,
 	thuth@redhat.com,
 	alexandru.elisei@arm.com,
 	eric.auger@redhat.com
-Subject: [kvm-unit-tests PATCH 18/24] riscv: Add MMU support
-Date: Wed, 24 Jan 2024 08:18:34 +0100
-Message-ID: <20240124071815.6898-44-andrew.jones@linux.dev>
+Subject: [kvm-unit-tests PATCH 19/24] riscv: Enable the MMU in secondaries
+Date: Wed, 24 Jan 2024 08:18:35 +0100
+Message-ID: <20240124071815.6898-45-andrew.jones@linux.dev>
 In-Reply-To: <20240124071815.6898-26-andrew.jones@linux.dev>
 References: <20240124071815.6898-26-andrew.jones@linux.dev>
 Precedence: bulk
@@ -68,332 +68,80 @@ Content-type: text/plain
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Add minimal page table defines and functions in order to build page
-tables and enable the MMU.
+Set each secondary satp to the same as the primary's and enable the
+MMU when starting. We also change the memalign() to alloc_pages()
+to prepare for enabling vmalloc_ops. We always want an address
+for the stack where its virtual address is the same as its physical
+address, but vmalloc_ops.memalign wouldn't provide that.
 
 Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 ---
- lib/riscv/asm/csr.h     |   1 +
- lib/riscv/asm/io.h      |   3 +
- lib/riscv/asm/mmu.h     |  28 ++++++++
- lib/riscv/asm/page.h    |  11 ++++
- lib/riscv/asm/pgtable.h |  42 ++++++++++++
- lib/riscv/mmu.c         | 140 ++++++++++++++++++++++++++++++++++++++++
- lib/riscv/setup.c       |   3 +
- riscv/Makefile          |   1 +
- 8 files changed, 229 insertions(+)
- create mode 100644 lib/riscv/asm/mmu.h
- create mode 100644 lib/riscv/asm/pgtable.h
- create mode 100644 lib/riscv/mmu.c
+ lib/riscv/asm-offsets.c | 1 +
+ lib/riscv/asm/smp.h     | 1 +
+ lib/riscv/smp.c         | 7 +++++--
+ 3 files changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/lib/riscv/asm/csr.h b/lib/riscv/asm/csr.h
-index eeddd1fb448a..88c816c68d09 100644
---- a/lib/riscv/asm/csr.h
-+++ b/lib/riscv/asm/csr.h
-@@ -9,6 +9,7 @@
- #define CSR_SEPC		0x141
- #define CSR_SCAUSE		0x142
- #define CSR_STVAL		0x143
-+#define CSR_SATP		0x180
+diff --git a/lib/riscv/asm-offsets.c b/lib/riscv/asm-offsets.c
+index f5beeeb45e09..a2a32438e075 100644
+--- a/lib/riscv/asm-offsets.c
++++ b/lib/riscv/asm-offsets.c
+@@ -53,6 +53,7 @@ int main(void)
+ 	OFFSET(PT_ORIG_A0, pt_regs, orig_a0);
+ 	DEFINE(PT_SIZE, sizeof(struct pt_regs));
  
- /* Exception cause high bit - is an interrupt if set */
- #define CAUSE_IRQ_FLAG		(_AC(1, UL) << (__riscv_xlen - 1))
-diff --git a/lib/riscv/asm/io.h b/lib/riscv/asm/io.h
-index d2eb3acc9fda..6fe111289102 100644
---- a/lib/riscv/asm/io.h
-+++ b/lib/riscv/asm/io.h
-@@ -73,6 +73,9 @@ static inline u64 __raw_readq(const volatile void __iomem *addr)
- }
- #endif
++	OFFSET(SECONDARY_SATP, secondary_data, satp);
+ 	OFFSET(SECONDARY_STVEC, secondary_data, stvec);
+ 	OFFSET(SECONDARY_FUNC, secondary_data, func);
+ 	DEFINE(SECONDARY_DATA_SIZE, sizeof(struct secondary_data));
+diff --git a/lib/riscv/asm/smp.h b/lib/riscv/asm/smp.h
+index 931766dc3969..b3ead4e86433 100644
+--- a/lib/riscv/asm/smp.h
++++ b/lib/riscv/asm/smp.h
+@@ -15,6 +15,7 @@ static inline int smp_processor_id(void)
+ typedef void (*secondary_func_t)(void);
  
-+#define ioremap ioremap
-+void __iomem *ioremap(phys_addr_t phys_addr, size_t size);
-+
- #include <asm-generic/io.h>
- 
- #endif /* _ASMRISCV_IO_H_ */
-diff --git a/lib/riscv/asm/mmu.h b/lib/riscv/asm/mmu.h
-new file mode 100644
-index 000000000000..02703f607511
---- /dev/null
-+++ b/lib/riscv/asm/mmu.h
-@@ -0,0 +1,28 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+#ifndef _ASMRISCV_MMU_H_
-+#define _ASMRISCV_MMU_H_
-+#include <libcflat.h>
-+#include <asm/csr.h>
-+#include <asm/page.h>
-+#include <asm/pgtable.h>
-+
-+static inline pgd_t *current_pgtable(void)
-+{
-+	return (pgd_t *)((csr_read(CSR_SATP) & SATP_PPN) << PAGE_SHIFT);
-+}
-+
-+void mmu_set_range_ptes(pgd_t *pgtable, uintptr_t virt_offset,
-+			phys_addr_t phys_start, phys_addr_t phys_end,
-+			pgprot_t prot, bool flush);
-+void __mmu_enable(unsigned long satp);
-+void mmu_enable(unsigned long mode, pgd_t *pgtable);
-+void mmu_disable(void);
-+
-+void setup_mmu(void);
-+
-+static inline void local_flush_tlb_page(unsigned long addr)
-+{
-+	asm volatile("sfence.vma %0" : : "r" (addr) : "memory");
-+}
-+
-+#endif /* _ASMRISCV_MMU_H_ */
-diff --git a/lib/riscv/asm/page.h b/lib/riscv/asm/page.h
-index 7d7c9191605a..9801b4d1b9c1 100644
---- a/lib/riscv/asm/page.h
-+++ b/lib/riscv/asm/page.h
-@@ -2,6 +2,17 @@
- #ifndef _ASMRISCV_PAGE_H_
- #define _ASMRISCV_PAGE_H_
- 
-+#ifndef __ASSEMBLY__
-+
-+typedef unsigned long pgd_t;
-+typedef unsigned long pte_t;
-+typedef unsigned long pgprot_t;
-+typedef unsigned long pteval_t;
-+
-+#define __pgprot(x)		((pgprot_t)(x))
-+
-+#endif /* !__ASSEMBLY__ */
-+
- #include <asm-generic/page.h>
- 
- #endif /* _ASMRISCV_PAGE_H_ */
-diff --git a/lib/riscv/asm/pgtable.h b/lib/riscv/asm/pgtable.h
-new file mode 100644
-index 000000000000..98d41ff9f661
---- /dev/null
-+++ b/lib/riscv/asm/pgtable.h
-@@ -0,0 +1,42 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+#ifndef _ASMRISCV_PGTABLE_H_
-+#define _ASMRISCV_PGTABLE_H_
-+#include <linux/const.h>
-+
-+#if __riscv_xlen == 32
-+#define SATP_PPN		_AC(0x003FFFFF, UL)
-+#define SATP_MODE_32		_AC(0x80000000, UL)
-+#define SATP_MODE_SHIFT		31
-+#define NR_LEVELS		2
-+#define PGDIR_BITS		10
-+#define PGDIR_MASK		_AC(0x3FF, UL)
-+#define PTE_PPN			_AC(0xFFFFFC00, UL)
-+
-+#define SATP_MODE_DEFAULT	SATP_MODE_32
-+
-+#else
-+#define SATP_PPN		_AC(0x00000FFFFFFFFFFF, UL)
-+#define SATP_MODE_39		_AC(0x8000000000000000, UL)
-+#define SATP_MODE_SHIFT		60
-+#define NR_LEVELS		3
-+#define PGDIR_BITS		9
-+#define PGDIR_MASK		_AC(0x1FF, UL)
-+#define PTE_PPN			_AC(0x3FFFFFFFFFFC00, UL)
-+
-+#define SATP_MODE_DEFAULT	SATP_MODE_39
-+
-+#endif
-+
-+#define PPN_SHIFT		10
-+
-+#define _PAGE_PRESENT		(1 << 0)
-+#define _PAGE_READ		(1 << 1)
-+#define _PAGE_WRITE		(1 << 2)
-+#define _PAGE_EXEC		(1 << 3)
-+#define _PAGE_USER		(1 << 4)
-+#define _PAGE_GLOBAL		(1 << 5)
-+#define _PAGE_ACCESSED		(1 << 6)
-+#define _PAGE_DIRTY		(1 << 7)
-+#define _PAGE_SOFT		(3 << 8)
-+
-+#endif /* _ASMRISCV_PGTABLE_H_ */
-diff --git a/lib/riscv/mmu.c b/lib/riscv/mmu.c
-new file mode 100644
-index 000000000000..6b1af518ddd8
---- /dev/null
-+++ b/lib/riscv/mmu.c
-@@ -0,0 +1,140 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2023, Ventana Micro Systems Inc., Andrew Jones <ajones@ventanamicro.com>
-+ */
-+#include <libcflat.h>
+ struct secondary_data {
++	unsigned long satp;
+ 	unsigned long stvec;
+ 	secondary_func_t func;
+ } __attribute__((aligned(16)));
+diff --git a/lib/riscv/smp.c b/lib/riscv/smp.c
+index ed7984e75608..7e4bb5b76903 100644
+--- a/lib/riscv/smp.c
++++ b/lib/riscv/smp.c
+@@ -5,9 +5,10 @@
+  * Copyright (C) 2023, Ventana Micro Systems Inc., Andrew Jones <ajones@ventanamicro.com>
+  */
+ #include <libcflat.h>
+-#include <alloc.h>
 +#include <alloc_page.h>
-+#include <memregions.h>
-+#include <asm/csr.h>
-+#include <asm/io.h>
-+#include <asm/mmu.h>
-+#include <asm/page.h>
-+
-+static pgd_t *__initial_pgtable;
-+
-+static int pte_index(uintptr_t vaddr, int level)
-+{
-+	return (vaddr >> (PGDIR_BITS * level + PAGE_SHIFT)) & PGDIR_MASK;
-+}
-+
-+static pte_t *pte_to_ptep(pte_t pte)
-+{
-+	return (pte_t *)(((pte & PTE_PPN) >> PPN_SHIFT) << PAGE_SHIFT);
-+}
-+
-+static pte_t ptep_to_pte(pte_t *ptep)
-+{
-+	return ((pte_t)ptep >> PAGE_SHIFT) << PPN_SHIFT;
-+}
-+
-+static pteval_t *__install_page(pgd_t *pgtable, phys_addr_t paddr,
-+				uintptr_t vaddr, pgprot_t prot, bool flush)
-+{
-+	phys_addr_t ppn = (paddr >> PAGE_SHIFT) << PPN_SHIFT;
-+	pte_t pte = (pte_t)ppn;
-+	pte_t *ptep = pgtable;
-+
-+	assert(pgtable && !((uintptr_t)pgtable & ~PAGE_MASK));
-+	assert(!(ppn & ~PTE_PPN));
-+
-+	for (int level = NR_LEVELS - 1; level > 0; --level) {
-+		pte_t *next = &ptep[pte_index(vaddr, level)];
-+		if (!*next) {
-+			void *page = alloc_page();
-+			*next = ptep_to_pte(page) | _PAGE_PRESENT;
-+		}
-+		ptep = pte_to_ptep(*next);
-+	}
-+	ptep = &ptep[pte_index(vaddr, 0)];
-+	*ptep = pte | prot | _PAGE_PRESENT;
-+
-+	if (flush)
-+		local_flush_tlb_page(vaddr);
-+
-+	return (pteval_t *)ptep;
-+}
-+
-+void mmu_set_range_ptes(pgd_t *pgtable, uintptr_t virt_offset,
-+			phys_addr_t phys_start, phys_addr_t phys_end,
-+			pgprot_t prot, bool flush)
-+{
-+	phys_addr_t paddr = phys_start & PAGE_MASK;
-+	uintptr_t vaddr = virt_offset & PAGE_MASK;
-+	uintptr_t virt_end = phys_end - paddr + vaddr;
-+
-+	assert(phys_start < phys_end);
-+
-+	for (; vaddr < virt_end; vaddr += PAGE_SIZE, paddr += PAGE_SIZE)
-+		__install_page(pgtable, paddr, vaddr, prot, flush);
-+}
-+
-+void mmu_disable(void)
-+{
-+	__asm__ __volatile__ (
-+	"	csrw	" xstr(CSR_SATP) ", zero\n"
-+	"	sfence.vma\n"
-+	: : : "memory");
-+}
-+
-+void __mmu_enable(unsigned long satp)
-+{
-+	__asm__ __volatile__ (
-+	"	sfence.vma\n"
-+	"	csrw	" xstr(CSR_SATP) ", %0\n"
-+	: : "r" (satp) : "memory");
-+}
-+
-+void mmu_enable(unsigned long mode, pgd_t *pgtable)
-+{
-+	unsigned long ppn = (unsigned long)pgtable >> PAGE_SHIFT;
-+	unsigned long satp = mode | ppn;
-+
-+	assert(!(ppn & ~SATP_PPN));
-+	__mmu_enable(satp);
-+}
-+
-+void setup_mmu(void)
-+{
-+	struct mem_region *r;
-+	pgd_t *pgtable;
-+
-+	if (!__initial_pgtable)
-+		__initial_pgtable = alloc_page();
-+	pgtable = __initial_pgtable;
-+
-+	for (r = mem_regions; r->end; ++r) {
-+		if (r->flags & (MR_F_IO | MR_F_RESERVED))
-+			continue;
-+		if (r->flags & MR_F_CODE) {
-+			mmu_set_range_ptes(pgtable, r->start, r->start, r->end,
-+					   __pgprot(_PAGE_READ | _PAGE_EXEC), false);
-+		} else {
-+			mmu_set_range_ptes(pgtable, r->start, r->start, r->end,
-+					   __pgprot(_PAGE_READ | _PAGE_WRITE), false);
-+		}
-+	}
-+
-+	mmu_enable(SATP_MODE_DEFAULT, pgtable);
-+}
-+
-+void __iomem *ioremap(phys_addr_t phys_addr, size_t size)
-+{
-+	phys_addr_t start = phys_addr & PAGE_MASK;
-+	phys_addr_t end = PAGE_ALIGN(phys_addr + size);
-+	pgd_t *pgtable = current_pgtable();
-+	bool flush = true;
-+
-+	assert(sizeof(long) == 8 || !(phys_addr >> 32));
-+
-+	if (!pgtable) {
-+		if (!__initial_pgtable)
-+			__initial_pgtable = alloc_page();
-+		pgtable = __initial_pgtable;
-+		flush = false;
-+	}
-+
-+	mmu_set_range_ptes(pgtable, start, start, end,
-+			   __pgprot(_PAGE_READ | _PAGE_WRITE), flush);
-+
-+	return (void __iomem *)(unsigned long)phys_addr;
-+}
-diff --git a/lib/riscv/setup.c b/lib/riscv/setup.c
-index 848ec8e83496..c4c1bd58b337 100644
---- a/lib/riscv/setup.c
-+++ b/lib/riscv/setup.c
-@@ -14,6 +14,7 @@
- #include <memregions.h>
- #include <on-cpus.h>
+ #include <cpumask.h>
  #include <asm/csr.h>
 +#include <asm/mmu.h>
  #include <asm/page.h>
  #include <asm/processor.h>
- #include <asm/setup.h>
-@@ -171,5 +172,7 @@ void setup(const void *fdt, phys_addr_t freemem_start)
- 		setup_env(env, initrd_size);
- 	}
+ #include <asm/sbi.h>
+@@ -23,6 +24,7 @@ secondary_func_t secondary_cinit(struct secondary_data *data)
+ {
+ 	struct thread_info *info;
  
-+	setup_mmu();
-+
- 	banner();
- }
-diff --git a/riscv/Makefile b/riscv/Makefile
-index ed1a14025ed2..821891b719e7 100644
---- a/riscv/Makefile
-+++ b/riscv/Makefile
-@@ -29,6 +29,7 @@ cflatobjs += lib/memregions.o
- cflatobjs += lib/on-cpus.o
- cflatobjs += lib/riscv/bitops.o
- cflatobjs += lib/riscv/io.o
-+cflatobjs += lib/riscv/mmu.o
- cflatobjs += lib/riscv/processor.o
- cflatobjs += lib/riscv/sbi.o
- cflatobjs += lib/riscv/setup.o
++	__mmu_enable(data->satp);
+ 	thread_info_init();
+ 	info = current_thread_info();
+ 	set_cpu_online(info->cpu, true);
+@@ -33,10 +35,11 @@ secondary_func_t secondary_cinit(struct secondary_data *data)
+ 
+ static void __smp_boot_secondary(int cpu, secondary_func_t func)
+ {
+-	struct secondary_data *sp = memalign(16, SZ_8K) + SZ_8K - 16;
++	struct secondary_data *sp = alloc_pages(1) + SZ_8K - 16;
+ 	struct sbiret ret;
+ 
+ 	sp -= sizeof(struct secondary_data);
++	sp->satp = csr_read(CSR_SATP);
+ 	sp->stvec = csr_read(CSR_STVEC);
+ 	sp->func = func;
+ 
 -- 
 2.43.0
 
