@@ -1,59 +1,59 @@
-Return-Path: <kvm+bounces-6938-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6939-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EFEE83B80D
-	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 04:32:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A1A983B810
+	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 04:32:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 33CAD1C21400
-	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 03:32:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 190A31F2165C
+	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 03:32:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D08F1A726;
-	Thu, 25 Jan 2024 03:29:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 819E71B271;
+	Thu, 25 Jan 2024 03:30:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OG8ibtqB"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Wugy6uJC"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7560199D0
-	for <kvm@vger.kernel.org>; Thu, 25 Jan 2024 03:29:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 360AA1AAC4
+	for <kvm@vger.kernel.org>; Thu, 25 Jan 2024 03:30:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706153397; cv=none; b=ALxdJWZbuvJkotdThDEgqa4/rEBlfwLyzTZyM4pmNlytXxtwKUi11ntjaVLHrWghcveLvF8deDfMII0Eb3AeGmiKyeNqfK0hfKBEvvF//OZ3ei763Dq5XlUhsU4mvc9NP0TWc+FHIdwhgzCS+ggH2JMZ37Ga1lAhc6la/6/7WDE=
+	t=1706153401; cv=none; b=Tr0VWCLW65I0pdHfhpFND1CjpFDFGMkgutVxQJegXqXTngKpiJ383BJiiODz8eZE8w0NTod4oQ8m4kWpBQmlyi//mDbKqVG8OOpNkUZ9O+PVpWWShFudtX9WS7PHtaYSNSSpBZLopHIAKC5Sxmmmp/KKST4S6feAkwf4yfmerC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706153397; c=relaxed/simple;
-	bh=ApcKD7KIvNT2bfBIjrshzea2tHyD/Q7COO8WA0lJvDs=;
+	s=arc-20240116; t=1706153401; c=relaxed/simple;
+	bh=DXW5KztBDhhlKnAFTYjRgbJNPzJi/KwPkWh3iOcYHVc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=d1vKV3+ODDWUjpqi9gTapmynf90iL/Cgg/IbcmilvPau1YKUb3nN2W0wYppCTw/bFbqHy26RKivufeiigqhJdcuymdvUukHlAgV0Y9ziLCVkvRREOjgDC+/dpAngTICQJNdjdKIxXBhoJMAe+Cq7N+S/jVevcH2uqiXCGP1G0Xs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OG8ibtqB; arc=none smtp.client-ip=192.198.163.10
+	 MIME-Version; b=rhyplZJAFurFv8Zz56WUCiGKbCk31kSQkXIdbKWzRgvvwUq+tp8JNMgDk9vsL5VCh8Bp5kQpI21x65UW9RzoZgj+5nQqFYj+1af/BZxegxCEAKEIVdP+IUS/9TIyQ91IPQRp44Siw17uCPeR+6/4Nyvwv1VTRCAf6LRr4yriqDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Wugy6uJC; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706153396; x=1737689396;
+  t=1706153400; x=1737689400;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=ApcKD7KIvNT2bfBIjrshzea2tHyD/Q7COO8WA0lJvDs=;
-  b=OG8ibtqBFaFp9++aHc5JLagppZFjK1AXuW1rDl84+XshWtBY0JeTjF0v
-   6QxMC1de3PY4DJcdMc8xSWpBxuiEpwgSyzxYPGxxqT1UP1CIvr/JOOMUU
-   jC+aDAqn4zT6YP5kPKJ5LUyDUY/PJBZbfFmSJQ9D5+D/d8jtQlOKDzBIM
-   8QdloU04Du/4ac6Q8tZkXdlsNj724sukO3sDO87Nf2DGsp0stqVmw4MDS
-   JvDAF8iDNf3VfVdk9iVo0FjOIwVvIFIIQrvZu8+vyjxLUcTmWw86lYU86
-   EQPELQcjI8bz+tI8X7qiZqJ8wsoRmXp17B+LM74TTrRU0ObcBg5h8Qmzp
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="9429325"
+  bh=DXW5KztBDhhlKnAFTYjRgbJNPzJi/KwPkWh3iOcYHVc=;
+  b=Wugy6uJCfAOTBLzQqNbDw0wIJm0AjdkDGKrmd5bxVkgbvIEkbiqaO4vC
+   V1DMv/Fx7z3izMOJe5li7Ac/D4vrskuswTzDy4eDTUZsZieDAiPipWwgW
+   OaUamWlN7Q0MCHZpCXT8STlW0IXTxGIbSIvwptO+0gBdErCgnKVfIDZ3b
+   Ovy/0bEnJ/kFpMMRv70lqPAnubLffNh/4rSBo8eGkCY1ehTfxYF84R2XR
+   55K8ENgjvo1wKjAcbSc2TTqt4XNfLC4C3XFSkHBimiI6mQcGEYSl8Z9QI
+   K2lLqoes9ae8mkxtSvXHN27fiocNy+KSQ9fDZu/+0gtHw2hWX7ovXHVA8
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="9429387"
 X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="9429325"
+   d="scan'208";a="9429387"
 Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2024 19:26:55 -0800
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2024 19:27:01 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="2085839"
+   d="scan'208";a="2085867"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.48.52])
-  by orviesa005.jf.intel.com with ESMTP; 24 Jan 2024 19:26:50 -0800
+  by orviesa005.jf.intel.com with ESMTP; 24 Jan 2024 19:26:56 -0800
 From: Xiaoyao Li <xiaoyao.li@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	David Hildenbrand <david@redhat.com>,
@@ -77,9 +77,9 @@ Cc: qemu-devel@nongnu.org,
 	Gerd Hoffmann <kraxel@redhat.com>,
 	Isaku Yamahata <isaku.yamahata@gmail.com>,
 	Chenyi Qiang <chenyi.qiang@intel.com>
-Subject: [PATCH v4 36/66] i386/tdvf: Introduce function to parse TDVF metadata
-Date: Wed, 24 Jan 2024 22:22:58 -0500
-Message-Id: <20240125032328.2522472-37-xiaoyao.li@intel.com>
+Subject: [PATCH v4 37/66] i386/tdx: Parse TDVF metadata for TDX VM
+Date: Wed, 24 Jan 2024 22:22:59 -0500
+Message-Id: <20240125032328.2522472-38-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240125032328.2522472-1-xiaoyao.li@intel.com>
 References: <20240125032328.2522472-1-xiaoyao.li@intel.com>
@@ -91,331 +91,125 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+TDX cannot support pflash device since it doesn't support read-only
+memslot and doesn't support emulation. Load TDVF(OVMF) with -bios option
+for TDs.
 
-TDX VM needs to boot with its specialized firmware, Trusted Domain
-Virtual Firmware (TDVF). QEMU needs to parse TDVF and map it in TD
-guest memory prior to running the TDX VM.
+When boot a TD, besides loading TDVF to the address below 4G, it needs
+parse TDVF metadata.
 
-A TDVF Metadata in TDVF image describes the structure of firmware.
-QEMU refers to it to setup memory for TDVF. Introduce function
-tdvf_parse_metadata() to parse the metadata from TDVF image and store
-the info of each TDVF section.
-
-TDX metadata is located by a TDX metadata offset block, which is a
-GUID-ed structure. The data portion of the GUID structure contains
-only an 4-byte field that is the offset of TDX metadata to the end
-of firmware file.
-
-Select X86_FW_OVMF when TDX is enable to leverage existing functions
-to parse and search OVMF's GUID-ed structures.
-
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 Acked-by: Gerd Hoffmann <kraxel@redhat.com>
-
 ---
-Changes in v1:
- - rename tdvf_parse_section_entry() to
-   tdvf_parse_and_check_section_entry()
-Changes in RFC v4:
- - rename TDX_METADATA_GUID to TDX_METADATA_OFFSET_GUID
----
- hw/i386/Kconfig        |   1 +
- hw/i386/meson.build    |   1 +
- hw/i386/tdvf.c         | 199 +++++++++++++++++++++++++++++++++++++++++
- include/hw/i386/tdvf.h |  51 +++++++++++
- 4 files changed, 252 insertions(+)
- create mode 100644 hw/i386/tdvf.c
- create mode 100644 include/hw/i386/tdvf.h
+ hw/i386/pc_sysfw.c         | 7 +++++++
+ hw/i386/x86.c              | 3 ++-
+ target/i386/kvm/tdx-stub.c | 5 +++++
+ target/i386/kvm/tdx.c      | 5 +++++
+ target/i386/kvm/tdx.h      | 4 ++++
+ 5 files changed, 23 insertions(+), 1 deletion(-)
 
-diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
-index c0ccf50ac3ef..4e6c8905f077 100644
---- a/hw/i386/Kconfig
-+++ b/hw/i386/Kconfig
-@@ -12,6 +12,7 @@ config SGX
+diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
+index c8d9e71b889b..cf63434ba89d 100644
+--- a/hw/i386/pc_sysfw.c
++++ b/hw/i386/pc_sysfw.c
+@@ -37,6 +37,7 @@
+ #include "hw/block/flash.h"
+ #include "sysemu/kvm.h"
+ #include "sev.h"
++#include "kvm/tdx.h"
  
- config TDX
-     bool
-+    select X86_FW_OVMF
-     depends on KVM
+ #define FLASH_SECTOR_SIZE 4096
  
- config PC
-diff --git a/hw/i386/meson.build b/hw/i386/meson.build
-index 369c6bf823bb..6808bd4e3032 100644
---- a/hw/i386/meson.build
-+++ b/hw/i386/meson.build
-@@ -27,6 +27,7 @@ i386_ss.add(when: 'CONFIG_PC', if_true: files(
-   'port92.c'))
- i386_ss.add(when: 'CONFIG_X86_FW_OVMF', if_true: files('pc_sysfw_ovmf.c'),
-                                         if_false: files('pc_sysfw_ovmf-stubs.c'))
-+i386_ss.add(when: 'CONFIG_TDX', if_true: files('tdvf.c'))
+@@ -265,5 +266,11 @@ void x86_firmware_configure(void *ptr, int size)
+         }
  
- subdir('kvm')
- subdir('xen')
-diff --git a/hw/i386/tdvf.c b/hw/i386/tdvf.c
-new file mode 100644
-index 000000000000..ff51f40088f0
---- /dev/null
-+++ b/hw/i386/tdvf.c
-@@ -0,0 +1,199 @@
-+/*
-+ * SPDX-License-Identifier: GPL-2.0-or-later
+         sev_encrypt_flash(ptr, size, &error_fatal);
++    } else if (is_tdx_vm()) {
++        ret = tdx_parse_tdvf(ptr, size);
++        if (ret) {
++            error_report("failed to parse TDVF for TDX VM");
++            exit(1);
++        }
+     }
+ }
+diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+index f66a92f6c9cc..343a929e1825 100644
+--- a/hw/i386/x86.c
++++ b/hw/i386/x86.c
+@@ -47,6 +47,7 @@
+ #include "hw/intc/i8259.h"
+ #include "hw/rtc/mc146818rtc.h"
+ #include "target/i386/sev.h"
++#include "kvm/tdx.h"
+ 
+ #include "hw/acpi/cpu_hotplug.h"
+ #include "hw/irq.h"
+@@ -1156,7 +1157,7 @@ void x86_bios_rom_init(MachineState *ms, const char *default_firmware,
+     }
+     bios = g_malloc(sizeof(*bios));
+     memory_region_init_ram(bios, NULL, "pc.bios", bios_size, &error_fatal);
+-    if (sev_enabled()) {
++    if (sev_enabled() || is_tdx_vm()) {
+         /*
+          * The concept of a "reset" simply doesn't exist for
+          * confidential computing guests, we have to destroy and
+diff --git a/target/i386/kvm/tdx-stub.c b/target/i386/kvm/tdx-stub.c
+index 3877d432a397..587dbeeed196 100644
+--- a/target/i386/kvm/tdx-stub.c
++++ b/target/i386/kvm/tdx-stub.c
+@@ -11,3 +11,8 @@ int tdx_pre_create_vcpu(CPUState *cpu, Error **errp)
+ {
+     return -EINVAL;
+ }
 +
-+ * Copyright (c) 2020 Intel Corporation
-+ * Author: Isaku Yamahata <isaku.yamahata at gmail.com>
-+ *                        <isaku.yamahata at intel.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/error-report.h"
-+
-+#include "hw/i386/pc.h"
-+#include "hw/i386/tdvf.h"
-+#include "sysemu/kvm.h"
-+
-+#define TDX_METADATA_OFFSET_GUID    "e47a6535-984a-4798-865e-4685a7bf8ec2"
-+#define TDX_METADATA_VERSION        1
-+#define TDVF_SIGNATURE              0x46564454 /* TDVF as little endian */
-+
-+typedef struct {
-+    uint32_t DataOffset;
-+    uint32_t RawDataSize;
-+    uint64_t MemoryAddress;
-+    uint64_t MemoryDataSize;
-+    uint32_t Type;
-+    uint32_t Attributes;
-+} TdvfSectionEntry;
-+
-+typedef struct {
-+    uint32_t Signature;
-+    uint32_t Length;
-+    uint32_t Version;
-+    uint32_t NumberOfSectionEntries;
-+    TdvfSectionEntry SectionEntries[];
-+} TdvfMetadata;
-+
-+struct tdx_metadata_offset {
-+    uint32_t offset;
-+};
-+
-+static TdvfMetadata *tdvf_get_metadata(void *flash_ptr, int size)
++int tdx_parse_tdvf(void *flash_ptr, int size)
 +{
-+    TdvfMetadata *metadata;
-+    uint32_t offset = 0;
-+    uint8_t *data;
-+
-+    if ((uint32_t) size != size) {
-+        return NULL;
-+    }
-+
-+    if (pc_system_ovmf_table_find(TDX_METADATA_OFFSET_GUID, &data, NULL)) {
-+        offset = size - le32_to_cpu(((struct tdx_metadata_offset *)data)->offset);
-+
-+        if (offset + sizeof(*metadata) > size) {
-+            return NULL;
-+        }
-+    } else {
-+        error_report("Cannot find TDX_METADATA_OFFSET_GUID");
-+        return NULL;
-+    }
-+
-+    metadata = flash_ptr + offset;
-+
-+    /* Finally, verify the signature to determine if this is a TDVF image. */
-+    metadata->Signature = le32_to_cpu(metadata->Signature);
-+    if (metadata->Signature != TDVF_SIGNATURE) {
-+        error_report("Invalid TDVF signature in metadata!");
-+        return NULL;
-+    }
-+
-+    /* Sanity check that the TDVF doesn't overlap its own metadata. */
-+    metadata->Length = le32_to_cpu(metadata->Length);
-+    if (offset + metadata->Length > size) {
-+        return NULL;
-+    }
-+
-+    /* Only version 1 is supported/defined. */
-+    metadata->Version = le32_to_cpu(metadata->Version);
-+    if (metadata->Version != TDX_METADATA_VERSION) {
-+        return NULL;
-+    }
-+
-+    return metadata;
-+}
-+
-+static int tdvf_parse_and_check_section_entry(const TdvfSectionEntry *src,
-+                                              TdxFirmwareEntry *entry)
-+{
-+    entry->data_offset = le32_to_cpu(src->DataOffset);
-+    entry->data_len = le32_to_cpu(src->RawDataSize);
-+    entry->address = le64_to_cpu(src->MemoryAddress);
-+    entry->size = le64_to_cpu(src->MemoryDataSize);
-+    entry->type = le32_to_cpu(src->Type);
-+    entry->attributes = le32_to_cpu(src->Attributes);
-+
-+    /* sanity check */
-+    if (entry->size < entry->data_len) {
-+        error_report("Broken metadata RawDataSize 0x%x MemoryDataSize 0x%lx",
-+                     entry->data_len, entry->size);
-+        return -1;
-+    }
-+    if (!QEMU_IS_ALIGNED(entry->address, TARGET_PAGE_SIZE)) {
-+        error_report("MemoryAddress 0x%lx not page aligned", entry->address);
-+        return -1;
-+    }
-+    if (!QEMU_IS_ALIGNED(entry->size, TARGET_PAGE_SIZE)) {
-+        error_report("MemoryDataSize 0x%lx not page aligned", entry->size);
-+        return -1;
-+    }
-+
-+    switch (entry->type) {
-+    case TDVF_SECTION_TYPE_BFV:
-+    case TDVF_SECTION_TYPE_CFV:
-+        /* The sections that must be copied from firmware image to TD memory */
-+        if (entry->data_len == 0) {
-+            error_report("%d section with RawDataSize == 0", entry->type);
-+            return -1;
-+        }
-+        break;
-+    case TDVF_SECTION_TYPE_TD_HOB:
-+    case TDVF_SECTION_TYPE_TEMP_MEM:
-+        /* The sections that no need to be copied from firmware image */
-+        if (entry->data_len != 0) {
-+            error_report("%d section with RawDataSize 0x%x != 0",
-+                         entry->type, entry->data_len);
-+            return -1;
-+        }
-+        break;
-+    default:
-+        error_report("TDVF contains unsupported section type %d", entry->type);
-+        return -1;
-+    }
-+
-+    return 0;
-+}
-+
-+int tdvf_parse_metadata(TdxFirmware *fw, void *flash_ptr, int size)
-+{
-+    TdvfSectionEntry *sections;
-+    TdvfMetadata *metadata;
-+    ssize_t entries_size;
-+    uint32_t len, i;
-+
-+    metadata = tdvf_get_metadata(flash_ptr, size);
-+    if (!metadata) {
-+        return -EINVAL;
-+    }
-+
-+    //load and parse metadata entries
-+    fw->nr_entries = le32_to_cpu(metadata->NumberOfSectionEntries);
-+    if (fw->nr_entries < 2) {
-+        error_report("Invalid number of fw entries (%u) in TDVF", fw->nr_entries);
-+        return -EINVAL;
-+    }
-+
-+    len = le32_to_cpu(metadata->Length);
-+    entries_size = fw->nr_entries * sizeof(TdvfSectionEntry);
-+    if (len != sizeof(*metadata) + entries_size) {
-+        error_report("TDVF metadata len (0x%x) mismatch, expected (0x%x)",
-+                     len, (uint32_t)(sizeof(*metadata) + entries_size));
-+        return -EINVAL;
-+    }
-+
-+    fw->entries = g_new(TdxFirmwareEntry, fw->nr_entries);
-+    sections = g_new(TdvfSectionEntry, fw->nr_entries);
-+
-+    if (!memcpy(sections, (void *)metadata + sizeof(*metadata), entries_size))  {
-+        error_report("Failed to read TDVF section entries");
-+        goto err;
-+    }
-+
-+    for (i = 0; i < fw->nr_entries; i++) {
-+        if (tdvf_parse_and_check_section_entry(&sections[i], &fw->entries[i])) {
-+            goto err;
-+        }
-+    }
-+    g_free(sections);
-+
-+    return 0;
-+
-+err:
-+    g_free(sections);
-+    fw->entries = 0;
-+    g_free(fw->entries);
 +    return -EINVAL;
 +}
-diff --git a/include/hw/i386/tdvf.h b/include/hw/i386/tdvf.h
-new file mode 100644
-index 000000000000..593341eb2e93
---- /dev/null
-+++ b/include/hw/i386/tdvf.h
-@@ -0,0 +1,51 @@
-+/*
-+ * SPDX-License-Identifier: GPL-2.0-or-later
+diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
+index f892551821ce..c743340c145c 100644
+--- a/target/i386/kvm/tdx.c
++++ b/target/i386/kvm/tdx.c
+@@ -622,6 +622,11 @@ int tdx_pre_create_vcpu(CPUState *cpu, Error **errp)
+     return 0;
+ }
+ 
++int tdx_parse_tdvf(void *flash_ptr, int size)
++{
++    return tdvf_parse_metadata(&tdx_guest->tdvf, flash_ptr, size);
++}
 +
-+ * Copyright (c) 2020 Intel Corporation
-+ * Author: Isaku Yamahata <isaku.yamahata at gmail.com>
-+ *                        <isaku.yamahata at intel.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
+ static void tdx_guest_region_add(MemoryListener *listener,
+                                  MemoryRegionSection *section)
+ {
+diff --git a/target/i386/kvm/tdx.h b/target/i386/kvm/tdx.h
+index 6e39ef3bac13..a46af433135f 100644
+--- a/target/i386/kvm/tdx.h
++++ b/target/i386/kvm/tdx.h
+@@ -6,6 +6,7 @@
+ #endif
+ 
+ #include "exec/confidential-guest-support.h"
++#include "hw/i386/tdvf.h"
+ 
+ #define TYPE_TDX_GUEST "tdx-guest"
+ #define TDX_GUEST(obj)  OBJECT_CHECK(TdxGuest, (obj), TYPE_TDX_GUEST)
+@@ -24,6 +25,8 @@ typedef struct TdxGuest {
+     char *mrconfigid;       /* base64 encoded sha348 digest */
+     char *mrowner;          /* base64 encoded sha348 digest */
+     char *mrownerconfig;    /* base64 encoded sha348 digest */
 +
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef HW_I386_TDVF_H
-+#define HW_I386_TDVF_H
-+
-+#include "qemu/osdep.h"
-+
-+#define TDVF_SECTION_TYPE_BFV               0
-+#define TDVF_SECTION_TYPE_CFV               1
-+#define TDVF_SECTION_TYPE_TD_HOB            2
-+#define TDVF_SECTION_TYPE_TEMP_MEM          3
-+
-+#define TDVF_SECTION_ATTRIBUTES_MR_EXTEND   (1U << 0)
-+#define TDVF_SECTION_ATTRIBUTES_PAGE_AUG    (1U << 1)
-+
-+typedef struct TdxFirmwareEntry {
-+    uint32_t data_offset;
-+    uint32_t data_len;
-+    uint64_t address;
-+    uint64_t size;
-+    uint32_t type;
-+    uint32_t attributes;
-+} TdxFirmwareEntry;
-+
-+typedef struct TdxFirmware {
-+    uint32_t nr_entries;
-+    TdxFirmwareEntry *entries;
-+} TdxFirmware;
-+
-+int tdvf_parse_metadata(TdxFirmware *fw, void *flash_ptr, int size);
-+
-+#endif /* HW_I386_TDVF_H */
++    TdxFirmware tdvf;
+ } TdxGuest;
+ 
+ #ifdef CONFIG_TDX
+@@ -36,5 +39,6 @@ int tdx_kvm_init(MachineState *ms, Error **errp);
+ void tdx_get_supported_cpuid(uint32_t function, uint32_t index, int reg,
+                              uint32_t *ret);
+ int tdx_pre_create_vcpu(CPUState *cpu, Error **errp);
++int tdx_parse_tdvf(void *flash_ptr, int size);
+ 
+ #endif /* QEMU_I386_TDX_H */
 -- 
 2.34.1
 
