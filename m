@@ -1,259 +1,182 @@
-Return-Path: <kvm+bounces-6968-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6970-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94E5183B851
-	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 04:35:10 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E21483B875
+	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 04:45:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 176A71F263F3
-	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 03:35:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 289E0B24123
+	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 03:45:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CAB9175BF;
-	Thu, 25 Jan 2024 03:31:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3B9B7489;
+	Thu, 25 Jan 2024 03:45:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Db97TZCk"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Qc5yxEdq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB41417575
-	for <kvm@vger.kernel.org>; Thu, 25 Jan 2024 03:31:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706153492; cv=none; b=s0KmqCDOBYwSmS9BMwTUPdvoBZs4N00oCnKgDA7lvZFmsqZttyCZz1W2+7yZNw2VJwGdK9f8JoM5ZaafWEGI/m9MmuzrHh5iRAE27dTXDhMaaOaBNj/T1vxpDITkWprNYQe7YAIrRPIbizYel6NP0w/u9Tx/XIBlw3JunsL2gQs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706153492; c=relaxed/simple;
-	bh=klfzRXQXY4gU48ZNC2oRdXZ/A2KblsfGhFWWh4dKX9U=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=KTkoyDNU/8uocOjMtR183+FdLVBhUGXmArhiSgOXPjksdMA40zYUJo/Jknkc9jsi1F8h6fOW6Nw+W9s/PiJbUH9z9UxZuF8Qy9avd8b2yeHMha/V4yJH9nrHMoYE1gDuk34BOyzQAmJc44BO7CAFBOaf9ETvSoH3/oP3Xx6KI9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Db97TZCk; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05C7D6FC3;
+	Thu, 25 Jan 2024 03:45:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=134.134.136.65
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706154342; cv=fail; b=kynKyZ4bCAG1infZcLz1n/kcmtTbZOxJGtTLVP+pEsTNsxTfu0bLmGpgwwVC30vY821EFGHOy+m6Gi4YSl6VUF7OhOM/dCtPnlxio5ZfyprQQeOrKWHV8/tQwypM7yLM8RDF91Pcl6Efs45chOiRtC+0ivp6TKijAn5WuzfU7tg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706154342; c=relaxed/simple;
+	bh=+gFBJ1cX4FIBmLdCthemGgDJGL1NKU2E8nG/NAmTnhg=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=WpKdSw1gCxC3jEpYWLTmSHGoGaNIWxRHaYd5CHbj5GKd5A44ZTnpscG/2CqCQVJZc6rg4VCzOyRI9J23zfECD7Z4wEWSCv4GdG8yLEgpSUjve8o3+XJkhGMMrJ9TU3qLj5imY59D9A3NzTtXgOovjNR6vYGv45w91Mes8JsWXa4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Qc5yxEdq; arc=fail smtp.client-ip=134.134.136.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706153491; x=1737689491;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=klfzRXQXY4gU48ZNC2oRdXZ/A2KblsfGhFWWh4dKX9U=;
-  b=Db97TZCkRqYJrRJ/GOT4C6LTiThm0Ra+gJBzSFYbAgBzSiOLM/VCfheP
-   pWnqFQTSCMCCndR8hBRe2hbkYrluGP+MS4U98GGyaJ58+LnPQ9QXcc6LV
-   1PdT+JC0k4vcc+CwJHxRndUEEc84Ztt22LdwoIIyDDJSSdThHf8JPU3Qg
-   r2cM192jTWo9Wv18CP9k73edVTW4mqz2A4x+gOHlXTemLYUQzwiehTP4K
-   MnE9oEkX9a3Atwdsi/kNvnmyiYsaEiVhnvEssLf4zOpFUiqcoWqy4PUzu
-   DlnYP/KX2+9saAWGziPH7Ih88mwf5dJe1jbE11RygWxhwxyeWJ9jBI8Hs
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="9430599"
+  t=1706154341; x=1737690341;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=+gFBJ1cX4FIBmLdCthemGgDJGL1NKU2E8nG/NAmTnhg=;
+  b=Qc5yxEdqEvNlCl3filQh/9J154coMtkX8CDONWafhMH+X10TFxWVyRCq
+   BZnjIcE9H9RuYFOYQyoRBFkxbO4xIvAWfkvkooqKpiKQPA9S40dUxcL0C
+   IfPIBS+h//A731NkzfG6OysktbKgCqpsM3OmsSKOjP+sURR2aWaErOVdd
+   OIUQmIIZcIfFrDYLrZTuPPpjKGoDPsl0l2MfSJqUUlDMD06CVrorlrRha
+   4eHUPQ6H5068TxFU0RxENBcGKm1yWIBBjTWfff2TaVMGC43nwWpcyz/J2
+   V/BQxDuH03mVM1BRsK/3faKV/oZvGA+qOYJJFga2L2wXrXkidfTdCLYy6
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="405798315"
 X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="9430599"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2024 19:29:37 -0800
+   d="scan'208";a="405798315"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2024 19:45:40 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="2086811"
-Received: from lxy-clx-4s.sh.intel.com ([10.239.48.52])
-  by orviesa005.jf.intel.com with ESMTP; 24 Jan 2024 19:29:32 -0800
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-To: Paolo Bonzini <pbonzini@redhat.com>,
-	David Hildenbrand <david@redhat.com>,
-	Igor Mammedov <imammedo@redhat.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Peter Xu <peterx@redhat.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Cornelia Huck <cohuck@redhat.com>,
-	=?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
-	Eric Blake <eblake@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>
-Cc: qemu-devel@nongnu.org,
-	kvm@vger.kernel.org,
-	xiaoyao.li@intel.com,
-	Michael Roth <michael.roth@amd.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Claudio Fontana <cfontana@suse.de>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Isaku Yamahata <isaku.yamahata@gmail.com>,
-	Chenyi Qiang <chenyi.qiang@intel.com>
-Subject: [PATCH v4 66/66] docs: Add TDX documentation
-Date: Wed, 24 Jan 2024 22:23:28 -0500
-Message-Id: <20240125032328.2522472-67-xiaoyao.li@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240125032328.2522472-1-xiaoyao.li@intel.com>
-References: <20240125032328.2522472-1-xiaoyao.li@intel.com>
+   d="scan'208";a="2265317"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmviesa004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 24 Jan 2024 19:44:17 -0800
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 24 Jan 2024 19:44:16 -0800
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 24 Jan 2024 19:44:15 -0800
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Wed, 24 Jan 2024 19:44:15 -0800
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.168)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 24 Jan 2024 19:44:14 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XXgVwEOUYArb8mnIORJYJ2ekWrCe/pUXeC2e0ypAqvxzjTRmM3P/eRWJAO6HAXkMyRKyyqWCzhDBKpKFC13xpMkeiI8EIJ6HKPEsS6kBp/mAw+z+na+2K164VZedNLH/R6dAHp4vUdy+Ku4N2wMWSmYU3NpARwLWkTFp+F5939TPoa9gNvbk6WZYqSJra7lHT/tiSGdslfTj9YQIvzN0VXQK7+FBrd9iAIgKTNnG9oekab6OlLHX/n2BZB+aC1iPe47CKnqp8H9aTgc7/7i3XnajOnh+4IgeOD5+LU3MHn7aFw2oFOPR5Orp5Brio3JI4zSofAjcjXu734NeXhfOXw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+gFBJ1cX4FIBmLdCthemGgDJGL1NKU2E8nG/NAmTnhg=;
+ b=GIBW79ZGO/Z+k7sSZWGiz/FtdpJGeCt1A2m0Q5+XagpSdJSiVS+ts2lefWYVfMy4XIZdanlvDkr0f+z0SkBjs+9Md0tLZw+SFnNtyM/NQOA2COIrT2q43cg1KeIbCiY+7lbTxr9ZKhYanv1k7spccvV95o44yNwzERSCLDVXoYSHYdKAWCV/yWsgowO3VG7B5HYXxuwCjm2s3HGrnQRV7HAcJdRex/DXB8it5qOo7enwy39kmdv9ZGHnnkS4p1BYSW5X2IRdV9JYzDQDttXKFYSuPKetrefTgcwOsv9JSMk7Wwu8NpdfyD7k8vJNGd2JpE5RCkdYbqRoEZfMR8j7WA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
+ by CH0PR11MB5458.namprd11.prod.outlook.com (2603:10b6:610:d1::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.24; Thu, 25 Jan
+ 2024 03:44:08 +0000
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::2903:9163:549:3b0d]) by CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::2903:9163:549:3b0d%6]) with mapi id 15.20.7202.034; Thu, 25 Jan 2024
+ 03:44:08 +0000
+Date: Thu, 25 Jan 2024 11:43:57 +0800
+From: Chao Gao <chao.gao@intel.com>
+To: Yang Weijiang <weijiang.yang@intel.com>
+CC: <seanjc@google.com>, <pbonzini@redhat.com>, <dave.hansen@intel.com>,
+	<kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <x86@kernel.org>,
+	<yuan.yao@linux.intel.com>, <peterz@infradead.org>,
+	<rick.p.edgecombe@intel.com>, <mlevitsk@redhat.com>, <john.allen@amd.com>
+Subject: Re: [PATCH v9 09/27] KVM: x86: Rename kvm_{g,s}et_msr() to menifest
+ emulation operations
+Message-ID: <ZbHY/UVpRVRuyELV@chao-email>
+References: <20240124024200.102792-1-weijiang.yang@intel.com>
+ <20240124024200.102792-10-weijiang.yang@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240124024200.102792-10-weijiang.yang@intel.com>
+X-ClientProxiedBy: SI2P153CA0036.APCP153.PROD.OUTLOOK.COM
+ (2603:1096:4:190::11) To CH3PR11MB8660.namprd11.prod.outlook.com
+ (2603:10b6:610:1ce::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|CH0PR11MB5458:EE_
+X-MS-Office365-Filtering-Correlation-Id: b02bd932-f302-460e-dac4-08dc1d57e27f
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: CmKZFE2AopR1pOmk4CBjSMYk+puYHJR70wznhts4o34legxxjczs/akqLixBBawuyNh/xg28gLUZ8HURkTTHTnRSrYts/YylDoSNub+4MJBUVsuKk29dKrf2OvU6Xz3k9MpLfyO5lV9CvIZSnuAu5I58iPd09UP/dP6LdFxtFJ+n0Wywl9newGjTvkT3D+8wyESwh5TFYqfANgKhpNsK0SEVufnTT/8fFixoauVMXI00KQu3pXP6/xrNO3rNwQjgCvZapobwN8eHokaiBMrFz5gby6btSL6pW74ywhEESzI/uAqDQMZ+OfBIcGm93OzLP0qrlgozLJ6luZVgHJMlPYbAvzBVUUE/ji0Zwb7hXYR3XaVJUMpzASklQKx8/0FCHLzHwuE0u3W/W8F0DUULEYMJhVywn1rROIxD0NBWqvSvlzIBZORghcwff8QHypSL/gESMoasQVsu59fpU+Sd5xxCo8qNQs4FsoNpgSemxxM2VeV2fiJC5H8j/v1tRF+JwiTVSpFeJIxkt37nZhrEy7yEnkdtQBoogTfImbgDw7GY/PoMr2gk21q13u5/6N7A
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(346002)(366004)(39860400002)(136003)(396003)(376002)(230922051799003)(64100799003)(186009)(451199024)(1800799012)(41300700001)(86362001)(82960400001)(38100700002)(26005)(33716001)(6486002)(9686003)(66556008)(6512007)(4744005)(66476007)(6506007)(316002)(66946007)(6636002)(6666004)(44832011)(478600001)(2906002)(4326008)(6862004)(8676002)(8936002)(5660300002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?5p3i0FEUq/nHAwCHk2ZsGzR4EScSoSSlb38W4imX9r+MeI6V9JJI4zv21haH?=
+ =?us-ascii?Q?9OrGxeKFQOZqew6lpKaHnsT8HUrjdPqxX4MSUsAZloWu2xGC0rh+q4W/oXSg?=
+ =?us-ascii?Q?7XHql3Q26a/68tkV4RydsFLQa56G+u56dC1i9PmYMCObkNHpmge2JM3gyyle?=
+ =?us-ascii?Q?xzGx33BPeNKV24qKH2BtBNAcRSkReBgzd1kpgTCruU2L17rELMzKHLjktjvt?=
+ =?us-ascii?Q?SnQ7ybKDWJXbZNEEUXA4q573BSB3waIUqCIVNLMEmQBFhK8H7oeXkJ+87o6P?=
+ =?us-ascii?Q?BW/lQ56GWhB7sCh9lcc6dGe45h/ucWDmeYtViYyQUGTq+6ylk2MM1CaZbxNC?=
+ =?us-ascii?Q?ud8y6uLea47QpFugOS/MTxmR/iLXBhJWbuLZw0ou41nxdjWsdz7cxV95hDgr?=
+ =?us-ascii?Q?DVqU/njOlETT3H1D11tw/6z2qp75U/AlYbtDDRe/xf3qz9ccypVhKaSx8Cdt?=
+ =?us-ascii?Q?9OVHD0eOs8W6x+SkR+ORVRc3T6dlc5EDD3+CGbEDnBwF4j1VTtkwFwj+PU8w?=
+ =?us-ascii?Q?9nP9yoFbN46OHinDjANG6cOuh1CRnP9Rw7oIP7OksAZ3ICWflkQMHDk/P2pK?=
+ =?us-ascii?Q?aMR3rFPS4Fuy6jYlsFgNhUbHu0oMgZKDeDxfioizMfnuY9Yikw98qDFwo8Eg?=
+ =?us-ascii?Q?1XygT9XPZB++wZq1cWXbJuUEep9bnU1P37P8HuIGlq1NrPnFzVSZc/WXKDsv?=
+ =?us-ascii?Q?ftp/wcrMbVcIKORfjqPovJNDeMXeNYLg2BKhwlPC9jcLZH6X3rcyTre60hzh?=
+ =?us-ascii?Q?elWjtIp++iB9LNZSd4LKXx/gvkcDNlzhWWz53RNSKMytgp/YTFe6/UaWYiA5?=
+ =?us-ascii?Q?64wM6oRb/EsI73LBNt8RFakWcleETnV5xPfG9SioFH3jU88RTklS6FU7+KTi?=
+ =?us-ascii?Q?sIziJLzNPc5grl79w/c0k0qKP8DXnxKBk7puy4M4z6Gco/MSzxMI3iriAlK3?=
+ =?us-ascii?Q?y8Y0+vLarxhUWQSpqu4SVjhQdjWzMnel2aF9srtaYEr3ryTFTtw0vUgA86Wv?=
+ =?us-ascii?Q?tZDWNXIWqyATrbcqUUYwFDDcQRj9msnv7Tm/w9ExZY25K/VjrtVYAKXw5LbP?=
+ =?us-ascii?Q?hZIdcvOuetsoAO5IilLrAuqYCKZty5cNyDJZWRfBUDz7jeoqwDoqs0CQVtCF?=
+ =?us-ascii?Q?Frp0sLmjSRqVlS32DDuATq8htm9kYS9ze4iXFkoj7IBc+Tr075m71hv9dpYV?=
+ =?us-ascii?Q?NyDVRi01PvNWVkVvSo+hnAyzAMuBZh8C6JUIyc7acic7AmxHsB8kcih6YTgN?=
+ =?us-ascii?Q?Lh5dC5UECRqeDADM8F504wzNE3/3K72o0j7Mm8maReLbZssTJormHy67pYr1?=
+ =?us-ascii?Q?kxn99uRv+L4ioAXUm5qKLqHxvLYYWZmomDlYMAzVPOUl3TLFGohlGXEVQ3wg?=
+ =?us-ascii?Q?tRGTf8Jc2Ut+UjpMZW2VHhqmpwPfuLWrfM2NOTQtEoEUAenAEdPIdMQKTvMX?=
+ =?us-ascii?Q?DE5O7BL2BQl2aKIOmO5EcsPprBAIY6kMlPVYQQDeDOtyUd4pRjPLlMLo8GvK?=
+ =?us-ascii?Q?75lEutDMEJgFGDuHhQ8RCJaGdJ7mSKGJlyQqL2SxcoLW+YaD+n19hbK4zArW?=
+ =?us-ascii?Q?UTXwwpePqjipK6uwEYNFY+DKlyeVYfhv5GqPiHfl?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: b02bd932-f302-460e-dac4-08dc1d57e27f
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jan 2024 03:44:08.0695
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: P5fDaMOZJL37E3u2g07hYvRkXv16Uy1y1288jykqtOi05dD83LVDw8qGsg5IVDKQzvBCUsVhFi2RVd+B6Ff18Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR11MB5458
+X-OriginatorOrg: intel.com
 
-Add docs/system/i386/tdx.rst for TDX support, and add tdx in
-confidential-guest-support.rst
+On Tue, Jan 23, 2024 at 06:41:42PM -0800, Yang Weijiang wrote:
+>Rename kvm_{g,s}et_msr() to kvm_emulate_msr_{read,write}() to make it
+>more obvious that KVM uses these helpers to emulate guest behaviors,
+>i.e., host_initiated == false in these helpers.
+>
+>Suggested-by: Sean Christopherson <seanjc@google.com>
+>Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+>Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
-Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+I think {kvm,emulator}_{g,s}et_msr_with_filter are equally confusing.
+Maybe you can rename them as well.
 
----
-Changes since v1:
- - Add prerequisite of private gmem;
- - update example command to launch TD;
+Anyway, this patch looks good;
 
-Changes since RFC v4:
- - add the restriction that kernel-irqchip must be split
----
- docs/system/confidential-guest-support.rst |   1 +
- docs/system/i386/tdx.rst                   | 113 +++++++++++++++++++++
- docs/system/target-i386.rst                |   1 +
- 3 files changed, 115 insertions(+)
- create mode 100644 docs/system/i386/tdx.rst
-
-diff --git a/docs/system/confidential-guest-support.rst b/docs/system/confidential-guest-support.rst
-index 0c490dbda2b7..66129fbab64c 100644
---- a/docs/system/confidential-guest-support.rst
-+++ b/docs/system/confidential-guest-support.rst
-@@ -38,6 +38,7 @@ Supported mechanisms
- Currently supported confidential guest mechanisms are:
- 
- * AMD Secure Encrypted Virtualization (SEV) (see :doc:`i386/amd-memory-encryption`)
-+* Intel Trust Domain Extension (TDX) (see :doc:`i386/tdx`)
- * POWER Protected Execution Facility (PEF) (see :ref:`power-papr-protected-execution-facility-pef`)
- * s390x Protected Virtualization (PV) (see :doc:`s390x/protvirt`)
- 
-diff --git a/docs/system/i386/tdx.rst b/docs/system/i386/tdx.rst
-new file mode 100644
-index 000000000000..1872e4f5a8be
---- /dev/null
-+++ b/docs/system/i386/tdx.rst
-@@ -0,0 +1,113 @@
-+Intel Trusted Domain eXtension (TDX)
-+====================================
-+
-+Intel Trusted Domain eXtensions (TDX) refers to an Intel technology that extends
-+Virtual Machine Extensions (VMX) and Multi-Key Total Memory Encryption (MKTME)
-+with a new kind of virtual machine guest called a Trust Domain (TD). A TD runs
-+in a CPU mode that is designed to protect the confidentiality of its memory
-+contents and its CPU state from any other software, including the hosting
-+Virtual Machine Monitor (VMM), unless explicitly shared by the TD itself.
-+
-+Prerequisites
-+-------------
-+
-+To run TD, the physical machine needs to have TDX module loaded and initialized
-+while KVM hypervisor has TDX support and has TDX enabled. If those requirements
-+are met, the ``KVM_CAP_VM_TYPES`` will report the support of ``KVM_X86_TDX_VM``.
-+
-+Trust Domain Virtual Firmware (TDVF)
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+Trust Domain Virtual Firmware (TDVF) is required to provide TD services to boot
-+TD Guest OS. TDVF needs to be copied to guest private memory and measured before
-+a TD boots.
-+
-+The VM scope ``MEMORY_ENCRYPT_OP`` ioctl provides command ``KVM_TDX_INIT_MEM_REGION``
-+to copy the TDVF image to TD's private memory space.
-+
-+Since TDX doesn't support readonly memslot, TDVF cannot be mapped as pflash
-+device and it actually works as RAM. "-bios" option is chosen to load TDVF.
-+
-+OVMF is the opensource firmware that implements the TDVF support. Thus the
-+command line to specify and load TDVF is ``-bios OVMF.fd``
-+
-+KVM private gmem
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+TD's memory (RAM) needs to be able to be transformed between private and shared.
-+And its BIOS (OVMF/TDVF) needs to be mapped as private. Thus QEMU needs to
-+allocate private gmem for them via KVM's IOCTL (KVM_CREATE_GUEST_MEMFD), which
-+requires KVM is newer enough that reports KVM_CAP_GUEST_MEMFD.
-+
-+Feature Control
-+---------------
-+
-+Unlike non-TDX VM, the CPU features (enumerated by CPU or MSR) of a TD is not
-+under full control of VMM. VMM can only configure part of features of a TD on
-+``KVM_TDX_INIT_VM`` command of VM scope ``MEMORY_ENCRYPT_OP`` ioctl.
-+
-+The configurable features have three types:
-+
-+- Attributes:
-+  - PKS (bit 30) controls whether Supervisor Protection Keys is exposed to TD,
-+  which determines related CPUID bit and CR4 bit;
-+  - PERFMON (bit 63) controls whether PMU is exposed to TD.
-+
-+- XSAVE related features (XFAM):
-+  XFAM is a 64b mask, which has the same format as XCR0 or IA32_XSS MSR. It
-+  determines the set of extended features available for use by the guest TD.
-+
-+- CPUID features:
-+  Only some bits of some CPUID leaves are directly configurable by VMM.
-+
-+What features can be configured is reported via TDX capabilities.
-+
-+TDX capabilities
-+~~~~~~~~~~~~~~~~
-+
-+The VM scope ``MEMORY_ENCRYPT_OP`` ioctl provides command ``KVM_TDX_CAPABILITIES``
-+to get the TDX capabilities from KVM. It returns a data structure of
-+``struct kvm_tdx_capabilites``, which tells the supported configuration of
-+attributes, XFAM and CPUIDs.
-+
-+Launching a TD (TDX VM)
-+-----------------------
-+
-+To launch a TDX guest, below are new added and required:
-+
-+.. parsed-literal::
-+
-+    |qemu_system_x86| \\
-+        -object tdx-guest,id=tdx0 \\
-+        -machine ...,kernel-irqchip=split,confidential-guest-support=tdx0 \\
-+        -bios OVMF.fd \\
-+
-+Debugging
-+---------
-+
-+Bit 0 of TD attributes, is DEBUG bit, which decides if the TD runs in off-TD
-+debug mode. When in off-TD debug mode, TD's VCPU state and private memory are
-+accessible via given SEAMCALLs. This requires KVM to expose APIs to invoke those
-+SEAMCALLs and resonponding QEMU change.
-+
-+It's targeted as future work.
-+
-+restrictions
-+------------
-+
-+ - kernel-irqchip must be split;
-+
-+ - No readonly support for private memory;
-+
-+ - No SMM support: SMM support requires manipulating the guset register states
-+   which is not allowed;
-+
-+Live Migration
-+--------------
-+
-+TODO
-+
-+References
-+----------
-+
-+- `TDX Homepage <https://www.intel.com/content/www/us/en/developer/articles/technical/intel-trust-domain-extensions.html>`__
-diff --git a/docs/system/target-i386.rst b/docs/system/target-i386.rst
-index 1b8a1f248abb..4d58cdbc4e06 100644
---- a/docs/system/target-i386.rst
-+++ b/docs/system/target-i386.rst
-@@ -29,6 +29,7 @@ Architectural features
-    i386/kvm-pv
-    i386/sgx
-    i386/amd-memory-encryption
-+   i386/tdx
- 
- OS requirements
- ~~~~~~~~~~~~~~~
--- 
-2.34.1
-
+Reviewed-by: Chao Gao <chao.gao@intel.com>
 
