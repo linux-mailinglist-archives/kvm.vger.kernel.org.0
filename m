@@ -1,59 +1,59 @@
-Return-Path: <kvm+bounces-6955-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6956-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7416683B835
-	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 04:33:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D6D283B838
+	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 04:34:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 14A2EB270AB
-	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 03:33:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D31E31F218D8
+	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 03:34:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D64812E49;
-	Thu, 25 Jan 2024 03:30:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCBFB134A0;
+	Thu, 25 Jan 2024 03:30:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CAqnPLwg"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="e/8Cvndd"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A785612E40
-	for <kvm@vger.kernel.org>; Thu, 25 Jan 2024 03:30:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 729F712E58
+	for <kvm@vger.kernel.org>; Thu, 25 Jan 2024 03:30:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706153452; cv=none; b=QdpVkOdY8J9RdyKlR+RGDxlQk1Np2tIq/2aBRSkNTp16JcNXKoXJOJRbfCVhEHd6qZcePv1EFYCVVupAt+Yhb9QNvpAMDHqcgDqcsfnFOyHBnBi+08G0FWKJYko4OS92DtDS5QLurd7LJAlgnss1Tj1mCmNmQLXlEIKdb3MsePQ=
+	t=1706153455; cv=none; b=Q0m0Ye32QtDeEHfhVNVy4H8GzZTFQif7eo1c6A7On/wY1H6cCUhn1b1BePPzgrl3cqCaCbbcAqfHIlnZsFEcI4dV/UM18j3m/1BQsaFU9WO5qIquqh0W1YVkZu8U2ifbdnzZkpMImJRdPJeYoooI8BUDJVkgy9AW5il0gejOOa0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706153452; c=relaxed/simple;
-	bh=XbBZ8FghQKjl9boDgrpDUaHhve+aNsi3xaBiWaJYrm0=;
+	s=arc-20240116; t=1706153455; c=relaxed/simple;
+	bh=ojsjJjwwvXFn32DtEbF5sMQKOA0I6qo1coDuhp7qGAs=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=jT02aySUhY8epILky1HGO9AeppSuWS5vuVFNLnuLX9Qa9RApan03etJmovT/wCMR2XX99iRoXw+A7Gc9TEJbb0O+wp+i6+8XssDg05yVD4ZunrYctngQ4tsrv3uXpBL3snhxREkkct76n22XqaPLLW/1od+UV2Q3g74brzXc61o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CAqnPLwg; arc=none smtp.client-ip=192.198.163.10
+	 MIME-Version; b=U8/qw+2/jgGZlOfhuzcLtcRMYiWG6l37Z6u0BfZjfE5fKU/NHmBDdTedS0hAM+NlVGTdTs+pXRvgq935TOTLrxH3XimaU0jz9nLDPLLAtYgDh4+mZhRdOpO2ts1786Hfj2YGT0LNqwbioAcbf3aPHgDvbcJj1vaEuWwlVePU+5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=e/8Cvndd; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706153451; x=1737689451;
+  t=1706153453; x=1737689453;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=XbBZ8FghQKjl9boDgrpDUaHhve+aNsi3xaBiWaJYrm0=;
-  b=CAqnPLwga9sOq2F50F+M6RsQ8XsEmRJYBTXaZRSgz/+UCX4gZ8b51yhv
-   Zd1nHrxKd0NNjgZaIS60a86Ej4Z8+yTCrihmxi+NMjpSbSDV+mJA05ehv
-   jWdmhR4rvgOda3HRfEZmQDsVpQKO3/bhIEfd4iEi3H3rM4bKiu5U7zp7+
-   aT3t679oDhB3HHIIXCU8/+ISAiUWWbKqIlUG+abbk7juXdmvWCDbYCWQA
-   kvRCE67aA0/prX7Ty3JT+vLw32+RaoSHxNeSFkr95q+XwuQqkWIW9o6Br
-   MIJQFgnogbwyNekn4QSB2iXxPgGicTgZ2P5pvfzLdZ02W01o8A7UsI36k
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="9430152"
+  bh=ojsjJjwwvXFn32DtEbF5sMQKOA0I6qo1coDuhp7qGAs=;
+  b=e/8CvnddSaMVVl/LeBJceKajyi5ptRXqa3VWsbqh7aS/AVuHp8wMUJ91
+   R8pcJRwBn/QCOF1STtOHg7teDQ6WCgQX8vcNxHvCq0+PujBtpqVdXsa+e
+   RbGOgkQGQkiQtxs3PtDOdqNeMRkNScdRfENaHXqiePH4kn8KselHrwVVG
+   6a+Zv84SbA1049gJ6kwihLAOx1HN2mfH+KB+A8Gs/1ntFc8uEgOEtqOmk
+   61+OvTMYAnK5GfxK/shiuNq5PCpdGGydd5Kr/dUhX8w9qkLam4U6ocmJY
+   keWV+jMy2tUqXkJmEKgv3XIng/4vbqre2Tw7LlrfsWoB4d6nWib41ZY7q
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="9430202"
 X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="9430152"
+   d="scan'208";a="9430202"
 Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2024 19:28:28 -0800
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2024 19:28:33 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="2086209"
+   d="scan'208";a="2086272"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.48.52])
-  by orviesa005.jf.intel.com with ESMTP; 24 Jan 2024 19:28:23 -0800
+  by orviesa005.jf.intel.com with ESMTP; 24 Jan 2024 19:28:28 -0800
 From: Xiaoyao Li <xiaoyao.li@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	David Hildenbrand <david@redhat.com>,
@@ -77,9 +77,9 @@ Cc: qemu-devel@nongnu.org,
 	Gerd Hoffmann <kraxel@redhat.com>,
 	Isaku Yamahata <isaku.yamahata@gmail.com>,
 	Chenyi Qiang <chenyi.qiang@intel.com>
-Subject: [PATCH v4 53/66] i386/tdx: Wire TDX_REPORT_FATAL_ERROR with GuestPanic facility
-Date: Wed, 24 Jan 2024 22:23:15 -0500
-Message-Id: <20240125032328.2522472-54-xiaoyao.li@intel.com>
+Subject: [PATCH v4 54/66] pci-host/q35: Move PAM initialization above SMRAM initialization
+Date: Wed, 24 Jan 2024 22:23:16 -0500
+Message-Id: <20240125032328.2522472-55-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240125032328.2522472-1-xiaoyao.li@intel.com>
 References: <20240125032328.2522472-1-xiaoyao.li@intel.com>
@@ -91,206 +91,54 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Integrate TDX's TDX_REPORT_FATAL_ERROR into QEMU GuestPanic facility
+From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Originated-from: Isaku Yamahata <isaku.yamahata@intel.com>
+In mch_realize(), process PAM initialization before SMRAM initialization so
+that later patch can skill all the SMRAM related with a single check.
+
+Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 ---
-Changes in v4:
-- refine the documentation; (Markus)
+ hw/pci-host/q35.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
-Changes in v3:
-- Add docmentation of new type and struct; (Daniel)
-- refine the error message handling; (Daniel)
----
- qapi/run-state.json   | 28 ++++++++++++++++++++--
- system/runstate.c     | 54 +++++++++++++++++++++++++++++++++++++++++++
- target/i386/kvm/tdx.c | 24 ++++++++++++++++++-
- 3 files changed, 103 insertions(+), 3 deletions(-)
-
-diff --git a/qapi/run-state.json b/qapi/run-state.json
-index 08bc99cb8561..5429116679e3 100644
---- a/qapi/run-state.json
-+++ b/qapi/run-state.json
-@@ -485,10 +485,12 @@
- #
- # @s390: s390 guest panic information type (Since: 2.12)
- #
-+# @tdx: tdx guest panic information type (Since: 8.2)
-+#
- # Since: 2.9
- ##
- { 'enum': 'GuestPanicInformationType',
--  'data': [ 'hyper-v', 's390' ] }
-+  'data': [ 'hyper-v', 's390', 'tdx' ] }
+diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
+index 0d7d4e3f0860..98d4a7c253a6 100644
+--- a/hw/pci-host/q35.c
++++ b/hw/pci-host/q35.c
+@@ -568,6 +568,16 @@ static void mch_realize(PCIDevice *d, Error **errp)
+     /* setup pci memory mapping */
+     pc_pci_as_mapping_init(mch->system_memory, mch->pci_address_space);
  
- ##
- # @GuestPanicInformation:
-@@ -503,7 +505,8 @@
-  'base': {'type': 'GuestPanicInformationType'},
-  'discriminator': 'type',
-  'data': {'hyper-v': 'GuestPanicInformationHyperV',
--          's390': 'GuestPanicInformationS390'}}
-+          's390': 'GuestPanicInformationS390',
-+          'tdx' : 'GuestPanicInformationTdx'}}
- 
- ##
- # @GuestPanicInformationHyperV:
-@@ -566,6 +569,27 @@
-           'psw-addr': 'uint64',
-           'reason': 'S390CrashReason'}}
- 
-+##
-+# @GuestPanicInformationTdx:
-+#
-+# TDX Guest panic information specific to TDX GCHI
-+# TDG.VP.VMCALL<ReportFatalError>.
-+#
-+# @error-code: TD-specific error code
-+#
-+# @gpa: guest-physical address of a page that contains additional
-+#     error data, in forms of zero-terminated string.
-+#
-+# @message: Human-readable error message provided by the guest. Not
-+#     to be trusted.
-+#
-+# Since: 9.0
-+##
-+{'struct': 'GuestPanicInformationTdx',
-+ 'data': {'error-code': 'uint64',
-+          'gpa': 'uint64',
-+          'message': 'str'}}
-+
- ##
- # @MEMORY_FAILURE:
- #
-diff --git a/system/runstate.c b/system/runstate.c
-index d6ab860ecaa7..1ae85ea2c345 100644
---- a/system/runstate.c
-+++ b/system/runstate.c
-@@ -519,6 +519,52 @@ static void qemu_system_wakeup(void)
-     }
- }
- 
-+static char* tdx_parse_panic_message(char *message)
-+{
-+    bool printable = false;
-+    char *buf = NULL;
-+    int len = 0, i;
-+
-+    /*
-+     * Although message is defined as a json string, we shouldn't
-+     * unconditionally treat it as is because the guest generated it and
-+     * it's not necessarily trustable.
-+     */
-+    if (message) {
-+        /* The caller guarantees the NUL-terminated string. */
-+        len = strlen(message);
-+
-+        printable = len > 0;
-+        for (i = 0; i < len; i++) {
-+            if (!(0x20 <= message[i] && message[i] <= 0x7e)) {
-+                printable = false;
-+                break;
-+            }
-+        }
++    /* PAM */
++    init_pam(&mch->pam_regions[0], OBJECT(mch), mch->ram_memory,
++             mch->system_memory, mch->pci_address_space,
++             PAM_BIOS_BASE, PAM_BIOS_SIZE);
++    for (i = 0; i < ARRAY_SIZE(mch->pam_regions) - 1; ++i) {
++        init_pam(&mch->pam_regions[i + 1], OBJECT(mch), mch->ram_memory,
++                 mch->system_memory, mch->pci_address_space,
++                 PAM_EXPAN_BASE + i * PAM_EXPAN_SIZE, PAM_EXPAN_SIZE);
 +    }
 +
-+    if (!printable && len) {
-+        /* 3 = length of "%02x " */
-+        buf = g_malloc(len * 3);
-+        for (i = 0; i < len; i++) {
-+            if (message[i] == '\0') {
-+                break;
-+            } else {
-+                sprintf(buf + 3 * i, "%02x ", message[i]);
-+            }
-+        }
-+        if (i > 0)
-+            /* replace the last ' '(space) to NUL */
-+            buf[i * 3 - 1] = '\0';
-+        else
-+            buf[0] = '\0';
-+
-+        return buf;
-+    }
-+
-+    return message;
-+}
-+
- void qemu_system_guest_panicked(GuestPanicInformation *info)
- {
-     qemu_log_mask(LOG_GUEST_ERROR, "Guest crashed");
-@@ -560,7 +606,15 @@ void qemu_system_guest_panicked(GuestPanicInformation *info)
-                           S390CrashReason_str(info->u.s390.reason),
-                           info->u.s390.psw_mask,
-                           info->u.s390.psw_addr);
-+        } else if (info->type == GUEST_PANIC_INFORMATION_TYPE_TDX) {
-+            qemu_log_mask(LOG_GUEST_ERROR,
-+                          " TDX guest reports fatal error:\"%s\""
-+                          " error code: 0x%016" PRIx64 " gpa page: 0x%016" PRIx64 "\n",
-+                          tdx_parse_panic_message(info->u.tdx.message),
-+                          info->u.tdx.error_code,
-+                          info->u.tdx.gpa);
-         }
-+
-         qapi_free_GuestPanicInformation(info);
-     }
- }
-diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
-index 1c79032ca262..4fbb18135951 100644
---- a/target/i386/kvm/tdx.c
-+++ b/target/i386/kvm/tdx.c
-@@ -20,6 +20,7 @@
- #include "qom/object_interfaces.h"
- #include "standard-headers/asm-x86/kvm_para.h"
- #include "sysemu/kvm.h"
-+#include "sysemu/runstate.h"
- #include "sysemu/sysemu.h"
- #include "exec/address-spaces.h"
- #include "exec/ramblock.h"
-@@ -1078,11 +1079,26 @@ static int tdx_handle_get_quote(X86CPU *cpu, struct kvm_tdx_vmcall *vmcall)
-     return 0;
+     /* if *disabled* show SMRAM to all CPUs */
+     memory_region_init_alias(&mch->smram_region, OBJECT(mch), "smram-region",
+                              mch->pci_address_space, MCH_HOST_BRIDGE_SMRAM_C_BASE,
+@@ -634,15 +644,6 @@ static void mch_realize(PCIDevice *d, Error **errp)
+ 
+     object_property_add_const_link(qdev_get_machine(), "smram",
+                                    OBJECT(&mch->smram));
+-
+-    init_pam(&mch->pam_regions[0], OBJECT(mch), mch->ram_memory,
+-             mch->system_memory, mch->pci_address_space,
+-             PAM_BIOS_BASE, PAM_BIOS_SIZE);
+-    for (i = 0; i < ARRAY_SIZE(mch->pam_regions) - 1; ++i) {
+-        init_pam(&mch->pam_regions[i + 1], OBJECT(mch), mch->ram_memory,
+-                 mch->system_memory, mch->pci_address_space,
+-                 PAM_EXPAN_BASE + i * PAM_EXPAN_SIZE, PAM_EXPAN_SIZE);
+-    }
  }
  
-+static void tdx_panicked_on_fatal_error(X86CPU *cpu, uint64_t error_code,
-+                                        uint64_t gpa, char *message)
-+{
-+    GuestPanicInformation *panic_info;
-+
-+    panic_info = g_new0(GuestPanicInformation, 1);
-+    panic_info->type = GUEST_PANIC_INFORMATION_TYPE_TDX;
-+    panic_info->u.tdx.error_code = error_code;
-+    panic_info->u.tdx.gpa = gpa;
-+    panic_info->u.tdx.message = message;
-+
-+    qemu_system_guest_panicked(panic_info);
-+}
-+
- static int tdx_handle_report_fatal_error(X86CPU *cpu,
-                                          struct kvm_tdx_vmcall *vmcall)
- {
-     uint64_t error_code = vmcall->in_r12;
-     char *message = NULL;
-+    uint64_t gpa = -1ull;
- 
-     if (error_code & 0xffff) {
-         error_report("TDX: REPORT_FATAL_ERROR: invalid error code: "
-@@ -1111,7 +1127,13 @@ static int tdx_handle_report_fatal_error(X86CPU *cpu,
-         assert((char *)tmp == message + GUEST_PANIC_INFO_TDX_MESSAGE_MAX);
-     }
- 
--    error_report("TD guest reports fatal error. %s\n", message ? : "");
-+#define TDX_REPORT_FATAL_ERROR_GPA_VALID    BIT_ULL(63)
-+    if (error_code & TDX_REPORT_FATAL_ERROR_GPA_VALID) {
-+        gpa = vmcall->in_r13;
-+    }
-+
-+    tdx_panicked_on_fatal_error(cpu, error_code, gpa, message);
-+
-     return -1;
- }
- 
+ uint64_t mch_mcfg_base(void)
 -- 
 2.34.1
 
