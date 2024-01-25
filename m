@@ -1,136 +1,106 @@
-Return-Path: <kvm+bounces-7005-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7006-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A18A183C05A
-	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 12:10:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 881F783C0B6
+	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 12:22:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 402A01F216AD
-	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 11:10:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 28AE31F23A59
+	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 11:22:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BB243F8CA;
-	Thu, 25 Jan 2024 11:02:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7290733CCD;
+	Thu, 25 Jan 2024 11:22:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="enn/eet3"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jOo3a7ho"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5F3D1C16;
-	Thu, 25 Jan 2024 11:02:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23DA032C8C;
+	Thu, 25 Jan 2024 11:22:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.134.136.31
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706180524; cv=none; b=QZ77GNqM3EDgLBqh/mA53uH87f5QOAl20LuIoQtk+eSU+iBBo3u4CPBZOWyrjQUrqFKoKq8+qhEv3iw0pvbhCSJ1NCxOcz9DjLAFeh3Zddewf64g5fY5HtjJFVfQBLvMkrrdIycn6PBCdBgJvmNFFATjyME7+3xZvjGa0KjFQBc=
+	t=1706181727; cv=none; b=H2DAHWYBiRCwF38clfbbGLCE1DRNJCychOhx1CcLt1r6toMiccIqzK72fDVICvPSgQukConCgfeqT3nnhHrUHFrqSHBy1+aX5HOESRCzA/JQOyk/ryPolk+N4UttmV070Df3ibRJ+6+ybbeRgBFS3JAqVKTRLAPjXUgx9JTdIno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706180524; c=relaxed/simple;
-	bh=QoLtJhax5FRP1/wP5osvaDsb01kHkav7FL5tHy/UekQ=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ed7OL78+krY58aSDD6uRIOMmEZYOvGMhuPdeV59kDrDW5A1ULkP4RUy62qL4tLx9yTj/0JX57LZW2f/A9TCbW5S2uSM7Mzc5O+AKuBTXbIMZehJfE6ibGbKSSSrck40K1Z0S3CpCnb2KfItim6/+cj7RL/oC+a7hwMFkhqLGNKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=enn/eet3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FDADC433C7;
-	Thu, 25 Jan 2024 11:02:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706180524;
-	bh=QoLtJhax5FRP1/wP5osvaDsb01kHkav7FL5tHy/UekQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=enn/eet3O116NLrhiq7jlG6ANuEaBW6zFAvQdy07perA1dTDRc9THMguITl/NOlPN
-	 AXDsffIfgCgsZByTce3FxALTs9aWIAaCry/LETWFiBKwesDBwOMFRqh3MGB3oLsToV
-	 xpD3286z1wfNpGlRs8HNIfg+mD5M79xcMgz0Ph2V1zUqajdCKfRIdhX9SraeypljnY
-	 LuL5xMSpQRCiXgQ3eGfcaVMiMwRG2ZF5Pk3DOWq2dE+EY2I4AnIs5YUSQG68oGWe6g
-	 4rde6c5igjr7+Dz2+vkUHM+yqF1H54V9Cs2cvvKs+iJ07kbhNmV9g/kbqzYuX97y8A
-	 XhOeNMydS7j8Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rSxUf-00Eh8C-TE;
-	Thu, 25 Jan 2024 11:02:02 +0000
-Date: Thu, 25 Jan 2024 11:02:01 +0000
-Message-ID: <86zfwt7k2e.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH 00/15] KVM: arm64: Improvements to GICv3 LPI injection
-In-Reply-To: <20240124204909.105952-1-oliver.upton@linux.dev>
-References: <20240124204909.105952-1-oliver.upton@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1706181727; c=relaxed/simple;
+	bh=6XmL08t5nvQeDJ0ijBle9RmMpOjyA1qD7j3fdFOhR6k=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=Yc7yagjQnkyHiZu/oEjNZxcX3tppU2VwcKTnt2MjT3TAflFwmdlkuzCtLPvmqw3RkqtqmKOwi5AlXw/IfgJf7bGFYXi7WhTYNqP0PbUgGlHDQz9l0oFedTEet5aSn+lGbhZ7seiKIaFDvUreTOb06km08rnQuvIqMU0YyHvN8Lw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jOo3a7ho; arc=none smtp.client-ip=134.134.136.31
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706181726; x=1737717726;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=6XmL08t5nvQeDJ0ijBle9RmMpOjyA1qD7j3fdFOhR6k=;
+  b=jOo3a7ho0KLSENJLvBa1snW2YXQWlazrtZzh1p7TosAHhjFJE5lvxbRi
+   iiuux1BCwVnxuPr8C3diiEYfzwKKko7Gf286dTF4Svr2F0J8xs7HxiKZO
+   P3oqbj/lj8Tay4o9Rjg8gTd5FOzvAbmdAaZeerQlVfjdHaUjHyu+1zsNv
+   u7Acn//kEinEpV3oOBa36RRMmSwmKorp2TLeUeXYWjsHdDHD4lDrt8o1n
+   kz3e+D6OHYrKI/D+AmYFKJH0gWveEdL56iuGs8hgTgLNXE9YphQdPSfYo
+   qtDqgVRwth10wgt5cGaQty++VfpYZ6kkd0F60qSNM31mMRFqq49ntgrr1
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="466414530"
+X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
+   d="scan'208";a="466414530"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2024 03:22:03 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="1117919561"
+X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
+   d="scan'208";a="1117919561"
+Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.254.209.226]) ([10.254.209.226])
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2024 03:21:55 -0800
+Message-ID: <95ff904c-4731-46e2-ad3b-313811a3c2f2@linux.intel.com>
+Date: Thu, 25 Jan 2024 19:21:53 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, rananta@google.com, jingzhangos@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Cc: baolu.lu@linux.intel.com, Joerg Roedel <joro@8bytes.org>,
+ Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>,
+ Jean-Philippe Brucker <jean-philippe@linaro.org>,
+ Nicolin Chen <nicolinc@nvidia.com>, Yi Liu <yi.l.liu@intel.com>,
+ Jacob Pan <jacob.jun.pan@linux.intel.com>,
+ Longfang Liu <liulongfang@huawei.com>, Yan Zhao <yan.y.zhao@intel.com>,
+ iommu@lists.linux.dev, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCH v10 01/16] iommu: Move iommu fault data to linux/iommu.h
+Content-Language: en-US
+To: Joel Granados <j.granados@samsung.com>
+References: <20240122054308.23901-1-baolu.lu@linux.intel.com>
+ <20240122054308.23901-2-baolu.lu@linux.intel.com>
+ <CGME20240125091737eucas1p2091d853e27e669b3b12cea8ee3bbe34e@eucas1p2.samsung.com>
+ <20240125091734.chekvxgof2d5zpcg@localhost>
+From: Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <20240125091734.chekvxgof2d5zpcg@localhost>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Oliver,
+On 2024/1/25 17:17, Joel Granados wrote:
+> On Mon, Jan 22, 2024 at 01:42:53PM +0800, Lu Baolu wrote:
+>> The iommu fault data is currently defined in uapi/linux/iommu.h, but is
+>> only used inside the iommu subsystem. Move it to linux/iommu.h, where it
+>> will be more accessible to kernel drivers.
+>>
+>> With this done, uapi/linux/iommu.h becomes empty and can be removed from
+>> the tree.
+> The reason for removing this [1] is that it is only being used by
+> internal code in the kernel. What happens with usespace code that have
+> used these definitions? Should we deprecate instead of just removing?
 
-On Wed, 24 Jan 2024 20:48:54 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> The unfortunate reality is there are increasingly large systems that are
-> shipping today without support for GICv4 vLPI injection. Serialization
-> in KVM's LPI routing/injection code has been a significant bottleneck
-> for VMs on these machines when under a high load of LPIs (e.g. a
-> multi-queue NIC).
-> 
-> Even though the long-term solution is quite clearly **direct
-> injection**, we really ought to do something about the LPI scaling
-> issues within KVM.
-> 
-> This series aims to improve the performance of LPI routing/injection in
-> KVM by moving readers of LPI configuration data away from the
-> lpi_list_lock in favor or using RCU.
-> 
-> Patches 1-5 change out the representation of LPIs in KVM from a
-> linked-list to an xarray. While not strictly necessary for making the
-> locking improvements, this seems to be an opportune time to switch to a
-> data structure that can actually be indexed.
-> 
-> Patches 6-10 transition vgic_get_lpi() and vgic_put_lpi() away from
-> taking the lpi_list_lock in favor of using RCU for protection. Note that
-> this requires some rework to the way references are taken on LPIs and
-> how reclaim works to be RCU safe.
-> 
-> Lastly, patches 11-15 rework the LRU policy on the LPI translation cache
-> to not require moving elements in the linked-list and take advantage of
-> this to make it an rculist readable outside of the lpi_list_lock.
+The interfaces to deliver I/O page faults to user space have never been
+implemented in the Linux kernel before. Therefore, from a uAPI point of
+view, this definition is actually dead code.
 
-I quite like the overall direction. I've left a few comments here and
-there, and will probably get back to it after I try to run some tests
-on a big-ish box.
-
-> All of this was tested on top of v6.8-rc1. Apologies if any of the
-> changelogs are a bit too light, I'm happy to rework those further in
-> subsequent revisions.
-> 
-> I would've liked to have benchmark data showing the improvement on top
-> of upstream with this series, but I'm currently having issues with our
-> internal infrastructure and upstream kernels. However, this series has
-> been found to have a near 2x performance improvement to redis-memtier [*]
-> benchmarks on our kernel tree.
-
-It'd be really good to have upstream-based numbers, with details of
-the actual setup (device assignment? virtio?) so that we can compare
-things and even track regressions in the future.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Best regards,
+baolu
 
