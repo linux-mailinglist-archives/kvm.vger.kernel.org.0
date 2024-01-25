@@ -1,234 +1,159 @@
-Return-Path: <kvm+bounces-6889-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6890-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12EEA83B664
-	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 02:09:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E6F083B6E1
+	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 02:54:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37AF21C234B5
-	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 01:09:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1CAD1C22618
+	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 01:54:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 781A86FC7;
-	Thu, 25 Jan 2024 01:09:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=joelfernandes.org header.i=@joelfernandes.org header.b="M1limboU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 198AE5680;
+	Thu, 25 Jan 2024 01:54:28 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD254566A
-	for <kvm@vger.kernel.org>; Thu, 25 Jan 2024 01:09:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1E6EECC;
+	Thu, 25 Jan 2024 01:54:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706144952; cv=none; b=d3CJAcMuSVIKWWNCnWS9o+U8AJcOdNw7OMNqo98F4xYBTxHrypd6ruRQkfT9c/qvAKKn+x4/RDuT8aqHxttHDNnU1ndFuPR+rox0fExYdpnGaucls/jGLidhjO/LXgQ+XPVzAdsQGE9yW1FSZhP4w6isfpn5JRK08NAWUQPRWDk=
+	t=1706147667; cv=none; b=gyscpzOVSjzEQxWsLMmiD4LyS/SWDsaoj+PixLaMsD29VnOM/YOCsevXtfKhPT9I/aYEOKnb1wrRJv86DpK1FqrVBfmNp5Te7LSKS69c80gwRnhxzXueSHNflQB5NLcLgaxLkYLtT7+BvpUQsyIYCNJdKO640oH9jukSqSPw1lc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706144952; c=relaxed/simple;
-	bh=XfnH0XnxBRxSw8s+Kmggue61fl8TjZsRhAk9ljaDQ/o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ReWljtIC0A0S70W5a74R59BO3Y+tWEtUIB6/6fgqKsPSADWv/7SxrWxam5Zxz0eyRSJh3eRf30Kv+kluiPY0/7IaItdvtlPy/2kktwjJEFLSJ4/DB0WHWgNLnWQk2q2irMG8nNyffsM+YRT39JDFrePid0q1tSrmv2BqMn4Puhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=joelfernandes.org; spf=pass smtp.mailfrom=joelfernandes.org; dkim=pass (1024-bit key) header.d=joelfernandes.org header.i=@joelfernandes.org header.b=M1limboU; arc=none smtp.client-ip=209.85.208.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=joelfernandes.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=joelfernandes.org
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2cf108d8dbeso29209161fa.3
-        for <kvm@vger.kernel.org>; Wed, 24 Jan 2024 17:09:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=joelfernandes.org; s=google; t=1706144949; x=1706749749; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PiUW1kySFY5d/pkzoDzjFVz4adphI3+IFsUwCl7g0Cw=;
-        b=M1limboU6m+53976lC325ZeB0bSQMABBxqExECk6McTgXWGObUxu5ocGquLfaT2XQM
-         fR27aMpNBTLy3GJCLB0VkY/uXts/f3HLltthLAg/jH934I8QsGAxgJrwKVhu1z2x0VqP
-         p+CNS2aand+nHQpF5PpP1xt/K4MW5CoRpsyu0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706144949; x=1706749749;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PiUW1kySFY5d/pkzoDzjFVz4adphI3+IFsUwCl7g0Cw=;
-        b=kC9H9lUXudnJAeARZUCjxMxY+Vhf3mMnHP3gHRXz+b83fHnZFvYxSs+mtm4dhWOXEO
-         noCVi+YP59GqGaVWa49fh3UJ1CSxDo7qUlIAIFIEuAdJczsAUaGnnMJJiHfQOUaqGEiq
-         snhoiigtgfdK5SEPZCUudPvGBIOkPI3UQG5WDdKJxbwYaGtfZ5j4xm91Yiyre/2YvvTC
-         UK8eZE8KmWvSZI9NlONRu+cIh6a3XQi8x86pFrd3t+wrE9GbuOldRupAnE6Blz97rVCk
-         eXnj0vH0Z/Co/OQbdg82LiUdDRobFPncs2y1ox7wcHUP0XXUHw86XQ1Bzvqf31+tb79X
-         G3pg==
-X-Gm-Message-State: AOJu0YwbgleBTs2eWbAZytBgJp0CmxFfVwSQYnJa+uG0rCUxCCzfWwzO
-	OlHnVPg7c9WGfObDEoxyYe/ZZW9oWcAEiiLcARQFwORp1KyKyAbyZx9LocJA0B74pzNQAAtX71D
-	7POPmt/W3sE2MTm7ISJJKYx2EjhupOZNv4bYtJQ==
-X-Google-Smtp-Source: AGHT+IHJ7U3y7K16MAJwZ9L7zwf69BBYdFrG85RGACDOZ5s5lNNGtUA2ZLqUoinUEmFG3pgoJzQ6zATtiiWTOT6o3Fk=
-X-Received: by 2002:a2e:3a03:0:b0:2cf:1c74:9bcb with SMTP id
- h3-20020a2e3a03000000b002cf1c749bcbmr100829lja.106.1706144948656; Wed, 24 Jan
- 2024 17:09:08 -0800 (PST)
+	s=arc-20240116; t=1706147667; c=relaxed/simple;
+	bh=EYJs42oleCox/S63sw57aXE+eNGfKyc9KiXA8iCOBdI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=RbKLyH1F0Jc6/Mnc6DdkMlHohPEI8ETZKR5iNBaA9h1XfsD8eY58+yFvqmgzqcJWtRJKLK9ApIL5NcytdIYhHHYb5LO7gJQdzP0rj4WlEvkt2bt22oX6UT7VZ+nLaPU1Rt+AkBNtGT1pyNKBb7WDyuHcSD9X9CljDUvUnCKsAgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.2.5.213])
+	by gateway (Coremail) with SMTP id _____8AxeehNv7Fllj0FAA--.682S3;
+	Thu, 25 Jan 2024 09:54:21 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.2.5.213])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8BxVMxMv7FlojkYAA--.45641S2;
+	Thu, 25 Jan 2024 09:54:20 +0800 (CST)
+From: Bibo Mao <maobibo@loongson.cn>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Sean Christopherson <seanjc@google.com>
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn>,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH v6 0/4] VM: selftests: Add LoongArch support
+Date: Thu, 25 Jan 2024 09:54:16 +0800
+Message-Id: <20240125015420.1960090-1-maobibo@loongson.cn>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231214024727.3503870-1-vineeth@bitbyteword.org>
- <ZXsvl7mabUuNkWcY@google.com> <20231215181014.GB2853@maniforge>
- <6595bee6.e90a0220.57b35.76e9@mx.google.com> <20240104223410.GE303539@maniforge>
- <052b0521-2273-4b1f-bd94-a3decceb9b05@joelfernandes.org> <20240124170648.GA249939@maniforge>
-In-Reply-To: <20240124170648.GA249939@maniforge>
-From: Joel Fernandes <joel@joelfernandes.org>
-Date: Wed, 24 Jan 2024 20:08:56 -0500
-Message-ID: <CAEXW_YR5weKdRD3DfJCUPr4eyXtj=HgTqw0=oV_0Kh2VDVhDdg@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/8] Dynamic vcpu priority management in kvm
-To: David Vernet <void@manifault.com>
-Cc: Sean Christopherson <seanjc@google.com>, "Vineeth Pillai (Google)" <vineeth@bitbyteword.org>, 
-	Ben Segall <bsegall@google.com>, Borislav Petkov <bp@alien8.de>, 
-	Daniel Bristot de Oliveira <bristot@redhat.com>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	Dietmar Eggemann <dietmar.eggemann@arm.com>, "H . Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, 
-	Juri Lelli <juri.lelli@redhat.com>, Mel Gorman <mgorman@suse.de>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Andy Lutomirski <luto@kernel.org>, 
-	Peter Zijlstra <peterz@infradead.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Thomas Gleixner <tglx@linutronix.de>, Valentin Schneider <vschneid@redhat.com>, 
-	Vincent Guittot <vincent.guittot@linaro.org>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
-	Wanpeng Li <wanpengli@tencent.com>, Suleiman Souhlal <suleiman@google.com>, 
-	Masami Hiramatsu <mhiramat@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	x86@kernel.org, Tejun Heo <tj@kernel.org>, Josh Don <joshdon@google.com>, 
-	Barret Rhoden <brho@google.com>, David Dunn <daviddunn@google.com>, julia.lawall@inria.fr, 
-	himadrispandya@gmail.com, jean-pierre.lozi@inria.fr, ast@kernel.org, 
-	paulmck@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8BxVMxMv7FlojkYAA--.45641S2
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoWxGF4DZFyUtryrury7tF15Jrc_yoW5KrWUpa
+	yI9Fn0gF48JFy2q3Z3J34kXFyfK3Z3GF4xCr1aqrWUuw1jyrW8JrWxKFWqyas5Z398Xa40
+	v3WxtwnxW3WUtacCm3ZEXasCq-sJn29KB7ZKAUJUUUU5529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUk0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+	Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx1l5I
+	8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv67AK
+	xVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41l42xK82IYc2Ij64
+	vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
+	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2I
+	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK
+	8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
+	0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU7_MaUUUUU
 
-Hi David,
+This patchset adds KVM selftests for LoongArch system, currently only
+some common test cases are supported and pass to run. These testcase
+are listed as following: 
+	demand_paging_test
+	dirty_log_perf_test
+	dirty_log_test
+	guest_print_test
+	hardware_disable_test
+	kvm_binary_stats_test
+	kvm_create_max_vcpus
+	kvm_page_table_test
+	memslot_modification_stress_test
+	memslot_perf_test
+	set_memory_region_test
 
-On Wed, Jan 24, 2024 at 12:06=E2=80=AFPM David Vernet <void@manifault.com> =
-wrote:
->
-[...]
-> > There might be a caveat to the unboosting path though needing a hyperca=
-ll and I
-> > need to check with Vineeth on his latest code whether it needs a hyperc=
-all, but
-> > we could probably figure that out. In the latest design, one thing I kn=
-ow is
-> > that we just have to force a VMEXIT for both boosting and unboosting. W=
-ell for
-> > boosting, the VMEXIT just happens automatically due to vCPU preemption,=
- but for
-> > unboosting it may not.
->
-> As mentioned above, I think we'd need to add UAPI for setting state from
-> the guest scheduler, even if we didn't use a hypercall to induce a
-> VMEXIT, right?
+This patchset originally is posted from zhaotianrui, I continue to work
+on his efforts.
 
-I see what you mean now. I'll think more about it. The immediate
-thought is to load BPF programs to trigger at appropriate points in
-the guest. For instance, we already have tracepoints for preemption
-disabling. I added that upstream like 8 years ago or something. And
-sched_switch already knows when we switch to RT, which we could
-leverage in the guest. The BPF program would set some shared memory
-state in whatever format it desires, when it runs is what I'm
-envisioning.
+---
+Changes in v6:
+1. Refresh the patch based on latest kernel 6.8-rc1, add LoongArch
+support about testcase set_memory_region_test.
+2. Add hardware_disable_test test case.
+3. Drop modification about macro DEFAULT_GUEST_TEST_MEM, it is problem
+of LoongArch binutils, this issue is raised to LoongArch binutils owners.
 
-By the way, one crazy idea about loading BPF programs into a guest..
-Maybe KVM can pass along the BPF programs to be loaded to the guest?
-The VMM can do that. The nice thing there is only the host would be
-the only responsible for the BPF programs. I am not sure if that makes
-sense, so please let me know what you think. I guess the VMM should
-also be passing additional metadata, like which tracepoints to hook
-to, in the guest, etc.
+Changes in v5:
+1. In LoongArch kvm self tests, the DEFAULT_GUEST_TEST_MEM could be
+0x130000000, it is different from the default value in memstress.h.
+So we Move the definition of DEFAULT_GUEST_TEST_MEM into LoongArch
+ucall.h, and add 'ifndef' condition for DEFAULT_GUEST_TEST_MEM
+in memstress.h.
 
-> > In any case, can we not just force a VMEXIT from relevant path within t=
-he guest,
-> > again using a BPF program? I don't know what the BPF prog to do that wo=
-uld look
-> > like, but I was envisioning we would call a BPF prog from within a gues=
-t if
-> > needed at relevant point (example, return to guest userspace).
->
-> I agree it would be useful to have a kfunc that could be used to force a
-> VMEXIT if we e.g. need to trigger a resched or something. In general
-> that seems like a pretty reasonable building block for something like
-> this. I expect there are use cases where doing everything async would be
-> useful as well. We'll have to see what works well in experimentation.
+Changes in v4:
+1. Remove the based-on flag, as the LoongArch KVM patch series
+have been accepted by Linux kernel, so this can be applied directly
+in kernel.
 
-Sure.
+Changes in v3:
+1. Improve implementation of LoongArch VM page walk.
+2. Add exception handler for LoongArch.
+3. Add dirty_log_test, dirty_log_perf_test, guest_print_test
+test cases for LoongArch.
+4. Add __ASSEMBLER__ macro to distinguish asm file and c file.
+5. Move ucall_arch_do_ucall to the header file and make it as
+static inline to avoid function calls.
+6. Change the DEFAULT_GUEST_TEST_MEM base addr for LoongArch.
 
-> > >> Still there is a lot of merit to sharing memory with BPF and let BPF=
- decide
-> > >> the format of the shared memory, than baking it into the kernel... s=
-o thanks
-> > >> for bringing this up! Lets talk more about it... Oh, and there's my =
-LSFMMBPF
-> > >> invitiation request ;-) ;-).
-> > >
-> > > Discussing this BPF feature at LSFMMBPF is a great idea -- I'll submi=
-t a
-> > > proposal for it and cc you. I looked and couldn't seem to find the
-> > > thread for your LSFMMBPF proposal. Would you mind please sending a li=
-nk?
-> >
-> > I actually have not even submitted one for LSFMM but my management is s=
-upportive
-> > of my visit. Do you want to go ahead and submit one with all of us incl=
-uded in
-> > the proposal? And I am again sorry for the late reply and hopefully we =
-did not
-> > miss any deadlines. Also on related note, there is interest in sched_ex=
-t for
->
-> I see that you submitted a proposal in [2] yesterday. Thanks for writing
-> it up, it looks great and I'll comment on that thread adding a +1 for
-> the discussion.
->
-> [2]: https://lore.kernel.org/all/653c2448-614e-48d6-af31-c5920d688f3e@joe=
-lfernandes.org/
->
-> No worries at all about the reply latency. Thank you for being so open
-> to discussing different approaches, and for driving the discussion. I
-> think this could be a very powerful feature for the kernel so I'm
-> pretty excited to further flesh out the design and figure out what makes
-> the most sense here.
+Changes in v2:
+1. We should use ".balign 4096" to align the assemble code with 4K in
+exception.S instead of "align 12".
+2. LoongArch only supports 3 or 4 levels page tables, so we remove the
+hanlders for 2-levels page table.
+3. Remove the DEFAULT_LOONGARCH_GUEST_STACK_VADDR_MIN and use the common
+DEFAULT_GUEST_STACK_VADDR_MIN to allocate stack memory in guest.
+4. Reorganize the test cases supported by LoongArch.
+5. Fix some code comments.
+6. Add kvm_binary_stats_test test case into LoongArch KVM selftests.
 
-Great!
+---
+Tianrui Zhao (4):
+  KVM: selftests: Add KVM selftests header files for LoongArch
+  KVM: selftests: Add core KVM selftests support for LoongArch
+  KVM: selftests: Add ucall test support for LoongArch
+  KVM: selftests: Add test cases for LoongArch
 
-> > As mentioned above, for boosting, there is no hypercall. The VMEXIT is =
-induced
-> > by host preemption.
->
-> I expect I am indeed missing something then, as mentioned above. VMEXIT
-> aside, we still need some UAPI for the shared structure between the
-> guest and host where the guest indicates its need for boosting, no?
+ tools/testing/selftests/kvm/Makefile          |  16 +
+ .../selftests/kvm/include/kvm_util_base.h     |   5 +
+ .../kvm/include/loongarch/processor.h         | 133 +++++++
+ .../selftests/kvm/include/loongarch/ucall.h   |  20 ++
+ .../selftests/kvm/lib/loongarch/exception.S   |  59 ++++
+ .../selftests/kvm/lib/loongarch/processor.c   | 332 ++++++++++++++++++
+ .../selftests/kvm/lib/loongarch/ucall.c       |  38 ++
+ .../selftests/kvm/set_memory_region_test.c    |   2 +-
+ 8 files changed, 604 insertions(+), 1 deletion(-)
+ create mode 100644 tools/testing/selftests/kvm/include/loongarch/processor.h
+ create mode 100644 tools/testing/selftests/kvm/include/loongarch/ucall.h
+ create mode 100644 tools/testing/selftests/kvm/lib/loongarch/exception.S
+ create mode 100644 tools/testing/selftests/kvm/lib/loongarch/processor.c
+ create mode 100644 tools/testing/selftests/kvm/lib/loongarch/ucall.c
 
-Yes you are right, it is more clear now what you were referring to
-with UAPI. I think we need figure that issue out. But if we can make
-the VMM load BPF programs, then the host can completely decide how to
-structure the shared memory.
 
-> > > 2. What is the cost we're imposing on users if we force paravirt to b=
-e
-> > >    done through BPF? Is this prohibitively high?
-> > >
-> > > There is certainly a nonzero cost. As you pointed out, right now Andr=
-oid
-> > > apparently doesn't use much BPF, and adding the requisite logic to us=
-e
-> > > and manage BPF programs is not insigificant.
-> > >
-> > > Is that cost prohibitively high? I would say no. BPF should be fully
-> > > supported on aarch64 at this point, so it's really a user space probl=
-em.
-> > > Managing the system is what user space does best, and many other
-> > > ecosystems have managed to integrate BPF to great effect. So while th=
-e
-> > > cost is cetainly nonzero, I think there's a reasonable argument to be
-> > > made that it's not prohibitively high.
-> >
-> > Yes, I think it is doable.
-> >
-> > Glad to be able to finally reply, and I shall prioritize this thread mo=
-re on my
-> > side moving forward.
->
-> Thanks for your detailed reply, and happy belated birthday :-)
+base-commit: 7ed2632ec7d72e926b9e8bcc9ad1bb0cd37274bf
+-- 
+2.33.0
 
-Thank you!!! :-)
-
- - Joel
 
