@@ -1,59 +1,59 @@
-Return-Path: <kvm+bounces-6942-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6943-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2192B83B818
-	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 04:32:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEB9083B819
+	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 04:32:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F24A1F21695
-	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 03:32:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F2DB287AA4
+	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 03:32:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46B10107B4;
-	Thu, 25 Jan 2024 03:30:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FC7810A13;
+	Thu, 25 Jan 2024 03:30:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="brBOVKZx"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eflKts5y"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAFFA748D
-	for <kvm@vger.kernel.org>; Thu, 25 Jan 2024 03:30:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FDCA10A05
+	for <kvm@vger.kernel.org>; Thu, 25 Jan 2024 03:30:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706153412; cv=none; b=W/TnlceqGhs7DJgLyjgwo5RkG/djjO3cgDbqmhRwW7JUQ/LQwJpVQZweaLIr1a8clr7EH+lQv3v3I67N5itL12EIjNbWEL5Gp6IYr+23BYkV2RGhULRn2RhCyclVeoBYgElOBy0cU/XFFErkY5LYpRlGorvO2aZzuZ5Ro/gfnIo=
+	t=1706153416; cv=none; b=J4+SP5VlAObq3j5qpKNrUiHjiWI4RIV3N7CtHYTpsL1YXLSwMN56nD+Zpi2PL3pxgEEMsF3eUYitOh2P7u0Ra/F38N3nbuUCAtOxJg46LWgYxMw8iy/kBiTrQTIg12aeTGy48XEUiBcckOFSyTvfTzX4TsO6yyWU2dVq9/gNHGA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706153412; c=relaxed/simple;
-	bh=pqlef+BHr2IcdindiCfmL2SellunImM1H5iUxXML6lI=;
+	s=arc-20240116; t=1706153416; c=relaxed/simple;
+	bh=NmbU8F/irPPwVcBVKFkzoaJ4r3DVaecEUvLuNuQfAao=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=dhezIXpAZd5W3baRJ1irl85XXdGp0oxckyus+E2Bh0r8jPGBLefPfFfKP/5zBMDPFEU6DkYivdZegTtPYmYvGZ1WNh6SMfSCwN8wXryf3Xfd03ALR5Z9o1zGmu4eEe4BG7As4ryqPoXOoHZINbqC1LSuQewQtf+j7ePdkyA+9s8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=brBOVKZx; arc=none smtp.client-ip=192.198.163.10
+	 MIME-Version; b=s1Ix+kKfdZToRe4Sq0Ca2Xr+j81NQgp3mVBhJ2ldsGbTFMjvimKIJogMZGkM/tfWtAczAWs9CrhyX/XgzLm0kMfwap0TZrdZATjLWBugml9mY8dUA+SwKk9wY13PfIzOac+Lbsb3Co2KjzdoZQ2507peHiNunhzGUedFM+9peeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eflKts5y; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706153411; x=1737689411;
+  t=1706153415; x=1737689415;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=pqlef+BHr2IcdindiCfmL2SellunImM1H5iUxXML6lI=;
-  b=brBOVKZxIs+2p+jyb/4B9+9XbSbRjLcUY2GEu84EIYetygi85ezzPGVL
-   zOEXAUvGk4QpGc3/3jV4O/ecxzgZo91QErln4IdYFTHgPGRUJ/sd8RhdZ
-   JV1WW5eka2jUh6sI2/m6PDwZegWIdLYei2hv0DfOgE4h6Jv/p0JlHfYkd
-   oumDDnKRT+o4kRuLqSI1URt0awhQ6tygjmb3TvlcBqUqq68/02Ja/g81B
-   d6Kxvyazehi7Y/gkjAJC7q//YOhogJng6epN9Qd+BlOUDpYBJaKAI72Od
-   zKoCm4kijKZgfiobn/QnqLr3BueeaMHBQNQPlWTCxFQDUg1s6wz0PcDKC
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="9429522"
+  bh=NmbU8F/irPPwVcBVKFkzoaJ4r3DVaecEUvLuNuQfAao=;
+  b=eflKts5y2qbxjkWLkD2ewd84u91OKz3QDZOeayM2TMFvYyfSU/cPly04
+   xfyVXe/YVzIGnMY6+WxJAhmCEPEOUwFasCzJhaluMADcknRGgUdX58Qsp
+   nt40QnOJeLE7+K6szHUmV5pZAR2EmdiVWZF4Szutw0zWYwk+ungz45O/Z
+   TXvzTVtpdTAFZOgORY3QXQxi0b6pKYt1m3Rn/tkcRVWIe+VJtMjiGGteO
+   8qBl/5PH37Vs1OOm/VZ1p4R8vF5+Iiqq8S6GuhkETg3iV+QRaYaQYx77X
+   hJfyOzES3NzK4rrb4fcR6n4sgoZhmHnCjQRo4ZzmH5VGJPO6rsSlQeShf
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="9429582"
 X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="9429522"
+   d="scan'208";a="9429582"
 Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2024 19:27:17 -0800
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2024 19:27:23 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="2085912"
+   d="scan'208";a="2085935"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.48.52])
-  by orviesa005.jf.intel.com with ESMTP; 24 Jan 2024 19:27:12 -0800
+  by orviesa005.jf.intel.com with ESMTP; 24 Jan 2024 19:27:17 -0800
 From: Xiaoyao Li <xiaoyao.li@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	David Hildenbrand <david@redhat.com>,
@@ -77,9 +77,9 @@ Cc: qemu-devel@nongnu.org,
 	Gerd Hoffmann <kraxel@redhat.com>,
 	Isaku Yamahata <isaku.yamahata@gmail.com>,
 	Chenyi Qiang <chenyi.qiang@intel.com>
-Subject: [PATCH v4 40/66] i386/tdx: Track mem_ptr for each firmware entry of TDVF
-Date: Wed, 24 Jan 2024 22:23:02 -0500
-Message-Id: <20240125032328.2522472-41-xiaoyao.li@intel.com>
+Subject: [PATCH v4 41/66] i386/tdx: Track RAM entries for TDX VM
+Date: Wed, 24 Jan 2024 22:23:03 -0500
+Message-Id: <20240125032328.2522472-42-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240125032328.2522472-1-xiaoyao.li@intel.com>
 References: <20240125032328.2522472-1-xiaoyao.li@intel.com>
@@ -91,130 +91,222 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-For each TDVF sections, QEMU needs to copy the content to guest
-private memory via KVM API (KVM_TDX_INIT_MEM_REGION).
+The RAM of TDX VM can be classified into two types:
 
-Introduce a field @mem_ptr for TdxFirmwareEntry to track the memory
-pointer of each TDVF sections. So that QEMU can add/copy them to guest
-private memory later.
+ - TDX_RAM_UNACCEPTED: default type of TDX memory, which needs to be
+   accepted by TDX guest before it can be used and will be all-zeros
+   after being accepted.
 
-TDVF sections can be classified into two groups:
- - Firmware itself, e.g., TDVF BFV and CFV, that located separately from
-   guest RAM. Its memory pointer is the bios pointer.
+ - TDX_RAM_ADDED: the RAM that is ADD'ed to TD guest before running, and
+   can be used directly. E.g., TD HOB and TEMP MEM that needed by TDVF.
 
- - Sections located at guest RAM, e.g., TEMP_MEM and TD_HOB.
-   mmap a new memory range for them.
+Maintain TdxRamEntries[] which grabs the initial RAM info from e820 table
+and mark each RAM range as default type TDX_RAM_UNACCEPTED.
 
-Register a machine_init_done callback to do the stuff.
+Then turn the range of TD HOB and TEMP MEM to TDX_RAM_ADDED since these
+ranges will be ADD'ed before TD runs and no need to be accepted runtime.
+
+The TdxRamEntries[] are later used to setup the memory TD resource HOB
+that passes memory info from QEMU to TDVF.
 
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 Acked-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/i386/tdvf.c         |  1 +
- include/hw/i386/tdvf.h |  7 +++++++
- target/i386/kvm/tdx.c  | 31 +++++++++++++++++++++++++++++++
- 3 files changed, 39 insertions(+)
+Changes in v3:
+- use enum TdxRamType in struct TdxRamEntry; (Isaku)
+- Fix the indention; (Daniel)
 
-diff --git a/hw/i386/tdvf.c b/hw/i386/tdvf.c
-index ff51f40088f0..0a6445705160 100644
---- a/hw/i386/tdvf.c
-+++ b/hw/i386/tdvf.c
-@@ -189,6 +189,7 @@ int tdvf_parse_metadata(TdxFirmware *fw, void *flash_ptr, int size)
-     }
-     g_free(sections);
- 
-+    fw->mem_ptr = flash_ptr;
-     return 0;
- 
- err:
-diff --git a/include/hw/i386/tdvf.h b/include/hw/i386/tdvf.h
-index 593341eb2e93..d880af245a73 100644
---- a/include/hw/i386/tdvf.h
-+++ b/include/hw/i386/tdvf.h
-@@ -39,13 +39,20 @@ typedef struct TdxFirmwareEntry {
-     uint64_t size;
-     uint32_t type;
-     uint32_t attributes;
-+
-+    void *mem_ptr;
- } TdxFirmwareEntry;
- 
- typedef struct TdxFirmware {
-+    void *mem_ptr;
-+
-     uint32_t nr_entries;
-     TdxFirmwareEntry *entries;
- } TdxFirmware;
- 
-+#define for_each_tdx_fw_entry(fw, e)    \
-+    for (e = (fw)->entries; e != (fw)->entries + (fw)->nr_entries; e++)
-+
- int tdvf_parse_metadata(TdxFirmware *fw, void *flash_ptr, int size);
- 
- #endif /* HW_I386_TDVF_H */
+Changes in v1:
+  - simplify the algorithm of tdx_accept_ram_range() (Suggested-by: Gerd Hoffman)
+    (1) Change the existing entry to cover the accepted ram range.
+    (2) If there is room before the accepted ram range add a
+	TDX_RAM_UNACCEPTED entry for that.
+    (3) If there is room after the accepted ram range add a
+	TDX_RAM_UNACCEPTED entry for that.
+---
+ target/i386/kvm/tdx.c | 111 ++++++++++++++++++++++++++++++++++++++++++
+ target/i386/kvm/tdx.h |  14 ++++++
+ 2 files changed, 125 insertions(+)
+
 diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
-index c743340c145c..825a432255ff 100644
+index 825a432255ff..c8c6ed9f811b 100644
 --- a/target/i386/kvm/tdx.c
 +++ b/target/i386/kvm/tdx.c
-@@ -14,6 +14,7 @@
- #include "qemu/osdep.h"
- #include "qemu/error-report.h"
- #include "qemu/base64.h"
-+#include "qemu/mmap-alloc.h"
- #include "qapi/error.h"
- #include "qom/object_interfaces.h"
- #include "standard-headers/asm-x86/kvm_para.h"
-@@ -22,6 +23,7 @@
+@@ -22,6 +22,7 @@
+ #include "sysemu/sysemu.h"
  #include "exec/address-spaces.h"
  
++#include "hw/i386/e820_memory_layout.h"
  #include "hw/i386/x86.h"
-+#include "hw/i386/tdvf.h"
+ #include "hw/i386/tdvf.h"
  #include "kvm_i386.h"
- #include "tdx.h"
- #include "../cpu-internal.h"
-@@ -464,6 +466,33 @@ static void update_tdx_cpuid_lookup_by_tdx_caps(void)
+@@ -466,11 +467,117 @@ static void update_tdx_cpuid_lookup_by_tdx_caps(void)
              (tdx_caps->xfam_fixed1 & CPUID_XSTATE_XSS_MASK) >> 32;
  }
  
-+static void tdx_finalize_vm(Notifier *notifier, void *unused)
++static void tdx_add_ram_entry(uint64_t address, uint64_t length,
++                              enum TdxRamType type)
 +{
-+    TdxFirmware *tdvf = &tdx_guest->tdvf;
-+    TdxFirmwareEntry *entry;
++    uint32_t nr_entries = tdx_guest->nr_ram_entries;
++    tdx_guest->ram_entries = g_renew(TdxRamEntry, tdx_guest->ram_entries,
++                                     nr_entries + 1);
 +
-+    for_each_tdx_fw_entry(tdvf, entry) {
-+        switch (entry->type) {
-+        case TDVF_SECTION_TYPE_BFV:
-+        case TDVF_SECTION_TYPE_CFV:
-+            entry->mem_ptr = tdvf->mem_ptr + entry->data_offset;
-+            break;
-+        case TDVF_SECTION_TYPE_TD_HOB:
-+        case TDVF_SECTION_TYPE_TEMP_MEM:
-+            entry->mem_ptr = qemu_ram_mmap(-1, entry->size,
-+                                           qemu_real_host_page_size(), 0, 0);
-+            break;
-+        default:
-+            error_report("Unsupported TDVF section %d", entry->type);
-+            exit(1);
-+        }
-+    }
++    tdx_guest->ram_entries[nr_entries].address = address;
++    tdx_guest->ram_entries[nr_entries].length = length;
++    tdx_guest->ram_entries[nr_entries].type = type;
++    tdx_guest->nr_ram_entries++;
 +}
 +
-+static Notifier tdx_machine_done_notify = {
-+    .notify = tdx_finalize_vm,
++static int tdx_accept_ram_range(uint64_t address, uint64_t length)
++{
++    uint64_t head_start, tail_start, head_length, tail_length;
++    uint64_t tmp_address, tmp_length;
++    TdxRamEntry *e;
++    int i;
++
++    for (i = 0; i < tdx_guest->nr_ram_entries; i++) {
++        e = &tdx_guest->ram_entries[i];
++
++        if (address + length <= e->address ||
++            e->address + e->length <= address) {
++            continue;
++        }
++
++        /*
++         * The to-be-accepted ram range must be fully contained by one
++         * RAM entry.
++         */
++        if (e->address > address ||
++            e->address + e->length < address + length) {
++            return -EINVAL;
++        }
++
++        if (e->type == TDX_RAM_ADDED) {
++            return -EINVAL;
++        }
++
++        break;
++    }
++
++    if (i == tdx_guest->nr_ram_entries) {
++        return -1;
++    }
++
++    tmp_address = e->address;
++    tmp_length = e->length;
++
++    e->address = address;
++    e->length = length;
++    e->type = TDX_RAM_ADDED;
++
++    head_length = address - tmp_address;
++    if (head_length > 0) {
++        head_start = tmp_address;
++        tdx_add_ram_entry(head_start, head_length, TDX_RAM_UNACCEPTED);
++    }
++
++    tail_start = address + length;
++    if (tail_start < tmp_address + tmp_length) {
++        tail_length = tmp_address + tmp_length - tail_start;
++        tdx_add_ram_entry(tail_start, tail_length, TDX_RAM_UNACCEPTED);
++    }
++
++    return 0;
++}
++
++static int tdx_ram_entry_compare(const void *lhs_, const void* rhs_)
++{
++    const TdxRamEntry *lhs = lhs_;
++    const TdxRamEntry *rhs = rhs_;
++
++    if (lhs->address == rhs->address) {
++        return 0;
++    }
++    if (le64_to_cpu(lhs->address) > le64_to_cpu(rhs->address)) {
++        return 1;
++    }
++    return -1;
++}
++
++static void tdx_init_ram_entries(void)
++{
++    unsigned i, j, nr_e820_entries;
++
++    nr_e820_entries = e820_get_num_entries();
++    tdx_guest->ram_entries = g_new(TdxRamEntry, nr_e820_entries);
++
++    for (i = 0, j = 0; i < nr_e820_entries; i++) {
++        uint64_t addr, len;
++
++        if (e820_get_entry(i, E820_RAM, &addr, &len)) {
++            tdx_guest->ram_entries[j].address = addr;
++            tdx_guest->ram_entries[j].length = len;
++            tdx_guest->ram_entries[j].type = TDX_RAM_UNACCEPTED;
++            j++;
++        }
++    }
++    tdx_guest->nr_ram_entries = j;
++}
++
+ static void tdx_finalize_vm(Notifier *notifier, void *unused)
+ {
+     TdxFirmware *tdvf = &tdx_guest->tdvf;
+     TdxFirmwareEntry *entry;
+ 
++    tdx_init_ram_entries();
++
+     for_each_tdx_fw_entry(tdvf, entry) {
+         switch (entry->type) {
+         case TDVF_SECTION_TYPE_BFV:
+@@ -481,12 +588,16 @@ static void tdx_finalize_vm(Notifier *notifier, void *unused)
+         case TDVF_SECTION_TYPE_TEMP_MEM:
+             entry->mem_ptr = qemu_ram_mmap(-1, entry->size,
+                                            qemu_real_host_page_size(), 0, 0);
++            tdx_accept_ram_range(entry->address, entry->size);
+             break;
+         default:
+             error_report("Unsupported TDVF section %d", entry->type);
+             exit(1);
+         }
+     }
++
++    qsort(tdx_guest->ram_entries, tdx_guest->nr_ram_entries,
++          sizeof(TdxRamEntry), &tdx_ram_entry_compare);
+ }
+ 
+ static Notifier tdx_machine_done_notify = {
+diff --git a/target/i386/kvm/tdx.h b/target/i386/kvm/tdx.h
+index a46af433135f..3a35a2bc0900 100644
+--- a/target/i386/kvm/tdx.h
++++ b/target/i386/kvm/tdx.h
+@@ -15,6 +15,17 @@ typedef struct TdxGuestClass {
+     ConfidentialGuestSupportClass parent_class;
+ } TdxGuestClass;
+ 
++enum TdxRamType{
++    TDX_RAM_UNACCEPTED,
++    TDX_RAM_ADDED,
 +};
 +
- int tdx_kvm_init(MachineState *ms, Error **errp)
- {
-     TdxGuest *tdx = TDX_GUEST(OBJECT(ms->cgs));
-@@ -489,6 +518,8 @@ int tdx_kvm_init(MachineState *ms, Error **errp)
-      */
-     kvm_readonly_mem_allowed = false;
- 
-+    qemu_add_machine_init_done_notifier(&tdx_machine_done_notify);
++typedef struct TdxRamEntry {
++    uint64_t address;
++    uint64_t length;
++    enum TdxRamType type;
++} TdxRamEntry;
 +
-     tdx_guest = tdx;
-     return 0;
- }
+ typedef struct TdxGuest {
+     ConfidentialGuestSupport parent_obj;
+ 
+@@ -27,6 +38,9 @@ typedef struct TdxGuest {
+     char *mrownerconfig;    /* base64 encoded sha348 digest */
+ 
+     TdxFirmware tdvf;
++
++    uint32_t nr_ram_entries;
++    TdxRamEntry *ram_entries;
+ } TdxGuest;
+ 
+ #ifdef CONFIG_TDX
 -- 
 2.34.1
 
