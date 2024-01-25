@@ -1,59 +1,59 @@
-Return-Path: <kvm+bounces-6909-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6910-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2821383B7CF
-	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 04:28:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6723A83B7D4
+	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 04:29:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5BBA31C22CBD
-	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 03:28:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1692428905D
+	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 03:29:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8739510A18;
-	Thu, 25 Jan 2024 03:28:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1B6F10A2D;
+	Thu, 25 Jan 2024 03:28:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Msazv583"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LoisvXnb"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39B9CD287
-	for <kvm@vger.kernel.org>; Thu, 25 Jan 2024 03:28:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 491BF10A10
+	for <kvm@vger.kernel.org>; Thu, 25 Jan 2024 03:28:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706153290; cv=none; b=NsUQEO55Yd/5SQB+iIQIyC8bHg4yNMF/2MFg7DWh/zH1Hz7cY9dwseztwZ7wJSZ844Fsc0BiUCOW+ybusyS9udnMeE4cZG/DZxCaec+WRgZb73ccvnNyfQBGKMGiq+DbmeJTOjEZb/thADlzKgEIp+pW50nRobgjhQt1a+stWkg=
+	t=1706153292; cv=none; b=sBl5HC9gjaeBlHQHIptulHlmy+8mo3qw3kpyZjVxok15nMml32HkUzCAsSrpqXk5xeuIIJWnpvBfwObrk5k9guaM4DeE8GR0jYQDTN2aocVwtzQOvYGA4txbTYkNNGVn+Ovuv34RiAo/YGvuabuMGXk7UrYSq+g13mwKkqfm24I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706153290; c=relaxed/simple;
-	bh=HeSIyCfwY3UukiDGQMr59wgL9NJm35/w6ryNr1Q1bMU=;
+	s=arc-20240116; t=1706153292; c=relaxed/simple;
+	bh=Uni5ljiplp5k1TOtlm3XfrP7/ANeaONuXLXuV9G5ctA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ZZe9lZp4OXwR6SfCthbO7BA8GUy8SMN2vk2z/RmB88xSfoo+bz7i5o2Tt0UbVDBtWcPqxu5RPmyPKOGiDs4LXMyHjikzFdDDpWbvndHTnypnzBoXHS7/Upm6TWkGTpe9FmIczXbyg5g2uKwC78EPW3Myb/zIUOw8oqunQIsV474=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Msazv583; arc=none smtp.client-ip=192.198.163.10
+	 MIME-Version; b=sTD69wcNkExAqoWc13JCjXP22h/IYmhx4pkFMvQSbj6CkqkwFpbrY+SO3dTUSFdXXwViZApDZ0UdXJB/sLw0ClLGTP8h3TJ4sEbCQI9ToYgDhp49zyQVpns+ZvHlfecgKybGZAAwMjNi1ak+BnmvuwSSxmYd8V/ppq/elsehwws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LoisvXnb; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706153289; x=1737689289;
+  t=1706153291; x=1737689291;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=HeSIyCfwY3UukiDGQMr59wgL9NJm35/w6ryNr1Q1bMU=;
-  b=Msazv583njSDj15cxS2HQ1zXFi0TEIhC0+u2LdeO4kJa57sSVnmTmzpA
-   6rIGSxE5EFCf4G8D1ujnYtLgVHdLh4BZrMioJz9fqquiqbQLDg65+Z4bl
-   OMNYPzNMbQEpmeESW7K9MNWnkN9J652PkztJvG+002P8AYDXKEkwTH3E9
-   N4K6udYv8ltxAzPdjONK0Cg5PsdfF0OKIuNXqH4wIUG9Jqu6ZtepTtB6u
-   y9O3PDVfS3QDyTem3OET7ekDGD/lmQw4ujmy3ttwyzBuckyn6z4U9JbRl
-   zEIWZ1RD0eV8nTfGJHZnlA0rzSQjyOuoRJHofd+/x9sd//bU3252uqIai
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="9427969"
+  bh=Uni5ljiplp5k1TOtlm3XfrP7/ANeaONuXLXuV9G5ctA=;
+  b=LoisvXnbUNEJhMThMYI/XUtWl9iDs9ThMosumipwaywEZP3Wi6/6bkYE
+   hDA7EOihBq9sKY5Pp8nl9eQ3/HFn5ZfY2OT8yfL3smNOzo7tXUT2dKs2x
+   9CNjtQDZhYjiSihq7pKosk3rY8SAA+hZ0RiA4+z6Evp6Vx7gLgcaHWJ8G
+   ewAtX1RQbwDgTX+gSURXXiATd+WuNw7nbzEYPeV0MAa28eiBEeu5e2HVZ
+   NamqmjKaG/n1iDh4ITIdMdwRb4Lopwdchk4Me68yIiMrXkqhF976REWhu
+   DFTWrgMPIzrAZp7TVelu5VsFJjSI1pGn0eI9bBtIW7Yy7BaYrjHrvQFgO
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="9428003"
 X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="9427969"
+   d="scan'208";a="9428003"
 Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2024 19:24:15 -0800
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2024 19:24:21 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="2084618"
+   d="scan'208";a="2084663"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.48.52])
-  by orviesa005.jf.intel.com with ESMTP; 24 Jan 2024 19:24:10 -0800
+  by orviesa005.jf.intel.com with ESMTP; 24 Jan 2024 19:24:16 -0800
 From: Xiaoyao Li <xiaoyao.li@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	David Hildenbrand <david@redhat.com>,
@@ -77,9 +77,9 @@ Cc: qemu-devel@nongnu.org,
 	Gerd Hoffmann <kraxel@redhat.com>,
 	Isaku Yamahata <isaku.yamahata@gmail.com>,
 	Chenyi Qiang <chenyi.qiang@intel.com>
-Subject: [PATCH v4 07/66] physmem: Introduce ram_block_discard_guest_memfd_range()
-Date: Wed, 24 Jan 2024 22:22:29 -0500
-Message-Id: <20240125032328.2522472-8-xiaoyao.li@intel.com>
+Subject: [PATCH v4 08/66] kvm: handle KVM_EXIT_MEMORY_FAULT
+Date: Wed, 24 Jan 2024 22:22:30 -0500
+Message-Id: <20240125032328.2522472-9-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240125032328.2522472-1-xiaoyao.li@intel.com>
 References: <20240125032328.2522472-1-xiaoyao.li@intel.com>
@@ -91,70 +91,159 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When memory page is converted from private to shared, the original
-private memory is back'ed by guest_memfd. Introduce
-ram_block_discard_guest_memfd_range() for discarding memory in
-guest_memfd.
+From: Chao Peng <chao.p.peng@linux.intel.com>
 
-Originally-from: Isaku Yamahata <isaku.yamahata@intel.com>
-Codeveloped-by: Xiaoyao Li <xiaoyao.li@intel.com>
+When geeting KVM_EXIT_MEMORY_FAULT exit, it indicates userspace needs to
+do the memory conversion on the RAMBlock to turn the memory into desired
+attribute, i.e., private/shared.
+
+Currently only KVM_MEMORY_EXIT_FLAG_PRIVATE in flags is valid when
+KVM_EXIT_MEMORY_FAULT happens.
+
+Note, KVM_EXIT_MEMORY_FAULT makes sense only when the RAMBlock has
+guest_memfd memory backend.
+
+Note, KVM_EXIT_MEMORY_FAULT returns with -EFAULT, so special handling is
+added.
+
+When page is converted from shared to private, the original shared
+memory can be discarded via ram_block_discard_range(). Note, shared
+memory can be discarded only when it's not back'ed by hugetlb because
+hugetlb is supposed to be pre-allocated and no need for discarding.
+
+Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
----
-Changes in in v4:
-- Drop ram_block_convert_range() and open code its implementation in the
-  next Patch.
----
- include/exec/cpu-common.h |  2 ++
- system/physmem.c          | 23 +++++++++++++++++++++++
- 2 files changed, 25 insertions(+)
 
-diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
-index fef3138d29fc..05610efa8b4f 100644
---- a/include/exec/cpu-common.h
-+++ b/include/exec/cpu-common.h
-@@ -175,6 +175,8 @@ typedef int (RAMBlockIterFunc)(RAMBlock *rb, void *opaque);
- 
- int qemu_ram_foreach_block(RAMBlockIterFunc func, void *opaque);
- int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length);
-+int ram_block_discard_guest_memfd_range(RAMBlock *rb, uint64_t start,
-+                                        size_t length);
- 
- #endif
- 
-diff --git a/system/physmem.c b/system/physmem.c
-index 4735b0462ed9..fc59470191ef 100644
---- a/system/physmem.c
-+++ b/system/physmem.c
-@@ -3626,6 +3626,29 @@ err:
-     return ret;
+---
+Changes in v4:
+- open-coded ram_block_discard logic;
+- change warn_report() to error_report(); (Daniel)
+---
+ accel/kvm/kvm-all.c | 94 ++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 84 insertions(+), 10 deletions(-)
+
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 3bc78a16b48d..2421b8a5b314 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -2893,6 +2893,68 @@ static void kvm_eat_signals(CPUState *cpu)
+     } while (sigismember(&chkset, SIG_IPI));
  }
  
-+int ram_block_discard_guest_memfd_range(RAMBlock *rb, uint64_t start,
-+                                        size_t length)
++static int kvm_convert_memory(hwaddr start, hwaddr size, bool to_private)
 +{
++    MemoryRegionSection section;
++    ram_addr_t offset;
++    MemoryRegion *mr;
++    RAMBlock *rb;
++    void *addr;
 +    int ret = -1;
 +
-+#ifdef CONFIG_FALLOCATE_PUNCH_HOLE
-+    ret = fallocate(rb->guest_memfd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
-+                    start, length);
-+
-+    if (ret) {
-+        ret = -errno;
-+        error_report("%s: Failed to fallocate %s:%" PRIx64 " +%zx (%d)",
-+                     __func__, rb->idstr, start, length, ret);
++    if (!QEMU_PTR_IS_ALIGNED(start, qemu_host_page_size) ||
++        !QEMU_PTR_IS_ALIGNED(size, qemu_host_page_size)) {
++        return -1;
 +    }
-+#else
-+    ret = -ENOSYS;
-+    error_report("%s: fallocate not available %s:%" PRIx64 " +%zx (%d)",
-+                 __func__, rb->idstr, start, length, ret);
-+#endif
 +
++    if (!size) {
++        return -1;
++    }
++
++    section = memory_region_find(get_system_memory(), start, size);
++    mr = section.mr;
++    if (!mr) {
++        return -1;
++    }
++
++    if (memory_region_has_guest_memfd(mr)) {
++        if (to_private) {
++            ret = kvm_set_memory_attributes_private(start, size);
++        } else {
++            ret = kvm_set_memory_attributes_shared(start, size);
++        }
++
++        if (ret) {
++            memory_region_unref(section.mr);
++            return ret;
++        }
++
++        addr = memory_region_get_ram_ptr(mr) + section.offset_within_region;
++        rb = qemu_ram_block_from_host(addr, false, &offset);
++
++        if (to_private) {
++            if (rb->page_size != qemu_host_page_size) {
++                /*
++                * shared memory is back'ed by  hugetlb, which is supposed to be
++                * pre-allocated and doesn't need to be discarded
++                */
++                return 0;
++            } else {
++                ret = ram_block_discard_range(rb, offset, size);
++            }
++        } else {
++            ret = ram_block_discard_guest_memfd_range(rb, offset, size);
++        }
++    } else {
++        error_report("Convert non guest_memfd backed memory region "
++                    "(0x%"HWADDR_PRIx" ,+ 0x%"HWADDR_PRIx") to %s",
++                    start, size, to_private ? "private" : "shared");
++    }
++
++    memory_region_unref(section.mr);
 +    return ret;
 +}
 +
- bool ramblock_is_pmem(RAMBlock *rb)
+ int kvm_cpu_exec(CPUState *cpu)
  {
-     return rb->flags & RAM_PMEM;
+     struct kvm_run *run = cpu->kvm_run;
+@@ -2960,18 +3022,20 @@ int kvm_cpu_exec(CPUState *cpu)
+                 ret = EXCP_INTERRUPT;
+                 break;
+             }
+-            fprintf(stderr, "error: kvm run failed %s\n",
+-                    strerror(-run_ret));
++            if (!(run_ret == -EFAULT && run->exit_reason == KVM_EXIT_MEMORY_FAULT)) {
++                fprintf(stderr, "error: kvm run failed %s\n",
++                        strerror(-run_ret));
+ #ifdef TARGET_PPC
+-            if (run_ret == -EBUSY) {
+-                fprintf(stderr,
+-                        "This is probably because your SMT is enabled.\n"
+-                        "VCPU can only run on primary threads with all "
+-                        "secondary threads offline.\n");
+-            }
++                if (run_ret == -EBUSY) {
++                    fprintf(stderr,
++                            "This is probably because your SMT is enabled.\n"
++                            "VCPU can only run on primary threads with all "
++                            "secondary threads offline.\n");
++                }
+ #endif
+-            ret = -1;
+-            break;
++                ret = -1;
++                break;
++            }
+         }
+ 
+         trace_kvm_run_exit(cpu->cpu_index, run->exit_reason);
+@@ -3054,6 +3118,16 @@ int kvm_cpu_exec(CPUState *cpu)
+                 break;
+             }
+             break;
++        case KVM_EXIT_MEMORY_FAULT:
++            if (run->memory_fault.flags & ~KVM_MEMORY_EXIT_FLAG_PRIVATE) {
++                error_report("KVM_EXIT_MEMORY_FAULT: Unknown flag 0x%" PRIx64,
++                             (uint64_t)run->memory_fault.flags);
++                ret = -1;
++                break;
++            }
++            ret = kvm_convert_memory(run->memory_fault.gpa, run->memory_fault.size,
++                                     run->memory_fault.flags & KVM_MEMORY_EXIT_FLAG_PRIVATE);
++            break;
+         default:
+             ret = kvm_arch_handle_exit(cpu, run);
+             break;
 -- 
 2.34.1
 
