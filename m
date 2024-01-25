@@ -1,220 +1,294 @@
-Return-Path: <kvm+bounces-6999-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7000-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C5B683BE84
-	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 11:19:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FCFD83BE89
+	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 11:23:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B037E1F22CF5
-	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 10:19:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF6371C20CE7
+	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 10:23:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 278ED1CAA3;
-	Thu, 25 Jan 2024 10:19:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D61361CA94;
+	Thu, 25 Jan 2024 10:23:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YBggP/Op"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="QDl9h4cW"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E3761CA85;
-	Thu, 25 Jan 2024 10:19:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A9E31CA80;
+	Thu, 25 Jan 2024 10:23:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706177990; cv=none; b=CwQQIpEXK4utBJYOrVKHC1aaVZmbGb79Sl4UxNVxkSvEnLAU5JFBHnJcfb9R+Oprf8jjq1C9NxZPjKtX+jPMR8q3E+3ArIfnB5TrAIYk9NQV25rehy8+rVsmlfzS7KblPF+6kEGDQOmtUhZiC6/zyQI4YAqS+QYOsDnjhJdeyLs=
+	t=1706178215; cv=none; b=uKlDWUmuv+iFQ/57TgnS+sbpGTYR5ReMEORagTLFKH8De72EqXm7nQwPa/0IJLJsRJZD6lJK4yb7eIctMB/CQe0t8YasWLQUkiOrY6oBkTuxi3J2eGNUrztYQDBdofDVMpVNCveKJYuBkikbjTZuo9g70lZuthET7mv+G6oYPI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706177990; c=relaxed/simple;
-	bh=ltWDaLX0IuZ18+/wbv8xvJPW/A8nI4upBIJOwGhugTs=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=h7QTUo0ZXBmFzUbYQXk1qQxLw+tljCcKgN7YQnXDTFX8myfQg5FHm3NrA4qLkcKmgLfxijZNiQ6ZugkVwDsKbfhx8NSHLeXtaxKoGlNhOP09h9+v9t5sfU44l6fwvzzXJf1kSRetCgx9xCOgoDB/JFn2r4op6hEfpzf1hDAaTiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YBggP/Op; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5FB7C433C7;
-	Thu, 25 Jan 2024 10:19:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706177989;
-	bh=ltWDaLX0IuZ18+/wbv8xvJPW/A8nI4upBIJOwGhugTs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=YBggP/OpCDzUDU2EUweqVC3//Ck/xIxF9B9SMCLH+Ds9ynp9jp6aQUwfAfhXIk4M5
-	 cF1DaSLjytpX0EJ49mY9iYn9qlLPIbtEDyprwfqMzv1IDm0VUJ2iiNSkCL1V63rHVj
-	 TWEj+4poPuMmtJYTFWSC6kp6tNjqc8Gd7Sw9aPsPpIAzrrHO7YCEUk3VZLomD6C/+7
-	 g9joC67aIfioF7Dg/0Cn35f/Ju5eF+668pJVuaMAob+MidD7OrYNrPVdU7AunJjArd
-	 K77FMx+PWkUi7tZIkjZ0CtWM2Pv6IhAEuWtBBGhhYsAxD4CpZr45rkvI4g2vh/7i9n
-	 9nat+9pv1YvRA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rSwpn-00EgUF-8E;
-	Thu, 25 Jan 2024 10:19:47 +0000
-Date: Thu, 25 Jan 2024 10:19:46 +0000
-Message-ID: <8634ul90l9.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH 11/15] KVM: arm64: vgic-its: Lazily allocate LPI translation cache
-In-Reply-To: <20240124204909.105952-12-oliver.upton@linux.dev>
-References: <20240124204909.105952-1-oliver.upton@linux.dev>
-	<20240124204909.105952-12-oliver.upton@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1706178215; c=relaxed/simple;
+	bh=Ly0PqbW2oN2Opyh9CU4T7uFbAhstoUyNcMUmv9bejv0=;
+	h=Date:From:To:CC:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To:References; b=dLLpP+knCj0Fo0EO+FTU1X1SkxsbpeDu+LfEVU+Tru1+LO+pDB6eqRblUIK9hjkClAvOUWQoshzP4wYHocIPqaxLyal5vpkO2d2yHw6ctEPb2dopQSubuYradwESUDA83BxiVnp5XjXMM9s/iJrhSmBmEjc+3j3H2tklDxJquSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=QDl9h4cW; arc=none smtp.client-ip=210.118.77.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20240125102329euoutp0137eef922e1df916568b2d7683d0e2f8b~tkAqfmrpb1687616876euoutp01d;
+	Thu, 25 Jan 2024 10:23:29 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20240125102329euoutp0137eef922e1df916568b2d7683d0e2f8b~tkAqfmrpb1687616876euoutp01d
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1706178209;
+	bh=Ncm394Ii3OYDiiNg4FkBaNLChaaJ1n7sSj+vagiflN0=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=QDl9h4cWUW3wnts/KO5svoxURrJQvmv+r+Wj+gGwxZd4vhuk3jSuKEi3VTgDl73t3
+	 HO4xnWTHrYCfnsxIrkdKaHzbdulAMexZR2Ztf8bRKid8hlZQo7KXcLaHFRY3hJRCOM
+	 fzxOmd0dE7V3BPf3pGcDGjpBRe7TwwtvuQcgfx4M=
+Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
+	eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+	20240125102328eucas1p2f4be424c5e16ea6c48eef02eb1676f52~tkAqQUE0t2319823198eucas1p2b;
+	Thu, 25 Jan 2024 10:23:28 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+	eusmges1new.samsung.com (EUCPMTA) with SMTP id 59.33.09539.0A632B56; Thu, 25
+	Jan 2024 10:23:28 +0000 (GMT)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+	20240125102328eucas1p288a2c65df13b1f60d60f363447bb8e5c~tkApwnWYS1923419234eucas1p2E;
+	Thu, 25 Jan 2024 10:23:28 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+	eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20240125102328eusmtrp13cbab7d9d9bccfe35f7e068ca9461055~tkApvjrdn1016510165eusmtrp1n;
+	Thu, 25 Jan 2024 10:23:28 +0000 (GMT)
+X-AuditID: cbfec7f2-52bff70000002543-78-65b236a0feab
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+	eusmgms1.samsung.com (EUCPMTA) with SMTP id 26.C2.09146.0A632B56; Thu, 25
+	Jan 2024 10:23:28 +0000 (GMT)
+Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
+	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20240125102328eusmtip276b916752f476bcb1a639b8cb39af250~tkApik6bW1219912199eusmtip2Q;
+	Thu, 25 Jan 2024 10:23:28 +0000 (GMT)
+Received: from localhost (106.210.248.232) by CAMSVWEXC02.scsc.local
+	(2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+	Thu, 25 Jan 2024 10:23:27 +0000
+Date: Thu, 25 Jan 2024 11:23:26 +0100
+From: Joel Granados <j.granados@samsung.com>
+To: Lu Baolu <baolu.lu@linux.intel.com>
+CC: Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>, Robin
+	Murphy <robin.murphy@arm.com>, Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian
+	<kevin.tian@intel.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	Nicolin Chen <nicolinc@nvidia.com>, Yi Liu <yi.l.liu@intel.com>, Jacob Pan
+	<jacob.jun.pan@linux.intel.com>, Longfang Liu <liulongfang@huawei.com>, Yan
+	Zhao <yan.y.zhao@intel.com>, <iommu@lists.linux.dev>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCH v10 04/16] iommu: Cleanup iopf data structure
+ definitions
+Message-ID: <20240125102326.rgos2wizh273rteq@localhost>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, rananta@google.com, jingzhangos@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg="pgp-sha512";
+	protocol="application/pgp-signature"; boundary="g7md5qdsafvmcjsg"
+Content-Disposition: inline
+In-Reply-To: <20240122054308.23901-5-baolu.lu@linux.intel.com>
+X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
+	CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprEJsWRmVeSWpSXmKPExsWy7djP87oLzDalGtyerGuxeeJWNotfXyws
+	lh5cz2LRsPoCq8WVf3sYLWbOOMFo0Tl7A7vF0rdb2S3mTC20uLxrDpvFpoZki71PH7NZHPzw
+	hNWi5Y6pxd0r9xgt5v68xuIg4PHk4DwmjzXz1jB6tBx5y+qxeM9LJo9NqzrZPO5c28PmMe9k
+	oMeLzTMZPXqb37F5fN4k57H1822WAO4oLpuU1JzMstQifbsErozLPzrZCpo1K+4ecWlgnKXU
+	xcjJISFgInFu+3d2EFtIYAWjxNN3El2MXED2F0aJ1f1bWSGcz4wSKybPY4HpWPR4MiNEx3JG
+	iVuHpeCKtuybzQzhbGWUWHJ8DhNIFYuAqsSCdSfBdrAJ6Eicf3MHqIiDQ0RAXeLZlwCQemaB
+	XhaJ5s0PwaYKC/hLTF16AKyeV8Bc4suEU2wQtqDEyZlPwK5gFqiQ+Lr8IQvIHGYBaYnl/zhA
+	wpwCdhIfLtxggzhUWeL6zBdMEHatxKktt5hAdkkItHFJPL86gxEi4SKxrHsfVJGwxKvjW9gh
+	bBmJ05N7WCAaJjNK7P/3gR3CWc0osazxK1SHtUTLlSdQHY4SVz8/ZwS5SEKAT+LGW0GIQ/kk
+	Jm2bzgwR5pXoaBOCqFaTWH3vDcsERuVZSF6bheS1WQivQYR1JBbs/sSGIawtsWzha2YI21Zi
+	3br3LAsY2VcxiqeWFuempxYb5qWW6xUn5haX5qXrJefnbmIEJtXT/45/2sE499VHvUOMTByM
+	hxhVgJofbVh9gVGKJS8/L1VJhNfEdGOqEG9KYmVValF+fFFpTmrxIUZpDhYlcV7VFPlUIYH0
+	xJLU7NTUgtQimCwTB6dUA1NW4t8D+1/K3hdutd2vZGQi9HNF+srlmquU5UJX9rutjn1WFdV1
+	R+ufx8EIJdninD3+klaawlyNwd98L71fJtB+bp9HnRS3tnbpw4Nv2E9VxV7nu7amp+BHZdmP
+	syLrZp+T/hT15b6Q6ZwfUVolumkcZrcb/qWridx4kemeZei/4fJhxXKftC0dPH/vzOW8/tAs
+	sdzKkWXNMb4NB4Q8I/YYM/Qk2vw5ssOMYenHmAV6h7Y93bc+9PnzFZsfpB6vVoroLL0ZeLVm
+	wSTRv2HMcfMu1K5Kc91lc+/BMqGPc9l3RTP0vn736nxVTfzS9TM2nFasXOi/dUWQjebNP1V6
+	ndsMP8WsLi5clhW6qdutaZ4SS3FGoqEWc1FxIgDuZuJ5JQQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrAKsWRmVeSWpSXmKPExsVy+t/xe7oLzDalGpzexm+xeeJWNotfXyws
+	lh5cz2LRsPoCq8WVf3sYLWbOOMFo0Tl7A7vF0rdb2S3mTC20uLxrDpvFpoZki71PH7NZHPzw
+	hNWi5Y6pxd0r9xgt5v68xuIg4PHk4DwmjzXz1jB6tBx5y+qxeM9LJo9NqzrZPO5c28PmMe9k
+	oMeLzTMZPXqb37F5fN4k57H1822WAO4oPZui/NKSVIWM/OISW6VoQwsjPUNLCz0jE0s9Q2Pz
+	WCsjUyV9O5uU1JzMstQifbsEvYxZdxewFDRqVjycv5mlgXGGUhcjJ4eEgInEoseTGbsYuTiE
+	BJYySmx50cACkZCR2PjlKiuELSzx51oXG0TRR0aJr6ufMUM4Wxkldm2azA5SxSKgKrFg3Ukw
+	m01AR+L8mztARRwcIgLqEs++BIDUMwv0skg8mNkHtkFYwFfiSO8TJhCbV8Bc4suEU2wgtpBA
+	ocSuvS9ZIeKCEidnPgGrZxYokziwbRU7yExmAWmJ5f84QMKcAnYSHy7cYIM4VFni+swXTBB2
+	rcTnv88YJzAKz0IyaRaSSbMQJkGEtSRu/HvJhCGsLbFs4WtmCNtWYt269ywLGNlXMYqklhbn
+	pucWG+oVJ+YWl+al6yXn525iBCaXbcd+bt7BOO/VR71DjEwcjIcYVYA6H21YfYFRiiUvPy9V
+	SYTXxHRjqhBvSmJlVWpRfnxRaU5q8SFGU2AgTmSWEk3OB6a9vJJ4QzMDU0MTM0sDU0szYyVx
+	Xs+CjkQhgfTEktTs1NSC1CKYPiYOTqkGprTbedt/h0dbz7/DqZ6499HZ/qDn0u8tj3+bI5Y2
+	g+HpsZd1hbF5k1KTI7ZwWjhrHcg4au4eWZU5ceuCADUl9bApHy6dvrbcbXW12mplo9ucB75N
+	Obc5WKZ607bbfhnzpy6+LjFJWTTn4uKj2znO5y1+kKBvqtH27Wm63oT3S4uPynTK/TFoy6oI
+	n3j+T9qqX9dPv+NdEj8noPjXFq5i7hvP3kqdEPXZLtUr/qzsQN1ct0OH11S2rL57Qo7f9MUl
+	XpO/k8x2CjnuT4w6NEtVJWriFvnzC5fMaN/KJCxzQjN7SUok03u9qa8lj3y7ba2/5FmEQc/X
+	htAp6r9WfGlR9Lup/zs//ssmztffXH2ZyhmVWIozEg21mIuKEwGcclQ2wwMAAA==
+X-CMS-MailID: 20240125102328eucas1p288a2c65df13b1f60d60f363447bb8e5c
+X-Msg-Generator: CA
+X-RootMTR: 20240125102328eucas1p288a2c65df13b1f60d60f363447bb8e5c
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20240125102328eucas1p288a2c65df13b1f60d60f363447bb8e5c
+References: <20240122054308.23901-1-baolu.lu@linux.intel.com>
+	<20240122054308.23901-5-baolu.lu@linux.intel.com>
+	<CGME20240125102328eucas1p288a2c65df13b1f60d60f363447bb8e5c@eucas1p2.samsung.com>
 
-On Wed, 24 Jan 2024 20:49:05 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> Reusing translation cache entries within a read-side critical section is
-> fundamentally incompatible with an rculist. As such, we need to allocate
-> a new entry to replace an eviction and free the removed entry
-> afterwards.
-> 
-> Take this as an opportunity to remove the eager allocation of
-> translation cache entries altogether in favor of a lazy allocation model
-> on cache miss.
-> 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+--g7md5qdsafvmcjsg
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Jan 22, 2024 at 01:42:56PM +0800, Lu Baolu wrote:
+> struct iommu_fault_page_request and struct iommu_page_response are not
+> part of uAPI anymore. Convert them to data structures for kAPI.
+>=20
+> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+> Reviewed-by: Yi Liu <yi.l.liu@intel.com>
+> Tested-by: Yan Zhao <yan.y.zhao@intel.com>
+> Tested-by: Longfang Liu <liulongfang@huawei.com>
 > ---
->  arch/arm64/kvm/vgic/vgic-init.c |  3 --
->  arch/arm64/kvm/vgic/vgic-its.c  | 86 ++++++++++++++-------------------
->  include/kvm/arm_vgic.h          |  1 +
->  3 files changed, 38 insertions(+), 52 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-> index e25672d6e846..660d5ce3b610 100644
-> --- a/arch/arm64/kvm/vgic/vgic-init.c
-> +++ b/arch/arm64/kvm/vgic/vgic-init.c
-> @@ -305,9 +305,6 @@ int vgic_init(struct kvm *kvm)
->  		}
->  	}
->  
-> -	if (vgic_has_its(kvm))
-> -		vgic_lpi_translation_cache_init(kvm);
-> -
->  	/*
->  	 * If we have GICv4.1 enabled, unconditionnaly request enable the
->  	 * v4 support so that we get HW-accelerated vSGIs. Otherwise, only
-> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-> index 8c026a530018..aec82d9a1b3c 100644
-> --- a/arch/arm64/kvm/vgic/vgic-its.c
-> +++ b/arch/arm64/kvm/vgic/vgic-its.c
-> @@ -608,12 +608,20 @@ static struct vgic_irq *vgic_its_check_cache(struct kvm *kvm, phys_addr_t db,
->  	return irq;
->  }
->  
-> +/* Default is 16 cached LPIs per vcpu */
-> +#define LPI_DEFAULT_PCPU_CACHE_SIZE	16
-> +
-> +static unsigned int vgic_its_max_cache_size(struct kvm *kvm)
-> +{
-> +	return atomic_read(&kvm->online_vcpus) * LPI_DEFAULT_PCPU_CACHE_SIZE;
-> +}
-> +
->  static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
->  				       u32 devid, u32 eventid,
->  				       struct vgic_irq *irq)
+>  include/linux/iommu.h      | 27 +++++++++++----------------
+>  drivers/iommu/io-pgfault.c |  1 -
+>  drivers/iommu/iommu.c      |  4 ----
+>  3 files changed, 11 insertions(+), 21 deletions(-)
+>=20
+> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> index c960c4fae3bc..829bcb5a8e23 100644
+> --- a/include/linux/iommu.h
+> +++ b/include/linux/iommu.h
+> @@ -71,12 +71,12 @@ struct iommu_fault_page_request {
+>  #define IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE	(1 << 1)
+>  #define IOMMU_FAULT_PAGE_REQUEST_PRIV_DATA	(1 << 2)
+>  #define IOMMU_FAULT_PAGE_RESPONSE_NEEDS_PASID	(1 << 3)
+> -	__u32	flags;
+> -	__u32	pasid;
+> -	__u32	grpid;
+> -	__u32	perm;
+> -	__u64	addr;
+> -	__u64	private_data[2];
+> +	u32	flags;
+> +	u32	pasid;
+> +	u32	grpid;
+> +	u32	perm;
+> +	u64	addr;
+> +	u64	private_data[2];
+>  };
+> =20
+>  /**
+> @@ -85,7 +85,7 @@ struct iommu_fault_page_request {
+>   * @prm: Page Request message, when @type is %IOMMU_FAULT_PAGE_REQ
+>   */
+>  struct iommu_fault {
+> -	__u32	type;
+> +	u32 type;
+>  	struct iommu_fault_page_request prm;
+>  };
+> =20
+> @@ -106,8 +106,6 @@ enum iommu_page_response_code {
+> =20
+>  /**
+>   * struct iommu_page_response - Generic page response information
+> - * @argsz: User filled size of this data
+> - * @version: API version of this structure
+>   * @flags: encodes whether the corresponding fields are valid
+>   *         (IOMMU_FAULT_PAGE_RESPONSE_* values)
+>   * @pasid: Process Address Space ID
+> @@ -115,14 +113,11 @@ enum iommu_page_response_code {
+>   * @code: response code from &enum iommu_page_response_code
+>   */
+>  struct iommu_page_response {
+> -	__u32	argsz;
+> -#define IOMMU_PAGE_RESP_VERSION_1	1
+> -	__u32	version;
+>  #define IOMMU_PAGE_RESP_PASID_VALID	(1 << 0)
+> -	__u32	flags;
+> -	__u32	pasid;
+> -	__u32	grpid;
+> -	__u32	code;
+> +	u32	flags;
+> +	u32	pasid;
+> +	u32	grpid;
+> +	u32	code;
+>  };
+> =20
+> =20
+> diff --git a/drivers/iommu/io-pgfault.c b/drivers/iommu/io-pgfault.c
+> index e5b8b9110c13..24b5545352ae 100644
+> --- a/drivers/iommu/io-pgfault.c
+> +++ b/drivers/iommu/io-pgfault.c
+> @@ -56,7 +56,6 @@ static int iopf_complete_group(struct device *dev, stru=
+ct iopf_fault *iopf,
+>  			       enum iommu_page_response_code status)
 >  {
-> +	struct vgic_translation_cache_entry *new, *victim;
->  	struct vgic_dist *dist = &kvm->arch.vgic;
-> -	struct vgic_translation_cache_entry *cte;
->  	unsigned long flags;
->  	phys_addr_t db;
->  
-> @@ -621,10 +629,11 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
->  	if (irq->hw)
->  		return;
->  
-> -	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
-> +	new = victim = kzalloc(sizeof(*new), GFP_KERNEL_ACCOUNT);
-> +	if (!new)
-> +		return;
->  
-> -	if (unlikely(list_empty(&dist->lpi_translation_cache)))
-> -		goto out;
-> +	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
->  
->  	/*
->  	 * We could have raced with another CPU caching the same
-> @@ -635,17 +644,15 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
->  	if (__vgic_its_check_cache(dist, db, devid, eventid))
->  		goto out;
->  
-> -	/* Always reuse the last entry (LRU policy) */
-> -	cte = list_last_entry(&dist->lpi_translation_cache,
-> -			      typeof(*cte), entry);
+>  	struct iommu_page_response resp =3D {
+> -		.version		=3D IOMMU_PAGE_RESP_VERSION_1,
+>  		.pasid			=3D iopf->fault.prm.pasid,
+>  		.grpid			=3D iopf->fault.prm.grpid,
+>  		.code			=3D status,
+> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> index 68e648b55767..b88dc3e0595c 100644
+> --- a/drivers/iommu/iommu.c
+> +++ b/drivers/iommu/iommu.c
+> @@ -1494,10 +1494,6 @@ int iommu_page_response(struct device *dev,
+>  	if (!param || !param->fault_param)
+>  		return -EINVAL;
+> =20
+> -	if (msg->version !=3D IOMMU_PAGE_RESP_VERSION_1 ||
+> -	    msg->flags & ~IOMMU_PAGE_RESP_PASID_VALID)
+> -		return -EINVAL;
 > -
-> -	/*
-> -	 * Caching the translation implies having an extra reference
-> -	 * to the interrupt, so drop the potential reference on what
-> -	 * was in the cache, and increment it on the new interrupt.
-> -	 */
-> -	if (cte->irq)
-> -		vgic_put_irq(kvm, cte->irq);
-> +	if (dist->lpi_cache_count >= vgic_its_max_cache_size(kvm)) {
-> +		/* Always reuse the last entry (LRU policy) */
-> +		victim = list_last_entry(&dist->lpi_translation_cache,
-> +				      typeof(*cte), entry);
-> +		list_del(&victim->entry);
-> +		dist->lpi_cache_count--;
-> +	} else {
-> +		victim = NULL;
-> +	}
->
->  	/*
->  	 * The irq refcount is guaranteed to be nonzero while holding the
-> @@ -654,16 +661,26 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
->  	lockdep_assert_held(&its->its_lock);
->  	vgic_get_irq_kref(irq);
->  
-> -	cte->db		= db;
-> -	cte->devid	= devid;
-> -	cte->eventid	= eventid;
-> -	cte->irq	= irq;
-> +	new->db		= db;
-> +	new->devid	= devid;
-> +	new->eventid	= eventid;
-> +	new->irq	= irq;
->  
->  	/* Move the new translation to the head of the list */
-> -	list_move(&cte->entry, &dist->lpi_translation_cache);
-> +	list_add(&new->entry, &dist->lpi_translation_cache);
->  
->  out:
->  	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
-> +
-> +	/*
-> +	 * Caching the translation implies having an extra reference
-> +	 * to the interrupt, so drop the potential reference on what
-> +	 * was in the cache, and increment it on the new interrupt.
-> +	 */
-> +	if (victim && victim->irq)
-> +		vgic_put_irq(kvm, victim->irq);
+I see that this function `iommu_page_response` eventually lands in
+drivers/iommu/io-pgfault.c as `iopf_group_response`. But it seems that
+the check for IOMMU_PAGE_RESP_PASID_VALID is dropped.
 
-The games you play with 'victim' are a bit odd. I'd rather have it
-initialised to NULL, and be trusted to have a valid irq if non-NULL.
+I see that after applying [1] and [2] there are only three places where
+IOMMU_PAGE_RESP_PASID_VALID appears in the code: One is the definition
+and the other two are just setting the value. We effectively dropped the
+check. Is the drop intended? and if so, should we just get rid of
+IOMMU_PAGE_RESP_PASID_VALID?
 
-Is there something special I'm missing?
+Best
 
-Thanks,
+[1] https://lore.kernel.org/all/20240122054308.23901-1-baolu.lu@linux.intel=
+=2Ecom
+[2] https://lore.kernel.org/all/20240122073903.24406-1-baolu.lu@linux.intel=
+=2Ecom
 
-	M.
+>  	/* Only send response if there is a fault report pending */
+>  	mutex_lock(&param->fault_param->lock);
+>  	if (list_empty(&param->fault_param->faults)) {
+> --=20
+> 2.34.1
+>=20
 
--- 
-Without deviation from the norm, progress is not possible.
+--=20
+
+Joel Granados
+
+--g7md5qdsafvmcjsg
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAABCgAdFiEErkcJVyXmMSXOyyeQupfNUreWQU8FAmWyNpsACgkQupfNUreW
+QU+6hwv/TaKF2IQiTXor9rKsoUWbb18zSHY+9a6gb2JXmoq36LeghRmGq08Fqlhe
+sfWpsfisZ1vQyMisJpmGYUjvADZAwz58CzPuJg5/mvYIQ92MzOdw9uuYtEhQ8NCn
+2aBCirkZqnmgs9PT+LeOiZI27SqnJ20BYxHziHwKImO00xdF0ATVYJ0WPrC1bBrQ
+2AyluVYBnJBf6eD1aBRyJhd2p+n+Vz5Khjwccg4gHD2wtlHhfaw+bxvHYG/LaTN2
+GtPZlIxvszLugo10D0dJPvQT/UyWPok58qV0vs7j7n66xtQYRFC72aV2PgydIvy0
+BlQd6ekUVDGKiJ3hCrelfmngenwkO7nEA3IMZizb5jFm7fJTshVyOKJ73cB9AKtr
+BVfFbPV+D3a5q5hojISFuouMA0TCXjcbAVxD06LhPly6r6YqC6F2teQK2NzPmZwr
+5FN7CR+oA8kYi/BNa7cjX0CWPorJZuJnNT+UEv38+EzuKfLZ3RjCpcN4iHDTorCf
+ZknArIcN
+=QScI
+-----END PGP SIGNATURE-----
+
+--g7md5qdsafvmcjsg--
 
