@@ -1,79 +1,67 @@
-Return-Path: <kvm+bounces-6991-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6992-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B59E83BC92
-	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 10:02:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27B6F83BD01
+	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 10:15:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D6E101F24616
-	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 09:02:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BF0B6B274F9
+	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 09:15:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 669661CF99;
-	Thu, 25 Jan 2024 08:58:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 799BC1BC53;
+	Thu, 25 Jan 2024 09:15:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OpMMtDBv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H6xYevna"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C7C01CD3D;
-	Thu, 25 Jan 2024 08:58:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4CB717BA7;
+	Thu, 25 Jan 2024 09:15:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706173130; cv=none; b=J43vvgD+CIzfD8/0JQ5kWP9ayEiKDKB/x5XGKnUZwvRqeX7LdvieYbyLZUmnLiK8sgsPl2mzogNCTv6vNpEeWXc6t1Rbsoxmns/CxIEezfZbEAF3Nsuu4X/RIjEe81FyLMsSYApCGvEEzWy4wY1ybsnMdt76URhW5jAbfdu3GUM=
+	t=1706174133; cv=none; b=d+x3+pMyb2jZGaJE2sgWEPLDKbUsx81bh+IdO2wIuU8EsSd8dk/GRri8TKRM+AZG38a9tvRAhWWyL7RKTplg4jrA5B1TU2qwqqkx0JznlK2i+Mk3DhY1+ifZWwrGDnUL8mq/W06gdzWEnc9MQnKprxTMEl/iq2jsYXgGzM+X8oo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706173130; c=relaxed/simple;
-	bh=5ESz6JtE+U09p1ZlznRZpR/p4SYH9bbFXDckngkPJGk=;
+	s=arc-20240116; t=1706174133; c=relaxed/simple;
+	bh=K9lYZvrqdgnYP3UGmpgkuK/YqJ3JhSr/K1XaHoW8CxE=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=D1YIPY4Mb+mGoAD9yRGQlvxa5s9/4WmKQtzgQyb0iKg7tNrNmnI61MQxiUvVQyOsEqdAbeHzWdORpzd5JxMMhJAkFP3G8uZePL6r/VRB5QRHrqCW875prTAo83QNn02oDPDHnRxuKHjpKuxz+ENjeGYxMbmmyb22pfc7TI+D6Dg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OpMMtDBv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0365C433F1;
-	Thu, 25 Jan 2024 08:58:49 +0000 (UTC)
+	 MIME-Version:Content-Type; b=gvskvTaQYsKMrZFyxbuEbQ0M2RekiYJvNt5CMR+xK8gAJgOVvGGPRYVBDYhyfUtEhpo8CaSOiQd/AvxA4QPA2gTsMROU9r7/duzGRmbhfb4lH5FApuU/OurQL62gkP7EAJ01oj3NUQC+gNLd76e2spp9mRcpMyiltmliR1mQPcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H6xYevna; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 173B7C433F1;
+	Thu, 25 Jan 2024 09:15:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706173129;
-	bh=5ESz6JtE+U09p1ZlznRZpR/p4SYH9bbFXDckngkPJGk=;
+	s=k20201202; t=1706174133;
+	bh=K9lYZvrqdgnYP3UGmpgkuK/YqJ3JhSr/K1XaHoW8CxE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OpMMtDBvdUl60ZwdLDe95Zfh/slGKD9gv37QAaVH9zeexBt8z4t/Im1KFyaI8OmyY
-	 8Ch8UXPtoOlpdEhI4/9MBBGePNM52SR+tav+FYEOU3Ru4+wTiL3x8Lq9naKnBIQISF
-	 mXleuLOdD3i3pwqlgZMsnwMXGVNM9daixDnSQBj4JvZcCqiMRC7g005WwT2jIhLCJf
-	 bwpMUJvu9R1hpzIZi59c0sx9CXvXRBhKZ1FrDOIJzfmVws+jISnGQdF9OC7SZ9wPzB
-	 u3izUF1B3/HVz0GdOGPcDgfpeDTb258nLy/wTVbXJgly35pMe3U6ct/MyDq2+LMse9
-	 7fHsqntZcrdNQ==
+	b=H6xYevnalxh+Yn9zgKcLDclQWboRoKYZnaeI9f0xI0v5QeE9+nR6XqeEbJDS3elwZ
+	 1bbOvyg6ryhmWj3xrtkWS0ThR+2teDkJLKotLGjqGDhoE84/LuZINLgQeDBd9tlcOs
+	 HHVt82WzbIvBG4tcV/Jmdx9fagCK84ZwlHOm7c29IOIa3Kk7JVGrBdVjEDqt8NTVCx
+	 gbi+u6usmihayMcll8JN3NPoILuDuMZDvOoCQJVwyAla53tbhapcBB4E/VdZEnoIIx
+	 2ObNGH4/V4Pj+eeqkT7p8AuCTOub3r1jouC3c2SlWrPbyMZdXEZZUGKivgxm16xgBX
+	 rqzMg++Fl/d6Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rSvZP-00EemY-8z;
-	Thu, 25 Jan 2024 08:58:47 +0000
-Date: Thu, 25 Jan 2024 08:58:46 +0000
-Message-ID: <868r4d94c9.wl-maz@kernel.org>
+	id 1rSvpa-00EfA8-RV;
+	Thu, 25 Jan 2024 09:15:30 +0000
+Date: Thu, 25 Jan 2024 09:15:30 +0000
+Message-ID: <867cjx93kd.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Chase Conklin <chase.conklin@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Darren Hart <darren@os.amperecomputing.com>,
-	Jintack Lim <jintack@cs.columbia.edu>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	Miguel Luis <miguel.luis@oracle.com>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	D Scott Phillips <scott@os.amperecomputing.com>
-Subject: Re: [PATCH v11 17/43] KVM: arm64: nv: Support multiple nested Stage-2 mmu structures
-In-Reply-To: <3b51d760-fd32-41b7-b142-5974fdf3e90e@os.amperecomputing.com>
-References: <20231120131027.854038-1-maz@kernel.org>
-	<20231120131027.854038-18-maz@kernel.org>
-	<f0416fa9-b4f1-4bad-a73b-b1d7ecbffc62@os.amperecomputing.com>
-	<86le8g86t6.wl-maz@kernel.org>
-	<3b51d760-fd32-41b7-b142-5974fdf3e90e@os.amperecomputing.com>
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH 04/15] KVM: arm64: vgic-its: Walk the LPI xarray in vgic_copy_lpi_list()
+In-Reply-To: <20240124204909.105952-5-oliver.upton@linux.dev>
+References: <20240124204909.105952-1-oliver.upton@linux.dev>
+	<20240124204909.105952-5-oliver.upton@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -85,98 +73,62 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, darren@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, scott@os.amperecomputing.com
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, rananta@google.com, jingzhangos@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 25 Jan 2024 08:14:32 +0000,
-Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+On Wed, 24 Jan 2024 20:48:58 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
+> Start iterating the LPI xarray in anticipation of removing the LPI
+> linked-list.
 > 
-> Hi Marc,
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/kvm/vgic/vgic-its.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
 > 
-> On 23-01-2024 07:56 pm, Marc Zyngier wrote:
-> > Hi Ganapatrao,
-> > 
-> > On Tue, 23 Jan 2024 09:55:32 +0000,
-> > Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
-> >> 
-> >> Hi Marc,
-> >> 
-> >>> +void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu)
-> >>> +{
-> >>> +	if (is_hyp_ctxt(vcpu)) {
-> >>> +		vcpu->arch.hw_mmu = &vcpu->kvm->arch.mmu;
-> >>> +	} else {
-> >>> +		write_lock(&vcpu->kvm->mmu_lock);
-> >>> +		vcpu->arch.hw_mmu = get_s2_mmu_nested(vcpu);
-> >>> +		write_unlock(&vcpu->kvm->mmu_lock);
-> >>> +	}
-> >> 
-> >> Due to race, there is a non-existing L2's mmu table is getting loaded
-> >> for some of vCPU while booting L1(noticed with L1 boot using large
-> >> number of vCPUs). This is happening since at the early stage the
-> >> e2h(hyp-context) is not set and trap to eret of L1 boot-strap code
-> >> resulting in context switch as if it is returning to L2(guest enter)
-> >> and loading not initialized mmu table on those vCPUs resulting in
-> >> unrecoverable traps and aborts.
-> > 
-> > I'm not sure I understand the problem you're describing here.
-> > 
-> 
-> IIUC, When the S2 fault happens, the faulted vCPU gets the pages from
-> qemu process and maps in S2 and copies the code to allocated
-> memory. Mean while other vCPUs which are in race to come online, when
-> they switches over to dummy S2 finds the mapping and returns to L1 and
-> subsequent execution does not fault instead fetches from memory where
-> no code exists yet(for some) and generates stage 1 instruction abort
-> and jumps to abort handler and even there is no code exist and keeps
-> aborting. This is happening on random vCPUs(no pattern).
+> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> index f152d670113f..a2d95a279798 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> @@ -332,6 +332,7 @@ static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
+>  int vgic_copy_lpi_list(struct kvm *kvm, struct kvm_vcpu *vcpu, u32 **intid_ptr)
+>  {
+>  	struct vgic_dist *dist = &kvm->arch.vgic;
+> +	XA_STATE(xas, &dist->lpi_xa, 0);
 
-Why is that any different from the way we handle faults in the
-non-nested case? If there is a case where we can map the PTE at S2
-before the data is available, this is a generic bug that can trigger
-irrespective of NV.
+Why 0? LPIs start at 8192 (aka GIC_LPI_OFFSET), so it'd probably make
+sense to use that.
 
-> 
-> > What is the race exactly? Why isn't the shadow S2 good enough? Not
-> > having HCR_EL2.VM set doesn't mean we can use the same S2, as the TLBs
-> > are tagged by a different VMID, so staying on the canonical S2 seems
-> > wrong.
-> 
-> IMO, it is unnecessary to switch-over for first ERET while L1 is
-> booting and repeat the faults and page allocation which is anyway
-> dummy once L1 switches to E2H.
+>  	struct vgic_irq *irq;
+>  	unsigned long flags;
+>  	u32 *intids;
+> @@ -350,7 +351,9 @@ int vgic_copy_lpi_list(struct kvm *kvm, struct kvm_vcpu *vcpu, u32 **intid_ptr)
+>  		return -ENOMEM;
+>  
+>  	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
+> -	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
+> +	rcu_read_lock();
+> +
+> +	xas_for_each(&xas, irq, U32_MAX) {
 
-It is mandated by the architecture. EL1 is, by definition, a different
-translation regime from EL2. So we *must* have a different S2, because
-that defines the boundaries of TLB creation and invalidation. The
-fact that these are the same pages is totally irrelevant.
+Similar thing: we advertise 16 bits of ID space (described as
+INTERRUPT_ID_BITS_ITS), so capping at that level would make it more
+understandable.
 
-> Let L1 use its S2 always which is created by L0. Even we should
-> consider avoiding the entry created for L1 in array(first entry in the
-> array) of S2-MMUs and avoid unnecessary iteration/lookup while unmap
-> of NestedVMs.
-
-I'm sorry, but this is just wrong. You are merging the EL1 and EL2
-translation regimes, which is not acceptable.
-
-> I am anticipating this unwanted switch-over wont happen when we have
-> NV2 only support in V12?
-
-V11 is already NV2 only, so I really don't get what you mean here.
-Everything stays the same, and there is nothing to change here.
-
-What you describe looks like a terrible bug somewhere on the
-page-fault path that has the potential to impact non-NV, and I'd like
-to focus on that.
-
-I've been booting my L1 with a fairly large number of vcpus (32 vcpu
-for 6 physical CPUs), and I don't see this.
-
-Since you seem to have a way to trigger it on your HW, can you please
-pinpoint the situation where we map the page without having the
-corresponding data?
+>  		if (i == irq_count)
+>  			break;
+>  		/* We don't need to "get" the IRQ, as we hold the list lock. */
+> @@ -358,6 +361,8 @@ int vgic_copy_lpi_list(struct kvm *kvm, struct kvm_vcpu *vcpu, u32 **intid_ptr)
+>  			continue;
+>  		intids[i++] = irq->intid;
+>  	}
+> +
+> +	rcu_read_unlock();
+>  	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
+>  
+>  	*intid_ptr = intids;
 
 Thanks,
 
