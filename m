@@ -1,59 +1,59 @@
-Return-Path: <kvm+bounces-6948-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6949-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3FCB83B824
-	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 04:33:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4F4083B825
+	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 04:33:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4648FB2384C
-	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 03:33:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7AE01C21158
+	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 03:33:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8228111B1;
-	Thu, 25 Jan 2024 03:30:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9187E1171C;
+	Thu, 25 Jan 2024 03:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YWg96GaU"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jhydKGOi"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0D2511198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56ADB111A2
 	for <kvm@vger.kernel.org>; Thu, 25 Jan 2024 03:30:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706153427; cv=none; b=mm4rT5N9LFnaXLdkf7T7wtafIDwr/UUHeUH3jRzn3HVIvLfEgQB0r6Ic0ZJTj+Ok/8Cd6I6fkNlyjwBw6TDLQSIdWQ5zq6UOM2bc5BnvEooO81gCibrEiyTdSh3vWg6zu7z9AqvXeFgXEwBVDOKAkfzNjCUn3wA8LoDByyB6jF8=
+	t=1706153427; cv=none; b=sC9tMjKGb43ZjqbjCwScHbLU3mQ2eISoU4uLO8NcSQTW3TxJMbGJskBBqXvWMctcGRTRZayNix7HhGxPa+oYCiEzD5uDyCJ33yfOcHAYwHOGdS5PISWRPFsXNWNKlWh6B+sz/jcOXR87lgjCy+21dELJV9ZZUMEkiwIEBNwDmEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1706153427; c=relaxed/simple;
-	bh=bJTP6E2Rl4twKGI84lzeZa4Iz6YIJ0/25aqi4lu48xU=;
+	bh=AdKQF2BW1bf4ZYSY+8ORr/ArRwOGx//exmON+mQRoYo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=q1B7BqdQ+HXTDwalG9+o8hSI+2hzdNmEckXFYSDghPuAet1EG0krIUg6BP8xqM0CNoqHz2Mdn9CPGFfhFW83SHvLSCZb3HXBJ/sjKcoi2pGdTvCWyYd4PKXKz8jn8AeYYwGoi9BJ+ruqrh/Zurv8AvBWukRN4Y2l0cMD7hRDxIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YWg96GaU; arc=none smtp.client-ip=192.198.163.10
+	 MIME-Version; b=Drpdl3UJPulOkhOSxyuvOlAk+qGj/63o/VUZ8pB/enrMiyVzWc9QNimLoLyzCokYz1DJ6hH1PoLKfjoF9ZHQak4kV8e6P+wPxJFj88US9u7FXsQyJSJ0c8QldsfwVaTEvfwXBWJOh8pYdBv2ruehVUOcbTuqs/4POxnDf8AxIMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jhydKGOi; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706153425; x=1737689425;
+  t=1706153426; x=1737689426;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=bJTP6E2Rl4twKGI84lzeZa4Iz6YIJ0/25aqi4lu48xU=;
-  b=YWg96GaUlWtPg96l+yafqXccdPRmwBkLL5SFpOOKTqblrTxa0Ug4kdEU
-   4+yistqbA+sHE86Vu18uQlwMDFnmLs3hiX7b0045WsxoMjeNdLWX/XL2y
-   eVXKCYTCIjs3G3J1zMrtyD2a8yq9MLfMIVMKGCAY/WjdrUtc6yQLG2YCK
-   7dx6GQzOGlb3AfUhOeB8hOPtvE0JnflkcFUipaH6y0dmaf2GdRusGUqNm
-   c/Kb0j1eM1Bf4prnsF2SvFkvROJGmr4oeDLD0EnNKftLKn5cVRjd9DLrT
-   CYtFSeOHc/Bi+mlHGpYkuKeUm7xgXP3nAJiz4N6kpseVzQBRJyHJkSb8J
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="9429880"
+  bh=AdKQF2BW1bf4ZYSY+8ORr/ArRwOGx//exmON+mQRoYo=;
+  b=jhydKGOia4fJ4i1facq62Fs6R3eyVbztiVJj+hd0eamLv5SyFltc7afB
+   CC3Csdl/aw6aWytDVMylLUQx5QCdHU6PuUbGjLPn4smtKuSXkMmi04Ke9
+   kXko6sDZa6JXszQjlB0D21owFJmqFIRTGLYR0KDB9dV3Zl3cCZs0v+yQn
+   cA+W0IIH33nwBGr+FRNC2tmA88S8/s/SdGd5J+a+X+f9w0hc3YEowH90o
+   suSZyAIYLmAQKF3lARlZgMvMBtMnr1HnNNMM8SUamvZy5OwBazhw0sG02
+   seUod3ICeyQS04gkctLSPS+CBeElnu9+KbgSwf8Hek8qiiuza/LQ+95yw
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="9429920"
 X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="9429880"
+   d="scan'208";a="9429920"
 Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2024 19:27:55 -0800
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2024 19:28:00 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="2086098"
+   d="scan'208";a="2086101"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.48.52])
-  by orviesa005.jf.intel.com with ESMTP; 24 Jan 2024 19:27:50 -0800
+  by orviesa005.jf.intel.com with ESMTP; 24 Jan 2024 19:27:55 -0800
 From: Xiaoyao Li <xiaoyao.li@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	David Hildenbrand <david@redhat.com>,
@@ -77,9 +77,9 @@ Cc: qemu-devel@nongnu.org,
 	Gerd Hoffmann <kraxel@redhat.com>,
 	Isaku Yamahata <isaku.yamahata@gmail.com>,
 	Chenyi Qiang <chenyi.qiang@intel.com>
-Subject: [PATCH v4 47/66] i386/tdx: Call KVM_TDX_INIT_VCPU to initialize TDX vcpu
-Date: Wed, 24 Jan 2024 22:23:09 -0500
-Message-Id: <20240125032328.2522472-48-xiaoyao.li@intel.com>
+Subject: [PATCH v4 48/66] i386/tdx: Finalize TDX VM
+Date: Wed, 24 Jan 2024 22:23:10 -0500
+Message-Id: <20240125032328.2522472-49-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240125032328.2522472-1-xiaoyao.li@intel.com>
 References: <20240125032328.2522472-1-xiaoyao.li@intel.com>
@@ -91,54 +91,33 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-TDX vcpu needs to be initialized by SEAMCALL(TDH.VP.INIT) and KVM
-provides vcpu level IOCTL KVM_TDX_INIT_VCPU for it.
-
-KVM_TDX_INIT_VCPU needs the address of the HOB as input. Invoke it for
-each vcpu after HOB list is created.
+Invoke KVM_TDX_FINALIZE_VM to finalize the TD's measurement and make
+the TD vCPUs runnable once machine initialization is complete.
 
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 Acked-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- target/i386/kvm/tdx.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ target/i386/kvm/tdx.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
-index 0f6a6e9bb024..341b4e76bf7d 100644
+index 341b4e76bf7d..69a697608219 100644
 --- a/target/i386/kvm/tdx.c
 +++ b/target/i386/kvm/tdx.c
-@@ -592,6 +592,22 @@ static void tdx_init_ram_entries(void)
-     tdx_guest->nr_ram_entries = j;
+@@ -674,6 +674,13 @@ static void tdx_finalize_vm(Notifier *notifier, void *unused)
+     /* Tdvf image was copied into private region above. It becomes unnecessary. */
+     ram_block = tdx_guest->tdvf_region->ram_block;
+     ram_block_discard_range(ram_block, 0, ram_block->max_length);
++
++    r = tdx_vm_ioctl(KVM_TDX_FINALIZE_VM, 0, NULL);
++    if (r < 0) {
++        error_report("KVM_TDX_FINALIZE_VM failed %s", strerror(-r));
++        exit(0);
++    }
++    tdx_guest->parent_obj.ready = true;
  }
  
-+static void tdx_post_init_vcpus(void)
-+{
-+    TdxFirmwareEntry *hob;
-+    CPUState *cpu;
-+    int r;
-+
-+    hob = tdx_get_hob_entry(tdx_guest);
-+    CPU_FOREACH(cpu) {
-+        r = tdx_vcpu_ioctl(cpu, KVM_TDX_INIT_VCPU, 0, (void *)hob->address);
-+        if (r < 0) {
-+            error_report("KVM_TDX_INIT_VCPU failed %s", strerror(-r));
-+            exit(1);
-+        }
-+    }
-+}
-+
- static void tdx_finalize_vm(Notifier *notifier, void *unused)
- {
-     TdxFirmware *tdvf = &tdx_guest->tdvf;
-@@ -624,6 +640,8 @@ static void tdx_finalize_vm(Notifier *notifier, void *unused)
- 
-     tdvf_hob_create(tdx_guest, tdx_get_hob_entry(tdx_guest));
- 
-+    tdx_post_init_vcpus();
-+
-     for_each_tdx_fw_entry(tdvf, entry) {
-         struct kvm_tdx_init_mem_region mem_region = {
-             .source_addr = (__u64)entry->mem_ptr,
+ static Notifier tdx_machine_done_notify = {
 -- 
 2.34.1
 
