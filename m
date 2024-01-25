@@ -1,59 +1,59 @@
-Return-Path: <kvm+bounces-6953-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6954-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E85283B82F
-	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 04:33:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A3F183B831
+	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 04:33:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 308B11F2184D
-	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 03:33:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02F04280F84
+	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 03:33:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67C8312B6D;
-	Thu, 25 Jan 2024 03:30:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C96A212B8A;
+	Thu, 25 Jan 2024 03:30:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bG6Q4n2r"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cjb/mBZY"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 207E6125D7
-	for <kvm@vger.kernel.org>; Thu, 25 Jan 2024 03:30:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 952ED12B70
+	for <kvm@vger.kernel.org>; Thu, 25 Jan 2024 03:30:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706153438; cv=none; b=UBbYyyT7jMAlY2phhwbkcUteJGRkXGV5JL8X9jq1yOebjhpZMXhLiQ3jzn7x1SCueEsctClYW05pDKcjUzY0/RNIUDnVMaI6UVGf3KXQC9cAWqVUHYtoSSBNj7zQX5n9BujSWZppRCp8d0FoKRkXGEs80AcAOOJ5KGoqRwb5zZA=
+	t=1706153441; cv=none; b=N2s0hiOP1fdVD9IoRRdIKbddOlXDwFBCFkUeDjXj1hz3q0b/rY0w1XFqxTxO7HBh8z9WS3OW7FjwzBU8OndrSvNynn3t3B9p38ieKvBbR4JEviiwjeCtfnau6Sc+aabLCzuA227WMC5woxuwvRH+2cwBzyMFsTSicocoXEGz3P0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706153438; c=relaxed/simple;
-	bh=X8zT+hRGFWRLG2SSYKlzsvTGhWc+CZMy8l1V5tc6R5U=;
+	s=arc-20240116; t=1706153441; c=relaxed/simple;
+	bh=fDht0M8HIC/RtXrcbvEg+wKbn8OdTSNmi650IuzqiJs=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=polXyJ/6rPlcpApyXELnvHDIofY/U0MGhOL0w74QIeoSIUAJ+BbTKjjOO/yIWOpuqN62JvC7o/495i2X0uYkcki0iTLvj3lgDadNP70Dy53cH2Uc7wH0VxAxKTXMulJG7JXAR66/hijzzPsS2j/N4+5TJ51kntn7FzIsP83i6l8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bG6Q4n2r; arc=none smtp.client-ip=192.198.163.10
+	 MIME-Version; b=o1y+Eikkss3S1s11iyI9s6jrSefJJzTfVqWfR2BEdz2g6q/d5iQOZ6tHjbtmaMYwzcv928e6kpSQuLmCA6oO8w9aX/RLMqeW5Z6aTyzfXQhm6cxjb+1+MJuiW9aVIOvZycQzLcDDkQKEBRkHSnbzW6HGr/8SiYocfxjbTY1n+E8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cjb/mBZY; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706153437; x=1737689437;
+  t=1706153439; x=1737689439;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=X8zT+hRGFWRLG2SSYKlzsvTGhWc+CZMy8l1V5tc6R5U=;
-  b=bG6Q4n2rfD9S/bXLm0yNtIXszAwmaC/iD2/snW6nufDCkPNnbNZHgGaC
-   k9NbN36H3nzVMDlvQh3kJIlwTDSPGLeepE+WUoXDUxMQTC5BGA1eFhik6
-   K/XcG3Fw6h2MBD72aYpTbzdTWltE8Cm7wFbcrUjj//V9R/UwZoKjFnf8I
-   h6UkAjoVxBuNkTxnnqpcLlO8icfqzSmPRsZRzXTxVZJDQrzhhMvfEUSZT
-   IdLzKhkNGE9b4GfqgbGomL07nuifVk2rNYuysYQC4EVK46Al0LVSB5sQ+
-   MgWNO0QgPE4zLKVhrtSByxuotN1+Whs6+L+SfVC1t8zr/1ImZpjcj+lIe
+  bh=fDht0M8HIC/RtXrcbvEg+wKbn8OdTSNmi650IuzqiJs=;
+  b=cjb/mBZYIUFXxdoZ62Ye6cV7+hFFod2peaRDOZnbSDU1afA7+OB/sje/
+   1lYl3yKCFoUpi7a+wJs1+DgES+/K18BOU+MpvOUrxjcNuC7MhdDXk7erh
+   HX7kvqGYXZqBOgPhQ02mafdx1+1aeW94sQDsb9o8LJ54zj+9ykmWBVLs/
+   bZeippaOtxF1cZ3T9xAWWdESlp2+7bWxdJM+jJMXOqNt5DUtDcDRyccDV
+   ibzESsOVjxpKlVq3AzPT48i0axnxQC6MJ7+7r0RVus93yNnWVPuXWs2Vs
+   VuYu2wEiAOZvj+bJou0tLoxnkJAwaUQRkNH+5VRAfdPZuJ28m42k9qIAS
    w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="9430044"
+X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="9430085"
 X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="9430044"
+   d="scan'208";a="9430085"
 Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2024 19:28:17 -0800
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2024 19:28:22 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="2086124"
+   d="scan'208";a="2086138"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.48.52])
-  by orviesa005.jf.intel.com with ESMTP; 24 Jan 2024 19:28:12 -0800
+  by orviesa005.jf.intel.com with ESMTP; 24 Jan 2024 19:28:17 -0800
 From: Xiaoyao Li <xiaoyao.li@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	David Hildenbrand <david@redhat.com>,
@@ -77,9 +77,9 @@ Cc: qemu-devel@nongnu.org,
 	Gerd Hoffmann <kraxel@redhat.com>,
 	Isaku Yamahata <isaku.yamahata@gmail.com>,
 	Chenyi Qiang <chenyi.qiang@intel.com>
-Subject: [PATCH v4 51/66] i386/tdx: handle TDG.VP.VMCALL<MapGPA> hypercall
-Date: Wed, 24 Jan 2024 22:23:13 -0500
-Message-Id: <20240125032328.2522472-52-xiaoyao.li@intel.com>
+Subject: [PATCH v4 52/66] i386/tdx: Handle TDG.VP.VMCALL<REPORT_FATAL_ERROR>
+Date: Wed, 24 Jan 2024 22:23:14 -0500
+Message-Id: <20240125032328.2522472-53-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240125032328.2522472-1-xiaoyao.li@intel.com>
 References: <20240125032328.2522472-1-xiaoyao.li@intel.com>
@@ -91,129 +91,87 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+TD guest can use TDG.VP.VMCALL<REPORT_FATAL_ERROR> to request termination
+with error message encoded in GPRs.
 
-MapGPA is a hypercall to convert GPA from/to private GPA to/from shared GPA.
-As the conversion function is already implemented as kvm_convert_memory,
-wire it to TDX hypercall exit.
+Parse and print the error message, and terminate the TD guest in the
+handler.
 
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 ---
- accel/kvm/kvm-all.c   |  2 +-
- include/sysemu/kvm.h  |  2 ++
- target/i386/kvm/tdx.c | 54 +++++++++++++++++++++++++++++++++++++++++++
+ target/i386/kvm/tdx.c | 39 +++++++++++++++++++++++++++++++++++++++
  target/i386/kvm/tdx.h |  1 +
- 4 files changed, 58 insertions(+), 1 deletion(-)
+ 2 files changed, 40 insertions(+)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index eb8b3925dbe1..04309a8623d9 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -2920,7 +2920,7 @@ static void kvm_eat_signals(CPUState *cpu)
-     } while (sigismember(&chkset, SIG_IPI));
- }
- 
--static int kvm_convert_memory(hwaddr start, hwaddr size, bool to_private)
-+int kvm_convert_memory(hwaddr start, hwaddr size, bool to_private)
- {
-     MemoryRegionSection section;
-     ram_addr_t offset;
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index 2f6592859ac6..e0061848b053 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -544,4 +544,6 @@ int kvm_create_guest_memfd(uint64_t size, uint64_t flags, Error **errp);
- 
- int kvm_set_memory_attributes_private(hwaddr start, hwaddr size);
- int kvm_set_memory_attributes_shared(hwaddr start, hwaddr size);
-+
-+int kvm_convert_memory(hwaddr start, hwaddr size, bool to_private);
- #endif
 diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
-index d27e775eec5d..f1c60274c448 100644
+index f1c60274c448..1c79032ca262 100644
 --- a/target/i386/kvm/tdx.c
 +++ b/target/i386/kvm/tdx.c
-@@ -884,6 +884,58 @@ static hwaddr tdx_shared_bit(X86CPU *cpu)
-     return (cpu->phys_bits > 48) ? BIT_ULL(51) : BIT_ULL(47);
+@@ -1078,6 +1078,43 @@ static int tdx_handle_get_quote(X86CPU *cpu, struct kvm_tdx_vmcall *vmcall)
+     return 0;
  }
  
-+/* 64MB at most in one call. What value is appropriate? */
-+#define TDX_MAP_GPA_MAX_LEN     (64 * 1024 * 1024)
-+
-+static int tdx_handle_map_gpa(X86CPU *cpu, struct kvm_tdx_vmcall *vmcall)
++static int tdx_handle_report_fatal_error(X86CPU *cpu,
++                                         struct kvm_tdx_vmcall *vmcall)
 +{
-+    hwaddr shared_bit = tdx_shared_bit(cpu);
-+    hwaddr gpa = vmcall->in_r12 & ~shared_bit;
-+    bool private = !(vmcall->in_r12 & shared_bit);
-+    hwaddr size = vmcall->in_r13;
-+    bool retry = false;
-+    int ret = 0;
++    uint64_t error_code = vmcall->in_r12;
++    char *message = NULL;
 +
-+    vmcall->status_code = TDG_VP_VMCALL_INVALID_OPERAND;
-+
-+    if (!QEMU_IS_ALIGNED(gpa, 4096) || !QEMU_IS_ALIGNED(size, 4096)) {
-+        vmcall->status_code = TDG_VP_VMCALL_ALIGN_ERROR;
-+        return 0;
++    if (error_code & 0xffff) {
++        error_report("TDX: REPORT_FATAL_ERROR: invalid error code: "
++                     "0x%lx\n", error_code);
++        return -1;
 +    }
 +
-+    /* Overflow case. */
-+    if (gpa + size < gpa) {
-+        return 0;
-+    }
-+    if (gpa >= (1ULL << cpu->phys_bits) ||
-+        gpa + size >= (1ULL << cpu->phys_bits)) {
-+        return 0;
++    /* it has optional message */
++    if (vmcall->in_r14) {
++        uint64_t * tmp;
++
++#define GUEST_PANIC_INFO_TDX_MESSAGE_MAX        64
++        message = g_malloc0(GUEST_PANIC_INFO_TDX_MESSAGE_MAX + 1);
++
++        tmp = (uint64_t *)message;
++        /* The order is defined in TDX GHCI spec */
++        *(tmp++) = cpu_to_le64(vmcall->in_r14);
++        *(tmp++) = cpu_to_le64(vmcall->in_r15);
++        *(tmp++) = cpu_to_le64(vmcall->in_rbx);
++        *(tmp++) = cpu_to_le64(vmcall->in_rdi);
++        *(tmp++) = cpu_to_le64(vmcall->in_rsi);
++        *(tmp++) = cpu_to_le64(vmcall->in_r8);
++        *(tmp++) = cpu_to_le64(vmcall->in_r9);
++        *(tmp++) = cpu_to_le64(vmcall->in_rdx);
++        message[GUEST_PANIC_INFO_TDX_MESSAGE_MAX] = '\0';
++        assert((char *)tmp == message + GUEST_PANIC_INFO_TDX_MESSAGE_MAX);
 +    }
 +
-+    if (size > TDX_MAP_GPA_MAX_LEN) {
-+        retry = true;
-+        size = TDX_MAP_GPA_MAX_LEN;
-+    }
-+
-+    if (size > 0) {
-+        ret = kvm_convert_memory(gpa, size, private);
-+    }
-+
-+    if (!ret) {
-+        if (retry) {
-+            vmcall->status_code = TDG_VP_VMCALL_RETRY;
-+            vmcall->out_r11 = gpa + size;
-+            if (!private) {
-+                vmcall->out_r11 |= shared_bit;
-+            }
-+        } else {
-+            vmcall->status_code = TDG_VP_VMCALL_SUCCESS;
-+        }
-+    }
-+
-+    return 0;
++    error_report("TD guest reports fatal error. %s\n", message ? : "");
++    return -1;
 +}
 +
- static void tdx_get_quote_completion(struct tdx_generate_quote_task *task)
+ static int tdx_handle_setup_event_notify_interrupt(X86CPU *cpu,
+                                                    struct kvm_tdx_vmcall *vmcall)
  {
-     int ret;
-@@ -1056,6 +1108,8 @@ static int tdx_handle_vmcall(X86CPU *cpu, struct kvm_tdx_vmcall *vmcall)
-     }
- 
-     switch (vmcall->subfunction) {
-+    case TDG_VP_VMCALL_MAP_GPA:
-+        return tdx_handle_map_gpa(cpu, vmcall);
+@@ -1112,6 +1149,8 @@ static int tdx_handle_vmcall(X86CPU *cpu, struct kvm_tdx_vmcall *vmcall)
+         return tdx_handle_map_gpa(cpu, vmcall);
      case TDG_VP_VMCALL_GET_QUOTE:
          return tdx_handle_get_quote(cpu, vmcall);
++    case TDG_VP_VMCALL_REPORT_FATAL_ERROR:
++        return  tdx_handle_report_fatal_error(cpu, vmcall);
      case TDG_VP_VMCALL_SETUP_EVENT_NOTIFY_INTERRUPT:
+         return tdx_handle_setup_event_notify_interrupt(cpu, vmcall);
+     default:
 diff --git a/target/i386/kvm/tdx.h b/target/i386/kvm/tdx.h
-index c6e4c275262d..cedc7d7e226f 100644
+index cedc7d7e226f..37fdd845f462 100644
 --- a/target/i386/kvm/tdx.h
 +++ b/target/i386/kvm/tdx.h
-@@ -18,6 +18,7 @@ typedef struct TdxGuestClass {
-     ConfidentialGuestSupportClass parent_class;
- } TdxGuestClass;
+@@ -20,6 +20,7 @@ typedef struct TdxGuestClass {
  
-+#define TDG_VP_VMCALL_MAP_GPA                           0x10001ULL
+ #define TDG_VP_VMCALL_MAP_GPA                           0x10001ULL
  #define TDG_VP_VMCALL_GET_QUOTE                         0x10002ULL
++#define TDG_VP_VMCALL_REPORT_FATAL_ERROR                0x10003ULL
  #define TDG_VP_VMCALL_SETUP_EVENT_NOTIFY_INTERRUPT      0x10004ULL
  
+ #define TDG_VP_VMCALL_SUCCESS           0x0000000000000000ULL
 -- 
 2.34.1
 
