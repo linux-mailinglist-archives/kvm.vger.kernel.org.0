@@ -1,128 +1,132 @@
-Return-Path: <kvm+bounces-6972-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6973-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D897783B8EB
-	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 06:09:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C749F83B90D
+	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 06:23:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 62B4DB21EA5
-	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 05:09:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 781F828545A
+	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 05:23:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9A0F8831;
-	Thu, 25 Jan 2024 05:09:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19506D287;
+	Thu, 25 Jan 2024 05:23:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="miEO1Cy0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i5H0MEyI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B11EC79EA;
-	Thu, 25 Jan 2024 05:09:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4885C1381
+	for <kvm@vger.kernel.org>; Thu, 25 Jan 2024 05:23:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706159360; cv=none; b=R0wmg1s7aVgdyumvhzSVdY/X3VK9qSk2Ha+pcuN1Eq07TNl1jAMuqKaEmK3flIaFchfcmi7u7ZCxrJrlfGKS/DekCjRPy0QbP4zQFrj38ecA+zLnb9qMlKUzOZa4vcYklzxTkrbUdWP+dJ/fyrjWFP8LYdPC3ciF5O1yiM7CNQQ=
+	t=1706160188; cv=none; b=oT+5Hla8swpKi2aBqN9nDKm5NrdDV5h+mAoxHrpjgvNLbGy1kfdKkwqChukyvBnvhXqEhakSJXn75gLHWGz/PCalGZUOqmeeB1wvHPJc8pPveKjuvS1lYty58CuGMFY1ihxB7vt4iMcWgOtAY6w0gly3TB3Bpha7l6sgXVMQSaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706159360; c=relaxed/simple;
-	bh=tEoZA2XXLvRj0jSzEf7kmZBKMCXXRf3AZLxJiaXdg9g=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=opBvAcuY1LQrUIuq3BMicNWVe9IGaN2HiEa6zQgWti1ru6LsO83rCfH9t0oHmXJWPgWCcrKgDE+LVRan8nmIkiqsc96tt7iXrS260Xy8lGUmfE6FrUlh9LRYwiYSnu5BgEHu5kFk5XPznb8zbCVyaWUNkQVYPeIqbLvkGtgPaCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=miEO1Cy0; arc=none smtp.client-ip=209.85.210.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-6dd7b525cd6so2017682b3a.2;
-        Wed, 24 Jan 2024 21:09:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706159358; x=1706764158; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SzoDGo3P/j0GvDgArKX+MVMdHU8LGqkP77lyVEPPjAo=;
-        b=miEO1Cy03D5R7xKwYi8rGmguiVyCzIAJQ2KdLDtbfEIdH5j1froWcfi45ElaXEE6S+
-         6tosKcQHUxcg9yR59yzXhMRGwll40hrE5WJKtKGY7a6ulFylUE8xFTOh9UPZDSFu8Yur
-         nEh7e/DhY/DymTnDkLRqFWeKkKJyr8oHXcrMdIDf99IC+5Q8hw2GqEMNG9Uubkzx0e9s
-         gBb7rbQNbTZYixaIXUCkw1QEfG3/hQVw0l9HFF+v5R9vqMn20sW2Su+3HWbIInWLo2IA
-         oflg9afQptrjt3wi1THYJBH0rdqs6CoEvTPKSssM5nl0sxR+a5+fAJxLv4M3SfbQmoKI
-         PMfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706159358; x=1706764158;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SzoDGo3P/j0GvDgArKX+MVMdHU8LGqkP77lyVEPPjAo=;
-        b=PcDkH2fkPnSKnAh0oiRNofhNnkctCYMCuih3f+F+awEohLam1DKawCb4elQC98Mxa5
-         j2xj7DfMYrmm1RjPcWjrnLrwoYxOmZAIrJcN6l761bcZuMGB1vex2C4xUt6/q+p3shoq
-         1MdkB3N9blrgmHEq1XjD6OU1SlDpyzddAcUmgBOX0dy+ghwr/auouDLjjPUZnzO+ojxh
-         Z/JPWb5pX3sKYvHTBJSBxdPE1rD63v7GwV5GbsEUgf/pXA6VsJV+Y5gTwFdyFruDuAn/
-         BmCOsLhldrFgZqsRI8IuZYCAYkXUaTXMje+1QRmaMwb+mDNDigi6wCCzElVdlxFA7eAN
-         K4tw==
-X-Gm-Message-State: AOJu0Yw5jeMSYR8vBSfSr3eFxS4WzsC5mXqCkowF17p5xWsc+hSC7n0o
-	nEaehpDH/XoTztBfL8MT9IX9sZVEjEwL1S7IpRNFIYWwM5j0EbNQ
-X-Google-Smtp-Source: AGHT+IF7T3031ORcm6+Eu0itPc1RkABymLTLfzvgslJMJCpjdcd4BxBmfGnjGHof5XUQipOYveFpOA==
-X-Received: by 2002:a05:6a21:3996:b0:199:ba9c:3e91 with SMTP id ad22-20020a056a21399600b00199ba9c3e91mr419373pzc.25.1706159357578;
-        Wed, 24 Jan 2024 21:09:17 -0800 (PST)
-Received: from localhost.localdomain ([43.129.20.31])
-        by smtp.gmail.com with ESMTPSA id pb5-20020a17090b3c0500b002926f68a5f8sm415759pjb.52.2024.01.24.21.09.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jan 2024 21:09:16 -0800 (PST)
-From: Tengfei Yu <moehanabichan@gmail.com>
-To: Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>
-Cc: Tengfei Yu <moehanabichan@gmail.com>,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] KVM: x86: Check irqchip mode before create PIT
-Date: Thu, 25 Jan 2024 13:08:23 +0800
-Message-Id: <20240125050823.4893-1-moehanabichan@gmail.com>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <ZbGkZlFmi1war6vq@google.com>
-References: <ZbGkZlFmi1war6vq@google.com>
+	s=arc-20240116; t=1706160188; c=relaxed/simple;
+	bh=1eX8lTztm56ud9FjKkdssZKa3a22dudfPnfMcaB5cM8=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=KH3/x1Byg0rHRXNZJXth6nwr5q9vfrxEA6f8PVmHcpLoVv0naptmtP1n4XGbGc11WpUzMcmbc0XmFakfa29/Ex4htg6O84L7mzZpkD213i5BtyeoHSNta5teQcDiHcq2Ila+RfFllk2hntNtK201Kya32sCkZ1D4T267CskrS3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i5H0MEyI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B18B9C433F1
+	for <kvm@vger.kernel.org>; Thu, 25 Jan 2024 05:23:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706160187;
+	bh=1eX8lTztm56ud9FjKkdssZKa3a22dudfPnfMcaB5cM8=;
+	h=From:To:Subject:Date:From;
+	b=i5H0MEyItxpo37iwVW2/Rz+Cjn815Cv6AOTlzUE63s0v3HVqOyc1FZAYHN29pRxip
+	 4dqnF9iqOZmVc8IMEsLZaaM4MYXHscLbenUUelVAyz0eea/7p7I5NgcrcuAZkBRe47
+	 lgJIghNL08oUU4oinR879Jx1FtxdHZBhEz4CKX3epR7m1nNnY0V8xrAZ3rs95NzSRV
+	 AeC2BeYBpFvkI5T1b+B9t6pQ7dpVZn6ZgEvxHyclh3wOGcGtxIiNGEb1p2xlkEWoG3
+	 AOVWW1/CGSvPAYv9Jy/fR7YV1hsjhNUw8WUEmPZOSSZ1F1T1DX3FRA+tV2rp0VLBEv
+	 pQq980DaNWhBw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 9C9A0C53BD1; Thu, 25 Jan 2024 05:23:07 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: kvm@vger.kernel.org
+Subject: [Bug 218419] New: kvm-unit-tests asyncpf is skipped with no reason
+Date: Thu, 25 Jan 2024 05:23:07 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: xiaoling.song@intel.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
+ op_sys bug_status bug_severity priority component assigned_to reporter
+ cf_regression
+Message-ID: <bug-218419-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-As the kvm api(https://docs.kernel.org/virt/kvm/api.html) reads,
-KVM_CREATE_PIT2 call is only valid after enabling in-kernel irqchip
-support via KVM_CREATE_IRQCHIP.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D218419
 
-Without this check, I can create PIT first and enable irqchip-split
-then, which may cause the PIT invalid because of lacking of in-kernel
-PIC to inject the interrupt.
+            Bug ID: 218419
+           Summary: kvm-unit-tests asyncpf is skipped with no reason
+           Product: Virtualization
+           Version: unspecified
+          Hardware: All
+                OS: Linux
+            Status: NEW
+          Severity: normal
+          Priority: P3
+         Component: kvm
+          Assignee: virtualization_kvm@kernel-bugs.osdl.org
+          Reporter: xiaoling.song@intel.com
+        Regression: No
 
-Signed-off-by: Tengfei Yu <moehanabichan@gmail.com>
----
-v1 -> v2: Change errno from -EEXIST to -ENOENT.
-v1 link: https://lore.kernel.org/lkml/ZbGkZlFmi1war6vq@google.com/
+kvm-unit-tests asyncpf test case report SKIP with no reason, log as below
 
- arch/x86/kvm/x86.c | 3 +++
- 1 file changed, 3 insertions(+)
+./tests/asyncpf
+BUILD_HEAD=3D3c1736b1
+timeout -k 1s --foreground 90s /usr/local/bin/qemu-system-x86_64 --no-reboot
+-nodefaults -device pc-testdev -device isa-debug-exit,iobase=3D0xf4,iosize=
+=3D0x4
+-vnc none -serial stdio -device pci-testdev -machine accel=3Dkvm -kernel
+/tmp/tmp.Ruk4OlGWh7 -smp 1 -m 2048 # -initrd /tmp/tmp.jG2j3sfpQC
+enabling apic
+smp: waiting for 0 APs
+paging enabled
+cr0 =3D 80010011
+cr3 =3D 107f000
+cr4 =3D 20
+install handler
+enable async pf
+alloc memory
+start loop
+end loop
+start loop
+end loop
+SUMMARY: 0 tests
+SKIP asyncpf (0 tests)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 27e23714e960..c1e3aecd627f 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -7016,6 +7016,9 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
- 		r = -EEXIST;
- 		if (kvm->arch.vpit)
- 			goto create_pit_unlock;
-+		r = -ENOENT;
-+		if (!pic_in_kernel(kvm))
-+			goto create_pit_unlock;
- 		r = -ENOMEM;
- 		kvm->arch.vpit = kvm_create_pit(kvm, u.pit_config.flags);
- 		if (kvm->arch.vpit)
--- 
-2.39.3
+Tried to add a cgroup with below commonds still has the same issue
 
+mkdir /sys/fs/cgroup/cg1
+echo $$ >  /sys/fs/cgroup/cg1/cgroup.procs
+echo 512M > /sys/fs/cgroup/cg1/memory.max
+
+This issue happens for long time, and the latest versio I tried is V6.7-RC7
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
 
