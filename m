@@ -1,59 +1,59 @@
-Return-Path: <kvm+bounces-6959-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6960-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C687783B842
-	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 04:34:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AD2F83B843
+	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 04:34:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 061961C20DD2
-	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 03:34:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E0711C228BF
+	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 03:34:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 063D279E2;
-	Thu, 25 Jan 2024 03:31:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCDB1125D7;
+	Thu, 25 Jan 2024 03:31:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bqDUS+eE"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WNlHprzy"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5720B882D
-	for <kvm@vger.kernel.org>; Thu, 25 Jan 2024 03:31:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 416BE8830
+	for <kvm@vger.kernel.org>; Thu, 25 Jan 2024 03:31:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706153467; cv=none; b=qqwruSl6jd9eSlEzZZ27fp4eCads6L7LadB5lfenxg98DKGx0VAx+oPA8ZHGGiBa8ECK+1v8jzhZBmbtMPGVZEgKd95yeQc/WWqRYsGQcnGdGt50TjLgd6SovL91ZZoZCWjhsmhDeyxuK3vgnjfu3c8wvO/s+uh99wTZpPWdjjw=
+	t=1706153469; cv=none; b=r8oS6qYe5Xwfcs2PurgYPHzAl5Qn61juaYpofuGhK3b2T4eimwlQFY9VrVIuBBfh5ZsBtGCatO+4+KG4UqDUGeO2V487iKEUbKy1QHBkFrSb5lBqYv1sOrtYQneTKpl6X/TWocSbS+leBFJ1NYaFmtqYwLl/q22DPKrhv/+Uu30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706153467; c=relaxed/simple;
-	bh=dYbC6/O6Cy+T1AZ7szpJepdFNBXHXc3/nDTSns21eRk=;
+	s=arc-20240116; t=1706153469; c=relaxed/simple;
+	bh=06fQye4ab2G7q75ZKWk8jLhdTnPCEpYY476w3krl16E=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Tp/3olb0l2fWeeA/ng/U3tTsZgW0TVQXh2CwFiGXIUYBide/mzVpbvLRGAuCdnKfW90X69ZpRXrSrKxDoyuVvpVr/Wx7zdBctkbe6+SffMCPSaBxwwj+ovwXAwhGYDHkiAftT3q5nn/MrJG7gji3fqcyqokF5dPa1BCMxBdEZ7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bqDUS+eE; arc=none smtp.client-ip=192.198.163.10
+	 MIME-Version; b=sEBVRKOzCiqul3oY8dR5+qHBmVUtY/QLLdbB5+sg5S+NnbDFnOy5XO0GnN+LAqttIM0lDtxo+seh6z7w16WfLKO+C0WCwlIoegRpiK3iL7n2UhgX/m6Y+tLzTFKVxUeETc7oBx7fFnbvNmUEmEa2VV5nClkpSnDbyD1CaL3BatI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WNlHprzy; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706153466; x=1737689466;
+  t=1706153468; x=1737689468;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=dYbC6/O6Cy+T1AZ7szpJepdFNBXHXc3/nDTSns21eRk=;
-  b=bqDUS+eEkyA7Bwltfgy19wLdsVY1bgl8FN/oA14bAUdKP5jNrMCOP7pL
-   RtDS298HNqnrGK6RG11HNeQT1WJ5FDiQGmPwlxawk32t90ymRgMexXKSA
-   8+mNDhwYtoqQ6D4qZ0aFgpKYMNDbyaC61uN+oIBqHFXx3utZJj1Z2m7wv
-   s9IbA94Rgu4zkFU95jgoA4LokuMeHZYD0SFgDjMV88gdnSw9gXA+iDuAn
-   JmCsDQbTW2n3RTMV5ywUr/ArRfJExaa2fc1UCeBHChx9EIDmg2pydlr5D
-   r9bcxH0/HnRmmJR/fX/yNkpK3EuW9nsda/IDydCYtiUEUaaZA46/svWnk
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="9430352"
+  bh=06fQye4ab2G7q75ZKWk8jLhdTnPCEpYY476w3krl16E=;
+  b=WNlHprzyDPOBWQhDPVrCvvWRGnytKoGjsJAh0APYXAkmxiw3B6Ic5WUJ
+   v9fiQ3qu1uuQW6wKzge3rdk6slbuO4UwNjeWh0JKeJLYT5/+egI+22IL8
+   6QoP1ZybeYoH1VNNy+bK7D66ZYC3zQo/HtI4h5A5lHAPtqLMAhtplmucG
+   Zb9c39VEuyMnbqZNKI9vxF6g8RFClkrzGmAQqQ1ZAH75dsj2zGNCyNm+q
+   NsBqqKS6NNy5FARAKUcCHt+ErfwWOlA63ydcbumYMPzqsroan+zKPd/LX
+   1dcKN5/QS0fVHZC1ZzZxfiamJiPVPyvejcV5a/6pDbX8ToL+r118Vc/NL
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="9430379"
 X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="9430352"
+   d="scan'208";a="9430379"
 Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2024 19:28:49 -0800
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2024 19:28:54 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="2086423"
+   d="scan'208";a="2086449"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.48.52])
-  by orviesa005.jf.intel.com with ESMTP; 24 Jan 2024 19:28:44 -0800
+  by orviesa005.jf.intel.com with ESMTP; 24 Jan 2024 19:28:50 -0800
 From: Xiaoyao Li <xiaoyao.li@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	David Hildenbrand <david@redhat.com>,
@@ -77,9 +77,9 @@ Cc: qemu-devel@nongnu.org,
 	Gerd Hoffmann <kraxel@redhat.com>,
 	Isaku Yamahata <isaku.yamahata@gmail.com>,
 	Chenyi Qiang <chenyi.qiang@intel.com>
-Subject: [PATCH v4 57/66] i386/tdx: Disable PIC for TDX VMs
-Date: Wed, 24 Jan 2024 22:23:19 -0500
-Message-Id: <20240125032328.2522472-58-xiaoyao.li@intel.com>
+Subject: [PATCH v4 58/66] i386/tdx: Don't allow system reset for TDX VMs
+Date: Wed, 24 Jan 2024 22:23:20 -0500
+Message-Id: <20240125032328.2522472-59-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240125032328.2522472-1-xiaoyao.li@intel.com>
 References: <20240125032328.2522472-1-xiaoyao.li@intel.com>
@@ -91,37 +91,27 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Legacy PIC (8259) cannot be supported for TDX VMs since TDX module
-doesn't allow directly interrupt injection.  Using posted interrupts
-for the PIC is not a viable option as the guest BIOS/kernel will not
-do EOI for PIC IRQs, i.e. will leave the vIRR bit set.
-
-Hence disable PIC for TDX VMs and error out if user wants PIC.
+TDX CPU state is protected and thus vcpu state cann't be reset by VMM.
 
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 Acked-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- target/i386/kvm/tdx.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ target/i386/kvm/kvm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
-index 7eb3628763ae..838b7916278c 100644
---- a/target/i386/kvm/tdx.c
-+++ b/target/i386/kvm/tdx.c
-@@ -708,6 +708,13 @@ int tdx_kvm_init(MachineState *ms, Error **errp)
-         return -EINVAL;
-     }
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index e36ece874246..0ec0584d22ca 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -5686,7 +5686,7 @@ bool kvm_has_waitpkg(void)
  
-+    if (x86ms->pic == ON_OFF_AUTO_AUTO) {
-+        x86ms->pic = ON_OFF_AUTO_OFF;
-+    } else if (x86ms->pic == ON_OFF_AUTO_ON) {
-+        error_setg(errp, "TDX VM doesn't support PIC");
-+        return -EINVAL;
-+    }
-+
-     if (!tdx_caps) {
-         r = get_tdx_capabilities(errp);
-         if (r) {
+ bool kvm_arch_cpu_check_are_resettable(void)
+ {
+-    return !sev_es_enabled();
++    return !sev_es_enabled() && !is_tdx_vm();
+ }
+ 
+ #define ARCH_REQ_XCOMP_GUEST_PERM       0x1025
 -- 
 2.34.1
 
