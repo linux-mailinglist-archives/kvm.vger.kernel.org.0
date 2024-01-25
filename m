@@ -1,134 +1,152 @@
-Return-Path: <kvm+bounces-7019-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7020-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10D3583C692
-	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 16:30:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42C1383C6C9
+	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 16:34:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E2631C2297E
-	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 15:30:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E946F1F22023
+	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 15:34:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 615DA6EB7E;
-	Thu, 25 Jan 2024 15:30:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56E477316D;
+	Thu, 25 Jan 2024 15:34:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="oIvgTAe0"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rkkBeBFq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B5326EB5A;
-	Thu, 25 Jan 2024 15:30:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0C4A6EB71
+	for <kvm@vger.kernel.org>; Thu, 25 Jan 2024 15:34:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706196609; cv=none; b=HPqrFHsU8ixurO8r9D/aG8mxA+cJp4pnmL5q0xzTgfmanMmdByVs4jxwfRePKtKOGjb4liYLJeZk5k2LMRFeS9jZeMcWt4gNcq4Gsf7dFlblcD0x2/h9ly6rz0tggv+rJ1Br8uwRviimmwieyeh5VgOKjk1WWav6I1LC+ZAAtRE=
+	t=1706196880; cv=none; b=hHp/fyK/KPHS3qOBWr2vFl52qyaTixnsyg2o9H4isEIeKKoW24wZ2SX1AlyDKJSTu0bMDdLpLPd5LvkUyv03M4MpEx0ZASuVBXnWU06PFt/yrHLTBtxbFAN06UCNqEbejg5hoEdXZvuaJ3DLxfQqRpKyKdm5ON378CYdSe8pkYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706196609; c=relaxed/simple;
-	bh=8sNYc6omXmo+sIVthIv8mFB9oMl5eKVxyEvARsj5RW0=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=ZqneGkkXCilVe8a2glcAd+Cw3oUjxNb9YUMj3iG6dLPgjFDs0Vk2wF1WERQVOHxnZV1FSI0+5JacDuvuKKDvuyws66xeTcmUWYCeoINNZSv+oYfIjATxt0O4P+wcfCbdz5U5gRLc/XFPafsB4Il/vDH+tiefhPd0JNu7Ex0e7d0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=oIvgTAe0; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40PFOi6F022094;
-	Thu, 25 Jan 2024 15:30:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : in-reply-to : references : date : message-id : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=oMxuBUn4Em3leAMa/T3nkqmsWa01MMp0NYPr8CZQ8Fc=;
- b=oIvgTAe00gzGMb+ZWquXCqpKbdSRo+kggvdfMscfl6gQpzCWzZEYk43idydEKbo3uFNJ
- +AJzmYGrLpKy/fBLZ3nbLkhRWiMP/ogeT204XxcSKzdmsehi8avUmCZ4kov3gqz2yyP1
- NOF7Hugnm1T/liLO8SVrPz7GDhDgvEt9a7oOunEl8rgmbkoWYUI/Fp9BgguKXRHhvkuc
- Z2Lo8jyhogQruXatUVhYw0EP8c7BLkF/hiXbQT2ysPKstlWqDLcnWu41xUnnenhBLN+n
- Ojcjf4Q/idlN+kS9s0bKFU+bZPSrviMX5edHP4on7Dck+f+SFjhuJGimVEfCG8EXktJ1 wg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vut8w03mg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 25 Jan 2024 15:30:06 +0000
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 40PFRbbg029662;
-	Thu, 25 Jan 2024 15:30:06 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vut8w03kw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 25 Jan 2024 15:30:06 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 40PEfrak010860;
-	Thu, 25 Jan 2024 15:30:05 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3vrrw05884-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 25 Jan 2024 15:30:05 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 40PFU1wA656008
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 25 Jan 2024 15:30:01 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id ACEEE20043;
-	Thu, 25 Jan 2024 15:30:01 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2F01420040;
-	Thu, 25 Jan 2024 15:30:01 +0000 (GMT)
-Received: from li-1de7cd4c-3205-11b2-a85c-d27f97db1fe1.ibm.com (unknown [9.171.4.43])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Thu, 25 Jan 2024 15:30:01 +0000 (GMT)
-From: "Marc Hartmayer" <mhartmay@linux.ibm.com>
-To: Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda
- <imbrenda@linux.ibm.com>,
-        Nico Boehr <nrb@linux.ibm.com>, Thomas Huth
- <thuth@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH] (arm|powerpc|s390x): Makefile: add
- `%.aux.o` target
-In-Reply-To: <20240125151127.94798-1-mhartmay@linux.ibm.com>
-References: <20240125151127.94798-1-mhartmay@linux.ibm.com>
-Date: Thu, 25 Jan 2024 16:30:00 +0100
-Message-ID: <87v87hsa6f.fsf@linux.ibm.com>
+	s=arc-20240116; t=1706196880; c=relaxed/simple;
+	bh=N9SIOM9LI+59wt2sYvd/8utU150nlmQFsnLLCY3O7MM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aYzCucaPhXyJqJGDUU6W5ASjDH+RPpusEalUu2OpupqFxFbRes91S7aZ1YUvtQ+4tA1bbQxmRg0HnnjRS4byFSwE8FYr1Am5BEtV+lAtGb5xCXdDRbJGSj+leO3gerFlkkPWSh73MdbmuKmfexhinUEtmjPQqIApuKyAtgqT4Cs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rkkBeBFq; arc=none smtp.client-ip=91.218.175.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Thu, 25 Jan 2024 15:34:31 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1706196875;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VtDAmOrZY4Bx+Tsgzo/1O7l/sBnHyINDVYGufCEohmQ=;
+	b=rkkBeBFqLH2kWFQIs78U50g1WVIkEkR/Op14SsDRTRQ/ZkJkjrrHAGmctrIjOYw7oFfQmx
+	S9Em/TsZWXHCtMX5/ZijBy0nVvjF6uca9d/KvFRXJHJUSiH/30STDIHysvqj/gGLjJZcSD
+	BqNOPln/4bK3PByNMIh9ikf1+4zUrTM=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH 12/15] KVM: arm64: vgic-its: Pick cache victim based on
+ usage count
+Message-ID: <ZbJ_h7s9W1J7wy-B@linux.dev>
+References: <20240124204909.105952-1-oliver.upton@linux.dev>
+ <20240124204909.105952-13-oliver.upton@linux.dev>
+ <861qa58yy0.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: _Vucir9Hl1bSbC9f_2fUeXBemDddGFeT
-X-Proofpoint-GUID: clzHjQgHy02E05mGfUniUnb1aP4CzOcW
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-25_08,2024-01-25_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
- bulkscore=0 priorityscore=1501 mlxscore=0 spamscore=0 adultscore=0
- clxscore=1015 lowpriorityscore=0 mlxlogscore=999 suspectscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2401250107
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <861qa58yy0.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Jan 25, 2024 at 04:11 PM +0100, Marc Hartmayer <mhartmay@linux.ibm.=
-com> wrote:
-> It's unusual to create multiple files in one target rule, therefore creat=
-e an
-> extra target for `%.aux.o` and list it as prerequisite. As a side effect,=
- this
-> change fixes the dependency tracking of the prerequisites of
-> `.aux.o` (`lib/auxinfo.c` was missing).
+On Thu, Jan 25, 2024 at 10:55:19AM +0000, Marc Zyngier wrote:
+> On Wed, 24 Jan 2024 20:49:06 +0000, Oliver Upton <oliver.upton@linux.dev> wrote:
+
+[...]
+
+> > +static struct vgic_translation_cache_entry *vgic_its_cache_victim(struct vgic_dist *dist)
+> > +{
+> > +	struct vgic_translation_cache_entry *cte, *victim = NULL;
+> > +	u64 min, tmp;
+> > +
+> > +	/*
+> > +	 * Find the least used cache entry since the last cache miss, preferring
+> > +	 * older entries in the case of a tie. Note that usage accounting is
+> > +	 * deliberately non-atomic, so this is all best-effort.
+> > +	 */
+> > +	list_for_each_entry(cte, &dist->lpi_translation_cache, entry) {
+> > +		if (!cte->irq)
+> > +			return cte;
+> > +
+> > +		tmp = atomic64_xchg_relaxed(&cte->usage_count, 0);
+> > +		if (!victim || tmp <= min) {
+> 
+> min is not initialised until after the first round. Not great. How
+> comes the compiler doesn't spot this?
+
+min never gets read on the first iteration, since victim is known to be
+NULL. Happy to initialize it though to keep this more ovbviously sane.
+
+> > +			victim = cte;
+> > +			min = tmp;
+> > +		}
+> > +	}
+> 
+> So this resets all the counters on each search for a new insertion?
+> Seems expensive, specially on large VMs (512 * 16 = up to 8K SWP
+> instructions in a tight loop, and I'm not even mentioning the fun
+> without LSE). I can at least think of a box that will throw its
+> interconnect out of the pram it tickled that way.
+
+Well, each cache eviction after we hit the cache limit. I wrote this up
+to have _something_ that allowed the rculist conversion to later come
+back to rework futher, but that obviously didn't happen.
+
+> I'd rather the new cache entry inherits the max of the current set,
+> making it a lot cheaper. We can always detect the overflow and do a
+> full invalidation in that case (worse case -- better options exist).
+
+Yeah, I like your suggested approach. I'll probably build a bit on top
+of that.
+
+> > +
+> > +	return victim;
+> > +}
+> > +
+> >  static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
+> >  				       u32 devid, u32 eventid,
+> >  				       struct vgic_irq *irq)
+> > @@ -645,9 +664,12 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
+> >  		goto out;
+> >  
+> >  	if (dist->lpi_cache_count >= vgic_its_max_cache_size(kvm)) {
+> > -		/* Always reuse the last entry (LRU policy) */
+> > -		victim = list_last_entry(&dist->lpi_translation_cache,
+> > -				      typeof(*cte), entry);
+> > +		victim = vgic_its_cache_victim(dist);
+> > +		if (WARN_ON_ONCE(!victim)) {
+> > +			victim = new;
+> > +			goto out;
+> > +		}
 >
-> Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
-> ---
+> I don't understand how this could happen. It sort of explains the
+> oddity I was mentioning earlier, but I don't think we need this
+> complexity.
 
-Note: I have only tested it for s390x, so please take a close look!
+The only way it could actually happen is if a bug were introduced where
+lpi_cache_count is somehow nonzero but the list is empty. But yeah, we
+can dump this and assume we find a victim, which ought to always be
+true.
 
---=20
-Kind regards / Beste Gr=C3=BC=C3=9Fe
-   Marc Hartmayer
-
-IBM Deutschland Research & Development GmbH
-Vorsitzender des Aufsichtsrats: Wolfgang Wendt
-Gesch=C3=A4ftsf=C3=BChrung: David Faller
-Sitz der Gesellschaft: B=C3=B6blingen
-Registergericht: Amtsgericht Stuttgart, HRB 243294
+-- 
+Thanks,
+Oliver
 
