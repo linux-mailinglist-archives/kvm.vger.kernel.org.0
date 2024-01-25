@@ -1,287 +1,360 @@
-Return-Path: <kvm+bounces-6901-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-6902-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25AFF83B784
-	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 04:06:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89A9A83B7C8
+	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 04:28:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4931F1C2342E
-	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 03:06:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39970286FCA
+	for <lists+kvm@lfdr.de>; Thu, 25 Jan 2024 03:28:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE1896FCA;
-	Thu, 25 Jan 2024 03:06:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECC896FC8;
+	Thu, 25 Jan 2024 03:28:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lqJLYM9Q"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Kuxv22AI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20EF46FA7;
-	Thu, 25 Jan 2024 03:06:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC71F63AE
+	for <kvm@vger.kernel.org>; Thu, 25 Jan 2024 03:28:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706151992; cv=none; b=czXtHBf2XN+dUHxGFxPBGKFSY03YkVICxXph2IhfLqNX6WCVarSgnI9gAZx6UzxVqsl6MLumrtXBtAP+uYbWPJPMkMwt0QvAURVrd/aicHGyIZbGwcMO1faQ/x84Y6I6dLF7zxtym+mclI/XW3Pn5I4+upqnEXNsXKF/+GAw5lg=
+	t=1706153284; cv=none; b=YE2BQDa9HX6I3Plsr5IrwQkK0Wklg+uH2CAkYgODUK3yw27NpHCCb6H115YiITJwCoEfbk9Fe3vaLW0yiZ4gFbfWMHwDx2V+KvKsMbtxydQu6n30PvTOn1NlZaZ2iTHwcYrZPdJBf4jBBFf/NxPL4C06+VewXsa5ti7Fk+liYnA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706151992; c=relaxed/simple;
-	bh=3rJULeyM9xYbVpyP/NnT3ukU2TEBtC8bBU7bswXKk0E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GdUULNeyB6b/+khdr1l9vczar9BvDU7UCtxjTKLCSwO1jzsPBGzrE8OUS19uQbWi+3ImJeS1d7anjWuVJF5JjeUca1f4+r24gziaF2upPD+Z1Xp4Zar3RaP2pBjOm54vALYg6LZBVeilczzel9g5tcrDcWpSELR92UPAbQVykbE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lqJLYM9Q; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1706153284; c=relaxed/simple;
+	bh=Of3mFbVM+GTkJbDZyhCqYv1uvOziNsWS5nNX/r0uYZI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=eJMf9B1di2ZD66H0/a/mN28m12j7dd5jmZVps1T86EP0oKEUVaZi5p3LU0rhYe7dSM5j5ny3Ly/bVjM1lXywFhgYDXyR8sqGVdm7TCz1oxZR+25esT3jL0GS5kBhx4NLzOtt2NZ02KO6qAd3TaI1o9Izr4k5KGWeqbL/i/1u/js=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Kuxv22AI; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706151990; x=1737687990;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=3rJULeyM9xYbVpyP/NnT3ukU2TEBtC8bBU7bswXKk0E=;
-  b=lqJLYM9QC4bhGjd0y5znqUIeT1AYn7SW0Mv9bmQcuHRLJagpqOGNWIdk
-   Z3pOG8X0kt+F3nJQV9SMD/7672Nj8UxcMhka3LmLTY2mkfC0qG9XIppLt
-   T12Fd39itBq+R0mYtOiDVR0t4aQ3ZsVSbkAnJPFuIcMKV6gE3F+bg5gBN
-   3S7m/h2PNMq/NgKrxKuslVXp7yJbZMReOJB6b3N2IGLj2cdmqttkKBmeY
-   cc7sv1yH3JwgxnWqjNJdHrdFUWxlGanFEvABLocxkHjE/5dCMdI7YNTpU
-   0hwpnUCPTM6rNBCacBQBIfKCSD7N4vzmCrSF2+h1RiqpzfcuKlEnEXv0Q
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="1884870"
+  t=1706153282; x=1737689282;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Of3mFbVM+GTkJbDZyhCqYv1uvOziNsWS5nNX/r0uYZI=;
+  b=Kuxv22AIjB6bgFfvMaAQ5eEufdjQt8Py5DKNnvyu82GlBH2VJQl8CSyo
+   hthzBTgUSK5pFDDuWspGVWWfY1c+pVu3n5qxzFuUJ7f/URrYQlqhnFPL4
+   f6SnNXy7BPvKSPZ2XDZZGS85vBXHfptMcfArCQSxuxV0aaYvQE+lQvHRF
+   29iNQQ5MR9ZM4qphjFs4YWH4XSINe0TevwKEWjxpm2tGRW+5eXeg/75FI
+   W83+cJcCUKsHXriYKPY6zBV/cARNcHun+y6Ul8JDrZGtJRjlDpS6+5NCQ
+   ou/V5f48qW8KDgN/f39figG81nv6KovEGYRU9OeEZn15oxUQR0WKHf+zc
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="9427821"
 X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="1884870"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2024 19:06:29 -0800
+   d="scan'208";a="9427821"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2024 19:23:37 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="2269262"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.10.49]) ([10.238.10.49])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2024 19:06:25 -0800
-Message-ID: <49f044a1-e5ab-4a3d-8d73-67fa913e2948@linux.intel.com>
-Date: Thu, 25 Jan 2024 11:06:22 +0800
+   d="scan'208";a="2084289"
+Received: from lxy-clx-4s.sh.intel.com ([10.239.48.52])
+  by orviesa005.jf.intel.com with ESMTP; 24 Jan 2024 19:23:31 -0800
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+	David Hildenbrand <david@redhat.com>,
+	Igor Mammedov <imammedo@redhat.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Peter Xu <peterx@redhat.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Cornelia Huck <cohuck@redhat.com>,
+	=?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+	Eric Blake <eblake@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>
+Cc: qemu-devel@nongnu.org,
+	kvm@vger.kernel.org,
+	xiaoyao.li@intel.com,
+	Michael Roth <michael.roth@amd.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Claudio Fontana <cfontana@suse.de>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Isaku Yamahata <isaku.yamahata@gmail.com>,
+	Chenyi Qiang <chenyi.qiang@intel.com>
+Subject: [PATCH v4 00/66] QEMU Guest memfd + QEMU TDX support
+Date: Wed, 24 Jan 2024 22:22:22 -0500
+Message-Id: <20240125032328.2522472-1-xiaoyao.li@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v18 029/121] KVM: TDX: create/free TDX vcpu structure
-To: isaku.yamahata@intel.com
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
- erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
- Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
- chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com
-References: <cover.1705965634.git.isaku.yamahata@intel.com>
- <f857ba01c0b2ffbcc310727fd7a61599221c4f21.1705965635.git.isaku.yamahata@intel.com>
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <f857ba01c0b2ffbcc310727fd7a61599221c4f21.1705965635.git.isaku.yamahata@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
+This v4 series still carry both QEMU guest memfd support and QEMU TDX
+support. Because TDX is going to be the first user of guest memfd in
+QEMU, put them together can provide us a full picture of how they work.
 
+KVM provides guest memfd, which cannot be mapped, read, or written by
+userspace. It's designed to serve as private memory for confidential
+VMs, like Intel TDX and AMD sev-snp.
 
-On 1/23/2024 7:53 AM, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
->
-> The next step of TDX guest creation is to create vcpu.  Create TDX vcpu
-> structures, initialize it that doesn't require TDX SEAMCALL.  TDX specific
-> vcpu initialization will be implemented as independent KVM_TDX_INIT_VCPU
-> so that when error occurs it's easy to determine which component has the
-> issue, KVM or TDX.
->
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
-> v18:
-> - update commit log to use create instead of allocate because the patch
->    doesn't newly allocate memory for TDX vcpu.
->
-> v15 -> v16:
-> - Add AMX support as the KVM upstream supports it.
-> ---
->   arch/x86/kvm/vmx/main.c    | 44 ++++++++++++++++++++++++++++++----
->   arch/x86/kvm/vmx/tdx.c     | 49 ++++++++++++++++++++++++++++++++++++++
->   arch/x86/kvm/vmx/x86_ops.h | 10 ++++++++
->   arch/x86/kvm/x86.c         |  2 ++
->   4 files changed, 101 insertions(+), 4 deletions(-)
->
-> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-> index 50a1f50c0fc5..c2f1dc2000c5 100644
-> --- a/arch/x86/kvm/vmx/main.c
-> +++ b/arch/x86/kvm/vmx/main.c
-> @@ -102,6 +102,42 @@ static void vt_vm_free(struct kvm *kvm)
->   		tdx_vm_free(kvm);
->   }
->   
-> +static int vt_vcpu_precreate(struct kvm *kvm)
-> +{
-> +	if (is_td(kvm))
-> +		return 0;
-> +
-> +	return vmx_vcpu_precreate(kvm);
-> +}
-> +
-> +static int vt_vcpu_create(struct kvm_vcpu *vcpu)
-> +{
-> +	if (is_td_vcpu(vcpu))
-> +		return tdx_vcpu_create(vcpu);
-> +
-> +	return vmx_vcpu_create(vcpu);
-> +}
-> +
-> +static void vt_vcpu_free(struct kvm_vcpu *vcpu)
-> +{
-> +	if (is_td_vcpu(vcpu)) {
-> +		tdx_vcpu_free(vcpu);
-> +		return;
-> +	}
-> +
-> +	vmx_vcpu_free(vcpu);
-> +}
-> +
-> +static void vt_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
-> +{
-> +	if (is_td_vcpu(vcpu)) {
-> +		tdx_vcpu_reset(vcpu, init_event);
-> +		return;
-> +	}
-> +
-> +	vmx_vcpu_reset(vcpu, init_event);
-> +}
-> +
->   static int vt_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
->   {
->   	if (!is_td(kvm))
-> @@ -140,10 +176,10 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
->   	.vm_destroy = vt_vm_destroy,
->   	.vm_free = vt_vm_free,
->   
-> -	.vcpu_precreate = vmx_vcpu_precreate,
-> -	.vcpu_create = vmx_vcpu_create,
-> -	.vcpu_free = vmx_vcpu_free,
-> -	.vcpu_reset = vmx_vcpu_reset,
-> +	.vcpu_precreate = vt_vcpu_precreate,
-> +	.vcpu_create = vt_vcpu_create,
-> +	.vcpu_free = vt_vcpu_free,
-> +	.vcpu_reset = vt_vcpu_reset,
->   
->   	.prepare_switch_to_guest = vmx_prepare_switch_to_guest,
->   	.vcpu_load = vmx_vcpu_load,
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index 1c6541789c39..8330f448ab8e 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -411,6 +411,55 @@ int tdx_vm_init(struct kvm *kvm)
->   	return 0;
->   }
->   
-> +int tdx_vcpu_create(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
-> +
-> +	/*
-> +	 * On cpu creation, cpuid entry is blank.  Forcibly enable
-> +	 * X2APIC feature to allow X2APIC.
+Patches 1 - 9 add support of guest memfd into QEMU, associating it with
+RAMBlock. For the VM types that require private memory (see
+tdx_kvm_init() in patch 14), QEMU will automatically create guest memfd
+for each RAM backend.
 
-This comment is a bit confusing.
-Do you mean force x2apic here or elsewhere?
-So far, in this patch, x2apic is not forced yet.
+Follwoing patches 10 to 66, enables TDX support to allow creating and
+booting a TD (TDX VM) with QEMU.
 
-> +	 * Because vcpu_reset() can't return error, allocation is done here.
+This series needs to work with KVM TDX v18 series:
+https://lore.kernel.org/all/cover.1705965634.git.isaku.yamahata@intel.com/T/#u
 
-What do you mean "allocation" here?
+(TDX host kernel support and guest memfd KVM support lands in Linux
+v6.8-rc1.)
 
-> +	 */
-> +	WARN_ON_ONCE(vcpu->arch.cpuid_entries);
-> +	WARN_ON_ONCE(vcpu->arch.cpuid_nent);
-> +
-> +	/* TDX only supports x2APIC, which requires an in-kernel local APIC. */
-> +	if (!vcpu->arch.apic)
-> +		return -EINVAL;
-> +
-> +	fpstate_set_confidential(&vcpu->arch.guest_fpu);
-> +
-> +	vcpu->arch.efer = EFER_SCE | EFER_LME | EFER_LMA | EFER_NX;
-> +
-> +	vcpu->arch.cr0_guest_owned_bits = -1ul;
-> +	vcpu->arch.cr4_guest_owned_bits = -1ul;
-> +
-> +	vcpu->arch.tsc_offset = to_kvm_tdx(vcpu->kvm)->tsc_offset;
-> +	vcpu->arch.l1_tsc_offset = vcpu->arch.tsc_offset;
-> +	vcpu->arch.guest_state_protected =
-> +		!(to_kvm_tdx(vcpu->kvm)->attributes & TDX_TD_ATTRIBUTE_DEBUG);
-> +
-> +	if ((kvm_tdx->xfam & XFEATURE_MASK_XTILE) == XFEATURE_MASK_XTILE)
-> +		vcpu->arch.xfd_no_write_intercept = true;
-> +
-> +	return 0;
-> +}
-> +
-> +void tdx_vcpu_free(struct kvm_vcpu *vcpu)
-> +{
-> +	/* This is stub for now.  More logic will come. */
-> +}
-> +
-> +void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
-> +{
-> +
-> +	/* Ignore INIT silently because TDX doesn't support INIT event. */
-> +	if (init_event)
-> +		return;
-> +
-> +	/* This is stub for now. More logic will come here. */
-> +}
-> +
->   static int tdx_get_capabilities(struct kvm_tdx_cmd *cmd)
->   {
->   	struct kvm_tdx_capabilities __user *user_caps;
-> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-> index 645688081561..1ea532dfaf2a 100644
-> --- a/arch/x86/kvm/vmx/x86_ops.h
-> +++ b/arch/x86/kvm/vmx/x86_ops.h
-> @@ -144,7 +144,12 @@ int tdx_vm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap);
->   int tdx_vm_init(struct kvm *kvm);
->   void tdx_mmu_release_hkid(struct kvm *kvm);
->   void tdx_vm_free(struct kvm *kvm);
-> +
->   int tdx_vm_ioctl(struct kvm *kvm, void __user *argp);
-> +
-> +int tdx_vcpu_create(struct kvm_vcpu *vcpu);
-> +void tdx_vcpu_free(struct kvm_vcpu *vcpu);
-> +void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event);
->   #else
->   static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return -EOPNOTSUPP; }
->   static inline void tdx_hardware_unsetup(void) {}
-> @@ -158,7 +163,12 @@ static inline int tdx_vm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
->   static inline int tdx_vm_init(struct kvm *kvm) { return -EOPNOTSUPP; }
->   static inline void tdx_mmu_release_hkid(struct kvm *kvm) {}
->   static inline void tdx_vm_free(struct kvm *kvm) {}
-> +
->   static inline int tdx_vm_ioctl(struct kvm *kvm, void __user *argp) { return -EOPNOTSUPP; }
-> +
-> +static inline int tdx_vcpu_create(struct kvm_vcpu *vcpu) { return -EOPNOTSUPP; }
-> +static inline void tdx_vcpu_free(struct kvm_vcpu *vcpu) {}
-> +static inline void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event) {}
->   #endif
->   
->   #endif /* __KVM_X86_VMX_X86_OPS_H */
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index c5b66b493f1d..e0027134454c 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -502,6 +502,7 @@ int kvm_set_apic_base(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->   	kvm_recalculate_apic_map(vcpu->kvm);
->   	return 0;
->   }
-> +EXPORT_SYMBOL_GPL(kvm_set_apic_base);
->   
->   /*
->    * Handle a fault on a hardware virtualization (VMX or SVM) instruction.
-> @@ -12488,6 +12489,7 @@ bool kvm_vcpu_is_reset_bsp(struct kvm_vcpu *vcpu)
->   {
->   	return vcpu->kvm->arch.bsp_vcpu_id == vcpu->vcpu_id;
->   }
-> +EXPORT_SYMBOL_GPL(kvm_vcpu_is_reset_bsp);
->   
->   bool kvm_vcpu_is_bsp(struct kvm_vcpu *vcpu)
->   {
+===
+This series is also available in github:
+https://github.com/intel/qemu-tdx/tree/tdx-qemu-upstream-v4
+
+It's based on several patches that haven't get merged:
+https://lore.kernel.org/qemu-devel/20231007065819.27498-1-xiaoyao.li@intel.com/
+https://lore.kernel.org/qemu-devel/20240125023328.2520888-1-xiaoyao.li@intel.com/
+https://lore.kernel.org/all/20240125024016.2521244-1-xiaoyao.li@intel.com/
+
+Luckily, the absence of them doesn't block applying this series nor
+affecting the functionality.
+
+== Limitation and future work ==
+- Readonly memslot
+
+  TDX only support readonly (write protection) memslot for shared memory, but
+  not for private memory. For simplicity, just mark readonly memslot not
+  supported entirely for TDX.
+
+- CPU model
+
+  We cannot create a TD with arbitrary CPU model like what for non-TDX VMs,
+  because only a subset of features can be configured for TD.
+
+  - It's recommended to use '-cpu host' to create TD;
+  - '+feature/-feature' might not work as expected;
+
+  future work: To introduce specific CPU model for TDs and enhance ±features
+               for TDs.
+
+- gdb suppport
+
+  gdb support to debug a TD of off-debug mode is future work.
+
+===
+Main changes in v4:
+guset memfd part:
+ - Drop the patch that supports KVM_GUEST_MEMFD_ALLOW_HUGEPAGE flag
+   because KVM side leaves it as future work;
+ - send patch "physmem: replace function name with __func__ in
+   ram_block_discard_range()" separately;
+ - drop ram_block_convert_range() and open code it instead.
+ - move the supported attribute bit check into
+   kvm_set_memory_attributes() (per request from Wei)
+ - Clarify more for the desgin consideration in the commit messages
+
+TDX part:
+ - Re-implement get-quote support by introduing TdxQuoteGenerator object
+   and make the socket communication non-blocking; (per Daniel)
+ - Various code and doc refinement;
+
+v3:
+https://lore.kernel.org/qemu-devel/20231115071519.2864957-1-xiaoyao.li@intel.com/
+
+Main changes in v3:
+gmem memfd part: 
+ - Since KVM side renamed gmem to guest_memfd in the uapi, this version
+   renames it accordingly;
+ - Drop the 'private' property of memory backend. (see comment[1])
+   Now QEMU decides whether need to create guest memfd based on specific
+   vm type (or specific VM implementation, please see patch *X* and *Y*);
+ - Drop sw_protected_vm implementation;
+
+TDX part:
+ - improve the error report in various patches by utilizing 'errp';
+ - drop the vm-type interface;
+ - rename __tdx_ioctl() to tdx_ioctl_internal();
+ - refine the description of 'sept-ve-disable' in qom.json;
+ - use base64 for mrconfigif/mrowner/mrownerconfig instread of hex-string;
+ - use type SocketAddress for quote-generation-service;
+
+[1] https://lore.kernel.org/qemu-devel/a1e34896-c46d-c87c-0fda-971bbf3dcfbd@redhat.com/
+
+Chao Peng (3):
+  kvm: Enable KVM_SET_USER_MEMORY_REGION2 for memslot
+  kvm: handle KVM_EXIT_MEMORY_FAULT
+  i386/tdx: register TDVF as private memory
+
+Isaku Yamahata (14):
+  trace/kvm: Add trace for page convertion between shared and private
+  i386/tdx: Make sept_ve_disable set by default
+  i386/tdx: Support user configurable mrconfigid/mrowner/mrownerconfig
+  kvm/tdx: Don't complain when converting vMMIO region to shared
+  kvm/tdx: Ignore memory conversion to shared of unassigned region
+  i386/tdvf: Introduce function to parse TDVF metadata
+  i386/tdx: Add TDVF memory via KVM_TDX_INIT_MEM_REGION
+  i386/tdx: handle TDG.VP.VMCALL<SetupEventNotifyInterrupt>
+  i386/tdx: handle TDG.VP.VMCALL<GetQuote>
+  i386/tdx: handle TDG.VP.VMCALL<MapGPA> hypercall
+  pci-host/q35: Move PAM initialization above SMRAM initialization
+  q35: Introduce smm_ranges property for q35-pci-host
+  hw/i386: add option to forcibly report edge trigger in acpi tables
+  i386/tdx: Don't synchronize guest tsc for TDs
+
+Sean Christopherson (2):
+  i386/kvm: Move architectural CPUID leaf generation to separate helper
+  i386/tdx: Don't get/put guest state for TDX VMs
+
+Xiaoyao Li (47):
+  linux-headers: Update to Linux v6.8-rc1
+  RAMBlock: Add support of KVM private guest memfd
+  HostMem: Add mechanism to opt in kvm guest memfd via MachineState
+  trace/kvm: Split address space and slot id in
+    trace_kvm_set_user_memory()
+  kvm: Introduce support for memory_attributes
+  physmem: Introduce ram_block_discard_guest_memfd_range()
+  *** HACK *** linux-headers: Update headers to pull in TDX API changes
+  i386: Introduce tdx-guest object
+  target/i386: Implement mc->kvm_type() to get VM type
+  target/i386: Introduce kvm_confidential_guest_init()
+  i386/tdx: Implement tdx_kvm_init() to initialize TDX VM context
+  i386/tdx: Get tdx_capabilities via KVM_TDX_CAPABILITIES
+  i386/tdx: Introduce is_tdx_vm() helper and cache tdx_guest object
+  i386/tdx: Adjust the supported CPUID based on TDX restrictions
+  i386/tdx: Make Intel-PT unsupported for TD guest
+  i386/tdx: Update tdx_cpuid_lookup[].tdx_fixed0/1 by
+    tdx_caps.cpuid_config[]
+  i386/tdx: Integrate tdx_caps->xfam_fixed0/1 into tdx_cpuid_lookup
+  i386/tdx: Integrate tdx_caps->attrs_fixed0/1 to tdx_cpuid_lookup
+  kvm: Introduce kvm_arch_pre_create_vcpu()
+  i386/tdx: Initialize TDX before creating TD vcpus
+  i386/tdx: Add property sept-ve-disable for tdx-guest object
+  i386/tdx: Wire CPU features up with attributes of TD guest
+  i386/tdx: Validate TD attributes
+  i386/tdx: Implement user specified tsc frequency
+  i386/tdx: Set kvm_readonly_mem_enabled to false for TDX VM
+  kvm/memory: Introduce the infrastructure to set the default
+    shared/private value
+  i386/tdx: Make memory type private by default
+  i386/tdx: Parse TDVF metadata for TDX VM
+  i386/tdx: Skip BIOS shadowing setup
+  i386/tdx: Don't initialize pc.rom for TDX VMs
+  i386/tdx: Track mem_ptr for each firmware entry of TDVF
+  i386/tdx: Track RAM entries for TDX VM
+  headers: Add definitions from UEFI spec for volumes, resources, etc...
+  i386/tdx: Setup the TD HOB list
+  memory: Introduce memory_region_init_ram_guest_memfd()
+  i386/tdx: Call KVM_TDX_INIT_VCPU to initialize TDX vcpu
+  i386/tdx: Finalize TDX VM
+  i386/tdx: Handle TDG.VP.VMCALL<REPORT_FATAL_ERROR>
+  i386/tdx: Wire TDX_REPORT_FATAL_ERROR with GuestPanic facility
+  i386/tdx: Disable SMM for TDX VMs
+  i386/tdx: Disable PIC for TDX VMs
+  i386/tdx: Don't allow system reset for TDX VMs
+  i386/tdx: LMCE is not supported for TDX
+  hw/i386: add eoi_intercept_unsupported member to X86MachineState
+  i386/tdx: Only configure MSR_IA32_UCODE_REV in kvm_init_msrs() for TDs
+  i386/tdx: Skip kvm_put_apicbase() for TDs
+  docs: Add TDX documentation
+
+ accel/kvm/kvm-all.c                           |  278 +++-
+ accel/kvm/trace-events                        |    3 +-
+ accel/stubs/kvm-stub.c                        |    5 +
+ backends/hostmem-file.c                       |    1 +
+ backends/hostmem-memfd.c                      |    1 +
+ backends/hostmem-ram.c                        |    1 +
+ backends/hostmem.c                            |    1 +
+ configs/devices/i386-softmmu/default.mak      |    1 +
+ docs/system/confidential-guest-support.rst    |    1 +
+ docs/system/i386/tdx.rst                      |  113 ++
+ docs/system/target-i386.rst                   |    1 +
+ hw/core/machine.c                             |    5 +
+ hw/i386/Kconfig                               |    6 +
+ hw/i386/acpi-build.c                          |   99 +-
+ hw/i386/acpi-common.c                         |   50 +-
+ hw/i386/meson.build                           |    1 +
+ hw/i386/pc.c                                  |   21 +-
+ hw/i386/pc_q35.c                              |    2 +
+ hw/i386/pc_sysfw.c                            |    7 +
+ hw/i386/tdvf-hob.c                            |  147 ++
+ hw/i386/tdvf-hob.h                            |   24 +
+ hw/i386/tdvf.c                                |  200 +++
+ hw/i386/x86.c                                 |   51 +-
+ hw/pci-host/q35.c                             |   61 +-
+ include/exec/cpu-common.h                     |    2 +
+ include/exec/memory.h                         |   33 +-
+ include/exec/ram_addr.h                       |    2 +-
+ include/exec/ramblock.h                       |    1 +
+ include/hw/boards.h                           |    2 +
+ include/hw/i386/pc.h                          |    1 +
+ include/hw/i386/tdvf.h                        |   58 +
+ include/hw/i386/x86.h                         |    2 +
+ include/hw/pci-host/q35.h                     |    1 +
+ include/standard-headers/drm/drm_fourcc.h     |   10 +-
+ include/standard-headers/linux/ethtool.h      |   41 +-
+ .../standard-headers/linux/virtio_config.h    |    8 +-
+ include/standard-headers/linux/virtio_pci.h   |   68 +
+ include/standard-headers/linux/virtio_pmem.h  |    7 +
+ include/standard-headers/uefi/uefi.h          |  198 +++
+ include/sysemu/hostmem.h                      |    1 +
+ include/sysemu/kvm.h                          |    8 +
+ include/sysemu/kvm_int.h                      |    2 +
+ linux-headers/asm-generic/unistd.h            |   15 +-
+ linux-headers/asm-loongarch/kvm.h             |    1 +
+ linux-headers/asm-mips/mman.h                 |    2 +-
+ linux-headers/asm-mips/unistd_n32.h           |    5 +
+ linux-headers/asm-mips/unistd_n64.h           |    5 +
+ linux-headers/asm-mips/unistd_o32.h           |    5 +
+ linux-headers/asm-powerpc/unistd_32.h         |    5 +
+ linux-headers/asm-powerpc/unistd_64.h         |    5 +
+ linux-headers/asm-riscv/kvm.h                 |   13 +
+ linux-headers/asm-s390/unistd_32.h            |    5 +
+ linux-headers/asm-s390/unistd_64.h            |    5 +
+ linux-headers/asm-x86/kvm.h                   |   94 ++
+ linux-headers/asm-x86/unistd_32.h             |    5 +
+ linux-headers/asm-x86/unistd_64.h             |    5 +
+ linux-headers/asm-x86/unistd_x32.h            |    5 +
+ linux-headers/linux/iommufd.h                 |   79 +
+ linux-headers/linux/kvm.h                     |  229 +--
+ linux-headers/linux/userfaultfd.h             |   29 +-
+ linux-headers/linux/vfio.h                    |    1 +
+ qapi/qom.json                                 |   33 +
+ qapi/run-state.json                           |   28 +-
+ system/memory.c                               |   45 +
+ system/physmem.c                              |   47 +-
+ system/runstate.c                             |   54 +
+ target/i386/cpu-internal.h                    |    9 +
+ target/i386/cpu.c                             |   12 -
+ target/i386/cpu.h                             |   21 +
+ target/i386/kvm/kvm-cpu.c                     |    5 +
+ target/i386/kvm/kvm.c                         |  611 +++++---
+ target/i386/kvm/kvm_i386.h                    |    6 +
+ target/i386/kvm/meson.build                   |    2 +
+ target/i386/kvm/tdx-quote-generator.c         |  170 ++
+ target/i386/kvm/tdx-quote-generator.h         |   95 ++
+ target/i386/kvm/tdx-stub.c                    |   23 +
+ target/i386/kvm/tdx.c                         | 1373 +++++++++++++++++
+ target/i386/kvm/tdx.h                         |   82 +
+ target/i386/sev.c                             |    1 -
+ target/i386/sev.h                             |    2 +
+ 80 files changed, 4156 insertions(+), 501 deletions(-)
+ create mode 100644 docs/system/i386/tdx.rst
+ create mode 100644 hw/i386/tdvf-hob.c
+ create mode 100644 hw/i386/tdvf-hob.h
+ create mode 100644 hw/i386/tdvf.c
+ create mode 100644 include/hw/i386/tdvf.h
+ create mode 100644 include/standard-headers/uefi/uefi.h
+ create mode 100644 target/i386/kvm/tdx-quote-generator.c
+ create mode 100644 target/i386/kvm/tdx-quote-generator.h
+ create mode 100644 target/i386/kvm/tdx-stub.c
+ create mode 100644 target/i386/kvm/tdx.c
+ create mode 100644 target/i386/kvm/tdx.h
+
+-- 
+2.34.1
 
 
