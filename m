@@ -1,297 +1,321 @@
-Return-Path: <kvm+bounces-7237-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7238-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1707883E4B1
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 23:09:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E108583E4E0
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 23:12:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C331E2869C1
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 22:09:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4FDFD1F22BDF
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 22:12:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 392B93B1A9;
-	Fri, 26 Jan 2024 22:06:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DCAA51009;
+	Fri, 26 Jan 2024 22:11:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dhitYyLo"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="gmp6me5v"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2046.outbound.protection.outlook.com [40.107.94.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 742AD249EC
-	for <kvm@vger.kernel.org>; Fri, 26 Jan 2024 22:06:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706306798; cv=none; b=sNb+E3tcrwQt+UngWB7D9tQn0VUmrNIm/oesmRsVdfd6cAPpvJmta4EU+YB1NXIsaXpqh4OANh543vZc50YSiTJbKZDTP5bQd0zG4nvn8H+1MS2BNbiHnyyplDAY4DPLjxBFio5eShRYNEPkcVRAlk8p/T/ssLatmoLYZ+dvjds=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706306798; c=relaxed/simple;
-	bh=Uh7QAG/HtQUsIUU24UODDO19+1gtcCEvAL7xPkfK4IA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AlgDwoE6K7M2pkmcB0qIM63jNhRMF7ERKcd+y1DXXdEjwm59wVrRMMs7sR4D93aILwu5fu1VBbaFu2m5lZ0s4ue1+wS7RWgiKqvWnPb28ndsyHmRREhXV/iEVyzCrWVgegqxiazq23FskYyuR9ysp/bfSDwodfGX3rGLHo3wTzw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=dhitYyLo; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-33ae2d80b70so30256f8f.0
-        for <kvm@vger.kernel.org>; Fri, 26 Jan 2024 14:06:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1706306795; x=1706911595; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1fYY/rLuA2hauAuBtrudFqwtHsgwmB3pc71dc5VwoGs=;
-        b=dhitYyLoETHDWk+it+/9evOMdAjGE+9ucSMmz1QrbhwWH6z5QanizxaFBJ71C2xmD3
-         sQ2fv5j/Rf1j6Inh6Brf6F6loc6BowZSG1EOBvDxSBbsEomf4kGy32RD5YORvdBiTtxL
-         ie5g1UVc7tEhPye2WIyE/tj+4xGrBKhY6pBvOKJl37GqUHrJkZYI4q1DdH8i1U6ZQP19
-         5BGHby7YTvmr6C/dEvcnFK0TzSod1UOSOVvSibm0CTLxbvYKefbJDiTxwh4PG2xBbqJv
-         JVQebZZhYRLutQ0uPngbvrj/sqvDuk+AiY1E2ePP2uETxOp4OhrutWcoKDYy+KY6NP9H
-         nxsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706306795; x=1706911595;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1fYY/rLuA2hauAuBtrudFqwtHsgwmB3pc71dc5VwoGs=;
-        b=GHh9wvDU3VyOeesWP0g6cy4c00Cx1RwhhEPmG4Pn5Hfxe58ZoWgMHlen1YkZpEfhKH
-         0llzW4ZBRSSspNP8CDoL3mZuvuIt/a5EQp8gCIScIGp9HZ5nyEXhh9dCCGMSUFwDEBLA
-         SgS7OLlmDU4gZGrs08MqZGajpbcYt1R7waJ3keeLfald1s/nhesrZMkWj1S/KJixuhDm
-         5BxBsig6yvucY94y0GUiaGoCVoyz5+5MaCybzOSKFG7ZWGW7ocp85MxtrKXJL/+hQmDN
-         zx/8miulGW0sgN7o7kFmv5uRlhpZ150FQlZ+YBZ2LYgJrHvZDPCAcgWVFOMtCHj4itOD
-         qhDA==
-X-Gm-Message-State: AOJu0YySgBBiJVA1u6JRxNwSJq2IikABwqqGBeJJ4Z3xZjSpEtXFnewg
-	Q05NnIPJTy2XMJOmzWjebYnegaSjjjX1SlyLJh/AraH9LITB0Jzyk3XP/zLCBlE=
-X-Google-Smtp-Source: AGHT+IG7a7xEui69gg0qXrAz5p7Hrr1+TBmeVYWg5uEu5eOY3lm2QMdEghKBG4M/Df8L/t6sj7dohg==
-X-Received: by 2002:a5d:4d11:0:b0:337:ca7a:313d with SMTP id z17-20020a5d4d11000000b00337ca7a313dmr228329wrt.10.1706306794747;
-        Fri, 26 Jan 2024 14:06:34 -0800 (PST)
-Received: from m1x-phil.lan ([176.176.142.39])
-        by smtp.gmail.com with ESMTPSA id r18-20020adfce92000000b00337aed83aaasm2064013wrn.92.2024.01.26.14.06.32
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Fri, 26 Jan 2024 14:06:34 -0800 (PST)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org,
-	Thomas Huth <thuth@redhat.com>,
-	qemu-s390x@nongnu.org,
-	qemu-riscv@nongnu.org,
-	Eduardo Habkost <eduardo@habkost.net>,
-	kvm@vger.kernel.org,
-	qemu-ppc@nongnu.org,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Vladimir Sementsov-Ogievskiy <vsementsov@yandex-team.ru>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-	Artyom Tarasenko <atar4qemu@gmail.com>
-Subject: [PATCH v2 23/23] target/sparc: Prefer fast cpu_env() over slower CPU QOM cast macro
-Date: Fri, 26 Jan 2024 23:04:05 +0100
-Message-ID: <20240126220407.95022-24-philmd@linaro.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20240126220407.95022-1-philmd@linaro.org>
-References: <20240126220407.95022-1-philmd@linaro.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD2FD50A9B;
+	Fri, 26 Jan 2024 22:11:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706307080; cv=fail; b=phLJqTcmyz4JqbwceBrCvuWE+ueq6F0GBNcgGBOlVrXSw4otl2FYnoCuTS22sE2KBLjOHMZ8fZHzokcKCJHREB25jdilRAhNLmHJp+NZo0U3TOGYhLqGZQWW4KZBCXS+nUCfmXscH+ieEPzmwzt2Y60LFdO2bZUn0y+MtHe202c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706307080; c=relaxed/simple;
+	bh=KaAqVIxioAWfLaxxgkDvI+w7m6OSuCDz75OpVr4pwes=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=r7LMqWrkRGKeKrbBdQ19NFQRetSsSL63MolorUzHsCFh47YoUGi3CTJ1Z5G/XjAL006G3vHFYZs90eZiU6fV5vDi0yOSSssGPMVXX7pGcyXFvkK14yBsLhuKPOZdePSwoM8JulVlOg1Jq8CpybmVgkG5lfN8K2CAnrd/A+LsGd0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=gmp6me5v; arc=fail smtp.client-ip=40.107.94.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=T+Ocmiq0yNaIWjOEE5CAwWiv0E+myMi2mG8wA4EJZX8+Meb9IQk1ZHlJdLwMMkfFvH1YbJE2ChH8YGbJevZFHNGY4rX+TrqF8n19aLvvcoQYnp7ZRttgqmfHdXufy9CQibXCYMGbCoBCqafY07cEx7msysoGVoNIHdpPzgQwtQXl2RvHblONBxXuyG4zw4AAsgUxy5vSoai+rMp1vwSxS3JbO38CxjdZSmjdIF6YfJ2kD0WULlLz1o2bJI2JkAJBTwrYZ/SN4+9yoMkg6ZTJAnxzEmB6+jfGxNYStqK6nSTv6wvirdGOwzJjbJm23ysyWSPDJSptiMWBU/JTiIUSpg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fAZNIsMrtlluLqeDHpluf5YDg9+gPi+AP4H7IIeGK98=;
+ b=jqWSdrirGbnXjfsJAv/boXBpt3yzuHSw53i1C262GHV1rDql2mpzYWqZAkN3Pvye8yRzyQCPNQ25sIn5b8YBwAq/TX7SQ7ZtHQOmHV55zbw2lpvBWxYI8VdLNh2ns0JpkHhQNqUptPrwhi+yOntmdVozktiKmY98PylUQ7aUzu/zAxiIkZwJVxPY+pIbCw33OLX31FXMfJ/uE0i/jRjskmVt956h8o/GwfOkJPey+F1BottBeYB+k1qOH5rbd3/S6yUb9wdL89w7eq8P6ij304Fcaw00TIS6JlIUxHqKLkr/k2/H/jAR4VTdrIlW91fDKDEVtZEAC7iPaSeDYCAMVg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fAZNIsMrtlluLqeDHpluf5YDg9+gPi+AP4H7IIeGK98=;
+ b=gmp6me5vZVFEcNr70QgNXDWEc5S508XsUdLabW8R2ogWFb9YurbGWWMf16zMZs//ddoDgqmVBWrsXnr8bb/LUN2dZW8K9k8hbWN9wMgCBlDkaNc8FRwV7LZH803PDlJL1dmi3BWblDupj3Dgc6BAELemTif8uZwDw7hXRWXNCl8=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BL1PR12MB5732.namprd12.prod.outlook.com (2603:10b6:208:387::17)
+ by CO6PR12MB5473.namprd12.prod.outlook.com (2603:10b6:303:13e::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.22; Fri, 26 Jan
+ 2024 22:11:16 +0000
+Received: from BL1PR12MB5732.namprd12.prod.outlook.com
+ ([fe80::200:c1d0:b9aa:e16c]) by BL1PR12MB5732.namprd12.prod.outlook.com
+ ([fe80::200:c1d0:b9aa:e16c%4]) with mapi id 15.20.7228.027; Fri, 26 Jan 2024
+ 22:11:16 +0000
+Message-ID: <47bbe1e6-e9c6-cff8-987e-e244581f689b@amd.com>
+Date: Fri, 26 Jan 2024 16:11:13 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v7 06/16] virt: sev-guest: Move SNP Guest command mutex
+Content-Language: en-US
+To: Nikunj A Dadhania <nikunj@amd.com>, linux-kernel@vger.kernel.org,
+ x86@kernel.org, kvm@vger.kernel.org
+Cc: bp@alien8.de, mingo@redhat.com, tglx@linutronix.de,
+ dave.hansen@linux.intel.com, dionnaglaze@google.com, pgonda@google.com,
+ seanjc@google.com, pbonzini@redhat.com
+References: <20231220151358.2147066-1-nikunj@amd.com>
+ <20231220151358.2147066-7-nikunj@amd.com>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+In-Reply-To: <20231220151358.2147066-7-nikunj@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SA1P222CA0004.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:806:22c::14) To BL1PR12MB5732.namprd12.prod.outlook.com
+ (2603:10b6:208:387::17)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5732:EE_|CO6PR12MB5473:EE_
+X-MS-Office365-Filtering-Correlation-Id: bfe73e8e-8166-42e9-afea-08dc1ebbb734
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	U4To2KAPJKiE46qTtvf8bKb/MJmZuHuQQ7yL0ZibYpd+4UUltwFukibToqbTmX1OMUbWBd+PgR4wNPsVFb71haHV56WaCxCLCphnwM079j934QgnI50eTDJ0DFrusXiWJf4Vl6Y2meUUiiAulmxPm0pOogaRm+rYY0zpJ7DckBnAQSPqpYcbKodIR5LpzuYG4abTioZlDsk1AByC8x7aMUQ1kyRzvYIOxFjYrxKJCekdnjXsJhSp1KL+LEJt6tCXkcXmjPke+Zw+UYbxJhvK5QniwyWYaoBpY8nivoXlKukmb0XLRo5oUz9k8TX2wN/CWAGnfvfiVU2cl/Y/+/sVSpdZJIHydp4qTwJ36rWcplRLhRT9i/ZiwiFRhzi5Ze4VVw6I/sIygvnqHQyXuLi8Ck6FIyq4gq/e4JH03bp5WkXCwvHPCeIWaxKlcnK9kibsCbUGa+uTuvwqPSSNJzlyDsSGk3QLZGE7u7JGZt0hcd02yJLLm+35GmZlFUNOSHwdfE/xVvDgbrsIcrP7GyWP22ZugMTK0YU73dsGW6vBwDTsnOwxGCJ3lgKdEQZes+RpwhWqXWoIok7/9GYgCdbzUh+5bgYq2KouLLzjANtI6RPVYA0h4ymKoKa93iTdWVESudhblj5UqcIzCxAz25tDjw==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5732.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(396003)(346002)(366004)(39860400002)(136003)(230922051799003)(451199024)(64100799003)(186009)(1800799012)(478600001)(38100700002)(2906002)(86362001)(31696002)(36756003)(41300700001)(316002)(66476007)(6506007)(66556008)(6512007)(5660300002)(66946007)(53546011)(6486002)(6666004)(83380400001)(2616005)(4326008)(7416002)(8936002)(26005)(8676002)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?NmlFeGF0N3pic1RvUC96VGk2ZzhxV2xDMFJ1VTRKVGc3SCtndFRuTExmNEJW?=
+ =?utf-8?B?cjdsWEsycG9qdkR0Mm5wcnRaYmJ3Q0ZYZE5TM3BoZlBWTEt6THJMOWVsamFD?=
+ =?utf-8?B?dk5RLy9NUEsraXFPSVRjMFdFV3ZvaXd1N1Vwd0NzcnR6aUJIZ3Z5bDlNUEI3?=
+ =?utf-8?B?TFlTVVMxb1ZtQ0tPTnIvUGN1dkE0eE5JQ1lmQkxtak1YeHZ0Ym5UY2JSN09l?=
+ =?utf-8?B?OUZyOExWNUVFS1dNUjFkV3Qwa2gzbzFEV29Jb0F2Zmc3NWJvaXlyNHRrTEJM?=
+ =?utf-8?B?WW5XK2twdjJZaFgvL2pOam1CeXplZEVtU0dybWF5ejhXMmVCUnpoQ2o3RHpF?=
+ =?utf-8?B?Q0pTdElYS21CbHRBL1Yva3lkdjk3Q0ZjQjhFK1RTbm4vTkRuT1NzaDQ3b3hz?=
+ =?utf-8?B?SE83ZlR5VmpkK25WSFU5ZTgrVm91Q0hzTlA2OFBtbE03VHN5ZGlnNGkzUHNI?=
+ =?utf-8?B?d09GQWZkd1ZNNDhnbU5TTk02ZCtoaEpkN1ZjbElnako0cS92OWFGdUlvZnlz?=
+ =?utf-8?B?K1VwUDhwZkxRNENoSExmZ3VUdlpycHozQ2VldDdPL3d4Nm1zZ0pPVkVnUkgx?=
+ =?utf-8?B?UTJ2Ly9pMWhqUmRCd2t5MFZzUkJYa3hGUVYvZzBBODRHNjFCRGpFM2Y2R1NX?=
+ =?utf-8?B?a2FpajlYTHRRWTl0ZmlNc2h0S1J2eE9PeE4yUlRPc2JMRFlRaHdIV0NoQW9W?=
+ =?utf-8?B?aWNhTVpHZytTZFROaS9TeFJhcnpFTll5b29QWGQ0NEExNFZ3QW1nNUJmZ2pj?=
+ =?utf-8?B?cTQwWmJCNlR6VUc3T2pWdGRjSmpOVi9qbmcrTUJOTTBnS0lHQXV5MjhialVj?=
+ =?utf-8?B?Ti9PeWJ0L2lHc2I0VGs4M1RnRmtSOXMwNW1ZQlkrRVE5Y0JxZU92bEtBQlU2?=
+ =?utf-8?B?VENQdmgzS015ZGI4dEN0RWJ5Y3o0eWJRMzNPRGF2eTdIbG9UR1ZyQ0hnczVG?=
+ =?utf-8?B?RXlQZ1p6RHp6dGFtVi8ranFWT0dnWTV5SU5YcnRqUFVzSzNvaDFmakJPV0dh?=
+ =?utf-8?B?SndhV01zalMzMUc4SUhCMVZJRDFWdDk0N1RYQllzZ21nOC9Uc2hibzVTYlhr?=
+ =?utf-8?B?dmtmekRkOG5oc2V6YlcyODM0MXBBaDE3WVMwbStXTVRFd0YxMnYwN3YxRnRC?=
+ =?utf-8?B?cVhPVUltWDJJTU5uUWdFMFJNSXhQeENHdzZFK1JMdGplV0sxdERTMHpUYVRl?=
+ =?utf-8?B?SGtYV3ozNWttZnY2dCtaL3hHOGw2UW85R2FGVXFBYW02anAyMGhqUldNTkt6?=
+ =?utf-8?B?ZFRveHY2VEE1VFRkU3Uvd2hmT0lTUjMwZ3kwcjlxU3MzWklTeWNpSEhGNjhw?=
+ =?utf-8?B?ZXRnbGsvejM3amF3cUhTVk9rQzRRTnUvbnlyc00xbThDNHZza1RvMW9Dc2Fa?=
+ =?utf-8?B?bkcyOWdDSWRJVGRSVmtQM2JIbnkwaE50TDJNVHBIVmROcTFkSGtncmUzbFpD?=
+ =?utf-8?B?YmNndkFvYkJLOUEzc0tnQ2RmbG5Ta1M0WTcwdkJEQ1ZmWWhEZzd6VlFsaDlY?=
+ =?utf-8?B?aWwyUmxidWhYNWloQTg2WFp5ZlhMRDVEeUxiak04MGFuVkhiZ3g5dzVhaWla?=
+ =?utf-8?B?aVpKSkxTVFRtdENBSG1jUnFsSTdmQjZxY2l4dmhVMld6T0lQQ1F5RzNScUtB?=
+ =?utf-8?B?cVJqM01IVEIvZjhlcllFMVZTR204OGFLUHB0cUpQaERaempqTzhBRkJFclhP?=
+ =?utf-8?B?SDVIcUxHMlc4TUxOS2g1U09IMWRPU1lLQ2s0aFVTbElPRHUyTTY5bDdVdU5G?=
+ =?utf-8?B?dU1TOW9zTVhUUWVIT2M3NEJuV0tpd1dVYkw0eTJrVHlqbCtMQ0R6S2RkK0VO?=
+ =?utf-8?B?VzNVQlF3Q1ZTSnBFa09zeGxvdDBHcnlqcjlydmc3RnhaYnUwNGQ5TWd5alg2?=
+ =?utf-8?B?dmVTTjhSYU1SVlQrNGFYSGEyRi8wMkFlVjcyU1JlVWRDSW9wUW1KZTdJZEwr?=
+ =?utf-8?B?OUVmMVkvbm9weldNRXp4VGxPNWx5TjN4TFFEMUMxWE1mK3hKaGQ2cHZBQVZK?=
+ =?utf-8?B?cUdpa252dGlCMlN5QWxzWXZCYXFEY1U3OW56UDgrcFR3L2N1QVdXcjM4d0Nz?=
+ =?utf-8?B?VzFySUpWUWQybWZVbXJVREMvcHc3NVNNRHZOak4yZ2lpUGt4MGRVZ3NMZSs2?=
+ =?utf-8?Q?Rejrh5PKeAVJkXgYRn7eybAO7?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bfe73e8e-8166-42e9-afea-08dc1ebbb734
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5732.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jan 2024 22:11:16.2159
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: VNMKJCz2aF0c3VNIyUUxmWYGbFIcn5YClSVKdc6Pz/ctF0MWJ8lNnOFuA2njULt1agCrkORt5CohQJJlYuUPVQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR12MB5473
 
-Mechanical patch produced running the command documented
-in scripts/coccinelle/cpu_env.cocci_template header.
+On 12/20/23 09:13, Nikunj A Dadhania wrote:
+> SNP command mutex is used to serialize the shared buffer access, command
+> handling and message sequence number races. Move the SNP guest command
+> mutex out of the sev guest driver and provide accessors to sev-guest
+> driver. Remove multiple lockdep check in sev-guest driver, next patch adds
+> a single lockdep check in snp_send_guest_request().
+> 
+> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+> ---
+>   arch/x86/include/asm/sev-guest.h        |  3 +++
+>   arch/x86/kernel/sev.c                   | 21 +++++++++++++++++++++
+>   drivers/virt/coco/sev-guest/sev-guest.c | 23 +++++++----------------
+>   3 files changed, 31 insertions(+), 16 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/sev-guest.h b/arch/x86/include/asm/sev-guest.h
+> index 27cc15ad6131..2f3cceb88396 100644
+> --- a/arch/x86/include/asm/sev-guest.h
+> +++ b/arch/x86/include/asm/sev-guest.h
+> @@ -81,4 +81,7 @@ struct snp_guest_req {
+>   
+>   int snp_issue_guest_request(struct snp_guest_req *req, struct snp_req_data *input,
+>   			    struct snp_guest_request_ioctl *rio);
+> +void snp_guest_cmd_lock(void);
+> +void snp_guest_cmd_unlock(void);
+> +
+>   #endif /* __VIRT_SEVGUEST_H__ */
+> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+> index 6aa0bdf8a7a0..191193924b22 100644
+> --- a/arch/x86/kernel/sev.c
+> +++ b/arch/x86/kernel/sev.c
+> @@ -941,6 +941,21 @@ static void snp_cleanup_vmsa(struct sev_es_save_area *vmsa)
+>   		free_page((unsigned long)vmsa);
+>   }
+>   
+> +/*  SNP Guest command mutex to serialize the shared buffer access and command handling. */
+> +static struct mutex snp_guest_cmd_mutex;
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
----
- target/sparc/cpu.c          | 14 ++++----------
- target/sparc/gdbstub.c      |  3 +--
- target/sparc/int32_helper.c |  3 +--
- target/sparc/int64_helper.c |  3 +--
- target/sparc/ldst_helper.c  |  6 ++----
- target/sparc/mmu_helper.c   | 15 +++++----------
- target/sparc/translate.c    |  3 +--
- 7 files changed, 15 insertions(+), 32 deletions(-)
+You should probably use:
 
-diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
-index befa7fc4eb..a53c200d8b 100644
---- a/target/sparc/cpu.c
-+++ b/target/sparc/cpu.c
-@@ -83,8 +83,7 @@ static void sparc_cpu_reset_hold(Object *obj)
- static bool sparc_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
- {
-     if (interrupt_request & CPU_INTERRUPT_HARD) {
--        SPARCCPU *cpu = SPARC_CPU(cs);
--        CPUSPARCState *env = &cpu->env;
-+        CPUSPARCState *env = cpu_env(cs);
- 
-         if (cpu_interrupts_enabled(env) && env->interrupt_index > 0) {
-             int pil = env->interrupt_index & 0xf;
-@@ -613,8 +612,7 @@ static void cpu_print_cc(FILE *f, uint32_t cc)
- 
- static void sparc_cpu_dump_state(CPUState *cs, FILE *f, int flags)
- {
--    SPARCCPU *cpu = SPARC_CPU(cs);
--    CPUSPARCState *env = &cpu->env;
-+    CPUSPARCState *env = cpu_env(cs);
-     int i, x;
- 
-     qemu_fprintf(f, "pc: " TARGET_FMT_lx "  npc: " TARGET_FMT_lx "\n", env->pc,
-@@ -711,11 +709,8 @@ static void sparc_cpu_synchronize_from_tb(CPUState *cs,
- 
- static bool sparc_cpu_has_work(CPUState *cs)
- {
--    SPARCCPU *cpu = SPARC_CPU(cs);
--    CPUSPARCState *env = &cpu->env;
--
-     return (cs->interrupt_request & CPU_INTERRUPT_HARD) &&
--           cpu_interrupts_enabled(env);
-+           cpu_interrupts_enabled(cpu_env(cs));
- }
- 
- static char *sparc_cpu_type_name(const char *cpu_model)
-@@ -749,8 +744,7 @@ static void sparc_cpu_realizefn(DeviceState *dev, Error **errp)
-     CPUState *cs = CPU(dev);
-     SPARCCPUClass *scc = SPARC_CPU_GET_CLASS(dev);
-     Error *local_err = NULL;
--    SPARCCPU *cpu = SPARC_CPU(dev);
--    CPUSPARCState *env = &cpu->env;
-+    CPUSPARCState *env = cpu_env(cs);
- 
- #if defined(CONFIG_USER_ONLY)
-     /* We are emulating the kernel, which will trap and emulate float128. */
-diff --git a/target/sparc/gdbstub.c b/target/sparc/gdbstub.c
-index a1c8fdc4d5..5257c49a0d 100644
---- a/target/sparc/gdbstub.c
-+++ b/target/sparc/gdbstub.c
-@@ -29,8 +29,7 @@
- 
- int sparc_cpu_gdb_read_register(CPUState *cs, GByteArray *mem_buf, int n)
- {
--    SPARCCPU *cpu = SPARC_CPU(cs);
--    CPUSPARCState *env = &cpu->env;
-+    CPUSPARCState *env = cpu_env(cs);
- 
-     if (n < 8) {
-         /* g0..g7 */
-diff --git a/target/sparc/int32_helper.c b/target/sparc/int32_helper.c
-index 058dd712b5..6b7d65b031 100644
---- a/target/sparc/int32_helper.c
-+++ b/target/sparc/int32_helper.c
-@@ -99,8 +99,7 @@ void cpu_check_irqs(CPUSPARCState *env)
- 
- void sparc_cpu_do_interrupt(CPUState *cs)
- {
--    SPARCCPU *cpu = SPARC_CPU(cs);
--    CPUSPARCState *env = &cpu->env;
-+    CPUSPARCState *env = cpu_env(cs);
-     int cwp, intno = cs->exception_index;
- 
-     if (qemu_loglevel_mask(CPU_LOG_INT)) {
-diff --git a/target/sparc/int64_helper.c b/target/sparc/int64_helper.c
-index 27df9dba89..bd14c7a0db 100644
---- a/target/sparc/int64_helper.c
-+++ b/target/sparc/int64_helper.c
-@@ -130,8 +130,7 @@ void cpu_check_irqs(CPUSPARCState *env)
- 
- void sparc_cpu_do_interrupt(CPUState *cs)
- {
--    SPARCCPU *cpu = SPARC_CPU(cs);
--    CPUSPARCState *env = &cpu->env;
-+    CPUSPARCState *env = cpu_env(cs);
-     int intno = cs->exception_index;
-     trap_state *tsptr;
- 
-diff --git a/target/sparc/ldst_helper.c b/target/sparc/ldst_helper.c
-index 09066d5487..203441bfb2 100644
---- a/target/sparc/ldst_helper.c
-+++ b/target/sparc/ldst_helper.c
-@@ -421,8 +421,7 @@ static void sparc_raise_mmu_fault(CPUState *cs, hwaddr addr,
-                                   bool is_write, bool is_exec, int is_asi,
-                                   unsigned size, uintptr_t retaddr)
- {
--    SPARCCPU *cpu = SPARC_CPU(cs);
--    CPUSPARCState *env = &cpu->env;
-+    CPUSPARCState *env = cpu_env(cs);
-     int fault_type;
- 
- #ifdef DEBUG_UNASSIGNED
-@@ -483,8 +482,7 @@ static void sparc_raise_mmu_fault(CPUState *cs, hwaddr addr,
-                                   bool is_write, bool is_exec, int is_asi,
-                                   unsigned size, uintptr_t retaddr)
- {
--    SPARCCPU *cpu = SPARC_CPU(cs);
--    CPUSPARCState *env = &cpu->env;
-+    CPUSPARCState *env = cpu_env(cs);
- 
- #ifdef DEBUG_UNASSIGNED
-     printf("Unassigned mem access to " HWADDR_FMT_plx " from " TARGET_FMT_lx
-diff --git a/target/sparc/mmu_helper.c b/target/sparc/mmu_helper.c
-index 453498c670..a05ee22315 100644
---- a/target/sparc/mmu_helper.c
-+++ b/target/sparc/mmu_helper.c
-@@ -206,8 +206,7 @@ bool sparc_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-                         MMUAccessType access_type, int mmu_idx,
-                         bool probe, uintptr_t retaddr)
- {
--    SPARCCPU *cpu = SPARC_CPU(cs);
--    CPUSPARCState *env = &cpu->env;
-+    CPUSPARCState *env = cpu_env(cs);
-     CPUTLBEntryFull full = {};
-     target_ulong vaddr;
-     int error_code = 0, access_index;
-@@ -391,8 +390,7 @@ void dump_mmu(CPUSPARCState *env)
- int sparc_cpu_memory_rw_debug(CPUState *cs, vaddr address,
-                               uint8_t *buf, int len, bool is_write)
- {
--    SPARCCPU *cpu = SPARC_CPU(cs);
--    CPUSPARCState *env = &cpu->env;
-+    CPUSPARCState *env = cpu_env(cs);
-     target_ulong addr = address;
-     int i;
-     int len1;
-@@ -759,8 +757,7 @@ bool sparc_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-                         MMUAccessType access_type, int mmu_idx,
-                         bool probe, uintptr_t retaddr)
- {
--    SPARCCPU *cpu = SPARC_CPU(cs);
--    CPUSPARCState *env = &cpu->env;
-+    CPUSPARCState *env = cpu_env(cs);
-     CPUTLBEntryFull full = {};
-     int error_code = 0, access_index;
- 
-@@ -898,8 +895,7 @@ hwaddr cpu_get_phys_page_nofault(CPUSPARCState *env, target_ulong addr,
- 
- hwaddr sparc_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
- {
--    SPARCCPU *cpu = SPARC_CPU(cs);
--    CPUSPARCState *env = &cpu->env;
-+    CPUSPARCState *env = cpu_env(cs);
-     hwaddr phys_addr;
-     int mmu_idx = cpu_mmu_index(env, false);
- 
-@@ -916,8 +912,7 @@ G_NORETURN void sparc_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
-                                               int mmu_idx,
-                                               uintptr_t retaddr)
- {
--    SPARCCPU *cpu = SPARC_CPU(cs);
--    CPUSPARCState *env = &cpu->env;
-+    CPUSPARCState *env = cpu_env(cs);
- 
- #ifdef TARGET_SPARC64
-     env->dmmu.sfsr = build_sfsr(env, mmu_idx, access_type);
-diff --git a/target/sparc/translate.c b/target/sparc/translate.c
-index 9387299559..412b7d1b66 100644
---- a/target/sparc/translate.c
-+++ b/target/sparc/translate.c
-@@ -5406,8 +5406,7 @@ void sparc_restore_state_to_opc(CPUState *cs,
-                                 const TranslationBlock *tb,
-                                 const uint64_t *data)
- {
--    SPARCCPU *cpu = SPARC_CPU(cs);
--    CPUSPARCState *env = &cpu->env;
-+    CPUSPARCState *env = cpu_env(cs);
-     target_ulong pc = data[0];
-     target_ulong npc = data[1];
- 
--- 
-2.41.0
+static DEFINE_MUTEX(snp_guest_cmd_mutex);
 
+That way you can avoid the initialization in snp_init_platform_device().
+
+With that:
+
+Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+
+> +
+> +void snp_guest_cmd_lock(void)
+> +{
+> +	mutex_lock(&snp_guest_cmd_mutex);
+> +}
+> +EXPORT_SYMBOL_GPL(snp_guest_cmd_lock);
+> +
+> +void snp_guest_cmd_unlock(void)
+> +{
+> +	mutex_unlock(&snp_guest_cmd_mutex);
+> +}
+> +EXPORT_SYMBOL_GPL(snp_guest_cmd_unlock);
+> +
+>   static int wakeup_cpu_via_vmgexit(u32 apic_id, unsigned long start_ip)
+>   {
+>   	struct sev_es_save_area *cur_vmsa, *vmsa;
+> @@ -2240,6 +2255,12 @@ static int __init snp_init_platform_device(void)
+>   		return -ENODEV;
+>   	}
+>   
+> +	/*
+> +	 * Initialize snp command mutex that is used to serialize the shared
+> +	 * buffer access and use of the vmpck and message sequence number
+> +	 */
+> +	mutex_init(&snp_guest_cmd_mutex);
+> +
+>   	data.secrets_gpa = secrets_pa;
+>   	if (platform_device_add_data(&sev_guest_device, &data, sizeof(data)))
+>   		return -ENODEV;
+> diff --git a/drivers/virt/coco/sev-guest/sev-guest.c b/drivers/virt/coco/sev-guest/sev-guest.c
+> index 9c0ff69a16da..bd30a9ff82c1 100644
+> --- a/drivers/virt/coco/sev-guest/sev-guest.c
+> +++ b/drivers/virt/coco/sev-guest/sev-guest.c
+> @@ -63,9 +63,6 @@ static u32 vmpck_id;
+>   module_param(vmpck_id, uint, 0444);
+>   MODULE_PARM_DESC(vmpck_id, "The VMPCK ID to use when communicating with the PSP.");
+>   
+> -/* Mutex to serialize the shared buffer access and command handling. */
+> -static DEFINE_MUTEX(snp_cmd_mutex);
+> -
+>   static inline u8 *snp_get_vmpck(struct snp_guest_dev *snp_dev)
+>   {
+>   	return snp_dev->layout->vmpck0 + snp_dev->vmpck_id * VMPCK_KEY_LEN;
+> @@ -115,8 +112,6 @@ static inline u64 __snp_get_msg_seqno(struct snp_guest_dev *snp_dev)
+>   	u32 *os_area_msg_seqno = snp_get_os_area_msg_seqno(snp_dev);
+>   	u64 count;
+>   
+> -	lockdep_assert_held(&snp_cmd_mutex);
+> -
+>   	/* Read the current message sequence counter from secrets pages */
+>   	count = *os_area_msg_seqno;
+>   
+> @@ -409,8 +404,6 @@ static int get_report(struct snp_guest_dev *snp_dev, struct snp_guest_request_io
+>   	struct snp_report_resp *resp;
+>   	int rc, resp_len;
+>   
+> -	lockdep_assert_held(&snp_cmd_mutex);
+> -
+>   	if (!arg->req_data || !arg->resp_data)
+>   		return -EINVAL;
+>   
+> @@ -457,8 +450,6 @@ static int get_derived_key(struct snp_guest_dev *snp_dev, struct snp_guest_reque
+>   	/* Response data is 64 bytes and max authsize for GCM is 16 bytes. */
+>   	u8 buf[64 + 16];
+>   
+> -	lockdep_assert_held(&snp_cmd_mutex);
+> -
+>   	if (!arg->req_data || !arg->resp_data)
+>   		return -EINVAL;
+>   
+> @@ -507,8 +498,6 @@ static int get_ext_report(struct snp_guest_dev *snp_dev, struct snp_guest_reques
+>   	sockptr_t certs_address;
+>   	int ret, resp_len;
+>   
+> -	lockdep_assert_held(&snp_cmd_mutex);
+> -
+>   	if (sockptr_is_null(io->req_data) || sockptr_is_null(io->resp_data))
+>   		return -EINVAL;
+>   
+> @@ -604,12 +593,12 @@ static long snp_guest_ioctl(struct file *file, unsigned int ioctl, unsigned long
+>   	if (!input.msg_version)
+>   		return -EINVAL;
+>   
+> -	mutex_lock(&snp_cmd_mutex);
+> +	snp_guest_cmd_lock();
+>   
+>   	/* Check if the VMPCK is not empty */
+>   	if (snp_is_vmpck_empty(snp_dev)) {
+>   		dev_err_ratelimited(snp_dev->dev, "VMPCK is disabled\n");
+> -		mutex_unlock(&snp_cmd_mutex);
+> +		snp_guest_cmd_unlock();
+>   		return -ENOTTY;
+>   	}
+>   
+> @@ -634,7 +623,7 @@ static long snp_guest_ioctl(struct file *file, unsigned int ioctl, unsigned long
+>   		break;
+>   	}
+>   
+> -	mutex_unlock(&snp_cmd_mutex);
+> +	snp_guest_cmd_unlock();
+>   
+>   	if (input.exitinfo2 && copy_to_user(argp, &input, sizeof(input)))
+>   		return -EFAULT;
+> @@ -724,14 +713,14 @@ static int sev_report_new(struct tsm_report *report, void *data)
+>   	if (!buf)
+>   		return -ENOMEM;
+>   
+> -	guard(mutex)(&snp_cmd_mutex);
+> -
+>   	/* Check if the VMPCK is not empty */
+>   	if (snp_is_vmpck_empty(snp_dev)) {
+>   		dev_err_ratelimited(snp_dev->dev, "VMPCK is disabled\n");
+>   		return -ENOTTY;
+>   	}
+>   
+> +	snp_guest_cmd_lock();
+> +
+>   	cert_table = buf + report_size;
+>   	struct snp_ext_report_req ext_req = {
+>   		.data = { .vmpl = desc->privlevel },
+> @@ -752,6 +741,8 @@ static int sev_report_new(struct tsm_report *report, void *data)
+>   	};
+>   
+>   	ret = get_ext_report(snp_dev, &input, &io);
+> +	snp_guest_cmd_unlock();
+> +
+>   	if (ret)
+>   		return ret;
+>   
 
