@@ -1,60 +1,60 @@
-Return-Path: <kvm+bounces-7248-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7247-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA14683E70B
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7823383E70A
 	for <lists+kvm@lfdr.de>; Sat, 27 Jan 2024 00:38:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1E8F28776B
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33FFB287CBD
 	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 23:38:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A02F85EE62;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E97B5EE60;
 	Fri, 26 Jan 2024 23:37:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DE9ZUdGM"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="R0KGBdX9"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B95559144;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC2065A7A2;
 	Fri, 26 Jan 2024 23:37:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706312247; cv=none; b=shsk1Fbyk+tY6WCczf2ZEf+6298rSQ2zTLd4gQETGUdjM6N/PZcW8P4FPUB/OFoVEGIOuHZnW+0aTZgl2IC1zKNN/yb6udNJ+1KTLpPVRkiTNsdgy9szjIRHXBcQJk57+Qv0Ir2/CYe24UlYlYfiBF+75MT1x5jya6CNMx38QKU=
+	t=1706312247; cv=none; b=fqhZRQ9rChwt3FzSpnZFchBVZNgrx6O8LrMlnW/L/3PbxqnggyT7RlNgQQARX7k+gIF97q0oUOfTWhLClFmH0EsXvoFM2vHb7aUsz2NdEwruKCDMcvOeybQWSG4plM+3xqZIdoQo9ZHfkxt+/Jjhf3wtReg57i9Cc0cOPfwDvJ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1706312247; c=relaxed/simple;
-	bh=TiUyHPWp/CruDSgiWpJ9abORXg7ueQkxnjZwsyBxeWU=;
+	bh=QJV30lNeix5myDOaVVsdK3RMyy1VcDvQ9cOpKGwrPwg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=q1K7qRMmBUcpTcpdYFJ/BO4rRHROcD080leQaPrhGG7aV0HShK8aFlyctAX3b5YdisHNs8lo/v+fya7iDhf8+fkceljbCV/TJxPY+nBcS1S1Tbldyz+Ym4CDdFf6e/ecv6Xc1SZM19Gg3lape9bss1N4E4usmJczvmps8av92E8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DE9ZUdGM; arc=none smtp.client-ip=192.198.163.10
+	 MIME-Version; b=SbNrgXSESzomJSsD+2oeIZzRarAH+od2CCaXEiHhSN3YbtcQkZ3YvC3K5EC9G7mdpMASBaXX2PlBabghAZuhnyrWNMsFAksX9nCWIabEF5/sdcrawHqgPk9nbw3v6SZVzKqFrU8pnOr1PlF2cs7UKhm603z6yC7JZsUfn7nZO8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=R0KGBdX9; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706312245; x=1737848245;
+  t=1706312246; x=1737848246;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=TiUyHPWp/CruDSgiWpJ9abORXg7ueQkxnjZwsyBxeWU=;
-  b=DE9ZUdGMQ/IBVIsZi7to9I6IXbOkkwHBIiX5ltT9Pfll+r/wztVO8egh
-   1fjb/6+5seJvjReJNoxAzfsqHJIhClGlP5e5NJYIP5N4eqjHokCj/p4YQ
-   5zWfTwhmS+7XY8RZLu6CXISZMWr0IZ1DdvFya7oFHXMnreTHD6//Y2dG2
-   tyxHMn2tJ8utBGXkCNMsp/SaW55mr/PY0RTWyMP6uNBW5BSt69fKQSsPZ
-   67aZUKl0uxxpkXMXk4x40nNbVwoP3CsSGLLoMO3KGabMvto/oSjxKoDbp
-   7eAEov6VHWpcxDErkVSI8Q5g9AdcR4II4NLi1AtVHhY5ffa8yj8Ca5GRq
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="9990661"
+  bh=QJV30lNeix5myDOaVVsdK3RMyy1VcDvQ9cOpKGwrPwg=;
+  b=R0KGBdX9thnwx1KkeuOUNNwybbsWww76snbTLVeujKIj/aVeBIcRF9yz
+   YLtLNBvpyhifmvCUnBZhECmsT0jUajSx6CakdR/Yhy9YblOB0E31g96RM
+   +/4+ivpABHmFNMfRySda3wFJi+2gCw42xj7baAeOaBRTNGrFfTvEPLXXQ
+   dm1UWP2UasNS7HHdBwZsk+c+BBY9yHMKRP6xT1WVZu2WvtRRzfrvsAQzK
+   6SLKSDunpCZ1l1msPj7YhtGvJ+XMG3MJAVsqdjJe5C/OELalHTvhRCSKb
+   RDp8n5FcH3uSIk19WyQLqdUus0cIU1dPhTE4lvP8VO03WTHZw+niHNIRT
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="9990682"
 X-IronPort-AV: E=Sophos;i="6.05,220,1701158400"; 
-   d="scan'208";a="9990661"
+   d="scan'208";a="9990682"
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
   by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2024 15:37:21 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="821290722"
+X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="821290725"
 X-IronPort-AV: E=Sophos;i="6.05,220,1701158400"; 
-   d="scan'208";a="821290722"
+   d="scan'208";a="821290725"
 Received: from srinivas-otcpl-7600.jf.intel.com (HELO jacob-builder.jf.intel.com) ([10.54.39.116])
-  by orsmga001.jf.intel.com with ESMTP; 26 Jan 2024 15:37:20 -0800
+  by orsmga001.jf.intel.com with ESMTP; 26 Jan 2024 15:37:21 -0800
 From: Jacob Pan <jacob.jun.pan@linux.intel.com>
 To: LKML <linux-kernel@vger.kernel.org>,
 	X86 Kernel <x86@kernel.org>,
@@ -77,9 +77,9 @@ Cc: Paul Luse <paul.e.luse@intel.com>,
 	seanjc@google.com,
 	"Robin Murphy" <robin.murphy@arm.com>,
 	Jacob Pan <jacob.jun.pan@linux.intel.com>
-Subject: [PATCH 04/15] x86/irq: Add a Kconfig option for posted MSI
-Date: Fri, 26 Jan 2024 15:42:26 -0800
-Message-Id: <20240126234237.547278-5-jacob.jun.pan@linux.intel.com>
+Subject: [PATCH 05/15] x86/irq: Reserve a per CPU IDT vector for posted MSIs
+Date: Fri, 26 Jan 2024 15:42:27 -0800
+Message-Id: <20240126234237.547278-6-jacob.jun.pan@linux.intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240126234237.547278-1-jacob.jun.pan@linux.intel.com>
 References: <20240126234237.547278-1-jacob.jun.pan@linux.intel.com>
@@ -91,36 +91,37 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This option will be used to support delivering MSIs as posted
-interrupts. Interrupt remapping is required.
+When posted MSI is enabled, all device MSIs are multiplexed into a single
+notification vector. MSI handlers will be de-multiplexed at run-time by
+system software without IDT delivery.
 
 Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
 ---
- arch/x86/Kconfig | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ arch/x86/include/asm/irq_vectors.h | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index 5edec175b9bf..79f04ee2b91c 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -463,6 +463,17 @@ config X86_X2APIC
+diff --git a/arch/x86/include/asm/irq_vectors.h b/arch/x86/include/asm/irq_vectors.h
+index 3a19904c2db6..08329bef5b1d 100644
+--- a/arch/x86/include/asm/irq_vectors.h
++++ b/arch/x86/include/asm/irq_vectors.h
+@@ -99,9 +99,16 @@
  
- 	  If you don't know what to do here, say N.
+ #define LOCAL_TIMER_VECTOR		0xec
  
-+config X86_POSTED_MSI
-+	bool "Enable MSI and MSI-x delivery by posted interrupts"
-+	depends on X86_X2APIC && X86_64 && IRQ_REMAP
-+	help
-+	  This enables MSIs that are under interrupt remapping to be delivered as
-+	  posted interrupts to the host kernel. Interrupt throughput can
-+	  potentially be improved by coalescing CPU notifications during high
-+	  frequency bursts.
-+
-+	  If you don't know what to do here, say N.
-+
- config X86_MPPARSE
- 	bool "Enable MPS table" if ACPI
- 	default y
++/*
++ * Posted interrupt notification vector for all device MSIs delivered to
++ * the host kernel.
++ */
++#define POSTED_MSI_NOTIFICATION_VECTOR	0xeb
+ #define NR_VECTORS			 256
+ 
+-#ifdef CONFIG_X86_LOCAL_APIC
++#ifdef X86_POSTED_MSI
++#define FIRST_SYSTEM_VECTOR		POSTED_MSI_NOTIFICATION_VECTOR
++#elif defined(CONFIG_X86_LOCAL_APIC)
+ #define FIRST_SYSTEM_VECTOR		LOCAL_TIMER_VECTOR
+ #else
+ #define FIRST_SYSTEM_VECTOR		NR_VECTORS
 -- 
 2.25.1
 
