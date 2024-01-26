@@ -1,167 +1,109 @@
-Return-Path: <kvm+bounces-7038-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7039-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2B2D83D1D6
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 02:00:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B16783D1F6
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 02:20:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A5A6292D6A
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 01:00:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D911D1F27C76
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 01:20:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2781A524F;
-	Fri, 26 Jan 2024 01:00:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0FA917F7;
+	Fri, 26 Jan 2024 01:19:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uXtUAFSa"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DCsJZkL6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0236399
-	for <kvm@vger.kernel.org>; Fri, 26 Jan 2024 01:00:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9F8664C
+	for <kvm@vger.kernel.org>; Fri, 26 Jan 2024 01:19:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706230839; cv=none; b=HC1U0o4y7ZzRF3T1naOn2Om2k5XWSpDZiUtK+Aoaj/JI9VJfHz2+aCRXCSdyJsdo60bO9xks8iRJ4qtSiIPOtJfhbgq1zJz/C7Et4y/X6LuSFSHGugpR/HQt+Kkb32GZuKVeyWWNAFn3ZLaEW5E9p9vY5YpZ9qbwIx2XIQSzwbs=
+	t=1706231999; cv=none; b=n8JscooI9lJSq/MrNvCBSe2S1J9ApW8lB36y5P19tVMvQU8QDTt2//np0zJGZmRlLI6yFma/sK5yCwfAkr0OybC5/A25x1m9wP0lutQP+OSGiih6e22wF2s0qmco2z0aVqjtYbXZLnNlYBjm9nmk+EWqP67rNcp2svkLyf1MMNM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706230839; c=relaxed/simple;
-	bh=b1EysaVqnVOuKJxM2IaK/TxCQ3p1ykl4Repgjoi2kfQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CDI/MkyzLeui6ZEKMeyuOCioSrQYmi/EXvHvRaTkR4w0OzUK6uW5mPB/6vqTzsjG1t1xn8KieytbmPelRAV00m4i0poIwu5KccTk99bCFMC3ezxaY5tnfrdrGBjFUCDKUQXDmRvmtNBQ7yxPLqL11hpdauIduaYFahOBEQ8XZX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uXtUAFSa; arc=none smtp.client-ip=209.85.208.48
+	s=arc-20240116; t=1706231999; c=relaxed/simple;
+	bh=O+ISzNiDeEkah3Hw3HoidwKq5p/UbFijfXglLbQfZBo=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=V/wCwi1aBvqRORKc4fuUnvOJfDLNV4BwZ6zQaFzihxp2TdDv4dwangEY4A/ELeL/qbSbPd2MjSlqSwSAH7p2JswMpniRTlSQZkOUWpAe3rEpuWfZ6LCM92kxMXJeTMpR1MRpgSsojo8Np+J6WUIRwOGme6igaoVBayRlPNuk4rM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DCsJZkL6; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-55c89dbef80so3665a12.1
-        for <kvm@vger.kernel.org>; Thu, 25 Jan 2024 17:00:37 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5ffa2bb4810so3242687b3.0
+        for <kvm@vger.kernel.org>; Thu, 25 Jan 2024 17:19:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706230836; x=1706835636; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UoRz9Pe9GXZ+r6gty+528GFeZ2jb+Iln87IYuPoUJm4=;
-        b=uXtUAFSavHIAlokoD9ChlZDw7bcCC+GKxtYPDXbA1y5/qumtsgjcvjZSKg+CiZuLlN
-         /+JmWcwoKoUeB9+XaTjDqH/bIFe1jF1RM899+YUvG7Kb/l6RmyLSuzfmGBMvc3tQiDnh
-         DC1CV3IAsMYbUI+jiS5K8LHygztIGmUxR2E6UwphAc0/8siFIROE099EhkgYtv47fQfg
-         uT1ESirUBpk1zo4Qv4eASm1FzeCPYu6TRi12+dtMZCWwFHxhVwbR2JClK4/4vgbnrgir
-         rYGpQ9pUAaAkfOHx3+r0CKS7Izh4bULrfIw27XQQDIH1BmJGJIF8D5SOCPf7tG5lU4DH
-         5sIQ==
+        d=google.com; s=20230601; t=1706231997; x=1706836797; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=pHG1ZSD8JrDcka5NqVhNUxwoRtm1E+uIuqNOvvYJ6SE=;
+        b=DCsJZkL6fr0saIXsihcPapgknJE0lKn04IC7lcLMMZlJVPFGT3ATnpSfY3dq4W//jl
+         3RoQDDg59GppQ/gpSmoAKAyLT1FXmY9hAP5FHHGdXU+VAvH/K5xGgeO2WdQC0LuZb544
+         XSRmMeUnQXbG2eZcFHG3Rj+RIkIxZngpbQ2DVl0pYOv09ew7gp4G7JcqxzffkkSEQthu
+         0AvTKmPJNkNq/WoMqSMXkZtFu5t/T9KTK2qx94olY2M3quGtag13jPIt1P+D/5K6dQNY
+         4jtiJzyCzNvit9znOBGiNiSS4KTo/BUhixsL2BnzTnykPkTkZ8QwWM2VxS//R+uZ1kTv
+         rWCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706230836; x=1706835636;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UoRz9Pe9GXZ+r6gty+528GFeZ2jb+Iln87IYuPoUJm4=;
-        b=AeHhZ2YxD6yRWWW/OA7huqJGYdTXOhhb9d6gQHPOgElXAT3Y3L4SjOkDwBJ6+ifyLI
-         2EVTD+ju2mILVK+ZJCtZFJUpsvUP6CW7Wmgi2Aa81EHnHwjQAr4X4iEYlT2Z4vlTq7D6
-         WzFUT/mRNlEu3QsMcyPHx+kr9dj7AUKXORPYxD+t9cpGqjShFYW4i8Aj5GjMieKw82ZX
-         M8J+ivW3IrvQZx6juZtT6yIexQ0E/HktZnGdCHD0VF+pmNT3kC3dJMlGcWFl9aKKW26i
-         aAECV9RQvp0XAaarLdlJ/Wl9z8QxPgY16/IUmuS0a1leTS928MWRSKebp/v5LK8j6blZ
-         pPtw==
-X-Gm-Message-State: AOJu0YzQTQzHae7sH1gJyTxUjR+b6Jbefk4SqBYcJhfe5Pvz7gZIsi6t
-	iCdexdpApgGOGO47txMSc/8EIRUv/ElITGpNgcE+3bsGTMljHYGp5k7/RGU4PH1LZvwOZ65MSBK
-	w3aP15gUtsgJ2BiLzickoHX4/EcUt8S+kslyq
-X-Google-Smtp-Source: AGHT+IGL6rWZU5v103N0xcbcUzq2l0nfavM24hYp0Ft0qdPxvPUH9Pfo6QzVp+PC4QsbaCA/ecx9XWSzUb/uCr9Bg04=
-X-Received: by 2002:a05:6402:b6f:b0:55c:e4da:760d with SMTP id
- cb15-20020a0564020b6f00b0055ce4da760dmr48283edb.1.1706230835791; Thu, 25 Jan
- 2024 17:00:35 -0800 (PST)
+        d=1e100.net; s=20230601; t=1706231997; x=1706836797;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pHG1ZSD8JrDcka5NqVhNUxwoRtm1E+uIuqNOvvYJ6SE=;
+        b=BZOcnJL+ZGnxxvMlkg1ja/+lKE5OXP/+A5LoxvOCXCgXwDUoiPVEnrVbwhJw89dtf2
+         jGP+MXSmF2qZYYM/p10pK3FE8MwShuvDt0kAs0THRr+l9B4NtriUgSvFiwaUufiP89mg
+         iBlM4wn7FQE4CM1UbZNgC5PYC8dl36lXUi6SYSsZNPxungdc1VWsse9POMXRIjoi2Df3
+         BXvne7Kz/pOlYWy2k1bzKnCOXl2tdZjhSWA87J23AQY87ZbFSPdqQ5PSjbbwWav+QfHE
+         VfbhkM4cqz0bboyDTVCdufnIKmpOMXr3dpYkLuvDLvizAIXQqta9CgD4cWDr4rBzpAzW
+         ihVw==
+X-Gm-Message-State: AOJu0YwgqNgSd2OuCrtkaQJXVyi0G6dD2OSwUN3PFlWJc/w5eyR0IyNU
+	w1menL6Lb0BBKIHWHOt2BG5dH4CChNjRU43WrHjz0A/WSFzSHAiMMSJ4ASB7J2iACe9SgPe6rqs
+	15w==
+X-Google-Smtp-Source: AGHT+IHLXKe8GGe5tsEa+OhFYDBbxSYWI6FcMBfKCtGBbLWVOaSELCB0u0zyOphLvMaVq7WfVLhu2EXTeNQ=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:2309:b0:dc2:3a02:4fc8 with SMTP id
+ do9-20020a056902230900b00dc23a024fc8mr87710ybb.6.1706231996798; Thu, 25 Jan
+ 2024 17:19:56 -0800 (PST)
+Date: Thu, 25 Jan 2024 17:19:55 -0800
+In-Reply-To: <2b4d020c-08ba-46ac-b004-cd9cb7256bd9@xen.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20231220151358.2147066-1-nikunj@amd.com> <8cd3e742-2103-44b4-8ccf-92acda960245@amd.com>
-In-Reply-To: <8cd3e742-2103-44b4-8ccf-92acda960245@amd.com>
-From: Dionna Amalie Glaze <dionnaglaze@google.com>
-Date: Thu, 25 Jan 2024 17:00:22 -0800
-Message-ID: <CAAH4kHZ8TWbWtf2_2DjEQosO8M08wD-EvaEsBKrXmPUaiFg+ug@mail.gmail.com>
-Subject: Re: [PATCH v7 00/16] Add Secure TSC support for SNP guests
-To: nikunj@amd.com
-Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org, 
-	kvm@vger.kernel.org, bp@alien8.de, mingo@redhat.com, tglx@linutronix.de, 
-	dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com, 
-	pbonzini@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20240115125707.1183-1-paul@xen.org> <2b4d020c-08ba-46ac-b004-cd9cb7256bd9@xen.org>
+Message-ID: <ZbMIu84Zi2_PF9o4@google.com>
+Subject: Re: [PATCH v12 00/20] KVM: xen: update shared_info and vcpu_info handling
+From: Sean Christopherson <seanjc@google.com>
+To: paul@xen.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, David Woodhouse <dwmw2@infradead.org>, Shuah Khan <shuah@kernel.org>, 
+	kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Jan 24, 2024 at 10:08=E2=80=AFPM Nikunj A. Dadhania <nikunj@amd.com=
-> wrote:
->
-> On 12/20/2023 8:43 PM, Nikunj A Dadhania wrote:
-> > Secure TSC allows guests to securely use RDTSC/RDTSCP instructions as t=
-he
-> > parameters being used cannot be changed by hypervisor once the guest is
-> > launched. More details in the AMD64 APM Vol 2, Section "Secure TSC".
-> >
-> > During the boot-up of the secondary cpus, SecureTSC enabled guests need=
- to
-> > query TSC info from AMD Security Processor. This communication channel =
-is
-> > encrypted between the AMD Security Processor and the guest, the hypervi=
-sor
-> > is just the conduit to deliver the guest messages to the AMD Security
-> > Processor. Each message is protected with an AEAD (AES-256 GCM). See "S=
-EV
-> > Secure Nested Paging Firmware ABI Specification" document (currently at
-> > https://www.amd.com/system/files/TechDocs/56860.pdf) section "TSC Info"
-> >
-> > Use a minimal GCM library to encrypt/decrypt SNP Guest messages to
-> > communicate with the AMD Security Processor which is available at early
-> > boot.
-> >
-> > SEV-guest driver has the implementation for guest and AMD Security
-> > Processor communication. As the TSC_INFO needs to be initialized during
-> > early boot before smp cpus are started, move most of the sev-guest driv=
-er
-> > code to kernel/sev.c and provide well defined APIs to the sev-guest dri=
-ver
-> > to use the interface to avoid code-duplication.
-> >
-> > Patches:
-> > 01-08: Preparation and movement of sev-guest driver code
-> > 09-16: SecureTSC enablement patches.
-> >
-> > Testing SecureTSC
-> > -----------------
-> >
-> > SecureTSC hypervisor patches based on top of SEV-SNP Guest MEMFD series=
-:
-> > https://github.com/nikunjad/linux/tree/snp-host-latest-securetsc_v5
-> >
-> > QEMU changes:
-> > https://github.com/nikunjad/qemu/tree/snp_securetsc_v5
-> >
-> > QEMU commandline SEV-SNP-UPM with SecureTSC:
-> >
-> >   qemu-system-x86_64 -cpu EPYC-Milan-v2,+secure-tsc,+invtsc -smp 4 \
-> >     -object memory-backend-memfd-private,id=3Dram1,size=3D1G,share=3Dtr=
-ue \
-> >     -object sev-snp-guest,id=3Dsev0,cbitpos=3D51,reduced-phys-bits=3D1,=
-secure-tsc=3Don \
-> >     -machine q35,confidential-guest-support=3Dsev0,memory-backend=3Dram=
-1,kvm-type=3Dsnp \
-> >     ...
-> >
-> > Changelog:
-> > ----------
-> > v7:
-> > * Drop mutex from the snp_dev and add snp_guest_cmd_{lock,unlock} API
-> > * Added comments for secrets page failure
-> > * Added define for maximum supported VMPCK
-> > * Updated comments why sev_status is used directly instead of
-> >   cpu_feature_enabled()
->
-> A gentle reminder.
->
+On Thu, Jan 25, 2024, Paul Durrant wrote:
+> On 15/01/2024 12:56, Paul Durrant wrote:
+> > From: Paul Durrant <pdurrant@amazon.com>
+> > 
+> > This series has one small fix to what was in v11 [1]:
+> > 
+> > * KVM: xen: re-initialize shared_info if guest (32/64-bit) mode is set
+> > 
+> > The v11 patch failed to set the return code of the ioctl if the mode
+> > was not actually changed, leading to a spurious failure.
+> > 
+> > This version of the series also contains a new bug-fix to the pfncache
+> > code from David Woodhouse.
+> > 
+> > [1] https://lore.kernel.org/kvm/20231219161109.1318-1-paul@xen.org/
+> > 
+> 
+> Ping?
 
-From the Google testing side of things, we may not get to this for
-another while.
-
-> Regards
-> Nikunj
->
-
-
---=20
--Dionna Glaze, PhD (she/her)
+Sorry, I have done basically zero upstream reviews over the last few weeks, for
+a variety of reasons.  Unless yet another thing pops up, I expect to dive into
+upstream reviews tomorrow and spend a good long while there.
 
