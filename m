@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-7234-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7235-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23AA883E4AE
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 23:09:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E298E83E4AF
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 23:09:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A6BA21F21AD2
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 22:09:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D69C91C23358
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 22:09:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 661F8286BD;
-	Fri, 26 Jan 2024 22:06:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3B5C2E3E4;
+	Fri, 26 Jan 2024 22:06:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PF4/Hlib"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ECh2SKRc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 995602556C
-	for <kvm@vger.kernel.org>; Fri, 26 Jan 2024 22:06:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48FF32555E
+	for <kvm@vger.kernel.org>; Fri, 26 Jan 2024 22:06:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706306778; cv=none; b=jsC/gv1NfIdulNrc0JHIJPMrQTYFhU5mPbu53ifGhgBn6QcbZb5N1cxHBNcUY6JwYgdITqPgHsgGYsov/nqpFGS/SaChWMKyuw1MiqRDfS7qs1AssBimaPwgG+cVHZroVNjxTPvCX6b4RqaUvL2Y9NEEcfu/e1XGFhC50H9rJ5Q=
+	t=1706306785; cv=none; b=P8KGN/EFiHGpxVhTgCgGxbrvgUDwVju8mf3O3fsajvGW06OHP8EVBCtLmV45wGKHF0jewuG3pIiItxHWhWOP0aDVaHADwUP/1aSEcE2UDDGzpiU7+TosgrpDIp95DKoyPiBVEdVUAu48ZlaNLOaz/U5pmNabOm/h+yHgxNY+7NE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706306778; c=relaxed/simple;
-	bh=8LmqU9yjgNdQvLQyecghfn9zAsXYBZZP2oV+iI7FEjk=;
+	s=arc-20240116; t=1706306785; c=relaxed/simple;
+	bh=kQIj/Okg5eAzamYjUoUwfm59wqdNrYwL8c1qYbBzRQ4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nUTWn3Ie0O8DGS7CqouxYbPDXe2DEojeuNBUEc2XP/TIeaQyf7NPJEdSDIhgaI2PeaOvDwUTRzb7IwklEWxkMC2TdBZwPCZr1qAjNTMZfIV6v8aaio4VwrA5Y7ECIsSfNdjSmFq+0J2FVAlretrF98zoTWLTqN9O6JitEUNyHVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=PF4/Hlib; arc=none smtp.client-ip=209.85.128.44
+	 MIME-Version:Content-Type; b=EQL94WQcOStHyu8xDGtpyz/93sUugCVru1XpMur07YLV3zwwyvK7cJlH7anj2dPNrgr42b+Y3bxwCst1/yrWS19dAxGOl61Jy/wNWjzPpqQdliEJZ9B3XLelrPU2xxAIeyb4OX0/lysS1MhGH5MWtWZ7TpLMNEwllJrMbbw1jc4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ECh2SKRc; arc=none smtp.client-ip=209.85.221.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-40e775695c6so6715935e9.3
-        for <kvm@vger.kernel.org>; Fri, 26 Jan 2024 14:06:16 -0800 (PST)
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-3394dc75eadso908727f8f.2
+        for <kvm@vger.kernel.org>; Fri, 26 Jan 2024 14:06:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1706306775; x=1706911575; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1706306781; x=1706911581; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YtuQrPEiaOdoOF8LUQEAgkD/kFrAu5dyJpYlVEeXrYA=;
-        b=PF4/HlibH4+G6+oM47qYE+zvLHHsdRfi4ZEx8/Q1eaNOpSYXJna+/wevSwqfbPipgz
-         rfDbiQZp4fPmG2h7HcQySR+T43JEWq+Td3xOIFkMXFAeIZi0/Mx/aloBhZroeoH10ixi
-         WGchu50j26tqziZSVT+ux3AWXcE/lRvIZcft1LPAwGFMHW4WjTAq9bec1E55vXb7WIKS
-         FOZUYRoxzTQuKKRlCMnxS0kBbuttrgr2h6EVWuyWIUddSmCho6q7Xq1wSyjHX++l9gzb
-         xJ6YJ59WWM5dUrsKV9TCiibjab9h1YU+jyi/fH1AfsKbJ91ZnhtxYUaeCDIHLibdR3hX
-         RbtA==
+        bh=vV6dlj18pAtxWLV4KcwUuJD4lVU4OiaIF5yNARG5Efc=;
+        b=ECh2SKRc5a18tNq6uDXQQudlGUb9ir6NxuINAgjSVFge4skCPSDAC61d7yDEivsb4+
+         xEG6Iwllzm517Dws/zIZQaRW1QCHuV20lHUnMFn0OcHsDpY/1jKr6/VWFB2JC3D4mUR3
+         /HRzmyZ3Zr3SwhtoSkUMZgJOhiBduzKQjqbsllTZ9Mp/sl819xGJttPYlBAxDxhXdoUY
+         4hnIH01kIYYxX0YLNzvPWwsSL8txtkShHuobGHiptdaikfnh5C5qe78CN9MBjoNYTwT3
+         H02aa6o3/esxjqV2V4OjyiBc53G3OQq7EkqmEc0IoshXUSdvYSlOM1ORLEv9nAnRTl4S
+         9lVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706306775; x=1706911575;
+        d=1e100.net; s=20230601; t=1706306781; x=1706911581;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=YtuQrPEiaOdoOF8LUQEAgkD/kFrAu5dyJpYlVEeXrYA=;
-        b=DNMhfOLWut6K5jrfX0M89JpcS/m0tiRx7EUT71yK4M+c3u5kGq+qUgLpeeLLlXAJeH
-         nH1bRBspjIfAP0/npUFGowpk9KgWMgRGxz8YiC3GcosvdzKcsI2qsnlJwX05WcZoyc6N
-         8b40TZ/ZWgPFo1fbjdlJ4I77nf+mu/qb6htrLCgTBA1wp8Z82jj9/On6sAK9wt/eR7LC
-         NYXBCGBlyeRCkl6UsHI+PONaBGm+kJHCW1PMzG4ZIJLZhrqDpJ7c4/adFjHxDx9Q85vy
-         VT2agDd9jcRHxGv7lrz9etcotWJ2XX5tz2xc1Z/qD5QDCR3ZoIi5pmasuEzfITBzwJ5F
-         dgFQ==
-X-Gm-Message-State: AOJu0YwkU5PPZbMqrey5JzBsJh3eNXM17NIpXOSRP1vjOwAGtwQe8c8f
-	IzLhQYD/DAYOTRPJUryM5+5hnxb6v0uhoYRtE5om9bUBzukhQFBSPXzISGr9VWM=
-X-Google-Smtp-Source: AGHT+IGAJd1+nxpnhxNSxbbDkweDQV7fyyewwmnnG2Uh8Gfd0V5Pa5JSlH8Cjw1RHP8jg3sEePPxpg==
-X-Received: by 2002:a05:600c:b8a:b0:40e:5947:bcf9 with SMTP id fl10-20020a05600c0b8a00b0040e5947bcf9mr535667wmb.18.1706306774930;
-        Fri, 26 Jan 2024 14:06:14 -0800 (PST)
+        bh=vV6dlj18pAtxWLV4KcwUuJD4lVU4OiaIF5yNARG5Efc=;
+        b=Ftux8GLSNDaDdLzV2JOsSze5nD+QTM0bnYatax6/a7pjKh2HEmr3BpIfbi5wD04BLo
+         jhGdk9Q0Z/oJNUHGUgBfhsNtmZRz6jN6IHgiev7FZzeV1fsYGHAGE1YqzTvlf1+xmrW8
+         jIV+J9nJ0PHoPfxhlUxayytLRnnGv1eUjZ6jVXnR9RkIqBnY4dOYNYJkJfgp9XPXx+Pv
+         naVau2ub/W7mOnkG+t05UKFVwVgeb6QQZMlgQDGsxpM5x5h7s34Y4+uNUjzU5/tOEhTf
+         IVFHrokLjXt1yoAnFRvgzX6SSniB878ils2zhnEjpsyhiutkg1yhppyoQqEK0xnkiMYl
+         //ZQ==
+X-Gm-Message-State: AOJu0YyPOaTOCkLZrG9wQMDPs8uWQQ7jIzN4qYn65vPl/OL2a9fOxwgH
+	yfDF+RK9YWnKAk67dODlubjMOIRzsDRQBpGTb9sxpuKVn/NhSCTkQGD21r+T6ps=
+X-Google-Smtp-Source: AGHT+IEILfBTjrvb6AYehjpbj/erQivk6DH/567rWQm8N/mmRzPIMyAQrBr8ZvoYrwb5nMIDLR/v/w==
+X-Received: by 2002:adf:f48d:0:b0:337:bfdb:5b8d with SMTP id l13-20020adff48d000000b00337bfdb5b8dmr216861wro.115.1706306781480;
+        Fri, 26 Jan 2024 14:06:21 -0800 (PST)
 Received: from m1x-phil.lan ([176.176.142.39])
-        by smtp.gmail.com with ESMTPSA id bu25-20020a056000079900b0033921b2a5d4sm2097084wrb.75.2024.01.26.14.06.13
+        by smtp.gmail.com with ESMTPSA id n14-20020a5d6b8e000000b0033ade016ba5sm1380477wrx.4.2024.01.26.14.06.19
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Fri, 26 Jan 2024 14:06:14 -0800 (PST)
+        Fri, 26 Jan 2024 14:06:21 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org,
@@ -79,10 +79,10 @@ Cc: qemu-arm@nongnu.org,
 	Vladimir Sementsov-Ogievskiy <vsementsov@yandex-team.ru>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Yoshinori Sato <ysato@users.sourceforge.jp>
-Subject: [PATCH v2 20/23] target/sh4: Prefer fast cpu_env() over slower CPU QOM cast macro
-Date: Fri, 26 Jan 2024 23:04:02 +0100
-Message-ID: <20240126220407.95022-21-philmd@linaro.org>
+	Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Subject: [PATCH v2 21/23] target/tricore: Prefer fast cpu_env() over slower CPU QOM cast macro
+Date: Fri, 26 Jan 2024 23:04:03 +0100
+Message-ID: <20240126220407.95022-22-philmd@linaro.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20240126220407.95022-1-philmd@linaro.org>
 References: <20240126220407.95022-1-philmd@linaro.org>
@@ -100,141 +100,111 @@ in scripts/coccinelle/cpu_env.cocci_template header.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- target/sh4/cpu.c       | 15 +++++----------
- target/sh4/gdbstub.c   |  6 ++----
- target/sh4/helper.c    | 11 +++--------
- target/sh4/translate.c |  3 +--
- 4 files changed, 11 insertions(+), 24 deletions(-)
+ target/tricore/cpu.c       | 20 ++++----------------
+ target/tricore/gdbstub.c   |  6 ++----
+ target/tricore/helper.c    |  3 +--
+ target/tricore/translate.c |  3 +--
+ 4 files changed, 8 insertions(+), 24 deletions(-)
 
-diff --git a/target/sh4/cpu.c b/target/sh4/cpu.c
-index 806a0ef875..786c77615e 100644
---- a/target/sh4/cpu.c
-+++ b/target/sh4/cpu.c
-@@ -71,8 +71,7 @@ static void superh_restore_state_to_opc(CPUState *cs,
- static bool superh_io_recompile_replay_branch(CPUState *cs,
-                                               const TranslationBlock *tb)
+diff --git a/target/tricore/cpu.c b/target/tricore/cpu.c
+index 8acacdf0c0..7f0609090c 100644
+--- a/target/tricore/cpu.c
++++ b/target/tricore/cpu.c
+@@ -36,38 +36,26 @@ static const gchar *tricore_gdb_arch_name(CPUState *cs)
+ 
+ static void tricore_cpu_set_pc(CPUState *cs, vaddr value)
  {
--    SuperHCPU *cpu = SUPERH_CPU(cs);
--    CPUSH4State *env = &cpu->env;
-+    CPUSH4State *env = cpu_env(cs);
- 
-     if ((env->flags & (TB_FLAG_DELAY_SLOT | TB_FLAG_DELAY_SLOT_COND))
-         && !(cs->tcg_cflags & CF_PCREL) && env->pc != tb->pc) {
-@@ -144,8 +143,7 @@ out:
- 
- static void sh7750r_cpu_initfn(Object *obj)
- {
--    SuperHCPU *cpu = SUPERH_CPU(obj);
--    CPUSH4State *env = &cpu->env;
-+    CPUSH4State *env = cpu_env(CPU(obj));
- 
-     env->id = SH_CPU_SH7750R;
-     env->features = SH_FEATURE_BCR3_AND_BCR4;
-@@ -162,8 +160,7 @@ static void sh7750r_class_init(ObjectClass *oc, void *data)
- 
- static void sh7751r_cpu_initfn(Object *obj)
- {
--    SuperHCPU *cpu = SUPERH_CPU(obj);
--    CPUSH4State *env = &cpu->env;
-+    CPUSH4State *env = cpu_env(CPU(obj));
- 
-     env->id = SH_CPU_SH7751R;
-     env->features = SH_FEATURE_BCR3_AND_BCR4;
-@@ -180,8 +177,7 @@ static void sh7751r_class_init(ObjectClass *oc, void *data)
- 
- static void sh7785_cpu_initfn(Object *obj)
- {
--    SuperHCPU *cpu = SUPERH_CPU(obj);
--    CPUSH4State *env = &cpu->env;
-+    CPUSH4State *env = cpu_env(CPU(obj));
- 
-     env->id = SH_CPU_SH7785;
-     env->features = SH_FEATURE_SH4A;
-@@ -216,8 +212,7 @@ static void superh_cpu_realizefn(DeviceState *dev, Error **errp)
- 
- static void superh_cpu_initfn(Object *obj)
- {
--    SuperHCPU *cpu = SUPERH_CPU(obj);
--    CPUSH4State *env = &cpu->env;
-+    CPUSH4State *env = cpu_env(CPU(obj));
- 
-     env->movcal_backup_tail = &(env->movcal_backup);
- }
-diff --git a/target/sh4/gdbstub.c b/target/sh4/gdbstub.c
-index d8e199fc06..75926d4e04 100644
---- a/target/sh4/gdbstub.c
-+++ b/target/sh4/gdbstub.c
-@@ -26,8 +26,7 @@
- 
- int superh_cpu_gdb_read_register(CPUState *cs, GByteArray *mem_buf, int n)
- {
--    SuperHCPU *cpu = SUPERH_CPU(cs);
--    CPUSH4State *env = &cpu->env;
-+    CPUSH4State *env = cpu_env(cs);
- 
-     switch (n) {
-     case 0 ... 7:
-@@ -76,8 +75,7 @@ int superh_cpu_gdb_read_register(CPUState *cs, GByteArray *mem_buf, int n)
- 
- int superh_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
- {
--    SuperHCPU *cpu = SUPERH_CPU(cs);
--    CPUSH4State *env = &cpu->env;
-+    CPUSH4State *env = cpu_env(cs);
- 
-     switch (n) {
-     case 0 ... 7:
-diff --git a/target/sh4/helper.c b/target/sh4/helper.c
-index 5a6f653c12..28b81a5c54 100644
---- a/target/sh4/helper.c
-+++ b/target/sh4/helper.c
-@@ -55,8 +55,7 @@ int cpu_sh4_is_cached(CPUSH4State *env, target_ulong addr)
- 
- void superh_cpu_do_interrupt(CPUState *cs)
- {
--    SuperHCPU *cpu = SUPERH_CPU(cs);
--    CPUSH4State *env = &cpu->env;
-+    CPUSH4State *env = cpu_env(cs);
-     int do_irq = cs->interrupt_request & CPU_INTERRUPT_HARD;
-     int do_exp, irq_vector = cs->exception_index;
- 
-@@ -782,11 +781,8 @@ int cpu_sh4_is_cached(CPUSH4State * env, target_ulong addr)
- bool superh_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
- {
-     if (interrupt_request & CPU_INTERRUPT_HARD) {
--        SuperHCPU *cpu = SUPERH_CPU(cs);
--        CPUSH4State *env = &cpu->env;
+-    TriCoreCPU *cpu = TRICORE_CPU(cs);
+-    CPUTriCoreState *env = &cpu->env;
 -
-         /* Delay slots are indivisible, ignore interrupts */
--        if (env->flags & TB_FLAG_DELAY_SLOT_MASK) {
-+        if (cpu_env(cs)->flags & TB_FLAG_DELAY_SLOT_MASK) {
-             return false;
-         } else {
-             superh_cpu_do_interrupt(cs);
-@@ -800,8 +796,7 @@ bool superh_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-                          MMUAccessType access_type, int mmu_idx,
-                          bool probe, uintptr_t retaddr)
- {
--    SuperHCPU *cpu = SUPERH_CPU(cs);
--    CPUSH4State *env = &cpu->env;
-+    CPUSH4State *env = cpu_env(cs);
-     int ret;
+-    env->PC = value & ~(target_ulong)1;
++    cpu_env(cs)->PC = value & ~(target_ulong)1;
+ }
  
-     target_ulong physical;
-diff --git a/target/sh4/translate.c b/target/sh4/translate.c
-index 81f825f125..4a933adad8 100644
---- a/target/sh4/translate.c
-+++ b/target/sh4/translate.c
-@@ -159,8 +159,7 @@ void sh4_translate_init(void)
- 
- void superh_cpu_dump_state(CPUState *cs, FILE *f, int flags)
+ static vaddr tricore_cpu_get_pc(CPUState *cs)
  {
--    SuperHCPU *cpu = SUPERH_CPU(cs);
--    CPUSH4State *env = &cpu->env;
-+    CPUSH4State *env = cpu_env(cs);
+-    TriCoreCPU *cpu = TRICORE_CPU(cs);
+-    CPUTriCoreState *env = &cpu->env;
+-
+-    return env->PC;
++    return cpu_env(cs)->PC;
+ }
+ 
+ static void tricore_cpu_synchronize_from_tb(CPUState *cs,
+                                             const TranslationBlock *tb)
+ {
+-    TriCoreCPU *cpu = TRICORE_CPU(cs);
+-    CPUTriCoreState *env = &cpu->env;
+-
+     tcg_debug_assert(!(cs->tcg_cflags & CF_PCREL));
+-    env->PC = tb->pc;
++    cpu_env(cs)->PC = tb->pc;
+ }
+ 
+ static void tricore_restore_state_to_opc(CPUState *cs,
+                                          const TranslationBlock *tb,
+                                          const uint64_t *data)
+ {
+-    TriCoreCPU *cpu = TRICORE_CPU(cs);
+-    CPUTriCoreState *env = &cpu->env;
+-
+-    env->PC = data[0];
++    cpu_env(cs)->PC = data[0];
+ }
+ 
+ static void tricore_cpu_reset_hold(Object *obj)
+diff --git a/target/tricore/gdbstub.c b/target/tricore/gdbstub.c
+index e8f8e5e6ea..f9309c5e27 100644
+--- a/target/tricore/gdbstub.c
++++ b/target/tricore/gdbstub.c
+@@ -106,8 +106,7 @@ static void tricore_cpu_gdb_write_csfr(CPUTriCoreState *env, int n,
+ 
+ int tricore_cpu_gdb_read_register(CPUState *cs, GByteArray *mem_buf, int n)
+ {
+-    TriCoreCPU *cpu = TRICORE_CPU(cs);
+-    CPUTriCoreState *env = &cpu->env;
++    CPUTriCoreState *env = cpu_env(cs);
+ 
+     if (n < 16) { /* data registers */
+         return gdb_get_reg32(mem_buf, env->gpr_d[n]);
+@@ -121,8 +120,7 @@ int tricore_cpu_gdb_read_register(CPUState *cs, GByteArray *mem_buf, int n)
+ 
+ int tricore_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
+ {
+-    TriCoreCPU *cpu = TRICORE_CPU(cs);
+-    CPUTriCoreState *env = &cpu->env;
++    CPUTriCoreState *env = cpu_env(cs);
+     uint32_t tmp;
+ 
+     tmp = ldl_p(mem_buf);
+diff --git a/target/tricore/helper.c b/target/tricore/helper.c
+index 174f666e1e..d328414c99 100644
+--- a/target/tricore/helper.c
++++ b/target/tricore/helper.c
+@@ -67,8 +67,7 @@ bool tricore_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+                           MMUAccessType rw, int mmu_idx,
+                           bool probe, uintptr_t retaddr)
+ {
+-    TriCoreCPU *cpu = TRICORE_CPU(cs);
+-    CPUTriCoreState *env = &cpu->env;
++    CPUTriCoreState *env = cpu_env(cs);
+     hwaddr physical;
+     int prot;
+     int ret = 0;
+diff --git a/target/tricore/translate.c b/target/tricore/translate.c
+index 66553d1be0..ad314bdf3c 100644
+--- a/target/tricore/translate.c
++++ b/target/tricore/translate.c
+@@ -95,8 +95,7 @@ enum {
+ 
+ void tricore_cpu_dump_state(CPUState *cs, FILE *f, int flags)
+ {
+-    TriCoreCPU *cpu = TRICORE_CPU(cs);
+-    CPUTriCoreState *env = &cpu->env;
++    CPUTriCoreState *env = cpu_env(cs);
+     uint32_t psw;
      int i;
  
-     qemu_fprintf(f, "pc=0x%08x sr=0x%08x pr=0x%08x fpscr=0x%08x\n",
 -- 
 2.41.0
 
