@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-7151-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7153-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FAC283DBAC
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 15:24:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CB1D583DBAE
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 15:24:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11B2B283A97
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 14:24:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87340283F7F
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 14:24:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96D8D1D529;
-	Fri, 26 Jan 2024 14:23:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8CD01D54B;
+	Fri, 26 Jan 2024 14:23:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RnohD1NB"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Md2fslmI"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D502F1CFB4
-	for <kvm@vger.kernel.org>; Fri, 26 Jan 2024 14:23:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 659311D524
+	for <kvm@vger.kernel.org>; Fri, 26 Jan 2024 14:23:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706279033; cv=none; b=PwPFw5hpxH4JpXiK6GXouCb+Z7/aw/WLiigjQsoFdfPRrVGr4hV86nvAO/4kNi9vrniMNUcaYZNKEiYWMGWnvAlkGtObnXYMBCm85Eo/YLNi8RqHjXJPZeqoqWADYShaB+wO3ZH6xRLgY6hYqlaTL29utX014eyMmVAaVXGYdhw=
+	t=1706279036; cv=none; b=r0oD/BuKroe0OTf0ptm4S1A2K42cQZWxPhY4yttvy1nqLiG7Not8eMDNOHISOLckwbIWdLMOygQFlcNPmu1FXjjaCKJ9MubpGFnYwj+DQmeSyoDer8ZRvDg4lN4+w189djtrRSKCPt1VM4F5q1d/A33CeoiGY/+H1GT9MhCJEZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706279033; c=relaxed/simple;
-	bh=4UQoi4njaeFjOf/QXwERiOoLZlO+Oj+PvN4qoHRq6sc=;
+	s=arc-20240116; t=1706279036; c=relaxed/simple;
+	bh=AqzowsNVzjsrMExYxA4bt+5klnLgZ5ZI5/RvSwZrV3A=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-type; b=duIqjmt+9EfIYbpp1Sj3bO6bIlQ5gcFCOnHLVSih/h3wLbVBgVfBcxgVAff8h1BgKEcbTvk//WqeNtjHCHW0Cm2YXwbk0aiNVrdF91Ndnc1gWMsRDi9yjzyyxG+7MYbAeR9W0iawWvsOvTIkyncbPZ5ANjRxH+UorX0lPI60IVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RnohD1NB; arc=none smtp.client-ip=91.218.175.178
+	 MIME-Version:Content-type; b=tWHC2i+jZ68B2s3eH7bb5Oy/7167XUCI1P+AlraH/XFJHsMTaFGN1vmRZfidpXj0BqpLijzdEmdcziWKyqoTGIYhEK4BsNozdcc1ER4idxZRDskjiwCScaTV+E8ge8O48NjplFcIq6WHXJEnXHhnyH7iTFgOIb+ggihtIkrbzW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Md2fslmI; arc=none smtp.client-ip=95.215.58.187
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706279029;
+	t=1706279032;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=XALcCOhBRhRS90DS1bmFvcQjoN6qf84gpDsgMJgZLT4=;
-	b=RnohD1NBHgs96YT9EXzNQrPNnN1yI478tFsv4qqj2PdiqKUyqI0vOHISV/++hn0XuGmTre
-	CDlG6LJj20Gi/8o8IRHlBOEO/QKp6mIQfplcU1KsiJHf27laWQpF5Ugj0zM/JgYd8lOzI3
-	4rwoXW0yLyNB8a7VIThi3rGHr2nWmYU=
+	bh=AZUp330OSR2JQRH74uAFZ7ZfiTWvrNknQMPMiXtJgyA=;
+	b=Md2fslmISirutiSNzN2GS5dsDCWQGGnjqqJKnujJVrWZRC3PPm+v+MmObOZSwutsGCvPHU
+	ZA52HIBHjW34JM2/xs4gnJ82whPKo6mh4gG7wG+tT584BDePjkKUL7v4UE4J5OwIw9yREb
+	c8g6HTOYEHV7Mlfe3vgwFyuuFNP8wiI=
 From: Andrew Jones <andrew.jones@linux.dev>
 To: kvm@vger.kernel.org,
 	kvm-riscv@lists.infradead.org,
@@ -53,9 +53,9 @@ Cc: ajones@ventanamicro.com,
 	thuth@redhat.com,
 	alexandru.elisei@arm.com,
 	eric.auger@redhat.com
-Subject: [kvm-unit-tests PATCH v2 06/24] riscv: Add initial SBI support
-Date: Fri, 26 Jan 2024 15:23:31 +0100
-Message-ID: <20240126142324.66674-32-andrew.jones@linux.dev>
+Subject: [kvm-unit-tests PATCH v2 07/24] riscv: Add run script and unittests.cfg
+Date: Fri, 26 Jan 2024 15:23:32 +0100
+Message-ID: <20240126142324.66674-33-andrew.jones@linux.dev>
 In-Reply-To: <20240126142324.66674-26-andrew.jones@linux.dev>
 References: <20240126142324.66674-26-andrew.jones@linux.dev>
 Precedence: bulk
@@ -68,199 +68,128 @@ Content-type: text/plain
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Add an SBI call function and immediately apply it to properly
-exiting the test (instead of hanging) by invoking SBI shutdown
-from exit(). Also seed an SBI test file with a simple SBI test
-that checks mvendorid is correctly extracted.
+With a run script and a unittests.cfg file we can now run
 
-Run with e.g.
-  qemu-system-riscv64 -nographic -M virt \
+ $ KVM_UNIT_TESTS_ENV=test-env ./run_tests.sh
+
+where test-env has the environment variables needed for both tests.
+
+Note, to change the SBI implementation under test, for example to
+RustSBI, QEMU needs the -bios parameter. The full command line
+would be
+
+  qemu-system-riscv64 -nographic -M virt -cpu rv64 \
       -kernel riscv/sbi.flat \
-      -cpu rv64,mvendorid=45 \
-      -initrd sbi-env
+      -bios $PATH_TO_RUSTSBI
 
-and be happy that ctrl-a c q is no longer necessary to return to
-the shell prompt. sbi-env has MVENDORID=45 in it.
+and with the run script, it's
+
+  SBI_IMPL="-bios $PATH_TO_RUSTSBI" ./run_tests.sh -g sbi
+
+(note the '-g sbi' to only run the SBI test group)
+
+Finally, with the addition of the run script, 'make standalone' now
+also works.
 
 Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 Acked-by: Thomas Huth <thuth@redhat.com>
 ---
- lib/riscv/asm/sbi.h | 32 ++++++++++++++++++++++++++++++++
- lib/riscv/io.c      |  2 ++
- lib/riscv/sbi.c     | 35 +++++++++++++++++++++++++++++++++++
- riscv/Makefile      |  2 ++
- riscv/sbi.c         | 41 +++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 112 insertions(+)
- create mode 100644 lib/riscv/asm/sbi.h
- create mode 100644 lib/riscv/sbi.c
- create mode 100644 riscv/sbi.c
+ riscv/run           | 41 +++++++++++++++++++++++++++++++++++++++++
+ riscv/unittests.cfg | 37 +++++++++++++++++++++++++++++++++++++
+ 2 files changed, 78 insertions(+)
+ create mode 100755 riscv/run
+ create mode 100644 riscv/unittests.cfg
 
-diff --git a/lib/riscv/asm/sbi.h b/lib/riscv/asm/sbi.h
-new file mode 100644
-index 000000000000..aeff07f6f1a8
+diff --git a/riscv/run b/riscv/run
+new file mode 100755
+index 000000000000..cbe5dd792dcd
 --- /dev/null
-+++ b/lib/riscv/asm/sbi.h
-@@ -0,0 +1,32 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+#ifndef _ASMRISCV_SBI_H_
-+#define _ASMRISCV_SBI_H_
-+
-+enum sbi_ext_id {
-+	SBI_EXT_BASE = 0x10,
-+	SBI_EXT_SRST = 0x53525354,
-+};
-+
-+enum sbi_ext_base_fid {
-+	SBI_EXT_BASE_GET_SPEC_VERSION = 0,
-+	SBI_EXT_BASE_GET_IMP_ID,
-+	SBI_EXT_BASE_GET_IMP_VERSION,
-+	SBI_EXT_BASE_PROBE_EXT,
-+	SBI_EXT_BASE_GET_MVENDORID,
-+	SBI_EXT_BASE_GET_MARCHID,
-+	SBI_EXT_BASE_GET_MIMPID,
-+};
-+
-+struct sbiret {
-+	long error;
-+	long value;
-+};
-+
-+struct sbiret sbi_ecall(int ext, int fid, unsigned long arg0,
-+			unsigned long arg1, unsigned long arg2,
-+			unsigned long arg3, unsigned long arg4,
-+			unsigned long arg5);
-+
-+void sbi_shutdown(void);
-+
-+#endif /* _ASMRISCV_SBI_H_ */
-diff --git a/lib/riscv/io.c b/lib/riscv/io.c
-index aeda74be61ee..b3f587bb68ca 100644
---- a/lib/riscv/io.c
-+++ b/lib/riscv/io.c
-@@ -9,6 +9,7 @@
- #include <config.h>
- #include <devicetree.h>
- #include <asm/io.h>
-+#include <asm/sbi.h>
- #include <asm/setup.h>
- #include <asm/spinlock.h>
- 
-@@ -90,6 +91,7 @@ void halt(int code);
- void exit(int code)
- {
- 	printf("\nEXIT: STATUS=%d\n", ((code) << 1) | 1);
-+	sbi_shutdown();
- 	halt(code);
- 	__builtin_unreachable();
- }
-diff --git a/lib/riscv/sbi.c b/lib/riscv/sbi.c
-new file mode 100644
-index 000000000000..fd758555b888
---- /dev/null
-+++ b/lib/riscv/sbi.c
-@@ -0,0 +1,35 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+#include <libcflat.h>
-+#include <asm/sbi.h>
-+
-+struct sbiret sbi_ecall(int ext, int fid, unsigned long arg0,
-+			unsigned long arg1, unsigned long arg2,
-+			unsigned long arg3, unsigned long arg4,
-+			unsigned long arg5)
-+{
-+	register uintptr_t a0 asm ("a0") = (uintptr_t)(arg0);
-+	register uintptr_t a1 asm ("a1") = (uintptr_t)(arg1);
-+	register uintptr_t a2 asm ("a2") = (uintptr_t)(arg2);
-+	register uintptr_t a3 asm ("a3") = (uintptr_t)(arg3);
-+	register uintptr_t a4 asm ("a4") = (uintptr_t)(arg4);
-+	register uintptr_t a5 asm ("a5") = (uintptr_t)(arg5);
-+	register uintptr_t a6 asm ("a6") = (uintptr_t)(fid);
-+	register uintptr_t a7 asm ("a7") = (uintptr_t)(ext);
-+	struct sbiret ret;
-+
-+	asm volatile (
-+		"ecall"
-+		: "+r" (a0), "+r" (a1)
-+		: "r" (a2), "r" (a3), "r" (a4), "r" (a5), "r" (a6), "r" (a7)
-+		: "memory");
-+	ret.error = a0;
-+	ret.value = a1;
-+
-+	return ret;
-+}
-+
-+void sbi_shutdown(void)
-+{
-+	sbi_ecall(SBI_EXT_SRST, 0, 0, 0, 0, 0, 0, 0);
-+	puts("SBI shutdown failed!\n");
-+}
-diff --git a/riscv/Makefile b/riscv/Makefile
-index ddf2a0e016a8..4e7fcc538ba1 100644
---- a/riscv/Makefile
-+++ b/riscv/Makefile
-@@ -11,6 +11,7 @@ exe = flat
- endif
- 
- tests =
-+tests += $(TEST_DIR)/sbi.$(exe)
- tests += $(TEST_DIR)/selftest.$(exe)
- #tests += $(TEST_DIR)/sieve.$(exe)
- 
-@@ -25,6 +26,7 @@ cflatobjs += lib/alloc_phys.o
- cflatobjs += lib/devicetree.o
- cflatobjs += lib/riscv/bitops.o
- cflatobjs += lib/riscv/io.o
-+cflatobjs += lib/riscv/sbi.o
- cflatobjs += lib/riscv/setup.o
- cflatobjs += lib/riscv/smp.o
- 
-diff --git a/riscv/sbi.c b/riscv/sbi.c
-new file mode 100644
-index 000000000000..ffb07a256ff6
---- /dev/null
-+++ b/riscv/sbi.c
++++ b/riscv/run
 @@ -0,0 +1,41 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * SBI verification
-+ *
-+ * Copyright (C) 2023, Ventana Micro Systems Inc., Andrew Jones <ajones@ventanamicro.com>
-+ */
-+#include <libcflat.h>
-+#include <stdlib.h>
-+#include <asm/sbi.h>
++#!/usr/bin/env bash
 +
-+static void help(void)
-+{
-+	puts("Test SBI\n");
-+	puts("An environ must be provided where expected values are given.\n");
-+}
++if [ -z "$KUT_STANDALONE" ]; then
++	if [ ! -f config.mak ]; then
++		echo "run ./configure && make first. See ./configure -h"
++		exit 2
++	fi
++	source config.mak
++	source scripts/arch-run.bash
++fi
 +
-+int main(int argc, char **argv)
-+{
-+	struct sbiret ret;
-+	long expected;
++# Allow user overrides of some config.mak variables
++processor=$PROCESSOR_OVERRIDE
++firmware=$FIRMWARE_OVERRIDE
 +
-+	if (argc > 1 && !strcmp(argv[1], "-h")) {
-+		help();
-+		exit(0);
-+	}
++[ "$PROCESSOR" = "$ARCH" ] && PROCESSOR="max"
++: "${processor:=$PROCESSOR}"
++: "${firmware:=$FIRMWARE}"
++[ "$firmware" ] && firmware="-bios $firmware"
 +
-+	report_prefix_push("sbi");
++set_qemu_accelerator || exit $?
++[ "$ACCEL" = "kvm" ] && QEMU_ARCH=$HOST
++acc="-accel $ACCEL$ACCEL_PROPS"
 +
-+	if (!getenv("MVENDORID")) {
-+		report_skip("mvendorid: missing MVENDORID environment variable");
-+		goto done;
-+	}
-+	expected = strtol(getenv("MVENDORID"), NULL, 0);
++qemu=$(search_qemu_binary) || exit $?
++if ! $qemu -machine '?' | grep -q 'RISC-V VirtIO board'; then
++	echo "$qemu doesn't support mach-virt ('-machine virt'). Exiting."
++	exit 2
++fi
++mach='-machine virt'
 +
-+	ret = sbi_ecall(SBI_EXT_BASE, SBI_EXT_BASE_GET_MVENDORID, 0, 0, 0, 0, 0, 0);
-+	report(!ret.error, "mvendorid: no error");
-+	report(ret.value == expected, "mvendorid");
++command="$qemu -nodefaults -nographic -serial mon:stdio"
++command+=" $mach $acc $firmware -cpu $processor "
++command="$(migration_cmd) $(timeout_cmd) $command"
 +
-+done:
-+	return report_summary();
-+}
++if [ "$EFI_RUN" = "y" ]; then
++	ENVIRON_DEFAULT=n run_qemu_status $command "$@"
++else
++	# We return the exit code via stdout, not via the QEMU return code
++	run_qemu_status $command -kernel "$@"
++fi
+diff --git a/riscv/unittests.cfg b/riscv/unittests.cfg
+new file mode 100644
+index 000000000000..5a23bed9cdd6
+--- /dev/null
++++ b/riscv/unittests.cfg
+@@ -0,0 +1,37 @@
++##############################################################################
++# unittest configuration
++#
++# [unittest_name]
++# file = <name>.flat		# Name of the flat file to be used.
++# smp  = <num>			# Number of processors the VM will use
++#				# during this test. Use $MAX_SMP to use
++#				# the maximum the host supports. Defaults
++#				# to one.
++# extra_params = -append <params...>	# Additional parameters used.
++# arch = riscv32|riscv64		# Select one if the test case is
++#					# specific to only one.
++# groups = <group_name1> <group_name2> ...	# Used to identify test cases
++#						# with run_tests -g ...
++#						# Specify group_name=nodefault
++#						# to have test not run by
++#						# default
++# accel = kvm|tcg		# Optionally specify if test must run with
++#				# kvm or tcg. If not specified, then kvm will
++#				# be used when available.
++# timeout = <duration>		# Optionally specify a timeout.
++# check = <path>=<value> # check a file for a particular value before running
++#                        # a test. The check line can contain multiple files
++#                        # to check separated by a space but each check
++#                        # parameter needs to be of the form <path>=<value>
++##############################################################################
++
++[selftest]
++file = selftest.flat
++smp = 16
++extra_params = -append 'foo bar baz'
++groups = selftest
++
++# Set $FIRMWARE_OVERRIDE to /path/to/firmware to select the SBI implementation.
++[sbi]
++file = sbi.flat
++groups = sbi
 -- 
 2.43.0
 
