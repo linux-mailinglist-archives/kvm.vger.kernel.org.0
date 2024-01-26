@@ -1,136 +1,141 @@
-Return-Path: <kvm+bounces-7195-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7196-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B032983E1DB
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 19:45:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14BD983E1DF
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 19:45:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 664721F287A4
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 18:45:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D3E21C241A2
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 18:45:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50FF321A06;
-	Fri, 26 Jan 2024 18:43:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F808224E0;
+	Fri, 26 Jan 2024 18:44:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ERBLH5Pi"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="dZ7IOSuV"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7874210F3
-	for <kvm@vger.kernel.org>; Fri, 26 Jan 2024 18:43:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 791FF1DDFC;
+	Fri, 26 Jan 2024 18:44:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706294631; cv=none; b=ZPnu95yMsx+SeTo7cb7lUKqxoQP5G7DTi//kqT396GgB1J/gwKB+v54Iyn1VVsZlGIIiZeHRwknMO1pmYBFyTFwzyAZc6KRfBlDOpJJqEcUrlGG0CA6jPLLC/AyyPy3xgUCt3hel93GCKqbxf6exhH2LOZoIBQBt9xDITVh1HbY=
+	t=1706294673; cv=none; b=qZfR5f9PVsjsihMp6Ov/gZgFJDT1e1qXjWAB6h+P3xjHuH0ut8EPm7GdU0R70u3oz9jGTg1q+pnEH3sheA2UFoENbR2GVMRo6Yn9AGCjxAb2bgWD0X4WRsgUr4SbKLPjCjFPDCEHVXmQsKzD+JOspCghSepaZSOng8k/fQP83nQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706294631; c=relaxed/simple;
-	bh=GTDjsu6rhEo2jOBPARRAChZuzZfYp4I5irbMSymKoVk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ClcYs+YcRRdEJ3utCvh7FdRt1JcX71GyDWhflcLx13U9VL8NIUAUcRXoabXQN3xfvb/BNj009Vv0DehiHwJXBk1YbOcwGiD6njluqlnScbn6mPqLW8KI6xDSHiBanMPWuVkCHbTDK5u0FpUVApjgU8mVIF8nUzwerzrIPOLaxOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ERBLH5Pi; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706294628;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gjr2qXp3L4j2942eOUz5zFFxnCl3RL5KDAtLwwiTpOk=;
-	b=ERBLH5PidWzOKeZLne6FfGYhK1MxOkr+Gs5JHflrlnAd5ETYjYI0hjL1LOoSkKTuZbZeD0
-	ZkumvE0Z/lPPmG5Kh/msXTslX/OOiqKgOIfjx4HejWv5QUUKlWpQjr1N+4W2wSYW2iH8FZ
-	dI3UNUfhFq0Yg1aqTSC9HiIqkp7aDDg=
-Received: from mail-vs1-f72.google.com (mail-vs1-f72.google.com
- [209.85.217.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-594-HDDMhHfKPquJRhgGSd7TCw-1; Fri, 26 Jan 2024 13:43:46 -0500
-X-MC-Unique: HDDMhHfKPquJRhgGSd7TCw-1
-Received: by mail-vs1-f72.google.com with SMTP id ada2fe7eead31-467b0b7f260so194632137.3
-        for <kvm@vger.kernel.org>; Fri, 26 Jan 2024 10:43:46 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706294626; x=1706899426;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gjr2qXp3L4j2942eOUz5zFFxnCl3RL5KDAtLwwiTpOk=;
-        b=cM7KGyR/fVlo2Rlz60izH8ZEdfmT1ZLzyc5md5+dGIynb/060F/y6diuvromBZ4JvZ
-         /xpE9G6gipLtx01thRPWl1VoAKC7DrFAvMyByYlfG7u5fw0QzspxMhYmXavUxUyH0m5C
-         JLDOKOocAbFi2Lc85b7xvaJfA/8IbUqn9CmyF3G1iQKcJM30oSPEOpMxIEctAqlU8KJA
-         vIZCdd2Y2cO5QVKAi6bp+gZCkPGP9U3GY1v5sfm7xRuSujXDnMKplsMs2hrMr/Y/N4IX
-         MIkFurfw9cFLqvaueIoyYeXghOkH0UxX8M+m/3KfF7d4b0GxwbrAMdbrLQFVViXbGmVY
-         hPAQ==
-X-Gm-Message-State: AOJu0Yyh1zipLHBz3nmmxOr2a9IRig067udSVZwCRzZEeUSYTNV/FSGT
-	EZsuxs6ESSDPqarnq8FEuKz8QOWtkOrgrorm7lzWbm8hDmf4EPJz33ub3+TS0bwGBWLCIqDzKQR
-	/u7ChTELS4ZNtsNLrH31FC6p4Ls6nmprS3fXNuDklMhqmIOs0seY76+Ajj8XgBUDYOp27j6JXDG
-	ZVbCs/eOAHSqeTE2uAn1SbN1i+
-X-Received: by 2002:a05:6102:2929:b0:46b:2484:706 with SMTP id cz41-20020a056102292900b0046b24840706mr291426vsb.1.1706294626197;
-        Fri, 26 Jan 2024 10:43:46 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFeiYnaGwaRTPw/BuT1W1AJZWARSelaRPkVdIBhgQa1W/zS8FnDAO3yU8hld1a5HB0rBdrk+7Re9sseBLVfHU8=
-X-Received: by 2002:a05:6102:2929:b0:46b:2484:706 with SMTP id
- cz41-20020a056102292900b0046b24840706mr291419vsb.1.1706294625961; Fri, 26 Jan
- 2024 10:43:45 -0800 (PST)
+	s=arc-20240116; t=1706294673; c=relaxed/simple;
+	bh=nf/POY29CG3Y+BqXT0M1LE29Qv40vbKTyyGYz43XKHs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fTqiWFPgDEIQIOFIcwn/h4s9ns9HfyZXOmfUQ//Z9OUptYZraRfBMfjgFp7POOEoV7hdar63JIPvztMLUMOBJSA5kIH79V0YcORWjontguAUtI09oMO2FnPu8Rs+0tA0Y1uz12XAGpFotfTUuCnohqGlmghBtpT+hSSYafEL4x4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=dZ7IOSuV; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 5BA7F40E01A9;
+	Fri, 26 Jan 2024 18:44:27 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id pobZP-BeJfAp; Fri, 26 Jan 2024 18:44:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1706294665; bh=duwCYa0fwFKf6HI10qA1Z2xg/PK3N1HXBTl9zUoAe5Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dZ7IOSuVpOKnAq6iSSA/5BPQOosteryR4BL/dDYOzqOz7mbKP7XKS6DYNmYUuR7zQ
+	 ucDQCB+3oYkx5yez0vnxL08sdZIHI9XeqjTUjLhjeHjRH7KTfwFIhsp5Upqd2fz4iG
+	 IN6ieFmKw228wvOseFZAsBm4kuZ71QDY8XcRQrU3wwPB4gA/y0d1umlumNSy6PlR/6
+	 lFGPR1q0bFT80L8ZguOxanmGs9TLwgCOjQ+szOZi1iLGLfwkzYu13S2M9ozFFTiItu
+	 7aI1enA/as9CDGUCSqQLNtBO4im+L9sC7Wa2DDCtzOndx7PlKaP7XsYLJMYIwich8A
+	 HX2OWGwk+ZT1kNCsTNBihyxgyFzxn/h2k06fdbe5unNqSE+LfH7Oss/wbqBFz6pnQW
+	 I0VK/FW7wQAMQ89hI2Bm3AHl45qD6NlDpKSr4dfgRIOQZgENQYbIUtrQlTyZK/ccNF
+	 lFtJ68KKeAM5oX+Lokm9bWJvRMAaoTS7IHcX0AB7Dtg2x14FNrH9oNNX6vvQJo4BIb
+	 YS+H0YBgJqjXVhNmVsCkdnJQ6EDEx9ledNnVioJksK+fIyC+nlYnDb2XKLoC775Pcn
+	 KKFax279Nwwcmuvkq/sobr8XRY8Fuv8Su6Lo4xnRYi/aYYKe/ZlP29oc3397HujdT9
+	 w/8zEkJUX+JWvm6vs5bQrgZs=
+Received: from zn.tnic (pd953033e.dip0.t-ipconnect.de [217.83.3.62])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 853E840E00C5;
+	Fri, 26 Jan 2024 18:43:48 +0000 (UTC)
+Date: Fri, 26 Jan 2024 19:43:40 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Michael Roth <michael.roth@amd.com>
+Cc: x86@kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+	linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+	rientjes@google.com, tobin@ibm.com, vbabka@suse.cz,
+	kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+	pankaj.gupta@amd.com, liam.merwick@oracle.com
+Subject: Re: [PATCH v2 11/25] x86/sev: Adjust directmap to avoid inadvertant
+ RMP faults
+Message-ID: <20240126184340.GEZbP9XA13X91-eybA@fat_crate.local>
+References: <20240126041126.1927228-1-michael.roth@amd.com>
+ <20240126041126.1927228-12-michael.roth@amd.com>
+ <20240126153451.GDZbPRG3KxaQik-0aY@fat_crate.local>
+ <20240126170415.f7r4nvsrzgpzcrzv@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240124130317.495519-1-kirill.shutemov@linux.intel.com>
-In-Reply-To: <20240124130317.495519-1-kirill.shutemov@linux.intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 26 Jan 2024 19:43:34 +0100
-Message-ID: <CABgObfbQ72PQ5u06cOeowjzWqiQmWNn83xOWGE12R363dWOK_g@mail.gmail.com>
-Subject: Re: [PATCH, RESEND] x86/sev: Fix SEV check in sev_map_percpu_data()
-To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Cc: Wanpeng Li <wanpengli@tencent.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
-	Sean Christopherson <seanjc@google.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	Tom Lendacky <thomas.lendacky@amd.com>, x86@kernel.org, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, David Rientjes <rientjes@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240126170415.f7r4nvsrzgpzcrzv@amd.com>
 
-On Wed, Jan 24, 2024 at 2:09=E2=80=AFPM Kirill A. Shutemov
-<kirill.shutemov@linux.intel.com> wrote:
->
-> The function sev_map_percpu_data() checks if it is running on an SEV
-> platform by checking the CC_ATTR_GUEST_MEM_ENCRYPT attribute. However,
-> this attribute is also defined for TDX.
->
-> To avoid false positives, add a cc_vendor check.
->
-> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-> Fixes: 4d96f9109109 ("x86/sev: Replace occurrences of sev_active() with c=
-c_platform_has()")
-> Suggested-by: Borislav Petkov (AMD) <bp@alien8.de>
-> Acked-by: David Rientjes <rientjes@google.com>
+On Fri, Jan 26, 2024 at 11:04:15AM -0600, Michael Roth wrote:
+> vaddr comes from pfn_to_kaddr(pfn), i.e. __va(paddr), so it will
+> necessarily be a direct-mapped address above __PAGE_OFFSET.
 
-Queued, with "x86/kvm in the subject".
+Ah, true.
 
-Paolo
+> For upper-end, a pfn_valid(pfn) check might suffice, since only a valid
+> PFN would have a possibly-valid mapping wthin the directmap range.
 
-> ---
+Looking at it, yap, that could be a sensible thing to check.
 
->  arch/x86/kernel/kvm.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-> index dfe9945b9bec..428ee74002e1 100644
-> --- a/arch/x86/kernel/kvm.c
-> +++ b/arch/x86/kernel/kvm.c
-> @@ -434,7 +434,8 @@ static void __init sev_map_percpu_data(void)
->  {
->         int cpu;
->
-> -       if (!cc_platform_has(CC_ATTR_GUEST_MEM_ENCRYPT))
-> +       if (cc_vendor !=3D CC_VENDOR_AMD ||
-> +           !cc_platform_has(CC_ATTR_GUEST_MEM_ENCRYPT))
->                 return;
->
->         for_each_possible_cpu(cpu) {
-> --
-> 2.43.0
->
+> These are PFNs that are owned/allocated-to the caller. Due to the nature
+> of the directmap it's possible non-owners would write to a mapping that
+> overlaps, but vmalloc()/etc. would not create mappings for any pages that
+> were not specifically part of an allocation that belongs to the caller,
+> so I don't see where there's any chance for an overlap there. And the caller
+> of these functions would not be adjusting directmap for PFNs that might be
+> mapped into other kernel address ranges like kernel-text/etc unless the
+> caller was specifically making SNP-aware adjustments to those ranges, in
+> which case it would be responsible for making those other adjustments,
+> or implementing the necessary helpers/etc.
 
+Why does any of that matter?
+
+If you can make this helper as generic as possible now, why don't you?
+
+> I'm not aware of such cases in the current code, and I don't think it makes
+> sense to attempt to try to handle them here generically until such a case
+> arises, since it will likely involve more specific requirements than what
+> we can anticipate from a theoretical/generic standpoint.
+
+Then that's a different story. If it will likely involve more specific
+handling, then that function should deal with pfns for which it can DTRT
+and for others warn loudly so that the code gets fixed in time.
+
+IOW, then it should check for the upper pfn of the direct map here and
+we have two, depending on the page sizes used...
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
