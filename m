@@ -1,60 +1,60 @@
-Return-Path: <kvm+bounces-7099-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7100-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7BC483D669
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 10:34:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E0FC83D66C
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 10:34:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6516528DCA1
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 09:34:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E84E51F2B4F4
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 09:34:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7271013D514;
-	Fri, 26 Jan 2024 08:56:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A25913DB9D;
+	Fri, 26 Jan 2024 08:56:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XXvL5DVv"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jWAYMfU8"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B9A713D4FA;
-	Fri, 26 Jan 2024 08:56:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2735D2561B;
+	Fri, 26 Jan 2024 08:56:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706259398; cv=none; b=fPvkLTKSXxqQDoOAqfFc3w7BfoN7bFZqBP+9L5CRzt32/IIgx83nIf10jtGnwn/tTIQ12Z90s8zYsfOKmSQ3wwVjSDzdm8k+okuDXn03upWyf8Lc7Fk6l0GEEm4NqRpIeEm8zmFI8QuzM87NgHm+FAL4NrxQA1xQObCk83GGMQU=
+	t=1706259403; cv=none; b=EGJ8btAxPp9mcbTcDk8YHJfZYxAP7YQXhBbVNln4Z80TynxRXMTrcmn0DaeyzqH5R5vKTaXXH83cZvDZ4I6PjmjSOsWoNCJc+GrlKtHJ8ISMFDUnYvplegsXhrNb6f1A3uFcKynSEY/kYWOxQHMnsXsiR4C7g3kMrRYpZMmy3Es=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706259398; c=relaxed/simple;
-	bh=4CDJXW+Iqla+g6XKfF9G2UkkPi35sYQa5Y0bL/jzoKY=;
+	s=arc-20240116; t=1706259403; c=relaxed/simple;
+	bh=3CbxTSm9jdE8JbYcfkb6TVTOH+n5IRNFO96I1VKzzlQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=FMbe0q0QqRG/j2f9dTWxgfsn9y7OVGxPZ7IGTdpVaOWD5FR1bGeXutcsNIPJnVJ2yBr7+hyk6Emd8nQHIJ1PQT7s8RX9TkwpbcC8TNvk2OVVWZsFO8dM8TiETvvvvpzNeCA+yXG/jCoOP59LoxruR2j3JaHxKAdrxkQMnomgAZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XXvL5DVv; arc=none smtp.client-ip=198.175.65.12
+	 MIME-Version; b=NFmfqzYgROQ4yleVIAtX7s/BZyIbiNaYeq4WsoM8M+IwWIszc/Lrf5+9Ck02LGB8SmTnTXL7WwAjdo/sSRA44dp7ZFtMP0bT1OUAeHHYm+eVPAckKhGgZX+WUvhFOdxt8hx8l8nslOy0VSLcXC6CyEgt7GF2JGaqJRoCMDPzYIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jWAYMfU8; arc=none smtp.client-ip=198.175.65.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706259397; x=1737795397;
+  t=1706259402; x=1737795402;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=4CDJXW+Iqla+g6XKfF9G2UkkPi35sYQa5Y0bL/jzoKY=;
-  b=XXvL5DVvyJ9NtQLOaVElfGQOow/3u3Ai07UeQ3k0aYjTpFJsaXSZuQaZ
-   Co5++pvO1A1d7qIiU2NcFzmo5JUdTasWzZuEgxlYskdBtzXahSXfeMvQv
-   RX1T0j/hoWKnP6N73cgVN1U98HWwr7Da4CVRa2n5bjUDvhJh/rac7XnLR
-   VJVE4yAVcEBAWmBUJo5cUJLwwandQqnCwLuEMEkLsa/72E/t6DXHtb/oU
-   +BbXO3vXb2GzmaM77C6bJZMXC/qAnn85+2/FGznpU2xwK9DFpoEJ9KcvW
-   0oy5vwon0hfeuJEfemKEI5MrIGS4UnzXZotPpJC96dRITXiJOlwFArYsz
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="9792232"
+  bh=3CbxTSm9jdE8JbYcfkb6TVTOH+n5IRNFO96I1VKzzlQ=;
+  b=jWAYMfU8RPu0IaFuvRQOtQyOgaxv2LekqFqDUVsqeEzLEJQj4zOo89IB
+   +35CDdwN1bztxJw93kc4PT6/oFeKLipMGZym56ZnZaZ3oocIIHlyjtRJM
+   oyrUx+du7+Y0lnoexajugsXEaUQL3xqyM88Wu/ozUp85nUhwnPMk0ll5l
+   B+Xho/sx0S1z5S9bbTrk8zvls8+hvHM9NqFHKAnYN2XLGMC/ozMHH/n2g
+   TBF61mgY/nIruCSEEiZYdH3gKUC8Sp6N3GpBPVkbmGGAzOA16REyBEc1N
+   Ij7AGYGudLyE7iD8+7+7qih5K7r4tePEah1e7TfYrxoFp5QllqsD93SwM
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="9792254"
 X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="9792232"
+   d="scan'208";a="9792254"
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2024 00:56:37 -0800
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2024 00:56:42 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="930310020"
+X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="930310035"
 X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="930310020"
+   d="scan'208";a="930310035"
 Received: from yanli3-mobl.ccr.corp.intel.com (HELO xiongzha-desk1.ccr.corp.intel.com) ([10.254.213.178])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2024 00:56:31 -0800
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2024 00:56:36 -0800
 From: Xiong Zhang <xiong.y.zhang@linux.intel.com>
 To: seanjc@google.com,
 	pbonzini@redhat.com,
@@ -73,11 +73,10 @@ Cc: kvm@vger.kernel.org,
 	samantha.alt@intel.com,
 	like.xu.linux@gmail.com,
 	chao.gao@intel.com,
-	xiong.y.zhang@linux.intel.com,
-	Xiong Zhang <xiong.y.zhang@intel.com>
-Subject: [RFC PATCH 12/41] KVM: x86/pmu: Plumb through passthrough PMU to vcpu for Intel CPUs
-Date: Fri, 26 Jan 2024 16:54:15 +0800
-Message-Id: <20240126085444.324918-13-xiong.y.zhang@linux.intel.com>
+	xiong.y.zhang@linux.intel.com
+Subject: [RFC PATCH 13/41] KVM: x86/pmu: Add a helper to check if passthrough PMU is enabled
+Date: Fri, 26 Jan 2024 16:54:16 +0800
+Message-Id: <20240126085444.324918-14-xiong.y.zhang@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240126085444.324918-1-xiong.y.zhang@linux.intel.com>
 References: <20240126085444.324918-1-xiong.y.zhang@linux.intel.com>
@@ -91,72 +90,30 @@ Content-Transfer-Encoding: 8bit
 
 From: Mingwei Zhang <mizhang@google.com>
 
-Plumb through passthrough PMU setting from kvm->arch into kvm_pmu on each
-vcpu created. Note that enabling PMU is decided by VMM when it sets the
-CPUID bits exposed to guest VM. So plumb through the enabling for each pmu
-in intel_pmu_refresh().
+Add a helper to check if passthrough PMU is enabled for convenience as it
+is vendor neutral.
 
-Co-developed-by: Xiong Zhang <xiong.y.zhang@intel.com>
-Signed-off-by: Xiong Zhang <xiong.y.zhang@intel.com>
 Signed-off-by: Mingwei Zhang <mizhang@google.com>
 ---
- arch/x86/include/asm/kvm_host.h |  2 ++
- arch/x86/kvm/pmu.c              |  1 +
- arch/x86/kvm/vmx/pmu_intel.c    | 10 ++++++++--
- 3 files changed, 11 insertions(+), 2 deletions(-)
+ arch/x86/kvm/pmu.h | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index f2e73e6830a3..ede45c923089 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -575,6 +575,8 @@ struct kvm_pmu {
- 	 * redundant check before cleanup if guest don't use vPMU at all.
- 	 */
- 	u8 event_count;
-+
-+	bool passthrough;
- };
- 
- struct kvm_pmu_ops;
-diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index 9ae07db6f0f6..1853739a59bf 100644
---- a/arch/x86/kvm/pmu.c
-+++ b/arch/x86/kvm/pmu.c
-@@ -665,6 +665,7 @@ void kvm_pmu_init(struct kvm_vcpu *vcpu)
- 	static_call(kvm_x86_pmu_init)(vcpu);
- 	pmu->event_count = 0;
- 	pmu->need_cleanup = false;
-+	pmu->passthrough = false;
- 	kvm_pmu_refresh(vcpu);
+diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+index 51011603c799..28beae0f9209 100644
+--- a/arch/x86/kvm/pmu.h
++++ b/arch/x86/kvm/pmu.h
+@@ -267,6 +267,11 @@ static inline bool pmc_is_globally_enabled(struct kvm_pmc *pmc)
+ 	return test_bit(pmc->idx, (unsigned long *)&pmu->global_ctrl);
  }
  
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 820d3e1f6b4f..15cc107ed573 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -517,14 +517,20 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
- 		return;
- 
- 	entry = kvm_find_cpuid_entry(vcpu, 0xa);
--	if (!entry || !vcpu->kvm->arch.enable_pmu)
-+	if (!entry || !vcpu->kvm->arch.enable_pmu) {
-+		pmu->passthrough = false;
- 		return;
-+	}
- 	eax.full = entry->eax;
- 	edx.full = entry->edx;
- 
- 	pmu->version = eax.split.version_id;
--	if (!pmu->version)
-+	if (!pmu->version) {
-+		pmu->passthrough = false;
- 		return;
-+	}
++static inline bool is_passthrough_pmu_enabled(struct kvm_vcpu *vcpu)
++{
++	return vcpu_to_pmu(vcpu)->passthrough;
++}
 +
-+	pmu->passthrough = vcpu->kvm->arch.enable_passthrough_pmu;
- 
- 	pmu->nr_arch_gp_counters = min_t(int, eax.split.num_counters,
- 					 kvm_pmu_cap.num_counters_gp);
+ void kvm_pmu_deliver_pmi(struct kvm_vcpu *vcpu);
+ void kvm_pmu_handle_event(struct kvm_vcpu *vcpu);
+ int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned pmc, u64 *data);
 -- 
 2.34.1
 
