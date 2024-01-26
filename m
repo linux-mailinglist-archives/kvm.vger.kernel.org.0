@@ -1,489 +1,208 @@
-Return-Path: <kvm+bounces-7079-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7080-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52D3483D495
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 09:15:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3217D83D493
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 09:12:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DBDC028615B
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 08:15:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0148287DFC
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 08:11:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0340017745;
-	Fri, 26 Jan 2024 06:44:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D30D17C65;
+	Fri, 26 Jan 2024 06:52:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AvviNS2i"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YAMWr8TP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 252B2C2E3;
-	Fri, 26 Jan 2024 06:44:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706251448; cv=none; b=RTMKwCfJRQRQZAbzjAAN6E8dOlGLETCQOivgxTWp9AMv1H6Gx6mwQvk/eJ8zZ23upchs19q9sc5PknOkliNFKLMmUIxeifbTboErIg2JK28+MfgTzBmsGeTLaqLjPylWHAEpWPUFJ60M88Pkf1mnLAPjyY+YXHpycEywSFjxYms=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706251448; c=relaxed/simple;
-	bh=y5wLNN7Z3zsHAdRNaCAGJxPKA+oPlN1uoRNwzgksWtU=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=R1Y+qJdObEP3rs6Xy9RQbdS1EzFjh7qboPLZ1ahQ7WSMZWn4nwsIjuhDMETu8sRc0fG4dRIVdow5FuzrD5NAb58L798nqFuyUGsD0BeTVNVpl7Ce+TynlIr7RdifE6R5QFWQto1r3NrnD2JtCfks8IGb4raasvaFEn3sdrkWze8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AvviNS2i; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 985CC17585;
+	Fri, 26 Jan 2024 06:52:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706251933; cv=fail; b=sbUcbv78ize74NGZKC9YPxA0YQgcCKrwZc5YXoeMcaoyiuFTU+xD0ErTN6sOGxldqaNOZRL34uCgK8fJzpxAmfUzyTKMXKhaIJzhO5hBN5I069VglQGzJJbmph25+aBC6/uw937JW9E+ll7ByZXfcJOgNRym5BxC+V64gGE3vRM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706251933; c=relaxed/simple;
+	bh=7WzdeSVuAzPFIl4ACzjyiWkEQCd7IyJW+gCSgQtkbVE=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=YEUsZ7mXybfpygpfSWD/mpVTB5Wnd9W6Bf6PRLL7Zv8xfcXRZYN3o5n5d8+mqNLjCH603A28XEkayjD1LcctvzHyjcAZ4CWJiJXA7V601dQGld7iIB+GV0bs/AJKzKtbkd0CST/Ia137tuw9kvl4OPOZ+GJmif+SMBI1k1zHvxY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YAMWr8TP; arc=fail smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706251446; x=1737787446;
-  h=message-id:date:mime-version:cc:subject:to:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=y5wLNN7Z3zsHAdRNaCAGJxPKA+oPlN1uoRNwzgksWtU=;
-  b=AvviNS2iywgCC0prxd78zGNbgtK5e1FLq+sPaEjToFXWn8X5yVLnQ07e
-   5gDarWXsvJQa8PT/mvs2VTYQxr6VGhjofK1gjQPN0FE/iv4DX0gMy6Pxe
-   /jHvKpSl5nW8ijbGNU/DDLIghzkjlH8PgXyCDV6Kp/v4j99C1Rx+w3i5K
-   jVDtbb7r89VXKUGPym64Ta7RjJh4RVPaFEiXTmfAnr9s2SvbO4+RDMDPD
-   qa27cSwiWGuJ0xsBhCmRD6DBNTAifVC5lARA53neL2nYwcYZvrQUY5r/w
-   EPJ7Kec3HXo8Hf2pns4MnisxfFxSBPzU5DW2qx7U7gQh0Ls+Gdkam50cN
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="9155718"
+  t=1706251932; x=1737787932;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=7WzdeSVuAzPFIl4ACzjyiWkEQCd7IyJW+gCSgQtkbVE=;
+  b=YAMWr8TP/yqiTcduywTR923hrlaYd5eImDJh/gU+MPe84nGDZOU36j/h
+   SaSFzGlsTeAn52XRbcL7U6nJtwi0kl6tXcjifQvEeAqEuA5aLxh+6u3qc
+   FsUMFka6dnzdo2V8j2OidYFescmEgHY0OLREkjSE2NQpJMJGnNgd5ThFO
+   MrZRN/vo78apH7BH7qH7OApnxHSnl4/lIEN1iMBTzvHiPFykivSPi6E0I
+   1BF7E2RW8qKu4KAuUcc9odbM0QZ8rvA6HnHwSKS/ckXvGUZFSauF4/RB5
+   Pf8BsFSFZ/udYcXzgOu64KnBdn0AJL39I/ZPtnR/l8xmnJ6gxW4DjLX7r
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="2239825"
 X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="9155718"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2024 22:44:00 -0800
+   d="scan'208";a="2239825"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2024 22:52:11 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="877304497"
 X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="877304497"
-Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.249.174.176]) ([10.249.174.176])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2024 22:43:56 -0800
-Message-ID: <2f583fda-aebc-41c2-898c-d4f46eaa1ab4@linux.intel.com>
-Date: Fri, 26 Jan 2024 14:43:56 +0800
+   d="scan'208";a="28737788"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 25 Jan 2024 22:52:11 -0800
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 25 Jan 2024 22:52:10 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 25 Jan 2024 22:52:09 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 25 Jan 2024 22:52:09 -0800
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.169)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 25 Jan 2024 22:52:09 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=IomK7vw/Nvz3VXwae6BHU2LaWqMWoM0myB3S3YsdoXdh5ybyrkQYyO4rlWdtByR1OtvWIciWWwJHRpLn1fo2Kwf6Gvfg1Ur0bbeCeZFg1MyDQIcy5ebug5/83J2lZJDsGf1t8/f3U7Lkzvr9mgD5lwTADb8KY31s7xpJFlslD07BebYAeEnYlcqrP8+CL1vCGXOfXzCAYazNQbEkPaBCvrz9PqA2RNhxC03ShtouaTUWQT7IcUXZllfXB4Q8MgGJbRTerFw/6GsN5J31/7d8f/ZFzVT0JbuQ6ehHp16d1n8yxks/kKAkBVvW7D4DJQqvr3JfMBZSxHnwZMdRRgVg8Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6+9BDuY0xglbKXnFmiZyGIXGfEJvDRLL3uqBsKVPdcA=;
+ b=CJrs5v2WGlWVTnI7uUMXElNKHQbPAX7vpC5jjV6W1/9Zd+G7l3qNne4O86iYgDsb0Hamoj3lXAQfmjV0vCl54oUv4qU3aUBdsSQuDBMJXvy3x4Ibu5zmDE9M2oEe6a0eKdq3ACopl/XW6Ghl27x0yaFAm1G64tFL3MyyMSgpdIUwa3rKLktkG80ofBnwJBYTFQ2LEFGtjmOjjVvnsDwTIoTUiBGOODI3tQ3BD94IO7p38U04s2qZVULfporipmsXfq4kadTZsAdfBoVUIlzx0OIJTm7jeJ7eEXf1GQBMjfyAJgLEZAwt+b28PoPUWCNSe+bshIkGjyFLJ9D3WLk7LA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
+ by DS0PR11MB6446.namprd11.prod.outlook.com (2603:10b6:8:c5::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.22; Fri, 26 Jan
+ 2024 06:52:02 +0000
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::2903:9163:549:3b0d]) by CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::2903:9163:549:3b0d%6]) with mapi id 15.20.7228.027; Fri, 26 Jan 2024
+ 06:52:01 +0000
+Date: Fri, 26 Jan 2024 14:51:52 +0800
+From: Chao Gao <chao.gao@intel.com>
+To: Yang Weijiang <weijiang.yang@intel.com>
+CC: <seanjc@google.com>, <pbonzini@redhat.com>, <dave.hansen@intel.com>,
+	<kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <x86@kernel.org>,
+	<yuan.yao@linux.intel.com>, <peterz@infradead.org>,
+	<rick.p.edgecombe@intel.com>, <mlevitsk@redhat.com>, <john.allen@amd.com>
+Subject: Re: [PATCH v9 21/27] KVM: x86: Save and reload SSP to/from SMRAM
+Message-ID: <ZbNWiFt/azHuL1+f@chao-email>
+References: <20240124024200.102792-1-weijiang.yang@intel.com>
+ <20240124024200.102792-22-weijiang.yang@intel.com>
+ <ZbMkRKyhy3jdiuzx@chao-email>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <ZbMkRKyhy3jdiuzx@chao-email>
+X-ClientProxiedBy: SI2P153CA0032.APCP153.PROD.OUTLOOK.COM
+ (2603:1096:4:190::23) To CH3PR11MB8660.namprd11.prod.outlook.com
+ (2603:10b6:610:1ce::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: baolu.lu@linux.intel.com, Joerg Roedel <joro@8bytes.org>,
- Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
- Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>,
- Jean-Philippe Brucker <jean-philippe@linaro.org>,
- Nicolin Chen <nicolinc@nvidia.com>, Yi Liu <yi.l.liu@intel.com>,
- Jacob Pan <jacob.jun.pan@linux.intel.com>,
- Longfang Liu <liulongfang@huawei.com>, Yan Zhao <yan.y.zhao@intel.com>,
- iommu@lists.linux.dev, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: [PATCH v10 15/16] iommu: Make iopf_group_response() return void
-Content-Language: en-US
-To: Joel Granados <j.granados@samsung.com>
-References: <20240122054308.23901-1-baolu.lu@linux.intel.com>
- <20240122054308.23901-16-baolu.lu@linux.intel.com>
- <CGME20240125162723eucas1p2cc7562a22b8af9b46076e1c7b616531b@eucas1p2.samsung.com>
- <20240125162721.yd2xejowbri5fg5r@localhost>
-From: Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <20240125162721.yd2xejowbri5fg5r@localhost>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|DS0PR11MB6446:EE_
+X-MS-Office365-Filtering-Correlation-Id: 01508cbf-736c-4681-ca34-08dc1e3b4c8a
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: gXKYUuPO8HTEb1RUvzZxoK/vgG6E9mTVfRHA0oSDzum47KabOmNczFZzqljlw0bipinTX63KFAGMm1QS8L3KmcQRYckUh+NoYwNNtNDJyExYfO8vsuEnq6crZ/i153JwbsoRA2CXjU5EW1Yz5vDP+TUay+cGLv/qgxVvaJRWMxkqhrnkakU0MBoejwmNAesOzfw8o3GTIWrniLRhLrksH22BLvngyaBTfmI5XGULuSMiw6t3z0ku9Y5sf20lCadKxfvCHHcFr4tQCVqIKo2FBRyJI5WOrtvpJZ+nhmeE8gYYrvxQ4JI7hu8wfuAuzeb+xvyDd/Qs3B6DQraU/DwO9AArTze+tJ2ojQ8I1jEXHAYtjZpkX0ju8vAmFHxWGww+f9npo860G6FX3W+UHroyIi5duVHBekDPP2B6h0bM3QSWB2ePPBSZd0GTLFG09mS+fSzbARw30k8hDxUQmi3eFVu7pZrRkIY43Bm9RFjgy+nAxEDUC0Oy3JWeF5lVZynYZIO76o8mGvQOswynUJ/PjNHAuQa3NU8BfhacHd/xVmoASn8uU2CpMNAzSsTdJnrQ
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(39860400002)(366004)(376002)(136003)(346002)(396003)(230922051799003)(1800799012)(451199024)(64100799003)(186009)(6666004)(6486002)(478600001)(26005)(9686003)(6506007)(6512007)(83380400001)(316002)(6636002)(66556008)(66946007)(66476007)(5660300002)(8936002)(82960400001)(38100700002)(6862004)(8676002)(2906002)(86362001)(4326008)(41300700001)(33716001)(44832011);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?pKiRFZgZXkiuGmSwwT6vu7DBKPmELUv+mYBaERRRiO4z0Foyerl2b1EpG+WN?=
+ =?us-ascii?Q?hxTjRC2yp5AtRNWL7XrsGdlDY5/kNR17WyKHBEVlmAP1krrsiPXfpSHSIyuX?=
+ =?us-ascii?Q?NjQD5aUjgSwO7EMga1ilBLof9vSpA7Mbb6keh3mNQJKUI9TRwQz3rN8mqE0C?=
+ =?us-ascii?Q?INp+YkMktn39e+4X5/bRrOzz1WnR3eURnUvvxSqdllpe376ut6WnqmMZNrpQ?=
+ =?us-ascii?Q?ebo5KvZ5nAJ15bIE+HRA523nAjrqvEx4XSB3ehmnA12UkEq8eR8z2hIXDQ9U?=
+ =?us-ascii?Q?FeGixH4/FnfNsn01HBIDSkZ/L6Wvom5K790yWfSs9AZROJm43Y100DU+4V2S?=
+ =?us-ascii?Q?Mg/APU1sBnXpHyvAkrHF0Eybj3ylseOUj4/sIduuTYYwuhbk2G9chbTsTIZI?=
+ =?us-ascii?Q?IyDVANYHuiwgYc+W/XmF1VnjbvVkEU7wMcCDOB2DJPECUk9Dsmo4qbVhm0AH?=
+ =?us-ascii?Q?RlMn6ZboZT0KkcNTlzvo5P7vNAzMkjU7LW7Fr/8GZWw1COXf0OsD6eD+p2pW?=
+ =?us-ascii?Q?Py+BN5p8Ag06MF/lfn7r2j8B2Jr07rURXivKjB1pMGDinHFOLtsB+34WWaJ1?=
+ =?us-ascii?Q?k/aB9cEU0mj+P05ClHZCAV2kn8pxFmuFBjT2//L6LqdzuKRVKg2bw1THqAUf?=
+ =?us-ascii?Q?7PwkAMcrCQ9o34TL/o+NieQZXiJtX2rQO7GMTQ2f0gXGd6taiflb1Noy7rHa?=
+ =?us-ascii?Q?gL+W94R1U5HqLo+Q8GcbECaKzIjXeE+KQhnLmUIHIGk7d43a7LfFceoac8fA?=
+ =?us-ascii?Q?1lkw+Ooz6Qn4iG6zmGjilnuWqeoE7/ZSZkyca5wrtEySmVabZEBfRAGylNko?=
+ =?us-ascii?Q?GdjnpgKiwGlZRjpBDS+OwmzLvjVLeWt32k+gUm3mvAH9hyGfcEH0Mz2zYlWZ?=
+ =?us-ascii?Q?0Q1MFsJXTzfqnCIM7NHglqyGAwyCHWSfAn5wazMG4iYkOnzzx8nw6Was+WW0?=
+ =?us-ascii?Q?UU0QB3Jl7Ec/+aCt7t8VRDWdgoK4u7wHZLHAEPKqCrQJ1R5P5IWdykF2cH/J?=
+ =?us-ascii?Q?5lMjklsQGn3S9b57A+bHhv1OHG8TSaytulsQJc90DGHjSoDuLptTzRMqRjg+?=
+ =?us-ascii?Q?o4f7A+Uiqfu1qn0nao/JHnJbQl8MXGiU/o77uuKH5xyfStM1rgwASKg6DW4g?=
+ =?us-ascii?Q?/SGpUPoZG2LfLB3JU/qxaAFru/KQ7UO+Ek5IE/0D4Gp0VZllp9jyMUtOCXGQ?=
+ =?us-ascii?Q?YRUwIg5cUtVfsNWAupRgsbs3GOwOJQ+7EPQFy/B1DpawQcXkzQ/hw6+j/jcj?=
+ =?us-ascii?Q?EcIgX5Zys5hTo4kZhJhaKw3tOMmriEvG83tcY9M9MlcSjWTCS5AwiDHcqXJK?=
+ =?us-ascii?Q?6nzpuvQc0veyM6WRf8F3TCy9HTcNqaIwK9BFQX6jgMx61k021ai4Q9G3mcTx?=
+ =?us-ascii?Q?dI1jVhbt8+qYH1iOG1avzi0nJkEmRSAIS7F7Uv6S8JqTi++AhAKHJE+eYqTd?=
+ =?us-ascii?Q?CmiZFQXX+jvzxMz9t0A41XtN19llCeM6+0xsqo8RmGadPN4wsoLZ1PeczCPw?=
+ =?us-ascii?Q?f4aV3T7aHxEg0fr4UBBLL9ScGqYbGOatE0LML0urMKjAWuXexaHfw8XEgBZm?=
+ =?us-ascii?Q?GRTiNwz476O52i57C+0tARlFdM8fXdarzisnohP0?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 01508cbf-736c-4681-ca34-08dc1e3b4c8a
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jan 2024 06:52:01.7830
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: SZTsJfaYDVBxySm6amypFnTHzSEFM7qsqX9No2xl9ZUdX1uklnTC3sdHtoloUIM/Vy/J3ZSlCexx+dvtG61F2w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB6446
+X-OriginatorOrg: intel.com
 
-On 2024/1/26 0:27, Joel Granados wrote:
-> On Mon, Jan 22, 2024 at 01:43:07PM +0800, Lu Baolu wrote:
->> The iopf_group_response() should return void, as nothing can do anything
->> with the failure. This implies that ops->page_response() must also return
->> void; this is consistent with what the drivers do. The failure paths,
->> which are all integrity validations of the fault, should be WARN_ON'd,
->> not return codes.
+On Fri, Jan 26, 2024 at 11:17:24AM +0800, Chao Gao wrote:
+>On Tue, Jan 23, 2024 at 06:41:54PM -0800, Yang Weijiang wrote:
+>>Save CET SSP to SMRAM on SMI and reload it on RSM. KVM emulates HW arch
+>>behavior when guest enters/leaves SMM mode,i.e., save registers to SMRAM
+>>at the entry of SMM and reload them at the exit to SMM. Per SDM, SSP is
+>>one of such registers on 64-bit Arch, and add the support for SSP. Note,
+>>on 32-bit Arch, SSP is not defined in SMRAM, so fail 32-bit CET guest
+>>launch.
 >>
->> If the iommu core fails to enqueue the fault, it should respond the fault
->> directly by calling ops->page_response() instead of returning an error
->> number and relying on the iommu drivers to do so. Consolidate the error
->> fault handling code in the core.
+>>Suggested-by: Sean Christopherson <seanjc@google.com>
+>>Suggested-by: Chao Gao <chao.gao@intel.com>
+>>Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+>>Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+>>---
+>> arch/x86/kvm/cpuid.c | 11 +++++++++++
+>> arch/x86/kvm/smm.c   |  8 ++++++++
+>> arch/x86/kvm/smm.h   |  2 +-
+>> 3 files changed, 20 insertions(+), 1 deletion(-)
 >>
->> Co-developed-by: Jason Gunthorpe<jgg@nvidia.com>
->> Signed-off-by: Jason Gunthorpe<jgg@nvidia.com>
->> Signed-off-by: Lu Baolu<baolu.lu@linux.intel.com>
->> ---
->>   include/linux/iommu.h                       |  14 +--
->>   drivers/iommu/intel/iommu.h                 |   4 +-
->>   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c |  50 +++-----
->>   drivers/iommu/intel/svm.c                   |  18 +--
->>   drivers/iommu/io-pgfault.c                  | 132 +++++++++++---------
->>   5 files changed, 99 insertions(+), 119 deletions(-)
->>
->> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
->> index 48196efc9327..d7b6f4017254 100644
->> --- a/include/linux/iommu.h
->> +++ b/include/linux/iommu.h
->> @@ -578,9 +578,8 @@ struct iommu_ops {
->>   	int (*dev_enable_feat)(struct device *dev, enum iommu_dev_features f);
->>   	int (*dev_disable_feat)(struct device *dev, enum iommu_dev_features f);
->>   
->> -	int (*page_response)(struct device *dev,
->> -			     struct iopf_fault *evt,
->> -			     struct iommu_page_response *msg);
->> +	void (*page_response)(struct device *dev, struct iopf_fault *evt,
->> +			      struct iommu_page_response *msg);
->>   
->>   	int (*def_domain_type)(struct device *dev);
->>   	void (*remove_dev_pasid)(struct device *dev, ioasid_t pasid);
->> @@ -1551,8 +1550,8 @@ void iopf_queue_free(struct iopf_queue *queue);
->>   int iopf_queue_discard_partial(struct iopf_queue *queue);
->>   void iopf_free_group(struct iopf_group *group);
->>   int iommu_report_device_fault(struct device *dev, struct iopf_fault *evt);
->> -int iopf_group_response(struct iopf_group *group,
->> -			enum iommu_page_response_code status);
->> +void iopf_group_response(struct iopf_group *group,
->> +			 enum iommu_page_response_code status);
->>   #else
->>   static inline int
->>   iopf_queue_add_device(struct iopf_queue *queue, struct device *dev)
->> @@ -1594,10 +1593,9 @@ iommu_report_device_fault(struct device *dev, struct iopf_fault *evt)
->>   	return -ENODEV;
->>   }
->>   
->> -static inline int iopf_group_response(struct iopf_group *group,
->> -				      enum iommu_page_response_code status)
->> +static inline void iopf_group_response(struct iopf_group *group,
->> +				       enum iommu_page_response_code status)
->>   {
->> -	return -ENODEV;
->>   }
->>   #endif /* CONFIG_IOMMU_IOPF */
->>   #endif /* __LINUX_IOMMU_H */
->> diff --git a/drivers/iommu/intel/iommu.h b/drivers/iommu/intel/iommu.h
->> index 696d95293a69..cf9a28c7fab8 100644
->> --- a/drivers/iommu/intel/iommu.h
->> +++ b/drivers/iommu/intel/iommu.h
->> @@ -1079,8 +1079,8 @@ struct iommu_domain *intel_nested_domain_alloc(struct iommu_domain *parent,
->>   void intel_svm_check(struct intel_iommu *iommu);
->>   int intel_svm_enable_prq(struct intel_iommu *iommu);
->>   int intel_svm_finish_prq(struct intel_iommu *iommu);
->> -int intel_svm_page_response(struct device *dev, struct iopf_fault *evt,
->> -			    struct iommu_page_response *msg);
->> +void intel_svm_page_response(struct device *dev, struct iopf_fault *evt,
->> +			     struct iommu_page_response *msg);
->>   struct iommu_domain *intel_svm_domain_alloc(void);
->>   void intel_svm_remove_dev_pasid(struct device *dev, ioasid_t pasid);
->>   void intel_drain_pasid_prq(struct device *dev, u32 pasid);
->> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->> index 4e93e845458c..42eb59cb99f4 100644
->> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->> @@ -920,31 +920,29 @@ static int arm_smmu_cmdq_batch_submit(struct arm_smmu_device *smmu,
->>   	return arm_smmu_cmdq_issue_cmdlist(smmu, cmds->cmds, cmds->num, true);
->>   }
->>   
->> -static int arm_smmu_page_response(struct device *dev,
->> -				  struct iopf_fault *unused,
->> -				  struct iommu_page_response *resp)
->> +static void arm_smmu_page_response(struct device *dev, struct iopf_fault *unused,
->> +				   struct iommu_page_response *resp)
->>   {
->>   	struct arm_smmu_cmdq_ent cmd = {0};
->>   	struct arm_smmu_master *master = dev_iommu_priv_get(dev);
->>   	int sid = master->streams[0].id;
->>   
->> -	if (master->stall_enabled) {
->> -		cmd.opcode		= CMDQ_OP_RESUME;
->> -		cmd.resume.sid		= sid;
->> -		cmd.resume.stag		= resp->grpid;
->> -		switch (resp->code) {
->> -		case IOMMU_PAGE_RESP_INVALID:
->> -		case IOMMU_PAGE_RESP_FAILURE:
->> -			cmd.resume.resp = CMDQ_RESUME_0_RESP_ABORT;
->> -			break;
->> -		case IOMMU_PAGE_RESP_SUCCESS:
->> -			cmd.resume.resp = CMDQ_RESUME_0_RESP_RETRY;
->> -			break;
->> -		default:
->> -			return -EINVAL;
->> -		}
->> -	} else {
->> -		return -ENODEV;
->> +	if (WARN_ON(!master->stall_enabled))
->> +		return;
->> +
->> +	cmd.opcode		= CMDQ_OP_RESUME;
->> +	cmd.resume.sid		= sid;
->> +	cmd.resume.stag		= resp->grpid;
->> +	switch (resp->code) {
->> +	case IOMMU_PAGE_RESP_INVALID:
->> +	case IOMMU_PAGE_RESP_FAILURE:
->> +		cmd.resume.resp = CMDQ_RESUME_0_RESP_ABORT;
->> +		break;
->> +	case IOMMU_PAGE_RESP_SUCCESS:
->> +		cmd.resume.resp = CMDQ_RESUME_0_RESP_RETRY;
->> +		break;
->> +	default:
->> +		break;
->>   	}
->>   
->>   	arm_smmu_cmdq_issue_cmd(master->smmu, &cmd);
->> @@ -954,8 +952,6 @@ static int arm_smmu_page_response(struct device *dev,
->>   	 * terminated... at some point in the future. PRI_RESP is fire and
->>   	 * forget.
->>   	 */
->> -
->> -	return 0;
->>   }
->>   
->>   /* Context descriptor manipulation functions */
->> @@ -1516,16 +1512,6 @@ static int arm_smmu_handle_evt(struct arm_smmu_device *smmu, u64 *evt)
->>   	}
->>   
->>   	ret = iommu_report_device_fault(master->dev, &fault_evt);
->> -	if (ret && flt->type == IOMMU_FAULT_PAGE_REQ) {
->> -		/* Nobody cared, abort the access */
->> -		struct iommu_page_response resp = {
->> -			.pasid		= flt->prm.pasid,
->> -			.grpid		= flt->prm.grpid,
->> -			.code		= IOMMU_PAGE_RESP_FAILURE,
->> -		};
->> -		arm_smmu_page_response(master->dev, &fault_evt, &resp);
->> -	}
->> -
->>   out_unlock:
->>   	mutex_unlock(&smmu->streams_mutex);
->>   	return ret;
->> diff --git a/drivers/iommu/intel/svm.c b/drivers/iommu/intel/svm.c
->> index e1cbcb9515f0..2f8716636dbb 100644
->> --- a/drivers/iommu/intel/svm.c
->> +++ b/drivers/iommu/intel/svm.c
->> @@ -740,9 +740,8 @@ static irqreturn_t prq_event_thread(int irq, void *d)
->>   	return IRQ_RETVAL(handled);
->>   }
->>   
->> -int intel_svm_page_response(struct device *dev,
->> -			    struct iopf_fault *evt,
->> -			    struct iommu_page_response *msg)
->> +void intel_svm_page_response(struct device *dev, struct iopf_fault *evt,
->> +			     struct iommu_page_response *msg)
->>   {
->>   	struct device_domain_info *info = dev_iommu_priv_get(dev);
->>   	struct intel_iommu *iommu = info->iommu;
->> @@ -751,7 +750,6 @@ int intel_svm_page_response(struct device *dev,
->>   	bool private_present;
->>   	bool pasid_present;
->>   	bool last_page;
->> -	int ret = 0;
->>   	u16 sid;
->>   
->>   	prm = &evt->fault.prm;
->> @@ -760,16 +758,6 @@ int intel_svm_page_response(struct device *dev,
->>   	private_present = prm->flags & IOMMU_FAULT_PAGE_REQUEST_PRIV_DATA;
->>   	last_page = prm->flags & IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE;
->>   
->> -	if (!pasid_present) {
->> -		ret = -EINVAL;
->> -		goto out;
->> -	}
->> -
->> -	if (prm->pasid == 0 || prm->pasid >= PASID_MAX) {
->> -		ret = -EINVAL;
->> -		goto out;
->> -	}
->> -
->>   	/*
->>   	 * Per VT-d spec. v3.0 ch7.7, system software must respond
->>   	 * with page group response if private data is present (PDP)
->> @@ -798,8 +786,6 @@ int intel_svm_page_response(struct device *dev,
->>   
->>   		qi_submit_sync(iommu, &desc, 1, 0);
->>   	}
->> -out:
->> -	return ret;
->>   }
->>   
->>   static int intel_svm_set_dev_pasid(struct iommu_domain *domain,
->> diff --git a/drivers/iommu/io-pgfault.c b/drivers/iommu/io-pgfault.c
->> index c22e13df84c2..6e63e5a02884 100644
->> --- a/drivers/iommu/io-pgfault.c
->> +++ b/drivers/iommu/io-pgfault.c
->> @@ -39,7 +39,7 @@ static void iopf_put_dev_fault_param(struct iommu_fault_param *fault_param)
->>   		kfree_rcu(fault_param, rcu);
->>   }
->>   
->> -void iopf_free_group(struct iopf_group *group)
->> +static void __iopf_free_group(struct iopf_group *group)
->>   {
->>   	struct iopf_fault *iopf, *next;
->>   
->> @@ -50,6 +50,11 @@ void iopf_free_group(struct iopf_group *group)
->>   
->>   	/* Pair with iommu_report_device_fault(). */
->>   	iopf_put_dev_fault_param(group->fault_param);
->> +}
->> +
->> +void iopf_free_group(struct iopf_group *group)
->> +{
->> +	__iopf_free_group(group);
->>   	kfree(group);
->>   }
->>   EXPORT_SYMBOL_GPL(iopf_free_group);
->> @@ -97,14 +102,49 @@ static int report_partial_fault(struct iommu_fault_param *fault_param,
->>   	return 0;
->>   }
->>   
->> +static struct iopf_group *iopf_group_alloc(struct iommu_fault_param *iopf_param,
->> +					   struct iopf_fault *evt,
->> +					   struct iopf_group *abort_group)
->> +{
->> +	struct iopf_fault *iopf, *next;
->> +	struct iopf_group *group;
->> +
->> +	group = kzalloc(sizeof(*group), GFP_KERNEL);
->> +	if (!group) {
->> +		/*
->> +		 * We always need to construct the group as we need it to abort
->> +		 * the request at the driver if it cfan't be handled.
->> +		 */
->> +		group = abort_group;
->> +	}
->> +
->> +	group->fault_param = iopf_param;
->> +	group->last_fault.fault = evt->fault;
->> +	INIT_LIST_HEAD(&group->faults);
->> +	INIT_LIST_HEAD(&group->pending_node);
->> +	list_add(&group->last_fault.list, &group->faults);
->> +
->> +	/* See if we have partial faults for this group */
->> +	mutex_lock(&iopf_param->lock);
->> +	list_for_each_entry_safe(iopf, next, &iopf_param->partial, list) {
->> +		if (iopf->fault.prm.grpid == evt->fault.prm.grpid)
->> +			/* Insert*before*  the last fault */
->> +			list_move(&iopf->list, &group->faults);
->> +	}
->> +	list_add(&group->pending_node, &iopf_param->faults);
->> +	mutex_unlock(&iopf_param->lock);
->> +
->> +	return group;
->> +}
->> +
->>   /**
->>    * iommu_report_device_fault() - Report fault event to device driver
->>    * @dev: the device
->>    * @evt: fault event data
->>    *
->>    * Called by IOMMU drivers when a fault is detected, typically in a threaded IRQ
->> - * handler. When this function fails and the fault is recoverable, it is the
->> - * caller's responsibility to complete the fault.
->> + * handler. If this function fails then ops->page_response() was called to
->> + * complete evt if required.
->>    *
->>    * This module doesn't handle PCI PASID Stop Marker; IOMMU drivers must discard
->>    * them before reporting faults. A PASID Stop Marker (LRW = 0b100) doesn't
->> @@ -143,22 +183,18 @@ int iommu_report_device_fault(struct device *dev, struct iopf_fault *evt)
->>   {
->>   	struct iommu_fault *fault = &evt->fault;
->>   	struct iommu_fault_param *iopf_param;
->> -	struct iopf_fault *iopf, *next;
->> -	struct iommu_domain *domain;
->> +	struct iopf_group abort_group = {};
->>   	struct iopf_group *group;
->>   	int ret;
->>   
->> -	if (fault->type != IOMMU_FAULT_PAGE_REQ)
->> -		return -EOPNOTSUPP;
->> -
->>   	iopf_param = iopf_get_dev_fault_param(dev);
->> -	if (!iopf_param)
->> +	if (WARN_ON(!iopf_param))
->>   		return -ENODEV;
->>   
->>   	if (!(fault->prm.flags & IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE)) {
->>   		ret = report_partial_fault(iopf_param, fault);
->>   		iopf_put_dev_fault_param(iopf_param);
->> -
->> +		/* A request that is not the last does not need to be ack'd */
->>   		return ret;
->>   	}
->>   
->> @@ -170,56 +206,33 @@ int iommu_report_device_fault(struct device *dev, struct iopf_fault *evt)
->>   	 * will send a response to the hardware. We need to clean up before
->>   	 * leaving, otherwise partial faults will be stuck.
->>   	 */
->> -	domain = get_domain_for_iopf(dev, fault);
->> -	if (!domain) {
->> +	group = iopf_group_alloc(iopf_param, evt, &abort_group);
->> +	if (group == &abort_group) {
->> +		ret = -ENOMEM;
->> +		goto err_abort;
->> +	}
->> +
->> +	group->domain = get_domain_for_iopf(dev, fault);
->> +	if (!group->domain) {
->>   		ret = -EINVAL;
->> -		goto cleanup_partial;
->> +		goto err_abort;
->>   	}
->>   
->> -	group = kzalloc(sizeof(*group), GFP_KERNEL);
->> -	if (!group) {
->> -		ret = -ENOMEM;
->> -		goto cleanup_partial;
->> -	}
->> -
->> -	group->fault_param = iopf_param;
->> -	group->last_fault.fault = *fault;
->> -	INIT_LIST_HEAD(&group->faults);
->> -	INIT_LIST_HEAD(&group->pending_node);
->> -	group->domain = domain;
->> -	list_add(&group->last_fault.list, &group->faults);
->> -
->> -	/* See if we have partial faults for this group */
->> -	mutex_lock(&iopf_param->lock);
->> -	list_for_each_entry_safe(iopf, next, &iopf_param->partial, list) {
->> -		if (iopf->fault.prm.grpid == fault->prm.grpid)
->> -			/* Insert*before*  the last fault */
->> -			list_move(&iopf->list, &group->faults);
->> -	}
->> -	list_add(&group->pending_node, &iopf_param->faults);
->> -	mutex_unlock(&iopf_param->lock);
->> +	/*
->> +	 * On success iopf_handler must call iopf_group_response() and
->> +	 * iopf_free_group()
->> +	 */
->> +	ret = group->domain->iopf_handler(group);
->> +	if (ret)
->> +		goto err_abort;
->> +	return 0;
->>   
->> -	ret = domain->iopf_handler(group);
->> -	if (ret) {
->> -		mutex_lock(&iopf_param->lock);
->> -		list_del_init(&group->pending_node);
->> -		mutex_unlock(&iopf_param->lock);
->> +err_abort:
->> +	iopf_group_response(group, IOMMU_PAGE_RESP_FAILURE);
->> +	if (group == &abort_group)
->> +		__iopf_free_group(group);
->> +	else
->>   		iopf_free_group(group);
->> -	}
->> -
->> -	return ret;
->> -
->> -cleanup_partial:
->> -	mutex_lock(&iopf_param->lock);
->> -	list_for_each_entry_safe(iopf, next, &iopf_param->partial, list) {
->> -		if (iopf->fault.prm.grpid == fault->prm.grpid) {
->> -			list_del(&iopf->list);
->> -			kfree(iopf);
->> -		}
->> -	}
->> -	mutex_unlock(&iopf_param->lock);
->> -	iopf_put_dev_fault_param(iopf_param);
->> -
->>   	return ret;
->>   }
->>   EXPORT_SYMBOL_GPL(iommu_report_device_fault);
->> @@ -262,8 +275,8 @@ EXPORT_SYMBOL_GPL(iopf_queue_flush_dev);
->>    *
->>    * Return 0 on success and <0 on error.
->>    */
-> Should you adjust the docs as well?
+>>diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+>>index 3ab133530573..95233b0879a3 100644
+>>--- a/arch/x86/kvm/cpuid.c
+>>+++ b/arch/x86/kvm/cpuid.c
+>>@@ -149,6 +149,17 @@ static int kvm_check_cpuid(struct kvm_vcpu *vcpu,
+>> 		if (vaddr_bits != 48 && vaddr_bits != 57 && vaddr_bits != 0)
+>> 			return -EINVAL;
+>> 	}
+>>+	/*
+>>+	 * Prevent 32-bit guest launch if shadow stack is exposed as SSP
+>>+	 * state is not defined for 32-bit SMRAM.
+>>+	 */
+>>+	best = cpuid_entry2_find(entries, nent, 0x80000001,
+>>+				 KVM_CPUID_INDEX_NOT_SIGNIFICANT);
+>>+	if (best && !(best->edx & F(LM))) {
+>>+		best = cpuid_entry2_find(entries, nent, 0x7, 0);
+>>+		if (best && (best->ecx & F(SHSTK)))
+>
+>F(LM) and F(SHSTK) are kernel-defined feature bits; they are not
+>bit masks defined by the CPU.
 
-Yes. Will do.
-
-Best regards,
-baolu
+Oops, my comment is wrong here. Please disregard it.
 
