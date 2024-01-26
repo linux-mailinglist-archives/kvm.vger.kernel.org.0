@@ -1,60 +1,60 @@
-Return-Path: <kvm+bounces-7126-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7127-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D997E83D6E0
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 10:52:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45CEA83D6CE
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 10:49:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0F062B2DC99
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 09:48:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C66FE1F2F994
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 09:49:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B4E5152DE4;
-	Fri, 26 Jan 2024 08:58:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03B17152E04;
+	Fri, 26 Jan 2024 08:59:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RooFUHJF"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JEEePFvw"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A68145C1F;
-	Fri, 26 Jan 2024 08:58:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAD62482CD;
+	Fri, 26 Jan 2024 08:59:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706259536; cv=none; b=QyfyQ4jNTXNEgkH7RfSLw7UvtTU/NNspL0EY++IHO+VSGDJWFWIiRysp0VVsflyPreo86qwGg6F4kPoA416NtFqBffdWDbOIBXD9wv9dRttKfKMWc+1MkxzhC8LNDxSWAnu7dsUjca6V2NO/LLBfeKvyHzpIrp/WbixlRyiby0U=
+	t=1706259542; cv=none; b=qxsms+8CpVNAh40B5Yaf3uGznbI94fJ8XWoou2Vg6AKA5forzC/fFrKGyG/2oGXan0mRJorwKdjGT6Gf++zl4LoF+YztRwGA0Uu8nLO/tAQAihc0jeGEeLaehc8A0Z7aJBztmAD6Y/piunU1Hl+NVp5lMwwwdURljou6u0iQCvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706259536; c=relaxed/simple;
-	bh=bHmNwJkArTRO1rWzmQTGEV8UCY3qgs/M5gvIXwoJB5Y=;
+	s=arc-20240116; t=1706259542; c=relaxed/simple;
+	bh=4CxvW83RwYpJecZ+4IDD/HSNudmMoK3QPmnjuOvCTfI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=hSoTgFh3dvTJ7yMBEEuTOMzv3cJsSw3UBqJathDysPzj8m7J5AcbYbpMMNgRRg7em24d7HDkMAs5nqlJjK6CWKE3sxDJSFs4L0tnVsqu/nfA2siH+YUrwcAGlwq/zrYk18aucssBL3fNMNXUN4hPdp2YjCEr3f5fMQH/If392jw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RooFUHJF; arc=none smtp.client-ip=198.175.65.12
+	 MIME-Version; b=G0ju54kDNAf7Y2V6aL2m4ru5aTKTKYAeEnIiXdYXRbr0SjFGaUppUnnE707Ge3WgMm3WIwukOA1dysF2wB7rRLgBy4a/NKmGYfrFzkHhydynC5DqwBHBUexRm5QH0KBEwaf2spRJqABxAnjNzPEbg+FCh73CEIp9pqRnetjmPb4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JEEePFvw; arc=none smtp.client-ip=198.175.65.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706259535; x=1737795535;
+  t=1706259541; x=1737795541;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=bHmNwJkArTRO1rWzmQTGEV8UCY3qgs/M5gvIXwoJB5Y=;
-  b=RooFUHJFtMAH9TaR9KED3j8TG/M+kE2mIu90EX1HXG14DX2b164BWu2K
-   fTiy/j7ax0RrmQp3pMQz8gJfTQIaU6LiJTfY1ro4GPXpz4nQ5Iw4P4lZt
-   3d/J4fLIzIPbi9FYbbCDI/aD2obNq8FJjjsxIQyX+avc2WsMM735BeoKE
-   CMP2pDa3yY5v/ddjNsXT1yyAMkPiA3gsV/BfVmabOm6+8vHxZoKLQFoqr
-   2ae0MOAtSzt1HOak4akoaXhyIMQ0fTgXWwKJwiQNb8AOrgQwZ4aKA1Gaq
-   BF3Kk106o29xzy9UygmqQdoN0Urr+agFebxS2BgqdFD8JuJ4BHl7M+Cfv
+  bh=4CxvW83RwYpJecZ+4IDD/HSNudmMoK3QPmnjuOvCTfI=;
+  b=JEEePFvwWQMaP9ciI4V0jIvmJ2gtyoJMVgFZ2VM53qU3Y6tVANC100ke
+   afcMAeXzmsrlVt0hwEmI2EfTKfKFxv8d4TcwliQXZER52DLAtvIJw7aEG
+   z+hfoe1FpPtnZRkNBfmNpaTNnO/Fk7nbK9TpakvyyMfXiZV5oWRp5L+H1
+   J8qpiHFc2bh3uCAOly/l2QR7pEiXYhArOvp9tdgb0J3d1LW0g70vE6EPW
+   YSfY7JOKN6wRxxy2yo0jyIuNsdgcOZeGaUCzecAHXELTo91glcIYaWRbQ
+   BQnXWWPTJrrylbbemHxLq96PDBqZ+nfiPWtvAua6QOags6dRINxxhMR7T
    w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="9793100"
+X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="9793141"
 X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="9793100"
+   d="scan'208";a="9793141"
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2024 00:58:55 -0800
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2024 00:59:01 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="930310528"
+X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="930310561"
 X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="930310528"
+   d="scan'208";a="930310561"
 Received: from yanli3-mobl.ccr.corp.intel.com (HELO xiongzha-desk1.ccr.corp.intel.com) ([10.254.213.178])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2024 00:58:49 -0800
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2024 00:58:54 -0800
 From: Xiong Zhang <xiong.y.zhang@linux.intel.com>
 To: seanjc@google.com,
 	pbonzini@redhat.com,
@@ -74,9 +74,9 @@ Cc: kvm@vger.kernel.org,
 	like.xu.linux@gmail.com,
 	chao.gao@intel.com,
 	xiong.y.zhang@linux.intel.com
-Subject: [RFC PATCH 39/41] KVM: x86/pmu: Implement emulated counter increment for passthrough PMU
-Date: Fri, 26 Jan 2024 16:54:42 +0800
-Message-Id: <20240126085444.324918-40-xiong.y.zhang@linux.intel.com>
+Subject: [RFC PATCH 40/41] KVM: x86/pmu: Separate passthrough PMU logic in set/get_msr() from non-passthrough vPMU
+Date: Fri, 26 Jan 2024 16:54:43 +0800
+Message-Id: <20240126085444.324918-41-xiong.y.zhang@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240126085444.324918-1-xiong.y.zhang@linux.intel.com>
 References: <20240126085444.324918-1-xiong.y.zhang@linux.intel.com>
@@ -90,150 +90,68 @@ Content-Transfer-Encoding: 8bit
 
 From: Mingwei Zhang <mizhang@google.com>
 
-Implement emulated counter increment for passthrough PMU under KVM_REQ_PMU.
-Defer the counter increment to KVM_REQ_PMU handler because counter
-increment requests come from kvm_pmu_trigger_event() which can be triggered
-within the KVM_RUN inner loop or outside of the inner loop. This means the
-counter increment could happen before or after PMU context switch.
+Separate passthrough PMU logic from non-passthrough vPMU code. There are
+two places in passthrough vPMU when set/get_msr() may call into the
+existing non-passthrough vPMU code: 1) set/get counters; 2) set global_ctrl
+MSR.
 
-So process counter increment in one place makes the implementation simple.
+In the former case, non-passthrough vPMU will call into
+pmc_{read,write}_counter() which wires to the perf API. Update these
+functions to avoid the perf API invocation.
+
+The 2nd case is where global_ctrl MSR writes invokes reprogram_counters()
+which will invokes the non-passthrough PMU logic. So use pmu->passthrough
+flag to wrap out the call.
 
 Signed-off-by: Mingwei Zhang <mizhang@google.com>
 ---
- arch/x86/include/asm/kvm_host.h |  2 ++
- arch/x86/kvm/pmu.c              | 52 ++++++++++++++++++++++++++++++++-
- arch/x86/kvm/pmu.h              |  1 +
- arch/x86/kvm/x86.c              |  8 +++--
- 4 files changed, 60 insertions(+), 3 deletions(-)
+ arch/x86/kvm/pmu.c |  4 +++-
+ arch/x86/kvm/pmu.h | 10 +++++++++-
+ 2 files changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 869de0d81055..9080319751de 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -532,6 +532,7 @@ struct kvm_pmu {
- 	u64 fixed_ctr_ctrl_mask;
- 	u64 global_ctrl;
- 	u64 global_status;
-+	u64 synthesized_overflow;
- 	u64 counter_bitmask[2];
- 	u64 global_ctrl_mask;
- 	u64 global_status_mask;
-@@ -550,6 +551,7 @@ struct kvm_pmu {
- 		atomic64_t __reprogram_pmi;
- 	};
- 	DECLARE_BITMAP(all_valid_pmc_idx, X86_PMC_IDX_MAX);
-+	DECLARE_BITMAP(incremented_pmc_idx, X86_PMC_IDX_MAX);
- 	DECLARE_BITMAP(pmc_in_use, X86_PMC_IDX_MAX);
- 
- 	u64 ds_area;
 diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index 7b0bac1ac4bf..9e62e96fe48a 100644
+index 9e62e96fe48a..de653a67ba93 100644
 --- a/arch/x86/kvm/pmu.c
 +++ b/arch/x86/kvm/pmu.c
-@@ -449,6 +449,26 @@ static bool kvm_passthrough_pmu_incr_counter(struct kvm_pmc *pmc)
- 	return false;
- }
- 
-+void kvm_passthrough_pmu_handle_event(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-+	int bit;
-+
-+	for_each_set_bit(bit, pmu->incremented_pmc_idx, X86_PMC_IDX_MAX) {
-+		struct kvm_pmc *pmc = static_call(kvm_x86_pmu_pmc_idx_to_pmc)(pmu, bit);
-+
-+		if (kvm_passthrough_pmu_incr_counter(pmc)) {
-+			__set_bit(pmc->idx, (unsigned long *)&pmc_to_pmu(pmc)->synthesized_overflow);
-+
-+			if (pmc->eventsel & ARCH_PERFMON_EVENTSEL_INT)
-+				kvm_make_request(KVM_REQ_PMI, vcpu);
-+		}
-+	}
-+	bitmap_zero(pmu->incremented_pmc_idx, X86_PMC_IDX_MAX);
-+	pmu->global_status |= pmu->synthesized_overflow;
-+	pmu->synthesized_overflow = 0;
-+}
-+
- void kvm_pmu_handle_event(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-@@ -748,7 +768,29 @@ static inline bool cpl_is_matched(struct kvm_pmc *pmc)
- 	return (static_call(kvm_x86_get_cpl)(pmc->vcpu) == 0) ? select_os : select_user;
- }
- 
--void kvm_pmu_trigger_event(struct kvm_vcpu *vcpu, u64 perf_hw_id)
-+static void __kvm_passthrough_pmu_trigger_event(struct kvm_vcpu *vcpu, u64 perf_hw_id)
-+{
-+	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-+	struct kvm_pmc *pmc;
-+	int i;
-+
-+	for_each_set_bit(i, pmu->all_valid_pmc_idx, X86_PMC_IDX_MAX) {
-+		pmc = static_call(kvm_x86_pmu_pmc_idx_to_pmc)(pmu, i);
-+
-+		if (!pmc || !pmc_speculative_in_use(pmc) ||
-+		    !check_pmu_event_filter(pmc))
-+			continue;
-+
-+		/* Ignore checks for edge detect, pin control, invert and CMASK bits */
-+		if (eventsel_match_perf_hw_id(pmc, perf_hw_id) && cpl_is_matched(pmc)) {
-+			pmc->emulated_counter += 1;
-+			__set_bit(pmc->idx, pmu->incremented_pmc_idx);
-+			kvm_make_request(KVM_REQ_PMU, vcpu);
-+		}
-+	}
-+}
-+
-+static void __kvm_pmu_trigger_event(struct kvm_vcpu *vcpu, u64 perf_hw_id)
- {
- 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
- 	struct kvm_pmc *pmc;
-@@ -765,6 +807,14 @@ void kvm_pmu_trigger_event(struct kvm_vcpu *vcpu, u64 perf_hw_id)
- 			kvm_pmu_incr_counter(pmc);
- 	}
- }
-+
-+void kvm_pmu_trigger_event(struct kvm_vcpu *vcpu, u64 perf_hw_id)
-+{
-+	if (is_passthrough_pmu_enabled(vcpu))
-+		__kvm_passthrough_pmu_trigger_event(vcpu, perf_hw_id);
-+	else
-+		__kvm_pmu_trigger_event(vcpu, perf_hw_id);
-+}
- EXPORT_SYMBOL_GPL(kvm_pmu_trigger_event);
- 
- static bool is_masked_filter_valid(const struct kvm_x86_pmu_event_filter *filter)
+@@ -652,7 +652,9 @@ int kvm_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		if (pmu->global_ctrl != data) {
+ 			diff = pmu->global_ctrl ^ data;
+ 			pmu->global_ctrl = data;
+-			reprogram_counters(pmu, diff);
++			/* Passthrough vPMU never reprogram counters. */
++			if (!pmu->passthrough)
++				reprogram_counters(pmu, diff);
+ 		}
+ 		break;
+ 	case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
 diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-index 6f44fe056368..0fc37a06fe48 100644
+index 0fc37a06fe48..ab8d4a8e58a8 100644
 --- a/arch/x86/kvm/pmu.h
 +++ b/arch/x86/kvm/pmu.h
-@@ -277,6 +277,7 @@ static inline bool is_passthrough_pmu_enabled(struct kvm_vcpu *vcpu)
+@@ -70,6 +70,9 @@ static inline u64 pmc_read_counter(struct kvm_pmc *pmc)
+ 	u64 counter, enabled, running;
  
- void kvm_pmu_deliver_pmi(struct kvm_vcpu *vcpu);
- void kvm_pmu_handle_event(struct kvm_vcpu *vcpu);
-+void kvm_passthrough_pmu_handle_event(struct kvm_vcpu *vcpu);
- int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned pmc, u64 *data);
- bool kvm_pmu_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx);
- bool kvm_pmu_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index fe7da1a16c3b..1bbf312cbd73 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -10726,8 +10726,12 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 		}
- 		if (kvm_check_request(KVM_REQ_STEAL_UPDATE, vcpu))
- 			record_steal_time(vcpu);
--		if (kvm_check_request(KVM_REQ_PMU, vcpu))
--			kvm_pmu_handle_event(vcpu);
-+		if (kvm_check_request(KVM_REQ_PMU, vcpu)) {
-+			if (is_passthrough_pmu_enabled(vcpu))
-+				kvm_passthrough_pmu_handle_event(vcpu);
-+			else
-+				kvm_pmu_handle_event(vcpu);
-+		}
- 		if (kvm_check_request(KVM_REQ_PMI, vcpu))
- 			kvm_pmu_deliver_pmi(vcpu);
- #ifdef CONFIG_KVM_SMM
+ 	counter = pmc->counter;
++	if (pmc_to_pmu(pmc)->passthrough)
++		return counter & pmc_bitmask(pmc);
++
+ 	if (pmc->perf_event && !pmc->is_paused)
+ 		counter += perf_event_read_value(pmc->perf_event,
+ 						 &enabled, &running);
+@@ -79,7 +82,12 @@ static inline u64 pmc_read_counter(struct kvm_pmc *pmc)
+ 
+ static inline void pmc_write_counter(struct kvm_pmc *pmc, u64 val)
+ {
+-	pmc->counter += val - pmc_read_counter(pmc);
++	/* In passthrough PMU, counter value is the actual value in HW. */
++	if (pmc_to_pmu(pmc)->passthrough)
++		pmc->counter = val;
++	else
++		pmc->counter += val - pmc_read_counter(pmc);
++
+ 	pmc->counter &= pmc_bitmask(pmc);
+ }
+ 
 -- 
 2.34.1
 
