@@ -1,210 +1,387 @@
-Return-Path: <kvm+bounces-7086-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7087-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4269D83D631
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 10:25:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2CA083D648
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 10:29:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7A9CBB25832
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 09:25:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6CBE1C26CCD
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 09:29:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBE601EF1C;
-	Fri, 26 Jan 2024 08:53:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB03322625;
+	Fri, 26 Jan 2024 08:55:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FGlKkciv"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="P2SgqGur"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B0FFBA53;
-	Fri, 26 Jan 2024 08:53:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706259197; cv=fail; b=sUdZdTy2/NJE0rkCET1POblf9QjIPhXdMuLr++FGZOiSz1Qbram58bFd/soZAB8M2Gj8j2DKwTN4S8Oye2T8oXVTqZ8bQEh09UoaM1cg+YsJHJvGOSnvpxVxJlyuG0adMReA2QRwCBsAWp2W0FGbOO1yenG2v84hFjWDEGYndaw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706259197; c=relaxed/simple;
-	bh=mB6nd6IOO7O5oMDObzA9YBmsh3E1NpT3rgm5i6QY6gU=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=XqCVYi3iTv9jDfPz7OkqNOyej+LUhsDYzq13qeEhjiOX8FP5npTylwFME9HQZlF9jlHpdXrecUBwRI674K6D09FJj1bQcgL2B2V05mVhTuKQsBQV6SsPu73HZy2bE8qs4ZQn2jQwACtsAKttxfWumU5fgKKdDVz63dKmV671P0I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FGlKkciv; arc=fail smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0BE11D548;
+	Fri, 26 Jan 2024 08:55:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706259337; cv=none; b=lhq0E+E43eCOUWi2EsPmdf0dfga832B7BgT60Qhtf2f6pkoFrDyoIi6ydyHpJXqeHfoPAsx6L6NfCrlWyg6bUws9lwD+T3a82NI3unsQixBf8aEhNOuvE8VkGIBhpXc9+86/CIadVbE0DqHC8Qk/z9+wGJXRaT0DJVUH/M1miXg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706259337; c=relaxed/simple;
+	bh=lCUAogsNGKA1YUn7ZM4RKSghB5CV86gvsrghACp6bz0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=M2N246Pi6Eiy4Tq5rAU+hC3jRFXObLTUmAqHeZ+PXpzqrX84eQ+OYnoFvd59hMVaZUY5v14bHiAR8FiTG5QbD3VohRGVS5F2/JP996FlxNtQai+Tsp7CllG6WHl784fFlY3RuCOmdg13Vj8brMRdnS6Wu9UCAVWmJCao8ZlWiS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=P2SgqGur; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706259195; x=1737795195;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=mB6nd6IOO7O5oMDObzA9YBmsh3E1NpT3rgm5i6QY6gU=;
-  b=FGlKkciv67CxOjf24UdNw2zMvnR9tzhmS+Jz1DUIfsl52CApo7goe1Vq
-   NsRZL+FldlOzkAmrtyxWgY2Of5WFobQrbK02Cz6pxOWQMhUo2bl/ADyip
-   Q2RnYOei1p+oIEQ7izTFNWL+8CFKQ+NxxvPQOUe9ni9carbAoMGx5ebwx
-   xYVHzhWSl9Bj2kIume2cO6n0YhtPA588IACnSyb+kii6Ez9awLfAuwnzm
-   3cCauKvAVUs+M456PtkpEJfU09DXv2PYTmTG8pBCxHCBXLgBuABQtQ3Mn
-   r1zHBFuzjQO5orSV+XYzzElwo7pAWb3HlP+/a8qRwAXeQc5KtDORx+yKh
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="9081319"
+  t=1706259335; x=1737795335;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=lCUAogsNGKA1YUn7ZM4RKSghB5CV86gvsrghACp6bz0=;
+  b=P2SgqGuriKN2CGNemx0XWn1Xo7GQxVQhIssRRxpq0K4ZHDfm8RZahLWM
+   UGgWcT6RJCP8CA55yqYXNM6AlP6Uz3EV8JDm5btclarejKl2DPw4PyTDU
+   M3ELluNKmdKT7XDffVGCxV73QAOiOrUjlQcp6YGfvgD+tPh72crzgXtJK
+   BJMSqbwrJtP6EEBncvRGuat3Ey2D/DTRSoAfcbsCsH1Rzu2yPOWo0FSwT
+   ah7ZP/3sdGfu7gJOMBED8cXrUZPD++xdot2RJ73NB4bqKQWAmVl+wwy6m
+   K2dm/H2BeYTrkGhJadQ+6BrFsOB1WT8VnQ7NTJ9nh0kxIMySLnZFJZ24F
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="9792016"
 X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="9081319"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2024 00:53:15 -0800
+   d="scan'208";a="9792016"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2024 00:55:34 -0800
 X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="930309756"
 X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="28775413"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 26 Jan 2024 00:53:14 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 26 Jan 2024 00:53:14 -0800
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Fri, 26 Jan 2024 00:53:14 -0800
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.169)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 26 Jan 2024 00:53:13 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hNTrD1ESLp0O4D13UlVzhPeGExtbm/0AhcF46nRe5ZkFtdVBe9U2yDG3eKKErJ2MO7rBOWwXti/qWqpMlAiynSJeO83WLVJkKzdjWIV8aio4YsDMBaiEbCZpsjwnRSB/sa5jj9OAu1lZOYC/I84feNPjzqRGA4NVhH94EVTdaqtZOBQRBz4g/KoI2pEhFDUwg4xiNPJ/djSLyVNe+V2u2qLXKBTZYl+Kig//jlNd95s6/Ei9fs33TQMHUG61dFVFZLJx3Sd+CPnvbfnsKG6TB8mll+oW+Q1S+U+uGqcjfnOqwAU+8AaUU9ppC+MW874xGzkjMgeN+Kvcbu6hCIn5SA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Di7meIPl9U8Z5iL0vTY04z8FnjnyaGJiB7Y5n6hZEg0=;
- b=QAc76vRkWzjuAr+g57M/3QSpggg6v5A22cXacWoZPTe4zLT3OS3pmLDELvSdffQ1xpiK76eaj8ZOzVdbJlWlan/JymYLF88cRkwMDKh3d+zkA6EefuvCpnMumAQAoZtrcOcptUPoWy0SFoUnbjnDqjfv9BUWHsCribOr+xNciaKzLoJJBsguZLFpoRXXm/Vqq+hBUa4HBHw5FWon97/2gmzXwwOzBvWHRC+VyHdTm8JwB8TbepA5IXlTG9vtb0V4amO3GwDwUgYt7DJveIualzTkj+Ms7zL25QZqRO9Esean2wIjZRO75eFX2GE99Fu0f/AIx9+vxzqgflgi+xb7aw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
- by PH7PR11MB8009.namprd11.prod.outlook.com (2603:10b6:510:248::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.37; Fri, 26 Jan
- 2024 08:53:10 +0000
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::2903:9163:549:3b0d]) by CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::2903:9163:549:3b0d%6]) with mapi id 15.20.7228.027; Fri, 26 Jan 2024
- 08:53:09 +0000
-Date: Fri, 26 Jan 2024 16:53:01 +0800
-From: Chao Gao <chao.gao@intel.com>
-To: Yang Weijiang <weijiang.yang@intel.com>
-CC: <seanjc@google.com>, <pbonzini@redhat.com>, <dave.hansen@intel.com>,
-	<kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <x86@kernel.org>,
-	<yuan.yao@linux.intel.com>, <peterz@infradead.org>,
-	<rick.p.edgecombe@intel.com>, <mlevitsk@redhat.com>, <john.allen@amd.com>
-Subject: Re: [PATCH v9 27/27] KVM: x86: Stop emulating for CET protected
- branch instructions
-Message-ID: <ZbNy7TVq62JurQRc@chao-email>
-References: <20240124024200.102792-1-weijiang.yang@intel.com>
- <20240124024200.102792-28-weijiang.yang@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240124024200.102792-28-weijiang.yang@intel.com>
-X-ClientProxiedBy: SI2PR01CA0027.apcprd01.prod.exchangelabs.com
- (2603:1096:4:192::7) To CH3PR11MB8660.namprd11.prod.outlook.com
- (2603:10b6:610:1ce::13)
+   d="scan'208";a="930309756"
+Received: from yanli3-mobl.ccr.corp.intel.com (HELO xiongzha-desk1.ccr.corp.intel.com) ([10.254.213.178])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2024 00:55:28 -0800
+From: Xiong Zhang <xiong.y.zhang@linux.intel.com>
+To: seanjc@google.com,
+	pbonzini@redhat.com,
+	peterz@infradead.org,
+	mizhang@google.com,
+	kan.liang@intel.com,
+	zhenyuw@linux.intel.com,
+	dapeng1.mi@linux.intel.com,
+	jmattson@google.com
+Cc: kvm@vger.kernel.org,
+	linux-perf-users@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	zhiyuan.lv@intel.com,
+	eranian@google.com,
+	irogers@google.com,
+	samantha.alt@intel.com,
+	like.xu.linux@gmail.com,
+	chao.gao@intel.com,
+	xiong.y.zhang@linux.intel.com
+Subject: [RFC PATCH 00/41] KVM: x86/pmu: Introduce passthrough vPM
+Date: Fri, 26 Jan 2024 16:54:03 +0800
+Message-Id: <20240126085444.324918-1-xiong.y.zhang@linux.intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|PH7PR11MB8009:EE_
-X-MS-Office365-Filtering-Correlation-Id: 66926643-4aef-493f-c10c-08dc1e4c3890
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 4teuHsn/3IvzFmJHTUNUSHanqT1uxc56supGOEm8ivk0T1xPYCeBoZNle1idmNQ3D8tbm3FV6PL4Z7JTc7If3fkUg6iL8rZYT/J4gK66nwwqxf+OApnnqn1sUg9MVgEcJ42U13Z2Voom6IcqyhE32NBZIeWoFoA0WlUuDVuBKH9tw2Dpf7VmsrkvOUQFuw6UfceIiK/EMl94diPaSlNXzHlhF1c62Z6j5NtQgZp1BFrsrKzH+0OtwRCL1RF0e3/1nbooqXuLdvyhjpfNDpiHYzaHrOG2fADwQ5LWv95e+Q1EhJfYMCFsmqHVwuaVhyXXPTeHm4lJsYm9S1JxAqBvFTGlo3z91G2Mn6Pcq4vPH2n6P5EiBoUDKWdjNsjS/+hCU5VSWQNS7+yNi3TD5lI1uddbbOoi7JLMHvWgamKAXq3UG+Kmdwi/QSPWkUktmNQ1iv0RKvobqOWzmrTd9lv9om1FddojIVShO8uR8qRowZqzaZXFiVcJozAA65euqloTPR2cUhAi4jDfVLulcXsWpHkgKG5xpPnK/3x2vvUZ5VrXLQrTT+yB1inThgF3o6J0
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(366004)(346002)(376002)(136003)(39860400002)(396003)(230922051799003)(451199024)(186009)(64100799003)(1800799012)(83380400001)(26005)(4326008)(44832011)(86362001)(6862004)(82960400001)(8676002)(66946007)(5660300002)(316002)(6486002)(6636002)(66476007)(66556008)(38100700002)(478600001)(2906002)(33716001)(9686003)(6512007)(8936002)(41300700001)(6666004)(6506007);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?rjPezKbgehuh8ecXpH/eV9rn1r6wqFBQjKQoUKDa866R42E5zobKFyLeHawg?=
- =?us-ascii?Q?Yk//wFP1Ibq3lD2Z6e5iXJIfCx2oVRwGRnokfpp+WKJPUlJmPU9fHyzo0g/b?=
- =?us-ascii?Q?iRrsVHKIbVvmW1zPvmrW3lbz2epZgifuv7SwakhYesn/xdGO5pHwyILNruQc?=
- =?us-ascii?Q?Qy/ZaqQ4Nl/fldEWbSrlVxXKQHFk1lUZENobG6MBtpNYN0EBk4n/4wsavR1P?=
- =?us-ascii?Q?MKxom+FqxeGbyuZTqPatkU40RY7rB+5iPUPulYyFjvo5Iljm5575LZo5srkN?=
- =?us-ascii?Q?G8cdqOSwoYuSOJvj6RBF/LKTrpqi4YEzTC1qHwuJpr6BJyR+D3LOYR7i32x7?=
- =?us-ascii?Q?9CtOFLNjZd8AjOdeAEorf3HarRlTqlaglcHvNBeudSyLLrn+wjOdprHzkEQB?=
- =?us-ascii?Q?6/m6PDPjlP7HznQu49ztIFWDxWYxbbseG6J2jErv1nPnbKTHbLtbab0d94nb?=
- =?us-ascii?Q?47bYOk+dUSRFNKpYIN++IdE2e+JpHqPXiL7r07T6k436nT3deG+nfpJwt/D8?=
- =?us-ascii?Q?wfx7yKzbN2HT+8bkOdxT8Zp09n6AYm2HUcErd9e/q4E5dIz7cBYl8o1VHnz3?=
- =?us-ascii?Q?MaubFoCZplYeqrtL44YoeChS2eauE4qM830SEm+vP01NBfdTIqUxJrG685n/?=
- =?us-ascii?Q?Zl/XXAx7hwfaR/Jcy8Hs56RFmkK8WooRilRreFKZp41VMTt9ZF4yRmcFmPz4?=
- =?us-ascii?Q?Ge4chh+18yZVBJCOpj2mp6DbnOiFhILi8CtQGs3cuY7xkCknVa0N29rn/Pgl?=
- =?us-ascii?Q?LOQpadi36zY/bIb2BSSmGN0FGAlcoM8BpxOeVjyaSYTpBTV2Ny3rVIapyMBn?=
- =?us-ascii?Q?QONnbd5So592dLsn+9PLR1oaQKDiSMbb7k+QxdzBXnVk/f5ry1EFJ+7nuXeh?=
- =?us-ascii?Q?jouQhvZpFeaaxn6lji0jX/ghjr8IZRoYAHdYdDbjLfNSkoy/rHetUf035Bvl?=
- =?us-ascii?Q?cpBIiPudpwtgaDS72fjuRhi8adHImUSWkdbjBD64QZe16+3NzeCPSgMNJ5hd?=
- =?us-ascii?Q?+JIlHGNgBfeBR1InoFdfllfBsPaadAsAevHM2jy0vqP5p1O/fdQERcwnsh9a?=
- =?us-ascii?Q?i1C/g3jWOyuR+AWE+wxstJGwlj0hULHMm2Od9z2N6OvtwUq4eyx/TrTmoFzv?=
- =?us-ascii?Q?QVqKz009PJklQZrz5Q72+sKaNUmvVuux48AEDI33GT5pRbEV8XzaRaGRLhGo?=
- =?us-ascii?Q?757K0zBDqd+SEtEqjFIIyMLtbdoMSId7L00XKvO+Ecj6lbdh/hHicvx0etYu?=
- =?us-ascii?Q?TE8/fzHkd4sPQcniWLr53qd0LFNeDBwuc5om6uSFycgBOvJuiATmzVGnFfo1?=
- =?us-ascii?Q?C+ZLgDDKM7L/nhxyAittbJyPH7Lr1Sc/JMtEH6dcDek2itOcDlWvUJFWkHCe?=
- =?us-ascii?Q?8fHlPYIfPpJHrxLwq6Vr3duqXYsuDKuLnh7XECPtKp7jKHGJlH9FSgX07p4z?=
- =?us-ascii?Q?c7hN7BuGU+dG57byRedJ7qyOWrsVCfdym5ZoG0ccpqlGYICRnX55R4719Lhd?=
- =?us-ascii?Q?TOb5mFuKtAObHIDsXxWM9lzjCef9iRXfZtNNAbm/r4IbaiY9c7ogwvJVPJpD?=
- =?us-ascii?Q?BC44dJuiJ5Z+oQN8mCq8sGN7NsqenaCgGZqb1nnM?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 66926643-4aef-493f-c10c-08dc1e4c3890
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jan 2024 08:53:09.6308
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2oXdVllGdkRQ6DIazObD4N6FL+BrJiHTKO6CdAF9/S2iwKXWGvxkz3MIysSYmSOpZJv1lFhim//lxoMstvf60w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB8009
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jan 23, 2024 at 06:42:00PM -0800, Yang Weijiang wrote:
->Don't emulate the branch instructions, e.g., CALL/RET/JMP etc., when CET
->is active in guest, return KVM_INTERNAL_ERROR_EMULATION to userspace to
->handle it.
->
->KVM doesn't emulate CPU behaviors to check CET protected stuffs while
->emulating guest instructions, instead it stops emulation on detecting
->the instructions in process are CET protected. By doing so, it can avoid
->generating bogus #CP in guest and preventing CET protected execution flow
->subversion from guest side.
->
->Suggested-by: Chao Gao <chao.gao@intel.com>
->Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
->---
-> arch/x86/kvm/emulate.c | 27 ++++++++++++++++-----------
-> 1 file changed, 16 insertions(+), 11 deletions(-)
->
->diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
->index e223043ef5b2..ad15ce055a1d 100644
->--- a/arch/x86/kvm/emulate.c
->+++ b/arch/x86/kvm/emulate.c
->@@ -178,6 +178,7 @@
-> #define IncSP       ((u64)1 << 54)  /* SP is incremented before ModRM calc */
-> #define TwoMemOp    ((u64)1 << 55)  /* Instruction has two memory operand */
-> #define IsBranch    ((u64)1 << 56)  /* Instruction is considered a branch. */
->+#define IsProtected ((u64)1 << 57)  /* Instruction is protected by CET. */
+Background
+===
+KVM has supported vPMU for years as the emulated vPMU. In particular, KVM
+presents a virtual PMU to guest where accesses to PMU get trapped and
+converted into perf events. These perf events get scheduled along with
+other perf events at the host level, sharing the HW resource. In the
+emulated vPMU design, KVM is a client of the perf subsystem and has no
+control of the HW PMU resource at host level.
 
-the name IsProtected doesn't seem clear to me. Its meaning isn't obvious from
-the name and may be confused with protected mode. Maybe we can add two flags:
-"IndirectBranch" and "ShadowStack".
+This emulated vPMU has these drawbacks:
+1. Poor performance, guest PMU MSR accessing has VM-exit and some has
+expensive host perf API call. Once guest PMU is multiplexing its
+counters, KVM will waste majority of time re-creating/starting/releasing
+KVM perf events, then the guest perf performance is dropped dramatically.
+2. Guest perf events's backend may be swapped out or disabled silently.
+This is because host perf scheduler treats KVM perf events and other host
+perf events equally, they will contend HW resources. KVM perf events will
+be inactive when all HW resources have been owned by host perf events.
+But KVM can not notify this backend error into guest, this slient error
+is a red flag for vPMU as a production.
+3. Hard to add new vPMU features. For each vPMU new feature, KVM needs
+to emulate new MSRs, this involves perf and kvm two subsystems, mostly
+the vendor specific perf API is added and is hard to accept.
 
-> 
-> #define DstXacc     (DstAccLo | SrcAccHi | SrcWrite)
-> 
->@@ -4098,9 +4099,9 @@ static const struct opcode group4[] = {
-> static const struct opcode group5[] = {
-> 	F(DstMem | SrcNone | Lock,		em_inc),
-> 	F(DstMem | SrcNone | Lock,		em_dec),
->-	I(SrcMem | NearBranch | IsBranch,       em_call_near_abs),
->-	I(SrcMemFAddr | ImplicitOps | IsBranch, em_call_far),
->-	I(SrcMem | NearBranch | IsBranch,       em_jmp_abs),
->+	I(SrcMem | NearBranch | IsBranch | IsProtected, em_call_near_abs),
->+	I(SrcMemFAddr | ImplicitOps | IsBranch | IsProtected, em_call_far),
->+	I(SrcMem | NearBranch | IsBranch | IsProtected, em_jmp_abs),
+The community has discussed these drawbacks for years and reconsidered
+current emulated vPMU [1]. In latest discussion [2], both Perf and KVM
+x86 community agreed to try a passthrough vPMU. So we co-work with google
+engineers to develop this RFC, currently we implement it on Intel CPU
+only, and can add other arch's implementation later.
+Complete RFC source code can be found in below link:
+https://github.com/googleprodkernel/linux-kvm/tree/passthrough-pmu-rfc
 
-In SDM, I don't see a list of instructions that are affected by CET. how do you
-get the list.
+Under passthrough vPMU, VM direct access to all HW PMU general purpose
+counters and some of the fixed counters, VM has transparency of x86 PMU
+HW. All host perf events using x86 PMU are stopped during VM running, and
+are restarted at VM-exit. This has the following benefits:
+1. Better performance, when guest access x86 PMU MSRs and rdpmc, no VM-exit
+and no host perf API call.
+2. Guest perf events exclusively own HW resource during guest running. Host
+perf events are stopped and give up HW resource at VM-entry, and restart 
+runnging after VM-exit.
+3. Easier to enable PMU new features. KVM just needs to passthrough new
+MSRs and save/restore them at VM-exit and VM-entry, no need to add
+perf API.
+
+Note, passthrough vPMU does satisfy the enterprise-level requirement of
+secure usage for PMU by intercepting guest access to all event selectors.
+But the key problem of passthrough vPMU is that host user loses the
+capability to profile guest. If any users want to profile guest from the
+host, they should not enable passthrough vPMU mode. Another problem is
+the NMI watchdog is not fully functional anymore. Please see design opens
+for more details.
+
+Implementation
+===
+To passthrough host x86 PMU into guest, PMU context switch is mandatory,
+this RFC implements this PMU context switch at VM-entry/exit boundary.
+
+At VM-entry:
+1. KVM call perf supplied perf_guest_enter() interface, perf stops all
+the perf events which use host x86 PMU.
+2. KVM call perf supplied perf_guest_switch_to_kvm_pmi_vector() interface,
+perf switch PMI vector to a separate kvm_pmi_vector, so that KVM handles
+PMI after this point and KVM injects HW PMI into guest.
+3. KVM restores guest PMU context.
+
+In order to support KVM PMU filter feature for security, EVENT_SELECT and
+FIXED_CTR_CTRL MSRs are intercepted, all other MSRs defined in Architectural
+Performance Monitoring spec and rdpmc are passthrough, so guest can access
+them without VM exit during guest running, when guest counter overflow
+happens, HW PMI is triggered with dedicated kvm_pmi_vector, KVM injects a
+virtual PMI into guest through virtual local apic.
+
+At VM-exit:
+1. KVM saves and clears guest PMU context.
+2. KVM call perf supplied perf_guest_switch_to_host_pmi_vector() interface,
+perf switch PMI vector to host NMI, so that host handles PMI after this
+point.
+3. KVM call perf supplied perf_guest_exit() interface, perf resched all
+the perf events, these events stopped at VM-entry will be re-started here.
+
+Design Opens
+===
+we met some design opens during this POC and seek supporting from
+community:
+
+1. host system wide / QEMU events handling during VM running
+   At VM-entry, all the host perf events which use host x86 PMU will be
+   stopped. These events with attr.exclude_guest = 1 will be stopped here
+   and re-started after vm-exit. These events without attr.exclude_guest=1
+   will be in error state, and they cannot recovery into active state even
+   if the guest stops running. This impacts host perf a lot and request
+   host system wide perf events have attr.exclude_guest=1.
+
+   This requests QEMU Process's perf event with attr.exclude_guest=1 also.
+
+   During VM running, perf event creation for system wide and QEMU
+   process without attr.exclude_guest=1 fail with -EBUSY. 
+
+2. NMI watchdog
+   the perf event for NMI watchdog is a system wide cpu pinned event, it
+   will be stopped also during vm running, but it doesn't have
+   attr.exclude_guest=1, we add it in this RFC. But this still means NMI
+   watchdog loses function during VM running.
+
+   Two candidates exist for replacing perf event of NMI watchdog:
+   a. Buddy hardlock detector[3] may be not reliable to replace perf event.
+   b. HPET-based hardlock detector [4] isn't in the upstream kernel.
+
+3. Dedicated kvm_pmi_vector
+   In emulated vPMU, host PMI handler notify KVM to inject a virtual
+   PMI into guest when physical PMI belongs to guest counter. If the
+   same mechanism is used in passthrough vPMU and PMI skid exists
+   which cause physical PMI belonging to guest happens after VM-exit,
+   then the host PMI handler couldn't identify this PMI belongs to
+   host or guest.
+   So this RFC uses a dedicated kvm_pmi_vector, PMI belonging to guest
+   has this vector only. The PMI belonging to host still has an NMI
+   vector.
+
+   Without considering PMI skid especially for AMD, the host NMI vector
+   could be used for guest PMI also, this method is simpler and doesn't
+   need x86 subsystem to reserve the dedicated kvm_pmi_vector, and we
+   didn't meet the skid PMI issue on modern Intel processors.
+
+4. per-VM passthrough mode configuration
+   Current RFC uses a KVM module enable_passthrough_pmu RO parameter,
+   it decides vPMU is passthrough mode or emulated mode at kvm module
+   load time.
+   Do we need the capability of per-VM passthrough mode configuration?
+   So an admin can launch some non-passthrough VM and profile these
+   non-passthrough VMs in host, but admin still cannot profile all
+   the VMs once passthrough VM existence. This means passthrough vPMU
+   and emulated vPMU mix on one platform, it has challenges to implement.
+   As the commit message in commit 0011, the main challenge is 
+   passthrough vPMU and emulated vPMU have different vPMU features, this
+   ends up with two different values for kvm_cap.supported_perf_cap, which
+   is initialized at module load time. To support it, more refactor is
+   needed.
+
+Commits construction
+===
+0000 ~ 0003: Perf extends exclude_guest to stop perf events during
+             guest running.
+0004 ~ 0009: Perf interface for dedicated kvm_pmi_vector.
+0010 ~ 0032: all passthrough vPMU with PMU context switch at
+             VM-entry/exit boundary.
+0033 ~ 0037: Intercept EVENT_SELECT and FIXED_CTR_CTRL MSRs for
+             KVM PMU filter feature.
+0038 ~ 0039: Add emulated instructions to guest counter.
+0040 ~ 0041: Fixes for passthrough vPMU live migration and Nested VM.
+
+Performance Data
+===
+Measure method:
+First step: guest run workload without perf, and get basic workload score.
+Second step: guest run workload with perf commands, and get perf workload
+             score.
+Third step: perf overhead to workload is gotten from (first-second)/first.
+Finally: compare perf overhead between emulated vPMU and passthrough vPMU.
+
+Workload: Specint-2017
+HW platform: Sapphire rapids, 1 socket, 56 cores, no-SMT
+Perf command:
+a. basic-sampling: perf record -F 1000 -e 6-instructions  -a --overwrite
+b. multiplex-sampling: perf record -F 1000 -e 10-instructions -a --overwrite
+
+Guest performance overhead:
+---------------------------------------------------------------------------
+| Test case          | emulated vPMU | all passthrough | passthrough with |
+|                    |               |                 | event filters    |
+---------------------------------------------------------------------------
+| basic-sampling     |   33.62%      |    4.24%        |   6.21%          |
+---------------------------------------------------------------------------
+| multiplex-sampling |   79.32%      |    7.34%        |   10.45%         |
+---------------------------------------------------------------------------
+Note: here "passthrough with event filters" means KVM intercepts EVENT_SELECT
+and FIXED_CTR_CTRL MSRs to support KVM PMU filter feature for security, this
+is current RFC implementation. In order to collect EVENT_SELECT interception
+impact, we modified RFC source to passthrough all the MSRs into guest, this
+is "all passthrough" in above table.
+
+Conclusion:
+1. passthrough vPMU has much better performance than emulated vPMU.
+2. Intercept EVENT_SELECT and FIXED_CTR_CTRL MSRs cause 2% overhead.
+3. As PMU context switch happens at VM-exit/entry, the more VM-exit,
+the more vPMU overhead. This does not only impacts perf, but it also
+impacts other benchmarks which have massive VM-exit like fio. We will
+optimize this at the second phase of passthrough vPMU.
+
+Remain Works
+===
+1. To reduce passthrough vPMU overhead, optimize the PMU context switch.
+2. Add more PMU features like LBR, PEBS, perf metrics.
+3. vPMU live migration.
+
+Reference
+===
+1. https://lore.kernel.org/lkml/2db2ebbe-e552-b974-fc77-870d958465ba@gmail.com/
+2. https://lkml.kernel.org/kvm/ZRRl6y1GL-7RM63x@google.com/
+3. https://lwn.net/Articles/932497/
+4. https://lwn.net/Articles/924927/
+
+Dapeng Mi (4):
+  x86: Introduce MSR_CORE_PERF_GLOBAL_STATUS_SET for passthrough PMU
+  KVM: x86/pmu: Implement the save/restore of PMU state for Intel CPU
+  KVM: x86/pmu: Introduce macro PMU_CAP_PERF_METRICS
+  KVM: x86/pmu: Clear PERF_METRICS MSR for guest
+
+Kan Liang (2):
+  perf: x86/intel: Support PERF_PMU_CAP_VPMU_PASSTHROUGH
+  perf: Support guest enter/exit interfaces
+
+Mingwei Zhang (22):
+  perf: core/x86: Forbid PMI handler when guest own PMU
+  perf: core/x86: Plumb passthrough PMU capability from x86_pmu to
+    x86_pmu_cap
+  KVM: x86/pmu: Introduce enable_passthrough_pmu module parameter and
+    propage to KVM instance
+  KVM: x86/pmu: Plumb through passthrough PMU to vcpu for Intel CPUs
+  KVM: x86/pmu: Add a helper to check if passthrough PMU is enabled
+  KVM: x86/pmu: Allow RDPMC pass through
+  KVM: x86/pmu: Create a function prototype to disable MSR interception
+  KVM: x86/pmu: Implement pmu function for Intel CPU to disable MSR
+    interception
+  KVM: x86/pmu: Intercept full-width GP counter MSRs by checking with
+    perf capabilities
+  KVM: x86/pmu: Whitelist PMU MSRs for passthrough PMU
+  KVM: x86/pmu: Introduce PMU operation prototypes for save/restore PMU
+    context
+  KVM: x86/pmu: Introduce function prototype for Intel CPU to
+    save/restore PMU context
+  KVM: x86/pmu: Zero out unexposed Counters/Selectors to avoid
+    information leakage
+  KVM: x86/pmu: Add host_perf_cap field in kvm_caps to record host PMU
+    capability
+  KVM: x86/pmu: Exclude existing vLBR logic from the passthrough PMU
+  KVM: x86/pmu: Make check_pmu_event_filter() an exported function
+  KVM: x86/pmu: Allow writing to event selector for GP counters if event
+    is allowed
+  KVM: x86/pmu: Allow writing to fixed counter selector if counter is
+    exposed
+  KVM: x86/pmu: Introduce PMU helper to increment counter
+  KVM: x86/pmu: Implement emulated counter increment for passthrough PMU
+  KVM: x86/pmu: Separate passthrough PMU logic in set/get_msr() from
+    non-passthrough vPMU
+  KVM: nVMX: Add nested virtualization support for passthrough PMU
+
+Xiong Zhang (13):
+  perf: Set exclude_guest onto nmi_watchdog
+  perf: core/x86: Add support to register a new vector for PMI handling
+  KVM: x86/pmu: Register PMI handler for passthrough PMU
+  perf: x86: Add function to switch PMI handler
+  perf/x86: Add interface to reflect virtual LVTPC_MASK bit onto HW
+  KVM: x86/pmu: Add get virtual LVTPC_MASK bit function
+  KVM: x86/pmu: Manage MSR interception for IA32_PERF_GLOBAL_CTRL
+  KVM: x86/pmu: Switch IA32_PERF_GLOBAL_CTRL at VM boundary
+  KVM: x86/pmu: Switch PMI handler at KVM context switch boundary
+  KVM: x86/pmu: Call perf_guest_enter() at PMU context switch
+  KVM: x86/pmu: Add support for PMU context switch at VM-exit/enter
+  KVM: x86/pmu: Intercept EVENT_SELECT MSR
+  KVM: x86/pmu: Intercept FIXED_CTR_CTRL MSR
+
+ arch/x86/events/core.c                   |  38 +++++
+ arch/x86/events/intel/core.c             |   8 +
+ arch/x86/events/perf_event.h             |   1 +
+ arch/x86/include/asm/hardirq.h           |   1 +
+ arch/x86/include/asm/idtentry.h          |   1 +
+ arch/x86/include/asm/irq.h               |   1 +
+ arch/x86/include/asm/irq_vectors.h       |   2 +-
+ arch/x86/include/asm/kvm-x86-pmu-ops.h   |   3 +
+ arch/x86/include/asm/kvm_host.h          |   8 +
+ arch/x86/include/asm/msr-index.h         |   1 +
+ arch/x86/include/asm/perf_event.h        |   4 +
+ arch/x86/include/asm/vmx.h               |   1 +
+ arch/x86/kernel/idt.c                    |   1 +
+ arch/x86/kernel/irq.c                    |  29 ++++
+ arch/x86/kvm/cpuid.c                     |   4 +
+ arch/x86/kvm/lapic.h                     |   5 +
+ arch/x86/kvm/pmu.c                       | 102 ++++++++++++-
+ arch/x86/kvm/pmu.h                       |  37 ++++-
+ arch/x86/kvm/vmx/capabilities.h          |   1 +
+ arch/x86/kvm/vmx/nested.c                |  52 +++++++
+ arch/x86/kvm/vmx/pmu_intel.c             | 186 +++++++++++++++++++++--
+ arch/x86/kvm/vmx/vmx.c                   | 176 +++++++++++++++++----
+ arch/x86/kvm/vmx/vmx.h                   |   3 +-
+ arch/x86/kvm/x86.c                       |  37 ++++-
+ arch/x86/kvm/x86.h                       |   2 +
+ include/linux/perf_event.h               |  11 ++
+ kernel/events/core.c                     | 179 ++++++++++++++++++++++
+ kernel/watchdog_perf.c                   |   1 +
+ tools/arch/x86/include/asm/irq_vectors.h |   1 +
+ 29 files changed, 852 insertions(+), 44 deletions(-)
+
+
+base-commit: b85ea95d086471afb4ad062012a4d73cd328fa86
+-- 
+2.34.1
+
 
