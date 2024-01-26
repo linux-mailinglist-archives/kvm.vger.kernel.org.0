@@ -1,119 +1,155 @@
-Return-Path: <kvm+bounces-7193-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7194-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F2A083E19E
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 19:33:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41C2383E1A4
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 19:37:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61FA51C20C0A
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 18:33:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C15981F2653F
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 18:37:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10F86210ED;
-	Fri, 26 Jan 2024 18:33:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39C362231C;
+	Fri, 26 Jan 2024 18:37:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="utuHxNlP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GeG0yy9q"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E34311C295
-	for <kvm@vger.kernel.org>; Fri, 26 Jan 2024 18:33:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7B351EF1E
+	for <kvm@vger.kernel.org>; Fri, 26 Jan 2024 18:37:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706294025; cv=none; b=qXOwBHoHzcSjZjN1tRU4r+MOz4qCvjQzOdDpp3ned5ge9GBv2uGpH69IXWvWtGecuqt4ip3btfnMl6HnnzLM8apNl2avChXZKezJa5D5BsmY84rS3pa2Zq1EueMpe0t0zA12ZVkqkFNLiPbzJN+1r8xcu4YySNayWEynQpwC2P8=
+	t=1706294225; cv=none; b=Fy48tkN57E2Mu1bcKdqI0/AgEUYWWja6oHPFe+vNDKgNXdacxd6kzOGjTZLKRUIp+TWZF54+Ukkw9IibruMfnIcT4mlZFE1Uz9sU82PazaziBSvTA9m9HQQAds+X92WYDiiid3ZuWwxBpfGfbcm54DT7pXQH8yrERiZbc58HKqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706294025; c=relaxed/simple;
-	bh=lQzonua4L7LeuBe7wO8Mc6DzTpXm+HWTrEtwIwlJ7TA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=hEH8dANXQerTAB9gXvmkxWPRpQmVTJhQ6sz7TN6kSfRI/O8jOmH6hiNqe91Suf7qu0MLsr36mJEdAJfQo+uwbcfoFZDjAmEgLU0sFl71SUFlCQ3U+c6PCBl/RaDerxkInvh1/UTj21aB60qzIgiEf5Gz37BXA8/J0sUSnb45aq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=utuHxNlP; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc3645a6790so2042941276.0
-        for <kvm@vger.kernel.org>; Fri, 26 Jan 2024 10:33:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706294023; x=1706898823; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6Dcc9LRXvpntKzSYVjpRtgdZNNstahDCXgoyjCxDxqY=;
-        b=utuHxNlPmFVAA8LFUEBKQ3+hSCqPfaLcBYYkznaR13an82F8BU0OlnqY//MFOGorky
-         fj1RQtmo/63wYPFHrLGUmBntqysTKd8iNxW4SlReSYp01vWj1s+ED33/0b4C67tAoPGC
-         O8abyLHS3YQkK4P9BtVREHGEhmvOaK3lvw8yV1i64PhFSiXIeLcEyoWJMxWlr55DvhMU
-         eCtoHSOP8stzIHKOytHUczZ+sgEB8GuIUa94QdWRPN8cE6v24Lu7MdTpXp4lrpL8dprC
-         KMWMerZq6sGMzAW+HeTmk2nDit47EO53mmvQCh/vkmMRXj0uhuwxWCHKTxgppyICmEnr
-         LyRw==
+	s=arc-20240116; t=1706294225; c=relaxed/simple;
+	bh=S1fRMeft88UCS9XJ3ihj3GA2+mAls0h3Pf4XzLDD89s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XATwYFRjpHH7eF4xPjUnhqYp0EvSuhBlN0pmKqNpBwuTDJT2k5QFy6/zhKTauQ1T2XD/WAnk6UUGTTmYa2D8jXlmFX0aq0AXWbGaWZ6cRIiI5+se3SFkKPRL5/XWc5/rIbytoe0IgRUuNOWsjJ8pMDsl6RddXMRU2BAt76A7bZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GeG0yy9q; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706294222;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YtidRzgIyGrU6IJcvdjLJw1+3TfGvDrbdoaLpd1wvgI=;
+	b=GeG0yy9qvFzjkeJ24cH+gmuM+Bxr1JiWEKyILd0Yeo8xnXiOLeOMrmpmVcL1mfSkXsOvnI
+	ezPjeAxfUF9a7cpTIZofSqvdigy7oAZlal4EgiCA/lx3PZ4CVyCk/2ddWTpp4ds9oREL4H
+	+zavk5Zo9QAbuGeHHWHPTNJqjUhrvmg=
+Received: from mail-vs1-f72.google.com (mail-vs1-f72.google.com
+ [209.85.217.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-463-tw8dRDp9Neu44ikodSgU0g-1; Fri, 26 Jan 2024 13:37:01 -0500
+X-MC-Unique: tw8dRDp9Neu44ikodSgU0g-1
+Received: by mail-vs1-f72.google.com with SMTP id ada2fe7eead31-466ec6d33bcso200805137.3
+        for <kvm@vger.kernel.org>; Fri, 26 Jan 2024 10:37:01 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706294023; x=1706898823;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6Dcc9LRXvpntKzSYVjpRtgdZNNstahDCXgoyjCxDxqY=;
-        b=qgVviehIl5MDZ6AgOvfihXUvUpUO7XixgLH9u+7vMXa6xkIcBdMCv3qHpHF3W0Arwp
-         6wB3qizi7r8hP9uAj3HCrR7/0nNQO70f5wBCVeRAGskoVl4pf7nDN5Gj5/k72Zsm9BYf
-         4j7gxLtZzUvVI+7Yh7QL+S8yP6V7wFXtmAJE/ed+RdyRsVE08yA40ZK00D6ePq9ixHqQ
-         hIm9TDq1bDngiQSFDykOAGqcfhKwTZ0bM1O2Qzuhcq0Nk4wpo0Jf+YJ4UGc+pMsBCYkC
-         mv6LN2mdytD6gCujUAo5YTADP2OeeUoI77JnF5r7A8Pitd5UykzzAP4jM8lpGybOvwn7
-         Nd8Q==
-X-Gm-Message-State: AOJu0Yyhqfh1QiiIx0oT7lemqkVtUpeeumRBs9mqBuKuHigxeM/QWOS+
-	C6R0FKsk2zCDvTOUM3OnxXrwPKVK8HH8hAaH1QIAgLdlHiyH7LMF3vQ7yWjIDKTg/e0yUXfgrpn
-	j/Q==
-X-Google-Smtp-Source: AGHT+IG2evS1F5jsdTWYPfbDyr3i6wyF9yc/uUWrNxyUNahpRRRy9BhGGzgDwd5w+JSN//YUJY/YNq9YCRM=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:2481:b0:dc2:1cd6:346e with SMTP id
- ds1-20020a056902248100b00dc21cd6346emr139746ybb.8.1706294022986; Fri, 26 Jan
- 2024 10:33:42 -0800 (PST)
-Date: Fri, 26 Jan 2024 10:33:41 -0800
-In-Reply-To: <ZbGn8lAj4XxiecFn@google.com>
+        d=1e100.net; s=20230601; t=1706294220; x=1706899020;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YtidRzgIyGrU6IJcvdjLJw1+3TfGvDrbdoaLpd1wvgI=;
+        b=RXBbaWkd67W0CuQxlrv7NJQz6DSmIqjznOqDYIee3oxrR0CsSy2gBoXtzrX/5mGlxL
+         CQkBkiXK8yG8nvU5pi3Y6p5NhsRQpA41AMUTZssuBCPoTA9s+gcrlzBV4DAfj+U8fn4i
+         OPZBrT8oYVpSQWjBUEU6PDIISVkc5lQVUlr/junu+S3lRWy1cw6f9AlRUrc76C63y4v+
+         xBWdZzL4ue1TbN9xfa6E9812KbBIKBsy3nfsbtawFnnwtkDnumUh7HNqYCzckcB/VNYQ
+         naW1NaYOM+XjaKy60VPlvY+IYyke8C1AFX+IBUWJt0J8rMp95mKCudiInddB4kpLoEL2
+         YDvw==
+X-Gm-Message-State: AOJu0Yws+6bQV9Jz/3qP/M7jvf8lIM7MBUv+TQaaMDW+OVrD2BRgB4Ev
+	DPnDjGm9dyNMm7xa/3JlRAjPWp8M2LCD6vXYsD6+Wd9r8jZhbpzFjbe8xcFNVN3I0BQHi3XeyXT
+	0BJMJc/tmlRnUtcDSFDYZ5WKrMfAWpDVwp569Yuz/mzOMivkB35J5mFBo6c8PwgH8uTqg6KaDxZ
+	M75nlhXr9tlHQwpnDQxG9b7aAD
+X-Received: by 2002:a67:ebd4:0:b0:46b:1408:bbad with SMTP id y20-20020a67ebd4000000b0046b1408bbadmr198422vso.14.1706294220517;
+        Fri, 26 Jan 2024 10:37:00 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHEeg7aOHdJJCfQQbPMee0o+6vpKuc0K0Nk3OoMbEjhiU4ZqbmHCHJWBpLEKUXk5wz5VWKDRBo7LPYo1lJnIDk=
+X-Received: by 2002:a67:ebd4:0:b0:46b:1408:bbad with SMTP id
+ y20-20020a67ebd4000000b0046b1408bbadmr198415vso.14.1706294220297; Fri, 26 Jan
+ 2024 10:37:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240124003858.3954822-1-mizhang@google.com> <20240124003858.3954822-2-mizhang@google.com>
- <ZbExcMMl-IAzJrfx@google.com> <CAAAPnDFAvJBuETUsBScX6WqSbf_j=5h_CpWwrPHwXdBxDg_LFQ@mail.gmail.com>
- <ZbGAXpFUso9JzIjo@google.com> <ZbGOK9m6UKkQ38bK@google.com>
- <ZbGUfmn-ZAe4lkiN@google.com> <ZbGn8lAj4XxiecFn@google.com>
-Message-ID: <ZbP7BTvdZ1-b3MmE@google.com>
-Subject: Re: [PATCH 1/2] KVM: x86/pmu: Reset perf_capabilities in vcpu to 0 if
- PDCM is disabled
-From: Sean Christopherson <seanjc@google.com>
-To: Mingwei Zhang <mizhang@google.com>
-Cc: Aaron Lewis <aaronlewis@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <b83ab45c5e239e5d148b0ae7750133a67ac9575c.1706127425.git.maciej.szmigiero@oracle.com>
+In-Reply-To: <b83ab45c5e239e5d148b0ae7750133a67ac9575c.1706127425.git.maciej.szmigiero@oracle.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 26 Jan 2024 19:36:48 +0100
+Message-ID: <CABgObfZ1YzigovNEiYF7pbmRxv-SUzEFqnpaQZ4GT_hDssm65g@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: Give a hint when Win2016 might fail to boot due
+ to XSAVES erratum
+To: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Cc: Sean Christopherson <seanjc@google.com>, Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 25, 2024, Mingwei Zhang wrote:
-> On Wed, Jan 24, 2024, Sean Christopherson wrote:
-> > On Wed, Jan 24, 2024, Mingwei Zhang wrote:
-> > > I think this makes a lot of confusions on migration where VMM on the source
-> > > believes that a non-zero value from KVM_GET_MSRS is valid and the VMM on the
-> > > target will find it not true.
-> > 
-> > Yes, but seeing a non-zero value is a KVM bug that should be fixed.
-> > 
-> How about adding an entry in vmx_get_msr() for
-> MSR_IA32_PERF_CAPABILITIES and check pmu_version? This basically pairs
-> with the implementation in vmx_set_msr() for MSR_IA32_PERF_CAPABILITIES.
-> Doing so allows KVM_GET_MSRS return 0 for the MSR instead of returning
-> the initial permitted value.
+On Wed, Jan 24, 2024 at 9:18=E2=80=AFPM Maciej S. Szmigiero
+<mail@maciej.szmigiero.name> wrote:
+> +static void kvm_hv_xsaves_xsavec_maybe_warn_unlocked(struct kvm_vcpu *vc=
+pu)
 
-Hrm, I don't hate it as a stopgap.  But if we are the only people that are affected,
-because again I'm pretty sure QEMU is fine, I would rather we just fix things in
-our VMM and/or internal kernel.
+Calling this function "unlocked" is confusing (others would say
+"locked" is confusing instead). The double-underscore convention is
+more common.
 
-Long term, I want some form of fix for the initialization code, even if that means
-adding a quirk to let userspace opt out of KVM setting default values for platform
-MSRs.
+> +{
+> +       struct kvm *kvm =3D vcpu->kvm;
+> +       struct kvm_hv *hv =3D to_kvm_hv(kvm);
+> +
+> +       if (hv->xsaves_xsavec_warned)
+> +               return;
+> +
+> +       if (!vcpu->arch.hyperv_enabled)
+> +               return;
 
-Side topic, vmx_set_msr() should check X86_FEATURE_PDCM, not just the PMU version.
+I think these two should be in kvm_hv_xsaves_xsavec_maybe_warn(),
+though the former needs to be checked again under the lock.
 
-> The benefit is that it is not enforcing the VMM to explicitly set the
-> value. In fact, there are several platform MSRs which has initial value
-> that VMM may rely on instead of explicitly setting.
-> MSR_IA32_PERF_CAPABILITIES is only one of them.
+> +       if ((hv->hv_guest_os_id & KVM_HV_WIN2016_GUEST_ID_MASK) !=3D
+> +           KVM_HV_WIN2016_GUEST_ID)
+> +               return;
 
-Yeah, and all of those are broken.  AFAICT, the bad behavior got introduced for
-MSR_PLATFORM_INFO, and then people kept copy+pasting that broken pattern :-(
+At this point there is no need to return. You can set
+xsaves_xsavec_warned and save the checks in the future.
+
+> +       /* UP configurations aren't affected */
+> +       if (atomic_read(&kvm->online_vcpus) < 2)
+> +               return;
+> +
+> +       if (boot_cpu_has(X86_FEATURE_XSAVES) ||
+> +           !guest_cpuid_has(vcpu, X86_FEATURE_XSAVEC))
+> +               return;
+
+boot_cpu_has can also be done first to cull the whole check.
+
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 27e23714e960..db0a2c40d749 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -1782,6 +1782,10 @@ static int set_efer
+>        if ((efer ^ old_efer) & KVM_MMU_EFER_ROLE_BITS)
+>                kvm_mmu_reset_context(vcpu);
+>
+> +       if (guest_cpuid_is_amd_or_hygon(vcpu) &&
+> +           efer & EFER_SVME)
+> +               kvm_hv_xsaves_xsavec_maybe_warn(vcpu);
+> +
+>        return 0;
+> }
+
+Checking guest_cpuid_is_amd_or_hygon() is relatively expensive, it
+should be done after "efer & EFER_SVME" but really the bug can happen
+just as well on Intel as far as I understand? It's just less likely
+due to the AMD erratum.
+
+I'll send a v2.
+
+Paolo
+
 
