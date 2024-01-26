@@ -1,124 +1,161 @@
-Return-Path: <kvm+bounces-7175-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7176-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD1A683DD99
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 16:35:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E94283DE6F
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 17:17:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D5872853F0
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 15:35:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B18A928410F
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 16:17:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2295D1D522;
-	Fri, 26 Jan 2024 15:35:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 907BF1DA22;
+	Fri, 26 Jan 2024 16:17:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="e1N5s1Dc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lMo5XXVV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D58301CF94;
-	Fri, 26 Jan 2024 15:35:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7604C1D53E;
+	Fri, 26 Jan 2024 16:17:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706283342; cv=none; b=FHfuZAflJqgguHhf1L9ckFdIkEZ0f7iyafLVLrJvbWxhfdUhcmyzr4sRICYjfzDCvM3+q2VhNcmwnAHB1BJcmCv3S5XabDbWVLnBAR9QWRlrdnpoa13cf36gj8GyYSLgXJCh0kaGtKyFneP+nqbzdFHua6HmcP+zVWocuzKO9DE=
+	t=1706285847; cv=none; b=TVXFVkAmSoAKley3bTdyEdcE41oEO7WKsIaHR/nYyNfzYwPJlNS1E5zEz3gcLoSQc2Zh34qMY9RNiM+2dRJWQVczNdE9WnzMDqPOB/cNESF++4zYiswAk0FrxPtICeOZFihgzNHeyHvSVRejvEIFfp/qttRZUtdcnV8SnGlYOYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706283342; c=relaxed/simple;
-	bh=Q1gySN7TT9h0jHMhyfEM8IvkE1u4CiHb4/JNQ9iYKDg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gDqLZVDlL95K2j1kQ7QZXS6HPks5C5Ar7mgpS7M2rqtB3jcgdOB+vKqeAtQW/ryomY/VPp2R7AcK6x4VPseucOzHgF7E0oAEswLbV0YPwM4KBfp43uZnJ0+GnWlNXh29s9I93p+uT/nDHZMLD+rivGslGysG4lv3D9dGY+wU5ag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=e1N5s1Dc; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 01BE740E016C;
-	Fri, 26 Jan 2024 15:35:37 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id GaR2USFls6AC; Fri, 26 Jan 2024 15:35:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1706283334; bh=P7Oe6KlLPTo7Wpl5+l3vTi17r9sFPMt5tYVi1N17yxE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=e1N5s1DcEV7OiU5ueEYz3Jxa4whCu+ho0B6R1fOpyyV+Iv+KlFHIhB9EW9cLnU0Ln
-	 zva+78aCi2XO9l9jtkUIqqWPS+3xzfiB8Yvlr3S34dn3sIn4gSxL3uyVLrY7J9lDCs
-	 NOG1rnlnfuOSQNqMZgr4kbkKNL8i+V9Bo8F3tNfhufb9DnPpUjs+TT5+evf2sGLyjS
-	 i8nfDJflpmurujqBU7N92Bc7SpVkczSbBq9xp1xljfk46HlzCivDoZQpeyErkUFZiE
-	 94QEUkF118r3VnQlWKugUtvQu7tNF+JUI91yJChdl8ltXa8AR3u6lVp4D/zzuxqgEi
-	 MNVoV5Fb1TTudu8Gb/AAX0dl0RW1TPy+Y6xQ1sGbX8O/OvRnWmDheR5aCWKuHfip5g
-	 R+LHCSSifjGrgrmVZVypkn+7PxMJFrf3rVJIxOH791SzmggCT9Vt5pj3F2/ZrYTMlb
-	 P8WnVnvXwlSt7mvO17dEIZcNtBgKPsf7RG4R062ogzhkZSdu1XAzI+bfRRqJNsRerp
-	 cwJKPQZxDWk8SWv+UyMnNO4W5xDrPnuElc8jmGgdFNcZlucu4hVIMuZDyGJTDvjbMO
-	 qHa3FNM0namjZivxU/Rj3ymRYCZLeq0P2GGQxYYMsq6f8QFN5HAxtQ1+LASrFWoH55
-	 hfiAarXcIepWsdBBMxjYqSU4=
-Received: from zn.tnic (pd953033e.dip0.t-ipconnect.de [217.83.3.62])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 2982F40E0196;
-	Fri, 26 Jan 2024 15:34:58 +0000 (UTC)
-Date: Fri, 26 Jan 2024 16:34:51 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Michael Roth <michael.roth@amd.com>
-Cc: x86@kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-	linux-mm@kvack.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-	rientjes@google.com, tobin@ibm.com, vbabka@suse.cz,
-	kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
-	pankaj.gupta@amd.com, liam.merwick@oracle.com
-Subject: Re: [PATCH v2 11/25] x86/sev: Adjust directmap to avoid inadvertant
- RMP faults
-Message-ID: <20240126153451.GDZbPRG3KxaQik-0aY@fat_crate.local>
-References: <20240126041126.1927228-1-michael.roth@amd.com>
- <20240126041126.1927228-12-michael.roth@amd.com>
+	s=arc-20240116; t=1706285847; c=relaxed/simple;
+	bh=DYWVrLkbvnVV9kxczQSiMqM4FDXcGI57c3LQ06PvT+g=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=CGT4o1xn0E9p3kFe2sVzdYVtdQ5pwmx14Mq5uhoHH6pKsCcPvc5YnYw4O5mp7tv7tiQuWZWVZg5g/nTmuQPYyHwbavWn9zoOhCs5yOvFi17RVh3klMjKbQ82bhBml8WXFk6v05E9uMctOQ/l5vP7Z1Z6wnBuKeD1SEp+YTdrdzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lMo5XXVV; arc=none smtp.client-ip=209.85.216.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-29036dc3a63so319768a91.3;
+        Fri, 26 Jan 2024 08:17:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706285846; x=1706890646; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=IH0Z6gqEjq9Etqgb5EuNK3/R5ZZnLBR/umD5N+ZaEUM=;
+        b=lMo5XXVVzcm6tZg3nXslkb+mw2cq051wDBQ+XRSuI8vy6kg0OzVtCpO5+IOuR5Fp1C
+         BdwQCR8bGl7NHeboRGoKBskMk+UzoQE9sEjNQZxKk1yxL7uit9HqmlD8k6efu6JqNRhA
+         rUcv5HGfmxH9dQZhWmRrW3WP05xrMZV2f3H/dLi7oL6oPq2Vq14HLDNzs1bvCzekSrNn
+         Kn0RTA3Sp50ARHW93GlFU8DLGFgZrDj8Ih0JWn9vHAem9Kn7A8Rsb25qmYMbK/c0VX7L
+         BXp92GGb9S693IBQ9nq9/ycRcWx2nSpBN7nd/Q4WMPMCEOz1hWNJB7Q533uAttFQ195D
+         rz7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706285846; x=1706890646;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IH0Z6gqEjq9Etqgb5EuNK3/R5ZZnLBR/umD5N+ZaEUM=;
+        b=GEj1u5Ajh2EICJp8HCYaHik2UlgPo+Y82D7QifGhsa/cXo+s0I7yD3xO6Pl6gS7E/p
+         IVx5dAeIJGTiwKsdlHEZsHEAsV4aSd1DNlicVlk7wkepg4GnYVld48709avM2hyxgbH/
+         tW7EHBvT4bznC/rqKvaw3D76Owu9UOSSYhAe441gr41P2F3QJdRA4aOUOeN0T14aDuJ0
+         9fhNU/+5p+s/JE/rFdjRxw7fe68c3sbVW9VZ2RYZf1xs6AbwCyesv8tuEtf8S16BZzSo
+         m03BAOFZxzGJ+SXHALMLaVDUVyZzprEpg8AvbAqMSNtSmvdfrmcg5IyQyXw+V3opOEIT
+         y1+Q==
+X-Gm-Message-State: AOJu0YyiyqvhOS31pzxeMnWGH/nKB1yj6io4gmT8uOnQ1nLtP5NM5kij
+	wAWh82B4eSuK6t9+mwLdfQni7SQC7pd3XLMV9qlSNG/MY0Ur2+8h
+X-Google-Smtp-Source: AGHT+IFg2reFZ61M4UuBoF52IdIYH7ZP+oGCvisAptiOGkJhoHxr/m/SK2qnztDSC2/etm5B9DcnGw==
+X-Received: by 2002:a17:90a:d14f:b0:28f:fe38:aa59 with SMTP id t15-20020a17090ad14f00b0028ffe38aa59mr123012pjw.24.1706285845631;
+        Fri, 26 Jan 2024 08:17:25 -0800 (PST)
+Received: from wuhaoyu-Nitro-AN515-57.lan ([125.41.201.75])
+        by smtp.gmail.com with ESMTPSA id px12-20020a17090b270c00b0028c8a2a9c73sm1346096pjb.25.2024.01.26.08.16.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Jan 2024 08:17:09 -0800 (PST)
+From: Haoyu Wu <haoyuwu254@gmail.com>
+To: seanjc@google.com
+Cc: pbonzini@redhat.com,
+	tglx@linutronix.de,
+	mingo@redhat.com,
+	bp@alien8.de,
+	dave.hansen@linux.intel.com,
+	x86@kernel.org,
+	hpa@zytor.com,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	zheyuma97@gmail.com,
+	Haoyu Wu <haoyuwu254@gmail.com>
+Subject: [PATCH] KVM: Fix LDR inconsistency warning caused by APIC_ID format error
+Date: Sat, 27 Jan 2024 00:16:33 +0800
+Message-Id: <20240126161633.62529-1-haoyuwu254@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240126041126.1927228-12-michael.roth@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jan 25, 2024 at 10:11:11PM -0600, Michael Roth wrote:
-> +static int adjust_direct_map(u64 pfn, int rmp_level)
-> +{
-> +	unsigned long vaddr = (unsigned long)pfn_to_kaddr(pfn);
-> +	unsigned int level;
-> +	int npages, ret;
-> +	pte_t *pte;
+Syzkaller detected a warning in the kvm_recalculate_logical_map()
+function. This function employs VCPU_ID as the current x2APIC_ID
+following the apic_x2apic_mode() check. However, the LDR value,
+as computed using the current x2APIC_ID,  fails to align with the LDR
+value that is actually set.
 
-Again, something I asked the last time but no reply:
+Syzkaller scenario:
+1) Set up VCPU's
+2) Set the APIC_BASE to 0xd00
+3) Set the APIC status for a specific state
 
-Looking at Documentation/arch/x86/x86_64/mm.rst, the direct map starts
-at page_offset_base so this here should at least check
+The issue arises within kvm_apic_state_fixup, a function responsible
+for adjusting and correcting the APIC state. Initially, it verifies
+whether the current vcpu operates in x2APIC mode by examining the
+vcpu's mode. Subsequently, the function evaluates
+vcpu->kvm->arch.x2apic_format to ascertain if the preceding kvm version
+supports x2APIC mode. In cases where kvm is compatible with x2APIC mode,
+the function compares APIC_ID and VCPU_ID for equality. If they are not
+equal, it processes APIC_ID according to the set value. The error
+manifests when vcpu->kvm->arch.x2apic_format is false; under these
+circumstances, kvm_apic_state_fixup converts APIC_ID to the xAPIC format
+and invokes kvm_apic_calc_x2apic_ldr to compute the LDR. This leads to by
+passing consistency checks between VCPU_ID and APIC_ID and results in
+calling incorrect functions for LDR calculation.
 
-	if (vaddr < __PAGE_OFFSET)
-		return 0;
+Obviously, the crux of the issue hinges on the transition of the APIC
+state and the associated operations for transitioning APIC_ID. In the
+current kernel design, APIC_ID defaults to VCPU_ID in x2APIC mode, a
+specification not required in xAPIC mode. kvm_apic_state_fixup initiates
+by assessing the current status of both VCPU and KVM to identify their
+respective APIC modes. However, subsequent evaluations focus solely on
+the APIC mode of VCPU. To address this, a feasible minor modification
+involves advancing the comparison between APIC_ID and VCPU_ID,
+positioning it prior to the evaluation of vcpu→kvm→arch.x2apic_format.
 
-I'm not sure about the upper end. Right now, the adjusting should not
-happen only for the direct map but also for the whole kernel address
-space range because we don't want to cause any mismatch between page
-mappings anywhere.
+Signed-off-by: Haoyu Wu <haoyuwu254@gmail.com>
+---
+ arch/x86/kvm/lapic.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Which means, this function should be called adjust_kernel_map() or so...
-
-Hmmm.
-
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 3242f3da2..16c97d57d 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -2933,16 +2933,16 @@ static int kvm_apic_state_fixup(struct kvm_vcpu *vcpu,
+ 		u32 *ldr = (u32 *)(s->regs + APIC_LDR);
+ 		u64 icr;
+ 
+-		if (vcpu->kvm->arch.x2apic_format) {
+-			if (*id != vcpu->vcpu_id)
+-				return -EINVAL;
+-		} else {
++		if (*id != vcpu->vcpu_id)
++			return -EINVAL;
++		if (!vcpu->kvm->arch.x2apic_format) {
+ 			if (set)
+ 				*id >>= 24;
+ 			else
+ 				*id <<= 24;
+ 		}
+ 
++
+ 		/*
+ 		 * In x2APIC mode, the LDR is fixed and based on the id.  And
+ 		 * ICR is internally a single 64-bit register, but needs to be
 -- 
-Regards/Gruss,
-    Boris.
+2.34.1
 
-https://people.kernel.org/tglx/notes-about-netiquette
 
