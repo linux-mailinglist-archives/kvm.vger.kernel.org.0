@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-7219-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7220-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93FC383E47F
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 23:05:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F43383E482
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 23:05:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B71BA1C22E9D
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 22:05:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 750F71C21206
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 22:05:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EA103EA86;
-	Fri, 26 Jan 2024 22:04:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D9364595F;
+	Fri, 26 Jan 2024 22:04:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gIMUMEf2"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fwB1mHsj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AFF5286BD
-	for <kvm@vger.kernel.org>; Fri, 26 Jan 2024 22:04:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BD9443AC4
+	for <kvm@vger.kernel.org>; Fri, 26 Jan 2024 22:04:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706306684; cv=none; b=ut0uTaZ6alupKAcKVDhoQnoYwXxDMjohcN8XjJaJ1YAP+RnjRoec61QuA5cc802ey+w5qjzrnabiGWeN+crGGG3gHzgf1suXuhxo0WDlV2f+NPJaobsqsJVJH34LnG776Z8m+wR6BIbm4oVIUFhCc7gGllrUoTAkOtEV2yFPNSs=
+	t=1706306690; cv=none; b=gGjY2uTEZwkEFkgz75nKHXKyGPUAkKo5KL37cbIOLs3G0O75fsTi6/7aGxazPYiy3jKTevsrxE9Eo4qlD8V7BcwaFEoWdmhtfitB4dy8jY4IWPXfb1PYtYWLjp+bX5pEfUg6zLfI/JDS1aztvdwPMHQvQvu96P9Tof0f0iz89G8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706306684; c=relaxed/simple;
-	bh=Rkq9mzCcFxYl4vmeU6ZS3hbT/hAYTPeWCXcQ8M0y24k=;
+	s=arc-20240116; t=1706306690; c=relaxed/simple;
+	bh=7LZsh/ftUO/+WptUJpQnSY+dGSISrzOGS6CV50LmCNY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WkjTvCPKktxs39qIQ0/elkTcKUjQlXwPxGNXGvU8/3h9hUebARrJjNLXF4g00pDKtE3oL4lDAfl87aLD9YYjpu3Gzn3+D1ZURafBuEvqDfZOTGM4qsb6zzT87Tbv0Kx7CK1px070imAr397g5OdnSPXsghCWv93OtVDYcjRBZZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=gIMUMEf2; arc=none smtp.client-ip=209.85.218.51
+	 MIME-Version:Content-Type; b=k8UHud2ItAriv/Jm4zC5KOCOFzLbZG/vcrIUZN1DWmKZ7T4o1ohavoUkd1pscgymJO+Nn6f1BHwtxiiwms6rh8y4NTqzx/SpaiDctJ/wiwKnudzJsHueqV5iZGdsy5UKj+jYqZIQrLER14DSnkuIE8CjA5yc1ACgXkT7aUfGy4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=fwB1mHsj; arc=none smtp.client-ip=209.85.208.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a2f22bfb4e6so166138266b.0
-        for <kvm@vger.kernel.org>; Fri, 26 Jan 2024 14:04:42 -0800 (PST)
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-55a539d205aso979641a12.3
+        for <kvm@vger.kernel.org>; Fri, 26 Jan 2024 14:04:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1706306681; x=1706911481; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1706306686; x=1706911486; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Gp6DeXIBN6rItUvSYJmDDzKmD7zwVKQwnsgLGcelMOw=;
-        b=gIMUMEf2qHnctIiPBzoB5g3h3NBdYR70FQrA9VsatGqfYPcM/vAJdGJ/RvxdB9Vm/l
-         SXYYOV+22COn3LjXP2oTxahDL8W8TDq+5cJnNTZpRI5Wm7KbPufhY3+xUIDv9wN7lik8
-         3gMSaZM/1qtnYaB+2GigHSn/IJ42fUWCDaWKhy2Jgn2UbjPDhwnk8Q6jgc90sEoaohRR
-         FmsjTqvaJvDmzY1GyKqXOrakoPu//QWIGCTI6TFQ6Dv7HyX9nHAMtqFSiI+KB9FOTsyo
-         s5xitVltlQBtCAxEXS08H/5Q8RR5mZKKoV6/wi2RZmWh4hk7hXLbVigl3CbK1mh+zzR6
-         p7NQ==
+        bh=VRDZsAVCeKNjeYo+uMKOWsXHzCtDJO1BqKvym46fO1w=;
+        b=fwB1mHsjhJL3Ptx9uEke9oErxBkbypIYlls6vAStT9DwCcUPNURMGJD1b+2+23kJjC
+         LQROo7RG9QsTbercKGicqCPVGnrcQthwdikJhMTzWpcAodWPvLXVsBRaNfms557r530w
+         dL86xjbPUNIqqckqpkz0SrLidFVmeo115Jed5IQRhCkElCco4UNTnQgudfD+KeNi/jQ2
+         wRz9JXHkEzWRvtKcNAdKm6CZT6rVH0g7ztiZbsmDdpFtkihnyB9zd2q1ktlqi4RC6FvN
+         rpQGk+379HjWNWcMl/Q9KzBaVMbHvTBwTGWuDRp7H4Hv3ie7ST+UtES8X01lRSZLKnyb
+         YfZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706306681; x=1706911481;
+        d=1e100.net; s=20230601; t=1706306686; x=1706911486;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Gp6DeXIBN6rItUvSYJmDDzKmD7zwVKQwnsgLGcelMOw=;
-        b=HND7a9tjt7tpfUMw/ROHLliR1tOjM4CS2tNjznOFIC7PaDEd9UpqaS5vSu5G7d9Go0
-         ReC8u33ZGTarFKOZzb6LdUqpTSbXXMKx6vwQX5iph6O6Go6l6dhkLq41+v7wSOY12GD+
-         oglwoTpFunThe4UwR4pBL8FHnHPdToz0Y1ln7G7aEiVfBbgmhmtvpQeMTB5SGN5ytRz0
-         4C1mGXOmSqcQRZdUQt5JV0anYf84r8VHCGl+oAWHLModdbXUSSigZCW8TsnFQMP2486m
-         us06elc6LBpJ/sejYau90fH5HzkKM0NcvaFPcNMV3Lj5jBxeyyWMPqw8argwFpE6MB4S
-         ruZg==
-X-Gm-Message-State: AOJu0YwrizP5EvxRdcknWxnvowFvForYW9/VrSGmjzfoGm2ZYjI6eBNp
-	myXNrf0QrdClodcy/wer+7M2SdIoyvoLUfKN04m7ckK/Ex2q34rVw73/KG1fAac=
-X-Google-Smtp-Source: AGHT+IG2UFJF/DHmCLVHGidwqpa4bW5tblCDTCxKG8kjUEapwEiqAT3tnzoWhQ5lLj+4IuvY3q++IA==
-X-Received: by 2002:a17:906:3c59:b0:a34:9a5e:e15e with SMTP id i25-20020a1709063c5900b00a349a5ee15emr400769ejg.28.1706306680752;
-        Fri, 26 Jan 2024 14:04:40 -0800 (PST)
+        bh=VRDZsAVCeKNjeYo+uMKOWsXHzCtDJO1BqKvym46fO1w=;
+        b=Qn2PeDSLEo162Iu20I/TfwVCmEtAOcMckyPyFS2qG9BxM5NfBHheFrBn5Re3Fy0iRa
+         rly4Urqmez7JuSU0mo2/iKdFpeGWEkF4rEdPPNyoO4JAh/hMBiShXQaE4chmkN3TSy0i
+         5fW0Iww8og1gG36ekPiUUbGzKT37X0No89wcM/3kb31z4U6LgfsveL3w1pg0dhCkzlCJ
+         Axrg2g/GBabLzgUOTAXkfiqKM48ex7D830cz3yVbs8V1gs5jskOF2O3i94DRR8BTldmb
+         g74n/bGrmYVhpQEgZh2+IU59VA5XDBn0uMczDkoeSutmeVney09nvAKPcqAg+VpCJmHw
+         11bg==
+X-Gm-Message-State: AOJu0Yzxt0O5KCZ4OGR/g0Mrw7HB0EsmMXuhU8qFCNIGhn20G8x8HDOE
+	ZUciPWtm/s7uPH/6e0Eb9DHJXjeBzFzxPvLmlnG8BIKU80YJnpcGYHa43n+nN4c=
+X-Google-Smtp-Source: AGHT+IHTfEcgSksuOIIKpp6/FxDzCiCmGegHFfvtO9Oagqe7Xe64Ye3dgCpZ2GcKkkqpkEKaxO5XfA==
+X-Received: by 2002:a05:6402:22cb:b0:55e:b1c2:3939 with SMTP id dm11-20020a05640222cb00b0055eb1c23939mr48980edb.37.1706306686644;
+        Fri, 26 Jan 2024 14:04:46 -0800 (PST)
 Received: from m1x-phil.lan ([176.176.142.39])
-        by smtp.gmail.com with ESMTPSA id kq19-20020a170906abd300b00a29db9e8c84sm1051034ejb.220.2024.01.26.14.04.38
+        by smtp.gmail.com with ESMTPSA id er24-20020a056402449800b0055a82fe01cdsm1008665edb.67.2024.01.26.14.04.45
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Fri, 26 Jan 2024 14:04:40 -0800 (PST)
+        Fri, 26 Jan 2024 14:04:46 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org,
@@ -79,11 +79,10 @@ Cc: qemu-arm@nongnu.org,
 	Vladimir Sementsov-Ogievskiy <vsementsov@yandex-team.ru>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Alexander Graf <agraf@csgraf.de>
-Subject: [PATCH v2 05/23] target/arm: Prefer fast cpu_env() over slower CPU QOM cast macro
-Date: Fri, 26 Jan 2024 23:03:47 +0100
-Message-ID: <20240126220407.95022-6-philmd@linaro.org>
+	Michael Rolnik <mrolnik@gmail.com>
+Subject: [PATCH v2 06/23] target/avr: Prefer fast cpu_env() over slower CPU QOM cast macro
+Date: Fri, 26 Jan 2024 23:03:48 +0100
+Message-ID: <20240126220407.95022-7-philmd@linaro.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20240126220407.95022-1-philmd@linaro.org>
 References: <20240126220407.95022-1-philmd@linaro.org>
@@ -101,291 +100,149 @@ in scripts/coccinelle/cpu_env.cocci_template header.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- hw/intc/arm_gicv3_cpuif_common.c |  5 +----
- target/arm/cpu.c                 | 19 +++++--------------
- target/arm/debug_helper.c        |  8 ++------
- target/arm/gdbstub.c             |  6 ++----
- target/arm/gdbstub64.c           |  6 ++----
- target/arm/helper.c              |  9 +++------
- target/arm/hvf/hvf.c             | 12 ++++--------
- target/arm/kvm.c                 |  3 +--
- target/arm/ptw.c                 |  3 +--
- target/arm/tcg/cpu32.c           |  3 +--
- 10 files changed, 22 insertions(+), 52 deletions(-)
+ target/avr/cpu.c     | 27 +++++++--------------------
+ target/avr/gdbstub.c |  6 ++----
+ target/avr/helper.c  | 10 +++-------
+ 3 files changed, 12 insertions(+), 31 deletions(-)
 
-diff --git a/hw/intc/arm_gicv3_cpuif_common.c b/hw/intc/arm_gicv3_cpuif_common.c
-index ff1239f65d..bab3c3cdbd 100644
---- a/hw/intc/arm_gicv3_cpuif_common.c
-+++ b/hw/intc/arm_gicv3_cpuif_common.c
-@@ -15,8 +15,5 @@
+diff --git a/target/avr/cpu.c b/target/avr/cpu.c
+index f5cbdc4a8c..2ad24373a8 100644
+--- a/target/avr/cpu.c
++++ b/target/avr/cpu.c
+@@ -43,31 +43,22 @@ static vaddr avr_cpu_get_pc(CPUState *cs)
  
- void gicv3_set_gicv3state(CPUState *cpu, GICv3CPUState *s)
+ static bool avr_cpu_has_work(CPUState *cs)
  {
--    ARMCPU *arm_cpu = ARM_CPU(cpu);
--    CPUARMState *env = &arm_cpu->env;
+-    AVRCPU *cpu = AVR_CPU(cs);
+-    CPUAVRState *env = &cpu->env;
 -
--    env->gicv3state = (void *)s;
-+    cpu_env(cpu)->gicv3state = (void *)s;
- };
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 593695b424..3970223f33 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -51,8 +51,7 @@
- 
- static void arm_cpu_set_pc(CPUState *cs, vaddr value)
- {
--    ARMCPU *cpu = ARM_CPU(cs);
--    CPUARMState *env = &cpu->env;
-+    CPUARMState *env = cpu_env(cs);
- 
-     if (is_a64(env)) {
-         env->pc = value;
-@@ -65,8 +64,7 @@ static void arm_cpu_set_pc(CPUState *cs, vaddr value)
- 
- static vaddr arm_cpu_get_pc(CPUState *cs)
- {
--    ARMCPU *cpu = ARM_CPU(cs);
--    CPUARMState *env = &cpu->env;
-+    CPUARMState *env = cpu_env(cs);
- 
-     if (is_a64(env)) {
-         return env->pc;
-@@ -994,19 +992,15 @@ static void arm_cpu_kvm_set_irq(void *opaque, int irq, int level)
- 
- static bool arm_cpu_virtio_is_big_endian(CPUState *cs)
- {
--    ARMCPU *cpu = ARM_CPU(cs);
--    CPUARMState *env = &cpu->env;
--
-     cpu_synchronize_state(cs);
--    return arm_cpu_data_is_big_endian(env);
-+    return arm_cpu_data_is_big_endian(cpu_env(cs));
+     return (cs->interrupt_request & (CPU_INTERRUPT_HARD | CPU_INTERRUPT_RESET))
+-            && cpu_interrupts_enabled(env);
++            && cpu_interrupts_enabled(cpu_env(cs));
  }
  
- #endif
- 
- static void arm_disas_set_info(CPUState *cpu, disassemble_info *info)
+ static void avr_cpu_synchronize_from_tb(CPUState *cs,
+                                         const TranslationBlock *tb)
  {
--    ARMCPU *ac = ARM_CPU(cpu);
--    CPUARMState *env = &ac->env;
-+    CPUARMState *env = cpu_env(cpu);
-     bool sctlr_b;
- 
-     if (is_a64(env)) {
-@@ -2428,10 +2422,7 @@ static Property arm_cpu_properties[] = {
- 
- static const gchar *arm_gdb_arch_name(CPUState *cs)
- {
--    ARMCPU *cpu = ARM_CPU(cs);
--    CPUARMState *env = &cpu->env;
+-    AVRCPU *cpu = AVR_CPU(cs);
+-    CPUAVRState *env = &cpu->env;
 -
--    if (arm_feature(env, ARM_FEATURE_IWMMXT)) {
-+    if (arm_feature(cpu_env(cs), ARM_FEATURE_IWMMXT)) {
-         return "iwmmxt";
-     }
-     return "arm";
-diff --git a/target/arm/debug_helper.c b/target/arm/debug_helper.c
-index 7d856acddf..7bd5467414 100644
---- a/target/arm/debug_helper.c
-+++ b/target/arm/debug_helper.c
-@@ -468,8 +468,7 @@ void arm_debug_excp_handler(CPUState *cs)
-      * Called by core code when a watchpoint or breakpoint fires;
-      * need to check which one and raise the appropriate exception.
-      */
--    ARMCPU *cpu = ARM_CPU(cs);
--    CPUARMState *env = &cpu->env;
-+    CPUARMState *env = cpu_env(cs);
-     CPUWatchpoint *wp_hit = cs->watchpoint_hit;
+     tcg_debug_assert(!(cs->tcg_cflags & CF_PCREL));
+-    env->pc_w = tb->pc / 2; /* internally PC points to words */
++    cpu_env(cs)->pc_w = tb->pc / 2; /* internally PC points to words */
+ }
  
-     if (wp_hit) {
-@@ -757,9 +756,6 @@ void hw_breakpoint_update_all(ARMCPU *cpu)
- 
- vaddr arm_adjust_watchpoint_address(CPUState *cs, vaddr addr, int len)
+ static void avr_restore_state_to_opc(CPUState *cs,
+                                      const TranslationBlock *tb,
+                                      const uint64_t *data)
  {
--    ARMCPU *cpu = ARM_CPU(cs);
--    CPUARMState *env = &cpu->env;
+-    AVRCPU *cpu = AVR_CPU(cs);
+-    CPUAVRState *env = &cpu->env;
 -
-     /*
-      * In BE32 system mode, target memory is stored byteswapped (on a
-      * little-endian host system), and by the time we reach here (via an
-@@ -767,7 +763,7 @@ vaddr arm_adjust_watchpoint_address(CPUState *cs, vaddr addr, int len)
-      * to account for that, which means that watchpoints will not match.
-      * Undo the adjustment here.
-      */
--    if (arm_sctlr_b(env)) {
-+    if (arm_sctlr_b(cpu_env(cs))) {
-         if (len == 1) {
-             addr ^= 3;
-         } else if (len == 2) {
-diff --git a/target/arm/gdbstub.c b/target/arm/gdbstub.c
-index 28f546a5ff..dc6c29669c 100644
---- a/target/arm/gdbstub.c
-+++ b/target/arm/gdbstub.c
-@@ -40,8 +40,7 @@ typedef struct RegisterSysregXmlParam {
+-    env->pc_w = data[0];
++    cpu_env(cs)->pc_w = data[0];
+ }
  
- int arm_cpu_gdb_read_register(CPUState *cs, GByteArray *mem_buf, int n)
+ static void avr_cpu_reset_hold(Object *obj)
+@@ -165,8 +156,7 @@ static ObjectClass *avr_cpu_class_by_name(const char *cpu_model)
+ 
+ static void avr_cpu_dump_state(CPUState *cs, FILE *f, int flags)
  {
--    ARMCPU *cpu = ARM_CPU(cs);
--    CPUARMState *env = &cpu->env;
-+    CPUARMState *env = cpu_env(cs);
- 
-     if (n < 16) {
-         /* Core integer register.  */
-@@ -61,8 +60,7 @@ int arm_cpu_gdb_read_register(CPUState *cs, GByteArray *mem_buf, int n)
- 
- int arm_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
- {
--    ARMCPU *cpu = ARM_CPU(cs);
--    CPUARMState *env = &cpu->env;
-+    CPUARMState *env = cpu_env(cs);
-     uint32_t tmp;
- 
-     tmp = ldl_p(mem_buf);
-diff --git a/target/arm/gdbstub64.c b/target/arm/gdbstub64.c
-index d7b79a6589..b9f29b0a60 100644
---- a/target/arm/gdbstub64.c
-+++ b/target/arm/gdbstub64.c
-@@ -24,8 +24,7 @@
- 
- int aarch64_cpu_gdb_read_register(CPUState *cs, GByteArray *mem_buf, int n)
- {
--    ARMCPU *cpu = ARM_CPU(cs);
--    CPUARMState *env = &cpu->env;
-+    CPUARMState *env = cpu_env(cs);
- 
-     if (n < 31) {
-         /* Core integer register.  */
-@@ -45,8 +44,7 @@ int aarch64_cpu_gdb_read_register(CPUState *cs, GByteArray *mem_buf, int n)
- 
- int aarch64_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
- {
--    ARMCPU *cpu = ARM_CPU(cs);
--    CPUARMState *env = &cpu->env;
-+    CPUARMState *env = cpu_env(cs);
-     uint64_t tmp;
- 
-     tmp = ldq_p(mem_buf);
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index e068d35383..a504ed0612 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -10900,8 +10900,7 @@ static void arm_cpu_do_interrupt_aarch32_hyp(CPUState *cs)
-      * PSTATE A/I/F masks are set based only on the SCR.EA/IRQ/FIQ values.
-      */
-     uint32_t addr, mask;
--    ARMCPU *cpu = ARM_CPU(cs);
--    CPUARMState *env = &cpu->env;
-+    CPUARMState *env = cpu_env(cs);
- 
-     switch (cs->exception_index) {
-     case EXCP_UDEF:
-@@ -10979,8 +10978,7 @@ static void arm_cpu_do_interrupt_aarch32_hyp(CPUState *cs)
- 
- static void arm_cpu_do_interrupt_aarch32(CPUState *cs)
- {
--    ARMCPU *cpu = ARM_CPU(cs);
--    CPUARMState *env = &cpu->env;
-+    CPUARMState *env = cpu_env(cs);
-     uint32_t addr;
-     uint32_t mask;
-     int new_mode;
-@@ -11479,8 +11477,7 @@ static void arm_cpu_do_interrupt_aarch64(CPUState *cs)
- #ifdef CONFIG_TCG
- static void tcg_handle_semihosting(CPUState *cs)
- {
--    ARMCPU *cpu = ARM_CPU(cs);
--    CPUARMState *env = &cpu->env;
-+    CPUARMState *env = cpu_env(cs);
- 
-     if (is_a64(env)) {
-         qemu_log_mask(CPU_LOG_INT,
-diff --git a/target/arm/hvf/hvf.c b/target/arm/hvf/hvf.c
-index a537a5bc94..69211d0a60 100644
---- a/target/arm/hvf/hvf.c
-+++ b/target/arm/hvf/hvf.c
-@@ -1004,8 +1004,7 @@ void hvf_kick_vcpu_thread(CPUState *cpu)
- static void hvf_raise_exception(CPUState *cpu, uint32_t excp,
-                                 uint32_t syndrome)
- {
--    ARMCPU *arm_cpu = ARM_CPU(cpu);
--    CPUARMState *env = &arm_cpu->env;
-+    CPUARMState *env = cpu_env(cpu);
- 
-     cpu->exception_index = excp;
-     env->exception.target_el = 1;
-@@ -1483,8 +1482,7 @@ static bool hvf_sysreg_write_cp(CPUState *cpu, uint32_t reg, uint64_t val)
- 
- static int hvf_sysreg_write(CPUState *cpu, uint32_t reg, uint64_t val)
- {
--    ARMCPU *arm_cpu = ARM_CPU(cpu);
--    CPUARMState *env = &arm_cpu->env;
-+    CPUARMState *env = cpu_env(cpu);
- 
-     trace_hvf_sysreg_write(reg,
-                            SYSREG_OP0(reg),
-@@ -2150,8 +2148,7 @@ static void hvf_put_gdbstub_debug_registers(CPUState *cpu)
-  */
- static void hvf_put_guest_debug_registers(CPUState *cpu)
- {
--    ARMCPU *arm_cpu = ARM_CPU(cpu);
--    CPUARMState *env = &arm_cpu->env;
-+    CPUARMState *env = cpu_env(cpu);
-     hv_return_t r = HV_SUCCESS;
+-    AVRCPU *cpu = AVR_CPU(cs);
+-    CPUAVRState *env = &cpu->env;
++    CPUAVRState *env = cpu_env(cs);
      int i;
  
-@@ -2205,8 +2202,7 @@ static void hvf_arch_set_traps(void)
+     qemu_fprintf(f, "\n");
+@@ -276,8 +266,7 @@ static void avr_cpu_class_init(ObjectClass *oc, void *data)
+  */
+ static void avr_avr5_initfn(Object *obj)
+ {
+-    AVRCPU *cpu = AVR_CPU(obj);
+-    CPUAVRState *env = &cpu->env;
++    CPUAVRState *env = cpu_env(CPU(obj));
  
- void hvf_arch_update_guest_debug(CPUState *cpu)
+     set_avr_feature(env, AVR_FEATURE_LPM);
+     set_avr_feature(env, AVR_FEATURE_IJMP_ICALL);
+@@ -305,8 +294,7 @@ static void avr_avr5_initfn(Object *obj)
+  */
+ static void avr_avr51_initfn(Object *obj)
  {
--    ARMCPU *arm_cpu = ARM_CPU(cpu);
--    CPUARMState *env = &arm_cpu->env;
-+    CPUARMState *env = cpu_env(cpu);
+-    AVRCPU *cpu = AVR_CPU(obj);
+-    CPUAVRState *env = &cpu->env;
++    CPUAVRState *env = cpu_env(CPU(obj));
  
-     /* Check whether guest debugging is enabled */
-     cpu->accel->guest_debug_enabled = cpu->singlestep_enabled ||
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 8f52b211f9..9e97c847b3 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -1957,8 +1957,7 @@ int kvm_arch_destroy_vcpu(CPUState *cs)
- /* Callers must hold the iothread mutex lock */
- static void kvm_inject_arm_sea(CPUState *c)
+     set_avr_feature(env, AVR_FEATURE_LPM);
+     set_avr_feature(env, AVR_FEATURE_IJMP_ICALL);
+@@ -335,8 +323,7 @@ static void avr_avr51_initfn(Object *obj)
+  */
+ static void avr_avr6_initfn(Object *obj)
  {
--    ARMCPU *cpu = ARM_CPU(c);
--    CPUARMState *env = &cpu->env;
-+    CPUARMState *env = cpu_env(c);
-     uint32_t esr;
-     bool same_el;
+-    AVRCPU *cpu = AVR_CPU(obj);
+-    CPUAVRState *env = &cpu->env;
++    CPUAVRState *env = cpu_env(CPU(obj));
  
-diff --git a/target/arm/ptw.c b/target/arm/ptw.c
-index 5eb3577bcd..57a761ad68 100644
---- a/target/arm/ptw.c
-+++ b/target/arm/ptw.c
-@@ -3528,8 +3528,7 @@ bool get_phys_addr(CPUARMState *env, target_ulong address,
- hwaddr arm_cpu_get_phys_page_attrs_debug(CPUState *cs, vaddr addr,
-                                          MemTxAttrs *attrs)
+     set_avr_feature(env, AVR_FEATURE_LPM);
+     set_avr_feature(env, AVR_FEATURE_IJMP_ICALL);
+diff --git a/target/avr/gdbstub.c b/target/avr/gdbstub.c
+index 150344d8b9..2eeee2bf4e 100644
+--- a/target/avr/gdbstub.c
++++ b/target/avr/gdbstub.c
+@@ -23,8 +23,7 @@
+ 
+ int avr_cpu_gdb_read_register(CPUState *cs, GByteArray *mem_buf, int n)
  {
--    ARMCPU *cpu = ARM_CPU(cs);
--    CPUARMState *env = &cpu->env;
-+    CPUARMState *env = cpu_env(cs);
-     ARMMMUIdx mmu_idx = arm_mmu_idx(env);
-     ARMSecuritySpace ss = arm_security_space(env);
-     S1Translate ptw = {
-diff --git a/target/arm/tcg/cpu32.c b/target/arm/tcg/cpu32.c
-index d9e0e2a4dd..c11c5c85c4 100644
---- a/target/arm/tcg/cpu32.c
-+++ b/target/arm/tcg/cpu32.c
-@@ -102,8 +102,7 @@ void aa32_max_features(ARMCPU *cpu)
- static bool arm_v7m_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+-    AVRCPU *cpu = AVR_CPU(cs);
+-    CPUAVRState *env = &cpu->env;
++    CPUAVRState *env = cpu_env(cs);
+ 
+     /*  R */
+     if (n < 32) {
+@@ -53,8 +52,7 @@ int avr_cpu_gdb_read_register(CPUState *cs, GByteArray *mem_buf, int n)
+ 
+ int avr_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
  {
-     CPUClass *cc = CPU_GET_CLASS(cs);
--    ARMCPU *cpu = ARM_CPU(cs);
--    CPUARMState *env = &cpu->env;
-+    CPUARMState *env = cpu_env(cs);
-     bool ret = false;
+-    AVRCPU *cpu = AVR_CPU(cs);
+-    CPUAVRState *env = &cpu->env;
++    CPUAVRState *env = cpu_env(cs);
+ 
+     /*  R */
+     if (n < 32) {
+diff --git a/target/avr/helper.c b/target/avr/helper.c
+index fdc9884ea0..eeca415c43 100644
+--- a/target/avr/helper.c
++++ b/target/avr/helper.c
+@@ -30,8 +30,7 @@
+ 
+ bool avr_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+ {
+-    AVRCPU *cpu = AVR_CPU(cs);
+-    CPUAVRState *env = &cpu->env;
++    CPUAVRState *env = cpu_env(cs);
  
      /*
+      * We cannot separate a skip from the next instruction,
+@@ -69,8 +68,7 @@ bool avr_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+ 
+ void avr_cpu_do_interrupt(CPUState *cs)
+ {
+-    AVRCPU *cpu = AVR_CPU(cs);
+-    CPUAVRState *env = &cpu->env;
++    CPUAVRState *env = cpu_env(cs);
+ 
+     uint32_t ret = env->pc_w;
+     int vector = 0;
+@@ -144,9 +142,7 @@ bool avr_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+             if (probe) {
+                 page_size = 1;
+             } else {
+-                AVRCPU *cpu = AVR_CPU(cs);
+-                CPUAVRState *env = &cpu->env;
+-                env->fullacc = 1;
++                cpu_env(cs)->fullacc = 1;
+                 cpu_loop_exit_restore(cs, retaddr);
+             }
+         }
 -- 
 2.41.0
 
