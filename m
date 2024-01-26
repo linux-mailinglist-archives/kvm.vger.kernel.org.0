@@ -1,251 +1,470 @@
-Return-Path: <kvm+bounces-7242-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7243-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D2EF83E6F5
-	for <lists+kvm@lfdr.de>; Sat, 27 Jan 2024 00:28:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 56AC883E701
+	for <lists+kvm@lfdr.de>; Sat, 27 Jan 2024 00:37:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 520A11C24F05
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 23:28:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 738AE1C24915
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 23:37:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C741D5B5B4;
-	Fri, 26 Jan 2024 23:26:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AED359B43;
+	Fri, 26 Jan 2024 23:37:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Dgi7QXBT"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="j0/V4gqc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 711445B5A2;
-	Fri, 26 Jan 2024 23:26:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31DEF21104;
+	Fri, 26 Jan 2024 23:37:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706311605; cv=none; b=JnZ0meAsY/APqGpQvyiZUkcD2fwKJ3O6xfSKFotkdLsFSx0tzExSyP1tik84P2dIizhu7tOV3UL8lFVqOiIPmCpJVNeuz/y9DLzMIpppLCZpLQgpVsAU98qfbxtytDoMbGG503e11H59yynuj9XOP/2AwjzWt3xXzCkgUnpLebw=
+	t=1706312243; cv=none; b=a3Q7xQRdXayE5nMq63PVAYUwUlNsHtaiHQ8F/gg6Cag3EMs4h4LRBxXRJZ7uA5UlXGTSszop7Sq1BhyKGefOEA1c4mYcpW866FXKn0mWNwmo1hBkVF6UJULbMKW6+OE28+IVHNrfUD74+bgyqemAkPTweQDV3yLgf8KwSyyecuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706311605; c=relaxed/simple;
-	bh=4kglTVeS+XJa2Xp52prmK0+CovRPk+1iqNVnduvL7Lo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JPHmyKgiGJqkCWS8IxxBbik5LN15T630xVSgOxT1cQ2S2xQF+ncP2YvSNUPyOib8FqfQsSv1rLLSWymUyH5oYMKfUfbOD6IpnZDI8tGQN4nqNDAHBmOLNAW2XEG9+Hnuq9J6GvCvI2PXbmOg1cdicn+i4ngIld7d9z4c7QRl1PQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Dgi7QXBT; arc=none smtp.client-ip=198.175.65.15
+	s=arc-20240116; t=1706312243; c=relaxed/simple;
+	bh=vlpuoiSazSjngAmMLOc+ApMwriF0clgrRCONq8I4xeo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dXp1jltqzjCUfcFCg6/llOakChxO+HgAAvdVsYnPZfAd6pI0kC6VJNNRqdLxZx2rK7YDRmm/UCTCFV0b6Gg9ejk/rjIoS1A6UBoja/r9sGC8cSuvvJ2nLLsuN2bcWOyPRYQpev7qsVaOAiQxwQD7DfIUC9nQ2/izANCoqd/Bbos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=j0/V4gqc; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706311604; x=1737847604;
-  h=date:from:to:cc:subject:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=4kglTVeS+XJa2Xp52prmK0+CovRPk+1iqNVnduvL7Lo=;
-  b=Dgi7QXBT9VPzqo7y/UBB+1oy3OifjHlkHOaG0CJDZuit+12pNnFC+cw8
-   RgTXCGYAIfrw7UkAgtWHJqeNCY551X0p8nzVoZ0ItH1rPwJEx9u4EHGmR
-   aH4aTw7JWiZBK1iZQf8d8akgvyq29+cxu9rhKWgUXVx8bp7lE1E9M5RFe
-   M1bwm3NfHgC7JqRfUe/yfotxNzXzEWObuhKjzezffa7+aJ+U8j9Q+Qv9H
-   MtzEcfRErJyjgbUL8/o1mHZM2MQasrvhq3KmeGGdJCSMJsFt1tcQR5Ver
-   ik8ZKv/bbJuQHPPQr7sHc9oCKEuzynD9OdE6xnRYvZz7iGquIl4Sna6TM
+  t=1706312241; x=1737848241;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=vlpuoiSazSjngAmMLOc+ApMwriF0clgrRCONq8I4xeo=;
+  b=j0/V4gqcUC9SQ20Mw6IjhsthaOoqE6inJrn38UcHRPWQLzgr8xh5LYof
+   Sbjvd2E00Q+/zH2qlKyhrSIuDcmPmjmJ/Ex2um+hgcLGPmhZO0AwM+5O7
+   Ijv1+wl8L1kLkMoywJUoPHDnVpgwehUf6YDoxiihAyv2qiTh/XvwlsSni
+   cN72KPOSSoDFTOTCARCaYiAXKp6JH+lyqtAGSHf6cITq8yFnovdwmfZrX
+   fgyfgMxurdz0cNmVDOVqCazb5pWIYnPBJpEX/Q5bvSGzZpqE+XmmNh8OG
+   j71FAIGTY6WJ0+Hvmw7JoQGpg+klaz/4gMU1HcrLRj+TiftxBbvXfBwWU
    Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="2477208"
+X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="9990612"
 X-IronPort-AV: E=Sophos;i="6.05,220,1701158400"; 
-   d="scan'208";a="2477208"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2024 15:26:44 -0800
+   d="scan'208";a="9990612"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2024 15:37:20 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="906457771"
+X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="821290705"
 X-IronPort-AV: E=Sophos;i="6.05,220,1701158400"; 
-   d="scan'208";a="906457771"
-Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.24.100.114])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2024 15:26:41 -0800
-Date: Fri, 26 Jan 2024 15:32:00 -0800
+   d="scan'208";a="821290705"
+Received: from srinivas-otcpl-7600.jf.intel.com (HELO jacob-builder.jf.intel.com) ([10.54.39.116])
+  by orsmga001.jf.intel.com with ESMTP; 26 Jan 2024 15:37:19 -0800
 From: Jacob Pan <jacob.jun.pan@linux.intel.com>
-To: Thomas Gleixner <tglx@linutronix.de>
-Cc: Peter Zijlstra <peterz@infradead.org>, LKML
- <linux-kernel@vger.kernel.org>, X86 Kernel <x86@kernel.org>,
- iommu@lists.linux.dev, Lu Baolu <baolu.lu@linux.intel.com>,
- kvm@vger.kernel.org, Dave Hansen <dave.hansen@intel.com>, Joerg Roedel
- <joro@8bytes.org>, "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov
- <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>, Raj Ashok
- <ashok.raj@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>,
- maz@kernel.org, seanjc@google.com, Robin Murphy <robin.murphy@arm.com>,
- jacob.jun.pan@linux.intel.com
-Subject: Re: [PATCH RFC 09/13] x86/irq: Install posted MSI notification
- handler
-Message-ID: <20240126153200.720883db@jacob-builder>
-In-Reply-To: <87zfyksyge.ffs@tglx>
-References: <20231112041643.2868316-1-jacob.jun.pan@linux.intel.com>
- <20231112041643.2868316-10-jacob.jun.pan@linux.intel.com>
- <20231115125624.GF3818@noisy.programming.kicks-ass.net>
- <87cyvjun3z.ffs@tglx>
- <20231207204607.2d2a3b72@jacob-builder>
- <87zfyksyge.ffs@tglx>
-Organization: OTC
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+To: LKML <linux-kernel@vger.kernel.org>,
+	X86 Kernel <x86@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	iommu@lists.linux.dev,
+	Thomas Gleixner <tglx@linutronix.de>,
+	"Lu Baolu" <baolu.lu@linux.intel.com>,
+	kvm@vger.kernel.org,
+	Dave Hansen <dave.hansen@intel.com>,
+	Joerg Roedel <joro@8bytes.org>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	"Borislav Petkov" <bp@alien8.de>,
+	"Ingo Molnar" <mingo@redhat.com>
+Cc: Paul Luse <paul.e.luse@intel.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Raj Ashok <ashok.raj@intel.com>,
+	"Tian, Kevin" <kevin.tian@intel.com>,
+	maz@kernel.org,
+	seanjc@google.com,
+	"Robin Murphy" <robin.murphy@arm.com>,
+	Jacob Pan <jacob.jun.pan@linux.intel.com>
+Subject: [PATCH 00/15] Coalesced Interrupt Delivery with posted MSI
+Date: Fri, 26 Jan 2024 15:42:22 -0800
+Message-Id: <20240126234237.547278-1-jacob.jun.pan@linux.intel.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Thomas,
+Hi Thomas and all,
 
-On Fri, 08 Dec 2023 12:52:49 +0100, Thomas Gleixner <tglx@linutronix.de>
-wrote:
+This patch set is aimed to improve IRQ throughput on Intel Xeon by making use of
+posted interrupts.
 
-> > Without PIR copy:
-> >
-> > DMA memfill bandwidth: 4.944 Gbps
-> > Performance counter stats for './run_intr.sh 512 30':
-> > 
-> >     77,313,298,506      L1-dcache-loads
-> >               (79.98%) 8,279,458      L1-dcache-load-misses     #
-> > 0.01% of all L1-dcache accesses  (80.03%) 41,654,221,245
-> > L1-dcache-stores                                              (80.01%)
-> > 10,476      LLC-load-misses           #    0.31% of all LL-cache
-> > accesses  (79.99%) 3,332,748      LLC-loads
-> >                         (80.00%) 30.212055434 seconds time elapsed
-> > 
-> >        0.002149000 seconds user
-> > 30.183292000 seconds sys
-> >                         
-> >
-> > With PIR copy:
-> > DMA memfill bandwidth: 5.029 Gbps
-> > Performance counter stats for './run_intr.sh 512 30':
-> >
-> >     78,327,247,423      L1-dcache-loads
-> >               (80.01%) 7,762,311      L1-dcache-load-misses     #
-> > 0.01% of all L1-dcache accesses  (80.01%) 42,203,221,466
-> > L1-dcache-stores                                              (79.99%)
-> > 23,691      LLC-load-misses           #    0.67% of all LL-cache
-> > accesses  (80.01%) 3,561,890      LLC-loads
-> >                         (80.00%)
-> >
-> >       30.201065706 seconds time elapsed
-> >
-> >        0.005950000 seconds user
-> >       30.167885000 seconds sys  
-> 
-> Interesting, though I'm not really convinced that this DMA memfill
-> microbenchmark resembles real work loads.
-> 
-> Did you test with something realistic, e.g. storage or networking, too?
-I have done the following FIO test on NVME drives and not seeing any
-meaningful differences in IOPS between the two implementations.
+There is a session at LPC2023 IOMMU/VFIO/PCI MC where I have presented this
+topic.
 
-Here is my setup and results on 4 NVME drives connected to a x16 PCIe slot:
+https://lpc.events/event/17/sessions/172/#20231115
 
- +-[0000:62]-
- |           +-01.0-[63]----00.0  Samsung Electronics Co Ltd NVMe SSD Controller PM174X
- |           +-03.0-[64]----00.0  Samsung Electronics Co Ltd NVMe SSD Controller PM174X
- |           +-05.0-[65]----00.0  Samsung Electronics Co Ltd NVMe SSD Controller PM174X
- |           \-07.0-[66]----00.0  Samsung Electronics Co Ltd NVMe SSD Controller PM174X
+Background
+==========
+On modern x86 server SoCs, interrupt remapping (IR) is required and turned
+on by default to support X2APIC. Two interrupt remapping modes can be supported
+by IOMMU/VT-d:
+
+- Remappable 	(host)
+- Posted	(guest only so far)
+
+With remappable mode, the device MSI to CPU process is a HW flow without system
+software touch points, it roughly goes as follows:
+
+1.	Devices issue interrupt requests with writes to 0xFEEx_xxxx
+2.	The system agent accepts and remaps/translates the IRQ
+3.	Upon receiving the translation response, the system agent notifies the
+	destination CPU with the translated MSI
+4.	CPU's local APIC accepts interrupts into its IRR/ISR registers
+5.	Interrupt delivered through IDT (MSI vector)
+
+The above process can be inefficient under high IRQ rates. The notifications in
+step #3 are often unnecessary when the destination CPU is already overwhelmed
+with handling bursts of IRQs. On some architectures, such as Intel Xeon, step #3
+is also expensive and requires strong ordering w.r.t DMA. As a result, slower
+IRQ rates can become a limiting factor for DMA I/O performance.
+
+For example, on Intel Xeon Sapphire Rapids SoC, as more NVMe disks are attached
+to the same socket, FIO (libaio engine) 4K block random read performance
+per-disk drops quickly.
+
+# of disks  	2  	4  	8
+-------------------------------------
+IOPS(million)  	1.991	1.136  	0.834
+(NVMe Gen 5 Samsung PM174x)
+
+With posted mode enabled in interrupt remapping, the interrupt flow is divided
+into two parts: posting (storing pending IRQ vector information in memory) and
+CPU notification.
+
+The above remappable IRQ flow becomes the following (1 and 2 unchanged):
+3.	Notifies the destination CPU with a notification vector
+	- IOMMU suppresses CPU notification
+	- IOMMU atomic swap/store IRQ status to memory-resident posted interrupt
+	descriptor (PID)
+4.	CPU's local APIC accepts the notification interrupt into its IRR/ISR
+	registers
+5.	Interrupt delivered through IDT (notification vector handler)
+	System SW allows new notifications by clearing outstanding notification
+	(ON) bit in PID.
+(The above flow is not in Linux today since we only use posted mode for VM)
+
+Note that the system software can now suppress CPU notifications at runtime as
+needed. This allows the system software to coalesce the expensive CPU
+notifications and in turn, improve IRQ throughput and DMA performance.
+
+Consider the following scenario when MSIs arrive at a CPU in high-frequency
+bursts:
+
+Time ----------------------------------------------------------------------->
+    	^ ^ ^       	^ ^ ^ ^     	^   	^
+MSIs	A B C       	D E F G     	H   	I
+
+RI  	N  N'  N'     	N  N'  N'  N'  	N   	N
+
+PI  	N           	N           	N   	N
+
+RI: remappable interrupt;  PI:  posted interrupt;
+N: interrupt notification, N': superfluous interrupt notification
+
+With remappable interrupt (row titled RI), every MSI generates a notification
+event to the CPU.
+
+With posted interrupts enabled in this patch set (row titled PI), CPU
+notifications are coalesced during IRQ bursts. N's are eliminated in the flow
+above. We refer to this mechanism Coalesced Interrupt Delivery (CID).
+
+Post interrupts have existed for a long time, they have been used for
+virtualization where MSIs from directly assigned devices can be delivered to
+the guest kernel without VMM intervention. On x86 Intel platforms, posted
+interrupts can be used on the host as well. Only host physical address of
+Posted interrupt descriptor (PID) is used.
+
+This patch set enables a new usage of posted interrupts on existing (and
+new hardware) for host kernel device MSIs. It is referred to as Posted MSIs
+throughout this patch set.
+
+Performance (with this patch set):
+==================================
+Test #1. NVMe FIO
+
+FIO libaio (million IOPS/sec/disk) Gen 5 NVMe Samsung PM174x disks on a single
+socket, Intel Xeon Sapphire Rapids. Random read with 4k block size. NVMe IRQ
+affinity is managed by the kernel with one vector per CPU.
+
+#disks	Before		After		%Gain
+---------------------------------------------
+8	0.834		1.943		132%
+4	1.136		2.023		78%
+
+Other observations:
+- Increased block sizes shows diminishing benefits, e.g. with 4 NVME disks on
+one x16 PCIe slot, the combined IOPS looks like:
+
+    Block Size	Baseline	PostedMSI
+    -------------------------------------
+    4K		6475		8778
+    8K		5727		5896
+    16k		2864		2900
+    32k		1546		1520
+    128k	397		398
+
+- Submission/Completion latency (usec) also improved at 4K block size only
+  FIO report SLAT
+  ---------------------------------------
+  Block Size	Baseline	postedMSI
+  4k		2177		2282
+  8k		4416		3967
+  16k		2950		3053
+  32k		3453		3505
+  128k		5911		5801
+
+  FIO report CLAT
+  ---------------------------------------
+  Block Size	Baseline	postedMSI
+  4k		313		230
+  8k		352		343
+  16k		711		702
+  32k		1320		1343
+  128k		5146		5137
 
 
-libaio, no PIR_COPY
-======================================
-fio-3.35                                                                                                           
-Starting 512 processes                                                                                             
-Jobs: 512 (f=512): [r(512)][100.0%][r=32.2GiB/s][r=8445k IOPS][eta 00m:00s]                                        
-disk_nvme6n1_thread_1: (groupid=0, jobs=512): err= 0: pid=31559: Mon Jan  8 21:49:22 2024                          
-  read: IOPS=8419k, BW=32.1GiB/s (34.5GB/s)(964GiB/30006msec)                                                      
-    slat (nsec): min=1325, max=115807k, avg=42368.34, stdev=1517031.57                                             
-    clat (usec): min=2, max=499085, avg=15139.97, stdev=25682.25                                                   
-     lat (usec): min=68, max=499089, avg=15182.33, stdev=25709.81                                                  
-    clat percentiles (usec):                                                                                       
-     |  1.00th=[   734],  5.00th=[   783], 10.00th=[   816], 20.00th=[   857],                                     
-     | 30.00th=[   906], 40.00th=[   971], 50.00th=[  1074], 60.00th=[  1369],                                     
-     | 70.00th=[ 13042], 80.00th=[ 19792], 90.00th=[ 76022], 95.00th=[ 76022],                                     
-     | 99.00th=[ 77071], 99.50th=[ 81265], 99.90th=[ 85459], 99.95th=[ 91751],                                     
-     | 99.99th=[200279]                                                                                            
-   bw (  MiB/s): min=18109, max=51859, per=100.00%, avg=32965.98, stdev=16.88, samples=14839                       
-   iops        : min=4633413, max=13281470, avg=8439278.47, stdev=4324.70, samples=14839                           
-  lat (usec)   : 4=0.01%, 10=0.01%, 20=0.01%, 50=0.01%, 100=0.01%                                                  
-  lat (usec)   : 250=0.01%, 500=0.01%, 750=1.84%, 1000=41.96%                                                      
-  lat (msec)   : 2=18.37%, 4=0.20%, 10=3.88%, 20=13.95%, 50=5.42%                                                  
-  lat (msec)   : 100=14.33%, 250=0.02%, 500=0.01%                                                                  
-  cpu          : usr=1.16%, sys=3.54%, ctx=4932752, majf=0, minf=192764                                            
-  IO depths    : 1=0.1%, 2=0.1%, 4=0.1%, 8=0.1%, 16=0.1%, 32=0.1%, >=64=100.0%                                     
-     submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%                                    
-     complete  : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.1%                                    
-     issued rwts: total=252616589,0,0,0 short=0,0,0,0 dropped=0,0,0,0                                              
-     latency   : target=0, window=0, percentile=100.00%, depth=256                                                 
-                                                                                                                   
-Run status group 0 (all jobs):                                                                                     
-   READ: bw=32.1GiB/s (34.5GB/s), 32.1GiB/s-32.1GiB/s (34.5GB/s-34.5GB/s), io=964GiB (1035GB), run=30006-30006msec 
-                                                                                                                   
-Disk stats (read/write):                                                                                           
-  nvme6n1: ios=0/0, merge=0/0, ticks=0/0, in_queue=0, util=96.31%                                                  
-  nvme5n1: ios=0/0, merge=0/0, ticks=0/0, in_queue=0, util=97.15%                                                  
-  nvme4n1: ios=0/0, merge=0/0, ticks=0/0, in_queue=0, util=98.06%                                                  
-  nvme3n1: ios=0/0, merge=0/0, ticks=0/0, in_queue=0, util=98.94%                                                  
-                                                                                                                   
- Performance counter stats for 'system wide':                                                                      
-                                                                                                                   
-    22,985,903,515      L1-dcache-load-misses                                                   (42.86%)           
-    22,989,992,126      L1-dcache-load-misses                                                   (57.14%)           
-   751,228,710,993      L1-dcache-stores                                                        (57.14%)           
-       465,033,820      LLC-load-misses                  #   18.27% of all LL-cache accesses    (57.15%)           
-     2,545,570,669      LLC-loads                                                               (57.14%)           
-     1,058,582,881      LLC-stores                                                              (28.57%)           
-       326,135,823      LLC-store-misses                                                        (28.57%)           
-                                                                                                                   
-      32.045718194 seconds time elapsed                                                                       
--------------------------------------------
-libaio with PIR_COPY
--------------------------------------------
-fio-3.35                                                                                                           
-Starting 512 processes                                                                                             
-Jobs: 512 (f=512): [r(512)][100.0%][r=32.2GiB/s][r=8445k IOPS][eta 00m:00s]                                        
-disk_nvme6n1_thread_1: (groupid=0, jobs=512): err= 0: pid=5103: Mon Jan  8 23:12:12 2024                           
-  read: IOPS=8420k, BW=32.1GiB/s (34.5GB/s)(964GiB/30011msec)                                                      
-    slat (nsec): min=1339, max=97021k, avg=42447.84, stdev=1442726.09                                              
-    clat (usec): min=2, max=369410, avg=14820.01, stdev=24112.59                                                   
-     lat (usec): min=69, max=369412, avg=14862.46, stdev=24139.33                                                  
-    clat percentiles (usec):                                                                                       
-     |  1.00th=[   717],  5.00th=[   783], 10.00th=[   824], 20.00th=[   873],                                     
-     | 30.00th=[   930], 40.00th=[  1012], 50.00th=[  1172], 60.00th=[  8094],                                     
-     | 70.00th=[ 14222], 80.00th=[ 18744], 90.00th=[ 76022], 95.00th=[ 76022],                                     
-     | 99.00th=[ 76022], 99.50th=[ 78119], 99.90th=[ 81265], 99.95th=[ 81265],                                     
-     | 99.99th=[135267]                                                                                            
-   bw (  MiB/s): min=19552, max=62819, per=100.00%, avg=33774.56, stdev=31.02, samples=14540                       
-   iops        : min=5005807, max=16089892, avg=8646500.17, stdev=7944.42, samples=14540                           
-  lat (usec)   : 4=0.01%, 10=0.01%, 20=0.01%, 50=0.01%, 100=0.01%                                                  
-  lat (usec)   : 250=0.01%, 500=0.01%, 750=2.50%, 1000=36.41%                                                      
-  lat (msec)   : 2=17.39%, 4=0.27%, 10=5.83%, 20=18.94%, 50=5.59%                                                  
-  lat (msec)   : 100=13.06%, 250=0.01%, 500=0.01%                                                                  
-  cpu          : usr=1.20%, sys=3.74%, ctx=6758326, majf=0, minf=193128                                            
-  IO depths    : 1=0.1%, 2=0.1%, 4=0.1%, 8=0.1%, 16=0.1%, 32=0.1%, >=64=100.0%                                     
-     submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%                                    
-     complete  : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.1%                                    
-     issued rwts: total=252677827,0,0,0 short=0,0,0,0 dropped=0,0,0,0                                              
-     latency   : target=0, window=0, percentile=100.00%, depth=256                                                 
-                                                                                                                   
-Run status group 0 (all jobs):                                                                                     
-   READ: bw=32.1GiB/s (34.5GB/s), 32.1GiB/s-32.1GiB/s (34.5GB/s-34.5GB/s), io=964GiB (1035GB), run=30011-30011msec 
-                                                                                                                   
-Disk stats (read/write):                                                                                           
-  nvme6n1: ios=0/0, merge=0/0, ticks=0/0, in_queue=0, util=96.36%                                                  
-  nvme5n1: ios=0/0, merge=0/0, ticks=0/0, in_queue=0, util=97.18%                                                  
-  nvme4n1: ios=0/0, merge=0/0, ticks=0/0, in_queue=0, util=98.08%                                                  
-  nvme3n1: ios=0/0, merge=0/0, ticks=0/0, in_queue=0, util=98.96%                                                  
-                                                                                                                   
- Performance counter stats for 'system wide':                                                                      
-                                                                                                                   
-    24,762,800,042      L1-dcache-load-misses                                                   (42.86%)           
-    24,764,415,765      L1-dcache-load-misses                                                   (57.14%)           
-   756,096,467,595      L1-dcache-stores                                                        (57.14%)           
-       483,611,270      LLC-load-misses                  #   16.21% of all LL-cache accesses    (57.14%)           
-     2,982,610,898      LLC-loads                                                               (57.14%)           
-     1,283,077,818      LLC-stores                                                              (28.57%)           
-       313,253,711      LLC-store-misses                                                        (28.57%)           
-                                                                                                                   
-      32.059810215 seconds time elapsed
-                                       
+Test #2. Intel Data Streaming Accelerator
+
+Two dedicated workqueues from two PCI root complex integrated endpoint
+(RCIEP) devices, pin IRQ affinity of the two interrupts to a single CPU.
+
+				Before		After		%Gain
+				-------------------------------------
+DSA memfill (mil IRQs/sec)	5.157		8.987		74%
+
+DMA throughput has similar improvements.
+
+At lower IRQ rate (< 1 million/second), no performance benefits nor regression
+observed so far.
+
+No harm tests also performed to ensure no performance regression on workloads
+that do not have high interrupt rate. These tests include:
+- kernel compile time
+- file copy
+- FIO NVME random writes
+
+Implementation choices:
+======================
+- Transparent to the device drivers
+
+- System-wide option instead of per-device or per-IRQ opt-in, i.e. once enabled
+  all device MSIs are posted. The benefit is that we only need to change IR
+  irq_chip and domain layer. No change to PCI MSI.
+  Exceptions are: IOAPIC, HPET, and VT-d's own IRQs
+
+- Limit the number of polling/demuxing loops per CPU notification event
+
+- Only change Intel-IR in IRQ domain hierarchy VECTOR->INTEL-IR->PCI-MSI,
+
+- X86 Intel only so far, can be extended to other architectures with posted
+  interrupt support (ARM and AMD), RFC.
+
+- Bare metal only, no posted interrupt capable virtual IOMMU.
+
+
+Changes and implications (moving from remappable to posted mode)
+===============================
+1. All MSI vectors are multiplexed into a single notification vector for each
+CPU MSI vectors are then de-multiplexed by SW, no IDT delivery for MSIs
+
+2. Losing the following features compared to the remappable mode (AFAIK, none of
+the below matters for device MSIs)
+- Control of delivery mode, e.g. NMI for MSIs
+- No logical destinations, posted interrupt destination is x2APIC
+  physical APIC ID
+- No per vector stack, since all MSI vectors are multiplexed into one
+
+
+Runtime changes
+===============
+The IRQ runtime behavior has changed with this patch, here is a pseudo trace
+comparison for 3 MSIs of different vectors arriving in a burst on the same CPU.
+A system vector interrupt (e.g. timer) arrives randomly.
+
+BEFORE:
+interrupt(MSI)
+    irq_enter()
+    handler() /* EOI */
+    irq_exit()
+        process_softirq()
+
+interrupt(timer)
+
+interrupt(MSI)
+    irq_enter()
+    handler() /* EOI */
+    irq_exit()
+        process_softirq()
+
+interrupt(MSI)
+    irq_enter()
+    handler() /* EOI */
+    irq_exit()
+        process_softirq()
+
+
+AFTER:
+interrupt /* Posted MSI notification vector */
+    irq_enter()
+	atomic_xchg(PIR)
+	handler()
+	handler()
+	handler()
+	pi_clear_on()
+    apic_eoi()
+    irq_exit()
+interrupt(timer)
+        process_softirq()
+
+With posted MSI (as pointed out by Thomas Gleixner), both high-priority
+interrupts (system interrupt vectors) and softIRQs are blocked during MSI vector
+demux loop. Some can be timing sensitive.
+
+Here are the options I have attempted or still working on:
+
+1. Use self-IPI to invoke MSI vector handler but that took away the majority of
+the performance benefits.
+
+2. Limit the # of demuxing loops, this is implemented in this patch. Note that
+today, we already allow one low priority MSI to block system interrupts. System
+vector can preempt MSI vectors without waiting for EOI but we have IRQ disabled
+in the ISR.
+
+Performance data (on DSA with MEMFILL) also shows that coalescing more than 3
+loops yields diminishing benefits. Therefore, the max loops for coalescing is
+set to 3 in this patch.
+	MaxLoop		IRQ/sec		bandwidth Mbps
+-------------------------------------------------------------------------
+	2		6157107 		25219
+	3		6226611 		25504
+	4		6557081 		26857
+	5		6629683 		27155
+	6		6662425 		27289
+
+3. limit the time that system interrupts can be blocked (WIP).
+
+In addition, posted MSI uses atomic xchg from both CPU and IOMMU. Compared to
+remappable mode, there may be additional cache line ownership contention over
+PID. However, we have not observed performance regression at lower IRQ rates.
+At high interrupt rate, posted mode always wins.
+
+Testing:
+========
+
+The following tests have been performed and continue to be evaluated.
+- IRQ affinity change, migration
+- CPU offlining
+- Multi vector coalescing
+- Low IRQ rate, general no-harm test
+- VM device assignment via VFIO
+- General no harm test, performance regressions have not been observed for low
+IRQ rate workload.
+
+
+With the patch, a new entry in /proc/interrupts is added.
+cat /proc/interrupts | grep PMN
+PMN:         13868907 Posted MSI notification event
+
+No change to the device MSI accounting.
+
+A new INTEL-IR-POST irq_chip is visible at IRQ debugfs, e.g.
+domain:  IR-PCI-MSIX-0000:6f:01.0-12
+ hwirq:   0x8
+ chip:    IR-PCI-MSIX-0000:6f:01.0
+  flags:   0x430
+             IRQCHIP_SKIP_SET_WAKE
+             IRQCHIP_ONESHOT_SAFE
+ parent:
+    domain:  INTEL-IR-12-13
+     hwirq:   0x90000
+     chip:    INTEL-IR-POST /* For posted MSIs */
+      flags:   0x0
+     parent:
+        domain:  VECTOR
+         hwirq:   0x65
+         chip:    APIC
+
+
+Acknowledgment
+==============
+
+- Rajesh Sankaran and Ashok Raj for the original idea
+
+- Thomas Gleixner for reviewing and guiding the upstream direction of PoC
+patches. Help correct my many misunderstandings of the IRQ subsystem.
+
+- Jie J Yan(Jeff), Sebastien Lemarie, and Dan Liang for performance evaluation
+with NVMe and network workload
+
+- Bernice Zhang and Scott Morris for functional validation
+
+- Michael Prinke helped me understand how VT-d HW works
+
+- Sanjay Kumar for providing the DSA IRQ test suite
+
 
 
 Thanks,
 
 Jacob
+
+Change log:
+V1 (since RFC)
+   - Removed mentioning of wishful features, IRQ preemption, separate and
+     full MSI vector space
+   - Refined MSI handler de-multiplexing loop based on suggestions from
+     Peter and Thomas. Reduced xchg() usage and code duplication
+   - Assign the new posted IR irq_chip only to device MSI/x, avoid changing
+     IO-APIC code
+   - Extract and use common code for preventing lost interrupt during
+     affinity change
+   - Added more test results to the cover letter
+
+Jacob Pan (12):
+  x86/irq: Move posted interrupt descriptor out of vmx code
+  x86/irq: Unionize PID.PIR for 64bit access w/o casting
+  x86/irq: Add a Kconfig option for posted MSI
+  x86/irq: Reserve a per CPU IDT vector for posted MSIs
+  x86/irq: Add accessors for posted interrupt descriptors
+  x86/irq: Factor out calling ISR from common_interrupt
+  x86/irq: Install posted MSI notification handler
+  x86/irq: Factor out common code for checking pending interrupts
+  x86/irq: Extend checks for pending vectors to posted interrupts
+  iommu/vt-d: Make posted MSI an opt-in cmdline option
+  iommu/vt-d: Add an irq_chip for posted MSIs
+  iommu/vt-d: Enable posted mode for device MSIs
+
+Thomas Gleixner (3):
+  x86/irq: Use bitfields exclusively in posted interrupt descriptor
+  x86/irq: Set up per host CPU posted interrupt descriptors
+  iommu/vt-d: Add a helper to retrieve PID address
+
+ .../admin-guide/kernel-parameters.txt         |   1 +
+ arch/x86/Kconfig                              |  11 ++
+ arch/x86/include/asm/apic.h                   |  12 ++
+ arch/x86/include/asm/hardirq.h                |   6 +
+ arch/x86/include/asm/idtentry.h               |   3 +
+ arch/x86/include/asm/irq_remapping.h          |  11 ++
+ arch/x86/include/asm/irq_vectors.h            |   9 +-
+ arch/x86/include/asm/posted_intr.h            | 116 +++++++++++++
+ arch/x86/kernel/apic/vector.c                 |   5 +-
+ arch/x86/kernel/cpu/common.c                  |   3 +
+ arch/x86/kernel/idt.c                         |   3 +
+ arch/x86/kernel/irq.c                         | 156 ++++++++++++++++--
+ arch/x86/kvm/vmx/posted_intr.h                |  93 +----------
+ arch/x86/kvm/vmx/vmx.c                        |   1 +
+ arch/x86/kvm/vmx/vmx.h                        |   2 +-
+ drivers/iommu/intel/irq_remapping.c           | 115 ++++++++++++-
+ drivers/iommu/irq_remapping.c                 |  13 +-
+ 17 files changed, 446 insertions(+), 114 deletions(-)
+ create mode 100644 arch/x86/include/asm/posted_intr.h
+
+-- 
+2.25.1
+
 
