@@ -1,252 +1,110 @@
-Return-Path: <kvm+bounces-7212-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7213-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DFC283E3CD
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 22:19:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7693983E3F9
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 22:32:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8C0E5B22BCB
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 21:19:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E95F1C221BA
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 21:32:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4EFD250E8;
-	Fri, 26 Jan 2024 21:19:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED98F25564;
+	Fri, 26 Jan 2024 21:31:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EmYpnFG4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5940124B21;
-	Fri, 26 Jan 2024 21:19:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFDA7250FD
+	for <kvm@vger.kernel.org>; Fri, 26 Jan 2024 21:31:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706303960; cv=none; b=iLVfEb2q9TIMx+W96UNCDj/cdxgftyO3y03XxxSjASyRQ1WAbPFJ/PX/wEwRcLpO1vF3b57uKcy73noqoSIF2IBDL7LDU2AQVekPkZe3Bu/eqLnSWcbE2DC//llgLy6bzSPqfRlXsE2VdQiZjugZrelRinhUs4aFAQtErH4m6Gg=
+	t=1706304718; cv=none; b=Iy1v1sRYXU2KadINzM2tT3P6tp8MnHFJYHkx3ig6B1dBfeY1yR8QZvr/aTDZDjrA+LHIMCs4xWEQ8Vyrd0bqgGGHx7j18A9GxQot7EGreBTV/3sBkDHjHitxfaPkTYazIJj3xUx70KbwkmrivhcGgwjBx/YMNKzgBG9tZS2luNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706303960; c=relaxed/simple;
-	bh=eQKYfO/cv8kC+WzuBVji+qbCXw8oz0VQZF3PPQci9YQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QY4FYPvfF6L78tOXKgN5nlAGx0mVXBStoOf3sTzue5jjepd6BwS3vS1deHsXHmp78Hh7eFiXmKfS4+/2kzpuU+3oHLQB3jH2clLYScw9bqSEWMKgJ/C3j7XAJ8Voc99AqjRsNXYydZQik5HlFWH7l3QrKgX6jOYhSMQIotc18UI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=manifault.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=manifault.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-6e0e08c70f7so468171a34.2;
-        Fri, 26 Jan 2024 13:19:18 -0800 (PST)
+	s=arc-20240116; t=1706304718; c=relaxed/simple;
+	bh=pnPJv3C/8oI2mDLaLYSzM3++yh258fHVwIni0iXI++c=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=dcotBLasGsuaa8/ap9M6C73bIISfXTlb+yk4TsyXihrBuV9v1SrrtxTgtWfALho1ziTm6wO22nB9p4P7uiV7MIoYlXrLmWu9FMdeBqlljVIZ2cQydj/tTJEbzwgZdeJJxK9rd7xMce0up+DVMLtRaGMeC/pY3/49UZG8xlCmJpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EmYpnFG4; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6dbcdfde0eeso824969b3a.1
+        for <kvm@vger.kernel.org>; Fri, 26 Jan 2024 13:31:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1706304716; x=1706909516; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xJJmc9xeQcykeus6gCa38Rf/FAKcShuAjnIZq0Hgxno=;
+        b=EmYpnFG4Jrv+ozXW22/u1UaQHxP5Gus+V1C0Z7g383Jf0kcG7R4YPkpN++KTo5fNia
+         AZ8+Bk8FNUhPa6C+VBIRa+hVeqvrf13YxOSFXk/D+iIHZz18/E0nB6jIsWXZbW6Ueeqz
+         XJnsFJd2M26McrEC2s3AHM4Gyf26cHsaV3o0ECkmOSjoiG1+I7ftKVYG0+HGaE3OxKLh
+         kou+iFDAqicJVPmlFbvxEFcarr448sbc+fXW8fh77GoJH9znIlJnwEtAcIUw4Nj0GwLc
+         jOUC5eS5+JC7UpXp+yafmm8qlDViLlx3t+9jAb4Cc2E0SANzNQMW0X2mmfgiK48erVcK
+         r4mg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706303957; x=1706908757;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eQKYfO/cv8kC+WzuBVji+qbCXw8oz0VQZF3PPQci9YQ=;
-        b=ejiCyMSLR1nRQsFZDpSEjXTDigh/eUOKY+HxZUlq7aAMchEpo3GB92EpHEEay9vU0O
-         ZAji4rOfFzWKqsHSYT1+mkxnfTlH2e5YJzNYFj310ZEn3BDRoCk+T3cfF/2Ar6Bs7Hhq
-         6KvSN1RjnMv1QdObjvqowoqewavpGzIC4CKYtuHsvDmvSPe89HiUs6H+OrwKlpCr8bd8
-         i3fbb0LUbe5ziaVx2QYHnoQQldz4g6ZFgruhgoC8Nnxj1rXFz69pVEaZ3/6Cy/cRCkUl
-         s9f/TfFCvcsApdpg571mLM0gwV5PY4/gyQn2/jozK5IaKT876fQE7aYvzAnUxXE1Wx/4
-         6Gxg==
-X-Gm-Message-State: AOJu0YxgyIiM1kTaPX5OHlc3J7AHSQ6H0bViwBBe3mOydeBniLOgmcnP
-	HvLe92lx52uxoxWCJXcyTWS8IGsRke8dTP+Zv9MYruelZEkqMMFq
-X-Google-Smtp-Source: AGHT+IHf09Gfyvt0G8S1AhkYf+4bQllzPxaanyaMqPuBvf+9+61iV07vF4yoABPOCLr7VssJR6u4iQ==
-X-Received: by 2002:a05:6830:6a8e:b0:6dc:69e3:48e1 with SMTP id da14-20020a0568306a8e00b006dc69e348e1mr448962otb.39.1706303957230;
-        Fri, 26 Jan 2024 13:19:17 -0800 (PST)
-Received: from maniforge (c-24-1-27-177.hsd1.il.comcast.net. [24.1.27.177])
-        by smtp.gmail.com with ESMTPSA id jc11-20020a05622a714b00b00429d86c5c68sm870970qtb.32.2024.01.26.13.19.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Jan 2024 13:19:16 -0800 (PST)
-Date: Fri, 26 Jan 2024 15:19:13 -0600
-From: David Vernet <void@manifault.com>
-To: Joel Fernandes <joel@joelfernandes.org>
-Cc: Sean Christopherson <seanjc@google.com>,
-	"Vineeth Pillai (Google)" <vineeth@bitbyteword.org>,
-	Ben Segall <bsegall@google.com>, Borislav Petkov <bp@alien8.de>,
-	Daniel Bristot de Oliveira <bristot@redhat.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Dietmar Eggemann <dietmar.eggemann@arm.com>,
-	"H . Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-	Juri Lelli <juri.lelli@redhat.com>, Mel Gorman <mgorman@suse.de>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Valentin Schneider <vschneid@redhat.com>,
-	Vincent Guittot <vincent.guittot@linaro.org>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Wanpeng Li <wanpengli@tencent.com>,
-	Suleiman Souhlal <suleiman@google.com>,
-	Masami Hiramatsu <mhiramat@google.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, x86@kernel.org,
-	Tejun Heo <tj@kernel.org>, Josh Don <joshdon@google.com>,
-	Barret Rhoden <brho@google.com>, David Dunn <daviddunn@google.com>,
-	julia.lawall@inria.fr, himadrispandya@gmail.com,
-	jean-pierre.lozi@inria.fr, ast@kernel.org, paulmck@kernel.org
-Subject: Re: [RFC PATCH 0/8] Dynamic vcpu priority management in kvm
-Message-ID: <20240126211913.GB28094@maniforge>
-References: <20231214024727.3503870-1-vineeth@bitbyteword.org>
- <ZXsvl7mabUuNkWcY@google.com>
- <20231215181014.GB2853@maniforge>
- <6595bee6.e90a0220.57b35.76e9@mx.google.com>
- <20240104223410.GE303539@maniforge>
- <052b0521-2273-4b1f-bd94-a3decceb9b05@joelfernandes.org>
- <20240124170648.GA249939@maniforge>
- <CAEXW_YR5weKdRD3DfJCUPr4eyXtj=HgTqw0=oV_0Kh2VDVhDdg@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1706304716; x=1706909516;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xJJmc9xeQcykeus6gCa38Rf/FAKcShuAjnIZq0Hgxno=;
+        b=WpSgT90NWs1IhIJEEIiAUxORDMMD/Cqx4HVbFVbW4OxLiaXZ18le1bXACJvaVjSbFN
+         OBLTOvs2PHwDV6WVn2hY1Do5/gQO3CYDPXJ63VDb+u/K//k5+MlVw7/dfYfZNTYjxyjX
+         q7s3td4qehJm9tLyP627MiNqwY8bbOnhzTSW5SzMjFaSbVS09KXV6mRmoIX7F6db4Whu
+         KgpWRIQTzJLBqSbu1XmDJgE8EKRDgD8KdcxmJU1JJb1MG9vmdjHS+tSYJTW8RPZbuEGI
+         S7lwJv7RSWZZUSscpZcvyhMIXLZE2V2jF6VA/7jhJZ1X/hz2QIBDqay62sG6IFUiC1Z6
+         kuWw==
+X-Gm-Message-State: AOJu0YwtCLhH/C9Jhr08q2qLfbP8+YMQd+rYVOmX8ZxnE8xPu5Ay3V5b
+	o5Xc14gDzYYXf94PU0KwxYI1zz3RU1MYnCf7Csf8UBn0OplV5iHDaLLQxBf8bExWEQq1PGeY4Ws
+	w9Q==
+X-Google-Smtp-Source: AGHT+IHlUrVIaAxo07HXP8NgbIsOQ66wMvc8QqlRpVXum/0dlz10VAW3ioqj5+4vJmt6NA0WEqOzKCcyRUg=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:9095:b0:6dd:e157:fe76 with SMTP id
+ jo21-20020a056a00909500b006dde157fe76mr45718pfb.1.1706304716074; Fri, 26 Jan
+ 2024 13:31:56 -0800 (PST)
+Date: Fri, 26 Jan 2024 13:31:54 -0800
+In-Reply-To: <20240123-delay-verw-v6-6-a8206baca7d3@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="PdQvZZuf75rcA8TD"
-Content-Disposition: inline
-In-Reply-To: <CAEXW_YR5weKdRD3DfJCUPr4eyXtj=HgTqw0=oV_0Kh2VDVhDdg@mail.gmail.com>
-User-Agent: Mutt/2.2.12 (2023-09-09)
+Mime-Version: 1.0
+References: <20240123-delay-verw-v6-0-a8206baca7d3@linux.intel.com> <20240123-delay-verw-v6-6-a8206baca7d3@linux.intel.com>
+Message-ID: <ZbQkyr8c12jOqWQ-@google.com>
+Subject: Re: [PATCH  v6 6/6] KVM: VMX: Move VERW closer to VMentry for MDS mitigation
+From: Sean Christopherson <seanjc@google.com>
+To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>, 
+	Josh Poimboeuf <jpoimboe@kernel.org>, Andy Lutomirski <luto@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Paolo Bonzini <pbonzini@redhat.com>, tony.luck@intel.com, ak@linux.intel.com, 
+	tim.c.chen@linux.intel.com, Andrew Cooper <andrew.cooper3@citrix.com>, 
+	Nikolay Borisov <nik.borisov@suse.com>, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, kvm@vger.kernel.org, 
+	Alyssa Milburn <alyssa.milburn@linux.intel.com>, 
+	Daniel Sneddon <daniel.sneddon@linux.intel.com>, antonio.gomez.iglesias@linux.intel.com
+Content-Type: text/plain; charset="us-ascii"
 
+On Tue, Jan 23, 2024, Pawan Gupta wrote:
+> During VMentry VERW is executed to mitigate MDS. After VERW, any memory
+> access like register push onto stack may put host data in MDS affected
+> CPU buffers. A guest can then use MDS to sample host data.
+> 
+> Although likelihood of secrets surviving in registers at current VERW
+> callsite is less, but it can't be ruled out. Harden the MDS mitigation
+> by moving the VERW mitigation late in VMentry path.
+> 
+> Note that VERW for MMIO Stale Data mitigation is unchanged because of
+> the complexity of per-guest conditional VERW which is not easy to handle
+> that late in asm with no GPRs available. If the CPU is also affected by
+> MDS, VERW is unconditionally executed late in asm regardless of guest
+> having MMIO access.
+> 
+> Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+> ---
 
---PdQvZZuf75rcA8TD
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Jan 24, 2024 at 08:08:56PM -0500, Joel Fernandes wrote:
-> Hi David,
-
-Hi Joel,
-
->=20
-> On Wed, Jan 24, 2024 at 12:06=E2=80=AFPM David Vernet <void@manifault.com=
-> wrote:
-> >
-> [...]
-> > > There might be a caveat to the unboosting path though needing a hyper=
-call and I
-> > > need to check with Vineeth on his latest code whether it needs a hype=
-rcall, but
-> > > we could probably figure that out. In the latest design, one thing I =
-know is
-> > > that we just have to force a VMEXIT for both boosting and unboosting.=
- Well for
-> > > boosting, the VMEXIT just happens automatically due to vCPU preemptio=
-n, but for
-> > > unboosting it may not.
-> >
-> > As mentioned above, I think we'd need to add UAPI for setting state from
-> > the guest scheduler, even if we didn't use a hypercall to induce a
-> > VMEXIT, right?
->=20
-> I see what you mean now. I'll think more about it. The immediate
-> thought is to load BPF programs to trigger at appropriate points in
-> the guest. For instance, we already have tracepoints for preemption
-> disabling. I added that upstream like 8 years ago or something. And
-> sched_switch already knows when we switch to RT, which we could
-> leverage in the guest. The BPF program would set some shared memory
-> state in whatever format it desires, when it runs is what I'm
-> envisioning.
-
-That sounds like it would work perfectly. Tracepoints are really ideal,
-both because BPF doesn't allow (almost?) any kfuncs to be called from
-fentry/kprobe progs (whereas they do from tracepoints), and because
-tracepoint program arguments are trusted so the BPF verifier knows that
-it's safe to pass them onto kfuncs, etc as refernced kptrs.
-
-> By the way, one crazy idea about loading BPF programs into a guest..
-> Maybe KVM can pass along the BPF programs to be loaded to the guest?
-> The VMM can do that. The nice thing there is only the host would be
-> the only responsible for the BPF programs. I am not sure if that makes
-> sense, so please let me know what you think. I guess the VMM should
-> also be passing additional metadata, like which tracepoints to hook
-> to, in the guest, etc.
-
-This I'm not sure I can really share an intelligent opinion on. My first
-thought was that the guest VM would load some BPF programs at boot using
-something like systemd, and then those progs would somehow register with
-the VMM -- maybe through a kfunc implemented by KVM that makes a
-hypercall. Perhaps what you're suggesting would work as well.
-
-> > > In any case, can we not just force a VMEXIT from relevant path within=
- the guest,
-> > > again using a BPF program? I don't know what the BPF prog to do that =
-would look
-> > > like, but I was envisioning we would call a BPF prog from within a gu=
-est if
-> > > needed at relevant point (example, return to guest userspace).
-> >
-> > I agree it would be useful to have a kfunc that could be used to force a
-> > VMEXIT if we e.g. need to trigger a resched or something. In general
-> > that seems like a pretty reasonable building block for something like
-> > this. I expect there are use cases where doing everything async would be
-> > useful as well. We'll have to see what works well in experimentation.
->=20
-> Sure.
->=20
-> > > >> Still there is a lot of merit to sharing memory with BPF and let B=
-PF decide
-> > > >> the format of the shared memory, than baking it into the kernel...=
- so thanks
-> > > >> for bringing this up! Lets talk more about it... Oh, and there's m=
-y LSFMMBPF
-> > > >> invitiation request ;-) ;-).
-> > > >
-> > > > Discussing this BPF feature at LSFMMBPF is a great idea -- I'll sub=
-mit a
-> > > > proposal for it and cc you. I looked and couldn't seem to find the
-> > > > thread for your LSFMMBPF proposal. Would you mind please sending a =
-link?
-> > >
-> > > I actually have not even submitted one for LSFMM but my management is=
- supportive
-> > > of my visit. Do you want to go ahead and submit one with all of us in=
-cluded in
-> > > the proposal? And I am again sorry for the late reply and hopefully w=
-e did not
-> > > miss any deadlines. Also on related note, there is interest in sched_=
-ext for
-> >
-> > I see that you submitted a proposal in [2] yesterday. Thanks for writing
-> > it up, it looks great and I'll comment on that thread adding a +1 for
-> > the discussion.
-> >
-> > [2]: https://lore.kernel.org/all/653c2448-614e-48d6-af31-c5920d688f3e@j=
-oelfernandes.org/
-> >
-> > No worries at all about the reply latency. Thank you for being so open
-> > to discussing different approaches, and for driving the discussion. I
-> > think this could be a very powerful feature for the kernel so I'm
-> > pretty excited to further flesh out the design and figure out what makes
-> > the most sense here.
->=20
-> Great!
->=20
-> > > As mentioned above, for boosting, there is no hypercall. The VMEXIT i=
-s induced
-> > > by host preemption.
-> >
-> > I expect I am indeed missing something then, as mentioned above. VMEXIT
-> > aside, we still need some UAPI for the shared structure between the
-> > guest and host where the guest indicates its need for boosting, no?
->=20
-> Yes you are right, it is more clear now what you were referring to
-> with UAPI. I think we need figure that issue out. But if we can make
-> the VMM load BPF programs, then the host can completely decide how to
-> structure the shared memory.
-
-Yep -- if the communication channel is from guest BPF -> host BPF, I
-think the UAPI concerns are completely addressed. Figuring out how to
-actually load the guest BPF progs and setup the communication channels
-is another matter.
-
-Thanks,
-David
-
---PdQvZZuf75rcA8TD
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEARYKAB0WIQRBxU1So5MTLwphjdFZ5LhpZcTzZAUCZbQh0QAKCRBZ5LhpZcTz
-ZMyjAQDPs1jj5QTrt4NX9R4iZz13HaPvP5cEVDgB359fPOtAMAD+LQVf0hKHUlfW
-s3MUuJNykF9SAFO+FrOY4Ce6ALH1oAo=
-=bjnI
------END PGP SIGNATURE-----
-
---PdQvZZuf75rcA8TD--
+Acked-by: Sean Christopherson <seanjc@google.com>
 
