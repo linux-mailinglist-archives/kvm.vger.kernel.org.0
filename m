@@ -1,302 +1,132 @@
-Return-Path: <kvm+bounces-7202-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7203-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A62783E2A4
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 20:33:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A23DB83E2AA
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 20:34:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7EC151C22907
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 19:33:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 424C61F2362F
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 19:34:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC7B22554F;
-	Fri, 26 Jan 2024 19:32:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C969E22630;
+	Fri, 26 Jan 2024 19:34:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BdG+fjbV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OPm+4IVZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 490A2250F4
-	for <kvm@vger.kernel.org>; Fri, 26 Jan 2024 19:32:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B91ED22606
+	for <kvm@vger.kernel.org>; Fri, 26 Jan 2024 19:34:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706297555; cv=none; b=i/R2m4rbDTl9O0mEjG3TG4gN4HQrrJvWg/YlSZ5ADDPzp8uDfsjB33yFhVl4NQESqIc4VAIRVuW4poIY8VMp4oWwPaJvg+M/1NI2lo8jNK/hjrnbqMm1fWT+YPl4GDuGFwef+ET8CuRq0YlR79Cd+tmP2aKE8XYvawl08W8wmTc=
+	t=1706297674; cv=none; b=Smg1Ian+5wIurssOQ+Qa6Wwf5jf+3Zpc3zTXMjQWCP/uBqyMtmen2sZY/HaByyRkE6WFVpxlp1qPYyBRHF1t1xyF10mghQ9gYG3uBApDdI9ttqoOvJyf5ZUqRD4hssQoljW6wsIx+BfeLDoo554OMR4Zy3EL7PAJATFxoAmiAPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706297555; c=relaxed/simple;
-	bh=G7bXN1UU7tRHuhRNiFDWOUYFSBIKcFwI1z+6qWkllUs=;
+	s=arc-20240116; t=1706297674; c=relaxed/simple;
+	bh=N9Ey+GNs6mImmS+vqlu63GW6nIrlmLmxZOJyPG76Uvg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=WC2tv0vKJiyYuP5w/E80yj6q2g0bXV84LmLi4NUKC+v7BymGy1NgROMsJPLjMxv+JSFxrBgy38mTLlSPiPDjrI2BqGKEyidWo4MY+ltw2K3DnxBTEu/Y/LLjvVz9gchMoRPeOBKwp2AzVhkJ4HCeeJquz/MCKVw9JN5w1kEu75M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BdG+fjbV; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=fsM5pvJRoMVZpGPAT/6td7khrerH3qHSQvBHloJPrhCLcqn36CGZ+lykoOsy8XgVr/Uch2h3PWjaLuBpOJDG9EpfJZH2E1yn7MBbkV7lM9kv0a6HPDBOah8+qQePPoa8hTQmmJOmwh/S9GM6DDJdBEep6qu18vdAlVKzGwp0MlI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OPm+4IVZ; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6dbd093c2baso503090b3a.3
-        for <kvm@vger.kernel.org>; Fri, 26 Jan 2024 11:32:33 -0800 (PST)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1d740687d8dso5855525ad.1
+        for <kvm@vger.kernel.org>; Fri, 26 Jan 2024 11:34:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706297552; x=1706902352; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HZnAUMJ/rBNfk0zriTt4DNaLm50XXQ05JIKVH4sIBy8=;
-        b=BdG+fjbVyUIqrKOw3uVUKxJ8o/XFwNRo0rwZYz4jD/lnHkacK5/bItbaX4IVsj+Cfq
-         0UMaS5QAx8nqewtyAF/WU4og8GesrXHxckaca9Lu2zkazGVUiMOTgTqVPBAP023SGG9e
-         2iriWh31YizgBjXz6lkjIJz7cZSSYXDWeH4X0718UymPnjiwKZMb296jy/eWT2eF/fCF
-         eVuIRBgi/V2QpfnHnqXKVNVrSUifLA2vrRDYU+OgGoVLwujNVC/KpAtzFbcQY4sEBa7r
-         5p9KzxQ+G+l5szsgQkp4MUl/LNno/buj79kk7z5V8+ViS4MS896AYzU08hIhvwJBJyJl
-         a/qg==
+        d=google.com; s=20230601; t=1706297672; x=1706902472; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VDi21S2WSjOuRBpM9Lk1FIKTWvNjyTGMc+fXaSns+7w=;
+        b=OPm+4IVZZ5nYF1QTrktjGgLa9H4ZehC4010UmB9UJILUkF8Gub7hElGKlKsqYvAQQ4
+         9BVZaws7Jh9bVBVPZSCH28iJ3bjpepycVCYo8CKLaskcytqCel7qTnovTDQJOJ6UC+no
+         iAY+/KZW9VygCEwh5A1FhmDqlge3ny6lGrTFV8rmBu2pQJ+XZDiN1YOU6x3GyKp4DVxn
+         8IjwL0Xb09mH6WQTo6lGpPRGwppRAgex0mxAFMH+swkj53Jv+98m60sF78194y6TZ1Tm
+         HoH90RWChDK/WOE7DwDKvRMgSGtuzm4BxQSWUI+UWqqACoh4DdMYVSqMwGHuRntI0CwP
+         g0rA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706297552; x=1706902352;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HZnAUMJ/rBNfk0zriTt4DNaLm50XXQ05JIKVH4sIBy8=;
-        b=r6n9DqZfcvOR4q7pf/0NqX/+6UF2ek9PJ5t/cqWyvQxn1A1d/BtVCENRFpRX0RyhYT
-         kpHXsVFMHy0Pd8BuIG6a27r7CIbUAPf7EsvK8CwNYiF3G6Urexbo/CuEAk+m7ABkDZOH
-         1jUFy18MznEt3XDBI8mCga2dR7mbWnD1vSshSOVlImGKUXVUPgm7eYua1VBE15isxkJe
-         Wl4edT1oXBFFg85Mt6iFkWpNq/i69DISr1yQsGyuhe5MQIfBLbwCiRElexCVYd+CXran
-         sPDCrIP92nzZPiO9OT68hDoEBbe/MqIrEnors/tjLuYxrY0Bsko6DFVqMuVmWAOIVdOf
-         oNOw==
-X-Gm-Message-State: AOJu0YypW2aEX0kGX0BbQKoyW1UPnlZ3CKS7+z6A7E2HoQVkZs+oBLV5
-	6dJvP6W/GkAP2wCtTfdlc+imC4H4P77y+t4M+q6lI9zGU8ojOL6RH9zUPRwEWdwXKDJkkqIV0iC
-	YeA==
-X-Google-Smtp-Source: AGHT+IHM5VqGTPfsIsGNcbuR2VfSqB1AGkIPq1pRvYCtl3Dzv46BIfBqP1NL9KevmFyYzQje/NXy4EWVYsU=
+        d=1e100.net; s=20230601; t=1706297672; x=1706902472;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=VDi21S2WSjOuRBpM9Lk1FIKTWvNjyTGMc+fXaSns+7w=;
+        b=YbJgk2vx2EHyTyqynXGD4Y2j+xt9q8+IIj8H6VHFsW7h5hhjBbvYb+jqUyZbp/WlN1
+         6qfy1OPslBz0rkSFcEv8ONvHAYgfTH0e227T3P+FBroJKf4+NNVh5Tn5atl/RQaYZpms
+         pWwFDWHiIJEFZWyYy0movXMkkKh74gghWrcHSMxmMzx7EBHLaKuBfgax3HP/tu8bAyNU
+         FPI+D87vTo9Z569IR4FxH2BtMCVBkC02LGvJodB1acX3kr+GLFMtVNoPsEzmGCoUboME
+         sSw6BYaDSEQM6EZ8bdjwBfMLmG8hrqOXS9mjzaElJq9kRYai3Lr4XLiLQQ3cjpqyA2fG
+         1FnA==
+X-Gm-Message-State: AOJu0YyPJtZvufYf96DSn4H8MjUxBkuo87Ugjbo8auexurDh9P1heB6V
+	oqq8PA1j3FES5HX32OADDEtRjHlBwTAjLaHEF1A2ZRfwKezc2undDA48dEKwfka401TIHYOcuuL
+	OBQ==
+X-Google-Smtp-Source: AGHT+IG6iDfrXKF60Mn1tXIVcYuPyDJTeL9v6HNsiYCB2kJPLXZPTB5XEhh6DLfPtzAqTXhO4WuuZTwYFVw=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:1bc4:b0:6d9:b26d:d05d with SMTP id
- o4-20020a056a001bc400b006d9b26dd05dmr27073pfw.6.1706297552566; Fri, 26 Jan
- 2024 11:32:32 -0800 (PST)
-Date: Fri, 26 Jan 2024 11:32:31 -0800
-In-Reply-To: <20231005143839.365297-8-thuth@redhat.com>
+ (user=seanjc job=sendgmr) by 2002:a17:903:238f:b0:1d5:693a:8906 with SMTP id
+ v15-20020a170903238f00b001d5693a8906mr2053plh.3.1706297672003; Fri, 26 Jan
+ 2024 11:34:32 -0800 (PST)
+Date: Fri, 26 Jan 2024 11:34:30 -0800
+In-Reply-To: <CAL715WKMpui=+U56Qc5AiuLhUw_g-bjvtN5OmVz_hGdJmF1M5g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20231005143839.365297-1-thuth@redhat.com> <20231005143839.365297-8-thuth@redhat.com>
-Message-ID: <ZbQIz3thIczeRhCs@google.com>
-Subject: Re: [PATCH v2 7/7] KVM: selftests: x86: Use TAP interface in the
- userspace_msr_exit test
+References: <20240124003858.3954822-1-mizhang@google.com> <20240124003858.3954822-2-mizhang@google.com>
+ <ZbExcMMl-IAzJrfx@google.com> <CAAAPnDFAvJBuETUsBScX6WqSbf_j=5h_CpWwrPHwXdBxDg_LFQ@mail.gmail.com>
+ <ZbGAXpFUso9JzIjo@google.com> <ZbGOK9m6UKkQ38bK@google.com>
+ <ZbGUfmn-ZAe4lkiN@google.com> <ZbGn8lAj4XxiecFn@google.com>
+ <ZbP7BTvdZ1-b3MmE@google.com> <CAL715WKMpui=+U56Qc5AiuLhUw_g-bjvtN5OmVz_hGdJmF1M5g@mail.gmail.com>
+Message-ID: <ZbQJRtaxhpZR7ntT@google.com>
+Subject: Re: [PATCH 1/2] KVM: x86/pmu: Reset perf_capabilities in vcpu to 0 if
+ PDCM is disabled
 From: Sean Christopherson <seanjc@google.com>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, Shuah Khan <shuah@kernel.org>, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+To: Mingwei Zhang <mizhang@google.com>
+Cc: Frederick Mayle <fmayle@google.com>, Steven Moreland <smoreland@google.com>, 
+	Aaron Lewis <aaronlewis@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 05, 2023, Thomas Huth wrote:
-> Use the kselftest_harness.h interface in this test to get TAP
-> output, so that it is easier for the user to see what the test
-> is doing.
-> 
-> Note: We're not using the KVM_ONE_VCPU_TEST() macro here (but the
-> generic TEST() macro from kselftest_harness.h) since each of the
-> tests needs a different guest code function.
+On Fri, Jan 26, 2024, Mingwei Zhang wrote:
+> +Frederick Mayle +Steven Moreland
+>=20
+> On Fri, Jan 26, 2024 at 10:33=E2=80=AFAM Sean Christopherson <seanjc@goog=
+le.com> wrote:
+> >
+> > On Thu, Jan 25, 2024, Mingwei Zhang wrote:
+> > > On Wed, Jan 24, 2024, Sean Christopherson wrote:
+> > > > On Wed, Jan 24, 2024, Mingwei Zhang wrote:
+> > > > > I think this makes a lot of confusions on migration where VMM on =
+the source
+> > > > > believes that a non-zero value from KVM_GET_MSRS is valid and the=
+ VMM on the
+> > > > > target will find it not true.
+> > > >
+> > > > Yes, but seeing a non-zero value is a KVM bug that should be fixed.
+> > > >
+> > > How about adding an entry in vmx_get_msr() for
+> > > MSR_IA32_PERF_CAPABILITIES and check pmu_version? This basically pair=
+s
+> > > with the implementation in vmx_set_msr() for MSR_IA32_PERF_CAPABILITI=
+ES.
+> > > Doing so allows KVM_GET_MSRS return 0 for the MSR instead of returnin=
+g
+> > > the initial permitted value.
+> >
+> > Hrm, I don't hate it as a stopgap.  But if we are the only people that =
+are affected,
+> > because again I'm pretty sure QEMU is fine, I would rather we just fix =
+things in
+> > our VMM and/or internal kernel.
+>=20
+> It is not just QEMU. crossvm is another open source VMM that suffers
+> from this one.
 
-I would much rather we add a KVM framework that can deal with this, i.e. build
-something that is flexible from the get-go.  Allowing tests to set the entry point
-after vCPU is fairly straightforward (patch below, compile tested only on x86).
+Does CrosVM support migration or some other form of save/restore (RR?)?  An=
+d if
+so, does CrosVM do that in conjunction with hiding the vPMU from the guest?
 
-With that, my vote would be to have KVM_ONE_VCPU_TEST_SUITE() *always* pass NULL
-for the entry point, and instead always require sub-tests to pass the guest code
-to KVM_ONE_VCPU_TEST().  I think having the sub-test explicitly specify its guest
-code will be helpful for developers reading the code.  And maybe waaay down the
-road if we can get all tests converted to the framework, we can drop @guest_code
-from vm_create_with_one_vcpu() entirely.
-
-Apologies for the horrifically slow review, I got waylaid by non-upstream stuff
-for almost all of November=>January. :-(
-
----
-From: Sean Christopherson <seanjc@google.com>
-Date: Fri, 26 Jan 2024 11:15:13 -0800
-Subject: [PATCH] KVM: selftests: Move setting a vCPU's entry point to a
- dedicated API
-
-Extract the code to set a vCPU's entry point out of vm_arch_vcpu_add() and
-into a new API, vcpu_arch_set_entry_point().  Providing a separate API
-will allow creating a KVM selftests hardness that can handle tests that
-use different entry points for sub-tests, whereas *requiring* the entry
-point to be specified at vCPU creation makes it difficult to create a
-generic harness, e.g. the boilerplate setup/teardown can't easily create
-and destroy the VM and vCPUs.
-
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- .../selftests/kvm/include/kvm_util_base.h     | 11 +++++----
- .../selftests/kvm/lib/aarch64/processor.c     | 23 ++++++++++++++-----
- .../selftests/kvm/lib/riscv/processor.c       |  9 +++++---
- .../selftests/kvm/lib/s390x/processor.c       | 13 ++++++-----
- .../selftests/kvm/lib/x86_64/processor.c      | 13 ++++++++---
- 5 files changed, 47 insertions(+), 22 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-index 9e5afc472c14..a6e7738a8db7 100644
---- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-@@ -969,15 +969,18 @@ static inline void vcpu_dump(FILE *stream, struct kvm_vcpu *vcpu,
-  * Input Args:
-  *   vm - Virtual Machine
-  *   vcpu_id - The id of the VCPU to add to the VM.
-- *   guest_code - The vCPU's entry point
-  */
--struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
--				  void *guest_code);
-+struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id);
-+void vcpu_arch_set_entry_point(struct kvm_vcpu *vcpu, void *guest_code);
- 
- static inline struct kvm_vcpu *vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
- 					   void *guest_code)
- {
--	return vm_arch_vcpu_add(vm, vcpu_id, guest_code);
-+	struct kvm_vcpu *vcpu = vm_arch_vcpu_add(vm, vcpu_id);
-+
-+	vcpu_arch_set_entry_point(vcpu, guest_code);
-+
-+	return vcpu;
- }
- 
- /* Re-create a vCPU after restarting a VM, e.g. for state save/restore tests. */
-diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-index 43b9a7283360..ed4ab29f4fad 100644
---- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-@@ -365,8 +365,13 @@ void vcpu_arch_dump(FILE *stream, struct kvm_vcpu *vcpu, uint8_t indent)
- 		indent, "", pstate, pc);
- }
- 
--struct kvm_vcpu *aarch64_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
--				  struct kvm_vcpu_init *init, void *guest_code)
-+void vcpu_arch_set_entry_point(struct kvm_vcpu *vcpu, void *guest_code)
-+{
-+	vcpu_set_reg(vcpu, ARM64_CORE_REG(regs.pc), (uint64_t)guest_code);
-+}
-+
-+static struct kvm_vcpu *__aarch64_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
-+					   struct kvm_vcpu_init *init)
- {
- 	size_t stack_size;
- 	uint64_t stack_vaddr;
-@@ -381,15 +386,21 @@ struct kvm_vcpu *aarch64_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
- 	aarch64_vcpu_setup(vcpu, init);
- 
- 	vcpu_set_reg(vcpu, ARM64_CORE_REG(sp_el1), stack_vaddr + stack_size);
--	vcpu_set_reg(vcpu, ARM64_CORE_REG(regs.pc), (uint64_t)guest_code);
-+}
-+
-+struct kvm_vcpu *aarch64_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
-+				  struct kvm_vcpu_init *init, void *guest_code)
-+{
-+	struct kvm_vcpu *vcpu = __aarch64_vcpu_add(vm, vcpu_id, init);
-+
-+	vcpu_arch_set_entry_point(vcpu, guest_code);
- 
- 	return vcpu;
- }
- 
--struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
--				  void *guest_code)
-+struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id)
- {
--	return aarch64_vcpu_add(vm, vcpu_id, NULL, guest_code);
-+	return __aarch64_vcpu_add(vm, vcpu_id, NULL);
- }
- 
- void vcpu_args_set(struct kvm_vcpu *vcpu, unsigned int num, ...)
-diff --git a/tools/testing/selftests/kvm/lib/riscv/processor.c b/tools/testing/selftests/kvm/lib/riscv/processor.c
-index 2bb33a8ac03c..6d5ef6ed0234 100644
---- a/tools/testing/selftests/kvm/lib/riscv/processor.c
-+++ b/tools/testing/selftests/kvm/lib/riscv/processor.c
-@@ -277,8 +277,12 @@ static void __aligned(16) guest_unexp_trap(void)
- 		  0, 0, 0, 0, 0, 0);
- }
- 
--struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
--				  void *guest_code)
-+void vcpu_arch_set_entry_point(struct kvm_vcpu *vcpu, void *guest_code)
-+{
-+	vcpu_set_reg(vcpu, RISCV_CORE_REG(regs.pc), (unsigned long)guest_code);
-+}
-+
-+struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id)
- {
- 	int r;
- 	size_t stack_size;
-@@ -312,7 +316,6 @@ struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
- 
- 	/* Setup stack pointer and program counter of guest */
- 	vcpu_set_reg(vcpu, RISCV_CORE_REG(regs.sp), stack_vaddr + stack_size);
--	vcpu_set_reg(vcpu, RISCV_CORE_REG(regs.pc), (unsigned long)guest_code);
- 
- 	/* Setup default exception vector of guest */
- 	vcpu_set_reg(vcpu, RISCV_GENERAL_CSR_REG(stvec), (unsigned long)guest_unexp_trap);
-diff --git a/tools/testing/selftests/kvm/lib/s390x/processor.c b/tools/testing/selftests/kvm/lib/s390x/processor.c
-index f6d227892cbc..4ad4492eea1d 100644
---- a/tools/testing/selftests/kvm/lib/s390x/processor.c
-+++ b/tools/testing/selftests/kvm/lib/s390x/processor.c
-@@ -155,15 +155,18 @@ void virt_arch_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
- 	virt_dump_region(stream, vm, indent, vm->pgd);
- }
- 
--struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
--				  void *guest_code)
-+void vcpu_arch_set_entry_point(struct kvm_vcpu *vcpu, void *guest_code)
-+{
-+	vcpu->run->psw_addr = (uintptr_t)guest_code;
-+}
-+
-+struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id)
- {
- 	size_t stack_size =  DEFAULT_STACK_PGS * getpagesize();
- 	uint64_t stack_vaddr;
- 	struct kvm_regs regs;
- 	struct kvm_sregs sregs;
- 	struct kvm_vcpu *vcpu;
--	struct kvm_run *run;
- 
- 	TEST_ASSERT(vm->page_size == 4096, "Unsupported page size: 0x%x",
- 		    vm->page_size);
-@@ -184,9 +187,7 @@ struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
- 	sregs.crs[1] = vm->pgd | 0xf;		/* Primary region table */
- 	vcpu_sregs_set(vcpu, &sregs);
- 
--	run = vcpu->run;
--	run->psw_mask = 0x0400000180000000ULL;  /* DAT enabled + 64 bit mode */
--	run->psw_addr = (uintptr_t)guest_code;
-+	vcpu->run->psw_mask = 0x0400000180000000ULL;  /* DAT enabled + 64 bit mode */
- 
- 	return vcpu;
- }
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index 4bc52948447d..18dfabc1c6e7 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -562,8 +562,16 @@ void kvm_arch_vm_post_create(struct kvm_vm *vm)
- 	sync_global_to_guest(vm, host_cpu_is_amd);
- }
- 
--struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
--				  void *guest_code)
-+void vcpu_arch_set_entry_point(struct kvm_vcpu *vcpu, void *guest_code)
-+{
-+	struct kvm_regs regs;
-+
-+	vcpu_regs_get(vcpu, &regs);
-+	regs.rip = (unsigned long) guest_code;
-+	vcpu_regs_set(vcpu, &regs);
-+}
-+
-+struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id)
- {
- 	struct kvm_mp_state mp_state;
- 	struct kvm_regs regs;
-@@ -597,7 +605,6 @@ struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
- 	vcpu_regs_get(vcpu, &regs);
- 	regs.rflags = regs.rflags | 0x2;
- 	regs.rsp = stack_vaddr;
--	regs.rip = (unsigned long) guest_code;
- 	vcpu_regs_set(vcpu, &regs);
- 
- 	/* Setup the MP state */
-
-base-commit: e19ec6e3e05fa223f05c72806028dfa531dbd0ae
--- 
-
+Because if not, then I think we can squeak by.
 
