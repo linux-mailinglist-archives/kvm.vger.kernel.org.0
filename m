@@ -1,141 +1,222 @@
-Return-Path: <kvm+bounces-7196-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7197-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14BD983E1DF
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 19:45:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B02DA83E1E2
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 19:46:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D3E21C241A2
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 18:45:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 18BD5B21229
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 18:46:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F808224E0;
-	Fri, 26 Jan 2024 18:44:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51E87210F3;
+	Fri, 26 Jan 2024 18:46:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="dZ7IOSuV"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X5YIJEMb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 791FF1DDFC;
-	Fri, 26 Jan 2024 18:44:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DD771CFAE
+	for <kvm@vger.kernel.org>; Fri, 26 Jan 2024 18:46:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706294673; cv=none; b=qZfR5f9PVsjsihMp6Ov/gZgFJDT1e1qXjWAB6h+P3xjHuH0ut8EPm7GdU0R70u3oz9jGTg1q+pnEH3sheA2UFoENbR2GVMRo6Yn9AGCjxAb2bgWD0X4WRsgUr4SbKLPjCjFPDCEHVXmQsKzD+JOspCghSepaZSOng8k/fQP83nQ=
+	t=1706294772; cv=none; b=DGL+qAYzroNLFSi7356s3C2gPBqb88NghsO81AaYy6qG6apajjElkvntFAzpPDGU1XITWtpwdUCW7nm1Fty+8FafBomi3Pnzg105Y0eymTDvl4+iegUZpcXvCbaistmyxaT1f8iRQ+yC61HecCu6arG4rmso3CLkzvmJdMCZXyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706294673; c=relaxed/simple;
-	bh=nf/POY29CG3Y+BqXT0M1LE29Qv40vbKTyyGYz43XKHs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fTqiWFPgDEIQIOFIcwn/h4s9ns9HfyZXOmfUQ//Z9OUptYZraRfBMfjgFp7POOEoV7hdar63JIPvztMLUMOBJSA5kIH79V0YcORWjontguAUtI09oMO2FnPu8Rs+0tA0Y1uz12XAGpFotfTUuCnohqGlmghBtpT+hSSYafEL4x4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=dZ7IOSuV; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 5BA7F40E01A9;
-	Fri, 26 Jan 2024 18:44:27 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id pobZP-BeJfAp; Fri, 26 Jan 2024 18:44:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1706294665; bh=duwCYa0fwFKf6HI10qA1Z2xg/PK3N1HXBTl9zUoAe5Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dZ7IOSuVpOKnAq6iSSA/5BPQOosteryR4BL/dDYOzqOz7mbKP7XKS6DYNmYUuR7zQ
-	 ucDQCB+3oYkx5yez0vnxL08sdZIHI9XeqjTUjLhjeHjRH7KTfwFIhsp5Upqd2fz4iG
-	 IN6ieFmKw228wvOseFZAsBm4kuZ71QDY8XcRQrU3wwPB4gA/y0d1umlumNSy6PlR/6
-	 lFGPR1q0bFT80L8ZguOxanmGs9TLwgCOjQ+szOZi1iLGLfwkzYu13S2M9ozFFTiItu
-	 7aI1enA/as9CDGUCSqQLNtBO4im+L9sC7Wa2DDCtzOndx7PlKaP7XsYLJMYIwich8A
-	 HX2OWGwk+ZT1kNCsTNBihyxgyFzxn/h2k06fdbe5unNqSE+LfH7Oss/wbqBFz6pnQW
-	 I0VK/FW7wQAMQ89hI2Bm3AHl45qD6NlDpKSr4dfgRIOQZgENQYbIUtrQlTyZK/ccNF
-	 lFtJ68KKeAM5oX+Lokm9bWJvRMAaoTS7IHcX0AB7Dtg2x14FNrH9oNNX6vvQJo4BIb
-	 YS+H0YBgJqjXVhNmVsCkdnJQ6EDEx9ledNnVioJksK+fIyC+nlYnDb2XKLoC775Pcn
-	 KKFax279Nwwcmuvkq/sobr8XRY8Fuv8Su6Lo4xnRYi/aYYKe/ZlP29oc3397HujdT9
-	 w/8zEkJUX+JWvm6vs5bQrgZs=
-Received: from zn.tnic (pd953033e.dip0.t-ipconnect.de [217.83.3.62])
+	s=arc-20240116; t=1706294772; c=relaxed/simple;
+	bh=Pi1H1v2txq2Pi37UwQSnLaAZAbhT3iyI5PYxgw+NsAg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=ai2RKG7J3SOM7n0eM0nJrX1bleAUhX7smjMrsfInlNuXcdVy1Q+ej0mRzBNLdtMOjm6ODzYszTCYbX8WjO2BDNS1AqvrnGj5Ha3U7fb9UJM9Ljd7B9F+gCyyfcBtizbj+oj2ifSyoqp3DALOhkvhm594yIcsnSDTdSMA2T6uB50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=X5YIJEMb; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706294769;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=RKs48FQbd9FNeqPhxajh602gnifp1I14sgFmxWPk/Nc=;
+	b=X5YIJEMbZILucbZ7B5yaGmq7ayHKSmyupyoK8HIBzbOSe67yZAd/hlCB/PO3IOsneU3+al
+	zoJmHbEUCmubGi7RtSJDuqkORJIiM7ocYB8HyoUon8S4cqVWPDNAIZUQwV7FygDlHPDCdT
+	rD85v15pAahwz09PgJ0tPKXg+hgtCwU=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-684-34_5SqFYMgienixdVjGB9g-1; Fri,
+ 26 Jan 2024 13:46:03 -0500
+X-MC-Unique: 34_5SqFYMgienixdVjGB9g-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 853E840E00C5;
-	Fri, 26 Jan 2024 18:43:48 +0000 (UTC)
-Date: Fri, 26 Jan 2024 19:43:40 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Michael Roth <michael.roth@amd.com>
-Cc: x86@kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-	linux-mm@kvack.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-	rientjes@google.com, tobin@ibm.com, vbabka@suse.cz,
-	kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
-	pankaj.gupta@amd.com, liam.merwick@oracle.com
-Subject: Re: [PATCH v2 11/25] x86/sev: Adjust directmap to avoid inadvertant
- RMP faults
-Message-ID: <20240126184340.GEZbP9XA13X91-eybA@fat_crate.local>
-References: <20240126041126.1927228-1-michael.roth@amd.com>
- <20240126041126.1927228-12-michael.roth@amd.com>
- <20240126153451.GDZbPRG3KxaQik-0aY@fat_crate.local>
- <20240126170415.f7r4nvsrzgpzcrzv@amd.com>
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4174A3C100B2;
+	Fri, 26 Jan 2024 18:46:03 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 1FA36A2E;
+	Fri, 26 Jan 2024 18:46:03 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Cc: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+Subject: [PATCH v2] KVM: x86: Give a hint when Win2016 might fail to boot due to XSAVES erratum
+Date: Fri, 26 Jan 2024 13:46:02 -0500
+Message-Id: <20240126184602.2410991-1-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240126170415.f7r4nvsrzgpzcrzv@amd.com>
+Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
-On Fri, Jan 26, 2024 at 11:04:15AM -0600, Michael Roth wrote:
-> vaddr comes from pfn_to_kaddr(pfn), i.e. __va(paddr), so it will
-> necessarily be a direct-mapped address above __PAGE_OFFSET.
+From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
 
-Ah, true.
+Since commit b0563468eeac ("x86/CPU/AMD: Disable XSAVES on AMD family 0x17")
+kernel unconditionally clears the XSAVES CPU feature bit on Zen1/2 CPUs.
 
-> For upper-end, a pfn_valid(pfn) check might suffice, since only a valid
-> PFN would have a possibly-valid mapping wthin the directmap range.
+Because KVM CPU caps are initialized from the kernel boot CPU features this
+makes the XSAVES feature also unavailable for KVM guests in this case.
+At the same time the XSAVEC feature is left enabled.
 
-Looking at it, yap, that could be a sensible thing to check.
+Unfortunately, having XSAVEC but no XSAVES in CPUID breaks Hyper-V enabled
+Windows Server 2016 VMs that have more than one vCPU.
 
-> These are PFNs that are owned/allocated-to the caller. Due to the nature
-> of the directmap it's possible non-owners would write to a mapping that
-> overlaps, but vmalloc()/etc. would not create mappings for any pages that
-> were not specifically part of an allocation that belongs to the caller,
-> so I don't see where there's any chance for an overlap there. And the caller
-> of these functions would not be adjusting directmap for PFNs that might be
-> mapped into other kernel address ranges like kernel-text/etc unless the
-> caller was specifically making SNP-aware adjustments to those ranges, in
-> which case it would be responsible for making those other adjustments,
-> or implementing the necessary helpers/etc.
+Let's at least give users hint in the kernel log what could be wrong since
+these VMs currently simply hang at boot with a black screen - giving no
+clue what suddenly broke them and how to make them work again.
 
-Why does any of that matter?
+Trigger the kernel message hint based on the particular guest ID written to
+the Guest OS Identity Hyper-V MSR implemented by KVM.
 
-If you can make this helper as generic as possible now, why don't you?
+Defer this check to when the L1 Hyper-V hypervisor enables SVM in EFER
+since we want to limit this message to Hyper-V enabled Windows guests only
+(Windows session running nested as L2) but the actual Guest OS Identity MSR
+write is done by L1 and happens before it enables SVM.
 
-> I'm not aware of such cases in the current code, and I don't think it makes
-> sense to attempt to try to handle them here generically until such a case
-> arises, since it will likely involve more specific requirements than what
-> we can anticipate from a theoretical/generic standpoint.
+Fixes: b0563468eeac ("x86/CPU/AMD: Disable XSAVES on AMD family 0x17")
+Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+Message-Id: <b83ab45c5e239e5d148b0ae7750133a67ac9575c.1706127425.git.maciej.szmigiero@oracle.com>
+[Move some checks before mutex_lock(), rename function. - Paolo]
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/include/asm/kvm_host.h |  2 ++
+ arch/x86/kvm/hyperv.c           | 50 +++++++++++++++++++++++++++++++++
+ arch/x86/kvm/hyperv.h           |  3 ++
+ arch/x86/kvm/x86.c              |  4 +++
+ 4 files changed, 59 insertions(+)
 
-Then that's a different story. If it will likely involve more specific
-handling, then that function should deal with pfns for which it can DTRT
-and for others warn loudly so that the code gets fixed in time.
-
-IOW, then it should check for the upper pfn of the direct map here and
-we have two, depending on the page sizes used...
-
-Thx.
-
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index b5b2d0fde579..d271ba20a0b2 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1145,6 +1145,8 @@ struct kvm_hv {
+ 	unsigned int synic_auto_eoi_used;
+ 
+ 	struct kvm_hv_syndbg hv_syndbg;
++
++	bool xsaves_xsavec_checked;
+ };
+ #endif
+ 
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index 4943f6b2bbee..8a47f8541eab 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -1322,6 +1322,56 @@ static bool hv_check_msr_access(struct kvm_vcpu_hv *hv_vcpu, u32 msr)
+ 	return false;
+ }
+ 
++#define KVM_HV_WIN2016_GUEST_ID 0x1040a00003839
++#define KVM_HV_WIN2016_GUEST_ID_MASK (~GENMASK_ULL(23, 16)) /* mask out the service version */
++
++/*
++ * Hyper-V enabled Windows Server 2016 SMP VMs fail to boot in !XSAVES && XSAVEC
++ * configuration.
++ * Such configuration can result from, for example, AMD Erratum 1386 workaround.
++ *
++ * Print a notice so users aren't left wondering what's suddenly gone wrong.
++ */
++static void __kvm_hv_xsaves_xsavec_maybe_warn(struct kvm_vcpu *vcpu)
++{
++	struct kvm *kvm = vcpu->kvm;
++	struct kvm_hv *hv = to_kvm_hv(kvm);
++
++	/* Check again under the hv_lock.  */
++	if (hv->xsaves_xsavec_checked)
++		return;
++
++	if ((hv->hv_guest_os_id & KVM_HV_WIN2016_GUEST_ID_MASK) !=
++	    KVM_HV_WIN2016_GUEST_ID)
++		return;
++
++	hv->xsaves_xsavec_checked = true;
++
++	/* UP configurations aren't affected */
++	if (atomic_read(&kvm->online_vcpus) < 2)
++		return;
++
++	if (guest_cpuid_has(vcpu, X86_FEATURE_XSAVES) ||
++	    !guest_cpuid_has(vcpu, X86_FEATURE_XSAVEC))
++		return;
++
++	pr_notice_ratelimited("Booting SMP Windows KVM VM with !XSAVES && XSAVEC. "
++			      "If it fails to boot try disabling XSAVEC in the VM config.\n");
++}
++
++void kvm_hv_xsaves_xsavec_maybe_warn(struct kvm_vcpu *vcpu)
++{
++	struct kvm_hv *hv = to_kvm_hv(vcpu->kvm);
++
++	if (!vcpu->arch.hyperv_enabled ||
++	    hv->xsaves_xsavec_checked)
++		return;
++
++	mutex_lock(&hv->hv_lock);
++	__kvm_hv_xsaves_xsavec_maybe_warn(vcpu);
++	mutex_unlock(&hv->hv_lock);
++}
++
+ static int kvm_hv_set_msr_pw(struct kvm_vcpu *vcpu, u32 msr, u64 data,
+ 			     bool host)
+ {
+diff --git a/arch/x86/kvm/hyperv.h b/arch/x86/kvm/hyperv.h
+index 1dc0b6604526..923e64903da9 100644
+--- a/arch/x86/kvm/hyperv.h
++++ b/arch/x86/kvm/hyperv.h
+@@ -182,6 +182,8 @@ void kvm_hv_setup_tsc_page(struct kvm *kvm,
+ 			   struct pvclock_vcpu_time_info *hv_clock);
+ void kvm_hv_request_tsc_page_update(struct kvm *kvm);
+ 
++void kvm_hv_xsaves_xsavec_maybe_warn(struct kvm_vcpu *vcpu);
++
+ void kvm_hv_init_vm(struct kvm *kvm);
+ void kvm_hv_destroy_vm(struct kvm *kvm);
+ int kvm_hv_vcpu_init(struct kvm_vcpu *vcpu);
+@@ -267,6 +269,7 @@ int kvm_hv_vcpu_flush_tlb(struct kvm_vcpu *vcpu);
+ static inline void kvm_hv_setup_tsc_page(struct kvm *kvm,
+ 					 struct pvclock_vcpu_time_info *hv_clock) {}
+ static inline void kvm_hv_request_tsc_page_update(struct kvm *kvm) {}
++static inline void kvm_hv_xsaves_xsavec_maybe_warn(struct kvm_vcpu *vcpu) {}
+ static inline void kvm_hv_init_vm(struct kvm *kvm) {}
+ static inline void kvm_hv_destroy_vm(struct kvm *kvm) {}
+ static inline int kvm_hv_vcpu_init(struct kvm_vcpu *vcpu)
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 9a89471a613c..bf10a9073a09 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1782,6 +1782,10 @@ static int set_efer(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 	if ((efer ^ old_efer) & KVM_MMU_EFER_ROLE_BITS)
+ 		kvm_mmu_reset_context(vcpu);
+ 
++	if (!static_cpu_has(X86_FEATURE_XSAVES) &&
++	    (efer & EFER_SVME))
++		kvm_hv_xsaves_xsavec_maybe_warn(vcpu);
++
+ 	return 0;
+ }
+ 
 -- 
-Regards/Gruss,
-    Boris.
+2.39.1
 
-https://people.kernel.org/tglx/notes-about-netiquette
 
