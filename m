@@ -1,208 +1,164 @@
-Return-Path: <kvm+bounces-7080-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7081-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3217D83D493
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 09:12:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 011AF83D52D
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 10:01:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0148287DFC
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 08:11:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD3EC283B65
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 09:01:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D30D17C65;
-	Fri, 26 Jan 2024 06:52:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 027F058AAC;
+	Fri, 26 Jan 2024 07:39:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YAMWr8TP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GGO/xmxd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 985CC17585;
-	Fri, 26 Jan 2024 06:52:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706251933; cv=fail; b=sbUcbv78ize74NGZKC9YPxA0YQgcCKrwZc5YXoeMcaoyiuFTU+xD0ErTN6sOGxldqaNOZRL34uCgK8fJzpxAmfUzyTKMXKhaIJzhO5hBN5I069VglQGzJJbmph25+aBC6/uw937JW9E+ll7ByZXfcJOgNRym5BxC+V64gGE3vRM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706251933; c=relaxed/simple;
-	bh=7WzdeSVuAzPFIl4ACzjyiWkEQCd7IyJW+gCSgQtkbVE=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=YEUsZ7mXybfpygpfSWD/mpVTB5Wnd9W6Bf6PRLL7Zv8xfcXRZYN3o5n5d8+mqNLjCH603A28XEkayjD1LcctvzHyjcAZ4CWJiJXA7V601dQGld7iIB+GV0bs/AJKzKtbkd0CST/Ia137tuw9kvl4OPOZ+GJmif+SMBI1k1zHvxY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YAMWr8TP; arc=fail smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8967111700;
+	Fri, 26 Jan 2024 07:39:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.134.136.65
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706254785; cv=none; b=ME4pKaoTw+vOj5fc0gVv3cj9mRotwBNW1ccUD2ad6jw7t2xim4W67GndabG49LIwJIHwgONN4oYyS/d5px2PpIgIt/F9YMp4Xto+quXfabn2jnCn2/dViHut6oamtqFKlb3VgqcAVS3JFHWn0Ga582uTsYEYQA+p/TbhxHv5TBU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706254785; c=relaxed/simple;
+	bh=U9mNTNgZsSW+bVbmEnmLkw4a/p6CuTR5Z5KKpN05XeQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DQbFBCmBPoefhun4yYTvqsjFmOXldO1pclML3QbD/VbKhAyaNymne3CAyOZcj8w8YfbkdjtWnyho6CFs/GxIbhicLLk6pUxDNFVHe0MrchCcEVd1Bev/6rz3PJHudtYrj9eL1DtXKkAXNsgYQ5WZSiqJrrZnNtZbXvjaJOQYqx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GGO/xmxd; arc=none smtp.client-ip=134.134.136.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706251932; x=1737787932;
+  t=1706254783; x=1737790783;
   h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=7WzdeSVuAzPFIl4ACzjyiWkEQCd7IyJW+gCSgQtkbVE=;
-  b=YAMWr8TP/yqiTcduywTR923hrlaYd5eImDJh/gU+MPe84nGDZOU36j/h
-   SaSFzGlsTeAn52XRbcL7U6nJtwi0kl6tXcjifQvEeAqEuA5aLxh+6u3qc
-   FsUMFka6dnzdo2V8j2OidYFescmEgHY0OLREkjSE2NQpJMJGnNgd5ThFO
-   MrZRN/vo78apH7BH7qH7OApnxHSnl4/lIEN1iMBTzvHiPFykivSPi6E0I
-   1BF7E2RW8qKu4KAuUcc9odbM0QZ8rvA6HnHwSKS/ckXvGUZFSauF4/RB5
-   Pf8BsFSFZ/udYcXzgOu64KnBdn0AJL39I/ZPtnR/l8xmnJ6gxW4DjLX7r
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="2239825"
+   mime-version:in-reply-to;
+  bh=U9mNTNgZsSW+bVbmEnmLkw4a/p6CuTR5Z5KKpN05XeQ=;
+  b=GGO/xmxdPb+7QhoqXI/U8mp+6Mc8vkv1wfaEpqlUxM2SGGjv+pTqt9nl
+   eyuNa4kuc6MhKDtZuU+2D9Gza8F3otPcLf/eT2nO3SLjuXog8jIkR/cBI
+   zqDLTS9RngUxP0Ab7TX2N5xHAB6fp737zFP1XO86FwGAK7PcQQYQmEh18
+   PN1n+hvLgY40Muzf5cSgG22DY/vg3bo1kBYVG5YVB2xK+ZpRHBqF4KVw5
+   WG+iGn6qli9JAnlEjjjDxXZlJPyzCiTKpNWF0iwvXXetYTWxrr6z4/ZTx
+   9YvRwkmNDr3+x1BXvkNCGTn3oLsmYjqpG5vUhAwpPNx+LYTAJazY0PXbS
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="406145211"
 X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="2239825"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2024 22:52:11 -0800
+   d="scan'208";a="406145211"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2024 23:39:42 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="28737788"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 25 Jan 2024 22:52:11 -0800
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 25 Jan 2024 22:52:10 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 25 Jan 2024 22:52:09 -0800
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Thu, 25 Jan 2024 22:52:09 -0800
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.169)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 25 Jan 2024 22:52:09 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IomK7vw/Nvz3VXwae6BHU2LaWqMWoM0myB3S3YsdoXdh5ybyrkQYyO4rlWdtByR1OtvWIciWWwJHRpLn1fo2Kwf6Gvfg1Ur0bbeCeZFg1MyDQIcy5ebug5/83J2lZJDsGf1t8/f3U7Lkzvr9mgD5lwTADb8KY31s7xpJFlslD07BebYAeEnYlcqrP8+CL1vCGXOfXzCAYazNQbEkPaBCvrz9PqA2RNhxC03ShtouaTUWQT7IcUXZllfXB4Q8MgGJbRTerFw/6GsN5J31/7d8f/ZFzVT0JbuQ6ehHp16d1n8yxks/kKAkBVvW7D4DJQqvr3JfMBZSxHnwZMdRRgVg8Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6+9BDuY0xglbKXnFmiZyGIXGfEJvDRLL3uqBsKVPdcA=;
- b=CJrs5v2WGlWVTnI7uUMXElNKHQbPAX7vpC5jjV6W1/9Zd+G7l3qNne4O86iYgDsb0Hamoj3lXAQfmjV0vCl54oUv4qU3aUBdsSQuDBMJXvy3x4Ibu5zmDE9M2oEe6a0eKdq3ACopl/XW6Ghl27x0yaFAm1G64tFL3MyyMSgpdIUwa3rKLktkG80ofBnwJBYTFQ2LEFGtjmOjjVvnsDwTIoTUiBGOODI3tQ3BD94IO7p38U04s2qZVULfporipmsXfq4kadTZsAdfBoVUIlzx0OIJTm7jeJ7eEXf1GQBMjfyAJgLEZAwt+b28PoPUWCNSe+bshIkGjyFLJ9D3WLk7LA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
- by DS0PR11MB6446.namprd11.prod.outlook.com (2603:10b6:8:c5::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.22; Fri, 26 Jan
- 2024 06:52:02 +0000
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::2903:9163:549:3b0d]) by CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::2903:9163:549:3b0d%6]) with mapi id 15.20.7228.027; Fri, 26 Jan 2024
- 06:52:01 +0000
-Date: Fri, 26 Jan 2024 14:51:52 +0800
-From: Chao Gao <chao.gao@intel.com>
-To: Yang Weijiang <weijiang.yang@intel.com>
-CC: <seanjc@google.com>, <pbonzini@redhat.com>, <dave.hansen@intel.com>,
-	<kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <x86@kernel.org>,
-	<yuan.yao@linux.intel.com>, <peterz@infradead.org>,
-	<rick.p.edgecombe@intel.com>, <mlevitsk@redhat.com>, <john.allen@amd.com>
-Subject: Re: [PATCH v9 21/27] KVM: x86: Save and reload SSP to/from SMRAM
-Message-ID: <ZbNWiFt/azHuL1+f@chao-email>
-References: <20240124024200.102792-1-weijiang.yang@intel.com>
- <20240124024200.102792-22-weijiang.yang@intel.com>
- <ZbMkRKyhy3jdiuzx@chao-email>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <ZbMkRKyhy3jdiuzx@chao-email>
-X-ClientProxiedBy: SI2P153CA0032.APCP153.PROD.OUTLOOK.COM
- (2603:1096:4:190::23) To CH3PR11MB8660.namprd11.prod.outlook.com
- (2603:10b6:610:1ce::13)
+   d="scan'208";a="2684770"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by orviesa004.jf.intel.com with ESMTP; 25 Jan 2024 23:39:41 -0800
+Date: Fri, 26 Jan 2024 15:36:20 +0800
+From: Xu Yilun <yilun.xu@linux.intel.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH 1/4] KVM: Always flush async #PF workqueue when vCPU is
+ being destroyed
+Message-ID: <ZbNg9BFT2o6NbgRX@yilunxu-OptiPlex-7050>
+References: <20240110011533.503302-1-seanjc@google.com>
+ <20240110011533.503302-2-seanjc@google.com>
+ <Zau/VQ0B5MCwoqZT@yilunxu-OptiPlex-7050>
+ <ZbFfVxp76qoBstul@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|DS0PR11MB6446:EE_
-X-MS-Office365-Filtering-Correlation-Id: 01508cbf-736c-4681-ca34-08dc1e3b4c8a
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: gXKYUuPO8HTEb1RUvzZxoK/vgG6E9mTVfRHA0oSDzum47KabOmNczFZzqljlw0bipinTX63KFAGMm1QS8L3KmcQRYckUh+NoYwNNtNDJyExYfO8vsuEnq6crZ/i153JwbsoRA2CXjU5EW1Yz5vDP+TUay+cGLv/qgxVvaJRWMxkqhrnkakU0MBoejwmNAesOzfw8o3GTIWrniLRhLrksH22BLvngyaBTfmI5XGULuSMiw6t3z0ku9Y5sf20lCadKxfvCHHcFr4tQCVqIKo2FBRyJI5WOrtvpJZ+nhmeE8gYYrvxQ4JI7hu8wfuAuzeb+xvyDd/Qs3B6DQraU/DwO9AArTze+tJ2ojQ8I1jEXHAYtjZpkX0ju8vAmFHxWGww+f9npo860G6FX3W+UHroyIi5duVHBekDPP2B6h0bM3QSWB2ePPBSZd0GTLFG09mS+fSzbARw30k8hDxUQmi3eFVu7pZrRkIY43Bm9RFjgy+nAxEDUC0Oy3JWeF5lVZynYZIO76o8mGvQOswynUJ/PjNHAuQa3NU8BfhacHd/xVmoASn8uU2CpMNAzSsTdJnrQ
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(39860400002)(366004)(376002)(136003)(346002)(396003)(230922051799003)(1800799012)(451199024)(64100799003)(186009)(6666004)(6486002)(478600001)(26005)(9686003)(6506007)(6512007)(83380400001)(316002)(6636002)(66556008)(66946007)(66476007)(5660300002)(8936002)(82960400001)(38100700002)(6862004)(8676002)(2906002)(86362001)(4326008)(41300700001)(33716001)(44832011);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?pKiRFZgZXkiuGmSwwT6vu7DBKPmELUv+mYBaERRRiO4z0Foyerl2b1EpG+WN?=
- =?us-ascii?Q?hxTjRC2yp5AtRNWL7XrsGdlDY5/kNR17WyKHBEVlmAP1krrsiPXfpSHSIyuX?=
- =?us-ascii?Q?NjQD5aUjgSwO7EMga1ilBLof9vSpA7Mbb6keh3mNQJKUI9TRwQz3rN8mqE0C?=
- =?us-ascii?Q?INp+YkMktn39e+4X5/bRrOzz1WnR3eURnUvvxSqdllpe376ut6WnqmMZNrpQ?=
- =?us-ascii?Q?ebo5KvZ5nAJ15bIE+HRA523nAjrqvEx4XSB3ehmnA12UkEq8eR8z2hIXDQ9U?=
- =?us-ascii?Q?FeGixH4/FnfNsn01HBIDSkZ/L6Wvom5K790yWfSs9AZROJm43Y100DU+4V2S?=
- =?us-ascii?Q?Mg/APU1sBnXpHyvAkrHF0Eybj3ylseOUj4/sIduuTYYwuhbk2G9chbTsTIZI?=
- =?us-ascii?Q?IyDVANYHuiwgYc+W/XmF1VnjbvVkEU7wMcCDOB2DJPECUk9Dsmo4qbVhm0AH?=
- =?us-ascii?Q?RlMn6ZboZT0KkcNTlzvo5P7vNAzMkjU7LW7Fr/8GZWw1COXf0OsD6eD+p2pW?=
- =?us-ascii?Q?Py+BN5p8Ag06MF/lfn7r2j8B2Jr07rURXivKjB1pMGDinHFOLtsB+34WWaJ1?=
- =?us-ascii?Q?k/aB9cEU0mj+P05ClHZCAV2kn8pxFmuFBjT2//L6LqdzuKRVKg2bw1THqAUf?=
- =?us-ascii?Q?7PwkAMcrCQ9o34TL/o+NieQZXiJtX2rQO7GMTQ2f0gXGd6taiflb1Noy7rHa?=
- =?us-ascii?Q?gL+W94R1U5HqLo+Q8GcbECaKzIjXeE+KQhnLmUIHIGk7d43a7LfFceoac8fA?=
- =?us-ascii?Q?1lkw+Ooz6Qn4iG6zmGjilnuWqeoE7/ZSZkyca5wrtEySmVabZEBfRAGylNko?=
- =?us-ascii?Q?GdjnpgKiwGlZRjpBDS+OwmzLvjVLeWt32k+gUm3mvAH9hyGfcEH0Mz2zYlWZ?=
- =?us-ascii?Q?0Q1MFsJXTzfqnCIM7NHglqyGAwyCHWSfAn5wazMG4iYkOnzzx8nw6Was+WW0?=
- =?us-ascii?Q?UU0QB3Jl7Ec/+aCt7t8VRDWdgoK4u7wHZLHAEPKqCrQJ1R5P5IWdykF2cH/J?=
- =?us-ascii?Q?5lMjklsQGn3S9b57A+bHhv1OHG8TSaytulsQJc90DGHjSoDuLptTzRMqRjg+?=
- =?us-ascii?Q?o4f7A+Uiqfu1qn0nao/JHnJbQl8MXGiU/o77uuKH5xyfStM1rgwASKg6DW4g?=
- =?us-ascii?Q?/SGpUPoZG2LfLB3JU/qxaAFru/KQ7UO+Ek5IE/0D4Gp0VZllp9jyMUtOCXGQ?=
- =?us-ascii?Q?YRUwIg5cUtVfsNWAupRgsbs3GOwOJQ+7EPQFy/B1DpawQcXkzQ/hw6+j/jcj?=
- =?us-ascii?Q?EcIgX5Zys5hTo4kZhJhaKw3tOMmriEvG83tcY9M9MlcSjWTCS5AwiDHcqXJK?=
- =?us-ascii?Q?6nzpuvQc0veyM6WRf8F3TCy9HTcNqaIwK9BFQX6jgMx61k021ai4Q9G3mcTx?=
- =?us-ascii?Q?dI1jVhbt8+qYH1iOG1avzi0nJkEmRSAIS7F7Uv6S8JqTi++AhAKHJE+eYqTd?=
- =?us-ascii?Q?CmiZFQXX+jvzxMz9t0A41XtN19llCeM6+0xsqo8RmGadPN4wsoLZ1PeczCPw?=
- =?us-ascii?Q?f4aV3T7aHxEg0fr4UBBLL9ScGqYbGOatE0LML0urMKjAWuXexaHfw8XEgBZm?=
- =?us-ascii?Q?GRTiNwz476O52i57C+0tARlFdM8fXdarzisnohP0?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 01508cbf-736c-4681-ca34-08dc1e3b4c8a
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jan 2024 06:52:01.7830
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: SZTsJfaYDVBxySm6amypFnTHzSEFM7qsqX9No2xl9ZUdX1uklnTC3sdHtoloUIM/Vy/J3ZSlCexx+dvtG61F2w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB6446
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZbFfVxp76qoBstul@google.com>
 
-On Fri, Jan 26, 2024 at 11:17:24AM +0800, Chao Gao wrote:
->On Tue, Jan 23, 2024 at 06:41:54PM -0800, Yang Weijiang wrote:
->>Save CET SSP to SMRAM on SMI and reload it on RSM. KVM emulates HW arch
->>behavior when guest enters/leaves SMM mode,i.e., save registers to SMRAM
->>at the entry of SMM and reload them at the exit to SMM. Per SDM, SSP is
->>one of such registers on 64-bit Arch, and add the support for SSP. Note,
->>on 32-bit Arch, SSP is not defined in SMRAM, so fail 32-bit CET guest
->>launch.
->>
->>Suggested-by: Sean Christopherson <seanjc@google.com>
->>Suggested-by: Chao Gao <chao.gao@intel.com>
->>Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
->>Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
->>---
->> arch/x86/kvm/cpuid.c | 11 +++++++++++
->> arch/x86/kvm/smm.c   |  8 ++++++++
->> arch/x86/kvm/smm.h   |  2 +-
->> 3 files changed, 20 insertions(+), 1 deletion(-)
->>
->>diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
->>index 3ab133530573..95233b0879a3 100644
->>--- a/arch/x86/kvm/cpuid.c
->>+++ b/arch/x86/kvm/cpuid.c
->>@@ -149,6 +149,17 @@ static int kvm_check_cpuid(struct kvm_vcpu *vcpu,
->> 		if (vaddr_bits != 48 && vaddr_bits != 57 && vaddr_bits != 0)
->> 			return -EINVAL;
->> 	}
->>+	/*
->>+	 * Prevent 32-bit guest launch if shadow stack is exposed as SSP
->>+	 * state is not defined for 32-bit SMRAM.
->>+	 */
->>+	best = cpuid_entry2_find(entries, nent, 0x80000001,
->>+				 KVM_CPUID_INDEX_NOT_SIGNIFICANT);
->>+	if (best && !(best->edx & F(LM))) {
->>+		best = cpuid_entry2_find(entries, nent, 0x7, 0);
->>+		if (best && (best->ecx & F(SHSTK)))
->
->F(LM) and F(SHSTK) are kernel-defined feature bits; they are not
->bit masks defined by the CPU.
+On Wed, Jan 24, 2024 at 11:04:55AM -0800, Sean Christopherson wrote:
+> On Sat, Jan 20, 2024, Xu Yilun wrote:
+> > On Tue, Jan 09, 2024 at 05:15:30PM -0800, Sean Christopherson wrote:
+> > > Always flush the per-vCPU async #PF workqueue when a vCPU is clearing its
+> > > completion queue, e.g. when a VM and all its vCPUs is being destroyed.
+> > > KVM must ensure that none of its workqueue callbacks is running when the
+> > > last reference to the KVM _module_ is put.  Gifting a reference to the
+> > > associated VM prevents the workqueue callback from dereferencing freed
+> > > vCPU/VM memory, but does not prevent the KVM module from being unloaded
+> > > before the callback completes.
+> > > 
+> > > Drop the misguided VM refcount gifting, as calling kvm_put_kvm() from
+> > > async_pf_execute() if kvm_put_kvm() flushes the async #PF workqueue will
+> > > result in deadlock.  async_pf_execute() can't return until kvm_put_kvm()
+> > > finishes, and kvm_put_kvm() can't return until async_pf_execute() finishes:
+> > > 
+> > >  WARNING: CPU: 8 PID: 251 at virt/kvm/kvm_main.c:1435 kvm_put_kvm+0x2d/0x320 [kvm]
+> > >  Modules linked in: vhost_net vhost vhost_iotlb tap kvm_intel kvm irqbypass
+> > >  CPU: 8 PID: 251 Comm: kworker/8:1 Tainted: G        W          6.6.0-rc1-e7af8d17224a-x86/gmem-vm #119
+> > >  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
+> > >  Workqueue: events async_pf_execute [kvm]
+> > >  RIP: 0010:kvm_put_kvm+0x2d/0x320 [kvm]
+> > >  Call Trace:
+> > >   <TASK>
+> > >   async_pf_execute+0x198/0x260 [kvm]
+> > >   process_one_work+0x145/0x2d0
+> > >   worker_thread+0x27e/0x3a0
+> > >   kthread+0xba/0xe0
+> > >   ret_from_fork+0x2d/0x50
+> > >   ret_from_fork_asm+0x11/0x20
+> > >   </TASK>
+> > >  ---[ end trace 0000000000000000 ]---
+> > >  INFO: task kworker/8:1:251 blocked for more than 120 seconds.
+> > >        Tainted: G        W          6.6.0-rc1-e7af8d17224a-x86/gmem-vm #119
+> > >  "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> > >  task:kworker/8:1     state:D stack:0     pid:251   ppid:2      flags:0x00004000
+> > >  Workqueue: events async_pf_execute [kvm]
+> > >  Call Trace:
+> > >   <TASK>
+> > >   __schedule+0x33f/0xa40
+> > >   schedule+0x53/0xc0
+> > >   schedule_timeout+0x12a/0x140
+> > >   __wait_for_common+0x8d/0x1d0
+> > >   __flush_work.isra.0+0x19f/0x2c0
+> > >   kvm_clear_async_pf_completion_queue+0x129/0x190 [kvm]
+> > >   kvm_arch_destroy_vm+0x78/0x1b0 [kvm]
+> > >   kvm_put_kvm+0x1c1/0x320 [kvm]
+> > >   async_pf_execute+0x198/0x260 [kvm]
+> > >   process_one_work+0x145/0x2d0
+> > >   worker_thread+0x27e/0x3a0
+> > >   kthread+0xba/0xe0
+> > >   ret_from_fork+0x2d/0x50
+> > >   ret_from_fork_asm+0x11/0x20
+> > >   </TASK>
+> > > 
+> > > If kvm_clear_async_pf_completion_queue() actually flushes the workqueue,
+> > > then there's no need to gift async_pf_execute() a reference because all
+> > > invocations of async_pf_execute() will be forced to complete before the
+> > > vCPU and its VM are destroyed/freed.  And that in turn fixes the module
+> > > unloading bug as __fput() won't do module_put() on the last vCPU reference
+> > > until the vCPU has been freed, e.g. if closing the vCPU file also puts the
+> > 
+> > I'm not sure why __fput() of vCPU fd should be mentioned here. I assume
+> > we just need to say that vCPUs are freed before module_put(KVM the module)
+> > in kvm_destroy_vm(), then the whole logic for module unloading fix is:
+> > 
+> >   1. All workqueue callbacks complete when kvm_clear_async_pf_completion_queue(vcpu)
+> >   2. kvm_clear_async_pf_completion_queue(vcpu) must be executed before vCPU free.
+> >   3. vCPUs must be freed before module_put(KVM the module).
+> > 
+> >   So all workqueue callbacks complete before module_put(KVM the module).
+> > 
+> > 
+> > __fput() of vCPU fd is not the only trigger of kvm_destroy_vm(), that
+> > makes me distracted from reason of the fix.
+> 
+> My goal was to call out that (a) the vCPU file descriptor is what ensures kvm.ko
+> is alive at this point and (b) that __fput() very deliberately ensures module_put()
+> is called after all module function callbacks/hooks complete, as there was quite
 
-Oops, my comment is wrong here. Please disregard it.
+Ah, I understood. These are ensured by your previous fix which grants
+kvm_vcpu_fops the module owner. LGTM now.
+
+Thanks,
+Yilun
 
