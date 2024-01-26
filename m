@@ -1,31 +1,31 @@
-Return-Path: <kvm+bounces-7198-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7199-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CE9283E1ED
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 19:49:37 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D00483E27E
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 20:28:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 826581C20DC4
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 18:49:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 37F6EB24A55
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 19:28:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D22A42233D;
-	Fri, 26 Jan 2024 18:49:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 330CB225A5;
+	Fri, 26 Jan 2024 19:28:09 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 794D421371;
-	Fri, 26 Jan 2024 18:49:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 887B722618;
+	Fri, 26 Jan 2024 19:28:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.28.154.113
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706294955; cv=none; b=CMgiMGZ4iiTLH2nqnNnz5ehqnSl5seZzskBmGa1s/DRXxF6/UIcU4EvA/rEuwFnazfijQF7LQR6s5yHaeQW1JU3WD3/luSmnMXE/9cdE6ol7Jwnh84T5XQpkRr7JzWDtQh/kccSqaYtVOmzBQIG8zSHu2Ss3CJxZrLkfhbEXgHk=
+	t=1706297288; cv=none; b=bCAfqjFNoFoLatixn4zj494une1iQNf9/7L/DGcleZFmsSA32IO4G7Opzx1ViQCW5ZjsG1xr355kI4EbKWcb+4+zRgMBZRqJOcYztJSUDV/ovPNPDzLkNwVEj8IRvV9rZqVAXOzh+G6IzcAWGq7NIS3lIDx4v0Atzu/y5un0cHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706294955; c=relaxed/simple;
-	bh=pStHePFSIKYPMYDhCKX9LHB74JCGqh+BFv00THOanSE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qGKNNrNR4C9NUOW0FQmhCvVz32C/JMRI3ngKZZDxfYG5N/IpPrnBUAxQwGm75nenOAvKUZBdbNUdf/c7hGRBwpta5/3avrM26u0nOc9bSb/Wv2OHjUvQ/cKzWAABP9koBCPGzM//6ZaBJpIyHsNJBroGYk4c8Z5zwS3cfB7bGYY=
+	s=arc-20240116; t=1706297288; c=relaxed/simple;
+	bh=wa6nACIZtRxVnGrD6dWwimJPSEHg1URBTQrkPjgp/ok=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=ZLtG93PrHscI78XdEkvSuU3pLAgQmB8dBnFM2blV5q3+lIYnbM1EzQVlentQJnvmrIVxHF5W96Iufa67fkZ9sbeWgtoBekATvlgnhTb6gmER3+M/iUDk9jBKemh0w3Ljtgam0nTwL5OQF+OjN72GXlTM9Yu1kXPPmfJn5HZA72o=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name; spf=pass smtp.mailfrom=maciej.szmigiero.name; arc=none smtp.client-ip=37.28.154.113
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=maciej.szmigiero.name
@@ -33,9 +33,9 @@ Received: from MUA
 	by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.94.2)
 	(envelope-from <mail@maciej.szmigiero.name>)
-	id 1rTRG6-0007EI-DT; Fri, 26 Jan 2024 19:48:58 +0100
-Message-ID: <592977b7-e4c9-43af-aa33-1ce3b6fa1275@maciej.szmigiero.name>
-Date: Fri, 26 Jan 2024 19:48:52 +0100
+	id 1rTRrt-0007KY-Vv; Fri, 26 Jan 2024 20:28:02 +0100
+Message-ID: <78e85125-62aa-494d-a3c9-26f183b8d8c6@maciej.szmigiero.name>
+Date: Fri, 26 Jan 2024 20:27:56 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -43,15 +43,12 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: x86: Give a hint when Win2016 might fail to boot due
- to XSAVES erratum
+Subject: Re: [PATCH v2] KVM: x86: Give a hint when Win2016 might fail to boot
+ due to XSAVES erratum
 Content-Language: en-US, pl-PL
 To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>,
- Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <b83ab45c5e239e5d148b0ae7750133a67ac9575c.1706127425.git.maciej.szmigiero@oracle.com>
- <CABgObfZ1YzigovNEiYF7pbmRxv-SUzEFqnpaQZ4GT_hDssm65g@mail.gmail.com>
+References: <20240126184602.2410991-1-pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
 Autocrypt: addr=mail@maciej.szmigiero.name; keydata=
  xsFNBFpGusUBEADXUMM2t7y9sHhI79+2QUnDdpauIBjZDukPZArwD+sDlx5P+jxaZ13XjUQc
@@ -96,80 +93,43 @@ Autocrypt: addr=mail@maciej.szmigiero.name; keydata=
  5ZSOo27q/Ox95rwuC/n+PoJxBfqU36XBi886VV4LxuGZ8kfy0qDpL5neYtkC9w==
 Disposition-Notification-To: "Maciej S. Szmigiero"
  <mail@maciej.szmigiero.name>
-In-Reply-To: <CABgObfZ1YzigovNEiYF7pbmRxv-SUzEFqnpaQZ4GT_hDssm65g@mail.gmail.com>
+In-Reply-To: <20240126184602.2410991-1-pbonzini@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 26.01.2024 19:36, Paolo Bonzini wrote:
-> On Wed, Jan 24, 2024 at 9:18 PM Maciej S. Szmigiero
-> <mail@maciej.szmigiero.name> wrote:
->> +static void kvm_hv_xsaves_xsavec_maybe_warn_unlocked(struct kvm_vcpu *vcpu)
+On 26.01.2024 19:46, Paolo Bonzini wrote:
+> From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
 > 
-> Calling this function "unlocked" is confusing (others would say
-> "locked" is confusing instead). The double-underscore convention is
-> more common.
+> Since commit b0563468eeac ("x86/CPU/AMD: Disable XSAVES on AMD family 0x17")
+> kernel unconditionally clears the XSAVES CPU feature bit on Zen1/2 CPUs.
 > 
->> +{
->> +       struct kvm *kvm = vcpu->kvm;
->> +       struct kvm_hv *hv = to_kvm_hv(kvm);
->> +
->> +       if (hv->xsaves_xsavec_warned)
->> +               return;
->> +
->> +       if (!vcpu->arch.hyperv_enabled)
->> +               return;
+> Because KVM CPU caps are initialized from the kernel boot CPU features this
+> makes the XSAVES feature also unavailable for KVM guests in this case.
+> At the same time the XSAVEC feature is left enabled.
 > 
-> I think these two should be in kvm_hv_xsaves_xsavec_maybe_warn(),
-> though the former needs to be checked again under the lock.
+> Unfortunately, having XSAVEC but no XSAVES in CPUID breaks Hyper-V enabled
+> Windows Server 2016 VMs that have more than one vCPU.
 > 
->> +       if ((hv->hv_guest_os_id & KVM_HV_WIN2016_GUEST_ID_MASK) !=
->> +           KVM_HV_WIN2016_GUEST_ID)
->> +               return;
+> Let's at least give users hint in the kernel log what could be wrong since
+> these VMs currently simply hang at boot with a black screen - giving no
+> clue what suddenly broke them and how to make them work again.
 > 
-> At this point there is no need to return. You can set
-> xsaves_xsavec_warned and save the checks in the future.
->
->> +       /* UP configurations aren't affected */
->> +       if (atomic_read(&kvm->online_vcpus) < 2)
->> +               return;
->> +
->> +       if (boot_cpu_has(X86_FEATURE_XSAVES) ||
->> +           !guest_cpuid_has(vcpu, X86_FEATURE_XSAVEC))
->> +               return;
+> Trigger the kernel message hint based on the particular guest ID written to
+> the Guest OS Identity Hyper-V MSR implemented by KVM.
 > 
-> boot_cpu_has can also be done first to cull the whole check.
+> Defer this check to when the L1 Hyper-V hypervisor enables SVM in EFER
+> since we want to limit this message to Hyper-V enabled Windows guests only
+> (Windows session running nested as L2) but the actual Guest OS Identity MSR
+> write is done by L1 and happens before it enables SVM.
 > 
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index 27e23714e960..db0a2c40d749 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -1782,6 +1782,10 @@ static int set_efer
->>         if ((efer ^ old_efer) & KVM_MMU_EFER_ROLE_BITS)
->>                 kvm_mmu_reset_context(vcpu);
->>
->> +       if (guest_cpuid_is_amd_or_hygon(vcpu) &&
->> +           efer & EFER_SVME)
->> +               kvm_hv_xsaves_xsavec_maybe_warn(vcpu);
->> +
->>         return 0;
->> }
-> 
-> Checking guest_cpuid_is_amd_or_hygon() is relatively expensive, it
-> should be done after "efer & EFER_SVME" but really the bug can happen
-> just as well on Intel as far as I understand? It's just less likely
-> due to the AMD erratum.
+> Fixes: b0563468eeac ("x86/CPU/AMD: Disable XSAVES on AMD family 0x17")
+> Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+> Message-Id: <b83ab45c5e239e5d148b0ae7750133a67ac9575c.1706127425.git.maciej.szmigiero@oracle.com>
+> [Move some checks before mutex_lock(), rename function. - Paolo]
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
 
-Yes, I've checked this guest on an Intel host and it also fails to
-boot in !XSAVES && XSAVEC configuration.
-
-Only on Intel it's purely a theoretical problem as AFAIK there's
-no corresponding Intel errata that disables just XSAVES.
-
-> 
-> I'll send a v2.
-> 
-> Paolo
-> 
+I have tested this version now and it seems to work well, too.
 
 Thanks,
 Maciej
