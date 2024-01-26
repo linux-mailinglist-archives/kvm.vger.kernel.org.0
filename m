@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-7206-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7207-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5923683E35F
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 21:28:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 583C383E365
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 21:32:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DE93AB24DE6
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 20:28:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15B84287CA5
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 20:32:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BCF52374F;
-	Fri, 26 Jan 2024 20:28:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D00F2420C;
+	Fri, 26 Jan 2024 20:32:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="08ShMefS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LmguHJry"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A1DC224C6
-	for <kvm@vger.kernel.org>; Fri, 26 Jan 2024 20:28:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F6CE22EFD
+	for <kvm@vger.kernel.org>; Fri, 26 Jan 2024 20:32:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706300915; cv=none; b=qc1twbTagZIdD/EA/umNKStALOuGdIH1RJlTRGM+h30uyvEIb7rvZrMZicZf3aDHdN7nO0e53SjPSGV/bF+sf980R3m4RTXxj1RfSndwyJIHaPkFUUPy/Re037bdIivOKqoXTBgTCxswbdmipXd1ATRuVjxdbiHQKnn3FGVMUxk=
+	t=1706301142; cv=none; b=axvrqMtwx8d8clXWZ7GDjFeAvHqs0EQn5iPzra/SBDgQ7uB5Unvo7u4/nI6qYTTNTingaYU4XSVlhOjFy5VCorQHlnZQ9WLxQe18GJGLnSu/iN3ps3Bml65gGAdevbgIYenxYsC8gQQsvHicdEpfgKHwBFeKRlzAQqk5dMi8rs0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706300915; c=relaxed/simple;
-	bh=MX1cl8lmGmpn8sljYyeenca6Mtxd43PcXSi1NGAVEWI=;
+	s=arc-20240116; t=1706301142; c=relaxed/simple;
+	bh=SFib0KiekjrLD8wcJY8L7d4ExRDyCFVGTi65Fe3iBQo=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Rm5ddDh3UhW53fuSJg5cm0sThcXCVE5Y1KHJbAMqMrCTvsG9TXfN/1LClX0quAKA+CrZMXPC5GJu2apTL8WYHcqvBfglUqUr3aKzzRcGpi+TLimogr2XUPdDjd1AowwfEHUfnERK7FiX1ZktuEqLCdA0Hn1n2bPr6BlgyeYIxAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=08ShMefS; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=mbZ9CM1wveQF/tDTCsEYAL/fyHCLFQom3RHJBUHUAPQeR7g1WrBSPhQrYTuFErHFc/45jnBhpdIm8pWiudSlQs8t1u/iFm9aT/oSeBwMXhaU12vkMtsfXe7Ipd2QH/ILm6f6uUaNoWqWsaaaSk7Wd+HQq2/0LDZ0mLUCpBYTxaY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LmguHJry; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5cec090b2bdso730985a12.0
-        for <kvm@vger.kernel.org>; Fri, 26 Jan 2024 12:28:33 -0800 (PST)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5d1bffa322eso770984a12.1
+        for <kvm@vger.kernel.org>; Fri, 26 Jan 2024 12:32:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706300913; x=1706905713; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1706301140; x=1706905940; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KbQ+Dwhg/HevKgCb1ijIHEGKfQzi7W5glVtqWEkhfqI=;
-        b=08ShMefSLdxC/ARJQwgiMa+S+0aZex2v0Z2VBtJz2u4xIzNCYJq5KQVEP8ybwehpBp
-         PEtCK0rn57jC9b6zuvKx2wQCdIHRwoVGZv/Gd4eJhNOS0xAGpXVq8fM3bSyJtF8UOQfD
-         JJT8CpRGuS6PhcZBh73ZAjWzbRZTJfn1Z+S9ipqXXkF8Vq5IbwSyWQFlLA0Cj9WuwtTv
-         wz48QUZg86HgL1Har/y5CLwl5KSq3VzoJwjEC/HSWfGGluNhJPOIKi8hiOZ2ovCfTFxr
-         tBZcO2pBnU/cmJxk5g0DgLDLXLcDAIOfTKtMLvv6zeTXopA/j3Q3P5YKFp2+kX0kON92
-         HzRw==
+        bh=khTRnTM9rQ9XNgg2MeAsdPMur24bOv6XznsHlkn8x0g=;
+        b=LmguHJrykGozB+Rm8hqImcDxTucI0eh7FcEbBMB/vtD5dEn/Eyq3o3hMhIPt21Fjfu
+         h5Z6e12lp/7OPjwlMgo4NwF0hTiR0rMXC3OblJLjphoLl1Bzv5u7E7tdz3rgxwyflrQK
+         cOt/3QPQhHpWds8LNlz7LIH6Kc2As1LK4d52FiUWqH5Ba18EqqWRTorrQASBFsCVfX9i
+         JvqsV0tJe2gwoP0zNTabAjKbQEwkg8/4ISMgaJWtwYN3TBu1SfC11Qlj4kfILQaLpTDK
+         T6eqJYTOmQbun4o7mNHqDa1jvmgOJ05hRcYlW3iAfSqA6ajtNfl8YzMG1UoRZ21I8KGB
+         TiXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706300913; x=1706905713;
+        d=1e100.net; s=20230601; t=1706301140; x=1706905940;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KbQ+Dwhg/HevKgCb1ijIHEGKfQzi7W5glVtqWEkhfqI=;
-        b=jIQxhKK+1zXoXQ6lidZCdr4Rb4K+oA1qtxphiym6DccGsqIWImzgIIeUfEw9ICY+zL
-         cmvmU21grUiWluAPGZ7CdZYEqv2LHtMqu3sIG1mmQgFHylfIw/62zz1U8sfHBGuLiS2N
-         Rzqz9ruW17w9OLJb1B17IA1pv47IdSdy66P1CQjFzYe/xLlqzOeTzJ92bImnQ4Xhi3GS
-         3785bYQeXq5GIXfy+9B3l3g9EcerXDIZBZphVrOJDbZ08aqspOG8hdAoy1UrsU24Dpuw
-         xthlrSFY+KAESMIao7AnGcMzr4Bc74rwRhtMMp3Yp8zx1QRfXb9NWrjh9JLmPSHBXA4m
-         Fh4Q==
-X-Gm-Message-State: AOJu0YwhYnct92RG2WfcL99/CqI4JR82e9m8ck/d/FDXGAa43k18KYSO
-	/h9N4cYOOpBLeRUcmw17cql3LcXX5rjeL+9S/rewO7y5flytHizNmIuCILxQSEhSzW2GVhuRXFK
-	sYw==
-X-Google-Smtp-Source: AGHT+IFuxqVUto7K9qlkno1FvOpuribEDZLPtNAujSDb8v9/ilztKOioPYJlW0aBaN6d/Nq82pMdRpk7AJQ=
+        bh=khTRnTM9rQ9XNgg2MeAsdPMur24bOv6XznsHlkn8x0g=;
+        b=X5Zk00YHCn14OZ7DDKCTuYcl9LtJc0YHdPbKu3pZ/N1wN+0GcuRVNZ1xbWs8Zk1+LZ
+         ZFa5W3Hj9/CrcZWZGZV5udP3/orIoNSvmY6I0gCU/Oi7jnTOIdodw8iDVN3Rwnlx4AUx
+         pKpecqmKIgi65rsuPw94zqhyFa5xveSygPhPoqstrQ6YjrB5bPqX7Rcb3a0ulm+8zz4u
+         rVPbK6qGyQrkKCYj3B2ug4RjBwU69a1XoSc4/0x22w6lanL2214XKTPZu5yM3/qXi8k4
+         Jh9XJPGeyCDdxbeb7xlLbwE6u230UBDRKP9OsR8O4Mopzek92etwCk8hRE+r3PLSmJ4y
+         umPQ==
+X-Gm-Message-State: AOJu0YzNtMCDu+2a3Yu/Vk84Gb1iwfoj70VouWIaBf5XHC6QPvZVj7Mc
+	CXvn1XbsUShJtfSTQXksACRVRwyfhiFIVePFdnG+yvY0/wIxh7lI4nDAM5DVYzRIk0AaDU72mIl
+	TDQ==
+X-Google-Smtp-Source: AGHT+IHD5o9pq2Tm1Yf56JTr5JwG33a2+qbUQ+STfhE1ewZfpJUWm5UZX9iC3wjEL7rnY42xPcJH7AdNIcM=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a65:64c4:0:b0:5ce:474:352b with SMTP id
- t4-20020a6564c4000000b005ce0474352bmr1894pgv.5.1706300913464; Fri, 26 Jan
- 2024 12:28:33 -0800 (PST)
-Date: Fri, 26 Jan 2024 12:28:31 -0800
-In-Reply-To: <20240125015420.1960090-5-maobibo@loongson.cn>
+ (user=seanjc job=sendgmr) by 2002:a65:6648:0:b0:5d7:d631:202d with SMTP id
+ z8-20020a656648000000b005d7d631202dmr1912pgv.4.1706301140652; Fri, 26 Jan
+ 2024 12:32:20 -0800 (PST)
+Date: Fri, 26 Jan 2024 12:32:19 -0800
+In-Reply-To: <20240125015420.1960090-1-maobibo@loongson.cn>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240125015420.1960090-1-maobibo@loongson.cn> <20240125015420.1960090-5-maobibo@loongson.cn>
-Message-ID: <ZbQV75Q-N_cJLhj6@google.com>
-Subject: Re: [PATCH v6 4/4] KVM: selftests: Add test cases for LoongArch
+References: <20240125015420.1960090-1-maobibo@loongson.cn>
+Message-ID: <ZbQW0yfI08qwXcfQ@google.com>
+Subject: Re: [PATCH v6 0/4] VM: selftests: Add LoongArch support
 From: Sean Christopherson <seanjc@google.com>
 To: Bibo Mao <maobibo@loongson.cn>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
@@ -82,23 +82,29 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
 Content-Type: text/plain; charset="us-ascii"
 
 On Thu, Jan 25, 2024, Bibo Mao wrote:
-> diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
-> index 075b80dbe237..7b09e59296be 100644
-> --- a/tools/testing/selftests/kvm/set_memory_region_test.c
-> +++ b/tools/testing/selftests/kvm/set_memory_region_test.c
-> @@ -333,7 +333,7 @@ static void test_invalid_memory_region_flags(void)
->  	struct kvm_vm *vm;
->  	int r, i;
->  
-> -#if defined __aarch64__ || defined __x86_64__
-> +#if defined __aarch64__ || defined __x86_64__ || __loongarch__
-
-I assume that last one wants to be "defined __loongarch__"
-
->  	supported_flags |= KVM_MEM_READONLY;
->  #endif
->  
-> -- 
-> 2.39.3
+> ---
+> Tianrui Zhao (4):
+>   KVM: selftests: Add KVM selftests header files for LoongArch
+>   KVM: selftests: Add core KVM selftests support for LoongArch
+>   KVM: selftests: Add ucall test support for LoongArch
+>   KVM: selftests: Add test cases for LoongArch
 > 
+>  tools/testing/selftests/kvm/Makefile          |  16 +
+>  .../selftests/kvm/include/kvm_util_base.h     |   5 +
+>  .../kvm/include/loongarch/processor.h         | 133 +++++++
+>  .../selftests/kvm/include/loongarch/ucall.h   |  20 ++
+>  .../selftests/kvm/lib/loongarch/exception.S   |  59 ++++
+>  .../selftests/kvm/lib/loongarch/processor.c   | 332 ++++++++++++++++++
+>  .../selftests/kvm/lib/loongarch/ucall.c       |  38 ++
+>  .../selftests/kvm/set_memory_region_test.c    |   2 +-
+>  8 files changed, 604 insertions(+), 1 deletion(-)
+>  create mode 100644 tools/testing/selftests/kvm/include/loongarch/processor.h
+>  create mode 100644 tools/testing/selftests/kvm/include/loongarch/ucall.h
+>  create mode 100644 tools/testing/selftests/kvm/lib/loongarch/exception.S
+>  create mode 100644 tools/testing/selftests/kvm/lib/loongarch/processor.c
+>  create mode 100644 tools/testing/selftests/kvm/lib/loongarch/ucall.c
+
+I did a *very* quick read through and didn't see anything egregious.  I really
+hope that someday we can deduplicate much of the ARM/RISC-V/LoongArch code, but
+that's no reason to hold up getting selftests support merged.
 
