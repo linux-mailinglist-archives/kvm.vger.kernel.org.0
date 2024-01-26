@@ -1,60 +1,60 @@
-Return-Path: <kvm+bounces-7103-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7104-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11B3483D67A
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 10:36:00 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C24783D689
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 10:37:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 444BD1C291C7
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 09:35:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E1C24B2794C
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 09:37:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CCDA13F01E;
-	Fri, 26 Jan 2024 08:57:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E7A71419BF;
+	Fri, 26 Jan 2024 08:57:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="edt/f7sF"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MZn8s8xT"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2D3D13EFEA;
-	Fri, 26 Jan 2024 08:56:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0696141989;
+	Fri, 26 Jan 2024 08:57:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706259419; cv=none; b=E0XL+gUkt5z2gR7gRMFiDsUou2+zB7JCgMUS6yKSEA7FPpl1L9TRuxMoo3YeGZk0b9rbamCI1h19ipteOVxLU9V712XlpWXiwb/azrfzy212w3s4AHRLhZYVlGZnyH/jeuONNWzkEsJ/ex8E9iw4jxmNyPmSRoyFWw1tYZ7ISuc=
+	t=1706259424; cv=none; b=nT6N41TRDNNBB8uuI4QvZeCvbaQ2eARp1wQ40coI3g9rGQ8AXxKFgd5BHkaceR17efOaRWWAmaqgvdKbgi/Zk+szPQ2c6O5Emc/nJ3DNfmAyiWEzrTsEdLT4mKSBifT2ZEbrfKX3Hvvj6JpBBzAA1e2toLJU9JWHH0nmh17dB7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706259419; c=relaxed/simple;
-	bh=RjuN6r5nGa+8QVlv978u5XMosX7zu6au/aoXHUlMgkg=;
+	s=arc-20240116; t=1706259424; c=relaxed/simple;
+	bh=GzJZFmwxaViqE549pvNgrElLN7vRyewyPIaEXXRczfc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=u2OPicK3YrsvQfQbg8CbJZSNtsGA2shkJqUyu5MWalaAzDuntWwXex6szZQjK+VqbqICjZUcnx3J0GJPiQDEMgbk9FqWMTAzVjUeSHGLTlgs7zIOjzfvMvdEk883a+7LtIkU6VKphAcnIe1UhvbngOxgwIXCSmXU3+Gh7NRYdsc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=edt/f7sF; arc=none smtp.client-ip=198.175.65.12
+	 MIME-Version; b=uxTZIbKJjQHPXOL12FYEd6IgZSUICDDTCwamp3US4n8enWvfl5PKOPekRYBCyQx0uk0lnN9UQWmp7ga7ZyTxUHt36UcVj8xyiOuK8Rvolf1iOBVNotxwi1tj81mXrXluAWNC/qUMbAWht0iLCBx7OepAIERDWqoKewbb6QrdA/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MZn8s8xT; arc=none smtp.client-ip=198.175.65.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706259418; x=1737795418;
+  t=1706259423; x=1737795423;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=RjuN6r5nGa+8QVlv978u5XMosX7zu6au/aoXHUlMgkg=;
-  b=edt/f7sFyoSeFBoIiZ4Tr8Ak6UE8xgOfoxvNT8Rux0I0qt6J8DWUyR+J
-   vpHLNqHLx530/Qz6wg6FMxSuDmDIy/+uuj8xN7OvKGK8IsjBVcAxyg2tK
-   +qTEZQKXaVXt+cD/1DGPMIfVbXpQfwndx/D/RpwQ+3jkcw1izCtawSjiY
-   l9sBHDwaSd6xtCaImV7hnw82PxgRqldWy5VvJdvrfn8O9dxMdQ8waq2uP
-   sTifi7nTRyvhgmK8UTC7J1p3k20/p5qwrKPJ7E6HXsJJ5/WsAxXp+cpwG
-   5JsIyes/MgdwVWhKu9CHf3dwuTHPSAN32q9WKcDH42keGr1/AkRtrUgDE
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="9792463"
+  bh=GzJZFmwxaViqE549pvNgrElLN7vRyewyPIaEXXRczfc=;
+  b=MZn8s8xTS3blgqv5/60f0HP3oKe7efeDMhJPyyxt0/CI+pOMpNIr3WFu
+   il65di4ax0Y1ZxnWndh9KeRlRssLLXkEZBirT9F3Ik0WyRAUrWNYARlWi
+   lHH6DA29uaUps5/Q4m1z4gTn0Tcgu3XW4DtphFD13+PTk5NG0SR9RSvZd
+   pJjwQ7+YsfI2PoHcf4zHkYXINAvToo0h6pVYRwJ90uVHC//1QaeBpAwNR
+   oY4EFtdm+AjIu7z3wFVzITfg0gegNr0B148aWqiK9zY3vIbFv5wIBYlGS
+   7x7ZGhKVWpcPRsk+XMaX7vgxyes43wxlrkWs0m1Yhp3C6p/3XGNTaR4Z7
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="9792564"
 X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="9792463"
+   d="scan'208";a="9792564"
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2024 00:56:57 -0800
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2024 00:57:02 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="930310069"
+X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="930310087"
 X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="930310069"
+   d="scan'208";a="930310087"
 Received: from yanli3-mobl.ccr.corp.intel.com (HELO xiongzha-desk1.ccr.corp.intel.com) ([10.254.213.178])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2024 00:56:52 -0800
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2024 00:56:57 -0800
 From: Xiong Zhang <xiong.y.zhang@linux.intel.com>
 To: seanjc@google.com,
 	pbonzini@redhat.com,
@@ -74,9 +74,9 @@ Cc: kvm@vger.kernel.org,
 	like.xu.linux@gmail.com,
 	chao.gao@intel.com,
 	xiong.y.zhang@linux.intel.com
-Subject: [RFC PATCH 16/41] KVM: x86/pmu: Create a function prototype to disable MSR interception
-Date: Fri, 26 Jan 2024 16:54:19 +0800
-Message-Id: <20240126085444.324918-17-xiong.y.zhang@linux.intel.com>
+Subject: [RFC PATCH 17/41] KVM: x86/pmu: Implement pmu function for Intel CPU to disable MSR interception
+Date: Fri, 26 Jan 2024 16:54:20 +0800
+Message-Id: <20240126085444.324918-18-xiong.y.zhang@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240126085444.324918-1-xiong.y.zhang@linux.intel.com>
 References: <20240126085444.324918-1-xiong.y.zhang@linux.intel.com>
@@ -90,77 +90,53 @@ Content-Transfer-Encoding: 8bit
 
 From: Mingwei Zhang <mizhang@google.com>
 
-Add one extra pmu function prototype in kvm_pmu_ops to disable PMU MSR
-interception.
+Disable PMU MSRs interception, these MSRs are defined in Architectural
+Performance Monitoring from SDM, so that guest can access them without
+VM-exit.
 
 Signed-off-by: Mingwei Zhang <mizhang@google.com>
 ---
- arch/x86/include/asm/kvm-x86-pmu-ops.h | 1 +
- arch/x86/kvm/cpuid.c                   | 4 ++++
- arch/x86/kvm/pmu.c                     | 5 +++++
- arch/x86/kvm/pmu.h                     | 2 ++
- 4 files changed, 12 insertions(+)
+ arch/x86/kvm/vmx/pmu_intel.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-diff --git a/arch/x86/include/asm/kvm-x86-pmu-ops.h b/arch/x86/include/asm/kvm-x86-pmu-ops.h
-index 6c98f4bb4228..a2acf0afee5d 100644
---- a/arch/x86/include/asm/kvm-x86-pmu-ops.h
-+++ b/arch/x86/include/asm/kvm-x86-pmu-ops.h
-@@ -25,6 +25,7 @@ KVM_X86_PMU_OP(init)
- KVM_X86_PMU_OP(reset)
- KVM_X86_PMU_OP_OPTIONAL(deliver_pmi)
- KVM_X86_PMU_OP_OPTIONAL(cleanup)
-+KVM_X86_PMU_OP_OPTIONAL(passthrough_pmu_msrs)
- 
- #undef KVM_X86_PMU_OP
- #undef KVM_X86_PMU_OP_OPTIONAL
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index dda6fc4cfae8..ab9e47ba8b6a 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -366,6 +366,10 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
- 	vcpu->arch.reserved_gpa_bits = kvm_vcpu_reserved_gpa_bits_raw(vcpu);
- 
- 	kvm_pmu_refresh(vcpu);
-+
-+	if (is_passthrough_pmu_enabled(vcpu))
-+		kvm_pmu_passthrough_pmu_msrs(vcpu);
-+
- 	vcpu->arch.cr4_guest_rsvd_bits =
- 	    __cr4_reserved_bits(guest_cpuid_has, vcpu);
- 
-diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index 1853739a59bf..d83746f93392 100644
---- a/arch/x86/kvm/pmu.c
-+++ b/arch/x86/kvm/pmu.c
-@@ -893,3 +893,8 @@ int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp)
- 	kfree(filter);
- 	return r;
+diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+index 15cc107ed573..7f6cabb2c378 100644
+--- a/arch/x86/kvm/vmx/pmu_intel.c
++++ b/arch/x86/kvm/vmx/pmu_intel.c
+@@ -794,6 +794,25 @@ void intel_pmu_cross_mapped_check(struct kvm_pmu *pmu)
+ 	}
  }
-+
-+void kvm_pmu_passthrough_pmu_msrs(struct kvm_vcpu *vcpu)
+ 
++void intel_passthrough_pmu_msrs(struct kvm_vcpu *vcpu)
 +{
-+	static_call_cond(kvm_x86_pmu_passthrough_pmu_msrs)(vcpu);
++	int i;
++
++	for (i = 0; i < vcpu_to_pmu(vcpu)->nr_arch_gp_counters; i++) {
++		vmx_set_intercept_for_msr(vcpu, MSR_ARCH_PERFMON_EVENTSEL0 + i, MSR_TYPE_RW, false);
++		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PERFCTR0 + i, MSR_TYPE_RW, false);
++		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PMC0 + i, MSR_TYPE_RW, false);
++	}
++
++	vmx_set_intercept_for_msr(vcpu, MSR_CORE_PERF_FIXED_CTR_CTRL, MSR_TYPE_RW, false);
++	for (i = 0; i < vcpu_to_pmu(vcpu)->nr_arch_fixed_counters; i++)
++		vmx_set_intercept_for_msr(vcpu, MSR_CORE_PERF_FIXED_CTR0 + i, MSR_TYPE_RW, false);
++
++	vmx_set_intercept_for_msr(vcpu, MSR_CORE_PERF_GLOBAL_STATUS, MSR_TYPE_RW, false);
++	vmx_set_intercept_for_msr(vcpu, MSR_CORE_PERF_GLOBAL_CTRL, MSR_TYPE_RW, false);
++	vmx_set_intercept_for_msr(vcpu, MSR_CORE_PERF_GLOBAL_OVF_CTRL, MSR_TYPE_RW, false);
 +}
-diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-index 28beae0f9209..d575808c7258 100644
---- a/arch/x86/kvm/pmu.h
-+++ b/arch/x86/kvm/pmu.h
-@@ -33,6 +33,7 @@ struct kvm_pmu_ops {
- 	void (*reset)(struct kvm_vcpu *vcpu);
- 	void (*deliver_pmi)(struct kvm_vcpu *vcpu);
- 	void (*cleanup)(struct kvm_vcpu *vcpu);
-+	void (*passthrough_pmu_msrs)(struct kvm_vcpu *vcpu);
- 
- 	const u64 EVENTSEL_EVENT;
- 	const int MAX_NR_GP_COUNTERS;
-@@ -286,6 +287,7 @@ void kvm_pmu_cleanup(struct kvm_vcpu *vcpu);
- void kvm_pmu_destroy(struct kvm_vcpu *vcpu);
- int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp);
- void kvm_pmu_trigger_event(struct kvm_vcpu *vcpu, u64 perf_hw_id);
-+void kvm_pmu_passthrough_pmu_msrs(struct kvm_vcpu *vcpu);
- 
- bool is_vmware_backdoor_pmc(u32 pmc_idx);
- 
++
+ struct kvm_pmu_ops intel_pmu_ops __initdata = {
+ 	.hw_event_available = intel_hw_event_available,
+ 	.pmc_idx_to_pmc = intel_pmc_idx_to_pmc,
+@@ -808,6 +827,7 @@ struct kvm_pmu_ops intel_pmu_ops __initdata = {
+ 	.reset = intel_pmu_reset,
+ 	.deliver_pmi = intel_pmu_deliver_pmi,
+ 	.cleanup = intel_pmu_cleanup,
++	.passthrough_pmu_msrs = intel_passthrough_pmu_msrs,
+ 	.EVENTSEL_EVENT = ARCH_PERFMON_EVENTSEL_EVENT,
+ 	.MAX_NR_GP_COUNTERS = KVM_INTEL_PMC_MAX_GENERIC,
+ 	.MIN_NR_GP_COUNTERS = 1,
 -- 
 2.34.1
 
