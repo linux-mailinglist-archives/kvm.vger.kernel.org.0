@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-7239-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7240-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7831383E6EE
-	for <lists+kvm@lfdr.de>; Sat, 27 Jan 2024 00:27:28 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DE3183E6F2
+	for <lists+kvm@lfdr.de>; Sat, 27 Jan 2024 00:27:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB8BA1C2305E
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 23:27:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C9AE8B24986
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 23:27:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CBF457869;
-	Fri, 26 Jan 2024 23:25:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 979CB5914C;
+	Fri, 26 Jan 2024 23:25:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cIDa0FZb"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LEp07/0+"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A35F756473;
-	Fri, 26 Jan 2024 23:25:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DDA4224CF;
+	Fri, 26 Jan 2024 23:25:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.55.52.88
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706311531; cv=none; b=WqMLGZD2ai380SCqmbYmG3IIeSZEBq5g9RcB/zpEimH5gxxgBsAJDotjiPF/49NzvwbQv7N2yxc8wUiSnn5afrrCIcLsMOfJSTmQRPzEeWx6+5xo+GkO1BRLIt+CgH5qpQ27XDu1aGGhr3XhsAyLzpPt6D8w3Xx2Ac8pxbB6jm8=
+	t=1706311551; cv=none; b=jgrGRmvs7bMcixXtVtJewkXvjRMCu9MHE7UUill1RUSy/7sM8LsK3jgzkjgBfk1eEkTOlr6DsJJBqs4E+yfDJoCnXroulcUOE5C1cq5FQL89Mc8QfZKkNSAkTskhJahLYjtZ7KQ1DBG/wyENt7zdRyGwabTBMfvuXj7VwKmsUWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706311531; c=relaxed/simple;
-	bh=kMFx64NyVo89pOPt8/Nbt5gcEmGFIJLK+tf/jeK7Gjw=;
+	s=arc-20240116; t=1706311551; c=relaxed/simple;
+	bh=OT63v6nV293o1ccgnhbVK00HEvGSO8K/GxmBZEmDAWM=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GE1BoQM7fCTHbuLvEStGeHug6CCtNktACwiQ5GqnLNE2w76ZvIKgGv/1+gKuiINQaCuz+ecnl5zxc5wX9Dp0MXFER3J9FY3yP6q3P4QV3jlKaTzlGRJouEc19olNJI+/cyaqx1wDOGxjoJP66fqUPASWGKcDDyQ0sK+520QSamE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cIDa0FZb; arc=none smtp.client-ip=192.55.52.88
+	 MIME-Version:Content-Type; b=HyBUg/Xn0nmnSkN4FsZUznA+piv1XTVz7d1KzN+PGI26Pa4yllru98UprMUyvJatBoU3lc75XfP5MT2Y/jv+lEHbG8T154/+RC+pjNzyhsUJfn1TdH6CLKxP4B4ieUOrAzaDWzlxEoNfcKtDEXa/8VZC2D34NjQYa/IKQtk9lHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LEp07/0+; arc=none smtp.client-ip=192.55.52.88
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706311529; x=1737847529;
+  t=1706311550; x=1737847550;
   h=date:from:to:cc:subject:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=kMFx64NyVo89pOPt8/Nbt5gcEmGFIJLK+tf/jeK7Gjw=;
-  b=cIDa0FZbbRqIAejkd8C5NhI+Nqc2IqNR2jPZ0WV0xdumvH4HShgfJfNw
-   xOhealDOGLReky3lKvcN5oW/LA9ZcoQiYWyRDgWh2l6j98KofTduT1vnw
-   3b4U7YKIrl5+EldFlszL5jwoFiteqnMEQs0a5zZdjsG0AhmBqoC4CYsOt
-   PmghdwHj/AQCFYIKikJ2O55DoHnEBSny1jN6VaAdxpOwth4tq/dLaFNlJ
-   VUWHfxfDwFmLExmqMuhPdRnOw8VeYh9XnZRduhHOihMwmsUIKxwKpwOKe
-   aRImZgpm8PdtKIdr7gwHMNHLrKAGFGNO3t0ZiiaQdH1yLniElTsgboSw/
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="433757807"
+  bh=OT63v6nV293o1ccgnhbVK00HEvGSO8K/GxmBZEmDAWM=;
+  b=LEp07/0+/69DLaGxN9FvpiLz3w2IlkIwAgDffihYL7rfofRH/qA48cJQ
+   oufZuSiT9IELyZ4qJPuMIf7sCnFXm7/FjPBA/g/WdYhfl8YW7WqzMEDQQ
+   TrxyxtjIURiASUBdnVy52oKwLEG8uqmMOT24M1zCtIdN2k9j7up8V0Fy1
+   2/85Gu/v8N+pn29tI+xMSl1FokMUHr2MKo45ugncNblKWfEp12SJTwWm3
+   aIoXGs9ALvT3lL8kZ1o2Rk6jeZJo+uqTWBEZ0Gdp0D9IZtWQ0Bng8KHr3
+   w/ojkj61x+EYW5xVQ3OSsOvTwfXU6A6L1AjW9b5pZvAd/EoFd2L7ekzev
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="433757928"
 X-IronPort-AV: E=Sophos;i="6.05,220,1701158400"; 
-   d="scan'208";a="433757807"
+   d="scan'208";a="433757928"
 Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2024 15:25:28 -0800
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2024 15:25:49 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="910489711"
+X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="910489872"
 X-IronPort-AV: E=Sophos;i="6.05,220,1701158400"; 
-   d="scan'208";a="910489711"
+   d="scan'208";a="910489872"
 Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.24.100.114])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2024 15:25:28 -0800
-Date: Fri, 26 Jan 2024 15:30:47 -0800
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2024 15:25:48 -0800
+Date: Fri, 26 Jan 2024 15:31:08 -0800
 From: Jacob Pan <jacob.jun.pan@linux.intel.com>
 To: Thomas Gleixner <tglx@linutronix.de>
 Cc: LKML <linux-kernel@vger.kernel.org>, X86 Kernel <x86@kernel.org>,
@@ -66,13 +66,12 @@ Cc: LKML <linux-kernel@vger.kernel.org>, X86 Kernel <x86@kernel.org>,
  <ashok.raj@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>,
  maz@kernel.org, peterz@infradead.org, seanjc@google.com, Robin Murphy
  <robin.murphy@arm.com>, jacob.jun.pan@linux.intel.com
-Subject: Re: [PATCH RFC 12/13] iommu/vt-d: Add a helper to retrieve PID
- address
-Message-ID: <20240126153047.5e42e5d0@jacob-builder>
-In-Reply-To: <874jgvuls0.ffs@tglx>
+Subject: Re: [PATCH RFC 07/13] x86/irq: Add helpers for checking Intel PID
+Message-ID: <20240126153108.2a6bbb9e@jacob-builder>
+In-Reply-To: <87il5bupb1.ffs@tglx>
 References: <20231112041643.2868316-1-jacob.jun.pan@linux.intel.com>
- <20231112041643.2868316-13-jacob.jun.pan@linux.intel.com>
- <874jgvuls0.ffs@tglx>
+ <20231112041643.2868316-8-jacob.jun.pan@linux.intel.com>
+ <87il5bupb1.ffs@tglx>
 Organization: OTC
 X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
@@ -86,87 +85,110 @@ Content-Transfer-Encoding: 7bit
 
 Hi Thomas,
 
-On Wed, 06 Dec 2023 21:19:11 +0100, Thomas Gleixner <tglx@linutronix.de>
+On Wed, 06 Dec 2023 20:02:58 +0100, Thomas Gleixner <tglx@linutronix.de>
 wrote:
 
 > On Sat, Nov 11 2023 at 20:16, Jacob Pan wrote:
-> > From: Thomas Gleixner <tglx@linutronix.de>
-> >
-> > When programming IRTE for posted mode, we need to retrieve the
-> > physical  
 > 
-> we need .... I surely did not write this changelog.
+> That 'Intel PID' in the subject line sucks. What's wrong with writing
+> things out?
 > 
-Will delete this.
+>        x86/irq: Add accessors for posted interrupt descriptors
+> 
+will do.
 
-> > address of the posted interrupt descriptor (PID) that belongs to it's
-> > target CPU.
-> >
-> > This per CPU PID has already been set up during cpu_init().  
+> Hmm?
 > 
-> This information is useful because?
-ditto.
+> > Intel posted interrupt descriptor (PID) stores pending interrupts in its
+> > posted interrupt requests (PIR) bitmap.
+> >
+> > Add helper functions to check individual vector status and the entire
+> > bitmap.
+> >
+> > They are used for interrupt migration and runtime demultiplexing posted
+> > MSI vectors.  
+> 
+> This is all backwards.
+> 
+>   Posted interrupts are controlled by and pending interrupts are marked in
+>   the posted interrupt descriptor. The upcoming support for host side
+>   posted interrupts requires accessors to check for pending vectors.
+> 
+>   Add ....
+> 
+> >  #ifdef CONFIG_X86_POSTED_MSI
+> > +/*
+> > + * Not all external vectors are subject to interrupt remapping, e.g.
+> > IOMMU's
+> > + * own interrupts. Here we do not distinguish them since those vector
+> > bits in
+> > + * PIR will always be zero.
+> > + */
+> > +static inline bool is_pi_pending_this_cpu(unsigned int vector)  
+> 
+> Can you please use a proper name space pi_.....() instead of this
+> is_...() muck which is horrible to grep for. It's documented ....
+> 
+good idea, will do.
 
-> > +static u64 get_pi_desc_addr(struct irq_data *irqd)
 > > +{
-> > +	int cpu =
-> > cpumask_first(irq_data_get_effective_affinity_mask(irqd));  
+> > +	struct pi_desc *pid;
+> > +
+> > +	if (WARN_ON(vector > NR_VECTORS || vector <
+> > FIRST_EXTERNAL_VECTOR))
+> > +		return false;  
 > 
-> The effective affinity mask is magically correct when this is called?
+> Haha. So much about your 'can use the full vector space' dreams .... And
+> WARN_ON_ONCE() please.
 > 
-My understanding is that remappable device MSIs have the following
-hierarchy,e.g.
+yes, will do. Not enough motivation for the full vector space.
 
-parent:                              
-    domain:  INTEL-IR-5-13            
-     hwirq:   0x20000                 
-     chip:    INTEL-IR-POST           
-      flags:   0x0                    
-     parent:                          
-        domain:  VECTOR            
-         hwirq:   0x3c             
-         chip:    APIC         
+> > +
+> > +	pid = this_cpu_ptr(&posted_interrupt_desc);  
+> 
+> Also this can go into the declaration line.
+will do
 
-When irqs are allocated and activated, parents domain op is always called
-first. Effective affinity mask is set up by the parent domain, i.e. VECTOR.
-Example call stack for alloc:
-	irq_data_update_effective_affinity
-	apic_update_irq_cfg
-	x86_vector_alloc_irqs
-	intel_irq_remapping_alloc
-	msi_domain_alloc
+> 
+> > +
+> > +	return (pid->pir[vector >> 5] & (1 << (vector % 32)));  
+> 
+>   __test_bit() perhaps?
+> 
+> > +}  
+> 
+> > +static inline bool is_pir_pending(struct pi_desc *pid)
+> > +{
+> > +	int i;
+> > +
+> > +	for (i = 0; i < 4; i++) {
+> > +		if (pid->pir_l[i])
+> > +			return true;
+> > +	}
+> > +
+> > +	return false;  
+> 
+> This is required because pi_is_pir_empty() is checking the other way
+> round, right?
+> 
+This function is not needed anymore in the next version. I was thinking
+performance is better if we bail out while encountering the first set bit.
 
-x86_vector_activate also changes the effective affinity mask before calling
-intel_irq_remapping_activate() where a posted interrupt is configured for
-its destination CPU.
-
-At runtime, when IRQ affinity is changed by userspace Intel interrupt
-remapping code also calls parent data/chip to update the effective affinity
-map before changing IRTE.
-
-intel_ir_set_affinity(struct irq_data *data, const struct cpumask *mask,
-		      bool force)
-{
-	ret = parent->chip->irq_set_affinity(parent, mask, force);
-
-...
-}
-Here the parent APIC chip does apic_set_affinity() which will set up
-effective mask before posted MSI affinity change.
-
-Maybe I missed some cases?
-
-I will also add a check if the effective affinity mask is not set up.
-
-static phys_addr_t get_pi_desc_addr(struct irq_data *irqd)
-{
-	int cpu = cpumask_first(irq_data_get_effective_affinity_mask(irqd));
-
-	if (WARN_ON(cpu >= nr_cpu_ids))
-		return 0;
-
-	return __pa(per_cpu_ptr(&posted_interrupt_desc, cpu));
-}
+> > +}
+> > +
+> >  extern void intel_posted_msi_init(void);
+> >  
+> >  #else
+> > +static inline bool is_pi_pending_this_cpu(unsigned int vector) {return
+> > false; }  
+> 
+> lacks space before 'return'
+> 
+will fix.
+> > +
+> >  static inline void intel_posted_msi_init(void) {};
+> >  
+> >  #endif /* X86_POSTED_MSI */  
 
 
 Thanks,
