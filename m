@@ -1,137 +1,125 @@
-Return-Path: <kvm+bounces-7190-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7191-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2868383E11B
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 19:13:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7835483E122
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 19:16:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C86461F261F6
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 18:13:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F7052824FD
+	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 18:16:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1612520DCE;
-	Fri, 26 Jan 2024 18:12:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E633320B37;
+	Fri, 26 Jan 2024 18:16:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CGc/ziW9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dBWZnp3z"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC16020B24
-	for <kvm@vger.kernel.org>; Fri, 26 Jan 2024 18:12:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 924A81EB5E
+	for <kvm@vger.kernel.org>; Fri, 26 Jan 2024 18:16:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706292761; cv=none; b=Y5m9gH9YvKWkO7SkEeKL+auI/QpJDTdZdM+zaX2nEyYqULB/sOUzwo8ao576aHtrfqbEeCG94Sr+jBlkgGACKI9rwqQibFNJJAeCH9M3/6PalElC9k8DPoWY2qIwEhJekDOmcOMBSc2Euyd4VF1n/TYmyiRq4xXDg7chPMJckg4=
+	t=1706292983; cv=none; b=dU+yv1k6M+eW9lUlVn/At5Ug4lzMd6kpoEmuM5XFTsAFwy/6a7LpWxt/GBTjv+xOu3+aUBGLWbc3Or/2tBqoBSQjnW4cTpo4rwHjh4Gegpg7hi0lHEaOrE+6UdfJHoq9RxYq2S+m+JFNBkMLT3zm4aWAattq1zStWz6sLyXxaiM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706292761; c=relaxed/simple;
-	bh=6yCOi67LSlnU+pmKW/Ep4Ha9/RlzYxbaLQYCGWndYNk=;
+	s=arc-20240116; t=1706292983; c=relaxed/simple;
+	bh=Aj47SDmrcP4Pxh/hJwfKzfAt19g8T0eO/pfpf8fQ60M=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MXeljihVl6671M1s/kIjOV9vEEVqnjdA7KoQedTI+x9awIvN/kE8SLAG5Jse85nytXghrKwO8zbWEwBHUci4NlkXAFO0PWSgN1gxZAYznndm7Ee05v2sSl9uGwUjLbVpGPZ5TAeD8/9DcTbECoFo88r3hvV4w7TfchaPoloiUzk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CGc/ziW9; arc=none smtp.client-ip=170.10.129.124
+	 To:Cc:Content-Type; b=jHVokyolz93SlMWYgiaQSZMdYlEt2jslWUiLiEdEBL8WhVP8MhdkGWCeO/5RStr3CgptieThprFkWxWDuarKwZPFQG+n9hYxeCBRB6yyHbiH09LDcgqUP5EUDZLs1NVo+ctntYalov80IKzSaaxkYaNTfoKsEe5NOlmVnq2NxVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dBWZnp3z; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706292758;
+	s=mimecast20190719; t=1706292980;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=mcV+9Bo1H23A9wxX2UhBXjVrN11bidIv7zn0dsKCWms=;
-	b=CGc/ziW99IYRgNoSWJpPT1TG6eTKsuE2X11C9QutBNhciUXZIIvZRqSYRNeyeYFafVaw+J
-	qiEzVlJROQr5qV1lwK5WxBBhdkEvxLR8VokJm4vwDBLyuk4vi7SfdoPPDhQ6XC802LTQxM
-	K60hfmhOGyo0VSjgVTnVn56EE2jCFLw=
+	bh=uNG6H+3tybJ100+FQ7ifNQULqIkXKOGQRCmck6q+baY=;
+	b=dBWZnp3zPPd2/AjiEvuq1Hmih1zFnun9C6IU+BX3Yl1E47sZlrZPmFnR5c1XRK7wYJAV2b
+	vgY5vuKT2ef+SNu8Sxus4/GT4SA5M2B+O5uLjsYVqZvlMPOWe648CHskwlmXf8rh49yo7v
+	egO+SpXvyJIiUwW+E7cTKpUGD8wevrk=
 Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
  [209.85.167.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-401-bMuqrGp6O9aGXPX7Kspvmw-1; Fri, 26 Jan 2024 13:12:36 -0500
-X-MC-Unique: bMuqrGp6O9aGXPX7Kspvmw-1
-Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-3bd4b623e4aso932385b6e.3
-        for <kvm@vger.kernel.org>; Fri, 26 Jan 2024 10:12:36 -0800 (PST)
+ us-mta-340-_MqfY369OT-d7T8znew5CQ-1; Fri, 26 Jan 2024 13:16:18 -0500
+X-MC-Unique: _MqfY369OT-d7T8znew5CQ-1
+Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-3bdf1be1528so965669b6e.2
+        for <kvm@vger.kernel.org>; Fri, 26 Jan 2024 10:16:18 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706292756; x=1706897556;
+        d=1e100.net; s=20230601; t=1706292977; x=1706897777;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=mcV+9Bo1H23A9wxX2UhBXjVrN11bidIv7zn0dsKCWms=;
-        b=ZYMvV78UBxnUJllvMwIk1uhJ1vtOUTMb+SuyGzO6UClqXuMJ5ztCFtGoGVGxvMhqlC
-         31aZ7B2IWSkT3JFatiNLnVPHvASPLDu/pwFMhJcRBioZjFZr6UVloyQ2RXvdWql1c0zw
-         fUyCg9yPljRnysIzSlZLU38y4YaYB5U5dh9QyynmLGSr8tG14zR1O44tmfuxvmi8L9v3
-         pJFiUIebutbvr3VSmaHc4ohnqf/bweXQvdYE7MTPYuj/HWpcmKzf5zw7PO2fXrcAIis2
-         pYurF5DiYrO0pQYjs0vhpGToKxuPZmGhYKgXP+SBzrhec0XpYMpawigPuuRivfyXA92t
-         2sFw==
-X-Gm-Message-State: AOJu0YwST66BUMkNqiR9GY/X/mLjml2G/28D7wlz0Toefx2hIPyCuFB/
-	ORegY1SRBEQZ7kVwMufw4jAKU9dIa2GxpnZQiaSpXSP9FjR2kM5GDL1KxBkFTVLN8zLkFeecBgm
-	Dd8ybEGEF52sPdKLv/9tz4JPGGtpyENWbuZ5wy2PFK6oJYMZ9Q64j0LgBz2GBJnjkTy+W7jDqVw
-	22eSy97CgXCPzse7zqPtmCt49c
-X-Received: by 2002:a4a:bb13:0:b0:59a:f1e:9b3b with SMTP id f19-20020a4abb13000000b0059a0f1e9b3bmr31628oop.16.1706292755833;
-        Fri, 26 Jan 2024 10:12:35 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEWdCtjgO3580n6V/ysz5cdqBhP2YbS7PowzyjTwjU/nOPK/g3zR7PIHStrWznjt939pfIl/ZSUhr6xwGM74cg=
-X-Received: by 2002:a4a:bb13:0:b0:59a:f1e:9b3b with SMTP id
- f19-20020a4abb13000000b0059a0f1e9b3bmr31613oop.16.1706292755620; Fri, 26 Jan
- 2024 10:12:35 -0800 (PST)
+        bh=uNG6H+3tybJ100+FQ7ifNQULqIkXKOGQRCmck6q+baY=;
+        b=UrkeUWiq8gBHHrnngp+KKxDGGLetOplvuQ0X5S5VzaVeUvePpD+utjIQgpNMqB8hQs
+         Z1FQ0m6wvWTujBWA57+IwGmbqhhcVgajo5Ia+Wb/Zid72GV47Gxpbsiq7AobgrUHNX9a
+         DREOaDhg1IkaE71KTwVM55HLN31HlFU+x91BY2GS2fBVA6SHFP+PiIUqThmHaILwH0dx
+         89mLh0VAu3Gxh53b7ZosITbVSRf+r2HHvheT8uHG0ui+FsDXxFN7ybVU5ountfOqBqkh
+         xe06oztPsgyQrxkL9AYf2SgdwRi97E+BJKDP7xR1kWoD4OgXtBS+ZukHUAufZLM7xg2L
+         b2lw==
+X-Gm-Message-State: AOJu0YyraYswZUkosZzrzMHbuDZB+b7VjWi3sACvjjAKXIl63Xn8/U0g
+	aCVESyjPjI6pn5dB8n7kYiO2evybSRNAYtumWIaXw6BTP3EbyLv6O0jr8VAgmsizxI3hpUyHh3u
+	S8ToUL03U+XBNcmJsNoze3JtdQ47ACgacrQ3Ysyhd6GXEV6oGHq9KUHfYEfbMCBQSp/cw7FGp43
+	YX0O0VFpv4CV3cI1GjVEmlU+W3
+X-Received: by 2002:a05:6808:d4b:b0:3bd:f41f:f9a6 with SMTP id w11-20020a0568080d4b00b003bdf41ff9a6mr168941oik.25.1706292977737;
+        Fri, 26 Jan 2024 10:16:17 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFxGYME3uEkFpYZdF0yuGNjBmdCuRZUGKjm+7ziR8gEBrV71tk/J3Re8/gUBge6UdSLwQtE2ayJ0S4PUmkNJQ4=
+X-Received: by 2002:a05:6808:d4b:b0:3bd:f41f:f9a6 with SMTP id
+ w11-20020a0568080d4b00b003bdf41ff9a6mr168928oik.25.1706292977542; Fri, 26 Jan
+ 2024 10:16:17 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <ZbGkZlFmi1war6vq@google.com> <20240125050823.4893-1-moehanabichan@gmail.com>
-In-Reply-To: <20240125050823.4893-1-moehanabichan@gmail.com>
+References: <20240124155425.73195-1-philmd@linaro.org>
+In-Reply-To: <20240124155425.73195-1-philmd@linaro.org>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 26 Jan 2024 19:12:24 +0100
-Message-ID: <CABgObfbjzmv3WiVUMpxLHHYYf+EyvGxRvaMR0_-PkiKGOmSsxg@mail.gmail.com>
-Subject: Re: [PATCH v2] KVM: x86: Check irqchip mode before create PIT
-To: Tengfei Yu <moehanabichan@gmail.com>
-Cc: Sean Christopherson <seanjc@google.com>, Thomas Gleixner <tglx@linutronix.de>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Fri, 26 Jan 2024 19:16:06 +0100
+Message-ID: <CABgObfb8pKdf=Q7JPDQ9j=Zanbk9gYOC8ufxprGA88zAPaoO5Q@mail.gmail.com>
+Subject: Re: [PATCH 0/2] accel/kvm: Sanitize KVM_HAVE_MCE_INJECTION definition
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>
+Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, 
+	qemu-ppc@nongnu.org, qemu-arm@nongnu.org, qemu-riscv@nongnu.org, 
+	Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org, 
+	qemu-s390x@nongnu.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 25, 2024 at 6:09=E2=80=AFAM Tengfei Yu <moehanabichan@gmail.com=
-> wrote:
+On Wed, Jan 24, 2024 at 4:54=E2=80=AFPM Philippe Mathieu-Daud=C3=A9
+<philmd@linaro.org> wrote:
 >
-> As the kvm api(https://docs.kernel.org/virt/kvm/api.html) reads,
-> KVM_CREATE_PIT2 call is only valid after enabling in-kernel irqchip
-> support via KVM_CREATE_IRQCHIP.
->
-> Without this check, I can create PIT first and enable irqchip-split
-> then, which may cause the PIT invalid because of lacking of in-kernel
-> PIC to inject the interrupt.
->
-> Signed-off-by: Tengfei Yu <moehanabichan@gmail.com>
+> Trivial replacement of KVM_HAVE_MCE_INJECTION by
+> KVM_ARCH_HAVE_MCE_INJECTION (not the "ARCH_" difference).
 
-Queued, thanks.
+I am confused, why can't you just rename the symbol and instead you go
+through this change?
 
 Paolo
 
-> ---
-> v1 -> v2: Change errno from -EEXIST to -ENOENT.
-> v1 link: https://lore.kernel.org/lkml/ZbGkZlFmi1war6vq@google.com/
+> Philippe Mathieu-Daud=C3=A9 (2):
+>   accel/kvm: Define KVM_ARCH_HAVE_MCE_INJECTION in each target
+>   accel/kvm: Directly check KVM_ARCH_HAVE_MCE_INJECTION value in place
 >
->  arch/x86/kvm/x86.c | 3 +++
->  1 file changed, 3 insertions(+)
+>  include/sysemu/kvm.h         |  7 ++++++-
+>  target/arm/cpu-param.h       |  5 +++++
+>  target/arm/cpu.h             |  4 ----
+>  target/i386/cpu-param.h      |  2 ++
+>  target/i386/cpu.h            |  2 --
+>  target/loongarch/cpu-param.h |  2 ++
+>  target/mips/cpu-param.h      |  2 ++
+>  target/ppc/cpu-param.h       |  2 ++
+>  target/riscv/cpu-param.h     |  2 ++
+>  target/s390x/cpu-param.h     |  2 ++
+>  accel/kvm/kvm-all.c          | 10 +++++-----
+>  11 files changed, 28 insertions(+), 12 deletions(-)
 >
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 27e23714e960..c1e3aecd627f 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -7016,6 +7016,9 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned i=
-nt ioctl, unsigned long arg)
->                 r =3D -EEXIST;
->                 if (kvm->arch.vpit)
->                         goto create_pit_unlock;
-> +               r =3D -ENOENT;
-> +               if (!pic_in_kernel(kvm))
-> +                       goto create_pit_unlock;
->                 r =3D -ENOMEM;
->                 kvm->arch.vpit =3D kvm_create_pit(kvm, u.pit_config.flags=
-);
->                 if (kvm->arch.vpit)
 > --
-> 2.39.3
+> 2.41.0
 >
 
 
