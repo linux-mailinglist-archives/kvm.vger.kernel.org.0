@@ -1,94 +1,84 @@
-Return-Path: <kvm+bounces-7281-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7282-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEA8783EE0B
-	for <lists+kvm@lfdr.de>; Sat, 27 Jan 2024 16:45:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB78283EE3D
+	for <lists+kvm@lfdr.de>; Sat, 27 Jan 2024 17:11:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7F9CBB21EC0
-	for <lists+kvm@lfdr.de>; Sat, 27 Jan 2024 15:45:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7723F2842C7
+	for <lists+kvm@lfdr.de>; Sat, 27 Jan 2024 16:11:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6524429422;
-	Sat, 27 Jan 2024 15:45:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AC2F2C1A3;
+	Sat, 27 Jan 2024 16:10:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="VM0q+w5H"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="R8rDkWRY"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2078.outbound.protection.outlook.com [40.107.94.78])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABA8928DD3;
-	Sat, 27 Jan 2024 15:45:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.78
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706370328; cv=fail; b=m5HVZtZdzoFCCGLVXTjFcm3NdKjUScLNEv/9Skng+d4ra4kLXaTA4pvaavBw5EdempdfZ9IJ4lFsKm/mIQcB7PfmRoC6RLfXC4+rVA7O4K0H4Opg9zxxcfnLRTr7xjfXa73a3QOJB9JvzkSpoDnMnPN1op6mKeDXhn4nTIZlSe8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706370328; c=relaxed/simple;
-	bh=cpJdl/KLyH4nt4a3/9uzX9y+G1ZjU5cLci8ZQSoUlo0=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gKXwRM6Ws8XJhFztt1eWVKYVNVZOLHAVcZbFwV+51FN3UlYxuL3JAZewsAh7szo+ZGsiVp1G3AyVJ3CheCYZ5nPiIA1S9nWC6tEnux1G4l6QaNMlu9qIIvurvQV8jLmjp6+GZeA2AbPZZVd7NNxzxJRoNiE3lE3a/ParrisYX9w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=VM0q+w5H; arc=fail smtp.client-ip=40.107.94.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YI7Shyar2bN32WpDzsK313uAHkaQ6IM+JPitk98C1SwpCZPaR6WW+YMPeHokxbbieVqIAua5vY0bC1d42YLVq0mGSesAacISioGlFCjDrdBGY4kiks/0E7T9AoFjQGwxK0OLjn35GY7olcHScZnC423rHe7lSic38fPutJbIUlcq3rK4HXENEQ2cY7qfwcEfIvD1lOymLnmpQQaax7y2L3EeTYx0MMl5SAZcUZZAcNtCOYaaPazZ70U7fc/HtqOhFil+AxBxCUEF7lfiZ3gzTjazg/qYARlp49DJvf/R/791ec8a0+2CVwe68Q2y/kaNVaq0evY1zkFWQFw2h1g3BA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=eIgWZRkoHR8/peI0RlxwsM2rSt1Umjo3Dmebk+MIZtI=;
- b=FRJgvbb6uGaGlI86PHFyyLfhzdxj0vYgt1B93IRYYwzVjNpNFrbcMCoKX2L51leFPkNuduob/aOtCaV/dbw6XNWNvJYkdKOWIA5LvtsF9Lc97fnUwGpZa7bx8mMkyUrCKaRbn9NLKywJc2t5m7SvLHYHlPXGPMKIwTNBjY5OLOkXFBA+0bBXjNaVk8sGisBjISRbrkSJRXO+RXAS98dFHcVo8T0CAOF11x4KVTi963r1DNtDm6QPMTErxTduvBZUlWiNLR/bd/LVsXYDhoC8rHjF70K7UjaOdw1EiMnEJ7Io9k+RdF34LBzx02lKvJvZivhnGpAo1zm0YUFh9Y/2Ew==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=alien8.de smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eIgWZRkoHR8/peI0RlxwsM2rSt1Umjo3Dmebk+MIZtI=;
- b=VM0q+w5HG9BR0v2QTQxSOWGWMiOegojSJdyPszSKVnSYfYTrgZYsTMSnfnK1QP2l5/IpZQGNsHRHYDGLXDbd/D3vhb/nFZTyKp4zDs6reSsiBXnxiFnnbsxKO3El912vgk0Pwo3dHNDoBlO8NOdfB6HFKk1K/5DTRoRVhZqzLAA=
-Received: from BL0PR02CA0107.namprd02.prod.outlook.com (2603:10b6:208:51::48)
- by BY5PR12MB4258.namprd12.prod.outlook.com (2603:10b6:a03:20d::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.31; Sat, 27 Jan
- 2024 15:45:21 +0000
-Received: from BL6PEPF0001AB55.namprd02.prod.outlook.com
- (2603:10b6:208:51:cafe::8b) by BL0PR02CA0107.outlook.office365.com
- (2603:10b6:208:51::48) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.30 via Frontend
- Transport; Sat, 27 Jan 2024 15:45:20 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BL6PEPF0001AB55.mail.protection.outlook.com (10.167.241.7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7181.14 via Frontend Transport; Sat, 27 Jan 2024 15:45:20 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Sat, 27 Jan
- 2024 09:45:19 -0600
-Date: Sat, 27 Jan 2024 09:45:06 -0600
-From: Michael Roth <michael.roth@amd.com>
-To: Borislav Petkov <bp@alien8.de>
-CC: <x86@kernel.org>, <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
-	<linux-mm@kvack.org>, <linux-crypto@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
-	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
-	<ardb@kernel.org>, <pbonzini@redhat.com>, <seanjc@google.com>,
-	<vkuznets@redhat.com>, <jmattson@google.com>, <luto@kernel.org>,
-	<dave.hansen@linux.intel.com>, <slp@redhat.com>, <pgonda@google.com>,
-	<peterz@infradead.org>, <srinivas.pandruvada@linux.intel.com>,
-	<rientjes@google.com>, <tobin@ibm.com>, <vbabka@suse.cz>,
-	<kirill@shutemov.name>, <ak@linux.intel.com>, <tony.luck@intel.com>,
-	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
-	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A88C3224DD;
+	Sat, 27 Jan 2024 16:10:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706371856; cv=none; b=qZl7ASHInW/uVOVYPo+PYiv1sC9K0QJcum57Fmh8rfsRV4BE42oFMjm+SUQvYljqNFYNn15mY5er60i+jKlWoyZvzs+sTGI2jesn1sUdddO9rs918is7hsWZl9IMNz7WK9BiPoV9T9WpUPyzcyvBzVnCmYaf+V3ThzU7OpYU6/U=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706371856; c=relaxed/simple;
+	bh=GC4fVdRsHNvUDt/q1fyQJYqojn4dlLXr9MCgr6ezbYY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ltMmHwmfInfnWR1njZU35H7qniPUiabCAESEKKhLH11GMRPGfq+iGMjS9OPV0tov579HHKtVG7O83IWGXAPxSm+ArKiLRxXxBPi7mrRyGSxadx+6e4QybmGJ6EA2AGwoT6tfnPT1ftlBYvjZujvOKlFk2xQDqMyPpPNSuyON8Yo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=R8rDkWRY; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 54F6740E01A9;
+	Sat, 27 Jan 2024 16:03:37 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id lu71nTCNoEp9; Sat, 27 Jan 2024 16:03:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1706371414; bh=zJjvOvg09j/JxgCLQEW8hFY2bFZEzCn3tUUE3IeXvDI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=R8rDkWRY9JApzGfMhoO/ltUpWhxXsJorl0xs3AW2oEMUGgqBJJ7et23aCsX/6rSk7
+	 L1JZYSWGKq7guE8YqyGaMRXJrgA5qVJ9suCJL5LaRAjq9FgHLzJdkEZMxnSFMc2dtO
+	 gI4C12ZpMQGXlnS6ee8Hmd71QGrLYIjVdKj4p1Ryh0bmpobnRyMq49pcLhPYQikihj
+	 ue5l4fe7Nu2OCWJjYUTML+jOR/Z+9YoxQUnqYVWHEPdCUjY9UuUpJc4g+VS02kKWIW
+	 m6wXthg1Rtf8TnMSi5t1h7SkVGOiOlGC4YOldUaHQHzwLVqUUOuKrYZ3JBzjl4bi04
+	 rs90xV6Ajdo+l1b0MRawQxxeu/ulhLAeopq07RMbJff6rXn1FQFYWl397VI847fDKM
+	 ETxBr43+USwVBUxwmJYsP0SHnk4yZUfN6etUbxgZlUqlH9uzKgyIY95J0r5YXAXZl6
+	 iLYItOwjknaULfEgslHWFl6kTpSlysbnoqnWLxZeb/icAB9I6CmJ7keyRbjk7M3QFB
+	 liy7SwZp6fLivc4G3qmFGJ/LpDY3kVBGUC1ykFRxaYnoSobjO181UN8BzgedLbuQFB
+	 1MtGE0JiOZbMIg+4bbG09P2gpteSN1AQ0jQW/wgSXWwaEcucT55dtP6lvCMlfx8Ozk
+	 GL8HCR0ME/5W6ZUstLeOYxkE=
+Received: from zn.tnic (pd953033e.dip0.t-ipconnect.de [217.83.3.62])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 64B8D40E016C;
+	Sat, 27 Jan 2024 16:02:58 +0000 (UTC)
+Date: Sat, 27 Jan 2024 17:02:49 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Michael Roth <michael.roth@amd.com>
+Cc: x86@kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+	linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+	rientjes@google.com, tobin@ibm.com, vbabka@suse.cz,
+	kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+	pankaj.gupta@amd.com, liam.merwick@oracle.com
 Subject: Re: [PATCH v2 11/25] x86/sev: Adjust directmap to avoid inadvertant
  RMP faults
-Message-ID: <20240127154506.v3wdio25zs6i2lc3@amd.com>
+Message-ID: <20240127160249.GDZbUpKW_cqRzdYn7Z@fat_crate.local>
 References: <20240126041126.1927228-1-michael.roth@amd.com>
  <20240126041126.1927228-12-michael.roth@amd.com>
  <20240126153451.GDZbPRG3KxaQik-0aY@fat_crate.local>
@@ -96,104 +86,92 @@ References: <20240126041126.1927228-1-michael.roth@amd.com>
  <20240126184340.GEZbP9XA13X91-eybA@fat_crate.local>
  <20240126235420.mu644waj2eyoxqx6@amd.com>
  <20240127114207.GBZbTsDyC3hFq8pQ3D@fat_crate.local>
+ <20240127154506.v3wdio25zs6i2lc3@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240127114207.GBZbTsDyC3hFq8pQ3D@fat_crate.local>
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB55:EE_|BY5PR12MB4258:EE_
-X-MS-Office365-Filtering-Correlation-Id: 11b8c8e4-a730-4017-64e4-08dc1f4ef7a8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	T0uix9xMryNqjhgdI4rJ7He12MGm+7IlakDuSdpDu04OLYaLmBJSVIYMknC5gGl0IqHyOy6o5pkfwUb2Z/g4oivTZZOlLFlOOE3EPRxp0x3/VSPdZGzcvTxH8Qtj6u7giYSMwn7l2qwyHuzCjGHD3XZ7eJNBOU9yVgUk36MwlaBJd23LK4dJUGCbq8AKMTgxqSXfHxrbcC0edKlbO7hv6MZxD+InyVstTluWmvL0AK3vA0JHPeActObYayg00muhuqUIhcaIXvA9NRnvtEk5QKlVRIUYioc72ZYMtlzazdqdBGC6azfTFg4Axx1G7JBXSEmWI1RYCBl8RG5hnHHunI/TaGojHRmv3do0i6NHpPw4n66G0ug3zSnHkeKC5+spG5haSv7RtKqBMVkmLnyi410VSllcH1BSDDz6PEtGdA+4RLlaVy5Vud9NSuxTr0lrT9GiIAQznciz4lybk8kgbzAiZy1UtkhkKcuGfstg2HzmHqsh5FbOUez7Yhu6JFqg2sfXionKPaLXZCDxdDe2fecD75PRQRQpT97RsjIT3mR7ekskObliTc5DLWtx0o2umI2Vqp5v5tM65GbeTfdmumfPVP8Dyn+edGWVABBX8sQYlVVQgWf4tOkCN8MrQOS+t1FCfRSjowTL9ifes8/+9xqG8tNaKkmwq29Wx3sjdJ50zN3/X0QF/7L9KEa7fza+Yh5FjIt+R141kx9a0SAL5bL6BFQO3UgyFoUbNVYql91Ucsn6bPMinxepCkfjXwl1fbayeP/uhvz7JakBMjvH3w==
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(396003)(376002)(136003)(346002)(39850400004)(230922051799003)(451199024)(82310400011)(186009)(1800799012)(64100799003)(36840700001)(46966006)(40470700004)(36860700001)(83380400001)(36756003)(47076005)(54906003)(6916009)(316002)(70586007)(70206006)(8936002)(8676002)(86362001)(966005)(478600001)(6666004)(4326008)(26005)(16526019)(2906002)(1076003)(336012)(426003)(44832011)(7416002)(7406005)(2616005)(5660300002)(41300700001)(356005)(40480700001)(40460700003)(81166007)(82740400003)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jan 2024 15:45:20.2061
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 11b8c8e4-a730-4017-64e4-08dc1f4ef7a8
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL6PEPF0001AB55.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4258
+In-Reply-To: <20240127154506.v3wdio25zs6i2lc3@amd.com>
 
-On Sat, Jan 27, 2024 at 12:42:07PM +0100, Borislav Petkov wrote:
-> On Fri, Jan 26, 2024 at 05:54:20PM -0600, Michael Roth wrote:
-> > Is something like this close to what you're thinking? I've re-tested with
-> > SNP guests and it seems to work as expected.
-> > 
-> > diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
-> > index 846e9e53dff0..c09497487c08 100644
-> > --- a/arch/x86/virt/svm/sev.c
-> > +++ b/arch/x86/virt/svm/sev.c
-> > @@ -421,7 +421,12 @@ static int adjust_direct_map(u64 pfn, int rmp_level)
-> >         if (WARN_ON_ONCE(rmp_level > PG_LEVEL_2M))
-> >                 return -EINVAL;
-> > 
-> > -       if (WARN_ON_ONCE(rmp_level == PG_LEVEL_2M && !IS_ALIGNED(pfn, PTRS_PER_PMD)))
-> > +       if (!pfn_valid(pfn))
-> 
-> _text at VA 0xffffffff81000000 is also a valid pfn so no, this is not
-> enough.
+On Sat, Jan 27, 2024 at 09:45:06AM -0600, Michael Roth wrote:
+> directmap maps all physical memory accessible by kernel, including text
+> pages, so those are valid PFNs as far as this function is concerned.
 
-directmap maps all physical memory accessible by kernel, including text
-pages, so those are valid PFNs as far as this function is concerned. We
-can't generally guard against the caller passing in any random PFN that
-might also be mapped into additional address ranges, similarly to how
-we can't guard against something doing a write to some random PFN
-__va(0x1234) and scribbling over memory that it doesn't own, or just
-unmapping the entire directmap range and blowing up the kernel.
+Why don't you have a look at
 
-The expectation is that the caller is aware of what PFNs it is passing in,
-whether those PFNs have additional mappings, and if those mappings are of
-concern, implement the necessary handlers if new use-cases are ever
-introducted, like the adjust_kernel_text_mapping() example I mentioned
-earlier. 
+Documentation/arch/x86/x86_64/mm.rst
 
-> 
-> Either this function should not have "direct map" in the name as it
-> converts *any* valid pfn not just the direct map ones or it should check
-> whether the pfn belongs to the direct map range.
+to sync up on the nomenclature first?
 
-This function only splits mappings in the 0xffff888000000000 directmap
-range. It would be inaccurate to name it in such a way that suggests
-that it does anything else. If a use-case ever arises for splitting
-_text mappings at 0xffffffff81000000, or any other ranges, those too
-would best served by dedicated helpers adjust_kernel_text_mapping()
-that *actually* modify mappings for those virtual ranges, and implement
-bounds-checking appropriate for those physical/virtual ranges. The
-directmap range maps all kernel-accessible physical memory, so it's
-appropriate that our bounds-checking for the purpose of
-adjust_direct_map() is all kernel-accessible physical memory. If that
-includes PFNs mapped to other virtual ranges as well, the caller needs
-to consider that and implement additional helpers as necessary, but
-they'd likely *still* need to call adjust_direct_map() to adjust the
-directmap range in addition to those other ranges, so even if were
-possible to do so reliably, we shouldn't try to selectively reject any
-PFN ranges beyond what mm.rst suggests is valid for 0xffff888000000000.
+   ffff888000000000 | -119.5  TB | ffffc87fffffffff |   64 TB | direct mapping of all physical memory (page_offset_base)
 
--Mike
+   ...
 
-> 
-> Thx.
-> 
-> -- 
-> Regards/Gruss,
->     Boris.
-> 
-> https://people.kernel.org/tglx/notes-about-netiquette
-> 
+   ffffffff80000000 |   -2    GB | ffffffff9fffffff |  512 MB | kernel text mapping, mapped to physical address 0
+
+and so on.
+
+> The expectation is that the caller is aware of what PFNs it is passing in,
+
+There are no expectations. Have you written them down somewhere?
+
+> This function only splits mappings in the 0xffff888000000000 directmap
+> range.
+
+This function takes any PFN it gets passed in as it is. I don't care
+who its users are now or in the future and whether they pay attention
+what they pass into - it needs to be properly defined.
+
+Mike, please get on with the program. Use the right naming for the
+function and basta.
+
+IOW, this:
+
+diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
+index 0a8f9334ec6e..652ee63e87fd 100644
+--- a/arch/x86/virt/svm/sev.c
++++ b/arch/x86/virt/svm/sev.c
+@@ -394,7 +394,7 @@ EXPORT_SYMBOL_GPL(psmash);
+  * More specifics on how these checks are carried out can be found in APM
+  * Volume 2, "RMP and VMPL Access Checks".
+  */
+-static int adjust_direct_map(u64 pfn, int rmp_level)
++static int split_pfn(u64 pfn, int rmp_level)
+ {
+ 	unsigned long vaddr = (unsigned long)pfn_to_kaddr(pfn);
+ 	unsigned int level;
+@@ -405,7 +405,12 @@ static int adjust_direct_map(u64 pfn, int rmp_level)
+ 	if (WARN_ON_ONCE(rmp_level > PG_LEVEL_2M))
+ 		return -EINVAL;
+ 
+-	if (WARN_ON_ONCE(rmp_level == PG_LEVEL_2M && !IS_ALIGNED(pfn, PTRS_PER_PMD)))
++       if (!pfn_valid(pfn))
++               return -EINVAL;
++
++       if (rmp_level == PG_LEVEL_2M &&
++           (!IS_ALIGNED(pfn, PTRS_PER_PMD) ||
++            !pfn_valid(pfn + PTRS_PER_PMD - 1)))
+ 		return -EINVAL;
+ 
+ 	/*
+@@ -456,7 +461,7 @@ static int rmpupdate(u64 pfn, struct rmp_state *state)
+ 
+ 	level = RMP_TO_PG_LEVEL(state->pagesize);
+ 
+-	if (adjust_direct_map(pfn, level))
++	if (split_pfn(pfn, level))
+ 		return -EFAULT;
+ 
+ 	do {
+
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
