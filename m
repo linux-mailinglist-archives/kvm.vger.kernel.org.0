@@ -1,200 +1,220 @@
-Return-Path: <kvm+bounces-7278-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7279-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0879283ECFD
-	for <lists+kvm@lfdr.de>; Sat, 27 Jan 2024 12:52:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6324683ED03
+	for <lists+kvm@lfdr.de>; Sat, 27 Jan 2024 13:08:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6155A282949
-	for <lists+kvm@lfdr.de>; Sat, 27 Jan 2024 11:52:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B011F1F230AE
+	for <lists+kvm@lfdr.de>; Sat, 27 Jan 2024 12:08:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CC402111B;
-	Sat, 27 Jan 2024 11:51:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CFEF2031A;
+	Sat, 27 Jan 2024 12:08:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kKjJvqJo"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CEVTLowA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27C2A210EC;
-	Sat, 27 Jan 2024 11:51:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9496D51B
+	for <kvm@vger.kernel.org>; Sat, 27 Jan 2024 12:08:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706356318; cv=none; b=NaHK+KSvwrr6q8cQGd3eHQsGriuwMGavp0d1s+STu3W+sOcXLKLMk39aoqC9XjYCQQifqK5P0OBkpbC8YPsy1tjKdlkvWroLuQylxerqYE0WVVpLhBC2HaKRMjL7fT4Fd42Jkx2AH+7dDoBMQ1LIT6ZXjf1nqcugiju8H5pjd0I=
+	t=1706357311; cv=none; b=lE67L+bwgFTSy6YeP7pwvWa2w7RB9zBLsvDGO+mfaJb7Sz9IOEqxO55Xmd0eFsvhATNqeAfzPVj+jEx5uTsFboxsFQuILSFNphh06GwzB9wRlCcsJYpY5aIqbQjSTQJLL8rd3t6DUgWPoKWEipDnipRKxxZLgSLSd81NSafxTis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706356318; c=relaxed/simple;
-	bh=jnRrxh/V+RN3sG5q2rcPRKXGLcZ1nvL8YBZ6HRmzutg=;
+	s=arc-20240116; t=1706357311; c=relaxed/simple;
+	bh=3x780jZTGqOv7hVPrMhBFyVFEFi8QjUCScTBKCbV9CE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=okLADENkQRrebdI6iq9H9B/ayAtm8Xw8BaVsac/BKAOwl8i+w8FSt6Fe3qynQPaJpQ7FurcGyDVyF7JAbkYe2CK5rriLZ9da1XydPcLd1kXEVRunyKZSvdsB40am7Qz7X4ia15fSb3UJjXwp0C8XKeRru2nRNUvmke3XBO9klOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kKjJvqJo; arc=none smtp.client-ip=198.175.65.13
+	 Content-Type:Content-Disposition:In-Reply-To; b=sikV2X7VE5Rre8dU91rQVPK2Hjm3Z36uqQNDwiTihqBW3lAnwVmGlnawURbmnzSNlv86Hlaex2e+1eujZYCQBrj28INvqI94qDtXRB04+FAk+NxO35/TqWKOH2KYlA+rwJyVWNTXHRZCB/Z059EjPRGIh+pG9e57SlNtdTrDQzU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CEVTLowA; arc=none smtp.client-ip=192.198.163.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706356316; x=1737892316;
+  t=1706357310; x=1737893310;
   h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=jnRrxh/V+RN3sG5q2rcPRKXGLcZ1nvL8YBZ6HRmzutg=;
-  b=kKjJvqJopo4hqf3Uabeo/RcCZtXKRZQym63+ab+lxAT/C9Gt+dRlXqNS
-   ABO0la27n9hTVWnF7poeBM68QQYNz45aEU5KEYySsyfGwvBq33VLbqUA/
-   ek0KZ68jrtkvpR5uq7JeB46xEYgWWZbw4rixZpMSabqgqpPTxOaGqSs+z
-   pwSOPSnIzbhUtLOmnOkeYyRL/BxCCxN8k5U1ZuUGusddtlLiNBH8XUdvA
-   Y+hLk1ncbQs4FPAiaK3I6QAjwGxB6MBw+l5YJigQhtfNfRMtsJWH6b0+Z
-   AuWfX3dBfAmzpZUbnoz5CqMIvSU/reA4je0KqaIM5zYmgjT1lvEGDnYgq
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="9788321"
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=3x780jZTGqOv7hVPrMhBFyVFEFi8QjUCScTBKCbV9CE=;
+  b=CEVTLowAtIl/eAolZWh0Xi7Xzu/rFQVDY1UpnjlInxhx/VuTRbm/efwq
+   bLWEJSSKEyXCBAITjhx5wUmCLiyFv3OkvL52HRjx8op1bWsRl7MVOglDe
+   Ib3h+JfR4iQK+y8WeUAkRIjSNh/e4D5b+fVBjCWWt7nVnHGnRCF4iLC3I
+   VPGPkhqU7oVC2Dgj1dc5c8celtf46QAQKWK7c3dIXGK9WD9RCCNPYyMF7
+   cZKRQCthuQ9/z+gWdR6FGAefatKJ2JaP8pZ5AZl2KRiHE4yGc8St3dfkE
+   zls7KEM2dltFzcijLHgnqTfOdIj4zBvzS+QOtCAYQVPtCMjMH7Xxu/Q7x
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="2506037"
 X-IronPort-AV: E=Sophos;i="6.05,220,1701158400"; 
-   d="scan'208";a="9788321"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jan 2024 03:51:55 -0800
+   d="scan'208";a="2506037"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jan 2024 04:08:29 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.05,220,1701158400"; 
-   d="scan'208";a="21626178"
-Received: from lkp-server01.sh.intel.com (HELO 370188f8dc87) ([10.239.97.150])
-  by fmviesa002.fm.intel.com with ESMTP; 27 Jan 2024 03:51:50 -0800
-Received: from kbuild by 370188f8dc87 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rThDx-0002HM-0h;
-	Sat, 27 Jan 2024 11:51:49 +0000
-Date: Sat, 27 Jan 2024 19:51:33 +0800
-From: kernel test robot <lkp@intel.com>
-To: Yunjian Wang <wangyunjian@huawei.com>, mst@redhat.com,
-	willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
-	kuba@kernel.org, davem@davemloft.net, magnus.karlsson@intel.com
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, virtualization@lists.linux.dev,
-	xudingke@huawei.com, Yunjian Wang <wangyunjian@huawei.com>
-Subject: Re: [PATCH net-next 2/2] tun: AF_XDP Rx zero-copy support
-Message-ID: <202401271943.bs1GPeEU-lkp@intel.com>
-References: <1706089075-16084-1-git-send-email-wangyunjian@huawei.com>
+   d="scan'208";a="29342189"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
+  by fmviesa001.fm.intel.com with ESMTP; 27 Jan 2024 04:08:23 -0800
+Date: Sat, 27 Jan 2024 20:21:27 +0800
+From: Zhao Liu <zhao1.liu@intel.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+	Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org,
+	qemu-riscv@nongnu.org, Eduardo Habkost <eduardo@habkost.net>,
+	kvm@vger.kernel.org, qemu-ppc@nongnu.org,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Vladimir Sementsov-Ogievskiy <vsementsov@yandex-team.ru>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Anthony Perard <anthony.perard@citrix.com>,
+	Paul Durrant <paul@xen.org>, Cameron Esfahani <dirty@apple.com>,
+	Roman Bolshakov <rbolshakov@ddn.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	David Woodhouse <dwmw2@infradead.org>,
+	xen-devel@lists.xenproject.org
+Subject: Re: [PATCH v2 10/23] target/i386: Prefer fast cpu_env() over slower
+ CPU QOM cast macro
+Message-ID: <ZbT1R7impEw4whqP@intel.com>
+References: <20240126220407.95022-1-philmd@linaro.org>
+ <20240126220407.95022-11-philmd@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <1706089075-16084-1-git-send-email-wangyunjian@huawei.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240126220407.95022-11-philmd@linaro.org>
 
-Hi Yunjian,
+Hi Philippe,
 
-kernel test robot noticed the following build warnings:
+On Fri, Jan 26, 2024 at 11:03:52PM +0100, Philippe Mathieu-Daudé wrote:
+> Date: Fri, 26 Jan 2024 23:03:52 +0100
+> From: Philippe Mathieu-Daudé <philmd@linaro.org>
+> Subject: [PATCH v2 10/23] target/i386: Prefer fast cpu_env() over slower
+>  CPU QOM cast macro
+> X-Mailer: git-send-email 2.41.0
+> 
+> Mechanical patch produced running the command documented
+> in scripts/coccinelle/cpu_env.cocci_template header.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+> ---
+>  target/i386/hvf/vmx.h               | 13 +++-------
+>  hw/i386/vmmouse.c                   |  6 ++---
+>  hw/i386/xen/xen-hvm.c               |  3 +--
+>  target/i386/arch_memory_mapping.c   |  3 +--
+>  target/i386/cpu-dump.c              |  3 +--
+>  target/i386/cpu.c                   | 37 +++++++++------------------
+>  target/i386/helper.c                | 39 ++++++++---------------------
+>  target/i386/hvf/hvf.c               |  8 ++----
+>  target/i386/hvf/x86.c               |  4 +--
+>  target/i386/hvf/x86_emu.c           |  6 ++---
+>  target/i386/hvf/x86_task.c          | 10 +++-----
+>  target/i386/hvf/x86hvf.c            |  6 ++---
+>  target/i386/kvm/kvm.c               |  6 ++---
+>  target/i386/kvm/xen-emu.c           | 32 ++++++++---------------
+>  target/i386/tcg/sysemu/bpt_helper.c |  3 +--
+>  target/i386/tcg/tcg-cpu.c           | 14 +++--------
+>  target/i386/tcg/user/excp_helper.c  |  3 +--
+>  target/i386/tcg/user/seg_helper.c   |  3 +--
+>  18 files changed, 59 insertions(+), 140 deletions(-)
+> 
 
-[auto build test WARNING on net-next/main]
+[snip]
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Yunjian-Wang/xsk-Remove-non-zero-dma_page-check-in-xp_assign_dev/20240124-174011
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/1706089075-16084-1-git-send-email-wangyunjian%40huawei.com
-patch subject: [PATCH net-next 2/2] tun: AF_XDP Rx zero-copy support
-config: um-allmodconfig (https://download.01.org/0day-ci/archive/20240127/202401271943.bs1GPeEU-lkp@intel.com/config)
-compiler: clang version 18.0.0git (https://github.com/llvm/llvm-project a31a60074717fc40887cfe132b77eec93bedd307)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240127/202401271943.bs1GPeEU-lkp@intel.com/reproduce)
+> diff --git a/target/i386/hvf/x86hvf.c b/target/i386/hvf/x86hvf.c
+> index 3b1ef5f49a..1e7fd587fe 100644
+> --- a/target/i386/hvf/x86hvf.c
+> +++ b/target/i386/hvf/x86hvf.c
+> @@ -238,8 +238,7 @@ void hvf_get_msrs(CPUState *cs)
+>  
+>  int hvf_put_registers(CPUState *cs)
+>  {
+> -    X86CPU *x86cpu = X86_CPU(cs);
+> -    CPUX86State *env = &x86cpu->env;
+> +    CPUX86State *env = cpu_env(cs);
+>  
+>      wreg(cs->accel->fd, HV_X86_RAX, env->regs[R_EAX]);
+>      wreg(cs->accel->fd, HV_X86_RBX, env->regs[R_EBX]);
+> @@ -282,8 +281,7 @@ int hvf_put_registers(CPUState *cs)
+>  
+>  int hvf_get_registers(CPUState *cs)
+>  {
+> -    X86CPU *x86cpu = X86_CPU(cs);
+> -    CPUX86State *env = &x86cpu->env;
+> +    CPUX86State *env = cpu_env(cs);
+>  
+>      env->regs[R_EAX] = rreg(cs->accel->fd, HV_X86_RAX);
+>      env->regs[R_EBX] = rreg(cs->accel->fd, HV_X86_RBX);
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202401271943.bs1GPeEU-lkp@intel.com/
+In this file, there's another corner case:
 
-All warnings (new ones prefixed by >>):
+diff --git a/target/i386/hvf/x86hvf.c b/target/i386/hvf/x86hvf.c
+index 3b1ef5f49a8a..9a145aa5aa4f 100644
+--- a/target/i386/hvf/x86hvf.c
++++ b/target/i386/hvf/x86hvf.c
+@@ -342,8 +342,7 @@ void vmx_clear_int_window_exiting(CPUState *cs)
 
-   In file included from drivers/net/tun.c:44:
-   In file included from include/linux/skbuff.h:17:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:12:
-   In file included from include/linux/hardirq.h:11:
-   In file included from arch/um/include/asm/hardirq.h:5:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:13:
-   In file included from arch/um/include/asm/io.h:24:
-   include/asm-generic/io.h:547:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     547 |         val = __raw_readb(PCI_IOBASE + addr);
-         |                           ~~~~~~~~~~ ^
-   include/asm-generic/io.h:560:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     560 |         val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
-         |                                                         ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/little_endian.h:37:51: note: expanded from macro '__le16_to_cpu'
-      37 | #define __le16_to_cpu(x) ((__force __u16)(__le16)(x))
-         |                                                   ^
-   In file included from drivers/net/tun.c:44:
-   In file included from include/linux/skbuff.h:17:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:12:
-   In file included from include/linux/hardirq.h:11:
-   In file included from arch/um/include/asm/hardirq.h:5:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:13:
-   In file included from arch/um/include/asm/io.h:24:
-   include/asm-generic/io.h:573:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     573 |         val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
-         |                                                         ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/little_endian.h:35:51: note: expanded from macro '__le32_to_cpu'
-      35 | #define __le32_to_cpu(x) ((__force __u32)(__le32)(x))
-         |                                                   ^
-   In file included from drivers/net/tun.c:44:
-   In file included from include/linux/skbuff.h:17:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:12:
-   In file included from include/linux/hardirq.h:11:
-   In file included from arch/um/include/asm/hardirq.h:5:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:13:
-   In file included from arch/um/include/asm/io.h:24:
-   include/asm-generic/io.h:584:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     584 |         __raw_writeb(value, PCI_IOBASE + addr);
-         |                             ~~~~~~~~~~ ^
-   include/asm-generic/io.h:594:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     594 |         __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
-         |                                                       ~~~~~~~~~~ ^
-   include/asm-generic/io.h:604:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     604 |         __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
-         |                                                       ~~~~~~~~~~ ^
-   include/asm-generic/io.h:692:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     692 |         readsb(PCI_IOBASE + addr, buffer, count);
-         |                ~~~~~~~~~~ ^
-   include/asm-generic/io.h:700:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     700 |         readsw(PCI_IOBASE + addr, buffer, count);
-         |                ~~~~~~~~~~ ^
-   include/asm-generic/io.h:708:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     708 |         readsl(PCI_IOBASE + addr, buffer, count);
-         |                ~~~~~~~~~~ ^
-   include/asm-generic/io.h:717:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     717 |         writesb(PCI_IOBASE + addr, buffer, count);
-         |                 ~~~~~~~~~~ ^
-   include/asm-generic/io.h:726:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     726 |         writesw(PCI_IOBASE + addr, buffer, count);
-         |                 ~~~~~~~~~~ ^
-   include/asm-generic/io.h:735:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     735 |         writesl(PCI_IOBASE + addr, buffer, count);
-         |                 ~~~~~~~~~~ ^
->> drivers/net/tun.c:1298:5: warning: no previous prototype for function 'tun_xsk_pool_setup' [-Wmissing-prototypes]
-    1298 | int tun_xsk_pool_setup(struct net_device *dev, struct xsk_buff_pool *pool,
-         |     ^
-   drivers/net/tun.c:1298:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
-    1298 | int tun_xsk_pool_setup(struct net_device *dev, struct xsk_buff_pool *pool,
-         | ^
-         | static 
-   13 warnings generated.
+ bool hvf_inject_interrupts(CPUState *cs)
+ {
+-    X86CPU *x86cpu = X86_CPU(cs);
+-    CPUX86State *env = &x86cpu->env;
++    CPUX86State *env = cpu_env(cs);
+
+     uint8_t vector;
+     uint64_t intr_type;
+@@ -408,7 +407,7 @@ bool hvf_inject_interrupts(CPUState *cs)
+     if (!(env->hflags & HF_INHIBIT_IRQ_MASK) &&
+         (cs->interrupt_request & CPU_INTERRUPT_HARD) &&
+         (env->eflags & IF_MASK) && !(info & VMCS_INTR_VALID)) {
+-        int line = cpu_get_pic_interrupt(&x86cpu->env);
++        int line = cpu_get_pic_interrupt(env);
+         cs->interrupt_request &= ~CPU_INTERRUPT_HARD;
+         if (line >= 0) {
+             wvmcs(cs->accel->fd, VMCS_ENTRY_INTR_INFO, line |
 
 
-vim +/tun_xsk_pool_setup +1298 drivers/net/tun.c
+For this special case, I'm not sure if the script can cover it as well,
+otherwise maybe it's OK to be cleaned up manually ;-).
 
-  1297	
-> 1298	int tun_xsk_pool_setup(struct net_device *dev, struct xsk_buff_pool *pool,
-  1299			       u16 qid)
-  1300	{
-  1301		return pool ? tun_xsk_pool_enable(dev, pool, qid) :
-  1302			tun_xsk_pool_disable(dev, qid);
-  1303	}
-  1304	
+> diff --git a/target/i386/tcg/user/excp_helper.c b/target/i386/tcg/user/excp_helper.c
+> index b3bdb7831a..bfcae9f39e 100644
+> --- a/target/i386/tcg/user/excp_helper.c
+> +++ b/target/i386/tcg/user/excp_helper.c
+> @@ -26,8 +26,7 @@ void x86_cpu_record_sigsegv(CPUState *cs, vaddr addr,
+>                              MMUAccessType access_type,
+>                              bool maperr, uintptr_t ra)
+>  {
+> -    X86CPU *cpu = X86_CPU(cs);
+> -    CPUX86State *env = &cpu->env;
+> +    CPUX86State *env = cpu_env(cs);
+>  
+>      /*
+>       * The error_code that hw reports as part of the exception frame
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+In this file, there's another case:
+
+diff --git a/target/i386/tcg/user/excp_helper.c b/target/i386/tcg/user/excp_helper.c
+index b3bdb7831a7a..02fcd64fc080 100644
+--- a/target/i386/tcg/user/excp_helper.c
++++ b/target/i386/tcg/user/excp_helper.c
+@@ -52,6 +52,5 @@ void x86_cpu_record_sigsegv(CPUState *cs, vaddr addr,
+ void x86_cpu_record_sigbus(CPUState *cs, vaddr addr,
+                            MMUAccessType access_type, uintptr_t ra)
+ {
+-    X86CPU *cpu = X86_CPU(cs);
+-    handle_unaligned_access(&cpu->env, addr, access_type, ra);
++    handle_unaligned_access(cpu_env(cs), addr, access_type, ra);
+ }
+
+[snip]
+
+LGTM.
+Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
+
+
 
