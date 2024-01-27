@@ -1,226 +1,333 @@
-Return-Path: <kvm+bounces-7259-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7260-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98A0A83E749
-	for <lists+kvm@lfdr.de>; Sat, 27 Jan 2024 00:54:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D5E083E870
+	for <lists+kvm@lfdr.de>; Sat, 27 Jan 2024 01:25:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C77881C26439
-	for <lists+kvm@lfdr.de>; Fri, 26 Jan 2024 23:54:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB1351F22A7C
+	for <lists+kvm@lfdr.de>; Sat, 27 Jan 2024 00:25:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDE1059B43;
-	Fri, 26 Jan 2024 23:54:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1CD02912;
+	Sat, 27 Jan 2024 00:25:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="fWCT+5NF"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="bmVcraQl";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="EO2coDWp"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2058.outbound.protection.outlook.com [40.107.223.58])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D4F020320;
-	Fri, 26 Jan 2024 23:54:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.58
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EBA417F4;
+	Sat, 27 Jan 2024 00:25:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706313286; cv=fail; b=gII+d9MV5bFdUIiNZfNzU9d/pXmQSXB25ZiX6SmbfUXta6tixeYiIbOHY7avU4T84a6XoTUL+ZX8eAeg7zOxhrTlNHXICzCCw3x0dJAvgLMfbpqdCpHmC2EPDBSiGw+L+2Lm+MQrLaKUJUCS7toW4Xg5+7Eo/I9n1hH8ZOqerz8=
+	t=1706315116; cv=fail; b=bPyTaKc6RY/rN6ZwLyZV3Qe71hV8jTBGNwyfVhfdEhmytw9MrSsQqXoKbuqK/Z0OnkO6RuNQu97rG0qacBffjufahG6QfMVD7a/F3LJEiH6hUqdxxyGhV3xlJL8D9nMPJl0/paR97bIv6C2MOWShfqnlNBV7aA29OlrpvvRVc4Q=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706313286; c=relaxed/simple;
-	bh=FfXZ7x2qGBN6QehgouhexwIqD6sLQo+74Q3G27bEsTc=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=abITHQ3iX3f6dvRaQK0ij8FndV5w5XVyeNv+4QMm0vc1AzB04vRX+lszuA8VsFQIjgE0D+a4HZSGe4tQbMHqkVIkIxIQh6hVZZaBSFVDPAWKWRb1IqIFRoJvWPnhb1ntLXgmgDk2t9GloTn3YMXbyDLzEPbsdoGCVMFlWbkObPs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=fWCT+5NF; arc=fail smtp.client-ip=40.107.223.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	s=arc-20240116; t=1706315116; c=relaxed/simple;
+	bh=rkpw32swyaMNgzMFyOIr26/qd4MkOks47A2BtLuJR/M=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=dKqnrQyhMiNtkxJ+badFej7+ymlu5B9l4AvIbhHCYo2zkqrNPcJptp9KLmkM/fXnME7SHySJx5Go/gPZLSlDvu0r24+oY/D4iDCTbfX+v5Jtr0fZ6sVrLEOLygoejO+tlMlH8lL6caCw7hjR04GOSJYUcSm64X2+NrxOvpNWNjc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=bmVcraQl; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=EO2coDWp; arc=fail smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40QLeSNl027536;
+	Sat, 27 Jan 2024 00:25:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : content-transfer-encoding : content-type :
+ mime-version; s=corp-2023-11-20;
+ bh=WVMdUQMtLieiPLiXnz3lkm4b9VtA9gLcmHG1OWVHN2U=;
+ b=bmVcraQl6rtPbysW/9nHmK7WoTw5sab0MkLXZhWZ9D0+zX/JwJfJY2l3Iq8ZMF+nxdqn
+ oAiKZX/I90HNtQxq8Mor32a9TUYLlIffiLtZ3JclNtmPB7rCa80y6gUeBMB4PF6s4QE+
+ gvamJGTYmwvC4l2xWevbCJ+Ep5GXV9CrLoiKE99K+GcmiFDCmSTsH3MZU9etqQ4vuyKQ
+ 5M7nZZrXUDyU03dGgDMeYO9N+/Rho9DMGazzWNg06abWqf0cRVkLrd2p9mJmxiSQ/xCa
+ ru9vJTx0iGCPemQmTcJlenl5fbiH9rkE/2jzXdKcqkk4XZbeyTYhCh3b4Crc2F+EYYr9 0w== 
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3vr7cv3fdt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sat, 27 Jan 2024 00:25:10 +0000
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 40QMpsHM014360;
+	Sat, 27 Jan 2024 00:25:09 GMT
+Received: from nam10-bn7-obe.outbound.protection.outlook.com (mail-bn7nam10lp2101.outbound.protection.outlook.com [104.47.70.101])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3vs376kvb7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sat, 27 Jan 2024 00:25:09 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GAEB7IbA8od+QWRFUnegmUaJvRgXlG3uGvg9oqRCA3o9r6251LknZZ6GIaWhk+SSnO3H52OrkwNtCQAiGgM1ts9WHhBYvX3FNruyz6yY9aVTdeYTBTOKgRVtrKixEQsh5ztB6PgqtNoHw+EpXDFOGG9aYev9p7bI8fGg/k7r+eSUXa+TetW1l6vxwS3ArpT5mOralmxmlIS/AorQzj1N9mpIB0lysyjHYd4Um0+uJh9ahWBfJVeMarhpuMkkoh3yffq4vE3nY2W5H805mxhuneqS1nwgWAT2vOSsRGGQOoDt2kKPYlr2NoUHFeyVhk76kBVXjk14Q7y9d68bjBG2nA==
+ b=nQukETJfEhA5e5MRtEIkCW6Wa0z8qAFAEyvlqAPDpAflb4cnbvnsnW7Kun1XoXuP/OWC727UqJKfNRxuynlCUUZOVhCZZu7uVkMCpq9BcKS3Yz8QNgefEzOqGQggpSCQ8GcW+qTTPALjdgowyckw4Dvv0dWjUsEtj7cMw5ZePxHsVg0/N9op/yMSy+M+BnArteqeqG7Kd5ApbN6um63tF0IdY0PJSWxbLO8vEBFfCpUMLPXcz2ExGM64thpkYZC6/xLGbjKy07XxGhwUp8aKf/RFcOzblBYCoTeViLnlYTyB/AdaIGZvtFw/N0RmusHfn/4TT5hOxy+x7tiQXUwjvg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7wHnL7u6s8sdvRMf3uic4a10KJS12/oeCxM4Jt6Mlow=;
- b=f/ymHpNOmZV2SYa72kDMiDDMqalftV1BI2wNVU8264F13Nyx1yRshlf/b3142icIsrEeWwVTzf9mfXa8B4QJ/0wW+Tt3auda65fC6ruoRF/xnil+WTMCcdQ7sw20EQDLPME0KkOdcffHVJnLuYNy6GSjUzOGtMYRVqK8daZxq82CwjKXJWjf35Dx+IzYUCZhO2raaYUyCkdXZC/ulyw0DlimEcn+BzxM/Ts0Ay/EXq1F2sbBiJd4x1iaofs7ObMCxMo7uGUbKOTBWGB8mb1AQ78sFJcylvdlJnstpdsfqeSZQXnp3KYdz8GnPIEoKJqSiTIfE2qJMVkAi6j4IWC/DA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=alien8.de smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ bh=WVMdUQMtLieiPLiXnz3lkm4b9VtA9gLcmHG1OWVHN2U=;
+ b=dsWofi97/kq0fkeU5bZqW+s9TOHysNX9sT0bdBPUiSKBUcbj8fSjrepfa3zDk/Q9BrH5F4FtMYHlIQutq6f2UA9fPrhxfPSmQf5dUkGJWBOOBWnOtaQptVLhXHutgiQFpxjVBS7ZqRuaIotJiA5wOrimVj8vtigMMrpvqmnAnIZxrMK2RpxG4Dylg7G8VeOfJLNuEzi2MT4zwjGGyjhXZoyVEr+YLl6K3XzfdHyHcq/VoBdqgZOx/twWDTkAcNwA9785MUa1PQapPCIv0F0mqTyvoZ15OnWomuWfikLh216420X9IZzD4W/RQkOdgnkkuZCVlJ4QbG7z4ZZy7vtC3w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7wHnL7u6s8sdvRMf3uic4a10KJS12/oeCxM4Jt6Mlow=;
- b=fWCT+5NFCRZxAbc1dXG2dWeCnqMpY9V4VOf2S55pNBtWnSrx6CN5rjOzsjgVjzw9vwY44oEtQHF6sgNJWjToC+sOvBnbah1WBjrp4+THiRvB8v1twvTX28QgWqksqZcn+vFkiUVeVcUqQDJC5pIoJlFgovCB4rq1CLeMkrR5dbc=
-Received: from BLAPR03CA0133.namprd03.prod.outlook.com (2603:10b6:208:32e::18)
- by IA1PR12MB6577.namprd12.prod.outlook.com (2603:10b6:208:3a3::20) with
+ bh=WVMdUQMtLieiPLiXnz3lkm4b9VtA9gLcmHG1OWVHN2U=;
+ b=EO2coDWpIid2filV7BmiO+50pIvEOQicrg4bAxNFetvMf9T23I3VutnI+pQHRQLBvKMEx6r+9hQJaW3TIN1Iwjw8MwaJAMG+DldZ34Zl8RSJPrFb9iweDs7nkaS/83Wk9+SpclTGhylt6qAT1mq0iMBz6fhCdi8ohcp/ScALUDg=
+Received: from BYAPR10MB2663.namprd10.prod.outlook.com (2603:10b6:a02:a9::20)
+ by PH7PR10MB5815.namprd10.prod.outlook.com (2603:10b6:510:126::6) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.22; Fri, 26 Jan
- 2024 23:54:40 +0000
-Received: from MN1PEPF0000ECDB.namprd02.prod.outlook.com
- (2603:10b6:208:32e:cafe::c7) by BLAPR03CA0133.outlook.office365.com
- (2603:10b6:208:32e::18) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.27 via Frontend
- Transport; Fri, 26 Jan 2024 23:54:40 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- MN1PEPF0000ECDB.mail.protection.outlook.com (10.167.242.139) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7228.16 via Frontend Transport; Fri, 26 Jan 2024 23:54:39 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Fri, 26 Jan
- 2024 17:54:39 -0600
-Date: Fri, 26 Jan 2024 17:54:20 -0600
-From: Michael Roth <michael.roth@amd.com>
-To: Borislav Petkov <bp@alien8.de>
-CC: <x86@kernel.org>, <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
-	<linux-mm@kvack.org>, <linux-crypto@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
-	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
-	<ardb@kernel.org>, <pbonzini@redhat.com>, <seanjc@google.com>,
-	<vkuznets@redhat.com>, <jmattson@google.com>, <luto@kernel.org>,
-	<dave.hansen@linux.intel.com>, <slp@redhat.com>, <pgonda@google.com>,
-	<peterz@infradead.org>, <srinivas.pandruvada@linux.intel.com>,
-	<rientjes@google.com>, <tobin@ibm.com>, <vbabka@suse.cz>,
-	<kirill@shutemov.name>, <ak@linux.intel.com>, <tony.luck@intel.com>,
-	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
-	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>
-Subject: Re: [PATCH v2 11/25] x86/sev: Adjust directmap to avoid inadvertant
- RMP faults
-Message-ID: <20240126235420.mu644waj2eyoxqx6@amd.com>
-References: <20240126041126.1927228-1-michael.roth@amd.com>
- <20240126041126.1927228-12-michael.roth@amd.com>
- <20240126153451.GDZbPRG3KxaQik-0aY@fat_crate.local>
- <20240126170415.f7r4nvsrzgpzcrzv@amd.com>
- <20240126184340.GEZbP9XA13X91-eybA@fat_crate.local>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.27; Sat, 27 Jan
+ 2024 00:25:07 +0000
+Received: from BYAPR10MB2663.namprd10.prod.outlook.com
+ ([fe80::a1c5:b1ad:2955:e7a6]) by BYAPR10MB2663.namprd10.prod.outlook.com
+ ([fe80::a1c5:b1ad:2955:e7a6%5]) with mapi id 15.20.7228.027; Sat, 27 Jan 2024
+ 00:25:07 +0000
+From: Dongli Zhang <dongli.zhang@oracle.com>
+To: mlevitsk@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org
+Cc: stable@vger.kernel.org, joe.jin@oracle.com
+Subject: Stable bugfix backport request of "KVM: x86: smm: preserve interrupt shadow in SMRAM"?
+Date: Fri, 26 Jan 2024 16:20:16 -0800
+Message-Id: <20240127002016.95369-1-dongli.zhang@oracle.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: BL1PR13CA0298.namprd13.prod.outlook.com
+ (2603:10b6:208:2bc::33) To BYAPR10MB2663.namprd10.prod.outlook.com
+ (2603:10b6:a02:a9::20)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240126184340.GEZbP9XA13X91-eybA@fat_crate.local>
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN1PEPF0000ECDB:EE_|IA1PR12MB6577:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7e2cd9f6-4175-416d-6f6d-08dc1eca2908
+X-MS-TrafficTypeDiagnostic: BYAPR10MB2663:EE_|PH7PR10MB5815:EE_
+X-MS-Office365-Filtering-Correlation-Id: f19aaa52-17d1-4b14-066f-08dc1ece6a16
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	sizMSvqj3rx8isC8yIg+s2E9ftCsbPqpTYW776SFVypLuAcyo+vc5D0cQeYnFwdwdgmWQKfTX4mL6oHmg4jdoSEHubdV6ivh2EN6MaLRVd8MNIBLj6PfYWj+CzHivy2BrYYcXbOnNlfmg/eS1o7N7TSpUb/2iEFSApKk7ovSQksE293fjM5uNmoGEOfofzE4BQ7gIfetNwFvrJin8t7cxO8+DSuwSfnKDtjFY1+edqOjBtqXn1Yxfn9jlj1okdRuCes9Lq0cBo8DuIlURR5iwOJoUIGXYjomSj5jfFB0zYAafkxj8mCaqC+gSejI5zBLX/okDBqLayu5fnUia8tGzRzDk/OtLew+D07CY+C7xci45hfnE9VFs/RUGF2eWq++HNB0G7xn7vfQUqQWi8LSSY4O8rMN9MzH1jtcvPSNNneMpwviqxnjEkSg4JeLBouuMSICQKxOlOWnVWH8Rtwlqf8rbLHcDDU/oiHLK7AuaAW33IvxSuTQKq288zhbhYZsxqaHiDR6egtuqqwCK4W1tspsvbLiJ2X210M9brpF7RVOGpqZxXFhv48TZCewYvPJSU28bzzL98J1y7KcoFdTCexVnt3yFSOKRjkaDYUM3w2XRuaTxXDByW+01fVbO+bfuzFqWi2Z56OMBvPDOyRpmalvcsCvB++xEdaNnl8MpiYImC3BBryKTBf2zP4QGLW8Au+x4k/9xhLb8Y5ckGUPXrPgPRD6wItBOlRGhtaYI4aEUN7avtkG7IjgjEd5uNAC
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(396003)(136003)(346002)(376002)(39860400002)(230922051799003)(82310400011)(186009)(64100799003)(1800799012)(451199024)(40470700004)(36840700001)(46966006)(54906003)(6916009)(1076003)(70206006)(70586007)(316002)(40460700003)(40480700001)(5660300002)(2616005)(426003)(336012)(478600001)(6666004)(16526019)(26005)(966005)(36756003)(83380400001)(66899024)(44832011)(41300700001)(81166007)(2906002)(356005)(86362001)(47076005)(8936002)(8676002)(36860700001)(4326008)(82740400003)(7416002)(7406005)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jan 2024 23:54:39.9632
+X-Microsoft-Antispam-Message-Info: 
+	jPEVn5yGuLFYpkLDHalOT4MS1Op4fa2X6IzHqIkVIdXNLFfB7kj7yEFNSE2kiJbV2MqF19mKaBYt1zPjMkd1L3J8UInRksRcwuVBKIfrq/4rdDG23AItdpE/ab0fSs3aFl8ePLmEgiqtlFss14j1pucrvFdAfBDevZbYBKu9xyskVxZv8KOjiv8jwy1q2CPXNd7xppMtPlhQD4y/OQxU9cCt81a3kmfutEPkJ7NgjjcbP3EdjAQ/p0oqe3QNkECLg3YJmJUg8Wk35Fq0j32b5h1Pi/V2hFC9ZV2NIetrqdMd0JA3RmKRXnMyhfoWpFDAD42ODioQmU1neqfu9NldNxcp+NwLskmNehT1dHQGVH0i9A4Lwujnk+qYZRHcwyMR7tQxRd7/uiNZnwzkP8t6DyaQJZhI6UV9T5Ka98uYBB4zdkwbuo0QBJSneyStz/kdcCq/7H43u6ukPSxsj8AkC3vA/WYDB1egvows52NFo13IIG2TYv6Maj+VRIj26I0qjwnUsS0/yKZz+B+pXsTJ0+Jf48UG/PmuP3YWPaAk27o=
+X-Forefront-Antispam-Report: 
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR10MB2663.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(396003)(136003)(366004)(346002)(39860400002)(230922051799003)(64100799003)(186009)(1800799012)(451199024)(41300700001)(26005)(6666004)(2616005)(107886003)(6506007)(1076003)(53546011)(83380400001)(8936002)(4326008)(8676002)(6512007)(5660300002)(6486002)(478600001)(966005)(66476007)(316002)(66556008)(86362001)(66946007)(38100700002)(44832011)(2906002)(36756003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: 
+	=?us-ascii?Q?LwgfzVbLd5rmxa1w6vg7cdDQJbiWY8CL6DSMxPtqEehRu1JEKm4P6PJz2gLP?=
+ =?us-ascii?Q?xY2JxAogSFyGadL1FHgsAvmyRAm1+4bZpyfPdh+XFNwBwMC62rXfaoWbXp49?=
+ =?us-ascii?Q?0qw7s4Nl/CjPNRw1aq8Xf+PxtBhpT92Tm6G9+A1V72KtVIgdyiFtOpEV1FfN?=
+ =?us-ascii?Q?laYDiXfBFn+XYIKcivxJWJU4MIMPbGVMXRH0+8hyEp+zGA9sazIk/YYe7gEV?=
+ =?us-ascii?Q?v7+U1xf2+uyxxNqg97oQlIjAwmiDqUZ5mLQgQ2ZCzrol/vkdI7gDOhls5O4v?=
+ =?us-ascii?Q?eBpKcD7MwVsckki4ybR+rBOK2f+kajDYqXEWdo+6UcfCJ+PF+OciZsZBTLhp?=
+ =?us-ascii?Q?klmk9iCMGj8vVmc9BRxxolInjaxV2hW5IirDbDrxfmeFlKr3ZPwQBVusuzZ+?=
+ =?us-ascii?Q?BQjTKB82rICNNo90Pn7rmy+uFETzfcKU4uVv2/aTwj9gY90PMNQPsYooJW9S?=
+ =?us-ascii?Q?8kxjO5bZ5Lcv1bu/CIKUeLe0/NCvqkXP6nPKv3fuFza7FU3wmk80qtF3/18P?=
+ =?us-ascii?Q?G8CydOXAleSGzR+U7vk3nKFQjr/Z+yeg46GqaVjj6H98xQDoN4ZJ10pxwu0F?=
+ =?us-ascii?Q?hwonIAo4gBLt7wjFHFJJwpO1Jvtb/YfGcIKm/rdCYtglGIPW6k84TUC22nK4?=
+ =?us-ascii?Q?L12+sLF8fN+/JQsnmq5oBBFbnzMJicCRpFr67B2DGdjnXzb/8da3W8/Uu4up?=
+ =?us-ascii?Q?HBbDQaIwHTgOaDvfhAragr5RCn87sUOKG2h7mlrtWOabpojQtKh6WCzfpu22?=
+ =?us-ascii?Q?YZBvDdQ5CTgOZnohA1gsh9l+q/FjJXks+A9BTJO793yo5lOpHGFu61fQ0QMc?=
+ =?us-ascii?Q?wxw4SjNssIvGru1tC3qrRIm60SdHFUcWvNDTfAsJCj74wAOEtx5PJnIAxfca?=
+ =?us-ascii?Q?aNS6FhtGnwmM39tl2Lqi83J0KaGuLO8jXngEcd4Tt7oBCFnzDHkx8TFMNBt/?=
+ =?us-ascii?Q?xxtt9RDOf6HgNc/+V6AryGChNlkxe3a6CGO7R2doaTtpwdzDapqzlCSCsQjv?=
+ =?us-ascii?Q?ZNAO/GvOTzSGQ/GvojJEDsApZXZmqDK3hLM6Xtmw1Dq+zkV9Md5ELVce4m9+?=
+ =?us-ascii?Q?17TznywMcA1/HxC545t+u0dzYqVosefNudjS8hOVlgFmzTrvd5b0xlJnvUCf?=
+ =?us-ascii?Q?vQlrU+ycohBnaKPFk6S5nm41QzpKn30L8cnfK0QUj6nTePsAgv6+kaURwCBN?=
+ =?us-ascii?Q?f4wEB7/1TiGIWFX7gQhXReYPqKWSbt9jpkamtTr3/cfxHaZnh/vohiGCc7os?=
+ =?us-ascii?Q?+ad5elfkjXF1d0z6m5rTtozUdkCG7LPMr0E+0YjHZbXBVZTVgBMx46kX5Ok7?=
+ =?us-ascii?Q?28a1xYR6E9DIcn1Gpjw7Mcx7s764GjYVkbC7+//tl7Y1TH2RSRD4Infkoi4H?=
+ =?us-ascii?Q?QFrApWnkkUhdt+lnL4d8YSofh08P1QsfMiAQyfl01boJmR7Zh6O9KuTrAQcm?=
+ =?us-ascii?Q?pIMvdg+cLSpI6q2eOSJD0KduVQ5JFq+S3tWvDHVgOx6K1WOG3WxCx3DKVViG?=
+ =?us-ascii?Q?W0BBYZTa+V30Uqj090ClQaPX8+LZw/pQEOUB4l54tfwYAefKIqlt1G+OX2VW?=
+ =?us-ascii?Q?Q547ivNN/laT12I8YkrYq4BdBdk4r/OfUG/t3TfDhkQEVx0Hx9kUVTbfj+zA?=
+ =?us-ascii?Q?Lw=3D=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
+	6dkr7Ufn6IzuEVEIXitPEXtzolATrx+NfaKn3gsGW3uzmRDzm+RWmXT6LY1icr3Hd96vGXDLUpMK4rUUvFNDUdZa185J97V932M2Yo30m1YurzuxeTEy9YtiyVsCVgqcoYGrt5ih/rU3bluNH+A/Zi1KR9j5XB5Q6jBuCiKUc6+pFwbOLQSlmJTe2GJFU1qiGAEEFOO3AvvngqpYmt4mmoJRyUyVKXT2E65MSI2oLtXeHj+H0fBduUrwB1eDn3grz+fDpTnFfbLDehNeia0Yrmp8vTWVinHAbLHbP0kvxXJOS6ZPYxOz87oxlEDBlQIhFfQdkvsuPiYn5DUR+eFYVPkhqF4jhoZefoIgpEGuryDCwCZpJw09ZRZlF6R2+lu1+paTTbXlvfe0LfzQmboRf3+SSOXPT4PJQlRHq2HRGi4n9bZkBOHzKFdt6vPjW2qQECtJJtyFlVB19YGcYe2+xFK+MW0eSdXZyL/LkLnGdYB7nmoN9HFqPCiKqG/Fk30Bo2/ZRrsYTQHBQF6h9otBHUpJRORI3JSOetluTuSL+oPHJQ6WFrchmIUzWUx7P1UkknX4WeDxUZjG5AkT7dLi2f/627yZX1yccizXT4Udu5Y=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f19aaa52-17d1-4b14-066f-08dc1ece6a16
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR10MB2663.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jan 2024 00:25:07.4214
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7e2cd9f6-4175-416d-6f6d-08dc1eca2908
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MN1PEPF0000ECDB.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6577
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: QOin6oxWn7hw6iJdGDN9X0+i5eqE0aRKfPOrmB7ex+4NKSQvR47608QLZEc5CfKDun/acktZbGxV66Pl9XbYjQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR10MB5815
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-25_14,2024-01-25_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 bulkscore=0
+ mlxlogscore=999 mlxscore=0 phishscore=0 adultscore=0 spamscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2401270001
+X-Proofpoint-ORIG-GUID: BpIfWe1zQV6Wo3NE6JJy0J1LnGemKsU9
+X-Proofpoint-GUID: BpIfWe1zQV6Wo3NE6JJy0J1LnGemKsU9
 
-On Fri, Jan 26, 2024 at 07:43:40PM +0100, Borislav Petkov wrote:
-> On Fri, Jan 26, 2024 at 11:04:15AM -0600, Michael Roth wrote:
-> > vaddr comes from pfn_to_kaddr(pfn), i.e. __va(paddr), so it will
-> > necessarily be a direct-mapped address above __PAGE_OFFSET.
-> 
-> Ah, true.
-> 
-> > For upper-end, a pfn_valid(pfn) check might suffice, since only a valid
-> > PFN would have a possibly-valid mapping wthin the directmap range.
-> 
-> Looking at it, yap, that could be a sensible thing to check.
-> 
-> > These are PFNs that are owned/allocated-to the caller. Due to the nature
-> > of the directmap it's possible non-owners would write to a mapping that
-> > overlaps, but vmalloc()/etc. would not create mappings for any pages that
-> > were not specifically part of an allocation that belongs to the caller,
-> > so I don't see where there's any chance for an overlap there. And the caller
-> > of these functions would not be adjusting directmap for PFNs that might be
-> > mapped into other kernel address ranges like kernel-text/etc unless the
-> > caller was specifically making SNP-aware adjustments to those ranges, in
-> > which case it would be responsible for making those other adjustments,
-> > or implementing the necessary helpers/etc.
-> 
-> Why does any of that matter?
-> 
-> If you can make this helper as generic as possible now, why don't you?
+Hi Maxim and Paolo, 
 
-In this case, it would make it more difficult to handle things
-efficiently and implement proper bounds-checking/etc. For instance, if
-the caller *knows* they are doing something different like splitting a
-kernel-text mapping, then we could implement proper bounds-checking
-based on expected ranges, and implement any special handling associated
-with that use-case, and capture that in a nice/understandable
-adjust_kernel_text_mapping() helper. Or maybe if these are adjustments
-for non-static/non-linear mappings, it makes more sense to be given an
-HVA rather than PFN, etc., since we might not have any sort of reverse-map
-structure/function than can be used to do the PFN->HVA lookups efficiently.
+This is the linux-stable backport request regarding the below patch.
 
-It's just a lot to guess at. And just the directmap splitting itself has
-been the source of so much discussion, investigation, re-work, benchmarking,
-etc., that it hints that implementing similar handling for other use-cases
-really needs to have a clear and necessary purpose and set of requirements 
-hat can be evaluated/tested before enabling them and reasonably expecting
-them to work as expected.
+KVM: x86: smm: preserve interrupt shadow in SMRAM
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=fb28875fd7da184079150295da7ee8d80a70917e
 
-> 
-> > I'm not aware of such cases in the current code, and I don't think it makes
-> > sense to attempt to try to handle them here generically until such a case
-> > arises, since it will likely involve more specific requirements than what
-> > we can anticipate from a theoretical/generic standpoint.
-> 
-> Then that's a different story. If it will likely involve more specific
-> handling, then that function should deal with pfns for which it can DTRT
-> and for others warn loudly so that the code gets fixed in time.
-> 
-> IOW, then it should check for the upper pfn of the direct map here and
-> we have two, depending on the page sizes used...
+According to the below link, there may be a backport to stable kernels, while I
+do not see it in the stable kernels.
 
-Is something like this close to what you're thinking? I've re-tested with
-SNP guests and it seems to work as expected.
+https://gitlab.com/qemu-project/qemu/-/issues/1198
 
-diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
-index 846e9e53dff0..c09497487c08 100644
---- a/arch/x86/virt/svm/sev.c
-+++ b/arch/x86/virt/svm/sev.c
-@@ -421,7 +421,12 @@ static int adjust_direct_map(u64 pfn, int rmp_level)
-        if (WARN_ON_ONCE(rmp_level > PG_LEVEL_2M))
-                return -EINVAL;
+Would you mind sharing if there is already any existing backport, or please let
+me know if I can send the backport to the linux-stable?
 
--       if (WARN_ON_ONCE(rmp_level == PG_LEVEL_2M && !IS_ALIGNED(pfn, PTRS_PER_PMD)))
-+       if (!pfn_valid(pfn))
-+               return -EINVAL;
+There are many conflicts unless we backport the entire patchset, e.g.,: I
+choose 0x7f1a/0x7ecb for 32-bit/64-bit int_shadow in the smram.
+
+--------------------------------
+
+From 90f492c865a4b7ca6187a4fc9eebe451f3d6c17e Mon Sep 17 00:00:00 2001
+From: Maxim Levitsky <mlevitsk@redhat.com>
+Date: Fri, 26 Jan 2024 14:03:59 -0800
+Subject: [PATCH linux-5.15.y 1/1] KVM: x86: smm: preserve interrupt shadow in SMRAM
+
+[ Upstream commit fb28875fd7da184079150295da7ee8d80a70917e ]
+
+When #SMI is asserted, the CPU can be in interrupt shadow due to sti or
+mov ss.
+
+It is not mandatory in  Intel/AMD prm to have the #SMI blocked during the
+shadow, and on top of that, since neither SVM nor VMX has true support
+for SMI window, waiting for one instruction would mean single stepping
+the guest.
+
+Instead, allow #SMI in this case, but both reset the interrupt window and
+stash its value in SMRAM to restore it on exit from SMM.
+
+This fixes rare failures seen mostly on windows guests on VMX, when #SMI
+falls on the sti instruction which mainfest in VM entry failure due
+to EFLAGS.IF not being set, but STI interrupt window still being set
+in the VMCS.
+
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+Message-Id: <20221025124741.228045-24-mlevitsk@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+Backport fb28875fd7da184079150295da7ee8d80a70917e from a big patchset
+merge:
+
+[PATCH RESEND v4 00/23] SMM emulation and interrupt shadow fixes
+https://lore.kernel.org/all/20221025124741.228045-1-mlevitsk@redhat.com/
+
+Since only the last patch is backported, there are many conflicts.
+
+The core idea of the patch:
+
+- Save the interruptibility before entering SMM.
+- Load the interruptibility after leaving SMM.
+
+Although the real offsets in smram buffer are the same, the bugfix and the
+UEK5 use different offsets in the function calls. Here are some examples.
+
+32-bit:
+              bugfix      UEK6
+smbase     -> 0xFEF8  -> 0x7ef8
+cr4        -> 0xFF14  -> 0x7f14
+int_shadow -> 0xFF1A  ->  n/a
+eip        -> 0xFFF0  -> 0x7ff0
+cr0        -> 0xFFFC  -> 0x7ffc
+
+64-bit:
+              bugfix      UEK6
+int_shadow -> 0xFECB  ->  n/a
+efer       -> 0xFEd0  -> 0x7ed0
+smbase     -> 0xFF00  -> 0x7f00
+cr4        -> 0xFF48  -> 0x7f48
+cr0        -> 0xFF58  -> 0x7f58
+rip        -> 0xFF78  -> 0x7f78
+
+Therefore, we choose the below offsets for int_shadow:
+
+32-bit: int_shadow = 0x7f1a
+64-bit: int_shadow = 0x7ecb
+
+Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+---
+ arch/x86/kvm/emulate.c | 15 +++++++++++++--
+ arch/x86/kvm/x86.c     |  6 ++++++
+ 2 files changed, 19 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index 98b25a7..00df781b 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -2438,7 +2438,7 @@ static int rsm_load_state_32(struct x86_emulate_ctxt *ctxt,
+ 	struct desc_ptr dt;
+ 	u16 selector;
+ 	u32 val, cr0, cr3, cr4;
+-	int i;
++	int i, r;
+
+ 	cr0 =                      GET_SMSTATE(u32, smstate, 0x7ffc);
+ 	cr3 =                      GET_SMSTATE(u32, smstate, 0x7ff8);
+@@ -2488,7 +2488,15 @@ static int rsm_load_state_32(struct x86_emulate_ctxt *ctxt,
+
+ 	ctxt->ops->set_smbase(ctxt, GET_SMSTATE(u32, smstate, 0x7ef8));
+
+-	return rsm_enter_protected_mode(ctxt, cr0, cr3, cr4);
++	r = rsm_enter_protected_mode(ctxt, cr0, cr3, cr4);
 +
-+       if (rmp_level == PG_LEVEL_2M &&
-+           (!IS_ALIGNED(pfn, PTRS_PER_PMD) ||
-+            !pfn_valid(pfn + PTRS_PER_PMD - 1)))
-                return -EINVAL;
++	if (r != X86EMUL_CONTINUE)
++		return r;
++
++	static_call(kvm_x86_set_interrupt_shadow)(ctxt->vcpu, 0);
++	ctxt->interruptibility = GET_SMSTATE(u8, smstate, 0x7f1a);
++
++	return r;
+ }
 
-Note that I removed the WARN_ON_ONCE(), which I think was a bit overzealous
-for this check. The one above it for rmp_level > PG_LEVEL_2M I think is more
-warranted, since it returns error for a use-case that might in theory become
-valid on future hardware, but would result in unecessary 1GB->2MB directmap
-splitting if we were to try to implement handling for that before it's
-actually needed (which may well be never).
+ #ifdef CONFIG_X86_64
+@@ -2559,6 +2567,9 @@ static int rsm_load_state_64(struct x86_emulate_ctxt *ctxt,
+ 			return r;
+ 	}
 
--Mike
++	static_call(kvm_x86_set_interrupt_shadow)(ctxt->vcpu, 0);
++	ctxt->interruptibility = GET_SMSTATE(u8, smstate, 0x7ecb);
++
+ 	return X86EMUL_CONTINUE;
+ }
+ #endif
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index aa6f700..6b30d40 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9400,6 +9400,8 @@ static void enter_smm_save_state_32(struct kvm_vcpu *vcpu, char *buf)
+ 	/* revision id */
+ 	put_smstate(u32, buf, 0x7efc, 0x00020000);
+ 	put_smstate(u32, buf, 0x7ef8, vcpu->arch.smbase);
++
++	put_smstate(u8, buf, 0x7f1a, static_call(kvm_x86_get_interrupt_shadow)(vcpu));
+ }
 
-> 
-> Thx.
-> 
-> -- 
-> Regards/Gruss,
->     Boris.
-> 
-> https://people.kernel.org/tglx/notes-about-netiquette
+ #ifdef CONFIG_X86_64
+@@ -9454,6 +9456,8 @@ static void enter_smm_save_state_64(struct kvm_vcpu *vcpu, char *buf)
+
+ 	for (i = 0; i < 6; i++)
+ 		enter_smm_save_seg_64(vcpu, buf, i);
++
++	put_smstate(u8, buf, 0x7ecb, static_call(kvm_x86_get_interrupt_shadow)(vcpu));
+ }
+ #endif
+
+@@ -9490,6 +9494,8 @@ static void enter_smm(struct kvm_vcpu *vcpu)
+ 	kvm_set_rflags(vcpu, X86_EFLAGS_FIXED);
+ 	kvm_rip_write(vcpu, 0x8000);
+
++	static_call(kvm_x86_set_interrupt_shadow)(vcpu, 0);
++
+ 	cr0 = vcpu->arch.cr0 & ~(X86_CR0_PE | X86_CR0_EM | X86_CR0_TS | X86_CR0_PG);
+ 	static_call(kvm_x86_set_cr0)(vcpu, cr0);
+ 	vcpu->arch.cr0 = cr0;
+--
+1.8.3.1
+
+--------------------------------
+
+Thank you very much!
+
+Dongli Zhang
 
