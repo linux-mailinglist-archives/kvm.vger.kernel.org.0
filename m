@@ -1,135 +1,139 @@
-Return-Path: <kvm+bounces-7273-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7274-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58C3883EC01
-	for <lists+kvm@lfdr.de>; Sat, 27 Jan 2024 09:18:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD91D83EC53
+	for <lists+kvm@lfdr.de>; Sat, 27 Jan 2024 10:34:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12E9F2836A1
-	for <lists+kvm@lfdr.de>; Sat, 27 Jan 2024 08:18:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1EAF4B216B9
+	for <lists+kvm@lfdr.de>; Sat, 27 Jan 2024 09:34:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0428A1DFD6;
-	Sat, 27 Jan 2024 08:18:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tcElxdZR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5833C1EB34;
+	Sat, 27 Jan 2024 09:34:24 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 280191DA26;
-	Sat, 27 Jan 2024 08:18:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC9871EB21;
+	Sat, 27 Jan 2024 09:34:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706343488; cv=none; b=Gytf0kpcZE66Q7MJ5LPXUVSmjTeZEqN0R/Xr4Xz61lG09d3QB1DszUwIwK/DfodmiFcJde1GoMsgwTwnsNB8Dm3LNswbeh3RJwrw5PPKMa8eHWB83GAtawLZkj0Mwz3zFVVyx+j7UPQswf8aHqDxC507O3o4sxKYAJPLMWV32Vg=
+	t=1706348063; cv=none; b=eHP7MTW/Ge2AAukZnSOOuM5BgQ4mWnY4SDMqyDCntzMMlbbMjUItGV5zkXl2s1te4EoomMah4/kWjfrFLiJTW1GVvHQoBzXLRTYBDoB6ZWtGW4DVMpqos3ybe4IOA7RyPrNDbkshl2nZJvnzukNzY/kJD+63pquggLv15KYleJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706343488; c=relaxed/simple;
-	bh=8LLLdtl9//0302xBmCAb5fVKYkH14Azx9Y+eiOFpAO8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=g2Rgricsdj2Byib3H79sHlNCcbT34xs9UQcng9U0Qo9MTs8RS9+AkNrFI9iprhOwyYbU/r5UiugzbX+ZV3H58pRvbdynpY7f44PsAXrbjVF6vP9TxrDHEiRfFmsVATllMuMqSLSXstMcU5pTJ5yGMNNtVgVpj3EmZRcWIAezHpc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tcElxdZR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0930C433A6;
-	Sat, 27 Jan 2024 08:18:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706343487;
-	bh=8LLLdtl9//0302xBmCAb5fVKYkH14Azx9Y+eiOFpAO8=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=tcElxdZRnTaWsZzPC7p3aBqDTC4aQE52psLaEiaM4MbTL1R+0e/ZkyFK1w4LXot/g
-	 1Y70EW59o197oUXOdEcEr1OiBU7mt8TmuIPJzXlLwojfAdPuXHEC1RZMrQX0TKN8m2
-	 wwo1RSbYFf0so93MyKlCKL4lxZY4HLkVNY7PnFZMOw1MGgApyPIrk8ASAF0xBtOmmT
-	 /ChNYNQzoYx+75oXF4GJSEeQd1rJTbvzM9YM+7UL9kAuXzlUfo5mvmmWzlUlWCZMed
-	 V7ioLrPNwbY3IFw2F4Q2JeaQY5SA8tbpJbKPs0PI2ADccsDwoLksi8fhh+l3pS9HyX
-	 yusO6eyo6DK2g==
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-55790581457so894132a12.3;
-        Sat, 27 Jan 2024 00:18:07 -0800 (PST)
-X-Gm-Message-State: AOJu0YyVrNGRIhFBxp0smw2LR5IU5xEgvSIwdb95hYhlmAYm3MUtFrOu
-	FEP70rq4miYYwspbxXmTjLaOULxZFsc9OVVza0bdpGUHxK7wGUzB11ahC50L1aEsQM6l4Yy31lP
-	1vfoF5uvFTGYzOzNp4ZZCACHM9Jk=
-X-Google-Smtp-Source: AGHT+IGT2oaOQe+6LGqKk1utGK8v/4/ke1g5CH4yt8uO8c+K4HjhzynJLCp1L0QZDaO+dh5JgCFYR94L+8zzSAZbfAA=
-X-Received: by 2002:aa7:da08:0:b0:55e:ba92:21a6 with SMTP id
- r8-20020aa7da08000000b0055eba9221a6mr256577eds.19.1706343485949; Sat, 27 Jan
- 2024 00:18:05 -0800 (PST)
+	s=arc-20240116; t=1706348063; c=relaxed/simple;
+	bh=jWWHAvPyYDmqWSnWLY25KtBJxBARbNBlduXIIg7JPi4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=eyiOs8KiP29kFiIRBGWsDITVFR+AvKyAISGISYAEtmkoL9s68tMoguz4xZ+Lrw8LOFuomAV+srZVc3LBGdenmTq2Y1rweGdXnwJMaISlb7lBiyVUuV0+lJXWkDlGpKb61ojDocKC8Gf+CD/Vf1/ZfyJ9MovyesdeVODVj2hkb3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4TMTqt3f6XzvVKf;
+	Sat, 27 Jan 2024 17:32:42 +0800 (CST)
+Received: from dggpemm500008.china.huawei.com (unknown [7.185.36.136])
+	by mail.maildlp.com (Postfix) with ESMTPS id E0421180079;
+	Sat, 27 Jan 2024 17:34:17 +0800 (CST)
+Received: from dggpemm500008.china.huawei.com (7.185.36.136) by
+ dggpemm500008.china.huawei.com (7.185.36.136) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Sat, 27 Jan 2024 17:34:17 +0800
+Received: from dggpemm500008.china.huawei.com ([7.185.36.136]) by
+ dggpemm500008.china.huawei.com ([7.185.36.136]) with mapi id 15.01.2507.035;
+ Sat, 27 Jan 2024 17:34:17 +0800
+From: wangyunjian <wangyunjian@huawei.com>
+To: wangyunjian <wangyunjian@huawei.com>, Jason Wang <jasowang@redhat.com>
+CC: "mst@redhat.com" <mst@redhat.com>, "willemdebruijn.kernel@gmail.com"
+	<willemdebruijn.kernel@gmail.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>, "magnus.karlsson@intel.com"
+	<magnus.karlsson@intel.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, xudingke
+	<xudingke@huawei.com>
+Subject: RE: [PATCH net-next 2/2] tun: AF_XDP Rx zero-copy support
+Thread-Topic: [PATCH net-next 2/2] tun: AF_XDP Rx zero-copy support
+Thread-Index: AQHaTqkDLHSSzcU2CESolpkubpTJa7DpcBcAgAD60ACAAvY/kA==
+Date: Sat, 27 Jan 2024 09:34:17 +0000
+Message-ID: <156030296fea4f7abef6ab7155ba2e32@huawei.com>
+References: <1706089075-16084-1-git-send-email-wangyunjian@huawei.com>
+ <CACGkMEu5PaBgh37X4KysoF9YB8qy6jM5W4G6sm+8fjrnK36KXA@mail.gmail.com>
+ <ad74a361d5084c62a89f7aa276273649@huawei.com>
+In-Reply-To: <ad74a361d5084c62a89f7aa276273649@huawei.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231115090735.2404866-1-chenhuacai@loongson.cn> <CABgObfYbv_rHto8eEWLB3srmCPj6Le7wDfG5XtYpUH17HBTcCw@mail.gmail.com>
-In-Reply-To: <CABgObfYbv_rHto8eEWLB3srmCPj6Le7wDfG5XtYpUH17HBTcCw@mail.gmail.com>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Sat, 27 Jan 2024 16:17:55 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H5OV4ije66YM=nTTL47nEmSb-N3KqnLWLYXx7UXeM=4PA@mail.gmail.com>
-Message-ID: <CAAhV-H5OV4ije66YM=nTTL47nEmSb-N3KqnLWLYXx7UXeM=4PA@mail.gmail.com>
-Subject: Re: [PATCH] LoongArch: KVM: Fix build due to API changes
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Huacai Chen <chenhuacai@loongson.cn>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
-	Bibo Mao <maobibo@loongson.cn>, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Xuerui Wang <kernel@xen0n.name>, 
-	Jiaxun Yang <jiaxun.yang@flygoat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi, Paolo,
-
-On Sat, Jan 27, 2024 at 2:01=E2=80=AFAM Paolo Bonzini <pbonzini@redhat.com>=
- wrote:
->
-> On Wed, Nov 15, 2023 at 10:14=E2=80=AFAM Huacai Chen <chenhuacai@loongson=
-.cn> wrote:
-> >
-> > Commit 8569992d64b8f750e34b7858eac ("KVM: Use gfn instead of hva for
-> > mmu_notifier_retry") replaces mmu_invalidate_retry_hva() usage with
-> > mmu_invalidate_retry_gfn() for X86, LoongArch also need similar changes
-> > to fix build.
-> >
-> > Signed-off-by: Huacai Chen <chenhuacai@loongson.cn>
->
-> Applied, thanks.
-I'm sorry that I have already sent a PR to Linus which includes this
-one and together with some other patches.
-
-Huacai
-
->
-> Paolo
->
-> > ---
-> >  arch/loongarch/kvm/mmu.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/arch/loongarch/kvm/mmu.c b/arch/loongarch/kvm/mmu.c
-> > index 80480df5f550..9463ebecd39b 100644
-> > --- a/arch/loongarch/kvm/mmu.c
-> > +++ b/arch/loongarch/kvm/mmu.c
-> > @@ -627,7 +627,7 @@ static bool fault_supports_huge_mapping(struct kvm_=
-memory_slot *memslot,
-> >   *
-> >   * There are several ways to safely use this helper:
-> >   *
-> > - * - Check mmu_invalidate_retry_hva() after grabbing the mapping level=
-, before
-> > + * - Check mmu_invalidate_retry_gfn() after grabbing the mapping level=
-, before
-> >   *   consuming it.  In this case, mmu_lock doesn't need to be held dur=
-ing the
-> >   *   lookup, but it does need to be held while checking the MMU notifi=
-er.
-> >   *
-> > @@ -807,7 +807,7 @@ static int kvm_map_page(struct kvm_vcpu *vcpu, unsi=
-gned long gpa, bool write)
-> >
-> >         /* Check if an invalidation has taken place since we got pfn */
-> >         spin_lock(&kvm->mmu_lock);
-> > -       if (mmu_invalidate_retry_hva(kvm, mmu_seq, hva)) {
-> > +       if (mmu_invalidate_retry_gfn(kvm, mmu_seq, gfn)) {
-> >                 /*
-> >                  * This can happen when mappings are changed asynchrono=
-usly, but
-> >                  * also synchronously if a COW is triggered by
-> > --
-> > 2.39.3
-> >
->
+PiA+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+ID4gRnJvbTogSmFzb24gV2FuZyBbbWFp
+bHRvOmphc293YW5nQHJlZGhhdC5jb21dDQo+ID4gU2VudDogVGh1cnNkYXksIEphbnVhcnkgMjUs
+IDIwMjQgMTI6NDkgUE0NCj4gPiBUbzogd2FuZ3l1bmppYW4gPHdhbmd5dW5qaWFuQGh1YXdlaS5j
+b20+DQo+ID4gQ2M6IG1zdEByZWRoYXQuY29tOyB3aWxsZW1kZWJydWlqbi5rZXJuZWxAZ21haWwu
+Y29tOyBrdWJhQGtlcm5lbC5vcmc7DQo+ID4gZGF2ZW1AZGF2ZW1sb2Z0Lm5ldDsgbWFnbnVzLmth
+cmxzc29uQGludGVsLmNvbTsNCj4gPiBuZXRkZXZAdmdlci5rZXJuZWwub3JnOyBsaW51eC1rZXJu
+ZWxAdmdlci5rZXJuZWwub3JnOw0KPiA+IGt2bUB2Z2VyLmtlcm5lbC5vcmc7IHZpcnR1YWxpemF0
+aW9uQGxpc3RzLmxpbnV4LmRldjsgeHVkaW5na2UNCj4gPiA8eHVkaW5na2VAaHVhd2VpLmNvbT4N
+Cj4gPiBTdWJqZWN0OiBSZTogW1BBVENIIG5ldC1uZXh0IDIvMl0gdHVuOiBBRl9YRFAgUnggemVy
+by1jb3B5IHN1cHBvcnQNCj4gPg0KPiA+IE9uIFdlZCwgSmFuIDI0LCAyMDI0IGF0IDU6MzjigK9Q
+TSBZdW5qaWFuIFdhbmcNCj4gPHdhbmd5dW5qaWFuQGh1YXdlaS5jb20+DQo+ID4gd3JvdGU6DQo+
+ID4gPg0KPiA+ID4gTm93IHRoZSB6ZXJvLWNvcHkgZmVhdHVyZSBvZiBBRl9YRFAgc29ja2V0IGlz
+IHN1cHBvcnRlZCBieSBzb21lDQo+ID4gPiBkcml2ZXJzLCB3aGljaCBjYW4gcmVkdWNlIENQVSB1
+dGlsaXphdGlvbiBvbiB0aGUgeGRwIHByb2dyYW0uDQo+ID4gPiBUaGlzIHBhdGNoIHNldCBhbGxv
+d3MgdHVuIHRvIHN1cHBvcnQgQUZfWERQIFJ4IHplcm8tY29weSBmZWF0dXJlLg0KPiA+ID4NCj4g
+PiA+IFRoaXMgcGF0Y2ggdHJpZXMgdG8gYWRkcmVzcyB0aGlzIGJ5Og0KPiA+ID4gLSBVc2UgcGVl
+a19sZW4gdG8gY29uc3VtZSBhIHhzay0+ZGVzYyBhbmQgZ2V0IHhzay0+ZGVzYyBsZW5ndGguDQo+
+ID4gPiAtIFdoZW4gdGhlIHR1biBzdXBwb3J0IEFGX1hEUCBSeCB6ZXJvLWNvcHksIHRoZSB2cSdz
+IGFycmF5IG1heWJlIGVtcHR5Lg0KPiA+ID4gU28gYWRkIGEgY2hlY2sgZm9yIGVtcHR5IHZxJ3Mg
+YXJyYXkgaW4gdmhvc3RfbmV0X2J1Zl9wcm9kdWNlKCkuDQo+ID4gPiAtIGFkZCBYRFBfU0VUVVBf
+WFNLX1BPT0wgYW5kIG5kb194c2tfd2FrZXVwIGNhbGxiYWNrIHN1cHBvcnQNCj4gPiA+IC0gYWRk
+IHR1bl9wdXRfdXNlcl9kZXNjIGZ1bmN0aW9uIHRvIGNvcHkgdGhlIFJ4IGRhdGEgdG8gVk0NCj4g
+Pg0KPiA+IENvZGUgZXhwbGFpbnMgdGhlbXNlbHZlcywgbGV0J3MgZXhwbGFpbiB3aHkgeW91IG5l
+ZWQgdG8gZG8gdGhpcy4NCj4gPg0KPiA+IDEpIHdoeSB5b3Ugd2FudCB0byB1c2UgcGVla19sZW4N
+Cj4gPiAyKSBmb3IgInZxJ3MgYXJyYXkiLCB3aGF0IGRvZXMgaXQgbWVhbj8NCj4gPiAzKSBmcm9t
+IHRoZSB2aWV3IG9mIFRVTi9UQVAgdHVuX3B1dF91c2VyX2Rlc2MoKSBpcyB0aGUgVFggcGF0aCwg
+c28gSQ0KPiA+IGd1ZXNzIHlvdSBtZWFudCBUWCB6ZXJvY29weSBpbnN0ZWFkIG9mIFJYIChhcyBJ
+IGRvbid0IHNlZSBjb2RlcyBmb3INCj4gPiBSWD8pDQo+IA0KPiBPSywgSSBhZ3JlZSBhbmQgdXNl
+IFRYIHplcm9jb3B5IGluc3RlYWQgb2YgUlggemVyb2NvcHkuIEkgbWVhbnQgUlggemVyb2NvcHkN
+Cj4gZnJvbSB0aGUgdmlldyBvZiB2aG9zdC1uZXQuDQo+IA0KPiA+DQo+ID4gQSBiaWcgcXVlc3Rp
+b24gaXMgaG93IGNvdWxkIHlvdSBoYW5kbGUgR1NPIHBhY2tldHMgZnJvbSB1c2Vyc3BhY2UvZ3Vl
+c3RzPw0KPiANCj4gTm93IGJ5IGRpc2FibGluZyBWTSdzIFRTTyBhbmQgY3N1bSBmZWF0dXJlLiBY
+RFAgZG9lcyBub3Qgc3VwcG9ydCBHU08NCj4gcGFja2V0cy4NCj4gSG93ZXZlciwgdGhpcyBmZWF0
+dXJlIGNhbiBiZSBhZGRlZCBvbmNlIFhEUCBzdXBwb3J0cyBpdCBpbiB0aGUgZnV0dXJlLg0KPiAN
+Cj4gPg0KPiA+ID4NCj4gPiA+IFNpZ25lZC1vZmYtYnk6IFl1bmppYW4gV2FuZyA8d2FuZ3l1bmpp
+YW5AaHVhd2VpLmNvbT4NCj4gPiA+IC0tLQ0KPiA+ID4gIGRyaXZlcnMvbmV0L3R1bi5jICAgfCAx
+NjUNCj4gPiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLQ0KPiA+
+ID4gIGRyaXZlcnMvdmhvc3QvbmV0LmMgfCAgMTggKysrLS0NCj4gPiA+ICAyIGZpbGVzIGNoYW5n
+ZWQsIDE3NiBpbnNlcnRpb25zKCspLCA3IGRlbGV0aW9ucygtKQ0KDQpbLi4uXQ0KDQo+ID4gPg0K
+PiA+ID4gIHN0YXRpYyBpbnQgcGVla19oZWFkX2xlbihzdHJ1Y3Qgdmhvc3RfbmV0X3ZpcnRxdWV1
+ZSAqcnZxLCBzdHJ1Y3QNCj4gPiA+IHNvY2sNCj4gPiA+ICpzaykgIHsNCj4gPiA+ICsgICAgICAg
+c3RydWN0IHNvY2tldCAqc29jayA9IHNrLT5za19zb2NrZXQ7DQo+ID4gPiAgICAgICAgIHN0cnVj
+dCBza19idWZmICpoZWFkOw0KPiA+ID4gICAgICAgICBpbnQgbGVuID0gMDsNCj4gPiA+ICAgICAg
+ICAgdW5zaWduZWQgbG9uZyBmbGFnczsNCj4gPiA+DQo+ID4gPiAtICAgICAgIGlmIChydnEtPnJ4
+X3JpbmcpDQo+ID4gPiAtICAgICAgICAgICAgICAgcmV0dXJuIHZob3N0X25ldF9idWZfcGVlayhy
+dnEpOw0KPiA+ID4gKyAgICAgICBpZiAocnZxLT5yeF9yaW5nKSB7DQo+ID4gPiArICAgICAgICAg
+ICAgICAgbGVuID0gdmhvc3RfbmV0X2J1Zl9wZWVrKHJ2cSk7DQo+ID4gPiArICAgICAgICAgICAg
+ICAgaWYgKGxpa2VseShsZW4pKQ0KPiA+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgcmV0dXJu
+IGxlbjsNCj4gPiA+ICsgICAgICAgfQ0KPiA+ID4gKw0KPiA+ID4gKyAgICAgICBpZiAoc29jay0+
+b3BzLT5wZWVrX2xlbikNCj4gPiA+ICsgICAgICAgICAgICAgICByZXR1cm4gc29jay0+b3BzLT5w
+ZWVrX2xlbihzb2NrKTsNCj4gPg0KPiA+IFdoYXQgcHJldmVudHMgeW91IGZyb20gcmV1c2luZyB0
+aGUgcHRyX3JpbmcgaGVyZT8gVGhlbiB5b3UgZG9uJ3QgbmVlZA0KPiA+IHRoZSBhYm92ZSB0cmlj
+a3MuDQo+IA0KPiBUaGFuayB5b3UgZm9yIHlvdXIgc3VnZ2VzdGlvbi4gSSB3aWxsIGNvbnNpZGVy
+IGhvdyB0byByZXVzZSB0aGUgcHRyX3JpbmcuDQoNCklmIHB0cl9yaW5nIGlzIHVzZWQgdG8gdHJh
+bnNmZXIgeGRwX2Rlc2NzLCB0aGVyZSBpcyBhIHByb2JsZW06IEFmdGVyIHNvbWUNCnhkcF9kZXNj
+cyBhcmUgb2J0YWluZWQgdGhyb3VnaCB4c2tfdHhfcGVla19kZXNjKCksIHRoZSBkZXNjcyBtYXkg
+ZmFpbA0KdG8gYmUgYWRkZWQgdG8gcHRyX3JpbmcuIEhvd2V2ZXIsIG5vIEFQSSBpcyBhdmFpbGFi
+bGUgdG8gaW1wbGVtZW50IHRoZQ0Kcm9sbGJhY2sgZnVuY3Rpb24uDQoNClRoYW5rcw0KDQo+IA0K
+PiA+DQo+ID4gVGhhbmtzDQo+ID4NCj4gPg0KPiA+ID4NCj4gPiA+ICAgICAgICAgc3Bpbl9sb2Nr
+X2lycXNhdmUoJnNrLT5za19yZWNlaXZlX3F1ZXVlLmxvY2ssIGZsYWdzKTsNCj4gPiA+ICAgICAg
+ICAgaGVhZCA9IHNrYl9wZWVrKCZzay0+c2tfcmVjZWl2ZV9xdWV1ZSk7DQo+ID4gPiAtLQ0KPiA+
+ID4gMi4zMy4wDQo+ID4gPg0KDQo=
 
