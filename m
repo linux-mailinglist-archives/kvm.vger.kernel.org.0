@@ -1,122 +1,89 @@
-Return-Path: <kvm+bounces-7284-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7285-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AB2783F4DD
-	for <lists+kvm@lfdr.de>; Sun, 28 Jan 2024 10:39:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46A6283F50E
+	for <lists+kvm@lfdr.de>; Sun, 28 Jan 2024 11:56:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 070BAB21BB4
-	for <lists+kvm@lfdr.de>; Sun, 28 Jan 2024 09:39:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F1561C20DD7
+	for <lists+kvm@lfdr.de>; Sun, 28 Jan 2024 10:56:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BC501B27D;
-	Sun, 28 Jan 2024 09:39:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A3411EB22;
+	Sun, 28 Jan 2024 10:56:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="h7PFbpsO"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mail.uni-paderborn.de header.i=@mail.uni-paderborn.de header.b="mtzig3qU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+Received: from zuban.uni-paderborn.de (zuban.uni-paderborn.de [131.234.189.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EE08DF55;
-	Sun, 28 Jan 2024 09:39:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.55.52.88
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC0898C1E
+	for <kvm@vger.kernel.org>; Sun, 28 Jan 2024 10:56:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=131.234.189.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706434769; cv=none; b=qHYG/qYcPeG6GxRbIytaGq4m/sq6gpuPp+SIRGsWdAGBObvKFUfkN0NMRpxDk4EqXBdScVWLGoR2bQnxdL9XjRTNLy55O5PfyGPGsfqNuSQRH7g22Cruk1keVCO+HCkWa/8D7FFB/F4kn5RlfJ1/KYhj7gF2WZ+zQMd+ZYiFUJw=
+	t=1706439378; cv=none; b=OP3GInM1BOqWUFWGOpzLBr3xLC4KJ2nn7N6MgzMy30ZcC53bBvsEaV9s74q6rJL3wCrw9fxQ2agiHzTrkKWPL8UgcaCKC6m5zg+xYbQ3rN8JUbGHTjGj0YNjNhBBs1KubzRXo9MAShMmsadVJzBG8JtDNDhgaYZRwEr4G03sAAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706434769; c=relaxed/simple;
-	bh=fdCtoglZXG7iKsGa+puUFV3eAFQc046my63SuMWnsd4=;
+	s=arc-20240116; t=1706439378; c=relaxed/simple;
+	bh=fFAgeFBEgOOFJ5hD4V3021p4VZqeTLLRWgB35/dvVN0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cC37hj2fg89MIThHeH6Bom3dsTHyUJ047u8KGKLjIAUHxYkx3W/FGPSVg/sQ+799Kar2SG/YWoGa2/E7Pf5vaUsASD+tWlQGsxa3bohfJPVOeg9012WzqxumLrvXTQPl18ISi8mX83Ag6GUtU3rgX3JOFuAE0nL9lwpn1Jb0yYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=h7PFbpsO; arc=none smtp.client-ip=192.55.52.88
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706434767; x=1737970767;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=fdCtoglZXG7iKsGa+puUFV3eAFQc046my63SuMWnsd4=;
-  b=h7PFbpsOUZLPx0R3ogO7ZFFU8rwDkKINQmNrFm7OiQ8rw1IXm7DNWAGa
-   pGIwVSVR2HhmBen31i/8z0+x6Bx4oDx5p0qEPYtYu2kOp+cfj8DEJpXdo
-   35CCshNVUcgQwK5Nb8Ui+0vZKwhGnVuzY2vnPD89fzLsAxKAenAhJSZ3y
-   P48L0/VkAaZ2z52XQEy4q/lKn0KwrNdsAjUW8p67U64K8M53tTrI2cMaZ
-   Xvz0kGyo0ejz0amSEo1WceSr9B1Hffk1zPu17c2cn7cB/V3Yj22ubRobG
-   o7Z9H9iMKiRk5FaMkluaekaxm1NIm+V3l3rTWXjBIxnxm9LxxaiASCCH4
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10966"; a="433919595"
-X-IronPort-AV: E=Sophos;i="6.05,220,1701158400"; 
-   d="scan'208";a="433919595"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2024 01:39:26 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10966"; a="910763413"
-X-IronPort-AV: E=Sophos;i="6.05,220,1701158400"; 
-   d="scan'208";a="910763413"
-Received: from lkp-server01.sh.intel.com (HELO 370188f8dc87) ([10.239.97.150])
-  by orsmga004.jf.intel.com with ESMTP; 28 Jan 2024 01:39:22 -0800
-Received: from kbuild by 370188f8dc87 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rU1dI-0003Hq-1o;
-	Sun, 28 Jan 2024 09:39:20 +0000
-Date: Sun, 28 Jan 2024 17:39:06 +0800
-From: kernel test robot <lkp@intel.com>
-To: Yunjian Wang <wangyunjian@huawei.com>, mst@redhat.com,
-	willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
-	kuba@kernel.org, davem@davemloft.net, magnus.karlsson@intel.com
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, xudingke@huawei.com,
-	Yunjian Wang <wangyunjian@huawei.com>
-Subject: Re: [PATCH net-next 2/2] tun: AF_XDP Rx zero-copy support
-Message-ID: <202401281735.bX1dign9-lkp@intel.com>
-References: <1706089075-16084-1-git-send-email-wangyunjian@huawei.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ee3KtdBbGJL+UYoHQfdWOtNIACsxgmVmlxBgvgxPDGRsm+58ewDEv4k78FpAdZ+EUaEKK0Z27JOkrXHFjan5yveaG6OpPgS2sNUa22KbYRbmWgvOYqt4XxOww/MEMuCAFNrvaPjWJkD6dDiTfDptKy1lkEih66Ko5JT2XkoS+z4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mail.uni-paderborn.de; spf=pass smtp.mailfrom=mail.uni-paderborn.de; dkim=pass (1024-bit key) header.d=mail.uni-paderborn.de header.i=@mail.uni-paderborn.de header.b=mtzig3qU; arc=none smtp.client-ip=131.234.189.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mail.uni-paderborn.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mail.uni-paderborn.de
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=mail.uni-paderborn.de; s=20170601; h=In-Reply-To:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+	Sender:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=vvIF26RBDLw+ldxcag6nMVV5Dto0lCR4pixmzH4okR8=; b=mtzig3qUEc29xOV48tBTafSouS
+	kYOTxo1qfO1eb7PHNe7+5869tAjNjANki5CK7hOSu7tfylhpsS2P8/rOpbfXQcILECgiWXepxp8Q2
+	tq6NqTcqAisc0R98LRRP3A+RjNTk4zdt50hyxYyw8X2VhXC3NE0/Hoe+69FX9vTAmFoo=;
+Date: Sun, 28 Jan 2024 11:34:48 +0100
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, 
+	Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-riscv@nongnu.org, 
+	Eduardo Habkost <eduardo@habkost.net>, kvm@vger.kernel.org, qemu-ppc@nongnu.org, 
+	Richard Henderson <richard.henderson@linaro.org>, Vladimir Sementsov-Ogievskiy <vsementsov@yandex-team.ru>, 
+	Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2 21/23] target/tricore: Prefer fast cpu_env() over
+ slower CPU QOM cast macro
+Message-ID: <mc67nwaoaqancyz63zt36awnsyzslgl24w3hnctaxzuycezixt@yvxaywvzntvb>
+References: <20240126220407.95022-1-philmd@linaro.org>
+ <20240126220407.95022-22-philmd@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <1706089075-16084-1-git-send-email-wangyunjian@huawei.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240126220407.95022-22-philmd@linaro.org>
+X-IMT-Source: Extern
+X-IMT-rspamd-score: -25
+X-IMT-Spam-Score: 0.0 ()
+X-Sophos-SenderHistory: ip=84.184.59.80,fs=1716459,da=194047155,mc=2,sc=0,hc=2,sp=0,fso=1716459,re=0,sd=0,hd=0
+X-PMX-Version: 6.4.9.2830568, Antispam-Engine: 2.7.2.2107409, Antispam-Data: 2024.1.27.235115, AntiVirus-Engine: 6.0.2, AntiVirus-Data: 2024.1.26.602001
+X-IMT-Authenticated-Sender: kbastian@UNI-PADERBORN.DE
 
-Hi Yunjian,
+On Fri, Jan 26, 2024 at 11:04:03PM +0100, Philippe Mathieu-Daudé wrote:
+> Mechanical patch produced running the command documented
+> in scripts/coccinelle/cpu_env.cocci_template header.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+> ---
+>  target/tricore/cpu.c       | 20 ++++----------------
+>  target/tricore/gdbstub.c   |  6 ++----
+>  target/tricore/helper.c    |  3 +--
+>  target/tricore/translate.c |  3 +--
+>  4 files changed, 8 insertions(+), 24 deletions(-)
 
-kernel test robot noticed the following build warnings:
+Reviewed-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-[auto build test WARNING on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Yunjian-Wang/xsk-Remove-non-zero-dma_page-check-in-xp_assign_dev/20240124-174011
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/1706089075-16084-1-git-send-email-wangyunjian%40huawei.com
-patch subject: [PATCH net-next 2/2] tun: AF_XDP Rx zero-copy support
-config: i386-randconfig-062-20240127 (https://download.01.org/0day-ci/archive/20240128/202401281735.bX1dign9-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240128/202401281735.bX1dign9-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202401281735.bX1dign9-lkp@intel.com/
-
-sparse warnings: (new ones prefixed by >>)
->> drivers/net/tun.c:1298:5: sparse: sparse: symbol 'tun_xsk_pool_setup' was not declared. Should it be static?
-   drivers/net/tun.c: note: in included file (through include/linux/mmzone.h, include/linux/gfp.h, include/linux/umh.h, include/linux/kmod.h, ...):
-   include/linux/page-flags.h:242:46: sparse: sparse: self-comparison always evaluates to false
-
-vim +/tun_xsk_pool_setup +1298 drivers/net/tun.c
-
-  1297	
-> 1298	int tun_xsk_pool_setup(struct net_device *dev, struct xsk_buff_pool *pool,
-  1299			       u16 qid)
-  1300	{
-  1301		return pool ? tun_xsk_pool_enable(dev, pool, qid) :
-  1302			tun_xsk_pool_disable(dev, qid);
-  1303	}
-  1304	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Cheers,
+Bastian
 
