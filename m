@@ -1,308 +1,143 @@
-Return-Path: <kvm+bounces-7307-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7308-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 653B783FD35
-	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 05:29:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95B8583FDCA
+	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 06:44:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A2B0EB21BBC
-	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 04:29:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFF491C22364
+	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 05:44:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E234719BA3;
-	Mon, 29 Jan 2024 04:29:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A39945BE9;
+	Mon, 29 Jan 2024 05:44:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OmFk+bD2"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="dRar5eJu"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D94B14AAA;
-	Mon, 29 Jan 2024 04:29:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0F17446CA;
+	Mon, 29 Jan 2024 05:44:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706502567; cv=none; b=mKR/TfEIR/NSVy4BCSx/Txf6GhTuPu/GFTaE9Rhg9P7iVHwp5OA9DEXSPMyITpOCdgSdOypESIaBtuqZ/KoiNPkbLW8abeiVVoutbDo2AB6amKN3+/uIZgYbLP4CyIrkhuRCM1b8BEtfhDnMnBCcU9QyB1eGhOCG0OA0sFf0IFU=
+	t=1706507056; cv=none; b=svfztWrDPw8oJOshsa4mJLK5Lqrrfe3MfunQ9/nxTJ14lQjOvQst8YD3s3ka6E0zIxUGGnnckSGzTTOjvqlaHaYQPY23cO9+d0vfYbfOcFfYdK1Vxrvx4FCeBIqgVLc+MW1I+Ggm0jPIY0EcZpDLdTxi8wrH86U/sZxYdIQ2enc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706502567; c=relaxed/simple;
-	bh=3EK/8yxeed8m7k4dlgjD0V/NjwPLMBHE+69C12MTZ18=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Hw3SBe0QSKWkCtxY2ypV7dAfEYmdji0P9mMLVnsYw0UMhUDCfLgHgOBUKc8BguOADY8i02Ds822LAfed80DdQauPnSWoxjoh0u42uEjTwJ4dvC2rBES07HuZQO5Wk00/08R8HGbQ8TEKS3nIfnc3FdX7KJIP2X5Swd7mhrfjiuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OmFk+bD2; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706502565; x=1738038565;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=3EK/8yxeed8m7k4dlgjD0V/NjwPLMBHE+69C12MTZ18=;
-  b=OmFk+bD2PXX+IfN88vXweFzYh5e5D0jSpW6UMakb4VbR+ai1EC+PUw1w
-   jOqlcWdM8lswiiO6SKlH8z0cwMypgQeQeLPZunNSBNHGHg6uwd4wLIXq8
-   8cJFJcLVy91sGktP6Na8qKB8i6Hb6+QidF84a8g84wM0XmjCkfkjB6hx0
-   ArR8/0nVjbXdah8nYPSM7WhPd0YfVZnK2nuFvU1h6a/roQ1UDIeYttSZc
-   MH0u43LuHt7xSWjhJIvu8WQc9IVTVADAhn+J368yUkSLg+gl/ii1R9GF/
-   LznAK6Z9lRlNHDMZf8t15GrruMzuhxqXtka1NU3xiHILOncDxJNdC8bev
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10967"; a="9521283"
-X-IronPort-AV: E=Sophos;i="6.05,226,1701158400"; 
-   d="scan'208";a="9521283"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2024 20:29:24 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,226,1701158400"; 
-   d="scan'208";a="3229390"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.10.49]) ([10.238.10.49])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2024 20:29:21 -0800
-Message-ID: <56882cd9-67f5-4396-b91b-52fb202d3386@linux.intel.com>
-Date: Mon, 29 Jan 2024 12:29:18 +0800
+	s=arc-20240116; t=1706507056; c=relaxed/simple;
+	bh=pyJVcpc0mV/wy4nwItJ7qfaDl9SI0Rs/Nxj67sqOE34=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=lUZ0askajjPMUtBw9mOFqXLlkeWjbEK7ECtXR4lMAR1+u/4Mpyie5fHt2txqSltuYU7uHLMyVrWuEp2jDPuaXdl7yHpkNR5/ZUFk1nDGQ/xUTPph70fc+Wvin9mXzKenHWkPXhajzHeoi/k1ol4a6cs/29dampFduo4DItzWnxo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=dRar5eJu; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40T4TVNd000412;
+	Mon, 29 Jan 2024 05:44:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : in-reply-to : references : date : message-id : mime-version :
+ content-type; s=pp1; bh=5P19J4UsCEy395Sq3OX4ZVElGZFdAvopFeOiSHWhQEY=;
+ b=dRar5eJuhlhXw888NbvsP9CB2dVEj6Wg8i42MaDSFVk7trPXqFEUI25p6YQlJSnlaLmI
+ 1brq5tQlJP4KoA+ApTperTjQTWq1rzxDNIpqPg8Fi3HZpfrYvN4wylBMOgeqIcZSTcVW
+ 2GavLDrAxS69pxFnPcKx376+G7oPSb6MsyOz04VfIvzoZy+4KdGqhPmEK5TVf5hagiI9
+ 1bjyPT+U3yhJCMVxEd5vKTA0bXWaBlEbyyTik8qBRJHJrDYDsb6hQ4UfJNjQMwN/pvJo
+ rwbOJOnME6SUBlIMo7/aNSx9J6k3RVclAhHve4XqYK9q8yu+zPhYDqGXO8rIHLCXV4yQ 7A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vwtaek4v7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 29 Jan 2024 05:44:01 +0000
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 40T4dcZS031374;
+	Mon, 29 Jan 2024 05:44:00 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vwtaek4u9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 29 Jan 2024 05:44:00 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 40T5R7UZ007964;
+	Mon, 29 Jan 2024 05:43:59 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3vwdnkp8s7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 29 Jan 2024 05:43:59 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 40T5hu6s46661986
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 29 Jan 2024 05:43:56 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id F206C20043;
+	Mon, 29 Jan 2024 05:43:55 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7753A20040;
+	Mon, 29 Jan 2024 05:43:51 +0000 (GMT)
+Received: from vaibhav?linux.ibm.com (unknown [9.43.24.56])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Mon, 29 Jan 2024 05:43:51 +0000 (GMT)
+Received: by vaibhav@linux.ibm.com (sSMTP sendmail emulation); Mon, 29 Jan 2024 11:13:50 +0530
+From: Vaibhav Jain <vaibhav@linux.ibm.com>
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Michael Ellerman
+ <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Christophe
+ Leroy <christophe.leroy@csgroup.eu>,
+        "Aneesh Kumar K.V"
+ <aneesh.kumar@kernel.org>,
+        "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+        Kautuk Consul <kconsul@linux.vnet.ibm.com>,
+        Amit Machhiwal
+ <amachhiw@linux.vnet.ibm.com>,
+        Jordan Niethe <jniethe5@gmail.com>
+Cc: linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Gautam Menghani
+ <gautam@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH] KVM: PPC: Book3S HV nestedv2: Fix an error handling
+ path in gs_msg_ops_kvmhv_nestedv2_config_fill_info()
+In-Reply-To: <a7ed4cc12e0a0bbd97fac44fe6c222d1c393ec95.1706441651.git.christophe.jaillet@wanadoo.fr>
+References: <a7ed4cc12e0a0bbd97fac44fe6c222d1c393ec95.1706441651.git.christophe.jaillet@wanadoo.fr>
+Date: Mon, 29 Jan 2024 11:13:50 +0530
+Message-ID: <874jewy9rd.fsf@vajain21.in.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v18 047/121] KVM: x86/mmu: Add a private pointer to struct
- kvm_mmu_page
-To: isaku.yamahata@intel.com
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
- erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
- Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
- chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com
-References: <cover.1705965634.git.isaku.yamahata@intel.com>
- <3a97d83c79350c4a2ae10de86270ee8f8d0bf1e2.1705965635.git.isaku.yamahata@intel.com>
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <3a97d83c79350c4a2ae10de86270ee8f8d0bf1e2.1705965635.git.isaku.yamahata@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: kpf5wIbPQbNQS9J3hKoQo_0puOIwm1mu
+X-Proofpoint-GUID: FRQApm0KkC0kJTi0jS-4tya3IfZLlrx8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-29_02,2024-01-25_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 spamscore=0 clxscore=1011 suspectscore=0
+ lowpriorityscore=0 mlxlogscore=901 adultscore=0 phishscore=0 bulkscore=0
+ mlxscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2401290039
 
 
 
-On 1/23/2024 7:53 AM, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
->
-> For private GPA, CPU refers a private page table whose contents are
-> encrypted.  The dedicated APIs to operate on it (e.g. updating/reading its
-> PTE entry) are used and their cost is expensive.
->
-> When KVM resolves KVM page fault, it walks the page tables.  To reuse the
-> existing KVM MMU code and mitigate the heavy cost to directly walk private
-> page table, allocate one more page to copy the dummy page table for KVM MMU
-> code to directly walk.  Resolve KVM page fault with the existing code, and
-> do additional operations necessary for the private page table.  To
-> distinguish such cases, the existing KVM page table is called a shared page
-> table (i.e. not associated with private page table), and the page table
-> with private page table is called a private page table.  The relationship
-> is depicted below.
->
-> Add a private pointer to struct kvm_mmu_page for private page table and
-> add helper functions to allocate/initialize/free a private page table
-> page.
->
->                KVM page fault                     |
->                       |                           |
->                       V                           |
->          -------------+----------                 |
->          |                      |                 |
->          V                      V                 |
->       shared GPA           private GPA            |
->          |                      |                 |
->          V                      V                 |
->      shared PT root      dummy PT root            |    private PT root
->          |                      |                 |           |
->          V                      V                 |           V
->       shared PT            dummy PT ----propagate---->   private PT
->          |                      |                 |           |
->          |                      \-----------------+------\    |
->          |                                        |      |    |
->          V                                        |      V    V
->    shared guest page                              |    private guest page
->                                                   |
->                             non-encrypted memory  |    encrypted memory
->                                                   |
-> PT: page table
-> - Shared PT is visible to KVM and it is used by CPU.
-> - Private PT is used by CPU but it is invisible to KVM.
-> - Dummy PT is visible to KVM but not used by CPU.  It is used to
->    propagate PT change to the actual private PT which is used by CPU.
 
-Nit: one typo below.
+Christophe JAILLET <christophe.jaillet@wanadoo.fr> writes:
 
-Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
+<snip>
+>  	if (kvmppc_gsm_includes(gsm, KVMPPC_GSID_RUN_OUTPUT)) {
+> -		kvmppc_gse_put_buff_info(gsb, KVMPPC_GSID_RUN_OUTPUT,
+> -					 cfg->vcpu_run_output_cfg);
+> +		rc = kvmppc_gse_put_buff_info(gsb, KVMPPC_GSID_RUN_OUTPUT,
+> +					      cfg->vcpu_run_output_cfg);
+>  		if (rc < 0)
+>  			return rc;
+>  	}
+> -- 
+Thanks for catching this and the change looks good to me.
 
->
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
->   arch/x86/include/asm/kvm_host.h |  5 ++
->   arch/x86/kvm/mmu/mmu.c          |  7 +++
->   arch/x86/kvm/mmu/mmu_internal.h | 83 +++++++++++++++++++++++++++++++--
->   arch/x86/kvm/mmu/tdp_mmu.c      |  1 +
->   4 files changed, 92 insertions(+), 4 deletions(-)
->
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 0cdbbc21136b..1d074956ac0d 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -841,6 +841,11 @@ struct kvm_vcpu_arch {
->   	struct kvm_mmu_memory_cache mmu_shadow_page_cache;
->   	struct kvm_mmu_memory_cache mmu_shadowed_info_cache;
->   	struct kvm_mmu_memory_cache mmu_page_header_cache;
-> +	/*
-> +	 * This cache is to allocate private page table. E.g.  Secure-EPT used
-> +	 * by the TDX module.
-> +	 */
-> +	struct kvm_mmu_memory_cache mmu_private_spt_cache;
->   
->   	/*
->   	 * QEMU userspace and the guest each have their own FPU state.
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 583ae9d6bf5d..32c619125be4 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -685,6 +685,12 @@ static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_indirect)
->   				       1 + PT64_ROOT_MAX_LEVEL + PTE_PREFETCH_NUM);
->   	if (r)
->   		return r;
-> +	if (kvm_gfn_shared_mask(vcpu->kvm)) {
-> +		r = kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_private_spt_cache,
-> +					       PT64_ROOT_MAX_LEVEL);
-> +		if (r)
-> +			return r;
-> +	}
->   	r = kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_shadow_page_cache,
->   				       PT64_ROOT_MAX_LEVEL);
->   	if (r)
-> @@ -704,6 +710,7 @@ static void mmu_free_memory_caches(struct kvm_vcpu *vcpu)
->   	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache);
->   	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_shadow_page_cache);
->   	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_shadowed_info_cache);
-> +	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_private_spt_cache);
->   	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_header_cache);
->   }
->   
-> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-> index 97af4e39ce6f..957654c3cde9 100644
-> --- a/arch/x86/kvm/mmu/mmu_internal.h
-> +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> @@ -101,7 +101,23 @@ struct kvm_mmu_page {
->   		int root_count;
->   		refcount_t tdp_mmu_root_count;
->   	};
-> -	unsigned int unsync_children;
-> +	union {
-> +		struct {
-> +			unsigned int unsync_children;
-> +			/*
-> +			 * Number of writes since the last time traversal
-> +			 * visited this page.
-> +			 */
-> +			atomic_t write_flooding_count;
-> +		};
-> +#ifdef CONFIG_KVM_MMU_PRIVATE
-> +		/*
-> +		 * Associated private shadow page table, e.g. Secure-EPT page
-> +		 * passed to the TDX module.
-> +		 */
-> +		void *private_spt;
-> +#endif
-> +	};
->   	union {
->   		struct kvm_rmap_head parent_ptes; /* rmap pointers to parent sptes */
->   		tdp_ptep_t ptep;
-> @@ -124,9 +140,6 @@ struct kvm_mmu_page {
->   	int clear_spte_count;
->   #endif
->   
-> -	/* Number of writes since the last time traversal visited this page.  */
-> -	atomic_t write_flooding_count;
-> -
->   #ifdef CONFIG_X86_64
->   	/* Used for freeing the page asynchronously if it is a TDP MMU page. */
->   	struct rcu_head rcu_head;
-> @@ -150,6 +163,68 @@ static inline bool is_private_sp(const struct kvm_mmu_page *sp)
->   	return kvm_mmu_page_role_is_private(sp->role);
->   }
->   
-> +#ifdef CONFIG_KVM_MMU_PRIVATE
-> +static inline void *kvm_mmu_private_spt(struct kvm_mmu_page *sp)
-> +{
-> +	return sp->private_spt;
-> +}
-> +
-> +static inline void kvm_mmu_init_private_spt(struct kvm_mmu_page *sp, void *private_spt)
-> +{
-> +	sp->private_spt = private_spt;
-> +}
-> +
-> +static inline void kvm_mmu_alloc_private_spt(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
-> +{
-> +	bool is_root = vcpu->arch.root_mmu.root_role.level == sp->role.level;
-> +
-> +	KVM_BUG_ON(!kvm_mmu_page_role_is_private(sp->role), vcpu->kvm);
-> +	if (is_root)
-> +		/*
-> +		 * Because TDX module assigns root Secure-EPT page and set it to
-> +		 * Secure-EPTP when TD vcpu is created, secure page table for
-> +		 * root isn't needed.
-> +		 */
-> +		sp->private_spt = NULL;
-> +	else {
-> +		/*
-> +		 * Because the TDX module doesn't trust VMM and initializes
-> +		 * the pages itself, KVM doesn't initialize them.  Allocate
-> +		 * pages with garbage and give them to the TDX module.
-> +		 */
-> +		sp->private_spt = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_private_spt_cache);
-> +		/*
-> +		 * Because mmu_private_spt_cache is topped up before staring kvm
-s/staring/starting
+Reviewed-by: Vaibhav Jain <vaibhav@linux.ibm.com>
 
-> +		 * page fault resolving, the allocation above shouldn't fail.
-> +		 */
-> +		WARN_ON_ONCE(!sp->private_spt);
-> +	}
-> +}
-> +
-> +static inline void kvm_mmu_free_private_spt(struct kvm_mmu_page *sp)
-> +{
-> +	if (sp->private_spt)
-> +		free_page((unsigned long)sp->private_spt);
-> +}
-> +#else
-> +static inline void *kvm_mmu_private_spt(struct kvm_mmu_page *sp)
-> +{
-> +	return NULL;
-> +}
-> +
-> +static inline void kvm_mmu_init_private_spt(struct kvm_mmu_page *sp, void *private_spt)
-> +{
-> +}
-> +
-> +static inline void kvm_mmu_alloc_private_spt(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
-> +{
-> +}
-> +
-> +static inline void kvm_mmu_free_private_spt(struct kvm_mmu_page *sp)
-> +{
-> +}
-> +#endif
-> +
->   static inline bool kvm_mmu_page_ad_need_write_protect(struct kvm_mmu_page *sp)
->   {
->   	/*
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 87233b3ceaef..d47f0daf1b03 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -53,6 +53,7 @@ void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
->   
->   static void tdp_mmu_free_sp(struct kvm_mmu_page *sp)
->   {
-> +	kvm_mmu_free_private_spt(sp);
->   	free_page((unsigned long)sp->spt);
->   	kmem_cache_free(mmu_page_header_cache, sp);
->   }
-
+-- 
+Cheers
+~ Vaibhav
 
