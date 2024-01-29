@@ -1,324 +1,241 @@
-Return-Path: <kvm+bounces-7336-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7337-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EE2E84065E
-	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 14:12:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DE2984083A
+	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 15:26:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 773A0B24BA0
-	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 13:12:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C1741C21972
+	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 14:26:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5FD9629EE;
-	Mon, 29 Jan 2024 13:11:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F803664A7;
+	Mon, 29 Jan 2024 14:26:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OKjxsM/J"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="MoS1gs2H";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="lWxaA4vI";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="gfO7Mc1E";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="sd1TWSyq"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1387B62804;
-	Mon, 29 Jan 2024 13:11:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1DA865BAC;
+	Mon, 29 Jan 2024 14:26:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706533913; cv=none; b=EuJiyc38NpkKirk+xyJXookKgkCgiZFBYC19LF3Xu4dN0GnXuG9NhSc/xcQOjqDSAakXhXJ6cpNGMjCpPXubQ0ESlqrwM6PVGw4E5ZF68W4QOoJ36TSRIjA3gh9DHkQKSTm2c2u49LOc4oxHaxjG+a6Z9f6EW4SkQzBBiNbi1fY=
+	t=1706538395; cv=none; b=baj6qki1xC561MRX1J086jafdrkRFfE8nHxxfFShHsLLsD1anAgXcHukfc2+IpWEoFT5HSg6rn3otQTTtvy5DIbNU5o7xSbFtnFZPqH93MGVzKTaCkj7ETlk7/XUzeqDfGk7blp9yYQXYrTxZ7umGO0RGme6+p2X0BTHWoBBcgs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706533913; c=relaxed/simple;
-	bh=ZnTukG0ry6mY3S68K6+Bb7CU4b4XhqHBZ2rqk7MM7uk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=S+Vagg3FUNofxWUB9mSjAk9H8z7AfDulr3kEvMbi3R6uVY1UNxfSDiMfDZvY2YmVrdVQDXnV/Fbmrp40BxtLnZJ0OHHP1FZxjYw7r1yLMGmoMWMXTX4ivd+77ci6n2MbYO8lBZS4oKpCo+bnIkJ2/6N6S67trcddt4jxAW3YTvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OKjxsM/J; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A99BEC43399;
-	Mon, 29 Jan 2024 13:11:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706533912;
-	bh=ZnTukG0ry6mY3S68K6+Bb7CU4b4XhqHBZ2rqk7MM7uk=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=OKjxsM/JqzCOSUwLADpWgrNEZS88Om80y6gqueEU4TasftSyLcTVaIMr6iR8hlcKN
-	 NY4rYvx2qwWcp5286XdMkG0srhX1ar4BFlNOKXKgCG8MjyWeSe8EsfXDEJWjRkQMkG
-	 ABb30mF6c6eTuP9YwOetPm0B4FFoLznUzcm4Xt3hVsVZP75RtKzrRAloG0UcqdMhzq
-	 KM0hryVSodNKQlByH8lWfw9Dym5zoWrf7+PYwDicP34ERJl9SrZ2i03s7sUFDRmdo/
-	 qBuM92InOKhTei6K9Qwczcosc10h7sQTxh2S4eQrsagtCUBv5ztG9ullfILH+jAE4N
-	 3+/aQkXsE+S+Q==
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-55f0b2c79cdso976630a12.3;
-        Mon, 29 Jan 2024 05:11:52 -0800 (PST)
-X-Gm-Message-State: AOJu0YxmxMPqa1pPFyeayJxXc0uxRmq5GC7bmh2JvxmRRY8WWZHpJ5aY
-	i6etH483XHYv9o1/DQiIqTzkHbYtpzPGwYFPjMTT0n0GNYcC3nBdWX67L0q4l+l24Ars52auTDd
-	WD9PFCOHsRpnEkYqmMQhLg8Jz9l8=
-X-Google-Smtp-Source: AGHT+IFQnhgfnpp+VE5IQCX1aYZC0mg2RyViiRDUgWm/V/YSKftwQ7xS3+Lvsojh4UebgJU9yOs6uZ0X/z3KAqgiqWU=
-X-Received: by 2002:a05:6402:35c2:b0:55d:2447:844f with SMTP id
- z2-20020a05640235c200b0055d2447844fmr5704057edc.26.1706533910974; Mon, 29 Jan
- 2024 05:11:50 -0800 (PST)
+	s=arc-20240116; t=1706538395; c=relaxed/simple;
+	bh=1CWG8fGDTE0PFV2DRxwsn6+363/lO1dP/IeyyUt0PoY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rsGd+iSf8nacC2mm6Ysrdp/iF6szX4yypq4LQGADPqYnzY2CoNEAsjwG5Of0myJrVS2pMy74xwsG54edAuCuyUY0CZju19mNxNdbvPt3hJhfTNDSCBNnK7Ym2GdMNvRxpgG5VgoVq8LiXgR/rySXq4p0qPVN73nRgFR8lLxSYOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=MoS1gs2H; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=lWxaA4vI; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=gfO7Mc1E; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=sd1TWSyq; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id E012C21BF5;
+	Mon, 29 Jan 2024 14:26:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1706538391; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yVCErth3fJSXbSPYKO931WJVaP5CdJG9Rs6XjxdlFvY=;
+	b=MoS1gs2Hl4EgJ5NL6qalPr5In9E86rdnlvIznU6e6uzBepu+P+a0IA3lv84Ad2PzWvlMyQ
+	hxoXkyxOG2VPmgjftKtmq1GlPP379m4z03COsx7ohuQr/BlvK5JSkoDNk7WLGBSbAbNLFw
+	5KJ009zaCwYLAYNjS9CHarYnvFpB7FI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1706538391;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yVCErth3fJSXbSPYKO931WJVaP5CdJG9Rs6XjxdlFvY=;
+	b=lWxaA4vI45WlLR5SVl+jZF3+l5yuFu9OW9bU6bJGmfamA8bxRT4JWrN5/sgvElyJ5cHzV1
+	wUM/aMXPmstFo6CQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1706538389; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yVCErth3fJSXbSPYKO931WJVaP5CdJG9Rs6XjxdlFvY=;
+	b=gfO7Mc1E1PiMODYu+5MLfCH3iGbrIB26IpBO4ToDdMgglzyXCPJCUV6j/pBJwIh28EHLOA
+	vso3+m3dnRk3TNOJ/iAPbh9RFv8O4T1LKt1VC0+uiF+y+P1peMVG41CIi4juS3SKyDiOhf
+	Hgrn5fDKGnsuNp7qAdgKdQBVKVSG3mQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1706538389;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yVCErth3fJSXbSPYKO931WJVaP5CdJG9Rs6XjxdlFvY=;
+	b=sd1TWSyqZeSLloNag5rRyzE3DDd9JvMRR0bf2I1EfXwV4odzaQaVunxZ/10QQB7zUqffYs
+	u7U2ysU9swvXdECA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9B73012FF7;
+	Mon, 29 Jan 2024 14:26:29 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id BmKbJZW1t2WqNQAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Mon, 29 Jan 2024 14:26:29 +0000
+Message-ID: <1cc76023-ef3e-4639-9a02-644c5abe918d@suse.cz>
+Date: Mon, 29 Jan 2024 15:26:29 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240122100313.1589372-1-maobibo@loongson.cn> <20240122100313.1589372-6-maobibo@loongson.cn>
-In-Reply-To: <20240122100313.1589372-6-maobibo@loongson.cn>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Mon, 29 Jan 2024 21:11:42 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H78HiRRsdsVHxYBYOEWew9FKDSF++bK_=g=UbBKc46d2Q@mail.gmail.com>
-Message-ID: <CAAhV-H78HiRRsdsVHxYBYOEWew9FKDSF++bK_=g=UbBKc46d2Q@mail.gmail.com>
-Subject: Re: [PATCH v3 5/6] LoongArch: KVM: Add physical cpuid map support
-To: Bibo Mao <maobibo@loongson.cn>
-Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, Juergen Gross <jgross@suse.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, loongarch@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, 
-	kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 15/25] x86/sev: Introduce snp leaked pages list
+Content-Language: en-US
+To: Michael Roth <michael.roth@amd.com>, x86@kernel.org
+Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
+ linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+ tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
+ thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
+ pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+ jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
+ slp@redhat.com, pgonda@google.com, peterz@infradead.org,
+ srinivas.pandruvada@linux.intel.com, rientjes@google.com, tobin@ibm.com,
+ bp@alien8.de, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+ sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+ jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+ pankaj.gupta@amd.com, liam.merwick@oracle.com
+References: <20240126041126.1927228-1-michael.roth@amd.com>
+ <20240126041126.1927228-16-michael.roth@amd.com>
+From: Vlastimil Babka <vbabka@suse.cz>
+In-Reply-To: <20240126041126.1927228-16-michael.roth@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Authentication-Results: smtp-out1.suse.de;
+	none
+X-Spamd-Result: default: False [-3.09 / 50.00];
+	 ARC_NA(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 XM_UA_NO_VERSION(0.01)[];
+	 FROM_HAS_DN(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 BAYES_HAM(-3.00)[100.00%];
+	 MIME_GOOD(-0.10)[text/plain];
+	 R_RATELIMIT(0.00)[to_ip_from(RL81e5qggtdx371s8ik49ru6xr)];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	 RCPT_COUNT_TWELVE(0.00)[36];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 RCVD_TLS_ALL(0.00)[];
+	 MID_RHS_MATCH_FROM(0.00)[]
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spam-Score: -3.09
 
-Hi, Bibo,
+On 1/26/24 05:11, Michael Roth wrote:
+> From: Ashish Kalra <ashish.kalra@amd.com>
+> 
+> Pages are unsafe to be released back to the page-allocator, if they
+> have been transitioned to firmware/guest state and can't be reclaimed
+> or transitioned back to hypervisor/shared state. In this case add
+> them to an internal leaked pages list to ensure that they are not freed
+> or touched/accessed to cause fatal page faults.
+> 
+> Suggested-by: Vlastimil Babka <vbabka@suse.cz>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> [mdr: relocate to arch/x86/virt/svm/sev.c]
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
 
-Without this patch I can also create a SMP VM, so what problem does
-this patch want to solve?
+Reviewed-by: Vlastimil Babka <vbabka@suse.cz>
 
-Huacai
+Some minor nitpicks:
 
-On Mon, Jan 22, 2024 at 6:03=E2=80=AFPM Bibo Mao <maobibo@loongson.cn> wrot=
-e:
->
-> Physical cpuid is used to irq routing for irqchips such as ipi/msi/
-> extioi interrupt controller. And physical cpuid is stored at CSR
-> register LOONGARCH_CSR_CPUID, it can not be changed once vcpu is
-> created. Since different irqchips have different size definition
-> about physical cpuid, KVM uses the smallest cpuid from extioi, and
-> the max cpuid size is defines as 256.
->
-> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
 > ---
->  arch/loongarch/include/asm/kvm_host.h | 26 ++++++++
->  arch/loongarch/include/asm/kvm_vcpu.h |  1 +
->  arch/loongarch/kvm/vcpu.c             | 93 ++++++++++++++++++++++++++-
->  arch/loongarch/kvm/vm.c               | 11 ++++
->  4 files changed, 130 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/inclu=
-de/asm/kvm_host.h
-> index 2d62f7b0d377..57399d7cf8b7 100644
-> --- a/arch/loongarch/include/asm/kvm_host.h
-> +++ b/arch/loongarch/include/asm/kvm_host.h
-> @@ -64,6 +64,30 @@ struct kvm_world_switch {
->
->  #define MAX_PGTABLE_LEVELS     4
->
-> +/*
-> + * Physical cpu id is used for interrupt routing, there are different
-> + * definitions about physical cpuid on different hardwares.
-> + *  For LOONGARCH_CSR_CPUID register, max cpuid size if 512
-> + *  For IPI HW, max dest CPUID size 1024
-> + *  For extioi interrupt controller, max dest CPUID size is 256
-> + *  For MSI interrupt controller, max supported CPUID size is 65536
-> + *
-> + * Currently max CPUID is defined as 256 for KVM hypervisor, in future
-> + * it will be expanded to 4096, including 16 packages at most. And every
-> + * package supports at most 256 vcpus
-> + */
-> +#define KVM_MAX_PHYID          256
-> +
-> +struct kvm_phyid_info {
-> +       struct kvm_vcpu *vcpu;
-> +       bool            enabled;
-> +};
-> +
-> +struct kvm_phyid_map {
-> +       int max_phyid;
-> +       struct kvm_phyid_info phys_map[KVM_MAX_PHYID];
-> +};
-> +
->  struct kvm_arch {
->         /* Guest physical mm */
->         kvm_pte_t *pgd;
-> @@ -71,6 +95,8 @@ struct kvm_arch {
->         unsigned long invalid_ptes[MAX_PGTABLE_LEVELS];
->         unsigned int  pte_shifts[MAX_PGTABLE_LEVELS];
->         unsigned int  root_level;
-> +       struct mutex  phyid_map_lock;
-> +       struct kvm_phyid_map  *phyid_map;
->
->         s64 time_offset;
->         struct kvm_context __percpu *vmcs;
-> diff --git a/arch/loongarch/include/asm/kvm_vcpu.h b/arch/loongarch/inclu=
-de/asm/kvm_vcpu.h
-> index e71ceb88f29e..2402129ee955 100644
-> --- a/arch/loongarch/include/asm/kvm_vcpu.h
-> +++ b/arch/loongarch/include/asm/kvm_vcpu.h
-> @@ -81,6 +81,7 @@ void kvm_save_timer(struct kvm_vcpu *vcpu);
->  void kvm_restore_timer(struct kvm_vcpu *vcpu);
->
->  int kvm_vcpu_ioctl_interrupt(struct kvm_vcpu *vcpu, struct kvm_interrupt=
- *irq);
-> +struct kvm_vcpu *kvm_get_vcpu_by_cpuid(struct kvm *kvm, int cpuid);
->
->  /*
->   * Loongarch KVM guest interrupt handling
-> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
-> index 27701991886d..97ca9c7160e6 100644
-> --- a/arch/loongarch/kvm/vcpu.c
-> +++ b/arch/loongarch/kvm/vcpu.c
-> @@ -274,6 +274,95 @@ static int _kvm_getcsr(struct kvm_vcpu *vcpu, unsign=
-ed int id, u64 *val)
->         return 0;
+>  arch/x86/include/asm/sev.h |  2 ++
+>  arch/x86/virt/svm/sev.c    | 34 ++++++++++++++++++++++++++++++++++
+>  2 files changed, 36 insertions(+)
+> 
+> diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+> index d3ccb7a0c7e9..435ba9bc4510 100644
+> --- a/arch/x86/include/asm/sev.h
+> +++ b/arch/x86/include/asm/sev.h
+> @@ -264,6 +264,7 @@ void snp_dump_hva_rmpentry(unsigned long address);
+>  int psmash(u64 pfn);
+>  int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int asid, bool immutable);
+>  int rmp_make_shared(u64 pfn, enum pg_level level);
+> +void snp_leak_pages(u64 pfn, unsigned int npages);
+>  #else
+>  static inline bool snp_probe_rmptable_info(void) { return false; }
+>  static inline int snp_lookup_rmpentry(u64 pfn, bool *assigned, int *level) { return -ENODEV; }
+> @@ -275,6 +276,7 @@ static inline int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int as
+>  	return -ENODEV;
 >  }
->
-> +static inline int kvm_set_cpuid(struct kvm_vcpu *vcpu, u64 val)
-> +{
-> +       int cpuid;
-> +       struct loongarch_csrs *csr =3D vcpu->arch.csr;
-> +       struct kvm_phyid_map  *map;
+>  static inline int rmp_make_shared(u64 pfn, enum pg_level level) { return -ENODEV; }
+> +static inline void snp_leak_pages(u64 pfn, unsigned int npages) {}
+>  #endif
+>  
+>  #endif
+> diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
+> index 1a13eff78c9d..649ac1bb6b0e 100644
+> --- a/arch/x86/virt/svm/sev.c
+> +++ b/arch/x86/virt/svm/sev.c
+> @@ -65,6 +65,11 @@ static u64 probed_rmp_base, probed_rmp_size;
+>  static struct rmpentry *rmptable __ro_after_init;
+>  static u64 rmptable_max_pfn __ro_after_init;
+>  
+> +static LIST_HEAD(snp_leaked_pages_list);
+> +static DEFINE_SPINLOCK(snp_leaked_pages_list_lock);
 > +
-> +       if (val >=3D KVM_MAX_PHYID)
-> +               return -EINVAL;
+> +static unsigned long snp_nr_leaked_pages;
 > +
-> +       cpuid =3D kvm_read_sw_gcsr(csr, LOONGARCH_CSR_ESTAT);
-> +       map =3D vcpu->kvm->arch.phyid_map;
-> +       mutex_lock(&vcpu->kvm->arch.phyid_map_lock);
-> +       if (map->phys_map[cpuid].enabled) {
-> +               /*
-> +                * Cpuid is already set before
-> +                * Forbid changing different cpuid at runtime
-> +                */
-> +               if (cpuid !=3D val) {
-> +                       /*
-> +                        * Cpuid 0 is initial value for vcpu, maybe inval=
-id
-> +                        * unset value for vcpu
-> +                        */
-> +                       if (cpuid) {
-> +                               mutex_unlock(&vcpu->kvm->arch.phyid_map_l=
-ock);
-> +                               return -EINVAL;
-> +                       }
-> +               } else {
-> +                        /* Discard duplicated cpuid set */
-> +                       mutex_unlock(&vcpu->kvm->arch.phyid_map_lock);
-> +                       return 0;
-> +               }
-> +       }
-> +
-> +       if (map->phys_map[val].enabled) {
-> +               /*
-> +                * New cpuid is already set with other vcpu
-> +                * Forbid sharing the same cpuid between different vcpus
-> +                */
-> +               if (map->phys_map[val].vcpu !=3D vcpu) {
-> +                       mutex_unlock(&vcpu->kvm->arch.phyid_map_lock);
-> +                       return -EINVAL;
-> +               }
-> +
-> +               /* Discard duplicated cpuid set operation*/
-> +               mutex_unlock(&vcpu->kvm->arch.phyid_map_lock);
-> +               return 0;
-> +       }
-> +
-> +       kvm_write_sw_gcsr(csr, LOONGARCH_CSR_CPUID, val);
-> +       map->phys_map[val].enabled      =3D true;
-> +       map->phys_map[val].vcpu         =3D vcpu;
-> +       if (map->max_phyid < val)
-> +               map->max_phyid =3D val;
-> +       mutex_unlock(&vcpu->kvm->arch.phyid_map_lock);
-> +       return 0;
-> +}
-> +
-> +struct kvm_vcpu *kvm_get_vcpu_by_cpuid(struct kvm *kvm, int cpuid)
-> +{
-> +       struct kvm_phyid_map  *map;
-> +
-> +       if (cpuid >=3D KVM_MAX_PHYID)
-> +               return NULL;
-> +
-> +       map =3D kvm->arch.phyid_map;
-> +       if (map->phys_map[cpuid].enabled)
-> +               return map->phys_map[cpuid].vcpu;
-> +
-> +       return NULL;
-> +}
-> +
-> +static inline void kvm_drop_cpuid(struct kvm_vcpu *vcpu)
-> +{
-> +       int cpuid;
-> +       struct loongarch_csrs *csr =3D vcpu->arch.csr;
-> +       struct kvm_phyid_map  *map;
-> +
-> +       map =3D vcpu->kvm->arch.phyid_map;
-> +       cpuid =3D kvm_read_sw_gcsr(csr, LOONGARCH_CSR_ESTAT);
-> +       if (cpuid >=3D KVM_MAX_PHYID)
-> +               return;
-> +
-> +       if (map->phys_map[cpuid].enabled) {
-> +               map->phys_map[cpuid].vcpu =3D NULL;
-> +               map->phys_map[cpuid].enabled =3D false;
-> +               kvm_write_sw_gcsr(csr, LOONGARCH_CSR_CPUID, 0);
-> +       }
-> +}
-> +
->  static int _kvm_setcsr(struct kvm_vcpu *vcpu, unsigned int id, u64 val)
->  {
->         int ret =3D 0, gintc;
-> @@ -291,7 +380,8 @@ static int _kvm_setcsr(struct kvm_vcpu *vcpu, unsigne=
-d int id, u64 val)
->                 kvm_set_sw_gcsr(csr, LOONGARCH_CSR_ESTAT, gintc);
->
->                 return ret;
-> -       }
-> +       } else if (id =3D=3D LOONGARCH_CSR_CPUID)
-> +               return kvm_set_cpuid(vcpu, val);
->
->         kvm_write_sw_gcsr(csr, id, val);
->
-> @@ -925,6 +1015,7 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
->         hrtimer_cancel(&vcpu->arch.swtimer);
->         kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_cache);
->         kfree(vcpu->arch.csr);
-> +       kvm_drop_cpuid(vcpu);
->
->         /*
->          * If the vCPU is freed and reused as another vCPU, we don't want=
- the
-> diff --git a/arch/loongarch/kvm/vm.c b/arch/loongarch/kvm/vm.c
-> index 0a37f6fa8f2d..6fd5916ebef3 100644
-> --- a/arch/loongarch/kvm/vm.c
-> +++ b/arch/loongarch/kvm/vm.c
-> @@ -30,6 +30,14 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long ty=
-pe)
->         if (!kvm->arch.pgd)
->                 return -ENOMEM;
->
-> +       kvm->arch.phyid_map =3D kvzalloc(sizeof(struct kvm_phyid_map),
-> +                               GFP_KERNEL_ACCOUNT);
-> +       if (!kvm->arch.phyid_map) {
-> +               free_page((unsigned long)kvm->arch.pgd);
-> +               kvm->arch.pgd =3D NULL;
-> +               return -ENOMEM;
-> +       }
-> +
->         kvm_init_vmcs(kvm);
->         kvm->arch.gpa_size =3D BIT(cpu_vabits - 1);
->         kvm->arch.root_level =3D CONFIG_PGTABLE_LEVELS - 1;
-> @@ -44,6 +52,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long typ=
-e)
->         for (i =3D 0; i <=3D kvm->arch.root_level; i++)
->                 kvm->arch.pte_shifts[i] =3D PAGE_SHIFT + i * (PAGE_SHIFT =
-- 3);
->
-> +       mutex_init(&kvm->arch.phyid_map_lock);
->         return 0;
+>  #undef pr_fmt
+>  #define pr_fmt(fmt)	"SEV-SNP: " fmt
+>  
+> @@ -505,3 +510,32 @@ int rmp_make_shared(u64 pfn, enum pg_level level)
+>  	return rmpupdate(pfn, &state);
 >  }
->
-> @@ -51,7 +60,9 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
->  {
->         kvm_destroy_vcpus(kvm);
->         free_page((unsigned long)kvm->arch.pgd);
-> +       kvfree(kvm->arch.phyid_map);
->         kvm->arch.pgd =3D NULL;
-> +       kvm->arch.phyid_map =3D NULL;
->  }
->
->  int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
-> --
-> 2.39.3
->
+>  EXPORT_SYMBOL_GPL(rmp_make_shared);
+> +
+> +void snp_leak_pages(u64 pfn, unsigned int npages)
+> +{
+> +	struct page *page = pfn_to_page(pfn);
+> +
+> +	pr_warn("Leaking PFN range 0x%llx-0x%llx\n", pfn, pfn + npages);
+> +
+> +	spin_lock(&snp_leaked_pages_list_lock);
+> +	while (npages--) {
+> +		/*
+> +		 * Reuse the page's buddy list for chaining into the leaked
+> +		 * pages list. This page should not be on a free list currently
+> +		 * and is also unsafe to be added to a free list.
+> +		 */
+> +		if (likely(!PageCompound(page)) ||
+> +		    (PageHead(page) && compound_nr(page) <= npages))
+> +			/*
+> +			 * Skip inserting tail pages of compound page as
+> +			 * page->buddy_list of tail pages is not usable.
+> +			 */
+> +			list_add_tail(&page->buddy_list, &snp_leaked_pages_list);
+
+Even though it's not necessary for correctness, with the comment I'd put the
+whole block into { } to make easier to follow. Or just move the comment
+above the if() itself?
+
+> +		dump_rmpentry(pfn);
+> +		snp_nr_leaked_pages++;
+> +		pfn++;
+> +		page++;
+> +	}
+> +	spin_unlock(&snp_leaked_pages_list_lock);
+> +}
+> +EXPORT_SYMBOL_GPL(snp_leak_pages);
+
 
