@@ -1,190 +1,187 @@
-Return-Path: <kvm+bounces-7379-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7380-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A260F8410C7
-	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 18:32:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7124A841172
+	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 18:59:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C6A2B1C21D69
-	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 17:32:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DDAF5B22C95
+	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 17:59:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ADF776C70;
-	Mon, 29 Jan 2024 17:32:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 904023F9FC;
+	Mon, 29 Jan 2024 17:59:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="W8sNyCXd"
+	dkim=fail reason="signature verification failed" (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Cotx7+I0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D468C76C67
-	for <kvm@vger.kernel.org>; Mon, 29 Jan 2024 17:32:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95A313F9DA;
+	Mon, 29 Jan 2024 17:58:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706549539; cv=none; b=StlfA8j3tBrD3NkKDhCd4tpmLVydjk3IlWisuvc76IHoz6wkub4BRU7La7Wan/buYYal/GCkh0Gg+sXDGIahkayjRr88v+dS2EqJr7SMlZdRz8xRjTY4AiPQYcENqIN6nPnLvFJTlvLJwkEL1dvRnLYGuVugWMaA72dMiiVSD1c=
+	t=1706551139; cv=none; b=uzE32sVhDNGYbgnToh43AcQr0TF8PV3uwC/hf1kpT6lVq5dhsb940fru2TFoZTbaj3n0xAR4kly7E3WV9Jnc90p/PF7lTlbPDwpymHEocQCGtdeHSPzlOSJ3Xq/rVk/BchIg8RDIehupErUM/pKbCL4+ZzsOTuuZ1dpTMCtyGzg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706549539; c=relaxed/simple;
-	bh=YRp4BUluCZHs8RgVpTg5d5hV53aVQO6lRbp0r5NoFfM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=dBVv9ic+iknh2mF3R2bkAZPls06P5TM3iSR6NQTULTNQ1PEXetmeau/SFYhXmj0i29GwmNf7SC8olc43oLeXJFHO/ig/gQ8wPG37DeWKuHcMTTUnmgHhSj9+bFlRA74SGUhn1GazWHRHN9PxXEC0AAHj3WkOQ8Ddswl0fFJAvL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=W8sNyCXd; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dbf618042daso4863682276.0
-        for <kvm@vger.kernel.org>; Mon, 29 Jan 2024 09:32:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706549537; x=1707154337; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pZZGujZoT6sM5Lr8hNPPy5oQsn3CrEfvKDxIfmYq8To=;
-        b=W8sNyCXd/N/qXjTacvZp/gRU9lBcHQyo9Hy/X00w1IgkgC0m2DwOsjhRywKuViFdIV
-         fElKQG3Y91tPAm0IRGVaeQLLccTpSBLvXfz24K1mpugNLei5OhejOkiTJFsH1jlUIsLi
-         /Bj5L/FPfL5EU7tCmCdxZkbd7sEswBjVuWQx8bZ1qvjU9b+B+GToH5L03a8lXTduaMvg
-         SUty3EMo4zs2lQdNWMqHoAHCVw3M7FJwMIH5vfXQGDkA/8enPjWXsPtarKVcPjE9Pr6P
-         kCcGcAdtBq7UWXqTbKvHRngxXrUCN3gGQ5N1ieXpTKSCMDLdDaAVmFSUv5YImbnF68Ft
-         Lsaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706549537; x=1707154337;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pZZGujZoT6sM5Lr8hNPPy5oQsn3CrEfvKDxIfmYq8To=;
-        b=aBEjWJuOuLmXt1tQghylocEchK+l5z9eN6cL/l1xcw2ISP8VOBovrxqutEeeXQC4M0
-         i/hygRT/zAH7UWMLDoBS76Mwm+ftbZDmJ4XmuwhdnG4A3muIHkOdL5bvhaYUH4pzQKEk
-         PRzUBvG70BK6+d+vbZ6rntvZBcLNaKLLZsMszUJMmyAsJ2HiYScRsKOjYSDzz21zFl+V
-         3lqMGXqdOCrf8AzCOHKQDKtMxCcXAkZqiaWTYS3e6fQBimYuwGmWtEiuSc8K9MytXtjn
-         JbHyELe5NVDDYoB87A+jZeDekZ29mSVQQ3qXrUdOt7kcLRprTGK3Lr1VwvlsxBjLV5yq
-         Y2PQ==
-X-Gm-Message-State: AOJu0YxjDr1nLQMQ41NBW6DydbUww9HeRsHgtiGd8ybk+/jDg9mjytml
-	zszXFHWe2LyCFz3/npyDvDmnqgb8K4noLATPm66sGKKiGoVN6zdjnSBA+Cc74eJolfP0LCVSjFs
-	+vQ==
-X-Google-Smtp-Source: AGHT+IHJ/i4DPTqnqZB8npqnNHttUvFnACIn8Jmuz+nWARXZQ5V5oTWnuYa0qw0vDT+AepoC6NmM+pUL1H4=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:144e:b0:dc2:3a02:4fc8 with SMTP id
- a14-20020a056902144e00b00dc23a024fc8mr424567ybv.6.1706549536834; Mon, 29 Jan
- 2024 09:32:16 -0800 (PST)
-Date: Mon, 29 Jan 2024 09:32:15 -0800
-In-Reply-To: <Zbdf+GSYU+5EGfBL@linux.bj.intel.com>
+	s=arc-20240116; t=1706551139; c=relaxed/simple;
+	bh=brZXU+54yeeIyXk8P9EznYfF+mgwIvbQaMmnQXIIBt4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SXgt2h30MndcNiO6ooNtv+F0NHq1KQsG/Pc1aQmLFiGNQfAu0TAvNBcxHoMjxXzk4nZO8hJd0vYQxXYWm6ZyoSGmDXEX2V2s4PwGHfwIgPsBVwCymxI6vDkQuj7D1BbZyk7JtCyQhkZvf+dZ6QipS5njw6z20iRdK1JfxJe7seA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=fail (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Cotx7+I0 reason="signature verification failed"; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 68C1140E00C5;
+	Mon, 29 Jan 2024 17:58:53 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=fail (4096-bit key)
+	reason="fail (body has been altered)" header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id i6QaokLd0hxR; Mon, 29 Jan 2024 17:58:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1706551131; bh=haKRuQSPjwn4cZ6Nd5ze9P3MYIvIFCO4ld+rTiW5Nok=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Cotx7+I0f/7Gt9x7NWnbs/g0LaIwF6oRcwW5rTcKXCC9xkME6wAfqHrTzkkgOup7A
+	 kDUNDxWsdDds1nDmCKD58UhsVntsZo4C1fKrPqXjaY9dqRt+Z9cIJeFDdI9mLbgpKZ
+	 s4qgfyCwegiOe+c95T55T+0LMrvWz73oQGMlt6hhTINLQ9u87OV1BBkzI+s3UAMQki
+	 EiE6/lwoUIQamQYxuGWU4v8uXNZLA5BzheYMPr+4XA6EAJG+cTumWaule7SYdQzd3X
+	 CjbsbDw4O+fCxHaSfXhPPQWWT4oCT5B2SRv3OUnqAXhk8gefpEDl39LkU1ErXglmpz
+	 IihJRAoHAdwcNdjWr/KPPnqwegCBx27/RNuUlxQ340dn5QvkqTNFfTdKgGO9WwNUR1
+	 aoYa+eaWqChUqSSrv+g/QxeICCyfZaIicFzzOIjUmKN7xRw4Wal7qz4dNYTfEzOT4q
+	 q968O/clmAVLn5qoGPNuD3WoaQS/ESk1uAeK2GLknMWm+Rh+HIO8KvXhrRTwibbd0/
+	 rzkAqbvj5HS19afzr2rnkbYCCU/HRthEyYW3mpHBsK7JwXgWzu1WEjqZzR5jK15Yt8
+	 mtoc0sk0JJii4l6Roz1lSmr79VPsu/i8lclUem/bo+LBSd+mlVZtNyFzNat27QDPzs
+	 SNsPorfagbq1htmTG2J6pDaM=
+Received: from zn.tnic (pd953033e.dip0.t-ipconnect.de [217.83.3.62])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id A6D1940E016C;
+	Mon, 29 Jan 2024 17:58:12 +0000 (UTC)
+Date: Mon, 29 Jan 2024 18:58:06 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Michael Roth <michael.roth@amd.com>
+Cc: x86@kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+	linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+	rientjes@google.com, tobin@ibm.com, vbabka@suse.cz,
+	kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+	pankaj.gupta@amd.com, liam.merwick@oracle.com,
+	Brijesh Singh <brijesh.singh@amd.com>,
+	Jarkko Sakkinen <jarkko@profian.com>
+Subject: Re: [PATCH v2 13/25] crypto: ccp: Add support to initialize the
+ AMD-SP for SEV-SNP
+Message-ID: <20240129175806.GBZbfnLsqTgqoKwt0S@fat_crate.local>
+References: <20240126041126.1927228-1-michael.roth@amd.com>
+ <20240126041126.1927228-14-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240122064053.2825097-1-tao1.su@linux.intel.com>
- <ZbQYlYz5aCPFal5f@google.com> <Zbdf+GSYU+5EGfBL@linux.bj.intel.com>
-Message-ID: <ZbfhH1ubtrql2Mt5@google.com>
-Subject: Re: [PATCH v2] KVM: selftests: Fix dirty_log_page_splitting_test as
- page migration
-From: Sean Christopherson <seanjc@google.com>
-To: Tao Su <tao1.su@linux.intel.com>
-Cc: kvm@vger.kernel.org, pbonzini@redhat.com, shuah@kernel.org, 
-	yi1.lai@intel.com, David Matlack <dmatlack@google.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240126041126.1927228-14-michael.roth@amd.com>
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 29, 2024, Tao Su wrote:
-> On Fri, Jan 26, 2024 at 12:39:49PM -0800, Sean Christopherson wrote:
-> > +David
-> > 
-> 
-> [ ... ]
-> 
-> > >  
-> > >  	/*
-> > > @@ -192,7 +193,6 @@ static void run_test(enum vm_guest_mode mode, void *unused)
-> > >  	 * memory again, the page counts should be the same as they were
-> > >  	 * right after initial population of memory.
-> > >  	 */
-> > > -	TEST_ASSERT_EQ(stats_populated.pages_4k, stats_repopulated.pages_4k);
-> > >  	TEST_ASSERT_EQ(stats_populated.pages_2m, stats_repopulated.pages_2m);
-> > >  	TEST_ASSERT_EQ(stats_populated.pages_1g, stats_repopulated.pages_1g);
-> > 
-> > Isn't it possible that something other than guest data could be mapped by THP
-> > hugepage, and that that hugepage could get shattered between the initial run and
-> > the re-population run?
-> 
-> Good catch, I found that if the backing source is specified as THP, all hugepages
-> can also be migrated.
+On Thu, Jan 25, 2024 at 10:11:13PM -0600, Michael Roth wrote:
+> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+> index 006e4cdbeb78..8128de17f0f4 100644
+> --- a/include/linux/psp-sev.h
+> +++ b/include/linux/psp-sev.h
+> @@ -790,10 +790,23 @@ struct sev_data_snp_shutdown_ex {
+> =20
+>  #ifdef CONFIG_CRYPTO_DEV_SP_PSP
+> =20
+> +/**
+> + * struct sev_platform_init_args
+> + *
+> + * @error: SEV firmware error code
+> + * @probe: True if this is being called as part of CCP module probe, w=
+hich
+> + *  will defer SEV_INIT/SEV_INIT_EX firmware initialization until need=
+ed
+> + *  unless psp_init_on_probe module param is set
+> + */
+> +struct sev_platform_init_args {
+> +	int error;
+> +	bool probe;
+> +};
 
-The backing source for the test slots?  Using THP is inherently fragile for this
-test, and IMO is firmly out of scope.  I was talking about any memslots allocated
-by the core library, e.g. for the test's code and page tables.  Those should be
-forced to be MADV_NOHUGEPAGE, though if the allocations are smaller than 2MiB
-(I forget how much we allocate), that would suffice for now.
+This struct definition cannot be under the ifdef, otherwise:
 
-If we ensure the other memslots can only use 4KiB, then it's only the *.pages_4k
-checks that are problematic.  Then the hugepage counts can be precise.
-
-Something like this is what I'm thinking (again, assuming the "other" memslot
-created by the library can't use THP).
+arch/x86/kvm/svm/sev.c: In function =E2=80=98sev_guest_init=E2=80=99:
+arch/x86/kvm/svm/sev.c:267:33: error: passing argument 1 of =E2=80=98sev_=
+platform_init=E2=80=99 from incompatible pointer type [-Werror=3Dincompat=
+ible-pointer-types]
+  267 |         ret =3D sev_platform_init(&init_args);
+      |                                 ^~~~~~~~~~
+      |                                 |
+      |                                 struct sev_platform_init_args *
+In file included from arch/x86/kvm/svm/sev.c:16:
+./include/linux/psp-sev.h:952:42: note: expected =E2=80=98int *=E2=80=99 =
+but argument is of type =E2=80=98struct sev_platform_init_args *=E2=80=99
+  952 | static inline int sev_platform_init(int *error) { return -ENODEV;=
+ }
+      |                                     ~~~~~^~~~~
+cc1: all warnings being treated as errors
 
 ---
- .../x86_64/dirty_log_page_splitting_test.c    | 21 +++++++++++--------
- 1 file changed, 12 insertions(+), 9 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/x86_64/dirty_log_page_splitting_test.c b/tools/testing/selftests/kvm/x86_64/dirty_log_page_splitting_test.c
-index 634c6bfcd572..4864cf3fae57 100644
---- a/tools/testing/selftests/kvm/x86_64/dirty_log_page_splitting_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/dirty_log_page_splitting_test.c
-@@ -92,7 +92,6 @@ static void run_test(enum vm_guest_mode mode, void *unused)
- 	uint64_t host_num_pages;
- 	uint64_t pages_per_slot;
- 	int i;
--	uint64_t total_4k_pages;
- 	struct kvm_page_stats stats_populated;
- 	struct kvm_page_stats stats_dirty_logging_enabled;
- 	struct kvm_page_stats stats_dirty_pass[ITERATIONS];
-@@ -107,6 +106,9 @@ static void run_test(enum vm_guest_mode mode, void *unused)
- 	guest_num_pages = vm_adjust_num_guest_pages(mode, guest_num_pages);
- 	host_num_pages = vm_num_host_pages(mode, guest_num_pages);
- 	pages_per_slot = host_num_pages / SLOTS;
-+	TEST_ASSERT_EQ(host_num_pages, pages_per_slot * SLOTS);
-+	TEST_ASSERT(!(host_num_pages % 512),
-+		    "Number of pages, '%lu' not a multiple of 2MiB", host_num_pages);
- 
- 	bitmaps = memstress_alloc_bitmaps(SLOTS, pages_per_slot);
- 
-@@ -165,10 +167,8 @@ static void run_test(enum vm_guest_mode mode, void *unused)
- 	memstress_free_bitmaps(bitmaps, SLOTS);
- 	memstress_destroy_vm(vm);
- 
--	/* Make assertions about the page counts. */
--	total_4k_pages = stats_populated.pages_4k;
--	total_4k_pages += stats_populated.pages_2m * 512;
--	total_4k_pages += stats_populated.pages_1g * 512 * 512;
-+	TEST_ASSERT_EQ((stats_populated.pages_2m * 512 +
-+			stats_populated.pages_1g * 512 * 512), host_num_pages);
- 
- 	/*
- 	 * Check that all huge pages were split. Since large pages can only
-@@ -180,19 +180,22 @@ static void run_test(enum vm_guest_mode mode, void *unused)
- 	 */
- 	if (dirty_log_manual_caps) {
- 		TEST_ASSERT_EQ(stats_clear_pass[0].hugepages, 0);
--		TEST_ASSERT_EQ(stats_clear_pass[0].pages_4k, total_4k_pages);
-+		TEST_ASSERT(stats_clear_pass[0].pages_4k >= host_num_pages,
-+			    "Expected at least '%lu' 4KiB pages, found only '%lu'",
-+			    host_num_pages, stats_clear_pass[0].pages_4k);
- 		TEST_ASSERT_EQ(stats_dirty_logging_enabled.hugepages, stats_populated.hugepages);
- 	} else {
- 		TEST_ASSERT_EQ(stats_dirty_logging_enabled.hugepages, 0);
--		TEST_ASSERT_EQ(stats_dirty_logging_enabled.pages_4k, total_4k_pages);
-+		TEST_ASSERT(stats_dirty_logging_enabled.pages_4k >= host_num_pages,
-+			    "Expected at least '%lu' 4KiB pages, found only '%lu'",
-+			    host_num_pages, stats_clear_pass[0].pages_4k);
- 	}
- 
- 	/*
- 	 * Once dirty logging is disabled and the vCPUs have touched all their
--	 * memory again, the page counts should be the same as they were
-+	 * memory again, the hugepage counts should be the same as they were
- 	 * right after initial population of memory.
- 	 */
--	TEST_ASSERT_EQ(stats_populated.pages_4k, stats_repopulated.pages_4k);
- 	TEST_ASSERT_EQ(stats_populated.pages_2m, stats_repopulated.pages_2m);
- 	TEST_ASSERT_EQ(stats_populated.pages_1g, stats_repopulated.pages_1g);
- }
+on a 32-bit allmodconfig.
 
-base-commit: 0762cdfe8ee16e4035b0ad27418686ef0452932f
--- 
+Build fix:
+
+---
+
+diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+index beba10d6b39c..d0e184db9d37 100644
+--- a/include/linux/psp-sev.h
++++ b/include/linux/psp-sev.h
+@@ -797,8 +797,6 @@ struct sev_data_snp_commit {
+ 	u32 len;
+ } __packed;
+=20
+-#ifdef CONFIG_CRYPTO_DEV_SP_PSP
+-
+ /**
+  * struct sev_platform_init_args
+  *
+@@ -812,6 +810,8 @@ struct sev_platform_init_args {
+ 	bool probe;
+ };
+=20
++#ifdef CONFIG_CRYPTO_DEV_SP_PSP
++
+ /**
+  * sev_platform_init - perform SEV INIT command
+  *
+@@ -949,7 +949,7 @@ void snp_free_firmware_page(void *addr);
+ static inline int
+ sev_platform_status(struct sev_user_data_status *status, int *error) { r=
+eturn -ENODEV; }
+=20
+-static inline int sev_platform_init(int *error) { return -ENODEV; }
++static inline int sev_platform_init(struct sev_platform_init_args *args)=
+ { return -ENODEV; }
+=20
+ static inline int
+ sev_guest_deactivate(struct sev_data_deactivate *data, int *error) { ret=
+urn -ENODEV; }
+
+--=20
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
