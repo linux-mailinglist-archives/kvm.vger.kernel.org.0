@@ -1,148 +1,173 @@
-Return-Path: <kvm+bounces-7389-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7390-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8E18841391
-	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 20:34:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2CD18413A8
+	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 20:40:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E82B51C24710
-	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 19:34:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 52BAD1F22BE2
+	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 19:40:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36260179AB;
-	Mon, 29 Jan 2024 19:34:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E317D4CB3D;
+	Mon, 29 Jan 2024 19:40:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="bdsIxLwX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MsqJbbCv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2655E2E834;
-	Mon, 29 Jan 2024 19:34:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BFF74CB24
+	for <kvm@vger.kernel.org>; Mon, 29 Jan 2024 19:39:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706556870; cv=none; b=ZRszzev+Be3/k3Rc4pUYFFVzhH0Q4A0SyHh3vBqbwsiISp0HKuFdjIjNV1Uc9ydMOlvNICr8LPmJoI62xJj8j1No8CS48fjJiog0C6DmaQTOeVv66L/G0EUsVxfAExPF6OKFoRlMJc8gJGzUzgn76JQbproRJ2CM603jeZ8RyEc=
+	t=1706557201; cv=none; b=afPlQZ/RbMgNANS4c45mLLAWdCZtv2jFmp+qybbS3Elrm3P9AvNvUrBgo/k/13BzDVa/XOeCHhDywFNKWANKAVWrz5pMZmQ0vkfnz01ETR6f45tBSHZBKO+JsYDo9PxLLm8an3SwQdd9gWn5rdfA0wkTIUjCdUMcvzgLAs4mbsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706556870; c=relaxed/simple;
-	bh=I7RxhbY/EibWYZIjX/KVd/UOGTnYnSVr17JA67fezys=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JfJfI9RYVOyfghxSzu6mE68E8A/2jRUaj6utGZt7UPh9xVZvxM91OxqSEKjn8GCyra4Ezyq7/AtsuDiy4A4XRSztobfi8qscOFwuJCh4wQdV5Jx+KPRItYiV2HQDyXhClvM+UuY4Bfr2W64JsEGAwBSDAKGJw9XqPEDGDEgDIo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=bdsIxLwX; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 45A6640E016C;
-	Mon, 29 Jan 2024 19:34:25 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id 4_ICJQF_PwKX; Mon, 29 Jan 2024 19:34:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1706556863; bh=Y20SlS97Pif+eZWcli8UoWz3jQtBHyVieM06xnSycFE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bdsIxLwXTfiTiQNBBuB4jxzMjtcW9WLQgDndiKuh2Dgb1Fycm7YYU1xoqIfx8WkDk
-	 ZWPNJ92VcRA1likU1aDH2DuQQ7wGisMuAlPOoUjuJESd23/x1dOTfWX9bt5UW1wmKO
-	 rHqGvrOI2XHAzgnHlljaQXh3TONXOx51jFEdh8ehAc3IT296ZK3HC4+Pam2D4/uDPq
-	 fMTRb2p0RgOZRUCeqxKFq0ATiK3GGxR9YoTj16jRNFwQN8Jfl0rhgBBWliLPOJByFm
-	 0Td75HtzdqwyPNJj86PRwlop6u+oa52/lGQDVrYYDp2x7jNnJSVXCc176KK6TJWi15
-	 PleiW0y++W5QfJAynv5b2KyzlzKuVHFgYHiE19YgVM7xqUnPJtXzHwg88/O5VVUGvf
-	 Ih4s4Cp5x4PlvJouh/SQWBI/8w8nnVddxJmn4cov/xaqB0Ue9l9VfcJArJOV1O3BSG
-	 pSMPG234d7SXmNE0YITi5zqaBZMRqGvjr7zYkGwoMtl6NnQ0o430Idm6aw4KArALM0
-	 1F0CPmVk1pZzMIAcEnJDhltOfay5/dxNH6KDVIB/5hEzJoAAhGGWpa48ZrBKyJN0DB
-	 0JacNamOknGrSMo/o4CSeVOcYWxIzE9hvOEGg4CDxDlyHSiQWj4J7LytH4Bvm1aMi7
-	 Njo5QWcNHZ2lOUtJBw05ByGk=
-Received: from zn.tnic (pd953033e.dip0.t-ipconnect.de [217.83.3.62])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 92C6C40E00C5;
-	Mon, 29 Jan 2024 19:33:45 +0000 (UTC)
-Date: Mon, 29 Jan 2024 20:33:44 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Liam Merwick <liam.merwick@oracle.com>
-Cc: Michael Roth <michael.roth@amd.com>, "x86@kernel.org" <x86@kernel.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"tglx@linutronix.de" <tglx@linutronix.de>,
-	"mingo@redhat.com" <mingo@redhat.com>,
-	"jroedel@suse.de" <jroedel@suse.de>,
-	"thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
-	"hpa@zytor.com" <hpa@zytor.com>,
-	"ardb@kernel.org" <ardb@kernel.org>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"seanjc@google.com" <seanjc@google.com>,
-	"vkuznets@redhat.com" <vkuznets@redhat.com>,
-	"jmattson@google.com" <jmattson@google.com>,
-	"luto@kernel.org" <luto@kernel.org>,
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-	"slp@redhat.com" <slp@redhat.com>,
-	"pgonda@google.com" <pgonda@google.com>,
-	"peterz@infradead.org" <peterz@infradead.org>,
-	"srinivas.pandruvada@linux.intel.com" <srinivas.pandruvada@linux.intel.com>,
-	"rientjes@google.com" <rientjes@google.com>,
-	"tobin@ibm.com" <tobin@ibm.com>, "vbabka@suse.cz" <vbabka@suse.cz>,
-	"kirill@shutemov.name" <kirill@shutemov.name>,
-	"ak@linux.intel.com" <ak@linux.intel.com>,
-	"tony.luck@intel.com" <tony.luck@intel.com>,
-	"sathyanarayanan.kuppuswamy@linux.intel.com" <sathyanarayanan.kuppuswamy@linux.intel.com>,
-	"alpergun@google.com" <alpergun@google.com>,
-	"jarkko@kernel.org" <jarkko@kernel.org>,
-	"ashish.kalra@amd.com" <ashish.kalra@amd.com>,
-	"nikunj.dadhania@amd.com" <nikunj.dadhania@amd.com>,
-	"pankaj.gupta@amd.com" <pankaj.gupta@amd.com>,
-	Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH v2 10/25] x86/sev: Add helper functions for RMPUPDATE and
- PSMASH instruction
-Message-ID: <20240129193344.GFZbf9mEIxZg7ZEb8f@fat_crate.local>
-References: <20240126041126.1927228-1-michael.roth@amd.com>
- <20240126041126.1927228-11-michael.roth@amd.com>
- <23cb85b1-4072-45a4-b7dd-9afd6ad20126@oracle.com>
- <20240129192820.GEZbf8VBsDhI0Be8y0@fat_crate.local>
+	s=arc-20240116; t=1706557201; c=relaxed/simple;
+	bh=zEICr1QmXRFmGfhgJTC8MTvyADukMO2VuiYXvG5FET8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IdBZKky2vJdlaGWMRtKejUiV48NkFLHVnhDpHcwpfTLvBk6Rc5EsEHfAqvqXrHLF+0Cs0d51XK2MSzQLyaoe2QPwK52MqRZ2kAh3qBdws+rrtW8wJ9NbGm18n+rtRKXbP0lF5dv1WYJ5qwKLfKtefgDUGqW7Qr++EM8JKMcrRgg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MsqJbbCv; arc=none smtp.client-ip=209.85.160.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-214dbe25f8aso1476231fac.3
+        for <kvm@vger.kernel.org>; Mon, 29 Jan 2024 11:39:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706557198; x=1707161998; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zEICr1QmXRFmGfhgJTC8MTvyADukMO2VuiYXvG5FET8=;
+        b=MsqJbbCvHw737tS9uFAdDdyv2fB8PEJE0GlMS7bF8TAXPXLKpj5LbBoVlwsd8bDNQ8
+         J+tKZKPshHIY9Y6mjuEJWkU3PJ6WvuHQC4JS6Kd+DQXqXBSl6bTXHUyLEoeb53DVMj9q
+         V8g56BIg0tymVBw2KcC3Lq0h6ooxOnG1izY23Hdx61eCCs6Qft2avc33pFDFI7j8HsZC
+         PRPeuTYg6JE5Lb0n7zCpMTmqMPN/7dNp4h0hNRj+odMXZP+8mdaq5T1wmTh6mR9a4aTF
+         BicyuVbjghNCPpQ5hsQQka+FU0R6nRV6DBOjBrGQ9EbC3Mow4/VJVEcLh5bfpMxiUDmd
+         80vg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706557198; x=1707161998;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zEICr1QmXRFmGfhgJTC8MTvyADukMO2VuiYXvG5FET8=;
+        b=G8ckvTVWILXSOuLyS06Q+3NC7PQCtbV5zFK8/SZ6Z+K1Im4trC3kPL4Jyy1KFSBxlB
+         BDq5ocukWvbt5Q4P+KkFzH8tMIAkid1f5ZgG0JpG1JpwSTWkOR9bcukWRGkQoJE9BYxR
+         EEaMEF4VkWznk8JvYTcVWfYS4InlfsmwYKKjXqmOSTCUDB+CK2EI0kmdiLYmOJaDX/KX
+         MBwWj65K3CzK+4FuTu/N6dNX0qrjxtwU11CMweCRSMGKHV3o3CxwZ+2uVNGTmGJWT0mN
+         VyOlpBphump7f3peVzG2hDYxXzTL80R/FXal9bFdPjyjjLD0D7/vWKK2b7Y2EjJBvBeH
+         9UJw==
+X-Gm-Message-State: AOJu0YzfVCOEOUdgAcaqLABi7TP55lv7InX4+rz2WNqgL+b6a56iTabD
+	1c/4Wg/w9IdgGymf779LsiTT8Vmw6AXi1K+Z3//uVjACLsUXMkiO5Gds07hFVYdbUgLoMXEADyK
+	3X6blNxqCMxtv2a2B9gbRwsPAZJk=
+X-Google-Smtp-Source: AGHT+IGrqlz3fxhPT8BNhS56XLZfowmZNWfb6WVzUXdMMpDIIupZxON6sLvwqAbUGsBHFsIUXDgnRRjBZyFAaFLq7Yo=
+X-Received: by 2002:a05:6870:4341:b0:218:6ff5:a190 with SMTP id
+ x1-20020a056870434100b002186ff5a190mr4369413oah.39.1706557198088; Mon, 29 Jan
+ 2024 11:39:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240129192820.GEZbf8VBsDhI0Be8y0@fat_crate.local>
+References: <CAJSP0QX9TQ-=PD7apOamXvGW29VwJPfVNN2X5BsFLFoP2g6USg@mail.gmail.com>
+ <CAJaqyWdMNP3V=JL6C8SSbXV5AP_2O9SNJLUS+Go7AjVsrT1FdQ@mail.gmail.com>
+In-Reply-To: <CAJaqyWdMNP3V=JL6C8SSbXV5AP_2O9SNJLUS+Go7AjVsrT1FdQ@mail.gmail.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Mon, 29 Jan 2024 14:39:45 -0500
+Message-ID: <CAJSP0QXMJiRQFJh6383tnCOXyLwAbBYM7ff-mtregO3MKAEC1A@mail.gmail.com>
+Subject: Re: Call for GSoC/Outreachy internship project ideas
+To: Eugenio Perez Martin <eperezma@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>, 
+	Alberto Faria <afaria@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, 
+	German Maglione <gmaglione@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, 
+	"Richard W.M. Jones" <rjones@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Warner Losh <imp@bsdimp.com>, 
+	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, 
+	Daniel Henrique Barboza <danielhb413@gmail.com>, Song Gao <gaosong@loongson.cn>, 
+	Akihiko Odaki <akihiko.odaki@daynix.com>, Bernhard Beschow <shentey@gmail.com>, 
+	Nicholas Piggin <npiggin@gmail.com>, Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 29, 2024 at 08:28:20PM +0100, Borislav Petkov wrote:
-> On Mon, Jan 29, 2024 at 06:00:36PM +0000, Liam Merwick wrote:
-> > asid is typically a u32 (or at least unsigned) - is it better to avoid 
-> > potential conversion issues with an 'int'?
-> 
-> struct rmp_state.asid is already u32 but yeah, lemme fix that.
+On Mon, 29 Jan 2024 at 13:53, Eugenio Perez Martin <eperezma@redhat.com> wr=
+ote:
+>
+> On Mon, Jan 15, 2024 at 5:33=E2=80=AFPM Stefan Hajnoczi <stefanha@gmail.c=
+om> wrote:
+> >
+> > Dear QEMU and KVM communities,
+> > QEMU will apply for the Google Summer of Code and Outreachy internship
+> > programs again this year. Regular contributors can submit project
+> > ideas that they'd like to mentor by replying to this email before
+> > January 30th.
+> >
+>
+>
+> =3D=3D=3D Add packed virtqueue to Shadow Virtqueue =3D=3D=3D
 
-Btw,
+Yes! I'm a fan of packed virtqueues, so I'm excited to see this project ide=
+a :).
 
-static int sev_get_asid(struct kvm *kvm)
-{
-        struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> Summary: Add the packed virtqueue format support to QEMU's Shadow Virtque=
+ue.
+>
+> To perform a virtual machine live migration with an external device to
+> qemu, qemu needs a way to know which memory the device modifies so it
+> is able to resend it. Otherwise the guest would resume with invalid /
+> outdated memory in the destination.
+>
+> This is especially hard with passthrough hardware devices, as
+> transports like PCI imposes a few security and performance challenges.
+> As a method to overcome this for virtio devices, qemu can offer an
+> emulated virtqueue to the device, called Shadow Virtqueue (SVQ),
+> instead of allowing the device to communicate directly with the guest.
+> SVQ will then forward the writes to the guest, being the effective
+> writer in the guest memory and knowing when a portion of it needs to
+> be resent.
+>
+> Compared with original Split Virtqueues, already supported by Shadow
+> Virtqueue, Packed virtqueue is a more compact representation that uses
+> less memory size and allows both devices and drivers to exchange the
+> same amount of information with less memory operations.
+>
+> The task is to complete the packed virtqueue support for SVQ, using
+> the kernel virtio ring driver as a reference. There is already a setup
+> that can be used to test the changes.
+>
+> Links:
+> * https://www.redhat.com/en/blog/virtio-devices-and-drivers-overview-head=
+jack-and-phone
+> * https://www.redhat.com/en/blog/virtqueues-and-virtio-ring-how-data-trav=
+els
+> * https://www.redhat.com/en/blog/packed-virtqueue-how-reduce-overhead-vir=
+tio
+> * https://www.youtube.com/watch?v=3Dx9ARoNVzS04
+>
+> Details:
+> * Skill level: Intermediate
+> * Language: C
 
-        return sev->asid;
-}
+I have added this project idea to the wiki. I made minor edits (e.g.
+consistently using "guest" instead of both "virtual machine" and
+"guest" to minimize the amount of terminology). I also added a link to
+the vhost-shadow-virtqueue.c source code so applicants have a starting
+point for researching the code.
 
-whereas
+https://wiki.qemu.org/Internships/ProjectIdeas/PackedShadowVirtqueue
 
-struct kvm_sev_info {
-	...
-        unsigned int asid;      /* ASID used for this guest */
+Please edit the page to clarify the following:
+- Project size: 90 (small), 175 (medium), or 350 (large) hours
+- A list of suggested tasks for the coding period that applicants can
+research and refine for their project plan
 
-so that function needs fixing too.
+Possible stretch goals if the intern completes packed svq support
+early or maybe you have your own ideas:
+- Split/rename vhost-shadow-virtqueue.c into a VIRTIO driver-side
+virtqueue API (which could be used by any other feature that acts as a
+VIRTIO driver, like vhost-user clients) and shadow virtqueue logic
+- Implement packed virtqueue support in other components where it is
+not yet supported (like kernel vhost)
 
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Stefan
 
