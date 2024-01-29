@@ -1,209 +1,455 @@
-Return-Path: <kvm+bounces-7300-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7301-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34EA883FC37
-	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 03:30:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07F3883FC4B
+	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 03:37:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E888284EAE
-	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 02:30:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74CDB281AD3
+	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 02:37:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AFA6F9D6;
-	Mon, 29 Jan 2024 02:30:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C952EEED7;
+	Mon, 29 Jan 2024 02:37:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KIbKmClC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JSoQCUew"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25E45EAE5
-	for <kvm@vger.kernel.org>; Mon, 29 Jan 2024 02:30:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706495451; cv=fail; b=YVAT2uLAwNPnm0rS3ulJRNezYKmD4OKvObwWOIj5Lsr3YM696fzW2P1y1salWxkEstzsbjp2WQq0CAGttfBGUDODKmKPIg8we2ayqoOgnzwEe2vACulNt/+Zk94HR7v2eT2M1bs8QD4Xjc9prS+r/UTMOD3C08LBhWsLvkNxWXk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706495451; c=relaxed/simple;
-	bh=9iLJh0qHdKUYxWA0AW1n8/l1GHmT3tx/4H1TqbUhxso=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=WPupXNaRXB5xdvGTU9fepOCiV3cG8BCe8UEiu11UE3C6EK4QL9noCBNLGqYb8MK1ZVEPz8GdhrUuR+c6sKTJnWf2fhleHfnnkBjlc72yA5J7VZTyTeMaA0b1g2ZSgQCm8JnGSKD4HYjOGk86a7zhHhL/kOYe2qg0e1SbVQhqs7k=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KIbKmClC; arc=fail smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706495450; x=1738031450;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=9iLJh0qHdKUYxWA0AW1n8/l1GHmT3tx/4H1TqbUhxso=;
-  b=KIbKmClCecp7Q+GMTatTd1JQjnB5M0xr8KaxzjrQVyCFQK0Y6DTwbArX
-   ttL5/uus7GFAf+twGtxugFj12Q+bgz3/8Wx2QW3/Buoxw0bTPCXODXuQw
-   KhqwHORYWMZnin/Tl72c6pgcExWybta+WfloLrtxzI2ABhk5trKynCyBZ
-   63g13Do53Y3l4RmtOJ1fvdsFwVjCRYTBoES3VnQuWK2IXQKkSuxDpbmSD
-   wI/X4069SFGXa46/saqI0klkCqatZ+TUpOkAabd9u7LoNnl28kEsU4l1D
-   UQG6sklGCKneu4foQdiEhU0+nGaNUnG+RCe6PIXGTnqh1wtU0qlsNlrCD
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10967"; a="2721049"
-X-IronPort-AV: E=Sophos;i="6.05,226,1701158400"; 
-   d="scan'208";a="2721049"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2024 18:30:49 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,226,1701158400"; 
-   d="scan'208";a="29366613"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 28 Jan 2024 18:30:50 -0800
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Sun, 28 Jan 2024 18:30:48 -0800
-Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Sun, 28 Jan 2024 18:30:48 -0800
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Sun, 28 Jan 2024 18:30:48 -0800
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.168)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Sun, 28 Jan 2024 18:30:47 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Yy2VGlC13HEUxvSjd9w/rQxlieCgeB6VnXI+R9wzbDHisA6F2YmvXOHZ7X4E+8odj4Ww4KGZREkIxEbyRt2VhbPg+2i+rMjjl8of54AXa8099eOPAT2UpLLh+pfo03rkMlDbi2wJYJg+lOZ92GIekRrjVTHp805s1EmvOfua6rWFqK/hW9GgQ/R/KJFrB2W81IblpIg+0FPZddRfOOobYYEP+qp6T/9VaUrSXst0qsEjJ9sY0rm+c2KH32t+uMJ7iUfLAzo+Vp9zPPO03OsR3MDUz0/e7oE7aM5uILmQnBX50bQYMI++iix9YTrVONTdmM+gWlXkQSUnOgQ3JJnpVA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=RGe3G2gjnDYpnjeLvfLtK3283DGxHs+wPMzp9224cJI=;
- b=Zu5XjFVEew/dxDPcrTH01M8hZjEPR1d6Wls2CdpqdzUFczZWzmjRsEwFchG0uQI6FgGXN4+r84Hom+rYKahxu8q750qsTg8OXE+0D+cy2QeYjE8P9/9WiW4KRh/okbK6MTD842hiOAviDAQuL/hu7L5R5YTlaBqP1aKU6KEuA5nhghcg7UoRyDhwzn/h93mCucKEbJlmjNKFpmB1+HSkU3j9HZ5M/H7SRkswkTv+iwyozouJrSRL10K60f30DvnYrXfn79a4vuWkHaO4CAfpldr6dN+RN/tHDX2QmU9L7fqGcJ1SwyZWXLha8kSxTtUchQJyrh5aWoBm7oml+x+12A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH0PR11MB4965.namprd11.prod.outlook.com (2603:10b6:510:34::7)
- by SA1PR11MB8318.namprd11.prod.outlook.com (2603:10b6:806:373::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.32; Mon, 29 Jan
- 2024 02:30:44 +0000
-Received: from PH0PR11MB4965.namprd11.prod.outlook.com
- ([fe80::5d67:24d8:8c3d:acba]) by PH0PR11MB4965.namprd11.prod.outlook.com
- ([fe80::5d67:24d8:8c3d:acba%5]) with mapi id 15.20.7228.029; Mon, 29 Jan 2024
- 02:30:44 +0000
-Message-ID: <08966170-651e-446b-aac5-47e6156786b9@intel.com>
-Date: Mon, 29 Jan 2024 10:30:36 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v2 0/3] Fix test failures caused by CET KVM
- series
-To: Paolo Bonzini <pbonzini@redhat.com>
-CC: "Christopherson,, Sean" <seanjc@google.com>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>
-References: <20230913235006.74172-1-weijiang.yang@intel.com>
- <CABgObfb-cfZTW=xb7Vf3Fh0pAsQkkrrxuB2MczrR5X3bTpWr3Q@mail.gmail.com>
-Content-Language: en-US
-From: "Yang, Weijiang" <weijiang.yang@intel.com>
-In-Reply-To: <CABgObfb-cfZTW=xb7Vf3Fh0pAsQkkrrxuB2MczrR5X3bTpWr3Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SI2PR02CA0023.apcprd02.prod.outlook.com
- (2603:1096:4:195::11) To PH0PR11MB4965.namprd11.prod.outlook.com
- (2603:10b6:510:34::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 876CCEEDA
+	for <kvm@vger.kernel.org>; Mon, 29 Jan 2024 02:37:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706495852; cv=none; b=I5VVBvN622JMVc7K4h2ak0n01drHnNCAUfh3Uf9VpBwVg4B/68bXVLPN037qzfzDI/ZKl3dhH33mt6Wl7g4K5UHHzJLuDMIqoN+tobHjCOR0aAsHSRaoBWctawrxQqQGDDcJG8rQooOTqCLqPCC+EKUdgXoYYgNGwvWm3VQ0lpk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706495852; c=relaxed/simple;
+	bh=CAWwSzCuBzJdr058/ylm6lEd55rfXQHXxKM1iD0BTXs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fFeP/YRWIUBHbiil//Ct7AiDN0/0QTVZ8csOm11DX2S2LuoTDuNQbyWlvamDD9uT2UUgasmL+iLfGqZUCbWIXyhaUUjq59PIwuuk1eGOomy6bElR5HdIATZq3R7Nj0XxtMqJlBrZHO6Ip0YXb6Y14pBCg+n5G61GS6jEu1uWsxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JSoQCUew; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706495848;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wGgk+9hWDFF+qHIPCRgy4HE2ZOQkr1JKpCtykkITOz0=;
+	b=JSoQCUewLO70jBzjI2MVU5RAue/P0c92+RzEXm8p964ipGeBkGV3z372wlifUDWyO79dys
+	uKlWPs4l9cYMk8cOe4H/JGpwomkwHkrwBXQTH5e6F/FBFBplx/CjOi/XkQc6bn2lEsPhBo
+	/n2425oOmAoHcF3rq6pAB47nJpD6a8A=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-519-J0EYZS9OOzCdkrHQAAlSRA-1; Sun, 28 Jan 2024 21:37:26 -0500
+X-MC-Unique: J0EYZS9OOzCdkrHQAAlSRA-1
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-35fc6976630so13520075ab.0
+        for <kvm@vger.kernel.org>; Sun, 28 Jan 2024 18:37:26 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706495845; x=1707100645;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wGgk+9hWDFF+qHIPCRgy4HE2ZOQkr1JKpCtykkITOz0=;
+        b=p/kwv/uDFqlc5jofaXqFq66Gd2Re6gN8mcmLcHpzJTw7h5Yxw/msA0TCVOELYALC39
+         +jEkR7+HJ+G1g5ES7sIhYTMPKtPTbmHTiNjcpAk1vrGNpA7wU2WkhME/4854LyxSYnRF
+         I+Vw+Tchj1WDJg/wa+zAXtQHnOUfsfUsTWApkGWJGrhD0XjF84hdHrjZIXyNc+hotTpD
+         c/fJJIZWz0agzfLEfe1jXyo5GWOCJWS5vGZsKxJbs/zZxAevNMbPEv2SdYOIktYCCFlJ
+         PcwyocAmFVnUuWjwdFiET42o3d01ek0FUjaGJSkvvR/+zWRY3IyYTKXFDai+k+k6bwLW
+         8jXw==
+X-Gm-Message-State: AOJu0YyVKNAG201nxSAI6A8Eqja0MwlNe1aEuCeIBXcf7wae0/8PNU93
+	SWztz4OEF7BRe1S7dZthW/QQulO9Kflksd5SJkkwHPrZx3YIQjV8aYN5r9O0hD/YqJsscWtCs1w
+	1hCQWRmCpBOzjbDS6ARihYcuu/2IYieu6qM/GgHiWvWMbeUhacg==
+X-Received: by 2002:a92:ce52:0:b0:363:7777:658f with SMTP id a18-20020a92ce52000000b003637777658fmr3539026ilr.11.1706495845485;
+        Sun, 28 Jan 2024 18:37:25 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGL4U+CjALkUwgvEr0R2oxBdMRVvvqiairWp4q2asmJLUfMC7QmBMQd0rY+7cfLFiD2FCE7LA==
+X-Received: by 2002:a92:ce52:0:b0:363:7777:658f with SMTP id a18-20020a92ce52000000b003637777658fmr3539021ilr.11.1706495845142;
+        Sun, 28 Jan 2024 18:37:25 -0800 (PST)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id n12-20020a92d9cc000000b0036382484384sm275669ilq.17.2024.01.28.18.37.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 28 Jan 2024 18:37:24 -0800 (PST)
+Date: Sun, 28 Jan 2024 19:37:23 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: liulongfang <liulongfang@huawei.com>
+Cc: <jgg@nvidia.com>, <shameerali.kolothum.thodi@huawei.com>,
+ <jonathan.cameron@huawei.com>, <kvm@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <linuxarm@openeuler.org>
+Subject: Re: [PATCH 2/3] hisi_acc_vfio_pci: register debugfs for hisilicon
+ migration driver
+Message-ID: <20240128193723.2f16c2fc.alex.williamson@redhat.com>
+In-Reply-To: <ff787286-e3f6-1a32-2eb0-3d7976aeb34e@huawei.com>
+References: <20240125081031.48707-1-liulongfang@huawei.com>
+	<20240125081031.48707-3-liulongfang@huawei.com>
+	<20240125153834.3f44bbad.alex.williamson@redhat.com>
+	<ff787286-e3f6-1a32-2eb0-3d7976aeb34e@huawei.com>
+Organization: Red Hat
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR11MB4965:EE_|SA1PR11MB8318:EE_
-X-MS-Office365-Filtering-Correlation-Id: f51078fd-5d57-4929-1a1a-08dc20724b42
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: FETPDIxYd7onLShb2uOrUDirU7jAY8xzZn25KtgXhMYZldFb5EwlqOmVUX/O1md93Pvb+08msp2uZl5IVbdc9SdjSib0b3UTeziiKA9uh23ZqTG/kG67j9uK7moYqiqlMOJIZixcjosz49illiMhMT0IR9Z8GWJ+rJmksc2Tx6xkNWMNPPlW6PHMza5bRCHdH8CCvdB4VpkUrg3QTDvU99M6Dn9Ue+cXl6Awrp7mI90vxaDYbas9tPdvFg3exahz10lJFaga9tZBMO8//QfDVIz24OTr5rSubGRlzdkK0xaqQqOj+uc3ee/Ee0vjUdN0c32G8unjPT3p8exsZ6vx249z6a7dfMWoi27EkQ6Ey3EhfR3wTvCVLGvDpjYugJNU8Ztdv+WO6L/BzEFsTu2V33lLvidVgepTXjPw11ElaSNaO5w4r2XKKkBzf40bpdNC1CO7/bCJ7lR8D3Tsmtd5OrtPs+6ZydEXx019bm+k+Nypejg0pA2Zu/GA6vUXApf+eBsluTkmH/Z/p5DY/88KV1KMZlwwO9ior0PtMbLple3cimQid3GXcOaRObSovRX96TUSum6h6L+pq/ixi9PyOvQKfLgWNjmSHZ403KufmnpVY5ZnNBkqakk3kPKx6dmHYSTzeJ5c/lBtE5k+ONzRxg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4965.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(376002)(346002)(136003)(396003)(366004)(230922051799003)(64100799003)(186009)(451199024)(1800799012)(41300700001)(2616005)(6506007)(53546011)(6512007)(26005)(83380400001)(6666004)(8676002)(8936002)(4326008)(5660300002)(6486002)(478600001)(316002)(6916009)(54906003)(66476007)(66556008)(31696002)(66946007)(86362001)(82960400001)(38100700002)(31686004)(2906002)(36756003)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TDc5ZEJLeVFZVzlReDQ0TmM2UzZucyt2cHFrcGtGUVVpMmRMNXkySTErN3hH?=
- =?utf-8?B?Vit0UitoRVJCYTZvTWJrUVF2T2VGSWpPcklaWVlnS3VsV1BhSXVGS05OTXVm?=
- =?utf-8?B?c0U4VkRsQVI1Zmw1UWlYUXI4ZUluL24vYnhVeUJjem5wbUZzdkxIQkhpTU45?=
- =?utf-8?B?OHNDZHdsY3hQRngzakZURWsxMkc5ODUxMGFCQU1jSGZETWRGS1dHT2FZRE0x?=
- =?utf-8?B?d3c2aHJlQlZjV1dtRGNiay9XdFZwQUdOcG5pOHdoaC92d2owYnBrcElLZktS?=
- =?utf-8?B?VEZqbDF3cDhxTUFOeTB4a0cxQTk1NkZnOHMxb3krTHFMbnB5QmdYQ0pWdWpI?=
- =?utf-8?B?elZWSS95bHBDdmRYUXJsdEpKMlM1UmF0RXlxTFRrZWl2WkZYYzY2ckl3MzB6?=
- =?utf-8?B?VXhFakVvM2tkVUE1OEwwSEpaOTFrZ2F4czRYYmtrSkZGeVVLSHNwRjJKcVdP?=
- =?utf-8?B?QlNtT0JNc0RseWhHYWhpeU1GTE45cE5sbVJKMHE1YXBzL2FzSWhJR3k4WkNX?=
- =?utf-8?B?Z0NMaVlhWjlhQ2JDTUZGOStSSXNYZEVBZi8yQTM5RkJQb0dlNHpxMGU0dVd2?=
- =?utf-8?B?OHp6alhKeVFzalA3d1RXTWsyUWZSRUpXNW13ZHJWQ0NnTUcreFl1TFZhc3pj?=
- =?utf-8?B?T2orMnRDNEg2ank5cUFqRE5rSEZxVndGTTRlcm56ckJZS3Y3N3ptUkc4RXFs?=
- =?utf-8?B?ZDdsZGo5WWg2Y0ZXbmZ0dDJLZFNNMXREM1JrRThib1UyVWV6cHRRaDczYjR6?=
- =?utf-8?B?UDBGUms0TUJNdE1rT2JXZ2xmQmV3eHo4UmR0d3R4Z2Z4bWxwUWlqQURNb2p1?=
- =?utf-8?B?QWRxWk0ySjgxY3FJS0VvZ3N0RFdzQldudWZrZ2praGt5TmFYWk8vVmZOeEM2?=
- =?utf-8?B?N1Vad3ozZWhiS0VZaHNHanRyVjRVVkZtOUVENzk4ZHB0UzRxdndabzVJbkpH?=
- =?utf-8?B?bEFnSjJBNEtiTXpGR0xkYVEzS0h1K1cvUHh1VGtvNXRBMTVjajhFUHluVURQ?=
- =?utf-8?B?QTRVbDRKc1ZGelptZTFTTlZkVnpCRTQ1eW0zbWFuaDltVzR5ZzZMbk5QRW1B?=
- =?utf-8?B?OWpIQURCUU9scTkzK0lMT1RiNUJqRnNOaVU2VDJ5RjZ2NU02ZEtVZ0Fvekl6?=
- =?utf-8?B?Qk9STkFwbk9zR2xQellhVXhKb2FocVVRVUUwTTllQmhpL3lSOEI2YStTZ0dI?=
- =?utf-8?B?TjdtaCtpa2RJdUl5SmFBT1pxMlJPenJNUUQ1VnkrbGRGNjhmenZDQ21MVEF2?=
- =?utf-8?B?S1dGdDRhV1AvQzk5MUFnaitWMUx5VzlqK1ZFeTdaM05Xbk11eVFpaVl3Q21k?=
- =?utf-8?B?ZXdha3JCOXkvclVFakpONTlmOW1LV2VHWXl5SHFLOEJVU1M0aEhHcklqYStM?=
- =?utf-8?B?MEZTRDA5TWV5U1lXSTVUYjluNkFSbWd3Tmp6ZjRVOVY4S3ZGcUkrejQ5UG8w?=
- =?utf-8?B?U3htaEoxQSt1QnZCY3VQMm0ra2Zac1QyVkg4dG9wVEhIRHRZOVVaQTZZUzRu?=
- =?utf-8?B?RE10d3JqWjdoL01uVFdVemZnU2luZ3I0ZHpmbWdSdVhKRU02SVB3RE1PKzda?=
- =?utf-8?B?NjZZNE5jUmtnakJRNmtTNE1KQmgxUTlkTWZPb1ovSTBlMzF0Z1VOaHdCM0ZO?=
- =?utf-8?B?OTRVNGdWTEF6VnYzKzlLVmt3Q0tpWDRRYWJha3hYVmJrY0NXd0t3enFIU1R3?=
- =?utf-8?B?VVVweDBIbGpSM1lkYWVWQTZkSkhzemh0WUJHQm5xMWRMYmxCbWltQWd0dDVp?=
- =?utf-8?B?OERhV3FvRHQzUGNRWWNVU1c5MGxjbHlEUmw0dW1lYnlXVmFxeVhYNmlYRUFi?=
- =?utf-8?B?aGhZbUVZZ1pFMzlONndMYnhHbGd2cTNTc1c2S3kxdVZIRWx3cTBKckRYWkxn?=
- =?utf-8?B?WWhBZjdHZThEQ0JNM0RFWDJwQ2dGaW94c3BzS09VcTdDS1orQisydjZYQnYw?=
- =?utf-8?B?SER4OUN5OUdKV3JkaGRab2drdSttYUF3TndjT3dOc01Mcy9JNFVubURMK0tj?=
- =?utf-8?B?ajF1cTE0dDZ4emVDeVNnbzFheVdnTC9rbkl6dHpyc2FCbC8ySTc2SE5lb1Jz?=
- =?utf-8?B?MlNOMGc0VWhEbVBHNEIzVDVmY1U4dDYwYUkzeWRCazZlaTJxV3d3TVIwV29Q?=
- =?utf-8?B?MzRWOW5BS2p5cm0xQzliZXRNVmxUdy9NOStQNWJRVXROb0h2ZWYwdmdDL040?=
- =?utf-8?B?UVE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: f51078fd-5d57-4929-1a1a-08dc20724b42
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4965.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jan 2024 02:30:44.3603
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: IC21eP+Mw5cWv67FolprjgEK+J6vpgZcQKUryItUt+xk5UndAxkemDGfjQIUYUG/RQs6ACxqGQcd3TBqMmv3Qg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB8318
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 9/20/2023 11:44 PM, Paolo Bonzini wrote:
-> On Thu, Sep 14, 2023 at 4:55 AM Yang Weijiang <weijiang.yang@intel.com> wrote:
->> CET KVM series causes sereral test cases fail due to:
->> 1) New introduced constraints between CR0.WP and CR4.CET bits, i.e., setting
->>   CR4.CET == 1 fails if CR0.WP == 0, and setting CR0.WP == 0 fails if CR4.CET
->> == 1
->> 2) New introduced support of VMX_BASIC[bit56], i.e., skipping HW consistent
->> check for event error code if the bit is set.
-> Queued, thanks.
+On Mon, 29 Jan 2024 10:24:00 +0800
+liulongfang <liulongfang@huawei.com> wrote:
 
-Hi, Paolo,
-I don't find the fixup patches in this series merged in kvm-unit-tests, could you double check?
-Thanks!
+> On 2024/1/26 6:38, Alex Williamson wrote:
+> > On Thu, 25 Jan 2024 16:10:30 +0800
+> > Longfang Liu <liulongfang@huawei.com> wrote:
+> >   
+> >> On the debugfs framework of VFIO, if the CONFIG_VFIO_DEBUGFS macro is
+> >> enabled, the debug function is registered for the live migration driver
+> >> of the HiSilicon accelerator device.
+> >>
+> >> After registering the HiSilicon accelerator device on the debugfs
+> >> framework of live migration of vfio, a directory file "hisi_acc"
+> >> of debugfs is created, and then three debug function files are
+> >> created in this directory:
+> >>
+> >>    vfio
+> >>     |
+> >>     +---<dev_name1>
+> >>     |    +---migration
+> >>     |        +--state
+> >>     |        +--hisi_acc
+> >>     |            +--attr
+> >>     |            +--data
+> >>     |            +--save
+> >>     |            +--cmd_state
+> >>     |
+> >>     +---<dev_name2>
+> >>          +---migration
+> >>              +--state
+> >>              +--hisi_acc
+> >>                  +--attr
+> >>                  +--data
+> >>                  +--save
+> >>                  +--cmd_state
+> >>
+> >> data file: used to get the migration data from the driver
+> >> attr file: used to get device attributes parameters from the driver
+> >> save file: used to read the data of the live migration device and save
+> >> it to the driver.
+> >> cmd_state: used to get the cmd channel state for the device.
+> >>
+> >> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+> >> ---
+> >>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 190 ++++++++++++++++++
+> >>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |   5 +
+> >>  2 files changed, 195 insertions(+)
+> >>
+> >> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+> >> index 5f6e01571a7b..2cbbc52b7377 100644
+> >> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+> >> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+> >> @@ -15,6 +15,7 @@
+> >>  #include <linux/anon_inodes.h>
+> >>  
+> >>  #include "hisi_acc_vfio_pci.h"
+> >> +#include "../../vfio.h"
+> >>  
+> >>  /* Return 0 on VM acc device ready, -ETIMEDOUT hardware timeout */
+> >>  static int qm_wait_dev_not_ready(struct hisi_qm *qm)
+> >> @@ -617,6 +618,18 @@ hisi_acc_check_int_state(struct hisi_acc_vf_core_device *hisi_acc_vdev)
+> >>  	}
+> >>  }
+> >>  
+> >> +static void hisi_acc_vf_migf_save(struct hisi_acc_vf_migration_file *dst_migf,
+> >> +	struct hisi_acc_vf_migration_file *src_migf)
+> >> +{
+> >> +	if (!dst_migf)
+> >> +		return;
+> >> +
+> >> +	dst_migf->disabled = false;
+> >> +	dst_migf->total_length = src_migf->total_length;
+> >> +	memcpy(&dst_migf->vf_data, &src_migf->vf_data,
+> >> +		    sizeof(struct acc_vf_data));
+> >> +}
+> >> +
+> >>  static void hisi_acc_vf_disable_fd(struct hisi_acc_vf_migration_file *migf)
+> >>  {
+> >>  	mutex_lock(&migf->lock);
+> >> @@ -629,12 +642,16 @@ static void hisi_acc_vf_disable_fd(struct hisi_acc_vf_migration_file *migf)
+> >>  static void hisi_acc_vf_disable_fds(struct hisi_acc_vf_core_device *hisi_acc_vdev)
+> >>  {
+> >>  	if (hisi_acc_vdev->resuming_migf) {
+> >> +		hisi_acc_vf_migf_save(hisi_acc_vdev->debug_migf,
+> >> +						hisi_acc_vdev->resuming_migf);
+> >>  		hisi_acc_vf_disable_fd(hisi_acc_vdev->resuming_migf);
+> >>  		fput(hisi_acc_vdev->resuming_migf->filp);
+> >>  		hisi_acc_vdev->resuming_migf = NULL;
+> >>  	}
+> >>  
+> >>  	if (hisi_acc_vdev->saving_migf) {
+> >> +		hisi_acc_vf_migf_save(hisi_acc_vdev->debug_migf,
+> >> +						hisi_acc_vdev->saving_migf);
+> >>  		hisi_acc_vf_disable_fd(hisi_acc_vdev->saving_migf);
+> >>  		fput(hisi_acc_vdev->saving_migf->filp);
+> >>  		hisi_acc_vdev->saving_migf = NULL;
+> >> @@ -1175,6 +1192,7 @@ static int hisi_acc_vf_qm_init(struct hisi_acc_vf_core_device *hisi_acc_vdev)
+> >>  	if (!vf_qm->io_base)
+> >>  		return -EIO;
+> >>  
+> >> +	mutex_init(&hisi_acc_vdev->enable_mutex);
+> >>  	vf_qm->fun_type = QM_HW_VF;
+> >>  	vf_qm->pdev = vf_dev;
+> >>  	mutex_init(&vf_qm->mailbox_lock);
+> >> @@ -1325,6 +1343,172 @@ static long hisi_acc_vfio_pci_ioctl(struct vfio_device *core_vdev, unsigned int
+> >>  	return vfio_pci_core_ioctl(core_vdev, cmd, arg);
+> >>  }
+> >>  
+> >> +static int hisi_acc_vf_debug_check(struct seq_file *seq, struct vfio_device *vdev)
+> >> +{
+> >> +	struct hisi_acc_vf_core_device *hisi_acc_vdev = hisi_acc_get_vf_dev(vdev);
+> >> +	struct hisi_acc_vf_migration_file *migf = hisi_acc_vdev->debug_migf;
+> >> +
+> >> +	if (!vdev->mig_ops || !migf) {
+> >> +		seq_printf(seq, "%s\n", "device does not support live migration!");
+> >> +		return -EINVAL;
+> >> +	}
+> >> +
+> >> +	/**
+> >> +	 * When the device is not opened, the io_base is not mapped.
+> >> +	 * The driver cannot perform device read and write operations.
+> >> +	 */
+> >> +	if (!vdev->open_count) {
+> >> +		seq_printf(seq, "%s\n", "device not opened!");
+> >> +		return -EINVAL;
+> >> +	}  
+> > 
+> > This is racy, this check could occur while the user is already closing
+> > the device and vfio_df_device_last_close() may have already iounmap'd
+> > the io_base.  Only after that is open_count decremented.  The debugfs
+> > interfaces would then proceed to access the unmapped space.  The
+> > enable_mutex is entirely ineffective (and also asymmetric, initialized
+> > in the open_device path but never destroyed).
+> > 
+> > In fact, the enable_mutex really only seems to be trying to protect
+> > io_base (which it doesn't do), meanwhile the core driver execution path
+> > can run concurrently to debugfs operations with no serialization.  It
+> > looks like these operations would step on each other.
+> >  
+> 
+> Yes, this enable_mutex is used to protect io_base. It prevents debugfs
+> from being used after executing iounmap in io_base.
+> 
+> > I think you might need an atomic to guard against io_base unmapping and
+> > then maybe a mutex or semaphore to avoid debugfs accesses from
+> > interfering with the actual core logic interacting with the device.
+> > Thanks,
+> >  
+> 
+> OK An atomic variable needs to be added to replace vdev->open_count to prevent
+> competition. And use enable_mutex to prevent io_base from being released early.
 
->
-> Paolo
->
->> Opportunistically rename related struct and variable to avoid confusion.
->>
->> Yang Weijiang (3):
->>    x86: VMX: Exclude CR4.CET from the test_vmxon_bad_cr()
->>    x86: VMX: Rename union vmx_basic and related global variable
->>    x86:VMX: Introduce new vmx_basic MSR feature bit for vmx tests
->>
->>   x86/vmx.c       | 46 +++++++++++++++++++++++-----------------------
->>   x86/vmx.h       |  7 ++++---
->>   x86/vmx_tests.c | 31 ++++++++++++++++++++++---------
->>   3 files changed, 49 insertions(+), 35 deletions(-)
->>
->> --
->> 2.27.0
->>
+That's not what I'm suggesting, open_count is safe in the core code, it
+doesn't need to be an atomic.  Your use of it is unsafe.  enable_mutex
+doesn't protect what it intends to protect.  Thanks,
+
+Alex
+
+> >> +	return 0;
+> >> +}
+> >> +
+> >> +static int hisi_acc_vf_debug_cmd(struct seq_file *seq, void *data)
+> >> +{
+> >> +	struct device *vf_dev = seq->private;
+> >> +	struct vfio_pci_core_device *core_device = dev_get_drvdata(vf_dev);
+> >> +	struct vfio_device *vdev = &core_device->vdev;
+> >> +	struct hisi_acc_vf_core_device *hisi_acc_vdev = hisi_acc_get_vf_dev(vdev);
+> >> +	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
+> >> +	u64 value;
+> >> +	int ret;
+> >> +
+> >> +	ret = hisi_acc_vf_debug_check(seq, vdev);
+> >> +	if (ret)
+> >> +		return 0;
+> >> +
+> >> +	mutex_lock(&hisi_acc_vdev->enable_mutex);
+> >> +	ret = qm_wait_dev_not_ready(vf_qm);
+> >> +	if (ret) {
+> >> +		mutex_unlock(&hisi_acc_vdev->enable_mutex);
+> >> +		seq_printf(seq, "%s\n", "VF device not ready!");
+> >> +		return 0;
+> >> +	}
+> >> +
+> >> +	value = readl(vf_qm->io_base + QM_MB_CMD_SEND_BASE);
+> >> +	mutex_unlock(&hisi_acc_vdev->enable_mutex);
+> >> +	seq_printf(seq, "%s:0x%llx\n", "mailbox cmd channel state is OK", value);
+> >> +
+> >> +	return 0;
+> >> +}
+> >> +
+> >> +static int hisi_acc_vf_debug_save(struct seq_file *seq, void *data)
+> >> +{
+> >> +	struct device *vf_dev = seq->private;
+> >> +	struct vfio_pci_core_device *core_device = dev_get_drvdata(vf_dev);
+> >> +	struct vfio_device *vdev = &core_device->vdev;
+> >> +	struct hisi_acc_vf_core_device *hisi_acc_vdev = hisi_acc_get_vf_dev(vdev);
+> >> +	struct hisi_acc_vf_migration_file *migf = hisi_acc_vdev->debug_migf;
+> >> +	int ret;
+> >> +
+> >> +	ret = hisi_acc_vf_debug_check(seq, vdev);
+> >> +	if (ret)
+> >> +		return 0;
+> >> +
+> >> +	mutex_lock(&hisi_acc_vdev->enable_mutex);
+> >> +	ret = vf_qm_state_save(hisi_acc_vdev, migf);
+> >> +	if (ret) {
+> >> +		mutex_unlock(&hisi_acc_vdev->enable_mutex);
+> >> +		seq_printf(seq, "%s\n", "failed to save device data!");
+> >> +		return 0;
+> >> +	}
+> >> +	mutex_unlock(&hisi_acc_vdev->enable_mutex);
+> >> +	seq_printf(seq, "%s\n", "successful to save device data!");
+> >> +
+> >> +	return 0;
+> >> +}
+> >> +
+> >> +static int hisi_acc_vf_data_read(struct seq_file *seq, void *data)
+> >> +{
+> >> +	struct device *vf_dev = seq->private;
+> >> +	struct vfio_pci_core_device *core_device = dev_get_drvdata(vf_dev);
+> >> +	struct vfio_device *vdev = &core_device->vdev;
+> >> +	struct hisi_acc_vf_core_device *hisi_acc_vdev = hisi_acc_get_vf_dev(vdev);
+> >> +	struct hisi_acc_vf_migration_file *debug_migf = hisi_acc_vdev->debug_migf;
+> >> +	size_t vf_data_sz = offsetofend(struct acc_vf_data, padding);
+> >> +
+> >> +	if (debug_migf && debug_migf->total_length)
+> >> +		seq_hex_dump(seq, "Mig Data:", DUMP_PREFIX_OFFSET, 16, 1,
+> >> +				(unsigned char *)&debug_migf->vf_data,
+> >> +				vf_data_sz, false);
+> >> +	else
+> >> +		seq_printf(seq, "%s\n", "device not migrated!");
+> >> +
+> >> +	return 0;
+> >> +}
+> >> +
+> >> +static int hisi_acc_vf_attr_read(struct seq_file *seq, void *data)
+> >> +{
+> >> +	struct device *vf_dev = seq->private;
+> >> +	struct vfio_pci_core_device *core_device = dev_get_drvdata(vf_dev);
+> >> +	struct vfio_device *vdev = &core_device->vdev;
+> >> +	struct hisi_acc_vf_core_device *hisi_acc_vdev = hisi_acc_get_vf_dev(vdev);
+> >> +	struct hisi_acc_vf_migration_file *debug_migf = hisi_acc_vdev->debug_migf;
+> >> +
+> >> +	if (debug_migf && debug_migf->total_length) {
+> >> +		seq_printf(seq,
+> >> +			 "acc device:\n"
+> >> +			 "device  state: %d\n"
+> >> +			 "device  ready: %u\n"
+> >> +			 "data    valid: %d\n"
+> >> +			 "data     size: %lu\n",
+> >> +			 hisi_acc_vdev->mig_state,
+> >> +			 hisi_acc_vdev->vf_qm_state,
+> >> +			 debug_migf->disabled,
+> >> +			 debug_migf->total_length);
+> >> +	} else {
+> >> +		seq_printf(seq, "%s\n", "device not migrated!");
+> >> +	}
+> >> +
+> >> +	return 0;
+> >> +}
+> >> +
+> >> +static int hisi_acc_vfio_debug_init(struct hisi_acc_vf_core_device *hisi_acc_vdev)
+> >> +{
+> >> +	struct vfio_device *vdev = &hisi_acc_vdev->core_device.vdev;
+> >> +	struct dentry *vfio_dev_migration = NULL;
+> >> +	struct dentry *vfio_hisi_acc = NULL;
+> >> +	struct device *dev = vdev->dev;
+> >> +	void *migf = NULL;
+> >> +
+> >> +	if (!debugfs_initialized())
+> >> +		return 0;
+> >> +
+> >> +	migf = kzalloc(sizeof(struct hisi_acc_vf_migration_file), GFP_KERNEL);
+> >> +	if (!migf)
+> >> +		return -ENOMEM;
+> >> +	hisi_acc_vdev->debug_migf = migf;
+> >> +
+> >> +	vfio_dev_migration = debugfs_lookup("migration", vdev->debug_root);
+> >> +	if (!vfio_dev_migration) {
+> >> +		kfree(migf);
+> >> +		dev_err(dev, "failed to lookup migration debugfs file!\n");
+> >> +		return -ENODEV;
+> >> +	}
+> >> +
+> >> +	vfio_hisi_acc = debugfs_create_dir("hisi_acc", vfio_dev_migration);
+> >> +	debugfs_create_devm_seqfile(dev, "data", vfio_hisi_acc,
+> >> +				  hisi_acc_vf_data_read);
+> >> +	debugfs_create_devm_seqfile(dev, "attr", vfio_hisi_acc,
+> >> +				  hisi_acc_vf_attr_read);
+> >> +	debugfs_create_devm_seqfile(dev, "cmd_state", vfio_hisi_acc,
+> >> +				  hisi_acc_vf_debug_cmd);
+> >> +	debugfs_create_devm_seqfile(dev, "save", vfio_hisi_acc,
+> >> +				  hisi_acc_vf_debug_save);
+> >> +
+> >> +	return 0;
+> >> +}
+> >> +
+> >> +static void hisi_acc_vf_debugfs_exit(struct hisi_acc_vf_core_device *hisi_acc_vdev)
+> >> +{
+> >> +	if (!debugfs_initialized())
+> >> +		return;
+> >> +
+> >> +	kfree(hisi_acc_vdev->debug_migf);
+> >> +}
+> >> +
+> >>  static int hisi_acc_vfio_pci_open_device(struct vfio_device *core_vdev)
+> >>  {
+> >>  	struct hisi_acc_vf_core_device *hisi_acc_vdev = hisi_acc_get_vf_dev(core_vdev);
+> >> @@ -1353,7 +1537,9 @@ static void hisi_acc_vfio_pci_close_device(struct vfio_device *core_vdev)
+> >>  	struct hisi_acc_vf_core_device *hisi_acc_vdev = hisi_acc_get_vf_dev(core_vdev);
+> >>  	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
+> >>  
+> >> +	mutex_lock(&hisi_acc_vdev->enable_mutex);
+> >>  	iounmap(vf_qm->io_base);
+> >> +	mutex_unlock(&hisi_acc_vdev->enable_mutex);
+> >>  	vfio_pci_core_close_device(core_vdev);
+> >>  }
+> >>  
+> >> @@ -1444,6 +1630,9 @@ static int hisi_acc_vfio_pci_probe(struct pci_dev *pdev, const struct pci_device
+> >>  	ret = vfio_pci_core_register_device(&hisi_acc_vdev->core_device);
+> >>  	if (ret)
+> >>  		goto out_put_vdev;
+> >> +
+> >> +	if (ops == &hisi_acc_vfio_pci_migrn_ops)
+> >> +		hisi_acc_vfio_debug_init(hisi_acc_vdev);
+> >>  	return 0;
+> >>  
+> >>  out_put_vdev:
+> >> @@ -1456,6 +1645,7 @@ static void hisi_acc_vfio_pci_remove(struct pci_dev *pdev)
+> >>  	struct hisi_acc_vf_core_device *hisi_acc_vdev = hisi_acc_drvdata(pdev);
+> >>  
+> >>  	vfio_pci_core_unregister_device(&hisi_acc_vdev->core_device);
+> >> +	hisi_acc_vf_debugfs_exit(hisi_acc_vdev);
+> >>  	vfio_put_device(&hisi_acc_vdev->core_device.vdev);
+> >>  }
+> >>  
+> >> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+> >> index c58fc5861492..38327b97d535 100644
+> >> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+> >> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+> >> @@ -116,5 +116,10 @@ struct hisi_acc_vf_core_device {
+> >>  	spinlock_t reset_lock;
+> >>  	struct hisi_acc_vf_migration_file *resuming_migf;
+> >>  	struct hisi_acc_vf_migration_file *saving_migf;
+> >> +
+> >> +	/* To make sure the device is enabled */
+> >> +	struct mutex enable_mutex;
+> >> +	/* For debugfs */
+> >> +	struct hisi_acc_vf_migration_file *debug_migf;
+> >>  };
+> >>  #endif /* HISI_ACC_VFIO_PCI_H */  
+> > 
+> > .
+> >   
+> 
 
 
