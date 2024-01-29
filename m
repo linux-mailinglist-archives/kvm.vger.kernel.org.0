@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-7325-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7328-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F007840465
-	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 12:57:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4176184046E
+	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 12:58:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F34311F22B64
-	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 11:57:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC9632811AE
+	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 11:58:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC13760275;
-	Mon, 29 Jan 2024 11:56:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C33A860DC7;
+	Mon, 29 Jan 2024 11:56:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="nBMoaWfX"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="arNqT//g"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DD7F60868;
-	Mon, 29 Jan 2024 11:56:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E753605DC;
+	Mon, 29 Jan 2024 11:56:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706529401; cv=none; b=QxppGypOcBgCcthXfs1S5v8mQlYOjVanEUrBL0YS0asJFa1nLhks6gLhxmWE/LsyIaCrKTm8TpWwMvWWSV38arIKEIJm837smcEQQJFtfOp/utbU1zJltzf4wYuMNlxwJgWhTZFvoZo/Fj1BD3NblVHWUbKWJbAE5CahPlF2Rdg=
+	t=1706529404; cv=none; b=fVwahkxgGR2sFzgftJtFdpgJckXoPPyemU6c7Z5JRPzHeSFuH3t1AeW8udEA9o5nk73uW6UcvVMQLCJW8JEc4mdVhCEhFjFVzFAsHdKVlhDFd+A4RLpu9qcjZty3PPvFzvntsqoSFEhPZekE/b8TZPl7V4t98D3mDiIEPZtBjRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706529401; c=relaxed/simple;
-	bh=xi7YP0n2K4yFSd2jqDSsLMpbqfYwHLVWBJxbmKyKXX8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=MlNLfinyUCPovoCx3FGPbcrMMfjZCy97SXTbABqIC3vbETiYSjxglT7eoQK+Nj1yG5ohNF0luF5zK+vLvJfWJrmyObue5hrtq/Nbx5wxFw1o/8fe+4dNXPj86FEsm8nHg+Fm6k5LH/TN7A05zq7ZZ9B0ejwwGFJ1Xicy1n7E2AA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=nBMoaWfX; arc=none smtp.client-ip=205.220.165.32
+	s=arc-20240116; t=1706529404; c=relaxed/simple;
+	bh=itAGpoK1GE+qY997zBIODkztrKLK1F0Hodm4YM3X5T0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=cvWPcG8UiDBgHMKjZUoP95X5oqhW7jlUEBLPvuKVFV3Y+0d09J/oiabwfJhE2iGEe6+Wdn+d9F+1+eXWFkTfoU8bueqGCKoMJIZZ3CwERXpusfih5AywbPxpQW4j0BLB4cGQT5xmYsFiX1aTbrKv/o1KxpjYl33A/Fu2WH31ZtU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=arNqT//g; arc=none smtp.client-ip=205.220.177.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40T9iRll015940;
+Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40T9hsTD018229;
 	Mon, 29 Jan 2024 11:55:54 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references; s=corp-2023-11-20;
- bh=Z9qDnSm8OWwlAaxt9Fnk40RHUt26ekA0qcYXgbx3N2g=;
- b=nBMoaWfXQOwOo7LbAMW6V8tOZKPfKrMMieXrkRf1tVlkxeRGf+Ix4EAEakx03U3o109q
- JpXuiv/8jSZ0UCmYCglo2kw1RiCn254trrQpD+QpL7xXsa8hS11NRB+AQsY68lTDy1Jm
- qAmkDThI4QgLMZgrBudZn0G9A+thCt4FPPrrDXz4BDi2NTQVdOxPpsn2cTOEMRHMzZO+
- eJqshjbeN7f/BKbK7om5XpginGKJPABrl6K7oTK+JgRtUFjtk4DF0H8u9YYbFr2ZPMVX
- 6IV6Eo0DeF3RLg3XNoiI/DO/jZuwL7Z6c61Ng7/mMvC+t7neBlNGj9h7zD04scWhRtGx 6g== 
+ bh=EiyJUqJjlxAaUjUeSMA2TvLUIS1owYlx58/mzyn6NjU=;
+ b=arNqT//ghWxXIuUihHPtvfaNklTxZwqfzPzF9UwxhvXiZ7FwS+keRXH72XCbMkHCI69D
+ XLVwam4xPoPEd5q4foa1Q48soG7hN4la/eVwvFMvQizvjHPpEaCVTF6nzfWn+aRdKqbQ
+ Cc5JWWmeY8YBBRwLcr+NdxVPZspqaZGeev+S4FZDJKJajoSWweOWZOSwoUYD97u+2Sv6
+ pnajQkOr8W8L+cOd53Ku4MngAEyd1bSGjM7XPj9yNJTvmoajQVOfZgHlLCUg+rw/9/WE
+ o84xCLuB9zmqrobMnksn37hK8rc/1Z+ZMnnw4F8e2/+L3tTLys5r0nKj+yA1INmAXydB Cw== 
 Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3vvtcuukg6-1
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3vvr8ebmnx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 29 Jan 2024 11:55:54 +0000
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 40TA9Dw1035385;
+	Mon, 29 Jan 2024 11:55:53 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3vvr9bhcwd-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
 	Mon, 29 Jan 2024 11:55:53 +0000
-Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 40TBEgP0035372;
-	Mon, 29 Jan 2024 11:55:52 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3vvr9bhcvv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 29 Jan 2024 11:55:52 +0000
 Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 40TBtni6038181;
-	Mon, 29 Jan 2024 11:55:51 GMT
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 40TBtni8038181;
+	Mon, 29 Jan 2024 11:55:52 GMT
 Received: from mihai.localdomain (ban25x6uut25.us.oracle.com [10.153.73.25])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3vvr9bhcty-2;
-	Mon, 29 Jan 2024 11:55:51 +0000
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3vvr9bhcty-3;
+	Mon, 29 Jan 2024 11:55:52 +0000
 From: Mihai Carabas <mihai.carabas@oracle.com>
 To: linux-arm-kernel@lists.infradead.org
 Cc: kvm@vger.kernel.org, linux-pm@vger.kernel.org,
@@ -70,9 +70,9 @@ Cc: kvm@vger.kernel.org, linux-pm@vger.kernel.org,
         joao.m.martins@oracle.com, juerg.haefliger@canonical.com,
         mic@digikod.net, mihai.carabas@oracle.com, arnd@arndb.de,
         ankur.a.arora@oracle.com
-Subject: [PATCH v3 1/7] x86: Move ARCH_HAS_CPU_RELAX to arch
-Date: Mon, 29 Jan 2024 12:40:28 +0200
-Message-Id: <1706524834-11275-2-git-send-email-mihai.carabas@oracle.com>
+Subject: [PATCH v3 2/7] x86/kvm: Move haltpoll_want() to be arch defined
+Date: Mon, 29 Jan 2024 12:40:29 +0200
+Message-Id: <1706524834-11275-3-git-send-email-mihai.carabas@oracle.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1706524834-11275-1-git-send-email-mihai.carabas@oracle.com>
 References: <1706524834-11275-1-git-send-email-mihai.carabas@oracle.com>
@@ -80,11 +80,11 @@ X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2024-01-29_06,2024-01-29_01,2023-05-22_02
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 bulkscore=0 spamscore=0
- phishscore=0 adultscore=0 mlxlogscore=999 suspectscore=0 mlxscore=0
+ phishscore=0 adultscore=0 mlxlogscore=990 suspectscore=0 mlxscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
  definitions=main-2401290086
-X-Proofpoint-ORIG-GUID: TIDgASBHJXYtnPx3Vf4e7156qe29GyW2
-X-Proofpoint-GUID: TIDgASBHJXYtnPx3Vf4e7156qe29GyW2
+X-Proofpoint-ORIG-GUID: hbq0cf4vkgAmdyc6X0UvdpumIXbsXutW
+X-Proofpoint-GUID: hbq0cf4vkgAmdyc6X0UvdpumIXbsXutW
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -93,53 +93,94 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 
 From: Joao Martins <joao.m.martins@oracle.com>
 
-ARM64 is going to use it for haltpoll support (for poll-state)
-so move the definition to be arch-agnostic and allow architectures
-to override it.
+Right now, kvm_para_has_hint(KVM_HINTS_REALTIME) is x86 only, and so in the
+pursuit of making cpuidle-haltpoll arch independent, move the check for
+haltpoll enablement to be defined per architecture. Same thing for
+boot_option_idle_override. To that end, add a arch_haltpoll_want() and move the
+check there.
 
 Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
+Signed-off-by: Ankur Arora <ankur.a.arora@oracle.com>
 Signed-off-by: Mihai Carabas <mihai.carabas@oracle.com>
+Acked-by: Rafael J. Wysocki <rafael@kernel.org>
 ---
- arch/Kconfig     | 3 +++
- arch/x86/Kconfig | 4 +---
- 2 files changed, 4 insertions(+), 3 deletions(-)
+ arch/x86/include/asm/cpuidle_haltpoll.h |  1 +
+ arch/x86/kernel/kvm.c                   | 10 ++++++++++
+ drivers/cpuidle/cpuidle-haltpoll.c      |  8 ++------
+ include/linux/cpuidle_haltpoll.h        |  5 +++++
+ 4 files changed, 18 insertions(+), 6 deletions(-)
 
-diff --git a/arch/Kconfig b/arch/Kconfig
-index 12d51495caec..626ddd9ba7e0 100644
---- a/arch/Kconfig
-+++ b/arch/Kconfig
-@@ -1371,6 +1371,9 @@ config RELR
- config ARCH_HAS_MEM_ENCRYPT
- 	bool
+diff --git a/arch/x86/include/asm/cpuidle_haltpoll.h b/arch/x86/include/asm/cpuidle_haltpoll.h
+index c8b39c6716ff..2c5a53ce266f 100644
+--- a/arch/x86/include/asm/cpuidle_haltpoll.h
++++ b/arch/x86/include/asm/cpuidle_haltpoll.h
+@@ -4,5 +4,6 @@
  
-+config ARCH_HAS_CPU_RELAX
-+	bool
+ void arch_haltpoll_enable(unsigned int cpu);
+ void arch_haltpoll_disable(unsigned int cpu);
++bool arch_haltpoll_want(void);
+ 
+ #endif
+diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+index b8ab9ee5896c..2ba12da13fc1 100644
+--- a/arch/x86/kernel/kvm.c
++++ b/arch/x86/kernel/kvm.c
+@@ -1149,4 +1149,14 @@ void arch_haltpoll_disable(unsigned int cpu)
+ 	smp_call_function_single(cpu, kvm_enable_host_haltpoll, NULL, 1);
+ }
+ EXPORT_SYMBOL_GPL(arch_haltpoll_disable);
 +
- config ARCH_HAS_CC_PLATFORM
- 	bool
++bool arch_haltpoll_want(void)
++{
++	/* Do not load haltpoll if idle= is passed */
++	if (boot_option_idle_override != IDLE_NO_OVERRIDE)
++		return false;
++
++	return kvm_para_has_hint(KVM_HINTS_REALTIME);
++}
++EXPORT_SYMBOL_GPL(arch_haltpoll_want);
+ #endif
+diff --git a/drivers/cpuidle/cpuidle-haltpoll.c b/drivers/cpuidle/cpuidle-haltpoll.c
+index e66df22f9695..72f9c84990c5 100644
+--- a/drivers/cpuidle/cpuidle-haltpoll.c
++++ b/drivers/cpuidle/cpuidle-haltpoll.c
+@@ -96,7 +96,7 @@ static void haltpoll_uninit(void)
  
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index 66bfabae8814..aaca90ba791a 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -72,6 +72,7 @@ config X86
- 	select ARCH_HAS_CACHE_LINE_SIZE
- 	select ARCH_HAS_CPU_CACHE_INVALIDATE_MEMREGION
- 	select ARCH_HAS_CPU_FINALIZE_INIT
-+	select ARCH_HAS_CPU_RELAX
- 	select ARCH_HAS_CURRENT_STACK_POINTER
- 	select ARCH_HAS_DEBUG_VIRTUAL
- 	select ARCH_HAS_DEBUG_VM_PGTABLE	if !X86_PAE
-@@ -363,9 +364,6 @@ config ARCH_MAY_HAVE_PC_FDC
- config GENERIC_CALIBRATE_DELAY
- 	def_bool y
+ static bool haltpoll_want(void)
+ {
+-	return kvm_para_has_hint(KVM_HINTS_REALTIME) || force;
++	return (kvm_para_available() && arch_haltpoll_want()) || force;
+ }
  
--config ARCH_HAS_CPU_RELAX
--	def_bool y
+ static int __init haltpoll_init(void)
+@@ -104,11 +104,7 @@ static int __init haltpoll_init(void)
+ 	int ret;
+ 	struct cpuidle_driver *drv = &haltpoll_driver;
+ 
+-	/* Do not load haltpoll if idle= is passed */
+-	if (boot_option_idle_override != IDLE_NO_OVERRIDE)
+-		return -ENODEV;
 -
- config ARCH_HIBERNATION_POSSIBLE
- 	def_bool y
+-	if (!kvm_para_available() || !haltpoll_want())
++	if (!haltpoll_want())
+ 		return -ENODEV;
  
+ 	cpuidle_poll_state_init(drv);
+diff --git a/include/linux/cpuidle_haltpoll.h b/include/linux/cpuidle_haltpoll.h
+index d50c1e0411a2..bae68a6603e3 100644
+--- a/include/linux/cpuidle_haltpoll.h
++++ b/include/linux/cpuidle_haltpoll.h
+@@ -12,5 +12,10 @@ static inline void arch_haltpoll_enable(unsigned int cpu)
+ static inline void arch_haltpoll_disable(unsigned int cpu)
+ {
+ }
++
++static inline bool arch_haltpoll_want(void)
++{
++	return false;
++}
+ #endif
+ #endif
 -- 
 1.8.3.1
 
