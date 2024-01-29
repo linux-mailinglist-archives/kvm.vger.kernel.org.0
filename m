@@ -1,185 +1,157 @@
-Return-Path: <kvm+bounces-7394-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7395-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F39F6841437
-	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 21:25:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAA29841531
+	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 22:39:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25E561C23B61
-	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 20:25:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C8C3BB234CD
+	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 21:39:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90F6476054;
-	Mon, 29 Jan 2024 20:25:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34A73158D98;
+	Mon, 29 Jan 2024 21:39:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.de header.i=deller@gmx.de header.b="mRsgy2nT"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZumjhOHj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A7AC7603D
-	for <kvm@vger.kernel.org>; Mon, 29 Jan 2024 20:25:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E66101586D6
+	for <kvm@vger.kernel.org>; Mon, 29 Jan 2024 21:39:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706559924; cv=none; b=X28W1OqUIseljwbc/vKA1QykATQ1s1tW+kFtcyFglr92Cjs3x0LyBL/321wAgYqFN/at3Gbe8N/XdXjnyhZXXR/Dqi41Gb9sIUI2j4/5gkpBIYUwppIwcuazjjEQvu6Itzii+7X0FDGSJajLi24sQNJfSSIqTGpFoGlabf/tPX0=
+	t=1706564373; cv=none; b=fCyZ9H1keGzJJQ1C6ucAZ+GXhsrMUxkktVVvhoMBqSV88p+T/m1C3Ro8mmruFhy57SzIJiyCVYmHZfqKoGJQUzR/pNtloFFMCXCisJlAv+NCPvzHnrPoIi6jigif+ajd2zG6Gt4MXozwdzyYJifsNILfQsQ6brkMZjo08kllew8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706559924; c=relaxed/simple;
-	bh=t4y5O2v80/N1buYxN57NYKAZ0Bev0mKEYyc3wQDHke4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=A5vkgWnFNRl20FGC7cIfab3D75V/0Ti32SytAMlRFtbNovfk3WRGprFFe84YBCISfVc12Yo1u6V4MjL/qHadcSuqiDSu8J+cba0aznrwukY3zV5Ok45Jhf5uaKIjhXqNwnOkACBJGDVy65qx8VlPT86uK6+uDehOgxOMcFoPrtk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=deller@gmx.de header.b=mRsgy2nT; arc=none smtp.client-ip=212.227.15.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.de; s=s31663417;
-	t=1706559910; x=1707164710; i=deller@gmx.de;
-	bh=t4y5O2v80/N1buYxN57NYKAZ0Bev0mKEYyc3wQDHke4=;
-	h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:
-	 In-Reply-To;
-	b=mRsgy2nT6qg8doTPKWg4MJ8aGSLokAoS9T4Eafl/q8XtDYcMDg3532PQD++oGrRT
-	 3AraDvWUJgRR5EjTogtJZeR0z4N+pI1HP9KfPf45tGRecBwuxqaseu/JylHEtUBln
-	 OFyiA4eAxAnR8T5H72f2blTcWuaqIGYEgGWsjLt+6Yka3+0J9JXgnKdvfQKf2EKw2
-	 +4RD6EVxuZzZl0Eoq2dKa3VSHuDqtmXZ/xgyYWZYwp+7Bim704xg3pwU3lk4P24Zp
-	 3QQ0yEQbeGNnQtqjlCRm1XkFFSTEVv3yn41ussPVuQm5k15VaV/1H5k1P7XVXF7aN
-	 h3py3MQZrEHfAwSeLA==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [192.168.20.55] ([94.134.155.171]) by mail.gmx.net (mrgmx005
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1Mlw3N-1qnYBx1vRz-00j11b; Mon, 29
- Jan 2024 21:25:10 +0100
-Message-ID: <9c2e60fa-7a23-496d-bf81-8826810e6351@gmx.de>
-Date: Mon, 29 Jan 2024 21:25:09 +0100
+	s=arc-20240116; t=1706564373; c=relaxed/simple;
+	bh=7Nu5d56ZeDA6l5eLrmk49xSbFqNKeDMhhp/l9C/XfqI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=LMF9UOUX77/aOsJI4LHHqd6OKJyC6RV5/DAy+gdXlNfKefRAucU3BWuw2EwhVjV2cDT292gsQrix+zEQTz/JHKhU8PlX7C55mQBZ+cNspzSftzDNBJdnGevO43lLcx2A7Wy88iu5rrvJ0Q8m/OITuVRaJin+uzTmZs33fWazZus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZumjhOHj; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-60297bb7d44so60726937b3.0
+        for <kvm@vger.kernel.org>; Mon, 29 Jan 2024 13:39:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1706564371; x=1707169171; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=B99eaBaQvufEj95SWhNrEVaGQs5nxLAIqm27nnip6fg=;
+        b=ZumjhOHjWvebavKmoiTpwKV2HZOWh2JrXNMNeai7+UQ+vz7+V3W+f/UYt9XTAVlNzf
+         iqtFgi60YpN800Qku2RlBwzTwYOu7pM1KXzDdtIu1aV6KHygnHcCMYLlbbRKvggcHKIT
+         GzklPzp+2CHjdnQVUhbyvvYBSrTrj/DP9S9tkNK7HESw5NsQIzYH4y95cbfa9o3pjH3n
+         uCTL2DuDLbKAXicEt6/nHykZkihWKp/DZqyIGeIWxs08jzWl1k76NhYeA8dByvIGox9n
+         uNLQUwnGNQIymH/eHYbvO4tq26vKxYZwq+Td+ohxPvSTzWDkh3H7MAklRCH+l9//61b/
+         c37Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706564371; x=1707169171;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=B99eaBaQvufEj95SWhNrEVaGQs5nxLAIqm27nnip6fg=;
+        b=wZKzGVnDE7+o0IImCj1+Zt4pfJ1+3tv8eRqgPMa3WpvZpjI1cUjfn3nD2W39H7KrLe
+         f4sHl94/QlFvWabPtlD31SXEHdmaWd19jZVvrlfK6WnHOrI4U7UckmdZlD5//VkSVQMZ
+         Jv5Yz/STvjtaZz8wwOJ+Y465xAe4Ry2XxQSPAuDRQYzDk8mEybSXs/L82KpqvOQRsnDY
+         c27Z9Xva8dGSDIDIdeqRWb7O29YqzGJjmo0acxFSxKhxfl1AJyi536xb/vjEF/1EQNPb
+         QfXqDzihDyUjxkdkFSYQeQnkk5JmB1cIBDd+6iZB4E8B/ulm5u1iYroJlVd+u48Ix70P
+         RXSA==
+X-Gm-Message-State: AOJu0YxoYHhVtuINyV2ydfOcFtJi2lILhcMGL2PULVEMHOeU1ShhpmYu
+	lX4oZ1LV/Aquah+s2VcYf4ej+1q+aNnPajsH+skDcNyQZn1b3wXXiH8IytuHbAu+taUieXVL4GK
+	bwsOfbQxibZCRVbH3F/9XYnOrKSKtWR2MTu1t/TLC7QDGbUYExWfMSQe7NzDPfMzKDOT7ca6FTv
+	6sXkb1A8qgghBLxPOGi/LIWixS/Ztya1fr82vyROg9Qf1KsarCtKlsG4M=
+X-Google-Smtp-Source: AGHT+IGygDA4Yqae/lvO9WyCp0eJko74aZVetrKCwp+siiLUcGXRBnWtoHzcunXD7W6Fuab5xM5aed9VfSPBn+KUWA==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a05:6902:2082:b0:dc2:5525:f6b with
+ SMTP id di2-20020a056902208200b00dc255250f6bmr2459078ybb.7.1706564370856;
+ Mon, 29 Jan 2024 13:39:30 -0800 (PST)
+Date: Mon, 29 Jan 2024 21:39:17 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 12/29] target/hppa: Prefer fast cpu_env() over slower
- CPU QOM cast macro
-Content-Language: en-US
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- qemu-devel@nongnu.org
-Cc: qemu-riscv@nongnu.org, qemu-s390x@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
- qemu-ppc@nongnu.org, qemu-arm@nongnu.org,
- Richard Henderson <richard.henderson@linaro.org>
-References: <20240129164514.73104-1-philmd@linaro.org>
- <20240129164514.73104-13-philmd@linaro.org>
-From: Helge Deller <deller@gmx.de>
-Autocrypt: addr=deller@gmx.de; keydata=
- xsFNBF3Ia3MBEAD3nmWzMgQByYAWnb9cNqspnkb2GLVKzhoH2QD4eRpyDLA/3smlClbeKkWT
- HLnjgkbPFDmcmCz5V0Wv1mKYRClAHPCIBIJgyICqqUZo2qGmKstUx3pFAiztlXBANpRECgwJ
- r+8w6mkccOM9GhoPU0vMaD/UVJcJQzvrxVHO8EHS36aUkjKd6cOpdVbCt3qx8cEhCmaFEO6u
- CL+k5AZQoABbFQEBocZE1/lSYzaHkcHrjn4cQjc3CffXnUVYwlo8EYOtAHgMDC39s9a7S90L
- 69l6G73lYBD/Br5lnDPlG6dKfGFZZpQ1h8/x+Qz366Ojfq9MuuRJg7ZQpe6foiOtqwKym/zV
- dVvSdOOc5sHSpfwu5+BVAAyBd6hw4NddlAQUjHSRs3zJ9OfrEx2d3mIfXZ7+pMhZ7qX0Axlq
- Lq+B5cfLpzkPAgKn11tfXFxP+hcPHIts0bnDz4EEp+HraW+oRCH2m57Y9zhcJTOJaLw4YpTY
- GRUlF076vZ2Hz/xMEvIJddRGId7UXZgH9a32NDf+BUjWEZvFt1wFSW1r7zb7oGCwZMy2LI/G
- aHQv/N0NeFMd28z+deyxd0k1CGefHJuJcOJDVtcE1rGQ43aDhWSpXvXKDj42vFD2We6uIo9D
- 1VNre2+uAxFzqqf026H6cH8hin9Vnx7p3uq3Dka/Y/qmRFnKVQARAQABzRxIZWxnZSBEZWxs
- ZXIgPGRlbGxlckBnbXguZGU+wsGRBBMBCAA7AhsDBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheA
- FiEERUSCKCzZENvvPSX4Pl89BKeiRgMFAl3J1zsCGQEACgkQPl89BKeiRgNK7xAAg6kJTPje
- uBm9PJTUxXaoaLJFXbYdSPfXhqX/BI9Xi2VzhwC2nSmizdFbeobQBTtRIz5LPhjk95t11q0s
- uP5htzNISPpwxiYZGKrNnXfcPlziI2bUtlz4ke34cLK6MIl1kbS0/kJBxhiXyvyTWk2JmkMi
- REjR84lCMAoJd1OM9XGFOg94BT5aLlEKFcld9qj7B4UFpma8RbRUpUWdo0omAEgrnhaKJwV8
- qt0ULaF/kyP5qbI8iA2PAvIjq73dA4LNKdMFPG7Rw8yITQ1Vi0DlDgDT2RLvKxEQC0o3C6O4
- iQq7qamsThLK0JSDRdLDnq6Phv+Yahd7sDMYuk3gIdoyczRkXzncWAYq7XTWl7nZYBVXG1D8
- gkdclsnHzEKpTQIzn/rGyZshsjL4pxVUIpw/vdfx8oNRLKj7iduf11g2kFP71e9v2PP94ik3
- Xi9oszP+fP770J0B8QM8w745BrcQm41SsILjArK+5mMHrYhM4ZFN7aipK3UXDNs3vjN+t0zi
- qErzlrxXtsX4J6nqjs/mF9frVkpv7OTAzj7pjFHv0Bu8pRm4AyW6Y5/H6jOup6nkJdP/AFDu
- 5ImdlA0jhr3iLk9s9WnjBUHyMYu+HD7qR3yhX6uWxg2oB2FWVMRLXbPEt2hRGq09rVQS7DBy
- dbZgPwou7pD8MTfQhGmDJFKm2jvOwU0EXchrcwEQAOsDQjdtPeaRt8EP2pc8tG+g9eiiX9Sh
- rX87SLSeKF6uHpEJ3VbhafIU6A7hy7RcIJnQz0hEUdXjH774B8YD3JKnAtfAyuIU2/rOGa/v
- UN4BY6U6TVIOv9piVQByBthGQh4YHhePSKtPzK9Pv/6rd8H3IWnJK/dXiUDQllkedrENXrZp
- eLUjhyp94ooo9XqRl44YqlsrSUh+BzW7wqwfmu26UjmAzIZYVCPCq5IjD96QrhLf6naY6En3
- ++tqCAWPkqKvWfRdXPOz4GK08uhcBp3jZHTVkcbo5qahVpv8Y8mzOvSIAxnIjb+cklVxjyY9
- dVlrhfKiK5L+zA2fWUreVBqLs1SjfHm5OGuQ2qqzVcMYJGH/uisJn22VXB1c48yYyGv2HUN5
- lC1JHQUV9734I5cczA2Gfo27nTHy3zANj4hy+s/q1adzvn7hMokU7OehwKrNXafFfwWVK3OG
- 1dSjWtgIv5KJi1XZk5TV6JlPZSqj4D8pUwIx3KSp0cD7xTEZATRfc47Yc+cyKcXG034tNEAc
- xZNTR1kMi9njdxc1wzM9T6pspTtA0vuD3ee94Dg+nDrH1As24uwfFLguiILPzpl0kLaPYYgB
- wumlL2nGcB6RVRRFMiAS5uOTEk+sJ/tRiQwO3K8vmaECaNJRfJC7weH+jww1Dzo0f1TP6rUa
- fTBRABEBAAHCwXYEGAEIACAWIQRFRIIoLNkQ2+89Jfg+Xz0Ep6JGAwUCXchrcwIbDAAKCRA+
- Xz0Ep6JGAxtdEAC54NQMBwjUNqBNCMsh6WrwQwbg9tkJw718QHPw43gKFSxFIYzdBzD/YMPH
- l+2fFiefvmI4uNDjlyCITGSM+T6b8cA7YAKvZhzJyJSS7pRzsIKGjhk7zADL1+PJei9p9idy
- RbmFKo0dAL+ac0t/EZULHGPuIiavWLgwYLVoUEBwz86ZtEtVmDmEsj8ryWw75ZIarNDhV74s
- BdM2ffUJk3+vWe25BPcJiaZkTuFt+xt2CdbvpZv3IPrEkp9GAKof2hHdFCRKMtgxBo8Kao6p
- Ws/Vv68FusAi94ySuZT3fp1xGWWf5+1jX4ylC//w0Rj85QihTpA2MylORUNFvH0MRJx4mlFk
- XN6G+5jIIJhG46LUucQ28+VyEDNcGL3tarnkw8ngEhAbnvMJ2RTx8vGh7PssKaGzAUmNNZiG
- MB4mPKqvDZ02j1wp7vthQcOEg08z1+XHXb8ZZKST7yTVa5P89JymGE8CBGdQaAXnqYK3/yWf
- FwRDcGV6nxanxZGKEkSHHOm8jHwvQWvPP73pvuPBEPtKGLzbgd7OOcGZWtq2hNC6cRtsRdDx
- 4TAGMCz4j238m+2mdbdhRh3iBnWT5yPFfnv/2IjFAk+sdix1Mrr+LIDF++kiekeq0yUpDdc4
- ExBy2xf6dd+tuFFBp3/VDN4U0UfG4QJ2fg19zE5Z8dS4jGIbLg==
-In-Reply-To: <20240129164514.73104-13-philmd@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:xCtZ4NVqvrToy67dRKju7QMLsPslL2OSiWJVmyiAeOUiyCESqoD
- utHKpaNLSE25RvMViB2HhD3ifvw/it1fJE+hDZOweA1JBACyRGeRvLOD7qfBYGjQwipvsWQ
- LpwzihaLy0Y59ZL29TDPSaLRld7pGiLOH5/p+OPlYQdLGEpPB3auOcwJ5yPiy4zf5BzDZna
- z5wQQw5llbjlnpHDsgVmQ==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:5RFp/sdB+cw=;jxsVH2MuGrETdaV8Hb4NfNGRGdm
- d9Ev6uyc5cnRIlJVbZ2yPy1Go/1UwnYnLQval1/SlifLvYoTlAwtLNbaWioe0arMG7tQUvDos
- N3s7vntWS4eKrcUxpI1U3rvrEDX8fZrilxMnnvsfnyIlSQJdTmVQ6MRoge/LbAbP+t1t//HKa
- roDskNom3sAoaDmCp0768gnn+O7zLtpgKtBt0JKWHM05b7bLBctGSeFXdccPG3lZ6jj/0OMpL
- h45ywtHk1zn6ddZxKYxo5vy/LZ+i1BKpRt5gTxYaDCV2rRZb6XIKYDQRDcsGVBd2VEpyANT2M
- ORG27OEppDmWfmPhkKamrzqbvlHk/lk/lDrA3GN+JC+o4+H7HY0C0UDsRwXlTSgWbAmu28/yS
- uQ7IsdItn/B1X6mNsRktror78EvMNlT+Lf2pHtwkEvFB1O9tNhoP+DpwHZ9JQ1yJitFRJEgbF
- FaYFY3GkfVU2fbv6b61h2NQfOnoKx3MPwLTaFkoMxGx24gbc02aXqmfm3m7nU1mQ43tYmHS5i
- 488JLHtL8NOxI977NG5u0RYU3JbzjjTpfcrepr1w4dvt22bHr6d2xXAET8BHthDXm+uxBwCDW
- xHn0Conl74rKt/FURDX+jnX2AsVLE/qJG10EXHpBI89/I+JeqIKcyy4AdTHMTD6xLrXrtsjMy
- etlpA6Lcd62djZdAVtlI+t1kVg3j5ExSb9EYC6agW7ZAmxjkQEGulVt661/egM2HP9sQm4gJu
- MhobtE97chh1d8+G5Hb7HgKavWGGv7rIUxZleDOzg+zmfMsimZBYBPtUhoAE8RVgSoEkhHUsW
- vgdRYfaWZjIjUesSwyQczew5YX9qMA577tdTzziJLb/kg3a7ucr1f9KV/Tqn+VSHHxAn86Igt
- C7FuC1HDzr8Ac65/Fp5HESPIIbi5el9xbRc7wHS5asptW0Mz3VWtCr2m29OB5Oh9B+1e9cQ6i
- ZOQmCq4eJE3vzgQemJJVoxW8DQQ=
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.429.g432eaa2c6b-goog
+Message-ID: <20240129213918.3124494-1-coltonlewis@google.com>
+Subject: [PATCH] KVM: arm64: Add capability for unconditional WFx passthrough
+From: Colton Lewis <coltonlewis@google.com>
+To: kvm@vger.kernel.org
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Colton Lewis <coltonlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 1/29/24 17:44, Philippe Mathieu-Daud=C3=A9 wrote:
-> Mechanical patch produced running the command documented
-> in scripts/coccinelle/cpu_env.cocci_template header.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->   target/hppa/cpu.c        | 8 ++------
->   target/hppa/int_helper.c | 8 ++------
->   target/hppa/mem_helper.c | 3 +--
->   3 files changed, 5 insertions(+), 14 deletions(-)
->
-> diff --git a/target/hppa/cpu.c b/target/hppa/cpu.c
-> index 14e17fa9aa..3200de0998 100644
-> --- a/target/hppa/cpu.c
-> +++ b/target/hppa/cpu.c
-> @@ -106,11 +106,8 @@ void hppa_cpu_do_unaligned_access(CPUState *cs, vad=
-dr addr,
->                                     MMUAccessType access_type, int mmu_i=
-dx,
->                                     uintptr_t retaddr)
->   {
-> -    HPPACPU *cpu =3D HPPA_CPU(cs);
-> -    CPUHPPAState *env =3D &cpu->env;
-> -
->       cs->exception_index =3D EXCP_UNALIGN;
-> -    hppa_set_ior_and_isr(env, addr, MMU_IDX_MMU_DISABLED(mmu_idx));
-> +    hppa_set_ior_and_isr(cpu_env(cs), addr, MMU_IDX_MMU_DISABLED(mmu_id=
-x));
->
->       cpu_loop_exit_restore(cs, retaddr);
->   }
-> @@ -145,8 +142,7 @@ static void hppa_cpu_realizefn(DeviceState *dev, Err=
-or **errp)
->   static void hppa_cpu_initfn(Object *obj)
->   {
->       CPUState *cs =3D CPU(obj);
-> -    HPPACPU *cpu =3D HPPA_CPU(obj);
-> -    CPUHPPAState *env =3D &cpu->env;
-> +    CPUHPPAState *env =3D cpu_env(CPU(obj));
+Add KVM_CAP_ARM_WFX_PASSTHROUGH capability to always allow WFE/WFI
+instructions to run without trapping. Current behavior is to only
+allow this if the vcpu is the only task running. This commit keeps the
+old behavior when the capability is not set.
 
-Here it can become cpu_env(cs) too.
+This allows userspace to set deterministic behavior and increase
+efficiency for platforms with direct interrupt injection support.
 
-The rest looks ok, so with that changed:
-Reviewed-by: Helge Deller <deller@gmx.de>
+The implementation adds a new flag
+KVM_ARCH_FLAG_WFX_PASSTHROUGH_ENABLED to kvm.arch.flags.
 
-Helge
+Signed-off-by: Colton Lewis <coltonlewis@google.com>
+---
+ arch/arm64/include/asm/kvm_host.h | 2 ++
+ arch/arm64/kvm/arm.c              | 7 ++++++-
+ include/uapi/linux/kvm.h          | 1 +
+ 3 files changed, 9 insertions(+), 1 deletion(-)
 
+This patch is based on v6.8-rc1
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 21c57b812569..e0d5ec2983fa 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -274,6 +274,8 @@ struct kvm_arch {
+ #define KVM_ARCH_FLAG_TIMER_PPIS_IMMUTABLE		6
+ 	/* Initial ID reg values loaded */
+ #define KVM_ARCH_FLAG_ID_REGS_INITIALIZED		7
++	/* Never trap WFE/WFI instructions */
++#define KVM_ARCH_FLAG_WFX_PASSTHROUGH_ENABLED		8
+ 	unsigned long flags;
+
+ 	/* VM-wide vCPU feature set */
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index a25265aca432..6d993991bd7a 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -116,6 +116,10 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 		}
+ 		mutex_unlock(&kvm->slots_lock);
+ 		break;
++	case KVM_CAP_ARM_WFX_PASSTHROUGH:
++		r = 0;
++		set_bit(KVM_ARCH_FLAG_WFX_PASSTHROUGH_ENABLED, &kvm->arch.flags);
++		break;
+ 	default:
+ 		r = -EINVAL;
+ 		break;
+@@ -456,7 +460,8 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	if (kvm_arm_is_pvtime_enabled(&vcpu->arch))
+ 		kvm_make_request(KVM_REQ_RECORD_STEAL, vcpu);
+
+-	if (single_task_running())
++	if (single_task_running() ||
++	    test_bit(KVM_ARCH_FLAG_WFX_PASSTHROUGH_ENABLED, &vcpu->kvm->arch.flags))
+ 		vcpu_clear_wfx_traps(vcpu);
+ 	else
+ 		vcpu_set_wfx_traps(vcpu);
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index c3308536482b..7635b5cd2b3b 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1155,6 +1155,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_MEMORY_ATTRIBUTES 233
+ #define KVM_CAP_GUEST_MEMFD 234
+ #define KVM_CAP_VM_TYPES 235
++#define KVM_CAP_ARM_WFX_PASSTHROUGH 236
+
+ #ifdef KVM_CAP_IRQ_ROUTING
+
+--
+2.43.0.429.g432eaa2c6b-goog
 
