@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-7372-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7373-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13EC2840C28
-	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 17:48:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D597840C3B
+	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 17:49:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8E7F91F2403F
-	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 16:48:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8D01281B91
+	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 16:49:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21BB115703F;
-	Mon, 29 Jan 2024 16:48:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E772315A491;
+	Mon, 29 Jan 2024 16:48:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xKaQxpdv"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GL2TrhID"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50556664D2
-	for <kvm@vger.kernel.org>; Mon, 29 Jan 2024 16:47:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EF63159579
+	for <kvm@vger.kernel.org>; Mon, 29 Jan 2024 16:48:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706546881; cv=none; b=O6svx5P1YIfRL7cfuWqmaQ6B8Q99wwAcy+HiJ6w8sLf7LG4wUK9JrP0R4bWTqHS2rUZM0eZTHMRzzFzyp/JZyXWPFmT49RcQuZ1W2VGn7xBn+kxuc2pzIaHJDx5jZVaH4OaKN4RCS4VwWBTUXeBiXX0j0pM9Zh0Hmcn7Z5iogkw=
+	t=1706546887; cv=none; b=HSKmAiKJ8p3WZ0gPgcFOpTpbcAEim2RG/wFbRldZfSLkw2226QV8evzIHEuzlEhHESxiYHMzdbGCu88+8KqcLk/hXFuZ/1/4NDOeaFjpv2/N2pMZCUzTJFYvQ40b8A5Ctwf2GWwOubf0GAKAH+yr1ySAU55BslWke/RZITofVGA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706546881; c=relaxed/simple;
-	bh=xkVFL2XKpJDgGuvyXwALPhj/xdn8aOuHeD7OeGTn3cQ=;
+	s=arc-20240116; t=1706546887; c=relaxed/simple;
+	bh=/giGeSNQ051t0osD9OGq6OXrEl4LMgnNv5v2RuQWwX8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hS1XGTs08TAEvtkPWAbIZ6j5C7q248WZcWK/AgzcIkOLuhDlIlIBZQIDtkCUD1HzwleVHgH5Ro/RYv0XzLUA5Hy8MSJ7VjGRwXw7GFVpSKv09Q+Zjz+qhVCKov2Q+yw2Hfm5RCM4sWh7FyUe+ZtkJ84/nUQKOASVJhJVlRSOR0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=xKaQxpdv; arc=none smtp.client-ip=209.85.221.49
+	 MIME-Version:Content-Type; b=ghS/hj6hJjLa3vheR7t4J0uKP3i3cdShl9Clm5D2Ct9zBwv4elbIc11QbDdXFdKyAZJGgdh3e955lq9+fzOHD0ohjpZSA2LFX+kzcxEAD7jI6DSuwMDgSrR5pRBEoATyLHjXDTLV6xaEmcObuGaoiD+YotNcXke7rc6Q22gW5F0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=GL2TrhID; arc=none smtp.client-ip=209.85.221.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3394ca0c874so2642919f8f.2
-        for <kvm@vger.kernel.org>; Mon, 29 Jan 2024 08:47:59 -0800 (PST)
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-33af3c7ef60so588502f8f.0
+        for <kvm@vger.kernel.org>; Mon, 29 Jan 2024 08:48:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1706546877; x=1707151677; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1706546883; x=1707151683; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=nDyOJncTz/gz39l44d2jGwByTaW/KG4k2gJ/GNswNnI=;
-        b=xKaQxpdvY6imj4kGRv3CAXA3bStHQUr0P7ni7O+LZX3ba3HBGIgG7prcR5Eu+FAdLe
-         hJ2N5YfjmsOU5lJggqSEuIfolPzvcFwBN2eWbD9iyw9MIBtwGWtAvWyeL3gdZEBz+0zF
-         w4umA8QDidNDk34BzpgwN6ffYZH225gMaAsN+s/giEG9IaQP1cenBCTMbaMsfQTHJXeR
-         ynMfZL34TxVo91OQ0Px1aPulRbxbhsIdmUGuZQpdizKWjwfRnHRShw9SYSYdlBZJcdSU
-         zq4JJQDExfkmEZyUCHwAiSch4Bj2SNIE0WwyqcTmES0uzCExuScKTYKz0+5N07eVHIbi
-         HCvQ==
+        bh=+rt9340Neq6sQRGPVea3EhCde05ocdRyA3moNLb2tSg=;
+        b=GL2TrhID6fzDtJT8ygxBcmOycEs+ue/40l/YIA9gZ/2V7wnsDubK45f0KgzmMulf0d
+         8w7+5LUALlwIaFPA3BtUS6PV/pVzjra8aSi7igPm1CT/G+V3dUK4yq4WSSHtOTGLMBrD
+         xWehL22GzfHeGpr6DwGxxllLLXCkvJ0Mftk9ygExXQFehtUNCm6bD01XUbJPus8Scu38
+         Gb7I5okbHmJTpFxCiMV7rTsw9qi2+AL3IVp758qErgHuwShvxkbOMbxz5QeaX5xmXPDk
+         fx5HPZyTVKjapJiRgb5sOEDYEyiSfyaJsUp0lPo6OUXNsy3ZA6pQ8floyUwuZaYy2j4Q
+         Z0NQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706546877; x=1707151677;
+        d=1e100.net; s=20230601; t=1706546883; x=1707151683;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=nDyOJncTz/gz39l44d2jGwByTaW/KG4k2gJ/GNswNnI=;
-        b=CIUkrbFt853BTHJHwm9CTpHEtZzI1D+3Q2GeZi1p4He67Q44jem7Wokj83U706Gj41
-         Z2NVugJCZkdjuDUAhCzlHwJlW/fs9IXN7QfFTB2hGEg8lsS38+Xy4Y/mz1O5y7EzJJb1
-         8RM+wPTFv2QzOANHF39VVNdWgUCnUhh4bqa78k0ItD6T3i7XW3BkTWgjofPreogSGWzV
-         Fba2i1KDaF1lxF0P4MYe8RncUY+vEZZtR8FRoNiYu6wpo2XOsqbhOXMB5/Syjo/QnXnR
-         7zquI1c+CIbs1N3ONlIyEYNgIqcHoaTqzHAvTPvDjdGfflCBAUDCuoINtuHYT5m5byZL
-         olQA==
-X-Gm-Message-State: AOJu0Yyxdf4f0b1AU+CTZV78wB8O0/YRrWchQYUjBQwo5QxLBlupdqsn
-	v011EQAlBLGDryYjd5XyjYVv3XBe8RCWqHEb+3EDRqJv3RpiDC0MSMI3SyKtLLQ=
-X-Google-Smtp-Source: AGHT+IGpSP62XxzQ6ZDTlpeFHsIrctZ9h8BZDrmsx+XYzXCe3dEYoh7yTLPt/V9X39N+RCxRJF1Yww==
-X-Received: by 2002:a5d:6812:0:b0:33a:e75e:281c with SMTP id w18-20020a5d6812000000b0033ae75e281cmr3295951wru.5.1706546877555;
-        Mon, 29 Jan 2024 08:47:57 -0800 (PST)
+        bh=+rt9340Neq6sQRGPVea3EhCde05ocdRyA3moNLb2tSg=;
+        b=dNOy6wi9zXK+gMSh0aLvdjX8IFkx2g2mk0M1NdMUVBuSkfepceGDra53/tFukxgsy/
+         89uScKQbqVMX9u3aPPZt3ueAQSlwNX1P4QmZn2oQh0eaETwhK+9iRvpOA85+XbUpL42S
+         BjHaEc6Ufb4zxu2AUV2VJJ2lsoWsZviZp9RPCXe4Pa2TIHKdQcqcn3x8SfU8M8z9mXbM
+         qVameWC/6ikUyQC5ORyV4x9tlwyHvEuerSueIn2IhkDCRG1mj/QGPuwctNj2W8Ii8Dm+
+         NfLTScjQD+Al1J1WQeHRd4jsy2KCHUh0nFrGq8k6vR4HrWTxdy+M3yI5OKosVF10z0ut
+         05cg==
+X-Gm-Message-State: AOJu0YwtX8aViFs0CDLPsZlJeNnvC7lQUfpKViR2DTbapMZqxpdRIqiV
+	CNohxVSzyIUM5otZXphAVeLX21j4P2+N7fO3P4uCOoSCMWnm5omi4uFKTegLTAs=
+X-Google-Smtp-Source: AGHT+IHwCuq+6yh1m6T7vY3Y2cLEq0q/hPFlPvC2NilRjpgFakRKueneRO9FZiqsXUrqr0KBPgYKVA==
+X-Received: by 2002:a5d:510f:0:b0:33a:e7de:aa8b with SMTP id s15-20020a5d510f000000b0033ae7deaa8bmr2928268wrt.26.1706546883422;
+        Mon, 29 Jan 2024 08:48:03 -0800 (PST)
 Received: from m1x-phil.lan ([176.187.219.39])
-        by smtp.gmail.com with ESMTPSA id a15-20020a056000100f00b0033aee3bfac5sm2738967wrx.16.2024.01.29.08.47.56
+        by smtp.gmail.com with ESMTPSA id b3-20020a05600003c300b0033ae46e0f02sm6350998wrg.75.2024.01.29.08.48.02
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 29 Jan 2024 08:47:57 -0800 (PST)
+        Mon, 29 Jan 2024 08:48:03 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: qemu-riscv@nongnu.org,
@@ -76,11 +76,10 @@ Cc: qemu-riscv@nongnu.org,
 	qemu-arm@nongnu.org,
 	Richard Henderson <richard.henderson@linaro.org>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-	Artyom Tarasenko <atar4qemu@gmail.com>
-Subject: [PATCH v3 26/29] target/sparc: Prefer fast cpu_env() over slower CPU QOM cast macro
-Date: Mon, 29 Jan 2024 17:45:08 +0100
-Message-ID: <20240129164514.73104-27-philmd@linaro.org>
+	Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Subject: [PATCH v3 27/29] target/tricore: Prefer fast cpu_env() over slower CPU QOM cast macro
+Date: Mon, 29 Jan 2024 17:45:09 +0100
+Message-ID: <20240129164514.73104-28-philmd@linaro.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20240129164514.73104-1-philmd@linaro.org>
 References: <20240129164514.73104-1-philmd@linaro.org>
@@ -96,236 +95,129 @@ Content-Transfer-Encoding: 8bit
 Mechanical patch produced running the command documented
 in scripts/coccinelle/cpu_env.cocci_template header.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 ---
- target/sparc/cpu.c          | 17 +++++------------
- target/sparc/gdbstub.c      |  3 +--
- target/sparc/int32_helper.c |  3 +--
- target/sparc/int64_helper.c |  3 +--
- target/sparc/ldst_helper.c  |  6 ++----
- target/sparc/mmu_helper.c   | 15 +++++----------
- target/sparc/translate.c    |  9 +++------
- 7 files changed, 18 insertions(+), 38 deletions(-)
+ target/tricore/cpu.c       | 24 +++++-------------------
+ target/tricore/gdbstub.c   |  6 ++----
+ target/tricore/helper.c    |  3 +--
+ target/tricore/translate.c |  3 +--
+ 4 files changed, 9 insertions(+), 27 deletions(-)
 
-diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
-index 152bee4f81..72a9b9a285 100644
---- a/target/sparc/cpu.c
-+++ b/target/sparc/cpu.c
-@@ -32,9 +32,8 @@
- static void sparc_cpu_reset_hold(Object *obj)
+diff --git a/target/tricore/cpu.c b/target/tricore/cpu.c
+index 9bdaa1593a..7c4a9b41a3 100644
+--- a/target/tricore/cpu.c
++++ b/target/tricore/cpu.c
+@@ -36,52 +36,38 @@ static const gchar *tricore_gdb_arch_name(CPUState *cs)
+ 
+ static void tricore_cpu_set_pc(CPUState *cs, vaddr value)
  {
-     CPUState *cs = CPU(obj);
--    SPARCCPU *cpu = SPARC_CPU(cs);
-     SPARCCPUClass *scc = SPARC_CPU_GET_CLASS(obj);
--    CPUSPARCState *env = &cpu->env;
-+    CPUSPARCState *env = cpu_env(cs);
- 
-     if (scc->parent_phases.hold) {
-         scc->parent_phases.hold(obj);
-@@ -83,8 +82,7 @@ static void sparc_cpu_reset_hold(Object *obj)
- static bool sparc_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
- {
-     if (interrupt_request & CPU_INTERRUPT_HARD) {
--        SPARCCPU *cpu = SPARC_CPU(cs);
--        CPUSPARCState *env = &cpu->env;
-+        CPUSPARCState *env = cpu_env(cs);
- 
-         if (cpu_interrupts_enabled(env) && env->interrupt_index > 0) {
-             int pil = env->interrupt_index & 0xf;
-@@ -613,8 +611,7 @@ static void cpu_print_cc(FILE *f, uint32_t cc)
- 
- static void sparc_cpu_dump_state(CPUState *cs, FILE *f, int flags)
- {
--    SPARCCPU *cpu = SPARC_CPU(cs);
--    CPUSPARCState *env = &cpu->env;
-+    CPUSPARCState *env = cpu_env(cs);
-     int i, x;
- 
-     qemu_fprintf(f, "pc: " TARGET_FMT_lx "  npc: " TARGET_FMT_lx "\n", env->pc,
-@@ -711,11 +708,8 @@ static void sparc_cpu_synchronize_from_tb(CPUState *cs,
- 
- static bool sparc_cpu_has_work(CPUState *cs)
- {
--    SPARCCPU *cpu = SPARC_CPU(cs);
--    CPUSPARCState *env = &cpu->env;
+-    TriCoreCPU *cpu = TRICORE_CPU(cs);
+-    CPUTriCoreState *env = &cpu->env;
 -
-     return (cs->interrupt_request & CPU_INTERRUPT_HARD) &&
--           cpu_interrupts_enabled(env);
-+           cpu_interrupts_enabled(cpu_env(cs));
+-    env->PC = value & ~(target_ulong)1;
++    cpu_env(cs)->PC = value & ~(target_ulong)1;
  }
  
- static char *sparc_cpu_type_name(const char *cpu_model)
-@@ -749,8 +743,7 @@ static void sparc_cpu_realizefn(DeviceState *dev, Error **errp)
-     CPUState *cs = CPU(dev);
-     SPARCCPUClass *scc = SPARC_CPU_GET_CLASS(dev);
-     Error *local_err = NULL;
--    SPARCCPU *cpu = SPARC_CPU(dev);
--    CPUSPARCState *env = &cpu->env;
-+    CPUSPARCState *env = cpu_env(cs);
- 
- #if defined(CONFIG_USER_ONLY)
-     /* We are emulating the kernel, which will trap and emulate float128. */
-diff --git a/target/sparc/gdbstub.c b/target/sparc/gdbstub.c
-index a1c8fdc4d5..5257c49a0d 100644
---- a/target/sparc/gdbstub.c
-+++ b/target/sparc/gdbstub.c
-@@ -29,8 +29,7 @@
- 
- int sparc_cpu_gdb_read_register(CPUState *cs, GByteArray *mem_buf, int n)
+ static vaddr tricore_cpu_get_pc(CPUState *cs)
  {
--    SPARCCPU *cpu = SPARC_CPU(cs);
--    CPUSPARCState *env = &cpu->env;
-+    CPUSPARCState *env = cpu_env(cs);
+-    TriCoreCPU *cpu = TRICORE_CPU(cs);
+-    CPUTriCoreState *env = &cpu->env;
+-
+-    return env->PC;
++    return cpu_env(cs)->PC;
+ }
  
-     if (n < 8) {
-         /* g0..g7 */
-diff --git a/target/sparc/int32_helper.c b/target/sparc/int32_helper.c
-index 058dd712b5..6b7d65b031 100644
---- a/target/sparc/int32_helper.c
-+++ b/target/sparc/int32_helper.c
-@@ -99,8 +99,7 @@ void cpu_check_irqs(CPUSPARCState *env)
- 
- void sparc_cpu_do_interrupt(CPUState *cs)
+ static void tricore_cpu_synchronize_from_tb(CPUState *cs,
+                                             const TranslationBlock *tb)
  {
--    SPARCCPU *cpu = SPARC_CPU(cs);
--    CPUSPARCState *env = &cpu->env;
-+    CPUSPARCState *env = cpu_env(cs);
-     int cwp, intno = cs->exception_index;
+-    TriCoreCPU *cpu = TRICORE_CPU(cs);
+-    CPUTriCoreState *env = &cpu->env;
+-
+     tcg_debug_assert(!(cs->tcg_cflags & CF_PCREL));
+-    env->PC = tb->pc;
++    cpu_env(cs)->PC = tb->pc;
+ }
  
-     if (qemu_loglevel_mask(CPU_LOG_INT)) {
-diff --git a/target/sparc/int64_helper.c b/target/sparc/int64_helper.c
-index 27df9dba89..bd14c7a0db 100644
---- a/target/sparc/int64_helper.c
-+++ b/target/sparc/int64_helper.c
-@@ -130,8 +130,7 @@ void cpu_check_irqs(CPUSPARCState *env)
+ static void tricore_restore_state_to_opc(CPUState *cs,
+                                          const TranslationBlock *tb,
+                                          const uint64_t *data)
+ {
+-    TriCoreCPU *cpu = TRICORE_CPU(cs);
+-    CPUTriCoreState *env = &cpu->env;
+-
+-    env->PC = data[0];
++    cpu_env(cs)->PC = data[0];
+ }
  
- void sparc_cpu_do_interrupt(CPUState *cs)
+ static void tricore_cpu_reset_hold(Object *obj)
  {
--    SPARCCPU *cpu = SPARC_CPU(cs);
--    CPUSPARCState *env = &cpu->env;
-+    CPUSPARCState *env = cpu_env(cs);
-     int intno = cs->exception_index;
-     trap_state *tsptr;
+     CPUState *cs = CPU(obj);
+-    TriCoreCPU *cpu = TRICORE_CPU(cs);
+     TriCoreCPUClass *tcc = TRICORE_CPU_GET_CLASS(obj);
+-    CPUTriCoreState *env = &cpu->env;
  
-diff --git a/target/sparc/ldst_helper.c b/target/sparc/ldst_helper.c
-index 09066d5487..203441bfb2 100644
---- a/target/sparc/ldst_helper.c
-+++ b/target/sparc/ldst_helper.c
-@@ -421,8 +421,7 @@ static void sparc_raise_mmu_fault(CPUState *cs, hwaddr addr,
-                                   bool is_write, bool is_exec, int is_asi,
-                                   unsigned size, uintptr_t retaddr)
- {
--    SPARCCPU *cpu = SPARC_CPU(cs);
--    CPUSPARCState *env = &cpu->env;
-+    CPUSPARCState *env = cpu_env(cs);
-     int fault_type;
+     if (tcc->parent_phases.hold) {
+         tcc->parent_phases.hold(obj);
+     }
  
- #ifdef DEBUG_UNASSIGNED
-@@ -483,8 +482,7 @@ static void sparc_raise_mmu_fault(CPUState *cs, hwaddr addr,
-                                   bool is_write, bool is_exec, int is_asi,
-                                   unsigned size, uintptr_t retaddr)
- {
--    SPARCCPU *cpu = SPARC_CPU(cs);
--    CPUSPARCState *env = &cpu->env;
-+    CPUSPARCState *env = cpu_env(cs);
+-    cpu_state_reset(env);
++    cpu_state_reset(cpu_env(cs));
+ }
  
- #ifdef DEBUG_UNASSIGNED
-     printf("Unassigned mem access to " HWADDR_FMT_plx " from " TARGET_FMT_lx
-diff --git a/target/sparc/mmu_helper.c b/target/sparc/mmu_helper.c
-index 453498c670..a05ee22315 100644
---- a/target/sparc/mmu_helper.c
-+++ b/target/sparc/mmu_helper.c
-@@ -206,8 +206,7 @@ bool sparc_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-                         MMUAccessType access_type, int mmu_idx,
-                         bool probe, uintptr_t retaddr)
+ static bool tricore_cpu_has_work(CPUState *cs)
+diff --git a/target/tricore/gdbstub.c b/target/tricore/gdbstub.c
+index e8f8e5e6ea..f9309c5e27 100644
+--- a/target/tricore/gdbstub.c
++++ b/target/tricore/gdbstub.c
+@@ -106,8 +106,7 @@ static void tricore_cpu_gdb_write_csfr(CPUTriCoreState *env, int n,
+ 
+ int tricore_cpu_gdb_read_register(CPUState *cs, GByteArray *mem_buf, int n)
  {
--    SPARCCPU *cpu = SPARC_CPU(cs);
--    CPUSPARCState *env = &cpu->env;
-+    CPUSPARCState *env = cpu_env(cs);
-     CPUTLBEntryFull full = {};
-     target_ulong vaddr;
-     int error_code = 0, access_index;
-@@ -391,8 +390,7 @@ void dump_mmu(CPUSPARCState *env)
- int sparc_cpu_memory_rw_debug(CPUState *cs, vaddr address,
-                               uint8_t *buf, int len, bool is_write)
+-    TriCoreCPU *cpu = TRICORE_CPU(cs);
+-    CPUTriCoreState *env = &cpu->env;
++    CPUTriCoreState *env = cpu_env(cs);
+ 
+     if (n < 16) { /* data registers */
+         return gdb_get_reg32(mem_buf, env->gpr_d[n]);
+@@ -121,8 +120,7 @@ int tricore_cpu_gdb_read_register(CPUState *cs, GByteArray *mem_buf, int n)
+ 
+ int tricore_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
  {
--    SPARCCPU *cpu = SPARC_CPU(cs);
--    CPUSPARCState *env = &cpu->env;
-+    CPUSPARCState *env = cpu_env(cs);
-     target_ulong addr = address;
+-    TriCoreCPU *cpu = TRICORE_CPU(cs);
+-    CPUTriCoreState *env = &cpu->env;
++    CPUTriCoreState *env = cpu_env(cs);
+     uint32_t tmp;
+ 
+     tmp = ldl_p(mem_buf);
+diff --git a/target/tricore/helper.c b/target/tricore/helper.c
+index 174f666e1e..d328414c99 100644
+--- a/target/tricore/helper.c
++++ b/target/tricore/helper.c
+@@ -67,8 +67,7 @@ bool tricore_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+                           MMUAccessType rw, int mmu_idx,
+                           bool probe, uintptr_t retaddr)
+ {
+-    TriCoreCPU *cpu = TRICORE_CPU(cs);
+-    CPUTriCoreState *env = &cpu->env;
++    CPUTriCoreState *env = cpu_env(cs);
+     hwaddr physical;
+     int prot;
+     int ret = 0;
+diff --git a/target/tricore/translate.c b/target/tricore/translate.c
+index 66553d1be0..ad314bdf3c 100644
+--- a/target/tricore/translate.c
++++ b/target/tricore/translate.c
+@@ -95,8 +95,7 @@ enum {
+ 
+ void tricore_cpu_dump_state(CPUState *cs, FILE *f, int flags)
+ {
+-    TriCoreCPU *cpu = TRICORE_CPU(cs);
+-    CPUTriCoreState *env = &cpu->env;
++    CPUTriCoreState *env = cpu_env(cs);
+     uint32_t psw;
      int i;
-     int len1;
-@@ -759,8 +757,7 @@ bool sparc_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-                         MMUAccessType access_type, int mmu_idx,
-                         bool probe, uintptr_t retaddr)
- {
--    SPARCCPU *cpu = SPARC_CPU(cs);
--    CPUSPARCState *env = &cpu->env;
-+    CPUSPARCState *env = cpu_env(cs);
-     CPUTLBEntryFull full = {};
-     int error_code = 0, access_index;
- 
-@@ -898,8 +895,7 @@ hwaddr cpu_get_phys_page_nofault(CPUSPARCState *env, target_ulong addr,
- 
- hwaddr sparc_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
- {
--    SPARCCPU *cpu = SPARC_CPU(cs);
--    CPUSPARCState *env = &cpu->env;
-+    CPUSPARCState *env = cpu_env(cs);
-     hwaddr phys_addr;
-     int mmu_idx = cpu_mmu_index(env, false);
- 
-@@ -916,8 +912,7 @@ G_NORETURN void sparc_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
-                                               int mmu_idx,
-                                               uintptr_t retaddr)
- {
--    SPARCCPU *cpu = SPARC_CPU(cs);
--    CPUSPARCState *env = &cpu->env;
-+    CPUSPARCState *env = cpu_env(cs);
- 
- #ifdef TARGET_SPARC64
-     env->dmmu.sfsr = build_sfsr(env, mmu_idx, access_type);
-diff --git a/target/sparc/translate.c b/target/sparc/translate.c
-index 9387299559..769418d6b0 100644
---- a/target/sparc/translate.c
-+++ b/target/sparc/translate.c
-@@ -5154,13 +5154,12 @@ TRANS(FCMPEq, ALL, do_fcmpq, a, true)
- static void sparc_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
- {
-     DisasContext *dc = container_of(dcbase, DisasContext, base);
--    CPUSPARCState *env = cpu_env(cs);
-     int bound;
- 
-     dc->pc = dc->base.pc_first;
-     dc->npc = (target_ulong)dc->base.tb->cs_base;
-     dc->mem_idx = dc->base.tb->flags & TB_FLAG_MMU_MASK;
--    dc->def = &env->def;
-+    dc->def = &cpu_env(cs)->def;
-     dc->fpu_enabled = tb_fpu_enabled(dc->base.tb->flags);
-     dc->address_mask_32bit = tb_am_enabled(dc->base.tb->flags);
- #ifndef CONFIG_USER_ONLY
-@@ -5210,10 +5209,9 @@ static void sparc_tr_insn_start(DisasContextBase *dcbase, CPUState *cs)
- static void sparc_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
- {
-     DisasContext *dc = container_of(dcbase, DisasContext, base);
--    CPUSPARCState *env = cpu_env(cs);
-     unsigned int insn;
- 
--    insn = translator_ldl(env, &dc->base, dc->pc);
-+    insn = translator_ldl(cpu_env(cs), &dc->base, dc->pc);
-     dc->base.pc_next += 4;
- 
-     if (!decode(dc, insn)) {
-@@ -5406,8 +5404,7 @@ void sparc_restore_state_to_opc(CPUState *cs,
-                                 const TranslationBlock *tb,
-                                 const uint64_t *data)
- {
--    SPARCCPU *cpu = SPARC_CPU(cs);
--    CPUSPARCState *env = &cpu->env;
-+    CPUSPARCState *env = cpu_env(cs);
-     target_ulong pc = data[0];
-     target_ulong npc = data[1];
  
 -- 
 2.41.0
