@@ -1,65 +1,69 @@
-Return-Path: <kvm+bounces-7316-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7317-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8B898400C0
-	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 09:59:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A08468400C1
+	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 09:59:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2708E1C2338C
-	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 08:59:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 56AC21F23D40
+	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 08:59:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 029D955784;
-	Mon, 29 Jan 2024 08:58:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EDC255C02;
+	Mon, 29 Jan 2024 08:58:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fqewF380"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DGN9tsCM"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75A4955779
-	for <kvm@vger.kernel.org>; Mon, 29 Jan 2024 08:58:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 955935577A
+	for <kvm@vger.kernel.org>; Mon, 29 Jan 2024 08:58:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706518736; cv=none; b=JR0Fs0fZQOkNcVoslVWSwg1iIjxmcU4K9a3DU0oPI4UPiDhrhbXxlpR/SbSBNcsyZDgCBQN3hs5dLq407imNgmMZyUTDJCpp/V3gU7crw5ZjL8rPj00dcN7h1rA61m9uAt525dNii56TkOzpgRNdp5XXMJJPdQy5Evb8Tsn9TFQ=
+	t=1706518737; cv=none; b=n3CvJFxX5SBV+/BPxMhGyDqSAf4wBvwWAkicLeyaFUXA6tHkrjovXwCSnhKmCIeVNH+u2yafqLKNuqgPlAWPtoUdbkgtT8DFHsjyJgyOIwNwDOfan/rqqkcMiLRKS22hpMbQ71LD2XEsw4Ukj8xtC/tY6l4Mg9iE8hYIWxDScwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706518736; c=relaxed/simple;
-	bh=CqtkdCNxl9n+RA9D/beypA4ENvb3fZHppFOaSs6zSAY=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YP2X/KhwY94Y4TDiYA9uqabCl0A2hKZ0rMi2sUddmXUgA4nFV5n8OdxU3BFpz4P44Ha1Yo9WvLB214d/NIhpXI76VWq696gzdKMa+uXaYbzUkScBTvBzMDbdVgOdfJrHPCox3hGMu4Xuob51pIBToYInF8W4CaP2vFO3FE6YgDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fqewF380; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1706518737; c=relaxed/simple;
+	bh=YEy86K1x0qazORfLq0lORTS8eMy12FJ8kk0seMZrf18=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=oXXleJdYuGLiLAEkbuo2Kv0b9vhGArPkkFzPFRJ9/xZxkaTuDunc0EdOGYHhEbbnBftQRkIWXUEOg4R8yOhRzBF1dQ4Sv2/rMZO3ndvmlYdU87jHxLbYTBNXuW6Y/dqM8I6QWGfesX+essl+cecWDJK55emyZxNOqYcxr0n5ZVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DGN9tsCM; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706518733;
+	s=mimecast20190719; t=1706518734;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=5XzGyD91tSFtwbaP/RZX9vrPIPZ99bsOrgK+5Q9UbRw=;
-	b=fqewF380ObVUeZrtHa0ZYRpP83f3SZAj0SPFHic6D0YsUkup5m6pOegVAte1Ru36MP2I2Q
-	nhI0J/w9iYQH4xyIpnROfV5Lvr5rjA+MrmkLWLZ9cFkIpeCGrcSwkOyrBVHhsYxfmQm1Tq
-	HDj63AIDgj5QNP78D5fz0UXDLZvnmcE=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bzxCsmFGohwMmLt5w9cpmSAACkULFHcmcOvKhkRxwcM=;
+	b=DGN9tsCMzxOPgTYD/MJa0x4kXDsH93Hl1LKGg6euMhuhgXskJ6a+aDZTEf/1/GetcvoV0i
+	On9xlMnSriWt+EESM7QzRh7DL+aYLCZBpqwbx9WYQn75kF60vRsAk5d2r6s/CUGC5W7Zav
+	9BJlgpJHpMdyxmjbStpML+YbrBrWS6k=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-655-O3wt7qbhOH660AYE7c-3vg-1; Mon, 29 Jan 2024 03:58:49 -0500
-X-MC-Unique: O3wt7qbhOH660AYE7c-3vg-1
+ us-mta-653-lk8hdy6uNzmzfDzAo9nV6g-1; Mon, 29 Jan 2024 03:58:50 -0500
+X-MC-Unique: lk8hdy6uNzmzfDzAo9nV6g-1
 Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3B53A868900;
-	Mon, 29 Jan 2024 08:58:49 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2CE2E85A597;
+	Mon, 29 Jan 2024 08:58:50 +0000 (UTC)
 Received: from fedora.redhat.com (unknown [10.45.225.235])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 82AA2492BE2;
-	Mon, 29 Jan 2024 08:58:48 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 723FB492BE2;
+	Mon, 29 Jan 2024 08:58:49 +0000 (UTC)
 From: Vitaly Kuznetsov <vkuznets@redhat.com>
 To: kvm@vger.kernel.org,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	Sean Christopherson <seanjc@google.com>
-Subject: [PATCH v2 1/2] KVM: selftests: Avoid infinite loop in hyperv_features when invtsc is missing
-Date: Mon, 29 Jan 2024 09:58:46 +0100
-Message-ID: <20240129085847.2674082-1-vkuznets@redhat.com>
+Subject: [PATCH v2 2/2] KVM: selftests: Fail tests when open() fails with !ENOENT
+Date: Mon, 29 Jan 2024 09:58:47 +0100
+Message-ID: <20240129085847.2674082-2-vkuznets@redhat.com>
+In-Reply-To: <20240129085847.2674082-1-vkuznets@redhat.com>
+References: <20240129085847.2674082-1-vkuznets@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -70,66 +74,43 @@ Content-Type: text/plain
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
 
-When X86_FEATURE_INVTSC is missing, guest_test_msrs_access() was supposed
-to skip testing dependent Hyper-V invariant TSC feature. Unfortunately,
-'continue' does not lead to that as stage is not incremented. Moreover,
-'vm' allocated with vm_create_with_one_vcpu() is not freed and the test
-runs out of available file descriptors very quickly.
+open_path_or_exit() is used for '/dev/kvm', '/dev/sev', and
+'/sys/module/%s/parameters/%s' and skipping test when the entry is missing
+is completely reasonable. Other errors, however, may indicate a real issue
+which is easy to miss. E.g. when 'hyperv_features' test was entering an
+infinite loop the output was:
 
-Fixes: bd827bd77537 ("KVM: selftests: Test Hyper-V invariant TSC control")
+./hyperv_features
+Testing access to Hyper-V specific MSRs
+1..0 # SKIP - /dev/kvm not available (errno: 24)
+
+and this can easily get overlooked.
+
+Keep ENOENT case 'special' for skipping tests and fail when open() results
+in any other errno.
+
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- tools/testing/selftests/kvm/x86_64/hyperv_features.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+Changes since v1: Use strerror() for 'skip' and rely on the already
+existing one in test_assert() for 'fail'. [Sean]
+---
+ tools/testing/selftests/kvm/lib/kvm_util.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_features.c b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-index 4f4193fc74ff..b923a285e96f 100644
---- a/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-+++ b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-@@ -454,7 +454,7 @@ static void guest_test_msrs_access(void)
- 		case 44:
- 			/* MSR is not available when CPUID feature bit is unset */
- 			if (!has_invtsc)
--				continue;
-+				goto next_stage;
- 			msr->idx = HV_X64_MSR_TSC_INVARIANT_CONTROL;
- 			msr->write = false;
- 			msr->fault_expected = true;
-@@ -462,7 +462,7 @@ static void guest_test_msrs_access(void)
- 		case 45:
- 			/* MSR is vailable when CPUID feature bit is set */
- 			if (!has_invtsc)
--				continue;
-+				goto next_stage;
- 			vcpu_set_cpuid_feature(vcpu, HV_ACCESS_TSC_INVARIANT);
- 			msr->idx = HV_X64_MSR_TSC_INVARIANT_CONTROL;
- 			msr->write = false;
-@@ -471,7 +471,7 @@ static void guest_test_msrs_access(void)
- 		case 46:
- 			/* Writing bits other than 0 is forbidden */
- 			if (!has_invtsc)
--				continue;
-+				goto next_stage;
- 			msr->idx = HV_X64_MSR_TSC_INVARIANT_CONTROL;
- 			msr->write = true;
- 			msr->write_val = 0xdeadbeef;
-@@ -480,7 +480,7 @@ static void guest_test_msrs_access(void)
- 		case 47:
- 			/* Setting bit 0 enables the feature */
- 			if (!has_invtsc)
--				continue;
-+				goto next_stage;
- 			msr->idx = HV_X64_MSR_TSC_INVARIANT_CONTROL;
- 			msr->write = true;
- 			msr->write_val = 1;
-@@ -513,6 +513,7 @@ static void guest_test_msrs_access(void)
- 			return;
- 		}
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index e066d584c656..e354d1e513ba 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -27,7 +27,8 @@ int open_path_or_exit(const char *path, int flags)
+ 	int fd;
  
-+next_stage:
- 		stage++;
- 		kvm_vm_free(vm);
- 	}
+ 	fd = open(path, flags);
+-	__TEST_REQUIRE(fd >= 0, "%s not available (errno: %d)", path, errno);
++	__TEST_REQUIRE(fd >= 0 || errno != ENOENT, "Cannot open %s: %s", path, strerror(errno));
++	TEST_ASSERT(fd >= 0, "Failed to open '%s'", path);
+ 
+ 	return fd;
+ }
 -- 
 2.43.0
 
