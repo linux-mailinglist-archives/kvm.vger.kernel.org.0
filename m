@@ -1,117 +1,154 @@
-Return-Path: <kvm+bounces-7302-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7303-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6CAF83FC56
-	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 03:41:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EFDD83FC77
+	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 04:04:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 78BFBB21144
-	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 02:41:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C6BB1F233F0
+	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 03:04:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8871F9F2;
-	Mon, 29 Jan 2024 02:41:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A858E10957;
+	Mon, 29 Jan 2024 03:03:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SKdahftW"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CE75DDD7;
-	Mon, 29 Jan 2024 02:41:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B4D8F9EA
+	for <kvm@vger.kernel.org>; Mon, 29 Jan 2024 03:03:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706496094; cv=none; b=UhVNi7XZSYF8W31aRgfdLMK65HNhLGOfAiZS14GgBbzPzpi8lE5sut2lpxr8tahW+fGPzBI9/USMzKr3KXQ32/zGJWLQ16NMYUHRzy6lAJYoRnyD4BJEvVg5Bx1uZuOp1lUJ1hhfBRJ68IX9E0U2lhqN2nZ/sW7hLXWSVDpcXe8=
+	t=1706497421; cv=none; b=YKqPg18HOBZnfqVEsdYqdDinu4o+c/ke0PEq9MXKZ3f0l/hEpVgod5MkfZwUf6xbevUase/8m3IBEjiObP64AxTP+eR40wvVAOuwaBpzlnLOGtg3770xPK4tjjl2I24NSsjggE9/wTY9jgUzVfyIf/DgXnJRO3Gg8BK3knnztX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706496094; c=relaxed/simple;
-	bh=BZnih3B4LHOUfu+8lJbv8SbVzOo9wGNFWAuJnC18Guw=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=sRJ/9Q/DCg4/rRVZK7pyuJj7J8utw9PpSQ4B4m6qp+4JbZdgZS3vPSWINQNAZ0OjuT6COCvpfIRTTHCtLkzfeBYB8gxPQxXWiz8PlzOWyaRhK4ZHslMCq5ZetJ5Usy2EduHEVwf/b0EI+XGQng6S6grNkNze2WsOhKeXcVIH8Qw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.173])
-	by gateway (Coremail) with SMTP id _____8CxmehZELdlLJgHAA--.4481S3;
-	Mon, 29 Jan 2024 10:41:29 +0800 (CST)
-Received: from [10.20.42.173] (unknown [10.20.42.173])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8Cxf89WELdl_jokAA--.13380S3;
-	Mon, 29 Jan 2024 10:41:28 +0800 (CST)
-Subject: Re: [PATCH v6 0/4] VM: selftests: Add LoongArch support
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
- Tianrui Zhao <zhaotianrui@loongson.cn>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20240125015420.1960090-1-maobibo@loongson.cn>
- <ZbQW0yfI08qwXcfQ@google.com>
-From: maobibo <maobibo@loongson.cn>
-Message-ID: <cd42d246-896d-56a9-8dc3-6c998695aad2@loongson.cn>
-Date: Mon, 29 Jan 2024 10:41:26 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1706497421; c=relaxed/simple;
+	bh=hUZuM/7erQxDJnYlhTtks20R14zFZ05CUreg11QXzOM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oHOAKAtTMKQyNYe+WN/qg0Lp5IIsof8DvboWMKOR+Hu561ObO8e/g43TopJCnzBWU6vYDU0W2uJLoW2Y1nEc28hVwmPEdHU1Ubw9oVY7eIFI3n5ySu36UiqJNMSsQsqvZjYf/2haZWT548WL0EJg6xUJr1E2VPoG5S6HwGqiM8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SKdahftW; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706497418;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hUZuM/7erQxDJnYlhTtks20R14zFZ05CUreg11QXzOM=;
+	b=SKdahftWMz6S8G2jjeC0hwuSIPDbHeRpvGvjPltdTHrxQnRfhZ/ZPVlc8B/IIrsUmoDaEV
+	1j+sqLDxn1XCObJB0hYkpfXEw78l0G+s4wxDOCQrTruH/PQYI4IO0A9P+IPzBPV0FWluPJ
+	rx7cbJdQHbyBnIOI2KL9oNQkGyh10Rc=
+Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
+ [209.85.167.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-636-sgivkUjyMvi778qzln5Pag-1; Sun, 28 Jan 2024 22:03:37 -0500
+X-MC-Unique: sgivkUjyMvi778qzln5Pag-1
+Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-3bd3b54e5c6so3380476b6e.1
+        for <kvm@vger.kernel.org>; Sun, 28 Jan 2024 19:03:37 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706497416; x=1707102216;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hUZuM/7erQxDJnYlhTtks20R14zFZ05CUreg11QXzOM=;
+        b=WQyDJirdXxkhhbcbvXQQqfzIDhcH+hpoScyCGtXMbu5jANjfVRA1UwusUTd+iB3AZZ
+         UOY8mrsM83cYnthP2t2vYcjMPK5JcT3aU/8lucSWXOd2GV9OoFT7O/4vkanpCgJ5AsM3
+         UXmLz2L3e6pONmAJiSHMVluMX/Yz7FKQRh3ev6tZ7o+4DstKHZgi51GMomV5I7Xad8kT
+         ZO/3f1BtHSRMBI9UGLF5Hvz9CeNKcLFJdm6NVAn0NqUS2O1WfyQVEpWBuTnj99VmtwS2
+         cov5CJyVXGjANeYtFfDRT9yzkaav0+wDuFTraBIvRwrRe6fv4kRNTWEpXfNn20SJvnK2
+         3O6g==
+X-Gm-Message-State: AOJu0YzlqCERyzBEFu8wgATS19+6PAHbBI+rQNCxmzaxjZUGWpLAWOtY
+	mv/HzWCsWhnYjaYOGs+XiRo6vXQqkPcpq4IaZqjMGEHu9qLnX0KJXnQsJYH2LXkOMRq3Zv4eoIJ
+	7U1AqKkYZrF+Jr63w1AD5XjWa3slDESKJn3KEdjLHuNg7f39HIwwQ26bwepMIdnF4uo0yM5dJH0
+	t87Ploz077RjtfFeczFhzqcuyN
+X-Received: by 2002:a05:6359:459c:b0:176:5615:3ddd with SMTP id no28-20020a056359459c00b0017656153dddmr2935237rwb.2.1706497416343;
+        Sun, 28 Jan 2024 19:03:36 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IExhe3d4J+MGa7KOuc8jGw9K+dIEFQ7P5yFxc1K+TjoyzSuH0sJglvew2lRBzpwv6DzyOQIWq5hroZ6m+ZM7Dw=
+X-Received: by 2002:a05:6359:459c:b0:176:5615:3ddd with SMTP id
+ no28-20020a056359459c00b0017656153dddmr2935224rwb.2.1706497416041; Sun, 28
+ Jan 2024 19:03:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <ZbQW0yfI08qwXcfQ@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8Cxf89WELdl_jokAA--.13380S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoW7ZrWruFWxAr17CF1fKw4fXrc_yoW8CF18pa
-	yvk3WrKr48KF1xAF93X34vqr1ft3Z2kF4Iy3WaqryUZw47tr1xJw1xKF97Ca43Z3s5XryF
-	va4Ig3W3W3WUJacCm3ZEXasCq-sJn29KB7ZKAUJUUUU5529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUvYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
-	Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx1l5I
-	8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv67AK
-	xVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzV
-	AYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E
-	14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIx
-	kGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAF
-	wI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r
-	4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07j1WlkU
-	UUUU=
+References: <1706089075-16084-1-git-send-email-wangyunjian@huawei.com>
+ <CACGkMEu5PaBgh37X4KysoF9YB8qy6jM5W4G6sm+8fjrnK36KXA@mail.gmail.com> <ad74a361d5084c62a89f7aa276273649@huawei.com>
+In-Reply-To: <ad74a361d5084c62a89f7aa276273649@huawei.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Mon, 29 Jan 2024 11:03:24 +0800
+Message-ID: <CACGkMEvvdfBhNXPSxEgpPGAaTrNZr83nyw35bvuZoHLf+k85Yg@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/2] tun: AF_XDP Rx zero-copy support
+To: wangyunjian <wangyunjian@huawei.com>
+Cc: "mst@redhat.com" <mst@redhat.com>, 
+	"willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>, "kuba@kernel.org" <kuba@kernel.org>, 
+	"davem@davemloft.net" <davem@davemloft.net>, 
+	"magnus.karlsson@intel.com" <magnus.karlsson@intel.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, xudingke <xudingke@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Jan 25, 2024 at 8:54=E2=80=AFPM wangyunjian <wangyunjian@huawei.com=
+> wrote:
+>
+>
+>
+> > -----Original Message-----
+> > From: Jason Wang [mailto:jasowang@redhat.com]
+> > Sent: Thursday, January 25, 2024 12:49 PM
+> > To: wangyunjian <wangyunjian@huawei.com>
+> > Cc: mst@redhat.com; willemdebruijn.kernel@gmail.com; kuba@kernel.org;
+> > davem@davemloft.net; magnus.karlsson@intel.com; netdev@vger.kernel.org;
+> > linux-kernel@vger.kernel.org; kvm@vger.kernel.org;
+> > virtualization@lists.linux.dev; xudingke <xudingke@huawei.com>
+> > Subject: Re: [PATCH net-next 2/2] tun: AF_XDP Rx zero-copy support
+> >
+> > On Wed, Jan 24, 2024 at 5:38=E2=80=AFPM Yunjian Wang <wangyunjian@huawe=
+i.com>
+> > wrote:
+> > >
+> > > Now the zero-copy feature of AF_XDP socket is supported by some
+> > > drivers, which can reduce CPU utilization on the xdp program.
+> > > This patch set allows tun to support AF_XDP Rx zero-copy feature.
+> > >
+> > > This patch tries to address this by:
+> > > - Use peek_len to consume a xsk->desc and get xsk->desc length.
+> > > - When the tun support AF_XDP Rx zero-copy, the vq's array maybe empt=
+y.
+> > > So add a check for empty vq's array in vhost_net_buf_produce().
+> > > - add XDP_SETUP_XSK_POOL and ndo_xsk_wakeup callback support
+> > > - add tun_put_user_desc function to copy the Rx data to VM
+> >
+> > Code explains themselves, let's explain why you need to do this.
+> >
+> > 1) why you want to use peek_len
+> > 2) for "vq's array", what does it mean?
+> > 3) from the view of TUN/TAP tun_put_user_desc() is the TX path, so I gu=
+ess you
+> > meant TX zerocopy instead of RX (as I don't see codes for
+> > RX?)
+>
+> OK, I agree and use TX zerocopy instead of RX zerocopy. I meant RX zeroco=
+py
+> from the view of vhost-net.
 
+Ok.
 
-On 2024/1/27 上午4:32, Sean Christopherson wrote:
-> On Thu, Jan 25, 2024, Bibo Mao wrote:
->> ---
->> Tianrui Zhao (4):
->>    KVM: selftests: Add KVM selftests header files for LoongArch
->>    KVM: selftests: Add core KVM selftests support for LoongArch
->>    KVM: selftests: Add ucall test support for LoongArch
->>    KVM: selftests: Add test cases for LoongArch
->>
->>   tools/testing/selftests/kvm/Makefile          |  16 +
->>   .../selftests/kvm/include/kvm_util_base.h     |   5 +
->>   .../kvm/include/loongarch/processor.h         | 133 +++++++
->>   .../selftests/kvm/include/loongarch/ucall.h   |  20 ++
->>   .../selftests/kvm/lib/loongarch/exception.S   |  59 ++++
->>   .../selftests/kvm/lib/loongarch/processor.c   | 332 ++++++++++++++++++
->>   .../selftests/kvm/lib/loongarch/ucall.c       |  38 ++
->>   .../selftests/kvm/set_memory_region_test.c    |   2 +-
->>   8 files changed, 604 insertions(+), 1 deletion(-)
->>   create mode 100644 tools/testing/selftests/kvm/include/loongarch/processor.h
->>   create mode 100644 tools/testing/selftests/kvm/include/loongarch/ucall.h
->>   create mode 100644 tools/testing/selftests/kvm/lib/loongarch/exception.S
->>   create mode 100644 tools/testing/selftests/kvm/lib/loongarch/processor.c
->>   create mode 100644 tools/testing/selftests/kvm/lib/loongarch/ucall.c
-> 
-> I did a *very* quick read through and didn't see anything egregious.  I really
-> hope that someday we can deduplicate much of the ARM/RISC-V/LoongArch code, but
-> that's no reason to hold up getting selftests support merged.
-> 
-kvm seltests for LoongArch originally comes from ARM64, especially ucall 
-and page table walk code. And LoongArch kvm actually benefits much from 
-open source code, we will deduplicate some ARM/RISC-V/LoongArch kvm 
-selftests code when LoongArch KVM is basically supported.
+>
+> >
+> > A big question is how could you handle GSO packets from userspace/guest=
+s?
+>
+> Now by disabling VM's TSO and csum feature.
 
-Regards
-Bibo Mao
+Btw, how could you do that?
 
+Thanks
 
 
