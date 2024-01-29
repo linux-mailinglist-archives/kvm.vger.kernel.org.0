@@ -1,236 +1,217 @@
-Return-Path: <kvm+bounces-7292-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7293-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4663883FA0B
-	for <lists+kvm@lfdr.de>; Sun, 28 Jan 2024 22:24:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E8BF83FB9A
+	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 02:04:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 827E22830B6
-	for <lists+kvm@lfdr.de>; Sun, 28 Jan 2024 21:24:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A6EC1F23218
+	for <lists+kvm@lfdr.de>; Mon, 29 Jan 2024 01:04:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A12B51E873;
-	Sun, 28 Jan 2024 21:24:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA26BD27A;
+	Mon, 29 Jan 2024 01:03:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="aZuoExMx";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="gaHaosrr"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="S4/0uFcB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AE1933CFB;
-	Sun, 28 Jan 2024 21:24:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706477050; cv=fail; b=lc8pgf6Bjf0Xre0GO/hPRWQ0mWA01us2Gs8MItFP9zBsNmXUX8kvr6CkNDUyzbaiTa5DFFGbt1bg0GCmF1e7GIw3AQ6d8GWEGWfYy8O6lNR+p54e0BbG9y5CZdYeau2q+ou3eLCa8KtkC+silLA8CuQ2q8uHpeABHDdqLG39nWE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706477050; c=relaxed/simple;
-	bh=FjybJD1dcpGmKjPIMZsWOk4LOAdbE/dSXH6XVCSqBWk=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=A/YB5bYwEEQ9FwpCnb5AnHTZFHpbsspfGWnNwqlgsOGPIqAl1idyfCpq3IDb/UxCdeO4atpDggLF6tfpRKfINHoaMNHKbsXkEterBNbceFFhG68euxQ4O8gmhF4c4ZhdgDoDDTLv2YJd4TQzvQLGqtFm4nu0ls6bnpXo9w5bMcM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=aZuoExMx; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=gaHaosrr; arc=fail smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40SKgvBs023682;
-	Sun, 28 Jan 2024 21:23:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2023-11-20;
- bh=6Ucx6oqvJrsZZBb8dE2/OxPOB1nuTBCRgsbJwQOyV7k=;
- b=aZuoExMx3ZB5sKotQJwo3e49xN+f+ICgX1fbGbj/4BQLaNTIzOvKGaaRgx5pgSJy9/vn
- HSMLtidwtsl28tpMGLYXlp5TgIN7qaZk6UrDG1LxUxYQZM6dwjqD0rVrC6k5jA3lyKiN
- ca3XyLRwdsC2uF8jzB2vK4co/GUL/aSvQKVWE+sc14i/QYTlTxFjMUFG4EVxIMxzNCjL
- CmDg7qydgVkIgPPecBFS+qy0UA6N5+TISAVikFzjQH1CQVc+T6q2UcGQSh7uALljeS0+
- jLRPFLA925Dgm5FjxFukyh1tXohPW43KoXCkhRh+XojWDvsbuox0tGJEK4gwHYRJIwuw CA== 
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3vvrrcag3v-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 28 Jan 2024 21:23:02 +0000
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 40SJaVsq014588;
-	Sun, 28 Jan 2024 21:23:01 GMT
-Received: from nam10-bn7-obe.outbound.protection.outlook.com (mail-bn7nam10lp2100.outbound.protection.outlook.com [104.47.70.100])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3vvr94uvvu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 28 Jan 2024 21:23:01 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dVcwtpK8PTi5wlfa4cuRVKN74R6X6me/594WspeReJBCqd++MxkiQ3ijhEUOsyNOIRVuWTtVZ0Wa0IVXt57GHZWBsDsrVyLewnnu0rXEOX+9ULPCX92AWnrAk8VLkIIwts7yzW+eYBqypC+D9nL2q88WkmuCn+YB1jSW1ScSHHfLRARLuBFZOzZnSayer3FhHmKw4razE/YEMEAqbzBykx4rNCv2/07P0Zn6ESPf+niKhrMcHmpX7CKrTDXbm12eHVWnWlF8M4KhOoxXlKX1E0MahfQoxroUF7fJRSJ8s43d1Z4UcPLSjvl6kgoFwicltZIEOu5K6IHVi3hoqJOw4Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6Ucx6oqvJrsZZBb8dE2/OxPOB1nuTBCRgsbJwQOyV7k=;
- b=MXvWVkDu7oUfsHvExRHzSzB/Ja0fnKGhQu4UvCIvn9/J1ArWgodv58G6FQJzm3afRFwZBC3wy6rVGtuICV5kD0JJYHWw1tbzvWYSXxAFOJOepM1qEiKq+Y64rTKTWm9riNVtcG0q1bvWPDf8onu1cFAG4FI9vw9NiUuSBgdFzm17shoI2VemH7n+61vsG6KBO6OiGnRKs/cY8txrKVNvDOOvI9074pBkN2wvQvF1kKapCM1V2gvXgj+L391lVGuIerpA8dAXLlRZOMss5blJWW0jOoGAMo30ERQtOOLA9i2GwVJ7qDY3FB2obEl28u8ltx3rdK85e7AmMp1nOuSkYQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6Ucx6oqvJrsZZBb8dE2/OxPOB1nuTBCRgsbJwQOyV7k=;
- b=gaHaosrr+IEgXFUclADpP71aaibAZmLX+u00QKU7GfnaFoR/W/XQnZQgPLyByHlMjxFY/lmdBl2I4MpFe8PI+iAuTCikhGUTMuBOlSQu7PzFAOmirM644o36eMQjbMYJfu+zXzFCzuew7pcrLZDaVTJI+t71wrQzINVhKJkzJTM=
-Received: from PH0PR10MB5894.namprd10.prod.outlook.com (2603:10b6:510:14b::22)
- by SA1PR10MB5867.namprd10.prod.outlook.com (2603:10b6:806:233::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.26; Sun, 28 Jan
- 2024 21:22:57 +0000
-Received: from PH0PR10MB5894.namprd10.prod.outlook.com
- ([fe80::6fec:c8c5:bd31:11db]) by PH0PR10MB5894.namprd10.prod.outlook.com
- ([fe80::6fec:c8c5:bd31:11db%5]) with mapi id 15.20.7228.029; Sun, 28 Jan 2024
- 21:22:57 +0000
-Message-ID: <1b3650c5-822e-4789-81d2-0304573cabd9@oracle.com>
-Date: Sun, 28 Jan 2024 23:22:50 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 7/7] cpuidle/poll_state: replace cpu_relax with
- smp_cond_load_relaxed
-Content-Language: ro
-To: Will Deacon <will@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        catalin.marinas@arm.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, x86@kernel.org, hpa@zytor.com, pbonzini@redhat.com,
-        wanpengli@tencent.com, vkuznets@redhat.com, rafael@kernel.org,
-        daniel.lezcano@linaro.org, akpm@linux-foundation.org, pmladek@suse.com,
-        peterz@infradead.org, dianders@chromium.org, npiggin@gmail.com,
-        rick.p.edgecombe@intel.com, joao.m.martins@oracle.com,
-        juerg.haefliger@canonical.com, mic@digikod.net, arnd@arndb.de,
-        ankur.a.arora@oracle.com
-References: <1700488898-12431-1-git-send-email-mihai.carabas@oracle.com>
- <1700488898-12431-8-git-send-email-mihai.carabas@oracle.com>
- <20231211114642.GB24899@willie-the-truck>
-From: Mihai Carabas <mihai.carabas@oracle.com>
-In-Reply-To: <20231211114642.GB24899@willie-the-truck>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO2P265CA0195.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:9e::15) To PH0PR10MB5894.namprd10.prod.outlook.com
- (2603:10b6:510:14b::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE582DDA7
+	for <kvm@vger.kernel.org>; Mon, 29 Jan 2024 01:03:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706490238; cv=none; b=MmGl7v6SVOrp5IEOEpj3wQOMsMVIdgVKuDYtQAHMTfnRJ7XuNwqS4COsy1qWXPudv0lud4JnbIpS5nzsPhfSLt/MP8q6zfjOsXElS98fHErMcZv4bOyku+gwUvtenYb7U3dTUkF9uDcvWYut5z0rxnAiWJLGlLCS6Z+0jY0ZM5o=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706490238; c=relaxed/simple;
+	bh=7dCyYyC9HvsH0TC63mIxeQgXtZjfv1V7t2rD9NAJ8Jk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=d7epOqUOMbFtLjrDi20XtevXO9TZS1KC2I0B8do0/oMZGwcXdVfFHMCiQ/Nmu8jbCiCSGn0wh1QNm8+kAzmz5QnEU4jQa6Tcqj3NppDIqky/hZ2ixGWJiwd+L6VqkW7FYr+xD2HK6EqblIvVPWThNIpLBtF0UKL8no1rFsx7ziw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=S4/0uFcB; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706490237; x=1738026237;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=7dCyYyC9HvsH0TC63mIxeQgXtZjfv1V7t2rD9NAJ8Jk=;
+  b=S4/0uFcB8Uljbg/BkszEOU3zfu+pUqqH2ruH97Jwrpf4T56Y2yAKjTDM
+   0zQEuPgKRdtyQSr9WcpK9aUxots4BtS55NLcQ5qwqXipCwpFt33f7x2fO
+   L0Q3taPTV52sw3/Tok1HVzRbjdZ+D0ZNwNKmXTj/6Nrj7kb706iP2RoG/
+   mXl9dktq3356bmomatL4ojw0OkZ4bXnurap22+K6+7orcwDHHz99k0Qne
+   zVKEJdigcJI3G5wK23nMFry1uNUFHRYwqS9L1U6mdBylnLU2ZQB+Ql7yK
+   cX4F1j3CsUtmukee8V5TfriUhzUyZFNXUvzeMrXI7wi/b52BIGT7w8lXZ
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10967"; a="10207112"
+X-IronPort-AV: E=Sophos;i="6.05,226,1701158400"; 
+   d="scan'208";a="10207112"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2024 17:03:56 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10967"; a="906910595"
+X-IronPort-AV: E=Sophos;i="6.05,226,1701158400"; 
+   d="scan'208";a="906910595"
+Received: from lkp-server01.sh.intel.com (HELO 370188f8dc87) ([10.239.97.150])
+  by fmsmga002.fm.intel.com with ESMTP; 28 Jan 2024 17:03:53 -0800
+Received: from kbuild by 370188f8dc87 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rUG3y-0003uW-2i;
+	Mon, 29 Jan 2024 01:03:50 +0000
+Date: Mon, 29 Jan 2024 09:03:25 +0800
+From: kernel test robot <lkp@intel.com>
+To: Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
+Cc: oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
+	Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH 13/15] KVM: arm64: vgic-its: Protect cached vgic_irq
+ pointers with RCU
+Message-ID: <202401290835.TjDnhUFI-lkp@intel.com>
+References: <20240124204909.105952-14-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR10MB5894:EE_|SA1PR10MB5867:EE_
-X-MS-Office365-Filtering-Correlation-Id: fc12db02-be32-4116-b3ec-08dc20474c5e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 
-	jW0mZriM9Q0Lj8dRP9xBCbMd53eagVs90IZ0Za0LJxzLaRWy4fHjRNaICfTV9vpnZLG4wopHtYcR0AohwxIfzKUCJuMEY+AYO/RB2LZbp+VUIf3rpfKkaboj8Y0XxTJRTmYdqf5TaOQTMPieupnId7PFQ4Pfv/jMDPoMJoGxWIA8FymkWX2wG3hp93S2nzc2il2IEUgunqlIzjDAKNKTO0b+/Yia73BkRgji4O2tzARg0UT3NTTkXooEQNjjq1GsAE4FzPRTAux+3AM7FmXsFQu0bDdmk+8oglcnadkIRKXOg8e9zKcS4YQDGNQfgOOa4H1TkaotSpyNeqQbU9gNm7L18NzZx9PmsjxFv6Nw+B+MrN+XsHTJRbu+dYluUrj4AL3mFJcwoTelNQ7zgc/oaw1aOgdH9u8G7ndbgjCk0ed8UmK3mjxmPy8nzFNbJVLUBfrWTo0LtLw2CLDIy6xY9iRCTHIQV1lBoNTFjMrrYJ9ZXssEZ2uULzVvOVxNul+WzbxY4LaYrpr/3mao5mntLtCHWfdrgsMnNGCsOtbU87Q4xe4EyVhB2WAASGn9o2DNIXSnho13OfBpmJmt/XdYvYD4H+VKFT88mBGj0/YirmdQTzv2d/vGTs4It3hS3P+XiVYE7NZJUrWJVRkzdv9aQA==
-X-Forefront-Antispam-Report: 
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR10MB5894.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(376002)(136003)(346002)(39860400002)(396003)(230922051799003)(451199024)(186009)(64100799003)(1800799012)(66946007)(8676002)(5660300002)(66556008)(66476007)(2906002)(4326008)(8936002)(7416002)(316002)(31696002)(44832011)(86362001)(6486002)(6916009)(6512007)(83380400001)(36756003)(38100700002)(478600001)(6666004)(6506007)(2616005)(41300700001)(31686004)(26005)(107886003)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: 
-	=?utf-8?B?WGhVajBWa3lmaytVOCtSTGdsVXVzWCtIVW5Nemd0MkhDUDR0RnhMb1lMSXRL?=
- =?utf-8?B?c0twS0twQy9WUXlpRDd4TzJNNFF0aGUrOUs2aTJYdncxLzJQdVN4OHBkdlU3?=
- =?utf-8?B?bWFlTEQzdUdrRXllMWR1anc2WDJOc1E1cU51SUtGejNDbk02dkJpN3RyVFJw?=
- =?utf-8?B?elhEUFZNeHBwaGJCOUhqVlVKd04vZEduZEpCOGtjbHk0UHBkcXF6YmMrd2V2?=
- =?utf-8?B?WWUxdUxsWGJOVTIwNmpxUE8rL2ZKNjExVlBpYXBobnRJSWNrYngwM2pYeW44?=
- =?utf-8?B?c0ttdGJGQUY3V0Zwd1dCYnNyYnE1ZGdKdGMvazVYWnIwcEVPQm9IcDR2NGhT?=
- =?utf-8?B?dlBoTUpSeFd2dis3UjhBYXdNLzdmTlVTa1I3QzBJdEt0eHdQUkR3RFNmdFAz?=
- =?utf-8?B?UkJFRDN0QytsbXNKY0Rvc293YVpQOGlHbEtyWllYMkdveDR1MTdidmJNcDRZ?=
- =?utf-8?B?SDhaSmF0QlhLZEJ4ZFZWdkZWZzVHZW10L3ROWTNkNnJ4UHcvblpOQ3JzaHBB?=
- =?utf-8?B?RU9pUFROTUlPZUJqZytPWHBPOHBlRWgvaDFYNzhrbkhjcEo0ZldPWmRUcUxL?=
- =?utf-8?B?RTVsKzJ1clVDb05EeWlWa1hJVy9nN2FzdFVPL1lCSGdnN3I4aHB5S1JGb1pJ?=
- =?utf-8?B?MVRLZGVwUnRKcjIwZUh4U01lYjVrY0w1dnVpZkd5VzR1Mlpza0xHY3VzR2ht?=
- =?utf-8?B?cFZzbVdOQ21lZXl3cmlxbFRPYlVuWC9xSjV4RzRVUTVHU0xZdEIrc1pCdGZj?=
- =?utf-8?B?RXN2b2VxbFBodlQ4QWhlUlk3QkNVR09kWmNvN1lkbmZSd3RMTWlkSk5iYUpz?=
- =?utf-8?B?WGdyc2huN0hVRm1OYW1EcE9MZkJoZlJzYlgrSlJPZjd0R2ZUMVpLZUt0cmdF?=
- =?utf-8?B?dG9NdWsvZCtlYUQ3Mm0zU2lNV2dNQTQ3T2JmMU9kekFmVXltejdVVlQ1bTRt?=
- =?utf-8?B?MlRuSnNaWFphUDJqeUNNRDUva3RqU2tBbnJMTGtCazhLa3NERTVTdjEzcXVP?=
- =?utf-8?B?blpHRkVGL1RFVjhhSzRUU1JuKzdhTVJiakFjSm9hQWFadk8xeEU3MU16NTdM?=
- =?utf-8?B?WDIydHhYMWp2d1RCY3R5VTZJN1lHbyt2WThYMmdXWnBDV2FuMENNMDdRODlN?=
- =?utf-8?B?ekpGY0dsMlU5K200QWI3SGZLMkxKQmtuUy9qbjloc1FrYlBuczVMWjhRVGpJ?=
- =?utf-8?B?VEcxRTI1dEM5dXJ4dURrRVZtQjRiL0tha21aVElxUEhzajgwRE5MTDNSYkF3?=
- =?utf-8?B?cFl5encvQzloRlViWVdpdWcxMDNZRW0wdnVUVzAwcmRKaHYxRFlsNXdYOWN0?=
- =?utf-8?B?V2cwNFQ5VmU4S3pucVNLbHQwaXFYOEx0MUpYV1E1cmlYalJmODQrSjBKTCty?=
- =?utf-8?B?WjRSS01CR3B3REllamJaekozYStPWFp4UVI0MnV6c1FFMWlsWEtWUStHdmt4?=
- =?utf-8?B?WHl1SCt3QWVkTW9jV1prY3RmZERKaVpyZzNWK0FoUzNLbkpRTGhHYWkwQ05v?=
- =?utf-8?B?K2YwOVZ5RzdPYVY3cGpTU0gzUHhOeVhoTmtjYS9WTURlMU1MVU5uYnZnaDhr?=
- =?utf-8?B?SmNzZUxOTE1pU2NLRG1pYVhpUkxLTVNMMW83a21WTWVUN2NFUlVtYXZMMWda?=
- =?utf-8?B?Q0xwY3FZcjl6OTd3VWNZZ2Nkd2VXQ2pkVnVuTWhLd3pVdlVHMFNzZ3M5Vkxa?=
- =?utf-8?B?QWl6dTUvWWFCRTlVZzZuSkZuK1pRNmQ4djlvdENWUG91MXRna1dkdXVmbDBm?=
- =?utf-8?B?eEFHZjRWTEtCeVNSM2V0U0hUc1lNTkppS3p3NVREeHJPdmtYUUxiOHA5VGp0?=
- =?utf-8?B?TDFMUVVKOVl0ZVdNaVJ3UzUxcVZrc0JUam1ySGZacHhqN1MvK3ZyenI3ellK?=
- =?utf-8?B?RFFYUDlkd2VROGd4SjRRZmI0VllpVDJkSmVPTGt6TSttMmVmUklXeVpQdHg2?=
- =?utf-8?B?VkdwdzVra29Zdmd3dEF1bm1XNlp2N3RLNEFUeDV1Z3BUQnRZWkJ4ZjEzZDk3?=
- =?utf-8?B?aTUxMkxjOUZJQUg2ZERSMzd6SEE0akpmdU94aUJjQUprWTVTL1lVeDNLWUZM?=
- =?utf-8?B?ZDZJcjBQUktzUERaQXdzY3BtR3RRaHRpMlpGanRsZ2U4SHRpbVJmMDkzekJh?=
- =?utf-8?B?MzRoSWhUS2hXbTJ4NjAyVE5XeWdHVFVJZVlrU2gxVWc3QUNVSjN2RGgvWjFO?=
- =?utf-8?B?Rmc9PQ==?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	pkQA0Ysjn6awwHTgDWvUT3x7ZjQPQSDccXAj67YpMZEfrLQqfAb7uWaLTZwuvOr+rE0dvmIgTUicEpWfhZ1+NxcWI/k06hnKg16Sj3apAR0sv6EYFYbaBlR10FZZIYXU25aDSIw/ukyKMkKJxnZvzbQE1grjr3zLoM9XQfxCi9OOZP24NY3Jhp6lrqezuzwHQERwyseHWG6JLFX/ye5tHevhnh8q9tLFTl/BmSarLxdki9twV1p/JPTk7gWs2WlelLGsWjx9X8f5NqwgFIjRvmqWldkgVR7ooDH9+CX6KSu2gBwg1C1pkyxn323bz2tUBtVAanuZm0g8Xz6AGO32k7/ruKZb3ZcERoKeqFerLEcXlxaayBSOyuXWg4ZN7wZscZCUPPHnLYHc9ctnXk5h7ytOo73vIe5D1Sz8RBV3YxFZH72fex/jdzBbDPg5PZzdNLyH3hmpMBp3jYc9DQQsfKOjMyFraW5BV0TzNPUUInEhlAKdiR+/JMLitGKDmfChKxhE+SaVVRpZZFK1BJBWFwA5OPy0R5TwWzVG9yin/HuNH7OyFr5MZtF1KFadq6MTa58Qf+6GCW+zMkRd1e0P7GGEGom/ToVQBsECZu7jgLY=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fc12db02-be32-4116-b3ec-08dc20474c5e
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR10MB5894.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jan 2024 21:22:57.8168
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1dgQLupogO0VUJiM8H3xTvIVgvslOkc7KsHIW2u+5SKsj7lNOza5kpfruoVN5+J2SBe3c/bLaJKQ+2wRUvXSbmDqY6c7rj3T/6AdXlT8Rzc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR10MB5867
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-25_14,2024-01-25_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 bulkscore=0 malwarescore=0
- suspectscore=0 phishscore=0 mlxscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
- definitions=main-2401280161
-X-Proofpoint-ORIG-GUID: NISH4m-UVNfqzhovLBzMUFj71bEsjCbR
-X-Proofpoint-GUID: NISH4m-UVNfqzhovLBzMUFj71bEsjCbR
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240124204909.105952-14-oliver.upton@linux.dev>
 
-La 11.12.2023 13:46, Will Deacon a scris:
-> On Mon, Nov 20, 2023 at 04:01:38PM +0200, Mihai Carabas wrote:
->> cpu_relax on ARM64 does a simple "yield". Thus we replace it with
->> smp_cond_load_relaxed which basically does a "wfe".
->>
->> Suggested-by: Peter Zijlstra <peterz@infradead.org>
->> Signed-off-by: Mihai Carabas <mihai.carabas@oracle.com>
->> ---
->>   drivers/cpuidle/poll_state.c | 14 +++++++++-----
->>   1 file changed, 9 insertions(+), 5 deletions(-)
->>
->> diff --git a/drivers/cpuidle/poll_state.c b/drivers/cpuidle/poll_state.c
->> index 9b6d90a72601..440cd713e39a 100644
->> --- a/drivers/cpuidle/poll_state.c
->> +++ b/drivers/cpuidle/poll_state.c
->> @@ -26,12 +26,16 @@ static int __cpuidle poll_idle(struct cpuidle_device *dev,
->>   
->>   		limit = cpuidle_poll_time(drv, dev);
->>   
->> -		while (!need_resched()) {
->> -			cpu_relax();
->> -			if (loop_count++ < POLL_IDLE_RELAX_COUNT)
->> -				continue;
->> -
->> +		for (;;) {
->>   			loop_count = 0;
->> +
->> +			smp_cond_load_relaxed(&current_thread_info()->flags,
->> +					      (VAL & _TIF_NEED_RESCHED) ||
->> +					      (loop_count++ >= POLL_IDLE_RELAX_COUNT));
->> +
->> +			if (loop_count < POLL_IDLE_RELAX_COUNT)
->> +				break;
->> +
->>   			if (local_clock_noinstr() - time_start > limit) {
->>   				dev->poll_time_limit = true;
->>   				break;
-> Doesn't this make ARCH_HAS_CPU_RELAX a complete misnomer?
+Hi Oliver,
 
-This controls the build of poll_state.c and the generic definition of 
-smp_cond_load_relaxed (used by x86) is using cpu_relax(). Do you propose 
-other approach here?
+kernel test robot noticed the following build warnings:
 
+[auto build test WARNING on 6613476e225e090cc9aad49be7fa504e290dd33d]
 
->
-> Will
+url:    https://github.com/intel-lab-lkp/linux/commits/Oliver-Upton/KVM-arm64-vgic-Store-LPIs-in-an-xarray/20240125-045255
+base:   6613476e225e090cc9aad49be7fa504e290dd33d
+patch link:    https://lore.kernel.org/r/20240124204909.105952-14-oliver.upton%40linux.dev
+patch subject: [PATCH 13/15] KVM: arm64: vgic-its: Protect cached vgic_irq pointers with RCU
+config: arm64-randconfig-r112-20240128 (https://download.01.org/0day-ci/archive/20240129/202401290835.TjDnhUFI-lkp@intel.com/config)
+compiler: clang version 18.0.0git (https://github.com/llvm/llvm-project a31a60074717fc40887cfe132b77eec93bedd307)
+reproduce: (https://download.01.org/0day-ci/archive/20240129/202401290835.TjDnhUFI-lkp@intel.com/reproduce)
 
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202401290835.TjDnhUFI-lkp@intel.com/
 
+sparse warnings: (new ones prefixed by >>)
+>> arch/arm64/kvm/vgic/vgic-its.c:705:41: sparse: sparse: incorrect type in argument 2 (different address spaces) @@     expected struct vgic_irq *irq @@     got struct vgic_irq [noderef] __rcu *irq @@
+   arch/arm64/kvm/vgic/vgic-its.c:705:41: sparse:     expected struct vgic_irq *irq
+   arch/arm64/kvm/vgic/vgic-its.c:705:41: sparse:     got struct vgic_irq [noderef] __rcu *irq
+   arch/arm64/kvm/vgic/vgic-its.c:727:38: sparse: sparse: incorrect type in argument 2 (different address spaces) @@     expected struct vgic_irq *irq @@     got struct vgic_irq [noderef] __rcu *irq @@
+   arch/arm64/kvm/vgic/vgic-its.c:727:38: sparse:     expected struct vgic_irq *irq
+   arch/arm64/kvm/vgic/vgic-its.c:727:38: sparse:     got struct vgic_irq [noderef] __rcu *irq
+   arch/arm64/kvm/vgic/vgic-its.c:891:17: sparse: sparse: cast to restricted __le64
+   arch/arm64/kvm/vgic/vgic-its.c:1031:24: sparse: sparse: cast to restricted __le64
+   arch/arm64/kvm/vgic/vgic-its.c:2245:13: sparse: sparse: incorrect type in assignment (different base types) @@     expected unsigned long long [assigned] [usertype] val @@     got restricted __le64 [usertype] @@
+   arch/arm64/kvm/vgic/vgic-its.c:2245:13: sparse:     expected unsigned long long [assigned] [usertype] val
+   arch/arm64/kvm/vgic/vgic-its.c:2245:13: sparse:     got restricted __le64 [usertype]
+   arch/arm64/kvm/vgic/vgic-its.c:2271:15: sparse: sparse: cast to restricted __le64
+   arch/arm64/kvm/vgic/vgic-its.c:2397:13: sparse: sparse: incorrect type in assignment (different base types) @@     expected unsigned long long [assigned] [usertype] val @@     got restricted __le64 [usertype] @@
+   arch/arm64/kvm/vgic/vgic-its.c:2397:13: sparse:     expected unsigned long long [assigned] [usertype] val
+   arch/arm64/kvm/vgic/vgic-its.c:2397:13: sparse:     got restricted __le64 [usertype]
+   arch/arm64/kvm/vgic/vgic-its.c:2424:17: sparse: sparse: cast to restricted __le64
+   arch/arm64/kvm/vgic/vgic-its.c:2525:17: sparse: sparse: cast to restricted __le64
+   arch/arm64/kvm/vgic/vgic-its.c:2584:13: sparse: sparse: incorrect type in assignment (different base types) @@     expected unsigned long long [assigned] [usertype] val @@     got restricted __le64 [usertype] @@
+   arch/arm64/kvm/vgic/vgic-its.c:2584:13: sparse:     expected unsigned long long [assigned] [usertype] val
+   arch/arm64/kvm/vgic/vgic-its.c:2584:13: sparse:     got restricted __le64 [usertype]
+   arch/arm64/kvm/vgic/vgic-its.c:2605:15: sparse: sparse: cast to restricted __le64
+   arch/arm64/kvm/vgic/vgic-its.c:39:24: sparse: sparse: context imbalance in 'vgic_add_lpi' - different lock contexts for basic block
+   arch/arm64/kvm/vgic/vgic-its.c:284:12: sparse: sparse: context imbalance in 'update_lpi_config' - different lock contexts for basic block
+   arch/arm64/kvm/vgic/vgic-its.c:458:9: sparse: sparse: context imbalance in 'its_sync_lpi_pending_table' - different lock contexts for basic block
+   arch/arm64/kvm/vgic/vgic-its.c: note: in included file (through include/linux/random.h, arch/arm64/include/asm/pointer_auth.h, arch/arm64/include/asm/processor.h, ...):
+   include/linux/list.h:83:21: sparse: sparse: self-comparison always evaluates to true
+   arch/arm64/kvm/vgic/vgic-its.c:796:12: sparse: sparse: context imbalance in 'vgic_its_trigger_msi' - different lock contexts for basic block
+   arch/arm64/kvm/vgic/vgic-its.c:818:5: sparse: sparse: context imbalance in 'vgic_its_inject_cached_translation' - wrong count at exit
+   include/linux/list.h:83:21: sparse: sparse: self-comparison always evaluates to true
+   include/linux/list.h:83:21: sparse: sparse: self-comparison always evaluates to true
+   include/linux/list.h:83:21: sparse: sparse: self-comparison always evaluates to true
+
+vim +705 arch/arm64/kvm/vgic/vgic-its.c
+
+73dcc3dd6274b9 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  637  
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  638  static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  639  				       u32 devid, u32 eventid,
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  640  				       struct vgic_irq *irq)
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  641  {
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  642  	struct vgic_translation_cache_entry *new, *victim;
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  643  	struct vgic_dist *dist = &kvm->arch.vgic;
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  644  	unsigned long flags;
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  645  	phys_addr_t db;
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  646  
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  647  	/* Do not cache a directly injected interrupt */
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  648  	if (irq->hw)
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  649  		return;
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  650  
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  651  	new = victim = kzalloc(sizeof(*new), GFP_KERNEL_ACCOUNT);
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  652  	if (!new)
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  653  		return;
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  654  
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  655  	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
+131b61b5cd90e9 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  656  	rcu_read_lock();
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  657  
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  658  	/*
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  659  	 * We could have raced with another CPU caching the same
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  660  	 * translation behind our back, so let's check it is not in
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  661  	 * already
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  662  	 */
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  663  	db = its->vgic_its_base + GITS_TRANSLATER;
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  664  	if (__vgic_its_check_cache(dist, db, devid, eventid))
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  665  		goto out;
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  666  
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  667  	if (dist->lpi_cache_count >= vgic_its_max_cache_size(kvm)) {
+73dcc3dd6274b9 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  668  		victim = vgic_its_cache_victim(dist);
+73dcc3dd6274b9 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  669  		if (WARN_ON_ONCE(!victim)) {
+73dcc3dd6274b9 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  670  			victim = new;
+73dcc3dd6274b9 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  671  			goto out;
+73dcc3dd6274b9 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  672  		}
+73dcc3dd6274b9 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  673  
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  674  		list_del(&victim->entry);
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  675  		dist->lpi_cache_count--;
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  676  	} else {
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  677  		victim = NULL;
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  678  	}
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  679  
+7f253bdb6144f3 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  680  	/*
+7f253bdb6144f3 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  681  	 * The irq refcount is guaranteed to be nonzero while holding the
+7f253bdb6144f3 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  682  	 * its_lock, as the ITE (and the reference it holds) cannot be freed.
+7f253bdb6144f3 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  683  	 */
+7f253bdb6144f3 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  684  	lockdep_assert_held(&its->its_lock);
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  685  	vgic_get_irq_kref(irq);
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  686  
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  687  	new->db		= db;
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  688  	new->devid	= devid;
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  689  	new->eventid	= eventid;
+131b61b5cd90e9 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  690  	rcu_assign_pointer(new->irq, irq);
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  691  
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  692  	/* Move the new translation to the head of the list */
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  693  	list_add(&new->entry, &dist->lpi_translation_cache);
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  694  
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  695  out:
+131b61b5cd90e9 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  696  	rcu_read_unlock();
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  697  	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  698  
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  699  	/*
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  700  	 * Caching the translation implies having an extra reference
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  701  	 * to the interrupt, so drop the potential reference on what
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  702  	 * was in the cache, and increment it on the new interrupt.
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  703  	 */
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  704  	if (victim && victim->irq)
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24 @705  		vgic_put_irq(kvm, victim->irq);
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  706  
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  707  	kfree(victim);
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  708  }
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  709  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
