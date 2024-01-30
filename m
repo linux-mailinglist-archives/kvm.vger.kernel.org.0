@@ -1,197 +1,188 @@
-Return-Path: <kvm+bounces-7497-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7498-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77317842D1A
-	for <lists+kvm@lfdr.de>; Tue, 30 Jan 2024 20:41:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 09169842D1D
+	for <lists+kvm@lfdr.de>; Tue, 30 Jan 2024 20:42:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00E6E282E48
-	for <lists+kvm@lfdr.de>; Tue, 30 Jan 2024 19:41:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B33EE28220B
+	for <lists+kvm@lfdr.de>; Tue, 30 Jan 2024 19:42:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2F427B3FD;
-	Tue, 30 Jan 2024 19:40:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4DAE26AFC;
+	Tue, 30 Jan 2024 19:42:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dabbelt-com.20230601.gappssmtp.com header.i=@dabbelt-com.20230601.gappssmtp.com header.b="NZ4ZH2Tz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R8BWegSU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3BED7B3F6
-	for <kvm@vger.kernel.org>; Tue, 30 Jan 2024 19:40:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8149A7B3C3
+	for <kvm@vger.kernel.org>; Tue, 30 Jan 2024 19:42:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706643655; cv=none; b=jue1UTvfOB8PiKU+ofMijUh/BEee7wGD321OpaACnDIkXWH7moFn/Ip+uCQGn6U6vIXds9gFApZNFiHPNs1cg/ausevPHvKzoUF3WLnfh8X1OoFd/yRnNnbM4OYKLjQhca7ONrNNDNBHDAi4jk5tyGTNQ6TuAVxtOEjpc9bHJhU=
+	t=1706643724; cv=none; b=tEhrkxEcswi69bqvMVxeBI0FnEZUOXvR3hIdG4iRb5t5if1OY8oIfctfE1o2uwMxGH+9SXkrLxFC1C88kXF3hADcmSK8fCilSsNSb58rlZuzQpITcNSRZrPRzKE8zdGXeiwDPkABpwTyGB1QWAXQLU41UZGOQh0X3CSBNe6B/+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706643655; c=relaxed/simple;
-	bh=rC6SHJJOEh27ib1elTdvuAgGHYHDCk2hzZWvFEBeQoc=;
-	h=Date:Subject:In-Reply-To:CC:From:To:Message-ID:Mime-Version:
-	 Content-Type; b=kGgK5RhZT5IL6Ygf1Ao3t0NM58ZIL/iSttQYMDQFmTfsS2v2J+spuEwckpH+ymcM4t1XvlocBvw/zSY9l5z2Xgq6eAGCdReG+nsmrjaAU24gzJT0MSV+FwIU42g7VclCMdKFClmPzKqMTS/pE/locY1avtDRzkIPhNr+0T+hZKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com; spf=pass smtp.mailfrom=dabbelt.com; dkim=pass (2048-bit key) header.d=dabbelt-com.20230601.gappssmtp.com header.i=@dabbelt-com.20230601.gappssmtp.com header.b=NZ4ZH2Tz; arc=none smtp.client-ip=209.85.215.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dabbelt.com
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-5ce942efda5so3178164a12.2
-        for <kvm@vger.kernel.org>; Tue, 30 Jan 2024 11:40:53 -0800 (PST)
+	s=arc-20240116; t=1706643724; c=relaxed/simple;
+	bh=bpBlUG7tmAiiG8HgxWw/3bbxCo/qQ1cSl06c6rqWptQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=eEqJfbNt9xUb+6PN9vYaf4Mm6ro0VGOH2nKRCGObrc+7VdAgtZgFEioXHCVUqZU/KF50OHBU7unoGLQkZ3PR3+aJej1Af0JMjY4UgcwI9TINw+PZm0wapSrgU4yXMJk4acAlmJb8JH7UdUvkK7f5GLFr/jN34gqytjhLJtMdpaE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=R8BWegSU; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-603f3a66294so16786137b3.1
+        for <kvm@vger.kernel.org>; Tue, 30 Jan 2024 11:42:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dabbelt-com.20230601.gappssmtp.com; s=20230601; t=1706643653; x=1707248453; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9AW16PRokhMGl06KG1+mzOcMotYScHaSgwc9WRqUlNM=;
-        b=NZ4ZH2Tz0lnkM2XeYmm1/yy0w0JfT1pAX2vJCNf+ApYlMXGkDaYAW2yjTq3ustcVEZ
-         kcyEXR6iDT2Xnd06YsCqnE5kjkH08yMVUndrg2FPuTTk1Kf+UhjRTcNcEyo/MPsC6yh+
-         yZfjfxD5jfZmmESrQpSmSIr4pU1l3BcwacSGwqdh5oC0yZ7xI+WKhzwFd4Ey2By51htW
-         zJGoq3wlQL4zseFFq4lR0vPvjJNLdz1mqiPBIJfB6+dYiVSpuOO0tEfKe1BjcemjywEk
-         uv63tYBhWHoOF3+dzBJq0qG9x5bs0KdsKlsWIfYeetzG9N9FRpRTec8L7ZaTEMZ1DbaR
-         M+hw==
+        d=google.com; s=20230601; t=1706643721; x=1707248521; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=uiC6lDNYPacxijwp+TEOsYnfgAgHzQpJUcjk2C9MEX8=;
+        b=R8BWegSUzJ6UjS6sD5zTU9V4lDR0KNHKFxuCQoHvZuoe870svDXfwU7GK/DgwhUzQj
+         biCTOFg6qg6v7WJ0ZJe87F0qm6eHf0FEwsKw4lRihxolHMkjPrsVPZfB/IBqMkJ7oWRb
+         QyCT9YCWRLZu2kL94h+6UutZ2O0xvkBDVOopIfbyBKIzYYlH3iQnEwK34NWxWbBhRFvk
+         8tacm7BdVRcXOgPX/YK2CcbkLivXRu4orgYNEW8hJemPl/4l4nO3faf1U7j6tGF5NDjg
+         ykkizCkh5fcV+E3JruUjyzg9GnBpccOKnxtpgkN7I9u4boGLVtpdNZGP5CK0FR5MGOoA
+         dc2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706643653; x=1707248453;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9AW16PRokhMGl06KG1+mzOcMotYScHaSgwc9WRqUlNM=;
-        b=JvFT6ppG0hEWyk3aIB2/QlgD5ly/bOnRo12bU2mc3TMV/ajxGWhtS777WC3hlGPs1i
-         j00IPAF/lOslkXq66bSVu6SKjje6QNCM6WJDrrdl+AcGPDCRKyQylZ3IBsHpXjmd4awO
-         q5ldtjeYy+QyAuNC88JehuToShqkZzutn9Qq4EngacVRyvpywTaB0GJg43INwTcqrmty
-         iltFU9KQL9vtyPxoNvwTiQbWEkVGy3zohmkjC/zsDosuRL8yq4PS8luAkhK2Bse+sEDl
-         B/03LkfKs63usl3sl+bthWamF43vHQ38vpb3c8H648BJAdCqamgeI4HTTVrbM5jfci6O
-         vFtA==
-X-Gm-Message-State: AOJu0Yw6gdkSFKHXpWjszIrxk8KXTHJacSYUWC3tCU4pLfNGOJEVuX4X
-	L9spyyu9OlQZYNa4+ThcGFojlTuFDJwZcmTkP/MLVaVUPaobnk0mpLEX/WO8hN8=
-X-Google-Smtp-Source: AGHT+IE2ABRPgbWZ1/MDn9OpRWpB/SaUaaTOUydu8QmhFKdM9K+7ePH7kuhrq0irpESYDV32az2H2g==
-X-Received: by 2002:a05:6a21:920c:b0:19c:9ce0:6d87 with SMTP id tl12-20020a056a21920c00b0019c9ce06d87mr8460525pzb.0.1706643653109;
-        Tue, 30 Jan 2024 11:40:53 -0800 (PST)
-Received: from localhost ([12.44.203.122])
-        by smtp.gmail.com with ESMTPSA id i26-20020a63541a000000b005cd78f13608sm8579092pgb.13.2024.01.30.11.40.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jan 2024 11:40:52 -0800 (PST)
-Date: Tue, 30 Jan 2024 11:40:52 -0800 (PST)
-X-Google-Original-Date: Tue, 30 Jan 2024 11:40:44 PST (-0800)
-Subject:     Re: Call for GSoC/Outreachy internship project ideas
-In-Reply-To: <CAJSP0QX9TQ-=PD7apOamXvGW29VwJPfVNN2X5BsFLFoP2g6USg@mail.gmail.com>
-CC: qemu-devel@nongnu.org, kvm@vger.kernel.org, afaria@redhat.com,
-  alex.bennee@linaro.org, eperezma@redhat.com, gmaglione@redhat.com, marcandre.lureau@redhat.com,
-  rjones@redhat.com, sgarzare@redhat.com, imp@bsdimp.com, philmd@linaro.org, pbonzini@redhat.com,
-  thuth@redhat.com, danielhb413@gmail.com, gaosong@loongson.cn, akihiko.odaki@daynix.com,
-  shentey@gmail.com, npiggin@gmail.com, seanjc@google.com, Marc Zyngier <maz@kernel.org>
-From: Palmer Dabbelt <palmer@dabbelt.com>
-To: stefanha@gmail.com, Alistair Francis <Alistair.Francis@wdc.com>,
-  dbarboza@ventanamicro.com
-Message-ID: <mhng-bcb98ddd-c9a7-4bb9-b180-bf310a289eeb@palmer-ri-x1c9a>
+        d=1e100.net; s=20230601; t=1706643721; x=1707248521;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uiC6lDNYPacxijwp+TEOsYnfgAgHzQpJUcjk2C9MEX8=;
+        b=Kwd3AFR1Kot/jfuII8OoeY04mIBbOujBZB3REX/XeYBh+LGm9LWceyphJn8gjsm2Y+
+         r4EdXS3HN3fn+VwWVOXlrZwEydLS2oT0kLnO2BfL7OZraLR90J+NEHNx6730cnw6AS1B
+         CLuRBnhPYqNlucWtiJWRO+vRPAAbmB75WUgd2b9dNkepCU5HGgxlPexE4zLVdjvTrHI3
+         egqpdVU+tqwh9Rv6ak1f8KE/SZ1JhMznL8/tld49t55iOjG8DwvqwQjbVIEuCsj+JgPx
+         qER9XE4OPYP8UJo2eIY5+GmqQtavQ7j/nWfjvJS4EJ+tId43ElpFRPHqBr7+ahRRTkwO
+         0u7A==
+X-Gm-Message-State: AOJu0Yw44N3u5mOUjiQzklfTcVCt72eK9lCnOO8/nGlp7l9eBlCTJZNy
+	6XZkjoj0LEADzWWlvv03IPZUjCebA9HotL2J/Ltvgu5I2ur9AjD3aZDkLN5VwWJfpB+QhLXfH1N
+	p3w==
+X-Google-Smtp-Source: AGHT+IFHHxGWUEqLe7N1xAEh4N7i1S0F3fTyyhZhLrkLKn0sznbAPWpgIM9DmL6pSZMQEnDDFJEOTcmxBoU=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:2205:b0:dc2:23f5:1791 with SMTP id
+ dm5-20020a056902220500b00dc223f51791mr3280187ybb.6.1706643721548; Tue, 30 Jan
+ 2024 11:42:01 -0800 (PST)
+Date: Tue, 30 Jan 2024 11:41:59 -0800
+In-Reply-To: <20231218161146.3554657-4-pgonda@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20231218161146.3554657-1-pgonda@google.com> <20231218161146.3554657-4-pgonda@google.com>
+Message-ID: <ZblRB9IyXl9BE_4P@google.com>
+Subject: Re: [PATCH V7 3/8] KVM: selftests: add hooks for managing protected
+ guest memory
+From: Sean Christopherson <seanjc@google.com>
+To: Peter Gonda <pgonda@google.com>
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
+	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
+	Andrew Jones <andrew.jones@linux.dev>, Tom Lendacky <thomas.lendacky@amd.com>, 
+	Michael Roth <michael.roth@amd.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Mon, 15 Jan 2024 08:32:59 PST (-0800), stefanha@gmail.com wrote:
-> Dear QEMU and KVM communities,
-> QEMU will apply for the Google Summer of Code and Outreachy internship
-> programs again this year. Regular contributors can submit project
-> ideas that they'd like to mentor by replying to this email before
-> January 30th.
+On Mon, Dec 18, 2023, Peter Gonda wrote:
+> Add kvm_vm.protected metadata. Protected VMs memory, potentially
+> register and other state may not be accessible to KVM. This combined
+> with a new protected_phy_pages bitmap will allow the selftests to check
+> if a given pages is accessible.
+> 
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: Vishal Annapurve <vannapurve@google.com>
+> Cc: Ackerley Tng <ackerleytng@google.com>
+> cc: Andrew Jones <andrew.jones@linux.dev>
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Cc: Michael Roth <michael.roth@amd.com>
+> Originally-by: Michael Roth <michael.roth@amd.com>
+> Signed-off-by: Peter Gonda <pgonda@google.com>
+> ---
+>  .../selftests/kvm/include/kvm_util_base.h        | 15 +++++++++++++--
+>  tools/testing/selftests/kvm/lib/kvm_util.c       | 16 +++++++++++++---
+>  2 files changed, 26 insertions(+), 5 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> index ca99cc41685d..71c0ed6a1197 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> @@ -88,6 +88,7 @@ _Static_assert(NUM_VM_SUBTYPES < 256);
+>  struct userspace_mem_region {
+>  	struct kvm_userspace_memory_region region;
+>  	struct sparsebit *unused_phy_pages;
+> +	struct sparsebit *protected_phy_pages;
+>  	int fd;
+>  	off_t offset;
+>  	enum vm_mem_backing_src_type backing_src_type;
+> @@ -155,6 +156,9 @@ struct kvm_vm {
+>  	vm_vaddr_t handlers;
+>  	uint32_t dirty_ring_size;
+>  
+> +	/* VM protection enabled: SEV, etc*/
+> +	bool protected;
+ 
+Yet another bool is unnecessary, just add an arch hook.  That way it's impossible
+to have a discrepancy where vm->arch says a VM is protected, but vm->protected
+says it's not.
 
-It's the 30th, sorry if this is late but I just saw it today.  +Alistair 
-and Daniel, as I didn't sync up with anyone about this so not sure if 
-someone else is looking already (we're not internally).
+> @@ -1040,6 +1041,7 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm,
+>  
+>  	region->backing_src_type = src_type;
+>  	region->unused_phy_pages = sparsebit_alloc();
+> +	region->protected_phy_pages = sparsebit_alloc();
 
-> Internship programs
-> ---------------------------
-> GSoC (https://summerofcode.withgoogle.com/) and Outreachy
-> (https://www.outreachy.org/) offer paid open source remote work
-> internships to eligible people wishing to participate in open source
-> development. QEMU has been part of these internship programs for many
-> years. Our mentors have enjoyed helping talented interns make their
-> first open source contributions and some former interns continue to
-> participate today.
->
-> Who can mentor
-> ----------------------
-> Regular contributors to QEMU and KVM can participate as mentors.
-> Mentorship involves about 5 hours of time commitment per week to
-> communicate with the intern, review their patches, etc. Time is also
-> required during the intern selection phase to communicate with
-> applicants. Being a mentor is an opportunity to help someone get
-> started in open source development, will give you experience with
-> managing a project in a low-stakes environment, and a chance to
-> explore interesting technical ideas that you may not have time to
-> develop yourself.
->
-> How to propose your idea
-> ----------------------------------
-> Reply to this email with the following project idea template filled in:
->
-> === TITLE ===
->
-> '''Summary:''' Short description of the project
->
-> Detailed description of the project that explains the general idea,
-> including a list of high-level tasks that will be completed by the
-> project, and provides enough background for someone unfamiliar with
-> the codebase to do research. Typically 2 or 3 paragraphs.
->
-> '''Links:'''
-> * Wiki links to relevant material
-> * External links to mailing lists or web sites
->
-> '''Details:'''
-> * Skill level: beginner or intermediate or advanced
-> * Language: C/Python/Rust/etc
+There's zero region to allocate protected_phy_pages if the VM doesn't support
+protected memory.
 
-I'm not 100% sure this is a sane GSoC idea, as it's a bit open ended and 
-might have some tricky parts.  That said it's tripping some people up 
-and as far as I know nobody's started looking at it, so I figrued I'd 
-write something up.
+>  	sparsebit_set_num(region->unused_phy_pages,
+>  		guest_paddr >> vm->page_shift, npages);
+>  	region->region.slot = slot;
+> @@ -1829,6 +1831,10 @@ void vm_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
+>  			region->host_mem);
+>  		fprintf(stream, "%*sunused_phy_pages: ", indent + 2, "");
+>  		sparsebit_dump(stream, region->unused_phy_pages, 0);
+> +		if (vm->protected) {
 
-I can try and dig up some more links if folks thing it's interesting, 
-IIRC there's been a handful of bug reports related to very small loops 
-that run ~10x slower when vectorized.  Large benchmarks like SPEC have 
-also shown slowdowns.
+And this should check region->protected_phy_pages, not vm->protected.
 
----
+> +			fprintf(stream, "%*sprotected_phy_pages: ", indent + 2, "");
+> +			sparsebit_dump(stream, region->protected_phy_pages, 0);
+> +		}
+>  	}
+>  	fprintf(stream, "%*sMapped Virtual Pages:\n", indent, "");
+>  	sparsebit_dump(stream, vm->vpages_mapped, indent + 2);
+> @@ -1941,8 +1947,9 @@ const char *exit_reason_str(unsigned int exit_reason)
+>   * and their base address is returned. A TEST_ASSERT failure occurs if
+>   * not enough pages are available at or above paddr_min.
+>   */
+> -vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
+> -			      vm_paddr_t paddr_min, uint32_t memslot)
+> +vm_paddr_t __vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
+> +				vm_paddr_t paddr_min, uint32_t memslot,
+> +				bool protected)
+>  {
+>  	struct userspace_mem_region *region;
+>  	sparsebit_idx_t pg, base;
+> @@ -1975,8 +1982,11 @@ vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
+>  		abort();
+>  	}
 
-=== RISC-V Vector TCG Frontend Optimization ===
+And here, assert that:
 
-'''Summary:''' The RISC-V vector extension has been implemented in QEMU, 
-but we have some performance pathologies mapping it to existing TCG 
-backends.  This project would aim to improve the performance of the 
-RISC-V vector ISA's mappings to TCG.
+	TEST_ASSERT(!protected || region->protected_phy_pages,
+		    "Region doesn't support protected memory");
 
-The RISC-V TCG frontend (ie, decoding RISC-V instructions 
-and emitting TCG calls to emulate them) has some inefficient mappings to 
-TCG, which results in binaries that have vector instructions frequently 
-performing worse than those without, sometimes even up to 10x slower.  
-This causes various headaches for users, including running toolchain 
-regressions and doing distro work.  This project's aim would be to bring 
-the performance of vectorized RISC-V code to a similar level as the 
-corresponding scalar code.
-
-This will definitely require changing the RISC-V TCG frontend.  It's 
-likely there is some remaining optimization work that can be done 
-without adding TCG primitives, but it may be necessary to do some core 
-TCG work in order to improve performance sufficiently.
-
-'''Links:'''
-* https://lists.gnu.org/archive/html/qemu-devel/2023-07/msg04495.html
-
-'''Details'''
-* Skill level: intermediate
-* Language: C, RISC-V assembly
-
->
-> More information
-> ----------------------
-> You can find out about the process we follow here:
-> Video: https://www.youtube.com/watch?v=xNVCX7YMUL8
-> Slides (PDF): https://vmsplice.net/~stefan/stefanha-kvm-forum-2016.pdf
->
-> The QEMU wiki page for GSoC 2024 is now available:
-> https://wiki.qemu.org/Google_Summer_of_Code_2024
->
-> Thanks,
-> Stefan
+> -	for (pg = base; pg < base + num; ++pg)
+> +	for (pg = base; pg < base + num; ++pg) {
+>  		sparsebit_clear(region->unused_phy_pages, pg);
+> +		if (protected)
+> +			sparsebit_set(region->protected_phy_pages, pg);
+> +	}
+>  
+>  	return base * vm->page_size;
+>  }
+> -- 
+> 2.43.0.472.g3155946c3a-goog
+> 
 
