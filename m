@@ -1,170 +1,113 @@
-Return-Path: <kvm+bounces-7504-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7505-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B8E2842DDB
-	for <lists+kvm@lfdr.de>; Tue, 30 Jan 2024 21:30:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8CB0842F04
+	for <lists+kvm@lfdr.de>; Tue, 30 Jan 2024 22:50:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 422BC28B6F0
-	for <lists+kvm@lfdr.de>; Tue, 30 Jan 2024 20:30:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 604561F25D63
+	for <lists+kvm@lfdr.de>; Tue, 30 Jan 2024 21:50:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A496A79DCB;
-	Tue, 30 Jan 2024 20:28:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C24DF78B78;
+	Tue, 30 Jan 2024 21:49:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mNIM4WeH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="M9B0LnlW"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com [209.85.161.46])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 560FC79DBF
-	for <kvm@vger.kernel.org>; Tue, 30 Jan 2024 20:28:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 967D7762DD
+	for <kvm@vger.kernel.org>; Tue, 30 Jan 2024 21:49:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706646521; cv=none; b=a9SgcN0kdfYZXTa07Ceht7o64f7P/pCp8SjiEXoW2JZKvMvWBjSwm/ZlBUwSJ1qWOTdLwIA3GfFq4cS6MdKaPYQvkay875RQkKodDw0OVo4DqBUSzoGwscFldRd8vCrhIT+rDGzhQf0Ysy8p36HiMFtdySm87G6/5rM7nyXPcQE=
+	t=1706651395; cv=none; b=R04IrGSQPzfD+Tr9PePG2q2q8C27+Q+HXv+QwijBwoSp/NN9Yvg8tsj0T7PUTawDCpMXVkHVR0cYN28AIT/oo0bLOu87/yLXm4PcunLTpDcyIo1HDm84CuBojRkPpU5GaBfJuRVmgms2b69j0M0dUcVflgSxWIpdMXKNwR4Jvcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706646521; c=relaxed/simple;
-	bh=Cw+ZcenY7fmYnda7sUR4LsvN7SRkv4NhRAvj+cLVU5k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=c4+YZNHPE/IKJq4e4qNMB5E54huhwv+ZSSwEKrVQXW4PTFGhcDtJMJCFNuvlw6XgO54hx2MxG5SqxNTQOyMD2ZzjMY9j+d1+bpK5mEtBYa231E4kjZ5i+Gv+VVe34/XmlKynLmbJpwWNvhPVI6QBwV4kd2R0wUjyxopMWjUPhGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mNIM4WeH; arc=none smtp.client-ip=209.85.161.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-59505514213so110342eaf.0
-        for <kvm@vger.kernel.org>; Tue, 30 Jan 2024 12:28:40 -0800 (PST)
+	s=arc-20240116; t=1706651395; c=relaxed/simple;
+	bh=rzCvy6q4MAPeRM6DTO+v4XZw8YVJG6KsvRtGvI6JNbI=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=DzA//UtQEZWL8ylV2yUaW3SR/5eYk9sPlTxTSYPC66GBD5mEC2SxyaXTJyPgJ+4knQfcE0i4vTfwRwz7WnIRkmfPpwrzXbxjGbHvNxmCMMU3mjHodh9Tt2ICGb61kjHLpVueImWNbD9tbuV+krC6FR/r9Pd688Y6gZREfcNDcsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=M9B0LnlW; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-6dfc22e98ccso148825b3a.1
+        for <kvm@vger.kernel.org>; Tue, 30 Jan 2024 13:49:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706646519; x=1707251319; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=TYjiL86j5niPhaSV5lYxgLBEBpuOrxJ2AjgyyF2AcnM=;
-        b=mNIM4WeHlVYTeTG7Zcxse0wqddvLtVCAw2CEmCClYtLQA7CLszCBuzJI0Nso/aCh26
-         iXfavyzwE5H2RhbEiEySG/44eyDWwre2hToZtKPlMdBO6iwhQnzLGTaHlqN7O2kc3x2s
-         Eu+SkMS5Odle6EKhtG4yOvzCtmgSCZV3UCtBZGRmtJ8zDQTktAujyOgb66utPvwvXXuK
-         h5NwU0IH/9UvDTesCHj7cGfOqMIJkE1EYMErMg4oOF9zyMSY5DWv1IGk02sDsH5ySvf/
-         OSIkpQ7PmL/G+NNGoRq2kaDWscS+LKZr6p0DXtI92ZOwCu3X2YBpkUWm8u8fKy60ICjP
-         6dhQ==
+        d=google.com; s=20230601; t=1706651393; x=1707256193; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Lw84EX2PlOWpOjZV7N1lo37lxb7BMZhxthSdSYaU+U8=;
+        b=M9B0LnlWN7o/BcYtSzXDwlNVEtip7JqlNUmReZscwa/5g1RSyQ3yEsnijQamPOvD8k
+         fDGQkueH5343MyaSRo98dC0moejBUgHylzWAdOvePzn46odn1xDjlr5OdB1Ua7pj3zOa
+         p3N+2kHoWRRxHAp63W+fP1Dqqr5WkAe3FzkgvaNEQzc/DvGjGVT9xxnpQhb33kEeLlXX
+         vjUf4BJsowhEP7NB3G9vz2iwu33HxpS9pA9ySfxfM//q1aDisoEsiNa8uMu0mJwmQIUC
+         RhPGS8EaVG2Vc4kCBb6oxiAcYbBx54RshfDpl9emx04ySQ1DbsMMxXer61+/m7FNOg8X
+         id8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706646519; x=1707251319;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TYjiL86j5niPhaSV5lYxgLBEBpuOrxJ2AjgyyF2AcnM=;
-        b=uIAHe7+F0SVukMzg8STEwsDqWJzrDvoS5pJYAa1H3k7OQFbrIfNTFvk62yxpWenOL3
-         am0sVhhSlLr3nk7KVmd+AoXaK2RdNdDP2sb6RowzX0TnCYBcwIYEhZxbCaRaprPQfYun
-         glLn+5YM8CfpwktJWrAaC4DNFO9WDmfRcfuAy11APNEOPDIqqkhz5zgv0F6638h9W+Fj
-         yBLKkGId3jyoWeu2N/n5sbcC41H7t3dMtsRd/vPg1k/bsm4pw14oHm0ltH/COHLm3rmq
-         8p9oTLrdfb0TF3DC4uLgK5GxuzEzm7wbAmyHbwjGTwm/epK/wW/l9ILKx74WaLZus3Sw
-         UKqw==
-X-Gm-Message-State: AOJu0YyN4d3i4qHpmpTilF6sQif11d1+p/naWz6ptEHFNS8zwnM+kLqu
-	m30Pllcf4OgpqzG3zXy5bUX5vcPrm0XFx3FXWJ7HoO6kKNbkMSjh+U3pvkALuhqDci1Zz0s0u25
-	IZkYdfpnAOyA7AZ6RVJtIfvhTY4Q=
-X-Google-Smtp-Source: AGHT+IEgAFHJcT5ZyOD5Gq6Oo0pP5q1NgjrVNlQcrKs3vwi5+IJ3NA6BQXRkLImoda378AAHNUgK7bJmlJQgj35fiWw=
-X-Received: by 2002:a05:6820:167:b0:59a:8848:de64 with SMTP id
- k7-20020a056820016700b0059a8848de64mr271290ood.3.1706646519301; Tue, 30 Jan
- 2024 12:28:39 -0800 (PST)
+        d=1e100.net; s=20230601; t=1706651393; x=1707256193;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Lw84EX2PlOWpOjZV7N1lo37lxb7BMZhxthSdSYaU+U8=;
+        b=DnAgWK1cHiO/aJ25nbceVgPEtRDb3kehgr+W/W0oo38zdO+CfeIhqx2thepKa1yKqP
+         bGEHBFp8LLlwk0T6NgROeDXvSfikSGYhuqQE367ld/p1xYuizBQsXhFG7rMBBFws7jcw
+         5GIW3vNSim4GfVeos8bFVPXw1KQgIpeQr6gWzJknyWIKl7pfE2UT6o3hmdYaB8K13sGf
+         7/iPM13tv98RqF6rfta9KRg+hFMbWGvFGLmnA4oeFsnYJUP0kXP25snbQKCrAQ02msbS
+         fWoY2oRjdGjsG9hrY2YOaAvfftB8+oBi+8kDL6glKB8bVkIY39YT1t09H/glSlardzNf
+         J8Lw==
+X-Gm-Message-State: AOJu0Yx1h0Ny9cy4sVAYOlMrGw+mGFZCG5KATnban2oGt+aQ+d62TMJ0
+	hSxreicn0zMJH3ToF7jQMbFBTOie+rPYIsBd0ooalYiCqbxSOHusMi1AkE7Y61rxHNKMh1zfxom
+	el6pQR46xUkHte2HfeWK9ZA==
+X-Google-Smtp-Source: AGHT+IGq0m5k0bCDYiTVoVJeRL0cjrOQZIHc+ghwsNeE9y9od8UVzQwCHuC4h678mIHOKf17ugpanskAK85eEQOtQw==
+X-Received: from ackerleytng-ctop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:13f8])
+ (user=ackerleytng job=sendgmr) by 2002:a05:6a00:9387:b0:6da:bf5b:bd4e with
+ SMTP id ka7-20020a056a00938700b006dabf5bbd4emr124901pfb.3.1706651392893; Tue,
+ 30 Jan 2024 13:49:52 -0800 (PST)
+Date: Tue, 30 Jan 2024 21:49:50 +0000
+In-Reply-To: <ZblPfEi_t3BsRdN_@google.com> (message from Sean Christopherson
+ on Tue, 30 Jan 2024 11:35:24 -0800)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <CAJSP0QX9TQ-=PD7apOamXvGW29VwJPfVNN2X5BsFLFoP2g6USg@mail.gmail.com>
- <mhng-bcb98ddd-c9a7-4bb9-b180-bf310a289eeb@palmer-ri-x1c9a>
-In-Reply-To: <mhng-bcb98ddd-c9a7-4bb9-b180-bf310a289eeb@palmer-ri-x1c9a>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Tue, 30 Jan 2024 15:28:27 -0500
-Message-ID: <CAJSP0QU2M0e56M0S9ztMDO7eyqFB-p1KgwxJhzwkxt=CuS_PqA@mail.gmail.com>
-Subject: Re: Call for GSoC/Outreachy internship project ideas
-To: Palmer Dabbelt <palmer@dabbelt.com>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, dbarboza@ventanamicro.com, 
-	qemu-devel@nongnu.org, kvm@vger.kernel.org, afaria@redhat.com, 
-	alex.bennee@linaro.org, eperezma@redhat.com, gmaglione@redhat.com, 
-	marcandre.lureau@redhat.com, rjones@redhat.com, sgarzare@redhat.com, 
-	imp@bsdimp.com, philmd@linaro.org, pbonzini@redhat.com, thuth@redhat.com, 
-	danielhb413@gmail.com, gaosong@loongson.cn, akihiko.odaki@daynix.com, 
-	shentey@gmail.com, npiggin@gmail.com, seanjc@google.com, 
-	Marc Zyngier <maz@kernel.org>
+Mime-Version: 1.0
+Message-ID: <diqzfryecwzl.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [PATCH V7 6/8] KVM: selftests: add library for
+ creating/interacting with SEV guests
+From: Ackerley Tng <ackerleytng@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: pgonda@google.com, kvm@vger.kernel.org, pbonzini@redhat.com, 
+	vannapurve@google.com, andrew.jones@linux.dev, thomas.lendacky@amd.com, 
+	michael.roth@amd.com, afranji@google.com, erdemaktas@google.com, 
+	sagis@google.com, isaku.yamahata@intel.com
 Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 30 Jan 2024 at 14:40, Palmer Dabbelt <palmer@dabbelt.com> wrote:
->
-> On Mon, 15 Jan 2024 08:32:59 PST (-0800), stefanha@gmail.com wrote:
-> > Dear QEMU and KVM communities,
-> > QEMU will apply for the Google Summer of Code and Outreachy internship
-> > programs again this year. Regular contributors can submit project
-> > ideas that they'd like to mentor by replying to this email before
-> > January 30th.
->
-> It's the 30th, sorry if this is late but I just saw it today.  +Alistair
-> and Daniel, as I didn't sync up with anyone about this so not sure if
-> someone else is looking already (we're not internally).
->
-> > Internship programs
-> > ---------------------------
-> > GSoC (https://summerofcode.withgoogle.com/) and Outreachy
-> > (https://www.outreachy.org/) offer paid open source remote work
-> > internships to eligible people wishing to participate in open source
-> > development. QEMU has been part of these internship programs for many
-> > years. Our mentors have enjoyed helping talented interns make their
-> > first open source contributions and some former interns continue to
-> > participate today.
-> >
-> > Who can mentor
-> > ----------------------
-> > Regular contributors to QEMU and KVM can participate as mentors.
-> > Mentorship involves about 5 hours of time commitment per week to
-> > communicate with the intern, review their patches, etc. Time is also
-> > required during the intern selection phase to communicate with
-> > applicants. Being a mentor is an opportunity to help someone get
-> > started in open source development, will give you experience with
-> > managing a project in a low-stakes environment, and a chance to
-> > explore interesting technical ideas that you may not have time to
-> > develop yourself.
-> >
-> > How to propose your idea
-> > ----------------------------------
-> > Reply to this email with the following project idea template filled in:
-> >
-> > === TITLE ===
-> >
-> > '''Summary:''' Short description of the project
-> >
-> > Detailed description of the project that explains the general idea,
-> > including a list of high-level tasks that will be completed by the
-> > project, and provides enough background for someone unfamiliar with
-> > the codebase to do research. Typically 2 or 3 paragraphs.
-> >
-> > '''Links:'''
-> > * Wiki links to relevant material
-> > * External links to mailing lists or web sites
-> >
-> > '''Details:'''
-> > * Skill level: beginner or intermediate or advanced
-> > * Language: C/Python/Rust/etc
->
-> I'm not 100% sure this is a sane GSoC idea, as it's a bit open ended and
-> might have some tricky parts.  That said it's tripping some people up
-> and as far as I know nobody's started looking at it, so I figrued I'd
-> write something up.
->
-> I can try and dig up some more links if folks thing it's interesting,
-> IIRC there's been a handful of bug reports related to very small loops
-> that run ~10x slower when vectorized.  Large benchmarks like SPEC have
-> also shown slowdowns.
+Sean Christopherson <seanjc@google.com> writes:
 
-Hi Palmer,
-Performance optimization can be challenging for newcomers. I wouldn't
-recommend it for a GSoC project unless you have time to seed the
-project idea with specific optimizations to implement based on your
-experience and profiling. That way the intern has a solid starting
-point where they can have a few successes before venturing out to do
-their own performance analysis.
+> +TDX folks
+>
+> On Mon, Dec 18, 2023, Peter Gonda wrote:
+>> Add interfaces to allow tests to create SEV guests. The additional
+>> requirements for SEV guests PTs and other state is encapsulated by the
+>> new vm_sev_create_with_one_vcpu() function. This can future be
+>> generalized for more vCPUs but the first set of SEV selftests in this
+>> series only uses a single vCPU.
+>> 
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> Cc: Sean Christopherson <seanjc@google.com>
+>> Cc: Vishal Annapurve <vannapurve@google.com>
+>> Cc: Ackerly Tng <ackerleytng@google.com>
+>> cc: Andrew Jones <andrew.jones@linux.dev>
+>> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+>> Cc: Michael Roth <michael.roth@amd.com>
+>> Originally-by: Michael Roth <michael.roth@amd.com>
+>> Co-developed-by: Ackerly Tng <ackerleytng@google.com>
+>
+> Needs Ackerly's SoB.
+>
 
-Do you have the time to profile and add specifics to the project idea
-by Feb 21st? If that sounds good to you, I'll add it to the project
-ideas list and you can add more detailed tasks in the coming weeks.
+Signed-off-by: Ackerley Tng <ackerleytng@google.com>
 
-Thanks,
-Stefan
+> <snip>
 
