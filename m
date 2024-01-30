@@ -1,342 +1,182 @@
-Return-Path: <kvm+bounces-7491-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7492-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 093CA842B6B
-	for <lists+kvm@lfdr.de>; Tue, 30 Jan 2024 19:04:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3852E842CA9
+	for <lists+kvm@lfdr.de>; Tue, 30 Jan 2024 20:26:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6878D1F21014
-	for <lists+kvm@lfdr.de>; Tue, 30 Jan 2024 18:04:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 566711C24610
+	for <lists+kvm@lfdr.de>; Tue, 30 Jan 2024 19:26:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA27C155A50;
-	Tue, 30 Jan 2024 18:04:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pad/F91o"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C513B69974;
+	Tue, 30 Jan 2024 19:26:05 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E27714E2C5
-	for <kvm@vger.kernel.org>; Tue, 30 Jan 2024 18:04:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from zulu616.server4you.de (mail.csgraf.de [85.25.223.15])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15B8F69E00
+	for <kvm@vger.kernel.org>; Tue, 30 Jan 2024 19:26:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.25.223.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706637848; cv=none; b=JSnUHYunc6nmHmILyGWcWFytaYSbNZdWyBuAPztJWdPl4Qx3+uLMvuLww50l5sbF2r4EWK4tdwdhhS+L/JZOErQgQ9BTlunAku0y0SH/0Vh+T1qfkuGbu9PMisyIUETEseToXZ4bjIg7MTMkP3NqxQK+aEa3FFJovtys/VuqD6Y=
+	t=1706642765; cv=none; b=L8ebKAWfGGnAHDDuOAO4JNmx1tcKtqyDJA16OHkcpMpTd9MLdDdObFb0x96vMcP6XsaKYuG5cPAUkGWM6mHTfYZGQEHrH5qr/ogt/nlxTzq1Jlt+yvlic8iLuCN+/k9l9ZBu3hechqBjN+823ScVCvcYgaByaOuM8lPfeM84048=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706637848; c=relaxed/simple;
-	bh=MPXbEiZO8FTRRwkFuEYTYXcJ9fVUM/SOUAkr7KGxyO0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=pdDTru/C2Fqe3GezSOdig2SNoEKPT2VMqkbGb2KDHPn+7p3fCv8TiZ4VZKi1RM0JM2jJkbUHgJkGYlPwwRs5mPAM8GFVVocmCsDCLv5hRf3cQtn6jVCpmzecSkStGaxV2nVpzlek3ED/45EZV5tYXcTQkKHnaq56K6YHCjpRt60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Pad/F91o; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706637845;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=TazwPLpkgmn3mXSh/xoC2PCLCpZNJsn6snVolHEdHAs=;
-	b=Pad/F91oLaqhmB8ac3Na0PstWQehhl7uHRmvkZqhJUPqDDWAHzBaisiVYg1j68I4UqQtgK
-	L32TPcaOqjdPIRk9kEELtmCy5iT8XMZqA46axBriuV+Q0eGxxWtM4SUwi16ZeaGrBOtYht
-	rJaCOsjVJCIqkugqd+5kMbDP2q1Cpig=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-45-c8omlRjNM5yZqj5Uwb_I4A-1; Tue, 30 Jan 2024 13:04:03 -0500
-X-MC-Unique: c8omlRjNM5yZqj5Uwb_I4A-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-33aeb5a9275so1242142f8f.3
-        for <kvm@vger.kernel.org>; Tue, 30 Jan 2024 10:04:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706637842; x=1707242642;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TazwPLpkgmn3mXSh/xoC2PCLCpZNJsn6snVolHEdHAs=;
-        b=wKhogeZDXEGAzqgOO08p88U9XozD07zzn1QXYAgQ4UkFgPo2q0L5w9xSGF6pWTZ5XK
-         LHvBQdlrqsCjQy/NpxSrbb4Z8pFIwpbP9k3BNvKH9rv7wHA0yoWwcJTBaiYeLUDGEygo
-         x1MbIcJUlwObCQQUQ8LKZpqQ1YvtZViBo0MlvaprP/QtS7c7o1r/3eZ+diYJHoYaJ6Wz
-         NsSnMjPbm6YS2F1VX15Z4zhNWwQLETpA8LtXwP4+6FzKMwQrioe31Nn/ys0ur6q1dnzP
-         DCf2aFk8pT7COUlbES8O+BI5dGonFfwAnlu9qmgdv0pQMzw5p8NCCXFUGEN9ELuvD84N
-         +Vug==
-X-Gm-Message-State: AOJu0Ywx6Xk9X9750ZPMdCTWq/9gXso8jVHb9LN8mq3v4/1wYIaLwNgY
-	QrQIw6iIpHJvsLgkAoHJOSpD0XPeARz15rOgoxS5CoDMR9xBYG5OJTbVH0f6zqUBFDPBjORHefK
-	N1sel6YxpWXrcAggmGuZMUCrraHVbfSJOT9E5u8EvZnCsOabrAg==
-X-Received: by 2002:a05:6000:1acd:b0:33a:ef2c:7a4c with SMTP id i13-20020a0560001acd00b0033aef2c7a4cmr5678458wry.56.1706637842480;
-        Tue, 30 Jan 2024 10:04:02 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFU7/6Rvi9ldAJZO1ucasqfsyxIhxfkV0KJX5nRNIs26IAwrIfRSkZfgCNXiIiSJprvWzbV/A==
-X-Received: by 2002:a05:6000:1acd:b0:33a:ef2c:7a4c with SMTP id i13-20020a0560001acd00b0033aef2c7a4cmr5678431wry.56.1706637842100;
-        Tue, 30 Jan 2024 10:04:02 -0800 (PST)
-Received: from [192.168.10.118] ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.gmail.com with ESMTPSA id b16-20020a5d6350000000b0033aeb0afa8fsm6862636wrw.39.2024.01.30.10.04.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jan 2024 10:04:01 -0800 (PST)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Cc: Zixi Chen <zixchen@redhat.com>,
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-	Xiaoyao Li <xiaoyao.li@intel.com>,
-	Kai Huang <kai.huang@linux.intel.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@kernel.org>,
-	x86@kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH] x86/cpu/intel: Detect TME keyid bits before setting MTRR mask registers
-Date: Tue, 30 Jan 2024 19:04:00 +0100
-Message-ID: <20240130180400.1698136-1-pbonzini@redhat.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1706642765; c=relaxed/simple;
+	bh=LPQMG32TSIByugxLcNhDX++ZyXcMAEn5neQp7PqpIcY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AFfeTh1VkRQwcE36a/XuZFnniQkvE2ggsRqou5pz60xjVuQ+k+qVC70Eed3sTbYgytlGnH8XU7Nu+MGEhtB2EZVJYZAa1DqlYsl5OzjmEwbdRL5lxwm8knHUYIAaTkVVD6lss7+05N2TtC2L9F+o9kVwTtsBIFr6rQm/KAeE2Zo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csgraf.de; spf=pass smtp.mailfrom=csgraf.de; arc=none smtp.client-ip=85.25.223.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csgraf.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgraf.de
+Received: from [0.0.0.0] (ec2-3-122-114-9.eu-central-1.compute.amazonaws.com [3.122.114.9])
+	by csgraf.de (Postfix) with ESMTPSA id 73F9F608016B;
+	Tue, 30 Jan 2024 20:16:24 +0100 (CET)
+Message-ID: <834f4e79-7495-42b3-b6b1-aa614c03d15e@csgraf.de>
+Date: Tue, 30 Jan 2024 20:16:23 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: Call for GSoC/Outreachy internship project ideas
+Content-Language: en-US
+To: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>,
+ kvm <kvm@vger.kernel.org>
+Cc: Alberto Faria <afaria@redhat.com>, =?UTF-8?Q?Alex_Benn=C3=A9e?=
+ <alex.bennee@linaro.org>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, German Maglione <gmaglione@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
+ "Richard W.M. Jones" <rjones@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>, Warner Losh <imp@bsdimp.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Daniel Henrique Barboza <danielhb413@gmail.com>,
+ Song Gao <gaosong@loongson.cn>, Akihiko Odaki <akihiko.odaki@daynix.com>,
+ Bernhard Beschow <shentey@gmail.com>, Nicholas Piggin <npiggin@gmail.com>,
+ Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
+ "Koira, Eugene" <eugkoira@amazon.nl>, "Yap, William" <williyap@amazon.com>,
+ "Bean, J.D." <jdbean@amazon.com>
+References: <CAJSP0QX9TQ-=PD7apOamXvGW29VwJPfVNN2X5BsFLFoP2g6USg@mail.gmail.com>
+From: Alexander Graf <agraf@csgraf.de>
+In-Reply-To: <CAJSP0QX9TQ-=PD7apOamXvGW29VwJPfVNN2X5BsFLFoP2g6USg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-MKTME repurposes the high bit of physical address to key id for encryption
-key and, even though MAXPHYADDR in CPUID[0x80000008] remains the same,
-the valid bits in the MTRR mask register are based on the reduced number
-of physical address bits.
+Hey Stefan,
 
-detect_tme() in arch/x86/kernel/cpu/intel.c detects TME and subtracts
-it from the total usable physical bits, but it is called too late.
-Move the call to early_init_intel() so that it is called in setup_arch(),
-before MTRRs are setup.
+Thanks a lot for setting up GSoC this year again!
 
-This fixes boot on some TDX-enabled systems which until now only worked
-with "disable_mtrr_cleanup".  Without the patch, the values written to
-the MTRRs mask registers were 52-bit wide (e.g. 0x000fffff_80000800)
-and the writes failed; with the patch, the values are 46-bit wide,
-which matches the reduced MAXPHYADDR that is shown in /proc/cpuinfo.
+On 15.01.24 17:32, Stefan Hajnoczi wrote:
+> Dear QEMU and KVM communities,
+> QEMU will apply for the Google Summer of Code and Outreachy internship
+> programs again this year. Regular contributors can submit project
+> ideas that they'd like to mentor by replying to this email before
+> January 30th.
+>
+> Internship programs
+> ---------------------------
+> GSoC (https://summerofcode.withgoogle.com/) and Outreachy
+> (https://www.outreachy.org/) offer paid open source remote work
+> internships to eligible people wishing to participate in open source
+> development. QEMU has been part of these internship programs for many
+> years. Our mentors have enjoyed helping talented interns make their
+> first open source contributions and some former interns continue to
+> participate today.
+>
+> Who can mentor
+> ----------------------
+> Regular contributors to QEMU and KVM can participate as mentors.
+> Mentorship involves about 5 hours of time commitment per week to
+> communicate with the intern, review their patches, etc. Time is also
+> required during the intern selection phase to communicate with
+> applicants. Being a mentor is an opportunity to help someone get
+> started in open source development, will give you experience with
+> managing a project in a low-stakes environment, and a chance to
+> explore interesting technical ideas that you may not have time to
+> develop yourself.
+>
+> How to propose your idea
+> ----------------------------------
+> Reply to this email with the following project idea template filled in:
+>
+> === TITLE ===
+>
+> '''Summary:''' Short description of the project
+>
+> Detailed description of the project that explains the general idea,
+> including a list of high-level tasks that will be completed by the
+> project, and provides enough background for someone unfamiliar with
+> the codebase to do research. Typically 2 or 3 paragraphs.
+>
+> '''Links:'''
+> * Wiki links to relevant material
+> * External links to mailing lists or web sites
+>
+> '''Details:'''
+> * Skill level: beginner or intermediate or advanced
+> * Language: C/Python/Rust/etc
 
-Fixes: cb06d8e3d020 ("x86/tme: Detect if TME and MKTME is activated by BIOS", 2018-03-12)
-Reported-by: Zixi Chen <zixchen@redhat.com>
-Cc: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-Cc: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Kai Huang <kai.huang@linux.intel.com>
-Cc: Dave Hansen <dave.hansen@linux.intel.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Ingo Molnar <mingo@kernel.org>
-Cc: x86@kernel.org
-Cc: stable@vger.kernel.org
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kernel/cpu/intel.c | 178 ++++++++++++++++++------------------
- 1 file changed, 91 insertions(+), 87 deletions(-)
 
-diff --git a/arch/x86/kernel/cpu/intel.c b/arch/x86/kernel/cpu/intel.c
-index 579e34bdf7cd..70ee316a97a9 100644
---- a/arch/x86/kernel/cpu/intel.c
-+++ b/arch/x86/kernel/cpu/intel.c
-@@ -181,6 +181,90 @@ static bool bad_spectre_microcode(struct cpuinfo_x86 *c)
- 	return false;
- }
- 
-+#define MSR_IA32_TME_ACTIVATE		0x982
-+
-+/* Helpers to access TME_ACTIVATE MSR */
-+#define TME_ACTIVATE_LOCKED(x)		(x & 0x1)
-+#define TME_ACTIVATE_ENABLED(x)		(x & 0x2)
-+
-+#define TME_ACTIVATE_POLICY(x)		((x >> 4) & 0xf)	/* Bits 7:4 */
-+#define TME_ACTIVATE_POLICY_AES_XTS_128	0
-+
-+#define TME_ACTIVATE_KEYID_BITS(x)	((x >> 32) & 0xf)	/* Bits 35:32 */
-+
-+#define TME_ACTIVATE_CRYPTO_ALGS(x)	((x >> 48) & 0xffff)	/* Bits 63:48 */
-+#define TME_ACTIVATE_CRYPTO_AES_XTS_128	1
-+
-+/* Values for mktme_status (SW only construct) */
-+#define MKTME_ENABLED			0
-+#define MKTME_DISABLED			1
-+#define MKTME_UNINITIALIZED		2
-+static int mktme_status = MKTME_UNINITIALIZED;
-+
-+static void detect_tme_early(struct cpuinfo_x86 *c)
-+{
-+	u64 tme_activate, tme_policy, tme_crypto_algs;
-+	int keyid_bits = 0, nr_keyids = 0;
-+	static u64 tme_activate_cpu0 = 0;
-+
-+	rdmsrl(MSR_IA32_TME_ACTIVATE, tme_activate);
-+
-+	if (mktme_status != MKTME_UNINITIALIZED) {
-+		if (tme_activate != tme_activate_cpu0) {
-+			/* Broken BIOS? */
-+			pr_err_once("x86/tme: configuration is inconsistent between CPUs\n");
-+			pr_err_once("x86/tme: MKTME is not usable\n");
-+			mktme_status = MKTME_DISABLED;
-+
-+			/* Proceed. We may need to exclude bits from x86_phys_bits. */
-+		}
-+	} else {
-+		tme_activate_cpu0 = tme_activate;
-+	}
-+
-+	if (!TME_ACTIVATE_LOCKED(tme_activate) || !TME_ACTIVATE_ENABLED(tme_activate)) {
-+		pr_info_once("x86/tme: not enabled by BIOS\n");
-+		mktme_status = MKTME_DISABLED;
-+		return;
-+	}
-+
-+	if (mktme_status != MKTME_UNINITIALIZED)
-+		goto detect_keyid_bits;
-+
-+	pr_info("x86/tme: enabled by BIOS\n");
-+
-+	tme_policy = TME_ACTIVATE_POLICY(tme_activate);
-+	if (tme_policy != TME_ACTIVATE_POLICY_AES_XTS_128)
-+		pr_warn("x86/tme: Unknown policy is active: %#llx\n", tme_policy);
-+
-+	tme_crypto_algs = TME_ACTIVATE_CRYPTO_ALGS(tme_activate);
-+	if (!(tme_crypto_algs & TME_ACTIVATE_CRYPTO_AES_XTS_128)) {
-+		pr_err("x86/mktme: No known encryption algorithm is supported: %#llx\n",
-+				tme_crypto_algs);
-+		mktme_status = MKTME_DISABLED;
-+	}
-+detect_keyid_bits:
-+	keyid_bits = TME_ACTIVATE_KEYID_BITS(tme_activate);
-+	nr_keyids = (1UL << keyid_bits) - 1;
-+	if (nr_keyids) {
-+		pr_info_once("x86/mktme: enabled by BIOS\n");
-+		pr_info_once("x86/mktme: %d KeyIDs available\n", nr_keyids);
-+	} else {
-+		pr_info_once("x86/mktme: disabled by BIOS\n");
-+	}
-+
-+	if (mktme_status == MKTME_UNINITIALIZED) {
-+		/* MKTME is usable */
-+		mktme_status = MKTME_ENABLED;
-+	}
-+
-+	/*
-+	 * KeyID bits effectively lower the number of physical address
-+	 * bits.  Update cpuinfo_x86::x86_phys_bits accordingly.
-+	 */
-+	c->x86_phys_bits -= keyid_bits;
-+}
-+
- static void early_init_intel(struct cpuinfo_x86 *c)
- {
- 	u64 misc_enable;
-@@ -332,6 +416,13 @@ static void early_init_intel(struct cpuinfo_x86 *c)
- 	 */
- 	if (detect_extended_topology_early(c) < 0)
- 		detect_ht_early(c);
-+
-+	/*
-+	 * Adjust the number of physical bits early because it affects the
-+	 * valid bits of the MTRR mask registers.
-+	 */
-+	if (cpu_has(c, X86_FEATURE_TME))
-+		detect_tme_early(c);
- }
- 
- static void bsp_init_intel(struct cpuinfo_x86 *c)
-@@ -492,90 +583,6 @@ static void srat_detect_node(struct cpuinfo_x86 *c)
- #endif
- }
- 
--#define MSR_IA32_TME_ACTIVATE		0x982
--
--/* Helpers to access TME_ACTIVATE MSR */
--#define TME_ACTIVATE_LOCKED(x)		(x & 0x1)
--#define TME_ACTIVATE_ENABLED(x)		(x & 0x2)
--
--#define TME_ACTIVATE_POLICY(x)		((x >> 4) & 0xf)	/* Bits 7:4 */
--#define TME_ACTIVATE_POLICY_AES_XTS_128	0
--
--#define TME_ACTIVATE_KEYID_BITS(x)	((x >> 32) & 0xf)	/* Bits 35:32 */
--
--#define TME_ACTIVATE_CRYPTO_ALGS(x)	((x >> 48) & 0xffff)	/* Bits 63:48 */
--#define TME_ACTIVATE_CRYPTO_AES_XTS_128	1
--
--/* Values for mktme_status (SW only construct) */
--#define MKTME_ENABLED			0
--#define MKTME_DISABLED			1
--#define MKTME_UNINITIALIZED		2
--static int mktme_status = MKTME_UNINITIALIZED;
--
--static void detect_tme(struct cpuinfo_x86 *c)
--{
--	u64 tme_activate, tme_policy, tme_crypto_algs;
--	int keyid_bits = 0, nr_keyids = 0;
--	static u64 tme_activate_cpu0 = 0;
--
--	rdmsrl(MSR_IA32_TME_ACTIVATE, tme_activate);
--
--	if (mktme_status != MKTME_UNINITIALIZED) {
--		if (tme_activate != tme_activate_cpu0) {
--			/* Broken BIOS? */
--			pr_err_once("x86/tme: configuration is inconsistent between CPUs\n");
--			pr_err_once("x86/tme: MKTME is not usable\n");
--			mktme_status = MKTME_DISABLED;
--
--			/* Proceed. We may need to exclude bits from x86_phys_bits. */
--		}
--	} else {
--		tme_activate_cpu0 = tme_activate;
--	}
--
--	if (!TME_ACTIVATE_LOCKED(tme_activate) || !TME_ACTIVATE_ENABLED(tme_activate)) {
--		pr_info_once("x86/tme: not enabled by BIOS\n");
--		mktme_status = MKTME_DISABLED;
--		return;
--	}
--
--	if (mktme_status != MKTME_UNINITIALIZED)
--		goto detect_keyid_bits;
--
--	pr_info("x86/tme: enabled by BIOS\n");
--
--	tme_policy = TME_ACTIVATE_POLICY(tme_activate);
--	if (tme_policy != TME_ACTIVATE_POLICY_AES_XTS_128)
--		pr_warn("x86/tme: Unknown policy is active: %#llx\n", tme_policy);
--
--	tme_crypto_algs = TME_ACTIVATE_CRYPTO_ALGS(tme_activate);
--	if (!(tme_crypto_algs & TME_ACTIVATE_CRYPTO_AES_XTS_128)) {
--		pr_err("x86/mktme: No known encryption algorithm is supported: %#llx\n",
--				tme_crypto_algs);
--		mktme_status = MKTME_DISABLED;
--	}
--detect_keyid_bits:
--	keyid_bits = TME_ACTIVATE_KEYID_BITS(tme_activate);
--	nr_keyids = (1UL << keyid_bits) - 1;
--	if (nr_keyids) {
--		pr_info_once("x86/mktme: enabled by BIOS\n");
--		pr_info_once("x86/mktme: %d KeyIDs available\n", nr_keyids);
--	} else {
--		pr_info_once("x86/mktme: disabled by BIOS\n");
--	}
--
--	if (mktme_status == MKTME_UNINITIALIZED) {
--		/* MKTME is usable */
--		mktme_status = MKTME_ENABLED;
--	}
--
--	/*
--	 * KeyID bits effectively lower the number of physical address
--	 * bits.  Update cpuinfo_x86::x86_phys_bits accordingly.
--	 */
--	c->x86_phys_bits -= keyid_bits;
--}
--
- static void init_cpuid_fault(struct cpuinfo_x86 *c)
- {
- 	u64 msr;
-@@ -712,9 +719,6 @@ static void init_intel(struct cpuinfo_x86 *c)
- 
- 	init_ia32_feat_ctl(c);
- 
--	if (cpu_has(c, X86_FEATURE_TME))
--		detect_tme(c);
--
- 	init_intel_misc_features(c);
- 
- 	split_lock_init();
--- 
-2.43.0
+=== Implement -M nitro-enclave in QEMU  ===
+
+'''Summary:''' AWS EC2 provides the ability to create an isolated 
+sibling VM context from within a VM. This project implements the machine 
+model and input data format parsing needed to run these sibling VMs 
+stand alone in QEMU.
+
+Nitro Enclaves are the first widely adopted implementation of hypervisor 
+assisted compute isolation. Similar to technologies like SGX, it allows 
+to spawn a separate context that is inaccessible by the parent Operating 
+System. This is implemented by "giving up" resources of the parent VM 
+(CPU cores, memory) to the hypervisor which then spawns a second vmm to 
+execute a completely separate virtual machine. That new VM only has a 
+vsock communication channel to the parent and has a built-in lightweight 
+TPM called NSM.
+
+One big challenge with Nitro Enclaves is that due to its roots in 
+security, there are very few debugging / introspection capabilities. 
+That makes OS bringup, debugging and bootstrapping very difficult. 
+Having a local dev&test environment that looks like an Enclave, but is 
+100% controlled by the developer and introspectable would make life a 
+lot easier for everyone working on them. It also may pave the way to see 
+Nitro Enclaves adopted in VM environments outside of EC2.
+
+This project will consist of adding a new machine model to QEMU that 
+mimics a Nitro Enclave environment, including NSM, the vsock 
+communication channel and building firmware which loads the special 
+"EIF" file format which contains kernel, initramfs and metadata from a 
+-kernel image.
+
+If the student finishes early, we can then proceed to implement the 
+Nitro Enclaves parent driver in QEMU as well to create a full QEMU-only 
+Nitro Enclaves environment.
+
+'''Tasks:'''
+* Implement a device model for the NSM device (link to spec and driver 
+code below)
+* Implement a new machine model
+* Implement firmware for the new machine model that implements EIF parsing
+* Add tests for the NSM device
+* Add integration test for the machine model executing an actual EIF payload
+
+'''Links:'''
+* https://aws.amazon.com/ec2/nitro/nitro-enclaves/
+* 
+https://lore.kernel.org/lkml/20200921121732.44291-10-andraprs@amazon.com/T/
+* 
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/misc/nsm.c
+
+'''Details:'''
+* Skill level: intermediate - advanced (some understanding of QEMU 
+machine modeling would be good)
+* Language: C
+* Mentor: agraf
+* Suggested by: Alexander Graf (OFTC: agraf, Email: graf@amazon.com)
+
+
+
+Alex
+
 
 
