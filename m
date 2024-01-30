@@ -1,439 +1,198 @@
-Return-Path: <kvm+bounces-7399-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7400-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 924468417A5
-	for <lists+kvm@lfdr.de>; Tue, 30 Jan 2024 01:40:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5B37841844
+	for <lists+kvm@lfdr.de>; Tue, 30 Jan 2024 02:29:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A433281B40
-	for <lists+kvm@lfdr.de>; Tue, 30 Jan 2024 00:39:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3CED1C22776
+	for <lists+kvm@lfdr.de>; Tue, 30 Jan 2024 01:29:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 536CA1DFD9;
-	Tue, 30 Jan 2024 00:39:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AA5E3611F;
+	Tue, 30 Jan 2024 01:29:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jYD481aS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bLEnBP+y"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com [209.85.222.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E35E1E497
-	for <kvm@vger.kernel.org>; Tue, 30 Jan 2024 00:39:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.49
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706575191; cv=none; b=WqPx+9RiPomh1Euljhiqsb3qCN+WHZile9dKNsC7GbnJGLHWi74l1Ct6IlcRiPh1ZrPt0B0CoJBSLC22pModIWlsur4gn2OX9Qt98tow42TQbB8gUrTLgFfRqIcU3JIQukqz1ShsBP8BCZpwMgFhF1jRID+mCfFWZWI1+lSgsJc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706575191; c=relaxed/simple;
-	bh=vovB8N3hXoJV4jbRuhZTziXsXkSCoPnFgfQeaQ4uW7s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=f4C52cn/d7ysvtK2EVa5CAUiWYPBkYbg4myvoq0t3IF6CGyu6gWEw4/eaRQIk2zhT6TvUH7tXI7cosjZC7Rbz+R5iWQv4yoQjng1o2N0/76sfN2UnEzd929dkZqCvQDY7kqe+nmCtqJvyM8Hpd52tzZL5B8lpUTSeAlOVRPIxQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jYD481aS; arc=none smtp.client-ip=209.85.222.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f49.google.com with SMTP id a1e0cc1a2514c-7d2e19120b5so1440082241.2
-        for <kvm@vger.kernel.org>; Mon, 29 Jan 2024 16:39:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706575188; x=1707179988; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xgLBaAtH3oGihEve2iNQvD5qjcVl5BIm3JtCuboJjqA=;
-        b=jYD481aSta4F86FLSM5OnT6MG0N+rIDLsQg+PlRynLj69muQ6G7i8wxe07dgRFxBHL
-         clLSRt4HPMLXyIpbBqMdPK4zUgf5Zrj2a7Kzrn4pKmaFQuE7+E9qV/WsWzw/WI8NwvsD
-         ZmvhC4toB0NO2ET+8OmJoxvOEFuFbCRrq06+5M0D8xvHafh6OLySGDFOx0xnPejSShbN
-         jsExpZTcZR4ZqOGHtDGlAkCHbvYqBhp0DoAa7m/B6kO33RdOsgl9aCeFAUW5oBhUMjcD
-         JZn4Oe/AvumrsH+OWS3s2wo+pPdoUYz+usVpe+Frz/crEHYPYWFQfReeNgYed4ZcXcdu
-         7AuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706575188; x=1707179988;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xgLBaAtH3oGihEve2iNQvD5qjcVl5BIm3JtCuboJjqA=;
-        b=h3TB6dyySKKPjfDpQS4XYTTaGyQmL25AMbO1UzU7QtyDA64B9c6sw+SymB1Q1DorLW
-         QQzaOMXucC1el0RF5RItL4FQxlbPd/lfEjNWzDtbwnb/woihbWM9+I0zOUxgewpxDWBc
-         v4foRRvI26+Qpl/QH6l62SVVrJypyl3k/LLg9QrpvlqZnoBEBLHxJTBRi/4d/TpH4zVn
-         nUJLGhjUfYBshh4uceg1Bf8afdcfI7twxGu8pO79KQcpQPcB0/NWJt2Q9YX1N9jTJ7sD
-         /Tu/fagTkNC0m/Cu+Qrt9MLcMfcSOTLs7IWIenaqxrOR3psKisv4VRdXl3p+SLNcC/s6
-         gP8w==
-X-Gm-Message-State: AOJu0YzQkvwXrCPTrTm8oFvvDZ7qzcHvhik2mU77hrjNg2oy0yQYBOAW
-	CAC1nmjObSEOnf7Eg0a9jmwvTlVLivE257BHxI8+8c8mMCTF2O1/KPEF8G8riZdYEYY3PB+XrDq
-	HasL0s4l3rDpdG7bd/deG0wFw2ms=
-X-Google-Smtp-Source: AGHT+IFOvCqL2ps1d0mglgDukYHloWUlgq6B12Wyv7VOxXTPXFBITYeo/eLDuyWjJ6az8GtMlZbW7qTLlgaV6ZT9iE8=
-X-Received: by 2002:a05:6122:d11:b0:4b6:dfda:525c with SMTP id
- az17-20020a0561220d1100b004b6dfda525cmr4127171vkb.5.1706575188288; Mon, 29
- Jan 2024 16:39:48 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21F3236114;
+	Tue, 30 Jan 2024 01:29:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706578180; cv=fail; b=gRQ16JscT8pU+gmli6rlzR78fqQKpZyORadpalPUIpdMenLmOje71M/3t7sV6Gm+vEIZMjnHhGG67p5RKBx4SgrfmbW26saW7BgYiYM3OzYnTJDRNcJ3iXCIlGM8TAS11gzEPLBg+fdFnirzDpJeZYiY8nGJqP40Ok+j7DLJYmU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706578180; c=relaxed/simple;
+	bh=GD4XRL9MGUiNVbIo02y+3gUW3nhWg3ddIpouVvUhqrY=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=nHsEXjEupw/7uUrUAQYyQfpMWdqjHQ/S2bot2FLUkvWOOxMbG/QrykQ2XbXJ6WbMrwK1258WkxiuxZemFh6qTLaCodxoLwchnpRSyAeKErf1Vah3SoTkaDnzgMk16dFo2BAzZKvxMl60iPWcpGsDWRWNSwmUzsUJQ3Z62W91rfc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bLEnBP+y; arc=fail smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706578178; x=1738114178;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=GD4XRL9MGUiNVbIo02y+3gUW3nhWg3ddIpouVvUhqrY=;
+  b=bLEnBP+yeEU9zjZPPc815pIsj2s7DVi0+frRg737KO6l+jQTTsaI5yjj
+   ZqqFax5v3T4ppGHW56NQRcp45bZmmSXJxSKVG5oRLSPhWUzA8147IxPXG
+   d02mRH3sjWv2Zk12RFN56yMsCUm93ndUJePmzHAGgfmJBR8iqIF/vTJXO
+   fIh4qpD1VMB5kGf0SlXrtBQT4SCzC2wXdiqjIvXYBylREdVaRRKK21Xe2
+   fswgHFMI8KLj5WBaLKiOj0amhl5CJnbUrtXpRCXRAv7WoH/8Gucg8hpAp
+   UWopBkHbi/sPnxpkFj4g5cypiPRobwKoN8l/zBmragjUnRZT0LwGbVnOA
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10968"; a="10527050"
+X-IronPort-AV: E=Sophos;i="6.05,227,1701158400"; 
+   d="scan'208";a="10527050"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jan 2024 17:29:37 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,227,1701158400"; 
+   d="scan'208";a="29723626"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 29 Jan 2024 17:29:37 -0800
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 29 Jan 2024 17:29:35 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 29 Jan 2024 17:29:35 -0800
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Mon, 29 Jan 2024 17:29:35 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 29 Jan 2024 17:29:34 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=T8SvF4+z7DSU5LRDDYczdKz7kYDTNfOZ+Ftwb7Uh6WY/lN12MVOV5VVisRS+2yrzOdppME+VaIVD3o65eMZNbe0ZiyXDGmmlqtLjnHL3xsvA4VtfaFI5/Ah/boJXuk1loA+b60+tMb42EAwTmODsdgq+De9L80scfQ3j1p7IQ7WIw21TlzFnb0eFv7bfTafOPx5kS+Vg3ZEXwClcSvgJ09rGmRGpXvIku8Qs/tzwRDxqC+YDYGb2fQDapmz3mSPn79vUjRLAeZOEBSVEfIVo1K3XjsYBmwPxsJs2wFqhSRzIxsWaychoU3b0M4BIUW4jCMiNo9/k7lh5RKNIgOgznQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=GD4XRL9MGUiNVbIo02y+3gUW3nhWg3ddIpouVvUhqrY=;
+ b=m8+PI72K4NbJ4gK1X0Nucd+zVt4lN6fWkmcycBHquoq4KHy6eom4b2gmY+gUZv2VL2SAyM/Y9lqS7i+v6Vno+vf9UNj4CuIP6C3sj1ltW2LFwM5lNDe7fm0Z7+Lw0y4Ah1rcY+9x/zVi/lgG6Zq/BZxiurpAEWTDgLvPGimU083ZGuyErqpwVC/h+VJT+z9RawqLVj1chtih3102i0FDPbQX7KzFUiQyJsyDwZ4PCDEMS81gjn5EEVayfqqCGJ13Lk6ehG8ju1nMTNYlLJl6EDid5mIZd/K1qy9ulIZcm11WsgnTh75roOXXTZi0OEyGkZHahCzeh0/t1h+Utq/YGQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from MN0PR11MB5963.namprd11.prod.outlook.com (2603:10b6:208:372::10)
+ by CH3PR11MB7894.namprd11.prod.outlook.com (2603:10b6:610:12c::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.34; Tue, 30 Jan
+ 2024 01:29:33 +0000
+Received: from MN0PR11MB5963.namprd11.prod.outlook.com
+ ([fe80::5d40:83fd:94ac:d409]) by MN0PR11MB5963.namprd11.prod.outlook.com
+ ([fe80::5d40:83fd:94ac:d409%7]) with mapi id 15.20.7228.029; Tue, 30 Jan 2024
+ 01:29:33 +0000
+From: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+To: "Yang, Weijiang" <weijiang.yang@intel.com>, "Hansen, Dave"
+	<dave.hansen@intel.com>, "seanjc@google.com" <seanjc@google.com>,
+	"x86@kernel.org" <x86@kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "yuan.yao@linux.intel.com"
+	<yuan.yao@linux.intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>
+CC: "john.allen@amd.com" <john.allen@amd.com>, "peterz@infradead.org"
+	<peterz@infradead.org>, "Gao, Chao" <chao.gao@intel.com>,
+	"mlevitsk@redhat.com" <mlevitsk@redhat.com>
+Subject: Re: [PATCH v9 01/27] x86/fpu/xstate: Always preserve non-user
+ xfeatures/flags in __state_perm
+Thread-Topic: [PATCH v9 01/27] x86/fpu/xstate: Always preserve non-user
+ xfeatures/flags in __state_perm
+Thread-Index: AQHaTm7+ZRu25JLtD0WU2RaxQCOTtbDxmq4A
+Date: Tue, 30 Jan 2024 01:29:33 +0000
+Message-ID: <77ccb09bd946fd27f17f530ed8fb4484afa46a00.camel@intel.com>
+References: <20240124024200.102792-1-weijiang.yang@intel.com>
+	 <20240124024200.102792-2-weijiang.yang@intel.com>
+In-Reply-To: <20240124024200.102792-2-weijiang.yang@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Evolution 3.44.4-0ubuntu2 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MN0PR11MB5963:EE_|CH3PR11MB7894:EE_
+x-ms-office365-filtering-correlation-id: a84cf52c-3554-4eab-530f-08dc2132e9a6
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ga8dpeDbo6RgihD+Zd/gHoTTZLsHenvze7HHIH13mrnzRarVeMQEgAPXpgnzN0nO06O5AYlr18CWOwBOowkeCgGhQ589qpKj8eBBERPoPADYs6c/KtKxkZDmLTuEja144vDf2LVOpZ9oa4zribFa3W1sPhH9Zp9lcXXzf4OrjPA/wNoPdHqNXpCxRbD+Uvfd9w/CNSLQrOl0lMEOiemF9uEojXEdUaftRy0zETV862yAjUeuRygU+HZ3d3CY8sGkPsmF0A1flqsdb5E9wYPgU9vKD6sy8HblV4Pd2VSPN2di+hhl/+OzYnqi9T9hOIH8eT24S+8tdAMnTYXGju7LuVGsCoBIm4wloJF/0kB0cyjLsdzE6HOMxKiS+D9JKdXKo9eLWRZ9EMVYk7/PqrIQMej5FJK/EgoMkzIswnCzwJPkqRI6PHwkIkI6Gyo5MHQvtGL+95cmRiPQISCz93mBX3MAFVGcdgXyCuMjnSDFjS7gYmpaX2pl4tbXpsfplvvY55RLvx5KrE5YNKLO1lBpt1ITNyFbVOF9s3xKSnzktSG6pT9JtnimSbMRQXVmiXZUkKCo2WANK6zaFlyBkSUwMNQQtxjsAf5xAY8n5qGJsh+/txWELs15D5bY7TDYGWu6Mirmga5mBQAZ7ofqzVgRDg==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB5963.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(346002)(136003)(39860400002)(396003)(376002)(230922051799003)(451199024)(1800799012)(64100799003)(186009)(6506007)(26005)(2616005)(6512007)(71200400001)(5660300002)(4744005)(122000001)(2906002)(41300700001)(54906003)(66946007)(4326008)(478600001)(64756008)(316002)(66446008)(110136005)(921011)(8676002)(66476007)(8936002)(66556008)(6486002)(76116006)(82960400001)(86362001)(38100700002)(36756003)(38070700009);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?Q3YrNUZBUDRXMXdHTVJnOS94MHE5ZVN2N2NDODljbnQzUTI2dlZ6eDhGRGMr?=
+ =?utf-8?B?UnhtNVk3MlBwV1B5SEY4bWFWeVlYZUcrLzhEWmJXWWFkaTd3Y0FuMUNPb1RH?=
+ =?utf-8?B?RmNYWEYrbGJJZlUxTDY1WUNTVFl5dVI1cWlveDNBejdRQ3RIYitUejJoR0px?=
+ =?utf-8?B?M1VUL1U3WU4xODNJSHVJbW9KbVpDL2hwcHZYaG9JUkxONU9aWS84eGJ1REY2?=
+ =?utf-8?B?Y0pWYlQyL1BWZmdka2VFNGo4S1pRV2NoaUNLSk5JRTNkY0N1ekFVMEJ5cXRH?=
+ =?utf-8?B?ZHRhejhQK2pSRWNSeVBVZ3dhZXFkb2FxNUpBbVVvWGkvVnhmb2p6cnl2VWo4?=
+ =?utf-8?B?WmUrNjZ5Q0htemhCS1p3VHhrUzVYZytqYmpvQXVHNlNZbml6WDdMa1ZvMnlu?=
+ =?utf-8?B?UFQyQ0dnZThRYnRoZVNteWtjVXhQb1ZGQkhoWGF2UG1WcmFlNDRGMlNYcFJE?=
+ =?utf-8?B?OU5XTHp6T3A2QjZtQ0VwSmJQVG1Ra28wVUtyRkdjLzJZYjhrOWJWMmpTengr?=
+ =?utf-8?B?SDdrK3JaU1g1QjEvR0J0L1RYamIrdHJrd01iTnErM0FzSzhwUmd4akV1eXJF?=
+ =?utf-8?B?VmFvZ3BZK1laM2g5NnJKZWEzZ0E0bkNPdmtHMkc4bk1uOUZabERaNytHaGlV?=
+ =?utf-8?B?Z2VoWTU5akNWZ1B4VjBueTlpYkxFajRYS1dCQWJhV3dlQmhYRmNFYVZoK2lB?=
+ =?utf-8?B?WkdOOFAxbTVkZWF1MzVkZkkycUFFbSt4bWdqZHdTNlVCcTE4a0p3S3RVUXk2?=
+ =?utf-8?B?b29qc2Zzc0FlRDFiVlFMdmdBWUpwakZ1c3pxdWM1dlR6K1g0U0p2bVNjTTR4?=
+ =?utf-8?B?Yll1Z1k5QVd4NWhrK3ppQlhkei9uRjJLMFZKWk5BY0ppandzWXA0RWxVY3ZG?=
+ =?utf-8?B?YUM1a3lpTGhPRGM5T3NEUTdEOUVmcnRTRnUwczk2NjhPL2d6S0tucmJoNG1j?=
+ =?utf-8?B?Ri9oSU1ESmJTbTlid2FXU3BFT0lUaEh5NDJWN2dXbGtzSHBUMlRJa0pBeHZx?=
+ =?utf-8?B?bG54aWJMcFpSWGNsblo2OE5yd2ZFRmRtSEZtTnlzOW1TN0lqWm9CMHZ4cCt1?=
+ =?utf-8?B?bFZwc2xjRERrQmlrdTZySHFxMzVPNUU1M3pHdXJKVFhxMXloWXQzVGpSN0Y1?=
+ =?utf-8?B?aXRjc1p4UnVQR0ZWNFZlR0ZaeTJlWk80WUNTL01Tdm9GUTJyUXI5UzJId1Iw?=
+ =?utf-8?B?WitwRUdoTUxXZzRVN1g5UVJJbXBwazZVcERMdTJSem5zOStVY0U3MUwxN1lj?=
+ =?utf-8?B?WUVoTXFjMm9rL1VzWTF3a05kWHQ1Nk1YazJqMkRraDlMTmNtMWtuem9FVGRR?=
+ =?utf-8?B?MFVuYys4cEFoVzBzdW1rWkVOUjlsc1g1Z0pVcE0yUnZwbUVCaHVmcXZUZmta?=
+ =?utf-8?B?eWQ1TG1nUTRTMWsxdFRjM2RuWnZhKzNTUXFYNjZ4aXhHeWxJWk5XdFJ1Q0Zx?=
+ =?utf-8?B?MVZIalNHVkYrektGVDg1UmFnOVJab0dQVGZUdmczRUhiVk01RmZ0aFJYV1J1?=
+ =?utf-8?B?TnpST1NYbDF2R0tUTUs1L2RhUllrcU42V25ZOERCamJKdkE2ZjFiai9tL2U1?=
+ =?utf-8?B?Wms5SE1rc2pyaEl6RGFjZHJ3Kzk1V0FYc0YwSDFPeHFNVzJEVm5CU3RyQ1Z4?=
+ =?utf-8?B?TkcwZVhBMmxGMUtNZS91dFFncHBBWVp0N0lRZHNhK01mRXVabytpeUN6b2xQ?=
+ =?utf-8?B?UXhBRUZkbm1IZXdyRnRtejIxeDh1ZW5NYUlnakJVZURQRURMamkybE8ybkcw?=
+ =?utf-8?B?U0kwMW5uSytSVTlmeXk5Y1hkNkNYRmo2VUJJK3p1aG9vNWU5NzFzY0lPTThN?=
+ =?utf-8?B?ak4wcWtUNEdEa0FCWGlGaTNEWC92WHR5VWlrbjZIZzMxdXZiTXZsL1pMdkhz?=
+ =?utf-8?B?ZGVKQjRjaVVHclkyd2Y0VndySnRPRVZRemplREFPdmFRYTJhLy9Yd0NhSjNy?=
+ =?utf-8?B?VjV2NkdiaWhkUHdZekdQbXVjejc4ektqMm5lTW9RZmdTNHZkMTFBVXo2TWZG?=
+ =?utf-8?B?bHIrSzdtUHhWVDBZOHBJbjl5ZWRRektLODY0WVM5bkxqL1h3QXVDQWMxK0JU?=
+ =?utf-8?B?WkUrdFM4M2s2TnlVdmkxY0lsY0JmNDhOaTR0S3V5UjhFMVhWekxTRDYyOXBV?=
+ =?utf-8?B?RzRDZ0lwMVhtWnhXUnpnT3dqdDFwa3hEU0ZEK0NUUDh3N2xPdWFkVXA1RG9v?=
+ =?utf-8?B?WXc9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <D80AF0B06C79AE498013D3CBDD99C5CD@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240129164514.73104-1-philmd@linaro.org> <20240129164514.73104-23-philmd@linaro.org>
-In-Reply-To: <20240129164514.73104-23-philmd@linaro.org>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 30 Jan 2024 10:39:22 +1000
-Message-ID: <CAKmqyKMMYUT44mc4muZv0t+Cpu0ysw3Y5B6d6KVpnkw29pP0gQ@mail.gmail.com>
-Subject: Re: [PATCH v3 22/29] target/riscv: Prefer fast cpu_env() over slower
- CPU QOM cast macro
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>
-Cc: qemu-devel@nongnu.org, qemu-riscv@nongnu.org, qemu-s390x@nongnu.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, qemu-ppc@nongnu.org, 
-	qemu-arm@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Alistair Francis <alistair.francis@wdc.com>, 
-	Bin Meng <bin.meng@windriver.com>, Weiwei Li <liwei1518@gmail.com>, 
-	Daniel Henrique Barboza <dbarboza@ventanamicro.com>, Liu Zhiwei <zhiwei_liu@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB5963.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a84cf52c-3554-4eab-530f-08dc2132e9a6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Jan 2024 01:29:33.1486
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: YBwkfuu6OY1J9/ncp0/fmAlss78kMk11CkQItsPg0YCF9IbmTN8Oq9uQWOrarkmkBdTyzMIyG4kxfASIxgzpejD7PGT6wqYMmQlMU4dkags=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB7894
+X-OriginatorOrg: intel.com
 
-On Tue, Jan 30, 2024 at 2:52=E2=80=AFAM Philippe Mathieu-Daud=C3=A9
-<philmd@linaro.org> wrote:
->
-> Mechanical patch produced running the command documented
-> in scripts/coccinelle/cpu_env.cocci_template header.
->
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
-
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-
-Alistair
-
-> ---
->  target/riscv/arch_dump.c   |  6 ++----
->  target/riscv/cpu.c         | 17 +++++------------
->  target/riscv/cpu_helper.c  | 17 +++++------------
->  target/riscv/debug.c       |  9 +++------
->  target/riscv/gdbstub.c     |  6 ++----
->  target/riscv/kvm/kvm-cpu.c | 11 +++--------
->  target/riscv/tcg/tcg-cpu.c | 10 +++-------
->  target/riscv/translate.c   |  6 ++----
->  8 files changed, 25 insertions(+), 57 deletions(-)
->
-> diff --git a/target/riscv/arch_dump.c b/target/riscv/arch_dump.c
-> index 434c8a3dbb..994709647f 100644
-> --- a/target/riscv/arch_dump.c
-> +++ b/target/riscv/arch_dump.c
-> @@ -68,8 +68,7 @@ int riscv_cpu_write_elf64_note(WriteCoreDumpFunction f,=
- CPUState *cs,
->                                 int cpuid, DumpState *s)
->  {
->      struct riscv64_note note;
-> -    RISCVCPU *cpu =3D RISCV_CPU(cs);
-> -    CPURISCVState *env =3D &cpu->env;
-> +    CPURISCVState *env =3D cpu_env(cs);
->      int ret, i =3D 0;
->      const char name[] =3D "CORE";
->
-> @@ -137,8 +136,7 @@ int riscv_cpu_write_elf32_note(WriteCoreDumpFunction =
-f, CPUState *cs,
->                                 int cpuid, DumpState *s)
->  {
->      struct riscv32_note note;
-> -    RISCVCPU *cpu =3D RISCV_CPU(cs);
-> -    CPURISCVState *env =3D &cpu->env;
-> +    CPURISCVState *env =3D cpu_env(cs);
->      int ret, i;
->      const char name[] =3D "CORE";
->
-> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-> index 1bd99bc5c6..8af4f7a088 100644
-> --- a/target/riscv/cpu.c
-> +++ b/target/riscv/cpu.c
-> @@ -419,8 +419,7 @@ static void riscv_any_cpu_init(Object *obj)
->
->  static void riscv_max_cpu_init(Object *obj)
->  {
-> -    RISCVCPU *cpu =3D RISCV_CPU(obj);
-> -    CPURISCVState *env =3D &cpu->env;
-> +    CPURISCVState *env =3D cpu_env(CPU(obj));
->      RISCVMXL mlx =3D MXL_RV64;
->
->  #ifdef TARGET_RISCV32
-> @@ -828,8 +827,7 @@ static void riscv_cpu_dump_state(CPUState *cs, FILE *=
-f, int flags)
->
->  static void riscv_cpu_set_pc(CPUState *cs, vaddr value)
->  {
-> -    RISCVCPU *cpu =3D RISCV_CPU(cs);
-> -    CPURISCVState *env =3D &cpu->env;
-> +    CPURISCVState *env =3D cpu_env(cs);
->
->      if (env->xl =3D=3D MXL_RV32) {
->          env->pc =3D (int32_t)value;
-> @@ -840,8 +838,7 @@ static void riscv_cpu_set_pc(CPUState *cs, vaddr valu=
-e)
->
->  static vaddr riscv_cpu_get_pc(CPUState *cs)
->  {
-> -    RISCVCPU *cpu =3D RISCV_CPU(cs);
-> -    CPURISCVState *env =3D &cpu->env;
-> +    CPURISCVState *env =3D cpu_env(cs);
->
->      /* Match cpu_get_tb_cpu_state. */
->      if (env->xl =3D=3D MXL_RV32) {
-> @@ -853,8 +850,7 @@ static vaddr riscv_cpu_get_pc(CPUState *cs)
->  static bool riscv_cpu_has_work(CPUState *cs)
->  {
->  #ifndef CONFIG_USER_ONLY
-> -    RISCVCPU *cpu =3D RISCV_CPU(cs);
-> -    CPURISCVState *env =3D &cpu->env;
-> +    CPURISCVState *env =3D cpu_env(cs);
->      /*
->       * Definition of the WFI instruction requires it to ignore the privi=
-lege
->       * mode and delegation registers, but respect individual enables
-> @@ -1642,10 +1638,7 @@ static void rva22s64_profile_cpu_init(Object *obj)
->
->  static const gchar *riscv_gdb_arch_name(CPUState *cs)
->  {
-> -    RISCVCPU *cpu =3D RISCV_CPU(cs);
-> -    CPURISCVState *env =3D &cpu->env;
-> -
-> -    switch (riscv_cpu_mxl(env)) {
-> +    switch (riscv_cpu_mxl(cpu_env(cs))) {
->      case MXL_RV32:
->          return "riscv:rv32";
->      case MXL_RV64:
-> diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-> index 791435d628..01b32a3f83 100644
-> --- a/target/riscv/cpu_helper.c
-> +++ b/target/riscv/cpu_helper.c
-> @@ -493,9 +493,7 @@ static int riscv_cpu_local_irq_pending(CPURISCVState =
-*env)
->  bool riscv_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
->  {
->      if (interrupt_request & CPU_INTERRUPT_HARD) {
-> -        RISCVCPU *cpu =3D RISCV_CPU(cs);
-> -        CPURISCVState *env =3D &cpu->env;
-> -        int interruptno =3D riscv_cpu_local_irq_pending(env);
-> +        int interruptno =3D riscv_cpu_local_irq_pending(cpu_env(cs));
->          if (interruptno >=3D 0) {
->              cs->exception_index =3D RISCV_EXCP_INT_FLAG | interruptno;
->              riscv_cpu_do_interrupt(cs);
-> @@ -1196,8 +1194,7 @@ static void raise_mmu_exception(CPURISCVState *env,=
- target_ulong address,
->
->  hwaddr riscv_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
->  {
-> -    RISCVCPU *cpu =3D RISCV_CPU(cs);
-> -    CPURISCVState *env =3D &cpu->env;
-> +    CPURISCVState *env =3D cpu_env(cs);
->      hwaddr phys_addr;
->      int prot;
->      int mmu_idx =3D cpu_mmu_index(env, false);
-> @@ -1223,8 +1220,7 @@ void riscv_cpu_do_transaction_failed(CPUState *cs, =
-hwaddr physaddr,
->                                       int mmu_idx, MemTxAttrs attrs,
->                                       MemTxResult response, uintptr_t ret=
-addr)
->  {
-> -    RISCVCPU *cpu =3D RISCV_CPU(cs);
-> -    CPURISCVState *env =3D &cpu->env;
-> +    CPURISCVState *env =3D cpu_env(cs);
->
->      if (access_type =3D=3D MMU_DATA_STORE) {
->          cs->exception_index =3D RISCV_EXCP_STORE_AMO_ACCESS_FAULT;
-> @@ -1244,8 +1240,7 @@ void riscv_cpu_do_unaligned_access(CPUState *cs, va=
-ddr addr,
->                                     MMUAccessType access_type, int mmu_id=
-x,
->                                     uintptr_t retaddr)
->  {
-> -    RISCVCPU *cpu =3D RISCV_CPU(cs);
-> -    CPURISCVState *env =3D &cpu->env;
-> +    CPURISCVState *env =3D cpu_env(cs);
->      switch (access_type) {
->      case MMU_INST_FETCH:
->          cs->exception_index =3D RISCV_EXCP_INST_ADDR_MIS;
-> @@ -1631,9 +1626,7 @@ static target_ulong riscv_transformed_insn(CPURISCV=
-State *env,
->  void riscv_cpu_do_interrupt(CPUState *cs)
->  {
->  #if !defined(CONFIG_USER_ONLY)
-> -
-> -    RISCVCPU *cpu =3D RISCV_CPU(cs);
-> -    CPURISCVState *env =3D &cpu->env;
-> +    CPURISCVState *env =3D cpu_env(cs);
->      bool write_gva =3D false;
->      uint64_t s;
->
-> diff --git a/target/riscv/debug.c b/target/riscv/debug.c
-> index 4945d1a1f2..c8df9812be 100644
-> --- a/target/riscv/debug.c
-> +++ b/target/riscv/debug.c
-> @@ -757,8 +757,7 @@ target_ulong tinfo_csr_read(CPURISCVState *env)
->
->  void riscv_cpu_debug_excp_handler(CPUState *cs)
->  {
-> -    RISCVCPU *cpu =3D RISCV_CPU(cs);
-> -    CPURISCVState *env =3D &cpu->env;
-> +    CPURISCVState *env =3D cpu_env(cs);
->
->      if (cs->watchpoint_hit) {
->          if (cs->watchpoint_hit->flags & BP_CPU) {
-> @@ -773,8 +772,7 @@ void riscv_cpu_debug_excp_handler(CPUState *cs)
->
->  bool riscv_cpu_debug_check_breakpoint(CPUState *cs)
->  {
-> -    RISCVCPU *cpu =3D RISCV_CPU(cs);
-> -    CPURISCVState *env =3D &cpu->env;
-> +    CPURISCVState *env =3D cpu_env(cs);
->      CPUBreakpoint *bp;
->      target_ulong ctrl;
->      target_ulong pc;
-> @@ -832,8 +830,7 @@ bool riscv_cpu_debug_check_breakpoint(CPUState *cs)
->
->  bool riscv_cpu_debug_check_watchpoint(CPUState *cs, CPUWatchpoint *wp)
->  {
-> -    RISCVCPU *cpu =3D RISCV_CPU(cs);
-> -    CPURISCVState *env =3D &cpu->env;
-> +    CPURISCVState *env =3D cpu_env(cs);
->      target_ulong ctrl;
->      target_ulong addr;
->      int trigger_type;
-> diff --git a/target/riscv/gdbstub.c b/target/riscv/gdbstub.c
-> index 58b3ace0fe..999d815b34 100644
-> --- a/target/riscv/gdbstub.c
-> +++ b/target/riscv/gdbstub.c
-> @@ -49,8 +49,7 @@ static const struct TypeSize vec_lanes[] =3D {
->
->  int riscv_cpu_gdb_read_register(CPUState *cs, GByteArray *mem_buf, int n=
-)
->  {
-> -    RISCVCPU *cpu =3D RISCV_CPU(cs);
-> -    CPURISCVState *env =3D &cpu->env;
-> +    CPURISCVState *env =3D cpu_env(cs);
->      target_ulong tmp;
->
->      if (n < 32) {
-> @@ -75,8 +74,7 @@ int riscv_cpu_gdb_read_register(CPUState *cs, GByteArra=
-y *mem_buf, int n)
->
->  int riscv_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
->  {
-> -    RISCVCPU *cpu =3D RISCV_CPU(cs);
-> -    CPURISCVState *env =3D &cpu->env;
-> +    CPURISCVState *env =3D cpu_env(cs);
->      int length =3D 0;
->      target_ulong tmp;
->
-> diff --git a/target/riscv/kvm/kvm-cpu.c b/target/riscv/kvm/kvm-cpu.c
-> index 680a729cd8..563b371ec9 100644
-> --- a/target/riscv/kvm/kvm-cpu.c
-> +++ b/target/riscv/kvm/kvm-cpu.c
-> @@ -171,9 +171,7 @@ static void kvm_cpu_get_misa_ext_cfg(Object *obj, Vis=
-itor *v,
->  {
->      KVMCPUConfig *misa_ext_cfg =3D opaque;
->      target_ulong misa_bit =3D misa_ext_cfg->offset;
-> -    RISCVCPU *cpu =3D RISCV_CPU(obj);
-> -    CPURISCVState *env =3D &cpu->env;
-> -    bool value =3D env->misa_ext_mask & misa_bit;
-> +    bool value =3D cpu_env(CPU(obj))->misa_ext_mask & misa_bit;
->
->      visit_type_bool(v, name, &value, errp);
->  }
-> @@ -184,15 +182,13 @@ static void kvm_cpu_set_misa_ext_cfg(Object *obj, V=
-isitor *v,
->  {
->      KVMCPUConfig *misa_ext_cfg =3D opaque;
->      target_ulong misa_bit =3D misa_ext_cfg->offset;
-> -    RISCVCPU *cpu =3D RISCV_CPU(obj);
-> -    CPURISCVState *env =3D &cpu->env;
->      bool value, host_bit;
->
->      if (!visit_type_bool(v, name, &value, errp)) {
->          return;
->      }
->
-> -    host_bit =3D env->misa_ext_mask & misa_bit;
-> +    host_bit =3D cpu_env(CPU(obj))->misa_ext_mask & misa_bit;
->
->      if (value =3D=3D host_bit) {
->          return;
-> @@ -1583,10 +1579,9 @@ static void kvm_cpu_instance_init(CPUState *cs)
->   */
->  static bool kvm_cpu_realize(CPUState *cs, Error **errp)
->  {
-> -    RISCVCPU *cpu =3D RISCV_CPU(cs);
->      int ret;
->
-> -    if (riscv_has_ext(&cpu->env, RVV)) {
-> +    if (riscv_has_ext(cpu_env(cs), RVV)) {
->          ret =3D prctl(PR_RISCV_V_SET_CONTROL, PR_RISCV_V_VSTATE_CTRL_ON)=
-;
->          if (ret) {
->              error_setg(errp, "Error in prctl PR_RISCV_V_SET_CONTROL, cod=
-e: %s",
-> diff --git a/target/riscv/tcg/tcg-cpu.c b/target/riscv/tcg/tcg-cpu.c
-> index 994ca1cdf9..e0f05d898c 100644
-> --- a/target/riscv/tcg/tcg-cpu.c
-> +++ b/target/riscv/tcg/tcg-cpu.c
-> @@ -92,8 +92,7 @@ static void riscv_cpu_synchronize_from_tb(CPUState *cs,
->                                            const TranslationBlock *tb)
->  {
->      if (!(tb_cflags(tb) & CF_PCREL)) {
-> -        RISCVCPU *cpu =3D RISCV_CPU(cs);
-> -        CPURISCVState *env =3D &cpu->env;
-> +        CPURISCVState *env =3D cpu_env(cs);
->          RISCVMXL xl =3D FIELD_EX32(tb->flags, TB_FLAGS, XL);
->
->          tcg_debug_assert(!(cs->tcg_cflags & CF_PCREL));
-> @@ -110,8 +109,7 @@ static void riscv_restore_state_to_opc(CPUState *cs,
->                                         const TranslationBlock *tb,
->                                         const uint64_t *data)
->  {
-> -    RISCVCPU *cpu =3D RISCV_CPU(cs);
-> -    CPURISCVState *env =3D &cpu->env;
-> +    CPURISCVState *env =3D cpu_env(cs);
->      RISCVMXL xl =3D FIELD_EX32(tb->flags, TB_FLAGS, XL);
->      target_ulong pc;
->
-> @@ -1030,11 +1028,9 @@ static void cpu_get_misa_ext_cfg(Object *obj, Visi=
-tor *v, const char *name,
->  {
->      const RISCVCPUMisaExtConfig *misa_ext_cfg =3D opaque;
->      target_ulong misa_bit =3D misa_ext_cfg->misa_bit;
-> -    RISCVCPU *cpu =3D RISCV_CPU(obj);
-> -    CPURISCVState *env =3D &cpu->env;
->      bool value;
->
-> -    value =3D env->misa_ext & misa_bit;
-> +    value =3D cpu_env(CPU(obj))->misa_ext & misa_bit;
->
->      visit_type_bool(v, name, &value, errp);
->  }
-> diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-> index 071fbad7ef..24db9f3882 100644
-> --- a/target/riscv/translate.c
-> +++ b/target/riscv/translate.c
-> @@ -1074,9 +1074,8 @@ static uint32_t opcode_at(DisasContextBase *dcbase,=
- target_ulong pc)
->  {
->      DisasContext *ctx =3D container_of(dcbase, DisasContext, base);
->      CPUState *cpu =3D ctx->cs;
-> -    CPURISCVState *env =3D cpu_env(cpu);
->
-> -    return cpu_ldl_code(env, pc);
-> +    return cpu_ldl_code(cpu_env(cpu), pc);
->  }
->
->  /* Include insn module translation function */
-> @@ -1265,8 +1264,7 @@ static void riscv_tr_disas_log(const DisasContextBa=
-se *dcbase,
->                                 CPUState *cpu, FILE *logfile)
->  {
->  #ifndef CONFIG_USER_ONLY
-> -    RISCVCPU *rvcpu =3D RISCV_CPU(cpu);
-> -    CPURISCVState *env =3D &rvcpu->env;
-> +    CPURISCVState *env =3D cpu_env(cpu);
->  #endif
->
->      fprintf(logfile, "IN: %s\n", lookup_symbol(dcbase->pc_first));
-> --
-> 2.41.0
->
->
+T24gVHVlLCAyMDI0LTAxLTIzIGF0IDE4OjQxIC0wODAwLCBZYW5nIFdlaWppYW5nIHdyb3RlOg0K
+PiArwqDCoMKgwqDCoMKgwqAvKg0KPiArwqDCoMKgwqDCoMKgwqAgKiBDYWxjdWxhdGUgdGhlIHJl
+c3VsdGluZyBrZXJuZWwgc3RhdGUgc2l6ZS7CoCBOb3RlLA0KPiBAcGVybWl0dGVkIGFsc28NCj4g
+K8KgwqDCoMKgwqDCoMKgICogY29udGFpbnMgc3VwZXJ2aXNvciB4ZmVhdHVyZXMgZXZlbiB0aG91
+Z2ggc3VwZXJ2aXNvciBhcmUNCj4gYWx3YXlzDQo+ICvCoMKgwqDCoMKgwqDCoCAqIHBlcm1pdHRl
+ZCBmb3Iga2VybmVsIGFuZCBndWVzdCBGUFVzLCBhbmQgbmV2ZXIgcGVybWl0dGVkDQo+IGZvciB1
+c2VyDQo+ICvCoMKgwqDCoMKgwqDCoCAqIEZQVXMuDQo+ICvCoMKgwqDCoMKgwqDCoCAqLw0KDQpJ
+IHN0aWxsIGZpbmQgdGhpcyB2ZXJiaWFnZSBjb25mdXNpbmcsIGJ1dCBtYXliZSBpdCdzIGp1c3Qg
+bWUuDQoNClJldmlld2VkLWJ5OiBSaWNrIEVkZ2Vjb21iZSA8cmljay5wLmVkZ2Vjb21iZUBpbnRl
+bC5jb20+DQo=
 
