@@ -1,197 +1,195 @@
-Return-Path: <kvm+bounces-7507-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7508-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2672B84313D
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 00:28:19 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2592584319E
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 00:58:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B29D1C23D16
-	for <lists+kvm@lfdr.de>; Tue, 30 Jan 2024 23:28:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 84FD0B219C6
+	for <lists+kvm@lfdr.de>; Tue, 30 Jan 2024 23:58:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DCAA762D6;
-	Tue, 30 Jan 2024 23:27:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A1C079DB2;
+	Tue, 30 Jan 2024 23:58:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AX2A6ypD"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DkPW2Duk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FFEA79941
-	for <kvm@vger.kernel.org>; Tue, 30 Jan 2024 23:27:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E58E339AD
+	for <kvm@vger.kernel.org>; Tue, 30 Jan 2024 23:58:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706657273; cv=none; b=IuI/ZEHU/Ez4R5CyRyTAVmtFncuSWVVJ9xug8PAs98WWZ4HKNDd6vt4XIjbeD5SouxS074wfAfFkYD5IPvwNE8EHR++qWl+R/73MJJqRcvWvXtKbhgJKO4t1Un4qrzuhBQSERCT9Lp6g/tRt8by5RiT16wT2XGgkDec3ksrUgUs=
+	t=1706659124; cv=none; b=PoPkzz10s7rOmTRiW3U6IscrA3AKpWf6pz58PpjbVNyGZw/32RCVMiU2d+p0ZbA0SmrwoIazDZhravMxko6m0LfTJ4/xZvNtANSf3s9gzz1OJjGCcy+nEGZ38qwJPJCNXv4DJ/td52JCd3nU9Rcji9WKtn/PRQLF5ct0HvKyfYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706657273; c=relaxed/simple;
-	bh=KfTemhN3MAvuoqt6yf5Kxs1pawxGT8UvKf0mXE649a4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=AFAm739HokbCPpwV8cFX+2tYVt78mAeqljz6nzWycoQk79y327unUNyBi4o26rMHIZaxKPc9CE1y17LRFRlijc+wt4Ov2CNZdndY5Yf3Bb2uj/lAL/J6/oEsoO1YCAtChqFvotnWI7/svEcr3M5zsbbdFvh3OP5jmn40tWpg3Ho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AX2A6ypD; arc=none smtp.client-ip=209.85.219.202
+	s=arc-20240116; t=1706659124; c=relaxed/simple;
+	bh=mqasyqEC+6fRhw5/p/l75otWoegYgzBu1zpsELr1ZTo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HDdPW4OLKaNvOf60y05iIIQpyRtCXCRi52b/VMc7towlrOhW68lGwSbgio3nzmBWoXpkg+/5/L3FXcHwL+1KzEymV88EtJsVXMVFTYKPqYr/D50cMg0APlK7F2PchoKp5nDjR6EY4xarvmfQ9Iktz5SDx4MThCKGQ1UIHaBhYAg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DkPW2Duk; arc=none smtp.client-ip=209.85.214.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dbf216080f5so8121832276.1
-        for <kvm@vger.kernel.org>; Tue, 30 Jan 2024 15:27:51 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1d8d08f9454so37515ad.1
+        for <kvm@vger.kernel.org>; Tue, 30 Jan 2024 15:58:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706657270; x=1707262070; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4LUZBTwgQWOqcUDdzUzVaclv3cSncxEYBiXIU8rhjPo=;
-        b=AX2A6ypDaChfkgaj23qrbsy+YKRTa+OHCweeTH8CB7Zb1fNKwkOXSufQ316+JU3+kJ
-         4yvtd+gcam1mo7tVJNJ9tC1y0gGB9lY1JwOSMf+5fgLTbQ2A6jGXAkKeVuisKefq59xM
-         MJ/kjG/Z7y8I6/I6Vjdwz6sILPcYQ9NI8n37k6y5dIV0T7+uIWxSsq+qTjov3X6Tzm09
-         cOn5HsqxQ2CK/YexloGxySgma737AzyVxk9qNmfKTixRs4+koaTegJGntBBDDoyeKoCP
-         6c1wN0wuabD8yO+MOzwec8bzKgmV5l3mutFvWMgi6TWTYLXYFOAs+2Udiu+BtCKH6GqD
-         nRag==
+        d=google.com; s=20230601; t=1706659122; x=1707263922; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1u062nTR9tMZBKXAMw2gk2T6BiQu6ezEgEfg4ndl1uI=;
+        b=DkPW2DukdeDZ4Qqw4quZ72m9592+g93wjK3tsBLHcf41wLJpaesrj5CsNmFuN8QZ3f
+         sG2WRitAk39hdOZbNxuwZDj01StvNOQ4fLkTC4cN5CifgBMrguatDwGOk6aTJq1FelMA
+         yLthcHXM8A5vtwclIXvgF568POT8xL8pdfM86j907v9DCUf31EGJVTjYI3IAC91++OHs
+         OpKVQhedE3sm3YW1bn/ZddcdfjrNqR72i/uA7qF1jUg7HO8DCyxyhFFcLmZBj10J9OGt
+         Iw0rAnMJbwGGLjmdwtGZxby1fCdwt05Ncdvya1zrEBLdccpgiNpQlJ7c/Bgn7GoyK3gN
+         V7hQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706657270; x=1707262070;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=4LUZBTwgQWOqcUDdzUzVaclv3cSncxEYBiXIU8rhjPo=;
-        b=s1hNe+qdZ+HXR9BqDNy5MaE14KVu4NLyXuThvOEP/IEZ0vYgaqWosoiw8QhKPw/3L6
-         sUsucb4VH2umScbRYIx8nfWQaJIKPITVQd9g+PGg9MfjC7DJp1xgNZRnZn1t/QUVZWnr
-         8cdyJwwrqHJ9CWehX7v21m2Hp0luQILimR43HtMN1NeF+Ad/zr9mlucyUt8m/nbJFvuf
-         NC+A0LslwsT9AAAuEmBfDO9y+7s7N3UdtsnL78CgT3VPWJNJmuBCvh5aFmhOHpHI4nK7
-         qVJbN29sLAeovw7VqBziSMrJatm3R3iRka8EOqG0T4vWsQY8/tNKIllvDTrV2hwrIHed
-         V3YA==
-X-Gm-Message-State: AOJu0YzgdIoq0XJTowVKKQmO7xNBQcrDF9+r/5DpzCBW9gP8c758T/xL
-	fcpEokZrHITuLV65XNJLncVS3ci0xHpX+RhvWOlvzd2N1RKus3Ueku/0yi3Fn97w393SibksOhU
-	yiA==
-X-Google-Smtp-Source: AGHT+IGSOgtoOGUWy8KSdhTU0rJMoKxy/AeQnKMPIP2EYsFE4hLAMhJ/aHErXLGnJf88ZCIpOSHUxuMe89A=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1b10:b0:dc6:9e4a:f950 with SMTP id
- eh16-20020a0569021b1000b00dc69e4af950mr14836ybb.3.1706657270711; Tue, 30 Jan
- 2024 15:27:50 -0800 (PST)
-Date: Tue, 30 Jan 2024 15:27:49 -0800
-In-Reply-To: <cce0483f-539b-4be3-838d-af0ec91db8f0@linux.intel.com>
+        d=1e100.net; s=20230601; t=1706659122; x=1707263922;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1u062nTR9tMZBKXAMw2gk2T6BiQu6ezEgEfg4ndl1uI=;
+        b=f48GfnFX0gK8vfuYWsUq0wnw9fp/2VH9TAAeYbmaVFU5PZQXTbTKVx+DbOK/z8IpIn
+         qgAqBkD8CLmkj1l1fMhlgQrluE4Qu9ygtiDtPYmi8gVbgehtgdNjNrxvOp7hA1V/8Jv9
+         PY8zB8aT38WubquJHoFexfqRDP1iadlAyK5boQfoaWKYHnWI9uHFszNJkyPqNFHrrpW2
+         +Hp/yVXxXIO60lSqWEdhjLoW3aF6LtqId8DGnTSONYjqHI8yQnxAAONwaMBjb0l/l5Dm
+         EysaqOYmumy65RdwismlPRMoOrSb/NOvjgf8aw9U2Co8q/hR8v0NP2j53Ax74SyXHoxd
+         2u3Q==
+X-Gm-Message-State: AOJu0Yze4JdhARa6eoer+dwUiler93ASyEOeGFLXEngLSYXHRxtEpiSH
+	CtwY8dQHdmVVH6KlXa/vSGLjTkWEZHnQZMpConaPIOLUXjOgPwiqewEoPlmWZG2iou4SMLuK71v
+	YPKaC7WnxOgPmnKTu7cETHYEAzL2sVgxuVbWU
+X-Google-Smtp-Source: AGHT+IHcdkeyLXa6XCtLDjnDduk6glUOICOD9kwov8c2Kod0b9O1y98HahUbVVMf9/ahZ+kp6Ql6PausH1jHqmGnf44=
+X-Received: by 2002:a17:902:f688:b0:1d8:e7a1:8a87 with SMTP id
+ l8-20020a170902f68800b001d8e7a18a87mr405401plg.20.1706659122320; Tue, 30 Jan
+ 2024 15:58:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240109230250.424295-1-seanjc@google.com> <20240109230250.424295-17-seanjc@google.com>
- <5f51fda5-bc07-42ac-a723-d09d90136961@linux.intel.com> <ZaGxNsrf_pUHkFiY@google.com>
- <cce0483f-539b-4be3-838d-af0ec91db8f0@linux.intel.com>
-Message-ID: <ZbmF9eM84cQhdvGf@google.com>
-Subject: Re: [PATCH v10 16/29] KVM: selftests: Test Intel PMU architectural
- events on gp counters
-From: Sean Christopherson <seanjc@google.com>
-To: Dapeng Mi <dapeng1.mi@linux.intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Kan Liang <kan.liang@linux.intel.com>, Jim Mattson <jmattson@google.com>, 
-	Jinrong Liang <cloudliang@tencent.com>, Aaron Lewis <aaronlewis@google.com>, 
-	Like Xu <likexu@tencent.com>
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+References: <20231109210325.3806151-1-amoorthy@google.com> <20231109210325.3806151-10-amoorthy@google.com>
+In-Reply-To: <20231109210325.3806151-10-amoorthy@google.com>
+From: James Houghton <jthoughton@google.com>
+Date: Tue, 30 Jan 2024 15:58:04 -0800
+Message-ID: <CADrL8HXLF+EQZt+oXJAiatoJNzz2E-fiwUSJj=YpHzGQxL00mQ@mail.gmail.com>
+Subject: Re: [PATCH v6 09/14] KVM: arm64: Enable KVM_CAP_EXIT_ON_MISSING and
+ annotate an EFAULT from stage-2 fault-handler
+To: Anish Moorthy <amoorthy@google.com>
+Cc: seanjc@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	oliver.upton@linux.dev, pbonzini@redhat.com, maz@kernel.org, 
+	robert.hoo.linux@gmail.com, dmatlack@google.com, axelrasmussen@google.com, 
+	peterx@redhat.com, nadav.amit@gmail.com, isaku.yamahata@gmail.com, 
+	kconsul@linux.vnet.ibm.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 15, 2024, Dapeng Mi wrote:
->=20
-> On 1/13/2024 5:37 AM, Sean Christopherson wrote:
-> > On Fri, Jan 12, 2024, Dapeng Mi wrote:
-> > > On 1/10/2024 7:02 AM, Sean Christopherson wrote:
-> > > > +/*
-> > > > + * If an architectural event is supported and guaranteed to genera=
-te at least
-> > > > + * one "hit, assert that its count is non-zero.  If an event isn't=
- supported or
-> > > > + * the test can't guarantee the associated action will occur, then=
- all bets are
-> > > > + * off regarding the count, i.e. no checks can be done.
-> > > > + *
-> > > > + * Sanity check that in all cases, the event doesn't count when it=
-'s disabled,
-> > > > + * and that KVM correctly emulates the write of an arbitrary value=
-.
-> > > > + */
-> > > > +static void guest_assert_event_count(uint8_t idx,
-> > > > +				     struct kvm_x86_pmu_feature event,
-> > > > +				     uint32_t pmc, uint32_t pmc_msr)
-> > > > +{
-> > > > +	uint64_t count;
-> > > > +
-> > > > +	count =3D _rdpmc(pmc);
-> > > > +	if (!this_pmu_has(event))
-> > > > +		goto sanity_checks;
-> > > > +
-> > > > +	switch (idx) {
-> > > > +	case INTEL_ARCH_INSTRUCTIONS_RETIRED_INDEX:
-> > > > +		GUEST_ASSERT_EQ(count, NUM_INSNS_RETIRED);
-> > > > +		break;
-> > > > +	case INTEL_ARCH_BRANCHES_RETIRED_INDEX:
-> > > > +		GUEST_ASSERT_EQ(count, NUM_BRANCHES);
-> > > > +		break;
-> > > > +	case INTEL_ARCH_CPU_CYCLES_INDEX:
-> > > > +	case INTEL_ARCH_REFERENCE_CYCLES_INDEX:
-> > > Since we already support slots event in below guest_test_arch_event()=
-, we
-> > > can add check for INTEL_ARCH_TOPDOWN_SLOTS_INDEX here.
-> > Can that actually be tested at this point, since KVM doesn't support
-> > X86_PMU_FEATURE_TOPDOWN_SLOTS, i.e. this_pmu_has() above should always =
-fail, no?
->=20
-> I suppose X86_PMU_FEATURE_TOPDOWN_SLOTS has been supported in KVM.=C2=A0 =
-The
-> following output comes from a guest with latest kvm-x86 code on the Sapph=
-ire
-> Rapids platform.
->=20
-> sudo cpuid -l 0xa
-> CPU 0:
-> =C2=A0=C2=A0 Architecture Performance Monitoring Features (0xa):
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 version ID=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- =3D 0x2 (2)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 number of counters per logical processor =
-=3D 0x8 (8)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bit width of counter=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 =3D 0x30 (48)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 length of EBX bit vector=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 =3D 0x8 (8)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 core cycle event=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D available
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 instruction retired event=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- =3D available
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 reference cycles event=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 =3D available
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 last-level cache ref event=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D a=
-vailable
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 last-level cache miss event=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D availab=
-le
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 branch inst retired event=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- =3D available
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 branch mispred retired event=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D available
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 top-down slots event=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 =3D available
->=20
-> Current KVM doesn't support fixed counter 3 and pseudo slots event yet, b=
-ut
-> the architectural slots event is supported and can be programed on a GP
-> counter. Current test code can cover this case, so I think we'd better ad=
-d
-> the check for the slots count.
+Hi Anish,
 
-Can you submit a patch on top, with a changelog that includes justification=
- that
-that explains exactly what assertions can be made on the top-down slots eve=
-nt
-given the "workload" being measured?  I'm definitely not opposed to adding =
-coverage
-for top-down slots, but at this point, I don't want to respin this series, =
-nor do
-I want to make that change when applying on the fly.
+Sorry to get back to you so late. :) I was hoping others would provide
+more feedback, but I have a little bit to give anyway. Overall the
+series looks good to me.
+
+On Thu, Nov 9, 2023 at 1:03=E2=80=AFPM Anish Moorthy <amoorthy@google.com> =
+wrote:
+>
+> Prevent the stage-2 fault handler from faulting in pages when
+> KVM_MEM_EXIT_ON_MISSING is set by allowing its  __gfn_to_pfn_memslot()
+> calls to check the memslot flag.
+>
+> To actually make that behavior useful, prepare a KVM_EXIT_MEMORY_FAULT
+> when the stage-2 handler cannot resolve the pfn for a fault. With
+> KVM_MEM_EXIT_ON_MISSING enabled this effects the delivery of stage-2
+> faults as vCPU exits, which userspace can attempt to resolve without
+> terminating the guest.
+>
+> Delivering stage-2 faults to userspace in this way sidesteps the
+> significant scalabiliy issues associated with using userfaultfd for the
+> same purpose.
+>
+> Signed-off-by: Anish Moorthy <amoorthy@google.com>
+> ---
+>  Documentation/virt/kvm/api.rst | 2 +-
+>  arch/arm64/kvm/Kconfig         | 1 +
+>  arch/arm64/kvm/mmu.c           | 7 +++++--
+>  3 files changed, 7 insertions(+), 3 deletions(-)
+>
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.=
+rst
+> index fd87bbfbfdf2..67fcb9dbe855 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -8068,7 +8068,7 @@ See KVM_EXIT_MEMORY_FAULT for more information.
+>  7.35 KVM_CAP_EXIT_ON_MISSING
+>  ----------------------------
+>
+> -:Architectures: x86
+> +:Architectures: x86, arm64
+>  :Returns: Informational only, -EINVAL on direct KVM_ENABLE_CAP.
+>
+>  The presence of this capability indicates that userspace may set the
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index 1a777715199f..d6fae31f7e1a 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -43,6 +43,7 @@ menuconfig KVM
+>         select GUEST_PERF_EVENTS if PERF_EVENTS
+>         select INTERVAL_TREE
+>         select XARRAY_MULTI
+> +        select HAVE_KVM_EXIT_ON_MISSING
+>         help
+>           Support hosting virtualized guest machines.
+>
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 13066a6fdfff..3b9fb80672ac 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1486,13 +1486,16 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, =
+phys_addr_t fault_ipa,
+>         mmap_read_unlock(current->mm);
+>
+>         pfn =3D __gfn_to_pfn_memslot(memslot, gfn, false, false, NULL,
+> -                                  write_fault, &writable, false, NULL);
+> +                                  write_fault, &writable, true, NULL);
+>         if (pfn =3D=3D KVM_PFN_ERR_HWPOISON) {
+>                 kvm_send_hwpoison_signal(hva, vma_shift);
+>                 return 0;
+>         }
+> -       if (is_error_noslot_pfn(pfn))
+> +       if (is_error_noslot_pfn(pfn)) {
+> +               kvm_prepare_memory_fault_exit(vcpu, gfn * PAGE_SIZE, PAGE=
+_SIZE,
+> +                                             write_fault, exec_fault, fa=
+lse);
+
+I think that either (1) we move this kvm_prepare_memory_fault_exit
+logic into the previous patch[1], or (2) we merge this patch with the
+previous one. IIUC, we can only advertise KVM_CAP_MEMORY_FAULT_INFO on
+arm64 if this logic is present.
+
+As for the changelog in the previous patch[1], if you leave it
+unmerged with this one, something like "Enable
+KVM_CAP_MEMORY_FAULT_INFO to make KVM_CAP_EXIT_ON_MISSING useful, as
+without it, userspace doesn't know which page(s) of memory it needs to
+fix" works for me.
+
+Also, I think we need to update the documentation for
+KVM_CAP_MEMORY_FAULT_INFO to say that it is available for arm64 now
+(just like you have done for KVM_CAP_EXIT_ON_MISSING).
+
+Thanks!
+
+[1]: https://lore.kernel.org/kvm/20231109210325.3806151-9-amoorthy@google.c=
+om/
+
+>                 return -EFAULT;
+> +       }
+>
+>         if (kvm_is_device_pfn(pfn)) {
+>                 /*
+> --
+> 2.42.0.869.gea05f2083d-goog
+>
 
