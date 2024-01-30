@@ -1,190 +1,480 @@
-Return-Path: <kvm+bounces-7403-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7404-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86FA884187B
-	for <lists+kvm@lfdr.de>; Tue, 30 Jan 2024 02:40:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87768841973
+	for <lists+kvm@lfdr.de>; Tue, 30 Jan 2024 03:42:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC6401C21FA6
-	for <lists+kvm@lfdr.de>; Tue, 30 Jan 2024 01:40:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F3B72884CC
+	for <lists+kvm@lfdr.de>; Tue, 30 Jan 2024 02:42:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 735DF36133;
-	Tue, 30 Jan 2024 01:40:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="b233/glJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5274C36AF0;
+	Tue, 30 Jan 2024 02:42:50 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72CFF364A5;
-	Tue, 30 Jan 2024 01:40:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706578815; cv=fail; b=Wn8FCqsrsIyrnn8y+jlc6qdGNIO926lOcr721RgfyM+s5wpah4Bf83YIvuBtMBF5jbrdbtXRcDqGejg6oqk6Y3bCdlczrmcc6+Dv+QFqCKGlQY4ZQYZYoBBhrYPaUIjGiOodx/XcTTGmwqv50o2gtmiYrw/QcOO+ahU4MvJ6rvI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706578815; c=relaxed/simple;
-	bh=w8xBkzDO4hRS0ZbpeC8L5941cdvU8mtTLf1rMEc2qVY=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=pYNqH6sxMzr6OCp5taNS8z3iRrCoVHoMRsvymgjMsBS4NTAc5aPC6gnBPM9OyoPECjGxkaZFlDkcp5kiJ3WQnbeVzpsPV/bBiJcnomjgN811xz7+rV2x/lNL/W7OOojN7yLoPcIlbu0yYSarAxzgmNLmehoDcz5zlKe+ay0BCWA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=b233/glJ; arc=fail smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706578813; x=1738114813;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=w8xBkzDO4hRS0ZbpeC8L5941cdvU8mtTLf1rMEc2qVY=;
-  b=b233/glJND2cNRznXiV8HBDfkZrO2VHXTPTxGTtcx2UJTpoGxS8eR3u5
-   Yctd8/IcnjaorTW5xoCdcv81jjxc9X+JxTcN8qMqKTvZHZjhEUtwW53Md
-   07aVrW1xpdQ7ylbbmaQ/bvqHWMT7/YfR97xtZryq34P4wJnWbmGqXWuba
-   M2FvBEHeRZNel6IC6BGvv+zv5NHa+PXdFq37tVSAZ+Hojkbnja/ZjhFuD
-   wTPMtSxsJhuA9NKxbzLyLhML9+0tow1oBX6h3bBItzFit2TX0l37tVd3d
-   gBzjN0Y5j+mAkoyhrYBrYeN0lQ/cg+2pq4TxZfv1ivoSOY9vcIsCpqhQV
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10968"; a="24612886"
-X-IronPort-AV: E=Sophos;i="6.05,227,1701158400"; 
-   d="scan'208";a="24612886"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jan 2024 17:40:04 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10968"; a="1119091260"
-X-IronPort-AV: E=Sophos;i="6.05,227,1701158400"; 
-   d="scan'208";a="1119091260"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by fmsmga005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 29 Jan 2024 17:40:04 -0800
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 29 Jan 2024 17:40:03 -0800
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 29 Jan 2024 17:40:03 -0800
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Mon, 29 Jan 2024 17:40:03 -0800
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.100)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 29 Jan 2024 17:40:03 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iUwX5LTobpnYxHu3EWdBWV8bY41wHL/p49h2m2dskUwwGB2nDlHWO3GskQI5VfuOA43fIIpj9pkfEIMhRlE1ARN7BLnp/wfX/1+BJw9l6sAxt7J9ltw7A/cxFdsVlrBDq8dSEP7zEkbug7cIbN5yYsZnIfYaxs73uLZdF5LGAQo4nZOzCvCtR4MgaoYoaUIdJDCsp0a2HQDg56nZ+nQtdjWxiopXSPCfkH087PVWgcEoJXcQjW755CW+HW9h1qR0jX5FPROAfK/FETrFvm6gw80Dv+slWWl1O/qQFSu5k9aYWTjNBW5cR9RhwdB6llsFZ1KYY8WiVwj//AruIqF43Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=w8xBkzDO4hRS0ZbpeC8L5941cdvU8mtTLf1rMEc2qVY=;
- b=SJn3GJWhz7XTogzyfLAXw7A8xfqimJPsXODPX4GCu7nOidLBYTfPPsFR97ucESDWHPjtR+yrqiB/hkVVv0QZ9yTLqnNA7Aq6yu7OCi4wcjuIDNSuYBU1xa5G3KM7s37/ONWZro8XbcDIJKAN8x5oR1xukpcnQ7SlA3bU9LCTjhXqTManEQDTmzOJPQDwu8DQ018CmrSNFNy4imHW0zHfs9vzHnvDL6b3gBSEfarYoiTHECNerG8UEXCAobC7IY9YUwMoEBbv4voZQNXn2QMHu8czWdp4U4o1Ns3RG5boWOWhP2O5tQw5oKiIOEdckWFdZE5GvZOj9f4Ycq701LKndQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com (2603:10b6:208:372::10)
- by IA1PR11MB7823.namprd11.prod.outlook.com (2603:10b6:208:3f3::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.32; Tue, 30 Jan
- 2024 01:40:01 +0000
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::5d40:83fd:94ac:d409]) by MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::5d40:83fd:94ac:d409%7]) with mapi id 15.20.7228.029; Tue, 30 Jan 2024
- 01:40:01 +0000
-From: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-To: "Yang, Weijiang" <weijiang.yang@intel.com>, "Hansen, Dave"
-	<dave.hansen@intel.com>, "seanjc@google.com" <seanjc@google.com>,
-	"x86@kernel.org" <x86@kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "yuan.yao@linux.intel.com"
-	<yuan.yao@linux.intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>
-CC: "john.allen@amd.com" <john.allen@amd.com>, "peterz@infradead.org"
-	<peterz@infradead.org>, "Gao, Chao" <chao.gao@intel.com>,
-	"mlevitsk@redhat.com" <mlevitsk@redhat.com>
-Subject: Re: [PATCH v9 00/27] Enable CET Virtualization
-Thread-Topic: [PATCH v9 00/27] Enable CET Virtualization
-Thread-Index: AQHaTm7+Rcyn+RV2bkySwgIepGisrLDxnZsA
-Date: Tue, 30 Jan 2024 01:40:01 +0000
-Message-ID: <01235a152b201705bf59088d36eb820f5b35b8de.camel@intel.com>
-References: <20240124024200.102792-1-weijiang.yang@intel.com>
-In-Reply-To: <20240124024200.102792-1-weijiang.yang@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.44.4-0ubuntu2 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MN0PR11MB5963:EE_|IA1PR11MB7823:EE_
-x-ms-office365-filtering-correlation-id: 0226d0c1-0390-40a5-2088-08dc2134601f
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Ou65+Q0HQ85rQLDX6lOBct2KO9tgvs3GHQ58XaWMv6inkGdB0B37xW6ESmRT648l8KAU/dfPOAFhTlHDiNyC3sozOpB+Lr6379IaquZbmt9E0OKFj3Vi+k6fWb0I8RhOoRhXvosm9vVyANzECn5vszBaH2jJUlTk2DYX0ukN/TrOlLawhAIP8q5NI8rQC8XTNbVy+f3pnk2QxAGlZMn9rtpSYNTRcvokJrQ68WSczf+NCTdhLdBtS4HWZS9ryyJqPf2F5FBbA90XREY3zHB9IYPjnhAMrT6MtrbAentFNkKxOdYf6K9GH9Ulb5jphAPsA4d4FyBsvo8CL4K1cOU1kT1v2IwVb54DxeFqm0ebSwmYSl2fdsR11uwWhhUThAQhw+aNHlqow/D4cZ+naXG5CwJ0aC55s2sug8jt5TvcMFlexfgiK1vrD2VG8ZQZ31zPnkXJrDPRd8trvGRndUXvEZ5MSRVkAEr1jS3i9DeAZ4AZfQE+4ps/tiVNNfLJnsYKI5VcWUWhUejPkDuaHAck1n0V9+YbDxB5Cv8SASEblT+cS1SUo/bGCyy0NDrUlySHgoYbBVz7r9vhJ0iIh/RSBYqsvP6Rh2WVwVyhonokSPuZT9lW9+o9LVk7opGlak4w
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB5963.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(39860400002)(366004)(346002)(136003)(230922051799003)(451199024)(1800799012)(186009)(64100799003)(6512007)(6506007)(66946007)(478600001)(122000001)(38100700002)(316002)(8936002)(8676002)(5660300002)(4326008)(41300700001)(2616005)(71200400001)(6486002)(2906002)(64756008)(66476007)(76116006)(54906003)(110136005)(66556008)(66446008)(26005)(921011)(36756003)(558084003)(86362001)(82960400001)(38070700009);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?V0Nxbm1tRFBWaE9HYndXQ3h1V2JVR05MMVMwRU1FS2pLbUs0UkorOVE3NmJv?=
- =?utf-8?B?V3h6MGhyaDJBZk1FemRKakZ3M0NEck05dlZLc3NTM2xwYm9nbkoyK0UyRXlx?=
- =?utf-8?B?NUtubnlpRW1NMVh3bEdQYzI1VGJMTm95YU1vM2dMVTlIaUpFRmREWjhRaGJy?=
- =?utf-8?B?SjJuSTFTbUJPa0lzcDJNZ1l4dERPVmhUcUptOVZDVllOZW90dEZmVlRXek81?=
- =?utf-8?B?ejYzeHRNbEZYQVBLTlVXTWxnRFdVeXpHK1pyTFUwc0QyT0x0aG42VUwvdjJr?=
- =?utf-8?B?NkREQzVNNzIzS0J6V2ZhNGZrNVhpWWVlMmJnZytQeXhpV2MwYW56MmlhYWdZ?=
- =?utf-8?B?Ym5uTXJ5R3kwUU5MV3FVVGpQSkNzWWN3L29CeGFYOE5Wb0NVOHBIbVZjc25I?=
- =?utf-8?B?dTVvbGFkUjBWOG5Jb0lFVHNWSmZiWFJVdFRXUkJTb0NyS2tyT3ZWenlPZXNM?=
- =?utf-8?B?VU5hTHhMdmdJNUIrQU12US8yZFpnMEk2djB4bW8wbFV6aHF5SUlvcEQxbVBi?=
- =?utf-8?B?VW9HQ2djdlRuUkFGaWo2aTJydjRiVzNBa09QT2N0NVlBU21rWWNvRThjWXhn?=
- =?utf-8?B?N1A4VnNNWWZ5Ykd1QkEybXF2bGx0bHp1UXJ0OWxJU3BnZGp1aXlsZlhtM29u?=
- =?utf-8?B?R0M2UTZ2ejVZZmI4L2lkd1FhcWFURHVoR24vZTNxc1U1MkUrUHJ4S0w1QTkw?=
- =?utf-8?B?TEozTzEyWHl6UmhaVVdQMVRNSWtTS2lvc01xUlZOUWVxOHd1MFdSRW9DZzNq?=
- =?utf-8?B?eUY5ejk2Wm1nSllBVThhVUFKeUhIeC83MHczVlF6YlM2ckdxRkN0UnQ0MWpz?=
- =?utf-8?B?TlJhWnJXdzlwRnVDZUw0ZE1IbEVMQ282OHE0eFo5NUVOT2dMTmY2Vlo2ZUhz?=
- =?utf-8?B?OUYwN0FMRXgyUUR5RkFyY3N1NW1KRVNkUWpqVlRreGd0Vi96R3Q4ZkxHaVhC?=
- =?utf-8?B?NVVXSmJ0a3dZTkU1T0ZOVFhVWVZLVFFwR2c2UWE4V3JvUnBFeFZpOWFqc01u?=
- =?utf-8?B?aHh5anpNV0k2d0ZiV3E2ZVFocU1tY1BranRzL0ZoTDIyb0NkdDlPOGdHWW1N?=
- =?utf-8?B?dkxLZHIwOVFrU3hZK3ZSbUc2RmJJZ243RkRMVUlhZXZtZWt2WFc4a0tkYzhH?=
- =?utf-8?B?SUZQK1FETmVseHdibXZDRUxHakRnbDVJVENXMzJVR3lGb2JCT3JCTDdtOHdw?=
- =?utf-8?B?dGdzRlZQemsvQjhybjlXbHZoTjlBRTdSNkdKLy9hZENTMWcwNXA2NVBjMEdZ?=
- =?utf-8?B?NWlaVEpVYXBSNVNPMHRONmVQRU83MnRHL2tUM3lSdmg3S1V0SlE2TUo3QmNT?=
- =?utf-8?B?RzkxNk0xNkNMYXd5RWZzcUNsRnhieXlLWVpib2dqYy9mT0lUUmJuSTZrOS9i?=
- =?utf-8?B?NHIraTlKb0VORXpsb2hRak9mSzUvVlZWTkJOSWExc0w0c0svMVo4SHk4ang5?=
- =?utf-8?B?VW1JOHpvY0xzVlh5RjVuSkx5YUx0T3dxLy9VSS9STk5OT0R3bHpsVUx5cGxV?=
- =?utf-8?B?b21yaUZJTklkaTNVb3dnclN1RU5PQ3JBbTVjK3hrZVRBTmpSVjhzWC81NGNh?=
- =?utf-8?B?NkJsL2oxOXBEWDBnYXFnc3ladWNHQnBDWGlKT2UvOWhpdzVjOGUxYVJGcStM?=
- =?utf-8?B?R0ZFakQraWUrbkFRWGQxVWpNd1k0bFpjNG9GSjZ1N1JCVnhzeXd5MzFSdFha?=
- =?utf-8?B?b05jdnRxQmlJbXFvekIrbWxFbHF0TU9WYml4cCtHUkJsWlQyQTN5MkNPQVdY?=
- =?utf-8?B?TzVRRjRNcmRwY2FDOE5ZWmJjQmhFUHlFelgyT2Y4b1FBWG1VWEZndXNFWU9Z?=
- =?utf-8?B?WFdOOHBxRHFubzhFRGdUaGF3ek03enl1ZGQrcVk5Um10MDUxNnVQdnZ6WXg3?=
- =?utf-8?B?TGNjY0JxeUFMTFhYaUcwODB3bzlEZjRJS2hEazFXTklNQnpqNUhmdGUvWC9q?=
- =?utf-8?B?T2Faejdxb095UTRxNW8wVGNOanB1MVdUb2FNT25LZGlJYkRZM1lpVnl4S1NY?=
- =?utf-8?B?NVVDWlJScmVOYWs4cjQ2QUltbWx4NEd2Yjlycm1na0JCM0I2U3ZhNHVkL0Jl?=
- =?utf-8?B?S2tQa0lJRHRVSGlaVnBYcXBZWldueWE4SUxDRlBWRFl5UWRVcmFTM05ZbmJJ?=
- =?utf-8?B?TzNkM2dDVm4zTUJNNkV4SzFXRk5FTHRBSjI3NHRWSDYzc1Fpd1FQUWE2Q3Rs?=
- =?utf-8?B?OHc9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <FA905CC302C0AC48B6F5F3DB579AFE72@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B3A536137;
+	Tue, 30 Jan 2024 02:42:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706582569; cv=none; b=LlVVn3nQ7p9tfQU/rvRrfhQrkeIkDj60b5I53nCJeJ64cjw+hUaODrBuFiOCbH8Y21ol006M3sP3J/8gHa1tb2vaf0ocBQZMltDBDJnZQtyYWV6+e6DE8+CXrxCtxjKn6ze4fc/zDumUAaSLWG0uhIxAqYU81h9n+Bz21PN5duo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706582569; c=relaxed/simple;
+	bh=6/T/Ou9yv3PagUmCXfnGDxOLz73qUMFIagYLf1f7zsQ=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=L3TdrIqNBwArOAFJiA5nNlbfIX16umqiMBHwI8lDjHRp4Nyc8QFxPsszXOeW8LGsaUTqbHFOls9pZOYz0lOfH4d6lvRbz1xCriFiB//nah+qmEGlkw/S2YazpYuYfSdB2IIUGdLBWoRNMgNZtpasSCe7veeaIHV3LYcqW7M/9mA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.173])
+	by gateway (Coremail) with SMTP id _____8CxLOsfYrhlxCYIAA--.14943S3;
+	Tue, 30 Jan 2024 10:42:39 +0800 (CST)
+Received: from [10.20.42.173] (unknown [10.20.42.173])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8Ax3c4bYrhl+C0nAA--.22525S3;
+	Tue, 30 Jan 2024 10:42:38 +0800 (CST)
+Subject: Re: [PATCH v3 1/6] LoongArch/smp: Refine ipi ops on LoongArch
+ platform
+To: Huacai Chen <chenhuacai@kernel.org>
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, Juergen Gross <jgross@suse.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, loongarch@lists.linux.dev,
+ linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
+ kvm@vger.kernel.org
+References: <20240122100313.1589372-1-maobibo@loongson.cn>
+ <20240122100313.1589372-2-maobibo@loongson.cn>
+ <CAAhV-H6JnfdD1D0rMgDAk7gBWeYZn3ngFsE07_76Sk0Rv7Tksg@mail.gmail.com>
+From: maobibo <maobibo@loongson.cn>
+Message-ID: <34f2dce8-0cfe-7e62-bd63-6a634d1fbf31@loongson.cn>
+Date: Tue, 30 Jan 2024 10:42:35 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB5963.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0226d0c1-0390-40a5-2088-08dc2134601f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Jan 2024 01:40:01.4055
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: izQP7fu5qZraqCU4zTEkJFgzfDjcimDAEO5nzcfX64ERRsRobGqtyEdO9kOYfLjgTQ65UBEFE+aL5QElt39GfM0JaRdN9uBzKiLOeQURMyA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB7823
-X-OriginatorOrg: intel.com
+In-Reply-To: <CAAhV-H6JnfdD1D0rMgDAk7gBWeYZn3ngFsE07_76Sk0Rv7Tksg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8Ax3c4bYrhl+C0nAA--.22525S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj9fXoW3ZF47urW8tr13tF15JF48Zrc_yoW8GrW3Co
+	WftF1xtw48Wry3KF90q3ZaqryUX3Wjg340kas7Ar43CF1jy34qgryxKw1Yva9rGFs5GFsx
+	Ga4Sgr40k3y7XFnxl-sFpf9Il3svdjkaLaAFLSUrUUUU1b8apTn2vfkv8UJUUUU8wcxFpf
+	9Il3svdxBIdaVrn0xqx4xG64xvF2IEw4CE5I8CrVC2j2Jv73VFW2AGmfu7bjvjm3AaLaJ3
+	UjIYCTnIWjp_UUUYW7kC6x804xWl14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI
+	8IcIk0rVWrJVCq3wAFIxvE14AKwVWUXVWUAwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xG
+	Y2AK021l84ACjcxK6xIIjxv20xvE14v26r1I6r4UM28EF7xvwVC0I7IYx2IY6xkF7I0E14
+	v26r4j6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAF
+	wI0_Gr1j6F4UJwAaw2AFwI0_Jrv_JF1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2
+	xF0cIa020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_
+	Jrv_JF1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwI
+	xGrwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY
+	6r1j6r4UMxCIbckI1I0E14v26r1Y6r17MI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7
+	xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xII
+	jxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw2
+	0EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x02
+	67AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxU2MKZDUUUU
 
-T24gVHVlLCAyMDI0LTAxLTIzIGF0IDE4OjQxIC0wODAwLCBZYW5nIFdlaWppYW5nIHdyb3RlOg0K
-PiBUaGlzIHNlcmllcyBwYXNzZWQgYmFzaWMgQ0VUIHVzZXIgc2hhZG93IHN0YWNrIHRlc3QNCg0K
-SSByZXRlc3RlZCB0aGlzIHdpdGggc29tZSBoZWF2aWVyIHVzZXJzcGFjZSBzaGFkb3cgc3RhY2sg
-YWN0aXZpdHkgYW5kDQpkaWRuJ3Qgc2VlIGFueSBwcm9ibGVtcy4NCg==
+
+
+On 2024/1/29 下午8:38, Huacai Chen wrote:
+> Hi, Bibo,
+> 
+> On Mon, Jan 22, 2024 at 6:03 PM Bibo Mao <maobibo@loongson.cn> wrote:
+>>
+>> This patch refines ipi handling on LoongArch platform, there are
+>> three changes with this patch.
+>> 1. Add generic get_percpu_irq api, replace some percpu irq function
+>> such as get_ipi_irq/get_pmc_irq/get_timer_irq with get_percpu_irq.
+>>
+>> 2. Change parameter action definition with function
+>> loongson_send_ipi_single and loongson_send_ipi_mask. Code encoding is used
+>> here rather than bitmap encoding for ipi action, ipi hw sender uses action
+>> code, and ipi receiver will get action bitmap encoding, the ipi hw will
+>> convert it into bitmap in ipi message buffer.
+>>
+>> 3. Add smp_ops on LoongArch platform so that pv ipi can be used later.
+>>
+>> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+>> ---
+>>   arch/loongarch/include/asm/hardirq.h |  4 ++
+>>   arch/loongarch/include/asm/irq.h     | 10 ++++-
+>>   arch/loongarch/include/asm/smp.h     | 31 +++++++--------
+>>   arch/loongarch/kernel/irq.c          | 22 +----------
+>>   arch/loongarch/kernel/perf_event.c   | 14 +------
+>>   arch/loongarch/kernel/smp.c          | 58 +++++++++++++++++++---------
+>>   arch/loongarch/kernel/time.c         | 12 +-----
+>>   7 files changed, 71 insertions(+), 80 deletions(-)
+>>
+>> diff --git a/arch/loongarch/include/asm/hardirq.h b/arch/loongarch/include/asm/hardirq.h
+>> index 0ef3b18f8980..9f0038e19c7f 100644
+>> --- a/arch/loongarch/include/asm/hardirq.h
+>> +++ b/arch/loongarch/include/asm/hardirq.h
+>> @@ -12,6 +12,10 @@
+>>   extern void ack_bad_irq(unsigned int irq);
+>>   #define ack_bad_irq ack_bad_irq
+>>
+>> +enum ipi_msg_type {
+>> +       IPI_RESCHEDULE,
+>> +       IPI_CALL_FUNCTION,
+>> +};
+>>   #define NR_IPI 2
+>>
+>>   typedef struct {
+>> diff --git a/arch/loongarch/include/asm/irq.h b/arch/loongarch/include/asm/irq.h
+>> index 218b4da0ea90..00101b6d601e 100644
+>> --- a/arch/loongarch/include/asm/irq.h
+>> +++ b/arch/loongarch/include/asm/irq.h
+>> @@ -117,8 +117,16 @@ extern struct fwnode_handle *liointc_handle;
+>>   extern struct fwnode_handle *pch_lpc_handle;
+>>   extern struct fwnode_handle *pch_pic_handle[MAX_IO_PICS];
+>>
+>> -extern irqreturn_t loongson_ipi_interrupt(int irq, void *dev);
+>> +static inline int get_percpu_irq(int vector)
+>> +{
+>> +       struct irq_domain *d;
+>> +
+>> +       d = irq_find_matching_fwnode(cpuintc_handle, DOMAIN_BUS_ANY);
+>> +       if (d)
+>> +               return irq_create_mapping(d, vector);
+>>
+>> +       return -EINVAL;
+>> +}
+>>   #include <asm-generic/irq.h>
+>>
+>>   #endif /* _ASM_IRQ_H */
+>> diff --git a/arch/loongarch/include/asm/smp.h b/arch/loongarch/include/asm/smp.h
+>> index f81e5f01d619..330f1cb3741c 100644
+>> --- a/arch/loongarch/include/asm/smp.h
+>> +++ b/arch/loongarch/include/asm/smp.h
+>> @@ -12,6 +12,13 @@
+>>   #include <linux/threads.h>
+>>   #include <linux/cpumask.h>
+>>
+>> +struct smp_ops {
+>> +       void (*call_func_ipi)(const struct cpumask *mask, unsigned int action);
+>> +       void (*call_func_single_ipi)(int cpu, unsigned int action);
+> To keep consistency, it is better to use call_func_ipi_single and
+> call_func_ipi_mask.
+yes, how about using send_ipi_single/send_ipi_mask here? since both 
+function arch_smp_send_reschedule() and 
+arch_send_call_function_single_ipi use smp_ops.
+
+> 
+>> +       void (*ipi_init)(void);
+>> +};
+>> +
+>> +extern struct smp_ops smp_ops;
+>>   extern int smp_num_siblings;
+>>   extern int num_processors;
+>>   extern int disabled_cpus;
+>> @@ -24,8 +31,6 @@ void loongson_prepare_cpus(unsigned int max_cpus);
+>>   void loongson_boot_secondary(int cpu, struct task_struct *idle);
+>>   void loongson_init_secondary(void);
+>>   void loongson_smp_finish(void);
+>> -void loongson_send_ipi_single(int cpu, unsigned int action);
+>> -void loongson_send_ipi_mask(const struct cpumask *mask, unsigned int action);
+>>   #ifdef CONFIG_HOTPLUG_CPU
+>>   int loongson_cpu_disable(void);
+>>   void loongson_cpu_die(unsigned int cpu);
+>> @@ -59,9 +64,12 @@ extern int __cpu_logical_map[NR_CPUS];
+>>
+>>   #define cpu_physical_id(cpu)   cpu_logical_map(cpu)
+>>
+>> -#define SMP_BOOT_CPU           0x1
+>> -#define SMP_RESCHEDULE         0x2
+>> -#define SMP_CALL_FUNCTION      0x4
+>> +#define ACTTION_BOOT_CPU       0
+>> +#define ACTTION_RESCHEDULE     1
+>> +#define ACTTION_CALL_FUNCTION  2
+>> +#define SMP_BOOT_CPU           BIT(ACTTION_BOOT_CPU)
+>> +#define SMP_RESCHEDULE         BIT(ACTTION_RESCHEDULE)
+>> +#define SMP_CALL_FUNCTION      BIT(ACTTION_CALL_FUNCTION)
+>>
+>>   struct secondary_data {
+>>          unsigned long stack;
+>> @@ -71,7 +79,8 @@ extern struct secondary_data cpuboot_data;
+>>
+>>   extern asmlinkage void smpboot_entry(void);
+>>   extern asmlinkage void start_secondary(void);
+>> -
+>> +extern void arch_send_call_function_single_ipi(int cpu);
+>> +extern void arch_send_call_function_ipi_mask(const struct cpumask *mask);
+> Similarly, to keep consistency, it is better to use
+> arch_send_function_ipi_single and arch_send_function_ipi_mask.
+These two functions are used by all architectures and called in commcon 
+code send_call_function_single_ipi(). It is the same with removed static 
+inline function as follows:
+
+  -static inline void arch_send_call_function_single_ipi(int cpu)
+  -{
+  -       loongson_send_ipi_single(cpu, SMP_CALL_FUNCTION);
+  -}
+  -
+  -static inline void arch_send_call_function_ipi_mask(const struct 
+cpumask *mask)
+  -{
+  -       loongson_send_ipi_mask(mask, SMP_CALL_FUNCTION);
+  -}
+  -
+
+Regards
+Bibo Mao
+
+> 
+> Huacai
+> 
+>>   extern void calculate_cpu_foreign_map(void);
+>>
+>>   /*
+>> @@ -79,16 +88,6 @@ extern void calculate_cpu_foreign_map(void);
+>>    */
+>>   extern void show_ipi_list(struct seq_file *p, int prec);
+>>
+>> -static inline void arch_send_call_function_single_ipi(int cpu)
+>> -{
+>> -       loongson_send_ipi_single(cpu, SMP_CALL_FUNCTION);
+>> -}
+>> -
+>> -static inline void arch_send_call_function_ipi_mask(const struct cpumask *mask)
+>> -{
+>> -       loongson_send_ipi_mask(mask, SMP_CALL_FUNCTION);
+>> -}
+>> -
+>>   #ifdef CONFIG_HOTPLUG_CPU
+>>   static inline int __cpu_disable(void)
+>>   {
+>> diff --git a/arch/loongarch/kernel/irq.c b/arch/loongarch/kernel/irq.c
+>> index 883e5066ae44..1b58f7c3eed9 100644
+>> --- a/arch/loongarch/kernel/irq.c
+>> +++ b/arch/loongarch/kernel/irq.c
+>> @@ -87,23 +87,9 @@ static void __init init_vec_parent_group(void)
+>>          acpi_table_parse(ACPI_SIG_MCFG, early_pci_mcfg_parse);
+>>   }
+>>
+>> -static int __init get_ipi_irq(void)
+>> -{
+>> -       struct irq_domain *d = irq_find_matching_fwnode(cpuintc_handle, DOMAIN_BUS_ANY);
+>> -
+>> -       if (d)
+>> -               return irq_create_mapping(d, INT_IPI);
+>> -
+>> -       return -EINVAL;
+>> -}
+>> -
+>>   void __init init_IRQ(void)
+>>   {
+>>          int i;
+>> -#ifdef CONFIG_SMP
+>> -       int r, ipi_irq;
+>> -       static int ipi_dummy_dev;
+>> -#endif
+>>          unsigned int order = get_order(IRQ_STACK_SIZE);
+>>          struct page *page;
+>>
+>> @@ -113,13 +99,7 @@ void __init init_IRQ(void)
+>>          init_vec_parent_group();
+>>          irqchip_init();
+>>   #ifdef CONFIG_SMP
+>> -       ipi_irq = get_ipi_irq();
+>> -       if (ipi_irq < 0)
+>> -               panic("IPI IRQ mapping failed\n");
+>> -       irq_set_percpu_devid(ipi_irq);
+>> -       r = request_percpu_irq(ipi_irq, loongson_ipi_interrupt, "IPI", &ipi_dummy_dev);
+>> -       if (r < 0)
+>> -               panic("IPI IRQ request failed\n");
+>> +       smp_ops.ipi_init();
+>>   #endif
+>>
+>>          for (i = 0; i < NR_IRQS; i++)
+>> diff --git a/arch/loongarch/kernel/perf_event.c b/arch/loongarch/kernel/perf_event.c
+>> index 0491bf453cd4..3265c8f33223 100644
+>> --- a/arch/loongarch/kernel/perf_event.c
+>> +++ b/arch/loongarch/kernel/perf_event.c
+>> @@ -456,16 +456,6 @@ static void loongarch_pmu_disable(struct pmu *pmu)
+>>   static DEFINE_MUTEX(pmu_reserve_mutex);
+>>   static atomic_t active_events = ATOMIC_INIT(0);
+>>
+>> -static int get_pmc_irq(void)
+>> -{
+>> -       struct irq_domain *d = irq_find_matching_fwnode(cpuintc_handle, DOMAIN_BUS_ANY);
+>> -
+>> -       if (d)
+>> -               return irq_create_mapping(d, INT_PCOV);
+>> -
+>> -       return -EINVAL;
+>> -}
+>> -
+>>   static void reset_counters(void *arg);
+>>   static int __hw_perf_event_init(struct perf_event *event);
+>>
+>> @@ -473,7 +463,7 @@ static void hw_perf_event_destroy(struct perf_event *event)
+>>   {
+>>          if (atomic_dec_and_mutex_lock(&active_events, &pmu_reserve_mutex)) {
+>>                  on_each_cpu(reset_counters, NULL, 1);
+>> -               free_irq(get_pmc_irq(), &loongarch_pmu);
+>> +               free_irq(get_percpu_irq(INT_PCOV), &loongarch_pmu);
+>>                  mutex_unlock(&pmu_reserve_mutex);
+>>          }
+>>   }
+>> @@ -562,7 +552,7 @@ static int loongarch_pmu_event_init(struct perf_event *event)
+>>          if (event->cpu >= 0 && !cpu_online(event->cpu))
+>>                  return -ENODEV;
+>>
+>> -       irq = get_pmc_irq();
+>> +       irq = get_percpu_irq(INT_PCOV);
+>>          flags = IRQF_PERCPU | IRQF_NOBALANCING | IRQF_NO_THREAD | IRQF_NO_SUSPEND | IRQF_SHARED;
+>>          if (!atomic_inc_not_zero(&active_events)) {
+>>                  mutex_lock(&pmu_reserve_mutex);
+>> diff --git a/arch/loongarch/kernel/smp.c b/arch/loongarch/kernel/smp.c
+>> index a16e3dbe9f09..46735ba49815 100644
+>> --- a/arch/loongarch/kernel/smp.c
+>> +++ b/arch/loongarch/kernel/smp.c
+>> @@ -66,11 +66,6 @@ static cpumask_t cpu_core_setup_map;
+>>   struct secondary_data cpuboot_data;
+>>   static DEFINE_PER_CPU(int, cpu_state);
+>>
+>> -enum ipi_msg_type {
+>> -       IPI_RESCHEDULE,
+>> -       IPI_CALL_FUNCTION,
+>> -};
+>> -
+>>   static const char *ipi_types[NR_IPI] __tracepoint_string = {
+>>          [IPI_RESCHEDULE] = "Rescheduling interrupts",
+>>          [IPI_CALL_FUNCTION] = "Function call interrupts",
+>> @@ -123,24 +118,19 @@ static u32 ipi_read_clear(int cpu)
+>>
+>>   static void ipi_write_action(int cpu, u32 action)
+>>   {
+>> -       unsigned int irq = 0;
+>> -
+>> -       while ((irq = ffs(action))) {
+>> -               uint32_t val = IOCSR_IPI_SEND_BLOCKING;
+>> +       uint32_t val;
+>>
+>> -               val |= (irq - 1);
+>> -               val |= (cpu << IOCSR_IPI_SEND_CPU_SHIFT);
+>> -               iocsr_write32(val, LOONGARCH_IOCSR_IPI_SEND);
+>> -               action &= ~BIT(irq - 1);
+>> -       }
+>> +       val = IOCSR_IPI_SEND_BLOCKING | action;
+>> +       val |= (cpu << IOCSR_IPI_SEND_CPU_SHIFT);
+>> +       iocsr_write32(val, LOONGARCH_IOCSR_IPI_SEND);
+>>   }
+>>
+>> -void loongson_send_ipi_single(int cpu, unsigned int action)
+>> +static void loongson_send_ipi_single(int cpu, unsigned int action)
+>>   {
+>>          ipi_write_action(cpu_logical_map(cpu), (u32)action);
+>>   }
+>>
+>> -void loongson_send_ipi_mask(const struct cpumask *mask, unsigned int action)
+>> +static void loongson_send_ipi_mask(const struct cpumask *mask, unsigned int action)
+>>   {
+>>          unsigned int i;
+>>
+>> @@ -148,6 +138,16 @@ void loongson_send_ipi_mask(const struct cpumask *mask, unsigned int action)
+>>                  ipi_write_action(cpu_logical_map(i), (u32)action);
+>>   }
+>>
+>> +void arch_send_call_function_single_ipi(int cpu)
+>> +{
+>> +       smp_ops.call_func_single_ipi(cpu, ACTTION_CALL_FUNCTION);
+>> +}
+>> +
+>> +void arch_send_call_function_ipi_mask(const struct cpumask *mask)
+>> +{
+>> +       smp_ops.call_func_ipi(mask, ACTTION_CALL_FUNCTION);
+>> +}
+>> +
+>>   /*
+>>    * This function sends a 'reschedule' IPI to another CPU.
+>>    * it goes straight through and wastes no time serializing
+>> @@ -155,11 +155,11 @@ void loongson_send_ipi_mask(const struct cpumask *mask, unsigned int action)
+>>    */
+>>   void arch_smp_send_reschedule(int cpu)
+>>   {
+>> -       loongson_send_ipi_single(cpu, SMP_RESCHEDULE);
+>> +       smp_ops.call_func_single_ipi(cpu, ACTTION_RESCHEDULE);
+>>   }
+>>   EXPORT_SYMBOL_GPL(arch_smp_send_reschedule);
+>>
+>> -irqreturn_t loongson_ipi_interrupt(int irq, void *dev)
+>> +static irqreturn_t loongson_ipi_interrupt(int irq, void *dev)
+>>   {
+>>          unsigned int action;
+>>          unsigned int cpu = smp_processor_id();
+>> @@ -179,6 +179,26 @@ irqreturn_t loongson_ipi_interrupt(int irq, void *dev)
+>>          return IRQ_HANDLED;
+>>   }
+>>
+>> +static void loongson_ipi_init(void)
+>> +{
+>> +       int r, ipi_irq;
+>> +
+>> +       ipi_irq = get_percpu_irq(INT_IPI);
+>> +       if (ipi_irq < 0)
+>> +               panic("IPI IRQ mapping failed\n");
+>> +
+>> +       irq_set_percpu_devid(ipi_irq);
+>> +       r = request_percpu_irq(ipi_irq, loongson_ipi_interrupt, "IPI", &irq_stat);
+>> +       if (r < 0)
+>> +               panic("IPI IRQ request failed\n");
+>> +}
+>> +
+>> +struct smp_ops smp_ops = {
+>> +       .call_func_single_ipi   = loongson_send_ipi_single,
+>> +       .call_func_ipi          = loongson_send_ipi_mask,
+>> +       .ipi_init               = loongson_ipi_init,
+>> +};
+>> +
+>>   static void __init fdt_smp_setup(void)
+>>   {
+>>   #ifdef CONFIG_OF
+>> @@ -256,7 +276,7 @@ void loongson_boot_secondary(int cpu, struct task_struct *idle)
+>>
+>>          csr_mail_send(entry, cpu_logical_map(cpu), 0);
+>>
+>> -       loongson_send_ipi_single(cpu, SMP_BOOT_CPU);
+>> +       loongson_send_ipi_single(cpu, ACTTION_BOOT_CPU);
+>>   }
+>>
+>>   /*
+>> diff --git a/arch/loongarch/kernel/time.c b/arch/loongarch/kernel/time.c
+>> index e7015f7b70e3..fd5354f9be7c 100644
+>> --- a/arch/loongarch/kernel/time.c
+>> +++ b/arch/loongarch/kernel/time.c
+>> @@ -123,16 +123,6 @@ void sync_counter(void)
+>>          csr_write64(init_offset, LOONGARCH_CSR_CNTC);
+>>   }
+>>
+>> -static int get_timer_irq(void)
+>> -{
+>> -       struct irq_domain *d = irq_find_matching_fwnode(cpuintc_handle, DOMAIN_BUS_ANY);
+>> -
+>> -       if (d)
+>> -               return irq_create_mapping(d, INT_TI);
+>> -
+>> -       return -EINVAL;
+>> -}
+>> -
+>>   int constant_clockevent_init(void)
+>>   {
+>>          unsigned int cpu = smp_processor_id();
+>> @@ -142,7 +132,7 @@ int constant_clockevent_init(void)
+>>          static int irq = 0, timer_irq_installed = 0;
+>>
+>>          if (!timer_irq_installed) {
+>> -               irq = get_timer_irq();
+>> +               irq = get_percpu_irq(INT_TI);
+>>                  if (irq < 0)
+>>                          pr_err("Failed to map irq %d (timer)\n", irq);
+>>          }
+>> --
+>> 2.39.3
+>>
+
 
