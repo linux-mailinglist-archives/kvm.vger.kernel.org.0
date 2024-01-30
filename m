@@ -1,196 +1,118 @@
-Return-Path: <kvm+bounces-7481-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7483-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47DC284281D
-	for <lists+kvm@lfdr.de>; Tue, 30 Jan 2024 16:34:06 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88F9D8428FD
+	for <lists+kvm@lfdr.de>; Tue, 30 Jan 2024 17:21:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7ABB61C23354
-	for <lists+kvm@lfdr.de>; Tue, 30 Jan 2024 15:34:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 74476B25CF6
+	for <lists+kvm@lfdr.de>; Tue, 30 Jan 2024 16:21:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3992882D8A;
-	Tue, 30 Jan 2024 15:33:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38BB81272C1;
+	Tue, 30 Jan 2024 16:20:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="J1d9Ne19"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="RFQwU6NC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A10A5823C9;
-	Tue, 30 Jan 2024 15:33:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D3846D1BC;
+	Tue, 30 Jan 2024 16:20:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706628833; cv=none; b=qpnAyR+xlGbjigdElPlRe2XFsVJAPX2naiZk4FC0Y/CdeliuZgkcxvRpkWe6G48h6/zx9j53hdijbw/2X4NO3/fWEV+jgnrZld83HYEO8x/rfIH8c2Jv90/pCyjX5qZwpIUKN7bolApCGPVIzmsEzTMQR0g5oZc2PVKKm8ca9Hs=
+	t=1706631646; cv=none; b=SYdEGsQWvLEMPBVVz3kAASkk2cRQ3zGYYLm9SoE0/SJz+XQ20ypUl1ka9nhDfJmOC8Jev0d3Apv1TV2EMqlaWC1KD9jKmwRkfQo6YtymHplTp2xvdBeTwiMtZVfIdTAFLbaLFNjefIF/0x8wlcWNUJJ6yTWjJ8HGlT2jDuXY46A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706628833; c=relaxed/simple;
-	bh=nkm0OWHFuQWKYwZc1WEkbla4lt45LORU0WQDLLCTrX8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FTN828yswo2mlGM9HpteWocxZSUQXo1Q50BEChpVKfF4OlgLB6IBTtE7BJ9/4CG26cUNn/EhtL3J6R1gugxERV0yMiNiFAZeK3E24vmRsO1qWag5NUhwsAB+aRavDrRJXqzGX/vQeSLdmmIzTDLffMHAD1EPB8ZM92H1McPHiBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=J1d9Ne19; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706628832; x=1738164832;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=nkm0OWHFuQWKYwZc1WEkbla4lt45LORU0WQDLLCTrX8=;
-  b=J1d9Ne19A4LFXTKnCitwq93tpxnz9d8oXgrBENpCJ44yk1S0dbioAnLN
-   6CyUFLOsnp5z0ezptwgFQTwEfRdSEEsbOAQ2FJider9af8J+NkjfNira6
-   ngZDJ7D55lV9N44axbscd/javmXpZyjZgVOuuIKkzZh6z/pYUHcr2xzy9
-   zteSAvTiYidVODJxbWkHbBNSRpeGcTqlgZVY5SmR9ylGOoOWcE6yxIMCG
-   m50sYCFPjibiTIIWIhzxbJOSxdUhNk5YXUtaOX3MJkdjSghHV7gK4vGYV
-   gjJ3bsw9UAL87Ca82XRzx5XHgFJjFCpc0gLxCeAJd163G6fIB+uNoYk51
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10968"; a="24786745"
-X-IronPort-AV: E=Sophos;i="6.05,230,1701158400"; 
-   d="scan'208";a="24786745"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jan 2024 07:31:27 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,230,1701158400"; 
-   d="scan'208";a="22465315"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.93.16.217]) ([10.93.16.217])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jan 2024 07:31:24 -0800
-Message-ID: <9da45a6a-a40b-4768-90d0-d7de674baec1@linux.intel.com>
-Date: Tue, 30 Jan 2024 23:31:22 +0800
+	s=arc-20240116; t=1706631646; c=relaxed/simple;
+	bh=9dqoKUzfPnS0ouqZmUsutY8WSQ36Ew7hhDXp38tOQgU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZA1pjiAPRHvBz5D+h+LcMH4TgQwh1jJPBqDfjguu2c/5oj3FrqAq3wYk4C9Up0v5XerpUict1LfR3zVUNOP0Df4xHSa56FcRhS7ufOlGoQawG2TGHloagjHpTC8/iZaRxINKw9nDR+lUkQBFfR9XyirP6CKFd9yznLCnOLC2d98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=RFQwU6NC; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 161F040E01B3;
+	Tue, 30 Jan 2024 16:20:41 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id 7yVcVDOXyjWb; Tue, 30 Jan 2024 16:20:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1706631639; bh=alWf9PlcGUIY347NLIw+uw/YZFl5yuvijufcFHJXHac=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RFQwU6NCK40raUA31PWhXPZKfjdfhCWWZXv8repbMJaj2d3tzBIwSyhuY0zVFuL/t
+	 nGJHjh6F7ujehycrE+kCrMDQZbCn6ouDqp23GJ73Fe4jnIX5WaGDIQQFF/qUtf/Ujt
+	 /nknHKZZogm7FogSq7ryuDZobR5h0c7ThyoD7NY9hhxHGvpjhDbEKpk8pPCyPPguQL
+	 dIdj3AzixiVWYkSS78kQTyZ0yFwnUF5RCxkLDV8R8X88vHhSXKgLLF1ksUq8pnIGKv
+	 2fLvgnufs9u8Ml0SxAJughMKYrDg13dD+ul8HQPKYgJvWhL7j+BAW0DSrfUwG1XVY7
+	 /By15uTzDxBIdER5lNvw1JI0VM9rMiPJeT7rt2TWOOD7K8H3ZScAj+wzJTCs1wVW5j
+	 LvnDz5D4NIMP7QMiItg4PTaMZZLKAjVSpDES8TEw/8h7+7k3xyGQCQPYYcSeAYYh79
+	 VbAFiHvz0xEHOt1rmkwfNS/TqeT0R1fjx7XRHgoL6l4SbRbWj0DJY6kr1iuelg/9Xn
+	 /nCrkyaNKsNK3+BXCCFQWjRCcVWbPEV6YUZxfgY9IXU3hb9lZY6rBroNNLIcA9CXq5
+	 Sotj8mLiXilxw9pP/mTw6O34JotnPspFg0YTCAVMGQ147AKOYj5YSRCf95TC47qAFT
+	 tFPrc8bdrPIOARXme6y93Rgc=
+Received: from zn.tnic (pd953033e.dip0.t-ipconnect.de [217.83.3.62])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id B083840E00C5;
+	Tue, 30 Jan 2024 16:20:00 +0000 (UTC)
+Date: Tue, 30 Jan 2024 17:19:55 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Michael Roth <michael.roth@amd.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>
+Cc: x86@kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+	linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+	rientjes@google.com, tobin@ibm.com, vbabka@suse.cz,
+	kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+	pankaj.gupta@amd.com, liam.merwick@oracle.com
+Subject: Re: [PATCH v2 00/25] Add AMD Secure Nested Paging (SEV-SNP)
+ Initialization Support
+Message-ID: <20240130161955.GFZbkhq2RDUrW5-NvV@fat_crate.local>
+References: <20240126041126.1927228-1-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v18 060/121] KVM: TDX: TDP MMU TDX support
-To: isaku.yamahata@intel.com
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
- erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
- Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
- chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com
-References: <cover.1705965634.git.isaku.yamahata@intel.com>
- <a47c5a9442130f45fc09c1d4ae0e4352054be636.1705965635.git.isaku.yamahata@intel.com>
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <a47c5a9442130f45fc09c1d4ae0e4352054be636.1705965635.git.isaku.yamahata@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240126041126.1927228-1-michael.roth@amd.com>
 
+On Thu, Jan 25, 2024 at 10:11:00PM -0600, Michael Roth wrote:
+> This patchset is also available at:
+> 
+>   https://github.com/amdese/linux/commits/snp-host-init-v2
+> 
+> and is based on top of linux-next tag next-20240125
 
+Ok, I've queued this now after some testing.
 
-On 1/23/2024 7:53 AM, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
->
-> Implement hooks of TDP MMU for TDX backend.  TLB flush, TLB shootdown,
-> propagating the change private EPT entry to Secure EPT and freeing Secure
-> EPT page. TLB flush handles both shared EPT and private EPT.  It flushes
-> shared EPT same as VMX.  It also waits for the TDX TLB shootdown.  For the
-> hook to free Secure EPT page, unlinks the Secure EPT page from the Secure
-> EPT so that the page can be freed to OS.
->
-> Propagate the entry change to Secure EPT.  The possible entry changes are
-> present -> non-present(zapping) and non-present -> present(population).  On
-> population just link the Secure EPT page or the private guest page to the
-> Secure EPT by TDX SEAMCALL. Because TDP MMU allows concurrent
-> zapping/population, zapping requires synchronous TLB shoot down with the
-> frozen EPT entry.  It zaps the secure entry, increments TLB counter, sends
-> IPI to remote vcpus to trigger TLB flush, and then unlinks the private
-> guest page from the Secure EPT. For simplicity, batched zapping with
-> exclude lock is handled as concurrent zapping.  Although it's inefficient,
-> it can be optimized in the future.
->
-> For MMIO SPTE, the spte value changes as follows.
-> initial value (suppress VE bit is set)
-> -> Guest issues MMIO and triggers EPT violation
-> -> KVM updates SPTE value to MMIO value (suppress VE bit is cleared)
-> -> Guest MMIO resumes.  It triggers VE exception in guest TD
-> -> Guest VE handler issues TDG.VP.VMCALL<MMIO>
-> -> KVM handles MMIO
-> -> Guest VE handler resumes its execution after MMIO instruction
->
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
->
-> ---
-> v18:
-> - rename tdx_sept_page_aug() -> tdx_mem_page_aug()
-> - checkpatch: space => tab
->
-> v15 -> v16:
-> - Add the handling of TD_ATTR_SEPT_VE_DISABLE case.
->
-> v14 -> v15:
-> - Implemented tdx_flush_tlb_current()
-> - Removed unnecessary invept in tdx_flush_tlb().  It was carry over
->    from the very old code base.
-> ---
->   arch/x86/kvm/mmu/spte.c    |   3 +-
->   arch/x86/kvm/vmx/main.c    |  71 +++++++-
->   arch/x86/kvm/vmx/tdx.c     | 342 +++++++++++++++++++++++++++++++++++++
->   arch/x86/kvm/vmx/tdx.h     |   2 +-
->   arch/x86/kvm/vmx/tdx_ops.h |   6 +
->   arch/x86/kvm/vmx/x86_ops.h |   6 +
->   6 files changed, 424 insertions(+), 6 deletions(-)
-[...]
-> +
-> +/*
-> + * TLB shoot down procedure:
-> + * There is a global epoch counter and each vcpu has local epoch counter.
-> + * - TDH.MEM.RANGE.BLOCK(TDR. level, range) on one vcpu
-> + *   This blocks the subsequenct creation of TLB translation on that range.
-> + *   This corresponds to clear the present bit(all RXW) in EPT entry
-> + * - TDH.MEM.TRACK(TDR): advances the epoch counter which is global.
-> + * - IPI to remote vcpus
-> + * - TDExit and re-entry with TDH.VP.ENTER on remote vcpus
-> + * - On re-entry, TDX module compares the local epoch counter with the global
-> + *   epoch counter.  If the local epoch counter is older than the global epoch
-> + *   counter, update the local epoch counter and flushes TLB.
-> + */
-> +static void tdx_track(struct kvm *kvm)
-> +{
-> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> +	u64 err;
-> +
-> +	KVM_BUG_ON(!is_hkid_assigned(kvm_tdx), kvm);
-> +	/* If TD isn't finalized, it's before any vcpu running. */
-> +	if (unlikely(!is_td_finalized(kvm_tdx)))
-> +		return;
-> +
-> +	/*
-> +	 * tdx_flush_tlb() waits for this function to issue TDH.MEM.TRACK() by
-> +	 * the counter.  The counter is used instead of bool because multiple
-> +	 * TDH_MEM_TRACK() can be issued concurrently by multiple vcpus.
-> +	 */
-> +	atomic_inc(&kvm_tdx->tdh_mem_track);
-> +	/*
-> +	 * KVM_REQ_TLB_FLUSH waits for the empty IPI handler, ack_flush(), with
-> +	 * KVM_REQUEST_WAIT.
-> +	 */
-> +	kvm_make_all_cpus_request(kvm, KVM_REQ_TLB_FLUSH);
-> +
-> +	do {
-> +		/*
-> +		 * kvm_flush_remote_tlbs() doesn't allow to return error and
-> +		 * retry.
-> +		 */
-> +		err = tdh_mem_track(kvm_tdx->tdr_pa);
-> +	} while (unlikely((err & TDX_SEAMCALL_STATUS_MASK) == TDX_OPERAND_BUSY));
+As of now
 
-Why the sequence of the code is different from the description of the 
-function.
-In the description, do the TDH.MEM.TRACK before IPIs.
-But in the code, do TDH.MEM.TRACK after IPIs?
+https://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git/log/?h=x86/sev
 
+is frozen and fixes should come ontop so that Paolo/Sean can use that
+branch to base the remaining SNP host stuff ontop.
 
-> +
-> +	/* Release remote vcpu waiting for TDH.MEM.TRACK in tdx_flush_tlb(). */
-> +	atomic_dec(&kvm_tdx->tdh_mem_track);
-> +
-> +	if (KVM_BUG_ON(err, kvm))
-> +		pr_tdx_error(TDH_MEM_TRACK, err, NULL);
-> +
-> +}
-> +
-[...]
+Thx.
 
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
