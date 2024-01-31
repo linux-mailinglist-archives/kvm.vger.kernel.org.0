@@ -1,83 +1,80 @@
-Return-Path: <kvm+bounces-7579-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7580-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8AA5843BC2
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 11:03:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B558843CA2
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 11:29:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 51A7C1F2CF18
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 10:03:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D760F1F312A4
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 10:29:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 631C16A028;
-	Wed, 31 Jan 2024 10:02:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3AF06996C;
+	Wed, 31 Jan 2024 10:28:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GoopgIsx"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NBdJIzfJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33F626774E
-	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 10:02:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 540E169D13
+	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 10:28:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706695336; cv=none; b=g3SQmZ4PTon5Q7zeGuBrbbFOJV5xgi6wjZ7t45shBxK4SOt/IRaMir4HX/Q4qc2cyO9H94Dfcq35SMSqr9z1xiJBi2eXXLXO29m1j6LZovBQ6/vPpQaNsSwOSrBw4417MTvEl2ZoS5kJbmsuI3TtnHx9b0Rpg0klG/1eCElowlw=
+	t=1706696935; cv=none; b=eHAK9IcigeuG8d/SQGQV1X9zTN42uLgNiKWjXZeupE2nN1jxeLPnFoMtmUg/ohcqO0xaZYZvgJQFpaAICF3K392oBAX6DNeLCir9kCYA1wrTgCNqFqw5VFEALF9yAU+mGkw2T+qRf6QCtkVkWSIU6GNmsSC0/Uuiw8EsZigcqy8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706695336; c=relaxed/simple;
-	bh=fLMMs/SeWi/Vzb8lvrux8mGIdvidsDOqLQrh225b0Qg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=r+k6CTALpBtaj0GNSNkX3T/oofHZNdCNHYOqv8+OozGeWD1ZCZd/+qk2x/QIi5KebPYjxydPqDdH57hNq+hG/cBfEQg7/ERnmq1Cn2e6wExemq/NGt7m2MNGMQplg2g9C1+kauzNjN8BQsX3s+G2GkBYc56c14iEm6xViW7tSZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GoopgIsx; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706695335; x=1738231335;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=fLMMs/SeWi/Vzb8lvrux8mGIdvidsDOqLQrh225b0Qg=;
-  b=GoopgIsxuieeoHIaTdxmOmiDhKLqExg/cn+2IoAbpk26UTU7ee/3HjVx
-   QVrI0Mh88MgGezxWu7D9K+wIeAI8e4a5t26cfQJ13rl/EzkwrPD3sqOio
-   mtComU8k5CW2cVVmlRCbSE/gfwNQmB/xFvQTNvcPyd/VaBqbuLmX5uAuF
-   TZOo5Bj9Iq4ARvZqSGGbGyY6lkQXrwz6TOp2gRLK8h2RO2uXXyjn8un8e
-   RyBX27S0a5rlnZmbtbvnMeUqYcgXoEOE9PRFcGt9LXpZpZq8ZipBk+3uD
-   eGcStwAFUnTFAT7h6Jm34oGp8ikMShKK14P1BVlW2AYmvE871ds54UYUg
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="25033125"
-X-IronPort-AV: E=Sophos;i="6.05,231,1701158400"; 
-   d="scan'208";a="25033125"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2024 02:02:15 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,231,1701158400"; 
-   d="scan'208";a="4036401"
-Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
-  by fmviesa003.fm.intel.com with ESMTP; 31 Jan 2024 02:02:09 -0800
-From: Zhao Liu <zhao1.liu@linux.intel.com>
-To: Eduardo Habkost <eduardo@habkost.net>,
+	s=arc-20240116; t=1706696935; c=relaxed/simple;
+	bh=FPG6Y+PURvFGSE1B76rChV13yZ6TzykAFpFKvVJd1W4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nxjFznlbAn96BvRtBHnkWI+eG27QUAs+78LPypVLpbP/yezhzbi486BIBq7Dn6irOh2apjGnDkP80EJAnNidmHe/15VCqFMmqrIK2NCHU/LK5Am3urYkeqNl/LipR+cIwDaVuxjIkqYJFd7SCl0yVuJ5fVDP/4SpdA27SLWljb4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NBdJIzfJ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706696932;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:in-reply-to:in-reply-to:  references:references;
+	bh=7QFSz4iLpWcX1LVK89RhT/r6+WUAlS1/Pj27Dogjyms=;
+	b=NBdJIzfJlP6KX/rzU1J3ZVV+4XxVG42VRpTFl5SBbRqq9njNdYlTqiNmLJFk+df3IqMifr
+	5Q/na0iDVfAOGT5CWiHLo53r1Nhjk18wt+iMnMnYMj/7XzyaWEHZIB/D4oMKrFM2Gf7waC
+	cYx65CeCeLmXRmQacDqdauQXuyPA0Xs=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-524-ncC9b_gUPgOcqtOek-qlUw-1; Wed, 31 Jan 2024 05:28:48 -0500
+X-MC-Unique: ncC9b_gUPgOcqtOek-qlUw-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 73D3C8B3963;
+	Wed, 31 Jan 2024 10:28:47 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.28.72])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id D7551492BC6;
+	Wed, 31 Jan 2024 10:28:44 +0000 (UTC)
+Date: Wed, 31 Jan 2024 10:28:42 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Zhao Liu <zhao1.liu@linux.intel.com>
+Cc: Eduardo Habkost <eduardo@habkost.net>,
 	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
 	Yanan Wang <wangyanan55@huawei.com>,
 	"Michael S . Tsirkin" <mst@redhat.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	Richard Henderson <richard.henderson@linaro.org>,
 	Eric Blake <eblake@redhat.com>,
 	Markus Armbruster <armbru@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>
-Cc: qemu-devel@nongnu.org,
-	kvm@vger.kernel.org,
-	Babu Moger <babu.moger@amd.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
+	kvm@vger.kernel.org, Babu Moger <babu.moger@amd.com>,
 	Xiaoyao Li <xiaoyao.li@intel.com>,
 	Zhenyu Wang <zhenyu.z.wang@intel.com>,
 	Zhuocheng Ding <zhuocheng.ding@intel.com>,
-	Yongwei Ma <yongwei.ma@intel.com>,
-	Zhao Liu <zhao1.liu@intel.com>
-Subject: [PATCH v8 21/21] i386/cpu: Use CPUCacheInfo.share_level to encode CPUID[0x8000001D].EAX[bits 25:14]
-Date: Wed, 31 Jan 2024 18:13:50 +0800
-Message-Id: <20240131101350.109512-22-zhao1.liu@linux.intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240131101350.109512-1-zhao1.liu@linux.intel.com>
+	Yongwei Ma <yongwei.ma@intel.com>, Zhao Liu <zhao1.liu@intel.com>
+Subject: Re: [PATCH v8 00/21] Introduce smp.modules for x86 in QEMU
+Message-ID: <Zbog2vDrrWFbujrs@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <20240131101350.109512-1-zhao1.liu@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -85,67 +82,75 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240131101350.109512-1-zhao1.liu@linux.intel.com>
+User-Agent: Mutt/2.2.12 (2023-09-09)
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 
-From: Zhao Liu <zhao1.liu@intel.com>
+On Wed, Jan 31, 2024 at 06:13:29PM +0800, Zhao Liu wrote:
+> From: Zhao Liu <zhao1.liu@intel.com>
+> 
+> Hi list,
+> 
+> This is the our v8 patch series, rebased on the master branch at the
+> commit 11be70677c70 ("Merge tag 'pull-vfio-20240129' of
+> https://github.com/legoater/qemu into staging").
+> 
+> Compared with v7 [1], v8 mainly has the following changes:
+>   * Introduced smp.modules for x86 instead of reusing current
+>     smp.clusters.
+>   * Reworte the CPUID[0x1F] encoding.
+> 
+> Given the code change, I dropped the most previously gotten tags
+> (Acked-by/Reviewed-by/Tested-by from Michael & Babu, thanks for your
+> previous reviews and tests!) in v8.
+> 
+> With the description of the new modules added to x86 arch code in v7 [1]
+> cover letter, the following sections are mainly the description of
+> the newly added smp.modules (since v8) as supplement.
+> 
+> Welcome your comments!
+> 
+> 
+> Why We Need a New CPU Topology Level
+> ====================================
+> 
+> For the discussion in v7 about whether we should reuse current
+> smp.clusters for x86 module, the core point is what's the essential
+> differences between x86 module and general cluster.
+> 
+> Since, cluster (for ARM/riscv) lacks a comprehensive and rigorous
+> hardware definition, and judging from the description of smp.clusters
+> [2] when it was introduced by QEMU, x86 module is very similar to
+> general smp.clusters: they are all a layer above existing core level
+> to organize the physical cores and share L2 cache.
+> 
+> However, after digging deeper into the description and use cases of
+> cluster in the device tree [3], I realized that the essential
+> difference between clusters and modules is that cluster is an extremely
+> abstract concept:
+>   * Cluster supports nesting though currently QEMU doesn't support
+>     nested cluster topology. However, modules will not support nesting.
+>   * Also due to nesting, there is great flexibility in sharing resources
+>     on clusters, rather than narrowing cluster down to sharing L2 (and
+>     L3 tags) as the lowest topology level that contains cores.
+>   * Flexible nesting of cluster allows it to correspond to any level
+>     between the x86 package and core.
+> 
+> Based on the above considerations, and in order to eliminate the naming
+> confusion caused by the mapping between general cluster and x86 module
+> in v7, we now formally introduce smp.modules as the new topology level.
 
-CPUID[0x8000001D].EAX[bits 25:14] NumSharingCache: number of logical
-processors sharing cache.
+What is the Linux kernel calling this topology level on x86 ?
+It will be pretty unfortunate if Linux and QEMU end up with
+different names for the same topology level.
 
-The number of logical processors sharing this cache is
-NumSharingCache + 1.
-
-After cache models have topology information, we can use
-CPUCacheInfo.share_level to decide which topology level to be encoded
-into CPUID[0x8000001D].EAX[bits 25:14].
-
-Cc: Babu Moger <babu.moger@amd.com>
-Tested-by: Yongwei Ma <yongwei.ma@intel.com>
-Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
----
-Changes since v7:
- * Renamed max_processor_ids_for_cache() to max_thread_ids_for_cache().
- * Dropped Michael/Babu's ACKed/Tested tags since the code change.
- * Re-added Yongwei's Tested tag For his re-testing.
-
-Changes since v3:
- * Explained what "CPUID[0x8000001D].EAX[bits 25:14]" means in the
-   commit message. (Babu)
-
-Changes since v1:
- * Used cache->share_level as the parameter in
-   max_processor_ids_for_cache().
----
- target/i386/cpu.c | 10 +---------
- 1 file changed, 1 insertion(+), 9 deletions(-)
-
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index fbfebdc2caf3..763de2b93c28 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -481,20 +481,12 @@ static void encode_cache_cpuid8000001d(CPUCacheInfo *cache,
-                                        uint32_t *eax, uint32_t *ebx,
-                                        uint32_t *ecx, uint32_t *edx)
- {
--    uint32_t num_sharing_cache;
-     assert(cache->size == cache->line_size * cache->associativity *
-                           cache->partitions * cache->sets);
- 
-     *eax = CACHE_TYPE(cache->type) | CACHE_LEVEL(cache->level) |
-                (cache->self_init ? CACHE_SELF_INIT_LEVEL : 0);
--
--    /* L3 is shared among multiple cores */
--    if (cache->level == 3) {
--        num_sharing_cache = 1 << apicid_die_offset(topo_info);
--    } else {
--        num_sharing_cache = 1 << apicid_core_offset(topo_info);
--    }
--    *eax |= (num_sharing_cache - 1) << 14;
-+    *eax |= max_thread_ids_for_cache(topo_info, cache->share_level) << 14;
- 
-     assert(cache->line_size > 0);
-     assert(cache->partitions > 0);
+With regards,
+Daniel
 -- 
-2.34.1
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
