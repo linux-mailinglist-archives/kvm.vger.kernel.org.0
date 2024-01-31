@@ -1,206 +1,140 @@
-Return-Path: <kvm+bounces-7523-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7524-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA6208432B2
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 02:26:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EAEF8432FA
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 02:49:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A25B287584
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 01:26:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C28D28540C
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 01:49:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1334815C9;
-	Wed, 31 Jan 2024 01:26:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4899F5672;
+	Wed, 31 Jan 2024 01:48:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VvY9CP2s"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DgAniXR1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ua1-f48.google.com (mail-ua1-f48.google.com [209.85.222.48])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6F2C1368
-	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 01:26:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4B6117554
+	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 01:48:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706664401; cv=none; b=m40xfuci+vUM/3wfm2mXMnaM3Kl+GlmzdFYXIkWODiJBw2hglZbZsoANrNrau+Wd4C1NXsbdd/nN+/41gVQsCagCqTKFxULfThNeiAyHEYjBj/Ly9fGrX1s3qXdUB7stDmoK1ObpHUnOS7BR0ief/6d0p1zGCYy+cmEvLSIrka4=
+	t=1706665688; cv=none; b=XWFfxdG+EW4RLgG4CTsng01KDGSDMqoOEF+NelrpcpRc4xhFrGqhMDG3or0kNh86rzGSJaybigOSyvcUbW46ooH0aC0pWUlq5lXWQGAKYMoCIVvL5+TmoE+zMlALLeC+EivnLAcvOzQ1Uglhm90+oqaV6fqPxsI/qvrM68bHelI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706664401; c=relaxed/simple;
-	bh=ZNhDLzIeR/fzPEPKReexeRhO7EbokrTcuamNJtnSDoc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gNgW9ylOV4wjI638iXsglvEj1it5G10xjvs9ww9aN+LUmfUkqzXSOpHV3zkRaf1/IMDnFBhFk5yfwm8crh0ITEylaRzaSCW4tgTNPd6YS5TtHTzQlXVuZoVzEIifOIbbDOc8q7YRMANUV5eK+l1ajRUvGVOYaU0lzs5nyt+i0xg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VvY9CP2s; arc=none smtp.client-ip=209.85.222.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f48.google.com with SMTP id a1e0cc1a2514c-7d5c7443956so1184235241.0
-        for <kvm@vger.kernel.org>; Tue, 30 Jan 2024 17:26:39 -0800 (PST)
+	s=arc-20240116; t=1706665688; c=relaxed/simple;
+	bh=z18/1NG1zLW5yoDGt3zYqzrbxZEW6XZZsTCTId9IDzI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=u2yP2gVpVhlC8M3P7Bmd1y6ge8rfHC0PIm9nBv+tuYo/SHgNc6bfVpUnt5//AxygD9QQaS+fmpQ7G5c3rR13pgr9zirvZiR98r/MBjw1yBiU5BEOm27+kSbEQlJAULDCPxEfq2Rknu29ZxiZAKk92srVxPXX+pqhzuLAGuPS1gQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DgAniXR1; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-295beab55daso968006a91.0
+        for <kvm@vger.kernel.org>; Tue, 30 Jan 2024 17:48:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706664398; x=1707269198; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=h93BkgVFUuRnPb2+mPK0buA3QG1DHMAEwTXxdNF0ziU=;
-        b=VvY9CP2sjjMqBTWJID0aQxcuCRg161JOuUQC/S5SQVgzL6iuzmm5yqJAYTcs45U14V
-         ajX/VqWkEQxEKVAKW8WE/dunnW2AybH8RQGnSOARGB29IzXp15pFY5wayuKZ+i9yZQem
-         AAIFy/jkIXyiqp4X9W82wk5pnQjFs8uBFbR2ieEdbI+SxUWid5a7CshogY80gijC1FX+
-         qdyyo+izxmykSLZ7tDwAxB0xs1M5sI6pXGG0xNf3Ggfb4xg3s+ko5S7jCyI0Zxgah24X
-         CdaFYmY27Pw/SOkaqTOwf1a3u2S7Zgkg/hUbVOzjcwtNq68a46TxO0F+7ewAfe3lPQ/+
-         3ACw==
+        d=google.com; s=20230601; t=1706665686; x=1707270486; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=JdG1KVU/njo7PApRXford/HnaGUTjmthKcJoPmpTjfU=;
+        b=DgAniXR1jVedgB6qKJXSofURIl06lw5e5OZRvVpd9LmENzgTWAp7O5wpdsl9hoEA2M
+         TgL/iYk6H1zUHf0z0HYpZqfzkQ7qTQXaIRdjhyLnbZkd8bqLI4fNpOj3h6gBgkV/pbpp
+         d2eeK8+DKK19JY6wHVIbXzk7pz8ycIqnCUklsrkhsSOvDfujImbNDG4xwSZzIKDj/+By
+         /bIfLlc7/NvH1Y667azXl37sthpMaj9SUhdNJ+9hAJaB8Ld8AGkJqYoT3TogPr6OCQ/G
+         glBy3bFmSzGzondiheCgKKl3zoD/O9qBeMcmcRliQYWZbsIIfpDGBe3B1CnJqj81kVC/
+         qPug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706664398; x=1707269198;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=h93BkgVFUuRnPb2+mPK0buA3QG1DHMAEwTXxdNF0ziU=;
-        b=aNTJxrvcyKIlbFO9QnWVR6a+TWysALC9Cw+2lM7dmNMKfzsLgvhBhQpWyJZk2zhMWN
-         FJouBrmGUDW/t6GZS7GrKX43W9gCs0wS9je+BQlG7eD7MO21GVrPIDJa/Bt3VB3pBttU
-         Rm5qYhXDQMJn8g7V0zQNI7zXyBWo5eiLOZ34E0KTMbhcbP9Y2BWjN+4Gn8WBuxJUKoKQ
-         T6gFmTxL1WrI87Ep+pR1nAYtKMB43GoEzjKhYLgJT8n6OTjeJR6iRugAhkeQ+iX1h8/u
-         JnIb6+DsKeS5eRXjrGHqGawOIUywux/HEJYIQexkUgvIJV4//d6QIAC4BYM6k7aJIn8p
-         JPlw==
-X-Gm-Message-State: AOJu0Yy6KwAzjcBXGvc1c7gnnITKoZqL9evjrqhhU4ytw1UU82kiZ4YE
-	55oj6wu/Klh94VNY9S4LtnvQrWNC2H2VZk1DoTbS+DOyhjUPjuorvxzY5il5qOXBUoOeHhvxmwr
-	AdbHob65gY0eoGH0JROYypXrnc+w=
-X-Google-Smtp-Source: AGHT+IEyWGLO3/jvjHtdjXsT7PNhenjAm0xbQRnRwO0JBpDoipIMfct79gY1WGUaNOu7+iZ+11d5WShu6OqllnLtNJ4=
-X-Received: by 2002:a67:f90a:0:b0:46b:3fe2:4ae6 with SMTP id
- t10-20020a67f90a000000b0046b3fe24ae6mr93787vsq.27.1706664398424; Tue, 30 Jan
- 2024 17:26:38 -0800 (PST)
+        d=1e100.net; s=20230601; t=1706665686; x=1707270486;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JdG1KVU/njo7PApRXford/HnaGUTjmthKcJoPmpTjfU=;
+        b=M20JBfw6p2hcn0sPURPKIkp9PEK28sRERrYJM1IjaoCEr++DxJGfcLmx5lItbsRrMU
+         yFlpNcDfhg0Lgif5mzbVuAaTQv7oJ+P5fjKljSTGD4VJFbBcRKkGQljkDp5eDvV8BbbO
+         EAj/XdbleNWPdLHVb+5mSQ8J9Tdj/E43M8x2sohlmdwLaBhHWn2w1K0NBQtT0+URjPHr
+         VZPnyuHkef61rlW1+ahCJF1S+rLOioJDzYIp812D0e32AWWvGHdB+DmpSKH94XSfcmDR
+         FZLWKuIcGTANA0VXSs8p4XdlUFxK1a393Z0wz+t+52FyiJSYl2rleABIux0zPkDs4LJQ
+         mJxA==
+X-Gm-Message-State: AOJu0YzvNTRVnhIkQFeJcbNFOr0VFbdDOie8cy/oeZKTEX9f/P8vvr4b
+	vaK26cXcMOtUg/2byIPQaNrf9hje4BuJqHpZk6vaGM8r0PxvawMa+oCG7IYg6J6qbkHHV4rTuRL
+	u3g==
+X-Google-Smtp-Source: AGHT+IHkPAPzDQDil9cIn2c+oGBBDcXjd/kr8cTjB0uidyn4CQbS7fkF9Zjbea81BRd2hGwSuMMpPlMakCU=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90a:e550:b0:290:fd51:d7be with SMTP id
+ ei16-20020a17090ae55000b00290fd51d7bemr1533pjb.5.1706665686046; Tue, 30 Jan
+ 2024 17:48:06 -0800 (PST)
+Date: Tue, 30 Jan 2024 17:48:04 -0800
+In-Reply-To: <20240126234237.547278-4-jacob.jun.pan@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <CAJSP0QU2M0e56M0S9ztMDO7eyqFB-p1KgwxJhzwkxt=CuS_PqA@mail.gmail.com>
- <mhng-e7014372-2334-430e-b22e-17227af21bd9@palmer-ri-x1c9a>
-In-Reply-To: <mhng-e7014372-2334-430e-b22e-17227af21bd9@palmer-ri-x1c9a>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 31 Jan 2024 11:26:11 +1000
-Message-ID: <CAKmqyKMAQ1vrf9QnCx17DbKgGTqgDd58y46RLwZvzW4Sk4zyjA@mail.gmail.com>
-Subject: Re: Call for GSoC/Outreachy internship project ideas
-To: Palmer Dabbelt <palmer@dabbelt.com>
-Cc: stefanha@gmail.com, Alistair Francis <Alistair.Francis@wdc.com>, dbarboza@ventanamicro.com, 
-	qemu-devel@nongnu.org, kvm@vger.kernel.org, afaria@redhat.com, 
-	alex.bennee@linaro.org, eperezma@redhat.com, gmaglione@redhat.com, 
-	marcandre.lureau@redhat.com, rjones@redhat.com, sgarzare@redhat.com, 
-	imp@bsdimp.com, philmd@linaro.org, pbonzini@redhat.com, thuth@redhat.com, 
-	danielhb413@gmail.com, gaosong@loongson.cn, akihiko.odaki@daynix.com, 
-	shentey@gmail.com, npiggin@gmail.com, seanjc@google.com, 
-	Marc Zyngier <maz@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20240126234237.547278-1-jacob.jun.pan@linux.intel.com> <20240126234237.547278-4-jacob.jun.pan@linux.intel.com>
+Message-ID: <Zbmm1DZPmbFm8gan@google.com>
+Subject: Re: [PATCH 03/15] x86/irq: Use bitfields exclusively in posted
+ interrupt descriptor
+From: Sean Christopherson <seanjc@google.com>
+To: Jacob Pan <jacob.jun.pan@linux.intel.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, X86 Kernel <x86@kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>, iommu@lists.linux.dev, 
+	Thomas Gleixner <tglx@linutronix.de>, Lu Baolu <baolu.lu@linux.intel.com>, kvm@vger.kernel.org, 
+	Dave Hansen <dave.hansen@intel.com>, Joerg Roedel <joro@8bytes.org>, 
+	"H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>, 
+	Paul Luse <paul.e.luse@intel.com>, Dan Williams <dan.j.williams@intel.com>, 
+	Jens Axboe <axboe@kernel.dk>, Raj Ashok <ashok.raj@intel.com>, Kevin Tian <kevin.tian@intel.com>, 
+	maz@kernel.org, Robin Murphy <robin.murphy@arm.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Jan 31, 2024 at 10:30=E2=80=AFAM Palmer Dabbelt <palmer@dabbelt.com=
-> wrote:
->
-> On Tue, 30 Jan 2024 12:28:27 PST (-0800), stefanha@gmail.com wrote:
-> > On Tue, 30 Jan 2024 at 14:40, Palmer Dabbelt <palmer@dabbelt.com> wrote=
-:
-> >>
-> >> On Mon, 15 Jan 2024 08:32:59 PST (-0800), stefanha@gmail.com wrote:
-> >> > Dear QEMU and KVM communities,
-> >> > QEMU will apply for the Google Summer of Code and Outreachy internsh=
-ip
-> >> > programs again this year. Regular contributors can submit project
-> >> > ideas that they'd like to mentor by replying to this email before
-> >> > January 30th.
-> >>
-> >> It's the 30th, sorry if this is late but I just saw it today.  +Alista=
-ir
-> >> and Daniel, as I didn't sync up with anyone about this so not sure if
-> >> someone else is looking already (we're not internally).
-> >>
-> >> > Internship programs
-> >> > ---------------------------
-> >> > GSoC (https://summerofcode.withgoogle.com/) and Outreachy
-> >> > (https://www.outreachy.org/) offer paid open source remote work
-> >> > internships to eligible people wishing to participate in open source
-> >> > development. QEMU has been part of these internship programs for man=
-y
-> >> > years. Our mentors have enjoyed helping talented interns make their
-> >> > first open source contributions and some former interns continue to
-> >> > participate today.
-> >> >
-> >> > Who can mentor
-> >> > ----------------------
-> >> > Regular contributors to QEMU and KVM can participate as mentors.
-> >> > Mentorship involves about 5 hours of time commitment per week to
-> >> > communicate with the intern, review their patches, etc. Time is also
-> >> > required during the intern selection phase to communicate with
-> >> > applicants. Being a mentor is an opportunity to help someone get
-> >> > started in open source development, will give you experience with
-> >> > managing a project in a low-stakes environment, and a chance to
-> >> > explore interesting technical ideas that you may not have time to
-> >> > develop yourself.
-> >> >
-> >> > How to propose your idea
-> >> > ----------------------------------
-> >> > Reply to this email with the following project idea template filled =
-in:
-> >> >
-> >> > =3D=3D=3D TITLE =3D=3D=3D
-> >> >
-> >> > '''Summary:''' Short description of the project
-> >> >
-> >> > Detailed description of the project that explains the general idea,
-> >> > including a list of high-level tasks that will be completed by the
-> >> > project, and provides enough background for someone unfamiliar with
-> >> > the codebase to do research. Typically 2 or 3 paragraphs.
-> >> >
-> >> > '''Links:'''
-> >> > * Wiki links to relevant material
-> >> > * External links to mailing lists or web sites
-> >> >
-> >> > '''Details:'''
-> >> > * Skill level: beginner or intermediate or advanced
-> >> > * Language: C/Python/Rust/etc
-> >>
-> >> I'm not 100% sure this is a sane GSoC idea, as it's a bit open ended a=
-nd
-> >> might have some tricky parts.  That said it's tripping some people up
-> >> and as far as I know nobody's started looking at it, so I figrued I'd
-> >> write something up.
-> >>
-> >> I can try and dig up some more links if folks thing it's interesting,
-> >> IIRC there's been a handful of bug reports related to very small loops
-> >> that run ~10x slower when vectorized.  Large benchmarks like SPEC have
-> >> also shown slowdowns.
-> >
-> > Hi Palmer,
-> > Performance optimization can be challenging for newcomers. I wouldn't
-> > recommend it for a GSoC project unless you have time to seed the
-> > project idea with specific optimizations to implement based on your
-> > experience and profiling. That way the intern has a solid starting
-> > point where they can have a few successes before venturing out to do
-> > their own performance analysis.
->
-> Ya, I agree.  That's part of the reason why I wasn't sure if it's a
-> good idea.  At least for this one I think there should be some easy to
-> understand performance issue, as the loops that go very slowly consist
-> of a small number of instructions and go a lot slower.
->
-> I'm actually more worried about this running into a rabbit hole of
-> adding new TCG operations or even just having no well defined mappings
-> between RVV and AVX, those might make the project really hard.
->
-> > Do you have the time to profile and add specifics to the project idea
-> > by Feb 21st? If that sounds good to you, I'll add it to the project
-> > ideas list and you can add more detailed tasks in the coming weeks.
->
-> I can at least dig up some of the examples I ran into, there's been a
-> handful filtering in over the last year or so.
->
-> This one
-> <https://gist.github.com/compnerd/daa7e68f7b4910cb6b27f856e6c2beba>
-> still has a much more than 10x slowdown (73ms -> 13s) with
-> vectorization, for example.
+On Fri, Jan 26, 2024, Jacob Pan wrote:
+> From: Thomas Gleixner <tglx@linutronix.de>
+> 
+> Mixture of bitfields and types is weird and really not intuitive, remove
+> types and use bitfields exclusively.
 
-It's probably worth creating a Gitlab issue for this and adding all of
-the examples there. That way we have a single place to store them all
+I agree it's weird, and maybe not immediately intuitive, but that doesn't mean
+there's no a good reason for the code being the way it is, i.e. "it's weird" isn't
+sufficient justification for touching this type of code.
 
-Alistair
+Bitfields almost always generate inferior code when accessing a subset of the
+overall thing.  And even worse, there are subtle side effects that I really don't
+want to find out whether or not they are benign.
 
->
-> > Thanks,
-> > Stefan
->
+E.g. before this change, setting the notification vector is:
+
+	movb   $0xf2,0x62(%rsp)
+
+whereas after this change it becomes:
+
+	mov    %eax,%edx
+   	and    $0xff00fffd,%edx
+	or     $0xf20000,%edx
+   	mov    %edx,0x60(%rsp)
+
+Writing extra bytes _shouln't_ be a problem, as KVM needs to atomically write
+the entire control chunk no matter what, but changing this without very good cause
+scares me.
+
+If we really want to clean things up, my very strong vote is to remove the
+bitfields entirely.  SN is the only bit that's accessed without going through an
+accessor, and those should be easy enough to fixup one by one (and we can add
+more non-atomic accessors/mutators if it makes sense to do so).
+
+E.g. end up with
+
+/* Posted-Interrupt Descriptor */
+struct pi_desc {
+	u32 pir[8];     /* Posted interrupt requested */
+	union {
+		struct {
+			u16	notification_bits;
+			u8	nv;
+			u8	rsvd_2;
+			u32	ndst;
+		};
+		u64 control;
+	};
+	u32 rsvd[6];
+} __aligned(64);
 
