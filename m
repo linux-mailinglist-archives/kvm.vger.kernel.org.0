@@ -1,219 +1,173 @@
-Return-Path: <kvm+bounces-7605-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7606-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A6EE844B28
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 23:39:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B3CC7844B33
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 23:46:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6C1EDB23788
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 22:39:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 23C2FB24A8F
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 22:45:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 928193A8C2;
-	Wed, 31 Jan 2024 22:38:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44D7D3A278;
+	Wed, 31 Jan 2024 22:45:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gPSghukF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KSr1X6kH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com [209.85.167.180])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EA353A1CB
-	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 22:38:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEAF93A1D3
+	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 22:45:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706740720; cv=none; b=bSCuMKh/wy8sZoBUtnvsLdzzmHTjmhiQ2vMl/Dksg7t14yqPmdk3ZxOM4M26vU8SyJoNxZDmPM+PIfooUav5d9nKiIg9Eshe+ScdYk7H5+nSNCSgQa9k2QUd/YpEa+o4tvXMedMdrp+4xqnnvZAA/8D9o3/VUaEIb+IIGPDznrk=
+	t=1706741151; cv=none; b=VeTY2UJyVjAXth7OuXpAqVhAJkaknogVg5p0zUEDbU+JdgzKra+xP2ZcuyN8+ZxslHT+AqvuPoynECZMLuRxCpzycMP27kLtM/WvglG6YvWIXdZADpa0B3v0tYZGe20HVoCSl5NEa+WBL3F9tqjW/BBN66RyvzyvGZvGVLF50WY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706740720; c=relaxed/simple;
-	bh=yoNh0T6PTwSXjbboNf8HUKKSK9ptTYeZLMonhIMFcjA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KaNYLCGPr44huThhsq0uz/Aen9kwbOyxc3Hqm2osM+3Ft8pT7HO2i1vw1CC0cI6ygkdXjNgo+GmEGHRdn1LzOtV6e/L9t/JJS0N83QEdf4dKCrNRN9c/cXS0Es11sMjOfDrdErA3mNuVBTiK5kitFLtWjC5asRXdTBl5pdvtKiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gPSghukF; arc=none smtp.client-ip=209.85.167.180
+	s=arc-20240116; t=1706741151; c=relaxed/simple;
+	bh=AmunZczr7Dfx6/pExPG2SuXfqHdgyF1ugeSr+E7O7go=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Rie5b4QN4QvvQyFk4ucFnjG+0PEUIfP+xl/hWIOKAe7OtUJRA2b5XZdHFd1OHa6/r0oAUeiYwuFlkoeWwLIN0QhQhC43z3UEu8bYd8i5B2spWIdnN+x95TB9pKSiGApYF0l7zgbKTgynibVqnptftRO8PC1/Aj+Ev9SyEqhS8EA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KSr1X6kH; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-oi1-f180.google.com with SMTP id 5614622812f47-3be90c51299so201574b6e.0
-        for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 14:38:38 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc6b9f4a513so414193276.3
+        for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 14:45:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706740718; x=1707345518; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sihp+DDuzPlSLNRO3613GGhwVYkcOubyS/IEd97PSkE=;
-        b=gPSghukFgbZ3cLeQACcDu7kkTIrca6QjwiHY4K0LVZApYXfep2mJiUoYajnTIEXXUv
-         42hQDzNq6Yaf4IDpS+64fvs0xaWP1uC3UDShK26W7mtX7SoTzQZswz9iIvTNuBX1iFDz
-         /kEn8upp2pQTUo617T7NVEySjLGvpNVSk82yEPkEubJiDqJ1H3hUIiW/TZYATlzuIX7K
-         EqionGjirHB3nrjUQJibhWLvGxI4A34gMiSbdAX+GdxJTGsykwlompHIgphV6frc1TPT
-         10x4aFbZzbZjMqM5L9bZ6CUQyaReC9OUnuUaAEuQeEm47BSXX+Bg7n6yOkh1iFAIxQk/
-         9uuA==
+        d=google.com; s=20230601; t=1706741149; x=1707345949; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LFZR+caDlnxynR006W8r06MBUXUFwhkI/G9N83P84WQ=;
+        b=KSr1X6kHrIQ/BP+R5ebibWU22EhUPy/ug/0p0W6MqElajxbHo4ZiHrf4lbyyjsEVCS
+         uunvycOKsQT0UgHurNj7+18jQSIGYNFvdZ43I22f6RkSQVh49hapm+BXRuZgvHtwCIJ1
+         MHNJ5aXXC+9TExrXY90ZrfutlDh2NX0pSLsHWVzlzP5dBJbHTASNfBlFQXDbahpKTtjl
+         5YsSH6pw6ognzRKgx+95eLf8kdT/By3FPdIpAOAv2UyOQAsz8+hvN83LIFvHiaKREac2
+         PG3rlZjovqUuO9sJA11kjpNRqCXRmwjKy9bbBHurWZFiY2GrQT9B2B3h/QgovSFlvmPL
+         PTOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706740718; x=1707345518;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sihp+DDuzPlSLNRO3613GGhwVYkcOubyS/IEd97PSkE=;
-        b=q0Vg7laX+KY4G0YN0SZZuXdjTa7S2aCBX2rD2LK1VpW+AyqdVn2eNQ8rvM53zqLMWR
-         3Q1OEpMi7xXm62OMRqn4kmZUXd8ScGflbtP8AiBJx+FpfAJRCKrvcd797TVYkuHVdEeC
-         BB+wz5S3akP5UFcs3GAYAj0f2kp/TPhtYEZjNhAplCLpvEzPK2DYLwOJa/pdyeg5UasV
-         r6pNFq+MMWlDN+KTI1C4Ju02n7NrED0jowxmK1j7nJIiteGnWZPFH4cADknhyyRORN/B
-         oeaqge026Wn6mc0LTMuFR0LV35MUy2IEx49cXL+Od5Ex+6iUutP87xNZY6O4RiqybVF3
-         bDBQ==
-X-Gm-Message-State: AOJu0YyigUIEkTuMdywSx9oD3d67V2woS/1whS/zrFdFcSaBITWyG+q+
-	pmbyMAnR9amEbgkH/5dk+eMLr1KQTsEzTXybqYmPlI9B4j5F9onfldmaM9/j61KEcR1tVyXzoLy
-	930/9U+iyJtpUkss8G0Tq4HXQZYh3fe0kR9yh
-X-Google-Smtp-Source: AGHT+IG8GrrgZLcy7HqR+2o1QAFDucoWMa3/eNN8i/KauxGYEngI/wPyqxBwo50CC35GztzssCnleBwgGP7jPiLTB3I=
-X-Received: by 2002:a05:6870:3a09:b0:218:e36a:bc4f with SMTP id
- du9-20020a0568703a0900b00218e36abc4fmr362783oab.11.1706740718064; Wed, 31 Jan
- 2024 14:38:38 -0800 (PST)
+        d=1e100.net; s=20230601; t=1706741149; x=1707345949;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LFZR+caDlnxynR006W8r06MBUXUFwhkI/G9N83P84WQ=;
+        b=nD63cqFR4I0lFpuER7KC+HxpPb9tlahW575rfd36Cv44q+Bik3TeFqpuG5xyXRgilm
+         5miEGrCcnXZmOvbi+5ZuX9LwRGqld+UgpysSE9mOepL51qw+Q80SMdiPtThKYEtPt8Uf
+         0IKhCvWG0eiigBYU65hZofYIVzreUdHAWRcpW+ImNJrq5xTU3kUASUFVMwdyqnPYR5cH
+         6jMYijwVMsR6paaDP7Iu8WF5bEIaWmmwtYqgSEmtGpKRNpTSGQZpQ8GK7Dxn72On+e9I
+         8Kx/cAc1uwPFdsavRDIDpgEn6UJkFEneD62U86sQ8ltEOYQEPVBROmv6cfvrmNKc2625
+         fFNg==
+X-Gm-Message-State: AOJu0YxwczS/TDGSXZNwrfBle23BVryehN+9OBJ+MLyOY+QvDbfzQmP9
+	k6EPmkeCnD2cDY+WoUMnt7EpGAXxpqkwM1UxQw8JdshoPuhtiW5Qu1X+NLP4Lv9I3bGxImwYZ/2
+	Q9A==
+X-Google-Smtp-Source: AGHT+IHbj+iyys3ihZ/6xbW07HHtto50GCqd6T2uQS3vYWtVgZ/I/uUSlscC69aVq4ekwAFGEgKUUC6N6OE=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:11c3:b0:dc2:398d:a671 with SMTP id
+ n3-20020a05690211c300b00dc2398da671mr827981ybu.10.1706741148737; Wed, 31 Jan
+ 2024 14:45:48 -0800 (PST)
+Date: Wed, 31 Jan 2024 14:45:46 -0800
+In-Reply-To: <20231102155111.28821-2-guang.zeng@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20231109210325.3806151-1-amoorthy@google.com> <20231109210325.3806151-10-amoorthy@google.com>
- <CADrL8HXLF+EQZt+oXJAiatoJNzz2E-fiwUSJj=YpHzGQxL00mQ@mail.gmail.com>
-In-Reply-To: <CADrL8HXLF+EQZt+oXJAiatoJNzz2E-fiwUSJj=YpHzGQxL00mQ@mail.gmail.com>
-From: Anish Moorthy <amoorthy@google.com>
-Date: Wed, 31 Jan 2024 14:38:01 -0800
-Message-ID: <CAF7b7mrALBBWCg+ctU867BjQhtLQNuX=Yo8u9TZEuDTEtCV6qw@mail.gmail.com>
-Subject: Re: [PATCH v6 09/14] KVM: arm64: Enable KVM_CAP_EXIT_ON_MISSING and
- annotate an EFAULT from stage-2 fault-handler
-To: James Houghton <jthoughton@google.com>
-Cc: seanjc@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	oliver.upton@linux.dev, pbonzini@redhat.com, maz@kernel.org, 
-	robert.hoo.linux@gmail.com, dmatlack@google.com, axelrasmussen@google.com, 
-	peterx@redhat.com, nadav.amit@gmail.com, isaku.yamahata@gmail.com, 
-	kconsul@linux.vnet.ibm.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20231102155111.28821-1-guang.zeng@intel.com> <20231102155111.28821-2-guang.zeng@intel.com>
+Message-ID: <ZbrNmoSiufn4RM9K@google.com>
+Subject: Re: [RFC PATCH v1 1/8] KVM: selftests: x86: Fix bug in addr_arch_gva2gpa()
+From: Sean Christopherson <seanjc@google.com>
+To: Zeng Guang <guang.zeng@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
+	David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Jan 30, 2024 at 3:58=E2=80=AFPM James Houghton <jthoughton@google.c=
-om> wrote:
->
-> Hi Anish,
->
-> Sorry to get back to you so late. :) I was hoping others would provide
-> more feedback, but I have a little bit to give anyway. Overall the
-> series looks good to me.
+On Thu, Nov 02, 2023, Zeng Guang wrote:
+> Fix the approach to get page map from gva to gpa.
+> 
+> If gva maps a 4-KByte page, current implementation of addr_arch_gva2gpa()
+> will obtain wrong page size and cannot derive correct offset from the guest
+> virtual address.
+> 
+> Meanwhile using HUGEPAGE_MASK(x) to calculate the offset within page
+> (1G/2M/4K) mistakenly incorporates the upper part of 64-bit canonical
+> linear address. That will work out improper guest physical address if
+> translating guest virtual address in supervisor-mode address space.
 
-Thanks James. I'm just happy to have some review :D
+The "Meanwhile ..." is a huge clue that this should be two separate patches.
 
-> On Thu, Nov 9, 2023 at 1:03=E2=80=AFPM Anish Moorthy <amoorthy@google.com=
-> wrote:
-> >
-> > Prevent the stage-2 fault handler from faulting in pages when
-> > KVM_MEM_EXIT_ON_MISSING is set by allowing its  __gfn_to_pfn_memslot()
-> > calls to check the memslot flag.
-> >
-> > To actually make that behavior useful, prepare a KVM_EXIT_MEMORY_FAULT
-> > when the stage-2 handler cannot resolve the pfn for a fault. With
-> > KVM_MEM_EXIT_ON_MISSING enabled this effects the delivery of stage-2
-> > faults as vCPU exits, which userspace can attempt to resolve without
-> > terminating the guest.
-> >
-> > Delivering stage-2 faults to userspace in this way sidesteps the
-> > significant scalabiliy issues associated with using userfaultfd for the
-> > same purpose.
-> >
-> > Signed-off-by: Anish Moorthy <amoorthy@google.com>
-> > ---
-> >  Documentation/virt/kvm/api.rst | 2 +-
-> >  arch/arm64/kvm/Kconfig         | 1 +
-> >  arch/arm64/kvm/mmu.c           | 7 +++++--
-> >  3 files changed, 7 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/ap=
-i.rst
-> > index fd87bbfbfdf2..67fcb9dbe855 100644
-> > --- a/Documentation/virt/kvm/api.rst
-> > +++ b/Documentation/virt/kvm/api.rst
-> > @@ -8068,7 +8068,7 @@ See KVM_EXIT_MEMORY_FAULT for more information.
-> >  7.35 KVM_CAP_EXIT_ON_MISSING
-> >  ----------------------------
-> >
-> > -:Architectures: x86
-> > +:Architectures: x86, arm64
-> >  :Returns: Informational only, -EINVAL on direct KVM_ENABLE_CAP.
-> >
-> >  The presence of this capability indicates that userspace may set the
-> > diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> > index 1a777715199f..d6fae31f7e1a 100644
-> > --- a/arch/arm64/kvm/Kconfig
-> > +++ b/arch/arm64/kvm/Kconfig
-> > @@ -43,6 +43,7 @@ menuconfig KVM
-> >         select GUEST_PERF_EVENTS if PERF_EVENTS
-> >         select INTERVAL_TREE
-> >         select XARRAY_MULTI
-> > +        select HAVE_KVM_EXIT_ON_MISSING
-> >         help
-> >           Support hosting virtualized guest machines.
-> >
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index 13066a6fdfff..3b9fb80672ac 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -1486,13 +1486,16 @@ static int user_mem_abort(struct kvm_vcpu *vcpu=
-, phys_addr_t fault_ipa,
-> >         mmap_read_unlock(current->mm);
-> >
-> >         pfn =3D __gfn_to_pfn_memslot(memslot, gfn, false, false, NULL,
-> > -                                  write_fault, &writable, false, NULL)=
-;
-> > +                                  write_fault, &writable, true, NULL);
-> >         if (pfn =3D=3D KVM_PFN_ERR_HWPOISON) {
-> >                 kvm_send_hwpoison_signal(hva, vma_shift);
-> >                 return 0;
-> >         }
-> > -       if (is_error_noslot_pfn(pfn))
-> > +       if (is_error_noslot_pfn(pfn)) {
-> > +               kvm_prepare_memory_fault_exit(vcpu, gfn * PAGE_SIZE, PA=
-GE_SIZE,
-> > +                                             write_fault, exec_fault, =
-false);
->
-> I think that either (1) we move this kvm_prepare_memory_fault_exit
-> logic into the previous patch[1], or (2) we merge this patch with the
-> previous one. IIUC, we can only advertise KVM_CAP_MEMORY_FAULT_INFO on
-> arm64 if this logic is present.
+> Signed-off-by: Zeng Guang <guang.zeng@intel.com>
+> ---
+>  tools/testing/selftests/kvm/lib/x86_64/processor.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> index d8288374078e..9f4b8c47edce 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> @@ -293,6 +293,7 @@ uint64_t *__vm_get_page_table_entry(struct kvm_vm *vm, uint64_t vaddr,
+>  	if (vm_is_target_pte(pde, level, PG_LEVEL_2M))
+>  		return pde;
+>  
+> +	*level = PG_LEVEL_4K;
+>  	return virt_get_pte(vm, pde, vaddr, PG_LEVEL_4K);
+>  }
+>  
+> @@ -496,7 +497,7 @@ vm_paddr_t addr_arch_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
+>  	 * No need for a hugepage mask on the PTE, x86-64 requires the "unused"
+>  	 * address bits to be zero.
+>  	 */
+> -	return PTE_GET_PA(*pte) | (gva & ~HUGEPAGE_MASK(level));
+> +	return PTE_GET_PA(*pte) | (gva & (HUGEPAGE_SIZE(level) - 1));
 
-Actually (sorry, about-face from our off-list chat), *does* it make
-sense to merge these two patches? arm64 could benefit from annotated
-EFAULTs even without KVM_CAP_EXIT_ON_MISSING: for instance if there
-were spots outside the stage-2 handler if EFAULTs were annotated [a].
-And if this patch was for some reason reverted in the future, then we
-probably wouldn't want that to entail silencing any other
-KVM_EXIT_MEMORY_FAULTs that arm64 might also get.
+I think I would prefer to "fix" HUGEPAGE_MASK() and drop its incorporation of
+PHYSICAL_PAGE_MASK.  Regardless of anyone's personal views on whether or not
+PAGE_MASK and HUGEPAGE_MASK should only cover physical address bits, (a) the
+_one_ usage of HUGEPAGE_MASK is broken and (b) diverging from the kernel for
+something like is a terrible idea, and the kernel does:
 
-Sean did also ask me to merge some patches back on v5 [b], but I think
-the point there was to enable KVM_CAP_EXIT_ON_MISSING at the same time
-as adding the stage-2 annotation, which I'm doing here.
+	#define PAGE_MASK		(~(PAGE_SIZE-1))
+	#define HPAGE_MASK		(~(HPAGE_SIZE - 1))
+	#define KVM_HPAGE_MASK(x)	(~(KVM_HPAGE_SIZE(x) - 1))
 
-[a] Theoretically, anyways. Atm only x86 code uses
-kvm_prepare_memory_fault_exit()
-[b] https://lore.kernel.org/kvm/ZR4WzE1JOvq_0dhE@google.com/
+Luckily, there are barely any users in x86, so I think the entirety of the
+conversion is this?
 
-> As for the changelog in the previous patch[1], if you leave it
-> unmerged with this one, something like "Enable
-> KVM_CAP_MEMORY_FAULT_INFO to make KVM_CAP_EXIT_ON_MISSING useful, as
-> without it, userspace doesn't know which page(s) of memory it needs to
-> fix" works for me.
+diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+index 0f4792083d01..ef895038c87f 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/processor.h
++++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+@@ -352,11 +352,12 @@ static inline unsigned int x86_model(unsigned int eax)
+ 
+ #define PAGE_SHIFT             12
+ #define PAGE_SIZE              (1ULL << PAGE_SHIFT)
+-#define PAGE_MASK              (~(PAGE_SIZE-1) & PHYSICAL_PAGE_MASK)
++#define PAGE_MASK              (~(PAGE_SIZE-1))
++kvm_static_assert((PHYSICAL_PAGE_MASK & PAGE_MASK) == PHYSICAL_PAGE_MASK);
+ 
+ #define HUGEPAGE_SHIFT(x)      (PAGE_SHIFT + (((x) - 1) * 9))
+ #define HUGEPAGE_SIZE(x)       (1UL << HUGEPAGE_SHIFT(x))
+-#define HUGEPAGE_MASK(x)       (~(HUGEPAGE_SIZE(x) - 1) & PHYSICAL_PAGE_MASK)
++#define HUGEPAGE_MASK(x)       (~(HUGEPAGE_SIZE(x) - 1))
+ 
+ #define PTE_GET_PA(pte)                ((pte) & PHYSICAL_PAGE_MASK)
+ #define PTE_GET_PFN(pte)        (PTE_GET_PA(pte) >> PAGE_SHIFT)
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_tlb_flush.c b/tools/testing/selftests/kvm/x86_64/hyperv_tlb_flush.c
+index 05b56095cf76..cc5730322072 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_tlb_flush.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_tlb_flush.c
+@@ -623,7 +623,7 @@ int main(int argc, char *argv[])
+        for (i = 0; i < NTEST_PAGES; i++) {
+                pte = vm_get_page_table_entry(vm, data->test_pages + i * PAGE_SIZE);
+                gpa = addr_hva2gpa(vm, pte);
+-               __virt_pg_map(vm, gva + PAGE_SIZE * i, gpa & PAGE_MASK, PG_LEVEL_4K);
++               __virt_pg_map(vm, gva + PAGE_SIZE * i, gpa & PHYSICAL_PAGE_MASK, PG_LEVEL_4K);
+                data->test_pages_pte[i] = gva + (gpa & ~PAGE_MASK);
+        }
+ 
 
-For that previous patch, I updated the description to the following
-
-> Advertise to arm64 userspaces that KVM_RUN may return annotated EFAULTs
-> (see KVM_EXIT_MEMORY_FAULT). In fact KVM_RUN might already be annotating
-> some EFAULTs, but this capability is necessary for userspace to know
-> that.
-
-Which I think makes more sense than sort of forward-declaring
-KVM_CAP_EXIT_ON_MISSING on arm64.
-
-On Tue, Jan 30, 2024 at 3:58=E2=80=AFPM James Houghton <jthoughton@google.c=
-om> wrote:
->
-> Also, I think we need to update the documentation for
-> KVM_CAP_MEMORY_FAULT_INFO to say that it is available for arm64 now
-> (just like you have done for KVM_CAP_EXIT_ON_MISSING).
-
-Done, ty
 
