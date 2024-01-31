@@ -1,121 +1,157 @@
-Return-Path: <kvm+bounces-7598-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7599-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40A2584474F
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 19:38:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69D2B844833
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 20:43:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F10D5290BEB
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 18:38:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 028801F26850
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 19:43:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06D3F210E2;
-	Wed, 31 Jan 2024 18:38:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B831D3EA90;
+	Wed, 31 Jan 2024 19:43:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3GSMaXoh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wnstmyq6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f73.google.com (mail-io1-f73.google.com [209.85.166.73])
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE64117C75
-	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 18:38:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 826863E499
+	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 19:43:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706726294; cv=none; b=IjwrE2gqCUXseWnOZKcCtQaRG+JuuFJPUCspSTM9N8sywU+IS9YM0JFavL9UJA/WWEjqoWJTsw51UhDMP8LhATwQ4R4nb3NzHW3AO3DR2exzAtDboqJ9s52On7tkq+5vpLwJq8QnVsGlxBfJBmosCUbkm7vMDY/I7vFfGsjNHYg=
+	t=1706730186; cv=none; b=Wl8SlajTNOsQgsKugbr3iwPDD0CIWh6JeLj5UhAasszf7VdEvzYphHwva8Hf5wW8qfF11ajVeU0s7bm7DOjULmnahHGYY7TeHox3IeZHXG+xJiwGHO/XOWMPn0xiAhRJl2UJZ51CbgHZopRCmbQyVuCum2vxvfOVn9uF3wwTjvQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706726294; c=relaxed/simple;
-	bh=UfjYc4q1VOylXIyltW4pByW+ntMGUUi2w22Mn2XGXdw=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=XrAQBAM/e+cOQVDgIl1agn0ZZ6YhwgWJbv9WxAm+RU6PT5XKVOfaEIPOAKw/v2RxuwX9rjcUnZ8C9G5/+I3w8Ulxq0jTXo5JcNsvck8jOlmPpfBC2mcss3rpGa/RfAeyMFL/9lS5rT7hpWMpL32H0TK+8rVABurfP6TlZ7EfW+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3GSMaXoh; arc=none smtp.client-ip=209.85.166.73
+	s=arc-20240116; t=1706730186; c=relaxed/simple;
+	bh=i4zKc6NhXiMSl9AuIN6/Dd9lQJhIilwgHlR+1G0X1UE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KUVXvml+X3AiC94qtwfdV4N0Mc/1o2TY7pZ4T2Q5P+VGBPiKdUC8RRKgETrF3FPVuQ87l2MNjLDqrj+1+m+sOABAhnzVGvt4fbNERhAbzViicsC6ORDFpa+TgksRqhmG72yvAIOrUbvjQVodcTp6g5M1YUZ7mHK9oFkyKsq/7wg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wnstmyq6; arc=none smtp.client-ip=209.85.215.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
-Received: by mail-io1-f73.google.com with SMTP id ca18e2360f4ac-7c000114536so5534439f.2
-        for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 10:38:12 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-5ce9555d42eso162952a12.2
+        for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 11:43:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706726292; x=1707331092; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=B+7qh5lgqKvRJ5XTxEYs6sYIXkTaK5rzWchXA2WiWMs=;
-        b=3GSMaXohKe/sOzam4ctApjW8NDYxjXk4Hu/WRuY3k693uQdeeehFaRbc26X4eMbvsC
-         L/lAkqgbe2dweTQ02A78sLyEQ1Mhz+BpBbDctwiWw8Emy4iYbdNnf0yvN/IEHVbIxKm2
-         1WBl2+QkvepiqxpIGigbzawtV+05aIXbRWApWfn6V+c8KWegO/WrA0xTVqMFaDuss+TT
-         SdEo+9VQJS/V1Mem5j9DDH2tAO9IYZK+4x1BFgA8nBCTOUboG5hTh0rFsx5X1k2CANIm
-         SCx6x/hBI3o7TjTH1DEvG+KRuhWbcr0SuOFwsmvkestp0pCmxCMqC3dcf4NOLDsDvqGu
-         kI6g==
+        d=google.com; s=20230601; t=1706730185; x=1707334985; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=cr3/DP7XTiupTVnBc4u5yU3Y9Y+FH/h9EKQ8I83CyCY=;
+        b=wnstmyq6/yomqAUwPSvsMekgX0N7AtuzgzhJINNIYohbb3+/7XO+LHSeDSbrXcKVu3
+         JdkyNbuqECFaqv+Z7SHiEdp20OwFy472hJUV3be43veAreiPW3kbvHgCkLFNyDnLAw10
+         LqhaSkxiAgsQPdBkI/ce41sYsAYsaobupY6NJBLlMrpLABPhvthD1dQTlAurVcrduZAR
+         4NnqRlY28q4R493yWYkAFqN/Fwm1kGtfwtOhhsxcNtILVALp5bLt+Mvf2cYHZejCrp+2
+         OTE1PXiriZVxmAgs7Alh3u5kodkIRuZsFh1dMC7Ge0CgOm/FdCSG1aBtXDSzDYKWpprP
+         JO1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706726292; x=1707331092;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=B+7qh5lgqKvRJ5XTxEYs6sYIXkTaK5rzWchXA2WiWMs=;
-        b=UVDnyiToxZAkpbHNwbh19poluIFfhkGgYxdlBTHm85L9JTCi4NCD0yVH2YCe6SG4UT
-         HdQL2fSmqVQOUSn59OVUclc3RaLEVJamdGnlLZns2UasH40q1Xil3XSVZV7UhVg5wbZw
-         ZlDkSOeATbLb3ay24a9O7cLnQYevlBvxwUbIkeqCHQxpoBHBx8Ag3LJFrFH7JXAf4+dW
-         GJqSi1YJJLrv25EPAoIVicYX/xmqZSJawQV1tTp2WnttRrpIFiWxWvRwkdr52dYh24Y1
-         mFQW7ZWRNri8rvd29oxz/timl9qXi27sx8gxQT12JKw2WuhV81lpsAicAi7FKp7/OAKP
-         TxLQ==
-X-Gm-Message-State: AOJu0Yw23UVoanu656+quHhUuQJY1EkW5YcUVuZU1rwbWDxVFQVJq/7u
-	MVqXx/CHP24aWKUgQfyBbG92Dr3epvvjB4rhni31yehWVcAEZXAgZTW5Dt4N9QzEx37EGfC87Vp
-	kuEK1zs3Q/izeb88KHooCRA==
-X-Google-Smtp-Source: AGHT+IEWULPllFBaQ8dQeEAuZdnKaMWtTDPxrWTLe4io4YQ7kFWLbe1eQTSY5SCp/s+Zau2KSwPR0XFYd0AUCsyFhw==
-X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a5d:9c07:0:b0:7bf:ff87:209f with SMTP
- id 7-20020a5d9c07000000b007bfff87209fmr25977ioe.2.1706726292022; Wed, 31 Jan
- 2024 10:38:12 -0800 (PST)
-Date: Wed, 31 Jan 2024 18:38:10 +0000
-In-Reply-To: <Zbgx8hZgWCmtzMjH@linux.dev> (message from Oliver Upton on Mon,
- 29 Jan 2024 23:17:06 +0000)
+        d=1e100.net; s=20230601; t=1706730185; x=1707334985;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cr3/DP7XTiupTVnBc4u5yU3Y9Y+FH/h9EKQ8I83CyCY=;
+        b=rNffdgvMGflYGUPVNFa6uFgCg9owg+tqyAqGi1WWGJ1z9VQts8IdrXXpyIprhjUcpR
+         fqu68tkMBez9XSn9edOARuTJhQhgPlFPutcBjPLbB7oZlcStSg0lm7LrMVhXxrbaTsIm
+         UAYJ9uKfxytzC5/OIpnfERhYPQYLtPhGpGHZng/ZH0J1SDchWPtnphU36LO6dNbVsAw1
+         GK56rLpvkzx/y0Pn1ds2OYuw77yT1LFHIHtAEXBtvO+xBiyucz4Q1TH2XuhFimLqRD43
+         JhvvgLHFoUerfBCyrsTGioKHsotxN3iBQstOj9/RMn5O3ko1Hob+Fip852vCKpWGfZOD
+         02oA==
+X-Gm-Message-State: AOJu0YzAr2snbQZgQi1Y9CB2mpSfLb2JH9DKOnHSFF7S8AgpAMFI+OTt
+	dOHxf2MFkAHvTzf2DnBxtodC2IviGxKJEC/Wbbtbo6qF3oyJke0hsL3TOIByKw==
+X-Google-Smtp-Source: AGHT+IErewNCzDxtDqxxve/kaGns/6aAXmrX8n0YftYoz4uvZgGJp1nrQ+douz8Gg1swOGne1Q1TpA==
+X-Received: by 2002:a05:6a20:ba7:b0:19c:a980:58d6 with SMTP id i39-20020a056a200ba700b0019ca98058d6mr2532369pzh.2.1706730184553;
+        Wed, 31 Jan 2024 11:43:04 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCW+Pmwekr6pGKH43l8LTrTPx/TDT45wLMdyer8MiHn77z1PbTGEAX/+GPDXwv4AgP1vTdvy17rkOYYaZn6Ea7m559tkEgbSRrADfrrclpVj+PoiJclfnEWeatlWnBp6Lfigo/4OEXNez77qvOL+x4NhYyJqheGkBKZGLHJAyyXokB3u6mOHtpe/oq8yIjgf+VHosCqSZ8Jo05W7AA==
+Received: from google.com (60.89.247.35.bc.googleusercontent.com. [35.247.89.60])
+        by smtp.gmail.com with ESMTPSA id nc8-20020a17090b37c800b0028c8a2a9c73sm1926517pjb.25.2024.01.31.11.43.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 31 Jan 2024 11:43:04 -0800 (PST)
+Date: Wed, 31 Jan 2024 19:43:00 +0000
+From: Mingwei Zhang <mizhang@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>,
+	Aaron Lewis <aaronlewis@google.com>,
+	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] KVM: x86/pmu: Reset perf_capabilities in vcpu to 0
+ if PDCM is disabled
+Message-ID: <ZbqixOTlp61Lp-JV@google.com>
+References: <20240124003858.3954822-1-mizhang@google.com>
+ <20240124003858.3954822-2-mizhang@google.com>
+ <ZbExcMMl-IAzJrfx@google.com>
+ <CAAAPnDFAvJBuETUsBScX6WqSbf_j=5h_CpWwrPHwXdBxDg_LFQ@mail.gmail.com>
+ <ZbGAXpFUso9JzIjo@google.com>
+ <ZbGOK9m6UKkQ38bK@google.com>
+ <ZbGUfmn-ZAe4lkiN@google.com>
+ <b0b5ba26-505e-4247-b30d-9ba2bb0301c1@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Message-ID: <gsntcythl565.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH] KVM: arm64: Add capability for unconditional WFx passthrough
-From: Colton Lewis <coltonlewis@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvm@vger.kernel.org, maz@kernel.org, james.morse@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
-	will@kernel.org, pbonzini@redhat.com, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b0b5ba26-505e-4247-b30d-9ba2bb0301c1@redhat.com>
 
-Oliver Upton <oliver.upton@linux.dev> writes:
+On Mon, Jan 29, 2024, Paolo Bonzini wrote:
+> On 1/24/24 23:51, Sean Christopherson wrote:
+> > > If we follow the suggestion by removing the initial value at vCPU
+> > > creation time, then I think it breaks the existing VMM code, since that
+> > > requires VMM to explicitly set the MSR, which I am not sure we do today.
+> > Yeah, I'm hoping we can squeak by without breaking existing setups.
+> > 
+> > I'm 99% certain QEMU is ok, as QEMU has explicitly set MSR_IA32_PERF_CAPABILITIES
+> > since support for PDCM/PERF_CAPABILITIES was added by commit ea39f9b643
+> > ("target/i386: define a new MSR based feature word - FEAT_PERF_CAPABILITIES").
+> > 
+> > Frankly, if our VMM doesn't do the same, then it's wildly busted.  Relying on
+> > KVM to define the vCPU is irresponsible, to put it nicely.
+> 
+> Yes, I tend to agree.
 
-> Hi Colton,
+Discussed with Sean offline. Yes, I also agree that this should be
+handled at VMM level. MSR_IA32_PERF_CAPABILITIES should be regarded as
+part of the CPUID, or sort of. The diff is that its own
+"KVM_GET_SUPPORTED_CPUID" (ie., the default value) should come from
+KVM_GET_MSRS of the device ioctl.
 
-> On Mon, Jan 29, 2024 at 09:39:17PM +0000, Colton Lewis wrote:
->> Add KVM_CAP_ARM_WFX_PASSTHROUGH capability to always allow WFE/WFI
->> instructions to run without trapping. Current behavior is to only
->> allow this if the vcpu is the only task running. This commit keeps the
->> old behavior when the capability is not set.
+Providing the default value for MSR_IA32_PERF_CAPABILITIES is really
+making things messed. KVM has to always guard access to the cached guest
+value with the checking of X86_FEATURE_PDCM. I believe
+guest_cpuid_has(vcpu, X86_FEATURE_PDCM) will take runtime cost.
 
->> This allows userspace to set deterministic behavior and increase
->> efficiency for platforms with direct interrupt injection support.
-
-> Marc and I actually had an offlist conversation (shame on us!) about
-> this very topic since there are users asking for the _opposite_ of this
-> patch (unconditionally trap) [*].
-
-> I had originally wanted something like this, but Marc made the very good
-> point that (1) the behavior of WFx traps is in no way user-visible and
-> (2) it is entirely an IMP DEF behavior. The architecture only requires
-> the traps be effective if the instruction does not complete in finite
-> time.
-
-> We need to think of an interface that doesn't depend on
-> implementation-specific behavior, such as a control based on runqueue
-> depth.
-
-Good to know. I'll be thinking about that.
-
-
-> [*]  
-> https://lore.kernel.org/kvmarm/a481ef04-ddd2-dfc1-41b1-d2ec45c6a3b5@huawei.com/
-
-> --
-> Thanks,
-> Oliver
+> 
+> What QEMU does goes from the squeaky clean to the very debatable depending
+> on the parameters you give it.
+> 
+> With "-cpu Haswell" and similar, it will provide values for all CPUID and
+> MSR bits that match as much as possible values from an actual CPU model.  It
+> will complain if there are some values that do not match[1].
+> 
+> With "-cpu host", it will copy values from KVM_GET_SUPPORTED_CPUID and from
+> the feature MSRs, but only for features that it knows about.
+> 
+> With "-cpu host,migratable=no", it will copy values from
+> KVM_GET_SUPPORTED_CPUID and from the feature MSRs, but only for *feature
+> words* (CPUID registers, or MSRs) that it knows about.  This is where it
+> becomes debatable, because a CPUID bit could be added without QEMU knowing
+> the corresponding MSR.  In this case, the user probably expects the MSR to
+> have a nonzero.  On one hand I agree that it would be irresponsible, on the
+> other hand that's the point of "-cpu host,migratable=no".
+> 
+> If you want to proceed with the change, I don't have any problem with
+> considering it a QEMU bug that it doesn't copy over to the guest any unknown
+> leaves or MSRs.
+> 
+reply from another thread: CrosVM issue is not related to this one. It
+might have something to do with KVM_GET_MSR_INDEX_LIST. I will come up
+details later.
+> Paolo
+> 
+> [1] Unfortunately it's not fatal because there are way way too many models,
+> and also because until recently TCG lacked AVX---and therefore could only
+> emulate completely some very old CPU models.  But with "-cpu
+> Haswell,enforce" then everything's clean.
+> 
 
