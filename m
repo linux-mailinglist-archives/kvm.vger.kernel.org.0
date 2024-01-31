@@ -1,136 +1,120 @@
-Return-Path: <kvm+bounces-7602-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7603-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DCBA844AA4
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 23:00:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC8B9844ACD
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 23:15:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BF309B29E1C
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 22:00:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 24F22B21D6A
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 22:15:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A19BE39AFB;
-	Wed, 31 Jan 2024 22:00:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 482E839FE5;
+	Wed, 31 Jan 2024 22:15:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TkeS8GgD"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qbtjbIzz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oa1-f54.google.com (mail-oa1-f54.google.com [209.85.160.54])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F69E39FF5
-	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 22:00:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F449383A4
+	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 22:15:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706738408; cv=none; b=EN3rDBu6y3tfZvL5K9Rhb2f6Itxa19nwVhAqzh7BoX5up65SVi3PLXsseazxjWbnVZbTJmljsQmcnm/EY9t/y7gO+/qUps+TRx5y/Kkn9J/yfiH65Zq7YNUOB89Cz65QqgAEvY0uxhuJJ2+CXoqRot1nFBqGfo85tbTHXLpYpuE=
+	t=1706739312; cv=none; b=UsrtJneA1IH40G4fSJm+aGcgOY7RgIgop/gp5Kbcc75uU0ZOtzO5/3CHTxwx9e9/w9qgNSEJkW5TzZJMnIHf3rUgMe8YjerYBath/ntsdA5DCqoOsDbULHU3/UwaQLze/ERfnwd2WjrUwnfoautk8owrD8VabYXapkCtawj8GxQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706738408; c=relaxed/simple;
-	bh=pTPZRdj/clNw8Oelh7URCewuDtXPDjO7UvOoX7E79cU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FeYOiaXtbQ9Q1muwB8nds6puNgliQF0q+G3BoUdng7SJ6gQR1Klt667XbusBj7Bpl1bYBUlvhAGLebCY4YT6YdihmYmIt8J8HKWuwVMHTYCcAQr/L7Tly1vxeDPMbTQxclUc9VIB+WuPEUfaUC4/zlgtBqiwcv/TmHb/pUSvvVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TkeS8GgD; arc=none smtp.client-ip=209.85.160.54
+	s=arc-20240116; t=1706739312; c=relaxed/simple;
+	bh=LbAU2QOSUO4G2w7KXKLwqZIy9v04ComU9ZUQlJty5nc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Y7LIl5IKIwn/hVmtXF9TDaz2Z93Q7xV9OOz3XONJgV3y8upz3Vs8YT4wFwgIzw9qO84+yzV2Dv90q9h1+wNGYdEhGqz7WDhCQJxaj8X+2yLULmTUnptP/452fmMwwlQZsQ1axhaiWl2tb5FRmwb5pOJ6sMJiIE8/ItK++T1mcpI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qbtjbIzz; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-218dd3fdb7cso132268fac.2
-        for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 14:00:07 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-5cfc2041cdfso261398a12.2
+        for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 14:15:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706738406; x=1707343206; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3HWn2vkHxIR1F0Lo5tspJmR3xmAUHbpogVpChRP7V7U=;
-        b=TkeS8GgDHWr4KJ931bIZpdLmF+bWTNwHeqUrm+sqyqwGwPbgsd4KTh8go802QT3hgo
-         1RFO1Qw08pRBNfa13cFtIFfvs1wtXWff2cqDBMrZcd6nq/ASsB11qWSKAs846czaDMDK
-         awgDpnF2R84dckfj664oHVwTj5tw2Ou2veWy3Er3QQeViU3mdTQVP6cNpeDRxGjR/aJ5
-         pibv47WDbHT6yZCOuueg6NYkeRrBOaPgFD2rrC230W2dC0Wpkt+uGd6DI9M8XSZLedXc
-         JO9M1F8AqJ9vWe9OSaEzpniKgkAeeTEY4brPRJIGQzOPXO9i2oX2hihX2RMs5B/CsIxI
-         tjXg==
+        d=google.com; s=20230601; t=1706739310; x=1707344110; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bw10OTGUzfIt3yMJ/JYelZQmmsijYp7LFaUSBetq8KM=;
+        b=qbtjbIzzKii+/LAwUeXZSONTG5ZfHFFBCPyYAEb3jsnWHFp5nkZc83JEtdtQAumK+F
+         AcyBMzj12DfcmUECL0wqomwpO41E5xqeektYLCl+hrLvA7n9PATZtMuUEWOdDFS9eMbN
+         jQk4GpQO67+WdxjgDadjEbb5AvY0f90tgFmerVSXCtdD2xCqdgepEfVLgAQRUZVwPqZX
+         XCEm/90s2cbMFBOqcRHi3xMcZQIUaVhFzrcmCEtEMnmxv1B6xTw0ls8MaSzseybEa5up
+         8IE1TLUA9rIUtKx8tmN1m85mA1AD+n0Me2FygwkfwwfRWM7Vx960CUG4Qc6cMCa9+NlM
+         W4Eg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706738406; x=1707343206;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3HWn2vkHxIR1F0Lo5tspJmR3xmAUHbpogVpChRP7V7U=;
-        b=sWxwSnRfVUo21QEkVutjibDP7GAxVPJQK7LJvnvHn83FBCQEEMU+WjH79KWzr957Mu
-         kt+Bxmcw1q7uvqQpcT39UAoHAio/cnQGHbDJ5WRSnJs757OvhBcXrX0gEBZPSRHXesZ7
-         BJL9ax5smLJHK8FtkRapFl+/z5s7SatqOcan2Bhbz4vgzClzLLfeoMt5nUGF4Inppv+b
-         O1dHrKoSO/pLzGwW5EgloZoQvvhlnkZMdOCgu8KcXphYZW197OCWnnAbi+aSOO5Zg4l8
-         bBppY0qCdXqrI+URM+p6YongozP4UuIDxG/jbwaO3JXAoWvSiQ9eMXH5FiG0nJNAriE4
-         nT+g==
-X-Gm-Message-State: AOJu0YyStN8P/vWMezzUxyEi4KilgQkwyNgQjDVnzH4fCrVrMN6tbNzi
-	Rnb9r7ko8v3mU/IC45zLj/db4w+nZo5eK5xw/XZFJFl8VCI0vaUxpxH8W7XmHZ5pR3QEv2m+xR8
-	4ZbE3EsKe2JVAnaa8lRxbzT2UbInvci3whcBk
-X-Google-Smtp-Source: AGHT+IGKCsKTkygbpPhG3XJ9O5u/HE7aI2abahJw3REKjJnkzRFEpCfEVmamGfDvrnVqdpiddT5NVHn+Cs9fjWdogOQ=
-X-Received: by 2002:a05:6871:783:b0:210:af25:a5a0 with SMTP id
- o3-20020a056871078300b00210af25a5a0mr3347929oap.1.1706738406281; Wed, 31 Jan
- 2024 14:00:06 -0800 (PST)
+        d=1e100.net; s=20230601; t=1706739310; x=1707344110;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bw10OTGUzfIt3yMJ/JYelZQmmsijYp7LFaUSBetq8KM=;
+        b=p1zleesJcXwnSKvl/cfMB6IICiZ/XEOki0X8q/3iLFFTkSMJ62qJ5WwCHs8KOFxhjO
+         97OVaFlJrGShlHVZV4GbWkB4UTzrZrYHQQDo65Fs+QBcbSn+J++afzt/5xmR+V+THgPd
+         CZbZmMPvD81EIsxqEEC45VzHXbOE8hFcaOHOqXqNQvLyFvB8sDbfO9y6pWE6B3yZ+Tox
+         9m4apXYQ+lD5DUVnc/FBgwo5atHr7XdQUSMEiTqGq67JW0wtRG6HkRabhhjuHtDo0s5p
+         HY0LxK5fZP/nV95FMOSE2pkElQJ9VKrYvDc1pWo83aCxQ6TWGvmiEMhfq31jRR5hqn1e
+         tE0Q==
+X-Gm-Message-State: AOJu0YyDOXff0CAeu6XCeHmz6Zf8WzUbkgykT6uiTZywIhoPAiWdbI63
+	XzX6dbS+tLW6uO6lnmz3eZ9Jni0SLgFENxiNW5ZIno3pjV0VhdiDRZxEnJgvExsjtYs/kBhXP2+
+	h8g==
+X-Google-Smtp-Source: AGHT+IE+Vo3GXPRreNgaVd3lwX5nZFPepIKP7aB/TwetnDkyydFJ1AKzRBneBfh6gsYeBkB6ujDvtkFrTvI=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a65:68d3:0:b0:5d8:be91:930d with SMTP id
+ k19-20020a6568d3000000b005d8be91930dmr18124pgt.0.1706739310357; Wed, 31 Jan
+ 2024 14:15:10 -0800 (PST)
+Date: Wed, 31 Jan 2024 14:15:08 -0800
+In-Reply-To: <20240104190520.62510-1-Ashish.Kalra@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20231109210325.3806151-1-amoorthy@google.com> <20231109210325.3806151-7-amoorthy@google.com>
- <CADrL8HWYKSiDZ_ahGbMXjup=r75B4JqC3LvT8A-qPVenV+MOiw@mail.gmail.com>
-In-Reply-To: <CADrL8HWYKSiDZ_ahGbMXjup=r75B4JqC3LvT8A-qPVenV+MOiw@mail.gmail.com>
-From: Anish Moorthy <amoorthy@google.com>
-Date: Wed, 31 Jan 2024 13:59:30 -0800
-Message-ID: <CAF7b7mrA3rB33sUZe3HX33+fXpF=8VwD284LpCcEn9KT9OgwUQ@mail.gmail.com>
-Subject: Re: [PATCH v6 06/14] KVM: Add memslot flag to let userspace force an
- exit on missing hva mappings
-To: James Houghton <jthoughton@google.com>
-Cc: seanjc@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	oliver.upton@linux.dev, pbonzini@redhat.com, maz@kernel.org, 
-	robert.hoo.linux@gmail.com, dmatlack@google.com, axelrasmussen@google.com, 
-	peterx@redhat.com, nadav.amit@gmail.com, isaku.yamahata@gmail.com, 
-	kconsul@linux.vnet.ibm.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20240104190520.62510-1-Ashish.Kalra@amd.com>
+Message-ID: <ZbrGbLLvdwRfMun5@google.com>
+Subject: Re: [PATCH v3] x86/sev: Add support for allowing zero SEV ASIDs.
+From: Sean Christopherson <seanjc@google.com>
+To: Ashish Kalra <Ashish.Kalra@amd.com>
+Cc: pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
+	thomas.lendacky@amd.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	joro@8bytes.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Jan 30, 2024 at 4:26=E2=80=AFPM James Houghton <jthoughton@google.c=
-om> wrote:
->
-> Feel free to add:
->
-> Reviewed-by: James Houghton <jthoughton@google.com>
+On Thu, Jan 04, 2024, Ashish Kalra wrote:
+> From: Ashish Kalra <ashish.kalra@amd.com>
+> 
+> Some BIOSes allow the end user to set the minimum SEV ASID value
+> (CPUID 0x8000001F_EDX) to be greater than the maximum number of
+> encrypted guests, or maximum SEV ASID value (CPUID 0x8000001F_ECX)
+> in order to dedicate all the SEV ASIDs to SEV-ES or SEV-SNP.
+> 
+> The SEV support, as coded, does not handle the case where the minimum
+> SEV ASID value can be greater than the maximum SEV ASID value.
+> As a result, the following confusing message is issued:
+> 
+> [   30.715724] kvm_amd: SEV enabled (ASIDs 1007 - 1006)
+> 
+> Fix the support to properly handle this case.
+> 
+> Fixes: 916391a2d1dc ("KVM: SVM: Add support for SEV-ES capability in KVM")
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> Cc: stable@vger.kernel.org
+> ---
+>  arch/x86/kvm/svm/sev.c | 40 ++++++++++++++++++++++++----------------
 
-> If we include KVM_MEM_GUEST_MEMFD here, we should point the reader to
-> KVM_SET_USER_MEMORY_REGION2 and explain that using
-> KVM_SET_USER_MEMORY_REGION with this flag will always fail.
+This should be ~3 patches:
 
-Done and done (I've split the guest memfd doc update off into its own
-commit too).
+ 1. Convert ASID variables/params to unsigned integers.
+ 2. Return -EINVAL instead of -EBUSY
+ 3. The actual fix here
 
-> > @@ -3070,6 +3074,15 @@ kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_=
-memory_slot *slot, gfn_t gfn,
-> >                 writable =3D NULL;
-> >         }
-> >
-> > +       if (!atomic && can_exit_on_missing
-> > +           && kvm_is_slot_exit_on_missing(slot)) {
-> > +               atomic =3D true;
-> > +               if (async) {
-> > +                       *async =3D false;
-> > +                       async =3D NULL;
-> > +               }
-> > +       }
-> > +
->
-> Perhaps we should have a comment for this? Maybe something like: "If
-> we want to exit-on-missing, we want to bail out if fast GUP fails, and
-> we do not want to go into slow GUP. Setting atomic=3Dtrue does exactly
-> this."
+E.g if #2 breaks userspace (extremely unlikely) then bisection should point at
+exactly that, not at a commit with a whole pile of unrelated things going on.
 
-I was going to push back on the use of "we" but I see that it's all
-over kvm_main.c :).
-
-I agree that a comment would be good, but isn't the "fast GUP only iff
-atomic=3Dtrue" statement a tautology? That's an actual question, my
-memory's fuzzy. What about
-
-> When the slot is exit-on-missing (and when we should respect that)
-> set atomic=3Dtrue to prevent GUP from faulting in the userspace
-> mappings.
-
-instead?
+I'll send a v4, #1 should also be accompanied by a cleanup of sev_asid_new() to
+not multiplex the ASID with the return code.  It can simply set sev->asid directly,
+which as a bonus makes sev_asid_new() and sev_asid_free() more symmetric.
 
