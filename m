@@ -1,189 +1,101 @@
-Return-Path: <kvm+bounces-7510-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7511-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E7088431E8
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 01:29:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D70C4843245
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 01:51:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 924081C253B9
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 00:29:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 822AB1F26E21
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 00:51:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F2EA37B;
-	Wed, 31 Jan 2024 00:29:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91814EA4;
+	Wed, 31 Jan 2024 00:51:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dabbelt-com.20230601.gappssmtp.com header.i=@dabbelt-com.20230601.gappssmtp.com header.b="zr/T/TDH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eF+ntEbU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E049363
-	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 00:29:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5128336E
+	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 00:51:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706660977; cv=none; b=mr0+8UeAFg/MqAramiFFG2c+FC4sUpuIQPjolH7CQh629lWPECxwqVt3Sb46EMjpyxxN5gcpUqCu6PYr0ug4tRgQiUAOABm+yf7UgqYuXzuXkpgA9ujnaYvEGnzSCBgNGmYbL59YvxGRJwQvzYqvaAMCKu9zZKs1Ewm8d3QHtzQ=
+	t=1706662299; cv=none; b=HbaFLBHRh7tAzhtMQ7P0Hf8C6SCdcWZW54PWW5YjBVD7TnBMe7AjedqHkKaX/lzGXUWpdp0opqm4kTkQyc3poKpvQYRKvPmfzgNKqFMvvFowuUAmEq2eH3FjZd4rjqtf6k6FFEuzDc+/WazsqeGPHrzW1Q5QVW6iy/9vIdvlFqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706660977; c=relaxed/simple;
-	bh=5mowbIroZO20pwwDbs4jAweCIWBna8B+HnYvdPM8IYQ=;
-	h=Date:Subject:In-Reply-To:CC:From:To:Message-ID:Mime-Version:
-	 Content-Type; b=py4We2qcN8iAAFK5QCrbxBhodgy/nGMKvf3XTBJGOiMCFIe9drrg/mChkKCLUexWopLDBqvN3kSVMJGQAP1UgjKyD8o3ULYOn2Ar5mwXKYjvdySe8OQW2f3Fsk8CsHEQiVpOHeUPQFvhUCAxQ64ZT52VxmUQuf4MiRW5tyTbCs4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com; spf=pass smtp.mailfrom=dabbelt.com; dkim=pass (2048-bit key) header.d=dabbelt-com.20230601.gappssmtp.com header.i=@dabbelt-com.20230601.gappssmtp.com header.b=zr/T/TDH; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dabbelt.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1d73066880eso36665355ad.3
-        for <kvm@vger.kernel.org>; Tue, 30 Jan 2024 16:29:35 -0800 (PST)
+	s=arc-20240116; t=1706662299; c=relaxed/simple;
+	bh=h56iDYCY78b26JFQdhAEDEK0j/cfW7bNE2Mq5KdMyvs=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=KolBAELogOiggfDDgiI+KM0Z7mp0T7buhQXTvSVrniebJUeg5ySAz5PwP/jzjXWOAYIEMKOfpdFdDO3bK0WKP+0VB9MDDpnEM58F6VwUYeG2AsLihQ36bgqUro+s5o8PXI7xw9UGL8ZprdA0ADRyEHvhldhbHYUKv3LDQNZVjrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eF+ntEbU; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-60406626b50so8296127b3.0
+        for <kvm@vger.kernel.org>; Tue, 30 Jan 2024 16:51:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dabbelt-com.20230601.gappssmtp.com; s=20230601; t=1706660975; x=1707265775; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=oRLEFUdWpThQfnH7eYE9k9scQwtpW7zudC4XUtfylHg=;
-        b=zr/T/TDHHXmQZZd9u4bxfdyWp0K5Do0NA533iJvGylxvV/mZVsPwqdoHLW5I84AefT
-         2YduGmdSd1AHl1MwcT1h1uZjGtGclY32UCo9OMc3JHRsFzd8MVAkjHPhdITYQBZfs4i5
-         IZrRYGF1+CPWcJBUNaJb4y0kF/4fbwiBS0zIbKfQKDWHHOr8UZeg069wJ3wxbeH9pnlJ
-         oPZfhygwG6hTX9Ud6ek59nbaRtv+fZO3P5C+3NdMdWa8XUI7uMNjwXGBMeETXC5Sv9EA
-         1J4+ZWoIDUC2mcrI9bhJPHdfsgzWAAFAZtLx0OMZxvCyW5D0kX/4XEUJN5ViAfGKXiVi
-         YL/w==
+        d=google.com; s=20230601; t=1706662297; x=1707267097; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8PiTL2HcEpuubGvI5q0XemeJ60ITPrCqFkZKuXecBwA=;
+        b=eF+ntEbU6RGl355iGb6S3gD4F7OIL4pmN7533IOx4p31qMNl5nypnAXskdVbGyqReV
+         1BrIn54nx6YjCzJwRF3BNq+BEbcpzMHkKEYf5oPsmYIFRaiJmwoSH5CYAHjwzz67j58y
+         KfWdXfhfsRRJZxsTJ8ZUkZfgCJXVGymrv0GjzgMiep7AL1SYsP+/eX3li6gG8RzgiLRR
+         OdlWaEz1PrKS6owgTh9I7IkL7GaNwdMpSLUsYYAjIJxi2ZQs32nDva8vYSNWwpAntfG6
+         gZDV+2NjVdUag+rIHqjeMxaecBLj2GBmf1ds+8YnrBIHXc1i51Eq3Iq496YXoxcEE8+C
+         GONQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706660975; x=1707265775;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oRLEFUdWpThQfnH7eYE9k9scQwtpW7zudC4XUtfylHg=;
-        b=tHwjTbsz0WeO/TnTANYKY0qabQEJM5MLnR+aWDw6dsgchLvKJYFCUq/x1fEw2O3Cvd
-         W5Zr5CyjV+Am6gdNze03yG8ZmgpAvuL985OKAy8aD8cdpP7l5OnmIq2a5DsliQDh2OPV
-         EFWYTyt0Q+8iYIXK8V7AWoUCipefBx7XbjX09GdCvXg3Hb6MtsuZoAvg8SwMjm2oT+i3
-         CE8m/d0p5z1CMhJKs8nt9XcucBy78jWW7lwzrT98KVrUY/43bVE61vyTYC3ZhufQtj6Q
-         IiGKReN08G/7tLIFZR7YjlUsOQt/bBpUyWRKlHfMQgVcSbqRUqkfvHLh7i6TPd0JctKH
-         sRhQ==
-X-Gm-Message-State: AOJu0YzCbOK7R7d2qGHv6zeVs4y/za7WmVWk88jCNSPGKSE+9bax4F77
-	ZBfCX1T/qNh9wTXb1IWmPYyO0dfJMzBRPS+wD7a7GHvHy51rcdMncwRJlBcPT3Q=
-X-Google-Smtp-Source: AGHT+IEffwLOD3IeGUvaEZuDZg/fNUq8KeMu5UCv1OS3W7G/LqKI6ZtHB8RVKmtvaa6YyYi9ygBI9w==
-X-Received: by 2002:a17:903:1344:b0:1d6:f34c:35d9 with SMTP id jl4-20020a170903134400b001d6f34c35d9mr176144plb.58.1706660974561;
-        Tue, 30 Jan 2024 16:29:34 -0800 (PST)
-Received: from localhost ([12.44.203.122])
-        by smtp.gmail.com with ESMTPSA id c3-20020a170902d90300b001d901e176afsm2267470plz.232.2024.01.30.16.29.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jan 2024 16:29:34 -0800 (PST)
-Date: Tue, 30 Jan 2024 16:29:34 -0800 (PST)
-X-Google-Original-Date: Tue, 30 Jan 2024 16:29:29 PST (-0800)
-Subject:     Re: Call for GSoC/Outreachy internship project ideas
-In-Reply-To: <CAJSP0QU2M0e56M0S9ztMDO7eyqFB-p1KgwxJhzwkxt=CuS_PqA@mail.gmail.com>
-CC: Alistair Francis <Alistair.Francis@wdc.com>, dbarboza@ventanamicro.com,
-  qemu-devel@nongnu.org, kvm@vger.kernel.org, afaria@redhat.com, alex.bennee@linaro.org,
-  eperezma@redhat.com, gmaglione@redhat.com, marcandre.lureau@redhat.com, rjones@redhat.com,
-  sgarzare@redhat.com, imp@bsdimp.com, philmd@linaro.org, pbonzini@redhat.com, thuth@redhat.com,
-  danielhb413@gmail.com, gaosong@loongson.cn, akihiko.odaki@daynix.com, shentey@gmail.com,
-  npiggin@gmail.com, seanjc@google.com, Marc Zyngier <maz@kernel.org>
-From: Palmer Dabbelt <palmer@dabbelt.com>
-To: stefanha@gmail.com
-Message-ID: <mhng-e7014372-2334-430e-b22e-17227af21bd9@palmer-ri-x1c9a>
+        d=1e100.net; s=20230601; t=1706662297; x=1707267097;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8PiTL2HcEpuubGvI5q0XemeJ60ITPrCqFkZKuXecBwA=;
+        b=LFdmxKluLcfmOYBX1Q0eFxmJnazWFuxx/0pX2tTyNYRifb3kLzTARiEmFulWCVhMjy
+         WWkovTF3RrYAAvNdjlks0pUXqL1sL7BGFDLmqR1cN+x1V/wJNff++Yjm2+6yU1wp3ovX
+         bct9Q03u/tuywWpUu4j5RTyKpDhizm4Q4A5Jmd6rsypRu9H13KoLckfE1vWOFIfeRo8S
+         55gGPmfhTMx5yXN/9xv1wz5p4QYLwJe4Gzevjw+fA8Rh9y4wXnQ04iyxo7ADmTmDDy6H
+         JWl67mL/xpy2HB6FHtkwxQlG5cVufx5ZeM1tJ1KE0+OB//dbKxaRLyaulZHavPg32M25
+         VcrQ==
+X-Gm-Message-State: AOJu0YwXcBI/aqVaUsn1xD1cnf8K+FTOwy7qa6Xxr0tpWLnPHn9ChGuc
+	N1DpHscmEh4/ZxnPIDMI2jOwxTC7jmm113Fx1H9lOLHUIAEJ9JchVb0MZKx40Zan178+xX2/qyp
+	T6g==
+X-Google-Smtp-Source: AGHT+IHG+mR512nv1h56aKdPh5HMR7r1mFAr+oZY0klhTXoojvu4P6tkCzyWHsXtwGDD6eIKR2/1nj4sky8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:2608:b0:dc6:6da5:1a23 with SMTP id
+ dw8-20020a056902260800b00dc66da51a23mr58971ybb.4.1706662297300; Tue, 30 Jan
+ 2024 16:51:37 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Tue, 30 Jan 2024 16:51:30 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.429.g432eaa2c6b-goog
+Message-ID: <20240131005130.3855907-1-seanjc@google.com>
+Subject: [ANNOUNCE] PUCK Agenda - 2024.01.31 - Finalizing internal guest_memfd
+ APIs for SNP/TDX
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Michael Roth <michael.roth@amd.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 30 Jan 2024 12:28:27 PST (-0800), stefanha@gmail.com wrote:
-> On Tue, 30 Jan 2024 at 14:40, Palmer Dabbelt <palmer@dabbelt.com> wrote:
->>
->> On Mon, 15 Jan 2024 08:32:59 PST (-0800), stefanha@gmail.com wrote:
->> > Dear QEMU and KVM communities,
->> > QEMU will apply for the Google Summer of Code and Outreachy internship
->> > programs again this year. Regular contributors can submit project
->> > ideas that they'd like to mentor by replying to this email before
->> > January 30th.
->>
->> It's the 30th, sorry if this is late but I just saw it today.  +Alistair
->> and Daniel, as I didn't sync up with anyone about this so not sure if
->> someone else is looking already (we're not internally).
->>
->> > Internship programs
->> > ---------------------------
->> > GSoC (https://summerofcode.withgoogle.com/) and Outreachy
->> > (https://www.outreachy.org/) offer paid open source remote work
->> > internships to eligible people wishing to participate in open source
->> > development. QEMU has been part of these internship programs for many
->> > years. Our mentors have enjoyed helping talented interns make their
->> > first open source contributions and some former interns continue to
->> > participate today.
->> >
->> > Who can mentor
->> > ----------------------
->> > Regular contributors to QEMU and KVM can participate as mentors.
->> > Mentorship involves about 5 hours of time commitment per week to
->> > communicate with the intern, review their patches, etc. Time is also
->> > required during the intern selection phase to communicate with
->> > applicants. Being a mentor is an opportunity to help someone get
->> > started in open source development, will give you experience with
->> > managing a project in a low-stakes environment, and a chance to
->> > explore interesting technical ideas that you may not have time to
->> > develop yourself.
->> >
->> > How to propose your idea
->> > ----------------------------------
->> > Reply to this email with the following project idea template filled in:
->> >
->> > === TITLE ===
->> >
->> > '''Summary:''' Short description of the project
->> >
->> > Detailed description of the project that explains the general idea,
->> > including a list of high-level tasks that will be completed by the
->> > project, and provides enough background for someone unfamiliar with
->> > the codebase to do research. Typically 2 or 3 paragraphs.
->> >
->> > '''Links:'''
->> > * Wiki links to relevant material
->> > * External links to mailing lists or web sites
->> >
->> > '''Details:'''
->> > * Skill level: beginner or intermediate or advanced
->> > * Language: C/Python/Rust/etc
->>
->> I'm not 100% sure this is a sane GSoC idea, as it's a bit open ended and
->> might have some tricky parts.  That said it's tripping some people up
->> and as far as I know nobody's started looking at it, so I figrued I'd
->> write something up.
->>
->> I can try and dig up some more links if folks thing it's interesting,
->> IIRC there's been a handful of bug reports related to very small loops
->> that run ~10x slower when vectorized.  Large benchmarks like SPEC have
->> also shown slowdowns.
->
-> Hi Palmer,
-> Performance optimization can be challenging for newcomers. I wouldn't
-> recommend it for a GSoC project unless you have time to seed the
-> project idea with specific optimizations to implement based on your
-> experience and profiling. That way the intern has a solid starting
-> point where they can have a few successes before venturing out to do
-> their own performance analysis.
+Tomorrow's PUCK topic is finalizing KVM's internal guest_memfd APIs for SNP
+and TDX.
 
-Ya, I agree.  That's part of the reason why I wasn't sure if it's a 
-good idea.  At least for this one I think there should be some easy to 
-understand performance issue, as the loops that go very slowly consist 
-of a small number of instructions and go a lot slower.
+https://lore.kernel.org/all/20240105091237.24577-1-yan.y.zhao@intel.com
 
-I'm actually more worried about this running into a rabbit hole of 
-adding new TCG operations or even just having no well defined mappings 
-between RVV and AVX, those might make the project really hard.
+Time:     6am PDT
+Video:    https://meet.google.com/vdb-aeqo-knk
+Phone:    https://tel.meet/vdb-aeqo-knk?pin=3003112178656
 
-> Do you have the time to profile and add specifics to the project idea
-> by Feb 21st? If that sounds good to you, I'll add it to the project
-> ideas list and you can add more detailed tasks in the coming weeks.
+Calendar: https://calendar.google.com/calendar/u/0?cid=Y182MWE1YjFmNjQ0NzM5YmY1YmVkN2U1ZWE1ZmMzNjY5Y2UzMmEyNTQ0YzVkYjFjN2M4OTE3MDJjYTUwOTBjN2Q1QGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20
+Drive:    https://drive.google.com/drive/folders/1aTqCrvTsQI9T4qLhhLs_l986SngGlhPH?resourcekey=0-FDy0ykM3RerZedI8R-zj4A&usp=drive_link
 
-I can at least dig up some of the examples I ran into, there's been a 
-handful filtering in over the last year or so.
-
-This one 
-<https://gist.github.com/compnerd/daa7e68f7b4910cb6b27f856e6c2beba> 
-still has a much more than 10x slowdown (73ms -> 13s) with 
-vectorization, for example.
-
-> Thanks,
-> Stefan
+Future Schedule:
+February 7th  - Canceled (Sean offline)
+February 14th - Available
+February 21st - Available
+February 28th - Available
 
