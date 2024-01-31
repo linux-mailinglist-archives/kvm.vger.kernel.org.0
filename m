@@ -1,207 +1,163 @@
-Return-Path: <kvm+bounces-7525-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7526-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB9D2843304
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 02:50:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3DDC84332A
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 03:11:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 655BB1F2653D
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 01:50:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0A69BB2432F
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 02:11:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9142A5226;
-	Wed, 31 Jan 2024 01:50:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D2BF566B;
+	Wed, 31 Jan 2024 02:11:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dabbelt-com.20230601.gappssmtp.com header.i=@dabbelt-com.20230601.gappssmtp.com header.b="sGjjyLPW"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FrYV8GpX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0F775681
-	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 01:50:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA019523B;
+	Wed, 31 Jan 2024 02:11:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706665822; cv=none; b=oSdMIxs1eE1hsaeCvXjp3C3x8iH0K5XRggFucxsG6GFH6q4bUGawXsIlImj2z010v03VP9R6mutosjThF3ETK/P7Y/zYaybzlSOrHcq0Guz/f+WgrhEWZ+cF95sntnDboaUkxAd6Vpu5YhzSTO1rN63uxx7nUKUOtog+ifpL/Xc=
+	t=1706667088; cv=none; b=mcl3N5b0aftedAeki6QsjJ53F2tIIAj0h6Jlh2s6jMX9mVwufs9lR3w5GKp6hYYsF7xmjR9Mh1N/gBhduiczby+mE6AHjT4hMhb3yqn85+N3dba9vt7141EQgUTu/VaNjuu6IfNTGKGjTUc2Pof7dVrd6XWKH2FvZg75bn2HovU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706665822; c=relaxed/simple;
-	bh=p4LRqhJIZ6k1bmr3nu4cArGhLqaamucP100FbpNRzlI=;
-	h=Date:Subject:In-Reply-To:CC:From:To:Message-ID:Mime-Version:
-	 Content-Type; b=ctMiCHecbzS5gfLUyanmGVp1hZYO+jeOIry4rIq4nLFoRV8E50xFe1VCau3fR+r8jeVXPkjrJrnWkl4vVY3H5U+mZxkL9wED8tVgR7i8BTJNYtAvzQKRDNxaSfqY4MXimS8XfZIUu7rMXjp/DUgvHz9G4GXwpeD8fpE2xZmb7Xo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com; spf=pass smtp.mailfrom=dabbelt.com; dkim=pass (2048-bit key) header.d=dabbelt-com.20230601.gappssmtp.com header.i=@dabbelt-com.20230601.gappssmtp.com header.b=sGjjyLPW; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dabbelt.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1d71cb97937so27457625ad.3
-        for <kvm@vger.kernel.org>; Tue, 30 Jan 2024 17:50:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dabbelt-com.20230601.gappssmtp.com; s=20230601; t=1706665817; x=1707270617; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/kYJdJ0OmOFrp6DhbGNXAFfCBnvjcg1JoswxMFeCvkM=;
-        b=sGjjyLPWuFUU6IJ2C9zMHd27DRhK1UPj4RcbQ0w0q984XVYxttIk8Iet1twDCTHEBj
-         JTnFWYoCTTFUgyGap50lv4nmQSDADbvBF11zKDnJJOiJVJbAfR8TyeEjmrNFaOmu5+eX
-         jk/Oj2fMsusaaVpcYa/skD60UHlqTk9D8BBYcdyX3+tptWcZL/cvw6zXPO6zMb0zc4fC
-         v15XRTnl0WlKnCz+VEUUT/3DDYqR9u9hL7dFSH1LDck+wuw+1s71z2DvJ3u1SBiMw7Hs
-         z2qA7RXnNqWdPsp0+zBpW6wUXJUcJIclBofjwDLJUHzFiUA772uCjoNeG1R+gv1zDVK4
-         yRDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706665817; x=1707270617;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/kYJdJ0OmOFrp6DhbGNXAFfCBnvjcg1JoswxMFeCvkM=;
-        b=r9G+BecJa5zCKFz6G0ovY0xZoHyQOskjIRx/GjEl0RPzlaf3Wj5jDeOhfmPQDWhAcp
-         ya313o3xpbqd7L0r2VQyMDLQcZDhpzDP3w3ZBZo0aOmkOsgEkY6ykWxRxUUTkuK9+Pki
-         gSqdCdPM2vmPsfQQ/p8k4Xhkl06viEvQ1kQCii0TDO6OLS7O05pvSS0iGSVLyz1Rn04L
-         g1LLJXUOz8KywKK6/TeH4wNUBjEdRDQZ4J1Qla3etaBzAHqzxkmShl5Z7zR5N1ZeKy2M
-         tgfuO/q10NP4zWUR8vVdetC39vLwZDeXv2bNn6BEYIYetBdTQ3dtlKgsE/GJrp0W+wUe
-         HoAw==
-X-Gm-Message-State: AOJu0Yx+h1N4Hc2lkL7fb85JBO9sDXUpJgpKynMPSf/84veguuMvHKtP
-	ipShZQ6tEWs5wXNWa3X5tGNwh6ttc9+m38C47W+VmdUijwgFRBTEm9zPsiHGyeNEAYGk6dN62UP
-	E
-X-Google-Smtp-Source: AGHT+IH3j7ZZ8x+T/tjjx7aQcyGVM7Y3bc2tjampzOiiepQmi4ieofDEK2upvYP8R0gF54kHVhYuVQ==
-X-Received: by 2002:a17:902:da8c:b0:1d3:4860:591b with SMTP id j12-20020a170902da8c00b001d34860591bmr364269plx.0.1706665816803;
-        Tue, 30 Jan 2024 17:50:16 -0800 (PST)
-Received: from localhost ([12.44.203.122])
-        by smtp.gmail.com with ESMTPSA id y19-20020a170902ed5300b001d8b0750940sm6664266plb.175.2024.01.30.17.50.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jan 2024 17:50:16 -0800 (PST)
-Date: Tue, 30 Jan 2024 17:50:16 -0800 (PST)
-X-Google-Original-Date: Tue, 30 Jan 2024 17:49:31 PST (-0800)
-Subject:     Re: Call for GSoC/Outreachy internship project ideas
-In-Reply-To: <CAKmqyKMAQ1vrf9QnCx17DbKgGTqgDd58y46RLwZvzW4Sk4zyjA@mail.gmail.com>
-CC: stefanha@gmail.com, Alistair Francis <Alistair.Francis@wdc.com>,
-  dbarboza@ventanamicro.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, afaria@redhat.com,
-  alex.bennee@linaro.org, eperezma@redhat.com, gmaglione@redhat.com, marcandre.lureau@redhat.com,
-  rjones@redhat.com, sgarzare@redhat.com, imp@bsdimp.com, philmd@linaro.org, pbonzini@redhat.com,
-  thuth@redhat.com, danielhb413@gmail.com, gaosong@loongson.cn, akihiko.odaki@daynix.com,
-  shentey@gmail.com, npiggin@gmail.com, seanjc@google.com, Marc Zyngier <maz@kernel.org>
-From: Palmer Dabbelt <palmer@dabbelt.com>
-To: alistair23@gmail.com
-Message-ID: <mhng-3f05ad6b-53ef-4207-9592-625d794686e8@palmer-ri-x1c9a>
+	s=arc-20240116; t=1706667088; c=relaxed/simple;
+	bh=1eECbBTXJn2dJ3RKcITy2+8k4nSv/+0yUURQeFCZNHw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=suLeJsvHt9lfidM6BU8B5nyydsHO9HEvV0aCmrcNkMdTj0v6zR85A72cLVh22VW0VFd2c1iwXhqWvUGTfwAFNVAuUTMRwxysGYx8xIJ+7EWN5Dz7VJ8AIcXLUUZIlokCA2j+a1tcGdWKIYo1vNwtxmkpdFUqHnH9+gGReu+QI+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FrYV8GpX; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706667087; x=1738203087;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=1eECbBTXJn2dJ3RKcITy2+8k4nSv/+0yUURQeFCZNHw=;
+  b=FrYV8GpXf6eoW0guiCm70JnbkiUW9jB5QFCBhQMvVbx5jPaf01pFtw4I
+   bjA/mCZ5XsYMN/Ud+dufkOh5GmNlaGDI/pdw0sXkF4AFDBCKHv7rnU/vF
+   h1GHFLoat5kS/NpRNq+55O/4tqvQQ6MIG+QP2nW4xIoWRrqrcGHwuaUnn
+   hOkk8VbVtLLwWWqiHANW8ol/iSWdArKvQdqYiWomOP1006F2fBAFmm0ow
+   pUV12H2B2I8BL2RiJRJscFgskngnLaZokKuFf4J5aBujY56tkUtckzLVU
+   afZNBfiAd88e3NNyyvrbyEJhfVmJKarO+h0NAdN7LQL4dge00TuD/VK94
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="3317037"
+X-IronPort-AV: E=Sophos;i="6.05,231,1701158400"; 
+   d="scan'208";a="3317037"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jan 2024 18:11:26 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,231,1701158400"; 
+   d="scan'208";a="30333826"
+Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.93.12.33]) ([10.93.12.33])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jan 2024 18:11:23 -0800
+Message-ID: <d24dc389-8e73-4a7a-9970-1022dcbfa39c@linux.intel.com>
+Date: Wed, 31 Jan 2024 10:11:20 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v10 16/29] KVM: selftests: Test Intel PMU architectural
+ events on gp counters
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Kan Liang <kan.liang@linux.intel.com>,
+ Jim Mattson <jmattson@google.com>, Jinrong Liang <cloudliang@tencent.com>,
+ Aaron Lewis <aaronlewis@google.com>, Like Xu <likexu@tencent.com>
+References: <20240109230250.424295-1-seanjc@google.com>
+ <20240109230250.424295-17-seanjc@google.com>
+ <5f51fda5-bc07-42ac-a723-d09d90136961@linux.intel.com>
+ <ZaGxNsrf_pUHkFiY@google.com>
+ <cce0483f-539b-4be3-838d-af0ec91db8f0@linux.intel.com>
+ <ZbmF9eM84cQhdvGf@google.com>
+Content-Language: en-US
+From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+In-Reply-To: <ZbmF9eM84cQhdvGf@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On Tue, 30 Jan 2024 17:26:11 PST (-0800), alistair23@gmail.com wrote:
-> On Wed, Jan 31, 2024 at 10:30 AM Palmer Dabbelt <palmer@dabbelt.com> wrote:
->>
->> On Tue, 30 Jan 2024 12:28:27 PST (-0800), stefanha@gmail.com wrote:
->> > On Tue, 30 Jan 2024 at 14:40, Palmer Dabbelt <palmer@dabbelt.com> wrote:
->> >>
->> >> On Mon, 15 Jan 2024 08:32:59 PST (-0800), stefanha@gmail.com wrote:
->> >> > Dear QEMU and KVM communities,
->> >> > QEMU will apply for the Google Summer of Code and Outreachy internship
->> >> > programs again this year. Regular contributors can submit project
->> >> > ideas that they'd like to mentor by replying to this email before
->> >> > January 30th.
->> >>
->> >> It's the 30th, sorry if this is late but I just saw it today.  +Alistair
->> >> and Daniel, as I didn't sync up with anyone about this so not sure if
->> >> someone else is looking already (we're not internally).
->> >>
->> >> > Internship programs
->> >> > ---------------------------
->> >> > GSoC (https://summerofcode.withgoogle.com/) and Outreachy
->> >> > (https://www.outreachy.org/) offer paid open source remote work
->> >> > internships to eligible people wishing to participate in open source
->> >> > development. QEMU has been part of these internship programs for many
->> >> > years. Our mentors have enjoyed helping talented interns make their
->> >> > first open source contributions and some former interns continue to
->> >> > participate today.
->> >> >
->> >> > Who can mentor
->> >> > ----------------------
->> >> > Regular contributors to QEMU and KVM can participate as mentors.
->> >> > Mentorship involves about 5 hours of time commitment per week to
->> >> > communicate with the intern, review their patches, etc. Time is also
->> >> > required during the intern selection phase to communicate with
->> >> > applicants. Being a mentor is an opportunity to help someone get
->> >> > started in open source development, will give you experience with
->> >> > managing a project in a low-stakes environment, and a chance to
->> >> > explore interesting technical ideas that you may not have time to
->> >> > develop yourself.
->> >> >
->> >> > How to propose your idea
->> >> > ----------------------------------
->> >> > Reply to this email with the following project idea template filled in:
->> >> >
->> >> > === TITLE ===
->> >> >
->> >> > '''Summary:''' Short description of the project
->> >> >
->> >> > Detailed description of the project that explains the general idea,
->> >> > including a list of high-level tasks that will be completed by the
->> >> > project, and provides enough background for someone unfamiliar with
->> >> > the codebase to do research. Typically 2 or 3 paragraphs.
->> >> >
->> >> > '''Links:'''
->> >> > * Wiki links to relevant material
->> >> > * External links to mailing lists or web sites
->> >> >
->> >> > '''Details:'''
->> >> > * Skill level: beginner or intermediate or advanced
->> >> > * Language: C/Python/Rust/etc
->> >>
->> >> I'm not 100% sure this is a sane GSoC idea, as it's a bit open ended and
->> >> might have some tricky parts.  That said it's tripping some people up
->> >> and as far as I know nobody's started looking at it, so I figrued I'd
->> >> write something up.
->> >>
->> >> I can try and dig up some more links if folks thing it's interesting,
->> >> IIRC there's been a handful of bug reports related to very small loops
->> >> that run ~10x slower when vectorized.  Large benchmarks like SPEC have
->> >> also shown slowdowns.
->> >
->> > Hi Palmer,
->> > Performance optimization can be challenging for newcomers. I wouldn't
->> > recommend it for a GSoC project unless you have time to seed the
->> > project idea with specific optimizations to implement based on your
->> > experience and profiling. That way the intern has a solid starting
->> > point where they can have a few successes before venturing out to do
->> > their own performance analysis.
->>
->> Ya, I agree.  That's part of the reason why I wasn't sure if it's a
->> good idea.  At least for this one I think there should be some easy to
->> understand performance issue, as the loops that go very slowly consist
->> of a small number of instructions and go a lot slower.
->>
->> I'm actually more worried about this running into a rabbit hole of
->> adding new TCG operations or even just having no well defined mappings
->> between RVV and AVX, those might make the project really hard.
->>
->> > Do you have the time to profile and add specifics to the project idea
->> > by Feb 21st? If that sounds good to you, I'll add it to the project
->> > ideas list and you can add more detailed tasks in the coming weeks.
->>
->> I can at least dig up some of the examples I ran into, there's been a
->> handful filtering in over the last year or so.
->>
->> This one
->> <https://gist.github.com/compnerd/daa7e68f7b4910cb6b27f856e6c2beba>
->> still has a much more than 10x slowdown (73ms -> 13s) with
->> vectorization, for example.
->
-> It's probably worth creating a Gitlab issue for this and adding all of
-> the examples there. That way we have a single place to store them all
 
-Makes sense.  I think I'd been telling people to make bug reports for 
-them, so there might be some in there already -- I just dug this one out 
-of some history.
+On 1/31/2024 7:27 AM, Sean Christopherson wrote:
+> On Mon, Jan 15, 2024, Dapeng Mi wrote:
+>> On 1/13/2024 5:37 AM, Sean Christopherson wrote:
+>>> On Fri, Jan 12, 2024, Dapeng Mi wrote:
+>>>> On 1/10/2024 7:02 AM, Sean Christopherson wrote:
+>>>>> +/*
+>>>>> + * If an architectural event is supported and guaranteed to generate at least
+>>>>> + * one "hit, assert that its count is non-zero.  If an event isn't supported or
+>>>>> + * the test can't guarantee the associated action will occur, then all bets are
+>>>>> + * off regarding the count, i.e. no checks can be done.
+>>>>> + *
+>>>>> + * Sanity check that in all cases, the event doesn't count when it's disabled,
+>>>>> + * and that KVM correctly emulates the write of an arbitrary value.
+>>>>> + */
+>>>>> +static void guest_assert_event_count(uint8_t idx,
+>>>>> +				     struct kvm_x86_pmu_feature event,
+>>>>> +				     uint32_t pmc, uint32_t pmc_msr)
+>>>>> +{
+>>>>> +	uint64_t count;
+>>>>> +
+>>>>> +	count = _rdpmc(pmc);
+>>>>> +	if (!this_pmu_has(event))
+>>>>> +		goto sanity_checks;
+>>>>> +
+>>>>> +	switch (idx) {
+>>>>> +	case INTEL_ARCH_INSTRUCTIONS_RETIRED_INDEX:
+>>>>> +		GUEST_ASSERT_EQ(count, NUM_INSNS_RETIRED);
+>>>>> +		break;
+>>>>> +	case INTEL_ARCH_BRANCHES_RETIRED_INDEX:
+>>>>> +		GUEST_ASSERT_EQ(count, NUM_BRANCHES);
+>>>>> +		break;
+>>>>> +	case INTEL_ARCH_CPU_CYCLES_INDEX:
+>>>>> +	case INTEL_ARCH_REFERENCE_CYCLES_INDEX:
+>>>> Since we already support slots event in below guest_test_arch_event(), we
+>>>> can add check for INTEL_ARCH_TOPDOWN_SLOTS_INDEX here.
+>>> Can that actually be tested at this point, since KVM doesn't support
+>>> X86_PMU_FEATURE_TOPDOWN_SLOTS, i.e. this_pmu_has() above should always fail, no?
+>> I suppose X86_PMU_FEATURE_TOPDOWN_SLOTS has been supported in KVM.  The
+>> following output comes from a guest with latest kvm-x86 code on the Sapphire
+>> Rapids platform.
+>>
+>> sudo cpuid -l 0xa
+>> CPU 0:
+>>     Architecture Performance Monitoring Features (0xa):
+>>        version ID                               = 0x2 (2)
+>>        number of counters per logical processor = 0x8 (8)
+>>        bit width of counter                     = 0x30 (48)
+>>        length of EBX bit vector                 = 0x8 (8)
+>>        core cycle event                         = available
+>>        instruction retired event                = available
+>>        reference cycles event                   = available
+>>        last-level cache ref event               = available
+>>        last-level cache miss event              = available
+>>        branch inst retired event                = available
+>>        branch mispred retired event             = available
+>>        top-down slots event                     = available
+>>
+>> Current KVM doesn't support fixed counter 3 and pseudo slots event yet, but
+>> the architectural slots event is supported and can be programed on a GP
+>> counter. Current test code can cover this case, so I think we'd better add
+>> the check for the slots count.
+> Can you submit a patch on top, with a changelog that includes justification that
+> that explains exactly what assertions can be made on the top-down slots event
+> given the "workload" being measured?  I'm definitely not opposed to adding coverage
+> for top-down slots, but at this point, I don't want to respin this series, nor do
+> I want to make that change when applying on the fly.
 
-Here's a start: https://gitlab.com/qemu-project/qemu/-/issues/2137
+Yeah, I'm glad to submit a patch for this. :)
+
+BTW, I have a patch series to do the bug fixes and improvements for 
+kvm-unit-tests/pmu test. (some improvement ideas come from this patchset.)
+
+https://lore.kernel.org/kvm/20240103031409.2504051-1-dapeng1.mi@linux.intel.com/
+
+Could you please kindly review them? Thanks.
 
 >
-> Alistair
->
->>
->> > Thanks,
->> > Stefan
->>
 
