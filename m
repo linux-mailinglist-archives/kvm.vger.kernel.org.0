@@ -1,125 +1,121 @@
-Return-Path: <kvm+bounces-7597-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7598-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F19038446FF
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 19:20:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40A2584474F
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 19:38:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A5B301F2237C
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 18:20:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F10D5290BEB
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 18:38:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33FDB130E31;
-	Wed, 31 Jan 2024 18:20:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06D3F210E2;
+	Wed, 31 Jan 2024 18:38:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G28eJ3xU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3GSMaXoh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com [209.85.161.43])
+Received: from mail-io1-f73.google.com (mail-io1-f73.google.com [209.85.166.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E884A12CDB8
-	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 18:20:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE64117C75
+	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 18:38:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706725251; cv=none; b=SajwGEm5B37jLkwfe4Mv212m8Gm13MksggNMAJftiMrUB+TapR4f9MxHyDQj2d9CJd9gVOsw7kXLNtTQAy1axA+2WOhdks5Q463vA3iOZQwldaZwMmJ4EtmE1L42T46J2gSzvwZEyEjVIwpmzeXuwSi/Fftvf+uLTI8kjx8Rvm0=
+	t=1706726294; cv=none; b=IjwrE2gqCUXseWnOZKcCtQaRG+JuuFJPUCspSTM9N8sywU+IS9YM0JFavL9UJA/WWEjqoWJTsw51UhDMP8LhATwQ4R4nb3NzHW3AO3DR2exzAtDboqJ9s52On7tkq+5vpLwJq8QnVsGlxBfJBmosCUbkm7vMDY/I7vFfGsjNHYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706725251; c=relaxed/simple;
-	bh=BQ8gjiQ4pW3QLd5SlI2kujyplyxtS85Ic7rheVOqnQY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uunM6KxjJRpr/ZCrwr/kefas5NhW+cOOxoqmcvlgAVyUInaxkrmUMVPL6fgRomrePVlRayvgh8IcH7u9iIXfTayuY9z/zMorKMwak1A0q3dTxptwrzxZiyDyn2FTbutNedbzJDRzkZuKLWN2yuOXgghr6a87GpNun0IgNIrUYVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G28eJ3xU; arc=none smtp.client-ip=209.85.161.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f43.google.com with SMTP id 006d021491bc7-59a45d8ec91so30669eaf.3
-        for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 10:20:49 -0800 (PST)
+	s=arc-20240116; t=1706726294; c=relaxed/simple;
+	bh=UfjYc4q1VOylXIyltW4pByW+ntMGUUi2w22Mn2XGXdw=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=XrAQBAM/e+cOQVDgIl1agn0ZZ6YhwgWJbv9WxAm+RU6PT5XKVOfaEIPOAKw/v2RxuwX9rjcUnZ8C9G5/+I3w8Ulxq0jTXo5JcNsvck8jOlmPpfBC2mcss3rpGa/RfAeyMFL/9lS5rT7hpWMpL32H0TK+8rVABurfP6TlZ7EfW+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3GSMaXoh; arc=none smtp.client-ip=209.85.166.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+Received: by mail-io1-f73.google.com with SMTP id ca18e2360f4ac-7c000114536so5534439f.2
+        for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 10:38:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706725249; x=1707330049; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=5nzSUsGtwDOpa5mVgavX+vD5ccBHZ1+xybNzom9gkDM=;
-        b=G28eJ3xU11e9iLNSJ2YG+Tr8hg8S4KJJSqoIdlXALeKBv1TYKHjwhJNJlGWhSFj5Er
-         /BkM6hqnMX/eTql9dKOdiCCOeCuAWSRMk4QDCN/yZ+Zhq2+HxT/GHkpBH0PccE8idOz4
-         tPcz1k6Y1PqJyRw0NRD2o1Bh0HNw2dvnCILARPTFhBg4zEgA/PE3TvGwV1fICXmES6+9
-         sfQC5nrsEs9+p7oRKwf1ZbPPwiHMqx7zfKEHWn5qOv2RHe3FeMPsrYT1MzmaD/rzJuoF
-         C4Jpl2KY0CsMW0KK4vg+aYOhbeEbI486Vr30C5YwXyjmePWN5AjEtOSPPvLK9uYFveBJ
-         xOHg==
+        d=google.com; s=20230601; t=1706726292; x=1707331092; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=B+7qh5lgqKvRJ5XTxEYs6sYIXkTaK5rzWchXA2WiWMs=;
+        b=3GSMaXohKe/sOzam4ctApjW8NDYxjXk4Hu/WRuY3k693uQdeeehFaRbc26X4eMbvsC
+         L/lAkqgbe2dweTQ02A78sLyEQ1Mhz+BpBbDctwiWw8Emy4iYbdNnf0yvN/IEHVbIxKm2
+         1WBl2+QkvepiqxpIGigbzawtV+05aIXbRWApWfn6V+c8KWegO/WrA0xTVqMFaDuss+TT
+         SdEo+9VQJS/V1Mem5j9DDH2tAO9IYZK+4x1BFgA8nBCTOUboG5hTh0rFsx5X1k2CANIm
+         SCx6x/hBI3o7TjTH1DEvG+KRuhWbcr0SuOFwsmvkestp0pCmxCMqC3dcf4NOLDsDvqGu
+         kI6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706725249; x=1707330049;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5nzSUsGtwDOpa5mVgavX+vD5ccBHZ1+xybNzom9gkDM=;
-        b=aiEDxUqtBd4HJKS1ONm3I/EQrLs/DTLtknx6+SqBFodDJax2Y9uzsHSpnd12HxwjvT
-         QaJfCatCjdKrZqlGcx7ePPHo8e/LeAnvJOW5siplQAO1Q4RTsc25FAHANLI+vlshSWkS
-         ntT1E4J3Hzvo9jJqeODLSnwmGA6tzjrV1W9d2V2jQH8CeYsb1KUR9PLDz3vGXEVWkIr9
-         PIqCaQ8D6VebOj8TO9haCDWjUwOdeMr2jCIhyxb8KWRKe7sp907/ymEHKjuu/b8+76X3
-         CK1H2ca0aev7Pm7yc9u84z42YZCv3HE+RUjypnhPdl51hfIFTbz/eBGFw5T+QSCJ8DyT
-         u9aw==
-X-Gm-Message-State: AOJu0Yx4Y2tZoFJzkD3R/GsNRvJWeyWekiakp+uoNRfxRZgS9MjEyeYY
-	iJjYfASR+42cQmbH7W1Dww/JKlxpygKbQO5ZX1jje3WLQ1Dm00Ub0vzWkj5UEybsd8uxz55J68l
-	/Rfu2Zjh26mQJcBUMHJ94Rd8DBbU=
-X-Google-Smtp-Source: AGHT+IHPFDaL5R0u4JVoG0cJRFQ7IuSEn5SqHC7WVPA7Bzuf/ThSIeBbOqrKSRxz+u0Q4VWFrMbLHfJVpBlzcRr+qOg=
-X-Received: by 2002:a4a:d018:0:b0:59a:e23:2831 with SMTP id
- h24-20020a4ad018000000b0059a0e232831mr2276572oor.2.1706725248860; Wed, 31 Jan
- 2024 10:20:48 -0800 (PST)
+        d=1e100.net; s=20230601; t=1706726292; x=1707331092;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=B+7qh5lgqKvRJ5XTxEYs6sYIXkTaK5rzWchXA2WiWMs=;
+        b=UVDnyiToxZAkpbHNwbh19poluIFfhkGgYxdlBTHm85L9JTCi4NCD0yVH2YCe6SG4UT
+         HdQL2fSmqVQOUSn59OVUclc3RaLEVJamdGnlLZns2UasH40q1Xil3XSVZV7UhVg5wbZw
+         ZlDkSOeATbLb3ay24a9O7cLnQYevlBvxwUbIkeqCHQxpoBHBx8Ag3LJFrFH7JXAf4+dW
+         GJqSi1YJJLrv25EPAoIVicYX/xmqZSJawQV1tTp2WnttRrpIFiWxWvRwkdr52dYh24Y1
+         mFQW7ZWRNri8rvd29oxz/timl9qXi27sx8gxQT12JKw2WuhV81lpsAicAi7FKp7/OAKP
+         TxLQ==
+X-Gm-Message-State: AOJu0Yw23UVoanu656+quHhUuQJY1EkW5YcUVuZU1rwbWDxVFQVJq/7u
+	MVqXx/CHP24aWKUgQfyBbG92Dr3epvvjB4rhni31yehWVcAEZXAgZTW5Dt4N9QzEx37EGfC87Vp
+	kuEK1zs3Q/izeb88KHooCRA==
+X-Google-Smtp-Source: AGHT+IEWULPllFBaQ8dQeEAuZdnKaMWtTDPxrWTLe4io4YQ7kFWLbe1eQTSY5SCp/s+Zau2KSwPR0XFYd0AUCsyFhw==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a5d:9c07:0:b0:7bf:ff87:209f with SMTP
+ id 7-20020a5d9c07000000b007bfff87209fmr25977ioe.2.1706726292022; Wed, 31 Jan
+ 2024 10:38:12 -0800 (PST)
+Date: Wed, 31 Jan 2024 18:38:10 +0000
+In-Reply-To: <Zbgx8hZgWCmtzMjH@linux.dev> (message from Oliver Upton on Mon,
+ 29 Jan 2024 23:17:06 +0000)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <CAJSP0QWE8P-GTNmFPbHvvDLstBZgTZA7sFg0qz4u28kUFiCAHg@mail.gmail.com>
- <mhng-125f45c7-5a14-4c91-af16-197a4ad2f517@palmer-ri-x1c9a>
-In-Reply-To: <mhng-125f45c7-5a14-4c91-af16-197a4ad2f517@palmer-ri-x1c9a>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Wed, 31 Jan 2024 13:20:36 -0500
-Message-ID: <CAJSP0QU8d6UdNgk25+BZoOy6OXFMAR9Ux=T445O8Ehir_UsTew@mail.gmail.com>
-Subject: Re: Call for GSoC/Outreachy internship project ideas
-To: Palmer Dabbelt <palmer@dabbelt.com>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, dbarboza@ventanamicro.com, 
-	qemu-devel@nongnu.org, kvm@vger.kernel.org, afaria@redhat.com, 
-	alex.bennee@linaro.org, eperezma@redhat.com, gmaglione@redhat.com, 
-	marcandre.lureau@redhat.com, rjones@redhat.com, sgarzare@redhat.com, 
-	imp@bsdimp.com, philmd@linaro.org, pbonzini@redhat.com, thuth@redhat.com, 
-	danielhb413@gmail.com, gaosong@loongson.cn, akihiko.odaki@daynix.com, 
-	shentey@gmail.com, npiggin@gmail.com, seanjc@google.com, 
-	Marc Zyngier <maz@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Message-ID: <gsntcythl565.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH] KVM: arm64: Add capability for unconditional WFx passthrough
+From: Colton Lewis <coltonlewis@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvm@vger.kernel.org, maz@kernel.org, james.morse@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
+	will@kernel.org, pbonzini@redhat.com, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
-On Wed, 31 Jan 2024 at 10:59, Palmer Dabbelt <palmer@dabbelt.com> wrote:
->
-> On Wed, 31 Jan 2024 06:39:25 PST (-0800), stefanha@gmail.com wrote:
-> > On Tue, 30 Jan 2024 at 14:40, Palmer Dabbelt <palmer@dabbelt.com> wrote:
-> >> On Mon, 15 Jan 2024 08:32:59 PST (-0800), stefanha@gmail.com wrote:
-> >> I'm not 100% sure this is a sane GSoC idea, as it's a bit open ended and
-> >> might have some tricky parts.  That said it's tripping some people up
-> >> and as far as I know nobody's started looking at it, so I figrued I'd
-> >> write something up.
-> >
-> > Hi Palmer,
-> > Your idea has been added:
-> > https://wiki.qemu.org/Google_Summer_of_Code_2024#RISC-V_Vector_TCG_Frontend_Optimization
-> >
-> > I added links to the vector extension specification and the RISC-V TCG
-> > frontend source code.
-> >
-> > Please add concrete tasks (e.g. specific optimizations the intern
-> > should implement and benchmark) by Feb 21st. Thank you!
->
-> OK.  We've got a few examples starting to filter in, I'll keep updating
-> the bug until we get some nice concrete reproducers for slowdows of
-> decent vectorized code.  Then I'll take a look and what's inside them,
-> with any luck it'll be simple to figure out which vector instructions
-> are commonly used and slow -- there's a bunch of stuff in the RVV
-> translation that doesn't map cleanly, so I'm guessing it'll be in there.
->
-> If that all goes smoothly then I think we should have a reasonably
-> actionable intern project, but LMK if you were thinking of something
-> else?
+Oliver Upton <oliver.upton@linux.dev> writes:
 
-That's great!
+> Hi Colton,
 
-Thanks,
-Stefan
+> On Mon, Jan 29, 2024 at 09:39:17PM +0000, Colton Lewis wrote:
+>> Add KVM_CAP_ARM_WFX_PASSTHROUGH capability to always allow WFE/WFI
+>> instructions to run without trapping. Current behavior is to only
+>> allow this if the vcpu is the only task running. This commit keeps the
+>> old behavior when the capability is not set.
+
+>> This allows userspace to set deterministic behavior and increase
+>> efficiency for platforms with direct interrupt injection support.
+
+> Marc and I actually had an offlist conversation (shame on us!) about
+> this very topic since there are users asking for the _opposite_ of this
+> patch (unconditionally trap) [*].
+
+> I had originally wanted something like this, but Marc made the very good
+> point that (1) the behavior of WFx traps is in no way user-visible and
+> (2) it is entirely an IMP DEF behavior. The architecture only requires
+> the traps be effective if the instruction does not complete in finite
+> time.
+
+> We need to think of an interface that doesn't depend on
+> implementation-specific behavior, such as a control based on runqueue
+> depth.
+
+Good to know. I'll be thinking about that.
+
+
+> [*]  
+> https://lore.kernel.org/kvmarm/a481ef04-ddd2-dfc1-41b1-d2ec45c6a3b5@huawei.com/
+
+> --
+> Thanks,
+> Oliver
 
