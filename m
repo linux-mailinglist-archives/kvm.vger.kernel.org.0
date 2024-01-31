@@ -1,126 +1,122 @@
-Return-Path: <kvm+bounces-7592-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7593-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBB4E84434F
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 16:43:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AADCC844386
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 16:59:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8150D28BA5D
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 15:43:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7F7ECB2376C
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 15:59:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60669129A9B;
-	Wed, 31 Jan 2024 15:43:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 852A312A148;
+	Wed, 31 Jan 2024 15:59:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nZUKm2bO"
+	dkim=pass (2048-bit key) header.d=dabbelt-com.20230601.gappssmtp.com header.i=@dabbelt-com.20230601.gappssmtp.com header.b="ae7lyquR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 218F3128388
-	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 15:43:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9042112AAC0
+	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 15:59:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706715813; cv=none; b=Mped+qu/7mevDuXDpmzzCsBbXezV7ppxs2Whjke8Meo7mt4o2c4HQ9pqcetefrr0xzNhasBw6YRR9wQeeI2CT1ATF3D2UsG4gfxZBWGYK4DJvpHrDYFJr2WjoOk3JOTa/I7GfJuHLApTNKkLdQ/uu3u8Rlcs0Qn8SW2QFei53bk=
+	t=1706716758; cv=none; b=LQlloZTnP/WsXU09s8m1vj+KsxzCgPklc6lCpKORRBMqyjLOHzVM08uH5kqtZKaIsG6MfMw45uWVUUziyCVRqWYMCA32Txok6uslNVjJM9W+k4xP3B3YwwW9xgc0VZ6n6GUAI+mxDtfdDzP36gF+LtTh4mVOCwGTI6amYPaAJd4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706715813; c=relaxed/simple;
-	bh=vhbrZMHFjelXGRFhJ+BjMGubacmhxkKYeRxhEF4X3Wg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=DFPzsvZsDOeYVq/Q7iR/MhiVORXJZnnauFTk2U8f7TYi/9xxIuHr/nUHTlQj8AgCjRM3oyX3YUH8r5AQQMgqGHWugpHbqYHQfPh+QYI7LsUC5yPc/GL2IvjGt894huYAtCzGxV0UYXvu8szatZNZZYgSx8g4sZdrvS8+RpygUGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nZUKm2bO; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-602dae507caso89254737b3.0
-        for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 07:43:31 -0800 (PST)
+	s=arc-20240116; t=1706716758; c=relaxed/simple;
+	bh=Vbm4TiQOZt1Jz7l+uCpvtUon0P9dYsflBJizTapbuB4=;
+	h=Date:Subject:In-Reply-To:CC:From:To:Message-ID:Mime-Version:
+	 Content-Type; b=gT8mVdWteTUHvguX9ovkos6ZQeNZWOA43vUk/BcG4WNqJXd7hCPtDFoIlJ5vhhDClCSE99xZZL1O5lfcx0f968ezVNa14TE0I+yNb7QqBZWjvp2DenMev2Sn8cIqD3XaIJV2AJhhvLGCfd4wsfIgjPhrhKG7qsvAMfq2qsMLa9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com; spf=pass smtp.mailfrom=dabbelt.com; dkim=pass (2048-bit key) header.d=dabbelt-com.20230601.gappssmtp.com header.i=@dabbelt-com.20230601.gappssmtp.com header.b=ae7lyquR; arc=none smtp.client-ip=209.85.216.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dabbelt.com
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-295d22bd625so925815a91.1
+        for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 07:59:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706715811; x=1707320611; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rXirN1TSqSLWWOLHNkxUHkuNKeZ8QnnuiK8GRbGZ3WI=;
-        b=nZUKm2bOv4Y/oKKlz7W08nhMwawd3ALiBhncqSJXQONTBJWACJvQOsl8sUaJ/mnTxK
-         Pw6SemBuJSNhNzBfJTU/H6PqjnVinmKWmqeTgLKQsz9XkdA+MuGjyv81WMZIIBCmwt7i
-         /kAex6UlC3z7Wk7N08RX+WQlQfA6L4AbHADXbAQCiNX1mMnzJG6LJQ3lD1rzdSh6Jexk
-         7M9pu4Q7B0Yz1OqoKlngXKTvFNjCRr63x2l3wNcqkj9tngcK1XaIbWuyMRWfGlfWDa+9
-         8kNaj66Q2T8ZR5OaWbvC7IS5AzS1wi5my9Uj/k0O+oOkAco0FOGkTiNcNJs5CULgqvoc
-         TYJA==
+        d=dabbelt-com.20230601.gappssmtp.com; s=20230601; t=1706716756; x=1707321556; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:to:from:cc
+         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2tYCQRNgAZqwKRtR7jgxEs9S4CMjsHb/RcxjBFK8bE4=;
+        b=ae7lyquRle9vZh5m9fNP/HZQh1XC57fnPgB51cqXUB0cpPC2swudkdff/Me8AbCH1w
+         w5nukJvvg0/RsAcEXfujR7dvKOV8x9pih1nj3t87N6s/zHs2Ez0jBwRaJygA2bJnuvpa
+         cXNQt0hMHWxeSGKCuI6HB6Fs6LN+hoVVYlDxAFaQvmXvd6rjSXDx0jHz69CeiOIuysHb
+         WP195p4Bu4x55l5Gwx+ux9a3Exf07mBXkSc6lnGx4NaBEktM6/hrrHF0V8z9U0diz9HE
+         ujcyd7bdjRO6hc6TfGGf0dQbfJXsSmmlFZe+QHwq3YlDdQHbTbEEZ0VnaIr6zlGfVqmy
+         XMVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706715811; x=1707320611;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rXirN1TSqSLWWOLHNkxUHkuNKeZ8QnnuiK8GRbGZ3WI=;
-        b=XLfLDVU5KE3UO0h7vsNPKJydRpwpnBdlA8m9H1Ra1QFkQzkdRQkBqzD3YBJf+8J3Tp
-         XIud73i4pZEKZhRsUypaqlBaYIfAHg9F5hbYZmqBNFe0SubpjDdo14YssMuTFtIgS7Ew
-         V+svwG8yDRidRWh9zdfffKKri5h3wel8LEKUfecFtdDrbJ0KHPkCtgLaBmhvgsDlJTdV
-         X89KIbPisYGaZqSnMdeYUwAxjkXa0z/sCtogxqEmOn8mI/tQQfY+3aqCnUFQnWQLt5rj
-         BpnxhX9jVDvidxnDZyrwEeGyNC1Z20fJKNyw2NAgQnuuXJwyOFs8/rlUjry0Iv+e/UwD
-         Yz1A==
-X-Gm-Message-State: AOJu0YyjzuyRuBVwEiRkUBJD8qlrVctT+a0ghSaC0+Au0es7s+SFPIfQ
-	EcLsnAuV3sIOaqV29MMM+lznxwU7/MpNDdZKmk7CNlATQNke3g9BQLdmwz2yEQnxlwfR9aJvgcC
-	Low==
-X-Google-Smtp-Source: AGHT+IGa5eXROO4MrCt68oQY1jH9FGoPqrFbSytbtF+B4n2ewFSTJB3rHFDw5pL2slDaY8z/2D4CFC8loNk=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:4cd5:0:b0:604:9ba:9a03 with SMTP id
- z204-20020a814cd5000000b0060409ba9a03mr394475ywa.2.1706715811197; Wed, 31 Jan
- 2024 07:43:31 -0800 (PST)
-Date: Wed, 31 Jan 2024 07:43:29 -0800
-In-Reply-To: <20240123221220.3911317-1-mizhang@google.com>
+        d=1e100.net; s=20230601; t=1706716756; x=1707321556;
+        h=content-transfer-encoding:mime-version:message-id:to:from:cc
+         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2tYCQRNgAZqwKRtR7jgxEs9S4CMjsHb/RcxjBFK8bE4=;
+        b=JXnKyTfrlq9R2yuVpeUF2Xr8gVOF4Yk32CgaVUOhYoWl6zE5VPj4nztxaizjcKULSp
+         xHeI8aEpvWT6ylpQqb+LFL/wxWa1ZVvXc/1YEiRVp5DTGLXEQmZ+KjLfmr3EXSIpGgNv
+         o+9+pCyRfy9x2HkHr1h6BiQuhdCElO/s8+E2mv90FC2NSYn7cfLGvqixQDMtVI6b6XsK
+         g9ahUrANLAbCxscFa2L1tNZFW6ACcv3Qyc2m8W166F1Hnr0XdTz3ca2VJ4K2s6pcAti9
+         s167LQYwF6YKVzTZLMD+nrzKzwoKOjWvctaQAqzx7pw1yqj2byNCOmpeY9e5yNNqACF8
+         srXg==
+X-Gm-Message-State: AOJu0YwebMHGyKCjP+L7lZ091TNDrI0bWe9R5VksuRm36bDSsjgWfAtg
+	Hi4zb+p532WIdvnJ6Ya08l4pGlAmSw4WaeR5QyK5gZJp5fPjnE1iTA5DvpVHA+Q=
+X-Google-Smtp-Source: AGHT+IHkLqmeGopJwus/JjJcG+C3kOqqtllRCvELNYYwCNkT3Oml8KMueADzCsoiV4D/rVxVuAdu4g==
+X-Received: by 2002:a17:90a:c7d2:b0:295:eeb7:c53f with SMTP id gf18-20020a17090ac7d200b00295eeb7c53fmr1418541pjb.5.1706716755728;
+        Wed, 31 Jan 2024 07:59:15 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCWrNcIeUGJOTfQmB+PDhthnU0br0AGbtk4a6ou4Op9RvT/6EO5sV47AXaCjah6VOgKXMjp03JwJSGmQ+Qz2+Ogkth74YAWUv5uSBhSV0PbzuvEu3akAQmCzLpS2UKadLpOTD9gyxCK0unPXGXZhs1UckYsonAkZtmGTuw8IJyU9B0NShYMIpaXahpFiHQvHSJvPjL9qPZVZBCVp3AOkk2EBw34T8C+jboe5koJgqRO875alxLiUVG/w0vV9nVfd+t/+LzRwFa9xHLTcHwreKC2ygFjwPr1wUmvQ/Lze+EjeUoiAadEX5TLEWuG9AEZUHbhMVaNxtt8KbHqlNs5YBAG4u2gxGaQrH5/FMdQlM8um0tqJbqReMbdXbmx5LefN7pkVjC3yL9zO/U7Rk9lZMgJzcSV42o1ilbZwSY/y92lC2ugJ6SoUNabz0IpQmwu+Ui4trayE/rZlHY/NuRlEdO8zO9vx2EcwQpTiYflYzTRHqY+rRDwqLxaivGe7u9IkGPYts39TjlfxCa9FxZ/o/KblS2QRdXxGev3Pt6NHQTEG4DROCglxId90tnIXH9O/PXDW4lY60Qa1x7LlG/igclHsJUbZAyw8QPcuoAPXdxgNiSnnZSrjSeukzzo5EIZ6K2I/qjY0JRe6fL4=
+Received: from localhost ([12.44.203.122])
+        by smtp.gmail.com with ESMTPSA id nb4-20020a17090b35c400b00293d173ccbasm1679314pjb.52.2024.01.31.07.59.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 31 Jan 2024 07:59:15 -0800 (PST)
+Date: Wed, 31 Jan 2024 07:59:15 -0800 (PST)
+X-Google-Original-Date: Wed, 31 Jan 2024 07:59:13 PST (-0800)
+Subject:     Re: Call for GSoC/Outreachy internship project ideas
+In-Reply-To: <CAJSP0QWE8P-GTNmFPbHvvDLstBZgTZA7sFg0qz4u28kUFiCAHg@mail.gmail.com>
+CC: Alistair Francis <Alistair.Francis@wdc.com>, dbarboza@ventanamicro.com,
+  qemu-devel@nongnu.org, kvm@vger.kernel.org, afaria@redhat.com, alex.bennee@linaro.org,
+  eperezma@redhat.com, gmaglione@redhat.com, marcandre.lureau@redhat.com, rjones@redhat.com,
+  sgarzare@redhat.com, imp@bsdimp.com, philmd@linaro.org, pbonzini@redhat.com, thuth@redhat.com,
+  danielhb413@gmail.com, gaosong@loongson.cn, akihiko.odaki@daynix.com, shentey@gmail.com,
+  npiggin@gmail.com, seanjc@google.com, Marc Zyngier <maz@kernel.org>
+From: Palmer Dabbelt <palmer@dabbelt.com>
+To: stefanha@gmail.com
+Message-ID: <mhng-125f45c7-5a14-4c91-af16-197a4ad2f517@palmer-ri-x1c9a>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240123221220.3911317-1-mizhang@google.com>
-Message-ID: <ZbpqoU49k44xR4zB@google.com>
-Subject: Re: [PATCH] KVM: x86/pmu: Fix type length error when reading pmu->fixed_ctr_ctrl
-From: Sean Christopherson <seanjc@google.com>
-To: Mingwei Zhang <mizhang@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jan 23, 2024, Mingwei Zhang wrote:
-> Fix type length error since pmu->fixed_ctr_ctrl is u64 but the local
-> variable old_fixed_ctr_ctrl is u8. Truncating the value leads to
-> information loss at runtime. This leads to incorrect value in old_ctrl
-> retrieved from each field of old_fixed_ctr_ctrl and causes incorrect code
-> execution within the for loop of reprogram_fixed_counters(). So fix this
-> type to u64.
+On Wed, 31 Jan 2024 06:39:25 PST (-0800), stefanha@gmail.com wrote:
+> On Tue, 30 Jan 2024 at 14:40, Palmer Dabbelt <palmer@dabbelt.com> wrote:
+>> On Mon, 15 Jan 2024 08:32:59 PST (-0800), stefanha@gmail.com wrote:
+>> I'm not 100% sure this is a sane GSoC idea, as it's a bit open ended and
+>> might have some tricky parts.  That said it's tripping some people up
+>> and as far as I know nobody's started looking at it, so I figrued I'd
+>> write something up.
+>
+> Hi Palmer,
+> Your idea has been added:
+> https://wiki.qemu.org/Google_Summer_of_Code_2024#RISC-V_Vector_TCG_Frontend_Optimization
+>
+> I added links to the vector extension specification and the RISC-V TCG
+> frontend source code.
+>
+> Please add concrete tasks (e.g. specific optimizations the intern
+> should implement and benchmark) by Feb 21st. Thank you!
 
-But what is the actual fallout from this?  Stating that the bug causes incorrect
-code execution isn't helpful, that's akin to saying water is wet.
+OK.  We've got a few examples starting to filter in, I'll keep updating 
+the bug until we get some nice concrete reproducers for slowdows of 
+decent vectorized code.  Then I'll take a look and what's inside them, 
+with any luck it'll be simple to figure out which vector instructions 
+are commonly used and slow -- there's a bunch of stuff in the RVV 
+translation that doesn't map cleanly, so I'm guessing it'll be in there.
 
-If I'm following the code correctly, the only fallout is that KVM may unnecessarily
-mark a fixed PMC as in use and reprogram it.  I.e. the bug can result in (minor?)
-performance issues, but it won't cause functional problems.
+If that all goes smoothly then I think we should have a reasonably 
+actionable intern project, but LMK if you were thinking of something 
+else?
 
-Understanding what actually goes wrong matters, because I'm trying to determine
-whether or not this needs to be fixed in 6.8 and backported to stable trees.  If
-the bug is relatively benign, then this is fodder for 6.9.
-
-> Fixes: 76d287b2342e ("KVM: x86/pmu: Drop "u8 ctrl, int idx" for reprogram_fixed_counter()")
-> Signed-off-by: Mingwei Zhang <mizhang@google.com>
-> ---
->  arch/x86/kvm/vmx/pmu_intel.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-> index a6216c874729..315c7c2ba89b 100644
-> --- a/arch/x86/kvm/vmx/pmu_intel.c
-> +++ b/arch/x86/kvm/vmx/pmu_intel.c
-> @@ -71,7 +71,7 @@ static int fixed_pmc_events[] = {
->  static void reprogram_fixed_counters(struct kvm_pmu *pmu, u64 data)
->  {
->  	struct kvm_pmc *pmc;
-> -	u8 old_fixed_ctr_ctrl = pmu->fixed_ctr_ctrl;
-> +	u64 old_fixed_ctr_ctrl = pmu->fixed_ctr_ctrl;
->  	int i;
->  
->  	pmu->fixed_ctr_ctrl = data;
-> 
-> base-commit: 6613476e225e090cc9aad49be7fa504e290dd33d
-> -- 
-> 2.43.0.429.g432eaa2c6b-goog
-> 
+> Stefan
 
