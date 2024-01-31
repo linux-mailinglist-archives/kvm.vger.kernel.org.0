@@ -1,122 +1,235 @@
-Return-Path: <kvm+bounces-7593-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7594-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AADCC844386
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 16:59:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D30A2844499
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 17:34:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7F7ECB2376C
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 15:59:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88D72282A29
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 16:34:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 852A312A148;
-	Wed, 31 Jan 2024 15:59:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BE2D12BEBA;
+	Wed, 31 Jan 2024 16:34:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dabbelt-com.20230601.gappssmtp.com header.i=@dabbelt-com.20230601.gappssmtp.com header.b="ae7lyquR"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Z8soV5T+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9042112AAC0
-	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 15:59:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33D3663A7;
+	Wed, 31 Jan 2024 16:34:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706716758; cv=none; b=LQlloZTnP/WsXU09s8m1vj+KsxzCgPklc6lCpKORRBMqyjLOHzVM08uH5kqtZKaIsG6MfMw45uWVUUziyCVRqWYMCA32Txok6uslNVjJM9W+k4xP3B3YwwW9xgc0VZ6n6GUAI+mxDtfdDzP36gF+LtTh4mVOCwGTI6amYPaAJd4=
+	t=1706718872; cv=none; b=jVGjfHpHYstn7w9R89fpPBuzYCQpZksJPIwrBdklcQiSfTM6hOtCyPS/erY+o08HhvAdT5WfZxxCpSN1DJNVf38UDUShFzI0TS5OHy+iQ0MOFX8Re/xjAWcu/GXHsYwZ9CEhIcUGJaX7MBBSxWWYiO+dquXqBSNvDAF7XcPXX0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706716758; c=relaxed/simple;
-	bh=Vbm4TiQOZt1Jz7l+uCpvtUon0P9dYsflBJizTapbuB4=;
-	h=Date:Subject:In-Reply-To:CC:From:To:Message-ID:Mime-Version:
-	 Content-Type; b=gT8mVdWteTUHvguX9ovkos6ZQeNZWOA43vUk/BcG4WNqJXd7hCPtDFoIlJ5vhhDClCSE99xZZL1O5lfcx0f968ezVNa14TE0I+yNb7QqBZWjvp2DenMev2Sn8cIqD3XaIJV2AJhhvLGCfd4wsfIgjPhrhKG7qsvAMfq2qsMLa9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com; spf=pass smtp.mailfrom=dabbelt.com; dkim=pass (2048-bit key) header.d=dabbelt-com.20230601.gappssmtp.com header.i=@dabbelt-com.20230601.gappssmtp.com header.b=ae7lyquR; arc=none smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dabbelt.com
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-295d22bd625so925815a91.1
-        for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 07:59:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dabbelt-com.20230601.gappssmtp.com; s=20230601; t=1706716756; x=1707321556; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2tYCQRNgAZqwKRtR7jgxEs9S4CMjsHb/RcxjBFK8bE4=;
-        b=ae7lyquRle9vZh5m9fNP/HZQh1XC57fnPgB51cqXUB0cpPC2swudkdff/Me8AbCH1w
-         w5nukJvvg0/RsAcEXfujR7dvKOV8x9pih1nj3t87N6s/zHs2Ez0jBwRaJygA2bJnuvpa
-         cXNQt0hMHWxeSGKCuI6HB6Fs6LN+hoVVYlDxAFaQvmXvd6rjSXDx0jHz69CeiOIuysHb
-         WP195p4Bu4x55l5Gwx+ux9a3Exf07mBXkSc6lnGx4NaBEktM6/hrrHF0V8z9U0diz9HE
-         ujcyd7bdjRO6hc6TfGGf0dQbfJXsSmmlFZe+QHwq3YlDdQHbTbEEZ0VnaIr6zlGfVqmy
-         XMVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706716756; x=1707321556;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2tYCQRNgAZqwKRtR7jgxEs9S4CMjsHb/RcxjBFK8bE4=;
-        b=JXnKyTfrlq9R2yuVpeUF2Xr8gVOF4Yk32CgaVUOhYoWl6zE5VPj4nztxaizjcKULSp
-         xHeI8aEpvWT6ylpQqb+LFL/wxWa1ZVvXc/1YEiRVp5DTGLXEQmZ+KjLfmr3EXSIpGgNv
-         o+9+pCyRfy9x2HkHr1h6BiQuhdCElO/s8+E2mv90FC2NSYn7cfLGvqixQDMtVI6b6XsK
-         g9ahUrANLAbCxscFa2L1tNZFW6ACcv3Qyc2m8W166F1Hnr0XdTz3ca2VJ4K2s6pcAti9
-         s167LQYwF6YKVzTZLMD+nrzKzwoKOjWvctaQAqzx7pw1yqj2byNCOmpeY9e5yNNqACF8
-         srXg==
-X-Gm-Message-State: AOJu0YwebMHGyKCjP+L7lZ091TNDrI0bWe9R5VksuRm36bDSsjgWfAtg
-	Hi4zb+p532WIdvnJ6Ya08l4pGlAmSw4WaeR5QyK5gZJp5fPjnE1iTA5DvpVHA+Q=
-X-Google-Smtp-Source: AGHT+IHkLqmeGopJwus/JjJcG+C3kOqqtllRCvELNYYwCNkT3Oml8KMueADzCsoiV4D/rVxVuAdu4g==
-X-Received: by 2002:a17:90a:c7d2:b0:295:eeb7:c53f with SMTP id gf18-20020a17090ac7d200b00295eeb7c53fmr1418541pjb.5.1706716755728;
-        Wed, 31 Jan 2024 07:59:15 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCWrNcIeUGJOTfQmB+PDhthnU0br0AGbtk4a6ou4Op9RvT/6EO5sV47AXaCjah6VOgKXMjp03JwJSGmQ+Qz2+Ogkth74YAWUv5uSBhSV0PbzuvEu3akAQmCzLpS2UKadLpOTD9gyxCK0unPXGXZhs1UckYsonAkZtmGTuw8IJyU9B0NShYMIpaXahpFiHQvHSJvPjL9qPZVZBCVp3AOkk2EBw34T8C+jboe5koJgqRO875alxLiUVG/w0vV9nVfd+t/+LzRwFa9xHLTcHwreKC2ygFjwPr1wUmvQ/Lze+EjeUoiAadEX5TLEWuG9AEZUHbhMVaNxtt8KbHqlNs5YBAG4u2gxGaQrH5/FMdQlM8um0tqJbqReMbdXbmx5LefN7pkVjC3yL9zO/U7Rk9lZMgJzcSV42o1ilbZwSY/y92lC2ugJ6SoUNabz0IpQmwu+Ui4trayE/rZlHY/NuRlEdO8zO9vx2EcwQpTiYflYzTRHqY+rRDwqLxaivGe7u9IkGPYts39TjlfxCa9FxZ/o/KblS2QRdXxGev3Pt6NHQTEG4DROCglxId90tnIXH9O/PXDW4lY60Qa1x7LlG/igclHsJUbZAyw8QPcuoAPXdxgNiSnnZSrjSeukzzo5EIZ6K2I/qjY0JRe6fL4=
-Received: from localhost ([12.44.203.122])
-        by smtp.gmail.com with ESMTPSA id nb4-20020a17090b35c400b00293d173ccbasm1679314pjb.52.2024.01.31.07.59.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Jan 2024 07:59:15 -0800 (PST)
-Date: Wed, 31 Jan 2024 07:59:15 -0800 (PST)
-X-Google-Original-Date: Wed, 31 Jan 2024 07:59:13 PST (-0800)
-Subject:     Re: Call for GSoC/Outreachy internship project ideas
-In-Reply-To: <CAJSP0QWE8P-GTNmFPbHvvDLstBZgTZA7sFg0qz4u28kUFiCAHg@mail.gmail.com>
-CC: Alistair Francis <Alistair.Francis@wdc.com>, dbarboza@ventanamicro.com,
-  qemu-devel@nongnu.org, kvm@vger.kernel.org, afaria@redhat.com, alex.bennee@linaro.org,
-  eperezma@redhat.com, gmaglione@redhat.com, marcandre.lureau@redhat.com, rjones@redhat.com,
-  sgarzare@redhat.com, imp@bsdimp.com, philmd@linaro.org, pbonzini@redhat.com, thuth@redhat.com,
-  danielhb413@gmail.com, gaosong@loongson.cn, akihiko.odaki@daynix.com, shentey@gmail.com,
-  npiggin@gmail.com, seanjc@google.com, Marc Zyngier <maz@kernel.org>
-From: Palmer Dabbelt <palmer@dabbelt.com>
-To: stefanha@gmail.com
-Message-ID: <mhng-125f45c7-5a14-4c91-af16-197a4ad2f517@palmer-ri-x1c9a>
+	s=arc-20240116; t=1706718872; c=relaxed/simple;
+	bh=p+9BDB3tfGrAuMjx9z8N0dU+nT47L329pmPgaQqnrOQ=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=GaDG9CoYkH/IEa0mKJke3Fy41Ai9Y90lp8/nVj7d2sK+XOGg8auxTGazjJlzv9KXElfFh0eOD36m21iPFVYikJXgrbjBN2g3uKfolz1of/WaCXCgA7bg5lx62cfyXD+rSP25zeh4XYtoz7OvlLEZ8vG59T7NUrrcjGdYFOmdLc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Z8soV5T+; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=8QeY9hkXhXXWgkrG/9ywkh8znvMFdPxJx/4GDjlcD0A=; b=Z8soV5T+XxJYHu0Xv+sxcS5CdS
+	+IopC9YLPvLOgF2Zuq50O6aR/ZaAYuS8eFYRzGf+UeQG9V3kP251oKR4Unb6YlUuwR1pjAQ+oquEp
+	JLeMkeS9Iz1bJP4JLWHf4gh0VG1+dPZwjWjc+NJHY9zO2MGUKibAAYGosq1/piTPbNsrSxKJw5wX3
+	3a2IjecWUPB9T7WjTuo95N8yeuH7SVjM/BzRB1L08O1uJ3jTgKU6q/umfYd2EYXxCXMJK4EvrOt8Q
+	HbDxad5YVlXTGX1ByD+O5F87BaNlwP42arLPVjX3FwE7xkpi5kWfTcY/PANJzOn8w5AFYB1A3b2DV
+	oMmkeNiw==;
+Received: from [205.251.233.53] (helo=u3832b3a9db3152.ant.amazon.com)
+	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rVDXa-0000000DLIf-22LS;
+	Wed, 31 Jan 2024 16:34:24 +0000
+Message-ID: <596b2d7ce6941e5dd6bd7b2da6d3ea7d74f6c95a.camel@infradead.org>
+Subject: Re: [PATCH] KVM: selftests: Compare wall time from xen shinfo
+ against KVM_GET_CLOCK
+From: David Woodhouse <dwmw2@infradead.org>
+To: Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org, Paolo
+ Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
+Cc: Jan Richter <jarichte@redhat.com>, linux-kernel@vger.kernel.org
+Date: Wed, 31 Jan 2024 08:34:18 -0800
+In-Reply-To: <20240111135901.1785096-1-vkuznets@redhat.com>
+References: <20240111135901.1785096-1-vkuznets@redhat.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-+4sHBkGNlFmqBWK35EVZ"
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
-On Wed, 31 Jan 2024 06:39:25 PST (-0800), stefanha@gmail.com wrote:
-> On Tue, 30 Jan 2024 at 14:40, Palmer Dabbelt <palmer@dabbelt.com> wrote:
->> On Mon, 15 Jan 2024 08:32:59 PST (-0800), stefanha@gmail.com wrote:
->> I'm not 100% sure this is a sane GSoC idea, as it's a bit open ended and
->> might have some tricky parts.  That said it's tripping some people up
->> and as far as I know nobody's started looking at it, so I figrued I'd
->> write something up.
->
-> Hi Palmer,
-> Your idea has been added:
-> https://wiki.qemu.org/Google_Summer_of_Code_2024#RISC-V_Vector_TCG_Frontend_Optimization
->
-> I added links to the vector extension specification and the RISC-V TCG
-> frontend source code.
->
-> Please add concrete tasks (e.g. specific optimizations the intern
-> should implement and benchmark) by Feb 21st. Thank you!
 
-OK.  We've got a few examples starting to filter in, I'll keep updating 
-the bug until we get some nice concrete reproducers for slowdows of 
-decent vectorized code.  Then I'll take a look and what's inside them, 
-with any luck it'll be simple to figure out which vector instructions 
-are commonly used and slow -- there's a bunch of stuff in the RVV 
-translation that doesn't map cleanly, so I'm guessing it'll be in there.
+--=-+4sHBkGNlFmqBWK35EVZ
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-If that all goes smoothly then I think we should have a reasonably 
-actionable intern project, but LMK if you were thinking of something 
-else?
+Sorry for delayed response.
 
-> Stefan
+On Thu, 2024-01-11 at 14:59 +0100, Vitaly Kuznetsov wrote:
+>=20
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vm_ioctl(vm, KVM_GET_CLOCK, &kcdata=
+);
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 delta =3D (wc->sec * NSEC_PER_SEC +=
+ wc->nsec) - (kcdata.realtime - kcdata.clock);
+
+I think you need to check for KVM_CLOCK_REALTIME in the flags here,
+don't you? It might not always be set.
+
+And also, nobody should ever be using KVM_CLOCK_REALTIME as it stands
+at the moment. It's fundamentally broken because it should always have
+used CLOCK_TAI not CLOCK_REALTIME.
+
+I'm in the process of fixing that up as an incremental ABI change,
+putting the TAI offset into one of the spare pad fields in the
+kvm_clock_data and adding a new KVM_CLOCK_TAI_OFFSET flag.
+
+> +       TEST_ASSERT(llabs(delta) < 100,
+> +                   "Guest's epoch from shinfo %d.%09d differs from KVM_G=
+ET_CLOCK %lld.%lld",
+> +                   wc->sec, wc->nsec, (kcdata.realtime - kcdata.clock) /=
+ NSEC_PER_SEC,
+> +                   (kcdata.realtime - kcdata.clock) % NSEC_PER_SEC);
+>=20
+
+> Replace the check with comparing wall clock data from shinfo to
+> KVM_GET_CLOCK. The later gives both realtime and kvmclock so guest's epoc=
+h
+> can be calculated by subtraction. Note, the computed epoch may still diff=
+er
+> a few nanoseconds from shinfo as different TSC is used and there are
+> rounding errors but 100 nanoseconds margin should be enough to cover
+> it (famous last words).
+
+Aren't those just bugs? Surely this *should* be cycle-perfect, if the
+host has a stable TSC?
+
+But I suppose this isn't the test case for that. This is just testing
+that the Xen shinfo is doing basically the right thing.
+
+And we're going to need a few more fixes like this WIP before we get
+get to cycle perfection from the horrid mess that is our kvmclock code:
+https://git.infradead.org/?p=3Dusers/dwmw2/linux.git;a=3Dcommitdiff;h=3Dbc5=
+57e5ee4
+
+--=-+4sHBkGNlFmqBWK35EVZ
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwMTMxMTYzNDE4WjAvBgkqhkiG9w0BCQQxIgQgKz0FV/Gj
+oAqOYP9d3Nm1S0uXEnG6C+5lBXRopKj2w04wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBglWvT/o2nA8eUYyNy104oxb/d03Hv+5Gt
+g7jdRQ6n+FrQCo+2qI21cnZzMln+T0TdhI+JGE2ncSKgUEuSRGkBeWpZ7lwTRWU0yVehlKRoxJ7Q
+rUuiSzzXU0sbHTDaCzOMwidhewB/n9f86sprwtrkZ7Bkk7nNEOHFSW4N89F6wfzfiWEYbFg+AY6B
+8YlYATIvDjm05/vzgJCPJqiuC80S35qCqf+OELbJwwnzhv1vfbHpwJApweYXVRLNCqD9IByLf8s5
+gk8lnRwgePn5ZRC5vBA2yWvs4IyrtWLn3XWANdIGMMjII0RLCLMf/soeQZTa7YzNFQbuFRuxUFjh
+2VUOCSmQDWEp4UUgoQ1GYaUyJtpgxi6c9Rx33PuEfffie26TNGwH0XUrIGOWS+G2v9y/wC7AEew5
+7gBPWG6tKP0kWSqHeoTa3shPjrJ9yxpdzPFeQwhFK4taiCOzM0BmxX8WzsQbWpYyf2xfbRGc0EHJ
+s+FOpj/YB11CC7+BFBJFzxP3YQYpLiqGG9LCFfQW52BNS0M3cgvxf0Hf80ew8Ke9zel+dm/76Fr6
+EOSbqCn0LXvURNQzmxlRaV4l+Z43ei7jU66SPZxz5f4P0QONnRL8eVWVvwfeFE05Ol3VfGYitzCu
+hySc1zpWKJQje5tnJrox029HAOqM+hZxeeG+oH8w7QAAAAAAAA==
+
+
+--=-+4sHBkGNlFmqBWK35EVZ--
 
