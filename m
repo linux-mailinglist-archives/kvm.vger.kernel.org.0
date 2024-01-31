@@ -1,221 +1,240 @@
-Return-Path: <kvm+bounces-7585-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7586-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 005A0843EF0
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 12:58:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6EFA844105
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 14:50:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 762D41F2E2B8
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 11:58:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CEBF31C2459D
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 13:50:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77FC678689;
-	Wed, 31 Jan 2024 11:58:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F58C80C07;
+	Wed, 31 Jan 2024 13:50:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RHOFVXOz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uPLkcnf3"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E56997690E
-	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 11:58:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8204F80BEB;
+	Wed, 31 Jan 2024 13:50:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706702300; cv=none; b=gbRNo5xZIBCTKv79urj3wwx/F5fki8SgYqyyZbsCacNu9pOKR22i2UnCpUlvPQ2nWcq2MzcwLmIyLHz9FR3bjqghkAiG3aQEZ9WnhyTuo0gw0m8m4jqwgyg4invvE/sGcgSlFiwpwLVLh3XJKJGNxK/xdgzeBi811fkcrqg3mm8=
+	t=1706709029; cv=none; b=QSofSTeXzbYedSnVj/TLSKX+cZ41ZJn9F9RGfhBtCX9O7KQbf3eB+vxFaD6cdrAr9d67JgESWmhMdWqSVFsuSlraLfB9gmt5kSfYHqx9vMs6cBpERl3myINYICqyQ7StVK2I8tD21NZnL4tVTuctNKJkhvlVR5fScg4bI2zAwyU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706702300; c=relaxed/simple;
-	bh=hI6pIxWYZn6JeCEExsEXYy9voSGnFqpL/k6e0jjFvJ8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=E/FywBjhL26yPrM7Igdv2znnnsFyNhFosavPkoPIeKbwg1FaIyepsAMwF0oXnhn92H50syBJci4vFHnnU6y10L5EPOwvoAtWBsLAisYaAbGDmQCgcxgtKtHdOrX6xEpaoq6BYThsFu8F4zDlQzQ19AoM7QSZTVMYczIv2omemV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RHOFVXOz; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706702297;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=Um39ebN5ZMur/OwoYxUGFeLAS+a+2jb5T67VWPDiRzw=;
-	b=RHOFVXOzCT5/Zk9M2Uektkko+jUDBoLnz9tUSe81LhO2riiVuzyKxgCXrbmU2zC0xUMmOm
-	1uFiCoT262iXokHuf0WbQydviyE1sjECfYFOo0/D1G32V41pU2ruqIdiCF7QzwyzfI3Ohd
-	GcVualvompvAvbIFRC9l3N34LcJWJWw=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-599-XIYp0df2MR6hkgyqKpyRMw-1; Wed, 31 Jan 2024 06:58:16 -0500
-X-MC-Unique: XIYp0df2MR6hkgyqKpyRMw-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-40ef75adf5fso17247335e9.0
-        for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 03:58:15 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706702294; x=1707307094;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Um39ebN5ZMur/OwoYxUGFeLAS+a+2jb5T67VWPDiRzw=;
-        b=DHpu1ufDQy1blMlf6J6HmBjOa9rsHykVjzB62V5s/PbyDZxH7/435bYChqQH5a4rof
-         FzjmjvPi0U8ubsa91XVzFpkGKO1d/GK2/Qt4PyDNIbhyJGe1KjCINdwcSarWia/7U/8J
-         SGEm7C9CPTMGFejAssHni67v141I70rHHp+KDI8UDfROU0X85rjTWQirSnvMmz1OUEls
-         UsAtNxeP6KK0pDxokfapHS77E1tWlI2FUUMXfJur/5w6s/djCw4zmUoIV20d/TEN36ha
-         9d5T6osaDs01Y5U6xhfmOj4rLwTKU8/DumfhH72mJHKhkOQTtG95bUcCj/wQvuMWY8B3
-         LC0g==
-X-Gm-Message-State: AOJu0YyuccDBoI6QoTPPGT3Brvgw9Hx7PTH1m1AOccXI4ZgEkz2mj/cP
-	247ZeUB5xRWV1nJgPG4ElPamcEEc19VVVXFOoodB5PaR2YE/Hlxs/e62lQBetTz0J6Pj/D54sey
-	YYVfy8s1+DLHHoYOzq05BSmQdEmwKoYAJFl0Ct/CHKdtAhJhLGOoHPODhCw==
-X-Received: by 2002:a05:600c:4e14:b0:40e:d3db:ff71 with SMTP id b20-20020a05600c4e1400b0040ed3dbff71mr1080251wmq.2.1706702293915;
-        Wed, 31 Jan 2024 03:58:13 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFzOsNQ060KjCmFNJyVcxAX4cTTtvYMAQ7U1f5me3Rqe8XCqs5OGgYqtttJEGFB8uE1qXD1UA==
-X-Received: by 2002:a05:600c:4e14:b0:40e:d3db:ff71 with SMTP id b20-20020a05600c4e1400b0040ed3dbff71mr1080232wmq.2.1706702293586;
-        Wed, 31 Jan 2024 03:58:13 -0800 (PST)
-Received: from [10.254.108.137] ([151.14.9.35])
-        by smtp.googlemail.com with ESMTPSA id c20-20020a7bc014000000b0040e813f1f31sm1379119wmb.25.2024.01.31.03.58.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 31 Jan 2024 03:58:13 -0800 (PST)
-Message-ID: <96dd3b45-90c1-4454-abe3-61987defd03b@redhat.com>
-Date: Wed, 31 Jan 2024 12:58:04 +0100
+	s=arc-20240116; t=1706709029; c=relaxed/simple;
+	bh=gDrDYiIKj2pNOm3RnEnHWThrb2793XbTCaCB63sQ+hw=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KPFtfaExvqFERNV5Lx+LGfRWaZu6XwjcnOOG0tj2ZB4kK0RzuqLCa9cTi5GYKCr/Q9S40RSeZ/TSkNkte1aSNkFVzQ2s5D66M6qcwD0uQVhWRJCXbcbnSYOt1MfgI1co7sV0FIqwFx6hzafzRdwsqk+NSYEbdijXXo/uudwO6fY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uPLkcnf3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D66D5C433F1;
+	Wed, 31 Jan 2024 13:50:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706709029;
+	bh=gDrDYiIKj2pNOm3RnEnHWThrb2793XbTCaCB63sQ+hw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=uPLkcnf3C1e1YK9ZTFbKTQ3lvdHvzdr6O+9KkN0xqsH0tgQS4mQePq7I0NCESTQgj
+	 H7uxDt9hiaXFT+l7+kzGBhHaCqn1hsc2XbcR0LGj2Pdj0kn+Ej4YWGmfbrfNtOBOFh
+	 rUVMYpDw8uemg0hqKEzsaedA0zUZoJ/um7ZlShyCk4D487VhksTZJGIswnR6pCczL4
+	 YDZScjdovUOkF3hklOD+yTr2J6RUZhjg7iZ6GPnUIOgz60FPJ0SUH73+LiqA6QRXwc
+	 sxyYEBH3QgNqRU9azDY6nYWNaxey+VAEs7TSxPMjXQUkduDnWUl9NpvyVVjFjWl9bK
+	 TaWj5CBesglgg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rVAyv-00GcQt-Te;
+	Wed, 31 Jan 2024 13:50:26 +0000
+Date: Wed, 31 Jan 2024 13:50:25 +0000
+Message-ID: <86o7d17gta.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Chase Conklin <chase.conklin@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Darren Hart <darren@os.amperecomputing.com>,
+	Jintack Lim <jintack@cs.columbia.edu>,
+	Russell King <rmk+kernel@armlinux.org.uk>,
+	Miguel Luis <miguel.luis@oracle.com>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	D Scott Phillips <scott@os.amperecomputing.com>
+Subject: Re: [PATCH v11 17/43] KVM: arm64: nv: Support multiple nested Stage-2 mmu structures
+In-Reply-To: <3f30ac3a-9226-45fe-9e72-49c26a9f4c97@os.amperecomputing.com>
+References: <20231120131027.854038-1-maz@kernel.org>
+	<20231120131027.854038-18-maz@kernel.org>
+	<f0416fa9-b4f1-4bad-a73b-b1d7ecbffc62@os.amperecomputing.com>
+	<86le8g86t6.wl-maz@kernel.org>
+	<3b51d760-fd32-41b7-b142-5974fdf3e90e@os.amperecomputing.com>
+	<868r4d94c9.wl-maz@kernel.org>
+	<3f30ac3a-9226-45fe-9e72-49c26a9f4c97@os.amperecomputing.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] x86/cpu/intel: Detect TME keyid bits before setting MTRR
- mask registers
-Content-Language: en-US
-To: "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- Zixi Chen <zixchen@redhat.com>, Xiaoyao Li <xiaoyao.li@intel.com>,
- Kai Huang <kai.huang@linux.intel.com>,
- Dave Hansen <dave.hansen@linux.intel.com>,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>,
- x86@kernel.org, stable@vger.kernel.org
-References: <20240130180400.1698136-1-pbonzini@redhat.com>
- <bf3ptwhblztmal3c5b7jhjpohizw7q64th76pzit6rpgnewmo5@atq3oy6sp5vn>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <bf3ptwhblztmal3c5b7jhjpohizw7q64th76pzit6rpgnewmo5@atq3oy6sp5vn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, darren@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, scott@os.amperecomputing.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 1/31/24 09:39, Kirill A . Shutemov wrote:
-> On Tue, Jan 30, 2024 at 07:04:00PM +0100, Paolo Bonzini wrote:
->> MKTME repurposes the high bit of physical address to key id for encryption
->> key and, even though MAXPHYADDR in CPUID[0x80000008] remains the same,
->> the valid bits in the MTRR mask register are based on the reduced number
->> of physical address bits.
->>
->> detect_tme() in arch/x86/kernel/cpu/intel.c detects TME and subtracts
->> it from the total usable physical bits, but it is called too late.
->> Move the call to early_init_intel() so that it is called in setup_arch(),
->> before MTRRs are setup.
->>
->> This fixes boot on some TDX-enabled systems which until now only worked
->> with "disable_mtrr_cleanup".  Without the patch, the values written to
->> the MTRRs mask registers were 52-bit wide (e.g. 0x000fffff_80000800)
->> and the writes failed; with the patch, the values are 46-bit wide,
->> which matches the reduced MAXPHYADDR that is shown in /proc/cpuinfo.
->>
->> Fixes: cb06d8e3d020 ("x86/tme: Detect if TME and MKTME is activated by BIOS", 2018-03-12)
->> Reported-by: Zixi Chen <zixchen@redhat.com>
->> Cc: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
->> Cc: Xiaoyao Li <xiaoyao.li@intel.com>
->> Cc: Kai Huang <kai.huang@linux.intel.com>
->> Cc: Dave Hansen <dave.hansen@linux.intel.com>
->> Cc: Thomas Gleixner <tglx@linutronix.de>
->> Cc: Ingo Molnar <mingo@kernel.org>
->> Cc: x86@kernel.org
->> Cc: stable@vger.kernel.org
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+On Wed, 31 Jan 2024 09:39:34 +0000,
+Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
 > 
-> I've seen the patch before, although by different author and with
-> different commit message, not sure what is going on.
 > 
-> I had concern about that patch and I don't think it was addressed.
-
-Wow, slightly crazy that two people came up with exactly the same patch,
-including adding the comment before the moved call.  And yes, this patch
-only works until 6.6. :/
-
-The commit that moved get_cpu_address_size(), which has sha id
-fbf6449f84bf ("x86/sev-es: Set x86_virt_bits to the correct value
-straight away, instead of a two-phase approach"), was buggy for AMD
-processors; and it was noticed in the thread you linked, but never
-addressed.  It works more or less by chance because early_init_amd()
-calls init_amd(), but the x86_phys_bits value remains wrong for most of
-the boot process.  The MTRRs are also initialized wrongly, but that at
-least doesn't cause a #GP on AMD SME.
-
-I think the correct fix is something like
-
-diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
-index 0b97bcde70c6..fbc4e60d027c 100644
---- a/arch/x86/kernel/cpu/common.c
-+++ b/arch/x86/kernel/cpu/common.c
-@@ -1589,6 +1589,7 @@ static void __init early_identify_cpu(
-  		get_cpu_vendor(c);
-  		get_cpu_cap(c);
-  		setup_force_cpu_cap(X86_FEATURE_CPUID);
-+		get_cpu_address_sizes(c);
-  		cpu_parse_early_param();
-  
-  		if (this_cpu->c_early_init)
-@@ -1601,10 +1602,9 @@ static void __init early_identify_cpu(
-  			this_cpu->c_bsp_init(c);
-  	} else {
-  		setup_clear_cpu_cap(X86_FEATURE_CPUID);
-+		get_cpu_address_sizes(c);
-  	}
-  
--	get_cpu_address_sizes(c);
--
-  	setup_force_cpu_cap(X86_FEATURE_ALWAYS);
-  
-  	cpu_set_bug_bits(c);
-
-on top of which my (or Jeremy's) patch can be applied.  I'll test it and
-send a v2 of this patch.
-
-Paolo
-
-> See the thread:
+> Hi Marc,
 > 
-> https://lore.kernel.org/all/20231002224752.33qa2lq7q2w4nqws@box
+> On 25-01-2024 02:28 pm, Marc Zyngier wrote:
+> > On Thu, 25 Jan 2024 08:14:32 +0000,
+> > Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+> >> 
+> >> 
+> >> Hi Marc,
+> >> 
+> >> On 23-01-2024 07:56 pm, Marc Zyngier wrote:
+> >>> Hi Ganapatrao,
+> >>> 
+> >>> On Tue, 23 Jan 2024 09:55:32 +0000,
+> >>> Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+> >>>> 
+> >>>> Hi Marc,
+> >>>> 
+> >>>>> +void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu)
+> >>>>> +{
+> >>>>> +	if (is_hyp_ctxt(vcpu)) {
+> >>>>> +		vcpu->arch.hw_mmu = &vcpu->kvm->arch.mmu;
+> >>>>> +	} else {
+> >>>>> +		write_lock(&vcpu->kvm->mmu_lock);
+> >>>>> +		vcpu->arch.hw_mmu = get_s2_mmu_nested(vcpu);
+> >>>>> +		write_unlock(&vcpu->kvm->mmu_lock);
+> >>>>> +	}
+> >>>> 
+> >>>> Due to race, there is a non-existing L2's mmu table is getting loaded
+> >>>> for some of vCPU while booting L1(noticed with L1 boot using large
+> >>>> number of vCPUs). This is happening since at the early stage the
+> >>>> e2h(hyp-context) is not set and trap to eret of L1 boot-strap code
+> >>>> resulting in context switch as if it is returning to L2(guest enter)
+> >>>> and loading not initialized mmu table on those vCPUs resulting in
+> >>>> unrecoverable traps and aborts.
+> >>> 
+> >>> I'm not sure I understand the problem you're describing here.
+> >>> 
+> >> 
+> >> IIUC, When the S2 fault happens, the faulted vCPU gets the pages from
+> >> qemu process and maps in S2 and copies the code to allocated
+> >> memory. Mean while other vCPUs which are in race to come online, when
+> >> they switches over to dummy S2 finds the mapping and returns to L1 and
+> >> subsequent execution does not fault instead fetches from memory where
+> >> no code exists yet(for some) and generates stage 1 instruction abort
+> >> and jumps to abort handler and even there is no code exist and keeps
+> >> aborting. This is happening on random vCPUs(no pattern).
+> > 
+> > Why is that any different from the way we handle faults in the
+> > non-nested case? If there is a case where we can map the PTE at S2
+> > before the data is available, this is a generic bug that can trigger
+> > irrespective of NV.
+> > 
+> >> 
+> >>> What is the race exactly? Why isn't the shadow S2 good enough? Not
+> >>> having HCR_EL2.VM set doesn't mean we can use the same S2, as the TLBs
+> >>> are tagged by a different VMID, so staying on the canonical S2 seems
+> >>> wrong.
+> >> 
+> >> IMO, it is unnecessary to switch-over for first ERET while L1 is
+> >> booting and repeat the faults and page allocation which is anyway
+> >> dummy once L1 switches to E2H.
+> > 
+> > It is mandated by the architecture. EL1 is, by definition, a different
+> > translation regime from EL2. So we *must* have a different S2, because
+> > that defines the boundaries of TLB creation and invalidation. The
+> > fact that these are the same pages is totally irrelevant.
+> > 
+> >> Let L1 use its S2 always which is created by L0. Even we should
+> >> consider avoiding the entry created for L1 in array(first entry in the
+> >> array) of S2-MMUs and avoid unnecessary iteration/lookup while unmap
+> >> of NestedVMs.
+> > 
+> > I'm sorry, but this is just wrong. You are merging the EL1 and EL2
+> > translation regimes, which is not acceptable.
+> > 
+> >> I am anticipating this unwanted switch-over wont happen when we have
+> >> NV2 only support in V12?
+> > 
+> > V11 is already NV2 only, so I really don't get what you mean here.
+> > Everything stays the same, and there is nothing to change here.
+> > 
 > 
+> I am using still V10 since V11(also V12/nv-6.9-sr-enforcement) has
+> issues to boot with QEMU.
 
+Let's be clear: I have no interest in reports against a version that
+is older than the current one. If you still use V10, then
+congratulations, you are the maintainer of that version.
+
+> Tried V11 with my local branch of QEMU which
+> is 7.2 based and also with Eric's QEMU[1] which rebased on 8.2. The
+> issue is QEMU crashes at the very beginning itself. Not sure about the
+> issue and yet to debug.
+> 
+> [1] https://github.com/eauger/qemu/tree/v8.2-nv
+
+I have already reported that QEMU was doing some horrible things
+behind the kernel's back, and I don't think it is working correctly.
+
+> 
+> > What you describe looks like a terrible bug somewhere on the
+> > page-fault path that has the potential to impact non-NV, and I'd like
+> > to focus on that.
+> 
+> I found the bug/issue and fixed it.
+> The problem was so random and was happening when tried booting L1 with
+> large cores(200 to 300+).
+> 
+> I have implemented(yet to send to ML for review) to fix the
+> performance issue[2] due to unmapping of Shadow tables by implementing
+> the lookup table to unmap only the mapped Shadow IPAs instead of
+> unmapping complete Shadow S2 of all active NestedVMs.
+
+Again, this is irrelevant:
+
+- you develop against an unmaintained version
+
+- you waste time prematurely optimising code that is clearly
+  advertised as throw-away
+
+> 
+> This lookup table was not adding the mappings created for the L1 when
+> it is using the shadow S2-MMU(my bad, missed to notice that the L1
+> hops between vEL2 and EL1 at the booting stage), hence when there is a
+> page migration, the unmap was not getting done for those pages and
+> resulting in access of stale pages/memory by the some of the VCPUs of
+> L1.
+> 
+> I have modified the check while adding the Shadow-IPA to PA mapping to
+> a lookup table to check, is this page is getting mapped to NestedVMs
+> or to  a L1 while it is using Shadow S2.
+> 
+> [2] https://www.spinics.net/lists/kvm/msg326638.html
+
+Do I read it correctly that I wasted hours trying to reproduce
+something that only exists with on an obsolete series together with
+private patches?
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
