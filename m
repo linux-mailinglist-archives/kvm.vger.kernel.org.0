@@ -1,108 +1,104 @@
-Return-Path: <kvm+bounces-7590-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7591-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BACDA844200
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 15:40:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8025E844327
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 16:34:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECEAA1C218EA
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 14:40:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CDFB8B2DB8F
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 15:31:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 628BC84A4D;
-	Wed, 31 Jan 2024 14:39:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E188C1292E9;
+	Wed, 31 Jan 2024 15:31:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ejwWVEbo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XfRaxlP/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oa1-f43.google.com (mail-oa1-f43.google.com [209.85.160.43])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0041284A2E
-	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 14:39:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B963683CDB
+	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 15:31:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706711980; cv=none; b=Jq1UmPpMl5MXh9r1QmPEuXHrzHBn1fLK+++X1BXcf4/BQ5QSQwAjXi6H4P5XZyc/XbvQFMSKmRLPmAX36grE6NieTVi0mJvr5MVU9aHQKY+1Xkhkf/wXFPsW908Fe1Zj/mlALJX3LbEgAIu/NkYX2MtmIgYJs7OCEsJqVO3dLr8=
+	t=1706715103; cv=none; b=g0JR0sKd35n8ufzlvBR0M5JtVLA1e2+HFdBNQmW7jRLwwM7VGHMDKjsSl7Mi0X/sAspotmwKSXuEWRQHx79RrtaR7sPeTmOeEHlnKWQnNp27CFIb6yn/f1NI5LTvAuCxZF6bDHZ66GVG6ySOX5eUQtaZtAAIuinkvG2IyB3txyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706711980; c=relaxed/simple;
-	bh=MrKfgk26qxBJnNcLDFPDF4DUaUF80LiDpqyjHXVjBrM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MV4R7RvnWNa6b5GD6z18YwuOXLNECxEWOlkWBsOilPTMzmwuiS90hU2B/B+sS9MGgGk9YXXBRsrzynGbaoHEa85JFx6dv6mXvirQqFvd4+GkaKfWVYiXI3BRT59NY13kkl+N6AqmZ/mhuH1Xcc8R9yXd91m9EGdLsJIpbzPT/sU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ejwWVEbo; arc=none smtp.client-ip=209.85.160.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-2142ef4a7feso3332222fac.0
-        for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 06:39:38 -0800 (PST)
+	s=arc-20240116; t=1706715103; c=relaxed/simple;
+	bh=oL4W9D8uTGF08rS1s/ZYdHS1i0mWCq37SyhQwBq1J/M=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=pDlgDGkCb2tx4jAAySwKNPwFu1o7Zk0ES1p2ZbRK5ViSXMxWd2owkS0hmb91jbvfV7DS5Rysp6K1Z6D/ol0mzDZiEEcafid1jICcoB8bfJlZpiiOW9wQKVkR5NdQ9BriVLlQc3LDZCSbHklG1IKywKRVKgeNpPlv4aaHMDOMaMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XfRaxlP/; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6de331e3de2so961862b3a.0
+        for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 07:31:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706711978; x=1707316778; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=5aaFoAo6yHIEQXEMEH+9qzGfghoVpdZE0vIfZZ7ypDk=;
-        b=ejwWVEbozYTeSnlH6H0uj4LqEBccSbjHRBzU1CHn9+dqOql2p1aRdUBMSFHzNLPdNV
-         EqOMtEX6CXyLjSFtw8Dq97ymRUCd2+tm7ZCEABNLtZc1sG1WX0363d9Z6X5nFptcfdao
-         DPYFuaE2y29OEHFo82cmOiWAA3kX1ae8wRWYpcwkroiy3lz3SYe+c1ZkQjSbbY2wy8b8
-         AiTlKCi22CmNkz2wjEPqQR8gs4444tCkDVwS/rXVWnQwVU8QsKHX3+JJt4Cl2+guyi7C
-         UYbk9jqfLm6+HNFGWSEoHs3kEXGK2VUdoABQYFHsfiHKHlLzEDvkghPX/SZ1D28p6B2x
-         V5Zw==
+        d=google.com; s=20230601; t=1706715101; x=1707319901; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xLI/CdVyu9eHQa8UHfDtmUbiN6ljlyx0ki16JonNEL4=;
+        b=XfRaxlP/wEWHmRB8W4qh16naOXVxrnXbKK9v7R6GTvB3Xw5YP8A8K9HBrioKIaNPsW
+         Oh2KGtNCBJp7Wi+1ppueO66FuDd7NcrAI7r2kKkQGS5E3NzWoX6wz2Ss3Kf7NkucYL4s
+         TxfbemAIA7jIhwtzneXJudfw3jXy8NvfqhHeCqdE96ktNG2XcPSHN2WbWEZcy7qJMOg0
+         EQ9sE+bKVtw7eV9iZ1MdJo0RozdLFxkUCbJiPxvr6H1UIP2Y/E9b3AkT/xGCgRgNZK8H
+         UE6VMEEE3JYUpHu8RGr1zluteiM0sc8fISNEpZDUnH7l5hdVN8bxZ+2b1lzEWztvQ80q
+         eG0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706711978; x=1707316778;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5aaFoAo6yHIEQXEMEH+9qzGfghoVpdZE0vIfZZ7ypDk=;
-        b=Jj3zZcEjAhLRs/d/huNV+vFA3ryXj9KLu6ZvP5CpJzT9xW8h8rBFloz22x7u9tM122
-         Ie08oI8qhDd8laM7/6hM3iXYy8XAJjAaFmuUxr+Wj9zdva8197FqHIZ+sldpDG/S5S5z
-         2577WJllrWcUE29tji1ScT/kiMBizb7WPykyaJLf9smw3kKPcGG2Vaqwun0w8TCODhUe
-         Ed/MDebYgGCEB1FOpJv31NYTRd0sD8cd8oxVZR+3zMD0hwUh3hzaN5TaFpMbYBgbYI2g
-         Fp9hRR+tMVH4/J30BRGVY9LU9UkHMJLQOEVjdXqwc+3vlf4jToKL25q7BGnGQXkxldvg
-         /lPg==
-X-Gm-Message-State: AOJu0Ywr4PJKiDx/NDR5keQcCa8Gf7caWqrQU9N9tugV5ciFKQljWzpj
-	CZyYVXEILXciorOlm/4SVWnmscy2fYegQUhH3nmduaQhI8ogHOMABehwk3gGKn+3A/Dlv3I1RR7
-	Hlp1NniZovgIQpMjNJQw1/cisAJA=
-X-Google-Smtp-Source: AGHT+IFElWLLXQwef+7+fERmu7M4ME7jfoUL9BSEfQuPDKqElQIyuSJN5FKJdmp4ApM6HgZX0Ll8uj+vLtevJufb5Gg=
-X-Received: by 2002:a05:6870:6e12:b0:214:fd96:486c with SMTP id
- qt18-20020a0568706e1200b00214fd96486cmr2051195oab.9.1706711977915; Wed, 31
- Jan 2024 06:39:37 -0800 (PST)
+        d=1e100.net; s=20230601; t=1706715101; x=1707319901;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xLI/CdVyu9eHQa8UHfDtmUbiN6ljlyx0ki16JonNEL4=;
+        b=l9Kd5Rp1g0o76rZSXcg5TD5dy9zJyle557LEmP9lHOAs2ps/QR7NcMWm8se2mLVAk1
+         ifqJPOD2lzTX3K7BbQsfAXtfBFWVqBYeJS+E5fXWXqiTJVzykI81fuXDCpNg9RRFOl7Y
+         47jInzJo5COQfSk6FVlKBMxEy8aT2bxBMfRhMzU73aKi7TKN1/i1o7qPYK7oDDcjwB6d
+         FmAxKi4eYbfhbvrl3pkm63QqT745vCBCCnEDFI3iACVZWsG4DpuGkVsgkPa/KLJl8+iR
+         cZoyh18AaTO0j8CeoR37VxTuXhvSYV1DQ358Evpy4AwgOW+tq+PT7IRxO5VQFqOp8v3p
+         e1OQ==
+X-Gm-Message-State: AOJu0Yyw0cHwcQGxDIGWwRRyk8ZHKM4MdwvaPu+gNwo1nFfDybmQQnCr
+	+Fl8hVXt3IOTsNLC+hDIr9H+VLUQoQUk7byBWEjj7Xv1vtDt/LEsxqXc/zb6CV8dWmpWnqVJ9C9
+	dSA==
+X-Google-Smtp-Source: AGHT+IGakOzZSxJMYgkN0htnKhLJoZV0JKpLbOKc2nO+hNe/P1Xdl9Oswur6+6pTCFd171+nGMSVDK6fWyg=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:cca:b0:6df:dd47:ff3d with SMTP id
+ b10-20020a056a000cca00b006dfdd47ff3dmr85585pfv.0.1706715100889; Wed, 31 Jan
+ 2024 07:31:40 -0800 (PST)
+Date: Wed, 31 Jan 2024 07:31:39 -0800
+In-Reply-To: <d24dc389-8e73-4a7a-9970-1022dcbfa39c@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <CAJSP0QX9TQ-=PD7apOamXvGW29VwJPfVNN2X5BsFLFoP2g6USg@mail.gmail.com>
- <mhng-bcb98ddd-c9a7-4bb9-b180-bf310a289eeb@palmer-ri-x1c9a>
-In-Reply-To: <mhng-bcb98ddd-c9a7-4bb9-b180-bf310a289eeb@palmer-ri-x1c9a>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Wed, 31 Jan 2024 09:39:25 -0500
-Message-ID: <CAJSP0QWE8P-GTNmFPbHvvDLstBZgTZA7sFg0qz4u28kUFiCAHg@mail.gmail.com>
-Subject: Re: Call for GSoC/Outreachy internship project ideas
-To: Palmer Dabbelt <palmer@dabbelt.com>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, dbarboza@ventanamicro.com, 
-	qemu-devel@nongnu.org, kvm@vger.kernel.org, afaria@redhat.com, 
-	alex.bennee@linaro.org, eperezma@redhat.com, gmaglione@redhat.com, 
-	marcandre.lureau@redhat.com, rjones@redhat.com, sgarzare@redhat.com, 
-	imp@bsdimp.com, philmd@linaro.org, pbonzini@redhat.com, thuth@redhat.com, 
-	danielhb413@gmail.com, gaosong@loongson.cn, akihiko.odaki@daynix.com, 
-	shentey@gmail.com, npiggin@gmail.com, seanjc@google.com, 
-	Marc Zyngier <maz@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+References: <20240109230250.424295-1-seanjc@google.com> <20240109230250.424295-17-seanjc@google.com>
+ <5f51fda5-bc07-42ac-a723-d09d90136961@linux.intel.com> <ZaGxNsrf_pUHkFiY@google.com>
+ <cce0483f-539b-4be3-838d-af0ec91db8f0@linux.intel.com> <ZbmF9eM84cQhdvGf@google.com>
+ <d24dc389-8e73-4a7a-9970-1022dcbfa39c@linux.intel.com>
+Message-ID: <Zbpn284rPe3pMBwI@google.com>
+Subject: Re: [PATCH v10 16/29] KVM: selftests: Test Intel PMU architectural
+ events on gp counters
+From: Sean Christopherson <seanjc@google.com>
+To: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Kan Liang <kan.liang@linux.intel.com>, Jim Mattson <jmattson@google.com>, 
+	Jinrong Liang <cloudliang@tencent.com>, Aaron Lewis <aaronlewis@google.com>, 
+	Like Xu <likexu@tencent.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, 30 Jan 2024 at 14:40, Palmer Dabbelt <palmer@dabbelt.com> wrote:
-> On Mon, 15 Jan 2024 08:32:59 PST (-0800), stefanha@gmail.com wrote:
-> I'm not 100% sure this is a sane GSoC idea, as it's a bit open ended and
-> might have some tricky parts.  That said it's tripping some people up
-> and as far as I know nobody's started looking at it, so I figrued I'd
-> write something up.
+On Wed, Jan 31, 2024, Dapeng Mi wrote:
+> BTW, I have a patch series to do the bug fixes and improvements for
+> kvm-unit-tests/pmu test. (some improvement ideas come from this patchset.)
+> 
+> https://lore.kernel.org/kvm/20240103031409.2504051-1-dapeng1.mi@linux.intel.com/
+> 
+> Could you please kindly review them? Thanks.
 
-Hi Palmer,
-Your idea has been added:
-https://wiki.qemu.org/Google_Summer_of_Code_2024#RISC-V_Vector_TCG_Frontend_Optimization
+Unfortunately, that's probably not going to happen anytime soon.  I am overloaded
+with KVM/kernel reviews as it is, so I don't expect to have cycles for KUT reviews
+in the near future.
 
-I added links to the vector extension specification and the RISC-V TCG
-frontend source code.
-
-Please add concrete tasks (e.g. specific optimizations the intern
-should implement and benchmark) by Feb 21st. Thank you!
-
-Stefan
+And for PMU tests in particular, I really want to get selftests to the point where
+the PMU selftests are a superset of the PMU KUT tests so that we can drop the KUT
+versions.  In short, reviewing PMU KUT changes is very far down my todo list.
 
