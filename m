@@ -1,156 +1,136 @@
-Return-Path: <kvm+bounces-7580-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7581-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B558843CA2
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 11:29:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 872C5843CE8
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 11:37:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D760F1F312A4
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 10:29:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA5571C29E36
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 10:37:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3AF06996C;
-	Wed, 31 Jan 2024 10:28:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7689869D39;
+	Wed, 31 Jan 2024 10:37:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NBdJIzfJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Llijptv/"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 540E169D13
-	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 10:28:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 066A869D05
+	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 10:37:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706696935; cv=none; b=eHAK9IcigeuG8d/SQGQV1X9zTN42uLgNiKWjXZeupE2nN1jxeLPnFoMtmUg/ohcqO0xaZYZvgJQFpaAICF3K392oBAX6DNeLCir9kCYA1wrTgCNqFqw5VFEALF9yAU+mGkw2T+qRf6QCtkVkWSIU6GNmsSC0/Uuiw8EsZigcqy8=
+	t=1706697463; cv=none; b=PqbqXImrJfiHAev+s1D/qowpWL0yyT1o8VYTaXFdvn569aKACaF2WqqDSXCoKLwYpNpoal4F5WcwXkS9EOo/VG42OqZ8w5P9WoU2fmFZUfVWcwiKXiaJD3Uzdet3pubBNMJE8i0rj6i0HLzrBrBRZGZJwWCPrH3cnsLAk5qWMHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706696935; c=relaxed/simple;
-	bh=FPG6Y+PURvFGSE1B76rChV13yZ6TzykAFpFKvVJd1W4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nxjFznlbAn96BvRtBHnkWI+eG27QUAs+78LPypVLpbP/yezhzbi486BIBq7Dn6irOh2apjGnDkP80EJAnNidmHe/15VCqFMmqrIK2NCHU/LK5Am3urYkeqNl/LipR+cIwDaVuxjIkqYJFd7SCl0yVuJ5fVDP/4SpdA27SLWljb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NBdJIzfJ; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1706697463; c=relaxed/simple;
+	bh=BZ/5pXVh84yVqchUF8CdYzyQB86iKQFVoHBBNWzSgiI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WVO1Djq9YgGv0ZZTtFxl/ZOfE/RbXkgHQ8ObsxsL43J1vT/uywMPR5eo/5cMvaeAs9KwUVVTvkAfW0gZEw6dPzyrQTnuaPCIDED5EF4ABZysOhhB8AF9I74Zr7Gb2vzLRqvumkTIKSv0npVS9kwABqWrLcdKJep65peMZjNdDMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Llijptv/; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706696932;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:in-reply-to:in-reply-to:  references:references;
-	bh=7QFSz4iLpWcX1LVK89RhT/r6+WUAlS1/Pj27Dogjyms=;
-	b=NBdJIzfJlP6KX/rzU1J3ZVV+4XxVG42VRpTFl5SBbRqq9njNdYlTqiNmLJFk+df3IqMifr
-	5Q/na0iDVfAOGT5CWiHLo53r1Nhjk18wt+iMnMnYMj/7XzyaWEHZIB/D4oMKrFM2Gf7waC
-	cYx65CeCeLmXRmQacDqdauQXuyPA0Xs=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+	s=mimecast20190719; t=1706697460;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BZ/5pXVh84yVqchUF8CdYzyQB86iKQFVoHBBNWzSgiI=;
+	b=Llijptv/gMJgxceLCwi5v/t4AEZJgs83ZvVicUpV77jl6DYfdoKD0yZjZA8RycgP7D93zB
+	KGdwMT4COQwVDPJnPRQN+llDb35nRkxOH9hroZXNzG8Zm0rOvtByPF9sE17x3Fhn86Bt16
+	Ouryw4ulrDGGLt7S3X5b7tfA224hulY=
+Received: from mail-yw1-f200.google.com (mail-yw1-f200.google.com
+ [209.85.128.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-524-ncC9b_gUPgOcqtOek-qlUw-1; Wed, 31 Jan 2024 05:28:48 -0500
-X-MC-Unique: ncC9b_gUPgOcqtOek-qlUw-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 73D3C8B3963;
-	Wed, 31 Jan 2024 10:28:47 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.28.72])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id D7551492BC6;
-	Wed, 31 Jan 2024 10:28:44 +0000 (UTC)
-Date: Wed, 31 Jan 2024 10:28:42 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Zhao Liu <zhao1.liu@linux.intel.com>
-Cc: Eduardo Habkost <eduardo@habkost.net>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Yanan Wang <wangyanan55@huawei.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Eric Blake <eblake@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
-	kvm@vger.kernel.org, Babu Moger <babu.moger@amd.com>,
-	Xiaoyao Li <xiaoyao.li@intel.com>,
-	Zhenyu Wang <zhenyu.z.wang@intel.com>,
-	Zhuocheng Ding <zhuocheng.ding@intel.com>,
-	Yongwei Ma <yongwei.ma@intel.com>, Zhao Liu <zhao1.liu@intel.com>
-Subject: Re: [PATCH v8 00/21] Introduce smp.modules for x86 in QEMU
-Message-ID: <Zbog2vDrrWFbujrs@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20240131101350.109512-1-zhao1.liu@linux.intel.com>
+ us-mta-66-yIVzf4RTNGyzDzYVvkCATQ-1; Wed, 31 Jan 2024 05:37:39 -0500
+X-MC-Unique: yIVzf4RTNGyzDzYVvkCATQ-1
+Received: by mail-yw1-f200.google.com with SMTP id 00721157ae682-60413725f39so995717b3.2
+        for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 02:37:39 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706697459; x=1707302259;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BZ/5pXVh84yVqchUF8CdYzyQB86iKQFVoHBBNWzSgiI=;
+        b=ZE1rpXwNUaCibDR2Y4zMyt4wm36wEqjK0O0YYyWShizaJBVpYqF6ZrgzB8Wds218nV
+         YFqR8prYRUQ1Aw2wxeWmkNrQuvDvrtSe7xfBYUJfb8WsXC7eZNhZ6azgibH+b3Qhj0k+
+         2ChWTtuV0mWxmkOMALqNhArH2p9C9n/EL5sHXGaECgHzXcv1aTmuLVSZrlLY4Ayitd2f
+         IgsiJ682GXjSbM4cFdLAFHhOTmb2OTY/rK2ytuc/MrMXQ+7DV2TCjKpV1U182qyLyvN9
+         EKi96lTstos11R6+G86fVIuYhxHLUVrfhCh7rHsUZqvfkl3InGBPr7bmlP0FcmjoejeQ
+         QUFA==
+X-Gm-Message-State: AOJu0YxHfSIsU8rbmXJJqzlzEp+EggwKQcUg0a8hZuAUoSitdG3KRNkw
+	pBbpPcBbDJsXPYarrr2ulp8C9rfo4K2k4cFct8vzNvesArUhGEoFjJfptq6n0vPHRSZ4w8+sxWz
+	FGAXWOOkvVwd2T1LluKvt255gygGahy/zAFp2mww1IPRr55csa5Pwa4ViGzgR6lh3FxBIg/eiPN
+	U/OQPwudzspr2oS0INXYiKtRnE
+X-Received: by 2002:a81:c545:0:b0:5ff:a52b:55ac with SMTP id o5-20020a81c545000000b005ffa52b55acmr880382ywj.34.1706697458842;
+        Wed, 31 Jan 2024 02:37:38 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFshBQqoErbhHyr+Q5zY2LZvsx8RHksCLXSGgFJ0TPShcaDyG/Hw1jQof6Jm0l0MKneEtOr/J6LhaNERDvbBZw=
+X-Received: by 2002:a81:c545:0:b0:5ff:a52b:55ac with SMTP id
+ o5-20020a81c545000000b005ffa52b55acmr880376ywj.34.1706697458615; Wed, 31 Jan
+ 2024 02:37:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240131101350.109512-1-zhao1.liu@linux.intel.com>
-User-Agent: Mutt/2.2.12 (2023-09-09)
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
+References: <CAJSP0QX9TQ-=PD7apOamXvGW29VwJPfVNN2X5BsFLFoP2g6USg@mail.gmail.com>
+ <CAJaqyWdMNP3V=JL6C8SSbXV5AP_2O9SNJLUS+Go7AjVsrT1FdQ@mail.gmail.com>
+ <CAJSP0QXMJiRQFJh6383tnCOXyLwAbBYM7ff-mtregO3MKAEC1A@mail.gmail.com>
+ <CAJaqyWeKrjjMyRXo1LK4_2Q=HYKqd=omjDJ+by_=do9ppdCk3w@mail.gmail.com> <CAJSP0QU09UCkV6Q6HfsB8ozaE0mMC1tCH02e5CEBMPC_=eyUOw@mail.gmail.com>
+In-Reply-To: <CAJSP0QU09UCkV6Q6HfsB8ozaE0mMC1tCH02e5CEBMPC_=eyUOw@mail.gmail.com>
+From: Eugenio Perez Martin <eperezma@redhat.com>
+Date: Wed, 31 Jan 2024 11:37:02 +0100
+Message-ID: <CAJaqyWfy7io-F5LQKOWP8tWj8tsf8wa2MwUnOXzhYqF35g_LxA@mail.gmail.com>
+Subject: Re: Call for GSoC/Outreachy internship project ideas
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>, 
+	Alberto Faria <afaria@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, 
+	German Maglione <gmaglione@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, 
+	"Richard W.M. Jones" <rjones@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Warner Losh <imp@bsdimp.com>, 
+	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, 
+	Daniel Henrique Barboza <danielhb413@gmail.com>, Song Gao <gaosong@loongson.cn>, 
+	Akihiko Odaki <akihiko.odaki@daynix.com>, Bernhard Beschow <shentey@gmail.com>, 
+	Nicholas Piggin <npiggin@gmail.com>, Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 31, 2024 at 06:13:29PM +0800, Zhao Liu wrote:
-> From: Zhao Liu <zhao1.liu@intel.com>
-> 
-> Hi list,
-> 
-> This is the our v8 patch series, rebased on the master branch at the
-> commit 11be70677c70 ("Merge tag 'pull-vfio-20240129' of
-> https://github.com/legoater/qemu into staging").
-> 
-> Compared with v7 [1], v8 mainly has the following changes:
->   * Introduced smp.modules for x86 instead of reusing current
->     smp.clusters.
->   * Reworte the CPUID[0x1F] encoding.
-> 
-> Given the code change, I dropped the most previously gotten tags
-> (Acked-by/Reviewed-by/Tested-by from Michael & Babu, thanks for your
-> previous reviews and tests!) in v8.
-> 
-> With the description of the new modules added to x86 arch code in v7 [1]
-> cover letter, the following sections are mainly the description of
-> the newly added smp.modules (since v8) as supplement.
-> 
-> Welcome your comments!
-> 
-> 
-> Why We Need a New CPU Topology Level
-> ====================================
-> 
-> For the discussion in v7 about whether we should reuse current
-> smp.clusters for x86 module, the core point is what's the essential
-> differences between x86 module and general cluster.
-> 
-> Since, cluster (for ARM/riscv) lacks a comprehensive and rigorous
-> hardware definition, and judging from the description of smp.clusters
-> [2] when it was introduced by QEMU, x86 module is very similar to
-> general smp.clusters: they are all a layer above existing core level
-> to organize the physical cores and share L2 cache.
-> 
-> However, after digging deeper into the description and use cases of
-> cluster in the device tree [3], I realized that the essential
-> difference between clusters and modules is that cluster is an extremely
-> abstract concept:
->   * Cluster supports nesting though currently QEMU doesn't support
->     nested cluster topology. However, modules will not support nesting.
->   * Also due to nesting, there is great flexibility in sharing resources
->     on clusters, rather than narrowing cluster down to sharing L2 (and
->     L3 tags) as the lowest topology level that contains cores.
->   * Flexible nesting of cluster allows it to correspond to any level
->     between the x86 package and core.
-> 
-> Based on the above considerations, and in order to eliminate the naming
-> confusion caused by the mapping between general cluster and x86 module
-> in v7, we now formally introduce smp.modules as the new topology level.
+On Tue, Jan 30, 2024 at 8:34=E2=80=AFPM Stefan Hajnoczi <stefanha@gmail.com=
+> wrote:
+>
+> Hi Eugenio,
+> Stefano Garzarella and I had a SVQ-related project idea that I have added=
+:
+> https://wiki.qemu.org/Google_Summer_of_Code_2024#vhost-user_memory_isolat=
+ion
+>
+> We want to support vhost-user devices without exposing guest RAM. This
+> is attractive for security reasons in vhost-user-vsock where a process
+> that connects multiple guests should not give access to other guests'
+> RAM in the case of a security bug. It is also useful on host platforms
+> where guest RAM cannot be shared (we think this is the case on macOS
+> Hypervisor.framework).
+>
+> Please let us know if you have any thoughts about sharing/refactoring
+> the SVQ code.
+>
 
-What is the Linux kernel calling this topology level on x86 ?
-It will be pretty unfortunate if Linux and QEMU end up with
-different names for the same topology level.
+I'm totally in, sure :).
 
-With regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Actually I've been thinking about adding multithreading to SVQ. Since
+SVQ reuses a lot of code from the emulated devices in virtio.c, it
+would be great to add multithread to net devices too.
+
+On the other hand, I've not added indirect descriptor support because
+SVQ does not copy buffer memory by default, and there was little
+benefit because HW does not like indirections. It seems to me that
+reuse for your proposal would enable a justification to finally add
+it.
+
+Looking forward to this project, and I'd be happy to help it for sure. Than=
+ks!
 
 
