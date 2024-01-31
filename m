@@ -1,110 +1,101 @@
-Return-Path: <kvm+bounces-7515-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7516-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9F1C843264
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 02:00:59 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12A0F843266
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 02:01:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 729551F26F7C
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 01:00:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AA371B236FF
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 01:01:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 631CF18AE4;
-	Wed, 31 Jan 2024 01:00:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58DE0200A9;
+	Wed, 31 Jan 2024 01:00:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="G3n7s6iW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FeB8IdHX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1710517C8B
-	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 01:00:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31E401DA5E
+	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 01:00:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706662814; cv=none; b=bJXz4ImsVJPHch2nOzaqPSR9mbnq7H0kk1kPLv1Aff+YNjCSnYi7cMi9SCt/Bv/vCu8+Q2748znE+4yXYZBiJNc6zc0S25M+V0+8D30/+XqxNCIqqZCWrUsr+uhePWrRZ9I+iUXtcnmGlrlPpuWarjLQVRZQ0faJUhoKVsdOIdg=
+	t=1706662822; cv=none; b=LY2s17W3CEkqkIFiNWr+zU9Rh8rbwGgvzrmtwA27bQcnN7Z3l54mylAl4FJQ9Y5a7l28DaEpKOotsvsSm9+y7Jtn5iQx9rj6pzVjttCtoLplvEU26Mt9hp69jkG3/0fDq5mx6DTYN6NWKC6TBavjCKh4UaYmy2qFnHuaWo3JhSg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706662814; c=relaxed/simple;
-	bh=wgGzT6TUDG48PPLloOo3goD71TIEqTK3nSrqgx3qrtY=;
+	s=arc-20240116; t=1706662822; c=relaxed/simple;
+	bh=W81WAwbpwNinHckyfmuSp2lMOLfp9DwyrmSp+33sI1g=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=AGLJEUVQfzJGlVeqz3Uyc2C4FgwmXqBgAG2PtpmVHekZb8zhbQ2qy8aWAKHgDBq6Y7ZfJjpEHfuJsAljUd8QXdYBUYcw/ErP0dy3Xhx26CwOxReCwcSpN6g6+nZmBa6KCZZGg8MOaJoiBtORDK4Cn649jWkieyjABTrpBYSJ/nI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=G3n7s6iW; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=jdDBOrxILYhL7xDkTpwYcqFMwX+3Ay6twsEHJZOZ+wgDsz7MfQCO31Pw5Zq32nhJySfU3Db54UCuYJu/FM531HgHYRMsNQ00KhJbVZMpL+iAolaOKPMnMk7cz/j6zW9lIVegAyQvafwMTntG2WRewqVb+GLOGHm5jw5BiRF3SVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FeB8IdHX; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc6ba69e803so604220276.2
-        for <kvm@vger.kernel.org>; Tue, 30 Jan 2024 17:00:12 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1d90fe6eb71so6870015ad.1
+        for <kvm@vger.kernel.org>; Tue, 30 Jan 2024 17:00:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706662812; x=1707267612; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1706662820; x=1707267620; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=imus7iG1fygzlM/+HQtDbXSzUkJeHNIgQ1UAJ0qGMVo=;
-        b=G3n7s6iW6Eqm1qhJn6vDNSHAgFE87zTNWM2fWo3JNyGsnOpQcQBF3QZs1NxGdQMx/e
-         ezkuWRkENccxrXO0DHklin4CB1O2JhrdX1nydy2xaHbJBHgQ4JFW3G+TPQo+r2nOj5gG
-         m5lh0PvYoDdQz1wvvoOzwvFffrGUAz3JSslsY0l4vQfNeEszMG7qegn8iWfL7QB5i0n2
-         DD0q+UvVgzYSgFXqSLqFY80KutF+uzERbfZkqn27xJIjnlXjXLNFV94qnk2LPUa4l/7s
-         a1wNOSdkhF5iL8eH6FtJgmUXHKc/HIePLhI8a+Cb9GMdz2O1XwtLuzTBnXLiqzSv+xNX
-         K+2g==
+        bh=bKWIiu7uHz0RVP6+wAtO6U5GdJZCiWNuIT4RisPJ4tc=;
+        b=FeB8IdHXj7cIuFfSYeci3ynBgl5HLXN1rmDHHAF/O/e4GaIawfOxki1VOL+uuhBmKO
+         YE8Zj6PLMABeQCEyYFlboN83SzaKbbScUpHchQEKP/c4l3FNZdluRS8cux7RUNsX2OGm
+         hXEd/2GgUbWxIoLCC31Xj/yVmB3tcH67ExAeVizJomTgLp6/csNBhIdSVrVDqGp69zu4
+         UX3ZK2agyw8gp6gr0KHRUoqA8/PrPj135u5XwVPX07iI+L2oq9vKlu1AdJmeIFget05W
+         TjV+wYr0zvR4ro241BBfrQWv4KhI9AmR6L+d9pjmBaQoV6QvNggr7Aj79j4+DmfIqSi2
+         7yWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706662812; x=1707267612;
+        d=1e100.net; s=20230601; t=1706662820; x=1707267620;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=imus7iG1fygzlM/+HQtDbXSzUkJeHNIgQ1UAJ0qGMVo=;
-        b=D4wbAdRY3//TrC8H/T29tkCngfq+FUApB9HJnnD3IU8MGCUg0t3Y+1y1X6G12h6N2P
-         pOYKsRC402R5Utb8JGW3zVD4LltrUT57jyD3x5NEbX5v5trftU7W84B72+XmWDuV/n2j
-         j9/6SX6ltOIfLriSTn8bug5pU+/Y1Ov2VR1IwycT4sqDGWcV4r9VPZax6vltQIS81pWJ
-         Q9VQ5pO3c9bYhGr8IjcqcqPC485FCxuzHf+43MIy7bf7EWOrbYsjkd7xENC7any02bfR
-         MFZCyNNCaTXanqmSVvGJ9Hy7eHg5U09rWPymcvCEA7GA78q0v56btWWWaMAJlxljHA73
-         1ueg==
-X-Gm-Message-State: AOJu0YwMxz3U6t+hzdAR6rQYaodenVDNn6qtsslfLdmNOQreLGlSMNGs
-	nkEp4EqW12RUx1TiMHDPstgqhv5Xx/wVM5nW3I08lD33PUtqLrIeIKjapwve8XwVjni3b9PZh1d
-	eBg==
-X-Google-Smtp-Source: AGHT+IGoolaig8BLWgySJofQnaPMqobQkEKwg5l04qA235dPVfbdb8mdTfDb/M1PXPWp3ev5IMjPTztNJB4=
+        bh=bKWIiu7uHz0RVP6+wAtO6U5GdJZCiWNuIT4RisPJ4tc=;
+        b=etKmljZEaRCNbFNwdmAAi0Ca6x7dXlw2vc/ly/8bCCSh1GRDJoIB1h1gsMFQAood5U
+         2rW+WwlOqMJjGzJlH49JG3EvBg//FnMyD7mHisFiUGjJJPmQ4bXtxDmJYNPDVeHPKltY
+         +h8nQ8CEgNnZvyDPzefRjmNibkGqT19CCYl9ZtSRrB4+SSzm+lyZ8ijEnbu0yWUuiKaf
+         vW5jz3CfNEP/x2yH/fRRwkeJDNg4dpqmZcCwV8KGMFhu95I2UBhehwpl8WdDwi45250T
+         u8B9cbxEkrEhNwn1ScnNQsuqGmlNBXVNekHNyaGSDYDow8Y1EErLwjnclIQ590G4xOTA
+         TX/g==
+X-Gm-Message-State: AOJu0YwXyVNZ+ipI7pSlKscRsdbxmiWJ2fm+JBYICcgaBduOmoBBSI/Y
+	w3SOPrgb065WUh0u5EQDtThR9LEnS28rfMtk5iC6p/A3/g/anfWfRiXr7xvljLR0fTWLqhePn8s
+	TSQ==
+X-Google-Smtp-Source: AGHT+IEM1cso6fIfX03D7X87/AGdU86vxPOMTGT+qtgZw5no5IqwR/Eri9aeoz2kcYXs7sCN2nfhVwOS0sM=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:15c1:b0:dc2:4d91:fb4b with SMTP id
- l1-20020a05690215c100b00dc24d91fb4bmr61290ybu.9.1706662812244; Tue, 30 Jan
- 2024 17:00:12 -0800 (PST)
-Date: Tue, 30 Jan 2024 16:59:21 -0800
-In-Reply-To: <20231206170241.82801-7-ajones@ventanamicro.com>
+ (user=seanjc job=sendgmr) by 2002:a17:902:f748:b0:1d8:d3d4:4ee9 with SMTP id
+ g8-20020a170902f74800b001d8d3d44ee9mr699plw.1.1706662819214; Tue, 30 Jan 2024
+ 17:00:19 -0800 (PST)
+Date: Tue, 30 Jan 2024 16:59:23 -0800
+In-Reply-To: <20240109220302.399296-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20231206170241.82801-7-ajones@ventanamicro.com>
+References: <20240109220302.399296-1-seanjc@google.com>
 X-Mailer: git-send-email 2.43.0.429.g432eaa2c6b-goog
-Message-ID: <170629088388.3096286.8233473691080181709.b4-ty@google.com>
-Subject: Re: [PATCH 0/5] KVM: selftests: Remove redundant newlines
+Message-ID: <170629088602.3096343.7212872953446337485.b4-ty@google.com>
+Subject: Re: [PATCH] KVM: selftests: Delete superfluous, unused "stage"
+ variable in AMX test
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	kvm-riscv@lists.infradead.org, Andrew Jones <ajones@ventanamicro.com>
-Cc: pbonzini@redhat.com, maz@kernel.org, oliver.upton@linux.dev, 
-	anup@brainfault.org, borntraeger@linux.ibm.com, frankja@linux.ibm.com, 
-	imbrenda@linux.ibm.com
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 
-On Wed, 06 Dec 2023 18:02:42 +0100, Andrew Jones wrote:
-> This series has a lot of churn for dubious value, but I'm posting it
-> anyway since I've already done the work. Each patch in the series is
-> simply removing trailing newlines from format strings in TEST_* function
-> callsites, since TEST_* functions append their own. The first patch
-> addresses common lib and test code, the rest of the changes are split
-> by arch in the remaining patches.
+On Tue, 09 Jan 2024 14:03:02 -0800, Sean Christopherson wrote:
+> Delete the AMX's tests "stage" counter, as the counter is no longer used,
+> which makes clang unhappy:
+> 
+>   x86_64/amx_test.c:224:6: error: variable 'stage' set but not used
+>           int stage, ret;
+>               ^
+>   1 error generated.
 > 
 > [...]
 
-Applied to kvm-x86 selftests, with the fix for the "tsc\n" bug.  Thanks!
+Applied to kvm-x86 selftests, thanks!
 
-[1/5] KVM: selftests: Remove redundant newlines
-      https://github.com/kvm-x86/linux/commit/250e138d8768
-[2/5] KVM: selftests: aarch64: Remove redundant newlines
-      https://github.com/kvm-x86/linux/commit/95be17e4008b
-[3/5] KVM: selftests: riscv: Remove redundant newlines
-      https://github.com/kvm-x86/linux/commit/93e43e50b80b
-[4/5] KVM: selftests: s390x: Remove redundant newlines
-      https://github.com/kvm-x86/linux/commit/a38125f188c1
-[5/5] KVM: selftests: x86_64: Remove redundant newlines
-      https://github.com/kvm-x86/linux/commit/65612e993493
+[1/1] KVM: selftests: Delete superfluous, unused "stage" variable in AMX test
+      https://github.com/kvm-x86/linux/commit/46fee9e38995
 
 --
 https://github.com/kvm-x86/linux/tree/next
