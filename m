@@ -1,81 +1,61 @@
-Return-Path: <kvm+bounces-7588-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7589-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBEB084419C
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 15:16:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C67F8441F1
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 15:34:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4209B1F213DA
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 14:16:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CBF131F25F2A
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 14:34:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 045FB81AAF;
-	Wed, 31 Jan 2024 14:16:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CA2883CC0;
+	Wed, 31 Jan 2024 14:34:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="dgRaAODB"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WPkGeq5v"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 220B4762DD;
-	Wed, 31 Jan 2024 14:16:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BF5741AAB;
+	Wed, 31 Jan 2024 14:34:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706710607; cv=none; b=lVRPFRRN0RBONxM7GvGcZqpNbLnbQqLoPV7CBmuzS6ERc6ftnKu1ztLf9QTT48GZmkmK5hQ1Tn2KfI3FXsxftwn7kFD/I7qU1XBb9Xofs2xzu/zBSnoluoVMTBRCGPLdgVt+IYr810TNPd878jaCu+JNTU3uLt+9gEGx/U7qnJI=
+	t=1706711670; cv=none; b=K6/doZ8htLXp8Mo+s0U5fmwi1e6Hy6z+kVZORJSXJf3ZVNaMRBE+uxj3yo6nsMxlCAzO3HX+x2tLOZMXx3RRJ5/VEjESFLmOZBMDAnuaoLDYYd0Tfg5dOw2CphAYtrpRrG8UlRQfmsl4OO5jv6ShyYgyQl+ypaivH+1Z4CFYgo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706710607; c=relaxed/simple;
-	bh=Gtb1SAWDGEEOBfeIdV+KcYnSmri4QZUcptIg3t8uaE4=;
+	s=arc-20240116; t=1706711670; c=relaxed/simple;
+	bh=CYvz0qJVVOJjGjyVyIx0kkVnNE9jPzphOdhUwRpNJ7Y=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KH/b8Zze0R7ZfVZBQRWakkfTP3Dd3aeKvO+ronsyzjom2lusUUyXsKdLnh9Q6uUsntPe67w5fPhxAYUAoQ7mBo3nJHQu+sfc3XHFjXypO2VhRjeo5NSasRKJm1WUGObpJZF0pkyoKCrWl72HbywNaMuxruZtC0p1Tunyja8rwMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=dgRaAODB; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40VCOngZ025578;
-	Wed, 31 Jan 2024 14:16:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=z1/eLlLzF2xewLBMweZlcubwiaHIhEa+mEKnx7/v2yk=;
- b=dgRaAODBBjykGlBieNrsuVJmc6daOFOGR0/532eyRtgT0qMDMgq5zeALSY3K0lVWTCDr
- 5IHq4LXNSRpHeJ1opVhtTazdBX0wbSHgeHyX2IAag16GLUMD1Z7axu7khsxIesugAn3r
- oJdhvHYf1oGM/Bzo+zLw1K0o/BoWskDpXg33WNoBFlEeaIieKpcceqYDZfiMTGm4lj5v
- z9dDwnw2Y1OntURRDdni9NKwaHt+FN/cpFzKvldmKn0Lk2C7qEuozdrkcpwehHcWX8Py
- 3HYNMfWlKIrvRRpfkA5YJGs/NLPwcBZgS6xjmKNPD63eWiUqsHFnk1DnmRv/HJGkJCCd QA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vyfx4cq2x-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 31 Jan 2024 14:16:43 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 40VE0Io6026485;
-	Wed, 31 Jan 2024 14:16:43 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vyfx4cq1t-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 31 Jan 2024 14:16:43 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 40VCZvgJ007955;
-	Wed, 31 Jan 2024 14:16:41 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3vwdnm5q5k-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 31 Jan 2024 14:16:41 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 40VEGckb30081714
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 31 Jan 2024 14:16:38 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7A1BA2004B;
-	Wed, 31 Jan 2024 14:16:38 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 08A5E20043;
-	Wed, 31 Jan 2024 14:16:38 +0000 (GMT)
-Received: from [9.171.45.77] (unknown [9.171.45.77])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 31 Jan 2024 14:16:37 +0000 (GMT)
-Message-ID: <b1d55c6b-eb06-42ee-bb70-53735f1de138@linux.ibm.com>
-Date: Wed, 31 Jan 2024 15:16:37 +0100
+	 In-Reply-To:Content-Type; b=mE9x507y6oFdjOy6+9t4zBQzYmIjwYJPTsmGwsobU5I0s/fPgCcqhEbI0snyD34NaNI8jtNazrkaiCX/V9XUO72hmLJ+AzqPiangWTy/zXq1VFARmuLkZ8clw+qSx+X9/aIeltMI5BTbE4BvUIQUgcN9ZFUnZrNtoZ9mRC4SFuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WPkGeq5v; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706711668; x=1738247668;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=CYvz0qJVVOJjGjyVyIx0kkVnNE9jPzphOdhUwRpNJ7Y=;
+  b=WPkGeq5vAtbXl2XhX8InMnyzoshc+DqQUy8hYzVjaqKpixjhzwiLFbST
+   nupmGoie7Bq3VI5aXrg2WFjB5Ngr8lPwveBrj+LdzhxxiRw3la2Uady5O
+   JwR5su01Lvoa/xdW8LiBn1ZeYRp2gr+wTlUedVGkBsUOWUKXRbvCaEhao
+   V3H0kD8FOcKTTI1Jk+HsfgM70JI1L6LfIQTs6OPXYXEtqCYWMtOvPA/CB
+   fYo0+5VnSzeN+GN12waRZm/QnOIXb9RlVNzVcCc3S2rJnKLbsbbMRYfPO
+   +AsXZACVQ62AqGv89z4cKRSFjjZI7Rme5bWzNNPIrgFbQ6PmGtc7SC5mN
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="3451927"
+X-IronPort-AV: E=Sophos;i="6.05,231,1701158400"; 
+   d="scan'208";a="3451927"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2024 06:34:27 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,231,1701158400"; 
+   d="scan'208";a="4075207"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.33.17]) ([10.93.33.17])
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2024 06:34:23 -0800
+Message-ID: <ea5426ca-d74c-415d-8a70-ef64fa54639e@intel.com>
+Date: Wed, 31 Jan 2024 22:34:19 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,109 +63,77 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v2 1/5] lib: s390x: sigp: Dirty CC before
- sigp execution
+Subject: Re: [PATCH v18 004/121] KVM: VMX: Move out vmx_x86_ops to 'main.c' to
+ wrap VMX and TDX
 Content-Language: en-US
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
-        david@redhat.com, nsg@linux.ibm.com, nrb@linux.ibm.com
-References: <20240131074427.70871-1-frankja@linux.ibm.com>
- <20240131074427.70871-2-frankja@linux.ibm.com>
- <20240131125618.42f508d7@p-imbrenda>
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- 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
-In-Reply-To: <20240131125618.42f508d7@p-imbrenda>
+To: isaku.yamahata@intel.com, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+ erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+ Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
+ chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
+ Sean Christopherson <sean.j.christopherson@intel.com>,
+ Binbin Wu <binbin.wu@linux.intel.com>
+References: <cover.1705965634.git.isaku.yamahata@intel.com>
+ <e603c317587f933a9d1bee8728c84e4935849c16.1705965634.git.isaku.yamahata@intel.com>
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <e603c317587f933a9d1bee8728c84e4935849c16.1705965634.git.isaku.yamahata@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: GwJIpfOMbTmXTZKAC-QqyyNe8ejY5tvS
-X-Proofpoint-ORIG-GUID: cpMYK_LQT2dFz831XuQDyftpvb2Ymzyv
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-31_08,2024-01-30_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
- phishscore=0 lowpriorityscore=0 clxscore=1015 malwarescore=0 mlxscore=0
- mlxlogscore=934 impostorscore=0 priorityscore=1501 spamscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2401310109
 
-On 1/31/24 12:56, Claudio Imbrenda wrote:
-> On Wed, 31 Jan 2024 07:44:23 +0000
-> Janosch Frank <frankja@linux.ibm.com> wrote:
+On 1/23/2024 7:52 AM, isaku.yamahata@intel.com wrote:
+> From: Sean Christopherson <sean.j.christopherson@intel.com>
 > 
->> Dirtying the CC allows us to find missing CC changes when sigp is
->> emulated.
->>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> ---
->>   lib/s390x/asm/sigp.h | 6 +++++-
->>   1 file changed, 5 insertions(+), 1 deletion(-)
->>
->> diff --git a/lib/s390x/asm/sigp.h b/lib/s390x/asm/sigp.h
->> index 61d2c625..4eae95d0 100644
->> --- a/lib/s390x/asm/sigp.h
->> +++ b/lib/s390x/asm/sigp.h
->> @@ -49,13 +49,17 @@ static inline int sigp(uint16_t addr, uint8_t order, unsigned long parm,
->>   		       uint32_t *status)
->>   {
->>   	register unsigned long reg1 asm ("1") = parm;
->> +	uint64_t bogus_cc = SIGP_CC_NOT_OPERATIONAL;
->>   	int cc;
->>   
->>   	asm volatile(
->> +		"	tmll	%[bogus_cc],3\n"
->>   		"	sigp	%1,%2,0(%3)\n"
->>   		"	ipm	%0\n"
->>   		"	srl	%0,28\n"
->> -		: "=d" (cc), "+d" (reg1) : "d" (addr), "a" (order) : "cc");
->> +		: "=d" (cc), "+d" (reg1)
->> +		: "d" (addr), "a" (order), [bogus_cc] "d" (bogus_cc)
->> +		: "cc");
+> KVM accesses Virtual Machine Control Structure (VMCS) with VMX instructions
+> to operate on VM.  TDX doesn't allow VMM to operate VMCS directly.
+> Instead, TDX has its own data structures, and TDX SEAMCALL APIs for VMM to
+> indirectly operate those data structures.  This means we must have a TDX
+> version of kvm_x86_ops.
 > 
-> since you are doing changes in this inline asm, could you put names for
-> all the parameters? that way it will be more consistent and readable.
+> The existing global struct kvm_x86_ops already defines an interface which
+> fits with TDX.  But kvm_x86_ops is system-wide, not per-VM structure.  To
+> allow VMX to coexist with TDs, the kvm_x86_ops callbacks will have wrappers
+> "if (tdx) tdx_op() else vmx_op()" to switch VMX or TDX at run time.
 > 
+> To split the runtime switch, the VMX implementation, and the TDX
+> implementation, add main.c, and move out the vmx_x86_ops hooks in
+> preparation for adding TDX, which can coexist with VMX, i.e. KVM can run
+> both VMs and TDs.  Use 'vt' for the naming scheme as a nod to VT-x and as a
+> concatenation of VmxTdx.
+> 
+> The current code looks as follows.
+> In vmx.c
+>    static vmx_op() { ... }
+>    static struct kvm_x86_ops vmx_x86_ops = {
+>          .op = vmx_op,
+>    initialization code
+> 
+> The eventually converted code will look like
+> In vmx.c, keep the VMX operations.
+>    vmx_op() { ... }
+>    VMX initialization
+> In tdx.c, define the TDX operations.
+>    tdx_op() { ... }
+>    TDX initialization
+> In x86_ops.h, declare the VMX and TDX operations.
+>    vmx_op();
+>    tdx_op();
+> In main.c, define common wrappers for VMX and TDX.
+>    static vt_ops() { if (tdx) tdx_ops() else vmx_ops() }
+>    static struct kvm_x86_ops vt_x86_ops = {
+>          .op = vt_op,
+>    initialization to call VMX and TDX initialization
+> 
+> Opportunistically, fix the name inconsistency from vmx_create_vcpu() and
+> vmx_free_vcpu() to vmx_vcpu_create() and vmx_vcpu_free().
+> 
+> Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
 
-NACK, not in this series.
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+
 
