@@ -1,75 +1,77 @@
-Return-Path: <kvm+bounces-7612-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7613-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00614844CB2
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 00:26:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEEB8844CB5
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 00:27:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3290A1C203F6
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 23:26:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7326A1F2901F
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 23:27:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4711F4654B;
-	Wed, 31 Jan 2024 23:09:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D15EB47F46;
+	Wed, 31 Jan 2024 23:09:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i67o2CFj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SS0x9QY3"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9F923B78D
-	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 23:09:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72B784779F
+	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 23:09:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706742550; cv=none; b=UvF12fmTEapwrQqFO5MDgiPYysqr/EhcZQjO5QXgxiqr9gkJeL2TSh0xshY9pNnzi02kqmfWQPcwox8fSyftFtjV/KD5GhA5noySJ2E7dJ9gT0z0aSQHdI7bSBjuBiw7wyzzzMyf+BpCHXNjH0kDMAZk2LWgmXgFWdoiLM6PFgM=
+	t=1706742553; cv=none; b=e+HMvR+FgR8zIxh8C1MxmFZzVcpmlnr88zIURde1dJwrNl/wPpLu+0Z37h2hNYFVcnGl2takYYGPmNt5My7VHaBcmF/5e9Jk0AdQ258CaYsS8HAxQw+xKzAotLV52OHdL3UdA9AE1jcMpq9c4LOi9ZBvFuEXOegGpLWDBy5OAGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706742550; c=relaxed/simple;
-	bh=U3zze03rYR9J4ydeGjvVX+Qf6+csvmvvvlokpUg28Rg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Ibk2ysFMuQ0J2j8vTwJgoPuz/dt0bv0Qkd1c2a8CvFOkJQ168YkmJQeHqG3WY21h9i2hTa389yIVYXCn3BFHk3IsV6RNq4yyToxOWnfmV9ew6ugEElaK79QyO2pViUCYGUf1Sj0euFXlzP9m8A0moipJOzSHzI9qaeIBJEcXM0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=i67o2CFj; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1706742553; c=relaxed/simple;
+	bh=AITC0g6KpE00MHHi4gqzkoS6GaRfFWD8G+vwLdrjOPo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SqtKTAOwaFdWEh3Eh/rR4C6NRgKbCe0U9dICRNzVGbT6SbM/ZKQzabnzdBOhRQk7DxUp8rz9hlOTz6A08lNsRGbN8bKWL6WwPiSAs4w5z1RVJzw8e4rzaXqnjuqVLX/vArK5w31q8VdvRbdKTh/XgECId14lh5rQOtdIOqTnM9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SS0x9QY3; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706742547;
+	s=mimecast20190719; t=1706742549;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=wn5H9c6FKbtv2kaoojksI6x/4GykFYB4EqXdTdRH6Pk=;
-	b=i67o2CFjVfUf/xfsi2gEhw8i0gpoXKjnl7zclnJxDkAxpJBg1x31iqKfKe3s4T8vur2KDE
-	hccvJbu0trik/cwrAypZUlOuIsOhnZi3Oo38ZgHjzBt+T3DNMZXccrIonqM36uZlToQYCW
-	VRq9irHalpeP7L6SyEIZKV7qjJCiYyA=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6tcUd6aqQBTGujreDUlh09+Wd/lkDDTLdTqmcFaCI+4=;
+	b=SS0x9QY3wFco+YJWHeBeN78CIfWxhigd/5bJrMKItiaClLP3fAOnyjvECQ2f2TrkY/PgQr
+	xmf7V/yErX5p+7B1TcEsoD/gz80Hjsd8xANwgdQcaMeKJ/A8eM3y/eb5rC2wuNqmtw8whz
+	WAH68Xnsla9J25SaXMNmwXV2AgzOE9g=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-392-3X6tnb3vM4uer-KAVdcATQ-1; Wed, 31 Jan 2024 18:09:05 -0500
-X-MC-Unique: 3X6tnb3vM4uer-KAVdcATQ-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-33aec659d0aso632312f8f.0
-        for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 15:09:05 -0800 (PST)
+ us-mta-509-_SE6PFjhOxmBGyAnwcc3nw-1; Wed, 31 Jan 2024 18:09:08 -0500
+X-MC-Unique: _SE6PFjhOxmBGyAnwcc3nw-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-33b14a51901so5455f8f.2
+        for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 15:09:08 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706742545; x=1707347345;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wn5H9c6FKbtv2kaoojksI6x/4GykFYB4EqXdTdRH6Pk=;
-        b=Mt7jyy4VsrWjQhJWES3RQiWyW4XC8JlFx5GKqyzReRTa1W9uEbemE2Jdkvweh9KI1F
-         3zNDBtr9Fs+/4gLXPFVQA1B3vRnfE9Knhrxj8m0yDP+bCi1INB7ARr7lAvumbQpOjtqt
-         Ggd9GM226t4AMjG4RixKWGZfXxNibnhTcx6p2s4UKgI4FEczepKF4ojwwSBhVHrO7R+I
-         qFUHCg8t7DPYzokr9JbLUFaxz8PEYprNgrNWR3lyoiej7m3cFDzAKMYaT/802ComxRBm
-         /73HZH0ciXhgjzRfWQZY0rAdPkH5oHVUTSq0DJ9hBuwBZ8S06rg/tlPUK6EHQGt2OKPh
-         TN0w==
-X-Gm-Message-State: AOJu0YxMQhiJEac2ZTLXCmU0IU2DMjecgtvF8wTlaU7o1laxngjE3vc4
-	lo0gcg55VimP9pv4koRAzX0ezp2rNjO+qIRpJbnrZzH0+3YjKEEgx7fGhBBCGOam/4+9dGZx7cA
-	WrD/ptPVfJC+gwqcLrOYB0sl29XQCQlAy+r4ixOJDpFR42KMzZw==
-X-Received: by 2002:adf:f851:0:b0:33b:146e:241f with SMTP id d17-20020adff851000000b0033b146e241fmr36412wrq.4.1706742544794;
-        Wed, 31 Jan 2024 15:09:04 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFKFqJlbUDXcFwA216i9Cm/Cmaahpr4+i21Re3cmDbw1k8bOGY9R17PpiVJWG0x+U+fgdI6KA==
-X-Received: by 2002:adf:f851:0:b0:33b:146e:241f with SMTP id d17-20020adff851000000b0033b146e241fmr36399wrq.4.1706742544417;
-        Wed, 31 Jan 2024 15:09:04 -0800 (PST)
+        d=1e100.net; s=20230601; t=1706742547; x=1707347347;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6tcUd6aqQBTGujreDUlh09+Wd/lkDDTLdTqmcFaCI+4=;
+        b=rsgUOJwNHDRzCNHVLfUTVQJeeLfghICbSlgyiBjuU37XjUbLL9AfsuG+nsqphlJNwW
+         hAmRdOAjyFlnt/ZgYdOYc5I1Wm5Vl/KlxBF0adA8UXLOEl8DXDCW6JmWg5DJvKwyVMnr
+         tZ2tMtVAvbi9IcPb5DJYL5jVBR1lDn+u0edPFeXeJTVxyifbhNG4kBrGAiu93lUhwpjY
+         UU4QYQIhJcysPTEilf8tXn2TO9vnHPrqILFrO9g6naNMJlCIu3MjEU5w2sox9HKYgHWI
+         b/tN8/8orQlPE/UTOv+2VotbKi0I+BKiQDjHQI6WfuARiIJDWIeyPDkkJ813urT8IGYE
+         5fJw==
+X-Gm-Message-State: AOJu0YxxDrHWX07FYfEEHfTHODhFbgneDzUaEHH1xSYByU22q8NuNgCa
+	mKDO7QzLdp9hWgmYwQiT4IjFbJFAMnPOitKFdCB3/jc50IcgObyPkaFbR4YlZ8K6rKrR1si4Pyu
+	vLTxNxgV57zqouVgak8gAOKR/E/VbZLSfDQVWmIkJsubNfq9+WQ==
+X-Received: by 2002:adf:e2c5:0:b0:33a:fe3b:b2ae with SMTP id d5-20020adfe2c5000000b0033afe3bb2aemr1897576wrj.66.1706742547299;
+        Wed, 31 Jan 2024 15:09:07 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHAzHcFMYzZ1Fjt1TKLWmURRBot7v+72esHPyNaiZPiNsBBgagAdfrkSX8NfQy6730BbzqiyA==
+X-Received: by 2002:adf:e2c5:0:b0:33a:fe3b:b2ae with SMTP id d5-20020adfe2c5000000b0033afe3bb2aemr1897565wrj.66.1706742547097;
+        Wed, 31 Jan 2024 15:09:07 -0800 (PST)
 Received: from [10.10.0.32] ([213.214.41.32])
-        by smtp.gmail.com with ESMTPSA id l10-20020a056000022a00b0033af350fb88sm7797114wrz.25.2024.01.31.15.09.03
+        by smtp.gmail.com with ESMTPSA id a2-20020a5d4d42000000b0033afe816977sm3900965wru.66.2024.01.31.15.09.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Jan 2024 15:09:03 -0800 (PST)
+        Wed, 31 Jan 2024 15:09:05 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org
@@ -83,10 +85,12 @@ Cc: Zixi Chen <zixchen@redhat.com>,
 	Ingo Molnar <mingo@kernel.org>,
 	x86@kernel.org,
 	stable@vger.kernel.org
-Subject: [PATCH v2 0/2] x86/cpu: fix invalid MTRR mask values for SEV or TME
-Date: Thu,  1 Feb 2024 00:09:00 +0100
-Message-ID: <20240131230902.1867092-1-pbonzini@redhat.com>
+Subject: [PATCH v2 1/2] x86/cpu: allow reducing x86_phys_bits during early_identify_cpu()
+Date: Thu,  1 Feb 2024 00:09:01 +0100
+Message-ID: <20240131230902.1867092-2-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240131230902.1867092-1-pbonzini@redhat.com>
+References: <20240131230902.1867092-1-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -96,46 +100,59 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Supersedes: <20240130180400.1698136-1-pbonzini@redhat.com>
+In commit fbf6449f84bf ("x86/sev-es: Set x86_virt_bits to the correct
+value straight away, instead of a two-phase approach"), the initialization
+of c->x86_phys_bits was moved after this_cpu->c_early_init(c).  This is
+incorrect because early_init_amd() expected to be able to reduce the
+value according to the contents of CPUID leaf 0x8000001f.
 
-MKTME repurposes the high bit of physical address to key id for encryption
-key and, even though MAXPHYADDR in CPUID[0x80000008] remains the same,
-the valid bits in the MTRR mask register are based on the reduced number
-of physical address bits.  This breaks boot on machines that have TME enabled
-and do something to cleanup MTRRs, unless "disable_mtrr_cleanup" is
-passed on the command line.  The fix is to move the check to early CPU
-initialization, which runs before Linux sets up MTRRs.
+Fortunately, the bug was negated by init_amd()'s call to early_init_amd(),
+which does reduce x86_phys_bits in the end.  However, this is very
+late in the boot process and, most notably, the wrong value is used for
+x86_phys_bits when setting up MTRRs.
 
-However, as noticed by Kirill, the patch I sent as v1 actually works only
-until Linux 6.6.  In Linux 6.7, commit fbf6449f84bf ("x86/sev-es: Set
-x86_virt_bits to the correct value straight away, instead of a two-phase
-approach") reorganized the initialization of c->x86_phys_bits in a way
-that broke the patch.  But even in 6.7 AMD processors, which did try to
-reduce it in this_cpu->c_early_init(c), had their x86_phys_bits value
-overwritten by get_cpu_address_sizes(), so that early_identify_cpu()
-left the wrong value in x86_phys_bits.  This probably went unnoticed
-because on AMD processors you need not apply the reduced MAXPHYADDR to
-MTRR masks.
+To fix this, call get_cpu_address_sizes() as soon as X86_FEATURE_CPUID is
+set/cleared, and c->extended_cpuid_level is retrieved.
 
-Therefore, this v2 prepends the fix for this issue in commit fbf6449f84bf.
-Apologies for the oversight.
+Fixes: fbf6449f84bf ("x86/sev-es: Set x86_virt_bits to the correct value straight away, instead of a two-phase approach")
+Cc: Adam Dunlap <acdunlap@google.com>
+Cc: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Cc: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: Kai Huang <kai.huang@intel.com>
+Cc: Dave Hansen <dave.hansen@linux.intel.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@kernel.org>
+Cc: x86@kernel.org
+Cc: stable@vger.kernel.org
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kernel/cpu/common.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Tested on an AMD Epyc machine (where I resorted to dumping mtrr_state) and
-on the problematic Intel Emerald Rapids machine.
-
-Thanks,
-
-Paolo
-
-Paolo Bonzini (2):
-  x86/cpu: allow reducing x86_phys_bits during early_identify_cpu()
-  x86/cpu/intel: Detect TME keyid bits before setting MTRR mask
-    registers
-
- arch/x86/kernel/cpu/common.c |   4 +-
- arch/x86/kernel/cpu/intel.c  | 178 ++++++++++++++++++-----------------
- 2 files changed, 93 insertions(+), 89 deletions(-)
-
+diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
+index 0b97bcde70c6..fbc4e60d027c 100644
+--- a/arch/x86/kernel/cpu/common.c
++++ b/arch/x86/kernel/cpu/common.c
+@@ -1589,6 +1589,7 @@ static void __init early_identify_cpu(struct cpuinfo_x86 *c)
+ 		get_cpu_vendor(c);
+ 		get_cpu_cap(c);
+ 		setup_force_cpu_cap(X86_FEATURE_CPUID);
++		get_cpu_address_sizes(c);
+ 		cpu_parse_early_param();
+ 
+ 		if (this_cpu->c_early_init)
+@@ -1601,10 +1602,9 @@ static void __init early_identify_cpu(struct cpuinfo_x86 *c)
+ 			this_cpu->c_bsp_init(c);
+ 	} else {
+ 		setup_clear_cpu_cap(X86_FEATURE_CPUID);
++		get_cpu_address_sizes(c);
+ 	}
+ 
+-	get_cpu_address_sizes(c);
+-
+ 	setup_force_cpu_cap(X86_FEATURE_ALWAYS);
+ 
+ 	cpu_set_bug_bits(c);
 -- 
 2.43.0
 
