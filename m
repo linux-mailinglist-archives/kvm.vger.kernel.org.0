@@ -1,161 +1,137 @@
-Return-Path: <kvm+bounces-7532-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7535-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B77B68437D7
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 08:28:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9005D84382C
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 08:45:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 737D4284308
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 07:27:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2FA41C2582E
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 07:45:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25DB35813B;
-	Wed, 31 Jan 2024 07:22:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B9A557339;
+	Wed, 31 Jan 2024 07:45:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RK7HR50b"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="OI7iAzO7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C24014F608;
-	Wed, 31 Jan 2024 07:22:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 419775FBA3;
+	Wed, 31 Jan 2024 07:44:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706685766; cv=none; b=aRBGSLBg7kPDhw7VbmsnjJgDWwUHSOcwt9S2s1J+xSOV1wRJgo/6joDcvUBh7JfvZWTHtRAEtPb38ZWfQvtgCTfujRADwCY1aM+gs2pdnhjUP/fBEp/deHY54NJQtMxDBJyZOM8TnwJ1mFNfliN2QHG+fd5XT7yKLbOPC68IeR0=
+	t=1706687100; cv=none; b=gNEhHyLEpyc0w3m4Y/LzvrOWc//dNbrw58N2f+D0RSlegrW876XO3ubXswkzRmXIy7w6KHKA44ZZyfaiqro/uByB5ZqaXyEO4Maw6WGgiNbHEY9knbWUQWDshEqVclBKtmJ/XVhbfeFV6J4H1iZIldI1CyTyYW6Mo0zOPxdlkV8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706685766; c=relaxed/simple;
-	bh=UUE+/VJXlKc4HQKfxBesRIPvkbX3DupU4onjGeqAeHI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E+fv9/W3Msj41GYDaANDgU7XmuE2MWlMqClcHi+Bk3n4k9EPsx6jptzOSRWktdGBRoEjS5tlsPFZ/O+mkgTxRnJj7QpXx323fYGsaDSDSl58Qs+fmx/uf31b7CGHPbk5s36/QEZ3QDpluhxmmuyh2JZLKHNJOWILFB2Xo6vWy3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RK7HR50b; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706685765; x=1738221765;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=UUE+/VJXlKc4HQKfxBesRIPvkbX3DupU4onjGeqAeHI=;
-  b=RK7HR50bOjXsY4ogRtK6+RkHNMoHs36zAC+hV9zeuM4p9a7NkXccwvZ1
-   X/KpSXKiVvAOcCxDoSiGdzeCUPIZp3biDYJynfxAbLPqUhho0Sipt1Pup
-   0+vMXL97L4L/RpsfuZS9KLPumiRhqu1gA9hKDL6JkCGTLVBxe75GJC5a1
-   sv2c6mLn4xD81Opngm9n+gnh01NqgNhkHiA/5ph0M8Y7+2MPI6ZyZIMFF
-   DAiYwHO3PLXGd58Ca7m882XvjOrqOB2KdPOCBkYtOge6APKusDGWFhBBV
-   mWfLupZIclrEVt8PSrMh4z2/vhuc1b7LhqLilgkU8NEubaWEAPjRUCu4+
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="3359615"
-X-IronPort-AV: E=Sophos;i="6.05,231,1701158400"; 
-   d="scan'208";a="3359615"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jan 2024 23:22:44 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="788484430"
-X-IronPort-AV: E=Sophos;i="6.05,231,1701158400"; 
-   d="scan'208";a="788484430"
-Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
-  by orsmga002.jf.intel.com with ESMTP; 30 Jan 2024 23:22:39 -0800
-Date: Wed, 31 Jan 2024 15:22:39 +0800
-From: Yuan Yao <yuan.yao@linux.intel.com>
-To: isaku.yamahata@intel.com
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-	erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
-	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
-	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
-	Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: Re: [PATCH v18 013/121] KVM: TDX: Add TDX "architectural" error codes
-Message-ID: <20240131072239.wirjxijv7kumy3g4@yy-desk-7060>
-References: <cover.1705965634.git.isaku.yamahata@intel.com>
- <212f22ed28e43c016607e3c420d7d98910878007.1705965634.git.isaku.yamahata@intel.com>
+	s=arc-20240116; t=1706687100; c=relaxed/simple;
+	bh=UM6/zkdoNiwVS+WydWJVd2C2Pgo9XyKLremQp9WsTOg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=O10cqj6WMjRCZLTwxHWrlQbsRRVMyT8gitsjPso6i1oSMHOxPMzr3hRhUSeZK/6i2AHUWPtBfsG7FcIMsENLlD5dQoiHMqdoWM0k6QcRSKPDaJyHgvDLWttgfABY+c3hMojMMpmAXz6RzMGfW+IMnlHnGdqBG+1wTvXxvP8ks+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=OI7iAzO7; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40V6Huis032268;
+	Wed, 31 Jan 2024 07:44:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=Ix/2K9UVc6Dr0BIQ8Qu2PAODInqVRDkg8E05rwWw8HY=;
+ b=OI7iAzO728/7YacXt56AL44jmWmf4hld0kBufir3zmgDk0iWO6y7bmLGyOQ91MHQoOhT
+ gbxdsDowqhHy57oPAVPq5HOxxivilkQNoe9CBexkEnrVIZaiRBxs/QFhS5AYgrVkiYqq
+ Cm3RIo9BL45kyfbY3hDOqpmLnd0T/tcaZ0pfdH5jIns2OQnfoCL1s+QUOMI2ToSyxW68
+ HeNBMrHjwquEk+XQWMyjv6MfDd0vlSw7hAnoDY6Hu1vxH5eUY7iWc9brtkD11ku0VTuY
+ Bzx8PGZh4aKFGfSZvLUHAW9IhThCZyO0nVljnDOnxwdqTyZPDRlk5ZKCrd70VmeO7IZM zg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vyac9a3dn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 31 Jan 2024 07:44:56 +0000
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 40V6rSVI020853;
+	Wed, 31 Jan 2024 07:44:56 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vyac9a3dd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 31 Jan 2024 07:44:56 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 40V6kQb2010858;
+	Wed, 31 Jan 2024 07:44:55 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3vweckkpsn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 31 Jan 2024 07:44:55 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 40V7iq0W27591192
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 31 Jan 2024 07:44:52 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 85E602004D;
+	Wed, 31 Jan 2024 07:44:52 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4B27820040;
+	Wed, 31 Jan 2024 07:44:52 +0000 (GMT)
+Received: from a46lp67.lnxne.boe (unknown [9.152.108.100])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 31 Jan 2024 07:44:52 +0000 (GMT)
+From: Janosch Frank <frankja@linux.ibm.com>
+To: kvm@vger.kernel.org
+Cc: linux-s390@vger.kernel.org, imbrenda@linux.ibm.com, thuth@redhat.com,
+        david@redhat.com, nsg@linux.ibm.com, nrb@linux.ibm.com
+Subject: [kvm-unit-tests PATCH v2 0/5] s390x: Dirty cc before executing tested instructions
+Date: Wed, 31 Jan 2024 07:44:22 +0000
+Message-Id: <20240131074427.70871-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.40.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: rWsJPSOdS9R1ePVcG9Al8bTFbaVNXIdE
+X-Proofpoint-GUID: HOd9ZHUpiQ_BrxbwQSmbQZpiLgPCKLEQ
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <212f22ed28e43c016607e3c420d7d98910878007.1705965634.git.isaku.yamahata@intel.com>
-User-Agent: NeoMutt/20171215
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-31_02,2024-01-30_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=2 mlxlogscore=164 bulkscore=0
+ phishscore=0 lowpriorityscore=0 clxscore=1015 adultscore=0 spamscore=2
+ impostorscore=0 malwarescore=0 priorityscore=1501 suspectscore=0
+ mlxscore=2 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2401310057
 
-On Mon, Jan 22, 2024 at 03:52:49PM -0800, isaku.yamahata@intel.com wrote:
-> From: Sean Christopherson <sean.j.christopherson@intel.com>
->
-> Add error codes for the TDX SEAMCALLs both for TDX VMM side for TDH
-> SEAMCALL and TDX guest side for TDG.VP.VMCALL.  KVM issues the TDX
-> SEAMCALLs and checks its error code.  KVM handles hypercall from the TDX
-> guest and may return an error.  So error code for the TDX guest is also
-> needed.
->
-> TDX SEAMCALL uses bits 31:0 to return more information, so these error
-> codes will only exactly match RAX[63:32].  Error codes for TDG.VP.VMCALL is
-> defined by TDX Guest-Host-Communication interface spec.
->
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  arch/x86/kvm/vmx/tdx_errno.h | 43 ++++++++++++++++++++++++++++++++++++
->  1 file changed, 43 insertions(+)
->  create mode 100644 arch/x86/kvm/vmx/tdx_errno.h
->
-> diff --git a/arch/x86/kvm/vmx/tdx_errno.h b/arch/x86/kvm/vmx/tdx_errno.h
-> new file mode 100644
-> index 000000000000..7f96696b8e7c
-> --- /dev/null
-> +++ b/arch/x86/kvm/vmx/tdx_errno.h
-> @@ -0,0 +1,43 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/* architectural status code for SEAMCALL */
-> +
-> +#ifndef __KVM_X86_TDX_ERRNO_H
-> +#define __KVM_X86_TDX_ERRNO_H
-> +
-> +#define TDX_SEAMCALL_STATUS_MASK		0xFFFFFFFF00000000ULL
-> +
-> +/*
-> + * TDX SEAMCALL Status Codes (returned in RAX)
-> + */
-> +#define TDX_NON_RECOVERABLE_VCPU		0x4000000100000000ULL
-> +#define TDX_INTERRUPTED_RESUMABLE		0x8000000300000000ULL
-> +#define TDX_OPERAND_INVALID			0xC000010000000000ULL
-> +#define TDX_OPERAND_BUSY			0x8000020000000000ULL
-> +#define TDX_PREVIOUS_TLB_EPOCH_BUSY		0x8000020100000000ULL
-> +#define TDX_VCPU_NOT_ASSOCIATED			0x8000070200000000ULL
-> +#define TDX_KEY_GENERATION_FAILED		0x8000080000000000ULL
-> +#define TDX_KEY_STATE_INCORRECT			0xC000081100000000ULL
-> +#define TDX_KEY_CONFIGURED			0x0000081500000000ULL
-> +#define TDX_NO_HKID_READY_TO_WBCACHE		0x0000082100000000ULL
-> +#define TDX_FLUSHVP_NOT_DONE			0x8000082400000000ULL
-> +#define TDX_EPT_WALK_FAILED			0xC0000B0000000000ULL
-> +#define TDX_EPT_ENTRY_NOT_FREE			0xC0000B0200000000ULL
+A recent s390 KVM fixpatch [1] showed us that checking the cc is not
+enough when emulation code forgets to set the cc. There might just be
+the correct cc in the PSW which would make the cc check succeed.
 
-Looks these 2 TDX_EPT_xx are not used, so can remove them.
+This series intentionally dirties the cc for sigp, uvc, some io
+instructions and sclp to make cc setting errors more apparent. I had a
+cursory look through the tested instructions and those are the most
+prominent ones with defined cc values.
 
-Reviewed-by: Yuan Yao <yuan.yao@intel.com>
+Since the issue appeared in PQAP my AP test series is now dependent on
+this series.
 
-> +#define TDX_EPT_ENTRY_STATE_INCORRECT		0xC0000B0D00000000ULL
-> +
-> +/*
-> + * TDG.VP.VMCALL Status Codes (returned in R10)
-> + */
-> +#define TDG_VP_VMCALL_SUCCESS			0x0000000000000000ULL
-> +#define TDG_VP_VMCALL_RETRY			0x0000000000000001ULL
-> +#define TDG_VP_VMCALL_INVALID_OPERAND		0x8000000000000000ULL
-> +#define TDG_VP_VMCALL_TDREPORT_FAILED		0x8000000000000001ULL
-> +
-> +/*
-> + * TDX module operand ID, appears in 31:0 part of error code as
-> + * detail information
-> + */
-> +#define TDX_OPERAND_ID_RCX			0x01
-> +#define TDX_OPERAND_ID_SEPT			0x92
-> +#define TDX_OPERAND_ID_TD_EPOCH			0xa9
-> +
-> +#endif /* __KVM_X86_TDX_ERRNO_H */
-> --
-> 2.25.1
->
->
+[1] https://lore.kernel.org/kvm/20231201181657.1614645-1-farman@linux.ibm.com/
+
+v2:
+	* Moved from spm to tmll (thanks Nina)
+
+Janosch Frank (5):
+  lib: s390x: sigp: Dirty CC before sigp execution
+  lib: s390x: uv: Dirty CC before uvc execution
+  lib: s390x: css: Dirty CC before css instructions
+  s390x: mvpg: Dirty CC before mvpg execution
+  s390x: sclp: Dirty CC before sclp execution
+
+ lib/s390x/asm/sigp.h |  6 +++++-
+ lib/s390x/asm/uv.h   |  4 +++-
+ lib/s390x/css.h      | 16 ++++++++++++----
+ s390x/mvpg.c         |  6 ++++--
+ s390x/sclp.c         |  5 ++++-
+ 5 files changed, 28 insertions(+), 9 deletions(-)
+
+-- 
+2.40.1
+
 
