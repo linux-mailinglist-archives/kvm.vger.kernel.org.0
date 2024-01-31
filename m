@@ -1,59 +1,59 @@
-Return-Path: <kvm+bounces-7568-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7569-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65E4E843BB3
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 11:02:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDF79843BB4
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 11:02:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A8DD1C26454
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 10:02:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6B92B1F2C957
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 10:02:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D499069D39;
-	Wed, 31 Jan 2024 10:01:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F58C69DEB;
+	Wed, 31 Jan 2024 10:01:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="C1bAvBvJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WgtTjliq"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B45467C51
-	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 10:01:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0EC567C51
+	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 10:01:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706695289; cv=none; b=CjVv2GRQXVnznaMgd/QQAc/zzjODzD4HUXyDR8z7Qm0ng12d/psO1PDub0hHAjNZO+/nopBe29CNLyzAD2NXVwiQfovR812uXw35H7S3pFcTsTR0jTaqf4+54V63Kd+7LM+FlutqA16VArC2TVa/SPAJAlD1ztgjbhI3WpVlNUs=
+	t=1706695293; cv=none; b=PeVtrc4ZAD6J2bjhQZjwtayALfZlLB9NGTj1Ia2vChxJbzkHP88MWk4MYtZ/TldHJoUKTJZpYbbdwOqZiqLwK9dX9DSzu5FbzIjXzXQtrTgObv4pIV9htJc0O09gwtsYfmd/CxliBjToH1Xm6GGys9MXG22eWWJtWpNAEVyk2cc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706695289; c=relaxed/simple;
-	bh=UM7ZZqMgruDN7ot3TMcwFYXsOFWdcg8mETgGBxArI7I=;
+	s=arc-20240116; t=1706695293; c=relaxed/simple;
+	bh=rQH4cb88YQu4USO/rc23aIuAEVq0GLT8oyYQVius5i4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=YLviDH8iLGo1G7dhbBFQ46L+B9cyPsPgTw3rXE11bVRXuQK/n+71jS8wL1JSJue1d5ZZW2f7o9U2OA6iLqttkqVZcEdgvOnEHtkS5VSGJbnuvvEQBKowA0kBTeQmhWNDwCHdiW84Amfi8nvwWI79SSKIxILo9+oQZzjWDefZdJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=C1bAvBvJ; arc=none smtp.client-ip=192.198.163.7
+	 MIME-Version; b=lwbN+BS4ZVzc+R2Ubs3YG/HF6jlJbbPTf/IjtP6kwuSXR5FEafe2XB6xOUL8VtHUAETVvAA0OqZyysdOune3gcsH8jEbT3LPKCK6RfOANTMmAy947iaZWGChPyW5N4s8KoH3FZsUG005GgQiYpTQVnLGRhYL5CEMECUx2SvmSAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WgtTjliq; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706695287; x=1738231287;
+  t=1706695291; x=1738231291;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=UM7ZZqMgruDN7ot3TMcwFYXsOFWdcg8mETgGBxArI7I=;
-  b=C1bAvBvJdxQomGYhKMPyXRi3cFQb5p1s8KQfOarC9GsuRFD828Xag+pp
-   cykHmwHLsVp+hRndSvY1LZLgu6L7+RqQivMDKEB/11wP1LB9Q6fJTFH+v
-   gpCYbZ94wU0TggzGsXfrGiRs/85TZoxLg0ziAckTIS0Ap9C/ZmF99+pTk
-   5kGQtxdUGW2D4n0xCF5R5Tidh+qeyDBm+tLq8+2VbP6+nNGbEKfYqAS/V
-   sJHLFZf4MkU3Ie7Qz7ZlOqPGzXv/I2piddubt73/Nl+h2QhAT6Rx0LYyZ
-   TgGAOVNEQp2ujW9/XU+CgizjEAgAGS1mcwXmAB96JJkTf7FT5YP2otmli
+  bh=rQH4cb88YQu4USO/rc23aIuAEVq0GLT8oyYQVius5i4=;
+  b=WgtTjliqv6emdncuAlxwYiY9rDaSRh5YsZaBic3B7qJrtFIOuWQqJpYS
+   9kQMqOcE0xXjsyUXW8eZjdPD86HGbwQmOw8vV3YSqmYFSBMyrT1R25JUN
+   xAY4iXS+quqdSqFu1LvMzot6UZh6JVuEz0klYPf8ziES57v5+BcSZbhly
+   xbsF1sAi5tyvSKSpsi8AmyIRmmb7/7/uIDe90InVKYpXLD2xO525FdrKw
+   gFdp3WU/wn4wtiHpD/40N6gn9YN/L2lXyobav6T62T9Dty4RNnEvroYY1
+   H09xVDlbvjCKC2fP3ok4DT+CKb7uPad12W/QwkbY3inA/LUnzNe4az1Q4
    g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="25032821"
+X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="25032836"
 X-IronPort-AV: E=Sophos;i="6.05,231,1701158400"; 
-   d="scan'208";a="25032821"
+   d="scan'208";a="25032836"
 Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2024 02:01:27 -0800
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2024 02:01:31 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.05,231,1701158400"; 
-   d="scan'208";a="4036080"
+   d="scan'208";a="4036105"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
-  by fmviesa003.fm.intel.com with ESMTP; 31 Jan 2024 02:01:22 -0800
+  by fmviesa003.fm.intel.com with ESMTP; 31 Jan 2024 02:01:26 -0800
 From: Zhao Liu <zhao1.liu@linux.intel.com>
 To: Eduardo Habkost <eduardo@habkost.net>,
 	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
@@ -73,9 +73,9 @@ Cc: qemu-devel@nongnu.org,
 	Zhuocheng Ding <zhuocheng.ding@intel.com>,
 	Yongwei Ma <yongwei.ma@intel.com>,
 	Zhao Liu <zhao1.liu@intel.com>
-Subject: [PATCH v8 10/21] i386: Split topology types of CPUID[0x1F] from the definitions of CPUID[0xB]
-Date: Wed, 31 Jan 2024 18:13:39 +0800
-Message-Id: <20240131101350.109512-11-zhao1.liu@linux.intel.com>
+Subject: [PATCH v8 11/21] i386/cpu: Decouple CPUID[0x1F] subleaf with specific topology level
+Date: Wed, 31 Jan 2024 18:13:40 +0800
+Message-Id: <20240131101350.109512-12-zhao1.liu@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240131101350.109512-1-zhao1.liu@linux.intel.com>
 References: <20240131101350.109512-1-zhao1.liu@linux.intel.com>
@@ -89,106 +89,195 @@ Content-Transfer-Encoding: 8bit
 
 From: Zhao Liu <zhao1.liu@intel.com>
 
-CPUID[0xB] defines SMT, Core and Invalid types, and this leaf is shared
-by Intel and AMD CPUs.
+At present, the subleaf 0x02 of CPUID[0x1F] is bound to the "die" level.
 
-But for extended topology levels, Intel CPU (in CPUID[0x1F]) and AMD CPU
-(in CPUID[0x80000026]) have the different definitions with different
-enumeration values.
+In fact, the specific topology level exposed in 0x1F depends on the
+platform's support for extension levels (module, tile and die).
 
-Though CPUID[0x80000026] hasn't been implemented in QEMU, to avoid
-possible misunderstanding, split topology types of CPUID[0x1F] from the
-definitions of CPUID[0xB] and introduce CPUID[0x1F]-specific topology
-types.
+To help expose "module" level in 0x1F, decouple CPUID[0x1F] subleaf
+with specific topology level.
 
-Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
-Tested-by: Babu Moger <babu.moger@amd.com>
 Tested-by: Yongwei Ma <yongwei.ma@intel.com>
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
+Changes since v7:
+ * Refactored the encode_topo_cpuid1f() to use traversal to search the
+   encoded level and avoid using static variables. (Xiaoyao)
+   - Since the total number of levels in the bitmap is not too large,
+     the overhead of traversing is supposed to be acceptable.
+ * Renamed the variable num_cpus_next_level to num_threads_next_level.
+   (Xiaoyao)
+ * Renamed the helper num_cpus_by_topo_level() to
+   num_threads_by_topo_level(). (Xiaoyao)
+ * Dropped Michael/Babu's Acked/Tested tags since the code change.
+ * Re-added Yongwei's Tested tag For his re-testing.
+
 Changes since v3:
- * New commit to prepare to refactor CPUID[0x1F] encoding.
+ * New patch to prepare to expose module level in 0x1F.
+ * Moved the CPUTopoLevel enumeration definition from "i386: Add cache
+   topology info in CPUCacheInfo" to this patch. Note, to align with
+   topology types in SDM, revert the name of CPU_TOPO_LEVEL_UNKNOW to
+   CPU_TOPO_LEVEL_INVALID.
 ---
- target/i386/cpu.c | 14 +++++++-------
- target/i386/cpu.h | 13 +++++++++----
- 2 files changed, 16 insertions(+), 11 deletions(-)
+ target/i386/cpu.c | 138 +++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 113 insertions(+), 25 deletions(-)
 
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 607d8eff017b..4e5feb153152 100644
+index 4e5feb153152..81d2f0c42a0c 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -6257,17 +6257,17 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-         case 0:
-             *eax = apicid_core_offset(&topo_info);
-             *ebx = topo_info.threads_per_core;
--            *ecx |= CPUID_TOPOLOGY_LEVEL_SMT;
-+            *ecx |= CPUID_B_ECX_TOPO_LEVEL_SMT << 8;
-             break;
-         case 1:
-             *eax = apicid_pkg_offset(&topo_info);
-             *ebx = threads_per_pkg;
--            *ecx |= CPUID_TOPOLOGY_LEVEL_CORE;
-+            *ecx |= CPUID_B_ECX_TOPO_LEVEL_CORE << 8;
-             break;
-         default:
-             *eax = 0;
-             *ebx = 0;
--            *ecx |= CPUID_TOPOLOGY_LEVEL_INVALID;
-+            *ecx |= CPUID_B_ECX_TOPO_LEVEL_INVALID << 8;
-         }
+@@ -269,6 +269,118 @@ static void encode_cache_cpuid4(CPUCacheInfo *cache,
+            (cache->complex_indexing ? CACHE_COMPLEX_IDX : 0);
+ }
  
-         assert(!(*eax & ~0x1f));
-@@ -6292,22 +6292,22 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-         case 0:
-             *eax = apicid_core_offset(&topo_info);
-             *ebx = topo_info.threads_per_core;
--            *ecx |= CPUID_TOPOLOGY_LEVEL_SMT;
-+            *ecx |= CPUID_1F_ECX_TOPO_LEVEL_SMT << 8;
-             break;
-         case 1:
-             *eax = apicid_die_offset(&topo_info);
-             *ebx = topo_info.cores_per_die * topo_info.threads_per_core;
--            *ecx |= CPUID_TOPOLOGY_LEVEL_CORE;
-+            *ecx |= CPUID_1F_ECX_TOPO_LEVEL_CORE << 8;
-             break;
-         case 2:
-             *eax = apicid_pkg_offset(&topo_info);
-             *ebx = threads_per_pkg;
--            *ecx |= CPUID_TOPOLOGY_LEVEL_DIE;
-+            *ecx |= CPUID_1F_ECX_TOPO_LEVEL_DIE << 8;
-             break;
-         default:
-             *eax = 0;
-             *ebx = 0;
--            *ecx |= CPUID_TOPOLOGY_LEVEL_INVALID;
-+            *ecx |= CPUID_1F_ECX_TOPO_LEVEL_INVALID << 8;
-         }
-         assert(!(*eax & ~0x1f));
-         *ebx &= 0xffff; /* The count doesn't need to be reliable. */
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index f341affd5a59..8a7450f265a1 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1010,10 +1010,15 @@ uint64_t x86_cpu_get_supported_feature_word(FeatureWord w,
- #define CPUID_MWAIT_EMX     (1U << 0) /* enumeration supported */
- 
- /* CPUID[0xB].ECX level types */
--#define CPUID_TOPOLOGY_LEVEL_INVALID  (0U << 8)
--#define CPUID_TOPOLOGY_LEVEL_SMT      (1U << 8)
--#define CPUID_TOPOLOGY_LEVEL_CORE     (2U << 8)
--#define CPUID_TOPOLOGY_LEVEL_DIE      (5U << 8)
-+#define CPUID_B_ECX_TOPO_LEVEL_INVALID  0
-+#define CPUID_B_ECX_TOPO_LEVEL_SMT      1
-+#define CPUID_B_ECX_TOPO_LEVEL_CORE     2
++static uint32_t num_threads_by_topo_level(X86CPUTopoInfo *topo_info,
++                                          enum CPUTopoLevel topo_level)
++{
++    switch (topo_level) {
++    case CPU_TOPO_LEVEL_SMT:
++        return 1;
++    case CPU_TOPO_LEVEL_CORE:
++        return topo_info->threads_per_core;
++    case CPU_TOPO_LEVEL_DIE:
++        return topo_info->threads_per_core * topo_info->cores_per_die;
++    case CPU_TOPO_LEVEL_PACKAGE:
++        return topo_info->threads_per_core * topo_info->cores_per_die *
++               topo_info->dies_per_pkg;
++    default:
++        g_assert_not_reached();
++    }
++    return 0;
++}
 +
-+/* COUID[0x1F].ECX level types */
-+#define CPUID_1F_ECX_TOPO_LEVEL_INVALID  CPUID_B_ECX_TOPO_LEVEL_INVALID
-+#define CPUID_1F_ECX_TOPO_LEVEL_SMT      CPUID_B_ECX_TOPO_LEVEL_SMT
-+#define CPUID_1F_ECX_TOPO_LEVEL_CORE     CPUID_B_ECX_TOPO_LEVEL_CORE
-+#define CPUID_1F_ECX_TOPO_LEVEL_DIE      5
++static uint32_t apicid_offset_by_topo_level(X86CPUTopoInfo *topo_info,
++                                            enum CPUTopoLevel topo_level)
++{
++    switch (topo_level) {
++    case CPU_TOPO_LEVEL_SMT:
++        return 0;
++    case CPU_TOPO_LEVEL_CORE:
++        return apicid_core_offset(topo_info);
++    case CPU_TOPO_LEVEL_DIE:
++        return apicid_die_offset(topo_info);
++    case CPU_TOPO_LEVEL_PACKAGE:
++        return apicid_pkg_offset(topo_info);
++    default:
++        g_assert_not_reached();
++    }
++    return 0;
++}
++
++static uint32_t cpuid1f_topo_type(enum CPUTopoLevel topo_level)
++{
++    switch (topo_level) {
++    case CPU_TOPO_LEVEL_INVALID:
++        return CPUID_1F_ECX_TOPO_LEVEL_INVALID;
++    case CPU_TOPO_LEVEL_SMT:
++        return CPUID_1F_ECX_TOPO_LEVEL_SMT;
++    case CPU_TOPO_LEVEL_CORE:
++        return CPUID_1F_ECX_TOPO_LEVEL_CORE;
++    case CPU_TOPO_LEVEL_DIE:
++        return CPUID_1F_ECX_TOPO_LEVEL_DIE;
++    default:
++        /* Other types are not supported in QEMU. */
++        g_assert_not_reached();
++    }
++    return 0;
++}
++
++static void encode_topo_cpuid1f(CPUX86State *env, uint32_t count,
++                                X86CPUTopoInfo *topo_info,
++                                uint32_t *eax, uint32_t *ebx,
++                                uint32_t *ecx, uint32_t *edx)
++{
++    X86CPU *cpu = env_archcpu(env);
++    unsigned long level;
++    uint32_t num_threads_next_level, offset_next_level;
++
++    assert(count + 1 < CPU_TOPO_LEVEL_MAX);
++
++    /*
++     * Find the No.count topology levels in avail_cpu_topo bitmap.
++     * Start from bit 0 (CPU_TOPO_LEVEL_INVALID).
++     */
++    level = CPU_TOPO_LEVEL_INVALID;
++    for (int i = 0; i <= count; i++) {
++        level = find_next_bit(env->avail_cpu_topo,
++                              CPU_TOPO_LEVEL_PACKAGE,
++                              level + 1);
++
++        /*
++         * CPUID[0x1f] doesn't explicitly encode the package level,
++         * and it just encode the invalid level (all fields are 0)
++         * into the last subleaf of 0x1f.
++         */
++        if (level == CPU_TOPO_LEVEL_PACKAGE) {
++            level = CPU_TOPO_LEVEL_INVALID;
++            break;
++        }
++    }
++
++    if (level == CPU_TOPO_LEVEL_INVALID) {
++        num_threads_next_level = 0;
++        offset_next_level = 0;
++    } else {
++        unsigned long next_level;
++
++        next_level = find_next_bit(env->avail_cpu_topo,
++                                   CPU_TOPO_LEVEL_PACKAGE,
++                                   level + 1);
++        num_threads_next_level = num_threads_by_topo_level(topo_info,
++                                                           next_level);
++        offset_next_level = apicid_offset_by_topo_level(topo_info,
++                                                        next_level);
++    }
++
++    *eax = offset_next_level;
++    *ebx = num_threads_next_level;
++    *ebx &= 0xffff; /* The count doesn't need to be reliable. */
++    *ecx = count & 0xff;
++    *ecx |= cpuid1f_topo_type(level) << 8;
++    *edx = cpu->apic_id;
++
++    assert(!(*eax & ~0x1f));
++}
++
+ /* Encode cache info for CPUID[0x80000005].ECX or CPUID[0x80000005].EDX */
+ static uint32_t encode_cache_cpuid80000005(CPUCacheInfo *cache)
+ {
+@@ -6286,31 +6398,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+             break;
+         }
  
- /* MSR Feature Bits */
- #define MSR_ARCH_CAP_RDCL_NO            (1U << 0)
+-        *ecx = count & 0xff;
+-        *edx = cpu->apic_id;
+-        switch (count) {
+-        case 0:
+-            *eax = apicid_core_offset(&topo_info);
+-            *ebx = topo_info.threads_per_core;
+-            *ecx |= CPUID_1F_ECX_TOPO_LEVEL_SMT << 8;
+-            break;
+-        case 1:
+-            *eax = apicid_die_offset(&topo_info);
+-            *ebx = topo_info.cores_per_die * topo_info.threads_per_core;
+-            *ecx |= CPUID_1F_ECX_TOPO_LEVEL_CORE << 8;
+-            break;
+-        case 2:
+-            *eax = apicid_pkg_offset(&topo_info);
+-            *ebx = threads_per_pkg;
+-            *ecx |= CPUID_1F_ECX_TOPO_LEVEL_DIE << 8;
+-            break;
+-        default:
+-            *eax = 0;
+-            *ebx = 0;
+-            *ecx |= CPUID_1F_ECX_TOPO_LEVEL_INVALID << 8;
+-        }
+-        assert(!(*eax & ~0x1f));
+-        *ebx &= 0xffff; /* The count doesn't need to be reliable. */
++        encode_topo_cpuid1f(env, count, &topo_info, eax, ebx, ecx, edx);
+         break;
+     case 0xD: {
+         /* Processor Extended State */
 -- 
 2.34.1
 
