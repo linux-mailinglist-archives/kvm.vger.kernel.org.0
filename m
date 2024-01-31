@@ -1,149 +1,158 @@
-Return-Path: <kvm+bounces-7610-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7611-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC243844B41
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 23:51:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4899A844C30
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 00:13:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C66A1C2427D
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 22:51:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6CA8C1C23515
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 23:13:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5FA73B2A8;
-	Wed, 31 Jan 2024 22:50:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22CE713E21D;
+	Wed, 31 Jan 2024 23:03:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e3KuSYCB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iYQ97gUz"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52DF43B781
-	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 22:50:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 908EF13E21B
+	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 23:03:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706741423; cv=none; b=XhJ42gNT7cbRqyCT7nTAYy94pQILrM5dERNjd6VSx4F2jm3sE77vubFDnYR+brOjuLXtq5pka1/AbNMvh2vdU4Hcdcjl40vhr9GtgF8y+4sCHH+2LCBEzjzQClCrwBsLs0qqvJKlUwiCK/eSg7EhviMxZTkswQcxB8GlzNtJix8=
+	t=1706742233; cv=none; b=MFCyAQB4Tefdwb2PagX0iLUEFiMwn4tvC8ZKEmGTeSvI8dkZJTmAkAVPqTjJqmQN5K5Mj7856zhMz40gTJWCpyzc6T+/tUju8fe0olbgueN4ylEIUgniRrkfKx9AVTyDZf2h0dsRCisr76CQBTsNVuaVAE6vpyPPnXlM4apBUao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706741423; c=relaxed/simple;
-	bh=AYdMEWZrrFVOE5/Y3TiS+Iapcw8zW/FHFD57cTayr5Q=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sCfz8/3X/GI0ml55jxSP883rrfVzHaxQkerCQNrMhFauzbqNYfHlRZT2l2j4lwfHPgFRvVOdUQ7RJaEc84hv4tp/6feRdbrJw3IDwVXKbL0XX8eJhCn3+LAup8//RGQiJ6SOkodeMkbUoVbkiyeU0iYxW4PZRgrTmsA3B8DmWqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e3KuSYCB; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706741421;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FcW4aA4QUlOADw+pKX0iGEX+H00vP76wOtrVID4JVvo=;
-	b=e3KuSYCBF2HdkWa8JMRppaboP7xkjmbb/bO7xdDgjjCFfKGgyNso7rrCRHbnPfEzEUMcXv
-	yuCEmGEuiuW7WS64Y9MVZktwZKIGxAYJIDtFeKrJZ4H1i9bdityX1pQqBqp2toJMEmnZwf
-	ZqkVhBfleqTcHzzz/7BVh5y8nJ6Vfxc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-370-PhiVAquEOmSRTXpoEibaxg-1; Wed, 31 Jan 2024 17:50:11 -0500
-X-MC-Unique: PhiVAquEOmSRTXpoEibaxg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 85444185A787;
-	Wed, 31 Jan 2024 22:50:11 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 63A5D2166B31;
-	Wed, 31 Jan 2024 22:50:11 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Cc: dionnaglaze@google.com,
-	seanjc@google.com
-Subject: [PATCH 3/3] kvm: x86: use a uapi-friendly macro for GENMASK
-Date: Wed, 31 Jan 2024 17:50:10 -0500
-Message-Id: <20240131225010.2872733-4-pbonzini@redhat.com>
-In-Reply-To: <20240131225010.2872733-1-pbonzini@redhat.com>
-References: <20240131225010.2872733-1-pbonzini@redhat.com>
+	s=arc-20240116; t=1706742233; c=relaxed/simple;
+	bh=r+gw0hlTKtdohBZj+zXKIzyuXhBHBMj2XAt/CW5yWgQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ArMiohcQ0DJ8XAoGUScIqHZnqoA+IBEtmSOrC6qgzGfOvof3PSRKnd9O0JuYZ7Yu72o5dMl6gX3oUyJvwv3zEWB4DbFuoQEbspppzB3PhrJN31IsnWmtbNmep8yR+4zvz9YGrRUUZnATSdB6xC+NLTIiFEnzpOLaXN6/kbs/aj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iYQ97gUz; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5eba564eb3fso6146067b3.1
+        for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 15:03:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1706742230; x=1707347030; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=DZwweSSUYQvO/z20yvIqcaNFaLAc1RqILCFOCkMXbPM=;
+        b=iYQ97gUzmWVVoNJtEuLbFJ4S5h8HpYVi1CxUgL2jom/QXujR1tOaXR8gTv9gHboxAR
+         +FuFGe0gP4YF672OsN7lKVxUI/2T/5+iW66Cghp6vtM1NUKqh0Nlp2QEkoaG/LVY5T7P
+         AZvb8pdjnyLugW27KRV2Ib5aeQH0rH+qEwjLl4V0pA4PbeIQ4C+6SPUUzBL90uzeQiuW
+         SFOkw18jDq5BHsH5qIQgbhsN3I/T+94bo3Y0Ff8pMvFNJ8tYq3nmkra04+XHVmzxk5NP
+         ZnXJNQylACQYwDfg7QqpS0Xhgy3EsRvlR6SH55HRTCOa8VtmjY62KWUJepxsnBV/EzLe
+         Fc1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706742230; x=1707347030;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DZwweSSUYQvO/z20yvIqcaNFaLAc1RqILCFOCkMXbPM=;
+        b=WNWZazlesILVoa4dwISeiNy+HhWiQPQcKVJ4w+ghdg632EWx81SSWhr0RNdeem2JnD
+         gNBcolaQdoaYd/muEm9m2NuDkLILEkQvXzj/dV/xxTawG60JgTIVGTieSF9h3NDwdGBK
+         j5jmdmiB0x5lj8M6kMWmduNuFaOc0b4qg8SVRuVjbRJ7RxpIshreOsdbCvWZCLoz9PM6
+         v1DDPWciC2p6qV/jK15MDvDICXD8FLphpcE1w77L0ntxosHUVihqYTvNy7upVcmVjyxd
+         rTW0Q7/LxDlT5CbEIl4rq50n60u3oWDmxO0bB85FvCDsLD6zLnpEjHZfUPJ+cXa0pna3
+         7GZA==
+X-Gm-Message-State: AOJu0YzCXoMMJctXMPX2POfWmAMlatl4D4DnK2s1CiXnsmX5j+IRLYSz
+	uy4df6A35Ed0SwsrEgKmH6jlyJmqptrRHrAIBTn9T6LuF+ZXYYTNXe/kTyRLu24/CrS6l8h+qem
+	Xig==
+X-Google-Smtp-Source: AGHT+IFJbItnQs4Y8jmKkE5kxYlZxxDLejMwZjXJSJ/Pnb1uodzlMpEbl5+L7dgh/lCtAx5a7aAZSZtZzuc=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:dd6:b0:5fc:43cb:cb1e with SMTP id
+ db22-20020a05690c0dd600b005fc43cbcb1emr691136ywb.10.1706742230591; Wed, 31
+ Jan 2024 15:03:50 -0800 (PST)
+Date: Wed, 31 Jan 2024 15:03:48 -0800
+In-Reply-To: <20231102155111.28821-3-guang.zeng@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
+Mime-Version: 1.0
+References: <20231102155111.28821-1-guang.zeng@intel.com> <20231102155111.28821-3-guang.zeng@intel.com>
+Message-ID: <ZbrR1BJROP4O9eGx@google.com>
+Subject: Re: [RFC PATCH v1 2/8] KVM: selftests: x86: Support guest running on
+ canonical linear-address organization
+From: Sean Christopherson <seanjc@google.com>
+To: Zeng Guang <guang.zeng@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
+	David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org
+Content-Type: text/plain; charset="us-ascii"
 
-Change uapi header uses of GENMASK to instead use the uapi/linux/bits.h bit
-macros, since GENMASK is not defined in uapi headers.
+On Thu, Nov 02, 2023, Zeng Guang wrote:
+> Setup execution environment running on 64-bit linear addresses for
+> user and supervisor mode.
+> 
+> Define the linear address based on 48-bit canonical format in which
+> bits 63:47 of the address are identical. All addresses to system data
+> structure are shifted to supervisor-mode address space.
+> 
+> Extend page table mapping for supervisor mode to same guest physical
+> address. This allows guest in supervisor mode can run in the
+> corresponding canonical linear address space.
+> 
+> Signed-off-by: Zeng Guang <guang.zeng@intel.com>
+> ---
+>  .../selftests/kvm/include/x86_64/processor.h  |  6 ++++
+>  tools/testing/selftests/kvm/lib/kvm_util.c    |  6 ++--
+>  .../selftests/kvm/lib/x86_64/processor.c      | 28 ++++++++++++-------
+>  3 files changed, 28 insertions(+), 12 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> index 25bc61dac5fb..00f7337a520a 100644
+> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
+> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> @@ -1256,4 +1256,10 @@ void virt_map_level(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
+>  #define PFERR_GUEST_PAGE_MASK	BIT_ULL(PFERR_GUEST_PAGE_BIT)
+>  #define PFERR_IMPLICIT_ACCESS	BIT_ULL(PFERR_IMPLICIT_ACCESS_BIT)
+>  
+> +/*
+> + * X86 kernel linear address defines
+> + */
+> +#define KERNEL_LNA_OFFSET 0xffff800000000000
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/arm64/include/uapi/asm/kvm.h    | 8 ++++----
- arch/x86/include/uapi/asm/kvm.h      | 7 ++++---
- arch/x86/include/uapi/asm/kvm_para.h | 2 +-
- 3 files changed, 9 insertions(+), 8 deletions(-)
+Please don't make up acronyms, I can more or less glean what LNA is from the
+context _here_, but in other usage I would truly have no idea.
 
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 89d2fc872d9f..6b8b57b97228 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -76,11 +76,11 @@ struct kvm_regs {
- 
- /* KVM_ARM_SET_DEVICE_ADDR ioctl id encoding */
- #define KVM_ARM_DEVICE_TYPE_SHIFT	0
--#define KVM_ARM_DEVICE_TYPE_MASK	GENMASK(KVM_ARM_DEVICE_TYPE_SHIFT + 15, \
--						KVM_ARM_DEVICE_TYPE_SHIFT)
-+#define KVM_ARM_DEVICE_TYPE_MASK	__GENMASK(KVM_ARM_DEVICE_TYPE_SHIFT + 15, \
-+						  KVM_ARM_DEVICE_TYPE_SHIFT)
- #define KVM_ARM_DEVICE_ID_SHIFT		16
--#define KVM_ARM_DEVICE_ID_MASK		GENMASK(KVM_ARM_DEVICE_ID_SHIFT + 15, \
--						KVM_ARM_DEVICE_ID_SHIFT)
-+#define KVM_ARM_DEVICE_ID_MASK		__GENMASK(KVM_ARM_DEVICE_ID_SHIFT + 15, \
-+						  KVM_ARM_DEVICE_ID_SHIFT)
- 
- /* Supported device IDs */
- #define KVM_ARM_DEVICE_VGIC_V2		0
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index 9ae91a21ffea..bd36d74b593b 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -8,6 +8,7 @@
-  */
- 
- #include <linux/const.h>
-+#include <linux/bits.h>
- #include <linux/types.h>
- #include <linux/ioctl.h>
- #include <linux/stddef.h>
-@@ -550,9 +551,9 @@ struct kvm_pmu_event_filter {
- 	((__u64)(!!(exclude)) << 55))
- 
- #define KVM_PMU_MASKED_ENTRY_EVENT_SELECT \
--	(GENMASK_ULL(7, 0) | GENMASK_ULL(35, 32))
--#define KVM_PMU_MASKED_ENTRY_UMASK_MASK		(GENMASK_ULL(63, 56))
--#define KVM_PMU_MASKED_ENTRY_UMASK_MATCH	(GENMASK_ULL(15, 8))
-+	(__GENMASK_ULL(7, 0) | __GENMASK_ULL(35, 32))
-+#define KVM_PMU_MASKED_ENTRY_UMASK_MASK		(__GENMASK_ULL(63, 56))
-+#define KVM_PMU_MASKED_ENTRY_UMASK_MATCH	(__GENMASK_ULL(15, 8))
- #define KVM_PMU_MASKED_ENTRY_EXCLUDE		(_BITULL(55))
- #define KVM_PMU_MASKED_ENTRY_UMASK_MASK_SHIFT	(56)
- 
-diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uapi/asm/kvm_para.h
-index 6e64b27b2c1e..6bc3456a8ebf 100644
---- a/arch/x86/include/uapi/asm/kvm_para.h
-+++ b/arch/x86/include/uapi/asm/kvm_para.h
-@@ -92,7 +92,7 @@ struct kvm_clock_pairing {
- #define KVM_ASYNC_PF_DELIVERY_AS_INT		(1 << 3)
- 
- /* MSR_KVM_ASYNC_PF_INT */
--#define KVM_ASYNC_PF_VEC_MASK			GENMASK(7, 0)
-+#define KVM_ASYNC_PF_VEC_MASK			__GENMASK(7, 0)
- 
- /* MSR_KVM_MIGRATION_CONTROL */
- #define KVM_MIGRATION_READY		(1 << 0)
--- 
-2.39.0
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> index 9f4b8c47edce..6f4295a13d00 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> @@ -227,6 +227,13 @@ void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr, int level)
+>  void virt_arch_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
+>  {
+>  	__virt_pg_map(vm, vaddr, paddr, PG_LEVEL_4K);
+> +
+> +	/*
+> +	 * Map same paddr to kernel linear address space. Make execution
+> +	 * environment supporting running both in user and kernel mode.
+> +	 */
+> +	if (!(vaddr & BIT_ULL(63)))
+> +		__virt_pg_map(vm, (uint64_t)KERNEL_ADDR(vaddr), paddr, PG_LEVEL_4K);
 
+I really don't like the idea of piling hacks on top of selftests' misguided
+infrastructure.  Letting tests control virtual addresses is all kinds of stupid.
+Except for ARM's ucall_arch_init(), I don't think there's a single user of
+virt_map() that _needs_ a specific address, e.g. most tests just identity map
+the GPA.
+
+So rather than fudge things by stuffing two mappings, which is wasteful for 99%
+of mappings and will likely be a maintenance nightmare, I think we should go
+straight to getting x86's kernel mappings setup correctly from time zero.
+
+From KUT experience, using USER mappings for kernel accesses is explosions waiting
+to happen due to SMAP and SMEP.  And expecting developers to remember to sprinkle
+KERNEL_ADDR() everywhere is not remotely maintainable.
+
+In other words, give virt_arch_pg_map() (or ideally, the common virt_map()) over
+picking the virtual address, and then plumb in information as to whether the
+allocation is USER vs. SUPERVISOR.
 
