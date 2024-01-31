@@ -1,61 +1,80 @@
-Return-Path: <kvm+bounces-7526-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7527-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3DDC84332A
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 03:11:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F8FE84345D
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 04:11:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0A69BB2432F
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 02:11:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43EE01C244BA
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 03:11:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D2BF566B;
-	Wed, 31 Jan 2024 02:11:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35F8F107A9;
+	Wed, 31 Jan 2024 03:11:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FrYV8GpX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cialewYm"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA019523B;
-	Wed, 31 Jan 2024 02:11:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAFD6FC19
+	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 03:11:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706667088; cv=none; b=mcl3N5b0aftedAeki6QsjJ53F2tIIAj0h6Jlh2s6jMX9mVwufs9lR3w5GKp6hYYsF7xmjR9Mh1N/gBhduiczby+mE6AHjT4hMhb3yqn85+N3dba9vt7141EQgUTu/VaNjuu6IfNTGKGjTUc2Pof7dVrd6XWKH2FvZg75bn2HovU=
+	t=1706670700; cv=none; b=XPULlmX+6fBauuIJSxSafPaeixhd+ejs1Gbr+iXSFAmu28o/W1i3KMW2mXuOqivWI22gB7N9od0MKWXiMYdNbytdo7tbPirzAr0Wl5O2JxS4Lei5qpn8XSk64ntolO4AXKCdxsrj5ZaQ+DdBFqeN0PLofiEP/KcCSy5W1ZLyRbg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706667088; c=relaxed/simple;
-	bh=1eECbBTXJn2dJ3RKcITy2+8k4nSv/+0yUURQeFCZNHw=;
+	s=arc-20240116; t=1706670700; c=relaxed/simple;
+	bh=8A1sNTcqh/vi3qf/rn7lmh0Ujtt2fMYFqdqHx9tLGhU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=suLeJsvHt9lfidM6BU8B5nyydsHO9HEvV0aCmrcNkMdTj0v6zR85A72cLVh22VW0VFd2c1iwXhqWvUGTfwAFNVAuUTMRwxysGYx8xIJ+7EWN5Dz7VJ8AIcXLUUZIlokCA2j+a1tcGdWKIYo1vNwtxmkpdFUqHnH9+gGReu+QI+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FrYV8GpX; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706667087; x=1738203087;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=1eECbBTXJn2dJ3RKcITy2+8k4nSv/+0yUURQeFCZNHw=;
-  b=FrYV8GpXf6eoW0guiCm70JnbkiUW9jB5QFCBhQMvVbx5jPaf01pFtw4I
-   bjA/mCZ5XsYMN/Ud+dufkOh5GmNlaGDI/pdw0sXkF4AFDBCKHv7rnU/vF
-   h1GHFLoat5kS/NpRNq+55O/4tqvQQ6MIG+QP2nW4xIoWRrqrcGHwuaUnn
-   hOkk8VbVtLLwWWqiHANW8ol/iSWdArKvQdqYiWomOP1006F2fBAFmm0ow
-   pUV12H2B2I8BL2RiJRJscFgskngnLaZokKuFf4J5aBujY56tkUtckzLVU
-   afZNBfiAd88e3NNyyvrbyEJhfVmJKarO+h0NAdN7LQL4dge00TuD/VK94
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="3317037"
-X-IronPort-AV: E=Sophos;i="6.05,231,1701158400"; 
-   d="scan'208";a="3317037"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jan 2024 18:11:26 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,231,1701158400"; 
-   d="scan'208";a="30333826"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.93.12.33]) ([10.93.12.33])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jan 2024 18:11:23 -0800
-Message-ID: <d24dc389-8e73-4a7a-9970-1022dcbfa39c@linux.intel.com>
-Date: Wed, 31 Jan 2024 10:11:20 +0800
+	 In-Reply-To:Content-Type; b=fdTcZhG30GGCNbVhi7pbv/TeamMgAMWEr3mm80+hi3zIurMMUkIlV0KqCp6yJkC7XTHxWnXVhL7zR59tXUvMXQbd7+yuNhPhvV0CVet1T0SmY4EMWedymevPTJ7tkJQVo/0bPDfsBG+OyrFj+LmD1sL8l8McoOkVYv9CZXPGyw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cialewYm; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706670697;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iu3CJL4LbQS98hB4MGDC78q9pGdj3UV5DPUVK7DzfMo=;
+	b=cialewYmOI7mv2yx+FujmNkQumDXIc+/uzJuNFRWAy2FqV4EwZXQ4ucqZkpPaOtTuk/7mw
+	lsVV0gbyEGezuQ2enxTPUn7RNdayhzSyDNyGpt5Ed5hxZzFjXCyru9LfwIe8kEytKeIgBq
+	N7Fo2wtW4mLaZKyZ8x+pn42LqydGujg=
+Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com
+ [209.85.167.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-32-HtiH9HdcM9GvaBiaWlDbcQ-1; Tue, 30 Jan 2024 22:11:35 -0500
+X-MC-Unique: HtiH9HdcM9GvaBiaWlDbcQ-1
+Received: by mail-oi1-f198.google.com with SMTP id 5614622812f47-3be75cab163so605004b6e.0
+        for <kvm@vger.kernel.org>; Tue, 30 Jan 2024 19:11:35 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706670695; x=1707275495;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iu3CJL4LbQS98hB4MGDC78q9pGdj3UV5DPUVK7DzfMo=;
+        b=ndz68dey6u8kYfaFD//VzO3Q9Sr4+TIsRQksmwUhkRhtdIGSccddMrDwcyyvqXRGps
+         s/LzPoUM1TZsLY+lzdRRo8GuxoHP+/gLYdVVqcGSQ+Erj+uQVt/39BHSAl612FZuWq0Y
+         yljqMDb3yPJ9YrJnbeIUcceRcCwSoHT0jDhE6Li5D9oMIMh4azIrCOqjQ5Ec/sq1Hhl2
+         ESZLnXZh6OnUWVA/sMDgvMFzzosWHBnbPH6OWhVM/vsgnckQ131tbDpCgB+xzkNO/gU2
+         0lkqrUSXDoDpyCL4Wwl4pBrwMLtm70HV8GDGF46G1lm9dpyGBrIINsDikzd0nX+Uwc6n
+         3s4g==
+X-Gm-Message-State: AOJu0Yz1f/aPktFweU1giRicP4GrAQpbDtEsIiwvTvLB0qQgTie9JCow
+	spB9c261g0EPNnGtaKoGAMtgUvwUXMBWryDAX8ijjnw6d2Ma7LfpdiV8kmqub57SxBsAwYEjNTu
+	Fng6WK+eCs8wj+8tCJcQbkcfOHvOlNB7wU8lbAb/rkwfkNXn5fw==
+X-Received: by 2002:a05:6808:329a:b0:3be:6bed:70af with SMTP id cg26-20020a056808329a00b003be6bed70afmr574525oib.3.1706670695140;
+        Tue, 30 Jan 2024 19:11:35 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFmfRksgT7QnfG2CN0xzUAVB0zgkTIWmjGTT9JZuTu7vPmTr2vpPAGzf5rzH88B+9ZKhzkzMg==
+X-Received: by 2002:a05:6808:329a:b0:3be:6bed:70af with SMTP id cg26-20020a056808329a00b003be6bed70afmr574507oib.3.1706670694846;
+        Tue, 30 Jan 2024 19:11:34 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCWlTw1dye8bxzwmPtvq8UxMcKWb53stpiyLPATNR6iaQUszWm9J9ynFpckV3yNoZa1PI8CIknSnuWJsBwaO02BqdGhqrfursNiEOkio6a2UGvFqsVKpuU/H5CSPkl+Aa2kxjGVkGMiZrkfwq5bg8R52435X0a6KA1/AbSuJhoyQpkAD+OlfOvHsMt3eGTuITT3pZ5hRXf59RibQDhxuEv0FmCJIGONPRfRNZ93L0Oa8zSOPIpMBk7+pzBn8w2th2H5M99+zW5THY8QAvX/oZjnk9j0cijhnLF+LkcajdzOpCxzEneepW3w+i56pxirHQMbskARfpvCEAFw5kgClUG9W352XhNnU0gEOP6vKEt04bMNk8V7vkIhMeiBB+5sV09Y7rU8hpuw0ZumI+0dFILHnPHNahfEQXvzi9sFHpw==
+Received: from [10.72.116.50] ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id p26-20020a62ab1a000000b006ddb85a61cfsm8564500pff.162.2024.01.30.19.11.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 30 Jan 2024 19:11:34 -0800 (PST)
+Message-ID: <d2d09269-30fa-461d-9461-16a1ffbde6b6@redhat.com>
+Date: Wed, 31 Jan 2024 11:11:28 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -63,101 +82,85 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 16/29] KVM: selftests: Test Intel PMU architectural
- events on gp counters
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, Kan Liang <kan.liang@linux.intel.com>,
- Jim Mattson <jmattson@google.com>, Jinrong Liang <cloudliang@tencent.com>,
- Aaron Lewis <aaronlewis@google.com>, Like Xu <likexu@tencent.com>
-References: <20240109230250.424295-1-seanjc@google.com>
- <20240109230250.424295-17-seanjc@google.com>
- <5f51fda5-bc07-42ac-a723-d09d90136961@linux.intel.com>
- <ZaGxNsrf_pUHkFiY@google.com>
- <cce0483f-539b-4be3-838d-af0ec91db8f0@linux.intel.com>
- <ZbmF9eM84cQhdvGf@google.com>
+Subject: Re: [PATCH v3 0/5] KVM: selftests: aarch64: Introduce
+ pmu_event_filter_test
+To: Eric Auger <eauger@redhat.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev
+Cc: James Morse <james.morse@arm.com>, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Shuah Khan <shuah@kernel.org>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Zenghui Yu <yuzenghui@huawei.com>
+References: <20240116060129.55473-1-shahuang@redhat.com>
+ <51ca8edc-81e6-4c6d-9c72-80fe59919868@redhat.com>
 Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <ZbmF9eM84cQhdvGf@google.com>
+From: Shaoqin Huang <shahuang@redhat.com>
+In-Reply-To: <51ca8edc-81e6-4c6d-9c72-80fe59919868@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
+Hi Eric,
 
-On 1/31/2024 7:27 AM, Sean Christopherson wrote:
-> On Mon, Jan 15, 2024, Dapeng Mi wrote:
->> On 1/13/2024 5:37 AM, Sean Christopherson wrote:
->>> On Fri, Jan 12, 2024, Dapeng Mi wrote:
->>>> On 1/10/2024 7:02 AM, Sean Christopherson wrote:
->>>>> +/*
->>>>> + * If an architectural event is supported and guaranteed to generate at least
->>>>> + * one "hit, assert that its count is non-zero.  If an event isn't supported or
->>>>> + * the test can't guarantee the associated action will occur, then all bets are
->>>>> + * off regarding the count, i.e. no checks can be done.
->>>>> + *
->>>>> + * Sanity check that in all cases, the event doesn't count when it's disabled,
->>>>> + * and that KVM correctly emulates the write of an arbitrary value.
->>>>> + */
->>>>> +static void guest_assert_event_count(uint8_t idx,
->>>>> +				     struct kvm_x86_pmu_feature event,
->>>>> +				     uint32_t pmc, uint32_t pmc_msr)
->>>>> +{
->>>>> +	uint64_t count;
->>>>> +
->>>>> +	count = _rdpmc(pmc);
->>>>> +	if (!this_pmu_has(event))
->>>>> +		goto sanity_checks;
->>>>> +
->>>>> +	switch (idx) {
->>>>> +	case INTEL_ARCH_INSTRUCTIONS_RETIRED_INDEX:
->>>>> +		GUEST_ASSERT_EQ(count, NUM_INSNS_RETIRED);
->>>>> +		break;
->>>>> +	case INTEL_ARCH_BRANCHES_RETIRED_INDEX:
->>>>> +		GUEST_ASSERT_EQ(count, NUM_BRANCHES);
->>>>> +		break;
->>>>> +	case INTEL_ARCH_CPU_CYCLES_INDEX:
->>>>> +	case INTEL_ARCH_REFERENCE_CYCLES_INDEX:
->>>> Since we already support slots event in below guest_test_arch_event(), we
->>>> can add check for INTEL_ARCH_TOPDOWN_SLOTS_INDEX here.
->>> Can that actually be tested at this point, since KVM doesn't support
->>> X86_PMU_FEATURE_TOPDOWN_SLOTS, i.e. this_pmu_has() above should always fail, no?
->> I suppose X86_PMU_FEATURE_TOPDOWN_SLOTS has been supported in KVM.  The
->> following output comes from a guest with latest kvm-x86 code on the Sapphire
->> Rapids platform.
+On 1/26/24 18:25, Eric Auger wrote:
+> Hi Shaoqin,
+> 
+> On 1/16/24 07:01, Shaoqin Huang wrote:
+>> The test is inspired by the pmu_event_filter_test which implemented by x86. On
+>> the arm64 platform, there is the same ability to set the pmu_event_filter
+>> through the KVM_ARM_VCPU_PMU_V3_FILTER attribute. So add the test for arm64.
 >>
->> sudo cpuid -l 0xa
->> CPU 0:
->>     Architecture Performance Monitoring Features (0xa):
->>        version ID                               = 0x2 (2)
->>        number of counters per logical processor = 0x8 (8)
->>        bit width of counter                     = 0x30 (48)
->>        length of EBX bit vector                 = 0x8 (8)
->>        core cycle event                         = available
->>        instruction retired event                = available
->>        reference cycles event                   = available
->>        last-level cache ref event               = available
->>        last-level cache miss event              = available
->>        branch inst retired event                = available
->>        branch mispred retired event             = available
->>        top-down slots event                     = available
+>> The series first move some pmu common code from vpmu_counter_access to
+>> lib/aarch64/vpmu.c and include/aarch64/vpmu.h, which can be used by
+>> pmu_event_filter_test. Then fix a bug related to the [enable|disable]_counter,
+>> and at last, implement the test itself.
+> which branch does it apply on? I fail to apply on top on main.
+> 
+> Or can you provide a branch?
+
+This was based on v6.7.
+
+> 
+> Eric
 >>
->> Current KVM doesn't support fixed counter 3 and pseudo slots event yet, but
->> the architectural slots event is supported and can be programed on a GP
->> counter. Current test code can cover this case, so I think we'd better add
->> the check for the slots count.
-> Can you submit a patch on top, with a changelog that includes justification that
-> that explains exactly what assertions can be made on the top-down slots event
-> given the "workload" being measured?  I'm definitely not opposed to adding coverage
-> for top-down slots, but at this point, I don't want to respin this series, nor do
-> I want to make that change when applying on the fly.
+>> Changelog:
+>> ----------
+>> v2->v3:
+>>    - Check the pmceid in guest code instead of pmu event count since different
+>>    hardware may have different event count result, check pmceid makes it stable
+>>    on different platform.                        [Eric]
+>>    - Some typo fixed and commit message improved.
+>>
+>> v1->v2:
+>>    - Improve the commit message.                 [Eric]
+>>    - Fix the bug in [enable|disable]_counter.    [Raghavendra & Marc]
+>>    - Add the check if kvm has attr KVM_ARM_VCPU_PMU_V3_FILTER.
+>>    - Add if host pmu support the test event throught pmceid0.
+>>    - Split the test_invalid_filter() to another patch. [Eric]
+>>
+>> v1: https://lore.kernel.org/all/20231123063750.2176250-1-shahuang@redhat.com/
+>> v2: https://lore.kernel.org/all/20231129072712.2667337-1-shahuang@redhat.com/
+>>
+>> Shaoqin Huang (5):
+>>    KVM: selftests: aarch64: Make the [create|destroy]_vpmu_vm() public
+>>    KVM: selftests: aarch64: Move pmu helper functions into vpmu.h
+>>    KVM: selftests: aarch64: Fix the buggy [enable|disable]_counter
+>>    KVM: selftests: aarch64: Introduce pmu_event_filter_test
+>>    KVM: selftests: aarch64: Add invalid filter test in
+>>      pmu_event_filter_test
+>>
+>>   tools/testing/selftests/kvm/Makefile          |   2 +
+>>   .../kvm/aarch64/pmu_event_filter_test.c       | 255 ++++++++++++++++++
+>>   .../kvm/aarch64/vpmu_counter_access.c         | 218 ++-------------
+>>   .../selftests/kvm/include/aarch64/vpmu.h      | 135 ++++++++++
+>>   .../testing/selftests/kvm/lib/aarch64/vpmu.c  |  74 +++++
+>>   5 files changed, 490 insertions(+), 194 deletions(-)
+>>   create mode 100644 tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
+>>   create mode 100644 tools/testing/selftests/kvm/include/aarch64/vpmu.h
+>>   create mode 100644 tools/testing/selftests/kvm/lib/aarch64/vpmu.c
+>>
+> 
 
-Yeah, I'm glad to submit a patch for this. :)
+-- 
+Shaoqin
 
-BTW, I have a patch series to do the bug fixes and improvements for 
-kvm-unit-tests/pmu test. (some improvement ideas come from this patchset.)
-
-https://lore.kernel.org/kvm/20240103031409.2504051-1-dapeng1.mi@linux.intel.com/
-
-Could you please kindly review them? Thanks.
-
->
 
