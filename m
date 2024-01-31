@@ -1,111 +1,169 @@
-Return-Path: <kvm+bounces-7528-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7529-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D24CD8434AB
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 04:48:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F903843685
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 07:18:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 115441C20AF7
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 03:48:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4FB1F1F28609
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 06:18:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1966E1642A;
-	Wed, 31 Jan 2024 03:48:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F22E3E496;
+	Wed, 31 Jan 2024 06:18:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cQ2Oekej"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AFD9125B9;
-	Wed, 31 Jan 2024 03:48:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23EB33E477
+	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 06:18:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706672908; cv=none; b=oODvdFvTPeXJzcBzrNFY8/+Ub3BeywcgAZm+vEE2wKUHc2i9Om5k4uB/Dequu4rYK5DqOPRqz8PgvLkxTtjN8yJCcSwkOvVcU9/1V68mEJGtxU4fecLIyG7L7SSp9bGmAEqXIRb9dEZPRbSaeU89BKlrx3+yDCXFOnW2l2tfPJ0=
+	t=1706681918; cv=none; b=urZY0CreZe4UADsbeNT0j4cFznHEXVOnneHzFk1HGI4kqZE1zzjssZPXw6Lw8q5Y2pJQZy46s+mcmjaIREQUqvmoab1fuWgYnCfE2q3MoJCOBXUmnipzE5DOsrQAgKWnazSNKkxuM69cLNSnY9tDpUaNGdjpMpvd3xzcIXYS9HU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706672908; c=relaxed/simple;
-	bh=WjJKpyNGS1blPKAfbNn8MquKPZSqvebdPCEZMuXh/+M=;
-	h=Subject:From:To:Cc:References:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=F3PxKJT5E/202J2KYP5FSbKj8tDggvSswL+AtDF8Ut/c0yc89WDlznGghuqsGmmdwZahxPhEGW+grrVBk4myFzt4hc9+S3OY/hKbimUrToMtnLxqbZB++n8M3ZzGkrzd+91NPhvxUVjz7pVx32OgkvQ9C/iUPhRMC7fyLAOqVlw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.173])
-	by gateway (Coremail) with SMTP id _____8BxVfECw7llcsMIAA--.26966S3;
-	Wed, 31 Jan 2024 11:48:18 +0800 (CST)
-Received: from [10.20.42.173] (unknown [10.20.42.173])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8AxjhMAw7llOn0pAA--.40142S3;
-	Wed, 31 Jan 2024 11:48:18 +0800 (CST)
-Subject: Re: [PATCH] LoongArch: KVM: Remove unnecessary CSR register saving
- during enter guest
-From: maobibo <maobibo@loongson.cn>
-To: Tianrui Zhao <zhaotianrui@loongson.cn>,
- Huacai Chen <chenhuacai@kernel.org>
-Cc: kvm@vger.kernel.org, loongarch@lists.linux.dev,
- linux-kernel@vger.kernel.org
-References: <20240112035039.833974-1-maobibo@loongson.cn>
-Message-ID: <b7c08e0d-bd7d-aea9-250e-1649e95599b7@loongson.cn>
-Date: Wed, 31 Jan 2024 11:48:16 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1706681918; c=relaxed/simple;
+	bh=zA6aJsaDtmLd5+Y6MNNx83hN3QwgcpsGMzFn6iLlCH8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HemMtlAXKbBHEJzWYR13cYf6UeVKnw5sQ6PRCkA+fBT+BRaPjic8vhqOhFcgEBVjdlTbLbieObI5iIqtfcV8P2qB8UM94Zjp+IE2iHWSpRvRSWot4rEiLKYpWReAQShJ+boSnBTvLI4/XRZWEUnTEzxdHRXI2/uLDAKe8fpEqpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cQ2Oekej; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706681915;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=uMOJVNfR07h1/ubgQW2Q7QaaOn6H+CmbyhhDETS3nnw=;
+	b=cQ2OekejOvi2y/xyImkYJRGubNlH6hfTKXLmyin3Gw1atCuCVCi5qLOSbxufCrTJ76YLdg
+	8iMJ+ikngZLAm03pnLiFumkAJPlgY3Za9ZKheHZeCwkRbt16VHe8NlnXOan+hecXPj18xN
+	n8o/xWPQ4JCJKfjCcIYuWSA+0SNYVko=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-281-985ozJ5KPo-2Awla3T-LOA-1; Wed, 31 Jan 2024 01:18:32 -0500
+X-MC-Unique: 985ozJ5KPo-2Awla3T-LOA-1
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-67ef8bbfe89so104401926d6.0
+        for <kvm@vger.kernel.org>; Tue, 30 Jan 2024 22:18:32 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706681912; x=1707286712;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uMOJVNfR07h1/ubgQW2Q7QaaOn6H+CmbyhhDETS3nnw=;
+        b=kiq9Or8vY4rG+zjgBtLy/RWvtLnSk5pkeQrp04DzmJ0yLgSVADUK/173JPiFHeOIAX
+         d6oGGe7vmufrWJX2HypoJ2RAJWKlG+5cgTcm/FdwMbm1eKDeZlN6xdNFiuDQoyZJwfPa
+         SLE6T/4Ze1B2GjWVfSj81hze6Ei3w2q5/gJsOJxtHpxqZGP015zlvcjq8B7S1Khfx87D
+         YCxf4rxcHUSzGVjpurpTqp7RYwjqFp5Rb6hx/ryTdBHPuIw2klysRJYN1pWvlXsClgv1
+         ApRlucX3V4P+KBWwZk603JyqGTl6Z9vwV7hmBiub8NcNj2+W9Vdiu84rh8xjwR4T/shM
+         GXSA==
+X-Gm-Message-State: AOJu0YxdTxAcxD2dGxJV3pKlTxHuMacs99Y/40+Yj4CigJj3YLfFXPMN
+	F7ppTQ6cFmb3uozstJgKdBwM77STJ2Hn54lVrnlyRDIiYFDONUQ9Kk22Z3YjTdxh4o5s61WgmRT
+	jtW4Ln2GdSFOIYw8R5dEPqFPOqLduNxynHt8oEncPhb1Ew6HGCg==
+X-Received: by 2002:ad4:5de3:0:b0:68c:5486:b770 with SMTP id jn3-20020ad45de3000000b0068c5486b770mr778547qvb.65.1706681912364;
+        Tue, 30 Jan 2024 22:18:32 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGLCLZ0jwTiDBJHVB0lht83HfcrPG76fJq5Cv0lMylyTrYVHPEdFUn111YSn4ViamxgMZeCkA==
+X-Received: by 2002:ad4:5de3:0:b0:68c:5486:b770 with SMTP id jn3-20020ad45de3000000b0068c5486b770mr778537qvb.65.1706681912134;
+        Tue, 30 Jan 2024 22:18:32 -0800 (PST)
+Received: from [192.168.0.9] (ip-109-43-177-196.web.vodafone.de. [109.43.177.196])
+        by smtp.gmail.com with ESMTPSA id lr6-20020a0562145bc600b0068189e9d3a3sm94384qvb.112.2024.01.30.22.18.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 30 Jan 2024 22:18:31 -0800 (PST)
+Message-ID: <a63eb87f-042a-41aa-a3b8-9fed549c4ccb@redhat.com>
+Date: Wed, 31 Jan 2024 07:18:23 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240112035039.833974-1-maobibo@loongson.cn>
-Content-Type: text/plain; charset=utf-8; format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 02/29] hw/core: Declare CPUArchId::cpu as CPUState
+ instead of Object
 Content-Language: en-US
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ qemu-devel@nongnu.org
+Cc: qemu-riscv@nongnu.org, qemu-s390x@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+ qemu-ppc@nongnu.org, qemu-arm@nongnu.org,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Eduardo Habkost <eduardo@habkost.net>,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ Yanan Wang <wangyanan55@huawei.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Song Gao <gaosong@loongson.cn>, Nicholas Piggin <npiggin@gmail.com>,
+ Daniel Henrique Barboza <danielhb413@gmail.com>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Harsh Prateek Bora <harshpb@linux.ibm.com>, Halil Pasic
+ <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Eric Farman <farman@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
+ Ilya Leoshkevich <iii@linux.ibm.com>
+References: <20240129164514.73104-1-philmd@linaro.org>
+ <20240129164514.73104-3-philmd@linaro.org>
+From: Thomas Huth <thuth@redhat.com>
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+In-Reply-To: <20240129164514.73104-3-philmd@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8AxjhMAw7llOn0pAA--.40142S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj9xXoWrKFyrur4rGrW5tr17ur1ruFX_yoWDGwb_X3
-	WIkw4Dur4fJa17u3yF9r98Xw1jq3WkG39a9ry8ZryxJa4FqrZ8Xr47Aa1rAw13KFWUJ3yf
-	ArWxKrZ3ur1ayosvyTuYvTs0mTUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUj1kv1TuYvT
-	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
-	cSsGvfJTRUUUbxAYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
-	vaj40_Wr0E3s1l1IIY67AEw4v_JrI_Jryl8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
-	w2x7M28EF7xvwVC0I7IYx2IY67AKxVWUJVWUCwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
-	WUJVW8JwA2z4x0Y4vEx4A2jsIE14v26F4j6r4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
-	Gr1j6F4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYIkI8VC2zVCFFI0UMc
-	02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAF
-	wI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4
-	CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG
-	67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMI
-	IYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E
-	14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJV
-	W8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07j8yCJU
-	UUUU=
 
-slightly ping :)
-
-On 2024/1/12 上午11:50, Bibo Mao wrote:
-> Some CSR registers like CRMD/PRMD are saved during enter VM mode. However
-> they are not restored for actual use, saving for these CSR registers
-> can be removed.
+On 29/01/2024 17.44, Philippe Mathieu-Daudé wrote:
+> Do not accept any Object for CPUArchId::cpu field,
+> restrict it to CPUState type.
 > 
-> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 > ---
->   arch/loongarch/kvm/switch.S | 6 ------
->   1 file changed, 6 deletions(-)
-> 
-> diff --git a/arch/loongarch/kvm/switch.S b/arch/loongarch/kvm/switch.S
-> index 0ed9040307b7..905b90de50e8 100644
-> --- a/arch/loongarch/kvm/switch.S
-> +++ b/arch/loongarch/kvm/switch.S
-> @@ -213,12 +213,6 @@ SYM_FUNC_START(kvm_enter_guest)
->   	/* Save host GPRs */
->   	kvm_save_host_gpr a2
->   
-> -	/* Save host CRMD, PRMD to stack */
-> -	csrrd	a3, LOONGARCH_CSR_CRMD
-> -	st.d	a3, a2, PT_CRMD
-> -	csrrd	a3, LOONGARCH_CSR_PRMD
-> -	st.d	a3, a2, PT_PRMD
-> -
->   	addi.d	a2, a1, KVM_VCPU_ARCH
->   	st.d	sp, a2, KVM_ARCH_HSP
->   	st.d	tp, a2, KVM_ARCH_HTP
-> 
-> base-commit: de927f6c0b07d9e698416c5b287c521b07694cac
-> 
+>   include/hw/boards.h        | 2 +-
+>   hw/core/machine.c          | 4 ++--
+>   hw/i386/x86.c              | 2 +-
+>   hw/loongarch/virt.c        | 2 +-
+>   hw/ppc/spapr.c             | 5 ++---
+>   hw/s390x/s390-virtio-ccw.c | 2 +-
+>   6 files changed, 8 insertions(+), 9 deletions(-)
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
 
