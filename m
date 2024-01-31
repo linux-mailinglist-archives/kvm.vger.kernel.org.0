@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-7626-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7627-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9182844D79
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 00:57:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2016844D96
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 01:05:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C9741C22B2B
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 23:57:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0EE97B2D75B
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 23:57:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C1AE3CF45;
-	Wed, 31 Jan 2024 23:56:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 380B73BB4D;
+	Wed, 31 Jan 2024 23:56:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QdSWPBrH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nE6k6GwO"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 832CD3B197
-	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 23:56:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7797C3BB27
+	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 23:56:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706745376; cv=none; b=bmPwlf2Z+HPBdlREXK4r48UkAMU3RCJnlsU3rpkXiyFQxek+hG6mO5VTuSPufhqX7ZcG02BEpLSmAoAW9WFZzg0OLLVE7hLrcdtQ3OdNYpLH3kFH5uh1Ef6K7OYI22CLoESiviI7TsjCLWv1+60enkGCFfxjZI8A8HeGwQunZ4s=
+	t=1706745378; cv=none; b=CR3sfBdXqOf4NZXnBqu2y2NlJqfno0UVvKllvrgSY+oElQ5b+Tt4Fm8H/4ATSUNGMqE/o81+OqdpxaSkefvVzfoF403Gw/34oXlk3jrDJpQ3rLjiON0YxRWjGsNIqq753JlN2a8Nxak4Txdd20a4hyAsYzxJdnjKKNRj/dL6o0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706745376; c=relaxed/simple;
-	bh=C2Mp5wDF+w5HYei1nLihykDqJ+peIrgUvLAyytBwPBU=;
+	s=arc-20240116; t=1706745378; c=relaxed/simple;
+	bh=Y2eTrWyIvoI9BY4Vorbbz847bJmJSiZQnQACclMHzyM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=shkvWmUSeqtHwMaAEJjkeyd8+7h0HENR8YdQIbEuf26g/MkLBYViD697QP//3ym4hWa46VhN9DbQxwZ/8FzHe7/gsALBs8/McWltMD/pvXXsyfLKp5az+vZsbVZyF9nwD62GBypvyDrS7wcwYrDmg00O67uBl5qofud4zRexzMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QdSWPBrH; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=ftqt6YvA1cKVDilFZaJXsqtgEykBh6n9akfRd2ODTrJyUZl3PFZziOxLKwExiTOQIW2xRBKcHb2f0Q6hHsAcgiHuKGxdu8kzMJdIT9q6DavGSNikrHgmxJ8WoiRGIqYOpxd21P+xBVHuZ+CZKZh/VfVMU27U/e1gM8V/1faaSVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nE6k6GwO; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6040ffa60ddso6723587b3.2
-        for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 15:56:14 -0800 (PST)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-60403a678f2so6268047b3.3
+        for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 15:56:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706745373; x=1707350173; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1706745375; x=1707350175; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=CQD8xVAMwqMOWi6PTJB0HJDtmdm31D4WNpxMiUSqPiQ=;
-        b=QdSWPBrHomk20lzUGbh0sGV4DlQIZgWvcIOlSeU+SvoGq4ZqXlm3BAeLhfaA8+1lv8
-         mMJ2JM9bYLHtBdN4+utWr47sJlauQ8DZjxoadFqKfIv/SGjfd53gidHQU1itQuBygbYq
-         21AC1wKE/mv0pxC4S1u8z521kI9bg8UJFljJdyzhCr6OJ6Si2ZSAtklEO28JduH8XJOc
-         6F+bljjU5K7OqwB+N+IFWxZAFqI9+FpEHv/9YJiEFDjw73kU07ADdG5AR77DAU2//z5l
-         tdPPHsaa/KdYvbLrzWufCdkIdk8Q8ODIUU9HBsFWn6NYu341dvpFT7LTTvOS76FUzErK
-         epzw==
+        bh=wDrpEbS6CmtfJ+E5uJL5CN/JlvMOfJl9phijYT5xNg4=;
+        b=nE6k6GwOgPbzqBzDgNDXdpItFoEceXrLJfmpvHlwcgPlaUbtKdpXDQIZbJkpbJ8XN3
+         YQlCPCTG49J0ezo4eRtgwoplBXIgraqjEuogEM3OgshhL6XRok1l3lxP4ssI6pcF0jWA
+         A4TAD/fV0uJ2mhwU61jYzyU3vt0XMy2H7Zez8nmR7AUsXycLTttGvyrNd+B8YPQ64nvb
+         XpdM6zlwXClEJlVlrCwYeGgzZ9DZQwIeWKEyXI4YPsqn8G86B6ilsOjetPE7zbR1Ug6K
+         2zFRg1EkP/oXdeppVZan34sZ5Uy9ohgNVVFIDNPIdwVFABl7gBJywozQ7lki4uk8ybMh
+         2XgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706745373; x=1707350173;
+        d=1e100.net; s=20230601; t=1706745375; x=1707350175;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=CQD8xVAMwqMOWi6PTJB0HJDtmdm31D4WNpxMiUSqPiQ=;
-        b=l6Au9OXFAO0zFQLCV5NKuez5ZIu+s7rQNk2qzp9erPwwYldEv9PYIbhtdSmRqjVkUX
-         jHsVmYQYt3CUjIxlhcBPUFo/Wo0Yg02m8wx9ShYl9xFiLMl8SGMFG6e6jnnwMTHm+46I
-         LbuThSDSMiwl5JMzpXfDYlXUpj5rKQkwAWzE1CURM0tJJFJ8uTt8mX26K4TpYPJCy935
-         l0DmXKjAlJpCHHHwMEPz6vQ5d+CIylUk5lFDF/nVNNEQZEpx6IUFcXLtPJcV6Eb+A91Y
-         LXGkEnL34UHR9NsCPwVtrRpAe5DqwvYGmSMn4knckFsP5NIW6pSYlLeTiOe3eGEAhxTy
-         IlLg==
-X-Gm-Message-State: AOJu0Yx9eIFSMV+U6zFrvJV8aujkrULhl+fuVqlGWpDGzkBafPXPcAa3
-	KJtq9nJDeydUTds2yzXU1QplaNuOwA6FFftIXI1vJclzFHJqgHs8KJ5cO4mIxcURSSuYdf//l6V
-	VzA==
-X-Google-Smtp-Source: AGHT+IFEng8Bm/KBVwygkVXasRuf80ylGucwfbCrR5PDNSdg9SWzRiLInuFRXQK/bBefwUgzcl0fGDldrs0=
+        bh=wDrpEbS6CmtfJ+E5uJL5CN/JlvMOfJl9phijYT5xNg4=;
+        b=pU8ow6E10Z+Ns7VIWzMDBxsCnk4531G5sTOxH6/ur80/BEaxOi+jHN6LgH28HZ3FAz
+         jNzYJmbHWInDyUMzutdIbfQpdxcXucqU2joVaP4TS5dr9aeV/tBekOL8SyjZKU/Ef/7a
+         IigvDQyU2Zog10MedmhMHg7+LGnP4jRWqeQPb/7/13Q6IsuAdrbRXVIg0ffN67J8DBiu
+         jHG2/vGcJFvYCd+ZRdIQL6pOBjIM6h7S1Egt7KpVszq1ck1sp4XpkNdl/m0/FJiO3s3W
+         KMqgPA9m80HVr+IzcNP9NVd6qoxDMk4cX9C7HDjIJntCkT9c+FuiZjMicOPfn11fHBUq
+         jaHA==
+X-Gm-Message-State: AOJu0YyRHiGbX0E8DnxazzAqURrwqkEd+yNi6AGN+CTIYfuTRQHV7E99
+	pwBMCIMoILG8jrjptldOolTYNzB/I/4ibz9vCS4k6nL4vZhFEGPKd7LMoyP/eq4MP/vY2vutp97
+	aYg==
+X-Google-Smtp-Source: AGHT+IGbEnNEURC9jLZidxPUnwtX4/73UpoOEZWNy8Mqhjwh4iVtL4GbanNwrnNPMoZFVk33EXFFZMNkdNI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1385:b0:dc2:3441:897f with SMTP id
- x5-20020a056902138500b00dc23441897fmr859913ybu.6.1706745373557; Wed, 31 Jan
- 2024 15:56:13 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a05:690c:9e:b0:603:ea10:c37c with SMTP id
+ be30-20020a05690c009e00b00603ea10c37cmr719982ywb.7.1706745375516; Wed, 31 Jan
+ 2024 15:56:15 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 31 Jan 2024 15:56:06 -0800
+Date: Wed, 31 Jan 2024 15:56:07 -0800
 In-Reply-To: <20240131235609.4161407-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,63 +75,134 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240131235609.4161407-1-seanjc@google.com>
 X-Mailer: git-send-email 2.43.0.429.g432eaa2c6b-goog
-Message-ID: <20240131235609.4161407-2-seanjc@google.com>
-Subject: [PATCH v4 1/4] KVM: SVM: Set sev->asid in sev_asid_new() instead of
- overloading the return
+Message-ID: <20240131235609.4161407-3-seanjc@google.com>
+Subject: [PATCH v4 2/4] KVM: SVM: Use unsigned integers when dealing with ASIDs
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	Ashish Kalra <ashish.kalra@amd.com>, Tom Lendacky <thomas.lendacky@amd.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Explicitly set sev->asid in sev_asid_new() when a new ASID is successfully
-allocated, and return '0' to indicate success instead of overloading the
-return value to multiplex the ASID with error codes.  There is exactly one
-caller of sev_asid_new(), and sev_asid_free() already consumes sev->asid,
-i.e. returning the ASID isn't necessary for flexibility, nor does it
-provide symmetry between related APIs.
+Convert all local ASID variables and parameters throughout the SEV code
+from signed integers to unsigned integers.  As ASIDs are fundamentally
+unsigned values, and the global min/max variables are appropriately
+unsigned integers, too.
+
+Functionally, this is a glorified nop as KVM guarantees min_sev_asid is
+non-zero, and no CPU supports -1u as the _only_ asid, i.e. the signed vs.
+unsigned goof won't cause problems in practice.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/sev.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ arch/x86/kvm/svm/sev.c | 18 ++++++++++--------
+ arch/x86/kvm/trace.h   | 10 +++++-----
+ 2 files changed, 15 insertions(+), 13 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index f760106c31f8..7c000088bca6 100644
+index 7c000088bca6..04c4c14473fd 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -179,7 +179,8 @@ static int sev_asid_new(struct kvm_sev_info *sev)
+@@ -84,9 +84,10 @@ struct enc_region {
+ };
  
- 	mutex_unlock(&sev_bitmap_lock);
- 
--	return asid;
-+	sev->asid = asid;
-+	return 0;
- e_uncharge:
- 	sev_misc_cg_uncharge(sev);
- 	put_misc_cg(sev->misc_cg);
-@@ -246,7 +247,7 @@ static void sev_unbind_asid(struct kvm *kvm, unsigned int handle)
- static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ /* Called with the sev_bitmap_lock held, or on shutdown  */
+-static int sev_flush_asids(int min_asid, int max_asid)
++static int sev_flush_asids(unsigned int min_asid, unsigned int max_asid)
  {
- 	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
--	int asid, ret;
+-	int ret, asid, error = 0;
++	int ret, error = 0;
++	unsigned int asid;
+ 
+ 	/* Check if there are any ASIDs to reclaim before performing a flush */
+ 	asid = find_next_bit(sev_reclaim_asid_bitmap, nr_asids, min_asid);
+@@ -116,7 +117,7 @@ static inline bool is_mirroring_enc_context(struct kvm *kvm)
+ }
+ 
+ /* Must be called with the sev_bitmap_lock held */
+-static bool __sev_recycle_asids(int min_asid, int max_asid)
++static bool __sev_recycle_asids(unsigned int min_asid, unsigned int max_asid)
+ {
+ 	if (sev_flush_asids(min_asid, max_asid))
+ 		return false;
+@@ -143,8 +144,9 @@ static void sev_misc_cg_uncharge(struct kvm_sev_info *sev)
+ 
+ static int sev_asid_new(struct kvm_sev_info *sev)
+ {
+-	int asid, min_asid, max_asid, ret;
++	unsigned int asid, min_asid, max_asid;
+ 	bool retry = true;
 +	int ret;
  
- 	if (kvm->created_vcpus)
- 		return -EINVAL;
-@@ -257,10 +258,9 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 	WARN_ON(sev->misc_cg);
+ 	sev->misc_cg = get_current_misc_cg();
+@@ -188,7 +190,7 @@ static int sev_asid_new(struct kvm_sev_info *sev)
+ 	return ret;
+ }
  
- 	sev->active = true;
- 	sev->es_active = argp->id == KVM_SEV_ES_INIT;
--	asid = sev_asid_new(sev);
--	if (asid < 0)
-+	ret = sev_asid_new(sev);
-+	if (ret)
- 		goto e_no_asid;
--	sev->asid = asid;
+-static int sev_get_asid(struct kvm *kvm)
++static unsigned int sev_get_asid(struct kvm *kvm)
+ {
+ 	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
  
- 	ret = sev_platform_init(&argp->error);
- 	if (ret)
+@@ -284,8 +286,8 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 
+ static int sev_bind_asid(struct kvm *kvm, unsigned int handle, int *error)
+ {
++	unsigned int asid = sev_get_asid(kvm);
+ 	struct sev_data_activate activate;
+-	int asid = sev_get_asid(kvm);
+ 	int ret;
+ 
+ 	/* activate ASID on the given handle */
+@@ -2312,7 +2314,7 @@ int sev_cpu_init(struct svm_cpu_data *sd)
+  */
+ static void sev_flush_encrypted_page(struct kvm_vcpu *vcpu, void *va)
+ {
+-	int asid = to_kvm_svm(vcpu->kvm)->sev_info.asid;
++	unsigned int asid = to_kvm_svm(vcpu->kvm)->sev_info.asid;
+ 
+ 	/*
+ 	 * Note!  The address must be a kernel address, as regular page walk
+@@ -2630,7 +2632,7 @@ void sev_es_unmap_ghcb(struct vcpu_svm *svm)
+ void pre_sev_run(struct vcpu_svm *svm, int cpu)
+ {
+ 	struct svm_cpu_data *sd = per_cpu_ptr(&svm_data, cpu);
+-	int asid = sev_get_asid(svm->vcpu.kvm);
++	unsigned int asid = sev_get_asid(svm->vcpu.kvm);
+ 
+ 	/* Assign the asid allocated with this SEV guest */
+ 	svm->asid = asid;
+diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
+index 83843379813e..b82e6ed4f024 100644
+--- a/arch/x86/kvm/trace.h
++++ b/arch/x86/kvm/trace.h
+@@ -732,13 +732,13 @@ TRACE_EVENT(kvm_nested_intr_vmexit,
+  * Tracepoint for nested #vmexit because of interrupt pending
+  */
+ TRACE_EVENT(kvm_invlpga,
+-	    TP_PROTO(__u64 rip, int asid, u64 address),
++	    TP_PROTO(__u64 rip, unsigned int asid, u64 address),
+ 	    TP_ARGS(rip, asid, address),
+ 
+ 	TP_STRUCT__entry(
+-		__field(	__u64,	rip	)
+-		__field(	int,	asid	)
+-		__field(	__u64,	address	)
++		__field(	__u64,		rip	)
++		__field(	unsigned int,	asid	)
++		__field(	__u64,		address	)
+ 	),
+ 
+ 	TP_fast_assign(
+@@ -747,7 +747,7 @@ TRACE_EVENT(kvm_invlpga,
+ 		__entry->address	=	address;
+ 	),
+ 
+-	TP_printk("rip: 0x%016llx asid: %d address: 0x%016llx",
++	TP_printk("rip: 0x%016llx asid: %u address: 0x%016llx",
+ 		  __entry->rip, __entry->asid, __entry->address)
+ );
+ 
 -- 
 2.43.0.429.g432eaa2c6b-goog
 
