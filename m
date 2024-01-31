@@ -1,59 +1,59 @@
-Return-Path: <kvm+bounces-7565-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7566-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AABF843BA9
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 11:01:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA95F843BAF
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 11:02:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E7C91C26344
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 10:01:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 41EE51F2C98D
+	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 10:02:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18E1F69D14;
-	Wed, 31 Jan 2024 10:01:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BAC969E13;
+	Wed, 31 Jan 2024 10:01:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="D5PbZHTO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IblzPJJZ"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A401769D01
-	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 10:01:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 186A567C51
+	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 10:01:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706695280; cv=none; b=THLcTYxsqT73Wmrfe/1MmsaBxH4ehj3JgFmvVrkhl3svooGHNmarN6o6VzWqRmAgBkL6t9mbHv+kyREI0eBihQ/Un7nyXBVdnJqYzLbyxpkQ7htUvBoP86Fu/4JXx0BditVq/Mx7wGVAY/5CA/yS2SkauPD5DK7NDapc4zwwYHs=
+	t=1706695284; cv=none; b=bYAm6PEQk4+ByQlm4LLz5zctbfQSwj7KNYrgGFu2NLCM8IYFOnKTDWgrHdRLpTy5IPljSiI3F8r0ephSydMXCKhXK179+odOCvc+g2IimiM3q64KBs8W4rZ9Lp1862p/aGMyz97D42MaIWyRYnffiqN3D4eTeBsYgof8SpP5qoo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706695280; c=relaxed/simple;
-	bh=cOydRttf84q3Jkoe8+e7FBE3nU5gyeAi/0KZhDKalVw=;
+	s=arc-20240116; t=1706695284; c=relaxed/simple;
+	bh=dqVAp/mlK/ZWsBxRXuBhw678ydijj1fK6M7bq7JhVtE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=tX9j7210/3EtWZMUdUMy0DwXvbaxm8lTadOV93NWb48bI4mKV2Rc3goP7DnFqdb375M0jWH8H67Ukj2Fzl2YAVZo2VnsagrgoRlePd8mmHk+1Kzpk5ETQGrDFKvq9AzXFXL3pSj4XeLZjGOinx0pIihqDVuzIO8p24ArhL4yLaY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=D5PbZHTO; arc=none smtp.client-ip=192.198.163.7
+	 MIME-Version; b=rhqWXFjZvF+t4zuYSLA0JAzYTAI2jbUI9B6QAEq/AJx5CINPiR+FSScj5MIBmkbtt7sn4jFQnr8YxdFb+CnbNuGzkG61bisclMtoKZkHzpFignSeqjFGrHG3jdDc7XZymrBPJZD9DtStolmHpa4VHFT2wZ0dvu/Ls7ilBJlvMpk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IblzPJJZ; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706695278; x=1738231278;
+  t=1706695283; x=1738231283;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=cOydRttf84q3Jkoe8+e7FBE3nU5gyeAi/0KZhDKalVw=;
-  b=D5PbZHTOCz5Y1Lxy94RN45eoifM/YrKgfo2p70BwoOfChxznYBllvV93
-   kG5O9fjeDg4GBU1oTEFIe6oYugscgWtzQvUT0JkSEafhAwlhoyBlTCcPq
-   9GkhmS9SAz1MNId4mOT6kj56+JoN6iuMjE2BzA1P1DSy4zVrz8e5o6I6Z
-   g4ZKej4q0bCt0lsyJDaM7KnnmUM3Tdtoaq2aQ3PUEKDgho8RgNLoGqW/I
-   jSbRaYiKvGaKuvlQ2NJdxyWqLM8MvfIl74XQL3Wk+eWv0NO4G0bardzQM
-   hNB+Vufpeu3DKaFoj8RX+ykkcg7POWuZDfoHsWFH3ZnWfB4AjT1xJXyBp
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="25032725"
+  bh=dqVAp/mlK/ZWsBxRXuBhw678ydijj1fK6M7bq7JhVtE=;
+  b=IblzPJJZ1Ru8OeXzTDk7k7UIApG2Qzlmv7K5B4kSYx7lFdi3gjXekuI1
+   sMbAaKTg16ZJ4d7owSad7kBGBNJn7B8aeI+RdhuJN488Y2wt3TQd+DYlR
+   iIg/3xzFXD38DXVM6kopQvfz6An6NKPklxj3oJYNKwBzhwCcO0q9m+9t3
+   I+2YOTRr1sLSOaslVrLsMx4lVUbKpvY8CWSE83GpcKZ6RgNsBcNO0FnWw
+   12N3gCiFtA7xPCkb8FL0MAOywj+ZCG3uNhA1TBYaAloHIkAT7wfCzp9O5
+   B6Bj/jcxJI3glax1IbJqbi2TCLssu57hfryZ3YvLjmJw8WnGEVJuE/8vo
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="25032810"
 X-IronPort-AV: E=Sophos;i="6.05,231,1701158400"; 
-   d="scan'208";a="25032725"
+   d="scan'208";a="25032810"
 Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2024 02:01:18 -0800
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2024 02:01:22 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.05,231,1701158400"; 
-   d="scan'208";a="4036039"
+   d="scan'208";a="4036057"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
-  by fmviesa003.fm.intel.com with ESMTP; 31 Jan 2024 02:01:13 -0800
+  by fmviesa003.fm.intel.com with ESMTP; 31 Jan 2024 02:01:17 -0800
 From: Zhao Liu <zhao1.liu@linux.intel.com>
 To: Eduardo Habkost <eduardo@habkost.net>,
 	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
@@ -72,11 +72,10 @@ Cc: qemu-devel@nongnu.org,
 	Zhenyu Wang <zhenyu.z.wang@intel.com>,
 	Zhuocheng Ding <zhuocheng.ding@intel.com>,
 	Yongwei Ma <yongwei.ma@intel.com>,
-	Zhao Liu <zhao1.liu@intel.com>,
-	Robert Hoo <robert.hu@linux.intel.com>
-Subject: [PATCH v8 08/21] i386/cpu: Consolidate the use of topo_info in cpu_x86_cpuid()
-Date: Wed, 31 Jan 2024 18:13:37 +0800
-Message-Id: <20240131101350.109512-9-zhao1.liu@linux.intel.com>
+	Zhao Liu <zhao1.liu@intel.com>
+Subject: [PATCH v8 09/21] i386/cpu: Introduce bitmap to cache available CPU topology levels
+Date: Wed, 31 Jan 2024 18:13:38 +0800
+Message-Id: <20240131101350.109512-10-zhao1.liu@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240131101350.109512-1-zhao1.liu@linux.intel.com>
 References: <20240131101350.109512-1-zhao1.liu@linux.intel.com>
@@ -90,163 +89,177 @@ Content-Transfer-Encoding: 8bit
 
 From: Zhao Liu <zhao1.liu@intel.com>
 
-In cpu_x86_cpuid(), there are many variables in representing the cpu
-topology, e.g., topo_info, cs->nr_cores and cs->nr_threads.
+Currently, QEMU checks the specify number of topology domains to detect
+if there's extended topology levels (e.g., checking nr_dies).
 
-Since the names of cs->nr_cores/cs->nr_threads does not accurately
-represent its meaning, the use of cs->nr_cores/cs->nr_threads is prone
-to confusion and mistakes.
+With this bitmap, the extended CPU topology (the levels other than SMT,
+core and package) could be easier to detect without touching the
+topology details.
 
-And the structure X86CPUTopoInfo names its members clearly, thus the
-variable "topo_info" should be preferred.
+This is also in preparation for the follow-up to decouple CPUID[0x1F]
+subleaf with specific topology level.
 
-In addition, in cpu_x86_cpuid(), to uniformly use the topology variable,
-replace env->dies with topo_info.dies_per_pkg as well.
-
-Suggested-by: Robert Hoo <robert.hu@linux.intel.com>
 Tested-by: Yongwei Ma <yongwei.ma@intel.com>
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
-Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 ---
 Changes since v7:
- * Renamed cpus_per_pkg to threads_per_pkg. (Xiaoyao)
- * Dropped Michael/Babu's Acked/Tested tags since the code change.
- * Re-added Yongwei's Tested tag For his re-testing.
- * Added Xiaoyao's Reviewed tag.
-
-Changes since v3:
- * Fixed typo. (Babu)
-
-Changes since v1:
- * Extracted cores_per_socket from the code block and use it as a local
-   variable for cpu_x86_cpuid(). (Yanan)
- * Removed vcpus_per_socket variable and use cpus_per_pkg directly.
-   (Yanan)
- * Replaced env->dies with topo_info.dies_per_pkg in cpu_x86_cpuid().
+ * New commit to response Xiaoyao's suggestion about the gloabl variable
+   to cache topology levels. (Xiaoyao)
 ---
- target/i386/cpu.c | 31 ++++++++++++++++++-------------
- 1 file changed, 18 insertions(+), 13 deletions(-)
+ hw/i386/x86.c              |  5 ++++-
+ include/hw/i386/topology.h | 23 +++++++++++++++++++++++
+ target/i386/cpu.c          | 18 +++++++++++++++---
+ target/i386/cpu.h          |  4 ++++
+ target/i386/kvm/kvm.c      |  3 ++-
+ 5 files changed, 48 insertions(+), 5 deletions(-)
 
+diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+index 2b6291ad8d5f..5a42e3757099 100644
+--- a/hw/i386/x86.c
++++ b/hw/i386/x86.c
+@@ -309,7 +309,10 @@ void x86_cpu_pre_plug(HotplugHandler *hotplug_dev,
+ 
+     init_topo_info(&topo_info, x86ms);
+ 
+-    env->nr_dies = ms->smp.dies;
++    if (ms->smp.dies > 1) {
++        env->nr_dies = ms->smp.dies;
++        set_bit(CPU_TOPO_LEVEL_DIE, env->avail_cpu_topo);
++    }
+ 
+     /*
+      * If APIC ID is not set,
+diff --git a/include/hw/i386/topology.h b/include/hw/i386/topology.h
+index d4eeb7ab8290..befeb92b0b19 100644
+--- a/include/hw/i386/topology.h
++++ b/include/hw/i386/topology.h
+@@ -60,6 +60,21 @@ typedef struct X86CPUTopoInfo {
+     unsigned threads_per_core;
+ } X86CPUTopoInfo;
+ 
++/*
++ * CPUTopoLevel is the general i386 topology hierarchical representation,
++ * ordered by increasing hierarchical relationship.
++ * Its enumeration value is not bound to the type value of Intel (CPUID[0x1F])
++ * or AMD (CPUID[0x80000026]).
++ */
++enum CPUTopoLevel {
++    CPU_TOPO_LEVEL_INVALID,
++    CPU_TOPO_LEVEL_SMT,
++    CPU_TOPO_LEVEL_CORE,
++    CPU_TOPO_LEVEL_DIE,
++    CPU_TOPO_LEVEL_PACKAGE,
++    CPU_TOPO_LEVEL_MAX,
++};
++
+ /* Return the bit width needed for 'count' IDs */
+ static unsigned apicid_bitwidth_for_count(unsigned count)
+ {
+@@ -168,4 +183,12 @@ static inline apic_id_t x86_apicid_from_cpu_idx(X86CPUTopoInfo *topo_info,
+     return x86_apicid_from_topo_ids(topo_info, &topo_ids);
+ }
+ 
++/*
++ * Check whether there's extended topology level (die)?
++ */
++static inline bool x86_has_extended_topo(unsigned long *topo_bitmap)
++{
++    return test_bit(CPU_TOPO_LEVEL_DIE, topo_bitmap);
++}
++
+ #endif /* HW_I386_TOPOLOGY_H */
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 65944645db5c..b32833f65dd6 100644
+index b32833f65dd6..607d8eff017b 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -6016,11 +6016,16 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-     uint32_t limit;
-     uint32_t signature[3];
-     X86CPUTopoInfo topo_info;
-+    uint32_t cores_per_pkg;
-+    uint32_t threads_per_pkg;
- 
-     topo_info.dies_per_pkg = env->nr_dies;
-     topo_info.cores_per_die = cs->nr_cores / env->nr_dies;
-     topo_info.threads_per_core = cs->nr_threads;
- 
-+    cores_per_pkg = topo_info.cores_per_die * topo_info.dies_per_pkg;
-+    threads_per_pkg = cores_per_pkg * topo_info.threads_per_core;
-+
-     /* Calculate & apply limits for different index ranges */
-     if (index >= 0xC0000000) {
-         limit = env->cpuid_xlevel2;
-@@ -6056,8 +6061,8 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-             *ecx |= CPUID_EXT_OSXSAVE;
-         }
-         *edx = env->features[FEAT_1_EDX];
--        if (cs->nr_cores * cs->nr_threads > 1) {
--            *ebx |= (cs->nr_cores * cs->nr_threads) << 16;
-+        if (threads_per_pkg > 1) {
-+            *ebx |= threads_per_pkg << 16;
-             *edx |= CPUID_HT;
-         }
-         if (!cpu->enable_pmu) {
-@@ -6097,15 +6102,15 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-              */
-             if (*eax & 31) {
-                 int host_vcpus_per_cache = 1 + ((*eax & 0x3FFC000) >> 14);
--                int vcpus_per_socket = cs->nr_cores * cs->nr_threads;
--                if (cs->nr_cores > 1) {
-+
-+                if (cores_per_pkg > 1) {
-                     addressable_cores_width = apicid_pkg_offset(&topo_info) -
-                                               apicid_core_offset(&topo_info);
- 
-                     *eax &= ~0xFC000000;
-                     *eax |= ((1 << addressable_cores_width) - 1) << 26;
-                 }
--                if (host_vcpus_per_cache > vcpus_per_socket) {
-+                if (host_vcpus_per_cache > threads_per_pkg) {
-                     /* Share the cache at package level. */
-                     addressable_threads_width = apicid_pkg_offset(&topo_info);
- 
-@@ -6251,12 +6256,12 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-         switch (count) {
-         case 0:
-             *eax = apicid_core_offset(&topo_info);
--            *ebx = cs->nr_threads;
-+            *ebx = topo_info.threads_per_core;
-             *ecx |= CPUID_TOPOLOGY_LEVEL_SMT;
-             break;
-         case 1:
-             *eax = apicid_pkg_offset(&topo_info);
--            *ebx = cs->nr_cores * cs->nr_threads;
-+            *ebx = threads_per_pkg;
-             *ecx |= CPUID_TOPOLOGY_LEVEL_CORE;
-             break;
-         default:
-@@ -6276,7 +6281,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+@@ -6281,7 +6281,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
          break;
      case 0x1F:
          /* V2 Extended Topology Enumeration Leaf */
--        if (env->nr_dies < 2) {
-+        if (topo_info.dies_per_pkg < 2) {
+-        if (topo_info.dies_per_pkg < 2) {
++        if (!x86_has_extended_topo(env->avail_cpu_topo)) {
              *eax = *ebx = *ecx = *edx = 0;
              break;
          }
-@@ -6286,7 +6291,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-         switch (count) {
-         case 0:
-             *eax = apicid_core_offset(&topo_info);
--            *ebx = cs->nr_threads;
-+            *ebx = topo_info.threads_per_core;
-             *ecx |= CPUID_TOPOLOGY_LEVEL_SMT;
-             break;
-         case 1:
-@@ -6296,7 +6301,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-             break;
-         case 2:
-             *eax = apicid_pkg_offset(&topo_info);
--            *ebx = cs->nr_cores * cs->nr_threads;
-+            *ebx = threads_per_pkg;
-             *ecx |= CPUID_TOPOLOGY_LEVEL_DIE;
-             break;
-         default:
-@@ -6520,7 +6525,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-          * discards multiple thread information if it is set.
-          * So don't set it here for Intel to make Linux guests happy.
+@@ -7107,7 +7107,7 @@ void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+          * cpu->vendor_cpuid_only has been unset for compatibility with older
+          * machine types.
           */
--        if (cs->nr_cores * cs->nr_threads > 1) {
-+        if (threads_per_pkg > 1) {
-             if (env->cpuid_vendor1 != CPUID_VENDOR_INTEL_1 ||
-                 env->cpuid_vendor2 != CPUID_VENDOR_INTEL_2 ||
-                 env->cpuid_vendor3 != CPUID_VENDOR_INTEL_3) {
-@@ -6586,7 +6591,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-              *eax |= (cpu_x86_virtual_addr_width(env) << 8);
+-        if ((env->nr_dies > 1) &&
++        if (x86_has_extended_topo(env->avail_cpu_topo) &&
+             (IS_INTEL_CPU(env) || !cpu->vendor_cpuid_only)) {
+             x86_cpu_adjust_level(cpu, &env->cpuid_min_level, 0x1F);
          }
-         *ebx = env->features[FEAT_8000_0008_EBX];
--        if (cs->nr_cores * cs->nr_threads > 1) {
-+        if (threads_per_pkg > 1) {
-             /*
-              * Bits 15:12 is "The number of bits in the initial
-              * Core::X86::Apic::ApicId[ApicId] value that indicate
-@@ -6594,7 +6599,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-              * Bits 7:0 is "The number of threads in the package is NC+1"
-              */
-             *ecx = (apicid_pkg_offset(&topo_info) << 12) |
--                   ((cs->nr_cores * cs->nr_threads) - 1);
-+                   (threads_per_pkg - 1);
-         } else {
-             *ecx = 0;
+@@ -7608,13 +7608,25 @@ static void x86_cpu_post_initfn(Object *obj)
+     accel_cpu_instance_init(CPU(obj));
+ }
+ 
++static void x86_cpu_init_default_topo(X86CPU *cpu)
++{
++    CPUX86State *env = &cpu->env;
++
++    env->nr_dies = 1;
++
++    /* SMT, core and package levels are set by default. */
++    set_bit(CPU_TOPO_LEVEL_SMT, env->avail_cpu_topo);
++    set_bit(CPU_TOPO_LEVEL_CORE, env->avail_cpu_topo);
++    set_bit(CPU_TOPO_LEVEL_PACKAGE, env->avail_cpu_topo);
++}
++
+ static void x86_cpu_initfn(Object *obj)
+ {
+     X86CPU *cpu = X86_CPU(obj);
+     X86CPUClass *xcc = X86_CPU_GET_CLASS(obj);
+     CPUX86State *env = &cpu->env;
+ 
+-    env->nr_dies = 1;
++    x86_cpu_init_default_topo(cpu);
+ 
+     object_property_add(obj, "feature-words", "X86CPUFeatureWordInfo",
+                         x86_cpu_get_feature_words,
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 7f0786e8b98f..f341affd5a59 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -24,6 +24,7 @@
+ #include "cpu-qom.h"
+ #include "kvm/hyperv-proto.h"
+ #include "exec/cpu-defs.h"
++#include "hw/i386/topology.h"
+ #include "qapi/qapi-types-common.h"
+ #include "qemu/cpu-float.h"
+ #include "qemu/timer.h"
+@@ -1885,6 +1886,9 @@ typedef struct CPUArchState {
+ 
+     /* Number of dies within this CPU package. */
+     unsigned nr_dies;
++
++    /* Bitmap of available CPU topology levels for this CPU. */
++    DECLARE_BITMAP(avail_cpu_topo, CPU_TOPO_LEVEL_MAX);
+ } CPUX86State;
+ 
+ struct kvm_msrs;
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index 76a66246eb72..25d438e0b586 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -50,6 +50,7 @@
+ #include "hw/i386/apic_internal.h"
+ #include "hw/i386/apic-msidef.h"
+ #include "hw/i386/intel_iommu.h"
++#include "hw/i386/topology.h"
+ #include "hw/i386/x86-iommu.h"
+ #include "hw/i386/e820_memory_layout.h"
+ 
+@@ -1913,7 +1914,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+             break;
          }
+         case 0x1f:
+-            if (env->nr_dies < 2) {
++            if (!x86_has_extended_topo(env->avail_cpu_topo)) {
+                 break;
+             }
+             /* fallthrough */
 -- 
 2.34.1
 
