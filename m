@@ -1,158 +1,169 @@
-Return-Path: <kvm+bounces-7693-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7694-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75A238454E0
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 11:09:45 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46514845519
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 11:20:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F3B011F236D1
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 10:09:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 633A2B23232
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 10:20:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7757E15B0FF;
-	Thu,  1 Feb 2024 10:09:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3BE215B973;
+	Thu,  1 Feb 2024 10:20:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="PKU61Siw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QFzJNb/y"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B0174DA05;
-	Thu,  1 Feb 2024 10:09:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6644D4D9F9
+	for <kvm@vger.kernel.org>; Thu,  1 Feb 2024 10:20:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706782176; cv=none; b=iHqRn+iQqRGYNh7H+O8Y5AHSMseBFY9wccJC042JbP/hH9A3lPuZNu1f5f3EG7OSmozDcBn0nsqYIa67fT28LJzvOE9EYPUR+gGJ35hluKFsjZhMVpa+8aEUUlmK06Gw8V6CMJ4YN9Hh6xhMBUQOyUoG2VfKqxHVUdJzuhkGR7w=
+	t=1706782805; cv=none; b=rPzUrdxvDl5OH8DUPnh1hq9IFb7tysblqSmPIbkuyvhLGun4zpweKP+BnVtlXmBW5zyhj9G0WuqjE923j3Co0Zaj/+Gb0jDebepux3XSqsj0YeKRWQMEWGb8aOOxBfVb8gY64nj4wtRXNDCHwyWGm1/RdyQDP8BTe41/Pbuhb8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706782176; c=relaxed/simple;
-	bh=khglv1S2txolyfuJETjG/WsW9nN8P6HLnDJl9f/6CTw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Q8U+w1unfH+s0XovdvJC4ndsp2uH0zONHkXJ33E1cwaJ8WaMTJMVSkIBgw3SGXe3ZfH99LmJLxRwAxU6b97lJJz6agjev4QGLbFSX2Vzy5QNuC5TZomHAbvAk+P4/Oc5bg1hF8I2H84GO1DhNaDaK/aEUZi1ctphmn5R2cNVxFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=PKU61Siw; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 4119ZshC011668;
-	Thu, 1 Feb 2024 10:09:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=s2HwtZoSORbC/FFYkhvPytvLbh4PKO2jjIAuSPXHUb8=;
- b=PKU61SiwNp3Etk0ueN3795rqGduhcpKZrH+vvsmt7ZdRQiKXhnc1fV+JHWV4KojOXR9d
- iAc997XZ6D2w/6KgkSnSN04ai/7nJ9gw320JKvDr7YXplEaSzw+stygeAtoQtCLCnouk
- LvWdtJkpoADosh0vA5ka7PQZIFTx4T9Z04JC9H7LnPrYrcpd7gTvD2cZOdlPjbTdUswo
- 1a3+ckeMkycnK7v+0F3xOnxB7yOLhHA/hG27ozqU3un4TmDA48tYwbJBNCXsL4TAP1gz
- Ovw56EPNcX2bY6P7FXw8v5R1BnyWp6aENUgoV509ToqXA0D60PAS45Pr6RanV/I3ZD0K dA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w079kkbgh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 01 Feb 2024 10:09:33 +0000
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 4119tVAg005806;
-	Thu, 1 Feb 2024 10:09:33 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w079kkbg7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 01 Feb 2024 10:09:33 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4117ZXlD011292;
-	Thu, 1 Feb 2024 10:09:32 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3vwecku43n-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 01 Feb 2024 10:09:32 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 411A9TUH43516360
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 1 Feb 2024 10:09:29 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 782F02004B;
-	Thu,  1 Feb 2024 10:09:29 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2CE3B20049;
-	Thu,  1 Feb 2024 10:09:29 +0000 (GMT)
-Received: from [9.171.38.59] (unknown [9.171.38.59])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  1 Feb 2024 10:09:29 +0000 (GMT)
-Message-ID: <28cfafd8-e2d4-41a9-8f90-2838e8bce25a@linux.ibm.com>
-Date: Thu, 1 Feb 2024 11:09:28 +0100
+	s=arc-20240116; t=1706782805; c=relaxed/simple;
+	bh=fOv7oevZuvvZsJf1C1St13HEDSFkJW2lWu0qBEAsTwc=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=fVZWuvcLjQrBIDIxo3z58/8Zx9/Sd1Rk7qK5T1ytyy9JGzpjHm9Hex06LHwUtaOF88lDTdyibbc/21BXkvprG4Npc9mN50jZopE1PX10xc4VGbj6S5hL4solkVXOBm9JKUuhM8sn8bpk/Qh59C3CFIysc8uiQ9apJDkuFJKc/Wc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QFzJNb/y; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706782802;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=v/4dNiv7Gixt65uHC5aCs29qHOR+DNKVZDoHEZy6bqM=;
+	b=QFzJNb/yFHqj0lECgOOaCuSB9d4LWnsxzi/suNWvkH7K1qbS31mriop01P0U4guOvtokwH
+	JMP9ffhzUucmRBhjoALz0BZo9GnIbFerEYjNX3kcAsfzU/NiApmTlbRR7oHzntqkbd6bou
+	4/mWQQ4B5LzHYTP8WSRlG5jGXVlZlow=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-516-w-kLKAfdMdK1wDsqdFuNuw-1; Thu, 01 Feb 2024 05:20:00 -0500
+X-MC-Unique: w-kLKAfdMdK1wDsqdFuNuw-1
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a357c92f241so43402666b.0
+        for <kvm@vger.kernel.org>; Thu, 01 Feb 2024 02:20:00 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706782799; x=1707387599;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=v/4dNiv7Gixt65uHC5aCs29qHOR+DNKVZDoHEZy6bqM=;
+        b=Eg5W1wBld0X7SmsYS8+IJM3K2+tb9Dw85vr9fCr2eS85GWlHeN25nW8xyVRQxtp9II
+         m7iXHu5KYZgMcN1yB+VbenfPswxntJoAJEdjrUomq82FLtVLhFbHi6A9Vq83CKwsxBqG
+         AtiSz5G2Yq4tQfGjThxDYMsyzBQha8jyYAha7dW0glYh3xfEWas4BCzJWzuWxG4Yoy8Q
+         B4MLu3TqQnSa9WOXqNp3kRRGsvi+IMjcKCBxniGoYN31pGJnYl47TpH3GiPqKfzmO1tT
+         AkRn05wOlyJQMN0XqbjeApGD7U7f/2eT6FG9/cPWOXMfuxs/dXLwnlXrX701xdDtMSqH
+         HUFg==
+X-Gm-Message-State: AOJu0Yz4+S12HEuD1JUQAKSdrQZlEcEeVRwbXcEYYTXAjxs4aYh34/0P
+	uaoFa6peNGdwxGG4hJz7Y6DL136IgII+sYlvV7ASoJxg/CPKN9ik0LwOKGDTNRmyA5iZLebn6Id
+	gnKm/a1MN8C9O8bSnCJ3Gzw+C9StR4pdu9T0kWe9FICOCTMLwww==
+X-Received: by 2002:a17:906:d10e:b0:a31:61ad:6554 with SMTP id b14-20020a170906d10e00b00a3161ad6554mr1429950ejz.69.1706782799670;
+        Thu, 01 Feb 2024 02:19:59 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF/GkhU57dioOHC7xr2O/jFX4EwaPurr5DMMYY1FG8VzQcAwtDPgonJDhdsMsmkqsVkOvrUSw==
+X-Received: by 2002:a17:906:d10e:b0:a31:61ad:6554 with SMTP id b14-20020a170906d10e00b00a3161ad6554mr1429938ejz.69.1706782799369;
+        Thu, 01 Feb 2024 02:19:59 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCXJSx1+Gy7uGkCto8Zt1KBxcUnD2ZLhWxsVkpmKm5U5+OL9zn33sGzRU7E78tS+Hy/5FlzM9yhmk9DWGTItzzIjvVv8ZeC1z+wfdQXpJcn1hHtAHafdNx0aowOBmkVezCnXw2pjZ0YHGRIJ9+v1aW9ap6nZCdmf+07dLJE/mb05zBj53vU7//jjyQ==
+Received: from fedora (g2.ign.cz. [91.219.240.8])
+        by smtp.gmail.com with ESMTPSA id ps10-20020a170906bf4a00b00a368718314dsm1232216ejb.7.2024.02.01.02.19.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Feb 2024 02:19:58 -0800 (PST)
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Jan Richter <jarichte@redhat.com>, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Sean
+ Christopherson <seanjc@google.com>
+Subject: Re: [PATCH] KVM: selftests: Compare wall time from xen shinfo
+ against KVM_GET_CLOCK
+In-Reply-To: <596b2d7ce6941e5dd6bd7b2da6d3ea7d74f6c95a.camel@infradead.org>
+References: <20240111135901.1785096-1-vkuznets@redhat.com>
+ <596b2d7ce6941e5dd6bd7b2da6d3ea7d74f6c95a.camel@infradead.org>
+Date: Thu, 01 Feb 2024 11:19:57 +0100
+Message-ID: <87h6is7agi.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v1] s390x: add pv-attest to unittests.cfg
-To: Nico Boehr <nrb@linux.ibm.com>, imbrenda@linux.ibm.com, thuth@redhat.com
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org
-References: <20240201100713.1497439-1-nrb@linux.ibm.com>
-Content-Language: en-US
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- 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
-In-Reply-To: <20240201100713.1497439-1-nrb@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Tfv7Pa9oVLDLofvGD3m00KYs-I_PNOpd
-X-Proofpoint-GUID: EEj4bRsai0I4K4PKNBBdBSebpfFVDz4X
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-31_10,2024-01-31_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- bulkscore=0 suspectscore=0 mlxlogscore=832 mlxscore=0 malwarescore=0
- priorityscore=1501 clxscore=1015 spamscore=0 phishscore=0 impostorscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2402010081
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 2/1/24 11:07, Nico Boehr wrote:
-> There seems to be no obvious reason why it shouldn't be there.
-> 
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+David Woodhouse <dwmw2@infradead.org> writes:
 
-This has been in the CI for months, so consider this to be applied and:
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+> Sorry for delayed response.
+>
+> On Thu, 2024-01-11 at 14:59 +0100, Vitaly Kuznetsov wrote:
+>>=20
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vm_ioctl(vm, KVM_GET_CLOCK, &kcdat=
+a);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 delta =3D (wc->sec * NSEC_PER_SEC =
++ wc->nsec) - (kcdata.realtime - kcdata.clock);
+>
+> I think you need to check for KVM_CLOCK_REALTIME in the flags here,
+> don't you? It might not always be set.
 
+Good suggestion; while this shouldn't be a common use-case on x86_64, it
+is possible when TSC is *not* the clocksource used on the host. I guess
+we can just skip the sub-test with a message in this case.
+
+>
+> And also, nobody should ever be using KVM_CLOCK_REALTIME as it stands
+> at the moment. It's fundamentally broken because it should always have
+> used CLOCK_TAI not CLOCK_REALTIME.
+>
+> I'm in the process of fixing that up as an incremental ABI change,
+> putting the TAI offset into one of the spare pad fields in the
+> kvm_clock_data and adding a new KVM_CLOCK_TAI_OFFSET flag.
+>
+>> +       TEST_ASSERT(llabs(delta) < 100,
+>> +                   "Guest's epoch from shinfo %d.%09d differs from KVM_=
+GET_CLOCK %lld.%lld",
+>> +                   wc->sec, wc->nsec, (kcdata.realtime - kcdata.clock) =
+/ NSEC_PER_SEC,
+>> +                   (kcdata.realtime - kcdata.clock) % NSEC_PER_SEC);
+>>=20
+>
+>> Replace the check with comparing wall clock data from shinfo to
+>> KVM_GET_CLOCK. The later gives both realtime and kvmclock so guest's epo=
+ch
+>> can be calculated by subtraction. Note, the computed epoch may still dif=
+fer
+>> a few nanoseconds from shinfo as different TSC is used and there are
+>> rounding errors but 100 nanoseconds margin should be enough to cover
+>> it (famous last words).
+>
+> Aren't those just bugs? Surely this *should* be cycle-perfect, if the
+> host has a stable TSC?
+>
+> But I suppose this isn't the test case for that. This is just testing
+> that the Xen shinfo is doing basically the right thing.
+>
+> And we're going to need a few more fixes like this WIP before we get
+> get to cycle perfection from the horrid mess that is our kvmclock code:
+> https://git.infradead.org/?p=3Dusers/dwmw2/linux.git;a=3Dcommitdiff;h=3Db=
+c557e5ee4
+
+(Some time ago I was considering suggesting we switch to Hypet-V TSC page
+clocksource for Linux guests to avoid fixing the mess :-) It's becoming
+less and less relevant as with modern hardware which supports TSC
+scaling (and which doesn't support famous TSC bugs like TSC divergence
+across sockets :-) passing through raw TSC to guests is becoming more
+and more popular.)
+
+Regarding this fix, what's your decree? My intention here is to
+basically get rid on xen_shinfo flakyness without reducing test
+coverage. I.e. we still want to test that shinfo data is somewhat
+sane. Later, when you get your 'cycle perfection' and 'TAI' patches in,
+we can always adjust the test accordingly. In case you agree, I can
+re-send this with KVM_CLOCK_REALTIME check added.
+
+--=20
+Vitaly
 
 
