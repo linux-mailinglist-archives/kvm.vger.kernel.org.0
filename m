@@ -1,99 +1,119 @@
-Return-Path: <kvm+bounces-7706-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7707-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AA0E84594F
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 14:51:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4480C845955
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 14:52:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E94831F218A0
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 13:51:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DBE34B2351C
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 13:52:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C71035D48D;
-	Thu,  1 Feb 2024 13:51:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1B1C5D467;
+	Thu,  1 Feb 2024 13:52:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ORYm901G"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ueiC7CfB"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F308E5D474
-	for <kvm@vger.kernel.org>; Thu,  1 Feb 2024 13:51:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BF8F8663B;
+	Thu,  1 Feb 2024 13:52:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706795465; cv=none; b=lQSwqJf45jPYHXHjjd3HRo25kheve045P6BoppEr0ftnvMHk0RyeEJNDNpUO03eZK5L/pzrTbSsTljfGlB7ORxR1PMElndoi8Hq8/tNfab140UyLBxf6M7aj/UG5sHBuXyyYIIyDGQVCk8aZmpEd4c17Jj8nch9snZp1OWn4uSY=
+	t=1706795554; cv=none; b=uSSY17aZYFRLI2tzFxWUqUYOWUe8XmwKfdFlHusTOL237kEDUyic09d8ccZiAIEYRb2Z83H9E5j4txFdRLuinimZ9X3iGeWQnYV0DrU5IT4yuUvG7Arjd5OCh88BVAqdsf4eurF5EBVcDS42UA7idBIFiMbyeFpmOPvDXUXDNV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706795465; c=relaxed/simple;
-	bh=v/Ou3niPEfbcvn5BHjAVtFCTt1ddhpLsUW2SrXKSj/s=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=dnDtKpYIjkqVHcz2H4P71N3nmv9hPhQAkQEAzmHxw3XG3PkWZ/JB6Jubs8x/ptsZ3ZYDXMC4TbRU93jeHlwTgdKJPCrXzc+hvaRLXtJzAETI2CUWY/EQjv9hv1JtPLkWssDGvGdlveBWoaUhR5a447zEsVxEBHrEqgeUGVgYBFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ORYm901G; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 81EA9C433F1
-	for <kvm@vger.kernel.org>; Thu,  1 Feb 2024 13:51:04 +0000 (UTC)
+	s=arc-20240116; t=1706795554; c=relaxed/simple;
+	bh=hU+ObxdoMg2MlAgcOXqMatFJ02oxVhmfiG3OEicRvus=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cLCupQ7rHJVreglaT93Yqc5dtL77zMULFrEBD8wxNJKW1f7t1acGDTqNdVKpewkA0R/HkxOqHo54djkaMQqqWoYdpn3cx1kndziMpZ5qoFKwGEAt+s5hNgFz21KDcF/YfHIvPQVslsm7EjG1yETYwHf4Sx90C7tjIogZKe8i+w8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ueiC7CfB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65C90C433C7;
+	Thu,  1 Feb 2024 13:52:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706795464;
-	bh=v/Ou3niPEfbcvn5BHjAVtFCTt1ddhpLsUW2SrXKSj/s=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=ORYm901Gw9TOvUFC7U3VGDv83+wZJBvt4rfXDSGw0UlTDH52Ku74JNXbBOo4oxl+l
-	 yeNYC6narD5CJNzzCewTR3hcqfyj4GSfbv5mw8dWu5TZtzHVmcgDt9cGB3nXixZdLT
-	 /JVpnmtNYEITaEDGLT0NjuJ8mQdWUpRX/JCd+iQm3+TZfP83bACSc4G5ke8R+H8B9R
-	 hBt3PqdRRR362BjtYz8p4QXAssIopd68MhR9SsbWJF/9NbJu5gMnFhpQTGnrfnmK+3
-	 s7LC8JflvMKXUGz6OlIifABJi+QWdtxuyPw5jlNYNZ8Wq5VadR52NWgjiMJa/TUsbv
-	 HMb7u9m0xVRhw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 724A8C53BC6; Thu,  1 Feb 2024 13:51:04 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: kvm@vger.kernel.org
-Subject: [Bug 199727] CPU freezes in KVM guests during high IO load on host
-Date: Thu, 01 Feb 2024 13:51:03 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: mgabriel@inett.de
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-199727-28872-nRUlhRssoC@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-199727-28872@https.bugzilla.kernel.org/>
-References: <bug-199727-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=k20201202; t=1706795553;
+	bh=hU+ObxdoMg2MlAgcOXqMatFJ02oxVhmfiG3OEicRvus=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ueiC7CfBdVH8cLEkErjSzc5fwcnpU9NQYkgJAZKkZdye5Ve0ZZKpNZkx3AVRwFN75
+	 KWfgD/PQh0yb1xyYnWyQvuITxKNcSfvokL/qgPm60I6VUngyErYQtVbkmm1HxINcWy
+	 n25D8upedMPS0wwORv12rv5WLwDH8rBYraNM1Y7jw90bRRBqH1TqBkIoZ12b47Q4S5
+	 bEmHqC008jveWDP4yVx3r2spzj2wAyJRWlp1SH0MdHpKOkZvtZFnwQ9upnvCRmf22x
+	 zVTDquAJf3Foz2m00hXuZMXU0GIh/8UrrPALF8N2+BjvcH4xIUHomOf1jE4UFs2Asy
+	 Y9zyJjvGVo+VQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rVXUU-00GwZa-OY;
+	Thu, 01 Feb 2024 13:52:30 +0000
+Date: Thu, 01 Feb 2024 13:52:29 +0000
+Message-ID: <86jzno70ma.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Peter Hilber <peter.hilber@opensynergy.com>
+Cc: linux-kernel@vger.kernel.org,
+	"D, Lakshmi Sowjanya" <lakshmi.sowjanya.d@intel.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	jstultz@google.com,
+	giometti@enneenne.com,
+	corbet@lwn.net,
+	"Dong, Eddie" <eddie.dong@intel.com>,
+	"Hall, Christopher S" <christopher.s.hall@intel.com>,
+	Simon Horman <horms@kernel.org>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	linux-arm-kernel@lists.infradead.org,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Wanpeng Li <wanpengli@tencent.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Daniel Lezcano <daniel.lezcano@linaro.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	kvm@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v3 5/8] ptp/kvm, arm_arch_timer: Set system_counterval_t.cs_id to constant
+In-Reply-To: <20240201010453.2212371-6-peter.hilber@opensynergy.com>
+References: <20240201010453.2212371-1-peter.hilber@opensynergy.com>
+	<20240201010453.2212371-6-peter.hilber@opensynergy.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: peter.hilber@opensynergy.com, linux-kernel@vger.kernel.org, lakshmi.sowjanya.d@intel.com, tglx@linutronix.de, jstultz@google.com, giometti@enneenne.com, corbet@lwn.net, eddie.dong@intel.com, christopher.s.hall@intel.com, horms@kernel.org, andriy.shevchenko@linux.intel.com, linux-arm-kernel@lists.infradead.org, seanjc@google.com, pbonzini@redhat.com, mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, wanpengli@tencent.com, vkuznets@redhat.com, mark.rutland@arm.com, daniel.lezcano@linaro.org, richardcochran@gmail.com, kvm@vger.kernel.org, netdev@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D199727
+On Thu, 01 Feb 2024 01:04:50 +0000,
+Peter Hilber <peter.hilber@opensynergy.com> wrote:
+> 
+> Identify the clocksources used by ptp_kvm by setting clocksource ID enum
+> constants. This avoids dereferencing struct clocksource. Once the
+> system_counterval_t.cs member will be removed, this will also avoid the
+> need to obtain clocksource pointers from kvm_arch_ptp_get_crosststamp().
+> 
+> The clocksource IDs are associated to timestamps requested from the KVM
+> hypervisor, so the proper clocksource ID is known at the ptp_kvm request
+> site.
+> 
+> While at it, also rectify the ptp_kvm_get_time_fn() ret type.
 
---- Comment #23 from Marco Gabriel (mgabriel@inett.de) ---
-(In reply to Roland Kletzing from comment #13)
-> hello, thanks - aio=3Dio_uring is no better, the only real way to get to a
-> stable system is virtio-scsi-single/iothreads=3D1/aio=3Dthreads
->=20
-> the question is why aio=3Dnative and io_uring has issues and threads has =
-not...
+Not sure what is wrong with that return type, but this patch doesn't
+seem to affect it.
 
-Just for reference: Using aio=3Dthreads doesn't help on our lab and customer
-setups (Proxmox/Ceph HCI) - we still see vm freezes after several minutes w=
-hen
-I/O load is high.
+	M.
 
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+-- 
+Without deviation from the norm, progress is not possible.
 
