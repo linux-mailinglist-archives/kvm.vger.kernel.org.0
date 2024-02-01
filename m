@@ -1,188 +1,122 @@
-Return-Path: <kvm+bounces-7691-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7692-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED4ED84549E
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 10:58:12 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC4C68454D9
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 11:07:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 674251F2B44B
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 09:58:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8CC32B212D6
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 10:07:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9817715B0F5;
-	Thu,  1 Feb 2024 09:57:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33A5E15B0FE;
+	Thu,  1 Feb 2024 10:07:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="yCHRXKIz"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="k+SCy2J1"
 X-Original-To: kvm@vger.kernel.org
-Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F77B4D9E9;
-	Thu,  1 Feb 2024 09:57:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C9074DA1D;
+	Thu,  1 Feb 2024 10:07:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706781476; cv=none; b=JbuY1pjt1Zb14Da2aNt8JkA1GbmAtpmtAflxy+We8KTwIsy7p2Zjms4W69BcBGcVDS4uz02Ga+LfsgQ6Djdrz9r/2kdqszEHjbX/unQXstn4lUTCfTVE3MRhKN3FLnUMgxbLCWdPBIP1X+wkVhViFV7ociAKXweI0Cma7UD9nzw=
+	t=1706782041; cv=none; b=BS9XosvzjcIl5oqip1zDPJsPGznxvOBYZkyyCo0/n2vprU5GhKk7LIOBALDzh2VSHUnK49kJRbtiMZNYdVYId9NgpHxi76fydz6+R6h2sYIkhpDC2mbQ0v9FzdKGvg96miBGU6bIHJ152N7NryJYi+MMkAU5xa/9JW8ZL88TFKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706781476; c=relaxed/simple;
-	bh=wXHv1FvFttD+/4Ykt/AOCzKeEg28Zvwn1bnpohIfpYQ=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
-	 Content-Type; b=ay9nXfZkrGlxjz0fZ7sZbgMDCOf6PoMNr5TyXEmqSUJTfKolqzB8ez8rya1EUTXU2l6XKLnuqnta4db1A5SYIDfW0vhnborJBeYZVAsWQDODqnGp6pn19aR5vpXSgIXyU8mKJR4ka3x/sQeTgTLO21ZErxRNU2/Kn/fltAFQA/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=yCHRXKIz; arc=none smtp.client-ip=115.124.30.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1706781471; h=Message-ID:Subject:Date:From:To:Content-Type;
-	bh=90to8cwBJMQb8442ZR8q4xiN29UaF6MDG11lxdXfYpM=;
-	b=yCHRXKIzH2vyssrt6aC07nP9lBW+5Swf9CNg2qdnlaBRV5llBTS4flRkIFlemcMG7eEAIA03dtPZQVlLZaBM97K1CKQoJKEEY4i8cJScDPsHCw1mTdeDaJ+bayuuceZGtfQteswLCuglrZ4ELoo/kiZILwe9/fkacawB3CRk8kU=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=37;SR=0;TI=SMTPD_---0W.tM-xH_1706781468;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W.tM-xH_1706781468)
-          by smtp.aliyun-inc.com;
-          Thu, 01 Feb 2024 17:57:49 +0800
-Message-ID: <1706781420.4036775-6-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH vhost 00/17] virtio: drivers maintain dma info for premapped vq
-Date: Thu, 1 Feb 2024 17:57:00 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Zhu Yanjun <yanjun.zhu@linux.dev>
-Cc: Richard Weinberger <richard@nod.at>,
- Anton Ivanov <anton.ivanov@cambridgegreys.com>,
- Johannes Berg <johannes@sipsolutions.net>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Hans de Goede <hdegoede@redhat.com>,
- =?utf-8?q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- Vadim Pasternak <vadimp@nvidia.com>,
- Bjorn Andersson <andersson@kernel.org>,
- Mathieu Poirier <mathieu.poirier@linaro.org>,
- Cornelia Huck <cohuck@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Eric Farman <farman@linux.ibm.com>,
- Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Benjamin Berg <benjamin.berg@intel.com>,
- Yang Li <yang.lee@linux.alibaba.com>,
- linux-um@lists.infradead.org,
- netdev@vger.kernel.org,
- platform-driver-x86@vger.kernel.org,
- linux-remoteproc@vger.kernel.org,
- linux-s390@vger.kernel.org,
- kvm@vger.kernel.org,
- bpf@vger.kernel.org,
- virtualization@lists.linux.dev
-References: <20240130114224.86536-1-xuanzhuo@linux.alibaba.com>
- <fdc2da16-5680-44cf-bc18-b3e8c0f565fa@linux.dev>
-In-Reply-To: <fdc2da16-5680-44cf-bc18-b3e8c0f565fa@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1706782041; c=relaxed/simple;
+	bh=nNcegXSwW6UKFtduCCYg4voqCfFvyFX+9AKEHwxgUzQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PH0UwBlaLsp2W3RzTqx7DeMfXzHpUI+dMASAAzjPwrLKCCn/6yktA2wurCWZcej3X3IpnRVv7LFdYKO43/VSMVs7YUlLsFqlBFOhu0kQ6rQ/5qgGckMyRKuz8jS1ZdEwfGavds03jOrCiAQtyct4vjcVEPYSjXFLMoTbQvUcYaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=k+SCy2J1; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 4119KxmZ018497;
+	Thu, 1 Feb 2024 10:07:18 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=K6zUDQ751WWX1tafHaNS0tK9NuJ5KJR8fw4MJCPB3g0=;
+ b=k+SCy2J1OylDGoK4ztjTUjfnohgolLHegyCeGusQjJX6+0P/j1toDdw9A0/IuNdyXkVx
+ URm2Vy4U0Sd+Y25s4UkWon1hBK8UBX/wBUYZ9OeuGXH2zWEwbg0oyWyEgi3Rk/aax3NZ
+ FrMufQKrDasbJtJxQHf3qW+7RocGuXd/dvmTxSqD/8FxHAn6E/mNgsXQ3IoOXxTOhmjK
+ 64pNcIBmKXd6A05+ulbGAsSGew9rJOGm+AIL2G/xk2nsPQ7BX6scs27DMS/nfUBxnoIq
+ 3yV7MBBA/NLMM3OgjCm41jEalDwgqxawqTxm0zQhGDmlDzv9/bZAMsgHdpoGiBBpSC9J HQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w083at0xk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 01 Feb 2024 10:07:18 +0000
+Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 4119kLIv026850;
+	Thu, 1 Feb 2024 10:07:18 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w083at0x6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 01 Feb 2024 10:07:17 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4119mOpP017755;
+	Thu, 1 Feb 2024 10:07:16 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3vwcj03k28-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 01 Feb 2024 10:07:16 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 411A7D4o14156290
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 1 Feb 2024 10:07:13 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 875F620043;
+	Thu,  1 Feb 2024 10:07:13 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4AF5520040;
+	Thu,  1 Feb 2024 10:07:13 +0000 (GMT)
+Received: from t35lp63.lnxne.boe (unknown [9.152.108.100])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  1 Feb 2024 10:07:13 +0000 (GMT)
+From: Nico Boehr <nrb@linux.ibm.com>
+To: frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: [kvm-unit-tests PATCH v1] s390x: add pv-attest to unittests.cfg
+Date: Thu,  1 Feb 2024 11:07:10 +0100
+Message-ID: <20240201100713.1497439-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: AxJ3NXdBDxlLYMgvcwWjj55ACoWxqIY9
+X-Proofpoint-ORIG-GUID: gQr5BZAR-XPqJW2poRm_fm4OWJL5WLuj
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-31_10,2024-01-31_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ phishscore=0 mlxlogscore=952 clxscore=1011 bulkscore=0 priorityscore=1501
+ adultscore=0 mlxscore=0 impostorscore=0 malwarescore=0 spamscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2402010081
 
-On Thu, 1 Feb 2024 15:43:51 +0800, Zhu Yanjun <yanjun.zhu@linux.dev> wrote:
-> =E5=9C=A8 2024/1/30 19:42, Xuan Zhuo =E5=86=99=E9=81=93:
-> > As discussed:
-> > http://lore.kernel.org/all/CACGkMEvq0No8QGC46U4mGsMtuD44fD_cfLcPaVmJ3rH=
-YqRZxYg@mail.gmail.com
-> >
-> > If the virtio is premapped mode, the driver should manage the dma info =
-by self.
-> > So the virtio core should not store the dma info.
-> > So we can release the memory used to store the dma info.
-> >
-> > But if the desc_extra has not dma info, we face a new question,
-> > it is hard to get the dma info of the desc with indirect flag.
-> > For split mode, that is easy from desc, but for the packed mode,
-> > it is hard to get the dma info from the desc. And for hardening
-> > the dma unmap is saft, we should store the dma info of indirect
-> > descs.
-> >
-> > So I introduce the "structure the indirect desc table" to
-> > allocate space to store dma info with the desc table.
-> >
-> > On the other side, we mix the descs with indirect flag
-> > with other descs together to share the unmap api. That
-> > is complex. I found if we we distinguish the descs with
-> > VRING_DESC_F_INDIRECT before unmap, thing will be clearer.
-> >
-> > Because of the dma array is allocated in the find_vqs(),
-> > so I introduce a new parameter to find_vqs().
-> >
-> > Please review.
-> >
-> > Thanks
-> >
-> > Xuan Zhuo (17):
-> >    virtio_ring: introduce vring_need_unmap_buffer
-> >    virtio_ring: packed: remove double check of the unmap ops
-> >    virtio_ring: packed: structure the indirect desc table
-> >    virtio_ring: split: remove double check of the unmap ops
-> >    virtio_ring: split: structure the indirect desc table
-> >    virtio_ring: no store dma info when unmap is not needed
-> >    virtio: find_vqs: pass struct instead of multi parameters
-> >    virtio: vring_new_virtqueue(): pass struct instead of multi paramete=
-rs
-> >    virtio_ring: reuse the parameter struct of find_vqs()
-> >    virtio: find_vqs: add new parameter premapped
-> >    virtio_ring: export premapped to driver by struct virtqueue
-> >    virtio_net: set premapped mode by find_vqs()
-> >    virtio_ring: remove api of setting vq premapped
-> >    virtio_ring: introduce dma map api for page
-> >    virtio_net: unify the code for recycling the xmit ptr
-> >    virtio_net: rename free_old_xmit_skbs to free_old_xmit
-> >    virtio_net: sq support premapped mode
->
-> The above can not be cleanly merged into kernel 6.8-rc2.
->
-> Perhaps a base-commit is needed. About base-commit, please see the link
-> https://people.kernel.org/monsieuricon/all-patches-must-include-base-comm=
-it-info
+There seems to be no obvious reason why it shouldn't be there.
 
-The target branch is Michael's vhost.
+Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+---
+ s390x/unittests.cfg | 3 +++
+ 1 file changed, 3 insertions(+)
 
-https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git/log/?h=3Dlinu=
-x-next
+diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+index f5024b6eefd9..018e4129ffac 100644
+--- a/s390x/unittests.cfg
++++ b/s390x/unittests.cfg
+@@ -383,3 +383,6 @@ extra_params = """-cpu max,ctop=on -smp cpus=1,drawers=2,books=2,sockets=2,cores
+ 
+ [sie-dat]
+ file = sie-dat.elf
++
++[pv-attest]
++file = pv-attest.elf
+-- 
+2.41.0
 
-Thanks.
-
->
-> Zhu Yanjun
->
-> >
-> >   arch/um/drivers/virtio_uml.c             |  29 +-
-> >   drivers/net/virtio_net.c                 | 298 +++++++---
-> >   drivers/platform/mellanox/mlxbf-tmfifo.c |  24 +-
-> >   drivers/remoteproc/remoteproc_virtio.c   |  31 +-
-> >   drivers/s390/virtio/virtio_ccw.c         |  33 +-
-> >   drivers/virtio/virtio_mmio.c             |  30 +-
-> >   drivers/virtio/virtio_pci_common.c       |  59 +-
-> >   drivers/virtio/virtio_pci_common.h       |   9 +-
-> >   drivers/virtio/virtio_pci_legacy.c       |  16 +-
-> >   drivers/virtio/virtio_pci_modern.c       |  24 +-
-> >   drivers/virtio/virtio_ring.c             | 660 ++++++++++++-----------
-> >   drivers/virtio/virtio_vdpa.c             |  33 +-
-> >   include/linux/virtio.h                   |  10 +-
-> >   include/linux/virtio_config.h            |  48 +-
-> >   include/linux/virtio_ring.h              |  82 +--
-> >   tools/virtio/virtio_test.c               |   4 +-
-> >   tools/virtio/vringh_test.c               |  32 +-
-> >   17 files changed, 812 insertions(+), 610 deletions(-)
-> >
-> > --
-> > 2.32.0.3.g01195cf9f
-> >
->
 
