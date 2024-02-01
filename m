@@ -1,234 +1,124 @@
-Return-Path: <kvm+bounces-7746-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7747-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B182D845DDF
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 17:56:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C519845DF7
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 18:00:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1AD01C2668B
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 16:56:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0128B1F2C4FD
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 17:00:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38D34DF6D;
-	Thu,  1 Feb 2024 16:56:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06F315CDD1;
+	Thu,  1 Feb 2024 17:00:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="pSacDwcQ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yaSfUf4q"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 500D05CAF;
-	Thu,  1 Feb 2024 16:56:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52A6D5A4EC
+	for <kvm@vger.kernel.org>; Thu,  1 Feb 2024 17:00:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706806594; cv=none; b=N1pzUkdcFvp4x9kv8i5X110iJ2riWAWDZx844XMnB0U9LVOpVmjlmJ/irpXxb/fwobaLdTI7+lt4maHidH8Nln1cCBRamK1V3z7jyR0RR6hVnh+ig4msqsGbTxT6zMxQFn22u3r9dj7ndArHeuKOlmF0OSN6ZTC/mkCebO+3Xfk=
+	t=1706806822; cv=none; b=gEqxtCYMFtQCvjBUxejcIZr+XOw4JSO+ioGclKJkINv6zE7UqR6nZ+IcWwP0sAPhD5Zg3sY59/WQla9m00aPNJCIcbl57rtlZomFqtP+Yzb113jdv0mIuSVH2QJFXYOeeypJMpCqHoIUfWm9IN1tYrzCejkcRKbX1UwTgOOb/P0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706806594; c=relaxed/simple;
-	bh=AB9ax/8t0wejVj9CtQ5Su7le0JSY/WoSYrFGi7uK99A=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=juPbzHayqifMAtgPKzxWvVui7+9yTHwFa7YtoEz8gLa7q16xStxfW2TFv6AU8glM0FT8OCWNmtIFYjTiULjNn6HPlE672ZjL5k1ZAYfhiau7dM6YPDNnp8WzviMtl6wGtXABPr5q1XVK4kkiFVOVmc4NamPFnRb5w7KLNChlLWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=pSacDwcQ; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 411GM8Up025717;
-	Thu, 1 Feb 2024 16:56:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=TGuZpbQaYfHv91tvzcPlYr89K1RYmI9ZNSDUiqOumAM=;
- b=pSacDwcQmPMYZaopbb26LNhil8hlAlbCMKAwX9RcGs6OdrFSW65kYLtsYtk2qKqwMn98
- YnJw+YO/tgr8Aexk7AorTBX01ivNbhHgJZAC9sdJrbZNlNm1dWlcK4S/k5JoDN0O+L/l
- UhMZ3rE1zhqJwmdtN3EjrVFvUAv8FgoW+/SVtv6E9qfRRkngqxFAcStsCgArtKI5hJP3
- uRy+CsfO3oRqSdjddAcpQyZRu3GE9rERS8rzEcWrvCkG+33pIvkqCKGsP9xvvuAk7RfU
- x+I7in2D/xYZiZ8nS1mGRP671RFNet+hjvEBneoC0+jGxaTDyS1b0eC2khufRB11p8DG wg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w0e6ej1jp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 01 Feb 2024 16:56:29 +0000
-Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 411GguSt028856;
-	Thu, 1 Feb 2024 16:56:29 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w0e6ej1ja-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 01 Feb 2024 16:56:29 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 411GOSVZ010884;
-	Thu, 1 Feb 2024 16:56:28 GMT
-Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3vweckwa87-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 01 Feb 2024 16:56:28 +0000
-Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
-	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 411GuRpm21168574
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 1 Feb 2024 16:56:28 GMT
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BCEA35804E;
-	Thu,  1 Feb 2024 16:56:27 +0000 (GMT)
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E2EA058060;
-	Thu,  1 Feb 2024 16:56:26 +0000 (GMT)
-Received: from li-479af74c-31f9-11b2-a85c-e4ddee11713b.ibm.com (unknown [9.61.18.22])
-	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  1 Feb 2024 16:56:26 +0000 (GMT)
-Message-ID: <f82ab76e5f389a92afe2fa8834812feeec4df4b5.camel@linux.ibm.com>
-Subject: Re: [RFC PATCH] KVM: s390: remove extra copy of access registers
- into KVM_RUN
-From: Eric Farman <farman@linux.ibm.com>
-To: Heiko Carstens <hca@linux.ibm.com>
-Cc: Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank
- <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David
- Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Date: Thu, 01 Feb 2024 11:56:26 -0500
-In-Reply-To: <20240201151432.6306-C-hca@linux.ibm.com>
-References: <20240131205832.2179029-1-farman@linux.ibm.com>
-	 <20240201151432.6306-C-hca@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+	s=arc-20240116; t=1706806822; c=relaxed/simple;
+	bh=N4n3zRIvR+VTDaguBtwM3JkuHD6WLYuDJPmBPDcTpS4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=nIAY4rNKoQng0xeM+XcDOaARDfr0/rDXqdQo5d3fUe5JPjoMwlzM2FmFaNnNlKsPXzmlnyPSHsEX+3qQfVinqhRa4ooCcSN3ufnlgWVk4iXtciDxuyq83j+C3qPJ4aEjzRC4zgi02/G01Xx2cCzsKzrgJDmKnyA6XWmCxjW0fag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yaSfUf4q; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1d542680c9cso13178545ad.2
+        for <kvm@vger.kernel.org>; Thu, 01 Feb 2024 09:00:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1706806819; x=1707411619; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/x3jlCLNc7UiUHoyVg434LJ4SeDSaVulHM99QrXsAOg=;
+        b=yaSfUf4qjNdx+8mecKoY/fSIpRbXUcC2IWLwR+bfxg+bLTfXaQ71owfoew/ibncffw
+         daiLgWckS6VUrYZrsNCMIzJNSMtGrsbjT1yie3bfkFGsg7yZ5c4VIqZ28lcigYR55y+X
+         48s/LJ5QPWua9VwbW9STTNjS6/pD6yDCh6KN2OL0BCUC+HsU8ColMgXUQzWMjKB75BcG
+         hsn7tKjgBKrYtjupX47SXFqILMW7dN3p8reSLp8nfgHh2zwUCecvCIET3LrrMQfkBTnF
+         GUrmIEtoMhWfBEEcUKjuIutSbAnGn5tJmVmB/HmPWO2m5T7xUanx00SYOn0Zl3ALlbmf
+         itjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706806819; x=1707411619;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/x3jlCLNc7UiUHoyVg434LJ4SeDSaVulHM99QrXsAOg=;
+        b=bKa1JmvOqyQ7+uR4AeV00kSm6xstJMEE3AZXtEHGbTQV4FtpwypefL5WHcI3wc7qQK
+         Ba45Cqhf5zcGShmb/7Dk7VRF4pmX5Yg7tOdzMZ0mcY6ZQ9gf/dBVT1XXoo35PzKOphB0
+         UP5dwmAb0beIGevds32C9WOQbBACs7uVzf6JsFcEHhVZhq05IEu+Zdk2d++8u9bWJEUh
+         8oBWd3/KdlqOZhRW3XS8wQa3dC1fCQb/3btjwLSUuMLq1+rPnfqln+rWOLCeBY1YG351
+         ghloHd44iNP+nbIknJ9S07BzQfONLa23srU96mKLO7G7F6Iyg6lvJjZToTu3F2RbWD7+
+         ebJw==
+X-Gm-Message-State: AOJu0YwZ78jjo3zyst2nXxrkEVD4x/qHmEvLTNqNBPc1TR9btwh9zQFE
+	cxHggY6zhl+bGOno+sD1MUlFqdU9OcicunqRPY89/vlQcy1GDpoyTljRWbvmWEIQF7qQqvKmlzK
+	XNQUV57xiR+Z4+yX2vn1NjYqcxcFkyydTNFSH1jV11SFELIoCCv8b1e92Fa909qI9Tk3B9JDHHp
+	1zSMMSXFHUw4TKQ7jxHGapcAybEib8
+X-Google-Smtp-Source: AGHT+IHzf36y0HnGIX/3H+jUOKEMIK/NvtVO4O2y3aiz38JRM3qjQA3HJXJ+4Z9mqhTO31dM1UgLkbISPBo=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:903:348b:b0:1d7:8535:d089 with SMTP id
+ mg11-20020a170903348b00b001d78535d089mr14916plb.11.1706806819590; Thu, 01 Feb
+ 2024 09:00:19 -0800 (PST)
+Date: Thu, 1 Feb 2024 09:00:17 -0800
+In-Reply-To: <170666266778.3861845.16453599042139259499.b4-ty@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: UwuggBJf7R37CyNEl0meptnfVcURyw4s
-X-Proofpoint-ORIG-GUID: N7IRSIF4cshaldvrI24wWBHuDaiXpxuf
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-01_04,2024-01-31_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
- clxscore=1015 lowpriorityscore=0 adultscore=0 bulkscore=0 spamscore=0
- mlxlogscore=490 phishscore=0 priorityscore=1501 suspectscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2402010132
+Mime-Version: 1.0
+References: <20240109141121.1619463-1-vkuznets@redhat.com> <170666266778.3861845.16453599042139259499.b4-ty@google.com>
+Message-ID: <ZbvOIQqGt6SJMJrm@google.com>
+Subject: Re: [PATCH 0/5] KVM: selftests: Fix clocksource requirements in tests
+From: Sean Christopherson <seanjc@google.com>
+To: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
+	Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: linux-kernel@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, 2024-02-01 at 16:14 +0100, Heiko Carstens wrote:
-> On Wed, Jan 31, 2024 at 09:58:32PM +0100, Eric Farman wrote:
-> > The routine ar_translation() is called by get_vcpu_asce(), which is
-> > called from a handful of places, such as an interception that is
-> > being handled during KVM_RUN processing. In that case, the access
-> > registers of the vcpu had been saved to a host_acrs struct and then
-> > the guest access registers loaded from the KVM_RUN struct prior to
-> > entering SIE. Saving them back to KVM_RUN at this point doesn't do
-> > any harm, since it will be done again at the end of the KVM_RUN
-> > loop when the host access registers are restored.
-> >=20
-> > But that's not the only path into this code. The MEM_OP ioctl can
-> > be used while specifying an access register, and will arrive here.
-> >=20
-> > Linux itself doesn't use the access registers for much, but it does
-> > squirrel the thread local storage variable into ACRs 0 and 1 in
-> > copy_thread() [1]. This means that the MEM_OP ioctl may copy
-> > non-zero access registers (the upper- and lower-halves of the TLS
-> > pointer) to the KVM_RUN struct, which will end up getting
-> > propogated
-> > to the guest once KVM_RUN ioctls occur. Since these are almost
-> > certainly invalid as far as an ALET goes, an ALET Specification
-> > Exception would be triggered if it were attempted to be used.
->=20
-> What's the code path that can lead to this scenario?
+On Tue, Jan 30, 2024, Sean Christopherson wrote:
+> On Tue, 09 Jan 2024 15:11:16 +0100, Vitaly Kuznetsov wrote:
+> > It was discovered that 'hyperv_clock' fails miserably when the system is
+> > using an unsupported (by KVM) clocksource, e.g. 'kvm-clock'. The root cause
+> > of the failure is that 'hyperv_clock' doesn't actually check which clocksource
+> > is currently in use. Other tests (kvm_clock_test, vmx_nested_tsc_scaling_test)
+> > have the required check but each test does it on its own.
+> > 
+> > Generalize clocksource checking infrastructure, make all three clocksource
+> > dependent tests run with 'tsc' and 'hyperv_clocksource_tsc_page', and skip
+> > gracefully when run in an unsupported configuration.
+> > 
+> > [...]
+> 
+> Applied to kvm-x86 selftests, thanks!
+> 
+> [1/5] KVM: selftests: Generalize check_clocksource() from kvm_clock_test
+>       https://github.com/kvm-x86/linux/commit/449d0d6ccf55
+> [2/5] KVM: selftests: Use generic sys_clocksource_is_tsc() in vmx_nested_tsc_scaling_test
+>       https://github.com/kvm-x86/linux/commit/a79036441a68
+> [3/5] KVM: selftests: Run clocksource dependent tests with hyperv_clocksource_tsc_page too
+>       https://github.com/kvm-x86/linux/commit/436e6e541cb2
+> [4/5] KVM: selftests: Make hyperv_clock require TSC based system clocksource
+>       https://github.com/kvm-x86/linux/commit/14fce852a14b
+> [5/5] KVM: x86: Make gtod_is_based_on_tsc() return 'bool'
+>       https://github.com/kvm-x86/linux/commit/57cc53712934
 
-When processing a KVM_RUN ioctl, the kernel is going to swap the
-host/guest access registers in sync_regs, enter SIE, and then swap them
-back in store_regs when it has to exit to userspace. So then on the
-QEMU side it might look something like this:
+FYI, I dropped the xen_shinfo patch, and past me wasn't clever enough to make sure
+that patch was applied last.  New hashes are:
 
-kvm_arch_handle_exit
-  handle_intercept
-    handle_instruction
-      handle_b2
-        ioinst_handle_stsch
-          s390_cpu_virt_mem_rw(ar=3D0xe, is_write=3Dtrue)
-            kvm_s390_mem_op
-
-Where the interesting registers at that point are:
-
-acr0           0x3ff               1023
-acr1           0x33bff8c0          868219072
-...
-acr14          0x0                 0
-
-Note ACR0/1 are already buggered up from an earlier pass.
-
-The above carries us through the kernel this way:
-
-kvm_arch_vcpu_ioctl(KVM_S390_MEM_OP)
-  kvm_s390_vcpu_memsida_op
-    kvm_s390_vcpu_mem_op
-      write_guest_with_key
-        access_guest_with_key
-          get_vcpu_asce
-            ar_translate
-              save_access_regs(kvm_run)
-
->=20
-> > =C2=A0arch/s390/kvm/gaccess.c | 5 +++--
-> > =C2=A01 file changed, 3 insertions(+), 2 deletions(-)
-> >=20
-> > diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
-> > index 5bfcc50c1a68..9205496195a4 100644
-> > --- a/arch/s390/kvm/gaccess.c
-> > +++ b/arch/s390/kvm/gaccess.c
-> > @@ -380,6 +380,7 @@ void ipte_unlock(struct kvm *kvm)
-> > =C2=A0static int ar_translation(struct kvm_vcpu *vcpu, union asce *asce=
-,
-> > u8 ar,
-> > =C2=A0			=C2=A0 enum gacc_mode mode)
-> > =C2=A0{
-> > +	int acrs[NUM_ACRS];
-> > =C2=A0	union alet alet;
-> > =C2=A0	struct ale ale;
-> > =C2=A0	struct aste aste;
-> > @@ -391,8 +392,8 @@ static int ar_translation(struct kvm_vcpu
-> > *vcpu, union asce *asce, u8 ar,
-> > =C2=A0	if (ar >=3D NUM_ACRS)
-> > =C2=A0		return -EINVAL;
-> > =C2=A0
-> > -	save_access_regs(vcpu->run->s.regs.acrs);
-> > -	alet.val =3D vcpu->run->s.regs.acrs[ar];
-> > +	save_access_regs(acrs);
-> > +	alet.val =3D acrs[ar];
->=20
-> If the above is like you said, then this code would use the host
-> access register contents for ar translation of the guest?
->=20
-> Or maybe I'm simply misunderstanding what you write.
-
-Well regardless of this patch, I think it's using the contents of the
-host registers today, isn't it? save_access_regs() does a STAM to put
-the current registers into some bit of memory, so ar_translation() can
-do regular logic against it. The above just changes WHERE that bit of
-memory lives from something shared with another ioctl to something
-local to ar_translation().=20
-
-My original change just removed the save_access_regs() call entirely
-and read the contents of the kvm_run struct since they were last saved
-(see below). This "feels" better to me, and works for the scenario I
-bumped into too. Maybe this is more appropriate?
-
----8<---
-
-diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
-index 5bfcc50c1a68..c5ed3b0b665a 100644
---- a/arch/s390/kvm/gaccess.c
-+++ b/arch/s390/kvm/gaccess.c
-@@ -391,7 +391,6 @@ static int ar_translation(struct kvm_vcpu *vcpu,
-union asce *asce, u8 ar,
-        if (ar >=3D NUM_ACRS)
-                return -EINVAL;
-=20
--       save_access_regs(vcpu->run->s.regs.acrs);
-        alet.val =3D vcpu->run->s.regs.acrs[ar];
-=20
-        if (ar =3D=3D 0 || alet.val =3D=3D 0) {
-
+[1/5] KVM: selftests: Generalize check_clocksource() from kvm_clock_test
+      https://github.com/kvm-x86/linux/commit/e440c5f2e3e6
+[2/5] KVM: selftests: Use generic sys_clocksource_is_tsc() in vmx_nested_tsc_scaling_test
+      https://github.com/kvm-x86/linux/commit/410cb01ead5b
+[3/5] KVM: selftests: Run clocksource dependent tests with hyperv_clocksource_tsc_page too
+      https://github.com/kvm-x86/linux/commit/09951bf2cbb3
+[4/5] KVM: selftests: Make hyperv_clock require TSC based system clocksource
+      https://github.com/kvm-x86/linux/commit/b6831a108be1
+[5/5] KVM: x86: Make gtod_is_based_on_tsc() return 'bool'
+      https://github.com/kvm-x86/linux/commit/9e62797fd7e8
 
