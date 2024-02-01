@@ -1,320 +1,334 @@
-Return-Path: <kvm+bounces-7680-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7681-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF359845323
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 09:52:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45729845330
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 09:55:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3987C1F23669
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 08:52:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC69128C5DA
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 08:55:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B25815AAB5;
-	Thu,  1 Feb 2024 08:51:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0CA115AACC;
+	Thu,  1 Feb 2024 08:55:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aQjBUf8f"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ADrcx9AS"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E24E315AAA7
-	for <kvm@vger.kernel.org>; Thu,  1 Feb 2024 08:51:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F32A9158D9B;
+	Thu,  1 Feb 2024 08:55:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706777510; cv=none; b=JIr/4NjZFZVIa7FIEZWzBPgahGQceuVSJYNksGuY2rIyGQZQrG7LXnqDiz7OBeEeMk9iRWJwlajAoX+kIJVR92eEn9dFSymQ2Tj589rVuWKPGjGBdZqpcKuh1rxtsyNDNpVZr+3c6v4ng4o9/PlGBIpeysD+Q+VKooHSeG1Ja5k=
+	t=1706777710; cv=none; b=Aoqfxw2tb50jSyr5saxLWYI09RKjcGWK7vpFNEup4IVNptQfRB4erjKjaWctwHv7cq/SMwIN7ZubrjYVfRU/BKMMuFeAMoTO9bPTfGHXKPBqm3rRI1fY9vWr43R9/b8Qu//UJ/j75sS5d4ueJhpWqzRN+ajkn2BN6sBKqw5Ib0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706777510; c=relaxed/simple;
-	bh=ksw74lbTG+rNChnAUvQ4t9jlME9/0bLUh6+pEk1RlLU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=PPqrIeKINFpDaHq/yVxgpkeZNlrL8FEGaD3JE1Pibsu8+iv2KyDtYicBcK07YvM7hTTASjuxJbr1Sn2q9TU9ub2xhczh5a9e3PxmeGJSsiYGLcoy/7BRPTnE5TP0ggfJTH4SIJk0CMxePu+Koz6BajAuAItw7xl/HZyexynuEok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aQjBUf8f; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706777507;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=HVrefMOnjiHYiKBEqY4ofoeAwAOjB/FmRujOaXDuXkg=;
-	b=aQjBUf8faW0Hg4b+IHijWtbGpT20R/mPNft+zIslx5eoxmGXTwsgEzDL0IEwVu1rXvw2/t
-	tBBhJSljqj5gAMP4MHjdUphJxlyKfw0gMP6dGxVgQLzfG4AIb6Pl7mMrZ/DnPDfVm5C3ci
-	p3ECCLrIZ7Kz8r61GjVHCyNs7CUUMhY=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-199-G1VobIXFMA2Haw6EYfPjeg-1; Thu,
- 01 Feb 2024 03:51:44 -0500
-X-MC-Unique: G1VobIXFMA2Haw6EYfPjeg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 436201C068E0;
-	Thu,  1 Feb 2024 08:51:44 +0000 (UTC)
-Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 26E8F1BDB1;
-	Thu,  1 Feb 2024 08:51:44 +0000 (UTC)
-From: Shaoqin Huang <shahuang@redhat.com>
-To: qemu-arm@nongnu.org
-Cc: Eric Auger <eauger@redhat.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shaoqin Huang <shahuang@redhat.com>,
-	Sebastian Ott <sebott@redhat.com>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	qemu-devel@nongnu.org,
-	kvm@vger.kernel.org
-Subject: [PATCH v6] arm/kvm: Enable support for KVM_ARM_VCPU_PMU_V3_FILTER
-Date: Thu,  1 Feb 2024 03:51:24 -0500
-Message-Id: <20240201085124.152799-1-shahuang@redhat.com>
+	s=arc-20240116; t=1706777710; c=relaxed/simple;
+	bh=b2rj9dZ0y8jK7bvIn9RbX/qXY3lPt+yCZVrBwH2TDls=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TMkXJ5KqNg03VGLuAwWoNf1eQ7iu4xrtuY1n86EUqp/NQEaoU1fMCPeOdkqctmJ2+fgU9f87aqGBEe9JS7yFW0zZrxQqaU25Vg62ch1jnerBp484ZeKm9laoZtiomvAlHzJz1+N++Y+YhHWyYDn7oTas1s9qEOCDsensysxD3i4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ADrcx9AS; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706777709; x=1738313709;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=b2rj9dZ0y8jK7bvIn9RbX/qXY3lPt+yCZVrBwH2TDls=;
+  b=ADrcx9ASm0FqbquqwUZsm01XStJJw2eua0LcQrt3gUwMaI8BIMr45nn6
+   jesMYbSQSkxTZ51GPDIR7iL4nKvcO6hbVKRa9/gNQgxzBKN+mVmIEiH7e
+   tEb1xycaF1wsx9N66PO9BsbPxwLszApcjGmYkyhNN23MHRc00MrvngUFB
+   Usc1AkZYFmL/FNR55UgIgItscJs62g+T/+i1MbYfgwv7lRhTEd2z3paJk
+   R57fVSo1pbdC2p8D8wzhmnesMXuTR880ndhjf9V0KYkOj0yRaiGV4dhyO
+   Y4c1SoR3ESL2GK6lXy/yihiNierf43OZ7ofBfzECi5w+Oues0vO7SUDNu
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="31894"
+X-IronPort-AV: E=Sophos;i="6.05,234,1701158400"; 
+   d="scan'208";a="31894"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2024 00:55:08 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,234,1701158400"; 
+   d="scan'208";a="31888"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.33.17]) ([10.93.33.17])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2024 00:55:05 -0800
+Message-ID: <c0ac9a16-16dc-4238-b045-543252411fc9@intel.com>
+Date: Thu, 1 Feb 2024 16:55:00 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v18 008/121] KVM: TDX: Initialize the TDX module when
+ loading the KVM intel kernel module
+Content-Language: en-US
+To: isaku.yamahata@intel.com, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+ erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+ Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
+ chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com
+References: <cover.1705965634.git.isaku.yamahata@intel.com>
+ <9804cc9409d6773115e70bbb3bdc4adb67234cd6.1705965634.git.isaku.yamahata@intel.com>
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <9804cc9409d6773115e70bbb3bdc4adb67234cd6.1705965634.git.isaku.yamahata@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The KVM_ARM_VCPU_PMU_V3_FILTER provides the ability to let the VMM decide
-which PMU events are provided to the guest. Add a new option
-`kvm-pmu-filter` as -cpu sub-option to set the PMU Event Filtering.
-Without the filter, all PMU events are exposed from host to guest by
-default. The usage of the new sub-option can be found from the updated
-document (docs/system/arm/cpu-features.rst).
+On 1/23/2024 7:52 AM, isaku.yamahata@intel.com wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+> 
+> TDX requires several initialization steps for KVM to create guest TDs.
+> Detect CPU feature, enable VMX (TDX is based on VMX) on all online CPUs,
+> detect the TDX module availability, initialize it and disable VMX.
+> 
+> To enable/disable VMX on all online CPUs, utilize
+> vmx_hardware_enable/disable().  The method also initializes each CPU for
+> TDX.  TDX requires calling a TDX initialization function per logical
+> processor (LP) before the LP uses TDX.  When the CPU is becoming online,
+> call the TDX LP initialization API.  If it fails to initialize TDX, refuse
+> CPU online for simplicity instead of TDX avoiding the failed LP.
+> 
+> There are several options on when to initialize the TDX module.  A.) kernel
+> module loading time, B.) the first guest TD creation time.  A.) was chosen.
+> With B.), a user may hit an error of the TDX initialization when trying to
+> create the first guest TD.  The machine that fails to initialize the TDX
+> module can't boot any guest TD further.  Such failure is undesirable and a
+> surprise because the user expects that the machine can accommodate guest
+> TD, but not.  So A.) is better than B.).
+> 
+> Introduce a module parameter, kvm_intel.tdx, to explicitly enable TDX KVM
+> support.  It's off by default to keep the same behavior for those who don't
+> use TDX.  Implement hardware_setup method to detect TDX feature of CPU and
+> initialize TDX module.
+> 
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+> v18:
+> - Added comment in vt_hardware_enable() by Binbin.
+> ---
+>   arch/x86/kvm/Makefile      |  1 +
+>   arch/x86/kvm/vmx/main.c    | 38 ++++++++++++++++-
+>   arch/x86/kvm/vmx/tdx.c     | 84 ++++++++++++++++++++++++++++++++++++++
+>   arch/x86/kvm/vmx/x86_ops.h |  8 ++++
+>   4 files changed, 129 insertions(+), 2 deletions(-)
+>   create mode 100644 arch/x86/kvm/vmx/tdx.c
+> 
+> diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
+> index 274df24b647f..5b85ef84b2e9 100644
+> --- a/arch/x86/kvm/Makefile
+> +++ b/arch/x86/kvm/Makefile
+> @@ -24,6 +24,7 @@ kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
+>   
+>   kvm-intel-$(CONFIG_X86_SGX_KVM)	+= vmx/sgx.o
+>   kvm-intel-$(CONFIG_KVM_HYPERV)	+= vmx/hyperv.o vmx/hyperv_evmcs.o
+> +kvm-intel-$(CONFIG_INTEL_TDX_HOST)	+= vmx/tdx.o
+>   
+>   kvm-amd-y		+= svm/svm.o svm/vmenter.o svm/pmu.o svm/nested.o svm/avic.o \
+>   			   svm/sev.o
+> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+> index 443db8ec5cd5..1e1feaacac59 100644
+> --- a/arch/x86/kvm/vmx/main.c
+> +++ b/arch/x86/kvm/vmx/main.c
+> @@ -6,6 +6,40 @@
+>   #include "nested.h"
+>   #include "pmu.h"
+>   
+> +static bool enable_tdx __ro_after_init;
+> +module_param_named(tdx, enable_tdx, bool, 0444);
+> +
+> +static int vt_hardware_enable(void)
+> +{
+> +	int ret;
+> +
+> +	ret = vmx_hardware_enable();
+> +	if (ret || !enable_tdx)
+> +		return ret;
+> +
+> +	ret = tdx_cpu_enable();
 
-Here is an example which shows how to use the PMU Event Filtering, when
-we launch a guest by use kvm, add such command line:
+What's the reason for it?
 
-  # qemu-system-aarch64 \
-        -accel kvm \
-        -cpu host,kvm-pmu-filter="D:0x11-0x11"
+vt_hardware_setup()
+   -> tdx_hardware_setup()
+      -> on_each_cpu(vmx_tdx_on, &vmx_tdx, true);
+         -> vmx_tdx_on()
+            -> tdx_cpu_enable()
 
-Since the first action is deny, we have a global allow policy. This
-filters out the cycle counter (event 0x11 being CPU_CYCLES).
+ensures tdx_cpu_enable() is called once. No need to call it every 
+vt_hardware_enable().
 
-And then in guest, use the perf to count the cycle:
+> +	if (ret)
+> +		/*
+> +		 * In error case, we keep the CPU offline in error case.  So
+> +		 * need to revert VMXON.
+> +		 */
+> +		vmx_hardware_disable();
+> +	return ret;
+> +}
+> +
+> +static __init int vt_hardware_setup(void)
+> +{
+> +	int ret;
+> +
+> +	ret = vmx_hardware_setup();
+> +	if (ret)
+> +		return ret;
+> +
+> +	enable_tdx = enable_tdx && !tdx_hardware_setup(&vt_x86_ops);
+> +
+> +	return 0;
+> +}
+> +
+>   #define VMX_REQUIRED_APICV_INHIBITS				\
+>   	(BIT(APICV_INHIBIT_REASON_DISABLE)|			\
+>   	 BIT(APICV_INHIBIT_REASON_ABSENT) |			\
+> @@ -22,7 +56,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+>   
+>   	.hardware_unsetup = vmx_hardware_unsetup,
+>   
+> -	.hardware_enable = vmx_hardware_enable,
+> +	.hardware_enable = vt_hardware_enable,
+>   	.hardware_disable = vmx_hardware_disable,
+>   	.has_emulated_msr = vmx_has_emulated_msr,
+>   
+> @@ -161,7 +195,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+>   };
+>   
+>   struct kvm_x86_init_ops vt_init_ops __initdata = {
+> -	.hardware_setup = vmx_hardware_setup,
+> +	.hardware_setup = vt_hardware_setup,
+>   	.handle_intel_pt_intr = NULL,
+>   
+>   	.runtime_ops = &vt_x86_ops,
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> new file mode 100644
+> index 000000000000..8a378fb6f1d4
+> --- /dev/null
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -0,0 +1,84 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +#include <linux/cpu.h>
+> +
+> +#include <asm/tdx.h>
+> +
+> +#include "capabilities.h"
+> +#include "x86_ops.h"
+> +#include "x86.h"
+> +
+> +#undef pr_fmt
+> +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+> +
+> +static int __init tdx_module_setup(void)
+> +{
+> +	int ret;
+> +
+> +	ret = tdx_enable();
+> +	if (ret) {
+> +		pr_info("Failed to initialize TDX module.\n");
+> +		return ret;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +struct vmx_tdx_enabled {
 
-  # perf stat sleep 1
+the name is so confusing at first glance, ...
 
-   Performance counter stats for 'sleep 1':
+> +	cpumask_var_t vmx_enabled;
+> +	atomic_t err;
+> +};
+> +
+> +static void __init vmx_tdx_on(void *_vmx_tdx)
 
-              1.22 msec task-clock                       #    0.001 CPUs utilized
-                 1      context-switches                 #  820.695 /sec
-                 0      cpu-migrations                   #    0.000 /sec
-                55      page-faults                      #   45.138 K/sec
-   <not supported>      cycles
-           1128954      instructions
-            227031      branches                         #  186.323 M/sec
-              8686      branch-misses                    #    3.83% of all branches
+so is this function name.
 
-       1.002492480 seconds time elapsed
+> +{
+> +	struct vmx_tdx_enabled *vmx_tdx = _vmx_tdx;
+> +	int r;
+> +
+> +	r = vmx_hardware_enable();
+> +	if (!r) {
+> +		cpumask_set_cpu(smp_processor_id(), vmx_tdx->vmx_enabled);
+> +		r = tdx_cpu_enable();
+> +	}
+> +	if (r)
+> +		atomic_set(&vmx_tdx->err, r);
+> +}
+> +
+> +static void __init vmx_off(void *_vmx_enabled)
+> +{
+> +	cpumask_var_t *vmx_enabled = (cpumask_var_t *)_vmx_enabled;
+> +
+> +	if (cpumask_test_cpu(smp_processor_id(), *vmx_enabled))
+> +		vmx_hardware_disable();
+> +}
+> +
+> +int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
+> +{
+> +	struct vmx_tdx_enabled vmx_tdx = {
+> +		.err = ATOMIC_INIT(0),
+> +	};
+> +	int r = 0;
+> +
+> +	if (!enable_ept) {
+> +		pr_warn("Cannot enable TDX with EPT disabled\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (!zalloc_cpumask_var(&vmx_tdx.vmx_enabled, GFP_KERNEL)) {
+> +		r = -ENOMEM;
+> +		goto out;
+> +	}
+> +
+> +	/* tdx_enable() in tdx_module_setup() requires cpus lock. */
+> +	cpus_read_lock();
+> +	on_each_cpu(vmx_tdx_on, &vmx_tdx, true);	/* TDX requires vmxon. */
+> +	r = atomic_read(&vmx_tdx.err);
+> +	if (!r)
+> +		r = tdx_module_setup();
+> +	else
+> +		r = -EIO;
+> +	on_each_cpu(vmx_off, &vmx_tdx.vmx_enabled, true);
+> +	cpus_read_unlock();
+> +	free_cpumask_var(vmx_tdx.vmx_enabled);
+> +
+> +out:
+> +	return r;
+> +}
+> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+> index bca2d27b3dfd..b44cb681f74d 100644
+> --- a/arch/x86/kvm/vmx/x86_ops.h
+> +++ b/arch/x86/kvm/vmx/x86_ops.h
+> @@ -18,6 +18,8 @@ bool kvm_is_vmx_supported(void);
+>   int __init vmx_init(void);
+>   void vmx_exit(void);
+>   
+> +__init int vmx_hardware_setup(void);
 
-       0.001752000 seconds user
-       0.000000000 seconds sys
+superfluous declaration.
 
-As we can see, the cycle counter has been disabled in the guest, but
-other pmu events do still work.
+It's added in patch 4 already.
 
-Reviewed-by: Sebastian Ott <sebott@redhat.com>
-Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
----
-v5->v6:
-  - Commit message improvement.
-  - Remove some unused code.
-  - Collect Reviewed-by, thanks Sebastian.
-  - Use g_auto(Gstrv) to replace the gchar **.          [Eric]
-
-v4->v5:
-  - Change the kvm-pmu-filter as a -cpu sub-option.     [Eric]
-  - Comment tweak.                                      [Gavin]
-  - Rebase to the latest branch.
-
-v3->v4:
-  - Fix the wrong check for pmu_filter_init.            [Sebastian]
-  - Fix multiple alignment issue.                       [Gavin]
-  - Report error by warn_report() instead of error_report(), and don't use
-  abort() since the PMU Event Filter is an add-on and best-effort feature.
-                                                        [Gavin]
-  - Add several missing {  } for single line of code.   [Gavin]
-  - Use the g_strsplit() to replace strtok().           [Gavin]
-
-v2->v3:
-  - Improve commits message, use kernel doc wording, add more explaination on
-    filter example, fix some typo error.                [Eric]
-  - Add g_free() in kvm_arch_set_pmu_filter() to prevent memory leak. [Eric]
-  - Add more precise error message report.              [Eric]
-  - In options doc, add pmu-filter rely on KVM_ARM_VCPU_PMU_V3_FILTER support in
-    KVM.                                                [Eric]
-
-v1->v2:
-  - Add more description for allow and deny meaning in 
-    commit message.                                     [Sebastian]
-  - Small improvement.                                  [Sebastian]
-
- docs/system/arm/cpu-features.rst | 23 ++++++++++
- target/arm/cpu.h                 |  3 ++
- target/arm/kvm.c                 | 76 ++++++++++++++++++++++++++++++++
- 3 files changed, 102 insertions(+)
-
-diff --git a/docs/system/arm/cpu-features.rst b/docs/system/arm/cpu-features.rst
-index a5fb929243..26e306cc83 100644
---- a/docs/system/arm/cpu-features.rst
-+++ b/docs/system/arm/cpu-features.rst
-@@ -204,6 +204,29 @@ the list of KVM VCPU features and their descriptions.
-   the guest scheduler behavior and/or be exposed to the guest
-   userspace.
- 
-+``kvm-pmu-filter``
-+  By default kvm-pmu-filter is disabled. This means that by default all pmu
-+  events will be exposed to guest.
-+
-+  KVM implements PMU Event Filtering to prevent a guest from being able to
-+  sample certain events. It depends on the KVM_ARM_VCPU_PMU_V3_FILTER
-+  attribute supported in KVM. It has the following format:
-+
-+  kvm-pmu-filter="{A,D}:start-end[;{A,D}:start-end...]"
-+
-+  The A means "allow" and D means "deny", start is the first event of the
-+  range and the end is the last one. The first registered range defines
-+  the global policy(global ALLOW if the first @action is DENY, global DENY
-+  if the first @action is ALLOW). The start and end only support hexadecimal
-+  format now. For example:
-+
-+  kvm-pmu-filter="A:0x11-0x11;A:0x23-0x3a;D:0x30-0x30"
-+
-+  Since the first action is allow, we have a global deny policy. It
-+  will allow event 0x11 (The cycle counter), events 0x23 to 0x3a are
-+  also allowed except the event 0x30 which is denied, and all the other
-+  events are denied.
-+
- TCG VCPU Features
- =================
- 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index d3477b1601..2d860c227d 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -948,6 +948,9 @@ struct ArchCPU {
- 
-     /* KVM steal time */
-     OnOffAuto kvm_steal_time;
-+
-+    /* KVM PMU Filter */
-+    char *kvm_pmu_filter;
- #endif /* CONFIG_KVM */
- 
-     /* Uniprocessor system with MP extensions */
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 81813030a5..3f16f96f7e 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -496,6 +496,22 @@ static void kvm_steal_time_set(Object *obj, bool value, Error **errp)
-     ARM_CPU(obj)->kvm_steal_time = value ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
- }
- 
-+static char *kvm_pmu_filter_get(Object *obj, Error **errp)
-+{
-+    ARMCPU *cpu = ARM_CPU(obj);
-+
-+    return g_strdup(cpu->kvm_pmu_filter);
-+}
-+
-+static void kvm_pmu_filter_set(Object *obj, const char *pmu_filter,
-+                               Error **errp)
-+{
-+    ARMCPU *cpu = ARM_CPU(obj);
-+
-+    g_free(cpu->kvm_pmu_filter);
-+    cpu->kvm_pmu_filter = g_strdup(pmu_filter);
-+}
-+
- /* KVM VCPU properties should be prefixed with "kvm-". */
- void kvm_arm_add_vcpu_properties(ARMCPU *cpu)
- {
-@@ -517,6 +533,12 @@ void kvm_arm_add_vcpu_properties(ARMCPU *cpu)
-                              kvm_steal_time_set);
-     object_property_set_description(obj, "kvm-steal-time",
-                                     "Set off to disable KVM steal time.");
-+
-+    object_property_add_str(obj, "kvm-pmu-filter", kvm_pmu_filter_get,
-+                            kvm_pmu_filter_set);
-+    object_property_set_description(obj, "kvm-pmu-filter",
-+                                    "PMU Event Filtering description for "
-+                                    "guest PMU. (default: NULL, disabled)");
- }
- 
- bool kvm_arm_pmu_supported(void)
-@@ -1706,6 +1728,58 @@ static bool kvm_arm_set_device_attr(ARMCPU *cpu, struct kvm_device_attr *attr,
-     return true;
- }
- 
-+static void kvm_arm_pmu_filter_init(ARMCPU *cpu)
-+{
-+    static bool pmu_filter_init;
-+    struct kvm_pmu_event_filter filter;
-+    struct kvm_device_attr attr = {
-+        .group      = KVM_ARM_VCPU_PMU_V3_CTRL,
-+        .attr       = KVM_ARM_VCPU_PMU_V3_FILTER,
-+        .addr       = (uint64_t)&filter,
-+    };
-+    int i;
-+    g_auto(GStrv) event_filters;
-+
-+    if (!cpu->kvm_pmu_filter) {
-+        return;
-+    }
-+    if (kvm_vcpu_ioctl(CPU(cpu), KVM_HAS_DEVICE_ATTR, &attr)) {
-+        warn_report("The KVM doesn't support the PMU Event Filter!");
-+        return;
-+    }
-+
-+    /*
-+     * The filter only needs to be initialized through one vcpu ioctl and it
-+     * will affect all other vcpu in the vm.
-+     */
-+    if (pmu_filter_init) {
-+        return;
-+    } else {
-+        pmu_filter_init = true;
-+    }
-+
-+    event_filters = g_strsplit(cpu->kvm_pmu_filter, ";", -1);
-+    for (i = 0; event_filters[i]; i++) {
-+        unsigned short start = 0, end = 0;
-+        char act;
-+
-+        sscanf(event_filters[i], "%c:%hx-%hx", &act, &start, &end);
-+        if ((act != 'A' && act != 'D') || (!start && !end)) {
-+            warn_report("Skipping invalid PMU filter %s", event_filters[i]);
-+            continue;
-+        }
-+
-+        filter.base_event = start;
-+        filter.nevents = end - start + 1;
-+        filter.action = (act == 'A') ? KVM_PMU_EVENT_ALLOW :
-+                                       KVM_PMU_EVENT_DENY;
-+
-+        if (!kvm_arm_set_device_attr(cpu, &attr, "PMU_V3_FILTER")) {
-+            break;
-+        }
-+    }
-+}
-+
- void kvm_arm_pmu_init(ARMCPU *cpu)
- {
-     struct kvm_device_attr attr = {
-@@ -1716,6 +1790,8 @@ void kvm_arm_pmu_init(ARMCPU *cpu)
-     if (!cpu->has_pmu) {
-         return;
-     }
-+
-+    kvm_arm_pmu_filter_init(cpu);
-     if (!kvm_arm_set_device_attr(cpu, &attr, "PMU")) {
-         error_report("failed to init PMU");
-         abort();
-
-base-commit: bd2e12310b18b51aefbf834e6d54989fd175976f
--- 
-2.40.1
+>   extern struct kvm_x86_ops vt_x86_ops __initdata;
+>   extern struct kvm_x86_init_ops vt_init_ops __initdata;
+>   
+> @@ -133,4 +135,10 @@ void vmx_cancel_hv_timer(struct kvm_vcpu *vcpu);
+>   #endif
+>   void vmx_setup_mce(struct kvm_vcpu *vcpu);
+>   
+> +#ifdef CONFIG_INTEL_TDX_HOST
+> +int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops);
+> +#else
+> +static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return -EOPNOTSUPP; }
+> +#endif
+> +
+>   #endif /* __KVM_X86_VMX_X86_OPS_H */
 
 
