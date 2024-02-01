@@ -1,127 +1,179 @@
-Return-Path: <kvm+bounces-7764-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7765-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFFC184610D
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 20:36:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43B4F846113
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 20:38:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6AF4828C710
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 19:36:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF0BC1F276E3
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 19:38:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30BD985290;
-	Thu,  1 Feb 2024 19:36:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A1518527B;
+	Thu,  1 Feb 2024 19:38:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cIaNTsdg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KuIuNajf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 065327C6C1
-	for <kvm@vger.kernel.org>; Thu,  1 Feb 2024 19:36:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 779B06D39;
+	Thu,  1 Feb 2024 19:38:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706816178; cv=none; b=uh0qt7fJJVkyzn2Z1yQEqedI8MT8A6FViFgh/GFy6dXo2nA4Y/xB5SLax21Efbhd+geoFeIJ1IHWJNJYQ27aKH2SJgpOiMJXROHJRY4UlgbtlGu9xfVoFCVTnZ5aLXftz8OS6sH+FNmxqFuOAVuA8yW0oSAD8/lm2FPpE0tO8Tg=
+	t=1706816292; cv=none; b=uXIR/gB+kYzb5pvGsnEya57hG6ofeYBKrP1LfzPIUt8p7CrvuX3eM/IOKodLH8R5DVERESAWxLZXb20Y6vAvK+7dCudzwi0xtDpTtrJEH1/jpK5yMW/UV7j2dEz6IUyvKcerafIOmNMM1uX0ACkv7LCDI2ITw0sOdwmlK7SM3Fo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706816178; c=relaxed/simple;
-	bh=qfMTZUwrX0hQseYFBDB6O+l3/V7yP1wzA1uQCR9WF6M=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=V10a9gBb4pxyMrSkTYy+MdSjulAHjMYQz3STYxdipGiyxdFoXJHy+RB5MRNVh/6Co9YcHKicfcXznfDCs9Q5B7BbjecAtAJXa8dIxilIl4ouYN6LlPumTQjZaQi6SzJuVLx+3CGhW5LU50YPWbYfCTM6LakKJFqZfBsKGheLEew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cIaNTsdg; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1d409124358so12978195ad.1
-        for <kvm@vger.kernel.org>; Thu, 01 Feb 2024 11:36:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706816176; x=1707420976; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FsllCZK2FAGWJHcpt8xBy9rt8mAFX0Y7/cdzkhjefJw=;
-        b=cIaNTsdgRqqgDv8m1WRIY9xzMLxL5yvzgHNSZVnL5gbjVk8YtpQw6QSsvoNn/skTWD
-         eckgKoAG3avVzDHgtLdFYtqW0hSIPcT1tGXKEDpXioJvK8EJcewQZ+dPzuuoo5tBYL7I
-         9DgWOA/b21QojdCu8ESBusw6wuYVlw+XIyYBOMD3QOl6MqcMTARldYR2CnxldT5RNnA1
-         P1/cYEtJH4tevcECe/nY7M+Kx98uK5P5GXrTYFKL7rWehbwILQerOuXa1v7dHlQLLacw
-         pQU7miM2gJGx+30SxuUDXqMRH199rlxq4ABVmUwHhcevOVE7+kHjjfNhtztDa+VUYp6Z
-         002w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706816176; x=1707420976;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FsllCZK2FAGWJHcpt8xBy9rt8mAFX0Y7/cdzkhjefJw=;
-        b=JpEJBhpCOs6CoyWN4EXojdrTVtarHnMA+F66LSvAQKfVRaiSbitRC/+hhQX/8IzPqi
-         grBwADrp/h+yB7VEAL5HxUHLzXmzjwllWtpK8RnPUi9UmHyw/bfm8G4mS4HoTOtIdJOa
-         yobgLy3S2uC8gW5WxW4tRi80JiliYYazm25QPxrlomeAbyvanfa0I9Qs1CkzY3nJCCjU
-         rkOFZAabM0xI++Rthcd+4nqhq7p6AQULlvcrE7awQaW1qpUSdUAfeuRXNZTFtOEfZ091
-         w2ac7ApjDd3rpMJQZEPCMCCrFSiYNC9+wZA6hIwmJwB/sr/QaT7i+FU8Stfm4CKjzqVB
-         p75g==
-X-Gm-Message-State: AOJu0YwwknW1f5/b23r285/3WZvDMgaHpaz29DtSzpTvcWI735LHhX30
-	Jrkq5TRBFIQeMds0c67/pL1rsY+dk88smO7ugF4v2vAdIzDk84KF5L+5aInVR1oIqV3wcAkVuyz
-	E2A==
-X-Google-Smtp-Source: AGHT+IGBPaQJijU+ZClk1MamKTuF3e9qb4VlY549Op2uZmIOtLM3UnE8nRsFRbt7USk8HD+C1KynLRxBCIc=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:8ecc:b0:1d8:debb:413a with SMTP id
- x12-20020a1709028ecc00b001d8debb413amr18118plo.8.1706816176244; Thu, 01 Feb
- 2024 11:36:16 -0800 (PST)
-Date: Thu, 1 Feb 2024 11:36:14 -0800
-In-Reply-To: <ZbvjKtsVjpuQmKE2@google.com>
+	s=arc-20240116; t=1706816292; c=relaxed/simple;
+	bh=Pc8RJJh2G6jJWkbbYSZ2kbzKYJeZHz+HBeINvqtqkOM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=vBe25lWU1xOw8SwOYXYQccQS8iHBHe3WN/moXCqEq7vDECxtxA7VHYrXGtoFQJvcaGtoFCTIOzu6e8eeZLZkoYSr6zoI/eeyHFQIPxhEakiDjz+pVxb8bC8y/BwHPjYHBckjH2tMZtbsI+3fU6NmPKrcBU3+5F3VSJ08Hkz+5JI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KuIuNajf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A5D0C433F1;
+	Thu,  1 Feb 2024 19:38:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706816291;
+	bh=Pc8RJJh2G6jJWkbbYSZ2kbzKYJeZHz+HBeINvqtqkOM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KuIuNajfDKG7/E3ZIeBHtV8/CFSrNKOmaY0nx8dkI1GH6VMIRsyZxDrqaI/vwG0vB
+	 KDp9YxOgUAVfuq2bbtqh+KGA3/3/Wrkf4MSI36WHQXy6daeHlgWKK4eA1nyoq3hGQY
+	 pESBJ3BX6KstsHRVP3NdvYGcHpJBrKEs8HBPZdKEnzoUJmcUFF8qPjBkmVWLkIIA/V
+	 VFIbbNlj2joyAFFwNC8nQA7KLn21Aa/uh5ldgZArRkj++y0xY6WfVk/0i0fmEi6I+D
+	 9iqe/X1HD/ZPIk9XpcRu3O85JYIraeMKU/sMwCQK1rXpbxWQSEcLA3VRgzAdPDFvHK
+	 OuvcYIYaquUNA==
+Date: Thu, 1 Feb 2024 12:38:09 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Wanpeng Li <wanpengli@tencent.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>, x86@kernel.org,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	David Rientjes <rientjes@google.com>, llvm@lists.linux.dev
+Subject: Re: [PATCH, RESEND] x86/sev: Fix SEV check in sev_map_percpu_data()
+Message-ID: <20240201193809.GA2710596@dev-arch.thelio-3990X>
+References: <20240124130317.495519-1-kirill.shutemov@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240123221220.3911317-1-mizhang@google.com> <ZbpqoU49k44xR4zB@google.com>
- <368248d0-d379-23c8-dedf-af7e1e8d23c7@oracle.com> <CAL715WJDesggP0S0M0SWX2QaFfjBNdqD1j1tDU10Qxk6h7O0pA@mail.gmail.com>
- <ZbvUyaEypRmb2s73@google.com> <ZbvjKtsVjpuQmKE2@google.com>
-Message-ID: <ZbvyrvvZM-Tocza2@google.com>
-Subject: Re: [PATCH] KVM: x86/pmu: Fix type length error when reading pmu->fixed_ctr_ctrl
-From: Sean Christopherson <seanjc@google.com>
-To: Mingwei Zhang <mizhang@google.com>
-Cc: Dongli Zhang <dongli.zhang@oracle.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240124130317.495519-1-kirill.shutemov@linux.intel.com>
 
-On Thu, Feb 01, 2024, Mingwei Zhang wrote:
-> On Thu, Feb 01, 2024, Sean Christopherson wrote:
-> > On Wed, Jan 31, 2024, Mingwei Zhang wrote:
-> > > > The PMC is still active while the VM side handle_pmi_common() is not going to handle it?
-> > > 
-> > > hmm, so the new value is '0', but the old value is non-zero, KVM is
-> > > supposed to zero out (stop) the fix counter), but it skips it. This
-> > > leads to the counter continuously increasing until it overflows, but
-> > > guest PMU thought it had disabled it. That's why you got this warning?
-> > 
-> > No, that can't happen, and KVM would have a massive bug if that were the case.
-> > The truncation can _only_ cause bits to disappear, it can't magically make bits
-> > appear, i.e. the _only_ way this can cause a problem is for KVM to incorrectly
-> > think a PMC is being disabled.
+On Wed, Jan 24, 2024 at 03:03:17PM +0200, Kirill A. Shutemov wrote:
+> The function sev_map_percpu_data() checks if it is running on an SEV
+> platform by checking the CC_ATTR_GUEST_MEM_ENCRYPT attribute. However,
+> this attribute is also defined for TDX.
 > 
-> The reason why the bug does not happen is because there is global
-> control. So disabling a counter will be effectively done in the global
-> disable part, ie., when guest PMU writes to MSR 0x38f.
-
-
-> > fixed PMC is disabled. KVM will pause the counter in reprogram_counter(), and
-> > then leave the perf event paused counter as pmc_event_is_allowed() will return
-> > %false due to the PMC being locally disabled.
-> >
-> > But in this case, _if_ the counter is actually enabled, KVM will simply reprogram
-> > the PMC.  Reprogramming is unnecessary and wasteful, but it's not broken.
+> To avoid false positives, add a cc_vendor check.
 > 
-> no, if the counter is actually enabled, but then it is assigned to
-> old_fixed_ctr_ctrl, the value is truncated. When control goes to the
-> check at the time of disabling the counter, KVM thinks it is disabled,
-> since the value is already truncated to 0. So KVM will skip by saying
-> "oh, the counter is already disabled, why reprogram? No need!".
+> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+> Fixes: 4d96f9109109 ("x86/sev: Replace occurrences of sev_active() with cc_platform_has()")
+> Suggested-by: Borislav Petkov (AMD) <bp@alien8.de>
+> Acked-by: David Rientjes <rientjes@google.com>
+> ---
+>  arch/x86/kernel/kvm.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+> index dfe9945b9bec..428ee74002e1 100644
+> --- a/arch/x86/kernel/kvm.c
+> +++ b/arch/x86/kernel/kvm.c
+> @@ -434,7 +434,8 @@ static void __init sev_map_percpu_data(void)
+>  {
+>  	int cpu;
+>  
+> -	if (!cc_platform_has(CC_ATTR_GUEST_MEM_ENCRYPT))
+> +	if (cc_vendor != CC_VENDOR_AMD ||
+> +	    !cc_platform_has(CC_ATTR_GUEST_MEM_ENCRYPT))
+>  		return;
+>  
+>  	for_each_possible_cpu(cpu) {
+> -- 
+> 2.43.0
+> 
 
-Ooh, I had them backwards.  KVM can miss 1=>0, but not 0=>1.  I'll apply this
-for 6.8; does this changelog work for you?
+Our CI has started seeing a build failure as a result of this patch when
+using LLVM to build x86_64_defconfig + CONFIG_GCOV_KERNEL=y +
+CONFIG_GCOV_PROFILE_ALL=y:
 
-  Use a u64 instead of a u8 when taking a snapshot of pmu->fixed_ctr_ctrl
-  when reprogramming fixed counters, as truncating the value results in KVM
-  thinking all fixed counters, except counter 0, are already disabled.  As
-  a result, if the guest disables a fixed counter, KVM will get a false
-  negative and fail to reprogram/disable emulation of the counter, which can
-  leads to spurious PMIs in the guest.
+  $ echo 'CONFIG_GCOV_KERNEL=y
+  CONFIG_GCOV_PROFILE_ALL=y' >kernel/configs/gcov.config
+
+  $ make -skj"$(nproc)" ARCH=x86_64 LLVM=1 mrproper defconfig gcov.config vmlinux
+  ...
+  ld.lld: error: undefined symbol: cc_vendor
+  >>> referenced by kvm.c
+  >>>               arch/x86/kernel/kvm.o:(kvm_smp_prepare_boot_cpu) in archive vmlinux.a
+  ...
+
+I was somewhat confused at first why this build error only shows up with
+GCOV until I looked at the optimized IR. This configuration has
+CONFIG_ARCH_HAS_CC_PLATFORM=n, which means that cc_vendor is declared
+but not defined anywhere, so I was expecting an unconditional error.
+Looking closer, I realized that cc_platform_has() evaluates to
+false in that configuration, so the compiler can always turn
+
+  if (cond || !false)
+      action();
+
+into
+
+  action();
+
+but it seems like with the GCOV instrumentation, it keeps both branches
+(since GCOV is about code coverage, it makes sense that you would want
+to see if each branch is ever taken). I can eliminate the error with the
+following diff, I am not sure if that is too much though.
+
+diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+index 428ee74002e1..4432ee09cbcb 100644
+--- a/arch/x86/kernel/kvm.c
++++ b/arch/x86/kernel/kvm.c
+@@ -434,7 +434,7 @@ static void __init sev_map_percpu_data(void)
+ {
+ 	int cpu;
+ 
+-	if (cc_vendor != CC_VENDOR_AMD ||
++	if ((IS_ENABLED(CONFIG_ARCH_HAS_CC_PLATFORM) && cc_vendor != CC_VENDOR_AMD) ||
+ 	    !cc_platform_has(CC_ATTR_GUEST_MEM_ENCRYPT))
+ 		return;
+ 
+Perhaps another solution would be to just
+
+  #define cc_vendor (CC_VENDOR_NONE)
+
+if CONFIG_ARCH_HAS_CC_PLATFORM is not set, since it can never be changed
+from the default in arch/x86/coco/core.c.
+
+diff --git a/arch/x86/include/asm/coco.h b/arch/x86/include/asm/coco.h
+index 6ae2d16a7613..f3909894f82f 100644
+--- a/arch/x86/include/asm/coco.h
++++ b/arch/x86/include/asm/coco.h
+@@ -10,13 +10,13 @@ enum cc_vendor {
+ 	CC_VENDOR_INTEL,
+ };
+ 
+-extern enum cc_vendor cc_vendor;
+-
+ #ifdef CONFIG_ARCH_HAS_CC_PLATFORM
++extern enum cc_vendor cc_vendor;
+ void cc_set_mask(u64 mask);
+ u64 cc_mkenc(u64 val);
+ u64 cc_mkdec(u64 val);
+ #else
++#define cc_vendor (CC_VENDOR_NONE)
+ static inline u64 cc_mkenc(u64 val)
+ {
+ 	return val;
+
+Cheers,
+Nathan
+
 
