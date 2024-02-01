@@ -1,120 +1,279 @@
-Return-Path: <kvm+bounces-7737-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7739-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 375BA845C0E
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 16:48:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFF85845C6F
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 17:03:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DFEBD1F256BF
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 15:48:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1064B1C2C5C5
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 16:03:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D2C5626B3;
-	Thu,  1 Feb 2024 15:48:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07848779FC;
+	Thu,  1 Feb 2024 16:02:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C+5MOZYR"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="HxBSqBJf"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF027626A6
-	for <kvm@vger.kernel.org>; Thu,  1 Feb 2024 15:48:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D672262159;
+	Thu,  1 Feb 2024 16:02:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706802520; cv=none; b=lOUsFTXz7TjI/jHRjAx0QeKQrvb7JuFpaId6OVj4VKAk82ZG2e3HyTD/gX4wRMVDBu9G/+ZOpWOULNxM105foDDXWoBevud8UzgG1zC+8G7HsL3tuBkiasEFqdZHfqxo/JJB89BC79vUpfJ0Ake3no9N57MUqBdFzl7rPAZVFpc=
+	t=1706803339; cv=none; b=NFJNQmXJrs32bMiq8xO960LCxGVWTMCpEY/qU/0oFNVKEOCPcq/k+vWb1EDX9Jf6Ip4Q6NIeB5kSYjK72a89KZdaW3EQvXMWeaqPJyD6ErBeX/S8rnZWnxbtMC/xy0cjFHyaqO6DfYlnp0IRj9nEK5JZqLJvlONpJwreTWmJicI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706802520; c=relaxed/simple;
-	bh=u4eMRdiVQD77B+FhnGkSd3q0aMsF0Up82tvfkFTaYQY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=vE21+Ips0pw5O2UYOI5M6SGipB/86qxqvtiFjHK9En1o0pUZ3/v7JaSldz+bwx1gNsNVFFUSVoPgr1cKESWzC8p/cEyGWGfEN5zg1IFhZ6XeflFtuA4/WIvhCazcqhLp2MQdCowPqv9bUNKe0FSDymwOLr8jn1wvOuHVN6lOOcs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=C+5MOZYR; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706802517;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JUy0BYrD39GIfiCcfziHo26bl6JbaDYlzmvvdn7klvY=;
-	b=C+5MOZYRL5wpSnXGQskH00YMwrhPAC+akP/2cHRcBxdCTjj7/sk15PFKxPp3GQaT+nKTKk
-	pqez1c1zowkh96b2usxPetziLOlMMrrA4lZ+IEeH+8XMs//Ifd0HB/x82WAByiUa4wN/xt
-	d+KEacc5VHtixViVplQcDKnBYoyNFIw=
-Received: from mail-ua1-f69.google.com (mail-ua1-f69.google.com
- [209.85.222.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-272-9TiCsUSeMoqqCniCclRZOQ-1; Thu, 01 Feb 2024 10:48:36 -0500
-X-MC-Unique: 9TiCsUSeMoqqCniCclRZOQ-1
-Received: by mail-ua1-f69.google.com with SMTP id a1e0cc1a2514c-7d2d72f7965so574797241.2
-        for <kvm@vger.kernel.org>; Thu, 01 Feb 2024 07:48:36 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706802515; x=1707407315;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JUy0BYrD39GIfiCcfziHo26bl6JbaDYlzmvvdn7klvY=;
-        b=vt+b9x9HA/zQO9hGrtK1Hjolw5s2itLnuEtoZF8qUYH+xCkGHg3gXsBr05zkUgx/w/
-         euBwyKH6WVYNB2McVKmWMu2UVcQnHMOuCyqut0DlWR2FJ7PbzyVyzJxsD0ULY/EpgucB
-         g7Uj3E0dQQARaBfkw7aXRjtcIRVvK0VhNJGkle9jekG4zaZ34p1tNU25mY8DQ7+6mQL6
-         o8cME6XNoYanils1A81QvuUE1sv99gMLjfBNfoXPLKtV7KSvPa+yRnHfQ+1HwZjQ7zHB
-         pfPGLngIk/cPXtDjojwUTxE6s6Q1yDrVlDx5xMHZCGA0OYacUY8JdToP5/iIMSurSRgl
-         rOew==
-X-Gm-Message-State: AOJu0YwOUSJx8eE2zmnStZn5P+T3au09g6kzEmk6pkKYOuUTiHyl1wdM
-	n5fOqnN5oSD7OkDQpTdHVPjl0q71Adj33HH9CR6gtbMG/L0zhrpU74UyHJ1dkg7dMcjzeyf00Ji
-	iGKukLi6Nh3EKc60ZIq00JIgx2rccV5NJ6UhPXC3s0IS4hLcPLnXROLbn4G2kTyFfum9ajvZ1Fj
-	CF4pf7cOP0UUy1N4UlEmeFdi84
-X-Received: by 2002:a67:fac5:0:b0:46c:f3fe:4556 with SMTP id g5-20020a67fac5000000b0046cf3fe4556mr1737758vsq.13.1706802515705;
-        Thu, 01 Feb 2024 07:48:35 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFDhVjf+JElyY1WLqEUv9Hx1l5qUK2apiia4uTUVGtGJ2NJ4Sg+VSZKVRPgmbFloNdmnAVo9kLhn8J9ymVn+5E=
-X-Received: by 2002:a67:fac5:0:b0:46c:f3fe:4556 with SMTP id
- g5-20020a67fac5000000b0046cf3fe4556mr1737725vsq.13.1706802515324; Thu, 01 Feb
- 2024 07:48:35 -0800 (PST)
+	s=arc-20240116; t=1706803339; c=relaxed/simple;
+	bh=JjCBJs2+blIlirPozwQ0nRAAbqv5U+lX8HbTP1k5z24=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=pjWq1P2QFygn7Uv89WSBuJ9tOQoIuJicITAME3YJErPuKbiI4RTjdRRFM7BT+T1LlCPdEBm+6jfUy+NLV8OkYYBHdH0rW8n/9zKHtiC/ifg57WcQyNUDEDRWpCZJpmtO+Jr3JTuyVCxXwozem57zcjl57EZphetifAmR1klkFJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=HxBSqBJf; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=JjCBJs2+blIlirPozwQ0nRAAbqv5U+lX8HbTP1k5z24=; b=HxBSqBJfnZ56oknWlxO+4ngILF
+	j3wBPqiuZTQXfmCuY5dN1O70pr4Ojlj8bjgRDF1mGM84cx09awHUz7NdR2MsCl01X+6Ktc+j/Vz+H
+	1M2qd0+/0M02GZH02UdMn+KbQ4K6St/tLUQndz0Me8Y/IE0jATboze/a2S8bYw7gJW1WJ2yfaXglr
+	V9IQueR9sNTNRk4o/5pGxvvk3GdC/t7GSA22Hj+NUpp42K64950yLu0lSFLlrGxOUkUVsHTtKnc3C
+	ei1p4zNanUiObBALK5c5MeE4kuYH1uH+DXw1d3T0fM84WANvraeudgh0CZwmOqFfT29cwY9bge/Zv
+	5e8+05/g==;
+Received: from [205.251.233.234] (helo=iad12-dhcp-142-231-114.iad12.amazon.com)
+	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rVZVq-0000000GDXj-2aLr;
+	Thu, 01 Feb 2024 16:02:04 +0000
+Message-ID: <edbd29815cfed8e5b94e6af6395b6a25abb681c8.camel@infradead.org>
+Subject: Re: [PATCH] KVM: selftests: Compare wall time from xen shinfo
+ against KVM_GET_CLOCK
+From: David Woodhouse <dwmw2@infradead.org>
+To: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Jan Richter <jarichte@redhat.com>, linux-kernel@vger.kernel.org, 
+ kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Sean
+ Christopherson <seanjc@google.com>
+Date: Thu, 01 Feb 2024 08:02:00 -0800
+In-Reply-To: <87h6is7agi.fsf@redhat.com>
+References: <20240111135901.1785096-1-vkuznets@redhat.com>
+	 <596b2d7ce6941e5dd6bd7b2da6d3ea7d74f6c95a.camel@infradead.org>
+	 <87h6is7agi.fsf@redhat.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-XMPlC68ccDGI6Hw9e/oR"
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231220151358.2147066-1-nikunj@amd.com> <20231220151358.2147066-11-nikunj@amd.com>
- <CABgObfYwtMQY-E+ENs3z8Ew-Yc7tiXC7PmdvFjPcUeXqOMY8PQ@mail.gmail.com>
-In-Reply-To: <CABgObfYwtMQY-E+ENs3z8Ew-Yc7tiXC7PmdvFjPcUeXqOMY8PQ@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 1 Feb 2024 16:48:23 +0100
-Message-ID: <CABgObfbdJe2eui7_3eopf_g8u56D_YYzJUf2drbLp=ACGP2=LA@mail.gmail.com>
-Subject: Re: [PATCH v7 10/16] x86/sev: Add Secure TSC support for SNP guests
-To: Nikunj A Dadhania <nikunj@amd.com>
-Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org, 
-	kvm@vger.kernel.org, bp@alien8.de, mingo@redhat.com, tglx@linutronix.de, 
-	dave.hansen@linux.intel.com, dionnaglaze@google.com, pgonda@google.com, 
-	seanjc@google.com
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+
+
+--=-XMPlC68ccDGI6Hw9e/oR
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 1, 2024 at 4:46=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com> =
-wrote:
->
-> On Wed, Dec 20, 2023 at 4:16=E2=80=AFPM Nikunj A Dadhania <nikunj@amd.com=
-> wrote:
->
-> > +       /* Setting Secure TSC parameters */
-> > +       if (cpu_feature_enabled(X86_FEATURE_SNP_SECURE_TSC)) {
-> > +               vmsa->tsc_scale =3D snp_tsc_scale;
-> > +               vmsa->tsc_offset =3D snp_tsc_offset;
-> > +       }
->
-> This needs to use guest_cpu_has, otherwise updating the hypervisor or
-> processor will change the initial VMSA and any measurement derived
-> from there.
->
-> In fact, the same issue exists for DEBUG_SWAP and I will shortly post
-> a series to allow enabling/disabling DEBUG_SWAP per-VM, so that
-> updating the kernel does not break existing measurements.
+On Thu, 2024-02-01 at 11:19 +0100, Vitaly Kuznetsov wrote:
+> David Woodhouse <dwmw2@infradead.org> writes:
+>=20
+> > Sorry for delayed response.
+> >=20
+> > On Thu, 2024-01-11 at 14:59 +0100, Vitaly Kuznetsov wrote:
+> > >=20
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vm_ioctl(vm, KVM_GET_CLOCK, &kc=
+data);
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 delta =3D (wc->sec * NSEC_PER_S=
+EC + wc->nsec) - (kcdata.realtime - kcdata.clock);
+> >=20
+> > I think you need to check for KVM_CLOCK_REALTIME in the flags here,
+> > don't you? It might not always be set.
+>=20
+> Good suggestion; while this shouldn't be a common use-case on x86_64, it
+> is possible when TSC is *not* the clocksource used on the host. I guess
+> we can just skip the sub-test with a message in this case.
+>=20
+> >=20
+> > And also, nobody should ever be using KVM_CLOCK_REALTIME as it stands
+> > at the moment. It's fundamentally broken because it should always have
+> > used CLOCK_TAI not CLOCK_REALTIME.
+> >=20
+> > I'm in the process of fixing that up as an incremental ABI change,
+> > putting the TAI offset into one of the spare pad fields in the
+> > kvm_clock_data and adding a new KVM_CLOCK_TAI_OFFSET flag.
+> >=20
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 TEST_ASSERT(llabs(delta) < 100,
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "Guest's epoch from shinfo %d.%0=
+9d differs from KVM_GET_CLOCK %lld.%lld",
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 wc->sec, wc->nsec, (kcdata.realt=
+ime - kcdata.clock) / NSEC_PER_SEC,
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (kcdata.realtime - kcdata.clock)=
+ % NSEC_PER_SEC);
+> > >=20
+> >=20
+> > > Replace the check with comparing wall clock data from shinfo to
+> > > KVM_GET_CLOCK. The later gives both realtime and kvmclock so guest's =
+epoch
+> > > can be calculated by subtraction. Note, the computed epoch may still =
+differ
+> > > a few nanoseconds from shinfo as different TSC is used and there are
+> > > rounding errors but 100 nanoseconds margin should be enough to cover
+> > > it (famous last words).
+> >=20
+> > Aren't those just bugs? Surely this *should* be cycle-perfect, if the
+> > host has a stable TSC?
+> >=20
+> > But I suppose this isn't the test case for that. This is just testing
+> > that the Xen shinfo is doing basically the right thing.
+> >=20
+> > And we're going to need a few more fixes like this WIP before we get
+> > get to cycle perfection from the horrid mess that is our kvmclock code:
+> > https://git.infradead.org/?p=3Dusers/dwmw2/linux.git;a=3Dcommitdiff;h=
+=3Dbc557e5ee4
+>=20
+> (Some time ago I was considering suggesting we switch to Hypet-V TSC page
+> clocksource for Linux guests to avoid fixing the mess :-) It's becoming
+> less and less relevant as with modern hardware which supports TSC
+> scaling (and which doesn't support famous TSC bugs like TSC divergence
+> across sockets :-) passing through raw TSC to guests is becoming more
+> and more popular.)
 
-Nevermind, I keep confusing guest and host-side patches.
+Except for migration, which is kind of hosed. And live update too.
+Where you are only doing a kexec on the *same* host and your time
+source is the *same* TSC, there's no excuse for anything less than
+cycle perfection. But KVM is a long way from that :)
 
-/me goes in the corner.
+> Regarding this fix, what's your decree? My intention here is to
+> basically get rid on xen_shinfo flakyness without reducing test
+> coverage. I.e. we still want to test that shinfo data is somewhat
+> sane. Later, when you get your 'cycle perfection' and 'TAI' patches in,
+> we can always adjust the test accordingly. In case you agree, I can
+> re-send this with KVM_CLOCK_REALTIME check added.
 
-Paolo
+I think just the KVM_CLOCK_REALTIME check is all we need. No need for
+*this* test to be pedantic about the clock precision; mostly it's just
+checking that something that looks a *bit* like a time value is written
+to the right place in guest memory.
 
+So forget TAI, accept a slop of over 1s, with a snarky comment that the
+API using CLOCK_REALTIME should never have been accepted into the
+kernel in the first place. (I mean that; we don't want people cutting
+and pasting it as an example).
+
+--=-XMPlC68ccDGI6Hw9e/oR
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwMjAxMTYwMjAwWjAvBgkqhkiG9w0BCQQxIgQgiLH2vq0n
+DNmG454UooU7Hc9Era8NXb80WGRGntHr6PYwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBRFx4L7sqrkSDvn9e9CW+dbu1hJPplbWCa
+8O8JoDNR8Qsu1WbcArJ8oH6+g5IK+LZWNkS6/tDyOYsi3WN/056FxqNG3b6VkKDfa2kJiAjIjJWr
+3SYIQU6gYHHegWMBCUbyanlPVSPltAzugLOusHgRS93jU4o9VCVTJMvmQvz3uFCSkzRZLkPQ+Ey7
+dXOuNwwb8Rf/u+Wipndzktl8F6nmFHoCakTgjPrGtjFqZv7Vropmt1UJw+jYEGTpc53aybMwcq9a
+IlUTITnQVXkS/BRurSKFrsUCEN/l8Me5m6vQMgbLMw4u1mCR4VKtRGeiiH4aUTNeVkKOSbgyj+Kj
+pbjYUa0j5yfFKWn93wkZdyzFRcXGaZAR0ofjAb6Qw+ZfSfaYU8B6exbn0lD2uhifZmS6pNafLAM0
+4Xy4x1oXDzW9aL7n0fGmUxuivkkX04SRyQzDSwpBHe9aa35EA4XgxgUEjEiSpcUgunDTuMxRGL9s
+PpTHGc40K/y1ZIo6GyAzKRpmFkbH/l7QDmWw7SUhFLFE8W7HJjakjW4+nmOhWqOwJymSLavdfIY5
+/yo9BvEsfD76OpwOmex4TtirWyreWPT/b8CI2bAdYzKa8qyPxZbiloSxwk2ria3tEyxkoYnVtSOY
+nGllnKSSkdWkEyyKsE4Nri7d4kFTAGS9RDU58mDNugAAAAAAAA==
+
+
+--=-XMPlC68ccDGI6Hw9e/oR--
 
