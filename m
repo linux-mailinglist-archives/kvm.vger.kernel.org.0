@@ -1,145 +1,172 @@
-Return-Path: <kvm+bounces-7755-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7756-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1680845EEE
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 18:52:41 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AAA4845F1A
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 19:01:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DE55FB28D57
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 17:52:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C33A5B26D97
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 18:01:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D2B67C6EA;
-	Thu,  1 Feb 2024 17:52:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B38F284FAE;
+	Thu,  1 Feb 2024 18:01:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="cakyn+Dq"
+	dkim=pass (2048-bit key) header.d=dabbelt-com.20230601.gappssmtp.com header.i=@dabbelt-com.20230601.gappssmtp.com header.b="2FY75X4n"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9173F7C6CA;
-	Thu,  1 Feb 2024 17:52:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3F8984FA6
+	for <kvm@vger.kernel.org>; Thu,  1 Feb 2024 18:01:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706809945; cv=none; b=U7m1iQb9jJjw3+kcPTaay2J0urLuH1nZZONHHMVydMRuEp4cP+GiZVCP9tmklm+1ysCksS23tg6NzTjvN7XBC4WEtc2mrZcpKCycvz5/8cuUL2KsRzA39M8hVUPOOYlhY0HbRuPlSeN95iDCek/1nIJeqaf43CUr8I25s6R2QH8=
+	t=1706810476; cv=none; b=VMX+c5qxYolsuqzfAO0HcNQlf/WOweB5ATCbgroqduMV9jBq9rpcUiq0dnSCMDlXX48Uvfs/1+hP8wG25BeGwLYQ8GZiOJnDvvnfdxzHrWClGhIfCt81cRMjFwlUUSYc0vAuM27XRRR979Kk78WcwRIeuTg8OrYCKlXOCvDA3cM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706809945; c=relaxed/simple;
-	bh=vKGVOt3qDY/BbZWbDGXKexzYGxavNrzwHlou1tNwrwg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hWuAgZsz1UwaBm4K8ZECr3tCl7ptbb9FPdsmo5lWMqzu3Kw3TyK+dlEgNQk3LTr8uPtsfrcUIDU6gJ2C1vdRUUemQiYPon/H5m6foWQT5yulp+95j/vOGx0UrExk/nsa+1EydlgboqiQx5ElAtgOME8OW1C5pN3XHapVv77YuhQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=cakyn+Dq; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 411HOVFk027203;
-	Thu, 1 Feb 2024 17:52:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=9jHM+F2W8hB/Kpbn1Kor3AqkqKDgnCHSoCprrPdaBgs=;
- b=cakyn+DqeNwhdY2wMCSd1kdBYUAoBHP0tduph7RvwNmSYV2XPQCxI867cuqORE3y0p41
- hVoIXRywyX3MlXsFfOsyDXWKRwpIeyO1N/6jF6BEKX/6W4Z7cp3C5Xjj4vTTMYwuqGTF
- 6KzOwReu1+nuDG4IUNBGg01lqkkRG9FPG1DAmPBp7xkp8Kk/3VliHMObJ/XSg3k0sit1
- 1NVvzpdfaovW0/0tH17am68EGMispiVR1vL+nfGmQE4XZqpsh10JpLPyjD7bB9YaWVpd
- bpJ8fLCLj/mZUDQwWEck85bt8VNoW+N57uPbrvMGc6wlFAHwn/i5bBRZIMfKzq0gcI+y sg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w0e5x3m22-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 01 Feb 2024 17:52:22 +0000
-Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 411G1BVB017203;
-	Thu, 1 Feb 2024 17:52:22 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w0e5x3m1g-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 01 Feb 2024 17:52:22 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 411GKCR8007188;
-	Thu, 1 Feb 2024 17:52:20 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3vwev2nk60-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 01 Feb 2024 17:52:20 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 411HqI6O17957522
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 1 Feb 2024 17:52:18 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 015E320043;
-	Thu,  1 Feb 2024 17:52:18 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9668B20040;
-	Thu,  1 Feb 2024 17:52:17 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.179.24.180])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Thu,  1 Feb 2024 17:52:17 +0000 (GMT)
-Date: Thu, 1 Feb 2024 18:52:16 +0100
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: Janosch Frank <frankja@linux.ibm.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
-        david@redhat.com, nsg@linux.ibm.com, nrb@linux.ibm.com
-Subject: Re: [kvm-unit-tests RFC 1/2] lib: s390x: sigp: Name inline assembly
- arguments
-Message-ID: <20240201185216.08a5ad10@p-imbrenda>
-In-Reply-To: <20240201142356.534783-2-frankja@linux.ibm.com>
-References: <20240201142356.534783-1-frankja@linux.ibm.com>
-	<20240201142356.534783-2-frankja@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1706810476; c=relaxed/simple;
+	bh=W9J0NoGcrnYERrTcK+GUgbqfp52tsMxvbK+w7SaPV60=;
+	h=Date:Subject:In-Reply-To:CC:From:To:Message-ID:Mime-Version:
+	 Content-Type; b=Fh+RpYgST28QdP7Qtss+YOcfnQDLEm8H4ijUy0HshEzrKxWuhDd7qw26BQkFgQ0cT+vYzsRXcs8E2qRHX1FX22JgtPpogn5s5OBWTAMpG86pWzu47sK9CEQfgTWgfZ2VkygwA4eq5FHo4XSICdU8sLD5hQqkAk2O0RTuCgxbIb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com; spf=pass smtp.mailfrom=dabbelt.com; dkim=pass (2048-bit key) header.d=dabbelt-com.20230601.gappssmtp.com header.i=@dabbelt-com.20230601.gappssmtp.com header.b=2FY75X4n; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dabbelt.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1d7393de183so9213055ad.3
+        for <kvm@vger.kernel.org>; Thu, 01 Feb 2024 10:01:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dabbelt-com.20230601.gappssmtp.com; s=20230601; t=1706810474; x=1707415274; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:to:from:cc
+         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=a6iCiiJEkCihp55oAEAEl5G/BiNyoF0zUrNoSz0w21Q=;
+        b=2FY75X4nrzFMK1XzjhuAQe3D1ffF6yy69PRaYmV5nO7E0yEbnNl+1iGCSm7qpggOls
+         Anr3GAz9HR7tU6olcQheBuq64Rybuc11COTPWH7xJFqDUm4TAgNc46lox9vLqWQtW8mS
+         YFvjCjx4Qh2l3cwgZXi27fAVj9qpjfE4B+v+/cbC8f2vRBL0hoKXuLJzycVcfbedO28f
+         MdoQ+ANVRNiI5yq4VOZ2w7Ko/P+3vn70RBP7dH1NRJQT/+IPRqvtEz+rF0TlujPque9Z
+         Uh/bLQAU7syL0rn/gn23QCA7M5qBh8Rki0BeOBnioziXCLexfv/s177tbXZS4zKTh3Ot
+         bDcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706810474; x=1707415274;
+        h=content-transfer-encoding:mime-version:message-id:to:from:cc
+         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=a6iCiiJEkCihp55oAEAEl5G/BiNyoF0zUrNoSz0w21Q=;
+        b=a9d8UfftIe5x0gJTor2tEOqzeLWhbX7VjapudM2r0pnsZhdGu1in0W3JuB5INsVDi4
+         z8zBlPPEfIGDEIPNWlIEzjWs3NAPArXy8w74BAu9MZAedt4UTUh4N0UQZhi3xqDyJEXg
+         jIeVlvPPEMelo8yyJcjeDXShWx7hfH4TYG+lEd9SZh3GUrtdWDf300XNztXnh/JUWax/
+         fUmbFLv7pwuTpgcsMNL/bofHCAwrYTPoqUJtZoM9CumuM1JEShn3vMP7wX2o0fHM73D3
+         OJebHIKOvNReXfy9hRpYvObtplE9gYAi9XAFCNhGFX/LXU+dr2VWxa7gM+PRO/2M0kRa
+         OR1Q==
+X-Gm-Message-State: AOJu0YwngVFil58e3FclubS4KI2v0p24DwEncwTEUYLv4MrEEhbAKydD
+	rT0JnPOmFxqzNSbGO7mB3ULkNE11CJOhtTRnriE0kAFZ8P9zOoCfuajattKsDHg=
+X-Google-Smtp-Source: AGHT+IF15aCA64A+pUYtrNvn3aPBFP3YvRRtEpAp7GhLaGBTwkos6AGRBMomIaVUMVTpq99RCQfFMQ==
+X-Received: by 2002:a17:90a:bc89:b0:293:d87e:c0fa with SMTP id x9-20020a17090abc8900b00293d87ec0famr3127352pjr.17.1706810473841;
+        Thu, 01 Feb 2024 10:01:13 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCVLFmKNxnofRAm9+gmbtAPqzFlddhJuk3PI7Q/NjyXtJ7ZmHp/iTXv0TqfWfZjBaYzFcJopyG/9CDE+R+Jvvm0AZE2oEp2H1XiQOasKu+bdMsINxyBmBY5jTw58tvIpPgG+8pFfE4REHtX6JYC4f0MnquUQN2FJgHlWUglZqdX0AAutrjhomLn4WOttNBDZowK8M6oTDpJIKMK5zEL7B57m8l2DzdVPdCvNWBdNIiiJJpTqImLPcPjW1TVcA+i/QJ+Smow81am9Ta9fUe93MosSLs3u5DtSGA71RgmAo0rrseQVq4kPrBBAL0YwWtv87oLFn0jnKEYoDs/3013pcUBUSS1NOLxp/ILGeAvZ8CtLkHexM/zGg2zr3jqNiiyjXNuFTOwvY7CH857u5/m6eEZC4kBw+4isj41JIR5jioNJPtspftVQDzfP51ZYtxZJvdJd1G/n1LmyzTdmgDM5DCZYxDVbq7r21JeY+DbRZ9cDGnbcC80C+Dq1YyM1TrSNFLrGFjr4cn4CPrY/V9vyNQTBRhdzHLpuJwBz3zxXJlwPr0XZN2BEmMZgokwZxh+BZVCbuy2MQwBBdL4evAMOsvE007/KWpdqC+Ehpyr8KJ5Stk4roUjeT1/2UPsSMDH/dPqhrm/ODu25Q02BsA==
+Received: from localhost ([12.44.203.122])
+        by smtp.gmail.com with ESMTPSA id w20-20020a17090aea1400b00295f2cb67d1sm3326389pjy.16.2024.02.01.10.01.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Feb 2024 10:01:13 -0800 (PST)
+Date: Thu, 01 Feb 2024 10:01:13 -0800 (PST)
+X-Google-Original-Date: Thu, 01 Feb 2024 10:01:10 PST (-0800)
+Subject:     Re: Call for GSoC/Outreachy internship project ideas
+In-Reply-To: <87le84jd85.fsf@draig.linaro.org>
+CC: stefanha@gmail.com, Alistair Francis <Alistair.Francis@wdc.com>,
+  dbarboza@ventanamicro.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, afaria@redhat.com,
+  eperezma@redhat.com, gmaglione@redhat.com, marcandre.lureau@redhat.com, rjones@redhat.com,
+  sgarzare@redhat.com, imp@bsdimp.com, philmd@linaro.org, pbonzini@redhat.com, thuth@redhat.com,
+  danielhb413@gmail.com, gaosong@loongson.cn, akihiko.odaki@daynix.com, shentey@gmail.com,
+  npiggin@gmail.com, seanjc@google.com, Marc Zyngier <maz@kernel.org>
+From: Palmer Dabbelt <palmer@dabbelt.com>
+To: alex.bennee@linaro.org
+Message-ID: <mhng-ec5f9ea7-e704-4302-8542-c8c36ea979d8@palmer-ri-x1c9a>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: rSu7dnpQblSmGtG2U_ImBXHTeYmdBZMC
-X-Proofpoint-ORIG-GUID: a2MJ2jwwycFgTQvSvUbAUXV9xrmXIAyu
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-01_04,2024-01-31_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- priorityscore=1501 suspectscore=0 mlxscore=0 adultscore=0 clxscore=1015
- impostorscore=0 phishscore=0 bulkscore=0 mlxlogscore=999 malwarescore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2402010138
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu,  1 Feb 2024 14:23:55 +0000
-Janosch Frank <frankja@linux.ibm.com> wrote:
+On Thu, 01 Feb 2024 09:39:22 PST (-0800), alex.bennee@linaro.org wrote:
+> Palmer Dabbelt <palmer@dabbelt.com> writes:
+>
+>> On Tue, 30 Jan 2024 12:28:27 PST (-0800), stefanha@gmail.com wrote:
+>>> On Tue, 30 Jan 2024 at 14:40, Palmer Dabbelt <palmer@dabbelt.com> wrote:
+>>>>
+>>>> On Mon, 15 Jan 2024 08:32:59 PST (-0800), stefanha@gmail.com wrote:
+>>>> > Dear QEMU and KVM communities,
+>>>> > QEMU will apply for the Google Summer of Code and Outreachy internship
+>>>> > programs again this year. Regular contributors can submit project
+>>>> > ideas that they'd like to mentor by replying to this email before
+>>>> > January 30th.
+>>>>
+>>>> It's the 30th, sorry if this is late but I just saw it today.  +Alistair
+>>>> and Daniel, as I didn't sync up with anyone about this so not sure if
+>>>> someone else is looking already (we're not internally).
+> <snip>
+>>> Hi Palmer,
+>>> Performance optimization can be challenging for newcomers. I wouldn't
+>>> recommend it for a GSoC project unless you have time to seed the
+>>> project idea with specific optimizations to implement based on your
+>>> experience and profiling. That way the intern has a solid starting
+>>> point where they can have a few successes before venturing out to do
+>>> their own performance analysis.
+>>
+>> Ya, I agree.  That's part of the reason why I wasn't sure if it's a
+>> good idea.  At least for this one I think there should be some easy to
+>> understand performance issue, as the loops that go very slowly consist
+>> of a small number of instructions and go a lot slower.
+>>
+>> I'm actually more worried about this running into a rabbit hole of
+>> adding new TCG operations or even just having no well defined mappings
+>> between RVV and AVX, those might make the project really hard.
+>
+> You shouldn't have a hard guest-target mapping. But are you already
+> using the TCGVec types and they are not expanding to AVX when its
+> available?
 
-> Less need to count the operands makes the code easier to read.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+Ya, sorry, I guess that was an odd way to describe it.  IIUC we're doing 
+sane stuff, it's just that RISC-V has a very different vector masking 
+model than other ISAs.  I just said AVX there because I only care about 
+the performance on Intel servers, since that's what I run QEMU on.  I'd 
+asssume we have similar performance problems on other targets, I just 
+haven't looked.
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+So my worry would be that the RVV things we're doing slowly just don't 
+have fast implementations via AVX and thus we run into some intractable 
+problems.  That sort of stuff can be really frusturating for an intern, 
+as everything's new to them so it can be hard to know when something's 
+an optimization dead end.
 
-> ---
->  lib/s390x/asm/sigp.h | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/lib/s390x/asm/sigp.h b/lib/s390x/asm/sigp.h
-> index 4eae95d0..c9af2c49 100644
-> --- a/lib/s390x/asm/sigp.h
-> +++ b/lib/s390x/asm/sigp.h
-> @@ -54,11 +54,11 @@ static inline int sigp(uint16_t addr, uint8_t order, unsigned long parm,
->  
->  	asm volatile(
->  		"	tmll	%[bogus_cc],3\n"
-> -		"	sigp	%1,%2,0(%3)\n"
-> -		"	ipm	%0\n"
-> -		"	srl	%0,28\n"
-> -		: "=d" (cc), "+d" (reg1)
-> -		: "d" (addr), "a" (order), [bogus_cc] "d" (bogus_cc)
-> +		"	sigp	%[reg1],%[addr],0(%[order])\n"
-> +		"	ipm	%[cc]\n"
-> +		"	srl	%[cc],28\n"
-> +		: [cc] "=d" (cc), [reg1] "+d" (reg1)
-> +		: [addr] "d" (addr), [order] "a" (order), [bogus_cc] "d" (bogus_cc)
->  		: "cc");
->  	if (status)
->  		*status = reg1;
+That said, we're seeing 100x slowdows in microbenchmarks and 10x 
+slowdowns in real code, so I think there sholud be some way to do 
+better.
 
+> Remember for anything float we will end up with softfloat anyway so we
+> can't use SIMD on the backend.
+
+Yep, but we have a handful of integer slowdowns too so I think there's 
+some meat to chew on here.  The softfloat stuff should be equally slow 
+for scalar/vector, so we shouldn't be tripping false positives there.
+
+>>> Do you have the time to profile and add specifics to the project idea
+>>> by Feb 21st? If that sounds good to you, I'll add it to the project
+>>> ideas list and you can add more detailed tasks in the coming weeks.
+>>
+>> I can at least dig up some of the examples I ran into, there's been a
+>> handful filtering in over the last year or so.
+>>
+>> This one
+>> <https://gist.github.com/compnerd/daa7e68f7b4910cb6b27f856e6c2beba>
+>> still has a much more than 10x slowdown (73ms -> 13s) with
+>> vectorization, for example.
+>>
+>>> Thanks,
+>>> Stefan
+>
+> -- 
+> Alex Bennée
+> Virtualisation Tech Lead @ Linaro
 
