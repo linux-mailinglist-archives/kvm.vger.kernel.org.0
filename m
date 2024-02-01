@@ -1,101 +1,107 @@
-Return-Path: <kvm+bounces-7641-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7644-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68784844E9D
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 02:19:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11EE5844EC5
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 02:41:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25074294CDB
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 01:19:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 790271F2E082
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 01:41:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACF0E443E;
-	Thu,  1 Feb 2024 01:19:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 290EC4C7E;
+	Thu,  1 Feb 2024 01:41:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="T58wrdoS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AQmIM7Nr"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-176.mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1DC42107
-	for <kvm@vger.kernel.org>; Thu,  1 Feb 2024 01:19:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76F3F524B;
+	Thu,  1 Feb 2024 01:41:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706750357; cv=none; b=AOhDd6sWnzirUAvpF1o6/Mij/8IFP8fCxVzrOnSIgX7pOjpEBUNoIKuTu4lehV9SkBfnwELURB/s1hNgaPfZoILqrRi6zpAmCVdoDMwhqUHJhAQR/pP5bTapQMqVpU6LLI5lwMi2PwWdLRVXk+EOkVLBZX2E6g9suOndMnJrjak=
+	t=1706751672; cv=none; b=WcK30kzqZt5cdQn7ag4QffJYpEy/vNOvNELxV5rABZ5PtsbiGq66PQmRkp1pgek9k3pbL0oV6yshAYhMmeJ2hLCPjN+MnxSQBcoEBKgGYFZe4MoKH0RUj73XniQBEYT3mQP2o3hAJQlUvBalebuUwnQV4wLPbWSuYZmMSCESV30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706750357; c=relaxed/simple;
-	bh=7fRlzmXPRGNcP7/rdkvvjw/GywXiezprH3glel5e1Y0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Qi7bQBzDQ6HHI6VC3y3r/41tKGVTJSSQ4mpaWQQ1XFyuBhkKgLXRBTjWnJS0ExAgXzSJygyEr8nHiW88/XQZhkz8DRDWM/O59ne66zMKE7tGmyaQ2OWE2NntG7vL34yy946IS64qzXAOA3ArmGGqhxMTiE4MhKt0t3v4LKEhCO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=T58wrdoS; arc=none smtp.client-ip=91.218.175.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Thu, 1 Feb 2024 01:19:05 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706750351;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jdGWg9mLdgVQVzubThwyPSrz1+OTwVAbV3Hd5xxiYb4=;
-	b=T58wrdoSVWwBPyvZipAUQ5zN0guv+zb27w40axBq0O8RkShsNA6VT11q6sHwmGVS2UPohE
-	bUEIGzfmhOW4zzwLFga3AwvpM92q7Dovee16HHMTzJxUsdYTP+a0um4Pm5/h6hVRj8z7Lh
-	oNcIl9SG/A2IrGsuHFnDzfmec0woV8Q=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: James Houghton <jthoughton@google.com>
-Cc: Anish Moorthy <amoorthy@google.com>, seanjc@google.com,
-	kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
-	maz@kernel.org, robert.hoo.linux@gmail.com, dmatlack@google.com,
-	axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com,
-	isaku.yamahata@gmail.com, kconsul@linux.vnet.ibm.com
-Subject: Re: [PATCH v6 06/14] KVM: Add memslot flag to let userspace force an
- exit on missing hva mappings
-Message-ID: <ZbrxiSNV7e1C6LO-@linux.dev>
-References: <20231109210325.3806151-1-amoorthy@google.com>
- <20231109210325.3806151-7-amoorthy@google.com>
- <CADrL8HWYKSiDZ_ahGbMXjup=r75B4JqC3LvT8A-qPVenV+MOiw@mail.gmail.com>
- <CAF7b7mrA3rB33sUZe3HX33+fXpF=8VwD284LpCcEn9KT9OgwUQ@mail.gmail.com>
- <CADrL8HXSzm_C9UwUb8-H_c6-TRgpkKLE+qeXfyN-X_rHGj2vuw@mail.gmail.com>
+	s=arc-20240116; t=1706751672; c=relaxed/simple;
+	bh=wjNPj8TpVPxMj33O6Zocl9vYBSzey858v7bzOGiD7a0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BhGPOpDsxZCZNwrKXHF8ZIdgG/KhaMlaRs4At+E5p/m6StpwA2LyWBQONkLKprBbjtkPORCajKz6+pPQ57ND16ew7BLEL73xI36Wk6rDk3nGzU2znDi0a4caZbVAeZYh89akj6YgrlXkMQRuZFCEGHE3LYYg956RCjuQoj4NuGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AQmIM7Nr; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706751670; x=1738287670;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=wjNPj8TpVPxMj33O6Zocl9vYBSzey858v7bzOGiD7a0=;
+  b=AQmIM7NrzxkUtGiADWRSWNNQU2K+7z+ssFO94rEaAb8x1Bb5hfDGoyz1
+   kjr4ViWLvGP2TIpBkdbGFC7Lrq4z1a3FaWw0/5lgsUEfrem+KtFaonb9r
+   DNSH/r/kCCMEl/qHzt+vTewgrF/3UJ5RDkoTDngejKJ2/gOOZPiCwpV7G
+   xjUZEAU4eynG9Tj6g+oxK/WzbtFRMByE247WrElyDgy9RmZeqZ8NziYF3
+   js756piO67MpiW4lE7sFs8JIWJFnlfTpYQSQ61F7Rrmna08fzhnQGItU+
+   RvtBkMmehbq1Y5qR7/kN2dL1Pjj0Ffy5HoEujRg/ODze4ZVl4nM1SjtbB
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="17164929"
+X-IronPort-AV: E=Sophos;i="6.05,233,1701158400"; 
+   d="scan'208";a="17164929"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2024 17:41:09 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,233,1701158400"; 
+   d="scan'208";a="4272686"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.33.17]) ([10.93.33.17])
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2024 17:41:05 -0800
+Message-ID: <9b1ca7cc-1a16-4bab-8398-f9bdc4bc23cb@intel.com>
+Date: Thu, 1 Feb 2024 09:41:01 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADrL8HXSzm_C9UwUb8-H_c6-TRgpkKLE+qeXfyN-X_rHGj2vuw@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v18 006/121] KVM: x86/vmx: Refactor KVM VMX module
+ init/exit functions
+Content-Language: en-US
+To: isaku.yamahata@intel.com, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+ erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+ Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
+ chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com
+References: <cover.1705965634.git.isaku.yamahata@intel.com>
+ <f6c59ec1b4822263fc946b7d53a83f3b5ba59261.1705965634.git.isaku.yamahata@intel.com>
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <f6c59ec1b4822263fc946b7d53a83f3b5ba59261.1705965634.git.isaku.yamahata@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jan 31, 2024 at 04:26:08PM -0800, James Houghton wrote:
-> On Wed, Jan 31, 2024 at 2:00 PM Anish Moorthy <amoorthy@google.com> wrote:
+On 1/23/2024 7:52 AM, isaku.yamahata@intel.com wrote:
 
-[...]
+...
 
-> On that note, I think we need to drop the patch that causes
-> read-faults in RO memslots to go through fast GUP. KVM didn't do that
-> for a good reason[1].
-> 
-> That would break KVM_EXIT_ON_MISSING for RO memslots, so I think that
-> the right way to implement KVM_EXIT_ON_MISSING is to have
-> hva_to_pfn_slow pass FOLL_NOFAULT, at least for the RO memslot case.
-> We still get the win we're looking for: don't grab the userfaultfd
-> locks.
+> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+> index b6836bedc4d3..b936388853ab 100644
+> --- a/arch/x86/kvm/vmx/x86_ops.h
+> +++ b/arch/x86/kvm/vmx/x86_ops.h
+> @@ -6,11 +6,24 @@
+>   
+>   #include "x86.h"
+>   
+> -__init int vmx_hardware_setup(void);
 
-Is there even a legitimate use case that warrants optimizing faults on
-RO memslots? My expectation is that the VMM uses these to back things
-like guest ROM, or at least that's what QEMU does. In that case I'd
-expect faults to be exceedingly rare, and if the VMM actually cared it
-could just pre-populate the primary mapping.
+...
 
-I understand why we would want to support KVM_EXIT_ON_MISSING for the
-sake of completeness of the UAPI, but it'd be surprising if this
-mattered in the context of post-copy.
+>   
+> +__init int vmx_hardware_setup(void);
 
--- 
-Thanks,
-Oliver
+this change belongs to Patch 4
+
+>   void vmx_hardware_unsetup(void);
+>   int vmx_check_processor_compat(void);
+>   int vmx_hardware_enable(void);
+
 
