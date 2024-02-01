@@ -1,116 +1,227 @@
-Return-Path: <kvm+bounces-7629-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7630-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2BFD844D8E
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 01:03:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18967844DC3
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 01:21:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 93930B2DB7F
-	for <lists+kvm@lfdr.de>; Wed, 31 Jan 2024 23:57:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C77992858FC
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 00:21:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60A8F3FB04;
-	Wed, 31 Jan 2024 23:56:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B1261848;
+	Thu,  1 Feb 2024 00:20:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jCj4pBkI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AFeTbHsO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33D243D0A0
-	for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 23:56:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0F8C7E6
+	for <kvm@vger.kernel.org>; Thu,  1 Feb 2024 00:20:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706745381; cv=none; b=d5vsDcyH+6JAS4pykXAnXLXQOytMtggXEAvhad3NqJreKYE8dmHeIQQG04DPvtkqKOKx/kfO1lCMACm9cD72UWEhQbFCg7NswqfNBglxWIAEItS9Tbdzz5no8bpyj7JS6UpJvnnhSIxgWh9RmNiZA88CCkTVtzMIZ/E1Jk/IMUA=
+	t=1706746858; cv=none; b=hUE7wvzc8d1kLU8cs+42JsyS37F5FAspU5wVvp3Pyzl2SNzhOwXdkgpCe/4SelX0TzO9d1T5sjyUVAt+ldHsSkKt6udI7TrIS01PJNIArNq45cQkDUAqyYu74SD1rDo22nUk9sunt/UqAgJNqsXXyCYMeY7DB4nK/FWVTVQPTTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706745381; c=relaxed/simple;
-	bh=dJzDRHZ4lvHqnCEXSzwyrLR5DGIflpjXQoxReg/o7XY=;
+	s=arc-20240116; t=1706746858; c=relaxed/simple;
+	bh=vPtpnLaleP3MgQmoDyqqaoE5DCMRkDO/XbE6A+o6ZGs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=gNIDZeO7ZRETGoXlrmbC+Nx9LEVR4rr+5noUnNZsnjge4dwKd3aiTU5UkDj+wUUPS8DGtjAQOSsTylkwW07wtdPqXVQpZVFHYrE/CuKydLO5yqN0eHcFIHQPxhb9f+Fz6GxREszEhR9vFUaIzjnr6y4TrtiSPRJyBZcovkP/GfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jCj4pBkI; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=ADdCh13pebEi0f+bzpZSZT2sSAGoIl5nLUibzvCPT3OjOSHb/mLwHHuT00CxBl4ET4YdNBpf9tme3VvihHJezMjEGGkFYZKP9EEjy2d2O6iB67pwlH7umzKdYhADtvVQ6osX0cwPg5VbcoIeIN3iwz+FCQGZ0qrcdZAV0GMwxtE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AFeTbHsO; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5cf2714e392so232043a12.0
-        for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 15:56:19 -0800 (PST)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6040b27151eso7592767b3.3
+        for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 16:20:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706745379; x=1707350179; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1706746854; x=1707351654; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=yNChpOdBDlQ0ccn6PmbEc8ewiIrWgLKikwCTAZH7kF8=;
-        b=jCj4pBkI9HgR+IeJsNF9dobIM76elCbTIgKk4h/ayPUdl0+FYpXwmVuUfJ5PzF8A8J
-         CBoHx5a/kZTBxoVcnqcGg/G8QDOjsMQcpwPo0grIF5KUG0GjPbTgF29R6NIQbBcnKX7H
-         LEK31rmIqNscZOrex+6NzOcgs+Eidca+ZTFRHdEuFaU+9uwsi7hIAUia2cUHr1R7+myb
-         gEHeAQ+s9SpIiDoLRI3NBUHKMJ7Q8oD1JB1c5ju0jA2irn2jmzz3FFv4HOTvX5TRju01
-         L68CkRgBJel/SnhCVkJ/MQoyoTkzxnrX/4zwgusRuArJB3Nnpigr5ZttMDLSlcE/mE19
-         oDWw==
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=g1PMHYRH7qb67G88ys4k0o39fe/edxcv9FM2T4EKaqk=;
+        b=AFeTbHsOsKi0IdFmI4ZHqHMqsZQrVeacIQd1k/xRKGIHIzMtd0fGZV0dv6RVKFWPzp
+         NfIdcY1+/yq9AB4JCtHAOXqOYfJAaUJhQh17mNlm+GBau9Nw5FuY9+Crtdpv1OGhgpBP
+         k+BZqbQWQNyD3KVftXmFrnVXGnLT0Cj4H/5emXpjY8cPtNjsovulp9yHl1OYFhkeejBn
+         BbguLsmNpBvN1fPIPaCakGvjv2KBMzTN3vWR37OpWUu70Y4rokHViV3Q98fA/oMd4091
+         5LqxDxF5jTSU9lj4QvFxrOBaasgXia7QUfavSW+h58reOnEjQa2HKuIPFA9h+ovDgXAa
+         9F3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706745379; x=1707350179;
+        d=1e100.net; s=20230601; t=1706746854; x=1707351654;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yNChpOdBDlQ0ccn6PmbEc8ewiIrWgLKikwCTAZH7kF8=;
-        b=VAtlTKAjqWcldZfO6LARIiMtF/BThmzTK/2ZzgmKHTbUTRZy6uNcYEl4FbvAiJMpiT
-         xjbdUViKyzbHVfNW+Q/48X4RYH9GaWt1Xqmq8hkSeIZEj/dK9PK86W8G54C0YImIrvQQ
-         5/xLxrC6PesFBSb32LtoCGKvIufojHCcRdW1aBbesoxc4+QdL1at7DFCvjhkAk/x/IwU
-         DzK9Pd4aqYRNuvcQBgTQTIILR94xnngEoooPCFqgNR5miNwqJZfuej8K++HJ2ny0OU4U
-         aTIrVrfjruHNp6TQipyAiiGrLur2pVI20Q6zzedBVR9dKFO4CqVVrumy99tHmtGaGTKp
-         5vvA==
-X-Gm-Message-State: AOJu0YxfU+7v4QwR0teHGAHYKNRRK7G//KvYypyDK0poEat2ugOD41ND
-	BZps2N3tpto5M0qySW39Qr5ZTyulpnD+LdMWXvFpMsr7r6UXTbfvVsqPKOvqT1XX2gzifNlFSS3
-	iyQ==
-X-Google-Smtp-Source: AGHT+IFTr/+IS+bV1DcMzvuzP3zhkalRQ/k9HG3wrh1LLkzsqwYxmu0x9I1ATz04QKIOVB1h9pFrfMHC57Y=
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=g1PMHYRH7qb67G88ys4k0o39fe/edxcv9FM2T4EKaqk=;
+        b=CUB0vgiqCwrakOF1CefStoY5uQDXQLzeVEwy7yPT+vHGkN0GI0JP5W1j3pLmJevFrk
+         WThGWId1WQuOgMJEp+fpWMfQ/j6/f0z3rv8cj1HkPgRXQrixYxOrY56LOzRxbuCGTzXR
+         SQ4NF5IX5ta/Te47r7ivNQstbfK43fq2WtlbkL2DzMZBUOw82jLQTQ6T2NUMGcTAhv2l
+         65gubCmE4hCCSAwhwUv/9L60cLz/vQrCvnCN8UJ7IK1yGRj+Lg+vdFJnZaCgD57VBNtC
+         6qu+KO46jF7V+CgrS8DfeD45BM884tzMfGqUGEejaJEd60hvNwApAKn4NWjGh1XrYUz9
+         bdtg==
+X-Gm-Message-State: AOJu0YxPQY4+pZKOBowblatCv47JLocfLpBmDiJzvoG4bbJrFjdVbBLT
+	Py8EvgbuiVCGz27K1OnN5UXcl90BfiHy8lDSl4y4RiTlIIazNqOL+DBIycTxfeFVN+sLXCYo9aw
+	Oog==
+X-Google-Smtp-Source: AGHT+IH80WQPe2gC0t41s8elGGKjfDMTRtXWW//0TOVmoyUvyUr43Ya/wSrUFZF+r6Z3Ca0w0TJIfiQeiMA=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:8849:0:b0:5cd:c9af:ff21 with SMTP id
- l70-20020a638849000000b005cdc9afff21mr191194pgd.3.1706745379511; Wed, 31 Jan
- 2024 15:56:19 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 31 Jan 2024 15:56:09 -0800
-In-Reply-To: <20240131235609.4161407-1-seanjc@google.com>
+ (user=seanjc job=sendgmr) by 2002:a05:690c:f85:b0:5ff:9315:7579 with SMTP id
+ df5-20020a05690c0f8500b005ff93157579mr690348ywb.6.1706746854726; Wed, 31 Jan
+ 2024 16:20:54 -0800 (PST)
+Date: Wed, 31 Jan 2024 16:20:53 -0800
+In-Reply-To: <97bb1f2996d8a7b828cd9e3309380d1a86ca681b.1705965635.git.isaku.yamahata@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240131235609.4161407-1-seanjc@google.com>
-X-Mailer: git-send-email 2.43.0.429.g432eaa2c6b-goog
-Message-ID: <20240131235609.4161407-5-seanjc@google.com>
-Subject: [PATCH v4 4/4] KVM: SVM: Return -EINVAL instead of -EBUSY on attempt
- to re-init SEV/SEV-ES
+References: <cover.1705965634.git.isaku.yamahata@intel.com> <97bb1f2996d8a7b828cd9e3309380d1a86ca681b.1705965635.git.isaku.yamahata@intel.com>
+Message-ID: <Zbrj5WKVgMsUFDtb@google.com>
+Subject: Re: [PATCH v18 064/121] KVM: TDX: Create initial guest memory
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: isaku.yamahata@intel.com
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Ashish Kalra <ashish.kalra@amd.com>, Tom Lendacky <thomas.lendacky@amd.com>
-Content-Type: text/plain; charset="UTF-8"
+	isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com, 
+	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>, chen.bo@intel.com, 
+	hang.yuan@intel.com, tina.zhang@intel.com, gkirkpatrick@google.com
+Content-Type: text/plain; charset="us-ascii"
 
-Return -EINVAL instead of -EBUSY if userspace attempts KVM_SEV{,ES}_INIT
-on a VM that already has SEV active.  Returning -EBUSY is nonsencial as
-it's impossible to deactivate SEV without destroying the VM, i.e. the VM
-isn't "busy" in any sane sense of the word, and the odds of any userspace
-wanting exactly -EBUSY on a userspace bug are minuscule.
+On Mon, Jan 22, 2024, isaku.yamahata@intel.com wrote:
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index 4cbcedff4f16..1a5a91b99de9 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -591,6 +591,69 @@ static int tdx_mem_page_aug(struct kvm *kvm, gfn_t gfn,
+>  	return 0;
+>  }
+>  
+> +static int tdx_mem_page_add(struct kvm *kvm, gfn_t gfn,
+> +			    enum pg_level level, kvm_pfn_t pfn)
+> +{
+> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
+> +	hpa_t hpa = pfn_to_hpa(pfn);
+> +	gpa_t gpa = gfn_to_gpa(gfn);
+> +	struct tdx_module_args out;
+> +	hpa_t source_pa;
+> +	bool measure;
+> +	u64 err;
+> +	int i;
+> +
+> +	/*
+> +	 * KVM_INIT_MEM_REGION, tdx_init_mem_region(), supports only 4K page
+> +	 * because tdh_mem_page_add() supports only 4K page.
+> +	 */
+> +	if (KVM_BUG_ON(level != PG_LEVEL_4K, kvm))
+> +		return -EINVAL;
+> +
+> +	/*
+> +	 * In case of TDP MMU, fault handler can run concurrently.  Note
+> +	 * 'source_pa' is a TD scope variable, meaning if there are multiple
+> +	 * threads reaching here with all needing to access 'source_pa', it
+> +	 * will break.  However fortunately this won't happen, because below
+> +	 * TDH_MEM_PAGE_ADD code path is only used when VM is being created
+> +	 * before it is running, using KVM_TDX_INIT_MEM_REGION ioctl (which
+> +	 * always uses vcpu 0's page table and protected by vcpu->mutex).
+> +	 */
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/svm/sev.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Most of the above is superflous.  tdx_mem_page_add() is called if and only if
+the TD is finalized, and the TDX module disallow running vCPUs before the TD is
+finalized.  That's it.  And maybe throw in a lockdep to assert that kvm->lock is
+held.
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 38e40fbc7ea0..cb19b57e1031 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -259,9 +259,8 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	if (kvm->created_vcpus)
- 		return -EINVAL;
- 
--	ret = -EBUSY;
- 	if (unlikely(sev->active))
--		return ret;
-+		return -EINVAL;
- 
- 	sev->active = true;
- 	sev->es_active = argp->id == KVM_SEV_ES_INIT;
--- 
-2.43.0.429.g432eaa2c6b-goog
+> +	if (KVM_BUG_ON(kvm_tdx->source_pa == INVALID_PAGE, kvm)) {
+> +		tdx_unpin(kvm, pfn);
+> +		return -EINVAL;
+> +	}
+> +
+> +	source_pa = kvm_tdx->source_pa & ~KVM_TDX_MEASURE_MEMORY_REGION;
+> +	measure = kvm_tdx->source_pa & KVM_TDX_MEASURE_MEMORY_REGION;
+> +	kvm_tdx->source_pa = INVALID_PAGE;
+> +
+> +	do {
+> +		err = tdh_mem_page_add(kvm_tdx->tdr_pa, gpa, hpa, source_pa,
+> +				       &out);
+> +		/*
+> +		 * This path is executed during populating initial guest memory
+> +		 * image. i.e. before running any vcpu.  Race is rare.
 
+How are races possible at all?
+
+> +		 */
+> +	} while (unlikely(err == TDX_ERROR_SEPT_BUSY));
+> +	if (KVM_BUG_ON(err, kvm)) {
+> +		pr_tdx_error(TDH_MEM_PAGE_ADD, err, &out);
+> +		tdx_unpin(kvm, pfn);
+> +		return -EIO;
+> +	} else if (measure) {
+> +		for (i = 0; i < PAGE_SIZE; i += TDX_EXTENDMR_CHUNKSIZE) {
+> +			err = tdh_mr_extend(kvm_tdx->tdr_pa, gpa + i, &out);
+> +			if (KVM_BUG_ON(err, &kvm_tdx->kvm)) {
+> +				pr_tdx_error(TDH_MR_EXTEND, err, &out);
+> +				break;
+> +			}
+> +		}
+
+Why is measurement done deep within the MMU?  At a glance, I don't see why this
+can't be done up in the ioctl, outside of a spinlock.
+
+And IIRC, the order affects the measurement but doesn't truly matter, e.g. KVM
+could choose to completely separate tdh_mr_extend() from tdh_mem_page_add(), no?
+
+> +static int tdx_init_mem_region(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
+> +{
+> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
+> +	struct kvm_tdx_init_mem_region region;
+> +	struct kvm_vcpu *vcpu;
+> +	struct page *page;
+> +	int idx, ret = 0;
+> +	bool added = false;
+> +
+> +	/* Once TD is finalized, the initial guest memory is fixed. */
+> +	if (is_td_finalized(kvm_tdx))
+> +		return -EINVAL;
+> +
+> +	/* The BSP vCPU must be created before initializing memory regions. */
+> +	if (!atomic_read(&kvm->online_vcpus))
+> +		return -EINVAL;
+> +
+> +	if (cmd->flags & ~KVM_TDX_MEASURE_MEMORY_REGION)
+> +		return -EINVAL;
+> +
+> +	if (copy_from_user(&region, (void __user *)cmd->data, sizeof(region)))
+> +		return -EFAULT;
+> +
+> +	/* Sanity check */
+> +	if (!IS_ALIGNED(region.source_addr, PAGE_SIZE) ||
+> +	    !IS_ALIGNED(region.gpa, PAGE_SIZE) ||
+> +	    !region.nr_pages ||
+> +	    region.nr_pages & GENMASK_ULL(63, 63 - PAGE_SHIFT) ||
+> +	    region.gpa + (region.nr_pages << PAGE_SHIFT) <= region.gpa ||
+> +	    !kvm_is_private_gpa(kvm, region.gpa) ||
+> +	    !kvm_is_private_gpa(kvm, region.gpa + (region.nr_pages << PAGE_SHIFT)))
+> +		return -EINVAL;
+> +
+> +	vcpu = kvm_get_vcpu(kvm, 0);
+> +	if (mutex_lock_killable(&vcpu->mutex))
+> +		return -EINTR;
+
+The real reason for this drive-by pseudo-review is that I am hoping/wishing we
+can turn this into a generic KVM ioctl() to allow userspace to pre-map guest
+memory[*].
+
+If we're going to carry non-trivial code, we might as well squeeze as much use
+out of it as we can.
+
+Beyond wanting to shove this into KVM_MEMORY_ENCRYPT_OP, is there any reason why
+this is a VM ioctl() and not a vCPU ioctl()?  Very roughly, couldn't we use a
+struct like this as input to a vCPU ioctl() that maps memory, and optionally
+initializes memory from @source?
+
+	struct kvm_memory_mapping {
+		__u64 base_gfn;
+		__u64 nr_pages;
+		__u64 flags;
+		__u64 source;
+	}
+
+TDX would need to do special things for copying the source, but beyond that most
+of the code in this function is generic.
+
+[*] https://lore.kernel.org/all/65262e67-7885-971a-896d-ad9c0a760907@polito.it
 
