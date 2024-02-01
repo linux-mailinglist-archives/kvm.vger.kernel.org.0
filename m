@@ -1,158 +1,158 @@
-Return-Path: <kvm+bounces-7752-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7753-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D7C8845EB7
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 18:39:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0855845ED8
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 18:47:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 12ACF1F20F4A
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 17:39:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2533E1C25107
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 17:47:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8494684037;
-	Thu,  1 Feb 2024 17:39:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B61CF6FB93;
+	Thu,  1 Feb 2024 17:46:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ucRcnqQM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ihK5pDi1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8FB26FB80
-	for <kvm@vger.kernel.org>; Thu,  1 Feb 2024 17:39:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 327247C6C3
+	for <kvm@vger.kernel.org>; Thu,  1 Feb 2024 17:46:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706809166; cv=none; b=DDSyPzVpxe+ZqhBb1Q3r+uv00MJZdgrUjTmXhfBqP6aXtqTTv6bkYtg8Ps91SAJlQNUsCi6mm85aQDaoD5OhkN7XU9qxVP6hJn3i2tzBo5sWQGDrApr4MNsaaXfexzoZUEPt8xA+HJ8ENCLw99E6Pp1PJ37QEZ4vKfbthJreNOI=
+	t=1706809614; cv=none; b=kNx5/k7fZRN4Z8+snu3oFlljwXHZMYorCvmaVpuMYvKCUmczQufbgAS4yFfIaeB1L90A5afG0ZXebehqXGWKc6nZAWdZfrn7JcxgtRvY8kzVqClA2BzHwAFp3ehubpGN6LV/U4VmpUVxN1x2rGGurQDy4fY/+FaJYeUU+iB8Y3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706809166; c=relaxed/simple;
-	bh=cNYzf74IkkkykwrChcmSNmZf+xD4qBOuu79n6zi5ZR4=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=iqjb42mrr9jYkSva8LKbguM+N377PI+8RCzMvq6UhIlmNXBnHDYWvTmz5RJ3/bQs43bQZur7IrCdYDdOGNamoaRAT9Ibm/R0buPHLof1jYTam6/D6gszBJf2xXc5peXXey/hyFTUYKECfS2si3Pk6lNP3I0FbB91mNX5eLH9Qvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ucRcnqQM; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-40ef6da20feso7153055e9.0
-        for <kvm@vger.kernel.org>; Thu, 01 Feb 2024 09:39:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1706809163; x=1707413963; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:user-agent
-         :references:in-reply-to:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RzoZDvDII/Op/k856KqiHsOD8jArS3pDpqkAcYGo0Nw=;
-        b=ucRcnqQMvz+S0DxMedK2im+16xrbWb0/hbDne2NtDh+gpza69ii1OgwAxOJEMnLBID
-         a2nisJmAV8vsvlbNSMlTY3tc2qfiFEkf75jMwQX7J1FXA8KFvsrv8ccbmeryHq8a/wSO
-         v1k4kBay6MhasjVqp0TbpzCGHRJpKtP9kFpHgdl/oO6yus5E45nUOy1UIvXLuW7ce3XB
-         xEMwN5ghJJ07S09CnU3d/1vlVzvC4qCd0EIqH6HW6S3QPQy9rzr7QzFjLYdfQjYtl0UP
-         L1gmrcFR4lEJnq9xNrPTY3Hsl32FH6lbXVcvGkZXk5Kwi4+iyIb0EROFlA1K55hNDVVp
-         WqRw==
+	s=arc-20240116; t=1706809614; c=relaxed/simple;
+	bh=UtrCl+//nMzOrjxzTW2hJCrpbv42WlAfJ1HSYNjMd1Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ERezpxOrNfXuxcFpsvkKUNE6odBlK0YMDujM/J2fjDmAaTbGQwSwaP2jjxXD4CKMRP6lELqqPSp1LIjiOkszqWYT0NpHp0oV49g+8Fy1EHfQxrEN6DjZxJjemHG0tO8WoM3y/QheY76u7OSPZPf+IT8yEOFT7IwpgpsiJp0fXg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ihK5pDi1; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706809612;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8Pfr4KxXg16gh4zIma5BqG45urMrXkBX1Ao+OzgSrmg=;
+	b=ihK5pDi186Kjedu5CT+2qFSYlnuNjbprczMNbhlrR0Z4TpGL6eTvXQpExR78jwpbmJ+aIy
+	ae6H4yLXyac9CWnJ09m6qIr3sN2pV3jCUECZ6an6wFkNJffweQdH68yM4tJVD1jgM2VFOR
+	40Hnv0wtRINVOaEh9pIegYDD714QnDQ=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-139-67L0lAOLPOGpOm3-0mNM9w-1; Thu, 01 Feb 2024 12:46:50 -0500
+X-MC-Unique: 67L0lAOLPOGpOm3-0mNM9w-1
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-78538ead61fso115297585a.2
+        for <kvm@vger.kernel.org>; Thu, 01 Feb 2024 09:46:50 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706809163; x=1707413963;
-        h=content-transfer-encoding:mime-version:message-id:date:user-agent
-         :references:in-reply-to:subject:cc:to:from:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=RzoZDvDII/Op/k856KqiHsOD8jArS3pDpqkAcYGo0Nw=;
-        b=KaN2unbWYkIkWHCcdCSPw0DIQQ5VgOQez1Z3kiPPXJVdyDNwizofmQ3b3Uldbk+xqL
-         /6MKMtLjLt7N/qMzKRzDgPkIhIBrQUKo5IM78A+LL0z1LIoH/nb8f5nWB2dahDg2h960
-         19wtx2Vz9iaOhYsEY0jdnbjPC48X2TNSuCu+PDMx1GeGsbFw3H85F1/bS2CuFbUs3LYv
-         pHlfAOdH7jBO1jY1J8XzhJRPtWEUWLMzd6AsCiI5ZhlH4GoI9+zar5gaM8Xd/PhyCcyw
-         sECKpeSiEtWOcKkJzTXMl50ThEpk/DMiKzuqYYFWkwM9GqZ0coJzEOViVScFabjfURJL
-         nrOQ==
-X-Gm-Message-State: AOJu0YweQAi60cEJj5uts9sj+Ej9Tp8T2dDuho+lSDdvzntvL/6wD0Rg
-	tKQ2Y9wBNqar07jjgKF+XHjdy0j/4LGLrLFLR4qHZ2gZGYsB87f4l+nA3hNT0J4=
-X-Google-Smtp-Source: AGHT+IEtGiborKIfQbJLWBuCUv3huaGcPbA7q0BWb9JZD3oxvCoNvcOtJRpS2hpUEL26RpAa9e6Xkw==
-X-Received: by 2002:a05:600c:1c0a:b0:40e:e8e3:40c2 with SMTP id j10-20020a05600c1c0a00b0040ee8e340c2mr8118047wms.12.1706809163021;
-        Thu, 01 Feb 2024 09:39:23 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCVOcVhgl2NT50x2K+iQRLmWZxW6bkz8eMXCrH2OwknGbH9+8scUaFH+cL7tVOQm48Uf2NvmOwxUIKNn1dIsfgqPw8b2/vZZAVDYDLvoVmmKo3xv8LeZYL6jxy6ARvrkem9jVY3EPVCwFzEGHl4WBKK2SVWVRKFfv41N99SCs5i0SXqkBSUI+1e+Ewg/xtC3wRtBI3miu+abWrpvw8/nHHeqYKOG3NXSQsEgPPFAHzOJaRZv/tTGgO52v3Zu/XacebJd9xzgvm7Z3DwwOWiWYd35uQp/bqPYtOU4zzFK6LxucK7I3N+1QZypAVgJ408LmgRQ3iU4NwxlqH4B6+Z8n1ZbBYFIoz+AX0JTjl6v8n0n6rCKKr49WCZBKnhU93ngVwzqMnnJozvvHsHFXtiMMdYbmq1C+JwGHUKpEX7GIr1P8gB5PWtEGmvMO7t+tjTd71C7+rwZzdCMrQdEQIAs+C6nsh24NOWIqfQx6zEVup2jeaeUQXK2DZRijyLfsqumNFnFMQanhb44SRxDNuwj6I0Lv69SYccZLbPyBLC+SGH8uaBcViwNlJXewA5ybtYHCRurYNYU94jMq9EyuytWWl6QrV6pApWDllnpp+n3AzUiEVBJCorGnN3LisRKwbkeTNwC8nL2RyCq97/mPg==
-Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id o7-20020a05600c510700b0040e880ac6ecsm5096977wms.35.2024.02.01.09.39.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Feb 2024 09:39:22 -0800 (PST)
-Received: from draig (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 50CBE5F7AF;
-	Thu,  1 Feb 2024 17:39:22 +0000 (GMT)
-From: =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Palmer Dabbelt <palmer@dabbelt.com>
-Cc: stefanha@gmail.com,  Alistair Francis <Alistair.Francis@wdc.com>,
-  dbarboza@ventanamicro.com,  qemu-devel@nongnu.org,  kvm@vger.kernel.org,
-  afaria@redhat.com,  eperezma@redhat.com,  gmaglione@redhat.com,
-  marcandre.lureau@redhat.com,  rjones@redhat.com,  sgarzare@redhat.com,
-  imp@bsdimp.com,  philmd@linaro.org,  pbonzini@redhat.com,
-  thuth@redhat.com,  danielhb413@gmail.com,  gaosong@loongson.cn,
-  akihiko.odaki@daynix.com,  shentey@gmail.com,  npiggin@gmail.com,
-  seanjc@google.com,  Marc Zyngier <maz@kernel.org>
-Subject: Re: Call for GSoC/Outreachy internship project ideas
-In-Reply-To: <mhng-e7014372-2334-430e-b22e-17227af21bd9@palmer-ri-x1c9a>
-	(Palmer Dabbelt's message of "Tue, 30 Jan 2024 16:29:34 -0800 (PST)")
-References: <mhng-e7014372-2334-430e-b22e-17227af21bd9@palmer-ri-x1c9a>
-User-Agent: mu4e 1.11.27; emacs 29.1
-Date: Thu, 01 Feb 2024 17:39:22 +0000
-Message-ID: <87le84jd85.fsf@draig.linaro.org>
+        d=1e100.net; s=20230601; t=1706809610; x=1707414410;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8Pfr4KxXg16gh4zIma5BqG45urMrXkBX1Ao+OzgSrmg=;
+        b=j7dyL7/RxK59pVANY1M8W5YnDajvi+zZs0AwXYJw9/e5q35FIiGhZltrkUS+gSm5Es
+         uowca+oxzQ+HMenetVytd4HXoC9zA0pmOpGstGzxhdlYWZXKXufzloXO/lCHi1sMDw01
+         5aYt0pJ/NaN63eJrTHdIr3sTKFrEH0dhHTOE0rJn11+Nhlm4ZDPJgY5g25npNynsuKY1
+         2nHmwZCbKPik/sGT3R1SLuSAkvVfOf+DpVRIgP8sgAkzDhyOvb4suEpf9+XIeG3/467o
+         A6Q8ybFrAG2jgfJ9OhjYGNqcE2ffO8gwqTWPpzXsZ8kyXXp/94oknvZ5LR+9+B0Q/iJU
+         P/gw==
+X-Gm-Message-State: AOJu0Yx1Hax9lzNje7ymdiemSFbZUrmy8jT1YOjkXZArS3Sz04SbzoP4
+	U0TI0PfSYf+6MBDuyM5UVd32zZugB+f9NxMcA+kGszHNYwiJdhzLnWhG6/lAaiiyc4VLEuBSb05
+	7Gp/I5haezAn9M97En4bjzd3OGi67vAzlmWrD4N/xxq8wUky2TQ==
+X-Received: by 2002:a05:620a:4014:b0:783:f7a9:9cef with SMTP id h20-20020a05620a401400b00783f7a99cefmr4001840qko.16.1706809610359;
+        Thu, 01 Feb 2024 09:46:50 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGVkeTVrLRcUd7YlboQiZrp4IV61mP2U3t7oYqqsWCeH9M0QO425T0tKYqDxmrKuuUO20X6Bw==
+X-Received: by 2002:a05:620a:4014:b0:783:f7a9:9cef with SMTP id h20-20020a05620a401400b00783f7a99cefmr4001822qko.16.1706809610101;
+        Thu, 01 Feb 2024 09:46:50 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCU3ksgcpVhUOrPNNPWWNbdI3Oocz2WpGPfCP4NRqj8Igra3/lFT+ycuOqRpZkaFR+b6rYyUnUWnS5n1Bh94rEXkni93Kxo808C/N0CcTRK7/rDFdXHyZlLcwbAQ6ivxr0OaEmDpUuzGc4U4yDQQQwmn8LW7CpxUqn2ORSbfJG/tmBEcBrsFDWZPkf/RCGXIXTbBAMw2My2fFvkoGDFs8VY+exOjZqs7PbABabYQYxcisv6eV1visCdwx8CYu6HZhiyuiJyFsffkhL2JTL4AOYnQ4RkI8u0UG4fhVjb5pwJCDkiyx/KdVTX2qmhH
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id u20-20020a05620a085400b00783f669dc18sm2605qku.118.2024.02.01.09.46.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 01 Feb 2024 09:46:49 -0800 (PST)
+Message-ID: <783ed9aa-82f7-41b7-a082-e3b75276bd7c@redhat.com>
+Date: Thu, 1 Feb 2024 18:46:46 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Reply-To: eric.auger@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v2 16/24] arm/arm64: Share memregions
+Content-Language: en-US
+To: Andrew Jones <andrew.jones@linux.dev>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+ kvmarm@lists.linux.dev, ajones@ventanamicro.com, anup@brainfault.org,
+ atishp@atishpatra.org, pbonzini@redhat.com, thuth@redhat.com,
+ alexandru.elisei@arm.com
+References: <20240126142324.66674-26-andrew.jones@linux.dev>
+ <20240126142324.66674-42-andrew.jones@linux.dev>
+ <730ca018-cb7b-4ef8-b544-7afdfce03bc8@redhat.com>
+ <20240201-522cd6aa1f8162c0c50f63b0@orel>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20240201-522cd6aa1f8162c0c50f63b0@orel>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Palmer Dabbelt <palmer@dabbelt.com> writes:
 
-> On Tue, 30 Jan 2024 12:28:27 PST (-0800), stefanha@gmail.com wrote:
->> On Tue, 30 Jan 2024 at 14:40, Palmer Dabbelt <palmer@dabbelt.com> wrote:
->>>
->>> On Mon, 15 Jan 2024 08:32:59 PST (-0800), stefanha@gmail.com wrote:
->>> > Dear QEMU and KVM communities,
->>> > QEMU will apply for the Google Summer of Code and Outreachy internship
->>> > programs again this year. Regular contributors can submit project
->>> > ideas that they'd like to mentor by replying to this email before
->>> > January 30th.
->>>
->>> It's the 30th, sorry if this is late but I just saw it today.  +Alistair
->>> and Daniel, as I didn't sync up with anyone about this so not sure if
->>> someone else is looking already (we're not internally).
-<snip>
->> Hi Palmer,
->> Performance optimization can be challenging for newcomers. I wouldn't
->> recommend it for a GSoC project unless you have time to seed the
->> project idea with specific optimizations to implement based on your
->> experience and profiling. That way the intern has a solid starting
->> point where they can have a few successes before venturing out to do
->> their own performance analysis.
->
-> Ya, I agree.  That's part of the reason why I wasn't sure if it's a
-> good idea.  At least for this one I think there should be some easy to
-> understand performance issue, as the loops that go very slowly consist
-> of a small number of instructions and go a lot slower.
->
-> I'm actually more worried about this running into a rabbit hole of
-> adding new TCG operations or even just having no well defined mappings
-> between RVV and AVX, those might make the project really hard.
 
-You shouldn't have a hard guest-target mapping. But are you already
-using the TCGVec types and they are not expanding to AVX when its
-available?
+On 2/1/24 15:21, Andrew Jones wrote:
+> On Thu, Feb 01, 2024 at 01:03:54PM +0100, Eric Auger wrote:
+>> Hi Drew,
+>>
+>> On 1/26/24 15:23, Andrew Jones wrote:
+> ...
+>>> -static void mem_regions_add_assumed(void)
+>>> -{
+>>> -	phys_addr_t code_end = (phys_addr_t)(unsigned long)&_etext;
+>>> -	struct mem_region *r;
+>>> -
+>>> -	r = mem_region_find(code_end - 1);
+>>> -	assert(r);
+>>> +	struct mem_region *code, *data;
+>>>  
+>>>  	/* Split the region with the code into two regions; code and data */
+>>> -	mem_region_add(&(struct mem_region){
+>>> -		.start = code_end,
+>>> -		.end = r->end,
+>>> -	});
+>>> -	*r = (struct mem_region){
+>>> -		.start = r->start,
+>>> -		.end = code_end,
+>>> -		.flags = MR_F_CODE,
+>>> -	};
+>>> +	memregions_split((unsigned long)&_etext, &code, &data);
+>>> +	assert(code);
+>>> +	code->flags |= MR_F_CODE;
+>> I think this would deserve to be split into several patches, esp. this
+>> change in the implementation of
+>>
+>> mem_regions_add_assumed and the init changes. At the moment this is pretty difficult to review
+>>
+> Darn, you called me out on this one :-) I had a feeling I should split out
+> the introduction of memregions_split(), since it was sneaking a bit more
+> into the patch than just code motion as advertised, but then I hoped I
+> get away with putting a bit more burden on the reviewer instead. If you
+> haven't already convinced yourself that the new function is equivalent to
+> the old code, then I'll respin with the splitting and also create a new
+> patch for the 'mem_region' to 'memregions' rename while at it (so there
+> will be three patches instead of one). But, if you're already good with
+> it, then I'll leave it as is, since patch splitting is a pain...
+frankly I would prefer you split. But maybe somebody smarter than me
+will be able to review as is, maybe just wait a little bit until you
+respin ;-)
 
-Remember for anything float we will end up with softfloat anyway so we
-can't use SIMD on the backend.
+Eric
+>
+> Thanks,
+> drew
+>
 
->
->> Do you have the time to profile and add specifics to the project idea
->> by Feb 21st? If that sounds good to you, I'll add it to the project
->> ideas list and you can add more detailed tasks in the coming weeks.
->
-> I can at least dig up some of the examples I ran into, there's been a
-> handful filtering in over the last year or so.
->
-> This one
-> <https://gist.github.com/compnerd/daa7e68f7b4910cb6b27f856e6c2beba>
-> still has a much more than 10x slowdown (73ms -> 13s) with
-> vectorization, for example.
->
->> Thanks,
->> Stefan
-
---=20
-Alex Benn=C3=A9e
-Virtualisation Tech Lead @ Linaro
 
