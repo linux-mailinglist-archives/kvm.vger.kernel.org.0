@@ -1,196 +1,450 @@
-Return-Path: <kvm+bounces-7717-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7719-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 793B0845A83
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 15:46:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C349F845A94
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 15:49:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D4B311F29948
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 14:46:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A92029209F
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 14:49:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 515C05F48F;
-	Thu,  1 Feb 2024 14:46:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8E6D5F494;
+	Thu,  1 Feb 2024 14:48:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="RReZhhHR"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="iseYvR9j"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B40E5CDEC
-	for <kvm@vger.kernel.org>; Thu,  1 Feb 2024 14:46:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EB7D5F48F
+	for <kvm@vger.kernel.org>; Thu,  1 Feb 2024 14:48:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706798791; cv=none; b=mJstnAT0jxNzF31jXrN1wa/kF1r9Xkx8euD9DgURdQ6UvRo4XCKL/Z37WcrcoQwWgFlvBT2OVzKa3rBsZ8BOhkTGvWTk6uEmLm4zRAS2KQpxntag4v3AspoFFyi15/hDDFU+n049DDpXcfwabKHJ3gefXEMSHE9Kxy7KId5LGkU=
+	t=1706798927; cv=none; b=ba5MMkwq9fCUA4akUdaI5r2zCHKeNf9TZjOf2ohRwAJxfEBZtG8GkDHaPy0wPyGfEoM795B3oQ65z06vbWQ9fyZRJ1IBFjG0KQUJSumd6vTa6SnK/x++TkQUq9gsEVQtDPDO/hnoFkUxhuTyddtElRZZJU0o/YxN3zRgXE4wTyQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706798791; c=relaxed/simple;
-	bh=Qr/AJXeF+JhwAEa3Nq85Zo9rr+1aUuhsfLCj623eehU=;
-	h=Subject:From:To:Cc:Date:Message-ID:Content-Type:MIME-Version; b=tsAuMPZ8L9iDIt4ff2nU3xeQZBpfra9tMGh2e6o4djcZILCIZLDmN0jxDpF5am5qbwMVZw/2Ufndn+lG9VkSXZfmdWOOh/7t3zJCLjKiMfa7iExjSP69/F58Z65qonpTY39iQNNH/qad7mi0zmZjaWoNuAx7FRJ+DccsZeS9Cmw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=RReZhhHR; arc=none smtp.client-ip=148.163.158.5
+	s=arc-20240116; t=1706798927; c=relaxed/simple;
+	bh=MLCSLIz9jPeXY4FjSGQTNMtUwyzLlAMgxYLzWZT1H8w=;
+	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QN56y6cyEYH0DPD3RGjqQXZ8OgIfby9eqbex/w3hjA+2cMA7ABHBlNhlwr13SVZ491TBBVBEFgM0wRKhiT/u28qSsOvC76vvA3obEF2NLDlGqwVyaBsNk+03NQwANEN5HtRUDgfeRsPM2cPFQlcfDRm17+VPVyVRbcyrwoJZRuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=iseYvR9j; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 411E1nbH025309;
-	Thu, 1 Feb 2024 14:46:13 GMT
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 411DMab8007467;
+	Thu, 1 Feb 2024 14:48:29 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : from : to : cc
- : date : message-id : content-type : content-transfer-encoding :
- mime-version; s=pp1; bh=Bmx1ylp55yzqu7ofM8ntA08kJgrzUuPz8INfGq6Cpu0=;
- b=RReZhhHRUivNOYqIcNtL95qqv5gsm4WoyHNDC1j0mEYG1lK5h7nSCoEE+HxHVINXQH7B
- QgB+VjD9WKplRz71QyhWYfqZ1vWcFq/Jlx0FUaEXD8rLHB5zP6Px4dOdd7yYSmiSoDxL
- xnOzYMzchB7uNOB6DjYvWB1L34DbaD3yekVYPk2ce2AVe5iY7o7jTETIRnzI0jK2Bus3
- 7EfKgoOeXlB8PZww0Xbgxjo78qNEI3VjoXIGea9+9yxzQXbowdD0q+xUxNLfdFTTnky2
- eu8DIhqRNY3ErIICXIU4RngHICCwwp8dKcc1JOvJA5NVWI5vn213ZVXFPjqFBAzbes3E 6Q== 
+ : date : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=D36gZtpxOFLcMyfcAuMNznFeMfR1JI7UZXERls1aoNY=;
+ b=iseYvR9jBJNYNmGHZoGQKnsKXwzC6byWr+rTHybDAQV3qd0ZrndXho0svPIvaByh7EQK
+ H5uICEWtBsHB2ZGVHXXvKwBB/hYbO2gWWl8ggvXJL8dKz1Ex0tya+KgNjoGnmoXwp8V9
+ 5T7Kr3vScE8pppJU8RihgIwZzboEmA+VXEXTsh4G1Eryw+C2vl/4eWhojdnHPJmSl09s
+ mWqCzdDat0RXfgoEm4yFUNcup0EOAvd2MITi45n52a264bVncB102q/pfWuoBJe7TFe+
+ Mxijf+74FM5+LxfF5qiKJZLd2Jr+bh39wAtgOOk6k04toYkUVCtS8fZfZes0NS/EzXR/ FA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w0bswjwcw-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w0c4n2vxx-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 01 Feb 2024 14:46:13 +0000
-Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 411EaMMi032725;
-	Thu, 1 Feb 2024 14:46:12 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w0bswjwcf-1
+	Thu, 01 Feb 2024 14:48:29 +0000
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 411Dgrrt015344;
+	Thu, 1 Feb 2024 14:48:26 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w0c4n2vmw-4
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 01 Feb 2024 14:46:12 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 411CCrtH002190;
-	Thu, 1 Feb 2024 14:46:11 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3vwc5tn09r-1
+	Thu, 01 Feb 2024 14:48:26 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 411DPCHe011067;
+	Thu, 1 Feb 2024 14:46:28 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3vwd5p4qev-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 01 Feb 2024 14:46:11 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 411Ek9sc17826416
+	Thu, 01 Feb 2024 14:46:27 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 411EkODa18416200
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 1 Feb 2024 14:46:09 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E793D2004B;
-	Thu,  1 Feb 2024 14:46:08 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2367720040;
-	Thu,  1 Feb 2024 14:46:07 +0000 (GMT)
+	Thu, 1 Feb 2024 14:46:24 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A57A620043;
+	Thu,  1 Feb 2024 14:46:24 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CB22D20040;
+	Thu,  1 Feb 2024 14:46:22 +0000 (GMT)
 Received: from ltc-boston1.aus.stglabs.ibm.com (unknown [9.40.193.18])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  1 Feb 2024 14:46:06 +0000 (GMT)
-Subject: [PATCH v8 0/2] ppc: Enable 2nd DAWR support on Power10
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  1 Feb 2024 14:46:22 +0000 (GMT)
+Subject: [PATCH v8 1/2] ppc: Enable 2nd DAWR support on Power10 PowerNV
+ machine
 From: Shivaprasad G Bhat <sbhat@linux.ibm.com>
 To: danielhb413@gmail.com, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au,
         harshpb@linux.ibm.com, clg@kaod.org, npiggin@gmail.com, groug@kaod.org
 Cc: sbhat@linux.ibm.com, pbonzini@redhat.com, kvm@vger.kernel.org,
         qemu-devel@nongnu.org
-Date: Thu, 01 Feb 2024 09:46:06 -0500
+Date: Thu, 01 Feb 2024 09:46:22 -0500
 Message-ID: 
+ <170679877410.188422.2597832350300436754.stgit@ltc-boston1.aus.stglabs.ibm.com>
+In-Reply-To: 
+ <170679876639.188422.11634974895844092362.stgit@ltc-boston1.aus.stglabs.ibm.com>
+References: 
  <170679876639.188422.11634974895844092362.stgit@ltc-boston1.aus.stglabs.ibm.com>
 User-Agent: StGit/1.5
-Content-Type: text/plain; charset="utf-8"
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: iRI054W2H_NHq0Hl0P9QCWM9u9mpmzCS
-X-Proofpoint-ORIG-GUID: YrLDlRNl6zbr6BK1WmvchqTTuPkN-oJx
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 9S1DR3eqNH0H2GOQhqMwsNSew9HY2ryn
+X-Proofpoint-ORIG-GUID: Oy0BgFSyxQlkWOhQW9ptbdIpglvu1aVa
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2024-02-01_02,2024-01-31_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- lowpriorityscore=0 adultscore=0 mlxlogscore=999 spamscore=0 suspectscore=0
- bulkscore=0 impostorscore=0 phishscore=0 mlxscore=0 clxscore=1011
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2402010116
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
+ spamscore=0 bulkscore=0 impostorscore=0 lowpriorityscore=0 phishscore=0
+ mlxlogscore=950 priorityscore=1501 mlxscore=0 malwarescore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2402010117
 
-Extends the existing watchpoint facility from TCG DAWR0 emulation to DAWR1 on
-Power10 for powernv in the first patch, and for pseries in the second patch
-with both TCG and KVM.
+Extend the existing watchpoint facility from TCG DAWR0 emulation
+to DAWR1 on POWER10.
 
+Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
 ---
-Changelog:
-v7: https://lore.kernel.org/qemu-devel/170063834599.621665.9541440879278084501.stgit@ltcd48-lp2.aus.stglab.ibm.com/
-v7->v8:
-  - Fixed the missed out ppc_store_dawr* calls.
-  - Removed the macros and split the patch into 2 one just enabling the
-    facility for powernv and the next one doing the same for pseries guest.
-  - The macro removal barely increased the number of lines by 12 as against
-    the previous version.
+ target/ppc/cpu.c         |   45 ++++++++++++++++++++++++----------
+ target/ppc/cpu.h         |    8 +++++-
+ target/ppc/cpu_init.c    |   15 +++++++++++
+ target/ppc/excp_helper.c |   61 ++++++++++++++++++++++++++--------------------
+ target/ppc/helper.h      |    2 ++
+ target/ppc/machine.c     |    3 ++
+ target/ppc/misc_helper.c |   10 ++++++++
+ target/ppc/spr_common.h  |    2 ++
+ target/ppc/translate.c   |   12 +++++++++
+ 9 files changed, 115 insertions(+), 43 deletions(-)
 
-v6: https://lore.kernel.org/qemu-devel/168871963321.58984.15628382614621248470.stgit@ltcd89-lp2/
-v6->v7:
-  - Sorry about the delay in sending out this version, I have dropped the
-    Reviewed-bys as suggested and converted the patch to RFC back again.
-  - Added the TCG support. Basically, converted the existing DAWR0 support
-    routines into macros for reuse by the DAWR1. Let me know if the macro
-    conversions should be moved to a separate independent patch.
-  - As the dawr1 works on TCG, the checks in cap_dawr1_apply() report a warning
-    now only for P9 or P9 compat modes for both KVM and TCG use cases.
-  - 'make test' passes for caps checks. Also, as suggested by Greg Kurz, the
-    'make test' after making the DAWR1 default 'on' and updating defaut cpu
-    to Power10, shows no failures.
+diff --git a/target/ppc/cpu.c b/target/ppc/cpu.c
+index e3ad8e0c27..d5ac9bb888 100644
+--- a/target/ppc/cpu.c
++++ b/target/ppc/cpu.c
+@@ -130,11 +130,13 @@ void ppc_store_ciabr(CPUPPCState *env, target_ulong val)
+     ppc_update_ciabr(env);
+ }
+ 
+-void ppc_update_daw0(CPUPPCState *env)
++void ppc_update_daw(CPUPPCState *env, int rid)
+ {
+     CPUState *cs = env_cpu(env);
+-    target_ulong deaw = env->spr[SPR_DAWR0] & PPC_BITMASK(0, 60);
+-    uint32_t dawrx = env->spr[SPR_DAWRX0];
++    int spr_dawr = !rid ? SPR_DAWR0 : SPR_DAWR1;
++    int spr_dawrx = !rid ? SPR_DAWRX0 : SPR_DAWRX1;
++    target_ulong deaw = env->spr[spr_dawr] & PPC_BITMASK(0, 60);
++    uint32_t dawrx = env->spr[spr_dawrx];
+     int mrd = extract32(dawrx, PPC_BIT_NR(48), 54 - 48);
+     bool dw = extract32(dawrx, PPC_BIT_NR(57), 1);
+     bool dr = extract32(dawrx, PPC_BIT_NR(58), 1);
+@@ -144,9 +146,9 @@ void ppc_update_daw0(CPUPPCState *env)
+     vaddr len;
+     int flags;
+ 
+-    if (env->dawr0_watchpoint) {
+-        cpu_watchpoint_remove_by_ref(cs, env->dawr0_watchpoint);
+-        env->dawr0_watchpoint = NULL;
++    if (env->dawr_watchpoint[rid]) {
++        cpu_watchpoint_remove_by_ref(cs, env->dawr_watchpoint[rid]);
++        env->dawr_watchpoint[rid] = NULL;
+     }
+ 
+     if (!dr && !dw) {
+@@ -166,28 +168,45 @@ void ppc_update_daw0(CPUPPCState *env)
+         flags |= BP_MEM_WRITE;
+     }
+ 
+-    cpu_watchpoint_insert(cs, deaw, len, flags, &env->dawr0_watchpoint);
++    cpu_watchpoint_insert(cs, deaw, len, flags, &env->dawr_watchpoint[rid]);
+ }
+ 
+ void ppc_store_dawr0(CPUPPCState *env, target_ulong val)
+ {
+     env->spr[SPR_DAWR0] = val;
+-    ppc_update_daw0(env);
++    ppc_update_daw(env, 0);
+ }
+ 
+-void ppc_store_dawrx0(CPUPPCState *env, uint32_t val)
++static void ppc_store_dawrx(CPUPPCState *env, uint32_t val, int rid)
+ {
+     int hrammc = extract32(val, PPC_BIT_NR(56), 1);
+ 
+     if (hrammc) {
+         /* This might be done with a second watchpoint at the xor of DEAW[0] */
+-        qemu_log_mask(LOG_UNIMP, "%s: DAWRX0[HRAMMC] is unimplemented\n",
+-                      __func__);
++        qemu_log_mask(LOG_UNIMP, "%s: DAWRX%d[HRAMMC] is unimplemented\n",
++                      __func__, rid);
+     }
+ 
+-    env->spr[SPR_DAWRX0] = val;
+-    ppc_update_daw0(env);
++    env->spr[!rid ? SPR_DAWRX0 : SPR_DAWRX1] = val;
++    ppc_update_daw(env, rid);
++}
++
++void ppc_store_dawrx0(CPUPPCState *env, uint32_t val)
++{
++    ppc_store_dawrx(env, val, 0);
++}
++
++void ppc_store_dawr1(CPUPPCState *env, target_ulong val)
++{
++    env->spr[SPR_DAWR1] = val;
++    ppc_update_daw(env, 1);
++}
++
++void ppc_store_dawrx1(CPUPPCState *env, uint32_t val)
++{
++    ppc_store_dawrx(env, val, 1);
+ }
++
+ #endif
+ #endif
+ 
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index f8101ffa29..18dcc438ea 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1236,7 +1236,7 @@ struct CPUArchState {
+ #if defined(TARGET_PPC64)
+     ppc_slb_t slb[MAX_SLB_ENTRIES]; /* PowerPC 64 SLB area */
+     struct CPUBreakpoint *ciabr_breakpoint;
+-    struct CPUWatchpoint *dawr0_watchpoint;
++    struct CPUWatchpoint *dawr_watchpoint[2];
+ #endif
+     target_ulong sr[32];   /* segment registers */
+     uint32_t nb_BATs;      /* number of BATs */
+@@ -1549,9 +1549,11 @@ void ppc_store_sdr1(CPUPPCState *env, target_ulong value);
+ void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong val);
+ void ppc_update_ciabr(CPUPPCState *env);
+ void ppc_store_ciabr(CPUPPCState *env, target_ulong value);
+-void ppc_update_daw0(CPUPPCState *env);
++void ppc_update_daw(CPUPPCState *env, int rid);
+ void ppc_store_dawr0(CPUPPCState *env, target_ulong value);
+ void ppc_store_dawrx0(CPUPPCState *env, uint32_t value);
++void ppc_store_dawr1(CPUPPCState *env, target_ulong value);
++void ppc_store_dawrx1(CPUPPCState *env, uint32_t value);
+ #endif /* !defined(CONFIG_USER_ONLY) */
+ void ppc_store_msr(CPUPPCState *env, target_ulong value);
+ 
+@@ -1737,9 +1739,11 @@ void ppc_compat_add_property(Object *obj, const char *name,
+ #define SPR_PSPB              (0x09F)
+ #define SPR_DPDES             (0x0B0)
+ #define SPR_DAWR0             (0x0B4)
++#define SPR_DAWR1             (0x0B5)
+ #define SPR_RPR               (0x0BA)
+ #define SPR_CIABR             (0x0BB)
+ #define SPR_DAWRX0            (0x0BC)
++#define SPR_DAWRX1            (0x0BD)
+ #define SPR_HFSCR             (0x0BE)
+ #define SPR_VRSAVE            (0x100)
+ #define SPR_USPRG0            (0x100)
+diff --git a/target/ppc/cpu_init.c b/target/ppc/cpu_init.c
+index 23eb5522b6..c901559859 100644
+--- a/target/ppc/cpu_init.c
++++ b/target/ppc/cpu_init.c
+@@ -5131,6 +5131,20 @@ static void register_book3s_207_dbg_sprs(CPUPPCState *env)
+                         KVM_REG_PPC_CIABR, 0x00000000);
+ }
+ 
++static void register_book3s_310_dbg_sprs(CPUPPCState *env)
++{
++    spr_register_kvm_hv(env, SPR_DAWR1, "DAWR1",
++                        SPR_NOACCESS, SPR_NOACCESS,
++                        SPR_NOACCESS, SPR_NOACCESS,
++                        &spr_read_generic, &spr_write_dawr1,
++                        KVM_REG_PPC_DAWR1, 0x00000000);
++    spr_register_kvm_hv(env, SPR_DAWRX1, "DAWRX1",
++                        SPR_NOACCESS, SPR_NOACCESS,
++                        SPR_NOACCESS, SPR_NOACCESS,
++                        &spr_read_generic, &spr_write_dawrx1,
++                        KVM_REG_PPC_DAWRX1, 0x00000000);
++}
++
+ static void register_970_dbg_sprs(CPUPPCState *env)
+ {
+     /* Breakpoints */
+@@ -6473,6 +6487,7 @@ static void init_proc_POWER10(CPUPPCState *env)
+     /* Common Registers */
+     init_proc_book3s_common(env);
+     register_book3s_207_dbg_sprs(env);
++    register_book3s_310_dbg_sprs(env);
+ 
+     /* Common TCG PMU */
+     init_tcg_pmu_power8(env);
+diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
+index 2ec6429e36..32eba7f725 100644
+--- a/target/ppc/excp_helper.c
++++ b/target/ppc/excp_helper.c
+@@ -3314,39 +3314,46 @@ bool ppc_cpu_debug_check_watchpoint(CPUState *cs, CPUWatchpoint *wp)
+ {
+ #if defined(TARGET_PPC64)
+     CPUPPCState *env = cpu_env(cs);
++    bool wt, wti, hv, sv, pr;
++    uint32_t dawrx;
++
++    if ((env->insns_flags2 & PPC2_ISA207S) &&
++        (wp == env->dawr_watchpoint[0])) {
++        dawrx = env->spr[SPR_DAWRX0];
++    } else if ((env->insns_flags2 & PPC2_ISA310) &&
++               (wp == env->dawr_watchpoint[1])) {
++        dawrx = env->spr[SPR_DAWRX1];
++    } else {
++        return false;
++    }
+ 
+-    if (env->insns_flags2 & PPC2_ISA207S) {
+-        if (wp == env->dawr0_watchpoint) {
+-            uint32_t dawrx = env->spr[SPR_DAWRX0];
+-            bool wt = extract32(dawrx, PPC_BIT_NR(59), 1);
+-            bool wti = extract32(dawrx, PPC_BIT_NR(60), 1);
+-            bool hv = extract32(dawrx, PPC_BIT_NR(61), 1);
+-            bool sv = extract32(dawrx, PPC_BIT_NR(62), 1);
+-            bool pr = extract32(dawrx, PPC_BIT_NR(62), 1);
+-
+-            if ((env->msr & ((target_ulong)1 << MSR_PR)) && !pr) {
+-                return false;
+-            } else if ((env->msr & ((target_ulong)1 << MSR_HV)) && !hv) {
+-                return false;
+-            } else if (!sv) {
++    wt = extract32(dawrx, PPC_BIT_NR(59), 1);
++    wti = extract32(dawrx, PPC_BIT_NR(60), 1);
++    hv = extract32(dawrx, PPC_BIT_NR(61), 1);
++    sv = extract32(dawrx, PPC_BIT_NR(62), 1);
++    pr = extract32(dawrx, PPC_BIT_NR(62), 1);
++
++    if ((env->msr & ((target_ulong)1 << MSR_PR)) && !pr) {
++        return false;
++    } else if ((env->msr & ((target_ulong)1 << MSR_HV)) && !hv) {
++        return false;
++    } else if (!sv) {
++        return false;
++    }
++
++    if (!wti) {
++        if (env->msr & ((target_ulong)1 << MSR_DR)) {
++            if (!wt) {
+                 return false;
+             }
+-
+-            if (!wti) {
+-                if (env->msr & ((target_ulong)1 << MSR_DR)) {
+-                    if (!wt) {
+-                        return false;
+-                    }
+-                } else {
+-                    if (wt) {
+-                        return false;
+-                    }
+-                }
++        } else {
++            if (wt) {
++                return false;
+             }
+-
+-            return true;
+         }
+     }
++
++    return true;
+ #endif
+ 
+     return false;
+diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+index 86f97ee1e7..0c008bb725 100644
+--- a/target/ppc/helper.h
++++ b/target/ppc/helper.h
+@@ -28,6 +28,8 @@ DEF_HELPER_2(store_pcr, void, env, tl)
+ DEF_HELPER_2(store_ciabr, void, env, tl)
+ DEF_HELPER_2(store_dawr0, void, env, tl)
+ DEF_HELPER_2(store_dawrx0, void, env, tl)
++DEF_HELPER_2(store_dawr1, void, env, tl)
++DEF_HELPER_2(store_dawrx1, void, env, tl)
+ DEF_HELPER_2(store_mmcr0, void, env, tl)
+ DEF_HELPER_2(store_mmcr1, void, env, tl)
+ DEF_HELPER_3(store_pmc, void, env, i32, i64)
+diff --git a/target/ppc/machine.c b/target/ppc/machine.c
+index 203fe28e01..082712ff16 100644
+--- a/target/ppc/machine.c
++++ b/target/ppc/machine.c
+@@ -325,7 +325,8 @@ static int cpu_post_load(void *opaque, int version_id)
+         /* Re-set breaks based on regs */
+ #if defined(TARGET_PPC64)
+         ppc_update_ciabr(env);
+-        ppc_update_daw0(env);
++        ppc_update_daw(env, 0);
++        ppc_update_daw(env, 1);
+ #endif
+         /*
+          * TCG needs to re-start the decrementer timer and/or raise the
+diff --git a/target/ppc/misc_helper.c b/target/ppc/misc_helper.c
+index a9d41d2802..54e402b139 100644
+--- a/target/ppc/misc_helper.c
++++ b/target/ppc/misc_helper.c
+@@ -214,6 +214,16 @@ void helper_store_dawrx0(CPUPPCState *env, target_ulong value)
+     ppc_store_dawrx0(env, value);
+ }
+ 
++void helper_store_dawr1(CPUPPCState *env, target_ulong value)
++{
++    ppc_store_dawr1(env, value);
++}
++
++void helper_store_dawrx1(CPUPPCState *env, target_ulong value)
++{
++    ppc_store_dawrx1(env, value);
++}
++
+ /*
+  * DPDES register is shared. Each bit reflects the state of the
+  * doorbell interrupt of a thread of the same core.
+diff --git a/target/ppc/spr_common.h b/target/ppc/spr_common.h
+index 8a9d6cd994..c987a50809 100644
+--- a/target/ppc/spr_common.h
++++ b/target/ppc/spr_common.h
+@@ -162,6 +162,8 @@ void spr_write_cfar(DisasContext *ctx, int sprn, int gprn);
+ void spr_write_ciabr(DisasContext *ctx, int sprn, int gprn);
+ void spr_write_dawr0(DisasContext *ctx, int sprn, int gprn);
+ void spr_write_dawrx0(DisasContext *ctx, int sprn, int gprn);
++void spr_write_dawr1(DisasContext *ctx, int sprn, int gprn);
++void spr_write_dawrx1(DisasContext *ctx, int sprn, int gprn);
+ void spr_write_ureg(DisasContext *ctx, int sprn, int gprn);
+ void spr_read_purr(DisasContext *ctx, int gprn, int sprn);
+ void spr_write_purr(DisasContext *ctx, int sprn, int gprn);
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 049f636927..ac2a53f3b8 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -593,6 +593,18 @@ void spr_write_dawrx0(DisasContext *ctx, int sprn, int gprn)
+     translator_io_start(&ctx->base);
+     gen_helper_store_dawrx0(tcg_env, cpu_gpr[gprn]);
+ }
++
++void spr_write_dawr1(DisasContext *ctx, int sprn, int gprn)
++{
++    translator_io_start(&ctx->base);
++    gen_helper_store_dawr1(tcg_env, cpu_gpr[gprn]);
++}
++
++void spr_write_dawrx1(DisasContext *ctx, int sprn, int gprn)
++{
++    translator_io_start(&ctx->base);
++    gen_helper_store_dawrx1(tcg_env, cpu_gpr[gprn]);
++}
+ #endif /* defined(TARGET_PPC64) && !defined(CONFIG_USER_ONLY) */
+ 
+ /* CTR */
 
-v5: https://lore.kernel.org/all/20210412114433.129702-1-ravi.bangoria@linux.ibm.com/
-v5->v6:
-  - The other patches in the original series already merged.
-  - Rebased to the top of the tree. So, the gen_spr_book3s_310_dbg() is renamed
-    to register_book3s_310_dbg_sprs() and moved to cpu_init.c accordingly.
-  - No functional changes.
-
-v4: https://lore.kernel.org/r/20210406053833.282907-1-ravi.bangoria@linux.ibm.com
-v3->v4:
-  - Make error message more proper.
-
-v3: https://lore.kernel.org/r/20210330095350.36309-1-ravi.bangoria@linux.ibm.com
-v3->v4:
-  - spapr_dt_pa_features(): POWER10 processor is compatible with 3.0
-    (PCR_COMPAT_3_00). No need to ppc_check_compat(3_10) for now as
-    ppc_check_compati(3_00) will also be true. ppc_check_compat(3_10)
-    can be added while introducing pa_features_310 in future.
-  - Use error_append_hint() for hints. Also add ERRP_GUARD().
-  - Add kvmppc_set_cap_dawr1() stub function for CONFIG_KVM=n.
-
-v2: https://lore.kernel.org/r/20210329041906.213991-1-ravi.bangoria@linux.ibm.com
-v2->v3:
-  - Don't introduce pa_features_310[], instead, reuse pa_features_300[]
-    for 3.1 guests, as there is no difference between initial values of
-    them atm.
-  - Call gen_spr_book3s_310_dbg() from init_proc_POWER10() instead of
-    init_proc_POWER8(). Also, Don't call gen_spr_book3s_207_dbg() from
-    gen_spr_book3s_310_dbg() as init_proc_POWER10() already calls it.
-
-v1: https://lore.kernel.org/r/20200723104220.314671-1-ravi.bangoria@linux.ibm.com
-v1->v2:
-  - Introduce machine capability cap-dawr1 to enable/disable
-    the feature. By default, 2nd DAWR is OFF for guests even
-    when host kvm supports it. User has to manually enable it
-    with -machine cap-dawr1=on if he wishes to use it.
-  - Split the header file changes into separate patch. (Sync
-    headers from v5.12-rc3)
-
-Shivaprasad G Bhat (2):
-      ppc: Enable 2nd DAWR support on Power10 PowerNV machine
-      ppc: spapr: Enable 2nd DAWR on Power10 pSeries machine
-
-
- hw/ppc/spapr.c           |  7 ++++-
- hw/ppc/spapr_caps.c      | 36 ++++++++++++++++++++++++
- hw/ppc/spapr_hcall.c     | 25 ++++++++++------
- include/hw/ppc/spapr.h   |  6 +++-
- target/ppc/cpu.c         | 45 ++++++++++++++++++++---------
- target/ppc/cpu.h         |  8 ++++--
- target/ppc/cpu_init.c    | 15 ++++++++++
- target/ppc/excp_helper.c | 61 ++++++++++++++++++++++------------------
- target/ppc/helper.h      |  2 ++
- target/ppc/kvm.c         | 12 ++++++++
- target/ppc/kvm_ppc.h     | 12 ++++++++
- target/ppc/machine.c     |  3 +-
- target/ppc/misc_helper.c | 10 +++++++
- target/ppc/spr_common.h  |  2 ++
- target/ppc/translate.c   | 12 ++++++++
- 15 files changed, 202 insertions(+), 54 deletions(-)
-
---
-Signature
 
 
