@@ -1,137 +1,312 @@
-Return-Path: <kvm+bounces-7650-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7651-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95191844F39
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 03:44:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09E5A844F56
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 04:07:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BAFCC1C2399E
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 02:44:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B62D8292A85
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 03:07:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D62CF3A1AB;
-	Thu,  1 Feb 2024 02:44:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11F363A8C9;
+	Thu,  1 Feb 2024 03:06:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kbefS1Q/"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Q8SQApPZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3933239FEE
-	for <kvm@vger.kernel.org>; Thu,  1 Feb 2024 02:44:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.134.136.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ADE3101D2;
+	Thu,  1 Feb 2024 03:06:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706755450; cv=none; b=YYOHpslhqcFL0COK0pnBjFc9m7LqZEjmx+W4Uu+1zrhzTvrG3qZlbe9lBR0kNy5hoAdt5peLdbcLh+aG0a+IHUrpZm8N01nMkfX51Z0jTjpRcHQQsSuZWFWxHNPzqvnT/6u9sCzgx2oGHcEjo6hg4+aoXcwCg8WGBX+/JHynwwI=
+	t=1706756818; cv=none; b=IWDN5v9xL5eo3MCB6tiXHsWFNNti7U65wTBPNVgAT50YDjQ4oJcRFETg84rIxli/qEvzCqVp0kkhhtw5rz+D/nEoLbeT+giVAHD9W2gcKKaDisVxsB5iUJNTb9d58fDhCawsZo8GR3G6Y6Sn6S9bR73HQhDROgIW903BQBqeaT4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706755450; c=relaxed/simple;
-	bh=Yc3gR68rS4/B0kEheqFMJGBIql3pAV51T/Q4R/eXbuk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hCHeh6WYHtALYBBF81ZQPegf5gClug43PpIaGVSQBcd9pnwntl+e9r3z5AvhwdkTyOm6L0UOyMuSvHFLZqhv3fpalyiD1/VS4D+5w0wpHUUW8NZ6NkeKEFW+YZltdzwaMLEBJbV+tVuXamPvrymOmHNYNyr14YbHbV/5/eSNgyI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kbefS1Q/; arc=none smtp.client-ip=134.134.136.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706755448; x=1738291448;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=Yc3gR68rS4/B0kEheqFMJGBIql3pAV51T/Q4R/eXbuk=;
-  b=kbefS1Q/8pm3VqGaZez6yZomzcZMNSy8JXdYSEJDhaGSPoZqiHJMn+AT
-   jt/yvy4dnyGtUGMlXXEzyraS2TspxJ/IQB2n9jWz5RQwODjYTm6AZgIzR
-   S7Rb6rpElmDM9wg0Rv9vmIvbC51Nj0h0Sx/4EsS5VVlESCHek25O2SZWA
-   uFg5xjGoi1D9UkEV0/SDS3Ip1haqOS+5clELmaD8QpnF98wRn2elaJvqn
-   30eb48g2xS6uo4tKNViXrcUtT6alD4j0RSpGTunr+wEd416YbeZBKNnBn
-   vQbV/97dsA5+9ZpwIWsEcWExetZJjKeCQoQBqpu0j1EHQslWImMDxE+uL
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="407506887"
-X-IronPort-AV: E=Sophos;i="6.05,234,1701158400"; 
-   d="scan'208";a="407506887"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2024 18:44:07 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="788810725"
-X-IronPort-AV: E=Sophos;i="6.05,234,1701158400"; 
-   d="scan'208";a="788810725"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
-  by orsmga002.jf.intel.com with ESMTP; 31 Jan 2024 18:44:02 -0800
-Date: Thu, 1 Feb 2024 10:57:32 +0800
-From: Zhao Liu <zhao1.liu@linux.intel.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: Eduardo Habkost <eduardo@habkost.net>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-	Yanan Wang <wangyanan55@huawei.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Eric Blake <eblake@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
-	kvm@vger.kernel.org, Babu Moger <babu.moger@amd.com>,
-	Xiaoyao Li <xiaoyao.li@intel.com>,
-	Zhenyu Wang <zhenyu.z.wang@intel.com>,
-	Zhuocheng Ding <zhuocheng.ding@intel.com>,
-	Yongwei Ma <yongwei.ma@intel.com>, Zhao Liu <zhao1.liu@intel.com>
-Subject: Re: [PATCH v8 00/21] Introduce smp.modules for x86 in QEMU
-Message-ID: <ZbsInI6Z66edm3eH@intel.com>
-References: <20240131101350.109512-1-zhao1.liu@linux.intel.com>
- <Zbog2vDrrWFbujrs@redhat.com>
+	s=arc-20240116; t=1706756818; c=relaxed/simple;
+	bh=Mo3mQIa4FnyVO3DqyF4rmJLSmQ9+LmwDbRfw3hP+Ij4=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
+	 Content-Type; b=NdW2fjAgiL2DXE0l5C7pMRbQUyWac5I9SyUeQ5Dv1h2nAaVbrQWgOAB4joQgUUDh7pp5K+4PCUzjEfrEOVJc9RvR1gZsWBSDRVjcDok0nfiMO15sePUMaMbf909jFY+e00tz9CVoTUcYaJPnWc3KA9c6CMJjYm9hh7BJ3PtcFos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Q8SQApPZ; arc=none smtp.client-ip=115.124.30.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1706756812; h=Message-ID:Subject:Date:From:To:Content-Type;
+	bh=OIzQSRKNh1ZV+Nnz1+bU4a7ItleWsZPQWVeR5Bih22A=;
+	b=Q8SQApPZUV0QhWOS7bGJ+5rqJw3Jyxd8vCspg+dQMy12/pFhH/c2HmASkRi8264i1fqDOIFhYrtvjTUjnFSwD8vUvhVl23xNKNNXvfiytPzZV5wBfsfmTKvk0NbvwcKu/0CrYmEt8ck6mJqSnLQrjGP+ZoKcDHpBf0mNi7+qO2M=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=36;SR=0;TI=SMTPD_---0W.mW2hm_1706756809;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W.mW2hm_1706756809)
+          by smtp.aliyun-inc.com;
+          Thu, 01 Feb 2024 11:06:50 +0800
+Message-ID: <1706756442.5524123-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH vhost 07/17] virtio: find_vqs: pass struct instead of multi parameters
+Date: Thu, 1 Feb 2024 11:00:42 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: virtualization@lists.linux.dev,
+ Richard Weinberger <richard@nod.at>,
+ Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+ Johannes Berg <johannes@sipsolutions.net>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Hans de Goede <hdegoede@redhat.com>,
+ =?utf-8?q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+ Vadim Pasternak <vadimp@nvidia.com>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Mathieu Poirier <mathieu.poirier@linaro.org>,
+ Cornelia Huck <cohuck@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Eric Farman <farman@linux.ibm.com>,
+ Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Benjamin Berg <benjamin.berg@intel.com>,
+ Yang Li <yang.lee@linux.alibaba.com>,
+ linux-um@lists.infradead.org,
+ netdev@vger.kernel.org,
+ platform-driver-x86@vger.kernel.org,
+ linux-remoteproc@vger.kernel.org,
+ linux-s390@vger.kernel.org,
+ kvm@vger.kernel.org,
+ bpf@vger.kernel.org
+References: <20240130114224.86536-1-xuanzhuo@linux.alibaba.com>
+ <20240130114224.86536-8-xuanzhuo@linux.alibaba.com>
+ <CACGkMEvb4N8kthr4qWXrLOh9v422OYhrYU6hQejusw-e5EacPw@mail.gmail.com>
+In-Reply-To: <CACGkMEvb4N8kthr4qWXrLOh9v422OYhrYU6hQejusw-e5EacPw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Zbog2vDrrWFbujrs@redhat.com>
 
-Hi Daniel,
+On Wed, 31 Jan 2024 17:12:34 +0800, Jason Wang <jasowang@redhat.com> wrote:
+> On Tue, Jan 30, 2024 at 7:42=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba=
+.com> wrote:
+> >
+> > Now, we pass multi parameters to find_vqs. These parameters
+> > may work for transport or work for vring.
+> >
+> > And find_vqs has multi implements in many places:
+> >
+> > But every time,
+> >  arch/um/drivers/virtio_uml.c
+> >  drivers/platform/mellanox/mlxbf-tmfifo.c
+> >  drivers/remoteproc/remoteproc_virtio.c
+> >  drivers/s390/virtio/virtio_ccw.c
+> >  drivers/virtio/virtio_mmio.c
+> >  drivers/virtio/virtio_pci_legacy.c
+> >  drivers/virtio/virtio_pci_modern.c
+> >  drivers/virtio/virtio_vdpa.c
+> >
+> > Every time, we try to add a new parameter, that is difficult.
+> > We must change every find_vqs implement.
+> >
+> > One the other side, if we want to pass a parameter to vring,
+> > we must change the call path from transport to vring.
+> > Too many functions need to be changed.
+> >
+> > So it is time to refactor the find_vqs. We pass a structure
+> > cfg to find_vqs(), that will be passed to vring by transport.
+> >
+> > And squish the parameters from transport to a structure.
+>=20
+> The patch did more than what is described here, it also switch to use
+> a structure for vring_create_virtqueue() etc.
+>=20
+> Is it better to split?
 
-On Wed, Jan 31, 2024 at 10:28:42AM +0000, Daniel P. Berrangé wrote:
-> Date: Wed, 31 Jan 2024 10:28:42 +0000
-> From: "Daniel P. Berrangé" <berrange@redhat.com>
-> Subject: Re: [PATCH v8 00/21] Introduce smp.modules for x86 in QEMU
-> 
-> On Wed, Jan 31, 2024 at 06:13:29PM +0800, Zhao Liu wrote:
-> > From: Zhao Liu <zhao1.liu@intel.com>
+Sure.
 
-[snip]
+>=20
+> >
+> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > ---
+> >  arch/um/drivers/virtio_uml.c             | 29 +++++++-----
+> >  drivers/platform/mellanox/mlxbf-tmfifo.c | 14 +++---
+> >  drivers/remoteproc/remoteproc_virtio.c   | 28 ++++++-----
+> >  drivers/s390/virtio/virtio_ccw.c         | 33 ++++++-------
+> >  drivers/virtio/virtio_mmio.c             | 30 ++++++------
+> >  drivers/virtio/virtio_pci_common.c       | 59 +++++++++++-------------
+> >  drivers/virtio/virtio_pci_common.h       |  9 +---
+> >  drivers/virtio/virtio_pci_legacy.c       | 16 ++++---
+> >  drivers/virtio/virtio_pci_modern.c       | 24 +++++-----
+> >  drivers/virtio/virtio_ring.c             | 59 ++++++++++--------------
+> >  drivers/virtio/virtio_vdpa.c             | 33 +++++++------
+> >  include/linux/virtio_config.h            | 51 ++++++++++++++++----
+> >  include/linux/virtio_ring.h              | 40 ++++++----------
+> >  13 files changed, 217 insertions(+), 208 deletions(-)
+> >
+> > diff --git a/arch/um/drivers/virtio_uml.c b/arch/um/drivers/virtio_uml.c
+> > index 8adca2000e51..161bac67e454 100644
+> > --- a/arch/um/drivers/virtio_uml.c
+> > +++ b/arch/um/drivers/virtio_uml.c
+> > @@ -937,11 +937,12 @@ static int vu_setup_vq_call_fd(struct virtio_uml_=
+device *vu_dev,
+> >  }
+> >
+> >  static struct virtqueue *vu_setup_vq(struct virtio_device *vdev,
+> > -                                    unsigned index, vq_callback_t *cal=
+lback,
+> > -                                    const char *name, bool ctx)
+> > +                                    unsigned index,
+> > +                                    struct virtio_vq_config *cfg)
+> >  {
+> >         struct virtio_uml_device *vu_dev =3D to_virtio_uml_device(vdev);
+> >         struct platform_device *pdev =3D vu_dev->pdev;
+> > +       struct transport_vq_config tp_cfg =3D {};
+>=20
+> Nit: what did "tp" short for?
 
-> > However, after digging deeper into the description and use cases of
-> > cluster in the device tree [3], I realized that the essential
-> > difference between clusters and modules is that cluster is an extremely
-> > abstract concept:
-> >   * Cluster supports nesting though currently QEMU doesn't support
-> >     nested cluster topology. However, modules will not support nesting.
-> >   * Also due to nesting, there is great flexibility in sharing resources
-> >     on clusters, rather than narrowing cluster down to sharing L2 (and
-> >     L3 tags) as the lowest topology level that contains cores.
-> >   * Flexible nesting of cluster allows it to correspond to any level
-> >     between the x86 package and core.
-> > 
-> > Based on the above considerations, and in order to eliminate the naming
-> > confusion caused by the mapping between general cluster and x86 module
-> > in v7, we now formally introduce smp.modules as the new topology level.
-> 
-> What is the Linux kernel calling this topology level on x86 ?
-> It will be pretty unfortunate if Linux and QEMU end up with
-> different names for the same topology level.
-> 
+tp: transport
 
-Now Intel's engineers in the Linux kernel are starting to use "module"
-to refer to this layer of topology [4] to avoid confusion, where
-previously the scheduler developers referred to the share L2 hierarchy
-collectively as "cluster".
+Any better?
 
-Looking at it this way, it makes more sense for QEMU to use the
-"module" for x86.
 
-[4]: https://lore.kernel.org/lkml/20231116142245.1233485-3-kan.liang@linux.intel.com/
+>=20
+> >         struct virtio_uml_vq_info *info;
+> >         struct virtqueue *vq;
+> >         int num =3D MAX_SUPPORTED_QUEUE_SIZE;
+> > @@ -953,10 +954,15 @@ static struct virtqueue *vu_setup_vq(struct virti=
+o_device *vdev,
+> >                 goto error_kzalloc;
+> >         }
+> >         snprintf(info->name, sizeof(info->name), "%s.%d-%s", pdev->name,
+> > -                pdev->id, name);
+> > +                pdev->id, cfg->names[cfg->cfg_idx]);
+> >
+> > -               dev_err(dev, "vring_new_virtqueue %s failed\n", name);
 
-Thanks,
-Zhao
+[...]
 
+
+> > -       if (virtio_has_feature(vdev, VIRTIO_F_RING_PACKED))
+> > -               return vring_create_virtqueue_packed(index, num, vring_=
+align,
+> > -                               vdev, weak_barriers, may_reduce_num,
+> > -                               context, notify, callback, name, vdev->=
+dev.parent);
+> > +       dma_dev =3D tp_cfg->dma_dev;
+> > +       if (!dma_dev)
+> > +               dma_dev  =3D vdev->dev.parent;
+>=20
+> Nit: This seems suboptimal than using "?:" ?
+
+YES
+
+
+>=20
+> >
+> > -       return vring_create_virtqueue_split(index, num, vring_align,
+> > -                       vdev, weak_barriers, may_reduce_num,
+> > -                       context, notify, callback, name, vdev->dev.pare=
+nt);
+> > -}
+
+[...]
+
+> >                         err =3D PTR_ERR(vqs[i]);
+> >                         goto err_setup_vq;
+> > diff --git a/include/linux/virtio_config.h b/include/linux/virtio_confi=
+g.h
+> > index 2b3438de2c4d..e2c72e125dae 100644
+> > --- a/include/linux/virtio_config.h
+> > +++ b/include/linux/virtio_config.h
+> > @@ -94,6 +94,20 @@ typedef void vq_callback_t(struct virtqueue *);
+> >   *     If disable_vq_and_reset is set, then enable_vq_after_reset must=
+ also be
+> >   *     set.
+> >   */
+> > +
+> > +struct virtio_vq_config {
+> > +       unsigned int nvqs;
+> > +
+> > +       /* the vq index may not eq to the cfg index of the other array =
+items */
+>=20
+> What does this mean?
+
+
+When we read from the names/ctx/callbacks array, we can use the vq index,
+because some names maybe null, the vq index may not equal to the array inde=
+x.
+We must save a cfg idx for the names/ctx/callbacks array.
+
+
+
+	for (i =3D 0; i < nvqs; ++i) {
+		if (!cfg->names[i]) {
+			vqs[i] =3D NULL;
+			continue;
+		}
+
+		cfg->cfg_idx =3D i;
+		vqs[i] =3D vp_setup_vq(vdev, queue_idx++, cfg, VIRTIO_MSI_NO_VECTOR);
+		if (IS_ERR(vqs[i])) {
+			err =3D PTR_ERR(vqs[i]);
+			goto out_del_vqs;
+		}
+	}
+
+notice "i" and "queue_idx"
+
+Thanks.
+
+
+>=20
+> > +       unsigned int cfg_idx;
+> > +
+> > +       struct virtqueue **vqs;
+> > +       vq_callback_t **callbacks;
+> > +       const char *const *names;
+> > +       const bool *ctx;
+> > +       struct irq_affinity *desc;
+> > +};
+> > +
+> >  struct virtio_config_ops {
+> >         void (*get)(struct virtio_device *vdev, unsigned offset,
+> >                     void *buf, unsigned len);
+
+[...]
+
+> > diff --git a/include/linux/virtio_ring.h b/include/linux/virtio_ring.h
+> > index 9b33df741b63..0de46ed17cc0 100644
+> > --- a/include/linux/virtio_ring.h
+> > +++ b/include/linux/virtio_ring.h
+> > @@ -5,6 +5,7 @@
+> >  #include <asm/barrier.h>
+> >  #include <linux/irqreturn.h>
+> >  #include <uapi/linux/virtio_ring.h>
+> > +#include <linux/virtio_config.h>
+> >
+> >  /*
+> >   * Barriers in virtio are tricky.  Non-SMP virtio guests can't assume
+> > @@ -60,38 +61,25 @@ struct virtio_device;
+> >  struct virtqueue;
+> >  struct device;
+> >
+> > +struct transport_vq_config {
+>=20
+> To reduce the confusion, let's rename this as "vq_transport_config"
+
+OK
+
+Thanks.
+
+
+>=20
+> Thanks
+>=20
 
