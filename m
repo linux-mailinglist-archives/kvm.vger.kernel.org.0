@@ -1,227 +1,146 @@
-Return-Path: <kvm+bounces-7630-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7631-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18967844DC3
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 01:21:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2777A844DCE
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 01:26:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C77992858FC
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 00:21:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A2EB1C24533
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 00:26:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B1261848;
-	Thu,  1 Feb 2024 00:20:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A99877FE;
+	Thu,  1 Feb 2024 00:26:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AFeTbHsO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bs2mZMwe"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0F8C7E6
-	for <kvm@vger.kernel.org>; Thu,  1 Feb 2024 00:20:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 434BE1FDB
+	for <kvm@vger.kernel.org>; Thu,  1 Feb 2024 00:26:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706746858; cv=none; b=hUE7wvzc8d1kLU8cs+42JsyS37F5FAspU5wVvp3Pyzl2SNzhOwXdkgpCe/4SelX0TzO9d1T5sjyUVAt+ldHsSkKt6udI7TrIS01PJNIArNq45cQkDUAqyYu74SD1rDo22nUk9sunt/UqAgJNqsXXyCYMeY7DB4nK/FWVTVQPTTw=
+	t=1706747207; cv=none; b=JgQOQ7PRg2IIdTw3isKmA+QoLwQM5KU3ugW3iLHtnDXvbNbi/SLd/whSVk0LPzOTw56+ZIrX+ZYbSS5XNvQWVGnzd9sZ/PnhSlQAoel1g9oDQyRMIRCkFAKuB+GNUTxh0cgvP9cpdNeYtjTdRNd3zx4YJMcBzh1rCr308Jgp7KI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706746858; c=relaxed/simple;
-	bh=vPtpnLaleP3MgQmoDyqqaoE5DCMRkDO/XbE6A+o6ZGs=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ADdCh13pebEi0f+bzpZSZT2sSAGoIl5nLUibzvCPT3OjOSHb/mLwHHuT00CxBl4ET4YdNBpf9tme3VvihHJezMjEGGkFYZKP9EEjy2d2O6iB67pwlH7umzKdYhADtvVQ6osX0cwPg5VbcoIeIN3iwz+FCQGZ0qrcdZAV0GMwxtE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AFeTbHsO; arc=none smtp.client-ip=209.85.128.201
+	s=arc-20240116; t=1706747207; c=relaxed/simple;
+	bh=6tJHrUkrQP7NwvtLhO/da5PPrg5uJy9hVBGQTtTpIig=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NgWJyOEIOzncTlkE8jY8vs4cZlX9UTWlFSEaybNRZ0G5hh44CvxITfqu20/vYOUoPq55Tw9B+dKcpf+TXymfx6SRm/kVF10Hh8VnuQVk8qLUCsDFQPEszwUpHNFJQQnPOyjCZ8I47dEI4f9Do8gIUjfG0/9hijYs8qGy5XzpXBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bs2mZMwe; arc=none smtp.client-ip=209.85.160.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6040b27151eso7592767b3.3
-        for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 16:20:55 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-42a88ad0813so106641cf.0
+        for <kvm@vger.kernel.org>; Wed, 31 Jan 2024 16:26:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706746854; x=1707351654; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=g1PMHYRH7qb67G88ys4k0o39fe/edxcv9FM2T4EKaqk=;
-        b=AFeTbHsOsKi0IdFmI4ZHqHMqsZQrVeacIQd1k/xRKGIHIzMtd0fGZV0dv6RVKFWPzp
-         NfIdcY1+/yq9AB4JCtHAOXqOYfJAaUJhQh17mNlm+GBau9Nw5FuY9+Crtdpv1OGhgpBP
-         k+BZqbQWQNyD3KVftXmFrnVXGnLT0Cj4H/5emXpjY8cPtNjsovulp9yHl1OYFhkeejBn
-         BbguLsmNpBvN1fPIPaCakGvjv2KBMzTN3vWR37OpWUu70Y4rokHViV3Q98fA/oMd4091
-         5LqxDxF5jTSU9lj4QvFxrOBaasgXia7QUfavSW+h58reOnEjQa2HKuIPFA9h+ovDgXAa
-         9F3A==
+        d=google.com; s=20230601; t=1706747205; x=1707352005; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MfVbRf3BHUSn3cK7ZTAjeFEicT/rpADsX5UluXSAJko=;
+        b=bs2mZMweE6PBbSexA3DCBTBBrm5dgKLNq6kdXdw5CAIPQZsoLvA+sDpbxzCeiCPKUn
+         9ZUasKnXeponk+or0/3tjwbJjFyh/uBxsDeJI585dJjp9tgq6siAOKZ8bogI7Cg2Fs9f
+         pHIMQB1kxDvFZs4VilEM+fZiqu3txLbM09HVlVBAyjHnD1LCWOa01vlZuJWvJstypyZ4
+         a+jzHrffMsFjXmB3coDInexeokHAK1SYu+UBl9XsJvVAWIHfYJaAVrYiJyaBTLNVIrHS
+         v7R7qCfYXd/JMB7CPHEiTRh/TFUlEaBVr9G/IuJ0wq+X3qq3BkeChBoERlYXRGxjcBIH
+         IuRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706746854; x=1707351654;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=g1PMHYRH7qb67G88ys4k0o39fe/edxcv9FM2T4EKaqk=;
-        b=CUB0vgiqCwrakOF1CefStoY5uQDXQLzeVEwy7yPT+vHGkN0GI0JP5W1j3pLmJevFrk
-         WThGWId1WQuOgMJEp+fpWMfQ/j6/f0z3rv8cj1HkPgRXQrixYxOrY56LOzRxbuCGTzXR
-         SQ4NF5IX5ta/Te47r7ivNQstbfK43fq2WtlbkL2DzMZBUOw82jLQTQ6T2NUMGcTAhv2l
-         65gubCmE4hCCSAwhwUv/9L60cLz/vQrCvnCN8UJ7IK1yGRj+Lg+vdFJnZaCgD57VBNtC
-         6qu+KO46jF7V+CgrS8DfeD45BM884tzMfGqUGEejaJEd60hvNwApAKn4NWjGh1XrYUz9
-         bdtg==
-X-Gm-Message-State: AOJu0YxPQY4+pZKOBowblatCv47JLocfLpBmDiJzvoG4bbJrFjdVbBLT
-	Py8EvgbuiVCGz27K1OnN5UXcl90BfiHy8lDSl4y4RiTlIIazNqOL+DBIycTxfeFVN+sLXCYo9aw
-	Oog==
-X-Google-Smtp-Source: AGHT+IH80WQPe2gC0t41s8elGGKjfDMTRtXWW//0TOVmoyUvyUr43Ya/wSrUFZF+r6Z3Ca0w0TJIfiQeiMA=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:f85:b0:5ff:9315:7579 with SMTP id
- df5-20020a05690c0f8500b005ff93157579mr690348ywb.6.1706746854726; Wed, 31 Jan
- 2024 16:20:54 -0800 (PST)
-Date: Wed, 31 Jan 2024 16:20:53 -0800
-In-Reply-To: <97bb1f2996d8a7b828cd9e3309380d1a86ca681b.1705965635.git.isaku.yamahata@intel.com>
+        d=1e100.net; s=20230601; t=1706747205; x=1707352005;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MfVbRf3BHUSn3cK7ZTAjeFEicT/rpADsX5UluXSAJko=;
+        b=LrQfVWQgr83JkktDsiEcPaRWOQYoLDv3jngtqh8QIoO3CEkDOqAPxZ4XKSs/oI8YTv
+         GHB5U9EJd0m1a2EZGOek4SfH1xArHm0XBMZIB/cgWTcioYYfmWc8f6fCAY9f6qceQvBn
+         6QMx9YNxocqEbgtsAPDLtkrAZnb8pIi3johmR/fY6/V2WO6Q7bfda6l6atMWBrT/pUb3
+         royXJocEv5YEEBDXHmc710ZiiR9sCqps0OYHbcwKY1S1FEf0bUMbMF8B3lZrE6Wt0M34
+         c9MV0TyZ+LCIM+4raT0qswkXTHYKrMyR0fMKcW1YRWjGjF4pM6deQd0oBvTc6pvmiLD6
+         3xnA==
+X-Gm-Message-State: AOJu0YxrKytRiXdJUZGQb/gJKr/QAHqldpmoNrhN6FFnkWC2cYy8aEVE
+	r7HBr6nhg6dbXIzTiz0HpCI/jfJWWvMx3vEASpVKtgKPF04UdzuafGP9WtBwzwZ8tLLrPKy4QbZ
+	N7eTeUelLmMdtnndvbYXMgI8/m/o+TvWN7p+P
+X-Google-Smtp-Source: AGHT+IFkozDy72/y2wNyA2yA/lTNSD0/eZVvz82Xg5xHONs8hs/Df4umXylnquFRHZr6PnmZkZkDhPz2CdJa2WRWaj8=
+X-Received: by 2002:a05:622a:3ce:b0:42a:9c21:2655 with SMTP id
+ k14-20020a05622a03ce00b0042a9c212655mr86925qtx.13.1706747204771; Wed, 31 Jan
+ 2024 16:26:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <cover.1705965634.git.isaku.yamahata@intel.com> <97bb1f2996d8a7b828cd9e3309380d1a86ca681b.1705965635.git.isaku.yamahata@intel.com>
-Message-ID: <Zbrj5WKVgMsUFDtb@google.com>
-Subject: Re: [PATCH v18 064/121] KVM: TDX: Create initial guest memory
-From: Sean Christopherson <seanjc@google.com>
-To: isaku.yamahata@intel.com
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com, 
-	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>, chen.bo@intel.com, 
-	hang.yuan@intel.com, tina.zhang@intel.com, gkirkpatrick@google.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20231109210325.3806151-1-amoorthy@google.com> <20231109210325.3806151-7-amoorthy@google.com>
+ <CADrL8HWYKSiDZ_ahGbMXjup=r75B4JqC3LvT8A-qPVenV+MOiw@mail.gmail.com> <CAF7b7mrA3rB33sUZe3HX33+fXpF=8VwD284LpCcEn9KT9OgwUQ@mail.gmail.com>
+In-Reply-To: <CAF7b7mrA3rB33sUZe3HX33+fXpF=8VwD284LpCcEn9KT9OgwUQ@mail.gmail.com>
+From: James Houghton <jthoughton@google.com>
+Date: Wed, 31 Jan 2024 16:26:08 -0800
+Message-ID: <CADrL8HXSzm_C9UwUb8-H_c6-TRgpkKLE+qeXfyN-X_rHGj2vuw@mail.gmail.com>
+Subject: Re: [PATCH v6 06/14] KVM: Add memslot flag to let userspace force an
+ exit on missing hva mappings
+To: Anish Moorthy <amoorthy@google.com>
+Cc: seanjc@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	oliver.upton@linux.dev, pbonzini@redhat.com, maz@kernel.org, 
+	robert.hoo.linux@gmail.com, dmatlack@google.com, axelrasmussen@google.com, 
+	peterx@redhat.com, nadav.amit@gmail.com, isaku.yamahata@gmail.com, 
+	kconsul@linux.vnet.ibm.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 22, 2024, isaku.yamahata@intel.com wrote:
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index 4cbcedff4f16..1a5a91b99de9 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -591,6 +591,69 @@ static int tdx_mem_page_aug(struct kvm *kvm, gfn_t gfn,
->  	return 0;
->  }
->  
-> +static int tdx_mem_page_add(struct kvm *kvm, gfn_t gfn,
-> +			    enum pg_level level, kvm_pfn_t pfn)
-> +{
-> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> +	hpa_t hpa = pfn_to_hpa(pfn);
-> +	gpa_t gpa = gfn_to_gpa(gfn);
-> +	struct tdx_module_args out;
-> +	hpa_t source_pa;
-> +	bool measure;
-> +	u64 err;
-> +	int i;
-> +
-> +	/*
-> +	 * KVM_INIT_MEM_REGION, tdx_init_mem_region(), supports only 4K page
-> +	 * because tdh_mem_page_add() supports only 4K page.
-> +	 */
-> +	if (KVM_BUG_ON(level != PG_LEVEL_4K, kvm))
-> +		return -EINVAL;
-> +
-> +	/*
-> +	 * In case of TDP MMU, fault handler can run concurrently.  Note
-> +	 * 'source_pa' is a TD scope variable, meaning if there are multiple
-> +	 * threads reaching here with all needing to access 'source_pa', it
-> +	 * will break.  However fortunately this won't happen, because below
-> +	 * TDH_MEM_PAGE_ADD code path is only used when VM is being created
-> +	 * before it is running, using KVM_TDX_INIT_MEM_REGION ioctl (which
-> +	 * always uses vcpu 0's page table and protected by vcpu->mutex).
-> +	 */
+On Wed, Jan 31, 2024 at 2:00=E2=80=AFPM Anish Moorthy <amoorthy@google.com>=
+ wrote:
+>
+> On Tue, Jan 30, 2024 at 4:26=E2=80=AFPM James Houghton <jthoughton@google=
+.com> wrote:
+> > > @@ -3070,6 +3074,15 @@ kvm_pfn_t __gfn_to_pfn_memslot(const struct kv=
+m_memory_slot *slot, gfn_t gfn,
+> > >                 writable =3D NULL;
+> > >         }
+> > >
+> > > +       if (!atomic && can_exit_on_missing
+> > > +           && kvm_is_slot_exit_on_missing(slot)) {
+> > > +               atomic =3D true;
+> > > +               if (async) {
+> > > +                       *async =3D false;
+> > > +                       async =3D NULL;
+> > > +               }
+> > > +       }
+> > > +
+> >
+> > Perhaps we should have a comment for this? Maybe something like: "If
+> > we want to exit-on-missing, we want to bail out if fast GUP fails, and
+> > we do not want to go into slow GUP. Setting atomic=3Dtrue does exactly
+> > this."
+>
+> I was going to push back on the use of "we" but I see that it's all
+> over kvm_main.c :).
+>
+> I agree that a comment would be good, but isn't the "fast GUP only iff
+> atomic=3Dtrue" statement a tautology? That's an actual question, my
+> memory's fuzzy.
+>
+> What about
+>
+> > When the slot is exit-on-missing (and when we should respect that)
+> > set atomic=3Dtrue to prevent GUP from faulting in the userspace
+> > mappings.
+>
+> instead?
 
-Most of the above is superflous.  tdx_mem_page_add() is called if and only if
-the TD is finalized, and the TDX module disallow running vCPUs before the TD is
-finalized.  That's it.  And maybe throw in a lockdep to assert that kvm->lock is
-held.
+This is much better than what I wrote, thanks! We merely want GUP not
+to fault the page in; we don't actually care about fast GUP vs. slow
+GUP.
 
-> +	if (KVM_BUG_ON(kvm_tdx->source_pa == INVALID_PAGE, kvm)) {
-> +		tdx_unpin(kvm, pfn);
-> +		return -EINVAL;
-> +	}
-> +
-> +	source_pa = kvm_tdx->source_pa & ~KVM_TDX_MEASURE_MEMORY_REGION;
-> +	measure = kvm_tdx->source_pa & KVM_TDX_MEASURE_MEMORY_REGION;
-> +	kvm_tdx->source_pa = INVALID_PAGE;
-> +
-> +	do {
-> +		err = tdh_mem_page_add(kvm_tdx->tdr_pa, gpa, hpa, source_pa,
-> +				       &out);
-> +		/*
-> +		 * This path is executed during populating initial guest memory
-> +		 * image. i.e. before running any vcpu.  Race is rare.
+On that note, I think we need to drop the patch that causes
+read-faults in RO memslots to go through fast GUP. KVM didn't do that
+for a good reason[1].
 
-How are races possible at all?
+That would break KVM_EXIT_ON_MISSING for RO memslots, so I think that
+the right way to implement KVM_EXIT_ON_MISSING is to have
+hva_to_pfn_slow pass FOLL_NOFAULT, at least for the RO memslot case.
+We still get the win we're looking for: don't grab the userfaultfd
+locks.
 
-> +		 */
-> +	} while (unlikely(err == TDX_ERROR_SEPT_BUSY));
-> +	if (KVM_BUG_ON(err, kvm)) {
-> +		pr_tdx_error(TDH_MEM_PAGE_ADD, err, &out);
-> +		tdx_unpin(kvm, pfn);
-> +		return -EIO;
-> +	} else if (measure) {
-> +		for (i = 0; i < PAGE_SIZE; i += TDX_EXTENDMR_CHUNKSIZE) {
-> +			err = tdh_mr_extend(kvm_tdx->tdr_pa, gpa + i, &out);
-> +			if (KVM_BUG_ON(err, &kvm_tdx->kvm)) {
-> +				pr_tdx_error(TDH_MR_EXTEND, err, &out);
-> +				break;
-> +			}
-> +		}
-
-Why is measurement done deep within the MMU?  At a glance, I don't see why this
-can't be done up in the ioctl, outside of a spinlock.
-
-And IIRC, the order affects the measurement but doesn't truly matter, e.g. KVM
-could choose to completely separate tdh_mr_extend() from tdh_mem_page_add(), no?
-
-> +static int tdx_init_mem_region(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
-> +{
-> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> +	struct kvm_tdx_init_mem_region region;
-> +	struct kvm_vcpu *vcpu;
-> +	struct page *page;
-> +	int idx, ret = 0;
-> +	bool added = false;
-> +
-> +	/* Once TD is finalized, the initial guest memory is fixed. */
-> +	if (is_td_finalized(kvm_tdx))
-> +		return -EINVAL;
-> +
-> +	/* The BSP vCPU must be created before initializing memory regions. */
-> +	if (!atomic_read(&kvm->online_vcpus))
-> +		return -EINVAL;
-> +
-> +	if (cmd->flags & ~KVM_TDX_MEASURE_MEMORY_REGION)
-> +		return -EINVAL;
-> +
-> +	if (copy_from_user(&region, (void __user *)cmd->data, sizeof(region)))
-> +		return -EFAULT;
-> +
-> +	/* Sanity check */
-> +	if (!IS_ALIGNED(region.source_addr, PAGE_SIZE) ||
-> +	    !IS_ALIGNED(region.gpa, PAGE_SIZE) ||
-> +	    !region.nr_pages ||
-> +	    region.nr_pages & GENMASK_ULL(63, 63 - PAGE_SHIFT) ||
-> +	    region.gpa + (region.nr_pages << PAGE_SHIFT) <= region.gpa ||
-> +	    !kvm_is_private_gpa(kvm, region.gpa) ||
-> +	    !kvm_is_private_gpa(kvm, region.gpa + (region.nr_pages << PAGE_SHIFT)))
-> +		return -EINVAL;
-> +
-> +	vcpu = kvm_get_vcpu(kvm, 0);
-> +	if (mutex_lock_killable(&vcpu->mutex))
-> +		return -EINTR;
-
-The real reason for this drive-by pseudo-review is that I am hoping/wishing we
-can turn this into a generic KVM ioctl() to allow userspace to pre-map guest
-memory[*].
-
-If we're going to carry non-trivial code, we might as well squeeze as much use
-out of it as we can.
-
-Beyond wanting to shove this into KVM_MEMORY_ENCRYPT_OP, is there any reason why
-this is a VM ioctl() and not a vCPU ioctl()?  Very roughly, couldn't we use a
-struct like this as input to a vCPU ioctl() that maps memory, and optionally
-initializes memory from @source?
-
-	struct kvm_memory_mapping {
-		__u64 base_gfn;
-		__u64 nr_pages;
-		__u64 flags;
-		__u64 source;
-	}
-
-TDX would need to do special things for copying the source, but beyond that most
-of the code in this function is generic.
-
-[*] https://lore.kernel.org/all/65262e67-7885-971a-896d-ad9c0a760907@polito.it
+[1]: Commit 17839856fd5 ("gup: document and work around "COW can break
+either way" issue")
 
