@@ -1,289 +1,189 @@
-Return-Path: <kvm+bounces-7670-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7671-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C92B184519A
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 07:48:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AFE484521C
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 08:39:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F3EC3B255B6
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 06:48:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F9F71C21732
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 07:39:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEB961586CD;
-	Thu,  1 Feb 2024 06:48:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BE291586C8;
+	Thu,  1 Feb 2024 07:39:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="RpNvQwqg"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="cIkXFR+n"
 X-Original-To: kvm@vger.kernel.org
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ACDA2B9D1;
-	Thu,  1 Feb 2024 06:48:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 993A6208DD;
+	Thu,  1 Feb 2024 07:39:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706770099; cv=none; b=qrzPLID90LjgcM1YJqR7gInocdjnBqLoenrOukG1MRBRmHN/TbS+2RH0RRuIktElPTbHPcrWzgHHk6fjAraHOQ91NVNXJ47QChDf0dfz0yf7OozNJIAQFjQ2L9cZqmryCwPpgMfuTCPaKXv/JTRbIqjIXnh7b7ISjzYgoKw/e7Y=
+	t=1706773146; cv=none; b=esFXr8JAJVCC6bJ3KxT/aXO2ksb34kAu0sBgJSaTk/eXd/ykx5qqNCfE2o1B8QkJvbsYgPa3QM2tHmKG+GVOPn/cympoV+4c1ZGHE75dUTrc7tssU41cV8kYym5TCsLLVBMuZoa5r3j0UWS7yAgzRzeAr+13egfl7t0uabme9j0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706770099; c=relaxed/simple;
-	bh=/IVd0rrF2KtB3FVvceo+CBZZI6gkOZlP17o00V0cGH0=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
-	 Content-Type; b=HQpNwXGMCpGy4Yj9edVJdN2qWV8qVCFOY/XQuiOF9pNNFvmDtpRdHC/qz4/4VesalnXHyh9Et1BQJ7DMvHNwTFos+XGICVpEjnAvQyUZDEtw4EmNrl13q5jUgZpvjhv7HwNYJ/svCc4X2er+FfH+R68Wq1HO0vYD41Su+eBXF9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=RpNvQwqg; arc=none smtp.client-ip=115.124.30.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1706770092; h=Message-ID:Subject:Date:From:To:Content-Type;
-	bh=TWr1CQEd6xDFjrk3l/xQeYg2YrwKV9kMpWG3h49S4As=;
-	b=RpNvQwqgUfd72kbGTTKiD7twUlcwT+90WNVJuZqk9kV6hNiZwQglR/iDryXfWiX47nsLiHXtabYqu8LXpD6WKaVPbk/9sV5fscoFkqZM6blJKhAkvP3EfoXWeGQePnq01X4kt8r3P+vGpjvfEBMvD0HaawNFfqTOh9Z6KJNgM/Y=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=36;SR=0;TI=SMTPD_---0W.pYjzd_1706770089;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W.pYjzd_1706770089)
-          by smtp.aliyun-inc.com;
-          Thu, 01 Feb 2024 14:48:10 +0800
-Message-ID: <1706769826.0586398-4-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH vhost 04/17] virtio_ring: split: remove double check of the unmap ops
-Date: Thu, 1 Feb 2024 14:43:46 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: virtualization@lists.linux.dev,
- Richard Weinberger <richard@nod.at>,
- Anton Ivanov <anton.ivanov@cambridgegreys.com>,
- Johannes Berg <johannes@sipsolutions.net>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Hans de Goede <hdegoede@redhat.com>,
- =?utf-8?q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- Vadim Pasternak <vadimp@nvidia.com>,
- Bjorn Andersson <andersson@kernel.org>,
- Mathieu Poirier <mathieu.poirier@linaro.org>,
- Cornelia Huck <cohuck@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Eric Farman <farman@linux.ibm.com>,
- Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Benjamin Berg <benjamin.berg@intel.com>,
- Yang Li <yang.lee@linux.alibaba.com>,
- linux-um@lists.infradead.org,
- netdev@vger.kernel.org,
- platform-driver-x86@vger.kernel.org,
- linux-remoteproc@vger.kernel.org,
- linux-s390@vger.kernel.org,
- kvm@vger.kernel.org,
- bpf@vger.kernel.org
-References: <20240130114224.86536-1-xuanzhuo@linux.alibaba.com>
- <20240130114224.86536-5-xuanzhuo@linux.alibaba.com>
- <CACGkMEs-wUa_z_tGYEwBf7EVJAtuJdkX4HAdjqMXHEM1ys-gKQ@mail.gmail.com>
-In-Reply-To: <CACGkMEs-wUa_z_tGYEwBf7EVJAtuJdkX4HAdjqMXHEM1ys-gKQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1706773146; c=relaxed/simple;
+	bh=Vy3QAsyp6Zh8+Hcn9aLRVk8VwYfa3R24xQXNfWAKT4M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JAKSUxILUQY7Ruo7iOx6NcfGS3CtyyTTNtbH8ryxpg/3gKLeNnyg/jaQCHYA/Pk6TLe9MEaNyMchyWSjGTdNXeV39in9uYYuGSJxs99bo9khpNoZ8okk+z9btIkL4BACZXlBktK8SFBkXGnzyN3PfPS7wJX1kjQVZWJEmi/E0mo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=cIkXFR+n; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41167OjR023207;
+	Thu, 1 Feb 2024 07:38:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=O5xbgGIVQTFeQwn1snTqVjPyk1UJqDq7NObWf8KUYvU=;
+ b=cIkXFR+n/pu1/YCFuL3LWp5TOK+UO2VLs5whWub60JTQvqf7suBBLJs13FHLYc9zWQ1W
+ d7JcT8/RNZwbGn/W9zSt3rfaBTNLYdDeyuE6YMcoH5fmZYF7NFUYjlyREmOtGMtMfskT
+ HRY/TVn8v2Tf/srs8UsUY3sS7ni6PvYdHi7HiI6iDLVTD1FyPMl8WE5q4/nXQOoznlw7
+ aAKl/QCb1GgQdQQdknUYQD49mCWo5/n6UIFW66TcWc0JZVK6DW0fKJF9D86ubAiq+4tT
+ amyz0z2suBSkX+5Rf/t3P598z4ONL5iKeResvWudmHo76N13suWP/lxmy8dM7gGYnTIm gA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w05re1wty-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 01 Feb 2024 07:38:49 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 4117TlOG016946;
+	Thu, 1 Feb 2024 07:38:48 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w05re1wtf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 01 Feb 2024 07:38:48 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4116sqx1008242;
+	Thu, 1 Feb 2024 07:38:47 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3vwdnmajk0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 01 Feb 2024 07:38:47 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4117cj8X39518878
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 1 Feb 2024 07:38:45 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1431920043;
+	Thu,  1 Feb 2024 07:38:45 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DA4DE20040;
+	Thu,  1 Feb 2024 07:38:44 +0000 (GMT)
+Received: from DESKTOP-2CCOB1S. (unknown [9.171.218.73])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Thu,  1 Feb 2024 07:38:44 +0000 (GMT)
+Date: Thu, 1 Feb 2024 08:38:43 +0100
+From: Tobias Huschle <huschle@linux.ibm.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, Abel Wu <wuyun.abel@bytedance.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        virtualization@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: Re: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6
+ sched/fair: Add lag based placement)
+Message-ID: <ZbtKg6815Uwg3HPw@DESKTOP-2CCOB1S.>
+References: <20231211115329-mutt-send-email-mst@kernel.org>
+ <CACGkMEudZnF7hUajgt0wtNPCxH8j6A3L1DgJj2ayJWhv9Bh1WA@mail.gmail.com>
+ <20231212111433-mutt-send-email-mst@kernel.org>
+ <42870.123121305373200110@us-mta-641.us.mimecast.lan>
+ <20231213061719-mutt-send-email-mst@kernel.org>
+ <25485.123121307454100283@us-mta-18.us.mimecast.lan>
+ <20231213094854-mutt-send-email-mst@kernel.org>
+ <20231214021328-mutt-send-email-mst@kernel.org>
+ <92916.124010808133201076@us-mta-622.us.mimecast.lan>
+ <20240121134311-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240121134311-mutt-send-email-mst@kernel.org>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: dszN-J_Pt26RmI-Q8iq1vbjEbXr0EEWP
+X-Proofpoint-ORIG-GUID: TIVluWx1UphXsst12-HPeQ90EczE4qo0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-31_10,2024-01-31_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 impostorscore=0
+ spamscore=0 lowpriorityscore=0 suspectscore=0 adultscore=0 malwarescore=0
+ mlxlogscore=686 bulkscore=0 phishscore=0 priorityscore=1501 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
+ definitions=main-2402010060
 
-On Wed, 31 Jan 2024 17:12:22 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> On Tue, Jan 30, 2024 at 7:42=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba=
-.com> wrote:
-> >
-> > In the functions vring_unmap_one_split and
-> > vring_unmap_one_split_indirect,
-> > multiple checks are made whether unmap is performed and whether it is
-> > INDIRECT.
-> >
-> > These two functions are usually called in a loop, and we should put the
-> > check outside the loop.
-> >
-> > And we unmap the descs with VRING_DESC_F_INDIRECT on the same path with
-> > other descs, that make the thing more complex. If we distinguish the
-> > descs with VRING_DESC_F_INDIRECT before unmap, thing will be clearer.
-> >
-> > 1. only one desc of the desc table is used, we do not need the loop
-> > 2. the called unmap api is difference from the other desc
-> > 3. the vq->premapped is not needed to check
-> > 4. the vq->indirect is not needed to check
-> > 5. the state->indir_desc must not be null
-> >
-> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > ---
-> >  drivers/virtio/virtio_ring.c | 80 ++++++++++++++++++------------------
-> >  1 file changed, 39 insertions(+), 41 deletions(-)
-> >
-> > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
-> > index dd03bc5a81fe..2b41fdbce975 100644
-> > --- a/drivers/virtio/virtio_ring.c
-> > +++ b/drivers/virtio/virtio_ring.c
-> > @@ -452,9 +452,6 @@ static void vring_unmap_one_split_indirect(const st=
-ruct vring_virtqueue *vq,
-> >  {
-> >         u16 flags;
-> >
-> > -       if (!vring_need_unmap_buffer(vq))
-> > -               return;
-> > -
-> >         flags =3D virtio16_to_cpu(vq->vq.vdev, desc->flags);
-> >
-> >         dma_unmap_page(vring_dma_dev(vq),
-> > @@ -472,27 +469,12 @@ static unsigned int vring_unmap_one_split(const s=
-truct vring_virtqueue *vq,
-> >
-> >         flags =3D extra[i].flags;
-> >
-> > -       if (flags & VRING_DESC_F_INDIRECT) {
-> > -               if (!vq->use_dma_api)
-> > -                       goto out;
-> > -
-> > -               dma_unmap_single(vring_dma_dev(vq),
-> > -                                extra[i].addr,
-> > -                                extra[i].len,
-> > -                                (flags & VRING_DESC_F_WRITE) ?
-> > -                                DMA_FROM_DEVICE : DMA_TO_DEVICE);
-> > -       } else {
-> > -               if (!vring_need_unmap_buffer(vq))
-> > -                       goto out;
-> > -
-> > -               dma_unmap_page(vring_dma_dev(vq),
-> > -                              extra[i].addr,
-> > -                              extra[i].len,
-> > -                              (flags & VRING_DESC_F_WRITE) ?
-> > -                              DMA_FROM_DEVICE : DMA_TO_DEVICE);
-> > -       }
-> > +       dma_unmap_page(vring_dma_dev(vq),
-> > +                      extra[i].addr,
-> > +                      extra[i].len,
-> > +                      (flags & VRING_DESC_F_WRITE) ?
-> > +                      DMA_FROM_DEVICE : DMA_TO_DEVICE);
-> >
-> > -out:
-> >         return extra[i].next;
-> >  }
-> >
-> > @@ -660,7 +642,7 @@ static inline int virtqueue_add_split(struct virtqu=
-eue *_vq,
-> >                         vq, desc, total_sg * sizeof(struct vring_desc),
-> >                         DMA_TO_DEVICE);
-> >                 if (vring_mapping_error(vq, addr)) {
-> > -                       if (vq->premapped)
-> > +                       if (!vring_need_unmap_buffer(vq))
-> >                                 goto free_indirect;
-> >
-> >                         goto unmap_release;
-> > @@ -713,6 +695,9 @@ static inline int virtqueue_add_split(struct virtqu=
-eue *_vq,
-> >         return 0;
-> >
-> >  unmap_release:
-> > +
-> > +       WARN_ON(!vring_need_unmap_buffer(vq));
-> > +
-> >         err_idx =3D i;
-> >
-> >         if (indirect)
-> > @@ -774,34 +759,42 @@ static void detach_buf_split(struct vring_virtque=
-ue *vq, unsigned int head,
-> >  {
-> >         unsigned int i, j;
-> >         __virtio16 nextflag =3D cpu_to_virtio16(vq->vq.vdev, VRING_DESC=
-_F_NEXT);
-> > +       u16 flags;
-> >
-> >         /* Clear data ptr. */
-> >         vq->split.desc_state[head].data =3D NULL;
-> > +       flags =3D vq->split.desc_extra[head].flags;
-> >
-> >         /* Put back on free list: unmap first-level descriptors and fin=
-d end */
-> >         i =3D head;
-> >
-> > -       while (vq->split.vring.desc[i].flags & nextflag) {
-> > -               vring_unmap_one_split(vq, i);
-> > -               i =3D vq->split.desc_extra[i].next;
-> > -               vq->vq.num_free++;
-> > -       }
-> > -
-> > -       vring_unmap_one_split(vq, i);
-> > -       vq->split.desc_extra[i].next =3D vq->free_head;
-> > -       vq->free_head =3D head;
-> > +       if (!(flags & VRING_DESC_F_INDIRECT)) {
->
-> So during add we do:
->
->         if (!indirect && vring_need_unmap_buffer(vq))
->                 vq->split.desc_extra[prev & (vq->split.vring.num - 1)].fl=
-ags &=3D
->                         ~VRING_DESC_F_NEXT;
+On Sun, Jan 21, 2024 at 01:44:32PM -0500, Michael S. Tsirkin wrote:
+> On Mon, Jan 08, 2024 at 02:13:25PM +0100, Tobias Huschle wrote:
+> > On Thu, Dec 14, 2023 at 02:14:59AM -0500, Michael S. Tsirkin wrote:
+> > - Along with the wakeup of the kworker, need_resched needs to
+> >   be set, such that cond_resched() triggers a reschedule.
+> 
+> Let's try this? Does not look like discussing vhost itself will
+> draw attention from scheduler guys but posting a scheduling
+> patch probably will? Can you post a patch?
+
+As a baseline, I verified that the following two options fix
+the regression:
+
+- replacing the cond_resched in the vhost_worker function with a hard
+  schedule 
+- setting the need_resched flag using set_tsk_need_resched(current)
+  right before calling cond_resched
+
+I then tried to find a better spot to put the set_tsk_need_resched
+call. 
+
+One approach I found to be working is setting the need_resched flag 
+at the end of handle_tx and hande_rx.
+This would be after data has been actually passed to the socket, so 
+the originally blocked kworker has something to do and will profit
+from the reschedule. 
+It might be possible to go deeper and place the set_tsk_need_resched
+call to the location right after actually passing the data, but this
+might leave us with sprinkling that call in multiple places and
+might be too intrusive.
+Furthermore, it might be possible to check if an error occured when
+preparing the transmission and then skip the setting of the flag.
+
+This would require a conceptual decision on the vhost side.
+This solution would not touch the scheduler, only incentivise it to
+do the right thing for this particular regression.
+
+Another idea could be to find the counterpart that initiates the
+actual data transfer, which I assume wakes up the kworker. From
+what I gather it seems to be an eventfd notification that ends up
+somewhere in the qemu code. Not sure if that context would allow
+to set the need_resched flag, nor whether this would be a good idea.
+
+> 
+> > - On cond_resched(), verify if the consumed runtime of the caller
+> >   is outweighing the negative lag of another process (e.g. the 
+> >   kworker) and schedule the other process. Introduces overhead
+> >   to cond_resched.
+> 
+> Or this last one.
+
+On cond_resched itself, this will probably only be possible in a very 
+very hacky way. That is because currently, there is no immidiate access
+to the necessary data available, which would make it necessary to 
+bloat up the cond_resched function quite a bit, with a probably 
+non-negligible amount of overhead.
+
+Changing other aspects in the scheduler might get us in trouble as
+they all would probably resolve back to the question "What is the magic
+value that determines whether a small task not being scheduled justifies
+setting the need_resched flag for a currently running task or adjusting 
+its lag?". As this would then also have to work for all non-vhost related
+cases, this looks like a dangerous path to me on second thought.
 
 
-This does not affect this patch.
+-------- Summary --------
 
-1. this just considers the VRING_DESC_F_NEXT of desc_extra.flags
-2. the desc_extra.flags is updated by virtqueue_add_desc_split()
-
-So for desc_extra.flags & VRING_DESC_F_INDIRECT, that is right.
-
-Thanks.
-
-
->
-> Then using flags here unconditionally seems not reliable.
->
-> I post a patch to store flags unconditionally at:
->
-> https://lore.kernel.org/all/20220224122655-mutt-send-email-mst@kernel.org/
->
-> > +               while (vq->split.vring.desc[i].flags & nextflag) {
-> > +                       if (vring_need_unmap_buffer(vq))
-> > +                               vring_unmap_one_split(vq, i);
-> > +                       i =3D vq->split.desc_extra[i].next;
-> > +                       vq->vq.num_free++;
-> > +               }
-> >
-> > -       /* Plus final descriptor */
-> > -       vq->vq.num_free++;
-> > +               if (vring_need_unmap_buffer(vq))
-> > +                       vring_unmap_one_split(vq, i);
-> >
-> > -       if (vq->indirect) {
-> > +               if (ctx)
-> > +                       *ctx =3D vq->split.desc_state[head].indir_desc;
-> > +       } else {
-> >                 struct vring_desc *indir_desc =3D
-> >                                 vq->split.desc_state[head].indir_desc;
-> >                 u32 len;
-> >
-> > -               /* Free the indirect table, if any, now that it's unmap=
-ped. */
-> > -               if (!indir_desc)
-> > -                       return;
-> > +               if (vq->use_dma_api) {
-> > +                       struct vring_desc_extra *extra =3D vq->split.de=
-sc_extra;
-> > +
-> > +                       dma_unmap_single(vring_dma_dev(vq),
-> > +                                        extra[i].addr,
-> > +                                        extra[i].len,
-> > +                                        (flags & VRING_DESC_F_WRITE) ?
-> > +                                        DMA_FROM_DEVICE : DMA_TO_DEVIC=
-E);
-> > +               }
->
-> Note that there's a following
->
-> BUG_ON(!(vq->split.desc_extra[head].flags &
->                                 VRING_DESC_F_INDIRECT));
->
-> Which I think we can remove.
->
-> Thanks
->
+In my (non-vhost experience) opinion the way to go would be either
+replacing the cond_resched with a hard schedule or setting the
+need_resched flag within vhost if the a data transfer was successfully
+initiated. It will be necessary to check if this causes problems with
+other workloads/benchmarks.
 
