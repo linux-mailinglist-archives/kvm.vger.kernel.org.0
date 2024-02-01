@@ -1,166 +1,207 @@
-Return-Path: <kvm+bounces-7672-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7673-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E80BE845231
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 08:44:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40F8184526B
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 09:09:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 72A4D1F299B3
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 07:44:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 734281C26024
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 08:09:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12F32158D76;
-	Thu,  1 Feb 2024 07:44:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AFEE15A499;
+	Thu,  1 Feb 2024 08:08:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BTi5Srt3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KUf9fVqL"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-184.mta1.migadu.com (out-184.mta1.migadu.com [95.215.58.184])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 506E085C7D
-	for <kvm@vger.kernel.org>; Thu,  1 Feb 2024 07:44:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 405C715B109
+	for <kvm@vger.kernel.org>; Thu,  1 Feb 2024 08:08:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706773455; cv=none; b=u6h3eXouS3R2oNpgT6W7fy9b2EUFqA8C7QXOLHnxh/QhkpcYFzV5JljKf4ZTRr6n4TdsC8j1/4ebXK7XqMtvr6iAXOqVDEQj+9YnqSV/az2lz+St1gjN5mPS+ZdMuUWpbSz7ENxVTluhGv65QGuBVb0w0WJ3yeR5InMLL+404Ek=
+	t=1706774907; cv=none; b=d+Y0OPFDnXdYtD6NM4/6tN/2rWXpBbgPOzqWH1NVWtrD8ZM34LPITrYJT11LnVSxI9UQY6mTm1W0V0kYmgxteabyl3W6B7gBmvj+HL8gb7s+N41lXIQCFL2xuOHkALrGiDyYob2Rj/1kw6IGxu7L6ksDI8PXwg9hDpbnLtxTD6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706773455; c=relaxed/simple;
-	bh=VUxkMaWDzVG8ks5grBa6GIO8EpjRdlccwEaXcMtktI4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hnDaQsMt5Pw1WvRjWemN2CYLc/azteMjYHgyymEW6W71SmzdmdcV2BXPxXnEzfTlmmida2Z/hdJQCfYTxGdpEQsO6pDwU+XO8rsTHxvtVH7wydfpZ6Jviy2nKKfAIVRHeaYLNd40yrth6HqkDf4ksoAwETxCNiO2Le9VXQW3FB8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BTi5Srt3; arc=none smtp.client-ip=95.215.58.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <fdc2da16-5680-44cf-bc18-b3e8c0f565fa@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706773449;
+	s=arc-20240116; t=1706774907; c=relaxed/simple;
+	bh=yRW+zk6ipQx+/UeKBycRl86N7OpB8VApca3JZVyt31I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=phR+6fmlyjKOjSQ6u3eGLznEpmaY6nZSNh78hNUCFAiKUug94AwFztkCfKVVCUytmmUFA79qsoL8d2EgSZ4cJvX8Bl9Bia1IPK3Q4UC6WvtIUw0a4++KWIlqHLUJQd0+PohD6GoF03FcrUdBX6ka10p+LXgwZb1Go5EyS7OEduc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KUf9fVqL; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706774896;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=W+Ldjee8H+rdTycXwv7iNM7fs8dOnUOKfLYDOYFBKVs=;
-	b=BTi5Srt3XKJ6GI3RHRfeEo1l/LIcvsed3vksfXGfzoNkv2bVp9RgtmgnorM1PflB601mio
-	ZFYZWsWXuDV9CHI2hA0a6mHsCy0fjvtfbHXRWJUGYQG/TN+xsopEpfQy0//LmahUgBBaBR
-	ctnB69aOTsyBQtqsU/VGoDWvQfeYCms=
-Date: Thu, 1 Feb 2024 15:43:51 +0800
+	bh=iy0to9gJNsnChVp/GnNaL86E7YakxrA6m3SgledDRmM=;
+	b=KUf9fVqL2VNKyOK/W4u2vJjGcoR0ZzK0JfOARQOruN+EmAIoApqVfkDNm5N83wlLezXF8z
+	hgy9yuQeD7uiATwZR6OojRBpzEExLxt2NxnP/Hjq5LVtdSxNveoDBgC4d7FB3DdrFTiUB9
+	v5cQ0Y3GDeZx20dShwcSQBJ6rjWjrcY=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-79-DlyIt0NBOg6P3Iyl7CjwOQ-1; Thu, 01 Feb 2024 03:08:14 -0500
+X-MC-Unique: DlyIt0NBOg6P3Iyl7CjwOQ-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a2fba67ec20so38712266b.3
+        for <kvm@vger.kernel.org>; Thu, 01 Feb 2024 00:08:14 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706774894; x=1707379694;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iy0to9gJNsnChVp/GnNaL86E7YakxrA6m3SgledDRmM=;
+        b=DJUkPKmhRYXyjOQ9rgMIVJ1J7MrKOvd0wWnj154+WhHq24o6GGxvu7zdOMeaw/yleH
+         xBskIPUTXm+VLRW/Mv9JXx8SNciI7PzmgxfHgDNweYsHrDk9qANDVM2j5MxG/9Gp8Rbd
+         GP8ftcHBOtk+bCkFa1fr/PGQ30qmDeVC40C6e22yLmVvNUcrdk0mOBB1E++m8xB6nlFI
+         rzycOdbc0wimgnusvBKrvWAKpJQaWGOU8k3y+ccQhHS8NWJiWoOdWLL2yNhwequ8hzDv
+         6WH3Krk5QB0c2NZO1J20Zj1YdaWNlzZFqRFYh+hk1cCkf0qVEljsPvId+YSz/EP4G4bb
+         2Q0A==
+X-Gm-Message-State: AOJu0YxceHvkxAntudGEoPCEzlbm51ni6X/QEGeFbgfyXg6GafHdmBN8
+	2xc5adc1Msrw7z9yW9PnvjAvbAGH+7IpgsCpyR+B8FxHw0uDiQ9zDYHrgmRFRserE8ounV6Y13n
+	xRvRYAuu9rLsvovqcSHG72Ce0gAmA5LvuwVjjBXTz4v0ZLhzxkw==
+X-Received: by 2002:a17:907:994a:b0:a36:6198:3505 with SMTP id kl10-20020a170907994a00b00a3661983505mr2891736ejc.25.1706774893763;
+        Thu, 01 Feb 2024 00:08:13 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGR6sQz2gxBGtwqzlmOhuYoQMalz//Dwvh7p+uyOALTuWEkXwrce4iZxrh7C6Z3DpndGvJclg==
+X-Received: by 2002:a17:907:994a:b0:a36:6198:3505 with SMTP id kl10-20020a170907994a00b00a3661983505mr2891712ejc.25.1706774893374;
+        Thu, 01 Feb 2024 00:08:13 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCUPikGwlmK61HBD824LPki9FCPfzBqA8DOG1qFKTu86qM6TT3O5V9/CvItrJ98+QzfcVoEyp+96Zr1Nn2L+BvS4DqHAaoL3vKwZ6lp6Isco+Twi35RKwnoZUuMkraXf3k7IhNqwNPtWxXU0q5hpZ3dtYMws/l0G/WLT2JxU+Az61Ph3wfFwo0rWQrE9KpQ7vopZeP4GRY7hV6XC5TPZ8jR/tHxE8mlGsfTD2vqlwVDFVHk3t88eeqmNpQtAeXcq4Z1TDE9naso78eI=
+Received: from redhat.com ([2a02:14f:179:3a6d:f252:c632:3893:a2ef])
+        by smtp.gmail.com with ESMTPSA id m1-20020a1709062b8100b00a363e8be473sm2143643ejg.143.2024.02.01.00.08.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Feb 2024 00:08:12 -0800 (PST)
+Date: Thu, 1 Feb 2024 03:08:07 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Tobias Huschle <huschle@linux.ibm.com>
+Cc: Jason Wang <jasowang@redhat.com>, Abel Wu <wuyun.abel@bytedance.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: Re: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6
+ sched/fair: Add lag based placement)
+Message-ID: <20240201030341-mutt-send-email-mst@kernel.org>
+References: <CACGkMEudZnF7hUajgt0wtNPCxH8j6A3L1DgJj2ayJWhv9Bh1WA@mail.gmail.com>
+ <20231212111433-mutt-send-email-mst@kernel.org>
+ <42870.123121305373200110@us-mta-641.us.mimecast.lan>
+ <20231213061719-mutt-send-email-mst@kernel.org>
+ <25485.123121307454100283@us-mta-18.us.mimecast.lan>
+ <20231213094854-mutt-send-email-mst@kernel.org>
+ <20231214021328-mutt-send-email-mst@kernel.org>
+ <92916.124010808133201076@us-mta-622.us.mimecast.lan>
+ <20240121134311-mutt-send-email-mst@kernel.org>
+ <07974.124020102385100135@us-mta-501.us.mimecast.lan>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH vhost 00/17] virtio: drivers maintain dma info for
- premapped vq
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, virtualization@lists.linux.dev
-Cc: Richard Weinberger <richard@nod.at>,
- Anton Ivanov <anton.ivanov@cambridgegreys.com>,
- Johannes Berg <johannes@sipsolutions.net>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Hans de Goede <hdegoede@redhat.com>,
- =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- Vadim Pasternak <vadimp@nvidia.com>, Bjorn Andersson <andersson@kernel.org>,
- Mathieu Poirier <mathieu.poirier@linaro.org>,
- Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
- Eric Farman <farman@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
- <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Benjamin Berg <benjamin.berg@intel.com>, Yang Li
- <yang.lee@linux.alibaba.com>, linux-um@lists.infradead.org,
- netdev@vger.kernel.org, platform-driver-x86@vger.kernel.org,
- linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
- kvm@vger.kernel.org, bpf@vger.kernel.org
-References: <20240130114224.86536-1-xuanzhuo@linux.alibaba.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <20240130114224.86536-1-xuanzhuo@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <07974.124020102385100135@us-mta-501.us.mimecast.lan>
 
-在 2024/1/30 19:42, Xuan Zhuo 写道:
-> As discussed:
-> http://lore.kernel.org/all/CACGkMEvq0No8QGC46U4mGsMtuD44fD_cfLcPaVmJ3rHYqRZxYg@mail.gmail.com
+On Thu, Feb 01, 2024 at 08:38:43AM +0100, Tobias Huschle wrote:
+> On Sun, Jan 21, 2024 at 01:44:32PM -0500, Michael S. Tsirkin wrote:
+> > On Mon, Jan 08, 2024 at 02:13:25PM +0100, Tobias Huschle wrote:
+> > > On Thu, Dec 14, 2023 at 02:14:59AM -0500, Michael S. Tsirkin wrote:
+> > > - Along with the wakeup of the kworker, need_resched needs to
+> > >   be set, such that cond_resched() triggers a reschedule.
+> > 
+> > Let's try this? Does not look like discussing vhost itself will
+> > draw attention from scheduler guys but posting a scheduling
+> > patch probably will? Can you post a patch?
 > 
-> If the virtio is premapped mode, the driver should manage the dma info by self.
-> So the virtio core should not store the dma info.
-> So we can release the memory used to store the dma info.
+> As a baseline, I verified that the following two options fix
+> the regression:
 > 
-> But if the desc_extra has not dma info, we face a new question,
-> it is hard to get the dma info of the desc with indirect flag.
-> For split mode, that is easy from desc, but for the packed mode,
-> it is hard to get the dma info from the desc. And for hardening
-> the dma unmap is saft, we should store the dma info of indirect
-> descs.
+> - replacing the cond_resched in the vhost_worker function with a hard
+>   schedule 
+> - setting the need_resched flag using set_tsk_need_resched(current)
+>   right before calling cond_resched
 > 
-> So I introduce the "structure the indirect desc table" to
-> allocate space to store dma info with the desc table.
+> I then tried to find a better spot to put the set_tsk_need_resched
+> call. 
 > 
-> On the other side, we mix the descs with indirect flag
-> with other descs together to share the unmap api. That
-> is complex. I found if we we distinguish the descs with
-> VRING_DESC_F_INDIRECT before unmap, thing will be clearer.
+> One approach I found to be working is setting the need_resched flag 
+> at the end of handle_tx and hande_rx.
+> This would be after data has been actually passed to the socket, so 
+> the originally blocked kworker has something to do and will profit
+> from the reschedule. 
+> It might be possible to go deeper and place the set_tsk_need_resched
+> call to the location right after actually passing the data, but this
+> might leave us with sprinkling that call in multiple places and
+> might be too intrusive.
+> Furthermore, it might be possible to check if an error occured when
+> preparing the transmission and then skip the setting of the flag.
 > 
-> Because of the dma array is allocated in the find_vqs(),
-> so I introduce a new parameter to find_vqs().
+> This would require a conceptual decision on the vhost side.
+> This solution would not touch the scheduler, only incentivise it to
+> do the right thing for this particular regression.
 > 
-> Please review.
+> Another idea could be to find the counterpart that initiates the
+> actual data transfer, which I assume wakes up the kworker. From
+> what I gather it seems to be an eventfd notification that ends up
+> somewhere in the qemu code. Not sure if that context would allow
+> to set the need_resched flag, nor whether this would be a good idea.
 > 
-> Thanks
+> > 
+> > > - On cond_resched(), verify if the consumed runtime of the caller
+> > >   is outweighing the negative lag of another process (e.g. the 
+> > >   kworker) and schedule the other process. Introduces overhead
+> > >   to cond_resched.
+> > 
+> > Or this last one.
 > 
-> Xuan Zhuo (17):
->    virtio_ring: introduce vring_need_unmap_buffer
->    virtio_ring: packed: remove double check of the unmap ops
->    virtio_ring: packed: structure the indirect desc table
->    virtio_ring: split: remove double check of the unmap ops
->    virtio_ring: split: structure the indirect desc table
->    virtio_ring: no store dma info when unmap is not needed
->    virtio: find_vqs: pass struct instead of multi parameters
->    virtio: vring_new_virtqueue(): pass struct instead of multi parameters
->    virtio_ring: reuse the parameter struct of find_vqs()
->    virtio: find_vqs: add new parameter premapped
->    virtio_ring: export premapped to driver by struct virtqueue
->    virtio_net: set premapped mode by find_vqs()
->    virtio_ring: remove api of setting vq premapped
->    virtio_ring: introduce dma map api for page
->    virtio_net: unify the code for recycling the xmit ptr
->    virtio_net: rename free_old_xmit_skbs to free_old_xmit
->    virtio_net: sq support premapped mode
+> On cond_resched itself, this will probably only be possible in a very 
+> very hacky way. That is because currently, there is no immidiate access
+> to the necessary data available, which would make it necessary to 
+> bloat up the cond_resched function quite a bit, with a probably 
+> non-negligible amount of overhead.
+> 
+> Changing other aspects in the scheduler might get us in trouble as
+> they all would probably resolve back to the question "What is the magic
+> value that determines whether a small task not being scheduled justifies
+> setting the need_resched flag for a currently running task or adjusting 
+> its lag?". As this would then also have to work for all non-vhost related
+> cases, this looks like a dangerous path to me on second thought.
+> 
+> 
+> -------- Summary --------
+> 
+> In my (non-vhost experience) opinion the way to go would be either
+> replacing the cond_resched with a hard schedule or setting the
+> need_resched flag within vhost if the a data transfer was successfully
+> initiated. It will be necessary to check if this causes problems with
+> other workloads/benchmarks.
 
-The above can not be cleanly merged into kernel 6.8-rc2.
+Yes but conceptually I am still in the dark on whether the fact that
+periodically invoking cond_resched is no longer sufficient to be nice to
+others is a bug, or intentional.  So you feel it is intentional?
+I propose a two patch series then:
 
-Perhaps a base-commit is needed. About base-commit, please see the link
-https://people.kernel.org/monsieuricon/all-patches-must-include-base-commit-info
+patch 1: in this text in Documentation/kernel-hacking/hacking.rst
 
-Zhu Yanjun
+If you're doing longer computations: first think userspace. If you
+**really** want to do it in kernel you should regularly check if you need
+to give up the CPU (remember there is cooperative multitasking per CPU).
+Idiom::
 
-> 
->   arch/um/drivers/virtio_uml.c             |  29 +-
->   drivers/net/virtio_net.c                 | 298 +++++++---
->   drivers/platform/mellanox/mlxbf-tmfifo.c |  24 +-
->   drivers/remoteproc/remoteproc_virtio.c   |  31 +-
->   drivers/s390/virtio/virtio_ccw.c         |  33 +-
->   drivers/virtio/virtio_mmio.c             |  30 +-
->   drivers/virtio/virtio_pci_common.c       |  59 +-
->   drivers/virtio/virtio_pci_common.h       |   9 +-
->   drivers/virtio/virtio_pci_legacy.c       |  16 +-
->   drivers/virtio/virtio_pci_modern.c       |  24 +-
->   drivers/virtio/virtio_ring.c             | 660 ++++++++++++-----------
->   drivers/virtio/virtio_vdpa.c             |  33 +-
->   include/linux/virtio.h                   |  10 +-
->   include/linux/virtio_config.h            |  48 +-
->   include/linux/virtio_ring.h              |  82 +--
->   tools/virtio/virtio_test.c               |   4 +-
->   tools/virtio/vringh_test.c               |  32 +-
->   17 files changed, 812 insertions(+), 610 deletions(-)
-> 
-> --
-> 2.32.0.3.g01195cf9f
-> 
+    cond_resched(); /* Will sleep */
+
+
+replace cond_resched -> schedule
+
+
+Since apparently cond_resched is no longer sufficient to
+make the scheduler check whether you need to give up the CPU.
+
+patch 2: make this change for vhost.
+
+WDYT?
+
+-- 
+MST
 
 
