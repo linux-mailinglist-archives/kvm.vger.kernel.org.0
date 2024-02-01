@@ -1,200 +1,113 @@
-Return-Path: <kvm+bounces-7660-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7661-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF770844FB7
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 04:28:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD574844FC1
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 04:30:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF94C1C25239
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 03:28:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 68A3F1F267DB
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 03:30:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5DBD3B19E;
-	Thu,  1 Feb 2024 03:28:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="WU+IEHii"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E777C3AC34;
+	Thu,  1 Feb 2024 03:30:16 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A21E3A8C2;
-	Thu,  1 Feb 2024 03:28:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD7EA3A8C5;
+	Thu,  1 Feb 2024 03:30:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706758109; cv=none; b=nICSBk9SOze5I5+VCpqb9mHT1CuF9YBGGH9ZALACxvVnF9K9qryDr8fJ/sTun0VM89MpJlv2WLfs0qDzjQu6bdpgczxZ1dHkyvm4x1oVAFJfoFioV8yznZ+XJ0OKideHWDyDSROgzDZbvuU27vx4HX36eow7HmfEbdbrGhSfZKM=
+	t=1706758216; cv=none; b=YdgKtrcLVvI7UKC2t4a5HYuS3rvk73jHiUgpUnTbVXL84hAnHGcvRE3u/THtj+1InA/iorg56hz2hJkJ0EdK+vwccw4TC8XF1HW3xnnACpBECFHweYusSVrpWg7/bwbpR27vmxf21rOEZkISMVMr0CZAzSWjKeEmSHsOVImXTnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706758109; c=relaxed/simple;
-	bh=19F4hBJvqDWepo7c7foZ8C/PBfer0yZOd17lJx6Vgmo=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
-	 Content-Type; b=FAVsSyVb26sP4Wh6uX4UZFPEgwzvh4HdSIGRtxDEef43ijFSwpKM+2aJrvBP1sze8wLO7oY2wqvB2RLH8JGOO4JcC+/H1tXp9SYYKhAKLgtAgUNgRsRIXkR0mjlSt0gmL8XH6RLFrzQU1I2mmd74I/vTCuB/XoODjgd9rFihl78=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=WU+IEHii; arc=none smtp.client-ip=115.124.30.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1706758103; h=Message-ID:Subject:Date:From:To:Content-Type;
-	bh=Rizqv7gNwAJ86f3D7E8G85LNpNZ3ICAQbtSLpFYlUOE=;
-	b=WU+IEHiiAFUCLsBebmcrJSCOGQ6IajD+c5xEXBLEp9ImB67PkBLDWYJVazDBqc3yFJYWUslxPznItrjr6J9oZJqRHSrKBgzNONMsM27DIi5RUhScaFp+W480Vd2PzdGmm0wJC2XTTuYq/Kut3UOOwbYnId6QW0D2iidbujOpBxE=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R801e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=36;SR=0;TI=SMTPD_---0W.lzK49_1706758100;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W.lzK49_1706758100)
-          by smtp.aliyun-inc.com;
-          Thu, 01 Feb 2024 11:28:21 +0800
-Message-ID: <1706757660.3554723-2-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH vhost 17/17] virtio_net: sq support premapped mode
-Date: Thu, 1 Feb 2024 11:21:00 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: virtualization@lists.linux.dev,
- Richard Weinberger <richard@nod.at>,
- Anton Ivanov <anton.ivanov@cambridgegreys.com>,
- Johannes Berg <johannes@sipsolutions.net>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Hans de Goede <hdegoede@redhat.com>,
- =?utf-8?q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- Vadim Pasternak <vadimp@nvidia.com>,
- Bjorn Andersson <andersson@kernel.org>,
- Mathieu Poirier <mathieu.poirier@linaro.org>,
- Cornelia Huck <cohuck@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Eric Farman <farman@linux.ibm.com>,
- Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Benjamin Berg <benjamin.berg@intel.com>,
- Yang Li <yang.lee@linux.alibaba.com>,
- linux-um@lists.infradead.org,
- netdev@vger.kernel.org,
- platform-driver-x86@vger.kernel.org,
- linux-remoteproc@vger.kernel.org,
- linux-s390@vger.kernel.org,
- kvm@vger.kernel.org,
- bpf@vger.kernel.org
-References: <20240130114224.86536-1-xuanzhuo@linux.alibaba.com>
- <20240130114224.86536-18-xuanzhuo@linux.alibaba.com>
- <CACGkMEv2cyuesaTx899hwZt7uDdqwmAwXJ8fZDv00W9FbVbTpw@mail.gmail.com>
-In-Reply-To: <CACGkMEv2cyuesaTx899hwZt7uDdqwmAwXJ8fZDv00W9FbVbTpw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1706758216; c=relaxed/simple;
+	bh=9uBM/8fJawcJ3y/dAPR6vQeEhlmYRiH/RTb/Lg63Fxg=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=O21879v0IbjcNC9sOElcexJ8SqBpJkUcFt7eWo9UE1F+X6uv9mTmaO2B68TvfNrvqD2UU2UDoXDBlKiRXfXmAxMCU1akvfSU18mipAj+YCqOrG4l4k0rHctAE4CM81Xa4gYQItixF52vYM4foICdgVXpWAN7QELa5/+vqcZnGwc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.183])
+	by gateway (Coremail) with SMTP id _____8BxefBEELtlFlYJAA--.28279S3;
+	Thu, 01 Feb 2024 11:30:12 +0800 (CST)
+Received: from [10.20.42.183] (unknown [10.20.42.183])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8Dxfs1DELtlZEYrAA--.33789S3;
+	Thu, 01 Feb 2024 11:30:11 +0800 (CST)
+Subject: Re: [PATCH] LoongArch: KVM: Remove unnecessary CSR register saving
+ during enter guest
+To: maobibo <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>
+Cc: kvm@vger.kernel.org, loongarch@lists.linux.dev,
+ linux-kernel@vger.kernel.org
+References: <20240112035039.833974-1-maobibo@loongson.cn>
+ <b7c08e0d-bd7d-aea9-250e-1649e95599b7@loongson.cn>
+From: zhaotianrui <zhaotianrui@loongson.cn>
+Message-ID: <fbd8b226-1972-322b-d884-bb41d262dd16@loongson.cn>
+Date: Thu, 1 Feb 2024 11:29:12 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <b7c08e0d-bd7d-aea9-250e-1649e95599b7@loongson.cn>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8Dxfs1DELtlZEYrAA--.33789S3
+X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
+X-Coremail-Antispam: 1Uk129KBj93XoW7Cw1xtr4rtF1DGr1xury8WFX_yoW8JFyUpF
+	97AF1vyFW5urn7ArWDKas8WryUJ347K3Z5WFyUJFy5Gr45Zry0gr1UXFn2gF1UZw48Jr18
+	uF1UJrnavFWUA3XCm3ZEXasCq-sJn29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUvIb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r106r15M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAF
+	wI0_Gr1j6F4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYIkI8VC2zVCFFI
+	0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280
+	aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2
+	xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAq
+	x4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r
+	1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF
+	7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxV
+	WUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07UR
+	a0PUUUUU=
 
-On Wed, 31 Jan 2024 17:12:47 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> On Tue, Jan 30, 2024 at 7:43=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba=
-.com> wrote:
-> >
-> > If the xsk is enabling, the xsk tx will share the send queue.
-> > But the xsk requires that the send queue use the premapped mode.
-> > So the send queue must support premapped mode.
-> >
-> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > ---
-> >  drivers/net/virtio_net.c | 167 ++++++++++++++++++++++++++++++++++++++-
-> >  1 file changed, 163 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > index 226ab830870e..cf0c67380b07 100644
-> > --- a/drivers/net/virtio_net.c
-> > +++ b/drivers/net/virtio_net.c
-> > @@ -46,6 +46,7 @@ module_param(napi_tx, bool, 0644);
-> >  #define VIRTIO_XDP_REDIR       BIT(1)
-> >
-> >  #define VIRTIO_XDP_FLAG        BIT(0)
-> > +#define VIRTIO_DMA_FLAG        BIT(1)
-> >
-> >  /* RX packet size EWMA. The average packet size is used to determine t=
-he packet
-> >   * buffer size when refilling RX rings. As the entire RX ring may be r=
-efilled
-> > @@ -140,6 +141,21 @@ struct virtnet_rq_dma {
-> >         u16 need_sync;
-> >  };
-> >
-> > +struct virtnet_sq_dma {
-> > +       union {
-> > +               struct virtnet_sq_dma *next;
-> > +               void *data;
-> > +       };
-> > +       dma_addr_t addr;
-> > +       u32 len;
-> > +       bool is_tail;
-> > +};
-> > +
-> > +struct virtnet_sq_dma_head {
-> > +       struct virtnet_sq_dma *free;
-> > +       struct virtnet_sq_dma *head;
->=20
-> Any reason the head must be a pointer instead of a simple index?
+Reviewed-by: Tianrui Zhao <zhaotianrui@loongson.cn>
 
+在 2024/1/31 上午11:48, maobibo 写道:
+> slightly ping :)
+> 
+> On 2024/1/12 上午11:50, Bibo Mao wrote:
+>> Some CSR registers like CRMD/PRMD are saved during enter VM mode. However
+>> they are not restored for actual use, saving for these CSR registers
+>> can be removed.
+>>
+>> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+>> ---
+>>   arch/loongarch/kvm/switch.S | 6 ------
+>>   1 file changed, 6 deletions(-)
+>>
+>> diff --git a/arch/loongarch/kvm/switch.S b/arch/loongarch/kvm/switch.S
+>> index 0ed9040307b7..905b90de50e8 100644
+>> --- a/arch/loongarch/kvm/switch.S
+>> +++ b/arch/loongarch/kvm/switch.S
+>> @@ -213,12 +213,6 @@ SYM_FUNC_START(kvm_enter_guest)
+>>       /* Save host GPRs */
+>>       kvm_save_host_gpr a2
+>> -    /* Save host CRMD, PRMD to stack */
+>> -    csrrd    a3, LOONGARCH_CSR_CRMD
+>> -    st.d    a3, a2, PT_CRMD
+>> -    csrrd    a3, LOONGARCH_CSR_PRMD
+>> -    st.d    a3, a2, PT_PRMD
+>> -
+>>       addi.d    a2, a1, KVM_VCPU_ARCH
+>>       st.d    sp, a2, KVM_ARCH_HSP
+>>       st.d    tp, a2, KVM_ARCH_HTP
+>>
+>> base-commit: de927f6c0b07d9e698416c5b287c521b07694cac
+>>
 
-The head is used for kfree.
-Maybe I need to rename it.
-
-About the index(next) of the virtnet_sq_dma.
-If we use the index, the struct will be:
-
-struct virtnet_sq_dma {
-       dma_addr_t addr;
-       u32 len;
-
-       u32 next;
-       void *data
-};
-
-The size of virtnet_sq_dma is same.=20
-
-
->=20
-> > +};
-> > +
-> >  /* Internal representation of a send virtqueue */
-> >  struct send_queue {
-> >         /* Virtqueue associated with this send _queue */
-> > @@ -159,6 +175,8 @@ struct send_queue {
-> >
-> >         /* Record whether sq is in reset state. */
-> >         bool reset;
-> > +
-> > +       struct virtnet_sq_dma_head dmainfo;
-> >  };
-> >
-
-....
-
-> > +
-> > +static int virtnet_sq_init_dma_mate(struct send_queue *sq)
-> > +{
-> > +       struct virtnet_sq_dma *d;
-> > +       int size, i;
-> > +
-> > +       size =3D virtqueue_get_vring_size(sq->vq);
-> > +
-> > +       size +=3D MAX_SKB_FRAGS + 2;
->=20
-> Is this enough for the case where an indirect descriptor is used?
-
-
-This is for the case, when the ring is full, the xmit_skb is called.
-
-I will add comment.
-
-Thanks.
-
-
->=20
-> Thanks
->=20
 
