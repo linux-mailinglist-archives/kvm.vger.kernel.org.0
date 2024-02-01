@@ -1,142 +1,171 @@
-Return-Path: <kvm+bounces-7741-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7738-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 784B2845C85
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 17:10:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3869B845C62
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 17:01:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 594DF1C226B1
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 16:10:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8B86295982
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 16:01:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E606626CD;
-	Thu,  1 Feb 2024 16:10:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 850B515A485;
+	Thu,  1 Feb 2024 15:57:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="w9ugbW94"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iO7nvVrr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A6AF626B1
-	for <kvm@vger.kernel.org>; Thu,  1 Feb 2024 16:09:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34BC85F47B
+	for <kvm@vger.kernel.org>; Thu,  1 Feb 2024 15:57:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706803799; cv=none; b=egdk6drtjtH288+AyxUiVYetEb0Bch6w32L7T4KMElJ2NOhRAngU/0Crf/0krLDVuSmHWMQU0wVrINoEMcj/6w+jB+hdj4MJEGSPZUeW8BY3d3ImNztLw8pxuT4pGkk5tPW9MfPi5dKSBNn6LtVatHRCVAeGPUhvHRJuaVRkIYc=
+	t=1706803054; cv=none; b=NXJPLMMW5xcnbaAmJgGRu+f9+iozICAXuGcsBew3VN6QUOjyHvBCCP/Q/j5acKIPXQX/ZWDM5s44XNrHf/hdeBeHcBYko8WNX3u8uMfoj1s65LdVmHX0seHoEFy/G7vdb6cx+ajeONIA/+NHa3l4WWSbtmaCIKL9eZD8hAlCsLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706803799; c=relaxed/simple;
-	bh=7CSEMHGFIzUqMuP3BxvtQKRgmSmzo+WkEAQHpp7aqbQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=qIdssOmJd8T0On1ThdoFH4/yf7k2jsqXzfArTddaJ2WAa4fBPWQL6AusPQfZELl+FwqvY7brfNCSGv2SkWXpNxnGI8wxLPwhWVX8ePk2ONNjsTL8iypJF0otcEZd6VzPEmIW05y1Ch7pO4iyYbfe4Lp+adMxjBINSq+nV1ELqDs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=w9ugbW94; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc6b269b172so2768143276.1
-        for <kvm@vger.kernel.org>; Thu, 01 Feb 2024 08:09:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706803797; x=1707408597; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5D6A9MAokm1eQJhhhCS/vvtEFg3NRQqyUoXU7zcFXbM=;
-        b=w9ugbW94r3ibq1Lk0LU0PTF5uNEdZxjvxlF44n2EMnYnDmououZ6nZeRzen4ts2rt2
-         snd9BLVDYOpS1wPSuCHAWoGxUxqT83IUj7ZMMG2W6VtAJp47VioFA51L2FB6z/VxzHd4
-         mB9IOYBRH7aGgKwooQhEGe9BBWc/bkQK4WQSYZXI6avq8pVyQAM1dHdJnOqfFISWBMLt
-         zgWzlC5Ln2YGSu3f6rSnG0IUhJ80/kPx8EuDIOAjwMPlH+COedCLxC03lm6SZYA8Mjc5
-         vGddH0UrdMIrmsRMPSoQhIvcx/7sZ1hDdEbokXPzVxnjuWmgpTemxaiFt3sW7d0NiYSg
-         bieA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706803797; x=1707408597;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=5D6A9MAokm1eQJhhhCS/vvtEFg3NRQqyUoXU7zcFXbM=;
-        b=Z7PGNHLjlbQlYGUo+jGVmBEQti8idNRg1Yc9KLYFrDkz/BuVX40Xmhl74zqQlRH+EP
-         6N+mwNOoNt0x5qYxWQckGfUvP5tm4gDNPtVTE8YumFu9uFkcsc8r2/aVhqUwK2p6Gn51
-         awD2Fac107LJp/IKngWbAjbNRQw/48H5XfexJJ/cnG0s/0xHychGoSHKRZ8/45V7aVB5
-         b7o0uVK/dxjgt5B3yZwXeebG8j7NyDSfrf2O2AphUsofa4eXl0erCJq855pXkYZJV4qS
-         e2EiP3NhfkRTm7QFbqdwflNNfWtOl12yaq6uMULczhmRPaovHWpl8Jag2PHsb+2SK3Wp
-         L+4w==
-X-Gm-Message-State: AOJu0YxCbgPHeBeXZeYqHA0PoE5Z9m6WqBKDH3IhxZJRTrvtcW6UtBIP
-	/IQ4yWthcij9gi57h0NTo1WVROs7Bov/TItMaBPx+e+t3wz3GLCZt4YSo4AvjTMSAYuSufZY+Q6
-	xRQ==
-X-Google-Smtp-Source: AGHT+IH+OpGONSjXILl9u3ckR2DfQpvHTkdIoYM8QZCypQrXj2y1qc/DOfkdyz811+61uoLrP/+1GQZPrKY=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:2404:b0:dc2:51f6:9168 with SMTP id
- dr4-20020a056902240400b00dc251f69168mr1296460ybb.2.1706803797347; Thu, 01 Feb
- 2024 08:09:57 -0800 (PST)
-Date: Thu, 1 Feb 2024 08:09:55 -0800
-In-Reply-To: <CAF7b7mrA3rB33sUZe3HX33+fXpF=8VwD284LpCcEn9KT9OgwUQ@mail.gmail.com>
+	s=arc-20240116; t=1706803054; c=relaxed/simple;
+	bh=h1q4KvAJn4CIoLG3naX5sp1wYlxPpERj17PvK1eyhmQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PBbGOCq6bOHaG51ULEpD2NnNvNnb8LtRAQjzGo56a/FDigJYuG76WuS2nLND1fh/e8yjrtqQTtNr7wnSh2eXcjkFPojftWv+mF7CNArUCXUeyCDpcG53p2SZd6OjCoGIoDHNS1MNP1qBUshw2CFphYbGEJVIS8RhrQkL7qAbLz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iO7nvVrr; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706803053; x=1738339053;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=h1q4KvAJn4CIoLG3naX5sp1wYlxPpERj17PvK1eyhmQ=;
+  b=iO7nvVrrg0hsfCaDOUkcEdQW+UbMSI+eV0Siryd8Q6uYREWis1K8ROoT
+   I/MY0pkPFfDwwl3cTbRfF7Aly/yAFbCcF1e1GyM40AkLIWSlxHA3e2mcr
+   JDittyr4aznBWIPqRG0BmU9xVEFEUJOPLdYV55V7X5SfcBaE0uWMwBRxo
+   H9Fu6WZA04XzJVt8rHk7M3y81azKCG8LJEBAR3M8l0TlrB9fiHRGxomTJ
+   Nw8s1v0t+uhwtyWst5fHPjb6pfoTbuijDGZnADwURZJs8su5du16vqyKU
+   rD2Map7mxqIoPsEY0w2Ikp1wR3QoWKrE01xpSmQ2Vl1hVlXmawzawLqfC
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="3792438"
+X-IronPort-AV: E=Sophos;i="6.05,234,1701158400"; 
+   d="scan'208";a="3792438"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2024 07:57:32 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,234,1701158400"; 
+   d="scan'208";a="4440963"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
+  by fmviesa003.fm.intel.com with ESMTP; 01 Feb 2024 07:57:28 -0800
+Date: Fri, 2 Feb 2024 00:10:58 +0800
+From: Zhao Liu <zhao1.liu@linux.intel.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: Eduardo Habkost <eduardo@habkost.net>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+	Yanan Wang <wangyanan55@huawei.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Eric Blake <eblake@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
+	kvm@vger.kernel.org, Babu Moger <babu.moger@amd.com>,
+	Xiaoyao Li <xiaoyao.li@intel.com>,
+	Zhenyu Wang <zhenyu.z.wang@intel.com>,
+	Zhuocheng Ding <zhuocheng.ding@intel.com>,
+	Yongwei Ma <yongwei.ma@intel.com>, Zhao Liu <zhao1.liu@intel.com>
+Subject: Re: [PATCH v8 00/21] Introduce smp.modules for x86 in QEMU
+Message-ID: <ZbvCktGZFj4v3I/P@intel.com>
+References: <20240131101350.109512-1-zhao1.liu@linux.intel.com>
+ <Zbog2vDrrWFbujrs@redhat.com>
+ <ZbsInI6Z66edm3eH@intel.com>
+ <ZbtirK-orqCb5sba@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231109210325.3806151-1-amoorthy@google.com> <20231109210325.3806151-7-amoorthy@google.com>
- <CADrL8HWYKSiDZ_ahGbMXjup=r75B4JqC3LvT8A-qPVenV+MOiw@mail.gmail.com> <CAF7b7mrA3rB33sUZe3HX33+fXpF=8VwD284LpCcEn9KT9OgwUQ@mail.gmail.com>
-Message-ID: <ZbvCU5wPAnePJZtI@google.com>
-Subject: Re: [PATCH v6 06/14] KVM: Add memslot flag to let userspace force an
- exit on missing hva mappings
-From: Sean Christopherson <seanjc@google.com>
-To: Anish Moorthy <amoorthy@google.com>
-Cc: James Houghton <jthoughton@google.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	oliver.upton@linux.dev, pbonzini@redhat.com, maz@kernel.org, 
-	robert.hoo.linux@gmail.com, dmatlack@google.com, axelrasmussen@google.com, 
-	peterx@redhat.com, nadav.amit@gmail.com, isaku.yamahata@gmail.com, 
-	kconsul@linux.vnet.ibm.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZbtirK-orqCb5sba@redhat.com>
 
-On Wed, Jan 31, 2024, Anish Moorthy wrote:
-> On Tue, Jan 30, 2024 at 4:26=E2=80=AFPM James Houghton <jthoughton@google=
-.com> wrote:
-> >
-> > Feel free to add:
-> >
-> > Reviewed-by: James Houghton <jthoughton@google.com>
->=20
-> > If we include KVM_MEM_GUEST_MEMFD here, we should point the reader to
-> > KVM_SET_USER_MEMORY_REGION2 and explain that using
-> > KVM_SET_USER_MEMORY_REGION with this flag will always fail.
->=20
-> Done and done (I've split the guest memfd doc update off into its own
-> commit too).
->=20
-> > > @@ -3070,6 +3074,15 @@ kvm_pfn_t __gfn_to_pfn_memslot(const struct kv=
-m_memory_slot *slot, gfn_t gfn,
-> > >                 writable =3D NULL;
-> > >         }
-> > >
-> > > +       if (!atomic && can_exit_on_missing
-> > > +           && kvm_is_slot_exit_on_missing(slot)) {
+Hi Daniel,
 
-Operators go on the preceding line:
+On Thu, Feb 01, 2024 at 09:21:48AM +0000, Daniel P. Berrangé wrote:
+> Date: Thu, 1 Feb 2024 09:21:48 +0000
+> From: "Daniel P. Berrangé" <berrange@redhat.com>
+> Subject: Re: [PATCH v8 00/21] Introduce smp.modules for x86 in QEMU
+> 
+> On Thu, Feb 01, 2024 at 10:57:32AM +0800, Zhao Liu wrote:
+> > Hi Daniel,
+> > 
+> > On Wed, Jan 31, 2024 at 10:28:42AM +0000, Daniel P. Berrangé wrote:
+> > > Date: Wed, 31 Jan 2024 10:28:42 +0000
+> > > From: "Daniel P. Berrangé" <berrange@redhat.com>
+> > > Subject: Re: [PATCH v8 00/21] Introduce smp.modules for x86 in QEMU
+> > > 
+> > > On Wed, Jan 31, 2024 at 06:13:29PM +0800, Zhao Liu wrote:
+> > > > From: Zhao Liu <zhao1.liu@intel.com>
+> > 
+> > [snip]
+> > 
+> > > > However, after digging deeper into the description and use cases of
+> > > > cluster in the device tree [3], I realized that the essential
+> > > > difference between clusters and modules is that cluster is an extremely
+> > > > abstract concept:
+> > > >   * Cluster supports nesting though currently QEMU doesn't support
+> > > >     nested cluster topology. However, modules will not support nesting.
+> > > >   * Also due to nesting, there is great flexibility in sharing resources
+> > > >     on clusters, rather than narrowing cluster down to sharing L2 (and
+> > > >     L3 tags) as the lowest topology level that contains cores.
+> > > >   * Flexible nesting of cluster allows it to correspond to any level
+> > > >     between the x86 package and core.
+> > > > 
+> > > > Based on the above considerations, and in order to eliminate the naming
+> > > > confusion caused by the mapping between general cluster and x86 module
+> > > > in v7, we now formally introduce smp.modules as the new topology level.
+> > > 
+> > > What is the Linux kernel calling this topology level on x86 ?
+> > > It will be pretty unfortunate if Linux and QEMU end up with
+> > > different names for the same topology level.
+> > > 
+> > 
+> > Now Intel's engineers in the Linux kernel are starting to use "module"
+> > to refer to this layer of topology [4] to avoid confusion, where
+> > previously the scheduler developers referred to the share L2 hierarchy
+> > collectively as "cluster".
+> > 
+> > Looking at it this way, it makes more sense for QEMU to use the
+> > "module" for x86.
+> 
+> I was thinking specificially about what Linux calls this topology when
+> exposing it in sysfs and /proc/cpuinfo. AFAICT, it looks like it is
+> called 'clusters' in this context, and so this is the terminology that
+> applications and users are going to expect.
 
-	if (!atomic && can_exit_on_missing &&
-	    kvm_is_slot_exit_on_missing(slot))
+The cluster related topology information under "/sys/devices/system/cpu/
+cpu*/topology" indicates the L2 cache topology (CPUID[0x4]), not module
+level CPU topology (CPUID[0x1f]).
 
-> > > +               atomic =3D true;
-> > > +               if (async) {
-> > > +                       *async =3D false;
-> > > +                       async =3D NULL;
-> > > +               }
-> > > +       }
-> > > +
-> >
-> > Perhaps we should have a comment for this? Maybe something like: "If
-> > we want to exit-on-missing, we want to bail out if fast GUP fails, and
-> > we do not want to go into slow GUP. Setting atomic=3Dtrue does exactly
-> > this."
->=20
-> I was going to push back on the use of "we" but I see that it's all
-> over kvm_main.c :).
+So far, kernel hasn't exposed module topology related sysfs. But we will
+add new "module" related information in sysfs. The relevant patches are
+ready internally, but not posted yet.
 
-Ignore the ancient art, push back.  The KVM code base is 15 years old at th=
-is
-point.  A _lot_ of has changed in 15 years.  The fact that KVM has existing=
- code
-that's in violation of current standards doesn't justify ignoring the stand=
-ards
-when adding new code.
+In the future, we will use "module" in sysfs to indicate module level CPU
+topology, and "cluster" will be only used to refer to the l2 cache domain
+as it is now.
+
+> 
+> I think it would be a bad idea for QEMU to diverge from this and call
+> it modules.
+>
+
+This patch set mainly tries to configure the module level CPU topology
+for Guest, which will be aligned with the future module information in
+the sysfs, so that it doesn't violate the kernel x86 arch's definition
+or current end users' expectation for x86's cluster.
+
+Thanks,
+Zhao
+
 
