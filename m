@@ -1,284 +1,289 @@
-Return-Path: <kvm+bounces-7669-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7670-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F77F845148
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 07:16:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C92B184519A
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 07:48:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 586D41C26A06
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 06:16:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F3EC3B255B6
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 06:48:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2CC0651A2;
-	Thu,  1 Feb 2024 06:16:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEB961586CD;
+	Thu,  1 Feb 2024 06:48:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HHVbXHYz"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="RpNvQwqg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 614D65FB9C;
-	Thu,  1 Feb 2024 06:16:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.134.136.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ACDA2B9D1;
+	Thu,  1 Feb 2024 06:48:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706768189; cv=none; b=uHjaCKHjfy6ZxbNOBVD6SbRUxEsOLxMzeko4+DKLMOGXFX5pJZCuV7PHNcWDZY/5qKv2fHHUf1ro+h/OVLldV4/rCAQNJlC+j+Aymy9W4MYzNP/Jng7VGgaFl1yAp1ZsPKaHLttG4WH4Z4zSjKxFuvjfmmAZnnR9PiiNFJmfJQo=
+	t=1706770099; cv=none; b=qrzPLID90LjgcM1YJqR7gInocdjnBqLoenrOukG1MRBRmHN/TbS+2RH0RRuIktElPTbHPcrWzgHHk6fjAraHOQ91NVNXJ47QChDf0dfz0yf7OozNJIAQFjQ2L9cZqmryCwPpgMfuTCPaKXv/JTRbIqjIXnh7b7ISjzYgoKw/e7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706768189; c=relaxed/simple;
-	bh=/CJW5+f/hsgH8Yfkf9jmrhy26uWv39fxhjkF6NFeymk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i0S613SGzvvpyp1yIxRYRiWROg+cZ9OPH9dVNcWWAiKpUn/fzPETXfi1leMeEufjYgw9ibqhUwYTEOETH7qWVfPaCJKP9wnvONXGrKAG9KNquXaJ5rpL9z4PTU4bXrLdgegQM08BOBxiiVB7Ixc2BBkvC/fLujaQ95M71lKjygc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HHVbXHYz; arc=none smtp.client-ip=134.134.136.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706768187; x=1738304187;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=/CJW5+f/hsgH8Yfkf9jmrhy26uWv39fxhjkF6NFeymk=;
-  b=HHVbXHYzJv7Wu64wkK6JvuK3cmrvmrBIwV3HpdHYGCKEvIZCXCLAYmlD
-   pJeESNn+oqfgywjIUzkIUq9JCAtWPzj6ePrXAuYZ5ahEFUvIckG5jsaLf
-   6buXAsvTfBEpmEZXDAThK2ud4XUiIYjJ5tEhwviOAy498F2oW2gMYyVMK
-   0oTRzIb3bYbDJq3LWLTMwEZvSmC4N5BTyBLdk+sQrOQaKCnVuhKlisizw
-   aa0cJw29btrntW7RUxymByKSJjERTsNp29qHR+aa/Jz4JLwrEP3E/79BF
-   skqTQF1ZgMHKWMo8EJiKP9+y76uE2kF2+JF/ia+GUxTJwyAawf9Kg9MfJ
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="394266941"
-X-IronPort-AV: E=Sophos;i="6.05,234,1701158400"; 
-   d="scan'208";a="394266941"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2024 22:16:26 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,234,1701158400"; 
-   d="scan'208";a="4324644"
-Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
-  by fmviesa003.fm.intel.com with ESMTP; 31 Jan 2024 22:16:22 -0800
-Date: Thu, 1 Feb 2024 14:16:22 +0800
-From: Yuan Yao <yuan.yao@linux.intel.com>
-To: Binbin Wu <binbin.wu@linux.intel.com>
-Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
-	Sean Christopherson <seanjc@google.com>,
-	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
-	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com
-Subject: Re: [PATCH v18 023/121] KVM: TDX: Make KVM_CAP_MAX_VCPUS backend
- specific
-Message-ID: <20240201061622.hvun7amakvbplmsb@yy-desk-7060>
-References: <cover.1705965634.git.isaku.yamahata@intel.com>
- <ed33ebe29b231e8e657cd610a983fa603b10f530.1705965634.git.isaku.yamahata@intel.com>
- <7cc28677-f7d1-4aba-8557-66c685115074@linux.intel.com>
+	s=arc-20240116; t=1706770099; c=relaxed/simple;
+	bh=/IVd0rrF2KtB3FVvceo+CBZZI6gkOZlP17o00V0cGH0=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
+	 Content-Type; b=HQpNwXGMCpGy4Yj9edVJdN2qWV8qVCFOY/XQuiOF9pNNFvmDtpRdHC/qz4/4VesalnXHyh9Et1BQJ7DMvHNwTFos+XGICVpEjnAvQyUZDEtw4EmNrl13q5jUgZpvjhv7HwNYJ/svCc4X2er+FfH+R68Wq1HO0vYD41Su+eBXF9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=RpNvQwqg; arc=none smtp.client-ip=115.124.30.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1706770092; h=Message-ID:Subject:Date:From:To:Content-Type;
+	bh=TWr1CQEd6xDFjrk3l/xQeYg2YrwKV9kMpWG3h49S4As=;
+	b=RpNvQwqgUfd72kbGTTKiD7twUlcwT+90WNVJuZqk9kV6hNiZwQglR/iDryXfWiX47nsLiHXtabYqu8LXpD6WKaVPbk/9sV5fscoFkqZM6blJKhAkvP3EfoXWeGQePnq01X4kt8r3P+vGpjvfEBMvD0HaawNFfqTOh9Z6KJNgM/Y=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=36;SR=0;TI=SMTPD_---0W.pYjzd_1706770089;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W.pYjzd_1706770089)
+          by smtp.aliyun-inc.com;
+          Thu, 01 Feb 2024 14:48:10 +0800
+Message-ID: <1706769826.0586398-4-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH vhost 04/17] virtio_ring: split: remove double check of the unmap ops
+Date: Thu, 1 Feb 2024 14:43:46 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: virtualization@lists.linux.dev,
+ Richard Weinberger <richard@nod.at>,
+ Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+ Johannes Berg <johannes@sipsolutions.net>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Hans de Goede <hdegoede@redhat.com>,
+ =?utf-8?q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+ Vadim Pasternak <vadimp@nvidia.com>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Mathieu Poirier <mathieu.poirier@linaro.org>,
+ Cornelia Huck <cohuck@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Eric Farman <farman@linux.ibm.com>,
+ Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Benjamin Berg <benjamin.berg@intel.com>,
+ Yang Li <yang.lee@linux.alibaba.com>,
+ linux-um@lists.infradead.org,
+ netdev@vger.kernel.org,
+ platform-driver-x86@vger.kernel.org,
+ linux-remoteproc@vger.kernel.org,
+ linux-s390@vger.kernel.org,
+ kvm@vger.kernel.org,
+ bpf@vger.kernel.org
+References: <20240130114224.86536-1-xuanzhuo@linux.alibaba.com>
+ <20240130114224.86536-5-xuanzhuo@linux.alibaba.com>
+ <CACGkMEs-wUa_z_tGYEwBf7EVJAtuJdkX4HAdjqMXHEM1ys-gKQ@mail.gmail.com>
+In-Reply-To: <CACGkMEs-wUa_z_tGYEwBf7EVJAtuJdkX4HAdjqMXHEM1ys-gKQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7cc28677-f7d1-4aba-8557-66c685115074@linux.intel.com>
-User-Agent: NeoMutt/20171215
 
-On Wed, Jan 24, 2024 at 09:17:15AM +0800, Binbin Wu wrote:
->
->
-> On 1/23/2024 7:52 AM, isaku.yamahata@intel.com wrote:
-> > From: Isaku Yamahata <isaku.yamahata@intel.com>
+On Wed, 31 Jan 2024 17:12:22 +0800, Jason Wang <jasowang@redhat.com> wrote:
+> On Tue, Jan 30, 2024 at 7:42=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba=
+.com> wrote:
 > >
-> > TDX has its own limitation on the maximum number of vcpus that the guest
-> > can accommodate.  Allow x86 kvm backend to implement its own KVM_ENABLE_CAP
-> > handler and implement TDX backend for KVM_CAP_MAX_VCPUS.  user space VMM,
-> > e.g. qemu, can specify its value instead of KVM_MAX_VCPUS.
-> For legacy VM, KVM just provides the interface to query the max_vcpus.
-> Why TD needs to provide a interface for userspace to set the limitation?
-> What's the scenario?
-
-I think the reason is TDH.MNG.INIT needs it:
-
-TD_PARAMS:
-    MAX_VCPUS:
-        offset: 16 bytes.
-        type: Unsigned 16b Integer.
-        size: 2.
-        Description: Maximum number of VCPUs.
-
-May better to clarify this in the commit yet.
-
->
->
+> > In the functions vring_unmap_one_split and
+> > vring_unmap_one_split_indirect,
+> > multiple checks are made whether unmap is performed and whether it is
+> > INDIRECT.
 > >
-> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> > These two functions are usually called in a loop, and we should put the
+> > check outside the loop.
+> >
+> > And we unmap the descs with VRING_DESC_F_INDIRECT on the same path with
+> > other descs, that make the thing more complex. If we distinguish the
+> > descs with VRING_DESC_F_INDIRECT before unmap, thing will be clearer.
+> >
+> > 1. only one desc of the desc table is used, we do not need the loop
+> > 2. the called unmap api is difference from the other desc
+> > 3. the vq->premapped is not needed to check
+> > 4. the vq->indirect is not needed to check
+> > 5. the state->indir_desc must not be null
+> >
+> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 > > ---
-> > v18:
-> > - use TDX instead of "x86, tdx" in subject
-> > - use min(max_vcpu, TDX_MAX_VCPU) instead of
-> >    min3(max_vcpu, KVM_MAX_VCPU, TDX_MAX_VCPU)
-> > - make "if (KVM_MAX_VCPU) and if (TDX_MAX_VCPU)" into one if statement
-> > ---
-> >   arch/x86/include/asm/kvm-x86-ops.h |  2 ++
-> >   arch/x86/include/asm/kvm_host.h    |  2 ++
-> >   arch/x86/kvm/vmx/main.c            | 22 ++++++++++++++++++++++
-> >   arch/x86/kvm/vmx/tdx.c             | 29 +++++++++++++++++++++++++++++
-> >   arch/x86/kvm/vmx/x86_ops.h         |  5 +++++
-> >   arch/x86/kvm/x86.c                 |  4 ++++
-> >   6 files changed, 64 insertions(+)
+> >  drivers/virtio/virtio_ring.c | 80 ++++++++++++++++++------------------
+> >  1 file changed, 39 insertions(+), 41 deletions(-)
 > >
-> > diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-> > index 943b21b8b106..2f976c0f3116 100644
-> > --- a/arch/x86/include/asm/kvm-x86-ops.h
-> > +++ b/arch/x86/include/asm/kvm-x86-ops.h
-> > @@ -21,6 +21,8 @@ KVM_X86_OP(hardware_unsetup)
-> >   KVM_X86_OP(has_emulated_msr)
-> >   KVM_X86_OP(vcpu_after_set_cpuid)
-> >   KVM_X86_OP(is_vm_type_supported)
-> > +KVM_X86_OP_OPTIONAL(max_vcpus);
-> > +KVM_X86_OP_OPTIONAL(vm_enable_cap)
-> >   KVM_X86_OP(vm_init)
-> >   KVM_X86_OP_OPTIONAL(vm_destroy)
-> >   KVM_X86_OP_OPTIONAL_RET0(vcpu_precreate)
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > index 26f4668b0273..db44a92e5659 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -1602,7 +1602,9 @@ struct kvm_x86_ops {
-> >   	void (*vcpu_after_set_cpuid)(struct kvm_vcpu *vcpu);
-> >   	bool (*is_vm_type_supported)(unsigned long vm_type);
-> > +	int (*max_vcpus)(struct kvm *kvm);
-> >   	unsigned int vm_size;
-> > +	int (*vm_enable_cap)(struct kvm *kvm, struct kvm_enable_cap *cap);
-> >   	int (*vm_init)(struct kvm *kvm);
-> >   	void (*vm_destroy)(struct kvm *kvm);
-> > diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-> > index 50da807d7aea..4611f305a450 100644
-> > --- a/arch/x86/kvm/vmx/main.c
-> > +++ b/arch/x86/kvm/vmx/main.c
-> > @@ -6,6 +6,7 @@
-> >   #include "nested.h"
-> >   #include "pmu.h"
-> >   #include "tdx.h"
-> > +#include "tdx_arch.h"
-> >   static bool enable_tdx __ro_after_init;
-> >   module_param_named(tdx, enable_tdx, bool, 0444);
-> > @@ -16,6 +17,17 @@ static bool vt_is_vm_type_supported(unsigned long type)
-> >   		(enable_tdx && tdx_is_vm_type_supported(type));
-> >   }
-> > +static int vt_max_vcpus(struct kvm *kvm)
-> > +{
-> > +	if (!kvm)
-> > +		return KVM_MAX_VCPUS;
+> > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+> > index dd03bc5a81fe..2b41fdbce975 100644
+> > --- a/drivers/virtio/virtio_ring.c
+> > +++ b/drivers/virtio/virtio_ring.c
+> > @@ -452,9 +452,6 @@ static void vring_unmap_one_split_indirect(const st=
+ruct vring_virtqueue *vq,
+> >  {
+> >         u16 flags;
+> >
+> > -       if (!vring_need_unmap_buffer(vq))
+> > -               return;
+> > -
+> >         flags =3D virtio16_to_cpu(vq->vq.vdev, desc->flags);
+> >
+> >         dma_unmap_page(vring_dma_dev(vq),
+> > @@ -472,27 +469,12 @@ static unsigned int vring_unmap_one_split(const s=
+truct vring_virtqueue *vq,
+> >
+> >         flags =3D extra[i].flags;
+> >
+> > -       if (flags & VRING_DESC_F_INDIRECT) {
+> > -               if (!vq->use_dma_api)
+> > -                       goto out;
+> > -
+> > -               dma_unmap_single(vring_dma_dev(vq),
+> > -                                extra[i].addr,
+> > -                                extra[i].len,
+> > -                                (flags & VRING_DESC_F_WRITE) ?
+> > -                                DMA_FROM_DEVICE : DMA_TO_DEVICE);
+> > -       } else {
+> > -               if (!vring_need_unmap_buffer(vq))
+> > -                       goto out;
+> > -
+> > -               dma_unmap_page(vring_dma_dev(vq),
+> > -                              extra[i].addr,
+> > -                              extra[i].len,
+> > -                              (flags & VRING_DESC_F_WRITE) ?
+> > -                              DMA_FROM_DEVICE : DMA_TO_DEVICE);
+> > -       }
+> > +       dma_unmap_page(vring_dma_dev(vq),
+> > +                      extra[i].addr,
+> > +                      extra[i].len,
+> > +                      (flags & VRING_DESC_F_WRITE) ?
+> > +                      DMA_FROM_DEVICE : DMA_TO_DEVICE);
+> >
+> > -out:
+> >         return extra[i].next;
+> >  }
+> >
+> > @@ -660,7 +642,7 @@ static inline int virtqueue_add_split(struct virtqu=
+eue *_vq,
+> >                         vq, desc, total_sg * sizeof(struct vring_desc),
+> >                         DMA_TO_DEVICE);
+> >                 if (vring_mapping_error(vq, addr)) {
+> > -                       if (vq->premapped)
+> > +                       if (!vring_need_unmap_buffer(vq))
+> >                                 goto free_indirect;
+> >
+> >                         goto unmap_release;
+> > @@ -713,6 +695,9 @@ static inline int virtqueue_add_split(struct virtqu=
+eue *_vq,
+> >         return 0;
+> >
+> >  unmap_release:
 > > +
-> > +	if (is_td(kvm))
-> > +		return min(kvm->max_vcpus, TDX_MAX_VCPUS);
+> > +       WARN_ON(!vring_need_unmap_buffer(vq));
 > > +
-> > +	return kvm->max_vcpus;
-> > +}
-> > +
-> >   static int vt_hardware_enable(void)
-> >   {
-> >   	int ret;
-> > @@ -54,6 +66,14 @@ static void vt_hardware_unsetup(void)
-> >   	vmx_hardware_unsetup();
-> >   }
-> > +static int vt_vm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
-> > +{
-> > +	if (is_td(kvm))
-> > +		return tdx_vm_enable_cap(kvm, cap);
-> > +
-> > +	return -EINVAL;
-> > +}
-> > +
-> >   static int vt_vm_init(struct kvm *kvm)
-> >   {
-> >   	if (is_td(kvm))
-> > @@ -91,7 +111,9 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
-> >   	.has_emulated_msr = vmx_has_emulated_msr,
-> >   	.is_vm_type_supported = vt_is_vm_type_supported,
-> > +	.max_vcpus = vt_max_vcpus,
-> >   	.vm_size = sizeof(struct kvm_vmx),
-> > +	.vm_enable_cap = vt_vm_enable_cap,
-> >   	.vm_init = vt_vm_init,
-> >   	.vm_destroy = vmx_vm_destroy,
-> > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> > index 8c463407f8a8..876ad7895b88 100644
-> > --- a/arch/x86/kvm/vmx/tdx.c
-> > +++ b/arch/x86/kvm/vmx/tdx.c
-> > @@ -100,6 +100,35 @@ struct tdx_info {
-> >   /* Info about the TDX module. */
-> >   static struct tdx_info *tdx_info;
-> > +int tdx_vm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
-> > +{
-> > +	int r;
-> > +
-> > +	switch (cap->cap) {
-> > +	case KVM_CAP_MAX_VCPUS: {
-> > +		if (cap->flags || cap->args[0] == 0)
-> > +			return -EINVAL;
-> > +		if (cap->args[0] > KVM_MAX_VCPUS ||
-> > +		    cap->args[0] > TDX_MAX_VCPUS)
-> > +			return -E2BIG;
-> > +
-> > +		mutex_lock(&kvm->lock);
-> > +		if (kvm->created_vcpus)
-> > +			r = -EBUSY;
-> > +		else {
-> > +			kvm->max_vcpus = cap->args[0];
-> > +			r = 0;
-> > +		}
-> > +		mutex_unlock(&kvm->lock);
-> > +		break;
-> > +	}
-> > +	default:
-> > +		r = -EINVAL;
-> > +		break;
-> > +	}
-> > +	return r;
-> > +}
-> > +
-> >   static int tdx_get_capabilities(struct kvm_tdx_cmd *cmd)
-> >   {
-> >   	struct kvm_tdx_capabilities __user *user_caps;
-> > diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-> > index 6e238142b1e8..3a3be66888da 100644
-> > --- a/arch/x86/kvm/vmx/x86_ops.h
-> > +++ b/arch/x86/kvm/vmx/x86_ops.h
-> > @@ -139,12 +139,17 @@ int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops);
-> >   void tdx_hardware_unsetup(void);
-> >   bool tdx_is_vm_type_supported(unsigned long type);
-> > +int tdx_vm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap);
-> >   int tdx_vm_ioctl(struct kvm *kvm, void __user *argp);
-> >   #else
-> >   static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return -EOPNOTSUPP; }
-> >   static inline void tdx_hardware_unsetup(void) {}
-> >   static inline bool tdx_is_vm_type_supported(unsigned long type) { return false; }
-> > +static inline int tdx_vm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
-> > +{
-> > +	return -EINVAL;
-> > +};
-> >   static inline int tdx_vm_ioctl(struct kvm *kvm, void __user *argp) { return -EOPNOTSUPP; }
-> >   #endif
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index dd3a23d56621..a1389ddb1b33 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -4726,6 +4726,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
-> >   		break;
-> >   	case KVM_CAP_MAX_VCPUS:
-> >   		r = KVM_MAX_VCPUS;
-> > +		if (kvm_x86_ops.max_vcpus)
-> > +			r = static_call(kvm_x86_max_vcpus)(kvm);
-> >   		break;
-> >   	case KVM_CAP_MAX_VCPU_ID:
-> >   		r = KVM_MAX_VCPU_IDS;
-> > @@ -6683,6 +6685,8 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
-> >   		break;
-> >   	default:
-> >   		r = -EINVAL;
-> > +		if (kvm_x86_ops.vm_enable_cap)
-> > +			r = static_call(kvm_x86_vm_enable_cap)(kvm, cap);
-> >   		break;
-> >   	}
-> >   	return r;
+> >         err_idx =3D i;
+> >
+> >         if (indirect)
+> > @@ -774,34 +759,42 @@ static void detach_buf_split(struct vring_virtque=
+ue *vq, unsigned int head,
+> >  {
+> >         unsigned int i, j;
+> >         __virtio16 nextflag =3D cpu_to_virtio16(vq->vq.vdev, VRING_DESC=
+_F_NEXT);
+> > +       u16 flags;
+> >
+> >         /* Clear data ptr. */
+> >         vq->split.desc_state[head].data =3D NULL;
+> > +       flags =3D vq->split.desc_extra[head].flags;
+> >
+> >         /* Put back on free list: unmap first-level descriptors and fin=
+d end */
+> >         i =3D head;
+> >
+> > -       while (vq->split.vring.desc[i].flags & nextflag) {
+> > -               vring_unmap_one_split(vq, i);
+> > -               i =3D vq->split.desc_extra[i].next;
+> > -               vq->vq.num_free++;
+> > -       }
+> > -
+> > -       vring_unmap_one_split(vq, i);
+> > -       vq->split.desc_extra[i].next =3D vq->free_head;
+> > -       vq->free_head =3D head;
+> > +       if (!(flags & VRING_DESC_F_INDIRECT)) {
 >
+> So during add we do:
+>
+>         if (!indirect && vring_need_unmap_buffer(vq))
+>                 vq->split.desc_extra[prev & (vq->split.vring.num - 1)].fl=
+ags &=3D
+>                         ~VRING_DESC_F_NEXT;
+
+
+This does not affect this patch.
+
+1. this just considers the VRING_DESC_F_NEXT of desc_extra.flags
+2. the desc_extra.flags is updated by virtqueue_add_desc_split()
+
+So for desc_extra.flags & VRING_DESC_F_INDIRECT, that is right.
+
+Thanks.
+
+
+>
+> Then using flags here unconditionally seems not reliable.
+>
+> I post a patch to store flags unconditionally at:
+>
+> https://lore.kernel.org/all/20220224122655-mutt-send-email-mst@kernel.org/
+>
+> > +               while (vq->split.vring.desc[i].flags & nextflag) {
+> > +                       if (vring_need_unmap_buffer(vq))
+> > +                               vring_unmap_one_split(vq, i);
+> > +                       i =3D vq->split.desc_extra[i].next;
+> > +                       vq->vq.num_free++;
+> > +               }
+> >
+> > -       /* Plus final descriptor */
+> > -       vq->vq.num_free++;
+> > +               if (vring_need_unmap_buffer(vq))
+> > +                       vring_unmap_one_split(vq, i);
+> >
+> > -       if (vq->indirect) {
+> > +               if (ctx)
+> > +                       *ctx =3D vq->split.desc_state[head].indir_desc;
+> > +       } else {
+> >                 struct vring_desc *indir_desc =3D
+> >                                 vq->split.desc_state[head].indir_desc;
+> >                 u32 len;
+> >
+> > -               /* Free the indirect table, if any, now that it's unmap=
+ped. */
+> > -               if (!indir_desc)
+> > -                       return;
+> > +               if (vq->use_dma_api) {
+> > +                       struct vring_desc_extra *extra =3D vq->split.de=
+sc_extra;
+> > +
+> > +                       dma_unmap_single(vring_dma_dev(vq),
+> > +                                        extra[i].addr,
+> > +                                        extra[i].len,
+> > +                                        (flags & VRING_DESC_F_WRITE) ?
+> > +                                        DMA_FROM_DEVICE : DMA_TO_DEVIC=
+E);
+> > +               }
+>
+> Note that there's a following
+>
+> BUG_ON(!(vq->split.desc_extra[head].flags &
+>                                 VRING_DESC_F_INDIRECT));
+>
+> Which I think we can remove.
+>
+> Thanks
 >
 
