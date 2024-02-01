@@ -1,90 +1,78 @@
-Return-Path: <kvm+bounces-7694-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7695-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46514845519
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 11:20:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BBC2845554
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 11:30:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 633A2B23232
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 10:20:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E71762912FB
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 10:30:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3BE215B973;
-	Thu,  1 Feb 2024 10:20:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE63D15B99D;
+	Thu,  1 Feb 2024 10:30:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QFzJNb/y"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="e3027xbY"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6644D4D9F9
-	for <kvm@vger.kernel.org>; Thu,  1 Feb 2024 10:20:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE9DF15B96E;
+	Thu,  1 Feb 2024 10:30:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706782805; cv=none; b=rPzUrdxvDl5OH8DUPnh1hq9IFb7tysblqSmPIbkuyvhLGun4zpweKP+BnVtlXmBW5zyhj9G0WuqjE923j3Co0Zaj/+Gb0jDebepux3XSqsj0YeKRWQMEWGb8aOOxBfVb8gY64nj4wtRXNDCHwyWGm1/RdyQDP8BTe41/Pbuhb8g=
+	t=1706783412; cv=none; b=R96Te8PnpHKOqAFyRAEVRSRJZf1WcHLLWSZD1RiTTi3QgASlBSSLo3d36J01zvClp+7l31GkjhidOaQ963SWV3uobsLegqP0Ofy5ecxEGU0YGOGJ6aybB92pJJIpLmsATqJvl//TIL9L/ny/iIdfJRPixoY8fQze+onzf/cL3u4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706782805; c=relaxed/simple;
-	bh=fOv7oevZuvvZsJf1C1St13HEDSFkJW2lWu0qBEAsTwc=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=fVZWuvcLjQrBIDIxo3z58/8Zx9/Sd1Rk7qK5T1ytyy9JGzpjHm9Hex06LHwUtaOF88lDTdyibbc/21BXkvprG4Npc9mN50jZopE1PX10xc4VGbj6S5hL4solkVXOBm9JKUuhM8sn8bpk/Qh59C3CFIysc8uiQ9apJDkuFJKc/Wc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QFzJNb/y; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706782802;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=v/4dNiv7Gixt65uHC5aCs29qHOR+DNKVZDoHEZy6bqM=;
-	b=QFzJNb/yFHqj0lECgOOaCuSB9d4LWnsxzi/suNWvkH7K1qbS31mriop01P0U4guOvtokwH
-	JMP9ffhzUucmRBhjoALz0BZo9GnIbFerEYjNX3kcAsfzU/NiApmTlbRR7oHzntqkbd6bou
-	4/mWQQ4B5LzHYTP8WSRlG5jGXVlZlow=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-516-w-kLKAfdMdK1wDsqdFuNuw-1; Thu, 01 Feb 2024 05:20:00 -0500
-X-MC-Unique: w-kLKAfdMdK1wDsqdFuNuw-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a357c92f241so43402666b.0
-        for <kvm@vger.kernel.org>; Thu, 01 Feb 2024 02:20:00 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706782799; x=1707387599;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=v/4dNiv7Gixt65uHC5aCs29qHOR+DNKVZDoHEZy6bqM=;
-        b=Eg5W1wBld0X7SmsYS8+IJM3K2+tb9Dw85vr9fCr2eS85GWlHeN25nW8xyVRQxtp9II
-         m7iXHu5KYZgMcN1yB+VbenfPswxntJoAJEdjrUomq82FLtVLhFbHi6A9Vq83CKwsxBqG
-         AtiSz5G2Yq4tQfGjThxDYMsyzBQha8jyYAha7dW0glYh3xfEWas4BCzJWzuWxG4Yoy8Q
-         B4MLu3TqQnSa9WOXqNp3kRRGsvi+IMjcKCBxniGoYN31pGJnYl47TpH3GiPqKfzmO1tT
-         AkRn05wOlyJQMN0XqbjeApGD7U7f/2eT6FG9/cPWOXMfuxs/dXLwnlXrX701xdDtMSqH
-         HUFg==
-X-Gm-Message-State: AOJu0Yz4+S12HEuD1JUQAKSdrQZlEcEeVRwbXcEYYTXAjxs4aYh34/0P
-	uaoFa6peNGdwxGG4hJz7Y6DL136IgII+sYlvV7ASoJxg/CPKN9ik0LwOKGDTNRmyA5iZLebn6Id
-	gnKm/a1MN8C9O8bSnCJ3Gzw+C9StR4pdu9T0kWe9FICOCTMLwww==
-X-Received: by 2002:a17:906:d10e:b0:a31:61ad:6554 with SMTP id b14-20020a170906d10e00b00a3161ad6554mr1429950ejz.69.1706782799670;
-        Thu, 01 Feb 2024 02:19:59 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF/GkhU57dioOHC7xr2O/jFX4EwaPurr5DMMYY1FG8VzQcAwtDPgonJDhdsMsmkqsVkOvrUSw==
-X-Received: by 2002:a17:906:d10e:b0:a31:61ad:6554 with SMTP id b14-20020a170906d10e00b00a3161ad6554mr1429938ejz.69.1706782799369;
-        Thu, 01 Feb 2024 02:19:59 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCXJSx1+Gy7uGkCto8Zt1KBxcUnD2ZLhWxsVkpmKm5U5+OL9zn33sGzRU7E78tS+Hy/5FlzM9yhmk9DWGTItzzIjvVv8ZeC1z+wfdQXpJcn1hHtAHafdNx0aowOBmkVezCnXw2pjZ0YHGRIJ9+v1aW9ap6nZCdmf+07dLJE/mb05zBj53vU7//jjyQ==
-Received: from fedora (g2.ign.cz. [91.219.240.8])
-        by smtp.gmail.com with ESMTPSA id ps10-20020a170906bf4a00b00a368718314dsm1232216ejb.7.2024.02.01.02.19.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Feb 2024 02:19:58 -0800 (PST)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Jan Richter <jarichte@redhat.com>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Sean
- Christopherson <seanjc@google.com>
-Subject: Re: [PATCH] KVM: selftests: Compare wall time from xen shinfo
- against KVM_GET_CLOCK
-In-Reply-To: <596b2d7ce6941e5dd6bd7b2da6d3ea7d74f6c95a.camel@infradead.org>
-References: <20240111135901.1785096-1-vkuznets@redhat.com>
- <596b2d7ce6941e5dd6bd7b2da6d3ea7d74f6c95a.camel@infradead.org>
-Date: Thu, 01 Feb 2024 11:19:57 +0100
-Message-ID: <87h6is7agi.fsf@redhat.com>
+	s=arc-20240116; t=1706783412; c=relaxed/simple;
+	bh=hkxe3RRd1kMjzW+0Bw8TfFoFkJcpMZftimo9SVEgji0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CoRTrZHxEL9Q/bV5pOl0xa3hiuUgyrGUpNy+1CZQw9z65xSANxnXXUhrfx8ZXFMiedRpt9pgSuk30ZfXTUSXKIHyP9GUyEp5PQnTeea+kALRkUZIJc9KtdFtLdqnhmEtZdOdolwCxXjrzblM7IzujRmMO/pzWV+VKQlLfktsozI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=e3027xbY; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 5956740E01A2;
+	Thu,  1 Feb 2024 10:30:07 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id EkmV47niBGgf; Thu,  1 Feb 2024 10:30:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1706783404; bh=6nY6T5PvIjKKLumCcm7k0MIRlTMiw061kXfO9W2fLyE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=e3027xbYpcXstWm2F9mg90OqQrj5jyBvIjW9RaBbGaqLTDQ6yKvgSQkEqD9A84kXm
+	 +pcr7c4AA0eShN5S3WraUbtdDMyW6F7t5IJR80FPe2Qm3g90/DS7mackk79q+picGm
+	 0I+hTYBqVmmPTRqok6W7aTQ0smfO4ob5Y68uRKY2VanRoAD4Wkze/kdH+mQDAN90nO
+	 ChmiCRlOx+Sxb1x/mecnpuVgy5GZehezm8hkz0jrN6tsk1233tq2I0zJEHOuhLnWZt
+	 NWm9+qwZe0nVAtKiM1D7OwE2rnbQRXH9/7iAbYMyM1ZxOdQkU4yjo2cX/R98DwsF6L
+	 ejyQee8Qc7Mhh9IUZ2XXn5QKlhi8S8CX5m10oGP3w5D0qduB2GxP1vZ55VZ7Bqubnk
+	 0wnFL8StTOt0tVkzOWYilR3fvcrkVPjlyZdDjeKthvJlgSV+ywnMAyOfJ5xPADBIaY
+	 EH1gq5S31uBvF2La/RnoT+WXhOD49GSXMIFkIM5sSL0/LmIq7LL7x0J178EozIeuB0
+	 HL011PaqCDQLMxgKWv9gbqWikqBaEpLoAh34E4D2eB+nVGABLu+xDRPTHDxi95PKin
+	 eC2vftIHkwjsAYscb8/lbh6+NJ0nRNk19zfjvIiYTgUQQVjG+r+l2CIAzVnojY0V3u
+	 RJY/rHFVoJqhFphXl7P5Py64=
+Received: from zn.tnic (pd953033e.dip0.t-ipconnect.de [217.83.3.62])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 08AE740E00B2;
+	Thu,  1 Feb 2024 10:29:52 +0000 (UTC)
+Date: Thu, 1 Feb 2024 11:29:46 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: "Nikunj A. Dadhania" <nikunj@amd.com>
+Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org,
+	kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
+	dave.hansen@linux.intel.com, dionnaglaze@google.com,
+	pgonda@google.com, seanjc@google.com, pbonzini@redhat.com
+Subject: Re: [PATCH v7 03/16] virt: sev-guest: Add SNP guest request structure
+Message-ID: <20240201102946.GCZbtymsufm3j2KI85@fat_crate.local>
+References: <20231220151358.2147066-1-nikunj@amd.com>
+ <20231220151358.2147066-4-nikunj@amd.com>
+ <20240125115952.GXZbJNOGfxfuiC5WRT@fat_crate.local>
+ <03719b26-9b59-4e88-9e7e-60c6f2617565@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -92,78 +80,59 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+In-Reply-To: <03719b26-9b59-4e88-9e7e-60c6f2617565@amd.com>
 
-David Woodhouse <dwmw2@infradead.org> writes:
+On Wed, Jan 31, 2024 at 07:28:05PM +0530, Nikunj A. Dadhania wrote:
+> Changed to "req" for all the guest request throughout the file. Other "req" 
+> usage are renamed appropriately.
 
-> Sorry for delayed response.
->
-> On Thu, 2024-01-11 at 14:59 +0100, Vitaly Kuznetsov wrote:
->>=20
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vm_ioctl(vm, KVM_GET_CLOCK, &kcdat=
-a);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 delta =3D (wc->sec * NSEC_PER_SEC =
-+ wc->nsec) - (kcdata.realtime - kcdata.clock);
->
-> I think you need to check for KVM_CLOCK_REALTIME in the flags here,
-> don't you? It might not always be set.
+Yes, better from what I can tell.
 
-Good suggestion; while this shouldn't be a common use-case on x86_64, it
-is possible when TSC is *not* the clocksource used on the host. I guess
-we can just skip the sub-test with a message in this case.
+However, I can't apply this patch in order to have a better look, it is
+mangled. Next time, before you send a patch this way, send it yourself
+first and try applying it.
 
->
-> And also, nobody should ever be using KVM_CLOCK_REALTIME as it stands
-> at the moment. It's fundamentally broken because it should always have
-> used CLOCK_TAI not CLOCK_REALTIME.
->
-> I'm in the process of fixing that up as an incremental ABI change,
-> putting the TAI offset into one of the spare pad fields in the
-> kvm_clock_data and adding a new KVM_CLOCK_TAI_OFFSET flag.
->
->> +       TEST_ASSERT(llabs(delta) < 100,
->> +                   "Guest's epoch from shinfo %d.%09d differs from KVM_=
-GET_CLOCK %lld.%lld",
->> +                   wc->sec, wc->nsec, (kcdata.realtime - kcdata.clock) =
-/ NSEC_PER_SEC,
->> +                   (kcdata.realtime - kcdata.clock) % NSEC_PER_SEC);
->>=20
->
->> Replace the check with comparing wall clock data from shinfo to
->> KVM_GET_CLOCK. The later gives both realtime and kvmclock so guest's epo=
-ch
->> can be calculated by subtraction. Note, the computed epoch may still dif=
-fer
->> a few nanoseconds from shinfo as different TSC is used and there are
->> rounding errors but 100 nanoseconds margin should be enough to cover
->> it (famous last words).
->
-> Aren't those just bugs? Surely this *should* be cycle-perfect, if the
-> host has a stable TSC?
->
-> But I suppose this isn't the test case for that. This is just testing
-> that the Xen shinfo is doing basically the right thing.
->
-> And we're going to need a few more fixes like this WIP before we get
-> get to cycle perfection from the horrid mess that is our kvmclock code:
-> https://git.infradead.org/?p=3Dusers/dwmw2/linux.git;a=3Dcommitdiff;h=3Db=
-c557e5ee4
+If it doesn't work, throw away your mailer and use a proper one:
 
-(Some time ago I was considering suggesting we switch to Hypet-V TSC page
-clocksource for Linux guests to avoid fixing the mess :-) It's becoming
-less and less relevant as with modern hardware which supports TSC
-scaling (and which doesn't support famous TSC bugs like TSC divergence
-across sockets :-) passing through raw TSC to guests is becoming more
-and more popular.)
+Documentation/process/email-clients.rst
 
-Regarding this fix, what's your decree? My intention here is to
-basically get rid on xen_shinfo flakyness without reducing test
-coverage. I.e. we still want to test that shinfo data is somewhat
-sane. Later, when you get your 'cycle perfection' and 'TAI' patches in,
-we can always adjust the test accordingly. In case you agree, I can
-re-send this with KVM_CLOCK_REALTIME check added.
+> Subject: [PATCH] virt: sev-guest: Add SNP guest request structure
+> 
+> Add a snp_guest_req structure to simplify the function arguments. The
+> structure will be used to call the SNP Guest message request API
+> instead of passing a long list of parameters. Use "req" as variable name
+> for guest req throughout the file and rename other variables appropriately.
+> 
+> Update snp_issue_guest_request() prototype to include the new guest request
+> structure and move the prototype to sev_guest.h.
+> 
+> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+> Tested-by: Peter Gonda <pgonda@google.com>
 
---=20
-Vitaly
+Tested-by: tags must be dropped if you change a patch in a non-trivial
+way. And this change is not that trivial I'd say.
 
+> ---
+>  .../x86/include/asm}/sev-guest.h              |  18 ++
+>  arch/x86/include/asm/sev.h                    |   8 -
+>  arch/x86/kernel/sev.c                         |  16 +-
+>  drivers/virt/coco/sev-guest/sev-guest.c       | 195 ++++++++++--------
+>  4 files changed, 135 insertions(+), 102 deletions(-)
+>  rename {drivers/virt/coco/sev-guest => arch/x86/include/asm}/sev-guest.h (78%)
+
+I didn't notice this before: why am I getting a sev-guest.h header in
+arch/x86/?
+
+Lemme quote again the file paths we agreed upon:
+
+https://lore.kernel.org/all/Yg5nh1RknPRwIrb8@zn.tnic/
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
