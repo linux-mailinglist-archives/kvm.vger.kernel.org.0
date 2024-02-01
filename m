@@ -1,172 +1,108 @@
-Return-Path: <kvm+bounces-7756-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7757-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AAA4845F1A
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 19:01:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FFB7845F4E
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 19:07:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C33A5B26D97
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 18:01:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 427B61C22746
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 18:07:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B38F284FAE;
-	Thu,  1 Feb 2024 18:01:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAA7212FB3C;
+	Thu,  1 Feb 2024 18:02:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dabbelt-com.20230601.gappssmtp.com header.i=@dabbelt-com.20230601.gappssmtp.com header.b="2FY75X4n"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iBeRCQHw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3F8984FA6
-	for <kvm@vger.kernel.org>; Thu,  1 Feb 2024 18:01:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7684474299
+	for <kvm@vger.kernel.org>; Thu,  1 Feb 2024 18:02:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706810476; cv=none; b=VMX+c5qxYolsuqzfAO0HcNQlf/WOweB5ATCbgroqduMV9jBq9rpcUiq0dnSCMDlXX48Uvfs/1+hP8wG25BeGwLYQ8GZiOJnDvvnfdxzHrWClGhIfCt81cRMjFwlUUSYc0vAuM27XRRR979Kk78WcwRIeuTg8OrYCKlXOCvDA3cM=
+	t=1706810571; cv=none; b=UWs73X9R/nq9v14+S2QEU5HxUKfIaaqLS0DXVhbQuFMMMNL7lYoplhGYf+0QDID1aC2BRtzuF6RW9U1ISIlt9PM8AP1/u53UYosTZqOVs6w6rltgunAMpingD347aY+KKRsXx3uhU/dwHqEK8a9cZrN2mKTR1cCsBkoK6bKMxxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706810476; c=relaxed/simple;
-	bh=W9J0NoGcrnYERrTcK+GUgbqfp52tsMxvbK+w7SaPV60=;
-	h=Date:Subject:In-Reply-To:CC:From:To:Message-ID:Mime-Version:
-	 Content-Type; b=Fh+RpYgST28QdP7Qtss+YOcfnQDLEm8H4ijUy0HshEzrKxWuhDd7qw26BQkFgQ0cT+vYzsRXcs8E2qRHX1FX22JgtPpogn5s5OBWTAMpG86pWzu47sK9CEQfgTWgfZ2VkygwA4eq5FHo4XSICdU8sLD5hQqkAk2O0RTuCgxbIb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com; spf=pass smtp.mailfrom=dabbelt.com; dkim=pass (2048-bit key) header.d=dabbelt-com.20230601.gappssmtp.com header.i=@dabbelt-com.20230601.gappssmtp.com header.b=2FY75X4n; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dabbelt.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1d7393de183so9213055ad.3
-        for <kvm@vger.kernel.org>; Thu, 01 Feb 2024 10:01:14 -0800 (PST)
+	s=arc-20240116; t=1706810571; c=relaxed/simple;
+	bh=ColfYwGzOWxKPXerfApdGAeGET6bCQa3gNPmYycvkQM=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Urt229891h4krMDSNhiH+5THN/NRg/m6B6KHSCbilsZAdv138IfwBbJ+e85k369lkfn1VZDfqObltgekQBTI1d5J6p2JrESICd5MyLgzj6TUM0umMjSu204fdRr8qQ4zgqgUsoZWByNIDWkbN5tz7fp1cGMBOKoNwNdJ7v7Y14s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iBeRCQHw; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-60403a678f2so20844687b3.3
+        for <kvm@vger.kernel.org>; Thu, 01 Feb 2024 10:02:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dabbelt-com.20230601.gappssmtp.com; s=20230601; t=1706810474; x=1707415274; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=a6iCiiJEkCihp55oAEAEl5G/BiNyoF0zUrNoSz0w21Q=;
-        b=2FY75X4nrzFMK1XzjhuAQe3D1ffF6yy69PRaYmV5nO7E0yEbnNl+1iGCSm7qpggOls
-         Anr3GAz9HR7tU6olcQheBuq64Rybuc11COTPWH7xJFqDUm4TAgNc46lox9vLqWQtW8mS
-         YFvjCjx4Qh2l3cwgZXi27fAVj9qpjfE4B+v+/cbC8f2vRBL0hoKXuLJzycVcfbedO28f
-         MdoQ+ANVRNiI5yq4VOZ2w7Ko/P+3vn70RBP7dH1NRJQT/+IPRqvtEz+rF0TlujPque9Z
-         Uh/bLQAU7syL0rn/gn23QCA7M5qBh8Rki0BeOBnioziXCLexfv/s177tbXZS4zKTh3Ot
-         bDcg==
+        d=google.com; s=20230601; t=1706810569; x=1707415369; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vt7MU0bmv3DhhiQJ3wtJw9K+Dqd9x1ouKjCbyi3XDIo=;
+        b=iBeRCQHwnhng3F7xF2wvH9rngX7LXNNuPb4fIrcvbWP0PKEchzldpXqbtvENO0q2af
+         8ufDzTTB14ip4V47s2EbwMRCybDCocdBE8iYQwwmKv4HwL5EcHUqc89OZCg/CvwfD8eh
+         kdV+WzDrl41kQ++QUXTNQoGBaouklYy83LvdvLajTYBun6f5/VUhO0yF8VpX4BfyiZv/
+         gQ9Ueb8gYuFztOFz+6nmkX0sZfej2ov2Eb1vnoNKys5esCjsXIhUNR/fQAc8KxPlsnSs
+         aAbM2TNGdJ0OC8Oxjit+M7Yk0zABfE0dW5AoFvWQ+NH1td3UVxOA/kmUS7Mw529NX7tN
+         B08Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706810474; x=1707415274;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=a6iCiiJEkCihp55oAEAEl5G/BiNyoF0zUrNoSz0w21Q=;
-        b=a9d8UfftIe5x0gJTor2tEOqzeLWhbX7VjapudM2r0pnsZhdGu1in0W3JuB5INsVDi4
-         z8zBlPPEfIGDEIPNWlIEzjWs3NAPArXy8w74BAu9MZAedt4UTUh4N0UQZhi3xqDyJEXg
-         jIeVlvPPEMelo8yyJcjeDXShWx7hfH4TYG+lEd9SZh3GUrtdWDf300XNztXnh/JUWax/
-         fUmbFLv7pwuTpgcsMNL/bofHCAwrYTPoqUJtZoM9CumuM1JEShn3vMP7wX2o0fHM73D3
-         OJebHIKOvNReXfy9hRpYvObtplE9gYAi9XAFCNhGFX/LXU+dr2VWxa7gM+PRO/2M0kRa
-         OR1Q==
-X-Gm-Message-State: AOJu0YwngVFil58e3FclubS4KI2v0p24DwEncwTEUYLv4MrEEhbAKydD
-	rT0JnPOmFxqzNSbGO7mB3ULkNE11CJOhtTRnriE0kAFZ8P9zOoCfuajattKsDHg=
-X-Google-Smtp-Source: AGHT+IF15aCA64A+pUYtrNvn3aPBFP3YvRRtEpAp7GhLaGBTwkos6AGRBMomIaVUMVTpq99RCQfFMQ==
-X-Received: by 2002:a17:90a:bc89:b0:293:d87e:c0fa with SMTP id x9-20020a17090abc8900b00293d87ec0famr3127352pjr.17.1706810473841;
-        Thu, 01 Feb 2024 10:01:13 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCVLFmKNxnofRAm9+gmbtAPqzFlddhJuk3PI7Q/NjyXtJ7ZmHp/iTXv0TqfWfZjBaYzFcJopyG/9CDE+R+Jvvm0AZE2oEp2H1XiQOasKu+bdMsINxyBmBY5jTw58tvIpPgG+8pFfE4REHtX6JYC4f0MnquUQN2FJgHlWUglZqdX0AAutrjhomLn4WOttNBDZowK8M6oTDpJIKMK5zEL7B57m8l2DzdVPdCvNWBdNIiiJJpTqImLPcPjW1TVcA+i/QJ+Smow81am9Ta9fUe93MosSLs3u5DtSGA71RgmAo0rrseQVq4kPrBBAL0YwWtv87oLFn0jnKEYoDs/3013pcUBUSS1NOLxp/ILGeAvZ8CtLkHexM/zGg2zr3jqNiiyjXNuFTOwvY7CH857u5/m6eEZC4kBw+4isj41JIR5jioNJPtspftVQDzfP51ZYtxZJvdJd1G/n1LmyzTdmgDM5DCZYxDVbq7r21JeY+DbRZ9cDGnbcC80C+Dq1YyM1TrSNFLrGFjr4cn4CPrY/V9vyNQTBRhdzHLpuJwBz3zxXJlwPr0XZN2BEmMZgokwZxh+BZVCbuy2MQwBBdL4evAMOsvE007/KWpdqC+Ehpyr8KJ5Stk4roUjeT1/2UPsSMDH/dPqhrm/ODu25Q02BsA==
-Received: from localhost ([12.44.203.122])
-        by smtp.gmail.com with ESMTPSA id w20-20020a17090aea1400b00295f2cb67d1sm3326389pjy.16.2024.02.01.10.01.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Feb 2024 10:01:13 -0800 (PST)
-Date: Thu, 01 Feb 2024 10:01:13 -0800 (PST)
-X-Google-Original-Date: Thu, 01 Feb 2024 10:01:10 PST (-0800)
-Subject:     Re: Call for GSoC/Outreachy internship project ideas
-In-Reply-To: <87le84jd85.fsf@draig.linaro.org>
-CC: stefanha@gmail.com, Alistair Francis <Alistair.Francis@wdc.com>,
-  dbarboza@ventanamicro.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, afaria@redhat.com,
-  eperezma@redhat.com, gmaglione@redhat.com, marcandre.lureau@redhat.com, rjones@redhat.com,
-  sgarzare@redhat.com, imp@bsdimp.com, philmd@linaro.org, pbonzini@redhat.com, thuth@redhat.com,
-  danielhb413@gmail.com, gaosong@loongson.cn, akihiko.odaki@daynix.com, shentey@gmail.com,
-  npiggin@gmail.com, seanjc@google.com, Marc Zyngier <maz@kernel.org>
-From: Palmer Dabbelt <palmer@dabbelt.com>
-To: alex.bennee@linaro.org
-Message-ID: <mhng-ec5f9ea7-e704-4302-8542-c8c36ea979d8@palmer-ri-x1c9a>
+        d=1e100.net; s=20230601; t=1706810569; x=1707415369;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vt7MU0bmv3DhhiQJ3wtJw9K+Dqd9x1ouKjCbyi3XDIo=;
+        b=BBpSV3VKGzuKYTHsPJQmpFC91aP4ApcokgxMTlVDs1gC97zzqbeWFkE9b82KAhKouH
+         OiFfexIK+DtLYIiySQkILzba4aPLfsEIK2lMHlO7+t1+YWGTVtbFttqFpRfy4grKNlrI
+         tTFkjwdT5Flrxb1mog2M72ICOXUkN0vC0FgS6Sl8zcMl9ApbDWJ8Hy1GpSmuUE/N87A2
+         LmXm2Nd9LDUVP3X2zwGypwylOMEDM+GhdN9GmGc0JBr3bhg17eRYF/keWHORZuIdKwx5
+         Ai9BzFlJzGGs4DWScVH9BsgNpc+g02falYF1pJW07q/URYYuzqDDK9b+H2Ata2bx2KBR
+         sRjA==
+X-Gm-Message-State: AOJu0Yywy6egTXILKUFmoYTb1ggrjHutpVO4/O9A4D2NLiCuU9GYAMHY
+	i5glJXpD9vIFunD2L4iyIQ7pmGOJ9zbfM9f070oIR/r+rzUkhvpZrmHx6D2OL2c7grdBWMw85OF
+	CFA==
+X-Google-Smtp-Source: AGHT+IGoUgKcoa4GAi8Lw+GdpN5bAXMcZfSWEQrKdT61wiJMGMnkzYXnrDgYCKzRULVUjofcJPOdgJcRbDc=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:13ce:b0:dc2:1bde:b7ed with SMTP id
+ y14-20020a05690213ce00b00dc21bdeb7edmr1349889ybu.8.1706810569436; Thu, 01 Feb
+ 2024 10:02:49 -0800 (PST)
+Date: Thu, 1 Feb 2024 10:02:47 -0800
+In-Reply-To: <20240201061505.2027804-1-dapeng1.mi@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20240201061505.2027804-1-dapeng1.mi@linux.intel.com>
+Message-ID: <Zbvcx0A-Ln2sP6XA@google.com>
+Subject: Re: [PATCH] KVM: selftests: Test top-down slots event
+From: Sean Christopherson <seanjc@google.com>
+To: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Kan Liang <kan.liang@linux.intel.com>, Jim Mattson <jmattson@google.com>, 
+	Jinrong Liang <cloudliang@tencent.com>, Aaron Lewis <aaronlewis@google.com>, 
+	Dapeng Mi <dapeng1.mi@intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, 01 Feb 2024 09:39:22 PST (-0800), alex.bennee@linaro.org wrote:
-> Palmer Dabbelt <palmer@dabbelt.com> writes:
->
->> On Tue, 30 Jan 2024 12:28:27 PST (-0800), stefanha@gmail.com wrote:
->>> On Tue, 30 Jan 2024 at 14:40, Palmer Dabbelt <palmer@dabbelt.com> wrote:
->>>>
->>>> On Mon, 15 Jan 2024 08:32:59 PST (-0800), stefanha@gmail.com wrote:
->>>> > Dear QEMU and KVM communities,
->>>> > QEMU will apply for the Google Summer of Code and Outreachy internship
->>>> > programs again this year. Regular contributors can submit project
->>>> > ideas that they'd like to mentor by replying to this email before
->>>> > January 30th.
->>>>
->>>> It's the 30th, sorry if this is late but I just saw it today.  +Alistair
->>>> and Daniel, as I didn't sync up with anyone about this so not sure if
->>>> someone else is looking already (we're not internally).
-> <snip>
->>> Hi Palmer,
->>> Performance optimization can be challenging for newcomers. I wouldn't
->>> recommend it for a GSoC project unless you have time to seed the
->>> project idea with specific optimizations to implement based on your
->>> experience and profiling. That way the intern has a solid starting
->>> point where they can have a few successes before venturing out to do
->>> their own performance analysis.
->>
->> Ya, I agree.  That's part of the reason why I wasn't sure if it's a
->> good idea.  At least for this one I think there should be some easy to
->> understand performance issue, as the loops that go very slowly consist
->> of a small number of instructions and go a lot slower.
->>
->> I'm actually more worried about this running into a rabbit hole of
->> adding new TCG operations or even just having no well defined mappings
->> between RVV and AVX, those might make the project really hard.
->
-> You shouldn't have a hard guest-target mapping. But are you already
-> using the TCGVec types and they are not expanding to AVX when its
-> available?
+On Thu, Feb 01, 2024, Dapeng Mi wrote:
+> Although the fixed counter 3 and the exclusive pseudo slots events is
+> not supported by KVM yet, the architectural slots event is supported by
+> KVM and can be programed on any GP counter. Thus add validation for this
+> architectural slots event.
+> 
+> Top-down slots event "counts the total number of available slots for an
+> unhalted logical processor, and increments by machine-width of the
+> narrowest pipeline as employed by the Top-down Microarchitecture
+> Analysis method." So suppose the measured count of slots event would be
+> always larger than 0.
 
-Ya, sorry, I guess that was an odd way to describe it.  IIUC we're doing 
-sane stuff, it's just that RISC-V has a very different vector masking 
-model than other ISAs.  I just said AVX there because I only care about 
-the performance on Intel servers, since that's what I run QEMU on.  I'd 
-asssume we have similar performance problems on other targets, I just 
-haven't looked.
+Please translate that into something non-perf folks can understand.  I know what
+a pipeline slot is, and I know a dictionary's definition of "available" is, but I
+still have no idea what this event actually counts.  In other words, I want a
+precise definition of exactly what constitutes an "available slot", in verbiage
+that anyone with basic understanding of x86 architectures can follow after reading
+the whitepaper[*], which is helpful for understanding the concepts, but doesn't
+crisply explain what this event counts.
 
-So my worry would be that the RVV things we're doing slowly just don't 
-have fast implementations via AVX and thus we run into some intractable 
-problems.  That sort of stuff can be really frusturating for an intern, 
-as everything's new to them so it can be hard to know when something's 
-an optimization dead end.
+Examples of when a slot is available vs. unavailable would be extremely helpful.
 
-That said, we're seeing 100x slowdows in microbenchmarks and 10x 
-slowdowns in real code, so I think there sholud be some way to do 
-better.
-
-> Remember for anything float we will end up with softfloat anyway so we
-> can't use SIMD on the backend.
-
-Yep, but we have a handful of integer slowdowns too so I think there's 
-some meat to chew on here.  The softfloat stuff should be equally slow 
-for scalar/vector, so we shouldn't be tripping false positives there.
-
->>> Do you have the time to profile and add specifics to the project idea
->>> by Feb 21st? If that sounds good to you, I'll add it to the project
->>> ideas list and you can add more detailed tasks in the coming weeks.
->>
->> I can at least dig up some of the examples I ran into, there's been a
->> handful filtering in over the last year or so.
->>
->> This one
->> <https://gist.github.com/compnerd/daa7e68f7b4910cb6b27f856e6c2beba>
->> still has a much more than 10x slowdown (73ms -> 13s) with
->> vectorization, for example.
->>
->>> Thanks,
->>> Stefan
->
-> -- 
-> Alex Bennée
-> Virtualisation Tech Lead @ Linaro
+[*] https://www.intel.com/content/www/us/en/docs/vtune-profiler/cookbook/2023-0/top-down-microarchitecture-analysis-method.html
 
