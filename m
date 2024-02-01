@@ -1,238 +1,116 @@
-Return-Path: <kvm+bounces-7682-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7683-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43ED484533D
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 09:57:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C731B845375
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 10:11:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 681F71C22D6B
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 08:57:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CA78289AA8
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 09:11:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F81415B0FA;
-	Thu,  1 Feb 2024 08:57:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1852D15B0EC;
+	Thu,  1 Feb 2024 09:11:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iEuFoIiG"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gYphGDPP"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F9CC15AAD6
-	for <kvm@vger.kernel.org>; Thu,  1 Feb 2024 08:57:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23F9A15B0E2;
+	Thu,  1 Feb 2024 09:11:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706777849; cv=none; b=mKWuedsbqA4LIW4i+j0XyPwo4SljnJEacTjzudAhzDJwwPN/Lwn6vCq++ei/hPBxH+39TW2+LnAANDUI4Zu3x6jc7z8bnXiBzaw8PhMDUHZVONDRdZ6DucVyMulL6I0qqPyRXnZrDhoxv8OIkZxNcnV0Ya4LFcUIhpk2iicr9QY=
+	t=1706778706; cv=none; b=hgwLTfzG7i/MOuENYeeJO0mqo6XwZf7v6TdqFa2WaLa3S6sKkxEJ1EAt0fEi5DjJ5giZkaxDc4qTvN7i1MSahzD6CvBQAH9StNkmHvMbVTEIpp7fu1R06w7shscGzI0Gk8jsk9i8m7pK/0Kd6qa30VDbeOIMWwCRb7T/cLtLnAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706777849; c=relaxed/simple;
-	bh=j3Zd4mKrm216Zi80MFkLzEXQBZt3skOFnFm6RoTNJkY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YhJa+t87xm/SyPLV5fWx9NbEYZo7Wq0Ii7ps2zc3nk6/uMpSbZ4RhOAd+aqPgAAqHtm+yyBcezOgQwjgyAEwesoOOj0xC7sUUo8Tb0zkAsKS3N9t7k4t+3EyNkoz4m8mjT4DeLH1WF1gwKhrdYiXxZP4FhPo4j6c35pNL4EV1Jo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iEuFoIiG; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706777845;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WmH3EWgqG+olCCSdo93j0hjDoEO8xtf6eODTmOyVxmc=;
-	b=iEuFoIiG1Bkc0wtbUnhL4mcAg7dcmNMf1qxgf5yhPonQ9KY1FIxYE7onGVpq2f40uFnOIw
-	38iygeSMlofcNVyOu5zsb3gmy1v/L0Fwb17JWKudQ1DY0iSDvR/KBwyciG6jcNetk3Mxce
-	FShCQi522dchHj1fz06OnpjRxKLGK/4=
-Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
- [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-640-5VX4uhNkOUWkyBNl6ZByjQ-1; Thu, 01 Feb 2024 03:57:24 -0500
-X-MC-Unique: 5VX4uhNkOUWkyBNl6ZByjQ-1
-Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-6dbd919aba8so169199b3a.0
-        for <kvm@vger.kernel.org>; Thu, 01 Feb 2024 00:57:23 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706777843; x=1707382643;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WmH3EWgqG+olCCSdo93j0hjDoEO8xtf6eODTmOyVxmc=;
-        b=LOmkQ7eyBvlxQ8TLOszsggmO3yAipTiZYF5dfhhclPeoErTlj3KBJW/dwYUaVa4Ccv
-         zYienFCK2TpQ+DgitfN5rMdOvtNTYDTHvgqs2N5L+adIJJcUWmB4JA8FR6UxG5G2vmVN
-         uQtvHIGWfDGFEgszglXs0J0MIEv0eVqHNcn+5ykgivG7NK+id+1bUEaJD1gjrGQoC+R+
-         dzLxlwPIvzGYQDffG5Btbe2UFt3TYN7AGhhNk9XAoyKLetfRBstBpOZFWmHOdmBWoWLZ
-         Dg97uQYEzEGATe9RzA3tjvlcCFwLESKOQVD6Lqm3xEdUTnKbVElt9frZva7y5+U9jHuz
-         LnyQ==
-X-Gm-Message-State: AOJu0Yye28o1nNUnt9w+BPfDP2LWVON5ejEObLD7kox5K2lDtgVHSpna
-	DwhDhMNrgvi9og1/LZjocIeX7arc54P7RN9wuW2UqJN3R+0zDrpmolC1ITf0JKX7VazFC+7rZWa
-	YGjrnowvjx/mpqE2ofIxXfVx/cmEyrsK+KJn1zR8ciBla8XS/QA==
-X-Received: by 2002:a05:6a20:160f:b0:19c:a8bf:cd8a with SMTP id l15-20020a056a20160f00b0019ca8bfcd8amr4380746pzj.6.1706777842869;
-        Thu, 01 Feb 2024 00:57:22 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGTFKwk/btSV/URCvdNmfvTLLCCyn2J86wXYURGOxFkP60VZpTwKUeSS6vccvZLBAnMS5i/pQ==
-X-Received: by 2002:a05:6a20:160f:b0:19c:a8bf:cd8a with SMTP id l15-20020a056a20160f00b0019ca8bfcd8amr4380731pzj.6.1706777842524;
-        Thu, 01 Feb 2024 00:57:22 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCUP/ZIaNn49n5TVAR93hXxAwxjFEqEJt4iHPuOJgKwEjVloTkbnBVGpepDMZwP7FegNvKVoxj9riCBjxnnhojfbyPR9TGdcIyKENxVf03w30ZLoGFsf1nuH7zly7RWLiI0V8KZVmkbfH07smSntsCCYZYP+DDWQU1+Hmat3VqEYJbXLWzIrYOSbQhQ2erhMv+ccDRg4W26EmkMN555UWF4MegUUDvhBFe09n/brWh+bZXflVeTWO+ydsBnoAFTECQ==
-Received: from [10.66.61.39] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id jh21-20020a170903329500b001d951b9ce37sm765467plb.273.2024.02.01.00.57.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 01 Feb 2024 00:57:22 -0800 (PST)
-Message-ID: <510f3534-b076-4d23-b4b8-361c1f872d57@redhat.com>
-Date: Thu, 1 Feb 2024 16:57:19 +0800
+	s=arc-20240116; t=1706778706; c=relaxed/simple;
+	bh=d0QUE64pt164Gb922DtwPyKlQyM7T2wpfLolXVuFrVk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GyUWj6V7xk488MWEfEsYvdEbj7W1qpifSqmyaZG2MOnL3ZjyDmZj2/aDfu7E0CP3RBVSKybGAsFRee3+Op94DdIc6fUXzv+b4RN2pTX1+y9lt2zhz/wkcG/5TLFNTCwp1azzCAoNOer0k9rCL2wZWQuizHtpa6Z5e+xtx4w0gds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gYphGDPP; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706778704; x=1738314704;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=d0QUE64pt164Gb922DtwPyKlQyM7T2wpfLolXVuFrVk=;
+  b=gYphGDPPNcBTKGk5usgi+ZEV9J/LOq04Z5XX6SJ21D++N5bY6A++5iAD
+   engs6rVkYkV32TGt+daTknu2VbbuBGOa9D0TvmqKcq/K4ecbC20bQgp1O
+   0D1gnMtfJlsuTLFR7QynLWf2odavd+MJi+YZCbWBh1X6XGCWOW2mjBZnZ
+   2f4t4zCuIksF4Oh52xZtjzSsy/XZZ+98k2WPZijoDvaxcgRzL7KrM9/et
+   5p68b6jdQXW0jT6ImfGknonLzfZ3FbUvAePLzlq0FLDuQvNI7DmDCL7LR
+   QiiiMLDWlmtgoxVHAYVjSwsoewPPvVSMdjRlYsrFlHtP13dQj0/QPdObk
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="2785324"
+X-IronPort-AV: E=Sophos;i="6.05,234,1701158400"; 
+   d="scan'208";a="2785324"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2024 01:11:43 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="879056989"
+X-IronPort-AV: E=Sophos;i="6.05,234,1701158400"; 
+   d="scan'208";a="879056989"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by FMSMGA003.fm.intel.com with ESMTP; 01 Feb 2024 01:11:40 -0800
+Received: by black.fi.intel.com (Postfix, from userid 1000)
+	id 0363E8EA; Thu,  1 Feb 2024 10:34:48 +0200 (EET)
+Date: Thu, 1 Feb 2024 10:34:48 +0200
+From: "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	Zixi Chen <zixchen@redhat.com>, Adam Dunlap <acdunlap@google.com>, 
+	Xiaoyao Li <xiaoyao.li@intel.com>, Kai Huang <kai.huang@intel.com>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@kernel.org>, x86@kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] x86/cpu/intel: Detect TME keyid bits before
+ setting MTRR mask registers
+Message-ID: <qtzc3jejjsvxpa6sz3zgoelf77ejr7fioxdaw2o5ezuxevetks@kcwjgzp2gi2u>
+References: <20240131230902.1867092-1-pbonzini@redhat.com>
+ <20240131230902.1867092-3-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] KVM: selftests: Fix the dirty_log_test semaphore
- imbalance
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
- Peter Xu <peterx@redhat.com>
-References: <20231117052210.26396-1-shahuang@redhat.com>
- <ZbQVRX3V1P-ZE2Wf@google.com>
-Content-Language: en-US
-From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <ZbQVRX3V1P-ZE2Wf@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240131230902.1867092-3-pbonzini@redhat.com>
 
-Hi Sean,
-
-Thanks for your reviewing.
-
-On 1/27/24 04:25, Sean Christopherson wrote:
-> +Peter
+On Thu, Feb 01, 2024 at 12:09:02AM +0100, Paolo Bonzini wrote:
+> MKTME repurposes the high bit of physical address to key id for encryption
+> key and, even though MAXPHYADDR in CPUID[0x80000008] remains the same,
+> the valid bits in the MTRR mask register are based on the reduced number
+> of physical address bits.
 > 
-> On Fri, Nov 17, 2023, Shaoqin Huang wrote:
->> When execute the dirty_log_test on some aarch64 machine, it sometimes
->> trigger the ASSERT:
->>
->> ==== Test Assertion Failure ====
->>    dirty_log_test.c:384: dirty_ring_vcpu_ring_full
->>    pid=14854 tid=14854 errno=22 - Invalid argument
->>       1  0x00000000004033eb: dirty_ring_collect_dirty_pages at dirty_log_test.c:384
->>       2  0x0000000000402d27: log_mode_collect_dirty_pages at dirty_log_test.c:505
->>       3   (inlined by) run_test at dirty_log_test.c:802
->>       4  0x0000000000403dc7: for_each_guest_mode at guest_modes.c:100
->>       5  0x0000000000401dff: main at dirty_log_test.c:941 (discriminator 3)
->>       6  0x0000ffff9be173c7: ?? ??:0
->>       7  0x0000ffff9be1749f: ?? ??:0
->>       8  0x000000000040206f: _start at ??:?
->>    Didn't continue vcpu even without ring full
->>
->> The dirty_log_test fails when execute the dirty-ring test, this is
->> because the sem_vcpu_cont and the sem_vcpu_stop is non-zero value when
->> execute the dirty_ring_collect_dirty_pages() function. When those two
->> sem_t variables are non-zero, the dirty_ring_wait_vcpu() at the
->> beginning of the dirty_ring_collect_dirty_pages() will not wait for the
->> vcpu to stop, but continue to execute the following code. In this case,
->> before vcpu stop, if the dirty_ring_vcpu_ring_full is true, and the
->> dirty_ring_collect_dirty_pages() has passed the check for the
->> dirty_ring_vcpu_ring_full but hasn't execute the check for the
->> continued_vcpu, the vcpu stop, and set the dirty_ring_vcpu_ring_full to
->> false. Then dirty_ring_collect_dirty_pages() will trigger the ASSERT.
->>
->> Why sem_vcpu_cont and sem_vcpu_stop can be non-zero value? It's because
->> the dirty_ring_before_vcpu_join() execute the sem_post(&sem_vcpu_cont)
->> at the end of each dirty-ring test. It can cause two cases:
->>
->> 1. sem_vcpu_cont be non-zero. When we set the host_quit to be true,
->>     the vcpu_worker directly see the host_quit to be true, it quit. So
->>     the log_mode_before_vcpu_join() function will set the sem_vcpu_cont
->>     to 1, since the vcpu_worker has quit, it won't consume it.
->> 2. sem_vcpu_stop be non-zero. When we set the host_quit to be true,
->>     the vcpu_worker has entered the guest state, the next time it exit
->>     from guest state, it will set the sem_vcpu_stop to 1, and then see
->>     the host_quit, no one will consume the sem_vcpu_stop.
->>
->> When execute more and more dirty-ring tests, the sem_vcpu_cont and
->> sem_vcpu_stop can be larger and larger, which makes many code paths
->> don't wait for the sem_t. Thus finally cause the problem.
->>
->> To fix this problem, we can wait a while before set the host_quit to
->> true, which gives the vcpu time to enter the guest state, so it will
->> exit again. Then we can wait the vcpu to exit, and let it continue
->> again, then the vcpu will see the host_quit. Thus the sem_vcpu_cont and
->> sem_vcpu_stop will be both zero when test finished.
->>
->> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
->> ---
->> v1->v2:
->>    - Fix the real logic bug, not just fresh the context.
->>
->> v1: https://lore.kernel.org/all/20231116093536.22256-1-shahuang@redhat.com/
->> ---
->>   tools/testing/selftests/kvm/dirty_log_test.c | 16 +++++++++++++++-
->>   1 file changed, 15 insertions(+), 1 deletion(-)
->>
->> diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
->> index 936f3a8d1b83..a6e0ff46a07c 100644
->> --- a/tools/testing/selftests/kvm/dirty_log_test.c
->> +++ b/tools/testing/selftests/kvm/dirty_log_test.c
->> @@ -417,7 +417,8 @@ static void dirty_ring_after_vcpu_run(struct kvm_vcpu *vcpu, int ret, int err)
->>   
->>   static void dirty_ring_before_vcpu_join(void)
->>   {
->> -	/* Kick another round of vcpu just to make sure it will quit */
->> +	/* Wait vcpu exit, and let it continue to see the host_quit. */
->> +	dirty_ring_wait_vcpu();
->>   	sem_post(&sem_vcpu_cont);
->>   }
->>   
->> @@ -719,6 +720,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->>   	struct kvm_vm *vm;
->>   	unsigned long *bmap;
->>   	uint32_t ring_buf_idx = 0;
->> +	int sem_val;
->>   
->>   	if (!log_mode_supported()) {
->>   		print_skip("Log mode '%s' not supported",
->> @@ -726,6 +728,11 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->>   		return;
->>   	}
->>   
->> +	sem_getvalue(&sem_vcpu_stop, &sem_val);
->> +	assert(sem_val == 0);
->> +	sem_getvalue(&sem_vcpu_cont, &sem_val);
->> +	assert(sem_val == 0);
+> detect_tme() in arch/x86/kernel/cpu/intel.c detects TME and subtracts
+> it from the total usable physical bits, but it is called too late.
+> Move the call to early_init_intel() so that it is called in setup_arch(),
+> before MTRRs are setup.
 > 
-> Never use bare assert() in selftests, they'll either get compiled out or IIRC,
-> will cause the test to silently exit if they fail.  Either do nothing, or use
-> TEST_ASSERT().
+> This fixes boot on TDX-enabled systems, which until now only worked with
+> "disable_mtrr_cleanup".  Without the patch, the values written to the
+> MTRRs mask registers were 52-bit wide (e.g. 0x000fffff_80000800) and
+> the writes failed; with the patch, the values are 46-bit wide, which
+> matches the reduced MAXPHYADDR that is shown in /proc/cpuinfo.
 > 
+> Reported-by: Zixi Chen <zixchen@redhat.com>
+> Cc: Adam Dunlap <acdunlap@google.com>
+> Cc: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+> Cc: Xiaoyao Li <xiaoyao.li@intel.com>
+> Cc: Kai Huang <kai.huang@intel.com>
+> Cc: Dave Hansen <dave.hansen@linux.intel.com>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ingo Molnar <mingo@kernel.org>
+> Cc: x86@kernel.org
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-Sure. I will replace them with TEST_ASSERT().
-
->> +
->>   	/*
->>   	 * We reserve page table for 2 times of extra dirty mem which
->>   	 * will definitely cover the original (1G+) test range.  Here
->> @@ -825,6 +832,13 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->>   		sync_global_to_guest(vm, iteration);
->>   	}
->>   
->> +	/*
->> +	 *
->> +	 * Before we set the host_quit, let the vcpu has time to run, to make
->> +	 * sure we consume the sem_vcpu_stop and the vcpu consume the
->> +	 * sem_vcpu_cont, to keep the semaphore balance.
->> +	 */
->> +	usleep(p->interval * 1000);
-> 
-> Please no.  "Wait for a while" is never a complete solution for fixing races.
-> In rare cases, adding a delay might be the only sane workaround, but I doubt that's
-> the case here.
-
-If that's the case. I guess I should keep the current solution. Except 
-you have any better solution, please let me know.
-
-Thanks,
-Shaoqin
-
-> 
+Reviewed-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 
 -- 
-Shaoqin
-
+  Kiryl Shutsemau / Kirill A. Shutemov
 
