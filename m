@@ -1,183 +1,188 @@
-Return-Path: <kvm+bounces-7690-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7691-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA94384547C
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 10:46:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED4ED84549E
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 10:58:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 566111F25C61
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 09:46:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 674251F2B44B
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 09:58:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5E5F4DA1F;
-	Thu,  1 Feb 2024 09:45:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9817715B0F5;
+	Thu,  1 Feb 2024 09:57:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V9CUkDpv"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="yCHRXKIz"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47FE34DA1B
-	for <kvm@vger.kernel.org>; Thu,  1 Feb 2024 09:45:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F77B4D9E9;
+	Thu,  1 Feb 2024 09:57:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706780757; cv=none; b=nCYgdLB6PCMNFxtJFCcDBPqCuSPrHWkDFrm1uOpECS4SRWFuS1h1uODDE5xjhvAebshNkm/ccEDTan467H7HhUpbasajsT3/DugarbRV7W0PTknPrgZXNaWVDQrDhVCWZWjAKt/eAegMpdodi23qDEV7enl/6mXIeo9SsfusGWg=
+	t=1706781476; cv=none; b=JbuY1pjt1Zb14Da2aNt8JkA1GbmAtpmtAflxy+We8KTwIsy7p2Zjms4W69BcBGcVDS4uz02Ga+LfsgQ6Djdrz9r/2kdqszEHjbX/unQXstn4lUTCfTVE3MRhKN3FLnUMgxbLCWdPBIP1X+wkVhViFV7ociAKXweI0Cma7UD9nzw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706780757; c=relaxed/simple;
-	bh=aNqWZW6RcqK8RA8lTfX+odywxwnNVRg2P8cqZ4BDSgU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Qlwb/44zA80BzZUEQ00wY9upABYxt3qLQT5wgdH+kq66XCdRNNVjyXPWWYirX9NrOsDKPWycpAqKBb6rMM3woX2tGNEo16V3XdSskUz7oD41uw2xVPZSHisHGp5RcJoKMZbXpF/Yppr6onHLicXjj5n0dcTywZrmhtCpRf+eAds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=V9CUkDpv; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706780753;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DrVU+bxCb/uw2+gU2fqkwUl2STpHNw8pC2Tx+pltE8s=;
-	b=V9CUkDpvgYtdu6upsAlRyNWR0ir04Ddx3qSqBVrY8YzthnCZhgaQzr3wx00WIRDSPMmYbF
-	wpMroSxYdaI5DVOzgSjyQQGwJEnl+8o4qP7PCjnK0RQUYFtLmSrRgdi4D7CwDNB2Ef2UoZ
-	VsFB7zl8P+BALOq2PlaKOFEzYGAGTXY=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-479-Yflc9WzrPLW0IbGdpS18HQ-1; Thu, 01 Feb 2024 04:45:52 -0500
-X-MC-Unique: Yflc9WzrPLW0IbGdpS18HQ-1
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-68c4ea596cdso8149626d6.2
-        for <kvm@vger.kernel.org>; Thu, 01 Feb 2024 01:45:52 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706780752; x=1707385552;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DrVU+bxCb/uw2+gU2fqkwUl2STpHNw8pC2Tx+pltE8s=;
-        b=mTTuizPe+42b+eglYaBhHgGXDtt/in61p1ayrd4bGixVxOkzvTtLI0Gxbenc7bvRkH
-         Q1I2uhgWP5Eljm627TaHT58uLK5zieYHeK3JnFjnLmFiyrZHQNcyt/MSeqSHVEbrbeVK
-         oEUtJiXg8UPTdFXK22e07aNA+jH4GG8QIWt3zoiQ6yl9nyr2rqonGlfc22yXtYnccC1R
-         hV9dxvTvL/8qmCH+17EtPbka+rB49q3UIDMS68bmsztWre5y+YdClt7qagsWaxRSxW6o
-         UcWRCC3j8PlMRjBJ1HchcFd5/NXlqPK3JeNn+b86Yb7iqQjHyWryV85GPxeDXjVDRwpr
-         SjwQ==
-X-Gm-Message-State: AOJu0Yztgi4s277VqDUfBy4pem+YBEwJcXNZtEjJVE8j63w9hqUqerTD
-	vzvYYR4KPztpr/tp9Crc4emgweYPYWfYQevcJ1eeKFQbRfzuMouiSXqH3y9juQLIJYO9LjgmIUG
-	7Ir5EC2hvsj9IRtDmQ7avFJngPUyk3iiVGHAHQ3BxqGRTvNLncw==
-X-Received: by 2002:a05:6214:1314:b0:685:a8d7:4c24 with SMTP id pn20-20020a056214131400b00685a8d74c24mr4751652qvb.32.1706780752218;
-        Thu, 01 Feb 2024 01:45:52 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFG28NP3prMqpJ8rQDWnq3QonHb0ZxcexPRck7gHhbp2xafjHdgp1Ueix8Ur/1n+r+ZLdchpQ==
-X-Received: by 2002:a05:6214:1314:b0:685:a8d7:4c24 with SMTP id pn20-20020a056214131400b00685a8d74c24mr4751642qvb.32.1706780751974;
-        Thu, 01 Feb 2024 01:45:51 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCXXSldVy67JtjS3zYuvLQ7dLV4xY/2lUtZvTKDaUuT0poXQEL5joBK+zCKbk+yFEg7eH7J4zGbGgVU8gLcIS2J0NtDzyEml/cW46f8HI9Ul/EsGro9DzrmVJYV83VPhR91gxoNGWiB9CYdGp24L8KdJ/kzwUm3oEt5OwURZHUKhPZO1lYPEeEOxPRxA/3sI2Xbh/OFBpmmc8ozfV+kKjCwC835yioAfFprDR7EzY5RKi1sqUcUC3Z+nFu2F9628d8GmbL/RsepRn4w+2Byvm7KkE90IojwX7w+6wUnCnrDy3X6dCVlv7/A=
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id ma4-20020a0562145b0400b006843f949b29sm6375102qvb.16.2024.02.01.01.45.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 01 Feb 2024 01:45:51 -0800 (PST)
-Message-ID: <9087ae37-e42c-456c-a9f1-b62fd101e9e0@redhat.com>
-Date: Thu, 1 Feb 2024 10:45:48 +0100
+	s=arc-20240116; t=1706781476; c=relaxed/simple;
+	bh=wXHv1FvFttD+/4Ykt/AOCzKeEg28Zvwn1bnpohIfpYQ=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
+	 Content-Type; b=ay9nXfZkrGlxjz0fZ7sZbgMDCOf6PoMNr5TyXEmqSUJTfKolqzB8ez8rya1EUTXU2l6XKLnuqnta4db1A5SYIDfW0vhnborJBeYZVAsWQDODqnGp6pn19aR5vpXSgIXyU8mKJR4ka3x/sQeTgTLO21ZErxRNU2/Kn/fltAFQA/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=yCHRXKIz; arc=none smtp.client-ip=115.124.30.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1706781471; h=Message-ID:Subject:Date:From:To:Content-Type;
+	bh=90to8cwBJMQb8442ZR8q4xiN29UaF6MDG11lxdXfYpM=;
+	b=yCHRXKIzH2vyssrt6aC07nP9lBW+5Swf9CNg2qdnlaBRV5llBTS4flRkIFlemcMG7eEAIA03dtPZQVlLZaBM97K1CKQoJKEEY4i8cJScDPsHCw1mTdeDaJ+bayuuceZGtfQteswLCuglrZ4ELoo/kiZILwe9/fkacawB3CRk8kU=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=37;SR=0;TI=SMTPD_---0W.tM-xH_1706781468;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W.tM-xH_1706781468)
+          by smtp.aliyun-inc.com;
+          Thu, 01 Feb 2024 17:57:49 +0800
+Message-ID: <1706781420.4036775-6-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH vhost 00/17] virtio: drivers maintain dma info for premapped vq
+Date: Thu, 1 Feb 2024 17:57:00 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Zhu Yanjun <yanjun.zhu@linux.dev>
+Cc: Richard Weinberger <richard@nod.at>,
+ Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+ Johannes Berg <johannes@sipsolutions.net>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Hans de Goede <hdegoede@redhat.com>,
+ =?utf-8?q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+ Vadim Pasternak <vadimp@nvidia.com>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Mathieu Poirier <mathieu.poirier@linaro.org>,
+ Cornelia Huck <cohuck@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Eric Farman <farman@linux.ibm.com>,
+ Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Benjamin Berg <benjamin.berg@intel.com>,
+ Yang Li <yang.lee@linux.alibaba.com>,
+ linux-um@lists.infradead.org,
+ netdev@vger.kernel.org,
+ platform-driver-x86@vger.kernel.org,
+ linux-remoteproc@vger.kernel.org,
+ linux-s390@vger.kernel.org,
+ kvm@vger.kernel.org,
+ bpf@vger.kernel.org,
+ virtualization@lists.linux.dev
+References: <20240130114224.86536-1-xuanzhuo@linux.alibaba.com>
+ <fdc2da16-5680-44cf-bc18-b3e8c0f565fa@linux.dev>
+In-Reply-To: <fdc2da16-5680-44cf-bc18-b3e8c0f565fa@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v2 21/24] lib: Add strcasecmp and
- strncasecmp
-Content-Language: en-US
-To: Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org,
- kvm-riscv@lists.infradead.org, kvmarm@lists.linux.dev
-Cc: ajones@ventanamicro.com, anup@brainfault.org, atishp@atishpatra.org,
- pbonzini@redhat.com, thuth@redhat.com, alexandru.elisei@arm.com
-References: <20240126142324.66674-26-andrew.jones@linux.dev>
- <20240126142324.66674-47-andrew.jones@linux.dev>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20240126142324.66674-47-andrew.jones@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-
-
-On 1/26/24 15:23, Andrew Jones wrote:
-> We'll soon want a case insensitive string comparison. Add toupper()
-> and tolower() too (the latter gets used by the new string functions).
+On Thu, 1 Feb 2024 15:43:51 +0800, Zhu Yanjun <yanjun.zhu@linux.dev> wrote:
+> =E5=9C=A8 2024/1/30 19:42, Xuan Zhuo =E5=86=99=E9=81=93:
+> > As discussed:
+> > http://lore.kernel.org/all/CACGkMEvq0No8QGC46U4mGsMtuD44fD_cfLcPaVmJ3rH=
+YqRZxYg@mail.gmail.com
+> >
+> > If the virtio is premapped mode, the driver should manage the dma info =
+by self.
+> > So the virtio core should not store the dma info.
+> > So we can release the memory used to store the dma info.
+> >
+> > But if the desc_extra has not dma info, we face a new question,
+> > it is hard to get the dma info of the desc with indirect flag.
+> > For split mode, that is easy from desc, but for the packed mode,
+> > it is hard to get the dma info from the desc. And for hardening
+> > the dma unmap is saft, we should store the dma info of indirect
+> > descs.
+> >
+> > So I introduce the "structure the indirect desc table" to
+> > allocate space to store dma info with the desc table.
+> >
+> > On the other side, we mix the descs with indirect flag
+> > with other descs together to share the unmap api. That
+> > is complex. I found if we we distinguish the descs with
+> > VRING_DESC_F_INDIRECT before unmap, thing will be clearer.
+> >
+> > Because of the dma array is allocated in the find_vqs(),
+> > so I introduce a new parameter to find_vqs().
+> >
+> > Please review.
+> >
+> > Thanks
+> >
+> > Xuan Zhuo (17):
+> >    virtio_ring: introduce vring_need_unmap_buffer
+> >    virtio_ring: packed: remove double check of the unmap ops
+> >    virtio_ring: packed: structure the indirect desc table
+> >    virtio_ring: split: remove double check of the unmap ops
+> >    virtio_ring: split: structure the indirect desc table
+> >    virtio_ring: no store dma info when unmap is not needed
+> >    virtio: find_vqs: pass struct instead of multi parameters
+> >    virtio: vring_new_virtqueue(): pass struct instead of multi paramete=
+rs
+> >    virtio_ring: reuse the parameter struct of find_vqs()
+> >    virtio: find_vqs: add new parameter premapped
+> >    virtio_ring: export premapped to driver by struct virtqueue
+> >    virtio_net: set premapped mode by find_vqs()
+> >    virtio_ring: remove api of setting vq premapped
+> >    virtio_ring: introduce dma map api for page
+> >    virtio_net: unify the code for recycling the xmit ptr
+> >    virtio_net: rename free_old_xmit_skbs to free_old_xmit
+> >    virtio_net: sq support premapped mode
 >
-> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Acked-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-Eric
-> ---
->  lib/ctype.h  | 10 ++++++++++
->  lib/string.c | 14 ++++++++++++++
->  lib/string.h |  2 ++
->  3 files changed, 26 insertions(+)
+> The above can not be cleanly merged into kernel 6.8-rc2.
 >
-> diff --git a/lib/ctype.h b/lib/ctype.h
-> index 48a9c16300f8..45c96f111e19 100644
-> --- a/lib/ctype.h
-> +++ b/lib/ctype.h
-> @@ -37,4 +37,14 @@ static inline int isspace(int c)
->          return c == ' ' || c == '\t' || c == '\r' || c == '\n' || c == '\v' || c == '\f';
->  }
->  
-> +static inline int toupper(int c)
-> +{
-> +	return islower(c) ? c - 'a' + 'A' : c;
-> +}
-> +
-> +static inline int tolower(int c)
-> +{
-> +	return isupper(c) ? c - 'A' + 'a' : c;
-> +}
-> +
->  #endif /* _CTYPE_H_ */
-> diff --git a/lib/string.c b/lib/string.c
-> index 6d8a6380db92..ab6a724a3144 100644
-> --- a/lib/string.c
-> +++ b/lib/string.c
-> @@ -54,11 +54,25 @@ int strncmp(const char *a, const char *b, size_t n)
->  	return 0;
->  }
->  
-> +int strncasecmp(const char *a, const char *b, size_t n)
-> +{
-> +	for (; n--; ++a, ++b)
-> +		if (tolower(*a) != tolower(*b) || *a == '\0')
-> +			return tolower(*a) - tolower(*b);
-> +
-> +	return 0;
-> +}
-> +
->  int strcmp(const char *a, const char *b)
->  {
->  	return strncmp(a, b, SIZE_MAX);
->  }
->  
-> +int strcasecmp(const char *a, const char *b)
-> +{
-> +	return strncasecmp(a, b, SIZE_MAX);
-> +}
-> +
->  char *strchr(const char *s, int c)
->  {
->  	while (*s != (char)c)
-> diff --git a/lib/string.h b/lib/string.h
-> index 758dca8af36a..a28d75641530 100644
-> --- a/lib/string.h
-> +++ b/lib/string.h
-> @@ -15,6 +15,8 @@ extern char *strcat(char *dest, const char *src);
->  extern char *strcpy(char *dest, const char *src);
->  extern int strcmp(const char *a, const char *b);
->  extern int strncmp(const char *a, const char *b, size_t n);
-> +int strcasecmp(const char *a, const char *b);
-> +int strncasecmp(const char *a, const char *b, size_t n);
->  extern char *strchr(const char *s, int c);
->  extern char *strrchr(const char *s, int c);
->  extern char *strchrnul(const char *s, int c);
+> Perhaps a base-commit is needed. About base-commit, please see the link
+> https://people.kernel.org/monsieuricon/all-patches-must-include-base-comm=
+it-info
 
+The target branch is Michael's vhost.
+
+https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git/log/?h=3Dlinu=
+x-next
+
+Thanks.
+
+>
+> Zhu Yanjun
+>
+> >
+> >   arch/um/drivers/virtio_uml.c             |  29 +-
+> >   drivers/net/virtio_net.c                 | 298 +++++++---
+> >   drivers/platform/mellanox/mlxbf-tmfifo.c |  24 +-
+> >   drivers/remoteproc/remoteproc_virtio.c   |  31 +-
+> >   drivers/s390/virtio/virtio_ccw.c         |  33 +-
+> >   drivers/virtio/virtio_mmio.c             |  30 +-
+> >   drivers/virtio/virtio_pci_common.c       |  59 +-
+> >   drivers/virtio/virtio_pci_common.h       |   9 +-
+> >   drivers/virtio/virtio_pci_legacy.c       |  16 +-
+> >   drivers/virtio/virtio_pci_modern.c       |  24 +-
+> >   drivers/virtio/virtio_ring.c             | 660 ++++++++++++-----------
+> >   drivers/virtio/virtio_vdpa.c             |  33 +-
+> >   include/linux/virtio.h                   |  10 +-
+> >   include/linux/virtio_config.h            |  48 +-
+> >   include/linux/virtio_ring.h              |  82 +--
+> >   tools/virtio/virtio_test.c               |   4 +-
+> >   tools/virtio/vringh_test.c               |  32 +-
+> >   17 files changed, 812 insertions(+), 610 deletions(-)
+> >
+> > --
+> > 2.32.0.3.g01195cf9f
+> >
+>
 
