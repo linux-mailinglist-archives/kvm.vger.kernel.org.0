@@ -1,207 +1,209 @@
-Return-Path: <kvm+bounces-7673-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7674-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40F8184526B
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 09:09:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BAF78452B4
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 09:29:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 734281C26024
-	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 08:09:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6F950B22E5E
+	for <lists+kvm@lfdr.de>; Thu,  1 Feb 2024 08:29:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AFEE15A499;
-	Thu,  1 Feb 2024 08:08:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81CDF159585;
+	Thu,  1 Feb 2024 08:29:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KUf9fVqL"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KpxDd4hy"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 405C715B109
-	for <kvm@vger.kernel.org>; Thu,  1 Feb 2024 08:08:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE227159589
+	for <kvm@vger.kernel.org>; Thu,  1 Feb 2024 08:29:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706774907; cv=none; b=d+Y0OPFDnXdYtD6NM4/6tN/2rWXpBbgPOzqWH1NVWtrD8ZM34LPITrYJT11LnVSxI9UQY6mTm1W0V0kYmgxteabyl3W6B7gBmvj+HL8gb7s+N41lXIQCFL2xuOHkALrGiDyYob2Rj/1kw6IGxu7L6ksDI8PXwg9hDpbnLtxTD6o=
+	t=1706776169; cv=none; b=VkRRvyENj+1LpfOcuKm6V9szMOh3RNbACA3EJllicpnsZVTkvXAEDASzQv0n51JotgnGDkxz1y8qRxO+o+0IRES/HqclxY1bXvQIEwm/ndhcOcY1LsOVfwRWSeZXBfIXnMHXokLM59n8j7OffzYOvsolj0q7ImwrnwPQ7dX2qZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706774907; c=relaxed/simple;
-	bh=yRW+zk6ipQx+/UeKBycRl86N7OpB8VApca3JZVyt31I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=phR+6fmlyjKOjSQ6u3eGLznEpmaY6nZSNh78hNUCFAiKUug94AwFztkCfKVVCUytmmUFA79qsoL8d2EgSZ4cJvX8Bl9Bia1IPK3Q4UC6WvtIUw0a4++KWIlqHLUJQd0+PohD6GoF03FcrUdBX6ka10p+LXgwZb1Go5EyS7OEduc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KUf9fVqL; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1706776169; c=relaxed/simple;
+	bh=G2AM12amVMrP7GZrkut2e97ASmNSuJ6AUi0+jpz9Sno=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SLG2IKukpBOCKgMjKCgG5xVciDX3fqIvn4kWLiEYbNNCrPfl0N4Sekv6jUhIAALhTUqyv4gRhxwr/eB1o7/zkO64NNmo6heoxXf3puKxmblG7+VYp5mqjn3D656CGFnGs9uS3zGQxUc/UhqmLCfp/5JaLUSs5paT2EkZoxgOaDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KpxDd4hy; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706774896;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	s=mimecast20190719; t=1706776166;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=iy0to9gJNsnChVp/GnNaL86E7YakxrA6m3SgledDRmM=;
-	b=KUf9fVqL2VNKyOK/W4u2vJjGcoR0ZzK0JfOARQOruN+EmAIoApqVfkDNm5N83wlLezXF8z
-	hgy9yuQeD7uiATwZR6OojRBpzEExLxt2NxnP/Hjq5LVtdSxNveoDBgC4d7FB3DdrFTiUB9
-	v5cQ0Y3GDeZx20dShwcSQBJ6rjWjrcY=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=X9MZIyh9FSa9PbK1/5CHC5q5vkvb+rf2FqdbmMNUUP0=;
+	b=KpxDd4hySrMzQkMYsUrCFFffhd061sEBKDayByd9poz9zs8yUfcpAr14SO2vwh5DqV8EBa
+	tFRwrOgJmB5VbDRv92EXgPWClXUcp/az/RZVP06in+PuR81YO8YQlWzEIzyEDsBDxr9FS7
+	zqoC2Mdmo9BmsmVCMOtLOwjiB1PE8Hg=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-79-DlyIt0NBOg6P3Iyl7CjwOQ-1; Thu, 01 Feb 2024 03:08:14 -0500
-X-MC-Unique: DlyIt0NBOg6P3Iyl7CjwOQ-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a2fba67ec20so38712266b.3
-        for <kvm@vger.kernel.org>; Thu, 01 Feb 2024 00:08:14 -0800 (PST)
+ us-mta-680-Nx559nStP1yqMA00ITtvRw-1; Thu, 01 Feb 2024 03:29:25 -0500
+X-MC-Unique: Nx559nStP1yqMA00ITtvRw-1
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-5101b9343easo492964e87.3
+        for <kvm@vger.kernel.org>; Thu, 01 Feb 2024 00:29:25 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706774894; x=1707379694;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iy0to9gJNsnChVp/GnNaL86E7YakxrA6m3SgledDRmM=;
-        b=DJUkPKmhRYXyjOQ9rgMIVJ1J7MrKOvd0wWnj154+WhHq24o6GGxvu7zdOMeaw/yleH
-         xBskIPUTXm+VLRW/Mv9JXx8SNciI7PzmgxfHgDNweYsHrDk9qANDVM2j5MxG/9Gp8Rbd
-         GP8ftcHBOtk+bCkFa1fr/PGQ30qmDeVC40C6e22yLmVvNUcrdk0mOBB1E++m8xB6nlFI
-         rzycOdbc0wimgnusvBKrvWAKpJQaWGOU8k3y+ccQhHS8NWJiWoOdWLL2yNhwequ8hzDv
-         6WH3Krk5QB0c2NZO1J20Zj1YdaWNlzZFqRFYh+hk1cCkf0qVEljsPvId+YSz/EP4G4bb
-         2Q0A==
-X-Gm-Message-State: AOJu0YxceHvkxAntudGEoPCEzlbm51ni6X/QEGeFbgfyXg6GafHdmBN8
-	2xc5adc1Msrw7z9yW9PnvjAvbAGH+7IpgsCpyR+B8FxHw0uDiQ9zDYHrgmRFRserE8ounV6Y13n
-	xRvRYAuu9rLsvovqcSHG72Ce0gAmA5LvuwVjjBXTz4v0ZLhzxkw==
-X-Received: by 2002:a17:907:994a:b0:a36:6198:3505 with SMTP id kl10-20020a170907994a00b00a3661983505mr2891736ejc.25.1706774893763;
-        Thu, 01 Feb 2024 00:08:13 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGR6sQz2gxBGtwqzlmOhuYoQMalz//Dwvh7p+uyOALTuWEkXwrce4iZxrh7C6Z3DpndGvJclg==
-X-Received: by 2002:a17:907:994a:b0:a36:6198:3505 with SMTP id kl10-20020a170907994a00b00a3661983505mr2891712ejc.25.1706774893374;
-        Thu, 01 Feb 2024 00:08:13 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCUPikGwlmK61HBD824LPki9FCPfzBqA8DOG1qFKTu86qM6TT3O5V9/CvItrJ98+QzfcVoEyp+96Zr1Nn2L+BvS4DqHAaoL3vKwZ6lp6Isco+Twi35RKwnoZUuMkraXf3k7IhNqwNPtWxXU0q5hpZ3dtYMws/l0G/WLT2JxU+Az61Ph3wfFwo0rWQrE9KpQ7vopZeP4GRY7hV6XC5TPZ8jR/tHxE8mlGsfTD2vqlwVDFVHk3t88eeqmNpQtAeXcq4Z1TDE9naso78eI=
-Received: from redhat.com ([2a02:14f:179:3a6d:f252:c632:3893:a2ef])
-        by smtp.gmail.com with ESMTPSA id m1-20020a1709062b8100b00a363e8be473sm2143643ejg.143.2024.02.01.00.08.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Feb 2024 00:08:12 -0800 (PST)
-Date: Thu, 1 Feb 2024 03:08:07 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Tobias Huschle <huschle@linux.ibm.com>
-Cc: Jason Wang <jasowang@redhat.com>, Abel Wu <wuyun.abel@bytedance.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org
-Subject: Re: Re: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6
- sched/fair: Add lag based placement)
-Message-ID: <20240201030341-mutt-send-email-mst@kernel.org>
-References: <CACGkMEudZnF7hUajgt0wtNPCxH8j6A3L1DgJj2ayJWhv9Bh1WA@mail.gmail.com>
- <20231212111433-mutt-send-email-mst@kernel.org>
- <42870.123121305373200110@us-mta-641.us.mimecast.lan>
- <20231213061719-mutt-send-email-mst@kernel.org>
- <25485.123121307454100283@us-mta-18.us.mimecast.lan>
- <20231213094854-mutt-send-email-mst@kernel.org>
- <20231214021328-mutt-send-email-mst@kernel.org>
- <92916.124010808133201076@us-mta-622.us.mimecast.lan>
- <20240121134311-mutt-send-email-mst@kernel.org>
- <07974.124020102385100135@us-mta-501.us.mimecast.lan>
+        d=1e100.net; s=20230601; t=1706776164; x=1707380964;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=X9MZIyh9FSa9PbK1/5CHC5q5vkvb+rf2FqdbmMNUUP0=;
+        b=M8Ljg9mYAncSd6v8iGV3EJAHD0oueerGa3SWN9cAyEcYT4y1tr2DRs/+32kId2B8n/
+         EtuinSNRpgEwD3flChaEb1jFtQfmzuyhtIzTM1gqNz4HP8YOuZljZFUHlPaQBx1H5Ek5
+         1E89SDbC3NY/aQAOZFS9tcvf5QRaWgD/ZDj7KJUB85FBvguAwV/Zrqwox7RYfIE+7Un6
+         f40p4D6RJSFrYI2nvxhvTLZq20s67NbV/5KQyW4pA9a7ymD4h4B5o+s3oy+/GY1Fbj6x
+         4KTGsXCBrw8TDXhHIpgH1FP5Yuqa5cpDQVfRWywxEOZ4acAjm7tUIvIenIxL2Uj1DZOw
+         Eitw==
+X-Gm-Message-State: AOJu0Yyvb4fYfXgDxUnM+AQ/gOZLoUvgDvfjrP8PJD5Nm+FSnTCG429I
+	eyC0TLIIYbesnGWR060MeLZ8D0F/V+qkvJVSvPfQ4L+x4d6mbQ/xND0ZchVtisjz9QMRenT5btI
+	VXFGfhhBsDgPXc4+8nNGFASb+Vof2EdBwun1VlGMevhmb05I5XA==
+X-Received: by 2002:a05:6512:40c:b0:511:300c:d40 with SMTP id u12-20020a056512040c00b00511300c0d40mr494948lfk.22.1706776164261;
+        Thu, 01 Feb 2024 00:29:24 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE4Wtl9F00WmIcVZzUI9GgxMBA9Jw/EuFwtCT01zyHKVbWo1cfOrwDxkZlAB7zsztJlmflgxQ==
+X-Received: by 2002:a05:6512:40c:b0:511:300c:d40 with SMTP id u12-20020a056512040c00b00511300c0d40mr494936lfk.22.1706776163954;
+        Thu, 01 Feb 2024 00:29:23 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCVG5oaiR8h3AJCow9zKczsXhGg/hyrZfHKcIOnsw8823xzKGU65rkho7WydIvsh2Kjbxk0OGiOothfvmzQdo2vdPyCiYgoYQ9joVE9VWarEODeKHYy9gWXcr0AHr1RuYwbv0rOyw0bSv8relNci25sj3lAKxZguTtEufVHUcdFvaXYPX8k7wozBtrx8OEHkwf3coLK8pSiM+GYsY36LsAHNRw70kTk0jvgoAXjBtw4/fVAUQyN6lVsFiTUsOxpxK4cfL0jtIIxaEtQoT6VtIqvQ1EAXWzl3H4c966OiWdMzDu0lsHMb9U8=
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id jr7-20020a05600c560700b0040efa513540sm3643423wmb.22.2024.02.01.00.29.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 01 Feb 2024 00:29:23 -0800 (PST)
+Message-ID: <caa36aaf-e386-4217-8444-8b6f38be00ea@redhat.com>
+Date: Thu, 1 Feb 2024 09:29:21 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <07974.124020102385100135@us-mta-501.us.mimecast.lan>
+User-Agent: Mozilla Thunderbird
+Reply-To: eric.auger@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v2 04/24] arm/arm64: Share cpu online,
+ present and idle masks
+Content-Language: en-US
+To: Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org,
+ kvm-riscv@lists.infradead.org, kvmarm@lists.linux.dev
+Cc: ajones@ventanamicro.com, anup@brainfault.org, atishp@atishpatra.org,
+ pbonzini@redhat.com, thuth@redhat.com, alexandru.elisei@arm.com
+References: <20240126142324.66674-26-andrew.jones@linux.dev>
+ <20240126142324.66674-30-andrew.jones@linux.dev>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20240126142324.66674-30-andrew.jones@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Feb 01, 2024 at 08:38:43AM +0100, Tobias Huschle wrote:
-> On Sun, Jan 21, 2024 at 01:44:32PM -0500, Michael S. Tsirkin wrote:
-> > On Mon, Jan 08, 2024 at 02:13:25PM +0100, Tobias Huschle wrote:
-> > > On Thu, Dec 14, 2023 at 02:14:59AM -0500, Michael S. Tsirkin wrote:
-> > > - Along with the wakeup of the kworker, need_resched needs to
-> > >   be set, such that cond_resched() triggers a reschedule.
-> > 
-> > Let's try this? Does not look like discussing vhost itself will
-> > draw attention from scheduler guys but posting a scheduling
-> > patch probably will? Can you post a patch?
-> 
-> As a baseline, I verified that the following two options fix
-> the regression:
-> 
-> - replacing the cond_resched in the vhost_worker function with a hard
->   schedule 
-> - setting the need_resched flag using set_tsk_need_resched(current)
->   right before calling cond_resched
-> 
-> I then tried to find a better spot to put the set_tsk_need_resched
-> call. 
-> 
-> One approach I found to be working is setting the need_resched flag 
-> at the end of handle_tx and hande_rx.
-> This would be after data has been actually passed to the socket, so 
-> the originally blocked kworker has something to do and will profit
-> from the reschedule. 
-> It might be possible to go deeper and place the set_tsk_need_resched
-> call to the location right after actually passing the data, but this
-> might leave us with sprinkling that call in multiple places and
-> might be too intrusive.
-> Furthermore, it might be possible to check if an error occured when
-> preparing the transmission and then skip the setting of the flag.
-> 
-> This would require a conceptual decision on the vhost side.
-> This solution would not touch the scheduler, only incentivise it to
-> do the right thing for this particular regression.
-> 
-> Another idea could be to find the counterpart that initiates the
-> actual data transfer, which I assume wakes up the kworker. From
-> what I gather it seems to be an eventfd notification that ends up
-> somewhere in the qemu code. Not sure if that context would allow
-> to set the need_resched flag, nor whether this would be a good idea.
-> 
-> > 
-> > > - On cond_resched(), verify if the consumed runtime of the caller
-> > >   is outweighing the negative lag of another process (e.g. the 
-> > >   kworker) and schedule the other process. Introduces overhead
-> > >   to cond_resched.
-> > 
-> > Or this last one.
-> 
-> On cond_resched itself, this will probably only be possible in a very 
-> very hacky way. That is because currently, there is no immidiate access
-> to the necessary data available, which would make it necessary to 
-> bloat up the cond_resched function quite a bit, with a probably 
-> non-negligible amount of overhead.
-> 
-> Changing other aspects in the scheduler might get us in trouble as
-> they all would probably resolve back to the question "What is the magic
-> value that determines whether a small task not being scheduled justifies
-> setting the need_resched flag for a currently running task or adjusting 
-> its lag?". As this would then also have to work for all non-vhost related
-> cases, this looks like a dangerous path to me on second thought.
-> 
-> 
-> -------- Summary --------
-> 
-> In my (non-vhost experience) opinion the way to go would be either
-> replacing the cond_resched with a hard schedule or setting the
-> need_resched flag within vhost if the a data transfer was successfully
-> initiated. It will be necessary to check if this causes problems with
-> other workloads/benchmarks.
+Hi Drew,
 
-Yes but conceptually I am still in the dark on whether the fact that
-periodically invoking cond_resched is no longer sufficient to be nice to
-others is a bug, or intentional.  So you feel it is intentional?
-I propose a two patch series then:
+On 1/26/24 15:23, Andrew Jones wrote:
+> RISC-V will also use Arm's three cpumasks. These were in smp.h,
+> but they can be in cpumask.h instead, so move them there, which
+> is now shared.
+>
+> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Acked-by: Thomas Huth <thuth@redhat.com>
 
-patch 1: in this text in Documentation/kernel-hacking/hacking.rst
-
-If you're doing longer computations: first think userspace. If you
-**really** want to do it in kernel you should regularly check if you need
-to give up the CPU (remember there is cooperative multitasking per CPU).
-Idiom::
-
-    cond_resched(); /* Will sleep */
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
 
-replace cond_resched -> schedule
-
-
-Since apparently cond_resched is no longer sufficient to
-make the scheduler check whether you need to give up the CPU.
-
-patch 2: make this change for vhost.
-
-WDYT?
-
--- 
-MST
+Eric
+> ---
+>  lib/arm/asm/smp.h | 33 ---------------------------------
+>  lib/cpumask.h     | 33 +++++++++++++++++++++++++++++++++
+>  2 files changed, 33 insertions(+), 33 deletions(-)
+>
+> diff --git a/lib/arm/asm/smp.h b/lib/arm/asm/smp.h
+> index bb3e71a55e8c..b89a68dd344f 100644
+> --- a/lib/arm/asm/smp.h
+> +++ b/lib/arm/asm/smp.h
+> @@ -23,39 +23,6 @@ extern bool cpu0_calls_idle;
+>  extern void halt(void);
+>  extern void do_idle(void);
+>  
+> -extern cpumask_t cpu_present_mask;
+> -extern cpumask_t cpu_online_mask;
+> -extern cpumask_t cpu_idle_mask;
+> -#define cpu_present(cpu)		cpumask_test_cpu(cpu, &cpu_present_mask)
+> -#define cpu_online(cpu)			cpumask_test_cpu(cpu, &cpu_online_mask)
+> -#define cpu_idle(cpu)			cpumask_test_cpu(cpu, &cpu_idle_mask)
+> -#define for_each_present_cpu(cpu)	for_each_cpu(cpu, &cpu_present_mask)
+> -#define for_each_online_cpu(cpu)	for_each_cpu(cpu, &cpu_online_mask)
+> -
+> -static inline void set_cpu_present(int cpu, bool present)
+> -{
+> -	if (present)
+> -		cpumask_set_cpu(cpu, &cpu_present_mask);
+> -	else
+> -		cpumask_clear_cpu(cpu, &cpu_present_mask);
+> -}
+> -
+> -static inline void set_cpu_online(int cpu, bool online)
+> -{
+> -	if (online)
+> -		cpumask_set_cpu(cpu, &cpu_online_mask);
+> -	else
+> -		cpumask_clear_cpu(cpu, &cpu_online_mask);
+> -}
+> -
+> -static inline void set_cpu_idle(int cpu, bool idle)
+> -{
+> -	if (idle)
+> -		cpumask_set_cpu(cpu, &cpu_idle_mask);
+> -	else
+> -		cpumask_clear_cpu(cpu, &cpu_idle_mask);
+> -}
+> -
+>  extern void smp_boot_secondary(int cpu, secondary_entry_fn entry);
+>  extern void on_cpu_async(int cpu, void (*func)(void *data), void *data);
+>  extern void on_cpu(int cpu, void (*func)(void *data), void *data);
+> diff --git a/lib/cpumask.h b/lib/cpumask.h
+> index d30e14cda09e..be1919234d8e 100644
+> --- a/lib/cpumask.h
+> +++ b/lib/cpumask.h
+> @@ -119,4 +119,37 @@ static inline int cpumask_next(int cpu, const cpumask_t *mask)
+>  			(cpu) < nr_cpus; 			\
+>  			(cpu) = cpumask_next(cpu, mask))
+>  
+> +extern cpumask_t cpu_present_mask;
+> +extern cpumask_t cpu_online_mask;
+> +extern cpumask_t cpu_idle_mask;
+> +#define cpu_present(cpu)		cpumask_test_cpu(cpu, &cpu_present_mask)
+> +#define cpu_online(cpu)			cpumask_test_cpu(cpu, &cpu_online_mask)
+> +#define cpu_idle(cpu)			cpumask_test_cpu(cpu, &cpu_idle_mask)
+> +#define for_each_present_cpu(cpu)	for_each_cpu(cpu, &cpu_present_mask)
+> +#define for_each_online_cpu(cpu)	for_each_cpu(cpu, &cpu_online_mask)
+> +
+> +static inline void set_cpu_present(int cpu, bool present)
+> +{
+> +	if (present)
+> +		cpumask_set_cpu(cpu, &cpu_present_mask);
+> +	else
+> +		cpumask_clear_cpu(cpu, &cpu_present_mask);
+> +}
+> +
+> +static inline void set_cpu_online(int cpu, bool online)
+> +{
+> +	if (online)
+> +		cpumask_set_cpu(cpu, &cpu_online_mask);
+> +	else
+> +		cpumask_clear_cpu(cpu, &cpu_online_mask);
+> +}
+> +
+> +static inline void set_cpu_idle(int cpu, bool idle)
+> +{
+> +	if (idle)
+> +		cpumask_set_cpu(cpu, &cpu_idle_mask);
+> +	else
+> +		cpumask_clear_cpu(cpu, &cpu_idle_mask);
+> +}
+> +
+>  #endif /* _CPUMASK_H_ */
 
 
