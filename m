@@ -1,58 +1,58 @@
-Return-Path: <kvm+bounces-7808-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7810-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72ACD84674A
-	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 06:01:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67AFE84674E
+	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 06:02:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5CCA1C24F9F
-	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 05:01:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E3B9E1F2276A
+	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 05:02:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EC211B277;
-	Fri,  2 Feb 2024 04:57:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC2473FE44;
+	Fri,  2 Feb 2024 04:57:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aIaAUh6M"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="T0w3GHBm"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41EC618624;
-	Fri,  2 Feb 2024 04:57:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1081199C7;
+	Fri,  2 Feb 2024 04:57:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706849858; cv=none; b=QyCxGrk+fBd6N2pMgNcvi17owKZmtZkU+gnpgYQSZ/Yzm4wh96DDdJAwytS9G6/JYlQZNrBczX8NuDDF/GkZmOgOZeksaIjsfwtV486IMakQmcQ9HzMf3dimo4XFIq5cNoCORQ9qIGxEnlrvVLDLqWxB8rfSbEMIwO0k/PIUmLw=
+	t=1706849859; cv=none; b=Txy4UqsYPqzjUiTTEoNnm+YFJy2tvB+YdUOEcvg0UUDZnhEDHDQfnQOjoUeqereswXbqA6MYzZK7CwiUJ5qMw7wfOvRZlbLITI4IZqrHrIzoVrMA3XKGKMrtq+l3CgVYAEK+NpoAI9grxkWzT9D+wPySujsU6xapQPYM9D44xvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706849858; c=relaxed/simple;
-	bh=QAj3VSDW4vnn+85iNztQ9s3NyXx5nCvtMRrW9/sf7+4=;
+	s=arc-20240116; t=1706849859; c=relaxed/simple;
+	bh=UPkU4CgiMaVZ/F/r+r3Za8ed6ay66IJYSHKlYHufPks=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=HWkFRrw6VoeB6VWtLHOrEwKDKvZgskeutYlvEovIIHmgMeY1UneSJajkClnMTN8bO0SZexT0PqkOYrU5yx2xYRhN+dYkrcy/9l64fgLy+X74Ec+dox3oBodGO9mfiZOh8MkOrPGU3xVK5sDacWn7JLBLdcNL4ewbLtKwXThUk/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aIaAUh6M; arc=none smtp.client-ip=192.198.163.8
+	 MIME-Version; b=j2iomrYfDzplSmc79ibCkHiw1dfjY9QyEp1YpIJG6Jjuyiu6FqYzKUWqwYxEyPYpo/r7F7dGrpWhQ41inZB4owRF2ODBwHUMFg3u4NxjBTSsLcs2MxNVYsqHPg7imCMgs26GK6yMvTP/4umfZAOnjY7e7hDHWjJ2Ov8MkukaOl8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=T0w3GHBm; arc=none smtp.client-ip=192.198.163.8
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706849856; x=1738385856;
+  t=1706849858; x=1738385858;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=QAj3VSDW4vnn+85iNztQ9s3NyXx5nCvtMRrW9/sf7+4=;
-  b=aIaAUh6MXBBKLpWpRk3Va8xm9/sQUBNqoX0OxgOO9TqtbxSC6mJzmZt4
-   Lg5Grropsi1eCTx4oYLEDYaek4K282UtnbOQxfH+yqs9qFNkm2WoBF+ap
-   s3cRkUFU+hgQasbNe5cqSx4NHFkwNTrW82155OBPzXkdLykwEV3u4uAWv
-   Wqkis985A2AE/rwv1lkRag8drbTlYBBR8rMj6k1BJzPhe7juIALgOzRiQ
-   Yb7W/53py2KEivNlqquzUl8SSwWUnEKshTvljXYM7k/hihIP6YKaw/bRm
-   EOxodCJpfSw3sE0a605iT1qTYDhi4PAhnZ9ihd8YqJdrDwEPNbJPa2dQe
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="17615861"
+  bh=UPkU4CgiMaVZ/F/r+r3Za8ed6ay66IJYSHKlYHufPks=;
+  b=T0w3GHBm46+6MvQbdSXdnZ7OTOnlxg64zn0FSGiOt7m67z5m4fO3tKGI
+   E2xD9Os5j2oFs7n6yCQmqyqdtUETeIg3gySlphB8eN5PW8u7bK9rMqFvt
+   NSeUKzcd8Nk+kDVjFUYEJ/f1I13tkMECHftAcII/6kVwa08dR4t0A7T9/
+   BovkDpAW3t4yyHLEnthfAmhj2GDSWgsWo6NWq/xFaXv7nOIxzSgoENc8v
+   OyZErmmUuux8BSqbgxvaqlDAEFFTD4LXvNf3hMjDShpAbOWytnIlSDEPN
+   9qINJYIK+PZi0H63NNZF7igfNkMZ6Lu7SIkWjTk1xRqgXEm0bTZrvm22a
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="17615868"
 X-IronPort-AV: E=Sophos;i="6.05,237,1701158400"; 
-   d="scan'208";a="17615861"
+   d="scan'208";a="17615868"
 Received: from orsmga004.jf.intel.com ([10.7.209.38])
   by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2024 20:57:27 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="912339798"
+X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="912339801"
 X-IronPort-AV: E=Sophos;i="6.05,237,1701158400"; 
-   d="scan'208";a="912339798"
+   d="scan'208";a="912339801"
 Received: from rchatre-ws.ostc.intel.com ([10.54.69.144])
   by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2024 20:57:25 -0800
 From: Reinette Chatre <reinette.chatre@intel.com>
@@ -67,9 +67,9 @@ Cc: kvm@vger.kernel.org,
 	reinette.chatre@intel.com,
 	linux-kernel@vger.kernel.org,
 	patches@lists.linux.dev
-Subject: [PATCH 14/17] vfio/pci: Add utility to trigger INTx eventfd knowing interrupt context
-Date: Thu,  1 Feb 2024 20:57:08 -0800
-Message-Id: <e9a8d78ed76e253c5c9f71484da91070ce5df775.1706849424.git.reinette.chatre@intel.com>
+Subject: [PATCH 15/17] vfio/pci: Let enable and disable of interrupt types use same signature
+Date: Thu,  1 Feb 2024 20:57:09 -0800
+Message-Id: <bf87e46c249941ebbfacb20ee9ff92e8efd2a595.1706849424.git.reinette.chatre@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <cover.1706849424.git.reinette.chatre@intel.com>
 References: <cover.1706849424.git.reinette.chatre@intel.com>
@@ -81,93 +81,132 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-vfio_send_intx_eventfd() is available to signal the eventfd associated
-with the INTx interrupt. It does so by first obtaining the vector's
-interrupt context and then signaling the eventfd. The interrupt context
-may already be available before vfio_send_intx_eventfd() is called,
-making the additional query unnecessary.
+vfio_pci_set_intx_trigger() and vfio_pci_set_msi_trigger() have
+flows that can be shared.
 
-Introduce vfio_send_intx_eventfd_ctx() that can be used to signal the
-eventfd associated with the INTx interrupt when the interrupt context
-is already known and use it instead of vfio_send_intx_eventfd() in the
-one instance where the interrupt context is already known.
+For INTx, MSI, and MSI-X interrupt management to share the
+same enable/disable flow the interrupt specific enable and
+disable functions should have the same signatures.
 
-Replace usage of vfio_send_intx_eventfd() within
-vfio_pci_set_intx_trigger() with a new snippet that results in the
-same functionality while mirroring the flow vfio_pci_set_msi_trigger()
-as a preparatory step to merge vfio_pci_set_msi_trigger() and
-vfio_pci_set_intx_trigger(). The new snippet is marked as
-"temporary" until the flows are merged.
+Let vfio_intx_enable() and vfio_msi_enable() use the same
+parameters by passing "start" and "count" to these functions
+instead of letting the (what will eventually be) common code
+interpret these values.
+
+Providing "start" and "count" to vfio_intx_enable()
+enables the INTx specific check of these parameters to move into
+the INTx specific vfio_intx_enable(). Similarly, providing "start"
+and "count" to vfio_msi_enable() enables the MSI/MSI-X specific
+code to initialize number of vectors needed.
+
+The shared MSI/MSI-X code needs the interrupt index. Provide
+the interrupt index (clearly marked as unused) to the INTx code
+to use the same signatures.
+
+With interrupt type specific code using the same parameters it
+is possible to have common code that calls the enable/disable
+code for different interrupt types.
 
 Signed-off-by: Reinette Chatre <reinette.chatre@intel.com>
 ---
- drivers/vfio/pci/vfio_pci_intrs.c | 32 ++++++++++++++++++++++++-------
- 1 file changed, 25 insertions(+), 7 deletions(-)
+ drivers/vfio/pci/vfio_pci_intrs.c | 27 ++++++++++++++++++---------
+ 1 file changed, 18 insertions(+), 9 deletions(-)
 
 diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-index d7c2cd739d74..37065623d286 100644
+index 37065623d286..9217fea3f636 100644
 --- a/drivers/vfio/pci/vfio_pci_intrs.c
 +++ b/drivers/vfio/pci/vfio_pci_intrs.c
-@@ -103,6 +103,13 @@ vfio_irq_ctx_alloc(struct vfio_pci_core_device *vdev, unsigned long index)
- /*
-  * INTx
-  */
-+static void vfio_send_intx_eventfd_ctx(struct vfio_pci_core_device *vdev,
-+				       struct vfio_pci_irq_ctx *ctx)
-+{
-+	if (likely(is_intx(vdev) && !vdev->virq_disabled))
-+		eventfd_signal(ctx->trigger);
-+}
-+
- static void vfio_send_intx_eventfd(void *opaque, void *unused)
- {
- 	struct vfio_pci_core_device *vdev = opaque;
-@@ -245,7 +252,7 @@ static irqreturn_t vfio_intx_handler(int irq, void *dev_id)
- 	spin_unlock_irqrestore(&vdev->irqlock, flags);
- 
- 	if (ret == IRQ_HANDLED)
--		vfio_send_intx_eventfd(vdev, NULL);
-+		vfio_send_intx_eventfd_ctx(vdev, ctx);
- 
+@@ -257,13 +257,18 @@ static irqreturn_t vfio_intx_handler(int irq, void *dev_id)
  	return ret;
  }
-@@ -690,6 +697,9 @@ static int vfio_pci_set_intx_trigger(struct vfio_pci_core_device *vdev,
- 				     unsigned int count, uint32_t flags,
- 				     void *data)
+ 
+-static int vfio_intx_enable(struct vfio_pci_core_device *vdev)
++static int vfio_intx_enable(struct vfio_pci_core_device *vdev,
++			    unsigned int start, unsigned int count,
++			    unsigned int __always_unused index)
  {
-+	struct vfio_pci_irq_ctx *ctx;
-+	unsigned int i;
-+
- 	if (is_intx(vdev) && !count && (flags & VFIO_IRQ_SET_DATA_NONE)) {
- 		vfio_intx_disable(vdev);
- 		return 0;
-@@ -719,13 +729,21 @@ static int vfio_pci_set_intx_trigger(struct vfio_pci_core_device *vdev,
- 	if (!is_intx(vdev))
+ 	struct vfio_pci_irq_ctx *ctx;
+ 
+ 	if (!is_irq_none(vdev))
  		return -EINVAL;
  
--	if (flags & VFIO_IRQ_SET_DATA_NONE) {
--		vfio_send_intx_eventfd(vdev, NULL);
--	} else if (flags & VFIO_IRQ_SET_DATA_BOOL) {
--		uint8_t trigger = *(uint8_t *)data;
--		if (trigger)
--			vfio_send_intx_eventfd(vdev, NULL);
-+	/* temporary */
-+	for (i = start; i < start + count; i++) {
-+		ctx = vfio_irq_ctx_get(vdev, i);
-+		if (!ctx || !ctx->trigger)
-+			continue;
-+		if (flags & VFIO_IRQ_SET_DATA_NONE) {
-+			vfio_send_intx_eventfd_ctx(vdev, ctx);
-+		} else if (flags & VFIO_IRQ_SET_DATA_BOOL) {
-+			uint8_t *bools = data;
++	if (start != 0 || count != 1)
++		return -EINVAL;
 +
-+			if (bools[i - start])
-+				vfio_send_intx_eventfd_ctx(vdev, ctx);
-+		}
- 	}
-+
- 	return 0;
+ 	if (!vdev->pdev->irq)
+ 		return -ENODEV;
+ 
+@@ -332,7 +337,8 @@ static char *vfio_intx_device_name(struct vfio_pci_core_device *vdev,
+ 	return kasprintf(GFP_KERNEL_ACCOUNT, "vfio-intx(%s)", pci_name(pdev));
  }
+ 
+-static void vfio_intx_disable(struct vfio_pci_core_device *vdev)
++static void vfio_intx_disable(struct vfio_pci_core_device *vdev,
++			      unsigned int __always_unused index)
+ {
+ 	struct vfio_pci_irq_ctx *ctx;
+ 
+@@ -358,17 +364,20 @@ static irqreturn_t vfio_msihandler(int irq, void *arg)
+ 	return IRQ_HANDLED;
+ }
+ 
+-static int vfio_msi_enable(struct vfio_pci_core_device *vdev, int nvec,
++static int vfio_msi_enable(struct vfio_pci_core_device *vdev,
++			   unsigned int start, unsigned int count,
+ 			   unsigned int index)
+ {
+ 	struct pci_dev *pdev = vdev->pdev;
+ 	unsigned int flag;
+-	int ret;
++	int ret, nvec;
+ 	u16 cmd;
+ 
+ 	if (!is_irq_none(vdev))
+ 		return -EINVAL;
+ 
++	nvec = start + count;
++
+ 	flag = (index == VFIO_PCI_MSIX_IRQ_INDEX) ? PCI_IRQ_MSIX : PCI_IRQ_MSI;
+ 
+ 	/* return the number of supported vectors if we can't get all: */
+@@ -701,11 +710,11 @@ static int vfio_pci_set_intx_trigger(struct vfio_pci_core_device *vdev,
+ 	unsigned int i;
+ 
+ 	if (is_intx(vdev) && !count && (flags & VFIO_IRQ_SET_DATA_NONE)) {
+-		vfio_intx_disable(vdev);
++		vfio_intx_disable(vdev, index);
+ 		return 0;
+ 	}
+ 
+-	if (!(is_intx(vdev) || is_irq_none(vdev)) || start != 0 || count != 1)
++	if (!(is_intx(vdev) || is_irq_none(vdev)))
+ 		return -EINVAL;
+ 
+ 	if (flags & VFIO_IRQ_SET_DATA_EVENTFD) {
+@@ -715,13 +724,13 @@ static int vfio_pci_set_intx_trigger(struct vfio_pci_core_device *vdev,
+ 		if (is_intx(vdev))
+ 			return vfio_irq_set_block(vdev, start, count, fds, index);
+ 
+-		ret = vfio_intx_enable(vdev);
++		ret = vfio_intx_enable(vdev, start, count, index);
+ 		if (ret)
+ 			return ret;
+ 
+ 		ret = vfio_irq_set_block(vdev, start, count, fds, index);
+ 		if (ret)
+-			vfio_intx_disable(vdev);
++			vfio_intx_disable(vdev, index);
+ 
+ 		return ret;
+ 	}
+@@ -771,7 +780,7 @@ static int vfio_pci_set_msi_trigger(struct vfio_pci_core_device *vdev,
+ 			return vfio_irq_set_block(vdev, start, count,
+ 						  fds, index);
+ 
+-		ret = vfio_msi_enable(vdev, start + count, index);
++		ret = vfio_msi_enable(vdev, start, count, index);
+ 		if (ret)
+ 			return ret;
  
 -- 
 2.34.1
