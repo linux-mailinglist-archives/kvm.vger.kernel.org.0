@@ -1,111 +1,120 @@
-Return-Path: <kvm+bounces-7869-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7870-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 340BB847B8A
-	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 22:32:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3362847BF7
+	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 23:04:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D94B71F27CF8
-	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 21:32:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C7FD288C59
+	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 22:04:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48AD883A1C;
-	Fri,  2 Feb 2024 21:31:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E474785926;
+	Fri,  2 Feb 2024 22:03:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OKgdLLSG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="utht3VX+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB5ED83A03;
-	Fri,  2 Feb 2024 21:31:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B001883A09
+	for <kvm@vger.kernel.org>; Fri,  2 Feb 2024 22:03:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706909497; cv=none; b=m9leEEsqZeBLTKhtZKRw9XnxildElhpPpOYJc1Yz80/DnxYh7MagB5kSD25Vpnky20DECKGDEH6EPgevKYsrjwmKgGml5Pc1CHG9KhL6xQrwxhlPMEdO8dECpZbzwdDHRFR5WUtLIe4lZXaUfM48nZwXjHNLSHudEb3nBjACLe0=
+	t=1706911434; cv=none; b=WFpJYapef/3zDF9XDzmp6cuIvld7LpczqpV8C5RhXerZGx9laXNdlu+8LiQr5WBHek9RREMRcSAgmbfnKjXsls3INXoPh984zaYN+dQTZXKhLlZTXSXIL0ZxxJJsDZaSK5DH6k/DoUCqKEDRCrjNtrzbG9mjICrS2wdsa4e/qDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706909497; c=relaxed/simple;
-	bh=e/jtn8sn44EpFq31C7CYmB+SiierH0OvgSrhIK/xiS4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KG3gGPtCxCkpv/gGEvyx6UId8wyTw1Km0w/sZw22YfAfIdx2mMzpAuijdZYl+dipoIT0qpDvOC+duW5ZcrD9sXrzif3l0sp9U4sVAn7/Z7J4Gieq2BED8EvmKA9N/dWH+c4j6dyMdQ3Wg3eMTH34St21iYhkdY0SGh4m2n/4Pj4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OKgdLLSG; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706909496; x=1738445496;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=e/jtn8sn44EpFq31C7CYmB+SiierH0OvgSrhIK/xiS4=;
-  b=OKgdLLSGYbzT8o94fCo7cSVgzI3lU9DYBgmv0Icw9nvaEijRHRzVxiLj
-   ZIzMAT4GbTvObt5Xte+MlsAprBNjRywiQFrdOt+NXu0PSdno+Vyv36Qkn
-   0MY+ikNlzhF1KD7/lCwGvAFHmLOoXWFnwOSsqX0zGPSqXmPkRmX8aHyC7
-   IEEcmXIbgyiIsN+BrJ82xNOBx4s3KvN7jKkjSUTBhpmcokqEG5X4D6sI/
-   0sI83L0CuNG0E3iYCKpW3B4FxYEOjdx/3LCOJX3mljcHwdUJ9NdBOuQMK
-   9VFAEdLeqawxTCfpLmJ5rsGpD46tS2U+3FB7h6GfkL749fmxVMXsID658
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="143422"
-X-IronPort-AV: E=Sophos;i="6.05,238,1701158400"; 
-   d="scan'208";a="143422"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2024 13:31:35 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,238,1701158400"; 
-   d="scan'208";a="481566"
-Received: from shannonw-mobl2.amr.corp.intel.com (HELO desk) ([10.209.74.93])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2024 13:31:34 -0800
-Date: Fri, 2 Feb 2024 13:31:32 -0800
-From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To: Josh Poimboeuf <jpoimboe@kernel.org>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Andy Lutomirski <luto@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, tony.luck@intel.com,
-	ak@linux.intel.com, tim.c.chen@linux.intel.com,
-	Andrew Cooper <andrew.cooper3@citrix.com>,
-	Nikolay Borisov <nik.borisov@suse.com>,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	kvm@vger.kernel.org,
-	Alyssa Milburn <alyssa.milburn@linux.intel.com>,
-	Daniel Sneddon <daniel.sneddon@linux.intel.com>,
-	antonio.gomez.iglesias@linux.intel.com,
-	Alyssa Milburn <alyssa.milburn@intel.com>
-Subject: Re: [PATCH  v6 1/6] x86/bugs: Add asm helpers for executing VERW
-Message-ID: <20240202213132.kvdyz3dqqkzw7gox@desk>
-References: <20240123-delay-verw-v6-0-a8206baca7d3@linux.intel.com>
- <20240123-delay-verw-v6-1-a8206baca7d3@linux.intel.com>
- <20240202032909.exegdxpgyndlkn2n@treble>
+	s=arc-20240116; t=1706911434; c=relaxed/simple;
+	bh=mS6RlgWUtAgL4Hsb+bdLT8pfZr5Df9vOrkPpbDxrTGY=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=KWUJo3znHtL0RNqYBzzhVJp2VN68j2q/gIEjvwxOGudnIWQObyz9pLErFVe4SuHiSNrJ+Z/oDK5HS7qHpGVxaH4SclWGhtQYYOS/Y6UrzBuakiXKvtJDaWI5uFt0BlhqKY/by1yE+Vz41pXrSAz7yAw8+TLvhjUvmy4iRlzPM6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=utht3VX+; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dbf618042daso3579859276.0
+        for <kvm@vger.kernel.org>; Fri, 02 Feb 2024 14:03:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1706911431; x=1707516231; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9fdyvAj2ceAkBq1V2vAT6+dViND/2+FyBMSAlIkBp4A=;
+        b=utht3VX+hyijieij3Wso5n4JB6SH8vZdI/W8yRyEGPT7tQOqeVuXJJJHKJJwvhFaHl
+         AvH/c581c9tp6Iu1thyIbatXeHi9I0s/O1q2ZYc4Dicp26DEbG62o9+uV9s94tFjHz8L
+         jN+1R2pAOsr2e8kbAM9/MXU/x8I6LF1ij+H9JjySyHckLcZSk77iXY0JWzlqg8p5Rj9d
+         rKZ3pCZNXG7/6X4fx4zo0GKxgkzQFHBq9oxESFAPf2roGPMc/d1bTfDDpMk2+Bg1bb+a
+         ci+i4PTYBqBltTCPpekJPQeFxcMCrNRGfhEBHsExte+70+NW63BiNuojNEEd5+tgY17g
+         hAwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706911431; x=1707516231;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9fdyvAj2ceAkBq1V2vAT6+dViND/2+FyBMSAlIkBp4A=;
+        b=X/UoTCx+kScCxq9GtJxV3SJp41DLZvAHXKglzjcRXF4/EZLLIEe8pxCqJm1kD2MDwE
+         fbBOlBprrgiobfD2p8ctbcH9F+QILCBLEwlhtnjIG67KcYoEsGN+pVAPvU9RMf9hFvAy
+         IRjWpvC+64jW8fFXxNHvZ+YKbxp5zuqCNVO86qrJyZ4VSi43dcIk8szIU0jg87lcMrwg
+         OpzH2Aciv08HQu97pGngxN+yMQxf8vyv6A1nu4sBpJjWsUu4uqZLhVGU0fCJN2Mv/5z7
+         HtzmRFaNawd6Bjpr+XxULLm7vOP/4oHP4+nO+BnOL6glBT9Ba9DQp2MWUYraDmPZIOPH
+         HLjA==
+X-Gm-Message-State: AOJu0YygDrFU5g88hb8nn98idY9/ckCA7pJALqNu3hXobzk2FqdNe19J
+	/TsbatGwBIOi7EXF8anGwmY4umaLfV7JrfRGGqXErbLF+4NId8siTrMoMJU/AxJumlzoM0AzUi7
+	Y5w==
+X-Google-Smtp-Source: AGHT+IFpPBhkfQUEm966eS1GQX2rrTrFBtCY3uv3k+mXuiT5na9D0Sj1i0Fisqxp9eDGDSeUa0YKmeBQquo=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:240f:b0:dc6:4bf5:5a74 with SMTP id
+ dr15-20020a056902240f00b00dc64bf55a74mr297595ybb.11.1706911431732; Fri, 02
+ Feb 2024 14:03:51 -0800 (PST)
+Date: Fri, 2 Feb 2024 14:03:49 -0800
+In-Reply-To: <b45ee6cf-fa51-49eb-93ba-a54f4469470e@xen.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240202032909.exegdxpgyndlkn2n@treble>
+Mime-Version: 1.0
+References: <20240115125707.1183-1-paul@xen.org> <2b4d020c-08ba-46ac-b004-cd9cb7256bd9@xen.org>
+ <ZbMIu84Zi2_PF9o4@google.com> <b45ee6cf-fa51-49eb-93ba-a54f4469470e@xen.org>
+Message-ID: <Zb1mxTgzJRWLtofw@google.com>
+Subject: Re: [PATCH v12 00/20] KVM: xen: update shared_info and vcpu_info handling
+From: Sean Christopherson <seanjc@google.com>
+To: paul@xen.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, David Woodhouse <dwmw2@infradead.org>, Shuah Khan <shuah@kernel.org>, 
+	kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Feb 01, 2024 at 07:29:09PM -0800, Josh Poimboeuf wrote:
-> On Tue, Jan 23, 2024 at 11:41:01PM -0800, Pawan Gupta wrote:
-> > index 4af140cf5719..79a7e81b9458 100644
-> > --- a/arch/x86/include/asm/cpufeatures.h
-> > +++ b/arch/x86/include/asm/cpufeatures.h
-> > @@ -308,10 +308,10 @@
-> >  #define X86_FEATURE_SMBA		(11*32+21) /* "" Slow Memory Bandwidth Allocation */
-> >  #define X86_FEATURE_BMEC		(11*32+22) /* "" Bandwidth Monitoring Event Configuration */
-> >  #define X86_FEATURE_USER_SHSTK		(11*32+23) /* Shadow stack support for user mode applications */
-> > -
-> >  #define X86_FEATURE_SRSO		(11*32+24) /* "" AMD BTB untrain RETs */
-> >  #define X86_FEATURE_SRSO_ALIAS		(11*32+25) /* "" AMD BTB untrain RETs through aliasing */
-> >  #define X86_FEATURE_IBPB_ON_VMEXIT	(11*32+26) /* "" Issue an IBPB only on VMEXIT */
-> > +#define X86_FEATURE_CLEAR_CPU_BUF	(11*32+27) /* "" Clear CPU buffers using VERW */
+On Fri, Feb 02, 2024, Paul Durrant wrote:
+> On 26/01/2024 01:19, Sean Christopherson wrote:
+> > On Thu, Jan 25, 2024, Paul Durrant wrote:
+> > > On 15/01/2024 12:56, Paul Durrant wrote:
+> > > > From: Paul Durrant <pdurrant@amazon.com>
+> > > > 
+> > > > This series has one small fix to what was in v11 [1]:
+> > > > 
+> > > > * KVM: xen: re-initialize shared_info if guest (32/64-bit) mode is set
+> > > > 
+> > > > The v11 patch failed to set the return code of the ioctl if the mode
+> > > > was not actually changed, leading to a spurious failure.
+> > > > 
+> > > > This version of the series also contains a new bug-fix to the pfncache
+> > > > code from David Woodhouse.
+> > > > 
+> > > > [1] https://lore.kernel.org/kvm/20231219161109.1318-1-paul@xen.org/
+> > > > 
+> > > 
+> > > Ping?
+> > 
+> > Sorry, I have done basically zero upstream reviews over the last few weeks, for
+> > a variety of reasons.  Unless yet another thing pops up, I expect to dive into
+> > upstream reviews tomorrow and spend a good long while there.
 > 
-> This will need to be rebased.  And the "11*32" level is now full in
-> Linus' tree, so this will presumably need to go to a different "level".
+> Hi Sean,
+> 
+>   Have you had any time to take a look at this?
 
-Yes, will send a new rebased version.
+No, I was hoping to get to it today, but that isn't happening.  It's next in my
+queue after David Steven's "KVM: allow mapping non-refcounted pages" serie", so
+hopefully Monday or Tuesday will be the day.
 
