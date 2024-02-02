@@ -1,89 +1,127 @@
-Return-Path: <kvm+bounces-7776-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7777-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E4C5846539
-	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 02:03:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66B2584657B
+	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 02:39:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C04401F25E6B
-	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 01:03:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 999FB1C2403E
+	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 01:39:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C35FBE61;
-	Fri,  2 Feb 2024 01:03:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF38FC13E;
+	Fri,  2 Feb 2024 01:38:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xtC+82p3"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nfR9GklR"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A79BFBE59
-	for <kvm@vger.kernel.org>; Fri,  2 Feb 2024 01:03:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C9C4BE59;
+	Fri,  2 Feb 2024 01:38:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706835795; cv=none; b=QILeQLq0uS+PnRNTpdyQglonfSr/9fuvPRH8mtSdcwLFm05Hth0x6OAWY4Y1n54+Hvgjd81N7uUNZY0mu4sfSIWoeIiath7bSxsq53I3PZvEnySigaBj800iamN+izLn6jN99Wd+TU7NWAeLiWI4dIz2daiKwf19MZ3PxJxV6IA=
+	t=1706837939; cv=none; b=WITuarFJbPwmGQipcC/kkM+9MbE/WAbga30XbZ2KLQwjSqcRT+GZm1v2sKcSlmOqvDiufcAF9hw4pWEQB/lKm+wc/yuDoRfYAjphMttkT9aI09/BFDLIiNzZbt1i209XOKJQQcT2Je8X2AzIh07JG5tSptChiyaQGFxd3KnWAs8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706835795; c=relaxed/simple;
-	bh=mFPlKhdz7L2eM2XkLINvK0cSi79KSTAM+3hkIu+Lwhs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U6uEnjew0C33d90H7KixPstpodYNDwXTnMLikSRqkFm/97bk1mk9gnHd8+YxA7H7Cq3iW/FZMHJgSacaCWMXsoWTZr+R0Cw4xzeowFpEOEjjIU1kvE7Hr4ityf+rzm3TIlPrDrFcvqBDntHjB/qQ/z3JIAAoDuOE94tpp6OU5nM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xtC+82p3; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Fri, 2 Feb 2024 01:03:04 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706835791;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9PrC2aYf8pLPqSNAOw/QU3xgkqlWQAcR7b6XNjRtpdk=;
-	b=xtC+82p3mHdVo0ZQsM8DKUpnebYwaUsmGbfs7pzyJ2Ii971A0l6GL0aPXqV/+r67EFrySG
-	odZM1iGRMpopgj/+RAhgV9o1Yd+yNwrRsE54YIaMNhzP4eE4xFjWSA9YU5yzu7E1jt1BE/
-	JWOZL2sKapXBIb0EpZBw9X7orERJIoI=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Anish Moorthy <amoorthy@google.com>
-Cc: Sean Christopherson <seanjc@google.com>,
-	James Houghton <jthoughton@google.com>, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org,
-	robert.hoo.linux@gmail.com, dmatlack@google.com,
-	axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com,
-	isaku.yamahata@gmail.com, kconsul@linux.vnet.ibm.com
-Subject: Re: [PATCH v6 06/14] KVM: Add memslot flag to let userspace force an
- exit on missing hva mappings
-Message-ID: <Zbw_SOq9gsFfh284@linux.dev>
-References: <20231109210325.3806151-1-amoorthy@google.com>
- <20231109210325.3806151-7-amoorthy@google.com>
- <CADrL8HWYKSiDZ_ahGbMXjup=r75B4JqC3LvT8A-qPVenV+MOiw@mail.gmail.com>
- <CAF7b7mrA3rB33sUZe3HX33+fXpF=8VwD284LpCcEn9KT9OgwUQ@mail.gmail.com>
- <CADrL8HXSzm_C9UwUb8-H_c6-TRgpkKLE+qeXfyN-X_rHGj2vuw@mail.gmail.com>
- <ZbrxiSNV7e1C6LO-@linux.dev>
- <ZbvGoz67L3gtnHhI@google.com>
- <CAF7b7mpAt9Dr2jqU6uH=e9gno282BwtHcU7cSSrdBWz7adAW1A@mail.gmail.com>
+	s=arc-20240116; t=1706837939; c=relaxed/simple;
+	bh=zyaP16MSd8gEad9hTG4ClUHQAbuKQXGyiMvFX29b+L8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lMYD6kvmGH3YgIOlith0ytRyro9QJ1IUulsNEIWFi1hgd09YeAw+ZY62m44rJU6Vv66bT7pEKELIWTvwUsX0xeGkWfU3lHOerrazF3lFCXIPHYu9BQkXH/XTpn7lYnYSLhbHeRkoKILm6DySQzeei7/zr4qEZGgomxalDL3Jao8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nfR9GklR; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706837937; x=1738373937;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=zyaP16MSd8gEad9hTG4ClUHQAbuKQXGyiMvFX29b+L8=;
+  b=nfR9GklR2lTe5KPWnJYaRzWdIflCskEV45RMe3lsmhS4hS2PpkpXVDMi
+   hw+jiWo53MJFXYCBd6Qo3O4p72oFnS0pRSibF+tB0CA2tErsSP93icZ8q
+   LK2Rj1TRX+keRa47U+LmuBNaY8QicOc8h4nZF4SEld29gRNpoUuBq5ffx
+   W7dayxTOkoe/xVY067aU8WQMYTgFJeDQo8T3tb9twpG5fVX6Yf39XLnE6
+   FfjmMD2Vu8LpjqcI16tpvIK7g0GRxL+3w6/9oFY7hCxyvcohVP7uQY+mL
+   ONRnDBglxdm53xEGc8+jBILfF45qAflDDdEQL5PIVDJoZLZxPF20WUETE
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="240135"
+X-IronPort-AV: E=Sophos;i="6.05,236,1701158400"; 
+   d="scan'208";a="240135"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2024 17:38:55 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,236,1701158400"; 
+   d="scan'208";a="144139"
+Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.93.9.228]) ([10.93.9.228])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2024 17:38:53 -0800
+Message-ID: <95c3dc22-2d40-46fc-bc4d-8206b002e0a1@linux.intel.com>
+Date: Fri, 2 Feb 2024 09:38:50 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAF7b7mpAt9Dr2jqU6uH=e9gno282BwtHcU7cSSrdBWz7adAW1A@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: selftests: Test top-down slots event
+Content-Language: en-US
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Kan Liang <kan.liang@linux.intel.com>,
+ Jim Mattson <jmattson@google.com>, Jinrong Liang <cloudliang@tencent.com>,
+ Aaron Lewis <aaronlewis@google.com>, Dapeng Mi <dapeng1.mi@intel.com>
+References: <20240201061505.2027804-1-dapeng1.mi@linux.intel.com>
+ <Zbvcx0A-Ln2sP6XA@google.com>
+From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+In-Reply-To: <Zbvcx0A-Ln2sP6XA@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Feb 01, 2024 at 11:24:54AM -0800, Anish Moorthy wrote:
 
-[...]
+On 2/2/2024 2:02 AM, Sean Christopherson wrote:
+> On Thu, Feb 01, 2024, Dapeng Mi wrote:
+>> Although the fixed counter 3 and the exclusive pseudo slots events is
+>> not supported by KVM yet, the architectural slots event is supported by
+>> KVM and can be programed on any GP counter. Thus add validation for this
+>> architectural slots event.
+>>
+>> Top-down slots event "counts the total number of available slots for an
+>> unhalted logical processor, and increments by machine-width of the
+>> narrowest pipeline as employed by the Top-down Microarchitecture
+>> Analysis method." So suppose the measured count of slots event would be
+>> always larger than 0.
+> Please translate that into something non-perf folks can understand.  I know what
+> a pipeline slot is, and I know a dictionary's definition of "available" is, but I
+> still have no idea what this event actually counts.  In other words, I want a
+> precise definition of exactly what constitutes an "available slot", in verbiage
+> that anyone with basic understanding of x86 architectures can follow after reading
+> the whitepaper[*], which is helpful for understanding the concepts, but doesn't
+> crisply explain what this event counts.
+>
+> Examples of when a slot is available vs. unavailable would be extremely helpful.
+>
+> [*] https://www.intel.com/content/www/us/en/docs/vtune-profiler/cookbook/2023-0/top-down-microarchitecture-analysis-method.html
 
-> Gotcha, I'll go ahead and make the flags incompatible for the next
-> version. Thanks for the tidbit on how RO memslots are used Oliver- I
-> didn't know that we expect faults on these to be so rare.
+Yeah, indeed, 'slots' is not easily understood from its literal meaning. 
+I also took some time to understand it when I look at this event for the 
+first time. Simply speaking, slots is an abstract concept which 
+indicates how many uops (decoded from instructions) can be processed 
+simultaneously (per cycle) on HW. we assume there is a classic 5-stage 
+pipeline, fetch, decode, execute, memory access and register writeback. 
+In topdown micro-architectural analysis method, the former two stages 
+(fetch/decode) is called front-end and the last three stages are called 
+back-end.
 
-You should definitely go and check your userspace to make sure that is
-actually the case, but at least for open source VMMs that's the case :)
+In modern Intel processors, a complicated instruction could be decoded 
+into several uops (micro-operations) and so these uops can be processed 
+simultaneously and then improve the performance. Thus, assume a 
+processor can decode and dispatch 4 uops in front-end and execute 4 uops 
+in back-end simultaneously (per-cycle), so we would say this processor 
+has 4 topdown slots per-cycle. If a slot is spare and can be used to 
+process new uop, we say it's available, but if a slot is occupied by a 
+uop for several cycles and not retired (maybe blocked by memory access), 
+we say this slot is stall and unavailable.
 
--- 
-Thanks,
-Oliver
+Ok, I would rewrite the commit description and add more explanation there.
+
 
