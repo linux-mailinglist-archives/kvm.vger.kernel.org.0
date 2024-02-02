@@ -1,151 +1,111 @@
-Return-Path: <kvm+bounces-7868-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7869-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68F26847B66
-	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 22:15:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 340BB847B8A
+	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 22:32:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1DCA91F28588
-	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 21:15:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D94B71F27CF8
+	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 21:32:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD683839F9;
-	Fri,  2 Feb 2024 21:15:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48AD883A1C;
+	Fri,  2 Feb 2024 21:31:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K6X1dJBl"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OKgdLLSG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D3BE8063C
-	for <kvm@vger.kernel.org>; Fri,  2 Feb 2024 21:14:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB5ED83A03;
+	Fri,  2 Feb 2024 21:31:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706908502; cv=none; b=ho4QfpXsH9F4da3UxzERgY31PtoP5MF14y1S9J2a/GBJ3d2lB6J5n8UNZ3YewxPqdJR16AKFb41cIfaYXY8/IPlXaKKfYUwYOcHE0BUX/h8rGp4evvvKuSl30edPdqWh8MlQ5ZPls37qC5ValwtpYRpPWmeLi/Vez6aq9eXVO5U=
+	t=1706909497; cv=none; b=m9leEEsqZeBLTKhtZKRw9XnxildElhpPpOYJc1Yz80/DnxYh7MagB5kSD25Vpnky20DECKGDEH6EPgevKYsrjwmKgGml5Pc1CHG9KhL6xQrwxhlPMEdO8dECpZbzwdDHRFR5WUtLIe4lZXaUfM48nZwXjHNLSHudEb3nBjACLe0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706908502; c=relaxed/simple;
-	bh=WgxILiF//GwaDAUI2ya23z43c/S2iEAwu4PRQ9y0cAY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=lNYp1bfw7eroyVqZSka50Pp2/zdL57zQAkxJ3tUZi2I7afWv6EVg54QWFNM9MJmn5JprHmngPVUXXdr15VVJRhvXc/rO2YDrKjThZ8pU8vlXinF4duZmIA6vk4ZtOhdu1LeYn4GhMq+OZUl84udq99pFDxd4yjjUUKiI4jZdECI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K6X1dJBl; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5cec090b2bdso2688849a12.0
-        for <kvm@vger.kernel.org>; Fri, 02 Feb 2024 13:14:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706908499; x=1707513299; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Uq7KIGo6ksoIAaNr+JZVlNnWKqprFhC+i/3sd4c5jr0=;
-        b=K6X1dJBlCwndi4LNdjcIvUvZvMSJvoaCh2MEKpE29D7l/Yiu1fsEN5ib5hTVc2lB0M
-         JZGePZQVrSv2Iz84jqpLry6B1pjZuH/P8x7ZUAnCQhdvjrcalyI57V+B3frJx5cnqzjJ
-         mwROXz0Z0IsvoOM+MpLvy0XAY5cy5a43ffsoWRh7lOj3HOFTiyn/6LqtulUv8Yk/oyCL
-         DQtOQEQk9XtdJLxIBDgySSkYc1/MbVlOL9yOluJsnlaicEiiTqHj1EukteVKOzv9FkvE
-         EKKN3MJWFqbny+sZglzt1vdFA5rOVb2t8wahkn1hYKzHdozaWw2OICcH1YR6lZgOh3Jb
-         +SzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706908499; x=1707513299;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Uq7KIGo6ksoIAaNr+JZVlNnWKqprFhC+i/3sd4c5jr0=;
-        b=dAbavog7ppweZ+6kK48a2n/fpx9P5VbaQg2SaHOcgGnX3phygkpVgH0pF+VZPX0z+t
-         MCvizkblvjS887HmhJ9XqXY7QzWRE5GXKMWCprJ8Pknnf4rFLXudsj+gKWJGxVC+en9i
-         UA4CZf2RFYSYxRZtHds0DDxzJMMUgI78TaZ0rqI1Z07wE4XKgvQYYTG8gtmv58Ta/EBd
-         1ycIwktH/3rKa6q8HIireTDJUIuQja9/vxFR7tPoZoMaj50UtVHUBZlnABE4HxLISBoT
-         46LCR3kzMPz7gLrffFtCcVKvRqMcKG8BBXQJBy03ZDRhWkGzXjfG7R0q9BnPiywnlGGq
-         8aFA==
-X-Gm-Message-State: AOJu0YyMcq5BnuqVS5BQ07bCBOAmdRbcdhXyhBoCFtoNJYSby++7nwI2
-	/z/eZW9HGkavKYLgC81pyDMbJ2PWG99NAh73ce/sI2+rR7eqyjfTrNNK9/B+aIw25LD1ZpM2lU/
-	T3g==
-X-Google-Smtp-Source: AGHT+IFVLmLkVXVVvZGLfIWrnCvRLCG+jeP6MsCJO3IsM6/mFibOyj9YkN3wYbHEizc9kSQGUkDAu580T58=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a02:91a:b0:5db:edbd:a2e0 with SMTP id
- ck26-20020a056a02091a00b005dbedbda2e0mr65596pgb.3.1706908498760; Fri, 02 Feb
- 2024 13:14:58 -0800 (PST)
-Date: Fri, 2 Feb 2024 13:14:57 -0800
-In-Reply-To: <Zb0qaZ7iT0_8Rp7-@google.com>
+	s=arc-20240116; t=1706909497; c=relaxed/simple;
+	bh=e/jtn8sn44EpFq31C7CYmB+SiierH0OvgSrhIK/xiS4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KG3gGPtCxCkpv/gGEvyx6UId8wyTw1Km0w/sZw22YfAfIdx2mMzpAuijdZYl+dipoIT0qpDvOC+duW5ZcrD9sXrzif3l0sp9U4sVAn7/Z7J4Gieq2BED8EvmKA9N/dWH+c4j6dyMdQ3Wg3eMTH34St21iYhkdY0SGh4m2n/4Pj4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OKgdLLSG; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706909496; x=1738445496;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=e/jtn8sn44EpFq31C7CYmB+SiierH0OvgSrhIK/xiS4=;
+  b=OKgdLLSGYbzT8o94fCo7cSVgzI3lU9DYBgmv0Icw9nvaEijRHRzVxiLj
+   ZIzMAT4GbTvObt5Xte+MlsAprBNjRywiQFrdOt+NXu0PSdno+Vyv36Qkn
+   0MY+ikNlzhF1KD7/lCwGvAFHmLOoXWFnwOSsqX0zGPSqXmPkRmX8aHyC7
+   IEEcmXIbgyiIsN+BrJ82xNOBx4s3KvN7jKkjSUTBhpmcokqEG5X4D6sI/
+   0sI83L0CuNG0E3iYCKpW3B4FxYEOjdx/3LCOJX3mljcHwdUJ9NdBOuQMK
+   9VFAEdLeqawxTCfpLmJ5rsGpD46tS2U+3FB7h6GfkL749fmxVMXsID658
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="143422"
+X-IronPort-AV: E=Sophos;i="6.05,238,1701158400"; 
+   d="scan'208";a="143422"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2024 13:31:35 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,238,1701158400"; 
+   d="scan'208";a="481566"
+Received: from shannonw-mobl2.amr.corp.intel.com (HELO desk) ([10.209.74.93])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2024 13:31:34 -0800
+Date: Fri, 2 Feb 2024 13:31:32 -0800
+From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To: Josh Poimboeuf <jpoimboe@kernel.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Andy Lutomirski <luto@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, tony.luck@intel.com,
+	ak@linux.intel.com, tim.c.chen@linux.intel.com,
+	Andrew Cooper <andrew.cooper3@citrix.com>,
+	Nikolay Borisov <nik.borisov@suse.com>,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	kvm@vger.kernel.org,
+	Alyssa Milburn <alyssa.milburn@linux.intel.com>,
+	Daniel Sneddon <daniel.sneddon@linux.intel.com>,
+	antonio.gomez.iglesias@linux.intel.com,
+	Alyssa Milburn <alyssa.milburn@intel.com>
+Subject: Re: [PATCH  v6 1/6] x86/bugs: Add asm helpers for executing VERW
+Message-ID: <20240202213132.kvdyz3dqqkzw7gox@desk>
+References: <20240123-delay-verw-v6-0-a8206baca7d3@linux.intel.com>
+ <20240123-delay-verw-v6-1-a8206baca7d3@linux.intel.com>
+ <20240202032909.exegdxpgyndlkn2n@treble>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240202064332.9403-1-shahuang@redhat.com> <Zb0qaZ7iT0_8Rp7-@google.com>
-Message-ID: <Zb1bUU4V6TYFZ972@google.com>
-Subject: Re: [PATCH v3] KVM: selftests: Fix the dirty_log_test semaphore imbalance
-From: Sean Christopherson <seanjc@google.com>
-To: Shaoqin Huang <shahuang@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240202032909.exegdxpgyndlkn2n@treble>
 
-On Fri, Feb 02, 2024, Sean Christopherson wrote:
-> On Fri, Feb 02, 2024, Shaoqin Huang wrote:
-> > ---
-> > v2->v3:
-> >   - Rebase to v6.8-rc2.
-> >   - Use TEST_ASSERT().
+On Thu, Feb 01, 2024 at 07:29:09PM -0800, Josh Poimboeuf wrote:
+> On Tue, Jan 23, 2024 at 11:41:01PM -0800, Pawan Gupta wrote:
+> > index 4af140cf5719..79a7e81b9458 100644
+> > --- a/arch/x86/include/asm/cpufeatures.h
+> > +++ b/arch/x86/include/asm/cpufeatures.h
+> > @@ -308,10 +308,10 @@
+> >  #define X86_FEATURE_SMBA		(11*32+21) /* "" Slow Memory Bandwidth Allocation */
+> >  #define X86_FEATURE_BMEC		(11*32+22) /* "" Bandwidth Monitoring Event Configuration */
+> >  #define X86_FEATURE_USER_SHSTK		(11*32+23) /* Shadow stack support for user mode applications */
+> > -
+> >  #define X86_FEATURE_SRSO		(11*32+24) /* "" AMD BTB untrain RETs */
+> >  #define X86_FEATURE_SRSO_ALIAS		(11*32+25) /* "" AMD BTB untrain RETs through aliasing */
+> >  #define X86_FEATURE_IBPB_ON_VMEXIT	(11*32+26) /* "" Issue an IBPB only on VMEXIT */
+> > +#define X86_FEATURE_CLEAR_CPU_BUF	(11*32+27) /* "" Clear CPU buffers using VERW */
 > 
-> Patch says otherwise.
-> 
-> > @@ -726,6 +728,11 @@ static void run_test(enum vm_guest_mode mode, void *arg)
-> >  		return;
-> >  	}
-> >  
-> > +	sem_getvalue(&sem_vcpu_stop, &sem_val);
-> > +	assert(sem_val == 0);
-> > +	sem_getvalue(&sem_vcpu_cont, &sem_val);
-> > +	assert(sem_val == 0);
-> > +
-> >  	/*
-> >  	 * We reserve page table for 2 times of extra dirty mem which
-> >  	 * will definitely cover the original (1G+) test range.  Here
-> > @@ -825,6 +832,13 @@ static void run_test(enum vm_guest_mode mode, void *arg)
-> >  		sync_global_to_guest(vm, iteration);
-> >  	}
-> >  
-> > +	/*
-> > +	 *
-> > +	 * Before we set the host_quit, let the vcpu has time to run, to make
-> > +	 * sure we consume the sem_vcpu_stop and the vcpu consume the
-> > +	 * sem_vcpu_cont, to keep the semaphore balance.
-> > +	 */
-> > +	usleep(p->interval * 1000);
-> 
-> Sorry, I wasn't as explicit as I should have been.  When I said I don't have a
-> better solution, I did not mean to imply that I am ok with busy waiting as a
-> hack-a-around.
-> 
-> Against my better judgment, I spent half an hour slogging through this test to
-> figure out what's going wrong.  IIUC, the problem is essentially that the test
-> instructs the vCPU worker to continue _after_ the last iteration, and _then_ sets
-> host_quit, which results in the vCPU running one extra (unvalidated) iteration.
-> 
-> For the other modes, which stop if and only if vcpu_sync_stop_requested is set,
-> the extra iteration is a non-issue.  But because the dirty ring variant stops
-> after every exit (to purge the ring), it hangs without an extra "continue".
-> 
-> So rather than blindly fire off an extra sem_vcpu_cont that may or may not be
-> consumed, I believe the test can simply set host_quit _before_ the final "continue"
-> so that the vCPU worker doesn't run an extra iteration.
-> 
-> I ran the below with 1000 loops of "for (i = 0; i < LOG_MODE_NUM; i++)" and so
-> no issues.  I didn't see the assert you hit, but without the fix, I did see this
-> fire within a few loops (less than 5 I think)l
-> 
-> 	assert(host_log_mode == LOG_MODE_DIRTY_RING ||
-> 	       atomic_read(&vcpu_sync_stop_requested) == false);
-> 
-> I'll post this as two patches: one to fix the bug, and a second to have the
-> LOG_MODE_DIRTY_RING variant clear vcpu_sync_stop_requested so that the above
-> assert() can be modified as below.
+> This will need to be rebased.  And the "11*32" level is now full in
+> Linus' tree, so this will presumably need to go to a different "level".
 
-Scratch patch 2, I'm pretty sure the vCPU worker can race with the main task and
-clear vcpu_sync_stop_requested just before the main task sets it, which would
-result in a false positive.  I didn't see any failures, but I'm 99% certain the
-race exists.  I suspect there are some other warts in the test that would
-complicate attempts to clean things up, so for now I'l just post the fix for
-the imbalance bug.
+Yes, will send a new rebased version.
 
