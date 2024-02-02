@@ -1,75 +1,75 @@
-Return-Path: <kvm+bounces-7857-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7855-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 768C584728F
-	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 16:05:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B43C84728D
+	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 16:05:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B52F1C26280
-	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 15:05:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F7D61C25D02
+	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 15:05:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 676681468EE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4710B1468E6;
 	Fri,  2 Feb 2024 15:05:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="tU36jqF7"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="GANkYRDd"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3BF0145328;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAD24144636;
 	Fri,  2 Feb 2024 15:05:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706886302; cv=none; b=abuZJTagtAPSHWVQPpp8I3xgWZqKXFotjTr4zSKgvQ9wH+P5yz6dHrazoCtHtJmlFnuyRTnmn5YE5RtZIeNis19LBnGCdJafILANkisVrP2c7bqhyMVitcDzv5ETHNSGsgtYDTF7FQb37ekYMcZJSKO3bVazJCE/6JiF9KIDZo8=
+	t=1706886302; cv=none; b=oil6/swI1ED+Cd4pzWnR1SzrOq8QYhuHrYOfTYPtKWxfxLKgobpBfNe9vYRpVloVLCJZHvuFBJNxXR3vHM5JmZ1ubA8iXedZ7wzmWeIaxmTlYjIQ58GVPevUcw4yj2buHgEN4K3rJxc4Th9Mhuu2++2y+BH2OuobLm+Bhj9UXlw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1706886302; c=relaxed/simple;
-	bh=zCso99M9a1qyL0jm4xlACxx+HLW2uGX84k1uSSZhPGs=;
+	bh=7ZsC+e0vsm/1YAntHM0K/eR5e8WTd5p7YdVzQHYQcFg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=kZdvxzcJXH917gfBrmRi7BD4sf6A84oqx8GpquYAfjCXcX/WG/DCROUAV8v/eLtIzNeY9TC55KM2G/fzhNyhv98Fp4ovYnDHgf1lRTseo7LV7/VrdEatwN/cDH2RXBQWjZBii2LeByPJ+sfzR8FoWP6Sz0ClEUMfSn7ZsWFkXHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=tU36jqF7; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=s3fObgkMcfrhLlAuTZUQSWhuweb4m5SjNlvm1lapZJZxnlf7yKFQUKGwH7POeT0r+etNXIXFqCs9PPjJsgD3l6zh4/GEzHP/i0/k6wVHBDIcook9ACCc6cmLm/YCLssWPJxVaw6Gk2qOo0E4aL45ZnUe06l9reUq+cBpMXd0+hE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=GANkYRDd; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 412DRJYK008982;
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 412EQ6IB025828;
 	Fri, 2 Feb 2024 15:05:00 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=CRhOrZKd7zsvbBX2wbnVjqeQRkqFJiW13gJswaKAOxE=;
- b=tU36jqF7eBncZ0CX//MzI6CYjL7xk34qHCo7PpBSM7duTUVlFtuDq2Al65m4Lc0LcRp/
- UoKOS6XVCvaoN0+rj9M6fs6/sPuJwxSFEw2lRyFtu9D+avPoqrAus9sUqL4JSG/tSSNH
- NQUUlSJEQeFVED8+Q3UKus8WzSL4aO336KFezLtuNzav4TgMzJJkPKspK6sSr2MkCTjm
- Wvx7KBSKewdzLuvY3uRWzImBPl8g8g3tnAjwtRMYaDpBG3KAKI5DSwKDDb0QU5vHwXjt
- 7F0HJVptLFWuSsthck15jbSHL5sfaKK+hSIskSNt76oxoW6M22OVhcQDYf7p8Zx8jbCV Cg== 
+ bh=PJii8eqAgh7vyiuiy/+5zpmkAQQ4wcReDrFT5R7mCs8=;
+ b=GANkYRDdb2Tqg0qbGlq8mwMLKNBh1sB9aDbOf8RZoYefCC08fOK6BkIFB4q/OktcqTpV
+ Sb9kNf6shQ6LjS0p/srZuqk8QFDBZ8PGsgBuZVy7lrP1CeRNDWsXJ2NcLSNWDVA1wFvk
+ X+5sXh0ARQ17eJwrDCSB+NSE8CxXvLHvcsHw3H5Cl/aarB1A9yzsFFf9EPUEisO5q3PS
+ qAQdoRkOoyMXzuhH9V6fQtCmAvG4hvTXiJJaJM1pEJo3w58FWZGLrOQw5EMb/pgM3Zum
+ 6E4JmMaWrGZ719tLiWtXUHJBf6Vcezs3/Dl59k3cFJ68IFdW2Z+LVONxafWnJviQAyOV Qw== 
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w119t2fba-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w11xrh80c-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Fri, 02 Feb 2024 15:04:59 +0000
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 412Eo9Qv029557;
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 412EsFn1020426;
 	Fri, 2 Feb 2024 15:04:59 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w119t2fat-1
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w11xrh7yt-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Fri, 02 Feb 2024 15:04:59 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 412CpGlc010569;
-	Fri, 2 Feb 2024 15:04:57 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3vwd5pby3b-1
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 412DAB5N008086;
+	Fri, 2 Feb 2024 15:04:58 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3vwdnmku0g-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 02 Feb 2024 15:04:57 +0000
+	Fri, 02 Feb 2024 15:04:58 +0000
 Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 412F4sxr18678276
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 412F4tpx39256660
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 2 Feb 2024 15:04:54 GMT
+	Fri, 2 Feb 2024 15:04:55 GMT
 Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id AA85C20049;
+	by IMSVA (Postfix) with ESMTP id E316420049;
 	Fri,  2 Feb 2024 15:04:54 +0000 (GMT)
 Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6F72F2004B;
+	by IMSVA (Postfix) with ESMTP id B15A32004D;
 	Fri,  2 Feb 2024 15:04:54 +0000 (GMT)
 Received: from a46lp67.lnxne.boe (unknown [9.152.108.100])
 	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
@@ -79,9 +79,9 @@ To: kvm@vger.kernel.org
 Cc: linux-s390@vger.kernel.org, imbrenda@linux.ibm.com, thuth@redhat.com,
         david@redhat.com, nsg@linux.ibm.com, nrb@linux.ibm.com,
         akrowiak@linux.ibm.com, jjherne@linux.ibm.com
-Subject: [kvm-unit-tests PATCH v4 2/7] s390x: Add guest 2 AP test
-Date: Fri,  2 Feb 2024 14:59:08 +0000
-Message-Id: <20240202145913.34831-3-frankja@linux.ibm.com>
+Subject: [kvm-unit-tests PATCH v4 3/7] lib: s390x: ap: Add proper ap setup code
+Date: Fri,  2 Feb 2024 14:59:09 +0000
+Message-Id: <20240202145913.34831-4-frankja@linux.ibm.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20240202145913.34831-1-frankja@linux.ibm.com>
 References: <20240202145913.34831-1-frankja@linux.ibm.com>
@@ -93,369 +93,192 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: VXsZL3v6HCI6XomHemb09IgcdjWKKtXZ
-X-Proofpoint-GUID: J9uibLZAep8YqF9TzMPaKnKqT-aeSNNM
+X-Proofpoint-ORIG-GUID: NjsVL2pp4DYDCq6c3vzgtcPoBGHO31on
+X-Proofpoint-GUID: P8c4-KXgEHCPAdgXztj8gzQXmg5KIO6n
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2024-02-02_08,2024-01-31_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- phishscore=0 mlxlogscore=775 impostorscore=0 spamscore=0 suspectscore=0
- bulkscore=0 mlxscore=0 priorityscore=1501 malwarescore=0 clxscore=1015
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
+ priorityscore=1501 malwarescore=0 mlxscore=0 mlxlogscore=999 clxscore=1015
+ bulkscore=0 suspectscore=0 spamscore=0 impostorscore=0 adultscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2311290000 definitions=main-2402020109
 
-Add a test that checks the exceptions for the PQAP, NQAP and DQAP
-adjunct processor (AP) crypto instructions.
+For the next tests we need a valid queue which means we need to grab
+the qci info and search the first set bit in the ap and aq masks.
 
-Since triggering the exceptions doesn't require actual AP hardware,
-this test can run without complicated setup.
+Let's move from the stfle 12 check to proper setup code that also
+returns arrays for the aps and qns.
 
 Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 ---
- s390x/Makefile      |   1 +
- s390x/ap.c          | 309 ++++++++++++++++++++++++++++++++++++++++++++
- s390x/unittests.cfg |   3 +
- 3 files changed, 313 insertions(+)
- create mode 100644 s390x/ap.c
+ lib/s390x/ap.c | 90 +++++++++++++++++++++++++++++++++++++++++++++++---
+ lib/s390x/ap.h | 17 +++++++++-
+ s390x/ap.c     |  4 ++-
+ 3 files changed, 105 insertions(+), 6 deletions(-)
 
-diff --git a/s390x/Makefile b/s390x/Makefile
-index 4f6c627d..6d28a5bf 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -42,6 +42,7 @@ tests += $(TEST_DIR)/exittime.elf
- tests += $(TEST_DIR)/ex.elf
- tests += $(TEST_DIR)/topology.elf
- tests += $(TEST_DIR)/sie-dat.elf
-+tests += $(TEST_DIR)/ap.elf
+diff --git a/lib/s390x/ap.c b/lib/s390x/ap.c
+index 9560ff64..c85172a8 100644
+--- a/lib/s390x/ap.c
++++ b/lib/s390x/ap.c
+@@ -13,10 +13,18 @@
  
- pv-tests += $(TEST_DIR)/pv-diags.elf
- pv-tests += $(TEST_DIR)/pv-icptcode.elf
-diff --git a/s390x/ap.c b/s390x/ap.c
-new file mode 100644
-index 00000000..b3cee37a
---- /dev/null
-+++ b/s390x/ap.c
-@@ -0,0 +1,309 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * AP instruction G2 tests
-+ *
-+ * Copyright (c) 2024 IBM Corp
-+ *
-+ * Authors:
-+ *  Janosch Frank <frankja@linux.ibm.com>
-+ */
-+
-+#include <libcflat.h>
-+#include <interrupt.h>
+ #include <libcflat.h>
+ #include <interrupt.h>
++#include <alloc.h>
 +#include <bitops.h>
-+#include <alloc_page.h>
-+#include <asm/facility.h>
-+#include <asm/time.h>
-+#include <ap.h>
-+
-+/* For PQAP PGM checks where we need full control over the input */
-+static void pqap(unsigned long grs[3])
-+{
-+	asm volatile(
-+		"	lgr	0,%[r0]\n"
-+		"	lgr	1,%[r1]\n"
-+		"	lgr	2,%[r2]\n"
-+		"	.insn	rre,0xb2af0000,0,0\n" /* PQAP */
-+		::  [r0] "d" (grs[0]), [r1] "d" (grs[1]), [r2] "d" (grs[2])
-+		: "cc", "memory", "0", "1", "2");
-+}
-+
-+static void test_pgms_pqap(void)
-+{
-+	unsigned long grs[3] = {};
-+	struct pqap_r0 *r0 = (struct pqap_r0 *)grs;
-+	uint8_t *data = alloc_page();
-+	uint16_t pgm;
-+	int fails = 0;
-+	int i;
-+
-+	report_prefix_push("pqap");
-+
-+	/* Wrong FC code */
-+	report_prefix_push("invalid fc");
-+	r0->fc = 42;
-+	expect_pgm_int();
-+	pqap(grs);
-+	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
-+	memset(grs, 0, sizeof(grs));
-+	report_prefix_pop();
-+
-+	report_prefix_push("invalid gr0 bits");
-+	/*
-+	 * GR0 bits 41 - 47 are defined 0 and result in a
-+	 * specification exception if set to 1.
-+	 */
-+	for (i = 0; i < 48 - 41; i++) {
-+		grs[0] = BIT(63 - 47 + i);
-+
-+		expect_pgm_int();
-+		pqap(grs);
-+		pgm = clear_pgm_int();
-+
-+		if (pgm != PGM_INT_CODE_SPECIFICATION) {
-+			report_fail("fail on bit %d", 42 + i);
-+			fails++;
-+		}
-+	}
-+	report(!fails, "All bits tested");
-+	memset(grs, 0, sizeof(grs));
-+	fails = 0;
-+	report_prefix_pop();
-+
-+	report_prefix_push("alignment");
-+	report_prefix_push("fc=4");
-+	r0->fc = PQAP_QUERY_AP_CONF_INFO;
-+	grs[2] = (unsigned long)data;
-+	for (i = 1; i < 8; i++) {
-+		expect_pgm_int();
-+		grs[2]++;
-+		pqap(grs);
-+		pgm = clear_pgm_int();
-+		if (pgm != PGM_INT_CODE_SPECIFICATION) {
-+			report_fail("fail on bit %d", i);
-+			fails++;
-+		}
-+	}
-+	report(!fails, "All alignments tested");
-+	report_prefix_pop();
-+	report_prefix_push("fc=6");
-+	r0->fc = PQAP_BEST_AP;
-+	grs[2] = (unsigned long)data;
-+	for (i = 1; i < 8; i++) {
-+		expect_pgm_int();
-+		grs[2]++;
-+		pqap(grs);
-+		pgm = clear_pgm_int();
-+		if (pgm != PGM_INT_CODE_SPECIFICATION) {
-+			report_fail("fail on bit %d", i);
-+			fails++;
-+		}
-+	}
-+	report(!fails, "All alignments tested");
-+	report_prefix_pop();
-+	report_prefix_pop();
-+
-+	free_page(data);
-+	report_prefix_pop();
-+}
-+
-+static void test_pgms_nqap(void)
-+{
-+	uint8_t gr0_zeroes_bits[] = {
-+		32, 34, 35, 40
-+	};
-+	uint64_t gr0;
-+	bool fail;
-+	int i;
-+
-+	report_prefix_push("nqap");
-+
-+	/* Registers 0 and 1 are always used, the others are even/odd pairs */
-+	report_prefix_push("spec");
-+	report_prefix_push("r1");
-+	expect_pgm_int();
-+	asm volatile (
-+		".insn	rre,0xb2ad0000,3,6\n"
-+		: : : "cc", "memory", "0", "1", "2", "3", "4", "6", "7");
-+	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
-+	report_prefix_pop();
-+
-+	report_prefix_push("r2");
-+	expect_pgm_int();
-+	asm volatile (
-+		".insn	rre,0xb2ad0000,2,7\n"
-+		: : : "cc", "memory", "0", "1", "2", "3", "4", "6", "7");
-+	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
-+	report_prefix_pop();
-+
-+	report_prefix_push("both");
-+	expect_pgm_int();
-+	asm volatile (
-+		".insn	rre,0xb2ad0000,3,7\n"
-+		: : : "cc", "memory", "0", "1", "2", "3", "4", "6", "7");
-+	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
-+	report_prefix_pop();
-+
-+	report_prefix_push("len==0");
-+	expect_pgm_int();
-+	asm volatile (
-+		"xgr	0,0\n"
-+		"xgr	5,5\n"
-+		".insn	rre,0xb2ad0000,2,4\n"
-+		: : : "cc", "memory", "0", "1", "2", "3", "4", "5", "6", "7");
-+	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
-+	report_prefix_pop();
-+
-+	report_prefix_push("gr0_zero_bits");
-+	fail = false;
-+	for (i = 0; i < ARRAY_SIZE(gr0_zeroes_bits); i++) {
-+		expect_pgm_int();
-+		gr0 = BIT_ULL(63 - gr0_zeroes_bits[i]);
-+		asm volatile (
-+			"xgr	5,5\n"
-+			"lghi	5, 128\n"
-+			"lg	0, 0(%[val])\n"
-+			".insn	rre,0xb2ad0000,2,4\n"
-+			: : [val] "a" (&gr0)
-+			: "cc", "memory", "0", "1", "2", "3", "4", "5", "6", "7");
-+		if (clear_pgm_int() != PGM_INT_CODE_SPECIFICATION) {
-+			report_fail("setting gr0 bit %d did not result in a spec exception",
-+				    gr0_zeroes_bits[i]);
-+			fail = true;
-+		}
-+	}
-+	report(!fail, "set bit gr0 pgms");
-+	report_prefix_pop();
-+
-+	report_prefix_pop();
-+	report_prefix_pop();
-+}
-+
-+static void test_pgms_dqap(void)
-+{
-+	uint8_t gr0_zeroes_bits[] = {
-+		33, 34, 35, 40, 41
-+	};
-+	uint64_t gr0;
-+	bool fail;
-+	int i;
-+
-+	report_prefix_push("dqap");
-+
-+	/* Registers 0 and 1 are always used, the others are even/odd pairs */
-+	report_prefix_push("spec");
-+	report_prefix_push("r1");
-+	expect_pgm_int();
-+	asm volatile (
-+		".insn	rre,0xb2ae0000,3,6\n"
-+		: : : "cc", "memory", "0", "1", "2", "3", "4", "6", "7");
-+	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
-+	report_prefix_pop();
-+
-+	report_prefix_push("r2");
-+	expect_pgm_int();
-+	asm volatile (
-+		".insn	rre,0xb2ae0000,2,7\n"
-+		: : : "cc", "memory", "0", "1", "2", "3", "4", "6", "7");
-+	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
-+	report_prefix_pop();
-+
-+	report_prefix_push("both");
-+	expect_pgm_int();
-+	asm volatile (
-+		".insn	rre,0xb2ae0000,3,7\n"
-+		: : : "cc", "memory", "0", "1", "2", "3", "4", "6", "7");
-+	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
-+	report_prefix_pop();
-+
-+	report_prefix_push("len==0");
-+	expect_pgm_int();
-+	asm volatile (
-+		"xgr	0,0\n"
-+		"xgr	5,5\n"
-+		".insn	rre,0xb2ae0000,2,4\n"
-+		: : : "cc", "memory", "0", "1", "2", "3", "4", "5", "6", "7");
-+	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
-+	report_prefix_pop();
-+
-+	report_prefix_push("gr0_zero_bits");
-+	fail = false;
-+	for (i = 0; i < ARRAY_SIZE(gr0_zeroes_bits); i++) {
-+		expect_pgm_int();
-+		gr0 = BIT_ULL(63 - gr0_zeroes_bits[i]);
-+		asm volatile (
-+			"xgr	5,5\n"
-+			"lghi	5, 128\n"
-+			"lg	0, 0(%[val])\n"
-+			".insn	rre,0xb2ae0000,2,4\n"
-+			: : [val] "a" (&gr0)
-+			: "cc", "memory", "0", "1", "2", "3", "4", "5", "6", "7");
-+		if (clear_pgm_int() != PGM_INT_CODE_SPECIFICATION) {
-+			report_info("setting gr0 bit %d did not result in a spec exception",
-+				    gr0_zeroes_bits[i]);
-+			fail = true;
-+		}
-+	}
-+	report(!fail, "set bit pgms");
-+	report_prefix_pop();
-+
-+	report_prefix_pop();
-+	report_prefix_pop();
-+}
-+
-+static void test_priv(void)
-+{
-+	struct ap_config_info info = {};
-+
-+	report_prefix_push("privileged");
-+
-+	report_prefix_push("pqap");
-+	expect_pgm_int();
-+	enter_pstate();
-+	ap_pqap_qci(&info);
-+	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
-+	report_prefix_pop();
-+
-+	/*
-+	 * Enqueue and dequeue take too many registers so a simple
-+	 * inline assembly makes more sense than using the library
-+	 * functions.
-+	 */
-+	report_prefix_push("nqap");
-+	expect_pgm_int();
-+	enter_pstate();
-+	asm volatile (
-+		".insn	rre,0xb2ad0000,0,2\n"
-+		: : : "cc", "memory", "0", "1", "2", "3");
-+	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
-+	report_prefix_pop();
-+
-+	report_prefix_push("dqap");
-+	expect_pgm_int();
-+	enter_pstate();
-+	asm volatile (
-+		".insn	rre,0xb2ae0000,0,2\n"
-+		: : : "cc", "memory", "0", "1", "2", "3");
-+	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
-+	report_prefix_pop();
-+
-+	report_prefix_pop();
-+}
-+
-+int main(void)
-+{
-+	report_prefix_push("ap");
-+	if (!ap_check()) {
-+		report_skip("AP instructions not available");
-+		goto done;
-+	}
-+
-+	test_priv();
-+	test_pgms_pqap();
-+	test_pgms_nqap();
-+	test_pgms_dqap();
-+
-+done:
-+	report_prefix_pop();
-+	return report_summary();
-+}
-diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-index 018e4129..578375e4 100644
---- a/s390x/unittests.cfg
-+++ b/s390x/unittests.cfg
-@@ -386,3 +386,6 @@ file = sie-dat.elf
+ #include <ap.h>
+ #include <asm/time.h>
+ #include <asm/facility.h>
  
- [pv-attest]
- file = pv-attest.elf
++static uint8_t num_ap;
++static uint8_t num_queue;
++static uint8_t *array_ap;
++static uint8_t *array_queue;
++static struct ap_config_info qci;
 +
-+[ap]
-+file = ap.elf
+ int ap_pqap_tapq(uint8_t ap, uint8_t qn, struct ap_queue_status *apqsw,
+ 		 struct pqap_r2 *r2)
+ {
+@@ -82,16 +90,90 @@ int ap_pqap_qci(struct ap_config_info *info)
+ 	return cc;
+ }
+ 
+-/* Will later be extended to a proper setup function */
+-bool ap_setup(void)
++static int get_entry(uint8_t *ptr, int i, size_t len)
+ {
++	/* Skip over the last entry */
++	if (i)
++		i++;
++
++	for (; i < 8 * len; i++) {
++		/* Do we even need to check the byte? */
++		if (!ptr[i / 8]) {
++			i += 7;
++			continue;
++		}
++
++		/* Check the bit in big-endian order */
++		if (ptr[i / 8] & BIT(7 - (i % 8)))
++			return i;
++	}
++	return -1;
++}
++
++static void setup_info(void)
++{
++	int i, entry = 0;
++
++	ap_pqap_qci(&qci);
++
++	for (i = 0; i < AP_ARRAY_MAX_NUM; i++) {
++		entry = get_entry((uint8_t *)qci.apm, entry, sizeof(qci.apm));
++		if (entry == -1)
++			break;
++
++		if (!num_ap) {
++			/*
++			 * We have at least one AP, time to
++			 * allocate the queue arrays
++			 */
++			array_ap = malloc(AP_ARRAY_MAX_NUM);
++			array_queue = malloc(AP_ARRAY_MAX_NUM);
++		}
++		array_ap[num_ap] = entry;
++		num_ap += 1;
++	}
++
++	/* Without an AP we don't even need to look at the queues */
++	if (!num_ap)
++		return;
++
++	entry = 0;
++	for (i = 0; i < AP_ARRAY_MAX_NUM; i++) {
++		entry = get_entry((uint8_t *)qci.aqm, entry, sizeof(qci.aqm));
++		if (entry == -1)
++			return;
++
++		array_queue[num_queue] = entry;
++		num_queue += 1;
++	}
++
++}
++
++int ap_setup(uint8_t **ap_array, uint8_t **qn_array, uint8_t *naps, uint8_t *nqns)
++{
++	assert(!num_ap);
++
+ 	/*
+ 	 * Base AP support has no STFLE or SCLP feature bit but the
+ 	 * PQAP QCI support is indicated via stfle bit 12. As this
+ 	 * library relies on QCI we bail out if it's not available.
+ 	 */
+ 	if (!test_facility(12))
+-		return false;
++		return AP_SETUP_NOINSTR;
+ 
+-	return true;
++	/* Setup ap and queue arrays */
++	setup_info();
++
++	if (!num_ap)
++		return AP_SETUP_NOAPQN;
++
++	/* Only provide the data if the caller actually needs it. */
++	if (ap_array && qn_array && naps && nqns) {
++		*ap_array = array_ap;
++		*qn_array = array_queue;
++		*naps = num_ap;
++		*nqns = num_queue;
++	}
++
++	return AP_SETUP_READY;
+ }
+diff --git a/lib/s390x/ap.h b/lib/s390x/ap.h
+index b806513f..8feca43a 100644
+--- a/lib/s390x/ap.h
++++ b/lib/s390x/ap.h
+@@ -81,7 +81,22 @@ struct pqap_r2 {
+ } __attribute__((packed))  __attribute__((aligned(8)));
+ _Static_assert(sizeof(struct pqap_r2) == sizeof(uint64_t), "pqap_r2 size");
+ 
+-bool ap_setup(void);
++/*
++ * Maximum number of APQNs that we keep track of.
++ *
++ * This value is already way larger than the number of APQNs a AP test
++ * is probably going to use.
++ */
++#define AP_ARRAY_MAX_NUM	16
++
++/* Return values of ap_setup() */
++enum {
++	AP_SETUP_NOINSTR,	/* AP instructions not available */
++	AP_SETUP_NOAPQN,	/* Instructions available but no APQNs */
++	AP_SETUP_READY		/* Full setup complete, at least one APQN */
++};
++
++int ap_setup(uint8_t **ap_array, uint8_t **qn_array, uint8_t *naps, uint8_t *nqns);
+ int ap_pqap_tapq(uint8_t ap, uint8_t qn, struct ap_queue_status *apqsw,
+ 		 struct pqap_r2 *r2);
+ int ap_pqap_qci(struct ap_config_info *info);
+diff --git a/s390x/ap.c b/s390x/ap.c
+index b3cee37a..5c458e7e 100644
+--- a/s390x/ap.c
++++ b/s390x/ap.c
+@@ -292,8 +292,10 @@ static void test_priv(void)
+ 
+ int main(void)
+ {
++	int setup_rc = ap_setup(NULL, NULL, NULL, NULL);
++
+ 	report_prefix_push("ap");
+-	if (!ap_check()) {
++	if (setup_rc == AP_SETUP_NOINSTR) {
+ 		report_skip("AP instructions not available");
+ 		goto done;
+ 	}
 -- 
 2.40.1
 
