@@ -1,78 +1,70 @@
-Return-Path: <kvm+bounces-7812-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7813-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43DD7846751
-	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 06:02:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4705846867
+	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 07:48:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 681801C22B63
-	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 05:02:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05C7B1C24D8C
+	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 06:48:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D090447F53;
-	Fri,  2 Feb 2024 04:57:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91AEF3CF4B;
+	Fri,  2 Feb 2024 06:43:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Iy8CILgn"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QlIxGjHM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23F3A1B299;
-	Fri,  2 Feb 2024 04:57:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C3E019478
+	for <kvm@vger.kernel.org>; Fri,  2 Feb 2024 06:43:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706849861; cv=none; b=cjYuL2NXN0qPIelN2C6Exxuk/ucP7aBFfjLnw608uYhCQTdWsz2ihTNQJi3y4CI7Un/6YndIW3ZtEBGsbdME+a8JziSIX9Xyd67Xs0v++a08/GWN2Zm3t9+fsgMji32F419Hn4w0V40+fTtwr9twngkt1q3gHpzoDYA86cnhqgo=
+	t=1706856221; cv=none; b=M4Ft08HIrAbsHfbC6KWnRokNKpR2Vk/WtbWFPdVU7zQqsYYh8lrNBczZJ1z+VIQw7AcS5Njt/gV8NdVjTVRSbaHX6UOH2hzg+T3S8SjzgAW5CZWhPTrJgC//0x8b/Jt7o7KKqIZCNqrwGDqMqGL75/ZQ9FsuqR+ozel5W3ceGPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706849861; c=relaxed/simple;
-	bh=4QFGx+82iSOQD5Uy7w9iqIN8hz1HoOJM57vM7BEXPkc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=oT/Ddg0Npb6DrhmZQqZVy/tuC3nvM9Sua9qjQxh9FiskNKVkhhf8vXqhcd7VjOVcXbnjwLThNmuklNM5s+3QdJBGE4+8wIvHmku/tlbJgo0KlJhPLjJFQoZMGdIfVXkPP8yze15lozziz1OIgFkKWKW2SpiH3XbHGXZmY2gaHG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Iy8CILgn; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706849859; x=1738385859;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=4QFGx+82iSOQD5Uy7w9iqIN8hz1HoOJM57vM7BEXPkc=;
-  b=Iy8CILgnJZ1cQcQ52vjAEEuKGn3rwbhWJG2pc9idgTpLbkNBO9K29kZG
-   4V89/Lf3zUJKw5XZMOLAdyWv1SsPOefjHKwt7Sz0RdatupE2N/eciA7Bz
-   ktJqopQUd0HGNneZVM2fDOEhMCsIRlmnKoCRS74MA8VTfzwcgVPbCNnRu
-   jYvZJZJSiYstvG0mkzrIr8k7WUXgmdUJTe0pl1qop3+P+rbnjJivsg+9E
-   dWsZVne9+65x/PbTl/WZtIjt5u7yQog5Za4iwoIV4jNkb7aQ/7AVo+Chy
-   KyZCDsa1+xx8T+elmMN0JOLxpnu/AZiMqAXNwzPbX1upNwaocDdSoCf7u
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="17615872"
-X-IronPort-AV: E=Sophos;i="6.05,237,1701158400"; 
-   d="scan'208";a="17615872"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2024 20:57:27 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="912339806"
-X-IronPort-AV: E=Sophos;i="6.05,237,1701158400"; 
-   d="scan'208";a="912339806"
-Received: from rchatre-ws.ostc.intel.com ([10.54.69.144])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2024 20:57:25 -0800
-From: Reinette Chatre <reinette.chatre@intel.com>
-To: jgg@nvidia.com,
-	yishaih@nvidia.com,
-	shameerali.kolothum.thodi@huawei.com,
-	kevin.tian@intel.com,
-	alex.williamson@redhat.com
-Cc: kvm@vger.kernel.org,
-	dave.jiang@intel.com,
-	ashok.raj@intel.com,
-	reinette.chatre@intel.com,
-	linux-kernel@vger.kernel.org,
-	patches@lists.linux.dev
-Subject: [PATCH 17/17] vfio/pci: Remove duplicate interrupt management flow
-Date: Thu,  1 Feb 2024 20:57:11 -0800
-Message-Id: <6ec901daffab4170d9740c7d066becd079925d53.1706849424.git.reinette.chatre@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <cover.1706849424.git.reinette.chatre@intel.com>
-References: <cover.1706849424.git.reinette.chatre@intel.com>
+	s=arc-20240116; t=1706856221; c=relaxed/simple;
+	bh=XLvulHZVJquTrMep5y1cVtcFzDjgJkl/pS+1VTnGBD0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=M9Vswn1M4wmHMnA6g/BWUGt16gpKkelD7bU6Qi88KFoLDt4gKFtl2lWjVN1wuYyOiA4JT95TCod//nsePDAJHCozxMISoq7CmSdcJe38902xbi5pCdB0dGMsA47r5JaMauQDo/LIvNiO0cIdtK7du+hbFSFTV6vLjeQsuohfp/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QlIxGjHM; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706856218;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=0uFHR1zAX7zGOTNl6chkBN+h5HVp+40si/IAsptCuA8=;
+	b=QlIxGjHMKRhTgd0IPzBhQwGOe/1fTQU2fjJy5tfK6T5jLgL9+y/7MwSmFolMqyy0a+ThbO
+	jlSxDO4KfURe9rIUDgNJ/DFhdPtZCgbxu5jRTu67m89fE3O4n3NS+sJ5vFTErKyB23o0Xj
+	n2Bq9bNdZ3BElx65vg+uF+0/qPqj4BY=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-500-xf7PUJSRNKyGeKSykiMSGw-1; Fri, 02 Feb 2024 01:43:34 -0500
+X-MC-Unique: xf7PUJSRNKyGeKSykiMSGw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 00403827D88;
+	Fri,  2 Feb 2024 06:43:34 +0000 (UTC)
+Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id DEEB63C2E;
+	Fri,  2 Feb 2024 06:43:33 +0000 (UTC)
+From: Shaoqin Huang <shahuang@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>
+Cc: Peter Xu <peterx@redhat.com>,
+	Shaoqin Huang <shahuang@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v3] KVM: selftests: Fix the dirty_log_test semaphore imbalance
+Date: Fri,  2 Feb 2024 01:43:32 -0500
+Message-Id: <20240202064332.9403-1-shahuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -80,223 +72,125 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
-vfio_pci_set_intx_trigger() and vfio_pci_set_trigger() have the
-same flow that calls interrupt type (INTx, MSI, MSI-X) specific
-functions.
+When execute the dirty_log_test on some aarch64 machine, it sometimes
+trigger the ASSERT:
 
-Create callbacks for the interrupt type specific code that
-can be called by the shared code so that only one of these functions
-are needed. Rename the final generic function shared by all
-interrupt types vfio_pci_set_trigger().
+==== Test Assertion Failure ====
+  dirty_log_test.c:384: dirty_ring_vcpu_ring_full
+  pid=14854 tid=14854 errno=22 - Invalid argument
+     1  0x00000000004033eb: dirty_ring_collect_dirty_pages at dirty_log_test.c:384
+     2  0x0000000000402d27: log_mode_collect_dirty_pages at dirty_log_test.c:505
+     3   (inlined by) run_test at dirty_log_test.c:802
+     4  0x0000000000403dc7: for_each_guest_mode at guest_modes.c:100
+     5  0x0000000000401dff: main at dirty_log_test.c:941 (discriminator 3)
+     6  0x0000ffff9be173c7: ?? ??:0
+     7  0x0000ffff9be1749f: ?? ??:0
+     8  0x000000000040206f: _start at ??:?
+  Didn't continue vcpu even without ring full
 
-Relocate the "IOCTL support" marker to correctly mark the
-now generic code.
+The dirty_log_test fails when execute the dirty-ring test, this is
+because the sem_vcpu_cont and the sem_vcpu_stop is non-zero value when
+execute the dirty_ring_collect_dirty_pages() function. When those two
+sem_t variables are non-zero, the dirty_ring_wait_vcpu() at the
+beginning of the dirty_ring_collect_dirty_pages() will not wait for the
+vcpu to stop, but continue to execute the following code. In this case,
+before vcpu stop, if the dirty_ring_vcpu_ring_full is true, and the
+dirty_ring_collect_dirty_pages() has passed the check for the
+dirty_ring_vcpu_ring_full but hasn't execute the check for the
+continued_vcpu, the vcpu stop, and set the dirty_ring_vcpu_ring_full to
+false. Then dirty_ring_collect_dirty_pages() will trigger the ASSERT.
 
-Signed-off-by: Reinette Chatre <reinette.chatre@intel.com>
+Why sem_vcpu_cont and sem_vcpu_stop can be non-zero value? It's because
+the dirty_ring_before_vcpu_join() execute the sem_post(&sem_vcpu_cont)
+at the end of each dirty-ring test. It can cause two cases:
+
+1. sem_vcpu_cont be non-zero. When we set the host_quit to be true,
+   the vcpu_worker directly see the host_quit to be true, it quit. So
+   the log_mode_before_vcpu_join() function will set the sem_vcpu_cont
+   to 1, since the vcpu_worker has quit, it won't consume it.
+2. sem_vcpu_stop be non-zero. When we set the host_quit to be true,
+   the vcpu_worker has entered the guest state, the next time it exit
+   from guest state, it will set the sem_vcpu_stop to 1, and then see
+   the host_quit, no one will consume the sem_vcpu_stop.
+
+When execute more and more dirty-ring tests, the sem_vcpu_cont and
+sem_vcpu_stop can be larger and larger, which makes many code paths
+don't wait for the sem_t. Thus finally cause the problem.
+
+To fix this problem, we can wait a while before set the host_quit to
+true, which gives the vcpu time to enter the guest state, so it will
+exit again. Then we can wait the vcpu to exit, and let it continue
+again, then the vcpu will see the host_quit. Thus the sem_vcpu_cont and
+sem_vcpu_stop will be both zero when test finished.
+
+Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
 ---
- drivers/vfio/pci/vfio_pci_intrs.c | 104 ++++++++++--------------------
- 1 file changed, 35 insertions(+), 69 deletions(-)
+v2->v3:
+  - Rebase to v6.8-rc2.
+  - Use TEST_ASSERT().
 
-diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-index daa84a317f40..a5b337cfae60 100644
---- a/drivers/vfio/pci/vfio_pci_intrs.c
-+++ b/drivers/vfio/pci/vfio_pci_intrs.c
-@@ -32,6 +32,12 @@ struct vfio_pci_irq_ctx {
- };
+v1->v2:
+  - Fix the real logic bug, not just fresh the context.
+
+v1: https://lore.kernel.org/all/20231116093536.22256-1-shahuang@redhat.com/
+v2: https://lore.kernel.org/all/20231117052210.26396-1-shahuang@redhat.com/
+
+ tools/testing/selftests/kvm/dirty_log_test.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
+
+diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
+index 6cbecf499767..dd2d8be390a5 100644
+--- a/tools/testing/selftests/kvm/dirty_log_test.c
++++ b/tools/testing/selftests/kvm/dirty_log_test.c
+@@ -417,7 +417,8 @@ static void dirty_ring_after_vcpu_run(struct kvm_vcpu *vcpu, int ret, int err)
  
- struct vfio_pci_intr_ops {
-+	int (*enable)(struct vfio_pci_core_device *vdev, unsigned int start,
-+		      unsigned int count, unsigned int index);
-+	void (*disable)(struct vfio_pci_core_device *vdev,
-+			unsigned int index);
-+	void (*send_eventfd)(struct vfio_pci_core_device *vdev,
-+			     struct vfio_pci_irq_ctx *ctx);
- 	int (*request_interrupt)(struct vfio_pci_core_device *vdev,
- 				 struct vfio_pci_irq_ctx *ctx,
- 				 unsigned int vector, unsigned int index);
-@@ -356,6 +362,12 @@ static void vfio_intx_disable(struct vfio_pci_core_device *vdev,
- /*
-  * MSI/MSI-X
-  */
-+static void vfio_send_msi_eventfd(struct vfio_pci_core_device *vdev,
-+				  struct vfio_pci_irq_ctx *ctx)
-+{
-+	eventfd_signal(ctx->trigger);
-+}
+ static void dirty_ring_before_vcpu_join(void)
+ {
+-	/* Kick another round of vcpu just to make sure it will quit */
++	/* Wait vcpu exit, and let it continue to see the host_quit. */
++	dirty_ring_wait_vcpu();
+ 	sem_post(&sem_vcpu_cont);
+ }
+ 
+@@ -719,6 +720,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 	struct kvm_vm *vm;
+ 	unsigned long *bmap;
+ 	uint32_t ring_buf_idx = 0;
++	int sem_val;
+ 
+ 	if (!log_mode_supported()) {
+ 		print_skip("Log mode '%s' not supported",
+@@ -726,6 +728,11 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 		return;
+ 	}
+ 
++	sem_getvalue(&sem_vcpu_stop, &sem_val);
++	assert(sem_val == 0);
++	sem_getvalue(&sem_vcpu_cont, &sem_val);
++	assert(sem_val == 0);
 +
- static irqreturn_t vfio_msihandler(int irq, void *arg)
- {
- 	struct eventfd_ctx *trigger = arg;
-@@ -544,13 +556,22 @@ static void vfio_msi_unregister_producer(struct vfio_pci_irq_ctx *ctx)
- 	irq_bypass_unregister_producer(&ctx->producer);
- }
- 
-+/*
-+ * IOCTL support
-+ */
- static struct vfio_pci_intr_ops intr_ops[] = {
- 	[VFIO_PCI_INTX_IRQ_INDEX] = {
-+		.enable = vfio_intx_enable,
-+		.disable = vfio_intx_disable,
-+		.send_eventfd = vfio_send_intx_eventfd_ctx,
- 		.request_interrupt = vfio_intx_request_interrupt,
- 		.free_interrupt = vfio_intx_free_interrupt,
- 		.device_name = vfio_intx_device_name,
- 	},
- 	[VFIO_PCI_MSI_IRQ_INDEX] = {
-+		.enable = vfio_msi_enable,
-+		.disable = vfio_msi_disable,
-+		.send_eventfd = vfio_send_msi_eventfd,
- 		.request_interrupt = vfio_msi_request_interrupt,
- 		.free_interrupt = vfio_msi_free_interrupt,
- 		.device_name = vfio_msi_device_name,
-@@ -558,6 +579,9 @@ static struct vfio_pci_intr_ops intr_ops[] = {
- 		.unregister_producer = vfio_msi_unregister_producer,
- 	},
- 	[VFIO_PCI_MSIX_IRQ_INDEX] = {
-+		.enable = vfio_msi_enable,
-+		.disable = vfio_msi_disable,
-+		.send_eventfd = vfio_send_msi_eventfd,
- 		.request_interrupt = vfio_msi_request_interrupt,
- 		.free_interrupt = vfio_msi_free_interrupt,
- 		.device_name = vfio_msi_device_name,
-@@ -646,9 +670,6 @@ static int vfio_irq_set_block(struct vfio_pci_core_device *vdev,
- 	return ret;
- }
- 
--/*
-- * IOCTL support
-- */
- static int vfio_pci_set_intx_unmask(struct vfio_pci_core_device *vdev,
- 				    unsigned int index, unsigned int start,
- 				    unsigned int count, uint32_t flags,
-@@ -701,71 +722,16 @@ static int vfio_pci_set_intx_mask(struct vfio_pci_core_device *vdev,
- 	return 0;
- }
- 
--static int vfio_pci_set_intx_trigger(struct vfio_pci_core_device *vdev,
--				     unsigned int index, unsigned int start,
--				     unsigned int count, uint32_t flags,
--				     void *data)
--{
--	struct vfio_pci_irq_ctx *ctx;
--	unsigned int i;
--
--	if (is_intx(vdev) && !count && (flags & VFIO_IRQ_SET_DATA_NONE)) {
--		vfio_intx_disable(vdev, index);
--		return 0;
--	}
--
--	if (!(is_intx(vdev) || is_irq_none(vdev)))
--		return -EINVAL;
--
--	if (flags & VFIO_IRQ_SET_DATA_EVENTFD) {
--		int32_t *fds = data;
--		int ret;
--
--		if (is_intx(vdev))
--			return vfio_irq_set_block(vdev, start, count, fds, index);
--
--		ret = vfio_intx_enable(vdev, start, count, index);
--		if (ret)
--			return ret;
--
--		ret = vfio_irq_set_block(vdev, start, count, fds, index);
--		if (ret)
--			vfio_intx_disable(vdev, index);
--
--		return ret;
--	}
--
--	if (!is_intx(vdev))
--		return -EINVAL;
--
--	/* temporary */
--	for (i = start; i < start + count; i++) {
--		ctx = vfio_irq_ctx_get(vdev, i);
--		if (!ctx || !ctx->trigger)
--			continue;
--		if (flags & VFIO_IRQ_SET_DATA_NONE) {
--			vfio_send_intx_eventfd_ctx(vdev, ctx);
--		} else if (flags & VFIO_IRQ_SET_DATA_BOOL) {
--			uint8_t *bools = data;
--
--			if (bools[i - start])
--				vfio_send_intx_eventfd_ctx(vdev, ctx);
--		}
--	}
--
--	return 0;
--}
--
--static int vfio_pci_set_msi_trigger(struct vfio_pci_core_device *vdev,
--				    unsigned int index, unsigned int start,
--				    unsigned int count, uint32_t flags,
--				    void *data)
-+static int vfio_pci_set_trigger(struct vfio_pci_core_device *vdev,
-+				unsigned int index, unsigned int start,
-+				unsigned int count, uint32_t flags,
-+				void *data)
- {
- 	struct vfio_pci_irq_ctx *ctx;
- 	unsigned int i;
- 
- 	if (irq_is(vdev, index) && !count && (flags & VFIO_IRQ_SET_DATA_NONE)) {
--		vfio_msi_disable(vdev, index);
-+		intr_ops[index].disable(vdev, index);
- 		return 0;
+ 	/*
+ 	 * We reserve page table for 2 times of extra dirty mem which
+ 	 * will definitely cover the original (1G+) test range.  Here
+@@ -825,6 +832,13 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 		sync_global_to_guest(vm, iteration);
  	}
  
-@@ -780,13 +746,13 @@ static int vfio_pci_set_msi_trigger(struct vfio_pci_core_device *vdev,
- 			return vfio_irq_set_block(vdev, start, count,
- 						  fds, index);
- 
--		ret = vfio_msi_enable(vdev, start, count, index);
-+		ret = intr_ops[index].enable(vdev, start, count, index);
- 		if (ret)
- 			return ret;
- 
- 		ret = vfio_irq_set_block(vdev, start, count, fds, index);
- 		if (ret)
--			vfio_msi_disable(vdev, index);
-+			intr_ops[index].disable(vdev, index);
- 
- 		return ret;
- 	}
-@@ -799,11 +765,11 @@ static int vfio_pci_set_msi_trigger(struct vfio_pci_core_device *vdev,
- 		if (!ctx || !ctx->trigger)
- 			continue;
- 		if (flags & VFIO_IRQ_SET_DATA_NONE) {
--			eventfd_signal(ctx->trigger);
-+			intr_ops[index].send_eventfd(vdev, ctx);
- 		} else if (flags & VFIO_IRQ_SET_DATA_BOOL) {
- 			uint8_t *bools = data;
- 			if (bools[i - start])
--				eventfd_signal(ctx->trigger);
-+				intr_ops[index].send_eventfd(vdev, ctx);
- 		}
- 	}
- 	return 0;
-@@ -912,7 +878,7 @@ int vfio_pci_set_irqs_ioctl(struct vfio_pci_core_device *vdev, uint32_t flags,
- 			func = vfio_pci_set_intx_unmask;
- 			break;
- 		case VFIO_IRQ_SET_ACTION_TRIGGER:
--			func = vfio_pci_set_intx_trigger;
-+			func = vfio_pci_set_trigger;
- 			break;
- 		}
- 		break;
-@@ -924,7 +890,7 @@ int vfio_pci_set_irqs_ioctl(struct vfio_pci_core_device *vdev, uint32_t flags,
- 			/* XXX Need masking support exported */
- 			break;
- 		case VFIO_IRQ_SET_ACTION_TRIGGER:
--			func = vfio_pci_set_msi_trigger;
-+			func = vfio_pci_set_trigger;
- 			break;
- 		}
- 		break;
++	/*
++	 *
++	 * Before we set the host_quit, let the vcpu has time to run, to make
++	 * sure we consume the sem_vcpu_stop and the vcpu consume the
++	 * sem_vcpu_cont, to keep the semaphore balance.
++	 */
++	usleep(p->interval * 1000);
+ 	/* Tell the vcpu thread to quit */
+ 	host_quit = true;
+ 	log_mode_before_vcpu_join();
+
+base-commit: 41bccc98fb7931d63d03f326a746ac4d429c1dd3
 -- 
-2.34.1
+2.40.1
 
 
