@@ -1,246 +1,163 @@
-Return-Path: <kvm+bounces-7823-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7824-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 184C68468E5
-	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 08:03:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28FE38469AB
+	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 08:36:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C402928DBC2
-	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 07:03:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1EE528D472
+	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 07:36:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E132A18658;
-	Fri,  2 Feb 2024 06:59:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6843517BDD;
+	Fri,  2 Feb 2024 07:36:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LJ52ZUqr"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ky1+34J6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-176.mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A63FC1863E;
-	Fri,  2 Feb 2024 06:59:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B285217755
+	for <kvm@vger.kernel.org>; Fri,  2 Feb 2024 07:36:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706857161; cv=none; b=boU0ZNobDA653VygXmjApmjbeXPpmCYP9C6VjICvs0w9ubiVcwKENPeZMInYYt8ouBa+fZIIsR7MR0qa3jcvejc7Yg+Mz4dXQumOZX+dh5VaLZTvXxLoLIX/bpY9frjGdhOklYs8EoXjeYiJRXIS2w7zfpBWzxfSMM3275lHqa8=
+	t=1706859381; cv=none; b=l2yv6BOuqQCfqGjp+yUTNSJ/MPYArKJyth+tCbE9A+AWI8oo3N67rrY0c24xlOXyPIJcGhZUmxdN3qOJf18GvzAAGd+0qPvjW7BTNYaucaM+25EKOWWTEBdZgYatkmQFL0RR/8O7YXC5LzbTJlnkKweq1TDs3AH0c34zn8LAf8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706857161; c=relaxed/simple;
-	bh=RzVPdOIfzAxNtVdgDbvFjWjEIWTRZqcwvTXSWOWEVGE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=e/7tgXRb9W+rKQdBPUQ5iqDxG3Dr7zS882CduWdJeuNoKSsDsOToIu8AkaMPPkdWvDrIU0AfvuqkjbvWz24MCLvsmTf6Jzu6gtX0tzJpKRDpuwaXAsylDnvHSQBrVfZb75XuWl8tByLD9mwOEAL83WtFEmN4p8Gqua6BSc0ThjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LJ52ZUqr; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1d8e7df6abcso16665925ad.1;
-        Thu, 01 Feb 2024 22:59:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706857159; x=1707461959; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mjGoSmks1AnXMChnPHaCCI0+kK+ugRn2W8NsPjJCZUU=;
-        b=LJ52ZUqrzCUBbZNyGG/IHjv47MQMdcV8O3MIeBS4uOl1J1Y9NbXC0YrfgWPUFSkYax
-         XsuXyNzEXe99K4xmjwvz0dBjwA0Ct0cQosrm45epMOoGQw3BNi0H66Wd5E6MjmX38+S4
-         dYm6RdFBHAhNhTUBNXL4WgfJ7dGGZMpAX85aPA48kPQbFgrCYTkwSIF4y9QoQ3OGOJE2
-         XOk1U9LnMXEY1vH4vGr5LdXUlRgsS/8ihE7GD3bfuy38KZgmJy+hEFSa6ncCGR/n6ISx
-         U/aWqa4LIymm0wqZGJxTt1tqeJ9pmjh9tY51A8I6yVop7jpEpg10NZvW6axV4IJYPbSJ
-         Dc7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706857159; x=1707461959;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mjGoSmks1AnXMChnPHaCCI0+kK+ugRn2W8NsPjJCZUU=;
-        b=CGddM0+BnMUWR/2aq7FY5tB/aeEx6EOp1yx+OtpzjirpdDq/nF+/n8a43itARuOC2c
-         IcOLEpEtLtxy1G34ab5m8b+RaKOwEZko9VvM0wu9viPK+8XicKrqtKsbp2cRAbhnyZJp
-         nblrxiF1rV7ivWdN0MQAnhl1dyyqfihXhDHJ1EuPLUN7QOvCRTmDPBYU80oWfJ6QmRfu
-         pRNvtpKCg0uprTU46LnvZHvJmMjECUl8Q8CGbf+xv64/JpoiwqAr6Fq7UAKNbOSweubC
-         9Of43yvDfi3Mne2MnbdkXiF8x8CvogqAyzlD1KsKqCZWRsl40prIrsEAJY0ItYuRInbi
-         YAMQ==
-X-Gm-Message-State: AOJu0YwAY0VIc6E8mc9Zq88Jq7EaLcZR+c4CDFM/7S1zUykTq+rb+K2R
-	jUlT7SkrfTviloT15LICt5VdQWj5Geyj2FHC05haPrW6JZLSA4cG
-X-Google-Smtp-Source: AGHT+IGNcwlMvoqjjMx7S0tilyD6LP0972eDlmeEGxt1rTpDEdMA+PGwhHdjfkb9sruwSSLgt7sSAQ==
-X-Received: by 2002:a17:902:7847:b0:1d9:d:5730 with SMTP id e7-20020a170902784700b001d9000d5730mr1104086pln.3.1706857159061;
-        Thu, 01 Feb 2024 22:59:19 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCXMFpmzv+sw/9fGzfBrXMtUzkOqt4yxTX4S9LpgchJ6GlcxuaqKoM5whKP+fJRmXM2QTFsy5mwrFyimGhnVxwjB/BgfCxbfpoHa44jAc1Pu6xlt4NK0D0oLh8AUgQqek5byqjl409Tdco3PHCd0eRC0Sz7mc/EcR+p7yuPWqyv8mElN/Wq6FDWVuSMPyhyF5vdo/Mu2OIWXvwnAY9AlYnSW02WUPnkVlZN+XZzks5G1peQOyAlX49ftWwZI6VDWG14w/pbGyMi72CTfs15ZvezIdTtqLJtIWEiQpeX6XOPN88RNtPdMifLkZk7mFmK8vC17sPUKR2QJv5MQ9VJdj8rGOM9cUYxzqUOYDf2ChlOLYuw4nEksUOFdp5gL7N0RrknPqLjUHSjl2/YLSFg9zaCJfsizkIhiYi/G8Wj8bMNm7Bw/OR/mSi/6Us6VWoBYeSKbf+cspqYPDKM1GMuFirWAmoRKG2lTlWzcQgIzPfZGeo7fT5BtLaQeXnzLU/xVq3xu38fp+WC/YpE=
-Received: from wheely.local0.net ([1.146.53.155])
-        by smtp.gmail.com with ESMTPSA id d18-20020a170903209200b001d948adc19fsm905734plc.46.2024.02.01.22.59.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Feb 2024 22:59:18 -0800 (PST)
-From: Nicholas Piggin <npiggin@gmail.com>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Nicholas Piggin <npiggin@gmail.com>,
-	kvm@vger.kernel.org,
-	Laurent Vivier <lvivier@redhat.com>,
-	"Shaoqin Huang" <shahuang@redhat.com>,
-	Andrew Jones <andrew.jones@linux.dev>,
-	Nico Boehr <nrb@linux.ibm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@redhat.com>,
-	Marc Hartmayer <mhartmay@linux.ibm.com>,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-s390@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: [kvm-unit-tests PATCH v2 9/9] migration: add a migration selftest
-Date: Fri,  2 Feb 2024 16:57:40 +1000
-Message-ID: <20240202065740.68643-10-npiggin@gmail.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20240202065740.68643-1-npiggin@gmail.com>
-References: <20240202065740.68643-1-npiggin@gmail.com>
+	s=arc-20240116; t=1706859381; c=relaxed/simple;
+	bh=F8Vf9MHjreYyw+SWVq3L3jo/ghauMjcPIlV1loK3X1M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hdt3eTsfoOkSh+SCpiVRDstetptomp91Y+ZNFtzIJAXXjlzgbTV1tmzbjCrjqoEQUL/71pO+3udQFufmAqeM6lfty+C5NrRe2QUWpiKYAif3WPodTUM3hxiL+XsE6E2P19JjCcrpDy0SF7ZY6AOSumyEl4ars3jK+EUYjPwIVRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ky1+34J6; arc=none smtp.client-ip=91.218.175.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Fri, 2 Feb 2024 07:36:08 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1706859375;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5EWZhYkrDt/8XKpyBqmfzBglkyRPBzsB9XpFbePCy6s=;
+	b=Ky1+34J6vLyruougguTgN/oJcFJWeF+YLyxaTsnQ9gIwRuQsHNtyO1eFPA58P6H3pOO0tx
+	7EuHIa7HF/yJjY14d7KjLmsw4C0A5wKd3POh4hbUg68SxT5aSTr6mugk2tEcm/R5sY8hD8
+	/dqY+kyYgEts8oY6uBbwKYoFe+aM5no=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Shaoqin Huang <shahuang@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+	Eric Auger <eauger@redhat.com>, Eric Auger <eric.auger@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v4 1/5] KVM: selftests: aarch64: Make the
+ [create|destroy]_vpmu_vm() public
+Message-ID: <ZbybaH2t7Yp9NJOK@linux.dev>
+References: <20240202025659.5065-1-shahuang@redhat.com>
+ <20240202025659.5065-2-shahuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240202025659.5065-2-shahuang@redhat.com>
+X-Migadu-Flow: FLOW_OUT
 
-Add a selftest for migration support in  guest library and test harness
-code. It performs migrations a tight loop to irritate races and bugs in
-the test harness code.
+On Thu, Feb 01, 2024 at 09:56:50PM -0500, Shaoqin Huang wrote:
 
-Acked-by: Claudio Imbrenda <imbrenda@linux.ibm.com> (s390x)
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+[...]
 
-This has flushed out several bugs in developing the multi migration test
-harness code already.
----
- arm/Makefile.common         |  1 +
- arm/unittests.cfg           |  6 ++++++
- common/selftest-migration.c | 34 ++++++++++++++++++++++++++++++++++
- powerpc/Makefile.common     |  1 +
- powerpc/unittests.cfg       |  4 ++++
- s390x/Makefile              |  1 +
- s390x/unittests.cfg         |  4 ++++
- 7 files changed, 51 insertions(+)
- create mode 100644 common/selftest-migration.c
+> diff --git a/tools/testing/selftests/kvm/include/aarch64/vpmu.h b/tools/testing/selftests/kvm/include/aarch64/vpmu.h
+> new file mode 100644
+> index 000000000000..0a56183644ee
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/include/aarch64/vpmu.h
+> @@ -0,0 +1,16 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +
+> +#include <kvm_util.h>
+> +
+> +#define GICD_BASE_GPA	0x8000000ULL
+> +#define GICR_BASE_GPA	0x80A0000ULL
 
-diff --git a/arm/Makefile.common b/arm/Makefile.common
-index c2ee568c..371a2c6a 100644
---- a/arm/Makefile.common
-+++ b/arm/Makefile.common
-@@ -5,6 +5,7 @@
- #
- 
- tests-common  = $(TEST_DIR)/selftest.$(exe)
-+tests-common += $(TEST_DIR)/selftest-migration.$(exe)
- tests-common += $(TEST_DIR)/spinlock-test.$(exe)
- tests-common += $(TEST_DIR)/pci-test.$(exe)
- tests-common += $(TEST_DIR)/pmu.$(exe)
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index fe601cbb..1ffd9a82 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -55,6 +55,12 @@ smp = $MAX_SMP
- extra_params = -append 'smp'
- groups = selftest
- 
-+# Test migration
-+[selftest-migration]
-+file = selftest-migration.flat
-+groups = selftest migration
-+
-+arch = arm64
- # Test PCI emulation
- [pci-test]
- file = pci-test.flat
-diff --git a/common/selftest-migration.c b/common/selftest-migration.c
-new file mode 100644
-index 00000000..f70c505f
---- /dev/null
-+++ b/common/selftest-migration.c
-@@ -0,0 +1,34 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Machine independent migration tests
-+ *
-+ * This is just a very simple test that is intended to stress the migration
-+ * support in the test harness. This could be expanded to test more guest
-+ * library code, but architecture-specific tests should be used to test
-+ * migration of tricky machine state.
-+ */
-+#include <libcflat.h>
-+#include <migrate.h>
-+
-+#if defined(__arm__) || defined(__aarch64__)
-+/* arm can only call getchar 15 times */
-+#define NR_MIGRATIONS 15
-+#else
-+#define NR_MIGRATIONS 100
-+#endif
-+
-+int main(int argc, char **argv)
-+{
-+	int i = 0;
-+
-+	report_prefix_push("migration");
-+
-+	for (i = 0; i < NR_MIGRATIONS; i++)
-+		migrate_quiet();
-+
-+	report(true, "simple harness stress test");
-+
-+	report_prefix_pop();
-+
-+	return report_summary();
-+}
-diff --git a/powerpc/Makefile.common b/powerpc/Makefile.common
-index eb88398d..da4a7bbb 100644
---- a/powerpc/Makefile.common
-+++ b/powerpc/Makefile.common
-@@ -6,6 +6,7 @@
- 
- tests-common = \
- 	$(TEST_DIR)/selftest.elf \
-+	$(TEST_DIR)/selftest-migration.elf \
- 	$(TEST_DIR)/spapr_hcall.elf \
- 	$(TEST_DIR)/rtas.elf \
- 	$(TEST_DIR)/emulator.elf \
-diff --git a/powerpc/unittests.cfg b/powerpc/unittests.cfg
-index e71140aa..7ce57de0 100644
---- a/powerpc/unittests.cfg
-+++ b/powerpc/unittests.cfg
-@@ -36,6 +36,10 @@ smp = 2
- extra_params = -m 256 -append 'setup smp=2 mem=256'
- groups = selftest
- 
-+[selftest-migration]
-+file = selftest-migration.elf
-+groups = selftest migration
-+
- [spapr_hcall]
- file = spapr_hcall.elf
- 
-diff --git a/s390x/Makefile b/s390x/Makefile
-index b72f7578..344d46d6 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -1,4 +1,5 @@
- tests = $(TEST_DIR)/selftest.elf
-+tests += $(TEST_DIR)/selftest-migration.elf
- tests += $(TEST_DIR)/intercept.elf
- tests += $(TEST_DIR)/emulator.elf
- tests += $(TEST_DIR)/sieve.elf
-diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-index f5024b6e..a7ad522c 100644
---- a/s390x/unittests.cfg
-+++ b/s390x/unittests.cfg
-@@ -24,6 +24,10 @@ groups = selftest
- # please keep the kernel cmdline in sync with $(TEST_DIR)/selftest.parmfile
- extra_params = -append 'test 123'
- 
-+[selftest-migration]
-+file = selftest-migration.elf
-+groups = selftest migration
-+
- [intercept]
- file = intercept.elf
- 
+Shouldn't a standardized layout of the GIC frames go with the rest of
+the GIC stuff?
+
+> +/* Create a VM that has one vCPU with PMUv3 configured. */
+> +struct vpmu_vm *create_vpmu_vm(void *guest_code)
+> +{
+> +	struct kvm_vcpu_init init;
+> +	uint8_t pmuver;
+> +	uint64_t dfr0, irq = 23;
+> +	struct kvm_device_attr irq_attr = {
+> +		.group = KVM_ARM_VCPU_PMU_V3_CTRL,
+> +		.attr = KVM_ARM_VCPU_PMU_V3_IRQ,
+> +		.addr = (uint64_t)&irq,
+> +	};
+> +	struct kvm_device_attr init_attr = {
+> +		.group = KVM_ARM_VCPU_PMU_V3_CTRL,
+> +		.attr = KVM_ARM_VCPU_PMU_V3_INIT,
+> +	};
+> +	struct vpmu_vm *vpmu_vm;
+> +
+> +	vpmu_vm = calloc(1, sizeof(*vpmu_vm));
+> +	TEST_ASSERT(vpmu_vm != NULL, "Insufficient Memory");
+
+!vpmu_vm would be the normal way to test if a pointer is NULL.
+
+> +	memset(vpmu_vm, 0, sizeof(vpmu_vm));
+
+What? man calloc would tell you that the returned object is already
+zero-initalized.
+
+> +	vpmu_vm->vm = vm_create(1);
+> +	vm_init_descriptor_tables(vpmu_vm->vm);
+> +
+> +	/* Create vCPU with PMUv3 */
+> +	vm_ioctl(vpmu_vm->vm, KVM_ARM_PREFERRED_TARGET, &init);
+> +	init.features[0] |= (1 << KVM_ARM_VCPU_PMU_V3);
+> +	vpmu_vm->vcpu = aarch64_vcpu_add(vpmu_vm->vm, 0, &init, guest_code);
+> +	vcpu_init_descriptor_tables(vpmu_vm->vcpu);
+
+I extremely dislike that the VM is semi-configured by this helper.
+You're still expecting the caller to actually install the exception
+handler.
+
+> +	vpmu_vm->gic_fd = vgic_v3_setup(vpmu_vm->vm, 1, 64,
+> +					GICD_BASE_GPA, GICR_BASE_GPA);
+> +	__TEST_REQUIRE(vpmu_vm->gic_fd >= 0,
+> +		       "Failed to create vgic-v3, skipping");
+> +
+> +	/* Make sure that PMUv3 support is indicated in the ID register */
+> +	vcpu_get_reg(vpmu_vm->vcpu,
+> +		     KVM_ARM64_SYS_REG(SYS_ID_AA64DFR0_EL1), &dfr0);
+> +	pmuver = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), dfr0);
+> +	TEST_ASSERT(pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF &&
+> +		    pmuver >= ID_AA64DFR0_EL1_PMUVer_IMP,
+> +		    "Unexpected PMUVER (0x%x) on the vCPU with PMUv3", pmuver);
+
+Not your code, but this assertion is meaningless. KVM does not advertise
+an IMP_DEF PMU to guests.
+
+> +	/* Initialize vPMU */
+> +	vcpu_ioctl(vpmu_vm->vcpu, KVM_SET_DEVICE_ATTR, &irq_attr);
+> +	vcpu_ioctl(vpmu_vm->vcpu, KVM_SET_DEVICE_ATTR, &init_attr);
+
+Not your code, but these should be converted to kvm_device_attr_set()
+calls.
+
+Overall I'm somewhat tepid on the idea of the library being so
+coarse-grained. It is usually more helpful to expose finer-grained
+controls, like a helper that initializes the vPMU state for a
+preexisting VM. That way the PMU code can more easily be composed with
+other helpers in different tests.
+
 -- 
-2.42.0
-
+Thanks,
+Oliver
 
