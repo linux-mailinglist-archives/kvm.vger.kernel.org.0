@@ -1,145 +1,150 @@
-Return-Path: <kvm+bounces-7864-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7865-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DAF88475C4
-	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 18:08:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B195847606
+	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 18:24:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 620661C232D7
-	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 17:08:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8818E1F25617
+	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 17:24:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3682F14D423;
-	Fri,  2 Feb 2024 17:07:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8603F14A4E2;
+	Fri,  2 Feb 2024 17:24:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HMJ2FJDL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dz87J7uG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA7B014A4F5
-	for <kvm@vger.kernel.org>; Fri,  2 Feb 2024 17:07:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35BA613F001
+	for <kvm@vger.kernel.org>; Fri,  2 Feb 2024 17:24:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706893637; cv=none; b=ssRX2lT4mky0o38HSyTmUpobSm9c/U6x2Kp5c1twJ16ZkTgB0M4/eo9/w5J7zJ+fTrBYxzdK46s29y7IAUzndeCce67KxGQOxXSAk1J0xiosL525Dd95UWwCJK9TgQnGO1SEpwde1p8Bk/T9x4lQHGMBys1WnZFKTLWCGIO1LY8=
+	t=1706894657; cv=none; b=rwG2U46RnfdOOzkF7lRJSIut3tktMxoSKHquV089wa5dMfjRjzWB5BtXpdlhEtCI/kO9fFJ31HI7UKDWa2/8HnNAGfwHLJr7z4eI+M88h/1+g1tuQclzRomnRFzOkS9OIBa5MXVZF9P40BH87xJ5OBzkH1ij6m7LTHcSgQvnEMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706893637; c=relaxed/simple;
-	bh=ZxYwtQl6gwkvn4vNBtszF0Bkjvg2DtSi0J2BX7wpt0I=;
+	s=arc-20240116; t=1706894657; c=relaxed/simple;
+	bh=f4w3yfckQ6AIGjZw7uQb+qgVSH6aBp1dXcAlQ6VCmsU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=fbzeyBLZ6wUdRsSMdYrFNwhESk8iIN3Cw+qa/7AOF5Qc2GX01bxNU0XWk6TBTCNMBUTvj7GNOi00sWyQG+B4CtqR1BTURZuRraNY6FFHeAUf+graQD2HWQkzMko2STRnrQ6MSqCsSagAIPnHcOkLTSHWU2lVxAjR/kptdryk02Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HMJ2FJDL; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=dMWXM1FJ4NwwksZi3lXGlMTSJBUX1zw+cZyBKssLzjyUok9ivwFynXKqQSyk7NEacP1B34WVSa0YahmWwf8iZCAcqL5iOa91mhJyA3TLJafOxF4WzE5qMXi9xhmEWTjmIKWEPta/zrgX0Dg8vULF5cSNjbPz8AdcFVY4BaNg6uU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dz87J7uG; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-603c0e020a6so34124587b3.0
-        for <kvm@vger.kernel.org>; Fri, 02 Feb 2024 09:07:15 -0800 (PST)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6040ffa60ddso45911917b3.2
+        for <kvm@vger.kernel.org>; Fri, 02 Feb 2024 09:24:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706893634; x=1707498434; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1706894655; x=1707499455; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=52hREpEdz1wY5YQcf323vOpsz5jH6pb2sFOoSjdgNLo=;
-        b=HMJ2FJDLYfvzE1o+llrEPHrviYAQlluTGKopi6t+mNB9P29lfyQ1YEnDlLlKrblq3H
-         RUMrjYDE1168Msw+NH2z+2gZnePwFPkh1PblRWcIXUuXcq4M3QGJI+bN3kRHxvbI0tRj
-         1YHs4XHz7iikq9vlnlGRaXJh7PlyiYF+wzkKobWuQ5VWftXfFS+N4qtNNaDT31KRoAW4
-         /Fzt4FbB+j4ZPO1iNiwidOVT+/MlyjncWpxBGJrPT26oHWngS39ScA13tcMqd31RnWCR
-         2KkhbiEpFZTYfY/Rp1VlkIBC2RLbISA60+JcaSGS/aBGy/cT5EJrzQkJp7+rj7iwLcgO
-         JuZw==
+        bh=Jh8tPI6zDKBJW5XNFKGiR3+xJf/t/qaa3P1NxbupNfc=;
+        b=dz87J7uGkmnmxHC2AnQ3HtNip0UaCBr7GjH6znlI+p7a9KTR1/Wpc4yqszeMlVUMXy
+         Wg/l+g/iYttu3F38uZJAqxsx4UHMeu8Tilan6pfa8yYUB5j2SUapdP4gzrWQI2nPcenr
+         +NB5yzxv6sz17S5hrlrASkwhtXrl8v6PRPWhuBkF+vDzoHl54tkiQztiVIEeVZwO9fPb
+         7C/FMVoeKM2DJZuwSXws/kwxMUdLrYIYHRshb9GKdXPAOXxuPRHi94a9IycFjBCmPQjp
+         YGPuxcShR+RD2DlXDpx5POg2NJxbpzO6jfImbkZZiDozv0VeFNtRhQBg8SR24CGgJqyu
+         46Cw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706893634; x=1707498434;
+        d=1e100.net; s=20230601; t=1706894655; x=1707499455;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=52hREpEdz1wY5YQcf323vOpsz5jH6pb2sFOoSjdgNLo=;
-        b=pFvvZhgHUB92KMABqKmywJwsax/Me8kE7fFx7BV18qUw8vs4yv028RahLIg4+Uc6PJ
-         TQ7AR2nyOpNshMFASH5vVB9Kn79Vp/jaj65B5Lz3AVX81g8W3zf+Hg4S1jUZGjQRvmaO
-         Io6xGPSgyf5GjAxd7Hn3+rDZxH4ns9mZQ75kwPii368WqwnggG1zbGc4IBbXJKELz9+c
-         kegbuR/nP92GdZw83EXPNeaoFgsyfLxZ3pdr+8tnWrxQZ03dbu1z1Eez9zbLWW81R/XD
-         P4vxwXECcZ5qNGSMa6EpxE7YdvO4NBiN/rDsJwghkj1Gt1/xqW6GCB9MllZMU3hySGyr
-         Dn6Q==
-X-Gm-Message-State: AOJu0YzYNIA63DzxK5cRiVN2iuMH9JFRXXw6g8UXoItvzpzCH0RuA+md
-	HDm0mRL4eNu6qoXIyz8yiXEKTRQyPlMH6h+ujz1YJbhoL+qShq/cBN7ZCYSy6AKn3BTLt9z8XnM
-	NJA==
-X-Google-Smtp-Source: AGHT+IGW368ALVFacBMp4luOZOtgF9xdwUNWVenx3J/2DBP1Gf1M9X6P48vkhXsEFewVeUm8CzD7lSb87CA=
+        bh=Jh8tPI6zDKBJW5XNFKGiR3+xJf/t/qaa3P1NxbupNfc=;
+        b=SPjJjqLBQ9jle5Y25C02y1IB9wQRW/UtZUNVGPV/bp0oPS+KwHnDUVDHWHx6sJEFau
+         AnviXtQ8qpJw+zeE+3MfD2WQNIWKrhaofi20GMlTCSGViwkS2ont4qGT8SZsIZizWzJI
+         erGfhSiZNzmokZBv4sCiYly9qoBJriAkMFrt8mctlKX0lrcYeB5HAMmbHd1Z0l6oUSKf
+         Nb+6Bd2HZCn5/7h9M/82ncdQiFTJjDnN81/vA+Rnk4QrFAvCdf7XdkIUOLEdG91+3t0q
+         1icstKq0d5dlZhEAnhNkfL30Y3iUIcSoyD9KtPs7QfHkSo2pG/TYoMoSV/ZOFzWF+M7i
+         tokg==
+X-Gm-Message-State: AOJu0YwbagVgqnYqxdK/dyhQzb7KR4OVP+vrfDfxk+bg5CnIqPnhZmRa
+	t8np8BrTiSnCTDrqeN46/A66YGFcfFHVp+MXlMlmDLH1dCYfu7nudmUVQozKr+eiLFMk7SgXGwL
+	BoQ==
+X-Google-Smtp-Source: AGHT+IFYznk7JpLxuRok8AtJlpZ2llmKQpQE42vIimTuUoL3PWXT0NTUQQ7owcgwAoNNjSDys4Q9Eh7vX8A=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:9805:0:b0:602:d545:a3bb with SMTP id
- p5-20020a819805000000b00602d545a3bbmr990910ywg.1.1706893634791; Fri, 02 Feb
- 2024 09:07:14 -0800 (PST)
-Date: Fri, 2 Feb 2024 09:07:13 -0800
-In-Reply-To: <9098e8bb-cbe4-432c-98d6-ce96a4f7094f@linux.intel.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:200a:b0:dc2:3441:897f with SMTP id
+ dh10-20020a056902200a00b00dc23441897fmr748244ybb.6.1706894655216; Fri, 02 Feb
+ 2024 09:24:15 -0800 (PST)
+Date: Fri, 2 Feb 2024 09:24:13 -0800
+In-Reply-To: <95c3dc22-2d40-46fc-bc4d-8206b002e0a1@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240123221220.3911317-1-mizhang@google.com> <ZbpqoU49k44xR4zB@google.com>
- <368248d0-d379-23c8-dedf-af7e1e8d23c7@oracle.com> <CAL715WJDesggP0S0M0SWX2QaFfjBNdqD1j1tDU10Qxk6h7O0pA@mail.gmail.com>
- <ZbvUyaEypRmb2s73@google.com> <ZbvjKtsVjpuQmKE2@google.com>
- <ZbvyrvvZM-Tocza2@google.com> <9098e8bb-cbe4-432c-98d6-ce96a4f7094f@linux.intel.com>
-Message-ID: <Zb0hQfZX89gJOtRX@google.com>
-Subject: Re: [PATCH] KVM: x86/pmu: Fix type length error when reading pmu->fixed_ctr_ctrl
+References: <20240201061505.2027804-1-dapeng1.mi@linux.intel.com>
+ <Zbvcx0A-Ln2sP6XA@google.com> <95c3dc22-2d40-46fc-bc4d-8206b002e0a1@linux.intel.com>
+Message-ID: <Zb0lPSBI_GFGuVex@google.com>
+Subject: Re: [PATCH] KVM: selftests: Test top-down slots event
 From: Sean Christopherson <seanjc@google.com>
-To: Xiong Y Zhang <xiong.y.zhang@linux.intel.com>
-Cc: Mingwei Zhang <mizhang@google.com>, Dongli Zhang <dongli.zhang@oracle.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+To: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Kan Liang <kan.liang@linux.intel.com>, Jim Mattson <jmattson@google.com>, 
+	Jinrong Liang <cloudliang@tencent.com>, Aaron Lewis <aaronlewis@google.com>, 
+	Dapeng Mi <dapeng1.mi@intel.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Feb 02, 2024, Xiong Y Zhang wrote:
+On Fri, Feb 02, 2024, Dapeng Mi wrote:
 > 
+> On 2/2/2024 2:02 AM, Sean Christopherson wrote:
+> > On Thu, Feb 01, 2024, Dapeng Mi wrote:
+> > > Although the fixed counter 3 and the exclusive pseudo slots events is
+> > > not supported by KVM yet, the architectural slots event is supported by
+> > > KVM and can be programed on any GP counter. Thus add validation for this
+> > > architectural slots event.
+> > > 
+> > > Top-down slots event "counts the total number of available slots for an
+> > > unhalted logical processor, and increments by machine-width of the
+> > > narrowest pipeline as employed by the Top-down Microarchitecture
+> > > Analysis method." So suppose the measured count of slots event would be
+> > > always larger than 0.
+> > Please translate that into something non-perf folks can understand.  I know what
+> > a pipeline slot is, and I know a dictionary's definition of "available" is, but I
+> > still have no idea what this event actually counts.  In other words, I want a
+> > precise definition of exactly what constitutes an "available slot", in verbiage
+> > that anyone with basic understanding of x86 architectures can follow after reading
+> > the whitepaper[*], which is helpful for understanding the concepts, but doesn't
+> > crisply explain what this event counts.
+> > 
+> > Examples of when a slot is available vs. unavailable would be extremely helpful.
+> > 
+> > [*] https://www.intel.com/content/www/us/en/docs/vtune-profiler/cookbook/2023-0/top-down-microarchitecture-analysis-method.html
 > 
-> On 2/2/2024 3:36 AM, Sean Christopherson wrote:
-> > On Thu, Feb 01, 2024, Mingwei Zhang wrote:
-> >> On Thu, Feb 01, 2024, Sean Christopherson wrote:
-> >>> On Wed, Jan 31, 2024, Mingwei Zhang wrote:
-> >>>>> The PMC is still active while the VM side handle_pmi_common() is not going to handle it?
-> >>>>
-> >>>> hmm, so the new value is '0', but the old value is non-zero, KVM is
-> >>>> supposed to zero out (stop) the fix counter), but it skips it. This
-> >>>> leads to the counter continuously increasing until it overflows, but
-> >>>> guest PMU thought it had disabled it. That's why you got this warning?
-> >>>
-> >>> No, that can't happen, and KVM would have a massive bug if that were the case.
-> >>> The truncation can _only_ cause bits to disappear, it can't magically make bits
-> >>> appear, i.e. the _only_ way this can cause a problem is for KVM to incorrectly
-> >>> think a PMC is being disabled.
-> >>
-> >> The reason why the bug does not happen is because there is global
-> >> control. So disabling a counter will be effectively done in the global
-> >> disable part, ie., when guest PMU writes to MSR 0x38f.
-> > 
-> > 
-> >>> fixed PMC is disabled. KVM will pause the counter in reprogram_counter(), and
-> >>> then leave the perf event paused counter as pmc_event_is_allowed() will return
-> >>> %false due to the PMC being locally disabled.
-> >>>
-> >>> But in this case, _if_ the counter is actually enabled, KVM will simply reprogram
-> >>> the PMC.  Reprogramming is unnecessary and wasteful, but it's not broken.
-> >>
-> >> no, if the counter is actually enabled, but then it is assigned to
-> >> old_fixed_ctr_ctrl, the value is truncated. When control goes to the
-> >> check at the time of disabling the counter, KVM thinks it is disabled,
-> >> since the value is already truncated to 0. So KVM will skip by saying
-> >> "oh, the counter is already disabled, why reprogram? No need!".
-> > 
-> > Ooh, I had them backwards.  KVM can miss 1=>0, but not 0=>1.  I'll apply this
-> > for 6.8; does this changelog work for you?
-> > 
-> >   Use a u64 instead of a u8 when taking a snapshot of pmu->fixed_ctr_ctrl
-> >   when reprogramming fixed counters, as truncating the value results in KVM
-> >   thinking all fixed counters, except counter 0, 
-> each counter has four bits in fixed_ctr_ctrl, here u8 could cover counter 0
-> and counter 1, so "except counter 0" can be modified to "except counter 0 and
-> 1" 
+> Yeah, indeed, 'slots' is not easily understood from its literal meaning. I
+> also took some time to understand it when I look at this event for the first
+> time. Simply speaking, slots is an abstract concept which indicates how many
+> uops (decoded from instructions) can be processed simultaneously (per cycle)
+> on HW. we assume there is a classic 5-stage pipeline, fetch, decode,
+> execute, memory access and register writeback. In topdown
+> micro-architectural analysis method, the former two stages (fetch/decode) is
+> called front-end and the last three stages are called back-end.
+> 
+> In modern Intel processors, a complicated instruction could be decoded into
+> several uops (micro-operations) and so these uops can be processed
+> simultaneously and then improve the performance. Thus, assume a processor
+> can decode and dispatch 4 uops in front-end and execute 4 uops in back-end
+> simultaneously (per-cycle), so we would say this processor has 4 topdown
+> slots per-cycle. If a slot is spare and can be used to process new uop, we
+> say it's available, but if a slot is occupied by a uop for several cycles
+> and not retired (maybe blocked by memory access), we say this slot is stall
+> and unavailable.
 
-Ugh, math.  I'll adjust it to:
+In that case, can't the test assert that the count is at least NUM_INSNS_RETIRED?
+AFAIK, none of the sequences in the measured code can be fused, i.e. the test can
+assert that every instruction requires at least one uop, and IIUC, actually
+executing a uop requires an available slot at _some_ time.
 
-  Use a u64 instead of a u8 when taking a snapshot of pmu->fixed_ctr_ctrl
-  when reprogramming fixed counters, as truncating the value results in KVM
-  thinking fixed counter 2 is already disabled (the bug also affects fixed
-  counters 3+, but KVM doesn't yet support those).  As a result, if the
-  guest disables fixed counter 2, KVM will get a false negative and fail to
-  reprogram/disable emulation of the counter, which can leads to incorrect
-  counts and spurious PMIs in the guest.
-
-Thanks!
+diff --git a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
+index ae5f6042f1e8..29609b52f8fa 100644
+--- a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
++++ b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
+@@ -119,6 +119,9 @@ static void guest_assert_event_count(uint8_t idx,
+        case INTEL_ARCH_REFERENCE_CYCLES_INDEX:
+                GUEST_ASSERT_NE(count, 0);
+                break;
++       case INTEL_ARCH_TOPDOWN_SLOTS_INDEX:
++               GUEST_ASSERT(count >= NUM_INSNS_RETIRED);
++               break;
+        default:
+                break;
+        }
 
