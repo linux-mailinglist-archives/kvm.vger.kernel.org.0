@@ -1,182 +1,137 @@
-Return-Path: <kvm+bounces-7778-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7779-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBB818465A7
-	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 03:10:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F254846617
+	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 03:57:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 243DBB22AD0
-	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 02:10:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A1C528EB23
+	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 02:57:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD669B67C;
-	Fri,  2 Feb 2024 02:10:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AB43C8E1;
+	Fri,  2 Feb 2024 02:57:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RtzBrCyg"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2881EBE55;
-	Fri,  2 Feb 2024 02:10:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0AC5C155
+	for <kvm@vger.kernel.org>; Fri,  2 Feb 2024 02:57:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706839814; cv=none; b=POEC7NIP6jDK5EDB5/dJjURccWEeuSCkss4/7AvACzd8gmI8vsvi+9pFTvsCsT2jifn1qB3rCyg6vNWzTeg7E3bilcW6OpfIDc4gZ5pVDT1RGLhUKkvzgZvGfG13qvTRqgiDuykXGL9IfqZNVLg7T2UEQ4Gb7/gXQDfH24AOn9U=
+	t=1706842630; cv=none; b=dkF9TLAru1qADR+B1dFNOVV8iqlDEnzRqrEzJOxshj+hYeBI0/Sg99T8PE+SnOvTKVqHofkrRkfRbsg5NegaodflQE2d88kQpfswrofSkKzqSrpSKXm6v1JELR8+HTYcCxBSTWCRl7sfVKx8ElmpLE6ClkvPp/oEH6faUIfD+0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706839814; c=relaxed/simple;
-	bh=S1wJ8O2c3yy8xDXZK3UXs+325LgwXfZxjnn5v0hTV8w=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=Ji95BbYBQiYG/bxFPkHu5yoLoCIKG1Ai4zDJJcS8b7g69tSZKLDBOmjdD/DbYP06Uu5KIGmrLdcaG4ktbyX/46Fn6pc4UwNiyFjNAydeQPPr1wXDowxdYY9ArHj635I33frxQOVLQTzLHkzRQqU/xE+0fhlCkEV/rlxviJhe3lQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4TQzhj4yq1zXgvp;
-	Fri,  2 Feb 2024 10:08:37 +0800 (CST)
-Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0296B18007A;
-	Fri,  2 Feb 2024 10:10:03 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 2 Feb
- 2024 10:10:02 +0800
-Subject: Re: [PATCH net-next v4 2/5] page_frag: unify gfp bits for order 3
- page allocation
-To: Paolo Abeni <pabeni@redhat.com>, <davem@davemloft.net>, <kuba@kernel.org>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Alexander Duyck
-	<alexanderduyck@fb.com>, Alexander Duyck <alexander.duyck@gmail.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>, Eric Dumazet
-	<edumazet@google.com>, <kvm@vger.kernel.org>,
-	<virtualization@lists.linux.dev>, <linux-mm@kvack.org>
-References: <20240130113710.34511-1-linyunsheng@huawei.com>
- <20240130113710.34511-3-linyunsheng@huawei.com>
- <81c37127dda0f2f69a019d67d4420f62c995ee7f.camel@redhat.com>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <2e8606b1-81c2-6f3f-622c-607db5e90253@huawei.com>
-Date: Fri, 2 Feb 2024 10:10:02 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	s=arc-20240116; t=1706842630; c=relaxed/simple;
+	bh=m9FZO3q9smB7cSYDW0f7Awe436TxHdLzwmgKLOV6UpY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pHViAq0teGuvAnM/znmFQ6B0YbCczP3dgfBpxTg/83ZyP5L3glhc8n2BSywAGFCAEA7g/AXXjQqjrKrneMIdUTF1xokuolzgsBmLmtMGblWhdBg6rh1K69I/13pn6/VmC4+DAhQU8SToZ9ngvhUTM1o0Q8XCIRGuj3m/qvx6bhM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RtzBrCyg; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706842627;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=alz1bWzkdlVdcD3J1YSOwuXprTmyNWB0NW6vFsZRqwo=;
+	b=RtzBrCygpv9TkMbCRHGXXiH8zATHPyvmGojl862MHljwWomOmr4nGNisGEQ67lZPlutTZ7
+	2UkOgXFj7aYkQOdw+yQTHulrnkZ0lB22GPnLjDXC+GewbbJ+kJApd5O34QI8y+M2BjMOvN
+	6oNmrCWbpnGr/7+uOiwD+fADJEnykIU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-186-1EBHbB8BPyqnm_YXc-oHSA-1; Thu, 01 Feb 2024 21:57:03 -0500
+X-MC-Unique: 1EBHbB8BPyqnm_YXc-oHSA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9D75883514A;
+	Fri,  2 Feb 2024 02:57:02 +0000 (UTC)
+Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 58548C15E61;
+	Fri,  2 Feb 2024 02:57:02 +0000 (UTC)
+From: Shaoqin Huang <shahuang@redhat.com>
+To: Oliver Upton <oliver.upton@linux.dev>,
+	Marc Zyngier <maz@kernel.org>,
+	kvmarm@lists.linux.dev
+Cc: Eric Auger <eauger@redhat.com>,
+	Shaoqin Huang <shahuang@redhat.com>,
+	James Morse <james.morse@arm.com>,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH v4 0/5] KVM: selftests: aarch64: Introduce pmu_event_filter_test
+Date: Thu,  1 Feb 2024 21:56:49 -0500
+Message-Id: <20240202025659.5065-1-shahuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <81c37127dda0f2f69a019d67d4420f62c995ee7f.camel@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggpemm500005.china.huawei.com (7.185.36.74)
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
 
-On 2024/2/1 21:16, Paolo Abeni wrote:
-> On Tue, 2024-01-30 at 19:37 +0800, Yunsheng Lin wrote:
->> Currently there seems to be three page frag implementions
->> which all try to allocate order 3 page, if that fails, it
->> then fail back to allocate order 0 page, and each of them
->> all allow order 3 page allocation to fail under certain
->> condition by using specific gfp bits.
->>
->> The gfp bits for order 3 page allocation are different
->> between different implementation, __GFP_NOMEMALLOC is
->> or'd to forbid access to emergency reserves memory for
->> __page_frag_cache_refill(), but it is not or'd in other
->> implementions, __GFP_DIRECT_RECLAIM is masked off to avoid
->> direct reclaim in skb_page_frag_refill(), but it is not
->> masked off in __page_frag_cache_refill().
->>
->> This patch unifies the gfp bits used between different
->> implementions by or'ing __GFP_NOMEMALLOC and masking off
->> __GFP_DIRECT_RECLAIM for order 3 page allocation to avoid
->> possible pressure for mm.
->>
->> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
->> Reviewed-by: Alexander Duyck <alexanderduyck@fb.com>
->> CC: Alexander Duyck <alexander.duyck@gmail.com>
->> ---
->>  drivers/vhost/net.c | 2 +-
->>  mm/page_alloc.c     | 4 ++--
->>  net/core/sock.c     | 2 +-
->>  3 files changed, 4 insertions(+), 4 deletions(-)
->>
->> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
->> index f2ed7167c848..e574e21cc0ca 100644
->> --- a/drivers/vhost/net.c
->> +++ b/drivers/vhost/net.c
->> @@ -670,7 +670,7 @@ static bool vhost_net_page_frag_refill(struct vhost_net *net, unsigned int sz,
->>  		/* Avoid direct reclaim but allow kswapd to wake */
->>  		pfrag->page = alloc_pages((gfp & ~__GFP_DIRECT_RECLAIM) |
->>  					  __GFP_COMP | __GFP_NOWARN |
->> -					  __GFP_NORETRY,
->> +					  __GFP_NORETRY | __GFP_NOMEMALLOC,
->>  					  SKB_FRAG_PAGE_ORDER);
-> 
->>  		if (likely(pfrag->page)) {
->>  			pfrag->size = PAGE_SIZE << SKB_FRAG_PAGE_ORDER;
->> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
->> index c0f7e67c4250..636145c29f70 100644
->> --- a/mm/page_alloc.c
->> +++ b/mm/page_alloc.c
->> @@ -4685,8 +4685,8 @@ static struct page *__page_frag_cache_refill(struct page_frag_cache *nc,
->>  	gfp_t gfp = gfp_mask;
->>  
->>  #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
->> -	gfp_mask |= __GFP_COMP | __GFP_NOWARN | __GFP_NORETRY |
->> -		    __GFP_NOMEMALLOC;
->> +	gfp_mask = (gfp_mask & ~__GFP_DIRECT_RECLAIM) |  __GFP_COMP |
->> +		   __GFP_NOWARN | __GFP_NORETRY | __GFP_NOMEMALLOC;
->>  	page = alloc_pages_node(NUMA_NO_NODE, gfp_mask,
->>  				PAGE_FRAG_CACHE_MAX_ORDER);
->>  	nc->size = page ? PAGE_FRAG_CACHE_MAX_SIZE : PAGE_SIZE;
->> diff --git a/net/core/sock.c b/net/core/sock.c
->> index 88bf810394a5..8289a3d8c375 100644
->> --- a/net/core/sock.c
->> +++ b/net/core/sock.c
->> @@ -2919,7 +2919,7 @@ bool skb_page_frag_refill(unsigned int sz, struct page_frag *pfrag, gfp_t gfp)
->>  		/* Avoid direct reclaim but allow kswapd to wake */
->>  		pfrag->page = alloc_pages((gfp & ~__GFP_DIRECT_RECLAIM) |
->>  					  __GFP_COMP | __GFP_NOWARN |
->> -					  __GFP_NORETRY,
->> +					  __GFP_NORETRY | __GFP_NOMEMALLOC,
->>  					  SKB_FRAG_PAGE_ORDER);
-> 
-> This will prevent memory reserve usage when allocating order 3 pages,
-> but not when allocating a single page as a fallback. Still different
+The test is inspired by the pmu_event_filter_test which implemented by x86. On
+the arm64 platform, there is the same ability to set the pmu_event_filter
+through the KVM_ARM_VCPU_PMU_V3_FILTER attribute. So add the test for arm64.
 
-More accurately, the above ensures memory reserve is always not used
-for order 3 pages, whether memory reserve is used for order 0 pages
-depending on original 'gfp' flags, if 'gfp' does not have __GFP_NOMEMALLOC
-bit set, memory reserve may still be used  for order 0 pages.
+The series first move some pmu common code from vpmu_counter_access to
+lib/aarch64/vpmu.c and include/aarch64/vpmu.h, which can be used by
+pmu_event_filter_test. Then fix a bug related to the [enable|disable]_counter,
+and at last, implement the test itself.
 
-> from the __page_frag_cache_refill() allocator - which never accesses
-> the memory reserves.
+Changelog:
+----------
+v3->v4:
+  - Rebased to the v6.8-rc2.
 
-I am not really sure I understand the above commemt.
-The semantic is the same as skb_page_frag_refill() as explained above
-as my understanding. Note that __page_frag_cache_refill() use 'gfp_mask'
-for allocating order 3 pages and use the original 'gfp' for allocating
-order 0 pages.
+v2->v3:
+  - Check the pmceid in guest code instead of pmu event count since different
+  hardware may have different event count result, check pmceid makes it stable
+  on different platform.                        [Eric]
+  - Some typo fixed and commit message improved.
 
-> 
-> I'm unsure we want to propagate the __page_frag_cache_refill behavior
-> here, the current behavior could be required by some systems.
-> 
-> It looks like this series still leave the skb_page_frag_refill()
-> allocator alone, what about dropping this chunk, too? 
+v1->v2:
+  - Improve the commit message.                 [Eric]
+  - Fix the bug in [enable|disable]_counter.    [Raghavendra & Marc]
+  - Add the check if kvm has attr KVM_ARM_VCPU_PMU_V3_FILTER.
+  - Add if host pmu support the test event throught pmceid0.
+  - Split the test_invalid_filter() to another patch. [Eric]
 
-As explained above, I would prefer to keep it as it is as it seems
-to be quite obvious that we can avoid possible pressure for mm by
-not using memory reserve for order 3 pages as we have the fallback
-for order 0 pages.
+v1: https://lore.kernel.org/all/20231123063750.2176250-1-shahuang@redhat.com/
+v2: https://lore.kernel.org/all/20231129072712.2667337-1-shahuang@redhat.com/
+v3: https://lore.kernel.org/all/20240116060129.55473-1-shahuang@redhat.com/
 
-Please let me know if there is anything obvious I missed.
+Shaoqin Huang (5):
+  KVM: selftests: aarch64: Make the [create|destroy]_vpmu_vm() public
+  KVM: selftests: aarch64: Move pmu helper functions into vpmu.h
+  KVM: selftests: aarch64: Fix the buggy [enable|disable]_counter
+  KVM: selftests: aarch64: Introduce pmu_event_filter_test
+  KVM: selftests: aarch64: Add invalid filter test in
+    pmu_event_filter_test
 
-> 
-> Thanks!
-> 
-> Paolo
-> 
-> 
-> .
-> 
+ tools/testing/selftests/kvm/Makefile          |   2 +
+ .../kvm/aarch64/pmu_event_filter_test.c       | 255 ++++++++++++++++++
+ .../kvm/aarch64/vpmu_counter_access.c         | 217 ++-------------
+ .../selftests/kvm/include/aarch64/vpmu.h      | 134 +++++++++
+ .../testing/selftests/kvm/lib/aarch64/vpmu.c  |  74 +++++
+ 5 files changed, 489 insertions(+), 193 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/vpmu.h
+ create mode 100644 tools/testing/selftests/kvm/lib/aarch64/vpmu.c
+
+
+base-commit: 41bccc98fb7931d63d03f326a746ac4d429c1dd3
+-- 
+2.40.1
+
 
