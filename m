@@ -1,130 +1,292 @@
-Return-Path: <kvm+bounces-7866-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7867-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EFA684764A
-	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 18:38:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DEF584769F
+	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 18:50:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 922F91C230ED
-	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 17:38:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 17988B24DA8
+	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 17:47:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 820A614AD0D;
-	Fri,  2 Feb 2024 17:37:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1957614AD34;
+	Fri,  2 Feb 2024 17:46:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a1II5zjZ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0NFuDAZG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CE47145B2D;
-	Fri,  2 Feb 2024 17:37:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9031014A4F0
+	for <kvm@vger.kernel.org>; Fri,  2 Feb 2024 17:46:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706895471; cv=none; b=n3tUaGPOe4N5uKjx1o1zzHA7mjO1hp4hFUK8ZiAD8NXSpyhva+mDoP0XgcRo4f2QcfdZCKSIaJA+8XGV3b7Fkrajno/Vw5D8xuRDSr4T8yG4qWa11uqOCac08WK7KIXnNDO548pBnXu27Y0FurNToWewjU5x2o9m2igKUyE9TrY=
+	t=1706895981; cv=none; b=oGYWwUkaqS+YEhTIFA4s4LJsE8Dc5wb8ep7MrTLHQWRtqmjcNrIC/xvPsB0aPplTrYUHOXWWoW22lkpcgSAYLM2WNVeitaVxIrnVzAZBexrhljkcvroXOZkxPvcLYK7uSv8qyL4m8r0caOyteGgeI7hyinCNDWD2Iw5jYTS4cwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706895471; c=relaxed/simple;
-	bh=FV/m1E7grOjaP45bX+Q462zCMaKioikg4jNtCMJ8RG0=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=fUUvUHUjZ4fAtJDvfHiCjCza8X8EIWew717FlQ7zsObp97A0V0mtVYTzjpMapcoH0mg4agpOR+37ZhbcY8KwNp64YwhbLE46fGl7qUaeGQxBNH8I+qvUqxrNzm/VQ+5NVjfAYTsZB9q5gJ2jNPAbaa7an+IOWnfcJkvXhvmzprE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a1II5zjZ; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-40ef6f10b56so19495295e9.2;
-        Fri, 02 Feb 2024 09:37:49 -0800 (PST)
+	s=arc-20240116; t=1706895981; c=relaxed/simple;
+	bh=wbyUml4VzPHLwdgPIsVLZjqXLgyXVtdvOqZgsHvr69s=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=sb2Srz1tvl5D7hLyj6Ka1KCc5O2gq8rZ1vx5qcDHLkOsuaIrJGaIXQHL8eaiGskdg93z9XUkEZOaBq5LtEtzjpP83eZA4dDYRxTQAQzIh6nym4tfcwfoDhS95azaKaBnJxIUUpF576itCvLImv2X5gQP+f6O/JaCIFwOUxKDv+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0NFuDAZG; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc6bea4c8b9so3193891276.3
+        for <kvm@vger.kernel.org>; Fri, 02 Feb 2024 09:46:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706895468; x=1707500268; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=acuHhQibuujsn4pRPkaFqcAuYowoSVcKHridiNfbyLA=;
-        b=a1II5zjZA9dTIO7NXb2yNksfhzjmZpnb5CteWiK/dkS9tj3BnnDx+EuB58af7ubgXZ
-         6A3ZR/oFzDJWWn/GYqSF1BiykkZPQRraWRAfH9ymTwhPRRJYjUySfvFiM5qG+BboupRe
-         970iYGMK+ncdUGFWJlQIqiPPR/0oftnvSKMjO0qzULIvlyvO66uQrffoSXuqihrEA8Ik
-         GCfBmTuGP8NQ+9JmtLY1TESTzNkrEd8s8bIn6rB43XQLzfH7Qf8uy8KzI4knzD0XiDIf
-         /VA9vL57HAphoqgonWNlpNCvqcPcGy8KpPSeOUcjlaqnNZoSlaw3LlkNmxGJxHHmPPPQ
-         8A2Q==
+        d=google.com; s=20230601; t=1706895978; x=1707500778; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=YHpFLXNrvHNKh8cz0f89B1EFXTS6HjoV5QmargAn3T4=;
+        b=0NFuDAZGPAyy/VJGH1Dv+wBjPUbGw0rCNuIG0cZkhc95xj2+/RELxQEqNgt8t92BCc
+         ODsp4qwJMuTluqm2y+zzXhDXBngnwUgT+fyWyZdiR3a0Z4Yob7fhZIfRypKFSVYUZQDO
+         hYt92Qb7ReM6oWfJOyPvxD8Wm8LJ8wEkf1Z1x1qRSTFmBuH+OCINeDoyMF1WvnFoZlyJ
+         JEb9/fwTf6STF9PDVSkpnvfXIfNV9Ygdywoks5RevD48eT6K87TJSa/9h7kuLB43uDWn
+         LB4K7XmRuqhbu20KPuTJAyxJ24IYzxml0JA9Kf0pNJdG9Zo+jgYUNng08Q5E7EothQ94
+         CJRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706895468; x=1707500268;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=acuHhQibuujsn4pRPkaFqcAuYowoSVcKHridiNfbyLA=;
-        b=ORAxmxgQ7jAiKfb/7nEY/BxU6FecFgTVuj9hMWPqww5neXBq/IFkT1fNI60DheWPR3
-         HxZqlE5g9fB8stLIBYP/4VdlcseYDiOOErm7l92cEZjCMaolbvkydkt+FzIgJNpHlscF
-         Ll2GVy+Exbvp5zk0fu6nOp5TspAcCtT1IzUKERJFfC2OfROJmLrEZMvfK1rzdXnSvnem
-         Y+rL8CaiwsFNtSmw7KqVU3ZP/chjhD4lMzgz8klAGuqmVgFoaVSV4IQHYTiRBUFn+hR9
-         7RPvE3IS3gmp8/utrTfy4dNOoJKVm/eKrbefKVe0SvsMwmufaNZs/x+4nASmbYiY6zcD
-         gyaA==
-X-Gm-Message-State: AOJu0YwSj9RnniR7T7eyF+b2UiQuVGphNHNc/9Y2I1UVygqgUFPHXB9t
-	z0DfPTibwdZUfPhwwqfIMprxro6ZoG0HzIRqr3dovZXQyB15c9rk
-X-Google-Smtp-Source: AGHT+IFP1U7E1vQNZZAEKVGRs0X7US3VdZuoJ7HCxosixrNynGfyp2sionPT/sfCZQoU7Ovm/YDo9A==
-X-Received: by 2002:a5d:574d:0:b0:33a:e88e:828a with SMTP id q13-20020a5d574d000000b0033ae88e828amr4307092wrw.48.1706895468099;
-        Fri, 02 Feb 2024 09:37:48 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCV4/67qMFuG0VRExjGEKwZna+M+0UfAg+Zqv1mPsb4Vsjyp8dzBNRxvCkcj2m6bl4ZuUfmOKV72fzBhh2lni7CmicfWzYTKsxvGrvSr2Gthrk1R3kxTvEKvmpHFa9KGDzzU7L2Q7nqCUhD0Ql7q6g9GnleOOl5vzIn9wpmN3dXdNJwvcziy2RYT9QaRdt6smxHiFkwYqW04DzziBu3PWzfH5mo7bL3+ZPloPlm8B/dFKTvX/nyYOGCyO64tT+egSNC5f1Va7VJL+e3Y8zivWgWlKryPkezzINcmJo6fgwroNf7iu5Ax8J0c7BVexr3yaJdYcOMtKp27XICHv7+1+XdUSsFn1ga9hSUIWKUXmn1m2qUauvFO2UoRPITb0X4gPVProX04HusH+AQA84iRLLKMQA+VHTU5AE0tb4Zokjsf3NpPuVg=
-Received: from [192.168.12.38] (54-240-197-238.amazon.com. [54.240.197.238])
-        by smtp.gmail.com with ESMTPSA id b1-20020a5d45c1000000b0033b28a784dcsm352982wrs.114.2024.02.02.09.37.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 02 Feb 2024 09:37:47 -0800 (PST)
-From: Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: Paul Durrant <paul@xen.org>
-Message-ID: <b45ee6cf-fa51-49eb-93ba-a54f4469470e@xen.org>
-Date: Fri, 2 Feb 2024 17:37:44 +0000
+        d=1e100.net; s=20230601; t=1706895978; x=1707500778;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YHpFLXNrvHNKh8cz0f89B1EFXTS6HjoV5QmargAn3T4=;
+        b=O/iLBFpcteZKM8+RAkXIvZP2/lsKBgEV/70KDcfWne7MdAxNDuFP02sSOKwXD3h0Y6
+         lVYQvy89esvhh/7Uxmr77oCRB1CcXyYmrpczR3DsdrS7QtIB5LTX1SX/ECZ772gW3uRH
+         n8IUZQSjPT27/I974r9K3zqb6HIhVCssXVMLxyGtt33RwccuUvzd1pfH8iVAbSN98C+f
+         wyZyYAma+z0mtrxre+3rpbcgKiH+ZbOBhzfC+ZjSKTkUZrZfuGPN7RXN4hOtf4grpCCu
+         b2yPpQlsGkj4NeatA0gMcxOqmX852Bp06uugnlAmD9m9WUHKIImFTQjK+Hx1jDf/F8Fk
+         CULA==
+X-Gm-Message-State: AOJu0YzvZgQ8n459YmzqooDYemk4iDcg0U+QEOUNJb1AsX9ksGiEqC4H
+	VokdD2KBquDb9/F8k+HBzeqfo0RejnwEopNWf/X3c7AB7Jnsvy9R0su0XA/rPjUTQmrrPsm64QU
+	7og==
+X-Google-Smtp-Source: AGHT+IFdKiwGSp4Z4DOEbhpt9+g9PeoUWimmoqa1d6bp/KHrS9gSglpHXV8BAfo+RK/WrgFtiPOmzPaTbo8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1681:b0:dc6:bd9f:b061 with SMTP id
+ bx1-20020a056902168100b00dc6bd9fb061mr144705ybb.13.1706895978655; Fri, 02 Feb
+ 2024 09:46:18 -0800 (PST)
+Date: Fri, 2 Feb 2024 09:46:17 -0800
+In-Reply-To: <20240202064332.9403-1-shahuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: paul@xen.org
-Subject: Re: [PATCH v12 00/20] KVM: xen: update shared_info and vcpu_info
- handling
-Content-Language: en-US
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
- David Woodhouse <dwmw2@infradead.org>, Shuah Khan <shuah@kernel.org>,
- kvm@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20240115125707.1183-1-paul@xen.org>
- <2b4d020c-08ba-46ac-b004-cd9cb7256bd9@xen.org> <ZbMIu84Zi2_PF9o4@google.com>
-Organization: Xen Project
-In-Reply-To: <ZbMIu84Zi2_PF9o4@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20240202064332.9403-1-shahuang@redhat.com>
+Message-ID: <Zb0qaZ7iT0_8Rp7-@google.com>
+Subject: Re: [PATCH v3] KVM: selftests: Fix the dirty_log_test semaphore imbalance
+From: Sean Christopherson <seanjc@google.com>
+To: Shaoqin Huang <shahuang@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On 26/01/2024 01:19, Sean Christopherson wrote:
-> On Thu, Jan 25, 2024, Paul Durrant wrote:
->> On 15/01/2024 12:56, Paul Durrant wrote:
->>> From: Paul Durrant <pdurrant@amazon.com>
->>>
->>> This series has one small fix to what was in v11 [1]:
->>>
->>> * KVM: xen: re-initialize shared_info if guest (32/64-bit) mode is set
->>>
->>> The v11 patch failed to set the return code of the ioctl if the mode
->>> was not actually changed, leading to a spurious failure.
->>>
->>> This version of the series also contains a new bug-fix to the pfncache
->>> code from David Woodhouse.
->>>
->>> [1] https://lore.kernel.org/kvm/20231219161109.1318-1-paul@xen.org/
->>>
->>
->> Ping?
-> 
-> Sorry, I have done basically zero upstream reviews over the last few weeks, for
-> a variety of reasons.  Unless yet another thing pops up, I expect to dive into
-> upstream reviews tomorrow and spend a good long while there.
+On Fri, Feb 02, 2024, Shaoqin Huang wrote:
+> ---
+> v2->v3:
+>   - Rebase to v6.8-rc2.
+>   - Use TEST_ASSERT().
 
-Hi Sean,
+Patch says otherwise.
 
-   Have you had any time to take a look at this?
+> @@ -726,6 +728,11 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>  		return;
+>  	}
+>  
+> +	sem_getvalue(&sem_vcpu_stop, &sem_val);
+> +	assert(sem_val == 0);
+> +	sem_getvalue(&sem_vcpu_cont, &sem_val);
+> +	assert(sem_val == 0);
+> +
+>  	/*
+>  	 * We reserve page table for 2 times of extra dirty mem which
+>  	 * will definitely cover the original (1G+) test range.  Here
+> @@ -825,6 +832,13 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>  		sync_global_to_guest(vm, iteration);
+>  	}
+>  
+> +	/*
+> +	 *
+> +	 * Before we set the host_quit, let the vcpu has time to run, to make
+> +	 * sure we consume the sem_vcpu_stop and the vcpu consume the
+> +	 * sem_vcpu_cont, to keep the semaphore balance.
+> +	 */
+> +	usleep(p->interval * 1000);
 
-   Paul
+Sorry, I wasn't as explicit as I should have been.  When I said I don't have a
+better solution, I did not mean to imply that I am ok with busy waiting as a
+hack-a-around.
+
+Against my better judgment, I spent half an hour slogging through this test to
+figure out what's going wrong.  IIUC, the problem is essentially that the test
+instructs the vCPU worker to continue _after_ the last iteration, and _then_ sets
+host_quit, which results in the vCPU running one extra (unvalidated) iteration.
+
+For the other modes, which stop if and only if vcpu_sync_stop_requested is set,
+the extra iteration is a non-issue.  But because the dirty ring variant stops
+after every exit (to purge the ring), it hangs without an extra "continue".
+
+So rather than blindly fire off an extra sem_vcpu_cont that may or may not be
+consumed, I believe the test can simply set host_quit _before_ the final "continue"
+so that the vCPU worker doesn't run an extra iteration.
+
+I ran the below with 1000 loops of "for (i = 0; i < LOG_MODE_NUM; i++)" and so
+no issues.  I didn't see the assert you hit, but without the fix, I did see this
+fire within a few loops (less than 5 I think)l
+
+	assert(host_log_mode == LOG_MODE_DIRTY_RING ||
+	       atomic_read(&vcpu_sync_stop_requested) == false);
+
+I'll post this as two patches: one to fix the bug, and a second to have the
+LOG_MODE_DIRTY_RING variant clear vcpu_sync_stop_requested so that the above
+assert() can be modified as below.
+
+---
+ tools/testing/selftests/kvm/dirty_log_test.c | 62 ++++++++++++--------
+ 1 file changed, 37 insertions(+), 25 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
+index babea97b31a4..1a93c4231e45 100644
+--- a/tools/testing/selftests/kvm/dirty_log_test.c
++++ b/tools/testing/selftests/kvm/dirty_log_test.c
+@@ -376,7 +376,10 @@ static void dirty_ring_collect_dirty_pages(struct kvm_vcpu *vcpu, int slot,
+ 
+ 	cleared = kvm_vm_reset_dirty_ring(vcpu->vm);
+ 
+-	/* Cleared pages should be the same as collected */
++	/*
++	 * Cleared pages should be the same as collected, as KVM is supposed to
++	 * clear only the entries that have been harvested.
++	 */
+ 	TEST_ASSERT(cleared == count, "Reset dirty pages (%u) mismatch "
+ 		    "with collected (%u)", cleared, count);
+ 
+@@ -402,6 +405,15 @@ static void dirty_ring_after_vcpu_run(struct kvm_vcpu *vcpu, int ret, int err)
+ 		/* Update the flag first before pause */
+ 		WRITE_ONCE(dirty_ring_vcpu_ring_full,
+ 			   run->exit_reason == KVM_EXIT_DIRTY_RING_FULL);
++
++		/*
++		 * Unconditionally clear the stop request.  This dirty ring
++		 * variant doesn't actually consume the request, because the
++		 * vCPU worker stops after every exit to allow the main task
++		 * to reap the dirty ring.  But the vCPU is still obviously
++		 * stopped, i.e. has honored the request if one was made.
++		 */
++		atomic_set(&vcpu_sync_stop_requested, false);
+ 		sem_post(&sem_vcpu_stop);
+ 		pr_info("vcpu stops because %s...\n",
+ 			dirty_ring_vcpu_ring_full ?
+@@ -415,12 +427,6 @@ static void dirty_ring_after_vcpu_run(struct kvm_vcpu *vcpu, int ret, int err)
+ 	}
+ }
+ 
+-static void dirty_ring_before_vcpu_join(void)
+-{
+-	/* Kick another round of vcpu just to make sure it will quit */
+-	sem_post(&sem_vcpu_cont);
+-}
+-
+ struct log_mode {
+ 	const char *name;
+ 	/* Return true if this mode is supported, otherwise false */
+@@ -433,7 +439,6 @@ struct log_mode {
+ 				     uint32_t *ring_buf_idx);
+ 	/* Hook to call when after each vcpu run */
+ 	void (*after_vcpu_run)(struct kvm_vcpu *vcpu, int ret, int err);
+-	void (*before_vcpu_join) (void);
+ } log_modes[LOG_MODE_NUM] = {
+ 	{
+ 		.name = "dirty-log",
+@@ -452,7 +457,6 @@ struct log_mode {
+ 		.supported = dirty_ring_supported,
+ 		.create_vm_done = dirty_ring_create_vm_done,
+ 		.collect_dirty_pages = dirty_ring_collect_dirty_pages,
+-		.before_vcpu_join = dirty_ring_before_vcpu_join,
+ 		.after_vcpu_run = dirty_ring_after_vcpu_run,
+ 	},
+ };
+@@ -513,14 +517,6 @@ static void log_mode_after_vcpu_run(struct kvm_vcpu *vcpu, int ret, int err)
+ 		mode->after_vcpu_run(vcpu, ret, err);
+ }
+ 
+-static void log_mode_before_vcpu_join(void)
+-{
+-	struct log_mode *mode = &log_modes[host_log_mode];
+-
+-	if (mode->before_vcpu_join)
+-		mode->before_vcpu_join();
+-}
+-
+ static void generate_random_array(uint64_t *guest_array, uint64_t size)
+ {
+ 	uint64_t i;
+@@ -719,6 +715,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 	struct kvm_vm *vm;
+ 	unsigned long *bmap;
+ 	uint32_t ring_buf_idx = 0;
++	int sem_val;
+ 
+ 	if (!log_mode_supported()) {
+ 		print_skip("Log mode '%s' not supported",
+@@ -788,12 +785,22 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 	/* Start the iterations */
+ 	iteration = 1;
+ 	sync_global_to_guest(vm, iteration);
+-	host_quit = false;
++	WRITE_ONCE(host_quit, false);
+ 	host_dirty_count = 0;
+ 	host_clear_count = 0;
+ 	host_track_next_count = 0;
+ 	WRITE_ONCE(dirty_ring_vcpu_ring_full, false);
+ 
++	/*
++	 * Ensure the previous iteration didn't leave a dangling semaphore, i.e.
++	 * that the main task and vCPU worker were synchronized and completed
++	 * verification of all iterations.
++	 */
++	sem_getvalue(&sem_vcpu_stop, &sem_val);
++	TEST_ASSERT_EQ(sem_val, 0);
++	sem_getvalue(&sem_vcpu_cont, &sem_val);
++	TEST_ASSERT_EQ(sem_val, 0);
++
+ 	pthread_create(&vcpu_thread, NULL, vcpu_worker, vcpu);
+ 
+ 	while (iteration < p->iterations) {
+@@ -816,18 +823,23 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 		 * the flush of the last page, and since we handle the last
+ 		 * page specially verification will succeed anyway.
+ 		 */
+-		assert(host_log_mode == LOG_MODE_DIRTY_RING ||
+-		       atomic_read(&vcpu_sync_stop_requested) == false);
++		TEST_ASSERT_EQ(atomic_read(&vcpu_sync_stop_requested), false);
+ 		vm_dirty_log_verify(mode, bmap);
++
++		/*
++		 * Set host_quit before sem_vcpu_cont in the final iteration to
++		 * ensure that the vCPU worker doesn't resume the guest.  As
++		 * above, the dirty ring test may stop and wait even when not
++		 * explicitly request to do so, i.e. would hang waiting for a
++		 * "continue" if it's allowed to resume the guest.
++		 */
++		if (++iteration == p->iterations)
++			WRITE_ONCE(host_quit, true);
++
+ 		sem_post(&sem_vcpu_cont);
+-
+-		iteration++;
+ 		sync_global_to_guest(vm, iteration);
+ 	}
+ 
+-	/* Tell the vcpu thread to quit */
+-	host_quit = true;
+-	log_mode_before_vcpu_join();
+ 	pthread_join(vcpu_thread, NULL);
+ 
+ 	pr_info("Total bits checked: dirty (%"PRIu64"), clear (%"PRIu64"), "
+
+base-commit: 78651ed78b3496b6dbf1fb7d64d9d9736a23edc0
+-- 
+
+
 
