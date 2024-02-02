@@ -1,260 +1,141 @@
-Return-Path: <kvm+bounces-7860-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7861-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B71B5847292
-	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 16:05:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5615384734C
+	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 16:36:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB6261C26DFD
-	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 15:05:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E54651F2137A
+	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 15:36:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BDF3146911;
-	Fri,  2 Feb 2024 15:05:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D151A1468EA;
+	Fri,  2 Feb 2024 15:36:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="jUdx4xjU"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="It4UgSvK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99DBB145346;
-	Fri,  2 Feb 2024 15:05:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A48D14690F
+	for <kvm@vger.kernel.org>; Fri,  2 Feb 2024 15:36:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706886303; cv=none; b=spbVLI32ZSn0P0HCR45suVfVzmbL0vusgYCpT86Ni7QPPVCyNjDREpT83in8Wz6S7dfIGlD2GtCAgQL3Pwk+Xj2XhHQonwilK+CH8NI2hAQGxj1TfRT18SaZ7Q4iw21XRPt5Nqc8atRriF1Hjb2Xy2NMLULdqwTMQGrFh9FWMqg=
+	t=1706888193; cv=none; b=MJ8BmaP+YDqrk7WypopoNTv5b06v6lO48+kZzNeb1s8EhsdfXV/kBbnKmyo15WoKQl7lGTzTlC7Bl2Uuyy2JJPf+N4/rc4LPvW0bZW+dpjwhHSLqqoisn7XL3YG4jrUmVOMds+ziB7Ry1NpRFAyXCL2qf6/MES580J7BaVCx9dA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706886303; c=relaxed/simple;
-	bh=MmHFruIEQPPNV6IzR8a9y1V2kpuZAhG2jGPaYq6CLUQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=jR++jaMTEEOBoTxmgjSPC5zWtVBkzAu0hW1pgDHCQHm8o8dD1rwJb6eol4L+gUvgKM/nfo51AoR+V7L7lZqlIzvHM6ZOfQeIoVTe+OKlj/By4GV1Y9jlYrtIfMYaZn8mXK3tiamFmoN7Ro0D5CTVIaE8//hPMQgP/UIflSDxzFk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=jUdx4xjU; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 412DlEmQ028249;
-	Fri, 2 Feb 2024 15:05:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=PlxEm0GI6NfvVvLPF4GC52hpl5uvmNkqBPfzvMvCxpc=;
- b=jUdx4xjUD2+GbZ/ont1s/53HxYsuGvMgsBccpayCs2p12O/3xgAipNJlNzIN2B0SLZQw
- hLdtP89EjqY01//pnWqYxpfDhOhQNaWx53HrY893HdSxr2vf+7WJbk/a0NHeqSvmguvV
- 31dhQ/CHVFggPvgYBg1+05WeFC6n4itqBi+9Bd9CndSDnpqg0kSoQNZZWV4UCx1E8C1Z
- kqymWm3ytS74snDhJ/ykw7D+V8diBs+yIdkBP0gBDC0CkTIzHiQdUVDf4d+qU2dmi4er
- REUWizGm2ODiyCEbcPn7TifOBZvcAOp/vyUCy+PnO4NqKK0XMI8dbCU7wPkbmy+tMztq Ew== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w11k0t01e-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 02 Feb 2024 15:05:00 +0000
-Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 412ExjWN019791;
-	Fri, 2 Feb 2024 15:04:59 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w11k0t011-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 02 Feb 2024 15:04:59 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 412DZDFM007188;
-	Fri, 2 Feb 2024 15:04:58 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3vwev2ujpf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 02 Feb 2024 15:04:58 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 412F4t5Y39256670
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 2 Feb 2024 15:04:56 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D3BA92004B;
-	Fri,  2 Feb 2024 15:04:55 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A1C1720049;
-	Fri,  2 Feb 2024 15:04:55 +0000 (GMT)
-Received: from a46lp67.lnxne.boe (unknown [9.152.108.100])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri,  2 Feb 2024 15:04:55 +0000 (GMT)
-From: Janosch Frank <frankja@linux.ibm.com>
-To: kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org, imbrenda@linux.ibm.com, thuth@redhat.com,
-        david@redhat.com, nsg@linux.ibm.com, nrb@linux.ibm.com,
-        akrowiak@linux.ibm.com, jjherne@linux.ibm.com
-Subject: [kvm-unit-tests PATCH v4 7/7] s390x: ap: Add nq/dq len test
-Date: Fri,  2 Feb 2024 14:59:13 +0000
-Message-Id: <20240202145913.34831-8-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20240202145913.34831-1-frankja@linux.ibm.com>
-References: <20240202145913.34831-1-frankja@linux.ibm.com>
+	s=arc-20240116; t=1706888193; c=relaxed/simple;
+	bh=Fg0vF/DKGnFKdPAxtNJWEsCiIanMISLov5rth1azicY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tuYh+gwsS1Ha1N1QnLZN0QB8vKfwa69qxzTomvFE1nX2W7Ehv0xEsP/VEHid6A5JXEzf1JUoELErDCeF6UtV1U6JZz753LUX54Xa1KYVLx691T06elvZddh9twHdC42RdjMMS6Z9LPRfq4A/15nYgKT9udr7JoENTnHHfZ5G0j0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=It4UgSvK; arc=none smtp.client-ip=209.85.222.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-783ef8ae70aso163627085a.2
+        for <kvm@vger.kernel.org>; Fri, 02 Feb 2024 07:36:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1706888185; x=1707492985; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jRSa4TT8HVH8576bDhqIPmdbLRM9nyjGP0P+K9geus8=;
+        b=It4UgSvKLEpxOMpS7xqSJijhPsH5kq6d3Z3PfOt64xfqKYUDQc7S7XNMYqrlf28Ssu
+         e+tGq/2S4bUWfo+1XQlYrbDhpA8WkOOsfyTnY1m8hEogjNSGCIQBfXAKjK5btJ8E6SQ5
+         ObGCy93QhPdj8VXDJL5TKrU2NCdFk8xkyLcbkRtBk5ij7GOrxU6WLdaJ7HECiFAr4A/4
+         tDTzJvc+SyfUhnyqrb2JUf3kIAEzvcwcb6VOvIg705tsAHtW6aGXGYh4PYBaGSBwdzNC
+         zhrhSCEP9iJjXygGv12cK3f4Dc1ZaEgaty/QsSTeOqnaeYk9IQCjPE3SLKk2Q/hLnFMw
+         vnSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706888185; x=1707492985;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jRSa4TT8HVH8576bDhqIPmdbLRM9nyjGP0P+K9geus8=;
+        b=az9F5m7xsa9uOGtWDPbolwkyY7rcgC3TgYVdZiW8JXGXXDTaetEBbnDCcxtxYahxlM
+         bTA0vpcD5mXFGZ1IMgDubhAqwl2S8DHlrK3Oz4SW/ew5XxYgXqqpMrq9msPkIRcLJhDT
+         2EOEa6DnFRwfLuyX9DddY+OKNOHXRd3daNuOBKHuLlOJytknP/6E3rwKiypXiqqZOKOz
+         ez8CXVfoO4UOXfxyW7PILImaoihyKmgXtIRW6WVdpyQSq7lbJIf3r3LEw6JCJmkOeTNY
+         cMloG8QIoVbMs3O0z/l80L658gyKtFDY3m91vN57dStaLDLuTDxocRDquvgCaHSTF87a
+         j2Hw==
+X-Gm-Message-State: AOJu0YzWFq3mzbKJLTm9uohHxdnyjwWsixRnoHxZdHWZE5zrB8N3qbt/
+	3XZZTBV/v7wwr9g8DvQZ/SKc5Kaw+1i95XHBHSAEtCnIQCRD+lWzindyvDyxs4g=
+X-Google-Smtp-Source: AGHT+IHgoLTjDGqcVBJHeDO/+4xepghxs6zy3yXbqAEo9+eksg5MPspO+NnPRp35JWUiTkmwcplNIA==
+X-Received: by 2002:a05:620a:1447:b0:785:43d7:cd0d with SMTP id i7-20020a05620a144700b0078543d7cd0dmr5503107qkl.27.1706888185060;
+        Fri, 02 Feb 2024 07:36:25 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCUFwKseQX4Qsq/U7oliva32huh0WpnlP9H2RmmN32JeZGOlrWJLaJZWLc9ppObbDwYDQV4sN7pUUZMCsO8tSFXSQJmcRGn+0ufquLHbJD1n5fzINj6sjjJv3dkjJOrN1QEsZiBVWFkYzeqnXqMwOqEHyIymkSi3B0oCOc5x9B6RE9X0hh8jrCLAS/PANjfoSo/rRgMRJGBcFJUCufODDCXB9jPLvby/TOw6PDi/PiXXaNWf6dsKiH+LDw3kiKrGVwerK4/DkUHol9QZWPHWp5Omyx0ca2rOvsUYk+OUWtuGlc7B0eOG3a6RzgWhdK8dYHm0gscYJwdfLAiXXgZ7SzzLyziu3DsqSb/YsxwTsJLPwdREaYfhXn96czeFqnVrIVcsWxSSIWpVfPCraGXpvS0VTC8bFw6Xzg4VBcDrwgor7MFt03tk
+Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
+        by smtp.gmail.com with ESMTPSA id vu21-20020a05620a561500b0078552f53b85sm724769qkn.86.2024.02.02.07.36.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Feb 2024 07:36:24 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1rVvaZ-00AwH2-RL;
+	Fri, 02 Feb 2024 11:36:23 -0400
+Date: Fri, 2 Feb 2024 11:36:23 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Lu Baolu <baolu.lu@linux.intel.com>
+Cc: Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	Nicolin Chen <nicolinc@nvidia.com>, Yi Liu <yi.l.liu@intel.com>,
+	Jacob Pan <jacob.jun.pan@linux.intel.com>,
+	Longfang Liu <liulongfang@huawei.com>,
+	Yan Zhao <yan.y.zhao@intel.com>, iommu@lists.linux.dev,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v10 15/16] iommu: Make iopf_group_response() return void
+Message-ID: <20240202153623.GA50608@ziepe.ca>
+References: <20240122054308.23901-1-baolu.lu@linux.intel.com>
+ <20240122054308.23901-16-baolu.lu@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: QZN35oTWpnaN1SopNV_bX_iFmPxdVnb9
-X-Proofpoint-ORIG-GUID: lfGUVY64yK9SIsMQ1Wj2tQ4Wumrbw2T2
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-02_08,2024-01-31_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
- suspectscore=0 impostorscore=0 phishscore=0 malwarescore=0 adultscore=0
- spamscore=0 lowpriorityscore=0 priorityscore=1501 mlxlogscore=999
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2402020109
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240122054308.23901-16-baolu.lu@linux.intel.com>
 
-For years the nqap/dqap max length was 12KB but with a recent machine
-extended message length support was introduced. The support is AP type
-and generation specific, so it can vary from card to card which
-complicates testing by a lot.
+On Mon, Jan 22, 2024 at 01:43:07PM +0800, Lu Baolu wrote:
+> The iopf_group_response() should return void, as nothing can do anything
+> with the failure. This implies that ops->page_response() must also return
+> void; this is consistent with what the drivers do. The failure paths,
+> which are all integrity validations of the fault, should be WARN_ON'd,
+> not return codes.
+> 
+> If the iommu core fails to enqueue the fault, it should respond the fault
+> directly by calling ops->page_response() instead of returning an error
+> number and relying on the iommu drivers to do so. Consolidate the error
+> fault handling code in the core.
+> 
+> Co-developed-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+> ---
+>  include/linux/iommu.h                       |  14 +--
+>  drivers/iommu/intel/iommu.h                 |   4 +-
+>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c |  50 +++-----
+>  drivers/iommu/intel/svm.c                   |  18 +--
+>  drivers/iommu/io-pgfault.c                  | 132 +++++++++++---------
+>  5 files changed, 99 insertions(+), 119 deletions(-)
 
-This test will use the APQN that all other tests use no matter if
-there's extended length support or not. But if longer messages are
-supported by the APQN we need to adapt our tests.
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
- lib/s390x/ap.h |   3 +-
- s390x/ap.c     | 103 +++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 105 insertions(+), 1 deletion(-)
+>  
+> +static struct iopf_group *iopf_group_alloc(struct iommu_fault_param *iopf_param,
+> +					   struct iopf_fault *evt,
+> +					   struct iopf_group *abort_group)
+> +{
+> +	struct iopf_fault *iopf, *next;
+> +	struct iopf_group *group;
+> +
+> +	group = kzalloc(sizeof(*group), GFP_KERNEL);
+> +	if (!group) {
+> +		/*
+> +		 * We always need to construct the group as we need it to abort
+> +		 * the request at the driver if it cfan't be handled.
+                                                  ^^^^^^ can't
 
-diff --git a/lib/s390x/ap.h b/lib/s390x/ap.h
-index eecb39be..792149ea 100644
---- a/lib/s390x/ap.h
-+++ b/lib/s390x/ap.h
-@@ -77,7 +77,8 @@ struct pqap_r2 {
- 	uint8_t pad_1[3];
- 	uint8_t at;
- 	uint8_t nd;
--	uint8_t pad_6;
-+	uint8_t pad_6 : 4;
-+	uint8_t ml : 4;
- 	uint8_t pad_7 : 4;
- 	uint8_t qd : 4;
- } __attribute__((packed))  __attribute__((aligned(8)));
-diff --git a/s390x/ap.c b/s390x/ap.c
-index 0f2d03c2..edb4943b 100644
---- a/s390x/ap.c
-+++ b/s390x/ap.c
-@@ -257,6 +257,106 @@ static void test_pgms_dqap(void)
- 	report_prefix_pop();
- }
- 
-+/*
-+ * For years the nqap/dqap max length was 12KB but with a recent
-+ * machine extended message length support was introduced. The support
-+ * is AP type and generation specific, so it can vary from card to
-+ * card.
-+ *
-+ * This test will use the APQN that all other tests use no matter if
-+ * there's extended length support or not. But if longer messages are
-+ * supported by the APQN we need to adapt our tests.
-+ */
-+static void test_pgms_nqdq_len(void)
-+{
-+	struct ap_queue_status apqsw = {};
-+	struct pqap_r2 r2 = {};
-+	uint64_t len, mlen;
-+	bool fail;
-+	int i;
-+
-+	/* Extended message support is reported via tapq with T=1 */
-+	ap_pqap_tapq(apn, qn, &apqsw, &r2, true);
-+	/* < 3 means 3 because of backwards compatibility */
-+	mlen = r2.ml ? r2.ml : 3;
-+	/* Len is reported in pages */
-+	mlen *= PAGE_SIZE;
-+
-+	report_prefix_push("nqap");
-+	report_prefix_push("spec");
-+
-+	report_prefix_push("len + 1");
-+	expect_pgm_int();
-+	len = mlen + 1;
-+	asm volatile (
-+		"lg	5,  0(%[len])\n"
-+		".insn	rre,0xb2ae0000,2,4\n"
-+		: : [len] "a" (&len)
-+		: "cc", "memory", "0", "1", "2", "3", "4", "5", "6", "7");
-+	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
-+	report_prefix_pop();
-+
-+	report_prefix_push("len bits");
-+	fail = false;
-+	for (i = 12; i < 63; i++) {
-+		len = BIT(i);
-+		if (len < mlen)
-+			continue;
-+		expect_pgm_int();
-+		asm volatile (
-+			"lg	5,  0(%[len])\n"
-+			".insn	rre,0xb2ae0000,2,4\n"
-+			: : [len] "a" (&len)
-+			: "cc", "memory", "0", "1", "2", "3", "4", "5", "6", "7");
-+		if (clear_pgm_int() != PGM_INT_CODE_SPECIFICATION) {
-+			report_fail("setting len to %lx did not result in a spec exception",
-+				    len);
-+			fail = true;
-+		}
-+	}
-+	report(!fail, "length pgms");
-+	report_prefix_pop();
-+	report_prefix_pop();
-+	report_prefix_pop();
-+
-+	report_prefix_push("dqap");
-+	report_prefix_push("spec");
-+
-+	report_prefix_push("len + 1");
-+	expect_pgm_int();
-+	len = mlen + 1;
-+	asm volatile (
-+		"lg	5,  0(%[len])\n"
-+		".insn	rre,0xb2ae0000,2,4\n"
-+		: : [len] "a" (&len)
-+		: "cc", "memory", "0", "1", "2", "3", "4", "5", "6", "7");
-+	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
-+	report_prefix_pop();
-+
-+	report_prefix_push("len bits");
-+	fail = false;
-+	for (i = 12; i < 63; i++) {
-+		len = BIT(i);
-+		if (len < mlen)
-+			continue;
-+		expect_pgm_int();
-+		asm volatile (
-+			"lg	5,  0(%[len])\n"
-+			".insn	rre,0xb2ae0000,2,4\n"
-+			: : [len] "a" (&len)
-+			: "cc", "memory", "0", "1", "2", "3", "4", "5", "6", "7");
-+		if (clear_pgm_int() != PGM_INT_CODE_SPECIFICATION) {
-+			report_fail("setting len to %lx did not result in a spec exception",
-+				    len);
-+			fail = true;
-+		}
-+	}
-+	report(!fail, "length pgms");
-+	report_prefix_pop();
-+	report_prefix_pop();
-+	report_prefix_pop();
-+}
-+
- static void test_priv(void)
- {
- 	struct ap_config_info info = {};
-@@ -446,6 +546,9 @@ int main(void)
- 	}
- 	apn = apns[0];
- 	qn = qns[0];
-+
-+	test_pgms_nqdq_len();
-+
- 	report_prefix_push("pqap");
- 	if (test_facility(65)) {
- 		test_pqap_aqic();
--- 
-2.40.1
 
+Jason
 
