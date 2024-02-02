@@ -1,45 +1,45 @@
-Return-Path: <kvm+bounces-7841-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7845-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C986D846CA4
-	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 10:43:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CEC6846CB9
+	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 10:44:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 756D228B22D
-	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 09:43:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D77B28FF62
+	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 09:44:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD9D180033;
-	Fri,  2 Feb 2024 09:40:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F43981AA0;
+	Fri,  2 Feb 2024 09:40:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="LSHUT5JX"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="GmGKGy2r"
 X-Original-To: kvm@vger.kernel.org
-Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF2877E595;
-	Fri,  2 Feb 2024 09:40:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECD667E769;
+	Fri,  2 Feb 2024 09:40:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706866821; cv=none; b=Uy2YRDS0+b4QOs0uWM7e3XpP9ayD3dI5NUPOriwxKwuh/drCreXLEVa4xDxnMqriJv42YqZ9L8qIqXsDzXhizaB3ET0BaNOUhgt6GThL+k1/7g6szqqQ2UOsomiq4ZpHcmMiY5S8/KZuyDhjhhQ/WynmttICFTLrQjzmP567sCg=
+	t=1706866825; cv=none; b=tIQrpXg67ph9RAGgQ0+N6YBbKA00pfb0zrm9cae66ZIwzP2zP11dkX9MzWiO5qD6Ci52T7e7OAH2ydH2YaIWFfTqS41JkwH4KXYyfe9ueEQFFfEXBeZ9WHAF4wZqLBfBpjtsc6/y20KjB28CleEtKmytLmk8xpYASmk0XVH0Jgs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706866821; c=relaxed/simple;
-	bh=UawFHymn/WbRyi0GQZudqUjSp2NaYt7kLoKeSsy8eJw=;
+	s=arc-20240116; t=1706866825; c=relaxed/simple;
+	bh=NNM9tWQnMQInuiN94nJotBSG7mda/K1Qh7QCalmDDpE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=MRUTjayStzV8C8ML8K52B5KTzKRxRVl+jKN0YHSVCax0A2OZ+EksIwPs1I0fXB9wRmGSA6fytaSq9EhfsZKwgrKagYanA5STTaQqXon6iwl5UQT3xsoVveiRqMOxfepjRLSlboKVmJ9fFR9RVcaGBjRtXBq3BIbvFWIOKqcX9wQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=LSHUT5JX; arc=none smtp.client-ip=115.124.30.119
+	 MIME-Version; b=BIBTxTS2VLjZ6pPzLIoP/gi8IxK1VXOm3JnER/EDsMwNkuv7V82PgJjfmHOwF5cM+zbXhN2z+BT2x96lQTwzuKXzu6a62AFKVPCxDZ8wnPFjQt8N6IU1xokPL+LYY0uOFZQNmPtLuGHa6OxXVN9jpeGHpHqgx00OUmvsBcAflTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=GmGKGy2r; arc=none smtp.client-ip=115.124.30.132
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=linux.alibaba.com; s=default;
-	t=1706866817; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=XwxucoBJyXK5Ypckln3RBEEy/W277PjCTbn/Ba+xv6k=;
-	b=LSHUT5JXs5VeQytMMY+PsPBEvYVfLeFC/DVej07CdXxVUGTsOrj+V95gGEAyyg4ldwXNd0gXkvc35IGbZ9XOml+1i3smN88ko7nmY/YLX201C0qgiR/oPusaLyL3BVUtL1EgKdDAoNTtejzte8HGV8UonacZmTZasIZ7QBK3AZI=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R471e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=36;SR=0;TI=SMTPD_---0W.wdbkN_1706866814;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W.wdbkN_1706866814)
+	t=1706866820; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=szqnWCRY+3t7jHL1CQv9OY3Vs1PE98SAQIcyewZeW44=;
+	b=GmGKGy2rNGNmJp1Y6WVGjBxmTW78AbCxSAQCnuf/GuQ0U1EUr0ufhj7OQHzGTRLvHKyAuwrfIm3KrpdDCdkGTW4tx+j5txFYpgAS8aJ2zrT7XC+LtEgdQaxRBgCyMyP3LgefqmsIEZ5gEyOqPDR5sbS0NzKYGk/OyynHiHhepRI=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=36;SR=0;TI=SMTPD_---0W.wiMVl_1706866816;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W.wiMVl_1706866816)
           by smtp.aliyun-inc.com;
-          Fri, 02 Feb 2024 17:40:15 +0800
+          Fri, 02 Feb 2024 17:40:17 +0800
 From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 To: virtualization@lists.linux.dev
 Cc: Richard Weinberger <richard@nod.at>,
@@ -77,9 +77,9 @@ Cc: Richard Weinberger <richard@nod.at>,
 	linux-s390@vger.kernel.org,
 	kvm@vger.kernel.org,
 	bpf@vger.kernel.org
-Subject: [PATCH vhost v1 14/19] virtio_ring: remove api of setting vq premapped
-Date: Fri,  2 Feb 2024 17:39:46 +0800
-Message-Id: <20240202093951.120283-15-xuanzhuo@linux.alibaba.com>
+Subject: [PATCH vhost v1 15/19] virtio_ring: introduce dma map api for page
+Date: Fri,  2 Feb 2024 17:39:47 +0800
+Message-Id: <20240202093951.120283-16-xuanzhuo@linux.alibaba.com>
 X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 In-Reply-To: <20240202093951.120283-1-xuanzhuo@linux.alibaba.com>
 References: <20240202093951.120283-1-xuanzhuo@linux.alibaba.com>
@@ -92,98 +92,104 @@ MIME-Version: 1.0
 X-Git-Hash: 4c7bacd05cb8
 Content-Transfer-Encoding: 8bit
 
-The virtio-net sets the premapped mode by find_vqs().
+The virtio-net sq will use these APIs to map the scatterlist.
+For scatterlist, the page dma APIs are more appropriate.
 
-So the below API is not used by anyone, we remove it.
-
-int virtqueue_set_dma_premapped(struct virtqueue *_vq);
+dma_addr_t virtqueue_dma_map_page_attrs(struct virtqueue *_vq, struct page *page,
+                                       size_t offset, size_t size,
+                                       enum dma_data_direction dir,
+                                       unsigned long attrs);
+void virtqueue_dma_unmap_page_attrs(struct virtqueue *_vq, dma_addr_t addr,
+                                   size_t size, enum dma_data_direction dir,
+                                   unsigned long attrs);
 
 Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 ---
- drivers/virtio/virtio_ring.c | 56 ------------------------------------
- include/linux/virtio.h       |  2 --
- 2 files changed, 58 deletions(-)
+ drivers/virtio/virtio_ring.c | 52 ++++++++++++++++++++++++++++++++++++
+ include/linux/virtio.h       |  7 +++++
+ 2 files changed, 59 insertions(+)
 
 diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
-index 4a5e54fdbf54..57b669180e6e 100644
+index 57b669180e6e..79868967a676 100644
 --- a/drivers/virtio/virtio_ring.c
 +++ b/drivers/virtio/virtio_ring.c
-@@ -2775,62 +2775,6 @@ int virtqueue_resize(struct virtqueue *_vq, u32 num,
+@@ -3117,6 +3117,58 @@ void virtqueue_dma_unmap_single_attrs(struct virtqueue *_vq, dma_addr_t addr,
  }
- EXPORT_SYMBOL_GPL(virtqueue_resize);
+ EXPORT_SYMBOL_GPL(virtqueue_dma_unmap_single_attrs);
  
--/**
-- * virtqueue_set_dma_premapped - set the vring premapped mode
-- * @_vq: the struct virtqueue we're talking about.
-- *
-- * Enable the premapped mode of the vq.
-- *
-- * The vring in premapped mode does not do dma internally, so the driver must
-- * do dma mapping in advance. The driver must pass the dma_address through
-- * dma_address of scatterlist. When the driver got a used buffer from
-- * the vring, it has to unmap the dma address.
-- *
-- * This function must be called immediately after creating the vq, or after vq
-- * reset, and before adding any buffers to it.
-- *
-- * Caller must ensure we don't call this with other virtqueue operations
-- * at the same time (except where noted).
-- *
-- * Returns zero or a negative error.
-- * 0: success.
-- * -EINVAL: vring does not use the dma api, so we can not enable premapped mode.
-- */
--int virtqueue_set_dma_premapped(struct virtqueue *_vq)
--{
--	struct vring_virtqueue *vq = to_vvq(_vq);
--	u32 num;
--
--	START_USE(vq);
--
--	num = vq->packed_ring ? vq->packed.vring.num : vq->split.vring.num;
--
--	if (num != vq->vq.num_free) {
--		END_USE(vq);
--		return -EINVAL;
--	}
--
--	if (!vq->use_dma_api) {
--		END_USE(vq);
--		return -EINVAL;
--	}
--
--	vq->vq.premapped = true;
--
--	if (vq->packed_ring) {
--		kfree(vq->packed.desc_dma);
--		vq->packed.desc_dma = NULL;
--	} else {
--		kfree(vq->split.desc_dma);
--		vq->split.desc_dma = NULL;
--	}
--
--	END_USE(vq);
--
--	return 0;
--}
--EXPORT_SYMBOL_GPL(virtqueue_set_dma_premapped);
--
++/**
++ * virtqueue_dma_map_page_attrs - map DMA for _vq
++ * @_vq: the struct virtqueue we're talking about.
++ * @page: the page to do dma
++ * @offset: the offset inside the page
++ * @size: the size of the page to do dma
++ * @dir: DMA direction
++ * @attrs: DMA Attrs
++ *
++ * The caller calls this to do dma mapping in advance. The DMA address can be
++ * passed to this _vq when it is in pre-mapped mode.
++ *
++ * return DMA address. Caller should check that by virtqueue_dma_mapping_error().
++ */
++dma_addr_t virtqueue_dma_map_page_attrs(struct virtqueue *_vq, struct page *page,
++					size_t offset, size_t size,
++					enum dma_data_direction dir,
++					unsigned long attrs)
++{
++	struct vring_virtqueue *vq = to_vvq(_vq);
++
++	if (!vq->use_dma_api)
++		return page_to_phys(page) + offset;
++
++	return dma_map_page_attrs(vring_dma_dev(vq), page, offset, size, dir, attrs);
++}
++EXPORT_SYMBOL_GPL(virtqueue_dma_map_page_attrs);
++
++/**
++ * virtqueue_dma_unmap_page_attrs - unmap DMA for _vq
++ * @_vq: the struct virtqueue we're talking about.
++ * @addr: the dma address to unmap
++ * @size: the size of the buffer
++ * @dir: DMA direction
++ * @attrs: DMA Attrs
++ *
++ * Unmap the address that is mapped by the virtqueue_dma_map_* APIs.
++ *
++ */
++void virtqueue_dma_unmap_page_attrs(struct virtqueue *_vq, dma_addr_t addr,
++				    size_t size, enum dma_data_direction dir,
++				    unsigned long attrs)
++{
++	struct vring_virtqueue *vq = to_vvq(_vq);
++
++	if (!vq->use_dma_api)
++		return;
++
++	dma_unmap_page_attrs(vring_dma_dev(vq), addr, size, dir, attrs);
++}
++EXPORT_SYMBOL_GPL(virtqueue_dma_unmap_page_attrs);
++
  /**
-  * virtqueue_reset - detach and recycle all unused buffers
+  * virtqueue_dma_mapping_error - check dma address
   * @_vq: the struct virtqueue we're talking about.
 diff --git a/include/linux/virtio.h b/include/linux/virtio.h
-index 37ba44dc34de..7f16bacc6c49 100644
+index 7f16bacc6c49..8a8d282982ad 100644
 --- a/include/linux/virtio.h
 +++ b/include/linux/virtio.h
-@@ -82,8 +82,6 @@ bool virtqueue_enable_cb(struct virtqueue *vq);
+@@ -216,6 +216,13 @@ dma_addr_t virtqueue_dma_map_single_attrs(struct virtqueue *_vq, void *ptr, size
+ void virtqueue_dma_unmap_single_attrs(struct virtqueue *_vq, dma_addr_t addr,
+ 				      size_t size, enum dma_data_direction dir,
+ 				      unsigned long attrs);
++dma_addr_t virtqueue_dma_map_page_attrs(struct virtqueue *_vq, struct page *page,
++					size_t offset, size_t size,
++					enum dma_data_direction dir,
++					unsigned long attrs);
++void virtqueue_dma_unmap_page_attrs(struct virtqueue *_vq, dma_addr_t addr,
++				    size_t size, enum dma_data_direction dir,
++				    unsigned long attrs);
+ int virtqueue_dma_mapping_error(struct virtqueue *_vq, dma_addr_t addr);
  
- unsigned virtqueue_enable_cb_prepare(struct virtqueue *vq);
- 
--int virtqueue_set_dma_premapped(struct virtqueue *_vq);
--
- bool virtqueue_poll(struct virtqueue *vq, unsigned);
- 
- bool virtqueue_enable_cb_delayed(struct virtqueue *vq);
+ bool virtqueue_dma_need_sync(struct virtqueue *_vq, dma_addr_t addr);
 -- 
 2.32.0.3.g01195cf9f
 
