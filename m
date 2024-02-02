@@ -1,62 +1,62 @@
-Return-Path: <kvm+bounces-7824-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7825-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28FE38469AB
-	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 08:36:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40D2B8469BA
+	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 08:45:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1EE528D472
-	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 07:36:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E766C1F23D62
+	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 07:45:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6843517BDD;
-	Fri,  2 Feb 2024 07:36:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8548517BD8;
+	Fri,  2 Feb 2024 07:45:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ky1+34J6"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YNFcnHtJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-176.mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B285217755
-	for <kvm@vger.kernel.org>; Fri,  2 Feb 2024 07:36:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07E6B17BB7
+	for <kvm@vger.kernel.org>; Fri,  2 Feb 2024 07:45:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706859381; cv=none; b=l2yv6BOuqQCfqGjp+yUTNSJ/MPYArKJyth+tCbE9A+AWI8oo3N67rrY0c24xlOXyPIJcGhZUmxdN3qOJf18GvzAAGd+0qPvjW7BTNYaucaM+25EKOWWTEBdZgYatkmQFL0RR/8O7YXC5LzbTJlnkKweq1TDs3AH0c34zn8LAf8A=
+	t=1706859905; cv=none; b=R32YCn7BX/BJCwgZ2LxBaUEBfOgMu8OomMt9fE+xI0w4KqMRy17v1jvCTG6dqszbJWo33X2Pz9gu7bKUefMV3dcJphvtEbQlhaWmCJg4KA0KI+Z4jY8PWRAfBryKo+nlTlatz1zGWworRR6orLvz5H3sF590gReTEd5ntXlWHo0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706859381; c=relaxed/simple;
-	bh=F8Vf9MHjreYyw+SWVq3L3jo/ghauMjcPIlV1loK3X1M=;
+	s=arc-20240116; t=1706859905; c=relaxed/simple;
+	bh=zuxEjjnkyCiU2jxBsKwIXFDFrYt5ZXuz0QMOj8jPOOA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hdt3eTsfoOkSh+SCpiVRDstetptomp91Y+ZNFtzIJAXXjlzgbTV1tmzbjCrjqoEQUL/71pO+3udQFufmAqeM6lfty+C5NrRe2QUWpiKYAif3WPodTUM3hxiL+XsE6E2P19JjCcrpDy0SF7ZY6AOSumyEl4ars3jK+EUYjPwIVRs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ky1+34J6; arc=none smtp.client-ip=91.218.175.176
+	 Content-Type:Content-Disposition:In-Reply-To; b=WlCKAFGhEBEgm0PXd7v94bW1nxcYkmdfYgyWkXnaVyKi0JcnG1/rJhH/0F59py3zlMo0Hq9HNJLDAa1sSaQJ67Q3UnMyx0sQ8zu43KSnKHf5e8rp1smwElNqMt6YyKm0G4PCVQnZum0s29VYj3zXvuWGJGDdH+fAUesUrmndVVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YNFcnHtJ; arc=none smtp.client-ip=91.218.175.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Fri, 2 Feb 2024 07:36:08 +0000
+Date: Fri, 2 Feb 2024 07:44:56 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706859375;
+	t=1706859901;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=5EWZhYkrDt/8XKpyBqmfzBglkyRPBzsB9XpFbePCy6s=;
-	b=Ky1+34J6vLyruougguTgN/oJcFJWeF+YLyxaTsnQ9gIwRuQsHNtyO1eFPA58P6H3pOO0tx
-	7EuHIa7HF/yJjY14d7KjLmsw4C0A5wKd3POh4hbUg68SxT5aSTr6mugk2tEcm/R5sY8hD8
-	/dqY+kyYgEts8oY6uBbwKYoFe+aM5no=
+	bh=yXYgbL9pawqCQfLD7tUkx2pUHhN7+ydoo6Ga24ca9gc=;
+	b=YNFcnHtJlTgzMTxTop4NnZqSpbhk46tadJrsfBw04VBy206G8dAEJZT/TRYNnaYmxIeuDJ
+	wV0/PJI96jbkEktFxfACqS8W3T45QyFRKLqLdXk9SMTRvcTMC6cg5tfsdY1d7MwyFFWlbt
+	QLoXJAxqqHDaY1x/HuSN02rLDJu26Cc=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Shaoqin Huang <shahuang@redhat.com>
 Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
 	Eric Auger <eauger@redhat.com>, Eric Auger <eric.auger@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v4 1/5] KVM: selftests: aarch64: Make the
- [create|destroy]_vpmu_vm() public
-Message-ID: <ZbybaH2t7Yp9NJOK@linux.dev>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 2/5] KVM: selftests: aarch64: Move pmu helper
+ functions into vpmu.h
+Message-ID: <ZbydeB5MEJIhxaw6@linux.dev>
 References: <20240202025659.5065-1-shahuang@redhat.com>
- <20240202025659.5065-2-shahuang@redhat.com>
+ <20240202025659.5065-3-shahuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -65,97 +65,32 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240202025659.5065-2-shahuang@redhat.com>
+In-Reply-To: <20240202025659.5065-3-shahuang@redhat.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Thu, Feb 01, 2024 at 09:56:50PM -0500, Shaoqin Huang wrote:
+On Thu, Feb 01, 2024 at 09:56:51PM -0500, Shaoqin Huang wrote:
+> -static uint64_t get_pmcr_n(uint64_t pmcr)
+> -{
+> -	return FIELD_GET(ARMV8_PMU_PMCR_N, pmcr);
+> -}
+> -
+> -static void set_pmcr_n(uint64_t *pmcr, uint64_t pmcr_n)
+> -{
+> -	u64p_replace_bits((__u64 *) pmcr, pmcr_n, ARMV8_PMU_PMCR_N);
+> -}
+> -
+> -static uint64_t get_counters_mask(uint64_t n)
+> -{
+> -	uint64_t mask = BIT(ARMV8_PMU_CYCLE_IDX);
+> -
+> -	if (n)
+> -		mask |= GENMASK(n - 1, 0);
+> -	return mask;
+> -}
 
-[...]
-
-> diff --git a/tools/testing/selftests/kvm/include/aarch64/vpmu.h b/tools/testing/selftests/kvm/include/aarch64/vpmu.h
-> new file mode 100644
-> index 000000000000..0a56183644ee
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/include/aarch64/vpmu.h
-> @@ -0,0 +1,16 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +
-> +#include <kvm_util.h>
-> +
-> +#define GICD_BASE_GPA	0x8000000ULL
-> +#define GICR_BASE_GPA	0x80A0000ULL
-
-Shouldn't a standardized layout of the GIC frames go with the rest of
-the GIC stuff?
-
-> +/* Create a VM that has one vCPU with PMUv3 configured. */
-> +struct vpmu_vm *create_vpmu_vm(void *guest_code)
-> +{
-> +	struct kvm_vcpu_init init;
-> +	uint8_t pmuver;
-> +	uint64_t dfr0, irq = 23;
-> +	struct kvm_device_attr irq_attr = {
-> +		.group = KVM_ARM_VCPU_PMU_V3_CTRL,
-> +		.attr = KVM_ARM_VCPU_PMU_V3_IRQ,
-> +		.addr = (uint64_t)&irq,
-> +	};
-> +	struct kvm_device_attr init_attr = {
-> +		.group = KVM_ARM_VCPU_PMU_V3_CTRL,
-> +		.attr = KVM_ARM_VCPU_PMU_V3_INIT,
-> +	};
-> +	struct vpmu_vm *vpmu_vm;
-> +
-> +	vpmu_vm = calloc(1, sizeof(*vpmu_vm));
-> +	TEST_ASSERT(vpmu_vm != NULL, "Insufficient Memory");
-
-!vpmu_vm would be the normal way to test if a pointer is NULL.
-
-> +	memset(vpmu_vm, 0, sizeof(vpmu_vm));
-
-What? man calloc would tell you that the returned object is already
-zero-initalized.
-
-> +	vpmu_vm->vm = vm_create(1);
-> +	vm_init_descriptor_tables(vpmu_vm->vm);
-> +
-> +	/* Create vCPU with PMUv3 */
-> +	vm_ioctl(vpmu_vm->vm, KVM_ARM_PREFERRED_TARGET, &init);
-> +	init.features[0] |= (1 << KVM_ARM_VCPU_PMU_V3);
-> +	vpmu_vm->vcpu = aarch64_vcpu_add(vpmu_vm->vm, 0, &init, guest_code);
-> +	vcpu_init_descriptor_tables(vpmu_vm->vcpu);
-
-I extremely dislike that the VM is semi-configured by this helper.
-You're still expecting the caller to actually install the exception
-handler.
-
-> +	vpmu_vm->gic_fd = vgic_v3_setup(vpmu_vm->vm, 1, 64,
-> +					GICD_BASE_GPA, GICR_BASE_GPA);
-> +	__TEST_REQUIRE(vpmu_vm->gic_fd >= 0,
-> +		       "Failed to create vgic-v3, skipping");
-> +
-> +	/* Make sure that PMUv3 support is indicated in the ID register */
-> +	vcpu_get_reg(vpmu_vm->vcpu,
-> +		     KVM_ARM64_SYS_REG(SYS_ID_AA64DFR0_EL1), &dfr0);
-> +	pmuver = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), dfr0);
-> +	TEST_ASSERT(pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF &&
-> +		    pmuver >= ID_AA64DFR0_EL1_PMUVer_IMP,
-> +		    "Unexpected PMUVER (0x%x) on the vCPU with PMUv3", pmuver);
-
-Not your code, but this assertion is meaningless. KVM does not advertise
-an IMP_DEF PMU to guests.
-
-> +	/* Initialize vPMU */
-> +	vcpu_ioctl(vpmu_vm->vcpu, KVM_SET_DEVICE_ATTR, &irq_attr);
-> +	vcpu_ioctl(vpmu_vm->vcpu, KVM_SET_DEVICE_ATTR, &init_attr);
-
-Not your code, but these should be converted to kvm_device_attr_set()
-calls.
-
-Overall I'm somewhat tepid on the idea of the library being so
-coarse-grained. It is usually more helpful to expose finer-grained
-controls, like a helper that initializes the vPMU state for a
-preexisting VM. That way the PMU code can more easily be composed with
-other helpers in different tests.
+I don't see these helpers being used by your test, and they seem rather
+specific to what the original test was trying to accomplish. Let's not
+move this unnecessarily.
 
 -- 
 Thanks,
