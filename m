@@ -1,98 +1,163 @@
-Return-Path: <kvm+bounces-7825-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7826-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40D2B8469BA
-	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 08:45:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D8258846A1D
+	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 09:04:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E766C1F23D62
-	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 07:45:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C93F1F2AB88
+	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 08:04:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8548517BD8;
-	Fri,  2 Feb 2024 07:45:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 110EE17C67;
+	Fri,  2 Feb 2024 08:04:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YNFcnHtJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UBttLn8v"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07E6B17BB7
-	for <kvm@vger.kernel.org>; Fri,  2 Feb 2024 07:45:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AC9E17C64;
+	Fri,  2 Feb 2024 08:04:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706859905; cv=none; b=R32YCn7BX/BJCwgZ2LxBaUEBfOgMu8OomMt9fE+xI0w4KqMRy17v1jvCTG6dqszbJWo33X2Pz9gu7bKUefMV3dcJphvtEbQlhaWmCJg4KA0KI+Z4jY8PWRAfBryKo+nlTlatz1zGWworRR6orLvz5H3sF590gReTEd5ntXlWHo0=
+	t=1706861069; cv=none; b=YnJEciWZYtPlGXhe6B7MESYHMYb/NkKZuLS0jxOer/fAkNDt1dI3JXTqXeTKZsBKyAJ/AamT+Tt+W2epsMuJ6RlldHNM4gAngSR9SC778gs7IFFYnWK9OLmUrVpkA2pjwkmTVUxHzh7hHi2aEg0urx0ro2ni7eaeGjEWjweGZ1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706859905; c=relaxed/simple;
-	bh=zuxEjjnkyCiU2jxBsKwIXFDFrYt5ZXuz0QMOj8jPOOA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WlCKAFGhEBEgm0PXd7v94bW1nxcYkmdfYgyWkXnaVyKi0JcnG1/rJhH/0F59py3zlMo0Hq9HNJLDAa1sSaQJ67Q3UnMyx0sQ8zu43KSnKHf5e8rp1smwElNqMt6YyKm0G4PCVQnZum0s29VYj3zXvuWGJGDdH+fAUesUrmndVVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YNFcnHtJ; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Fri, 2 Feb 2024 07:44:56 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706859901;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yXYgbL9pawqCQfLD7tUkx2pUHhN7+ydoo6Ga24ca9gc=;
-	b=YNFcnHtJlTgzMTxTop4NnZqSpbhk46tadJrsfBw04VBy206G8dAEJZT/TRYNnaYmxIeuDJ
-	wV0/PJI96jbkEktFxfACqS8W3T45QyFRKLqLdXk9SMTRvcTMC6cg5tfsdY1d7MwyFFWlbt
-	QLoXJAxqqHDaY1x/HuSN02rLDJu26Cc=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Shaoqin Huang <shahuang@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-	Eric Auger <eauger@redhat.com>, Eric Auger <eric.auger@redhat.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 2/5] KVM: selftests: aarch64: Move pmu helper
- functions into vpmu.h
-Message-ID: <ZbydeB5MEJIhxaw6@linux.dev>
-References: <20240202025659.5065-1-shahuang@redhat.com>
- <20240202025659.5065-3-shahuang@redhat.com>
+	s=arc-20240116; t=1706861069; c=relaxed/simple;
+	bh=vn1Uy7iLyuBoZC2jtSRfxjt5sl8GxyEeXddLMX+BM7s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kZ5nriDFjG67VlWjUede0ETq/wCXe2dpiWR16Fk1DGrcn1Q5YoIzOoCmBbyeOQMJcRQp5wkzfD4VzPIVRZDMljCRNRod8XQsEzu0D5pTCkKXyV+dbHF29ykiut18KioHoLwZtkdJ4eo9Hrn/Frgge1jz5VxQeVIDKMV8ENyY3kU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UBttLn8v; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706861068; x=1738397068;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=vn1Uy7iLyuBoZC2jtSRfxjt5sl8GxyEeXddLMX+BM7s=;
+  b=UBttLn8vRLNhj50s9wsLyFXzIlmT3nI0a4IuVsERvdkPluq4a9bED7T1
+   YQMqaCrK/B1Wf+nYcZjI+qIeJFsAClqxmDBtjIl+TGW5sjOoQ5I+50wPI
+   i6yNYAD5c65QeWbr1YrFWK/oCqbzec8F/HLS3shXdY7dYGwY36+keriCV
+   Dh8khYnM+XUvXW2dm+VLVXeVqteKKarzkuxLTBvXCam2nAw+5mu5i9vUx
+   DDbMVsysWaddeOdKuCUTZI1b67BSYMpvbzMiD+ADOo8sHPGZ2tybVK0TO
+   2q+emsFgl7txjVOeGEVyX0xQyMlVSiJnU5VipTnztuoV+NWVKkIKwHx5e
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="3959696"
+X-IronPort-AV: E=Sophos;i="6.05,237,1701158400"; 
+   d="scan'208";a="3959696"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2024 00:04:26 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="962145227"
+X-IronPort-AV: E=Sophos;i="6.05,237,1701158400"; 
+   d="scan'208";a="962145227"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.33.17]) ([10.93.33.17])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2024 00:04:22 -0800
+Message-ID: <2e174040-933d-4f54-b5fb-380411b53355@intel.com>
+Date: Fri, 2 Feb 2024 16:04:17 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240202025659.5065-3-shahuang@redhat.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v18 013/121] KVM: TDX: Add TDX "architectural" error codes
+Content-Language: en-US
+To: isaku.yamahata@intel.com, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+ erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+ Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
+ chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
+ Sean Christopherson <sean.j.christopherson@intel.com>
+References: <cover.1705965634.git.isaku.yamahata@intel.com>
+ <212f22ed28e43c016607e3c420d7d98910878007.1705965634.git.isaku.yamahata@intel.com>
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <212f22ed28e43c016607e3c420d7d98910878007.1705965634.git.isaku.yamahata@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Feb 01, 2024 at 09:56:51PM -0500, Shaoqin Huang wrote:
-> -static uint64_t get_pmcr_n(uint64_t pmcr)
-> -{
-> -	return FIELD_GET(ARMV8_PMU_PMCR_N, pmcr);
-> -}
-> -
-> -static void set_pmcr_n(uint64_t *pmcr, uint64_t pmcr_n)
-> -{
-> -	u64p_replace_bits((__u64 *) pmcr, pmcr_n, ARMV8_PMU_PMCR_N);
-> -}
-> -
-> -static uint64_t get_counters_mask(uint64_t n)
-> -{
-> -	uint64_t mask = BIT(ARMV8_PMU_CYCLE_IDX);
-> -
-> -	if (n)
-> -		mask |= GENMASK(n - 1, 0);
-> -	return mask;
-> -}
+On 1/23/2024 7:52 AM, isaku.yamahata@intel.com wrote:
+> From: Sean Christopherson <sean.j.christopherson@intel.com>
+> 
+> Add error codes for the TDX SEAMCALLs both for TDX VMM side for TDH
+> SEAMCALL and TDX guest side for TDG.VP.VMCALL.  KVM issues the TDX
+> SEAMCALLs and checks its error code.  KVM handles hypercall from the TDX
+> guest and may return an error.  So error code for the TDX guest is also
+> needed.
+> 
+> TDX SEAMCALL uses bits 31:0 to return more information, so these error
+> codes will only exactly match RAX[63:32].  Error codes for TDG.VP.VMCALL is
+> defined by TDX Guest-Host-Communication interface spec.
+> 
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>   arch/x86/kvm/vmx/tdx_errno.h | 43 ++++++++++++++++++++++++++++++++++++
+>   1 file changed, 43 insertions(+)
+>   create mode 100644 arch/x86/kvm/vmx/tdx_errno.h
+> 
+> diff --git a/arch/x86/kvm/vmx/tdx_errno.h b/arch/x86/kvm/vmx/tdx_errno.h
+> new file mode 100644
+> index 000000000000..7f96696b8e7c
+> --- /dev/null
+> +++ b/arch/x86/kvm/vmx/tdx_errno.h
+> @@ -0,0 +1,43 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/* architectural status code for SEAMCALL */
+> +
+> +#ifndef __KVM_X86_TDX_ERRNO_H
+> +#define __KVM_X86_TDX_ERRNO_H
+> +
+> +#define TDX_SEAMCALL_STATUS_MASK		0xFFFFFFFF00000000ULL
+> +
+> +/*
+> + * TDX SEAMCALL Status Codes (returned in RAX)
+> + */
+> +#define TDX_NON_RECOVERABLE_VCPU		0x4000000100000000ULL
+> +#define TDX_INTERRUPTED_RESUMABLE		0x8000000300000000ULL
+> +#define TDX_OPERAND_INVALID			0xC000010000000000ULL
+> +#define TDX_OPERAND_BUSY			0x8000020000000000ULL
+> +#define TDX_PREVIOUS_TLB_EPOCH_BUSY		0x8000020100000000ULL
+> +#define TDX_VCPU_NOT_ASSOCIATED			0x8000070200000000ULL
+> +#define TDX_KEY_GENERATION_FAILED		0x8000080000000000ULL
+> +#define TDX_KEY_STATE_INCORRECT			0xC000081100000000ULL
+> +#define TDX_KEY_CONFIGURED			0x0000081500000000ULL
+> +#define TDX_NO_HKID_READY_TO_WBCACHE		0x0000082100000000ULL
+> +#define TDX_FLUSHVP_NOT_DONE			0x8000082400000000ULL
+> +#define TDX_EPT_WALK_FAILED			0xC0000B0000000000ULL
+> +#define TDX_EPT_ENTRY_NOT_FREE			0xC0000B0200000000ULL
+> +#define TDX_EPT_ENTRY_STATE_INCORRECT		0xC0000B0D00000000ULL
+> +
+> +/*
+> + * TDG.VP.VMCALL Status Codes (returned in R10)
+> + */
+> +#define TDG_VP_VMCALL_SUCCESS			0x0000000000000000ULL
+> +#define TDG_VP_VMCALL_RETRY			0x0000000000000001ULL
+> +#define TDG_VP_VMCALL_INVALID_OPERAND		0x8000000000000000ULL
+> +#define TDG_VP_VMCALL_TDREPORT_FAILED		0x8000000000000001ULL
 
-I don't see these helpers being used by your test, and they seem rather
-specific to what the original test was trying to accomplish. Let's not
-move this unnecessarily.
+Same to previous Patch:
 
--- 
-Thanks,
-Oliver
+These should be put in some shared header file, because they are shared 
+with guest TD code.
+
+Other than it,
+
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+
+> +/*
+> + * TDX module operand ID, appears in 31:0 part of error code as
+> + * detail information
+> + */
+> +#define TDX_OPERAND_ID_RCX			0x01
+> +#define TDX_OPERAND_ID_SEPT			0x92
+> +#define TDX_OPERAND_ID_TD_EPOCH			0xa9
+> +
+> +#endif /* __KVM_X86_TDX_ERRNO_H */
+
 
