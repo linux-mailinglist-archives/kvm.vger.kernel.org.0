@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-7816-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7817-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 814DD8468D6
-	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 08:02:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87F748468D8
+	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 08:02:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B40DA1C254AD
-	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 07:02:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16473287DE4
+	for <lists+kvm@lfdr.de>; Fri,  2 Feb 2024 07:02:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51B6317C70;
-	Fri,  2 Feb 2024 06:58:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 608E517C9B;
+	Fri,  2 Feb 2024 06:58:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DMhKWY4x"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PFEpSd9i"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BD6717BC2;
-	Fri,  2 Feb 2024 06:58:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BE6A17C72;
+	Fri,  2 Feb 2024 06:58:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706857099; cv=none; b=dYEslCfgXO8KtVJWpnwMzOThqCO0YTXf8lq2s6cWnr5mYREyosEx6GWTnl+mF/J9wwwfYcVM43FSxE8yCwLYU1Lj2uz6Yrzmfgu1yf1uOP7aifXYC4AJKexXfl8NSGyRrvI/euzGBPdE4miw4Gig0VsifSOxiSdf7XYqMGtg66Y=
+	t=1706857108; cv=none; b=oDh5nfojxK0AK6bv80aZ+cQnaLp0XXjURzruU26x2AOdaT70qsrVu3P6Nxca3+nmkcERi9KLnr3wki7WT7dF/2HKYOcslT0r5JMslgDwXfWfzU9Itqxz27TI21I5Ns8F1bD66A4v4AkjP2qXbFdLMGEnuDRuctm8tmnsyQD6s2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706857099; c=relaxed/simple;
-	bh=bfyX8EE4/uU+JXe129hEHOC/zLEOlb2+oTpWsMsoZPs=;
+	s=arc-20240116; t=1706857108; c=relaxed/simple;
+	bh=4yScsOrcnjKTTDzCPnl6oSqQbBcwqPOJzQMwRvXXfl8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rdDM7ib49VXYvFKt5pdjSPhwt/RaiwZ6TZva1aclIGf1gx1b7UHVmtRGXdp6LLV1ERBNN2PhBBkV+RLquyWEc+5qfY2dBzcJqLPZt5hinVQ5hOM8YJQiAimclmpAdNbrQT9Q/q5lu1EffRVYptE1oS7Ksl2FsfAQoLV8gl567Rs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DMhKWY4x; arc=none smtp.client-ip=209.85.214.181
+	 MIME-Version; b=GKzorPg/5p0Eet/V2wdEwC+blfAJLDzDZxd6485w6ZVIX3Y7hDjutGtLCuhnnXqi4ihOIFeLk4kWBeH5iaoy0uy718YniVsj2GDzYrfHQMr3DHuzWiag6d/Zi4Xq1iKFGwYoUp6MzVjPLFmuJF2olcGEYbzTYerzy50YJRw+eQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PFEpSd9i; arc=none smtp.client-ip=209.85.214.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1d918008b99so14157195ad.3;
-        Thu, 01 Feb 2024 22:58:17 -0800 (PST)
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1d8e7df6abcso16662555ad.1;
+        Thu, 01 Feb 2024 22:58:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706857097; x=1707461897; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1706857106; x=1707461906; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=aeVnbjWEi5yI3wZCxJZ+3TFl6uPEJpXO65IAKcNUOWw=;
-        b=DMhKWY4xeMmxF6+dP012AH4IhDNrqIg3BnIOhrlyCFRP4SFY8Iw74E3/8AAAOCqTmy
-         qNotH6YVwqeMc1+FoWHYz2SCnAqtSCOWER2OvOlSz8ALl5yWHL70XvQ4QAME4aqsK1og
-         9ldqVyGIbgeBE82ZhHfGTebWOIPh4OceS137b+EechI6gawXlCovvjynB66pTyiPcNYu
-         13le2I2UiHVscbs+g0NTzgjhNlI456AG5a7Xe86UBsIA5fmjqDExEzWDTYNc8bKI+mUM
-         3A1fRXXjZDlrwiBiegfwRKtZabOV2Yu0+UkhOngkqMNRuR7dfV1coNy0Cxh52UjfEZLR
-         MrUw==
+        bh=EawXcrWZcj4wjBdULRz+yh78MdJFfpIVMXufen8CLio=;
+        b=PFEpSd9iABdv0Rs4jJjTgfG9YOUwIoAdNPj/Hwlf68QO7WJxKTKiWRbv1CYvu0S6U7
+         478w7BnKhUBywiIkt1OSVBZEHHjoNO9QJYOW4i/pkanr+7MGqmRQtJz3J9N6NOkH/7mg
+         LsUt8J3WqoSMfEV7aLe4Qn7GIwvRCgHvuwHKwBv2F5CEXKN9KkwFgsm/HK3+crHmqykR
+         uvrI2mMKyNHl0iyNmPJ9hI0qG227IjTyZ3sUGA+X2lKrgBxhE5iCV2y+qC3af9+E8eeX
+         meh7dS/zD62deX/U0uMZxErLhyEReKLIM7lEFpDSW4IZjA8kaNcWvScktozy/5Pq+Lat
+         sFBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706857097; x=1707461897;
+        d=1e100.net; s=20230601; t=1706857106; x=1707461906;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=aeVnbjWEi5yI3wZCxJZ+3TFl6uPEJpXO65IAKcNUOWw=;
-        b=b+QhnNT0WT4XW2BUTcbb/xZuDyi3sbcHBqnA34KVbMFvtwDA5hmBJ6BiIyeMz1K+l2
-         BiMn5NWA8F9zLqfjkB1g+lUgwbe9ih32RcCeyC8wD+caAn+Z2ZlJDvpuKmQg/A4LaTQR
-         VYAv76fJOxAkWgPSB8mZSaD53t8u+yOqcyWxnEcRH5Kw9A5n1rKG+IfU3/lFL52t/u08
-         brYU47FDE8/PDalPNibxSY8VitvFHVHJQACnVJImI0t0W4GUHyUTXGDfCH9mXztSaelh
-         1Q/CQfNJeaNkR9IAdXBCqyjXKMZCq39+wdBvEx8vWTo4U0+0QpoJQtQMgakmk73H3vOg
-         2SfQ==
-X-Gm-Message-State: AOJu0YyeKoWSpON3/pan7NH+JZJYzdshrD06ltNa+X/4MxL7LfHrI4bQ
-	kUAQyv7Bkvyc0Nw4WyPLLyBzSS8czXhAsjDWBmgoLNo0xpviXV1UPHCr7c/W
-X-Google-Smtp-Source: AGHT+IFBf6XLeyraYLqpgaXllqfIV8nP9aOkiHz9H9CBuCbU+/Yzwi3JwhbazRyvCR+MSQuAhK3haw==
-X-Received: by 2002:a17:902:ce8c:b0:1d9:7412:834 with SMTP id f12-20020a170902ce8c00b001d974120834mr718546plg.8.1706857097435;
-        Thu, 01 Feb 2024 22:58:17 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCVJmtn1TofVQ50OkhQ3d7+h/hvpgY3hL3pMQR9S++DrXoJ95NmPFx5wFTv7bvP1p2/l1zKasGkK1rD+WWnzk0PdekgWWBoWRk4nYWS8BRvT70PElYjZom3Rl0qdTRjjdtOjns3331AdDSmEOawg0WnT2m8XyVQDQAYwn7JPuJP81H7+qD7eL00OM7eZO4aKstDvUSDy6kLbKV5SaTYhXjNv5bPHsj3fWPSZMsvPgE7p1uaxNJfAY2jceiXMTarske+gOQQArkw+uqLvSq5bWvZg6PEEwChSgxUg9SJlP/fYrh3NV4WAq/ldvN/DezZK9hI7K3zk9mqC3a8UEDoxSunAP8OzgOJRcpdqNwykqePnm3DAQ9tZlxD5vWC+kH4QwqVMQf3gFEGrrprsp4X7Ez5x6S4cT1HtvqoNHsrstfzGR8kDguZc6NNun+ggT2fufC+TbxJjBqqNBEr8AK5yEGxHSjNEFgJ1aqV8sTR/1zRNnen1Dio6xSdaw+FCJi3AIxME1Z58TikkJmw=
+        bh=EawXcrWZcj4wjBdULRz+yh78MdJFfpIVMXufen8CLio=;
+        b=rmo2AjBGEEXjs+Dz0+M+wTXhqFFLacMPtS0zcmmq2t+b7MMO1m7zifNR4IDBV9AZoA
+         7ynRnTMAXFhqYuPFtgs0tvtKufyAGKSeX2gIiwA0hGdJiZTxU+7plMtPV+HhTczLPQgN
+         fiXpQlj6mqoQNRybExoohbiiQff6kGhfmXj1OVv2fE122gvglKHhqKetGsxkIPxl6vZm
+         YNBf7znHv6n4BG40Bo0wm1yIkv1+vKUJ/qkJjjvcx8d3F2d12C/x6U2+e13qOyCysss4
+         BfQ6nr6BuqONRwQV5K9RVecrgbJRXoRF9rIX8IMEukvFnzqMOCnNG2sx/2YCBRuuSJDc
+         xbdg==
+X-Gm-Message-State: AOJu0YxWrg4uoMwNf5B/FshirENSFXq/+K2tb16QI2VfqJ0ppeESafAf
+	PAuusodObHO+4BMxXe/um3kigf5kifYdVwJwch6TMbPHWOAo/d30
+X-Google-Smtp-Source: AGHT+IGl/XMjvd9Klgg2/FWxCwJMxKc63HwstNQDO2ClYm/78uC2k5jJZCUW+UiCZN8A2rtA+7mFiQ==
+X-Received: by 2002:a17:903:445:b0:1d9:5ef2:abdd with SMTP id iw5-20020a170903044500b001d95ef2abddmr1116146plb.0.1706857106567;
+        Thu, 01 Feb 2024 22:58:26 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCW/IOgMZYUZthoBpoNRMf/oli+krs0I7QalTXQLhmUUWWhn4KTEGdDr/tD4cxALPr5YanOFmAHpezVtwao2TQzO+RlJR3Ey/l7/3QH/K3g+wJhke1+8D7EBboNPM5WoqME9ClFM8Tb2qCEIYjo+bDj+JytizB/Z/HHC2r1N33PYMUgH67boLyOHJbDw9bZpjApoN82XPi+TIHolN046l5iX1K13QrymhO+WP1rEnsSa9hFW05dJESbK9n9XsLx0/+71n2h46K26UvtQ2Tvhi4CxxSgx61auRLuHt8a4ivXCW09clAuX2orO6qQmVgmRP6m0MuduJ7wcFMpF4m/Yyx8XgB+x2QC4G9sG0uUxRP61DypLkLC/HukTiuGgrKuWO8070olj+6YNjeeQFlx6mz0z7Ta+qF2P+x5aggZgJT35GSJypgDz0pyEIOTAPK75Tgu99P65NQ0dXD3u4iLw7/cZe08vmV/GqS8qWhRhxtJKwMQsq18X2q834tfjJ55jslSnq+Pu+viz/94=
 Received: from wheely.local0.net ([1.146.53.155])
-        by smtp.gmail.com with ESMTPSA id d18-20020a170903209200b001d948adc19fsm905734plc.46.2024.02.01.22.58.09
+        by smtp.gmail.com with ESMTPSA id d18-20020a170903209200b001d948adc19fsm905734plc.46.2024.02.01.22.58.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Feb 2024 22:58:17 -0800 (PST)
+        Thu, 01 Feb 2024 22:58:26 -0800 (PST)
 From: Nicholas Piggin <npiggin@gmail.com>
 To: Thomas Huth <thuth@redhat.com>
 Cc: Nicholas Piggin <npiggin@gmail.com>,
@@ -85,9 +85,9 @@ Cc: Nicholas Piggin <npiggin@gmail.com>,
 	linuxppc-dev@lists.ozlabs.org,
 	linux-s390@vger.kernel.org,
 	kvmarm@lists.linux.dev
-Subject: [kvm-unit-tests PATCH v2 2/9] arch-run: Clean up temporary files properly
-Date: Fri,  2 Feb 2024 16:57:33 +1000
-Message-ID: <20240202065740.68643-3-npiggin@gmail.com>
+Subject: [kvm-unit-tests PATCH v2 3/9] arch-run: Clean up initrd cleanup
+Date: Fri,  2 Feb 2024 16:57:34 +1000
+Message-ID: <20240202065740.68643-4-npiggin@gmail.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20240202065740.68643-1-npiggin@gmail.com>
 References: <20240202065740.68643-1-npiggin@gmail.com>
@@ -99,47 +99,40 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Migration files weren't being removed when tests were interrupted.
-This improves the situation.
+Rather than put a big script into the trap handler, have it call
+a function.
 
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- scripts/arch-run.bash | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+ scripts/arch-run.bash | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
 diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-index d0864360..f22ead6f 100644
+index f22ead6f..cc7da7c5 100644
 --- a/scripts/arch-run.bash
 +++ b/scripts/arch-run.bash
-@@ -134,12 +134,14 @@ run_migration ()
- 	qmp1=$(mktemp -u -t mig-helper-qmp1.XXXXXXXXXX)
- 	qmp2=$(mktemp -u -t mig-helper-qmp2.XXXXXXXXXX)
- 	fifo=$(mktemp -u -t mig-helper-fifo.XXXXXXXXXX)
+@@ -271,10 +271,20 @@ search_qemu_binary ()
+ 	export PATH=$save_path
+ }
+ 
++initrd_cleanup ()
++{
++	if [ "$KVM_UNIT_TESTS_ENV_OLD" ]; then
++		export KVM_UNIT_TESTS_ENV="$KVM_UNIT_TESTS_ENV_OLD"
++	else
++		unset KVM_UNIT_TESTS_ENV
++		unset KVM_UNIT_TESTS_ENV_OLD
++	fi
++}
 +
-+	# race here between file creation and trap
-+	trap "trap - TERM ; kill 0 ; exit 2" INT TERM
-+	trap "rm -f ${migout1} ${migsock} ${qmp1} ${qmp2} ${fifo}" RETURN EXIT
-+
- 	qmpout1=/dev/null
- 	qmpout2=/dev/null
- 
--	trap 'kill 0; exit 2' INT TERM
--	trap 'rm -f ${migout1} ${migsock} ${qmp1} ${qmp2} ${fifo}' RETURN EXIT
--
- 	eval "$@" -chardev socket,id=mon1,path=${qmp1},server=on,wait=off \
- 		-mon chardev=mon1,mode=control | tee ${migout1} &
- 	live_pid=`jobs -l %+ | grep "eval" | awk '{print$2}'`
-@@ -211,8 +213,8 @@ run_panic ()
- 
- 	qmp=$(mktemp -u -t panic-qmp.XXXXXXXXXX)
- 
--	trap 'kill 0; exit 2' INT TERM
--	trap 'rm -f ${qmp}' RETURN EXIT
-+	trap "trap - TERM ; kill 0 ; exit 2" INT TERM
-+	trap "rm -f ${qmp}" RETURN EXIT
- 
- 	# start VM stopped so we don't miss any events
- 	eval "$@" -chardev socket,id=mon1,path=${qmp},server=on,wait=off \
+ initrd_create ()
+ {
+ 	if [ "$ENVIRON_DEFAULT" = "yes" ]; then
+-		trap_exit_push 'rm -f $KVM_UNIT_TESTS_ENV; [ "$KVM_UNIT_TESTS_ENV_OLD" ] && export KVM_UNIT_TESTS_ENV="$KVM_UNIT_TESTS_ENV_OLD" || unset KVM_UNIT_TESTS_ENV; unset KVM_UNIT_TESTS_ENV_OLD'
++		trap_exit_push 'rm -f $KVM_UNIT_TESTS_ENV; initrd_cleanup'
+ 		[ -f "$KVM_UNIT_TESTS_ENV" ] && export KVM_UNIT_TESTS_ENV_OLD="$KVM_UNIT_TESTS_ENV"
+ 		export KVM_UNIT_TESTS_ENV=$(mktemp)
+ 		env_params
 -- 
 2.42.0
 
