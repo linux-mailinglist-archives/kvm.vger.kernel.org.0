@@ -1,59 +1,59 @@
-Return-Path: <kvm+bounces-7912-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7913-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D20958484C6
-	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 10:05:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12DFA8484CA
+	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 10:06:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66862290E37
-	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 09:05:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 459C11C28DCA
+	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 09:06:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 179F960877;
-	Sat,  3 Feb 2024 09:01:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45C1F60ED6;
+	Sat,  3 Feb 2024 09:01:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ho84Tknx"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AWRm4P9l"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBF8C6086E;
-	Sat,  3 Feb 2024 09:01:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB9C45D489;
+	Sat,  3 Feb 2024 09:01:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706950879; cv=none; b=UaGQTJqd38Ux+1UH/zMbkyTZJ7wyhVeUEwnaGNANCeGAv0uqJUdUM5mudZpYYvtGLXXl7DddxskIzsua+umUPtDLbWo8tGgshtgbNzyHRT00OvZ23SPBwms2Xwiz1Klg1sSB4xZbNaHfCWJCpJGUeis/qSqNcVqe8MCIAKwHuRk=
+	t=1706950886; cv=none; b=hqfQireyjwqG8rMVmn70vqkSPtYmPr6+y95c9cC4zpNyPlqkPI8pteJ5dtfA1y3eqc1aOY3a8jWcabAKRwsT6Sd1zU/puyTFivwdAQWiflqF3eTyYw7uDHxnbN/1kBKtzRvbk5594gUDcCJCrb6B7lhh6tCUtq6eOOG9bdubNtY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706950879; c=relaxed/simple;
-	bh=o9Ea4he1GyJdoS3fqNSGXkZQw07L9///FXUYj80JU5U=;
+	s=arc-20240116; t=1706950886; c=relaxed/simple;
+	bh=SMoF3nIPJhY2CvvIts5nS/Mk2TwIlNjiRdux5w3q9k8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=oLhRptss+HYgza5tvMN2hw4SKyBx71bmpStT+7/c27Y325Rdwgw/GseVobg/FuTcqMv7+pJxkzeAmBrItsWUwHEHfTQ/sjyJsqlKQhwhTYZfejVc0AoyLvvl+UwTIKJxLTm0XK6lzx+Eg9JixGZagWnTvwwVhI4wR41QrdiTbK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ho84Tknx; arc=none smtp.client-ip=198.175.65.14
+	 MIME-Version; b=L7e0QZd/iimOaJ4hsH9HHb+Kw7D9wWlFTsHEcEbf7RmGAreprzaUFaInu8pGbog5L844+lHDd+uSHwSEK1ouAifXE7iOs4KsGTOc/ixm5fjMkK77ZsU1bIy0k/DOUR18r4aCT92d42zF9BqNyjJu6QfQBEDlHQ3p/pjoIfq5xGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AWRm4P9l; arc=none smtp.client-ip=198.175.65.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706950878; x=1738486878;
+  t=1706950885; x=1738486885;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=o9Ea4he1GyJdoS3fqNSGXkZQw07L9///FXUYj80JU5U=;
-  b=ho84TknxSFDncqBiIGAInwPEc9R1sZIU2l7u5x6rySaMBs8YvndVtUro
-   fVFoF+XKepcIRIVwcLuEKq9GlIWFkjCRBD9+PrLhA/6YBOWhk0FbSz6Df
-   x2++Q+OzoyrxVCPDKwWq4ezXLGNY6vd+nrqjXn86RvB2wlGM42xsQmwUp
-   1czQ//dGkTV2DoYrMLovGsCbVdudttw8V2nLZ9uJunDS3ZH5VpDNQ6Y46
-   SxBsw3eXNOa91AFOVzZDMC6iD0ILANm5zJ+acuD1lHLA1SSbhU1QECmeo
-   +5GWtX3O36LE6ZOtZyx81/35TnAZ9eQBwrd4DKuDoRww0gnfsazBe6oF9
+  bh=SMoF3nIPJhY2CvvIts5nS/Mk2TwIlNjiRdux5w3q9k8=;
+  b=AWRm4P9lOt9jckK0W6gew+9NvQoJCEKUaNX1QZvA+GPVwjjGfwPc3xeF
+   Bmuq7/zV05gFQQJ8S0ZoER1p0C77FBuQ+7LWgh1gMgXFvaMh/qHKgdm8o
+   NE2qS4A/HESDHIQPVfXSmIBjkFqKpf4oNTT+Y5p6xjSo0r/zrGtvW9zZJ
+   ej0ueyTlte1W+ROoNk27EhYW6uKxwNZVKSExFSl1mdpCADYgNOcHa7V/W
+   lTdCaUknK8FuwX+djLi0oBdZzjcUfpZDfwEiLZCadmHntxdmzZ6HagHp0
+   Rlpny6jWxckhzUdAr19vGRC3++m4Xb0q2lskJ1P+ZCl+CQWqBL15D31bC
    A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="4132054"
+X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="4132070"
 X-IronPort-AV: E=Sophos;i="6.05,240,1701158400"; 
-   d="scan'208";a="4132054"
+   d="scan'208";a="4132070"
 Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2024 01:01:18 -0800
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2024 01:01:24 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.05,240,1701158400"; 
-   d="scan'208";a="291457"
+   d="scan'208";a="291478"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
-  by fmviesa009.fm.intel.com with ESMTP; 03 Feb 2024 01:01:11 -0800
+  by fmviesa009.fm.intel.com with ESMTP; 03 Feb 2024 01:01:17 -0800
 From: Zhao Liu <zhao1.liu@linux.intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Sean Christopherson <seanjc@google.com>,
@@ -82,9 +82,9 @@ Cc: Ricardo Neri <ricardo.neri-calderon@linux.intel.com>,
 	David Dai <davidai@google.com>,
 	Saravana Kannan <saravanak@google.com>,
 	Zhao Liu <zhao1.liu@intel.com>
-Subject: [RFC 16/26] KVM: VMX: Update HFI table when vCPU migrates
-Date: Sat,  3 Feb 2024 17:12:04 +0800
-Message-Id: <20240203091214.411862-17-zhao1.liu@linux.intel.com>
+Subject: [RFC 17/26] KVM: VMX: Allow to inject thermal interrupt without HFI update
+Date: Sat,  3 Feb 2024 17:12:05 +0800
+Message-Id: <20240203091214.411862-18-zhao1.liu@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240203091214.411862-1-zhao1.liu@linux.intel.com>
 References: <20240203091214.411862-1-zhao1.liu@linux.intel.com>
@@ -96,58 +96,54 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Zhuocheng Ding <zhuocheng.ding@intel.com>
+From: Zhao Liu <zhao1.liu@intel.com>
 
-When the vCPU migrates to a different pCPU, the virtual hfi data
-corresponding to the vCPU's hfi index should be updated to the new
-pCPU's data.
+When the HFI table memory address is set by MSR_IA32_HW_FEEDBACK_PTR or
+when MSR_IA32_HW_FEEDBACK_CONFIG enables the HFI feature, the hardware
+sends an initial HFI notification via thermal interrupt and sets the
+thermal status bit.
 
-We don't need to re-register HFI notifier because currently ITD/HFI
-virtualization is only supported for client platforms (with only one
-HFI instance).
-
-In this case, make the request to update the virtual hfi table.
+To prepare for the above cases, extend vmx_update_hfi_table() to allow
+the forced thermal interrupt injection (with the thermal status bit set)
+regardless of whether there is the HFI table change to be updated.
 
 Tested-by: Yanting Jiang <yanting.jiang@intel.com>
-Signed-off-by: Zhuocheng Ding <zhuocheng.ding@intel.com>
-Co-developed-by: Zhao Liu <zhao1.liu@intel.com>
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ arch/x86/kvm/vmx/vmx.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 0ad5e3473a28..44c09c995120 100644
+index 44c09c995120..97bb7b304213 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1735,6 +1735,17 @@ static void vmx_dynamic_update_hfi_table(struct kvm_vcpu *vcpu)
+@@ -1616,7 +1616,7 @@ static int vmx_build_hfi_table(struct kvm *kvm)
+ 	return 1;
+ }
+ 
+-static void vmx_update_hfi_table(struct kvm *kvm)
++static void vmx_update_hfi_table(struct kvm *kvm, bool forced_int)
+ {
+ 	struct kvm_vmx *kvm_vmx = to_kvm_vmx(kvm);
+ 	struct hfi_desc *kvm_vmx_hfi = &kvm_vmx->pkg_therm.hfi_desc;
+@@ -1635,7 +1635,7 @@ static void vmx_update_hfi_table(struct kvm *kvm)
+ 	}
+ 
+ 	ret = vmx_build_hfi_table(kvm);
+-	if (ret <= 0)
++	if (ret < 0 || (!ret && !forced_int))
+ 		return;
+ 
+ 	kvm_vmx_hfi->hfi_update_status = true;
+@@ -1731,7 +1731,7 @@ static void vmx_dynamic_update_hfi_table(struct kvm_vcpu *vcpu)
+ 	 * of the same VM are sharing the one HFI table. Therefore, one
+ 	 * vCPU can update the HFI table for the whole VM.
+ 	 */
+-	vmx_update_hfi_table(vcpu->kvm);
++	vmx_update_hfi_table(vcpu->kvm, false);
  	mutex_unlock(&kvm_vmx->pkg_therm.pkg_therm_lock);
  }
  
-+static void vmx_vcpu_hfi_load(struct kvm_vcpu *vcpu, int cpu)
-+{
-+	if (!intel_hfi_enabled())
-+		return;
-+
-+	if (!vmx_hfi_initialized(to_kvm_vmx(vcpu->kvm)))
-+		return;
-+
-+	kvm_make_request(KVM_REQ_HFI_UPDATE, vcpu);
-+}
-+
- /*
-  * Switches to specified vcpu, until a matching vcpu_put(), but assumes
-  * vcpu mutex is already taken.
-@@ -1748,6 +1759,9 @@ static void vmx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 	vmx_vcpu_pi_load(vcpu, cpu);
- 
- 	vmx->host_debugctlmsr = get_debugctlmsr();
-+
-+	if (unlikely(vcpu->cpu != cpu))
-+		vmx_vcpu_hfi_load(vcpu, cpu);
- }
- 
- static void vmx_vcpu_put(struct kvm_vcpu *vcpu)
 -- 
 2.34.1
 
