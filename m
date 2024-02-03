@@ -1,123 +1,113 @@
-Return-Path: <kvm+bounces-7889-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7890-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77763847DA8
-	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 01:15:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 003C9847DBA
+	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 01:23:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9CB7F1C21970
-	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 00:15:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 881FC284231
+	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 00:23:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54C4C10A18;
-	Sat,  3 Feb 2024 00:13:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58E3F136F;
+	Sat,  3 Feb 2024 00:23:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m0ZcI6mv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tMXOhuVu"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27A9A10782
-	for <kvm@vger.kernel.org>; Sat,  3 Feb 2024 00:13:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18267622
+	for <kvm@vger.kernel.org>; Sat,  3 Feb 2024 00:23:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706919207; cv=none; b=YKT0GL/DxRxru8ZBye3xInCd293sFka6ttUOwd4d+SYlisu+BwIHT585pIRpdOAe6Ci34hCsHcLS8jFygl56GxsGPNqSR0Pe8tByncR3yaEECCqBQKcrDhphAEJOOB1mqvSp2EO3N7AGxpvwXYFGPB3zNAFQtDtT8sShH6YIffc=
+	t=1706919828; cv=none; b=kBySay8YK9M1DhdbY2XYVIxH9ws4UkIqbUUcVVf+hCglRVw6ewf8xTBvOlrXxo2Ewfbnde/eEbsLW2OyOnkAmxTnsv7Qm+FHbx9+3n3Muuf26qpwoa9nWwuqPQ2pQ/8xVAuPRG6zNfu3Lh6OQfVM3uzyBTl+5xHzp/IamyhkSks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706919207; c=relaxed/simple;
-	bh=0UHnjpZa0/n5Wch+Vjh3VbZabsU3SfAQTGXXdQqFuNI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Nnsna1uG+K8MPCQj0Npt0Wlq2sRFbdx5CStavswxDUkXg6DkBVT+dbuyb5ath4HSBzOs/awE48xV7KRXMRhxYd/DVRsMFwL6QJHixdaK2iA+VwExqX5aGdihV/dZ7Nk0WVme6nWYmWvJmBoXqu2KCge94on+Qijo/z444h8/T/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m0ZcI6mv; arc=none smtp.client-ip=209.85.214.201
+	s=arc-20240116; t=1706919828; c=relaxed/simple;
+	bh=Ig5QOPcKdALnxA85Z7llLLp9UDM/G3xlM1p/8HzbKgc=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=lexjZM6BoIKYyCpnmCCT7lHYsKitW+JLUZ81RgAYvxIgZMzYfB1iCYcvxAgRXjMqmAL5wKYoUx417LlOo7fOtBOwGZIe6yYdGjrT2S5SqeIMV8Jzw36qWzMrAiEYb2lRWmlnQxjpRfWwX69QW3CUpj/oWUQivPVVmNtCutThlq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tMXOhuVu; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1d97eb98e1cso6265735ad.2
-        for <kvm@vger.kernel.org>; Fri, 02 Feb 2024 16:13:25 -0800 (PST)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5efe82b835fso52077097b3.0
+        for <kvm@vger.kernel.org>; Fri, 02 Feb 2024 16:23:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706919205; x=1707524005; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UblZcdIbFFW166FC0SJ65RVKv7Yp//8SVMLiUJZhHNc=;
-        b=m0ZcI6mvrHlUQFmb3ztP/G/TtsHgSQ+WvOutvtpTsvEQnsJOqv/X7A6XRvzHaD519w
-         7CUUkPGKHh65Zb26rYu4oa3p8jnA2VQ3oGvpgplmGGI50yh+dh0Cze5oAqxPmK/pcDCp
-         i86zGNWluErHezEEka48bl3WHghHxX57SdJpdU/nepyQbF4qzK7vBmOTHKo0F02u6si6
-         J0WYWMjMJd0tKtWMey/IRPUGlwzEdF19XyRWajPdLmvAFGuy3gyEq/E7A/hJvJjsZWQL
-         1bQD4yccVYP+91is715oWDVSKYSyxfQCwqODdXXkzrxR2HA6sppvZegc1B++1KTq71hr
-         G9LQ==
+        d=google.com; s=20230601; t=1706919826; x=1707524626; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dGotQ4CRNy4fAvOu+oQXTLBsL4Zddq3WhrzF/jyrszE=;
+        b=tMXOhuVujC0iClLNkuWDTEV8b2v47TEuTJKjJLYYBYxlGmzh6U0ZoJQmhl0/V3zzqn
+         aiIuNXqjIhY/nXNsLLPqyl+AW0vpCLBLhltRLT6gSAUsTNlnv1/IxilXCpCYzNBjzIEq
+         BkVeXg8wmTxAv9+RxjUZ0KwcQReQtIrT2reRDWE+/EibHeRBjTQcRdSumDsawK73qz+2
+         ZJDl2ln0YjJqdBo/Mq218ND7YeChdE4yQJLdB7DVWVPNsLDnP+93jmnB85/wPbhxDuZW
+         TGPqRnqldn6CLsf/DA5wVOfahFFzBD9KhwGtbqQ4QFRpCGYBeTa8VDTKfmYFoM/3Ksjz
+         dQTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706919205; x=1707524005;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UblZcdIbFFW166FC0SJ65RVKv7Yp//8SVMLiUJZhHNc=;
-        b=FPS4Q0Cj7tbe/3ABp8INc8wr0n20o+oZKg4piEkzB1bgxoOXCTtqG8q4xGC7/k+Lbv
-         NFleRadstvPwmPgAKku5wFvKjbPY1jYTDJ16RLHbFQMN1Wve/ZpN/ISeUqgDQ6vDuz/4
-         Y8ub/fbA6sCtavfdoCJhKq2xMvKveomlM4fUjTlv+pMrDIGFYXq66e9yBUj12+iWC101
-         Pjj2SXBwGRfhg+NvOANM8QBLSPoxv5hn5s9LmXp/COY3Ylt3E+uolNFvexQLBW5/YoI/
-         FJOwfFIFreAY25NL05wk+JVe/2BN55Cj2Tao/zsX8kmm9nw92hBOo1o1Qo6PizNLm/kT
-         FIfg==
-X-Gm-Message-State: AOJu0Yzeg1OI0utYDY+zyK12dkmN10SXcQOnblJlx2rcPpIwPM77Mn0w
-	7Zk0Nvo5zGV2EfJ1IovYqmsd26ODxbm5eikL1q4x/sNoFhJjdgwKjQno9yyvJObzG8lzVvSfKtu
-	HpQ==
-X-Google-Smtp-Source: AGHT+IEpA02eLXo5kivTLKOG0egFzivasL8l5/x4YkqvERVRNd7PfchGE4aayftMm/hGrKG0zH0YT9yO09A=
+        d=1e100.net; s=20230601; t=1706919826; x=1707524626;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dGotQ4CRNy4fAvOu+oQXTLBsL4Zddq3WhrzF/jyrszE=;
+        b=ZJnFWGvxQzZxRS2zKZvCrFKBhPYKXnxayCXXAQIu6i+ZsLUGmh9/PoH7HkVUqGYiEa
+         HEnAehqUluwa7ngZinKwXHSYLMBb+8P8g+/ytytZb83V3bYU6BbWMBjOHue5BMy0+lJW
+         RhJmc3VIqF6xiCgaBfDJgixJbXVK8yD0WL9Y+cuGojRTCD4jD2VE9wMRFjlTDPM+yJ/A
+         UrzymZgmSUZcF3jWQDIwm2ccjyMjToSTYMX6qpkPydjkverhQllv9V8crsd/F4D4LR96
+         7Or86f0ow8ybDtFb97FVEXRKFnWyP400BRYjOm6HOSvJyMvU03yJ7UcOKgx04XbZ3JlR
+         wMOg==
+X-Gm-Message-State: AOJu0YzhTgtdbUwFhzk/lUbjZFiWw+/2DkBjOV6rxowEr3n+nzNTWOvW
+	RT666W4ZGMgfyR2HT7zwwSIXE2J/bPGNUv6OaUwVug6NVPBvVEjoEGantD2p7akTMMsIiTr6BX/
+	t3w==
+X-Google-Smtp-Source: AGHT+IHS/GWOABGX4xJG8AHRzxkTf0zb48V+udqrJOGNsWOjkK0E3395IqogMvo4wYjDgX/IQNaZJN6+hjc=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:c1cb:b0:1d9:8bb4:6c2b with SMTP id
- c11-20020a170902c1cb00b001d98bb46c2bmr27573plc.12.1706919205410; Fri, 02 Feb
- 2024 16:13:25 -0800 (PST)
-Date: Fri,  2 Feb 2024 16:11:35 -0800
-In-Reply-To: <20231110022857.1273836-1-seanjc@google.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:2512:b0:dc2:1dd0:c517 with SMTP id
+ dt18-20020a056902251200b00dc21dd0c517mr2477010ybb.7.1706919826067; Fri, 02
+ Feb 2024 16:23:46 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Fri,  2 Feb 2024 16:23:39 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20231110022857.1273836-1-seanjc@google.com>
 X-Mailer: git-send-email 2.43.0.594.gd9cf4e227d-goog
-Message-ID: <170691189173.332407.7692729833772898167.b4-ty@google.com>
-Subject: Re: [PATCH 00/10] KVM: x86/pmu: Optimize triggering of emulated events
+Message-ID: <20240203002343.383056-1-seanjc@google.com>
+Subject: [PATCH v2 0/4] KVM: x86/mmu: Clean up indirect_shadow_pages usage
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Konstantin Khorenko <khorenko@virtuozzo.com>, Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="utf-8"
+	Jim Mattson <jmattson@google.com>, Mingwei Zhang <mizhang@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, 09 Nov 2023 18:28:47 -0800, Sean Christopherson wrote:
-> Optimize code used by, or which impacts, kvm_pmu_trigger_event() to try
-> and make a dent in the overhead of emulating PMU events in software, which
-> is quite noticeable due to it kicking in anytime the guest has a vPMU and
-> KVM is skipping an instruction.
-> 
-> Note, Jim has a proposal/idea[*] (that I supported) to make
-> kvm_pmu_trigger_event() even more performant.  I opted not to do that as
-> it's a bit more invasive, and I started chewing on this not so much because
-> I care _that_ much about performance, but because it irritates me that the
-> PMU code makes things way harder than they need to be.
-> 
-> [...]
+Resurrect a 6 month old patch from Mingwei, add a few cleanps on top, and
+fix a largely theoretical race between emulating writes and write-protecting
+shadow pages.  At least, I'm pretty sure there's a race.  Memory ordering
+isn't exactly my strong suit.
 
-Applied to kvm-x86 pmu, thanks!
+v2:
+ - Drop the unnecessary READ_ONCE(). [Jim]
+ - Cleanup more old crud in reexecute_instruction().
+ - Fix the aforementioned race.
 
-[01/10] KVM: x86/pmu: Zero out PMU metadata on AMD if PMU is disabled
-        https://github.com/kvm-x86/linux/commit/f933b88e2015
-[02/10] KVM: x86/pmu: Add common define to capture fixed counters offset
-        https://github.com/kvm-x86/linux/commit/be6b067dae15
-[03/10] KVM: x86/pmu: Move pmc_idx => pmc translation helper to common code
-        https://github.com/kvm-x86/linux/commit/b31880ca2f41
-[04/10] KVM: x86/pmu: Snapshot and clear reprogramming bitmap before reprogramming
-        https://github.com/kvm-x86/linux/commit/004a0aa56ede
-[05/10] KVM: x86/pmu: Add macros to iterate over all PMCs given a bitmap
-        https://github.com/kvm-x86/linux/commit/e5a65d4f723a
-[06/10] KVM: x86/pmu: Process only enabled PMCs when emulating events in software
-        https://github.com/kvm-x86/linux/commit/d2b321ea9380
-[07/10] KVM: x86/pmu: Snapshot event selectors that KVM emulates in software
-        https://github.com/kvm-x86/linux/commit/f19063b1ca05
-[08/10] KVM: x86/pmu: Expand the comment about what bits are check emulating events
-        https://github.com/kvm-x86/linux/commit/afda2d7666f8
-[09/10] KVM: x86/pmu: Check eventsel first when emulating (branch) insns retired
-        https://github.com/kvm-x86/linux/commit/e35529fb4ac9
-[10/10] KVM: x86/pmu: Avoid CPL lookup if PMC enabline for USER and KERNEL is the same
-        https://github.com/kvm-x86/linux/commit/83bdfe04c968
+v1: https://lore.kernel.org/all/20230605004334.1930091-1-mizhang@google.com
 
---
-https://github.com/kvm-x86/linux/tree/next
+Mingwei Zhang (1):
+  KVM: x86/mmu: Don't acquire mmu_lock when using indirect_shadow_pages
+    as a heuristic
+
+Sean Christopherson (3):
+  KVM: x86: Drop dedicated logic for direct MMUs in
+    reexecute_instruction()
+  KVM: x86: Drop superfluous check on direct MMU vs. WRITE_PF_TO_SP flag
+  KVM: x86/mmu: Fix a *very* theoretical race in kvm_mmu_track_write()
+
+ arch/x86/kvm/mmu/mmu.c | 19 ++++++++++++++++---
+ arch/x86/kvm/x86.c     | 35 ++++++++++++++---------------------
+ 2 files changed, 30 insertions(+), 24 deletions(-)
+
+
+base-commit: 60eedcfceda9db46f1b333e5e1aa9359793f04fb
+-- 
+2.43.0.594.gd9cf4e227d-goog
+
 
