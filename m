@@ -1,59 +1,59 @@
-Return-Path: <kvm+bounces-7897-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7898-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19E18848497
-	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 10:00:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE73984849B
+	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 10:00:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 988961F278F5
-	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 09:00:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2CC6AB25290
+	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 09:00:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 520B35D72C;
-	Sat,  3 Feb 2024 08:59:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DA5C5D758;
+	Sat,  3 Feb 2024 09:00:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OqxgokOW"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ik5CkECQ"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6D515CDD3;
-	Sat,  3 Feb 2024 08:59:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 775EF5CDD3;
+	Sat,  3 Feb 2024 08:59:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706950793; cv=none; b=jB2FYW8QvJ1N970S63K/2qVzkMsdA3/3mCU/AssqXuULmQJYDOsQIC6ZTX6hr4P/+yaWU2jK7a2fEvyaUHKfzaGtZ5p49D1ZBpYjql1/hPsXHvkyXPIsJsDGI6VqngCMOwbLFcf3AwNR7wVINlw39TJVzkDnoNgyx01MCcU/GL4=
+	t=1706950799; cv=none; b=dazohyMkcihe4bt1gHPK8CZ0UjCC1uObQHm4u4pnc7jXYF/yu2Iek0mIU1ZoQrw1m9J6Xklfg9Txpxf4Wu64Tklajc5idKwMcPihntBmzowmozjAK0hnml99CoGlqUrgxgq2GsXNVBMIHELUmobHVDytBaNcJOcJZabREThoHeA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706950793; c=relaxed/simple;
-	bh=O309/Vt9MktFf0PdG6Lw5tGr+fycilz2bwzopTCTR0Y=;
+	s=arc-20240116; t=1706950799; c=relaxed/simple;
+	bh=ji6khLPdPc2d+wRmATkf+HZE1RiFEEWfxK/r4PNR6xw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=sh+l+RyY4JMFnWNvCkbH5znmfsdaEkEfhbq+CFyJSGOtHD3/FqZk6mVG2HDYtwTBroJgMfmDMjo2MmaGDUR2JB7lXkrRFbbzoixGEJdXTNE968Xwzrk2Y5d5iTuBi5bQfpl++X2HJd+1WgUnRdW+z7c6+tKw0+57XSUwPDf2kCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OqxgokOW; arc=none smtp.client-ip=198.175.65.14
+	 MIME-Version; b=KS73vLTeQv8zORXs0KqQjyTa4Mxv70TmZWQUxNB8WZP8lDVHIkQcFuPQJOvCafNar6vIBAb3kdT28vFwC/Ysiz7df8DWkZaO1i808ualjHiRIFnGHNnuxX+3Nl7oD+sWPY5EE8FLf03b7g+j30z9aK1ntmE94XDqAbgVh3JVijw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ik5CkECQ; arc=none smtp.client-ip=198.175.65.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706950792; x=1738486792;
+  t=1706950798; x=1738486798;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=O309/Vt9MktFf0PdG6Lw5tGr+fycilz2bwzopTCTR0Y=;
-  b=OqxgokOWH3FKqLfnco6VJfiyyvGuBZbnJ6NynOs6fn4KIPjx1LE1FNB9
-   xgzQzA3Y4SBTDWyBiYuKjXUInV0AZl1T4T9UPXlB5L9+pImPGPGxW+6lQ
-   PcBH8/v5fwYQWd1X4KV76Zg1vfkPLzA1YUitqhExME5Mzp2ZLDLmYJoPp
-   JlWG3CppyELiyTjKUCOOaQFH7rADn3njTs6jBquyCE6TuwXOYfIOY09Tf
-   4aZMgtpPekVpAtxonDLwh1eiCSpAl9dZpoUYIs3pQytIVwGGQhIxGX4gf
-   wE+X9ioOvTNCMH/tXmlAIJLI+Uo05ST0/nbYyFXfMlFpolNR4ZNi3Ffkn
+  bh=ji6khLPdPc2d+wRmATkf+HZE1RiFEEWfxK/r4PNR6xw=;
+  b=Ik5CkECQeyg67nr3+/tIk7xw8go43rgzgtt0eQVg2PNmHtmWvyWjOEOq
+   W7GhIaS50HEo12MZ2eXYxbzMQQ0UptG83yTEiofp3GFukW7BZjDevxPBe
+   d08/mHOfvQKUyaXRxn0ZDEqnScslaeVCVNbPzTwNKTvsi1r8McZOG3IrZ
+   bfE6Lp4fsIfjmo6duPDLTE6RVpfDBpN5SCzd7aZZ95llU4sihjHBsJ1Zx
+   bapVe7q4+SCWsJamxD0DEmiU/dwmpmrzf4cAZc4T6H3/7gC+P6QbJPI0h
+   lRsUmcnqO/m0F8lDs9RcBjDieIXbkvT9h+HutRCE3luxSDfXW6CFRp2UY
    Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="4131855"
+X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="4131863"
 X-IronPort-AV: E=Sophos;i="6.05,240,1701158400"; 
-   d="scan'208";a="4131855"
+   d="scan'208";a="4131863"
 Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2024 00:59:52 -0800
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2024 00:59:57 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.05,240,1701158400"; 
-   d="scan'208";a="291146"
+   d="scan'208";a="291159"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
-  by fmviesa009.fm.intel.com with ESMTP; 03 Feb 2024 00:59:45 -0800
+  by fmviesa009.fm.intel.com with ESMTP; 03 Feb 2024 00:59:51 -0800
 From: Zhao Liu <zhao1.liu@linux.intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Sean Christopherson <seanjc@google.com>,
@@ -82,9 +82,9 @@ Cc: Ricardo Neri <ricardo.neri-calderon@linux.intel.com>,
 	David Dai <davidai@google.com>,
 	Saravana Kannan <saravanak@google.com>,
 	Zhao Liu <zhao1.liu@intel.com>
-Subject: [RFC 01/26] thermal: Add bit definition for x86 thermal related MSRs
-Date: Sat,  3 Feb 2024 17:11:49 +0800
-Message-Id: <20240203091214.411862-2-zhao1.liu@linux.intel.com>
+Subject: [RFC 02/26] thermal: intel: hfi: Add helpers to build HFI/ITD structures
+Date: Sat,  3 Feb 2024 17:11:50 +0800
+Message-Id: <20240203091214.411862-3-zhao1.liu@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240203091214.411862-1-zhao1.liu@linux.intel.com>
 References: <20240203091214.411862-1-zhao1.liu@linux.intel.com>
@@ -96,115 +96,214 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Zhao Liu <zhao1.liu@intel.com>
+From: Zhuocheng Ding <zhuocheng.ding@intel.com>
 
-Add the definition of more bits of these MSRs:
-
-* MSR_IA32_THERM_CONTROL
-* MSR_IA32_THERM_INTERRUPT
-* MSR_IA32_THERM_STATUS
-* MSR_IA32_PACKAGE_THERM_STATUS
-* MSR_IA32_PACKAGE_THERM_INTERRUPT
-
-The virtualization of thermal events need these extra definitions.
-
-While here, regroup the definitions and use the BIT_ULL() and
-GENMASK_ULL() macro to improve readability.
+Virtual machines need to compose their own HFI tables. Provide helper
+functions that collect the relevant features and data from the host
+machine.
 
 Tested-by: Yanting Jiang <yanting.jiang@intel.com>
+Signed-off-by: Zhuocheng Ding <zhuocheng.ding@intel.com>
+Co-developed-by: Zhao Liu <zhao1.liu@intel.com>
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
- arch/x86/include/asm/msr-index.h    | 54 +++++++++++++++++++----------
- drivers/thermal/intel/therm_throt.c |  1 -
- 2 files changed, 35 insertions(+), 20 deletions(-)
+ arch/x86/include/asm/hfi.h        |  20 ++++
+ drivers/thermal/intel/intel_hfi.c | 149 ++++++++++++++++++++++++++++++
+ 2 files changed, 169 insertions(+)
 
-diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-index 65b1bfb9c304..4f7ebfafa46a 100644
---- a/arch/x86/include/asm/msr-index.h
-+++ b/arch/x86/include/asm/msr-index.h
-@@ -829,17 +829,26 @@
- #define MSR_IA32_MPERF			0x000000e7
- #define MSR_IA32_APERF			0x000000e8
+diff --git a/arch/x86/include/asm/hfi.h b/arch/x86/include/asm/hfi.h
+index b7fda3e0e8c8..e0fe5b30fb53 100644
+--- a/arch/x86/include/asm/hfi.h
++++ b/arch/x86/include/asm/hfi.h
+@@ -82,4 +82,24 @@ struct hfi_features {
+ 	unsigned int	hdr_size;
+ };
  
--#define MSR_IA32_THERM_CONTROL		0x0000019a
--#define MSR_IA32_THERM_INTERRUPT	0x0000019b
--
--#define THERM_INT_HIGH_ENABLE		(1 << 0)
--#define THERM_INT_LOW_ENABLE		(1 << 1)
--#define THERM_INT_PLN_ENABLE		(1 << 24)
--
--#define MSR_IA32_THERM_STATUS		0x0000019c
-+#define MSR_IA32_THERM_CONTROL			0x0000019a
-+#define THERM_ON_DEM_CLO_MOD_DUTY_CYC_MASK	GENMASK_ULL(3, 1)
-+#define THERM_ON_DEM_CLO_MOD_ENABLE		BIT_ULL(4)
- 
--#define THERM_STATUS_PROCHOT		(1 << 0)
--#define THERM_STATUS_POWER_LIMIT	(1 << 10)
-+#define MSR_IA32_THERM_INTERRUPT	0x0000019b
-+#define THERM_INT_HIGH_ENABLE		BIT_ULL(0)
-+#define THERM_INT_LOW_ENABLE		BIT_ULL(1)
-+#define THERM_INT_PROCHOT_ENABLE	BIT_ULL(2)
-+#define THERM_INT_FORCEPR_ENABLE	BIT_ULL(3)
-+#define THERM_INT_CRITICAL_TEM_ENABLE	BIT_ULL(4)
-+#define THERM_INT_PLN_ENABLE		BIT_ULL(24)
++#if defined(CONFIG_INTEL_HFI_THERMAL)
++int intel_hfi_max_instances(void);
++int intel_hfi_build_virt_features(struct hfi_features *features, unsigned int nr_classes,
++				  unsigned int nr_entries);
++int intel_hfi_build_virt_table(struct hfi_table *table, struct hfi_features *features,
++			       unsigned int nr_classes, unsigned int hfi_index,
++			       unsigned int cpu);
++static inline bool intel_hfi_enabled(void) { return intel_hfi_max_instances() > 0; }
++#else
++static inline int intel_hfi_max_instances(void) { return 0; }
++static inline int intel_hfi_build_virt_features(struct hfi_features *features,
++						unsigned int nr_classes,
++						unsigned int nr_entries) { return 0; }
++static inline int intel_hfi_build_virt_table(struct hfi_table *table,
++					     struct hfi_features *features,
++					     unsigned int nr_classes, unsigned int hfi_index,
++					     unsigned int cpu) { return 0; }
++static inline bool intel_hfi_enabled(void) { return false; }
++#endif
 +
-+#define MSR_IA32_THERM_STATUS			0x0000019c
-+#define THERM_STATUS_PROCHOT			BIT_ULL(0)
-+#define THERM_STATUS_PROCHOT_LOG		BIT_ULL(1)
-+#define THERM_STATUS_PROCHOT_FORCEPR_EVENT	BIT_ULL(2)
-+#define THERM_STATUS_PROCHOT_FORCEPR_LOG	BIT_ULL(3)
-+#define THERM_STATUS_CRITICAL_TEMP		BIT_ULL(4)
-+#define THERM_STATUS_CRITICAL_TEMP_LOG		BIT_ULL(5)
-+#define THERM_STATUS_POWER_LIMIT		BIT_ULL(10)
- 
- #define MSR_THERM2_CTL			0x0000019d
- 
-@@ -861,17 +870,24 @@
- #define ENERGY_PERF_BIAS_POWERSAVE		15
- 
- #define MSR_IA32_PACKAGE_THERM_STATUS		0x000001b1
--
--#define PACKAGE_THERM_STATUS_PROCHOT		(1 << 0)
--#define PACKAGE_THERM_STATUS_POWER_LIMIT	(1 << 10)
--#define PACKAGE_THERM_STATUS_HFI_UPDATED	(1 << 26)
-+#define PACKAGE_THERM_STATUS_PROCHOT		BIT_ULL(0)
-+#define PACKAGE_THERM_STATUS_PROCHOT_LOG	BIT_ULL(1)
-+#define PACKAGE_THERM_STATUS_PROCHOT_EVENT	BIT_ULL(2)
-+#define PACKAGE_THERM_STATUS_PROCHOT_EVENT_LOG	BIT_ULL(3)
-+#define PACKAGE_THERM_STATUS_CRITICAL_TEMP	BIT_ULL(4)
-+#define PACKAGE_THERM_STATUS_CRITICAL_TEMP_LOG	BIT_ULL(5)
-+#define PACKAGE_THERM_STATUS_POWER_LIMIT	BIT_ULL(10)
-+#define PACKAGE_THERM_STATUS_POWER_LIMIT_LOG	BIT_ULL(11)
-+#define PACKAGE_THERM_STATUS_DIG_READOUT_MASK	GENMASK_ULL(22, 16)
-+#define PACKAGE_THERM_STATUS_HFI_UPDATED	BIT_ULL(26)
- 
- #define MSR_IA32_PACKAGE_THERM_INTERRUPT	0x000001b2
--
--#define PACKAGE_THERM_INT_HIGH_ENABLE		(1 << 0)
--#define PACKAGE_THERM_INT_LOW_ENABLE		(1 << 1)
--#define PACKAGE_THERM_INT_PLN_ENABLE		(1 << 24)
--#define PACKAGE_THERM_INT_HFI_ENABLE		(1 << 25)
-+#define PACKAGE_THERM_INT_HIGH_ENABLE		BIT_ULL(0)
-+#define PACKAGE_THERM_INT_LOW_ENABLE		BIT_ULL(1)
-+#define PACKAGE_THERM_INT_PROCHOT_ENABLE	BIT_ULL(2)
-+#define PACKAGE_THERM_INT_OVERHEAT_ENABLE	BIT_ULL(4)
-+#define PACKAGE_THERM_INT_PLN_ENABLE		BIT_ULL(24)
-+#define PACKAGE_THERM_INT_HFI_ENABLE		BIT_ULL(25)
- 
- /* Thermal Thresholds Support */
- #define THERM_INT_THRESHOLD0_ENABLE    (1 << 15)
-diff --git a/drivers/thermal/intel/therm_throt.c b/drivers/thermal/intel/therm_throt.c
-index e69868e868eb..4c72fee32bf2 100644
---- a/drivers/thermal/intel/therm_throt.c
-+++ b/drivers/thermal/intel/therm_throt.c
-@@ -191,7 +191,6 @@ static const struct attribute_group thermal_attr_group = {
- #endif /* CONFIG_SYSFS */
- 
- #define THERM_THROT_POLL_INTERVAL	HZ
--#define THERM_STATUS_PROCHOT_LOG	BIT(1)
- 
- static u64 therm_intr_core_clear_mask;
- static u64 therm_intr_pkg_clear_mask;
+ #endif /* _ASM_X86_HFI_H */
+diff --git a/drivers/thermal/intel/intel_hfi.c b/drivers/thermal/intel/intel_hfi.c
+index b69fa234b317..139ce2d4b26b 100644
+--- a/drivers/thermal/intel/intel_hfi.c
++++ b/drivers/thermal/intel/intel_hfi.c
+@@ -29,6 +29,7 @@
+ #include <linux/io.h>
+ #include <linux/kernel.h>
+ #include <linux/math.h>
++#include <linux/mm.h>
+ #include <linux/mutex.h>
+ #include <linux/percpu-defs.h>
+ #include <linux/printk.h>
+@@ -642,3 +643,151 @@ void __init intel_hfi_init(void)
+ 	kfree(hfi_instances);
+ 	hfi_instances = NULL;
+ }
++
++/**
++ * intel_hfi_max_instances() - Get the maximum number of hfi instances.
++ *
++ * Return: the maximum number of hfi instances.
++ */
++int intel_hfi_max_instances(void)
++{
++	return max_hfi_instances;
++}
++EXPORT_SYMBOL_GPL(intel_hfi_max_instances);
++
++/**
++ * intel_hfi_build_virt_features() - Build a virtual hfi_features structure.
++ *
++ * @features:		Feature structure need to be filled
++ * @nr_classes:		Maximum number of classes supported. 1 class indicates
++ *			only HFI feature is configured and 4 classes indicates
++ *			both HFI and ITD features.
++ * @nr_entries:		Number of HFI entries in HFI table.
++ *
++ * Fill a virtual hfi_features structure which is used for HFI/ITD virtualization.
++ * HFI and ITD have different feature information, and the virtual feature
++ * structure is based on the corresponding configured number of classes (in Guest
++ * CPUID) to be built.
++ *
++ * Return: -EINVAL if there's the error for the parameters, otherwise 0.
++ */
++int intel_hfi_build_virt_features(struct hfi_features *features,
++				  unsigned int nr_classes,
++				  unsigned int nr_entries)
++{
++	unsigned int data_size;
++
++	if (!features || !nr_classes || !nr_entries)
++		return -EINVAL;
++
++	/*
++	 * The virtual feature must be based on the Host's feature; when Host
++	 * enables both HFI and ITD, it is allowed for Guest to create only the
++	 * HFI feature structure which has fewer classes than ITD.
++	 */
++	if (nr_classes > hfi_features.nr_classes)
++		return -EINVAL;
++
++	features->nr_classes = nr_classes;
++	features->class_stride = hfi_features.class_stride;
++	/*
++	 * For the meaning of these two calculations, please refer to the comments
++	 * in hfi_parse_features().
++	 */
++	features->hdr_size = DIV_ROUND_UP(features->class_stride *
++					  features->nr_classes, 8) * 8;
++	features->cpu_stride = DIV_ROUND_UP(features->class_stride *
++					    features->nr_classes, 8) * 8;
++
++	data_size = features->hdr_size + nr_entries * features->cpu_stride;
++	features->nr_table_pages = PAGE_ALIGN(data_size) >> PAGE_SHIFT;
++	return 0;
++}
++EXPORT_SYMBOL_GPL(intel_hfi_build_virt_features);
++
++/**
++ * intel_hfi_build_virt_table() - Fill the data of @hfi_index in virtual HFI table.
++ *
++ * @table:		HFI table to be filled
++ * @features:		Configured feature information of the HFI table
++ * @nr_classes:		Number of classes to be updated for @table. This field is
++ *			based on the enabled feature, which may be different with
++ *			the feature information configured in @features.
++ * @hfi_index:		Index of the HFI data in HFI table to be filled
++ * @cpu:		CPU whose real HFI data is used to fill the @hfi_index
++ *
++ * Fill the row data of hfi_index in a virtual HFI table which is used for HFI/ITD
++ * virtualization. The size of the virtual HFI table is decided by the configured
++ * feature information in @features, and the filled HFI data range is decided by
++ * specified number of classes @nr_classes.
++ *
++ * Virtual machine may disable ITD at runtime through MSR_IA32_HW_FEEDBACK_CONFIG,
++ * in this case, only 1 class data (class 0) can be dynamically updated in virtual
++ * HFI table (class 0).
++ *
++ * Return: 1 if the @table is changed, 0 if the @table isn't changed, and
++ * -EINVAL/-ENOMEM if there's the error for the parameters.
++ */
++int intel_hfi_build_virt_table(struct hfi_table *table,
++			       struct hfi_features *features,
++			       unsigned int nr_classes,
++			       unsigned int hfi_index,
++			       unsigned int cpu)
++{
++	struct hfi_instance *hfi_instance;
++	struct hfi_hdr *hfi_hdr = table->hdr;
++	s16 host_hfi_index;
++	void *src_ptr, *dst_ptr;
++	int table_changed = 0;
++
++	if (!table || !features || !nr_classes)
++		return -EINVAL;
++
++	if (nr_classes > features->nr_classes ||
++	    nr_classes > hfi_features.nr_classes)
++		return -EINVAL;
++
++	/*
++	 * Make sure that this raw that will be filled doesn't cause overflow.
++	 * features->nr_classes indicates the maximum number of possible
++	 * classes.
++	 */
++	if (features->hdr_size + (hfi_index + 1) * features->cpu_stride >
++	    features->nr_table_pages << PAGE_SHIFT)
++		return -ENOMEM;
++
++	if (cpu >= nr_cpu_ids)
++		return -EINVAL;
++
++	if (features->class_stride != hfi_features.class_stride)
++		return -EINVAL;
++
++	hfi_instance = per_cpu(hfi_cpu_info, cpu).hfi_instance;
++	host_hfi_index = per_cpu(hfi_cpu_info, cpu).index;
++
++	src_ptr = hfi_instance->local_table.data +
++		  host_hfi_index * hfi_features.cpu_stride;
++	dst_ptr = table->data + hfi_index * features->cpu_stride;
++
++	raw_spin_lock_irq(&hfi_instance->table_lock);
++	for (int i = 0; i < nr_classes; i++) {
++		struct hfi_cpu_data *src = src_ptr + i * hfi_features.class_stride;
++		struct hfi_cpu_data *dst = dst_ptr + i * features->class_stride;
++
++		if (dst->perf_cap != src->perf_cap) {
++			dst->perf_cap = src->perf_cap;
++			hfi_hdr->perf_updated = 1;
++		}
++		if (dst->ee_cap != src->ee_cap) {
++			dst->ee_cap = src->ee_cap;
++			hfi_hdr->ee_updated = 1;
++		}
++		if (hfi_hdr->perf_updated || hfi_hdr->ee_updated)
++			table_changed = 1;
++		hfi_hdr++;
++	}
++	raw_spin_unlock_irq(&hfi_instance->table_lock);
++
++	return table_changed;
++}
++EXPORT_SYMBOL_GPL(intel_hfi_build_virt_table);
 -- 
 2.34.1
 
