@@ -1,59 +1,59 @@
-Return-Path: <kvm+bounces-7917-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7918-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFD358484D6
-	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 10:07:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 540D48484D9
+	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 10:08:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 32BC21F2CA70
-	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 09:07:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 60B5EB2C1A1
+	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 09:08:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECDA363506;
-	Sat,  3 Feb 2024 09:01:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A484C657CA;
+	Sat,  3 Feb 2024 09:01:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YKfFuU/Y"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="b4SN3Uwf"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F5B6634F9;
-	Sat,  3 Feb 2024 09:01:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6276F64A8A;
+	Sat,  3 Feb 2024 09:01:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706950909; cv=none; b=pX1r2pyfdeG28eFYOEuJpLPD+lFfEqrUZfHd96RFqy0+Zud2M0Jp/3+szyo5y0M/Iz+ghLxGnzD6Rb33pht1jxF99eL/8uhtYOma7ESilaGuzE+awt5iMrV93+avUisBUWd17jfuwdGUKwskHV1FZGJEj1XpzFAmJrJI/20wKC8=
+	t=1706950914; cv=none; b=sqjqUygj4lTMP+PUMRBttjCLQu7AiJ94vCbtFL4mvniMmQrvhC2834emT5qUxPGbI5EBN3JQPu2bjoPmZQWAc61SfcSrYmrpgDDOI3Ho3DiFxD9xJ7VTURaMyg/E2LPSWM+CQRN+Ur4PqiF/7fRNNNQJgba5++9CucaJzFYs5H4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706950909; c=relaxed/simple;
-	bh=lSCiO+p9r/GjQUjj3pkuJGjUOV3DAnIfLLhwnD/+1iI=;
+	s=arc-20240116; t=1706950914; c=relaxed/simple;
+	bh=mfaQaAeHONDag9Knpv31L0HoH9EOtHuJiJGnjNwXfx8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=FngUg57vi5NDHpjD/iGFPTxBKzfeLTuWGgAT1EmrT62n2DU26yxVmri93E0LVu7FJj7LjafVruvIfsqx2CJxUIIABHbHgbXWnKVPhQaATY7ri95HlHVKAoJNKfR9oemd/fTOn+ahutUciggZLnbCUj6PvWwfcDN2O/vcMARhMjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YKfFuU/Y; arc=none smtp.client-ip=198.175.65.14
+	 MIME-Version; b=n9eJVKYgwksXLUdKqUjbasO/nA8lzuC201BdNMnHMqoV6LyDfH6HSjx7/u9RxFeqFLLoVygY0Ig0EkMZWL0OOxZpfWI/LVxpqp7WrGkUPDzq5EJJJbw8AzLwrG4/aCx3+ZLLP+h5Z7icVEMYD3okJRdoOTmrFrkG387vlIH3RCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=b4SN3Uwf; arc=none smtp.client-ip=198.175.65.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706950907; x=1738486907;
+  t=1706950914; x=1738486914;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=lSCiO+p9r/GjQUjj3pkuJGjUOV3DAnIfLLhwnD/+1iI=;
-  b=YKfFuU/Y0cuYxO2Kynb5wtEjNQ1Q+xXcv4+rnrk4lPgwKCQNrDd111Fr
-   Jx275Ga900i/5mI4HbWfSD+zy9b86Jl0Em9x4nv7vIyoQIcIsYkOaXReS
-   yGty4VwwMEvIRargPa+GDAaJiK/ixA8wFmXN2HPn2kaUFEIQi9TCjc5WD
-   iP6KhNPC3rbP6kmEwK++plqlBOWY5tSSLfrbF1djIIwG6bETRf9X22Wp5
-   6lyaBdsrTONFmB9Fw7S7WQRbYhqqO9jgu/KbFHJ+Js/a5cZWe1AYKNBEN
-   whS7nZ/gB7maItztlk/P6qfVd2jDBHTNN55aBLtt9ZnqeKjtMnCYSb29b
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="4132136"
+  bh=mfaQaAeHONDag9Knpv31L0HoH9EOtHuJiJGnjNwXfx8=;
+  b=b4SN3Uwfa9pyvX5CZskGA5dxNc9TUZ3xrckWhgZOrJNfasgsl3QSEmcJ
+   TFPK1IJRlrdxeQCgMcNY2fGq80/1mt19lO/484fsSmviQW4eoGdxTIqPz
+   6Zc+/OlRkHB/MdXg3mV2Z2UNwyT8Nyym5ziBXKEyE6Qr76J6FDvwQbCka
+   WKhcxpAXrxQ4ld0ZECHvL7Aqnsx7xhjERWab9heIQElDAYfe7N/VjFzg7
+   5ArBxvw3G/JtccnfYgcHyaEh4zuEJ+myJ97+a8DyHr+TeSOf99HlrAIp6
+   WgbEwohCFSYcg5NozVfWhFE/5ybAMJqinbDzvTX5D7g8Jq/pwhOTjiMSP
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="4132157"
 X-IronPort-AV: E=Sophos;i="6.05,240,1701158400"; 
-   d="scan'208";a="4132136"
+   d="scan'208";a="4132157"
 Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2024 01:01:47 -0800
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2024 01:01:52 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.05,240,1701158400"; 
-   d="scan'208";a="291543"
+   d="scan'208";a="291560"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
-  by fmviesa009.fm.intel.com with ESMTP; 03 Feb 2024 01:01:40 -0800
+  by fmviesa009.fm.intel.com with ESMTP; 03 Feb 2024 01:01:46 -0800
 From: Zhao Liu <zhao1.liu@linux.intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Sean Christopherson <seanjc@google.com>,
@@ -82,9 +82,9 @@ Cc: Ricardo Neri <ricardo.neri-calderon@linux.intel.com>,
 	David Dai <davidai@google.com>,
 	Saravana Kannan <saravanak@google.com>,
 	Zhao Liu <zhao1.liu@intel.com>
-Subject: [RFC 21/26] KVM: VMX: Extend HFI table and MSR emulation to support ITD
-Date: Sat,  3 Feb 2024 17:12:09 +0800
-Message-Id: <20240203091214.411862-22-zhao1.liu@linux.intel.com>
+Subject: [RFC 22/26] KVM: VMX: Pass through ITD classification related MSRs to Guest
+Date: Sat,  3 Feb 2024 17:12:10 +0800
+Message-Id: <20240203091214.411862-23-zhao1.liu@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240203091214.411862-1-zhao1.liu@linux.intel.com>
 References: <20240203091214.411862-1-zhao1.liu@linux.intel.com>
@@ -98,181 +98,151 @@ Content-Transfer-Encoding: 8bit
 
 From: Zhao Liu <zhao1.liu@intel.com>
 
-ITD (Intel Thread Director) is the extension of HFI feature. Based on
-HFI, it adds 4 classes in HFI table and it provides the MSR interface to
-support the OS to classify the currently running task into one of 4
-classes.
+ITD adds 2 new MSRs, MSR_IA32_HW_FEEDBACK_CHAR and
+MSR_IA32_HW_FEEDBACK_THREAD_CONFIG, to allow OS to classify the running
+task into one of four classes [1].
 
-As the first step of ITD support, extend the HFI table and related HFI
-MSRs' emulation to support the ITD:
+Pass through these 2 MSRs to Guest:
 
-* More classes in HFI table
+* MSR_IA32_HW_FEEDBACK_CHAR.
 
-If ITD is configured in Guest's CPUID, the virtual HFI table will be
-built with 4 classes.
+MSR_IA32_HW_FEEDBACK_CHAR is a thread scope MSR. It is used to specify
+the class for the currently running workload,
 
-But only when ITD is enabled in MSR_IA32_HW_FEEDBACK_CONFIG, the
-virtual HFI table will update all these 4 classes, otherwise it will
-only update class 0's data if HFI is enabled.
+* MSR_IA32_HW_FEEDBACK_THREAD_CONFIG.
 
-* MSR_IA32_HW_FEEDBACK_CONFIG (HW_FEEDBACK_CONFIG_ITD_ENABLE bit)
+MSR_IA32_HW_FEEDBACK_THREAD_CONFIG is also a thread scope MSR and is
+used to control the enablement of the classification function.
 
-With ITD support, MSR_IA32_HW_FEEDBACK_CONFIG has 2 feature enabling
-bits: HW_FEEDBACK_CONFIG_HFI_ENABLE and HW_FEEDBACK_CONFIG_ITD_ENABLE
-bit. These 2 bits control whether the HFI and ITD features are enabled
-or not, and also affect which class data should actually be updated in
-the virtual HFI table [1].
+[1]: SDM, vol. 3B, section 15.6.8 Logical Processor Scope Intel Thread
+     Director Configuration
 
-For the MSR_IA32_HW_FEEDBACK_CONFIG's emulation, add support for
-dynamically changing these two bits and the corresponding HFI update
-adjustments.
-
-[1]: SDM, vol. 3B, section 15.6.5 Hardware Feedback Interface
-     Configuration, Table 15-10. IA32_HW_FEEDBACK_CONFIG Control Option
-
+Suggested-by: Zhenyu Wang <zhenyu.z.wang@intel.com>
 Tested-by: Yanting Jiang <yanting.jiang@intel.com>
 Co-developed-by: Zhuocheng Ding <zhuocheng.ding@intel.com>
 Signed-off-by: Zhuocheng Ding <zhuocheng.ding@intel.com>
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 68 +++++++++++++++++++++++++++++++-----------
- arch/x86/kvm/vmx/vmx.h |  3 ++
- 2 files changed, 54 insertions(+), 17 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 37 +++++++++++++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/vmx.h |  8 +++++++-
+ 2 files changed, 44 insertions(+), 1 deletion(-)
 
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 636f2bd68546..bdff1d424b2f 100644
+index bdff1d424b2f..11d42e0a208b 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1547,11 +1547,11 @@ static int vmx_init_hfi_table(struct kvm *kvm)
- 	struct hfi_table *hfi_table = &kvm_vmx_hfi->hfi_table;
- 	int nr_classes, ret = 0;
+@@ -225,6 +225,8 @@ static u32 vmx_possible_passthrough_msrs[MAX_POSSIBLE_PASSTHROUGH_MSRS] = {
+ 	MSR_CORE_C3_RESIDENCY,
+ 	MSR_CORE_C6_RESIDENCY,
+ 	MSR_CORE_C7_RESIDENCY,
++	MSR_IA32_HW_FEEDBACK_THREAD_CONFIG,
++	MSR_IA32_HW_FEEDBACK_CHAR,
+ };
  
--	/*
--	 * Currently we haven't supported ITD. HFI is the default feature
--	 * with 1 class.
--	 */
--	nr_classes = 1;
-+	if (guest_cpuid_has(kvm_get_vcpu(kvm, 0), X86_FEATURE_ITD))
-+		nr_classes = 4;
-+	else
-+		nr_classes = 1;
-+
- 	ret = intel_hfi_build_virt_features(hfi_features,
- 					    nr_classes,
- 					    kvm->created_vcpus);
-@@ -1579,11 +1579,11 @@ static int vmx_build_hfi_table(struct kvm *kvm)
- 	struct kvm_vcpu *v;
- 	unsigned long i;
+ /*
+@@ -1288,6 +1290,30 @@ static void pt_guest_exit(struct vcpu_vmx *vmx)
+ 		wrmsrl(MSR_IA32_RTIT_CTL, vmx->pt_desc.host.ctl);
+ }
  
--	/*
--	 * Currently we haven't supported ITD. HFI is the default feature
--	 * with 1 class.
--	 */
--	nr_classes = 1;
-+	if (kvm_vmx_hfi->itd_enabled)
-+		nr_classes = kvm_vmx_hfi->hfi_features.nr_classes;
-+	else
-+		nr_classes = 1;
++static void itd_guest_enter(struct vcpu_vmx *vmx)
++{
++	struct vcpu_hfi_desc *vcpu_hfi = &vmx->vcpu_hfi_desc;
 +
- 	for (int j = 0; j < nr_classes; j++) {
- 		hfi_hdr->perf_updated = 0;
- 		hfi_hdr->ee_updated = 0;
-@@ -2575,7 +2575,7 @@ static int vmx_set_hfi_cfg_msr(struct kvm_vcpu *vcpu,
- 	struct kvm_vmx *kvm_vmx = to_kvm_vmx(vcpu->kvm);
- 	struct hfi_desc *kvm_vmx_hfi = &kvm_vmx->pkg_therm.hfi_desc;
- 	u64 data = msr_info->data;
--	bool hfi_enabled, hfi_changed;
-+	bool hfi_enabled, hfi_changed, itd_enabled, itd_changed;
++	if (!guest_cpuid_has(&vmx->vcpu, X86_FEATURE_ITD) ||
++	    !kvm_cpu_cap_has(X86_FEATURE_ITD))
++		return;
++
++	rdmsrl(MSR_IA32_HW_FEEDBACK_THREAD_CONFIG, vcpu_hfi->host_thread_cfg);
++	wrmsrl(MSR_IA32_HW_FEEDBACK_THREAD_CONFIG, vcpu_hfi->guest_thread_cfg);
++}
++
++static void itd_guest_exit(struct vcpu_vmx *vmx)
++{
++	struct vcpu_hfi_desc *vcpu_hfi = &vmx->vcpu_hfi_desc;
++
++	if (!guest_cpuid_has(&vmx->vcpu, X86_FEATURE_ITD) ||
++	    !kvm_cpu_cap_has(X86_FEATURE_ITD))
++		return;
++
++	rdmsrl(MSR_IA32_HW_FEEDBACK_THREAD_CONFIG, vcpu_hfi->guest_thread_cfg);
++	wrmsrl(MSR_IA32_HW_FEEDBACK_THREAD_CONFIG, vcpu_hfi->host_thread_cfg);
++}
++
+ void vmx_set_host_fs_gs(struct vmcs_host_state *host, u16 fs_sel, u16 gs_sel,
+ 			unsigned long fs_base, unsigned long gs_base)
+ {
+@@ -5485,6 +5511,8 @@ static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+ 	vmx->msr_ia32_therm_control = 0;
+ 	vmx->msr_ia32_therm_interrupt = 0;
+ 	vmx->msr_ia32_therm_status = 0;
++	vmx->vcpu_hfi_desc.host_thread_cfg = 0;
++	vmx->vcpu_hfi_desc.guest_thread_cfg = 0;
  
- 	/*
- 	 * When the HFI enable bit changes (either from 0 to 1 or 1 to
-@@ -2584,12 +2584,44 @@ static int vmx_set_hfi_cfg_msr(struct kvm_vcpu *vcpu,
- 	 */
- 	hfi_enabled = data & HW_FEEDBACK_CONFIG_HFI_ENABLE;
- 	hfi_changed = kvm_vmx_hfi->hfi_enabled != hfi_enabled;
-+	itd_enabled = data & HW_FEEDBACK_CONFIG_ITD_ENABLE;
-+	itd_changed = kvm_vmx_hfi->itd_enabled != itd_enabled;
+ 	vmx->hv_deadline_tsc = -1;
+ 	kvm_set_cr8(vcpu, 0);
+@@ -7977,6 +8005,7 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
+ 	kvm_load_guest_xsave_state(vcpu);
  
- 	kvm_vmx->pkg_therm.msr_ia32_hfi_cfg = data;
- 	kvm_vmx_hfi->hfi_enabled = hfi_enabled;
-+	kvm_vmx_hfi->itd_enabled = itd_enabled;
-+
-+	if (!hfi_changed && !itd_changed)
-+		return 0;
-+
-+	/*
-+	 * Refer to SDM, vol. 3B, Table 15-10. IA32_HW_FEEDBACK_CONFIG
-+	 * Control Option.
-+	 */
-+
-+	/* Invalid option; quietly ignored by the hardware. */
-+	if (!hfi_changed && itd_changed && !hfi_enabled && itd_enabled) {
-+		/* No action (no update in the table). */
-+		return 0;
-+	}
+ 	pt_guest_enter(vmx);
++	itd_guest_enter(vmx);
  
--	if (!hfi_changed)
-+	/* No action; keep HFI and Intel Thread Director disabled. */
-+	if (!hfi_changed && itd_changed && !hfi_enabled && !itd_enabled) {
-+		/* No action (no update in the table). */
- 		return 0;
-+	}
-+
-+	/* No action; keep HFI enabled. */
-+	if (!hfi_changed && itd_changed && hfi_enabled && !itd_enabled) {
-+		/* No action (no update in the table). */
-+		return 0;
+ 	atomic_switch_perf_msrs(vmx);
+ 	if (intel_pmu_lbr_is_enabled(vcpu))
+@@ -8015,6 +8044,7 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
+ 	loadsegment(es, __USER_DS);
+ #endif
+ 
++	itd_guest_exit(vmx);
+ 	pt_guest_exit(vmx);
+ 
+ 	kvm_load_host_xsave_state(vcpu);
+@@ -8475,6 +8505,13 @@ static void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+ 			vmx->hfi_table_idx = ((union cpuid6_edx)best->edx).split.index;
+ 	}
+ 
++	if (guest_cpuid_has(vcpu, X86_FEATURE_ITD) && kvm_cpu_cap_has(X86_FEATURE_ITD)) {
++		vmx_set_intercept_for_msr(vcpu, MSR_IA32_HW_FEEDBACK_THREAD_CONFIG,
++					  MSR_TYPE_RW, !guest_cpuid_has(vcpu, X86_FEATURE_ITD));
++		vmx_set_intercept_for_msr(vcpu, MSR_IA32_HW_FEEDBACK_CHAR,
++					  MSR_TYPE_RW, !guest_cpuid_has(vcpu, X86_FEATURE_ITD));
 +	}
 +
-+	/* Disable HFI and Intel Thread Director whether ITD changed. */
-+	if (hfi_changed && !hfi_enabled && itd_enabled) {
-+		kvm_vmx_hfi->hfi_enabled = false;
-+		kvm_vmx_hfi->itd_enabled = false;
-+	}
- 
- 	if (!hfi_enabled) {
- 		/*
-@@ -3006,12 +3038,14 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		if (!msr_info->host_initiated &&
- 		    !guest_cpuid_has(vcpu, X86_FEATURE_HFI))
- 			return 1;
--		/*
--		 * Unsupported and reserved bits. ITD is not supported
--		 * (CPUID.06H:EAX[19]) yet.
--		 */
-+		/* Unsupported bit: generate the exception. */
-+		if (!msr_info->host_initiated &&
-+		    !guest_cpuid_has(vcpu, X86_FEATURE_ITD) &&
-+		    (data & HW_FEEDBACK_CONFIG_ITD_ENABLE))
-+			return 1;
-+		/* Reserved bits: generate the exception. */
- 		if (!msr_info->host_initiated &&
--		    data & ~(HW_FEEDBACK_CONFIG_HFI_ENABLE))
-+		    data & ~(HW_FEEDBACK_CONFIG_HFI_ENABLE | HW_FEEDBACK_CONFIG_ITD_ENABLE))
- 			return 1;
- 
- 		mutex_lock(&kvm_vmx->pkg_therm.pkg_therm_lock);
+ 	/* Refresh #PF interception to account for MAXPHYADDR changes. */
+ 	vmx_update_exception_bitmap(vcpu);
+ }
 diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index d9db8bf3726f..0ef767d63def 100644
+index 0ef767d63def..3d3238dd8fc3 100644
 --- a/arch/x86/kvm/vmx/vmx.h
 +++ b/arch/x86/kvm/vmx/vmx.h
-@@ -377,6 +377,8 @@ struct vcpu_vmx {
-  * struct hfi_desc - Representation of an HFI instance (i.e., a table)
-  * @hfi_enabled:	Flag to indicate whether HFI is enabled at runtime.
-  *			Parsed from the Guest's MSR_IA32_HW_FEEDBACK_CONFIG.
-+ * @itd_enabled:	Flag to indicate whether ITD is enabled at runtime.
-+ *			Parsed from the Guest's MSR_IA32_HW_FEEDBACK_CONFIG.
-  * @hfi_int_enabled:	Flag to indicate whether HFI is enabled at runtime.
-  *			Parsed from Guest's MSR_IA32_PACKAGE_THERM_INTERRUPT[bit 25].
-  * @table_ptr_valid:	Flag to indicate whether the memory of Guest HFI table is ready.
-@@ -407,6 +409,7 @@ struct vcpu_vmx {
+@@ -71,6 +71,11 @@ struct pt_desc {
+ 	struct pt_ctx guest;
+ };
  
- struct hfi_desc {
- 	bool			hfi_enabled;
-+	bool			itd_enabled;
- 	bool			hfi_int_enabled;
- 	bool			table_ptr_valid;
- 	bool			hfi_update_status;
++struct vcpu_hfi_desc {
++	u64 host_thread_cfg;
++	u64 guest_thread_cfg;
++};
++
+ union vmx_exit_reason {
+ 	struct {
+ 		u32	basic			: 16;
+@@ -286,6 +291,7 @@ struct vcpu_vmx {
+ 	u64		      msr_ia32_therm_control;
+ 	u64		      msr_ia32_therm_interrupt;
+ 	u64		      msr_ia32_therm_status;
++	struct vcpu_hfi_desc  vcpu_hfi_desc;
+ 
+ 	/*
+ 	 * loaded_vmcs points to the VMCS currently used in this vcpu. For a
+@@ -366,7 +372,7 @@ struct vcpu_vmx {
+ 	int hfi_table_idx;
+ 
+ 	/* Save desired MSR intercept (read: pass-through) state */
+-#define MAX_POSSIBLE_PASSTHROUGH_MSRS	16
++#define MAX_POSSIBLE_PASSTHROUGH_MSRS	18
+ 	struct {
+ 		DECLARE_BITMAP(read, MAX_POSSIBLE_PASSTHROUGH_MSRS);
+ 		DECLARE_BITMAP(write, MAX_POSSIBLE_PASSTHROUGH_MSRS);
 -- 
 2.34.1
 
