@@ -1,230 +1,475 @@
-Return-Path: <kvm+bounces-7895-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7896-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8D94847DE5
-	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 01:35:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C27A848493
+	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 10:00:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FD3E292284
-	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 00:35:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A695288A3F
+	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 08:59:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEEB26FC3;
-	Sat,  3 Feb 2024 00:35:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F0AE5C91E;
+	Sat,  3 Feb 2024 08:59:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yuxm8q/g"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PfZ2yI6x"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EDB46FA7
-	for <kvm@vger.kernel.org>; Sat,  3 Feb 2024 00:35:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B32D55C8F8;
+	Sat,  3 Feb 2024 08:59:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706920523; cv=none; b=sMVQ1Jb/PPYpSMwJS3cvXvGHq2Onm23mYXrgFIA1Mos97eZ2KwJs6rIKS0caILYNcqm7vpA36GlqtZWOPy+63oaeeHfS9Gg/dcb2CjlEhOgwgSHLb/UWhJvtwrs4JPwivy89FSWXwNDaSe4y47LlptHGy67AE/+17v9zjJkqeXc=
+	t=1706950789; cv=none; b=TvHLXgCjY5RbOc9jTQHMbR22Voc9WRhhm8+Yo2KSlIVF91F+yA4amu3Ywq4Bo9e+K3OUgTpvTfV/fNThi1idpEi3knaNu8YKgRNz0qiY/8DuZCIpMFilOHV95cgakSi0Impsgu3dUXw0YdWrorTEnEg7i+aJ7LykmfmvXFXR5rY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706920523; c=relaxed/simple;
-	bh=+W0x0qmDTWJBFhcBNY7FAOGQpUdjN0SQbJHn4/GsvUM=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=BEW0mkJhJeII3YwosdHSAh8SLFWTNuMBU2EUVyY/Xk23hndt9tQulT7XzoGMYdNugark7fP7IYXFdBOZ0LmuVtctd94Ok/5J/y3TcqRt4Twzo1DNV1isJJn3qozQve0uch582Siua8oePpIZxZdFmKft9ZxxDMd9r2zX8eh26gY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yuxm8q/g; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-29608f00cbbso2542580a91.2
-        for <kvm@vger.kernel.org>; Fri, 02 Feb 2024 16:35:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706920521; x=1707525321; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=w8/W/QW1OnGWzQANjW/wBiiWNdyxuosNQc6VIGtK4Bs=;
-        b=yuxm8q/g7wRZaYvJ84zNlOADVgcgwiGoJHiirIKTuSbufO7jiTG680Gf6z+YHy4YSK
-         WZ8e/Us3lRnPdqOT1YEyclsLJtmJ7CjQIR14ZmGtQ6i9d745E1OrGxj5BXzbX+ARmiGe
-         n/iVcKddvlF/55gmQlkU9iJ6qDkkZf+OPbjmVM72hvGqcwppRCM+ohhJDr/frsG5Ox1D
-         YLnLXcY6OXok11Tc4KynmoJrlfYRaFgUFJqVtIw8Dns8ETUH55cHwRaA/QwT/bbL4b5Q
-         e/xpSxpU4n/bNAqnVKUaDdn2F943yczm72eBfmUi+tvBOxSVT0O9vRH7PsMnUcUdiLtq
-         TTXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706920521; x=1707525321;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=w8/W/QW1OnGWzQANjW/wBiiWNdyxuosNQc6VIGtK4Bs=;
-        b=rd/DLCXjiDkmWERXXMjsHcDk4zy+vDFh36FOfMF1lfxHzRixRQkN8XSp/2/4oShC+C
-         AnrKdxlRP3e2jHYeW3dh1xE6WzYhYNisFsLDUpznBtSNFgEXrlruWAJJBg6EDnwVHLfK
-         CXN03cCffQu730+ERo37+Hi+vpvEmIR9ypay4Sp32eMXHDnUbf16PfskXJmvmn95E5Bc
-         MI9+xQDlsAp9oVqzeU2HZCPRQ21AoCg74YfmZk4NP8ITlHcb671jFSBgLkax2WXxt433
-         6mRnUqzQQPw91YETngxfi9IoJe6fQidU/c6+jo3dvgnFcY3WvXhBcj/3SBPCdJSC0URm
-         1Wbg==
-X-Gm-Message-State: AOJu0YxN2Zn281a9GtYKcYDbkmP3BwPHCXasVuozg7SBFXAuZFHabrzb
-	idteKV4+0QOl+WWo0Tyf4KouDCLdbz377VlNc6l4q3b/cieuWCZT+QPE0zPDum2XK0BL/kpgYEd
-	JyQ==
-X-Google-Smtp-Source: AGHT+IGQ+vZkDSPZfozDOkYUmCM0pGO67d9wOLL8i5LulF6+4vDmWr6layMlPRZzcYK65MkYyIWpX1/esfg=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:5108:b0:296:5baa:63e with SMTP id
- sc8-20020a17090b510800b002965baa063emr75980pjb.8.1706920520809; Fri, 02 Feb
- 2024 16:35:20 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  2 Feb 2024 16:35:18 -0800
+	s=arc-20240116; t=1706950789; c=relaxed/simple;
+	bh=LKoakP2uOG96te4ZMtRc1jGGRSz2ihtD5kvp0w2TncE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YxL8v3jGYOi6q1pEpkNN1h0iPJ9rKHo5hg79KmA9k1VSHNpWrGdqJo6X1idXKx9uALjEBgouD14q25oHQwmjgcGd5VxqL+wDxnKcu2ROYgkvNmLyO0AReflVKIU1qtFayQd9EhQalcT8mE/mxhjpNs/teLPUVdE6b/4IBsgZVso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PfZ2yI6x; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706950787; x=1738486787;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=LKoakP2uOG96te4ZMtRc1jGGRSz2ihtD5kvp0w2TncE=;
+  b=PfZ2yI6xJ9Q/lKp0aBeAbSeKssOOeR1miVccAsAsJfRCOqeSWavXQ+zS
+   Oi0bZN+zcHgRU8g3Oax/wEIQ8HTyGf6dykvSqdollu49wZ6ymmZasySvV
+   l/EZ9ykHyLTLXHAsj4e4J8nbOWp6SViY/wtGJFGQ14c1DjUGfnxCehRgm
+   jd8Ec5/9lPIRQy5k8XGcW3XmEjeUULhzgbH2t7GQ43B6x3sJ6cMTMzG+s
+   hYL91BjS8xaGgeUUMwNZBrn3e8R5aojEHVkDsH7HuWcavmX4sKdldI8Au
+   0vMpprotlNeB14XpH6qY0lxfVoodnoFE809L2bblBc8va96QTCHve7hWl
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="4131842"
+X-IronPort-AV: E=Sophos;i="6.05,240,1701158400"; 
+   d="scan'208";a="4131842"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2024 00:59:46 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,240,1701158400"; 
+   d="scan'208";a="291124"
+Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
+  by fmviesa009.fm.intel.com with ESMTP; 03 Feb 2024 00:59:39 -0800
+From: Zhao Liu <zhao1.liu@linux.intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Daniel Lezcano <daniel.lezcano@linaro.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H . Peter Anvin" <hpa@zytor.com>,
+	kvm@vger.kernel.org,
+	linux-pm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	x86@kernel.org
+Cc: Ricardo Neri <ricardo.neri-calderon@linux.intel.com>,
+	Len Brown <len.brown@intel.com>,
+	Zhang Rui <rui.zhang@intel.com>,
+	Zhenyu Wang <zhenyu.z.wang@intel.com>,
+	Zhuocheng Ding <zhuocheng.ding@intel.com>,
+	Dapeng Mi <dapeng1.mi@intel.com>,
+	Yanting Jiang <yanting.jiang@intel.com>,
+	Yongwei Ma <yongwei.ma@intel.com>,
+	Vineeth Pillai <vineeth@bitbyteword.org>,
+	Suleiman Souhlal <suleiman@google.com>,
+	Masami Hiramatsu <mhiramat@google.com>,
+	David Dai <davidai@google.com>,
+	Saravana Kannan <saravanak@google.com>,
+	Zhao Liu <zhao1.liu@intel.com>
+Subject: [RFC 00/26] Intel Thread Director Virtualization
+Date: Sat,  3 Feb 2024 17:11:48 +0800
+Message-Id: <20240203091214.411862-1-zhao1.liu@linux.intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.43.0.594.gd9cf4e227d-goog
-Message-ID: <20240203003518.387220-1-seanjc@google.com>
-Subject: [PATCH v3] KVM: x86/mmu: Retry fault before acquiring mmu_lock if
- mapping is changing
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Yan Zhao <yan.y.zhao@intel.com>, Kai Huang <kai.huang@intel.com>, 
-	Yuan Yao <yuan.yao@linux.intel.com>, Xu Yilun <yilun.xu@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Retry page faults without acquiring mmu_lock if the resolved gfn is covered
-by an active invalidation.  Contending for mmu_lock is especially
-problematic on preemptible kernels as the mmu_notifier invalidation task
-will yield mmu_lock (see rwlock_needbreak()), delay the in-progress
-invalidation, and ultimately increase the latency of resolving the page
-fault.  And in the worst case scenario, yielding will be accompanied by a
-remote TLB flush, e.g. if the invalidation covers a large range of memory
-and vCPUs are accessing addresses that were already zapped.
+From: Zhao Liu <zhao1.liu@intel.com>
 
-Alternatively, the yielding issue could be mitigated by teaching KVM's MMU
-iterators to perform more work before yielding, but that wouldn't solve
-the lock contention and would negatively affect scenarios where a vCPU is
-trying to fault in an address that is NOT covered by the in-progress
-invalidation.
+Hi list,
 
-Add a dedicated lockess version of the range-based retry check to avoid
-false positives on the sanity check on start+end WARN, and so that it's
-super obvious that checking for a racing invalidation without holding
-mmu_lock is unsafe (though obviously useful).
+This is our RFC to virtualize Intel Thread Director (ITD) feature for
+Guest, which is based on Ricardo's patch series about ITD related
+support in HFI driver ("[PATCH 0/9] thermal: intel: hfi: Prework for the
+virtualization of HFI" [1]).
 
-Wrap mmu_invalidate_in_progress in READ_ONCE() to ensure that pre-checking
-invalidation in a loop won't put KVM into an infinite loop, e.g. due to
-caching the in-progress flag and never seeing it go to '0'.
+In short, the purpose of this patch set is to enable the ITD-based
+scheduling logic in Guest so that Guest can better schedule Guest tasks
+on Intel hybrid platforms.
 
-Force a load of mmu_invalidate_seq as well, even though it isn't strictly
-necessary to avoid an infinite loop, as doing so improves the probability
-that KVM will detect an invalidation that already completed before
-acquiring mmu_lock and bailing anyways.
+Currently, ITD is necessary for Windows VMs. Based on ITD virtualization
+support, the Windows 11 Guest could have significant performance
+improvement (for example, on i9-13900K, up to 14%+ improvement on
+3DMARK).
 
-Do the pre-check even for non-preemptible kernels, as waiting to detect
-the invalidation until mmu_lock is held guarantees the vCPU will observe
-the worst case latency in terms of handling the fault, and can generate
-even more mmu_lock contention.  E.g. the vCPU will acquire mmu_lock,
-detect retry, drop mmu_lock, re-enter the guest, retake the fault, and
-eventually re-acquire mmu_lock.  This behavior is also why there are no
-new starvation issues due to losing the fairness guarantees provided by
-rwlocks: if the vCPU needs to retry, it _must_ drop mmu_lock, i.e. waiting
-on mmu_lock doesn't guarantee forward progress in the face of _another_
-mmu_notifier invalidation event.
+Our ITD virtualization is not bound to VMs' hybrid topology or vCPUs'
+CPU affinity. However, in our practice, the ITD scheduling optimization
+for win11 VMs works best when combined with hybrid topology and CPU
+affinity (this is related to the specific implementation of Win11
+scheduling). For more details, please see the Section.1.2 "About hybrid
+topology and vCPU pinning".
 
-Note, adding READ_ONCE() isn't entirely free, e.g. on x86, the READ_ONCE()
-may generate a load into a register instead of doing a direct comparison
-(MOV+TEST+Jcc instead of CMP+Jcc), but practically speaking the added cost
-is a few bytes of code and maaaaybe a cycle or three.
+To enable ITD related scheduling optimization in Win11 VM, some other
+thermal related support is also needed (HWP, CPPC), but we could emulate
+it with dummy value in the VMM (We'll also be sending out extra patches
+in the future for these).
 
-Reported-by: Yan Zhao <yan.y.zhao@intel.com>
-Closes: https://lore.kernel.org/all/ZNnPF4W26ZbAyGto@yzhao56-desk.sh.intel.com
-Cc: Kai Huang <kai.huang@intel.com>
-Cc: Yan Zhao <yan.y.zhao@intel.com>
-Cc: Yuan Yao <yuan.yao@linux.intel.com>
-Cc: Xu Yilun <yilun.xu@linux.intel.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
+Welcome your feedback!
+
+
+1. Background and Motivation
+============================
+
+1.1. Background
+^^^^^^^^^^^^^^^
+
+We have the use case to run games in the client Windows VM as the cloud
+gaming solution.
+
+Gaming VMs are performance-sensitive VMs on Client, so that they usually
+have two characteristics to ensure interactivity and performance:
+
+i) There will be vCPUs equal to or close to the number of Host pCPUs.
+
+ii) The vCPUs of Gaming VM are often bound to the pCPUs to achieve
+exclusive resources and avoid the overhead of migration.
+
+In this case, Host can't provide effective scheduling for Guest, so we
+need to deliver more hardware-assisted scheduling capabilities to Guest
+to enhance Guest's scheduling.
+
+Windows 11 (and future Windows products) is heavily optimized for the
+Intel hybrid platform. To get the best performance, we need to
+virtualize hybrid scheduling features (HFI/ITD) for Windows Guest.
+
+
+1.2. About hybrid topology and vCPU pinning
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Our ITD virtualization can support most vCPU topologies (except multiple
+packages/dies, see details in 3.5 Restrictions on Guest Topology), and
+can also support the case of non-pinning vCPUs (i.e. it can handle vCPU
+thread migration).
+
+The following is our performance measuremnt on an i9-13900K machine
+(2995Mhz, 24Cores, 32Thread(8+16) RAM: 14GB (16GB Physical)), with
+iGPU passthrough, running 3DMARK in Win11 Professional Guest:
+
+
+compared with smp topo case       smp topo        smp topo        smp topo      hybrid topo       hybrid topo     hybrid topo     hybrid topo
+                                + affinity      + ITD           + ITD                           + affinity      + ITD           + ITD
+                                                                + affinity                                                      + affinity
+Time Spy - Overall                0.179%        -0.250%           0.179%        -0.107%           0.143%        -0.179%         -0.107%
+Graphics score                    0.124%        -0.249%           0.124%        -0.083%           0.124%        -0.166%         -0.249%
+CPU score                         0.916%        -0.485%           1.149%        -0.076%           0.722%        -0.324%         11.915%
+Fire Strike Extreme - Overall     0.149%         0.000%           0.224%        -1.021%          -3.361%        -1.319%         -3.361%
+Graphics score                    0.100%         0.050%           0.150%        -1.376%          -3.427%        -1.676%         -3.652%
+Physics score                     5.060%         0.759%           0.518%        -2.907%         -10.914%        -0.897%         14.638%
+Combined  score                   0.120%        -0.179%           0.418%         0.060%          -2.929%        -0.179%         -2.809%
+Fire Strike - Overall             0.350%        -0.085%           0.193%        -1.377%          -1.365%        -1.509%         -1.787%
+Graphics score                    0.256%        -0.047%           0.210%        -1.527%          -1.376%        -1.504%         -2.320%
+Physics score                     3.695%        -2.180%           0.629%        -1.581%          -6.846%        -1.444%         14.100%
+Combined  score                   0.415%        -0.128%           0.128%        -0.957%          -1.052%        -1.594%         -0.957%
+CPU Profile Max Threads           1.836%         0.298%           1.786%        -0.069%           1.545%         0.025%          9.472%
+16 Threads                        4.290%         0.989%           3.588%         0.595%           1.580%         0.848%         11.295%
+8 Threads                       -22.632%        -0.602%         -23.167%        -0.988%          -1.345%        -1.340%          8.648%
+4 Threads                       -21.598%         0.449%         -21.429%        -0.817%           1.951%        -0.832%          2.084%
+2 Threads                       -12.912%        -0.014%         -12.006%        -0.481%          -0.609%        -0.595%          1.161%
+1 Threads                        -3.793%        -0.137%          -3.793%        -0.495%          -3.189%        -0.495%          1.154%
+
+
+Based on the above result, we can find exposing only HFI/ITD to win11
+VMs without hybrid topology or CPU affinity (case "smp topo + ITD")
+won't hurt performance, but would also not get any performance
+improvement.
+
+Setting both hybrid topology and CPU affinity for ITD, then win11 VMs
+get significate performance improvement (up to 14%+, compared with the
+case setting smp topology without CPU affinity).
+
+Not only the numerical results of 3DMARK, but in practice, there is an
+significate improvement in the frame rate of the games.
+
+Also, the more powerful the machine, the more significate the
+performance gains!
+
+Therefore, the best practice for enabling ITD scheduling optimization
+is to set up both CPU affinity and hybrid topology for win11 Guest while
+enabling our ITD virtualization.
+
+Our earlier QEMU prototype RFC [2] presented the initial hybrid
+topology support for VMs. And currently our another proposal about
+"QOM topology" [3] has been raised in the QEMU community, which is the
+first step towards the hybrid topology implementation based on QOM
+approach.
+
+
+2. Introduction of HFI and ITD
+==============================
+
+Intel provides Hardware Feedback Interface (HFI) feature to allow
+hardware to provide guidance to the OS scheduler to perform optimal
+workload scheduling through a hardware feedback interface structure in
+memory [4]. This HFI structure is called HFI table.
+
+For now, the guidance includes performance and energy efficiency
+hints, and it could be update via thermal interrupt as the actual
+operating conditions of the processor change during run time.
+
+Intel Thread Director (ITD) feature extends the HFI to provide
+performance and energy efficiency data for advanced classes of
+instructions.
+
+Since ITD is an extension of HFI, our ITD virtualization also
+virtualizes the native HFI feature.
+
+
+3. Dependencies of ITD
+======================
+
+ITD is a thermal FEATURE that requires:
+* PTM (Package Thermal Management, alias, PTS)
+* HFI (Hardware Feedback Interface)
+
+In order to support the notification mechanism of ITD/HFI dynamic
+update, we also need to add thermal interrupt related support,
+including the following two features:
+* ACPI (Thermal Monitor and Software Controlled Clock Facilities)
+* TM (Thermal Monitor, alias, TM1/ACC)
+
+Therefore, we must also consider support for the emulation of all
+the above dependencies.
+
+
+3.1. ACPI emulation
+^^^^^^^^^^^^^^^^^^^
+
+For both ACPI, we can support it by emulating the RDMSR/WRMSR of the
+associated MSRs and adding the ability to inject thermal interrupts.
+But in fact, we don't really inject termal interrupts into Guest for
+the termal conditions corresponding to ACPI. Here the termal interrupt
+is prepared for the subsequent HFI/ITD.
+
+
+3.2. TM emulation
+^^^^^^^^^^^^^^^^^
+
+TM is a hardware feature and its CPUID bit only indicates the presence
+of the automatic thermal monitoring facilities. For TM, there's no
+interactive interface between OS and hardware, but its flag is one of
+the prerequisites for the OS to enable thermal interrupt.
+
+Thereby, as the support for TM, it is enough for us to expose its CPUID
+flag to Guest.
+
+
+3.3. PTM emulation
+^^^^^^^^^^^^^^^^^^
+
+PTM is a package-scope feature that includes package-level MSR and
+package-level thermal interrupt. Unfortunately, KVM currently only
+supports thread-scope MSR handling, and also doesn't care about the
+specific Guest's topology.
+
+But considering that our purpose of supporting PTM in KVM is to further
+support ITD, and the current platforms with ITD are all 1 package, so we
+emulate the MSRs of the package scope provided by PTM at the VM level.
+
+In this way, the VMM is required to set only one package topology for
+the PTM. In order to alleviate this limitation, we only expose the PTM
+feature bit to Guest when ITD needs to be supported.
+
+
+3.4. HFI emulation
+^^^^^^^^^^^^^^^^^^
+
+ITD is the extension of HFI, so both HFI and ITD depend on HFI table.
+HFI itself is used on the Host for power-related management control, so
+we should only expose HFI to Guest when we need to enable ITD.
+
+HFI also relies on PTM interrupt control, so it also has requirements
+for package topology, and we also emulate HFI (including ITD) at the VM
+level.
+
+In addition, because the HFI driver allocates HFI instances per die,
+this also affects HFI (and ITD) and must limit the Guest to only set one
+die.
+
+
+3.5. Restrictions on Guest Topology
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Due to KVM's incomplete support for MSR topology and the requirement for
+HFI instance management in the kernel, PTM, HFI, and ITD limit the
+topology of the Guest (mainly restricting the topology types created on
+the VMM side).
+
+Therefore, we only expose PTM, HFI, and ITD to userspace when we need to
+support ITD. At the same time, considering that currently, ITD is only
+used on the client platform with 1 package and 1 die, such temporary
+restrictions will not have too much impact.
+
+
+4. Overview of ITD (and HFI) virtualization
+===========================================
+
+The main tasks of ITD (including HFI) virtualization are:
+* maintain a virtual HFI table for VM.
+* inject thermal interrupt when HFI table updates.
+* handle related MSRs' emulation and adjust HFI table based on MSR's
+  control bits.
+* expose ITD/HFI configuration info in related CPUID leaves.
+
+The most important of these is the maintenance of the virtual HFI table.
+Although the HFI table should also be per package, since ITD/HFI related
+MSRs are treated as per VM in KVM, we also treat the virtual HFI table
+as per VM.
+
+
+4.1. HFI table building
+^^^^^^^^^^^^^^^^^^^^^^^
+
+HFI table contains a table header and many table entries. Each table
+entry is identified by an hfi table index, and each CPU corresponds to
+one of the hfi table indexes.
+
+ITD and HFI features both depend on the HFI table, but their HFI table
+are a little different. The HFI table provided by the ITD feature has
+more classes (in terms of more columns in the table) than the HFI table
+of native HFI feature.
+
+The virtual HFI table in KVM is built based on the actual HFI table,
+which is maintained by HFI instance in HFI driver. We extract the HFI
+data of the pCPUs, which vCPUs are running on, to form a virtual HFI
+table.
+
+
+4.2. HFI table index
+^^^^^^^^^^^^^^^^^^^^
+
+There are many entries in the HFI table, and the vCPU will be assigned
+an HFI table index to specify the entry it maps. KVM will fill the
+pCPU's HFI data (the pCPU that vCPU is running on) into the entry
+corresponding to the HFI table index of the vCPU in the vcitual HFI
+table.
+
+This index is set by VMM in CPUID.
+
+
+4.3. HFI table updating
+^^^^^^^^^^^^^^^^^^^^^^^
+
+On some platforms, the HFI table will be dynamically updated with
+thermal interrupts. In order to update the virtual HFI table in time, we
+added the per-VM notifier to the HFI driver to notify KVM to update the
+virtual HFI table for the VM, and then inject thermal interrupt into the
+VM to notify the Guest.
+
+There is another case that needs to update the virtual HFI table, that
+is, when the vCPU is migrated, the pCPU where it is located is changed,
+and the corresponding virtual HFI data should also be updated to the new
+pCPU's data. In this case, in order to reduce overhead, we can only
+update the data of a single vPCU without traversing the entire virtual
+HFI table.
+
+
+5. Patch Summary
+================
+
+Patch 01-03: Prepare the bit definition, the hfi helpers and hfi data
+             structures that KVM needs.
+Patch 04-05: Add the sched_out arch hook and reset the classification
+             history at sched_in()/schedu_out().
+Patch 06-10: Add emulations of ACPI, TM and PTM, mainly about CPUID and
+             related MSRs.
+Patch 11-20: Add the emulation support for HFI, including maintaining
+             the HFI table for VM.
+Patch 21-23: Add the emulation support for ITD, including extending HFI
+             to ITD and passing through the classification MSRs.
+Patch 24-25: Add HRESET emulation support, which is also used by IPC
+             classes feature.
+Patch 26:    Add the brief doc about the per-VM lock - pkg_therm_lock.
+
+
+6. References
+=============
+
+[1]: [PATCH 0/9] thermal: intel: hfi: Prework for the virtualization of HFI
+     https://lore.kernel.org/lkml/20240203040515.23947-1-ricardo.neri-calderon@linux.intel.com/
+[2]: [RFC 00/52] Introduce hybrid CPU topology,
+     https://lore.kernel.org/qemu-devel/20230213095035.158240-1-zhao1.liu@linux.intel.com/
+[3]: [RFC 00/41] qom-topo: Abstract Everything about CPU Topology,
+     https://lore.kernel.org/qemu-devel/20231130144203.2307629-1-zhao1.liu@linux.intel.com/
+[4]: SDM, vol. 3B, section 15.6 HARDWARE FEEDBACK INTERFACE AND INTEL
+     THREAD DIRECTOR
+
+
+Thanks and Best Regards,
+Zhao
 ---
+Zhao Liu (17):
+  thermal: Add bit definition for x86 thermal related MSRs
+  KVM: Add kvm_arch_sched_out() hook
+  KVM: x86: Reset hardware history at vCPU's sched_in/out
+  KVM: VMX: Add helpers to handle the writes to MSR's R/O and R/WC0 bits
+  KVM: x86: cpuid: Define CPUID 0x06.eax by kvm_cpu_cap_mask()
+  KVM: VMX: Introduce HFI description structure
+  KVM: VMX: Introduce HFI table index for vCPU
+  KVM: x86: Introduce the HFI dynamic update request and kvm_x86_ops
+  KVM: VMX: Allow to inject thermal interrupt without HFI update
+  KVM: VMX: Emulate HFI related bits in package thermal MSRs
+  KVM: VMX: Emulate the MSRs of HFI feature
+  KVM: x86: Expose HFI feature bit and HFI info in CPUID
+  KVM: VMX: Extend HFI table and MSR emulation to support ITD
+  KVM: VMX: Pass through ITD classification related MSRs to Guest
+  KVM: x86: Expose ITD feature bit and related info in CPUID
+  KVM: VMX: Emulate the MSR of HRESET feature
+  Documentation: KVM: Add description of pkg_therm_lock
 
-Kai and Yan, I dropped your reviews as this changed just enough to make me
-uncomfortable carrying reviews over from the previous version.
+Zhuocheng Ding (9):
+  thermal: intel: hfi: Add helpers to build HFI/ITD structures
+  thermal: intel: hfi: Add HFI notifier helpers to notify HFI update
+  KVM: VMX: Emulate ACPI (CPUID.0x01.edx[bit 22]) feature
+  KVM: x86: Expose TM/ACC (CPUID.0x01.edx[bit 29]) feature bit to VM
+  KVM: VMX: Emulate PTM/PTS (CPUID.0x06.eax[bit 6]) feature
+  KVM: VMX: Support virtual HFI table for VM
+  KVM: VMX: Sync update of Host HFI table to Guest
+  KVM: VMX: Update HFI table when vCPU migrates
+  KVM: x86: Expose HRESET feature's CPUID to Guest
 
-v3:
- - Release the pfn, i.e. put the struct page reference if one was held,
-   as the caller doesn't expect to get a reference on "failure". [Yuan]
- - Fix a typo in the comment.
+ Documentation/virt/kvm/locking.rst  |  13 +-
+ arch/arm64/include/asm/kvm_host.h   |   1 +
+ arch/mips/include/asm/kvm_host.h    |   1 +
+ arch/powerpc/include/asm/kvm_host.h |   1 +
+ arch/riscv/include/asm/kvm_host.h   |   1 +
+ arch/s390/include/asm/kvm_host.h    |   1 +
+ arch/x86/include/asm/hfi.h          |  28 ++
+ arch/x86/include/asm/kvm-x86-ops.h  |   3 +-
+ arch/x86/include/asm/kvm_host.h     |   2 +
+ arch/x86/include/asm/msr-index.h    |  54 +-
+ arch/x86/kvm/cpuid.c                | 201 +++++++-
+ arch/x86/kvm/irq.h                  |   1 +
+ arch/x86/kvm/lapic.c                |   9 +
+ arch/x86/kvm/svm/svm.c              |   8 +
+ arch/x86/kvm/vmx/vmx.c              | 751 +++++++++++++++++++++++++++-
+ arch/x86/kvm/vmx/vmx.h              |  79 ++-
+ arch/x86/kvm/x86.c                  |  18 +
+ drivers/thermal/intel/intel_hfi.c   | 212 +++++++-
+ drivers/thermal/intel/therm_throt.c |   1 -
+ include/linux/kvm_host.h            |   1 +
+ virt/kvm/kvm_main.c                 |   1 +
+ 21 files changed, 1343 insertions(+), 44 deletions(-)
 
-v2:
- - Introduce a dedicated helper and collapse to a single patch (because
-   adding an unused helper would be quite silly).
- - Add a comment to explain the "unsafe" check in kvm_faultin_pfn(). [Kai]
- - Add Kai's Ack.
-
-v1: https://lore.kernel.org/all/20230825020733.2849862-1-seanjc@google.com
-
- arch/x86/kvm/mmu/mmu.c   | 19 +++++++++++++++++++
- include/linux/kvm_host.h | 26 ++++++++++++++++++++++++++
- 2 files changed, 45 insertions(+)
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 3c193b096b45..8ce9898914f1 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4415,6 +4415,25 @@ static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
- 	if (unlikely(!fault->slot))
- 		return kvm_handle_noslot_fault(vcpu, fault, access);
- 
-+	/*
-+	 * Pre-check for a relevant mmu_notifier invalidation event prior to
-+	 * acquiring mmu_lock.  If there is an in-progress invalidation and the
-+	 * kernel allows preemption, the invalidation task may drop mmu_lock
-+	 * and yield in response to mmu_lock being contended, which is *very*
-+	 * counter-productive as this vCPU can't actually make forward progress
-+	 * until the invalidation completes.  This "unsafe" check can get false
-+	 * negatives, i.e. KVM needs to re-check after acquiring mmu_lock.
-+	 *
-+	 * Do the pre-check even for non-preemtible kernels, i.e. even if KVM
-+	 * will never yield mmu_lock in response to contention, as this vCPU is
-+	 * *guaranteed* to need to retry, i.e. waiting until mmu_lock is held
-+	 * to detect retry guarantees the worst case latency for the vCPU.
-+	 */
-+	if (mmu_invalidate_retry_gfn_unsafe(vcpu->kvm, fault->mmu_seq, fault->gfn)) {
-+		kvm_release_pfn_clean(fault->pfn);
-+		return RET_PF_RETRY;
-+	}
-+
- 	return RET_PF_CONTINUE;
- }
- 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 7e7fd25b09b3..179df96b20f8 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -2031,6 +2031,32 @@ static inline int mmu_invalidate_retry_gfn(struct kvm *kvm,
- 		return 1;
- 	return 0;
- }
-+
-+/*
-+ * This lockless version of the range-based retry check *must* be paired with a
-+ * call to the locked version after acquiring mmu_lock, i.e. this is safe to
-+ * use only as a pre-check to avoid contending mmu_lock.  This version *will*
-+ * get false negatives and false positives.
-+ */
-+static inline bool mmu_invalidate_retry_gfn_unsafe(struct kvm *kvm,
-+						   unsigned long mmu_seq,
-+						   gfn_t gfn)
-+{
-+	/*
-+	 * Use READ_ONCE() to ensure the in-progress flag and sequence counter
-+	 * are always read from memory, e.g. so that checking for retry in a
-+	 * loop won't result in an infinite retry loop.  Don't force loads for
-+	 * start+end, as the key to avoiding infinite retry loops is observing
-+	 * the 1=>0 transition of in-progress, i.e. getting false negatives
-+	 * due to stale start+end values is acceptable.
-+	 */
-+	if (unlikely(READ_ONCE(kvm->mmu_invalidate_in_progress)) &&
-+	    gfn >= kvm->mmu_invalidate_range_start &&
-+	    gfn < kvm->mmu_invalidate_range_end)
-+		return true;
-+
-+	return READ_ONCE(kvm->mmu_invalidate_seq) != mmu_seq;
-+}
- #endif
- 
- #ifdef CONFIG_HAVE_KVM_IRQ_ROUTING
-
-base-commit: 60eedcfceda9db46f1b333e5e1aa9359793f04fb
 -- 
-2.43.0.594.gd9cf4e227d-goog
+2.34.1
 
 
