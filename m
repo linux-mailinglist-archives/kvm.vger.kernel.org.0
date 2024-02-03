@@ -1,59 +1,59 @@
-Return-Path: <kvm+bounces-7901-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7902-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF0488484A3
-	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 10:01:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DEB68484A7
+	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 10:02:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7689828D1B1
-	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 09:01:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C00A71C2739E
+	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 09:02:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EE535D738;
-	Sat,  3 Feb 2024 09:00:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C83DA5E228;
+	Sat,  3 Feb 2024 09:00:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kJh6d7hv"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="B/cUFpCn"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2D7E5C61F;
-	Sat,  3 Feb 2024 09:00:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B60E5D727;
+	Sat,  3 Feb 2024 09:00:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706950829; cv=none; b=WV9LJdm+Byfpc7XIRQJjZle0XtYGTyrLvEvzAm37+dnSG4gU3NCuIxvcLTiwkktY9Vm/5bWe0Uc+gexQg7XEKgeiW3oGQk6PWWRpXJtPMNhyO8UfdRvIgrskdD/uEW+A1EGkSbd0LijAX29Xa9YRbJYPDlgz/EhLRyAtLxKZ7TU=
+	t=1706950831; cv=none; b=NcljuE+OQOS4RcWo1xnk02W6YTZk+wcx86QfLoWUTrKUCE/4vq7iJ0lFG1MQtRboBVygBT73e744gJFWrp8NvMSHPJEkEEYpEz9VzeYr4LyWQCBoF0yaS3vDDRZqKSgKGhIl5UflFqcbNhFlUo0a0Ct+B6TRJ8VHKb1X4JRmsA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706950829; c=relaxed/simple;
-	bh=SCjjaAWB7G5busdQtgw95kBzyDRKHqtVEz1Bv3Q2lXo=;
+	s=arc-20240116; t=1706950831; c=relaxed/simple;
+	bh=pRteXlHaQGDUTIvzskDwM7LxHqTRhHkoy/T6XfHmLLs=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qC0ybgDqc6+0ucFY0DJtTvRlLGxheCAbWlh10XWYUaYpJXIO1MoDeonMAADHCJexyjqLrAAhbypU/tDW/Q5q2yrLKJka7Prz6T+L3xvTOiqmWqGSZ04lT6ErQcAVH+qc9h5jBV0ZAq88h5wmUTqiNBp6snyn12ZWoxg0rhSxN1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kJh6d7hv; arc=none smtp.client-ip=198.175.65.14
+	 MIME-Version; b=BJq5WDJ2FJLWFCKXgenuy19hwYvIBG0gNYMOeXIk98zXHN9Ybzvv5vsvw0iTuTbBQaee+mtUWyHQpe3o5E59F6efdCJaIXXX0LRZvAQF4ewsWwNwuYVT9d5PPVcJL3v765YphShAmisI/Gz2mQ2w2Hg8B0et7uUFAjf49GM4MAk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=B/cUFpCn; arc=none smtp.client-ip=198.175.65.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706950828; x=1738486828;
+  t=1706950830; x=1738486830;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=SCjjaAWB7G5busdQtgw95kBzyDRKHqtVEz1Bv3Q2lXo=;
-  b=kJh6d7hv6OGZ80CVV+AFZZcrJ/XlBPL7M38Z1rj8bYO4bj5FRjjCQFRE
-   OPxmDuCxCDUt7/BWpaJt0NocHZ27wKTdXGfNZ/LPcBizK87UXkBKs52gy
-   MSG03aLL0plHfAvJF4KnEsEigtDB3WWmzKo0LDVsXpAL5qax2LdtV14JZ
-   vMSM/+zUsi3/sWoMaYeWuuiC2aHgLt2V+eoQxO8kDR8BBXT1hc9AiekQq
-   9E+PVq6Kp9XHNEAGjxI62QHedLrqv7fZffQXNCWyRN4kRAsm5mSSCbozD
-   bOSyTuyHf/0q5ItWyivr7hEPHfp6jy61sz+5bAWjhEUronu/v55NqnzDt
+  bh=pRteXlHaQGDUTIvzskDwM7LxHqTRhHkoy/T6XfHmLLs=;
+  b=B/cUFpCnkTRZEcGGLynukYXICSWwqFWvZWiU1YOz+glp5dNgH6fYYa4E
+   DQZReSydXutB2aYeQHRthyBWRU19HcKkXKZ7iDOO/j7QSy8A+ufebW+bl
+   jHkU9EL+GAabqylmb8RYE5pnaV7JoeaiCADRXbDjS5mRs01iL7GEk1juh
+   8CU43dWeksDTZSHUkaoL/+7v56omUS3WTvdsPpHu4iLUcn48uLfUJoauN
+   aHH8eIh9KpdYOt+EgIBnrL5HI6Ha2ortn3GFkeYQYDD213ViiXeuhaiSo
+   p+HxXBOGtTX6zwcz0QKg8LeCiXa8K+WaCUScfmCkYoW59Ksm0jwFhS3cv
    Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="4131903"
+X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="4131915"
 X-IronPort-AV: E=Sophos;i="6.05,240,1701158400"; 
-   d="scan'208";a="4131903"
+   d="scan'208";a="4131915"
 Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2024 01:00:15 -0800
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2024 01:00:21 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.05,240,1701158400"; 
-   d="scan'208";a="291244"
+   d="scan'208";a="291248"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
-  by fmviesa009.fm.intel.com with ESMTP; 03 Feb 2024 01:00:09 -0800
+  by fmviesa009.fm.intel.com with ESMTP; 03 Feb 2024 01:00:14 -0800
 From: Zhao Liu <zhao1.liu@linux.intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Sean Christopherson <seanjc@google.com>,
@@ -82,9 +82,9 @@ Cc: Ricardo Neri <ricardo.neri-calderon@linux.intel.com>,
 	David Dai <davidai@google.com>,
 	Saravana Kannan <saravanak@google.com>,
 	Zhao Liu <zhao1.liu@intel.com>
-Subject: [RFC 05/26] KVM: x86: Reset hardware history at vCPU's sched_in/out
-Date: Sat,  3 Feb 2024 17:11:53 +0800
-Message-Id: <20240203091214.411862-6-zhao1.liu@linux.intel.com>
+Subject: [RFC 06/26] KVM: VMX: Add helpers to handle the writes to MSR's R/O and R/WC0 bits
+Date: Sat,  3 Feb 2024 17:11:54 +0800
+Message-Id: <20240203091214.411862-7-zhao1.liu@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240203091214.411862-1-zhao1.liu@linux.intel.com>
 References: <20240203091214.411862-1-zhao1.liu@linux.intel.com>
@@ -98,62 +98,42 @@ Content-Transfer-Encoding: 8bit
 
 From: Zhao Liu <zhao1.liu@intel.com>
 
-Reset the classification history of the vCPU thread when it's scheduled
-in and scheduled out. Hardware will start the classification of the vCPU
-thread from scratch.
+For WRMSR emulation, any write to R/O bit and any nonzero write to R/WC0
+bit must be ignored.
 
-This helps protect Host/VM history information from leaking Host history
-to VMs or leaking VM history to sibling VMs.
+Provide 2 helpers to emulate the above R/O and R/WC0 write behavior.
 
 Tested-by: Yanting Jiang <yanting.jiang@intel.com>
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
- arch/x86/include/asm/kvm_host.h | 2 --
- arch/x86/kvm/x86.c              | 8 ++++++++
- 2 files changed, 8 insertions(+), 2 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 2be78549bec8..b5b2d0fde579 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -2280,8 +2280,6 @@ static inline int kvm_cpu_get_apicid(int mps_cpu)
- 
- int memslot_rmap_alloc(struct kvm_memory_slot *slot, unsigned long npages);
- 
--static inline void kvm_arch_sched_out(struct kvm_vcpu *vcpu) {}
--
- #define KVM_CLOCK_VALID_FLAGS						\
- 	(KVM_CLOCK_TSC_STABLE | KVM_CLOCK_REALTIME | KVM_CLOCK_HOST_TSC)
- 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 363b1c080205..cd9a7251c768 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -79,6 +79,7 @@
- #include <asm/div64.h>
- #include <asm/irq_remapping.h>
- #include <asm/mshyperv.h>
-+#include <asm/hreset.h>
- #include <asm/hypervisor.h>
- #include <asm/tlbflush.h>
- #include <asm/intel_pt.h>
-@@ -12491,9 +12492,16 @@ void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu)
- 		pmu->need_cleanup = true;
- 		kvm_make_request(KVM_REQ_PMU, vcpu);
- 	}
-+
-+	reset_hardware_history();
- 	static_call(kvm_x86_sched_in)(vcpu, cpu);
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index e262bc2ba4e5..8f5981635fe5 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -2147,6 +2147,20 @@ static u64 vmx_get_supported_debugctl(struct kvm_vcpu *vcpu, bool host_initiated
+ 	return debugctl;
  }
  
-+void kvm_arch_sched_out(struct kvm_vcpu *vcpu)
++/* Ignore writes to R/O bits. */
++static inline u64 vmx_set_msr_ro_bits(u64 new_val, u64 old_val, u64 ro_mask)
 +{
-+	reset_hardware_history();
++	return (new_val & ~ro_mask) | (old_val & ro_mask);
 +}
 +
- void kvm_arch_free_vm(struct kvm *kvm)
- {
- #if IS_ENABLED(CONFIG_HYPERV)
++/* Ignore non-zero writes to R/WC0 bits. */
++static inline u64 vmx_set_msr_rwc0_bits(u64 new_val, u64 old_val, u64 rwc0_mask)
++{
++	u64 new_rwc0 = new_val & rwc0_mask, old_rwc0 = old_val & rwc0_mask;
++
++	return ((new_rwc0 | ~old_rwc0) & old_rwc0) | (new_val & ~rwc0_mask);
++}
++
+ /*
+  * Writes msr value into the appropriate "register".
+  * Returns 0 on success, non-0 otherwise.
 -- 
 2.34.1
 
