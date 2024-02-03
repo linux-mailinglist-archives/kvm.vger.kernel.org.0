@@ -1,75 +1,71 @@
-Return-Path: <kvm+bounces-7929-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7930-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 198078484F3
-	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 10:18:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00F728484FB
+	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 10:24:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4CA3E1C21B46
-	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 09:18:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D53C1F2A45D
+	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 09:24:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DC4B5D720;
-	Sat,  3 Feb 2024 09:17:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 034655D724;
+	Sat,  3 Feb 2024 09:24:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ewZUn2ec"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I5Xc1opG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D25AE5CDD0
-	for <kvm@vger.kernel.org>; Sat,  3 Feb 2024 09:17:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9753B5D479
+	for <kvm@vger.kernel.org>; Sat,  3 Feb 2024 09:24:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706951869; cv=none; b=pQV0zTJ3DlRtYQw45547qN9e4hpPJ43gh0+zYI2UhU4RwRiM39ydY+sjriWqCVVk9uTSobuaF1YzlceY20uzGTDc5d4tHXs+bj9OhTSDkcm0yYMVEHcy1Az1PnqdUIi3I0xJvTfxOlTcwxnM+j1Z/ALE6EiuNGf3CikVrDBFgr8=
+	t=1706952258; cv=none; b=JEIEn4Ar4ea04oByr5c6ueltBqIjq/bvmNPpJH2BIi0cR05SMr3CL8Qa1b9JJ4aFPvMNf4AmR1MvcH9EFQPf+w1GNgzEpYE5+rJdBG+q1f0X+fE5we0Mc6zAL2wlquHhlGCpANHFI6cAdqYRoFNY7sg7Z802RLvFC6POfEi6kiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706951869; c=relaxed/simple;
-	bh=868VAJN89eGkinOq4EOD+Tl9/QzBYeTq2J6+WiPTTIA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Th9vTYeEizqaFekaIiAduxxT7+zMD3YdcXGK/pF0L9ZAlp1YOVrZVLIAUIBt2dtXKmfw/qbPUqq4gziVNHLFd7xlT9QO5DkrtB1ZeMYcxOJ7ThqHxFDHfCZyUg8GpztaIwrOu5xWd1MbZLk6jvcGAQkKWHWGlv8JRmQDBYYbt9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ewZUn2ec; arc=none smtp.client-ip=198.175.65.20
+	s=arc-20240116; t=1706952258; c=relaxed/simple;
+	bh=kw3OOTRz9AfhneBs+qlsMv0+ql7UK40PdaE6fG3rIDE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HqrtpQZCgIesjii+j82VJTVGt+1EPtV6z+qi9TWA8MEP1lxYwziI95FePdj8Eu37uPgrZWNQ1JN07BsYcsp5K/ETuVvE2d+g3XYc1ITNHTxkpiXkko8fwvOmM4+Ut71DmxaETKGeCf7qg6XzptIxVczkz0jfU9LkA8gOG98vKEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I5Xc1opG; arc=none smtp.client-ip=192.198.163.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706951868; x=1738487868;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=868VAJN89eGkinOq4EOD+Tl9/QzBYeTq2J6+WiPTTIA=;
-  b=ewZUn2ecv7ST4Hmft7az1vOn0kxf/DA8ykc5+ix1ZMOW6lbPCJJ2toNJ
-   EkSD1+xfGwEhb00cmh4MERnzme0KUQSHf0J6xAfQRArpaVv8BBno0rZcv
-   OYFNKMSv6t28ca0wiTd6MurOZql94vUIBPgXCtRpBpHt40FvVvoEMT2z3
-   zxPHCWOScA0xNdQHc/abMwgTR4fBANDimWFQ1P5nXpcPDE7muR1pm9x5t
-   +Q+UuUSfpcFWjHxdsB6XLlQImKQ9tcyBuKn0jRE5tCGEOFTF0qCowh52l
-   3Jv1w2KTief5KbKTnlruBpB+qMLC6Zll4kU5UYsrxOlHPmCxohPePYcEk
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="216392"
+  t=1706952257; x=1738488257;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=kw3OOTRz9AfhneBs+qlsMv0+ql7UK40PdaE6fG3rIDE=;
+  b=I5Xc1opGvHi8aHANUR5mvPSa5Hyj7LjFDPoXa9C6ftYbBWz/b2xE2fnc
+   Op8+K5DaPeNSamANcKawnTdUF50dhGEzc37jUZkqqrp3IRM1aroHjJj88
+   zf4HApSkHgdrt1idN0yoPODib96jnlIhAlx0OeK5uhyNKy6RrOK8a0RSO
+   xzazcdfa+sJUe8fjo40szLYk6NTv/hTxUOmp2ACeO+6E5hVDpzcyTRA4H
+   7AWgZyt05UWk7OXy2w7kSwrVZYocrwyqbpEdjisDeGuhMTJGnAjj0h8nD
+   edS9SVa4r/Od5qbyiO8oocvYD8yK3sGZ4BbZttXsMuzhsYmTYWfij+Nfg
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="209288"
 X-IronPort-AV: E=Sophos;i="6.05,240,1701158400"; 
-   d="scan'208";a="216392"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2024 01:17:41 -0800
+   d="scan'208";a="209288"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2024 01:24:16 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.05,240,1701158400"; 
-   d="scan'208";a="31379033"
-Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
-  by fmviesa001.fm.intel.com with ESMTP; 03 Feb 2024 01:17:38 -0800
+   d="scan'208";a="4913836"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
+  by fmviesa004.fm.intel.com with ESMTP; 03 Feb 2024 01:24:13 -0800
+Date: Sat, 3 Feb 2024 17:37:45 +0800
 From: Zhao Liu <zhao1.liu@linux.intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	qemu-devel@nongnu.org,
+	Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
 	kvm@vger.kernel.org
 Cc: Zhenyu Wang <zhenyu.z.wang@intel.com>,
 	Zhuocheng Ding <zhuocheng.ding@intel.com>,
 	Dapeng Mi <dapeng1.mi@intel.com>,
 	Yanting Jiang <yanting.jiang@intel.com>,
-	Yongwei Ma <yongwei.ma@intel.com>,
-	Zhao Liu <zhao1.liu@intel.com>
-Subject: [RFC 6/6] i386: Add a new property to set ITD related feature bits for Guest
-Date: Sat,  3 Feb 2024 17:30:54 +0800
-Message-Id: <20240203093054.412135-7-zhao1.liu@linux.intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240203093054.412135-1-zhao1.liu@linux.intel.com>
+	Yongwei Ma <yongwei.ma@intel.com>, Zhao Liu <zhao1.liu@intel.com>
+Subject: Re: [RFC 0/6] Intel Thread Director Virtualization Support in QEMU
+Message-ID: <Zb4JaZ+aNzsSsTp2@intel.com>
 References: <20240203093054.412135-1-zhao1.liu@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -77,100 +73,173 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240203093054.412135-1-zhao1.liu@linux.intel.com>
 
-From: Zhao Liu <zhao1.liu@intel.com>
+On Sat, Feb 03, 2024 at 05:30:48PM +0800, Zhao Liu wrote:
+> Date: Sat, 3 Feb 2024 17:30:48 +0800
+> From: Zhao Liu <zhao1.liu@linux.intel.com>
+> Subject: [RFC 0/6] Intel Thread Director Virtualization Support in QEMU
+> X-Mailer: git-send-email 2.34.1
+> 
+> From: Zhao Liu <zhao1.liu@intel.com>
+> 
+> Hi list,
+> 
+> This is our refreshed RFC to support our ITD virtualization patch
+> series [1] in KVM, and bases on bd2e12310b18 ("Merge tag
+> 'qga-pull-2024-01-30' of https://github.com/kostyanf14/qemu into
+> staging").
+> 
+> ITD is Intel's client specific feature to optimize scheduling on Intel
+> hybrid platforms. Though this feature depends on hybrid topology
 
-The property enable-itd will be used to set ITD related feature bits
-for Guest, which includes PTS, HFI, ITD and HRESET.
+s/depends/doesn't depend/
 
-Now PTS, HFI, ITD and HRESET are marked as no_autoenable_flags, since
-PTS, HFI and ITD have additional restrictions on CPU topology, and
-HRESET is only used in ITD case. If user wants to enable ITD for Guest,
-he need to specify PTS, HFI, ITD and HRESET explicitly in the -cpu
-command.
+Regards,
+Zhao
 
-Thus it's necessary to introduce "-cpu enable-itd" to help set these
-feature bits.
-
-Tested-by: Yanting Jiang <yanting.jiang@intel.com>
-Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
----
- target/i386/cpu.c | 20 +++++++++++++++-----
- target/i386/cpu.h |  3 +++
- 2 files changed, 18 insertions(+), 5 deletions(-)
-
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 3b26b471b861..070f7ff43a1b 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -7304,6 +7304,12 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
-      */
-     x86_cpu_hyperv_realize(cpu);
- 
-+    if (cpu->enable_itd) {
-+        env->features[FEAT_6_EAX] |= CPUID_6_EAX_PTS | CPUID_6_EAX_HFI |
-+                                     CPUID_6_EAX_ITD;
-+        env->features[FEAT_7_1_EAX] |= CPUID_7_1_EAX_HRESET;
-+    }
-+
-     x86_cpu_expand_features(cpu, &local_err);
-     if (local_err) {
-         goto out;
-@@ -7494,22 +7500,25 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
- 
-     if (env->features[FEAT_6_EAX] & CPUID_6_EAX_PTS && ms->smp.sockets > 1) {
-         error_setg(errp,
--                   "PTS currently only supports 1 package, "
--                   "please set by \"-smp ...,sockets=1\"");
-+                   "%s currently only supports 1 package, "
-+                   "please set by \"-smp ...,sockets=1\"",
-+                   cpu->enable_itd ? "enable-itd" : "PTS");
-         return;
-     }
- 
-     if (env->features[FEAT_6_EAX] & (CPUID_6_EAX_HFI | CPUID_6_EAX_ITD) &&
-         (ms->smp.dies > 1 || ms->smp.sockets > 1)) {
-         error_setg(errp,
--                   "HFI/ITD currently only supports die/package, "
--                   "please set by \"-smp ...,sockets=1,dies=1\"");
-+                   "%s currently only supports 1 die/package, "
-+                   "please set by \"-smp ...,sockets=1,dies=1\"",
-+                   cpu->enable_itd ? "enable-itd" : "HFI/ITD");
-         return;
-     }
- 
-     if (env->features[FEAT_6_EAX] & (CPUID_6_EAX_PTS | CPUID_6_EAX_HFI) &&
-         !(env->features[FEAT_6_EAX] & CPUID_6_EAX_ITD)) {
--        error_setg(errp,
-+        error_setg(errp, "%s", cpu->enable_itd ?
-+                   "Host doesn't support ITD" :
-                    "In the absence of ITD, Guest does "
-                    "not need PTS/HFI");
-         return;
-@@ -8003,6 +8012,7 @@ static Property x86_cpu_properties[] = {
-                      false),
-     DEFINE_PROP_BOOL("x-intel-pt-auto-level", X86CPU, intel_pt_auto_level,
-                      true),
-+    DEFINE_PROP_BOOL("enable-itd", X86CPU, enable_itd, false),
-     DEFINE_PROP_END_OF_LIST()
- };
- 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index a68c9d8a8660..009ec66dead0 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -2071,6 +2071,9 @@ struct ArchCPU {
-     int32_t hv_max_vps;
- 
-     bool xen_vapic;
-+
-+    /* Set ITD and related feature bits (PTS, HFI and HRESET) for Guest. */
-+    bool enable_itd;
- };
- 
- typedef struct X86CPUModel X86CPUModel;
--- 
-2.34.1
-
+> details, in our parctice on Win11 Guest, ITD works with hyrbid topolohy
+> and CPU affinity can achieve the most performance improvement in Win11
+> Guest (for example, on i9-13900K, up to 14%+ improvement on
+> 3DMARK). More data or details, can be found in [1]. Thus, the ITD for
+> Win11 is also a typical use case of hybrid topology.
+> 
+> 
+> Welcome your feedback!
+> 
+> 
+> 1. Background and Motivation
+> ============================
+> 
+> ITD allows the hardware to provide scheduling hints to the OS to help
+> optimize scheduling performance, and under the Intel hybrid
+> architecture, since Core and Atom have different capabilities
+> (performance, energy effency, etc.),  scheduling based on hardware
+> hints can take full advantage of this hybrid architecture. This is also
+> the most ideal scheduling model for intel hybrid architecture.
+> 
+> Therefore, we want to virtualize the ITD feature so that ITD can benefit
+> performance of the virtual machines on the hybrid machines as well.
+> 
+> Currently, our ITD virtualization is a software virtualization solution.
+> 
+> 
+> 2. Introduction to HFI and ITD
+> ==============================
+> 
+> Intel provides Hardware Feedback Interface (HFI) feature to allow
+> hardware to provide guidance to the OS scheduler to perform optimal
+> workload scheduling through a hardware feedback interface structure in
+> memory [2]. This hfi structure is called HFI table.
+> 
+> As for now, the guidance includes performance and energy enficency hints,
+> and it could update via thermal interrupt as the actual operating
+> conditions of the processor change during run time.
+> 
+> And Intel Thread Director (ITD) feature extends the HFI to provide
+> performance and energy efficiency data for advanced classes of
+> instructions.
+> 
+> The virtual HFI table is maintained in KVM, and for QEMU, we just need
+> to handle HFI/ITD/HRESET (and their dependent features: ACPI, TM and
+> PTS) related CPUIDs and MSRs.
+> 
+> 
+> 3. Package level MSRs handling
+> ==============================
+> 
+> PTS, HFI and ITD are all have package level features, such as package
+> level MSRs and package level HFI tables. But since KVM hasn't
+> support msr-topology and it just handle these package-level MSRs and
+> HFI table at VM level, in order to avoid potential contention problems
+> caused by multiple virtual-packages, we restrict VMs to be able to
+> enable PTC/HFI/ITD iff there's only 1 package (and only 1 die for
+> ITD/HFI).
+> 
+> 
+> 4. HFI/ITD related info in CPUID
+> ================================
+> 
+> KVM provides some basic HFI info in CPUID.0x06 leaf, which is associated
+> with the virtual HFI table in KVM.
+> 
+> QEMU should configure HFI table index for each vCPU. Here we set the HFI
+> table index to vCPU index so that different vCPUs have different HFI
+> entries to avoid unnecessary competition problems.
+> 
+> 
+> 5. Compatibility issues
+> =======================
+> 
+> HFI is supported in both server (SPR) and client (ADL/RPL/MTL) platform
+> products while ITD is the client specific feature.
+> 
+> For client platform, ITD (with HFI) could be enabled in Guest to improve
+> scheduling, but for server platform, HFI (without ITD) is only useful
+> on Host and Guest doesn't need it.
+> 
+> To simplify the enabling logic and avoid impacting the common topology
+> of the Guest, we set PTS, HFI, and ITD as feature bits that are not
+> automatically enabled.
+> 
+> Only when the user actively specifies these features, QEMU will check
+> and decide whether to enable them based on the topology constraints and
+> the ITD constraints.
+> 
+> 
+> 6. New option "enable-itd"
+> ============================
+> 
+> ITD-related features include PTS, HFI, ITD, and HRESET.
+> 
+> To make it easier for users to enable ITD for Guest without specifying
+> the above feature bits one by one, we provide a new option "enable-itd"
+> to set the above feature bits for Guest all at once.
+> 
+> "enable-itd" does not guarantee that ITD will be enabled for Guest.
+> The success of enabling ITD for guest depends on topology constraints,
+> platform support, etc., which are checked in QEMU.
+> 
+> 
+> 7. Patch Summary
+> ================
+> 
+> Patch 1: Add support save/load for ACPI feature related thermal MSRs
+>          since ACPI feature CPUID has been added in QEMU.
+> Patch 2: Add support for PTS (package) thermal MSRs and its CPUID
+> Patch 3: Add support for HFI MSRs and its CPUID
+> Patch 4: Add support ITD CPUID and MSR_IA32_HW_FEEDBACK_THREAD_CONFIG.
+> Patch 5: Add support HRESET CPUID and MSR_IA32_HW_HRESET_ENABLE.
+> Patch 6: Add "enable-itd" to help user set ITD related feature bits.
+> 
+> # 8. References
+> 
+> [1]: KVM RFC: [RFC 00/26] Intel Thread Director Virtualization
+>      https://lore.kernel.org/kvm/20240203091214.411862-1-zhao1.liu@linux.intel.com/T/#t
+> [2]: SDM, vol. 3B, section 15.6 HARDWARE FEEDBACK INTERFACE AND INTEL
+>      THREAD DIRECTOR
+> 
+> Thanks and Best Regards,
+> Zhao
+> ---
+> Zhao Liu (2):
+>   target/i386: Add support for Intel Thread Director feature
+>   i386: Add a new property to set ITD related feature bits for Guest
+> 
+> Zhuocheng Ding (4):
+>   target/i386: Add support for save/load of ACPI thermal MSRs
+>   target/i386: Add support for Package Thermal Management feature
+>   target/i386: Add support for Hardware Feedback Interface feature
+>   target/i386: Add support for HRESET feature
+> 
+>  target/i386/cpu.c     | 108 ++++++++++++++++++++++++++++++++++++++++--
+>  target/i386/cpu.h     |  37 +++++++++++++++
+>  target/i386/kvm/kvm.c |  84 ++++++++++++++++++++++++++++++++
+>  3 files changed, 225 insertions(+), 4 deletions(-)
+> 
+> -- 
+> 2.34.1
+> 
 
