@@ -1,59 +1,59 @@
-Return-Path: <kvm+bounces-7907-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7908-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84CBD8484B7
-	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 10:03:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C84A8484B9
+	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 10:04:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3AEA928F3F6
-	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 09:03:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE4451C27F0A
+	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 09:04:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBB675FB9A;
-	Sat,  3 Feb 2024 09:00:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C3835FDA1;
+	Sat,  3 Feb 2024 09:00:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lv0ZZ78y"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="B+ztlGDJ"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 761195FB83;
-	Sat,  3 Feb 2024 09:00:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 357335FB83;
+	Sat,  3 Feb 2024 09:00:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706950851; cv=none; b=fHeZwbKTNjarx3IS7Q92Jc/QS/tfcmvw7IufGPcZseUYfbXuPtmFIi+W/PsSCuz9HcubKbV8mOMSvez1HknofAK9oI+actTdbSnjj77aN7hfiLeCMJQj0YYO1Fwo974pWt0vTjaym5a/pWevofei4m433kAT4gZcOJLGn+f6+bE=
+	t=1706950856; cv=none; b=E5qUu5ni4G3RBNbBQNLusJLzWgdv1SI8vhkC+uT129HzTqROm0zJ1k4mA32SF/rz2orD4X9NSooPUYogMTdaa8FoZBOChKFSljHFq3s7eRDKYmtcivm5Ei6ZaeGPekeImV5RGgs50DvFfKaRs1MFjqX7ZRCpq0Vs9Em8wEEPhAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706950851; c=relaxed/simple;
-	bh=uBmYyQNd4eTBcQAihNRXZaPJbPctc/7AfMfj011jqn8=;
+	s=arc-20240116; t=1706950856; c=relaxed/simple;
+	bh=xuhB6ti18yKxtjfmmEA4k56Sy3StXgqJYsS1nszVK90=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=m/qxnLW42ehZVz9dRh7gW7n9o3iby0j3df2/Vo7wiIHc/np/7gTtcCpQMyFs5fOowzuz72bFHlUe69d7xDRx5rc0fwGdiLRo636gJLOP+64zGojyGwxNgvf40nFN6VB4h8EzbdxYX4QyXyFPYfFuVYjx9Ztr5KNQ3O1DgfU/05w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lv0ZZ78y; arc=none smtp.client-ip=198.175.65.14
+	 MIME-Version; b=Bv7JYMiajwWvSaIpgaQpW8L05Ki6ac1Ee8q7LtitG6ElffeCjBvFvpmjGfNrc3vMXiGjiVkEBqHYHVlFoXPOK1Mr7/uZ58szU29Nu1/SqfzPbNAvm9UaN/ntdLl7QNNzyxH6lZ5bG16XCvj2NNQY7JXOpE/UGH9QLd3X0QDmMSc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=B+ztlGDJ; arc=none smtp.client-ip=198.175.65.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706950850; x=1738486850;
+  t=1706950855; x=1738486855;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=uBmYyQNd4eTBcQAihNRXZaPJbPctc/7AfMfj011jqn8=;
-  b=lv0ZZ78yF8yFPdKFWxEszGiWsvN8JWMHvxW+p3Doa4poWzjH1xQ5+oRH
-   7RKfIboBvBDzDt3nb0wvlXGDRDCc97eiD/ZZ8geGWEuv8EavfqtRIOK28
-   8RyXaSLG2Vfk0V9rZjqbQGDqm+Q8DjRoQY4QWA/74p/pu4pN4HzcD03qa
-   npUDM39/H8X96v3CzS1rCL+lm7awhwy6y2y6wU+8Puo5UHlrMBwZJahNp
-   CQi82saLLiWq0UFH8G3vlcyJjFd5EpcyN+QV+F1etiVP8nGw9+XaV4zUS
-   4f10dYPdrjL/7Y6WfDulrtsQfzRHairNyt0SdTUKQqgIaY1F74uALP8xv
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="4131993"
+  bh=xuhB6ti18yKxtjfmmEA4k56Sy3StXgqJYsS1nszVK90=;
+  b=B+ztlGDJ3I4kpBbMIE3LTOQlXmNBXXW+uM9Q/mrh0x8LOSPgJMA1L8WI
+   H4mdRYiQmV3QOqg+IuNz2Ox/QCwXXm9uNagv72T1qWK43stAKQftg+w7l
+   +/VItCHcPr52eJ8uS6LOQx5xgzkbmqQDRncfJThMIuyb8RW438+HpZj1d
+   qNW4+TrTpSvBwUFaXxLd4Ph9/nc70cdUqz4GoMGvzzRpTPZvb1EXgJRkL
+   XUKeaPgZcKdwTtgK6NLYyjRcRVOH02ohXHUWVXEuBeFI8vkaV1x9ahOIW
+   5Nwm2HRbk5NTN8ufq+eyLcb6c/bMQgcgCirVsV6UeXc6Q2DILjVuy+q55
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="4132013"
 X-IronPort-AV: E=Sophos;i="6.05,240,1701158400"; 
-   d="scan'208";a="4131993"
+   d="scan'208";a="4132013"
 Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2024 01:00:49 -0800
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2024 01:00:55 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.05,240,1701158400"; 
-   d="scan'208";a="291356"
+   d="scan'208";a="291369"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
-  by fmviesa009.fm.intel.com with ESMTP; 03 Feb 2024 01:00:43 -0800
+  by fmviesa009.fm.intel.com with ESMTP; 03 Feb 2024 01:00:49 -0800
 From: Zhao Liu <zhao1.liu@linux.intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Sean Christopherson <seanjc@google.com>,
@@ -82,9 +82,9 @@ Cc: Ricardo Neri <ricardo.neri-calderon@linux.intel.com>,
 	David Dai <davidai@google.com>,
 	Saravana Kannan <saravanak@google.com>,
 	Zhao Liu <zhao1.liu@intel.com>
-Subject: [RFC 11/26] KVM: VMX: Introduce HFI description structure
-Date: Sat,  3 Feb 2024 17:11:59 +0800
-Message-Id: <20240203091214.411862-12-zhao1.liu@linux.intel.com>
+Subject: [RFC 12/26] KVM: VMX: Introduce HFI table index for vCPU
+Date: Sat,  3 Feb 2024 17:12:00 +0800
+Message-Id: <20240203091214.411862-13-zhao1.liu@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240203091214.411862-1-zhao1.liu@linux.intel.com>
 References: <20240203091214.411862-1-zhao1.liu@linux.intel.com>
@@ -98,106 +98,58 @@ Content-Transfer-Encoding: 8bit
 
 From: Zhao Liu <zhao1.liu@intel.com>
 
-HFI/ITD virtualization needs to maintain the virtual HFI table in KVM.
+The HFI table contains a table header and many table entries. Each table
+entry is identified by an HFI table index, and each CPU corresponds to
+one of the HFI table indexes [1].
 
-This virtual HFI table is used to sync the update of Host's HFI table,
-and then KVM will write this virtual table into Guest's HFI table
-address.
+Add hfi_table_idx in vcpu_vmx, and this will be used to build virtual
+HFI table.
 
-Along with the sync process, the KVM also needs to know the status of
-the Guest HFI.
+This HFI index is initialized to 0, but in the following patch the VMM
+can be allowed to configure this index with a custom value (CPUID.0x06.
+edx[bits 16-31]).
 
-Therefore, provide the hfi_desc structure to store the following things:
-* The state flags of Guest HFI.
-* The basic information of Guest HFI.
-* The local virtual HFI table.
-
-The PTS feature is emulated at VM level, so also support hfi_desc at VM
-level.
+[1]: SDM, vol. 3B, section 15.6.1 Hardware Feedback Interface Table
+     Structure
 
 Tested-by: Yanting Jiang <yanting.jiang@intel.com>
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
- arch/x86/kvm/vmx/vmx.c |  2 ++
- arch/x86/kvm/vmx/vmx.h | 41 +++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 43 insertions(+)
+ arch/x86/kvm/vmx/vmx.c | 6 ++++++
+ arch/x86/kvm/vmx/vmx.h | 3 +++
+ 2 files changed, 9 insertions(+)
 
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 45b40a47b448..48f304683d6f 100644
+index 48f304683d6f..96f0f768939d 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -8386,7 +8386,9 @@ static void vmx_hardware_unsetup(void)
- static void vmx_vm_destroy(struct kvm *kvm)
- {
- 	struct kvm_vmx *kvm_vmx = to_kvm_vmx(kvm);
-+	struct hfi_desc *kvm_vmx_hfi = &kvm_vmx->pkg_therm.hfi_desc;
+@@ -7648,6 +7648,12 @@ static int vmx_vcpu_create(struct kvm_vcpu *vcpu)
+ 			tsx_ctrl->mask = ~(u64)TSX_CTRL_CPUID_CLEAR;
+ 	}
  
-+	kfree(kvm_vmx_hfi->hfi_table.base_addr);
- 	free_pages((unsigned long)kvm_vmx->pid_table, vmx_get_pid_table_order(kvm));
- }
- 
++	/*
++	 * hfi_table_idx is initialized to 0, but later it may be changed according
++	 * to the value in the Guest's CPUID.0x06.edx[bits 16-31].
++	 */
++	vmx->hfi_table_idx = 0;
++
+ 	err = alloc_loaded_vmcs(&vmx->vmcs01);
+ 	if (err < 0)
+ 		goto free_pml;
 diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 5723780da180..4bf4ca6ac1c0 100644
+index 4bf4ca6ac1c0..63874aad7ae3 100644
 --- a/arch/x86/kvm/vmx/vmx.h
 +++ b/arch/x86/kvm/vmx/vmx.h
-@@ -7,6 +7,7 @@
- #include <asm/kvm.h>
- #include <asm/intel_pt.h>
- #include <asm/perf_event.h>
-+#include <asm/hfi.h>
+@@ -362,6 +362,9 @@ struct vcpu_vmx {
+ 	struct pt_desc pt_desc;
+ 	struct lbr_desc lbr_desc;
  
- #include "capabilities.h"
- #include "../kvm_cache_regs.h"
-@@ -369,9 +370,49 @@ struct vcpu_vmx {
- 	} shadow_msr_intercept;
- };
- 
-+/**
-+ * struct hfi_desc - Representation of an HFI instance (i.e., a table)
-+ * @hfi_enabled:	Flag to indicate whether HFI is enabled at runtime.
-+ *			Parsed from the Guest's MSR_IA32_HW_FEEDBACK_CONFIG.
-+ * @hfi_int_enabled:	Flag to indicate whether HFI is enabled at runtime.
-+ *			Parsed from Guest's MSR_IA32_PACKAGE_THERM_INTERRUPT[bit 25].
-+ * @table_ptr_valid:	Flag to indicate whether the memory of Guest HFI table is ready.
-+ *			Parsed from the valid bit of Guest's MSR_IA32_HW_FEEDBACK_PTR.
-+ * @hfi_update_status:	Flag to indicate whether Guest has handled the virtual HFI table
-+ *			update.
-+ *			Parsed from Guest's MSR_IA32_PACKAGE_THERM_STATUS[bit 26].
-+ * @hfi_update_pending:	Flag to indicate whether there's any update on Host that is not
-+ *			synced to Guest.
-+ *			KVM should update the Guest's HFI table and inject the notification
-+ *			until Guest has cleared hfi_update_status.
-+ * @table_base:		GPA of Guest's HFI table, which is parsed from Guest's
-+ *			MSR_IA32_HW_FEEDBACK_PTR.
-+ * @hfi_features:	Feature information based on Guest's HFI/ITD CPUID.
-+ * @hfi_table:		Local virtual HFI table based on the HFI data of the pCPU that
-+ *			the vCPU is running on.
-+ *			When KVM updates the Guest's HFI table, it writes the local
-+ *			virtual HFI table to the Guest HFI table memory in @table_base.
-+ *
-+ * A set of status flags and feature information, used to maintain local virtual HFI table
-+ * and sync updates to Guest HFI table.
-+ */
++	/* Should be extracted from Guest's CPUID.0x06.edx[bits 16-31]. */
++	int hfi_table_idx;
 +
-+struct hfi_desc {
-+	bool			hfi_enabled;
-+	bool			hfi_int_enabled;
-+	bool			table_ptr_valid;
-+	bool			hfi_update_status;
-+	bool			hfi_update_pending;
-+	gpa_t			table_base;
-+	struct			hfi_features hfi_features;
-+	struct hfi_table	hfi_table;
-+};
-+
- struct pkg_therm_desc {
- 	u64			msr_pkg_therm_int;
- 	u64			msr_pkg_therm_status;
-+	/* Currently HFI is only supported at package level. */
-+	struct hfi_desc		hfi_desc;
- 	/* All members before "struct mutex pkg_therm_lock" are protected by the lock. */
- 	struct mutex		pkg_therm_lock;
- };
+ 	/* Save desired MSR intercept (read: pass-through) state */
+ #define MAX_POSSIBLE_PASSTHROUGH_MSRS	16
+ 	struct {
 -- 
 2.34.1
 
