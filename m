@@ -1,101 +1,105 @@
-Return-Path: <kvm+bounces-7886-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7887-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB0EA847DA3
-	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 01:14:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42D70847DA5
+	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 01:14:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 604FAB21DE9
-	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 00:14:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73AE71C229CC
+	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 00:14:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FC1A63AE;
-	Sat,  3 Feb 2024 00:12:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B33479C3;
+	Sat,  3 Feb 2024 00:12:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ua01M4jw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EQIz3FI5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CD884697
-	for <kvm@vger.kernel.org>; Sat,  3 Feb 2024 00:12:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42E3A4432
+	for <kvm@vger.kernel.org>; Sat,  3 Feb 2024 00:12:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706919127; cv=none; b=mdBEA5OakOQbIsPUSgQOZTN76r1xYmWWbgLnY4AMgbdEQcvyr/3hNjE2oB2hqdE3ReBMAiy91IYnX4MYSHNl5hVcUYPFfVZ+EUF3Pt47USEPkzzKqDcirOdBsifelHU6okJAZ/E3Xn5PfS48zlqhRWRQ2W4SbxEkyiQ5raUiOho=
+	t=1706919172; cv=none; b=fpWuxx7Ju0zAGKvnxDHDRARKPvD6M7u+l8Wl806YuWmeL5cgSON5F7Q33nsqSM6/ScDypNX8kTLjQL2exoUcy0lTggAbCpkiiXMgcEzR2SOZnXDA5X3JrTlvLOwEUuOqKVpOuqoZvtpYYUGejwmmEwdCmgbCP41qSUY/g3vhswY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706919127; c=relaxed/simple;
-	bh=Q1o0DofRcMLTLWDBsn9giV1FxN9HMwZqB6JfLff9xJw=;
+	s=arc-20240116; t=1706919172; c=relaxed/simple;
+	bh=k+JGmJT6pmw6BssMNubU4nZj2bP5QOThSW+G9JE+WGA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=WYZ4rl4Ck9BIxra/V4gCkLN6DhNSEsVgw9hL1QDgYNy81O7UAWZV3Nw5LRC7XMs94ZWmWcAeUBjV733Vwx75eNnXPoSf6shTuHbJzKfJm32e+B6PduxOJe+wMpWMrG/TQbXnHinxrCDEpxw40829Yw52ggUfHFcV2FHcpAzyeaw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ua01M4jw; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=oNMwPgYUgPSBOpoVvdUq8Cd4Xs8JRZODjCMPaocWX+RMZMbEuiRU6XEjljP1VxeROJEOfzx/4rYBqtnGC/0iryr5tlw1ELvu+fgQpsaYpMJlc49U5qt3ncLHEp6GaCWP4JiCNr5STfOLidMx1LhE3iIlXBxhY89J5j87KgqGYac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EQIz3FI5; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6ddc2aefbe4so2648218b3a.0
-        for <kvm@vger.kernel.org>; Fri, 02 Feb 2024 16:12:06 -0800 (PST)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc6b2682870so4327345276.0
+        for <kvm@vger.kernel.org>; Fri, 02 Feb 2024 16:12:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706919125; x=1707523925; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1706919170; x=1707523970; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CXBUPXpWgAm5r1Pnwblz/7nmofC0KqBjONaFx44tX7w=;
-        b=ua01M4jwGIW06XAqfJ55qP01Y0fI+E4x+oVxmSkh+0wX8EL3Qr3iQNOvKxaSPwGu+C
-         AW7a5nGXh1s77c5p18hIwh1i5biLUmAWZ4FTU10p5BP97XHQgZg5aAKHxLnASFUCJd81
-         wDX3rePJRwQ81EloYsTWIHPACum+u+d2Qi85V0ukxUiXq5WnTOJqr7UxCONVA571eUTw
-         mzxwx+XGrtmQKMpkFe1m1L3t9TKTm1WG07qltU0/Mo9W6NybiTwe5loiM2kSg5nllzw0
-         rCoq06LLuEpIYAfnXTK1PqOdWrTTttFlZTmmM83FdZ2pMBp9NjzHX/+06r89nmeGakYc
-         iw4w==
+        bh=RFHy4J7jDQ4d5j3WCPCBh8/2qvapIS45X/oK++3Gn9I=;
+        b=EQIz3FI553KtrbtE7faX2fAxLHjgbVtobjQSZ7frcWj78znQRvN9qWTlCRG6jerUzp
+         nNSBiwXxBCUv895JeGGE0lnVgD4gIgWLaEUaafuPHVjT3BOMQN4nK7Tc3F1JIWSJsG8I
+         1zi07p7OhPzo/o14WsBnGprFhr7g+UKwrgKCOEGiLtcIQkQ+NH7Ky270nGhi58LWVsXu
+         49dNDBf+eRDDIioISEZftX24forhAG2dlZegRXCW4pwtVyRhsqs3V8jv0V1jeNfWMM8N
+         kTsMX92ZXaACOOVwgMGj8SxJEMo2y6sNH711c05GVA2Xc0Skr/CA+BlLZwqHyhlyMV29
+         jzbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706919125; x=1707523925;
+        d=1e100.net; s=20230601; t=1706919170; x=1707523970;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CXBUPXpWgAm5r1Pnwblz/7nmofC0KqBjONaFx44tX7w=;
-        b=cw4baEjlIQOVQGYvJkZ9OkjWKUJ9lmgEKAw4/WWHUb5qwbKC0Kxt+JCw2GnFoHOglz
-         W/VBn0ZotqS70tMsaHMwOwoMFSCKMw7ciStmGONNZ9B+n7vrIvAKfbXCl1WfJrMjwnku
-         Qa5kxgG28YPteMI6BkTtyhv2YqgA6/jZsyhuFWCNbqHPGsn8UZnKINdBpU2WV0zsDLFN
-         oeHCixm5Uw28H/bOdnxhWoCAVa5/RkXVpgTMgP11SeCO5ECYH147WugJSfN007kaFMiX
-         8SMN5mzV6wCeRtG0wQLX/qW9Dj+l2qV+nDRZ92tngltHnh/YmMGR4v8piQ38sgik/Oyd
-         au3g==
-X-Gm-Message-State: AOJu0YwPOA/qIXw0Db5sPZiU+MY1fOdJJ5DzftC53I6zNewylaeyRF5B
-	i2e/ysAVCwyvTe5ZxrhBjuVoQ4N7gBjmtefpHiU1dC43lTgBh9Vu66ohzD3oUmO3Pgs7sERKqw/
-	39A==
-X-Google-Smtp-Source: AGHT+IErdY/aHbCZMaGScpUo+KPbsMLgvZWLiqTFMDl9S8nTCSiyYvbbxCi7nFL9smHWAhbI9VH2yM8yCtU=
+        bh=RFHy4J7jDQ4d5j3WCPCBh8/2qvapIS45X/oK++3Gn9I=;
+        b=s+kwXatbLiTLFh4bo+yAbdgSWhvibj7ISyaq01TsEhEvYrRsHueARI4J8Mr5XiCXyh
+         rajAlfKiGuwcwZsqdykYmZAQ+YW6yes1EmQ9eVWu789gV+eEYwuQhuLQJTYEzfiI6kb0
+         3VZAfnixmB+SUnkI3ZQAeZRCes1kWrEM3t4bMOf/T09X0QdTD87axSI6DzaXp40u4jD1
+         1zAJO12SQPUnFnmy49WUsQ5kq9Fs/6rS6zfQZWJjHTHErEHtgRFSQ5mua5GKr65Y8RY1
+         EydqxwTMbYKSKtYCzpzXqkazs+NCmQGNaejsp/kobkbZZy4zBYO1Z4jYIsrwNiGE5BSw
+         Gs3A==
+X-Gm-Message-State: AOJu0YwfAZ5/3PkW1qPLvEMXgVagtVnh5lv+sNLcDhii1Thm9kHIX7pe
+	RYaW7QzVgFMGiLdeHkgW0MrfPQ4xf5HbHDseWQsa1v8OqYqOZYqS2qW/1Uv2N/RgEL8GMPCIH6D
+	UMA==
+X-Google-Smtp-Source: AGHT+IFtgRuypcYnht+yj6Dzn4uM5bNp5pQWc4eKniN9iWD0/HJITWw8l42f5Qj2/gotmpENlxiLRrKUbe4=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:1744:b0:6e0:2755:e56 with SMTP id
- j4-20020a056a00174400b006e027550e56mr19680pfc.3.1706919125499; Fri, 02 Feb
- 2024 16:12:05 -0800 (PST)
-Date: Fri,  2 Feb 2024 16:11:29 -0800
-In-Reply-To: <20240123221220.3911317-1-mizhang@google.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:2192:b0:dc6:fec4:1c26 with SMTP id
+ dl18-20020a056902219200b00dc6fec41c26mr29129ybb.1.1706919170350; Fri, 02 Feb
+ 2024 16:12:50 -0800 (PST)
+Date: Fri,  2 Feb 2024 16:11:31 -0800
+In-Reply-To: <20240103075343.549293-1-ppandit@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240123221220.3911317-1-mizhang@google.com>
+References: <20240103075343.549293-1-ppandit@redhat.com>
 X-Mailer: git-send-email 2.43.0.594.gd9cf4e227d-goog
-Message-ID: <170691180776.332020.3187581586977661860.b4-ty@google.com>
-Subject: Re: [PATCH] KVM: x86/pmu: Fix type length error when reading pmu->fixed_ctr_ctrl
+Message-ID: <170671742789.3944893.6069307090680601894.b4-ty@google.com>
+Subject: Re: [PATCH] KVM: x86: make KVM_REQ_NMI request iff NMI pending for vcpu
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Mingwei Zhang <mizhang@google.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Sean Christopherson <seanjc@google.com>, Prasad Pandit <ppandit@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Prasad Pandit <pjp@fedoraproject.org>
 Content-Type: text/plain; charset="utf-8"
 
-On Tue, 23 Jan 2024 22:12:20 +0000, Mingwei Zhang wrote:
-> Fix type length error since pmu->fixed_ctr_ctrl is u64 but the local
-> variable old_fixed_ctr_ctrl is u8. Truncating the value leads to
-> information loss at runtime. This leads to incorrect value in old_ctrl
-> retrieved from each field of old_fixed_ctr_ctrl and causes incorrect code
-> execution within the for loop of reprogram_fixed_counters(). So fix this
-> type to u64.
+On Wed, 03 Jan 2024 13:23:43 +0530, Prasad Pandit wrote:
+> kvm_vcpu_ioctl_x86_set_vcpu_events() routine makes 'KVM_REQ_NMI'
+> request for a vcpu even when its 'events->nmi.pending' is zero.
+> Ex:
+>     qemu_thread_start
+>      kvm_vcpu_thread_fn
+>       qemu_wait_io_event
+>        qemu_wait_io_event_common
+>         process_queued_cpu_work
+>          do_kvm_cpu_synchronize_post_init/_reset
+>           kvm_arch_put_registers
+>            kvm_put_vcpu_events (cpu, level=[2|3])
 > 
 > [...]
 
-Applied to kvm-x86 fixes.  I'll let it stew in -next for a few days before
-sending a pull request to Paolo.  Thanks!
+Applied to kvm-x86 fixes, thanks!
 
-[1/1] KVM: x86/pmu: Fix type length error when reading pmu->fixed_ctr_ctrl
-      https://github.com/kvm-x86/linux/commit/05519c86d699
+[1/1] KVM: x86: make KVM_REQ_NMI request iff NMI pending for vcpu
+      https://github.com/kvm-x86/linux/commit/6231c9e1a9f3
 
 --
 https://github.com/kvm-x86/linux/tree/next
