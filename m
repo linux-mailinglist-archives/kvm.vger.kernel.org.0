@@ -1,59 +1,59 @@
-Return-Path: <kvm+bounces-7906-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7907-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E38438484B3
-	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 10:03:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 84CBD8484B7
+	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 10:03:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 975A328ECF9
-	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 09:03:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3AEA928F3F6
+	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 09:03:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ECDD5D75A;
-	Sat,  3 Feb 2024 09:00:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBB675FB9A;
+	Sat,  3 Feb 2024 09:00:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ISWNHVpz"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lv0ZZ78y"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5F875F857;
-	Sat,  3 Feb 2024 09:00:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 761195FB83;
+	Sat,  3 Feb 2024 09:00:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706950845; cv=none; b=llF8S1OMNbkN96tbN0Tny/lfFZt2euz0eob+i9gqJK5OPOuzKtQ674Lw//lYlYYZZfvD6U48e3GINqe/mozOw2FBW3ViO7IMNnuXZPrCCLQagdZ7nd3+MvCt7h3CvTZe4K4yxExt8tXYkzEYhX/QWrZ7lRjOb8BjqUYAwvpnIE8=
+	t=1706950851; cv=none; b=fHeZwbKTNjarx3IS7Q92Jc/QS/tfcmvw7IufGPcZseUYfbXuPtmFIi+W/PsSCuz9HcubKbV8mOMSvez1HknofAK9oI+actTdbSnjj77aN7hfiLeCMJQj0YYO1Fwo974pWt0vTjaym5a/pWevofei4m433kAT4gZcOJLGn+f6+bE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706950845; c=relaxed/simple;
-	bh=m40AHoQ2UOqtleX+0akDeAncXxKxVKmuDUaNWhRJTc8=;
+	s=arc-20240116; t=1706950851; c=relaxed/simple;
+	bh=uBmYyQNd4eTBcQAihNRXZaPJbPctc/7AfMfj011jqn8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=cAH0mbhZuW4xypltjXUm0CXLlvwyun3P290W9jsVMQkFyN+ElH11bv4TwXR5RV6AYrd4Vt0txfGl7wjvIom+YNXWY6Fot9fhfAO14WgphreLfclcSGObJu6A1kH4fnVXCdRhrzSCrFh58KRfn4tR1TIuSButQ0A4GVessfCkFnI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ISWNHVpz; arc=none smtp.client-ip=198.175.65.14
+	 MIME-Version; b=m/qxnLW42ehZVz9dRh7gW7n9o3iby0j3df2/Vo7wiIHc/np/7gTtcCpQMyFs5fOowzuz72bFHlUe69d7xDRx5rc0fwGdiLRo636gJLOP+64zGojyGwxNgvf40nFN6VB4h8EzbdxYX4QyXyFPYfFuVYjx9Ztr5KNQ3O1DgfU/05w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lv0ZZ78y; arc=none smtp.client-ip=198.175.65.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706950844; x=1738486844;
+  t=1706950850; x=1738486850;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=m40AHoQ2UOqtleX+0akDeAncXxKxVKmuDUaNWhRJTc8=;
-  b=ISWNHVpzGFkmI5RK+i7DBalvx8y+pKvDxtXutoVUZJSK0CnFMiKRcR4s
-   On3bZM0AwWg3xlzKI+Uy1q1IzwElpALsfTyRJLQ3W5koUPkkorEletX4B
-   IfLSUCcpMfFY+/7y1h50EXwgbzJCRgQNur5p7EgFGl5jjRFLrl5YUpMjw
-   uUCx2a3iRzImbsyqP2SzhLuxZ9qWKA7bUS/pQbvhaQv/gmkLIbpwgl5zS
-   yolyTEVW4lkKF+qVR0qaHYimKsY5iHEDiukDFIj8JU8MYq34ZAAHu8Ikb
-   WlJ0SwUVFLEVuE6MntJBwNpl7WfuhDxSrrJiWHxyZl66AOkQ0cOFFWol1
+  bh=uBmYyQNd4eTBcQAihNRXZaPJbPctc/7AfMfj011jqn8=;
+  b=lv0ZZ78yF8yFPdKFWxEszGiWsvN8JWMHvxW+p3Doa4poWzjH1xQ5+oRH
+   7RKfIboBvBDzDt3nb0wvlXGDRDCc97eiD/ZZ8geGWEuv8EavfqtRIOK28
+   8RyXaSLG2Vfk0V9rZjqbQGDqm+Q8DjRoQY4QWA/74p/pu4pN4HzcD03qa
+   npUDM39/H8X96v3CzS1rCL+lm7awhwy6y2y6wU+8Puo5UHlrMBwZJahNp
+   CQi82saLLiWq0UFH8G3vlcyJjFd5EpcyN+QV+F1etiVP8nGw9+XaV4zUS
+   4f10dYPdrjL/7Y6WfDulrtsQfzRHairNyt0SdTUKQqgIaY1F74uALP8xv
    g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="4131982"
+X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="4131993"
 X-IronPort-AV: E=Sophos;i="6.05,240,1701158400"; 
-   d="scan'208";a="4131982"
+   d="scan'208";a="4131993"
 Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2024 01:00:44 -0800
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2024 01:00:49 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.05,240,1701158400"; 
-   d="scan'208";a="291335"
+   d="scan'208";a="291356"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
-  by fmviesa009.fm.intel.com with ESMTP; 03 Feb 2024 01:00:37 -0800
+  by fmviesa009.fm.intel.com with ESMTP; 03 Feb 2024 01:00:43 -0800
 From: Zhao Liu <zhao1.liu@linux.intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Sean Christopherson <seanjc@google.com>,
@@ -82,9 +82,9 @@ Cc: Ricardo Neri <ricardo.neri-calderon@linux.intel.com>,
 	David Dai <davidai@google.com>,
 	Saravana Kannan <saravanak@google.com>,
 	Zhao Liu <zhao1.liu@intel.com>
-Subject: [RFC 10/26] KVM: VMX: Emulate PTM/PTS (CPUID.0x06.eax[bit 6]) feature
-Date: Sat,  3 Feb 2024 17:11:58 +0800
-Message-Id: <20240203091214.411862-11-zhao1.liu@linux.intel.com>
+Subject: [RFC 11/26] KVM: VMX: Introduce HFI description structure
+Date: Sat,  3 Feb 2024 17:11:59 +0800
+Message-Id: <20240203091214.411862-12-zhao1.liu@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240203091214.411862-1-zhao1.liu@linux.intel.com>
 References: <20240203091214.411862-1-zhao1.liu@linux.intel.com>
@@ -96,253 +96,108 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Zhuocheng Ding <zhuocheng.ding@intel.com>
+From: Zhao Liu <zhao1.liu@intel.com>
 
-The PTM feature (Package Thermal Management, alias, PTS) is the
-dependency of the Hardware Feedback Interface (HFI) feature.
+HFI/ITD virtualization needs to maintain the virtual HFI table in KVM.
 
-To support HFI virtualization, PTM feature is also required to be
-emulated in KVM.
+This virtual HFI table is used to sync the update of Host's HFI table,
+and then KVM will write this virtual table into Guest's HFI table
+address.
 
-The PTM feature provides 2 package-level thermal related MSRs:
-MSR_IA32_PACKAGE_THERM_INTERRUPT and MSR_IA32_PACKAGE_THERM_STATUS.
+Along with the sync process, the KVM also needs to know the status of
+the Guest HFI.
 
-Currently KVM doesn't support MSR topology (except for thread scope MSR,
-no more other different topological scopes), but since PTM's package
-thermal MSRs are only used on client platform with only 1 package, it's
-enough to handle these 2 MSRs at VM level. Additionally, a mutex is used
-to avoid competing different vCPUs' access to emulated MSR values stored
-in kvm_vmx.
+Therefore, provide the hfi_desc structure to store the following things:
+* The state flags of Guest HFI.
+* The basic information of Guest HFI.
+* The local virtual HFI table.
 
-PTM also indicates the presence of package level thermal interrupts,
-which is meaningful for VM to handle package level thermal interrupt.
-
-The ACPI emulation patch has already added the support for thermal
-interrupt injection, and this also reflects the integrity of the PTM
-emulation. Although thermal interrupts are not actually injected into
-the Guest now, in the following HFI/ITD emulations, thermal interrupts
-will be injected into the Guest once the conditions are met.
-
-In addition, expose the CPUID bit of the PTM feature to the VM, which
-can help enable package thermal interrupt handling in VM.
+The PTS feature is emulated at VM level, so also support hfi_desc at VM
+level.
 
 Tested-by: Yanting Jiang <yanting.jiang@intel.com>
-Signed-off-by: Zhuocheng Ding <zhuocheng.ding@intel.com>
-Co-developed-by: Zhao Liu <zhao1.liu@intel.com>
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
- arch/x86/kvm/cpuid.c   | 11 ++++++
- arch/x86/kvm/svm/svm.c |  2 ++
- arch/x86/kvm/vmx/vmx.c | 76 +++++++++++++++++++++++++++++++++++++++++-
- arch/x86/kvm/vmx/vmx.h |  9 +++++
- arch/x86/kvm/x86.c     |  2 ++
- 5 files changed, 99 insertions(+), 1 deletion(-)
+ arch/x86/kvm/vmx/vmx.c |  2 ++
+ arch/x86/kvm/vmx/vmx.h | 41 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 43 insertions(+)
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index d8cfae17cc92..eaac2c8d98b9 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -632,6 +632,17 @@ void kvm_set_cpu_caps(void)
- 		F(ARAT)
- 	);
- 
-+	/*
-+	 * PTS is the dependency of ITD, currently we only use PTS for
-+	 * enabling ITD in KVM. Since KVM does not support msr topology at
-+	 * present, the emulation of PTS has restrictions on the topology of
-+	 * Guest, so we only expose PTS when Host enables ITD.
-+	 */
-+	if (cpu_feature_enabled(X86_FEATURE_ITD)) {
-+		if (boot_cpu_has(X86_FEATURE_PTS))
-+			kvm_cpu_cap_set(X86_FEATURE_PTS);
-+	}
-+
- 	kvm_cpu_cap_mask(CPUID_7_0_EBX,
- 		F(FSGSBASE) | F(SGX) | F(BMI1) | F(HLE) | F(AVX2) |
- 		F(FDP_EXCPTN_ONLY) | F(SMEP) | F(BMI2) | F(ERMS) | F(INVPCID) |
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 2e22d5e86768..7039ae48d8d0 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4291,6 +4291,8 @@ static bool svm_has_emulated_msr(struct kvm *kvm, u32 index)
- 	case MSR_IA32_THERM_CONTROL:
- 	case MSR_IA32_THERM_INTERRUPT:
- 	case MSR_IA32_THERM_STATUS:
-+	case MSR_IA32_PACKAGE_THERM_INTERRUPT:
-+	case MSR_IA32_PACKAGE_THERM_STATUS:
- 		return false;
- 	case MSR_IA32_SMBASE:
- 		if (!IS_ENABLED(CONFIG_KVM_SMM))
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index aa37b55cf045..45b40a47b448 100644
+index 45b40a47b448..48f304683d6f 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -183,6 +183,29 @@ module_param(allow_smaller_maxphyaddr, bool, S_IRUGO);
- 	THERM_MASK_THRESHOLD0 | THERM_INT_THRESHOLD0_ENABLE | \
- 	THERM_MASK_THRESHOLD1 | THERM_INT_THRESHOLD1_ENABLE)
- 
-+/* HFI (CPUID.06H:EAX[19]) is not emulated in kvm yet. */
-+#define MSR_IA32_PACKAGE_THERM_STATUS_RO_MASK (PACKAGE_THERM_STATUS_PROCHOT | \
-+	PACKAGE_THERM_STATUS_PROCHOT_EVENT | PACKAGE_THERM_STATUS_CRITICAL_TEMP | \
-+	THERM_STATUS_THRESHOLD0 | THERM_STATUS_THRESHOLD1 | \
-+	PACKAGE_THERM_STATUS_POWER_LIMIT | PACKAGE_THERM_STATUS_DIG_READOUT_MASK)
-+#define MSR_IA32_PACKAGE_THERM_STATUS_RWC0_MASK (PACKAGE_THERM_STATUS_PROCHOT_LOG | \
-+	PACKAGE_THERM_STATUS_PROCHOT_EVENT_LOG | PACKAGE_THERM_STATUS_CRITICAL_TEMP_LOG | \
-+	THERM_LOG_THRESHOLD0 | THERM_LOG_THRESHOLD1 | \
-+	PACKAGE_THERM_STATUS_POWER_LIMIT_LOG)
-+/* MSR_IA32_PACKAGE_THERM_STATUS unavailable bits mask: unsupported and reserved bits. */
-+#define MSR_IA32_PACKAGE_THERM_STATUS_UNAVAIL_MASK (~(MSR_IA32_PACKAGE_THERM_STATUS_RO_MASK | \
-+	MSR_IA32_PACKAGE_THERM_STATUS_RWC0_MASK))
-+
-+/*
-+ * MSR_IA32_PACKAGE_THERM_INTERRUPT available bits mask.
-+ * HFI (CPUID.06H:EAX[19]) is not emulated in kvm yet.
-+ */
-+#define MSR_IA32_PACKAGE_THERM_INTERRUPT_AVAIL_MASK (PACKAGE_THERM_INT_HIGH_ENABLE | \
-+	PACKAGE_THERM_INT_LOW_ENABLE | PACKAGE_THERM_INT_PROCHOT_ENABLE | \
-+	PACKAGE_THERM_INT_OVERHEAT_ENABLE | THERM_MASK_THRESHOLD0 | \
-+	THERM_INT_THRESHOLD0_ENABLE | THERM_MASK_THRESHOLD1 | \
-+	THERM_INT_THRESHOLD1_ENABLE | PACKAGE_THERM_INT_PLN_ENABLE)
-+
- /*
-  * List of MSRs that can be directly passed to the guest.
-  * In addition to these x2apic and PT MSRs are handled specially.
-@@ -2013,6 +2036,7 @@ static int vmx_get_msr_feature(struct kvm_msr_entry *msr)
- static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+@@ -8386,7 +8386,9 @@ static void vmx_hardware_unsetup(void)
+ static void vmx_vm_destroy(struct kvm *kvm)
  {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
-+	struct kvm_vmx *kvm_vmx = to_kvm_vmx(vcpu->kvm);
- 	struct vmx_uret_msr *msr;
- 	u32 index;
+ 	struct kvm_vmx *kvm_vmx = to_kvm_vmx(kvm);
++	struct hfi_desc *kvm_vmx_hfi = &kvm_vmx->pkg_therm.hfi_desc;
  
-@@ -2166,6 +2190,18 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 			return 1;
- 		msr_info->data = vmx->msr_ia32_therm_status;
- 		break;
-+	case MSR_IA32_PACKAGE_THERM_INTERRUPT:
-+		if (!msr_info->host_initiated &&
-+		    !guest_cpuid_has(vcpu, X86_FEATURE_PTS))
-+			return 1;
-+		msr_info->data = kvm_vmx->pkg_therm.msr_pkg_therm_int;
-+		break;
-+	case MSR_IA32_PACKAGE_THERM_STATUS:
-+		if (!msr_info->host_initiated &&
-+		    !guest_cpuid_has(vcpu, X86_FEATURE_PTS))
-+			return 1;
-+		msr_info->data = kvm_vmx->pkg_therm.msr_pkg_therm_status;
-+		break;
- 	default:
- 	find_uret_msr:
- 		msr = vmx_find_uret_msr(vmx, msr_info->index);
-@@ -2226,6 +2262,7 @@ static inline u64 vmx_set_msr_rwc0_bits(u64 new_val, u64 old_val, u64 rwc0_mask)
- static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
-+	struct kvm_vmx *kvm_vmx = to_kvm_vmx(vcpu->kvm);
- 	struct vmx_uret_msr *msr;
- 	int ret = 0;
- 	u32 msr_index = msr_info->index;
-@@ -2543,7 +2580,35 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		}
- 		vmx->msr_ia32_therm_status = data;
- 		break;
-+	case MSR_IA32_PACKAGE_THERM_INTERRUPT:
-+		if (!msr_info->host_initiated &&
-+		    !guest_cpuid_has(vcpu, X86_FEATURE_PTS))
-+			return 1;
-+		/* Unsupported and reserved bits: generate the exception. */
-+		if (!msr_info->host_initiated &&
-+		    data & ~MSR_IA32_PACKAGE_THERM_INTERRUPT_AVAIL_MASK)
-+			return 1;
-+		kvm_vmx->pkg_therm.msr_pkg_therm_int = data;
-+		break;
-+	case MSR_IA32_PACKAGE_THERM_STATUS:
-+		if (!msr_info->host_initiated &&
-+		    !guest_cpuid_has(vcpu, X86_FEATURE_PTS))
-+			return 1;
-+		/* Unsupported and reserved bits: generate the exception. */
-+		if (!msr_info->host_initiated &&
-+		    data & MSR_IA32_PACKAGE_THERM_STATUS_UNAVAIL_MASK)
-+			return 1;
- 
-+		mutex_lock(&kvm_vmx->pkg_therm.pkg_therm_lock);
-+		if (!msr_info->host_initiated) {
-+			data = vmx_set_msr_rwc0_bits(data, kvm_vmx->pkg_therm.msr_pkg_therm_status,
-+						     MSR_IA32_PACKAGE_THERM_STATUS_RWC0_MASK);
-+			data = vmx_set_msr_ro_bits(data, kvm_vmx->pkg_therm.msr_pkg_therm_status,
-+						   MSR_IA32_PACKAGE_THERM_STATUS_RO_MASK);
-+		}
-+		kvm_vmx->pkg_therm.msr_pkg_therm_status = data;
-+		mutex_unlock(&kvm_vmx->pkg_therm.pkg_therm_lock);
-+		break;
- 	default:
- 	find_uret_msr:
- 		msr = vmx_find_uret_msr(vmx, msr_index);
-@@ -7649,6 +7714,14 @@ static int vmx_vcpu_create(struct kvm_vcpu *vcpu)
- 	return err;
++	kfree(kvm_vmx_hfi->hfi_table.base_addr);
+ 	free_pages((unsigned long)kvm_vmx->pid_table, vmx_get_pid_table_order(kvm));
  }
  
-+static int vmx_vm_init_pkg_therm(struct kvm *kvm)
-+{
-+	struct pkg_therm_desc *pkg_therm = &to_kvm_vmx(kvm)->pkg_therm;
-+
-+	mutex_init(&pkg_therm->pkg_therm_lock);
-+	return 0;
-+}
-+
- #define L1TF_MSG_SMT "L1TF CPU bug present and SMT on, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.\n"
- #define L1TF_MSG_L1D "L1TF CPU bug present and virtualization mitigation disabled, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.\n"
- 
-@@ -7680,7 +7753,8 @@ static int vmx_vm_init(struct kvm *kvm)
- 			break;
- 		}
- 	}
--	return 0;
-+
-+	return vmx_vm_init_pkg_therm(kvm);
- }
- 
- static u8 vmx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
 diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index e159dd5b7a66..5723780da180 100644
+index 5723780da180..4bf4ca6ac1c0 100644
 --- a/arch/x86/kvm/vmx/vmx.h
 +++ b/arch/x86/kvm/vmx/vmx.h
-@@ -369,6 +369,13 @@ struct vcpu_vmx {
+@@ -7,6 +7,7 @@
+ #include <asm/kvm.h>
+ #include <asm/intel_pt.h>
+ #include <asm/perf_event.h>
++#include <asm/hfi.h>
+ 
+ #include "capabilities.h"
+ #include "../kvm_cache_regs.h"
+@@ -369,9 +370,49 @@ struct vcpu_vmx {
  	} shadow_msr_intercept;
  };
  
-+struct pkg_therm_desc {
-+	u64			msr_pkg_therm_int;
-+	u64			msr_pkg_therm_status;
-+	/* All members before "struct mutex pkg_therm_lock" are protected by the lock. */
-+	struct mutex		pkg_therm_lock;
++/**
++ * struct hfi_desc - Representation of an HFI instance (i.e., a table)
++ * @hfi_enabled:	Flag to indicate whether HFI is enabled at runtime.
++ *			Parsed from the Guest's MSR_IA32_HW_FEEDBACK_CONFIG.
++ * @hfi_int_enabled:	Flag to indicate whether HFI is enabled at runtime.
++ *			Parsed from Guest's MSR_IA32_PACKAGE_THERM_INTERRUPT[bit 25].
++ * @table_ptr_valid:	Flag to indicate whether the memory of Guest HFI table is ready.
++ *			Parsed from the valid bit of Guest's MSR_IA32_HW_FEEDBACK_PTR.
++ * @hfi_update_status:	Flag to indicate whether Guest has handled the virtual HFI table
++ *			update.
++ *			Parsed from Guest's MSR_IA32_PACKAGE_THERM_STATUS[bit 26].
++ * @hfi_update_pending:	Flag to indicate whether there's any update on Host that is not
++ *			synced to Guest.
++ *			KVM should update the Guest's HFI table and inject the notification
++ *			until Guest has cleared hfi_update_status.
++ * @table_base:		GPA of Guest's HFI table, which is parsed from Guest's
++ *			MSR_IA32_HW_FEEDBACK_PTR.
++ * @hfi_features:	Feature information based on Guest's HFI/ITD CPUID.
++ * @hfi_table:		Local virtual HFI table based on the HFI data of the pCPU that
++ *			the vCPU is running on.
++ *			When KVM updates the Guest's HFI table, it writes the local
++ *			virtual HFI table to the Guest HFI table memory in @table_base.
++ *
++ * A set of status flags and feature information, used to maintain local virtual HFI table
++ * and sync updates to Guest HFI table.
++ */
++
++struct hfi_desc {
++	bool			hfi_enabled;
++	bool			hfi_int_enabled;
++	bool			table_ptr_valid;
++	bool			hfi_update_status;
++	bool			hfi_update_pending;
++	gpa_t			table_base;
++	struct			hfi_features hfi_features;
++	struct hfi_table	hfi_table;
 +};
 +
- struct kvm_vmx {
- 	struct kvm kvm;
- 
-@@ -377,6 +384,8 @@ struct kvm_vmx {
- 	gpa_t ept_identity_map_addr;
- 	/* Posted Interrupt Descriptor (PID) table for IPI virtualization */
- 	u64 *pid_table;
-+
-+	struct pkg_therm_desc pkg_therm;
+ struct pkg_therm_desc {
+ 	u64			msr_pkg_therm_int;
+ 	u64			msr_pkg_therm_status;
++	/* Currently HFI is only supported at package level. */
++	struct hfi_desc		hfi_desc;
+ 	/* All members before "struct mutex pkg_therm_lock" are protected by the lock. */
+ 	struct mutex		pkg_therm_lock;
  };
- 
- void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu,
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 50aceb0ce4ee..7d787ced513f 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1548,6 +1548,8 @@ static const u32 emulated_msrs_all[] = {
- 	MSR_IA32_THERM_CONTROL,
- 	MSR_IA32_THERM_INTERRUPT,
- 	MSR_IA32_THERM_STATUS,
-+	MSR_IA32_PACKAGE_THERM_INTERRUPT,
-+	MSR_IA32_PACKAGE_THERM_STATUS,
- 
- 	/*
- 	 * KVM always supports the "true" VMX control MSRs, even if the host
 -- 
 2.34.1
 
