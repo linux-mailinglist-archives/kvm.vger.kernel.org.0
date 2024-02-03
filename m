@@ -1,58 +1,59 @@
-Return-Path: <kvm+bounces-7923-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7924-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0A4A8484ED
-	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 10:17:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4478D8484EE
+	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 10:17:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 29E1B1F2D3BA
-	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 09:17:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B0532B2B340
+	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 09:17:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 945E75D479;
-	Sat,  3 Feb 2024 09:17:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BC085D72E;
+	Sat,  3 Feb 2024 09:17:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bbfawXUN"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OxUcNdp3"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92ED35C902
-	for <kvm@vger.kernel.org>; Sat,  3 Feb 2024 09:17:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADA685CDC9
+	for <kvm@vger.kernel.org>; Sat,  3 Feb 2024 09:17:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706951849; cv=none; b=kQNBCtY60Lb3wjnZc4mlcCzFk2UXoEyRBFh8IBTJHadfwyUjHzpXvfC+iKt7QMmNsyXxKeBzvrps0Zg4cZIUQCu54z0ccNgHU6kYwmn0Kx2xVarAVM0ShKb1j1ockYZlxXAhS1hWHAevIL0UCTsB3iRAjed8ylbtbQTydh2tbQo=
+	t=1706951851; cv=none; b=NtbOEhEa9xWZVOJkL1+A6nzqYQHG7kgbWTpTothAq8ikgyl66KO9LHZcO1GbK9ZD/hmqwOKz/8tFzsYNTpcgkJQg2RvnHKTHi3NaUbadBVH4q7QtPsdbyof9MmXd+U/oTZ+XP9VwQDdH4lEVxyNhTU9BLGvA9i1bUDsAzCFYDY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706951849; c=relaxed/simple;
-	bh=pd0xBUReGlwLxJgRwszEc4fZcX2O6bD1wp14HZorAzo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VpYTY1nuIznqHw7ExpoP/bBkxcLFcVF7yMjHelBN+3+fMLh37cT8iZBKblWbUOIQkhOs81PiB5qG2J6Iadc+SzQkL8ybFBJKpajJjoslRMCAyZPk/Ssm8muSmCxudG4+cvW0OxIrrDWMxUCaNMDsFnpTXqGJdzqwr+psBCeoDz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bbfawXUN; arc=none smtp.client-ip=198.175.65.20
+	s=arc-20240116; t=1706951851; c=relaxed/simple;
+	bh=An89nTsf2RBLksmwt0+NzzeKNYWSam6kADPQj32WHLQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=DfLBRjdQw1MMOcXL3M6BQERo0mKmaqi7DmElCF88s/lnVQb6Z2AHYkGRmqO7JHfXOpIWMuQRQj0nYKmjJ/U3PArR6ZNO8hPsvZo8dKxrqTIjxPwo++8JVQW28Zr8ztjjQuixareOKLyxGMXuunxBDEDan0EBp4+SEutsmsS5G6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OxUcNdp3; arc=none smtp.client-ip=198.175.65.20
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706951848; x=1738487848;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=pd0xBUReGlwLxJgRwszEc4fZcX2O6bD1wp14HZorAzo=;
-  b=bbfawXUNEA2ycjO95vr/tDVeAOvM8B/ne68FhXxvm/62NMppUhS0z6ZF
-   QJ50F6yhOzZGcScid0Rw3GE/OfDDRJas+MRXQHBGQVwXGTuI2CgN/Yd/F
-   wQ5+uGWkicpvMgNJUpluZuYdva5lIWFih1RXKt2kp9odFhoJZBHar5tOR
-   yBZtFlgeMeIpq7GAC/4zUHkIKSAj0485vZDN218yqS2Mpz0zF49d1z/a1
-   JM0/5wAODK5zzLiOUbxWf2ltq+2J5x5o4A3/ak37MTYdXwkFZk1SH3XAh
-   v/PJQrRSUVGqIj2ELmFy6sM3e8Qmry1gc+8dcqeTz1Z/cXu3Cxj2MDS9l
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="216342"
+  t=1706951850; x=1738487850;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=An89nTsf2RBLksmwt0+NzzeKNYWSam6kADPQj32WHLQ=;
+  b=OxUcNdp33b6ni75sJ1QCcKJvGZsyNWMGqJs1+m9+OkjsECczXSzMa9sC
+   bL9iilXmAh66YlewZA+izPy4dXpwtLkn9fbC6mE5Ly9OyW08ardj2RfFj
+   NuAywQiZRwLqfmuz5TsGyOSrDsNpPd8UUcMBh5URzD3zzy7kxArtkfvzV
+   gYo9zQzI2J/+mhPVj4WAAGj9gl/R3/muK9rTjGNmQYYI57OZEztaKwhrG
+   gHZGFmPNBBqC5IEVV5C9z/lQMG/2bAf2DjnwYOACs30HORUTexioGDdy5
+   VCp/dtsadXQFRyTVPoV5/uwX21B4dg8lXOagalnai3b+Jr2941vKW5O06
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="216354"
 X-IronPort-AV: E=Sophos;i="6.05,240,1701158400"; 
-   d="scan'208";a="216342"
+   d="scan'208";a="216354"
 Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2024 01:17:27 -0800
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2024 01:17:29 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.05,240,1701158400"; 
-   d="scan'208";a="31378975"
+   d="scan'208";a="31378978"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
-  by fmviesa001.fm.intel.com with ESMTP; 03 Feb 2024 01:17:24 -0800
+  by fmviesa001.fm.intel.com with ESMTP; 03 Feb 2024 01:17:26 -0800
 From: Zhao Liu <zhao1.liu@linux.intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Marcelo Tosatti <mtosatti@redhat.com>,
@@ -64,10 +65,12 @@ Cc: Zhenyu Wang <zhenyu.z.wang@intel.com>,
 	Yanting Jiang <yanting.jiang@intel.com>,
 	Yongwei Ma <yongwei.ma@intel.com>,
 	Zhao Liu <zhao1.liu@intel.com>
-Subject: [RFC 0/6] Intel Thread Director Virtualization Support in QEMU
-Date: Sat,  3 Feb 2024 17:30:48 +0800
-Message-Id: <20240203093054.412135-1-zhao1.liu@linux.intel.com>
+Subject: [RFC 1/6] target/i386: Add support for save/load of ACPI thermal MSRs
+Date: Sat,  3 Feb 2024 17:30:49 +0800
+Message-Id: <20240203093054.412135-2-zhao1.liu@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240203093054.412135-1-zhao1.liu@linux.intel.com>
+References: <20240203093054.412135-1-zhao1.liu@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -76,156 +79,125 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Zhao Liu <zhao1.liu@intel.com>
+From: Zhuocheng Ding <zhuocheng.ding@intel.com>
 
-Hi list,
+The CPUID_ACPI (CPUID.0x01.edx[bit 22]) feature bit has been
+introduced as the TCG feature. Currently, based on KVM's ACPI emulation,
+add related ACPI support in QEMU.
 
-This is our refreshed RFC to support our ITD virtualization patch
-series [1] in KVM, and bases on bd2e12310b18 ("Merge tag
-'qga-pull-2024-01-30' of https://github.com/kostyanf14/qemu into
-staging").
+From SDM [1], ACPI feature means:
 
-ITD is Intel's client specific feature to optimize scheduling on Intel
-hybrid platforms. Though this feature depends on hybrid topology
-details, in our parctice on Win11 Guest, ITD works with hyrbid topolohy
-and CPU affinity can achieve the most performance improvement in Win11
-Guest (for example, on i9-13900K, up to 14%+ improvement on
-3DMARK). More data or details, can be found in [1]. Thus, the ITD for
-Win11 is also a typical use case of hybrid topology.
+"The ACPI flag (bit 22) of the CPUID feature flags indicates the
+presence of the IA32_THERM_STATUS, IA32_THERM_INTERRUPT,
+IA32_CLOCK_MODULATION MSRs, and the xAPIC thermal LVT entry."
 
+With the emulation of ACPI in KVM, add the support for save/load of ACPI
+thermal MSRs: MSR_IA32_THERM_CONTROL, MSR_IA32_THERM_INTERRUPT and
+MSR_IA32_THERM_STATUS.
 
-Welcome your feedback!
+[1]: SDM, vol. 3B, section 15.8.4.1, Detection of Software Controlled
+     Clock Modulation Extension.
 
-
-1. Background and Motivation
-============================
-
-ITD allows the hardware to provide scheduling hints to the OS to help
-optimize scheduling performance, and under the Intel hybrid
-architecture, since Core and Atom have different capabilities
-(performance, energy effency, etc.),  scheduling based on hardware
-hints can take full advantage of this hybrid architecture. This is also
-the most ideal scheduling model for intel hybrid architecture.
-
-Therefore, we want to virtualize the ITD feature so that ITD can benefit
-performance of the virtual machines on the hybrid machines as well.
-
-Currently, our ITD virtualization is a software virtualization solution.
-
-
-2. Introduction to HFI and ITD
-==============================
-
-Intel provides Hardware Feedback Interface (HFI) feature to allow
-hardware to provide guidance to the OS scheduler to perform optimal
-workload scheduling through a hardware feedback interface structure in
-memory [2]. This hfi structure is called HFI table.
-
-As for now, the guidance includes performance and energy enficency hints,
-and it could update via thermal interrupt as the actual operating
-conditions of the processor change during run time.
-
-And Intel Thread Director (ITD) feature extends the HFI to provide
-performance and energy efficiency data for advanced classes of
-instructions.
-
-The virtual HFI table is maintained in KVM, and for QEMU, we just need
-to handle HFI/ITD/HRESET (and their dependent features: ACPI, TM and
-PTS) related CPUIDs and MSRs.
-
-
-3. Package level MSRs handling
-==============================
-
-PTS, HFI and ITD are all have package level features, such as package
-level MSRs and package level HFI tables. But since KVM hasn't
-support msr-topology and it just handle these package-level MSRs and
-HFI table at VM level, in order to avoid potential contention problems
-caused by multiple virtual-packages, we restrict VMs to be able to
-enable PTC/HFI/ITD iff there's only 1 package (and only 1 die for
-ITD/HFI).
-
-
-4. HFI/ITD related info in CPUID
-================================
-
-KVM provides some basic HFI info in CPUID.0x06 leaf, which is associated
-with the virtual HFI table in KVM.
-
-QEMU should configure HFI table index for each vCPU. Here we set the HFI
-table index to vCPU index so that different vCPUs have different HFI
-entries to avoid unnecessary competition problems.
-
-
-5. Compatibility issues
-=======================
-
-HFI is supported in both server (SPR) and client (ADL/RPL/MTL) platform
-products while ITD is the client specific feature.
-
-For client platform, ITD (with HFI) could be enabled in Guest to improve
-scheduling, but for server platform, HFI (without ITD) is only useful
-on Host and Guest doesn't need it.
-
-To simplify the enabling logic and avoid impacting the common topology
-of the Guest, we set PTS, HFI, and ITD as feature bits that are not
-automatically enabled.
-
-Only when the user actively specifies these features, QEMU will check
-and decide whether to enable them based on the topology constraints and
-the ITD constraints.
-
-
-6. New option "enable-itd"
-============================
-
-ITD-related features include PTS, HFI, ITD, and HRESET.
-
-To make it easier for users to enable ITD for Guest without specifying
-the above feature bits one by one, we provide a new option "enable-itd"
-to set the above feature bits for Guest all at once.
-
-"enable-itd" does not guarantee that ITD will be enabled for Guest.
-The success of enabling ITD for guest depends on topology constraints,
-platform support, etc., which are checked in QEMU.
-
-
-7. Patch Summary
-================
-
-Patch 1: Add support save/load for ACPI feature related thermal MSRs
-         since ACPI feature CPUID has been added in QEMU.
-Patch 2: Add support for PTS (package) thermal MSRs and its CPUID
-Patch 3: Add support for HFI MSRs and its CPUID
-Patch 4: Add support ITD CPUID and MSR_IA32_HW_FEEDBACK_THREAD_CONFIG.
-Patch 5: Add support HRESET CPUID and MSR_IA32_HW_HRESET_ENABLE.
-Patch 6: Add "enable-itd" to help user set ITD related feature bits.
-
-# 8. References
-
-[1]: KVM RFC: [RFC 00/26] Intel Thread Director Virtualization
-     https://lore.kernel.org/kvm/20240203091214.411862-1-zhao1.liu@linux.intel.com/T/#t
-[2]: SDM, vol. 3B, section 15.6 HARDWARE FEEDBACK INTERFACE AND INTEL
-     THREAD DIRECTOR
-
-Thanks and Best Regards,
-Zhao
+Tested-by: Yanting Jiang <yanting.jiang@intel.com>
+Signed-off-by: Zhuocheng Ding <zhuocheng.ding@intel.com>
+Co-developed-by: Zhao Liu <zhao1.liu@intel.com>
+Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
-Zhao Liu (2):
-  target/i386: Add support for Intel Thread Director feature
-  i386: Add a new property to set ITD related feature bits for Guest
+ target/i386/cpu.h     |  9 +++++++++
+ target/i386/kvm/kvm.c | 25 +++++++++++++++++++++++++
+ 2 files changed, 34 insertions(+)
 
-Zhuocheng Ding (4):
-  target/i386: Add support for save/load of ACPI thermal MSRs
-  target/i386: Add support for Package Thermal Management feature
-  target/i386: Add support for Hardware Feedback Interface feature
-  target/i386: Add support for HRESET feature
-
- target/i386/cpu.c     | 108 ++++++++++++++++++++++++++++++++++++++++--
- target/i386/cpu.h     |  37 +++++++++++++++
- target/i386/kvm/kvm.c |  84 ++++++++++++++++++++++++++++++++
- 3 files changed, 225 insertions(+), 4 deletions(-)
-
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 7f0786e8b98f..e453b3f010e2 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -526,6 +526,10 @@ typedef enum X86Seg {
+ #define MSR_IA32_XSS                    0x00000da0
+ #define MSR_IA32_UMWAIT_CONTROL         0xe1
+ 
++#define MSR_IA32_THERM_CONTROL          0x0000019a
++#define MSR_IA32_THERM_INTERRUPT        0x0000019b
++#define MSR_IA32_THERM_STATUS           0x0000019c
++
+ #define MSR_IA32_VMX_BASIC              0x00000480
+ #define MSR_IA32_VMX_PINBASED_CTLS      0x00000481
+ #define MSR_IA32_VMX_PROCBASED_CTLS     0x00000482
+@@ -1758,6 +1762,11 @@ typedef struct CPUArchState {
+     uint64_t msr_lbr_depth;
+     LBREntry lbr_records[ARCH_LBR_NR_ENTRIES];
+ 
++    /* Per-VCPU thermal MSRs */
++    uint64_t therm_control;
++    uint64_t therm_interrupt;
++    uint64_t therm_status;
++
+     /* exception/interrupt handling */
+     int error_code;
+     int exception_is_int;
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index 76a66246eb72..3bf57b35bfcd 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -138,6 +138,7 @@ static bool has_msr_ucode_rev;
+ static bool has_msr_vmx_procbased_ctls2;
+ static bool has_msr_perf_capabs;
+ static bool has_msr_pkrs;
++static bool has_msr_therm;
+ 
+ static uint32_t has_architectural_pmu_version;
+ static uint32_t num_architectural_pmu_gp_counters;
+@@ -2455,6 +2456,11 @@ static int kvm_get_supported_msrs(KVMState *s)
+             case MSR_IA32_PKRS:
+                 has_msr_pkrs = true;
+                 break;
++            case MSR_IA32_THERM_CONTROL:
++            case MSR_IA32_THERM_INTERRUPT:
++            case MSR_IA32_THERM_STATUS:
++                has_msr_therm = true;
++                break;
+             }
+         }
+     }
+@@ -3302,6 +3308,11 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+     if (has_msr_virt_ssbd) {
+         kvm_msr_entry_add(cpu, MSR_VIRT_SSBD, env->virt_ssbd);
+     }
++    if (has_msr_therm) {
++        kvm_msr_entry_add(cpu, MSR_IA32_THERM_CONTROL, env->therm_control);
++        kvm_msr_entry_add(cpu, MSR_IA32_THERM_INTERRUPT, env->therm_interrupt);
++        kvm_msr_entry_add(cpu, MSR_IA32_THERM_STATUS, env->therm_status);
++    }
+ 
+ #ifdef TARGET_X86_64
+     if (lm_capable_kernel) {
+@@ -3774,6 +3785,11 @@ static int kvm_get_msrs(X86CPU *cpu)
+         kvm_msr_entry_add(cpu, MSR_IA32_TSC, 0);
+         env->tsc_valid = !runstate_is_running();
+     }
++    if (has_msr_therm) {
++        kvm_msr_entry_add(cpu, MSR_IA32_THERM_CONTROL, 0);
++        kvm_msr_entry_add(cpu, MSR_IA32_THERM_INTERRUPT, 0);
++        kvm_msr_entry_add(cpu, MSR_IA32_THERM_STATUS, 0);
++    }
+ 
+ #ifdef TARGET_X86_64
+     if (lm_capable_kernel) {
+@@ -4255,6 +4271,15 @@ static int kvm_get_msrs(X86CPU *cpu)
+         case MSR_ARCH_LBR_INFO_0 ... MSR_ARCH_LBR_INFO_0 + 31:
+             env->lbr_records[index - MSR_ARCH_LBR_INFO_0].info = msrs[i].data;
+             break;
++        case MSR_IA32_THERM_CONTROL:
++            env->therm_control = msrs[i].data;
++            break;
++        case MSR_IA32_THERM_INTERRUPT:
++            env->therm_interrupt = msrs[i].data;
++            break;
++        case MSR_IA32_THERM_STATUS:
++            env->therm_status = msrs[i].data;
++            break;
+         }
+     }
+ 
 -- 
 2.34.1
 
