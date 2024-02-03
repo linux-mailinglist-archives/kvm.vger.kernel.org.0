@@ -1,59 +1,59 @@
-Return-Path: <kvm+bounces-7909-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7910-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E23E68484BC
-	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 10:04:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08FE28484BF
+	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 10:05:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 126DC1C28329
-	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 09:04:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3980290357
+	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 09:05:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CE115FDD7;
-	Sat,  3 Feb 2024 09:01:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01C635FF13;
+	Sat,  3 Feb 2024 09:01:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JYdl/2He"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WUvoFJal"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA5185FDB7;
-	Sat,  3 Feb 2024 09:01:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B7325FEF8;
+	Sat,  3 Feb 2024 09:01:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706950862; cv=none; b=khSBATT0lVndlQBILkMyrdEy1saxLdkVadGwReSyn8Aw+u3XU8PUsYyahW1MPhTwhH0ju538heY/EW8ANDmAbN1pf4IebmTTHISP899PTypOFEzho1RxEqQgrhzl+cAdBuPZ2y8onpS8rtFbAMFD+9Z83LaPjIDghtfbD2gBc2k=
+	t=1706950868; cv=none; b=uqTvmk30TqcNMYNXiY2DDSVk4NyEZwa6C+JymrqDwGkLcUVk9NIgfXa5N6nAVTvQmkZG1ejlgWirgsHFZadqQ0MyYBxJKQJw0rSQm/S1ATf7bviHX2uUfwdpPBcg+udqLOI8tGjFgIanm1v3OFJN4xmYHdGXDqyM3XIrUki6a94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706950862; c=relaxed/simple;
-	bh=SIIfDj0zX5GYY4IEtDgxTxiCH4JC5qldRU/UOzkQNm0=;
+	s=arc-20240116; t=1706950868; c=relaxed/simple;
+	bh=jaSpkN47fYUzN6obTA+Fv5SVXL8pgNQFR+mSAgkAyoY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=VjN9MZAPmylvYZzs1RC8YCREskD9bb3Sf+t885xnuWWRuzByUCGMKT8eJfHgcqT1gUvhzg2fb55RZ6EhIsefMS8UbHedIsqxWNC06tYOS2iFrNxu1uDTe3wveiwewRj7TapsH4YbLT5pq+o60LUp3V6vOK63CJE3q4CgcLLhsfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JYdl/2He; arc=none smtp.client-ip=198.175.65.14
+	 MIME-Version; b=g1+bRW+MUyYl0Bf8xOvOTxbkWj/bm/qosPckRRpIL7zUqs5qiuwQ8ntutdEBbo+bdkjNEkfexsiz7CkTkWe+/4i1Vz9T8Eqr3vflqqkULYh1mOtbUER9ae810DlFqqccK52Fac9Qd8x+FphyQzg7cC7e7MPhqt/TwT6iuZkqG6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WUvoFJal; arc=none smtp.client-ip=198.175.65.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706950861; x=1738486861;
+  t=1706950867; x=1738486867;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=SIIfDj0zX5GYY4IEtDgxTxiCH4JC5qldRU/UOzkQNm0=;
-  b=JYdl/2HeBi52H//58wlbNOnv/kE3XYETHRw0Nr8pWcqgD7jfTIxrHgKf
-   /+mN/JKcCJ1d70yJFajX5hpBxnO2XutWkkNlWkpobbELwLXMeTMA0AoQx
-   5Mwt+TUj3djuxynDkjLhrg7FwuzWIYUm6UM3VP2TBqVOXNc0GFtg3xNwP
-   0XatsHBv/WQe83v60OTIixBPjlG21kEI+01vzyfx7SbgGbiUoOlf9TOTW
-   YfQHVVN2TslvCRvQmuXBYMLPl8T16YUrPLFTNfseyWrpJiZ/1fZnPGv8E
-   autM435WmNrIjsyT8b8FNWMYLyaWRo3cdiM/dL6WUm7sJNoRjIaM/TZB/
+  bh=jaSpkN47fYUzN6obTA+Fv5SVXL8pgNQFR+mSAgkAyoY=;
+  b=WUvoFJal5haVfkyljBUyamGtlIUZ1MjP3iQsB8q/hgYQqgp8U9zg9sRY
+   VnpoaGiT4v0tOzA2joZnFdBocnopNyXILz1plYCCx8AA/wygz+WrleDeF
+   cK1j/8vwYsA9x/8hvw+YhACGGSreULeRyZbA+1SpXrhw8BWiGWqbsEm0e
+   dRreTo35TxaG0h78FReEKOWO5zhfgZ1/LMjUXI0aITik3bFIDIN504c/Y
+   hhR9xqnnFX3/2YTPKIWVU/zVgnhmMDPvR7xOA6v5gaCpZMpCwdkWVszBh
+   J2F6dlfoNrl4EaRMLxrOs9T5oDMItXfRxPK1UQUMGvkwqlfeAX6yZner3
    A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="4132017"
+X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="4132038"
 X-IronPort-AV: E=Sophos;i="6.05,240,1701158400"; 
-   d="scan'208";a="4132017"
+   d="scan'208";a="4132038"
 Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2024 01:01:01 -0800
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2024 01:01:06 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.05,240,1701158400"; 
-   d="scan'208";a="291390"
+   d="scan'208";a="291420"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
-  by fmviesa009.fm.intel.com with ESMTP; 03 Feb 2024 01:00:54 -0800
+  by fmviesa009.fm.intel.com with ESMTP; 03 Feb 2024 01:01:00 -0800
 From: Zhao Liu <zhao1.liu@linux.intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Sean Christopherson <seanjc@google.com>,
@@ -82,9 +82,9 @@ Cc: Ricardo Neri <ricardo.neri-calderon@linux.intel.com>,
 	David Dai <davidai@google.com>,
 	Saravana Kannan <saravanak@google.com>,
 	Zhao Liu <zhao1.liu@intel.com>
-Subject: [RFC 13/26] KVM: VMX: Support virtual HFI table for VM
-Date: Sat,  3 Feb 2024 17:12:01 +0800
-Message-Id: <20240203091214.411862-14-zhao1.liu@linux.intel.com>
+Subject: [RFC 14/26] KVM: x86: Introduce the HFI dynamic update request and kvm_x86_ops
+Date: Sat,  3 Feb 2024 17:12:02 +0800
+Message-Id: <20240203091214.411862-15-zhao1.liu@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240203091214.411862-1-zhao1.liu@linux.intel.com>
 References: <20240203091214.411862-1-zhao1.liu@linux.intel.com>
@@ -96,180 +96,136 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Zhuocheng Ding <zhuocheng.ding@intel.com>
+From: Zhao Liu <zhao1.liu@intel.com>
 
-The Hardware Feedback Interface (HFI) is a feature that allows hardware
-to provide guidance to the operating system scheduler through a hardware
-feedback interface structure (HFI table) in memory [1], so that the
-scheduler can perform optimal workload scheduling.
+There're 2 cases that we need to update Guest HFI table dynamically:
 
-ITD (Intel Thread Director) and HFI features both depend on the HFI
-table, but their HFI tables are slightly different. The HFI table
-provided by the ITD feature has 4 classes (in terms of more columns
-in the table) and the native HFI feature supports 1 class [2].
+1. When Host's HFI table has update, we need to sync the change to
+   Guest.
 
-In fact, the size of the HFI table is determined by the feature bit that
-the processor supports, but the range of data updates in the table
-is determined by the feature actually enabled (HFI or ITD) [3], which is
-controlled by MSR_IA32_HW_FEEDBACK_CONFIG.
+2. When vCPU thread migrates to another pCPU, we need rebuild the new
+   Guest HFI table based the HFI data of the pCPU that the vCPU is
+   running on.
 
-To benefit the scheduling in VM with HFI/ITD, we need to maintain
-virtual HFI tables in KVM. The virtual HFI table is based on the real
-HFI table. We extract the HFI entries corresponding to the pCPU that the
-vCPU is running on, and reorganize these actual entries into a new
-virtual HFI table with the vCPU's HFI index.
+So add the updating mechanism with a new request and a new op to prepare
+for the above 2 cases:
 
-Also, to simplify the logic, before the emulation of ITD is supported,
-we build virtual HFI table based on HFI feature by default (i.e. only 1
-class is supported, based on class 0 of real hardware).
+- New KVM request type to perform HFI updating at vcpu_enter_guest().
+  Updating the VM's HFI table will result in writing to the VM's memory.
+  This requires vCPU context, so we pend HFI updates via kvm request
+  until vCPU is running. Here we only make request for one vCPU per VM
+  because all vCPUs of the same VM share the same HFI table. This allows
+  one vCPU to update the HFI table for the entire VM.
 
-Add the interfaces to initialize and build the virtual HFI table, and to
-inject the thermal interrupt into the VM to notify about HFI updates.
-
-[1]: SDM, vol. 3B, section 15.6 HARDWARE FEEDBACK INTERFACE AND INTEL
-     THREAD DIRECTOR
-[2]: SDM, vol. 3B, section 15.6.2 Intel Thread Director Table Structure
-[3]: SDM, vol. 3B, section 15.6.5 Hardware Feedback Interface
-     Configuration, Table 15-10. IA32_HW_FEEDBACK_CONFIG Control Option
+- New kvm_x86_op (optional for x86).
+  When KVM processes KVM_REQ_HFI_UPDATE, this ops is called to update
+  the corresponding HFI table raw for the specified vCPU.
 
 Tested-by: Yanting Jiang <yanting.jiang@intel.com>
-Signed-off-by: Zhuocheng Ding <zhuocheng.ding@intel.com>
-Co-developed-by: Zhao Liu <zhao1.liu@intel.com>
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 119 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 119 insertions(+)
+ arch/x86/include/asm/kvm-x86-ops.h |  3 ++-
+ arch/x86/include/asm/kvm_host.h    |  2 ++
+ arch/x86/kvm/vmx/vmx.c             | 30 ++++++++++++++++++++++++++++++
+ arch/x86/kvm/x86.c                 |  2 ++
+ 4 files changed, 36 insertions(+), 1 deletion(-)
 
+diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+index 378ed944b849..1b16de7a03eb 100644
+--- a/arch/x86/include/asm/kvm-x86-ops.h
++++ b/arch/x86/include/asm/kvm-x86-ops.h
+@@ -136,8 +136,9 @@ KVM_X86_OP_OPTIONAL(migrate_timers)
+ KVM_X86_OP(msr_filter_changed)
+ KVM_X86_OP(complete_emulated_msr)
+ KVM_X86_OP(vcpu_deliver_sipi_vector)
+-KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
++KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons)
+ KVM_X86_OP_OPTIONAL(get_untagged_addr)
++KVM_X86_OP_OPTIONAL(update_hfi)
+ 
+ #undef KVM_X86_OP
+ #undef KVM_X86_OP_OPTIONAL
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index b5b2d0fde579..e476a86b0766 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -121,6 +121,7 @@
+ 	KVM_ARCH_REQ_FLAGS(31, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+ #define KVM_REQ_HV_TLB_FLUSH \
+ 	KVM_ARCH_REQ_FLAGS(32, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
++#define KVM_REQ_HFI_UPDATE		KVM_ARCH_REQ(33)
+ 
+ #define CR0_RESERVED_BITS                                               \
+ 	(~(unsigned long)(X86_CR0_PE | X86_CR0_MP | X86_CR0_EM | X86_CR0_TS \
+@@ -1794,6 +1795,7 @@ struct kvm_x86_ops {
+ 	unsigned long (*vcpu_get_apicv_inhibit_reasons)(struct kvm_vcpu *vcpu);
+ 
+ 	gva_t (*get_untagged_addr)(struct kvm_vcpu *vcpu, gva_t gva, unsigned int flags);
++	void (*update_hfi)(struct kvm_vcpu *vcpu);
+ };
+ 
+ struct kvm_x86_nested_ops {
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 96f0f768939d..7881f6b51daa 100644
+index 7881f6b51daa..93c47ba0817b 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1532,6 +1532,125 @@ static void vmx_inject_therm_interrupt(struct kvm_vcpu *vcpu)
- 		kvm_apic_therm_deliver(vcpu);
+@@ -1651,6 +1651,35 @@ static void vmx_update_hfi_table(struct kvm *kvm)
+ 		vmx_inject_therm_interrupt(kvm_get_vcpu(kvm, 0));
  }
  
-+static inline bool vmx_hfi_initialized(struct kvm_vmx *kvm_vmx)
++static void vmx_dynamic_update_hfi_table(struct kvm_vcpu *vcpu)
 +{
-+	return kvm_vmx->pkg_therm.hfi_desc.hfi_enabled &&
-+	       kvm_vmx->pkg_therm.hfi_desc.table_ptr_valid;
-+}
-+
-+static inline bool vmx_hfi_int_enabled(struct kvm_vmx *kvm_vmx)
-+{
-+	return kvm_vmx->pkg_therm.hfi_desc.hfi_int_enabled;
-+}
-+
-+static int vmx_init_hfi_table(struct kvm *kvm)
-+{
-+	struct kvm_vmx *kvm_vmx = to_kvm_vmx(kvm);
++	struct kvm_vmx *kvm_vmx = to_kvm_vmx(vcpu->kvm);
 +	struct hfi_desc *kvm_vmx_hfi = &kvm_vmx->pkg_therm.hfi_desc;
-+	struct hfi_features *hfi_features = &kvm_vmx_hfi->hfi_features;
-+	struct hfi_table *hfi_table = &kvm_vmx_hfi->hfi_table;
-+	int nr_classes, ret = 0;
-+
-+	/*
-+	 * Currently we haven't supported ITD. HFI is the default feature
-+	 * with 1 class.
-+	 */
-+	nr_classes = 1;
-+	ret = intel_hfi_build_virt_features(hfi_features,
-+					    nr_classes,
-+					    kvm->created_vcpus);
-+	if (unlikely(ret))
-+		return ret;
-+
-+	hfi_table->base_addr = kzalloc(hfi_features->nr_table_pages <<
-+				       PAGE_SHIFT, GFP_KERNEL);
-+	if (!hfi_table->base_addr)
-+		return -ENOMEM;
-+
-+	hfi_table->hdr = hfi_table->base_addr + sizeof(*hfi_table->timestamp);
-+	hfi_table->data = hfi_table->hdr + hfi_features->hdr_size;
-+	return 0;
-+}
-+
-+static int vmx_build_hfi_table(struct kvm *kvm)
-+{
-+	struct kvm_vmx *kvm_vmx = to_kvm_vmx(kvm);
-+	struct hfi_desc *kvm_vmx_hfi = &kvm_vmx->pkg_therm.hfi_desc;
-+	struct hfi_features *hfi_features = &kvm_vmx_hfi->hfi_features;
-+	struct hfi_table *hfi_table = &kvm_vmx_hfi->hfi_table;
-+	struct hfi_hdr *hfi_hdr = hfi_table->hdr;
-+	int nr_classes, ret = 0, updated = 0;
-+	struct kvm_vcpu *v;
-+	unsigned long i;
-+
-+	/*
-+	 * Currently we haven't supported ITD. HFI is the default feature
-+	 * with 1 class.
-+	 */
-+	nr_classes = 1;
-+	for (int j = 0; j < nr_classes; j++) {
-+		hfi_hdr->perf_updated = 0;
-+		hfi_hdr->ee_updated = 0;
-+		hfi_hdr++;
-+	}
-+
-+	kvm_for_each_vcpu(i, v, kvm) {
-+		ret = intel_hfi_build_virt_table(hfi_table, hfi_features,
-+						 nr_classes,
-+						 to_vmx(v)->hfi_table_idx,
-+						 v->cpu);
-+		if (unlikely(ret < 0))
-+			return ret;
-+		updated |= ret;
-+	}
-+
-+	if (!updated)
-+		return updated;
-+
-+	/* Timestamp must be monotonic. */
-+	(*kvm_vmx_hfi->hfi_table.timestamp)++;
-+
-+	/* Update the HFI table, whether the HFI interrupt is enabled or not. */
-+	kvm_write_guest(kvm, kvm_vmx_hfi->table_base, hfi_table->base_addr,
-+			hfi_features->nr_table_pages << PAGE_SHIFT);
-+	return 1;
-+}
-+
-+static void vmx_update_hfi_table(struct kvm *kvm)
-+{
-+	struct kvm_vmx *kvm_vmx = to_kvm_vmx(kvm);
-+	struct hfi_desc *kvm_vmx_hfi = &kvm_vmx->pkg_therm.hfi_desc;
-+	int ret = 0;
 +
 +	if (!intel_hfi_enabled())
 +		return;
 +
-+	if (!vmx_hfi_initialized(kvm_vmx))
-+		return;
-+
-+	if (!kvm_vmx_hfi->hfi_table.base_addr) {
-+		ret = vmx_init_hfi_table(kvm);
-+		if (unlikely(ret))
-+			return;
-+	}
-+
-+	ret = vmx_build_hfi_table(kvm);
-+	if (ret <= 0)
-+		return;
-+
-+	kvm_vmx_hfi->hfi_update_status = true;
-+	kvm_vmx_hfi->hfi_update_pending = false;
++	mutex_lock(&kvm_vmx->pkg_therm.pkg_therm_lock);
 +
 +	/*
-+	 * Since HFI is shared for all vCPUs of the same VM, we
-+	 * actually support only 1 package topology VMs, so when
-+	 * emulating package level interrupt, we only inject an
-+	 * interrupt into one vCPU to reduce the overhead.
++	 * If Guest hasn't handled the previous update, just mark a pending
++	 * flag to indicate that Host has more updates that KVM needs to sync.
 +	 */
-+	if (vmx_hfi_int_enabled(kvm_vmx))
-+		vmx_inject_therm_interrupt(kvm_get_vcpu(kvm, 0));
++	if (kvm_vmx_hfi->hfi_update_status) {
++		kvm_vmx_hfi->hfi_update_pending = true;
++		mutex_unlock(&kvm_vmx->pkg_therm.pkg_therm_lock);
++		return;
++	}
++
++	/*
++	 * The virtual HFI table is maintained at VM level so that vCPUs
++	 * of the same VM are sharing the one HFI table. Therefore, one
++	 * vCPU can update the HFI table for the whole VM.
++	 */
++	vmx_update_hfi_table(vcpu->kvm);
++	mutex_unlock(&kvm_vmx->pkg_therm.pkg_therm_lock);
 +}
 +
  /*
   * Switches to specified vcpu, until a matching vcpu_put(), but assumes
   * vcpu mutex is already taken.
+@@ -8703,6 +8732,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
+ 	.vcpu_deliver_sipi_vector = kvm_vcpu_deliver_sipi_vector,
+ 
+ 	.get_untagged_addr = vmx_get_untagged_addr,
++	.update_hfi = vmx_dynamic_update_hfi_table,
+ };
+ 
+ static unsigned int vmx_handle_intel_pt_intr(void)
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 7d787ced513f..bea3def6a4b1 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -10850,6 +10850,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 
+ 		if (kvm_check_request(KVM_REQ_UPDATE_CPU_DIRTY_LOGGING, vcpu))
+ 			static_call(kvm_x86_update_cpu_dirty_logging)(vcpu);
++		if (kvm_check_request(KVM_REQ_HFI_UPDATE, vcpu))
++			static_call(kvm_x86_update_hfi)(vcpu);
+ 	}
+ 
+ 	if (kvm_check_request(KVM_REQ_EVENT, vcpu) || req_int_win ||
 -- 
 2.34.1
 
