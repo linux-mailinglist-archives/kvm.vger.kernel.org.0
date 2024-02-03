@@ -1,59 +1,59 @@
-Return-Path: <kvm+bounces-7898-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7899-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE73984849B
-	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 10:00:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F6D984849D
+	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 10:01:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2CC6AB25290
-	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 09:00:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C2D2128BEEC
+	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 09:01:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DA5C5D758;
-	Sat,  3 Feb 2024 09:00:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B64225D903;
+	Sat,  3 Feb 2024 09:00:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ik5CkECQ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="h1oR1Mcs"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 775EF5CDD3;
-	Sat,  3 Feb 2024 08:59:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5246A5D8F5;
+	Sat,  3 Feb 2024 09:00:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706950799; cv=none; b=dazohyMkcihe4bt1gHPK8CZ0UjCC1uObQHm4u4pnc7jXYF/yu2Iek0mIU1ZoQrw1m9J6Xklfg9Txpxf4Wu64Tklajc5idKwMcPihntBmzowmozjAK0hnml99CoGlqUrgxgq2GsXNVBMIHELUmobHVDytBaNcJOcJZabREThoHeA=
+	t=1706950804; cv=none; b=STAyRVGOBBeVvB4GxXdsjC6/yhdyqda5k3z+2tLRhBPP79UUBazfX6r0eie+dHPx0w9srCtbWiWlLpsUTqvSyXaL69fhV6pDa0jvs/3miFc0PrzjSnTuU99v5Yui2aVEM/FZ4cQ5nROGrZ6RIs+ZN3CuF1K8Bj8hFy+1gPO63q0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706950799; c=relaxed/simple;
-	bh=ji6khLPdPc2d+wRmATkf+HZE1RiFEEWfxK/r4PNR6xw=;
+	s=arc-20240116; t=1706950804; c=relaxed/simple;
+	bh=L+ZWKNEEcAmsWFGnKg8TWtGGaRb+SV6m6dlf0/X0V/c=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=KS73vLTeQv8zORXs0KqQjyTa4Mxv70TmZWQUxNB8WZP8lDVHIkQcFuPQJOvCafNar6vIBAb3kdT28vFwC/Ysiz7df8DWkZaO1i808ualjHiRIFnGHNnuxX+3Nl7oD+sWPY5EE8FLf03b7g+j30z9aK1ntmE94XDqAbgVh3JVijw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ik5CkECQ; arc=none smtp.client-ip=198.175.65.14
+	 MIME-Version; b=XR2rz5d1LAm19XXbD1cl1wvb6pQ7V1lcqm7ECNq6WYEIistQUTOWoYgXVbK6/Xo2Jm01eJIm9g5uLf1jzgi/vQapeylN4sJ6kMhEJSc5AQzsobQT4U0IK/5gcuDqi3Ocsd8fB7KPaiVIZI4sLOwJr6cc1XIH3uJzVuDET5CEjZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=h1oR1Mcs; arc=none smtp.client-ip=198.175.65.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706950798; x=1738486798;
+  t=1706950804; x=1738486804;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=ji6khLPdPc2d+wRmATkf+HZE1RiFEEWfxK/r4PNR6xw=;
-  b=Ik5CkECQeyg67nr3+/tIk7xw8go43rgzgtt0eQVg2PNmHtmWvyWjOEOq
-   W7GhIaS50HEo12MZ2eXYxbzMQQ0UptG83yTEiofp3GFukW7BZjDevxPBe
-   d08/mHOfvQKUyaXRxn0ZDEqnScslaeVCVNbPzTwNKTvsi1r8McZOG3IrZ
-   bfE6Lp4fsIfjmo6duPDLTE6RVpfDBpN5SCzd7aZZ95llU4sihjHBsJ1Zx
-   bapVe7q4+SCWsJamxD0DEmiU/dwmpmrzf4cAZc4T6H3/7gC+P6QbJPI0h
-   lRsUmcnqO/m0F8lDs9RcBjDieIXbkvT9h+HutRCE3luxSDfXW6CFRp2UY
+  bh=L+ZWKNEEcAmsWFGnKg8TWtGGaRb+SV6m6dlf0/X0V/c=;
+  b=h1oR1McsXko4tLa3NPZ1gpqBnP360P4GpCFQXJk5tT/wAqoy6D9RutCm
+   hEKOVM71npXHfQidOClNFBk3YlHbMGlrj9kNxxfKs+YJWVdp+2MmRZzOn
+   vHSSD1zu1VJ0xJrzAQjlc11IbKi7R2OgZaOhrXLzZFKecHV0+nhF5ZaDM
+   /5quFqilAeR8xWPEhhQZRj6UISZYpzm5myG6mYBZYyDzURavvJkam6OHX
+   6Ket3LFio9rqETS6mMEigl+dOSug133e9dp7VhcYrEk6q10NPAzrH3i5+
+   P/sUzYgMNRkU3bZtwH4B6EJn6VANb5y44iLfLBEjioTA2nQ4yHuvt7ctQ
    Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="4131863"
+X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="4131874"
 X-IronPort-AV: E=Sophos;i="6.05,240,1701158400"; 
-   d="scan'208";a="4131863"
+   d="scan'208";a="4131874"
 Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2024 00:59:57 -0800
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2024 01:00:03 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.05,240,1701158400"; 
-   d="scan'208";a="291159"
+   d="scan'208";a="291215"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
-  by fmviesa009.fm.intel.com with ESMTP; 03 Feb 2024 00:59:51 -0800
+  by fmviesa009.fm.intel.com with ESMTP; 03 Feb 2024 00:59:57 -0800
 From: Zhao Liu <zhao1.liu@linux.intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Sean Christopherson <seanjc@google.com>,
@@ -82,9 +82,9 @@ Cc: Ricardo Neri <ricardo.neri-calderon@linux.intel.com>,
 	David Dai <davidai@google.com>,
 	Saravana Kannan <saravanak@google.com>,
 	Zhao Liu <zhao1.liu@intel.com>
-Subject: [RFC 02/26] thermal: intel: hfi: Add helpers to build HFI/ITD structures
-Date: Sat,  3 Feb 2024 17:11:50 +0800
-Message-Id: <20240203091214.411862-3-zhao1.liu@linux.intel.com>
+Subject: [RFC 03/26] thermal: intel: hfi: Add HFI notifier helpers to notify HFI update
+Date: Sat,  3 Feb 2024 17:11:51 +0800
+Message-Id: <20240203091214.411862-4-zhao1.liu@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240203091214.411862-1-zhao1.liu@linux.intel.com>
 References: <20240203091214.411862-1-zhao1.liu@linux.intel.com>
@@ -98,212 +98,146 @@ Content-Transfer-Encoding: 8bit
 
 From: Zhuocheng Ding <zhuocheng.ding@intel.com>
 
-Virtual machines need to compose their own HFI tables. Provide helper
-functions that collect the relevant features and data from the host
-machine.
+KVM builds virtual HFI tables for virtual machines, which also needs to
+sync Host's HFI table update in time.
+
+Add notifier_chain in HFI instance to notify other modules about HFI
+table updates, and provide 2 helpers to register/unregister notifier
+hook in HFI driver.
 
 Tested-by: Yanting Jiang <yanting.jiang@intel.com>
 Signed-off-by: Zhuocheng Ding <zhuocheng.ding@intel.com>
 Co-developed-by: Zhao Liu <zhao1.liu@intel.com>
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
- arch/x86/include/asm/hfi.h        |  20 ++++
- drivers/thermal/intel/intel_hfi.c | 149 ++++++++++++++++++++++++++++++
- 2 files changed, 169 insertions(+)
+ arch/x86/include/asm/hfi.h        |  8 ++++
+ drivers/thermal/intel/intel_hfi.c | 63 ++++++++++++++++++++++++++++---
+ 2 files changed, 65 insertions(+), 6 deletions(-)
 
 diff --git a/arch/x86/include/asm/hfi.h b/arch/x86/include/asm/hfi.h
-index b7fda3e0e8c8..e0fe5b30fb53 100644
+index e0fe5b30fb53..19e3e5a7fb77 100644
 --- a/arch/x86/include/asm/hfi.h
 +++ b/arch/x86/include/asm/hfi.h
-@@ -82,4 +82,24 @@ struct hfi_features {
- 	unsigned int	hdr_size;
- };
+@@ -90,6 +90,10 @@ int intel_hfi_build_virt_table(struct hfi_table *table, struct hfi_features *fea
+ 			       unsigned int nr_classes, unsigned int hfi_index,
+ 			       unsigned int cpu);
+ static inline bool intel_hfi_enabled(void) { return intel_hfi_max_instances() > 0; }
++int intel_hfi_notifier_register(struct notifier_block *notifier,
++				unsigned int cpu);
++int intel_hfi_notifier_unregister(struct notifier_block *notifier,
++				  unsigned int cpu);
+ #else
+ static inline int intel_hfi_max_instances(void) { return 0; }
+ static inline int intel_hfi_build_virt_features(struct hfi_features *features,
+@@ -100,6 +104,10 @@ static inline int intel_hfi_build_virt_table(struct hfi_table *table,
+ 					     unsigned int nr_classes, unsigned int hfi_index,
+ 					     unsigned int cpu) { return 0; }
+ static inline bool intel_hfi_enabled(void) { return false; }
++static inline int intel_hfi_notifier_register(struct notifier_block *notifier,
++					      unsigned int cpu) { return -ENODEV; }
++static inline int intel_hfi_notifier_unregister(struct notifier_block *notifier,
++						unsigned int cpu) { return -ENODEV; }
+ #endif
  
-+#if defined(CONFIG_INTEL_HFI_THERMAL)
-+int intel_hfi_max_instances(void);
-+int intel_hfi_build_virt_features(struct hfi_features *features, unsigned int nr_classes,
-+				  unsigned int nr_entries);
-+int intel_hfi_build_virt_table(struct hfi_table *table, struct hfi_features *features,
-+			       unsigned int nr_classes, unsigned int hfi_index,
-+			       unsigned int cpu);
-+static inline bool intel_hfi_enabled(void) { return intel_hfi_max_instances() > 0; }
-+#else
-+static inline int intel_hfi_max_instances(void) { return 0; }
-+static inline int intel_hfi_build_virt_features(struct hfi_features *features,
-+						unsigned int nr_classes,
-+						unsigned int nr_entries) { return 0; }
-+static inline int intel_hfi_build_virt_table(struct hfi_table *table,
-+					     struct hfi_features *features,
-+					     unsigned int nr_classes, unsigned int hfi_index,
-+					     unsigned int cpu) { return 0; }
-+static inline bool intel_hfi_enabled(void) { return false; }
-+#endif
-+
  #endif /* _ASM_X86_HFI_H */
 diff --git a/drivers/thermal/intel/intel_hfi.c b/drivers/thermal/intel/intel_hfi.c
-index b69fa234b317..139ce2d4b26b 100644
+index 139ce2d4b26b..330b264ca23d 100644
 --- a/drivers/thermal/intel/intel_hfi.c
 +++ b/drivers/thermal/intel/intel_hfi.c
-@@ -29,6 +29,7 @@
- #include <linux/io.h>
- #include <linux/kernel.h>
- #include <linux/math.h>
-+#include <linux/mm.h>
- #include <linux/mutex.h>
- #include <linux/percpu-defs.h>
- #include <linux/printk.h>
-@@ -642,3 +643,151 @@ void __init intel_hfi_init(void)
- 	kfree(hfi_instances);
- 	hfi_instances = NULL;
+@@ -72,18 +72,20 @@ struct hfi_cpu_data {
+  * @cpus:		CPUs represented in this HFI table instance
+  * @hw_table:		Pointer to the HFI table of this instance
+  * @update_work:	Delayed work to process HFI updates
++ * @notifier_chain:	Notification chain dedicated to this instance
+  * @table_lock:		Lock to protect acceses to the table of this instance
+  * @event_lock:		Lock to process HFI interrupts
+  *
+  * A set of parameters to parse and navigate a specific HFI table.
+  */
+ struct hfi_instance {
+-	struct hfi_table	local_table;
+-	cpumask_var_t		cpus;
+-	void			*hw_table;
+-	struct delayed_work	update_work;
+-	raw_spinlock_t		table_lock;
+-	raw_spinlock_t		event_lock;
++	struct hfi_table		local_table;
++	cpumask_var_t			cpus;
++	void				*hw_table;
++	struct delayed_work		update_work;
++	struct raw_notifier_head	notifier_chain;
++	raw_spinlock_t			table_lock;
++	raw_spinlock_t			event_lock;
+ };
+ 
+ /**
+@@ -189,6 +191,7 @@ static void hfi_update_work_fn(struct work_struct *work)
+ 				    update_work);
+ 
+ 	update_capabilities(hfi_instance);
++	raw_notifier_call_chain(&hfi_instance->notifier_chain, 0, NULL);
  }
+ 
+ void intel_hfi_process_event(__u64 pkg_therm_status_msr_val)
+@@ -448,6 +451,7 @@ void intel_hfi_online(unsigned int cpu)
+ 	init_hfi_instance(hfi_instance);
+ 
+ 	INIT_DELAYED_WORK(&hfi_instance->update_work, hfi_update_work_fn);
++	RAW_INIT_NOTIFIER_HEAD(&hfi_instance->notifier_chain);
+ 	raw_spin_lock_init(&hfi_instance->table_lock);
+ 	raw_spin_lock_init(&hfi_instance->event_lock);
+ 
+@@ -791,3 +795,50 @@ int intel_hfi_build_virt_table(struct hfi_table *table,
+ 	return table_changed;
+ }
+ EXPORT_SYMBOL_GPL(intel_hfi_build_virt_table);
 +
 +/**
-+ * intel_hfi_max_instances() - Get the maximum number of hfi instances.
++ * intel_hfi_notifier_register() - Register @notifier hook at @hfi_instance.
 + *
-+ * Return: the maximum number of hfi instances.
++ * @notifier:		HFI notifier hook to be registered
++ * @cpu:		CPU whose HFI instance the notifier is register at
++ *
++ * When the HFI instance of @cpu receives HFI interrupt and updates its local
++ * HFI table, the registered HFI notifier will be called.
++ *
++ * Return: 0 if successful, otherwise error.
 + */
-+int intel_hfi_max_instances(void)
-+{
-+	return max_hfi_instances;
-+}
-+EXPORT_SYMBOL_GPL(intel_hfi_max_instances);
-+
-+/**
-+ * intel_hfi_build_virt_features() - Build a virtual hfi_features structure.
-+ *
-+ * @features:		Feature structure need to be filled
-+ * @nr_classes:		Maximum number of classes supported. 1 class indicates
-+ *			only HFI feature is configured and 4 classes indicates
-+ *			both HFI and ITD features.
-+ * @nr_entries:		Number of HFI entries in HFI table.
-+ *
-+ * Fill a virtual hfi_features structure which is used for HFI/ITD virtualization.
-+ * HFI and ITD have different feature information, and the virtual feature
-+ * structure is based on the corresponding configured number of classes (in Guest
-+ * CPUID) to be built.
-+ *
-+ * Return: -EINVAL if there's the error for the parameters, otherwise 0.
-+ */
-+int intel_hfi_build_virt_features(struct hfi_features *features,
-+				  unsigned int nr_classes,
-+				  unsigned int nr_entries)
-+{
-+	unsigned int data_size;
-+
-+	if (!features || !nr_classes || !nr_entries)
-+		return -EINVAL;
-+
-+	/*
-+	 * The virtual feature must be based on the Host's feature; when Host
-+	 * enables both HFI and ITD, it is allowed for Guest to create only the
-+	 * HFI feature structure which has fewer classes than ITD.
-+	 */
-+	if (nr_classes > hfi_features.nr_classes)
-+		return -EINVAL;
-+
-+	features->nr_classes = nr_classes;
-+	features->class_stride = hfi_features.class_stride;
-+	/*
-+	 * For the meaning of these two calculations, please refer to the comments
-+	 * in hfi_parse_features().
-+	 */
-+	features->hdr_size = DIV_ROUND_UP(features->class_stride *
-+					  features->nr_classes, 8) * 8;
-+	features->cpu_stride = DIV_ROUND_UP(features->class_stride *
-+					    features->nr_classes, 8) * 8;
-+
-+	data_size = features->hdr_size + nr_entries * features->cpu_stride;
-+	features->nr_table_pages = PAGE_ALIGN(data_size) >> PAGE_SHIFT;
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(intel_hfi_build_virt_features);
-+
-+/**
-+ * intel_hfi_build_virt_table() - Fill the data of @hfi_index in virtual HFI table.
-+ *
-+ * @table:		HFI table to be filled
-+ * @features:		Configured feature information of the HFI table
-+ * @nr_classes:		Number of classes to be updated for @table. This field is
-+ *			based on the enabled feature, which may be different with
-+ *			the feature information configured in @features.
-+ * @hfi_index:		Index of the HFI data in HFI table to be filled
-+ * @cpu:		CPU whose real HFI data is used to fill the @hfi_index
-+ *
-+ * Fill the row data of hfi_index in a virtual HFI table which is used for HFI/ITD
-+ * virtualization. The size of the virtual HFI table is decided by the configured
-+ * feature information in @features, and the filled HFI data range is decided by
-+ * specified number of classes @nr_classes.
-+ *
-+ * Virtual machine may disable ITD at runtime through MSR_IA32_HW_FEEDBACK_CONFIG,
-+ * in this case, only 1 class data (class 0) can be dynamically updated in virtual
-+ * HFI table (class 0).
-+ *
-+ * Return: 1 if the @table is changed, 0 if the @table isn't changed, and
-+ * -EINVAL/-ENOMEM if there's the error for the parameters.
-+ */
-+int intel_hfi_build_virt_table(struct hfi_table *table,
-+			       struct hfi_features *features,
-+			       unsigned int nr_classes,
-+			       unsigned int hfi_index,
-+			       unsigned int cpu)
++int intel_hfi_notifier_register(struct notifier_block *notifier,
++				unsigned int cpu)
 +{
 +	struct hfi_instance *hfi_instance;
-+	struct hfi_hdr *hfi_hdr = table->hdr;
-+	s16 host_hfi_index;
-+	void *src_ptr, *dst_ptr;
-+	int table_changed = 0;
 +
-+	if (!table || !features || !nr_classes)
-+		return -EINVAL;
-+
-+	if (nr_classes > features->nr_classes ||
-+	    nr_classes > hfi_features.nr_classes)
-+		return -EINVAL;
-+
-+	/*
-+	 * Make sure that this raw that will be filled doesn't cause overflow.
-+	 * features->nr_classes indicates the maximum number of possible
-+	 * classes.
-+	 */
-+	if (features->hdr_size + (hfi_index + 1) * features->cpu_stride >
-+	    features->nr_table_pages << PAGE_SHIFT)
-+		return -ENOMEM;
-+
-+	if (cpu >= nr_cpu_ids)
-+		return -EINVAL;
-+
-+	if (features->class_stride != hfi_features.class_stride)
++	if (!notifier || cpu >= nr_cpu_ids)
 +		return -EINVAL;
 +
 +	hfi_instance = per_cpu(hfi_cpu_info, cpu).hfi_instance;
-+	host_hfi_index = per_cpu(hfi_cpu_info, cpu).index;
-+
-+	src_ptr = hfi_instance->local_table.data +
-+		  host_hfi_index * hfi_features.cpu_stride;
-+	dst_ptr = table->data + hfi_index * features->cpu_stride;
-+
-+	raw_spin_lock_irq(&hfi_instance->table_lock);
-+	for (int i = 0; i < nr_classes; i++) {
-+		struct hfi_cpu_data *src = src_ptr + i * hfi_features.class_stride;
-+		struct hfi_cpu_data *dst = dst_ptr + i * features->class_stride;
-+
-+		if (dst->perf_cap != src->perf_cap) {
-+			dst->perf_cap = src->perf_cap;
-+			hfi_hdr->perf_updated = 1;
-+		}
-+		if (dst->ee_cap != src->ee_cap) {
-+			dst->ee_cap = src->ee_cap;
-+			hfi_hdr->ee_updated = 1;
-+		}
-+		if (hfi_hdr->perf_updated || hfi_hdr->ee_updated)
-+			table_changed = 1;
-+		hfi_hdr++;
-+	}
-+	raw_spin_unlock_irq(&hfi_instance->table_lock);
-+
-+	return table_changed;
++	return raw_notifier_chain_register(&hfi_instance->notifier_chain,
++					   notifier);
 +}
-+EXPORT_SYMBOL_GPL(intel_hfi_build_virt_table);
++EXPORT_SYMBOL_GPL(intel_hfi_notifier_register);
++
++/**
++ * intel_hfi_notifier_unregister() - Unregister @notifier hook at @hfi_instance
++ *
++ * @notifier:		HFI notifier hook to be unregistered
++ * @cpu:		CPU whose HFI instance the notifier is unregister from
++ *
++ * Return: 0 if successful, otherwise error.
++ */
++int intel_hfi_notifier_unregister(struct notifier_block *notifier,
++				  unsigned int cpu)
++{
++	struct hfi_instance *hfi_instance;
++
++	if (!notifier || cpu >= nr_cpu_ids)
++		return -EINVAL;
++
++	hfi_instance = per_cpu(hfi_cpu_info, cpu).hfi_instance;
++	return raw_notifier_chain_unregister(&hfi_instance->notifier_chain,
++					     notifier);
++}
++EXPORT_SYMBOL_GPL(intel_hfi_notifier_unregister);
 -- 
 2.34.1
 
