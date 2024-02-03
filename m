@@ -1,59 +1,59 @@
-Return-Path: <kvm+bounces-7915-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7916-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 404468484CF
-	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 10:07:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CAF48484D2
+	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 10:07:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7B051B2B5B1
-	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 09:07:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 41D521C29294
+	for <lists+kvm@lfdr.de>; Sat,  3 Feb 2024 09:07:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 157C262A16;
-	Sat,  3 Feb 2024 09:01:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9D7D6341A;
+	Sat,  3 Feb 2024 09:01:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FJLd0h6V"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="U+uoOdHJ"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B30EB63101;
-	Sat,  3 Feb 2024 09:01:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 368BC633F1;
+	Sat,  3 Feb 2024 09:01:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706950897; cv=none; b=OmIWpHLNNC9RI8yvmyynEUyY2oHNz+nn4s+p1OBk+zRwDqDijXSiLPYK1YZnfDaKKK834llbzqLuPkvRbVgZOVznUVKw/bhfjPXB7HO0XDOHG0YNwM0QxrOp1fzH1t9nDw9j5qLgOT/1CfujtESSfd8ypJaUMBz7+WmwEqj+3XQ=
+	t=1706950903; cv=none; b=Siu6zYVhcpfpXS95qlZfRs3ahBNUtb9qqAH60eKDbJ7nPPHPps9qS1qzqTAiaIM4tubbmGhZe7Cr8s1Z3r8EBdGrgdIrkzvfA1zrHg3wG8kFJBgMHAD17QtdjzDnUfrDOFCURDEOQEuY9ipSbsy5HjXykiUovOhvLowBh+rY/bk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706950897; c=relaxed/simple;
-	bh=SGebCb4uhyf1FjJh6l9SreVJIhhK/w3FLryXtt84pw8=;
+	s=arc-20240116; t=1706950903; c=relaxed/simple;
+	bh=tPickwMWphnvoa4nUW5041d+Jv4leQezd407dqDzWtA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=C7m7pPFqgl6+g0q9OESrmk+1xDzZQuZEQ2h4S5Vw1u+lomzrjb7q6lRTaWDiCxNI2MLuyQJD+j6qwPO0JwmSU9f3WaRsEbyQZiJmXqLML6rXX4HF4WZYaebJ1aN+hAEddJV5hMepP8YdrtRNh1KV7ZgBEpRILC14oSo5Nj4aKFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FJLd0h6V; arc=none smtp.client-ip=198.175.65.14
+	 MIME-Version; b=ezYkUzvjPGkDbsrBF/PMUP/VFujJoZGXQhuBNQ0eRGR/sFvcNbcZaG2L3++nmh4YKHUBVGqACKxBBXoJUj6QeZstPSqvrNix+1pN61shxVB2pcnj7ZPlEVZnav2+2zG4REwZAsWnEQcPsslgei8ZvYtIM6uJMJrpkXUfTkgEgeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=U+uoOdHJ; arc=none smtp.client-ip=198.175.65.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706950896; x=1738486896;
+  t=1706950902; x=1738486902;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=SGebCb4uhyf1FjJh6l9SreVJIhhK/w3FLryXtt84pw8=;
-  b=FJLd0h6VaqwYXyjXvE9CR+VFXPvMY7FGpcBjbRhO9Ch4qmaNFflPNWrR
-   pBmKh19vRegZLi/2BEIG1bOMGhZeLqBPQQEtR+bCgQBGt4+p6sue99iZ9
-   Han8wPbN30Ohqh91PLfOCRfnIHvmXWYr2SMWeqaoA6ZVnPK5grJlflxRx
-   wCeoOLVqjY1UAstPekJN53636sCdQejutS4gPCt0N73/9T0c3JtCfROvT
-   /SEc3pU7iw4IbRJeVFK0QA4xNQgo//et94UmexLHJaI97TtIsTHKJXHaW
-   ZWgbb14gijy9WwJ7E+wDjqG6o/Jq9J0YmTBpoVBJZmSYRQR9Xxlw8cyEL
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="4132093"
+  bh=tPickwMWphnvoa4nUW5041d+Jv4leQezd407dqDzWtA=;
+  b=U+uoOdHJ2mz53GnZP++rPgr8RLw2uc2m55byKaoul3C07JKYnPJmrgjm
+   JQmfZxAxct9Klalxx944Pi1b0kjxyFaBY/hR3m/dM0stw31bvkp7TJg4h
+   nx1OJ3/C2WNiefm2Hi8WAzKrEB7+5fMHAW1vIV9KxuJ3EqL8EAZMdQePd
+   DwJVmWGfl/ipdnWpImp9DqdLwF1gOphyJGBsb8gi2LoYpNR6ZJ9r+udt9
+   /GxnUu+0wiiZW+wnqTSgfHih7WLm3OZARLvMEISOrfIx5OQkIwc5pHiMd
+   ff7H5+FPWBalMVWW19LGR6hW+/0rprEZ8dI+ypE8MmDeDPenmcM/hud6L
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="4132106"
 X-IronPort-AV: E=Sophos;i="6.05,240,1701158400"; 
-   d="scan'208";a="4132093"
+   d="scan'208";a="4132106"
 Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2024 01:01:35 -0800
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2024 01:01:41 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.05,240,1701158400"; 
-   d="scan'208";a="291510"
+   d="scan'208";a="291526"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
-  by fmviesa009.fm.intel.com with ESMTP; 03 Feb 2024 01:01:29 -0800
+  by fmviesa009.fm.intel.com with ESMTP; 03 Feb 2024 01:01:34 -0800
 From: Zhao Liu <zhao1.liu@linux.intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Sean Christopherson <seanjc@google.com>,
@@ -82,9 +82,9 @@ Cc: Ricardo Neri <ricardo.neri-calderon@linux.intel.com>,
 	David Dai <davidai@google.com>,
 	Saravana Kannan <saravanak@google.com>,
 	Zhao Liu <zhao1.liu@intel.com>
-Subject: [RFC 19/26] KVM: VMX: Emulate the MSRs of HFI feature
-Date: Sat,  3 Feb 2024 17:12:07 +0800
-Message-Id: <20240203091214.411862-20-zhao1.liu@linux.intel.com>
+Subject: [RFC 20/26] KVM: x86: Expose HFI feature bit and HFI info in CPUID
+Date: Sat,  3 Feb 2024 17:12:08 +0800
+Message-Id: <20240203091214.411862-21-zhao1.liu@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240203091214.411862-1-zhao1.liu@linux.intel.com>
 References: <20240203091214.411862-1-zhao1.liu@linux.intel.com>
@@ -98,216 +98,253 @@ Content-Transfer-Encoding: 8bit
 
 From: Zhao Liu <zhao1.liu@intel.com>
 
-In addition to adding new bits to the package thermal MSRs, HFI has also
-introduced two new MSRs:
+The HFI feature contains the following relevant CPUID fields:
 
-* MSR_IA32_HW_FEEDBACK_CONFIG: used to enable/disable HFI feature at
-  runtime.
+* 0x06.eax[bit 19]: HFI feature bit
+* 0x06.ecx[bits 08-15]: Number of HFI/ITD supported classes
+* 0x06.edx[bits 00-07]: Bitmap of supported HFI capabilities
+* 0x06.edx[bits 08-11]: Enumerates the size of the HFI table in number
+                        of 4 KB pages
+* 0x06.edx[bits 16-31]: HFI table index of processor
 
-  Emulate this MSR by parsing the HFI enabling bit.
+Guest's HFI feature bit (0x06.eax[bit 19]) is based on Host's HFI
+enabling.
 
-* MSR_IA32_HW_FEEDBACK_PTR: used to configure the HFI table's memory
-  address.
+For other HFI related CPUID fields, since they affect the memory
+allocation and HFI data filling of the virtual HFI table in KVM, check
+the hfi related CPUID fields after KVM_SET_CPUID/KVM_SET_CPUID2 to
+ensure the valid HFI feature information and the valid memory size.
 
-  Emulate this MSR by storing the Guest HFI table's GPA, and writing
-  local virtual HFI table into this GPA when Guest's HFI table needs to
-  be updated.
+And about the HFI table index, since the current KVM creates the same
+CPUID template for all vCPUs, we refer to the CPU topology handling and
+leave the specific filling of the HFI table index to the user, if the
+user does not specifically specify the HFI index, all vCPUs will share
+the HFI entry with hfi index 0.
 
-Only when HFI is enabled (set by Guest in MSR_IA32_HW_FEEDBACK_CONFIG)
-and Guest HFI table is valid (set the valid address by Guest in
-MSR_IA32_HW_FEEDBACK_PTR), Guest can have the valid HFI table and its
-HFI table can be updated.
+The shared HFI index is valid in spec [1], but considering that the data
+of the virtual HFI table is all from the pCPU on which the vCPU is
+running, the shared hfi index of vCPUs on different pCPUs might cause
+frequent HFI updates, and the virtual HFI table cannot accurately reflect
+the actual processor situation, which might have a negative impact on
+the Guest performance. Therefore, it is better to assign different HFI
+table indexes to different vCPUs.
 
-Because the current virtual HFI table is maintained for each VM, not for
-each virtual package, these 2 MSRs are also emulated at the VM level.
+[1]: SDM, vol. 2A, chap. CPUID--CPU Identification, CPUID.06H.EDX[Bits
+     31-16], about HFI table index sharing, it said, "Note that on some
+     parts the index may be same for multiple logical processors".
 
 Tested-by: Yanting Jiang <yanting.jiang@intel.com>
 Co-developed-by: Zhuocheng Ding <zhuocheng.ding@intel.com>
 Signed-off-by: Zhuocheng Ding <zhuocheng.ding@intel.com>
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
- arch/x86/kvm/svm/svm.c |   2 +
- arch/x86/kvm/vmx/vmx.c | 112 +++++++++++++++++++++++++++++++++++++++++
- arch/x86/kvm/vmx/vmx.h |   2 +
- arch/x86/kvm/x86.c     |   2 +
- 4 files changed, 118 insertions(+)
+ arch/x86/kvm/cpuid.c   | 136 ++++++++++++++++++++++++++++++++++++-----
+ arch/x86/kvm/vmx/vmx.c |   7 +++
+ 2 files changed, 128 insertions(+), 15 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 7039ae48d8d0..980d93c70eb6 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4293,6 +4293,8 @@ static bool svm_has_emulated_msr(struct kvm *kvm, u32 index)
- 	case MSR_IA32_THERM_STATUS:
- 	case MSR_IA32_PACKAGE_THERM_INTERRUPT:
- 	case MSR_IA32_PACKAGE_THERM_STATUS:
-+	case MSR_IA32_HW_FEEDBACK_CONFIG:
-+	case MSR_IA32_HW_FEEDBACK_PTR:
- 		return false;
- 	case MSR_IA32_SMBASE:
- 		if (!IS_ENABLED(CONFIG_KVM_SMM))
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 92dded89ae3c..9c28d4ea0b2d 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2424,6 +2424,18 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		msr_info->data = kvm_vmx->pkg_therm.msr_pkg_therm_status;
- 		mutex_unlock(&kvm_vmx->pkg_therm.pkg_therm_lock);
- 		break;
-+	case MSR_IA32_HW_FEEDBACK_CONFIG:
-+		if (!msr_info->host_initiated &&
-+		    !guest_cpuid_has(vcpu, X86_FEATURE_HFI))
-+			return 1;
-+		msr_info->data = kvm_vmx->pkg_therm.msr_ia32_hfi_cfg;
-+		break;
-+	case MSR_IA32_HW_FEEDBACK_PTR:
-+		if (!msr_info->host_initiated &&
-+		    !guest_cpuid_has(vcpu, X86_FEATURE_HFI))
-+			return 1;
-+		msr_info->data = kvm_vmx->pkg_therm.msr_ia32_hfi_ptr;
-+		break;
- 	default:
- 	find_uret_msr:
- 		msr = vmx_find_uret_msr(vmx, msr_info->index);
-@@ -2557,6 +2569,77 @@ static int vmx_set_pkg_therm_status_msr(struct kvm_vcpu *vcpu,
- 	return 0;
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index eaac2c8d98b9..4da8f3319917 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -17,6 +17,7 @@
+ #include <linux/uaccess.h>
+ #include <linux/sched/stat.h>
+ 
++#include <asm/hfi.h>
+ #include <asm/processor.h>
+ #include <asm/user.h>
+ #include <asm/fpu/xstate.h>
+@@ -130,12 +131,77 @@ static inline struct kvm_cpuid_entry2 *cpuid_entry2_find(
+ 	return NULL;
  }
  
-+static int vmx_set_hfi_cfg_msr(struct kvm_vcpu *vcpu,
-+			       struct msr_data *msr_info)
++static int kvm_check_hfi_cpuid(struct kvm_vcpu *vcpu,
++			       struct kvm_cpuid_entry2 *entries,
++			       int nent)
 +{
-+	struct kvm_vmx *kvm_vmx = to_kvm_vmx(vcpu->kvm);
-+	struct hfi_desc *kvm_vmx_hfi = &kvm_vmx->pkg_therm.hfi_desc;
-+	u64 data = msr_info->data;
-+	bool hfi_enabled, hfi_changed;
++	struct hfi_features hfi_features;
++	struct kvm_cpuid_entry2 *best = NULL;
++	bool has_hfi;
++	int nr_classes, ret;
++	union cpuid6_ecx ecx;
++	union cpuid6_edx edx;
++	unsigned int data_size;
 +
-+	/*
-+	 * When the HFI enable bit changes (either from 0 to 1 or 1 to
-+	 * 0), HFI status bit is set and an interrupt is generated if
-+	 * enabled.
-+	 */
-+	hfi_enabled = data & HW_FEEDBACK_CONFIG_HFI_ENABLE;
-+	hfi_changed = kvm_vmx_hfi->hfi_enabled != hfi_enabled;
-+
-+	kvm_vmx->pkg_therm.msr_ia32_hfi_cfg = data;
-+	kvm_vmx_hfi->hfi_enabled = hfi_enabled;
-+
-+	if (!hfi_changed)
++	best = cpuid_entry2_find(entries, nent, 0x6, 0);
++	if (!best)
 +		return 0;
 +
-+	if (!hfi_enabled) {
-+		/*
-+		 * SDM: hardware sets the IA32_PACKAGE_THERM_STATUS[bit 26]
-+		 * to 1 to acknowledge disabling of the interface.
-+		 */
-+		kvm_vmx_hfi->hfi_update_status = true;
-+		if (vmx_hfi_int_enabled(kvm_vmx))
-+			vmx_inject_therm_interrupt(vcpu);
-+	} else {
-+		/*
-+		 * Here we don't care pending updates, because the enabed
-+		 * feature change may cause the HFI table update range to
-+		 * change.
-+		 */
-+		vmx_update_hfi_table(vcpu->kvm, true);
-+		vmx_hfi_notifier_register(vcpu->kvm);
-+	}
++	has_hfi = cpuid_entry_has(best, X86_FEATURE_HFI);
++	if (!has_hfi)
++		return 0;
++
++	/*
++	 * Only the platform with 1 HFI instance (i.e., client platform)
++	 * can enable HFI in Guest. For more information, please refer to
++	 * the comment in kvm_set_cpu_caps().
++	 */
++	if (intel_hfi_max_instances() != 1)
++		return -EINVAL;
++
++	/*
++	 * Currently we haven't supported ITD. HFI is the default feature
++	 * with 1 class.
++	 */
++	nr_classes = 1;
++	ret = intel_hfi_build_virt_features(&hfi_features,
++					    nr_classes,
++					    vcpu->kvm->created_vcpus);
++	if (ret)
++		return ret;
++
++	ecx.full = best->ecx;
++	edx.full = best->edx;
++
++	if (ecx.split.nr_classes != hfi_features.nr_classes)
++		return -EINVAL;
++
++	if (hweight8(edx.split.capabilities.bits) != hfi_features.class_stride)
++		return -EINVAL;
++
++	if (edx.split.table_pages + 1 != hfi_features.nr_table_pages)
++		return -EINVAL;
++
++	/*
++	 * The total size of the row corresponding to index and all
++	 * previous data.
++	 */
++	data_size = hfi_features.hdr_size + (edx.split.index + 1) *
++		    hfi_features.cpu_stride;
++	/* Invalid index. */
++	if (data_size > hfi_features.nr_table_pages << PAGE_SHIFT)
++		return -EINVAL;
 +
 +	return 0;
 +}
 +
-+static int vmx_set_hfi_ptr_msr(struct kvm_vcpu *vcpu,
-+			       struct msr_data *msr_info)
-+{
-+	struct kvm_vmx *kvm_vmx = to_kvm_vmx(vcpu->kvm);
-+	struct hfi_desc *kvm_vmx_hfi = &kvm_vmx->pkg_therm.hfi_desc;
-+	u64 data = msr_info->data;
-+
-+	if (kvm_vmx->pkg_therm.msr_ia32_hfi_ptr == data)
-+		return 0;
-+
-+	kvm_vmx->pkg_therm.msr_ia32_hfi_ptr = data;
-+	kvm_vmx_hfi->table_ptr_valid = data & HW_FEEDBACK_PTR_VALID;
-+	/*
-+	 * Currently we don't really support MSR handling for package
-+	 * scope, so when Guest writes, it is not possible to distinguish
-+	 * between writes from different packages or repeated writes from
-+	 * the same package. To simplify the process, we just assume that
-+	 * multiple writes are duplicate writes of the same package and
-+	 * overwrite the old.
-+	 */
-+	kvm_vmx_hfi->table_base = data & ~HW_FEEDBACK_PTR_VALID;
-+
-+	vmx_update_hfi_table(vcpu->kvm, true);
-+	vmx_hfi_notifier_register(vcpu->kvm);
-+
-+	return 0;
-+}
-+
- /*
-  * Writes msr value into the appropriate "register".
-  * Returns 0 on success, non-0 otherwise.
-@@ -2919,6 +3002,35 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		ret = vmx_set_pkg_therm_status_msr(vcpu, msr_info);
- 		mutex_unlock(&kvm_vmx->pkg_therm.pkg_therm_lock);
- 		break;
-+	case MSR_IA32_HW_FEEDBACK_CONFIG:
-+		if (!msr_info->host_initiated &&
-+		    !guest_cpuid_has(vcpu, X86_FEATURE_HFI))
-+			return 1;
-+		/*
-+		 * Unsupported and reserved bits. ITD is not supported
-+		 * (CPUID.06H:EAX[19]) yet.
-+		 */
-+		if (!msr_info->host_initiated &&
-+		    data & ~(HW_FEEDBACK_CONFIG_HFI_ENABLE))
-+			return 1;
-+
-+		mutex_lock(&kvm_vmx->pkg_therm.pkg_therm_lock);
-+		ret = vmx_set_hfi_cfg_msr(vcpu, msr_info);
-+		mutex_unlock(&kvm_vmx->pkg_therm.pkg_therm_lock);
-+		break;
-+	case MSR_IA32_HW_FEEDBACK_PTR:
-+		if (!msr_info->host_initiated &&
-+		    !guest_cpuid_has(vcpu, X86_FEATURE_HFI))
-+			return 1;
-+		/* Reserved bits: generate the exception. */
-+		if (!msr_info->host_initiated &&
-+		    data & HW_FEEDBACK_PTR_RESERVED_MASK)
-+			return 1;
-+
-+		mutex_lock(&kvm_vmx->pkg_therm.pkg_therm_lock);
-+		ret = vmx_set_hfi_ptr_msr(vcpu, msr_info);
-+		mutex_unlock(&kvm_vmx->pkg_therm.pkg_therm_lock);
-+		break;
- 	default:
- 	find_uret_msr:
- 		msr = vmx_find_uret_msr(vmx, msr_index);
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index ff205bc0e99a..d9db8bf3726f 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -422,6 +422,8 @@ struct hfi_desc {
- struct pkg_therm_desc {
- 	u64			msr_pkg_therm_int;
- 	u64			msr_pkg_therm_status;
-+	u64			msr_ia32_hfi_cfg;
-+	u64			msr_ia32_hfi_ptr;
- 	/* Currently HFI is only supported at package level. */
- 	struct hfi_desc		hfi_desc;
- 	/* All members before "struct mutex pkg_therm_lock" are protected by the lock. */
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index bea3def6a4b1..27bec359907c 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1550,6 +1550,8 @@ static const u32 emulated_msrs_all[] = {
- 	MSR_IA32_THERM_STATUS,
- 	MSR_IA32_PACKAGE_THERM_INTERRUPT,
- 	MSR_IA32_PACKAGE_THERM_STATUS,
-+	MSR_IA32_HW_FEEDBACK_CONFIG,
-+	MSR_IA32_HW_FEEDBACK_PTR,
+ static int kvm_check_cpuid(struct kvm_vcpu *vcpu,
+ 			   struct kvm_cpuid_entry2 *entries,
+ 			   int nent)
+ {
+ 	struct kvm_cpuid_entry2 *best;
+ 	u64 xfeatures;
++	int ret;
  
  	/*
- 	 * KVM always supports the "true" VMX control MSRs, even if the host
+ 	 * The existing code assumes virtual address is 48-bit or 57-bit in the
+@@ -155,15 +221,18 @@ static int kvm_check_cpuid(struct kvm_vcpu *vcpu,
+ 	 * enabling in the FPU, e.g. to expand the guest XSAVE state size.
+ 	 */
+ 	best = cpuid_entry2_find(entries, nent, 0xd, 0);
+-	if (!best)
+-		return 0;
+-
+-	xfeatures = best->eax | ((u64)best->edx << 32);
+-	xfeatures &= XFEATURE_MASK_USER_DYNAMIC;
+-	if (!xfeatures)
+-		return 0;
++	if (best) {
++		xfeatures = best->eax | ((u64)best->edx << 32);
++		xfeatures &= XFEATURE_MASK_USER_DYNAMIC;
++		if (xfeatures) {
++			ret = fpu_enable_guest_xfd_features(&vcpu->arch.guest_fpu,
++							    xfeatures);
++			if (ret)
++				return ret;
++		}
++	}
+ 
+-	return fpu_enable_guest_xfd_features(&vcpu->arch.guest_fpu, xfeatures);
++	return kvm_check_hfi_cpuid(vcpu, entries, nent);
+ }
+ 
+ /* Check whether the supplied CPUID data is equal to what is already set for the vCPU. */
+@@ -633,14 +702,27 @@ void kvm_set_cpu_caps(void)
+ 	);
+ 
+ 	/*
+-	 * PTS is the dependency of ITD, currently we only use PTS for
+-	 * enabling ITD in KVM. Since KVM does not support msr topology at
+-	 * present, the emulation of PTS has restrictions on the topology of
+-	 * Guest, so we only expose PTS when Host enables ITD.
++	 * PTS and HFI are the dependencies of ITD, currently we only use PTS/HFI
++	 * for enabling ITD in KVM. Since KVM does not support msr topology at
++	 * present, the emulation of PTS/HFI has restrictions on the topology of
++	 * Guest, so we only expose PTS/HFI when Host enables ITD.
++	 *
++	 * We also restrict HFI virtualization support to platforms with only 1 HFI
++	 * instance (i.e., this is the client platform, and ITD is currently a
++	 * client-specific feature), while server platforms with multiple instances
++	 * do not require HFI virtualization. This restriction avoids adding
++	 * additional complex logic to handle notification register updates when
++	 * vCPUs migrate between different HFI instances.
+ 	 */
+-	if (cpu_feature_enabled(X86_FEATURE_ITD)) {
++	if (cpu_feature_enabled(X86_FEATURE_ITD) && intel_hfi_max_instances() == 1) {
+ 		if (boot_cpu_has(X86_FEATURE_PTS))
+ 			kvm_cpu_cap_set(X86_FEATURE_PTS);
++		/*
++		 * Set HFI based on hardware capability. Only when the Host has
++		 * the valid HFI instance, KVM can build the virtual HFI table.
++		 */
++		if (intel_hfi_enabled())
++			kvm_cpu_cap_set(X86_FEATURE_HFI);
+ 	}
+ 
+ 	kvm_cpu_cap_mask(CPUID_7_0_EBX,
+@@ -986,8 +1068,32 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+ 			entry->eax |= 0x4;
+ 
+ 		entry->ebx = 0;
+-		entry->ecx = 0;
+-		entry->edx = 0;
++
++		if (kvm_cpu_cap_has(X86_FEATURE_HFI)) {
++			union cpuid6_ecx ecx;
++			union cpuid6_edx edx;
++
++			ecx.full = 0;
++			edx.full = 0;
++			/* Number of supported HFI classes */
++			ecx.split.nr_classes = 1;
++			/* HFI supports performance and energy efficiency capabilities. */
++			edx.split.capabilities.split.performance = 1;
++			edx.split.capabilities.split.energy_efficiency = 1;
++			/* As default, keep the same HFI table size as host. */
++			edx.split.table_pages = ((union cpuid6_edx)entry->edx).split.table_pages;
++			/*
++			 * Default HFI index = 0. User should be careful that
++			 * the index differ for each CPUs.
++			 */
++			edx.split.index = 0;
++
++			entry->ecx = ecx.full;
++			entry->edx = edx.full;
++		} else {
++			entry->ecx = 0;
++			entry->edx = 0;
++		}
+ 		break;
+ 	/* function 7 has additional index. */
+ 	case 7:
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 9c28d4ea0b2d..636f2bd68546 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -8434,6 +8434,13 @@ static void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+ 		vmx->msr_ia32_feature_control_valid_bits &=
+ 			~FEAT_CTL_SGX_LC_ENABLED;
+ 
++	if (guest_cpuid_has(vcpu, X86_FEATURE_HFI) && intel_hfi_enabled()) {
++		struct kvm_cpuid_entry2 *best = kvm_find_cpuid_entry_index(vcpu, 0x6, 0);
++
++		if (best)
++			vmx->hfi_table_idx = ((union cpuid6_edx)best->edx).split.index;
++	}
++
+ 	/* Refresh #PF interception to account for MAXPHYADDR changes. */
+ 	vmx_update_exception_bitmap(vcpu);
+ }
 -- 
 2.34.1
 
