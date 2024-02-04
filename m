@@ -1,120 +1,121 @@
-Return-Path: <kvm+bounces-7944-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7945-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8106848BFF
-	for <lists+kvm@lfdr.de>; Sun,  4 Feb 2024 08:51:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F876848C3D
+	for <lists+kvm@lfdr.de>; Sun,  4 Feb 2024 09:46:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8397F284F6B
-	for <lists+kvm@lfdr.de>; Sun,  4 Feb 2024 07:51:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB3881C229C6
+	for <lists+kvm@lfdr.de>; Sun,  4 Feb 2024 08:46:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F6C616423;
-	Sun,  4 Feb 2024 07:50:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 315B714AA5;
+	Sun,  4 Feb 2024 08:46:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="HnTtvqz+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nL1W88nU"
 X-Original-To: kvm@vger.kernel.org
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C567214A94;
-	Sun,  4 Feb 2024 07:50:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEC5A14275;
+	Sun,  4 Feb 2024 08:46:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707033003; cv=none; b=lo0uQ8UJKw/+VIziT4Bn2b+hY7ajqHICe2SjhNNof7IFhEhC66EeaUCSvfuCWN3tBlNGKv/OWweFf2KDFMSoZ0TTkpEmSFrdnUVC3LrqruREAJTu9xOOCAfNOaDpKzN5oVARNecOD+9e4ltogLZYVF/LRI87UH61GEPPrZc2poI=
+	t=1707036403; cv=none; b=SA7pckbAKX0nS2fhvoyG7DcHpfNWT1uhEtwN/cjw8whykuonSxWzmj9WV2ZpFB5+BZaBPIq5LrusfPNNlD7DIU3sNiLpFeewbVPJZ1ku2naM0l1my+PP7lzVhYbL/JwDLa9RcbTZrf+02z2ncyjri0yrgEsgXL5iXhbxAY53i1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707033003; c=relaxed/simple;
-	bh=8rYxczI/5Lo4DDBMNGT7Xezq3tFx3qZcjoXISzbgu8o=;
-	h=From:To:CC:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=EujY80wRTVHeBzWphuk8yr2PiR4FrHGB5lqcy3ww5m8srZ1q7YH++mNxx7S3mPpMFSYtpIau/BabK22fOqDQU1VYl5QeyGlz9N1/hvtWmQDVK05gv0IfAjbOUczNgCIkoVC2lU/ofNFfXanSuIiW0PhkOWIU5db1nHZO1JQn8XM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=HnTtvqz+; arc=none smtp.client-ip=198.47.19.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 4147nZVA040695;
-	Sun, 4 Feb 2024 01:49:35 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1707032975;
-	bh=A14BCls41fwfyoOZpPImx9gM6CsoQWADM/eYvGfz9Sg=;
-	h=From:To:CC:Subject:In-Reply-To:References:Date;
-	b=HnTtvqz+bj/maXJMRIFvmTvcnjEgG7IUIaeB9KK+Ei6OlNfkUkTvlpuVwxmar3cBM
-	 cGw8kVsdvDZXnSa2+/VkLNOML3E9cVn+EVg5R03mdJE5hQPyi4mWwMq+TzbQ939VJ8
-	 qpbx+8sA3WQ/9M2bYTOMCuSQ0vJWroZWlusiR2qM=
-Received: from DLEE115.ent.ti.com (dlee115.ent.ti.com [157.170.170.26])
-	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 4147nZ5A053108
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Sun, 4 Feb 2024 01:49:35 -0600
-Received: from DLEE111.ent.ti.com (157.170.170.22) by DLEE115.ent.ti.com
- (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Sun, 4
- Feb 2024 01:49:35 -0600
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE111.ent.ti.com
- (157.170.170.22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Sun, 4 Feb 2024 01:49:35 -0600
-Received: from localhost (kamlesh.dhcp.ti.com [172.24.227.123])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4147nY0O050380;
-	Sun, 4 Feb 2024 01:49:35 -0600
-From: Kamlesh Gurudasani <kamlesh@ti.com>
-To: Xin Zeng <xin.zeng@intel.com>, <herbert@gondor.apana.org.au>,
-        <alex.williamson@redhat.com>, <jgg@nvidia.com>, <yishaih@nvidia.com>,
-        <shameerali.kolothum.thodi@huawei.com>, <kevin.tian@intel.com>
-CC: <linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <qat-linux@intel.com>, Siming Wan <siming.wan@intel.com>,
-        Xin Zeng
-	<xin.zeng@intel.com>
-Subject: Re: [EXTERNAL] [PATCH 07/10] crypto: qat - add bank save and
- restore flows
-In-Reply-To: <20240201153337.4033490-8-xin.zeng@intel.com>
-References: <20240201153337.4033490-1-xin.zeng@intel.com>
- <20240201153337.4033490-8-xin.zeng@intel.com>
-Date: Sun, 4 Feb 2024 13:19:34 +0530
-Message-ID: <87o7cwzn1t.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
+	s=arc-20240116; t=1707036403; c=relaxed/simple;
+	bh=Cpy3CKuYNywdrx8Zum44pEFdPYhqxi2fjTOZk38Zifk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JEwMtx8L+dSd2Nbkd5I8+ZuoUCUe6wSz0DFAHg/o1LQgwz47UZR3AeAkVomTVdCK0dqpvrjQR+aBWjOfWGAC/CVsTnDsA14wFSYMmBR58b68+bHion+jpxy8Hjvo2bAUpRqu2cPvio3Rsd2cYe8CHlCZ6oRCsLmaIlLjnV6Shq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nL1W88nU; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707036402; x=1738572402;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=Cpy3CKuYNywdrx8Zum44pEFdPYhqxi2fjTOZk38Zifk=;
+  b=nL1W88nUfdRjOkUSjTPQy1lIvFGqsLTqVQG/bOzWLDP2yTXgl3FD1CpN
+   aCcCR4qkRzXJE5Glmqmk8KE7TvM2FHn/ejLsMlyfdsUqFEbz3L8PjnPq5
+   /Gsrd3RPAq6rNvugyIsL0yNQ6EBkSk8rT/g2QQAicX9bKvmnrlISHzzaL
+   ebzXqUEFN2/OXxQordWS/eYEkXdshz8QyQM02KpxRM+PmOpEcGgz4XlLb
+   53pH4Ok6bWdYoEORo/N03Ai/71q+CtVdrzywlNUMLz4PnwWT1GcWeyXhG
+   3s4+yJzd+tE9SqSy/VrqHs99OSJJalMi1R+CH+h0pgb8vKuDAd0FWZTQ1
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10973"; a="528900"
+X-IronPort-AV: E=Sophos;i="6.05,242,1701158400"; 
+   d="scan'208";a="528900"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2024 00:46:41 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,242,1701158400"; 
+   d="scan'208";a="515985"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.10.49]) ([10.238.10.49])
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2024 00:46:37 -0800
+Message-ID: <4f35f658-bd0a-4461-b9db-992bef0e57a9@linux.intel.com>
+Date: Sun, 4 Feb 2024 16:46:35 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v18 053/121] KVM: x86/mmu: TDX: Do not enable page track
+ for TD guest
+To: isaku.yamahata@intel.com
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+ erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+ Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
+ chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
+ Yan Zhao <yan.y.zhao@intel.com>, Yuan Yao <yuan.yao@linux.intel.com>
+References: <cover.1705965634.git.isaku.yamahata@intel.com>
+ <ba65644eb8327600c393bc3a3dc71c49e872d29f.1705965635.git.isaku.yamahata@intel.com>
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <ba65644eb8327600c393bc3a3dc71c49e872d29f.1705965635.git.isaku.yamahata@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Xin Zeng <xin.zeng@intel.com> writes:
 
-> This message was sent from outside of Texas Instruments. 
-> Do not click links or open attachments unless you recognize the source of this email and know the content is safe. 
->  
-> From: Siming Wan <siming.wan@intel.com>
+
+On 1/23/2024 7:53 AM, isaku.yamahata@intel.com wrote:
+> From: Yan Zhao <yan.y.zhao@intel.com>
 >
-> Add logic to save, restore, quiesce and drain a ring bank for QAT GEN4
-> devices.
-> This allows to save and restore the state of a Virtual Function (VF) and
-> will be used to implement VM live migration.
+> TDX does not support write protection and hence page track.
+> Though !tdp_enabled and kvm_shadow_root_allocated(kvm) are always false
+> for TD guest, should also return false when external write tracking is
+> enabled.
+
+Nit:
+The preferred shortlog prefix format is "KVM: <topic>:", remove "TDX" from
+the shortlog?
+"KVM: x86/mmu: Do not enable page track for TD guest" should be OK.
+
+Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
+
 >
-> Signed-off-by: Siming Wan <siming.wan@intel.com>
-> Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> Reviewed-by: Xin Zeng <xin.zeng@intel.com>
-> Signed-off-by: Xin Zeng <xin.zeng@intel.com>
-...
-> +#define CHECK_STAT(op, expect_val, name, args...) \
-> +({ \
-> +	u32 __expect_val = (expect_val); \
-> +	u32 actual_val = op(args); \
-> +	if (__expect_val != actual_val) \
-> +		pr_err("QAT: Fail to restore %s register. Expected 0x%x, but actual is 0x%x\n", \
-> +			name, __expect_val, actual_val); \
-> +	(__expect_val == actual_val) ? 0 : -EINVAL; \
-I was wondering if this can be done like following, saves repeat comparison.
+> Cc: Yuan Yao <yuan.yao@linux.intel.com>
+> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> ---
+>   arch/x86/kvm/mmu/page_track.c | 3 +++
+>   1 file changed, 3 insertions(+)
+>
+> diff --git a/arch/x86/kvm/mmu/page_track.c b/arch/x86/kvm/mmu/page_track.c
+> index c87da11f3a04..ce698ab213c1 100644
+> --- a/arch/x86/kvm/mmu/page_track.c
+> +++ b/arch/x86/kvm/mmu/page_track.c
+> @@ -22,6 +22,9 @@
+>   
+>   bool kvm_page_track_write_tracking_enabled(struct kvm *kvm)
+>   {
+> +	if (kvm->arch.vm_type == KVM_X86_TDX_VM)
+> +		return false;
+> +
+>   	return IS_ENABLED(CONFIG_KVM_EXTERNAL_WRITE_TRACKING) ||
+>   	       !tdp_enabled || kvm_shadow_root_allocated(kvm);
+>   }
 
-(__expect_val == actual_val) ? 0 : (pr_err("QAT: Fail to restore %s \
-                                          register. Expected 0x%x, \
-                                          but actual is 0x%x\n", \
-                 			  name, __expect_val, \
-                                          actual_val), -EINVAL); \
-Regards,
-Kamlesh
-
-> +})
-...
 
