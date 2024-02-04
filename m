@@ -1,147 +1,121 @@
-Return-Path: <kvm+bounces-7951-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7952-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28388848C68
-	for <lists+kvm@lfdr.de>; Sun,  4 Feb 2024 10:21:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24B7F848D18
+	for <lists+kvm@lfdr.de>; Sun,  4 Feb 2024 12:21:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB7F928305A
-	for <lists+kvm@lfdr.de>; Sun,  4 Feb 2024 09:21:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ACEE31F21EC6
+	for <lists+kvm@lfdr.de>; Sun,  4 Feb 2024 11:21:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF27118E2A;
-	Sun,  4 Feb 2024 09:21:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AD112209F;
+	Sun,  4 Feb 2024 11:20:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KUXpAfRR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R+YYUSPc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2283218E0E;
-	Sun,  4 Feb 2024 09:21:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70CCC219F6;
+	Sun,  4 Feb 2024 11:20:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707038481; cv=none; b=SyIvPLkelAGvnyJBIpiFh1CHUYdYv/0zUs+0XNu9YR3wM5umAbqtKOorl6c21tIvg80CkENoQUR0A5HR11oEUYNwQiBSfXmG8RWwMGQH4olZw4XCde8teZvLX2M7y1DHHKuUaK2x5/ipfIGWDFquM2Ycwf8eVm5NeBhhqqYCWqA=
+	t=1707045649; cv=none; b=ZewVojqVhnq6zDokFZrBAchaOsYMcucMpXYNyvRC8Q2bUc631Vj6pFEcn9NXzANga1fIfw0KN8/qcc1G964YgsJFza+dhS03A2e6LfT24tm4/UqqVBZ9PqxuU5qGAqzLE88cBCQqdHG8tbQCqrh2dioZ++Y2is2XtuQJYb/im0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707038481; c=relaxed/simple;
-	bh=igzb+GwK8rsfew2obxt6Oj0utoHph8HB+JdCy0g6+uQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=J7JeHP/1ZFu7AtvCi7tHDx8I3eGsxTU18/yQ8jpiS4erxx9nESMgnsJ0TYgBLdu8At7MURxK6KD8F+wR9IIvTHtT0tzXVZEB6hKs5Y6SNDX4/h8B9/dxgQHQUYtk0kPVRZvhTKBHyJDcj5whMl0eqtJmGdLtvuYlhgiUHWLmjr8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KUXpAfRR; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707038479; x=1738574479;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=igzb+GwK8rsfew2obxt6Oj0utoHph8HB+JdCy0g6+uQ=;
-  b=KUXpAfRRHZE8WsRox3S26wKKpxexKLj7OS7z71pRX7isyhrjRprluqzD
-   LmiGnnlCsWm08Yg6Ex9VtAw4snq3xORDFNItiy9YBY3U7CqxVKbdOjcdM
-   Y9VFnfktKk+qq6goLJOk+/SCJrijNEMcQkpenA0KMJYmmxUveKDh8GOyb
-   4ET8FPiAeKkK+EFIRmmEv3ixzsgDRaDdd4BJITrRAdeoaVbGQ7zaYBvOc
-   5pKsSreXXx7TKktUmYh5TYC/LdNVBof9kD6JsK94eolda3YFdnEGHipCj
-   Tff8qH1m7Gx/OjwkswaZi6mgIKho/FjVuroUrTmdZC9gb/dP+uqSgoraU
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10973"; a="551320"
-X-IronPort-AV: E=Sophos;i="6.05,242,1701158400"; 
-   d="scan'208";a="551320"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2024 01:21:18 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,242,1701158400"; 
-   d="scan'208";a="5074454"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.10.49]) ([10.238.10.49])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2024 01:21:14 -0800
-Message-ID: <040a00aa-2c21-46df-b94a-addf2502af75@linux.intel.com>
-Date: Sun, 4 Feb 2024 17:21:12 +0800
+	s=arc-20240116; t=1707045649; c=relaxed/simple;
+	bh=gyDst7/eGUNtEbvcd5veYryHJOS12fm91uoZLHb14BY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YI79rEolNZAOy61J3LSXv7xXuxBkbAYmMeb8G6PZWdrTWcouTTrVy7mowfhNj+1RGh5RW7CHnv1WCrEaVDLpvMzot5ZDTkSOdUvysxVemckobF+evw21iwYdKeF0tyfgZXJPpnuYecPiqiHmkcaDdVPeDj27bOsvc1QnrV+5e+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R+YYUSPc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FE51C433C7;
+	Sun,  4 Feb 2024 11:20:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707045649;
+	bh=gyDst7/eGUNtEbvcd5veYryHJOS12fm91uoZLHb14BY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=R+YYUSPcUyCeeEuzTDppzp9xZG+icLMMEHXtSxhqpkft2PiUdh6qYQ8whR9lTiSR0
+	 xHd9H7MwMkCMQ+EL9PoGwVO/JnyNa0EPBNX53KzLDzT1pNJvxOVIBZX9XkCT+sE8Fo
+	 Zmlwjrew/UHuoA3lfBzKb0QJiTxlWnuqZLZc46v26gNvYNRUZYIiEriEkJZM/mc4kJ
+	 4mmjp+8GPE77M62rfoXXKzxZAojqHYr+ti8z0Qh+93RLe/w9Td2Eaz0h6SOd490ROU
+	 SIZksWQZ9rB6stHZf+L87+F4o+8Kuf6R/ICWa3SIrgUXdXvsQj4GFpn2a+plNns+e9
+	 qOAErYX3CzUUA==
+Date: Sun, 4 Feb 2024 13:20:44 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Emily Deng <Emily.Deng@amd.com>
+Cc: amd-gfx@lists.freedesktop.org, bhelgaas@google.com,
+	alex.williamson@redhat.com, linux-pci@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH] PCI: Add vf reset notification for pf
+Message-ID: <20240204112044.GC5400@unreal>
+References: <20240204061257.1408243-1-Emily.Deng@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v18 055/121] KVM: VMX: Move setting of EPT MMU masks to
- common VT-x code
-To: isaku.yamahata@intel.com
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
- erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
- Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
- chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
- Sean Christopherson <sean.j.christopherson@intel.com>
-References: <cover.1705965634.git.isaku.yamahata@intel.com>
- <ded872753cfd4abdd7eb842b74c263539cb8f159.1705965635.git.isaku.yamahata@intel.com>
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <ded872753cfd4abdd7eb842b74c263539cb8f159.1705965635.git.isaku.yamahata@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240204061257.1408243-1-Emily.Deng@amd.com>
 
+On Sun, Feb 04, 2024 at 02:12:57PM +0800, Emily Deng wrote:
+> When a vf has been reset, the pf wants to get notification to remove the vf
+> out of schedule.
 
+It is very questionable if this is right thing to do. The idea of SR-IOV
+is that VFs represent a physical device and they should be treated
+separately from the PF.
 
-On 1/23/2024 7:53 AM, isaku.yamahata@intel.com wrote:
-> From: Sean Christopherson <sean.j.christopherson@intel.com>
->
-> EPT MMU masks are used commonly for VMX and TDX.  The value needs to be
-> initialized in common code before both VMX/TDX-specific initialization
-> code.
->
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+In addition to that Keith said, this patch needs better justification.
+
+Thanks
+
+> 
+> Solution:
+> Add the callback function in pci_driver sriov_vf_reset_notification. When
+> vf reset happens, then call this callback function.
+> 
+> Signed-off-by: Emily Deng <Emily.Deng@amd.com>
 > ---
->   arch/x86/kvm/vmx/main.c | 9 +++++++++
->   arch/x86/kvm/vmx/vmx.c  | 4 ----
->   2 files changed, 9 insertions(+), 4 deletions(-)
->
-> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-> index de4b6f924a36..8059b44ed159 100644
-> --- a/arch/x86/kvm/vmx/main.c
-> +++ b/arch/x86/kvm/vmx/main.c
-> @@ -4,6 +4,7 @@
->   #include "x86_ops.h"
->   #include "vmx.h"
->   #include "nested.h"
-> +#include "mmu.h"
->   #include "pmu.h"
->   #include "tdx.h"
->   #include "tdx_arch.h"
-> @@ -54,6 +55,14 @@ static __init int vt_hardware_setup(void)
->   	if (ret)
->   		return ret;
->   
-> +	/*
-> +	 * As kvm_mmu_set_ept_masks() updates enable_mmio_caching, call it
-> +	 * before checking enable_mmio_caching.
-> +	 */
-> +	if (enable_ept)
-> +		kvm_mmu_set_ept_masks(enable_ept_ad_bits,
-> +				      cpu_has_vmx_ept_execute_only());
+>  drivers/pci/pci.c   | 8 ++++++++
+>  include/linux/pci.h | 1 +
+>  2 files changed, 9 insertions(+)
+> 
+> diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
+> index 60230da957e0..aca937b05531 100644
+> --- a/drivers/pci/pci.c
+> +++ b/drivers/pci/pci.c
+> @@ -4780,6 +4780,14 @@ EXPORT_SYMBOL_GPL(pcie_flr);
+>   */
+>  int pcie_reset_flr(struct pci_dev *dev, bool probe)
+>  {
+> +	struct pci_dev *pf_dev;
 > +
->   	enable_tdx = enable_tdx && !tdx_hardware_setup(&vt_x86_ops);
->   
->   	return 0;
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 185e22a2e101..c2da39ceb02b 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -8452,10 +8452,6 @@ __init int vmx_hardware_setup(void)
->   
->   	set_bit(0, vmx_vpid_bitmap); /* 0 is reserved for host */
->   
-> -	if (enable_ept)
-> -		kvm_mmu_set_ept_masks(enable_ept_ad_bits,
-> -				      cpu_has_vmx_ept_execute_only());
-> -
-
- From hardware_setup aspect, vmx_hardware_setup() is the dependency of
-tdx_hardware_setup() and vmx_hardware_setup() is called earlier than
-tdx_hardware_setup(), it seems no need to move the code.
-
-
->   	/*
->   	 * Setup shadow_me_value/shadow_me_mask to include MKTME KeyID
->   	 * bits to shadow_zero_check.
-
+> +	if (dev->is_virtfn) {
+> +		pf_dev = dev->physfn;
+> +		if (pf_dev->driver->sriov_vf_reset_notification)
+> +			pf_dev->driver->sriov_vf_reset_notification(pf_dev, dev);
+> +	}
+> +
+>  	if (dev->dev_flags & PCI_DEV_FLAGS_NO_FLR_RESET)
+>  		return -ENOTTY;
+>  
+> diff --git a/include/linux/pci.h b/include/linux/pci.h
+> index c69a2cc1f412..4fa31d9b0aa7 100644
+> --- a/include/linux/pci.h
+> +++ b/include/linux/pci.h
+> @@ -926,6 +926,7 @@ struct pci_driver {
+>  	int  (*sriov_configure)(struct pci_dev *dev, int num_vfs); /* On PF */
+>  	int  (*sriov_set_msix_vec_count)(struct pci_dev *vf, int msix_vec_count); /* On PF */
+>  	u32  (*sriov_get_vf_total_msix)(struct pci_dev *pf);
+> +	void  (*sriov_vf_reset_notification)(struct pci_dev *pf, struct pci_dev *vf);
+>  	const struct pci_error_handlers *err_handler;
+>  	const struct attribute_group **groups;
+>  	const struct attribute_group **dev_groups;
+> -- 
+> 2.36.1
+> 
+> 
 
