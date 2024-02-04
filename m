@@ -1,72 +1,120 @@
-Return-Path: <kvm+bounces-7943-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7944-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D743848BBE
-	for <lists+kvm@lfdr.de>; Sun,  4 Feb 2024 08:08:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8106848BFF
+	for <lists+kvm@lfdr.de>; Sun,  4 Feb 2024 08:51:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49702284D37
-	for <lists+kvm@lfdr.de>; Sun,  4 Feb 2024 07:08:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8397F284F6B
+	for <lists+kvm@lfdr.de>; Sun,  4 Feb 2024 07:51:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9C118827;
-	Sun,  4 Feb 2024 07:08:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F6C616423;
+	Sun,  4 Feb 2024 07:50:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ASaMiiWh"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="HnTtvqz+"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFE2C749C;
-	Sun,  4 Feb 2024 07:08:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C567214A94;
+	Sun,  4 Feb 2024 07:50:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707030514; cv=none; b=B09DTstIsIYb/yR62CNLyonkLUg76U8H5j4Frn9hoGumLSgutwnwOurY2tr0U32BNLiCp6sP2C59tAT6ZiAkPo35wZJ5DNQXPA0XEQYjBQM/BZU/5nCT8rEpX/ukfqOBR24p73jqTR2hTiovOI9k8wKTChMLzM8oG1zECmpfFTE=
+	t=1707033003; cv=none; b=lo0uQ8UJKw/+VIziT4Bn2b+hY7ajqHICe2SjhNNof7IFhEhC66EeaUCSvfuCWN3tBlNGKv/OWweFf2KDFMSoZ0TTkpEmSFrdnUVC3LrqruREAJTu9xOOCAfNOaDpKzN5oVARNecOD+9e4ltogLZYVF/LRI87UH61GEPPrZc2poI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707030514; c=relaxed/simple;
-	bh=mqmUJhwMC+hGcCJ5oR07vsws9DjOZ4c7Y8U7ECmQp/M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kjFLajfv4fk/548Zxarpq7Lq358ysJVj1hC1GPksuGaDSVlWxi/YTJAMw2lyTvuytQ2IOlbr35LMGiXPHCOuEVN2RP/b9Qmp4Vaxf4MX2kaSbXnawXCFsN8z2qXlhrmtAqilvooysWDu1M+wpMcac55/2aFegjriE4257w+cWEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ASaMiiWh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 252B1C433C7;
-	Sun,  4 Feb 2024 07:08:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707030513;
-	bh=mqmUJhwMC+hGcCJ5oR07vsws9DjOZ4c7Y8U7ECmQp/M=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ASaMiiWhSgJ2CqyvHxc9ihtjwFqfRghZNAxwiJDRhCqFqhM5Y4XxX+pSM55YgHRPU
-	 gjmi4ZnMtGXLjiIfLw2/V0TyCGdMOlMVXbunn7zQzEVZibyORaJ7ZSW2SFZMrpMsto
-	 TLQT7N8KZSY9MhNWZAkvjv2G/Kh/T7oKqDz3uaBbtnEVUpa6jPhr4bqxNBtajSnitY
-	 gSienoP7Rj6HOpU4BWsoJhWdHrE3gOO/qZJoabUG8y2APql/Z3lQXBPBnkUuzNeO5A
-	 1d5j3KXJs+RQnST33R/H+JvNbTYp3FBB7e3Z57dH2jPTa1Ic7aGqaSqZUg15DMyliz
-	 RIgl3uhPFui0A==
-Date: Sun, 4 Feb 2024 00:08:31 -0700
-From: Keith Busch <kbusch@kernel.org>
-To: Emily Deng <Emily.Deng@amd.com>
-Cc: amd-gfx@lists.freedesktop.org, bhelgaas@google.com,
-	alex.williamson@redhat.com, linux-pci@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH] PCI: Add vf reset notification for pf
-Message-ID: <Zb8371oj6Xju_2gU@kbusch-mbp.mynextlight.net>
-References: <20240204061257.1408243-1-Emily.Deng@amd.com>
+	s=arc-20240116; t=1707033003; c=relaxed/simple;
+	bh=8rYxczI/5Lo4DDBMNGT7Xezq3tFx3qZcjoXISzbgu8o=;
+	h=From:To:CC:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=EujY80wRTVHeBzWphuk8yr2PiR4FrHGB5lqcy3ww5m8srZ1q7YH++mNxx7S3mPpMFSYtpIau/BabK22fOqDQU1VYl5QeyGlz9N1/hvtWmQDVK05gv0IfAjbOUczNgCIkoVC2lU/ofNFfXanSuIiW0PhkOWIU5db1nHZO1JQn8XM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=HnTtvqz+; arc=none smtp.client-ip=198.47.19.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 4147nZVA040695;
+	Sun, 4 Feb 2024 01:49:35 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1707032975;
+	bh=A14BCls41fwfyoOZpPImx9gM6CsoQWADM/eYvGfz9Sg=;
+	h=From:To:CC:Subject:In-Reply-To:References:Date;
+	b=HnTtvqz+bj/maXJMRIFvmTvcnjEgG7IUIaeB9KK+Ei6OlNfkUkTvlpuVwxmar3cBM
+	 cGw8kVsdvDZXnSa2+/VkLNOML3E9cVn+EVg5R03mdJE5hQPyi4mWwMq+TzbQ939VJ8
+	 qpbx+8sA3WQ/9M2bYTOMCuSQ0vJWroZWlusiR2qM=
+Received: from DLEE115.ent.ti.com (dlee115.ent.ti.com [157.170.170.26])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 4147nZ5A053108
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Sun, 4 Feb 2024 01:49:35 -0600
+Received: from DLEE111.ent.ti.com (157.170.170.22) by DLEE115.ent.ti.com
+ (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Sun, 4
+ Feb 2024 01:49:35 -0600
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE111.ent.ti.com
+ (157.170.170.22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Sun, 4 Feb 2024 01:49:35 -0600
+Received: from localhost (kamlesh.dhcp.ti.com [172.24.227.123])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4147nY0O050380;
+	Sun, 4 Feb 2024 01:49:35 -0600
+From: Kamlesh Gurudasani <kamlesh@ti.com>
+To: Xin Zeng <xin.zeng@intel.com>, <herbert@gondor.apana.org.au>,
+        <alex.williamson@redhat.com>, <jgg@nvidia.com>, <yishaih@nvidia.com>,
+        <shameerali.kolothum.thodi@huawei.com>, <kevin.tian@intel.com>
+CC: <linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <qat-linux@intel.com>, Siming Wan <siming.wan@intel.com>,
+        Xin Zeng
+	<xin.zeng@intel.com>
+Subject: Re: [EXTERNAL] [PATCH 07/10] crypto: qat - add bank save and
+ restore flows
+In-Reply-To: <20240201153337.4033490-8-xin.zeng@intel.com>
+References: <20240201153337.4033490-1-xin.zeng@intel.com>
+ <20240201153337.4033490-8-xin.zeng@intel.com>
+Date: Sun, 4 Feb 2024 13:19:34 +0530
+Message-ID: <87o7cwzn1t.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240204061257.1408243-1-Emily.Deng@amd.com>
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-On Sun, Feb 04, 2024 at 02:12:57PM +0800, Emily Deng wrote:
-> @@ -926,6 +926,7 @@ struct pci_driver {
->  	int  (*sriov_configure)(struct pci_dev *dev, int num_vfs); /* On PF */
->  	int  (*sriov_set_msix_vec_count)(struct pci_dev *vf, int msix_vec_count); /* On PF */
->  	u32  (*sriov_get_vf_total_msix)(struct pci_dev *pf);
-> +	void  (*sriov_vf_reset_notification)(struct pci_dev *pf, struct pci_dev *vf);
+Xin Zeng <xin.zeng@intel.com> writes:
 
-You've created a new callback, but there is no user. Could you resubmit
-this with an in-kernel use case?
+> This message was sent from outside of Texas Instruments. 
+> Do not click links or open attachments unless you recognize the source of this email and know the content is safe. 
+>  
+> From: Siming Wan <siming.wan@intel.com>
+>
+> Add logic to save, restore, quiesce and drain a ring bank for QAT GEN4
+> devices.
+> This allows to save and restore the state of a Virtual Function (VF) and
+> will be used to implement VM live migration.
+>
+> Signed-off-by: Siming Wan <siming.wan@intel.com>
+> Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> Reviewed-by: Xin Zeng <xin.zeng@intel.com>
+> Signed-off-by: Xin Zeng <xin.zeng@intel.com>
+...
+> +#define CHECK_STAT(op, expect_val, name, args...) \
+> +({ \
+> +	u32 __expect_val = (expect_val); \
+> +	u32 actual_val = op(args); \
+> +	if (__expect_val != actual_val) \
+> +		pr_err("QAT: Fail to restore %s register. Expected 0x%x, but actual is 0x%x\n", \
+> +			name, __expect_val, actual_val); \
+> +	(__expect_val == actual_val) ? 0 : -EINVAL; \
+I was wondering if this can be done like following, saves repeat comparison.
+
+(__expect_val == actual_val) ? 0 : (pr_err("QAT: Fail to restore %s \
+                                          register. Expected 0x%x, \
+                                          but actual is 0x%x\n", \
+                 			  name, __expect_val, \
+                                          actual_val), -EINVAL); \
+Regards,
+Kamlesh
+
+> +})
+...
 
