@@ -1,277 +1,166 @@
-Return-Path: <kvm+bounces-7941-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7942-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87AB3848AFC
-	for <lists+kvm@lfdr.de>; Sun,  4 Feb 2024 05:23:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8282848B69
+	for <lists+kvm@lfdr.de>; Sun,  4 Feb 2024 07:13:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF42B1F23EEC
-	for <lists+kvm@lfdr.de>; Sun,  4 Feb 2024 04:23:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08CDA1C216E4
+	for <lists+kvm@lfdr.de>; Sun,  4 Feb 2024 06:13:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCD85749A;
-	Sun,  4 Feb 2024 04:22:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5314749C;
+	Sun,  4 Feb 2024 06:13:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BirDRneg"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="raAk0hg7"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2057.outbound.protection.outlook.com [40.107.237.57])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D03E96FA8
-	for <kvm@vger.kernel.org>; Sun,  4 Feb 2024 04:22:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707020573; cv=none; b=m0jpuJZBP3bjEG2CYeJAn/mDK440Ys8JpZVcqAsnuURVvsvktuBYS4lWgzdqOZ04k/5ecBD/gt9V1Zpr7yPu0y4BVasq7kTHfEVuZ6LfbauAKrlNhVGPFQuUSxt/4q100nWxBZzSHzIVjeFW04jYgZdeyBsxLLs2XslmsTTMHrc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707020573; c=relaxed/simple;
-	bh=ivyjQmXbCTYO/puaNTbK55Wk2s7Pa48bP4R7RrFB7h0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CRTrKKfvmj+kj3Rs1mfdVaYNYV7Ut0spsLDOaFqsnWhnn/NLEdLMDm8jaC3W3Gxiu2QqJaWGiTufuwEisvCJXjkH2TToRbxjrHUZJPukTkdB2ewejaBOkRfxmQjePfroFlpaDZ7Ku2gVJSy+tpZ15CBIWBMzhchNSccgKgjOR9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BirDRneg; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707020569;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PyNa0NcWlAeyikPHcWl9Ahg0XOk5KDcxMhCNpLB7tmE=;
-	b=BirDRnegEdPjqCqsay9wodMAZzFrkvK5vdCBZLjbA+2qypI+ZZDB3js6n/HiZRrpILjr0R
-	6Grd/TE0olQFxQ50HEtJb+XKrrRDRoopDxsDShU5yKR9pzLSpKr3FRvEiObnuWlw5cW228
-	J/xKnawun8b4Nm/S8Av7sFrBPfIQt0o=
-Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
- [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-362-lFIv9IaePACHB9z-3phyWw-1; Sat, 03 Feb 2024 23:22:48 -0500
-X-MC-Unique: lFIv9IaePACHB9z-3phyWw-1
-Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-6e03d38022dso30740b3a.1
-        for <kvm@vger.kernel.org>; Sat, 03 Feb 2024 20:22:48 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707020567; x=1707625367;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PyNa0NcWlAeyikPHcWl9Ahg0XOk5KDcxMhCNpLB7tmE=;
-        b=o5c04xSJbBBpEcy2eX6rVn92Byjk4A6S6yQaMxyWwB9KvYK+qrg+cje5BOoksgwny8
-         B3x5lxUfrnStotXZRPrbxPsrA59hzHk0N3GFrJO3HXZXCIFAjg5G3mlJy1tFrx+iJBJl
-         kArA2I6P9mUsYotyuG/ggHP5Kwa5otoP12M5KYvJO61GIF+m21Yix0gt7t2URyRJLu7K
-         1RPlVESXmDnrJqCr3+vPLMKIePxlGCwvAKmgSeU3Er3jRcWwgVgOA6p3kK72YF69QXgO
-         X5JFt4cJfY+K/47ziLclZg2ZNHIhf4uS3Lji3puUpiMOWdeUD4CanSDQ56PJPlSzWbKa
-         Lcxw==
-X-Gm-Message-State: AOJu0YxcWyQPLSk4gbP+cR8zbiIxzj3SYLg0VakJn1C1s/zcpNYZmSCM
-	lifUYDTX0garvi6WPZtJ8JYo3TkyLlgz918vLHNYeY1OBQy2dHyQC0RhvCwgjcDzNa1IOmemt/2
-	oa9AiZ08CZeMjlYovTXRmmMx5ODQOZGIgfzNjx/SKvgYbM7534g==
-X-Received: by 2002:a05:6a00:1d0a:b0:6e0:289e:e182 with SMTP id a10-20020a056a001d0a00b006e0289ee182mr3350621pfx.0.1707020567014;
-        Sat, 03 Feb 2024 20:22:47 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF0IWLPV9X8xVOCdb2HdkLIVdBu0/yn9+Us/XbcpUulOgDCh/26Q+o/3WqXVJRRkOKXlGg58A==
-X-Received: by 2002:a05:6a00:1d0a:b0:6e0:289e:e182 with SMTP id a10-20020a056a001d0a00b006e0289ee182mr3350602pfx.0.1707020566576;
-        Sat, 03 Feb 2024 20:22:46 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCUYeUGVWEw40iaTavJzWEdI6BkQSKin8qEsbx1Lp1bcOjQdxKTRQaGm2/6pSArDWRz80mZSTaCnXAkTrIDZF4M/CvQI4OzQPEnkYWKcXfFriSO/286No3YJPLZFJ68Yqo5U
-Received: from [10.72.116.41] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id q14-20020a62ae0e000000b006e03bababf5sm358449pff.123.2024.02.03.20.22.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 03 Feb 2024 20:22:45 -0800 (PST)
-Message-ID: <17eefa60-cf30-4830-943e-793a63d4e6f1@redhat.com>
-Date: Sun, 4 Feb 2024 12:22:40 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E065B7460;
+	Sun,  4 Feb 2024 06:13:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.57
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707027218; cv=fail; b=Dd6c1u9rnQlwibBhpw0Aq0AyEbPIXocJTfWdRAy5KtR/xu9oWkJ7KBNtmfZ6/7DlvpnAZMy7iViJ712G1uIf/sOvH4VZ+zKv57PJKXlPcCABTvmzEp2PA+UHX7rHO1o1lrmZSdXtBlQcZE30In2MbGy8OwsuKb9YazQ0QdA7COM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707027218; c=relaxed/simple;
+	bh=ByZ8BP3v21BouqKjmZGNflfo+TK9zRKs+uXVcVUZLJU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=h94kQxqRbaE9XBWAKrZ1/UVVpOG7fgD5GPJj5CEcu5/j2t4QMmxH9zku4tq4DpP1FOM8qbjvgGlzjtNhrGc8sW5X8dD0ni6OTe3TK9+BE69wxcerl7LbjNZHBpwdiwnGlfmRhyRL1jKmOQLoeOrUufKW9RcoAa65KOfiqwuOVrY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=raAk0hg7; arc=fail smtp.client-ip=40.107.237.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NuzuPRo7gMOaCKKKCBtCu1RZE/XfZ3SgtB1IU32pxwVWo655xF0UJM6iZzOrtVC+3/Pk+iWAKuKAhWzg5BOfAZsg+Jc3l99Y51l1+RC8KiSqCFhBo0IATB6VbmfGZQIB4DHtgU0JhCl5mVFQX7OgZ2PBzxtQo5Zsrpoggv+nWNPnzQdN+wHkXTiSb6y6Cg5k+gRFaaftHmrhLcpSDWgz1kMYZcZaEQbAZoclcNeaxYyTyZeEzGboTpuyqiM0LtNTI+GRxOSN+Z0VyPMFcn420f1I4dNJQAzMVqLZzF8IvZYqimi/1nbZiKgHEPrRMFEMitL7/hD2z6D/LnIhC6T6lg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tOcQ3n89PK94DuMrj0kqWbgPixgTgPyrzVZuNor2Qtw=;
+ b=N+Dn+3BTRMnsnoYdqdV9SM/be693Rr/yMr0ZXYcic0J49ojTH2WwmdamuiO3s7gqEcwOmRG4cxh0c3N+uTXGzBvBzYk3gmjw8e7otoK1kKz2acKZ6PaxZKQocuFSfvQQmnn2ijzX/liDewYiKnSHjx6tJJe2HH++NZMieSFYficsC44S9u6PJfxQUosFPkUHpgU98yEJ0OokMCcQgvfYkZMkgQBcgVWXq1GhNCpXs08PSj4LoZDqVs//RuBAcOGrN53XAjVVYQMz6cO/s4APR5WBGAx36BAbil6w+9TXrBQ6tx3vBAPcjF+MpTtTxdHcGKOhkmh8i1wAfJuh0CEc9w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=lists.freedesktop.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tOcQ3n89PK94DuMrj0kqWbgPixgTgPyrzVZuNor2Qtw=;
+ b=raAk0hg72TzqIPOHBVAv2bzWgfBixWbAfiu8t07PmumDRUXYA46Nxx84e6y4D8H/JZmyh72gldcD7osMiszCUFT4EKwn4297SNSE9kKqBGzxTws+8LljsEXd/T+DITJ/PInQ6+xwn6lJZnyr7AT77VMbO81SB9nIuaCWwOmYVnU=
+Received: from SN1PR12CA0087.namprd12.prod.outlook.com (2603:10b6:802:21::22)
+ by SA1PR12MB7199.namprd12.prod.outlook.com (2603:10b6:806:2bc::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.13; Sun, 4 Feb
+ 2024 06:13:33 +0000
+Received: from SA2PEPF00001508.namprd04.prod.outlook.com
+ (2603:10b6:802:21:cafe::86) by SN1PR12CA0087.outlook.office365.com
+ (2603:10b6:802:21::22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7249.31 via Frontend
+ Transport; Sun, 4 Feb 2024 06:13:33 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
+Received: from SATLEXMB03.amd.com (165.204.84.17) by
+ SA2PEPF00001508.mail.protection.outlook.com (10.167.242.40) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7249.19 via Frontend Transport; Sun, 4 Feb 2024 06:13:33 +0000
+Received: from SATLEXMB08.amd.com (10.181.40.132) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Sun, 4 Feb
+ 2024 00:13:32 -0600
+Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB08.amd.com
+ (10.181.40.132) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.32; Sat, 3 Feb
+ 2024 22:13:32 -0800
+Received: from emily-Z10PA-U8-Series.amd.com (10.180.168.240) by
+ SATLEXMB04.amd.com (10.181.40.145) with Microsoft SMTP Server id 15.1.2507.34
+ via Frontend Transport; Sun, 4 Feb 2024 00:13:30 -0600
+From: Emily Deng <Emily.Deng@amd.com>
+To: <amd-gfx@lists.freedesktop.org>, <bhelgaas@google.com>,
+	<alex.williamson@redhat.com>, <linux-pci@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>
+CC: Emily Deng <Emily.Deng@amd.com>
+Subject: [PATCH] PCI: Add vf reset notification for pf
+Date: Sun, 4 Feb 2024 14:12:57 +0800
+Message-ID: <20240204061257.1408243-1-Emily.Deng@amd.com>
+X-Mailer: git-send-email 2.36.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: selftests: Fix a semaphore imbalance in the dirty
- ring logging test
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240202231831.354848-1-seanjc@google.com>
-Content-Language: en-US
-From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20240202231831.354848-1-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA2PEPF00001508:EE_|SA1PR12MB7199:EE_
+X-MS-Office365-Filtering-Correlation-Id: 893b5e49-c479-42d9-a45e-08dc25486a4e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	8DvhlD1tDLYzGOkHKPLmmpbNlI42K7oDJx4RyOEHbpRDkQlM1BJ4vtCK8rKrAVPl1ma73hXk3as9bq6JWEfCf4n8Ms3yKq2e82bsyPKQu0mUVng/7JKGykB4A/e9OfWXDBxCoTQx3G7F9AC0wAqdZS/KoygNFnTVdJN/Ub8FMLUEk9+jzqWtBFqtxON03NeSMRJ30mozRGeEqpoyab4hMzb2UV+jcrOvXwbmDd7DKI/D1hjE+UrQahR5260PiO6y7xV+M8Esw4VjeTNlBkqsm5PtSsrJag8Y5mARpGeunrPhWfyh13zHdyUs5uOkJM1LaoKQXT00AZ/V1oWRS+93qBq4qgMPEh86E2ZigFJ7DhbGl02xzL49MCviFVscC4Nrcabxyv1rnsr8eJqiUiY0LX0Qxie8eHxv/CJfc5NV3mQThADy3+aj2EU25eUmCLpqcI5wNa+hccpidoTymcRT1xWve7sl1aAOPHALNd5VzXbN/Sn99VkC1ijuAjDsiblYQO+W4Iw9kOfMwTW3Qv1oRq+oO7ffChw68YqvHvcRo4WkObZ5KYwKfDzrUM6zjKuHlP96mjBFVmofY/q7RKn0R/gJs8KWheMb9bcV5WlvnmuOCtWAp5PwpR7bhP1hyqeDJaco9ta9Tio2nQiVBymRUuIBEsrseQK7wzciAvSJYqrIBd6bmlqTYdVk/7pY/V/0WKI4Ucy49JsuxuFCdFQAriC1TethpeuN+3QN8rHKL1i8IRZ2npwWJC8a4s2sWUkmtfzZ9JiNi33PfHv88yAskw==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(136003)(396003)(39860400002)(376002)(346002)(230922051799003)(82310400011)(1800799012)(186009)(64100799003)(451199024)(46966006)(40470700004)(36840700001)(40460700003)(40480700001)(2906002)(15650500001)(478600001)(5660300002)(8936002)(83380400001)(110136005)(47076005)(70586007)(36756003)(7696005)(316002)(4326008)(8676002)(6666004)(70206006)(426003)(336012)(41300700001)(1076003)(356005)(86362001)(82740400003)(2616005)(26005)(36860700001)(81166007)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Feb 2024 06:13:33.0398
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 893b5e49-c479-42d9-a45e-08dc25486a4e
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SA2PEPF00001508.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7199
 
-Hi Sean,
+When a vf has been reset, the pf wants to get notification to remove the vf
+out of schedule.
 
-Thanks for your better solution to fix this issue, I've tested your 
-patch, it actually fix the problem I encounter. Thanks.
+Solution:
+Add the callback function in pci_driver sriov_vf_reset_notification. When
+vf reset happens, then call this callback function.
 
-Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
+Signed-off-by: Emily Deng <Emily.Deng@amd.com>
+---
+ drivers/pci/pci.c   | 8 ++++++++
+ include/linux/pci.h | 1 +
+ 2 files changed, 9 insertions(+)
 
-On 2/3/24 07:18, Sean Christopherson wrote:
-> When finishing the final iteration of dirty_log_test testcase, set
-> host_quit _before_ the final "continue" so that the vCPU worker doesn't
-> run an extra iteration, and delete the hack-a-fix of an extra "continue"
-> from the dirty ring testcase.  This fixes a bug where the extra post to
-> sem_vcpu_cont may not be consumed, which results in failures in subsequent
-> runs of the testcases.  The bug likely was missed during development as
-> x86 supports only a single "guest mode", i.e. there aren't any subsequent
-> testcases after the dirty ring test, because for_each_guest_mode() only
-> runs a single iteration.
-> 
-> For the regular dirty log testcases, letting the vCPU run one extra
-> iteration is a non-issue as the vCPU worker waits on sem_vcpu_cont if and
-> only if the worker is explicitly told to stop (vcpu_sync_stop_requested).
-> But for the dirty ring test, which needs to periodically stop the vCPU to
-> reap the dirty ring, letting the vCPU resume the guest _after_ the last
-> iteration means the vCPU will get stuck without an extra "continue".
-> 
-> However, blindly firing off an post to sem_vcpu_cont isn't guaranteed to
-> be consumed, e.g. if the vCPU worker sees host_quit==true before resuming
-> the guest.  This results in a dangling sem_vcpu_cont, which leads to
-> subsequent iterations getting out of sync, as the vCPU worker will
-> continue on before the main task is ready for it to resume the guest,
-> leading to a variety of asserts, e.g.
-> 
->    ==== Test Assertion Failure ====
->    dirty_log_test.c:384: dirty_ring_vcpu_ring_full
->    pid=14854 tid=14854 errno=22 - Invalid argument
->       1  0x00000000004033eb: dirty_ring_collect_dirty_pages at dirty_log_test.c:384
->       2  0x0000000000402d27: log_mode_collect_dirty_pages at dirty_log_test.c:505
->       3   (inlined by) run_test at dirty_log_test.c:802
->       4  0x0000000000403dc7: for_each_guest_mode at guest_modes.c:100
->       5  0x0000000000401dff: main at dirty_log_test.c:941 (discriminator 3)
->       6  0x0000ffff9be173c7: ?? ??:0
->       7  0x0000ffff9be1749f: ?? ??:0
->       8  0x000000000040206f: _start at ??:?
->    Didn't continue vcpu even without ring full
-> 
-> Alternatively, the test could simply reset the semaphores before each
-> testcase, but papering over hacks with more hacks usually ends in tears.
-> 
-> Reported-by: Shaoqin Huang <shahuang@redhat.com>
-> Fixes: 84292e565951 ("KVM: selftests: Add dirty ring buffer test")
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   tools/testing/selftests/kvm/dirty_log_test.c | 50 +++++++++++---------
->   1 file changed, 27 insertions(+), 23 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
-> index babea97b31a4..eaad5b20854c 100644
-> --- a/tools/testing/selftests/kvm/dirty_log_test.c
-> +++ b/tools/testing/selftests/kvm/dirty_log_test.c
-> @@ -376,7 +376,10 @@ static void dirty_ring_collect_dirty_pages(struct kvm_vcpu *vcpu, int slot,
->   
->   	cleared = kvm_vm_reset_dirty_ring(vcpu->vm);
->   
-> -	/* Cleared pages should be the same as collected */
-> +	/*
-> +	 * Cleared pages should be the same as collected, as KVM is supposed to
-> +	 * clear only the entries that have been harvested.
-> +	 */
->   	TEST_ASSERT(cleared == count, "Reset dirty pages (%u) mismatch "
->   		    "with collected (%u)", cleared, count);
->   
-> @@ -415,12 +418,6 @@ static void dirty_ring_after_vcpu_run(struct kvm_vcpu *vcpu, int ret, int err)
->   	}
->   }
->   
-> -static void dirty_ring_before_vcpu_join(void)
-> -{
-> -	/* Kick another round of vcpu just to make sure it will quit */
-> -	sem_post(&sem_vcpu_cont);
-> -}
-> -
->   struct log_mode {
->   	const char *name;
->   	/* Return true if this mode is supported, otherwise false */
-> @@ -433,7 +430,6 @@ struct log_mode {
->   				     uint32_t *ring_buf_idx);
->   	/* Hook to call when after each vcpu run */
->   	void (*after_vcpu_run)(struct kvm_vcpu *vcpu, int ret, int err);
-> -	void (*before_vcpu_join) (void);
->   } log_modes[LOG_MODE_NUM] = {
->   	{
->   		.name = "dirty-log",
-> @@ -452,7 +448,6 @@ struct log_mode {
->   		.supported = dirty_ring_supported,
->   		.create_vm_done = dirty_ring_create_vm_done,
->   		.collect_dirty_pages = dirty_ring_collect_dirty_pages,
-> -		.before_vcpu_join = dirty_ring_before_vcpu_join,
->   		.after_vcpu_run = dirty_ring_after_vcpu_run,
->   	},
->   };
-> @@ -513,14 +508,6 @@ static void log_mode_after_vcpu_run(struct kvm_vcpu *vcpu, int ret, int err)
->   		mode->after_vcpu_run(vcpu, ret, err);
->   }
->   
-> -static void log_mode_before_vcpu_join(void)
-> -{
-> -	struct log_mode *mode = &log_modes[host_log_mode];
-> -
-> -	if (mode->before_vcpu_join)
-> -		mode->before_vcpu_join();
-> -}
-> -
->   static void generate_random_array(uint64_t *guest_array, uint64_t size)
->   {
->   	uint64_t i;
-> @@ -719,6 +706,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->   	struct kvm_vm *vm;
->   	unsigned long *bmap;
->   	uint32_t ring_buf_idx = 0;
-> +	int sem_val;
->   
->   	if (!log_mode_supported()) {
->   		print_skip("Log mode '%s' not supported",
-> @@ -788,12 +776,22 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->   	/* Start the iterations */
->   	iteration = 1;
->   	sync_global_to_guest(vm, iteration);
-> -	host_quit = false;
-> +	WRITE_ONCE(host_quit, false);
->   	host_dirty_count = 0;
->   	host_clear_count = 0;
->   	host_track_next_count = 0;
->   	WRITE_ONCE(dirty_ring_vcpu_ring_full, false);
->   
-> +	/*
-> +	 * Ensure the previous iteration didn't leave a dangling semaphore, i.e.
-> +	 * that the main task and vCPU worker were synchronized and completed
-> +	 * verification of all iterations.
-> +	 */
-> +	sem_getvalue(&sem_vcpu_stop, &sem_val);
-> +	TEST_ASSERT_EQ(sem_val, 0);
-> +	sem_getvalue(&sem_vcpu_cont, &sem_val);
-> +	TEST_ASSERT_EQ(sem_val, 0);
-> +
->   	pthread_create(&vcpu_thread, NULL, vcpu_worker, vcpu);
->   
->   	while (iteration < p->iterations) {
-> @@ -819,15 +817,21 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->   		assert(host_log_mode == LOG_MODE_DIRTY_RING ||
->   		       atomic_read(&vcpu_sync_stop_requested) == false);
->   		vm_dirty_log_verify(mode, bmap);
-> +
-> +		/*
-> +		 * Set host_quit before sem_vcpu_cont in the final iteration to
-> +		 * ensure that the vCPU worker doesn't resume the guest.  As
-> +		 * above, the dirty ring test may stop and wait even when not
-> +		 * explicitly request to do so, i.e. would hang waiting for a
-> +		 * "continue" if it's allowed to resume the guest.
-> +		 */
-> +		if (++iteration == p->iterations)
-> +			WRITE_ONCE(host_quit, true);
-> +
->   		sem_post(&sem_vcpu_cont);
-> -
-> -		iteration++;
->   		sync_global_to_guest(vm, iteration);
->   	}
->   
-> -	/* Tell the vcpu thread to quit */
-> -	host_quit = true;
-> -	log_mode_before_vcpu_join();
->   	pthread_join(vcpu_thread, NULL);
->   
->   	pr_info("Total bits checked: dirty (%"PRIu64"), clear (%"PRIu64"), "
-> 
-> base-commit: d79e70e8cc9ee9b0901a93aef391929236ed0f39
-
+diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
+index 60230da957e0..aca937b05531 100644
+--- a/drivers/pci/pci.c
++++ b/drivers/pci/pci.c
+@@ -4780,6 +4780,14 @@ EXPORT_SYMBOL_GPL(pcie_flr);
+  */
+ int pcie_reset_flr(struct pci_dev *dev, bool probe)
+ {
++	struct pci_dev *pf_dev;
++
++	if (dev->is_virtfn) {
++		pf_dev = dev->physfn;
++		if (pf_dev->driver->sriov_vf_reset_notification)
++			pf_dev->driver->sriov_vf_reset_notification(pf_dev, dev);
++	}
++
+ 	if (dev->dev_flags & PCI_DEV_FLAGS_NO_FLR_RESET)
+ 		return -ENOTTY;
+ 
+diff --git a/include/linux/pci.h b/include/linux/pci.h
+index c69a2cc1f412..4fa31d9b0aa7 100644
+--- a/include/linux/pci.h
++++ b/include/linux/pci.h
+@@ -926,6 +926,7 @@ struct pci_driver {
+ 	int  (*sriov_configure)(struct pci_dev *dev, int num_vfs); /* On PF */
+ 	int  (*sriov_set_msix_vec_count)(struct pci_dev *vf, int msix_vec_count); /* On PF */
+ 	u32  (*sriov_get_vf_total_msix)(struct pci_dev *pf);
++	void  (*sriov_vf_reset_notification)(struct pci_dev *pf, struct pci_dev *vf);
+ 	const struct pci_error_handlers *err_handler;
+ 	const struct attribute_group **groups;
+ 	const struct attribute_group **dev_groups;
 -- 
-Shaoqin
+2.36.1
 
 
