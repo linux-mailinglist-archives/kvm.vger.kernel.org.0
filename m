@@ -1,54 +1,55 @@
-Return-Path: <kvm+bounces-8011-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8012-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08398849AE4
-	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 13:50:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1F86849AEC
+	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 13:51:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B0F381F236E3
-	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 12:50:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 11DFE1C20EF5
+	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 12:51:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1459F45033;
-	Mon,  5 Feb 2024 12:46:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD6B847F5B;
+	Mon,  5 Feb 2024 12:46:08 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1488F1CAA2;
-	Mon,  5 Feb 2024 12:46:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A6914595C;
+	Mon,  5 Feb 2024 12:46:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707137164; cv=none; b=g1qwUCh8OnuU8E1fmT8hKWwUyLgn8OqXVmjrYlBs2Uu26yXSQQeI5HrI8jGdq3PwAgukH7GKU6XnZX8XxbYrLyvvOhimqjkLSSwwqA9IXGyhoC70TIkQc7QE05YQCyuMxwgagVJnW81hwhLWwiQvHyDcEj8NU6rjiMtIuW3/SCA=
+	t=1707137168; cv=none; b=BYtBZqfZOeq7w/gAYRMIMGjVvBSPM5kDkLS7tuqhv2vZQ8rmfiIQwnDEr6oONsBga8wYvkqJAzAgbc/1LRavfo2UNsbahaH0OmBoQH28fKzscBWEadeydndrm6Gt6RFTUuY8GrGJDPgfTw/BaRRHgQARDNG5CC0jT3J0hAqxjic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707137164; c=relaxed/simple;
-	bh=nN0hXC2rCPqcNLu07ELbr6FXn/yhkJ6KwF/VMli0qYo=;
+	s=arc-20240116; t=1707137168; c=relaxed/simple;
+	bh=EkOVPmyG8AwI1ztH4WPEnwo5N1dm4jflvATq8fvXt7Q=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FpavDykORWJ+MNkUX4pHluBi8CcKJ4mqOPxtZBzVudhb8aXIf1X8UhYIEkHMzmBDsv/mgYxuA7n1e8vbMDvTrO6FAqiLEzS1LKJTg+lLIqIuTs7u0ZL/kG33ByFfEd3EJX+QicPkQy8NZ98208WS/QEdp1A8DyPRWHZ0wZkxmHc=
+	 MIME-Version:Content-Type; b=ZXqCWR0+LWanZHWwsrVfQGcjLhAS5kFQqcgrW7cTE2SNBCO2lxWG7hfgCqoelSsv/4uq72DTIguJbffXKY0mrLYFHdSDvt+tJoQ85cXH6gMg4+E2a9r0L4MnCtCyKnCQQd8ZPbCNCcleeu8nHr0K8UpIWSpxmxH1/oGEWbkKmb8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4TT5hD3kdwz1vtDM;
-	Mon,  5 Feb 2024 20:45:32 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4TT5hJ6QZGz1vt7q;
+	Mon,  5 Feb 2024 20:45:36 +0800 (CST)
 Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
-	by mail.maildlp.com (Postfix) with ESMTPS id CB9001A0172;
-	Mon,  5 Feb 2024 20:45:59 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 34B96140429;
+	Mon,  5 Feb 2024 20:46:04 +0800 (CST)
 Received: from localhost.localdomain (10.69.192.56) by
  dggpemm500005.china.huawei.com (7.185.36.74) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 5 Feb 2024 20:45:59 +0800
+ 15.1.2507.35; Mon, 5 Feb 2024 20:46:03 +0800
 From: Yunsheng Lin <linyunsheng@huawei.com>
 To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
 CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
-	<linyunsheng@huawei.com>, Alexander Duyck <alexanderduyck@fb.com>, Alexander
- Duyck <alexander.duyck@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>, Andrew Morton <akpm@linux-foundation.org>,
-	<kvm@vger.kernel.org>, <virtualization@lists.linux.dev>, <linux-mm@kvack.org>
-Subject: [PATCH net-next v5 2/5] page_frag: unify gfp bits for order 3 page allocation
-Date: Mon, 5 Feb 2024 20:45:02 +0800
-Message-ID: <20240205124506.57670-3-linyunsheng@huawei.com>
+	<linyunsheng@huawei.com>, Jason Wang <jasowang@redhat.com>, "Michael S.
+ Tsirkin" <mst@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>, <kvm@vger.kernel.org>,
+	<virtualization@lists.linux.dev>, <bpf@vger.kernel.org>
+Subject: [PATCH net-next v5 4/5] vhost/net: remove vhost_net_page_frag_refill()
+Date: Mon, 5 Feb 2024 20:45:04 +0800
+Message-ID: <20240205124506.57670-5-linyunsheng@huawei.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20240205124506.57670-1-linyunsheng@huawei.com>
 References: <20240205124506.57670-1-linyunsheng@huawei.com>
@@ -63,64 +64,189 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
  dggpemm500005.china.huawei.com (7.185.36.74)
 
-Currently there seems to be three page frag implementations
-which all try to allocate order 3 page, if that fails, it
-then fail back to allocate order 0 page, and each of them
-all allow order 3 page allocation to fail under certain
-condition by using specific gfp bits.
+The page frag in vhost_net_page_frag_refill() uses the
+'struct page_frag' from skb_page_frag_refill(), but it's
+implementation is similar to page_frag_alloc_align() now.
 
-The gfp bits for order 3 page allocation are different
-between different implementation, __GFP_NOMEMALLOC is
-or'd to forbid access to emergency reserves memory for
-__page_frag_cache_refill(), but it is not or'd in other
-implementions, __GFP_DIRECT_RECLAIM is masked off to avoid
-direct reclaim in vhost_net_page_frag_refill(), but it is
-not masked off in __page_frag_cache_refill().
+This patch removes vhost_net_page_frag_refill() by using
+'struct page_frag_cache' instead of 'struct page_frag',
+and allocating frag using page_frag_alloc_align().
 
-This patch unifies the gfp bits used between different
-implementions by or'ing __GFP_NOMEMALLOC and masking off
-__GFP_DIRECT_RECLAIM for order 3 page allocation to avoid
-possible pressure for mm.
-
-Leave the gfp unifying for page frag implementation in sock.c
-for now as suggested by Paolo Abeni.
+The added benefit is that not only unifying the page frag
+implementation a little, but also having about 0.5% performance
+boost testing by using the vhost_net_test introduced in the
+last patch.
 
 Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-Reviewed-by: Alexander Duyck <alexanderduyck@fb.com>
-CC: Alexander Duyck <alexander.duyck@gmail.com>
+Acked-by: Jason Wang <jasowang@redhat.com>
 ---
- drivers/vhost/net.c | 2 +-
- mm/page_alloc.c     | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ drivers/vhost/net.c | 91 ++++++++++++++-------------------------------
+ 1 file changed, 27 insertions(+), 64 deletions(-)
 
 diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index f2ed7167c848..e574e21cc0ca 100644
+index e574e21cc0ca..4b2fcb228a0a 100644
 --- a/drivers/vhost/net.c
 +++ b/drivers/vhost/net.c
-@@ -670,7 +670,7 @@ static bool vhost_net_page_frag_refill(struct vhost_net *net, unsigned int sz,
- 		/* Avoid direct reclaim but allow kswapd to wake */
- 		pfrag->page = alloc_pages((gfp & ~__GFP_DIRECT_RECLAIM) |
- 					  __GFP_COMP | __GFP_NOWARN |
--					  __GFP_NORETRY,
-+					  __GFP_NORETRY | __GFP_NOMEMALLOC,
- 					  SKB_FRAG_PAGE_ORDER);
- 		if (likely(pfrag->page)) {
- 			pfrag->size = PAGE_SIZE << SKB_FRAG_PAGE_ORDER;
-diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-index c0f7e67c4250..636145c29f70 100644
---- a/mm/page_alloc.c
-+++ b/mm/page_alloc.c
-@@ -4685,8 +4685,8 @@ static struct page *__page_frag_cache_refill(struct page_frag_cache *nc,
- 	gfp_t gfp = gfp_mask;
+@@ -141,10 +141,8 @@ struct vhost_net {
+ 	unsigned tx_zcopy_err;
+ 	/* Flush in progress. Protected by tx vq lock. */
+ 	bool tx_flush;
+-	/* Private page frag */
+-	struct page_frag page_frag;
+-	/* Refcount bias of page frag */
+-	int refcnt_bias;
++	/* Private page frag cache */
++	struct page_frag_cache pf_cache;
+ };
  
- #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
--	gfp_mask |= __GFP_COMP | __GFP_NOWARN | __GFP_NORETRY |
--		    __GFP_NOMEMALLOC;
-+	gfp_mask = (gfp_mask & ~__GFP_DIRECT_RECLAIM) |  __GFP_COMP |
-+		   __GFP_NOWARN | __GFP_NORETRY | __GFP_NOMEMALLOC;
- 	page = alloc_pages_node(NUMA_NO_NODE, gfp_mask,
- 				PAGE_FRAG_CACHE_MAX_ORDER);
- 	nc->size = page ? PAGE_FRAG_CACHE_MAX_SIZE : PAGE_SIZE;
+ static unsigned vhost_net_zcopy_mask __read_mostly;
+@@ -655,41 +653,6 @@ static bool tx_can_batch(struct vhost_virtqueue *vq, size_t total_len)
+ 	       !vhost_vq_avail_empty(vq->dev, vq);
+ }
+ 
+-static bool vhost_net_page_frag_refill(struct vhost_net *net, unsigned int sz,
+-				       struct page_frag *pfrag, gfp_t gfp)
+-{
+-	if (pfrag->page) {
+-		if (pfrag->offset + sz <= pfrag->size)
+-			return true;
+-		__page_frag_cache_drain(pfrag->page, net->refcnt_bias);
+-	}
+-
+-	pfrag->offset = 0;
+-	net->refcnt_bias = 0;
+-	if (SKB_FRAG_PAGE_ORDER) {
+-		/* Avoid direct reclaim but allow kswapd to wake */
+-		pfrag->page = alloc_pages((gfp & ~__GFP_DIRECT_RECLAIM) |
+-					  __GFP_COMP | __GFP_NOWARN |
+-					  __GFP_NORETRY | __GFP_NOMEMALLOC,
+-					  SKB_FRAG_PAGE_ORDER);
+-		if (likely(pfrag->page)) {
+-			pfrag->size = PAGE_SIZE << SKB_FRAG_PAGE_ORDER;
+-			goto done;
+-		}
+-	}
+-	pfrag->page = alloc_page(gfp);
+-	if (likely(pfrag->page)) {
+-		pfrag->size = PAGE_SIZE;
+-		goto done;
+-	}
+-	return false;
+-
+-done:
+-	net->refcnt_bias = USHRT_MAX;
+-	page_ref_add(pfrag->page, USHRT_MAX - 1);
+-	return true;
+-}
+-
+ #define VHOST_NET_RX_PAD (NET_IP_ALIGN + NET_SKB_PAD)
+ 
+ static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
+@@ -699,7 +662,6 @@ static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
+ 	struct vhost_net *net = container_of(vq->dev, struct vhost_net,
+ 					     dev);
+ 	struct socket *sock = vhost_vq_get_backend(vq);
+-	struct page_frag *alloc_frag = &net->page_frag;
+ 	struct virtio_net_hdr *gso;
+ 	struct xdp_buff *xdp = &nvq->xdp[nvq->batched_xdp];
+ 	struct tun_xdp_hdr *hdr;
+@@ -710,6 +672,7 @@ static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
+ 	int sock_hlen = nvq->sock_hlen;
+ 	void *buf;
+ 	int copied;
++	int ret;
+ 
+ 	if (unlikely(len < nvq->sock_hlen))
+ 		return -EFAULT;
+@@ -719,18 +682,17 @@ static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
+ 		return -ENOSPC;
+ 
+ 	buflen += SKB_DATA_ALIGN(len + pad);
+-	alloc_frag->offset = ALIGN((u64)alloc_frag->offset, SMP_CACHE_BYTES);
+-	if (unlikely(!vhost_net_page_frag_refill(net, buflen,
+-						 alloc_frag, GFP_KERNEL)))
++	buf = page_frag_alloc_align(&net->pf_cache, buflen, GFP_KERNEL,
++				    SMP_CACHE_BYTES);
++	if (unlikely(!buf))
+ 		return -ENOMEM;
+ 
+-	buf = (char *)page_address(alloc_frag->page) + alloc_frag->offset;
+-	copied = copy_page_from_iter(alloc_frag->page,
+-				     alloc_frag->offset +
+-				     offsetof(struct tun_xdp_hdr, gso),
+-				     sock_hlen, from);
+-	if (copied != sock_hlen)
+-		return -EFAULT;
++	copied = copy_from_iter(buf + offsetof(struct tun_xdp_hdr, gso),
++				sock_hlen, from);
++	if (copied != sock_hlen) {
++		ret = -EFAULT;
++		goto err;
++	}
+ 
+ 	hdr = buf;
+ 	gso = &hdr->gso;
+@@ -743,27 +705,30 @@ static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
+ 			       vhost16_to_cpu(vq, gso->csum_start) +
+ 			       vhost16_to_cpu(vq, gso->csum_offset) + 2);
+ 
+-		if (vhost16_to_cpu(vq, gso->hdr_len) > len)
+-			return -EINVAL;
++		if (vhost16_to_cpu(vq, gso->hdr_len) > len) {
++			ret = -EINVAL;
++			goto err;
++		}
+ 	}
+ 
+ 	len -= sock_hlen;
+-	copied = copy_page_from_iter(alloc_frag->page,
+-				     alloc_frag->offset + pad,
+-				     len, from);
+-	if (copied != len)
+-		return -EFAULT;
++	copied = copy_from_iter(buf + pad, len, from);
++	if (copied != len) {
++		ret = -EFAULT;
++		goto err;
++	}
+ 
+ 	xdp_init_buff(xdp, buflen, NULL);
+ 	xdp_prepare_buff(xdp, buf, pad, len, true);
+ 	hdr->buflen = buflen;
+ 
+-	--net->refcnt_bias;
+-	alloc_frag->offset += buflen;
+-
+ 	++nvq->batched_xdp;
+ 
+ 	return 0;
++
++err:
++	page_frag_free(buf);
++	return ret;
+ }
+ 
+ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
+@@ -1353,8 +1318,7 @@ static int vhost_net_open(struct inode *inode, struct file *f)
+ 			vqs[VHOST_NET_VQ_RX]);
+ 
+ 	f->private_data = n;
+-	n->page_frag.page = NULL;
+-	n->refcnt_bias = 0;
++	n->pf_cache.va = NULL;
+ 
+ 	return 0;
+ }
+@@ -1422,8 +1386,7 @@ static int vhost_net_release(struct inode *inode, struct file *f)
+ 	kfree(n->vqs[VHOST_NET_VQ_RX].rxq.queue);
+ 	kfree(n->vqs[VHOST_NET_VQ_TX].xdp);
+ 	kfree(n->dev.vqs);
+-	if (n->page_frag.page)
+-		__page_frag_cache_drain(n->page_frag.page, n->refcnt_bias);
++	page_frag_cache_drain(&n->pf_cache);
+ 	kvfree(n);
+ 	return 0;
+ }
 -- 
 2.33.0
 
