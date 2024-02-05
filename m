@@ -1,127 +1,253 @@
-Return-Path: <kvm+bounces-8030-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8031-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FBEF84A057
-	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 18:12:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B5F884A0A0
+	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 18:26:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C905D2871BF
-	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 17:12:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52A81281199
+	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 17:26:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A568240BE3;
-	Mon,  5 Feb 2024 17:12:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E4D744C7E;
+	Mon,  5 Feb 2024 17:25:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="POl5+JL/"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="0fWOz/ZV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oa1-f52.google.com (mail-oa1-f52.google.com [209.85.160.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2042.outbound.protection.outlook.com [40.107.237.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A2E84503E
-	for <kvm@vger.kernel.org>; Mon,  5 Feb 2024 17:12:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.52
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707153153; cv=none; b=B22aGiPt2F3nF9IvkskfckvShO+8aTY4hscK+Icl6oM4AOHGqCcjGj30oT1rutLhVDg4wzhqc6WVh3PgQt1MhwbYH4UxZXqredGzMJcfoRjrJsGF8ALhOkpzOOBITz8yrFK5HKYNvOotwUU7ECctCaTZY9Sns3ELVXmzvqvCrFQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707153153; c=relaxed/simple;
-	bh=m1QtL3ans36Yguk2A+1LNtWPxgFl5Ch0CUDhoxI8cj4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I92LmLQsftLIq8I+S78gchvW3gAOghq35BtKsrd0go80PSreGemkdUbmmI+iO0hvVmHQi7CLKyhViYD6ESMWYx8HRhR3a5DczsGf2ti635TPJ1cVuYc8KgyGTV776BSLhTXV8QFC8rP79xiIlNVzqerHCqMMdgPsvq4nV0UZlss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=POl5+JL/; arc=none smtp.client-ip=209.85.160.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-204235d0913so2802064fac.1
-        for <kvm@vger.kernel.org>; Mon, 05 Feb 2024 09:12:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1707153151; x=1707757951; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5qDbIp2yNtXU1RzQ539qXvN5xu3jf0vrl0xdf7V68t0=;
-        b=POl5+JL/hyS2mGa/py8JOz+c5qhrPsPBGkTGsNKOH6+qWyODZZT51zx3RE3b+810AD
-         X9v12YqGRt002pb/YlBadKtMmmhn0wzZFBhcqculFPjxFfD5lUH7NiwIm/tmXibh+5aV
-         1FVuEW7akqo8pKQXwZtSpLfuy/FnIfU6t4ZzljYpIqLqfZDopeEVaiA0MC4m3/hnz00C
-         D/UWE5M1hQwvWCVu8lCWk2iQBdZLji3F6T0VHQg+pwVaQrMGEdlRQOstRxR4GEoBj03S
-         l7lXn61Y++SZh+xqo2HrOBgTr0ITUETCYl3H4KGGFIaTU3t7X6G/Bi/XQqAbGhH5/1e/
-         WOAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707153151; x=1707757951;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5qDbIp2yNtXU1RzQ539qXvN5xu3jf0vrl0xdf7V68t0=;
-        b=sEF+6WhBhvSHiM0CfDm2iAdeGFSnkyQ8iQVNH+ebVhHIhwiQm/gUGL19jmLGg0v84N
-         9BiXkhQhudxJOWw6VkIEiuDpuzAYMG/4rH1zSBUzKECV4wMyLC5gKmYpyN8cfT4Xntew
-         XaEUwWrHRB6otna91IWfGhQfkabg86LRTh3AFIPjjlStQ2eXtl5hgTWLTmzM9au9XLeI
-         5VEtzWxKOqlksxljWaEJZxO3y1Tt2jJHhhceCti1hbAumKeL6aQXVWZzwgBKcGEJlHjh
-         hUBoar/0rdRIcyagtNoA0qWUe09pIF3a9RQf097Tm7xrwhWkghTNFaPRkONhhKOXuRPy
-         +n4g==
-X-Gm-Message-State: AOJu0YzmhKMW4b2EmrfKTrjQNXqD3s/6q7+p+um4Y8rmfWB8krr0viMQ
-	jgcgPBktyaMgnqz+5vQNpQmiJf3H8faULMXaMzf3QlriDkgUwyy9s2x/KKTkvbo=
-X-Google-Smtp-Source: AGHT+IFln/5f5G6GIeUtem4PLnGVB16+0C+2crVsZ05VhszKdHkv3XoMdgobGPR5lticlBVyoAC2eg==
-X-Received: by 2002:a05:6871:5813:b0:215:68d7:461b with SMTP id oj19-20020a056871581300b0021568d7461bmr322778oac.23.1707153151179;
-        Mon, 05 Feb 2024 09:12:31 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCV/rPy91arwpYIwAojARklp6ZMF9K+LQVXtUZZ6YGhWdbSR41RR9S8S8caNOyg5Xw541tmu/KUnL1bRkwrLAWUFUQvIxBuAH86HrvajT0/XV7ievA8flm9zmbktlvTgPRA0yJDD3YeqEMbTqxaPHx78ygvrA/LdsiY6hjFAYx3hveMP1d6W/6K3k1EeoEzo90VzeDX4LNG2UcoIuzn8m6WZRZawwUNd+8QLX9XNbvyX+fxR3fyR2KkUPftZmPdowvRIAvlRhyHwjG1bgBeEvc7d3Im4bHyZ5LgWimpfq0AnUsJa49hcgqa18SGKfIDO357HXXSckB3H4VdxbBTR9I45dNsvSz2iUqZTjHAbpAgsGcljcsJXIYKsrhGG9FxLtW5p590R06d0vW4BCLwzh5MlbNqk4LSt2GTNcJcpmFo55Yyj1G/hlxQypUbHBJCZVzbbo7/FoWYMlsuz7iMv5EBzmfwGjNEvyEkU4+HAjiu9R7nOQl62M73DoGf/9IBMJILTI4CKJkoWgyKcr9LlTDO16Riw0X0a2+S/yupU46js8efVoG04val7Yb6gYBHIStR6H11fRi9OhWk0YB5VN6N5KYXugRjyOAxpVLg0Rtt8AvhK8Dykw3m3tmG3Yi6bseB6dR4OYaw0dXa8GiZ/u1/G7p4k8O6NLeS+iE8ypk+u0M5hspJ7wNhWTvsjpjHNt1xovNvCg/o0wX4tLIgyKy9BQQf8jiFAkcp8+tFunLmk7sxu
-Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
-        by smtp.gmail.com with ESMTPSA id ej8-20020ad45a48000000b0068c6789ce9csm162580qvb.6.2024.02.05.09.12.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Feb 2024 09:12:30 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1rX2WE-000dJX-5F;
-	Mon, 05 Feb 2024 13:12:30 -0400
-Date: Mon, 5 Feb 2024 13:12:30 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: James Gowans <jgowans@amazon.com>
-Cc: linux-kernel@vger.kernel.org, Eric Biederman <ebiederm@xmission.com>,
-	kexec@lists.infradead.org, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, iommu@lists.linux.dev,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,
-	linux-fsdevel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
-	Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
-	Alexander Graf <graf@amazon.com>,
-	David Woodhouse <dwmw@amazon.co.uk>,
-	"Jan H . Schoenherr" <jschoenh@amazon.de>,
-	Usama Arif <usama.arif@bytedance.com>,
-	Anthony Yznaga <anthony.yznaga@oracle.com>,
-	Stanislav Kinsburskii <skinsburskii@linux.microsoft.com>,
-	madvenka@linux.microsoft.com, steven.sistare@oracle.com,
-	yuleixzhang@tencent.com
-Subject: Re: [RFC 14/18] intel-iommu: Allocate domain pgtable pages from
- pkernfs
-Message-ID: <20240205171230.GB31743@ziepe.ca>
-References: <20240205120203.60312-1-jgowans@amazon.com>
- <20240205120203.60312-15-jgowans@amazon.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160F8446C1;
+	Mon,  5 Feb 2024 17:25:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707153954; cv=fail; b=CstohKOu/R1JScRa/i6cHz7Qbh1suwe8ILOy17MqdLmB4+4lufKSzZELrBME3K0lbcxN/AFyXLkqhDVQwP0+lZ2t62Fjb4MCmPfo5ecAyOcNRRz0b0RGULK1kGaAot9S5prpvC5hykDYl6uA/mQ7SLA3f27GuI5Qj4IzVwPgkTU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707153954; c=relaxed/simple;
+	bh=Pq/rjQwilxrak0PZxGaHG1BNq6UqC/VrMbX6wx7c3p4=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Dmz81an6TuZZeesTfj3AFlgjjyVczwWIKGN/DwiH2+4uTqSER26zY0xyKvfbCCNWZrne/aIDWGN1X9zM0qthuZOhQf4BbPsCtsoucUU+4fiQlXHJuwWP+MjIs8X15Eix8jqXhjbBLZbsigsVXjNFUnrpcpMHIQlTtyyWdBtFjps=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=0fWOz/ZV; arc=fail smtp.client-ip=40.107.237.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XpbAK1wAea7o5GTpad2l3bwOO5YnbQrmYCjokWV5LDQSGPGEfrrYInvqSTDFDe5W+ofeUv+k1cyzH0vHIGe7XVFNpT1rpAn1Ob89UXP7E8JARQaJVPCo2O6mcoSnFL+B2u0xWdswIF7wZ1T30pP1TxkHZbkz/WRqMBFkryPiyN/Rf7C5/sqvMXdmVVv9GECFkJjmjtuk+YFG5A5typm6J2azS93PSm+nE01k9855W6reVxaUkGFKkSAujc+K8O7mMzcMe3/TENs/vKpPyktt27jMxLgL0mxfPQ4YXqVIkXgCacWQeVC4cf/WuX10HNZvLkpWEcg64HwAbYizj7SX1g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NA6Dc8gcQ9aOG4N3XfLgwme6uEmnzfy50BECLOqOs5k=;
+ b=TE44kzRnZzaTe2qjBcICrtHkEOPG/Od279tztNLogpFRnGt7Dvb7FZ9KtuRN2cD7tM867232zwYs7U9jcE2YR6N4nJb5S6U0i8Y9sKjReRAsFo3Uda8b2tOna46T7rtHklJTvD8LoKL7prZ66akiqOL3HFIBvSwmehHD8/Pf0chjv4EKKRxBEphoqC9IwWTzMhGh75IRhEKJV0kJyRlumENcN5HknlnAvq343OJlnKLq9Um89yfIrWX2R1s3b9xpqzzaBIWfcxktcC4H62nsXMVzk/lhPWNeM82eYC2yIBQ4g9H4Mj+V0Y7V890dfzT4D9+n9y9k5xBcBfRGFlncKQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NA6Dc8gcQ9aOG4N3XfLgwme6uEmnzfy50BECLOqOs5k=;
+ b=0fWOz/ZVZSRQWym+IEyJ3W9gwF3FoTCN+sCqzqnPpfrMhwnFLZKm7gkKXe5lO0WORxmK/VJ24Mhwcj3WEzt7NqLAWMz7sK5BCn6dBaBiTJ+syfQZyxRCPFJjPmtQpEbbAMVUmARBmMQWwxdJRYLZ/B0WqBSirJLYiWW9plWAq48=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
+ by CH3PR12MB7666.namprd12.prod.outlook.com (2603:10b6:610:152::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.17; Mon, 5 Feb
+ 2024 17:25:49 +0000
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::e9c7:35dd:23f8:74a1]) by PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::e9c7:35dd:23f8:74a1%4]) with mapi id 15.20.7270.016; Mon, 5 Feb 2024
+ 17:25:49 +0000
+Message-ID: <3f30d63a-0919-44a8-b05c-60d130ae1dcd@amd.com>
+Date: Mon, 5 Feb 2024 09:25:47 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH vfio] vfio/pds: Rework and simplify reset flows
+To: "Tian, Kevin" <kevin.tian@intel.com>,
+ Brett Creeley <brett.creeley@amd.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "shameerali.kolothum.thodi@huawei.com"
+ <shameerali.kolothum.thodi@huawei.com>,
+ "yishaih@nvidia.com" <yishaih@nvidia.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>
+Cc: "shannon.nelson@amd.com" <shannon.nelson@amd.com>
+References: <20240126183225.19193-1-brett.creeley@amd.com>
+ <BL1PR11MB52712B162AE5FEC2E24614F98C472@BL1PR11MB5271.namprd11.prod.outlook.com>
+Content-Language: en-US
+From: Brett Creeley <bcreeley@amd.com>
+In-Reply-To: <BL1PR11MB52712B162AE5FEC2E24614F98C472@BL1PR11MB5271.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SJ0PR13CA0022.namprd13.prod.outlook.com
+ (2603:10b6:a03:2c0::27) To PH0PR12MB7982.namprd12.prod.outlook.com
+ (2603:10b6:510:28d::5)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240205120203.60312-15-jgowans@amazon.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|CH3PR12MB7666:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8969fb84-9495-4c32-4f09-08dc266f7ee9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	29XBsLy8tayyJLayhwAwvNwsdHMJVGcnQ9ohen8n4a4BjMijA1UnVcG3nQftUY0cQeIcOn6y6JGgZLVfjHXRaQZns23fHYwum4kBJo0Jv0r+0w43+EeK/pICO7689RmwtMvtua+jLTzSqNWHiuKAhBYgRmMT/sC7yuEDV0+eGaPci+wtPA65UvMiCKlL1vcp4oTGwX1PbtAganuxWbsjhjdvyGPiaqLhQG/2OVRqYMOOwgVkvH4ZlqTy0ZdS0heBb4DZNtS1uBYOdkZcs0H7GKSbawFg1cx/bydJejYT7TJdiy6t/C4Yh6zDDDXU5jGh61tLFr704uTnYs9qMd1ZblsyEPw8Tpym3LmfgG7Zyf+RFyRZSn6GK2f4i5ILtStUKQN3bnbR3mfl6nIua9mOoybkAauS3yg7XCl58R5tR+m3ypJDB/K7e89lAYcpWCdc55s4izvjAusBDoEMJPyorXy8Q/wa3xFgFx8ChpOeIeUeyQ9Ko+m5pkoPoJ09sDroQrMBdVGGRQ0cBuwaXTOr57iVpbHwCYRMjBFlmS6Y0+i9O0q1oORSglarCWLymzmRx+f6jrZh2Eztx5Z1Jy5shOe8+sd3hqcWYeqZSqCq7fDsXlo86L8e+nB3PaReIfMbuauIX2EnQgttB5nh9J9IZQ==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(376002)(136003)(346002)(396003)(39860400002)(230273577357003)(230922051799003)(451199024)(1800799012)(186009)(64100799003)(36756003)(4326008)(8936002)(2906002)(41300700001)(5660300002)(31696002)(2616005)(6486002)(8676002)(6506007)(83380400001)(66556008)(53546011)(478600001)(66946007)(6512007)(316002)(38100700002)(66476007)(110136005)(26005)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?bjBYb3VLWUU2VEhUODBOMUI0eTN3ZFJCUGpsaFRqY2xSeGpZRkk1RHJBQmt1?=
+ =?utf-8?B?WUtSdFRpeXJRc0ZqRm5xenBSMVJ3WWpHTjJxRVJvL0hHR2hYM3VCZ2VoUDEy?=
+ =?utf-8?B?WlV5LytKNlhWeHdyVlVtR3FwTW1XM1pta2lPNjVVYmdTeVByczgvcEZ2c3cr?=
+ =?utf-8?B?TWsrRWJQdlJONUlqNU5ZM3NGZDFHeWJtK0xYdE95QkdSZEhRZFhhbXZDdjZI?=
+ =?utf-8?B?MkNYVjFOVFlmQncvb3lEZmRPSldEc2JBNEZMM1lJT0lXMXFVUHdOS2hhaWRL?=
+ =?utf-8?B?dDJDRDlLYjZBZTZ1dkY4MGcxOW9YYzAvK3BKN3FRU2FQVWRac1FxSHhPSkxt?=
+ =?utf-8?B?UDRjaWYvZVo5RHVTbitSczlrZGN4cERVZ294OW42Vm5VcytYdXNwK3ZzVDdt?=
+ =?utf-8?B?QUhKRjRkOVlWVnBSejY2L3hNa0JyVDk0Sjl6b1puTnZYWW9rbi9KVUFsbis5?=
+ =?utf-8?B?VWZCUnhybWJPV1IwRmsveFFXRURzUTNaNC9oUHdMdW9NUGl6cDlSRkgyd1Ns?=
+ =?utf-8?B?bXY5VUV2N1oxSDJHMmYwTWo2NDNSeFJ4aFhFM1ZXZ1VHM0MxQ2hUQkFpVlpZ?=
+ =?utf-8?B?SFhLNjJ6UktRcWJYVDY5dVluOFVXMVg1UDB6WGQ4RGxhdVQrTlJVQTI3VWxv?=
+ =?utf-8?B?dkhBZTZSVFVTSzVJM2hqdHR6cCs3UW1OYnVXa2FFYlNBSDlrdkxjRElvOW9z?=
+ =?utf-8?B?VUQzSDF1V3BidzV6NCtZMVhvejQ0a0RjdFdGSG1oS2hoT01vRFE2alR4d3NZ?=
+ =?utf-8?B?TWFISnVGaW1tWGVla2NRSW1oNkNKNEQ3VUNCN0lGVGhIWDhRaFVqNldiaXky?=
+ =?utf-8?B?RUh5RmtFem4yblU5eDBrSGovbytYUzJrbTRiMjczMGZESzU0Yk9PQjBhbDBq?=
+ =?utf-8?B?b0hGUktEUzFJb3NNblBUZm9qcmVjdEU3eW05MkszOTlLbGZUWGFYS1pNeXVx?=
+ =?utf-8?B?UEdPc3FJb0lVM2hIZE9KaFd1dXQ1dHpMN3oxYWtEUW1TUTNLUE1taitZbi9X?=
+ =?utf-8?B?SitWelJmYUY5N2pkRFNWelV2ZzdvYkJzbTNmUndjRzRMSWRLL1lvSVU5ZG5V?=
+ =?utf-8?B?RFRFaHF4bTVkMitpN0F1bjdXQ05UVElHbVFyM3VPTFJiZlFBZFhYUEVLWjJP?=
+ =?utf-8?B?TkFRMU5ZUW0vbXhDeXR5K2hya2dnNkt2VDdYY0xKcFhVUUdwNFBSUzI2WVV6?=
+ =?utf-8?B?dlBFejEyVncyeVYvZys3YzRhajBFOWtRN01FSzFLcC9TL0NwcU04UGZnQktv?=
+ =?utf-8?B?K083b0VDQU1MUm9mcGF1UG92dENWKzBkUXVEWjU3d0REZXNvc2FJQ3NsMjll?=
+ =?utf-8?B?amNVWUsrREk2cHIzSHlzL2lwSmh6bmxJMUZONW42bisxTWpWb0lKL1NuL2E5?=
+ =?utf-8?B?NXZWODA4WWdxKzdHL1Jkd0JSWUtIcHg5Mk9HbWg1MHh4bkN6YUtLYmc3ck5U?=
+ =?utf-8?B?MDR4bDFyQXQ1dHBHTDdxeDdHczdKZWtNeXdQNExNRDNFeGhhdC9JbWE2TUNS?=
+ =?utf-8?B?VmhGT0hUYVFrdkFvVVl0N3lIS2IvdkRMYlBGVzhBZTNLdEx3NE5kZXRRY2hM?=
+ =?utf-8?B?QnBUWGNCUmdvU0I2QjVvd1JCaUZ6a3JydzBsVTE5Z2dtajYxNHNuZUl1VlZo?=
+ =?utf-8?B?bXlORTlwQWcraFZCVDVnRVFHUElHcWlNL1Y5TFBSS1ptVWcyaHNqNXk3R1Rz?=
+ =?utf-8?B?YTJQdzU5dXVSbTBEWE9UWEVZNU85bXI3ZWl3dXZMN0d4NU4yZ25QZ3d2MmFB?=
+ =?utf-8?B?bGxrb2YxTmdYNW1nMFJLV3JsQXpTUjV3UWJmNkRzQVY0OEtnKzdYRlBUTWZQ?=
+ =?utf-8?B?TDlHZ28vQnFnSWlqTzRDRm5TbUNESmwwc2p1NTFYUm1ZNGpYajA5SGRaUG9u?=
+ =?utf-8?B?bUZJdVFWYTdqNGtCOTZ3a2RrclFobndkYXdHOUliWm9OSSs5cDkweG43TEE3?=
+ =?utf-8?B?eHFqVkg5ZnBhVHY2MkluQkxrUzFKYzFrbU1WY2lVWVJ2OTRFQ0xHK2VEdFdU?=
+ =?utf-8?B?ZkxMeU1VS1RIYTRUWmFieGU2TUw4elBvRkxuMEE2Rnp4ZTgvVlpaK3NHL3dI?=
+ =?utf-8?B?THM1UE5yQUt4SzE1S3h1YUNwVEUzOHVUcEpycjJMLys1WDgwbXFGaGdWZk53?=
+ =?utf-8?Q?4Mmeer8Ye0B7azEtSBcxXDruH?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8969fb84-9495-4c32-4f09-08dc266f7ee9
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Feb 2024 17:25:49.3344
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6iV426c40MM9AvaS1UkYEMhPo3mb9oEhd3OcFmyqOFyQ9T3phfAMUuBegutIYsMiiyhlLOGIhdf+d3YTy6KMMQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB7666
 
-On Mon, Feb 05, 2024 at 12:01:59PM +0000, James Gowans wrote:
-> @@ -946,7 +946,13 @@ static struct dma_pte *pfn_to_dma_pte(struct dmar_domain *domain,
->  		if (!dma_pte_present(pte)) {
->  			uint64_t pteval;
->  
-> -			tmp_page = alloc_pgtable_page(domain->nid, gfp);
-> +			if (domain->pgtables_allocator.vaddr)
-> +				iommu_alloc_page_from_region(
-> +						&domain->pgtables_allocator,
-> +						&tmp_page,
-> +						NULL);
+On 2/4/2024 10:58 PM, Tian, Kevin wrote:
+> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
+> 
+> 
+>> From: Brett Creeley <brett.creeley@amd.com>
+>> Sent: Saturday, January 27, 2024 2:32 AM
+>>
+>> The current logic for handling resets based on
+>> whether they were initiated from the DSC or
+>> host/VMM is slightly confusing and incorrect.
+>> The incorrect behavior can cause the VF device
+>> to be unusable on the destination on failed
+>> migrations due to incompatible configurations.
+>> Fix this by setting the state back to
+>> VFIO_DEVICE_STATE_RUNNING when an FLR is
+>> triggered, so the VF device is put back in
+>> an "initial" pre-configured state after failures.
+> 
+> any reason for putting short lines (<50 chars) in commit msg?
 
-I'm really worried about this change - I plan to redo all of this page
-table handling code so it makes use of struct page members for things
-like RCU free and more.
+No, I will make the lines longer in the next commits.
 
-Does this end up making the entire struct page owned by the
-filesystem?
+> 
+>>
+>> Also, while here clean-up the reset logic to
+>> make the source of the reset more obvious.
+> 
+> as a fix the a 'Fixed' tag is preferred and CC stable
+> 
+> also separate the real fix from the cleanup so stable kernel doesn't need
+> to backport unnecessary code.
 
-Jason
+Sure, I can split this into 2 changes as you suggested.
+
+> 
+> btw the commit msg is not clear to me. It says fixing the problem
+> by setting the state to _ERROR for the DSC path and to _RUNNING for
+> the FLR path.
+> 
+> But looks it's already such case with old code:
+> 
+> pds_vfio_recovery()
+>          pds_vfio->deferred_reset = true;
+>          pds_vfio->deferred_reset_state = VFIO_DEVICE_STATE_ERROR;
+> 
+> pds_vfio_reset()
+>          pds_vfio->deferred_reset = true;
+>          pds_vfio->deferred_reset_state = VFIO_DEVICE_STATE_RUNNING;
+> 
+> pds_vfio_state_mutex_unlock()
+>          if (pds_vfio->deferred_reset) {
+>                  ...
+>                  pds_vfio->state = pds_vfio->deferred_reset_state;
+>                  ...
+>          }
+> 
+> it's same as what this patch does:
+> 
+> pds_vfio_recovery()
+>          pds_vfio->deferred_reset_type = PDS_VFIO_DEVICE_RESET;
+> 
+> pds_vfio_reset()
+>          pds_vfio->deferred_reset_state = PDS_VFIO_HOST_RESET;
+> 
+> pds_vfio_state_mutex_unlock()
+>          if (pds_vfio->deferred_reset) {
+>                  ...
+>                  if (pds_vfio->deferred_reset_type == PDS_VFIO_HOST_RESET)
+>                          pds_vfio->state = VFIO_DEVICE_STATE_RUNNING;
+>                  else
+>                          pds_vfio->state = VFIO_DEVICE_STATE_ERROR;
+>                  ...
+>          }
+> 
+> looks the actual functional difference is from below change:
+> 
+>> @@ -32,13 +32,14 @@ void pds_vfio_state_mutex_unlock(struct
+>> pds_vfio_pci_device *pds_vfio)
+>>        mutex_lock(&pds_vfio->reset_mutex);
+>>        if (pds_vfio->deferred_reset) {
+>>                pds_vfio->deferred_reset = false;
+>> -             if (pds_vfio->state == VFIO_DEVICE_STATE_ERROR) {
+>> -                     pds_vfio_put_restore_file(pds_vfio);
+>> -                     pds_vfio_put_save_file(pds_vfio);
+>> +             pds_vfio_put_restore_file(pds_vfio);
+>> +             pds_vfio_put_save_file(pds_vfio);
+> 
+> above two are changed from conditional to always.
+> 
+>> +             if (pds_vfio->deferred_reset_type == PDS_VFIO_HOST_RESET)
+>> {
+>> +                     pds_vfio->state = VFIO_DEVICE_STATE_RUNNING;
+>> +             } else {
+>>                        pds_vfio_dirty_disable(pds_vfio, false);
+> 
+> and this is now only for the DSC path.
+> 
+> need a better explanation here.
+
+I will clean up this patch by separating it into 2 patches and improving 
+the commit descriptions before sending a v2.
+
+Thanks for the review,
+
+Brett
 
