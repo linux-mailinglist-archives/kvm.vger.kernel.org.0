@@ -1,253 +1,240 @@
-Return-Path: <kvm+bounces-8031-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8032-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B5F884A0A0
-	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 18:26:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8663984A0C8
+	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 18:31:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52A81281199
-	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 17:26:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E98D81F22CCC
+	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 17:31:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E4D744C7E;
-	Mon,  5 Feb 2024 17:25:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD41444C7E;
+	Mon,  5 Feb 2024 17:31:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="0fWOz/ZV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Z0bqpZx7"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2042.outbound.protection.outlook.com [40.107.237.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160F8446C1;
-	Mon,  5 Feb 2024 17:25:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707153954; cv=fail; b=CstohKOu/R1JScRa/i6cHz7Qbh1suwe8ILOy17MqdLmB4+4lufKSzZELrBME3K0lbcxN/AFyXLkqhDVQwP0+lZ2t62Fjb4MCmPfo5ecAyOcNRRz0b0RGULK1kGaAot9S5prpvC5hykDYl6uA/mQ7SLA3f27GuI5Qj4IzVwPgkTU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707153954; c=relaxed/simple;
-	bh=Pq/rjQwilxrak0PZxGaHG1BNq6UqC/VrMbX6wx7c3p4=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Dmz81an6TuZZeesTfj3AFlgjjyVczwWIKGN/DwiH2+4uTqSER26zY0xyKvfbCCNWZrne/aIDWGN1X9zM0qthuZOhQf4BbPsCtsoucUU+4fiQlXHJuwWP+MjIs8X15Eix8jqXhjbBLZbsigsVXjNFUnrpcpMHIQlTtyyWdBtFjps=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=0fWOz/ZV; arc=fail smtp.client-ip=40.107.237.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XpbAK1wAea7o5GTpad2l3bwOO5YnbQrmYCjokWV5LDQSGPGEfrrYInvqSTDFDe5W+ofeUv+k1cyzH0vHIGe7XVFNpT1rpAn1Ob89UXP7E8JARQaJVPCo2O6mcoSnFL+B2u0xWdswIF7wZ1T30pP1TxkHZbkz/WRqMBFkryPiyN/Rf7C5/sqvMXdmVVv9GECFkJjmjtuk+YFG5A5typm6J2azS93PSm+nE01k9855W6reVxaUkGFKkSAujc+K8O7mMzcMe3/TENs/vKpPyktt27jMxLgL0mxfPQ4YXqVIkXgCacWQeVC4cf/WuX10HNZvLkpWEcg64HwAbYizj7SX1g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NA6Dc8gcQ9aOG4N3XfLgwme6uEmnzfy50BECLOqOs5k=;
- b=TE44kzRnZzaTe2qjBcICrtHkEOPG/Od279tztNLogpFRnGt7Dvb7FZ9KtuRN2cD7tM867232zwYs7U9jcE2YR6N4nJb5S6U0i8Y9sKjReRAsFo3Uda8b2tOna46T7rtHklJTvD8LoKL7prZ66akiqOL3HFIBvSwmehHD8/Pf0chjv4EKKRxBEphoqC9IwWTzMhGh75IRhEKJV0kJyRlumENcN5HknlnAvq343OJlnKLq9Um89yfIrWX2R1s3b9xpqzzaBIWfcxktcC4H62nsXMVzk/lhPWNeM82eYC2yIBQ4g9H4Mj+V0Y7V890dfzT4D9+n9y9k5xBcBfRGFlncKQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NA6Dc8gcQ9aOG4N3XfLgwme6uEmnzfy50BECLOqOs5k=;
- b=0fWOz/ZVZSRQWym+IEyJ3W9gwF3FoTCN+sCqzqnPpfrMhwnFLZKm7gkKXe5lO0WORxmK/VJ24Mhwcj3WEzt7NqLAWMz7sK5BCn6dBaBiTJ+syfQZyxRCPFJjPmtQpEbbAMVUmARBmMQWwxdJRYLZ/B0WqBSirJLYiWW9plWAq48=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
- by CH3PR12MB7666.namprd12.prod.outlook.com (2603:10b6:610:152::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.17; Mon, 5 Feb
- 2024 17:25:49 +0000
-Received: from PH0PR12MB7982.namprd12.prod.outlook.com
- ([fe80::e9c7:35dd:23f8:74a1]) by PH0PR12MB7982.namprd12.prod.outlook.com
- ([fe80::e9c7:35dd:23f8:74a1%4]) with mapi id 15.20.7270.016; Mon, 5 Feb 2024
- 17:25:49 +0000
-Message-ID: <3f30d63a-0919-44a8-b05c-60d130ae1dcd@amd.com>
-Date: Mon, 5 Feb 2024 09:25:47 -0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH vfio] vfio/pds: Rework and simplify reset flows
-To: "Tian, Kevin" <kevin.tian@intel.com>,
- Brett Creeley <brett.creeley@amd.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "shameerali.kolothum.thodi@huawei.com"
- <shameerali.kolothum.thodi@huawei.com>,
- "yishaih@nvidia.com" <yishaih@nvidia.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>
-Cc: "shannon.nelson@amd.com" <shannon.nelson@amd.com>
-References: <20240126183225.19193-1-brett.creeley@amd.com>
- <BL1PR11MB52712B162AE5FEC2E24614F98C472@BL1PR11MB5271.namprd11.prod.outlook.com>
-Content-Language: en-US
-From: Brett Creeley <bcreeley@amd.com>
-In-Reply-To: <BL1PR11MB52712B162AE5FEC2E24614F98C472@BL1PR11MB5271.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR13CA0022.namprd13.prod.outlook.com
- (2603:10b6:a03:2c0::27) To PH0PR12MB7982.namprd12.prod.outlook.com
- (2603:10b6:510:28d::5)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BB5740BEB
+	for <kvm@vger.kernel.org>; Mon,  5 Feb 2024 17:31:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707154297; cv=none; b=nuXn8KSKEPRMMFE7L2LkYF3yI3nIPZA33jx2gxNrf1OQy4yxaGXhM3VatIQMfikGok9hWv3Et3DB2oUbQaRd+6ZgGPSlJYaS28qgriBNvzLCPoVodnwh2pEIXS87zncCUqm3AsVm+shsPjw5Dfuua+BFX2OhImlYHWXRVB7g2QM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707154297; c=relaxed/simple;
+	bh=xEyqyUOvdZboKmHpNCarFdt8jnKerrHqE4MpHsotmFI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=cAxv4YeFYEfc6sQpmSNKdjV+fYcRcrI9YOb0ZE52aBbc6Dp+w2renGC7Kq6bBKQW+5HY7tIp86liiOzxk8Zwh3Fw2PdBgJtc7ogqNPoE77mItN3VQV4D67OjNbKmdwUmcpphZtGI+7Lp1MSQqvfsTHvRSHaByIkhyVlegAaUupE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--avagin.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Z0bqpZx7; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--avagin.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5cf2714e392so2830921a12.0
+        for <kvm@vger.kernel.org>; Mon, 05 Feb 2024 09:31:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1707154295; x=1707759095; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=xAh+m8NpmmquiTQVj9HnmFfN4D8u5RS8wXiyWZb6U7A=;
+        b=Z0bqpZx7MOs4JrARy9CRfQv6ti8RwYWmFz7ed0E9qSbBPs+UEjCfDjAWWhRjTOPuhx
+         LhenMoN9QzfUKQmihjJl1gPwS+bD1y72hVqoZBgojmDLZYTVnMBAir30NEWpBeURqHln
+         4UWXL5oukkXnoB33Lq2udKKJwxQ+GuByth5II74lxwz1FYH6UvyUauq5CXD6q2kIWSeg
+         /Du/uE9y4D1ygMH5Smj3BxK46HqzSfo7pnx9QDDJGzaVglTXeT0HinsB6VTx6STnn2tu
+         BOszngCnL2VB6+m9Otw/MuLlRq5wXfynNH0kUJE3yv9lAm2taGqoqRXNdVny+K7e9L1r
+         HtKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707154295; x=1707759095;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xAh+m8NpmmquiTQVj9HnmFfN4D8u5RS8wXiyWZb6U7A=;
+        b=BVMgmdeB4APkZxOD76VIwkMn6phHfN/9ZjDs+3JMqtQWvbZ9Eor14sBV0wAL72fZ5P
+         RL/daL5F/pzScBQNDs+3LEtx3I1WkdhXIxTOafbOgr5cOYlNNaL2lx1RkQCf8M0wcHoh
+         CJxHSsJQHSagpWV4aKx9ySIgl4iwcA3tEsldTOVqUTUNSgJX1Hv/7qfW+JiekwgR+bZO
+         aIHSsRjaGT2ZIjl61mhsllft4XJOKkR49ZhiQK0F4vPQyiSCqW2eQGYWP6elpSYV5VfM
+         wb5GAtt7mG/09lJ3PvvPiBW0Nov/5JKlJjiKSnmaZw9X99o8uiWkFNKCwaOKZWfYdDGg
+         GzrQ==
+X-Gm-Message-State: AOJu0Yyv4z3YyPaBirgv0ziBKZrPS7C4ly9XtjQVrWywd2wUBVcOMtVH
+	Jt4i0gIFwjYwviIEKAXcQKITiQ2fxv4mofbT6sTICfxQ5xB4P05xFQb8l7yaL0QleYDktoAyud7
+	qLQ==
+X-Google-Smtp-Source: AGHT+IFVl860tRNXfVokCOJ+o6Ci2XKuNL395E+aTa7wrxYbxHjuwDpIoisRAUqIdRdRieAvjJFc+aKs/50=
+X-Received: from avagin.kir.corp.google.com ([2620:0:1008:10:98af:717c:5f3:596d])
+ (user=avagin job=sendgmr) by 2002:a63:7702:0:b0:5dc:229b:6777 with SMTP id
+ s2-20020a637702000000b005dc229b6777mr31895pgc.1.1707154294803; Mon, 05 Feb
+ 2024 09:31:34 -0800 (PST)
+Date: Mon,  5 Feb 2024 09:31:24 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|CH3PR12MB7666:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8969fb84-9495-4c32-4f09-08dc266f7ee9
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	29XBsLy8tayyJLayhwAwvNwsdHMJVGcnQ9ohen8n4a4BjMijA1UnVcG3nQftUY0cQeIcOn6y6JGgZLVfjHXRaQZns23fHYwum4kBJo0Jv0r+0w43+EeK/pICO7689RmwtMvtua+jLTzSqNWHiuKAhBYgRmMT/sC7yuEDV0+eGaPci+wtPA65UvMiCKlL1vcp4oTGwX1PbtAganuxWbsjhjdvyGPiaqLhQG/2OVRqYMOOwgVkvH4ZlqTy0ZdS0heBb4DZNtS1uBYOdkZcs0H7GKSbawFg1cx/bydJejYT7TJdiy6t/C4Yh6zDDDXU5jGh61tLFr704uTnYs9qMd1ZblsyEPw8Tpym3LmfgG7Zyf+RFyRZSn6GK2f4i5ILtStUKQN3bnbR3mfl6nIua9mOoybkAauS3yg7XCl58R5tR+m3ypJDB/K7e89lAYcpWCdc55s4izvjAusBDoEMJPyorXy8Q/wa3xFgFx8ChpOeIeUeyQ9Ko+m5pkoPoJ09sDroQrMBdVGGRQ0cBuwaXTOr57iVpbHwCYRMjBFlmS6Y0+i9O0q1oORSglarCWLymzmRx+f6jrZh2Eztx5Z1Jy5shOe8+sd3hqcWYeqZSqCq7fDsXlo86L8e+nB3PaReIfMbuauIX2EnQgttB5nh9J9IZQ==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(376002)(136003)(346002)(396003)(39860400002)(230273577357003)(230922051799003)(451199024)(1800799012)(186009)(64100799003)(36756003)(4326008)(8936002)(2906002)(41300700001)(5660300002)(31696002)(2616005)(6486002)(8676002)(6506007)(83380400001)(66556008)(53546011)(478600001)(66946007)(6512007)(316002)(38100700002)(66476007)(110136005)(26005)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?bjBYb3VLWUU2VEhUODBOMUI0eTN3ZFJCUGpsaFRqY2xSeGpZRkk1RHJBQmt1?=
- =?utf-8?B?WUtSdFRpeXJRc0ZqRm5xenBSMVJ3WWpHTjJxRVJvL0hHR2hYM3VCZ2VoUDEy?=
- =?utf-8?B?WlV5LytKNlhWeHdyVlVtR3FwTW1XM1pta2lPNjVVYmdTeVByczgvcEZ2c3cr?=
- =?utf-8?B?TWsrRWJQdlJONUlqNU5ZM3NGZDFHeWJtK0xYdE95QkdSZEhRZFhhbXZDdjZI?=
- =?utf-8?B?MkNYVjFOVFlmQncvb3lEZmRPSldEc2JBNEZMM1lJT0lXMXFVUHdOS2hhaWRL?=
- =?utf-8?B?dDJDRDlLYjZBZTZ1dkY4MGcxOW9YYzAvK3BKN3FRU2FQVWRac1FxSHhPSkxt?=
- =?utf-8?B?UDRjaWYvZVo5RHVTbitSczlrZGN4cERVZ294OW42Vm5VcytYdXNwK3ZzVDdt?=
- =?utf-8?B?QUhKRjRkOVlWVnBSejY2L3hNa0JyVDk0Sjl6b1puTnZYWW9rbi9KVUFsbis5?=
- =?utf-8?B?VWZCUnhybWJPV1IwRmsveFFXRURzUTNaNC9oUHdMdW9NUGl6cDlSRkgyd1Ns?=
- =?utf-8?B?bXY5VUV2N1oxSDJHMmYwTWo2NDNSeFJ4aFhFM1ZXZ1VHM0MxQ2hUQkFpVlpZ?=
- =?utf-8?B?SFhLNjJ6UktRcWJYVDY5dVluOFVXMVg1UDB6WGQ4RGxhdVQrTlJVQTI3VWxv?=
- =?utf-8?B?dkhBZTZSVFVTSzVJM2hqdHR6cCs3UW1OYnVXa2FFYlNBSDlrdkxjRElvOW9z?=
- =?utf-8?B?VUQzSDF1V3BidzV6NCtZMVhvejQ0a0RjdFdGSG1oS2hoT01vRFE2alR4d3NZ?=
- =?utf-8?B?TWFISnVGaW1tWGVla2NRSW1oNkNKNEQ3VUNCN0lGVGhIWDhRaFVqNldiaXky?=
- =?utf-8?B?RUh5RmtFem4yblU5eDBrSGovbytYUzJrbTRiMjczMGZESzU0Yk9PQjBhbDBq?=
- =?utf-8?B?b0hGUktEUzFJb3NNblBUZm9qcmVjdEU3eW05MkszOTlLbGZUWGFYS1pNeXVx?=
- =?utf-8?B?UEdPc3FJb0lVM2hIZE9KaFd1dXQ1dHpMN3oxYWtEUW1TUTNLUE1taitZbi9X?=
- =?utf-8?B?SitWelJmYUY5N2pkRFNWelV2ZzdvYkJzbTNmUndjRzRMSWRLL1lvSVU5ZG5V?=
- =?utf-8?B?RFRFaHF4bTVkMitpN0F1bjdXQ05UVElHbVFyM3VPTFJiZlFBZFhYUEVLWjJP?=
- =?utf-8?B?TkFRMU5ZUW0vbXhDeXR5K2hya2dnNkt2VDdYY0xKcFhVUUdwNFBSUzI2WVV6?=
- =?utf-8?B?dlBFejEyVncyeVYvZys3YzRhajBFOWtRN01FSzFLcC9TL0NwcU04UGZnQktv?=
- =?utf-8?B?K083b0VDQU1MUm9mcGF1UG92dENWKzBkUXVEWjU3d0REZXNvc2FJQ3NsMjll?=
- =?utf-8?B?amNVWUsrREk2cHIzSHlzL2lwSmh6bmxJMUZONW42bisxTWpWb0lKL1NuL2E5?=
- =?utf-8?B?NXZWODA4WWdxKzdHL1Jkd0JSWUtIcHg5Mk9HbWg1MHh4bkN6YUtLYmc3ck5U?=
- =?utf-8?B?MDR4bDFyQXQ1dHBHTDdxeDdHczdKZWtNeXdQNExNRDNFeGhhdC9JbWE2TUNS?=
- =?utf-8?B?VmhGT0hUYVFrdkFvVVl0N3lIS2IvdkRMYlBGVzhBZTNLdEx3NE5kZXRRY2hM?=
- =?utf-8?B?QnBUWGNCUmdvU0I2QjVvd1JCaUZ6a3JydzBsVTE5Z2dtajYxNHNuZUl1VlZo?=
- =?utf-8?B?bXlORTlwQWcraFZCVDVnRVFHUElHcWlNL1Y5TFBSS1ptVWcyaHNqNXk3R1Rz?=
- =?utf-8?B?YTJQdzU5dXVSbTBEWE9UWEVZNU85bXI3ZWl3dXZMN0d4NU4yZ25QZ3d2MmFB?=
- =?utf-8?B?bGxrb2YxTmdYNW1nMFJLV3JsQXpTUjV3UWJmNkRzQVY0OEtnKzdYRlBUTWZQ?=
- =?utf-8?B?TDlHZ28vQnFnSWlqTzRDRm5TbUNESmwwc2p1NTFYUm1ZNGpYajA5SGRaUG9u?=
- =?utf-8?B?bUZJdVFWYTdqNGtCOTZ3a2RrclFobndkYXdHOUliWm9OSSs5cDkweG43TEE3?=
- =?utf-8?B?eHFqVkg5ZnBhVHY2MkluQkxrUzFKYzFrbU1WY2lVWVJ2OTRFQ0xHK2VEdFdU?=
- =?utf-8?B?ZkxMeU1VS1RIYTRUWmFieGU2TUw4elBvRkxuMEE2Rnp4ZTgvVlpaK3NHL3dI?=
- =?utf-8?B?THM1UE5yQUt4SzE1S3h1YUNwVEUzOHVUcEpycjJMLys1WDgwbXFGaGdWZk53?=
- =?utf-8?Q?4Mmeer8Ye0B7azEtSBcxXDruH?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8969fb84-9495-4c32-4f09-08dc266f7ee9
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Feb 2024 17:25:49.3344
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6iV426c40MM9AvaS1UkYEMhPo3mb9oEhd3OcFmyqOFyQ9T3phfAMUuBegutIYsMiiyhlLOGIhdf+d3YTy6KMMQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB7666
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.594.gd9cf4e227d-goog
+Message-ID: <20240205173124.366901-1-avagin@google.com>
+Subject: [PATCH] kvm/x86: add capability to disable the write-track mechanism
+From: Andrei Vagin <avagin@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org, 
+	Andrei Vagin <avagin@google.com>, Zhenyu Wang <zhenyuw@linux.intel.com>, 
+	Zhi Wang <zhi.a.wang@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 2/4/2024 10:58 PM, Tian, Kevin wrote:
-> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
-> 
-> 
->> From: Brett Creeley <brett.creeley@amd.com>
->> Sent: Saturday, January 27, 2024 2:32 AM
->>
->> The current logic for handling resets based on
->> whether they were initiated from the DSC or
->> host/VMM is slightly confusing and incorrect.
->> The incorrect behavior can cause the VF device
->> to be unusable on the destination on failed
->> migrations due to incompatible configurations.
->> Fix this by setting the state back to
->> VFIO_DEVICE_STATE_RUNNING when an FLR is
->> triggered, so the VF device is put back in
->> an "initial" pre-configured state after failures.
-> 
-> any reason for putting short lines (<50 chars) in commit msg?
+The write-track is used externally only by the gpu/drm/i915 driver.
+Currently, it is always enabled, if a kernel has been compiled with this
+driver.
 
-No, I will make the lines longer in the next commits.
+Enabling the write-track mechanism adds a two-byte overhead per page across
+all memory slots. It isn't significant for regular VMs. However in gVisor,
+where the entire process virtual address space is mapped into the VM, even
+with a 39-bit address space, the overhead amounts to 256MB.
 
-> 
->>
->> Also, while here clean-up the reset logic to
->> make the source of the reset more obvious.
-> 
-> as a fix the a 'Fixed' tag is preferred and CC stable
-> 
-> also separate the real fix from the cleanup so stable kernel doesn't need
-> to backport unnecessary code.
+This change introduces the new KVM_CAP_PAGE_WRITE_TRACKING capability,
+allowing users to enable/disable the write-track mechanism. It is enabled
+by default for backward compatibility.
 
-Sure, I can split this into 2 changes as you suggested.
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
+Cc: Zhi Wang <zhi.a.wang@intel.com>
+Signed-off-by: Andrei Vagin <avagin@google.com>
+---
+ Documentation/virt/kvm/api.rst  | 16 ++++++++++++++++
+ arch/x86/include/asm/kvm_host.h |  4 ++++
+ arch/x86/kvm/mmu/page_track.c   | 13 +++++++++++--
+ arch/x86/kvm/x86.c              | 25 +++++++++++++++++++++++++
+ include/uapi/linux/kvm.h        |  1 +
+ 5 files changed, 57 insertions(+), 2 deletions(-)
 
-> 
-> btw the commit msg is not clear to me. It says fixing the problem
-> by setting the state to _ERROR for the DSC path and to _RUNNING for
-> the FLR path.
-> 
-> But looks it's already such case with old code:
-> 
-> pds_vfio_recovery()
->          pds_vfio->deferred_reset = true;
->          pds_vfio->deferred_reset_state = VFIO_DEVICE_STATE_ERROR;
-> 
-> pds_vfio_reset()
->          pds_vfio->deferred_reset = true;
->          pds_vfio->deferred_reset_state = VFIO_DEVICE_STATE_RUNNING;
-> 
-> pds_vfio_state_mutex_unlock()
->          if (pds_vfio->deferred_reset) {
->                  ...
->                  pds_vfio->state = pds_vfio->deferred_reset_state;
->                  ...
->          }
-> 
-> it's same as what this patch does:
-> 
-> pds_vfio_recovery()
->          pds_vfio->deferred_reset_type = PDS_VFIO_DEVICE_RESET;
-> 
-> pds_vfio_reset()
->          pds_vfio->deferred_reset_state = PDS_VFIO_HOST_RESET;
-> 
-> pds_vfio_state_mutex_unlock()
->          if (pds_vfio->deferred_reset) {
->                  ...
->                  if (pds_vfio->deferred_reset_type == PDS_VFIO_HOST_RESET)
->                          pds_vfio->state = VFIO_DEVICE_STATE_RUNNING;
->                  else
->                          pds_vfio->state = VFIO_DEVICE_STATE_ERROR;
->                  ...
->          }
-> 
-> looks the actual functional difference is from below change:
-> 
->> @@ -32,13 +32,14 @@ void pds_vfio_state_mutex_unlock(struct
->> pds_vfio_pci_device *pds_vfio)
->>        mutex_lock(&pds_vfio->reset_mutex);
->>        if (pds_vfio->deferred_reset) {
->>                pds_vfio->deferred_reset = false;
->> -             if (pds_vfio->state == VFIO_DEVICE_STATE_ERROR) {
->> -                     pds_vfio_put_restore_file(pds_vfio);
->> -                     pds_vfio_put_save_file(pds_vfio);
->> +             pds_vfio_put_restore_file(pds_vfio);
->> +             pds_vfio_put_save_file(pds_vfio);
-> 
-> above two are changed from conditional to always.
-> 
->> +             if (pds_vfio->deferred_reset_type == PDS_VFIO_HOST_RESET)
->> {
->> +                     pds_vfio->state = VFIO_DEVICE_STATE_RUNNING;
->> +             } else {
->>                        pds_vfio_dirty_disable(pds_vfio, false);
-> 
-> and this is now only for the DSC path.
-> 
-> need a better explanation here.
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 3ec0b7a455a0..448a96c950e7 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -8791,6 +8791,22 @@ means the VM type with value @n is supported.  Possible values of @n are::
+   #define KVM_X86_DEFAULT_VM	0
+   #define KVM_X86_SW_PROTECTED_VM	1
+ 
++8.38 KVM_CAP_PAGE_WRITE_TRACKING
++-------------------------------------
++
++:Capability: KVM_CAP_PAGE_WRITE_TRACKING
++:Architectures: x86
++:Type: system ioctl
++:Parameters: args[0] defines whether the feature should be enabled or not
++:Returns: 0 on success, -EINVAL if args[0] isn't 1 or 0, -EINVAL if any memslot
++          was already created or any users was registered, -EBUSY if write
++          tracking is used for internal needs and can't be disabled.
++
++This capability enables/disables the page write-track mechanism. It is enabled
++by default for backward compatibility.
++
++This capability may only be set before any mem slots are created.
++
+ 9. Known KVM API problems
+ =========================
+ 
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index d271ba20a0b2..8a05e3322a59 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1503,6 +1503,10 @@ struct kvm_arch {
+ 	 */
+ #define SPLIT_DESC_CACHE_MIN_NR_OBJECTS (SPTE_ENT_PER_PAGE + 1)
+ 	struct kvm_mmu_memory_cache split_desc_cache;
++
++#ifdef CONFIG_KVM_EXTERNAL_WRITE_TRACKING
++	bool page_write_tracking_disabled;
++#endif
+ };
+ 
+ struct kvm_vm_stat {
+diff --git a/arch/x86/kvm/mmu/page_track.c b/arch/x86/kvm/mmu/page_track.c
+index c87da11f3a04..bf8f9ca7b86e 100644
+--- a/arch/x86/kvm/mmu/page_track.c
++++ b/arch/x86/kvm/mmu/page_track.c
+@@ -20,9 +20,15 @@
+ #include "mmu_internal.h"
+ #include "page_track.h"
+ 
++#ifdef CONFIG_KVM_EXTERNAL_WRITE_TRACKING
++#define KVM_EXTERNAL_WRITE_TRACKING_ENABLED(kvm) \
++		(!kvm->arch.page_write_tracking_disabled)
++#else
++#define KVM_EXTERNAL_WRITE_TRACKING_ENABLED(kvm) false
++#endif
++
+ bool kvm_page_track_write_tracking_enabled(struct kvm *kvm)
+-{
+-	return IS_ENABLED(CONFIG_KVM_EXTERNAL_WRITE_TRACKING) ||
++{	return KVM_EXTERNAL_WRITE_TRACKING_ENABLED(kvm) ||
+ 	       !tdp_enabled || kvm_shadow_root_allocated(kvm);
+ }
+ 
+@@ -165,6 +171,9 @@ int kvm_page_track_register_notifier(struct kvm *kvm,
+ 	if (!kvm || kvm->mm != current->mm)
+ 		return -ESRCH;
+ 
++	if (kvm->arch.page_write_tracking_disabled)
++		return -EINVAL;
++
+ 	kvm_get_kvm(kvm);
+ 
+ 	head = &kvm->arch.track_notifier_head;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index bf10a9073a09..2f28a1b357dd 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -4668,6 +4668,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_VM_DISABLE_NX_HUGE_PAGES:
+ 	case KVM_CAP_IRQFD_RESAMPLE:
+ 	case KVM_CAP_MEMORY_FAULT_INFO:
++	case KVM_CAP_PAGE_WRITE_TRACKING:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_EXIT_HYPERCALL:
+@@ -6675,6 +6676,30 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 		}
+ 		mutex_unlock(&kvm->lock);
+ 		break;
++	case KVM_CAP_PAGE_WRITE_TRACKING: {
++		bool enabling = cap->args[0];
++
++		r = -EINVAL;
++		if (cap->args[0] & ~1)
++			break;
++
++		r = -EBUSY;
++		if (!enabling && (!tdp_enabled || kvm_shadow_root_allocated(kvm)))
++			break;
++#ifdef CONFIG_KVM_EXTERNAL_WRITE_TRACKING
++		write_lock(&kvm->mmu_lock);
++		if (!kvm_memslots_empty(kvm_memslots(kvm)) ||
++		    kvm_page_track_has_external_user(kvm)) {
++			write_unlock(&kvm->mmu_lock);
++			r = -EINVAL;
++			break;
++		}
++		kvm->arch.page_write_tracking_disabled = !enabling;
++		write_unlock(&kvm->mmu_lock);
++#endif
++		r = 0;
++		break;
++	}
+ 	default:
+ 		r = -EINVAL;
+ 		break;
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index c3308536482b..0e9ea5a62e38 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1155,6 +1155,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_MEMORY_ATTRIBUTES 233
+ #define KVM_CAP_GUEST_MEMFD 234
+ #define KVM_CAP_VM_TYPES 235
++#define KVM_CAP_PAGE_WRITE_TRACKING 236
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+-- 
+2.43.0.594.gd9cf4e227d-goog
 
-I will clean up this patch by separating it into 2 patches and improving 
-the commit descriptions before sending a v2.
-
-Thanks for the review,
-
-Brett
 
