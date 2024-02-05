@@ -1,160 +1,188 @@
-Return-Path: <kvm+bounces-8033-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8034-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 071BC84A106
-	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 18:38:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D60284A11D
+	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 18:42:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C16B1C226EC
-	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 17:38:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 728E81C21916
+	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 17:42:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C052A482C6;
-	Mon,  5 Feb 2024 17:35:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56D1045949;
+	Mon,  5 Feb 2024 17:42:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="VUYpnmZq"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="YSDkBdlq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05EC8481D8;
-	Mon,  5 Feb 2024 17:35:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8F6145947
+	for <kvm@vger.kernel.org>; Mon,  5 Feb 2024 17:42:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707154551; cv=none; b=aPvXc1Wta9oT9U+xJwAY9sOHD4hw1Yn0Ow0zYMGb0ufqwvVa9DCSdz1vV8bC5ogKwCzVBnDeYfnlb1yWD7e4sEA96Wy/Qbzvmcm6bZrgqii5qn1+7MT/7DdV83PLfZEhXorDdPIIiAcSxxCxIhrSV9d2hPHOnPNN8O4VrXv8An8=
+	t=1707154962; cv=none; b=hHidHk3YERTEw9z8vxrTFCeNeGdSzQTvV4R9NxcvdQyGPvEr9O9OFk8WUfPcVsUZ6mBmJRNplatYcLCqoIJW6xUtXIUWO0x+TDaw+mVtTnRbEts2pf+nN5+TclOJ8mzJazX6JXIRlu7C5JcaCxVCPY1KW17P2XtlzNd0iu/qSCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707154551; c=relaxed/simple;
-	bh=5JFqEmkOGc/As5iC/2BClGHdvHxa1EQgvh2dI2uGnSo=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=B+zPgQZrUudXwOdrfRWM3jDysTON9Nn1nAdydlvukIgjHUvDWmoSIwdFAfQ+4rS+tntldBKYvm2W7IkABZzk8uvapYCf2+pjFHnxJmOzxMlMq67mw+O2/5vScM0cOlbQ1QwOsPpnZ+PI6TUT/SAQKfdTfM9z4d8Tjwns0Rj6Z50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=VUYpnmZq; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 415H73uW022996;
-	Mon, 5 Feb 2024 17:35:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : in-reply-to : references : date : message-id : mime-version :
- content-type; s=pp1; bh=/m7ENcWw8jBryuscCbgPp7hzCQ34mIrSeEoKDPRIxks=;
- b=VUYpnmZq8uYLKWiMuY+HaiWasuEGFv+Q2STxO+vIgc42uKNqAIt5sagMNivWBCcH98jn
- Ck1fQ/BFAo63duCwVrRn6I5Rz1fMwF2WBuWug0OH51SdwQnY1Y8fCb2DFa++QwxRijW1
- nA/R+4CgAcWqjlLEvR5Acj6P7ohghZiHSzvnOiBlL+cbfnrjIVpsXePI34cKk5NzJd0p
- 0MUxgekfiQ6jUvlT/r6rYGEBFg7HpZyQ8m4lo/iBmUMY1plCkfxfygLVIpz2LVSX7Acu
- KUtDv4ElARcdH29vgLCiBJpv2SV4z34RVQe1hIjnSwYAHkQioBGX7cxyu2+Go039RMrt Kg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w337chrqx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 05 Feb 2024 17:35:36 +0000
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 415HQ8q3032430;
-	Mon, 5 Feb 2024 17:35:36 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w337chrqb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 05 Feb 2024 17:35:36 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 415H5Sov005455;
-	Mon, 5 Feb 2024 17:35:35 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3w21ak9t5r-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 05 Feb 2024 17:35:35 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 415HZWqx20316814
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 5 Feb 2024 17:35:32 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2B08720043;
-	Mon,  5 Feb 2024 17:35:32 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3E72C2004E;
-	Mon,  5 Feb 2024 17:35:27 +0000 (GMT)
-Received: from vaibhav?linux.ibm.com (unknown [9.43.112.222])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Mon,  5 Feb 2024 17:35:26 +0000 (GMT)
-Received: by vaibhav@linux.ibm.com (sSMTP sendmail emulation); Mon, 05 Feb 2024 23:05:23 +0530
-From: Vaibhav Jain <vaibhav@linux.ibm.com>
-To: Amit Machhiwal <amachhiw@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
-        kvm@vger.kernel.org, kvm-ppc@vger.kernel.org
-Cc: Nicholas Piggin <npiggin@gmail.com>,
-        Michael Ellerman
- <mpe@ellerman.id.au>,
-        Jordan Niethe <jniethe5@gmail.com>,
-        Vaidyanathan
- Srinivasan <svaidy@linux.ibm.com>,
-        "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>,
-        "Naveen N . Rao" <naveen.n.rao@linux.ibm.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Amit Machhiwal
- <amachhiw@linux.ibm.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] KVM: PPC: Book3S HV: Fix L2 guest reboot failure due
- to empty 'arch_compat'
-In-Reply-To: <20240205132607.2776637-1-amachhiw@linux.ibm.com>
-References: <20240205132607.2776637-1-amachhiw@linux.ibm.com>
-Date: Mon, 05 Feb 2024 23:05:23 +0530
-Message-ID: <87h6img6g4.fsf@vajain21.in.ibm.com>
+	s=arc-20240116; t=1707154962; c=relaxed/simple;
+	bh=8HE4Ga8BSdBO6M6GmqVFa+HwwrrcZFVY3gTfyQML7uA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tMbA2gd5M8elwy8xSDnl0c0e6YfLR3yMG3fP52xNL/Rj4Eq0uqUNRSMLO4JNy+TTUX2uWpFZq26MvlMOtpUXQH/GzsVTLkXyeRiIo+7DfyuV+706xCPRC23st2++fC6Z5GX+/mr9K+b66Wmf03Qu6uGV8pL0DtXqLw1mz5h042c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=YSDkBdlq; arc=none smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-42a8a3973c5so30963741cf.2
+        for <kvm@vger.kernel.org>; Mon, 05 Feb 2024 09:42:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1707154960; x=1707759760; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=8HE4Ga8BSdBO6M6GmqVFa+HwwrrcZFVY3gTfyQML7uA=;
+        b=YSDkBdlqh+RdEfZVeIPD5O0bw8zJoptlcqlngUBEXj/6l+uwzv4Ibe/PZhDGET0cHt
+         LWMIfk/s0RAOGiReC1q969qyY6NlkJQhSCGSPJOne9c0gwLDQoWHyxkOMROmG3FWNo8C
+         tW2stCvOx90JO3GQcLvJ3ZC1ywR8VX5Jy5zAzNuM5wxLd2D/xqhzkWdfPAGmgBPdzXQP
+         KYJ5pEqbX1WA2CqLMwEi4l2c8LaYxkhHA+QoGfCV0S/p1aoSdK055MnmMu4lXMTNGtPL
+         zlh6XgbqwbZZGaCE4WygoV2RfqWwiKIRgBwqzYF3GEySL0Bz6I3TrFDEL50qKYg/tQO6
+         5rjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707154960; x=1707759760;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8HE4Ga8BSdBO6M6GmqVFa+HwwrrcZFVY3gTfyQML7uA=;
+        b=ZK68DYYQL1i2k1l4QTy6N8lhlvlJW4ol36GLr1tftR91CBrbP6TkVPq+Ebl0CRBTrE
+         pNeLEmxImdNQh/FbElTPx0LdcN6ATeyDOexizqKfNLU5d8oJ3FxEsmac3zzIfqE7EjZh
+         Z2/lyeA/blU82WRqbDxnOUGuUYEiGRyxbrLDz/608Tzn6gr3550Mrg9RMXr1onrqANoN
+         Kx1bQ8PEJK/0IDvteF0Hw/+NN5RMwc5SWPBL4lpVA94yxJngXL/BHg2xTmCTi0qxgxsl
+         mB90p7y2FsoDi6VCRIHQSPJnTByhLxsfZgfRdNn71reyVfWDWiy4322EQzLAk4W/Uu2o
+         sN8w==
+X-Gm-Message-State: AOJu0YyySB1kSPmZW6Y3g9WosoBsLH3aEiH2n3PkWLaAxPDlw7sR3Qgp
+	HMEKp8tWYz7zSCsurau+7gHF/ERQRdfaJUPWefCzs8Bpr359dAO2e7pZnXFexX0=
+X-Google-Smtp-Source: AGHT+IHU4KsrD3c0EP9g7y8hIFpyaAa4okXRRNN8qBm5KuQa3mySXXt7+dYoSw0Wr4a8G0dHjecPyQ==
+X-Received: by 2002:a05:622a:60c:b0:42a:9cd0:10d6 with SMTP id z12-20020a05622a060c00b0042a9cd010d6mr76578qta.34.1707154959703;
+        Mon, 05 Feb 2024 09:42:39 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCUJEoYPtNarb3IKpx+TlDaQWnlGCPYYwqRse61FZumUi17YhNjF1PV/xF22JLrvNXqFbkebE3MWbOPPsd6X9lkUYDUu8OcgOJYYw525y7FBiRK5b6k1ygrBSUjRHKinQ83+/bgI+lNtpfQIgMjD96anUt1JUN/A07pGruYvZXzU+IkWkDlqulHlYWtlENVhDo7EDFB9txF76qn+sovVDt+EhL7ut1S/hZswfg+VWs1j/g37rEX6ap6/4HYUNOLco77wrroLxU0HPFDsjm75+gckY78bO+VGj8ZjeEVOo3As9m48+X0kxJ0Q+DCxEkK31OMS3+rk9JgZYfc/rvBZ4DfknXCKEFbNUSYiTsiRn8LuNk6aoyUi8Yt0fkyR8E0kWWgCK3tQyQl37yuAXLLWMzwjLPdLL+LetoDhwayckEgT6hVcQTSAdr/64XA4acyBFh/KrJTmXe27EODPpZ7XhFeqlSK9tOkNG5gDuy05MIpWcUZfCBG5xHxACRXuyekJg91XbC9JxH2AkXUiOdSYdpHdIXrVkRrLeiPD0hPJPc/vsi8qojAJdzmxkzyfLzLhg19sg4M2WCCcphSLrPd+8rW3G5XCnkab07S61wEP7FLkMnOakYoKQoDGJkTOFQdDEWmESvGbq6OoQFA0uUJj+KlWqrYt9e4aDsPJbchaYnyqj5Tje8QC1runF4T0tAZjue/v+GvEzghpVJQWjy+T/0qjRPKiwuFVw3YGWf5PAbhZzViL
+Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
+        by smtp.gmail.com with ESMTPSA id z5-20020ac86b85000000b0042c04cef1d6sm137895qts.66.2024.02.05.09.42.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Feb 2024 09:42:39 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1rX2zO-000fQ2-NV;
+	Mon, 05 Feb 2024 13:42:38 -0400
+Date: Mon, 5 Feb 2024 13:42:38 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: James Gowans <jgowans@amazon.com>
+Cc: linux-kernel@vger.kernel.org, Eric Biederman <ebiederm@xmission.com>,
+	kexec@lists.infradead.org, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, iommu@lists.linux.dev,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>,
+	linux-fsdevel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+	Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
+	Alexander Graf <graf@amazon.com>,
+	David Woodhouse <dwmw@amazon.co.uk>,
+	"Jan H . Schoenherr" <jschoenh@amazon.de>,
+	Usama Arif <usama.arif@bytedance.com>,
+	Anthony Yznaga <anthony.yznaga@oracle.com>,
+	Stanislav Kinsburskii <skinsburskii@linux.microsoft.com>,
+	madvenka@linux.microsoft.com, steven.sistare@oracle.com,
+	yuleixzhang@tencent.com
+Subject: Re: [RFC 00/18] Pkernfs: Support persistence for live update
+Message-ID: <20240205174238.GC31743@ziepe.ca>
+References: <20240205120203.60312-1-jgowans@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 5TnpgDh3nHIvKvMD6hFMeSDCRi2B20hH
-X-Proofpoint-ORIG-GUID: uIRLN9AqnSJ7beZNDqSxnZYfllpJf0Ed
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-05_12,2024-01-31_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
- malwarescore=0 lowpriorityscore=0 mlxlogscore=798 priorityscore=1501
- spamscore=0 phishscore=0 mlxscore=0 clxscore=1011 suspectscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2402050134
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240205120203.60312-1-jgowans@amazon.com>
 
-Hi Amit,
+On Mon, Feb 05, 2024 at 12:01:45PM +0000, James Gowans wrote:
 
-Thanks for the patch. Minor comment on the patch below:
+> The main aspect we’re looking for feedback/opinions on here is the concept of
+> putting all persistent state in a single filesystem: combining guest RAM and
+> IOMMU pgtables in one store. Also, the question of a hard separation between
+> persistent memory and ephemeral memory, compared to allowing arbitrary pages to
+> be persisted. Pkernfs does it via a hard separation defined at boot time, other
+> approaches could make the carving out of persistent pages dynamic.
 
-Amit Machhiwal <amachhiw@linux.ibm.com> writes:
+I think if you are going to attempt something like this then the end
+result must bring things back to having the same data structures fully
+restored.
 
-<snip>
+It is fine that the pkernfs holds some persistant memory that
+guarentees the IOMMU can remain programmed and the VM pages can become
+fixed across the kexec
 
->  
-> +static inline unsigned long map_pcr_to_cap(unsigned long pcr)
-> +{
-> +	unsigned long cap = 0;
-> +
-> +	switch (pcr) {
-> +	case PCR_ARCH_300:
-> +		cap = H_GUEST_CAP_POWER9;
-> +		break;
-> +	case PCR_ARCH_31:
-> +		cap = H_GUEST_CAP_POWER10;
-Though CONFIG_CC_IMPLICIT_FALLTHROUGH and '-Wimplicit-fallthrough'
-doesnt explicitly flag this usage, please consider using the
-'fallthrough;' keyword here.
+But once the VMM starts to restore it self we need to get back to the
+original configuration:
+ - A mmap that points to the VM's physical pages
+ - An iommufd IOAS that points to the above mmap
+ - An iommufd HWPT that represents that same mapping
+ - An iommu_domain programmed into HW that the HWPT
 
-However you probably dont want this switch-case to fallthrough so please
-use a 'break' instead.
+Ie you can't just reboot and leave the IOMMU hanging out in some
+undefined land - especially in latest kernels!
 
-> +	default:
-> +		break;
-> +	}
-> +
-> +	return cap;
-> +}
-> +
->
-<snip>
+For vt-d you need to retain the entire root table and all the required
+context entries too, The restarting iommu needs to understand that it
+has to "restore" a temporary iommu_domain from the pkernfs.
 
-With the suggested change above
+You can later reconstitute a proper iommu_domain from the VMM and
+atomic switch.
 
-Reviewed-by: Vaibhav Jain <vaibhav@linux.ibm.com>
+So, I'm surprised to see this approach where things just live forever
+in the kernfs, I don't see how "restore" is going to work very well
+like this.
 
--- 
-Cheers
-~ Vaibhav
+I would think that a save/restore mentalitity would make more
+sense. For instance you could make a special iommu_domain that is fixed
+and lives in the pkernfs. The operation would be to copy from the live
+iommu_domain to the fixed one and then replace the iommu HW to the
+fixed one.
+
+In the post-kexec world the iommu would recreate that special domain
+and point the iommu at it. (copying the root and context descriptions
+out of the pkernfs). Then somehow that would get into iommufd and VFIO
+so that it could take over that special mapping during its startup.
+
+Then you'd build the normal operating ioas and hwpt (with all the
+right page refcounts/etc) then switch to it and free the pkernfs
+memory.
+
+It seems alot less invasive to me. The special case is clearly a
+special case and doesn't mess up the normal operation of the drivers.
+
+It becomes more like kdump where the iommu driver is running in a
+fairly normal mode, just with some stuff copied from the prior kernel.
+
+Your text spent alot of time talking about the design of how the pages
+persist, which is interesting, but it seems like only a small part of
+the problem. Actually using that mechanism in a sane way and cover all
+the functional issues in the HW drivers is going to be really
+challenging.
+
+> * Needing to drive and re-hydrate the IOMMU page tables by defining an IOMMU file.
+> Really we should move the abstraction one level up and make the whole VFIO
+> container persistent via a pkernfs file. That way you’d "just" re-open the VFIO
+> container file and all of the DMA mappings inside VFIO would already be set up.
+
+I doubt this.. It probably needs to be much finer grained actually,
+otherwise you are going to be serializing everything. Somehow I think
+you are better to serialize a minimum and try to reconstruct
+everything else in userspace. Like conserving iommufd IDs would be a
+huge PITA.
+
+There are also going to be lots of security questions here, like we
+can't just let userspace feed in any garbage and violate vfio and
+iommu invariants.
+
+Jason
 
