@@ -1,163 +1,119 @@
-Return-Path: <kvm+bounces-8027-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8028-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB36F849FAC
-	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 17:44:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB59184A038
+	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 18:08:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C4DE9B23A5E
-	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 16:44:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8FD5A1F22C61
+	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 17:08:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D38F53EA86;
-	Mon,  5 Feb 2024 16:43:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F3C440C1B;
+	Mon,  5 Feb 2024 17:08:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QfcYOYvS"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="pThueR9t"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4829440BEF
-	for <kvm@vger.kernel.org>; Mon,  5 Feb 2024 16:43:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4D803D558
+	for <kvm@vger.kernel.org>; Mon,  5 Feb 2024 17:08:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707151418; cv=none; b=C+CLNZIUA3hMc6Dt5kWaZ3tsINORKC0ZGZOF9aF3b3PiBNBsSj+ZlmMTnDoZKyW8GKRhIf2h2sUU02SOkewyOJuo03bqkZ6V5qhi8j0hYEMaMlwlMt+T7ihGlT6czPElPraqzuJtJiryger7L88Glrkeg/r8eWyTYhAsLKdnOGY=
+	t=1707152923; cv=none; b=bUKtgPuATRgumQFPseGolHqGupHBZpiJ2mzEXMGqbrPLi4QK2pDnYQFU61GSqK8I0PAX+jYWyx/0uuoDJ1Y75NarINF8abeSnfG/QBOZ8yOUsupi92eNpfsRpZXmN3egeWcVzhR6ZtQcM5XceMUnAXxnOIZJgEv5iW38wbUXvl8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707151418; c=relaxed/simple;
-	bh=U/7TW3OSEZ6qhrwVPvN+Z5zX92htnPgIigRf5YEJMiQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pDGSb2DfI8M8iCHUbf335oxzPu/n/5R89jKHYHYQhOgLb07W0v/KaF1CSNBdQc257NLkEymJuFJIND8A6i4nGwwaFFOYRbFJymewwgqhhEAzYaitJTV0nzSy/Ev0Xi+FXuK7WRv56PUV9ULTVYTg4wFs7KigM0LJS1aH45sok5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QfcYOYvS; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707151415;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/eXP+XOU0IwSKfk9/shij3ieifTghjGjp9NYVzTL26w=;
-	b=QfcYOYvSjRYLsLz/s87UjQoVBW+KqeiZ6IhJXhX5WIQVjxhKsS3IHI/lZCBuCgmOD2xFU3
-	V1V8DNjbDB5xE9YGLe+hM1oolNiSRNsHF5DsPPIueHmkzxdfN7CzWUq1qPe0aiNFQAV6TM
-	VXAarZnZZPUEiEsj0uBKdEzVVHxbVDo=
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
- [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-690-06OCMUGJPg6LUPvS2SPqew-1; Mon, 05 Feb 2024 11:43:33 -0500
-X-MC-Unique: 06OCMUGJPg6LUPvS2SPqew-1
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-363be67c17aso8945695ab.0
-        for <kvm@vger.kernel.org>; Mon, 05 Feb 2024 08:43:33 -0800 (PST)
+	s=arc-20240116; t=1707152923; c=relaxed/simple;
+	bh=8gBlKfQm3vRprhFc0/QpnWE8p96XYPuWr7rTbz4Ejy4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lTlbY43S+ZveNo8AaIU3M53GP0pWrt8gmg7oUkkyp3qQl624LqX93DkRLF5/RtFbyFa9RqQ+mb9vwHWFloENDsXgjR0BSo8jj6oA6FiPprKKwdIWZhQc0/1O4h3nhYBoCBbU/UopWzk9yKeI5rxeMUZqrXUibW5KEzqVZ+oNV7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=pThueR9t; arc=none smtp.client-ip=209.85.160.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-42c1eb66355so12725951cf.2
+        for <kvm@vger.kernel.org>; Mon, 05 Feb 2024 09:08:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1707152920; x=1707757720; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8gBlKfQm3vRprhFc0/QpnWE8p96XYPuWr7rTbz4Ejy4=;
+        b=pThueR9tS4++4Ak+63QKJD5ztu0stiKwKjMYm8GGi9NWP+lqt1uz0Qk1hMqaGZ0sTr
+         fPWtCd+6Er9idhCPt1WvCPSvXTC9fC9GPLMkj6ZNKYLoknf0CPuLke9GltXcdBZOvuxr
+         QMbWzMqbX4BQAQm2Z4Fyl/Qm2YXQ+PH33fP3J0bLXIXGackyhFW0peHrgVFTIWQu+rab
+         SfQohNzSaxb3Gg7BUYxxs5LK+Hrs4oWJbn7fVhubCyLl3Iw3uTx17WKAQxtiqxVPH4pm
+         Ie1MIxErmkxewE9orbvfB1z2fHDsEB4SYyMoVokL/kYAP+1AsEFk4YK+1kNm7OOB2JzR
+         oKcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707151413; x=1707756213;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/eXP+XOU0IwSKfk9/shij3ieifTghjGjp9NYVzTL26w=;
-        b=Tk1Wpwrpnc1ajgwdA4Mbjk9HhMlXWKICQyNSS+HeGxVlVrbU3GKCVU5DqjnC1kMQ4G
-         6sFVVp+P0n7i3/eOydN+Xdh6XlbzdXlaytW/EIw0EPcJTfIgVBytgFPW8F6+jaU72GYb
-         Ajl9gZvdLrzqA7v0ReIqrCTuzvl1TW0QkFt4BJ8Tl1KdvMC19ELzqceRumYlNRBI4Idf
-         oAVzovnFcBxshgexG+QNTlPW6ZwQsHVKFM90hNzYvW4viqZKex059S/23leDfXHcT18Z
-         SYVcazn9iNS6CqdJfK6cuMtRIZyiacfdxLFKG0Z0p9Mk8VI/s7RXzVc7fCDiuRgNsQWo
-         Bhpg==
-X-Gm-Message-State: AOJu0Yy+0c8SXr0nilUbTdAIuf02zbX1Z6DYIdAqR3Y945cDnqCziGfY
-	oIGd8tqrm25mrFmJ5d5Xw2im3NDueNjyAtHdqktfWozoenU5DYuo4Ypcpa9KoO+BPB5u08yY/il
-	F+jNQYUsfF+kJc/ql4h73iFgbgyYRLb9IWPmeVqrEIiYVdSdGaQ==
-X-Received: by 2002:a05:6e02:164e:b0:360:628e:659f with SMTP id v14-20020a056e02164e00b00360628e659fmr200863ilu.5.1707151413050;
-        Mon, 05 Feb 2024 08:43:33 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGtaN4sEtvX2yaCb3cjEWCzbhiFSIYee5cINdZg+zrkrji5H3Ahcz7txIlReM70s7z7FBdE2g==
-X-Received: by 2002:a05:6e02:164e:b0:360:628e:659f with SMTP id v14-20020a056e02164e00b00360628e659fmr200841ilu.5.1707151412753;
-        Mon, 05 Feb 2024 08:43:32 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCU9nO84Ymt1SJKhzCuTL1objeZ5SSsE27RlJtvPYNi8r42f5mWWmIrH7Zn1RORfSf3iRjRG0nVdtbSdQV2aZkDLX91MB+PO7viz93UWxdXlN+MR6yyWU2BfxH1kyh3r1CppHdrXdbMzwqmnUYwyZe2ePeQBEw3iTWZNHIWSt/CCCId4cmjIcUAhyLhd74ujVHh1MNm84xYNdlCIP5okWpTEtJ5suECt02cKBKxITe8sQ26Snldjn31xRJVWYssCIewwB6l23QD5m4cFoyDJHIBLkBvw23emfyWQRjL2dz8J77lcbt0pE8A9QDgMfzTfNQk+IZh/FHYS
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id g19-20020a056638061300b004713ae4c62asm34884jar.46.2024.02.05.08.43.31
+        d=1e100.net; s=20230601; t=1707152920; x=1707757720;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8gBlKfQm3vRprhFc0/QpnWE8p96XYPuWr7rTbz4Ejy4=;
+        b=HvORWeDGDA/Q6foLUuoqnfXPF5J9oYETDhLH8sSi8fNZjh6fDv6fjTIDkYVSxvehvH
+         9C9PtxI7VLn332/XYzgPdoAoTxTtja667nqqWHxXdYl5Kbe/OaDVOEfOVjIqB6nLOFff
+         Ngt38g6peQrCy0bbJth6m9s6VypJzQpqIqmLT0Z2wSIEJJakQgOOJCTpjJMhdBiQ8r4q
+         8b1b97DaVzZLKhQzDqSUKJ9qiozSyvUsHfaaCz8oaNuzQBTK2m6BqWAJooGAcszK7RqD
+         QfUO7Rk70/wdNGTeMzPMCArBUQSLplslgy17EDatJYUeqoopMBVrzypa2xjMx6vryBXA
+         H0Gg==
+X-Gm-Message-State: AOJu0YxaZgYnwAG1rV1aAn12uEsZ6F/V0fDSbbr9RGj5nrrbbZbLzFvn
+	DspLl70VEE8vfZXDiG0DVIGxCvLqp0zNOl/Batg3B3boTIQFnu/m2zC+p1tAh24=
+X-Google-Smtp-Source: AGHT+IFRr68RJWhr55aAuCOmm/7ig7Z946GhQZxCWJnXpgTkXxQZq9u9NN3DdLuHLeVoxwlh1gajUQ==
+X-Received: by 2002:ac8:6bcb:0:b0:42a:48bc:f69 with SMTP id b11-20020ac86bcb000000b0042a48bc0f69mr7977973qtt.35.1707152920631;
+        Mon, 05 Feb 2024 09:08:40 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCWFnZsn/+oaH85mYCSnpv4YgXZiAdaRH0+Rq60h3VhSx80V/GhIDkgZR10vmkuwF1N3jhhz9aRo8LLD4ff5OgXLimlfMXcSIPuyfjqJcxPxDRiouB5DndZ1kQz5dDjvpSVf2qZnwpdmYLKdUUiGGPxIlHQiPas89V0qswdC6497cElumvLrngGqTJkZscqv6ouG2f0OrpG6Ei2Zn4TY19Lk9NbJPoaaQZIBZSq0XCtZUA7d3PA2XkCWjmZueMp2A4tCAorCWj6i6E3kIrdi2y7VdUXMK5IQwL1ODMaERiIbTXBJbVrhlVGqhDyHvDIuotZrahRKcH/dGKlHT6GOh0AiVMK8Tzohvd/1DqWSOsUrv6/uL6cpoulHtaNasUn2g1+as+1/aN3+PukRM38uB/fouGVfLgmdpOE3dunZMoCAT8ZvWsyLQq5HJzPKp8dnEjpdvCDijtK2oY+4Fte+c9yCkKSI9o3pZZZEGbyVB7g/qoYjmnzB6UvMvTFVVXtvqMnEmcwOaYKyi0HF6aat2Ve6C6mKE8L/YuQwof83w3Z5XmIHwIZ2oGMal/R+I06RZSVRWXaOUkQuB8sHRlexzojF3AdtuOI7nq6sqs2lcG4+ML2g+c2ZAxM9tnpLd69JMkvGu7iMwJ1692U5EjqV1QDP6l+mc+OUUzf8X6XSuc3UdFj+vXovcLlbwYzYR22mSvd+Sld4DusAh+aVZhGTkOMpJe7mDCGP0YbiYqikir3ZKx0d
+Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
+        by smtp.gmail.com with ESMTPSA id f22-20020ac84996000000b0042c22902ca2sm112941qtq.81.2024.02.05.09.08.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Feb 2024 08:43:32 -0800 (PST)
-Date: Mon, 5 Feb 2024 09:43:30 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Emily Deng <Emily.Deng@amd.com>
-Cc: <bhelgaas@google.com>, <linux-pci@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
- <Jerry.Jiang@amd.com>, <Andy.Zhang@amd.com>, <HaiJun.Chang@amd.com>,
- <Monk.Liu@amd.com>, <Horace.Chen@amd.com>, <ZhenGuo.Yin@amd.com>
-Subject: Re: [PATCH 1/2] PCI: Add VF reset notification to PF's VFIO user
- mode driver
-Message-ID: <20240205094330.59ca4c0a.alex.williamson@redhat.com>
-In-Reply-To: <20240205071538.2665628-1-Emily.Deng@amd.com>
-References: <20240205071538.2665628-1-Emily.Deng@amd.com>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+        Mon, 05 Feb 2024 09:08:39 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1rX2SV-000d2w-7N;
+	Mon, 05 Feb 2024 13:08:39 -0400
+Date: Mon, 5 Feb 2024 13:08:39 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: James Gowans <jgowans@amazon.com>
+Cc: linux-kernel@vger.kernel.org, Eric Biederman <ebiederm@xmission.com>,
+	kexec@lists.infradead.org, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, iommu@lists.linux.dev,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>,
+	linux-fsdevel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+	Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
+	Alexander Graf <graf@amazon.com>,
+	David Woodhouse <dwmw@amazon.co.uk>,
+	"Jan H . Schoenherr" <jschoenh@amazon.de>,
+	Usama Arif <usama.arif@bytedance.com>,
+	Anthony Yznaga <anthony.yznaga@oracle.com>,
+	Stanislav Kinsburskii <skinsburskii@linux.microsoft.com>,
+	madvenka@linux.microsoft.com, steven.sistare@oracle.com,
+	yuleixzhang@tencent.com
+Subject: Re: [RFC 13/18] vfio: add ioctl to define persistent pgtables on
+ container
+Message-ID: <20240205170839.GA31743@ziepe.ca>
+References: <20240205120203.60312-1-jgowans@amazon.com>
+ <20240205120203.60312-14-jgowans@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240205120203.60312-14-jgowans@amazon.com>
 
-On Mon, 5 Feb 2024 15:15:37 +0800
-Emily Deng <Emily.Deng@amd.com> wrote:
+On Mon, Feb 05, 2024 at 12:01:58PM +0000, James Gowans wrote:
+> The previous commits added a file type in pkernfs for IOMMU persistent
+> page tables. Now support actually setting persistent page tables on an
+> IOMMU domain. This is done via a VFIO ioctl on a VFIO container.
 
-> VF doesn't have the ability to reset itself completely which will cause the
-> hardware in unstable state. So notify PF driver when the VF has been reset
-> to let the PF resets the VF completely, and remove the VF out of schedule.
-> 
-> How to implement this?
-> Add the reset callback function in pci_driver
-> 
-> Implement the callback functin in VFIO_PCI driver.
-> 
-> Add the VF RESET IRQ for user mode driver to let the user mode driver
-> know the VF has been reset.
+Please no changes to VFIO in the iommu area, new features need to be
+implemented on top of iommufd instead.
 
-The solution that already exists for this sort of issue is a vfio-pci
-variant driver for the VF which communicates with an in-kernel PF
-driver to coordinate the VF FLR with the PF driver.  This can be done
-by intercepting the userspace access to the VF FLR config space region.
+We already have the infrastructure there to customize iommu_domain
+allocations that this can be implemented on top of.
 
-This solution of involving PCI-core and extending the vfio-pci interface
-only exists for userspace PF drivers.  I don't see that facilitating
-vendors to implement their PF drivers in userspace to avoid upstreaming
-is a compelling reason to extend the vfio-pci interface.  Thanks,
-
-Alex
- 
-> Signed-off-by: Emily Deng <Emily.Deng@amd.com>
-> ---
->  drivers/pci/pci.c   | 8 ++++++++
->  include/linux/pci.h | 1 +
->  2 files changed, 9 insertions(+)
-> 
-> diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
-> index 60230da957e0..aca937b05531 100644
-> --- a/drivers/pci/pci.c
-> +++ b/drivers/pci/pci.c
-> @@ -4780,6 +4780,14 @@ EXPORT_SYMBOL_GPL(pcie_flr);
->   */
->  int pcie_reset_flr(struct pci_dev *dev, bool probe)
->  {
-> +	struct pci_dev *pf_dev;
-> +
-> +	if (dev->is_virtfn) {
-> +		pf_dev = dev->physfn;
-> +		if (pf_dev->driver->sriov_vf_reset_notification)
-> +			pf_dev->driver->sriov_vf_reset_notification(pf_dev, dev);
-> +	}
-> +
->  	if (dev->dev_flags & PCI_DEV_FLAGS_NO_FLR_RESET)
->  		return -ENOTTY;
->  
-> diff --git a/include/linux/pci.h b/include/linux/pci.h
-> index c69a2cc1f412..4fa31d9b0aa7 100644
-> --- a/include/linux/pci.h
-> +++ b/include/linux/pci.h
-> @@ -926,6 +926,7 @@ struct pci_driver {
->  	int  (*sriov_configure)(struct pci_dev *dev, int num_vfs); /* On PF */
->  	int  (*sriov_set_msix_vec_count)(struct pci_dev *vf, int msix_vec_count); /* On PF */
->  	u32  (*sriov_get_vf_total_msix)(struct pci_dev *pf);
-> +	void  (*sriov_vf_reset_notification)(struct pci_dev *pf, struct pci_dev *vf);
->  	const struct pci_error_handlers *err_handler;
->  	const struct attribute_group **groups;
->  	const struct attribute_group **dev_groups;
-
+Jason
 
