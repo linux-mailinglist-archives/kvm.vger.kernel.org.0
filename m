@@ -1,96 +1,153 @@
-Return-Path: <kvm+bounces-8045-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8046-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BE8A84A792
-	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 22:36:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EAA4984A8C3
+	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 23:11:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC90F28D8FF
-	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 21:36:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1ACE11C28990
+	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 22:11:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 120EF126F35;
-	Mon,  5 Feb 2024 19:56:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F22C15A10C;
+	Mon,  5 Feb 2024 21:46:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h+iUiexR"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="QBNcIh0q"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D91B7126F19
-	for <kvm@vger.kernel.org>; Mon,  5 Feb 2024 19:56:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B35435A106;
+	Mon,  5 Feb 2024 21:46:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707163003; cv=none; b=X7aXv3BK2+oul+LNnhrPvB8r+UckDgoZisH1VUgtX8lIZdn+Tv0Vg80SnGA5XL8fV6EHO7P7wZ3I/AhrHXyeAeVlDVBoET8DaU2U1tNaEtk8nxyPbunmIYl7j4mhkPCocJ21sUP2iYdcmjYvhaDjcj/yAjpNQxjpTf3ls8A+ZeA=
+	t=1707169619; cv=none; b=GFO5MibmohFTcWNI7o+X/ezHw7HzLvTVBG4hY3yUEx1tS6NskGP3EGKbsN+XezsM+bUFr+o7Jzm0UDbBuFXi0bTw88iKGbbO3EBCKIeCSTqX8qNtSLIP6pzN8lMCeVBbWIaD4tgKKkw7TK8Z41hVYNisL5nGVs9bgrnDTQaf21M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707163003; c=relaxed/simple;
-	bh=02WevOzR7F1ml83hrSRGnJAm+ID6GOUPZ73AbMLz23g=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=GOPaFVHd7ahFLbf22RdOv3dEDtXr0aiXAly6d433iNdgCp4u8UJdn89edb8flk/FG8pwA9m2HpgZUaolku7+qXv+vCUGHu2vq5FpRkqqVVGcsTbzqu5DtP17e871iZPOeQoVCzzb+OqYdo0XGlqB/WdtqJm1o5axe384iBrbyes=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h+iUiexR; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc6ade10cb8so7324223276.0
-        for <kvm@vger.kernel.org>; Mon, 05 Feb 2024 11:56:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707163001; x=1707767801; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+DTrYIkl7AT71yg6HmiI+abi1ye8K0UNowyZnbjoLdM=;
-        b=h+iUiexRo6Ateci5ZSTA0KtpMA85EJeDGz94E+7uIhoK0nqm9T1ESJUmK4D6peJxhk
-         NQ3NNtHLd8apOG5thd9TTqbuZeAOf95gE6Bd81OHQJuxLNKuC8oCWnmlD9mlD/cYgULK
-         hI99Ex1L9mIqtzw/c9mmLdrqUBHok2RHT4nrMe9OjkWxI6NusCfoDUNJxVBtPevUw97/
-         m6ElbTz3wlycyLqI7+DJV2cmYdUtz2hHlseuKJJFBZ2piVjk7suIaxavb0KV1+3s3fPV
-         OGtwHHhK6GUl/w9ST3CQASOqXbV7gbk/G3YrsiSJnPA84ski6JQ35g9K6voZ8P90bZEA
-         6wjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707163001; x=1707767801;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+DTrYIkl7AT71yg6HmiI+abi1ye8K0UNowyZnbjoLdM=;
-        b=UC5radwT0FvjsIwDz+w+2OKY9k0i8eHWLZdq7yCG/BGs/Z2910A8Kg/IpKD8Lgf1VC
-         CqGWTumEKTKZciK+ibVz7wxRYphfgQIirVs3by3bAAqzjOsDzvKddDf1fG2p4Jii0Gnc
-         nucVxrhCOaQxO19wQXtcGtX/iPYfaqIEV5/dgNfKHGEebM+eYT4GesMA5mJf1a0en1XA
-         E9qHevs0MX/6zkX9sc5KDRCeJ1Hv5pP8vzqzSX+we7zMPobwphVW8ACHaxUgWl9WObUl
-         /pUZ8+yEO6osZdsZyT0WPvHMPpoY/BXuNdUs+gJ9sQjnpOn4iGilCQXIM9Q6SFV2hMq2
-         E26A==
-X-Gm-Message-State: AOJu0YxIf1Icf0D7U6qIFmB/fneAThM3ImmByjPZsATYTjnrCMXaT22k
-	c2rUWNgkdhSoOnUw+EU6HZrP7fmgZUy1rFNpYHI91BYINWd1YtHUBpMHOtMbMsN10n29qYHcjVK
-	Abw==
-X-Google-Smtp-Source: AGHT+IEo0T5iGmQc0qy1LFrIp+gQ5qjOdl3u69OaxCF7rFqPrH8fm5Bfv8wVZHEzVTMDhVnHv+fG0+ZUEOI=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:2208:b0:dc6:c9e8:8b0d with SMTP id
- dm8-20020a056902220800b00dc6c9e88b0dmr1746802ybb.1.1707163001056; Mon, 05 Feb
- 2024 11:56:41 -0800 (PST)
-Date: Mon, 5 Feb 2024 11:56:39 -0800
-In-Reply-To: <20240203124522.592778-1-minipli@grsecurity.net>
+	s=arc-20240116; t=1707169619; c=relaxed/simple;
+	bh=ADdQeqHsq6c4cbNHVMMeUNxJsYyvOeLIh6RTYLgnQGk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=OQeULzkjDNOn5TPa+TtbYAX4WDN3RFucfG5upbBmAVuSAGgBSTtWekvLASxvy6BUzZ/03+o1afDzLKi7IYSHFQzwYEAwuMt38jbJLdyKIhA/lS6DeRjWMEWg9kASv1OLMixW61tZEE3hLokYbXEDOrGM/6UbxrO2nPruko55C9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=QBNcIh0q; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 415LRDlf015176;
+	Mon, 5 Feb 2024 21:46:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=exwJpbKaDberRRtjsXNCtxC05LphlcH4pYtrKJjjGZo=;
+ b=QBNcIh0qQjlPVtM8nhi5kFDdAD+MCW6hXfQRLzjF6dSQLSYN1yie0dhIyoX1+zuhbczC
+ kbRO5q5xvZhfHosh4uUTau4HPm4jLbqjR2bf+0KyQ+5SZzbdzXV/gk6BkIcy+DFwgPKC
+ y9uNjjRrGg9mSGBvW2zjH5906V0Ng+xSYF3ZXIQP/ezIZCrOMM1oe/FYQHgPusplzLlC
+ 5kU343kn8vUbgXk115qINp3arv6KMMSjKrgfTN5/PbwLQNsF0raFVN2MaZGeT/muRJ2i
+ Vho8NXA2/7+NC0q2nPvlm8bXmhW76zPrFPYJCJHmAsI8TIj7n5Yd9OkePD+lP9jCqsWn 0w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w37kqrdw1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 05 Feb 2024 21:46:56 +0000
+Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 415Lkukd006438;
+	Mon, 5 Feb 2024 21:46:56 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w37kqrdn3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 05 Feb 2024 21:46:55 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 415Jjq29014865;
+	Mon, 5 Feb 2024 21:43:05 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3w20tnk32t-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 05 Feb 2024 21:43:05 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 415Lh2cV43188818
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 5 Feb 2024 21:43:02 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 612AA2004B;
+	Mon,  5 Feb 2024 21:43:02 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5054920043;
+	Mon,  5 Feb 2024 21:43:02 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Mon,  5 Feb 2024 21:43:02 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
+	id 1CB6BE050E; Mon,  5 Feb 2024 22:43:02 +0100 (CET)
+From: Eric Farman <farman@linux.ibm.com>
+To: Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>
+Cc: Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, Eric Farman <farman@linux.ibm.com>
+Subject: [PATCH] KVM: s390: only deliver the set service event bits
+Date: Mon,  5 Feb 2024 22:43:00 +0100
+Message-Id: <20240205214300.1018522-1-farman@linux.ibm.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240203124522.592778-1-minipli@grsecurity.net>
-Message-ID: <ZcE9dyQ3SOuUZ8Kv@google.com>
-Subject: Re: [PATCH 0/3] KVM: x86 - misc fixes
-From: Sean Christopherson <seanjc@google.com>
-To: Mathias Krause <minipli@grsecurity.net>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: l7YgtaTJbLjyUcohnal6N8ymwYdSn__K
+X-Proofpoint-GUID: MWx81qCgV0LdOyGB5Vq_lDomgFh49Tqh
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-05_16,2024-01-31_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=790
+ clxscore=1015 phishscore=0 mlxscore=0 impostorscore=0 suspectscore=0
+ spamscore=0 lowpriorityscore=0 priorityscore=1501 malwarescore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2402050163
 
-On Sat, Feb 03, 2024, Mathias Krause wrote:
-> This is v2 of an old patch which gained an info leak fix to make it a
-> series.
-> 
-> v1 -> v2:
-> - drop the stable cc, shorten commit log
-> - split out dr6 change
-> - add KVM_GET_MSRS stack info leak fix
+The SCLP driver code masks off the last two bits of the parameter [1]
+to determine if a read is required, but doesn't care about the
+contents of those bits. Meanwhile, the KVM code that delivers
+event interrupts masks off those two bits but sends both to the
+guest, even if only one was specified by userspace [2].
 
-In the future, please post unrelated patches separately.  Bundling things into a
-"misc fixes" series might seem like it's less work for maintainers, but for me at
-least, it ends up being more work, e.g. to route patches into different branches.
-It often ends up being more work for the contributor too, e.g. if only one patch
-needs a new version.
+This works for the driver code, but it means any nuances of those
+bits gets lost. Use the event pending mask as an actual mask, and
+only send the bit(s) that were specified in the pending interrupt.
+
+[1] Linux: sclp_interrupt_handler() (drivers/s390/char/sclp.c:658)
+[2] QEMU: service_interrupt() (hw/s390x/sclp.c:360..363)
+
+Fixes: 0890ddea1a90 ("KVM: s390: protvirt: Add SCLP interrupt handling")
+Signed-off-by: Eric Farman <farman@linux.ibm.com>
+---
+ arch/s390/kvm/interrupt.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
+index fc4007cc067a..20e080e9150b 100644
+--- a/arch/s390/kvm/interrupt.c
++++ b/arch/s390/kvm/interrupt.c
+@@ -1031,7 +1031,7 @@ static int __must_check __deliver_service_ev(struct kvm_vcpu *vcpu)
+ 		return 0;
+ 	}
+ 	ext = fi->srv_signal;
+-	/* only clear the event bit */
++	/* only clear the event bits */
+ 	fi->srv_signal.ext_params &= ~SCCB_EVENT_PENDING;
+ 	clear_bit(IRQ_PEND_EXT_SERVICE_EV, &fi->pending_irqs);
+ 	spin_unlock(&fi->lock);
+@@ -1041,7 +1041,7 @@ static int __must_check __deliver_service_ev(struct kvm_vcpu *vcpu)
+ 	trace_kvm_s390_deliver_interrupt(vcpu->vcpu_id, KVM_S390_INT_SERVICE,
+ 					 ext.ext_params, 0);
+ 
+-	return write_sclp(vcpu, SCCB_EVENT_PENDING);
++	return write_sclp(vcpu, ext.ext_params & SCCB_EVENT_PENDING);
+ }
+ 
+ static int __must_check __deliver_pfault_done(struct kvm_vcpu *vcpu)
+-- 
+2.40.1
+
 
