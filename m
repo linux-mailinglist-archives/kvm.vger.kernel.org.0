@@ -1,301 +1,386 @@
-Return-Path: <kvm+bounces-8043-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8044-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5259D84A700
-	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 22:20:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A46F84A783
+	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 22:35:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AA6B9B26852
-	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 21:19:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C94C1C27307
+	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 21:35:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 458015D8E2;
-	Mon,  5 Feb 2024 19:34:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 402CF84FCC;
+	Mon,  5 Feb 2024 19:53:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="UEXeiM8v";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="UdPnZyLt"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qCyIX7ob"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6009E5D75A;
-	Mon,  5 Feb 2024 19:34:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707161646; cv=fail; b=cUWht9K2W0LVLSVw4oDpORfuMBj/Soh0BDL4L2RIoxvIpJpr2SN1qjhUmBt5QD1wX907I46ONOZgfIYlNGrPYlcQO37NL841exwWJrX/X4fRTczametr2LZHIuYgHs1zJe8issd1XyE/cSfYhtDJe/Zw9ZmigaBWRglZt90DfN8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707161646; c=relaxed/simple;
-	bh=+S6MY1j3WdTBTyHJ7I3fxBeDoT2oqL3LDd6ZIAnDjCw=;
-	h=References:From:To:Cc:Subject:In-reply-to:Date:Message-ID:
-	 Content-Type:MIME-Version; b=bIAliXqDeh6tIty6HY8EhsiVdDIJDoXp/o1ZaQ104WkstGfmu7CamebHbDOdXSSxDUanNR0tXhWbBpqeF9UR/VwhAPxA90MqTTOYqChR+UHB1/il0wzDZtjnwZdsDlh426BGQyG+AtruZblrHHgDEcFOPRxrDiYZDT6czsvrvzA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=UEXeiM8v; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=UdPnZyLt; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 415J41xj019251;
-	Mon, 5 Feb 2024 19:33:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=references : from :
- to : cc : subject : in-reply-to : date : message-id : content-type :
- mime-version; s=corp-2023-11-20;
- bh=U5aqUBUpelIeMjha9AyN6uIel7EPdOhfDHReH6xNHkY=;
- b=UEXeiM8va0XC2zIjl5JppJk4x2/e8ABOLgpD46ei2ZYzuObY0QmOW9R8Zcu10q7Nms5X
- 2vLWBAJvfj1lJ8nkroght8fGdRxYLxoxoudeMiJpoUzk39HmJJ/1WUqfU4y5dq5vQGyT
- 70vWK3ZNwPPEGh2dJ4CMH49HBddXP6bREK6XktQW24aVgyBFmcSuDBT44u29p5MWHo8i
- aDoZTgFg9371zdn1zZHEbktvxgGA7GQj05l2tb5NoHxD2yZ5+KQ+r4PiZBnQy7f2Tp9u
- oBVqMs/h9S1tu3RzpPrzqpLtYY2RLo/WrFjUi9UkN3tJ1iMZfo1DvPptxnXhZPjPpi0K hA== 
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3w1bwemv68-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 05 Feb 2024 19:33:16 +0000
-Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 415JQJhL007040;
-	Mon, 5 Feb 2024 19:33:15 GMT
-Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2168.outbound.protection.outlook.com [104.47.58.168])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3w1bx6cjs3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 05 Feb 2024 19:33:15 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bl2uasSH3UtEFMo21TVVLkU8RleewhbScxkIafselUGeUNJCO7qkuJziR0E9T8DMPvta7rRlWBnKKees5+nmjlslLYy4Rdx9qmwCUYNpo3jrdMLxFg9evZmuKOUg1ej8cBhNNxn/IFE5Y61w/m9kH0rU4oVwrXqzqV+8YWo86XCWLgPK+sxTtwGpQI92y0FqdRTNuP6PDslzOhgLw3PBZrZ10alwdS0im/WChh+aWyPOyuftMEY63gDuNwm39bW8Nr6BkTwfHejOl6LW1fMAXxsaTivzRcpXxDgJkBZg4KkJLNkCBGjVOJWyajMEAkhTniNLgzY+iFrQzRoqZeBAPQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=U5aqUBUpelIeMjha9AyN6uIel7EPdOhfDHReH6xNHkY=;
- b=Mh+V+EomOvtE0LPaLjtk5DEWwhEBM3bEmNUJKIAcgnGzdKoCHT0HZi8nKvpeOWpe7LwLcZxYAXtoHLcln7aNBz3xAB4fn3oRKB+BppGIVjLgUgWtboaqVyYOfY5GKi42Oiu6SaMttuymulZdd835hpwbORLr2wTATCPTPf5PJ56RyN0x0UNHxYG3FMILKd7GQ9QgktvrwdUoGrV6OtLXn3b61f99kOEvtULAtb6IjMcwZSeTTTbgJsbjUybnZCuvLX0ANTnignnWUXTCSuiRAtYQuvqWWbjF6tQK68LmMC4XFVQXgabsPA9q9SgL+GBbJKqB5OLM8YrRW20/GSeuoQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 807D484051
+	for <kvm@vger.kernel.org>; Mon,  5 Feb 2024 19:53:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707162802; cv=none; b=Y1U+QloB+MgnjPz/jz7ZdBHN8B7HyHC3NO7toGxPB8hTfcij5UmI4sxErikAkBE7db06t4LclMII+p1dX7vjzy2P8rnwKQBW9Ih9NAhjBF8E03vuu87jgTnUFTIFHDEtWsMg85YDJUZTztJ19Z0HGvrs6xo441oi3Lw3F1gmeVM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707162802; c=relaxed/simple;
+	bh=jZRv8itKaPnOpEu+wwWpRGtxcnj8s2QUKv+eAKP5POw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=DTT6/EdstIFb+isHXqn/P6Xh3tzRe5YQc7y/iDqJvOmCrOT/FSGWtnl0ByTQ/l5Yp7M8qzxchbWV/CQG67fYweHykGHF0wn8krFYls44SQzwRPEC9jrWDqqdVZ+d7ESUCZAh3ctTJ41ZRdJt5ckNJDLK1pLWAPlnpFq7A7wtl8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qCyIX7ob; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6040f058d3fso106077417b3.3
+        for <kvm@vger.kernel.org>; Mon, 05 Feb 2024 11:53:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=U5aqUBUpelIeMjha9AyN6uIel7EPdOhfDHReH6xNHkY=;
- b=UdPnZyLtnE/evIdau59sBSzHmDkbR9WxwW+0XTCY/+OoqJwQ35QMyBsyfM2QnxCyjP4zB8IlreA1cdrkHYGGUpPHc49Gcv9pP0B2HegzEZ9qRR7a2wepINNHwTMBwJxP99MJ0/iDsgjIlwgloaM8lRTgQmX1kHTzQnBam/H0iD8=
-Received: from CO6PR10MB5409.namprd10.prod.outlook.com (2603:10b6:5:357::14)
- by CY8PR10MB6852.namprd10.prod.outlook.com (2603:10b6:930:84::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7249.36; Mon, 5 Feb
- 2024 19:33:12 +0000
-Received: from CO6PR10MB5409.namprd10.prod.outlook.com
- ([fe80::91b3:fd53:a6ee:8685]) by CO6PR10MB5409.namprd10.prod.outlook.com
- ([fe80::91b3:fd53:a6ee:8685%4]) with mapi id 15.20.7249.035; Mon, 5 Feb 2024
- 19:33:12 +0000
-References: <1700488898-12431-1-git-send-email-mihai.carabas@oracle.com>
- <1700488898-12431-8-git-send-email-mihai.carabas@oracle.com>
- <20231211114642.GB24899@willie-the-truck>
- <1b3650c5-822e-4789-81d2-0304573cabd9@oracle.com>
- <20240129181547.GA12305@willie-the-truck>
- <1b25b492-b9e7-4411-90d1-463d44084043@oracle.com>
-User-agent: mu4e 1.4.10; emacs 27.2
-From: Ankur Arora <ankur.a.arora@oracle.com>
-To: Mihai Carabas <mihai.carabas@oracle.com>
-Cc: Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org,
-        kvm@vger.kernel.org, linux-pm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, catalin.marinas@arm.com,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
-        hpa@zytor.com, pbonzini@redhat.com, wanpengli@tencent.com,
-        vkuznets@redhat.com, rafael@kernel.org, daniel.lezcano@linaro.org,
-        akpm@linux-foundation.org, pmladek@suse.com, peterz@infradead.org,
-        dianders@chromium.org, npiggin@gmail.com, rick.p.edgecombe@intel.com,
-        joao.m.martins@oracle.com, juerg.haefliger@canonical.com,
-        mic@digikod.net, arnd@arndb.de, ankur.a.arora@oracle.com
-Subject: Re: [PATCH 7/7] cpuidle/poll_state: replace cpu_relax with
- smp_cond_load_relaxed
-In-reply-to: <1b25b492-b9e7-4411-90d1-463d44084043@oracle.com>
-Date: Mon, 05 Feb 2024 11:33:23 -0800
-Message-ID: <87ttmmu2nw.fsf@oracle.com>
-Content-Type: text/plain
-X-ClientProxiedBy: LO4P123CA0096.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:191::11) To CO6PR10MB5409.namprd10.prod.outlook.com
- (2603:10b6:5:357::14)
+        d=google.com; s=20230601; t=1707162799; x=1707767599; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=mR0JyUctXntX6xrlSqqa1F9irdK0t/gq0bkhIw77qws=;
+        b=qCyIX7obVhO+pIwLQIUCOQaAvA7O650ljYI8lLLWltPqLrG39aSC/hl9lNVyjOYCOH
+         b3Y8V6tdyaXc907//RfPDU6G7SmJnVWzHCSgXmCq/iNz4ruJuZp86f8FzKlbxUGnHbh/
+         Y/Qxb2g/8R0UrOLapu/YoUJmUdq96rgIFNVSXfPKB7u7M34NwdngpQ2MMe3byixHdL+z
+         QyqiKurotwC93mFFz0YAajBH4Qjz5rA+DNtyUYlWHwmRnlEvR66BO8i+5N9GDKyoVH1i
+         PN5PBY80zE2TVuqigbRk2F0qNzVQb04POhMAmdSjAkrdKHJkBv5lD+Hl8nmQXVeOLrm7
+         /rBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707162799; x=1707767599;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mR0JyUctXntX6xrlSqqa1F9irdK0t/gq0bkhIw77qws=;
+        b=Dr/rcfXdzpr19+Cpl5ml0UOF0D5uokA7LrpkcnV7kGomxEH1vAoNXOGxz8EnzouCWp
+         KUU+fTFJ0SABABkDujae7/ujJqDXdgt/pN4pEh18nMK3OfXhYd65R2E8wvmT14p1cw/7
+         vjyK5wD5CN853Y3x9pwil8BHx8I/fTK+ZsO8zqAH3CTUIfa1OUGavpGSDdGHlwSzKb7q
+         zbnyZadQSi3gAunV00ITz6fM86fEDoylifCsyVTZM/e9S0RTNkvvQ+Xav51FlaxIkEMx
+         GmiyVgFxX0oF9tilFbXUtodkqa3ya/v9WRd7gVBaDU+mwnx1yshPCMDS3EulyHphzaUu
+         vuIw==
+X-Gm-Message-State: AOJu0Yzo5AHDFHIEH2/cTqn2QT4VkYTuZ3fl/YfJmDSJmlIzFTGw2lzA
+	cT0d2uVJ84kuFJALDzBfSVpCPEKutXiZ1yEzVXk+Dl+XY6Ljgz7ULdxc/FbAzzRwjBBPI3FyhVG
+	Wqw==
+X-Google-Smtp-Source: AGHT+IHD2z+BfZZPmCwQp1UHaG5MZacGl5kLBqTQGuOOCsv953ZbL7QURzJUrT4EgpWKQoP1ShleUAqaGVc=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:9ad6:0:b0:5fc:d439:4936 with SMTP id
+ r205-20020a819ad6000000b005fcd4394936mr121812ywg.8.1707162799558; Mon, 05 Feb
+ 2024 11:53:19 -0800 (PST)
+Date: Mon, 5 Feb 2024 11:53:17 -0800
+In-Reply-To: <20240203124522.592778-3-minipli@grsecurity.net>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO6PR10MB5409:EE_|CY8PR10MB6852:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0251e63c-771d-4854-bf50-08dc26814a5c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 
-	4aHx+RVdaYqEdyqAQV9tnT/j52KbmhSxjG9qGAWfjd36Kwon5EAIigLiEC1fzgwH8eoxsZZdGh4Cfc/HI/z7ihMIWeDCxVth2aYMWqNlaCKDsOibeKq4tvPNcVOIHMghYp/Lw5wAThLOkyQV2Ke2otfCYABmhfyzUOeLaXnruTwU4DPVVDXIQa9MBuSAj22+qpd20iqK+UJhek52JNQPJvgjEZQ19uY859E2JuUcGO9CUApDH9mQNTdDMK2C/8qYdTU2R4o7S31u9ugPpIPgHgDfWBIxkJ+vddgn0i8/FBB35qKjuPbQBG8BuCEumTRrYaBwXR/OJ6koNLsK6o5CYLS9EsECt1BM1W1zvO2M55/YQEZiI0IOUUp3RAv4SOkJNCacrMmpkWb/6sRb/3kfKW37IcIx/epQrK2OOD+nk2dCkzN7Pl+mMhsTsvOziHCd48Hsy5BmC4BoZj+u/norOzRsrlg9cACfQIctkHvjM5CqQXiFM/03l7hATaUczWZ3s8kbOkZnCAIoycsQ2NdSLVe8iZdq3cKz1D7LuT98bBUphxBcohLqa5P+xjEajEf4
-X-Forefront-Antispam-Report: 
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO6PR10MB5409.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(396003)(346002)(136003)(366004)(39860400002)(230922051799003)(1800799012)(186009)(451199024)(64100799003)(41300700001)(66556008)(66476007)(66946007)(36756003)(37006003)(6636002)(316002)(7416002)(5660300002)(2906002)(6862004)(4326008)(8676002)(8936002)(83380400001)(38100700002)(6666004)(6506007)(6512007)(478600001)(6486002)(26005)(2616005)(107886003)(86362001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: 
-	=?us-ascii?Q?h82tS+rvyE5MwJ0SVKoUuuRIgtpLVCGVVoPTfrfFvpjyWdmNdstoosYloYH7?=
- =?us-ascii?Q?4G4Ps28c5aoCIYsfQYBTKvi6fk4V1QhOYT8EzuErdPlulkcLeGMChRFyRyX+?=
- =?us-ascii?Q?mzGl+TXiSS+ZNoXR4D/wJ5pICGVH12duNf+7o3U5jJ5GOUQmjGFqoFhu7vlY?=
- =?us-ascii?Q?/6YobxRO4oCfq1NHvF+EabsQNj6GIgzGFkYR0LSxzRppO5JdOnA7fUwsBAe9?=
- =?us-ascii?Q?91phnn2cJ4oyY+iC5pKGYKWviyxv27+ehYbXig/WU8lxjJZQq1Kl/hMMz1Ch?=
- =?us-ascii?Q?vmdAkzo4u9RdXycAh0ZtDx5oylefF1fOpiRoH/sNbF1NtqaVmohrut0hbxG7?=
- =?us-ascii?Q?53enZXytiz9+otZ8cOd6yt9mEPqakral9r2JtS9ZfFiS/I2B7hDz1bzOY0eu?=
- =?us-ascii?Q?LOyWVB58wJyseuqu2lTJhExRGbSJiPVvf9bsVC+CML3tIS4yG/6GbboLblP9?=
- =?us-ascii?Q?itHd6iC+pe+me+DiEJlMv86PvHpYi0bMroRhdVAQKLA4kjEI2FY7/VH5kTNP?=
- =?us-ascii?Q?o2jao+LxRMcevoJfI8DlB4j5/1ifxhAoQ8jGae3j8l8fmd+W8xHV/U/px8PR?=
- =?us-ascii?Q?rk4R+p09aDJsMV6A6z17yasv3ljVqKxSbfD/kR+oS0I4sLw+LOgVS7WH2jHd?=
- =?us-ascii?Q?iZ+tFYW/pm430z+X9D2xAP+VUYNxkkGBAyb4oY3tsIvRswhSiAQZz6Htp7W4?=
- =?us-ascii?Q?DcFyCMTQDlYN9dLwPAxzJw69mZV+BWVwZ5DH0MfVK1bMiXoA/WcIrlPLdz1D?=
- =?us-ascii?Q?wTCP1uHx+OjQx8/k8gIOa8NsoNqJgOEb4S2zLASl59RR5DM2tlM4E2MBWAHV?=
- =?us-ascii?Q?yna6sxHXtqPlXdkqe00urHJieMxV+5YhGQQQg592VL3FMetfqMTlg1hh/MdI?=
- =?us-ascii?Q?m3FLMk9XBLkYWEaYZdG4nXf9bIy49J6/0XArumUkModdxIXSDVufJQnVNhkZ?=
- =?us-ascii?Q?PJKf8NeMAeUytjJ1rsrdAvN+J4t/aLDmgm4M4NfHEn1opV+Y8fNYBZtqzp/5?=
- =?us-ascii?Q?yUOoNUEFJuopHaxPFf2aibap96IECqXr4Lk3uIoi9r8wH3QYKBIfy+7ACMFH?=
- =?us-ascii?Q?8jeCKvrhkUcn0jJnSlShNf9ZXjb4K+G0Fxr3R7K5WN6dfslBJiSiy2ObqWhJ?=
- =?us-ascii?Q?0GRByQGGBvgcKb1y4PDgHcLSUk4hkEOyv0VzspIa3ZvelTy3/pJuYyWCf+IA?=
- =?us-ascii?Q?vmJJDedhdjKI41At0lFN4NNpikDqgoHX4Wq+r5stIat+Stz308BjopXR41yl?=
- =?us-ascii?Q?bO0qn+KQ2+Sz+N4LK7MMbTTORTnLjDTRfoN6QA5XPQIrZBOoCWOpmiBEU4cV?=
- =?us-ascii?Q?706cFZjyM0mRgpQAPvhU0DeYb1fjs4NtFXl2/8LRPgAclfy4VOrAf5wUsFh6?=
- =?us-ascii?Q?dXikXGcsdbvdiaMBaRGxgjDsiswHirT61vhVIoRNYYoqDpY24JQ0rTsVcyhy?=
- =?us-ascii?Q?LCqH482IPA85BHes+nA4sJpA25cqoJeC4csrMcSgWJiInZbMITkh3qQR4ppp?=
- =?us-ascii?Q?+moL9+KXqpBXDfcZCrzNG7vk5obnzyAr460uIuEYSI1ScjRy0CMgi2CcuEYR?=
- =?us-ascii?Q?cV3ayC/OmzEplf+8RvGMoUl25L7r9b0gPM9jDTVg?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	ZjYhGo1LBqYeQhbbkwIfTpu3Kot298LdXS0YCN96JBzElh6Fj9GohYF/q+jTqr+PMjODnqZfD1NEvhdBbijxPAMUXVWp4NG5bdKwds7CLGf5BzHvu/uBBBGuNsNkocZbfOh/pWvebPn5DgloHAULmsLD+FKA+6KlaKY1QeVCu5ZUswD/Cyb8KMuz5JvNngDUnKPocj1o1ghyJuIRDn9LrrKUQ1iLBBjmlyBqDLeoXDVeU5CUvWN7aJPKbpFh9HVduUKyPiUvjOc2+pnF6Byctxk4M3qeUObYVpKPtnn9ewHI7SXOv1ixnqyyzWN2gqJwvc4HkB++DrjyBk1dxJESaZWlRqOU4sNZPl/2YSNHKG142RweCioC87XwK+WXqzikhDrU8D/MiditkfzOi0Za6RZcwH21rCraP/mM/Wy189utWCn82QHtkCv7hav3ionG4FWbT6F4+YOiL4OLpZtRK4eVKATA9F/OOAxIdR5aCjUYqLN+Kb7yZTaGJcLmn2kwRvBPCNKfPoxGljA6fOQwkwvGjZyIHCPpTPfMbNMKjzFneSKtH21dMKOMTE9IJn3kUQXfqtZsm4TfX9c45KuBIQwtrEwKQ0QmYMJGGseCvuE=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0251e63c-771d-4854-bf50-08dc26814a5c
-X-MS-Exchange-CrossTenant-AuthSource: CO6PR10MB5409.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Feb 2024 19:33:12.2581
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: BJlDIXnGa/dwZJGF8tR24Rv867GcYvLEcBuv05T/1/op0TieuOfc726EIn6F+vwJHMyjuOF9hQEYDZNzeYD94jI3E5ID/YrH/SW2ecEk87g=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR10MB6852
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-05_13,2024-01-31_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 suspectscore=0
- mlxlogscore=999 bulkscore=0 mlxscore=0 adultscore=0 malwarescore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2402050145
-X-Proofpoint-ORIG-GUID: aH0LwGCI1vwOTtGkBwAT7rwWBpk_wEtO
-X-Proofpoint-GUID: aH0LwGCI1vwOTtGkBwAT7rwWBpk_wEtO
+Mime-Version: 1.0
+References: <20240203124522.592778-1-minipli@grsecurity.net> <20240203124522.592778-3-minipli@grsecurity.net>
+Message-ID: <ZcE8rXJiXFS6OFRR@google.com>
+Subject: Re: [PATCH 2/3] KVM: x86: Simplify kvm_vcpu_ioctl_x86_get_debugregs()
+From: Sean Christopherson <seanjc@google.com>
+To: Mathias Krause <minipli@grsecurity.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
+On Sat, Feb 03, 2024, Mathias Krause wrote:
+> Take 'dr6' from the arch part directly as already done for 'dr7'.
+> There's no need to take the clunky route via kvm_get_dr().
+> 
+> Signed-off-by: Mathias Krause <minipli@grsecurity.net>
+> ---
+>  arch/x86/kvm/x86.c | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 13ec948f3241..0f958dcf8458 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -5504,12 +5504,9 @@ static int kvm_vcpu_ioctl_x86_set_vcpu_events(struct kvm_vcpu *vcpu,
+>  static void kvm_vcpu_ioctl_x86_get_debugregs(struct kvm_vcpu *vcpu,
+>  					     struct kvm_debugregs *dbgregs)
+>  {
+> -	unsigned long val;
+> -
+>  	memset(dbgregs, 0, sizeof(*dbgregs));
+>  	memcpy(dbgregs->db, vcpu->arch.db, sizeof(vcpu->arch.db));
+> -	kvm_get_dr(vcpu, 6, &val);
+> -	dbgregs->dr6 = val;
+> +	dbgregs->dr6 = vcpu->arch.dr6;
 
-Mihai Carabas <mihai.carabas@oracle.com> writes:
+Blech, kvm_get_dr() is so dumb, it takes an out parameter despite have a void
+return.  I would rather fix that wart and go the other direction, i.e. make dr7
+go through kvm_get_dr().  This obviously isn't a fast path, so the extra CALL+RET
+is a non-issue.  And if we wanted to fix that, e.g. for other paths that are
+slightly less slow, we should do so for all reads (and writes) to dr6 and dr7,
+e.g. provide dedicated APIs like we do for GPRs.
 
->>>>> cpu_relax on ARM64 does a simple "yield". Thus we replace it with
->>>>> smp_cond_load_relaxed which basically does a "wfe".
->>>>>
->>>>> Suggested-by: Peter Zijlstra <peterz@infradead.org>
->>>>> Signed-off-by: Mihai Carabas <mihai.carabas@oracle.com>
->>>>> ---
->>>>>    drivers/cpuidle/poll_state.c | 14 +++++++++-----
->>>>>    1 file changed, 9 insertions(+), 5 deletions(-)
->>>>>
->>>>> diff --git a/drivers/cpuidle/poll_state.c b/drivers/cpuidle/poll_state.c
->>>>> index 9b6d90a72601..440cd713e39a 100644
->>>>> --- a/drivers/cpuidle/poll_state.c
->>>>> +++ b/drivers/cpuidle/poll_state.c
->>>>> @@ -26,12 +26,16 @@ static int __cpuidle poll_idle(struct cpuidle_device *dev,
->>>>>    		limit = cpuidle_poll_time(drv, dev);
->>>>> -		while (!need_resched()) {
->>>>> -			cpu_relax();
->>>>> -			if (loop_count++ < POLL_IDLE_RELAX_COUNT)
->>>>> -				continue;
->>>>> -
->>>>> +		for (;;) {
->>>>>    			loop_count = 0;
->>>>> +
->>>>> +			smp_cond_load_relaxed(&current_thread_info()->flags,
->>>>> +					      (VAL & _TIF_NEED_RESCHED) ||
->>>>> +					      (loop_count++ >= POLL_IDLE_RELAX_COUNT));
->>>>> +
->>>>> +			if (loop_count < POLL_IDLE_RELAX_COUNT)
->>>>> +				break;
->>>>> +
->>>>>    			if (local_clock_noinstr() - time_start > limit) {
->>>>>    				dev->poll_time_limit = true;
->>>>>    				break;
->>>> Doesn't this make ARCH_HAS_CPU_RELAX a complete misnomer?
->>> This controls the build of poll_state.c and the generic definition of
->>> smp_cond_load_relaxed (used by x86) is using cpu_relax(). Do you propose
->>> other approach here?
->> Give it a better name? Having ARCH_HAS_CPU_RELAX control a piece of code
->> that doesn't use cpu_relax() doesn't make sense to me.
->
-> The generic code for smp_cond_load_relaxed is using cpu_relax and this one is
-> used on x86 - so ARCH_HAS_CPU_RELAX is a prerequisite on x86 when using
-> haltpoll. Only on ARM64 this is overwritten. Moreover ARCH_HAS_CPU_RELAX is
-> controlling the function definition for cpuidle_poll_state_init (this is how it
-> was originally designed).
+Alternatively, I would probably be ok just open coding all direct reads and writes
+to dr6 and dr7.  IIRC, at one point KVM was doing something meaningful in kvm_get_dr()
+for DR7 (which probably contributed to the weird API), but that's no longer the
+case.
 
-I suspect Will's point is that the term ARCH_HAS_CPU_RELAX doesn't make
-a whole lot of sense when we are only indirectly using cpu_relax() in
-the series.
+Actually, it probably makes sense to do both, i.e. do the below, and then open
+code all direct accesses.  I think the odds of us needing wrappers around reading
+and writing guest DR6 and DR7 are quite low and there are enough existing open coded
+accesses that forcing them to convert would be awkward.
 
-Also, all archs define cpu_relax() (though some as just a barrier()) so
-ARCH_HAS_CPU_RELAX .
+I'll send a small two patch series.
 
-Maybe an arch can instead just opt into polling in idle?
+---
+Subject: [PATCH] KVM: x86: Make kvm_get_dr() return a value, not use an out
+ parameter
 
-Perhaps something like this trivial patch:
+TODO: writeme
 
---
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index 5edec175b9bf..d80c98c64fd4 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -367,7 +367,7 @@ config ARCH_MAY_HAVE_PC_FDC
- config GENERIC_CALIBRATE_DELAY
- 	def_bool y
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/include/asm/kvm_host.h |  2 +-
+ arch/x86/kvm/emulate.c          | 17 ++++-------------
+ arch/x86/kvm/kvm_emulate.h      |  2 +-
+ arch/x86/kvm/smm.c              | 15 ++++-----------
+ arch/x86/kvm/svm/svm.c          |  7 ++-----
+ arch/x86/kvm/vmx/nested.c       |  2 +-
+ arch/x86/kvm/vmx/vmx.c          |  5 +----
+ arch/x86/kvm/x86.c              | 20 ++++++++------------
+ 8 files changed, 22 insertions(+), 48 deletions(-)
 
--config ARCH_HAS_CPU_RELAX
-+config ARCH_WANTS_IDLE_POLL
- 	def_bool y
-
- config ARCH_HIBERNATION_POSSIBLE
-diff --git a/drivers/acpi/processor_idle.c b/drivers/acpi/processor_idle.c
-index 55437f5e0c3a..6a0a1f16a5c3 100644
---- a/drivers/acpi/processor_idle.c
-+++ b/drivers/acpi/processor_idle.c
-@@ -36,7 +36,7 @@
- #include <asm/cpu.h>
- #endif
-
--#define ACPI_IDLE_STATE_START	(IS_ENABLED(CONFIG_ARCH_HAS_CPU_RELAX) ? 1 : 0)
-+#define ACPI_IDLE_STATE_START	(IS_ENABLED(CONFIG_ARCH_WANTS_IDLE_POLL) ? 1 : 0)
-
- static unsigned int max_cstate __read_mostly = ACPI_PROCESSOR_MAX_POWER;
- module_param(max_cstate, uint, 0400);
-@@ -787,7 +787,7 @@ static int acpi_processor_setup_cstates(struct acpi_processor *pr)
- 	if (max_cstate == 0)
- 		max_cstate = 1;
-
--	if (IS_ENABLED(CONFIG_ARCH_HAS_CPU_RELAX)) {
-+	if (IS_ENABLED(CONFIG_ARCH_WANTS_IDLE_POLL)) {
- 		cpuidle_poll_state_init(drv);
- 		count = 1;
- 	} else {
-diff --git a/drivers/cpuidle/Makefile b/drivers/cpuidle/Makefile
-index d103342b7cfc..23f48d99f0f2 100644
---- a/drivers/cpuidle/Makefile
-+++ b/drivers/cpuidle/Makefile
-@@ -7,7 +7,7 @@ obj-y += cpuidle.o driver.o governor.o sysfs.o governors/
- obj-$(CONFIG_ARCH_NEEDS_CPU_IDLE_COUPLED) += coupled.o
- obj-$(CONFIG_DT_IDLE_STATES)		  += dt_idle_states.o
- obj-$(CONFIG_DT_IDLE_GENPD)		  += dt_idle_genpd.o
--obj-$(CONFIG_ARCH_HAS_CPU_RELAX)	  += poll_state.o
-+obj-$(CONFIG_ARCH_WANTS_IDLE_POLL)	  += poll_state.o
- obj-$(CONFIG_HALTPOLL_CPUIDLE)		  += cpuidle-haltpoll.o
-
- ##################################################################################
-diff --git a/include/linux/cpuidle.h b/include/linux/cpuidle.h
-index 3183aeb7f5b4..53e55a91d55d 100644
---- a/include/linux/cpuidle.h
-+++ b/include/linux/cpuidle.h
-@@ -275,7 +275,7 @@ static inline void cpuidle_coupled_parallel_barrier(struct cpuidle_device *dev,
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index ad5319a503f0..464fa2197748 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -2046,7 +2046,7 @@ int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3);
+ int kvm_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4);
+ int kvm_set_cr8(struct kvm_vcpu *vcpu, unsigned long cr8);
+ int kvm_set_dr(struct kvm_vcpu *vcpu, int dr, unsigned long val);
+-void kvm_get_dr(struct kvm_vcpu *vcpu, int dr, unsigned long *val);
++unsigned long kvm_get_dr(struct kvm_vcpu *vcpu, int dr);
+ unsigned long kvm_get_cr8(struct kvm_vcpu *vcpu);
+ void kvm_lmsw(struct kvm_vcpu *vcpu, unsigned long msw);
+ int kvm_emulate_xsetbv(struct kvm_vcpu *vcpu);
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index 695ab5b6055c..33444627fcf4 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -3011,7 +3011,7 @@ static int emulator_do_task_switch(struct x86_emulate_ctxt *ctxt,
+ 		ret = em_push(ctxt);
+ 	}
+ 
+-	ops->get_dr(ctxt, 7, &dr7);
++	dr7 = ops->get_dr(ctxt, 7);
+ 	ops->set_dr(ctxt, 7, dr7 & ~(DR_LOCAL_ENABLE_MASK | DR_LOCAL_SLOWDOWN));
+ 
+ 	return ret;
+@@ -3866,15 +3866,6 @@ static int check_cr_access(struct x86_emulate_ctxt *ctxt)
+ 	return X86EMUL_CONTINUE;
  }
- #endif
+ 
+-static int check_dr7_gd(struct x86_emulate_ctxt *ctxt)
+-{
+-	unsigned long dr7;
+-
+-	ctxt->ops->get_dr(ctxt, 7, &dr7);
+-
+-	return dr7 & DR7_GD;
+-}
+-
+ static int check_dr_read(struct x86_emulate_ctxt *ctxt)
+ {
+ 	int dr = ctxt->modrm_reg;
+@@ -3887,10 +3878,10 @@ static int check_dr_read(struct x86_emulate_ctxt *ctxt)
+ 	if ((cr4 & X86_CR4_DE) && (dr == 4 || dr == 5))
+ 		return emulate_ud(ctxt);
+ 
+-	if (check_dr7_gd(ctxt)) {
++	if (ctxt->ops->get_dr(ctxt, 7) & DR7_GD) {
+ 		ulong dr6;
+ 
+-		ctxt->ops->get_dr(ctxt, 6, &dr6);
++		dr6 = ctxt->ops->get_dr(ctxt, 6);
+ 		dr6 &= ~DR_TRAP_BITS;
+ 		dr6 |= DR6_BD | DR6_ACTIVE_LOW;
+ 		ctxt->ops->set_dr(ctxt, 6, dr6);
+@@ -5449,7 +5440,7 @@ int x86_emulate_insn(struct x86_emulate_ctxt *ctxt)
+ 		ctxt->dst.val = ops->get_cr(ctxt, ctxt->modrm_reg);
+ 		break;
+ 	case 0x21: /* mov from dr to reg */
+-		ops->get_dr(ctxt, ctxt->modrm_reg, &ctxt->dst.val);
++		ctxt->dst.val = ops->get_dr(ctxt, ctxt->modrm_reg);
+ 		break;
+ 	case 0x40 ... 0x4f:	/* cmov */
+ 		if (test_cc(ctxt->b, ctxt->eflags))
+diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
+index 4351149484fb..5382646162a3 100644
+--- a/arch/x86/kvm/kvm_emulate.h
++++ b/arch/x86/kvm/kvm_emulate.h
+@@ -203,7 +203,7 @@ struct x86_emulate_ops {
+ 	ulong (*get_cr)(struct x86_emulate_ctxt *ctxt, int cr);
+ 	int (*set_cr)(struct x86_emulate_ctxt *ctxt, int cr, ulong val);
+ 	int (*cpl)(struct x86_emulate_ctxt *ctxt);
+-	void (*get_dr)(struct x86_emulate_ctxt *ctxt, int dr, ulong *dest);
++	ulong (*get_dr)(struct x86_emulate_ctxt *ctxt, int dr);
+ 	int (*set_dr)(struct x86_emulate_ctxt *ctxt, int dr, ulong value);
+ 	int (*set_msr_with_filter)(struct x86_emulate_ctxt *ctxt, u32 msr_index, u64 data);
+ 	int (*get_msr_with_filter)(struct x86_emulate_ctxt *ctxt, u32 msr_index, u64 *pdata);
+diff --git a/arch/x86/kvm/smm.c b/arch/x86/kvm/smm.c
+index dc3d95fdca7d..f5a30d3a44a1 100644
+--- a/arch/x86/kvm/smm.c
++++ b/arch/x86/kvm/smm.c
+@@ -184,7 +184,6 @@ static void enter_smm_save_state_32(struct kvm_vcpu *vcpu,
+ 				    struct kvm_smram_state_32 *smram)
+ {
+ 	struct desc_ptr dt;
+-	unsigned long val;
+ 	int i;
+ 
+ 	smram->cr0     = kvm_read_cr0(vcpu);
+@@ -195,10 +194,8 @@ static void enter_smm_save_state_32(struct kvm_vcpu *vcpu,
+ 	for (i = 0; i < 8; i++)
+ 		smram->gprs[i] = kvm_register_read_raw(vcpu, i);
+ 
+-	kvm_get_dr(vcpu, 6, &val);
+-	smram->dr6     = (u32)val;
+-	kvm_get_dr(vcpu, 7, &val);
+-	smram->dr7     = (u32)val;
++	smram->dr6     = (u32)kvm_get_dr(vcpu, 6);
++	smram->dr7     = (u32)kvm_get_dr(vcpu, 7);
+ 
+ 	enter_smm_save_seg_32(vcpu, &smram->tr, &smram->tr_sel, VCPU_SREG_TR);
+ 	enter_smm_save_seg_32(vcpu, &smram->ldtr, &smram->ldtr_sel, VCPU_SREG_LDTR);
+@@ -231,7 +228,6 @@ static void enter_smm_save_state_64(struct kvm_vcpu *vcpu,
+ 				    struct kvm_smram_state_64 *smram)
+ {
+ 	struct desc_ptr dt;
+-	unsigned long val;
+ 	int i;
+ 
+ 	for (i = 0; i < 16; i++)
+@@ -240,11 +236,8 @@ static void enter_smm_save_state_64(struct kvm_vcpu *vcpu,
+ 	smram->rip    = kvm_rip_read(vcpu);
+ 	smram->rflags = kvm_get_rflags(vcpu);
+ 
+-
+-	kvm_get_dr(vcpu, 6, &val);
+-	smram->dr6 = val;
+-	kvm_get_dr(vcpu, 7, &val);
+-	smram->dr7 = val;
++	smram->dr6 = kvm_get_dr(vcpu, 6);
++	smram->dr7 = kvm_get_dr(vcpu, 7);;
+ 
+ 	smram->cr0 = kvm_read_cr0(vcpu);
+ 	smram->cr3 = kvm_read_cr3(vcpu);
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index e90b429c84f1..dda91f7cd71b 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -2735,7 +2735,6 @@ static int dr_interception(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 	int reg, dr;
+-	unsigned long val;
+ 	int err = 0;
+ 
+ 	/*
+@@ -2763,11 +2762,9 @@ static int dr_interception(struct kvm_vcpu *vcpu)
+ 	dr = svm->vmcb->control.exit_code - SVM_EXIT_READ_DR0;
+ 	if (dr >= 16) { /* mov to DRn  */
+ 		dr -= 16;
+-		val = kvm_register_read(vcpu, reg);
+-		err = kvm_set_dr(vcpu, dr, val);
++		err = kvm_set_dr(vcpu, dr, kvm_register_read(vcpu, reg));
+ 	} else {
+-		kvm_get_dr(vcpu, dr, &val);
+-		kvm_register_write(vcpu, reg, val);
++		kvm_register_write(vcpu, reg, kvm_get_dr(vcpu, dr));
+ 	}
+ 
+ 	return kvm_complete_insn_gp(vcpu, err);
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 994e014f8a50..28d1088a1770 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -4433,7 +4433,7 @@ static void sync_vmcs02_to_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
+ 		(vm_entry_controls_get(to_vmx(vcpu)) & VM_ENTRY_IA32E_MODE);
+ 
+ 	if (vmcs12->vm_exit_controls & VM_EXIT_SAVE_DEBUG_CONTROLS)
+-		kvm_get_dr(vcpu, 7, (unsigned long *)&vmcs12->guest_dr7);
++		vmcs12->guest_dr7 = kvm_get_dr(vcpu, 7);
+ 
+ 	if (vmcs12->vm_exit_controls & VM_EXIT_SAVE_IA32_EFER)
+ 		vmcs12->guest_ia32_efer = vcpu->arch.efer;
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index e262bc2ba4e5..aa47433d0c9b 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -5566,10 +5566,7 @@ static int handle_dr(struct kvm_vcpu *vcpu)
+ 
+ 	reg = DEBUG_REG_ACCESS_REG(exit_qualification);
+ 	if (exit_qualification & TYPE_MOV_FROM_DR) {
+-		unsigned long val;
+-
+-		kvm_get_dr(vcpu, dr, &val);
+-		kvm_register_write(vcpu, reg, val);
++		kvm_register_write(vcpu, reg, kvm_get_dr(vcpu, dr));
+ 		err = 0;
+ 	} else {
+ 		err = kvm_set_dr(vcpu, dr, kvm_register_read(vcpu, reg));
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index c339d9f95b4b..b2357009bbbe 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1399,21 +1399,21 @@ int kvm_set_dr(struct kvm_vcpu *vcpu, int dr, unsigned long val)
+ }
+ EXPORT_SYMBOL_GPL(kvm_set_dr);
+ 
+-void kvm_get_dr(struct kvm_vcpu *vcpu, int dr, unsigned long *val)
++unsigned long kvm_get_dr(struct kvm_vcpu *vcpu, int dr)
+ {
+ 	size_t size = ARRAY_SIZE(vcpu->arch.db);
+ 
+ 	switch (dr) {
+ 	case 0 ... 3:
+-		*val = vcpu->arch.db[array_index_nospec(dr, size)];
++		return vcpu->arch.db[array_index_nospec(dr, size)];
+ 		break;
+ 	case 4:
+ 	case 6:
+-		*val = vcpu->arch.dr6;
++		return vcpu->arch.dr6;
+ 		break;
+ 	case 5:
+ 	default: /* 7 */
+-		*val = vcpu->arch.dr7;
++		return vcpu->arch.dr7;
+ 		break;
+ 	}
+ }
+@@ -5510,13 +5510,10 @@ static int kvm_vcpu_ioctl_x86_set_vcpu_events(struct kvm_vcpu *vcpu,
+ static void kvm_vcpu_ioctl_x86_get_debugregs(struct kvm_vcpu *vcpu,
+ 					     struct kvm_debugregs *dbgregs)
+ {
+-	unsigned long val;
+-
+ 	memset(dbgregs, 0, sizeof(*dbgregs));
+ 	memcpy(dbgregs->db, vcpu->arch.db, sizeof(vcpu->arch.db));
+-	kvm_get_dr(vcpu, 6, &val);
+-	dbgregs->dr6 = val;
+-	dbgregs->dr7 = vcpu->arch.dr7;
++	dbgregs->dr6 = kvm_get_dr(vcpu, 6);
++	dbgregs->dr7 = kvm_get_dr(vcpu, 7);
+ }
+ 
+ static int kvm_vcpu_ioctl_x86_set_debugregs(struct kvm_vcpu *vcpu,
+@@ -8165,10 +8162,9 @@ static void emulator_wbinvd(struct x86_emulate_ctxt *ctxt)
+ 	kvm_emulate_wbinvd_noskip(emul_to_vcpu(ctxt));
+ }
+ 
+-static void emulator_get_dr(struct x86_emulate_ctxt *ctxt, int dr,
+-			    unsigned long *dest)
++static unsigned long emulator_get_dr(struct x86_emulate_ctxt *ctxt, int dr)
+ {
+-	kvm_get_dr(emul_to_vcpu(ctxt), dr, dest);
++	return kvm_get_dr(emul_to_vcpu(ctxt), dr);
+ }
+ 
+ static int emulator_set_dr(struct x86_emulate_ctxt *ctxt, int dr,
 
--#if defined(CONFIG_CPU_IDLE) && defined(CONFIG_ARCH_HAS_CPU_RELAX)
-+#if defined(CONFIG_CPU_IDLE) && defined(CONFIG_ARCH_WANTS_IDLE_POLL)
- void cpuidle_poll_state_init(struct cpuidle_driver *drv);
- #else
- static inline void cpuidle_poll_state_init(struct cpuidle_driver *drv) {}
+base-commit: 60eedcfceda9db46f1b333e5e1aa9359793f04fb
+-- 
+
 
