@@ -1,91 +1,91 @@
-Return-Path: <kvm+bounces-8053-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8051-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6D1E84A96C
-	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 23:38:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2871684A967
+	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 23:37:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB7AA1C26A89
-	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 22:38:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C8331C25F6D
+	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 22:37:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12C444F8BC;
-	Mon,  5 Feb 2024 22:36:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FEA54D9E4;
+	Mon,  5 Feb 2024 22:36:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="II1FSL1u"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T5b/pDaj"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B041E4F5F7
-	for <kvm@vger.kernel.org>; Mon,  5 Feb 2024 22:36:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A8B51EEEB
+	for <kvm@vger.kernel.org>; Mon,  5 Feb 2024 22:36:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707172592; cv=none; b=YCgajJfmFHhlSjCak4WMcDaeTGgyvirXYdywvnHF1/WhBQVopbUAynEbeQgB0YaHWvHanI97D+9USCFQTOH2M//UP+m029V9d6E2GJw3vagKh/jFiBPb7IoMzluQC5C22qHBGlLGX3D7kvYdRXVTZzX+j+6CvEgcGCkoKR91/4M=
+	t=1707172584; cv=none; b=iBR/TuaqfVDD1cxGfG9WC4sioolZzZso/NEQcdXQ9EUWlJyg0r7A6ZE2eMfpJYZTlPrtinXQWizLRQBv0SOgbep0Flvd3P7OdjxRTHFMoAEAFGvVXw4WXHMH0FNNNyQHc5Rd9eyWLqwpEEekEq7vBjxlj4EtL2dQ8R1fUu6i+JU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707172592; c=relaxed/simple;
-	bh=EqQ9MenzjCrFTlHTtt0bcFYKQybhQjUuz9ueBRPlcMU=;
+	s=arc-20240116; t=1707172584; c=relaxed/simple;
+	bh=6JYagHXucKlYsOfkuiAxIPDNGFx7tF1xUhXMyUU4rMA=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EcB9vmnFnhIlRqXzPe4WjojU9vR5U8HwrRS+d/7LuCFNxm3ti5nG3/SnwS1LHRmDl39+nkRk0+Vtdii4xph7RMI5w6lcKuTWCRkyl4PZw5j2uPLkj1EXs/RRObsIRCeY6kuY3AiThlqT+CkkmsoA8uGf9pAk4aPBZkD26qtIKXo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=II1FSL1u; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version:Content-Type; b=LbhHY7ViI3fffmsZmW8bPmrUz6mSrAk/oEp85Zw7lYhhgT6Vgb4FlV6a6YWi7sYsrHZdfBvxmsnevY+OW/peRE/pilvsNqdGZIUx9SxB7Qwi9YBUOrcffwCtN4LCZmSfLn4+fy2QRdf1/PvdlkflclOH4CB5sMSWeQ6J1tDn8Z0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T5b/pDaj; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707172586;
+	s=mimecast20190719; t=1707172580;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=l5+sRNSSKmOzqMPOlpF55UvsCPipUMWShM7Hzevo2EA=;
-	b=II1FSL1usRNiF8Y5ILpwZTqKdtgPprEV1M9OpZhK1ZVnhrZh4YeXiEJ6j3AMm/UipH0p2m
-	f9PV1NvGzHtppcVYAecrT6ID0U4eFuwyfEdfyUZbh39e3RlonTsRDpOqBF7Rnie55PHiKK
-	Jq2Jah8Mg4T2rrQIdWSvlVaq8awnC/s=
+	bh=jCym5d923wld6vPREpAl+FehvI78rNNZCzX1noGHDH4=;
+	b=T5b/pDaj3u79sja7Y3geLptd5llb1WF7WIiHP9pEY812vXW1YA+9ZjL/MwXY1HNVLVdfGs
+	c7HzO2P9vmFXhEyhH1+qdEcD7NlvyZc1CZMIqkEYuzEu3NCOOvfxcKN34Ea57Z6I77UZTo
+	hGwiEFnZoJnMTE4aezOplgjXw2dUpOg=
 Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
  [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-44-o0w6GakSMWmgziyQ_mJSpA-1; Mon, 05 Feb 2024 17:36:24 -0500
-X-MC-Unique: o0w6GakSMWmgziyQ_mJSpA-1
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7bec4b24a34so471300939f.3
-        for <kvm@vger.kernel.org>; Mon, 05 Feb 2024 14:36:24 -0800 (PST)
+ us-mta-180-oP3Iz-_WOGiqL6r-u3FEeg-1; Mon, 05 Feb 2024 17:36:19 -0500
+X-MC-Unique: oP3Iz-_WOGiqL6r-u3FEeg-1
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7bfd75bf218so420141139f.2
+        for <kvm@vger.kernel.org>; Mon, 05 Feb 2024 14:36:18 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707172582; x=1707777382;
+        d=1e100.net; s=20230601; t=1707172578; x=1707777378;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=l5+sRNSSKmOzqMPOlpF55UvsCPipUMWShM7Hzevo2EA=;
-        b=iy9C2EQAEecJu3oZGG89dwiUB3PWI4KTf62KTkokqrQzj4u9nCVsqLO7+Vxdfmme+x
-         VIOeli7gYfP3N/R9zgAG28N3Rpyarl7R9epj7KGIR2nLGV5Zhm0BiOu9o8gMXeOHWzfQ
-         Y3LSVk8dyr5sov2XUuWHOnL6t6SmmsAfDMVw5MbjR08xAavzbVwnisTrp6KE6fwYoQ00
-         73d8ZbP0UUMz/pIQR4z6De8qUBQQKQPjVsZzmDcxXbYvGq/s9xKxpAnIAyuZf7gFBuhR
-         BdbNKF/UFzT1eHwnVN0C/Chd9k+BotZGQSn6xwC6JbrrJJE6LUQA7YWSMSLp1N+Z1c87
-         AwZw==
-X-Gm-Message-State: AOJu0YwZfYCq0GlAWvx5+1R2lzXVhyGBh/nvzm8S09J2bx6UHUqqtKCg
-	AbJtFv0ClxZ97BbnVc7O4u47Q0xwtRDj4+aP+8Fc4rtNxCnEebVUkz4zoRalrC2p6TNY4vW5U9Q
-	DewI1bXeg1P21PaFkfwlIzaoowTeLcmEpOzidcdmjBOJ3Ev+0Jw==
-X-Received: by 2002:a5d:9ed5:0:b0:7c3:eda5:f418 with SMTP id a21-20020a5d9ed5000000b007c3eda5f418mr344368ioe.14.1707172582316;
-        Mon, 05 Feb 2024 14:36:22 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE5U6k02BKkprA4o5OQRn+FJZMOQRMF0m1ybF8f+k4uAvd6hCGcrIjSdFZFC9usmZJWumiCCw==
-X-Received: by 2002:a5d:9ed5:0:b0:7c3:eda5:f418 with SMTP id a21-20020a5d9ed5000000b007c3eda5f418mr344350ioe.14.1707172581994;
-        Mon, 05 Feb 2024 14:36:21 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCXGvJ2rExnLiSMqoPJCwTunOmYd+ODfGHJNEKxV2xhiAP3Rj0ZWrTgIC0Vxq+hjhi6+dqSlFllpvMlFAehMa+dHTANDCY7RR7b6pz19AXvxwJKuBxWGM2A9eOW1GL8EhGqKk8MO5dCXmVdWB4gQsUKk57V3aYCg6PPfCdEEPbQy689ftwI8CuhvcwAuFRxg5ccnLfjvYzd3vmVBDRKs1I+txlkQtU6SnNQpEFX/mAjuoywyChrwRzx7ew7biFU1I0cN4OScrqJhoIl7V1GritLLoAQQAmEofTQbvjWXeeYinnIAawGLgZ6LMlE4hJB5deztemhV8A==
+        bh=jCym5d923wld6vPREpAl+FehvI78rNNZCzX1noGHDH4=;
+        b=SpeOBBmyb0+20F47vCMj69VPw04sjTk+e/66H8IY+g9iSI6JsBWswT+09oS2vDLmAE
+         lx+kuh9YBUeO2Veo4LXXG6qesBaPFPDy0LY1a4YFYpRJt3B4uHnEXhdrvAoQzHUn6dBy
+         4W/hEnM7sVY2GKTOGP35qzsettQ+u9zlYBdGJkKAYcGJMlo3v1k2DrF82HWHzwesYvw4
+         ZhISjI+Nf+GFIebXFthBjgD/EAMevpFREBxK4gotHr9OeQkw/arDJIQfJitAcSrdOwlB
+         YlJjM+1QUMu6eY1YatQ/8Xu1E49jI/mUN0NJsCtiO+cB5KmyL8S4k4XRmjGzzDqLojct
+         PcpQ==
+X-Gm-Message-State: AOJu0YxEm5fmPcYgJoZAmsYD9OPiXA/I8cw4m1S19lckLa7qUiQNSKqS
+	YBVp0x0bCHm6WGbJLOTOrMi+UKwydle3CvhkVASfZLM60jCNacZxKplQfjDO5LKEge5inoBDqbR
+	cixFANElo0YEljJKQ4RXV0Rzfrew1/cpyH1v1ZeV43kgmCU66+g==
+X-Received: by 2002:a6b:7f07:0:b0:7bf:43ad:21fd with SMTP id l7-20020a6b7f07000000b007bf43ad21fdmr1209914ioq.6.1707172578237;
+        Mon, 05 Feb 2024 14:36:18 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHsZIwpeJmX5wltmo8bIJUYiKJXCkn2m4BRBUWMIcpK2JxVH5ZBr29yltiYvtI9nmV8wwwaHg==
+X-Received: by 2002:a6b:7f07:0:b0:7bf:43ad:21fd with SMTP id l7-20020a6b7f07000000b007bf43ad21fdmr1209897ioq.6.1707172577877;
+        Mon, 05 Feb 2024 14:36:17 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCU593A73UFQGGLvs1DwDL0axmGCz5389jvfk7tN7BWwlbTyBW8ilY+F92ulx9r3NWV6yKaRdLmwAVmAtQN1tcq+My42jjwkZxiKloCraJDJjo3vdb5s6SLcL8XC6HSO2a40y6YESYQ16qKd3Gufk6nDyZ2e91XAETsu9ZlTD2ddvKg2+gdlCi7W3HPbI6zODrvcmiLwS4ZpVH2NulBcESlh1ktBVpm7wxhmw7yc4vXsmgRJ1tzNuA5aSQNJ7r7wiwsx+D9+g7AmljP4S3fgbyQrtQjh4BU/H6zRGLKvte+bmWZJ5wxLFYV1ZKIBwsl64KSxaKwwgw==
 Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id 25-20020a0566380a5900b00471374f17a3sm190892jap.136.2024.02.05.14.36.20
+        by smtp.gmail.com with ESMTPSA id 25-20020a0566380a5900b00471374f17a3sm190892jap.136.2024.02.05.14.36.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Feb 2024 14:36:20 -0800 (PST)
-Date: Mon, 5 Feb 2024 15:35:42 -0700
+        Mon, 05 Feb 2024 14:36:16 -0800 (PST)
+Date: Mon, 5 Feb 2024 15:35:51 -0700
 From: Alex Williamson <alex.williamson@redhat.com>
 To: Reinette Chatre <reinette.chatre@intel.com>
 Cc: jgg@nvidia.com, yishaih@nvidia.com,
  shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
  kvm@vger.kernel.org, dave.jiang@intel.com, ashok.raj@intel.com,
  linux-kernel@vger.kernel.org, patches@lists.linux.dev
-Subject: Re: [PATCH 15/17] vfio/pci: Let enable and disable of interrupt
- types use same signature
-Message-ID: <20240205153542.0883e2ff.alex.williamson@redhat.com>
-In-Reply-To: <bf87e46c249941ebbfacb20ee9ff92e8efd2a595.1706849424.git.reinette.chatre@intel.com>
+Subject: Re: [PATCH 17/17] vfio/pci: Remove duplicate interrupt management
+ flow
+Message-ID: <20240205153551.429d9d76.alex.williamson@redhat.com>
+In-Reply-To: <6ec901daffab4170d9740c7d066becd079925d53.1706849424.git.reinette.chatre@intel.com>
 References: <cover.1706849424.git.reinette.chatre@intel.com>
-	<bf87e46c249941ebbfacb20ee9ff92e8efd2a595.1706849424.git.reinette.chatre@intel.com>
+	<6ec901daffab4170d9740c7d066becd079925d53.1706849424.git.reinette.chatre@intel.com>
 X-Mailer: Claws Mail 4.2.0 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -96,144 +96,229 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu,  1 Feb 2024 20:57:09 -0800
+On Thu,  1 Feb 2024 20:57:11 -0800
 Reinette Chatre <reinette.chatre@intel.com> wrote:
 
-> vfio_pci_set_intx_trigger() and vfio_pci_set_msi_trigger() have
-> flows that can be shared.
+> vfio_pci_set_intx_trigger() and vfio_pci_set_trigger() have the
+> same flow that calls interrupt type (INTx, MSI, MSI-X) specific
+> functions.
 > 
-> For INTx, MSI, and MSI-X interrupt management to share the
-> same enable/disable flow the interrupt specific enable and
-> disable functions should have the same signatures.
+> Create callbacks for the interrupt type specific code that
+> can be called by the shared code so that only one of these functions
+> are needed. Rename the final generic function shared by all
+> interrupt types vfio_pci_set_trigger().
 > 
-> Let vfio_intx_enable() and vfio_msi_enable() use the same
-> parameters by passing "start" and "count" to these functions
-> instead of letting the (what will eventually be) common code
-> interpret these values.
-> 
-> Providing "start" and "count" to vfio_intx_enable()
-> enables the INTx specific check of these parameters to move into
-> the INTx specific vfio_intx_enable(). Similarly, providing "start"
-> and "count" to vfio_msi_enable() enables the MSI/MSI-X specific
-> code to initialize number of vectors needed.
-> 
-> The shared MSI/MSI-X code needs the interrupt index. Provide
-> the interrupt index (clearly marked as unused) to the INTx code
-> to use the same signatures.
-> 
-> With interrupt type specific code using the same parameters it
-> is possible to have common code that calls the enable/disable
-> code for different interrupt types.
+> Relocate the "IOCTL support" marker to correctly mark the
+> now generic code.
 > 
 > Signed-off-by: Reinette Chatre <reinette.chatre@intel.com>
 > ---
->  drivers/vfio/pci/vfio_pci_intrs.c | 27 ++++++++++++++++++---------
->  1 file changed, 18 insertions(+), 9 deletions(-)
+>  drivers/vfio/pci/vfio_pci_intrs.c | 104 ++++++++++--------------------
+>  1 file changed, 35 insertions(+), 69 deletions(-)
 > 
 > diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-> index 37065623d286..9217fea3f636 100644
+> index daa84a317f40..a5b337cfae60 100644
 > --- a/drivers/vfio/pci/vfio_pci_intrs.c
 > +++ b/drivers/vfio/pci/vfio_pci_intrs.c
-> @@ -257,13 +257,18 @@ static irqreturn_t vfio_intx_handler(int irq, void *dev_id)
+> @@ -32,6 +32,12 @@ struct vfio_pci_irq_ctx {
+>  };
+>  
+>  struct vfio_pci_intr_ops {
+> +	int (*enable)(struct vfio_pci_core_device *vdev, unsigned int start,
+> +		      unsigned int count, unsigned int index);
+> +	void (*disable)(struct vfio_pci_core_device *vdev,
+> +			unsigned int index);
+> +	void (*send_eventfd)(struct vfio_pci_core_device *vdev,
+> +			     struct vfio_pci_irq_ctx *ctx);
+>  	int (*request_interrupt)(struct vfio_pci_core_device *vdev,
+>  				 struct vfio_pci_irq_ctx *ctx,
+>  				 unsigned int vector, unsigned int index);
+> @@ -356,6 +362,12 @@ static void vfio_intx_disable(struct vfio_pci_core_device *vdev,
+>  /*
+>   * MSI/MSI-X
+>   */
+> +static void vfio_send_msi_eventfd(struct vfio_pci_core_device *vdev,
+> +				  struct vfio_pci_irq_ctx *ctx)
+> +{
+> +	eventfd_signal(ctx->trigger);
+> +}
+> +
+>  static irqreturn_t vfio_msihandler(int irq, void *arg)
+>  {
+>  	struct eventfd_ctx *trigger = arg;
+> @@ -544,13 +556,22 @@ static void vfio_msi_unregister_producer(struct vfio_pci_irq_ctx *ctx)
+>  	irq_bypass_unregister_producer(&ctx->producer);
+>  }
+>  
+> +/*
+> + * IOCTL support
+> + */
+>  static struct vfio_pci_intr_ops intr_ops[] = {
+>  	[VFIO_PCI_INTX_IRQ_INDEX] = {
+> +		.enable = vfio_intx_enable,
+> +		.disable = vfio_intx_disable,
+> +		.send_eventfd = vfio_send_intx_eventfd_ctx,
+>  		.request_interrupt = vfio_intx_request_interrupt,
+>  		.free_interrupt = vfio_intx_free_interrupt,
+>  		.device_name = vfio_intx_device_name,
+>  	},
+>  	[VFIO_PCI_MSI_IRQ_INDEX] = {
+> +		.enable = vfio_msi_enable,
+> +		.disable = vfio_msi_disable,
+> +		.send_eventfd = vfio_send_msi_eventfd,
+>  		.request_interrupt = vfio_msi_request_interrupt,
+>  		.free_interrupt = vfio_msi_free_interrupt,
+>  		.device_name = vfio_msi_device_name,
+> @@ -558,6 +579,9 @@ static struct vfio_pci_intr_ops intr_ops[] = {
+>  		.unregister_producer = vfio_msi_unregister_producer,
+>  	},
+>  	[VFIO_PCI_MSIX_IRQ_INDEX] = {
+> +		.enable = vfio_msi_enable,
+> +		.disable = vfio_msi_disable,
+> +		.send_eventfd = vfio_send_msi_eventfd,
+>  		.request_interrupt = vfio_msi_request_interrupt,
+>  		.free_interrupt = vfio_msi_free_interrupt,
+>  		.device_name = vfio_msi_device_name,
+> @@ -646,9 +670,6 @@ static int vfio_irq_set_block(struct vfio_pci_core_device *vdev,
 >  	return ret;
 >  }
 >  
-> -static int vfio_intx_enable(struct vfio_pci_core_device *vdev)
-> +static int vfio_intx_enable(struct vfio_pci_core_device *vdev,
-> +			    unsigned int start, unsigned int count,
-> +			    unsigned int __always_unused index)
->  {
->  	struct vfio_pci_irq_ctx *ctx;
->  
->  	if (!is_irq_none(vdev))
->  		return -EINVAL;
->  
-> +	if (start != 0 || count != 1)
-> +		return -EINVAL;
-> +
->  	if (!vdev->pdev->irq)
->  		return -ENODEV;
->  
-> @@ -332,7 +337,8 @@ static char *vfio_intx_device_name(struct vfio_pci_core_device *vdev,
->  	return kasprintf(GFP_KERNEL_ACCOUNT, "vfio-intx(%s)", pci_name(pdev));
+> -/*
+> - * IOCTL support
+> - */
+>  static int vfio_pci_set_intx_unmask(struct vfio_pci_core_device *vdev,
+>  				    unsigned int index, unsigned int start,
+>  				    unsigned int count, uint32_t flags,
+> @@ -701,71 +722,16 @@ static int vfio_pci_set_intx_mask(struct vfio_pci_core_device *vdev,
+>  	return 0;
 >  }
 >  
-> -static void vfio_intx_disable(struct vfio_pci_core_device *vdev)
-> +static void vfio_intx_disable(struct vfio_pci_core_device *vdev,
-> +			      unsigned int __always_unused index)
+> -static int vfio_pci_set_intx_trigger(struct vfio_pci_core_device *vdev,
+> -				     unsigned int index, unsigned int start,
+> -				     unsigned int count, uint32_t flags,
+> -				     void *data)
+> -{
+> -	struct vfio_pci_irq_ctx *ctx;
+> -	unsigned int i;
+> -
+> -	if (is_intx(vdev) && !count && (flags & VFIO_IRQ_SET_DATA_NONE)) {
+> -		vfio_intx_disable(vdev, index);
+> -		return 0;
+> -	}
+> -
+> -	if (!(is_intx(vdev) || is_irq_none(vdev)))
+> -		return -EINVAL;
+> -
+> -	if (flags & VFIO_IRQ_SET_DATA_EVENTFD) {
+> -		int32_t *fds = data;
+> -		int ret;
+> -
+> -		if (is_intx(vdev))
+> -			return vfio_irq_set_block(vdev, start, count, fds, index);
+> -
+> -		ret = vfio_intx_enable(vdev, start, count, index);
+> -		if (ret)
+> -			return ret;
+> -
+> -		ret = vfio_irq_set_block(vdev, start, count, fds, index);
+> -		if (ret)
+> -			vfio_intx_disable(vdev, index);
+> -
+> -		return ret;
+> -	}
+> -
+> -	if (!is_intx(vdev))
+> -		return -EINVAL;
+> -
+> -	/* temporary */
+> -	for (i = start; i < start + count; i++) {
+> -		ctx = vfio_irq_ctx_get(vdev, i);
+> -		if (!ctx || !ctx->trigger)
+> -			continue;
+> -		if (flags & VFIO_IRQ_SET_DATA_NONE) {
+> -			vfio_send_intx_eventfd_ctx(vdev, ctx);
+> -		} else if (flags & VFIO_IRQ_SET_DATA_BOOL) {
+> -			uint8_t *bools = data;
+> -
+> -			if (bools[i - start])
+> -				vfio_send_intx_eventfd_ctx(vdev, ctx);
+> -		}
+> -	}
+> -
+> -	return 0;
+> -}
+> -
+> -static int vfio_pci_set_msi_trigger(struct vfio_pci_core_device *vdev,
+> -				    unsigned int index, unsigned int start,
+> -				    unsigned int count, uint32_t flags,
+> -				    void *data)
+> +static int vfio_pci_set_trigger(struct vfio_pci_core_device *vdev,
+> +				unsigned int index, unsigned int start,
+> +				unsigned int count, uint32_t flags,
+> +				void *data)
 >  {
 >  	struct vfio_pci_irq_ctx *ctx;
->  
-> @@ -358,17 +364,20 @@ static irqreturn_t vfio_msihandler(int irq, void *arg)
->  	return IRQ_HANDLED;
->  }
->  
-> -static int vfio_msi_enable(struct vfio_pci_core_device *vdev, int nvec,
-> +static int vfio_msi_enable(struct vfio_pci_core_device *vdev,
-> +			   unsigned int start, unsigned int count,
->  			   unsigned int index)
->  {
->  	struct pci_dev *pdev = vdev->pdev;
->  	unsigned int flag;
-> -	int ret;
-> +	int ret, nvec;
->  	u16 cmd;
->  
->  	if (!is_irq_none(vdev))
->  		return -EINVAL;
->  
-> +	nvec = start + count;
-> +
->  	flag = (index == VFIO_PCI_MSIX_IRQ_INDEX) ? PCI_IRQ_MSIX : PCI_IRQ_MSI;
->  
->  	/* return the number of supported vectors if we can't get all: */
-> @@ -701,11 +710,11 @@ static int vfio_pci_set_intx_trigger(struct vfio_pci_core_device *vdev,
 >  	unsigned int i;
 >  
->  	if (is_intx(vdev) && !count && (flags & VFIO_IRQ_SET_DATA_NONE)) {
-> -		vfio_intx_disable(vdev);
-> +		vfio_intx_disable(vdev, index);
+>  	if (irq_is(vdev, index) && !count && (flags & VFIO_IRQ_SET_DATA_NONE)) {
+> -		vfio_msi_disable(vdev, index);
+> +		intr_ops[index].disable(vdev, index);
 >  		return 0;
 >  	}
 >  
-> -	if (!(is_intx(vdev) || is_irq_none(vdev)) || start != 0 || count != 1)
-> +	if (!(is_intx(vdev) || is_irq_none(vdev)))
->  		return -EINVAL;
+> @@ -780,13 +746,13 @@ static int vfio_pci_set_msi_trigger(struct vfio_pci_core_device *vdev,
+>  			return vfio_irq_set_block(vdev, start, count,
+>  						  fds, index);
 >  
->  	if (flags & VFIO_IRQ_SET_DATA_EVENTFD) {
-> @@ -715,13 +724,13 @@ static int vfio_pci_set_intx_trigger(struct vfio_pci_core_device *vdev,
->  		if (is_intx(vdev))
->  			return vfio_irq_set_block(vdev, start, count, fds, index);
->  
-> -		ret = vfio_intx_enable(vdev);
-> +		ret = vfio_intx_enable(vdev, start, count, index);
-
-Please trace what happens when a user calls SET_IRQS to setup a trigger
-eventfd with start = 0, count = 1, followed by any other combination of
-start and count values once is_intx() is true.  vfio_intx_enable()
-cannot be the only place we bounds check the user, all of the INTx
-callbacks should be an error or nop if vector != 0.  Thanks,
-
-Alex
-
+> -		ret = vfio_msi_enable(vdev, start, count, index);
+> +		ret = intr_ops[index].enable(vdev, start, count, index);
 >  		if (ret)
 >  			return ret;
 >  
 >  		ret = vfio_irq_set_block(vdev, start, count, fds, index);
 >  		if (ret)
-> -			vfio_intx_disable(vdev);
-> +			vfio_intx_disable(vdev, index);
+> -			vfio_msi_disable(vdev, index);
+> +			intr_ops[index].disable(vdev, index);
 >  
 >  		return ret;
 >  	}
-> @@ -771,7 +780,7 @@ static int vfio_pci_set_msi_trigger(struct vfio_pci_core_device *vdev,
->  			return vfio_irq_set_block(vdev, start, count,
->  						  fds, index);
->  
-> -		ret = vfio_msi_enable(vdev, start + count, index);
-> +		ret = vfio_msi_enable(vdev, start, count, index);
->  		if (ret)
->  			return ret;
->  
+> @@ -799,11 +765,11 @@ static int vfio_pci_set_msi_trigger(struct vfio_pci_core_device *vdev,
+>  		if (!ctx || !ctx->trigger)
+>  			continue;
+>  		if (flags & VFIO_IRQ_SET_DATA_NONE) {
+> -			eventfd_signal(ctx->trigger);
+> +			intr_ops[index].send_eventfd(vdev, ctx);
+>  		} else if (flags & VFIO_IRQ_SET_DATA_BOOL) {
+>  			uint8_t *bools = data;
+
+Nit, an opportunity to add the missing new line between variable
+declaration and code here.  Thanks,
+
+Alex
+
+>  			if (bools[i - start])
+> -				eventfd_signal(ctx->trigger);
+> +				intr_ops[index].send_eventfd(vdev, ctx);
+>  		}
+>  	}
+>  	return 0;
+> @@ -912,7 +878,7 @@ int vfio_pci_set_irqs_ioctl(struct vfio_pci_core_device *vdev, uint32_t flags,
+>  			func = vfio_pci_set_intx_unmask;
+>  			break;
+>  		case VFIO_IRQ_SET_ACTION_TRIGGER:
+> -			func = vfio_pci_set_intx_trigger;
+> +			func = vfio_pci_set_trigger;
+>  			break;
+>  		}
+>  		break;
+> @@ -924,7 +890,7 @@ int vfio_pci_set_irqs_ioctl(struct vfio_pci_core_device *vdev, uint32_t flags,
+>  			/* XXX Need masking support exported */
+>  			break;
+>  		case VFIO_IRQ_SET_ACTION_TRIGGER:
+> -			func = vfio_pci_set_msi_trigger;
+> +			func = vfio_pci_set_trigger;
+>  			break;
+>  		}
+>  		break;
 
 
