@@ -1,324 +1,358 @@
-Return-Path: <kvm+bounces-8051-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8054-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2871684A967
-	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 23:37:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 916DF84AA2B
+	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 00:03:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C8331C25F6D
-	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 22:37:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 488F0293BBC
+	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 23:03:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FEA54D9E4;
-	Mon,  5 Feb 2024 22:36:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43E0B4BAB6;
+	Mon,  5 Feb 2024 23:01:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T5b/pDaj"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="LvW8wjFd"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2059.outbound.protection.outlook.com [40.107.243.59])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A8B51EEEB
-	for <kvm@vger.kernel.org>; Mon,  5 Feb 2024 22:36:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707172584; cv=none; b=iBR/TuaqfVDD1cxGfG9WC4sioolZzZso/NEQcdXQ9EUWlJyg0r7A6ZE2eMfpJYZTlPrtinXQWizLRQBv0SOgbep0Flvd3P7OdjxRTHFMoAEAFGvVXw4WXHMH0FNNNyQHc5Rd9eyWLqwpEEekEq7vBjxlj4EtL2dQ8R1fUu6i+JU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707172584; c=relaxed/simple;
-	bh=6JYagHXucKlYsOfkuiAxIPDNGFx7tF1xUhXMyUU4rMA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LbhHY7ViI3fffmsZmW8bPmrUz6mSrAk/oEp85Zw7lYhhgT6Vgb4FlV6a6YWi7sYsrHZdfBvxmsnevY+OW/peRE/pilvsNqdGZIUx9SxB7Qwi9YBUOrcffwCtN4LCZmSfLn4+fy2QRdf1/PvdlkflclOH4CB5sMSWeQ6J1tDn8Z0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T5b/pDaj; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707172580;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jCym5d923wld6vPREpAl+FehvI78rNNZCzX1noGHDH4=;
-	b=T5b/pDaj3u79sja7Y3geLptd5llb1WF7WIiHP9pEY812vXW1YA+9ZjL/MwXY1HNVLVdfGs
-	c7HzO2P9vmFXhEyhH1+qdEcD7NlvyZc1CZMIqkEYuzEu3NCOOvfxcKN34Ea57Z6I77UZTo
-	hGwiEFnZoJnMTE4aezOplgjXw2dUpOg=
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-180-oP3Iz-_WOGiqL6r-u3FEeg-1; Mon, 05 Feb 2024 17:36:19 -0500
-X-MC-Unique: oP3Iz-_WOGiqL6r-u3FEeg-1
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7bfd75bf218so420141139f.2
-        for <kvm@vger.kernel.org>; Mon, 05 Feb 2024 14:36:18 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707172578; x=1707777378;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jCym5d923wld6vPREpAl+FehvI78rNNZCzX1noGHDH4=;
-        b=SpeOBBmyb0+20F47vCMj69VPw04sjTk+e/66H8IY+g9iSI6JsBWswT+09oS2vDLmAE
-         lx+kuh9YBUeO2Veo4LXXG6qesBaPFPDy0LY1a4YFYpRJt3B4uHnEXhdrvAoQzHUn6dBy
-         4W/hEnM7sVY2GKTOGP35qzsettQ+u9zlYBdGJkKAYcGJMlo3v1k2DrF82HWHzwesYvw4
-         ZhISjI+Nf+GFIebXFthBjgD/EAMevpFREBxK4gotHr9OeQkw/arDJIQfJitAcSrdOwlB
-         YlJjM+1QUMu6eY1YatQ/8Xu1E49jI/mUN0NJsCtiO+cB5KmyL8S4k4XRmjGzzDqLojct
-         PcpQ==
-X-Gm-Message-State: AOJu0YxEm5fmPcYgJoZAmsYD9OPiXA/I8cw4m1S19lckLa7qUiQNSKqS
-	YBVp0x0bCHm6WGbJLOTOrMi+UKwydle3CvhkVASfZLM60jCNacZxKplQfjDO5LKEge5inoBDqbR
-	cixFANElo0YEljJKQ4RXV0Rzfrew1/cpyH1v1ZeV43kgmCU66+g==
-X-Received: by 2002:a6b:7f07:0:b0:7bf:43ad:21fd with SMTP id l7-20020a6b7f07000000b007bf43ad21fdmr1209914ioq.6.1707172578237;
-        Mon, 05 Feb 2024 14:36:18 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHsZIwpeJmX5wltmo8bIJUYiKJXCkn2m4BRBUWMIcpK2JxVH5ZBr29yltiYvtI9nmV8wwwaHg==
-X-Received: by 2002:a6b:7f07:0:b0:7bf:43ad:21fd with SMTP id l7-20020a6b7f07000000b007bf43ad21fdmr1209897ioq.6.1707172577877;
-        Mon, 05 Feb 2024 14:36:17 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCU593A73UFQGGLvs1DwDL0axmGCz5389jvfk7tN7BWwlbTyBW8ilY+F92ulx9r3NWV6yKaRdLmwAVmAtQN1tcq+My42jjwkZxiKloCraJDJjo3vdb5s6SLcL8XC6HSO2a40y6YESYQ16qKd3Gufk6nDyZ2e91XAETsu9ZlTD2ddvKg2+gdlCi7W3HPbI6zODrvcmiLwS4ZpVH2NulBcESlh1ktBVpm7wxhmw7yc4vXsmgRJ1tzNuA5aSQNJ7r7wiwsx+D9+g7AmljP4S3fgbyQrtQjh4BU/H6zRGLKvte+bmWZJ5wxLFYV1ZKIBwsl64KSxaKwwgw==
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id 25-20020a0566380a5900b00471374f17a3sm190892jap.136.2024.02.05.14.36.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Feb 2024 14:36:16 -0800 (PST)
-Date: Mon, 5 Feb 2024 15:35:51 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Reinette Chatre <reinette.chatre@intel.com>
-Cc: jgg@nvidia.com, yishaih@nvidia.com,
- shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
- kvm@vger.kernel.org, dave.jiang@intel.com, ashok.raj@intel.com,
- linux-kernel@vger.kernel.org, patches@lists.linux.dev
-Subject: Re: [PATCH 17/17] vfio/pci: Remove duplicate interrupt management
- flow
-Message-ID: <20240205153551.429d9d76.alex.williamson@redhat.com>
-In-Reply-To: <6ec901daffab4170d9740c7d066becd079925d53.1706849424.git.reinette.chatre@intel.com>
-References: <cover.1706849424.git.reinette.chatre@intel.com>
-	<6ec901daffab4170d9740c7d066becd079925d53.1706849424.git.reinette.chatre@intel.com>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F1FE3CF58;
+	Mon,  5 Feb 2024 23:01:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.59
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707174110; cv=fail; b=kLZatqX218UmDJl0/H1/IEYvuYXAp6RLBqbAsL10nAivPQTqsQSU8hnewmRxy+c3i0cv0V+eYbyXFU07xYcMZ8OseAyTXb7jvU/4clY8ddUF2GYv2JOB3pqqQ1bUpHEYzSlQhmbdT/Ww/s0TRjyCjONpPCymIE4lSdU1P3EWAfA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707174110; c=relaxed/simple;
+	bh=XlzphpN0+B2XskUUUR8NVhyITjWmNKw+KOi2uLzDFsg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=d+fUOExhTt1e4bk+EwZoySv0EBs6xknHUBTVEdG04x2LxbgSiiO9HOFpZZ737Cww2aORGbNATrX9RbXnem8wUHoxEGudkZMsX5plkw6OHbJS20vjJUKWVnehqE17+MRDOUNUR+IouvmMBUCnMO7FJbRgn70Ldy63ogVzSTNrN9Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=LvW8wjFd; arc=fail smtp.client-ip=40.107.243.59
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=LO8CJA4p9DCeSjlXCy99Cw6PXLS/R8EVb6pH8bvztUQjg25YqE46moPimih6zuDPdKgcTdOSZc3xQZeXYmXLh1SYPwClITqlqqHvGSpDCIc8kpaYuRjSyujIuBMq8f0ztx/0ANhOFlLhW7+BaSrC3+AsitjiTS9FHzAPX+IovuQui6Zqhtopz4u6itGpVlDBVJ5A/CHZuLmgYBQALRXtT+rNMuCkx4XjP8XmS5ZJJJjSLM4m3W/pf5PBJaQ00kNlv6pJ6q3Lp0gR34n1P4MwwVzYIXl11ch3pr39lg2XNSeVYeh01GOsajNR9fDLwZe8eQ9b+zcwyLmfCpwD7OmycQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Cslpe/vNkle6P8VNFzzxPckcfnqJRJuRU+Gn7cbMrik=;
+ b=ag+1lRs0rC3asxzb2R869VinhEXYlp886QcsvpP/HqnKLsdbat6FQ7hIfeN3/O/RQwwRRoajeL+nsi4PsVXMrG46J/s7MMbsv4+rUI41AG07P0+d25VUpvvGz25CaLGJsrHlz5VP/p3w8rfduqXZ74xqfwU/RNoeIpUiu/uRoFf1LZ61Wv3P2IJ5DRDGpFFivYkqlFAGmdUW9RORWFeq8pEF9Uyt0mPWrAY3TU/55buH64lv6xRaein/Orq3uknXx3nj1xtkXoXu2h/tB456q67BdYIfsgj8TABaxSQ/h5z4UmX7bBpiMG7rM9DsdHVstIa99bcvZFqeQBj4mwQVFw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.232) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Cslpe/vNkle6P8VNFzzxPckcfnqJRJuRU+Gn7cbMrik=;
+ b=LvW8wjFd2f8LQvm8TkUBfyMwrRpayW9zkXAt8vE9GpPsuD6cp4xzcXHHQ4IE6qOla+9NVPPb74MX/kcsOojpTDYD009vBtw+Stsqt8LIesZ9I21qcbco8RoW2EYRxCOwCiwJchicSos3u+qbE2rs+ClXN++iuTJ67Lit6ENtaGYozdCADApbS7hJqyfotIZNLHyNerXpa5yHv/4fDm+MznsTLQfPyhX4V8x47xXMNePkxZ5HFsVzkWZ0cu8reTOn763kVWqC0U8y3u9Zptr1X0ZOUIGO5WN23DJjw0mqYwL3Lleo7mVDDy6UC+B1x2Iwz1GEUfMGft0XgnZuxgEucg==
+Received: from DS7PR05CA0073.namprd05.prod.outlook.com (2603:10b6:8:57::27) by
+ DM4PR12MB6039.namprd12.prod.outlook.com (2603:10b6:8:aa::12) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7270.13; Mon, 5 Feb 2024 23:01:45 +0000
+Received: from DS3PEPF000099D3.namprd04.prod.outlook.com
+ (2603:10b6:8:57:cafe::4c) by DS7PR05CA0073.outlook.office365.com
+ (2603:10b6:8:57::27) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7249.24 via Frontend
+ Transport; Mon, 5 Feb 2024 23:01:45 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.232) by
+ DS3PEPF000099D3.mail.protection.outlook.com (10.167.17.4) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7249.19 via Frontend Transport; Mon, 5 Feb 2024 23:01:45 +0000
+Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
+ (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 5 Feb 2024
+ 15:01:33 -0800
+Received: from drhqmail202.nvidia.com (10.126.190.181) by
+ drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.12; Mon, 5 Feb 2024 15:01:32 -0800
+Received: from sgarnayak-dt.nvidia.com (10.127.8.9) by mail.nvidia.com
+ (10.126.190.181) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12 via Frontend
+ Transport; Mon, 5 Feb 2024 15:01:25 -0800
+From: <ankita@nvidia.com>
+To: <ankita@nvidia.com>, <jgg@nvidia.com>, <alex.williamson@redhat.com>,
+	<yishaih@nvidia.com>, <mst@redhat.com>,
+	<shameerali.kolothum.thodi@huawei.com>, <kevin.tian@intel.com>,
+	<clg@redhat.com>, <oleksandr@natalenko.name>,
+	<satyanarayana.k.v.p@intel.com>, <eric.auger@redhat.com>,
+	<brett.creeley@amd.com>, <horms@kernel.org>, <rrameshbabu@nvidia.com>
+CC: <aniketa@nvidia.com>, <cjia@nvidia.com>, <kwankhede@nvidia.com>,
+	<targupta@nvidia.com>, <vsethi@nvidia.com>, <acurrid@nvidia.com>,
+	<apopple@nvidia.com>, <jhubbard@nvidia.com>, <danw@nvidia.com>,
+	<anuaggarwal@nvidia.com>, <mochs@nvidia.com>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <virtualization@lists.linux-foundation.org>
+Subject: [PATCH v17 0/3] vfio/nvgrace-gpu: Add vfio pci variant module for grace hopper
+Date: Tue, 6 Feb 2024 04:31:20 +0530
+Message-ID: <20240205230123.18981-1-ankita@nvidia.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS3PEPF000099D3:EE_|DM4PR12MB6039:EE_
+X-MS-Office365-Filtering-Correlation-Id: 86ab51b5-7b72-48f8-c592-08dc269e6cf2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	3T6mp1a+CZgel0CK7k39nwIDH+vwaiBgJpheNET6toltpM9xTCLAy6Dk1+wv+wPasWJmMYKwWDtFVQFHZSTq6EQuXT5cp7ZQOgsXlIF4ipnKytxw+b+TIfDVfMKUSJq9LZWXCE9Cyh9e+kG0gK9jcgQDpJJ3uX4ynbthBPtMMfOGTAmIkNgE38gbqjS5Sr/Vv38umgf92ANDRO1iFWbsIFs/SXXjVNUnGBNsUYk0O5UoGk2CUOTPhH/BAI8Utfvbdfw/i1JbSgpxOeCS6jC85+96pC84ty6JBjb/rAKvkLMJVp/UIg9oLQi0j+VSdWK5pqHwIKqfbwQkUfx5loyFnTn/zSqRa2MXit/gPLVihSkPteSi9oxC7j8X3dXzuo7dlHlh2JdS6Ay+lWzfOCBVx7J9fWRr11JUflBoK2Zyn8shnKP/Goz5LEA9jiKbpBBRCdeNitJL7j06TNXbtkEK3F+eY30Dju2JmDyZBBbGyNynJ6Cudr2st1eVxbxfajNoPPFQNd5PkYaAeToO/JZDbaDAs4xj/ZJj2oOUom44GKmoCpS7fuPeUTDjI96pn3j7cbahx0EdHboxgaLrl+OP1atHDGe+QNhOimoc0E5WchZ/B9inXiHm0P5j1v9e6k76USB3jsOU4ZB98P780nJfG3ipfhY6f2jPZy6NMKJzF7uyGeRGZkbux/E90+CqWuyk+i1S0IW/IXLl+SMgs8QEakzu5EQ3fiPt9NHZjOd1lr4zxdn30MVGTZoOasp2UH8Lw4021RugimKIvE6M41QzFNkJPI3pvO9geyweU2fG4QiaD34qxC2McfEqupNo7gk3+RESRZJnyenTCaYPpc31Ig==
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(136003)(376002)(396003)(346002)(39860400002)(230922051799003)(82310400011)(451199024)(1800799012)(186009)(64100799003)(36840700001)(40470700004)(46966006)(6636002)(54906003)(316002)(70586007)(336012)(70206006)(110136005)(36860700001)(478600001)(966005)(7416002)(5660300002)(86362001)(7696005)(2876002)(426003)(36756003)(26005)(921011)(83380400001)(2616005)(1076003)(2906002)(30864003)(7636003)(356005)(8676002)(47076005)(8936002)(4326008)(6666004)(41300700001)(84970400001)(40480700001)(82740400003)(40460700003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Feb 2024 23:01:45.2899
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 86ab51b5-7b72-48f8-c592-08dc269e6cf2
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS3PEPF000099D3.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6039
 
-On Thu,  1 Feb 2024 20:57:11 -0800
-Reinette Chatre <reinette.chatre@intel.com> wrote:
+From: Ankit Agrawal <ankita@nvidia.com>
 
-> vfio_pci_set_intx_trigger() and vfio_pci_set_trigger() have the
-> same flow that calls interrupt type (INTx, MSI, MSI-X) specific
-> functions.
-> 
-> Create callbacks for the interrupt type specific code that
-> can be called by the shared code so that only one of these functions
-> are needed. Rename the final generic function shared by all
-> interrupt types vfio_pci_set_trigger().
-> 
-> Relocate the "IOCTL support" marker to correctly mark the
-> now generic code.
-> 
-> Signed-off-by: Reinette Chatre <reinette.chatre@intel.com>
-> ---
->  drivers/vfio/pci/vfio_pci_intrs.c | 104 ++++++++++--------------------
->  1 file changed, 35 insertions(+), 69 deletions(-)
-> 
-> diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-> index daa84a317f40..a5b337cfae60 100644
-> --- a/drivers/vfio/pci/vfio_pci_intrs.c
-> +++ b/drivers/vfio/pci/vfio_pci_intrs.c
-> @@ -32,6 +32,12 @@ struct vfio_pci_irq_ctx {
->  };
->  
->  struct vfio_pci_intr_ops {
-> +	int (*enable)(struct vfio_pci_core_device *vdev, unsigned int start,
-> +		      unsigned int count, unsigned int index);
-> +	void (*disable)(struct vfio_pci_core_device *vdev,
-> +			unsigned int index);
-> +	void (*send_eventfd)(struct vfio_pci_core_device *vdev,
-> +			     struct vfio_pci_irq_ctx *ctx);
->  	int (*request_interrupt)(struct vfio_pci_core_device *vdev,
->  				 struct vfio_pci_irq_ctx *ctx,
->  				 unsigned int vector, unsigned int index);
-> @@ -356,6 +362,12 @@ static void vfio_intx_disable(struct vfio_pci_core_device *vdev,
->  /*
->   * MSI/MSI-X
->   */
-> +static void vfio_send_msi_eventfd(struct vfio_pci_core_device *vdev,
-> +				  struct vfio_pci_irq_ctx *ctx)
-> +{
-> +	eventfd_signal(ctx->trigger);
-> +}
-> +
->  static irqreturn_t vfio_msihandler(int irq, void *arg)
->  {
->  	struct eventfd_ctx *trigger = arg;
-> @@ -544,13 +556,22 @@ static void vfio_msi_unregister_producer(struct vfio_pci_irq_ctx *ctx)
->  	irq_bypass_unregister_producer(&ctx->producer);
->  }
->  
-> +/*
-> + * IOCTL support
-> + */
->  static struct vfio_pci_intr_ops intr_ops[] = {
->  	[VFIO_PCI_INTX_IRQ_INDEX] = {
-> +		.enable = vfio_intx_enable,
-> +		.disable = vfio_intx_disable,
-> +		.send_eventfd = vfio_send_intx_eventfd_ctx,
->  		.request_interrupt = vfio_intx_request_interrupt,
->  		.free_interrupt = vfio_intx_free_interrupt,
->  		.device_name = vfio_intx_device_name,
->  	},
->  	[VFIO_PCI_MSI_IRQ_INDEX] = {
-> +		.enable = vfio_msi_enable,
-> +		.disable = vfio_msi_disable,
-> +		.send_eventfd = vfio_send_msi_eventfd,
->  		.request_interrupt = vfio_msi_request_interrupt,
->  		.free_interrupt = vfio_msi_free_interrupt,
->  		.device_name = vfio_msi_device_name,
-> @@ -558,6 +579,9 @@ static struct vfio_pci_intr_ops intr_ops[] = {
->  		.unregister_producer = vfio_msi_unregister_producer,
->  	},
->  	[VFIO_PCI_MSIX_IRQ_INDEX] = {
-> +		.enable = vfio_msi_enable,
-> +		.disable = vfio_msi_disable,
-> +		.send_eventfd = vfio_send_msi_eventfd,
->  		.request_interrupt = vfio_msi_request_interrupt,
->  		.free_interrupt = vfio_msi_free_interrupt,
->  		.device_name = vfio_msi_device_name,
-> @@ -646,9 +670,6 @@ static int vfio_irq_set_block(struct vfio_pci_core_device *vdev,
->  	return ret;
->  }
->  
-> -/*
-> - * IOCTL support
-> - */
->  static int vfio_pci_set_intx_unmask(struct vfio_pci_core_device *vdev,
->  				    unsigned int index, unsigned int start,
->  				    unsigned int count, uint32_t flags,
-> @@ -701,71 +722,16 @@ static int vfio_pci_set_intx_mask(struct vfio_pci_core_device *vdev,
->  	return 0;
->  }
->  
-> -static int vfio_pci_set_intx_trigger(struct vfio_pci_core_device *vdev,
-> -				     unsigned int index, unsigned int start,
-> -				     unsigned int count, uint32_t flags,
-> -				     void *data)
-> -{
-> -	struct vfio_pci_irq_ctx *ctx;
-> -	unsigned int i;
-> -
-> -	if (is_intx(vdev) && !count && (flags & VFIO_IRQ_SET_DATA_NONE)) {
-> -		vfio_intx_disable(vdev, index);
-> -		return 0;
-> -	}
-> -
-> -	if (!(is_intx(vdev) || is_irq_none(vdev)))
-> -		return -EINVAL;
-> -
-> -	if (flags & VFIO_IRQ_SET_DATA_EVENTFD) {
-> -		int32_t *fds = data;
-> -		int ret;
-> -
-> -		if (is_intx(vdev))
-> -			return vfio_irq_set_block(vdev, start, count, fds, index);
-> -
-> -		ret = vfio_intx_enable(vdev, start, count, index);
-> -		if (ret)
-> -			return ret;
-> -
-> -		ret = vfio_irq_set_block(vdev, start, count, fds, index);
-> -		if (ret)
-> -			vfio_intx_disable(vdev, index);
-> -
-> -		return ret;
-> -	}
-> -
-> -	if (!is_intx(vdev))
-> -		return -EINVAL;
-> -
-> -	/* temporary */
-> -	for (i = start; i < start + count; i++) {
-> -		ctx = vfio_irq_ctx_get(vdev, i);
-> -		if (!ctx || !ctx->trigger)
-> -			continue;
-> -		if (flags & VFIO_IRQ_SET_DATA_NONE) {
-> -			vfio_send_intx_eventfd_ctx(vdev, ctx);
-> -		} else if (flags & VFIO_IRQ_SET_DATA_BOOL) {
-> -			uint8_t *bools = data;
-> -
-> -			if (bools[i - start])
-> -				vfio_send_intx_eventfd_ctx(vdev, ctx);
-> -		}
-> -	}
-> -
-> -	return 0;
-> -}
-> -
-> -static int vfio_pci_set_msi_trigger(struct vfio_pci_core_device *vdev,
-> -				    unsigned int index, unsigned int start,
-> -				    unsigned int count, uint32_t flags,
-> -				    void *data)
-> +static int vfio_pci_set_trigger(struct vfio_pci_core_device *vdev,
-> +				unsigned int index, unsigned int start,
-> +				unsigned int count, uint32_t flags,
-> +				void *data)
->  {
->  	struct vfio_pci_irq_ctx *ctx;
->  	unsigned int i;
->  
->  	if (irq_is(vdev, index) && !count && (flags & VFIO_IRQ_SET_DATA_NONE)) {
-> -		vfio_msi_disable(vdev, index);
-> +		intr_ops[index].disable(vdev, index);
->  		return 0;
->  	}
->  
-> @@ -780,13 +746,13 @@ static int vfio_pci_set_msi_trigger(struct vfio_pci_core_device *vdev,
->  			return vfio_irq_set_block(vdev, start, count,
->  						  fds, index);
->  
-> -		ret = vfio_msi_enable(vdev, start, count, index);
-> +		ret = intr_ops[index].enable(vdev, start, count, index);
->  		if (ret)
->  			return ret;
->  
->  		ret = vfio_irq_set_block(vdev, start, count, fds, index);
->  		if (ret)
-> -			vfio_msi_disable(vdev, index);
-> +			intr_ops[index].disable(vdev, index);
->  
->  		return ret;
->  	}
-> @@ -799,11 +765,11 @@ static int vfio_pci_set_msi_trigger(struct vfio_pci_core_device *vdev,
->  		if (!ctx || !ctx->trigger)
->  			continue;
->  		if (flags & VFIO_IRQ_SET_DATA_NONE) {
-> -			eventfd_signal(ctx->trigger);
-> +			intr_ops[index].send_eventfd(vdev, ctx);
->  		} else if (flags & VFIO_IRQ_SET_DATA_BOOL) {
->  			uint8_t *bools = data;
+NVIDIA's upcoming Grace Hopper Superchip provides a PCI-like device
+for the on-chip GPU that is the logical OS representation of the
+internal proprietary chip-to-chip cache coherent interconnect.
 
-Nit, an opportunity to add the missing new line between variable
-declaration and code here.  Thanks,
+The device is peculiar compared to a real PCI device in that whilst
+there is a real 64b PCI BAR1 (comprising region 2 & region 3) on the
+device, it is not used to access device memory once the faster
+chip-to-chip interconnect is initialized (occurs at the time of host
+system boot). The device memory is accessed instead using the
+chip-to-chip interconnect that is exposed as a contiguous physically
+addressable region on the host. Since the device memory is cache
+coherent with the CPU, it can be mmaped into the user VMA with a
+cacheable mapping and used like a regular RAM. The device memory is
+not added to the host kernel, but mapped directly as this reduces
+memory wastage due to struct pages.
 
-Alex
+There is also a requirement of a reserved 1G uncached region (termed as
+resmem) to support the Multi-Instance GPU (MIG) feature [1]. This is
+to work around a HW defect. Based on [2], the requisite properties
+(uncached, unaligned access) can be achieved through a VM mapping (S1)
+of NORMAL_NC and host (S2) mapping with MemAttr[2:0]=0b101. To provide
+a different non-cached property to the reserved 1G region, it needs to
+be carved out from the device memory and mapped as a separate region
+in Qemu VMA with pgprot_writecombine(). pgprot_writecombine() sets
+the Qemu VMA page properties (pgprot) as NORMAL_NC.
 
->  			if (bools[i - start])
-> -				eventfd_signal(ctx->trigger);
-> +				intr_ops[index].send_eventfd(vdev, ctx);
->  		}
->  	}
->  	return 0;
-> @@ -912,7 +878,7 @@ int vfio_pci_set_irqs_ioctl(struct vfio_pci_core_device *vdev, uint32_t flags,
->  			func = vfio_pci_set_intx_unmask;
->  			break;
->  		case VFIO_IRQ_SET_ACTION_TRIGGER:
-> -			func = vfio_pci_set_intx_trigger;
-> +			func = vfio_pci_set_trigger;
->  			break;
->  		}
->  		break;
-> @@ -924,7 +890,7 @@ int vfio_pci_set_irqs_ioctl(struct vfio_pci_core_device *vdev, uint32_t flags,
->  			/* XXX Need masking support exported */
->  			break;
->  		case VFIO_IRQ_SET_ACTION_TRIGGER:
-> -			func = vfio_pci_set_msi_trigger;
-> +			func = vfio_pci_set_trigger;
->  			break;
->  		}
->  		break;
+Provide a VFIO PCI variant driver that adapts the unique device memory
+representation into a more standard PCI representation facing userspace.
+
+The variant driver exposes these two regions - the non-cached reserved
+(resmem) and the cached rest of the device memory (termed as usemem) as
+separate VFIO 64b BAR regions. This is divergent from the baremetal
+approach, where the device memory is exposed as a device memory region.
+The decision for a different approach was taken in view of the fact that
+it would necessiate additional code in Qemu to discover and insert those
+regions in the VM IPA, along with the additional VM ACPI DSDT changes to
+communiate the device memory region IPA to the VM workloads. Moreover,
+this behavior would have to be added to a variety of emulators (beyond
+top of tree Qemu) out there desiring grace hopper support.
+
+Since the device implements 64-bit BAR0, the VFIO PCI variant driver
+maps the uncached carved out region to the next available PCI BAR (i.e.
+comprising of region 2 and 3). The cached device memory aperture is
+assigned BAR region 4 and 5. Qemu will then naturally generate a PCI
+device in the VM with the uncached aperture reported as BAR2 region,
+the cacheable as BAR4. The variant driver provides emulation for these
+fake BARs' PCI config space offset registers.
+
+The hardware ensures that the system does not crash when the memory
+is accessed with the memory enable turned off. It synthesis ~0 reads
+and dropped writes on such access. So there is no need to support the
+disablement/enablement of BAR through PCI_COMMAND config space register.
+
+The memory layout on the host looks like the following:
+               devmem (memlength)
+|--------------------------------------------------|
+|-------------cached------------------------|--NC--|
+|                                           |
+usemem.phys/memphys                         resmem.phys
+
+PCI BARs need to be aligned to the power-of-2, but the actual memory on the
+device may not. A read or write access to the physical address from the
+last device PFN up to the next power-of-2 aligned physical address
+results in reading ~0 and dropped writes. Note that the GPU device
+driver [6] is capable of knowing the exact device memory size through
+separate means. The device memory size is primarily kept in the system
+ACPI tables for use by the VFIO PCI variant module.
+
+Note that the usemem memory is added by the VM Nvidia device driver [5]
+to the VM kernel as memblocks. Hence make the usable memory size memblock
+aligned.
+
+Currently there is no provision in KVM for a S2 mapping with
+MemAttr[2:0]=0b101, but there is an ongoing effort to provide the same [3].
+As previously mentioned, resmem is mapped pgprot_writecombine(), that
+sets the Qemu VMA page properties (pgprot) as NORMAL_NC. Using the
+proposed changes in [4] and [3], KVM marks the region with
+MemAttr[2:0]=0b101 in S2.
+
+If the device memory properties are not present in the host ACPI table,
+the driver registers the vfio-pci-core function pointers.
+
+This goes along with a qemu series [6] to provides the necessary
+implementation of the Grace Hopper Superchip firmware specification so
+that the guest operating system can see the correct ACPI modeling for
+the coherent GPU device. Verified with the CUDA workload in the VM.
+
+[1] https://www.nvidia.com/en-in/technologies/multi-instance-gpu/
+[2] section D8.5.5 of https://developer.arm.com/documentation/ddi0487/latest/
+[3] https://lore.kernel.org/all/20231205033015.10044-1-ankita@nvidia.com/
+[4] https://lore.kernel.org/all/20230907181459.18145-2-ankita@nvidia.com/
+[5] https://github.com/NVIDIA/open-gpu-kernel-modules
+[6] https://lore.kernel.org/all/20231203060245.31593-1-ankita@nvidia.com/
+
+Applied over v6.8-rc2.
+
+Signed-off-by: Aniket Agashe <aniketa@nvidia.com>
+Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
+---
+Link for variant driver v16:
+https://lore.kernel.org/all/20240115211516.635852-1-ankita@nvidia.com/
+
+v16 -> v17
+- Moved, renamed and exported the range_intersect_range() per
+  suggestion from Rahul Rameshbabu.
+- Updated license from GPLv2 to GPL.
+- Fixed S-O-B mistakes.
+- Removed nvgrace_gpu_vfio_pci.h based on Alex Williamson's suggestion.
+- Refactor [read]write_config_emu based on Alex's suggestion
+- Added fallback to vfio-pci-core function pointers in case of absence
+  of memory properties in the host ACPI table as per Alex's suggestion.
+- Used anonymous union to represent the mapped device memory.
+- Fixed code nits and rephrased comments.
+- Rebased to v6.8-rc2.
+
+v15 -> v16
+- Added the missing header file causing build failure in v15.
+- Moved the range_intersect_range function() to a seperate patch.
+- Exported the do_io_rw as GPL and moved to the vfio-pci-core file.
+- Added helper function to mask with BAR size and add flag while
+  returning a read on the fake BARs PCI config register.
+- Removed the PCI command disable.
+- Removed nvgrace_gpu_vfio_pci_fake_bar_mem_region().
+- Fixed miscellaneous nits.
+
+v14 -> v15
+- Added case to handle VFIO_DEVICE_IOEVENTFD to return -EIO as it
+  is not required on the device.
+- Updated the BAR config space handling code to closely resemble
+  by Yishai Hadas (using range_intersect_range) in
+  https://lore.kernel.org/all/20231207102820.74820-10-yishaih@nvidia.com
+- Changed the bar pci config register from union to u64.
+- Adapted the code to disable BAR when it is disabled through
+  PCI_COMMAND.
+- Exported and reused the do_io_rw to do mmio accesses.
+- Added a new header file to keep the newly declared structures.
+- Miscellaneous code fixes suggested by Alex Williamson in v14.
+
+v13 -> v14
+- Merged the changes for second BAR implementation for MIG support
+  on the device driver.
+  https://lore.kernel.org/all/20231115080751.4558-1-ankita@nvidia.com/
+- Added the missing implementation of sub-word access to fake BARs'
+  PCI config access. Implemented access algorithm suggested by
+  Alex Williamson in the comments (Thanks!)
+- Added support to BAR accesses on the reserved memory with
+  Qemu device param x-no-mmap=on.
+- Handled endian-ness in the PCI config space access.
+- Git commit message change
+
+v12 -> v13
+- Added emulation for the PCI config space BAR offset register for
+the fake BAR.
+- commit message updated with more details on the BAR offset emulation.
+
+v11 -> v12
+- More details in commit message on device memory size
+
+v10 -> v11
+- Removed sysfs attribute to expose the CPU coherent memory feature
+- Addressed review comments
+
+v9 -> v10
+- Add new sysfs attribute to expose the CPU coherent memory feature.
+
+v8 -> v9
+- Minor code adjustment suggested in v8.
+
+v7 -> v8
+- Various field names updated.
+- Added a new function to handle VFIO_DEVICE_GET_REGION_INFO ioctl.
+- Locking protection for memremap to bar region and other changes
+  recommended in v7.
+- Added code to fail if the devmem size advertized is 0 in system DSDT.
+
+v6 -> v7
+- Handled out-of-bound and overflow conditions at various places to validate
+  input offset and length.
+- Added code to return EINVAL for offset beyond region size.
+
+v5 -> v6
+- Added the code to handle BAR2 read/write using memremap to the device
+  memory.
+
+v4 -> v5
+- Changed the module name from nvgpu-vfio-pci to nvgrace-gpu-vfio-pci.
+
+v3 -> v4
+- Mapping the available device memory using sparse mmap. The region outside
+  the device memory is handled by read/write ops.
+- Removed the fault handler added in v3.
+
+v2 -> v3
+- Added fault handler to map the region outside the physical GPU memory
+  up to the next power-of-2 to a dummy PFN.
+- Changed to select instead of "depends on" VFIO_PCI_CORE for all the
+  vfio-pci variant driver.
+- Code cleanup based on feedback comments.
+- Code implemented and tested against v6.4-rc4.
+
+v1 -> v2
+- Updated the wording of reference to BAR offset and replaced with
+  index.
+- The GPU memory is exposed at the fixed BAR2_REGION_INDEX.
+- Code cleanup based on feedback comments.
+
+Ankit Agrawal (3):
+  vfio/pci: rename and export do_io_rw()
+  vfio/pci: rename and export range_intesect_range
+  vfio/nvgrace-gpu: Add vfio pci variant module for grace hopper
+
+ MAINTAINERS                           |   6 +
+ drivers/vfio/pci/Kconfig              |   2 +
+ drivers/vfio/pci/Makefile             |   2 +
+ drivers/vfio/pci/nvgrace-gpu/Kconfig  |  10 +
+ drivers/vfio/pci/nvgrace-gpu/Makefile |   3 +
+ drivers/vfio/pci/nvgrace-gpu/main.c   | 856 ++++++++++++++++++++++++++
+ drivers/vfio/pci/vfio_pci_config.c    |  45 ++
+ drivers/vfio/pci/vfio_pci_rdwr.c      |  16 +-
+ drivers/vfio/pci/virtio/main.c        |  72 +--
+ include/linux/vfio_pci_core.h         |  10 +-
+ 10 files changed, 968 insertions(+), 54 deletions(-)
+ create mode 100644 drivers/vfio/pci/nvgrace-gpu/Kconfig
+ create mode 100644 drivers/vfio/pci/nvgrace-gpu/Makefile
+ create mode 100644 drivers/vfio/pci/nvgrace-gpu/main.c
+
+-- 
+2.34.1
 
 
