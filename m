@@ -1,218 +1,257 @@
-Return-Path: <kvm+bounces-7961-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-7962-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F8BD8493AD
-	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 07:05:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3C5F849417
+	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 07:59:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AAE36B22A98
-	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 06:05:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72946281F62
+	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 06:59:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53C95BE4C;
-	Mon,  5 Feb 2024 06:05:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9E8310A2E;
+	Mon,  5 Feb 2024 06:58:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FLSdqkH8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ro/JkNMR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70A44107B6
-	for <kvm@vger.kernel.org>; Mon,  5 Feb 2024 06:05:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707113108; cv=none; b=MreOU/q9sqSrXt6w7kIRDunNLsmYU+PS3T3eQUSRRlvOSBLSfFNCKCuRtCQQKkOMlxFTlTgi22Jhw9Cpn4d45XzNxHUhqqrbnXpSXc2GDAB4z2eGjQGX21w5aPhzgtXe0d+fJgUNHAqeMILvMZtkxEsN/lOqmW89JZYAsWZsQ0U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707113108; c=relaxed/simple;
-	bh=E6VThuS6J+4wlEDuGxjEHe+5OXrQEnop+Am9LxEWQ5A=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=DBFVpkrj+hKypSxmxEnfxKgCmcQfxifGGfR2byyC1xodGMdmJM63t2NzN4pliqMuuGFTHirnHB5/8T0l3wLC27v+If3iinamfIDRHtacAz0Q7uG3vv/buG9pE6qGT3pAsYUOi3CgapoimWeMtFZgXRkQlSy6gzvIVTM3LOaacWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=FLSdqkH8; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a370328e8b8so325948166b.3
-        for <kvm@vger.kernel.org>; Sun, 04 Feb 2024 22:05:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1707113105; x=1707717905; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rUXcEjTVz3Gf2NIAf1nzsfebyGEbAOBm45S3k0v9MtE=;
-        b=FLSdqkH81dxaDvZr0r8BBPDHiveU5ucnvLSA6Q2eh0iUOy8nJWl7MgSIjwj1BA5n5G
-         ND5DUtEFzj/H8SH32BSs7Bi/zcHC7NAgIB2fOFjFMR9o5/KMUtopda36kxcJg93oZewz
-         uZJTI2EldVp9NbzDTiMu0kJThw0AZBkBSloyjjb0iRO/7nR+tA/Fo8fGO4W7JQuuffQT
-         UE5wTfGBHbvnRHbWbfugw3Ytkap2klCU+ZyYy0E7tDQqaUcd9bQHKDf3SMw7JfOt1DZf
-         4tCzffjRfePHHz2DZ8yVipBmjxB10VUj5qr0AJzKmzYa3tZiSnQP7qi4WAzXQaGOCnV6
-         CwVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707113105; x=1707717905;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rUXcEjTVz3Gf2NIAf1nzsfebyGEbAOBm45S3k0v9MtE=;
-        b=EKtBEYlVo9JlYqpxkv3G3ykWZifh2nCTu2wVw5+Hib2dphJvDVcnXYMe4QLCavpSlM
-         hvwpHMYeQsoDj18ePo88kv4Amgk++pJludDEfSFeWqtH4yXKse5sdZM5TcWdpNC/P0dm
-         yPr7p52X1nWdWtimqV8+xBGPORP2Qa6bHigfscVhy4b30prtNESOWp3RGqKzcU9M0xrO
-         oJKzemuibspwCxKXRa8JSMFTUYuXLk5uNhJNk7nxJSFjukfmH4c4WLDoa59EndN01ofZ
-         BXNYn+HJZVM46+NVdnraSNPz3Pz90UOrjtZhgp2uk3noD6Y5Y+Jo8qmy+u7HCJFS4LQb
-         RVlw==
-X-Gm-Message-State: AOJu0YxBNdTCzJoOCW7oofo10+VpX/58XPkzDnnMiL06g55g69do7FPF
-	6gE71jlsXJb6SMz/OvRq60aYqDuP71CvSCNik2lRROFu5y09gfeDD/QTUgQofKE=
-X-Google-Smtp-Source: AGHT+IFssy5CqM/Vb883XVIq5x8aJyEs2QxpbCyIySIjv0SV1nfr8XHJmThxvy0aeOQuPNaZjqe8yQ==
-X-Received: by 2002:a17:906:1445:b0:a30:e4d8:2e46 with SMTP id q5-20020a170906144500b00a30e4d82e46mr6276594ejc.20.1707113104474;
-        Sun, 04 Feb 2024 22:05:04 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCX0flFMNydgt2mx5eZkyzjut6uqV1WnMHvISyxJQDUv0vo4E6xj5/Akl0Dc+n3DdN//LFKXWjIqWXTb+cGtAMi/5dL3AIWjmU8lthqQ5NdD3fDgOZ9rdctSSRGTimbInUVqQXQjtpRTLCqaRy7htR+k2QD9h2ObBKZi7Hinb6sR3LFaD4p6qoPLXcvgJ/7WjbhBM2yLDpvYmbGCZk0WfqCEEu2vEnQTSKK3JvOI1eZ5bGofaV42e6R/u1C5ZaHlrGQ+zEnK4APuUDvLpIj4mXBy/EHfrtZX1mt36LxO+xhXjfRxB2pdFdF4y9Hy+yNvW9RiPW3q/E2eGqPJ2DWSoEEzjdCvk63QjwiR8YwDLHn0XZMvaKuYEExB8AaIehqhCgnP9PeKAFpiwP4Nvg==
-Received: from localhost ([102.222.70.76])
-        by smtp.gmail.com with ESMTPSA id pw8-20020a17090720a800b00a349d05c837sm3890430ejb.154.2024.02.04.22.05.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 04 Feb 2024 22:05:03 -0800 (PST)
-Date: Mon, 5 Feb 2024 09:05:00 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: oe-kbuild@lists.linux.dev, Oliver Upton <oliver.upton@linux.dev>,
-	kvmarm@lists.linux.dev
-Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
-	Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH 01/15] KVM: arm64: vgic: Store LPIs in an xarray
-Message-ID: <cd13d888-0d26-4dcc-b6a9-6a72e4e9d580@moroto.mountain>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14AAE10A01;
+	Mon,  5 Feb 2024 06:58:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707116339; cv=fail; b=roYOFBIllmiXQX6D8XKUuinD82uEmPwUOgD7lnJvRSAtCjKDKy8oJrLANORGqiFDXtMo2HKg9rwBF1phwgT38zdl1cQ5ApRDwZbfXUj0Vb1pg41PrKj/lSUNQed29qTdOAFOkbYGiRbXtkwjW8MkSukNymXaderHoM+EIGSJRjU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707116339; c=relaxed/simple;
+	bh=vMCof7zbsmPRNA0ZOzcnxQkQdFxCP6cw5QTjK5PuzdE=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=aMsepcj4DuTjrdJOUSHalHgn47G3rCSk2wfqm/dhdfH8n7IktxiaGsy9hAuU11DSdgiyBvR4oCR/2EO9u5imMShUcWyX5HtXoMKNld15JdSfd0Bly+Aa7iohWeG1Om+aEYnlRZ400Qu9/+QcQP4RXXHYxJWuz3ilqaxvpCKBXyk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ro/JkNMR; arc=fail smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707116337; x=1738652337;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=vMCof7zbsmPRNA0ZOzcnxQkQdFxCP6cw5QTjK5PuzdE=;
+  b=Ro/JkNMR0bD9WSwnCo6VtAP04HMnqKHSXfEshyEWuDm9YyWNQRH9nrxi
+   UT38yvhsiy/klH2mjq75VW3x5Zlo7ieyJ0/otQQUOtGce6IZ9y/69T9SZ
+   5P/kZipc9+zmQc3r8nDk/mnrSuyz2AJ85mGE0v/+u4OCOnOZviuYLqLaR
+   jTS1LqvzAypbukW40IrqcuYy9Wude+42Ib/rFJRxcZsMBdPJiYGBRMoyy
+   jjWhVOlhk3hhxMJcjWB51tsCj/gRFYzLhwrqZUDNsWz3QmtmASwI4gpdv
+   rFW4rm3E9YXvokf7sTV5L/GJrLaOBYF4j146z03bSqnHNXT12a75Zrz4Z
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10974"; a="11554688"
+X-IronPort-AV: E=Sophos;i="6.05,242,1701158400"; 
+   d="scan'208";a="11554688"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2024 22:58:56 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,242,1701158400"; 
+   d="scan'208";a="844853"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmviesa008.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Feb 2024 22:58:55 -0800
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Sun, 4 Feb 2024 22:58:55 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Sun, 4 Feb 2024 22:58:54 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Sun, 4 Feb 2024 22:58:54 -0800
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.169)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Sun, 4 Feb 2024 22:58:54 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=aXEMakul/L63VX5Yx6TuE07v7SYE6haDrt0ZeLNmtqp6kLehNQTEC0tcUu8u6MUnyDmq2odz7waPAqOfK/pVYcJh9fc9zesqEyPl9S9N8v20zB1wYxBiIVVp5zidBaRdXWy+OjqZTNIoJ3aI3bbEN5tgKFjHooxjCLbZEPZ8OsYee5kwwcWtdT1BtQ74v/7Xtybv+zk69a8f4naopK21hclJQ+5PZA6IDWl5hKr9AKiYPnmxsxRSytx+zOh3e+PK/oVCoKjvq28QJJ1/mocpjd4TyGzqH5bxJ9NY3+iQ6pzdk3MEuZsWSe3VqdYr1uuY6stYf/CwS0H+XIUYShANZw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=1e/354oLrt6Vd5D8ehfBOanI1BpLS/6zj9l0e9jn8Vg=;
+ b=VnJVXtkgCzDGLYVyKnEekh9ld97yc4+Td1YRwJzBdbP3j3oShUSqjGoYGoLG25e3P7R+WNFO+QRs9Kl1tAC/zYIlbIOFiBK7rbye7TslBHLeFZEo7OIjLxqR0BL26lI/IEMAR0/LEExzjBHcor8yrY8rXND/WzsAlzTUer+yCuFKapN1PaJ+cNIODeO6aW0BsV5Rd37on0t1bzTeS0cQGBmks2zVauYWBwN7C99k8yRssHhEnyZY6p9RDVP6nAPD71sy8l4hDekiZXSJ1s2EPqAYUu3ZBB2kfMTDatkkWtUV1/s63m7wf8HsKPO9DpMXFjl2DN9RIUlFs6oCmAmAaQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL1PR11MB5271.namprd11.prod.outlook.com (2603:10b6:208:31a::21)
+ by SA2PR11MB4795.namprd11.prod.outlook.com (2603:10b6:806:118::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7249.33; Mon, 5 Feb
+ 2024 06:58:52 +0000
+Received: from BL1PR11MB5271.namprd11.prod.outlook.com
+ ([fe80::55ed:61f6:bcd3:9e72]) by BL1PR11MB5271.namprd11.prod.outlook.com
+ ([fe80::55ed:61f6:bcd3:9e72%3]) with mapi id 15.20.7249.032; Mon, 5 Feb 2024
+ 06:58:51 +0000
+From: "Tian, Kevin" <kevin.tian@intel.com>
+To: Brett Creeley <brett.creeley@amd.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+	"shameerali.kolothum.thodi@huawei.com"
+	<shameerali.kolothum.thodi@huawei.com>, "yishaih@nvidia.com"
+	<yishaih@nvidia.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>
+CC: "shannon.nelson@amd.com" <shannon.nelson@amd.com>
+Subject: RE: [PATCH vfio] vfio/pds: Rework and simplify reset flows
+Thread-Topic: [PATCH vfio] vfio/pds: Rework and simplify reset flows
+Thread-Index: AQHaUIYcXfafP7iWiUS0/Oox6wrptLD7WkUQ
+Date: Mon, 5 Feb 2024 06:58:51 +0000
+Message-ID: <BL1PR11MB52712B162AE5FEC2E24614F98C472@BL1PR11MB5271.namprd11.prod.outlook.com>
+References: <20240126183225.19193-1-brett.creeley@amd.com>
+In-Reply-To: <20240126183225.19193-1-brett.creeley@amd.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL1PR11MB5271:EE_|SA2PR11MB4795:EE_
+x-ms-office365-filtering-correlation-id: 93e20388-26c5-4fd0-eb34-08dc2617e912
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ZuaMsSEI6yYlYucjjBqNwRDbNfPzRBku74bX9OGlLZYNfgV58e9B2Zy4im+zir5mA3ZXSq4l68yznPxvfWu8PeQ/mPNiQ5vv9l/Rvw3/dGP52b/W4Olbi65iCll7h6Y+gZFUpRCRw5t8vFduTj6ylCUQ9GQ/IIdKamOrNcMZcJ579Hc+03JWmDVNkbl2B+cFlt9N0D2NlyGUgRzw/b4cISURx7i2dDGyaT9w2Z4d3YQmzk/NhYQqcZlyEk36KkcINfjoTTnL5WXzvhBizMCZG+pXAmwgn4dnk8uX+WTO53ut1cofY+OKU/+R9yVE+1XmMg5HCY4X1K3mSjAkGIw4kal4AcSgfKyv/+MKUbyOQQqrqJfAoLrCEE37wIHc4tfgUYYRXHeRw0qrbIoI9Yb7nEHjEciGSXn0oVlHMCsI+GkurePtzk2CiFaICwlLANR1iuE5aGA2jc8kWHs6YEfqokAiOsNXXX8LQGufVc09pMvntgPYuJFW8lxtgdkbpOlXBC+tNE2USmoABsGABc1Aw0Ot2HTZ6ALFV8PNY3fM4eW45wQP4OCst/8WsegERPkaoD1jRMY45Feu4swlFBayy1bfvPa7XIigzZATE3zTcLVpDxU35iZyZLnsL+G2zTo9
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5271.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(346002)(136003)(366004)(39860400002)(396003)(230922051799003)(64100799003)(1800799012)(186009)(451199024)(41300700001)(55016003)(33656002)(478600001)(9686003)(38070700009)(86362001)(82960400001)(26005)(83380400001)(52536014)(316002)(71200400001)(66946007)(66446008)(5660300002)(64756008)(66476007)(6506007)(66556008)(110136005)(38100700002)(4326008)(8936002)(76116006)(8676002)(122000001)(2906002)(7696005);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?cxa1mYF/Ed4wW/uhgo9EqemgAQ5J6xVKRL3K0JxbVryb3FeN/ygR0XBqwxNe?=
+ =?us-ascii?Q?lXeN715jjm078hh4lw8QXakfnN5sG/XczQz51ecc+ayvpaZPpbpqHiaZ+kSi?=
+ =?us-ascii?Q?ZPpOPLgbCGmMQFaDWXxCR3DsqEDOwFFQzsiUNVTjul5Q4lh9oatfJtlmzCIN?=
+ =?us-ascii?Q?yJYWjlSDNhHnrcxS+B3HeDBkfrblGrQpLu4R+XeqFJ+78vFqma+tXy5mnZx1?=
+ =?us-ascii?Q?36zwCwjMcYZHNuZ7RuWAIXjHfeeO1OzfX9WgP0h5vrn965WWw/0/MDLeCggN?=
+ =?us-ascii?Q?tLxW3BJ5a0xdm6dXsI4ycch8Qg65cANIMGtVEB+oyNnwL9BNS9BHAWpO5j3x?=
+ =?us-ascii?Q?/ITsy00MFoh/6IxJBONSTAyuDukpdjHvfkg4shdC+BgruHTXcgRj6fBANQvl?=
+ =?us-ascii?Q?kI7Trys6MMi7vUL6/uBSV21EXPo0IMOZ/b6iGfpZIsPwZTHuua/NN7PqNNp2?=
+ =?us-ascii?Q?QOSeQ4n9+J3LEK1TBsjBO3X8WqUENjHDvMKdzpGBzHcyqajE48URM984tzNY?=
+ =?us-ascii?Q?9StQ9gMuVE6KiujcwxGYNPssfe/BPlO/ahEorHDmAbEuK4ZaROuH9PyDfALZ?=
+ =?us-ascii?Q?n0imsu5UyU6t00IJv1jPFDbaNtiIHRWoyGD4KLQb10GfvooxJdYPsSDrfgN+?=
+ =?us-ascii?Q?dpjxlu0QxS5+Xmcp5B10KTi7I8YrRSsnplKFMLbaUeGjW6J2oRLFCib3yOHR?=
+ =?us-ascii?Q?r/KtWLwvZGF3fwCujHR6cR8OHFKsRD3i9Fe3FdLfPvyxz6dSv2rq4M3QYB7J?=
+ =?us-ascii?Q?Fpg1pcbAvjK0kuOTbCeUrSrQoBrKuR5iLWzRU5Gr6r9snI6a+jCKXKWKgQ3D?=
+ =?us-ascii?Q?06s18cwUof72h6gNcPlApVUpFeY8pYG6Ln+INshNUDRwyAK5LDVPHnx0QhL+?=
+ =?us-ascii?Q?27h185Q/IG7klgDB8U4IT7/ngE9JBgcvs3l9nGFszKFB4v/80PHZZfBJUfWI?=
+ =?us-ascii?Q?Nmi++Awa0Klqrib80s6GbTDxCeu1UVguSEsvI+LOzTpEddfXl1xAHqbKrFP6?=
+ =?us-ascii?Q?VAwQl7YOSCoN+5IQuzueIC0hmxqWNFFAHKj2JtIznWgrzDAaLjwZ28NmflL0?=
+ =?us-ascii?Q?VMYhp05kaHD4f8lX+gCxtCkWIA99RC8wEJ0TkQ2mjABf80aBxPnTxr82Z5Sb?=
+ =?us-ascii?Q?ivHmprjJ5lSP+WEzx1WJAjM8Gld979DFxMZJ3MEoQup3paA7OWVXMGWyhJdO?=
+ =?us-ascii?Q?up5fvgCl/RitZcPON8ESQ/YdPUg0yXcrjiBibAmdaXVfxkwYFDyLcmtyUp9E?=
+ =?us-ascii?Q?AVc9HthbY965MbtdabrOlSYJAMjxhypHEc5euA3Yoz2rVpwYntf4qaVeEe77?=
+ =?us-ascii?Q?gOEeuLzeKj5ps4hFgJ4wGJCocXr8wrzh5hcSg4QiKKYL+oKsfPdFD8b0WDxn?=
+ =?us-ascii?Q?Z0qV8Rit2GLOpv7czyCGbvXVa4PPo4VJZ4YWc86Uxy8w0bx8Nx47bnjx+G2N?=
+ =?us-ascii?Q?JN2f1C01tX45wf5U4ELUVxYPuFJaDvF/oSMwS7AxsZBzN4HqZ68ZqegYKGbP?=
+ =?us-ascii?Q?aQ8zxJpH7eGvRNevLiS4fABHjI90rItbedi/bgNdM5r56Y+H0xgFzsh87IsP?=
+ =?us-ascii?Q?jqzs0UQHYFWEcc9VqUbtUUTimzH03d+V7jV+uVkT?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240124204909.105952-2-oliver.upton@linux.dev>
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5271.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 93e20388-26c5-4fd0-eb34-08dc2617e912
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Feb 2024 06:58:51.6120
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: hzwhZbtCdbyKE6cDJ4JZh8ouLo1lNpZxNfPJ7CWxVjs+rq9o2I+WG6x+k4QpFXlJycmsvGbo9ByACyGVrODUsw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB4795
+X-OriginatorOrg: intel.com
 
-Hi Oliver,
+> From: Brett Creeley <brett.creeley@amd.com>
+> Sent: Saturday, January 27, 2024 2:32 AM
+>=20
+> The current logic for handling resets based on
+> whether they were initiated from the DSC or
+> host/VMM is slightly confusing and incorrect.
+> The incorrect behavior can cause the VF device
+> to be unusable on the destination on failed
+> migrations due to incompatible configurations.
+> Fix this by setting the state back to
+> VFIO_DEVICE_STATE_RUNNING when an FLR is
+> triggered, so the VF device is put back in
+> an "initial" pre-configured state after failures.
 
-kernel test robot noticed the following build warnings:
+any reason for putting short lines (<50 chars) in commit msg?
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Oliver-Upton/KVM-arm64-vgic-Store-LPIs-in-an-xarray/20240125-045255
-base:   6613476e225e090cc9aad49be7fa504e290dd33d
-patch link:    https://lore.kernel.org/r/20240124204909.105952-2-oliver.upton%40linux.dev
-patch subject: [PATCH 01/15] KVM: arm64: vgic: Store LPIs in an xarray
-config: arm64-randconfig-r081-20240129 (https://download.01.org/0day-ci/archive/20240204/202402041412.mZlOxFFw-lkp@intel.com/config)
-compiler: clang version 19.0.0git (https://github.com/llvm/llvm-project 4a39d08908942b2d415db405844cbe4af73e75d4)
+>=20
+> Also, while here clean-up the reset logic to
+> make the source of the reset more obvious.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-| Closes: https://lore.kernel.org/r/202402041412.mZlOxFFw-lkp@intel.com/
+as a fix the a 'Fixed' tag is preferred and CC stable
 
-New smatch warnings:
-arch/arm64/kvm/vgic/vgic-its.c:128 vgic_add_lpi() warn: inconsistent returns '&dist->lpi_list_lock'.
-arch/arm64/kvm/vgic/vgic-its.c:128 vgic_add_lpi() warn: inconsistent returns 'flags'.
+also separate the real fix from the cleanup so stable kernel doesn't need
+to backport unnecessary code.
 
-Old smatch warnings:
-arch/arm64/kvm/vgic/vgic-its.c:324 update_lpi_config() warn: inconsistent returns '&irq->irq_lock'.
-arch/arm64/kvm/vgic/vgic-its.c:324 update_lpi_config() warn: inconsistent returns 'flags'.
+btw the commit msg is not clear to me. It says fixing the problem
+by setting the state to _ERROR for the DSC path and to _RUNNING for
+the FLR path.
 
-vim +128 arch/arm64/kvm/vgic/vgic-its.c
+But looks it's already such case with old code:
 
-06bd5359549d7a virt/kvm/arm/vgic/vgic-its.c   Eric Auger       2017-05-04   39  static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
-06bd5359549d7a virt/kvm/arm/vgic/vgic-its.c   Eric Auger       2017-05-04   40  				     struct kvm_vcpu *vcpu)
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   41  {
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   42  	struct vgic_dist *dist = &kvm->arch.vgic;
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   43  	struct vgic_irq *irq = vgic_get_irq(kvm, NULL, intid), *oldirq;
-388d4359680b56 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2018-05-11   44  	unsigned long flags;
-06bd5359549d7a virt/kvm/arm/vgic/vgic-its.c   Eric Auger       2017-05-04   45  	int ret;
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   46  
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   47  	/* In this case there is no put, since we keep the reference. */
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   48  	if (irq)
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   49  		return irq;
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   50  
-3ef231670b9e90 arch/arm64/kvm/vgic/vgic-its.c Jia He           2021-09-07   51  	irq = kzalloc(sizeof(struct vgic_irq), GFP_KERNEL_ACCOUNT);
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   52  	if (!irq)
-99e5e886a0a59d virt/kvm/arm/vgic/vgic-its.c   Christoffer Dall 2016-08-01   53  		return ERR_PTR(-ENOMEM);
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   54  
-3e55a25b7db23f arch/arm64/kvm/vgic/vgic-its.c Oliver Upton     2024-01-24   55  	ret = xa_reserve_irq(&dist->lpi_xa, intid, GFP_KERNEL_ACCOUNT);
-3e55a25b7db23f arch/arm64/kvm/vgic/vgic-its.c Oliver Upton     2024-01-24   56  	if (ret) {
-3e55a25b7db23f arch/arm64/kvm/vgic/vgic-its.c Oliver Upton     2024-01-24   57  		kfree(irq);
-3e55a25b7db23f arch/arm64/kvm/vgic/vgic-its.c Oliver Upton     2024-01-24   58  		return ERR_PTR(ret);
-3e55a25b7db23f arch/arm64/kvm/vgic/vgic-its.c Oliver Upton     2024-01-24   59  	}
-3e55a25b7db23f arch/arm64/kvm/vgic/vgic-its.c Oliver Upton     2024-01-24   60  
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   61  	INIT_LIST_HEAD(&irq->lpi_list);
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   62  	INIT_LIST_HEAD(&irq->ap_list);
-8fa3adb8c6beee virt/kvm/arm/vgic/vgic-its.c   Julien Thierry   2019-01-07   63  	raw_spin_lock_init(&irq->irq_lock);
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   64  
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   65  	irq->config = VGIC_CONFIG_EDGE;
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   66  	kref_init(&irq->refcount);
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   67  	irq->intid = intid;
-06bd5359549d7a virt/kvm/arm/vgic/vgic-its.c   Eric Auger       2017-05-04   68  	irq->target_vcpu = vcpu;
-8df3c8f33f46ad virt/kvm/arm/vgic/vgic-its.c   Christoffer Dall 2018-07-16   69  	irq->group = 1;
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   70  
-fc3bc475231e12 virt/kvm/arm/vgic/vgic-its.c   Julien Thierry   2019-01-07   71  	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   72  
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   73  	/*
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   74  	 * There could be a race with another vgic_add_lpi(), so we need to
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   75  	 * check that we don't add a second list entry with the same LPI.
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   76  	 */
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   77  	list_for_each_entry(oldirq, &dist->lpi_list_head, lpi_list) {
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   78  		if (oldirq->intid != intid)
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   79  			continue;
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   80  
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   81  		/* Someone was faster with adding this LPI, lets use that. */
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   82  		kfree(irq);
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   83  		irq = oldirq;
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   84  
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   85  		/*
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   86  		 * This increases the refcount, the caller is expected to
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   87  		 * call vgic_put_irq() on the returned pointer once it's
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   88  		 * finished with the IRQ.
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   89  		 */
-d97594e6bc1b4a virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier     2016-07-17   90  		vgic_get_irq_kref(irq);
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   91  
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   92  		goto out_unlock;
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   93  	}
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15   94  
-3e55a25b7db23f arch/arm64/kvm/vgic/vgic-its.c Oliver Upton     2024-01-24   95  	ret = xa_err(xa_store(&dist->lpi_xa, intid, irq, 0));
-3e55a25b7db23f arch/arm64/kvm/vgic/vgic-its.c Oliver Upton     2024-01-24   96  	if (ret) {
-3e55a25b7db23f arch/arm64/kvm/vgic/vgic-its.c Oliver Upton     2024-01-24   97  		xa_release(&dist->lpi_xa, intid);
-3e55a25b7db23f arch/arm64/kvm/vgic/vgic-its.c Oliver Upton     2024-01-24   98  		kfree(irq);
-3e55a25b7db23f arch/arm64/kvm/vgic/vgic-its.c Oliver Upton     2024-01-24   99  		return ERR_PTR(ret);
+pds_vfio_recovery()
+	pds_vfio->deferred_reset =3D true;
+	pds_vfio->deferred_reset_state =3D VFIO_DEVICE_STATE_ERROR;
 
-should be goto out_unlock or something
+pds_vfio_reset()
+	pds_vfio->deferred_reset =3D true;
+	pds_vfio->deferred_reset_state =3D VFIO_DEVICE_STATE_RUNNING;
 
-3e55a25b7db23f arch/arm64/kvm/vgic/vgic-its.c Oliver Upton     2024-01-24  100  	}
-3e55a25b7db23f arch/arm64/kvm/vgic/vgic-its.c Oliver Upton     2024-01-24  101  
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15  102  	list_add_tail(&irq->lpi_list, &dist->lpi_list_head);
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15  103  	dist->lpi_list_count++;
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15  104  
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15  105  out_unlock:
-fc3bc475231e12 virt/kvm/arm/vgic/vgic-its.c   Julien Thierry   2019-01-07  106  	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15  107  
-06bd5359549d7a virt/kvm/arm/vgic/vgic-its.c   Eric Auger       2017-05-04  108  	/*
-06bd5359549d7a virt/kvm/arm/vgic/vgic-its.c   Eric Auger       2017-05-04  109  	 * We "cache" the configuration table entries in our struct vgic_irq's.
-06bd5359549d7a virt/kvm/arm/vgic/vgic-its.c   Eric Auger       2017-05-04  110  	 * However we only have those structs for mapped IRQs, so we read in
-06bd5359549d7a virt/kvm/arm/vgic/vgic-its.c   Eric Auger       2017-05-04  111  	 * the respective config data from memory here upon mapping the LPI.
-57bdb436ce869a virt/kvm/arm/vgic/vgic-its.c   Zenghui Yu       2020-04-14  112  	 *
-57bdb436ce869a virt/kvm/arm/vgic/vgic-its.c   Zenghui Yu       2020-04-14  113  	 * Should any of these fail, behave as if we couldn't create the LPI
-57bdb436ce869a virt/kvm/arm/vgic/vgic-its.c   Zenghui Yu       2020-04-14  114  	 * by dropping the refcount and returning the error.
-06bd5359549d7a virt/kvm/arm/vgic/vgic-its.c   Eric Auger       2017-05-04  115  	 */
-6ce18e3a5f3308 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier     2017-10-27  116  	ret = update_lpi_config(kvm, irq, NULL, false);
-57bdb436ce869a virt/kvm/arm/vgic/vgic-its.c   Zenghui Yu       2020-04-14  117  	if (ret) {
-57bdb436ce869a virt/kvm/arm/vgic/vgic-its.c   Zenghui Yu       2020-04-14  118  		vgic_put_irq(kvm, irq);
-06bd5359549d7a virt/kvm/arm/vgic/vgic-its.c   Eric Auger       2017-05-04  119  		return ERR_PTR(ret);
-57bdb436ce869a virt/kvm/arm/vgic/vgic-its.c   Zenghui Yu       2020-04-14  120  	}
-06bd5359549d7a virt/kvm/arm/vgic/vgic-its.c   Eric Auger       2017-05-04  121  
-06bd5359549d7a virt/kvm/arm/vgic/vgic-its.c   Eric Auger       2017-05-04  122  	ret = vgic_v3_lpi_sync_pending_status(kvm, irq);
-57bdb436ce869a virt/kvm/arm/vgic/vgic-its.c   Zenghui Yu       2020-04-14  123  	if (ret) {
-57bdb436ce869a virt/kvm/arm/vgic/vgic-its.c   Zenghui Yu       2020-04-14  124  		vgic_put_irq(kvm, irq);
-06bd5359549d7a virt/kvm/arm/vgic/vgic-its.c   Eric Auger       2017-05-04  125  		return ERR_PTR(ret);
-57bdb436ce869a virt/kvm/arm/vgic/vgic-its.c   Zenghui Yu       2020-04-14  126  	}
-06bd5359549d7a virt/kvm/arm/vgic/vgic-its.c   Eric Auger       2017-05-04  127  
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15 @128  	return irq;
-df9f58fbea9bc6 virt/kvm/arm/vgic/vgic-its.c   Andre Przywara   2016-07-15  129  }
+pds_vfio_state_mutex_unlock()
+	if (pds_vfio->deferred_reset) {
+		...
+		pds_vfio->state =3D pds_vfio->deferred_reset_state;
+		...
+	}
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+it's same as what this patch does:
 
+pds_vfio_recovery()
+	pds_vfio->deferred_reset_type =3D PDS_VFIO_DEVICE_RESET;
+
+pds_vfio_reset()
+	pds_vfio->deferred_reset_state =3D PDS_VFIO_HOST_RESET;
+
+pds_vfio_state_mutex_unlock()
+	if (pds_vfio->deferred_reset) {
+		...
+		if (pds_vfio->deferred_reset_type =3D=3D PDS_VFIO_HOST_RESET)
+			pds_vfio->state =3D VFIO_DEVICE_STATE_RUNNING;
+		else
+			pds_vfio->state =3D VFIO_DEVICE_STATE_ERROR;
+		...
+	}
+
+looks the actual functional difference is from below change:
+
+> @@ -32,13 +32,14 @@ void pds_vfio_state_mutex_unlock(struct
+> pds_vfio_pci_device *pds_vfio)
+>  	mutex_lock(&pds_vfio->reset_mutex);
+>  	if (pds_vfio->deferred_reset) {
+>  		pds_vfio->deferred_reset =3D false;
+> -		if (pds_vfio->state =3D=3D VFIO_DEVICE_STATE_ERROR) {
+> -			pds_vfio_put_restore_file(pds_vfio);
+> -			pds_vfio_put_save_file(pds_vfio);
+> +		pds_vfio_put_restore_file(pds_vfio);
+> +		pds_vfio_put_save_file(pds_vfio);
+
+above two are changed from conditional to always.
+
+> +		if (pds_vfio->deferred_reset_type =3D=3D PDS_VFIO_HOST_RESET)
+> {
+> +			pds_vfio->state =3D VFIO_DEVICE_STATE_RUNNING;
+> +		} else {
+>  			pds_vfio_dirty_disable(pds_vfio, false);
+
+and this is now only for the DSC path.
+
+need a better explanation here.
 
