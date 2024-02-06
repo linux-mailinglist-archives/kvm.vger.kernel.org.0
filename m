@@ -1,173 +1,144 @@
-Return-Path: <kvm+bounces-8074-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8075-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C225084ADD9
-	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 06:16:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C21A484AE0C
+	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 06:22:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00EFC1C22897
-	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 05:16:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F3952852D7
+	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 05:22:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6EA97A727;
-	Tue,  6 Feb 2024 05:14:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55ECE7F486;
+	Tue,  6 Feb 2024 05:20:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gMy8qoU1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ahUqBpGA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA41C77F2A;
-	Tue,  6 Feb 2024 05:14:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEB307F7CC;
+	Tue,  6 Feb 2024 05:20:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707196484; cv=none; b=TmEmEjj4crXrMyGByBJfh2CQXEK6FPGlZysJ2+NvqAnwdYC2NBzrc3g0ncxLS0lCmBPAQ3HrpdOMXuumOWwb0NybFWRTs6ON+0x90CEhuvVos/1gNeoP0oGDlLimULsZsUuEWDyQIiiO8N2DZxAgTXjfLJIoTke3JifME9IAonU=
+	t=1707196852; cv=none; b=kNhX+7WHF0IvX+zSXvzarbvzKg9w9z/6SDv88dVAP3SsijefTAjrJG3Ym+EbZm5Uavvuye015eGMOAJGtCi4+ncesWV2xiAyTa+dP6uOUOGQLl1kiAHdjiUA0LR7GN+PNiYk/1/JuewQVQs1xdW5svcrwk85hk/mdUveJUnf0SQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707196484; c=relaxed/simple;
-	bh=vSJhso2JZf75lQS3y3aRewHIckrS3lQXcRZxC1OiZpM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z2tnfFg0XSw4LgvyELlkxP7JhIjGTMhNZG6gYkBHURB4t9gitV6WAGECF9xCUxgLzXbeDV1cbVPYP0oR1oK3MsM3i2fwlCVlVN1MDaUniAWWnfGHJvjHeffYUS14M6CZH2Y3krGe2QmGkgh8gyjMWKXVs4gHH7u1PT0uxNSXMuY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gMy8qoU1; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707196482; x=1738732482;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=vSJhso2JZf75lQS3y3aRewHIckrS3lQXcRZxC1OiZpM=;
-  b=gMy8qoU1qxaky/Vi9+FqHbBaFViUuJxQi/JuLATurPxIzCV+r0wbZ717
-   m7Ql3ofzizqRyXwVRTPDnblAuQNjvGikiLjEZjkIPl+9Bp6gL4GnbAa8k
-   EMjIBGBTd9xfP5ZvnIpH31SsDO/VC8914QCWzls30jzD2agb2LOOX+URg
-   3Hu/8gd5Cbm//EuiGPhFJkJIPHGhQ4Cn0xmvtjYvi8o53rPTEitC3cVz/
-   XIFP5YHvhAl9wTBJToBh81BR0YTyQvaqHcjmec1M6j1F/LMRNrfH6djBz
-   BvGLZ5uKiyc35WWLV/D6w/IB6P6FfCC4HrGcmnTBXr9IfJn2bD2XBdKOT
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10975"; a="555200"
-X-IronPort-AV: E=Sophos;i="6.05,246,1701158400"; 
-   d="scan'208";a="555200"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2024 21:14:39 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,246,1701158400"; 
-   d="scan'208";a="5518282"
-Received: from linux.bj.intel.com ([10.238.157.71])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2024 21:14:22 -0800
-Date: Tue, 6 Feb 2024 13:11:24 +0800
-From: Tao Su <tao1.su@linux.intel.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Yi Lai <yi1.lai@intel.com>
-Subject: Re: [PATCH] KVM: selftests: Don't assert on exact number of 4KiB in
- dirty log split test
-Message-ID: <ZcG/fB5me7wWUNQL@linux.bj.intel.com>
-References: <20240131222728.4100079-1-seanjc@google.com>
+	s=arc-20240116; t=1707196852; c=relaxed/simple;
+	bh=XEJ+jhnAPDqSuFwkdmvR0HvhYL9MbSjjh8X3b4RrQ5g=;
+	h=Mime-Version:Content-Type:Date:Message-Id:To:Cc:Subject:From:
+	 References:In-Reply-To; b=E+1G+LJfJENECLEa7ZwnfNbiUQKntKbFGyRPf6G6hBrlAj/GRSpxgrHgTaMbG8gSileevYlDEVmWTWbd0J2gWGkHsrmmjr4tDF/XdSW7+wKz48K7/S/0cErdcE+RHWtrkph3JCOSLjlPYD3iFxGlXqDgtBLi3TLiUwhqdPloHjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ahUqBpGA; arc=none smtp.client-ip=209.85.215.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-5dc13cbce45so1797739a12.2;
+        Mon, 05 Feb 2024 21:20:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707196849; x=1707801649; darn=vger.kernel.org;
+        h=in-reply-to:references:from:subject:cc:to:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6ujXxMm41r1DTz6hXgtYYr184Pjn4FDAt68mgLajJUg=;
+        b=ahUqBpGACFPt20dzEzNCwlSkfTzxLwlxh/wlrZoq50VZCKIh1zvoWutjp0/VdT9MmT
+         SOgyVmVxc8rgsV3c2+3Am/pSvFmQDRJbai9BQUtUMWUrX0MOgtYaqUcmyHpSgC0KGYMD
+         /UrAewqAkoAk7r9QXBoUNvEJ3lKjzOzxaK46VfhHkKknDJr/l7AWzVSsA/OU/NIUEcNZ
+         LBNimMQVzz4I/9XkoZG3oSi6x3viO2r9MTVBjr9d5+TJalaVagHit0/HL20huPgzj0sr
+         jgIh9vRn1NKwTOn5WR1lBKppRLXyLLpyNKeWg/eix+F9XjMwRSUD6DMLdtoeIOlbVlyc
+         HSHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707196849; x=1707801649;
+        h=in-reply-to:references:from:subject:cc:to:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=6ujXxMm41r1DTz6hXgtYYr184Pjn4FDAt68mgLajJUg=;
+        b=K6ExCULNRPoUgx/FrtI4MISCZa7nSFJrn9velgbMVxDN5b9SaHTBtEVcoDZpZcHuEx
+         uySvVNGZmAUBSKHaQumfYH1thlNI/f3t3dwvQPMneK5z55ucq+tUcIYmwfS2SyKb2RaT
+         kBHAUZjYh9MG7U0IkrBEuMrUwYRLd3eD3dAN68UagEHMZuMB5QYkquNtZkOkK9aNn3Yu
+         MN08bkBkZYvhrd9vWbUerSPnorcYeKHgiRL6iXKq5t1GSHWbNH6gYyYQLR7mgLPwSWNS
+         bhXFBoW1PqFiXQ9zjqxPH3JtKvKVoSepNnBFuWSMaXNdTtbpBv6pJ+Ef66HAE8th2zrE
+         Qn3Q==
+X-Gm-Message-State: AOJu0YwCglPRyyzZMuwlbsB6HWBeAKp+0hafxjvJJd9IHOQGq+od8IIo
+	os6hv6IE5HUmHNWGSDB0SPR5y7VXZVRqwZPVI3JvklkZkWufl241
+X-Google-Smtp-Source: AGHT+IGrC/r/fSLayc+2sKm4zT5ROnGWF0/akqOJQQ+ytoitx9LbhdLVzv/iUQiDN62FNk18zrb+oQ==
+X-Received: by 2002:a05:6a20:1585:b0:19a:28c3:ee0d with SMTP id h5-20020a056a20158500b0019a28c3ee0dmr633416pzj.15.1707196848684;
+        Mon, 05 Feb 2024 21:20:48 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCW18Usptg28HpXEBSe0coTZzST3WInoh7AzPcUDYZLKObsxXjGFfums519DdYypqLO/LRwtH87zuGBMa19V2aHodBMpHpIGAflAANNaysJmXcVvIOc9DTx/UVKQA/aoQ7Oe7tzqmEOuYyc14Zy37imoWAwt1LjfELNiQdFJHp0tnL/K7LbaIoxRZfTaNhHrA6yHV0o6bdyuNATTtTrhPGAoPm/nVh3TZ4MtaTZ2fDfQZO6qXuQ4n4Slo8zmtYh0F768tEb/iOmRyx9xEA40WasdNWE5hA08Wh5903uBFSBhSfcvh7muf1SRGe1EQr1jxbQD+I46Zh4b/Nzl/0j4inFDJUkZhYu5xZA4fRrSRciBWf56R43Aabd4gAQIUi7OkZgkrdVOa1Bhw8ILdcXk8ecS0GcwfJujRvqS+Be6BIBPIWdYfWWjyhqw9RbpOx8ArZx1jIqA/W6PpGe2upPJPkJPY1T+qch6S8t1qq2vMRSwBAkiKM8=
+Received: from localhost ([1.146.47.2])
+        by smtp.gmail.com with ESMTPSA id j6-20020a170902c3c600b001d965cf6a9bsm830428plj.252.2024.02.05.21.20.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 05 Feb 2024 21:20:48 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240131222728.4100079-1-seanjc@google.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 06 Feb 2024 15:20:15 +1000
+Message-Id: <CYXQRHUSFZ71.LI2K63O2WRJG@wheely>
+To: "Thomas Huth" <thuth@redhat.com>
+Cc: <kvm@vger.kernel.org>, "Laurent Vivier" <lvivier@redhat.com>, "Shaoqin
+ Huang" <shahuang@redhat.com>, "Andrew Jones" <andrew.jones@linux.dev>,
+ "Nico Boehr" <nrb@linux.ibm.com>, "Paolo Bonzini" <pbonzini@redhat.com>,
+ "Alexandru Elisei" <alexandru.elisei@arm.com>, "Eric Auger"
+ <eric.auger@redhat.com>, "Janosch Frank" <frankja@linux.ibm.com>, "Claudio
+ Imbrenda" <imbrenda@linux.ibm.com>, "David Hildenbrand" <david@redhat.com>,
+ "Marc Hartmayer" <mhartmay@linux.ibm.com>, <linuxppc-dev@lists.ozlabs.org>,
+ <linux-s390@vger.kernel.org>, <kvmarm@lists.linux.dev>
+Subject: Re: [kvm-unit-tests PATCH v2 3/9] arch-run: Clean up initrd cleanup
+From: "Nicholas Piggin" <npiggin@gmail.com>
+X-Mailer: aerc 0.15.2
+References: <20240202065740.68643-1-npiggin@gmail.com>
+ <20240202065740.68643-4-npiggin@gmail.com>
+ <cc1b4733-9a6f-4bb6-b8e6-1a6a8807b317@redhat.com>
+In-Reply-To: <cc1b4733-9a6f-4bb6-b8e6-1a6a8807b317@redhat.com>
 
-On Wed, Jan 31, 2024 at 02:27:28PM -0800, Sean Christopherson wrote:
-> Drop dirty_log_page_splitting_test's assertion that the number of 4KiB
-> pages remains the same across dirty logging being enabled and disabled, as
-> the test doesn't guarantee that mappings outside of the memslots being
-> dirty logged are stable, e.g. KVM's mappings for code and pages in
-> memslot0 can be zapped by things like NUMA balancing.
-> 
-> To preserve the spirit of the check, assert that (a) the number of 4KiB
-> pages after splitting is _at least_ the number of 4KiB pages across all
-> memslots under test, and (b) the number of hugepages before splitting adds
-> up to the number of pages across all memslots under test.  (b) is a little
-> tenuous as it relies on memslot0 being incompatible with transparent
-> hugepages, but that holds true for now as selftests explicitly madvise()
-> MADV_NOHUGEPAGE for memslot0 (__vm_create() unconditionally specifies the
-> backing type as VM_MEM_SRC_ANONYMOUS).
-> 
-> Reported-by: Yi Lai <yi1.lai@intel.com>
-> Reported-by: Tao Su <tao1.su@linux.intel.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  .../x86_64/dirty_log_page_splitting_test.c    | 21 +++++++++++--------
->  1 file changed, 12 insertions(+), 9 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/x86_64/dirty_log_page_splitting_test.c b/tools/testing/selftests/kvm/x86_64/dirty_log_page_splitting_test.c
-> index 634c6bfcd572..4864cf3fae57 100644
-> --- a/tools/testing/selftests/kvm/x86_64/dirty_log_page_splitting_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/dirty_log_page_splitting_test.c
-> @@ -92,7 +92,6 @@ static void run_test(enum vm_guest_mode mode, void *unused)
->  	uint64_t host_num_pages;
->  	uint64_t pages_per_slot;
->  	int i;
-> -	uint64_t total_4k_pages;
->  	struct kvm_page_stats stats_populated;
->  	struct kvm_page_stats stats_dirty_logging_enabled;
->  	struct kvm_page_stats stats_dirty_pass[ITERATIONS];
-> @@ -107,6 +106,9 @@ static void run_test(enum vm_guest_mode mode, void *unused)
->  	guest_num_pages = vm_adjust_num_guest_pages(mode, guest_num_pages);
->  	host_num_pages = vm_num_host_pages(mode, guest_num_pages);
->  	pages_per_slot = host_num_pages / SLOTS;
-> +	TEST_ASSERT_EQ(host_num_pages, pages_per_slot * SLOTS);
-> +	TEST_ASSERT(!(host_num_pages % 512),
-> +		    "Number of pages, '%lu' not a multiple of 2MiB", host_num_pages);
->  
->  	bitmaps = memstress_alloc_bitmaps(SLOTS, pages_per_slot);
->  
-> @@ -165,10 +167,8 @@ static void run_test(enum vm_guest_mode mode, void *unused)
->  	memstress_free_bitmaps(bitmaps, SLOTS);
->  	memstress_destroy_vm(vm);
->  
-> -	/* Make assertions about the page counts. */
-> -	total_4k_pages = stats_populated.pages_4k;
-> -	total_4k_pages += stats_populated.pages_2m * 512;
-> -	total_4k_pages += stats_populated.pages_1g * 512 * 512;
-> +	TEST_ASSERT_EQ((stats_populated.pages_2m * 512 +
-> +			stats_populated.pages_1g * 512 * 512), host_num_pages);
->  
->  	/*
->  	 * Check that all huge pages were split. Since large pages can only
-> @@ -180,19 +180,22 @@ static void run_test(enum vm_guest_mode mode, void *unused)
->  	 */
->  	if (dirty_log_manual_caps) {
->  		TEST_ASSERT_EQ(stats_clear_pass[0].hugepages, 0);
-> -		TEST_ASSERT_EQ(stats_clear_pass[0].pages_4k, total_4k_pages);
-> +		TEST_ASSERT(stats_clear_pass[0].pages_4k >= host_num_pages,
-> +			    "Expected at least '%lu' 4KiB pages, found only '%lu'",
-> +			    host_num_pages, stats_clear_pass[0].pages_4k);
->  		TEST_ASSERT_EQ(stats_dirty_logging_enabled.hugepages, stats_populated.hugepages);
->  	} else {
->  		TEST_ASSERT_EQ(stats_dirty_logging_enabled.hugepages, 0);
-> -		TEST_ASSERT_EQ(stats_dirty_logging_enabled.pages_4k, total_4k_pages);
-> +		TEST_ASSERT(stats_dirty_logging_enabled.pages_4k >= host_num_pages,
-> +			    "Expected at least '%lu' 4KiB pages, found only '%lu'",
-> +			    host_num_pages, stats_clear_pass[0].pages_4k);
+On Mon Feb 5, 2024 at 10:04 PM AEST, Thomas Huth wrote:
+> On 02/02/2024 07.57, Nicholas Piggin wrote:
+> > Rather than put a big script into the trap handler, have it call
+> > a function.
+> >=20
+> > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> > ---
+> >   scripts/arch-run.bash | 12 +++++++++++-
+> >   1 file changed, 11 insertions(+), 1 deletion(-)
+> >=20
+> > diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
+> > index f22ead6f..cc7da7c5 100644
+> > --- a/scripts/arch-run.bash
+> > +++ b/scripts/arch-run.bash
+> > @@ -271,10 +271,20 @@ search_qemu_binary ()
+> >   	export PATH=3D$save_path
+> >   }
+> >  =20
+> > +initrd_cleanup ()
+> > +{
+> > +	if [ "$KVM_UNIT_TESTS_ENV_OLD" ]; then
+> > +		export KVM_UNIT_TESTS_ENV=3D"$KVM_UNIT_TESTS_ENV_OLD"
+> > +	else
+> > +		unset KVM_UNIT_TESTS_ENV
+> > +		unset KVM_UNIT_TESTS_ENV_OLD
+> > +	fi
+> > +}
+> > +
+> >   initrd_create ()
+> >   {
+> >   	if [ "$ENVIRON_DEFAULT" =3D "yes" ]; then
+> > -		trap_exit_push 'rm -f $KVM_UNIT_TESTS_ENV; [ "$KVM_UNIT_TESTS_ENV_OL=
+D" ] && export KVM_UNIT_TESTS_ENV=3D"$KVM_UNIT_TESTS_ENV_OLD" || unset KVM_=
+UNIT_TESTS_ENV; unset KVM_UNIT_TESTS_ENV_OLD'
+> > +		trap_exit_push 'rm -f $KVM_UNIT_TESTS_ENV; initrd_cleanup'
+> >
+>
+> Why don't you move the 'rm -f $KVM_UNIT_TESTS_ENV' into the initrd_cleanu=
+p()=20
+> function, too? ... that would IMHO make more sense for a function that is=
+=20
+> called *_cleanup() ?
 
-Here should print stats_dirty_logging_enabled.pages_4k, not stats_clear_pass[0].pages_4k.
+Yeah good point, will respin.
 
-Everything else looks great.
-
-Reviewed-by: Tao Su <tao1.su@linux.intel.com>
-
->  	}
->  
->  	/*
->  	 * Once dirty logging is disabled and the vCPUs have touched all their
-> -	 * memory again, the page counts should be the same as they were
-> +	 * memory again, the hugepage counts should be the same as they were
->  	 * right after initial population of memory.
->  	 */
-> -	TEST_ASSERT_EQ(stats_populated.pages_4k, stats_repopulated.pages_4k);
->  	TEST_ASSERT_EQ(stats_populated.pages_2m, stats_repopulated.pages_2m);
->  	TEST_ASSERT_EQ(stats_populated.pages_1g, stats_repopulated.pages_1g);
->  }
-> 
-> base-commit: f0f3b810edda57f317d79f452056786257089667
-> -- 
-> 2.43.0.429.g432eaa2c6b-goog
-> 
+Thanks,
+Nick
 
