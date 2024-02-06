@@ -1,231 +1,233 @@
-Return-Path: <kvm+bounces-8143-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8144-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16C2B84BE5D
-	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 20:56:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E620484BE68
+	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 21:06:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7FF9287E73
-	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 19:56:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 14B0D1C22A95
+	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 20:06:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0558117732;
-	Tue,  6 Feb 2024 19:56:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E38BF17744;
+	Tue,  6 Feb 2024 20:06:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="q43V+YMp"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U8/nwTvK"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9083617731
-	for <kvm@vger.kernel.org>; Tue,  6 Feb 2024 19:56:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D8F71AADA
+	for <kvm@vger.kernel.org>; Tue,  6 Feb 2024 20:06:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707249363; cv=none; b=KI/yMuqRRWZSilpcXH5Tsjmyu4rmbmfT4MJpgp5tjipVQOKOA2x2RyLg15jPsesDlh8zqo0g0Ij+nqOlmvf0IPc5NwH9Ef/ZErObpXlgA+AkpZzuz155gBCnXE9+U822fBKqvNzRuYPya+fm1eTzH29LYbgxXP8PAmVqvf5/B14=
+	t=1707249997; cv=none; b=MhpvR7hTJ2lmiCCTae+HRgJVQOpgqtRjbU6hrMJLA7iZVijg/vwM2Mz3dJvkxD2SmzzyadiTX2XqggRSCupuxai9b1Kt/rfuwzwSeCZtc9teC6gSweftoAc8VvCVGhLnDg+nIqSbaHLOL7THehfaZ03zWgEOLKVz2fTbi06qRHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707249363; c=relaxed/simple;
-	bh=hh+xK2yS+ZRiN9Gjmf7Np/DmQbujstrSLJMd6Y7JOrw=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Zq6B0Nurwk5bYHEjdzR8558t4QKqEGDitXDIi3KfiGhBsfTjRboEAZJbCE2TU2il6JKMhdplTav5Lf0iCRnkN6jarxaTgWg2GfMf+5D8XTGu5tNkDFpxoN6U99lT44u3ycoVUaORgm37/7SaVinJugosN6dW1FjUHTQxfIy8YDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=q43V+YMp; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=hh+xK2yS+ZRiN9Gjmf7Np/DmQbujstrSLJMd6Y7JOrw=; b=q43V+YMpCTI1SHp/DRXcW7S3/m
-	j8P8/WWfQm93mHUGF8XZaLJBVGs5yo7Z+a/YAMLQlMRFxved3zYPKoNnYht9LV2dpuu07nqDJDEom
-	42fwB4X2GltUUfcNEIKIyZ6Mibdp2PLsxIt2X42ZWV2IKWRkkx7lEi1r9vIrIWoWjNhMl2ojseMYt
-	F4dYcOtneGPfKd4pOhzF4b2p5KOOs37k7IGCh9KBqUdk99tvWf/OSf+E0lctOhpbwwTFBexU5HXYl
-	hPx0gFuroAAvI51v27l1FtMc+o0SIBBu/G+Hkfe/7roJUk9bKlG6xq8FzazV3NYUBUA9lYK7xsnBv
-	V5v1cmtQ==;
-Received: from 72-21-196-67.amazon.com ([72.21.196.67] helo=u3832b3a9db3152.ant.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rXRXv-0000000D7qx-41w7;
-	Tue, 06 Feb 2024 19:55:57 +0000
-Message-ID: <78d989575840ed5ba57c9a73d9fa41ae7a1a6cf6.camel@infradead.org>
-Subject: Re: [PATCH v4] KVM: x86/xen: Inject vCPU upcall vector when local
- APIC is enabled
-From: David Woodhouse <dwmw2@infradead.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Thomas
- Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav
- Petkov <bp@alien8.de>,  Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, Paul Durrant
- <paul@xen.org>
-Date: Tue, 06 Feb 2024 11:55:53 -0800
-In-Reply-To: <ZcKNYq5OZxkSs_Z2@google.com>
-References: <6150a0a8c3d911c6c2ada23c0b9c8b35991bd235.camel@infradead.org>
-	 <ZcKGVoaituZPkNTU@google.com>
-	 <17435518cb127e7c1493edac09704623de9ae3f8.camel@infradead.org>
-	 <ZcKNYq5OZxkSs_Z2@google.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-Ujx4N55ShgdvpJlHZKu0"
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	s=arc-20240116; t=1707249997; c=relaxed/simple;
+	bh=PlwzN8x3eCddfNLwl0tQFZUsWaNW3CGdFeSD9FE45xU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hE53Lf2UNFbDRPZoEJjbJtxyg5aQLPs8G3fimY7z3Awi+vAh2tqXiEzEcXzw7871mYI+6pjYUEbR4/xwyRhN5NGqwjh3VmFeEDSbYyG5BXkXROJzIj09+W4vfs3DBfdtuVVRZvqxguXt2aFRCXX/igdkK/PbnsHLEq5svE+zLEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U8/nwTvK; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707249993;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=i/cd++jXszRXmfjXBwbNRqBwPxegiEkXzkrYtiCv0c8=;
+	b=U8/nwTvKJsfMtqE9DdVM4mDRtMuivNQg2jfo2G/cHpK1RbI1COhuvw/RxuuqPFex5P6eFv
+	vv/X9pdbysl+OBi18aXTPVEjjOjBcA97JyPUdiWTIVUzZRDwHWIk1qnVgW2IJWaDKCXBj4
+	IKaota8H0uM5CBErSTBQ59JJ32ITGTc=
+Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com
+ [209.85.161.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-153-Xk6O1A7mPMufbhbYrYJX4g-1; Tue, 06 Feb 2024 15:06:31 -0500
+X-MC-Unique: Xk6O1A7mPMufbhbYrYJX4g-1
+Received: by mail-oo1-f71.google.com with SMTP id 006d021491bc7-59922b09256so5865884eaf.2
+        for <kvm@vger.kernel.org>; Tue, 06 Feb 2024 12:06:31 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707249991; x=1707854791;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=i/cd++jXszRXmfjXBwbNRqBwPxegiEkXzkrYtiCv0c8=;
+        b=QTr7w0qjuedrQ3bjMrIjq/jZ9905nWYQT0eXnheGNIReizKV4kI3o6YV1TF0yI5PZP
+         ul7heyQiVwfQezKShnr8k/oHEXeHlhK5FIapRDqNWHQPZcrgNcgRulj4MsU3yIynQH3n
+         cMYM/VBV7Wi5c7vu6rwNzwTqCo4KiItGqs98VvRXFhIh6DC7tHiiWk0KZnEqISpc7mUj
+         yC1lSRAE7S6EXIZPT6yujxhWTqNI1w5bJZF0skbxApQP8YNbEc0vHsy1cx5nr+VvU7PQ
+         UR6crei+EirImEcafQzOWL3Hwho/+FhmnHjSUfqO2h+jxx7dgD6/SKGT4d9GqYLoJE5n
+         YTGg==
+X-Gm-Message-State: AOJu0YzEtzU54ggqeE+sj1d/yxbZ0HiuUxyLmvrrRVAFwawSc2eVk3ps
+	ve0u/xUlm8+7CxKVowxVHkDQCit9IWcPGoJeCaT1U9SH+o5A825P30fFW4ZdaiLNV3kDyQYHdx7
+	/qLywn5ZmzJMI5A9uHxzQzOQoA4E+z74WieJ9YeTL6R9wKtnbGw==
+X-Received: by 2002:a4a:8112:0:b0:59c:8b80:fe3e with SMTP id b18-20020a4a8112000000b0059c8b80fe3emr3080588oog.7.1707249991154;
+        Tue, 06 Feb 2024 12:06:31 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFJwnWL1LGz3lFyVKe1dlWAr2U11D5Zjkj6P8Frn4x+0vRY5zeaZeq+tu6iHoegpEk7pc/9Bg==
+X-Received: by 2002:a4a:8112:0:b0:59c:8b80:fe3e with SMTP id b18-20020a4a8112000000b0059c8b80fe3emr3080568oog.7.1707249990851;
+        Tue, 06 Feb 2024 12:06:30 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCXTlxv9RzqLCQNh9HJ7dSEM6u9dfW+aPvwY4ta3GiTxq7u4+IR4p/bnaJcGc57IteapASuaQESeyIaa2RM2mFIzrI/znQlTiv6yqgA2ckgbIoRE98/kvZAK5X3Rt9+nXNOjaN4IzNMNTzulBSnALH/JACVxliCZLGNHU9vphCiIsWNRmKyFOFkv83DwTzOsxnD5JdtO8NnVAn5ThS61u6+jU2pzf0aFR3EP/pFLOCckE7lbI2CZdG69P13Byh78UP5WRUa4cze+bTeQXp436I+w7qHOdPcAN6TtjPZIVmvdtq9bl1DL6y0U/4pcUifCDS5AxdynY5yGWWC3zmt3Ex8NSyhauqfLa/BuEd38oeI=
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id h1-20020a4a6f01000000b0059a975f3b8esm433475ooc.33.2024.02.06.12.06.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Feb 2024 12:06:30 -0800 (PST)
+Date: Tue, 6 Feb 2024 13:06:27 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: "Liu, Monk" <Monk.Liu@amd.com>
+Cc: Leon Romanovsky <leon@kernel.org>, "Deng, Emily" <Emily.Deng@amd.com>,
+ "bhelgaas@google.com" <bhelgaas@google.com>, "linux-pci@vger.kernel.org"
+ <linux-pci@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org"
+ <kvm@vger.kernel.org>, "Jiang, Jerry (SW)" <Jerry.Jiang@amd.com>, "Zhang,
+ Andy" <Andy.Zhang@amd.com>, "Chang, HaiJun" <HaiJun.Chang@amd.com>, "Chen,
+ Horace" <Horace.Chen@amd.com>, "Yin, ZhenGuo (Chris)" <ZhenGuo.Yin@amd.com>
+Subject: Re: [PATCH 1/2] PCI: Add VF reset notification to PF's VFIO user
+ mode driver
+Message-ID: <20240206130627.5c10fec7.alex.williamson@redhat.com>
+In-Reply-To: <BL1PR12MB526972B4E7CF6B2C993A2E6984462@BL1PR12MB5269.namprd12.prod.outlook.com>
+References: <20240205071538.2665628-1-Emily.Deng@amd.com>
+	<20240205090438.GB6294@unreal>
+	<BL1PR12MB526972B4E7CF6B2C993A2E6984462@BL1PR12MB5269.namprd12.prod.outlook.com>
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
-
-
---=-Ujx4N55ShgdvpJlHZKu0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2024-02-06 at 11:49 -0800, Sean Christopherson wrote:
-> On Tue, Feb 06, 2024, David Woodhouse wrote:
-> > That isn't Unicode. Well, it *is*, but it's the subset of Unicode which
-> > is also plain old legacy 8-bit ISO8859-1. For some reason, Evolution
-> > has converted those spaces to non-breaking spaces. I have no idea why
-> > it's suddenly started doing that; this is a Long Term Nosupport distro
-> > that $employer forces me to use, and it hasn't even been updated for
-> > over a year.
+On Tue, 6 Feb 2024 04:08:18 +0000
+"Liu, Monk" <Monk.Liu@amd.com> wrote:
+
+> [AMD Official Use Only - General]
 >=20
-> Out of genuine curiosity, why not use `git send-email`?
-
-I generally do for a series, but a single patch sometimes isn't even
-the latest or only thing in my working tree, and it's trivial enough to
-just dump it into the Drafts folder then edit it from there. And it's
-(almost) always worked in the past; as I said, I have no idea why it
-suddenly regressed.
-
-I do prefer to actually *read* the patch and the commit message one
-last time in the mailer before pressing 'send'. I do catch things that
-way.
-
-> > The patch is in
-> > https://git.infradead.org/?p=3Dusers/dwmw2/linux.git;a=3Dshortlog;h=3Dr=
-efs/heads/xenfv
-> > where I'd gathered everything that was pending, but if you prefer I'll
-> > also resend it later when I deal with the locking thing we discussed a
-> > few minutes ago.=20
+> Hi Leon
 >=20
-> I'd prefer a resend so that I generate a lore link to exactly what I appl=
-ied.
-> No rush on either patch, I'm going to be mostly offline from now-ish thro=
-ugh
-> tomorrow.
+> The thing is when qemu reset a VM it calls vfio=E2=80=99s reset ioctl to =
+the
+> given VF device, and in kernel the VFIO-pci module will do the reset
+> to that VF device via its PCI config space register, but
+> unfortunately our VF GPU isnot designed to support those
+> =E2=80=9Creset=E2=80=9D/=E2=80=9Dflr=E2=80=9D commands =E2=80=A6 not supp=
+orted by the VF, (and even many PF
+> cannot handle those commands well)
 
-Ack. I'll send something based on what I find in your kvm-x86 tree. You
-have the first 19 of Paul's series, just not the __kvm_gpc_refresh()
-one at the end, right?
+PFs are not required to implement FLR, VFs are.
 
---=-Ujx4N55ShgdvpJlHZKu0
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+SR-IOV spec, rev. 1.1:
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwMjA2MTk1NTUzWjAvBgkqhkiG9w0BCQQxIgQg1g2GAmnu
-SZ/T3oBcrnjFDHWMvy09qNheQFThMn+W8icwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBNAchHA9Jeo3jGBiVRfS6CREd8+bhEiy2+
-yTMYPVYnlam6e6pSWcBWz11bgxByiQ1f7cVJWUq7bH0dTV42vPws9pPNUVdmemKS1Ttz5dV687Ai
-nQGlCAjPT1TbTH2CcdQxheNBM6cDDRCgOx5hmXwVlgQkJjDXqLCiLBKFlIH9QxkiS6HRY/DtMCbp
-8VKUWoJbcYLO0EersUTGZ8JZPNPjZXeIXFuweyN23H3dAWm6cOqcixrQ//tA4K5EcqX4C1MI40Q7
-bnIkZZebq9tTXVE7i6gNnnj8/k/GmMpdTEB3U4AGP4d3yGjEPmTe0/uSIbOK+heU6u6zAN3tfGIL
-aL9kUlB1p/9F5OGyqPq+H7qTiRo7c35LsKfLSkG/rUfhfiwGKD4zY+dfPE6KNY7RPWE+gYQoHZAS
-fw8QUGZcsF5f3OUfNZWHoy86fILHRL6ZQhSbG98sLQk+5fteyiNrwy+v1uNK/0aTF+6Ixz/Brxwy
-Lm4bYd1guQlFiFFJooQS+aix4/oBDHyUJx18aCdX5P2EasxZUl7zxYrb8mfdltvtGsBsW5nGn5F0
-7ucoaNV3AFvQZCC6avY2hwL7PoByIM3aP1LXcxdVBvMimhIOeUMwzhEaEev2ks4qzRxWQZ8t+1sE
-KT2pNyqpWLX+x49ADoXOuTWw6n+aCyUw2jJhkmxgVgAAAAAAAA==
+	2.2.2. FLR That Targets a VF
+
+	VFs must support Function Level Reset (FLR).
+
+>=20
+> So the idea we can cook up is to move those Vf=E2=80=99s reset notificati=
+on
+> to our PF driver (which is a user mode driver running on PF=E2=80=99s VFIO
+> arch), and our user mode driver can program HW and do the reset for
+> that VF.
+
+The PF driver being able to arbitrarily reset a VF device provided to
+another userspace process doesn't sound like separate, isolated
+devices.  What else can the PF access?
+
+As noted in my other reply, vf-tokens should not be normalized and
+users of VFs provided by third party userspace PF drivers should
+consider the device no less tainted than if it were provided by an
+out-of-tree kernel driver.
+
+The idea to virtualize FLR on the VF to resolve the hardware defect is a
+good one, but it should be done in the context of a vfio-pci variant
+driver.  Thanks,
+
+Alex
 
 
---=-Ujx4N55ShgdvpJlHZKu0--
+> From: Leon Romanovsky <leon@kernel.org>
+> Date: Monday, February 5, 2024 at 17:04
+> To: Deng, Emily <Emily.Deng@amd.com>
+> Cc: bhelgaas@google.com <bhelgaas@google.com>,
+> alex.williamson@redhat.com <alex.williamson@redhat.com>,
+> linux-pci@vger.kernel.org <linux-pci@vger.kernel.org>,
+> linux-kernel@vger.kernel.org <linux-kernel@vger.kernel.org>,
+> kvm@vger.kernel.org <kvm@vger.kernel.org>, Jiang, Jerry (SW)
+> <Jerry.Jiang@amd.com>, Zhang, Andy <Andy.Zhang@amd.com>, Chang,
+> HaiJun <HaiJun.Chang@amd.com>, Liu, Monk <Monk.Liu@amd.com>, Chen,
+> Horace <Horace.Chen@amd.com>, Yin, ZhenGuo (Chris)
+> <ZhenGuo.Yin@amd.com> Subject: Re: [PATCH 1/2] PCI: Add VF reset
+> notification to PF's VFIO user mode driver On Mon, Feb 05, 2024 at
+> 03:15:37PM +0800, Emily Deng wrote:
+> > VF doesn't have the ability to reset itself completely which will
+> > cause the hardware in unstable state. So notify PF driver when the
+> > VF has been reset to let the PF resets the VF completely, and
+> > remove the VF out of schedule. =20
+>=20
+>=20
+> I'm sorry but this explanation is not different from the previous
+> version. Please provide a better explanation of the problem, why it is
+> needed, which VFs need and can't reset themselves, how and why it
+> worked before e.t.c.
+>=20
+> In addition, please follow kernel submission guidelines, write
+> changelong, add versions, cover letter e.t.c.
+>=20
+> Thanks
+>=20
+> >
+> > How to implement this?
+> > Add the reset callback function in pci_driver
+> >
+> > Implement the callback functin in VFIO_PCI driver.
+> >
+> > Add the VF RESET IRQ for user mode driver to let the user mode
+> > driver know the VF has been reset.
+> >
+> > Signed-off-by: Emily Deng <Emily.Deng@amd.com>
+> > ---
+> >  drivers/pci/pci.c   | 8 ++++++++
+> >  include/linux/pci.h | 1 +
+> >  2 files changed, 9 insertions(+)
+> >
+> > diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
+> > index 60230da957e0..aca937b05531 100644
+> > --- a/drivers/pci/pci.c
+> > +++ b/drivers/pci/pci.c
+> > @@ -4780,6 +4780,14 @@ EXPORT_SYMBOL_GPL(pcie_flr);
+> >   */
+> >  int pcie_reset_flr(struct pci_dev *dev, bool probe)
+> >  {
+> > +     struct pci_dev *pf_dev;
+> > +
+> > +     if (dev->is_virtfn) {
+> > +             pf_dev =3D dev->physfn;
+> > +             if (pf_dev->driver->sriov_vf_reset_notification)
+> > +
+> > pf_dev->driver->sriov_vf_reset_notification(pf_dev, dev);
+> > +     }
+> > +
+> >        if (dev->dev_flags & PCI_DEV_FLAGS_NO_FLR_RESET)
+> >                return -ENOTTY;
+> >
+> > diff --git a/include/linux/pci.h b/include/linux/pci.h
+> > index c69a2cc1f412..4fa31d9b0aa7 100644
+> > --- a/include/linux/pci.h
+> > +++ b/include/linux/pci.h
+> > @@ -926,6 +926,7 @@ struct pci_driver {
+> >        int  (*sriov_configure)(struct pci_dev *dev, int num_vfs);
+> > /* On PF */ int  (*sriov_set_msix_vec_count)(struct pci_dev *vf,
+> > int msix_vec_count); /* On PF */ u32
+> > (*sriov_get_vf_total_msix)(struct pci_dev *pf);
+> > +     void  (*sriov_vf_reset_notification)(struct pci_dev *pf,
+> > struct pci_dev *vf); const struct pci_error_handlers *err_handler;
+> >        const struct attribute_group **groups;
+> >        const struct attribute_group **dev_groups;
+> > --
+> > 2.36.1
+> >
+> > =20
+
 
