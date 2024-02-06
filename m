@@ -1,271 +1,109 @@
-Return-Path: <kvm+bounces-8150-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8151-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB70884BF1C
-	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 22:15:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E1D084BF4A
+	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 22:36:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4FD491F245B7
-	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 21:15:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60D221C2439D
+	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 21:36:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91C271B953;
-	Tue,  6 Feb 2024 21:14:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BD401BC41;
+	Tue,  6 Feb 2024 21:36:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fP6M4LyU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dA9es1Wr"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA6891B94A
-	for <kvm@vger.kernel.org>; Tue,  6 Feb 2024 21:14:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15F831B94F
+	for <kvm@vger.kernel.org>; Tue,  6 Feb 2024 21:36:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707254094; cv=none; b=m1688pbmpF+PftNcmZHwvw/mbNOzDrEPdGU7wlWtDJGLiLtl1n35Ao80Vqio3yygO9vTQycLBWL0UcBUsyyWs6lrp7UH0BMLLHcJH2CU/P9ddp0znD1mzeJV2vq9WI/DGV6muivrSZIn6zkNoxT1nfaNwuAzp3oU9nL5zeQE9FY=
+	t=1707255392; cv=none; b=Js6k2jIg1YhJ1LSZUspDh5bKhscALNJ/pwtCSGzYWKluc4wVNXPQkuKEZo4w5fqjY7PyKRIMFN2Ccg6IDAySCjG6Lh7/GYMv5NNE+cfb5P5iki/CvrvSHMhQakvOS2eZ2fO3G7g4WZP28WYsTu7VPhKsMHlRJjg8TVnRWUuzG1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707254094; c=relaxed/simple;
-	bh=rs009olvY/9WzzrCZpUhTiAvosuJDsNllQJzmm0cAf0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Dwrg5UfQ4BcHNi+PDVWIa2F73FrZzwBJ27i/XnYeW4NLW06DMORPmQdxUtaeWmwYI9g4qc25lMgM9Ky3/clAv8ab9M9UHsU71jBLVkEvV/HDQMg/MG5refqcy732+TYZvInTilMkcao+kVyqCOEwfwk+GcTgyaUua9kNunIp8Bg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fP6M4LyU; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707254091;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8hAmI/kTzxWy7R6bfZhnn1+RfmTFQ/1/obEiDj09sR4=;
-	b=fP6M4LyUlvT2G1PJioq7WUvDVpdrrcwxRGFwaQULmFJ5OWk7J9uLxpLNgvJJY7z6iOA46b
-	vhRiv2Q/1+wffh4qIhW0M9ZQG7TvToKb7hyDHQ+jBSR5d3112l6OF1THjBjxuMOxV8ZK4D
-	aSIz9uiQvyP0Bucef9hEj4jefcwp9U4=
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-619-oSk9aJ9EOWeMqf4kfyLqvg-1; Tue, 06 Feb 2024 16:14:50 -0500
-X-MC-Unique: oSk9aJ9EOWeMqf4kfyLqvg-1
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7c00a1374ecso425175739f.1
-        for <kvm@vger.kernel.org>; Tue, 06 Feb 2024 13:14:49 -0800 (PST)
+	s=arc-20240116; t=1707255392; c=relaxed/simple;
+	bh=NkDlqApIbTfwx3Q1RSxj4xs5tlfBlWOTaY+5f+NNjb0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=MWtbNR1F/ITZfcULQoTBqdgFFQJnjXw4zvgUYnpsfL2E59k7n8W/GYaIxdpdRrNUQkGHDJay0PSZMFNVMNGnIIpUtA29n4yMhgrru3kFHbeZ0l3gGQNsLWjpBj975bkKUUMG98eoYZ0wnwnTp2CsTaWMVcCSJ9KCEKu/8FmG6o0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dA9es1Wr; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc6c47cf679so10680848276.0
+        for <kvm@vger.kernel.org>; Tue, 06 Feb 2024 13:36:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1707255390; x=1707860190; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=er4oE/byCTH2PRrgRT8tuMj9OpU5LggotG3s4/YchRI=;
+        b=dA9es1WrPe7qht8Jx6qRUX7+5FDHwzF3tqdh9VjrtNiomSQ0psm1MMSGy3WKbd6fHf
+         HgT/U0RTPsLCG7UTeSVzJtSJ6Z4Qd9ne0rOOSYeb9Y/+UyoY2GqfVk3npeDqpHxZ8zu/
+         bWIJy8QZ3fIThLuehK3605XZENL/waCTma7pdCZvmquA2uqqfTBzI8awB6cOY5bV4bQU
+         lnOnlgpKSDAELfrTV0zg/I5KZRFsP3qwAxaRqM4z74Wz572+qYJbUf6Tk6fIUNlFnPZf
+         cWl4vRzBh8n1MgaZHMT0hlX/9iml+uivADVoJXdRemvXzn4ZERjVfXauuhxGdFtsChuZ
+         eLbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707254089; x=1707858889;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8hAmI/kTzxWy7R6bfZhnn1+RfmTFQ/1/obEiDj09sR4=;
-        b=NxGKE0EciNRotTUNCIdKDl4HhsUC4v32Qun3NI3nX4xfkh8rammfYBrMNTc+uAKlOB
-         Fq49NhM9jfZ+/DhbkB+B6B73w0F1GnVPhzxORuK2IqvK7oIniF8gOA8QrKzH6kRBKzdk
-         3fUBYzIFLuchvS6U/XdDHPQHpCdwXUAczMY1lalT9pBFBuvibi+v3nZbJDz1cOuPBpW4
-         zrG847vnTrVadquUeICg14FO2C48WW+dINPWwj1HsT+aPzR8TI4Ugq4ZPYEgpnLtJCFv
-         FnSK1PFFoLvPO8CN+FKKktNhrc2q8M9GG5M/Us6y6fhVwlJBVLXAAXpdW7S3rt77v6fz
-         qBJQ==
-X-Gm-Message-State: AOJu0YwYDd3Y4cTdDPRyOob0k0azqHJYRR9sQ3p9hkzhEQKb7mtVwORs
-	zbQsScIHRLdSWE0++5cxJeAbaFBZ0xAWpZGIGv1X06XhvTZBufusV6UnJ461WsPCdxQJgcQlNq5
-	kPOuf54lAXChut8zpQ0S9kDAtx2Uox1Nw80dFTfyc18tXzT5hKQ==
-X-Received: by 2002:a5e:8e49:0:b0:7c3:f324:2fe3 with SMTP id r9-20020a5e8e49000000b007c3f3242fe3mr2860593ioo.17.1707254089176;
-        Tue, 06 Feb 2024 13:14:49 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGaXoxO7J7wKDfWZtVSDEai0dLBM1FbmBcZ2Bc6IpfP3hxy51t/zZahiAjZCbuk5fzj9XvRSA==
-X-Received: by 2002:a5e:8e49:0:b0:7c3:f324:2fe3 with SMTP id r9-20020a5e8e49000000b007c3f3242fe3mr2860579ioo.17.1707254088908;
-        Tue, 06 Feb 2024 13:14:48 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCV+gMiE68QABRZ8gdjoRk+ExjhzvPonKBa+sPDkwIjgOVosM/6jB8tfRJAnWJ0xaFh6nUnyjIHsDeIOCo+ZeWQDwz68i781IPfFj/S/dj5ws1JfbEvWM1QAv0Y+kFJwCcJ3tbR/4iATAvM6sBeizFaH2Ua8oKQUlb19gmykURbsynjvs2HAdUMeppOnSfKab6LPjIybj81XEJ5EZIApuuaSWnfA61teGFUbA/uAbobBH4VTijtELYeP+XUEHgyO0qTr2AEPXXZmfj4jBKHRpbhSbxZgK6xO/LiFHVpGFsE7Qx1Phj3X2UYhNV7t
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id f26-20020a056638023a00b0047133a05f33sm743055jaq.49.2024.02.06.13.14.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Feb 2024 13:14:48 -0800 (PST)
-Date: Tue, 6 Feb 2024 14:14:46 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Xin Zeng <xin.zeng@intel.com>
-Cc: herbert@gondor.apana.org.au, jgg@nvidia.com, yishaih@nvidia.com,
- shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
- linux-crypto@vger.kernel.org, kvm@vger.kernel.org, qat-linux@intel.com,
- Yahui Cao <yahui.cao@intel.com>
-Subject: Re: [PATCH 10/10] vfio/qat: Add vfio_pci driver for Intel QAT VF
- devices
-Message-ID: <20240206141446.3547e4a9.alex.williamson@redhat.com>
-In-Reply-To: <20240201153337.4033490-11-xin.zeng@intel.com>
-References: <20240201153337.4033490-1-xin.zeng@intel.com>
-	<20240201153337.4033490-11-xin.zeng@intel.com>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+        d=1e100.net; s=20230601; t=1707255390; x=1707860190;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=er4oE/byCTH2PRrgRT8tuMj9OpU5LggotG3s4/YchRI=;
+        b=ZG+09yCRQg5v/uUpR1F2Fry8yJKjfAX9pf46XNaFzcFHhuMfOGZYCrnAMm9S2+CP5L
+         9Gv+EnmNZJn4VD0yYQjkt3gXJi9JgAJ98KcfzXy/GesTA0MN2wj4vcy4JGRDZLItqB2s
+         pPzl+/PQR7gjDqxwBHwE2QeCR4YPW0tv/lW6mgrAmc515mbcDlCtYevfxb7aM/20M9YF
+         fEZqoF5qcNzfgwNyLBua9nQha/Y86VWQFvJ0IM7YNz7yu6+47tBPWBbncIl9xzE42ffI
+         OuSICFABW4P6DKDOEy09m5oFLBvuKppFRiI+8pSQWS3rXzwc3+CFe1KO/w6nfqQNZURN
+         rZEA==
+X-Gm-Message-State: AOJu0Ywbh09Ek1oPT/BQblrmc4ArBN96nbjKZ+GN+DTtCmAD0qL5dZD9
+	HVFvkQC3AEHguzN7rXSHW98zKySViAMd94qRywY3Bp9RhHhlXv1txS6UUmKL1HF6HyFVe91JHWj
+	xvg==
+X-Google-Smtp-Source: AGHT+IHbFKc60lW+DAkcEqscHHtO+r3Bnf2mdnvF6kofoTO7sYjN4rOcax4DQFP874+yPL+DD8xNMyJ0twg=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:98f:b0:dc2:4d91:fb4b with SMTP id
+ bv15-20020a056902098f00b00dc24d91fb4bmr742512ybb.9.1707255389965; Tue, 06 Feb
+ 2024 13:36:29 -0800 (PST)
+Date: Tue,  6 Feb 2024 13:36:11 -0800
+In-Reply-To: <20231025055914.1201792-1-xiaoyao.li@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20231025055914.1201792-1-xiaoyao.li@intel.com>
+X-Mailer: git-send-email 2.43.0.687.g38aa6559b0-goog
+Message-ID: <170724645418.390975.5795716772259959043.b4-ty@google.com>
+Subject: Re: [PATCH v2 0/2] x86/asyncpf: Fixes the size of asyncpf PV data and
+ related docs
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, Wanpeng Li <wanpengli@tencent.com>, 
+	Vitaly Kuznetsov <vkuznets@redhat.com>, x86@kernel.org, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
 
-On Thu,  1 Feb 2024 23:33:37 +0800
-Xin Zeng <xin.zeng@intel.com> wrote:
-
-> Add vfio pci driver for Intel QAT VF devices.
+On Wed, 25 Oct 2023 01:59:12 -0400, Xiaoyao Li wrote:
+> First patch tries to make the size of 'struct kvm_vcpu_pv_apf_data'
+> matched with its documentation.
 > 
-> This driver uses vfio_pci_core to register to the VFIO subsystem. It
-> acts as a vfio agent and interacts with the QAT PF driver to implement
-> VF live migration.
+> Second patch fixes the wrong description of the MSR_KVM_ASYNC_PF_EN
+> documentation and some minor improvement.
 > 
-> Co-developed-by: Yahui Cao <yahui.cao@intel.com>
-> Signed-off-by: Yahui Cao <yahui.cao@intel.com>
-> Signed-off-by: Xin Zeng <xin.zeng@intel.com>
-> Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> ---
->  MAINTAINERS                         |   8 +
->  drivers/vfio/pci/Kconfig            |   2 +
->  drivers/vfio/pci/Makefile           |   2 +
->  drivers/vfio/pci/intel/qat/Kconfig  |  13 +
->  drivers/vfio/pci/intel/qat/Makefile |   4 +
->  drivers/vfio/pci/intel/qat/main.c   | 572 ++++++++++++++++++++++++++++
->  6 files changed, 601 insertions(+)
->  create mode 100644 drivers/vfio/pci/intel/qat/Kconfig
->  create mode 100644 drivers/vfio/pci/intel/qat/Makefile
->  create mode 100644 drivers/vfio/pci/intel/qat/main.c
+> v1: https://lore.kernel.org/all/ZS7ERnnRqs8Fl0ZF@google.com/T/#m0e12562199923ab58975d4ae9abaeb4a57597893
 > 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 8d1052fa6a69..c1d3e4cb3892 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -23095,6 +23095,14 @@ S:	Maintained
->  F:	Documentation/networking/device_drivers/ethernet/amd/pds_vfio_pci.rst
->  F:	drivers/vfio/pci/pds/
->  
-> +VFIO QAT PCI DRIVER
-> +M:	Xin Zeng <xin.zeng@intel.com>
-> +M:	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> +L:	kvm@vger.kernel.org
-> +L:	qat-linux@intel.com
-> +S:	Supported
-> +F:	drivers/vfio/pci/intel/qat/
-> +
->  VFIO PLATFORM DRIVER
->  M:	Eric Auger <eric.auger@redhat.com>
->  L:	kvm@vger.kernel.org
-> diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
-> index 18c397df566d..329d25c53274 100644
-> --- a/drivers/vfio/pci/Kconfig
-> +++ b/drivers/vfio/pci/Kconfig
-> @@ -67,4 +67,6 @@ source "drivers/vfio/pci/pds/Kconfig"
->  
->  source "drivers/vfio/pci/virtio/Kconfig"
->  
-> +source "drivers/vfio/pci/intel/qat/Kconfig"
-> +
->  endmenu
-> diff --git a/drivers/vfio/pci/Makefile b/drivers/vfio/pci/Makefile
-> index 046139a4eca5..a87b6b43ce1c 100644
-> --- a/drivers/vfio/pci/Makefile
-> +++ b/drivers/vfio/pci/Makefile
-> @@ -15,3 +15,5 @@ obj-$(CONFIG_HISI_ACC_VFIO_PCI) += hisilicon/
->  obj-$(CONFIG_PDS_VFIO_PCI) += pds/
->  
->  obj-$(CONFIG_VIRTIO_VFIO_PCI) += virtio/
-> +
-> +obj-$(CONFIG_QAT_VFIO_PCI) += intel/qat/
-> diff --git a/drivers/vfio/pci/intel/qat/Kconfig b/drivers/vfio/pci/intel/qat/Kconfig
-> new file mode 100644
-> index 000000000000..71b28ac0bf6a
-> --- /dev/null
-> +++ b/drivers/vfio/pci/intel/qat/Kconfig
-> @@ -0,0 +1,13 @@
-> +# SPDX-License-Identifier: GPL-2.0-only
-> +config QAT_VFIO_PCI
-> +	tristate "VFIO support for QAT VF PCI devices"
-> +	select VFIO_PCI_CORE
-> +	depends on CRYPTO_DEV_QAT
-> +	depends on CRYPTO_DEV_QAT_4XXX
+> [...]
 
-CRYPTO_DEV_QAT_4XXX selects CRYPTO_DEV_QAT, is it necessary to depend
-on CRYPTO_DEV_QAT here?
+Applied to kvm-x86 asyncpf_abi.  I'll send a pull request (for 6.9) to Paolo
+"soon" to ensure we get his eyeballs on the ABI change.
 
-> +	help
-> +	  This provides migration support for Intel(R) QAT Virtual Function
-> +	  using the VFIO framework.
-> +
-> +	  To compile this as a module, choose M here: the module
-> +	  will be called qat_vfio_pci. If you don't know what to do here,
-> +	  say N.
-> diff --git a/drivers/vfio/pci/intel/qat/Makefile b/drivers/vfio/pci/intel/qat/Makefile
-> new file mode 100644
-> index 000000000000..9289ae4c51bf
-> --- /dev/null
-> +++ b/drivers/vfio/pci/intel/qat/Makefile
-> @@ -0,0 +1,4 @@
-> +# SPDX-License-Identifier: GPL-2.0-only
-> +obj-$(CONFIG_QAT_VFIO_PCI) += qat_vfio_pci.o
-> +qat_vfio_pci-y := main.o
-> +
+[1/2] x86/kvm/async_pf: Use separate percpu variable to track the enabling of asyncpf
+      https://github.com/kvm-x86/linux/commit/ccb2280ec2f9
+[2/2] KVM: x86: Improve documentation of MSR_KVM_ASYNC_PF_EN
+      https://github.com/kvm-x86/linux/commit/df01f0a1165c
 
-Blank line at end of file.
-
-> diff --git a/drivers/vfio/pci/intel/qat/main.c b/drivers/vfio/pci/intel/qat/main.c
-> new file mode 100644
-> index 000000000000..85d0ed701397
-> --- /dev/null
-> +++ b/drivers/vfio/pci/intel/qat/main.c
-> @@ -0,0 +1,572 @@
-...
-> +static int qat_vf_pci_init_dev(struct vfio_device *core_vdev)
-> +{
-> +	struct qat_vf_core_device *qat_vdev = container_of(core_vdev,
-> +			struct qat_vf_core_device, core_device.vdev);
-> +	struct qat_migdev_ops *ops;
-> +	struct qat_mig_dev *mdev;
-> +	struct pci_dev *parent;
-> +	int ret, vf_id;
-> +
-> +	core_vdev->migration_flags = VFIO_MIGRATION_STOP_COPY | VFIO_MIGRATION_P2P;
-
-AFAICT it's always good practice to support VFIO_MIGRATION_PRE_COPY,
-even if only to leave yourself an option to mark an incompatible ABI
-change in the data stream that can be checked before the stop-copy
-phase of migration.  See for example the mtty sample driver.  Thanks,
-
-Alex
-
-> +	core_vdev->mig_ops = &qat_vf_pci_mig_ops;
-> +
-> +	ret = vfio_pci_core_init_dev(core_vdev);
-> +	if (ret)
-> +		return ret;
-> +
-> +	mutex_init(&qat_vdev->state_mutex);
-> +	spin_lock_init(&qat_vdev->reset_lock);
-> +
-> +	parent = qat_vdev->core_device.pdev->physfn;
-> +	vf_id = pci_iov_vf_id(qat_vdev->core_device.pdev);
-> +	if (!parent || vf_id < 0) {
-> +		ret = -ENODEV;
-> +		goto err_rel;
-> +	}
-> +
-> +	mdev = qat_vfmig_create(parent, vf_id);
-> +	if (IS_ERR(mdev)) {
-> +		ret = PTR_ERR(mdev);
-> +		goto err_rel;
-> +	}
-> +
-> +	ops = mdev->ops;
-> +	if (!ops || !ops->init || !ops->cleanup ||
-> +	    !ops->open || !ops->close ||
-> +	    !ops->save_state || !ops->load_state ||
-> +	    !ops->suspend || !ops->resume) {
-> +		ret = -EIO;
-> +		dev_err(&parent->dev, "Incomplete device migration ops structure!");
-> +		goto err_destroy;
-> +	}
-> +	ret = ops->init(mdev);
-> +	if (ret)
-> +		goto err_destroy;
-> +
-> +	qat_vdev->mdev = mdev;
-> +
-> +	return 0;
-> +
-> +err_destroy:
-> +	qat_vfmig_destroy(mdev);
-> +err_rel:
-> +	vfio_pci_core_release_dev(core_vdev);
-> +	return ret;
-> +}
-
+--
+https://github.com/kvm-x86/linux/tree/next
 
