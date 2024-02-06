@@ -1,146 +1,250 @@
-Return-Path: <kvm+bounces-8101-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8102-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9A6284B867
-	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 15:52:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DC1284B8E3
+	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 16:10:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06B041C20B9A
-	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 14:52:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2AEEBB2C770
+	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 14:56:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 549E81332AD;
-	Tue,  6 Feb 2024 14:52:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FD7F134723;
+	Tue,  6 Feb 2024 14:54:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dAzlcvC3"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jA8jF/7M"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E55DF132C03
-	for <kvm@vger.kernel.org>; Tue,  6 Feb 2024 14:52:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C43F1339A2;
+	Tue,  6 Feb 2024 14:54:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.55.52.88
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707231125; cv=none; b=Ey0Bv7VEpnOmA+UhYdI9dJd6p53xBXDOUAb+UkXGrVsJFdAfyw6/I+f+2jpZ1lOxXTVGDEk6gVhf30pvu+vpluUz2ZWjvE2GVqqzzCOBXaZEWHqVzd6d0C08bRPo1r6ZYmnvCiymcpR0gxxWi2zYW8RsH0yOIQpgVWdmeNHdIdw=
+	t=1707231297; cv=none; b=XHis8+ps0njDvKxH3BCYYFZ4zezfazuMzAI+CSCqS2E4KXeWnkY0xlY0SEco1IOm1g7wJwURcE475ekV0O+ibJzqeAFSQqeTjbpj6QidShAG620GpIACzp/K5IAwfeLx4pjOeufEUgTmJ4cjkAKzY2Y2IDgCsFuy/d7VuuQrQ4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707231125; c=relaxed/simple;
-	bh=R/o5EP7C+JnoxFgZaYwDA4ls6GyyKFxMVhJAZddFp0Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-type; b=cMvYoZlqMceF1fjrgUdZfGHv/Nht4v3YyVcdtoXPLRdcySiHqQlY49dVKyBE6myvXyvrnadNjYmwePyn7kf9LzBlmVFZltyKK9VARIxBN7LMnIZxuo2TTc4/TwK3U3iWxILxZETrP6nzrMe0P9cBILEaJs5W9blyb/hOlOoIfdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dAzlcvC3; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707231122;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=dQIKoNOJmX8VRVk5/I0n1vx+OMQlaoxl3aigw5zkfn8=;
-	b=dAzlcvC35TgfNFyBjvZDYo6g0yJP7+J3odtecvBRwyIJHcutYWLFL0HzxDyWTsACZrXl+t
-	1A7p2WlhB/ES6R1vGMVl8SyUdZpmAzasBZNkZpH9b9ZQe0qihFvgQnomybgNA5I/UrHHaP
-	D3iN33QTU8V0kzB0a/68wViH2kpySsA=
-Received: from mail-oa1-f71.google.com (mail-oa1-f71.google.com
- [209.85.160.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-401-E5QoQQnSPZKWxBTDEaTYrQ-1; Tue, 06 Feb 2024 09:51:59 -0500
-X-MC-Unique: E5QoQQnSPZKWxBTDEaTYrQ-1
-Received: by mail-oa1-f71.google.com with SMTP id 586e51a60fabf-219688c2d4cso4232833fac.1
-        for <kvm@vger.kernel.org>; Tue, 06 Feb 2024 06:51:59 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707231119; x=1707835919;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dQIKoNOJmX8VRVk5/I0n1vx+OMQlaoxl3aigw5zkfn8=;
-        b=VDWCDJp2vjmDxpj7TGHNdORbdy8A9Q3r9p4O3wYJz6sUbC6XDNfzQL3OP/UWCWfMiC
-         1pLrCapo1Kfy9puA0rl84SKcaGnuqJ8+R8XD6jZCAX6KP2xvquMy3gKqvzGRGJnb7gkk
-         Ga/NgikVh4IFbIvt5CAX35N+T4LX8oZOkmZGRpQcMtTQzEE6oFPXqKpsDnK0Xt1tnlzw
-         R9CpEGaxY9KQiinx8ghh46Yc86DK7xiIQQVmz7vo2W1ulUtskac8HW+ilbdpWOzJZRSR
-         NcH+Nb+1eDy0EdrsunvS+iS5lbtKfCnJ5e9K4nw5e98S53nLtpWvNnLxvbplHkb20f6m
-         21rQ==
-X-Gm-Message-State: AOJu0Ywg9Vq0MJH88wmfGW82pHjIdq8fmMio/7TMk6aWMaT+jEm6bBVz
-	ytHpqtdz7VEUvGY527AMIFTHmM73ePi6M/5pedV362Y706Sp0oICnRuPVCdttAPXcJ2tRI0jvd0
-	x/9ninIKENIKbCKGVsiWYqiDInn0JvWrQkE4vP8txFV36xukoZA==
-X-Received: by 2002:a05:6870:164d:b0:210:8802:786a with SMTP id c13-20020a056870164d00b002108802786amr3275740oae.53.1707231118959;
-        Tue, 06 Feb 2024 06:51:58 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFLCyho5u5y4dZMOsWQV1AaVbjSFpDdh6YZMYgsdjNzX2ck/ywfHH/5T/kc/2KHsZrayoPM0A==
-X-Received: by 2002:a05:6870:164d:b0:210:8802:786a with SMTP id c13-20020a056870164d00b002108802786amr3275728oae.53.1707231118721;
-        Tue, 06 Feb 2024 06:51:58 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCV6YVTF3BXfxD7oGuNc/5i4fJi9lzUP0v2EuV9vQ2uYj3WVgVJCvsEX8TROSCzAqDs5ebrmUOfU/S/j7kp3jXPim8rxZSbJKSJVXStktmV2oqMTXILCaFK8Q7/Dm4SdzEV1oi2ax7XvIFESMcCV8iCOJSstM1x0ffCK9wzkBPAe4UiZZyES5vihMsa0sRYoqZu0wDySrdl+bWTxhpQjZZsre7Rw5ZHednIiXPP1W399e2EE8jsT8XU9D+7TeQhQE87br0/am75tATSNqLHpbPwm+dZTE8klIcCGRw==
-Received: from step1.redhat.com (host-87-12-25-87.business.telecomitalia.it. [87.12.25.87])
-        by smtp.gmail.com with ESMTPSA id k19-20020ac84793000000b0042a9b28733fsm930742qtq.89.2024.02.06.06.51.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Feb 2024 06:51:58 -0800 (PST)
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: virtualization@lists.linux.dev
-Cc: Shannon Nelson <shannon.nelson@amd.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	kvm@vger.kernel.org,
-	Kevin Wolf <kwolf@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Stefano Garzarella <sgarzare@redhat.com>
-Subject: [PATCH] vhost-vdpa: fail enabling virtqueue in certain conditions
-Date: Tue,  6 Feb 2024 15:51:54 +0100
-Message-ID: <20240206145154.118044-1-sgarzare@redhat.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1707231297; c=relaxed/simple;
+	bh=lOr+XGR2hJml6WGSq7dut5XfAyTVuZ4y58BVDSiEjas=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dx44NmUNbghg81i12tqjwjJqWgCrVqJKKqDqS8ymgdaAqi+BtDe/VIofwoPkc+Uo4BaaH4Hodu3nRyQuX4OdUkwAcXEPZLsAbiGuKX4I+ulolRiTBrlk5sn5D6E8K6UBe2OeHufAA/MbOa8O0eVxjknmCZKbxAjT9AxCLC9I/VU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jA8jF/7M; arc=none smtp.client-ip=192.55.52.88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707231296; x=1738767296;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=lOr+XGR2hJml6WGSq7dut5XfAyTVuZ4y58BVDSiEjas=;
+  b=jA8jF/7ME2N9ead1vl+9g0/PtcsbYnGBpxzkFF+GFmUaLaGlQQ5BOIUn
+   m415YyPfB05LXzZeqvtr5F/jbdBjNUo2ctzfSvL4mKJfwTzv9eSpjeKBg
+   wfJEHCHoYBCqXA9UDDgYU34KnQFHt7Mzd1f+NTwzH28o+9J/XCOBLMKGG
+   tXJAQZUKGoudxcykkpflvTofb28EV9v8b4cmGtgkmW2sdLrujcA8kK7WH
+   R6yy2lJjFMKPp70qUZrUHE42JG2jpL/mKk8VlKMqpNjHU/D5gQtX4gY9p
+   II0NjEYysKxEXaYEoH4xwTEOBBvBLIwodajbqpIyciNhjOYS06sSSKheM
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10975"; a="435901069"
+X-IronPort-AV: E=Sophos;i="6.05,247,1701158400"; 
+   d="scan'208";a="435901069"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2024 06:54:55 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,247,1701158400"; 
+   d="scan'208";a="1067177"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by orviesa010.jf.intel.com with ESMTP; 06 Feb 2024 06:54:50 -0800
+Date: Tue, 6 Feb 2024 22:51:14 +0800
+From: Xu Yilun <yilun.xu@linux.intel.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
+	Pattara Teerapong <pteerapong@google.com>
+Subject: Re: [PATCH 6/8] KVM: x86/mmu: Check for usable TDP MMU root while
+ holding mmu_lock for read
+Message-ID: <ZcJHYtMZsQHInVEI@yilunxu-OptiPlex-7050>
+References: <20240111020048.844847-1-seanjc@google.com>
+ <20240111020048.844847-7-seanjc@google.com>
+ <ZcIFTkWaTqItQPsj@yilunxu-OptiPlex-7050>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-type: text/plain
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZcIFTkWaTqItQPsj@yilunxu-OptiPlex-7050>
 
-If VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK is not negotiated, we expect
-the driver to enable virtqueue before setting DRIVER_OK. If the driver
-tries anyway, better to fail right away as soon as we get the ioctl.
-Let's also update the documentation to make it clearer.
+On Tue, Feb 06, 2024 at 06:09:18PM +0800, Xu Yilun wrote:
+> On Wed, Jan 10, 2024 at 06:00:46PM -0800, Sean Christopherson wrote:
+> > When allocating a new TDP MMU root, check for a usable root while holding
+> > mmu_lock for read and only acquire mmu_lock for write if a new root needs
+> > to be created.  There is no need to serialize other MMU operations if a
+> > vCPU is simply grabbing a reference to an existing root, holding mmu_lock
+> > for write is "necessary" (spoiler alert, it's not strictly necessary) only
+> > to ensure KVM doesn't end up with duplicate roots.
+> > 
+> > Allowing vCPUs to get "new" roots in parallel is beneficial to VM boot and
+> > to setups that frequently delete memslots, i.e. which force all vCPUs to
+> > reload all roots.
+> > 
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  arch/x86/kvm/mmu/mmu.c     |  8 ++---
+> >  arch/x86/kvm/mmu/tdp_mmu.c | 60 +++++++++++++++++++++++++++++++-------
+> >  arch/x86/kvm/mmu/tdp_mmu.h |  2 +-
+> >  3 files changed, 55 insertions(+), 15 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index 3c844e428684..ea18aca23196 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -3693,15 +3693,15 @@ static int mmu_alloc_direct_roots(struct kvm_vcpu *vcpu)
+> >  	unsigned i;
+> >  	int r;
+> >  
+> > +	if (tdp_mmu_enabled)
+> > +		return kvm_tdp_mmu_alloc_root(vcpu);
+> > +
+> >  	write_lock(&vcpu->kvm->mmu_lock);
+> >  	r = make_mmu_pages_available(vcpu);
+> >  	if (r < 0)
+> >  		goto out_unlock;
+> >  
+> > -	if (tdp_mmu_enabled) {
+> > -		root = kvm_tdp_mmu_get_vcpu_root_hpa(vcpu);
+> > -		mmu->root.hpa = root;
+> > -	} else if (shadow_root_level >= PT64_ROOT_4LEVEL) {
+> > +	if (shadow_root_level >= PT64_ROOT_4LEVEL) {
+> >  		root = mmu_alloc_root(vcpu, 0, 0, shadow_root_level);
+> >  		mmu->root.hpa = root;
+> >  	} else if (shadow_root_level == PT32E_ROOT_LEVEL) {
+> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> > index e0a8343f66dc..9a8250a14fc1 100644
+> > --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> > @@ -223,21 +223,52 @@ static void tdp_mmu_init_child_sp(struct kvm_mmu_page *child_sp,
+> >  	tdp_mmu_init_sp(child_sp, iter->sptep, iter->gfn, role);
+> >  }
+> >  
+> > -hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
+> > +static struct kvm_mmu_page *kvm_tdp_mmu_try_get_root(struct kvm_vcpu *vcpu)
+> >  {
+> >  	union kvm_mmu_page_role role = vcpu->arch.mmu->root_role;
+> > +	int as_id = kvm_mmu_role_as_id(role);
+> >  	struct kvm *kvm = vcpu->kvm;
+> >  	struct kvm_mmu_page *root;
+> >  
+> > -	lockdep_assert_held_write(&kvm->mmu_lock);
+> > -
+> > -	/* Check for an existing root before allocating a new one. */
+> > -	for_each_valid_tdp_mmu_root(kvm, root, kvm_mmu_role_as_id(role)) {
+> > -		if (root->role.word == role.word &&
+> > -		    kvm_tdp_mmu_get_root(root))
+> > -			goto out;
+> > +	for_each_valid_tdp_mmu_root_yield_safe(kvm, root, as_id) {
+> 
+> No lock yielding attempt in this loop, why change to _yield_safe version?
 
-We had a problem in QEMU for not meeting this requirement, see
-https://lore.kernel.org/qemu-devel/20240202132521.32714-1-kwolf@redhat.com/
+Oh, I assume you just want to early exit the loop with the reference to
+root hold.  But I feel it makes harder for us to have a clear
+understanding of the usage of _yield_safe and non _yield_safe helpers.
 
-Fixes: 9f09fd6171fe ("vdpa: accept VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK backend feature")
-Cc: eperezma@redhat.com
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
- include/uapi/linux/vhost_types.h | 3 ++-
- drivers/vhost/vdpa.c             | 4 ++++
- 2 files changed, 6 insertions(+), 1 deletion(-)
+Maybe change it back?
 
-diff --git a/include/uapi/linux/vhost_types.h b/include/uapi/linux/vhost_types.h
-index d7656908f730..5df49b6021a7 100644
---- a/include/uapi/linux/vhost_types.h
-+++ b/include/uapi/linux/vhost_types.h
-@@ -182,7 +182,8 @@ struct vhost_vdpa_iova_range {
- /* Device can be resumed */
- #define VHOST_BACKEND_F_RESUME  0x5
- /* Device supports the driver enabling virtqueues both before and after
-- * DRIVER_OK
-+ * DRIVER_OK. If this feature is not negotiated, the virtqueues must be
-+ * enabled before setting DRIVER_OK.
-  */
- #define VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK  0x6
- /* Device may expose the virtqueue's descriptor area, driver area and
-diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-index bc4a51e4638b..1fba305ba8c1 100644
---- a/drivers/vhost/vdpa.c
-+++ b/drivers/vhost/vdpa.c
-@@ -651,6 +651,10 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
- 	case VHOST_VDPA_SET_VRING_ENABLE:
- 		if (copy_from_user(&s, argp, sizeof(s)))
- 			return -EFAULT;
-+		if (!vhost_backend_has_feature(vq,
-+			VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK) &&
-+		    (ops->get_status(vdpa) & VIRTIO_CONFIG_S_DRIVER_OK))
-+			return -EINVAL;
- 		ops->set_vq_ready(vdpa, idx, s.num);
- 		return 0;
- 	case VHOST_VDPA_GET_VRING_GROUP:
--- 
-2.43.0
+Thanks,
+Yilun
 
+> 
+> Thanks,
+> Yilun
+> 
+> > +		if (root->role.word == role.word)
+> > +			return root;
+> >  	}
+> >  
+> > +	return NULL;
+> > +}
+> > +
+> > +int kvm_tdp_mmu_alloc_root(struct kvm_vcpu *vcpu)
+> > +{
+> > +	struct kvm_mmu *mmu = vcpu->arch.mmu;
+> > +	union kvm_mmu_page_role role = mmu->root_role;
+> > +	struct kvm *kvm = vcpu->kvm;
+> > +	struct kvm_mmu_page *root;
+> > +
+> > +	/*
+> > +	 * Check for an existing root while holding mmu_lock for read to avoid
+> > +	 * unnecessary serialization if multiple vCPUs are loading a new root.
+> > +	 * E.g. when bringing up secondary vCPUs, KVM will already have created
+> > +	 * a valid root on behalf of the primary vCPU.
+> > +	 */
+> > +	read_lock(&kvm->mmu_lock);
+> > +	root = kvm_tdp_mmu_try_get_root(vcpu);
+> > +	read_unlock(&kvm->mmu_lock);
+> > +
+> > +	if (root)
+> > +		goto out;
+> > +
+> > +	write_lock(&kvm->mmu_lock);
+> > +
+> > +	/*
+> > +	 * Recheck for an existing root after acquiring mmu_lock for write.  It
+> > +	 * is possible a new usable root was created between dropping mmu_lock
+> > +	 * (for read) and acquiring it for write.
+> > +	 */
+> > +	root = kvm_tdp_mmu_try_get_root(vcpu);
+> > +	if (root)
+> > +		goto out_unlock;
+> > +
+> >  	root = tdp_mmu_alloc_sp(vcpu);
+> >  	tdp_mmu_init_sp(root, NULL, 0, role);
+> >  
+> > @@ -254,8 +285,17 @@ hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
+> >  	list_add_rcu(&root->link, &kvm->arch.tdp_mmu_roots);
+> >  	spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
+> >  
+> > +out_unlock:
+> > +	write_unlock(&kvm->mmu_lock);
+> >  out:
+> > -	return __pa(root->spt);
+> > +	/*
+> > +	 * Note, KVM_REQ_MMU_FREE_OBSOLETE_ROOTS will prevent entering the guest
+> > +	 * and actually consuming the root if it's invalidated after dropping
+> > +	 * mmu_lock, and the root can't be freed as this vCPU holds a reference.
+> > +	 */
+> > +	mmu->root.hpa = __pa(root->spt);
+> > +	mmu->root.pgd = 0;
+> > +	return 0;
+> >  }
+> >  
+> >  static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+> > @@ -917,7 +957,7 @@ void kvm_tdp_mmu_zap_invalidated_roots(struct kvm *kvm)
+> >   * the VM is being destroyed).
+> >   *
+> >   * Note, kvm_tdp_mmu_zap_invalidated_roots() is gifted the TDP MMU's reference.
+> > - * See kvm_tdp_mmu_get_vcpu_root_hpa().
+> > + * See kvm_tdp_mmu_alloc_root().
+> >   */
+> >  void kvm_tdp_mmu_invalidate_all_roots(struct kvm *kvm)
+> >  {
+> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
+> > index 20d97aa46c49..6e1ea04ca885 100644
+> > --- a/arch/x86/kvm/mmu/tdp_mmu.h
+> > +++ b/arch/x86/kvm/mmu/tdp_mmu.h
+> > @@ -10,7 +10,7 @@
+> >  void kvm_mmu_init_tdp_mmu(struct kvm *kvm);
+> >  void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm);
+> >  
+> > -hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu);
+> > +int kvm_tdp_mmu_alloc_root(struct kvm_vcpu *vcpu);
+> >  
+> >  __must_check static inline bool kvm_tdp_mmu_get_root(struct kvm_mmu_page *root)
+> >  {
+> > -- 
+> > 2.43.0.275.g3460e3d667-goog
+> > 
+> > 
+> 
 
