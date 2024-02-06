@@ -1,230 +1,314 @@
-Return-Path: <kvm+bounces-8104-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8105-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D039D84B95D
-	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 16:25:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C68884B9B4
+	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 16:34:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F2A31F26F1F
-	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 15:25:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF60E289A5E
+	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 15:34:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B39D134739;
-	Tue,  6 Feb 2024 15:19:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B11BC134743;
+	Tue,  6 Feb 2024 15:34:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vkb9JBRZ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="E4hE3Pks"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1753133982
-	for <kvm@vger.kernel.org>; Tue,  6 Feb 2024 15:19:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 578E2134729
+	for <kvm@vger.kernel.org>; Tue,  6 Feb 2024 15:34:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707232798; cv=none; b=dK9KnmFi4t8gUGiQgE44bZVVlsq6G/Wgrb4Uw+kQ+UlVLTAEkjf9Ozlt9EIzN0qOyTJRuf+0697L+nct4jSMPyRfRXQ4KIUV0RPQ300ERCLtx8MlksKlhs5ckAdDsis1dTK0jMJZUzECq/6/fNLwsuhYP5PEZUG534+K+ILp1oc=
+	t=1707233651; cv=none; b=Ks7UaAihM66kbvYv9glDtihgXA5YXvMpc7sX1U1zAGJuPDPWvsy8nCHogIXaI7UUiG5s7wBxqM8Ot8lJIJxT7yL9mMLkqCDZ07o1y/AyQ2Y1G3R5i7WYqbduorDyj5ivsi4bU2TxKSiao28gu+tULzS1E9T0GkbdSEm+4bnYbvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707232798; c=relaxed/simple;
-	bh=oyBbD9O77fdzA3mKoUnOeLqCcbuiPoR6Vq4YQ19WT8g=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kDioWxLSigASz+HNX5L6G/yAyhufMfkwG6E9eilr/H50pW/NGU9tHK/A0JhbG6RbWl2PR1vANwTR/wxA+REtN9Gl5O3iWHWWALRK5CtyVD3xjP0ldG/j/nCrnryGlrvddthSFjKMAc9yuR9NKk/JHca185n52ciMaz3fytgiCzc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Vkb9JBRZ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707232795;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=J8tSMCLStu5rYwI8aLzXD9+zfv3RFVQ4/1ORcx+dqxU=;
-	b=Vkb9JBRZ/N1gmhvsHJSZLpNqSVuKV547CXnuxaqIPnwHTp1ZAT9suzignHQXKgXpruvwXj
-	ZkBUG2BgBvSkH5/1oN4nF66GwZ2PgcVl8HMJ74yMl2C530W1vovG5jXxzZqAjM9jn6WbFD
-	yYFbnjC03tBrWDvxGr9FszxbKT4IL54=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-561-4CMy8lo5Nk2OaA6PlWeI_g-1; Tue,
- 06 Feb 2024 10:19:52 -0500
-X-MC-Unique: 4CMy8lo5Nk2OaA6PlWeI_g-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2CE1A3813BD2;
-	Tue,  6 Feb 2024 15:19:52 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.45.226.57])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 1EBCB1C060AF;
-	Tue,  6 Feb 2024 15:19:51 +0000 (UTC)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: kvm@vger.kernel.org,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	David Woodhouse <dwmw@amazon.co.uk>
-Cc: Jan Richter <jarichte@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] KVM: selftests: Compare wall time from xen shinfo against KVM_GET_CLOCK
-Date: Tue,  6 Feb 2024 16:19:50 +0100
-Message-ID: <20240206151950.31174-1-vkuznets@redhat.com>
+	s=arc-20240116; t=1707233651; c=relaxed/simple;
+	bh=djwHBFF/6b+JEsRyw/WpDuQJ81TX0FL0FrPWy97PCxU=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=JMaiLEFcKIl4o4Vqe68NPT5S3pcOyvSISZK0UseedvAPLyQCxxgNwZ/gvjFl/O0150vy/JejaRIOszo5w5N++HZX8I3SeLxS+3/g+klZCirPHAVRwpGwNleCox8kw60gjBa4LM8ZIJxQO9K0OURpJNio6goR4g+ymtGe/jKfNE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--avagin.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=E4hE3Pks; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--avagin.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1d9742bff20so6646245ad.1
+        for <kvm@vger.kernel.org>; Tue, 06 Feb 2024 07:34:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1707233649; x=1707838449; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=9JcuRLrkl5NZZWE8bXJY3ZHXnBfo6fG9Pt/Z+TQuz88=;
+        b=E4hE3PksQ41EAJqXzSQgXKktSjTubQyrhUQKpKSp1sy5A/feuK7XHlDNm7a7GmReJs
+         3FtKfcM2OkJqpE30SdJh/VEEQ8gG7uBscTotnmQWTlztbJRQFde8etLcFdWcQJcS/rid
+         enpnhkC2rwM+td1X7ddW001kOkiMmYA5uf1zG7kgm+oUEexVS/wjx59vi4ofBE9H4Y6W
+         7Hbgn/QM+3tVhNVEFyZmeMoZtO/uloekBjnW9SXUvSn+EfQgtYzI5K8e5r0RUWNuuHxS
+         soRtzMy0Ihjv5s9qiefN7Gzj+sMMwtzQVcpkuHRHzkbiw5pUCF7w32lVoCfsSXNnlIYz
+         xVcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707233649; x=1707838449;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9JcuRLrkl5NZZWE8bXJY3ZHXnBfo6fG9Pt/Z+TQuz88=;
+        b=PZA0wAke1BPdDUlcOSLYXUhMcIuA6OWAZQ3M8XUntZzG8vR9A9RyaRvwZ2xb0NbAbP
+         cIbjZUIz3Hh6Jll4uMY9sJVQYlqEJt4Uo53iKybttJ/9minMX6e3+lBPyFakzU8cCvW+
+         b4Jf3xrkQ2xzn9rqDqvN5mQMEAJ30Bagk0LMAnmOB08rtRCKVRtU0uItigdNPIjZVijE
+         Ghn9Yc278ePdjjnE3CT9UnF9yfpKs+qCOgJj86JdNhTX2xbfCFxfi7oiiENwTTB4Sq2K
+         Bop00ldIy5elOowehy1/fUgx93Qi5qYZsFa+QXq/vsJt4VdMi3ZPBNgV4WtPoW2JpyIj
+         F/Fg==
+X-Gm-Message-State: AOJu0Yyp9CKMgdmF7ZU6DwXfdCjOJmvDoqfiPXxGdPwDvXJslyFnneLr
+	tfZ2XXOawYfM7mrRgqqB6uxIvV57N71+iUvUkaiYxGARpVw9z6/3S++SeKeik1KNeNl4M8dQuL6
+	rgw==
+X-Google-Smtp-Source: AGHT+IGnVe8/AUYKWmmNmbjqGjxjNUoELEKOek2cIdx4iS37voI2OGUByDeYLeoszBKZ90KF5ix5pUAeSGw=
+X-Received: from avagin.kir.corp.google.com ([2620:0:1008:10:34a4:546d:dbbd:8cab])
+ (user=avagin job=sendgmr) by 2002:a17:903:1cd:b0:1d9:3f82:497d with SMTP id
+ e13-20020a17090301cd00b001d93f82497dmr71878plh.1.1707233649437; Tue, 06 Feb
+ 2024 07:34:09 -0800 (PST)
+Date: Tue,  6 Feb 2024 07:34:05 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.594.gd9cf4e227d-goog
+Message-ID: <20240206153405.489531-1-avagin@google.com>
+Subject: [PATCH v2] kvm/x86: allocate the write-tracking metadata on-demand
+From: Andrei Vagin <avagin@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org, 
+	Andrei Vagin <avagin@google.com>, Zhenyu Wang <zhenyuw@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
 
-xen_shinfo_test is observed to be flaky failing sporadically with
-"VM time too old". With min_ts/max_ts debug print added:
+The write-track is used externally only by the gpu/drm/i915 driver.
+Currently, it is always enabled, if a kernel has been compiled with this
+driver.
 
-Wall clock (v 3269818) 1704906491.986255664
-Time info 1: v 1282712 tsc 33530585736 time 14014430025 mul 3587552223 shift 4294967295 flags 1
-Time info 2: v 1282712 tsc 33530585736 time 14014430025 mul 3587552223 shift 4294967295 flags 1
-min_ts: 1704906491.986312153
-max_ts: 1704906506.001006963
-==== Test Assertion Failure ====
-  x86_64/xen_shinfo_test.c:1003: cmp_timespec(&min_ts, &vm_ts) <= 0
-  pid=32724 tid=32724 errno=4 - Interrupted system call
-     1	0x00000000004030ad: main at xen_shinfo_test.c:1003
-     2	0x00007fca6b23feaf: ?? ??:0
-     3	0x00007fca6b23ff5f: ?? ??:0
-     4	0x0000000000405e04: _start at ??:?
-  VM time too old
+Enabling the write-track mechanism adds a two-byte overhead per page across
+all memory slots. It isn't significant for regular VMs. However in gVisor,
+where the entire process virtual address space is mapped into the VM, even
+with a 39-bit address space, the overhead amounts to 256MB.
 
-The test compares wall clock data from shinfo (which is the output of
-kvm_get_wall_clock_epoch()) against clock_gettime(CLOCK_REALTIME) in the
-host system before the VM is created. In the example above, it compares
+This change rework the write-tracking mechanism to enable it on-demand
+in kvm_page_track_register_notifier.
 
- shinfo: 1704906491.986255664 vs min_ts: 1704906491.986312153
+Here is Sean's comment about the locking scheme:
 
-and fails as the later is greater than the former.  While this sounds like
-a sane test, it doesn't pass reality check: kvm_get_wall_clock_epoch()
-calculates guest's epoch (realtime when the guest was created) by
-subtracting kvmclock from the current realtime and the calculation happens
-when shinfo is setup. The problem is that kvmclock is a raw clock and
-realtime clock is affected by NTP. This means that if realtime ticks with a
-slightly reduced frequency, "guest's epoch" calculated by
-kvm_get_wall_clock_epoch() will actually tick backwards! This is not a big
-issue from guest's perspective as the guest can't really observe this but
-this epoch can't be compared with a fixed clock_gettime() on the host.
+The only potential hiccup would be if taking slots_arch_lock would
+deadlock, but it should be impossible for slots_arch_lock to be taken in
+any other path that involves VFIO and/or KVMGT *and* can be coincident.
+Except for kvm_arch_destroy_vm() (which deletes KVM's internal
+memslots), slots_arch_lock is taken only through KVM ioctls(), and the
+caller of kvm_page_track_register_notifier() *must* hold a reference to
+the VM.
 
-Replace the check with comparing wall clock data from shinfo to
-KVM_GET_CLOCK. The later gives both realtime and kvmclock so guest's epoch
-can be calculated by subtraction. Note, CLOCK_REALTIME is susceptible to
-leap seconds jumps but there's no better alternative in KVM at this
-moment. Leave a comment and accept 1s delta.
-
-Reported-by: Jan Richter <jarichte@redhat.com>
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Andrei Vagin <avagin@google.com>
 ---
-Changes since v1 [David Woodhouse]:
-- Check for KVM_CLOCK_REALTIME and skip testing shinfo epoch sanity in case
-it's missing (e.g. when a non-TSC clocksource is used)
-- Add a comment about a potential jump of CLOCK_REALTIME because of a leap
-second injection and accept 1s delta. While this is very unlikely anyone
-will even hit this in testing, this mostly serves a documentation purpose.
----
- .../selftests/kvm/x86_64/xen_shinfo_test.c    | 50 +++++++++++--------
- 1 file changed, 28 insertions(+), 22 deletions(-)
+v1: https://lore.kernel.org/lkml/ZcErs9rPqT09nNge@google.com/T/
+v2: allocate the write-tracking metadata on-demand
 
-diff --git a/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c b/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-index 9ec9ab60b63e..e6e3553633b1 100644
---- a/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-@@ -375,20 +375,6 @@ static void guest_code(void)
- 	GUEST_SYNC(TEST_DONE);
- }
- 
--static int cmp_timespec(struct timespec *a, struct timespec *b)
--{
--	if (a->tv_sec > b->tv_sec)
--		return 1;
--	else if (a->tv_sec < b->tv_sec)
--		return -1;
--	else if (a->tv_nsec > b->tv_nsec)
--		return 1;
--	else if (a->tv_nsec < b->tv_nsec)
--		return -1;
--	else
--		return 0;
--}
--
- static struct vcpu_info *vinfo;
- static struct kvm_vcpu *vcpu;
- 
-@@ -425,7 +411,6 @@ static void *juggle_shinfo_state(void *arg)
- 
- int main(int argc, char *argv[])
- {
--	struct timespec min_ts, max_ts, vm_ts;
- 	struct kvm_xen_hvm_attr evt_reset;
- 	struct kvm_vm *vm;
- 	pthread_t thread;
-@@ -443,8 +428,6 @@ int main(int argc, char *argv[])
- 	bool do_eventfd_tests = !!(xen_caps & KVM_XEN_HVM_CONFIG_EVTCHN_2LEVEL);
- 	bool do_evtchn_tests = do_eventfd_tests && !!(xen_caps & KVM_XEN_HVM_CONFIG_EVTCHN_SEND);
- 
--	clock_gettime(CLOCK_REALTIME, &min_ts);
--
- 	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
- 
- 	/* Map a region for the shared_info page */
-@@ -969,7 +952,6 @@ int main(int argc, char *argv[])
- 	vm_ioctl(vm, KVM_XEN_HVM_SET_ATTR, &evt_reset);
- 
- 	alarm(0);
--	clock_gettime(CLOCK_REALTIME, &max_ts);
- 
- 	/*
- 	 * Just a *really* basic check that things are being put in the
-@@ -978,6 +960,8 @@ int main(int argc, char *argv[])
+ arch/x86/include/asm/kvm_host.h |  2 +
+ arch/x86/kvm/mmu/mmu.c          | 24 +++++------
+ arch/x86/kvm/mmu/page_track.c   | 74 ++++++++++++++++++++++++++++-----
+ arch/x86/kvm/mmu/page_track.h   |  3 +-
+ 4 files changed, 78 insertions(+), 25 deletions(-)
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index d271ba20a0b2..c35641add93c 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1503,6 +1503,8 @@ struct kvm_arch {
  	 */
- 	struct pvclock_wall_clock *wc;
- 	struct pvclock_vcpu_time_info *ti, *ti2;
-+	struct kvm_clock_data kcdata;
-+	long long delta;
+ #define SPLIT_DESC_CACHE_MIN_NR_OBJECTS (SPTE_ENT_PER_PAGE + 1)
+ 	struct kvm_mmu_memory_cache split_desc_cache;
++
++	bool page_write_tracking_enabled;
+ };
  
- 	wc = addr_gpa2hva(vm, SHINFO_REGION_GPA + 0xc00);
- 	ti = addr_gpa2hva(vm, SHINFO_REGION_GPA + 0x40 + 0x20);
-@@ -993,12 +977,34 @@ int main(int argc, char *argv[])
- 		       ti2->tsc_shift, ti2->flags);
+ struct kvm_vm_stat {
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 2d6cdeab1f8a..e45fca3156de 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3755,29 +3755,29 @@ static int mmu_first_shadow_root_alloc(struct kvm *kvm)
+ 	 * Check if anything actually needs to be allocated, e.g. all metadata
+ 	 * will be allocated upfront if TDP is disabled.
+ 	 */
+-	if (kvm_memslots_have_rmaps(kvm) &&
+-	    kvm_page_track_write_tracking_enabled(kvm))
++	r = kvm_page_track_write_tracking_enable(kvm);
++	if (r)
++		goto out_unlock;
++
++	if (kvm_memslots_have_rmaps(kvm))
+ 		goto out_success;
+ 
+ 	for (i = 0; i < kvm_arch_nr_memslot_as_ids(kvm); i++) {
+ 		slots = __kvm_memslots(kvm, i);
+ 		kvm_for_each_memslot(slot, bkt, slots) {
+ 			/*
+-			 * Both of these functions are no-ops if the target is
+-			 * already allocated, so unconditionally calling both
+-			 * is safe.  Intentionally do NOT free allocations on
+-			 * failure to avoid having to track which allocations
+-			 * were made now versus when the memslot was created.
+-			 * The metadata is guaranteed to be freed when the slot
+-			 * is freed, and will be kept/used if userspace retries
++			 * This function is no-ops if the target is already
++			 * allocated, so unconditionally calling it is safe.
++			 * Intentionally do NOT free allocations on failure to
++			 * avoid having to track which allocations were made
++			 * now versus when the memslot was created.  The
++			 * metadata is guaranteed to be freed when the slot is
++			 * freed, and will be kept/used if userspace retries
+ 			 * KVM_RUN instead of killing the VM.
+ 			 */
+ 			r = memslot_rmap_alloc(slot, slot->npages);
+ 			if (r)
+ 				goto out_unlock;
+-			r = kvm_page_track_write_tracking_alloc(slot);
+-			if (r)
+-				goto out_unlock;
+ 		}
  	}
  
--	vm_ts.tv_sec = wc->sec;
--	vm_ts.tv_nsec = wc->nsec;
- 	TEST_ASSERT(wc->version && !(wc->version & 1),
- 		    "Bad wallclock version %x", wc->version);
--	TEST_ASSERT(cmp_timespec(&min_ts, &vm_ts) <= 0, "VM time too old");
--	TEST_ASSERT(cmp_timespec(&max_ts, &vm_ts) >= 0, "VM time too new");
-+
-+	vm_ioctl(vm, KVM_GET_CLOCK, &kcdata);
-+
-+	if (kcdata.flags & KVM_CLOCK_REALTIME) {
-+		if (verbose) {
-+			printf("KVM_GET_CLOCK clock: %lld.%09lld\n",
-+			       kcdata.clock / NSEC_PER_SEC, kcdata.clock % NSEC_PER_SEC);
-+			printf("KVM_GET_CLOCK realtime: %lld.%09lld\n",
-+			       kcdata.realtime / NSEC_PER_SEC, kcdata.realtime % NSEC_PER_SEC);
-+		}
-+
-+		delta = (wc->sec * NSEC_PER_SEC + wc->nsec) - (kcdata.realtime - kcdata.clock);
-+
-+		/*
-+		 * KVM_GET_CLOCK gives CLOCK_REALTIME which jumps on leap seconds updates but
-+		 * unfortunately KVM doesn't currently offer a CLOCK_TAI alternative. Accept 1s
-+		 * delta as testing clock accuracy is not the goal here. The test just needs to
-+		 * check that the value in shinfo is somewhat sane.
-+		 */
-+		TEST_ASSERT(llabs(delta) < NSEC_PER_SEC,
-+			    "Guest's epoch from shinfo %d.%09d differs from KVM_GET_CLOCK %lld.%lld",
-+			    wc->sec, wc->nsec, (kcdata.realtime - kcdata.clock) / NSEC_PER_SEC,
-+			    (kcdata.realtime - kcdata.clock) % NSEC_PER_SEC);
-+	} else {
-+		pr_info("Missing KVM_CLOCK_REALTIME, skipping shinfo epoch sanity check\n");
-+	}
+diff --git a/arch/x86/kvm/mmu/page_track.c b/arch/x86/kvm/mmu/page_track.c
+index c87da11f3a04..a4790b0a6f50 100644
+--- a/arch/x86/kvm/mmu/page_track.c
++++ b/arch/x86/kvm/mmu/page_track.c
+@@ -20,10 +20,14 @@
+ #include "mmu_internal.h"
+ #include "page_track.h"
  
- 	TEST_ASSERT(ti->version && !(ti->version & 1),
- 		    "Bad time_info version %x", ti->version);
+-bool kvm_page_track_write_tracking_enabled(struct kvm *kvm)
++static bool kvm_page_track_write_tracking_enabled(struct kvm *kvm)
+ {
+-	return IS_ENABLED(CONFIG_KVM_EXTERNAL_WRITE_TRACKING) ||
+-	       !tdp_enabled || kvm_shadow_root_allocated(kvm);
++	/*
++	 * Read page_write_tracking_enabled before related pointers. Pairs with
++	 * smp_store_release in kvm_page_track_write_tracking_enable.
++	 */
++	return smp_load_acquire(&kvm->arch.page_write_tracking_enabled) |
++	       !tdp_enabled;
+ }
+ 
+ void kvm_page_track_free_memslot(struct kvm_memory_slot *slot)
+@@ -32,8 +36,8 @@ void kvm_page_track_free_memslot(struct kvm_memory_slot *slot)
+ 	slot->arch.gfn_write_track = NULL;
+ }
+ 
+-static int __kvm_page_track_write_tracking_alloc(struct kvm_memory_slot *slot,
+-						 unsigned long npages)
++static int __kvm_write_tracking_alloc(struct kvm_memory_slot *slot,
++				      unsigned long npages)
+ {
+ 	const size_t size = sizeof(*slot->arch.gfn_write_track);
+ 
+@@ -51,12 +55,7 @@ int kvm_page_track_create_memslot(struct kvm *kvm,
+ 	if (!kvm_page_track_write_tracking_enabled(kvm))
+ 		return 0;
+ 
+-	return __kvm_page_track_write_tracking_alloc(slot, npages);
+-}
+-
+-int kvm_page_track_write_tracking_alloc(struct kvm_memory_slot *slot)
+-{
+-	return __kvm_page_track_write_tracking_alloc(slot, slot->npages);
++	return __kvm_write_tracking_alloc(slot, npages);
+ }
+ 
+ static void update_gfn_write_track(struct kvm_memory_slot *slot, gfn_t gfn,
+@@ -153,6 +152,50 @@ int kvm_page_track_init(struct kvm *kvm)
+ 	return init_srcu_struct(&head->track_srcu);
+ }
+ 
++/*
++ * kvm_page_track_write_tracking_enable enables the write tracking mechanism.
++ * If it has been already enabled, this function is no-op.
++ *
++ * The caller must hold kvm->slots_arch_lock.
++ */
++int kvm_page_track_write_tracking_enable(struct kvm *kvm)
++{
++	struct kvm_memslots *slots;
++	struct kvm_memory_slot *slot;
++	int r = 0, i, bkt;
++
++	lockdep_assert_held(&kvm->slots_arch_lock);
++
++	if (kvm_page_track_write_tracking_enabled(kvm))
++		return 0;
++
++	for (i = 0; i < kvm_arch_nr_memslot_as_ids(kvm); i++) {
++		slots = __kvm_memslots(kvm, i);
++		kvm_for_each_memslot(slot, bkt, slots) {
++			/*
++			 * This function is no-ops if the target is already
++			 * allocated, so unconditionally calling it is safe.
++			 * Intentionally do NOT free allocations on failure to
++			 * avoid having to track which allocations were made
++			 * now versus when the memslot was created.  The
++			 * metadata is guaranteed to be freed when the slot is
++			 * freed, and will be kept/used if userspace retries
++			 * KVM_RUN instead of killing the VM.
++			 */
++			r = __kvm_write_tracking_alloc(slot, slot->npages);
++			if (r)
++				goto err;
++		}
++	}
++	/*
++	 * Ensure that page_write_tracking_enabled becomes true strictly after
++	 * all the related pointers are set.
++	 */
++	smp_store_release(&kvm->arch.page_write_tracking_enabled, true);
++err:
++	return r;
++}
++
+ /*
+  * register the notifier so that event interception for the tracked guest
+  * pages can be received.
+@@ -161,12 +204,21 @@ int kvm_page_track_register_notifier(struct kvm *kvm,
+ 				     struct kvm_page_track_notifier_node *n)
+ {
+ 	struct kvm_page_track_notifier_head *head;
++	int r;
+ 
+ 	if (!kvm || kvm->mm != current->mm)
+ 		return -ESRCH;
+ 
+ 	kvm_get_kvm(kvm);
+ 
++	mutex_lock(&kvm->slots_arch_lock);
++	r = kvm_page_track_write_tracking_enable(kvm);
++	mutex_unlock(&kvm->slots_arch_lock);
++	if (r) {
++		kvm_put_kvm(kvm);
++		return r;
++	}
++
+ 	head = &kvm->arch.track_notifier_head;
+ 
+ 	write_lock(&kvm->mmu_lock);
+diff --git a/arch/x86/kvm/mmu/page_track.h b/arch/x86/kvm/mmu/page_track.h
+index d4d72ed999b1..f8984d163b2c 100644
+--- a/arch/x86/kvm/mmu/page_track.h
++++ b/arch/x86/kvm/mmu/page_track.h
+@@ -7,8 +7,7 @@
+ #include <asm/kvm_page_track.h>
+ 
+ 
+-bool kvm_page_track_write_tracking_enabled(struct kvm *kvm);
+-int kvm_page_track_write_tracking_alloc(struct kvm_memory_slot *slot);
++int kvm_page_track_write_tracking_enable(struct kvm *kvm);
+ 
+ void kvm_page_track_free_memslot(struct kvm_memory_slot *slot);
+ int kvm_page_track_create_memslot(struct kvm *kvm,
 -- 
-2.43.0
+2.43.0.594.gd9cf4e227d-goog
 
 
