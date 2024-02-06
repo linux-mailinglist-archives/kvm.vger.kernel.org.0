@@ -1,119 +1,105 @@
-Return-Path: <kvm+bounces-8070-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8071-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A96D84ACCD
-	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 04:23:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AF3984ACDC
+	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 04:29:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CDB321C230D9
-	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 03:23:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 96A001C22878
+	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 03:29:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A94C0745C9;
-	Tue,  6 Feb 2024 03:23:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DCC9745CF;
+	Tue,  6 Feb 2024 03:29:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nipICXxH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TOoi/NnZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8883E73188
-	for <kvm@vger.kernel.org>; Tue,  6 Feb 2024 03:23:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DB8F6E2AD
+	for <kvm@vger.kernel.org>; Tue,  6 Feb 2024 03:29:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707189807; cv=none; b=joPy2wkKbE8pXMDt7YciMvCiR2UZYiMs9A/g2IXg8UcC1E4V22GSaL3ucpwPXz8P9ASZ+Vl/2ZekRdtIbYd2QA4W2Y/Dx6m1AqNPNnCwJFr7bGi75hPXYTHzGmoAep6pBtMKcqDP3WShtRwaN+RuEfEl0kLhWDqiMRJsdN6dDfo=
+	t=1707190176; cv=none; b=tx5MUp1P1Y4xPCefzDhBlBIwK5GSkdrG28qb767aKG3oOjbi/ih3pIwUeyD7cwYvjIsrnr/R0tddq7DD2UGdXC8OdAIsq4pFDcsTOaXcVm1bLQu+cS755iByGVdj3nU1FvFb7dZvzx5ncvfHxhr7RBMz5RvOzIlpkFqYKhzoAWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707189807; c=relaxed/simple;
-	bh=UDDsuWPSW+daCIoSbgJFsD9FLwQJiP9p3QmcFSmkrL8=;
+	s=arc-20240116; t=1707190176; c=relaxed/simple;
+	bh=K47t6Qn8VX9LZd2vOHxHLV0Ys/CaGLr5+PC1CzGP2TU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=JNuu41Iv8aPmI/vJdVLK0kUXCR91A89oWUisYLrTWBzPy5USn55ML5V213m2u3iXAXRXEQnrmy3iW7Di5QzCLXlkrBCldeg/rc59MVsMz4PC1vBtqNltgq/aqTN4KQ6PFXU0gfEa+Plan8bWQCblbx4gFs0yjcnkQGTOx2cq+hQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nipICXxH; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=tCEHbEVQthxdgQR9x9qQTOEBv7gfai2XCiW/V6n2jjcG87WXDdtAKCcHXfhCe6xac3wDyMepnmaGN8Ej/qoQzfs+3IxshNvF4gV0MrWr34iY5OZ4O9sTd7yHHQiV4oLWB5p87LPPKkCq4pFI8ahKo8BcpIonBniPCoSxAZWL5N4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TOoi/NnZ; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1d45d23910aso4527865ad.1
-        for <kvm@vger.kernel.org>; Mon, 05 Feb 2024 19:23:26 -0800 (PST)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dbf216080f5so8480599276.1
+        for <kvm@vger.kernel.org>; Mon, 05 Feb 2024 19:29:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707189806; x=1707794606; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1707190174; x=1707794974; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8R1ERRzsuzMxbDKKjiu7D3XS5GbZ63vNtb/cSGihhOs=;
-        b=nipICXxHO1nJjO+JmKGVfaCij6btPcykHvyqG9bf2rUQif6VsjiZLuo7ESkFIDPC5B
-         3yAyxA9kkaM8evZWqeY4tjv/8EBsT4AulFXuK2NeYcMFHMRckW6vkAU7HFwI55wYIz8p
-         ivwVuCYE89R+gAKY+B0jMfQWSmxLeJ/0ETDNx9lTa1BOJqxmacy0cxAKjGGoKvRR/dmn
-         aWFW7rNgjGazQ6RSzuCYAr/hZ9I0yPWdA/b0V/5XMLVl2HCUaGIWfj7c6veBV/894Joj
-         iEKqeE+4hxeSREhz2Uu30Xh7bAdZaHuIT1hdAadVDOFwSKK2eRcXH5WrZEBx+FMitjqu
-         ajPA==
+        bh=/Tfd5OhfoKoOciQEBeRQDfj0WyGPDWpvLlZKvDtbwOk=;
+        b=TOoi/NnZH+pUj3KWcAJqUOwBc0c7UoEkwSEdwf66eoWBdZcAhhPN8swGlvwOqxFDkp
+         mzzYCAoip5P/yGQwTlxmz9KRuhSX2trcjL6e4e4f9gPhg44AKcksyuKB6YDPrkQ1k5v7
+         hOtGz9Q0VcgWLJRJj+7SMghr9zd1nI3r0BCfx/DCHMVaYsCbx2TnwZTDtK6kGv/UpUSJ
+         0chnSZ2EaLKri/8e7zGssw0b7/mLd7kqrAF4j2WtYUEaYr1sp8oLs79qbzDtlrlvdfML
+         wXsoENVlptkI5EG6ELh4enZ5KSfX6Z4m/f/89PSHdVcbKk0Ar2OTfA+eIIOteJf5/swi
+         DEVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707189806; x=1707794606;
+        d=1e100.net; s=20230601; t=1707190174; x=1707794974;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8R1ERRzsuzMxbDKKjiu7D3XS5GbZ63vNtb/cSGihhOs=;
-        b=jovC7CNBGXB835OB4PcUTEwkDWXFzmocUWicG3EiLnjGiqjZG05C7AoVUoLVTupCAg
-         35tqdsP1NfnOM9Cjtm+oQRW9j0JpM+HnfBnnqMoJbgn5v4PAB7k0PQd9lBoF8IjVMduc
-         4ZzUfWRdao1Rb7IYBsbf27MiTcjGJSSDFD2g/9mmLFbzR5UkEF5EsOXTwWxovhhgzprW
-         Z1zwVreiOcJ9sjI3TcPCFHaGcvCgUIA4BoPfclpWYEJC5pkQixALtiWn2vDe3wYsxbk9
-         it6IrMVayA7r+xrSDH0jZVWok7pqub70Ss34CgOtPSF5ImMjGqft+nQV2wLaOugwYjoW
-         h14g==
-X-Gm-Message-State: AOJu0YxzQRZYejScb+2sHf4jXu+wWL2CbvwvktXpvqyyMTxQD9vWV2R1
-	F4ulZPcRcrPqIgyb9sjwHYdBcHtIH7rVzuN7+tJYbnQxe6owkj153nx8vSomJlIHwinLFGN0Uvz
-	JLg==
-X-Google-Smtp-Source: AGHT+IE0G4SfzxxNcKBnPCRpYFdxC7UqdFDNFLn6IxTgkrQsyF2NU6Q4LbGrsElpxhUbA99G5w1BV9ZQ7JY=
+        bh=/Tfd5OhfoKoOciQEBeRQDfj0WyGPDWpvLlZKvDtbwOk=;
+        b=Eq1v1k+bZtzlctL+lSYbLtn82wrFbSVwc6szJguSyYToQrxPLpJ0JLsHM+zZbuilHR
+         CWFG6vZzMTO4/aForewq7wpJPloRmNc1PyNTPKW8l7og8m/ZU5KqYfeDor561tzjduUA
+         JlcHw3lVDFhfNR6DaXgKLT3XhO5mWbr+33+OKuXj2S0nW2XkYvs01xOqZ5fdwoqJpWJn
+         l0xz3/TRRopgkxN/E/Jg2wmsCz+r7G4gsGSmbumd628MlwO5ak8VQ8wXD3HoQwHlrF0F
+         kGuxGrcUASygDGBYUPiHKd07ifjhN7GOCNuWvHW++S/zysyp0e15p5r03nP5sPsktMHf
+         mf6A==
+X-Gm-Message-State: AOJu0YxtPRvNNxbjx4MAAHLBuzc0X4NhBwtyil+i8JPoYtimWa282tjq
+	qgxjCXPqTgyF5qg54SnBve8+mn2bvjaBed3eohUndhwN8dzt+ETzMPQadp30UYuO06D+7lQYQ+L
+	JbQ==
+X-Google-Smtp-Source: AGHT+IFGKs7rwk/xOH6e9m0tOkG5KkbLAalcPqOVjHui+Z6DsE6kZ01uHKZEANcR0800iNMQT8Is5W6Gv14=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:22c4:b0:1d9:6380:5485 with SMTP id
- y4-20020a17090322c400b001d963805485mr1077plg.13.1707189805737; Mon, 05 Feb
- 2024 19:23:25 -0800 (PST)
-Date: Mon, 5 Feb 2024 19:23:24 -0800
-In-Reply-To: <20230911021637.1941096-7-stevensd@google.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:160d:b0:dc2:1f34:fac4 with SMTP id
+ bw13-20020a056902160d00b00dc21f34fac4mr139109ybb.2.1707190174210; Mon, 05 Feb
+ 2024 19:29:34 -0800 (PST)
+Date: Mon, 5 Feb 2024 19:29:32 -0800
+In-Reply-To: <ZRpiXsm7X6BFAU/y@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20230911021637.1941096-1-stevensd@google.com> <20230911021637.1941096-7-stevensd@google.com>
-Message-ID: <ZcGmLKbLV2bVTxD1@google.com>
-Subject: Re: [PATCH v9 6/6] KVM: x86/mmu: Handle non-refcounted pages
+References: <20230911021637.1941096-1-stevensd@google.com> <ZRZeaP7W5SuereMX@infradead.org>
+ <ZRb2CljPvHlUErwM@google.com> <ZRpiXsm7X6BFAU/y@infradead.org>
+Message-ID: <ZcGnnIJNPG-nGAND@google.com>
+Subject: Re: [PATCH v9 0/6] KVM: allow mapping non-refcounted pages
 From: Sean Christopherson <seanjc@google.com>
-To: David Stevens <stevensd@chromium.org>
-Cc: Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	Zhi Wang <zhi.wang.linux@gmail.com>, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+To: Christoph Hellwig <hch@infradead.org>
+Cc: David Stevens <stevensd@chromium.org>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Isaku Yamahata <isaku.yamahata@gmail.com>, Zhi Wang <zhi.wang.linux@gmail.com>, 
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Sep 11, 2023, David Stevens wrote:
-> From: David Stevens <stevensd@chromium.org>
+On Sun, Oct 01, 2023, Christoph Hellwig wrote:
+> On Fri, Sep 29, 2023 at 09:06:34AM -0700, Sean Christopherson wrote:
+> > With the cleanups done, playing nice with non-refcounted paged instead of outright
+> > rejecting them is a wash in terms of lines of code, complexity, and ongoing
+> > maintenance cost.
 > 
-> Handle non-refcounted pages in __kvm_faultin_pfn. This allows the host
-> to map memory into the guest that is backed by non-refcounted struct
-> pages - for example, the tail pages of higher order non-compound pages
-> allocated by the amdgpu driver via ttm_pool_alloc_page.
-> 
-> The bulk of this change is tracking the is_refcounted_page flag so that
-> non-refcounted pages don't trigger page_count() == 0 warnings. This is
-> done by storing the flag in an unused bit in the sptes. There are no
-> bits available in PAE SPTEs, so non-refcounted pages can only be handled
-> on TDP and x86-64.
+> I tend to strongly disagree with that, though.  We can't just let these
+> non-refcounted pages spread everywhere and instead need to fix their
+> usage.
 
-Can you split this into two patches?  One to add all of the SPTE tracking, and
-then one final patch to allow faulting in non-refcounted pages.  I want to isolate
-the latter as much as possible, both for review purposes and in case something
-goes awry and needs to be reverted.
+Sorry for the horrifically slow reply.
 
-> @@ -4254,13 +4265,18 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
->  static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
->  {
->  	struct kvm_memory_slot *slot = fault->slot;
-> +	/*
-> +	 * There are no extra bits for tracking non-refcounted pages in
-> +	 * PAE SPTEs, so reject non-refcounted struct pages in that case.
-> +	 */
-> +	bool has_spte_refcount_bit = tdp_enabled && IS_ENABLED(CONFIG_X86_64);
+Is there a middle ground somewhere between allowing this willy nilly, and tainting
+the kernel?  I too would love to get the TTM stuff fixed up, but every time I look
+at that code I am less and less confident that it will happen anytime soon.  It's
+not even clear to me what all code needs to be touched.
 
-Eh, just drop the local variable and do
-
-		.allow_non_refcounted_struct_page = tdp_enabled &&
-						    IS_ENABLED(CONFIG_X86_64);
-(but keep the comment)
-
+In other words, is there a way we can unblock David and friends, while still
+providing a forcing function of some kind to motivate/heckle the TTM (or whatever
+is making the allocations) to change?
 
