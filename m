@@ -1,75 +1,74 @@
-Return-Path: <kvm+bounces-8127-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8128-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 491EF84BCE1
-	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 19:25:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CC8A84BCF2
+	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 19:30:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00442281873
-	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 18:25:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 614FB1C20292
+	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 18:30:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 480A212E68;
-	Tue,  6 Feb 2024 18:25:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52E79C148;
+	Tue,  6 Feb 2024 18:30:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="p1+u/+MH"
+	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="StBOuqaH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF2A9BA50
-	for <kvm@vger.kernel.org>; Tue,  6 Feb 2024 18:24:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAACD134C3
+	for <kvm@vger.kernel.org>; Tue,  6 Feb 2024 18:30:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707243901; cv=none; b=rDJYw0zW5eEy84UuVtHYgTHM8fhrZ1U5pV/l2Hiztbe0MavNdFz3UQKUUUQKYFWz+PG3cqzflYQlpoy16Kj9kV3UCmKGA6OwglVVdN1YBVGWyUHkRI7i1hfj48yzI0LwvkJ41tOOwhNZOApZ7fiY1vUE/5TtUfPNi9eqYxSW+dY=
+	t=1707244233; cv=none; b=OLlFtT5NimfHkZJuZ9xqA0tBFF+wYieWKZ2ZbQLOg3n6uhkGq8mXGoyxeOdb3geaklmza/E+2YfqbyzY/iSr3EUQX3UDi9qOCaRriPP8hyo5JVi0obnPrYzfMc4Q5oiJnDtmxuA5TQnmnkAm92WUOqmWVek770uHTR201JypRwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707243901; c=relaxed/simple;
-	bh=5g6zGk4/HgxgtZVwh8sjjIQyM9VipH8e2P55Ro/0jqU=;
+	s=arc-20240116; t=1707244233; c=relaxed/simple;
+	bh=e7367HiuTIgOjGKt1dhIzNpPH/PqUb1lItfEODOblpw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BKPLBPjNOJBxVmLWyMGq8iPc4EYZX5R5e+hdkB4pT3uPeO7EDiEIIpZJDTiJrlzGUhED7eiLhWQoWY+bXBMRTUm5PLbQhMlEdvG/IWd/dLeBGnErZxJVnWGa5B3qblgIl14MsJZh4CrGOp+RdnyqSWdEr79ZYP4iWrkwjbFRzVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=p1+u/+MH; arc=none smtp.client-ip=209.85.218.41
+	 In-Reply-To:Content-Type; b=WVPZvntKh5Elw6OC/S5Z/bs8SdkzYwra2CECTzBgLRdanBbxXHEd0jEIjWuwnWObvYlEJt92TX1LwbL1ImX+iQnhW4ZOwLjJeOJ1BdI9RVe17tGgcYnD44p4ofL6RCD0zSLGjStJ/pjsoxxqumfklWRewr3pPV3OguOh2tiKWSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=StBOuqaH; arc=none smtp.client-ip=209.85.208.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a3832a61a79so99966166b.1
-        for <kvm@vger.kernel.org>; Tue, 06 Feb 2024 10:24:59 -0800 (PST)
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5600d950442so1502642a12.1
+        for <kvm@vger.kernel.org>; Tue, 06 Feb 2024 10:30:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1707243898; x=1707848698; darn=vger.kernel.org;
+        d=grsecurity.net; s=grsec; t=1707244230; x=1707849030; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=ycBTxyrWdOEj3GiikcflPpq5rbuDb9mpBtug4LQWDRM=;
-        b=p1+u/+MHhIP0ePQX1yvpyJCAbUmle+KdxX0Agj8SNFvBJ4JuMsLrrw+P8xFlrSih1C
-         XiOvllaxnDBMUo75bkOP6PcUuHKJE56Jh27o+qFYi9nO0/xcsNahNPrTs+I1XRG9I5CV
-         A7EkyWOFRmcO2RYZca4v3y1pcipvc8JwkC2NnurTOl8Xj2pqmlSXk0YL2DcEfAREcAk1
-         mNbhKAmAPJ60mCPdl95bshp1MFkqTomgtymX4g6Xu7gHyyOwU1WXkOD/FedSDxyT4bVz
-         xjthk8EsSeiqK4AxAAiYXX38Ba0k0hjppURrIEvotKeuEzlvuJ2pguhe7MQzNlqqZkdL
-         y5lw==
+        bh=GABUZuAioDBDuZt1CwqcwaLffD+ZnRUCju2IZbwi/jk=;
+        b=StBOuqaH/YD5CBJ5UB0RQCBnIJpx3RZk8Hmfw8J3et3eRt87/sYbpYDD9lRMoRn1M2
+         dzyNgu2+dTiSysokT0DKz1wJ7RJmIKykv5oO4lb98GTx4khHZUPZBEGyTunYYOskR8KF
+         +/hhhiaz44ORYbOhxoUSSmdqjPXsc0ep8oCKysFdD+DGLSzG9dpu5NPNzPXHjpRzu+CQ
+         Y9LRIPDNmFrd2AWQUsylkQke+bONDXW2fyGzRmYEcIBCKS4YYQ5EygfD5UgdSU7ogqWH
+         +PJXBUGf0y475KHhnecVktCMPJM/XEhx3sCHHOqCFRnQRTNa4xqooQeRAJtwQNgK5+4d
+         IGEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707243898; x=1707848698;
+        d=1e100.net; s=20230601; t=1707244230; x=1707849030;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ycBTxyrWdOEj3GiikcflPpq5rbuDb9mpBtug4LQWDRM=;
-        b=c+YeWlk9W0xrcdMe62cvRLayZcuiF4Z/2iHoG5nniGJ6EqkeoNPi2JFgWx3aCbU9+1
-         LqXG5H+48mDfk48vxOzlk1r38fE/nHdZvz53VNoShT+YhZ7NqMBaeB/0IrytzjtMu02i
-         2/0SUEw1Dnl5vM9OpUCKKji45GKIbZokxq47l5RhAF3sAXlcZSap2hqWSbFsRUHCp0Ge
-         593EmsG4IHE5AXjEJ9NJRlGC2wHzwhSN+1uSWeF9MCSh5psbrxBd0hBgEIR9r3gJg7ox
-         LujPwz4BOg6EpHajgJuVntJIeduYLbGJiyIhleDjeYSaFx+cYqnhMDIv6aMM+xAV6+i+
-         u5Nw==
-X-Gm-Message-State: AOJu0YyGA9xfMqE6XCAyvEDJPPYX0YlAMvQODe4t4M3e+Pb3GNSA/Ej5
-	BNt5GoG/uYonfXTTB6pSXFbcahGTMXaJTsx/rPAgVMpHwZt6SC9OcBx4NuxS/WPWHI62YbRrQNu
-	r
-X-Google-Smtp-Source: AGHT+IGnxKUrZtUtAfDBNfI/w9t0vj8FWjcP+paaM3RBhYeTXDF7KQo24w/Po4O5zUNnqei1vf14uQ==
-X-Received: by 2002:a17:907:6d04:b0:a37:90a7:f846 with SMTP id sa4-20020a1709076d0400b00a3790a7f846mr3829869ejc.18.1707243898034;
-        Tue, 06 Feb 2024 10:24:58 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCWwZsckDlbvR+MDJnQ3HLWiasTyLXItZl+9hNSrcW/WIwsfIY+YVkr7lG93deW3fwJjvGVHrVePWFGF1HLJxyoJBWa4
+        bh=GABUZuAioDBDuZt1CwqcwaLffD+ZnRUCju2IZbwi/jk=;
+        b=GGNT2eWUQU/v++1Shz0C0MrOu8W6LAMPZASqZ9h48UiUJxsG4YcfACTF7+4rdq8Gsp
+         VGxWPEOSE3C7e7AytepMBgdDg3/egHDKZfdAeYKjam/oAIJe5BRqU7KiNCnIUUVvqdGW
+         fiQwV5yv5HJPeXEsJbu8ngHjf5bBW218cC6dmoL9P8JUWXMJRNrBfsS83sVKOOqF5Kly
+         5BbHt5oS60/aYDR77jzqRxsYVi5ZkYt+4WoguejfLnddcCl+tEGGna9n6VWumS+yhRx1
+         ZMsPaadYNLPwQDFLCm0daIoS+/D2DAJGWH7RaGj+gFKhuXODGDB5HW93eAD5bnuenvLH
+         RGuw==
+X-Gm-Message-State: AOJu0YxK5ycnVp6yR/WSnYTRcPsBz3P8KNBYqwaHGLktFlzpJ4DKfwvI
+	URNP3PDdk424OQpQRUavIkAEA9XecLcgtTM1z1Q9rg0GEzUbWOYfJ/h2NkzCs3c=
+X-Google-Smtp-Source: AGHT+IGGuikL6RHwAWmzYtJaOn/EvjMCeA1KmUqqur2QjE7uTPHZaTtscn6GiFHOCd8XIS702nRFGA==
+X-Received: by 2002:a17:906:13d6:b0:a37:b6e9:478 with SMTP id g22-20020a17090613d600b00a37b6e90478mr2515448ejc.72.1707244229870;
+        Tue, 06 Feb 2024 10:30:29 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCX63bxbR1eaFxZldvQFVawxDXUyWgfZMrSn/62PoHOZtmBadfJBuJhEKVdBX7pdbm9xZZqcHGHmktrW+Mv5cAltaFOi
 Received: from ?IPV6:2003:f6:af18:9900:571f:d8fb:277e:99a5? (p200300f6af189900571fd8fb277e99a5.dip0.t-ipconnect.de. [2003:f6:af18:9900:571f:d8fb:277e:99a5])
-        by smtp.gmail.com with ESMTPSA id qo4-20020a170907874400b00a35cd148c7esm1400396ejc.212.2024.02.06.10.24.57
+        by smtp.gmail.com with ESMTPSA id h11-20020a170906718b00b00a36fc7f0f85sm1434778ejk.47.2024.02.06.10.30.29
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 Feb 2024 10:24:57 -0800 (PST)
-Message-ID: <22b353d7-d973-4ccc-abd9-815d3be31ff7@grsecurity.net>
-Date: Tue, 6 Feb 2024 19:24:57 +0100
+        Tue, 06 Feb 2024 10:30:29 -0800 (PST)
+Message-ID: <1505cc9c-ce3d-4fda-95f1-3ab9f028a1a2@grsecurity.net>
+Date: Tue, 6 Feb 2024 19:30:28 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -77,12 +76,15 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/3] KVM: x86 - misc fixes
+Subject: Re: [PATCH 2/3] KVM: x86: Simplify kvm_vcpu_ioctl_x86_get_debugregs()
 Content-Language: en-US, de-DE
 To: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
 References: <20240203124522.592778-1-minipli@grsecurity.net>
- <ZcE9dyQ3SOuUZ8Kv@google.com>
+ <20240203124522.592778-3-minipli@grsecurity.net>
+ <ZcE8rXJiXFS6OFRR@google.com>
+ <86024ab8-0483-42a2-ab71-56c720b01b9e@grsecurity.net>
+ <ZcJ5YqJhSOrt-GMk@google.com>
 From: Mathias Krause <minipli@grsecurity.net>
 Autocrypt: addr=minipli@grsecurity.net; keydata=
  xsDNBF4u6F8BDAC1kCIyATzlCiDBMrbHoxLywJSUJT9pTbH9MIQIUW8K1m2Ney7a0MTKWQXp
@@ -118,27 +120,60 @@ Autocrypt: addr=minipli@grsecurity.net; keydata=
  zz3lozuC5nsm1nIbY62mR25Kikx7N6uL7TAZQWazURzVRe1xq2MqcF+18JTDdjzn53PEbg7L
  VeNDGqQ5lJk+rATW2VAy8zasP2/aqCPmSjlCogC6vgCot9mj+lmMkRUxspxCHDEms13K41tH
  RzDVkdgPJkL/NFTKZHo5foFXNi89kA==
-In-Reply-To: <ZcE9dyQ3SOuUZ8Kv@google.com>
+In-Reply-To: <ZcJ5YqJhSOrt-GMk@google.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 05.02.24 20:56, Sean Christopherson wrote:
-> On Sat, Feb 03, 2024, Mathias Krause wrote:
->> This is v2 of an old patch which gained an info leak fix to make it a
->> series.
+On 06.02.24 19:24, Sean Christopherson wrote:
+> On Tue, Feb 06, 2024, Mathias Krause wrote:
+>> On 05.02.24 20:53, Sean Christopherson wrote:
+>>> On Sat, Feb 03, 2024, Mathias Krause wrote:
+>>>> Take 'dr6' from the arch part directly as already done for 'dr7'.
+>>>> There's no need to take the clunky route via kvm_get_dr().
+>>>>
+>>>> Signed-off-by: Mathias Krause <minipli@grsecurity.net>
+>>>> ---
+>>>>  arch/x86/kvm/x86.c | 5 +----
+>>>>  1 file changed, 1 insertion(+), 4 deletions(-)
+>>>>
+>>>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>>>> index 13ec948f3241..0f958dcf8458 100644
+>>>> --- a/arch/x86/kvm/x86.c
+>>>> +++ b/arch/x86/kvm/x86.c
+>>>> @@ -5504,12 +5504,9 @@ static int kvm_vcpu_ioctl_x86_set_vcpu_events(struct kvm_vcpu *vcpu,
+>>>>  static void kvm_vcpu_ioctl_x86_get_debugregs(struct kvm_vcpu *vcpu,
+>>>>  					     struct kvm_debugregs *dbgregs)
+>>>>  {
+>>>> -	unsigned long val;
+>>>> -
+>>>>  	memset(dbgregs, 0, sizeof(*dbgregs));
+>>>>  	memcpy(dbgregs->db, vcpu->arch.db, sizeof(vcpu->arch.db));
+>>>> -	kvm_get_dr(vcpu, 6, &val);
+>>>> -	dbgregs->dr6 = val;
+>>>> +	dbgregs->dr6 = vcpu->arch.dr6;
+>>>
+>>> Blech, kvm_get_dr() is so dumb, it takes an out parameter despite have a void
+>>> return.
 >>
->> v1 -> v2:
->> - drop the stable cc, shorten commit log
->> - split out dr6 change
->> - add KVM_GET_MSRS stack info leak fix
+>> Jepp, that's why I tried to get rid of it.
+>>
+>>>          I would rather fix that wart and go the other direction, i.e. make dr7
+>>> go through kvm_get_dr().  This obviously isn't a fast path, so the extra CALL+RET
+>>> is a non-issue.
+>>
+>> Okay. I thought, as this is an indirect call which is slightly more
+>> expensive under RETPOLINE, I'd go the other way and simply open-code the
+>> access, as done a few lines below in kvm_vcpu_ioctl_x86_set_debugregs().
 > 
-> In the future, please post unrelated patches separately.  Bundling things into a
-> "misc fixes" series might seem like it's less work for maintainers, but for me at
-> least, it ends up being more work, e.g. to route patches into different branches.
-> It often ends up being more work for the contributor too, e.g. if only one patch
-> needs a new version.
+> It's not an indirect call.  It's not even strictly guaranteed to be a function
+> call, e.g. within x86.c, kvm_get_dr() is in scope of kvm_vcpu_ioctl_x86_get_debugregs()
+> and so a very smart compiler could fully inline and optimize it to just
+> "xxx = vcpu->arch.dr6" through dead code elimination (I doubt gcc or clang actually
+> does this, but it's possible).
 
-That was a little sloppy, agreed. Will do better next time.
+Oh, snap! I got confused by your later patch which had all the indirect
+calls. But yes, for arch/x86/kvm/x86.c you're right, gcc is smart enough
+to inline it. I guess, clang can do that as well.
 
 Thanks,
 Mathias
