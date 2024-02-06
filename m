@@ -1,136 +1,148 @@
-Return-Path: <kvm+bounces-8148-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8149-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C09D184BF01
-	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 21:58:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C04484BF0A
+	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 22:08:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3148B1F22860
-	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 20:58:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C54428487B
+	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 21:08:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D6A61B940;
-	Tue,  6 Feb 2024 20:58:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C21C11B957;
+	Tue,  6 Feb 2024 21:08:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Bc+M27W/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ptsah1Cv"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D391E1B944
-	for <kvm@vger.kernel.org>; Tue,  6 Feb 2024 20:58:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64DDC1B947
+	for <kvm@vger.kernel.org>; Tue,  6 Feb 2024 21:08:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707253130; cv=none; b=rXjv4cVZEwAUCp7z0OVnUK+8Q3CMe30W3m06OmrmpQyh/HG56KIp6cLhWA0pORjBM0W0aFvbqFh93Gpkq/Xfg40F/HtBYep1NQ5tWLDLIi5zfZx5LtiDP1YM+rVGNFcTJxJjydnghhY9MoEbfQTb4ybkHmeCkIEU58TJNXC0Rt0=
+	t=1707253730; cv=none; b=Rmmz+YCXwX8imQvQTMq94XKLwdUmcI0Tci5FwCsJmwM4lPcHH57KXu8HCZ1bGiiLzsXndPO7hb6kXeH/WXHJ3iBARFxwOeII8NHjFBtTsLv35Nfd7I7ufO3zzQvs6VB16JrKvivnD69+nkellNtKBnwHSna+ZEciSRHP+qjfGkM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707253130; c=relaxed/simple;
-	bh=9qRObfvA8ZAb+FX9SBRhdcDcbidM1/tWMt7Ry91tecE=;
+	s=arc-20240116; t=1707253730; c=relaxed/simple;
+	bh=zgAS7eEojvB4l1dUuynzszfleLxH1o1uHdUEOuRKM+Q=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=sg60WjBAb7e5t9x7pL2NqRAvvXIwYC3d/fCZC07q1QpCCYbvsuhSuENYhXsYHcoLdlXAQ3dy9adtUTXIs9Eiq/qEC8aN+ef/tFri1G59v/OyCU1L8B0gbBZFsurJ76/qCDtWg/CNU9gjsJkmEKXqe1k/0ydOzAYjZ0y7a9mD+Q0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Bc+M27W/; arc=none smtp.client-ip=209.85.219.201
+	 To:Cc:Content-Type; b=AlgsrK5beG93cmzlDT3WJXSu0gr9pUOiwXI91+DBAw2UbIhKJb6U2IQY9+KOgEhNueecMidawO6DU7YLlYkOkPOVWxiUstyNOR7/kpMYtbxfXT3B4S3nYvRoppLx5yNJZnUVmE9wSgJiBjBp6pU0rSrEDN6e6Bo6AYpSpTK+R18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ptsah1Cv; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc7165d7ca3so3133356276.2
-        for <kvm@vger.kernel.org>; Tue, 06 Feb 2024 12:58:48 -0800 (PST)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc6ba69e803so10177219276.2
+        for <kvm@vger.kernel.org>; Tue, 06 Feb 2024 13:08:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707253128; x=1707857928; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1707253727; x=1707858527; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0enT21I+2oflGQFv4IttPgAIR7OGwbDWfwrCGcb3/A4=;
-        b=Bc+M27W/7pD3mYKxQLPYJB8JbpVgsWB8bGq5QrRg3L/1H/L578u7XnmWcyY0N6IDVG
-         bWLziFYsy/Dkn+oItqWwJo8f80R7snRVublbS3Ph2Nzp+qIpi2WmdwoL8VBtvUW/ChA5
-         lDS5VV0j3BQokPNjlTiK7OVNWiyJd76WpYDycwclw2cMmkNtGUicNAJLAJaBx9hXYHvo
-         3kuKTpRwXzj2XOu7WQNTItJd9WYRyB0siQKDrGuSKHfSCKWkvOlkMUeaJAkUuvosQi4v
-         h7+NZ0IjOaZ04RDjQIvhj4rdYv5eGs5rJYrU0/yDsZPP3qdlYkSmCSV6KLZs5dGJO6IU
-         mYpw==
+        bh=jgnL0Q5rTfFWXEVUOgZf2CAS8hpKNN7Sgg+AvUluPpQ=;
+        b=ptsah1CvrUng+wtUau/vwqn94IsZZM105D5odxW3N5hAU/MlhjXUvviAriFSXjg/6r
+         8+VeutkvE0KEninyKCWA6b13hT0jBGniBnCsjJ/c3PoFgxrRZUYaYEpXZhKdE6mUXTFL
+         4GM6fZAt/kkPV+m4yCFPgsoZwEeeRP91b++6o3Pb79h8uhR5Lzsdj5V0Ns38SSTSlOUI
+         PR5yshL6MAU+Pq3cX6055zw9i5zdq6WaSY8o/T0/LEPLCrHpnwn/zlneTRlNKGpIdwsr
+         HiiFRaoXCX3fc4m7sMthtziraezMXzCBITjAOxXXIFkP9Ax9QtUJRHYXQphzYANYvAXG
+         c9+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707253128; x=1707857928;
+        d=1e100.net; s=20230601; t=1707253727; x=1707858527;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0enT21I+2oflGQFv4IttPgAIR7OGwbDWfwrCGcb3/A4=;
-        b=sE1md2Ua4JXuRtbeytU0m/VMeJhgeTdGeK2oh7tRU2egF2ya4oOk7DwXfzF55PYFcO
-         9L1utXzOtWyVzkoWG0ZSgOk/tgHjAibT2zzWyqvuJ6ZkwZ5JjtdtCZGBmezAJN5jkR+o
-         N9qHTgUvnu5J5XPZVJq8Ja5h8+sZrYuY7BjW1TrCoW5w/IMMRds/bDAi7aUXQN8WaKJN
-         yshhyJqYCowzIZHQWRB4piXJ/0L3PJ09thCJarBhPiNihcxHcVKmLiYCzgPlF5yD7Ca1
-         yRxSCFMfBSDHIHdzCPIjXEKqPYkRTR+Mw+qWmncdwSgBDvyZhjzIsVblHWd87/4469oU
-         x5mw==
-X-Gm-Message-State: AOJu0YxtCbpOH+ET6zZVbF3saW2xySNTnBLnZinrFpU2itu+uuGKxmpB
-	1ZPAtZ6dxOwe0RrXqkrHibu/h0e75zvZvcD6GdAPM4YEDy1qGREuXzmxKXznnqrAuEg1WqWWNSY
-	ypg==
-X-Google-Smtp-Source: AGHT+IFdIYHeFglOTEuwumdKlrr344iGbjKbzt7UsjDz5eT8lpnwnpjJUNFGytH7ONmGxE8/aWnk64dMfhI=
+        bh=jgnL0Q5rTfFWXEVUOgZf2CAS8hpKNN7Sgg+AvUluPpQ=;
+        b=gw/fhDeZE39/HBs/hLoWAH5dcuEvTQ2rJ0TEmEF7+Sf5ECmjhPALYE+CC7yXlr+RC+
+         VA50JAPGEUs5ZwuPolL0tTwRIZdHKF4L48d6XX8wZWr1LkaZkrV0kSZahdAcvSpTEMqq
+         wqh6o9axuEG+V3v3NlLQWJbttcAepnQDXKrflv5RXHjiPMxRKkyasAp8nW7OGymsvX15
+         o+YXgzQdec7pUH3B8J/Fo/JXRSCxppPvSr/IkjPdkomkbNqWtmK31AXx79+8WKdnyaED
+         5joGMhkKEfP5vMP0YvAPFdVphI3ZKqGc8nZoAYxcmYdOZI6xcm4XB8zTNI9elYy33AYe
+         ZfJg==
+X-Gm-Message-State: AOJu0YyFaYYuLhjP519k9FHTOi7ATvmckMybKd13s3oKw0ZfrkXfT3yj
+	kprGKa8i/T+rDde0yHsmL6TKMliFus/O1D1dldQNFKzFHECWvJ3BSYcz26a7tJi2EGnNQ3JOqGM
+	mHA==
+X-Google-Smtp-Source: AGHT+IHsQBjp6ilaiBbfbQpKFm/RSNkoDuvhzxvLO3wHQwgXXBD5flGG40KhtkrgYZsgXjL9FlPKO9Xe/78=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:2604:b0:dc2:57c9:b44d with SMTP id
- dw4-20020a056902260400b00dc257c9b44dmr127604ybb.8.1707253127933; Tue, 06 Feb
- 2024 12:58:47 -0800 (PST)
-Date: Tue, 6 Feb 2024 12:58:46 -0800
-In-Reply-To: <8fe554e5-e76e-9a0a-548d-bdac3b6b2b60@oracle.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:98f:b0:dc2:4d91:fb4b with SMTP id
+ bv15-20020a056902098f00b00dc24d91fb4bmr725206ybb.9.1707253727335; Tue, 06 Feb
+ 2024 13:08:47 -0800 (PST)
+Date: Tue, 6 Feb 2024 13:08:45 -0800
+In-Reply-To: <ZcKKwSi7FdbSnexE@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240103075343.549293-1-ppandit@redhat.com> <8fe554e5-e76e-9a0a-548d-bdac3b6b2b60@oracle.com>
-Message-ID: <ZcKdhuE2yNednYPD@google.com>
-Subject: Re: [PATCH] KVM: x86: make KVM_REQ_NMI request iff NMI pending for vcpu
+References: <20231206032054.55070-1-likexu@tencent.com> <ZcKKwSi7FdbSnexE@google.com>
+Message-ID: <ZcKf3RvyoVJ77sUQ@google.com>
+Subject: Re: [PATCH v2] KVM: x86/intr: Explicitly check NMI from guest to
+ eliminate false positives
 From: Sean Christopherson <seanjc@google.com>
-To: Dongli Zhang <dongli.zhang@oracle.com>
-Cc: Prasad Pandit <ppandit@redhat.com>, Prasad Pandit <pjp@fedoraproject.org>, kvm@vger.kernel.org, 
+To: Like Xu <like.xu.linux@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Andi Kleen <ak@linux.intel.com>, kvm@vger.kernel.org, 
 	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Feb 06, 2024, Dongli Zhang wrote:
-> Hi Prasad,
+On Tue, Feb 06, 2024, Sean Christopherson wrote:
+> +Oliver
 > 
-> On 1/2/24 23:53, Prasad Pandit wrote:
-> > From: Prasad Pandit <pjp@fedoraproject.org>
-> > 
-> > kvm_vcpu_ioctl_x86_set_vcpu_events() routine makes 'KVM_REQ_NMI'
-> > request for a vcpu even when its 'events->nmi.pending' is zero.
-> > Ex:
-> >     qemu_thread_start
-> >      kvm_vcpu_thread_fn
-> >       qemu_wait_io_event
-> >        qemu_wait_io_event_common
-> >         process_queued_cpu_work
-> >          do_kvm_cpu_synchronize_post_init/_reset
-> >           kvm_arch_put_registers
-> >            kvm_put_vcpu_events (cpu, level=[2|3])
-> > 
-> > This leads vCPU threads in QEMU to constantly acquire & release the
-> > global mutex lock, delaying the guest boot due to lock contention.
+> On Wed, Dec 06, 2023, Like Xu wrote:
+> > Note that when vm-exit is indeed triggered by PMI and before HANDLING_NMI
+> > is cleared, it's also still possible that another PMI is generated on host.
+> > Also for perf/core timer mode, the false positives are still possible since
+> > that non-NMI sources of interrupts are not always being used by perf/core.
+> > In both cases above, perf/core should correctly distinguish between real
+> > RIP sources or even need to generate two samples, belonging to host and
+> > guest separately, but that's perf/core's story for interested warriors.
 > 
-> Would you mind sharing where and how the lock contention is at QEMU space? That
-> is, how the QEMU mutex lock is impacted by KVM KVM_REQ_NMI?
+> Oliver has a patch[*] that he promised he would send "soon" (wink wink) to
+> properly fix events that are configured to exclude the guest.  Unless someone
+> objects, I'm going to tweak the last part of the changelog to be:
 > 
-> Or you meant line 3031 at QEMU side?
+>     Note that when VM-exit is indeed triggered by PMI and before HANDLING_NMI
+>     is cleared, it's also still possible that another PMI is generated on host.
+>     Also for perf/core timer mode, the false positives are still possible since
+>     that non-NMI sources of interrupts are not always being used by perf/core.
+>     
+>     For events that are host-only, perf/core can and should eliminate false
+>     positives by checking event->attr.exclude_guest, i.e. events that are
+>     configured to exclude KVM guests should never fire in the guest.
+>     
+>     Events that are configured to count host and guest are trickier, perhaps
+>     impossible to handle with 100% accuracy?  And regardless of what accuracy
+>     is provided by perf/core, improving KVM's accuracy is cheap and easy, with
+>     no real downsides.
 
-Yeah, something like that.  Details in this thread.
+Never mind, this causes KUT's pmu_pebs test to fail:
 
-https://lore.kernel.org/all/CAE8KmOyffXD4k69vRAFwesaqrBGzFY3i+kefbkHcQf4=jNYzOA@mail.gmail.com
+  FAIL: Multiple (0x700000055): No OVF irq, none PEBS records.
+  FAIL: Adaptive (0x1): Multiple (0x700000055): No OVF irq, none PEBS records.
+  FAIL: Adaptive (0x2): Multiple (0x700000055): No OVF irq, none PEBS records.
+  FAIL: Adaptive (0x4): Multiple (0x700000055): No OVF irq, none PEBS records.
+  FAIL: Adaptive (0x1f000008): Multiple (0x700000055): No OVF irq, none PEBS records.
+  FAIL: GP counter 0 (0xfffffffffffe): No OVF irq, none PEBS records.
+  FAIL: Multiple (0x700000055): No OVF irq, none PEBS records.
+  FAIL: Adaptive (0x1): GP counter 0 (0xfffffffffffe): No OVF irq, none PEBS records.
+  FAIL: Adaptive (0x1): Multiple (0x700000055): No OVF irq, none PEBS records.
+  FAIL: Adaptive (0x2): GP counter 0 (0xfffffffffffe): No OVF irq, none PEBS records.
+  FAIL: Adaptive (0x2): Multiple (0x700000055): No OVF irq, none PEBS records.
+  FAIL: Adaptive (0x4): GP counter 0 (0xfffffffffffe): No OVF irq, none PEBS records.
+  FAIL: Adaptive (0x4): Multiple (0x700000055): No OVF irq, none PEBS records.
+  FAIL: Adaptive (0x1f000008): GP counter 0 (0xfffffffffffe): No OVF irq, none PEBS records.
+  FAIL: Adaptive (0x1f000008): Multiple (0x700000055): No OVF irq, none PEBS records.
+  FAIL: Multiple (0x700000055): No OVF irq, none PEBS records.
+  FAIL: Adaptive (0x1): Multiple (0x700000055): No OVF irq, none PEBS records.
+  FAIL: Adaptive (0x2): Multiple (0x700000055): No OVF irq, none PEBS records.
+  FAIL: Adaptive (0x4): Multiple (0x700000055): No OVF irq, none PEBS records.
+  FAIL: Adaptive (0x1f000008): Multiple (0x700000055): No OVF irq, none PEBS records.
 
-> 2858 int kvm_cpu_exec(CPUState *cpu)
-> 2859 {
-> 2860     struct kvm_run *run = cpu->kvm_run;
-> 2861     int ret, run_ret;
-> ... ...
-> 3023         default:
-> 3024             DPRINTF("kvm_arch_handle_exit\n");
-> 3025             ret = kvm_arch_handle_exit(cpu, run);
-> 3026             break;
-> 3027         }
-> 3028     } while (ret == 0);
-> 3029
-> 3030     cpu_exec_end(cpu);
-> 3031     qemu_mutex_lock_iothread();
-> 3032
-> 3033     if (ret < 0) {
-> 3034         cpu_dump_state(cpu, stderr, CPU_DUMP_CODE);
-> 3035         vm_stop(RUN_STATE_INTERNAL_ERROR);
-> 3036     }
-> 3037
-> 3038     qatomic_set(&cpu->exit_request, 0);
-> 3039     return ret;
-> 3040 }
+It might be a test bug, but I have neither the time nor the inclination to
+investigate.
+
+
+Like,
+
+If you want any chance of your patches going anywhere but my trash folder, you
+need to change your upstream workflow to actually run tests.  I would give most
+people the benefit of the doubt, e.g. assume they didn't have the requisite
+hardware, or didn't realize which tests would be relevant/important.  But this
+is a recurring problem, and you have been warned, multiple times.
 
