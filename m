@@ -1,453 +1,391 @@
-Return-Path: <kvm+bounces-8122-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8133-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BA9C84BCC4
-	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 19:15:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C9DDC84BD7A
+	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 19:53:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3782289536
-	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 18:15:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8150728FF60
+	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 18:53:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0EF61118A;
-	Tue,  6 Feb 2024 18:15:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0135814017;
+	Tue,  6 Feb 2024 18:52:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="on7mZFTL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GjzircxU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA151DF56
-	for <kvm@vger.kernel.org>; Tue,  6 Feb 2024 18:15:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1097913AC6;
+	Tue,  6 Feb 2024 18:52:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707243344; cv=none; b=C9oTuq0EBPJ09f2Y8GeZIHFoiVSZCNBi/6UNfhIL+RD6zG3hSemt9lYUYRd/Ddxy5A0USdCXGACPtysddj1FowyyM7tkekXit27hhQeiHYHE/4aXI/2iX0A8ZFmza2rtswZ954EowODDJeSyb8+Dr76HiH287hOeoa7jRdDSFHA=
+	t=1707245566; cv=none; b=BVOSN4Z4qDDEYGNXs/EtPapM+a+bZfyxVyyu/usDE5iFs5X8PEVEWBW8yTqulZfWhr52n7/r+R8b04beso965Bq6S6077CZkwpspm1GIXdWU5yJsJqcK9bR8lWaZauhKAfUfnZ5aqCT7R1KYWq2eXD5jvFyX5XrvOKb9DhiWNEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707243344; c=relaxed/simple;
-	bh=pg+A/X0gbzq+b1GNJy+AuaQVvIInNspwG8FTxmbwO9o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mId55aiwZrtbqLFqZt6RDaDNdwpubT2Ck/7MN4gErLALpRUeAikMC2ex/MCk1p++7RX6maakeuKXR4rsXjMR4wGJxIBk2c1RgjdGlJQxSIgstnE5BpKuTzt1/b2YQrXPN/K2Feet0M8LnGF+uI9KYHE55o9XwW8qnQTkT7sditU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=on7mZFTL; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a37721e42feso385234066b.2
-        for <kvm@vger.kernel.org>; Tue, 06 Feb 2024 10:15:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1707243340; x=1707848140; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=VUAEcL2vNvw2dV15h5Gci8Nd7MVi2WOPefcRANZoiaQ=;
-        b=on7mZFTLhJbpsHaakHy1/4tmnXKzc/8nznzmSR9NhqPmDIC2EfuLL9HCXUWN8dAdMK
-         /pPaqChrYviqYEEBPs69anHvXmCEGvYzkxmxtxrK1jnbpHbVa4oo6yyatRvn40RIS1hw
-         EpjKmiNJwssxuqekhrusTS0SOkydHKk5ZRHE6V30oNpbCpcqjlCOeqDH2dtHeMvmeZjJ
-         cNieZM96RM4hY/rldv70B9KU3fxMXSwK85QnAtkJpuFxKzro4d3qHjTF0C8LVJ5RTqSR
-         uHjzvCMqUIW0ep6Lk++nfuZ5PpJuEDVVFsrwI4JqxsW06RuyTyIP13+BnQ77u9y926ZC
-         SqRw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707243340; x=1707848140;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VUAEcL2vNvw2dV15h5Gci8Nd7MVi2WOPefcRANZoiaQ=;
-        b=Vew97ZIBvDu3Es+Ljr+JbNEVWwCNTDtX03vtXH6xY4oJ/Z+CdJ4xgKuGM5jt6wM/Kh
-         H5JCrys4YLVkuKwZiIMHTGXj01MV/4it/FsZe6rUssshkoHeqzlzN4VdvW0rMr4ampy7
-         bg+iPHHXvIQq4uN8V9JSeOFvmYQU5e3WSctvefQ5gDayoHO0OcGblUjGPPVj13bdstAL
-         gV8V4jDUZh4bm2Jthoyr33MTqzMU/ulYYn9EUxdSOFJMdxMrlqZmop25erU+QDl4YFHT
-         lIVki4844qGZlGjcDrwQZRZAtNbKQ2FCl/QfxlmtVKgNlLf/POHsj9SKCWhq96peGMY3
-         rJZA==
-X-Gm-Message-State: AOJu0Yx4GnefLIYoKIaqOvBJ2dZVKYBDYlqVclbzx7KPjZAQxAA+dDg9
-	jW1P8JQgWixZPhVsi7S2JbQcflJCMDuWV0t7TVfWeLHyg/E8wyu9p7eWJFC7gbU=
-X-Google-Smtp-Source: AGHT+IEX6QaUbGSEhCAibVbnYc5A2cH2iDsUX3c8wl5tc0BTXeAPiLYvlkYnfoDR90F+h/HX0ey+5Q==
-X-Received: by 2002:a17:906:5398:b0:a38:2664:b65 with SMTP id g24-20020a170906539800b00a3826640b65mr1437645ejo.34.1707243339948;
-        Tue, 06 Feb 2024 10:15:39 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCW9yPAU6wo9BbJABQn0bvKX8/Ky7QAE0GVqNhnhJes4qyS5ZMZKb1wWSyLl5IjpguMaf4rtFDVGIrWnfpP4S13VKsOo
-Received: from ?IPV6:2003:f6:af18:9900:571f:d8fb:277e:99a5? (p200300f6af189900571fd8fb277e99a5.dip0.t-ipconnect.de. [2003:f6:af18:9900:571f:d8fb:277e:99a5])
-        by smtp.gmail.com with ESMTPSA id a19-20020a17090640d300b00a379cc90bdesm1409814ejk.199.2024.02.06.10.15.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 Feb 2024 10:15:39 -0800 (PST)
-Message-ID: <86024ab8-0483-42a2-ab71-56c720b01b9e@grsecurity.net>
-Date: Tue, 6 Feb 2024 19:15:38 +0100
+	s=arc-20240116; t=1707245566; c=relaxed/simple;
+	bh=lX8vukkd7mSbUzxN/gqo4+3FjsPU+eVbn7wv/qzjuBA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CyF/YkOm4G6KqXuCpbfksc5JwzHfLJJocZsGflmhRGf/rn4uee7F0jCUimYzF/QbTuJnCYX3C/HY8ewOg1lJxPRjFWrbMCF0V6G42cUG6FhVOV4oso5q49BLmSGEySnExvVGTkRO2wOKOYjnnFmnog3x92fDMYtnautjd+PR1LM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GjzircxU; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707245564; x=1738781564;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=lX8vukkd7mSbUzxN/gqo4+3FjsPU+eVbn7wv/qzjuBA=;
+  b=GjzircxUkhU6aKweQqed/RFNjtWDimrx55IPpMTom/kzgLrzGHM6FvQs
+   ggTeII+UVabpBTChSTYq8vl2V9PXID8LYL5BrTh9Mmx4V1mPWIIoiU0m7
+   UxD5LmDvP2w83O+ygpAtRpVFmnSjEkVrCWyfqY4XDcTQ73liHI9X3dif1
+   B0E9B+ILa5c5UniVzdOthhLteVyDRdDgGZbqR04LL68AHHI16oOdFBnsv
+   jS9FWIpo3GFolQJM+VQVtJLUUd6tu0O5I4kk3sZbT7SoR9WnjXsk2WZAj
+   sX5njqIyrCTxT/S438Dbuv5xW4aehPZYM0y2mBWlNQiN1Wvr+dVu+/Zej
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10976"; a="26265529"
+X-IronPort-AV: E=Sophos;i="6.05,248,1701158400"; 
+   d="scan'208";a="26265529"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2024 10:52:42 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,248,1701158400"; 
+   d="scan'208";a="1448003"
+Received: from unknown (HELO fred..) ([172.25.112.68])
+  by orviesa008.jf.intel.com with ESMTP; 06 Feb 2024 10:52:41 -0800
+From: Xin Li <xin3.li@intel.com>
+To: linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Cc: seanjc@google.com,
+	pbonzini@redhat.com,
+	tglx@linutronix.de,
+	mingo@redhat.com,
+	bp@alien8.de,
+	dave.hansen@linux.intel.com,
+	x86@kernel.org,
+	hpa@zytor.com,
+	weijiang.yang@intel.com,
+	kai.huang@intel.com
+Subject: [PATCH v5 1/2] KVM: VMX: Cleanup VMX basic information defines and usages
+Date: Tue,  6 Feb 2024 10:20:31 -0800
+Message-ID: <20240206182032.1596-1-xin3.li@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/3] KVM: x86: Simplify kvm_vcpu_ioctl_x86_get_debugregs()
-Content-Language: en-US, de-DE
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-References: <20240203124522.592778-1-minipli@grsecurity.net>
- <20240203124522.592778-3-minipli@grsecurity.net>
- <ZcE8rXJiXFS6OFRR@google.com>
-From: Mathias Krause <minipli@grsecurity.net>
-Autocrypt: addr=minipli@grsecurity.net; keydata=
- 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
- RzDVkdgPJkL/NFTKZHo5foFXNi89kA==
-In-Reply-To: <ZcE8rXJiXFS6OFRR@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 05.02.24 20:53, Sean Christopherson wrote:
-> On Sat, Feb 03, 2024, Mathias Krause wrote:
->> Take 'dr6' from the arch part directly as already done for 'dr7'.
->> There's no need to take the clunky route via kvm_get_dr().
->>
->> Signed-off-by: Mathias Krause <minipli@grsecurity.net>
->> ---
->>  arch/x86/kvm/x86.c | 5 +----
->>  1 file changed, 1 insertion(+), 4 deletions(-)
->>
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index 13ec948f3241..0f958dcf8458 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -5504,12 +5504,9 @@ static int kvm_vcpu_ioctl_x86_set_vcpu_events(struct kvm_vcpu *vcpu,
->>  static void kvm_vcpu_ioctl_x86_get_debugregs(struct kvm_vcpu *vcpu,
->>  					     struct kvm_debugregs *dbgregs)
->>  {
->> -	unsigned long val;
->> -
->>  	memset(dbgregs, 0, sizeof(*dbgregs));
->>  	memcpy(dbgregs->db, vcpu->arch.db, sizeof(vcpu->arch.db));
->> -	kvm_get_dr(vcpu, 6, &val);
->> -	dbgregs->dr6 = val;
->> +	dbgregs->dr6 = vcpu->arch.dr6;
-> 
-> Blech, kvm_get_dr() is so dumb, it takes an out parameter despite have a void
-> return.
+Define VMX basic information fields with BIT_ULL()/GENMASK_ULL(), and
+replace hardcoded VMX basic numbers with these field macros.
 
-Jepp, that's why I tried to get rid of it.
+Save the full/raw value of MSR_IA32_VMX_BASIC in the global vmcs_config
+as type u64 to get rid of the hi/lo crud, and then use VMX_BASIC helpers
+to extract info as needed.
 
->          I would rather fix that wart and go the other direction, i.e. make dr7
-> go through kvm_get_dr().  This obviously isn't a fast path, so the extra CALL+RET
-> is a non-issue.
+VMX_EPTP_MT_{WB,UC} values 0x6 and 0x0 are generic x86 memory type
+values, no need to prefix them with VMX_EPTP_.
 
-Okay. I thought, as this is an indirect call which is slightly more
-expensive under RETPOLINE, I'd go the other way and simply open-code the
-access, as done a few lines below in kvm_vcpu_ioctl_x86_set_debugregs().
+Signed-off-by: Xin Li <xin3.li@intel.com>
+Tested-by: Shan Kang <shan.kang@intel.com>
+Acked-by: Kai Huang <kai.huang@intel.com>
+---
 
-But I don't mind that hard. You just mentioned last year[1], this part
-shouldn't be squashed into what became patch 3 in this series.
+Changes since v4:
+* Do not split VMX_BASIC bit definitions across multiple files (Kai
+  Huang).
+* Put some words to the changelog to justify changes around memory
+  type macros (Kai Huang).
+* Remove a leftover ';' (Kai Huang).
 
-[1] https://lore.kernel.org/kvm/ZCxarzBknX6o7dcb@google.com/
+Changes since v3:
+* Remove vmx_basic_vmcs_basic_cap() (Kai Huang).
+* Add 2 macros VMX_BASIC_VMCS12_SIZE and VMX_BASIC_MEM_TYPE_WB to
+  avoid keeping 2 their bit shift macros (Kai Huang).
 
->                  And if we wanted to fix that, e.g. for other paths that are
-> slightly less slow, we should do so for all reads (and writes) to dr6 and dr7,
-> e.g. provide dedicated APIs like we do for GPRs.
-> 
-> Alternatively, I would probably be ok just open coding all direct reads and writes
-> to dr6 and dr7.  IIRC, at one point KVM was doing something meaningful in kvm_get_dr()
-> for DR7 (which probably contributed to the weird API), but that's no longer the
-> case.
+Changes since v2:
+* Simply save the full/raw value of MSR_IA32_VMX_BASIC in the global
+  vmcs_config, and then use the helpers to extract info from it as
+  needed (Sean Christopherson).
+* Move all VMX_MISC related changes to the second patch (Kai Huang).
+* Commonize memory type definitions used in the VMX files, as memory
+  types are architectural.
 
-Yeah, that special handling got simplified in commit 5679b803e44e ("KVM:
-SVM: keep DR6 synchronized with vcpu->arch.dr6"). And yes, open-coding
-the accesses would be my preferred option, as it's easier to read and
-generates even less code. No need to have this indirection for a simple
-member access.
+Changes since v1:
+* Don't add field shift macros unless it's really needed, extra layer
+  of indirect makes it harder to read (Sean Christopherson).
+* Add a static_assert() to ensure that VMX_BASIC_FEATURES_MASK doesn't
+  overlap with VMX_BASIC_RESERVED_BITS (Sean Christopherson).
+* read MSR_IA32_VMX_BASIC into an u64 rather than 2 u32 (Sean
+  Christopherson).
+* Add 2 new functions for extracting fields from VMX basic (Sean
+  Christopherson).
+* Drop the tools header update (Sean Christopherson).
+* Move VMX basic field macros to arch/x86/include/asm/vmx.h.
+---
+ arch/x86/include/asm/msr-index.h |  9 ---------
+ arch/x86/include/asm/vmx.h       | 18 ++++++++++++++++--
+ arch/x86/kvm/vmx/capabilities.h  |  6 ++----
+ arch/x86/kvm/vmx/nested.c        | 31 ++++++++++++++++++++-----------
+ arch/x86/kvm/vmx/vmx.c           | 24 ++++++++++--------------
+ 5 files changed, 48 insertions(+), 40 deletions(-)
 
-> 
-> Actually, it probably makes sense to do both, i.e. do the below, and then open
-> code all direct accesses.  I think the odds of us needing wrappers around reading
-> and writing guest DR6 and DR7 are quite low and there are enough existing open coded
-> accesses that forcing them to convert would be awkward.
-> 
-> I'll send a small two patch series.
-> 
-> ---
-> Subject: [PATCH] KVM: x86: Make kvm_get_dr() return a value, not use an out
->  parameter
-> 
-> TODO: writeme
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/include/asm/kvm_host.h |  2 +-
->  arch/x86/kvm/emulate.c          | 17 ++++-------------
->  arch/x86/kvm/kvm_emulate.h      |  2 +-
->  arch/x86/kvm/smm.c              | 15 ++++-----------
->  arch/x86/kvm/svm/svm.c          |  7 ++-----
->  arch/x86/kvm/vmx/nested.c       |  2 +-
->  arch/x86/kvm/vmx/vmx.c          |  5 +----
->  arch/x86/kvm/x86.c              | 20 ++++++++------------
->  8 files changed, 22 insertions(+), 48 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index ad5319a503f0..464fa2197748 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -2046,7 +2046,7 @@ int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3);
->  int kvm_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4);
->  int kvm_set_cr8(struct kvm_vcpu *vcpu, unsigned long cr8);
->  int kvm_set_dr(struct kvm_vcpu *vcpu, int dr, unsigned long val);
-> -void kvm_get_dr(struct kvm_vcpu *vcpu, int dr, unsigned long *val);
-> +unsigned long kvm_get_dr(struct kvm_vcpu *vcpu, int dr);
->  unsigned long kvm_get_cr8(struct kvm_vcpu *vcpu);
->  void kvm_lmsw(struct kvm_vcpu *vcpu, unsigned long msw);
->  int kvm_emulate_xsetbv(struct kvm_vcpu *vcpu);
-> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-> index 695ab5b6055c..33444627fcf4 100644
-> --- a/arch/x86/kvm/emulate.c
-> +++ b/arch/x86/kvm/emulate.c
-> @@ -3011,7 +3011,7 @@ static int emulator_do_task_switch(struct x86_emulate_ctxt *ctxt,
->  		ret = em_push(ctxt);
->  	}
->  
-> -	ops->get_dr(ctxt, 7, &dr7);
-> +	dr7 = ops->get_dr(ctxt, 7);
->  	ops->set_dr(ctxt, 7, dr7 & ~(DR_LOCAL_ENABLE_MASK | DR_LOCAL_SLOWDOWN));
->  
->  	return ret;
-> @@ -3866,15 +3866,6 @@ static int check_cr_access(struct x86_emulate_ctxt *ctxt)
->  	return X86EMUL_CONTINUE;
->  }
->  
-> -static int check_dr7_gd(struct x86_emulate_ctxt *ctxt)
-> -{
-> -	unsigned long dr7;
-> -
-> -	ctxt->ops->get_dr(ctxt, 7, &dr7);
-> -
-> -	return dr7 & DR7_GD;
-> -}
-> -
->  static int check_dr_read(struct x86_emulate_ctxt *ctxt)
->  {
->  	int dr = ctxt->modrm_reg;
-> @@ -3887,10 +3878,10 @@ static int check_dr_read(struct x86_emulate_ctxt *ctxt)
->  	if ((cr4 & X86_CR4_DE) && (dr == 4 || dr == 5))
->  		return emulate_ud(ctxt);
->  
-> -	if (check_dr7_gd(ctxt)) {
-> +	if (ctxt->ops->get_dr(ctxt, 7) & DR7_GD) {
->  		ulong dr6;
->  
-> -		ctxt->ops->get_dr(ctxt, 6, &dr6);
-> +		dr6 = ctxt->ops->get_dr(ctxt, 6);
->  		dr6 &= ~DR_TRAP_BITS;
->  		dr6 |= DR6_BD | DR6_ACTIVE_LOW;
->  		ctxt->ops->set_dr(ctxt, 6, dr6);
-> @@ -5449,7 +5440,7 @@ int x86_emulate_insn(struct x86_emulate_ctxt *ctxt)
->  		ctxt->dst.val = ops->get_cr(ctxt, ctxt->modrm_reg);
->  		break;
->  	case 0x21: /* mov from dr to reg */
-> -		ops->get_dr(ctxt, ctxt->modrm_reg, &ctxt->dst.val);
-> +		ctxt->dst.val = ops->get_dr(ctxt, ctxt->modrm_reg);
->  		break;
->  	case 0x40 ... 0x4f:	/* cmov */
->  		if (test_cc(ctxt->b, ctxt->eflags))
-> diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
-> index 4351149484fb..5382646162a3 100644
-> --- a/arch/x86/kvm/kvm_emulate.h
-> +++ b/arch/x86/kvm/kvm_emulate.h
-> @@ -203,7 +203,7 @@ struct x86_emulate_ops {
->  	ulong (*get_cr)(struct x86_emulate_ctxt *ctxt, int cr);
->  	int (*set_cr)(struct x86_emulate_ctxt *ctxt, int cr, ulong val);
->  	int (*cpl)(struct x86_emulate_ctxt *ctxt);
-> -	void (*get_dr)(struct x86_emulate_ctxt *ctxt, int dr, ulong *dest);
-> +	ulong (*get_dr)(struct x86_emulate_ctxt *ctxt, int dr);
->  	int (*set_dr)(struct x86_emulate_ctxt *ctxt, int dr, ulong value);
->  	int (*set_msr_with_filter)(struct x86_emulate_ctxt *ctxt, u32 msr_index, u64 data);
->  	int (*get_msr_with_filter)(struct x86_emulate_ctxt *ctxt, u32 msr_index, u64 *pdata);
-> diff --git a/arch/x86/kvm/smm.c b/arch/x86/kvm/smm.c
-> index dc3d95fdca7d..f5a30d3a44a1 100644
-> --- a/arch/x86/kvm/smm.c
-> +++ b/arch/x86/kvm/smm.c
-> @@ -184,7 +184,6 @@ static void enter_smm_save_state_32(struct kvm_vcpu *vcpu,
->  				    struct kvm_smram_state_32 *smram)
->  {
->  	struct desc_ptr dt;
-> -	unsigned long val;
->  	int i;
->  
->  	smram->cr0     = kvm_read_cr0(vcpu);
-> @@ -195,10 +194,8 @@ static void enter_smm_save_state_32(struct kvm_vcpu *vcpu,
->  	for (i = 0; i < 8; i++)
->  		smram->gprs[i] = kvm_register_read_raw(vcpu, i);
->  
-> -	kvm_get_dr(vcpu, 6, &val);
-> -	smram->dr6     = (u32)val;
-> -	kvm_get_dr(vcpu, 7, &val);
-> -	smram->dr7     = (u32)val;
-> +	smram->dr6     = (u32)kvm_get_dr(vcpu, 6);
-> +	smram->dr7     = (u32)kvm_get_dr(vcpu, 7);
->  
->  	enter_smm_save_seg_32(vcpu, &smram->tr, &smram->tr_sel, VCPU_SREG_TR);
->  	enter_smm_save_seg_32(vcpu, &smram->ldtr, &smram->ldtr_sel, VCPU_SREG_LDTR);
-> @@ -231,7 +228,6 @@ static void enter_smm_save_state_64(struct kvm_vcpu *vcpu,
->  				    struct kvm_smram_state_64 *smram)
->  {
->  	struct desc_ptr dt;
-> -	unsigned long val;
->  	int i;
->  
->  	for (i = 0; i < 16; i++)
-> @@ -240,11 +236,8 @@ static void enter_smm_save_state_64(struct kvm_vcpu *vcpu,
->  	smram->rip    = kvm_rip_read(vcpu);
->  	smram->rflags = kvm_get_rflags(vcpu);
->  
-> -
-> -	kvm_get_dr(vcpu, 6, &val);
-> -	smram->dr6 = val;
-> -	kvm_get_dr(vcpu, 7, &val);
-> -	smram->dr7 = val;
-> +	smram->dr6 = kvm_get_dr(vcpu, 6);
-> +	smram->dr7 = kvm_get_dr(vcpu, 7);;
->  
->  	smram->cr0 = kvm_read_cr0(vcpu);
->  	smram->cr3 = kvm_read_cr3(vcpu);
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index e90b429c84f1..dda91f7cd71b 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -2735,7 +2735,6 @@ static int dr_interception(struct kvm_vcpu *vcpu)
->  {
->  	struct vcpu_svm *svm = to_svm(vcpu);
->  	int reg, dr;
-> -	unsigned long val;
->  	int err = 0;
->  
->  	/*
-> @@ -2763,11 +2762,9 @@ static int dr_interception(struct kvm_vcpu *vcpu)
->  	dr = svm->vmcb->control.exit_code - SVM_EXIT_READ_DR0;
->  	if (dr >= 16) { /* mov to DRn  */
->  		dr -= 16;
-> -		val = kvm_register_read(vcpu, reg);
-> -		err = kvm_set_dr(vcpu, dr, val);
-> +		err = kvm_set_dr(vcpu, dr, kvm_register_read(vcpu, reg));
->  	} else {
-> -		kvm_get_dr(vcpu, dr, &val);
-> -		kvm_register_write(vcpu, reg, val);
-> +		kvm_register_write(vcpu, reg, kvm_get_dr(vcpu, dr));
->  	}
->  
->  	return kvm_complete_insn_gp(vcpu, err);
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 994e014f8a50..28d1088a1770 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -4433,7 +4433,7 @@ static void sync_vmcs02_to_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
->  		(vm_entry_controls_get(to_vmx(vcpu)) & VM_ENTRY_IA32E_MODE);
->  
->  	if (vmcs12->vm_exit_controls & VM_EXIT_SAVE_DEBUG_CONTROLS)
-> -		kvm_get_dr(vcpu, 7, (unsigned long *)&vmcs12->guest_dr7);
-> +		vmcs12->guest_dr7 = kvm_get_dr(vcpu, 7);
->  
->  	if (vmcs12->vm_exit_controls & VM_EXIT_SAVE_IA32_EFER)
->  		vmcs12->guest_ia32_efer = vcpu->arch.efer;
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index e262bc2ba4e5..aa47433d0c9b 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -5566,10 +5566,7 @@ static int handle_dr(struct kvm_vcpu *vcpu)
->  
->  	reg = DEBUG_REG_ACCESS_REG(exit_qualification);
->  	if (exit_qualification & TYPE_MOV_FROM_DR) {
-> -		unsigned long val;
-> -
-> -		kvm_get_dr(vcpu, dr, &val);
-> -		kvm_register_write(vcpu, reg, val);
-> +		kvm_register_write(vcpu, reg, kvm_get_dr(vcpu, dr));
->  		err = 0;
->  	} else {
->  		err = kvm_set_dr(vcpu, dr, kvm_register_read(vcpu, reg));
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index c339d9f95b4b..b2357009bbbe 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -1399,21 +1399,21 @@ int kvm_set_dr(struct kvm_vcpu *vcpu, int dr, unsigned long val)
->  }
->  EXPORT_SYMBOL_GPL(kvm_set_dr);
->  
-> -void kvm_get_dr(struct kvm_vcpu *vcpu, int dr, unsigned long *val)
-> +unsigned long kvm_get_dr(struct kvm_vcpu *vcpu, int dr)
->  {
->  	size_t size = ARRAY_SIZE(vcpu->arch.db);
->  
->  	switch (dr) {
->  	case 0 ... 3:
-> -		*val = vcpu->arch.db[array_index_nospec(dr, size)];
-> +		return vcpu->arch.db[array_index_nospec(dr, size)];
->  		break;
->  	case 4:
->  	case 6:
-> -		*val = vcpu->arch.dr6;
-> +		return vcpu->arch.dr6;
->  		break;
->  	case 5:
->  	default: /* 7 */
-> -		*val = vcpu->arch.dr7;
-> +		return vcpu->arch.dr7;
->  		break;
->  	}
->  }
-> @@ -5510,13 +5510,10 @@ static int kvm_vcpu_ioctl_x86_set_vcpu_events(struct kvm_vcpu *vcpu,
->  static void kvm_vcpu_ioctl_x86_get_debugregs(struct kvm_vcpu *vcpu,
->  					     struct kvm_debugregs *dbgregs)
->  {
-> -	unsigned long val;
-> -
->  	memset(dbgregs, 0, sizeof(*dbgregs));
->  	memcpy(dbgregs->db, vcpu->arch.db, sizeof(vcpu->arch.db));
-> -	kvm_get_dr(vcpu, 6, &val);
-> -	dbgregs->dr6 = val;
-> -	dbgregs->dr7 = vcpu->arch.dr7;
-> +	dbgregs->dr6 = kvm_get_dr(vcpu, 6);
-> +	dbgregs->dr7 = kvm_get_dr(vcpu, 7);
->  }
->  
->  static int kvm_vcpu_ioctl_x86_set_debugregs(struct kvm_vcpu *vcpu,
-> @@ -8165,10 +8162,9 @@ static void emulator_wbinvd(struct x86_emulate_ctxt *ctxt)
->  	kvm_emulate_wbinvd_noskip(emul_to_vcpu(ctxt));
->  }
->  
-> -static void emulator_get_dr(struct x86_emulate_ctxt *ctxt, int dr,
-> -			    unsigned long *dest)
-> +static unsigned long emulator_get_dr(struct x86_emulate_ctxt *ctxt, int dr)
->  {
-> -	kvm_get_dr(emul_to_vcpu(ctxt), dr, dest);
-> +	return kvm_get_dr(emul_to_vcpu(ctxt), dr);
->  }
->  
->  static int emulator_set_dr(struct x86_emulate_ctxt *ctxt, int dr,
-> 
-> base-commit: 60eedcfceda9db46f1b333e5e1aa9359793f04fb
+diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
+index f1bd7b91b3c6..63cd50bfdc6d 100644
+--- a/arch/x86/include/asm/msr-index.h
++++ b/arch/x86/include/asm/msr-index.h
+@@ -1102,15 +1102,6 @@
+ #define MSR_IA32_VMX_VMFUNC             0x00000491
+ #define MSR_IA32_VMX_PROCBASED_CTLS3	0x00000492
+ 
+-/* VMX_BASIC bits and bitmasks */
+-#define VMX_BASIC_VMCS_SIZE_SHIFT	32
+-#define VMX_BASIC_TRUE_CTLS		(1ULL << 55)
+-#define VMX_BASIC_64		0x0001000000000000LLU
+-#define VMX_BASIC_MEM_TYPE_SHIFT	50
+-#define VMX_BASIC_MEM_TYPE_MASK	0x003c000000000000LLU
+-#define VMX_BASIC_MEM_TYPE_WB	6LLU
+-#define VMX_BASIC_INOUT		0x0040000000000000LLU
+-
+ /* Resctrl MSRs: */
+ /* - Intel: */
+ #define MSR_IA32_L3_QOS_CFG		0xc81
+diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
+index 0e73616b82f3..4fa8012980f6 100644
+--- a/arch/x86/include/asm/vmx.h
++++ b/arch/x86/include/asm/vmx.h
+@@ -120,6 +120,17 @@
+ 
+ #define VM_ENTRY_ALWAYSON_WITHOUT_TRUE_MSR	0x000011ff
+ 
++/* x86 memory types, explicitly used in VMX only */
++#define MEM_TYPE_WB				0x6ULL
++#define MEM_TYPE_UC				0x0ULL
++
++/* VMX_BASIC bits */
++#define VMX_BASIC_32BIT_PHYS_ADDR_ONLY		BIT_ULL(48)
++#define VMX_BASIC_DUAL_MONITOR_TREATMENT	BIT_ULL(49)
++#define VMX_BASIC_INOUT				BIT_ULL(54)
++#define VMX_BASIC_TRUE_CTLS			BIT_ULL(55)
++
++
+ #define VMX_MISC_PREEMPTION_TIMER_RATE_MASK	0x0000001f
+ #define VMX_MISC_SAVE_EFER_LMA			0x00000020
+ #define VMX_MISC_ACTIVITY_HLT			0x00000040
+@@ -143,6 +154,11 @@ static inline u32 vmx_basic_vmcs_size(u64 vmx_basic)
+ 	return (vmx_basic & GENMASK_ULL(44, 32)) >> 32;
+ }
+ 
++static inline u32 vmx_basic_vmcs_mem_type(u64 vmx_basic)
++{
++	return (vmx_basic & GENMASK_ULL(53, 50)) >> 50;
++}
++
+ static inline int vmx_misc_preemption_timer_rate(u64 vmx_misc)
+ {
+ 	return vmx_misc & VMX_MISC_PREEMPTION_TIMER_RATE_MASK;
+@@ -505,8 +521,6 @@ enum vmcs_field {
+ #define VMX_EPTP_PWL_5				0x20ull
+ #define VMX_EPTP_AD_ENABLE_BIT			(1ull << 6)
+ #define VMX_EPTP_MT_MASK			0x7ull
+-#define VMX_EPTP_MT_WB				0x6ull
+-#define VMX_EPTP_MT_UC				0x0ull
+ #define VMX_EPT_READABLE_MASK			0x1ull
+ #define VMX_EPT_WRITABLE_MASK			0x2ull
+ #define VMX_EPT_EXECUTABLE_MASK			0x4ull
+diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
+index 41a4533f9989..86ce8bb96bed 100644
+--- a/arch/x86/kvm/vmx/capabilities.h
++++ b/arch/x86/kvm/vmx/capabilities.h
+@@ -54,9 +54,7 @@ struct nested_vmx_msrs {
+ };
+ 
+ struct vmcs_config {
+-	int size;
+-	u32 basic_cap;
+-	u32 revision_id;
++	u64 basic;
+ 	u32 pin_based_exec_ctrl;
+ 	u32 cpu_based_exec_ctrl;
+ 	u32 cpu_based_2nd_exec_ctrl;
+@@ -76,7 +74,7 @@ extern struct vmx_capability vmx_capability __ro_after_init;
+ 
+ static inline bool cpu_has_vmx_basic_inout(void)
+ {
+-	return	(((u64)vmcs_config.basic_cap << 32) & VMX_BASIC_INOUT);
++	return	vmcs_config.basic & VMX_BASIC_INOUT;
+ }
+ 
+ static inline bool cpu_has_virtual_nmis(void)
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 994e014f8a50..80fea1875948 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -1226,23 +1226,29 @@ static bool is_bitwise_subset(u64 superset, u64 subset, u64 mask)
+ 	return (superset | subset) == superset;
+ }
+ 
++#define VMX_BASIC_FEATURES_MASK			\
++	(VMX_BASIC_DUAL_MONITOR_TREATMENT |	\
++	 VMX_BASIC_INOUT |			\
++	 VMX_BASIC_TRUE_CTLS)
++
++#define VMX_BASIC_RESERVED_BITS			\
++	(GENMASK_ULL(63, 56) | GENMASK_ULL(47, 45) | BIT_ULL(31))
++
+ static int vmx_restore_vmx_basic(struct vcpu_vmx *vmx, u64 data)
+ {
+-	const u64 feature_and_reserved =
+-		/* feature (except bit 48; see below) */
+-		BIT_ULL(49) | BIT_ULL(54) | BIT_ULL(55) |
+-		/* reserved */
+-		BIT_ULL(31) | GENMASK_ULL(47, 45) | GENMASK_ULL(63, 56);
+ 	u64 vmx_basic = vmcs_config.nested.basic;
+ 
+-	if (!is_bitwise_subset(vmx_basic, data, feature_and_reserved))
++	static_assert(!(VMX_BASIC_FEATURES_MASK & VMX_BASIC_RESERVED_BITS));
++
++	if (!is_bitwise_subset(vmx_basic, data,
++			       VMX_BASIC_FEATURES_MASK | VMX_BASIC_RESERVED_BITS))
+ 		return -EINVAL;
+ 
+ 	/*
+ 	 * KVM does not emulate a version of VMX that constrains physical
+ 	 * addresses of VMX structures (e.g. VMCS) to 32-bits.
+ 	 */
+-	if (data & BIT_ULL(48))
++	if (data & VMX_BASIC_32BIT_PHYS_ADDR_ONLY)
+ 		return -EINVAL;
+ 
+ 	if (vmx_basic_vmcs_revision_id(vmx_basic) !=
+@@ -2726,11 +2732,11 @@ static bool nested_vmx_check_eptp(struct kvm_vcpu *vcpu, u64 new_eptp)
+ 
+ 	/* Check for memory type validity */
+ 	switch (new_eptp & VMX_EPTP_MT_MASK) {
+-	case VMX_EPTP_MT_UC:
++	case MEM_TYPE_UC:
+ 		if (CC(!(vmx->nested.msrs.ept_caps & VMX_EPTP_UC_BIT)))
+ 			return false;
+ 		break;
+-	case VMX_EPTP_MT_WB:
++	case MEM_TYPE_WB:
+ 		if (CC(!(vmx->nested.msrs.ept_caps & VMX_EPTP_WB_BIT)))
+ 			return false;
+ 		break;
+@@ -6994,6 +7000,9 @@ static void nested_vmx_setup_misc_data(struct vmcs_config *vmcs_conf,
+ 	msrs->misc_high = 0;
+ }
+ 
++#define VMX_BSAIC_VMCS12_SIZE	((u64)VMCS12_SIZE << 32)
++#define VMX_BASIC_MEM_TYPE_WB	(MEM_TYPE_WB << 50)
++
+ static void nested_vmx_setup_basic(struct nested_vmx_msrs *msrs)
+ {
+ 	/*
+@@ -7005,8 +7014,8 @@ static void nested_vmx_setup_basic(struct nested_vmx_msrs *msrs)
+ 	msrs->basic =
+ 		VMCS12_REVISION |
+ 		VMX_BASIC_TRUE_CTLS |
+-		((u64)VMCS12_SIZE << VMX_BASIC_VMCS_SIZE_SHIFT) |
+-		(VMX_BASIC_MEM_TYPE_WB << VMX_BASIC_MEM_TYPE_SHIFT);
++		VMX_BSAIC_VMCS12_SIZE |
++		VMX_BASIC_MEM_TYPE_WB;
+ 
+ 	if (cpu_has_vmx_basic_inout())
+ 		msrs->basic |= VMX_BASIC_INOUT;
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index e262bc2ba4e5..dc163a580f98 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -2563,13 +2563,13 @@ static u64 adjust_vmx_controls64(u64 ctl_opt, u32 msr)
+ static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+ 			     struct vmx_capability *vmx_cap)
+ {
+-	u32 vmx_msr_low, vmx_msr_high;
+ 	u32 _pin_based_exec_control = 0;
+ 	u32 _cpu_based_exec_control = 0;
+ 	u32 _cpu_based_2nd_exec_control = 0;
+ 	u64 _cpu_based_3rd_exec_control = 0;
+ 	u32 _vmexit_control = 0;
+ 	u32 _vmentry_control = 0;
++	u64 basic_msr;
+ 	u64 misc_msr;
+ 	int i;
+ 
+@@ -2688,29 +2688,25 @@ static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+ 		_vmexit_control &= ~x_ctrl;
+ 	}
+ 
+-	rdmsr(MSR_IA32_VMX_BASIC, vmx_msr_low, vmx_msr_high);
++	rdmsrl(MSR_IA32_VMX_BASIC, basic_msr);
+ 
+ 	/* IA-32 SDM Vol 3B: VMCS size is never greater than 4kB. */
+-	if ((vmx_msr_high & 0x1fff) > PAGE_SIZE)
++	if ((vmx_basic_vmcs_size(basic_msr) > PAGE_SIZE))
+ 		return -EIO;
+ 
+ #ifdef CONFIG_X86_64
+ 	/* IA-32 SDM Vol 3B: 64-bit CPUs always have VMX_BASIC_MSR[48]==0. */
+-	if (vmx_msr_high & (1u<<16))
++	if (basic_msr & VMX_BASIC_32BIT_PHYS_ADDR_ONLY)
+ 		return -EIO;
+ #endif
+ 
+ 	/* Require Write-Back (WB) memory type for VMCS accesses. */
+-	if (((vmx_msr_high >> 18) & 15) != 6)
++	if (vmx_basic_vmcs_mem_type(basic_msr) != MEM_TYPE_WB)
+ 		return -EIO;
+ 
+ 	rdmsrl(MSR_IA32_VMX_MISC, misc_msr);
+ 
+-	vmcs_conf->size = vmx_msr_high & 0x1fff;
+-	vmcs_conf->basic_cap = vmx_msr_high & ~0x1fff;
+-
+-	vmcs_conf->revision_id = vmx_msr_low;
+-
++	vmcs_conf->basic = basic_msr;
+ 	vmcs_conf->pin_based_exec_ctrl = _pin_based_exec_control;
+ 	vmcs_conf->cpu_based_exec_ctrl = _cpu_based_exec_control;
+ 	vmcs_conf->cpu_based_2nd_exec_ctrl = _cpu_based_2nd_exec_control;
+@@ -2860,13 +2856,13 @@ struct vmcs *alloc_vmcs_cpu(bool shadow, int cpu, gfp_t flags)
+ 	if (!pages)
+ 		return NULL;
+ 	vmcs = page_address(pages);
+-	memset(vmcs, 0, vmcs_config.size);
++	memset(vmcs, 0, vmx_basic_vmcs_size(vmcs_config.basic));
+ 
+ 	/* KVM supports Enlightened VMCS v1 only */
+ 	if (kvm_is_using_evmcs())
+ 		vmcs->hdr.revision_id = KVM_EVMCS_VERSION;
+ 	else
+-		vmcs->hdr.revision_id = vmcs_config.revision_id;
++		vmcs->hdr.revision_id = vmx_basic_vmcs_revision_id(vmcs_config.basic);
+ 
+ 	if (shadow)
+ 		vmcs->hdr.shadow_vmcs = 1;
+@@ -2959,7 +2955,7 @@ static __init int alloc_kvm_area(void)
+ 		 * physical CPU.
+ 		 */
+ 		if (kvm_is_using_evmcs())
+-			vmcs->hdr.revision_id = vmcs_config.revision_id;
++			vmcs->hdr.revision_id = vmx_basic_vmcs_revision_id(vmcs_config.basic);
+ 
+ 		per_cpu(vmxarea, cpu) = vmcs;
+ 	}
+@@ -3361,7 +3357,7 @@ static int vmx_get_max_ept_level(void)
+ 
+ u64 construct_eptp(struct kvm_vcpu *vcpu, hpa_t root_hpa, int root_level)
+ {
+-	u64 eptp = VMX_EPTP_MT_WB;
++	u64 eptp = MEM_TYPE_WB;
+ 
+ 	eptp |= (root_level == 5) ? VMX_EPTP_PWL_5 : VMX_EPTP_PWL_4;
+ 
 
-As this provides a saner API to kvm_set_dr(),
-Acked-by: Mathias Krause <minipli@grsecurity.net>
+base-commit: 60eedcfceda9db46f1b333e5e1aa9359793f04fb
+-- 
+2.43.0
+
 
