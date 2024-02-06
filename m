@@ -1,66 +1,67 @@
-Return-Path: <kvm+bounces-8116-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8117-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F12F084BC61
-	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 18:42:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B507284BC63
+	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 18:42:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A85A928A203
-	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 17:42:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 626581F278C3
+	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 17:42:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F24871757E;
-	Tue,  6 Feb 2024 17:40:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FE151AACF;
+	Tue,  6 Feb 2024 17:40:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b6DebAqz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W6A7/iBX"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4057134CE
-	for <kvm@vger.kernel.org>; Tue,  6 Feb 2024 17:40:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F02B713ADC
+	for <kvm@vger.kernel.org>; Tue,  6 Feb 2024 17:40:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707241203; cv=none; b=LyDw5fJfRMUvcAiGULl+1e11nE1vHhbvP2aKegIrEfOwOX2pqBmF9RpuUv3cYtfyT1zQOG4ddaKEoAwZ0F6NI1JlVl7DJxZYQGSsgZXrWT6lgczgxqWVPU/Qpi2qjhwNMwgVGipN3vB5B7ErS0N8DE2uh+MPOAO+Z95AS1B4emI=
+	t=1707241208; cv=none; b=cA4GcdHlNqfXNy1sPpkbpbeDLBQGwqp1cYZM2qWFoOT3Udz3rSVQ0JZblcbu51BQIx5hajap25wnmtaYE8kPkQSs0zyqfdc03Pp6hewLYk2Zu+Du0e3RTBEmHVGW7uT9uVmE6/ulFZMm+yvSfO5HoAjd5cI73OKXo2xLC675O/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707241203; c=relaxed/simple;
-	bh=DFZQ/EilDH1t8WOKFPKN8p7KM/uu/NEDA8dWflqpPdo=;
+	s=arc-20240116; t=1707241208; c=relaxed/simple;
+	bh=OqaVifQS+nxzCD21b4s8rJ7JH6j5ozOv9bSA598QaaY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kQVXPmnmFrZQo2z8I1O8wXRTYZiuxeu1dqA0KZN+rh4foLIXrN3EM5+7vpAD8m9rVojhYZHm6zEU6bH9sTFib0y+m4+thy3PoM7gYdX4+YlCENW4rsBQKEYY/9HJwXnsaqHujN6HGMs9a0nFShpLIkqbjcPmcIT5i6VxGx0kLMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b6DebAqz; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=b1MdD/jW7K2vJ3cDbqN80TVhcisbhovA5DmNQE2tOhJIca99/GECqZXd4kz3cCVzo7kYVpoX3PZJSXJlotFs7uAnEMcBtjniY8P56Y/eAehC/UlEFEbMbo3gq+k10UIVZ3G/pYDCR3Z4w6ml1yi8aHOzFcUbslMby1cVdbaxGvQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W6A7/iBX; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707241200;
+	s=mimecast20190719; t=1707241205;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=wAVeOMisjibwqonq5yPJYQ58Exx1w9fjDotka9U+BN4=;
-	b=b6DebAqzBuTjDALNp9OcZ106U74DKoDU/8rZX/oiek04G+9eHc6nCVTy8ql3Bc6RD0gDnb
-	Ck5atpO5WPtfBRGUzZTPkOsQY+m/f7bRr1Swo4errle2mu3a8JQV701H7WV7PEnRkRMTvw
-	E2aMC6uMlX+WzKlgPCfcLVkBrCeVr0A=
+	bh=DiAeFErACPu2Qq/VSwmzn5NIHI5rZO8DYF37cTAxg+8=;
+	b=W6A7/iBXUZ326iBjbODLCbswb+Y+BITEDS5Yhco3uB9pWxOgeu6o7/mpMUPnT4RLXdDwwd
+	vYgourOfqjjxgWZBhQAekTDfU/lOYpYcXLjE8G+lvjj98+NVgRMgpRIAyyd1h0U/iZUHRw
+	UcWeo/3N1dv3YjTZYnuNapFOZCjy2/o=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-680-X4XQR69UNdyvfJZ65mDaVw-1; Tue, 06 Feb 2024 12:39:57 -0500
-X-MC-Unique: X4XQR69UNdyvfJZ65mDaVw-1
+ us-mta-527-Leok8IbMPaWMhJaxElOyGA-1; Tue, 06 Feb 2024 12:40:02 -0500
+X-MC-Unique: Leok8IbMPaWMhJaxElOyGA-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2041E101FA2C;
-	Tue,  6 Feb 2024 17:39:56 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 98959879843;
+	Tue,  6 Feb 2024 17:40:00 +0000 (UTC)
 Received: from vschneid-thinkpadt14sgen2i.remote.csb (unknown [10.39.193.2])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id A881D2026D06;
-	Tue,  6 Feb 2024 17:39:51 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 5B9882026D06;
+	Tue,  6 Feb 2024 17:39:56 +0000 (UTC)
 From: Valentin Schneider <vschneid@redhat.com>
 To: linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org,
 	linux-arch@vger.kernel.org,
 	x86@kernel.org
-Cc: Josh Poimboeuf <jpoimboe@kernel.org>,
+Cc: Sean Christopherson <seanjc@google.com>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
 	Thomas Gleixner <tglx@linutronix.de>,
 	Borislav Petkov <bp@alien8.de>,
 	Peter Zijlstra <peterz@infradead.org>,
@@ -85,9 +86,9 @@ Cc: Josh Poimboeuf <jpoimboe@kernel.org>,
 	"ndesaulniers@google.com" <ndesaulniers@google.com>,
 	Michael Kelley <mikelley@microsoft.com>,
 	"Masami Hiramatsu (Google)" <mhiramat@kernel.org>
-Subject: [PATCH v2 2/5] context_tracking: Make context_tracking_key __ro_after_init
-Date: Tue,  6 Feb 2024 18:39:08 +0100
-Message-ID: <20240206173911.4131670-3-vschneid@redhat.com>
+Subject: [PATCH v2 3/5] x86/kvm: Make kvm_async_pf_enabled __ro_after_init
+Date: Tue,  6 Feb 2024 18:39:09 +0100
+Message-ID: <20240206173911.4131670-4-vschneid@redhat.com>
 In-Reply-To: <20240206173911.4131670-1-vschneid@redhat.com>
 References: <20240206173911.4131670-1-vschneid@redhat.com>
 Precedence: bulk
@@ -99,28 +100,29 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
 
-context_tracking_key is only ever enabled in __init ct_cpu_tracker_user(),
-so mark it as __ro_after_init.
+kvm_async_pf_enabled is only ever enabled in __init kvm_guest_init(), so
+mark it as __ro_after_init.
 
+Reviewed-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Valentin Schneider <vschneid@redhat.com>
 Acked-by: Josh Poimboeuf <jpoimboe@kernel.org>
 ---
- kernel/context_tracking.c | 2 +-
+ arch/x86/kernel/kvm.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/kernel/context_tracking.c b/kernel/context_tracking.c
-index 6ef0b35fc28c5..cc4f3a57f848c 100644
---- a/kernel/context_tracking.c
-+++ b/kernel/context_tracking.c
-@@ -432,7 +432,7 @@ static __always_inline void ct_kernel_enter(bool user, int offset) { }
- #define CREATE_TRACE_POINTS
- #include <trace/events/context_tracking.h>
+diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+index dfe9945b9bece..8f48ce7adfb28 100644
+--- a/arch/x86/kernel/kvm.c
++++ b/arch/x86/kernel/kvm.c
+@@ -44,7 +44,7 @@
+ #include <asm/svm.h>
+ #include <asm/e820/api.h>
  
--DEFINE_STATIC_KEY_FALSE(context_tracking_key);
-+DEFINE_STATIC_KEY_FALSE_RO(context_tracking_key);
- EXPORT_SYMBOL_GPL(context_tracking_key);
+-DEFINE_STATIC_KEY_FALSE(kvm_async_pf_enabled);
++DEFINE_STATIC_KEY_FALSE_RO(kvm_async_pf_enabled);
  
- static noinstr bool context_tracking_recursion_enter(void)
+ static int kvmapf = 1;
+ 
 -- 
 2.43.0
 
