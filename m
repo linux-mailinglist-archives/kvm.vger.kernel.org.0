@@ -1,250 +1,124 @@
-Return-Path: <kvm+bounces-8102-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8103-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DC1284B8E3
-	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 16:10:09 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD55C84B8C3
+	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 16:04:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2AEEBB2C770
-	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 14:56:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C83B6B20DD9
+	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 14:58:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FD7F134723;
-	Tue,  6 Feb 2024 14:54:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C8781350D8;
+	Tue,  6 Feb 2024 14:55:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jA8jF/7M"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mDQKX9Ia"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C43F1339A2;
-	Tue,  6 Feb 2024 14:54:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.55.52.88
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10CB313329A;
+	Tue,  6 Feb 2024 14:55:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707231297; cv=none; b=XHis8+ps0njDvKxH3BCYYFZ4zezfazuMzAI+CSCqS2E4KXeWnkY0xlY0SEco1IOm1g7wJwURcE475ekV0O+ibJzqeAFSQqeTjbpj6QidShAG620GpIACzp/K5IAwfeLx4pjOeufEUgTmJ4cjkAKzY2Y2IDgCsFuy/d7VuuQrQ4I=
+	t=1707231347; cv=none; b=Ur1Tgzq/d513fE+UwaYy+gzALKpsORmLg9cl5yCNxXXR8YB8xg576HgQmoF497/B+ux/RSsNkuJaNciH4luiYyPg4UVp/xKjm4DzMp5TS901v0US34vfpQI6xnX6gx2G3kJUD1bzt5bKvb9ac2SVVJYVbkIG55iaKn9rnJf6qLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707231297; c=relaxed/simple;
-	bh=lOr+XGR2hJml6WGSq7dut5XfAyTVuZ4y58BVDSiEjas=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Dx44NmUNbghg81i12tqjwjJqWgCrVqJKKqDqS8ymgdaAqi+BtDe/VIofwoPkc+Uo4BaaH4Hodu3nRyQuX4OdUkwAcXEPZLsAbiGuKX4I+ulolRiTBrlk5sn5D6E8K6UBe2OeHufAA/MbOa8O0eVxjknmCZKbxAjT9AxCLC9I/VU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jA8jF/7M; arc=none smtp.client-ip=192.55.52.88
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707231296; x=1738767296;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=lOr+XGR2hJml6WGSq7dut5XfAyTVuZ4y58BVDSiEjas=;
-  b=jA8jF/7ME2N9ead1vl+9g0/PtcsbYnGBpxzkFF+GFmUaLaGlQQ5BOIUn
-   m415YyPfB05LXzZeqvtr5F/jbdBjNUo2ctzfSvL4mKJfwTzv9eSpjeKBg
-   wfJEHCHoYBCqXA9UDDgYU34KnQFHt7Mzd1f+NTwzH28o+9J/XCOBLMKGG
-   tXJAQZUKGoudxcykkpflvTofb28EV9v8b4cmGtgkmW2sdLrujcA8kK7WH
-   R6yy2lJjFMKPp70qUZrUHE42JG2jpL/mKk8VlKMqpNjHU/D5gQtX4gY9p
-   II0NjEYysKxEXaYEoH4xwTEOBBvBLIwodajbqpIyciNhjOYS06sSSKheM
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10975"; a="435901069"
-X-IronPort-AV: E=Sophos;i="6.05,247,1701158400"; 
-   d="scan'208";a="435901069"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2024 06:54:55 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,247,1701158400"; 
-   d="scan'208";a="1067177"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by orviesa010.jf.intel.com with ESMTP; 06 Feb 2024 06:54:50 -0800
-Date: Tue, 6 Feb 2024 22:51:14 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
-	Pattara Teerapong <pteerapong@google.com>
-Subject: Re: [PATCH 6/8] KVM: x86/mmu: Check for usable TDP MMU root while
- holding mmu_lock for read
-Message-ID: <ZcJHYtMZsQHInVEI@yilunxu-OptiPlex-7050>
-References: <20240111020048.844847-1-seanjc@google.com>
- <20240111020048.844847-7-seanjc@google.com>
- <ZcIFTkWaTqItQPsj@yilunxu-OptiPlex-7050>
+	s=arc-20240116; t=1707231347; c=relaxed/simple;
+	bh=P+XZ9mIc4ZZ7nNbi2oJblEjps9kTAmyVg/UPtun3xME=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:Content-Type:
+	 MIME-Version; b=PNq2JqQyzxHmw+OnUkXLQTwt8rK5Bxv+kwZ+qSv8BP8zOKSfDp6RWWYu8duUxf27VNLPwvDgsG7jBYin079XDR+5xhejHdFroQ7D7A3DMDYDtEG2iji06XcgKb5fOHAVqv1rjmxBg1JcsHZO0iODRIBMYv2oEAp4mYsS0bD2nZ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mDQKX9Ia; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-40fc6343bd2so38580675e9.1;
+        Tue, 06 Feb 2024 06:55:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707231344; x=1707836144; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:in-reply-to:date
+         :cc:to:from:subject:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=P+XZ9mIc4ZZ7nNbi2oJblEjps9kTAmyVg/UPtun3xME=;
+        b=mDQKX9IaOLI3CS0i+I+hPPHGdT8C4zP9WcwnDhTehso1RztqZM8A0++BrzmAxI0Hb2
+         vwrsuppbQ+m3oyAZMEoAUfJEtPHuN1v2K3f5j2SfVTJUVExM15UOY6hjmXZgWFIRMorI
+         W+eXzyH/Oo30oJnPY7oh7VLdRpp8fa3dN4+IGfF44LZL6pcZ904o2p2NkqLDD3yBUw3M
+         4UAIjr+PLFy5yPW9K7F+WqenMk6t9ghqoqn3UjAsIgGKNvMu960xpvEBf+QUUW6QGgk/
+         oDqkOeYU1XmSVYnx/WI9ZsihHPjVMhi5jaErKkUinCS7w2NDl8pOCQQyDW6tL0A041AZ
+         XTRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707231344; x=1707836144;
+        h=mime-version:user-agent:content-transfer-encoding:in-reply-to:date
+         :cc:to:from:subject:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=P+XZ9mIc4ZZ7nNbi2oJblEjps9kTAmyVg/UPtun3xME=;
+        b=E+64AIyRhrlVf9La+iICwQNM1NSCdl+VHBbZMel49HCcjGnWf5jtvMYF6ArUle8Km8
+         cgsTTUMEPp35MEMv9Asxsct06WCCXnH5dKvBYdEYMK/nSY8EfG4jc/sW5RdRnplQX4PX
+         4Itqu9ubC9dfQ1mwIHvbAJSAGCLYhU4ouMTUXuDOj9s3wOwfz/+ysF5WwJ7ueTsmiaOp
+         KDLTICi2BAsYDEjb3LNd4YV18YJi0vJYCRSeQQFEryvdHOm5YV79vZLrEfYAM1t5XWSW
+         aoLWIOPywjmKtzu2vxMhNGIPcEHxdpFPJVXC4OJdV7pP5jXlMwhxK00MHbAKNDvoNgtt
+         IrXg==
+X-Gm-Message-State: AOJu0YwKZgoKGWxw+cCZ7W+7F2H0jEaIl3glsiaLjHLoHg7HGFo6c3b1
+	g+AuJ+G+S3DLzUV4mCYWgv1G0EJzSZdUm4Wu9OP1rRAUZp3vjPY2
+X-Google-Smtp-Source: AGHT+IGCu12mB9a0AFI2Ba4BEGYbcnCAFKhgWjEm1Z6uIPmbfR8ErP1f3Wsb1RcCeZiIJSqC7deq0Q==
+X-Received: by 2002:a05:600c:5103:b0:40f:c404:e2d1 with SMTP id o3-20020a05600c510300b0040fc404e2d1mr2172197wms.19.1707231344009;
+        Tue, 06 Feb 2024 06:55:44 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCWDK15ZzhPti6e+UKpuCLJ+9JFukOTN01W7k15JR3hJm0baSA7FuPj5PJJ3k4HijcEs5Rv0wkhg+3dhva9MPI9JBcXSvUh2zGRNkxVUjgrk0xotEExnIcaBAoYEUHedDS7Sj3CBwlQMCSasEXqn/y6c1pi15Mtxg5/H93/BGjq9uZAO+aW4rgTE7/JxqCootj4DK8Xsq0UsbUFzAh5te8GZotbsqIPtBeM4ONElJifzGw5pPzF8W1/0jxjdbI6jr1VMnqxR80uFjbYtSDRUushRf/+IX8nPWjF5oFWeSVJyMEw6Tt28Csojv1TsQSNLLbPRra+Fp0p729HNQehp/42CpldfO/HExuvqCTbk8X6f/xkCNNZqHhoGihKYVbQ9r//MK6U2gRWPS+6fWfcIo0tmPLmqBXNkW6/lD06BsD7LjSvEquthW8fQsyTBP5HNVBXLVtfmMjgGUTNhJR410OK83eQpJQObg01nURN3rFIK2qECUsVfA9RMzfNM3u++TxUi+3tZE40RwjVydmB1W8nZE8h/U5EChHJk+NKxwaG+J12i0hzjqDBrg+WCfRAH8yw09wHbFWOWvYiPtWEWTGQVKE2XADgkGoZPWJlP7H8Ii5AK55s56WLiWJ0zuuVOGQw8Jb8kgjrwo3htwsLesUC2/Y35SFyrCRLKIUmf033M1/a1CozvepAxGqjRGSUb9Xo2MO1lVmooDGgotT9fNJaL+RMINwks9cI/mihrgjCUSyg2Jv2r
+Received: from ?IPv6:2a01:4b00:d307:1000:f1d3:eb5e:11f4:a7d9? ([2a01:4b00:d307:1000:f1d3:eb5e:11f4:a7d9])
+        by smtp.gmail.com with ESMTPSA id fb4-20020a05600c520400b0040fd3121c4asm2243641wmb.46.2024.02.06.06.55.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Feb 2024 06:55:43 -0800 (PST)
+Message-ID: <888072e30cc003dbed3f41675242b877246e2f0a.camel@gmail.com>
+Subject: Re: [RFC 00/18] Pkernfs: Support persistence for live update
+From: Luca Boccassi <luca.boccassi@gmail.com>
+To: jgowans@amazon.com
+Cc: akpm@linux-foundation.org, anthony.yznaga@oracle.com,
+ brauner@kernel.org,  dwmw@amazon.co.uk, ebiederm@xmission.com,
+ graf@amazon.com, iommu@lists.linux.dev,  joro@8bytes.org,
+ jschoenh@amazon.de, kexec@lists.infradead.org,  kvm@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-mm@kvack.org, madvenka@linux.microsoft.com, pbonzini@redhat.com, 
+ seanjc@google.com, skinsburskii@linux.microsoft.com,
+ steven.sistare@oracle.com,  usama.arif@bytedance.com,
+ viro@zeniv.linux.org.uk, will@kernel.org,  yuleixzhang@tencent.com
+Date: Tue, 06 Feb 2024 14:55:42 +0000
+In-Reply-To: <20240205120203.60312-1-jgowans@amazon.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZcIFTkWaTqItQPsj@yilunxu-OptiPlex-7050>
 
-On Tue, Feb 06, 2024 at 06:09:18PM +0800, Xu Yilun wrote:
-> On Wed, Jan 10, 2024 at 06:00:46PM -0800, Sean Christopherson wrote:
-> > When allocating a new TDP MMU root, check for a usable root while holding
-> > mmu_lock for read and only acquire mmu_lock for write if a new root needs
-> > to be created.  There is no need to serialize other MMU operations if a
-> > vCPU is simply grabbing a reference to an existing root, holding mmu_lock
-> > for write is "necessary" (spoiler alert, it's not strictly necessary) only
-> > to ensure KVM doesn't end up with duplicate roots.
-> > 
-> > Allowing vCPUs to get "new" roots in parallel is beneficial to VM boot and
-> > to setups that frequently delete memslots, i.e. which force all vCPUs to
-> > reload all roots.
-> > 
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  arch/x86/kvm/mmu/mmu.c     |  8 ++---
-> >  arch/x86/kvm/mmu/tdp_mmu.c | 60 +++++++++++++++++++++++++++++++-------
-> >  arch/x86/kvm/mmu/tdp_mmu.h |  2 +-
-> >  3 files changed, 55 insertions(+), 15 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index 3c844e428684..ea18aca23196 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -3693,15 +3693,15 @@ static int mmu_alloc_direct_roots(struct kvm_vcpu *vcpu)
-> >  	unsigned i;
-> >  	int r;
-> >  
-> > +	if (tdp_mmu_enabled)
-> > +		return kvm_tdp_mmu_alloc_root(vcpu);
-> > +
-> >  	write_lock(&vcpu->kvm->mmu_lock);
-> >  	r = make_mmu_pages_available(vcpu);
-> >  	if (r < 0)
-> >  		goto out_unlock;
-> >  
-> > -	if (tdp_mmu_enabled) {
-> > -		root = kvm_tdp_mmu_get_vcpu_root_hpa(vcpu);
-> > -		mmu->root.hpa = root;
-> > -	} else if (shadow_root_level >= PT64_ROOT_4LEVEL) {
-> > +	if (shadow_root_level >= PT64_ROOT_4LEVEL) {
-> >  		root = mmu_alloc_root(vcpu, 0, 0, shadow_root_level);
-> >  		mmu->root.hpa = root;
-> >  	} else if (shadow_root_level == PT32E_ROOT_LEVEL) {
-> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> > index e0a8343f66dc..9a8250a14fc1 100644
-> > --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> > @@ -223,21 +223,52 @@ static void tdp_mmu_init_child_sp(struct kvm_mmu_page *child_sp,
-> >  	tdp_mmu_init_sp(child_sp, iter->sptep, iter->gfn, role);
-> >  }
-> >  
-> > -hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
-> > +static struct kvm_mmu_page *kvm_tdp_mmu_try_get_root(struct kvm_vcpu *vcpu)
-> >  {
-> >  	union kvm_mmu_page_role role = vcpu->arch.mmu->root_role;
-> > +	int as_id = kvm_mmu_role_as_id(role);
-> >  	struct kvm *kvm = vcpu->kvm;
-> >  	struct kvm_mmu_page *root;
-> >  
-> > -	lockdep_assert_held_write(&kvm->mmu_lock);
-> > -
-> > -	/* Check for an existing root before allocating a new one. */
-> > -	for_each_valid_tdp_mmu_root(kvm, root, kvm_mmu_role_as_id(role)) {
-> > -		if (root->role.word == role.word &&
-> > -		    kvm_tdp_mmu_get_root(root))
-> > -			goto out;
-> > +	for_each_valid_tdp_mmu_root_yield_safe(kvm, root, as_id) {
-> 
-> No lock yielding attempt in this loop, why change to _yield_safe version?
 
-Oh, I assume you just want to early exit the loop with the reference to
-root hold.  But I feel it makes harder for us to have a clear
-understanding of the usage of _yield_safe and non _yield_safe helpers.
+> Also, the question of a hard separation between
+> persistent memory and ephemeral memory, compared to allowing
+> arbitrary pages to
+> be persisted. Pkernfs does it via a hard separation defined at boot
+> time, other
+> approaches could make the carving out of persistent pages dynamic.
 
-Maybe change it back?
+Speaking from experience here - in Azure (Boost) we have been using
+hard-carved out memory areas (DAX devices with ranges configured via
+DTB) for persisting state across kexec for ~5 years or so. In a
+nutshell: don't, it's a mistake.
 
-Thanks,
-Yilun
+It's a constant and consistence source of problems, headaches, issues
+and workarounds piled upon workarounds, held together with duct tape
+and prayers. It's just not flexible enough for any modern system. For
+example, unless _all_ the machines are ridicolously overprovisioned in
+terms of memory capacity (and guaranteed to remain so, forever), you
+end up wasting enormous amounts of memory.
 
-> 
-> Thanks,
-> Yilun
-> 
-> > +		if (root->role.word == role.word)
-> > +			return root;
-> >  	}
-> >  
-> > +	return NULL;
-> > +}
-> > +
-> > +int kvm_tdp_mmu_alloc_root(struct kvm_vcpu *vcpu)
-> > +{
-> > +	struct kvm_mmu *mmu = vcpu->arch.mmu;
-> > +	union kvm_mmu_page_role role = mmu->root_role;
-> > +	struct kvm *kvm = vcpu->kvm;
-> > +	struct kvm_mmu_page *root;
-> > +
-> > +	/*
-> > +	 * Check for an existing root while holding mmu_lock for read to avoid
-> > +	 * unnecessary serialization if multiple vCPUs are loading a new root.
-> > +	 * E.g. when bringing up secondary vCPUs, KVM will already have created
-> > +	 * a valid root on behalf of the primary vCPU.
-> > +	 */
-> > +	read_lock(&kvm->mmu_lock);
-> > +	root = kvm_tdp_mmu_try_get_root(vcpu);
-> > +	read_unlock(&kvm->mmu_lock);
-> > +
-> > +	if (root)
-> > +		goto out;
-> > +
-> > +	write_lock(&kvm->mmu_lock);
-> > +
-> > +	/*
-> > +	 * Recheck for an existing root after acquiring mmu_lock for write.  It
-> > +	 * is possible a new usable root was created between dropping mmu_lock
-> > +	 * (for read) and acquiring it for write.
-> > +	 */
-> > +	root = kvm_tdp_mmu_try_get_root(vcpu);
-> > +	if (root)
-> > +		goto out_unlock;
-> > +
-> >  	root = tdp_mmu_alloc_sp(vcpu);
-> >  	tdp_mmu_init_sp(root, NULL, 0, role);
-> >  
-> > @@ -254,8 +285,17 @@ hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
-> >  	list_add_rcu(&root->link, &kvm->arch.tdp_mmu_roots);
-> >  	spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
-> >  
-> > +out_unlock:
-> > +	write_unlock(&kvm->mmu_lock);
-> >  out:
-> > -	return __pa(root->spt);
-> > +	/*
-> > +	 * Note, KVM_REQ_MMU_FREE_OBSOLETE_ROOTS will prevent entering the guest
-> > +	 * and actually consuming the root if it's invalidated after dropping
-> > +	 * mmu_lock, and the root can't be freed as this vCPU holds a reference.
-> > +	 */
-> > +	mmu->root.hpa = __pa(root->spt);
-> > +	mmu->root.pgd = 0;
-> > +	return 0;
-> >  }
-> >  
-> >  static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
-> > @@ -917,7 +957,7 @@ void kvm_tdp_mmu_zap_invalidated_roots(struct kvm *kvm)
-> >   * the VM is being destroyed).
-> >   *
-> >   * Note, kvm_tdp_mmu_zap_invalidated_roots() is gifted the TDP MMU's reference.
-> > - * See kvm_tdp_mmu_get_vcpu_root_hpa().
-> > + * See kvm_tdp_mmu_alloc_root().
-> >   */
-> >  void kvm_tdp_mmu_invalidate_all_roots(struct kvm *kvm)
-> >  {
-> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-> > index 20d97aa46c49..6e1ea04ca885 100644
-> > --- a/arch/x86/kvm/mmu/tdp_mmu.h
-> > +++ b/arch/x86/kvm/mmu/tdp_mmu.h
-> > @@ -10,7 +10,7 @@
-> >  void kvm_mmu_init_tdp_mmu(struct kvm *kvm);
-> >  void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm);
-> >  
-> > -hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu);
-> > +int kvm_tdp_mmu_alloc_root(struct kvm_vcpu *vcpu);
-> >  
-> >  __must_check static inline bool kvm_tdp_mmu_get_root(struct kvm_mmu_page *root)
-> >  {
-> > -- 
-> > 2.43.0.275.g3460e3d667-goog
-> > 
-> > 
-> 
+In Azure we are very much interested in a nice, well-abstracted, first-
+class replacement for that setup that allows persisting data across
+kexec, and in systemd userspace we'd very much want to use it as well,
+but it really, really needs to be dynamic, and avoid the pitfall of
+hard-configured carved out chunk.
+
+--=20
+Kind regards,
+Luca Boccassi
 
