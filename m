@@ -1,118 +1,136 @@
-Return-Path: <kvm+bounces-8061-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8062-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D6F584AADE
-	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 00:55:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55CB184AAF8
+	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 01:12:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0AF1A287ACA
-	for <lists+kvm@lfdr.de>; Mon,  5 Feb 2024 23:55:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 128DB28C218
+	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 00:12:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 391F34CE11;
-	Mon,  5 Feb 2024 23:55:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB76EEC7;
+	Tue,  6 Feb 2024 00:12:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dhr1Sw4J"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sA7uDE+p"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DED848CF2
-	for <kvm@vger.kernel.org>; Mon,  5 Feb 2024 23:55:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A16DA39B
+	for <kvm@vger.kernel.org>; Tue,  6 Feb 2024 00:12:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707177316; cv=none; b=EVc5u35N6QRwD1Qp41PEXlDh9+CHhthriFAXavsSNzdsKksLVJdtnlNyskCZEV7e757scXX2iqeG1PC6FyQ5va0L00LWFQ4tcGbFTjjDNy46McktJ6Z2ELnJmGM/V+V1IfJRlnSC43aEiAA5fYj1O+5D7coo96uvAZY3cSEK7k4=
+	t=1707178351; cv=none; b=d3ac7EgRc0S083DMmP+LOfXOsksaiV606esnByzd9Fvg2UVQsSH3+L4fXhaw/NBT8xwInd+WA5YDSGa1VLATYquReRWkF4Db4lGNbAmiCoQGYQnwgQiGWDs6mtMnYgqwSpIzMPdfh28VrhQ1ZQVfkaCcrQ0vJhmn/WpXKp/YfT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707177316; c=relaxed/simple;
-	bh=RCeuGw+qfyPj0dL0x8G1g1gkNuFp52X9i7h9BI/DiIo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tHfH89LCD2mQWUE0sV3K/R4HwL8nz57je8j1GQovMm+dHPl8EHN7K0oB7fPWIXYOJyfZa9myGcTCvv/7a1w+55nMFNFFo9ktryhslXV+opwByTwMYU2n6KbJBKfWQGoJUR2HshKU1iMl8zFhXzXBSAzV1pg3DSkSpQr38Lpuq/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dhr1Sw4J; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707177312;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=LXKNaLAXkFX+4eJ/GmG7ArIMhHKrCdx1mSkfjlmP4rg=;
-	b=dhr1Sw4Jp7Vm/mGa9rZpo8AEEAp9ZhDEs7NSmsFXPIZTjNVLBVtiC8Q0ZRiEzcyNGjpqCO
-	QMcAUuyOL8TRdmmq+zbjiR02Z3xCJPcSSHcf36bMVEYAT8yH0+UWQnBDEdi6UogRugqpTf
-	LaixJ3vSLRdobSOVngz1Jl5ZgK/bqDA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-190-h3rYFVZ5Oze82KcKwYddpg-1; Mon, 05 Feb 2024 18:55:11 -0500
-X-MC-Unique: h3rYFVZ5Oze82KcKwYddpg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DC6DC83B82B;
-	Mon,  5 Feb 2024 23:55:10 +0000 (UTC)
-Received: from omen.home.shazbot.org (unknown [10.22.8.77])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 8399D40C9444;
-	Mon,  5 Feb 2024 23:55:10 +0000 (UTC)
-From: Alex Williamson <alex.williamson@redhat.com>
-To: alex.williamson@redhat.com
-Cc: kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	yishaih@nvidia.com
-Subject: [PATCH] MAINTAINERS: Re-alphabetize VFIO
-Date: Mon,  5 Feb 2024 16:54:18 -0700
-Message-ID: <20240205235427.2103714-1-alex.williamson@redhat.com>
+	s=arc-20240116; t=1707178351; c=relaxed/simple;
+	bh=U7p1iFE6ywvljPJognZaN8unEMxJXmtola9t/S0saE0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=BtvdbgXwrAatayMfB2M87sdeuYrTM7hN3eBy+n7LIkfIvkXxSdPxqH+Uinv7oQHkADEXumLTElRkulmAvtyzDCFBGbt7LwrIyK+RawYeIMkBNfpE/BfDYndOgIxv3B6/Qelezz0XK7M1La3DUp84hgFb41m8UpNHTAhJEXnPEF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sA7uDE+p; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-5dbddee3694so38938a12.1
+        for <kvm@vger.kernel.org>; Mon, 05 Feb 2024 16:12:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1707178349; x=1707783149; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2aHBcot/2NqMYA7ZGuWe5JuLCcnyjFV+ziaoOKAd19I=;
+        b=sA7uDE+p+Au52Gr59NBaIRz8K9RyvlI4tf6Tys6SP2l2xwq/ndA5cisuoDeoKPnSgr
+         BavVl4oTvJdoFP04y/aLvvtCBG6vun3c13SVJhm7DMTIpxEFU/1i5OjGGrGGFHrsT5zp
+         8IaKrXYgMA6RFXPcRemSQSNAIBPzPZgDl2gr/BLVJr+bUdRh2r9o+twViZhKVbiMaZ/Y
+         804r6L7y8ImuXPY1ut/ZItCT7cpawXV9SXI7IwD3cIi7AQKF3zCJvyu/BG56rS+oVDTg
+         SSCcu4kJvFLQhEKyIJf9/EaJW20RG0ULkZHLIe4HpLWri1AEka3k5shpznmCAjOsEbiA
+         9pxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707178349; x=1707783149;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=2aHBcot/2NqMYA7ZGuWe5JuLCcnyjFV+ziaoOKAd19I=;
+        b=FxUqw1Lv5bMPVrXSoCwfsvRjh5hRXDcflsPPins8O/ox1fSZmfL+dl5CWxeM7MPWGx
+         FRkTvoEVFjskEmC+Kp77X/WQarEChGxSGzXL3PUGboIEKSkyRvx8gt3QY8v76nTfAZXJ
+         lfKSjpxTDwdK67RN+663F+vTwwBVGHVMKXtVLEcpif1cMqHxJIBrGMO1oDP+zfBwHisB
+         VvivXZPnClnLMo+4xLsOePqdqamGDnxnN3CygFmAh8CkFF2Ll/twjRWH4P3lptl8hTvK
+         BQlGrKtDMG0Egie/VKwUqztZ5nlFVWNak6x/4fraDeic2v5h1FevCCHxqsHt1C07mPnw
+         JJNw==
+X-Gm-Message-State: AOJu0Yz69POqssGmZ0fTnFHIdaOOdHoxM0bZ3k2t+8F2NNFZFLAvGAvP
+	epPfRNsRBv3dDwn8riV2IvV+HMKAy8nUKwVsKA0Wxy9vfYfFwQO4ooLMHBItaRGnDWsd07KCwhr
+	cow==
+X-Google-Smtp-Source: AGHT+IGrtWHSBFbmlk1OGbAiCKrrldxhM8yAJ86BBSoQJD/eK75NBEnbVI50mHb+WvJO+r3RBjcBOSJoxps=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:ced1:b0:1d9:5778:f923 with SMTP id
+ d17-20020a170902ced100b001d95778f923mr87plg.5.1707178348825; Mon, 05 Feb 2024
+ 16:12:28 -0800 (PST)
+Date: Mon, 5 Feb 2024 16:12:27 -0800
+In-Reply-To: <CANaxB-yAJf4wFyRgkc+XzAdkC9JUKtx-BoZ=eCV7jRSagjsv0g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
+Mime-Version: 1.0
+References: <20240205173124.366901-1-avagin@google.com> <ZcErs9rPqT09nNge@google.com>
+ <CANaxB-yAJf4wFyRgkc+XzAdkC9JUKtx-BoZ=eCV7jRSagjsv0g@mail.gmail.com>
+Message-ID: <ZcF5a72HihKkLGVx@google.com>
+Subject: Re: [PATCH] kvm/x86: add capability to disable the write-track mechanism
+From: Sean Christopherson <seanjc@google.com>
+To: Andrei Vagin <avagin@gmail.com>
+Cc: Andrei Vagin <avagin@google.com>, Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, 
+	x86@kernel.org, kvm@vger.kernel.org, Zhenyu Wang <zhenyuw@linux.intel.com>, 
+	Zhi Wang <zhi.a.wang@intel.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-The vfio-pci virtio variant entry slipped in out of order.
+On Mon, Feb 05, 2024, Andrei Vagin wrote:
+> On Mon, Feb 5, 2024 at 10:41=E2=80=AFAM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> >
+> > On Mon, Feb 05, 2024, Andrei Vagin wrote:
+> > > The write-track is used externally only by the gpu/drm/i915 driver.
+> > > Currently, it is always enabled, if a kernel has been compiled with t=
+his
+> > > driver.
+> > >
+> > > Enabling the write-track mechanism adds a two-byte overhead per page =
+across
+> > > all memory slots. It isn't significant for regular VMs. However in gV=
+isor,
+> > > where the entire process virtual address space is mapped into the VM,=
+ even
+> > > with a 39-bit address space, the overhead amounts to 256MB.
+> > >
+> > > This change introduces the new KVM_CAP_PAGE_WRITE_TRACKING capability=
+,
+> > > allowing users to enable/disable the write-track mechanism. It is ena=
+bled
+> > > by default for backward compatibility.
+> >
+> > I would much prefer to allocate the write-tracking metadata on-demand i=
+n
+> > kvm_page_track_register_notifier(), i.e. do the same as mmu_first_shado=
+w_root_alloc(),
+> > except for just gfn_write_track.
+> >
+> > The only potential hiccup would be if taking slots_arch_lock would dead=
+lock, but
+> > it should be impossible for slots_arch_lock to be taken in any other pa=
+th that
+> > involves VFIO and/or KVMGT *and* can be coincident.  Except for kvm_arc=
+h_destroy_vm()
+> > (which deletes KVM's internal memslots), slots_arch_lock is taken only =
+through
+> > KVM ioctls(), and the caller of kvm_page_track_register_notifier() *mus=
+t* hold
+> > a reference to the VM.
+> >
+> > That way there's no need for new uAPI and no need for userspace changes=
+.
+>=20
+> I think it is a good idea, I don't know why I didn't consider it.
 
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
-
-I'll plan to take this through the vfio tree.
-
- MAINTAINERS | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 960512bec428..e0060359a043 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -23076,13 +23076,6 @@ L:	kvm@vger.kernel.org
- S:	Maintained
- F:	drivers/vfio/pci/mlx5/
- 
--VFIO VIRTIO PCI DRIVER
--M:	Yishai Hadas <yishaih@nvidia.com>
--L:	kvm@vger.kernel.org
--L:	virtualization@lists.linux-foundation.org
--S:	Maintained
--F:	drivers/vfio/pci/virtio
--
- VFIO PCI DEVICE SPECIFIC DRIVERS
- R:	Jason Gunthorpe <jgg@nvidia.com>
- R:	Yishai Hadas <yishaih@nvidia.com>
-@@ -23106,6 +23099,13 @@ L:	kvm@vger.kernel.org
- S:	Maintained
- F:	drivers/vfio/platform/
- 
-+VFIO VIRTIO PCI DRIVER
-+M:	Yishai Hadas <yishaih@nvidia.com>
-+L:	kvm@vger.kernel.org
-+L:	virtualization@lists.linux-foundation.org
-+S:	Maintained
-+F:	drivers/vfio/pci/virtio
-+
- VGA_SWITCHEROO
- R:	Lukas Wunner <lukas@wunner.de>
- S:	Maintained
--- 
-2.43.0
-
+Because you wanted to make me look smart ;-)
 
