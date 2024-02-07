@@ -1,325 +1,204 @@
-Return-Path: <kvm+bounces-8213-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8214-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3011684C5F4
-	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 09:07:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FE2A84C65F
+	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 09:39:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B05CB25E28
-	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 08:07:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D04432865E2
+	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 08:39:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EBF0200B8;
-	Wed,  7 Feb 2024 08:07:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AA91208C0;
+	Wed,  7 Feb 2024 08:39:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="oyTIQsI0"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L4e1Ky6j"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 753AC20312;
-	Wed,  7 Feb 2024 08:07:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4850208AB
+	for <kvm@vger.kernel.org>; Wed,  7 Feb 2024 08:39:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707293222; cv=none; b=Chpz+z0eLiluAfZBgojFzPj0Y6JdJx+9juAmlp4Ut249db5Tyuy4b8SE0U2WWlB68wkZUxYYP1zWbBpJrbyWVSGAlLlhy+lofDSeOcZe1a2bqkyad5hgL7+6NHKLTEzEz2JGRFLH/wY01kSeeNhlrBmio6hzZL9gQ5OQKuBUZKg=
+	t=1707295173; cv=none; b=rj4DJ0Q1YXhaO3KDcJgcpUo4IZzFoBc8mz0tw+SEbMnluKh7CTi7rW0Ll0OVSs8f6jipDhYQ7H4c4SpiuNsO1lHz2ZUl7tjnm95pUAngBbkIMN0vy9D80RH1+uzeFOIlJ/A3bSJ5b5B5ALCtduA5GRCXT7CG50S7i86Xno3n+z0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707293222; c=relaxed/simple;
-	bh=ht+BT9ZADFMjKhpdVDXaZ5Jepkqt+5jAnDs1I9H7Etw=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=YLYgK6UlTKfCz8nDcNwXusdTAUFhhjAogpQsnO8o/3jih3x81vOZNaBfpcAz6Gse+ngKDNj6SA40TCfs2lYjqVsKlRY3KnFxAaiflc13c5lIuMScCE4H5okmBWUhU6YjJCLb1M/AMMXcegKYe4+MFKRzP/Mo/WEgWIveEVbEJbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=oyTIQsI0; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 4176vEpY019279;
-	Wed, 7 Feb 2024 08:06:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=mime-version : date :
- from : to : cc : subject : reply-to : in-reply-to : references :
- message-id : content-type : content-transfer-encoding; s=pp1;
- bh=e0aV/9kJJDXzTfaIsvpMN+NWFHLkEEfZKeUUyfq8Yu8=;
- b=oyTIQsI06dXFJsP/wEvF9NaLjeag1C6GC25RUrWg3WHuLgezlVxaUJbMVe1VwlQKyK0B
- aXtl7jRggYkd3YsXS3QDeeuASFWWFW5X9frs9Gln69jEwHGtYSU3F4wW0FBb8NY/rcxs
- 1OPq6M1MNFWUSKKX4MonqItUY8e+e2lzz++acn61W4LWARuaIA5cN8g+XJV/E36vR6dA
- eyhgbyrtvx2946JWddEnyt8xIAepa4DSORoBo0FjxonC3G3msBgcDx03ZHWvlGbFyZQC
- WLPhfvs7ThJkUO3howkacFLP+VF8USojknzShr+AP6oBTLh9L/bN3ighK8IeaEIfskoc Fg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w451ssmwv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 07 Feb 2024 08:06:59 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 4177OuxH012947;
-	Wed, 7 Feb 2024 08:06:59 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w451ssmvb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 07 Feb 2024 08:06:58 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4176ZckR008738;
-	Wed, 7 Feb 2024 08:06:55 GMT
-Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3w206ymm0p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 07 Feb 2024 08:06:55 +0000
-Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
-	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 41786sNP1049270
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 7 Feb 2024 08:06:55 GMT
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A9C2958064;
-	Wed,  7 Feb 2024 08:06:54 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4A28C58063;
-	Wed,  7 Feb 2024 08:06:54 +0000 (GMT)
-Received: from ltc.linux.ibm.com (unknown [9.5.196.140])
-	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  7 Feb 2024 08:06:54 +0000 (GMT)
+	s=arc-20240116; t=1707295173; c=relaxed/simple;
+	bh=ac9WGCOPPgNEkiYYzCiJVtWgr45GmwAPXfRv3awco68=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rkyOUEjb0DBJz7VDuppnu4CuVhwT/0tnBO+aPwWUJNwtwGeXz5y1QMyzobP9WOpFwwfE90RpJZpOfkIBHLZz8XEttawMDgLdTFQ/Y8FTF7hYXN8mWRarUEzIzfyXgg9j4t6S0DTTDYrr/wTNnvpI5aPGaF2IYODeiEJAWtUIpPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=L4e1Ky6j; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707295170;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZAXzbRx8bTrXW8mIoidP0h+87BdFw4xKcLSssnrU6kI=;
+	b=L4e1Ky6jhp3jBT29f84WPeXIe22+kt5BaQBFJGITZpxJRMIsM4zdpZ9vsKdkD9hW/qz+lC
+	IeQ4qDL6F465pAQ9cyvlVGSOKlq1jwaZsQUAx7/RIOM8Te8O6LV9MARs/eaA0cAaJfSUj0
+	kRaysZzk3TULt8sG9wRcro3VLX+gdyU=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-684-OrQW9Hg8MPiKemvuogwbNQ-1; Wed, 07 Feb 2024 03:39:29 -0500
+X-MC-Unique: OrQW9Hg8MPiKemvuogwbNQ-1
+Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-5606458fd5fso223540a12.3
+        for <kvm@vger.kernel.org>; Wed, 07 Feb 2024 00:39:28 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707295168; x=1707899968;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZAXzbRx8bTrXW8mIoidP0h+87BdFw4xKcLSssnrU6kI=;
+        b=YQpozz9dlFVwmca7qYkAKH/zKsm3WVXi9QxQ23wIJLVmYp/510KKpr4oYKUL8Yjr8e
+         EWeOBsvFldkNfh/+adB2JsjQste72+CXr9Dmy014XSWY16zYFwpDypvuCASuk2qhq85y
+         cvYYEfXafoEtZjAaTjAHt7anzDdP9KFeuWJYWqnygtWpzkgfJjwTtdF91QZMCbOHz+r/
+         qOQCOIqRlV0kHeWPze/UsN01uBr6osbOf6L9B/Y2pLzQhySxqseNRLb3QxYLh/g8ErSv
+         Q/DrEM5htz34KkwPY1i+ReOaIEr02/hd19BUXN++9v84OiRFxj4jQB27hnKrS5AgCLim
+         TVbw==
+X-Forwarded-Encrypted: i=1; AJvYcCVW2KTWSPJSTM6pJmOFRY6GJ1ZfNV6RIgEVDMRBgpv+4pEb18iY9w1r+Ktq5ndd2tIi1QpFSY/6wtmr8U3RArLJM38m
+X-Gm-Message-State: AOJu0YxR0gWT3/FgDyD1Ie24OLQpAWkR+iR5z2In3SQ1A/+Qk/5uBRva
+	Q+EaTdFC15lY8k3IpWTQIBRtvEjqHHph9KDlRptcnTnRV+O6FMV3lYg0vohkmySmtgiiL1YNrck
+	67EesT54GwqdKo9h/d9NYZbqSjVeC6BHhSCFXxANvTyM8FWUkTQ==
+X-Received: by 2002:a05:6402:5154:b0:560:5fbb:a148 with SMTP id n20-20020a056402515400b005605fbba148mr3754142edd.39.1707295168127;
+        Wed, 07 Feb 2024 00:39:28 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH2NsvT4sc6tbDBunK98s9BxDYPuRaNGFxjLy/cDFmkZ9+vFiimAUV20Le1jH9Jq916ADH4gw==
+X-Received: by 2002:a05:6402:5154:b0:560:5fbb:a148 with SMTP id n20-20020a056402515400b005605fbba148mr3754124edd.39.1707295167716;
+        Wed, 07 Feb 2024 00:39:27 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXmXD5gssWICrqVD4rXZExDudFbZYFR2RZeq+rMKAk4PNSqGJyVYi6dsTVcI41S1tFy7j/DSDMaVpAcS9U7JjFFrFdzxKjDIdVHlAXE6d4jIuNlpUNS+z/cs4AWYEg6ZJg9Zu+TQlheXCLTqcQkGgHV16qh2Thea3iaajmeXxbjQPhbXP68udVDcEOvSjb3S+jS6lJYMv6Uef0o/GdexErkRX7VNSNlJ9v8KyxR1BgFmBCJYoHi7E38rkAbeqhN7wHPNwm8f4vmtyF+G+2TrI7oBd8KtDmTS+ITz7MV45g6hA==
+Received: from sgarzare-redhat (host-87-12-25-87.business.telecomitalia.it. [87.12.25.87])
+        by smtp.gmail.com with ESMTPSA id 15-20020a0564021f4f00b00560622cd10fsm424307edz.68.2024.02.07.00.39.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Feb 2024 00:39:27 -0800 (PST)
+Date: Wed, 7 Feb 2024 09:39:23 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: virtualization@lists.linux.dev, 
+	Shannon Nelson <shannon.nelson@amd.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org, Kevin Wolf <kwolf@redhat.com>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Zhu Lingshan <lingshan.zhu@intel.com>
+Subject: Re: Re: [PATCH] vhost-vdpa: fail enabling virtqueue in certain
+ conditions
+Message-ID: <wixps4w7rnbd67t5is6wtqvuw7e3waat4no3embl3vnjimtxvz@pemiyojtmunz>
+References: <20240206145154.118044-1-sgarzare@redhat.com>
+ <CACGkMEs-FAz7Xv7j6k3grq97q9qO18Em2bLDS4qBaCDZS7+gbQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Wed, 07 Feb 2024 09:06:54 +0100
-From: Harald Freudenberger <freude@linux.ibm.com>
-To: Anthony Krowiak <akrowiak@linux.ibm.com>
-Cc: Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, imbrenda@linux.ibm.com, thuth@redhat.com,
-        david@redhat.com, nsg@linux.ibm.com, nrb@linux.ibm.com,
-        jjherne@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH v4 1/7] lib: s390x: Add ap library
-Reply-To: freude@linux.ibm.com
-Mail-Reply-To: freude@linux.ibm.com
-In-Reply-To: <e7a10411-ce12-4e44-8320-50ecea342059@linux.ibm.com>
-References: <20240202145913.34831-1-frankja@linux.ibm.com>
- <20240202145913.34831-2-frankja@linux.ibm.com>
- <b1bb6df4-dea3-414d-9f53-dfd76571fbb7@linux.ibm.com>
- <a289a445-7665-4013-adfe-dd95ac3558c0@linux.ibm.com>
- <e7a10411-ce12-4e44-8320-50ecea342059@linux.ibm.com>
-Message-ID: <f340dad2cca9fe47737a8742ecd7554e@linux.ibm.com>
-X-Sender: freude@linux.ibm.com
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: YPWs_9ZHD6XJq6BVoO5mJzypLGKKJQyQ
-X-Proofpoint-ORIG-GUID: -0YoyVMYxsrGdXMos3cTS9T8fChFAzp6
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-07_02,2024-01-31_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
- spamscore=0 bulkscore=0 phishscore=0 suspectscore=0 mlxlogscore=999
- malwarescore=0 lowpriorityscore=0 clxscore=1015 priorityscore=1501
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2402070060
+In-Reply-To: <CACGkMEs-FAz7Xv7j6k3grq97q9qO18Em2bLDS4qBaCDZS7+gbQ@mail.gmail.com>
 
-On 2024-02-06 16:55, Anthony Krowiak wrote:
-> On 2/6/24 8:42 AM, Janosch Frank wrote:
->> On 2/5/24 19:15, Anthony Krowiak wrote:
->>> I made a few comments and suggestions. I am not very well-versed in 
->>> the
->>> inline assembly code, so I'll leave that up to someone who is more
->>> knowledgeable. I copied @Harald since I believe it was him who wrote 
->>> it.
->>> 
->>> On 2/2/24 9:59 AM, Janosch Frank wrote:
->>>> Add functions and definitions needed to test the Adjunct
->>>> Processor (AP) crypto interface.
->>>> 
->>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> 
->> [...]
->> 
->>>> +/* Will later be extended to a proper setup function */
->>>> +bool ap_setup(void)
->>>> +{
->>>> +    /*
->>>> +     * Base AP support has no STFLE or SCLP feature bit but the
->>>> +     * PQAP QCI support is indicated via stfle bit 12. As this
->>>> +     * library relies on QCI we bail out if it's not available.
->>>> +     */
->>>> +    if (!test_facility(12))
->>>> +        return false;
->>> 
->>> 
->>> The STFLE.12 can be turned off when starting the guest, so this may 
->>> not
->>> be a valid test.
->>> 
->>> We use the ap_instructions_available function (in ap.h) which 
->>> executes
->>> the TAPQ command to verify whether the AP instructions are installed 
->>> or
->>> not. Maybe you can do something similar here:
->> 
->> This library relies on QCI, hence we only check for stfle.
->> I see no sense in manually probing the whole APQN space.
-> 
-> 
-> Makes sense. I was thrown off by the PQAP_FC enumeration which
-> includes all of the AP function codes.
-> 
-> 
->> 
->> 
->> If stfle 12 is indicated I'd expect AP instructions to not generate 
->> exceptions or do they in a sane CPU model?
-> 
-> 
-> No, I would not expect PQAP(QCI) to generate an exception if STFLE 12
-> is indicated.
-> 
+On Wed, Feb 07, 2024 at 11:27:14AM +0800, Jason Wang wrote:
+>On Tue, Feb 6, 2024 at 10:52 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
+>>
+>> If VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK is not negotiated, we expect
+>> the driver to enable virtqueue before setting DRIVER_OK. If the driver
+>> tries anyway, better to fail right away as soon as we get the ioctl.
+>> Let's also update the documentation to make it clearer.
+>>
+>> We had a problem in QEMU for not meeting this requirement, see
+>> https://lore.kernel.org/qemu-devel/20240202132521.32714-1-kwolf@redhat.com/
+>
+>Maybe it's better to only enable cvq when the backend supports
+>VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK. Eugenio, any comment on this?
+>
+>>
+>> Fixes: 9f09fd6171fe ("vdpa: accept VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK backend feature")
+>> Cc: eperezma@redhat.com
+>> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+>> ---
+>>  include/uapi/linux/vhost_types.h | 3 ++-
+>>  drivers/vhost/vdpa.c             | 4 ++++
+>>  2 files changed, 6 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/include/uapi/linux/vhost_types.h b/include/uapi/linux/vhost_types.h
+>> index d7656908f730..5df49b6021a7 100644
+>> --- a/include/uapi/linux/vhost_types.h
+>> +++ b/include/uapi/linux/vhost_types.h
+>> @@ -182,7 +182,8 @@ struct vhost_vdpa_iova_range {
+>>  /* Device can be resumed */
+>>  #define VHOST_BACKEND_F_RESUME  0x5
+>>  /* Device supports the driver enabling virtqueues both before and after
+>> - * DRIVER_OK
+>> + * DRIVER_OK. If this feature is not negotiated, the virtqueues must be
+>> + * enabled before setting DRIVER_OK.
+>>   */
+>>  #define VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK  0x6
+>>  /* Device may expose the virtqueue's descriptor area, driver area and
+>> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+>> index bc4a51e4638b..1fba305ba8c1 100644
+>> --- a/drivers/vhost/vdpa.c
+>> +++ b/drivers/vhost/vdpa.c
+>> @@ -651,6 +651,10 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
+>>         case VHOST_VDPA_SET_VRING_ENABLE:
+>>                 if (copy_from_user(&s, argp, sizeof(s)))
+>>                         return -EFAULT;
+>> +               if (!vhost_backend_has_feature(vq,
+>> +                       VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK) &&
+>> +                   (ops->get_status(vdpa) & VIRTIO_CONFIG_S_DRIVER_OK))
+>> +                       return -EINVAL;
+>
+>As discussed, without VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK, we don't
+>know if parents can do vq_ready after driver_ok.
+>
+>So maybe we need to keep this behaviour to unbreak some "legacy" userspace?
 
-Hm, I am not sure if you can rely just on checking stfle bit 12 and if 
-that's available assume
-you have AP instructions. I never tried this. But as far as I know the 
-KVM guys there is a chance
-that you see a stfle bit 12 but get an illegal instruction exception the 
-moment you call
-an AP instruction... Maybe check this before relying on such a thing.
+I'm not sure it's a good idea, since "legacy" userspace are currently 
+broken if used with VDUSE device. So we need to fix userspace in any 
+case, and IMHO is better if we start to return an error, so the user 
+understands what went wrong, because the problem in QEMU took us quite 
+some time to figure out that we couldn't enable vq after DRIVER_OK.
 
->> 
->> 
->>>> +
->>>> +    return true;
->>>> +}
->>>> diff --git a/lib/s390x/ap.h b/lib/s390x/ap.h
->>>> new file mode 100644
->>>> index 00000000..b806513f
->>>> --- /dev/null
->>>> +++ b/lib/s390x/ap.h
->>>> @@ -0,0 +1,88 @@
->>>> +/* SPDX-License-Identifier: GPL-2.0-only */
->>>> +/*
->>>> + * AP definitions
->>>> + *
->>>> + * Some parts taken from the Linux AP driver.
->>>> + *
->>>> + * Copyright IBM Corp. 2024
->>>> + * Author: Janosch Frank <frankja@linux.ibm.com>
->>>> + *       Tony Krowiak <akrowia@linux.ibm.com>
->>>> + *       Martin Schwidefsky <schwidefsky@de.ibm.com>
->>>> + *       Harald Freudenberger <freude@de.ibm.com>
->>>> + */
->>>> +
->>>> +#ifndef _S390X_AP_H_
->>>> +#define _S390X_AP_H_
->>>> +
->>>> +enum PQAP_FC {
->>>> +    PQAP_TEST_APQ,
->>>> +    PQAP_RESET_APQ,
->>>> +    PQAP_ZEROIZE_APQ,
->>>> +    PQAP_QUEUE_INT_CONTRL,
->>>> +    PQAP_QUERY_AP_CONF_INFO,
->>>> +    PQAP_QUERY_AP_COMP_TYPE,
->>>> +    PQAP_BEST_AP,
->>> 
->>> 
->>> Maybe use abbreviations like your function names above?
->>> 
->>>     PQAP_TAPQ,
->>>     PQAP_RAPQ,
->>>     PQAP_ZAPQ,
->>>     PQAP_AQIC,
->>>     PQAP_QCI,
->>>     PQAP_QACT,
->>>     PQAP_QBAP
->>> 
->> 
->> Hmmmmmmm(TM)
->> My guess is that I tried making these constants readable without 
->> consulting architecture documents. But another option is using the 
->> constants that you suggested and adding comments with a long version.
-> 
-> 
-> I think that works out better; you won't have to abbreviate the longer
-> version which will make it easier to understand.
-> 
-> 
->> 
->> Will do
->> 
->> [...]
->> 
->>>> +struct pqap_r0 {
->>>> +    uint32_t pad0;
->>>> +    uint8_t fc;
->>>> +    uint8_t t : 1;        /* Test facilities (TAPQ)*/
->>>> +    uint8_t pad1 : 7;
->>>> +    uint8_t ap;
->>> 
->>> 
->>> This is the APID part of an APQN, so how about renaming to 'apid'
->>> 
->>> 
->>>> +    uint8_t qn;
->>> 
->>> 
->>> This is the APQI  part of an APQN, so how about renaming to 'apqi'
->> 
->> Hmm Linux uses qid
->> I'll change it to the Linux naming convention, might take me a while 
->> though
-> 
-> 
-> Well, the AP bus uses qid, but the vfio_ap module and the architecture
-> doc uses APQN. In any case, it's a nit and I'm not terribly concerned
-> about it.
-> 
-> 
->> 
->>> 
->>> 
->>>> +} __attribute__((packed)) __attribute__((aligned(8)));
->>>> +
->>>> +struct pqap_r2 {
->>>> +    uint8_t s : 1;        /* Special Command facility */
->>>> +    uint8_t m : 1;        /* AP4KM */
->>>> +    uint8_t c : 1;        /* AP4KC */
->>>> +    uint8_t cop : 1;    /* AP is in coprocessor mode */
->>>> +    uint8_t acc : 1;    /* AP is in accelerator mode */
->>>> +    uint8_t xcp : 1;    /* AP is in XCP-mode */
->>>> +    uint8_t n : 1;        /* AP extended addressing facility */
->>>> +    uint8_t pad_0 : 1;
->>>> +    uint8_t pad_1[3];
->>> 
->>> 
->>> Is there a reason why the 'Classification'  field is left out?
->>> 
->> 
->> It's not used in this library and therefore I chose to not name it to 
->> make structs a bit more readable.
-> 
-> 
-> Okay, not a problem.
-> 
-> 
->> 
->>> 
->>>> +    uint8_t at;
->>>> +    uint8_t nd;
->>>> +    uint8_t pad_6;
->>>> +    uint8_t pad_7 : 4;
->>>> +    uint8_t qd : 4;
->>>> +} __attribute__((packed))  __attribute__((aligned(8)));
->>>> +_Static_assert(sizeof(struct pqap_r2) == sizeof(uint64_t), "pqap_r2 
->>>> size");
->>>> +
->>>> +bool ap_setup(void);
->>>> +int ap_pqap_tapq(uint8_t ap, uint8_t qn, struct ap_queue_status 
->>>> *apqsw,
->>>> +         struct pqap_r2 *r2);
->>>> +int ap_pqap_qci(struct ap_config_info *info);
->>>> +#endif
->>>> diff --git a/s390x/Makefile b/s390x/Makefile
->>>> index 7fce9f9d..4f6c627d 100644
->>>> --- a/s390x/Makefile
->>>> +++ b/s390x/Makefile
->>>> @@ -110,6 +110,7 @@ cflatobjs += lib/s390x/malloc_io.o
->>>>    cflatobjs += lib/s390x/uv.o
->>>>    cflatobjs += lib/s390x/sie.o
->>>>    cflatobjs += lib/s390x/fault.o
->>>> +cflatobjs += lib/s390x/ap.o
->>>>       OBJDIRS += lib/s390x
->> 
+Since userspace is unable to understand if a vhost-vdpa device is VDUSE 
+or not, I think we have only 2 options either merge this patch or fix 
+VDUSE somehow. But the last one I think is more complicated/intrusive.
+
+Thanks,
+Stefano
+
+>
+>For example ifcvf did:
+>
+>static void ifcvf_vdpa_set_vq_ready(struct vdpa_device *vdpa_dev,
+>                                    u16 qid, bool ready)
+>{
+>  struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
+>
+>        ifcvf_set_vq_ready(vf, qid, ready);
+>}
+>
+>And it did:
+>
+>void ifcvf_set_vq_ready(struct ifcvf_hw *hw, u16 qid, bool ready)
+>{
+>        struct virtio_pci_common_cfg __iomem *cfg = hw->common_cfg;
+>
+>        vp_iowrite16(qid, &cfg->queue_select);
+>        vp_iowrite16(ready, &cfg->queue_enable);
+>}
+>
+>Though it didn't advertise VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK?
+>
+>Adding LingShan for more thought.
+>
+>Thanks
+>
+>>                 ops->set_vq_ready(vdpa, idx, s.num);
+>>                 return 0;
+>>         case VHOST_VDPA_GET_VRING_GROUP:
+>> --
+>> 2.43.0
+>>
+>
+
 
