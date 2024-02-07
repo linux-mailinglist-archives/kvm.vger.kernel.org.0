@@ -1,157 +1,172 @@
-Return-Path: <kvm+bounces-8233-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8235-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E53A84CDBD
-	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 16:10:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0877184CDD2
+	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 16:17:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 047C6281FD0
-	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 15:10:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99E171F23386
+	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 15:17:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F29CB7FBC4;
-	Wed,  7 Feb 2024 15:10:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 410A37F7D9;
+	Wed,  7 Feb 2024 15:17:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AtX7nhxl"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ljNFezj+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 617AA7F481
-	for <kvm@vger.kernel.org>; Wed,  7 Feb 2024 15:10:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E24E7E77F;
+	Wed,  7 Feb 2024 15:17:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707318633; cv=none; b=mi114vKRU8/xNtzaq66C71raRv8tIo7ugY3uJ/PI1J1GrN5oZHtj32QYlmDKQq3XyN7geq4lc+jQ4El5m35bk3wEe0/YkU0LdISAoCE5+q8U4sSjWCY+eZAz0ElMW95Jv/UGr+zLQrvix1qC45zARj7X0Q6Ayu1jmfb3kumpS5c=
+	t=1707319042; cv=none; b=oXZpn15sRzbED1TXBX89XNTM4G4/vhei6cx5qDHVkvmy/c2pbAW8GmGO8xNjkYbi5UTYCqUj6XFhFXikBvyG/C26tc/lQHsaoapC8IzUi0TULStjU0hlj6Nn9hxd7uaFSyKtGdK/Eh0nxQJrNFLHBvaot29msGPBtHWPqpBlLLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707318633; c=relaxed/simple;
-	bh=TDeuMYw3V5mfviFayWil0sUeiH295xl/tQfWNiFIdFg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=c5cP8crJan6ef7nilO8tm8LT2tSHuZFgPERiyrQf/kbpr3gIJlHzYHKy/4M3Bv/4RGmp470zvGlpWPIc9AeTA01KgI9B7SRZCgiLMenPFa/2dKHZbxww8jAsEUD2uO6L20/6mcYU6386HbrpLNnBOhicPDoriT31AOteivlKPOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AtX7nhxl; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc6b26eef6cso966507276.3
-        for <kvm@vger.kernel.org>; Wed, 07 Feb 2024 07:10:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707318630; x=1707923430; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=C/5FPgGvRtWIxXt/NaMkBCrrVZJi2vGASXviIWBw83Q=;
-        b=AtX7nhxlgibTRw+/Xuk1ltRXz6DAeXR1MOjqdE8mMFF5Q1PrKrmwcQ2E2imBhe5l+E
-         DVVO95MQh6dG2yMwt7utxjtaBVlTlk4qd11EO6K3i+l8CLvR6kdlxt8m6kJSQw9DsS1D
-         EIx8NoYelrredMlJj7KtQDH3JM90e/KNnwpYkUEuKjCsQkv8OzXuHuZ3ZzMIosC3rWKI
-         N5UqY4+VBR5F8oFEn8wVaUa93sIi4LDQnoXlUlVSfCemXIfkCOHriP4SGwLopFs5d0EE
-         /keGIyll82Q24nQQHjsDbdV+4cz2aq3IzBC+Hhxd5rXpbkVy88gzZWC5DQUKVyZ3p928
-         UcMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707318630; x=1707923430;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=C/5FPgGvRtWIxXt/NaMkBCrrVZJi2vGASXviIWBw83Q=;
-        b=gNZ8owu92ervLZfrxliKBv5Ot9gR8e/saF6r5TdGPbS1SXm5bc9lrwmrr5/cRQbrvu
-         9ZAeT75NrjNhsrGmh7nGauRWNT2gw4+Ncl3qCWR5eqQcRDdCczsBsaKQrvmG2EQrRkMb
-         TeWiulOruVZ/0HHPy3eYtXi+bSuzSeKAylESPFj8eS8CUAmuUFUDJOldJZMA6xDvLFpU
-         KnD+0OmuwarvwrKaM/WjejtVHcB2CH1B/qclvgipE6nzrgSI8VeMFsJvH6wLuYA8xe/U
-         1pZ3bLf+02ceP/WJdM+xzZhXaqcLZY2CXPEJeF0pju5zRBmYXDZk1Sl2f+HZswLwzwPz
-         ovBg==
-X-Gm-Message-State: AOJu0YzbFTZGuHeYLBTXQyK5Rni9z53eEmmla6O9xhCAWWQexyzcWOBH
-	PvdKmH+lxlD1ZGfxwdJ9WkjmBcvUAqgvKwOEtg8moZCS2kBj4JqTUqJTi0jfdFwrWn7WXbAxmR9
-	Ifw==
-X-Google-Smtp-Source: AGHT+IFvJL9oypygwTLZ3VHM332NyBw8WKMDivEtxpFXSaOzxlyiHKWCNbhIvXGG/Y4f74o4QcvLCt4/dbI=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:220c:b0:dc2:5456:d9ac with SMTP id
- dm12-20020a056902220c00b00dc25456d9acmr181054ybb.5.1707318630365; Wed, 07 Feb
- 2024 07:10:30 -0800 (PST)
-Date: Wed, 7 Feb 2024 07:10:28 -0800
-In-Reply-To: <a817d64f3fe7b935a02e78df02dc0c6281e61af3.camel@infradead.org>
+	s=arc-20240116; t=1707319042; c=relaxed/simple;
+	bh=HaVwog0vd20fRKI8tk8LKuyAmGU4sQJZhYsnB/xkj5U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f4lTtvQyMWW2mtEOggBYFloPP5IZI1zA4acfsjcd6p/83cjwIFKCoKjnZOKFoU9+3l/oe1yKlHO5Zz/TF4PsB+FmS3QJ1cQbfzhY3hv5AVg0KCe/7QUlOk8AN0lin7SBRpgrx9V6F/Cj4PnvlhrZQ43JYK2KpHWtHzU/7hl0RJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ljNFezj+; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707319040; x=1738855040;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=HaVwog0vd20fRKI8tk8LKuyAmGU4sQJZhYsnB/xkj5U=;
+  b=ljNFezj+yRIK1tU8w7rnmY+UpOSZJPEn+GD4gcS5bzKJeP2v71DwSbfz
+   kkdxYx+W/R4QVenb/OlBOmUj74PXUZDy5xRNLdUfLD7Mll/Oeh6hZviw/
+   d59A9tr331+wHN2ArXcR/AKdXkcgq/R1Vz5gXswEqpxN/fXVGXwHAF8Go
+   A8oC1QBlH28tKTPNs+O+9Fl/NcFB8pB5TtafxLJ2EL65X6g+i/TwC7i0P
+   Zk4ToDtz3QtLkJDYn9qKDopgPLQ4tve+pjShTWYuwiHogD/9ySD3CfpnI
+   M+Prs2oWTFTnvAU0jV6Nbs5X6lJJ2HSj6n3fw3lcFGzIG66iO7z+Rs7NL
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10977"; a="11742453"
+X-IronPort-AV: E=Sophos;i="6.05,251,1701158400"; 
+   d="scan'208";a="11742453"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Feb 2024 07:17:20 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,251,1701158400"; 
+   d="scan'208";a="32431766"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by fmviesa001.fm.intel.com with ESMTP; 07 Feb 2024 07:17:18 -0800
+Date: Wed, 7 Feb 2024 23:13:41 +0800
+From: Xu Yilun <yilun.xu@linux.intel.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
+	Pattara Teerapong <pteerapong@google.com>
+Subject: Re: [PATCH 7/8] KVM: x86/mmu: Alloc TDP MMU roots while holding
+ mmu_lock for read
+Message-ID: <ZcOeJXHsiE5XUrBv@yilunxu-OptiPlex-7050>
+References: <20240111020048.844847-1-seanjc@google.com>
+ <20240111020048.844847-8-seanjc@google.com>
+ <ZcJSmNRLbKacPfoq@yilunxu-OptiPlex-7050>
+ <ZcJ2JG54O0g07e-P@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240115125707.1183-1-paul@xen.org> <20240115125707.1183-19-paul@xen.org>
- <ZcMFb1epchA7Mbzo@google.com> <bbd59a2c0897d8ca642ea8c4787b829190e75a4d.camel@infradead.org>
- <ZcMLX5Omum3riZe8@google.com> <a817d64f3fe7b935a02e78df02dc0c6281e61af3.camel@infradead.org>
-Message-ID: <ZcOdZKmmYz3kMgwp@google.com>
-Subject: Re: [PATCH v12 18/20] KVM: pfncache: check the need for invalidation
- under read lock first
-From: Sean Christopherson <seanjc@google.com>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Paul Durrant <paul@xen.org>, Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZcJ2JG54O0g07e-P@google.com>
 
-On Tue, Feb 06, 2024, David Woodhouse wrote:
-> On Tue, 2024-02-06 at 20:47 -0800, Sean Christopherson wrote:
-> >=20
-> > I'm saying this:
-> >=20
-> > =C2=A0 When processing mmu_notifier invalidations for gpc caches, pre-c=
-heck for
-> > =C2=A0 overlap with the invalidation event while holding gpc->lock for =
-read, and
-> > =C2=A0 only take gpc->lock for write if the cache needs to be invalidat=
-ed.=C2=A0 Doing
-> > =C2=A0 a pre-check without taking gpc->lock for write avoids unnecessar=
-ily
-> > =C2=A0 contending the lock for unrelated invalidations, which is very b=
-eneficial
-> > =C2=A0 for caches that are heavily used (but rarely subjected to mmu_no=
-tifier
-> > =C2=A0 invalidations).
-> >=20
-> > is much friendlier to readers than this:
-> >=20
-> > =C2=A0 Taking a write lock on a pfncache will be disruptive if the cach=
-e is
-> > =C2=A0 heavily used (which only requires a read lock). Hence, in the MM=
-U notifier
-> > =C2=A0 callback, take read locks on caches to check for a match; only t=
-aking a
-> > =C2=A0 write lock to actually perform an invalidation (after a another =
-check).
->=20
-> That's a somewhat subjective observation. I actually find the latter to
-> be far more succinct and obvious.
->=20
-> Actually... maybe I find yours harder because it isn't actually stating
-> the situation as I understand it. You said "unrelated invalidation" in
-> your first email, and "overlap with the invalidation event" in this
-> one... neither of which makes sense to me because there is no *other*
-> invalidation here.
+On Tue, Feb 06, 2024 at 10:10:44AM -0800, Sean Christopherson wrote:
+> On Tue, Feb 06, 2024, Xu Yilun wrote:
+> > On Wed, Jan 10, 2024 at 06:00:47PM -0800, Sean Christopherson wrote:
+> > > ---
+> > >  arch/x86/kvm/mmu/tdp_mmu.c | 55 +++++++++++++++-----------------------
+> > >  1 file changed, 22 insertions(+), 33 deletions(-)
+> > > 
+> > > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> > > index 9a8250a14fc1..d078157e62aa 100644
+> > > --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> > > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> > > @@ -223,51 +223,42 @@ static void tdp_mmu_init_child_sp(struct kvm_mmu_page *child_sp,
+> > >  	tdp_mmu_init_sp(child_sp, iter->sptep, iter->gfn, role);
+> > >  }
+> > >  
+> > > -static struct kvm_mmu_page *kvm_tdp_mmu_try_get_root(struct kvm_vcpu *vcpu)
+> > > -{
+> > > -	union kvm_mmu_page_role role = vcpu->arch.mmu->root_role;
+> > > -	int as_id = kvm_mmu_role_as_id(role);
+> > > -	struct kvm *kvm = vcpu->kvm;
+> > > -	struct kvm_mmu_page *root;
+> > > -
+> > > -	for_each_valid_tdp_mmu_root_yield_safe(kvm, root, as_id) {
+> > > -		if (root->role.word == role.word)
+> > > -			return root;
+> > > -	}
+> > > -
+> > > -	return NULL;
+> > > -}
+> > > -
+> > >  int kvm_tdp_mmu_alloc_root(struct kvm_vcpu *vcpu)
+> > >  {
+> > >  	struct kvm_mmu *mmu = vcpu->arch.mmu;
+> > >  	union kvm_mmu_page_role role = mmu->root_role;
+> > > +	int as_id = kvm_mmu_role_as_id(role);
+> > >  	struct kvm *kvm = vcpu->kvm;
+> > >  	struct kvm_mmu_page *root;
+> > >  
+> > >  	/*
+> > > -	 * Check for an existing root while holding mmu_lock for read to avoid
+> > > +	 * Check for an existing root before acquiring the pages lock to avoid
+> > >  	 * unnecessary serialization if multiple vCPUs are loading a new root.
+> > >  	 * E.g. when bringing up secondary vCPUs, KVM will already have created
+> > >  	 * a valid root on behalf of the primary vCPU.
+> > >  	 */
+> > >  	read_lock(&kvm->mmu_lock);
+> > > -	root = kvm_tdp_mmu_try_get_root(vcpu);
+> > > -	read_unlock(&kvm->mmu_lock);
+> > >  
+> > > -	if (root)
+> > > -		goto out;
+> > > +	for_each_valid_tdp_mmu_root_yield_safe(kvm, root, as_id) {
+> > > +		if (root->role.word == role.word)
+> > > +			goto out_read_unlock;
+> > > +	}
+> > >  
+> > > -	write_lock(&kvm->mmu_lock);
+> > 
+> > It seems really complex to me...
+> > 
+> > I failed to understand why the following KVM_BUG_ON() could be avoided
+> > without the mmu_lock for write. I thought a valid root could be added
+> > during zapping.
+> > 
+> >   void kvm_tdp_mmu_zap_invalidated_roots(struct kvm *kvm)
+> >   {
+> > 	struct kvm_mmu_page *root;
+> > 
+> > 	read_lock(&kvm->mmu_lock);
+> > 
+> > 	for_each_tdp_mmu_root_yield_safe(kvm, root) {
+> > 		if (!root->tdp_mmu_scheduled_root_to_zap)
+> > 			continue;
+> > 
+> > 		root->tdp_mmu_scheduled_root_to_zap = false;
+> > 		KVM_BUG_ON(!root->role.invalid, kvm);
+> 
+> tdp_mmu_scheduled_root_to_zap is set only when mmu_lock is held for write, i.e.
+> it's mutually exclusive with allocating a new root.
+> 
+> And tdp_mmu_scheduled_root_to_zap is cleared if and only if kvm_tdp_mmu_zap_invalidated_roots
+> is already set, and is only processed by kvm_tdp_mmu_zap_invalidated_roots(),
+> which runs under slots_lock (a mutex).
+> 
+> So a new, valid root can be added, but it won't have tdp_mmu_scheduled_root_to_zap
+> set, at least not until the current "fast zap" completes and a new one beings,
+> which as above requires taking mmu_lock for write.
 
-I am referring to the "mmu_notifier invalidation event".  While a particula=
-r GPC
-may not be affected by the invalidation, it's entirely possible that a diff=
-erent
-GPC and/or some chunk of guest memory does need to be invalidated/zapped.
+It's clear to me.
 
-> We're only talking about the MMU notifier gratuitously taking the write
-
-It's not "the MMU notifier" though, it's KVM that unnecessarily takes a loc=
-k.  I
-know I'm being somewhat pedantic, but the distinction does matter.  E.g. wi=
-th
-guest_memfd, there will be invalidations that get routed through this code,=
- but
-that do not originate in the mmu_notifier.
-
-And I think it's important to make it clear to readers that an mmu_notifier=
- really
-just is a notification from the primary MMU, albeit a notification that com=
-es with
-a rather strict contract.
-
-> lock on a GPC that it *isn't* going to invalidate (the common case),
-> and that disrupting users which are trying to take the read lock on
-> that GPC.
+Thanks for the detailed explanation.
+> 
 
