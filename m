@@ -1,105 +1,85 @@
-Return-Path: <kvm+bounces-8285-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8286-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A192584D582
-	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 23:11:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2109484D5A8
+	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 23:16:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 548161F2B66E
-	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 22:11:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE8DA2824B9
+	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 22:16:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 768AB128360;
-	Wed,  7 Feb 2024 21:41:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A0B8149DFB;
+	Wed,  7 Feb 2024 22:07:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RyNazpMF"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TApMJgiS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FC2780050
-	for <kvm@vger.kernel.org>; Wed,  7 Feb 2024 21:41:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 211F1149DF2
+	for <kvm@vger.kernel.org>; Wed,  7 Feb 2024 22:07:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707342085; cv=none; b=hmxGnlgk6EJBf3qD+sNKWZgLZBDcgqW9MxTXbEzjQRVlYBaT+32jMX3XfujQHLgQzpYehne6qOP8XL6pVYNo5aaKlZGgB77UAatG0Y/BNlaUnbRVKjQPvizl5CXAubAqF0BWHUpDDsAKV8S82h3J7CZxMRgXJ/GpYnieeAAgqc8=
+	t=1707343659; cv=none; b=NBUwln7ECitUJT5wwF2bFa/BezXc8BWP/JUygQ4kAsX6DDKLta895l3PDEk6Wvxwi0Q/tnyc5nyjWDGGqOfkFPScvclQ2BaEsLIPsDFpjftNoi0DwNTRdzQjq2WmMIvKfD4jP4/j7w0On/DgwC1NIsZ9CcERDoL8Cv65pNAL7Nc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707342085; c=relaxed/simple;
-	bh=m0X4iYY47mytjams2aAWGUUTlmfK2BhzrJXilnIMHUc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=iDh8u39E8gOfhBANsAn4tkMHoC3JjseU8BCpI4Pr67SyFNndPNxlzo4ZxLpmkEwGjDJJCurp9l5f5OuzTKoThs8d01Q1W/mH63IuniOmrIYAb/KND2yh9eBvhTQZFq7psb3Zdp34WRP28pQiSPIg7TGueKoYOQUxSsM5UPRk/2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RyNazpMF; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5c66a69ec8eso925252a12.3
-        for <kvm@vger.kernel.org>; Wed, 07 Feb 2024 13:41:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707342083; x=1707946883; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+uqJkD0pNiGFSzVNfxf/EpblheLHB1ALRvEiBOY/f2Q=;
-        b=RyNazpMFM2hrquVMChv73zs5N93tR7ZR2V/ouqqeRl6KyrcIDVMOANs5KZnHVt46X/
-         uKa2/pZvgGP+rT4cmzA8JDzBMSfp7QZQBm9sf3GthQaNWXeIcbRO7s0HCOlMqCONnq44
-         OKpU+1fPhxSvZZKzDOcxaXSAQdgsk08YaPjmXxx9nePmT8IzZSkg+v7iVR2UcTjyEgoD
-         HqnaAPkyTEIcCR6JJaCTvHIGnm+bN5Z8YyIbuQvlJJA5kTIlGMbDwkCukSxMCxoQAFLt
-         tTdkN5X5MSBfmlN3VVVakLAv+AZthDT8QIVq1irzYxF4x/bYAgw/rnKA093FZb9AlJbz
-         atQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707342083; x=1707946883;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=+uqJkD0pNiGFSzVNfxf/EpblheLHB1ALRvEiBOY/f2Q=;
-        b=vsVThHvF0aAQIr5jT+A4Rb5dzbvsvpaYo+LDL7TZIt/sZJ8iyneYfSCY2rmgA+dJrc
-         bR6tcAuP/IFirJ+fnX07SxHf/RotLDAX/wudmLgdkHSd8DhSOydI7QMrLTVstpiw3/O0
-         MmNIy8yjtGH+M9bcjnBsGyn+CFQWiEc5G2ugWA43fLQ2Jl9UteDQFqHKVUB1isDYcTJm
-         JrzE2WE+59Gyp/V/UXJIcZy59zwIxKmZLH3nmYnfE83PABdoC9tfW1mfqnJTBzssbQPB
-         qqpHwJGW9s+L6vLLlIRn2iYLbEeE8CVOZuXeq7h/q/rR+T/k0h/6Tdei1wcQ+L3BvbF9
-         Axvw==
-X-Gm-Message-State: AOJu0Yzj6/JoYp+WUrUl7+FV6oSryzeUbprVUO9s/kuHzkFUgrCd4vrQ
-	8wyLGOxL4cqqPafPiSMvMd5ymOmVIUDUHmk8wSGSOY/KpWWv+WHxd5J+kbj0z1bYbSynevoNVPo
-	dbQ==
-X-Google-Smtp-Source: AGHT+IFpdEi45Rjll8ycI0QJQfD6b8UOFdWhoFwT1NQma5Og9bbNF3xTCRlDkTCknSmCb3ZTBclclI1LzO4=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a02:8c8:b0:5dc:1c7d:2c75 with SMTP id
- ch8-20020a056a0208c800b005dc1c7d2c75mr11022pgb.1.1707342083319; Wed, 07 Feb
- 2024 13:41:23 -0800 (PST)
-Date: Wed, 7 Feb 2024 13:41:21 -0800
-In-Reply-To: <CAF7b7mqOCP2NiMsvzfpYaEaKWm4AzrRAHSGgQT9BWhRD1mcBcg@mail.gmail.com>
+	s=arc-20240116; t=1707343659; c=relaxed/simple;
+	bh=lQKTmXXfyL2HGCwmb6GhwD64ciTo7eQTjNUAe0lEzl4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JSzhdgLk6K1wLLC7C5S6FLI2bVE7H0ajeZAzeTRZWfGazrweqZyBJTw7gbYWocGXK0UC8oNaoRBXLbnHfcr2+SNAli05+29qa5CPp+83kIPiyG6ty43R4fAawAYF0toYsmnQ+XaUD9V8EQ7C5o8dJGpZYJt2gnhXRZ3GlQo5NJI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TApMJgiS; arc=none smtp.client-ip=95.215.58.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Wed, 7 Feb 2024 22:07:32 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1707343654;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=31fjjN/2eR9+G4chn6VsAsEY/daqpMI5kFarOQVJ+Oo=;
+	b=TApMJgiSddK6T73OIk+8bc+zjN5Ckb/zGPufuxwpRpcrqE0AAbToUBmGaLGYq/aOaL91k+
+	rBpb74dgeEPezUcB20eIplglFepUzPejJu7NrgBnIAWjLJNlcqRj6DAGGp/6g4LXtzuqgM
+	hbS0VMTzTuFuEz4t2xcKDXCppCyGer8=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Anish Moorthy <amoorthy@google.com>
+Cc: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org,
+	robert.hoo.linux@gmail.com, jthoughton@google.com,
+	dmatlack@google.com, axelrasmussen@google.com, peterx@redhat.com,
+	nadav.amit@gmail.com, isaku.yamahata@gmail.com,
+	kconsul@linux.vnet.ibm.com
+Subject: Re: [PATCH v6 08/14] KVM: arm64: Enable KVM_CAP_MEMORY_FAULT_INFO
+Message-ID: <ZcP_JHsMJUlvjAs1@linux.dev>
+References: <20231109210325.3806151-1-amoorthy@google.com>
+ <20231109210325.3806151-9-amoorthy@google.com>
+ <CAF7b7mqDN97OM7kgS--KsDygokUHd=wiZjYPVz3yk7UB0jF_6w@mail.gmail.com>
+ <ZcOkRoQn7Q-GcQ_s@google.com>
+ <ZcOysZC2TI7hZBPA@linux.dev>
+ <CAF7b7mqOCP2NiMsvzfpYaEaKWm4AzrRAHSGgQT9BWhRD1mcBcg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231109210325.3806151-1-amoorthy@google.com> <20231109210325.3806151-9-amoorthy@google.com>
- <CAF7b7mqDN97OM7kgS--KsDygokUHd=wiZjYPVz3yk7UB0jF_6w@mail.gmail.com>
- <ZcOkRoQn7Q-GcQ_s@google.com> <ZcOysZC2TI7hZBPA@linux.dev> <CAF7b7mqOCP2NiMsvzfpYaEaKWm4AzrRAHSGgQT9BWhRD1mcBcg@mail.gmail.com>
-Message-ID: <ZcP5ASva7h1gWhx7@google.com>
-Subject: Re: [PATCH v6 08/14] KVM: arm64: Enable KVM_CAP_MEMORY_FAULT_INFO
-From: Sean Christopherson <seanjc@google.com>
-To: Anish Moorthy <amoorthy@google.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	pbonzini@redhat.com, maz@kernel.org, robert.hoo.linux@gmail.com, 
-	jthoughton@google.com, dmatlack@google.com, axelrasmussen@google.com, 
-	peterx@redhat.com, nadav.amit@gmail.com, isaku.yamahata@gmail.com, 
-	kconsul@linux.vnet.ibm.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAF7b7mqOCP2NiMsvzfpYaEaKWm4AzrRAHSGgQT9BWhRD1mcBcg@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Feb 07, 2024, Anish Moorthy wrote:
-> On Wed, Feb 7, 2024 at 8:41=E2=80=AFAM Oliver Upton <oliver.upton@linux.d=
-ev> wrote:
+On Wed, Feb 07, 2024 at 01:21:05PM -0800, Anish Moorthy wrote:
+> On Wed, Feb 7, 2024 at 8:41 AM Oliver Upton <oliver.upton@linux.dev> wrote:
 > >
 > > On Wed, Feb 07, 2024 at 07:39:50AM -0800, Sean Christopherson wrote:
 > >
 > > Having said that...
 > >
-> > > be part of this patch.  Because otherwise, advertising KVM_CAP_MEMORY=
-_FAULT_INFO
-> > > is a lie.  Userspace can't catch KVM in the lie, but that doesn't mak=
-e it right.
+> > > be part of this patch.  Because otherwise, advertising KVM_CAP_MEMORY_FAULT_INFO
+> > > is a lie.  Userspace can't catch KVM in the lie, but that doesn't make it right.
 > > >
 > > > That should in turn make it easier to write a useful changelog.
 > >
@@ -109,18 +89,21 @@ e it right.
 > > --
 > > Thanks,
 > > Oliver
->=20
+> 
 > Hold on, I think there may be confusion here.
+
+No, there isn't.
+
 > KVM_CAP_MEMORY_FAULT_INFO is the mechanism for reporting annotated
 > EFAULTs. These are generic in that other things (such as the guest
 > memfd stuff) may also report information to userspace using annotated
 > EFAULTs.
->=20
+> 
 > KVM_CAP_EXIT_ON_MISSING is the thing that says "do an annotated EFAULT
 > when a stage-2 violation would require faulting in host mapping" On
 > both x86 and arm64, the relevant functionality is added and the cap is
 > advertised in a single patch.
->=20
+> 
 > I think it makes sense to enable/advertise the two caps separately (as
 > I've done here). The former, after all, just says that userspace "may
 > get annotated EFAULTs for whatever reason" (as opposed to the latter
@@ -129,15 +112,34 @@ e it right.
 > annotated EFAULTs as of this patch, I don't think we're "lying" to
 > them.
 
-Neither Oliver nor I are advocating you smush the two together.  We're sayi=
-ng
-the code that actually fills memory_fault should be either (a) a separate p=
-atch
-(x86) or (b) in the patch that advertises KVM_CAP_MEMORY_FAULT_INFO (arm).
+I don't know about you, but I find describing UAPI in terms of "may" and
+"whatever reason" quite unsettling. I like to keep my interactions with
+userspace deterministic.
 
-I *highly* doubt it will matter in practice, but if there was a problem wit=
-h
-filling memory_fault, it would be nice to isolate that to a standalone patc=
-h,
-and not the EXIT_ON_MISSING_CHANGE.
+Overall, I find the informational capability to be quite superfluous as
+it pertains to this feature. Userspace has *explicitly* opted in to a
+specific behavior, and the side band capability provides no useful
+information. You can easily document KVM_CAP_MEMORY_FAULT_INFO in
+such a way that userspace expects to take this sort of exit.
+
+Nobody has presented a use case for annotated EFAULTs on arm64 beyond this
+opt-in and there is zero interest in predefining UAPI for anything else.
+x86 may've done this a different way, but that's their business.
+
+We're not making UAPI out of any of our other EFAULT returns right now.
+
+> Consider a related problem: suppose that code is added in core KVM
+> which also generates annotated EFAULTs, and that later the arm64
+> "Enable KVM_CAP_EXIT_ON_MISSING"  patch [1] ends up needing to be
+> reverted for some reason.
+
+The single rule we try to uphold in the kernel is to *never break
+userspace*, so I don't see this being in the realm of possibility. The
+moment we expose a feature to userspace we're on the hook for it in
+perpetuity, and if we break that then you're welcome to send a nastygram
+to Marc or I.
+
+-- 
+Thanks,
+Oliver
 
