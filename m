@@ -1,195 +1,230 @@
-Return-Path: <kvm+bounces-8186-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8187-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 492C384C297
-	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 03:44:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9DCC84C2B1
+	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 03:50:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00ECD285DA9
-	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 02:44:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 645E1282022
+	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 02:50:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F3FAF9EF;
-	Wed,  7 Feb 2024 02:43:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C4A6F9E0;
+	Wed,  7 Feb 2024 02:50:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="grFK2SFK"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lter6zSS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F070F10961
-	for <kvm@vger.kernel.org>; Wed,  7 Feb 2024 02:43:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707273822; cv=none; b=uTNUhxeZIekX8KaOoOz57+tS7ghLQ1OIv76tWt6LFDwZM6RFqxANv9K1PPzbGKg7ykvOR2IDk3MBbTru8xi06krXtyys0FfECX138WC/iWmRpAUSephRO4dvX7hHS30HaQfIbacJUWjCuOadyOGN05KRNcH9hmZ5eKys8C9Qi7A=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707273822; c=relaxed/simple;
-	bh=yAc2qDg86yKSHh+BWfG2RTtPpu6Cksg1ErI8pCgZ7jE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Qsz5mdFEdNH7pUxh53+O4HeUfN2TrZeefGe8BWvWtaTzbIXjNa/FeJL7YZpqIE0p5VBVCcQ0mQluE9fl9KVxSqFSG09/7b0hArFxv5SuFQ7cvPbB0+Dkc9KiJtH2Dju8WxtfvYm/ZHovHk2F5R1JU3Ionoskpi5EA42tqsIbDao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=grFK2SFK; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc6ceade361so256900276.0
-        for <kvm@vger.kernel.org>; Tue, 06 Feb 2024 18:43:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707273820; x=1707878620; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=g7guOO3K6cZeccVPYodTSSR3CLbTuFzc0JepOhwBqf8=;
-        b=grFK2SFKZqLTXSDLVLI4bcvE0N08jdaLe1SI3FOpqQ0ljetYoTLDld5EdWLBmT/LbW
-         0eINMxXXSg3F9w4BlsaXm7IRfS6/gBFePOjaGmLOOBk8K2dgvImHNZoihGK05rhzS9EM
-         sd2OSZ6Fwd372IpKtvHh44VzMFVSoIqQuLQKtLJ+4oHPMwBnmPAU2x8m49+RFnt3lMb8
-         QibJ+olqqhcCADpriEKFktx1v0WeIG7zqS7K0juyRfpMBGPWadCBeuB/b2QlrQRFTBUU
-         V/d1UhftHn1nmFNSyhSn7AQbvrW3HF+5wmzWYsyPhg3QmSSeBRM2nHzZ2byyjFMNfceA
-         Ccqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707273820; x=1707878620;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=g7guOO3K6cZeccVPYodTSSR3CLbTuFzc0JepOhwBqf8=;
-        b=vAyvnpoOJUIl6ZjUc/XGFxqyfKo/pe+BDYmRtbummkU8841sjDAQ4eUcVFo6y0ucQ7
-         I7oUnueq8u9AHmJU+TqghAKbvXp8iqJD2+6hjbfdDOK6iPxKn1N9Gv+EHlQJx6sH2u+r
-         mfWK0N0H7f96OjEjKpmZJWQKTvkGe3V7kAfrQNhPjL/SculTieFmoyVDXwZIh7eJzqKl
-         XVj5wvqj8d+uXLSaYbDJ0DLjrMsNCWoHTWUTM1tqDY2NnI/rGQKDHMFwwcFxm5vDShTk
-         9KXcYOzsyIDg5f9eACWECfXOMWfATu+bnBsS/lvaH0fJ7oWd5Y11y5bcwiiNBVxE7wd8
-         Yxng==
-X-Gm-Message-State: AOJu0YzXdWgakOFRXyzRrr5uQYxFuAmvQeMS7c+WoZN6LbMJFMooYrpB
-	19/Wdx5cflhtNWOZs71X/BOIDSG9FkyTjBlXVixh0Zc5uBQl+EjJcfMUD2GeCLXMW9kEtYGJwOz
-	f3Q==
-X-Google-Smtp-Source: AGHT+IHFKn95FP8tDKGyeHSLkuyZnMtdrnlqEFcDN45UncE4QphOeyXOIkcKI10ZFatjnFxEnz3hwTc5JAw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:2485:b0:dc2:550b:a4f4 with SMTP id
- ds5-20020a056902248500b00dc2550ba4f4mr906756ybb.1.1707273820039; Tue, 06 Feb
- 2024 18:43:40 -0800 (PST)
-Date: Tue, 6 Feb 2024 18:43:38 -0800
-In-Reply-To: <CABgObfa_PbxXdj9v7=2ZXfqQ_tJgdQTrO9NHKOQ691TSKQDY2A@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EEB8D27D;
+	Wed,  7 Feb 2024 02:50:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707274223; cv=fail; b=SG8OUB1E63uVEf1gHQl5ag3ewZps3EU+1O17zhQwgRPqsjnI019F9Uln/RL2Zuge7cYpon0h348V7WvcfFQrN0rXqxGsQgAJExtH8y8GjsHHEONcRyYH1z9/nakEEmSipYpgjv503qO5/LBULHqI+wtrP8NuNaXcluiigfWmy6E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707274223; c=relaxed/simple;
+	bh=NZ7xBpKwgJOKJkXxpNiOOCDvUbiiEOl3eAamfkPwL6c=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=TAJe8V6G1fLdMHpkwsawjrkAGhonwe3OHkNcpph9lSa0RhGwM/OWDlcqWa/L4pxHBFfsH8L7qorytcwL5p300Sx3ccn6PAie+ntXf1iMsE502ZD/ug3r0hhyL1i1Et2RLrbii5YUJWehcZCFG7tI6vaAcPlf/wkE9FliIZT8HCk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lter6zSS; arc=fail smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707274222; x=1738810222;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=NZ7xBpKwgJOKJkXxpNiOOCDvUbiiEOl3eAamfkPwL6c=;
+  b=lter6zSSHyApi291SRB+K/5xFkMMozQ/+eP3xfeCCWyXQrWrbu4X9ud0
+   hnFDo0csJHoAT4l23sGwa/M+GPpRUQUIZ6iBH7eg70uA0DA9JsreDXovs
+   56RQ99Ga+nT3M/KRgqmloHIYCpxK2l/3C9y4v1yVZuFKQfaLI5bX62Rnx
+   WIXKnp8aB3322fek+F3CRFI+SuC2hVTAX+7wa3XD/Y3fn1hEvSF4icxOQ
+   5uoVx3cAlupzkqWx+6WUVPvurGVW+IXaYtn6hOFfYeOaBm9F+erl8WAqi
+   SCm8rTsiwmtosXoIJ0WGwOMDMQz4P7uFyvZbnofWbPxrQI9pNnlxujiET
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10976"; a="803228"
+X-IronPort-AV: E=Sophos;i="6.05,248,1701158400"; 
+   d="scan'208";a="803228"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2024 18:50:20 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,248,1701158400"; 
+   d="scan'208";a="1192040"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by fmviesa009.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 06 Feb 2024 18:50:20 -0800
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 6 Feb 2024 18:50:19 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Tue, 6 Feb 2024 18:50:19 -0800
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 6 Feb 2024 18:50:19 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=IJrJEp8U+S14zCbl9UZoB7gU078emIIY8wUEPJp9Ttwu3/Cfc/wqvljAt8L3lH1PGzYQZe4zf5ZHPf9Qv3u186jcDlgoS663NWpAUQrgufbhMgvf+m4o+uUUa5hCSUYvW4NYcZ6lKu7z2dJdQSFg8QbavLrBqRM3L0z1y+Ue6lIFbpLRFsJ7Ya09ZUalWJBoPzMgwRm4ePunmWQ0p9zOw4h3gLSjpG2kPhyguMVDdifRh+TRPRqtc5FkrQ3R0BYTCBh/eQprwhUZ57aQ4eKyJ0yHamLK/SpHPnH0uEqBUkASpQCtTAlra/DGv1o7re7IhfC/nXbPs3wAfqv1SOc6OQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0du1sR+WleoALCGIGEFnhrD+MnWZnt4FpnkOkQXNBfk=;
+ b=S7poYSMGg6CAg0bsA/GKmMB4LKLYuDpjLFPF32bhSiGBQmzUF+6tHpGVuyvrHjeom1R1r96AtmDjeSfrly9vX8eYfTSM9Q2rXa9iTHZnc58AFnohASCiK5Ol41t1rU53jQeVAbeZ4YrI8MhpSpSQUQi+rm71QDc0qk4QHJuxZ12+MjDFaqPvgl4G6VFpkgTOidHMcxsuYRKEcj+F0YLkX32WV47M7GDAs8Cp3HPE8oug6fw3IFl7LiiMk+LIY5x1gEXt8vvLOT3HEWr9nEkKUBJrwEyNEL3/zf3baEALJ0+teBqeGqnANMRUXb8bVxn9X9Ckdslb8EwSbNR6OfvRmg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by DS0PR11MB7786.namprd11.prod.outlook.com (2603:10b6:8:f2::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7249.36; Wed, 7 Feb 2024 02:50:16 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::a8e9:c80f:9484:f7cb]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::a8e9:c80f:9484:f7cb%3]) with mapi id 15.20.7249.035; Wed, 7 Feb 2024
+ 02:50:16 +0000
+From: "Tian, Kevin" <kevin.tian@intel.com>
+To: Lu Baolu <baolu.lu@linux.intel.com>, Joerg Roedel <joro@8bytes.org>, "Will
+ Deacon" <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>, "Jason
+ Gunthorpe" <jgg@ziepe.ca>, Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	Nicolin Chen <nicolinc@nvidia.com>
+CC: "Liu, Yi L" <yi.l.liu@intel.com>, Jacob Pan
+	<jacob.jun.pan@linux.intel.com>, Longfang Liu <liulongfang@huawei.com>,
+	"Zhao, Yan Y" <yan.y.zhao@intel.com>, Joel Granados <j.granados@samsung.com>,
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, Jason Gunthorpe <jgg@nvidia.com>
+Subject: RE: [PATCH v12 13/16] iommu: Improve iopf_queue_remove_device()
+Thread-Topic: [PATCH v12 13/16] iommu: Improve iopf_queue_remove_device()
+Thread-Index: AQHaWWafjR+FYFS4H0+ifBk3us7aubD+LEXA
+Date: Wed, 7 Feb 2024 02:50:16 +0000
+Message-ID: <BN9PR11MB527603AB5685FF3ED21647958C452@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20240207013325.95182-1-baolu.lu@linux.intel.com>
+ <20240207013325.95182-14-baolu.lu@linux.intel.com>
+In-Reply-To: <20240207013325.95182-14-baolu.lu@linux.intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|DS0PR11MB7786:EE_
+x-ms-office365-filtering-correlation-id: 59b28788-55a8-4bb3-c7f7-08dc278783ea
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 3qNTSBJiSAZiFJSrbDt1bUuT+nfqlzY/J3ENBN//11B40s86aMmIt7a/Q1C/rX+IUcaf/s4WLnAgDHi48U3FPcH8hDghgKtAqZ6HwJS6hfR3syyC6eXA708Ti1KuFv4BazGXBwHw7Lt7QJ7+sEYABBU8chbDT3CwYuswAKQm/u472Q+AaJa/nZWZAixAu+R9GuGcM3jOi+szwHF0YRvRX6/j+PLlwG5nB5izO3hfmSUmmSmTbDtr1j+gP6W0Hz8atZGVGU0lyjha3/N8EoLkbFJ8guG1LWlTRW7V6NaLK31PYN/rvyKNP2kjPEQZGeP6Sa9VYEbdXLzL/2LJSjDwtPiL3qivUk3vmmVwiGsft5HtBMcv50EfxG1CEFqUBg3A3A72Ce/5CwRadQYIXZESh7Gz3LKacu8rypKdawumZObVp2m8qtTjoVJeZc5wA5j9MUmgxmuw/o5ztC9Fl6c1q4Ss8RlGVhiJ8ZosRgEgUszoxNsVGQUB4HsdCQqYL4JsYmysigDl95Af7Mf2L7ZQ5k7skYPhhG96seJGDASi0GSjZbgnqqbD2BnuHJbU2oQNVBdL/bpgCsprXtkRDYVSeB3/3WUrZn1ELKEkcDZHzOJoVWmel/4/RWgZ9nV1nDga
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(376002)(396003)(136003)(366004)(39860400002)(230922051799003)(1800799012)(64100799003)(186009)(451199024)(7416002)(5660300002)(52536014)(2906002)(55016003)(41300700001)(86362001)(82960400001)(38100700002)(26005)(122000001)(83380400001)(33656002)(7696005)(6506007)(54906003)(9686003)(110136005)(71200400001)(64756008)(8676002)(478600001)(8936002)(66946007)(66556008)(76116006)(66446008)(66476007)(4326008)(38070700009)(316002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?OsK7klrUdRDbq/N8vjxsWrUIWzrYZDOMl/0Z1KO65aUU4J3VRupgpSlPVrsM?=
+ =?us-ascii?Q?0dI8fv/Au6EAILFz+gDvgIuAIfw4xuBFCuBoLMmpuT1rJ1Ags+ICNFKmWU0l?=
+ =?us-ascii?Q?wRwFnEdYdZyvBf4dd9t814kOT1U8p1jzknN7faYNE82aTpfyDD6QlZTywPq8?=
+ =?us-ascii?Q?TJsYqxQPiknCYYO5Cd34fO7xCr++PBbro+uWFwDLzYW2jN2yBESW+lSnYGv1?=
+ =?us-ascii?Q?pI4C5D1GO9LDNojrbNzx9+QxhK+5X7S8jJbtauyIZACNkIH6/v4SfYSKgA+X?=
+ =?us-ascii?Q?USMRVGCZGJfyMILd71bL1dUd9ao0Ml/lxkVwF62+L02Bc2hH9lo/C+iNiPGU?=
+ =?us-ascii?Q?ZPJlnKT1nh5NTX5AaJuhaPPjk7q3N5DknjtACqbXBP2nzBrrxILMhdnFfRCR?=
+ =?us-ascii?Q?JCEi9E8ZMxJ72kZ0RtdYEjoVWWMzdzX2VH+EFVNAKCFlq86IGkgDWkRwsgk4?=
+ =?us-ascii?Q?MrXmzodf4HSlUp8u4x0hn94kPEEyZI2Q6Kjkge8zCLLp8k4FU4ELTE79zfm5?=
+ =?us-ascii?Q?yqdtSjXD3QQgH8Za2O3Mqoj6+qfpEdJFBH6PrFao5WZD4R1hDcchv8PjvxBm?=
+ =?us-ascii?Q?lZpnqx8o/sQc6Ksezw7okfdzFHrgqKD/AClrtbFCiqRIrY6jRcB55QBmbsG1?=
+ =?us-ascii?Q?VtbpyYZeROTMOL/KeoXf0MKXMBOTHGZAbWaaZrBWecrPUfihpcmQwt+fcIY2?=
+ =?us-ascii?Q?s53qcMGiqHrIbIJPj4IJqT3t5oZQgeE2ApUIGTmIvlIFUM7sbkKSttoJvaZJ?=
+ =?us-ascii?Q?4MBS9+CdOYg1VzRExRfX3TxS0Ca7gek853oq4HSXx/v+vNVwNgCjXsUhHtgw?=
+ =?us-ascii?Q?cbaoGLSGyyu3EBPHWBle/EP5V7eDFMP1ZvQefqCccWQQeNSXdjBtEkr0+V37?=
+ =?us-ascii?Q?IgriftgY1ogu7UVuDXsBIVu3m8vc22AVOt8xMexyxvr6xahtaE4/L6VoPht3?=
+ =?us-ascii?Q?i938EfgnTNvXNgiBucaQdsSRuZvXuxyqR5w9sW5NdKRLL0yU0HosXjv3dnG4?=
+ =?us-ascii?Q?xTYEgNs1j+QSHTl9dxrno9IunW41z89lyGQOeefAAVJt7XU8KZpc/F+BeM9H?=
+ =?us-ascii?Q?jAKJhAaJwe0yFzTs8r1SqAbtglAg+fhI1XZoySZ0MQsNzfScU2HZsd52m0hY?=
+ =?us-ascii?Q?ObcovRScvKVzh5qrlbCZWtRITDSQFB4GWxAo/g8eFlk9NyrPu5lNGZ+uISb8?=
+ =?us-ascii?Q?g6LAmDqrmbVaO2Y2TCb//iecNw1iT/+huG9Pm9H8B2Fp4+34jrjtIdaNb52i?=
+ =?us-ascii?Q?JWTQMgdXMqOHGsh1uXtmdndeidxB8Z1SwIo3WBeI9gOH3/6QcVQnIIfyH4aw?=
+ =?us-ascii?Q?y9c7d5zIPWvlGhKE2feXzfCSHe4aPu5+VUcWLE6TWaTPWvHzBi8aY/JkUsiO?=
+ =?us-ascii?Q?d5z/xqSiip2/EeLJynAZZzd5kjTUik2SFzKkJDOI/oVp5laiB680sz2HPr3j?=
+ =?us-ascii?Q?89HLCn+WZbQkDKyyB7R1j2/n3X/R+tmLiEtoCDZN40I59wK2WAr6xqr4pE6U?=
+ =?us-ascii?Q?Gm6G1oFKUFw180yD8zaFFwVxyA9u8DTAhtxPO2mjYxZ8WVW8aIPtCIRplRrR?=
+ =?us-ascii?Q?iF7ojdy7xiWvO7x3TkxWWqG/4mwRBhpF4ZShg9VB?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231230172351.574091-1-michael.roth@amd.com> <20231230172351.574091-19-michael.roth@amd.com>
- <ZZ67oJwzAsSvui5U@google.com> <20240116041457.wver7acnwthjaflr@amd.com>
- <Zb1yv67h6gkYqqv9@google.com> <CABgObfa_PbxXdj9v7=2ZXfqQ_tJgdQTrO9NHKOQ691TSKQDY2A@mail.gmail.com>
-Message-ID: <ZcLuGxZ-w4fPmFxd@google.com>
-Subject: Re: [PATCH v11 18/35] KVM: SEV: Add KVM_SEV_SNP_LAUNCH_UPDATE command
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org, linux-coco@lists.linux.dev, 
-	linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org, 
-	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com, 
-	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, 
-	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org, 
-	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com, 
-	peterz@infradead.org, srinivas.pandruvada@linux.intel.com, 
-	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, 
-	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com, 
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com, 
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
-	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com, 
-	Brijesh Singh <brijesh.singh@amd.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 59b28788-55a8-4bb3-c7f7-08dc278783ea
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Feb 2024 02:50:16.6495
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: u9njTgmWLgYBhv/dCS6/PLMA8I2Evqd4gPkOzobiZ2w1PqfOnA1/TkP9zetQAVbT52NApQpqs6gT7Xsg5RoU0w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7786
+X-OriginatorOrg: intel.com
 
-On Wed, Feb 07, 2024, Paolo Bonzini wrote:
-> On Fri, Feb 2, 2024 at 11:55=E2=80=AFPM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> > > It doesn't really matter if the attributes are set before or after
-> > > KVM_SNP_LAUNCH_UPDATE, only that by the time the guest actually launc=
-hes
-> > > they pages get set to private so they get faulted in from gmem. We co=
-uld
-> > > document our expectations and enforce them here if that's preferable
-> > > however. Maybe requiring KVM_SET_MEMORY_ATTRIBUTES(private) in advanc=
-e
-> > > would make it easier to enforce that userspace does the right thing.
-> > > I'll see how that looks if there are no objections.
-> >
-> > Userspace owns whether a page is PRIVATE or SHARED, full stop.  If KVM =
-can't
-> > honor that, then we need to come up with better uAPI.
+> From: Lu Baolu <baolu.lu@linux.intel.com>
+> Sent: Wednesday, February 7, 2024 9:33 AM
 >=20
-> Can you explain more verbosely what you mean?
-
-As proposed, snp_launch_update_gfn_handler() doesn't verify the state of th=
-e
-gfns' attributes.  But that's a minor problem and probably not a sticking p=
-oint.
-
-My overarching complaint is that the code is to be wildly unsafe, or at the=
- very
-least brittle.  Without guest_memfd's knowledge, and without holding any lo=
-cks
-beyond kvm->lock, it=20
-
- 1) checks if a pfn is shared in the RMP
- 2) copies data to the page
- 3) converts the page to private in the RMP
- 4) does PSP stuff
- 5) on failure, converts the page back to shared in RMP
- 6) conditionally on failure, writes to the page via a gfn
-
-I'm not at all confident that 1-4 isn't riddled with TOCTOU bugs, and that'=
-s
-before KVM gains support for intrahost migration, i.e. before KVM allows mu=
-ltiple
-VM instances to bind to a single guest_memfd.
-
-But I _think_ we mostly sorted this out at PUCK.  IIRC, the plan is to have=
- guest_memfd
-provide (kernel) APIs to allow arch/vendor code to initialize a guest_memfd=
- range.
-That will give guest_memfd complete control over the state of a given page,=
- will
-allow guest_memfd to take the appropriate locks, and if we're lucky, will b=
-e reusable
-by other CoCo flavors beyond SNP.
-
-> > > > > +                  * When invalid CPUID function entries are dete=
-cted, the firmware
-> > > > > +                  * corrects these entries for debugging purpose=
- and leaves the
-> > > > > +                  * page unencrypted so it can be provided users=
- for debugging
-> > > > > +                  * and error-reporting.
-> > > >
-> > > > Why?  IIUC, this is basically backdooring reads/writes into guest_m=
-emfd to avoid
-> > > > having to add proper mmap() support.
-> >
-> > Yes, I am specifically complaining about writing guest memory on failur=
-e, which is
-> > all kinds of weird.
->=20
-> It is weird but I am not sure if you are complaining about firmware
-> behavior or something else.
-
-This proposed KVM code:
-
-+                               host_rmp_make_shared(pfns[i], PG_LEVEL_4K, =
-true);
-+
-+                               ret =3D kvm_write_guest_page(kvm, gfn, kvad=
-dr, 0, PAGE_SIZE);
-+                               if (ret)
-+                                       pr_err("Failed to write CPUID page =
-back to userspace, ret: 0x%x\n",
-+                                              ret);
-
-
-I have no objection to propagating error/debug information back to userspac=
+> Convert iopf_queue_remove_device() to return void instead of an error cod=
 e,
-but it needs to be routed through the source page (or I suppose some dedica=
-ted
-error page, but that seems like overkill).  Shoving the error information i=
-nto
-guest memory is gross.
+> as the return value is never used. This removal helper is designed to be
+> never-failed, so there's no need for error handling.
+>=20
+> Ack all outstanding page requests from the device with the response code =
+of
+> IOMMU_PAGE_RESP_INVALID, indicating device should not attempt any retry.
+>=20
+> Add comments to this helper explaining the steps involved in removing a
+> device from the iopf queue and disabling its PRI. The individual drivers
+> are expected to be adjusted accordingly. Here we just define the expected
+> behaviors of the individual iommu driver from the core's perspective.
+>=20
+> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+> Tested-by: Yan Zhao <yan.y.zhao@intel.com>
 
-But this should naturally go away when the requirement that the source be
-covered by the same memslot also goes away.
+Reviewed-by: Kevin Tian <kevin.tian@intel.com>, with one nit:
+
+> + * Removing a device from an iopf_queue. It's recommended to follow
+> these
+> + * steps when removing a device:
+>   *
+> - * Return: 0 on success and <0 on error.
+> + * - Disable new PRI reception: Turn off PRI generation in the IOMMU
+> hardware
+> + *   and flush any hardware page request queues. This should be done
+> before
+> + *   calling into this helper.
+> + * - Acknowledge all outstanding PRQs to the device: Respond to all
+> outstanding
+> + *   page requests with IOMMU_PAGE_RESP_INVALID, indicating the device
+> should
+> + *   not retry. This helper function handles this.
+
+this implies calling iopf_queue_remove_device() here.
+
+> + * - Disable PRI on the device: After calling this helper, the caller co=
+uld
+> + *   then disable PRI on the device.
+> + * - Call iopf_queue_remove_device(): Calling iopf_queue_remove_device()
+> + *   essentially disassociates the device. The fault_param might still e=
+xist,
+> + *   but iommu_page_response() will do nothing. The device fault paramet=
+er
+> + *   reference count has been properly passed from
+> iommu_report_device_fault()
+> + *   to the fault handling work, and will eventually be released after
+> + *   iommu_page_response().
+>   */
+
+but here it suggests calling iopf_queue_remove_device() again. If the comme=
+nt
+is just about to detail the behavior with that invocation shouldn't it be m=
+erged
+with the previous one instead of pretending to be the final step for driver
+to call?
 
