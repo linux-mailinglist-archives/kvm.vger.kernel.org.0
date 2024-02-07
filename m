@@ -1,79 +1,97 @@
-Return-Path: <kvm+bounces-8276-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8277-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CD3184D0EF
-	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 19:14:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D310D84D1C0
+	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 19:53:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFA1F1C23714
-	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 18:14:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FCDA284E9B
+	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 18:53:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FC6E12C54B;
-	Wed,  7 Feb 2024 18:08:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3489686157;
+	Wed,  7 Feb 2024 18:45:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JFcnIIgF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Wh1Xw5M7"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f53.google.com (mail-oo1-f53.google.com [209.85.161.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4855312B15A;
-	Wed,  7 Feb 2024 18:08:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5F2586144
+	for <kvm@vger.kernel.org>; Wed,  7 Feb 2024 18:45:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707329335; cv=none; b=mcOoY30j//OMG2PIGztbKY8ActVQMakD9rswhH38ql+VvpxIiJTvCwiascJSfIpULDap9bxeEMjMisfrkaxB9N15O0SHsjgm1ldhrvjrf6RXP4QZlsk7Wm2G2EOUODROR6zYU8UonF95Hz0H0HEg6LIvPyup/OgvTr5JPvmg58k=
+	t=1707331514; cv=none; b=h7C+U0/2kjYgkjUmiivSMESea5HQ3kZt7Yh00+512slx29me25UKwPGZ+fJwC7aqmx/0pMoz0Pdhu27Ix6yF4FWOPYUGT6RrvIms8BzMtVdAdsKUleezQSlc5Ii2zD/yht7WiTUBBk/b7dMJkr2XyXF8QKIKivEP53inR/GOnXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707329335; c=relaxed/simple;
-	bh=UXOVvErhhejeJv/afmJ/s4cpm4uILUA/UODLbK8EXKM=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=nJSQekD8UTg5e17cxrVdrNrONEGcrTYsO4pTGXIhaRRCWjrrs55P8XgNoWxcoZd/3M5Cy/fmtqV3TXOX3aTBYqH5ZL/xHV/SXORWKozNtQKhNRa+AOcOc5HftphBVBqdhVRVnAoYMmrE/CJZRpmI2C0V3s7/Wux5veMP209/AZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JFcnIIgF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1E10BC433F1;
-	Wed,  7 Feb 2024 18:08:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707329335;
-	bh=UXOVvErhhejeJv/afmJ/s4cpm4uILUA/UODLbK8EXKM=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=JFcnIIgFrmDzzoYk/PYQN10Smb9iskWhFVD+E9iga6YFvdmzebXbLrlIEAAD7q5L5
-	 2cvOK4cqdGIZq/8klft5FAqZNsoUHtqXrZcC7AuxVALosbE1Rb4wA8IdKdq8B9OKkL
-	 M2XMPBQ8IPVmqlv9wTPHRqTrbTjOnUwh9NXRIo1kljiHP0ptRuCg56+7ArkHfvMACl
-	 OM0KM7Y9Jj4FLw1kteIpenaLdWFTjpmhPKOHmeQKnMYiX4TgI+PrKpT0CQBDu7wC+e
-	 WWXSChHYS8GKR4mI4VWwGVP0KDHu/VotKbLkKxGINgab4WVIDsrj6JZWMyTnnafybi
-	 NVS8ciSE6vwWQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 08536D8C96E;
-	Wed,  7 Feb 2024 18:08:55 +0000 (UTC)
-Subject: Re: [GIT PULL] KVM changes for 6.8-rc4
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20240206182128.3271452-1-pbonzini@redhat.com>
-References: <20240206182128.3271452-1-pbonzini@redhat.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20240206182128.3271452-1-pbonzini@redhat.com>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-X-PR-Tracked-Commit-Id: e459647710070684a48384d67742822379de8c1c
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 5c24ba20555acd68537be26f05296649e171a27d
-Message-Id: <170732933502.14404.10080874035895601066.pr-tracker-bot@kernel.org>
-Date: Wed, 07 Feb 2024 18:08:55 +0000
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: torvalds@linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+	s=arc-20240116; t=1707331514; c=relaxed/simple;
+	bh=rB6Ec3p7AhKSA+4vWbIWmOnRXzrkeuPKLZuukgZZEB4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fIxwpOM2otQJc5Ah2zbAKCY0aECrtzRQk61lSin0EzW7r9yUmwd15znZtEAjtJypNe07BRK0wYmkxAUKnqihzKRfH5aGRSnHICttKizUkIgu9QPu/IAfbkpOq/zZa8IbgWS1Ob1g65USIKuokF0xGUy86BZa7WW3irwZ1D0PJZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Wh1Xw5M7; arc=none smtp.client-ip=209.85.161.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-59a8b9b327aso336408eaf.2
+        for <kvm@vger.kernel.org>; Wed, 07 Feb 2024 10:45:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1707331512; x=1707936312; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=D/ClBNBLoP9L3DooA9dVRQXDTvqkKaBQDDYFzsdwXvU=;
+        b=Wh1Xw5M7EdyZeUvD2PBM+WeFhljIwB9hopPLSu5J8rbWgUo/1lkcthd8keKIHpXtfP
+         e6EGecwzi+VCd0wu08YNhzdeMuDO2IF/HXAQvTkgZgw8n4Br0kgznLaShdgOidLseYN9
+         9Va70SuMpf5xTTG2tl6iwC8S1OdeDH/8lLp0QmOm+58ps2aPQqolaQyeJxYwM/qOvItR
+         a+Mk0evpyHD6QKTk2JFkoujo8wqW2bYgqZbBwhZ8ji4u0LXF2cZtccp34wxjo3sQ7h9Y
+         g3bhTMf+RbIiSi+/x6X/eLeLnamGNK8VxNs3g/9rBvzVD/D+p62cd1x7o6j7wYg2hYV3
+         tmsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707331512; x=1707936312;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=D/ClBNBLoP9L3DooA9dVRQXDTvqkKaBQDDYFzsdwXvU=;
+        b=SkEmOU0SKNWhEGJqJoWBrXtB+yWbKql70C8f46ayM4h4bmgpdsCbUi38V/J4mK9hcY
+         7Av5gXvY/KL3CnLY3VpNsE4NdtyN75xZSJcLgGPtuo7EayUYn97b1j4qc6jTiEz7Sz3x
+         V3Ej1N9hK+XEcvgdjhFIW8LJzEzgALcrz3cWawXbQWZvDvN0P/S/K0Eb0//3TtctVLjo
+         uFRFMlz7RVrtpQk/P1Ka7wSSW7ajSC6Nf7KMj7B8CCGRek0MgdwIUds+vOGI1Kv7wKlb
+         fSY66k/nfhqSocvMxhJz4knfmdT0E4RbUc5tnZy5AC8xKMkWJlwkzav4kjRKRK0u6nwE
+         sGSA==
+X-Gm-Message-State: AOJu0Yw3yY18MqxqXmxoDS6/bEzXit4lBfnhpEq7L1POyTDmHuVWT69L
+	Mp+AZ8fgpeP7zwp0gJRqBJ4nMeFUQ6HkAlq5LWSsexMVheutn0iNmy2/NWNHfpKWFUZs32NXixI
+	FXJlIJ8Vm+bULN9NDYzSNjsta9v4RtQ+ZXxlDRSb/FwE2114avQ==
+X-Google-Smtp-Source: AGHT+IFr75SrPnd63j+W0s/lOHj2a8WzH7MkXgPW3MqyBgjBBBpINO6XePXGPl2a+oNRSfCWUuFBSWROkh2x3mJJ2OQ=
+X-Received: by 2002:a4a:9c8b:0:b0:593:f906:614f with SMTP id
+ z11-20020a4a9c8b000000b00593f906614fmr7576755ooj.4.1707331511783; Wed, 07 Feb
+ 2024 10:45:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20231109210325.3806151-1-amoorthy@google.com> <20231109210325.3806151-2-amoorthy@google.com>
+ <ZcOhM5wPguyNC0j5@google.com>
+In-Reply-To: <ZcOhM5wPguyNC0j5@google.com>
+From: Anish Moorthy <amoorthy@google.com>
+Date: Wed, 7 Feb 2024 10:44:34 -0800
+Message-ID: <CAF7b7mrfn5jbDQpDf4_0_1vtMq8YS9mo4MpUK1wKuxgQ328rBA@mail.gmail.com>
+Subject: Re: [PATCH v6 01/14] KVM: Documentation: Clarify meaning of
+ hva_to_pfn()'s 'atomic' parameter
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The pull request you sent on Tue,  6 Feb 2024 13:21:28 -0500:
+On Wed, Feb 7, 2024 at 7:26=E2=80=AFAM Sean Christopherson <seanjc@google.c=
+om> wrote:
+>
+> This is not a Documentation change.  The comment might make its way to ge=
+nerated
+> docs, but this is not Documentation/ and I most definitely did not expect=
+ a change
+> to kvm_main.c based on the scope.
 
-> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/5c24ba20555acd68537be26f05296649e171a27d
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Whoops, didn't realize that Documentation: carried that specific
+meaning- thanks for letting me know
 
