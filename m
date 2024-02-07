@@ -1,201 +1,148 @@
-Return-Path: <kvm+bounces-8245-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8246-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A79A84CE8E
-	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 17:04:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C36984CE9E
+	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 17:09:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F4101C21C48
-	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 16:04:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6D172856B0
+	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 16:09:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2323E80BE2;
-	Wed,  7 Feb 2024 16:04:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0BF17FBDE;
+	Wed,  7 Feb 2024 16:08:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="H0HHLloK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Hes8HIdE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 191897FBDC
-	for <kvm@vger.kernel.org>; Wed,  7 Feb 2024 16:04:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ED2480056
+	for <kvm@vger.kernel.org>; Wed,  7 Feb 2024 16:08:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707321877; cv=none; b=iVhzo08vscDQTzu4K1+AwNe+jZYLwLJZIyfF2CByD1ZqDcCBKthopBJYbcAoInU51oSw/wWxN05lx5MmFTmVUf98JvIuPVEsajb02PUCRpmkZBN45DGV188SHjcNxQ0M9NXxv3FZz+K9Unr75xBalUcKlKN157gPPNSEtS12EOE=
+	t=1707322137; cv=none; b=F/chgogVY03ekcz/g9tX3vbY27BVQAU0bpyhssrI+e0GOx5rFVjriOhTC+2hP4R2Iwj+GD1CGP1GpF/XxLp9sjQwUzGxXSI0lKfsWUZoQ40LcqnRMBTQy9rV9Vo6x4Ejq60Xvas8H5JVpYqOe4Oe1BvGp+tNEqu/jUXVw5uL+HQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707321877; c=relaxed/simple;
-	bh=U784qeJ6nBxw6wDG9iod93zWSvHO8kFyVXpJtlwp29g=;
+	s=arc-20240116; t=1707322137; c=relaxed/simple;
+	bh=b6Pbg0aSosy9STDoBERpFBWvqP2/G4p3nZSShoKz0EA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=BjJ6Bdwl2ZV3b/vJgeYzHiPZ/toQAWa6YyRUPzsMY7qSV4mfZZkntAVNymB+0IRIpYJtJN5qWQz2V1rwpfSbAEwE0V+3n6PZbOXkIocbiVWe7EBF5kDtY4WFbP7HvkGvuJXXP56FgK2zo2wHe5YbKVtUMGNT0VBCh0ARDidhSJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=H0HHLloK; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=RPv3BvOPRNY4p9PtgOyiRRezHXIneAQf2zWf3EIbD3AmyQ0iVYmEktsxMiefHYOEVJqU2KB3nwAt+Wc2gdBS/xL839Qj8WU89+N6bby+yxyblWQxOO71weNiInNr68pq9MR+Xe1LizxytsUqCiUwSwAZDZawo4g8N8m6tBfScDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Hes8HIdE; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1d9c1d53de7so8036475ad.0
-        for <kvm@vger.kernel.org>; Wed, 07 Feb 2024 08:04:34 -0800 (PST)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc6df2b2d1aso1030756276.1
+        for <kvm@vger.kernel.org>; Wed, 07 Feb 2024 08:08:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707321874; x=1707926674; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pJsjt56qloa4KV7GYlBT9c9OJM+llHEZl1DwXvaLHRs=;
-        b=H0HHLloKoqrB+Y+zJeHbIoaUJfg3xDQnm/bOGJjVNecz88lJpERqSEYpJDHz4PoLx3
-         J4FO8Xa8c6CuZO81ueSRhT+G3Iz1C+7keUmOHTr32oAk6SaIsn52Ey3jMzsDsic5ORMd
-         p7MZaO+u4HpRLAhzgShT8TV1SCyzV9ZQ4w8OvqP7YbA27HgH/GuourbNjaOcnr2I39Ex
-         YhBeMWMdK5pxHg2NQQe2fniU1jMq/xBy3/FujWa3GlwEgJf6gkglRx5QW1/7nceqGFZ0
-         e8E5wqxZQgqC6p5WOXcJCz4VDztV1FDs1r+vJtsjJi92F4RcVmqLPhMjWXj68q8V+zsG
-         k9sA==
+        d=google.com; s=20230601; t=1707322134; x=1707926934; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=b6Pbg0aSosy9STDoBERpFBWvqP2/G4p3nZSShoKz0EA=;
+        b=Hes8HIdExo5hJfKu7G1taJvHisMdFqJ0TM3RtEQZ63NsbKXrEjkO1+YTQa1uTvhfiw
+         jB1/5h3x4Q9uI/RoSHXQb+jRtTilb+X/8sjVD9pMJI6984Cugjg+cTvgmpL4dwwD2SkD
+         bXAmq3JBmuwMGu8yiPPqSOzy5MFuyLYXmjAdpPmSodO8LJmpdWAtsGCrKBR0FysDb8zG
+         ksjQcgfIVZ67tvHp72bj3m4wEV3XvdeLs/ZgkSXa1o4Jwv2D6Wcj0N3dzAc06qEvpahi
+         AhXI06iOI+5P8p91phUyp/nX0VR2bUYjgPwvtuTX7R0HFcaYeSS5CYJL6/IIkMehZhfh
+         ICFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707321874; x=1707926674;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pJsjt56qloa4KV7GYlBT9c9OJM+llHEZl1DwXvaLHRs=;
-        b=QoiCP8BgyTHEsSGdW0fQd0ySc8W+IxqoNvYny41JlL2Nvrr9y6vmFl3b4Qdz9H+Ypy
-         sEsLF2WLXaZpAkvscy2Wu1byDgfgUMvmIIHb0nNjmd6IrH9gZ/M5TVsp536GMNEeRtm6
-         Xgo6kKbPOnjIM9IIe5XULi/I1qDIaa4eRhqxUsR74gkNvQ/GyjnJQZJF/SxYp98IgO43
-         e8ZxbTjwWMg7mk51sS0J6sXV9ji7AkldPJZjESPCV/v+bsukacBgLVNgwY3yJdTLbxqd
-         Yu7WroQqR5u7cXr6qhBn/U3vxwjAzMfbfOvW7Mmtm4Q9UvrEwdLsgu1vmeJU4+dGOekp
-         /meQ==
-X-Gm-Message-State: AOJu0YxOhaWTuXRycPJnlOtc3zNcFnaquJAmXwNRjp7v9dOuKCn2UZ/I
-	fzFgkR5Slct0rVM2ELjjWVc3yvhE85puNs15koSv8rsqvFTIJLz7tMvezhMQOHTyXuwHOnQBz3P
-	Fdw==
-X-Google-Smtp-Source: AGHT+IFyJtG5EyhxDAVsDKIAhWMowCgx/MJODI19A69KOcFop9G1VyI2+SVO5855R6027qmcImXZ1i7tGXQ=
+        d=1e100.net; s=20230601; t=1707322134; x=1707926934;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=b6Pbg0aSosy9STDoBERpFBWvqP2/G4p3nZSShoKz0EA=;
+        b=YYsrrX0KsdSCLHSWpTHNY7DCMaqb6zRFxTuSqNb+geMePyTxlEk3+Bb+QeS4yHudLX
+         +nIhKg3psb8SWZATltrzZ/7rp90YrBWHSzB6cSJZZJ0CBIrLWPmZ4Hx/NMogyi7og432
+         qNhP56biqVRUxTi6k33Dq9i1jEwttGkpsLieJZx6tfGY13/csMloFFI8SeUQHl439Nr9
+         Kl5PVGWULeqqrKPQxmAr64uGyTUpHQPY07gAY/M7vCie5LcNpnKglZMFRLjCxNF9yxT3
+         vhBTYabJMnmo/+Mu/PS6enYOBSV8bNIPqMJc5xnCvJ23x/h5tGWKxOZCppHIf8ldZ4lY
+         3Hzw==
+X-Gm-Message-State: AOJu0YwZGtH4Uw+rPmqMqwaZ6mDGpl2rEvJam5mhNWVyNiF+9oCUnEsi
+	dJpABjX2Tq5qZGjKbs8kRETAQxoNLKAczEk8/aWhevBDY4SHy5PaMbB08ZSzLqyjbcRw0NkNRh8
+	9gw==
+X-Google-Smtp-Source: AGHT+IFo7vSX32978mHp9DuIV/CuPmJCEwqoVvO8kVgUZkqtVinWNB21gS0NfuMw8kBxSh/qL8E88+WZRgE=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:e804:b0:1d9:47e7:3c86 with SMTP id
- u4-20020a170902e80400b001d947e73c86mr205386plg.0.1707321874324; Wed, 07 Feb
- 2024 08:04:34 -0800 (PST)
-Date: Wed, 7 Feb 2024 08:04:32 -0800
-In-Reply-To: <20231229022652.300095-1-chao.gao@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:2293:b0:dc6:207c:dc93 with SMTP id
+ dn19-20020a056902229300b00dc6207cdc93mr194834ybb.2.1707322134581; Wed, 07 Feb
+ 2024 08:08:54 -0800 (PST)
+Date: Wed, 7 Feb 2024 08:08:52 -0800
+In-Reply-To: <afc496b886bc46b956ede716d8db6f208e7bab0a.camel@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20231229022652.300095-1-chao.gao@intel.com>
-Message-ID: <ZcOqEBTJ5espqX0E@google.com>
-Subject: Re: [PATCH] KVM: VMX: Report up-to-date exit qualification to userspace
+References: <afc496b886bc46b956ede716d8db6f208e7bab0a.camel@infradead.org>
+Message-ID: <ZcOrFOPKekcDq3xe@google.com>
+Subject: Re: [PATCH v3] KVM: x86/xen: improve accuracy of Xen timers
 From: Sean Christopherson <seanjc@google.com>
-To: Chao Gao <chao.gao@intel.com>
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: kvm@vger.kernel.org, linux-kernel <linux-kernel@vger.kernel.org>, 
+	Paul Durrant <paul@xen.org>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
 	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+	"H. Peter Anvin" <hpa@zytor.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 29, 2023, Chao Gao wrote:
-> Use vmx_get_exit_qual() to read the exit qualification.
-> 
-> vcpu->arch.exit_qualification is cached for EPT violation only and even
-> for EPT violation, it is stale at this point because the up-to-date
-> value is cached later in handle_ept_violation().
+On Thu, Dec 14, 2023, David Woodhouse wrote:
+> From: David Woodhouse <dwmw@amazon.co.uk>
+>=20
+> A test program such as http://david.woodhou.se/timerlat.c=C2=A0confirms u=
+ser
+> reports that timers are increasingly inaccurate as the lifetime of a
+> guest increases. Reporting the actual delay observed when asking for
+> 100=C2=B5s of sleep, it starts off OK on a newly-launched guest but gets
+> worse over time, giving incorrect sleep times:
+>=20
+> root@ip-10-0-193-21:~# ./timerlat -c -n 5
+> 00000000 latency 103243/100000 (3.2430%)
+> 00000001 latency 103243/100000 (3.2430%)
+> 00000002 latency 103242/100000 (3.2420%)
+> 00000003 latency 103245/100000 (3.2450%)
+> 00000004 latency 103245/100000 (3.2450%)
+>=20
+> The biggest problem is that get_kvmclock_ns() returns inaccurate values
+> when the guest TSC is scaled. The guest sees a TSC value scaled from the
+> host TSC by a mul/shift conversion (hopefully done in hardware). The
+> guest then converts that guest TSC value into nanoseconds using the
+> mul/shift conversion given to it by the KVM pvclock information.
+>=20
+> But get_kvmclock_ns() performs only a single conversion directly from
+> host TSC to nanoseconds, giving a different result. A test program at
+> http://david.woodhou.se/tsdrift.c=C2=A0demonstrates the cumulative error
+> over a day.
+>=20
+> It's non-trivial to fix get_kvmclock_ns(), although I'll come back to
+> that. The actual guest hv_clock is per-CPU, and *theoretically* each
+> vCPU could be running at a *different* frequency. But this patch is
+> needed anyway because...
+>=20
+> The other issue with Xen timers was that the code would snapshot the
+> host CLOCK_MONOTONIC at some point in time, and then... after a few
+> interrupts may have occurred, some preemption perhaps... would also read
+> the guest's kvmclock. Then it would proceed under the false assumption
+> that those two happened at the *same* time. Any time which *actually*
+> elapsed between reading the two clocks was introduced as inaccuracies
+> in the time at which the timer fired.
+>=20
+> Fix it to use a variant of kvm_get_time_and_clockread(), which reads the
+> host TSC just *once*, then use the returned TSC value to calculate the
+> kvmclock (making sure to do that the way the guest would instead of
+> making the same mistake get_kvmclock_ns() does).
+>=20
+> Sadly, hrtimers based on CLOCK_MONOTONIC_RAW are not supported, so Xen
+> timers still have to use CLOCK_MONOTONIC. In practice the difference
+> between the two won't matter over the timescales involved, as the
+> *absolute* values don't matter; just the delta.
+>=20
+> This does mean a new variant of kvm_get_time_and_clockread() is needed;
+> called kvm_get_monotonic_and_clockread() because that's what it does.
+>=20
+> Fixes: 536395260582 ("KVM: x86/xen: handle PV timers oneshot mode")
+> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+> ---
 
-Oof, vcpu->arch.exit_qualification is *gross*.  At a glance, it should be
-straightforward to get rid of it and use the fault structure to pass the info
-that comes from the MMU.  I'll post a patch, assuming it works.
-
-As for this patch, I'll get it applied for 6.9.
-
----
- arch/x86/include/asm/kvm_host.h |  3 ---
- arch/x86/kvm/kvm_emulate.h      |  1 +
- arch/x86/kvm/mmu/paging_tmpl.h  | 14 +++++++-------
- arch/x86/kvm/vmx/nested.c       |  5 ++++-
- arch/x86/kvm/vmx/vmx.c          |  2 --
- 5 files changed, 12 insertions(+), 13 deletions(-)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index ad5319a503f0..7ef4715d43d6 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -993,9 +993,6 @@ struct kvm_vcpu_arch {
- 
- 	u64 msr_kvm_poll_control;
- 
--	/* set at EPT violation at this point */
--	unsigned long exit_qualification;
--
- 	/* pv related host specific info */
- 	struct {
- 		bool pv_unhalted;
-diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
-index 4351149484fb..b5791a66637e 100644
---- a/arch/x86/kvm/kvm_emulate.h
-+++ b/arch/x86/kvm/kvm_emulate.h
-@@ -26,6 +26,7 @@ struct x86_exception {
- 	bool nested_page_fault;
- 	u64 address; /* cr2 or nested page fault gpa */
- 	u8 async_page_fault;
-+	unsigned long exit_qualification;
- };
- 
- /*
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 4d4e98fe4f35..7a87097cb45b 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -497,21 +497,21 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
- 	 * The other bits are set to 0.
- 	 */
- 	if (!(errcode & PFERR_RSVD_MASK)) {
--		vcpu->arch.exit_qualification &= (EPT_VIOLATION_GVA_IS_VALID |
--						  EPT_VIOLATION_GVA_TRANSLATED);
-+		walker->fault.exit_qualification = 0;
-+
- 		if (write_fault)
--			vcpu->arch.exit_qualification |= EPT_VIOLATION_ACC_WRITE;
-+			walker->fault.exit_qualification |= EPT_VIOLATION_ACC_WRITE;
- 		if (user_fault)
--			vcpu->arch.exit_qualification |= EPT_VIOLATION_ACC_READ;
-+			walker->fault.exit_qualification |= EPT_VIOLATION_ACC_READ;
- 		if (fetch_fault)
--			vcpu->arch.exit_qualification |= EPT_VIOLATION_ACC_INSTR;
-+			walker->fault.exit_qualification |= EPT_VIOLATION_ACC_INSTR;
- 
- 		/*
- 		 * Note, pte_access holds the raw RWX bits from the EPTE, not
- 		 * ACC_*_MASK flags!
- 		 */
--		vcpu->arch.exit_qualification |= (pte_access & VMX_EPT_RWX_MASK) <<
--						 EPT_VIOLATION_RWX_SHIFT;
-+		walker->fault.exit_qualification |= (pte_access & VMX_EPT_RWX_MASK) <<
-+						     EPT_VIOLATION_RWX_SHIFT;
- 	}
- #endif
- 	walker->fault.address = addr;
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 994e014f8a50..15141b08c604 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -407,10 +407,13 @@ static void nested_ept_invalidate_addr(struct kvm_vcpu *vcpu, gpa_t eptp,
- static void nested_ept_inject_page_fault(struct kvm_vcpu *vcpu,
- 		struct x86_exception *fault)
- {
-+	unsigned long exit_qualification = fault->exit_qualification;
- 	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 	u32 vm_exit_reason;
--	unsigned long exit_qualification = vcpu->arch.exit_qualification;
-+
-+	exit_qualification |= vmx_get_exit_qual(vcpu) &
-+			      (EPT_VIOLATION_GVA_IS_VALID | EPT_VIOLATION_GVA_TRANSLATED);
- 
- 	if (vmx->nested.pml_full) {
- 		vm_exit_reason = EXIT_REASON_PML_FULL;
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index e262bc2ba4e5..1de022af7dcb 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -5771,8 +5771,6 @@ static int handle_ept_violation(struct kvm_vcpu *vcpu)
- 	error_code |= (exit_qualification & EPT_VIOLATION_GVA_TRANSLATED) != 0 ?
- 	       PFERR_GUEST_FINAL_MASK : PFERR_GUEST_PAGE_MASK;
- 
--	vcpu->arch.exit_qualification = exit_qualification;
--
- 	/*
- 	 * Check that the GPA doesn't exceed physical memory limits, as that is
- 	 * a guest page fault.  We have to emulate the instruction here, because
-
-base-commit: 873eef46b33c86be414d60bd00390e64fc0f006f
--- 
-
+Dagnabbit, this one is corrupt too :-/
 
