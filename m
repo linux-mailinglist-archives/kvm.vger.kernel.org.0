@@ -1,186 +1,245 @@
-Return-Path: <kvm+bounces-8192-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8193-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC42C84C316
-	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 04:27:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B10B484C31C
+	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 04:30:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 442941F280FC
-	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 03:27:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 342571F28538
+	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 03:30:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44F4111CB8;
-	Wed,  7 Feb 2024 03:27:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B0E0101D5;
+	Wed,  7 Feb 2024 03:29:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gQQKTsnS"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="sW+wveX/"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B32F13FF8
-	for <kvm@vger.kernel.org>; Wed,  7 Feb 2024 03:27:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19FF9FC01;
+	Wed,  7 Feb 2024 03:29:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707276453; cv=none; b=mX3II9r6j+lrsOkRoFtkqeoJz5cHjSkJWHaVfrdzYgdOwqD+oJAb3WZC+NIeJo8o/GRq9w6eC5U8l1A+sB14Ddzh3VQDR6r09ZvkK7mF8QNuN7GuUG7p1MH/FLqQEYhUsT0kZWRDEQYGQayGmsut9/MelCx6DP/U8EDKwB2Uvlo=
+	t=1707276595; cv=none; b=BkO91c69wQJEwtCdT9ybc3sR88Hw22qS4iw441s+woQNlNal/G0/lo4n1c2CuTmj4Ce2HVFBII2NI947Yn5dHNdBURHCZ0eCZiO6UqioQUPCApwC93ueeBB0kKMxB50yyi/dqtyq+sHRSz/cMuaHQOpPqpYdktSsppLIvBDte6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707276453; c=relaxed/simple;
-	bh=qsE//gaQh/ELevMsklLn/ApppxOTlK4xCHYMHM46s2I=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lbD+1cFicP2/6LQlLTfpxTqRMlEcCffevm2Zs4NXMixe17nhkqMa0JfZOp2EJLiDuBls96w17+xg1tbBKXv51D3XHPh8uVlb2AyhRqsJL7QOfFtuzV9dPccR/OxUm75ibNq7s/LwVSA4jJCoQyI/q87p3M10+BgZeR5rf6DH6uo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gQQKTsnS; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707276449;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ECyPdLbuQ8n+CIX5LY9BuiN4WFH5pGMhm7CI6F18Oro=;
-	b=gQQKTsnSKwv/jFr4F2rNRglH0LOq9eLjR4pd4HEkmuqaLtnwhMEE4aCXMQCcy84CPFO8ep
-	y42Y6xXJfj4GGRmFWUsTqvTBSqGDyYYfq1m0sjB4gNUOLvy1gZ+1SSP+W9VRjJYGlaL8s8
-	f4eraGFlKPMmogaWTw55IbqTU2GutS0=
-Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
- [209.85.210.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-2-ae875V1xOkKn7gPwAKPLNg-1; Tue, 06 Feb 2024 22:27:27 -0500
-X-MC-Unique: ae875V1xOkKn7gPwAKPLNg-1
-Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-6e0519304b2so240698b3a.3
-        for <kvm@vger.kernel.org>; Tue, 06 Feb 2024 19:27:27 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707276446; x=1707881246;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ECyPdLbuQ8n+CIX5LY9BuiN4WFH5pGMhm7CI6F18Oro=;
-        b=feRoNCB/UdM8Z0T2+6RKQKmQULDePPmeGo57nMnA5Kkkyx1SNMC/DS2Dj99VkUFqZX
-         K8mJAbbfvNvY1FCmaDTDPb2HQ1do0jY+5wOAyBA/2xp5Q24ebkB2NL4E5cimrAycr+b6
-         FOT9n2e8i1JHN8a16teqZq5CEuota6+Vq9FAu+PJLE8NQUfKVZ8MfE9SWOcDnqoi+vs5
-         QCgM0x4zFB/FjjxUYCdIceP/Q8ebRboYSGaFKh2hznKF72qPPeDEPz5agWrt9YvYNKOC
-         CxwGwiueFZIaFVCGBPH9zw0rBlaN6b2JeYzWTM5kup1DuAA008FqHrCoqGjWyXQ501F/
-         B31A==
-X-Gm-Message-State: AOJu0YySbYBAdKtB7UsPL2Oy5kXyRXchXKXrhJzHyF1jiyAcFvV1795d
-	QpfQJgrnZwsV8cejxXb3I0wR/nbFT3mVmQrAL1QrkMSac9OQZrA4zp1sagZxrkHlVqE9AJa3220
-	SyeGkLYHgoYA9VkLdGL/d9aL+iFkkusv6bBG5Dt5rL4G2AP888HiV8ngJqTzexfoIqITMPFr60O
-	EMbEa4VBISXTIfn/pIMDApFGo6
-X-Received: by 2002:aa7:84c6:0:b0:6dd:84ce:4602 with SMTP id x6-20020aa784c6000000b006dd84ce4602mr1445736pfn.6.1707276446478;
-        Tue, 06 Feb 2024 19:27:26 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEOduHPoLP4mCVG39rBl1Z8IToYghCDdc8bbnZRY4nXuhv/6H/c+FYVQ3yUyKyTYydLTVyAuvDaqusFQbjMZgQ=
-X-Received: by 2002:aa7:84c6:0:b0:6dd:84ce:4602 with SMTP id
- x6-20020aa784c6000000b006dd84ce4602mr1445717pfn.6.1707276446144; Tue, 06 Feb
- 2024 19:27:26 -0800 (PST)
+	s=arc-20240116; t=1707276595; c=relaxed/simple;
+	bh=LyH5K+H7797yevEx4J2prl3QUboclXhc6NHRR987NYQ=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=JadEiUoxXjxqZxtaeyFaAmGNcRIFhwNgmlTxqL/0VnqgjhlRBpEPbT+vU6/q11doMKEnR1DTjOYfwQUMauQ+xUduN0u9S5O5IAEx2Bo4rvYl02tqIWkl/UW6brqDMX4t26Fgtksslla+CG5qHtZVDpb2Y5G1zEji/4U6ovkHdP0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=sW+wveX/; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=LyH5K+H7797yevEx4J2prl3QUboclXhc6NHRR987NYQ=; b=sW+wveX/Pza0urHwhOvQYOO6xb
+	+rfQWljn2Y2JaRTI0Xwfkbb9kfu7dhbJg6E0z5rM9+RhcsPfT5WsotUugFE/2roZ6//cvQh0g+b7m
+	HskKob8X9XG1nn9zdPzPgb2hdc1e3tu1y4sH1wReM/m7ZO+cUxxGsJEnpRRY7x2ZkbqHKTtF4c1Af
+	DYq60B4zzJmJQ1cNAgftLkraplUqY/0e6ZayqZJKNzit8LHvOrmJU9n9aNj28rw7pJcNnZyi9Df/F
+	cFD3bZFJq7TC/sNNXLmzvRTO/PpFoM0E1brMiD8H9GVYtidDMYVeugPBqKHFK6mvXkjhAfBdq7cfH
+	FXjKfVyQ==;
+Received: from 72-21-196-67.amazon.com ([72.21.196.67] helo=u3832b3a9db3152.ant.amazon.com)
+	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rXYdA-0000000E418-3env;
+	Wed, 07 Feb 2024 03:29:50 +0000
+Message-ID: <165f07deb8d1e082756e6cae21a25b0060c18f85.camel@infradead.org>
+Subject: Re: [PATCH v3] KVM: x86: Use fast path for Xen timer delivery
+From: David Woodhouse <dwmw2@infradead.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm <kvm@vger.kernel.org>, Paul Durrant <paul@xen.org>, Paolo Bonzini
+ <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar
+ <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+ <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin"
+ <hpa@zytor.com>,  linux-kernel@vger.kernel.org
+Date: Tue, 06 Feb 2024 19:29:45 -0800
+In-Reply-To: <ZcLxzrbvSs0jNeR4@google.com>
+References: <f21ee3bd852761e7808240d4ecaec3013c649dc7.camel@infradead.org>
+	 <ZcJ9bXxU_Pthq_eh@google.com>
+	 <19a1ac538e6cb1b479122df677909fb49fedbb28.camel@infradead.org>
+	 <ZcLxzrbvSs0jNeR4@google.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-fEkZUfdFOYO0ekxydfqM"
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240206145154.118044-1-sgarzare@redhat.com>
-In-Reply-To: <20240206145154.118044-1-sgarzare@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 7 Feb 2024 11:27:14 +0800
-Message-ID: <CACGkMEs-FAz7Xv7j6k3grq97q9qO18Em2bLDS4qBaCDZS7+gbQ@mail.gmail.com>
-Subject: Re: [PATCH] vhost-vdpa: fail enabling virtqueue in certain conditions
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: virtualization@lists.linux.dev, Shannon Nelson <shannon.nelson@amd.com>, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org, Kevin Wolf <kwolf@redhat.com>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Zhu Lingshan <lingshan.zhu@intel.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+
+
+--=-fEkZUfdFOYO0ekxydfqM
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 6, 2024 at 10:52=E2=80=AFPM Stefano Garzarella <sgarzare@redhat=
-.com> wrote:
->
-> If VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK is not negotiated, we expect
-> the driver to enable virtqueue before setting DRIVER_OK. If the driver
-> tries anyway, better to fail right away as soon as we get the ioctl.
-> Let's also update the documentation to make it clearer.
->
-> We had a problem in QEMU for not meeting this requirement, see
-> https://lore.kernel.org/qemu-devel/20240202132521.32714-1-kwolf@redhat.co=
-m/
+On Tue, 2024-02-06 at 18:58 -0800, Sean Christopherson wrote:
+> On Tue, Feb 06, 2024, David Woodhouse wrote:
+> > On Tue, 2024-02-06 at 10:41 -0800, Sean Christopherson wrote:
+> > >=20
+> > > This has an obvious-in-hindsight recursive deadlock bug.=C2=A0 If KVM=
+ actually needs
+> > > to inject a timer IRQ, and the fast path fails, i.e. the gpc is inval=
+id,
+> > > kvm_xen_set_evtchn() will attempt to acquire xen.xen_lock, which is a=
+lready held
+> >=20
+> > Hm, right. In fact, kvm_xen_set_evtchn() shouldn't actually *need* the
+> > xen_lock in an ideal world; it's only taking it in order to work around
+> > the fact that the gfn_to_pfn_cache doesn't have its *own* self-
+> > sufficient locking. I have patches for that...
+> >=20
+> > I think the *simplest* of the "patches for that" approaches is just to
+> > use the gpc->refresh_lock to cover all activate, refresh and deactivate
+> > calls. I was waiting for Paul's series to land before sending that one,
+> > but I'll work on it today, and double-check my belief that we can then
+> > just drop xen_lock from kvm_xen_set_evtchn().
+>=20
+> While I definitely want to get rid of arch.xen.xen_lock, I don't want to =
+address
+> the deadlock by relying on adding more locking to the gpc code.=C2=A0 I w=
+ant a teeny
+> tiny patch that is easy to review and backport.=C2=A0 Y'all are *proably*=
+ the only
+> folks that care about Xen emulation, but even so, that's not a valid reas=
+on for
+> taking a roundabout way to fixing a deadlock.
 
-Maybe it's better to only enable cvq when the backend supports
-VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK. Eugenio, any comment on this?
+I strongly disagree. I get that you're reticent about fixing the gpc
+locking, but what I'm proposing is absolutely *not* a 'roundabout way
+to fixing a deadlock'. The kvm_xen_set_evtchn() function shouldn't
+*need* that lock; it's only taking it because of the underlying problem
+with the gpc itself, which needs its caller to do its locking for it.
 
->
-> Fixes: 9f09fd6171fe ("vdpa: accept VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK=
- backend feature")
-> Cc: eperezma@redhat.com
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> ---
->  include/uapi/linux/vhost_types.h | 3 ++-
->  drivers/vhost/vdpa.c             | 4 ++++
->  2 files changed, 6 insertions(+), 1 deletion(-)
->
-> diff --git a/include/uapi/linux/vhost_types.h b/include/uapi/linux/vhost_=
-types.h
-> index d7656908f730..5df49b6021a7 100644
-> --- a/include/uapi/linux/vhost_types.h
-> +++ b/include/uapi/linux/vhost_types.h
-> @@ -182,7 +182,8 @@ struct vhost_vdpa_iova_range {
->  /* Device can be resumed */
->  #define VHOST_BACKEND_F_RESUME  0x5
->  /* Device supports the driver enabling virtqueues both before and after
-> - * DRIVER_OK
-> + * DRIVER_OK. If this feature is not negotiated, the virtqueues must be
-> + * enabled before setting DRIVER_OK.
->   */
->  #define VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK  0x6
->  /* Device may expose the virtqueue's descriptor area, driver area and
-> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> index bc4a51e4638b..1fba305ba8c1 100644
-> --- a/drivers/vhost/vdpa.c
-> +++ b/drivers/vhost/vdpa.c
-> @@ -651,6 +651,10 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa=
- *v, unsigned int cmd,
->         case VHOST_VDPA_SET_VRING_ENABLE:
->                 if (copy_from_user(&s, argp, sizeof(s)))
->                         return -EFAULT;
-> +               if (!vhost_backend_has_feature(vq,
-> +                       VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK) &&
-> +                   (ops->get_status(vdpa) & VIRTIO_CONFIG_S_DRIVER_OK))
-> +                       return -EINVAL;
+The solution is not to do further gymnastics with the xen_lock.
 
-As discussed, without VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK, we don't
-know if parents can do vq_ready after driver_ok.
+> Can't we simply not take xen_lock in kvm_xen_vcpu_get_attr()=C2=A0 It hol=
+ds vcpu->mutex
+> so it's mutually exclusive with kvm_xen_vcpu_set_attr(), and I don't see =
+any other
+> flows other than vCPU destruction that deactivate (or change) the gpc.
 
-So maybe we need to keep this behaviour to unbreak some "legacy" userspace?
+Maybe. Although with the gpc locking being incomplete, I'm extremely
+concerned about something *implicitly* relying on the xen_lock. We
+still need to fix the gpc to have self-contained locking.
 
-For example ifcvf did:
+I'll put something together and do some testing.
 
-static void ifcvf_vdpa_set_vq_ready(struct vdpa_device *vdpa_dev,
-                                    u16 qid, bool ready)
-{
-  struct ifcvf_hw *vf =3D vdpa_to_vf(vdpa_dev);
 
-        ifcvf_set_vq_ready(vf, qid, ready);
-}
+--=-fEkZUfdFOYO0ekxydfqM
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
 
-And it did:
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwMjA3MDMyOTQ1WjAvBgkqhkiG9w0BCQQxIgQgoPE3/4jn
+RnQkrArvfF9fPNxia5TKotgrQVoS7OMMl5swgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAQBSDgIX4PL/cBkRMVg6B6Y5/rfqVkvsZL
+S7jGgUDeOEroR7kYBfUkBt3iJYMN1p3fUe3NN3lujKGlnphh46bDHSB3sOyy5/ztCRal9hABTaUL
+7NyQb7k7OlgwQsTHL73C/sjrAddK1623Qn6Kkf0OVzwYF/P18jaOzNXlkCyQHmFSxTOv0COL5rCR
+2Yn/TJBJmFgLfXRUqQUqbBcGRzI3R4La4wNAUvUN7deHgQwbKy2qLVsj4oyFm+6zwwBCH40pYiSB
+DfHl66OR7t3K4LAGyuzoQ1Av+HeZA5JoXd+v/k8P9VB66V7FCnkzPLL6eM0GnAo7dIGpsPzbr7ur
+r2M0bWB0c28ht4ciN8gpLcdDct+HQBZiIcMiQNftyzFTzl+fQ5O7Xl6hfrV/e4HtPXawnHc+1VQd
+icd8aR2M95rsg68oI5HwTb96g2SNY2dp7+a0SbnRLNepaAF6IhLbvPXwevKUaYhDY3gpjrAPAgZ2
+bY5+G23Kd4Jpqn8iMuUvTj8atoGLvujlZSnX3knsGxzSpcVTOBN4flGxlSxabghRemIpj+/IdNzb
+0bZ+VdEge8iCW9M6qB5KZss+7LsZdDlVjf+VlS34qXsZuCHrc3i9UQS0n12qsSnp0XtPELYYLlMX
+5Lk/goegad6SqfCR7OnYJoI2iOI809kvi92oq0vuFgAAAAAAAA==
 
-void ifcvf_set_vq_ready(struct ifcvf_hw *hw, u16 qid, bool ready)
-{
-        struct virtio_pci_common_cfg __iomem *cfg =3D hw->common_cfg;
 
-        vp_iowrite16(qid, &cfg->queue_select);
-        vp_iowrite16(ready, &cfg->queue_enable);
-}
-
-Though it didn't advertise VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK?
-
-Adding LingShan for more thought.
-
-Thanks
-
->                 ops->set_vq_ready(vdpa, idx, s.num);
->                 return 0;
->         case VHOST_VDPA_GET_VRING_GROUP:
-> --
-> 2.43.0
->
-
+--=-fEkZUfdFOYO0ekxydfqM--
 
