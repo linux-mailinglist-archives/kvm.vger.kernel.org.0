@@ -1,76 +1,61 @@
-Return-Path: <kvm+bounces-8209-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8210-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FCE384C494
-	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 07:01:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43ACB84C4F6
+	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 07:26:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A30B7B27679
-	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 06:01:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7686E1C24317
+	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 06:26:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E241D1CD2B;
-	Wed,  7 Feb 2024 06:00:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9DE31CD35;
+	Wed,  7 Feb 2024 06:26:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZTm+8dBP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="j2TcFVBd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 565811CD1B
-	for <kvm@vger.kernel.org>; Wed,  7 Feb 2024 06:00:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7B911BF2F;
+	Wed,  7 Feb 2024 06:26:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.134.136.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707285656; cv=none; b=SwaRM7oO/MVgFlrAwVLKgW6tLACE0VGtLg41OWWRKjSPAMOcQseIdx6MQ/MbA2OLmIvvS3mYC41j7n56I9qL2FYuRtOfyNnSCmHfuMHhLKTHtiwmnNHJA46j3FtZkR9sSjOuPJ3dH6MU4aUKu4oB35rKwY/rJiRSgGaq79AjPIo=
+	t=1707287182; cv=none; b=S8ke533lZYxxBpczpYcV1U05YUPYp5Bc7s/WBu4Wis8UX3NwRXHzi+3sy/aaUyTYt1nXb2jwKLMLjD1iLfbfqbm6qcshZOsJmYyLvQ+IzRFoV7NfjSx5mvxaEHzVeH+VOwQUJYcXyH9qmv8+lGHoGmDc/s72LCCp5nhZNt6uqX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707285656; c=relaxed/simple;
-	bh=zR2nlrfbCKLeUBTLm8BZz1K6BjshVdR3RMIVxY5J4Zs=;
+	s=arc-20240116; t=1707287182; c=relaxed/simple;
+	bh=JR4iOw+Y89uOOayhfwGLM6PMQqlJE72PkLkGScVGlEY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VcsGaAd3h7DyZrjqec15Ig6tXVyhSY7n+OGsQYBZrzx51dsrO/LXteJ0hShZUmi3yuGzBAiy4pzNSS7yTkPZ7cWug+Cgi7ql0y49AMe4j2/34XkZCDw8+OpenRcKIdvqx2nJM9bAGU+DOz6z/dl/6PsWMsawoXRl5WclJnF0W9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ZTm+8dBP; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a2d7e2e7fe0so48304466b.1
-        for <kvm@vger.kernel.org>; Tue, 06 Feb 2024 22:00:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1707285652; x=1707890452; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2PdZRQZrV1iRL9uj91XqvnzzUKZBCaWjr7/54DWT5QY=;
-        b=ZTm+8dBPzeYCpSnnnjiu/xEDXW6qtkIBDp4PeIEM9s0Gn+elR+i3V0pypSrOAsbty5
-         SXMzwvbJvs2VNT5NFgh82aXXHZucJa0QC/Qo+/2loUpuK7Jmn4lDQZshHc8+nvvmFK0U
-         l/9OMV/UXdVtKzekQzQD7J/HTli8ZbeeCWqyIzsCkIIUumrsVWM4UQVnzsqS6qjSvZfm
-         LZV1+yOR42k3H86c4OnkH+7rkGL10m/xKLMARPP94fK4I1UbhhmNqPHJxxvPLW8T600M
-         xnidGCYTYB8BzqmjMDYE+Zd5698iPA62lIaitsi2TmkUEyds/XnXD5KAjF5cnt2VMPPo
-         ZTFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707285652; x=1707890452;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2PdZRQZrV1iRL9uj91XqvnzzUKZBCaWjr7/54DWT5QY=;
-        b=HUSXJOQvSDEVjQ1S0fGmb3vQmV6yl2m37WpsAe1DsMvKrmCH2HIkX3cj9eyBxfUems
-         b0iRieFvmbrpFzO57fh9MQT6uyu6jppy0H+X7vPzfMZ8V0HaDvmCmWpI79CmYVzdevyv
-         LXGutJvJcmoc0a8Q5BCaWqNzsRm2RSP0SYIMjPCTvOI6BIR5ZMEH6+Dce620Qkoq7J8y
-         8gT8wu3XZ570yz8DQClgJwcjvkCIt4nNpq7xDiz4Sv4Hpb8gCBLdXjmQ+jX+ysOiJCke
-         /yycjEE1z5ocH+wP4tIjAEyJTKjnMHDnaSrPXvOAxJR1cRpccoZb6+J1kQ9Z9p+RoDsc
-         wSuA==
-X-Forwarded-Encrypted: i=1; AJvYcCWyc27ypEAjKxHr5QWW/PgBUgQrbPnkG61yUOZypdQpG4Tgxg+M3lqkDhk9sjap+/lH/L1s44awYuvR5x2/YnBnRGAo
-X-Gm-Message-State: AOJu0YyLAfV6HiYMvjGfBRINvV8fGZGBDBzMkiPvIZF9qvl6RqjyptkQ
-	0A5V0oc3taR/brbDYG+y1vmXel9y5pw/tEVUNQM64HwTpmNEpmb7xdWZ0JnoBv9hz/V8Ttmanrp
-	h
-X-Google-Smtp-Source: AGHT+IF2tNFW9eK8UTv5s68PzvbbyYPXn0kRif1NVpn9SLDDNEMMuqZ4QrDB6vIzVqGz3Yb2aRoZMA==
-X-Received: by 2002:a17:906:507:b0:a38:5a98:3a8a with SMTP id j7-20020a170906050700b00a385a983a8amr1814285eja.30.1707285652606;
-        Tue, 06 Feb 2024 22:00:52 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCU2ZlchI3VIK6aCNFEb0aXAydCir687lTS4bJ/uXEBHx591UX6knxUTbYCFo5LIv/CCSDQ+9PJ7GCVEZ7rT0PY3vfSEIOWq7K5SwkzLczioUnndgiIxUT1WekvJlOyJwklpJY0rdsHJiZuLmVXmDwbETyZKbQR6FZEo3j5awRR4MwhmdgL0YDk4fP635wVwlhNJe4LnYog/LqysJR+q3fCw6b5Fs/vcFI2jRIe7bWkxEs+dYF3bpmZ8w1TLXd/9A3vXoc+Ng84ciS+AwG4C9E8Y/63W4ErUVc3Krb2YCnInyCO6dyaO/uRuAr9Zgv6FLxkk6GlqdEyZGTbk82u57bk6RPUNzOBF1Nc27h1C0owA2whojL/RZEGof7Ww0ssQ/S3XTWC74N6d41F25kCyH1f+lEJ3zSIk0oty70mV3oPky5m8yzQigMyFudvxFD/lYYiGZ9ixxC5C3snZ+Smm/A0hkpBwbk0BtMpfWBFeLZe+N9r7w0IqtLa0Z0rQrLbqSwfWxvrJE90RPY79K13FfLXqO/M=
-Received: from [192.168.69.100] ([176.176.170.22])
-        by smtp.gmail.com with ESMTPSA id i17-20020a170906265100b00a38576aefabsm353945ejc.161.2024.02.06.22.00.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 Feb 2024 22:00:52 -0800 (PST)
-Message-ID: <7ebf479e-271f-42a8-8df0-f124dc481dca@linaro.org>
-Date: Wed, 7 Feb 2024 07:00:50 +0100
+	 In-Reply-To:Content-Type; b=Hy2IFo0Xl2atrSbs1+6iV0CF5SvDW8NcY08VEQBbvaIeuitlEeH7xPNLAjbgJsm+feoXdplV5rMk46T0hrZe3lpi4fg0sHTwvCcnoUJvEoHeDEioRF79Kz0C1eNo0NUjO8OJv8+dGuH8QR1dGcrFGhGfOZ/mvWRvtC8ZVZtEZHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=j2TcFVBd; arc=none smtp.client-ip=134.134.136.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707287179; x=1738823179;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=JR4iOw+Y89uOOayhfwGLM6PMQqlJE72PkLkGScVGlEY=;
+  b=j2TcFVBd7v6A6aj7waG2BYmDBkADYOynAss1utJVNrpS8iGVrAYCsTWx
+   nbgRxCIVM1cpHCaAMDWpn5ODTrIDWbAVAzj9QB54zGRF2vM3L8GvB+6hi
+   UZ0uI4hGosLxZQsE4EZa9MdJpA2dOWS1nW6c8k4pEjLvI6dcwhCKw+Nns
+   NmbPNPliIk5iTbNQlkiLDhA9i4ceIbDyEiLQEZKGK1gwotMuduAaJkqpE
+   s2Q5G9rpOpGXncEEFb3t3GLzJDa1nrhsn19YyDxNagP0t5rlQIB+EW9NB
+   tyYR7CBAtHNI2cBnMWvFqkhXPGXmLLpOJKW8q7D6qHNRuiHnicXYrZ0Fu
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10976"; a="395336114"
+X-IronPort-AV: E=Sophos;i="6.05,250,1701158400"; 
+   d="scan'208";a="395336114"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2024 22:26:19 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,250,1701158400"; 
+   d="scan'208";a="1268658"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.22.149]) ([10.93.22.149])
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2024 22:26:15 -0800
+Message-ID: <2a5c652f-6e14-4ed7-accd-1cc49f099701@intel.com>
+Date: Wed, 7 Feb 2024 14:26:12 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -78,56 +63,46 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 10/21] i386: Split topology types of CPUID[0x1F] from
- the definitions of CPUID[0xB]
+Subject: Re: [PATCH v2 0/2] x86/asyncpf: Fixes the size of asyncpf PV data and
+ related docs
 Content-Language: en-US
-To: Zhao Liu <zhao1.liu@linux.intel.com>,
- Eduardo Habkost <eduardo@habkost.net>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Yanan Wang <wangyanan55@huawei.com>, "Michael S . Tsirkin" <mst@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
- Babu Moger <babu.moger@amd.com>, Xiaoyao Li <xiaoyao.li@intel.com>,
- Zhenyu Wang <zhenyu.z.wang@intel.com>,
- Zhuocheng Ding <zhuocheng.ding@intel.com>, Yongwei Ma
- <yongwei.ma@intel.com>, Zhao Liu <zhao1.liu@intel.com>
-References: <20240131101350.109512-1-zhao1.liu@linux.intel.com>
- <20240131101350.109512-11-zhao1.liu@linux.intel.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-In-Reply-To: <20240131101350.109512-11-zhao1.liu@linux.intel.com>
+To: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, Wanpeng Li <wanpengli@tencent.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>, x86@kernel.org, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20231025055914.1201792-1-xiaoyao.li@intel.com>
+ <170724645418.390975.5795716772259959043.b4-ty@google.com>
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <170724645418.390975.5795716772259959043.b4-ty@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 31/1/24 11:13, Zhao Liu wrote:
-> From: Zhao Liu <zhao1.liu@intel.com>
+On 2/7/2024 5:36 AM, Sean Christopherson wrote:
+> On Wed, 25 Oct 2023 01:59:12 -0400, Xiaoyao Li wrote:
+>> First patch tries to make the size of 'struct kvm_vcpu_pv_apf_data'
+>> matched with its documentation.
+>>
+>> Second patch fixes the wrong description of the MSR_KVM_ASYNC_PF_EN
+>> documentation and some minor improvement.
+>>
+>> v1: https://lore.kernel.org/all/ZS7ERnnRqs8Fl0ZF@google.com/T/#m0e12562199923ab58975d4ae9abaeb4a57597893
+>>
+>> [...]
 > 
-> CPUID[0xB] defines SMT, Core and Invalid types, and this leaf is shared
-> by Intel and AMD CPUs.
-> 
-> But for extended topology levels, Intel CPU (in CPUID[0x1F]) and AMD CPU
-> (in CPUID[0x80000026]) have the different definitions with different
-> enumeration values.
-> 
-> Though CPUID[0x80000026] hasn't been implemented in QEMU, to avoid
-> possible misunderstanding, split topology types of CPUID[0x1F] from the
-> definitions of CPUID[0xB] and introduce CPUID[0x1F]-specific topology
-> types.
-> 
-> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
-> Tested-by: Babu Moger <babu.moger@amd.com>
-> Tested-by: Yongwei Ma <yongwei.ma@intel.com>
-> Acked-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
-> Changes since v3:
->   * New commit to prepare to refactor CPUID[0x1F] encoding.
-> ---
->   target/i386/cpu.c | 14 +++++++-------
->   target/i386/cpu.h | 13 +++++++++----
->   2 files changed, 16 insertions(+), 11 deletions(-)
+> Applied to kvm-x86 asyncpf_abi.  I'll send a pull request (for 6.9) to Paolo
+> "soon" to ensure we get his eyeballs on the ABI change.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+Thanks!
+
+> [1/2] x86/kvm/async_pf: Use separate percpu variable to track the enabling of asyncpf
+>        https://github.com/kvm-x86/linux/commit/ccb2280ec2f9
+> [2/2] KVM: x86: Improve documentation of MSR_KVM_ASYNC_PF_EN
+>        https://github.com/kvm-x86/linux/commit/df01f0a1165c
+> 
+> --
+> https://github.com/kvm-x86/linux/tree/next
 
 
