@@ -1,204 +1,124 @@
-Return-Path: <kvm+bounces-8214-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8215-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FE2A84C65F
-	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 09:39:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81A9E84C690
+	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 09:47:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D04432865E2
-	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 08:39:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 376C82831CA
+	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 08:47:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AA91208C0;
-	Wed,  7 Feb 2024 08:39:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC89A208D0;
+	Wed,  7 Feb 2024 08:47:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L4e1Ky6j"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mNnq3fMf"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4850208AB
-	for <kvm@vger.kernel.org>; Wed,  7 Feb 2024 08:39:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57C6A20B28;
+	Wed,  7 Feb 2024 08:47:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707295173; cv=none; b=rj4DJ0Q1YXhaO3KDcJgcpUo4IZzFoBc8mz0tw+SEbMnluKh7CTi7rW0Ll0OVSs8f6jipDhYQ7H4c4SpiuNsO1lHz2ZUl7tjnm95pUAngBbkIMN0vy9D80RH1+uzeFOIlJ/A3bSJ5b5B5ALCtduA5GRCXT7CG50S7i86Xno3n+z0=
+	t=1707295664; cv=none; b=SqagBq1mMwrkD/kkNHuCKsHiajdV+5m6QxXy/R4PrrBqtNfw2H1++RhIZFMa4435LTvvNsrJskj3jIsDFLgosmeNvmVkAmbkUJvNvJKDNtpUTX3ntIWSSaRgvy0oLk7FO29rIGE2aj6GWXWWIHPrfEg3oBuVk4fAOfR3Nnuh5TM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707295173; c=relaxed/simple;
-	bh=ac9WGCOPPgNEkiYYzCiJVtWgr45GmwAPXfRv3awco68=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rkyOUEjb0DBJz7VDuppnu4CuVhwT/0tnBO+aPwWUJNwtwGeXz5y1QMyzobP9WOpFwwfE90RpJZpOfkIBHLZz8XEttawMDgLdTFQ/Y8FTF7hYXN8mWRarUEzIzfyXgg9j4t6S0DTTDYrr/wTNnvpI5aPGaF2IYODeiEJAWtUIpPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=L4e1Ky6j; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707295170;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZAXzbRx8bTrXW8mIoidP0h+87BdFw4xKcLSssnrU6kI=;
-	b=L4e1Ky6jhp3jBT29f84WPeXIe22+kt5BaQBFJGITZpxJRMIsM4zdpZ9vsKdkD9hW/qz+lC
-	IeQ4qDL6F465pAQ9cyvlVGSOKlq1jwaZsQUAx7/RIOM8Te8O6LV9MARs/eaA0cAaJfSUj0
-	kRaysZzk3TULt8sG9wRcro3VLX+gdyU=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-684-OrQW9Hg8MPiKemvuogwbNQ-1; Wed, 07 Feb 2024 03:39:29 -0500
-X-MC-Unique: OrQW9Hg8MPiKemvuogwbNQ-1
-Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-5606458fd5fso223540a12.3
-        for <kvm@vger.kernel.org>; Wed, 07 Feb 2024 00:39:28 -0800 (PST)
+	s=arc-20240116; t=1707295664; c=relaxed/simple;
+	bh=GNCOdcDDyq/1NLW7gyIwNzWiCnIN2b2fyZWE+y6K3Vk=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=QLT6ypU5aZ93Gji3E1v/Tt5z9rl3ClrC2D22VRlXOrlnYYKXOGDpW2OLbqdM2xI1D426EzELulbdIXjex2JUhJtFW1WTfII0Shj2JVrhX2ESzAt4ynUr315z5cwbz68kwoPwUx3Hc5yKB0UPVO9UHgZ2QlgjmmGGHwJb3x9tpck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mNnq3fMf; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a30f7c9574eso47622766b.0;
+        Wed, 07 Feb 2024 00:47:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707295660; x=1707900460; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Fj4qPaMqnd9zvKedeyiEsUW9fSkzif8DNAdYYIQAxxY=;
+        b=mNnq3fMfqRQSq0ntsDrNHh7nWgUHRlm0XIFrZ1J49/NwRCFw3NzvKAKeh/IFcKK8Rc
+         Bsd//YHF2lL8rVma5Fffl69nGqj/+TE/1kYwmOnjFacoCPGg3nOYHd5U5VSwhFeHXw1e
+         hzjNAtyqVWWJqzaTDdxEafu+71gIZ0L+88UD6JqZXWk3f1a+pSnJlPyAfJxwPfYernqi
+         SvYLXwAhzcHPXh3Ia7MTogGDoiMPC/i58NwkGDIsRvPr/N9wl3GNuxO3IubOcb9jBowA
+         B70vL5Om8wLFSq57+LZaGOzy+o8UEDETPv3gH1luGxL5qfbotR2C7KymBJQNFThRKqg9
+         XDkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707295168; x=1707899968;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZAXzbRx8bTrXW8mIoidP0h+87BdFw4xKcLSssnrU6kI=;
-        b=YQpozz9dlFVwmca7qYkAKH/zKsm3WVXi9QxQ23wIJLVmYp/510KKpr4oYKUL8Yjr8e
-         EWeOBsvFldkNfh/+adB2JsjQste72+CXr9Dmy014XSWY16zYFwpDypvuCASuk2qhq85y
-         cvYYEfXafoEtZjAaTjAHt7anzDdP9KFeuWJYWqnygtWpzkgfJjwTtdF91QZMCbOHz+r/
-         qOQCOIqRlV0kHeWPze/UsN01uBr6osbOf6L9B/Y2pLzQhySxqseNRLb3QxYLh/g8ErSv
-         Q/DrEM5htz34KkwPY1i+ReOaIEr02/hd19BUXN++9v84OiRFxj4jQB27hnKrS5AgCLim
-         TVbw==
-X-Forwarded-Encrypted: i=1; AJvYcCVW2KTWSPJSTM6pJmOFRY6GJ1ZfNV6RIgEVDMRBgpv+4pEb18iY9w1r+Ktq5ndd2tIi1QpFSY/6wtmr8U3RArLJM38m
-X-Gm-Message-State: AOJu0YxR0gWT3/FgDyD1Ie24OLQpAWkR+iR5z2In3SQ1A/+Qk/5uBRva
-	Q+EaTdFC15lY8k3IpWTQIBRtvEjqHHph9KDlRptcnTnRV+O6FMV3lYg0vohkmySmtgiiL1YNrck
-	67EesT54GwqdKo9h/d9NYZbqSjVeC6BHhSCFXxANvTyM8FWUkTQ==
-X-Received: by 2002:a05:6402:5154:b0:560:5fbb:a148 with SMTP id n20-20020a056402515400b005605fbba148mr3754142edd.39.1707295168127;
-        Wed, 07 Feb 2024 00:39:28 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH2NsvT4sc6tbDBunK98s9BxDYPuRaNGFxjLy/cDFmkZ9+vFiimAUV20Le1jH9Jq916ADH4gw==
-X-Received: by 2002:a05:6402:5154:b0:560:5fbb:a148 with SMTP id n20-20020a056402515400b005605fbba148mr3754124edd.39.1707295167716;
-        Wed, 07 Feb 2024 00:39:27 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXmXD5gssWICrqVD4rXZExDudFbZYFR2RZeq+rMKAk4PNSqGJyVYi6dsTVcI41S1tFy7j/DSDMaVpAcS9U7JjFFrFdzxKjDIdVHlAXE6d4jIuNlpUNS+z/cs4AWYEg6ZJg9Zu+TQlheXCLTqcQkGgHV16qh2Thea3iaajmeXxbjQPhbXP68udVDcEOvSjb3S+jS6lJYMv6Uef0o/GdexErkRX7VNSNlJ9v8KyxR1BgFmBCJYoHi7E38rkAbeqhN7wHPNwm8f4vmtyF+G+2TrI7oBd8KtDmTS+ITz7MV45g6hA==
-Received: from sgarzare-redhat (host-87-12-25-87.business.telecomitalia.it. [87.12.25.87])
-        by smtp.gmail.com with ESMTPSA id 15-20020a0564021f4f00b00560622cd10fsm424307edz.68.2024.02.07.00.39.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Feb 2024 00:39:27 -0800 (PST)
-Date: Wed, 7 Feb 2024 09:39:23 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: virtualization@lists.linux.dev, 
-	Shannon Nelson <shannon.nelson@amd.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org, Kevin Wolf <kwolf@redhat.com>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: Re: Re: [PATCH] vhost-vdpa: fail enabling virtqueue in certain
- conditions
-Message-ID: <wixps4w7rnbd67t5is6wtqvuw7e3waat4no3embl3vnjimtxvz@pemiyojtmunz>
-References: <20240206145154.118044-1-sgarzare@redhat.com>
- <CACGkMEs-FAz7Xv7j6k3grq97q9qO18Em2bLDS4qBaCDZS7+gbQ@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1707295660; x=1707900460;
+        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Fj4qPaMqnd9zvKedeyiEsUW9fSkzif8DNAdYYIQAxxY=;
+        b=iFHqbUMi3gAOLqecaqvUB1cKCGfu7YDASNq5aq+NiT5IO1j7Hw1E+idOd5D41TrimM
+         Fd3hyX1a7XQgx9FKVERQpRkifxr91O1+e+rj6h2f+ErY+ohrLX+TpVeGTPyg27ip2mL3
+         pCb+tMeVuNhaKfNq9986XmhU8I02frF8YjJpmBOIpKRvIOLHojA8a4QODX/De+HfWbc3
+         ctnf8RRQcpA48M02LZxp/Carhk02N6diI4AWljlCdoXsgI/4CRsRB7Mm0WlWKCem5nOu
+         0UKGrVnjEJp0UpBsng1UjB+fh413AV+b7SLCfL3xsXq9rrCO5mtwQ3OrKdUewcNbxu2R
+         TaLQ==
+X-Gm-Message-State: AOJu0YxRTju8W6MzY5UcEfAKbxKhpYhKj3ieyAC2h8L8eR8Kbn7V5aRG
+	DQgY9DlHh1fwxA6/XB2nmOe6WfmjNiFORecT5jkyo02hVanm/JEB
+X-Google-Smtp-Source: AGHT+IF47eTBssASZHFBQHUPdVTL2sd8ymlIBQS3sFcE44/e0oqTP4d4WKnMkzyy/1zrot22kLO7yg==
+X-Received: by 2002:a17:906:18a2:b0:a38:4b66:4200 with SMTP id c2-20020a17090618a200b00a384b664200mr1702660ejf.57.1707295660122;
+        Wed, 07 Feb 2024 00:47:40 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXz+tbM5ryfemC1cx72pU+5wNDFh6HzwogLpRXC0HdVl5P+RkXzlB2okC+Bj5W40NV2hrKIh63klT1ZYWS3D8SffIEt1VfshC9egB3lFuiPFPtvx4Fh4MMvZpGynRuCbkMECy/CI217RumAlLel4Ms7bwHYSe6gM1WT6b4RUP5W3+4AN0Szfvaf0XBkrM5OdiQeoD9e074HyPgNgAFa6aayJLyqWl6Y/15+li9cLWO5I9yUhKwP9ig5fR57rfAaKpOsKIwuPrqS1ozhnnVbZHzaRPREjN2/PYwBGIIAFthCsT1tyuZ+Y4/R/Ga6S2Gtw9LhwARAjlxLV5YTfsya9CwAVoe+0tRNiYrhStXwToLsFMQ02i3eCdD4DnJ0Bj0WlhP+NNRRkA7hym5s5qAfNSXLNFw+Es6ZXOr51X51thFPKFVLAdE=
+Received: from [192.168.11.39] (54-240-197-227.amazon.com. [54.240.197.227])
+        by smtp.gmail.com with ESMTPSA id i26-20020a170906115a00b00a36c7a7b4f7sm503528eja.207.2024.02.07.00.47.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 07 Feb 2024 00:47:39 -0800 (PST)
+From: Paul Durrant <xadimgnik@gmail.com>
+X-Google-Original-From: Paul Durrant <paul@xen.org>
+Message-ID: <6d66b3ce-2be6-4111-8f19-9234ee92b15a@xen.org>
+Date: Wed, 7 Feb 2024 08:47:32 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACGkMEs-FAz7Xv7j6k3grq97q9qO18Em2bLDS4qBaCDZS7+gbQ@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Reply-To: paul@xen.org
+Subject: Re: [PATCH v12 04/20] KVM: pfncache: add a mark-dirty helper
+Content-Language: en-US
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+ David Woodhouse <dwmw2@infradead.org>, Shuah Khan <shuah@kernel.org>,
+ kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20240115125707.1183-1-paul@xen.org>
+ <20240115125707.1183-5-paul@xen.org> <ZcL3CdGHv5FQHBVD@google.com>
+Organization: Xen Project
+In-Reply-To: <ZcL3CdGHv5FQHBVD@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Feb 07, 2024 at 11:27:14AM +0800, Jason Wang wrote:
->On Tue, Feb 6, 2024 at 10:52 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
->>
->> If VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK is not negotiated, we expect
->> the driver to enable virtqueue before setting DRIVER_OK. If the driver
->> tries anyway, better to fail right away as soon as we get the ioctl.
->> Let's also update the documentation to make it clearer.
->>
->> We had a problem in QEMU for not meeting this requirement, see
->> https://lore.kernel.org/qemu-devel/20240202132521.32714-1-kwolf@redhat.com/
->
->Maybe it's better to only enable cvq when the backend supports
->VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK. Eugenio, any comment on this?
->
->>
->> Fixes: 9f09fd6171fe ("vdpa: accept VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK backend feature")
->> Cc: eperezma@redhat.com
->> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
->> ---
->>  include/uapi/linux/vhost_types.h | 3 ++-
->>  drivers/vhost/vdpa.c             | 4 ++++
->>  2 files changed, 6 insertions(+), 1 deletion(-)
->>
->> diff --git a/include/uapi/linux/vhost_types.h b/include/uapi/linux/vhost_types.h
->> index d7656908f730..5df49b6021a7 100644
->> --- a/include/uapi/linux/vhost_types.h
->> +++ b/include/uapi/linux/vhost_types.h
->> @@ -182,7 +182,8 @@ struct vhost_vdpa_iova_range {
->>  /* Device can be resumed */
->>  #define VHOST_BACKEND_F_RESUME  0x5
->>  /* Device supports the driver enabling virtqueues both before and after
->> - * DRIVER_OK
->> + * DRIVER_OK. If this feature is not negotiated, the virtqueues must be
->> + * enabled before setting DRIVER_OK.
->>   */
->>  #define VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK  0x6
->>  /* Device may expose the virtqueue's descriptor area, driver area and
->> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
->> index bc4a51e4638b..1fba305ba8c1 100644
->> --- a/drivers/vhost/vdpa.c
->> +++ b/drivers/vhost/vdpa.c
->> @@ -651,6 +651,10 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
->>         case VHOST_VDPA_SET_VRING_ENABLE:
->>                 if (copy_from_user(&s, argp, sizeof(s)))
->>                         return -EFAULT;
->> +               if (!vhost_backend_has_feature(vq,
->> +                       VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK) &&
->> +                   (ops->get_status(vdpa) & VIRTIO_CONFIG_S_DRIVER_OK))
->> +                       return -EINVAL;
->
->As discussed, without VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK, we don't
->know if parents can do vq_ready after driver_ok.
->
->So maybe we need to keep this behaviour to unbreak some "legacy" userspace?
+On 07/02/2024 03:20, Sean Christopherson wrote:
+> On Mon, Jan 15, 2024, Paul Durrant wrote:
+>> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+>> index 7e7fd25b09b3..f3bb9e0a81fe 100644
+>> --- a/include/linux/kvm_host.h
+>> +++ b/include/linux/kvm_host.h
+>> @@ -1399,6 +1399,17 @@ int kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, unsigned long len);
+>>    */
+>>   void kvm_gpc_deactivate(struct gfn_to_pfn_cache *gpc);
+>>   
+>> +/**
+>> + * kvm_gpc_mark_dirty - mark a cached page as dirty.
+>> + *
+>> + * @gpc:	   struct gfn_to_pfn_cache object.
+>> + */
+>> +static inline void kvm_gpc_mark_dirty(struct gfn_to_pfn_cache *gpc)
+> 
+> Any objection to kvm_gpc_mark_dirty_in_slot()?  I want to make it clear this only
+> marks the gfn dirty in the memslot, i.e. that it doesn't mark the underlying page
+> as dirty.
 
-I'm not sure it's a good idea, since "legacy" userspace are currently 
-broken if used with VDUSE device. So we need to fix userspace in any 
-case, and IMHO is better if we start to return an error, so the user 
-understands what went wrong, because the problem in QEMU took us quite 
-some time to figure out that we couldn't enable vq after DRIVER_OK.
+Ok, that sounds fair.
 
-Since userspace is unable to understand if a vhost-vdpa device is VDUSE 
-or not, I think we have only 2 options either merge this patch or fix 
-VDUSE somehow. But the last one I think is more complicated/intrusive.
-
-Thanks,
-Stefano
-
->
->For example ifcvf did:
->
->static void ifcvf_vdpa_set_vq_ready(struct vdpa_device *vdpa_dev,
->                                    u16 qid, bool ready)
->{
->  struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
->
->        ifcvf_set_vq_ready(vf, qid, ready);
->}
->
->And it did:
->
->void ifcvf_set_vq_ready(struct ifcvf_hw *hw, u16 qid, bool ready)
->{
->        struct virtio_pci_common_cfg __iomem *cfg = hw->common_cfg;
->
->        vp_iowrite16(qid, &cfg->queue_select);
->        vp_iowrite16(ready, &cfg->queue_enable);
->}
->
->Though it didn't advertise VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK?
->
->Adding LingShan for more thought.
->
->Thanks
->
->>                 ops->set_vq_ready(vdpa, idx, s.num);
->>                 return 0;
->>         case VHOST_VDPA_GET_VRING_GROUP:
->> --
->> 2.43.0
->>
->
-
+   Paul
 
