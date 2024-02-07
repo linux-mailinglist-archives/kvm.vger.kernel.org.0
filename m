@@ -1,140 +1,128 @@
-Return-Path: <kvm+bounces-8238-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8239-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F8D184CE09
-	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 16:29:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17D6284CE10
+	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 16:30:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D9A0FB2277C
-	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 15:29:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A8CD71F26C09
+	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 15:30:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B10EE80030;
-	Wed,  7 Feb 2024 15:29:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E933C7FBC9;
+	Wed,  7 Feb 2024 15:30:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="NU0KCFI2"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ga3f9zBW"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com [209.85.167.180])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2541B7FBB7
-	for <kvm@vger.kernel.org>; Wed,  7 Feb 2024 15:28:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CBD380041
+	for <kvm@vger.kernel.org>; Wed,  7 Feb 2024 15:30:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707319739; cv=none; b=JpnR7pkCK4HNVqOWhIdQ1ct4yRv97rMvvkm9kFWi+pEB9wzsPPnDSClcjk84XUzHQVcvujfEhx1mOHfFFGfPsvsuTMjCmcxz5Yis40QHW9claz8K8UJQ6DCedmWvlcLSHUESQi/1g3RpVj/MitKAzYGQqND4kmrB2jbVrIdJ7N8=
+	t=1707319826; cv=none; b=Vtu17J9sewmrrAYnkyMKaQ+lPv2NlT/ifOO6W3msIxHnSSloWAwW0nOdZPdXiDMmmyz8qRuaLUjREGRt8b2YlkKkY4/xyiqqxptu5dvVggxtIjt1OGUn8ZiFjVWSyFwfy1y4p3b4P3hggzO662achKHwMBnQCN7a6uf0qTpfQMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707319739; c=relaxed/simple;
-	bh=KgcZE+tbSx7VYsRad6qU230OGLkbrGEcFdePnG3XBqw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Tsd2xGUZi9jfKw/sTtH9GTALlDA8GWPGE9Mkl86lc0j3kxUMHL6r1pYQPtH4dKb2ShOUCAEjsmieG4ONTcF+1ENuCexGin9VjOS894IwicBtKradBQaAJnezRhi2E6/U0e44I8jhlIJ6qlt7OIZcdE0Gplf78hJnIAZ5GYJRRrw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=NU0KCFI2; arc=none smtp.client-ip=209.85.167.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-oi1-f180.google.com with SMTP id 5614622812f47-3bb9b28acb4so584689b6e.2
-        for <kvm@vger.kernel.org>; Wed, 07 Feb 2024 07:28:56 -0800 (PST)
+	s=arc-20240116; t=1707319826; c=relaxed/simple;
+	bh=29vGtu7yU0AAORwx8Q0xZo25ggpOKaABrK7glygmnuI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=DO4cJKrGPH2v4hRTF/z2d7nK/A844ybONg6jgcG9NCsx7l+igmP3gTCBzQXIYCbxvU/vB5D+CnurCXlat1+m7d6cTGTpl47SoEksoTKmQFgsArdFqLqHcTUFygPnoB9xX3VzKllT+Hn8nlpVx4K5QI6kBVJSsqFWcrwSx7/Lnjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ga3f9zBW; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc6cd10fd4aso1051463276.1
+        for <kvm@vger.kernel.org>; Wed, 07 Feb 2024 07:30:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1707319736; x=1707924536; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KgcZE+tbSx7VYsRad6qU230OGLkbrGEcFdePnG3XBqw=;
-        b=NU0KCFI2PcXIesrZqDGaMumM07ZvsINqITiEAwBMhskWR31PwJB4q9nWxtvDCTO8Rh
-         IfbIpX2RViygtZEXSpGQCGsTpsDT++li9tKJl1fcXN9y0zRUAUS7k9Vj9IluITTrToXf
-         xPIJsabXnGELRFFBalq7+OpPtmVwCRBvcBFnDUeNl1oL0ZgyAT+2IHM3qrrw8yQd1d29
-         WoNgWFmGjcu4PtpA3hm6bd6GDiVniNDgAiSjev6BW9nIsWDZFtgeSvTTPfYIfoa4Sbxq
-         0UlYxzNH7P8IyUa/gcZr3zalpmpaeVxPmxRrNG8d2DEjrIJKcndJUQSHxUSM1ckT3kjU
-         0zlA==
+        d=google.com; s=20230601; t=1707319823; x=1707924623; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Z4HtoAHVB9z2HW85BOTsqebXKmcVqdZooPls6AoWI2E=;
+        b=Ga3f9zBW2hPlnwZvgjsBkQzU4lyiKxCyhgTKq605Lgpng9FNijWXDvlLjcryw35ltW
+         x5yGIriC2PneH5boIQUmMINSEvMVHDn/MKihCY1FeoOeEAT4wXLLDEjQPMb6GY6CyjAu
+         dUCUTvLNqi3UfH58W2K7wJUAhQk1M74LxrXLVEN2L+McljLkqg5mapSh0XG5yi9bjI4S
+         /hw8BFprxcI/LIfPCngWR56mqS6MzYSmDwYpVMkZzgW1p1kdeOgDdSw9wih2ZEPhX5Q2
+         G9v03Az3e9CgKgSeuB0S9aV3H9/RT5mSCryEfoOKe5KfULfP4PAMvxJoMOr747Yyd7K+
+         i2YA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707319736; x=1707924536;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KgcZE+tbSx7VYsRad6qU230OGLkbrGEcFdePnG3XBqw=;
-        b=aPGMTomKhIvokU8QzGXVYyo2ShxD/PsQh+4RzYI1MKaFeKBbbwxsEpusCaU2Nq4LDR
-         VHJIYurn1aUgwaIstddySqSBb3g9J399d6XOAyZh57qCCpE8LFDc+fPizZzWkaztGtpQ
-         Gx6O4wFRRAvsQZxr4EoWeMeBpz53YhIQf+NqZiNVbyE6Rn6PbJLeqDpx6V/lACXRRIoM
-         B+7UkasL20kDbvpyIJ4jr+V8IwV+i12BIc966bzgDbBlVB3tClYwbzzXF0t5AuSs7uuQ
-         fAjojob8IonE0DKXeWmIPDoI0tUP8Hj8MGX1un/hDxABNIBnziWTzirVmOYqWT9g+gKY
-         JRrA==
-X-Gm-Message-State: AOJu0Yz0ptJU20VF9dke5v8bCCLJ/cl95p3auR5m6x5d+SvqpO4by0e0
-	H42+fQ9Rn9G04Ic3m0J8v/5JZ3FOncPxw83kOKVgh0ZttRGNEH7NtG7wPvrC0vY=
-X-Google-Smtp-Source: AGHT+IHEL7CFznI2Gw3SaxhMoycGQY1ZAMJ2M/MoHIzeasU/nr/2JepWSFEuheW8Ams28t9PtymRRw==
-X-Received: by 2002:a05:6870:bac7:b0:219:83cc:287c with SMTP id js7-20020a056870bac700b0021983cc287cmr6065943oab.18.1707319736190;
-        Wed, 07 Feb 2024 07:28:56 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVUY+po1giBXhl03Vf0urto5lU8KkUE0xa/D+uEwt3aAnuuk7whgR0HTCfY+MTVQpslUqqUs/wsMp+t3ROMVbRdiv139tCe2ZBXKAtq4ZceV9PQJGgSNRI8IXanfewIYC0pI3FzZsKmRPGCkekyIVSuYunEdq/NKi0/3z9aOOnSjGhG1HWtDCKx6tkf7sG69wd0voFNXVKcPnx/Nm+iJxlnF6OfGX8tZ9W5Ef2TdHxCT40iWFJmfW6S8uQKXx/coePehrn7fBGc1ApNtwTAo8s/s5HRc5UVF5kRUR22WO8nHBRkrzcJX/Ul/xP8hPJikjNY5otCJsvQrEVBk2ZaVzx3MkqaDTyR4Ul7c2lNd1sQoJE9R4hMA5FyNT4k6cGm9+PELO3Pd2X6HZW5Jm8qV/VAErzvt6LcaoXye2Wua/2AYMT/wp1V94k8M1zgi8oPWuI9edPTgsfIAIs+qSWZnIHymtDR0ZDoa4pbEKoLlGJm39ZpBPkOgypT7AHFEI8rU/GAr/BBLOvIN75lw9qDVd4OTS7E4DjE+P+TXjW/ejHtWFFjkRAxscCfnxXGlxTCjMW8flXh31SrWNWQb7kthgrk5FZ0nc1rQCTq6Q8fWQP0Awd0gAJf2PwiCs47eD05aetIREJ1Gf81uCiJ/HxdH+LBZUmXJT18VOvJdRMBqtyz
-Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
-        by smtp.gmail.com with ESMTPSA id p6-20020a9d76c6000000b006e112c93b1esm228799otl.6.2024.02.07.07.28.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Feb 2024 07:28:55 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1rXjr4-008ccK-Kk;
-	Wed, 07 Feb 2024 11:28:54 -0400
-Date: Wed, 7 Feb 2024 11:28:54 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: "Gowans, James" <jgowans@amazon.com>
-Cc: "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"kexec@lists.infradead.org" <kexec@lists.infradead.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"brauner@kernel.org" <brauner@kernel.org>,
-	"Graf (AWS), Alexander" <graf@amazon.de>,
-	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-	"anthony.yznaga@oracle.com" <anthony.yznaga@oracle.com>,
-	"skinsburskii@linux.microsoft.com" <skinsburskii@linux.microsoft.com>,
-	"steven.sistare@oracle.com" <steven.sistare@oracle.com>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"seanjc@google.com" <seanjc@google.com>,
-	"Woodhouse, David" <dwmw@amazon.co.uk>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"joro@8bytes.org" <joro@8bytes.org>,
-	"ebiederm@xmission.com" <ebiederm@xmission.com>,
-	=?utf-8?B?U2Now7ZuaGVyciwgSmFuIEgu?= <jschoenh@amazon.de>,
-	"will@kernel.org" <will@kernel.org>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"usama.arif@bytedance.com" <usama.arif@bytedance.com>
-Subject: Re: [RFC 00/18] Pkernfs: Support persistence for live update
-Message-ID: <20240207152854.GL31743@ziepe.ca>
-References: <20240205120203.60312-1-jgowans@amazon.com>
- <20240205101040.5d32a7e4.alex.williamson@redhat.com>
- <6387700a8601722838332fdb2f535f9802d2202e.camel@amazon.com>
+        d=1e100.net; s=20230601; t=1707319823; x=1707924623;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Z4HtoAHVB9z2HW85BOTsqebXKmcVqdZooPls6AoWI2E=;
+        b=E7iHcEOQBxHrhghVNG0XgvJpuxEjUHxjKshSMBGPvscr25YEpYW2XGmCT8ui7z101L
+         2e6uK9S2ChkoxDbBNnBIfK14V6nq7v4vxwcngEK/XssivCtEpQaxAcqs17PY0euXhmQJ
+         FbAWz5mhUelsKvyzuStI4n0eAnyyk76f8dpmvkAD65yjoXNLebs1vouzYARpR4ZtGLuJ
+         b5IuzrQblFGWRPoDso7stA99pB5lMuuWDexl913JXhIC5hQ6tyNiQdemaQkFQBlkESBa
+         CPiAtSP84G25pu0V2Z25t0YGYwaMAcM3lIFHzbjOdpaG5ePOih0G3lCcwmaw5XHplKHx
+         ZrYg==
+X-Gm-Message-State: AOJu0YwiF5Hh5kmMKVprk99Nqk00Alu948e5dd+RIkcRJGqz7Y9uzYAT
+	B2jamxmUOb9IM1D3T94Jw6y8JL2x2iAw68wjevmIjW30hVVtBJIJw9ohyZsPHzPMkRqaCGYdmtF
+	YyQ==
+X-Google-Smtp-Source: AGHT+IHm0UAeTY0jrRYDjxsi6/W2lf2idjMOZ/39omY/MC1KZboNEYOdi+7r5MhNrDC85iynVdmlrecExE4=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:2302:b0:dc6:ebd4:cca2 with SMTP id
+ do2-20020a056902230200b00dc6ebd4cca2mr168524ybb.11.1707319823546; Wed, 07 Feb
+ 2024 07:30:23 -0800 (PST)
+Date: Wed, 7 Feb 2024 07:30:22 -0800
+In-Reply-To: <20231109210325.3806151-3-amoorthy@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6387700a8601722838332fdb2f535f9802d2202e.camel@amazon.com>
+Mime-Version: 1.0
+References: <20231109210325.3806151-1-amoorthy@google.com> <20231109210325.3806151-3-amoorthy@google.com>
+Message-ID: <ZcOiDopfqnPc69rF@google.com>
+Subject: Re: [PATCH v6 02/14] KVM: Documentation: Add docstrings for __kvm_read/write_guest_page()
+From: Sean Christopherson <seanjc@google.com>
+To: Anish Moorthy <amoorthy@google.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, oliver.upton@linux.dev, 
+	pbonzini@redhat.com, maz@kernel.org, robert.hoo.linux@gmail.com, 
+	jthoughton@google.com, dmatlack@google.com, axelrasmussen@google.com, 
+	peterx@redhat.com, nadav.amit@gmail.com, isaku.yamahata@gmail.com, 
+	kconsul@linux.vnet.ibm.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Feb 07, 2024 at 02:56:33PM +0000, Gowans, James wrote:
-> 2. Tell VFIO to avoid mapping the memory in again after live update
-> because it already exists.
-> https://github.com/jgowans/qemu/commit/6e4f17f703eaf2a6f1e4cb2576d61683eaee02b0
-> (the above flag should only be set *after* live update...).
+Same "Documentation" issue.  And the purpose of the change isn't to add docstrings,
+the purpose is to clarify the goofy/strange parameters:
 
-Definately no to that entire idea. It completely breaks how the memory
-lifetime model works in iommufd.
+  KVM: Add comment to clarify param usage for __kvm{read,_write}_guest_page()
 
-iommufd has to re-establish its pins, and has to rebuild all its
-mapping data structures. Otherwise it won't work correctly at all.
+On Thu, Nov 09, 2023, Anish Moorthy wrote:
+> The (gfn, data, offset, len) order of parameters is a little strange
+> since "offset" applies to "gfn" rather than to "data". Add docstrings to
 
-This is what I was saying in the other thread, you can't just ignore
-fully restoring the iommu environment.
+s/docstrings/function comments/.  This change has value and impact even if the
+kernel suddenly stops generating documentation from code.
 
-The end goal must be to have fully reconstituted iommufd with all its
-maps, ioas's, and memory pins back to fully normal operation.
-
-IMHO you need to focus on atomic replace where you go from the frozen
-pkernfs environment to a live operating enviornment by hitlessly
-replacing the IO page table in the HW. Ie going from an
-IOMMU_DOMAIN_PKERFS to an IOMMU_DOMAIN_PAGING owned by iommufd that
-describes exactly the same translation.
-
-"adopting" an entire io page table with unknown contents, and still
-being able to correctly do map/unmap seems way too hard.
-
-Jason
+> make things perfectly clear.
+> 
+> Signed-off-by: Anish Moorthy <amoorthy@google.com>
+> ---
+>  virt/kvm/kvm_main.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 687374138cfd..f521b6fd808f 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -3328,6 +3328,7 @@ static int next_segment(unsigned long len, int offset)
+>  		return len;
+>  }
+>  
+> +/* Copy @len bytes from guest memory at '(@gfn * PAGE_SIZE) + @offset' to @data */
+>  static int __kvm_read_guest_page(struct kvm_memory_slot *slot, gfn_t gfn,
+>  				 void *data, int offset, int len)
+>  {
+> @@ -3429,6 +3430,7 @@ int kvm_vcpu_read_guest_atomic(struct kvm_vcpu *vcpu, gpa_t gpa,
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_vcpu_read_guest_atomic);
+>  
+> +/* Copy @len bytes from @data into guest memory at '(@gfn * PAGE_SIZE) + @offset' */
+>  static int __kvm_write_guest_page(struct kvm *kvm,
+>  				  struct kvm_memory_slot *memslot, gfn_t gfn,
+>  			          const void *data, int offset, int len)
+> -- 
+> 2.42.0.869.gea05f2083d-goog
+> 
 
