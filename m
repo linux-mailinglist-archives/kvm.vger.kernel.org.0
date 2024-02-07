@@ -1,172 +1,110 @@
-Return-Path: <kvm+bounces-8235-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8234-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0877184CDD2
-	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 16:17:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C71A84CDCE
+	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 16:16:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99E171F23386
-	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 15:17:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF5D61C26435
+	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 15:15:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 410A37F7D9;
-	Wed,  7 Feb 2024 15:17:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E1C57FBB5;
+	Wed,  7 Feb 2024 15:15:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ljNFezj+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kE//yfoY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E24E7E77F;
-	Wed,  7 Feb 2024 15:17:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E54317F7F6
+	for <kvm@vger.kernel.org>; Wed,  7 Feb 2024 15:15:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707319042; cv=none; b=oXZpn15sRzbED1TXBX89XNTM4G4/vhei6cx5qDHVkvmy/c2pbAW8GmGO8xNjkYbi5UTYCqUj6XFhFXikBvyG/C26tc/lQHsaoapC8IzUi0TULStjU0hlj6Nn9hxd7uaFSyKtGdK/Eh0nxQJrNFLHBvaot29msGPBtHWPqpBlLLs=
+	t=1707318938; cv=none; b=NisyeC7xPm35YBZp4456ekGvn++aVYECFxZH7DJSr4uxD9SLe38aFfZ8ZkU9FBgg/NxsWgZlFQJKIkj0dK3j+GToJxfjYwUjNbyYSb9D/Bg0YvRQzdT/6MP+Z7kO17Me+21ww+A4xO5pB2ZIaPkTPCIgyIGyZbbxJba6ySA2uY0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707319042; c=relaxed/simple;
-	bh=HaVwog0vd20fRKI8tk8LKuyAmGU4sQJZhYsnB/xkj5U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f4lTtvQyMWW2mtEOggBYFloPP5IZI1zA4acfsjcd6p/83cjwIFKCoKjnZOKFoU9+3l/oe1yKlHO5Zz/TF4PsB+FmS3QJ1cQbfzhY3hv5AVg0KCe/7QUlOk8AN0lin7SBRpgrx9V6F/Cj4PnvlhrZQ43JYK2KpHWtHzU/7hl0RJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ljNFezj+; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707319040; x=1738855040;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=HaVwog0vd20fRKI8tk8LKuyAmGU4sQJZhYsnB/xkj5U=;
-  b=ljNFezj+yRIK1tU8w7rnmY+UpOSZJPEn+GD4gcS5bzKJeP2v71DwSbfz
-   kkdxYx+W/R4QVenb/OlBOmUj74PXUZDy5xRNLdUfLD7Mll/Oeh6hZviw/
-   d59A9tr331+wHN2ArXcR/AKdXkcgq/R1Vz5gXswEqpxN/fXVGXwHAF8Go
-   A8oC1QBlH28tKTPNs+O+9Fl/NcFB8pB5TtafxLJ2EL65X6g+i/TwC7i0P
-   Zk4ToDtz3QtLkJDYn9qKDopgPLQ4tve+pjShTWYuwiHogD/9ySD3CfpnI
-   M+Prs2oWTFTnvAU0jV6Nbs5X6lJJ2HSj6n3fw3lcFGzIG66iO7z+Rs7NL
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10977"; a="11742453"
-X-IronPort-AV: E=Sophos;i="6.05,251,1701158400"; 
-   d="scan'208";a="11742453"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Feb 2024 07:17:20 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,251,1701158400"; 
-   d="scan'208";a="32431766"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by fmviesa001.fm.intel.com with ESMTP; 07 Feb 2024 07:17:18 -0800
-Date: Wed, 7 Feb 2024 23:13:41 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
-	Pattara Teerapong <pteerapong@google.com>
-Subject: Re: [PATCH 7/8] KVM: x86/mmu: Alloc TDP MMU roots while holding
- mmu_lock for read
-Message-ID: <ZcOeJXHsiE5XUrBv@yilunxu-OptiPlex-7050>
-References: <20240111020048.844847-1-seanjc@google.com>
- <20240111020048.844847-8-seanjc@google.com>
- <ZcJSmNRLbKacPfoq@yilunxu-OptiPlex-7050>
- <ZcJ2JG54O0g07e-P@google.com>
+	s=arc-20240116; t=1707318938; c=relaxed/simple;
+	bh=+5gAsmpd9QdKp7xCjs/9IKm5TooA5w/PXHdwwf0C/zM=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=WzU6g/v/yy10G2blUKmI/nYi6p5rW/ptYPy3OZwquI0XjMtpG1tfKIiJl22Dv/YRA+zYJeSXc2UBVXM+abzGgOljLQgQC9CdWe8O/O+6PXApvH176diOXkywQs26/u4/he1Rr0oMAOnrRZrAF+wl5e/Um+BYNAgsaPsb4xiaYVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kE//yfoY; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6040ffa60ddso14860797b3.2
+        for <kvm@vger.kernel.org>; Wed, 07 Feb 2024 07:15:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1707318936; x=1707923736; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SEn4KucfVwWnA6ONVB1s2d+K8L0IxI86qXgAYuZM0Tk=;
+        b=kE//yfoYcQrXOncvzHqq8pth1y6c4fU/MHZhza5U1FfNM7YjOiJLiY/oMY+3e0enFD
+         Ympu34lvB73M6/0deGhppliXcKsv90XMjuUoppB+KC5GenPAJ82yUQpTZJBY9ze5vqJJ
+         bfqdxKvdxs79w3pnkAopoP7b6Uetq2u3sOj4Yrlit1lUmu5smKQJlq1PXMhv0pgibvxW
+         AI2e37JUEi8VPF0G6t6v3NagBsgDHwmusdQfYZJTREZ0wybL5gJ4dSIfJ+zcVXcVScXr
+         0UuLuqZJiLvl0nH8Z+QmOBqtrhCo7q1x27y1aYwD9/0tFSooLonp8x0I3loKkCQ/hDdb
+         yPkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707318936; x=1707923736;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=SEn4KucfVwWnA6ONVB1s2d+K8L0IxI86qXgAYuZM0Tk=;
+        b=bm9H+GQVxPEGlKiQVZx0QO3bUHSIcMthepOviZkG1GGF/kQFFzpxCZZUtsHVPKZOB3
+         yy7tnkaWJVsFx2ThMlGadxUQd4nT9YgVw/7EkCGwzFlSuDJgscFsJ/iQZL/pzHLk8/E7
+         UUMHgY4cKv/TNNgSv1bsfEwCZkR9r+xPtkjcY3MbccZcb5yzovlvrh6rUkDRgVAUtedf
+         74opZa1JKgrdscqwTEzjd3cPWKYnkd2EGhm13AL0JJvVPBXgifML1XUM/oW1PEp77P5K
+         rVwePppT2GlM2XvXTYEwQQ5QOtJt9a0Q765/GXUNL2po1Fw+kGlYX2EiLxpjv22dnH41
+         jAvA==
+X-Gm-Message-State: AOJu0YxzxHo7ogKjPOFs2F3wmqzY/pD0vJbnaabjaxTZDcDh3whPXEu+
+	2pwvkHRnLMn3Xb3u2y8bSD0NigmUwT9LTGB+v7+boSHw74+FnvKUBLu7EfGBGY5NFrsBG3OvOkU
+	Axg==
+X-Google-Smtp-Source: AGHT+IEFZ+SP4R0EEFAHlwFzyVCVMNE8xnvlYJ09UyF9xPMQ49VRACOjvraPRowOTS/BI6HZPeFFmoALbiM=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:39c:b0:5d3:5a95:2338 with SMTP id
+ bh28-20020a05690c039c00b005d35a952338mr1120972ywb.9.1707318935989; Wed, 07
+ Feb 2024 07:15:35 -0800 (PST)
+Date: Wed, 7 Feb 2024 07:15:34 -0800
+In-Reply-To: <a7f375a2e60eae85ffa69f6e60ac6a8cf18521dd.camel@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZcJ2JG54O0g07e-P@google.com>
+Mime-Version: 1.0
+References: <20240115125707.1183-1-paul@xen.org> <20240115125707.1183-4-paul@xen.org>
+ <ZcL2Y1gpRG8C1_8f@google.com> <a7f375a2e60eae85ffa69f6e60ac6a8cf18521dd.camel@infradead.org>
+Message-ID: <ZcOelockFh47Xu3s@google.com>
+Subject: Re: [PATCH v12 03/20] KVM: xen: mark guest pages dirty with the
+ pfncache lock held
+From: Sean Christopherson <seanjc@google.com>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Paul Durrant <paul@xen.org>, Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 06, 2024 at 10:10:44AM -0800, Sean Christopherson wrote:
-> On Tue, Feb 06, 2024, Xu Yilun wrote:
-> > On Wed, Jan 10, 2024 at 06:00:47PM -0800, Sean Christopherson wrote:
-> > > ---
-> > >  arch/x86/kvm/mmu/tdp_mmu.c | 55 +++++++++++++++-----------------------
-> > >  1 file changed, 22 insertions(+), 33 deletions(-)
-> > > 
-> > > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> > > index 9a8250a14fc1..d078157e62aa 100644
-> > > --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> > > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> > > @@ -223,51 +223,42 @@ static void tdp_mmu_init_child_sp(struct kvm_mmu_page *child_sp,
-> > >  	tdp_mmu_init_sp(child_sp, iter->sptep, iter->gfn, role);
-> > >  }
-> > >  
-> > > -static struct kvm_mmu_page *kvm_tdp_mmu_try_get_root(struct kvm_vcpu *vcpu)
-> > > -{
-> > > -	union kvm_mmu_page_role role = vcpu->arch.mmu->root_role;
-> > > -	int as_id = kvm_mmu_role_as_id(role);
-> > > -	struct kvm *kvm = vcpu->kvm;
-> > > -	struct kvm_mmu_page *root;
-> > > -
-> > > -	for_each_valid_tdp_mmu_root_yield_safe(kvm, root, as_id) {
-> > > -		if (root->role.word == role.word)
-> > > -			return root;
-> > > -	}
-> > > -
-> > > -	return NULL;
-> > > -}
-> > > -
-> > >  int kvm_tdp_mmu_alloc_root(struct kvm_vcpu *vcpu)
-> > >  {
-> > >  	struct kvm_mmu *mmu = vcpu->arch.mmu;
-> > >  	union kvm_mmu_page_role role = mmu->root_role;
-> > > +	int as_id = kvm_mmu_role_as_id(role);
-> > >  	struct kvm *kvm = vcpu->kvm;
-> > >  	struct kvm_mmu_page *root;
-> > >  
-> > >  	/*
-> > > -	 * Check for an existing root while holding mmu_lock for read to avoid
-> > > +	 * Check for an existing root before acquiring the pages lock to avoid
-> > >  	 * unnecessary serialization if multiple vCPUs are loading a new root.
-> > >  	 * E.g. when bringing up secondary vCPUs, KVM will already have created
-> > >  	 * a valid root on behalf of the primary vCPU.
-> > >  	 */
-> > >  	read_lock(&kvm->mmu_lock);
-> > > -	root = kvm_tdp_mmu_try_get_root(vcpu);
-> > > -	read_unlock(&kvm->mmu_lock);
-> > >  
-> > > -	if (root)
-> > > -		goto out;
-> > > +	for_each_valid_tdp_mmu_root_yield_safe(kvm, root, as_id) {
-> > > +		if (root->role.word == role.word)
-> > > +			goto out_read_unlock;
-> > > +	}
-> > >  
-> > > -	write_lock(&kvm->mmu_lock);
-> > 
-> > It seems really complex to me...
-> > 
-> > I failed to understand why the following KVM_BUG_ON() could be avoided
-> > without the mmu_lock for write. I thought a valid root could be added
-> > during zapping.
-> > 
-> >   void kvm_tdp_mmu_zap_invalidated_roots(struct kvm *kvm)
-> >   {
-> > 	struct kvm_mmu_page *root;
-> > 
-> > 	read_lock(&kvm->mmu_lock);
-> > 
-> > 	for_each_tdp_mmu_root_yield_safe(kvm, root) {
-> > 		if (!root->tdp_mmu_scheduled_root_to_zap)
-> > 			continue;
-> > 
-> > 		root->tdp_mmu_scheduled_root_to_zap = false;
-> > 		KVM_BUG_ON(!root->role.invalid, kvm);
-> 
-> tdp_mmu_scheduled_root_to_zap is set only when mmu_lock is held for write, i.e.
-> it's mutually exclusive with allocating a new root.
-> 
-> And tdp_mmu_scheduled_root_to_zap is cleared if and only if kvm_tdp_mmu_zap_invalidated_roots
-> is already set, and is only processed by kvm_tdp_mmu_zap_invalidated_roots(),
-> which runs under slots_lock (a mutex).
-> 
-> So a new, valid root can be added, but it won't have tdp_mmu_scheduled_root_to_zap
-> set, at least not until the current "fast zap" completes and a new one beings,
-> which as above requires taking mmu_lock for write.
+On Tue, Feb 06, 2024, David Woodhouse wrote:
+> On Tue, 2024-02-06 at 19:17 -0800, Sean Christopherson wrote:
+> > KVM: x86/xen: for the scope please.=C2=A0 A few commits have "KVM: xen:=
+", but "x86/xen"
+> > is the overwhelming favorite.
+>=20
+> Paul's been using "KVM: xen:" in this patch series since first posting
+> it in September of last year. If there aren't more substantial changes
+> you need, would you perhaps be able to make that minor fixup as you
+> apply the series?
 
-It's clear to me.
-
-Thanks for the detailed explanation.
-> 
+Yes, I can fixup scopes when applying, though I think in this case there's =
+just
+enough small changes that another version would be helpful.  Tweaks to the =
+scope
+are rarely grounds for needing a new version.  I'd say "never", but then so=
+meone
+would inevitably prove me wrong :-)
 
