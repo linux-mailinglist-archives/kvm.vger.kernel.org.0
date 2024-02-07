@@ -1,133 +1,113 @@
-Return-Path: <kvm+bounces-8230-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8232-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EB3084CD73
-	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 15:57:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01EF784CD7D
+	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 15:58:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E7BF1F23BF3
-	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 14:57:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DBB32818BF
+	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 14:58:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59ABF7F7F2;
-	Wed,  7 Feb 2024 14:56:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59DFB7F7FE;
+	Wed,  7 Feb 2024 14:58:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="BhyBzEYb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SU6HsbBY"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1505E7F477;
-	Wed,  7 Feb 2024 14:56:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01CDB7F488
+	for <kvm@vger.kernel.org>; Wed,  7 Feb 2024 14:58:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707317804; cv=none; b=GRrt4YmOxsuddG6XspMhnI3nSS1q92nAOyPjKFmWO2R4CWi8tMMzN09+jleInu3SAj6TG6P8JRaW82iwJVFnShuJtrWkwHcbKLsLNFDbZaAxWKjzFbKvRqB0du2I5JdI73fzgV+Z571wdGfR/fO3wfH1KpLbiKVtKV2HENB8ExM=
+	t=1707317907; cv=none; b=Px1ICYrFuvOp9EaiL0UaUbLLHEfYV4drFLupCeuopZEBpz12LM5xPh1yIvPXPi8OdDSipmA/6HVVI99fBQD5uhz2Zsx4x/DmJMdhipA3Y7IgvesS4/FcgUDkuUXIsH6jresYLIJmEIyV2D6KTW/TJJSDM85zQD+snhgMFOdEwQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707317804; c=relaxed/simple;
-	bh=TkFpvZmkphqkK0Mc10r/Fe7liBcw8osCeQ/jSq2WNzk=;
-	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=OGw7QNDKhjYsu1HiiJEwypjE2ZTzzoam9LZmdYqxN2fiJLpGFThGJE9Xe9+CiZsYqgnPGHW8JBo35tlVexJik6E7N0Rd/zUFMHAlDeVidqavbt9S2MHRHEIJkt0IQBYwnLHSoAgWmuEa2j0Pmy8Wkesa4HsaM58cPHjALMxMpKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=BhyBzEYb; arc=none smtp.client-ip=207.171.188.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1707317907; c=relaxed/simple;
+	bh=fHxvY9j/1axe2y2RH+QTdN9Fl0eA2wK3G26jE5p972U=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=P5srkdj4MnoR7HT7/H9IPbEShLqHwtWoDcogkswdn5s4m85UUtK+7Os5ssw3sY4NzEupfHnfA7fty2Od11+Ua9SIxW1CT//DX4bfkuylX4X/IxxNTJviv8aafSYrD/Z0Qm003ZWoebg/INamsZbigABJ3jZh1oy4HA05QPNI1dc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SU6HsbBY; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5efe82b835fso16208087b3.0
+        for <kvm@vger.kernel.org>; Wed, 07 Feb 2024 06:58:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1707317804; x=1738853804;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-id:content-transfer-encoding:mime-version:subject;
-  bh=TkFpvZmkphqkK0Mc10r/Fe7liBcw8osCeQ/jSq2WNzk=;
-  b=BhyBzEYbSJL/RtHXiu83YiUoPc6Kp+kadbQWWVG2dsCE+ppdEvmIisbZ
-   YVsFwm7KBUPbzBNEl34Hbq1fKGOmNTstchHY4xBn0vkRvf9PnU/ocDs/l
-   AizigMnLrXUML3d7ao4nuVuRe6MHAgSVSr5NE0yCcVB1eB9inLeByef59
-   4=;
-X-IronPort-AV: E=Sophos;i="6.05,251,1701129600"; 
-   d="scan'208";a="702749743"
-Subject: Re: [RFC 00/18] Pkernfs: Support persistence for live update
-Thread-Topic: [RFC 00/18] Pkernfs: Support persistence for live update
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Feb 2024 14:56:36 +0000
-Received: from EX19MTAEUB001.ant.amazon.com [10.0.17.79:53357]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.33.191:2525] with esmtp (Farcaster)
- id 163cb722-79c0-4cd0-bb34-f3f452cd665d; Wed, 7 Feb 2024 14:56:33 +0000 (UTC)
-X-Farcaster-Flow-ID: 163cb722-79c0-4cd0-bb34-f3f452cd665d
-Received: from EX19D012EUC002.ant.amazon.com (10.252.51.162) by
- EX19MTAEUB001.ant.amazon.com (10.252.51.28) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Wed, 7 Feb 2024 14:56:33 +0000
-Received: from EX19D014EUC004.ant.amazon.com (10.252.51.182) by
- EX19D012EUC002.ant.amazon.com (10.252.51.162) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Wed, 7 Feb 2024 14:56:33 +0000
-Received: from EX19D014EUC004.ant.amazon.com ([fe80::76dd:4020:4ff2:1e41]) by
- EX19D014EUC004.ant.amazon.com ([fe80::76dd:4020:4ff2:1e41%3]) with mapi id
- 15.02.1118.040; Wed, 7 Feb 2024 14:56:33 +0000
-From: "Gowans, James" <jgowans@amazon.com>
-To: "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "jgg@ziepe.ca"
-	<jgg@ziepe.ca>
-CC: "kexec@lists.infradead.org" <kexec@lists.infradead.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "brauner@kernel.org"
-	<brauner@kernel.org>, "Graf (AWS), Alexander" <graf@amazon.de>,
-	"iommu@lists.linux.dev" <iommu@lists.linux.dev>, "anthony.yznaga@oracle.com"
-	<anthony.yznaga@oracle.com>, "skinsburskii@linux.microsoft.com"
-	<skinsburskii@linux.microsoft.com>, "steven.sistare@oracle.com"
-	<steven.sistare@oracle.com>, "akpm@linux-foundation.org"
-	<akpm@linux-foundation.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "seanjc@google.com" <seanjc@google.com>,
-	"Woodhouse, David" <dwmw@amazon.co.uk>, "pbonzini@redhat.com"
-	<pbonzini@redhat.com>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"joro@8bytes.org" <joro@8bytes.org>, "ebiederm@xmission.com"
-	<ebiederm@xmission.com>, =?utf-8?B?U2Now7ZuaGVyciwgSmFuIEgu?=
-	<jschoenh@amazon.de>, "will@kernel.org" <will@kernel.org>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"usama.arif@bytedance.com" <usama.arif@bytedance.com>
-Thread-Index: AQHaWFZfiDfmUo9FfU6oG+xq/LSkjrD++v0A
-Date: Wed, 7 Feb 2024 14:56:33 +0000
-Message-ID: <6387700a8601722838332fdb2f535f9802d2202e.camel@amazon.com>
-References: <20240205120203.60312-1-jgowans@amazon.com>
-	 <20240205101040.5d32a7e4.alex.williamson@redhat.com>
-In-Reply-To: <20240205101040.5d32a7e4.alex.williamson@redhat.com>
-Accept-Language: en-ZA, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E7A761E4DFFA1B418369CD572A93C5BE@amazon.com>
-Content-Transfer-Encoding: base64
+        d=google.com; s=20230601; t=1707317905; x=1707922705; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=022zwx6MCTM2+vKlsZn6bQvDtEHFbRDoI918KeNrDZQ=;
+        b=SU6HsbBYACKfMQSVt4o3Eljxgs78Ny9XAxR4wt3KTJXvwLFsdo/j0wJymr6fZMCwSa
+         G50doHOSltLcdCGrISd/TSpCWQMZNd92wmRQ+GTIBzxiHwr//oKccmIbcOWgsVDry/l1
+         SoiOlcIKtEChrfTju7iV5QZpNeZFJWpKQ7/xqG/06ljUK+mIMntbM9ti2jND4LQT551c
+         0ExrMd+hxNu+DcyWSblFxjaTxQ03WFJzsR4AF87n7IOoT2xdioEIi0eoTDmy4FGJGDk5
+         M0ccaTWx2FiAiIpi4feptu+wZTyEFnEl7Zt67EQylGuMnUac/U3Kkm97pgtSuPUQl4+w
+         4gwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707317905; x=1707922705;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=022zwx6MCTM2+vKlsZn6bQvDtEHFbRDoI918KeNrDZQ=;
+        b=EpMLTyHWyKkuyy7gkADueotG5kNMnSK3/ws4jFnjGjfvKaIS3n8g/V2kftUdGsq8jl
+         xXmULswtlXRpVszlfOmxcEba5azY6a43jcDvHqC+ChuLBgR4ywvWUARqm+2QlHG6utEf
+         pQtUgsCRE4I1mMl0EC1kbsVLiKFBjVqQaMc2KctU3geKCbYY1yO87bXK8k782amWLSav
+         DqiqTw+hqYB3iWm+GZdyNkgxyxi20QNWE1R5CQCxn/wGXv2CPeAlQofVBU7+9Pzf1InA
+         gOQ+vj/6rvNoecBuyHLMdFE+TPBle5w5FSb76VuVQihL2df1jFnsOv1Axuj4/UVf0VA2
+         M0jQ==
+X-Gm-Message-State: AOJu0YwG0MTh4btMmXuGKJzVHMMnnKlr6ItpjxsJwJuBFnIHGWSfZvdG
+	kA8epDs+7gvgLi6xHSJ1CNNFn9toxd57sa75cHErcDPLAp+jLvwcwC7V0EmNSrkAu/K4Kfpe+rT
+	MDQ==
+X-Google-Smtp-Source: AGHT+IH8cjw7WA+9nGuzcgqW2xA8Iv7w9A4Dc0/I3ut6wcjH4wqie1YwlqkB90ZuGDFt+lLgxUp28nS+SV8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:11c9:b0:dc6:dfd9:d431 with SMTP id
+ n9-20020a05690211c900b00dc6dfd9d431mr1230159ybu.1.1707317905016; Wed, 07 Feb
+ 2024 06:58:25 -0800 (PST)
+Date: Wed, 7 Feb 2024 06:58:22 -0800
+In-Reply-To: <e4fd8089-bbbf-4f54-98f5-211eac165ac2@xen.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+References: <20240115125707.1183-1-paul@xen.org> <20240115125707.1183-14-paul@xen.org>
+ <ZcMDjZ2t8XflbIpD@google.com> <e4fd8089-bbbf-4f54-98f5-211eac165ac2@xen.org>
+Message-ID: <ZcOajtvik5oU1sLQ@google.com>
+Subject: Re: [PATCH v12 13/20] KVM: selftests / xen: map shared_info using HVA
+ rather than GFN
+From: Sean Christopherson <seanjc@google.com>
+To: paul@xen.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, David Woodhouse <dwmw2@infradead.org>, Shuah Khan <shuah@kernel.org>, 
+	kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-T24gTW9uLCAyMDI0LTAyLTA1IGF0IDEwOjEwIC0wNzAwLCBBbGV4IFdpbGxpYW1zb24gd3JvdGU6
-DQo+ID4gKiBOZWVkaW5nIHRvIGRyaXZlIGFuZCByZS1oeWRyYXRlIHRoZSBJT01NVSBwYWdlIHRh
-YmxlcyBieSBkZWZpbmluZw0KPiA+IGFuIElPTU1VIGZpbGUuDQo+ID4gUmVhbGx5IHdlIHNob3Vs
-ZCBtb3ZlIHRoZSBhYnN0cmFjdGlvbiBvbmUgbGV2ZWwgdXAgYW5kIG1ha2UgdGhlDQo+ID4gd2hv
-bGUgVkZJTw0KPiA+IGNvbnRhaW5lciBwZXJzaXN0ZW50IHZpYSBhIHBrZXJuZnMgZmlsZS4gVGhh
-dCB3YXkgeW914oCZZCAianVzdCIgcmUtDQo+ID4gb3BlbiB0aGUgVkZJTw0KPiA+IGNvbnRhaW5l
-ciBmaWxlIGFuZCBhbGwgb2YgdGhlIERNQSBtYXBwaW5ncyBpbnNpZGUgVkZJTyB3b3VsZCBhbHJl
-YWR5DQo+ID4gYmUgc2V0IHVwLg0KPiANCj4gTm90ZSB0aGF0IHRoZSB2ZmlvIGNvbnRhaW5lciBp
-cyBvbiBhIHBhdGggdG93YXJkcyBkZXByZWNhdGlvbiwgdGhpcw0KPiBzaG91bGQgYmUgcmVmb2N1
-c2VkIG9uIHZmaW8gcmVsYXRpdmUgdG8gaW9tbXVmZC7CoCBUaGVyZSB3b3VsZCBuZWVkIHRvDQo+
-IGJlIGEgc3Ryb25nIGFyZ3VtZW50IGZvciBhIGNvbnRhaW5lci90eXBlMSBleHRlbnNpb24gdG8g
-c3VwcG9ydCB0aGlzLA0KPiBpb21tdWZkIHdvdWxkIG5lZWQgdG8gYmUgdGhlIGZpcnN0IGNsYXNz
-IGltcGxlbWVudGF0aW9uLsKgIFRoYW5rcywNCg0KQWNrISBXaGVuIEkgZmlyc3Qgc3RhcnRlZCBw
-dXR0aW5nIHBrZXJuZnMgdG9nZXRoZXIsIGlvbW11ZmQgd2Fzbid0DQppbnRlZ3JhdGVkIGludG8g
-UUVNVSB5ZXQsIGhlbmNlIEkgc3R1Y2sgd2l0aCBWRklPIGZvciB0aGlzIFBvQy4NCkknbSB0aHJp
-bGxlZCB0byBzZWUgdGhhdCBpb21tdWZkIG5vdyBzZWVtcyB0byBiZSBpbnRlZ3JhdGVkIGluIFFF
-TVUhDQpHb29kIG9wcG9ydHVuaXR5IHRvIGdldCB0byBncmlwcyB3aXRoIGl0Lg0KDQpUaGUgVkZJ
-Ty1zcGVjaWZpYyBwYXJ0IG9mIHRoaXMgcGF0Y2ggaXMgZXNzZW50aWFsbHkgaW9jdGxzIG9uIHRo
-ZQ0KKmNvbnRhaW5lciogdG8gYmUgYWJsZSB0bzoNCg0KMS4gZGVmaW5lIHBlcnNpc3RlbnQgcGFn
-ZSB0YWJsZXMgKFBQVHMpIG9uIHRoZSBjb250YWluZXJzIHNvIHRoYXQgdGhvc2UNClBQVHMgYXJl
-IHVzZWQgYnkgdGhlIElPTU1VIGRvbWFpbiBhbmQgaGVuY2UgYnkgYWxsIGRldmljZXMgYWRkZWQg
-dG8gdGhhdA0KY29udGFpbmVyLg0KaHR0cHM6Ly9naXRodWIuY29tL2pnb3dhbnMvcWVtdS9jb21t
-aXQvZTg0Y2ZiODE4NmQ3MWY3OTdlZjFmNzJkNTdkODczMjIyYTliNDc5ZQ0KDQoyLiBUZWxsIFZG
-SU8gdG8gYXZvaWQgbWFwcGluZyB0aGUgbWVtb3J5IGluIGFnYWluIGFmdGVyIGxpdmUgdXBkYXRl
-DQpiZWNhdXNlIGl0IGFscmVhZHkgZXhpc3RzLg0KaHR0cHM6Ly9naXRodWIuY29tL2pnb3dhbnMv
-cWVtdS9jb21taXQvNmU0ZjE3ZjcwM2VhZjJhNmYxZTRjYjI1NzZkNjE2ODNlYWVlMDJiMA0KKHRo
-ZSBhYm92ZSBmbGFnIHNob3VsZCBvbmx5IGJlIHNldCAqYWZ0ZXIqIGxpdmUgdXBkYXRlLi4uKS4N
-Cg0KRG8geW91IGhhdmUgYSByb3VnaCBzdWdnZXN0aW9uIGFib3V0IGhvdyBzaW1pbGFyIGNvdWxk
-IGJlIGRvbmUgd2l0aA0KaW9tbXVmZD8NCg0KSkcNCg0K
+On Wed, Feb 07, 2024, Paul Durrant wrote:
+> On 07/02/2024 04:14, Sean Christopherson wrote:
+> > Please stop making up random scopes.  Yes, I know "KVM: selftests:" is too coarse,
+> > bt everyone doing their own thing is worse.
+> 
+> So what would you suggest?
+
+Until someone comes up with a better idea that at least a majority of developers
+agree on, maintain the status quo and use "KVM: selftests:" for the scope, and
+call out and/or allude to the relevant test(s) in the shortlog.  E.g. you can
+even squeeze in both:
+
+  KVM: selftests: Map Xen's shared_info page by HVA, not GPA in xen_shinfo_test
+
+I know it's kludgy and silly, but it's consistent.
+
+Aside from consistency, the "problem" with selftests is that most changes are
+either specific to one test, or affect multiple tests that have no common
+denominator beyond KVM.  And for changes that are targeted at a single test, I
+find it helpful if the shortlog specifies the exact test that's being changed.
+
+To be clear, I am definitely open to ideas if people feel "KVM: selftests" isn't
+working, I just want us to make a decision as a group and commit to it, as opposed
+to people using whatever scope suits their fancy.
 
