@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-8194-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8195-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DA2584C35B
-	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 05:03:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5EAF84C362
+	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 05:10:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F20E128E2A8
-	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 04:03:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2512A1C215EA
+	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 04:10:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83C7A12E47;
-	Wed,  7 Feb 2024 04:03:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6F6C11733;
+	Wed,  7 Feb 2024 04:10:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="q1lWABzF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SF8Qnkhd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6576010A14
-	for <kvm@vger.kernel.org>; Wed,  7 Feb 2024 04:03:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C828D14AAD
+	for <kvm@vger.kernel.org>; Wed,  7 Feb 2024 04:10:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707278608; cv=none; b=sGMfrIr8gl7owdZFza5a/7UVcMG5Rw8qGdw804xZr+JIb1WdgZ2NoCjfnrKKl7/P0A3OmqKLLc4L8gclJOn5kKG7+IDRhys/k4Kbq2jitto809ITsDNhcWPcy2oZjn4Sp26BX1lpZuvvOHsm7DZTFFT1HHOvsWTdDCrlOblv66M=
+	t=1707279015; cv=none; b=IzLUSlFzZWqLn0J8WcyC4UXk5x2p0nNUvR9/uUrTSV/kaUR+T+VBlUYlW3Jn9yQjLgBYNo9x3rYY/ncrqx1p6aMLC0dQBR2xTOBPiozHVj1Wgsdh9hRr7rJ1JOvBWeM24lYs/hvkjbAxkXJzXXrV0n406gq+Xp+Qva91f7GGliY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707278608; c=relaxed/simple;
-	bh=JjLVC4wkJU//dBMXZ69oFBlCvjbkdkDiMa8lOoCkIp0=;
+	s=arc-20240116; t=1707279015; c=relaxed/simple;
+	bh=GoYtXApYyZBo4VKeqb1AsTKENYpsyaUCglDP8GuS7kQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=CBEw7t4bAYu0M2dhScNjq+h8FKr23KmFf5vqCTeN0cBVcYNHRVo5fFv+v9jH8j3djBDU85gS5iPPjsCLLji1E/9WYpVtdq/VaXq2U2+FkdCzyiEmR/Gkp3goNjkKzlxVs2+cWuoEfO5b9EwcxnHNI6cJu81Id0tjQ6KLREHVet4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=q1lWABzF; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=gpW8s+sfljyEphQZU6EZ7LUkjy6VicbP0Fx7xY3rwmVPAA6i4Jq8EccxIdKdbMXXzQjxR4BfGZ+jYi3hRMM/JTrJw1Ys9eH5CqUgNylsLc8H9qrmK0lZXFdNz+PcldrD/fmYk7wUpXanmRLgJLeSZhYEJdKRHsxBOY7BDucorek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SF8Qnkhd; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1d93de28dc8so1871885ad.0
-        for <kvm@vger.kernel.org>; Tue, 06 Feb 2024 20:03:26 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2962056d9e7so188760a91.0
+        for <kvm@vger.kernel.org>; Tue, 06 Feb 2024 20:10:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707278606; x=1707883406; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1707279012; x=1707883812; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7VdHBOFzG1hpPCE2aT7A9wtUIgr6V8/ADfSs0UT+wFE=;
-        b=q1lWABzF771DZPBNDL4sLFt1KNYVKJBv33Rq6R5KPpxbdJQR7MZLAMdsOad47BGWSo
-         oMz9eaYT880lOgCzoKyN9tjM1KQy+hJhrltg0XboNAnN+y/0z36TrEO16pJt7Aw0Y+pj
-         KYBE9Fyif7Rmk1BvrEXQtgDgYzNs89+DtTr9dtmKsYUTvPRM6jbrQA3X/Fhil2zBGc/y
-         +Mq7aKSEZ5IoTDdYBclpSEseAUmJaLbu6G2ooV0BgF91n8flClVZp6gSTTBcO9HQfSiM
-         zO1D5+vh0tT09gWAth26jFndcASCvOIG7FelXM2Z3QKH+Az1MDOw2hpulYgTSbXt5ZRX
-         0zJQ==
+        bh=ykLN7fs6qQRnuF8WSISkwVcQAWTyJrlW1o+moHfC85k=;
+        b=SF8QnkhdmzPTdOrFesWrthVZBtR5tJkCM6a1G1aS4RwUlGEQ4b20Pyai4LwpRFZEDO
+         gbEOvuVlz/MRpZJJnFJ8Y14uy8DBy1xXBNcixgUNsPHwR0c8U9QgwuzYRARv3SdKJkEJ
+         G4ogiri+ow+sdLNpjI+GZf0jqlAMbKT4Xdd+P3FDWi4ftO6FTEagEdvcP1TVkBHDKoyj
+         eTRBV2/y/ysc1M+lxWYKioQ3UiKFv8T8LYhfqG/EECEi77PtBhPBago1/6LkW65MaCEB
+         YpHz8/1KXdv5sAI1vG91MYiVxcqC1cvEvNFtGSYRI90M8h+cSwh28uhh3ZCDvKQMfyLL
+         Ru9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707278606; x=1707883406;
+        d=1e100.net; s=20230601; t=1707279012; x=1707883812;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7VdHBOFzG1hpPCE2aT7A9wtUIgr6V8/ADfSs0UT+wFE=;
-        b=Cz34w0zsuKu+wRgnIhdD9hrMDxC+mnS6Ao4HS+sHWVRJRN2xfGlc07xZcg9lGlAekT
-         kgFyxl4bNNMiHrFxXiOHU5e9QCrGM71nqdFqY7kEP4poqIEakbcLiX6HkpUHPuIUHSTU
-         ZuqnqncrupY4mi7hXVobhKYKRee6Qqzl+IkeroGwZLy75NDWqYMV11BLjly0yGaNPROG
-         +nlOv8BnNpNQd9L8ScRxgEngt4wnXfsR8JXNDbW83Q4NqAXE6yTA0z2cv9/zdfYasRXQ
-         ptoGW7eCBPLQ/BuFY8ZGaUsQXYj8mo/UFJ6MQno209oztLPm9cbrxiZN8xlERh1x1gNZ
-         Bs4A==
-X-Gm-Message-State: AOJu0YxTX2UQwvN11ccwbVw2/gebq+8hcG44l0sbwlfyj6LhluOCVN8C
-	Ra309Nzo/fSaghJmk2oxQLVwjTtfxNhZin/bCldLNYk6sZ5W7GYwbsxZ7Ox/2cR8KfGuXvpqt1n
-	Y9Q==
-X-Google-Smtp-Source: AGHT+IG2PPDPZf8UPHTOJABx6M+gZeVvnxbUern2G3J+X4qXywNyMM258LB942uRWNr2zyc2eNvSNrfvxhM=
+        bh=ykLN7fs6qQRnuF8WSISkwVcQAWTyJrlW1o+moHfC85k=;
+        b=ZZKDb8tbUjU+9Hf+8r0ksAp8N+mcxg45qy4uVylX9HvTYDVSjSPQ5B6P/vWL1mZaFZ
+         BySjNch1taohKV5j+yuxE8A8ORR9yL+mn+DxWptXMjvyDgvUnEpFJo0eVYVAgQDXvZEb
+         37u9BCnx8zWnRJdtjGyDNb3eOsB1wcKCE/21uHP93kYcTFMHfksnSTVe2ExINFR3h8R9
+         oKjPWNmI7AzsYt9tQyyo6eA3UBZXcpxQfXZGYrx9eWfRloZmFCxai3ZdPvyR9Q0BxKJ4
+         Ef4IEgN8J7W2C73Lfa4E6TaAdjvd/5sy2QV4GOz4I+JvPTfAzgHx4PWk/FhhUyAvWS7J
+         8/Pg==
+X-Gm-Message-State: AOJu0Yyd6WJI0cX49jBxD8j9coPRrRAaZ5A2vDjCJYUsQSJfbmbI4XfX
+	6mxOfjlguzE/uu54NGGeXQx2TufFsYTrylzl0xrrJmyDYUEA7oNOlaUaqy9U867kuWUVLwbuOY3
+	a3A==
+X-Google-Smtp-Source: AGHT+IH+x2hZr5hgrqRm9mwlhGTe1zHc/Sl0rpDh0FcM4XBSnVg/GkvyIkz7aXggcw04KlEwBYkQvLZXGzU=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:d4cf:b0:1d9:a466:ed5b with SMTP id
- o15-20020a170902d4cf00b001d9a466ed5bmr10654plg.6.1707278605717; Tue, 06 Feb
- 2024 20:03:25 -0800 (PST)
-Date: Tue, 6 Feb 2024 20:03:24 -0800
-In-Reply-To: <20240115125707.1183-9-paul@xen.org>
+ (user=seanjc job=sendgmr) by 2002:a17:90b:50c8:b0:296:58cc:601f with SMTP id
+ sb8-20020a17090b50c800b0029658cc601fmr51199pjb.9.1707279012122; Tue, 06 Feb
+ 2024 20:10:12 -0800 (PST)
+Date: Tue, 6 Feb 2024 20:10:10 -0800
+In-Reply-To: <20240115125707.1183-12-paul@xen.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240115125707.1183-1-paul@xen.org> <20240115125707.1183-9-paul@xen.org>
-Message-ID: <ZcMBDP6H5PRo5C2d@google.com>
-Subject: Re: [PATCH v12 08/20] KVM: pfncache: allow a cache to be activated
- with a fixed (userspace) HVA
+References: <20240115125707.1183-1-paul@xen.org> <20240115125707.1183-12-paul@xen.org>
+Message-ID: <ZcMCogbbVKuTIXWJ@google.com>
+Subject: Re: [PATCH v12 11/20] KVM: xen: allow shared_info to be mapped by
+ fixed HVA
 From: Sean Christopherson <seanjc@google.com>
 To: Paul Durrant <paul@xen.org>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
@@ -82,91 +82,56 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
 	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
 	"H. Peter Anvin" <hpa@zytor.com>, David Woodhouse <dwmw2@infradead.org>, Shuah Khan <shuah@kernel.org>, 
 	kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, David Hildenbrand <david@redhat.com>
+	linux-kselftest@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 
-+s390 folks (question on kvm_is_error_gpa() for ya)
-
 On Mon, Jan 15, 2024, Paul Durrant wrote:
-> @@ -1398,7 +1414,9 @@ void kvm_gpc_deactivate(struct gfn_to_pfn_cache *gpc);
->  static inline void kvm_gpc_mark_dirty(struct gfn_to_pfn_cache *gpc)
->  {
->  	lockdep_assert_held(&gpc->lock);
-> -	mark_page_dirty_in_slot(gpc->kvm, gpc->memslot, gpc->gpa >> PAGE_SHIFT);
-> +
-> +	if (gpc->gpa != KVM_XEN_INVALID_GPA)
-
-KVM_XEN_INVALID_GPA absolutely doesn't belong in common code.  Not to mention
-that it will break when Paolo (rightly) moves it to an x86 header.
-
-https://lore.kernel.org/all/20240131233056.10845-3-pbonzini@redhat.com
-
-> +		mark_page_dirty_in_slot(gpc->kvm, gpc->memslot, gpc->gpa >> PAGE_SHIFT);
->  }
+> @@ -638,20 +637,32 @@ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
+>  		}
+>  		break;
 >  
->  void kvm_sigset_activate(struct kvm_vcpu *vcpu);
-> diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
-> index 97eec8ee3449..ae822bff812f 100644
-> --- a/virt/kvm/pfncache.c
-> +++ b/virt/kvm/pfncache.c
-> @@ -48,7 +48,10 @@ bool kvm_gpc_check(struct gfn_to_pfn_cache *gpc, unsigned long len)
->  	if (!gpc->active)
->  		return false;
+> -	case KVM_XEN_ATTR_TYPE_SHARED_INFO: {
+> +	case KVM_XEN_ATTR_TYPE_SHARED_INFO:
+> +	case KVM_XEN_ATTR_TYPE_SHARED_INFO_HVA: {
+>  		int idx;
 >  
-> -	if (gpc->generation != slots->generation || kvm_is_error_hva(gpc->uhva))
-> +	if (gpc->gpa != KVM_XEN_INVALID_GPA && gpc->generation != slots->generation)
-
-This needs a comment.  I know what it's doing, but it wasn't obvious at first
-glance, and it definitely won't be intuitive for readers that aren't intimately
-familiar with memslots.
-
-> +		return false;
-> +
-> +	if (kvm_is_error_hva(gpc->uhva))
->  		return false;
+>  		mutex_lock(&kvm->arch.xen.xen_lock);
 >  
->  	if (offset_in_page(gpc->uhva) + len > PAGE_SIZE)
-> @@ -209,11 +212,13 @@ static kvm_pfn_t hva_to_pfn_retry(struct gfn_to_pfn_cache *gpc)
->  	return -EFAULT;
->  }
+>  		idx = srcu_read_lock(&kvm->srcu);
 >  
-> -static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa,
-> +static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned long uhva,
->  			     unsigned long len)
->  {
->  	struct kvm_memslots *slots = kvm_memslots(gpc->kvm);
-> -	unsigned long page_offset = offset_in_page(gpa);
-> +	unsigned long page_offset = (gpa != KVM_XEN_INVALID_GPA) ?
-> +		offset_in_page(gpa) :
-> +		offset_in_page(uhva);
+> -		if (data->u.shared_info.gfn == KVM_XEN_INVALID_GFN) {
+> -			kvm_gpc_deactivate(&kvm->arch.xen.shinfo_cache);
+> -			r = 0;
+> +		if (data->type == KVM_XEN_ATTR_TYPE_SHARED_INFO) {
+> +			if (data->u.shared_info.gfn == KVM_XEN_INVALID_GFN) {
+> +				kvm_gpc_deactivate(&kvm->arch.xen.shinfo_cache);
+> +				r = 0;
+> +			} else {
+> +				r = kvm_gpc_activate(&kvm->arch.xen.shinfo_cache,
+> +						     gfn_to_gpa(data->u.shared_info.gfn),
+> +						     PAGE_SIZE);
+> +			}
+>  		} else {
+> -			r = kvm_gpc_activate(&kvm->arch.xen.shinfo_cache,
+> -					     gfn_to_gpa(data->u.shared_info.gfn),
+> -					     PAGE_SIZE);
+> +			if (data->u.shared_info.hva == 0) {
 
-This formatting is funky.  I also think it would be worth adding a helper to pair
-with kvm_is_error_hva().
+I know I said I don't care about the KVM Xen ABI, but I still think using '0' as
+"invalid" is ridiculous.
 
-But!  kvm_is_error_gpa() already exists, and it very, very sneakily does a memslot
-lookup and checks for a valid HVA.
+More importantly, this code needs to check that HVA is a userspace pointer.
+Because __kvm_set_memory_region() performs the address checks, KVM assumes any
+hva that it gets out of a memslot, i.e. from a gfn, is a safe userspace address.
 
-s390 people, any objection to renaming kvm_is_error_gpa() to something like
-kvm_gpa_has_memslot() or kvm_gpa_is_in_memslot()?  s390 is the only code that
-uses the existing helper.
+kvm_is_error_hva() will catch most addresses, but I'm pretty sure there's still
+a small window where userspace could use this to write kernel memory.
 
-That would both to free up the name to pair with kvm_is_error_hva(), and would
-make it obvious what the helper does; I was quite surprised that "error" means
-"is covered by a valid memslot".
-
-Back to this code, then we can have a slightly cleaner:
-
-	unsigned long page_offset = kvm_is_error_gpa(gpa) ? offset_in_page(gpa) :
-							    offset_in_page(uhva);
-
-
-And I think it's worth asserting that exactly _one_ of GPA or HVA is valid, e.g.
-to ensure KVM doesn't end up with botched offsets, and to make it a bit more
-clear what's going on.
-
-
-	if (WARN_ON_ONCE(kvm_is_error_gpa(gpa) == kvm_is_error_hva(uhva))
-		return -EINVAL;
+> +				kvm_gpc_deactivate(&kvm->arch.xen.shinfo_cache);
+> +				r = 0;
+> +			} else {
+> +				r = kvm_gpc_activate_hva(&kvm->arch.xen.shinfo_cache,
+> +							 data->u.shared_info.hva,
+> +							 PAGE_SIZE);
+> +			}
 
