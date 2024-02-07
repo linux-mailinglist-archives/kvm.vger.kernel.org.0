@@ -1,148 +1,232 @@
-Return-Path: <kvm+bounces-8168-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8169-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93A8B84C110
-	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 00:52:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B132184C1F6
+	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 02:39:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C76ED1C235E4
-	for <lists+kvm@lfdr.de>; Tue,  6 Feb 2024 23:52:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 135CFB20B83
+	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 01:39:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55AC41CD38;
-	Tue,  6 Feb 2024 23:52:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56765D535;
+	Wed,  7 Feb 2024 01:39:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fels2s3I"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GnX8esHo"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED6A41CF8C
-	for <kvm@vger.kernel.org>; Tue,  6 Feb 2024 23:52:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D38ED299;
+	Wed,  7 Feb 2024 01:39:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707263522; cv=none; b=eGIpoIzTygKWm+AHjUD72gD6Auc6rv4VOaU9ly/ZOi1cXa7CdTTJ04ABtbJyHLPtoBc/oxiKFszIsn7O9dA6vF/BLubeL77NfMZJwLH1XqBoGWhf/LF17HW0EsMyDjsIzk+VPsiEVBTEOi1ZusCIq+fwj8Z+uLOKlI1esSdQdqM=
+	t=1707269951; cv=none; b=QeCXJyjUdiwXe8jPsOCcMVItGT5tEaEnrrJyJqS1spatrNS1UAwKnAcIFLUZhMioNz+zCpOvQFPVUEC2Ij/8wqRYxqz7pFK+QDv/JC5OuiozcB7VrRylL5EkjtWvS+LFO+T42cGFbh9WN+yM7ZXjma6hRS/ED+1x3IlR16/jOX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707263522; c=relaxed/simple;
-	bh=ve66283HQWjoTIfCCyXOJ53dpz5pgvyRfthFOrG2wSQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TnKeG201wNjVis+DCYz7Wrh39Wt+6IryteA3p44M76Z8SwbqaysBdHNAQhsjoc650lelhAjNBGapBk2HGerAq6kcisXsAFAGgFWB2vAU0n32Lfl4MN4TNGXr+PVl9gwk9tRiu2Z9ERp2YIkPwyCUrokmkYPP/34cn706fAEPCYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fels2s3I; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707263519;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QlaMHMv+OFsz29LUU+CREUFzhlwBZ5CupOOm81GfonI=;
-	b=fels2s3IuSxeSTU0T1hhpedDNZri0VY5q4h8xVz36HJgxtjdNUWCw5/tp6GvyaYiEe4+AY
-	BjYVVSEgV16IjWuescU2tlfpHz9qrAhwtCYmz+rMMkPr0JLNE3eQstlzVX16jruBBIgD3R
-	BqOHb00jFRULkYfrz4tx9+MO8unakes=
-Received: from mail-vs1-f72.google.com (mail-vs1-f72.google.com
- [209.85.217.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-655-hIzSkqkXMpmXo8pDztEUJQ-1; Tue, 06 Feb 2024 18:51:58 -0500
-X-MC-Unique: hIzSkqkXMpmXo8pDztEUJQ-1
-Received: by mail-vs1-f72.google.com with SMTP id ada2fe7eead31-46d31058c80so641137.1
-        for <kvm@vger.kernel.org>; Tue, 06 Feb 2024 15:51:58 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707263518; x=1707868318;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QlaMHMv+OFsz29LUU+CREUFzhlwBZ5CupOOm81GfonI=;
-        b=bkyWpHipvQeNE1u6xaBWJcgSnen4V1lnMLzbZONOLpY0tgTyXktKjqV90RugOZBNhi
-         w3Do2Z4CLx7dI1iWuHiafc7HoWH8rhunHT1MydFRv9TTQy6p/P27UIKhHJ/4sNtkRisB
-         Kbpfl7WAQzwx+c5hjl9ZUsIKxNUEzURqV9I5pF0jglNmqjAUD2yzMPz48pXVz58Nklg1
-         Y16U/8yI+O9r6Y9HTrSVPp5IMIOXupSAffZiaXKy0aP9b/CATaVGYUhbQOG98eZXZMCd
-         AlommGZFnf54haN80dmXhGuk05EHJlmTgOpPhNEEpGDdpeRxLeslSw6/SLUTFtQ6/52k
-         c7tg==
-X-Gm-Message-State: AOJu0YwYpm7+mLhN/oPv3tZAuJNJzDL9R3Nsx3XldeyjxuXrV+UInsx7
-	TN4duSg8TwZnn0ZsFKZ9GipIa9qixOpNzoivmZbs1CZDz6HYwIYAGlRPNaP7yfOd4Jdnlo5yAtb
-	/y0tCyKODWQ7GtX1EKk7n8DYhxjZEj+A7ojYMXB+d5XVYBj8muXKXgCXDSmFTIclaiy5FfSuZWD
-	gKtPSRLChj/62oCrliszPo2eNB
-X-Received: by 2002:a05:6102:cf:b0:46c:fd63:bde1 with SMTP id u15-20020a05610200cf00b0046cfd63bde1mr1286401vsp.19.1707263518111;
-        Tue, 06 Feb 2024 15:51:58 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF70k2IB6sfXGMG5DxBsPeJSyX4Z7lyvMyz2eIY0biSnZnIU+nH0ONxsk7eIwQOzejVn484uJrg8s77iTZynRo=
-X-Received: by 2002:a05:6102:cf:b0:46c:fd63:bde1 with SMTP id
- u15-20020a05610200cf00b0046cfd63bde1mr1286379vsp.19.1707263517863; Tue, 06
- Feb 2024 15:51:57 -0800 (PST)
+	s=arc-20240116; t=1707269951; c=relaxed/simple;
+	bh=6oaC1YUxCH9GQjn6gnonmhGsI7UoDOmJjPUCm9v5DgU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=o1Hs7dxSX7ZVE1yTCDRhu+R8V8bRsvOnQjiN613K6wbcga6xjGYOY3aXOcndymbu3n0YCjs46ZiBb7AaMXbaV/t0WwH2l8AfBmKN4q4GvU1kkWfbw/PhAk4SDxVQ660q0z/zO9fckmp0nQu9bnX4w1uKG+sgYdbdBg+rpvTk3NA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GnX8esHo; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707269948; x=1738805948;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=6oaC1YUxCH9GQjn6gnonmhGsI7UoDOmJjPUCm9v5DgU=;
+  b=GnX8esHo2JnogYEanGc4UM+/kQpfi2YdjwhDhsMwh07VoEVBq7W9HQhz
+   553EYjRIfYZg048B9N2PTjYi7u9XNqVZYkTRn6xzsDs0VV1Y4ZapBCJFi
+   uO/GE8WbHUxf8f2iEJlj8MUNuQSXsbT7YELWZTpexWURDudwxRNb0jUYq
+   7grBQAHvm+PPMUIjApGGiiDVqdbVDtBc640hsdoKdPDdPqv+gMscuGy8d
+   d2Bq/mFEhdPGxFv8i5yRaEJmtrwoVIcqig+28AcKCcNw+WddfiOnuKw+8
+   FihEK0G+rv0IQIXNIUFvE+N3Zj9LokduuE+pq8ZBhKFdutvoQHgjvhOM+
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10976"; a="11533955"
+X-IronPort-AV: E=Sophos;i="6.05,248,1701158400"; 
+   d="scan'208";a="11533955"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2024 17:39:07 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,248,1701158400"; 
+   d="scan'208";a="1190525"
+Received: from allen-box.sh.intel.com ([10.239.159.127])
+  by fmviesa010.fm.intel.com with ESMTP; 06 Feb 2024 17:39:03 -0800
+From: Lu Baolu <baolu.lu@linux.intel.com>
+To: Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	Nicolin Chen <nicolinc@nvidia.com>
+Cc: Yi Liu <yi.l.liu@intel.com>,
+	Jacob Pan <jacob.jun.pan@linux.intel.com>,
+	Longfang Liu <liulongfang@huawei.com>,
+	Yan Zhao <yan.y.zhao@intel.com>,
+	Joel Granados <j.granados@samsung.com>,
+	iommu@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Lu Baolu <baolu.lu@linux.intel.com>
+Subject: [PATCH v12 00/16] iommu: Prepare to deliver page faults to user space
+Date: Wed,  7 Feb 2024 09:33:09 +0800
+Message-Id: <20240207013325.95182-1-baolu.lu@linux.intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231230172351.574091-1-michael.roth@amd.com> <20231230172351.574091-16-michael.roth@amd.com>
-In-Reply-To: <20231230172351.574091-16-michael.roth@amd.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 7 Feb 2024 00:51:46 +0100
-Message-ID: <CABgObfYDeUWMT03=yjvKG5J2GHYc9M7+A4+oY22gpqMCk1eQBg@mail.gmail.com>
-Subject: Re: [PATCH v11 15/35] KVM: SEV: Add KVM_SNP_INIT command
-To: Michael Roth <michael.roth@amd.com>
-Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org, 
-	linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org, 
-	tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de, 
-	thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, seanjc@google.com, 
-	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org, 
-	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com, 
-	peterz@infradead.org, srinivas.pandruvada@linux.intel.com, 
-	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, 
-	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com, 
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com, 
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
-	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com, 
-	Brijesh Singh <brijesh.singh@amd.com>, Pavan Kumar Paluri <papaluri@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Sat, Dec 30, 2023 at 6:26=E2=80=AFPM Michael Roth <michael.roth@amd.com>=
- wrote:
->
-> From: Brijesh Singh <brijesh.singh@amd.com>
->
-> The KVM_SNP_INIT command is used by the hypervisor to initialize the
-> SEV-SNP platform context. In a typical workflow, this command should be
-> the first command issued. When creating SEV-SNP guest, the VMM must use
-> this command instead of the KVM_SEV_INIT or KVM_SEV_ES_INIT.
->
-> The flags value must be zero, it will be extended in future SNP support
-> to communicate the optional features (such as restricted INT injection
-> etc).
+When a user-managed page table is attached to an IOMMU, it is necessary
+to deliver IO page faults to user space so that they can be handled
+appropriately. One use case for this is nested translation, which is
+currently being discussed in the mailing list.
 
-We have a (preexisting) problem in that KVM_SEV_INIT and
-KVM_SEV_ES_INIT are not flexible enough. debug_swap has broken
-measurements of the VMSA because it changed the contents of the VMSA
-under userspace's feet, therefore VMSA features need to be passed into
-the API somehow. It's preexisting but we need to fix it before the new
-KVM_SNP_INIT API makes it worse.
+I have posted a RFC series [1] that describes the implementation of
+delivering page faults to user space through IOMMUFD. This series has
+received several comments on the IOMMU refactoring, which I am trying to
+address in this series.
 
-I have started prototyping a change to move SEV-ES/SEV-SNP to
-KVM_CREATE_VM, and introduce a single KVM_SEV_INIT_VM operation that
-can be used for the PSP initialization.
+The major refactoring includes:
 
-> +The flags bitmap is defined as::
-> +
-> +   /* enable the restricted injection */
-> +   #define KVM_SEV_SNP_RESTRICTED_INJET   (1<<0)
-> +
-> +   /* enable the restricted injection timer */
-> +   #define KVM_SEV_SNP_RESTRICTED_TIMER_INJET   (1<<1)
+- [PATCH 01 ~ 04] Move include/uapi/linux/iommu.h to
+  include/linux/iommu.h. Remove the unrecoverable fault data definition.
+- [PATCH 05 ~ 06] Remove iommu_[un]register_device_fault_handler().
+- [PATCH 07 ~ 10] Separate SVA and IOPF. Make IOPF a generic page fault
+  handling framework.
+- [PATCH 11 ~ 16] Improve iopf framework.
 
-These are not yet supported, so they might as well not be documented.
-If you want to document them, you need to provide an API to query
-SEV_SNP_SUPPORTED_FLAGS. Let's do that later.
+This is also available at github [2].
 
-> +       if (params.flags & ~SEV_SNP_SUPPORTED_FLAGS)
-> +               ret =3D -EOPNOTSUPP;
-> +
-> +       params.flags =3D SEV_SNP_SUPPORTED_FLAGS;
+[1] https://lore.kernel.org/linux-iommu/20230530053724.232765-1-baolu.lu@linux.intel.com/
+[2] https://github.com/LuBaolu/intel-iommu/commits/preparatory-io-pgfault-delivery-v12
 
-This assignment is not necessary.
+Change log:
+v12:
+ - Add Jason and Kevin's Reviewed-by tags.
+ - Fix some minor comments.
+ - No code change.
 
-Paolo
+v11: https://lore.kernel.org/linux-iommu/20240130080835.58921-1-baolu.lu@linux.intel.com/
+ - Cleanup IOMMU_PAGE_RESP_PASID_VALID flag bit.
+ - Cleanup code comments.
+
+v10: https://lore.kernel.org/linux-iommu/20240122054308.23901-1-baolu.lu@linux.intel.com/
+  - Make iopf_group_response() return void, as nobody can do anything
+    with the failure.
+  - Make iommu_report_device_fault() automatically respond to
+    unhandleable faults and change its return type to void.
+  - PATCH 01 ~ 14 are in good shapes now.
+
+v9: https://lore.kernel.org/linux-iommu/20231220012332.168188-1-baolu.lu@linux.intel.com/
+  - Protecting the assignment of dev->iommu->fault_param with RCU.
+  - Extending the fault parameter's lifetime to the entire path of iopf
+    handling.
+  - Since iopf_queue_flush_dev() can only be called before
+    iopf_queue_remove_device(), there's no need to hold a reference
+    count.
+  - Improve iopf_queue_remove_device() as per Jason's comments on the
+    device removal sequence from the iopf queue. This will likely
+    require changes to the iommu drivers, which are supposed to be
+    addressed in separate series.
+  - Track the iopf_group as a whole instead of the last fault within the
+    group to simplify the fault report and response paths.
+  - PATCH 01 ~ 11 are in good shapes now.
+
+v8: https://lore.kernel.org/linux-iommu/20231207064308.313316-1-baolu.lu@linux.intel.com/
+ - Drop PATCH 12/12 as it is no longer necessary to drain page requests
+   page requests during PASID translation changes.
+ - Separate PATCH 11/12 into two distinct patches. The first patch
+   refines locking scheme for protecting per-device fault data, while
+   the second patch replaces mutex with RCU to enhance locking
+   efficiency.
+ - PATCH 01 ~ 10 are in good shapes now.
+
+v7: https://lore.kernel.org/linux-iommu/20231115030226.16700-1-baolu.lu@linux.intel.com/
+ - Rebase to v6.7-rc1.
+ - Export iopf_group_response() for global use.
+ - Release lock when calling iopf handler.
+ - The whole series has been verified to work for SVA case on Intel
+   platforms by Zhao Yan. Add her Tested-by to affected patches.
+
+v6: https://lore.kernel.org/linux-iommu/20230928042734.16134-1-baolu.lu@linux.intel.com/
+ - [PATCH 09/12] Check IS_ERR() against the iommu domain. [Jingqi/Jason]
+ - [PATCH 12/12] Rename the comments and name of iopf_queue_flush_dev(),
+   no functionality changes. [Kevin]
+ - All patches rebased on the latest iommu/core branch.
+
+v5: https://lore.kernel.org/linux-iommu/20230914085638.17307-1-baolu.lu@linux.intel.com/
+ - Consolidate per-device fault data management. (New patch 11)
+ - Improve iopf_queue_flush_dev(). (New patch 12)
+
+v4: https://lore.kernel.org/linux-iommu/20230825023026.132919-1-baolu.lu@linux.intel.com/
+ - Merge iommu_fault_event and iopf_fault. They are duplicate.
+ - Move iommu_report_device_fault() and iommu_page_response() to
+   io-pgfault.c.
+ - Move iommu_sva_domain_alloc() to iommu-sva.c.
+ - Add group->domain and use it directly in sva fault handler.
+ - Misc code refactoring and refining.
+
+v3: https://lore.kernel.org/linux-iommu/20230817234047.195194-1-baolu.lu@linux.intel.com/
+ - Convert the fault data structures from uAPI to kAPI.
+ - Merge iopf_device_param into iommu_fault_param.
+ - Add debugging on domain lifetime for iopf.
+ - Remove patch "iommu: Change the return value of dev_iommu_get()".
+ - Remove patch "iommu: Add helper to set iopf handler for domain".
+ - Misc code refactoring and refining.
+
+v2: https://lore.kernel.org/linux-iommu/20230727054837.147050-1-baolu.lu@linux.intel.com/
+ - Remove unrecoverable fault data definition as suggested by Kevin.
+ - Drop the per-device fault cookie code considering that doesn't make
+   much sense for SVA.
+ - Make the IOMMU page fault handling framework generic. So that it can
+   available for use cases other than SVA.
+
+v1: https://lore.kernel.org/linux-iommu/20230711010642.19707-1-baolu.lu@linux.intel.com/
+
+Lu Baolu (16):
+  iommu: Move iommu fault data to linux/iommu.h
+  iommu/arm-smmu-v3: Remove unrecoverable faults reporting
+  iommu: Remove unrecoverable fault data
+  iommu: Cleanup iopf data structure definitions
+  iommu: Merge iopf_device_param into iommu_fault_param
+  iommu: Remove iommu_[un]register_device_fault_handler()
+  iommu: Merge iommu_fault_event and iopf_fault
+  iommu: Prepare for separating SVA and IOPF
+  iommu: Make iommu_queue_iopf() more generic
+  iommu: Separate SVA and IOPF
+  iommu: Refine locking for per-device fault data management
+  iommu: Use refcount for fault data access
+  iommu: Improve iopf_queue_remove_device()
+  iommu: Track iopf group instead of last fault
+  iommu: Make iopf_group_response() return void
+  iommu: Make iommu_report_device_fault() return void
+
+ include/linux/iommu.h                         | 262 +++++++---
+ drivers/iommu/intel/iommu.h                   |   4 +-
+ drivers/iommu/iommu-sva.h                     |  71 ---
+ include/uapi/linux/iommu.h                    | 161 ------
+ .../iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c   |  14 +-
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c   | 103 ++--
+ drivers/iommu/intel/iommu.c                   |  28 +-
+ drivers/iommu/intel/svm.c                     |  41 +-
+ drivers/iommu/io-pgfault.c                    | 473 ++++++++++--------
+ drivers/iommu/iommu-sva.c                     |  71 ++-
+ drivers/iommu/iommu.c                         | 233 ---------
+ MAINTAINERS                                   |   1 -
+ drivers/iommu/Kconfig                         |   4 +
+ drivers/iommu/Makefile                        |   3 +-
+ drivers/iommu/intel/Kconfig                   |   1 +
+ 15 files changed, 583 insertions(+), 887 deletions(-)
+ delete mode 100644 drivers/iommu/iommu-sva.h
+ delete mode 100644 include/uapi/linux/iommu.h
+
+-- 
+2.34.1
 
 
