@@ -1,173 +1,201 @@
-Return-Path: <kvm+bounces-8244-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8245-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67DD584CE5B
-	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 16:47:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A79A84CE8E
+	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 17:04:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C9CF1C235D3
-	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 15:47:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F4101C21C48
+	for <lists+kvm@lfdr.de>; Wed,  7 Feb 2024 16:04:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8242980041;
-	Wed,  7 Feb 2024 15:46:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2323E80BE2;
+	Wed,  7 Feb 2024 16:04:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YSNDXVs1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="H0HHLloK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5234C7FBBD
-	for <kvm@vger.kernel.org>; Wed,  7 Feb 2024 15:46:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 191897FBDC
+	for <kvm@vger.kernel.org>; Wed,  7 Feb 2024 16:04:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707320803; cv=none; b=c9jiONLvJAo7u6WP+BgJBjfEyoU3Q3MFTTuKj5Ce5K/JUDxpfHsIYJQslMFsEwkIReSZRfytOHkeaHx4G4cS5VRQ2l1dHfLWGej56MX/PgvfjgtD+/CgxPBTqPCiL76/pZp+gwvdS6VlGS0cwfKFAD5TV2SAPGJlX/Px+t/L/KA=
+	t=1707321877; cv=none; b=iVhzo08vscDQTzu4K1+AwNe+jZYLwLJZIyfF2CByD1ZqDcCBKthopBJYbcAoInU51oSw/wWxN05lx5MmFTmVUf98JvIuPVEsajb02PUCRpmkZBN45DGV188SHjcNxQ0M9NXxv3FZz+K9Unr75xBalUcKlKN157gPPNSEtS12EOE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707320803; c=relaxed/simple;
-	bh=K53ZZvCsrolT8X395l++Yn5v68FJcDCJp22aYenng28=;
+	s=arc-20240116; t=1707321877; c=relaxed/simple;
+	bh=U784qeJ6nBxw6wDG9iod93zWSvHO8kFyVXpJtlwp29g=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=A/IeJKg1Sy7Bq4ng+KdN8/kAoTkyqynWIR/K7fw4ug6cb+iWYcNzBFqa/U8wBLmZL/ftaMvXXudY/xV1/aGexE7YV1YX8FNa4AYfQZqX3c1Ioy95vpRBu8k7f0JzAkwmj0oQPXac9Gj7t8bJ+A5xZ2lhy4hZL+jtvu/fFJig4PI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YSNDXVs1; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=BjJ6Bdwl2ZV3b/vJgeYzHiPZ/toQAWa6YyRUPzsMY7qSV4mfZZkntAVNymB+0IRIpYJtJN5qWQz2V1rwpfSbAEwE0V+3n6PZbOXkIocbiVWe7EBF5kDtY4WFbP7HvkGvuJXXP56FgK2zo2wHe5YbKVtUMGNT0VBCh0ARDidhSJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=H0HHLloK; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-29679438039so581131a91.2
-        for <kvm@vger.kernel.org>; Wed, 07 Feb 2024 07:46:42 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1d9c1d53de7so8036475ad.0
+        for <kvm@vger.kernel.org>; Wed, 07 Feb 2024 08:04:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707320801; x=1707925601; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1707321874; x=1707926674; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=K1vUU5GtV/HreAMSegqNxbtSuUlLZ3yEj2TqAzmQFAQ=;
-        b=YSNDXVs1S+YhNYmI7+zg3JEjEnQq5vybKwmTDEz45SGIKGf8JL4rSLNqpIryb56JPt
-         /fRzkaLWsIdY3GIC//uFNpMke9SlunUbM4NdNrr5Jt+LTrnewqUtDxfhOA/R/TVzfqcA
-         MsxQ/Qvftto15+sQ7ufZs/0cPJcEQC2nAVsBUc1eJtswWgaVrVn6fYc4Y63fntvvI5Yr
-         jpCGNDTbhAg0yJtEzAeE3zzdI0RbnfZGhWVVRYQYowJUj5lJ+BxugK6WWW68VAm55DDO
-         MRE2OotzftXhRzP4cdUTT/Tcoom0NNYLy4nW+WIdjjR6eyYYVovdDtMYaED3fD8lquHN
-         HFqg==
+        bh=pJsjt56qloa4KV7GYlBT9c9OJM+llHEZl1DwXvaLHRs=;
+        b=H0HHLloKoqrB+Y+zJeHbIoaUJfg3xDQnm/bOGJjVNecz88lJpERqSEYpJDHz4PoLx3
+         J4FO8Xa8c6CuZO81ueSRhT+G3Iz1C+7keUmOHTr32oAk6SaIsn52Ey3jMzsDsic5ORMd
+         p7MZaO+u4HpRLAhzgShT8TV1SCyzV9ZQ4w8OvqP7YbA27HgH/GuourbNjaOcnr2I39Ex
+         YhBeMWMdK5pxHg2NQQe2fniU1jMq/xBy3/FujWa3GlwEgJf6gkglRx5QW1/7nceqGFZ0
+         e8E5wqxZQgqC6p5WOXcJCz4VDztV1FDs1r+vJtsjJi92F4RcVmqLPhMjWXj68q8V+zsG
+         k9sA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707320801; x=1707925601;
+        d=1e100.net; s=20230601; t=1707321874; x=1707926674;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=K1vUU5GtV/HreAMSegqNxbtSuUlLZ3yEj2TqAzmQFAQ=;
-        b=E9jc2dobrI2nd7pe/Agywa1zFQrhU79eps0QayGGIpH/Ov+W7L76pSYVYpGmiuzd9A
-         HHxaS4/NPRlmp9VPjchsWYV2MVeztK+aFowdXhR611JraRCtuFrw50pTmJIraxJIGa4j
-         F9S5NDP0WmGAzV4guE+cx8nFEXrWsbieax5vqgGXnEt+C//CWtv8JmUsHrt+qbpsjBzd
-         e0muCAFd8ueCI7oeWFN6L3aKyvRSpGdoN8JBDAXp2iKNqYYZtFIvrxEA4t+wmAQ8Tdif
-         Hb0lRnAX+pCzT4M3lgeNw+1+jpxvu0lpOKgYgClnQSh8dcHODnzhVgWM+f0PWnMZvcDd
-         DsQg==
-X-Gm-Message-State: AOJu0Yz0usE/YZKM2rDDLYEqOP9XUUS4VBJsqzTZbmC0Pqq2XrpwqZHN
-	BxTshEQSI2xpkmGw9yey32z2hd883j0qkY/smeMUgHwn1ug3Jcp4hCNQsyB1MEvGikMIOtJtImp
-	zKg==
-X-Google-Smtp-Source: AGHT+IG7frfAntHd6YSunGAL3Hn4axWdZ7/qTDuWTl4579rwZ2kTb+Iw2ltwdxLQXj5I7ZHZyi9fLGwQvM8=
+        bh=pJsjt56qloa4KV7GYlBT9c9OJM+llHEZl1DwXvaLHRs=;
+        b=QoiCP8BgyTHEsSGdW0fQd0ySc8W+IxqoNvYny41JlL2Nvrr9y6vmFl3b4Qdz9H+Ypy
+         sEsLF2WLXaZpAkvscy2Wu1byDgfgUMvmIIHb0nNjmd6IrH9gZ/M5TVsp536GMNEeRtm6
+         Xgo6kKbPOnjIM9IIe5XULi/I1qDIaa4eRhqxUsR74gkNvQ/GyjnJQZJF/SxYp98IgO43
+         e8ZxbTjwWMg7mk51sS0J6sXV9ji7AkldPJZjESPCV/v+bsukacBgLVNgwY3yJdTLbxqd
+         Yu7WroQqR5u7cXr6qhBn/U3vxwjAzMfbfOvW7Mmtm4Q9UvrEwdLsgu1vmeJU4+dGOekp
+         /meQ==
+X-Gm-Message-State: AOJu0YxOhaWTuXRycPJnlOtc3zNcFnaquJAmXwNRjp7v9dOuKCn2UZ/I
+	fzFgkR5Slct0rVM2ELjjWVc3yvhE85puNs15koSv8rsqvFTIJLz7tMvezhMQOHTyXuwHOnQBz3P
+	Fdw==
+X-Google-Smtp-Source: AGHT+IFyJtG5EyhxDAVsDKIAhWMowCgx/MJODI19A69KOcFop9G1VyI2+SVO5855R6027qmcImXZ1i7tGXQ=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:2b4f:b0:296:3a3a:92ae with SMTP id
- rr15-20020a17090b2b4f00b002963a3a92aemr8912pjb.4.1707320801606; Wed, 07 Feb
- 2024 07:46:41 -0800 (PST)
-Date: Wed, 7 Feb 2024 07:46:40 -0800
-In-Reply-To: <20231109210325.3806151-1-amoorthy@google.com>
+ (user=seanjc job=sendgmr) by 2002:a17:902:e804:b0:1d9:47e7:3c86 with SMTP id
+ u4-20020a170902e80400b001d947e73c86mr205386plg.0.1707321874324; Wed, 07 Feb
+ 2024 08:04:34 -0800 (PST)
+Date: Wed, 7 Feb 2024 08:04:32 -0800
+In-Reply-To: <20231229022652.300095-1-chao.gao@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20231109210325.3806151-1-amoorthy@google.com>
-Message-ID: <ZcOl4PTbobZTsuNW@google.com>
-Subject: Re: [PATCH v6 00/14] Improve KVM + userfaultfd performance via
- KVM_MEMORY_FAULT_EXITs on stage-2 faults
+References: <20231229022652.300095-1-chao.gao@intel.com>
+Message-ID: <ZcOqEBTJ5espqX0E@google.com>
+Subject: Re: [PATCH] KVM: VMX: Report up-to-date exit qualification to userspace
 From: Sean Christopherson <seanjc@google.com>
-To: Anish Moorthy <amoorthy@google.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, oliver.upton@linux.dev, 
-	pbonzini@redhat.com, maz@kernel.org, robert.hoo.linux@gmail.com, 
-	jthoughton@google.com, dmatlack@google.com, axelrasmussen@google.com, 
-	peterx@redhat.com, nadav.amit@gmail.com, isaku.yamahata@gmail.com, 
-	kconsul@linux.vnet.ibm.com
+To: Chao Gao <chao.gao@intel.com>
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Nov 09, 2023, Anish Moorthy wrote:
-> Base Commit
-> ~~~~~~~~~~~
-> This series is based off of kvm/next (45b890f7689e) with v14 of the
-> guest_memfd series applied, with some fixes on top [3].
-
-Please use `--base`.  I have gotten spoiled by git appending the object ID at the
-bottom, and get annoyed every time I have to go spelunking for the base :-)
-
-Also, in the future, when posting a series that has multiple dependencies, it is
-*very* helpful to reviewers and maintainers to provide a full branch somewhere,
-e.g. on github, gitlab, etc.  That way someone that wants to actually test things
-doesn't need to hunt down and splice together a bunch of different assets.
-
-From Documentation/process/maintainer-kvm-x86.rst:
-
-Git Base
-~~~~~~~~
-If you are using git version 2.9.0 or later (Googlers, this is all of you!),
-use ``git format-patch`` with the ``--base`` flag to automatically include the
-base tree information in the generated patches.
-
-Note, ``--base=auto`` works as expected if and only if a branch's upstream is
-set to the base topic branch, e.g. it will do the wrong thing if your upstream
-is set to your personal repository for backup purposes.  An alternative "auto"
-solution is to derive the names of your development branches based on their
-KVM x86 topic, and feed that into ``--base``.  E.g. ``x86/pmu/my_branch_name``,
-and then write a small wrapper to extract ``pmu`` from the current branch name
-to yield ``--base=x/pmu``, where ``x`` is whatever name your repository uses to
-track the KVM x86 remote.
-
-> Anish Moorthy (14):
->   KVM: Documentation: Clarify meaning of hva_to_pfn()'s 'atomic'
->     parameter
->   KVM: Documentation: Add docstrings for __kvm_read/write_guest_page()
->   KVM: Simplify error handling in __gfn_to_pfn_memslot()
->   KVM: Define and communicate KVM_EXIT_MEMORY_FAULT RWX flags to
->     userspace
->   KVM: Try using fast GUP to resolve read faults
->   KVM: Add memslot flag to let userspace force an exit on missing hva
->     mappings
->   KVM: x86: Enable KVM_CAP_EXIT_ON_MISSING and annotate EFAULTs from
->     stage-2 fault handler
->   KVM: arm64: Enable KVM_CAP_MEMORY_FAULT_INFO
->   KVM: arm64: Enable KVM_CAP_EXIT_ON_MISSING and annotate an EFAULT from
->     stage-2 fault-handler
->   KVM: selftests: Report per-vcpu demand paging rate from demand paging
->     test
->   KVM: selftests: Allow many vCPUs and reader threads per UFFD in demand
->     paging test
->   KVM: selftests: Use EPOLL in userfaultfd_util reader threads and
->     signal errors via TEST_ASSERT
->   KVM: selftests: Add memslot_flags parameter to memstress_create_vm()
->   KVM: selftests: Handle memory fault exits in demand_paging_test
+On Fri, Dec 29, 2023, Chao Gao wrote:
+> Use vmx_get_exit_qual() to read the exit qualification.
 > 
->  Documentation/virt/kvm/api.rst                |  33 +-
->  arch/arm64/kvm/Kconfig                        |   1 +
->  arch/arm64/kvm/arm.c                          |   1 +
->  arch/arm64/kvm/mmu.c                          |   7 +-
->  arch/powerpc/kvm/book3s_64_mmu_hv.c           |   2 +-
->  arch/powerpc/kvm/book3s_64_mmu_radix.c        |   2 +-
->  arch/x86/kvm/Kconfig                          |   1 +
->  arch/x86/kvm/mmu/mmu.c                        |   8 +-
->  include/linux/kvm_host.h                      |  21 +-
->  include/uapi/linux/kvm.h                      |   5 +
->  .../selftests/kvm/aarch64/page_fault_test.c   |   4 +-
->  .../selftests/kvm/access_tracking_perf_test.c |   2 +-
->  .../selftests/kvm/demand_paging_test.c        | 295 ++++++++++++++----
->  .../selftests/kvm/dirty_log_perf_test.c       |   2 +-
->  .../testing/selftests/kvm/include/memstress.h |   2 +-
->  .../selftests/kvm/include/userfaultfd_util.h  |  17 +-
->  tools/testing/selftests/kvm/lib/memstress.c   |   4 +-
->  .../selftests/kvm/lib/userfaultfd_util.c      | 159 ++++++----
->  .../kvm/memslot_modification_stress_test.c    |   2 +-
->  .../x86_64/dirty_log_page_splitting_test.c    |   2 +-
->  virt/kvm/Kconfig                              |   3 +
->  virt/kvm/kvm_main.c                           |  46 ++-
->  22 files changed, 444 insertions(+), 175 deletions(-)
+> vcpu->arch.exit_qualification is cached for EPT violation only and even
+> for EPT violation, it is stale at this point because the up-to-date
+> value is cached later in handle_ept_violation().
 
-A few nits throughout, but this is looking good for 6.9.
+Oof, vcpu->arch.exit_qualification is *gross*.  At a glance, it should be
+straightforward to get rid of it and use the fault structure to pass the info
+that comes from the MMU.  I'll post a patch, assuming it works.
 
-Oliver / Marc,
+As for this patch, I'll get it applied for 6.9.
 
-Any objection to taking this through kvm-x86? (when you feel it's ready, obviously)
-My plan is to put it in a dedicated topic branch, with a massaged cover letter as
-the tag used for the pull request so that we can capture the motivation/benefits.
+---
+ arch/x86/include/asm/kvm_host.h |  3 ---
+ arch/x86/kvm/kvm_emulate.h      |  1 +
+ arch/x86/kvm/mmu/paging_tmpl.h  | 14 +++++++-------
+ arch/x86/kvm/vmx/nested.c       |  5 ++++-
+ arch/x86/kvm/vmx/vmx.c          |  2 --
+ 5 files changed, 12 insertions(+), 13 deletions(-)
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index ad5319a503f0..7ef4715d43d6 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -993,9 +993,6 @@ struct kvm_vcpu_arch {
+ 
+ 	u64 msr_kvm_poll_control;
+ 
+-	/* set at EPT violation at this point */
+-	unsigned long exit_qualification;
+-
+ 	/* pv related host specific info */
+ 	struct {
+ 		bool pv_unhalted;
+diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
+index 4351149484fb..b5791a66637e 100644
+--- a/arch/x86/kvm/kvm_emulate.h
++++ b/arch/x86/kvm/kvm_emulate.h
+@@ -26,6 +26,7 @@ struct x86_exception {
+ 	bool nested_page_fault;
+ 	u64 address; /* cr2 or nested page fault gpa */
+ 	u8 async_page_fault;
++	unsigned long exit_qualification;
+ };
+ 
+ /*
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index 4d4e98fe4f35..7a87097cb45b 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -497,21 +497,21 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
+ 	 * The other bits are set to 0.
+ 	 */
+ 	if (!(errcode & PFERR_RSVD_MASK)) {
+-		vcpu->arch.exit_qualification &= (EPT_VIOLATION_GVA_IS_VALID |
+-						  EPT_VIOLATION_GVA_TRANSLATED);
++		walker->fault.exit_qualification = 0;
++
+ 		if (write_fault)
+-			vcpu->arch.exit_qualification |= EPT_VIOLATION_ACC_WRITE;
++			walker->fault.exit_qualification |= EPT_VIOLATION_ACC_WRITE;
+ 		if (user_fault)
+-			vcpu->arch.exit_qualification |= EPT_VIOLATION_ACC_READ;
++			walker->fault.exit_qualification |= EPT_VIOLATION_ACC_READ;
+ 		if (fetch_fault)
+-			vcpu->arch.exit_qualification |= EPT_VIOLATION_ACC_INSTR;
++			walker->fault.exit_qualification |= EPT_VIOLATION_ACC_INSTR;
+ 
+ 		/*
+ 		 * Note, pte_access holds the raw RWX bits from the EPTE, not
+ 		 * ACC_*_MASK flags!
+ 		 */
+-		vcpu->arch.exit_qualification |= (pte_access & VMX_EPT_RWX_MASK) <<
+-						 EPT_VIOLATION_RWX_SHIFT;
++		walker->fault.exit_qualification |= (pte_access & VMX_EPT_RWX_MASK) <<
++						     EPT_VIOLATION_RWX_SHIFT;
+ 	}
+ #endif
+ 	walker->fault.address = addr;
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 994e014f8a50..15141b08c604 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -407,10 +407,13 @@ static void nested_ept_invalidate_addr(struct kvm_vcpu *vcpu, gpa_t eptp,
+ static void nested_ept_inject_page_fault(struct kvm_vcpu *vcpu,
+ 		struct x86_exception *fault)
+ {
++	unsigned long exit_qualification = fault->exit_qualification;
+ 	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+ 	u32 vm_exit_reason;
+-	unsigned long exit_qualification = vcpu->arch.exit_qualification;
++
++	exit_qualification |= vmx_get_exit_qual(vcpu) &
++			      (EPT_VIOLATION_GVA_IS_VALID | EPT_VIOLATION_GVA_TRANSLATED);
+ 
+ 	if (vmx->nested.pml_full) {
+ 		vm_exit_reason = EXIT_REASON_PML_FULL;
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index e262bc2ba4e5..1de022af7dcb 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -5771,8 +5771,6 @@ static int handle_ept_violation(struct kvm_vcpu *vcpu)
+ 	error_code |= (exit_qualification & EPT_VIOLATION_GVA_TRANSLATED) != 0 ?
+ 	       PFERR_GUEST_FINAL_MASK : PFERR_GUEST_PAGE_MASK;
+ 
+-	vcpu->arch.exit_qualification = exit_qualification;
+-
+ 	/*
+ 	 * Check that the GPA doesn't exceed physical memory limits, as that is
+ 	 * a guest page fault.  We have to emulate the instruction here, because
+
+base-commit: 873eef46b33c86be414d60bd00390e64fc0f006f
+-- 
+
 
