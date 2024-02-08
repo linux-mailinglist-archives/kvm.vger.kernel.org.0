@@ -1,121 +1,168 @@
-Return-Path: <kvm+bounces-8345-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8346-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5F5984E218
-	for <lists+kvm@lfdr.de>; Thu,  8 Feb 2024 14:39:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD8F884E284
+	for <lists+kvm@lfdr.de>; Thu,  8 Feb 2024 14:54:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 77AF8B22427
-	for <lists+kvm@lfdr.de>; Thu,  8 Feb 2024 13:39:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9219F289951
+	for <lists+kvm@lfdr.de>; Thu,  8 Feb 2024 13:54:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E07F76418;
-	Thu,  8 Feb 2024 13:39:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97EC97992A;
+	Thu,  8 Feb 2024 13:52:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dPJnLIs6"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="nJCmgI3M"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38EFA763ED
-	for <kvm@vger.kernel.org>; Thu,  8 Feb 2024 13:39:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5A7978B51;
+	Thu,  8 Feb 2024 13:52:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707399559; cv=none; b=f8yG87bmrvuakQACBEje32ZIOkcisTk3CDh8GlA//qb6te+UcKhNtMV05walXz/wbzBfnZE6lOWAaYoBKEeZr7KpAaph2VFHf3kxM2SwNZSHfs4ATw+na911muEAUTw5oK/kapStCSOB4vAnHeRCnB9xSrGSkz3Yrjt9fkUkfB4=
+	t=1707400324; cv=none; b=JGGWxNkUNg0JAfJGzwCWC4CgeZoNuKGDqhKTTZmv2EUbhVFUV7xI5y6ua75ST2l1RVJSJQdgofrDbLhCG0LF7I5qEjD4WMASShxLMLaFTMy2qJrg5lHj9AfLfygV7GjzNoK73h7KHWfjkuwCczqobIpvAWJ6WvedxCpdpnNrojE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707399559; c=relaxed/simple;
-	bh=SBhV77nizQ8APQmEssjZYbIeubtS8uMS5FsbXrHmzjs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KE6WrUQ27utXvGnXMcTYWoZ6T8ejiDSuUYsF6zfiEfyav/p+MMmgEgEQg/J8PTbMSe/91CMKKVnQMgCilotPMi4QD9QOAYUo/k6qcpuGHnS/eX+i3voxqpldEPWokyQsM1ydjirrH21fN4vX1TbVTs02Kvf+LzZOk4QJPO6s6hY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dPJnLIs6; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707399557;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KXrfhhpcInwvwI4FrjbsTHUOux7lst37uiaeU7LGWF0=;
-	b=dPJnLIs6EdjMKibP3nBTxBybGXwqHFJesvTukMBcJ5uf7AUFl7u7bJbS4XTITZxt4ztuHg
-	/fhpInlVf7l8NJxNn5K8Zt3pNK53AN9amw2YF0dBUJ9ClB58wqmVInNgb/dMMtUpcm5w82
-	vN4FwDLx2PZwuCvA8ue9tqKdxGQRwtY=
-Received: from mail-vk1-f197.google.com (mail-vk1-f197.google.com
- [209.85.221.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-434-lm-Ub7SMMtqfJv8bqD8gTA-1; Thu, 08 Feb 2024 08:39:15 -0500
-X-MC-Unique: lm-Ub7SMMtqfJv8bqD8gTA-1
-Received: by mail-vk1-f197.google.com with SMTP id 71dfb90a1353d-4c017c025dbso728018e0c.2
-        for <kvm@vger.kernel.org>; Thu, 08 Feb 2024 05:39:15 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707399555; x=1708004355;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KXrfhhpcInwvwI4FrjbsTHUOux7lst37uiaeU7LGWF0=;
-        b=c7xNLQiMGR+/jPoYKqrdLBCpo/uFgXdVRfd+YnkFk9I3gcqODJl/5MV4pSuSnfAi7Z
-         JTezgnGP8AlVQ5cAyCI2lfuWWSM1NUdAKykibygtn2dzYThIgK3JnkMqjiAhiDG6MA2U
-         XQzdxc7UqIFJslA/PCcFIWtRuqk3Tf0DF4N9bGxTy2j74tHrk04IOeu7pyxHkHXNOOeZ
-         nroG2/cUfeX7cj/QemoNw0q7T+03U/QGp2dmHCqh1m1ps2XnLYTphABSh9e+Kaa7bGT7
-         eQxRcsU5r/LDiHpTnKBTObIf6S5gOicj7Y6rKEZzg+DjZVzh2y8yTa/nbUdESIFbioD3
-         7lVw==
-X-Gm-Message-State: AOJu0Yw0mpdz/2jNcLoLu19DiIzdznv5+EYKPBz3Y3jurUzVRzt+f1Za
-	Tblapo6iElG72LnCT3bKsvWZzuFCLglK52xx1I68Y9LCTdH91/6VN5DnVtTx8/lUloBPHzXU4QR
-	R4i6Dw8fwoGQPVdQ0sJcxQdX39666YgjmNaFEE+lNDIsl9Xr/vJEqcvFHi9wPb32Hc/SDHAvAV0
-	08EXgeLHj2GS0o3atdVCWoCsr3
-X-Received: by 2002:a05:6102:55a0:b0:46d:3b56:efe4 with SMTP id dc32-20020a05610255a000b0046d3b56efe4mr6384859vsb.32.1707399555019;
-        Thu, 08 Feb 2024 05:39:15 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHgRzHqQS39WbRm1wyA7DiuERX8kT576hNccxzT2Z21q2BolwCPEcvWjxv44tJRSxLvO1ePXU4CyIYtI7cA5cU=
-X-Received: by 2002:a05:6102:55a0:b0:46d:3b56:efe4 with SMTP id
- dc32-20020a05610255a000b0046d3b56efe4mr6384848vsb.32.1707399554687; Thu, 08
- Feb 2024 05:39:14 -0800 (PST)
+	s=arc-20240116; t=1707400324; c=relaxed/simple;
+	bh=csev0OvZB5RlTT3pM+W7YD0AnyDHo8l7BCU04ZcRDOk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=S8NjVDl2qEusWDhoX9amIXjIMRI7x90j1BUTVQeJpoHJdRpo2lJUPQYgLzFPIlee89UKK3wukQpOw+4rnyxM2yk8+YqCqm7zx7SF0g9yBFLggfBkS1ly91IFsWfkSywy1rE5EaWfmncqF+QIVuvwsgvZAknkwHaGvoC1pO1+1QI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=nJCmgI3M; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 418Dk82L005920;
+	Thu, 8 Feb 2024 13:52:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=qTllvUjzOOCahVHpd9bf0M3v2/AXqI4uoDasVK8Foyk=;
+ b=nJCmgI3MHPA5CPJaQFAarTRiS7glRNehf0SOcHGYQwnAY9tXssJ2Elzb/OyGMZH/lJ2V
+ pCXb+UKks51p5lT0BGrV/cSwOAG3Gt7LZu77z7JWyreJRKGlhzTMXaijnoYW9PXy6etc
+ B7IVXsU2AMg78Moa3FjzltCQVn34icM3KR8HL0JsAJ2fSE9IFdr4fG5qYcmvWZo+WUbT
+ k/RP7DdfEsqFqyIbWQMAbJWLHI28hIcJey55J4Xb5p8lCcIULW/kN7+V4m2R5AKXNlOC
+ +f40qIzT60CT5Lj6yxmqAD2gRgTDetYERzG56d60ORhp2cSr5zE5QXcZWRp8MNYWHtTC yw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w4x613gst-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 08 Feb 2024 13:52:01 +0000
+Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 418DkwMk011726;
+	Thu, 8 Feb 2024 13:52:01 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w4x613gs7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 08 Feb 2024 13:52:01 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 418BgDUO008770;
+	Thu, 8 Feb 2024 13:52:00 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3w206yvu3e-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 08 Feb 2024 13:51:59 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 418DpueU42271362
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 8 Feb 2024 13:51:56 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1BCFD2004D;
+	Thu,  8 Feb 2024 13:51:56 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E7A3C20043;
+	Thu,  8 Feb 2024 13:51:55 +0000 (GMT)
+Received: from [9.152.224.222] (unknown [9.152.224.222])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  8 Feb 2024 13:51:55 +0000 (GMT)
+Message-ID: <4b2729ba-d9ca-48f4-aa6d-4b421e8fa44d@linux.ibm.com>
+Date: Thu, 8 Feb 2024 14:51:55 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240131233056.10845-1-pbonzini@redhat.com> <ZcOWwYRUxZmpH304@google.com>
-In-Reply-To: <ZcOWwYRUxZmpH304@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 8 Feb 2024 14:39:03 +0100
-Message-ID: <CABgObfa1SmH0HDq5B5OQxpueej=bdivMTkVrO=cXNfOi09HhUw@mail.gmail.com>
-Subject: Re: [PATCH 0/8] KVM: cleanup linux/kvm.h
-To: Sean Christopherson <seanjc@google.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH] KVM: s390: remove extra copy of access registers into
+ KVM_RUN
+To: Janosch Frank <frankja@linux.ibm.com>, Eric Farman
+ <farman@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+References: <20240131205832.2179029-1-farman@linux.ibm.com>
+ <5ecbe9f3-827d-4308-90cd-84e065a76489@linux.ibm.com>
+ <84ae4b14-a514-462a-b084-4657f0353332@linux.ibm.com>
+Content-Language: en-US
+From: Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <84ae4b14-a514-462a-b084-4657f0353332@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: o3KR_61IgDTgnNs7eDKGxxnD_BqsUroW
+X-Proofpoint-GUID: lo-0mXCAWFzho6ySRvIYJnguKDDxVD8u
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-08_05,2024-02-08_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=790 bulkscore=0
+ clxscore=1015 priorityscore=1501 impostorscore=0 adultscore=0
+ malwarescore=0 mlxscore=0 suspectscore=0 lowpriorityscore=0 phishscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2402080074
 
-On Wed, Feb 7, 2024 at 3:43=E2=80=AFPM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> On Wed, Jan 31, 2024, Paolo Bonzini wrote:
-> > More cleanups of KVM's main header:
-> >
-> > * remove thoroughly obsolete APIs
-> >
-> > * move architecture-dependent stuff to uapi/asm/kvm.h
-> >
-> > * small cleanups to __KVM_HAVE_* symbols
->
-> Do you have any thoughts on how/when you're going to apply this?  The kvm=
-.h code
-> movement is likely going to generate conflicts for any new uAPI, e.g. I k=
-now Paul's
-> Xen series at least conflicts.
 
-It also conflicts (and was partly motivated by) the SEV API cleanups
-that I am going to post soon.
 
-> A topic branch is probably overkill.  Maybe getting this into kvm/next so=
-oner
-> than later so that kvm/next can be used as a base will suffice?
+Am 08.02.24 um 13:37 schrieb Janosch Frank:
+> On 2/8/24 12:50, Christian Borntraeger wrote:
+>> Am 31.01.24 um 21:58 schrieb Eric Farman:
+>>> The routine ar_translation() is called by get_vcpu_asce(), which is
+>>> called from a handful of places, such as an interception that is
+>>> being handled during KVM_RUN processing. In that case, the access
+>>> registers of the vcpu had been saved to a host_acrs struct and then
+>>> the guest access registers loaded from the KVM_RUN struct prior to
+>>> entering SIE. Saving them back to KVM_RUN at this point doesn't do
+>>> any harm, since it will be done again at the end of the KVM_RUN
+>>> loop when the host access registers are restored.
+>>>
+>>> But that's not the only path into this code. The MEM_OP ioctl can
+>>> be used while specifying an access register, and will arrive here.
+>>>
+>>> Linux itself doesn't use the access registers for much, but it does
+>>> squirrel the thread local storage variable into ACRs 0 and 1 in
+>>> copy_thread() [1]. This means that the MEM_OP ioctl may copy
+>>> non-zero access registers (the upper- and lower-halves of the TLS
+>>> pointer) to the KVM_RUN struct, which will end up getting propogated
+>>> to the guest once KVM_RUN ioctls occur. Since these are almost
+>>> certainly invalid as far as an ALET goes, an ALET Specification
+>>> Exception would be triggered if it were attempted to be used.
+>>>
+>>> [1] arch/s390/kernel/process.c:169
+>>>
+>>> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+>>> ---
+>>>
+>>> Notes:
+>>>       I've gone back and forth about whether the correct fix is
+>>>       to simply remove the save_access_regs() call and inspect
+>>>       the contents from the most recent KVM_RUN directly, versus
+>>>       storing the contents locally. Both work for me but I've
+>>>       opted for the latter, as it continues to behave the same
+>>>       as it does today but without the implicit use of the
+>>>       KVM_RUN space. As it is, this is (was) the only reference
+>>>       to vcpu->run in this file, which stands out since the
+>>>       routines are used by other callers.
+>>>       Curious about others' thoughts.
+>>
+>> Given the main idea that we have the guest ARs loaded in the kvm module
+>> when running a guest and that the kernel does not use those. This avoids
+>> saving/restoring the ARs for all the fast path exits.
+>> The MEM_OP is indeed a separate path.
+>> So what about making this slightly slower by doing something like this
+>> (untested, white space damaged)
+> 
+> We could fence AR loading/storing via the the PSW address space bits for more performance and not do a full sync/store regs here.
 
-I can do both, a topic branch is free. But if you think this is in the
-"if it compiles, apply it", then I can take that as Acked-by and apply
-it today or tomorrow.
-
-Paolo
-
+Hmm, we would then add a conditional branch which also is not ideal.
+Maybe just load/restore the ARs instead of the full sync/save_reg dance?
 
