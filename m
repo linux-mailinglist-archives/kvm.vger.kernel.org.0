@@ -1,158 +1,167 @@
-Return-Path: <kvm+bounces-8359-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8360-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A24C84E6CD
-	for <lists+kvm@lfdr.de>; Thu,  8 Feb 2024 18:30:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A96E184E6D1
+	for <lists+kvm@lfdr.de>; Thu,  8 Feb 2024 18:31:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3CDEBB29FE0
-	for <lists+kvm@lfdr.de>; Thu,  8 Feb 2024 17:30:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CBD711C26786
+	for <lists+kvm@lfdr.de>; Thu,  8 Feb 2024 17:31:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6F51823DE;
-	Thu,  8 Feb 2024 17:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21F2B83CD1;
+	Thu,  8 Feb 2024 17:30:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Daj4e0hN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QVN375MW"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DCCC7EF19
-	for <kvm@vger.kernel.org>; Thu,  8 Feb 2024 17:30:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C96A981AD7
+	for <kvm@vger.kernel.org>; Thu,  8 Feb 2024 17:30:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707413430; cv=none; b=hHRwrSXS78sv/h9XcKl0CYYMjaXYmZLlpmduP8bKG+JQDx46ma3/QYi0ZpMnaCU3AqnNeWVPV+V18t3XuAzTNoU6Dn4OjkAApsQjL8WD+426BqsFWsCE76QmWLY/eRo5ncTLWZRTAnHAyiD2/YDH5SK+solxMiqTKZcbNhaB4Uc=
+	t=1707413453; cv=none; b=RUSDSbe6BMqu1xWPzgr5rVz+ywLaeSkgywnPrnFAw4g/EuICXg0U3UX6Is7ol2GXOEBb9IuCigshyfqNfIKwghynFNds/62RxH0nXAEPnYCH15c0bVP33JO4knWKteClZM4DQbCnNK7DwwZfS0GLlwEKJCkeeTVeiHSvKwNXhwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707413430; c=relaxed/simple;
-	bh=KCRPEybqpLTnPIWw5roFcTQswnqgqagIK2IZEulcn+I=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FBZsuTJ/ZftdWfWJftVXU/pQI57Da73f/bB6cvMJuzNFT0+ofsB9eaCb//mO6OThO1HPjNdc1Z3/Bd5ESDK8ShfNUq+F0jZzQ/CK6izLMm3IIYrX56opQn7c7AbnNAs0OnIh25xxSbkzo/kcozgbPqe/+vhPd+QQgFDx8RCqgus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Daj4e0hN; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1707413453; c=relaxed/simple;
+	bh=1IQJLk1ty4Cbv9srUf/jkoJhkkc0s4qbS6Kv1KMw1nQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IrxLs7WLa6pxMwN1hq6QzRS+kMnMGQ7uu+n67qJwdsoLt6DOv4FQ/B0DJMftZPjoEEitkpPUqu8s1OTIYFLiZjfRmLYEapF8Nmg3D0OUVZ1xm8nHiEP2iJCvSR63IGvF7duuHjnuk1IEgjXBo4pxH9+UeljSvyBDeew8FOwEchQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QVN375MW; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707413427;
+	s=mimecast20190719; t=1707413450;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=WO5yVARso2Jg8Z0OQG5achjKt7tNGYabD1QNw/gc16k=;
-	b=Daj4e0hNnbtuw1hN2W/ULHNpainup4niQbuRGxVrAwM7RKWIn2gIVUUHAx+ET5NgSrhbKN
-	AKs9FAbkxwC4jiITNxnrNmOSMdRBqruXfjLDZxBTi4Wk4pT+SlZrq5pJTI0DSRhjEvEr+5
-	tYify7C7vFpF++HK82KdumbYh6Kjqqs=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=6sek37PEy2MZoPmgCe0RKHy1EATtqvffN4QHzb+4/dw=;
+	b=QVN375MW/3AQvPjf5bSqwLeA89/bnn96TvphKZtupSMyt6Z1uMC0q+d431Xl6P7FPLYONL
+	JGQSjTPSeTjVeEjiaCqaDYJaMbAHLs9i0W3CxlpshFIPrQFl871KJbwlqTtnqVwOtIv/oT
+	NscCodKhjuEinC+yjAPrM/myvm+ovC4=
+Received: from mail-ua1-f70.google.com (mail-ua1-f70.google.com
+ [209.85.222.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-638-FMP39uP-PqCTWidoZQ2-jQ-1; Thu, 08 Feb 2024 12:30:26 -0500
-X-MC-Unique: FMP39uP-PqCTWidoZQ2-jQ-1
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7becfc75cd4so167560339f.3
-        for <kvm@vger.kernel.org>; Thu, 08 Feb 2024 09:30:25 -0800 (PST)
+ us-mta-83-W_ydx_FzM0aPugErGtuJtw-1; Thu, 08 Feb 2024 12:30:49 -0500
+X-MC-Unique: W_ydx_FzM0aPugErGtuJtw-1
+Received: by mail-ua1-f70.google.com with SMTP id a1e0cc1a2514c-7d2dfa4c63dso6181241.1
+        for <kvm@vger.kernel.org>; Thu, 08 Feb 2024 09:30:49 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707413425; x=1708018225;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1707413447; x=1708018247;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=WO5yVARso2Jg8Z0OQG5achjKt7tNGYabD1QNw/gc16k=;
-        b=s20eszs6fOG9Tt4JLrzu5hjyBXuVtAznnL6tsu94GJv47ov/e7gAifxuKZWOVe+870
-         2CKdMSCXTaPCrl9oSw51JDDIbMLngORzklhM4MJZETJVUJVRVj+olXqD6M71BkKyOW0+
-         4MQt1+/9edjI3pCSRKMvwaInfQqtpk1c8IO/TrulCfkmZpOl8xL22YjEhptlpxBsv6Q8
-         CLEmwUEZVmxc02+8xQwq+n+0XAW2412iTVGKxd+Y44szy+iesey7dJW4ukUkS50YUIWa
-         CrtTpr4evzf+A1aCRXabZbB2unfXoDRdYViRWxAfG7NF+S4NnXdsvB17V84q955CS6Y0
-         MO4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCW+VA2JjXmIh3sQVVD7odawb32fL75rKqRgeoipq10PiIc9DppLyFk29AKWsMhOX7ovEOewT3YuhmNztlcCtRsjOBYW
-X-Gm-Message-State: AOJu0YxNeWjmRFdiwSHXbUpfrIDQWlSVr9xwGvfe09wF9JY/k1NUSBJh
-	DtZ+/AHSnQt/nsmKRT0hE+UIQUQdLyUkWzr0QqyRBfoy8ug7/cYbO0ESCYixPCq7H2sayaR+isM
-	w95QK0kQGFBxZTIQSQ4exDDCoChUHe+7gIye2FUHNmH0dp55EzA==
-X-Received: by 2002:a5e:c015:0:b0:7c3:ec35:8df7 with SMTP id u21-20020a5ec015000000b007c3ec358df7mr316081iol.3.1707413425279;
-        Thu, 08 Feb 2024 09:30:25 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE5cjmBmVzOqD9itRTqfUhfQRTZ1e6fo4necDLXqiHFxdWo0ezcppkqw1/b39eYhNrgHWeqZA==
-X-Received: by 2002:a5e:c015:0:b0:7c3:ec35:8df7 with SMTP id u21-20020a5ec015000000b007c3ec358df7mr316054iol.3.1707413425002;
-        Thu, 08 Feb 2024 09:30:25 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXsISWUx7+IbC4yWXLMIWdDubVunoNs0LamFRSmQHr/gq05or7/HwqOdJrrI7pQBSHJpi9tpnPqrfcgnndV++FpnI0A+XQmbrKQ43C4hGgaLaPvagxEPWQLWW56VJoy6E7RsYEFYxz9pjZSy+AjG0QWEIlNERpQxR5S3LZcgAzNBjq1hMLhXa/UFH/xd/a1SSxG4Q8k2nPztDLBNUInVOQkxtBcKotGfo7OKFejQfUS6h1J9OoM8ESlyTBQQ5w1IUAJtfga9XvDD70WSfCy4nqvj6SZjjA/SBVVIou7d1Bu8R2QyUMtY/8PHHGw7uTNsYp+OjNEv72Hai3e60llbXarCHiFbpbTD/Vo7YXdORPvdUR6Xqs2hQvGpQUtd8D7xgmnTXZXtrqEjty5iXgh72u5BXKPCFIMsRmpI63NtWN1V1iNchA4B0vUSI4uhi868kHoZqWoWuFoVXKfvEPf8tzSJMq/8VC63Znrj7a7j1jDE3AHby3SDniICgaLs1W401btgaav0KbqJyitTzx7irAEuL5xwNv2ftYUvxCykaFHMYvwJ/KDKnMOT7iydK21L8gd4e/joTLvoiyB+dEZhMtl/lpTVpUWtcvqsHpE9BssR269GYgXBUnsakMQJD4ltrWn3JYGgpIqLcYILsChNywx8xGPJydZi71+SxB40Nk1GXnJY+uD4taEfwa4FViWKOrtvPA6+txZ3hwmQkM2iZOFZMrhYKqOq0Qq7koCzMSO7rTLhuINcpV0GdSClcGxYa1UKsjIkwjyH5s9SHlQ3Tw+FkxieeHLXrA9mFxYWS07xwPfr1OFSNdMhtrAKMcS97HXlRAldNP1OS+0d6QczdkXN9IAOajk60SR8iWYiILXxbPOCfysj85ecfzdeVGI9XiRHzfM6BgnGmVS+3aa9xurS7THRYAkMcI3huwcHOs2QX/Vhe+zBU2hUUStkn6sDKVnnq
- 6LOIAsRALIOLFClLe35uMH0XBzvzIR6a2NOcOc5hhg2cPAI1s2LTiuTVXbLWmaAuO3AAh36/6dsRdG1fITBEeXY1QgHbfWxTkJVyvW6mOXuWMg5qK7r3uur5NMapW1hneooWpQrZSW47GvNnta61AY24w5t9GodVHVSgyx1C5K6rkVf99WE1rxOny6XPUYCTxc+hzSIBk3rmzZdBYSCImCrf1x
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id a18-20020a056638005200b00470fe9f837fsm972435jap.29.2024.02.08.09.30.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Feb 2024 09:30:24 -0800 (PST)
-Date: Thu, 8 Feb 2024 10:30:22 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: <ankita@nvidia.com>
-Cc: <jgg@nvidia.com>, <maz@kernel.org>, <oliver.upton@linux.dev>,
- <james.morse@arm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
- <reinette.chatre@intel.com>, <surenb@google.com>, <stefanha@redhat.com>,
- <brauner@kernel.org>, <catalin.marinas@arm.com>, <will@kernel.org>,
- <mark.rutland@arm.com>, <kevin.tian@intel.com>, <yi.l.liu@intel.com>,
- <ardb@kernel.org>, <akpm@linux-foundation.org>, <andreyknvl@gmail.com>,
- <wangjinchao@xfusion.com>, <gshan@redhat.com>, <ricarkol@google.com>,
- <linux-mm@kvack.org>, <lpieralisi@kernel.org>, <rananta@google.com>,
- <ryan.roberts@arm.com>, <aniketa@nvidia.com>, <cjia@nvidia.com>,
- <kwankhede@nvidia.com>, <targupta@nvidia.com>, <vsethi@nvidia.com>,
- <acurrid@nvidia.com>, <apopple@nvidia.com>, <jhubbard@nvidia.com>,
- <danw@nvidia.com>, <kvmarm@lists.linux.dev>, <mochs@nvidia.com>,
- <zhiw@nvidia.com>, <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH v6 4/4] vfio: convey kvm that the vfio-pci device is wc
- safe
-Message-ID: <20240208103022.452a1ba3.alex.williamson@redhat.com>
-In-Reply-To: <20240207204652.22954-5-ankita@nvidia.com>
-References: <20240207204652.22954-1-ankita@nvidia.com>
-	<20240207204652.22954-5-ankita@nvidia.com>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+        bh=6sek37PEy2MZoPmgCe0RKHy1EATtqvffN4QHzb+4/dw=;
+        b=PzmFUTuYzfGkVQUU8uz+plxyLm86RyKqeTA+aGEE4cIK7rkLFrDOvB2/5tGPifojS7
+         mss61UFC35ajniVL7V43PiK568eyNd1xi0rUE13caeHqMQq6DM+cqs+/CZ6Qv9d+CrYS
+         m7xUnS9mXXKix1MjRoee+NtTTk/4yc6Q0d06v0ynsNTuy845CyBbuMnRaIpg7j6OFtCg
+         ar+FqchOxyMdPWewjYUfvH1UyQvsUFUlqePLHTtncZbCKkcqP5YColYOTsHN+aNS2m6O
+         SUqoHwS99XxeEgxpT9SPLZyxqN9lQ47IPrR/pjHAZXRwUMJhVVKO3eT90/pKakZgDo2S
+         qvxw==
+X-Forwarded-Encrypted: i=1; AJvYcCXx2DeUi07ll4L4Ro9AGNZfobmJWqqcMMukFuH8MJtg91MoyD+J/BXlqTP+mxsRvtfsjFLr9Ho8lQ7kkisMMyQ1KQpI
+X-Gm-Message-State: AOJu0YyqsdHK1R7M/IbFcFX6zZPIw+mvGMdEH4ZUhBa4LH8kVx5dmOOm
+	f1EJP4vC17yZkT+LJIy9xzbnyTuKLEljN4ZxdDpa1osdU9SU4Z56kjh/Vf1LtH6ByamDnAHBD3h
+	aZPSoBHISCRW4Pl1TGRaO4O1LaseZRz/WMJOmDIM4Cay76xlbO3u2Q4GOuJeVT+4Fm45wj2XFXv
+	pnFMxuWyHInorf+YaM0dqB8z/D
+X-Received: by 2002:a05:6102:1158:b0:46d:5cb9:c3a0 with SMTP id j24-20020a056102115800b0046d5cb9c3a0mr2966155vsg.33.1707413445633;
+        Thu, 08 Feb 2024 09:30:45 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGHVJrEfvzHf07ew1SqpcL/nGkmHxsA0uPvjt9O5eXM69qEknptZPt4QM5pHUoRhFZH5bdOAnh06VotZpQb5AI=
+X-Received: by 2002:a05:6102:1158:b0:46d:5cb9:c3a0 with SMTP id
+ j24-20020a056102115800b0046d5cb9c3a0mr2966099vsg.33.1707413445212; Thu, 08
+ Feb 2024 09:30:45 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20231016115028.996656-1-michael.roth@amd.com> <20231016115028.996656-9-michael.roth@amd.com>
+ <ZbmenP05fo8hZU8N@google.com> <20240208002420.34mvemnzrwwsaesw@amd.com> <ZcUO5sFEAIH68JIA@google.com>
+In-Reply-To: <ZcUO5sFEAIH68JIA@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 8 Feb 2024 18:30:31 +0100
+Message-ID: <CABgObfa_KWVTk-yitCSU2aQi_a3vMTOMTHiT5s0qst5GtMwTzg@mail.gmail.com>
+Subject: Re: [PATCH RFC gmem v1 8/8] KVM: x86: Determine shared/private faults
+ based on vm_type
+To: Sean Christopherson <seanjc@google.com>
+Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org, linux-coco@lists.linux.dev, 
+	linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	isaku.yamahata@intel.com, ackerleytng@google.com, vbabka@suse.cz, 
+	ashish.kalra@amd.com, nikunj.dadhania@amd.com, jroedel@suse.de, 
+	pankaj.gupta@amd.com, thomas.lendacky@amd.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 8 Feb 2024 02:16:52 +0530
-<ankita@nvidia.com> wrote:
+On Thu, Feb 8, 2024 at 6:27=E2=80=AFPM Sean Christopherson <seanjc@google.c=
+om> wrote:
+> No.  KVM does not yet support SNP, so as far as KVM's ABI goes, there are=
+ no
+> existing guests.  Yes, I realize that I am burying my head in the sand to=
+ some
+> extent, but it is simply not sustainable for KVM to keep trying to pick u=
+p the
+> pieces of poorly defined hardware specs and broken guest firmware.
 
-> From: Ankit Agrawal <ankita@nvidia.com>
-> 
-> The code to map the MMIO in S2 as NormalNC is enabled when conveyed
-> that the device is WC safe using a new flag VM_VFIO_ALLOW_WC.
-> 
-> Make vfio-pci set the VM_VFIO_ALLOW_WC flag.
-> 
-> This could be extended to other devices in the future once that
-> is deemed safe.
-> 
-> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
-> Suggested-by: Catalin Marinas <catalin.marinas@arm.com>
-> Acked-by: Jason Gunthorpe <jgg@nvidia.com>
-> ---
->  drivers/vfio/pci/vfio_pci_core.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> index 1cbc990d42e0..c3f95ec7fc3a 100644
-> --- a/drivers/vfio/pci/vfio_pci_core.c
-> +++ b/drivers/vfio/pci/vfio_pci_core.c
-> @@ -1863,7 +1863,8 @@ int vfio_pci_core_mmap(struct vfio_device *core_vdev, struct vm_area_struct *vma
->  	 * See remap_pfn_range(), called from vfio_pci_fault() but we can't
->  	 * change vm_flags within the fault handler.  Set them now.
->  	 */
-> -	vm_flags_set(vma, VM_IO | VM_PFNMAP | VM_DONTEXPAND | VM_DONTDUMP);
-> +	vm_flags_set(vma, VM_VFIO_ALLOW_WC | VM_IO | VM_PFNMAP |
-> +			VM_DONTEXPAND | VM_DONTDUMP);
->  	vma->vm_ops = &vfio_pci_mmap_ops;
->  
->  	return 0;
+101% agreed. There are cases in which we have to and should bend
+together backwards for guests (e.g. older Linux kernels), but not for
+code that---according to current practices---is chosen by the host
+admin.
 
-The comment above this is justifying the flags as equivalent to those
-set by the remap_pfn_range() path.  That's no longer the case and the
-additional flag needs to be described there.
+(I am of the opinion that "bring your own firmware" is the only sane
+way to handle attestation/measurement, but that's not how things are
+done currently).
 
-I'm honestly surprised that a vm_flags bit named so specifically for a
-single driver has gotten this far.  It seems like the vfio use case for
-this and associated FUD for other use cases could all be encompassed in
-the comment where the bit is defined and we could use a name like
-VM_ALLOW_ANY_UNCACHED or VM_IO_ANY.  Thanks,
+Paolo
 
-Alex
+> > > > +static bool kvm_mmu_fault_is_private(struct kvm *kvm, gpa_t gpa, u=
+64 err)
+> > > > +{
+> > > > + bool private_fault =3D false;
+> > > > +
+> > > > + if (kvm_is_vm_type(kvm, KVM_X86_SNP_VM)) {
+> > > > +         private_fault =3D !!(err & PFERR_GUEST_ENC_MASK);
+> > > > + } else if (kvm_is_vm_type(kvm, KVM_X86_SW_PROTECTED_VM)) {
+> > > > +         /*
+> > > > +          * This handling is for gmem self-tests and guests that t=
+reat
+> > > > +          * userspace as the authority on whether a fault should b=
+e
+> > > > +          * private or not.
+> > > > +          */
+> > > > +         private_fault =3D kvm_mem_is_private(kvm, gpa >> PAGE_SHI=
+FT);
+> > > > + }
+> > >
+> > > This can be more simply:
+> > >
+> > >     if (kvm_is_vm_type(kvm, KVM_X86_SNP_VM))
+> > >             return !!(err & PFERR_GUEST_ENC_MASK);
+> > >
+> > >     if (kvm_is_vm_type(kvm, KVM_X86_SW_PROTECTED_VM))
+> > >             return kvm_mem_is_private(kvm, gpa >> PAGE_SHIFT);
+> > >
+> >
+> > Yes, indeed. But TDX has taken a different approach for SW_PROTECTED_VM
+> > case where they do this check in kvm_mmu_page_fault() and then synthesi=
+ze
+> > the PFERR_GUEST_ENC_MASK into error_code before calling
+> > kvm_mmu_do_page_fault(). It's not in the v18 patchset AFAICT, but it's
+> > in the tdx-upstream git branch that corresponds to it:
+> >
+> >   https://github.com/intel/tdx/commit/3717a903ef453aa7b62e7eb65f230566b=
+7f158d4
+> >
+> > Would you prefer that SNP adopt the same approach?
+>
+> Ah, yes, 'twas my suggestion in the first place.  FWIW, I was just review=
+ing the
+> literal code here and wasn't paying much attention to the content.
+>
+> https://lore.kernel.org/all/f474282d701aca7af00e4f7171445abb5e734c6f.1689=
+893403.git.isaku.yamahata@intel.com
+>
 
 
