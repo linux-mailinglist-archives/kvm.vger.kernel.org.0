@@ -1,169 +1,181 @@
-Return-Path: <kvm+bounces-8353-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8354-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FA4584E577
-	for <lists+kvm@lfdr.de>; Thu,  8 Feb 2024 17:52:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC50584E57D
+	for <lists+kvm@lfdr.de>; Thu,  8 Feb 2024 17:53:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 15928B26BF1
-	for <lists+kvm@lfdr.de>; Thu,  8 Feb 2024 16:52:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0C2D1C23F74
+	for <lists+kvm@lfdr.de>; Thu,  8 Feb 2024 16:53:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BBC58289D;
-	Thu,  8 Feb 2024 16:51:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EF227F7CF;
+	Thu,  8 Feb 2024 16:52:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AxBJ0I4B"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bGormSP6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF07D81ABC;
-	Thu,  8 Feb 2024 16:51:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B06347F470
+	for <kvm@vger.kernel.org>; Thu,  8 Feb 2024 16:52:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707411090; cv=none; b=DeDhzhkdbNK24hZmMw651lCwRdZyAcgdc2vFH+13T5vi0Yq8ShF5dE7RJt+fRcfqXBkZ6QH9a9MgCQLX/Jyl6RoWzDr1bhYxY4h0R0yWRdWFRa07XXrfBfqtnr8AO4EW2cuq7KD6jHJR6SuQtI6axlGTNMbo4d+xBoA4Ol7AnEs=
+	t=1707411164; cv=none; b=Q7B02bNm0jpqs7OVHZzh/K7ktEcBxBO20eialbMe5eUmyAbMmW1uWe8U7iA3eXwZtjFCogX7djaqCeb9ywEiIalOKFjVxFQnR8jlISUfmTOMg5XntHH0htj/xqjLfxq5fwXyhiRoDqnbMo65qEDTL/Uz78DC/fPwvzieFNq39C8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707411090; c=relaxed/simple;
-	bh=xzC243P64BD4dxu+mYtwLuALx8x8SKQa6GlBkvYhvAY=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=UqXeq/Gy3RgrhA+L3yMBL8Wz4UfSPj+SokVYQyMeiiMWLHlz9tLx6DGTc5K/2eJr4Ay+38mmouqnLkehr5qzA4ra/Sn9pVP2GiQyKLoLM7iux1tfDL1p9uBlb3Nxgx7SE8hHvmXCWnwcWea2fJJb2XhaS0bkZe3SsR7Q1Z9YEjo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AxBJ0I4B; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-41008ab427fso651315e9.0;
-        Thu, 08 Feb 2024 08:51:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707411087; x=1708015887; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=BKmRKXQ4Jb/UJrwbolAziRwHoP1CqWPr7lokSDT3Zv8=;
-        b=AxBJ0I4Bnv52AE55DZtgtZxJHwKo/GIRiGc8t1xnQyxVx3S3XQParJyOXx/5/1hv2b
-         S/emQJ46s0iAf/KpWVxCmd2mRDOOGv+2KUkH5J7TWU+lY663+oubSjODcxk02sJp2qV0
-         BaZMH5L2xG18WW5h9Q7PhtVT7Q9t9s06dY17kwBUQyjRVv1wq5NQmoKrAxgZI7W5tbyN
-         B3z0N24lnWtBFl1wTl/YxwM/n2HUZhx6hlrUEJuvelCRbZFDgIbkrHDVL5Y1cOnLYGFm
-         FXoCZyAGJ8Gn5TCXvEVd4LUGKI4zjTc4PkXH17ydoqGpaFk4+HQf7IiVwFlOOPeanAFa
-         oX2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707411087; x=1708015887;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BKmRKXQ4Jb/UJrwbolAziRwHoP1CqWPr7lokSDT3Zv8=;
-        b=S7HPzEcnhNg2A8p0Si+5N0rVoo5HJWuLPQukbeDc3YDUx6mfeGgrB8XJcamDn73cHR
-         LhPgOzCbE4YLkGqxFmxptAMOXkLkdsr1pdluudBKzqfIdafD3uSG7mP/S6uIUxdJ45cL
-         UmZPrez1gu7dgQdDLUPSSPcL2WT40Ibxr36hAYapPxH7PLDLMz5dUXmkuk0WoNaw/T4J
-         sHteQLwjH0oGIdNES5qD9q32U5Vr9A6pjaGXSC8k78p+5Y+x67HIwXlL6v7LgxM4uTRs
-         s8QLvOeYmGHRzoYOnwA+VSgWfrFSoDONFdwhj6W+3gF1FLXpfKyRH26AuXrTevXWDrFM
-         5bHQ==
-X-Gm-Message-State: AOJu0YxiCvj0cENuzlczYdma9ZQn4qat0E0zvoauuVyOVZkF2l48kVXw
-	UJmkijSLbxUCZiY8vl9if9gPmm6pBW/S9mUrYinlU/TkpiQKT1cM
-X-Google-Smtp-Source: AGHT+IG98zrnkTg7fNviSPhs9dA5QQKDFf0R75aZSaa7TrzSaBD5iM3Z4iLKBGwnVTuNoUDV2ArfTA==
-X-Received: by 2002:a05:600c:1390:b0:40e:a569:3555 with SMTP id u16-20020a05600c139000b0040ea5693555mr7176214wmf.35.1707411086636;
-        Thu, 08 Feb 2024 08:51:26 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUJGeVnGM1lvv2MH7XIj5f2p/JxGIGtjAiHNgpy9kBet5NobTXGQKb1AyMzKpLypnfjDu2z/xOytq/bA3PTsVPLibIpy2/fyDpBXD56ZMBYTRhfcA2QFMblj68MYTjaxxPNPPWEXt8Zr8AppKd9iM2RPeCiu5mUh37nMJPRuii360LL3VYh5FmOCgJJIrcVmCNN1Nj7EHkJkUSeUbO+3SSYcCh2/SAO13fZQnQuw0v1wtAGXK79i0kbUBHtgeuaS9xz6FHIzipQI5nVfuNExrF0VQNRFUWK5OfMmW4ukVdepViLHCuha0TEp0AlPm06TmMjGntWiOtEU+xGMg3E4AnMy71lQSqJjgT1ZoqBjNA9hkBxGrGAvOiuN7dcFhvuBoae38d6MS2ds0+OtDbZo/AjpGGz8L7SJJ2ByFzpJSLM++X2vaw=
-Received: from [192.168.10.199] (54-240-197-239.amazon.com. [54.240.197.239])
-        by smtp.gmail.com with ESMTPSA id m33-20020a05600c3b2100b004100826da82sm2153919wms.21.2024.02.08.08.51.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 Feb 2024 08:51:26 -0800 (PST)
-From: Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: Paul Durrant <paul@xen.org>
-Message-ID: <148d903c-fcc5-4a6a-aef1-c1e77e74d0fc@xen.org>
-Date: Thu, 8 Feb 2024 16:51:18 +0000
+	s=arc-20240116; t=1707411164; c=relaxed/simple;
+	bh=4GRScazr9z6cqgfVD6Rsf15gpA4ix02MJ80O8DrS20E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bNL0fo8uvEpW/BJUMWndKuCQKudhGlN/Gp+ka5cCRY9JUI6uqFFhYhf1WbUhuj3b6+P+jIIl/rLXT3JCIqf3XYkxyJS7Qa8SFllc78gzJy6uWpODDdX82dEPJwJRmMx1+Pnxraml/kakdOF9JzGnEnr5hCp3gFX91W0E6seQGbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bGormSP6; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707411161;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HnFPdWA5EVpY9l0ZaXfI71Ps/9IZ7jMzjXiDCC35kwI=;
+	b=bGormSP6g0vw9yN35gHSpFTlCwK/VSTtZZBVM7gBiellOCa2vXx/qJk080p6zkIyF3RX+J
+	2gtE2sxNnpMLtfJulMwPpiCHBtHNoH1r4ahsecGbCsPmb5lNBVJLlyChqXS3krN+4wY56F
+	KEjKMomOFngM2rWdXm4YtY8Pp9pLtxo=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-77-noKUIWZTNZCHdQvA0-KxkA-1; Thu,
+ 08 Feb 2024 11:52:39 -0500
+X-MC-Unique: noKUIWZTNZCHdQvA0-KxkA-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 61249282D3D7;
+	Thu,  8 Feb 2024 16:52:38 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.28.60])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 72C30492BF0;
+	Thu,  8 Feb 2024 16:52:35 +0000 (UTC)
+Date: Thu, 8 Feb 2024 16:52:33 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Zhao Liu <zhao1.liu@linux.intel.com>
+Cc: Eduardo Habkost <eduardo@habkost.net>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Yanan Wang <wangyanan55@huawei.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Eric Blake <eblake@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
+	kvm@vger.kernel.org, Babu Moger <babu.moger@amd.com>,
+	Xiaoyao Li <xiaoyao.li@intel.com>,
+	Zhenyu Wang <zhenyu.z.wang@intel.com>,
+	Zhuocheng Ding <zhuocheng.ding@intel.com>,
+	Yongwei Ma <yongwei.ma@intel.com>, Zhao Liu <zhao1.liu@intel.com>
+Subject: Re: [PATCH v8 00/21] Introduce smp.modules for x86 in QEMU
+Message-ID: <ZcUG0Uc8KylEQhUW@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20240131101350.109512-1-zhao1.liu@linux.intel.com>
+ <Zbog2vDrrWFbujrs@redhat.com>
+ <ZbsInI6Z66edm3eH@intel.com>
+ <ZbtirK-orqCb5sba@redhat.com>
+ <ZbvCktGZFj4v3I/P@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: paul@xen.org
-Subject: Re: [PATCH v12 11/20] KVM: xen: allow shared_info to be mapped by
- fixed HVA
-Content-Language: en-US
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
- David Woodhouse <dwmw2@infradead.org>, Shuah Khan <shuah@kernel.org>,
- kvm@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20240115125707.1183-1-paul@xen.org>
- <20240115125707.1183-12-paul@xen.org> <ZcMCogbbVKuTIXWJ@google.com>
- <92918ee8-3cc9-41c3-a284-5cd6648abc05@xen.org> <ZcUF-TNbykWvh3r7@google.com>
-Organization: Xen Project
-In-Reply-To: <ZcUF-TNbykWvh3r7@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZbvCktGZFj4v3I/P@intel.com>
+User-Agent: Mutt/2.2.12 (2023-09-09)
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
 
-On 08/02/2024 16:48, Sean Christopherson wrote:
-> On Thu, Feb 08, 2024, Paul Durrant wrote:
->> On 07/02/2024 04:10, Sean Christopherson wrote:
->>> On Mon, Jan 15, 2024, Paul Durrant wrote:
->>>> @@ -638,20 +637,32 @@ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
->>>>    		}
->>>>    		break;
->>>> -	case KVM_XEN_ATTR_TYPE_SHARED_INFO: {
->>>> +	case KVM_XEN_ATTR_TYPE_SHARED_INFO:
->>>> +	case KVM_XEN_ATTR_TYPE_SHARED_INFO_HVA: {
->>>>    		int idx;
->>>>    		mutex_lock(&kvm->arch.xen.xen_lock);
->>>>    		idx = srcu_read_lock(&kvm->srcu);
->>>> -		if (data->u.shared_info.gfn == KVM_XEN_INVALID_GFN) {
->>>> -			kvm_gpc_deactivate(&kvm->arch.xen.shinfo_cache);
->>>> -			r = 0;
->>>> +		if (data->type == KVM_XEN_ATTR_TYPE_SHARED_INFO) {
->>>> +			if (data->u.shared_info.gfn == KVM_XEN_INVALID_GFN) {
->>>> +				kvm_gpc_deactivate(&kvm->arch.xen.shinfo_cache);
->>>> +				r = 0;
->>>> +			} else {
->>>> +				r = kvm_gpc_activate(&kvm->arch.xen.shinfo_cache,
->>>> +						     gfn_to_gpa(data->u.shared_info.gfn),
->>>> +						     PAGE_SIZE);
->>>> +			}
->>>>    		} else {
->>>> -			r = kvm_gpc_activate(&kvm->arch.xen.shinfo_cache,
->>>> -					     gfn_to_gpa(data->u.shared_info.gfn),
->>>> -					     PAGE_SIZE);
->>>> +			if (data->u.shared_info.hva == 0) {
->>>
->>> I know I said I don't care about the KVM Xen ABI, but I still think using '0' as
->>> "invalid" is ridiculous.
->>>
->>
->> With the benefit of some sleep, I'm wondering why 0 is a 'ridiculous'
->> invalid value for a *virtual* address? Surely it's essentially a numerical
->> cast of the canonically invalid NULL pointer?
+On Fri, Feb 02, 2024 at 12:10:58AM +0800, Zhao Liu wrote:
+> Hi Daniel,
 > 
-> It's legal to mmap() virtual address '0', albeit not by default:
+> On Thu, Feb 01, 2024 at 09:21:48AM +0000, Daniel P. Berrangé wrote:
+> > Date: Thu, 1 Feb 2024 09:21:48 +0000
+> > From: "Daniel P. Berrangé" <berrange@redhat.com>
+> > Subject: Re: [PATCH v8 00/21] Introduce smp.modules for x86 in QEMU
+> > 
+> > On Thu, Feb 01, 2024 at 10:57:32AM +0800, Zhao Liu wrote:
+> > > Hi Daniel,
+> > > 
+> > > On Wed, Jan 31, 2024 at 10:28:42AM +0000, Daniel P. Berrangé wrote:
+> > > > Date: Wed, 31 Jan 2024 10:28:42 +0000
+> > > > From: "Daniel P. Berrangé" <berrange@redhat.com>
+> > > > Subject: Re: [PATCH v8 00/21] Introduce smp.modules for x86 in QEMU
+> > > > 
+> > > > On Wed, Jan 31, 2024 at 06:13:29PM +0800, Zhao Liu wrote:
+> > > > > From: Zhao Liu <zhao1.liu@intel.com>
+> > > 
+> > > [snip]
+> > > 
+> > > > > However, after digging deeper into the description and use cases of
+> > > > > cluster in the device tree [3], I realized that the essential
+> > > > > difference between clusters and modules is that cluster is an extremely
+> > > > > abstract concept:
+> > > > >   * Cluster supports nesting though currently QEMU doesn't support
+> > > > >     nested cluster topology. However, modules will not support nesting.
+> > > > >   * Also due to nesting, there is great flexibility in sharing resources
+> > > > >     on clusters, rather than narrowing cluster down to sharing L2 (and
+> > > > >     L3 tags) as the lowest topology level that contains cores.
+> > > > >   * Flexible nesting of cluster allows it to correspond to any level
+> > > > >     between the x86 package and core.
+> > > > > 
+> > > > > Based on the above considerations, and in order to eliminate the naming
+> > > > > confusion caused by the mapping between general cluster and x86 module
+> > > > > in v7, we now formally introduce smp.modules as the new topology level.
+> > > > 
+> > > > What is the Linux kernel calling this topology level on x86 ?
+> > > > It will be pretty unfortunate if Linux and QEMU end up with
+> > > > different names for the same topology level.
+> > > > 
+> > > 
+> > > Now Intel's engineers in the Linux kernel are starting to use "module"
+> > > to refer to this layer of topology [4] to avoid confusion, where
+> > > previously the scheduler developers referred to the share L2 hierarchy
+> > > collectively as "cluster".
+> > > 
+> > > Looking at it this way, it makes more sense for QEMU to use the
+> > > "module" for x86.
+> > 
+> > I was thinking specificially about what Linux calls this topology when
+> > exposing it in sysfs and /proc/cpuinfo. AFAICT, it looks like it is
+> > called 'clusters' in this context, and so this is the terminology that
+> > applications and users are going to expect.
 > 
->    config DEFAULT_MMAP_MIN_ADDR
-> 	int "Low address space to protect from user allocation"
-> 	depends on MMU
-> 	default 4096
-> 	help
-> 	  This is the portion of low virtual memory which should be protected
-> 	  from userspace allocation.  Keeping a user from writing to low pages
-> 	  can help reduce the impact of kernel NULL pointer bugs.
+> The cluster related topology information under "/sys/devices/system/cpu/
+> cpu*/topology" indicates the L2 cache topology (CPUID[0x4]), not module
+> level CPU topology (CPUID[0x1f]).
 > 
-> 	  For most ppc64 and x86 users with lots of address space
-> 	  a value of 65536 is reasonable and should cause no problems.
-> 	  On arm and other archs it should not be higher than 32768.
-> 	  Programs which use vm86 functionality or have some need to map
-> 	  this low address space will need CAP_SYS_RAWIO or disable this
-> 	  protection by setting the value to 0.
+> So far, kernel hasn't exposed module topology related sysfs. But we will
+> add new "module" related information in sysfs. The relevant patches are
+> ready internally, but not posted yet.
 > 
-> 	  This value can be changed after boot using the
-> 	  /proc/sys/vm/mmap_min_addr tunable.
-> 
-> 
-> Obviously it's equally ridiculous that userspace would ever mmap() '0' and pass
-> that as the shared_info, but given that this is x86-only, there are architecturally
-> illegal addresses that can be used, at least until Intel adds LA64 ;-)
+> In the future, we will use "module" in sysfs to indicate module level CPU
+> topology, and "cluster" will be only used to refer to the l2 cache domain
+> as it is now.
 
-Ok. Thanks for the reference.
+So, if they're distinct concepts both relevant to x86 CPUs, then from
+the QEMU POV, should this patch series be changing the -smp arg to
+allowing configuration of both 'clusters' and 'modules' for x86 ?
+
+An earlier version of this series just supported 'clusters', and this
+changed to 'modules', but your description of Linux reporting both
+suggests QEMU would need both.
+
+
+With regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
