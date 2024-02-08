@@ -1,222 +1,187 @@
-Return-Path: <kvm+bounces-8291-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8292-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3DEA84D723
-	for <lists+kvm@lfdr.de>; Thu,  8 Feb 2024 01:25:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD59484D795
+	for <lists+kvm@lfdr.de>; Thu,  8 Feb 2024 02:32:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 287F4B239EA
-	for <lists+kvm@lfdr.de>; Thu,  8 Feb 2024 00:25:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 655BF2843FB
+	for <lists+kvm@lfdr.de>; Thu,  8 Feb 2024 01:32:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6085012E4C;
-	Thu,  8 Feb 2024 00:24:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BCBE18EA1;
+	Thu,  8 Feb 2024 01:32:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="1YtD7J8G"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JoJpx/nY"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2042.outbound.protection.outlook.com [40.107.92.42])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A72FE2031E;
-	Thu,  8 Feb 2024 00:24:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707351884; cv=fail; b=vA44Qgb16ne57DnkbCR4ANqu6mW/FyB1AT/01WZAa/2IijchAOO3b3pdoNv2ixZk+L2Rx7bUg83zKM01x0vn2EJXfCkAOsa+8Ngbmfm4g1Xz0SNwnoQDWE94wLvhd2SlApfgqRUkZ27eJu270YoOPOh/vx0Ttmm2WA3x5A/30OA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707351884; c=relaxed/simple;
-	bh=24P25l7WOVAQI9MXmURNl7SfRkxv1meyHJ91yk9qp1c=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RIsngnCX6q8YR0ir8UiepHxSKHN4K1MeOUGMa6/baYVIsB/09lpIhduUoso0nIStcUDG4vU4HjfHBvGOlxreEVAn82C0DacU3RtxZod3tyvxYHZ7ZjeEqKq3zr9IIb7lnXMZ0748WlCYRBWi6OiHN4rQ91QTpe0SW7Gfmj7DtqU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=1YtD7J8G; arc=fail smtp.client-ip=40.107.92.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=da5i96kltwco148uw98uOhprLh+nfRKUtr2VA4j8UXFevJh++aI8PQ+Q1QTKFT3zEhCdRc6olllSgWmazDt9kE0oCCe+rlnwNLYDUPnpU/tTNwmUEhKFuyFVE0M7SgjbGQewyHchFJBvhhoy05ht/GJK5hf3Vqf/LVqcihLwcgAbH/kVsLgkpjXrjVuslBjmzg+g3wqQkrJfVElMHpfOKmeBCOmpdjHr0KMzm9G3H2sjeOVNlB6JJ5FVtaRnRD+M5DQFIBoLlw9F+QCEU2gQYpvkrDvfFh3o+ZMcuyYwfCDqW6Q8Lgx06HKWvtPTOndXCprEyb35XgENC3l5WvcQDQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/CYBAY5yRIT9SKIkZFN8jpfkACBa/PVJwqDruYaCGOY=;
- b=kgZ2mrtIxxy/R3Q2hIGD5VWDpRjovlpGdKivFi/w/QbzVCAGp0Kq8gFYY+AOEZG8vCM8pJUPB46T76S+brZiZdegDuQZo75MQlJnsOFIHATiC3BqyqR6I8gs5EhHt3WXFgMlId7zKjLlh7Vqmk1nUnStPk5Q8m7NwRLtJd+zTyq5Kz3vQS1ar+KxjzCnta95hZG9N6TpO3cHNhhh2xCmGYT/B+9hltmoRfNwbj4qhgoqAALJmZTgvxkVAL9D+UUxp+OerbEcucm9JK9yBywKzBMPzCn3gCR6gMWrf3WJJSYdB4YUiTGk6e4ObZ9ipoNJrUr+wBTy/oWraIrxMdSyXw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/CYBAY5yRIT9SKIkZFN8jpfkACBa/PVJwqDruYaCGOY=;
- b=1YtD7J8G6dEfDHKnjz5QjepfHP+uf/ZY0aiu0s+Jr+ouHzFcmNcT51v4atN/pVsuhzP8PkQ4ehdiQBMJLiNVZrqsLTvT42Fb5939IOaqmPcT/J3/yABuJLhHfMVCmEr9PbmajLorliPSpYRDZHi0mzrZlrTYrdmhlrZPOtnleRo=
-Received: from BYAPR07CA0086.namprd07.prod.outlook.com (2603:10b6:a03:12b::27)
- by PH8PR12MB8431.namprd12.prod.outlook.com (2603:10b6:510:25a::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.14; Thu, 8 Feb
- 2024 00:24:39 +0000
-Received: from CO1PEPF000044F1.namprd05.prod.outlook.com
- (2603:10b6:a03:12b:cafe::ba) by BYAPR07CA0086.outlook.office365.com
- (2603:10b6:a03:12b::27) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7249.38 via Frontend
- Transport; Thu, 8 Feb 2024 00:24:39 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1PEPF000044F1.mail.protection.outlook.com (10.167.241.71) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7249.19 via Frontend Transport; Thu, 8 Feb 2024 00:24:39 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Wed, 7 Feb
- 2024 18:24:38 -0600
-Date: Wed, 7 Feb 2024 18:24:20 -0600
-From: Michael Roth <michael.roth@amd.com>
-To: Sean Christopherson <seanjc@google.com>
-CC: <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
-	<linux-crypto@vger.kernel.org>, <x86@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-	<pbonzini@redhat.com>, <isaku.yamahata@intel.com>, <ackerleytng@google.com>,
-	<vbabka@suse.cz>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-	<jroedel@suse.de>, <pankaj.gupta@amd.com>, <thomas.lendacky@amd.com>
-Subject: Re: [PATCH RFC gmem v1 8/8] KVM: x86: Determine shared/private
- faults based on vm_type
-Message-ID: <20240208002420.34mvemnzrwwsaesw@amd.com>
-References: <20231016115028.996656-1-michael.roth@amd.com>
- <20231016115028.996656-9-michael.roth@amd.com>
- <ZbmenP05fo8hZU8N@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEB4A1E892;
+	Thu,  8 Feb 2024 01:32:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707355936; cv=none; b=kSUWKllYcQUefQr9hMVkjVW38MqFJotG6SGvbr1F8d1hqMLV6iIZ6hfEst3JV0as6d7MoQca8jYm8m0kQE9W+fYw38mnAQfqmfjBynsTIYmPDDiVPkHE31LfYyqfSDPdY49KXrgtGPp1lSSsqXrLYQB9nlR2wmN8CO5/T2w4OYo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707355936; c=relaxed/simple;
+	bh=3GYmPNV941sCNT9l4UOqAlQJiyzxjbIc9airZ677Slw=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=mSOPqGWcfrvkvK2LCdxIzxIOxjtbSbBWVbXaR9nRu7DbzdHZA1ah6VwKzrEJ+q5N2PqxhR/4EmxEKw3N3wwwlA51VpdLb7Rff5J25dTR4rFZ/quWFmtaf7LJIbGcCcOfFyKdsnfLP3I3TLBaTpePQwpqTn4OX6XmQCU8SJ535ko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JoJpx/nY; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707355935; x=1738891935;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=3GYmPNV941sCNT9l4UOqAlQJiyzxjbIc9airZ677Slw=;
+  b=JoJpx/nY5UBYsK9nA3KmaGKII5IOHrIP3TAIGZoqcS6lkc7mWDfyvw7C
+   3K4OL8WP4KMkv3sqbLuRsFLie2D02GolO71KxCUlTegVf8gt0YeVoBgEU
+   nG7KWJxHhZS3F4AGFZYK67uiAdhioFhymvus8NNr6vUtq7Wa0brDkw5v6
+   M7BltKfY7JuMUZOaVsgInjifS6mlsK18X/VcU+08tex57PGYKQIYtntj/
+   Vhm7rD45UhM7jlnnNTewSV7g878aG98xK8MZAQjlcxooRFW/pEXxc1L8Q
+   RrRxxnJ8WfEbsIsmOrwGNz1I4eHpWTD83LLDBu+wL1G6WPQWEnn+9AZP3
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10977"; a="4939035"
+X-IronPort-AV: E=Sophos;i="6.05,252,1701158400"; 
+   d="scan'208";a="4939035"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Feb 2024 17:32:14 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,252,1701158400"; 
+   d="scan'208";a="6159021"
+Received: from kailinz1-mobl2.ccr.corp.intel.com (HELO [10.249.169.136]) ([10.249.169.136])
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Feb 2024 17:32:08 -0800
+Message-ID: <9577ec59-fa05-4eea-b0ae-312d9531ce61@linux.intel.com>
+Date: Thu, 8 Feb 2024 09:32:05 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <ZbmenP05fo8hZU8N@google.com>
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000044F1:EE_|PH8PR12MB8431:EE_
-X-MS-Office365-Filtering-Correlation-Id: 68cf77cf-ad8e-40af-c1dc-08dc283c5688
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	BpLq/KEt89wK2BWexDAJoBmv1kYonYPuq8V6uE/+q2xPJRy8ohVWjQNNs1y+I1OgOqHnMYe0j58f/uPWMB83HFaSJTbJZv5ZwXLa+IyKLRowhxjvFwViD4vTToetTOf+AwsIphJYbL55ex+iRZbibrPOy4k97Y4a9R8WQDD6ZCfGnfKc+Wz0ZJLoyu0VYD4nLw9gdEyon9Yq4UYMZkPO3s0Ubf0sM5MLpJitHmYmRPmwcyQHiIA4TGvi8gTodAKtAMx0ACnSZPUB2C68vjoThdK8NVWJLUx7k9q7NBEiELqBSIRsbnrf4OFpt4Yq3lFXqQUwTtyc4cMn8fOcGt/QQ8LkXcpIH9u62R03QsqrPeQwW+gccXn0X0HhR/wdMJ2qJXsBtJ+Z22DX3q5tMx7hcRNXP9Bc2KHXP1Oe71RTl9q2d4CRPRV1frifqFJRCgntf3It325MMMHLtojAPH5f4Lz4GqblyGdEquzY8AkNw5MUUmbovGaFg5SJz4H5GKWlMaE7rSreAft5soLUCwcVBKCH/bHh1Cuo9/zznQJzam7gks6lehOMEnunJZcgU4Av02tH+fgCkpWRLBa56Lk2+Q==
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(376002)(396003)(39860400002)(136003)(346002)(230922051799003)(186009)(451199024)(64100799003)(1800799012)(82310400011)(40470700004)(46966006)(36840700001)(478600001)(86362001)(41300700001)(966005)(83380400001)(82740400003)(356005)(81166007)(336012)(426003)(8936002)(66899024)(6666004)(316002)(4326008)(6916009)(2906002)(5660300002)(36756003)(16526019)(26005)(70206006)(54906003)(7416002)(8676002)(44832011)(70586007)(2616005)(1076003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Feb 2024 00:24:39.3001
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 68cf77cf-ad8e-40af-c1dc-08dc283c5688
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000044F1.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB8431
+User-Agent: Mozilla Thunderbird
+Cc: baolu.lu@linux.intel.com, "Liu, Yi L" <yi.l.liu@intel.com>,
+ Jacob Pan <jacob.jun.pan@linux.intel.com>,
+ Longfang Liu <liulongfang@huawei.com>, "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+ Joel Granados <j.granados@samsung.com>,
+ "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCH v12 13/16] iommu: Improve iopf_queue_remove_device()
+To: Vasant Hegde <vasant.hegde@amd.com>, "Tian, Kevin"
+ <kevin.tian@intel.com>, Joerg Roedel <joro@8bytes.org>,
+ Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+ Jason Gunthorpe <jgg@ziepe.ca>,
+ Jean-Philippe Brucker <jean-philippe@linaro.org>,
+ Nicolin Chen <nicolinc@nvidia.com>
+References: <20240207013325.95182-1-baolu.lu@linux.intel.com>
+ <20240207013325.95182-14-baolu.lu@linux.intel.com>
+ <BN9PR11MB527603AB5685FF3ED21647958C452@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <693ee23d-30c6-4824-9bb2-1cfbf2eccfef@linux.intel.com>
+ <f856519f-419c-1901-b8bc-3e338873157f@amd.com>
+Content-Language: en-US
+From: Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <f856519f-419c-1901-b8bc-3e338873157f@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jan 30, 2024 at 05:13:00PM -0800, Sean Christopherson wrote:
-> On Mon, Oct 16, 2023, Michael Roth wrote:
-> > For KVM_X86_SNP_VM, only the PFERR_GUEST_ENC_MASK flag is needed to
-> > determine with an #NPF is due to a private/shared access by the guest.
-> > Implement that handling here. Also add handling needed to deal with
-> > SNP guests which in some cases will make MMIO accesses with the
-> > encryption bit.
+On 2024/2/8 1:59, Vasant Hegde wrote:
+> Hi Baolu,
 > 
-> ...
+> On 2/7/2024 5:59 PM, Baolu Lu wrote:
+>> On 2024/2/7 10:50, Tian, Kevin wrote:
+>>>> From: Lu Baolu<baolu.lu@linux.intel.com>
+>>>> Sent: Wednesday, February 7, 2024 9:33 AM
+>>>>
+>>>> Convert iopf_queue_remove_device() to return void instead of an error code,
+>>>> as the return value is never used. This removal helper is designed to be
+>>>> never-failed, so there's no need for error handling.
+>>>>
+>>>> Ack all outstanding page requests from the device with the response code of
+>>>> IOMMU_PAGE_RESP_INVALID, indicating device should not attempt any retry.
+>>>>
+>>>> Add comments to this helper explaining the steps involved in removing a
+>>>> device from the iopf queue and disabling its PRI. The individual drivers
+>>>> are expected to be adjusted accordingly. Here we just define the expected
+>>>> behaviors of the individual iommu driver from the core's perspective.
+>>>>
+>>>> Suggested-by: Jason Gunthorpe<jgg@nvidia.com>
+>>>> Signed-off-by: Lu Baolu<baolu.lu@linux.intel.com>
+>>>> Reviewed-by: Jason Gunthorpe<jgg@nvidia.com>
+>>>> Tested-by: Yan Zhao<yan.y.zhao@intel.com>
+>>> Reviewed-by: Kevin Tian<kevin.tian@intel.com>, with one nit:
+>>>
+>>>> + * Removing a device from an iopf_queue. It's recommended to follow
+>>>> these
+>>>> + * steps when removing a device:
+>>>>     *
+>>>> - * Return: 0 on success and <0 on error.
+>>>> + * - Disable new PRI reception: Turn off PRI generation in the IOMMU
+>>>> hardware
+>>>> + *   and flush any hardware page request queues. This should be done
+>>>> before
+>>>> + *   calling into this helper.
+>>>> + * - Acknowledge all outstanding PRQs to the device: Respond to all
+>>>> outstanding
+>>>> + *   page requests with IOMMU_PAGE_RESP_INVALID, indicating the device
+>>>> should
+>>>> + *   not retry. This helper function handles this.
+>>> this implies calling iopf_queue_remove_device() here.
+>>>
+>>>> + * - Disable PRI on the device: After calling this helper, the caller could
+>>>> + *   then disable PRI on the device.
+>>>> + * - Call iopf_queue_remove_device(): Calling iopf_queue_remove_device()
+>>>> + *   essentially disassociates the device. The fault_param might still exist,
+>>>> + *   but iommu_page_response() will do nothing. The device fault parameter
+>>>> + *   reference count has been properly passed from
+>>>> iommu_report_device_fault()
+>>>> + *   to the fault handling work, and will eventually be released after
+>>>> + *   iommu_page_response().
+>>>>     */
+>>> but here it suggests calling iopf_queue_remove_device() again. If the comment
+>>> is just about to detail the behavior with that invocation shouldn't it be merged
+>>> with the previous one instead of pretending to be the final step for driver
+>>> to call?
+>>
+>> Above just explains the behavior of calling iopf_queue_remove_device().
 > 
-> > @@ -4356,12 +4357,19 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
-> >  			return RET_PF_EMULATE;
-> >  	}
-> >  
-> > -	if (fault->is_private != kvm_mem_is_private(vcpu->kvm, fault->gfn)) {
-> > +	/*
-> > +	 * In some cases SNP guests will make MMIO accesses with the encryption
-> > +	 * bit set. Handle these via the normal MMIO fault path.
-> > +	 */
-> > +	if (!slot && private_fault && kvm_is_vm_type(vcpu->kvm, KVM_X86_SNP_VM))
-> > +		private_fault = false;
-> 
-> Why?  This is inarguably a guest bug.
+> Can you please leave a line -OR- move this to previous para? Otherwise we will
+> get confused.
 
-AFAICT this isn't explicitly disallowed by the SNP spec. There was
-however a set of security mitigations for SEV-ES that resulted in this
-being behavior being highly discouraged in linux guest code:
+Sure. I will make it look like below.
 
-  https://lkml.org/lkml/2020/10/20/464  
+/**
+  * iopf_queue_remove_device - Remove producer from fault queue
+  * @queue: IOPF queue
+  * @dev: device to remove
+  *
+  * Removing a device from an iopf_queue. It's recommended to follow these
+  * steps when removing a device:
+  *
+  * - Disable new PRI reception: Turn off PRI generation in the IOMMU 
+hardware
+  *   and flush any hardware page request queues. This should be done before
+  *   calling into this helper.
+  * - Acknowledge all outstanding PRQs to the device: Respond to all 
+outstanding
+  *   page requests with IOMMU_PAGE_RESP_INVALID, indicating the device 
+should
+  *   not retry. This helper function handles this.
+  * - Disable PRI on the device: After calling this helper, the caller could
+  *   then disable PRI on the device.
+  *
+  * Calling iopf_queue_remove_device() essentially disassociates the device.
+  * The fault_param might still exist, but iommu_page_response() will do
+  * nothing. The device fault parameter reference count has been properly
+  * passed from iommu_report_device_fault() to the fault handling work, and
+  * will eventually be released after iommu_page_response().
+  */
 
-as well as OVMF guest code:
+Best regards,
+baolu
 
-  https://edk2.groups.io/g/devel/message/69948
-
-However the OVMF guest code still allows 1 exception for accesses to the
-local APIC base address, which is the only case I'm aware of that
-triggers this condition:
-
-  https://github.com/tianocore/edk2/blob/master/OvmfPkg/Library/CcExitLib/CcExitVcHandler.c#L100
-
-I think the rationale there is that if the guest absolutely *knows* that
-encrypted information is not stored at a particular MMIO address, then
-it can selectively choose to allow for exceptional cases like these. So
-KVM would need to allow for these cases in order to be fully compatible
-with existing SNP guests that do this.
-
-> 
-> > +	if (private_fault != kvm_mem_is_private(vcpu->kvm, fault->gfn)) {
-> >  		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-> >  		return -EFAULT;
-> >  	}
-> >  
-> > -	if (fault->is_private)
-> > +	if (private_fault)
-> >  		return kvm_faultin_pfn_private(vcpu, fault);
-> >  
-> >  	async = false;
-> > diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-> > index 759c8b718201..e5b973051ad9 100644
-> > --- a/arch/x86/kvm/mmu/mmu_internal.h
-> > +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> > @@ -251,6 +251,24 @@ struct kvm_page_fault {
-> >  
-> >  int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
-> >  
-> > +static bool kvm_mmu_fault_is_private(struct kvm *kvm, gpa_t gpa, u64 err)
-> > +{
-> > +	bool private_fault = false;
-> > +
-> > +	if (kvm_is_vm_type(kvm, KVM_X86_SNP_VM)) {
-> > +		private_fault = !!(err & PFERR_GUEST_ENC_MASK);
-> > +	} else if (kvm_is_vm_type(kvm, KVM_X86_SW_PROTECTED_VM)) {
-> > +		/*
-> > +		 * This handling is for gmem self-tests and guests that treat
-> > +		 * userspace as the authority on whether a fault should be
-> > +		 * private or not.
-> > +		 */
-> > +		private_fault = kvm_mem_is_private(kvm, gpa >> PAGE_SHIFT);
-> > +	}
-> 
-> This can be more simply:
-> 
-> 	if (kvm_is_vm_type(kvm, KVM_X86_SNP_VM))
-> 		return !!(err & PFERR_GUEST_ENC_MASK);
-> 
-> 	if (kvm_is_vm_type(kvm, KVM_X86_SW_PROTECTED_VM))
-> 		return kvm_mem_is_private(kvm, gpa >> PAGE_SHIFT);
-> 
-
-Yes, indeed. But TDX has taken a different approach for SW_PROTECTED_VM
-case where they do this check in kvm_mmu_page_fault() and then synthesize
-the PFERR_GUEST_ENC_MASK into error_code before calling
-kvm_mmu_do_page_fault(). It's not in the v18 patchset AFAICT, but it's
-in the tdx-upstream git branch that corresponds to it:
-
-  https://github.com/intel/tdx/commit/3717a903ef453aa7b62e7eb65f230566b7f158d4
-
-Would you prefer that SNP adopt the same approach?
-
--Mike
 
