@@ -1,34 +1,34 @@
-Return-Path: <kvm+bounces-8376-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8375-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF27A84E9F0
-	for <lists+kvm@lfdr.de>; Thu,  8 Feb 2024 21:52:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0234784E9EF
+	for <lists+kvm@lfdr.de>; Thu,  8 Feb 2024 21:52:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1E871C211F4
-	for <lists+kvm@lfdr.de>; Thu,  8 Feb 2024 20:52:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 165481C213B9
+	for <lists+kvm@lfdr.de>; Thu,  8 Feb 2024 20:51:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DB5B51C55;
-	Thu,  8 Feb 2024 20:49:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F239D51C3B;
+	Thu,  8 Feb 2024 20:49:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ghLWCvg8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EqUiwsNC"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E19850A83
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D7B750A65
 	for <kvm@vger.kernel.org>; Thu,  8 Feb 2024 20:49:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707425350; cv=none; b=leVEa3/l1wCZMxqKoQWWvAQ2piJ7ZUEbVfTOF4EqTT7pXkFZ9zwM+WReVFJqKFrkgVH/8DsyD6O2SGyFI4CfvvkepLZ0ySBKTAxJCH9YNMdL6sZ+MQvOPW8TJjlp9QHCHXsZtkLmN2bj9bO/DrNBBf2cBgNmhnxZk2ISotgnfas=
+	t=1707425350; cv=none; b=dRlBzb5USFx8Cga6uz5AkMSreVRtVVP7/zMcuzRtnxiErtDPfRlhYZs+v5vNfGOkKkPi7kS3ZTCCIXYwRnwBFhDb1rcrjVUzZ4iieZaZo0I3hJPs80G31mjHxK2ghug0uyJmDhy4Xfexo6Yd0694Bf+Z3A5cQThyiLMKSnZ/Kb0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1707425350; c=relaxed/simple;
-	bh=4jFJKN6LVOTvoENVERYlx3BX42kUwr4xWT812ssHnTo=;
+	bh=a6/BPafWl2qCU4XHyBwQAlPOwqYDGt/oKxIvcc90JxU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qcUtifNhfUeVpy7JNyUA3VvNv0tcG1r0qRVovjzBHyOyw/vRvmTWbg/Mn1hx7lGRTh0niWxtAjlwkMOsoRGkcVdI6crGeBkOFL7/L49H+iN0fVtSCWkqHPCKOzVu6o2m3caGA/pEJ5w2njPxjeIm3rwuUD3TwvZOmY4Fq23nb+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ghLWCvg8; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=k4ZkNn3CfgiJR9RYYj/InkXZ/t6kM0maAdBJFKGtS0p6IDLEzOpOaxgwB9AYPOM/vv7bTjN6jyaNy623ftA/BB/0kVtNgimbbV+Zm4ooSZwKPCkvRXFMpjiPGtyzk8XWfUFqyOtqNzFVa7myV9jQKZFKlvJhI+UBtpJdM6EL/2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EqUiwsNC; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
@@ -37,24 +37,24 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=GvBT64/oLU+IfVRDquZlevwUrUAKsh5CvmhVsSc+u/4=;
-	b=ghLWCvg8YLaZkmcOAIUtKMYWfkPH/RxUjFyu6k+soOuXzBXhc24kUiZTM2pIcQQdJQknK2
-	OzHQ60kszTeZZ7n5GnW8LrzfhG9mcKJ3WkHPAGxOFB58Cwodcho2gRZXZ8aS5VLwzGBjCp
-	M8ut+v22WMy5I2fcSZ0txOjzTrNNUds=
+	bh=aaGh9xZ/5HFHiLGNtP8GrdGABTMwxb0FkMa8tkhhlR0=;
+	b=EqUiwsNCZd+mlJlFWAa4F0bsT0xnC2kZ2jwRkwf/CZhGCOYbV4lfnwwfYr3vu49IPGJ7vw
+	VBSMwkve/mzvYdGcQft2ceMBKJL5jWkTiD+Qh/+PjgFqCQ2NHFfS60UYsHxtcmaSm9lTDk
+	yhlFqjFts0DfVkbNrtSQZH8WaBvLd/0=
 Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
  by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-590-dP3yEAzJMJuRL4GDOr75Yw-1; Thu,
- 08 Feb 2024 15:49:03 -0500
-X-MC-Unique: dP3yEAzJMJuRL4GDOr75Yw-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-614--pIBS7ibMRStqwKFQtQ0mw-1; Thu,
+ 08 Feb 2024 15:49:05 -0500
+X-MC-Unique: -pIBS7ibMRStqwKFQtQ0mw-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0A9DC1C05141;
-	Thu,  8 Feb 2024 20:49:03 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5BC851C0BB44;
+	Thu,  8 Feb 2024 20:49:05 +0000 (UTC)
 Received: from thuth-p1g4.redhat.com (unknown [10.39.192.46])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id EE5541C10C0C;
-	Thu,  8 Feb 2024 20:49:00 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 7DE871C10C0E;
+	Thu,  8 Feb 2024 20:49:03 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: kvm@vger.kernel.org,
 	Sean Christopherson <seanjc@google.com>
@@ -62,9 +62,9 @@ Cc: linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	Andrew Jones <ajones@ventanamicro.com>
-Subject: [PATCH v3 7/8] KVM: selftests: x86: Use TAP interface in the vmx_pmu_caps test
-Date: Thu,  8 Feb 2024 21:48:43 +0100
-Message-ID: <20240208204844.119326-8-thuth@redhat.com>
+Subject: [PATCH v3 8/8] KVM: selftests: x86: Use TAP interface in the userspace_msr_exit test
+Date: Thu,  8 Feb 2024 21:48:44 +0100
+Message-ID: <20240208204844.119326-9-thuth@redhat.com>
 In-Reply-To: <20240208204844.119326-1-thuth@redhat.com>
 References: <20240208204844.119326-1-thuth@redhat.com>
 Precedence: bulk
@@ -76,171 +76,138 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
-Use the kvm_test_harness.h interface in this test to get TAP
+Use the kselftest_harness.h interface in this test to get TAP
 output, so that it is easier for the user to see what the test
 is doing.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- .../selftests/kvm/x86_64/vmx_pmu_caps_test.c  | 50 ++++---------------
- 1 file changed, 11 insertions(+), 39 deletions(-)
+ .../kvm/x86_64/userspace_msr_exit_test.c      | 52 +++++--------------
+ 1 file changed, 13 insertions(+), 39 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c b/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
-index 2a8d4ac2f0204..11953c3ded756 100644
---- a/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
-@@ -15,6 +15,7 @@
- 
- #include <linux/bitmap.h>
+diff --git a/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c b/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
+index 3533dc2fbfeeb..9591a5fd54d7c 100644
+--- a/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
++++ b/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
+@@ -8,6 +8,7 @@
+ #define _GNU_SOURCE /* for program_invocation_short_name */
+ #include <sys/ioctl.h>
  
 +#include "kvm_test_harness.h"
+ #include "test_util.h"
  #include "kvm_util.h"
  #include "vmx.h"
- 
-@@ -32,7 +33,7 @@ union perf_capabilities {
- 		u64	anythread_deprecated:1;
- 	};
- 	u64	capabilities;
--};
-+} host_cap;
- 
- /*
-  * The LBR format and most PEBS features are immutable, all other features are
-@@ -73,19 +74,19 @@ static void guest_code(uint64_t current_val)
- 	GUEST_DONE();
+@@ -527,14 +528,13 @@ static void run_guest_then_process_ucall_done(struct kvm_vcpu *vcpu)
+ 	process_ucall_done(vcpu);
  }
  
-+KVM_ONE_VCPU_TEST_SUITE(vmx_pmu_caps);
+-static void test_msr_filter_allow(void)
++KVM_ONE_VCPU_TEST_SUITE(user_msr);
 +
- /*
-  * Verify that guest WRMSRs to PERF_CAPABILITIES #GP regardless of the value
-  * written, that the guest always sees the userspace controlled value, and that
-  * PERF_CAPABILITIES is immutable after KVM_RUN.
-  */
--static void test_guest_wrmsr_perf_capabilities(union perf_capabilities host_cap)
-+KVM_ONE_VCPU_TEST(vmx_pmu_caps, guest_wrmsr_perf_capabilities, guest_code)
- {
--	struct kvm_vcpu *vcpu;
--	struct kvm_vm *vm = vm_create_with_one_vcpu(&vcpu, guest_code);
- 	struct ucall uc;
- 	int r, i;
- 
--	vm_init_descriptor_tables(vm);
-+	vm_init_descriptor_tables(vcpu->vm);
- 	vcpu_init_descriptor_tables(vcpu);
- 
- 	vcpu_set_msr(vcpu, MSR_IA32_PERF_CAPABILITIES, host_cap.capabilities);
-@@ -117,31 +118,21 @@ static void test_guest_wrmsr_perf_capabilities(union perf_capabilities host_cap)
- 		TEST_ASSERT(!r, "Post-KVM_RUN write '0x%llx'didn't fail",
- 			    host_cap.capabilities ^ BIT_ULL(i));
- 	}
--
--	kvm_vm_free(vm);
- }
- 
- /*
-  * Verify KVM allows writing PERF_CAPABILITIES with all KVM-supported features
-  * enabled, as well as '0' (to disable all features).
-  */
--static void test_basic_perf_capabilities(union perf_capabilities host_cap)
-+KVM_ONE_VCPU_TEST(vmx_pmu_caps, basic_perf_capabilities, guest_code)
- {
--	struct kvm_vcpu *vcpu;
--	struct kvm_vm *vm = vm_create_with_one_vcpu(&vcpu, NULL);
--
- 	vcpu_set_msr(vcpu, MSR_IA32_PERF_CAPABILITIES, 0);
- 	vcpu_set_msr(vcpu, MSR_IA32_PERF_CAPABILITIES, host_cap.capabilities);
--
--	kvm_vm_free(vm);
- }
- 
--static void test_fungible_perf_capabilities(union perf_capabilities host_cap)
-+KVM_ONE_VCPU_TEST(vmx_pmu_caps, fungible_perf_capabilities, guest_code)
- {
- 	const uint64_t fungible_caps = host_cap.capabilities & ~immutable_caps.capabilities;
--
--	struct kvm_vcpu *vcpu;
--	struct kvm_vm *vm = vm_create_with_one_vcpu(&vcpu, NULL);
- 	int bit;
- 
- 	for_each_set_bit(bit, &fungible_caps, 64) {
-@@ -150,8 +141,6 @@ static void test_fungible_perf_capabilities(union perf_capabilities host_cap)
- 			     host_cap.capabilities & ~BIT_ULL(bit));
- 	}
- 	vcpu_set_msr(vcpu, MSR_IA32_PERF_CAPABILITIES, host_cap.capabilities);
--
--	kvm_vm_free(vm);
- }
- 
- /*
-@@ -160,14 +149,11 @@ static void test_fungible_perf_capabilities(union perf_capabilities host_cap)
-  * separately as they are multi-bit values, e.g. toggling or setting a single
-  * bit can generate a false positive without dedicated safeguards.
-  */
--static void test_immutable_perf_capabilities(union perf_capabilities host_cap)
-+KVM_ONE_VCPU_TEST(vmx_pmu_caps, immutable_perf_capabilities, guest_code)
- {
- 	const uint64_t reserved_caps = (~host_cap.capabilities |
- 					immutable_caps.capabilities) &
- 				       ~format_caps.capabilities;
--
--	struct kvm_vcpu *vcpu;
--	struct kvm_vm *vm = vm_create_with_one_vcpu(&vcpu, NULL);
- 	union perf_capabilities val = host_cap;
- 	int r, bit;
- 
-@@ -201,8 +187,6 @@ static void test_immutable_perf_capabilities(union perf_capabilities host_cap)
- 		TEST_ASSERT(!r, "Bad PEBS FMT = 0x%x didn't fail, host = 0x%x",
- 			    val.pebs_format, host_cap.pebs_format);
- 	}
--
--	kvm_vm_free(vm);
- }
- 
- /*
-@@ -211,17 +195,13 @@ static void test_immutable_perf_capabilities(union perf_capabilities host_cap)
-  * LBR_TOS as those bits are writable across all uarch implementations (arch
-  * LBRs will need to poke a different MSR).
-  */
--static void test_lbr_perf_capabilities(union perf_capabilities host_cap)
-+KVM_ONE_VCPU_TEST(vmx_pmu_caps, lbr_perf_capabilities, guest_code)
++KVM_ONE_VCPU_TEST(user_msr, msr_filter_allow, guest_code_filter_allow)
  {
 -	struct kvm_vcpu *vcpu;
 -	struct kvm_vm *vm;
- 	int r;
++	struct kvm_vm *vm = vcpu->vm;
+ 	int rc;
  
- 	if (!host_cap.lbr_format)
- 		return;
- 
--	vm = vm_create_with_one_vcpu(&vcpu, NULL);
+-	vm = vm_create_with_one_vcpu(&vcpu, guest_code_filter_allow);
 -
- 	vcpu_set_msr(vcpu, MSR_IA32_PERF_CAPABILITIES, host_cap.capabilities);
- 	vcpu_set_msr(vcpu, MSR_LBR_TOS, 7);
+ 	rc = kvm_check_cap(KVM_CAP_X86_USER_SPACE_MSR);
+ 	TEST_ASSERT(rc, "KVM_CAP_X86_USER_SPACE_MSR is available");
+ 	vm_enable_cap(vm, KVM_CAP_X86_USER_SPACE_MSR, KVM_MSR_EXIT_REASON_FILTER);
+@@ -585,8 +585,6 @@ static void test_msr_filter_allow(void)
+ 	} else {
+ 		printf("To run the instruction emulated tests set the module parameter 'kvm.force_emulation_prefix=1'\n");
+ 	}
+-
+-	kvm_vm_free(vm);
+ }
  
-@@ -229,14 +209,10 @@ static void test_lbr_perf_capabilities(union perf_capabilities host_cap)
+ static int handle_ucall(struct kvm_vcpu *vcpu)
+@@ -646,16 +644,12 @@ static void handle_wrmsr(struct kvm_run *run)
+ 	}
+ }
  
- 	r = _vcpu_set_msr(vcpu, MSR_LBR_TOS, 7);
- 	TEST_ASSERT(!r, "Writing LBR_TOS should fail after disabling vPMU");
+-static void test_msr_filter_deny(void)
++KVM_ONE_VCPU_TEST(user_msr, msr_filter_deny, guest_code_filter_deny)
+ {
+-	struct kvm_vcpu *vcpu;
+-	struct kvm_vm *vm;
+-	struct kvm_run *run;
++	struct kvm_vm *vm = vcpu->vm;
++	struct kvm_run *run = vcpu->run;
+ 	int rc;
+ 
+-	vm = vm_create_with_one_vcpu(&vcpu, guest_code_filter_deny);
+-	run = vcpu->run;
+-
+ 	rc = kvm_check_cap(KVM_CAP_X86_USER_SPACE_MSR);
+ 	TEST_ASSERT(rc, "KVM_CAP_X86_USER_SPACE_MSR is available");
+ 	vm_enable_cap(vm, KVM_CAP_X86_USER_SPACE_MSR, KVM_MSR_EXIT_REASON_INVAL |
+@@ -689,18 +683,13 @@ static void test_msr_filter_deny(void)
+ done:
+ 	TEST_ASSERT(msr_reads == 4, "Handled 4 rdmsr in user space");
+ 	TEST_ASSERT(msr_writes == 3, "Handled 3 wrmsr in user space");
+-
+-	kvm_vm_free(vm);
+ }
+ 
+-static void test_msr_permission_bitmap(void)
++KVM_ONE_VCPU_TEST(user_msr, msr_permission_bitmap, guest_code_permission_bitmap)
+ {
+-	struct kvm_vcpu *vcpu;
+-	struct kvm_vm *vm;
++	struct kvm_vm *vm = vcpu->vm;
+ 	int rc;
+ 
+-	vm = vm_create_with_one_vcpu(&vcpu, guest_code_permission_bitmap);
+-
+ 	rc = kvm_check_cap(KVM_CAP_X86_USER_SPACE_MSR);
+ 	TEST_ASSERT(rc, "KVM_CAP_X86_USER_SPACE_MSR is available");
+ 	vm_enable_cap(vm, KVM_CAP_X86_USER_SPACE_MSR, KVM_MSR_EXIT_REASON_FILTER);
+@@ -715,8 +704,6 @@ static void test_msr_permission_bitmap(void)
+ 	vm_ioctl(vm, KVM_X86_SET_MSR_FILTER, &filter_gs);
+ 	run_guest_then_process_rdmsr(vcpu, MSR_GS_BASE);
+ 	run_guest_then_process_ucall_done(vcpu);
+-
+-	kvm_vm_free(vm);
+ }
+ 
+ #define test_user_exit_msr_ioctl(vm, cmd, arg, flag, valid_mask)	\
+@@ -786,31 +773,18 @@ static void run_msr_filter_flag_test(struct kvm_vm *vm)
+ }
+ 
+ /* Test that attempts to write to the unused bits in a flag fails. */
+-static void test_user_exit_msr_flags(void)
++KVM_ONE_VCPU_TEST(user_msr, user_exit_msr_flags, NULL)
+ {
+-	struct kvm_vcpu *vcpu;
+-	struct kvm_vm *vm;
+-
+-	vm = vm_create_with_one_vcpu(&vcpu, NULL);
++	struct kvm_vm *vm = vcpu->vm;
+ 
+ 	/* Test flags for KVM_CAP_X86_USER_SPACE_MSR. */
+ 	run_user_space_msr_flag_test(vm);
+ 
+ 	/* Test flags and range flags for KVM_X86_SET_MSR_FILTER. */
+ 	run_msr_filter_flag_test(vm);
 -
 -	kvm_vm_free(vm);
  }
  
  int main(int argc, char *argv[])
  {
--	union perf_capabilities host_cap;
+-	test_msr_filter_allow();
 -
- 	TEST_REQUIRE(get_kvm_param_bool("enable_pmu"));
- 	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_PDCM));
- 
-@@ -248,9 +224,5 @@ int main(int argc, char *argv[])
- 	TEST_ASSERT(host_cap.full_width_write,
- 		    "Full-width writes should always be supported");
- 
--	test_basic_perf_capabilities(host_cap);
--	test_fungible_perf_capabilities(host_cap);
--	test_immutable_perf_capabilities(host_cap);
--	test_guest_wrmsr_perf_capabilities(host_cap);
--	test_lbr_perf_capabilities(host_cap);
+-	test_msr_filter_deny();
+-
+-	test_msr_permission_bitmap();
+-
+-	test_user_exit_msr_flags();
+-
+-	return 0;
 +	return test_harness_run(argc, argv);
  }
 -- 
