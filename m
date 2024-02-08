@@ -1,202 +1,166 @@
-Return-Path: <kvm+bounces-8365-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8366-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1794484E8C9
-	for <lists+kvm@lfdr.de>; Thu,  8 Feb 2024 20:15:58 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 041B984E90D
+	for <lists+kvm@lfdr.de>; Thu,  8 Feb 2024 20:41:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FDD11C257AD
-	for <lists+kvm@lfdr.de>; Thu,  8 Feb 2024 19:15:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B371BB2FA06
+	for <lists+kvm@lfdr.de>; Thu,  8 Feb 2024 19:31:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 308E736B1A;
-	Thu,  8 Feb 2024 19:15:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88B48381B3;
+	Thu,  8 Feb 2024 19:31:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="UcbQf7Cq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BFrOs6qD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93DD336AF5;
-	Thu,  8 Feb 2024 19:15:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E17136B0A
+	for <kvm@vger.kernel.org>; Thu,  8 Feb 2024 19:31:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707419749; cv=none; b=T6fuVAh7s4BHfZGyD1ANVXO5dlHqE1QR02UvYtpktpOda8SXrZHd6MAf3GxElvpSSaxv/5WYymeXNDIo51aCg9q8nPVqoysjn8Xb1x/hP9ELo9pdeVTDEi4Tf3STAX7s0JJZoCuj30yVcU0JVVX9S8TEWc0FG8HrN0selN4ujhA=
+	t=1707420676; cv=none; b=NBBMvsuejRsEqShXcYjws7oF+HPZ7gvZ68fFish/GbYYPRwwcA0i8Ap+/3Q5qFKyBxVY+6yWKKApDkBIY90PKcM1K2vbdsNcgbAfLNgZVaIQsrSGaqbR8lSJhzHCgrQSgPxu9ZKadqkgEFIQUTP8yJrk7P+xcsGw0N9k47XEMvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707419749; c=relaxed/simple;
-	bh=hue2GXyKpIcwWf5LC3q+QpK2v/7XmcOWpQlxrCNIv4U=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=EsTtUS0hDnD9H/yspdXXIO5rndBHnSPyFWXf/1ZCizyq2golvoQbFo09aALasPOXDu3fvM+U+IIYmnRi1FMFfhD+CvYk3xcr+a7eBJYjL9uOZzR4OT/BHmqJcqz5PvtWZ3A0HFJvi4g4tVnOMUd4CJn9bzkRIPfrDaqJFZl0EQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=UcbQf7Cq; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 418HwH8P002927;
-	Thu, 8 Feb 2024 19:15:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=hue2GXyKpIcwWf5LC3q+QpK2v/7XmcOWpQlxrCNIv4U=;
- b=UcbQf7CqvIPfHRLPvKyyrZ27We1DeiN4rcjbcaXAX3jTkkOFBnTStKu717Tzb+tg7ipt
- W6Qhw9IEA5TFEYt9u8MaKs0T9TRwp+VSg7Vy15v7MB0DBG4hEm9vLGu1PC+m20mn2Rol
- WlYoy7NTqAMnS6OxI0IvACrBGYpiqxEsj0rnEQNwNqx7vXcCG6L1gCvVA+Hsf/QuHEOq
- D6Inv0VhfZJ5xkUwn1Gx6ePkfVoyFzjS+5ZJ3ViOcBCWQ6XPKDRlxp1RNkC0dhbtK8to
- 9wt4m9g/We0kPCgcigDwFjztOV7VkHBIFtXilSgLaEW65ayqNgdDQONK9QJV2KZPKRpG iw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w53tr1txg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 08 Feb 2024 19:15:46 +0000
-Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 418J91wX007103;
-	Thu, 8 Feb 2024 19:15:45 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w53tr1tx8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 08 Feb 2024 19:15:45 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 418HQsGT014765;
-	Thu, 8 Feb 2024 19:15:45 GMT
-Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3w20tp6m6w-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 08 Feb 2024 19:15:45 +0000
-Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
-	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 418JFhN91573572
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 8 Feb 2024 19:15:44 GMT
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DB5B358054;
-	Thu,  8 Feb 2024 19:15:43 +0000 (GMT)
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id F28FF58062;
-	Thu,  8 Feb 2024 19:15:42 +0000 (GMT)
-Received: from li-479af74c-31f9-11b2-a85c-e4ddee11713b.ibm.com (unknown [9.61.186.237])
-	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  8 Feb 2024 19:15:42 +0000 (GMT)
-Message-ID: <f942bca2f992dd45999284f79ad671a17b6a5bd2.camel@linux.ibm.com>
-Subject: Re: [RFC PATCH] KVM: s390: remove extra copy of access registers
- into KVM_RUN
-From: Eric Farman <farman@linux.ibm.com>
-To: Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank
-	 <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David
-	Hildenbrand <david@redhat.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        Nina Schoetterl-Glausch
-	 <nsg@linux.ibm.com>
-Date: Thu, 08 Feb 2024 14:15:42 -0500
-In-Reply-To: <4b2729ba-d9ca-48f4-aa6d-4b421e8fa44d@linux.ibm.com>
-References: <20240131205832.2179029-1-farman@linux.ibm.com>
-	 <5ecbe9f3-827d-4308-90cd-84e065a76489@linux.ibm.com>
-	 <84ae4b14-a514-462a-b084-4657f0353332@linux.ibm.com>
-	 <4b2729ba-d9ca-48f4-aa6d-4b421e8fa44d@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+	s=arc-20240116; t=1707420676; c=relaxed/simple;
+	bh=JTnL6CBuzBPqsrfYa0gkSIbWG2+BlvSoeYR5H7CNbok=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tZPXPcn9py5iYxgO7yJMKVZW9OotjYHVjDuMYrpfFCar8N1A5KfU/IA7H+S3YEYB+ZgsQPKGg68JEU5q8KfFIzrKcvdNtmHSyO/vcL4hQ5Q0zsr/zkSkpdB27gI64HWz78YLMKM9I+Tgn0NpFEzX2orOVXubbOCbJh6sximzD50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BFrOs6qD; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707420673;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=uQ9ZvCPxOXDHlqGQaVlrxREOk6cQTpNHPWgCRf8e/qY=;
+	b=BFrOs6qDDTZ5Z9bvpwOt8yIiNWroODKbQABy59/s5RLLZa/ms1JvXolJuE/rKnM3XCQjM3
+	MfeXeisW2JQh52uPHL82FhAoyW1SmIzJSSdaZ4yleNEL9l6IXoAunziRsydF4zzjums9Wi
+	dVz2B3sUZowXp5fZvN66V9iCPwetVj4=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-395-l7DjRl6xPYioe77wQwi8KQ-1; Thu, 08 Feb 2024 14:31:12 -0500
+X-MC-Unique: l7DjRl6xPYioe77wQwi8KQ-1
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-560d90fca35so183363a12.1
+        for <kvm@vger.kernel.org>; Thu, 08 Feb 2024 11:31:11 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707420671; x=1708025471;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uQ9ZvCPxOXDHlqGQaVlrxREOk6cQTpNHPWgCRf8e/qY=;
+        b=s0a8W3yoMEZ7O/2rTS+ZAEczgllNDJZj+z1huOId+7CCMNCrqW97358UG09bfnQcQF
+         BSql91cmr8Wrf61Wx+XZGen1of8YqGGIW5KGXiKt0ef6q0UGrCPpV4AQ9wvwA1tItDTZ
+         3MBoSD6aelOlKAz34gbomZsvqd41gi66K6Gfm9MjDcyXwm3kyWup9254267XnKU2O5A8
+         opIdc00L2RpgiWHP1ddh2WmvmcJTU1lvyay02UysI1QN6L09FHDGEDqgeeJtPjAg+PuJ
+         HqtzJ1evRPGovhAVVHv7q2CqUO2pNoA7J3YbiMQqUZhEloW3Pmurq6nkQBfHakH5a8fl
+         q5rg==
+X-Gm-Message-State: AOJu0YylwAmE/wh6NoH4ystlytC7FLWH9qvD04p38wm3zPCawdIu6fl8
+	4MYkSQB3pFqSdMMOhkavZij2o0uMz1WvnHxCtefaDhdQp/Pty3ZD9Jy6DcZvKuOy9D+4sh6v4b+
+	wAbjRbWLwUPza/kRd03YN2/crq0kDIFG1wdRHAvsCQCA0zgH1GQ==
+X-Received: by 2002:aa7:cf95:0:b0:55f:ec52:73c4 with SMTP id z21-20020aa7cf95000000b0055fec5273c4mr149358edx.34.1707420671059;
+        Thu, 08 Feb 2024 11:31:11 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFsxHVj4yR3SB291sP445sVMKVbI81OF8XZl66Kj6TFmKLpg0hThCmEuUlU77ldDlIGOUSAxA==
+X-Received: by 2002:aa7:cf95:0:b0:55f:ec52:73c4 with SMTP id z21-20020aa7cf95000000b0055fec5273c4mr149344edx.34.1707420670739;
+        Thu, 08 Feb 2024 11:31:10 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXcg+MkJnBi7LuWObXkd21CPr5jg44VOWU2Tp6hczV31yWw/visww1h4gsVEhYRIbrjDNlJ66aHv626fudQWiW4lziVNxrQPY32V+YTnr8Hf1XinfvXKd3q1nnMXytRG6FYkC15kTmd/TfYEmUkDRhe1rdLYFgJMkYhWVXXSHXuUAViYGHCvR/OQ/937C8v44WkZRKc
+Received: from [192.168.0.9] (ip-109-43-177-145.web.vodafone.de. [109.43.177.145])
+        by smtp.gmail.com with ESMTPSA id n22-20020a05640206d600b0055ff708dee3sm41793edy.11.2024.02.08.11.31.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 08 Feb 2024 11:31:10 -0800 (PST)
+Message-ID: <ed511f49-ef77-4cc6-bebb-7f4e7c69e008@redhat.com>
+Date: Thu, 8 Feb 2024 20:31:09 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 27iDrsc6BCFookJ4t94P5uUIoB7J47Q2
-X-Proofpoint-GUID: AOGPqpQQ_nmFBbFddhAU3kqFlSjKH-18
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-08_08,2024-02-08_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- mlxlogscore=751 impostorscore=0 adultscore=0 mlxscore=0 spamscore=0
- phishscore=0 lowpriorityscore=0 priorityscore=1501 suspectscore=0
- bulkscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2402080101
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 7/7] KVM: selftests: x86: Use TAP interface in the
+ userspace_msr_exit test
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+ Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <20231005143839.365297-1-thuth@redhat.com>
+ <20231005143839.365297-8-thuth@redhat.com> <ZbQIz3thIczeRhCs@google.com>
+Content-Language: en-US
+From: Thomas Huth <thuth@redhat.com>
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+In-Reply-To: <ZbQIz3thIczeRhCs@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, 2024-02-08 at 14:51 +0100, Christian Borntraeger wrote:
->=20
->=20
-> Am 08.02.24 um 13:37 schrieb Janosch Frank:
-> > On 2/8/24 12:50, Christian Borntraeger wrote:
-> > > Am 31.01.24 um 21:58 schrieb Eric Farman:
-> > > > The routine ar_translation() is called by get_vcpu_asce(),
-> > > > which is
-> > > > called from a handful of places, such as an interception that
-> > > > is
-> > > > being handled during KVM_RUN processing. In that case, the
-> > > > access
-> > > > registers of the vcpu had been saved to a host_acrs struct and
-> > > > then
-> > > > the guest access registers loaded from the KVM_RUN struct prior
-> > > > to
-> > > > entering SIE. Saving them back to KVM_RUN at this point doesn't
-> > > > do
-> > > > any harm, since it will be done again at the end of the KVM_RUN
-> > > > loop when the host access registers are restored.
-> > > >=20
-> > > > But that's not the only path into this code. The MEM_OP ioctl
-> > > > can
-> > > > be used while specifying an access register, and will arrive
-> > > > here.
-> > > >=20
-> > > > Linux itself doesn't use the access registers for much, but it
-> > > > does
-> > > > squirrel the thread local storage variable into ACRs 0 and 1 in
-> > > > copy_thread() [1]. This means that the MEM_OP ioctl may copy
-> > > > non-zero access registers (the upper- and lower-halves of the
-> > > > TLS
-> > > > pointer) to the KVM_RUN struct, which will end up getting
-> > > > propogated
-> > > > to the guest once KVM_RUN ioctls occur. Since these are almost
-> > > > certainly invalid as far as an ALET goes, an ALET Specification
-> > > > Exception would be triggered if it were attempted to be used.
-> > > >=20
-> > > > [1] arch/s390/kernel/process.c:169
-> > > >=20
-> > > > Signed-off-by: Eric Farman <farman@linux.ibm.com>
-> > > > ---
-> > > >=20
-> > > > Notes:
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 I've gone back and forth about wheth=
-er the correct fix is
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 to simply remove the save_access_reg=
-s() call and inspect
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 the contents from the most recent KV=
-M_RUN directly,
-> > > > versus
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 storing the contents locally. Both w=
-ork for me but I've
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 opted for the latter, as it continue=
-s to behave the same
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 as it does today but without the imp=
-licit use of the
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 KVM_RUN space. As it is, this is (wa=
-s) the only reference
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 to vcpu->run in this file, which sta=
-nds out since the
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 routines are used by other callers.
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Curious about others' thoughts.
-> > >=20
-> > > Given the main idea that we have the guest ARs loaded in the kvm
-> > > module
-> > > when running a guest and that the kernel does not use those. This
-> > > avoids
-> > > saving/restoring the ARs for all the fast path exits.
-> > > The MEM_OP is indeed a separate path.
-> > > So what about making this slightly slower by doing something like
-> > > this
-> > > (untested, white space damaged)
+On 26/01/2024 20.32, Sean Christopherson wrote:
+> On Thu, Oct 05, 2023, Thomas Huth wrote:
+>> Use the kselftest_harness.h interface in this test to get TAP
+>> output, so that it is easier for the user to see what the test
+>> is doing.
+>>
+>> Note: We're not using the KVM_ONE_VCPU_TEST() macro here (but the
+>> generic TEST() macro from kselftest_harness.h) since each of the
+>> tests needs a different guest code function.
+> 
+> I would much rather we add a KVM framework that can deal with this, i.e. build
+> something that is flexible from the get-go.  Allowing tests to set the entry point
+> after vCPU is fairly straightforward (patch below, compile tested only on x86).
+> 
+> With that, my vote would be to have KVM_ONE_VCPU_TEST_SUITE() *always* pass NULL
+> for the entry point, and instead always require sub-tests to pass the guest code
+> to KVM_ONE_VCPU_TEST().  I think having the sub-test explicitly specify its guest
+> code will be helpful for developers reading the code. 
 
-This idea seems to work fine for the case I was puzzling over.
+Yes, I agree that sounds quite a bit nicer. I'll give it a try...
 
-> >=20
-> > We could fence AR loading/storing via the the PSW address space
-> > bits for more performance and not do a full sync/store regs here.
->=20
-> Hmm, we would then add a conditional branch which also is not ideal.
-> Maybe just load/restore the ARs instead of the full sync/save_reg
-> dance?
+  Thomas
 
-This might work too. I'll give that a try later today.
+
 
