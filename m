@@ -1,346 +1,242 @@
-Return-Path: <kvm+bounces-8377-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8378-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D68E84EA19
-	for <lists+kvm@lfdr.de>; Thu,  8 Feb 2024 22:09:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C1B784EB28
+	for <lists+kvm@lfdr.de>; Thu,  8 Feb 2024 23:06:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 12FEA1F2EED7
-	for <lists+kvm@lfdr.de>; Thu,  8 Feb 2024 21:09:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 50BD91C22A4A
+	for <lists+kvm@lfdr.de>; Thu,  8 Feb 2024 22:06:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEAD14F1EC;
-	Thu,  8 Feb 2024 21:08:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32BBD4F60B;
+	Thu,  8 Feb 2024 22:06:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PlXMCfLc"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lknxpQss"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8284D48799
-	for <kvm@vger.kernel.org>; Thu,  8 Feb 2024 21:08:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA0F84F601
+	for <kvm@vger.kernel.org>; Thu,  8 Feb 2024 22:06:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707426527; cv=none; b=X6k4l7MXXyUKU6jH9HQ/A+6va4Lfx7E+/lqouneEJ1An1Isy4PAukj2pkRRc3cUyUxAfDtfCuMk2iBz3RIqWIYWtTbzMe+kPouzcWojRjkGPfAGgPcacUdXcg4ZKftrrLDZ8cvOaqwa7clMO3jgLZCcHI9ZZ/ikAI+/jMHujI54=
+	t=1707429971; cv=none; b=IibtMczCIPz6AonQoz7CBTTIJRwIzxTKt6hzAVHktxQvU1s2pLMLmtRSFUCUKyEGV5ZT0cqay/btCKSMacaSrG1NrBje350w4vEVVaFqE8aBSu1mviXffpUF7zeSHIBoBJ2mhC6LMjkzVco9IZ3JEmnyun9ZJuLdvMR5s9BlBc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707426527; c=relaxed/simple;
-	bh=NJd5ro/Dk6gqk+wousDZO3e2YpebOtIF9SpkKM9kPs8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JYzzV74Gc5r6ujLyuHnJNhnhFmIK3conBgxsHjmnEN5af3cUfTvujhBfT/7kMM4M0ZScEV/jtb2+7nn8/g4ObNH2wLZVOpD6tvDu0zje5Lj2BXnfyB6A8cYxHMfJ7hCSWfshh4w8qKvgOjCQcnhMEkP62ygKgcDL8fV3ILUxLFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PlXMCfLc; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707426523;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=n6Lom6fJfEX98E0m960fMPaVVmvrlkRK2vpWlXZeIZM=;
-	b=PlXMCfLcRmeTfGFnM2nzZmp9itXNZWF4/+w78+1k8gVf2VoX8U0n8tszzl61r1Iao8/X/f
-	dMJomwleoa1ZjO425uyomR6w/NMkrcDexIwWFMDWCGqo1guGcQGVy4kGvzJnt/Cra4Z00T
-	XkIcAnhqAKGuFI5+SPrGYBMcwEJiiRk=
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
- [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-624-BmH7sSTSNZuA_yAtRG8A8Q-1; Thu, 08 Feb 2024 16:08:40 -0500
-X-MC-Unique: BmH7sSTSNZuA_yAtRG8A8Q-1
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7c02ed38aa5so14896839f.3
-        for <kvm@vger.kernel.org>; Thu, 08 Feb 2024 13:08:39 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707426519; x=1708031319;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+	s=arc-20240116; t=1707429971; c=relaxed/simple;
+	bh=+HqxsW+M2owUPE1t0f3ih4AUm9D5nOd5rHTbwXvGmf4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=RmyY1TZd6kapPedosMGRY3LfvXIXTtaR3+x6u4WZK0B2unSd3ZpWwcY4IFMtH/2L05ebjJ9Lg832fsFLbl0bAaXonUrqgJLqcc3pGfkLAPH+Kmr3cfoGtCu5sRIiM5cMZ7c0xihaJOSVbBV7eBLZr56DPina/OQeuKo4M/aALWw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lknxpQss; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc746178515so552906276.2
+        for <kvm@vger.kernel.org>; Thu, 08 Feb 2024 14:06:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1707429968; x=1708034768; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=n6Lom6fJfEX98E0m960fMPaVVmvrlkRK2vpWlXZeIZM=;
-        b=RLNnAHrLWRgWcEcpi2SALjg1thwQ+XMg5wsPmOyBlY5OJj12tZo/g5pvQ7EKk6M8/K
-         C9Eql70E1AVhNx8B0Q1iQbpTbHdQbxgyBFpY3gH+/8jAEKM4flba4j+y0JB4/Jx+7M8F
-         EAFhEuRSVtTcZ0+m290uYdrcoNiKbbG+Tqq1z6XRIbcSE6Fds18X5yAWJHiMK8EbN9TI
-         VHZF2KiGwgW1eNM7KR/MC4M0zGtQtgj7Uqky3LWKPRcMHIv3X8MOg/kAXHATuGH9Fbuv
-         NNGVe76hwgG0UWKs2kStXCCQoPaRuWwSph692XwV39Swxf1lYCreOt4h0ANfQ0FfohWv
-         x8tw==
-X-Forwarded-Encrypted: i=1; AJvYcCV6Ajb3DZlZcThaCYHWh7AjjeB3ZRNrZKhNNxwDV7Plwp209WPyTeRkchmS2EFrlpd/Sfv99Y40vqX5iQSKa2rsDc56
-X-Gm-Message-State: AOJu0YyNNUM6xrKRAaRMKUvehFpQH5WSNzTfHbyvPKSeoEjRmu4NitC2
-	vLrO7KvBvme1ix/x0ErF7efW3abMq3Od77TXLEQOCRfJeL9/H2nWaaKKUAOL8oWi4zOb8G+9NmY
-	XCqgf8sc1e1Iz9afdCXAMCg2pjimBsq0gaQyinwnQiwdAW7OUrQ==
-X-Received: by 2002:a6b:5b14:0:b0:7c3:f542:66d5 with SMTP id v20-20020a6b5b14000000b007c3f54266d5mr1049998ioh.4.1707426519212;
-        Thu, 08 Feb 2024 13:08:39 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFZQ2zdMK0ogtlSgUF6h1GEGSod27Nz77anah68mxU9CUZ87LOYvVB84P/FMytNVpRB3ljpww==
-X-Received: by 2002:a6b:5b14:0:b0:7c3:f542:66d5 with SMTP id v20-20020a6b5b14000000b007c3f54266d5mr1049975ioh.4.1707426518924;
-        Thu, 08 Feb 2024 13:08:38 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCW38rfROHn9z/eBTCsfQUaiaXUIqanljDwgob2akrCPyr+WOFBAFABd+odnSrd6cPEvclnjvROBSHS110I8o6p9P/wPhNFNLMzz9GGLdVTYdaxQg5pja5pGlpI2ajqQrYPVS4+BjWWqhw/sXlmmRuDVf/JAqowZMOBkG2pi5xgyEEVMWCpRB/b9NakJUVwT4CnVKSx4HZX/E/I6pMhBAQhVkFNQx4hLFRxBSAJxwxEpLfrZ58LeLu89A1LQKQlNKYasInlDHIK3VpaPkW0jNm1X3g6axL+QO1yWhWYO0Q65brwkOY68iiT9tcaLBF1UWQx3qZfUuA==
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id m7-20020a02c887000000b00470f2874365sm46817jao.137.2024.02.08.13.08.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Feb 2024 13:08:38 -0800 (PST)
-Date: Thu, 8 Feb 2024 14:08:36 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Reinette Chatre <reinette.chatre@intel.com>
-Cc: <jgg@nvidia.com>, <yishaih@nvidia.com>,
- <shameerali.kolothum.thodi@huawei.com>, <kevin.tian@intel.com>,
- <kvm@vger.kernel.org>, <dave.jiang@intel.com>, <ashok.raj@intel.com>,
- <linux-kernel@vger.kernel.org>, <patches@lists.linux.dev>
-Subject: Re: [PATCH 15/17] vfio/pci: Let enable and disable of interrupt
- types use same signature
-Message-ID: <20240208140836.76a212d3.alex.williamson@redhat.com>
-In-Reply-To: <63ba0079-a035-4595-a40e-8c063b4a59eb@intel.com>
-References: <cover.1706849424.git.reinette.chatre@intel.com>
-	<bf87e46c249941ebbfacb20ee9ff92e8efd2a595.1706849424.git.reinette.chatre@intel.com>
-	<20240205153542.0883e2ff.alex.williamson@redhat.com>
-	<5784cc9b-697a-40fa-99b0-b75530f51214@intel.com>
-	<20240206150341.798bb9fe.alex.williamson@redhat.com>
-	<ce617344-ab6e-49f3-adbd-47be9fb87bf9@intel.com>
-	<20240206161934.684237d3.alex.williamson@redhat.com>
-	<63ba0079-a035-4595-a40e-8c063b4a59eb@intel.com>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+        bh=qvMyG9nvSBHLUMFOMKRFO9Rewa0dt7iLtbjmjr+czqE=;
+        b=lknxpQssqgRn4fHAUeAfrjKv0DS/rSWQX2OXM08f9QFBBuAmiFJA9Dwn7sTl51szmF
+         2/IEAEP7ilzwI5OB3VMBr5YAzUS283Zb2lySBdsfiRNNCqHRQGe1GHfUpmm71ahAXvaA
+         u2xAt7szGSSYyVqBck0V370VjE/aHtL7+fGWllBHjSS+RFl7w+nE6WdVg4nqTCzUItQb
+         pRpzKbeX42QwTDI+NBIuuCcoV2dzTzTkikXWxmVsqwncAVWa2h8oromlYRKhm79zlVVs
+         DuzRty6YdtYXu7ug8d5T/AtM0BsWv9qEhWFLnc3vAbeBfnGamXKeh4plIEYirUZdyWJo
+         G7QA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707429968; x=1708034768;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qvMyG9nvSBHLUMFOMKRFO9Rewa0dt7iLtbjmjr+czqE=;
+        b=T2qRiJZwDnIdwoyi++9jXwshJNdK4ZU/stLTFgXd6INDkjbAf38+riL7cpJIWbH93H
+         mfGWnx0Gb9lVGQ0jstfeuJ17NQo3yn8/h+3FCq6pHhsmxCME0t/9aHa80I8EIHdt0jDM
+         NbDzFZ9Ib3I49VCwbHVlsnp8FyxyXhJwOkd5a9vHNeIJSJ+0p6csWlbEr2hSVUyNQiZR
+         ooEjtx8a1h+xnk9sjdVTtqyvX3nX5HJ/zZbWlyfVIBsSUGwuCPAeb0px386uw6AYnEMQ
+         dJqPy7lx5CoezQkpJBB/2vm+j6DX0NKvP/OBhIy4y1yCwO6lhmdpf74wwImwq7eUzA8V
+         M29w==
+X-Forwarded-Encrypted: i=1; AJvYcCXOsZ3BK7zxcZb4W3loM8PaLm6u4caFYtsIpKgUiwZKsrTCitL4ZEwZlp+klmMdkhX994IDqengg0zw/I/oF+nB1ww5
+X-Gm-Message-State: AOJu0YwTPh8/nMYnzeoGYfxCcEQWcaq0po+prTCYWJnZjLp01qjRhAgu
+	6aLM8zCbtSWJKNJwI3tR41sfiW3TbTIplo/4wLbs7fVzrWdHZRKf9GGO2Ii+UabptcGuLEa5LN0
+	oyA==
+X-Google-Smtp-Source: AGHT+IF4UvzHXxBTFScmavn1RAtcQWZlBrtweDSMjdbmJ5YCqJHNXdskuFeue0XYnVhq0rq10/+PCXtYDjE=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:100a:b0:dc2:4ab7:3d89 with SMTP id
+ w10-20020a056902100a00b00dc24ab73d89mr203274ybt.1.1707429968666; Thu, 08 Feb
+ 2024 14:06:08 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Thu,  8 Feb 2024 14:06:04 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.687.g38aa6559b0-goog
+Message-ID: <20240208220604.140859-1-seanjc@google.com>
+Subject: [PATCH] Kconfig: Explicitly disable asm goto w/ outputs on gcc-11
+ (and earlier)
+From: Sean Christopherson <seanjc@google.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: linux-kernel@vger.kernel.org, Nick Desaulniers <ndesaulniers@google.com>, 
+	Masahiro Yamada <masahiroy@kernel.org>, Peter Zijlstra <peterz@infradead.org>, kvm@vger.kernel.org, 
+	Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 7 Feb 2024 15:30:15 -0800
-Reinette Chatre <reinette.chatre@intel.com> wrote:
+Explicitly require gcc-12+ to enable asm goto with outputs on gcc to avoid
+what is effectively a data corruption bug on gcc-11.  As per
+https://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html, "asm goto" is
+*supposed* be implicitly volatile, but gcc-11 fails to treat it as such.
+When compiling with -O2, failure to treat the asm block as volatile can
+result in the entire block being discarded during optimization.
 
-> Hi Alex,
-> 
-> On 2/6/2024 3:19 PM, Alex Williamson wrote:
-> > On Tue, 6 Feb 2024 14:22:04 -0800
-> > Reinette Chatre <reinette.chatre@intel.com> wrote:  
-> >> On 2/6/2024 2:03 PM, Alex Williamson wrote:  
-> >>> On Tue, 6 Feb 2024 13:46:37 -0800
-> >>> Reinette Chatre <reinette.chatre@intel.com> wrote:  
-> >>>> On 2/5/2024 2:35 PM, Alex Williamson wrote:    
-> >>>>> On Thu,  1 Feb 2024 20:57:09 -0800
-> >>>>> Reinette Chatre <reinette.chatre@intel.com> wrote:      
-> >>>>
-> >>>> ..
-> >>>>    
-> >>>>>> @@ -715,13 +724,13 @@ static int vfio_pci_set_intx_trigger(struct vfio_pci_core_device *vdev,
-> >>>>>>  		if (is_intx(vdev))
-> >>>>>>  			return vfio_irq_set_block(vdev, start, count, fds, index);
-> >>>>>>  
-> >>>>>> -		ret = vfio_intx_enable(vdev);
-> >>>>>> +		ret = vfio_intx_enable(vdev, start, count, index);      
-> >>>>>
-> >>>>> Please trace what happens when a user calls SET_IRQS to setup a trigger
-> >>>>> eventfd with start = 0, count = 1, followed by any other combination of
-> >>>>> start and count values once is_intx() is true.  vfio_intx_enable()
-> >>>>> cannot be the only place we bounds check the user, all of the INTx
-> >>>>> callbacks should be an error or nop if vector != 0.  Thanks,
-> >>>>>       
-> >>>>
-> >>>> Thank you very much for catching this. I plan to add the vector
-> >>>> check to the device_name() and request_interrupt() callbacks. I do
-> >>>> not think it is necessary to add the vector check to disable() since
-> >>>> it does not operate on a range and from what I can tell it depends on
-> >>>> a successful enable() that already contains the vector check. Similar,
-> >>>> free_interrupt() requires a successful request_interrupt() (that will
-> >>>> have vector check in next version).
-> >>>> send_eventfd() requires a valid interrupt context that is only
-> >>>> possible if enable() or request_interrupt() succeeded.    
-> >>>
-> >>> Sounds reasonable.
-> >>>     
-> >>>> If user space creates an eventfd with start = 0 and count = 1
-> >>>> and then attempts to trigger the eventfd using another combination then
-> >>>> the changes in this series will result in a nop while the current
-> >>>> implementation will result in -EINVAL. Is this acceptable?    
-> >>>
-> >>> I think by nop, you mean the ioctl returns success.  Was the call a
-> >>> success?  Thanks,    
-> >>
-> >> Yes, I mean the ioctl returns success without taking any
-> >> action (nop).
-> >>
-> >> It is not obvious to me how to interpret "success" because from what I
-> >> understand current INTx and MSI/MSI-x are behaving differently when
-> >> considering this flow. If I understand correctly, INTx will return
-> >> an error if user space attempts to trigger an eventfd that has not
-> >> been set up while MSI and MSI-x will return 0.
-> >>
-> >> I can restore existing INTx behavior by adding more logic and a return
-> >> code to the send_eventfd() callback so that the different interrupt types
-> >> can maintain their existing behavior.  
-> > 
-> > Ah yes, I see the dilemma now.  INTx always checked start/count were
-> > valid but MSI/X plowed through regardless, and with this series we've
-> > standardized the loop around the MSI/X flow.
-> > 
-> > Tricky, but probably doesn't really matter.  Unless we break someone.
-> > 
-> > I can ignore that INTx can be masked and signaling a masked vector
-> > doesn't do anything, but signaling an unconfigured vector feels like an
-> > error condition and trying to create verbiage in the uAPI header to
-> > weasel out of that error and unconditionally return success makes me
-> > cringe.
-> > 
-> > What if we did this:
-> > 
-> >         uint8_t *bools = data;
-> > 	...
-> >         for (i = start; i < start + count; i++) {
-> >                 if ((flags & VFIO_IRQ_SET_DATA_NONE) ||
-> >                     ((flags & VFIO_IRQ_SET_DATA_BOOL) && bools[i - start])) {
-> >                         ctx = vfio_irq_ctx_get(vdev, i);
-> >                         if (!ctx || !ctx->trigger)
-> >                                 return -EINVAL;
-> >                         intr_ops[index].send_eventfd(vdev, ctx);
-> >                 }
-> >         }
-> >   
-> 
-> This looks good. Thank you very much. Will do.
-> 
-> I studied the code more and have one more observation related to this portion
-> of the flow:
-> From what I can tell this change makes the INTx code more robust. If I
-> understand current implementation correctly it seems possible to enable
-> INTx but not have interrupt allocated. In this case the interrupt context
-> (ctx) will exist but ctx->trigger will be NULL. Current
-> vfio_pci_set_intx_trigger()->vfio_send_intx_eventfd() only checks if
-> ctx is valid. It looks like it may call eventfd_signal(NULL) where
-> pointer is dereferenced.
-> 
-> If this is correct then I think a separate fix that can easily be
-> backported may be needed. Something like:
+Even worse, forcing "asm volatile goto" keeps the block, but generates
+completely bogus code.
 
-Good find.  I think it's a bit more complicated though.  There are
-several paths to vfio_send_intx_eventfd:
+Hardcode the gcc-12 or later requirement as trying to pipe the assembled
+output to stdout, e.g. to query the generated code via objdump, doesn't
+work due to the assembler wanting to seek throughout the output file.
 
- - vfio_intx_handler
+Note, gcc-11 is the first gcc version that supports goto w/ outputs
+(obviously with a loose definition of "supports").
 
-	This can only be called between request_irq() and free_irq()
-	where trigger is always valid.  igate is not held.
+E.g. given KVM's code sequence:
 
- - vfio_pci_intx_unmask
+  vmcs12->guest_pdptr0 = vmcs_read64(GUEST_PDPTR0);
+  vmcs12->guest_pdptr1 = vmcs_read64(GUEST_PDPTR1);
+  vmcs12->guest_pdptr2 = vmcs_read64(GUEST_PDPTR2);
+  vmcs12->guest_pdptr3 = vmcs_read64(GUEST_PDPTR3);
 
-	Callers hold igate, additional test of ctx->trigger makes this
-	safe.
+where vmcs_read64() eventually becomes:
 
- - vfio_pci_set_intx_trigger
+	asm_volatile_goto("1: vmread %[field], %[output]\n\t"
+			  "jna %l[do_fail]\n\t"
 
-	Same as above.
+			  _ASM_EXTABLE(1b, %l[do_exception])
 
- - Through unmask eventfd (virqfd)
+			  : [output] "=r" (value)
+			  : [field] "r" (field)
+			  : "cc"
+			  : do_fail, do_exception);
 
-	Here be dragons.
+	return value;
 
-In the virqfd case, a write to the eventfd calls virqfd_wakeup() where
-we'll call the handler, vfio_pci_intx_unmask_handler(), and based on
-the result schedule the thread, vfio_send_intx_eventfd().  Both of
-these look suspicious.  They're not called under igate, so testing
-ctx->trigger doesn't resolve the race.
+  do_fail:
+	instrumentation_begin();
+	vmread_error(field);
+	instrumentation_end();
+	return 0;
 
-I think an option is to wrap the virqfd entry points in igate where we
-can then do something similar to your suggestion.  I don't think we
-want to WARN_ON(!ctx->trigger) because that's then a user reachable
-condition.  Instead we can just quietly follow the same exit paths.
+  do_exception:
+	kvm_spurious_fault();
+	return 0;
 
-I think that means we end up with something like this:
+the sequence of VMREADs should generate:
 
-diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-index 237beac83809..ace7e1dbc607 100644
---- a/drivers/vfio/pci/vfio_pci_intrs.c
-+++ b/drivers/vfio/pci/vfio_pci_intrs.c
-@@ -92,12 +92,21 @@ static void vfio_send_intx_eventfd(void *opaque, void *unused)
- 		struct vfio_pci_irq_ctx *ctx;
+   nopl   0x0(%rax,%rax,1)
+   mov    $0x280a,%eax
+   vmread %rax,%rax
+   jbe    0xffffffff81099849 <sync_vmcs02_to_vmcs12+1929>
+   mov    %rax,0xd8(%rbx)
+   nopl   0x0(%rax,%rax,1)
+   mov    $0x280c,%eax
+   vmread %rax,%rax
+   jbe    0xffffffff8109982c <sync_vmcs02_to_vmcs12+1900>
+   mov    %rax,0xe0(%rbx)
+   nopl   0x0(%rax,%rax,1)
+   mov    $0x280e,%eax
+   vmread %rax,%rax
+   jbe    0xffffffff8109980f <sync_vmcs02_to_vmcs12+1871>
+   mov    %rax,0xe8(%rbx)
+   nopl   0x0(%rax,%rax,1)
+   mov    $0x2810,%eax
+   vmread %rax,%rax
+   jbe    0xffffffff810997f2 <sync_vmcs02_to_vmcs12+1842>
+   mov    %rax,0xf0(%rbx)
+   jmp    0xffffffff81099297 <sync_vmcs02_to_vmcs12+471>
+
+but gcc-11 will omit the asm block for the VMREAD to GUEST_PDPTR3 and skip
+straight to one of the "return 0" statements:
+
+   nopl   0x0(%rax,%rax,1)
+   mov    $0x280a,%r13d
+   vmread %r13,%r13
+   jbe    0xffffffff810996cd <sync_vmcs02_to_vmcs12+1949>
+   mov    %r13,0xd8(%rbx)
+   nopl   0x0(%rax,%rax,1)
+   mov    $0x280c,%r13d
+   vmread %r13,%r13
+   jbe    0xffffffff810996ae <sync_vmcs02_to_vmcs12+1918>
+   mov    %r13,0xe0(%rbx)
+   nopl   0x0(%rax,%rax,1)
+   mov    $0x280e,%r13d
+   vmread %r13,%r13
+   jbe    0xffffffff8109968f <sync_vmcs02_to_vmcs12+1887>
+   mov    %r13,0xe8(%rbx)
+   nopl   0x0(%rax,%rax,1)
+   xor    %r12d,%r12d      <= return 0
+   mov    %r12,0xf0(%rbx)  <= store result to vmcs12->guest_pdptr3
+   jmp    0xffffffff8109912c <sync_vmcs02_to_vmcs12+508>
+
+and with "volatile" forced, gcc-11 generates the correct-at-first-glance,
+but terribly broken sequence of:
+
+   nopl   0x0(%rax,%rax,1)
+   mov    $0x280a,%r13d
+   vmread %r13,%r13
+   jbe    0xffffffff810999a4 <sync_vmcs02_to_vmcs12+1988>
+   mov    %r13,0xd8(%rbx)
+   nopl   0x0(%rax,%rax,1)
+   mov    $0x280c,%r13d
+   vmread %r13,%r13
+   jbe    0xffffffff81099985 <sync_vmcs02_to_vmcs12+1957>
+   mov    %r13,0xe0(%rbx)
+   nopl   0x0(%rax,%rax,1)
+   mov    $0x280e,%r13d
+   vmread %r13,%r13
+   jbe    0xffffffff81099966 <sync_vmcs02_to_vmcs12+1926>
+   mov    %r13,0xe8(%rbx)
+   nopl   0x0(%rax,%rax,1)
+   mov    $0x2810,%eax
+   vmread %rax,%rax
+   jbe    0xffffffff8109994a <sync_vmcs02_to_vmcs12+1898>
+   xor    %r12d,%r12d     <= WTF gcc!?!?!
+   mov    %r12,0xf0(%rbx)
+
+Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=103979
+Fixes: 587f17018a2c ("Kconfig: add config option for asm goto w/ outputs")
+Cc: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: kvm@vger.kernel.org
+Cc: stable@vger.kernel.org
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+
+Linus, I'm sending to you directly as this seems urgent enough to apply
+straightaway, and this obviously affects much more than the build system.
+
+ init/Kconfig | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/init/Kconfig b/init/Kconfig
+index deda3d14135b..f4e46d64c1e7 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -82,6 +82,11 @@ config CC_CAN_LINK_STATIC
+ 	default $(success,$(srctree)/scripts/cc-can-link.sh $(CC) $(CLANG_FLAGS) $(USERCFLAGS) $(USERLDFLAGS) $(m32-flag) -static)
  
- 		ctx = vfio_irq_ctx_get(vdev, 0);
--		if (WARN_ON_ONCE(!ctx))
-+		if (WARN_ON_ONCE(!ctx) || !ctx->trigger)
- 			return;
- 		eventfd_signal(ctx->trigger);
- 	}
- }
+ config CC_HAS_ASM_GOTO_OUTPUT
++	# gcc-11 has a nasty bug where it doesn't treat asm goto as volatile,
++	# which can result in asm blocks being dropped when compiling with -02.
++	# Note, explicitly forcing volatile doesn't entirely fix the bug!
++	# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=103979
++	depends on !CC_IS_GCC || GCC_VERSION >= 120000
+ 	def_bool $(success,echo 'int foo(int x) { asm goto ("": "=r"(x) ::: bar); return x; bar: return 0; }' | $(CC) -x c - -c -o /dev/null)
  
-+static void vfio_send_intx_eventfd_virqfd(void *opaque, void *unused)
-+{
-+	struct vfio_pci_core_device *vdev = opaque;
-+
-+	mutex_lock(&vdev->igate);
-+	vfio_send_intx_eventfd(opaque, unused);
-+	mutex_unlock(&vdev->igate);
-+}
-+
- /* Returns true if the INTx vfio_pci_irq_ctx.masked value is changed. */
- bool vfio_pci_intx_mask(struct vfio_pci_core_device *vdev)
- {
-@@ -170,7 +179,7 @@ static int vfio_pci_intx_unmask_handler(void *opaque, void *unused)
- 	}
- 
- 	ctx = vfio_irq_ctx_get(vdev, 0);
--	if (WARN_ON_ONCE(!ctx))
-+	if (WARN_ON_ONCE(!ctx) || !ctx->trigger)
- 		goto out_unlock;
- 
- 	if (ctx->masked && !vdev->virq_disabled) {
-@@ -194,6 +203,18 @@ static int vfio_pci_intx_unmask_handler(void *opaque, void *unused)
- 	return ret;
- }
- 
-+static int vfio_pci_intx_unmask_handler_virqfd(void *opaque, void *unused)
-+{
-+	struct vfio_pci_core_device *vdev = opaque;
-+	int ret;
-+
-+	mutex_lock(&vdev->igate);
-+	ret = vfio_pci_intx_unmask_handler(opaque, unused);
-+	mutex_unlock(&vdev->igate);
-+
-+	return ret;
-+}
-+
- void vfio_pci_intx_unmask(struct vfio_pci_core_device *vdev)
- {
- 	if (vfio_pci_intx_unmask_handler(vdev, NULL) > 0)
-@@ -572,10 +593,10 @@ static int vfio_pci_set_intx_unmask(struct vfio_pci_core_device *vdev,
- 		if (WARN_ON_ONCE(!ctx))
- 			return -EINVAL;
- 		if (fd >= 0)
--			return vfio_virqfd_enable((void *) vdev,
--						  vfio_pci_intx_unmask_handler,
--						  vfio_send_intx_eventfd, NULL,
--						  &ctx->unmask, fd);
-+			return vfio_virqfd_enable((void *)vdev,
-+					vfio_pci_intx_unmask_handler_virqfd,
-+					vfio_send_intx_eventfd_virqfd, NULL,
-+					&ctx->unmask, fd);
- 
- 		vfio_virqfd_disable(&ctx->unmask);
- 	}
+ config CC_HAS_ASM_GOTO_TIED_OUTPUT
 
-
-WDYT?
- 
-> > And we note the behavior change for MSI/X in the commit log and if
-> > someone shouts that we broke them, we can make that an -errno or
-> > continue based on is_intx().  Sound ok?  Thanks,  
-> 
-> I'll be sure to highlight the impact on MSI/MSI-x. Please do expect this
-> in the final patch "vfio/pci: Remove duplicate interrupt management flow"
-> though since that is where the different flows are merged.
-> 
-> I am not familiar with how all user space interacts with this flow and if/how
-> this may break things. I did look at Qemu code and I was not able to find
-> where it intentionally triggers MSI/MSI-x interrupts, I could only find it
-> for INTx.
-
-Being able to trigger the interrupt via ioctl is more of a diagnostic
-feature, not typically used in production.
- 
-> If this does break things I would like to also consider moving the
-> different behavior into the interrupt type's respective send_eventfd()
-> callback instead of adding interrupt type specific code (like
-> is_intx()) into the shared flow.
-
-Sure, we can pick the best option in the slim (imo) chance the change
-affects anyone.  Thanks,
-
-Alex
+base-commit: 047371968ffc470769f541d6933e262dc7085456
+-- 
+2.43.0.687.g38aa6559b0-goog
 
 
