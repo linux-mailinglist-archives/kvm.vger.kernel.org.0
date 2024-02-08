@@ -1,127 +1,114 @@
-Return-Path: <kvm+bounces-8323-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8324-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35F0C84DC7F
-	for <lists+kvm@lfdr.de>; Thu,  8 Feb 2024 10:12:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A1C284DC92
+	for <lists+kvm@lfdr.de>; Thu,  8 Feb 2024 10:14:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BA685B239CC
-	for <lists+kvm@lfdr.de>; Thu,  8 Feb 2024 09:12:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E314D1F25A50
+	for <lists+kvm@lfdr.de>; Thu,  8 Feb 2024 09:14:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3135F6BFBB;
-	Thu,  8 Feb 2024 09:11:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADC0B6BB4F;
+	Thu,  8 Feb 2024 09:14:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="n59bghUE"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ES0pCdTA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52639339BF
-	for <kvm@vger.kernel.org>; Thu,  8 Feb 2024 09:11:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B33167C45;
+	Thu,  8 Feb 2024 09:14:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707383479; cv=none; b=Uylw0iQWotRN9dRKxI6pRkUey/g9w1ZsdhLYWLyRR6GI6obd9b6K6MPgDE7kdTLpMX9kHFI0oB/zhwssw7DByzBEj0Bu1q1W6In4+LWLw1bAiMeuLPLv/rvQNi56Ek5Hqq0ry1Rf28dvPggUQlWunml4jHd02ekh4FGcGYiwR98=
+	t=1707383659; cv=none; b=sby0NwCc10VEnK+Wth1OQFYhddNoDn6aHmemME8bbNf/emmMoroEPQeWLxJVWqPnr51YQ4Etw/6DsnnXiDAvWmZk1Yl9jDE4ROAi6ux7I11dT7soOkgIUGO/PSACQs0bwGxNowji4lGmj5J0BehNdY67HS+AjneLyFHbmpuHdN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707383479; c=relaxed/simple;
-	bh=p7M5LRY2IIR3JbhYpi12gul04UVDehtCNBndvFQhT4s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EQ3L9V2W938+hlCW39cYraDDIaHUr+Z0O9RvrQkrucmUg2AtDaczWLLaca0MD11BQ1f1oEGxhevFPheDR24ekcu/5hQp/4xxbUs13vZHaO7IUEfz5Dq8D+B7aXOIHJHJsvXptGbaPxdE1OdlT+cotzYpgtal6egZUAlFg6zSkfI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=n59bghUE; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-511616b73ddso2743937e87.0
-        for <kvm@vger.kernel.org>; Thu, 08 Feb 2024 01:11:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1707383475; x=1707988275; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=o6hMNIZUaBRVM7gi8uDMiowpTMxtF27cC2fdkjBJWH8=;
-        b=n59bghUEZpcupbyWHTOfn5fjBy3lHpyanCd3+vpbeNeQygNyJzf9U8bchu+ymVMBH2
-         ZiUZappNAzxSGHH+j1QJVV0jz8Jrw3v0dEZ45dRaIbjFO3FAU364yjybdpblnOhU/5kE
-         PsyNirQDRDYX25xf7uABvAVnw9DroPZ2kARfGAoH8uov7LZOTafBYSzpcewav9N+fBBR
-         fPzYrZQ+a3EzMjbFr7Rh2lpFU9jOxqXSJ1e0B8AJH3ZEfRX2WXdClLtb7PsGxFL2eFW5
-         9wQZpIdTG5U87HUq5uNLTjPxvQR58YV7QeekO9VOlba+GUQd40AiHTolEf+Gpd9wa/Zk
-         kPAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707383475; x=1707988275;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=o6hMNIZUaBRVM7gi8uDMiowpTMxtF27cC2fdkjBJWH8=;
-        b=DmZ7a1Zog9EzJVp1+Ci1z9b9ieLuBnRyGFdXFWZ4QtUPoylyUZBuWft85FRCNrZePw
-         tE5BujVTrUeoEVT0IpNSRNQb1+xh7NzTCB5EsSZPK9yEuj9qvjGXUEBFYYCDDj6U5wgn
-         JtBWmTYrPlE9Oz8QFeJo23oshoz6HeYVRYa4Kl8/Ws5LxwZ8+NxU7a4RQ2SxUoRY+y5t
-         HCUUMbx5DdvpCfunEUt+YMfDkKy/kid8WNs3bCCzPovY3rTzaYVsapqn1ocNCdnECS/L
-         8H0hes6flb0YM0148F5sb/Gg6hVmNINNPvlV6yLvdVkfm1dJ7Lf0GLVzZ/tTtaOBFJ+/
-         jKJA==
-X-Forwarded-Encrypted: i=1; AJvYcCWe2XeFFMcBaPZU5gZnKn3iQCd9rGBbRyXM3mt8rw2PbCCoiHawq3Bwh9plX8SxWxH6rhRPPZomahzjUfPqxwPj/AZN
-X-Gm-Message-State: AOJu0Yy3YoQ5A/i/eq0NFULRoqbziJl7f72Bs75jx3kkrX1bVsN2Ysjt
-	fQ/Lqyffn4k2ANRRjCZZfSU+8QReDhiVlgiscmDLXbdL5grNl2Ra8pANqU880evm+LKjSTqiuX/
-	1RZ/B6E19y34jNK7dLXefKnBGooNaETuFY7xBvQ==
-X-Google-Smtp-Source: AGHT+IEdMMmX0qUysZ36JNG6vjjPDWbDnwCkmT8i09RQZO80h9rQ9AXsc+CoHbdB4Czk7n8tQfMWuFQWC0VHbAenhUk=
-X-Received: by 2002:ac2:4107:0:b0:511:6d76:4a6 with SMTP id
- b7-20020ac24107000000b005116d7604a6mr980330lfi.49.1707383475362; Thu, 08 Feb
- 2024 01:11:15 -0800 (PST)
+	s=arc-20240116; t=1707383659; c=relaxed/simple;
+	bh=GfZd+JEhD2jTwwbKWrI6hzvpQqkOQgWgJY3OFvAaJwg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=sddp1tF3HQRUeLfxLstquX8dzDDFhF50bV0RkTP94tn/ZxE+bGXSDFAKWBurwZ9ZI5bHYVkq/JvbnipohPMnLXBldUA+MhLLEXy9xIoti3a2HSNs9ThudAtV9WUfQh2ZjolksBlp2XZ4WiquB///pcoqV27KD1bCe94PPI9lT1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ES0pCdTA; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707383659; x=1738919659;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=GfZd+JEhD2jTwwbKWrI6hzvpQqkOQgWgJY3OFvAaJwg=;
+  b=ES0pCdTAwMA3TE7xcJ9m0lc6TGGqv6cKgIWxoKqEFroWjciGKuRihgq/
+   o/63n46ei9UkSt1K3GMdOb9g20SaOdesuh2dcKDVpWbpR7KJELv8RtTXh
+   DAbNlsVPoAVb0CwpKUS9m0rp5mK+CXU+Sm44agdwSfzTmhHoDgD4Fcnj5
+   glnoOlqx4aZljeJK1MyBuxq8UaYxabANI1PYBvXB7rQTixpNpGpgVoPRm
+   uNj2c/hPNnEizDeQCW5M6ignQDFbsUNbpvmyvWh7MbiKZhFTAamO8AVoi
+   LtC2/GQXjz6AE/oM7RqRpzTXcyItdurXzSTZPijDSJuimxZSO14deFNpV
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10977"; a="1475035"
+X-IronPort-AV: E=Sophos;i="6.05,253,1701158400"; 
+   d="scan'208";a="1475035"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2024 01:14:18 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,253,1701158400"; 
+   d="scan'208";a="32672164"
+Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
+  by fmviesa001.fm.intel.com with ESMTP; 08 Feb 2024 01:14:16 -0800
+From: Yi Liu <yi.l.liu@intel.com>
+To: joro@8bytes.org,
+	jgg@nvidia.com,
+	kevin.tian@intel.com,
+	baolu.lu@linux.intel.com
+Cc: alex.williamson@redhat.com,
+	robin.murphy@arm.com,
+	eric.auger@redhat.com,
+	nicolinc@nvidia.com,
+	kvm@vger.kernel.org,
+	chao.p.peng@linux.intel.com,
+	yi.l.liu@intel.com,
+	yi.y.sun@linux.intel.com,
+	iommu@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	zhenzhong.duan@intel.com,
+	joao.m.martins@oracle.com
+Subject: [PATCH] iommu/vt-d: Set SSADE when attaching to a parent with dirty tracking
+Date: Thu,  8 Feb 2024 01:14:14 -0800
+Message-Id: <20240208091414.28133-1-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240207013325.95182-1-baolu.lu@linux.intel.com>
-In-Reply-To: <20240207013325.95182-1-baolu.lu@linux.intel.com>
-From: Zhangfei Gao <zhangfei.gao@linaro.org>
-Date: Thu, 8 Feb 2024 17:11:04 +0800
-Message-ID: <CABQgh9G_KCNjj4TvKzG04cQVPsWn2OCSEd_vK10fBtJtWX4E0Q@mail.gmail.com>
-Subject: Re: [PATCH v12 00/16] iommu: Prepare to deliver page faults to user space
-To: Lu Baolu <baolu.lu@linux.intel.com>
-Cc: Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>, 
-	Robin Murphy <robin.murphy@arm.com>, Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>, 
-	Jean-Philippe Brucker <jean-philippe@linaro.org>, Nicolin Chen <nicolinc@nvidia.com>, 
-	Yi Liu <yi.l.liu@intel.com>, Jacob Pan <jacob.jun.pan@linux.intel.com>, 
-	Longfang Liu <liulongfang@huawei.com>, Yan Zhao <yan.y.zhao@intel.com>, 
-	Joel Granados <j.granados@samsung.com>, iommu@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On Wed, 7 Feb 2024 at 09:39, Lu Baolu <baolu.lu@linux.intel.com> wrote:
->
-> When a user-managed page table is attached to an IOMMU, it is necessary
-> to deliver IO page faults to user space so that they can be handled
-> appropriately. One use case for this is nested translation, which is
-> currently being discussed in the mailing list.
->
-> I have posted a RFC series [1] that describes the implementation of
-> delivering page faults to user space through IOMMUFD. This series has
-> received several comments on the IOMMU refactoring, which I am trying to
-> address in this series.
->
-> The major refactoring includes:
->
-> - [PATCH 01 ~ 04] Move include/uapi/linux/iommu.h to
->   include/linux/iommu.h. Remove the unrecoverable fault data definition.
-> - [PATCH 05 ~ 06] Remove iommu_[un]register_device_fault_handler().
-> - [PATCH 07 ~ 10] Separate SVA and IOPF. Make IOPF a generic page fault
->   handling framework.
-> - [PATCH 11 ~ 16] Improve iopf framework.
->
-> This is also available at github [2].
->
-> [1] https://lore.kernel.org/linux-iommu/20230530053724.232765-1-baolu.lu@linux.intel.com/
-> [2] https://github.com/LuBaolu/intel-iommu/commits/preparatory-io-pgfault-delivery-v12
->
+Should set the SSADE (Second Stage Access/Dirty bit Enable) bit of the
+pasid entry when attaching a device to a nested domain if its parent
+has already enabled dirty tracking.
 
-Wandering are these patches dropped now,
+Fixes: 111bf85c68f6 ("iommu/vt-d: Add helper to setup pasid nested translation")
+Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+---
+base commit: 547ab8fc4cb04a1a6b34377dd8fad34cd2c8a8e3
+---
+ drivers/iommu/intel/pasid.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-[PATCH v2 2/6] iommufd: Add iommu page fault uapi data
-https://lore.kernel.org/lkml/20231026024930.382898-3-baolu.lu@linux.intel.com/raw
+diff --git a/drivers/iommu/intel/pasid.c b/drivers/iommu/intel/pasid.c
+index 3239cefa4c33..9be24bb762cf 100644
+--- a/drivers/iommu/intel/pasid.c
++++ b/drivers/iommu/intel/pasid.c
+@@ -658,6 +658,8 @@ int intel_pasid_setup_nested(struct intel_iommu *iommu, struct device *dev,
+ 	pasid_set_domain_id(pte, did);
+ 	pasid_set_address_width(pte, s2_domain->agaw);
+ 	pasid_set_page_snoop(pte, !!ecap_smpwc(iommu->ecap));
++	if (s2_domain->dirty_tracking)
++		pasid_set_ssade(pte);
+ 	pasid_set_translation_type(pte, PASID_ENTRY_PGTT_NESTED);
+ 	pasid_set_present(pte);
+ 	spin_unlock(&iommu->lock);
+-- 
+2.34.1
 
-[PATCH v2 4/6] iommufd: Deliver fault messages to user space
-https://lore.kernel.org/lkml/20231026024930.382898-5-baolu.lu@linux.intel.com/
-
-And does iouring still be used in user space?
-
-Thanks
 
