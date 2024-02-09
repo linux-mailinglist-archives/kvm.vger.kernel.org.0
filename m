@@ -1,178 +1,108 @@
-Return-Path: <kvm+bounces-8487-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8488-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A62984FDE2
-	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 21:46:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD6B384FE2A
+	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 22:07:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FB7E1C250FB
-	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 20:46:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 138D11C22542
+	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 21:07:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 474D4CA68;
-	Fri,  9 Feb 2024 20:46:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5353817BC8;
+	Fri,  9 Feb 2024 21:07:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="i4wbRFqp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GiHQOwb8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA20E63B8;
-	Fri,  9 Feb 2024 20:46:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 200C614F6C
+	for <kvm@vger.kernel.org>; Fri,  9 Feb 2024 21:07:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707511568; cv=none; b=I9yQJwhRlC5Q838ht2K837Re5yclOg8QSftuOcxFHssnjJanaUm1N0VyoADOMfVTxORGSK3ks9+u9JFWL9A3a64VWhRNK55JF/y93rWoqKwl5goqMinu44vsxvhSFYG7lG8+QaBv/OjuAXvQYtEvc4ph6am6s6aZN2cuVZU4SxQ=
+	t=1707512844; cv=none; b=eQvURNTKUc+mDxjJbM0vlyjm7IJS2eDI80jGyPUKY4Pf3saVFrkQPeXuy8yKDyK9/bqu4xf1YBvl7WcYN2iHnQZulGtfMcJDhoCL8XbjlnoStDP0K0h5smUXeQ7oNP58BT0JV/9t5CrkSkRbDFlDzAFPwHe6xjnGxXL1HCFHd2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707511568; c=relaxed/simple;
-	bh=wFHRWFNDjByZdkECXDT5AIayYLGLuLsqg4VpCTDXaxk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=p0US78eShSyBAJtArO2oHBcDEoxm7sG+E/9jhxyYZMHTyuCStOD5Kyur8d1vjP41TvPatIMkpFE0ZzTFM1BxE9uUoUmc5YTj/KG0JUHGO9f7bgVIAqMUBmiAQ+/cJ6xzhx1Zf0VICn62PAr56QqUrCnYCugYQpOQ66yWPMgrUn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=i4wbRFqp; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 419Jxj9V005672;
-	Fri, 9 Feb 2024 20:46:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=naSuFLOBCRRosC0sA+aZ1BhtQ2Dg+R11DdlDmvqw/e4=;
- b=i4wbRFqpb9mJJhih4QDVygWtN6+9R/gmJGUXA8mj9V72qoCV9iCe/kmi10EQQYgFUyCp
- ntgLz5O79tDGYkUK3uUQJm7dwsdhynLzubVlNlDiTwma6Ot5KJTuuMrqIqRTs80loBaQ
- 5zYvTPb9P7CF5CZDp4Lpjd1Cp9qbNX/yEA4blsHe9cUWpw9ywdyOhDRIenZU+ZKA3zMy
- 0ZHcU+piV1WqhEuh2cqEJ+r7gGx9cE8bObLoaM/IcaZdySBi21SouDL+9LkfBU1l8ZWp
- pdvrWqmlHUHBr3lW3Buc53wzic5cI+NTTnZR3OsOPckziHUcngQrWjhlAiXgQ01D0dEc PA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w5t7fhjt2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 09 Feb 2024 20:46:04 +0000
-Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 419Kd7XX021131;
-	Fri, 9 Feb 2024 20:46:03 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w5t7fhjnc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 09 Feb 2024 20:46:03 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 419J6oKt008770;
-	Fri, 9 Feb 2024 20:45:49 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3w20705hxy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 09 Feb 2024 20:45:49 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 419Kjhor21365490
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 9 Feb 2024 20:45:46 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DD18220043;
-	Fri,  9 Feb 2024 20:45:43 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C93A520040;
-	Fri,  9 Feb 2024 20:45:43 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Fri,  9 Feb 2024 20:45:43 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
-	id 7963AE0361; Fri,  9 Feb 2024 21:45:43 +0100 (CET)
-From: Eric Farman <farman@linux.ibm.com>
-To: Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>
-Cc: Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, Eric Farman <farman@linux.ibm.com>
-Subject: [PATCH v1 2/2] KVM: s390: selftests: memop: add a simple AR test
-Date: Fri,  9 Feb 2024 21:45:39 +0100
-Message-Id: <20240209204539.4150550-3-farman@linux.ibm.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20240209204539.4150550-1-farman@linux.ibm.com>
-References: <20240209204539.4150550-1-farman@linux.ibm.com>
+	s=arc-20240116; t=1707512844; c=relaxed/simple;
+	bh=EsssZPfuAofzCYmifTEhn5L6k/IYT1EjOB6B81GWfQg=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=LlbVZbGEpzpQHUSBVrk2pb7ZR5uKBjhMti9VUEgMEdZ8KYqRAQqShGztU4OGo2XdktJTcqfPgv68OMBBBRiAIzbUaWsjzu1z2Es4+nDQuGulEis16S6nzT+Ws1Y+UZ3mFJfJYpVlTjZvFjpWmgX4ZhuPGVIt+2/O/Tm4CFz0UBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GiHQOwb8; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc6b269b172so3215010276.1
+        for <kvm@vger.kernel.org>; Fri, 09 Feb 2024 13:07:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1707512842; x=1708117642; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=QJVA7E4OPiD00glr6A2eE7hMnsJp0FoP1xE3INulbjM=;
+        b=GiHQOwb8WUG6fBVWqqW7XtV8lwwikpuA16Jxl3d7GkbymzzcSG3J/57H77NC6LRg5j
+         2MFc9d8a8BbJvXryVliz54FXtqBWFov0iws0K3O37FzybhWocI9D6usdBFLQpoqbkhIk
+         u1S4d7Q+k8huoAWe/ZTpVElj1bUXQh0DLrQWhpPg955Iwue6vwiF6mf6kh2d/tDRmgje
+         1RQgtICQMo9k5XEzYBjrESRQWOjXjMQ722yWs6bQB9rT4uQRO1iqUXnBoAhTHBBei1t+
+         D723gS4+zXizbPqFRq3/wdKrX+Zzz6BksPNQP0pvkp7j/Nvu8pnGhyOIg/C4ylEpj11O
+         4jUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707512842; x=1708117642;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QJVA7E4OPiD00glr6A2eE7hMnsJp0FoP1xE3INulbjM=;
+        b=PZwN6jfAATEKcBRf0u8XsQNqkeyYL+bjvWoUVmVssjnzSA1uaLyBYwzyw9VckrAW99
+         J+09GbsIC5b2VrGXHD3psHTAziGF42oSNe01L38CYXp0qSGUgruWca6Qpiv+WNOmKyMS
+         +BQ7Htl+tQGVTmiXqb93N40DO+Tj58hs40FR4fywNltVwIRFHERhXuSZ7mgEB++z1IwW
+         NkGuaJOV8TauU/ZjgdL7uRTfaX9IHkG5Q0sAkZKUFae1PuLoClHsZKJZVrUwBicJk9Tr
+         KhcIpHGaT00/PHI0jqjb4KLB6ZcJvHhw/VyLlspHdHMkp6F3U1QJLN3ekl5fCS29iNHl
+         Cd7g==
+X-Gm-Message-State: AOJu0Yyk4efLBjOOmhUgXItBoLDl59CW6/uBGavNa6ti/4MKHdgdRszT
+	i09nlMJnePYk4F1iLq0PKkNw/PlYWBQex2J8yWZl63AOGCaJiwQJs530CDuJCjPav7KLdcN5+eL
+	0+g==
+X-Google-Smtp-Source: AGHT+IGUHHBgahILEYWs+MFS2D8cEf65K6zPE01Gf0qcohepgEWrWwH95oTQfWnppRqpfBG3AOVVBhi0ZVA=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1002:b0:dc6:e884:2342 with SMTP id
+ w2-20020a056902100200b00dc6e8842342mr79952ybt.5.1707512842181; Fri, 09 Feb
+ 2024 13:07:22 -0800 (PST)
+Date: Fri, 9 Feb 2024 13:07:20 -0800
+In-Reply-To: <000000000000f6d051060c6785bc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: cVxdslRelh9t2e1uXQ5zRsESvKHfZdYA
-X-Proofpoint-ORIG-GUID: 6KAtnlhjlZ1tzGP8yysYJqalED_Rd8Nb
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-09_18,2024-02-08_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
- priorityscore=1501 impostorscore=0 bulkscore=0 suspectscore=0 adultscore=0
- clxscore=1015 phishscore=0 spamscore=0 mlxlogscore=972 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
- definitions=main-2402090151
+Mime-Version: 1.0
+References: <000000000000f6d051060c6785bc@google.com>
+Message-ID: <ZcaUCPka_WL4ruTq@google.com>
+Subject: Re: [syzbot] [kvm?] WARNING in kvm_mmu_notifier_change_pte
+From: Sean Christopherson <seanjc@google.com>
+To: syzbot <syzbot+81227d2bd69e9dedb802@syzkaller.appspotmail.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="us-ascii"
 
-There is a selftest that checks for an (expected) error when an
-invalid AR is specified, but not one that exercises the AR path.
+On Wed, Dec 13, 2023, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    f2e8a57ee903 Merge tag 'scsi-fixes' of git://git.kernel.or..
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=14fdc732e80000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=e56083f7dbe162c2
+> dashboard link: https://syzkaller.appspot.com/bug?extid=81227d2bd69e9dedb802
+> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=129d09cae80000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10b8afeee80000
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/7b75e59fc59d/disk-f2e8a57e.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/f853580d61be/vmlinux-f2e8a57e.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/8c893ce02e2c/bzImage-f2e8a57e.xz
+> 
+> Bisection is inconclusive: the first bad commit could be any of:
+> 
+> d61ea1cb0095 userfaultfd: UFFD_FEATURE_WP_ASYNC
+> 52526ca7fdb9 fs/proc/task_mmu: implement IOCTL to get and optionally clear info about PTEs
 
-Add a simple test that mirrors the vanilla write/read test while
-providing an AR. An AR that contains zero will direct the CPU to
-use the primary address space normally used anyway. AR[1] is
-selected for this test because the host AR[1] is usually non-zero,
-and KVM needs to correctly swap those values.
-
-Signed-off-by: Eric Farman <farman@linux.ibm.com>
----
- tools/testing/selftests/kvm/s390x/memop.c | 28 +++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
-
-diff --git a/tools/testing/selftests/kvm/s390x/memop.c b/tools/testing/selftests/kvm/s390x/memop.c
-index bb3ca9a5d731..be20c26ee545 100644
---- a/tools/testing/selftests/kvm/s390x/memop.c
-+++ b/tools/testing/selftests/kvm/s390x/memop.c
-@@ -375,6 +375,29 @@ static void test_copy(void)
- 	kvm_vm_free(t.kvm_vm);
- }
- 
-+static void test_copy_access_register(void)
-+{
-+	struct test_default t = test_default_init(guest_copy);
-+
-+	HOST_SYNC(t.vcpu, STAGE_INITED);
-+
-+	prepare_mem12();
-+	t.run->psw_mask &= ~(3UL << (63 - 17));
-+	t.run->psw_mask |= 1UL << (63 - 17);  /* Enable AR mode */
-+
-+	CHECK_N_DO(MOP, t.vcpu, LOGICAL, WRITE, mem1, t.size,
-+		   GADDR_V(mem1), AR(1));
-+	HOST_SYNC(t.vcpu, STAGE_COPIED);
-+
-+	CHECK_N_DO(MOP, t.vcpu, LOGICAL, READ, mem2, t.size,
-+		   GADDR_V(mem2), AR(1));
-+	ASSERT_MEM_EQ(mem1, mem2, t.size);
-+
-+	t.run->psw_mask &= ~(3UL << (63 - 17));   /* Disable AR mode */
-+
-+	kvm_vm_free(t.kvm_vm);
-+}
-+
- static void set_storage_key_range(void *addr, size_t len, uint8_t key)
- {
- 	uintptr_t _addr, abs, i;
-@@ -1101,6 +1124,11 @@ int main(int argc, char *argv[])
- 			.test = test_copy_key_fetch_prot_override,
- 			.requirements_met = extension_cap > 0,
- 		},
-+		{
-+			.name = "copy with access register mode",
-+			.test = test_copy_access_register,
-+			.requirements_met = true,
-+		},
- 		{
- 			.name = "error checks with key",
- 			.test = test_errors_key,
--- 
-2.40.1
-
+#syz fix: fs/proc/task_mmu: move mmu notification mechanism inside mm lock
 
