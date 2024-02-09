@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-8408-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8409-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED23584F15D
-	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 09:29:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F375F84F161
+	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 09:32:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A55EC28494D
-	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 08:29:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 24FBF1C22597
+	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 08:32:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05B1265BC6;
-	Fri,  9 Feb 2024 08:29:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE56256B90;
+	Fri,  9 Feb 2024 08:32:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f6RLnSIU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W57+KA6h"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C008065BB6
-	for <kvm@vger.kernel.org>; Fri,  9 Feb 2024 08:29:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C202EB14
+	for <kvm@vger.kernel.org>; Fri,  9 Feb 2024 08:32:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707467355; cv=none; b=nuDknHMmeTUWwMcezcY0I5JveJaWFkivxpORCxtn9Wt1Y8auI07ufmM7zxfLA5TM89ech+xWG86wFIEgWOZ2iQyKprSHBWEJhSNcT73PA1nzV47awfn7TxZ0LqrfRPwFa4t2gl0xa8R8SbG+Yu1rCmGTtLVkBpOiBlmMensd4Pk=
+	t=1707467550; cv=none; b=Mq1NILSkmvshRrvpwoGfqoW7xgmP1B977cKRKT/xyCr7Y6vV11pDaES1wdV9nkRMkS6Py07FQsOlQX9qMiOzvwo6YUw9AcEFYF20h0Q9y0LiBYlO2Yg+RsxRD+QclPkPNnNwFaeRyhWVjdmbQG8Gl3n/7EuzxMptKGc755ctLf8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707467355; c=relaxed/simple;
-	bh=ar3mqjsIdbZN/oexSyU52xoSyOoZGf+sKohPZbfTlAA=;
+	s=arc-20240116; t=1707467550; c=relaxed/simple;
+	bh=SNAFyvRV8ArvpSELs8/L7OL/I+4zB3EQAnWaBFE1nKA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oPjBz8ofQS/TmvmL9oUnqYJTZjxlOwU2KcvpQ/iISWiAuJGfaEmyQ1OSGbHPgKCvT5d3BcSE4W/bSOmb5t3gVjXvL43grC9BVLbgHttzbu+JzBRRyKuuS9s3qABAJSZKYBnRax5yvMgZYFjDzop20RI9+WUk42WU2NojRB1C+4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f6RLnSIU; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=P/mzw1DYkoCm28IVJwoIQ+kFEe4fi+KI+Dx0XOyc0amhLNvcyflgeNSe9qmGNXEa7xii1Avn4qGbIL/aOyuX9ChuXyLo8DtnjO7RG3w72gv3n353tAqfgBpeNvJacLDda35Ar+/4NIpep5xZxr1BEe3Fmu1CwtR91Hhu1JW0SIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W57+KA6h; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707467352;
+	s=mimecast20190719; t=1707467547;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=CYwym9bcvYVUdfgrQAx0w53qMrol8jdhzpg8cj+Mxlw=;
-	b=f6RLnSIUZXPCicCL7NMAW/GI6ESbHad1Kd2QxdqlXujdhw8uZbIEtexv5R6Rxbl7tRk6UE
-	TDhl6ugoTYe7pRjBaZo0GFUvQaunNDrM0s4VkkgVbYnE6rNV1ZC7HMyx1RfcQpLQH8Uec4
-	NowQTyOtPq8baIod4oRPmycsczudrLQ=
-Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
- [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=n1+bf0Nx8c8mDk6BEeuFlVUau/1lVtJgwfFu+gol4dA=;
+	b=W57+KA6hTJE8h8wKY87cCMBgXYn87w7z7v6Zd46TmRJ8qqqOQ/B94Ticq4vxbk2HVnFTrc
+	lTbpdWxlm0QUojPGZhTvxA1K8FlKTSXFv7AUH2DIRCUTcVmgPXUSlt8ubo0fJW3ge1NwxK
+	K7/ageT1e9zwz6XAe44dsB6ESzaTveA=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-509-aA_SdjQvNy24RZ7rtloAOw-1; Fri, 09 Feb 2024 03:29:10 -0500
-X-MC-Unique: aA_SdjQvNy24RZ7rtloAOw-1
-Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2d0d1cafe68so6434881fa.0
-        for <kvm@vger.kernel.org>; Fri, 09 Feb 2024 00:29:09 -0800 (PST)
+ us-mta-650-zokdq9QbMx6j9bJqzOJJyg-1; Fri, 09 Feb 2024 03:32:26 -0500
+X-MC-Unique: zokdq9QbMx6j9bJqzOJJyg-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a382663cfa1so37704466b.3
+        for <kvm@vger.kernel.org>; Fri, 09 Feb 2024 00:32:26 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707467349; x=1708072149;
+        d=1e100.net; s=20230601; t=1707467545; x=1708072345;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CYwym9bcvYVUdfgrQAx0w53qMrol8jdhzpg8cj+Mxlw=;
-        b=eLTdlgrHvJArpr8AE8dzx8Y2nDUsgoGlIUSdNFh1FJZblpK6BThT2ubDhJfIrStBHG
-         MuHfI3cm4zkTZr0YLE/F8FknjOThV2BfGE3hSakrMa+jS14Az+KgnfxywERg4GQTPclM
-         n/RyrAlUB37AqBECJydJD+CIv+g1+n00Ru956S/tO4lDfHYU9diCNBvx8yPkPkukD2vZ
-         Xdb+ZsBaN2IneklYkt1//Av7ReyYCG5MugecJ3FxO03dUeU3ggvYsLdaQY1UMv+hR7HZ
-         XngK2BH/xhrq04c1n79L9w9Zhw1GjFMXyXM3nieZEH3q5lSFddJEpBRPo/JtpQsSTF6B
-         fXFw==
-X-Gm-Message-State: AOJu0YxYPuPUSmAqS/tw/VoHnocSuUsz1/eAjtAPlVN63s/DnM/LmRD5
-	iSHyTZ1szF6PKwrEHeNRzZgED22PNwaaoadWlKZBE3mrwoueWR5KAKLdMFDz37dedSmQpWPkBD8
-	bIjSgQlQ/xEGPrBuqKvulW4T8fkNVvHb1JssFjC/fJmK9ESC+Vg==
-X-Received: by 2002:a05:6512:308e:b0:511:4a3c:bc67 with SMTP id z14-20020a056512308e00b005114a3cbc67mr667558lfd.9.1707467348817;
-        Fri, 09 Feb 2024 00:29:08 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGwQzReLeDNTCJB+qOG+onzJW+a/6xHFTd6Il5yE+rs5dotq6oI7ml/IRzP9nwb4WRCRf2AHg==
-X-Received: by 2002:a05:6512:308e:b0:511:4a3c:bc67 with SMTP id z14-20020a056512308e00b005114a3cbc67mr667543lfd.9.1707467348491;
-        Fri, 09 Feb 2024 00:29:08 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVpQeKhZnUF9IF482WFoi5RSuK2K0dPm/viY5gZvvdBGW8PlAajaezs2kgDI06usWdUXLoRirtPMouC6vzNVLm1ebJIWnLWDLZ0GEN+Ijk5unz/HqQMvORGDIXXL3Dtf+prelx+pNyvYgYqYusGnquqaTXZA7QhS6HkQap6Y42pIVEN3/EQmJy7vAJs2JpmpxDIiPxkRPxrVbsmZSVnuPOwCDkwsek/pGDlArNd6Bhx7ExRfGSaMOQ2ipZnPHh4xKDAKmuDjNtcq0sQclTvVZDBpof/gkZtZFbDZHPz4rmJ1ciKFyS3O6Q898x0YkZAk2y+sY3IzMbJvaRgk+otdK75cu7gdEwEl57Q4sWFImYaPJDLS4LbMQtxErNNwect2IH8XoJ7esHEcOsAFRZwxa5aVSJRog7z8LtqPN/lXwq8u0iG8XVW+VdnuP/432M3PyFw2p8MGpGvbbSILN0vtIlZUve5ulCwIGBluVrh3YxuLzmOOdbG19SRLy0gaYXvLczv3TncY87RBF6BZarBaQ6IX1OF
+        bh=n1+bf0Nx8c8mDk6BEeuFlVUau/1lVtJgwfFu+gol4dA=;
+        b=mZ/LPQJjE7Qz/QNd0sFhTyBAtjZDSKlmtoyss0AB4MQUiwk5ZUxSf7lseGKlpE12pG
+         KPTtN/CHHGKAl6F1cy2kcmWY4z11LxuvG5uTUSaYsOdEqJHFtYsKN65hx+8QnQNtfwqs
+         Q569L6CC9zZfMI/WmYRRXsd3aDD+Xb2a/VSe/uDxrcNR3qi4nqpzyJe27wYGx+f8iaBX
+         UJVBabmCKOfbdKktA7A+GUVpJRxukO1WZhXPS4g1dPyIsS8sTKh6w3AXWE6F48ABrMRL
+         Omz0UJXqv8Vb8fvn3lhGm8BmMWi/8qlkmUJMHV0nUTS5QT/7BohAdau/jNbgQsmmPfdR
+         Uv0A==
+X-Gm-Message-State: AOJu0Ywl+RUvKxeABn84FxFV3ir4/0fmTAM0YbFyNm8gaQFyxD4L1N5R
+	e2Mz6cbbqHP6eQAjvFisw07cT70NV4sTtOakYZyogzN22tqitzh1J1ghl0Kxat+PZM99M+0EdfW
+	j8luZyK1wBclzSlr9GJUbABpSKbK4C9b2XJrcbiTFpTik7+sKbA==
+X-Received: by 2002:a17:906:f25a:b0:a38:7541:36f6 with SMTP id gy26-20020a170906f25a00b00a38754136f6mr534604ejb.21.1707467545427;
+        Fri, 09 Feb 2024 00:32:25 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE/T6YYLfzbp3yhYxtgIsbBvBi9OmPusrYwMtKL4j3WI45fIZaoPgiu1tQyIJoywazyiWjlKA==
+X-Received: by 2002:a17:906:f25a:b0:a38:7541:36f6 with SMTP id gy26-20020a170906f25a00b00a38754136f6mr534582ejb.21.1707467545120;
+        Fri, 09 Feb 2024 00:32:25 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWXiUg04J0xyZA2xGb9Fu4y0ntNnaZfu5u3wCECya3Mj6SWlZwp5ICs3/Ov2/qiL9su432EHDvLiVJ0KuNjkJ9dA+qBka4y8ssadh6OiEJ5wpy1En3Fx6anCAdFa7L7MQ/5WVXwqd08bOmyybu5k7Qp1UMvIypUKIMPgtveVcd/GscsLTNJxkC7CaS/yJcLRXIRobE2cKHHIHL5sNoJ059E+mN1EgspRqxG1jLZpHKIRYudg+rhDdl4OtfFPow7/DAAcE/0UIo+I6M8OqxAw4LzeRm++4M4N032W3p0NvaLAdALIWIF/bz89lF45wQXVnsgVCFvipJxUOfJqVQ+tLKDf7Dm8rNEogN2oEb+qJl5xCTmAsxN0sSXNr0ar2u0ZxLikYF3QyLVUj9CsgOiEbIs2k7zhC71oFP6Eq0BDU/dVGAP0Ip74uqtYXDZDXYkmdNY01V18wx696yEfj1s7ZfgIstsNWb5OHSzpU25dubiYvEDA39m6AxMqZD8gr65Yuhuq60pdfoXeVeQ9K7ds7G3+Qqc
 Received: from [192.168.0.9] (ip-109-43-177-145.web.vodafone.de. [109.43.177.145])
-        by smtp.gmail.com with ESMTPSA id x21-20020ac24895000000b00511749fec62sm90472lfc.72.2024.02.09.00.29.05
+        by smtp.gmail.com with ESMTPSA id tb5-20020a1709078b8500b00a35e3202d81sm519996ejc.122.2024.02.09.00.32.23
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 09 Feb 2024 00:29:07 -0800 (PST)
-Message-ID: <92633259-1a46-4342-a709-7200c6d215ab@redhat.com>
-Date: Fri, 9 Feb 2024 09:29:05 +0100
+        Fri, 09 Feb 2024 00:32:24 -0800 (PST)
+Message-ID: <32a940e0-2b6d-489d-b987-41d640d04dd0@redhat.com>
+Date: Fri, 9 Feb 2024 09:32:23 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,8 +82,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v3 7/8] Add common/ directory for
- architecture-independent tests
+Subject: Re: [kvm-unit-tests PATCH v3 8/8] migration: add a migration selftest
 Content-Language: en-US
 To: Nicholas Piggin <npiggin@gmail.com>
 Cc: kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>,
@@ -97,7 +96,7 @@ Cc: kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>,
  linux-s390@vger.kernel.org, kvmarm@lists.linux.dev,
  kvm-riscv@lists.infradead.org
 References: <20240209070141.421569-1-npiggin@gmail.com>
- <20240209070141.421569-8-npiggin@gmail.com>
+ <20240209070141.421569-9-npiggin@gmail.com>
 From: Thomas Huth <thuth@redhat.com>
 Autocrypt: addr=thuth@redhat.com; keydata=
  xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
@@ -141,27 +140,87 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20240209070141.421569-8-npiggin@gmail.com>
+In-Reply-To: <20240209070141.421569-9-npiggin@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 09/02/2024 08.01, Nicholas Piggin wrote:
-> x86/sieve.c is used by s390x, arm, and riscv via symbolic link. Make a
-> new directory common/ for architecture-independent tests and move
-> sieve.c here.
+> Add a selftest for migration support in  guest library and test harness
+> code. It performs migrations a tight loop to irritate races and bugs in
+
+"*in* a tight loop" ?
+
+> the test harness code.
 > 
+> Include the test in arm, s390, powerpc.
+> 
+> Acked-by: Claudio Imbrenda <imbrenda@linux.ibm.com> (s390x)
 > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 > ---
->   arm/sieve.c    |  2 +-
->   common/sieve.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++
->   riscv/sieve.c  |  2 +-
->   s390x/sieve.c  |  2 +-
->   x86/sieve.c    | 52 +-------------------------------------------------
->   5 files changed, 55 insertions(+), 54 deletions(-)
->   create mode 100644 common/sieve.c
->   mode change 100644 => 120000 x86/sieve.c
+> This has flushed out several bugs in developing the multi migration test
+> harness code already.
+> 
+> Thanks,
+> Nick
+> 
+>   arm/Makefile.common          |  1 +
+>   arm/selftest-migration.c     |  1 +
+>   arm/unittests.cfg            |  6 ++++++
+>   common/selftest-migration.c  | 34 ++++++++++++++++++++++++++++++++++
+>   powerpc/Makefile.common      |  1 +
+>   powerpc/selftest-migration.c |  1 +
+>   powerpc/unittests.cfg        |  4 ++++
+>   s390x/Makefile               |  1 +
+>   s390x/selftest-migration.c   |  1 +
+>   s390x/unittests.cfg          |  4 ++++
+>   10 files changed, 54 insertions(+)
+>   create mode 120000 arm/selftest-migration.c
+>   create mode 100644 common/selftest-migration.c
+>   create mode 120000 powerpc/selftest-migration.c
+>   create mode 120000 s390x/selftest-migration.c
+> 
+> diff --git a/arm/Makefile.common b/arm/Makefile.common
+> index f828dbe0..f107c478 100644
+> --- a/arm/Makefile.common
+> +++ b/arm/Makefile.common
+> @@ -5,6 +5,7 @@
+>   #
+>   
+>   tests-common  = $(TEST_DIR)/selftest.$(exe)
+> +tests-common += $(TEST_DIR)/selftest-migration.$(exe)
+>   tests-common += $(TEST_DIR)/spinlock-test.$(exe)
+>   tests-common += $(TEST_DIR)/pci-test.$(exe)
+>   tests-common += $(TEST_DIR)/pmu.$(exe)
+> diff --git a/arm/selftest-migration.c b/arm/selftest-migration.c
+> new file mode 120000
+> index 00000000..bd1eb266
+> --- /dev/null
+> +++ b/arm/selftest-migration.c
+> @@ -0,0 +1 @@
+> +../common/selftest-migration.c
+> \ No newline at end of file
+> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+> index fe601cbb..1ffd9a82 100644
+> --- a/arm/unittests.cfg
+> +++ b/arm/unittests.cfg
+> @@ -55,6 +55,12 @@ smp = $MAX_SMP
+>   extra_params = -append 'smp'
+>   groups = selftest
+>   
+> +# Test migration
+> +[selftest-migration]
+> +file = selftest-migration.flat
+> +groups = selftest migration
+> +
+> +arch = arm64
 
+Please swap the last two lines!
 
+>   # Test PCI emulation
+>   [pci-test]
+>   file = pci-test.flat
+
+With the nits fixed:
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 
 
