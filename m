@@ -1,125 +1,134 @@
-Return-Path: <kvm+bounces-8491-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8492-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 401B684FF1B
-	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 22:47:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63E4384FF64
+	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 23:04:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C346BB274A9
-	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 21:47:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 147081F25F5D
+	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 22:04:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC3BA210E7;
-	Fri,  9 Feb 2024 21:46:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B0B324B57;
+	Fri,  9 Feb 2024 22:04:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bgObKC5d"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N4k9Lf6q"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADE9018C27
-	for <kvm@vger.kernel.org>; Fri,  9 Feb 2024 21:46:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4D2F18623
+	for <kvm@vger.kernel.org>; Fri,  9 Feb 2024 22:04:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707515216; cv=none; b=rlibkJ/Gyh6n/47+tAb7iq5IWukhMtGrY+H0bQgSlkMNlbDA/2ecz2FUewX6jUe/bvV2LbCMJ8NNASM9kNynOBlpGwSEZ5CeGlY6NUhfo1yOhiFLh4zpLlp2SMZytcTtoF7x1Kjkty6fRT1hYfJloVZlBszAyQXpoCmstc7tYNU=
+	t=1707516252; cv=none; b=nnpvo43/qAag/QQs1V4EsrFGuAEXRTmOZ1dzDmrFudgi+hE0x0TgkNqUxBF81DtWlDzzakqMZ8puTZCO0N0WaDs2uhWRvM3ddR30PQk8rsazQ01PJ9AWMw/LpZ7EHlqgJunpfqH7Q/cmTXLxYylZa5VqXOoGHpqqTMuWPS/tR+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707515216; c=relaxed/simple;
-	bh=E9RmYNvl+KP6ZoWmKcRICoo2zuZ2p0BRZ6TGm1vclWs=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VSV6/rnMWM9yLFraJ1J2f3f8f5BCZ88Dqx3PpP3JEb71E8dnFR7aZ31RAFQBM8u9jZ5vQrR2jfRKXl1PH5iEEGktqim5zuczmZswvZ/3SfPtFctL8uJZ0/6L1gwQNEyCmo2CxoO7txmeiNC+4sYAEbCvVOGUvtX3ttKWXLQ78mE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bgObKC5d; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dbf618042daso2310496276.0
-        for <kvm@vger.kernel.org>; Fri, 09 Feb 2024 13:46:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707515213; x=1708120013; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GL+pH50a20qqS3C4DJIFftY5VDxfmSdvc8SiM1uAYxI=;
-        b=bgObKC5dU+HxZNEKGVV5a2b0EV8Ey4AOAs8Y9eMgSqd6tLJLBrFwKW8jOdTuREerml
-         KmCl13MJNxd1nU0dIypu3NImilHftQjypOoGTAcOfY8Nb6Ogl68UlrgcUSIZiM74xT16
-         fH5lglZhAmkrIcmd+LaFwC7W4PkhWOMLre/ZzTyGvvcnVS6BXT2UkruoxPxUrovuaTIS
-         JFI2Xow2+G8rLSEnEHcW+0wfN1z2bDqOYwHs1WC0Z3Nrh6iBCeqrBrCs8vbQ1bWy/cI4
-         V8D1Xt7ja8hrGmXJ1NkmPwrAv45HL3kcM9mW1kwGZFkGCVXOd23jS6fZOUyrngjF7t5S
-         +lPw==
+	s=arc-20240116; t=1707516252; c=relaxed/simple;
+	bh=/eKGCuNJ3FHEbyu+DPRPVualyEamXtqY05+7kv0j6v0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VGn0rAEdqWHrK+vRoMEVtG0lg9PTNygWpI3HzHUjc4sO6NiCMEvI4gUF6bswlouYdSqA/PUpUQ9UYdgCZ/xP3bMv+4g4OZEXu9KUj5XxoV+nHMdJ5hWNqn/qKzRwtKoSmJmGJDlyPnZ0fyqfp5ktRIR63o/CSPgyKzyuamHUP7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=N4k9Lf6q; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707516248;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1PsQcBsRk1vKYhCjqjhZmQmcpr29M732Tn4RN7l3cCk=;
+	b=N4k9Lf6qvzr2x5qqvdf8EZBey+X7g0o4/ky6BynvetJZH5yA6PyJwi3lFRSNJKI4MMdayf
+	D9jWAJtX5xzXoI/cLQNUIJpXYDndNfIMV/QPpPyIxOpp5aYth77JlU7voSTh0ogVk16oAC
+	GddRQTsGlqooI3RUHnyaypoOwjHoLL8=
+Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com
+ [209.85.167.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-519-TjtckmTmPw2r0KAltZNuUA-1; Fri, 09 Feb 2024 17:04:07 -0500
+X-MC-Unique: TjtckmTmPw2r0KAltZNuUA-1
+Received: by mail-oi1-f198.google.com with SMTP id 5614622812f47-3bfc8b1853cso1609143b6e.3
+        for <kvm@vger.kernel.org>; Fri, 09 Feb 2024 14:04:07 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707515213; x=1708120013;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GL+pH50a20qqS3C4DJIFftY5VDxfmSdvc8SiM1uAYxI=;
-        b=e8qprZzxLcFfIzGZ1lujIWYr9KNGYeoTLIdO68PL66Hi/VBn52a0Z2C2v2YtNuso+Q
-         x/HdY1/5b9EK8qRk1BQKO1r0Aep0B5GmS7Yq0XfiMot66JH3GV0bb+kClJI6XdaUUa/K
-         JmVJHRJ5Vb7LjSS0Vy3O5G84WS2ya27Qv5f2jwh5BRke48WJGMClQC/VrLyQdrwSNb2d
-         db0POwD2fw/mt5hTJTZX8/N6W6b50Onq69q7Xl2dXMI8EwaEOPSReqx74Olijwulk0+U
-         DKSFFP3Ul4nV4aUCzgj8C5El+vvEaSyySuHr2LrAwH2R7i4oepfZJ9FpAEHGbLgCmQ2o
-         RxfQ==
-X-Gm-Message-State: AOJu0YyNhaAXtrR0enEOlNQXMUar7oWTeE/y5xaWDHa+uIau0KiuDR3o
-	uurAT6sQSZ6tFghSF/DRclAn9jK6X9Hse8zUHk3FT0HZozufpj5M2b4GUrscp9t/PoJCzMdr78Q
-	v/w==
-X-Google-Smtp-Source: AGHT+IHZrpvVEOXi6Dk7Xe7SLPmmmmxXWbzbmKhX4ZyvV8jkQs/9u4eI8K/UypS9QLyMLVxothRIaLWQdi0=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:8387:0:b0:dc6:db9b:7a6d with SMTP id
- t7-20020a258387000000b00dc6db9b7a6dmr16955ybk.13.1707515213670; Fri, 09 Feb
- 2024 13:46:53 -0800 (PST)
-Date: Fri, 9 Feb 2024 13:46:52 -0800
-In-Reply-To: <CAHk-=wgBt9SsYjyHWn1ZH5V0Q7P6thqv_urVCTYqyWNUWSJ6_g@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1707516246; x=1708121046;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1PsQcBsRk1vKYhCjqjhZmQmcpr29M732Tn4RN7l3cCk=;
+        b=D/OB+jG7GwOrVTswmIb9ObaktiQFdWVHg4KgEFIot8WJgPsekEX8un5KM2AX9vvYBl
+         nykLjEd263PeB+W6hAzD47bnYsg6J/xCPJwtdWKArYMxkWpUdSadtNDkFRakjNyOPs/Z
+         PpZbaRU4BRFZYf/P7M+/oF+HQZT38y5YpBgJuUeOGYQ0lzIKqPVJzXIzCNPRpReV2oIU
+         8nlSrEOuu2s+baizl/URlIvpTAN9o66KYLSAgF3DaKaKUgSrvhKdqhjCniugIzDbq8dI
+         PV+Ci4WdNcQoYymSmvmIPO+P6s4d3JXwlYca1fFUoOJ4R7OHTJ5LhIzvJktaxlbSjGRj
+         LVuw==
+X-Gm-Message-State: AOJu0YylOXt9QvX5VbLdl0tzA83C0+3uRyedPdhQ1GCukHxcGPAak1Ac
+	GsFURimn0B/U0BC0O+8H9cbaYojW1hO3GgkI6WtIU0YC1aoLkXPRJVy5aiWio5RMVLBdGnwUkq8
+	v+VPeZxuCg+BqyBesDSPhKv3RdczXR/Nyev61S/0CONm1CSsXq1mmvhF4wKuaFNf+TN6tqfOU65
+	bdDkROftOJqxuTU07Ed6KehUTp
+X-Received: by 2002:a05:6808:120b:b0:3bf:dc8c:7a10 with SMTP id a11-20020a056808120b00b003bfdc8c7a10mr380363oil.45.1707516246430;
+        Fri, 09 Feb 2024 14:04:06 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IESd3wyQYbLXEJgWAjhRINhimI++QSrzJ/Q1rWiu7+oeZZ7mrDpl2fSjeBnrRsri1YJlp6CLkBROWJZ9MNGWd0=
+X-Received: by 2002:a05:6808:120b:b0:3bf:dc8c:7a10 with SMTP id
+ a11-20020a056808120b00b003bfdc8c7a10mr380339oil.45.1707516246138; Fri, 09 Feb
+ 2024 14:04:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240208220604.140859-1-seanjc@google.com> <CAKwvOdk_obRUkD6WQHhS9uoFVe3HrgqH5h+FpqsNNgmj4cmvCQ@mail.gmail.com>
- <DM6PR02MB40587AD6ABBF1814E9CCFA7CB84B2@DM6PR02MB4058.namprd02.prod.outlook.com>
- <CAHk-=wi3p5C1n03UYoQhgVDJbh_0ogCpwbgVGnOdGn6RJ6hnKA@mail.gmail.com>
- <ZcZyWrawr1NUCiQZ@google.com> <CAKwvOdmKaYYxf7vjvPf2vbn-Ly+4=JZ_zf+OcjYOkWCkgyU_kA@mail.gmail.com>
- <CAHk-=wgEABCwu7HkJufpWC=K7u_say8k6Tp9eHvAXFa4DNXgzQ@mail.gmail.com> <CAHk-=wgBt9SsYjyHWn1ZH5V0Q7P6thqv_urVCTYqyWNUWSJ6_g@mail.gmail.com>
-Message-ID: <ZcadTKwaSvvywNA9@google.com>
-Subject: Re: [PATCH] Kconfig: Explicitly disable asm goto w/ outputs on gcc-11
- (and earlier)
-From: Sean Christopherson <seanjc@google.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Nick Desaulniers <ndesaulniers@google.com>, Uros Bizjak <ubizjak@gmail.com>, 
-	Jakub Jelinek <jakub@redhat.com>, "Andrew Pinski (QUIC)" <quic_apinski@quicinc.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, 
-	Peter Zijlstra <peterz@infradead.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20240123001555.4168188-1-michal.wilczynski@intel.com>
+ <20240125005710.GA8443@yjiang5-mobl.amr.corp.intel.com> <CABgObfYaUHXyRmsmg8UjRomnpQ0Jnaog9-L2gMjsjkqChjDYUQ@mail.gmail.com>
+ <42d31df4-2dbf-44db-a511-a2d65324fded@intel.com> <CABgObfYa5eKj_8qyRfimqG7DXpbxe-eSM6pCwR6Hq97eZEtX6A@mail.gmail.com>
+ <ZcY_GbqcFXH2pR5E@google.com>
+In-Reply-To: <ZcY_GbqcFXH2pR5E@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 9 Feb 2024 23:03:53 +0100
+Message-ID: <CABgObfYQQZooYrsUnc8SSUbpiYQyZKGzDN2JutB-a5mJWWcr7w@mail.gmail.com>
+Subject: Re: [PATCH v2] KVM: x86: nSVM/nVMX: Fix handling triple fault on RSM instruction
+To: Sean Christopherson <seanjc@google.com>
+Cc: Michal Wilczynski <michal.wilczynski@intel.com>, 
+	Yunhong Jiang <yunhong.jiang@linux.intel.com>, mlevitsk@redhat.com, tglx@linutronix.de, 
+	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
+	hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	dedekind1@gmail.com, yuan.yao@intel.com, Zheyu Ma <zheyuma97@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 09, 2024, Linus Torvalds wrote:
-> Sean? Does this work for the case you noticed?
+On Fri, Feb 9, 2024 at 4:05=E2=80=AFPM Sean Christopherson <seanjc@google.c=
+om> wrote:
+> > If they are needed, it's fine. In my opinion a new callback is easier
+> > to handle and understand than new state.
+>
+> Yeah, we ripped out post_leave_smm() because its sole usage at the time w=
+as buggy,
+> and having a callback without a purpose would just be dead code.
 
-Yep.  You can quite literally see the effect of the asm("").  A "good" sequence
-directly propagates the result from the VMREAD's destination register to its
-final destination
+[...]
 
-  <+1756>:  mov    $0x280e,%r13d
-  <+1762>:  vmread %r13,%r13
-  <+1766>:  jbe    0x209fa <sync_vmcs02_to_vmcs12+1834>
-  <+1768>:  mov    %r13,0xe8(%rbx)
+>  : But due to nested_run_pending being (unnecessarily) buried in vendor s=
+tructs, it
+>  : might actually be easier to do a cleaner fix.  E.g. add yet another fl=
+ag to track
+>  : that a hardware VM-Enter needs to be completed in order to complete in=
+struction
+>  : emulation.
+>
+> I didn't mean add a flag to the emulator to muck with nested_run_pending,=
+ I meant
+> add a flag to kvm_vcpu_arch to be a superset of nested_run_pending.  E.g.=
+ as a
+> first step, something like the below.  And then as follow up, see if it's=
+ doable
+> to propagate nested_run_pending =3D> insn_emulation_needs_vmenter so that=
+ the
+> nested_run_pending checks in {svm,vmx}_{interrupt,nmi,smi}_allowed() can =
+be
+> dropped.
 
-whereas the "bad" sequence bounces through a different register.
+That seems a lot more complicated... What do you think of the patches
+I posted (the one that works and the wish-it-could-be-like-that one
+that folds triple faults into check_nested_events).
 
-  <+1780>:  mov    $0x2810,%eax
-  <+1785>:  vmread %rax,%rax
-  <+1788>:  jbe    0x209e4 <sync_vmcs02_to_vmcs12+1812>
-  <+1790>:  mov    %rax,%r12
-  <+1793>:  mov    %r12,0xf0(%rbx)
+Paolo
 
-> That (b) is very much voodoo programming, but it matches the old magic
-> barrier thing that Jakub Jelinek suggested for the really *old* gcc
-> bug wrt plain (non-output) "asm goto". The underlying bug for _that_
-> was fixed long ago:
-> 
->     http://gcc.gnu.org/bugzilla/show_bug.cgi?id=58670
-> 
-> We removed that for plain "asm goto" workaround a couple of years ago,
-> so "asm_volatile_goto()" has been a no-op since June 2022, but this
-> now resurrects that hack for the output case.
-> 
-> I'm not loving it, but Sean seemed to confirm that it fixes the code
-> generation problem, so ...
-
-Yeah, I'm in the same boat.
 
