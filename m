@@ -1,124 +1,185 @@
-Return-Path: <kvm+bounces-8476-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8477-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C9C884FC86
-	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 20:01:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2DA884FC9E
+	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 20:06:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F1431C26C2E
-	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 19:01:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99B2A1F26067
+	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 19:06:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0D0F82892;
-	Fri,  9 Feb 2024 19:01:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5065E84A48;
+	Fri,  9 Feb 2024 19:06:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="OCzptNqt"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eW3LHiaJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3579643148
-	for <kvm@vger.kernel.org>; Fri,  9 Feb 2024 19:01:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D659A84A29;
+	Fri,  9 Feb 2024 19:06:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707505305; cv=none; b=ZKY9Bvn/f8t0/TklNtBUqg3+TCq8u+i1HYZGe4sowoX9/AFBgUUIPKFinLADmwtkRWNqz1xkBPQkPJCPOJhS8IMJBt3qt4nnoYF1jpASvXBG5+wDi8QAQhBpx3XMgPuFndWFf2XkcnESA70WbvRKdmacSoMbXT2u9NvDlJhj008=
+	t=1707505566; cv=none; b=OX+A+CmJ7o3FNIERSUmnSGtUNPJTDNbLkrZfAGvcHHeUKwumMCXws4d/DSsEn3B8qTieuQP58Tyh2ftLt5llnQDFltoXBaCnQ+v9dsFVlQMJkluHkJaMYbSPpMe09fCwKKeg0Epys81XMuno+dq26aKeiZYoEQgZQ2HNUxHKgWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707505305; c=relaxed/simple;
-	bh=/Fi6BzVbQmG5nVQ63UG70WqUaLeYJODCbbDv9TLG8F4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jBainflHrvicPDcgICLs+TAl00WXQ6PjGgWCKkQmwXUdHlPbsPl8TFzmuXSGnWgVIfFLSV9BMA5RMQg/RA1ipWyoAJN7Uj5ueA/eCtz1Ac1DHYqiCqmhEKdum3hsCQcwG6Up+2avpl5wSj4xDw3vVnyt7QgkNHPOBjErKZFLSTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=OCzptNqt; arc=none smtp.client-ip=209.85.167.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-511717231bfso1640408e87.2
-        for <kvm@vger.kernel.org>; Fri, 09 Feb 2024 11:01:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1707505302; x=1708110102; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=IdZXKSMkBRnCj9HwTG4zGu6FPnSLltcxrc9e3CQDYLI=;
-        b=OCzptNqtiODz+UiHiLte5mCCG0wbaplo0sV6dG+X3XzJ3G2cUrTICSgtHwTWexeLee
-         cdlxeqAPzUvPfHhgE+yvA+/KG0I4NRvOcMcHPTFEY2c/5WYn5IVgqIzgqHr/oJ5gtNuz
-         0DRhTeQapHqw3SHxZz+VER/rpI3nRsFLNRqY0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707505302; x=1708110102;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IdZXKSMkBRnCj9HwTG4zGu6FPnSLltcxrc9e3CQDYLI=;
-        b=jnWWUyfnmYBEN7RrhLljyolcz2TKEwNAdDICW11B5BmObH9xJKOmDP02De9JAyoxd7
-         t/CrNShlZMsgPcRy4yX1HmuhEe1Qe6sQavakKUdSSUzLK0eJx/spw9buZ7GYSsUZC9dC
-         avjhxrn7lkj6yUx2ghkrPqQAZYukpVfS5ivYvIjVfxotqEc1mOxTeo7dMdLSBYB76HCz
-         TC5puz7BpRDC0u/hhwdgTm0nLA1rMqzzmTe/WgUdCHHhZgFRUJeUtTQPQFzMTzWibVky
-         LrvKbEiSSUrtVFhPOLBJlo8xkEcMF1Gx/Qo/oznpkHp1F+POAo7HCuT7NBbzv1iJlapA
-         dBNg==
-X-Forwarded-Encrypted: i=1; AJvYcCXdGpjVCzigkseSiABcvo688XOpXTknGXpqaW4CydhfPIwIoTluCqjePuw3wtPWFHLpZvHanhZhzNWA1R6Li6Z2B6s/
-X-Gm-Message-State: AOJu0YzV1JH0Mw4NVqoEoWO92c+nBEH4J9u3b7QXijOgjbWsGMtVunZl
-	qipD9T2oxaBnypLZdRn6X3qKGRjsQRJre6cwFHAJY9UqsMX9I4mDzMCuvzgGxIcqB9YYbjAS6pI
-	Obsc=
-X-Google-Smtp-Source: AGHT+IEtQA6h9kGOwNn/f4gQrQ37+1Suir9/fZsQ35O2FBZ3HQ0f+L4oF5uqkctNdysG+O+GVhtI2g==
-X-Received: by 2002:a05:651c:544:b0:2d0:e32d:aa89 with SMTP id q4-20020a05651c054400b002d0e32daa89mr510195ljp.37.1707505301900;
-        Fri, 09 Feb 2024 11:01:41 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXp0JJHVFQCo5UPj0N0gyIplLIVPU//cqT5tMQgVdY1gS6OFm9/qZHDJLnwQFES0OEed4CT5U1D7re2rp12bROxy/Gs
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com. [209.85.208.47])
-        by smtp.gmail.com with ESMTPSA id c32-20020a509fa3000000b0056020849adfsm16585edf.26.2024.02.09.11.01.41
-        for <kvm@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 09 Feb 2024 11:01:41 -0800 (PST)
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-55f279dca99so1931780a12.3
-        for <kvm@vger.kernel.org>; Fri, 09 Feb 2024 11:01:41 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWUsXWvdNDlhXd/+n5OHD7VFmACfCTxWXA+sCLjJOnIFgMKh9dxS+NfJ7Sr49xS6BQ5SVsTekXuX/jLaqE8ARaKAMtS
-X-Received: by 2002:a05:6402:5d82:b0:561:3d83:96a4 with SMTP id
- if2-20020a0564025d8200b005613d8396a4mr1642420edb.42.1707505300634; Fri, 09
- Feb 2024 11:01:40 -0800 (PST)
+	s=arc-20240116; t=1707505566; c=relaxed/simple;
+	bh=uH5jVE0MECW4NZxWlW2VDnG/UXQKh57bJcefzW5uzZY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UmwF1sNcSZ1PHckf8Xo1obnnemX27UMqfA7x8ARLdVh8YM8j3pqpbtZ+ssQ+haJjHNPECzSGhqWQfdX85Npgam18wQRgPsaN8+CgPHkJyK+LTrY3uNTXIQh6zq1Fl6LCMYt1YsiW8XkYGOWUgL6eupZ5Fi9wDT8BMqZKjxHhDXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eW3LHiaJ; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707505565; x=1739041565;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=uH5jVE0MECW4NZxWlW2VDnG/UXQKh57bJcefzW5uzZY=;
+  b=eW3LHiaJi7abuANvCgilfBOBSCuwgvgerTAvOvGIgFBhQDkKJqrCPOrP
+   OtnkIR7p2CrVFa/MimkJSl6nJqYWZEhlMYxx8jobPGTR+mrTsxgvsy4R3
+   etzOSjS2Z6EXbn5WpZnYRxzknLMW2/jGcg4lgPeVrKXB2D6N+XpGkciw9
+   Zmpxqvlp7cVRU6CUxjrt1AKKyvOhpn5HE3+lLvLi2T+YBFl6CnWN10pGB
+   ar69gQl1BEkIjIXR1v0/WaEIM0ltbi8H0GoXagLU0c1xlBCb1nxPbrDHd
+   amjsL0tJfTBSjWjdN36mHqy4+sF8TVBKYsBbxNdZWnhq3tUHYCraYjR59
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10979"; a="1392462"
+X-IronPort-AV: E=Sophos;i="6.05,257,1701158400"; 
+   d="scan'208";a="1392462"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2024 11:06:04 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,257,1701158400"; 
+   d="scan'208";a="6661651"
+Received: from karenaba-mobl1.amr.corp.intel.com (HELO desk) ([10.209.64.107])
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2024 11:06:02 -0800
+Date: Fri, 9 Feb 2024 11:06:02 -0800
+From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To: Borislav Petkov <bp@alien8.de>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Andy Lutomirski <luto@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, tony.luck@intel.com,
+	ak@linux.intel.com, tim.c.chen@linux.intel.com,
+	Andrew Cooper <andrew.cooper3@citrix.com>,
+	Nikolay Borisov <nik.borisov@suse.com>,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	kvm@vger.kernel.org,
+	Alyssa Milburn <alyssa.milburn@linux.intel.com>,
+	Daniel Sneddon <daniel.sneddon@linux.intel.com>,
+	antonio.gomez.iglesias@linux.intel.com,
+	Alyssa Milburn <alyssa.milburn@intel.com>, stable@kernel.org
+Subject: Re: [PATCH  v7 1/6] x86/bugs: Add asm helpers for executing VERW
+Message-ID: <20240209190602.skqahxhgbdc5b2ax@desk>
+References: <20240204-delay-verw-v7-0-59be2d704cb2@linux.intel.com>
+ <20240204-delay-verw-v7-1-59be2d704cb2@linux.intel.com>
+ <20240209172843.GUZcZgy7EktXgKZQoc@fat_crate.local>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240208220604.140859-1-seanjc@google.com> <CAKwvOdk_obRUkD6WQHhS9uoFVe3HrgqH5h+FpqsNNgmj4cmvCQ@mail.gmail.com>
- <DM6PR02MB40587AD6ABBF1814E9CCFA7CB84B2@DM6PR02MB4058.namprd02.prod.outlook.com>
- <CAHk-=wi3p5C1n03UYoQhgVDJbh_0ogCpwbgVGnOdGn6RJ6hnKA@mail.gmail.com>
- <ZcZyWrawr1NUCiQZ@google.com> <CAKwvOdmKaYYxf7vjvPf2vbn-Ly+4=JZ_zf+OcjYOkWCkgyU_kA@mail.gmail.com>
-In-Reply-To: <CAKwvOdmKaYYxf7vjvPf2vbn-Ly+4=JZ_zf+OcjYOkWCkgyU_kA@mail.gmail.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Fri, 9 Feb 2024 11:01:24 -0800
-X-Gmail-Original-Message-ID: <CAHk-=wgEABCwu7HkJufpWC=K7u_say8k6Tp9eHvAXFa4DNXgzQ@mail.gmail.com>
-Message-ID: <CAHk-=wgEABCwu7HkJufpWC=K7u_say8k6Tp9eHvAXFa4DNXgzQ@mail.gmail.com>
-Subject: Re: [PATCH] Kconfig: Explicitly disable asm goto w/ outputs on gcc-11
- (and earlier)
-To: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Sean Christopherson <seanjc@google.com>, "Andrew Pinski (QUIC)" <quic_apinski@quicinc.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, 
-	Peter Zijlstra <peterz@infradead.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240209172843.GUZcZgy7EktXgKZQoc@fat_crate.local>
 
-On Fri, 9 Feb 2024 at 10:55, Nick Desaulniers <ndesaulniers@google.com> wrote:
+On Fri, Feb 09, 2024 at 06:28:43PM +0100, Borislav Petkov wrote:
+> On Sun, Feb 04, 2024 at 11:18:59PM -0800, Pawan Gupta wrote:
+> >  .popsection
+> > +
+> > +/*
+> > + * Defines the VERW operand that is disguised as entry code so that
+> 
+> "Define..."
+> 
+> > + * it can be referenced with KPTI enabled. This ensures VERW can be
+> 
+> "Ensure..."
+> 
+> But committer can fix those.
+> 
+> > + * used late in exit-to-user path after page tables are switched.
+> > + */
+> > +.pushsection .entry.text, "ax"
+> > +
+> > +.align L1_CACHE_BYTES, 0xcc
+> > +SYM_CODE_START_NOALIGN(mds_verw_sel)
+> > +	UNWIND_HINT_UNDEFINED
+> > +	ANNOTATE_NOENDBR
+> > +	.word __KERNEL_DS
+> > +.align L1_CACHE_BYTES, 0xcc
+> > +SYM_CODE_END(mds_verw_sel);
+> > +/* For KVM */
+> > +EXPORT_SYMBOL_GPL(mds_verw_sel);
+> > +
+> > +.popsection
+> > diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+> > index fdf723b6f6d0..2b62cdd8dd12 100644
+> > --- a/arch/x86/include/asm/cpufeatures.h
+> > +++ b/arch/x86/include/asm/cpufeatures.h
+> > @@ -95,7 +95,7 @@
+> >  #define X86_FEATURE_SYSENTER32		( 3*32+15) /* "" sysenter in IA32 userspace */
+> >  #define X86_FEATURE_REP_GOOD		( 3*32+16) /* REP microcode works well */
+> >  #define X86_FEATURE_AMD_LBR_V2		( 3*32+17) /* AMD Last Branch Record Extension Version 2 */
+> > -/* FREE, was #define X86_FEATURE_LFENCE_RDTSC		( 3*32+18) "" LFENCE synchronizes RDTSC */
+> > +#define X86_FEATURE_CLEAR_CPU_BUF	( 3*32+18) /* "" Clear CPU buffers using VERW */
+> >  #define X86_FEATURE_ACC_POWER		( 3*32+19) /* AMD Accumulated Power Mechanism */
+> >  #define X86_FEATURE_NOPL		( 3*32+20) /* The NOPL (0F 1F) instructions */
+> >  #define X86_FEATURE_ALWAYS		( 3*32+21) /* "" Always-present feature */
+> > diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
+> > index 262e65539f83..ec85dfe67123 100644
+> > --- a/arch/x86/include/asm/nospec-branch.h
+> > +++ b/arch/x86/include/asm/nospec-branch.h
+> > @@ -315,6 +315,21 @@
+> >  #endif
+> >  .endm
+> >  
+> > +/*
+> > + * Macros to execute VERW instruction that mitigate transient data sampling
+> > + * attacks such as MDS. On affected systems a microcode update overloaded VERW
+> > + * instruction to also clear the CPU buffers. VERW clobbers CFLAGS.ZF.
+> > + *
+> > + * Note: Only the memory operand variant of VERW clears the CPU buffers.
+> > + */
+> > +.macro EXEC_VERW
+> 
+> I think I asked this already:
+
+Sorry I can't seem to find that on lore.
+(Though, there was a comment on avoiding the macro alltogether, to which
+I replied that it complicates 32-bit.)
+
+> Why isn't this called simply "VERW"?
 >
-> And also pessimizes all asm gotos (for gcc) including ones that don't
-> contain output as described in 43c249ea0b1e.  The version checks would
-> at least not pessimize those.
+> There's no better name as this is basically the insn itself...
 
-Yeah, no, we should limit that workaround only to the asm goto with
-outputs case.
+Agree.
 
-We should also probably get rid of the existing "asm_volatile_goto()"
-macro name entirely. That name was always pretty horrific, in that it
-didn't even mark the asm as volatile even in the case where it did
-anything.
+> > +	verw _ASM_RIP(mds_verw_sel)
 
-So the name of that macro made little sense, and the new workaround
-should be only for asm goto with outputs. So I'd suggest jmaking a new
-macro with that name:
+But, in this case the instruction needs a special operand, and the build
+fails with the macro name VERW:
 
-   #define asm_goto_output(x...)
+  AS      arch/x86/entry/entry.o
+  AS      arch/x86/entry/entry_64.o
+arch/x86/entry/entry_64.S: Assembler messages:
+arch/x86/entry/entry_64.S:164: Error: too many positional arguments
+arch/x86/entry/entry_64.S:577: Error: too many positional arguments
+arch/x86/entry/entry_64.S:728: Error: too many positional arguments
+arch/x86/entry/entry_64.S:1479: Error: too many positional arguments
+make[4]: *** [scripts/Makefile.build:361: arch/x86/entry/entry_64.o] Error 1
+make[3]: *** [scripts/Makefile.build:481: arch/x86/entry] Error 2
+make[2]: *** [scripts/Makefile.build:481: arch/x86] Error 2
 
-and on gcc use that old workaround, and on clang just make it be a
-plain "asm goto".
+> > +.endm
 
-Hmm?
+Perhaps s/EXEC_VERW/_VERW/ ?
 
-            Linus
+Thanks for the review.
 
