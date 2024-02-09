@@ -1,120 +1,131 @@
-Return-Path: <kvm+bounces-8502-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8503-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13E4884FFCA
-	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 23:23:12 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D90F684FFE8
+	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 23:29:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 465F11C227BE
-	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 22:23:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5E189B226EF
+	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 22:29:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 731273A28B;
-	Fri,  9 Feb 2024 22:20:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3680364D4;
+	Fri,  9 Feb 2024 22:29:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="D+pL60lA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SIscm1Td"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1119439FE6
-	for <kvm@vger.kernel.org>; Fri,  9 Feb 2024 22:20:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7493B25625
+	for <kvm@vger.kernel.org>; Fri,  9 Feb 2024 22:29:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707517255; cv=none; b=s1jUbsZD8P/wEbf8aH0Zk5R7Ay0HN+bk1SGNnfrThFqvLZTN4Pdj/NldU2NQWakmKusj8/eNy0Yex/Q+ip+TKOZVdtfupyW/uFl/HM+2dMbbB7ai/HHRpKZKL1xPkc2CuCt/oM5CyZlFGFUqxoF5j5sv0bdZOTzSymsf7yY8scU=
+	t=1707517742; cv=none; b=bStiZIsMDoKy5lfA+ZfIQaBdoCLZF5KmQ3rvfegccBHYp2s1eg6Hyh0z0jVa/dCp2bNq293IbaV6ZRDefWloG0cOi29L3LFR12BUq7JqTkvjK3Hk2mPWtOTwNcIgE2Jmdw5xOSmmvC+wEfM9mun1VQjxuQs+EfzjK4d4oDf7cMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707517255; c=relaxed/simple;
-	bh=/+AACNUK3NWSn3jwhGJqpuGxVWUQ3Hc2IPGl9YwdYHM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=euwwCffSNNNCmqjTrmhjzXjCq7qD/y9WMMg1RPBDH7gN4cqSfzpdt82R42lB8p3sCRLY/y6IPniNtDWjDy58buspuYPUZZxX3j+OBtR1FmLoub+pZqRgfmT6TjK2Zx9C0EN0LTqeG5vtBYKfzR/I6T3DHpcgyECo2CYiqxbivl4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=D+pL60lA; arc=none smtp.client-ip=209.85.128.201
+	s=arc-20240116; t=1707517742; c=relaxed/simple;
+	bh=fIqYvORhxAkyZm48va/2ujkvGA7C8gveY8KxKZlfit8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=QduSeCPZ3eVxkvkJoy4WA0HLNY4FSReI9aNkIaaT9pZRg1OEAu+tFfA1/ePSIVQaQYiP1JP7r/YQdCGndNfqyLRDIvaCr6/KIzOKzmCPUnHaBXEBWI7pvQ08WbIwNx3xtyViVXHpWxyIQUtBLSGMbNiV/D0rlj2DopeC/gkhRQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SIscm1Td; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-604ad18981eso33477637b3.2
-        for <kvm@vger.kernel.org>; Fri, 09 Feb 2024 14:20:53 -0800 (PST)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5c66a69ec8eso1425927a12.3
+        for <kvm@vger.kernel.org>; Fri, 09 Feb 2024 14:29:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707517253; x=1708122053; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=yi4hHgzRm66Wj0icAfm6O+EqUFwwNEbxzptOYQ9az9o=;
-        b=D+pL60lAu5xXZzNy+stnlcNJnCE6Zb3CCbUt0wwSpMRelviatTlIpMNEEHe1LHRzbG
-         aITq67Fi6LG70I7szCTSxgMY6Qqj4niqXeG43t9HYWXmgBsKhTO8xpDZk95ORvQ0sfIz
-         mDiYV0fo8EGjL0Ab6TRxhQbDzsCim9u6alLtcfvXgFVM0AiEqWsDhy8d+1XKhN/gVtV8
-         lr0+2ws91rw1QRy+HSBt7ACK2KSJhtGRGT05ldHFs5YQ1gTwgOIBcV7dURA2Estwq8vp
-         ql4ZM8FXoAfSh9aKdfgA4CyydCaWcvRPENWoszCBGip+LRIP0vk+KHAr9H2GHOp+NRBC
-         TskA==
+        d=google.com; s=20230601; t=1707517741; x=1708122541; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=H5hQFyPpf+rydxjBfMUUkTUJgr64hFiwgdcvFQinuS0=;
+        b=SIscm1Tdv48XiEjz2aULMyi6MQ2rnjaJt5Fwnz4t1rR2ImKXv1n3e/fvvp62YQr79b
+         0mLDKp1cJ8wilJVvw3JnI0V2Whdwai95C/Wzv/+qTkjtCFN0dBDqcdPv2ltLMJnMSUlw
+         qJtNzqknyiVBq2hlElFG+aMUJZVeNiCrSBahIp++bADTzPs2R+36tSW1HQTJedLWK4+u
+         oQbctEz9n7rJwrUW/y9/0dkbEBDEPH4/FGeynSggChs29A12dqT+RUxOQrX536SoWIPM
+         bRazaiSeqGXMODYPwEC3fQpSvU67iZkem4e8wR0l0j0Ie+qSceiYz/piiIw+HVd1/kTQ
+         3f6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707517253; x=1708122053;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yi4hHgzRm66Wj0icAfm6O+EqUFwwNEbxzptOYQ9az9o=;
-        b=BxrV9l6iDz/HblVkDcX/TFOmfWaQ53C4xl0E4wsgdnrIn5i5+CW7R5O7MGjG1nGSNs
-         sCivDHzWQSzpQkg+Ax+BSDraLhM3tVOMGb+JXYRLOUQBgEYwk1YDleDaJVfbLY4Wbcl8
-         f7RZrlLbn90MF6vYzTaM1h5SwU9fv/RnNO0YBOeQC5rNy8x2x0HjZHBHz5NNxXcS6AK2
-         H0kTWnubG6ryRI4smAoCxTxHShkQ2xpfQJ9dI4K6I/xISltsleU1Rlpk5madYyy5i3qV
-         GdNJx04bYvTkErMNktgIh6PzSdgAiAVajVt3yzaEHfOJDuMSZNUABkG1hqMFcVpWx+1A
-         ct7w==
-X-Gm-Message-State: AOJu0Yym9gtQQJY4p9smGAfGh07ioALEjrh3NgJKxiN3oq0jLmuNNR8E
-	C/B4tucYTAErZWaiEfHewiDQSk0jw6cEttBB040DzHTs7doh4n+uEFsodemdvVOrxepEHCqFfkL
-	ibw==
-X-Google-Smtp-Source: AGHT+IEWGzKIt62JQrZlWShnfuhbbuyWmez5l2djLuVbJUzqXxVsrI6ck7bnEYXYkiyxPfSQN31DhiehvFs=
+        d=1e100.net; s=20230601; t=1707517741; x=1708122541;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=H5hQFyPpf+rydxjBfMUUkTUJgr64hFiwgdcvFQinuS0=;
+        b=kXfaOCBn0W14SAIvk4eEdBWglZGNQTiZnIX0vbZ2g3PH8SyrioWvLZTcloIJ8jhnDI
+         vkNT66xHIa9+tOKktF+spKcC/jhLwJTniL74kyMpGHC7ReReJhI8dONQ6pLRluITnLFT
+         5Jw7kxCNjEjOYT/FVh2vKCkGL+V08H5ZJ29RrehRkAbgjbDtmBS3SPZf8QK/4JsVcshl
+         Ivlf2fAEFujBmNz/8v8Uwkxd9tX86no91e+9AUELtX6TSKGz8PF9Ar7jHzRevaurLLDd
+         CfthG9XXuoLj0XL1013b7+WqPHz1AUHXJAe74KxTUlM9ZFrAm+g5L2anZJXOrwlU3DX6
+         waDw==
+X-Gm-Message-State: AOJu0YxnTNlD/bujsfYGS8qD/1G8ePsRcfzLnATthgvtbQ1XV9Scbgea
+	fI7WJBOjnXWS8Kvew62hSGA9TpYf4KJNkFVeCSI1bhbpXvtz4bmEj7h4Mk4QixPAYq/K0weRWC3
+	Ssw==
+X-Google-Smtp-Source: AGHT+IH4XFzuF2DKPAkh093CaHpAAUCLEz9Un/+UQsFkngrgKl6K7U6HxZSJmwZ1mrguGsAZTnMEI+Kpv+o=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a0d:d513:0:b0:604:103:567d with SMTP id
- x19-20020a0dd513000000b006040103567dmr152824ywd.0.1707517253085; Fri, 09 Feb
- 2024 14:20:53 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a65:6d07:0:b0:5dc:5111:d8b1 with SMTP id
+ bf7-20020a656d07000000b005dc5111d8b1mr936pgb.5.1707517740545; Fri, 09 Feb
+ 2024 14:29:00 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  9 Feb 2024 14:20:47 -0800
-In-Reply-To: <20240209222047.394389-1-seanjc@google.com>
+Date: Fri,  9 Feb 2024 14:28:54 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240209222047.394389-1-seanjc@google.com>
 X-Mailer: git-send-email 2.43.0.687.g38aa6559b0-goog
-Message-ID: <20240209222047.394389-3-seanjc@google.com>
-Subject: [PATCH 2/2] KVM: x86: Sanity check that kvm_has_noapic_vcpu is zero
- at module_exit()
+Message-ID: <20240209222858.396696-1-seanjc@google.com>
+Subject: [PATCH v4 0/4] KVM: x86/mmu: Pre-check for mmu_notifier retry
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Li RongQing <lirongqing@baidu.com>, Maxim Levitsky <mlevitsk@redhat.com>
+	Yan Zhao <yan.y.zhao@intel.com>, Friedrich Weber <f.weber@proxmox.com>, 
+	Kai Huang <kai.huang@intel.com>, Yuan Yao <yuan.yao@linux.intel.com>, 
+	Xu Yilun <yilun.xu@linux.intel.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
+	Michael Roth <michael.roth@amd.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	David Matlack <dmatlack@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-WARN if kvm.ko is unloaded with an elevated kvm_has_noapic_vcpu to guard
-against incorrect management of the key, e.g. to detect if KVM fails to
-decrement the key in error paths.  Because kvm_has_noapic_vcpu is purely
-an optimization, in all likelihood KVM could completely botch handling of
-kvm_has_noapic_vcpu and no one would notice (which is a good argument for
-deleting the key entirely, but that's a problem for another day).
+Retry page faults without acquiring mmu_lock, and potentially even without
+resolving a pfn, if the gfn is covered by an active invalidation.  This
+avoids resource and lock contention, which can be especially beneficial
+for preemptible kernels as KVM can get stuck bouncing mmu_lock between a
+vCPU and the invalidation task the vCPU is waiting on to finish.
 
-Note, ideally the sanity check would be performance when kvm_usage_count
-goes to zero, but adding an arch callback just for this sanity check isn't
-at all worth doing.
+v4: 
+ - Pre-check for retry before resolving the pfn, too. [Yan]
+ - Add a patch to fix a private/shared vs. memslot validity check
+   priority inversion bug.
+ - Refactor kvm_faultin_pfn() to clean up the handling of noslot faults.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/x86.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+v3:
+ - https://lkml.kernel.org/r/20240203003518.387220-1-seanjc%40google.com
+ - Release the pfn, i.e. put the struct page reference if one was held,
+   as the caller doesn't expect to get a reference on "failure". [Yuan]
+ - Fix a typo in the comment.
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 59119157bd20..779a5b32a5bf 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -13878,9 +13878,6 @@ module_init(kvm_x86_init);
- 
- static void __exit kvm_x86_exit(void)
- {
--	/*
--	 * If module_init() is implemented, module_exit() must also be
--	 * implemented to allow module unload.
--	 */
-+	WARN_ON_ONCE(static_branch_unlikely(&kvm_has_noapic_vcpu));
- }
- module_exit(kvm_x86_exit);
+v2:
+ - Introduce a dedicated helper and collapse to a single patch (because
+   adding an unused helper would be quite silly).
+ - Add a comment to explain the "unsafe" check in kvm_faultin_pfn(). [Kai]
+ - Add Kai's Ack.
+
+v1: https://lore.kernel.org/all/20230825020733.2849862-1-seanjc@google.com
+
+Sean Christopherson (4):
+  KVM: x86/mmu: Retry fault before acquiring mmu_lock if mapping is
+    changing
+  KVM: x86/mmu: Move private vs. shared check above slot validity checks
+  KVM: x86/mmu: Move slot checks from __kvm_faultin_pfn() to
+    kvm_faultin_pfn()
+  KVM: x86/mmu: Handle no-slot faults at the beginning of
+    kvm_faultin_pfn()
+
+ arch/x86/kvm/mmu/mmu.c          | 134 ++++++++++++++++++++++----------
+ arch/x86/kvm/mmu/mmu_internal.h |   5 +-
+ include/linux/kvm_host.h        |  26 +++++++
+ 3 files changed, 122 insertions(+), 43 deletions(-)
+
+
+base-commit: 60eedcfceda9db46f1b333e5e1aa9359793f04fb
 -- 
 2.43.0.687.g38aa6559b0-goog
 
