@@ -1,174 +1,164 @@
-Return-Path: <kvm+bounces-8390-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8391-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE83784EFB8
-	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 06:02:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5286784F080
+	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 08:02:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75371288AD1
-	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 05:02:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B8C9288043
+	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 07:02:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11FC65647F;
-	Fri,  9 Feb 2024 05:02:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31776657B9;
+	Fri,  9 Feb 2024 07:01:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NlY+deG+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AP2raOPK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D16256B65;
-	Fri,  9 Feb 2024 05:02:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E811B657AB;
+	Fri,  9 Feb 2024 07:01:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707454930; cv=none; b=DZ+Tq2bd+Bl+KjbTPUIsb4wzgL47iNl9vikQY6BPIhEy64UgAXcSHZbh/Nhz2df1AnnXyRoY/g1nhRZq8Q88+j2rwAk3SL3eA8GF19CahLVjFygm4j83v6Np2dDTJQWYMuAadJu9aJ68DhTn4aXg58TK52VfckaL6kNR2VVFJfk=
+	t=1707462116; cv=none; b=VBsju3k+Qf1kTx3wdOmDDUz37++dY/rpoCLCUczIkjx5wqhD2HXVaitOA5WUPfy1qCT5oMSLYdP2mqko+5SqQtcZlj2lyWsV94oj4DLiSF+lm6+whD8r2AWraSZJwuFkNphSTQ9xMCYo7CpLJpHp57HqCftFnqe17p1kmkXkCL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707454930; c=relaxed/simple;
-	bh=QHzDgfDMbhuy63JYBLnHTpA2kSqsUXdONURKUAyBw/Y=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:Cc:
-	 References:In-Reply-To; b=cQpGsi8CZxTKfhdT9/LE7CWIGUDPMea7UqL7ab/luZiHdjASmFpgzhGLx9k1MKbQcR4E36NfgSRKRQ4wdl7uH7/WB3A749agG45HGvWXmPtdWsLxO8SRCPbFgeJJKWK52xx8lvr98WlOc8IOSZ/c6eRzNw3nJ4A6iQc2TkNmRpc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NlY+deG+; arc=none smtp.client-ip=209.85.215.180
+	s=arc-20240116; t=1707462116; c=relaxed/simple;
+	bh=gY3xf0Lz5rDmuy2ZJ6dOxAu27NqM0PPCRNJY9WhIKWA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ljcil/u2Y+bHp68rgvu5S53a3z76+F4nsuEjOM+odLk9YkCOProcBsswvjESrm/XgZ+e70wTq/t8me6BHgh+lDTkNCmO8nzph1i04pmoqhGNbOfhzILXoDJcTb5z52OryAm6hH960U4gnrzJWsRAkh0K8eSOOe59iPAoC6RU/Ls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AP2raOPK; arc=none smtp.client-ip=209.85.214.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-5d8ddbac4fbso463755a12.0;
-        Thu, 08 Feb 2024 21:02:07 -0800 (PST)
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1d934c8f8f7so5020275ad.2;
+        Thu, 08 Feb 2024 23:01:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707454927; x=1708059727; darn=vger.kernel.org;
-        h=in-reply-to:references:cc:to:from:subject:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0wqz7Y/TcTN7smUZ/N4fhNV46jTItRF0U++Hxc5pAtk=;
-        b=NlY+deG+PRMkyWxfM1tmL1mvaYKwnRZfQb5GLs0HsS0nE141XBzeS/lNT7hKbQeT+/
-         mZPocaOzOJPadLdAcyoWGp+nvJRFb4GrCwGJIQSnRzlNUeIY0bT4BTQzO13S7cw03mY3
-         pGJwIamH8Vaucbnj+ldCoTYZGecItQst3q2Sduz7G1j2RlHE8maxgL2WUbo8Z8ruapbM
-         JJfpeeMFnRAhxL4AkFzmuodPcx8vrSuqEVbvgTsL6oMPqQYLI8SYvkmkNVmgGjntFLHi
-         lqa5ulXObyweqgnLHnYNg6puqajmO1RwcGSDrNs1P9QXA66QbgyIgKRNEC1c0HNwNY7a
-         ipzQ==
+        d=gmail.com; s=20230601; t=1707462114; x=1708066914; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7ZI6d9cux97L7dUT4TQMpq+dvoK2aI/bTyxDjBMmG0M=;
+        b=AP2raOPKHKcHBMXtAWFrifGG62+KuK9S32u5PZ5n8Ho+U+i58nkBZ2Nss1G28DoHqR
+         zy7h8kIBf9uXuReglr791e/zpydJsdzI7gCnFa8//aY0NA/9/d5q/AOEmKZuYIEfKFfX
+         pMWR2d6Ow7EoplCTA2zHLUWDINlyix+CxjPy3V4tpxNzExZcIR9PAsmow27CZXw7UYPG
+         MXH2YhYp/vgCLsAu9m8RbiBUEQbCs6WxYbCE6ZFGtAseIc5S+FvnwAkv2N0nkhOBNCvN
+         nYWo/lX6nyeYGOTdYxGfU4FvrE+InSSL8c9nlEfXDKeOzfQ8UZxjV19hjWaPJWNmAnLy
+         GVvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707454927; x=1708059727;
-        h=in-reply-to:references:cc:to:from:subject:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=0wqz7Y/TcTN7smUZ/N4fhNV46jTItRF0U++Hxc5pAtk=;
-        b=SvDAsIC/JYhoqorMbsoSFF+Sf7oo4lMa0L1HDepXU4inLIg7hc0euYdgOoOqEO9VFl
-         0r6ZBevciBFs2mp+aXnoUagaydQMNiJ7Z9Nq2cCVfmZs6IqRKic+v8AQ6+58C+BLa7Qr
-         EzgNpYnIGGdDQ/lN066yWMGcMLX5V0TH3U3hujY8383fquiBTXYDiH0iOvwPFKEbUHIG
-         inevQMCKRSbU2C7uJwXlb9zOc04I3MHWCaEtBUydHN5AMiA5l819cZJDLqa60ntG8v2M
-         nBs60GQi1r6mc90BoEwYCIP6SD+115uoNGDHzU/QvrXatktwNgYQwRQp3jWHuVWEKmgc
-         tsIA==
-X-Gm-Message-State: AOJu0Yx1ANarvrBLbNa+to3cSmVgJQc5kAaWsMQ6kP1STifrQZDmtiSO
-	pO3ERCmy5jyeS3kTT2LaHjVet43Ks6wwmfIo1PzP9Fh6u1DGgJ0o
-X-Google-Smtp-Source: AGHT+IEKRg+nU8BWUu6QYFnkof43Ezzita86bZjmYmWTU2CUj7lvOVVnWbVZiYrOWORfbM//Bd/KAg==
-X-Received: by 2002:a17:90a:bf02:b0:296:fe8d:248b with SMTP id c2-20020a17090abf0200b00296fe8d248bmr460936pjs.4.1707454926617;
-        Thu, 08 Feb 2024 21:02:06 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCX1gF5gyLodB9BkGeJgen+1IIQ898R25d9CxVUmwkcouUztyRgoFsqK6P/mdgxB8x2pFV63YnmUNoLXFz2tkj7tHB7BvZmMZtYCvmDYODZMgL6nAqi89JPL5OaMfN5wM7G+P/WEybND0q6L4npV2znOQTSXmjEfIM3vzWJGupZpCgApmK4Zp8537Kqb71pvvVCTG4IRXg/Ead8zsQkmaEGQf9EjyTNySMaIRyfi1UrqBNkWWzvE9Mhh27Hmr9u1j4fsYKdHqpt4KVsAm1byPRjBNTsC8PB9+4mz3BIeaSJVBX7hsxQcI5cAI85egsiwkEykDe++XJtbcn2LYw+BzjhlXrdMumIdXRIoqGb97NvoBlhgTavF03Nb47HVUU08eovz6ZBIHWxmMFKsWAYJXTsTuAivdoz+c7ew7L3p2ykLTjmmfwbQzEcokGzQvK9bHlV2pddrFIOsFhaMzkqe//FxH4GakiPArNdISfUQb6O4BNCeNdQ=
-Received: from localhost ([1.146.65.44])
-        by smtp.gmail.com with ESMTPSA id e5-20020a17090301c500b001d7610fdb7csm608163plh.226.2024.02.08.21.01.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 Feb 2024 21:02:06 -0800 (PST)
+        d=1e100.net; s=20230601; t=1707462114; x=1708066914;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7ZI6d9cux97L7dUT4TQMpq+dvoK2aI/bTyxDjBMmG0M=;
+        b=KkUr5aO842KApx++9Jvwb2wJNYlnI4hq+yRKofdnGvnWuWurO7H6ICx2zUvSMGSKrk
+         2Bz52ae+z3ubIsae2bOK289FvHy5XEnYBcZSy8Mr8eCXh8vp6bhpT+2Uf5nwEOMQPETH
+         iX1EVs1OdOlG/ICi4967gioSSkkl5NsZahce5dlv+xC1hfDIc0yke/mdkyM7BdApW89o
+         Bj7wsJOwKn9cq/upCKWixchmQUjXz7sfQLMz8HtLy137ou8TPLidyCCGzr8bxFiqaJKX
+         jFlYC5LYZtMWeEf7CNLMyFzZt7PbI9C+RH0YhHymKW1qqwI1tQaYOR+GKwbgmE/hdt+8
+         x40w==
+X-Gm-Message-State: AOJu0YwRIAiDqoo/X7bxhT7iQjEuH21Tz29GlSKHoDhthJJDhp6qFzum
+	vhzr3pwllrwfuc4asyIr1m0ldadZimkZJzgvKqQ43UKEChjhP4zi
+X-Google-Smtp-Source: AGHT+IHZRJNVGE1nRp4CsG243g7N5RxTDUHurXHV9jgjH8FEhvyBctWgR3dk3ZSZYU5s1toRaGxOVQ==
+X-Received: by 2002:a17:902:6503:b0:1d9:a609:dd96 with SMTP id b3-20020a170902650300b001d9a609dd96mr591187plk.41.1707462114175;
+        Thu, 08 Feb 2024 23:01:54 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWeYPIvgSE2lAHsViOQ/LpTx47391Fz3bpGJ589w2egJPbjUjq85ZVYSEyRf6FY+QZ9VfxhQy7NlooFf3bg10JLQ9VCFNlzq+3YvXyU5KDDMHyaV9JY5oDbQ81EJsRCNqSRRhiqJjD0KqRKrpJefva/gBYT4U91Kb/XVK/pwNjW/PPokJ/rCp0OtV2BJGSFZEqwHj6Wb3rAHNXuXwd/TOlUfFgsV0wA2Ji2Vllh6jtx0TYw7Pt9PtDeoTjnQi0jBwGBb4ig7ICoKVddJdour7JIcNSx1s+6g4fztyQUXdpEm/xpYrahxb8lzH7qxQdrWHia7kG/rB4+r4iqgMSq6z0G/qmM3pLc+lmnI8bgkxaiQnCnt3y/0vq0PO6YUEXUzjdmOBzckaCxeLC72BWLaSOowU8btDpixf0GqlKmHXyIWAGqWzwvlQpq6wqIYPETCQyc9jK6yj0/uhG6J3+nPU0SkKhET9JfWPvHZIuHGxLTHwhiOKj5Jw5uTT+wN/tC1udxD3Wp+w/mk45v2ekyfkDatVvRH+p28o/ehHOB7Kv7OQxROZjamJS1
+Received: from wheely.local0.net ([1.146.102.26])
+        by smtp.gmail.com with ESMTPSA id r10-20020a170903410a00b001d7284b9461sm839285pld.128.2024.02.08.23.01.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Feb 2024 23:01:53 -0800 (PST)
+From: Nicholas Piggin <npiggin@gmail.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Nicholas Piggin <npiggin@gmail.com>,
+	kvm@vger.kernel.org,
+	Laurent Vivier <lvivier@redhat.com>,
+	"Shaoqin Huang" <shahuang@redhat.com>,
+	Andrew Jones <andrew.jones@linux.dev>,
+	Nico Boehr <nrb@linux.ibm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	David Hildenbrand <david@redhat.com>,
+	Marc Hartmayer <mhartmay@linux.ibm.com>,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-s390@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	kvm-riscv@lists.infradead.org
+Subject: [kvm-unit-tests PATCH v3 0/8] Multi-migration support
+Date: Fri,  9 Feb 2024 17:01:33 +1000
+Message-ID: <20240209070141.421569-1-npiggin@gmail.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Fri, 09 Feb 2024 15:01:56 +1000
-Message-Id: <CZ0A93T119VP.1LQ0MR1O0PYJE@wheely>
-Subject: Re: [kvm-unit-tests PATCH v2 2/9] arch-run: Clean up temporary
- files properly
-From: "Nicholas Piggin" <npiggin@gmail.com>
-To: "Thomas Huth" <thuth@redhat.com>
-Cc: <kvm@vger.kernel.org>, "Laurent Vivier" <lvivier@redhat.com>, "Shaoqin
- Huang" <shahuang@redhat.com>, "Andrew Jones" <andrew.jones@linux.dev>,
- "Nico Boehr" <nrb@linux.ibm.com>, "Paolo Bonzini" <pbonzini@redhat.com>,
- "Alexandru Elisei" <alexandru.elisei@arm.com>, "Eric Auger"
- <eric.auger@redhat.com>, "Janosch Frank" <frankja@linux.ibm.com>, "Claudio
- Imbrenda" <imbrenda@linux.ibm.com>, "David Hildenbrand" <david@redhat.com>,
- "Marc Hartmayer" <mhartmay@linux.ibm.com>, <linuxppc-dev@lists.ozlabs.org>,
- <linux-s390@vger.kernel.org>, <kvmarm@lists.linux.dev>
-X-Mailer: aerc 0.15.2
-References: <20240202065740.68643-1-npiggin@gmail.com>
- <20240202065740.68643-3-npiggin@gmail.com>
- <c9039fc4-9809-43d9-8a99-88da1446d67f@redhat.com>
-In-Reply-To: <c9039fc4-9809-43d9-8a99-88da1446d67f@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Wed Feb 7, 2024 at 5:58 PM AEST, Thomas Huth wrote:
-> On 02/02/2024 07.57, Nicholas Piggin wrote:
-> > Migration files weren't being removed when tests were interrupted.
-> > This improves the situation.
-> >=20
-> > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> > ---
-> >   scripts/arch-run.bash | 12 +++++++-----
-> >   1 file changed, 7 insertions(+), 5 deletions(-)
-> >=20
-> > diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-> > index d0864360..f22ead6f 100644
-> > --- a/scripts/arch-run.bash
-> > +++ b/scripts/arch-run.bash
-> > @@ -134,12 +134,14 @@ run_migration ()
-> >   	qmp1=3D$(mktemp -u -t mig-helper-qmp1.XXXXXXXXXX)
-> >   	qmp2=3D$(mktemp -u -t mig-helper-qmp2.XXXXXXXXXX)
-> >   	fifo=3D$(mktemp -u -t mig-helper-fifo.XXXXXXXXXX)
-> > +
-> > +	# race here between file creation and trap
-> > +	trap "trap - TERM ; kill 0 ; exit 2" INT TERM
-> > +	trap "rm -f ${migout1} ${migsock} ${qmp1} ${qmp2} ${fifo}" RETURN EXI=
-T
-> > +
-> >   	qmpout1=3D/dev/null
-> >   	qmpout2=3D/dev/null
-> >  =20
-> > -	trap 'kill 0; exit 2' INT TERM
-> > -	trap 'rm -f ${migout1} ${migsock} ${qmp1} ${qmp2} ${fifo}' RETURN EXI=
-T
-> > -
-> >   	eval "$@" -chardev socket,id=3Dmon1,path=3D${qmp1},server=3Don,wait=
-=3Doff \
-> >   		-mon chardev=3Dmon1,mode=3Dcontrol | tee ${migout1} &
-> >   	live_pid=3D`jobs -l %+ | grep "eval" | awk '{print$2}'`
-> > @@ -211,8 +213,8 @@ run_panic ()
-> >  =20
-> >   	qmp=3D$(mktemp -u -t panic-qmp.XXXXXXXXXX)
-> >  =20
-> > -	trap 'kill 0; exit 2' INT TERM
-> > -	trap 'rm -f ${qmp}' RETURN EXIT
-> > +	trap "trap - TERM ; kill 0 ; exit 2" INT TERM
-> > +	trap "rm -f ${qmp}" RETURN EXIT
-> >  =20
-> >   	# start VM stopped so we don't miss any events
-> >   	eval "$@" -chardev socket,id=3Dmon1,path=3D${qmp},server=3Don,wait=
-=3Doff \
->
-> So the point is that the "EXIT" trap wasn't executed without the "trap -=
-=20
-> TERM" in the other trap? ... ok, then your patch certainly makes sense.
+Since v2:
+- Rebase on riscv port and auxvinfo fix was merged.
+- Clean up initrd cleanup moves more commands into the new cleanup
+  function from the trap handler comands (suggested by Thomas).
+- "arch-run: Clean up temporary files properly" patch is now renamed
+  to "arch-run: Fix TRAP handler..."
+- Fix TRAP handler patch has redone changelog to be more precise about
+  the problem and including recipe to recreate it.
+- Fix TRAP handler patch reworked slightly to remove the theoretical
+  race rather than just adding a comment about it.
+- Patch 3 was missing a couple of fixes that leaked into patch 4,
+  those are moved into patch 3.
 
-Iff you don't remove the TERM handler then the kill will recursively
-invoke it until some crash. This did solve some cases of dangling temp
-files for me, although now I test with a simple script:
-
-  #!/bin/bash
-
-  trap 'echo "INT" ; kill 0 ; exit 2' INT
-  trap 'trap - TERM ; echo "TERM" ; kill 0 ; exit 2' TERM
-  trap 'echo "RETURN"' RETURN
-  trap 'echo "EXIT"' EXIT
-
-  sleep 10
-  echo "done"
-
-If you ^C it then it still doesn't get to the EXIT or RETURN handlers.
-It looks like 'kill -INT $$' might be the way to do it instad of kill 0.
-
-Not sure if that means my observation was incorrect, or if the real
-script is behaving differently. In any case, I will dig into it and
-try to explain more precisely in the changelog what it is fixing. And
-possibly do another patch for the 'kill -INT $$' if that is needed.
+I did look into doing a better job at handling timeouts in places
+where the migration script can hang (the timeout command only kills
+the qemu process, but there are other places the bash script itself
+can still timeout). There are ways it might be possible (along the
+lines of starting ( sleep N ; kill ) subshell in the backround), but
+it's very tricky to handle all the details. Existing script has
+timeout issues already, so this series doesn't add a fundamentally
+new type of problem here.
 
 Thanks,
 Nick
+
+Nicholas Piggin (8):
+  arch-run: Fix TRAP handler recursion to remove temporary files
+    properly
+  arch-run: Clean up initrd cleanup
+  migration: use a more robust way to wait for background job
+  migration: Support multiple migrations
+  arch-run: rename migration variables
+  migration: Add quiet migration support
+  Add common/ directory for architecture-independent tests
+  migration: add a migration selftest
+
+ arm/Makefile.common          |   1 +
+ arm/selftest-migration.c     |   1 +
+ arm/sieve.c                  |   2 +-
+ arm/unittests.cfg            |   6 ++
+ common/selftest-migration.c  |  34 +++++++
+ common/sieve.c               |  51 ++++++++++
+ lib/migrate.c                |  20 +++-
+ lib/migrate.h                |   2 +
+ powerpc/Makefile.common      |   1 +
+ powerpc/selftest-migration.c |   1 +
+ powerpc/unittests.cfg        |   4 +
+ riscv/sieve.c                |   2 +-
+ s390x/Makefile               |   1 +
+ s390x/selftest-migration.c   |   1 +
+ s390x/sieve.c                |   2 +-
+ s390x/unittests.cfg          |   4 +
+ scripts/arch-run.bash        | 182 ++++++++++++++++++++++++++---------
+ x86/sieve.c                  |  52 +---------
+ 18 files changed, 261 insertions(+), 106 deletions(-)
+ create mode 120000 arm/selftest-migration.c
+ create mode 100644 common/selftest-migration.c
+ create mode 100644 common/sieve.c
+ create mode 120000 powerpc/selftest-migration.c
+ create mode 120000 s390x/selftest-migration.c
+ mode change 100644 => 120000 x86/sieve.c
+
+-- 
+2.42.0
+
 
