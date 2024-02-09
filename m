@@ -1,130 +1,154 @@
-Return-Path: <kvm+bounces-8480-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8481-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDCB984FD04
-	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 20:40:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B1F784FD41
+	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 20:57:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A86CC1C25AC3
-	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 19:40:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D5201C213AE
+	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 19:57:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B084084A49;
-	Fri,  9 Feb 2024 19:40:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46A9085C65;
+	Fri,  9 Feb 2024 19:57:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YpTFkfk9"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="LZhlomEb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65E1B8287F
-	for <kvm@vger.kernel.org>; Fri,  9 Feb 2024 19:40:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE7FD84A50;
+	Fri,  9 Feb 2024 19:57:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707507615; cv=none; b=YOFpTRoRQqCXxhJEP6Z5eFp6w23FoN4V4yHrLGav6Mid1cZUWGGOn8+sh8uxPVsc/1y4NAOPlVHkODrperiZ+P7IQETedShoTeh+ZffaTJnLlxjcGIXtZ+/zCjAlqTvcH8m9VJwncoAVs6o5NE/+2H3y0YSh7PZZ9Nr+Z5hgZk0=
+	t=1707508663; cv=none; b=hVFEhc6c6abapdFPOwjIvRVdRYAT2fa7JCwkOZLDEKDcA0Av/89NlzKlbyNOX6/WIiAApB+Mds/lBNjHfZreaKoWddrpc1iYp+Ffx0M9dcw8zZ8V3qd3r7dXb4VRDhCaE3BX/4bgy8GLIcoHx4FpytU0mC4CMrlODBDJpwxbCP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707507615; c=relaxed/simple;
-	bh=6PPQOnkkIeCfd/CHcSpaIXnSwRon/6R8zai/0r9L2sA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=qTJNL7PJre4DxJG956Y4n/mG4FJxeefP7i0Ur8ilf/GDRHODcT6k8L82eNAYa/OM2Bjd8wFw7c2ujJJX6ORtxdsj+KfMFvB65EkkhIbK9HDs3FyicbTZ8PinnC+3fU3+em9eebzOXqvMGkzgob1rJT2+lG3S9M36UETLAYcxce4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YpTFkfk9; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5cf2714e392so1308209a12.0
-        for <kvm@vger.kernel.org>; Fri, 09 Feb 2024 11:40:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707507613; x=1708112413; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=17oyzkB4xEUSVt+DktGPEZwkZ62rQj4myNkqahQjvb0=;
-        b=YpTFkfk9LE7LjXC30X+m/dcf4SKqGoSU+mC6LyKn1tjdv+XBKoYvYjgpoKb4vV6p+j
-         CAS6wv2BB5TK61nxl/bL6QeqUIrLgTZiR+fA+v7FOHln4NSm7i57XlbT//4IGFMF2Cs7
-         q+y83+WhAgqeCRN81P/7DUSoZtod1uDmoQgLuH5+/0igKR6cUc8kVXrLWOKlodhRcpPs
-         CESUlWlbqxp0qye6JpI/RfHjx/7Cz1SE3bg2fHvqdH/nZrTMITgOUkJPdTYomMLXrym7
-         IDnGRPR14om7MR0asbiMnJZba9Lv+a3rVvYG9UQDI7IVVRMXEbiqxPPRw7C7G/A840HM
-         LC+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707507613; x=1708112413;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=17oyzkB4xEUSVt+DktGPEZwkZ62rQj4myNkqahQjvb0=;
-        b=vdR/l0y/sjmb1EJ2/L7uADBx2Q0OV2JLbo5Bet9CLecj/gd3nX7N3Rp1lkD0vv6ibP
-         568+7HgC5m3bzGndNJ//BCKNuB7BDkZGrkXEr9AY1RnsMIBnaTjS7GCheYziy/qrFY2H
-         bjgBMWWCsI5ARZBTOfZByc4k1Tvp2XVcbCDl7vfcmSwTQzb/R8MbX+hTjkyEPdhVmHgj
-         dbrkyIiiExANJxOGL+dlQAoZNGMJLMW4ZVAnCZSvUjeh1SXOjTn23U0V/dtdb6E8PDAs
-         JAdDiZ17qPkKXpBeg8FG5obamI+zIYSxDeOb4z9GYHenub5+oEq6n1jBkw27nk/bQ2QH
-         34og==
-X-Gm-Message-State: AOJu0YzGL6gN/IoRE7/oXUyYy9TuBcv+SlWpGfZbvTSxYhbyGikxJB29
-	TqDDR3CZvC6QIqJVW3o0PBevwNIOPijX2HcD6lfd/yDsXVQimkhNEFd1NijEoLX5CyyCH42R2my
-	apQ==
-X-Google-Smtp-Source: AGHT+IEYqMT0SNTbGkgjXf0EJatqk8P6yv7iLn+6PgeWuWGZqraP/01ea/W8koFFPXxmnm6TihXTMgnPpMY=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a02:305:b0:5dc:19c9:d794 with SMTP id
- bn5-20020a056a02030500b005dc19c9d794mr1603pgb.0.1707507613300; Fri, 09 Feb
- 2024 11:40:13 -0800 (PST)
-Date: Fri, 9 Feb 2024 11:40:11 -0800
-In-Reply-To: <20240209183743.22030-1-pbonzini@redhat.com>
+	s=arc-20240116; t=1707508663; c=relaxed/simple;
+	bh=FsBb6B2wa3yPeH8I5VZIx7o8owuEkmIHTsHqHQ3wjh8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=q16lB/0iSY+SypJs8tHR7i5LgviB2YEnil3V5G0YFq/626kryYJpz+Bmj1QTYyszDGIj+1ELf7XjbJPOi0vVGoI4i5OoQfcLuct7rr2mR3Rapjqcr3qOHzKvww2t5KMQ8F/AU1GqS/JhBbs7R5ZpB87YSsv0QLSex+d9e701pO8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=LZhlomEb; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 5335A40E01A9;
+	Fri,  9 Feb 2024 19:57:37 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id TgbeWiLRVUwY; Fri,  9 Feb 2024 19:57:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1707508655; bh=iW9U2ooZEMeuKAa64COmmNOJFLMhQU+pVbKHtxLkfFs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LZhlomEbisqMj5X32Kwmu9a8PaI36q6p5jqAhfQGt8XkrpJPf51+8difz1IKJXdrv
+	 YdxoRIF/M1FwKldOPRYPvvrFMRzL93G4TlSlYisfT4w3tpHsn9wFi42EKPEqpU8x8z
+	 kKch9DkqJOccxKa05NN1BS83qWzwSzGz/0UBt0i+gBS2WfoG2sVObiW68EQEw7ovQd
+	 wNIYlC43Y3SVuFwNtcHYpitYgRl4i7KO/NGlbmQCpOTqxVXOH1mRQyVhswj67/rkzr
+	 +7q3n3awhX/obCg9N7IEJZJzC13o+O1BDwlOeDBLtTT5AjiWai+pfyx208vwGoAPrE
+	 BIiLI8Oi4xbTZOVCAffjpiT6v+XxTg9SPR4o+NWhqx0AjXgTWXLa0/OXIJlCrpgkUR
+	 pF5za3LKbelxUOR6iDM/XuUafFZPa4equKzoQeWz1gj0EDuhMTRd1wGL8iFyQAd9df
+	 lRcIY0Cfy3Fso6G4qVh/ibzBr8V99IuvfvWhLe9EzZU6Z6dHT67bfTIv142HaXwHCG
+	 QFyS98U9Rk36GjFo42q3gtU2dll+qY0+3R+GFs+V1VxCVJq/wE8t4PFOxgAZnha1wA
+	 EJ8aPA4Ec9t1e/Y8gU+MoKIGztEv5TzcDBjULbkn7j/0iQOdk5LtxvlzRoUPT6Pud2
+	 sQN5X+c0BkZkfhvnCGrlS9lA=
+Received: from zn.tnic (pd953021b.dip0.t-ipconnect.de [217.83.2.27])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id B234E40E016D;
+	Fri,  9 Feb 2024 19:57:09 +0000 (UTC)
+Date: Fri, 9 Feb 2024 20:57:04 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Andy Lutomirski <luto@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, tony.luck@intel.com,
+	ak@linux.intel.com, tim.c.chen@linux.intel.com,
+	Andrew Cooper <andrew.cooper3@citrix.com>,
+	Nikolay Borisov <nik.borisov@suse.com>,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	kvm@vger.kernel.org,
+	Alyssa Milburn <alyssa.milburn@linux.intel.com>,
+	Daniel Sneddon <daniel.sneddon@linux.intel.com>,
+	antonio.gomez.iglesias@linux.intel.com,
+	Alyssa Milburn <alyssa.milburn@intel.com>, stable@kernel.org
+Subject: Re: [PATCH  v7 1/6] x86/bugs: Add asm helpers for executing VERW
+Message-ID: <20240209195704.GEZcaDkMUR560qafaI@fat_crate.local>
+References: <20240204-delay-verw-v7-0-59be2d704cb2@linux.intel.com>
+ <20240204-delay-verw-v7-1-59be2d704cb2@linux.intel.com>
+ <20240209172843.GUZcZgy7EktXgKZQoc@fat_crate.local>
+ <20240209190602.skqahxhgbdc5b2ax@desk>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240209183743.22030-1-pbonzini@redhat.com>
-Message-ID: <ZcZ_m5By49jsKNXn@google.com>
-Subject: Re: [PATCH 00/10] KVM: SEV: allow customizing VMSA features
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, michael.roth@amd.com, 
-	aik@amd.com, isaku.yamahata@intel.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240209190602.skqahxhgbdc5b2ax@desk>
 
-On Fri, Feb 09, 2024, Paolo Bonzini wrote:
-> The idea that no parameter would ever be necessary when enabling SEV or
-> SEV-ES for a VM was decidedly optimistic.
+On Fri, Feb 09, 2024 at 11:06:02AM -0800, Pawan Gupta wrote:
+> (Though, there was a comment on avoiding the macro alltogether, to which
+> I replied that it complicates 32-bit.)
 
-That implies there was a conscious decision regarding the uAPI.  AFAICT, all of
-the SEV uAPIs are direct reflections of the PSP invocations.  Which is why I'm
-being so draconian about the SNP uAPIs; this time around, we need to actually
-design something.
+Hmm, so this seems to build the respective entry_{32,64}.S TUs fine:
 
-> The first source of variability that was encountered is the desired set of
-> VMSA features, as that affects the measurement of the VM's initial state and
-> cannot be changed arbitrarily by the hypervisor.
-> 
-> This series adds all the APIs that are needed to customize the features,
-> with room for future enhancements:
-> 
-> - a new /dev/kvm device attribute to retrieve the set of supported
->   features (right now, only debug swap)
-> 
-> - a new sub-operation for KVM_MEM_ENCRYPT_OP that can take a struct,
->   replacing the existing KVM_SEV_INIT and KVM_SEV_ES_INIT
-> 
-> It then puts the new op to work by including the VMSA features as a field
-> of the The existing KVM_SEV_INIT and KVM_SEV_ES_INIT use the full set of
-> supported VMSA features for backwards compatibility; but I am considering
-> also making them use zero as the feature mask, and will gladly adjust the
-> patches if so requested.
+---
+diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
+index e81cabcb758f..7d1e5fe66495 100644
+--- a/arch/x86/include/asm/nospec-branch.h
++++ b/arch/x86/include/asm/nospec-branch.h
+@@ -313,12 +313,9 @@
+  *
+  * Note: Only the memory operand variant of VERW clears the CPU buffers.
+  */
+-.macro EXEC_VERW
+-	verw _ASM_RIP(mds_verw_sel)
+-.endm
+ 
+ .macro CLEAR_CPU_BUFFERS
+-	ALTERNATIVE "", __stringify(EXEC_VERW), X86_FEATURE_CLEAR_CPU_BUF
++	ALTERNATIVE "",  __stringify(verw _ASM_RIP(mds_verw_sel)), X86_FEATURE_CLEAR_CPU_BUF
+ .endm
+ 
+ #else /* __ASSEMBLY__ */
+---
 
-Rather than add a new KVM_MEMORY_ENCRYPT_OP, I think we should go for broke and
-start building the generic set of "protected VM" APIs.  E.g. TDX wants to add
-KVM_TDX_INIT_VM, and I'm guessing ARM needs similar functionality.  And AFAIK,
-every technology follows an INIT => ADD (MEASURE) * N => FINALIZE type sequence.
+and looking at the asm:
 
-If need be, I would rather have a massive union, a la kvm_run, to hold the vendor
-specific bits than end up with sub-sub-ioctls and every vendor implementation
-reinventing the wheel.
+64-bit:
 
-If it's sane and feasible for userspace, maybe even KVM_CREATE_VM2?
+# 317 "./arch/x86/include/asm/nospec-branch.h"
+.macro CLEAR_CPU_BUFFERS
+ ALTERNATIVE "", "verw mds_verw_sel (% rip)", ( 3*32+18)
+.endm
 
-> In order to avoid creating *two* new KVM_MEM_ENCRYPT_OPs, I decided that
-> I could as well make SEV and SEV-ES use VM types.  And then, why not make
-> a SEV-ES VM, when created with the new VM type instead of KVM_SEV_ES_INIT,
-> reject KVM_GET_REGS/KVM_SET_REGS and friends on the vCPU file descriptor
-> once the VMSA has been encrypted...  Which is how the API should have
-> always behaved.
+  23:   0f 00 2d 00 00 00 00    verw   0x0(%rip)        # 2a <.altinstr_replacement+0x2a>
 
-+1000
+32-bit:
+
+.macro CLEAR_CPU_BUFFERS
+ ALTERNATIVE "", "verw mds_verw_sel", ( 3*32+18)
+.endm
+
+ 13d:   0f 00 2d 00 00 00 00    verw   0x0
+
+it makes sense.
+
+So what complications do you mean?
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
