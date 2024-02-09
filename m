@@ -1,81 +1,80 @@
-Return-Path: <kvm+bounces-8407-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8408-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FC0684F159
-	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 09:28:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED23584F15D
+	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 09:29:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7A9E0B2298C
-	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 08:28:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A55EC28494D
+	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 08:29:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E03AF65BDE;
-	Fri,  9 Feb 2024 08:28:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05B1265BC6;
+	Fri,  9 Feb 2024 08:29:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BJJ1KyiO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f6RLnSIU"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B3898493
-	for <kvm@vger.kernel.org>; Fri,  9 Feb 2024 08:28:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C008065BB6
+	for <kvm@vger.kernel.org>; Fri,  9 Feb 2024 08:29:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707467310; cv=none; b=jYkr6GaKFmPWR4+d9AkdGQ7OKEI70sTRzZizCxH3kWKsDsAhmlIgZ7kT+4dRyKOUxjGgYaQqYUjYSh7TEUW5plwJjR6nkblofCnZPAnmh7yzzLIEPdmvNdfI1SjXfH1Wow399qp/7FoYRCnjsRS5ZoQIouZzKuSHSD7UApFXdaE=
+	t=1707467355; cv=none; b=nuDknHMmeTUWwMcezcY0I5JveJaWFkivxpORCxtn9Wt1Y8auI07ufmM7zxfLA5TM89ech+xWG86wFIEgWOZ2iQyKprSHBWEJhSNcT73PA1nzV47awfn7TxZ0LqrfRPwFa4t2gl0xa8R8SbG+Yu1rCmGTtLVkBpOiBlmMensd4Pk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707467310; c=relaxed/simple;
-	bh=3HreAf3C7WSTTW6o9UNHFC8JLdzrORRUrztXIvGrHdY=;
+	s=arc-20240116; t=1707467355; c=relaxed/simple;
+	bh=ar3mqjsIdbZN/oexSyU52xoSyOoZGf+sKohPZbfTlAA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oCmzMWSy+8p+ni/Ot47lR3iDqHy61OyAAIO9pcU50iRg2oJhrkTUnX4K9x3B12OMEAIebTcmsBl//Pd29wxszz+sVd7baRRs9+62ee/4Cd9X5MvYItxDycTz/3vi+n6EHKCDzgCP8sNMyU6e5yGIl7NUXZWPptKMDHcs4JOP9VE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BJJ1KyiO; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=oPjBz8ofQS/TmvmL9oUnqYJTZjxlOwU2KcvpQ/iISWiAuJGfaEmyQ1OSGbHPgKCvT5d3BcSE4W/bSOmb5t3gVjXvL43grC9BVLbgHttzbu+JzBRRyKuuS9s3qABAJSZKYBnRax5yvMgZYFjDzop20RI9+WUk42WU2NojRB1C+4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f6RLnSIU; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707467307;
+	s=mimecast20190719; t=1707467352;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=lSIosa7H9Vqr6g6wkjLttbFme+deNKcmttLyp+MsKjU=;
-	b=BJJ1KyiOg9hBpniBEZQeJppk5yBbhCX9ehCoZI4qIuEzyXJzZiwezAwovdDR9vG/TfzxDf
-	gZG/IosvtcINhhT8wvcZSP3ewCCZyjJiCtf7SB/gorU3h9kBI3VLgZFR4tswPJ/QsAIBBU
-	EdZbwjdcupb6fA+IkSdmCdZt7ZLMaJU=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=CYwym9bcvYVUdfgrQAx0w53qMrol8jdhzpg8cj+Mxlw=;
+	b=f6RLnSIUZXPCicCL7NMAW/GI6ESbHad1Kd2QxdqlXujdhw8uZbIEtexv5R6Rxbl7tRk6UE
+	TDhl6ugoTYe7pRjBaZo0GFUvQaunNDrM0s4VkkgVbYnE6rNV1ZC7HMyx1RfcQpLQH8Uec4
+	NowQTyOtPq8baIod4oRPmycsczudrLQ=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-180-iC1QLjrSN0-cM73u5Yfy8A-1; Fri, 09 Feb 2024 03:28:25 -0500
-X-MC-Unique: iC1QLjrSN0-cM73u5Yfy8A-1
-Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-5116d7eb706so615447e87.1
-        for <kvm@vger.kernel.org>; Fri, 09 Feb 2024 00:28:25 -0800 (PST)
+ us-mta-509-aA_SdjQvNy24RZ7rtloAOw-1; Fri, 09 Feb 2024 03:29:10 -0500
+X-MC-Unique: aA_SdjQvNy24RZ7rtloAOw-1
+Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2d0d1cafe68so6434881fa.0
+        for <kvm@vger.kernel.org>; Fri, 09 Feb 2024 00:29:09 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707467304; x=1708072104;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lSIosa7H9Vqr6g6wkjLttbFme+deNKcmttLyp+MsKjU=;
-        b=PCEFzxY8HizRU2j6Q9BJGnb8qV4JQGX2f2HTmfh8VKeUVAvGGysrbTF2ga12VJDXfx
-         50zo3n2PIw39F19azpQ9LH/dcXgLcspbW2QhdBGj0Y8XWBgoMW7WpRyrqmTOwL0/Bx1B
-         ZpUd1JbDYM3/TxRT/drV5ZBapqT5qMvOwefvUt9o++DtP0IJz/9ELF05aQySkDxE5ZcX
-         aWao3lKnnEOo275sSeb2Um906tXxEBhQVGaow61PGyu9vE5XYU7JG6ew9n5MoOhxHfTo
-         /VEKuTazbj0+RMbVHX9bzNbGKsJyw16ifkL1eQw7jDLyorm0V5uyZDfmk5PNYhynhvpM
-         mbNg==
-X-Gm-Message-State: AOJu0YzM3yOE88un1IMM2JQKRFE0c/OnR5H7VwnJaiO2xbJZsvbdOEAr
-	51cHun0/duS3Sssnycc9Ylp7SzrK6XZsw8QD3FmKeP1+R7SupROfMXypKr3Icrzlkl2o3bMebwN
-	RPDeK0NfexRYRdY+mp/HBcIwRuibm4BvACvrDjW01R+H0izVbYA==
-X-Received: by 2002:a19:8c50:0:b0:511:5361:20df with SMTP id i16-20020a198c50000000b00511536120dfmr532243lfj.13.1707467304489;
-        Fri, 09 Feb 2024 00:28:24 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH4iC+FRipMyVJYsUFGfBqVSr7OvTucmAa52sfLjON5ya4vVilp+U93Cecd2K9MevakvwHq5Q==
-X-Received: by 2002:a19:8c50:0:b0:511:5361:20df with SMTP id i16-20020a198c50000000b00511536120dfmr532225lfj.13.1707467304116;
-        Fri, 09 Feb 2024 00:28:24 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVltiJ29BtpoUYrPf1SZB45utAeCwTbqwI56ds2Aa8EuZgPms0LwddB+C5/ltorHPajgsPjWHznwdj56pQ6nu24/cSU0eXH1BGFKlLpjR6rvBc3CaDz7fawO3HG0y/7Gj1kRsXQceUY8H9DTHj7+R44o5x/+wAiDlcMMgMVxyLdLPEAfjjAlfUUxE++n5R8EJIaBBcUd/sybg4tB7HpCx0xfR7A3QZtmcA4CGK+PO2aZ3a4C3MTk7GaNjIS70jqUB8QQi/QEZtTvXyQPH2SeBlVAk3amng9fA+1lWXwUoI8AxAXRBESY/XUYLDZ8hU2RQuaRJyEuWMq21JPhPOlKlAvy0qf8iePnq2dDkTWjkRgl9+vU2u0DhldVHMj2B3GnDXN84fFK6s9RaZwI3YbGQeghRctNDpy3xzctkbPneerKo1h0eN4mdodAM7NkNUCmR5Z9nBofp5yuUCaQgVQg4gzECnx0ypTC+kVRzZq9/hWL3AcB68IavYtB4tow7DLo1gLXWRDd9TcE1hYecDqA1g4uLor
+        d=1e100.net; s=20230601; t=1707467349; x=1708072149;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CYwym9bcvYVUdfgrQAx0w53qMrol8jdhzpg8cj+Mxlw=;
+        b=eLTdlgrHvJArpr8AE8dzx8Y2nDUsgoGlIUSdNFh1FJZblpK6BThT2ubDhJfIrStBHG
+         MuHfI3cm4zkTZr0YLE/F8FknjOThV2BfGE3hSakrMa+jS14Az+KgnfxywERg4GQTPclM
+         n/RyrAlUB37AqBECJydJD+CIv+g1+n00Ru956S/tO4lDfHYU9diCNBvx8yPkPkukD2vZ
+         Xdb+ZsBaN2IneklYkt1//Av7ReyYCG5MugecJ3FxO03dUeU3ggvYsLdaQY1UMv+hR7HZ
+         XngK2BH/xhrq04c1n79L9w9Zhw1GjFMXyXM3nieZEH3q5lSFddJEpBRPo/JtpQsSTF6B
+         fXFw==
+X-Gm-Message-State: AOJu0YxYPuPUSmAqS/tw/VoHnocSuUsz1/eAjtAPlVN63s/DnM/LmRD5
+	iSHyTZ1szF6PKwrEHeNRzZgED22PNwaaoadWlKZBE3mrwoueWR5KAKLdMFDz37dedSmQpWPkBD8
+	bIjSgQlQ/xEGPrBuqKvulW4T8fkNVvHb1JssFjC/fJmK9ESC+Vg==
+X-Received: by 2002:a05:6512:308e:b0:511:4a3c:bc67 with SMTP id z14-20020a056512308e00b005114a3cbc67mr667558lfd.9.1707467348817;
+        Fri, 09 Feb 2024 00:29:08 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGwQzReLeDNTCJB+qOG+onzJW+a/6xHFTd6Il5yE+rs5dotq6oI7ml/IRzP9nwb4WRCRf2AHg==
+X-Received: by 2002:a05:6512:308e:b0:511:4a3c:bc67 with SMTP id z14-20020a056512308e00b005114a3cbc67mr667543lfd.9.1707467348491;
+        Fri, 09 Feb 2024 00:29:08 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVpQeKhZnUF9IF482WFoi5RSuK2K0dPm/viY5gZvvdBGW8PlAajaezs2kgDI06usWdUXLoRirtPMouC6vzNVLm1ebJIWnLWDLZ0GEN+Ijk5unz/HqQMvORGDIXXL3Dtf+prelx+pNyvYgYqYusGnquqaTXZA7QhS6HkQap6Y42pIVEN3/EQmJy7vAJs2JpmpxDIiPxkRPxrVbsmZSVnuPOwCDkwsek/pGDlArNd6Bhx7ExRfGSaMOQ2ipZnPHh4xKDAKmuDjNtcq0sQclTvVZDBpof/gkZtZFbDZHPz4rmJ1ciKFyS3O6Q898x0YkZAk2y+sY3IzMbJvaRgk+otdK75cu7gdEwEl57Q4sWFImYaPJDLS4LbMQtxErNNwect2IH8XoJ7esHEcOsAFRZwxa5aVSJRog7z8LtqPN/lXwq8u0iG8XVW+VdnuP/432M3PyFw2p8MGpGvbbSILN0vtIlZUve5ulCwIGBluVrh3YxuLzmOOdbG19SRLy0gaYXvLczv3TncY87RBF6BZarBaQ6IX1OF
 Received: from [192.168.0.9] (ip-109-43-177-145.web.vodafone.de. [109.43.177.145])
-        by smtp.gmail.com with ESMTPSA id x21-20020ac24895000000b00511749fec62sm90472lfc.72.2024.02.09.00.28.22
+        by smtp.gmail.com with ESMTPSA id x21-20020ac24895000000b00511749fec62sm90472lfc.72.2024.02.09.00.29.05
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 09 Feb 2024 00:28:23 -0800 (PST)
-Message-ID: <cf01bf0c-ad31-4bb8-918f-98de47d40d7d@redhat.com>
-Date: Fri, 9 Feb 2024 09:28:21 +0100
+        Fri, 09 Feb 2024 00:29:07 -0800 (PST)
+Message-ID: <92633259-1a46-4342-a709-7200c6d215ab@redhat.com>
+Date: Fri, 9 Feb 2024 09:29:05 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,8 +82,9 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v3 5/8] arch-run: rename migration
- variables
+Subject: Re: [kvm-unit-tests PATCH v3 7/8] Add common/ directory for
+ architecture-independent tests
+Content-Language: en-US
 To: Nicholas Piggin <npiggin@gmail.com>
 Cc: kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>,
  Shaoqin Huang <shahuang@redhat.com>, Andrew Jones <andrew.jones@linux.dev>,
@@ -97,8 +97,7 @@ Cc: kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>,
  linux-s390@vger.kernel.org, kvmarm@lists.linux.dev,
  kvm-riscv@lists.infradead.org
 References: <20240209070141.421569-1-npiggin@gmail.com>
- <20240209070141.421569-6-npiggin@gmail.com>
-Content-Language: en-US
+ <20240209070141.421569-8-npiggin@gmail.com>
 From: Thomas Huth <thuth@redhat.com>
 Autocrypt: addr=thuth@redhat.com; keydata=
  xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
@@ -142,21 +141,27 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20240209070141.421569-6-npiggin@gmail.com>
+In-Reply-To: <20240209070141.421569-8-npiggin@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 09/02/2024 08.01, Nicholas Piggin wrote:
-> Using 1 and 2 for source and destination is confusing, particularly
-> now with multiple migrations that flip between them. Do a rename
-> pass to tidy things up.
+> x86/sieve.c is used by s390x, arm, and riscv via symbolic link. Make a
+> new directory common/ for architecture-independent tests and move
+> sieve.c here.
 > 
 > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 > ---
->   scripts/arch-run.bash | 115 +++++++++++++++++++++---------------------
->   1 file changed, 58 insertions(+), 57 deletions(-)
+>   arm/sieve.c    |  2 +-
+>   common/sieve.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++
+>   riscv/sieve.c  |  2 +-
+>   s390x/sieve.c  |  2 +-
+>   x86/sieve.c    | 52 +-------------------------------------------------
+>   5 files changed, 55 insertions(+), 54 deletions(-)
+>   create mode 100644 common/sieve.c
+>   mode change 100644 => 120000 x86/sieve.c
 
 
-Acked-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
 
