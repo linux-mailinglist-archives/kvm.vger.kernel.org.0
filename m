@@ -1,154 +1,186 @@
-Return-Path: <kvm+bounces-8481-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8482-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B1F784FD41
-	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 20:57:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF00984FD97
+	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 21:31:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D5201C213AE
-	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 19:57:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70582287D03
+	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 20:31:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46A9085C65;
-	Fri,  9 Feb 2024 19:57:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBB53611E;
+	Fri,  9 Feb 2024 20:31:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="LZhlomEb"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="lwDhLP6K"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE7FD84A50;
-	Fri,  9 Feb 2024 19:57:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDC315673
+	for <kvm@vger.kernel.org>; Fri,  9 Feb 2024 20:31:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707508663; cv=none; b=hVFEhc6c6abapdFPOwjIvRVdRYAT2fa7JCwkOZLDEKDcA0Av/89NlzKlbyNOX6/WIiAApB+Mds/lBNjHfZreaKoWddrpc1iYp+Ffx0M9dcw8zZ8V3qd3r7dXb4VRDhCaE3BX/4bgy8GLIcoHx4FpytU0mC4CMrlODBDJpwxbCP0=
+	t=1707510682; cv=none; b=ekjKyejcwlcy/+bvHb100k+j2pCH/S8jWXtZNenJ+bNo2DwV9PgflkTe7Hm9i2SIyxNx2i0NIgRAJPuyPui9gjBiFQaXZj5tytVMzbcnO9duv1p/k9vMjQBoq0hEhg26kiTjsNKqssqPFRRqZPICV4kRFtl/O4RnjBiifPXzBj0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707508663; c=relaxed/simple;
-	bh=FsBb6B2wa3yPeH8I5VZIx7o8owuEkmIHTsHqHQ3wjh8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q16lB/0iSY+SypJs8tHR7i5LgviB2YEnil3V5G0YFq/626kryYJpz+Bmj1QTYyszDGIj+1ELf7XjbJPOi0vVGoI4i5OoQfcLuct7rr2mR3Rapjqcr3qOHzKvww2t5KMQ8F/AU1GqS/JhBbs7R5ZpB87YSsv0QLSex+d9e701pO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=LZhlomEb; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 5335A40E01A9;
-	Fri,  9 Feb 2024 19:57:37 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id TgbeWiLRVUwY; Fri,  9 Feb 2024 19:57:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1707508655; bh=iW9U2ooZEMeuKAa64COmmNOJFLMhQU+pVbKHtxLkfFs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LZhlomEbisqMj5X32Kwmu9a8PaI36q6p5jqAhfQGt8XkrpJPf51+8difz1IKJXdrv
-	 YdxoRIF/M1FwKldOPRYPvvrFMRzL93G4TlSlYisfT4w3tpHsn9wFi42EKPEqpU8x8z
-	 kKch9DkqJOccxKa05NN1BS83qWzwSzGz/0UBt0i+gBS2WfoG2sVObiW68EQEw7ovQd
-	 wNIYlC43Y3SVuFwNtcHYpitYgRl4i7KO/NGlbmQCpOTqxVXOH1mRQyVhswj67/rkzr
-	 +7q3n3awhX/obCg9N7IEJZJzC13o+O1BDwlOeDBLtTT5AjiWai+pfyx208vwGoAPrE
-	 BIiLI8Oi4xbTZOVCAffjpiT6v+XxTg9SPR4o+NWhqx0AjXgTWXLa0/OXIJlCrpgkUR
-	 pF5za3LKbelxUOR6iDM/XuUafFZPa4equKzoQeWz1gj0EDuhMTRd1wGL8iFyQAd9df
-	 lRcIY0Cfy3Fso6G4qVh/ibzBr8V99IuvfvWhLe9EzZU6Z6dHT67bfTIv142HaXwHCG
-	 QFyS98U9Rk36GjFo42q3gtU2dll+qY0+3R+GFs+V1VxCVJq/wE8t4PFOxgAZnha1wA
-	 EJ8aPA4Ec9t1e/Y8gU+MoKIGztEv5TzcDBjULbkn7j/0iQOdk5LtxvlzRoUPT6Pud2
-	 sQN5X+c0BkZkfhvnCGrlS9lA=
-Received: from zn.tnic (pd953021b.dip0.t-ipconnect.de [217.83.2.27])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id B234E40E016D;
-	Fri,  9 Feb 2024 19:57:09 +0000 (UTC)
-Date: Fri, 9 Feb 2024 20:57:04 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Andy Lutomirski <luto@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, tony.luck@intel.com,
-	ak@linux.intel.com, tim.c.chen@linux.intel.com,
-	Andrew Cooper <andrew.cooper3@citrix.com>,
-	Nikolay Borisov <nik.borisov@suse.com>,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	kvm@vger.kernel.org,
-	Alyssa Milburn <alyssa.milburn@linux.intel.com>,
-	Daniel Sneddon <daniel.sneddon@linux.intel.com>,
-	antonio.gomez.iglesias@linux.intel.com,
-	Alyssa Milburn <alyssa.milburn@intel.com>, stable@kernel.org
-Subject: Re: [PATCH  v7 1/6] x86/bugs: Add asm helpers for executing VERW
-Message-ID: <20240209195704.GEZcaDkMUR560qafaI@fat_crate.local>
-References: <20240204-delay-verw-v7-0-59be2d704cb2@linux.intel.com>
- <20240204-delay-verw-v7-1-59be2d704cb2@linux.intel.com>
- <20240209172843.GUZcZgy7EktXgKZQoc@fat_crate.local>
- <20240209190602.skqahxhgbdc5b2ax@desk>
+	s=arc-20240116; t=1707510682; c=relaxed/simple;
+	bh=jtlLdqT7JxvhfFw+24KTD5ocDWh9zjIw61lTQPuBtQU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bzWzt4LeiASaz36o4+8rIBnlQQ82ERRySUPCLquje6caOrw/j+PfY+DmMrG33LPwdxUM5rnbL25t9MKbNs4tMk9FNvfD6z9t+l8WArRbjbO9RDYP+vRN42knY/tXvIcB4ayKqzYz5DP0nNU/5/JvtGCeYt7J74VeE5yvyLDQwWo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=lwDhLP6K; arc=none smtp.client-ip=209.85.166.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-7bf3283c18dso14731839f.0
+        for <kvm@vger.kernel.org>; Fri, 09 Feb 2024 12:31:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1707510679; x=1708115479; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=O2KY1VYsqophcwtt4/SkR/t54NG5tkSwXfgubEbyghk=;
+        b=lwDhLP6KHkVT3YJcxK1mNRY2oOqyMAPb71CHyiIZOXLn7aFwtxVp13GuJOegPr+ueP
+         Ok6rY7/tsLQHamp59taTVQhhfjIu6ybqlfCKCuAPT37c/lEFD9Jsm/4ttUSUoQl4DzV7
+         JHfLpxkN6MVcuhCU9gUcbWaCtij6/aCNxLyKSVxsDoA9FZ6wR8MXLv6Rve9l0kUDyLTK
+         NL/IlwAdVO9G9Wpj+7HA+jlW80OY3LViChzrz9P85Y0rqn55h2kVMBfJoGLsaV14F5Lr
+         AOAucWQDy2QBkfPqwMUzwCT37WWZbS1or/tSWYTTrTCkRpB0a+l73yLN21DFSm/JRuaB
+         di2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707510679; x=1708115479;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=O2KY1VYsqophcwtt4/SkR/t54NG5tkSwXfgubEbyghk=;
+        b=rweyvNpaP1RYnKj+hqN0JTqqa7eHdrMv5rb68dveOVdpptB0VvHvvH0g9cwPcvj9ol
+         1aCY+eGNfPm8DyNB9MGWEtuoX9tr1B5DEQ7vPW3XyPrrhaV9x0gxF5sZvkwCXe8y+8rn
+         O05iqxmK0HW3hJLGlWtrIEh7eXabOTL2uQsQFi8U/exqexGWYylKBwLeqBznZKzF3PAn
+         bpWmmJ5Z0uz3qaCDOI7pqU2wCG1hN8gRBvc9Yok5mhUiIRGZqZnKqaX5qHZ7Nc+OHHkV
+         b93PRXMmxBoJqwRLevO2dW9Rul5tp7KlWN0kqCdLRjIRoElpKhZ4RbFQun/9NnBCa0Bb
+         st6A==
+X-Forwarded-Encrypted: i=1; AJvYcCXq1vrLWAJpav8qxrMm1+n8vSNoshM9SauU1rup2wJ9L5RDGRTSFcBY+JgqzkP5SVRVoaomJElnOSkVIWFFQK2SSSAD
+X-Gm-Message-State: AOJu0YwV+JB14QCLepzbralJqRElaFv6t8Sw9B/dFosNo/Dbc0dVif8V
+	61jMdT2Jqi9UgYvvxjt6R+O01hO0KWYmqo+ByMWgi0vBJ32Zm1AEjbJ6cRLc/T4=
+X-Google-Smtp-Source: AGHT+IHcDmXuHAkGrM0JU+hJKxb+Mr26Xk4UsUGJPp6H3XHnx79km1fA7r4jshGN4U8romr1XVv5uQ==
+X-Received: by 2002:a5e:c706:0:b0:7c4:3a7e:ccc with SMTP id f6-20020a5ec706000000b007c43a7e0cccmr555511iop.0.1707510679074;
+        Fri, 09 Feb 2024 12:31:19 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCU032Qk23ZO/SpfO9usp9xETVY6Y0LyvDwtcN9rGuAyd7wQ/bi9wtDDm4s8ZTW2T4bmdxoYdm9BaB0pS6JYTm6GJBpbNLZP0k9cMSFt7liNpVESHJxcDYLXh1iC6JDSgIZl79LSrrfG9SdKprmMTmcWCtRZN9Ly2oLL7Agb7qCKs/pjs2mH8SIsJthVL5PmPaQfTgKInH6BR3ccaFX62zUiAPzpd7CYB0/RK1VIkCVhhWnAks/BdOKPkIn+xrOyAHWhPPsuiPzMnx1GRNQ9M3VaTVsmADK244Uit0oAMayI2pjE9B0CmCBBfF574vXOnNPntEfKXgDAiElTroarmYfvOHyPjmK2gXCXNsOF2Zi7pH4oKqHHLuMVv7PQyAFTXrlltF90a9QJtnJvMQIgm0LXAywby8u0Fi6I2UiWrOJBANOZdlAseUaI4rr/k4cKaqMqE4CKO4ASh78GAjv56xPINNwRCTcL/0G7wA9svgzA62cMZJny7S1/vDAcLGrHKFJSaLo0jLBkGDEyD/Oy5MDEiyFvBfwwmMRPAQ==
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id p18-20020a5d9852000000b007c408b504f9sm24837ios.50.2024.02.09.12.31.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 09 Feb 2024 12:31:18 -0800 (PST)
+Message-ID: <9285b29c-6556-46db-b0bb-7a85ad40d725@kernel.dk>
+Date: Fri, 9 Feb 2024 13:31:17 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240209190602.skqahxhgbdc5b2ax@desk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 00/15] Coalesced Interrupt Delivery with posted MSI
+Content-Language: en-US
+To: Jacob Pan <jacob.jun.pan@linux.intel.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, X86 Kernel <x86@kernel.org>,
+ Peter Zijlstra <peterz@infradead.org>, iommu@lists.linux.dev,
+ Thomas Gleixner <tglx@linutronix.de>, Lu Baolu <baolu.lu@linux.intel.com>,
+ kvm@vger.kernel.org, Dave Hansen <dave.hansen@intel.com>,
+ Joerg Roedel <joro@8bytes.org>, "H. Peter Anvin" <hpa@zytor.com>,
+ Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
+ Paul Luse <paul.e.luse@intel.com>, Dan Williams <dan.j.williams@intel.com>,
+ Raj Ashok <ashok.raj@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>,
+ maz@kernel.org, seanjc@google.com, Robin Murphy <robin.murphy@arm.com>
+References: <20240126234237.547278-1-jacob.jun.pan@linux.intel.com>
+ <051cf099-9ecf-4f5a-a3ac-ee2d63a62fa6@kernel.dk>
+ <20240209094307.4e7eacd0@jacob-builder>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20240209094307.4e7eacd0@jacob-builder>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Feb 09, 2024 at 11:06:02AM -0800, Pawan Gupta wrote:
-> (Though, there was a comment on avoiding the macro alltogether, to which
-> I replied that it complicates 32-bit.)
+On 2/9/24 10:43 AM, Jacob Pan wrote:
+> Hi Jens,
+> 
+> On Thu, 8 Feb 2024 08:34:55 -0700, Jens Axboe <axboe@kernel.dk> wrote:
+> 
+>> Hi Jacob,
+>>
+>> I gave this a quick spin, using 4 gen2 optane drives. Basic test, just
+>> IOPS bound on the drive, and using 1 thread per drive for IO. Random
+>> reads, using io_uring.
+>>
+>> For reference, using polled IO:
+>>
+>> IOPS=20.36M, BW=9.94GiB/s, IOS/call=31/31
+>> IOPS=20.36M, BW=9.94GiB/s, IOS/call=31/31
+>> IOPS=20.37M, BW=9.95GiB/s, IOS/call=31/31
+>>
+>> which is abount 5.1M/drive, which is what they can deliver.
+>>
+>> Before your patches, I see:
+>>
+>> IOPS=14.37M, BW=7.02GiB/s, IOS/call=32/32
+>> IOPS=14.38M, BW=7.02GiB/s, IOS/call=32/31
+>> IOPS=14.38M, BW=7.02GiB/s, IOS/call=32/31
+>> IOPS=14.37M, BW=7.02GiB/s, IOS/call=32/32
+>>
+>> at 2.82M ints/sec. With the patches, I see:
+>>
+>> IOPS=14.73M, BW=7.19GiB/s, IOS/call=32/31
+>> IOPS=14.90M, BW=7.27GiB/s, IOS/call=32/31
+>> IOPS=14.90M, BW=7.27GiB/s, IOS/call=31/32
+>>
+>> at 2.34M ints/sec. So a nice reduction in interrupt rate, though not
+>> quite at the extent I expected. Booted with 'posted_msi' and I do see
+>> posted interrupts increasing in the PMN in /proc/interrupts, 
+>>
+> The ints/sec reduction is not as high as I expected either, especially
+> at this high rate. Which means not enough coalescing going on to get the
+> performance benefits.
 
-Hmm, so this seems to build the respective entry_{32,64}.S TUs fine:
+Right, it means that we're getting pretty decent commands-per-int
+coalescing already. I added another drive and repeated, here's that one:
 
----
-diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
-index e81cabcb758f..7d1e5fe66495 100644
---- a/arch/x86/include/asm/nospec-branch.h
-+++ b/arch/x86/include/asm/nospec-branch.h
-@@ -313,12 +313,9 @@
-  *
-  * Note: Only the memory operand variant of VERW clears the CPU buffers.
-  */
--.macro EXEC_VERW
--	verw _ASM_RIP(mds_verw_sel)
--.endm
- 
- .macro CLEAR_CPU_BUFFERS
--	ALTERNATIVE "", __stringify(EXEC_VERW), X86_FEATURE_CLEAR_CPU_BUF
-+	ALTERNATIVE "",  __stringify(verw _ASM_RIP(mds_verw_sel)), X86_FEATURE_CLEAR_CPU_BUF
- .endm
- 
- #else /* __ASSEMBLY__ */
----
+IOPS w/polled: 25.7M IOPS
 
-and looking at the asm:
+Stock kernel:
 
-64-bit:
+IOPS=21.41M, BW=10.45GiB/s, IOS/call=32/32
+IOPS=21.44M, BW=10.47GiB/s, IOS/call=32/32
+IOPS=21.41M, BW=10.45GiB/s, IOS/call=32/32
 
-# 317 "./arch/x86/include/asm/nospec-branch.h"
-.macro CLEAR_CPU_BUFFERS
- ALTERNATIVE "", "verw mds_verw_sel (% rip)", ( 3*32+18)
-.endm
+at ~3.7M ints/sec, or about 5.8 IOPS / int on average.
 
-  23:   0f 00 2d 00 00 00 00    verw   0x0(%rip)        # 2a <.altinstr_replacement+0x2a>
+Patched kernel:
 
-32-bit:
+IOPS=21.90M, BW=10.69GiB/s, IOS/call=31/32
+IOPS=21.89M, BW=10.69GiB/s, IOS/call=32/31
+IOPS=21.89M, BW=10.69GiB/s, IOS/call=32/32
 
-.macro CLEAR_CPU_BUFFERS
- ALTERNATIVE "", "verw mds_verw_sel", ( 3*32+18)
-.endm
+at the same interrupt rate. So not a reduction, but slighter higher
+perf. Maybe we're reaping more commands on average per interrupt.
 
- 13d:   0f 00 2d 00 00 00 00    verw   0x0
+Anyway, not a lot of interesting data there, just figured I'd re-run it
+with the added drive.
 
-it makes sense.
+> The opportunity of IRQ coalescing is also dependent on how long the
+> driver's hardirq handler executes. In the posted MSI demux loop, it does
+> not wait for more MSIs to come before existing the pending IRQ polling
+> loop. So if the hardirq handler finishes very quickly, it may not coalesce
+> as much. Perhaps, we need to find more "useful" work to do to maximize the
+> window for coalescing.
+> 
+> I am not familiar with optane driver, need to look into how its hardirq
+> handler work. I have only tested NVMe gen5 in terms of storage IO, i saw
+> 30-50% ints/sec reduction at even lower IRQ rate (200k/sec).
 
-So what complications do you mean?
+It's just an nvme device, so it's the nvme driver. The IRQ side is very
+cheap - for as long as there are CQEs in the completion ring, it'll reap
+them and complete them. That does mean that if we get an IRQ and there's
+more than one entry to complete, we will do all of them. No IRQ
+coalescing is configured (nvme kind of sucks for that...), but optane
+media is much faster than flash, so that may be a difference.
 
 -- 
-Regards/Gruss,
-    Boris.
+Jens Axboe
 
-https://people.kernel.org/tglx/notes-about-netiquette
 
