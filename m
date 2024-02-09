@@ -1,163 +1,167 @@
-Return-Path: <kvm+bounces-8460-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8461-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C27F684FBA3
-	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 19:10:53 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A59084FC07
+	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 19:38:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 31BE91F23BA9
-	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 18:10:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 955D4B26B7D
+	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 18:38:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCE3280C0B;
-	Fri,  9 Feb 2024 18:09:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2279384A26;
+	Fri,  9 Feb 2024 18:37:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JQHPGWmP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O9cn2yL9"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BCD37EF00
-	for <kvm@vger.kernel.org>; Fri,  9 Feb 2024 18:09:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0281676030
+	for <kvm@vger.kernel.org>; Fri,  9 Feb 2024 18:37:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707502154; cv=none; b=CMA3+RTW0Cp97XNIDUh8ce5wVOvbk8GYide5JuaZA2SUTA+zQQsTtk9n4nACCPZh/ooXTv+lF1GDK0DI+BDi9MwYpOhM8OTqMWO4yLPQX+Nsc26e5cq1AIuNSb/IEx8zFtSvG4M8DyJYR2heCqkHTT2/B2zyI0fYdGqRiXtNL28=
+	t=1707503870; cv=none; b=YTrlDaz6umdj8xhnrdB66GZ/J/ceNH+Hd0BjurI3ZFOfSSTYCjcgqIYWg7fXFD3T64Urd656gG06AqUMZD96PKzTUjZYEANMeTPMrfGMJ1S+sOSCgufY1RVwTx2GfDDhI6rRkBTHv/cxMwyAgxpOPQvU6JlptMM2dJ6wN0RBr5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707502154; c=relaxed/simple;
-	bh=iHIuE205CtTkxTOJ8QBT9VX2BzHHxLYDd/fid54PptY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tcMzuVy8HFjbcXDhwPsi8Cl5GR4jtKP0+1CXg2ZWIjuuWHu5LviXmYlkRoeCiM15QVuqLhrHsgjy/buyEDp9Vyt86pwbmRrDIKsJFfCu7R44tB1FDxfgX8vAtEZOinNwytGy2xv66mnF+mP7sELFtsUGR153/PZ6xZsW5EJNixM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JQHPGWmP; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1707503870; c=relaxed/simple;
+	bh=L3jqclo0i9bH7DKaPal2eN/2Uf1+sDtL1jhCISxamCo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=mG/99GvHTiZpL/f5UW2MN6Os9aL+fj1jNgRSnWHP0gSIEMcLyXuLecjOEBoG9L4UjGnuLInfaXMcXl9D4lI+WhwBUYkepRcRgu9n1/1ejnX1Pt/NQF/vloDPSYcfLTrpw/PT6rWtbi8znb/iuRVeDZwsBlzweyZRB/QheF79CQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O9cn2yL9; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707502151;
+	s=mimecast20190719; t=1707503867;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=qWJBAjq5kZHM63Q92oX8rd7RVwpgAQWVuCWuJw6H2GI=;
-	b=JQHPGWmPbf9a22s9pyL5w8Y9pXiNV/y0OwXCGnXWepToDikQfSsndkquqGTkgaC2NSX5bk
-	tofIbygtxFX4EsKbEKmw9HJEKv6PV0cgFIfIGJCQoZSU6UKV6r6mv5z9ZxiKcErNW+x7Ni
-	CMHRJPYUxj3hVaqH6/Z8UE2zxq1AnM4=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Ql8NRVLUrfLSlW92JE+TglekoXsViOImgOkMVK8/eUc=;
+	b=O9cn2yL9Yt1trnG8OJMYB7RaGJd1/g7r3rfvyospsHY6lrb2W2npW5cf99c++Fn2aME1ce
+	/B0H8Pbk+IpE+NRXUo2/HFVtlYz1Tfg/3+GPuXKy/2FKW/fIDHB/nme6B9HexTEITFHDfB
+	HqFkjZeKOWw5QnHYrnWL6BteeQGDi8A=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-624-wPdG0lSzOFWX5fru1EAv4Q-1; Fri, 09 Feb 2024 13:09:09 -0500
-X-MC-Unique: wPdG0lSzOFWX5fru1EAv4Q-1
-Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-680b48a8189so16699586d6.1
-        for <kvm@vger.kernel.org>; Fri, 09 Feb 2024 10:09:09 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707502149; x=1708106949;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qWJBAjq5kZHM63Q92oX8rd7RVwpgAQWVuCWuJw6H2GI=;
-        b=J8cvxgfSQQ/+pX2VdMZ6FmfpwD8Rcm1iXB6nSLu+OacR8Be6/gL0ZI+inELvjExLLI
-         UdvSBOzamAvyu9qtv/KhN18EknI4EZCzPxvIsYCEpTs3CvN20bZmcYhZfeJkwV6r9fyV
-         5nsBvWSmYdfMUCwCs0xJef8ouZ9vJDQogYnqXmVGKY9QzT+HjYTmJYcCKnmcj7DJVVbJ
-         zYGBOre0uF5fG+gLXic0N3P7obpsEXiLv/UteK25pfONpT58YwzB29EdXxNu/Dnbpym5
-         0AGZupCa5qpQPigOHYZz4UDISCkjppzsSH17fxSt8HpBJb0EVpdPCxU9iu2oCz/lkyr+
-         2/2g==
-X-Gm-Message-State: AOJu0Yxxh94kPhNA/N6jNC8+7VqQq2tzzYMdw5BJF11z1xbuu3yOuF8v
-	6u+hp6DG0xRb3zbvd1PkPgb7EsvujVFYJnghP8nIOpGdQEgU049y5a5stj9TqeKaaf6C4y8yjbc
-	Q2lhWayAwK1oQBThizzDLgiopfslzkZBDaxwleSveXe5JHAllaw==
-X-Received: by 2002:ad4:5de8:0:b0:68c:8ee2:3fa0 with SMTP id jn8-20020ad45de8000000b0068c8ee23fa0mr2785581qvb.11.1707502149275;
-        Fri, 09 Feb 2024 10:09:09 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFtzks+e9Q2nimt+WHV4/eU5Wb7t5tJ07+77h0Wfr/SqqBOd3XyU6wdarwiFxt+G5VuHWYrMg==
-X-Received: by 2002:ad4:5de8:0:b0:68c:8ee2:3fa0 with SMTP id jn8-20020ad45de8000000b0068c8ee23fa0mr2785554qvb.11.1707502149049;
-        Fri, 09 Feb 2024 10:09:09 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWm4MgHh2FuocfMr0j0YAziH9jnpLxw46Vk1gOt4DPPwLZGIhOFvbtvc2/NiWd4RNK75vzcuho0FcXE876/WlhV32JQvZcs92n5psQ2MHVjJhkOnMZhtDfnlBlbEyjISh4Ki63oFKfhMZRzNE0YXFQVTnDHK4EuiQWSHTfcYtgBujW0y+WOniq1nh12MLWwXkry7LTR8a1JSfzQKZeEdTuRv2PEt5AibI09JqiKUTa6+3dvCZgAxHBnXYGbAYqrCe79U2CWjKHUeiN4WQ5LOqVWkBaWFIpsbfnW7RbQ8nUlM90s63Wf5D6WtoC1NpGmcCoWN8x2XRb/0P4vjhE0HXfnm9WPXwNKe3EdHAoPIO/+GcwI5Ln0ZPSxQSG2MmGK3tURNtcSNMsPjW8cM+BKpMVMt1HzkmXzcKg8KSkOQlRAWmIKyHq6a+9QMgm7oMb7bS0hUHzvOPTBx3kUUWWY06ik0mLyanfYuqeNFC+y718Zv57yIlofZac+3lzCWRXkoRvD6tPqHVKJF8aFGOMfHzaeCs1w
-Received: from [192.168.0.9] (ip-109-43-177-145.web.vodafone.de. [109.43.177.145])
-        by smtp.gmail.com with ESMTPSA id mc9-20020a056214554900b0068cb9a819a2sm1045597qvb.28.2024.02.09.10.09.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 09 Feb 2024 10:09:08 -0800 (PST)
-Message-ID: <62518aea-1214-4d33-8a15-41f1a494ee0b@redhat.com>
-Date: Fri, 9 Feb 2024 19:09:03 +0100
+ us-mta-473-vO884ImCMQWVY9YqEvVoxA-1; Fri, 09 Feb 2024 13:37:44 -0500
+X-MC-Unique: vO884ImCMQWVY9YqEvVoxA-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E4F79185A787;
+	Fri,  9 Feb 2024 18:37:43 +0000 (UTC)
+Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B37E2492BC6;
+	Fri,  9 Feb 2024 18:37:43 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Cc: seanjc@google.com,
+	michael.roth@amd.com,
+	aik@amd.com,
+	isaku.yamahata@intel.com
+Subject: [PATCH 00/10] KVM: SEV: allow customizing VMSA features
+Date: Fri,  9 Feb 2024 13:37:32 -0500
+Message-Id: <20240209183743.22030-1-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v4 6/8] migration: Add quiet migration
- support
-Content-Language: en-US
-To: Nicholas Piggin <npiggin@gmail.com>
-Cc: kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>,
- Shaoqin Huang <shahuang@redhat.com>, Andrew Jones <andrew.jones@linux.dev>,
- Nico Boehr <nrb@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Eric Auger <eric.auger@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Marc Hartmayer
- <mhartmay@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
- linux-s390@vger.kernel.org, kvmarm@lists.linux.dev,
- kvm-riscv@lists.infradead.org
-References: <20240209091134.600228-1-npiggin@gmail.com>
- <20240209091134.600228-7-npiggin@gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-In-Reply-To: <20240209091134.600228-7-npiggin@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 
-On 09/02/2024 10.11, Nicholas Piggin wrote:
-> Console output required to support migration becomes quite noisy
-> when doing lots of migrations. Provide a migrate_quiet() call that
-> suppresses console output and doesn't log a message.
-> 
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
->   lib/migrate.c         | 11 +++++++++++
->   lib/migrate.h         |  1 +
->   scripts/arch-run.bash |  4 ++--
->   3 files changed, 14 insertions(+), 2 deletions(-)
+The idea that no parameter would ever be necessary when enabling SEV or
+SEV-ES for a VM was decidedly optimistic.  The first source of variability
+that was encountered is the desired set of VMSA features, as that affects
+the measurement of the VM's initial state and cannot be changed
+arbitrarily by the hypervisor.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+This series adds all the APIs that are needed to customize the features,
+with room for future enhancements:
+
+- a new /dev/kvm device attribute to retrieve the set of supported
+  features (right now, only debug swap)
+
+- a new sub-operation for KVM_MEM_ENCRYPT_OP that can take a struct,
+  replacing the existing KVM_SEV_INIT and KVM_SEV_ES_INIT
+
+It then puts the new op to work by including the VMSA features as a field
+of the The existing KVM_SEV_INIT and KVM_SEV_ES_INIT use the full set of
+supported VMSA features for backwards compatibility; but I am considering
+also making them use zero as the feature mask, and will gladly adjust the
+patches if so requested.
+
+In order to avoid creating *two* new KVM_MEM_ENCRYPT_OPs, I decided that
+I could as well make SEV and SEV-ES use VM types.  And then, why not make
+a SEV-ES VM, when created with the new VM type instead of KVM_SEV_ES_INIT,
+reject KVM_GET_REGS/KVM_SET_REGS and friends on the vCPU file descriptor
+once the VMSA has been encrypted...  Which is how the API should have
+always behaved.
+
+The series is defined as follows:
+
+- patches 1 and 2 are unrelated fixes and improvements for the SEV API
+
+- patches 3 to 5 introduce the new device attribute to retrieve supported
+  VMSA features
+
+- patches 6 to 7 introduce new infrastructure for VM types, partly lifted
+  out of the TDX patches
+
+- patches 8 and 9 introduce respectively the new VM types for SEV and
+  SEV-ES, and KVM_SEV_INIT2 as a new sub-operation for KVM_MEM_ENCRYPT_OP.
+
+- patches 10 and 11 are tests.  The last patch is not intended to be applied
+  in order to keep some coverage of KVM_SEV_INIT and KVM_SEV_ES_INIT in
+  self tests; but it is there as "proof" that migration can be made to
+  work with the new API as well.
+
+
+The idea is that SEV SNP will only ever support KVM_SEV_INIT2.  I have
+patches in progress for QEMU to support this new API.
+
+Thanks,
+
+Paolo
+
+Isaku Yamahata (1):
+  KVM: x86: Add is_vm_type_supported callback
+
+Paolo Bonzini (10):
+  KVM: x86: define standard behavior for bits 0/1 of VM type
+  KVM: SEV: fix compat ABI for KVM_MEMORY_ENCRYPT_OP
+  KVM: introduce new vendor op for KVM_GET_DEVICE_ATTR
+  Documentation: kvm/sev: separate description of firmware
+  KVM: SEV: publish supported VMSA features
+  KVM: SEV: store VMSA features in kvm_sev_info
+  KVM: SEV: define VM types for SEV and SEV-ES
+  KVM: SEV: introduce KVM_SEV_INIT2 operation
+  selftests: kvm: add tests for KVM_SEV_INIT2
+  selftests: kvm: switch sev_migrate_tests to KVM_SEV_INIT2
+
+ Documentation/virt/kvm/api.rst                |   2 +
+ .../virt/kvm/x86/amd-memory-encryption.rst    |  81 +++++++--
+ arch/x86/include/asm/kvm-x86-ops.h            |   2 +
+ arch/x86/include/asm/kvm_host.h               |   4 +-
+ arch/x86/include/uapi/asm/kvm.h               |  42 ++++-
+ arch/x86/kvm/svm/sev.c                        | 104 +++++++++++-
+ arch/x86/kvm/svm/svm.c                        |  14 +-
+ arch/x86/kvm/svm/svm.h                        |   6 +-
+ arch/x86/kvm/x86.c                            | 158 ++++++++++++++----
+ arch/x86/kvm/x86.h                            |   2 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/include/kvm_util_base.h     |   6 +-
+ .../selftests/kvm/set_memory_region_test.c    |   8 +-
+ .../selftests/kvm/x86_64/sev_init2_tests.c    | 147 ++++++++++++++++
+ .../selftests/kvm/x86_64/sev_migrate_tests.c  |  45 ++---
+ 15 files changed, 530 insertions(+), 92 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/sev_init2_tests.c
+
+-- 
+2.39.0
 
 
 
