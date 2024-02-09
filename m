@@ -1,204 +1,163 @@
-Return-Path: <kvm+bounces-8509-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8510-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 832F3850002
-	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 23:33:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0233085002A
+	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 23:40:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF6F91F22192
-	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 22:33:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9B59281A74
+	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 22:40:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33E973D0CA;
-	Fri,  9 Feb 2024 22:30:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC5252E3E4;
+	Fri,  9 Feb 2024 22:40:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="G4brQ5d7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PUn8RCu/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F0983D0C3
-	for <kvm@vger.kernel.org>; Fri,  9 Feb 2024 22:30:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A60922083
+	for <kvm@vger.kernel.org>; Fri,  9 Feb 2024 22:40:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707517830; cv=none; b=s7sk9a7lOQJ0gCdaXcYDynpHcxuXKhGAWPSgbrUIxpa9v7lS9mseOthTGk3kC3KVZvnf1+m3vf0L+lm1t0pZccXANgXzJZBPdX2J/v5D6jn9AG2DsKVgaTVbbF7POb3WCJ9SVcxWSH0AcIHFeYyUJ5AfsPifGPw4dHBVbeaasK0=
+	t=1707518440; cv=none; b=ouENQCsMIjVShVQdym1Ny5zZkkakG1V0+4ia7BC9FxgPHIU5+06Oyc4kKpMYaV2qsyJi4Ps358y+9x1z7U5tIRCZCylVdSgDQJbnWZbJyneE7ljuo1TKMBkXazYokL8dtsg3ONs0RVKhTyBN3/qLeH6Fm6WoQFo0rAcv1xr1LlM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707517830; c=relaxed/simple;
-	bh=Fy+DFfgl9iPfXE4Cc00lQVCWdaZmYtdMTKbSdOK6dr8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fOnQCH8hNIhAQuCm7VhAC+Qvmtt/i94iJiF5SNaSRF/3Ig73HjTbvNyd9aUpYnQN0EcmcvSQRYRhWOPRl4sYdGJ/bPgWojwM3/x9wK4m89vnTi1HlIWAklBLk4W/XkB7q8wplv/tGE6kCF0gIslHJSAVXNi081hWrpHAy/oOIfM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=G4brQ5d7; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5605c7b0ca2so1702147a12.3
-        for <kvm@vger.kernel.org>; Fri, 09 Feb 2024 14:30:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1707517826; x=1708122626; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Q334rdbHohWsxJ77bsjyPgsTUJYym92p9x/mltaYtVg=;
-        b=G4brQ5d77cF1vSB81B3cApym8KcnqmQTkHY/ti4R52o80rTHXJQxFOOSSGsqhZDbM1
-         /2LP7bUzmrcwhYRIbvrVzKBVrb185RMshNCy3M/Ymx1ON0rFl0ocZ1kRHvipokwFHO8T
-         SxjSKYt6+XVx2uhhra6pCHDzBUfxKoN+vrDKyKqsPNdTLgGlEX0+AD09Mfayq3geGSR5
-         6HZZLU5Luq7DLRxkLoZc1m1OSfi6DFYc5bnp6Vhwb+ZItd+r6OKdbuz5mPlX40Q02Qfd
-         UYoXgxeWPIsUE3D7UMN9C8hi+hNQ0tNSmrJvItcKMsrPpy5uMkZLH68yaK4FDJnkN08D
-         9bKQ==
+	s=arc-20240116; t=1707518440; c=relaxed/simple;
+	bh=5mTur19Rxbo1EgoDaluJz65rrbAQAX8fLUiZ9Ef5FE0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=opnqNLY1oWEX+ytGxA4uTsqOOc3OsdLyxzMO0wPoskq+seGWAX/BISUMS3rTewhotB1pzaP6GOLVZfWj0bdUEfPXKUpogSQ31ZYZpJCG65Pn/1UYN0ZzkaP0nciY2PM3u0WwTg69Q5ftnXzrem0BiX2AjhHCCI3WxS2L7nrm/rE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PUn8RCu/; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707518438;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0VQrsHUE/LptBa5nKpmriIWMNQMle8yxHNuy/INIktI=;
+	b=PUn8RCu/8j+HXrPaOS0YiILrvRGviNGA+YEvg72EgVcbLqa6KuFgn25mJ91B+pFIjNzfk9
+	mcfdhRKP1snD0uWAvzG+wP8qWC1af5IkG2RH2VMp19XB+RfGX+d9H0yJvofWsa3NfeeoDs
+	nKJoOSpmLkJNa1qhbKqz3nfJxkmSfHk=
+Received: from mail-ua1-f71.google.com (mail-ua1-f71.google.com
+ [209.85.222.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-131-3KT0b-P5Nfun6rHXpPO50g-1; Fri, 09 Feb 2024 17:40:36 -0500
+X-MC-Unique: 3KT0b-P5Nfun6rHXpPO50g-1
+Received: by mail-ua1-f71.google.com with SMTP id a1e0cc1a2514c-7d5bbbe57b8so737001241.1
+        for <kvm@vger.kernel.org>; Fri, 09 Feb 2024 14:40:36 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707517826; x=1708122626;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q334rdbHohWsxJ77bsjyPgsTUJYym92p9x/mltaYtVg=;
-        b=oruPXE8WYTysZTZMZUf8ldVgwHiczKRVS8yO3RFg/TtGy23iKf0tu+S47bDXp/nfDg
-         xOI/mLkZLAmM/7xR/ylE8MOLkpA9HLqSh4/9xmZ/o1Q2G6hsMHa71lPXYvWHlTV1KVIJ
-         e5xVe8ShyXQYvh95jxVfD5JUI7Mv2X1epmWJxOYKC2NWC6VdlyGTRxSHUu0eiaidOO3s
-         bAZQms7JVzJtPieGyiCySIJFbY9CwtBe4F2jZwfVrRqiJhm27Y938CCRsWRFI073nyqx
-         Yp+pi62b4tv0HwCylGM6TsXTGYmUaBg/4dY3Z4pi1OsjNwrTKgocWVEPCcAXrfbRelDA
-         DCzw==
-X-Gm-Message-State: AOJu0YzWuMGdJDcN+ySHhF/n7M2TUjqyXeBm5KIon8TUf1AJ6EyyUaio
-	wWPqpM1O6f0KZ5kWxGxuKvNzSnaZjGoWZODVZEiX/zyJ3XMOL6qbpR8oZXM8bdQ=
-X-Google-Smtp-Source: AGHT+IE/3pC+fthtxR5cVJpZzV/OL1GamrSn10DOAVzpqvjahgRYZzWD7R97jCX60h8cwAfzW3AIcw==
-X-Received: by 2002:a17:906:68d8:b0:a38:96ef:4199 with SMTP id y24-20020a17090668d800b00a3896ef4199mr221824ejr.75.1707517825779;
-        Fri, 09 Feb 2024 14:30:25 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXmhADPjPQXFV6Z5GdiurBvyAgwNK0C3N9z8jawo/KNCwaAZNMD4Omlh3uuSxofmTcAOMTOPM/REeziKhZeuvQx6sG8n5NWEigzjfAgdeIRQv74hkcJtGgZQWWHikAQz3QF
-Received: from ?IPV6:2003:f6:af2c:a500:6e26:87f:cb2:6335? (p200300f6af2ca5006e26087f0cb26335.dip0.t-ipconnect.de. [2003:f6:af2c:a500:6e26:87f:cb2:6335])
-        by smtp.gmail.com with ESMTPSA id go43-20020a1709070dab00b00a385535a02asm1171411ejc.171.2024.02.09.14.30.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 09 Feb 2024 14:30:25 -0800 (PST)
-Message-ID: <19824d6d-28f9-4aa0-8b10-bacefc49adfd@grsecurity.net>
-Date: Fri, 9 Feb 2024 23:30:26 +0100
+        d=1e100.net; s=20230601; t=1707518435; x=1708123235;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0VQrsHUE/LptBa5nKpmriIWMNQMle8yxHNuy/INIktI=;
+        b=YnhihRYb1/2d9kV34pXXERMMCUwJJQw75UzRCv9yIsKIaokC4yvBbdRnunyal3mb9a
+         4Sgay7jYQeMgJy76tfcNM+yEQcux+HEMBS1dhszK1dPwVSefyK+p3lnWdSwRanUsjFdW
+         tD54Uek4VP19acOfktD/3NTcEaCymj4K5p9wfurF8WF/swMytWhaA2mJCpOJbmr3thX+
+         NJOAdO/B5Oh3UGKzp+RBxqezJPV/p7zUhYb+jbCaxeLxjGnbKafxX5LQsravNwyRLkti
+         XyksUEbhEHq/HDKWvLi5ZjFbpoDtAs+PBDGEMeGZib0JNXB+TyvSyMVST5/eRj4+jgzU
+         ysfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXI/eDQ/MdF2Jb7s/02eMrWb+C7jamcbGVTU0GNBaI3GV2OIuxc5mcoW18WbLSMq4gq7zsWnv4G3xk0dd4lZ1xjbNY/
+X-Gm-Message-State: AOJu0YzZFW8uueTzk9/NHXw5GokZWcBlbUVbWGtMIN1qzl6rctMy8zC3
+	dElAU+OMh9Y4mOKONIMJardvvB2jdyfqJUL+ntJf2Ky9q764sF5U31idgJeU/ma6nP1UjVkcVnY
+	tguHZPXIk1m2otU+wq3U0m9ZPo8ITQnwy+qQzFCI28C8MQjmZtEaQYCu8rHIBgrYR8INFBADcKu
+	iKdycPV4lTN9CmJDlDc/Xsk6aN
+X-Received: by 2002:a05:6102:198a:b0:46d:295d:1d9c with SMTP id jm10-20020a056102198a00b0046d295d1d9cmr966944vsb.21.1707518435613;
+        Fri, 09 Feb 2024 14:40:35 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGDT5FseOqjE7EgYc0WV0xo2jicn+bWaOOKx90vB2jZwvCrR/EUTmLrqEEMbxIhn/R3Z0xvt66ZxrXlXADlWgM=
+X-Received: by 2002:a05:6102:198a:b0:46d:295d:1d9c with SMTP id
+ jm10-20020a056102198a00b0046d295d1d9cmr966937vsb.21.1707518435345; Fri, 09
+ Feb 2024 14:40:35 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] KVM: x86: Open code all direct reads to guest DR6 and
- DR7
-Content-Language: en-US, de-DE
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240209220752.388160-1-seanjc@google.com>
- <20240209220752.388160-3-seanjc@google.com>
-From: Mathias Krause <minipli@grsecurity.net>
-Autocrypt: addr=minipli@grsecurity.net; keydata=
- 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
- RzDVkdgPJkL/NFTKZHo5foFXNi89kA==
-In-Reply-To: <20240209220752.388160-3-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20240209183743.22030-1-pbonzini@redhat.com> <ZcZ_m5By49jsKNXn@google.com>
+In-Reply-To: <ZcZ_m5By49jsKNXn@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 9 Feb 2024 23:40:23 +0100
+Message-ID: <CABgObfaum2=MpXE2kJsETe31RqWnXJQWBQ2iCMvFUoJXJkhF+w@mail.gmail.com>
+Subject: Re: [PATCH 00/10] KVM: SEV: allow customizing VMSA features
+To: Sean Christopherson <seanjc@google.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, michael.roth@amd.com, 
+	aik@amd.com, isaku.yamahata@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 09.02.24 23:07, Sean Christopherson wrote:
-> Bite the bullet, and open code all direct reads of DR6 and DR7.  KVM
-> currently has a mix of open coded accesses and calls to kvm_get_dr(),
-> which is confusing and ugly because there's no rhyme or reason as to why
-> any particular chunk of code uses kvm_get_dr().
-> 
-> The obvious alternative is to force all accesses through kvm_get_dr(),
-> but it's not at all clear that doing so would be a net positive, e.g. even
-> if KVM ends up wanting/needing to force all reads through a common helper,
-> e.g. to play caching games, the cost of reverting this change is likely
-> lower than the ongoing cost of maintaining weird, arbitrary code.
-> 
-> No functional change intended.
-> 
-> Cc: Mathias Krause <minipli@grsecurity.net>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/smm.c        | 8 ++++----
->  arch/x86/kvm/vmx/nested.c | 2 +-
->  arch/x86/kvm/x86.c        | 2 +-
->  3 files changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/smm.c b/arch/x86/kvm/smm.c
-> index 19a7a0a31953..d06d43d8d2aa 100644
-> --- a/arch/x86/kvm/smm.c
-> +++ b/arch/x86/kvm/smm.c
-> @@ -194,8 +194,8 @@ static void enter_smm_save_state_32(struct kvm_vcpu *vcpu,
->  	for (i = 0; i < 8; i++)
->  		smram->gprs[i] = kvm_register_read_raw(vcpu, i);
->  
-> -	smram->dr6     = (u32)kvm_get_dr(vcpu, 6);
-> -	smram->dr7     = (u32)kvm_get_dr(vcpu, 7);
-> +	smram->dr6     = (u32)vcpu->arch.dr6;
-> +	smram->dr7     = (u32)vcpu->arch.dr7;
->  
->  	enter_smm_save_seg_32(vcpu, &smram->tr, &smram->tr_sel, VCPU_SREG_TR);
->  	enter_smm_save_seg_32(vcpu, &smram->ldtr, &smram->ldtr_sel, VCPU_SREG_LDTR);
-> @@ -236,8 +236,8 @@ static void enter_smm_save_state_64(struct kvm_vcpu *vcpu,
->  	smram->rip    = kvm_rip_read(vcpu);
->  	smram->rflags = kvm_get_rflags(vcpu);
->  
-> -	smram->dr6 = kvm_get_dr(vcpu, 6);
-> -	smram->dr7 = kvm_get_dr(vcpu, 7);
-> +	smram->dr6 = vcpu->arch.dr6;
-> +	smram->dr7 = vcpu->arch.dr7;
->  
->  	smram->cr0 = kvm_read_cr0(vcpu);
->  	smram->cr3 = kvm_read_cr3(vcpu);
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 28d1088a1770..d05ddf751491 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -4433,7 +4433,7 @@ static void sync_vmcs02_to_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
->  		(vm_entry_controls_get(to_vmx(vcpu)) & VM_ENTRY_IA32E_MODE);
->  
->  	if (vmcs12->vm_exit_controls & VM_EXIT_SAVE_DEBUG_CONTROLS)
-> -		vmcs12->guest_dr7 = kvm_get_dr(vcpu, 7);
-> +		vmcs12->guest_dr7 = vcpu->arch.dr7;
->  
->  	if (vmcs12->vm_exit_controls & VM_EXIT_SAVE_IA32_EFER)
->  		vmcs12->guest_ia32_efer = vcpu->arch.efer;
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index bfffc13f91e6..5a08d895bde6 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -5510,7 +5510,7 @@ static void kvm_vcpu_ioctl_x86_get_debugregs(struct kvm_vcpu *vcpu,
->  	for (i = 0; i < ARRAY_SIZE(vcpu->arch.db); i++)
->  		dbgregs->db[i] = vcpu->arch.db[i];
->  
-> -	dbgregs->dr6 = kvm_get_dr(vcpu, 6);
-> +	dbgregs->dr6 = vcpu->arch.dr6;
->  	dbgregs->dr7 = vcpu->arch.dr7;
->  }
->  
+On Fri, Feb 9, 2024 at 8:40=E2=80=AFPM Sean Christopherson <seanjc@google.c=
+om> wrote:
+> On Fri, Feb 09, 2024, Paolo Bonzini wrote:
+> > The idea that no parameter would ever be necessary when enabling SEV or
+> > SEV-ES for a VM was decidedly optimistic.
+>
+> That implies there was a conscious decision regarding the uAPI.  AFAICT, =
+all of
+> the SEV uAPIs are direct reflections of the PSP invocations.  Which is wh=
+y I'm
+> being so draconian about the SNP uAPIs; this time around, we need to actu=
+ally
+> design something.
 
-Reviewed-by: Mathias Krause <minipli@grsecurity.net>
+You liked that word, heh? :) The part that I am less sure about, is
+that it's actually _possible_ to design something.
 
-Nice cleanup. Thanks a lot, Sean!
+If you end up with a KVM_CREATE_VM2 whose arguments are
+
+   uint32_t flags;
+   uint32_t vm_type;
+   uint64_t arch_mishmash_0; /* Intel only */
+   uint64_t arch_mishmash_1; /* AMD only */
+   uint64_t arch_mishmash_2; /* Intel only */
+   uint64_t arch_mishmash_3; /* AMD only */
+
+and half of the flags are Intel only, the other half are AMD only...
+do you actually gain anything over a vendor-specific ioctl?
+
+Case in point being that the SEV VMSA features would be one of the
+fields above, and they would obviously not be available for TDX.
+
+kvm_run is a different story because it's the result of mmap, and not
+a ioctl. But in this case we have:
+
+- pretty generic APIs like UPDATE_DATA and MEASURE that should just be
+renamed to remove SEV references. Even DBG_DECRYPT and DBG_ENCRYPT
+fall in this category
+
+- APIs that seem okay but may depend on specific initialization flows,
+for example LAUNCH_UPDATE_VMSA. One example of the problems with
+initialization flows is LAUNCH_FINISH, which seems pretty tame but is
+different between SEV{,-ES} and SNP. Another example could be CPUID
+which is slightly different between vendors.
+
+- APIs that are currently vendor-specific, but where a second version
+has a chance of being cross-vendor, for example LAUNCH_SECRET or
+GET_ATTESTATION_REPORT. Or maybe not.
+
+- others that have no hope, because they include so many pieces of
+vendor-specific data that there's hardly anything to share. INIT is
+one of them. I guess you could fit the Intel CPUID square hole into
+AMD's CPUID round peg or vice versa, but there's really little in
+common between the two.
+
+I think we should try to go for the first three, but realistically
+will have to stop at the first one in most cases. Honestly, this
+unified API effort should have started years ago if we wanted to go
+there. I see where you're coming from, but the benefits are marginal
+(like the amount of userspace code that could be reused) and the
+effort huge in comparison. And especially, it's much worse to get an
+attempt at a unified API wrong, than to have N different APIs.
+
+This is not a free-for-all, there are definitely some
+KVM_MEMORY_ENCRYPT_OP that can be shared between SEV and TDX. The
+series also adds VM type support for SEV which fixes a poor past
+choice. I don't think there's much to gain from sharing the whole INIT
+phase though.
+
+Paolo
+
 
