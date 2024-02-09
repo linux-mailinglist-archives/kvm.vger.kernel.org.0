@@ -1,72 +1,73 @@
-Return-Path: <kvm+bounces-8418-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8419-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BBEE84F209
-	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 10:12:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDA0484F20B
+	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 10:12:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A5FB31F2694C
-	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 09:12:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 770671F26972
+	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 09:12:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55957664DE;
-	Fri,  9 Feb 2024 09:12:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 875AB664CB;
+	Fri,  9 Feb 2024 09:12:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dDm1EluY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z7xeAvSD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
+Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EB99664C9;
-	Fri,  9 Feb 2024 09:12:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24BF1664C6;
+	Fri,  9 Feb 2024 09:12:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707469937; cv=none; b=iox1wdQuqP2ov1f/RkKGpQmsYqrgVSff188qLNtY1YlVchiGj1NNmv3zTsKEa0YSlnuHf2+uBQRoeQgW2PlgurjMu0zGUt/mEeOGUYimlYDUhwDxHRWt6XUFV8BZS1G88oypE+iPr3fc7yee9vV8X6qjNmICEROlaRVKHKlMLIs=
+	t=1707469944; cv=none; b=kCyAntGzSMkITwKCW8KUnpbSxsGJ7mblWFF9gbaxGgvZCnAxE85+53enhrE09gwpp331RvioVTX+ZqFPfGALL998enmu9nbbiw4pxYgGXwmb8MmP8XtGU9TQPRCqxyTsTM4ovISXbKo5Z13TOLX7xe4sFRU+xkCzyZ+GI7H24zk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707469937; c=relaxed/simple;
-	bh=/BWxHdbgtJmDCBbNGut75HtAqp/5+5sSfL8SAdWk/SU=;
+	s=arc-20240116; t=1707469944; c=relaxed/simple;
+	bh=hFQmAXGuXJzsU+D6+fezDb5bPNLYd+sNQribc7Q6YxQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ThWGrc0BxZq377CFE9vphNliO/f520YZw4xyztzGCb7KcARDPLBNwuh4qtyU9uk970bGB3P3mdKC6Brljt2WdyF995FybBvmTJiGt92YrwEnxx31UvDnkdEPm3gdJosbizEwK+hpEfnRw5qxOnCtF3T9Faa5np1qN6moeYwrFM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dDm1EluY; arc=none smtp.client-ip=209.85.166.176
+	 MIME-Version; b=p+yCIeKdOg0gpS4VS7PcTz9a5TH7QxiZy/PdUOJmU6mUJ0tOivqxoBRXWXBJM7KPkHfKQgH4JQNfA8idegpPxLsWmOYM9uxt0aGVv62MX4um8qTN3Ph3Xe9R0o6vCVh3q67mbh7+uOvftiJJMoPY7uW4vse/sPVZrww3iBwbq4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z7xeAvSD; arc=none smtp.client-ip=209.85.167.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-363dde86f0bso1927345ab.3;
-        Fri, 09 Feb 2024 01:12:15 -0800 (PST)
+Received: by mail-oi1-f173.google.com with SMTP id 5614622812f47-3bbb4806f67so451503b6e.3;
+        Fri, 09 Feb 2024 01:12:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707469934; x=1708074734; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1707469942; x=1708074742; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fT6qMRC+pw0S3IxnByVmt3CuBvluv9Wtp5vBNNErLSM=;
-        b=dDm1EluYObNvEVCeZFeS7pvRbRHIGJw1Pj0Xu8XAVHWyCVnMr8DJI9q2oJWjh12Ccq
-         DgPq/YEWQYbBcTEzBps0Ux5ptdrjqMb+zXnjlPTgk+qfhJqnOkZxneXldaLMexZa1bDJ
-         26BR2EbQr70yYecJThy8527BTfWMR2MF1JqvvGD4a9EaFscSBR0GB9izmClKTvC4HaIs
-         +yJyigpbnzPgDinXyfTFKWwIo7mdc1tKS9Vp4giDyFt7LWwstmdsQQbZJPgW6iy5mz+x
-         XiQDoeIemlSZNlHeosUiFye39ulCzgYa27ftH7ya5Fg+dAO//jJayST1ostCRQwuhRox
-         OHQw==
+        bh=X4s6FdHef7vHJmaayGa/KenEMFLkhsTB2Fe0/1F6SbM=;
+        b=Z7xeAvSDJkrttKIlB85D3aTzrdzXXwo3/bpnExbO3d/sMbJhsR7vcZZr4GtZTwqIEi
+         CfdTZhkfB2fOxDZfPTfw1EiHFZPb3wmqVI9HhfgxF4qRRrS8JWRFZK5Y6HOfCBYS3RnD
+         BCrkbG/ez2iJEFs6eeh6XwdOYCp91/s80yn7iJO2LpGjvqN+l6KM0bbQgQz9gWziWu8K
+         jUyo+CHgwOi6/86+Bd0gVAT85J+KREt5PgBWPkqypYZukRLCOwkXMJHtny2hBA/LlYR5
+         Xw+rgWC6Li5ivoweJk5NgtPlXnuXCBzACFYfAUEQHiKXbyc+GbXLuja453HNpP0xJRWq
+         zwgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707469934; x=1708074734;
+        d=1e100.net; s=20230601; t=1707469942; x=1708074742;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=fT6qMRC+pw0S3IxnByVmt3CuBvluv9Wtp5vBNNErLSM=;
-        b=gi9BXQSxOcehCDW84SXaqB1GE8k1b1N6raKWD8nwJNOJD/5j4tt2mJz2rA+cubfEFM
-         dpjYBWx7M9sKL5C33500JJg/onamEhMUiDBqQIYTHPobMjvpea6fvO5vo/ngYYa4G70w
-         i21MMewCWSHEWMiTiYmY2CHi+JSANrKPaxpFB2eY01dSYped827NDfoSzSMh0UPvr5Lz
-         erp8Acukn8BE90BSgCavXfvfL9uuxnmzYkXwkBng/WPfr+/Ct2jeY9u6djsKERkDKMRE
-         SS/2AZYwfy5T1wYs/sBGneHego7JGwHMd3J/uTxpCNzmEDHzYHSaS/+lShdPdleW20pS
-         1+Mg==
-X-Gm-Message-State: AOJu0YzTnAkD4i91qSFeilRoY8U7ux2/+pH/LxHp2hnIW+WnErrtraDF
-	809NoNkysrBgMsnXmkxdlKBPYRDVCys6XwVlf5WnpZ6g9FYQAX2tD5/sqkyN
-X-Google-Smtp-Source: AGHT+IHibsT0DSntKBcN9RYYZqiACNyhgKRW2VVt94qySfQqZmMFZ504tD+p+VBnJx+v68Q4gh04Fg==
-X-Received: by 2002:a92:b74e:0:b0:363:c664:cfed with SMTP id c14-20020a92b74e000000b00363c664cfedmr1118904ilm.32.1707469934457;
-        Fri, 09 Feb 2024 01:12:14 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUVYUB37apMvQ3VGs+5Ws3Gf62dyGZo9vthw/uz2L8OaqTwDVzG54ysbUP990pgHiF+QNtoyOA03eNjx1V+XPOOE9bPSzjN43HzQNvLlrAC9EAgh47UXkUot0FXDfz9bYAWPqelgBgje2D8EMT5PUnZGIl+6zCs7aIg3+ZGh/7zewiyD1ugr9cR3Ec3QFOGVtoTxgGaa0mco2m36Gc37syL5HxoDl8tB7OUqiiwCs73+Ag2Lt3vx/yDxMcfmIzSFRPihipEKRuVJH1AypJqKPjCUu28AGG6v534t8byoP2pY8YAy8QkPbGM+d+AaywgPttwLbA19VlO0PFkRzhUw4hI8Cj7EOQ8R/MnpLdZrgyWTzY/O0kidqUV9XJE3B7Ju0OampFZD00XE6Msn/CHG2OmecmFiFyY5M4pv1zwbh+LAtrk8zIzClmGUq/8ArY+g0DyeHn9H/bgFP7SA0cpfLUH3hKHqDsTEri1+o1FQzMuKvgpkWukjEm+chYWmmmo3dU5nf8NhrTVyoNDows/v56C+GpToh/abzr/uRsw+gG/UMq1QvVLg3Pf
+        bh=X4s6FdHef7vHJmaayGa/KenEMFLkhsTB2Fe0/1F6SbM=;
+        b=Wchhnft+ifYfgsekvJx/MBRjvQn+uflb5LX5k3qYvnckWNyv8N6h+/s4o3LHl5nti+
+         gAAdwrLGmSImGOPHsVDJIwf4r1Bgg55uYe8XlmpliFE6A/8r2Iad6t8lKvKjgHn1bUMW
+         DZVzwY7a8ntlmOHTeoWjbMlHYTrRRGzdAVOqDEMsxM2JCF8qpDlfrqiwgbfI1XuQdI7P
+         k6DYry9op4Dp2e9J5JNL6VUvSrSTu4AE2+/cllss3SsLR8WPLtc7Be900xoB7llKW1IU
+         ZTHsZEnopp4G/X7djaY8jOPGE/gp/S0AzqoA2sCFpQylt5IibtkpiJILDToEw7h9EpF9
+         Pt2w==
+X-Forwarded-Encrypted: i=1; AJvYcCV8E15gzNLgweCnCw2LCznqNHdj2ffCloYJiXEcp3UPvr/SlfyzC+5MQDXG6gLdwF4GALtQ63ktyucUA5Zel8+kzF9Et+V1wfisUp31JmVEtbG6h3W3ap6FLbMWWMJxZA==
+X-Gm-Message-State: AOJu0YwXFDger/j9z7+UfAPF4n1cztw9EXCNbRPzMD5a7Y4wvnUlWEDy
+	Tvq9Fa/w7R5QNWwlRJ6XkPvk+Y+BaTsgqYInd/zco5C1Jio1/6iS
+X-Google-Smtp-Source: AGHT+IHzygceGEjkPjUx0xiCajopPxJC7oryA1WqG+A/YiVXTpAlz8lhX39kYbGZTCk+iygcpAOZSw==
+X-Received: by 2002:a05:6871:888:b0:210:b468:6a5d with SMTP id r8-20020a056871088800b00210b4686a5dmr982709oaq.16.1707469942286;
+        Fri, 09 Feb 2024 01:12:22 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXKIzIOsROoCCo0GMYrwniUaZ4ECGCXrpd7nSeCWNDa7srXa24kJgicmOyaUEtvuC5H7ZuHqBX5XyVdmtQMrrH9+TJka+KvnEJG9BWBrL9jZQ9qVBJCOx5XZrM5C9NJtyoub16ywUB116Nk8aLVO+1LoLpqVZinTA8vznJM/LHt3o8kjpKjABgq7JhubrCdpM3DG05g7uzZ7yQni1/ln6w8NNVGWnCGmX7uvKUncNnqFbjEeNi/i6hKLl7wD729SMiITlNt9nEFJX4IE94OHsj1NLNXoSBdiw2cMGvcqi2nHWFgpkZY0CG5WqxtfYVyJsIXGqWfV9H2YaAy2HJpU1N74m8fRiRRtqukEbUw1p/bx9avPGME1U3BMu7ukU6Vf/yXwzquYMae78uUG6nTwxozOB7rddS+71+Y+YtIkx2xPOrMbnce7EtAi9OFs7SiwqpH7Nt948WvbtxL4qkPmOYQ80srRVLRA4io+LPSffMsLiN/N6vz7R96DH7+B8gSNPc7iS98UUCpxXl6HIqB8JsDqN7lU0+gL+vYk0mj9WvT2GerrLzpQxi4
 Received: from wheely.local0.net ([118.208.150.76])
-        by smtp.gmail.com with ESMTPSA id cb1-20020a056a02070100b005c1ce3c960bsm1101742pgb.50.2024.02.09.01.12.07
+        by smtp.gmail.com with ESMTPSA id cb1-20020a056a02070100b005c1ce3c960bsm1101742pgb.50.2024.02.09.01.12.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Feb 2024 01:12:14 -0800 (PST)
+        Fri, 09 Feb 2024 01:12:21 -0800 (PST)
 From: Nicholas Piggin <npiggin@gmail.com>
 To: Thomas Huth <thuth@redhat.com>
 Cc: Nicholas Piggin <npiggin@gmail.com>,
@@ -86,9 +87,9 @@ Cc: Nicholas Piggin <npiggin@gmail.com>,
 	linux-s390@vger.kernel.org,
 	kvmarm@lists.linux.dev,
 	kvm-riscv@lists.infradead.org
-Subject: [kvm-unit-tests PATCH v4 4/8] migration: Support multiple migrations
-Date: Fri,  9 Feb 2024 19:11:30 +1000
-Message-ID: <20240209091134.600228-5-npiggin@gmail.com>
+Subject: [kvm-unit-tests PATCH v4 5/8] arch-run: rename migration variables
+Date: Fri,  9 Feb 2024 19:11:31 +1000
+Message-ID: <20240209091134.600228-6-npiggin@gmail.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20240209091134.600228-1-npiggin@gmail.com>
 References: <20240209091134.600228-1-npiggin@gmail.com>
@@ -100,195 +101,202 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Support multiple migrations by flipping dest file/socket variables to
-source after the migration is complete, ready to start again. A new
-destination is created if the test outputs the migrate line again.
-Test cases may now switch to calling migrate() one or more times.
+Using 1 and 2 for source and destination is confusing, particularly
+now with multiple migrations that flip between them. Do a rename
+pass to 'src' and 'dst' to tidy things up.
 
+Acked-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- lib/migrate.c         |  8 ++--
- lib/migrate.h         |  1 +
- scripts/arch-run.bash | 86 ++++++++++++++++++++++++++++++++++++-------
- 3 files changed, 77 insertions(+), 18 deletions(-)
+ scripts/arch-run.bash | 111 +++++++++++++++++++++---------------------
+ 1 file changed, 56 insertions(+), 55 deletions(-)
 
-diff --git a/lib/migrate.c b/lib/migrate.c
-index 527e63ae..b7721659 100644
---- a/lib/migrate.c
-+++ b/lib/migrate.c
-@@ -8,8 +8,10 @@
- #include <libcflat.h>
- #include "migrate.h"
- 
--/* static for now since we only support migrating exactly once per test. */
--static void migrate(void)
-+/*
-+ * Initiate migration and wait for it to complete.
-+ */
-+void migrate(void)
- {
- 	puts("Now migrate the VM, then press a key to continue...\n");
- 	(void)getchar();
-@@ -19,8 +21,6 @@ static void migrate(void)
- /*
-  * Initiate migration and wait for it to complete.
-  * If this function is called more than once, it is a no-op.
-- * Since migrate_cmd can only migrate exactly once this function can
-- * simplify the control flow, especially when skipping tests.
-  */
- void migrate_once(void)
- {
-diff --git a/lib/migrate.h b/lib/migrate.h
-index 3c94e6af..2af06a72 100644
---- a/lib/migrate.h
-+++ b/lib/migrate.h
-@@ -6,4 +6,5 @@
-  * Author: Nico Boehr <nrb@linux.ibm.com>
-  */
- 
-+void migrate(void);
- void migrate_once(void);
 diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-index 9a5aaddc..c2002d7a 100644
+index c2002d7a..c98429e8 100644
 --- a/scripts/arch-run.bash
 +++ b/scripts/arch-run.bash
-@@ -129,12 +129,16 @@ run_migration ()
- 		return 77
- 	fi
+@@ -132,27 +132,27 @@ run_migration ()
+ 	migcmdline=$@
  
-+	migcmdline=$@
-+
  	trap 'trap - TERM ; kill 0 ; exit 2' INT TERM
--	trap 'rm -f ${migout1} ${migout_fifo1} ${migsock} ${qmp1} ${qmp2} ${fifo}' RETURN EXIT
-+	trap 'rm -f ${migout1} ${migout2} ${migout_fifo1} ${migout_fifo2} ${migsock} ${qmp1} ${qmp2} ${fifo}' RETURN EXIT
- 
- 	migsock=$(mktemp -u -t mig-helper-socket.XXXXXXXXXX)
- 	migout1=$(mktemp -t mig-helper-stdout1.XXXXXXXXXX)
- 	migout_fifo1=$(mktemp -u -t mig-helper-fifo-stdout1.XXXXXXXXXX)
-+	migout2=$(mktemp -t mig-helper-stdout2.XXXXXXXXXX)
-+	migout_fifo2=$(mktemp -u -t mig-helper-fifo-stdout2.XXXXXXXXXX)
- 	qmp1=$(mktemp -u -t mig-helper-qmp1.XXXXXXXXXX)
- 	qmp2=$(mktemp -u -t mig-helper-qmp2.XXXXXXXXXX)
- 	fifo=$(mktemp -u -t mig-helper-fifo.XXXXXXXXXX)
-@@ -142,20 +146,54 @@ run_migration ()
- 	qmpout2=/dev/null
- 
- 	mkfifo ${migout_fifo1}
--	eval "$@" -chardev socket,id=mon1,path=${qmp1},server=on,wait=off \
-+	mkfifo ${migout_fifo2}
+-	trap 'rm -f ${migout1} ${migout2} ${migout_fifo1} ${migout_fifo2} ${migsock} ${qmp1} ${qmp2} ${fifo}' RETURN EXIT
+-
+-	migsock=$(mktemp -u -t mig-helper-socket.XXXXXXXXXX)
+-	migout1=$(mktemp -t mig-helper-stdout1.XXXXXXXXXX)
+-	migout_fifo1=$(mktemp -u -t mig-helper-fifo-stdout1.XXXXXXXXXX)
+-	migout2=$(mktemp -t mig-helper-stdout2.XXXXXXXXXX)
+-	migout_fifo2=$(mktemp -u -t mig-helper-fifo-stdout2.XXXXXXXXXX)
+-	qmp1=$(mktemp -u -t mig-helper-qmp1.XXXXXXXXXX)
+-	qmp2=$(mktemp -u -t mig-helper-qmp2.XXXXXXXXXX)
+-	fifo=$(mktemp -u -t mig-helper-fifo.XXXXXXXXXX)
+-	qmpout1=/dev/null
+-	qmpout2=/dev/null
+-
+-	mkfifo ${migout_fifo1}
+-	mkfifo ${migout_fifo2}
++	trap 'rm -f ${src_out} ${dst_out} ${src_outfifo} ${dst_outfifo} ${dst_incoming} ${src_qmp} ${dst_qmp} ${dst_infifo}' RETURN EXIT
 +
-+	eval "$migcmdline" \
-+		-chardev socket,id=mon1,path=${qmp1},server=on,wait=off \
- 		-mon chardev=mon1,mode=control > ${migout_fifo1} &
++	dst_incoming=$(mktemp -u -t mig-helper-socket-incoming.XXXXXXXXXX)
++	src_out=$(mktemp -t mig-helper-stdout1.XXXXXXXXXX)
++	src_outfifo=$(mktemp -u -t mig-helper-fifo-stdout1.XXXXXXXXXX)
++	dst_out=$(mktemp -t mig-helper-stdout2.XXXXXXXXXX)
++	dst_outfifo=$(mktemp -u -t mig-helper-fifo-stdout2.XXXXXXXXXX)
++	src_qmp=$(mktemp -u -t mig-helper-qmp1.XXXXXXXXXX)
++	dst_qmp=$(mktemp -u -t mig-helper-qmp2.XXXXXXXXXX)
++	dst_infifo=$(mktemp -u -t mig-helper-fifo-stdin.XXXXXXXXXX)
++	src_qmpout=/dev/null
++	dst_qmpout=/dev/null
++
++	mkfifo ${src_outfifo}
++	mkfifo ${dst_outfifo}
+ 
+ 	eval "$migcmdline" \
+-		-chardev socket,id=mon1,path=${qmp1},server=on,wait=off \
+-		-mon chardev=mon1,mode=control > ${migout_fifo1} &
++		-chardev socket,id=mon,path=${src_qmp},server=on,wait=off \
++		-mon chardev=mon,mode=control > ${src_outfifo} &
  	live_pid=$!
- 	cat ${migout_fifo1} | tee ${migout1} &
+-	cat ${migout_fifo1} | tee ${migout1} &
++	cat ${src_outfifo} | tee ${src_out} &
  
--	# We have to use cat to open the named FIFO, because named FIFO's, unlike
--	# pipes, will block on open() until the other end is also opened, and that
--	# totally breaks QEMU...
-+	# Start the first destination QEMU machine in advance of the test
-+	# reaching the migration point, since we expect at least one migration.
-+	# Then destination machines are started after the test outputs
-+	# subsequent "Now migrate the VM" messages.
-+	do_migration || return $?
-+
-+	while ps -p ${live_pid} > /dev/null ; do
-+		# Wait for test exit or further migration messages.
-+		if ! grep -q -i "Now migrate the VM" < ${migout1} ; then
-+			sleep 0.1
-+		else
-+			do_migration || return $?
-+		fi
-+	done
-+
-+	wait ${live_pid}
-+	ret=$?
-+
-+	while (( $(jobs -r | wc -l) > 0 )); do
-+		sleep 0.1
-+	done
-+
-+	return $ret
-+}
-+
-+do_migration ()
-+{
-+	# We have to use cat to open the named FIFO, because named FIFO's,
-+	# unlike pipes, will block on open() until the other end is also
-+	# opened, and that totally breaks QEMU...
- 	mkfifo ${fifo}
--	eval "$@" -chardev socket,id=mon2,path=${qmp2},server=on,wait=off \
--		-mon chardev=mon2,mode=control -incoming unix:${migsock} < <(cat ${fifo}) &
-+	eval "$migcmdline" \
-+		-chardev socket,id=mon2,path=${qmp2},server=on,wait=off \
-+		-mon chardev=mon2,mode=control -incoming unix:${migsock} \
-+		< <(cat ${fifo}) > ${migout_fifo2} &
+ 	# Start the first destination QEMU machine in advance of the test
+ 	# reaching the migration point, since we expect at least one migration.
+@@ -162,7 +162,7 @@ run_migration ()
+ 
+ 	while ps -p ${live_pid} > /dev/null ; do
+ 		# Wait for test exit or further migration messages.
+-		if ! grep -q -i "Now migrate the VM" < ${migout1} ; then
++		if ! grep -q -i "Now migrate the VM" < ${src_out} ; then
+ 			sleep 0.1
+ 		else
+ 			do_migration || return $?
+@@ -184,80 +184,81 @@ do_migration ()
+ 	# We have to use cat to open the named FIFO, because named FIFO's,
+ 	# unlike pipes, will block on open() until the other end is also
+ 	# opened, and that totally breaks QEMU...
+-	mkfifo ${fifo}
++	mkfifo ${dst_infifo}
+ 	eval "$migcmdline" \
+-		-chardev socket,id=mon2,path=${qmp2},server=on,wait=off \
+-		-mon chardev=mon2,mode=control -incoming unix:${migsock} \
+-		< <(cat ${fifo}) > ${migout_fifo2} &
++		-chardev socket,id=mon,path=${dst_qmp},server=on,wait=off \
++		-mon chardev=mon,mode=control -incoming unix:${dst_incoming} \
++		< <(cat ${dst_infifo}) > ${dst_outfifo} &
  	incoming_pid=$!
-+	cat ${migout_fifo2} | tee ${migout2} &
+-	cat ${migout_fifo2} | tee ${migout2} &
++	cat ${dst_outfifo} | tee ${dst_out} &
  
--	# The test must prompt the user to migrate, so wait for the "migrate" keyword
-+	# The test must prompt the user to migrate, so wait for the
-+	# "Now migrate VM" console message.
- 	while ! grep -q -i "Now migrate the VM" < ${migout1} ; do
+ 	# The test must prompt the user to migrate, so wait for the
+ 	# "Now migrate VM" console message.
+-	while ! grep -q -i "Now migrate the VM" < ${migout1} ; do
++	while ! grep -q -i "Now migrate the VM" < ${src_out} ; do
  		if ! ps -p ${live_pid} > /dev/null ; then
  			echo "ERROR: Test exit before migration point." >&2
-@@ -164,7 +202,7 @@ run_migration ()
- 			qmp ${qmp2} '"quit"'> ${qmpout2} 2>/dev/null
+-			echo > ${fifo}
+-			qmp ${qmp1} '"quit"'> ${qmpout1} 2>/dev/null
+-			qmp ${qmp2} '"quit"'> ${qmpout2} 2>/dev/null
++			echo > ${dst_infifo}
++			qmp ${src_qmp} '"quit"'> ${src_qmpout} 2>/dev/null
++			qmp ${dst_qmp} '"quit"'> ${dst_qmpout} 2>/dev/null
  			return 3
  		fi
--		sleep 1
-+		sleep 0.1
+ 		sleep 0.1
  	done
  
  	# Wait until the destination has created the incoming and qmp sockets
-@@ -176,7 +214,7 @@ run_migration ()
+-	while ! [ -S ${migsock} ] ; do sleep 0.1 ; done
+-	while ! [ -S ${qmp2} ] ; do sleep 0.1 ; done
++	while ! [ -S ${dst_incoming} ] ; do sleep 0.1 ; done
++	while ! [ -S ${dst_qmp} ] ; do sleep 0.1 ; done
+ 
+-	qmp ${qmp1} '"migrate", "arguments": { "uri": "unix:'${migsock}'" }' > ${qmpout1}
++	qmp ${src_qmp} '"migrate", "arguments": { "uri": "unix:'${dst_incoming}'" }' > ${src_qmpout}
+ 
  	# Wait for the migration to complete
- 	migstatus=`qmp ${qmp1} '"query-migrate"' | grep return`
+-	migstatus=`qmp ${qmp1} '"query-migrate"' | grep return`
++	migstatus=`qmp ${src_qmp} '"query-migrate"' | grep return`
  	while ! grep -q '"completed"' <<<"$migstatus" ; do
--		sleep 1
-+		sleep 0.1
- 		if ! migstatus=`qmp ${qmp1} '"query-migrate"'`; then
+ 		sleep 0.1
+-		if ! migstatus=`qmp ${qmp1} '"query-migrate"'`; then
++		if ! migstatus=`qmp ${src_qmp} '"query-migrate"'`; then
  			echo "ERROR: Querying migration state failed." >&2
- 			echo > ${fifo}
-@@ -192,14 +230,34 @@ run_migration ()
+-			echo > ${fifo}
+-			qmp ${qmp2} '"quit"'> ${qmpout2} 2>/dev/null
++			echo > ${dst_infifo}
++			qmp ${dst_qmp} '"quit"'> ${dst_qmpout} 2>/dev/null
+ 			return 2
+ 		fi
+ 		migstatus=`grep return <<<"$migstatus"`
+ 		if grep -q '"failed"' <<<"$migstatus"; then
+ 			echo "ERROR: Migration failed." >&2
+-			echo > ${fifo}
+-			qmp ${qmp1} '"quit"'> ${qmpout1} 2>/dev/null
+-			qmp ${qmp2} '"quit"'> ${qmpout2} 2>/dev/null
++			echo > ${dst_infifo}
++			qmp ${src_qmp} '"quit"'> ${src_qmpout} 2>/dev/null
++			qmp ${dst_qmp} '"quit"'> ${dst_qmpout} 2>/dev/null
  			return 2
  		fi
  	done
-+
- 	qmp ${qmp1} '"quit"'> ${qmpout1} 2>/dev/null
-+
-+	# keypress to dst so getchar completes and test continues
- 	echo > ${fifo}
--	wait $incoming_pid
-+	rm ${fifo}
-+
-+	# Ensure the incoming socket is removed, ready for next destination
-+	if [ -S ${migsock} ] ; then
-+		echo "ERROR: Incoming migration socket not removed after migration." >& 2
-+		qmp ${qmp2} '"quit"'> ${qmpout2} 2>/dev/null
-+		return 2
-+	fi
-+
-+	wait ${live_pid}
+ 
+-	qmp ${qmp1} '"quit"'> ${qmpout1} 2>/dev/null
++	qmp ${src_qmp} '"quit"'> ${src_qmpout} 2>/dev/null
+ 
+ 	# keypress to dst so getchar completes and test continues
+-	echo > ${fifo}
+-	rm ${fifo}
++	echo > ${dst_infifo}
++	rm ${dst_infifo}
+ 
+ 	# Ensure the incoming socket is removed, ready for next destination
+-	if [ -S ${migsock} ] ; then
++	if [ -S ${dst_incoming} ] ; then
+ 		echo "ERROR: Incoming migration socket not removed after migration." >& 2
+-		qmp ${qmp2} '"quit"'> ${qmpout2} 2>/dev/null
++		qmp ${dst_qmp} '"quit"'> ${dst_qmpout} 2>/dev/null
+ 		return 2
+ 	fi
+ 
+ 	wait ${live_pid}
  	ret=$?
  
--	while (( $(jobs -r | wc -l) > 0 )); do
--		sleep 0.5
--	done
-+	# Now flip the variables because dest becomes source
-+	live_pid=${incoming_pid}
-+	tmp=${migout1}
-+	migout1=${migout2}
-+	migout2=${tmp}
-+	tmp=${migout_fifo1}
-+	migout_fifo1=${migout_fifo2}
-+	migout_fifo2=${tmp}
-+	tmp=${qmp1}
-+	qmp1=${qmp2}
-+	qmp2=${tmp}
+-	# Now flip the variables because dest becomes source
++	# Now flip the variables because destination machine becomes source
++	# for the next migration.
+ 	live_pid=${incoming_pid}
+-	tmp=${migout1}
+-	migout1=${migout2}
+-	migout2=${tmp}
+-	tmp=${migout_fifo1}
+-	migout_fifo1=${migout_fifo2}
+-	migout_fifo2=${tmp}
+-	tmp=${qmp1}
+-	qmp1=${qmp2}
+-	qmp2=${tmp}
++	tmp=${src_out}
++	src_out=${dst_out}
++	dst_out=${tmp}
++	tmp=${src_outfifo}
++	src_outfifo=${dst_outfifo}
++	dst_outfifo=${tmp}
++	tmp=${src_qmp}
++	src_qmp=${dst_qmp}
++	dst_qmp=${tmp}
  
  	return $ret
  }
+@@ -280,8 +281,8 @@ run_panic ()
+ 	qmp=$(mktemp -u -t panic-qmp.XXXXXXXXXX)
+ 
+ 	# start VM stopped so we don't miss any events
+-	eval "$@" -chardev socket,id=mon1,path=${qmp},server=on,wait=off \
+-		-mon chardev=mon1,mode=control -S &
++	eval "$@" -chardev socket,id=mon,path=${qmp},server=on,wait=off \
++		-mon chardev=mon,mode=control -S &
+ 
+ 	panic_event_count=$(qmp_events ${qmp} | jq -c 'select(.event == "GUEST_PANICKED")' | wc -l)
+ 	if [ "$panic_event_count" -lt 1 ]; then
 -- 
 2.42.0
 
