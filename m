@@ -1,121 +1,102 @@
-Return-Path: <kvm+bounces-8499-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8500-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6197F84FFB8
-	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 23:20:28 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D8E784FFC5
+	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 23:22:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 92C111C212BE
-	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 22:20:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0E0B8B2B6BE
+	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 22:22:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CCCE3D0C1;
-	Fri,  9 Feb 2024 22:17:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EB9B39870;
+	Fri,  9 Feb 2024 22:20:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GLAyxBTW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XUqWp6W/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4D863BB30
-	for <kvm@vger.kernel.org>; Fri,  9 Feb 2024 22:17:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07B2E38DEC
+	for <kvm@vger.kernel.org>; Fri,  9 Feb 2024 22:20:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707517031; cv=none; b=ezZLHTNklCsx4g4uCuG/L/OKX0/QB9DU+Il36oD+c6/Yf5f2jVv+9gMqGEXhCn6llXm5igoAXganN+JdDlO4PNMHYW9zwaggSJQcohbYfV01OLrgukl/qVYZnmmiqLGTk+Trim+0Gy8fIMRcfWbAC9DDW0tc/ZrkuVlhjjOe2kc=
+	t=1707517251; cv=none; b=Inz9B+eY5XpQjb70dE5b4dIPXbc9u5ZVfpmZtbibC6AFIFY1cj1gCorapUTNoE8yLwhUA1oaDMA++nPX9vZbcQHNXQmAALwpgB0dlZYo52Q7jFVajtKw91KhXIs/TU6XwUcjkmcbhd0Zq3vpfvZkqxVJf0GKA9X7MMzcMUzNcSE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707517031; c=relaxed/simple;
-	bh=5ROcmTVvSgXvIbGuiN/CZtA5rWbe5pIknCwUED8ic5c=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=vCdEF5RxzvS7gnFtFUaDSFak9s203S36V+m1xoOBKh9dn+x9VXqUikaCFn3t7Ufm2P3Z5OwDw/JKzvjOgVR5NDL5jH3021dEr5h5hg6WMf2aAGAwNU/008cj4ZC5oNuaXTlZRAxu0u6iuGCB/hwSqMLK4Kd+Q6i2FPw90Rxr9eM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GLAyxBTW; arc=none smtp.client-ip=209.85.128.201
+	s=arc-20240116; t=1707517251; c=relaxed/simple;
+	bh=lZYnzgAV5rx778pfz79UIcdx//13/9FmDoyFZzDnVhk=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=nX+1paEzvs0o+2GWqhJHYiJkxWHiU00KmH9MOt6f7b/W7TtUxXPQD2qcLqQcdOy4A2pI8OOEl8Ntn5/CIzr5wR2YYMCwUqHRQP63ZKsNexYtmjz6znNYXrMzVIw8Utg64QHW5tTQvI+bbNiFkSnSyfPmoAj+z/JE2yPX8l/KY2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XUqWp6W/; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-604a1a44b56so22449537b3.2
-        for <kvm@vger.kernel.org>; Fri, 09 Feb 2024 14:17:09 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-296f8ff53b9so1004860a91.2
+        for <kvm@vger.kernel.org>; Fri, 09 Feb 2024 14:20:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707517028; x=1708121828; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=xriXj5ETw+SM6HIrjBhtRYR+FpAUxlK2qVu7eV3/IuU=;
-        b=GLAyxBTWGWdBIiHRzZZ2cDdHVFRWzPWB0gVp6BnC9IrZBal8Uom1oqFhpI+RXcY6cX
-         I+iz04yAbfy9jFA7RMYaSJMP1h1uw1jE+d3N/zVMVfFoh2yV0WL5zJw+vBIhc9XANZvb
-         zT1igYLPYy1oqbKNCf9NNkTNTyRBJRtVONL7AVmLMNS4UGi1Pxhq77N9UEzHsyeey99s
-         5oIuiN2nilmffCHvWblbG2yfFPopqqu7XgCaYn8QcjEdnQqwuj1Jf62Fg20DMP2iW9tN
-         ZK5gNr+mZbtg9/HAKOuiCBkd6qR0G0gTT02qUbRcfV1IQRIocC0UfDTJJt9GPN2pbzeJ
-         3Mhw==
+        d=google.com; s=20230601; t=1707517249; x=1708122049; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AzfdPcYYQcVv15Q1COLpo+SFtGTau77kfvfYtZRIgv0=;
+        b=XUqWp6W/UX3tSKk0yIxfbclCZK38qUBhW8Dd7TYKBUVVg2QXQkhNwwItjG12RS4/wV
+         2OrNdhXb/V5rsy2TbuQirm/EbVDP6BWmcsPJxoZbmx7GPzrLJHyQwhauCnf4ZWs2LSBB
+         TdDbmiQlUGevAJWQEQkb6pCBBB/XNLa274JszV+QT8X227EVZ1Hl4NoVCJT3L/TwPryF
+         y8XFMmPqG2GiR6+pcpep9SMfabbDn01KLk+XpXfwSKgiHicmbb/y7jUB2hRLSib2YaX4
+         P2oYzLcJkjvu34nalcWDGtfknckGOmA4r5i+qw2MVavHBXlLsLhKG6t9JOGVadSljkiZ
+         3ntg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707517028; x=1708121828;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xriXj5ETw+SM6HIrjBhtRYR+FpAUxlK2qVu7eV3/IuU=;
-        b=xATNLTwv5i2KBnecxf76DyKhyWNx3Foz1yZaO+pjdrexfV5Dxbl5HRtF8oLnp1ymiB
-         uxHoxfb2eLoSRN66Ar1jlC8pVkU8i/P9yS5W77JVaZXdCBz7umV9PeYtrwbi2fTrNgXc
-         +pSoUFIJ1Km5Fwp08qXZm3QaCUNYBS9RQrYoANFuxIQFQM/wdgJIRNRUE5vAzXY1C0Ff
-         bc4PLJjcjtfOXWDdHlr/4tfOyNFCM/l17bOseGd3OSpwyxa5TjQ7CwzpZlhO5mWL4VcN
-         bjW2R1uW+fP7fO4ZCKov0NoiG/q/1cKt7IsQb12B82DU7oNPv2725ra2XALnF2yCmOs9
-         KKqQ==
-X-Gm-Message-State: AOJu0Yzv3WJKwhuI+iC4dGAc9DOzEDbZfu95Vtaw+LJHULhJVodGgBQK
-	CzWpOSQj87Gjri7WovrOYpnNFbnoGaltRO+UQ2xqh/4ox2Cogkgi9Ap7tElYQzAeFnsmHMFT8GE
-	GVw==
-X-Google-Smtp-Source: AGHT+IFBb4C7Le8Uy1i1H/KekvmVJQcT8a1e7ObuqcVXCQx3MQ2cKGmrti4S38CyLF4p9XbPUBMPk0eKB5o=
+        d=1e100.net; s=20230601; t=1707517249; x=1708122049;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AzfdPcYYQcVv15Q1COLpo+SFtGTau77kfvfYtZRIgv0=;
+        b=X+qvz71pK1kLA+N08MX3cfZ7NOIdWyhfkTBtsbiMj4+cJc5FUkG9lVzXybi6eHf4Rt
+         urNVbvvgJjXRmXCY1m4RZeWa/6Ld2TWZn3RV6/NmeI7wfwronEYpw55QVUWgQbe97b/p
+         rSKa+H+Nr45GCFxR9Gy4iEZNS8o7uP765mbmQ2vOu28/fWEqIkf/vFkR6/GU5OMoiUBp
+         29daQ+1X7YIhHqxcXl2D+A8ChIXVwC6oy1NPVmQ3oFF94qjdj1/GhuOII6/RBWtFpVtN
+         BUpixo2WTMHCME3lR0ONH42O0bc8B5afmftPyNodU9xYP3/ey1iWEn/fxUhFV8awHOTC
+         3E5A==
+X-Gm-Message-State: AOJu0YwlxkrzXF91aJepfJgFIsp0DX8ElX45E6M87/7Iddd7rhq10KgB
+	FXWKDZ7LxkQzsSPNsfxP/lAyykVOuqr7sEmli8HCpEYBpTEj2puDwHVx2E5Kv3V9JzvxU4rtM17
+	UxQ==
+X-Google-Smtp-Source: AGHT+IGIrypl49k+UeTHuPL7iRNAQJ9FUAu3GCrP5bn1Q2qsJQWzW33Jfk4E5btAookSRHH6YVh3soa6az0=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:d82:b0:604:ac3b:75d5 with SMTP id
- da2-20020a05690c0d8200b00604ac3b75d5mr123597ywb.7.1707517028741; Fri, 09 Feb
- 2024 14:17:08 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:90b:2d82:b0:296:c55b:273c with SMTP id
+ sj2-20020a17090b2d8200b00296c55b273cmr18091pjb.2.1707517249389; Fri, 09 Feb
+ 2024 14:20:49 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  9 Feb 2024 14:17:00 -0800
-In-Reply-To: <20240209221700.393189-1-seanjc@google.com>
+Date: Fri,  9 Feb 2024 14:20:45 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240209221700.393189-1-seanjc@google.com>
 X-Mailer: git-send-email 2.43.0.687.g38aa6559b0-goog
-Message-ID: <20240209221700.393189-4-seanjc@google.com>
-Subject: [PATCH 3/3] KVM: nVMX: Add a sanity check that nested PML Full stems
- from EPT Violations
+Message-ID: <20240209222047.394389-1-seanjc@google.com>
+Subject: [PATCH 0/2] KVM: x86: kvm_has_noapic_vcpu fix/cleanup
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Li RongQing <lirongqing@baidu.com>, Maxim Levitsky <mlevitsk@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Add a WARN_ON_ONCE() sanity check to verify that a nested PML Full VM-Exit
-is only synthesized when the original VM-Exit from L2 was an EPT Violation.
-While KVM can fallthrough to kvm_mmu_do_page_fault() if an EPT Misconfig
-occurs on a stale MMIO SPTE, KVM should not treat the access as a write
-(there isn't enough information to know *what* the access was), i.e. KVM
-should never try to insert a PML entry in that case.
+Fix a longstanding bug where KVM fails to decrement kvm_has_noapic_vcpu
+if vCPU creation ultimately fails.  This is obviously way more than just
+a fix, but (a) in all likelihood no real users are affected by this, (b)
+the absolutely worst case scenario is minor performance degredation, and
+(c) I'm not at all convinced that kvm_has_noapic_vcpu provides any
+performance benefits.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/vmx/nested.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+Sean Christopherson (2):
+  KVM: x86: Move "KVM no-APIC vCPU" key management into local APIC code
+  KVM: x86: Sanity check that kvm_has_noapic_vcpu is zero at
+    module_exit()
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 4d0561136e70..29df186dac84 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -416,6 +416,16 @@ static void nested_ept_inject_page_fault(struct kvm_vcpu *vcpu,
- 		vm_exit_reason = EXIT_REASON_PML_FULL;
- 		vmx->nested.pml_full = false;
- 
-+		/*
-+		 * It should be impossible to trigger a nested PML Full VM-Exit
-+		 * for anything other than an EPT Violation from L2.  KVM *can*
-+		 * trigger nEPT page fault injection in response to an EPT
-+		 * Misconfig, e.g. if the MMIO SPTE was stale and L1's EPT
-+		 * tables also changed, but KVM should not treat EPT Misconfig
-+		 * VM-Exits as writes.
-+		 */
-+		WARN_ON_ONCE(vmx->exit_reason.basic != EXIT_REASON_EPT_VIOLATION);
-+
- 		/*
- 		 * PML Full and EPT Violation VM-Exits both use bit 12 to report
- 		 * "NMI unblocking due to IRET", i.e. the bit can be propagated
+ arch/x86/kvm/lapic.c | 27 ++++++++++++++++++++++++++-
+ arch/x86/kvm/x86.c   | 34 ++++------------------------------
+ 2 files changed, 30 insertions(+), 31 deletions(-)
+
+
+base-commit: 7455665a3521aa7b56245c0a2810f748adc5fdd4
 -- 
 2.43.0.687.g38aa6559b0-goog
 
