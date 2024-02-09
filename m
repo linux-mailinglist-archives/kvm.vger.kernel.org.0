@@ -1,193 +1,192 @@
-Return-Path: <kvm+bounces-8434-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8435-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00D3084F6D8
-	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 15:14:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF42284F740
+	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 15:28:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACC39287B99
-	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 14:14:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4545F1F223A1
+	for <lists+kvm@lfdr.de>; Fri,  9 Feb 2024 14:28:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 093786F07A;
-	Fri,  9 Feb 2024 14:12:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C97E69978;
+	Fri,  9 Feb 2024 14:28:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="hmgXgDZI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZXpPNRmQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2062.outbound.protection.outlook.com [40.107.237.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A5736EB50;
-	Fri,  9 Feb 2024 14:12:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.62
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707487929; cv=fail; b=ty4R29OoVtG9OBs6xsLoqqO8ibPPWOBvmBzg69qpQxuuwqDh9NrEJ+7l6D9Z2HmfrxKjNMR2wUCqvDgyXeZBEdI+2HEKHyKEpkC7+ZfI3Oo+Kx+K50J9uVsi7JDnCPOv3X8BRCR0P+oWyuLTjix3jYgkbxPuPS/TjrmE6tZJ70k=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707487929; c=relaxed/simple;
-	bh=nZldan/vWQlag83bViKM8RzsXjhwWs6uyMwIzFLjciQ=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=rfTjn2Ubc8JEzeb/pKU25Suz2rpe8umXAcc5dQDgS1/lZeEEX/73ozPQQd99g2UrZJy9+Uqv2EdB50O+XNGfKcbURcwD++VvedLcMThkp3Vma7TAu50aCUkWO79tFX4ajI85rE3Fvq4Dfd5I9x6jh88rU6/a3GViysm1kfLn/Tc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=hmgXgDZI; arc=fail smtp.client-ip=40.107.237.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aA6z3a6mi0MQXW2yJ8ON1sLK+JIeUYTHW2dB2SJVWyU/RKXkCu84TCcijL6Er8x+KotrKsQ4kH7UE9wbhiVq/Qwzbr4l0bAN2Ws8PuOHaJfoC5OkbkCrTaRRnPjiLduOeA9SK+qbTsl8yc/Rdp1bABnKJ8emXrrWJJpeLxxvt6LvR5q7lWabcawiVcgUZmrFiUjuFILsMztSUl86WFlFg4LA1RgCv9qwpWEX/qr1N7Imxnd7cYu2yB7cg5rOnUt0qpbayRUSfJmQRow+bSx0fgJVLi5tRrDlWwgd7Kx1yIL8HTVKsDzo8uM4SWFlnkDJnMiOquJT1kv8ElB2iA2Qtg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nZldan/vWQlag83bViKM8RzsXjhwWs6uyMwIzFLjciQ=;
- b=dUjyFHxixOibpPAG6keFnIytj0QWx7iRGrwUyaPU/bDgQqht1DlfIUsKuSj/L4SEH0EJ7FAWO9lK6ymeOFxodmePrXD5SWNw6ltOv2mCbDTfKvGdtFE/TuMvc+mog6VdNFscqgTBkhOAjmimuiQ7XVA3bmUq7+zJhFxSlx6/UDhn4dmnmpVNIv69XiDpYHZnSIBQIQ0RdOJj1dib/xRuaiXzmXRNNamj9mEMVCq6LII8lbvnW3N2VJ6dC/cPM8OX9JuSUO/DrG5wJm90TY0wVSlFXfS46k4axUt6yPtqAn6o9TlS74kzSOhoQSeSuAT6W9xXvtELrFuiEf64KIYU/A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nZldan/vWQlag83bViKM8RzsXjhwWs6uyMwIzFLjciQ=;
- b=hmgXgDZI5PDzYsAwcB91mitJUZVZm4WSBoSrmxAUbbpaO3ekbBmxR6VFgmqk1ioFglleW+A5XM4w532bmJ9umwTCAQlg8+xJYfns+yrY77qk1NHKjXHMyGrg+EOTdK8Q33Ks6CqATuFDo/mbYK75ulqajyPpi891zM3wl1k4uaxjRl2txRfWI0hDqxt+lHIBxtRkGG0sTqqkIC5wUV2wtnn3hOg+HMh2R04iTOl0Iu6Km8znTiFQnGbUYSeBEWmljuTAQVLYIm0B8xqfk+blJed8BkkKv+nAjXR3H1vmNE9rWh+8uFk/qfG0fH0vfBbjqo2NUOzyQ8+s6MOU7btR5g==
-Received: from MW4PR12MB7213.namprd12.prod.outlook.com (2603:10b6:303:22a::18)
- by SA1PR12MB7296.namprd12.prod.outlook.com (2603:10b6:806:2ba::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.17; Fri, 9 Feb
- 2024 14:12:02 +0000
-Received: from MW4PR12MB7213.namprd12.prod.outlook.com
- ([fe80::b68c:1caf:4ca5:b0a7]) by MW4PR12MB7213.namprd12.prod.outlook.com
- ([fe80::b68c:1caf:4ca5:b0a7%6]) with mapi id 15.20.7270.012; Fri, 9 Feb 2024
- 14:12:02 +0000
-From: Ankit Agrawal <ankita@nvidia.com>
-To: Will Deacon <will@kernel.org>
-CC: Jason Gunthorpe <jgg@nvidia.com>, "maz@kernel.org" <maz@kernel.org>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, "james.morse@arm.com"
-	<james.morse@arm.com>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>, "reinette.chatre@intel.com"
-	<reinette.chatre@intel.com>, "surenb@google.com" <surenb@google.com>,
-	"stefanha@redhat.com" <stefanha@redhat.com>, "brauner@kernel.org"
-	<brauner@kernel.org>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-	"mark.rutland@arm.com" <mark.rutland@arm.com>, "alex.williamson@redhat.com"
-	<alex.williamson@redhat.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>,
-	"yi.l.liu@intel.com" <yi.l.liu@intel.com>, "ardb@kernel.org"
-	<ardb@kernel.org>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	"andreyknvl@gmail.com" <andreyknvl@gmail.com>, "wangjinchao@xfusion.com"
-	<wangjinchao@xfusion.com>, "gshan@redhat.com" <gshan@redhat.com>,
-	"ricarkol@google.com" <ricarkol@google.com>, "linux-mm@kvack.org"
-	<linux-mm@kvack.org>, "lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	"rananta@google.com" <rananta@google.com>, "ryan.roberts@arm.com"
-	<ryan.roberts@arm.com>, Aniket Agashe <aniketa@nvidia.com>, Neo Jia
-	<cjia@nvidia.com>, Kirti Wankhede <kwankhede@nvidia.com>, "Tarun Gupta
- (SW-GPU)" <targupta@nvidia.com>, Vikram Sethi <vsethi@nvidia.com>, Andy
- Currid <acurrid@nvidia.com>, Alistair Popple <apopple@nvidia.com>, John
- Hubbard <jhubbard@nvidia.com>, Dan Williams <danw@nvidia.com>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, Matt Ochs
-	<mochs@nvidia.com>, Zhi Wang <zhiw@nvidia.com>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH v6 1/4] kvm: arm64: introduce new flag for non-cacheable
- IO memory
-Thread-Topic: [PATCH v6 1/4] kvm: arm64: introduce new flag for non-cacheable
- IO memory
-Thread-Index: AQHaWgbdhvpY3ycYrU2mOegquaqhOrEAbuKAgAGgqXg=
-Date: Fri, 9 Feb 2024 14:12:01 +0000
-Message-ID:
- <MW4PR12MB72133DAC9A35687D33DCCDC0B04B2@MW4PR12MB7213.namprd12.prod.outlook.com>
-References: <20240207204652.22954-1-ankita@nvidia.com>
- <20240207204652.22954-2-ankita@nvidia.com>
- <20240208131938.GB23428@willie-the-truck>
-In-Reply-To: <20240208131938.GB23428@willie-the-truck>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MW4PR12MB7213:EE_|SA1PR12MB7296:EE_
-x-ms-office365-filtering-correlation-id: cd5026b1-aba7-496b-5ece-08dc29791632
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- X7PaqzyNG+bV54ihtbYRo79iflm0C5XJ/CuOT7qYLoHrPZVEsHVTkB9uQ6lQwx6V5q+KCie8Um0BIotigzysn7+JC+JrgI7uDNoNXWGcCeZNpEeuMIWX8xoCOUfkmnzrnC//uiATMthu2tB+ZDiF1z9WKTDHtZt4EhDig9o1ax1f8MzNkFYiK+ITbM9t1dpma4ZrM2M0bhWF18S5Q5BN+UQPCu8NwDpwovN4zkLR08lg1eJ5zLsgBzVlqMXv/uq0WCDrcg4xJ/VpFTgxk+sNRxfo6JMO/7gry6CVo0C1RsZOYEWuCwIpfK2POG51CCZ8/FrtqOIq4ul67GsVnCM3dhvtsJVH+JxyepE+oGb0j1jBTFmOba91xVgHUNDSDTs7grv9i42bQLEfyhF+HrNwhf1khe7IUds/Pq1HesES1PTIEnKXzY5yusNocWfvCJaC2s9CdrW1yLLZ4HFA5rgD48aB3tJwwSV+38R3MJwE8dmgLZ6mV+k6izVJRLm2Bj8RlWh+UCAi53Kd/1AApQVp1rhxi9Kv/GHX/TYWsro7+YmuTXHH1D4V9vMvxwa79VUDFooBicbJqcvBCFpIJI+foyS80E5ejAlE+h6ptvaruT7gH0KOVFy9rSo8/OK5H8a4
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR12MB7213.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(39860400002)(366004)(396003)(346002)(376002)(230922051799003)(1800799012)(451199024)(64100799003)(186009)(33656002)(26005)(55016003)(83380400001)(7416002)(41300700001)(4744005)(8936002)(76116006)(54906003)(86362001)(66476007)(38070700009)(122000001)(91956017)(6916009)(66446008)(66946007)(7696005)(64756008)(6506007)(71200400001)(9686003)(66556008)(38100700002)(478600001)(4326008)(316002)(2906002)(5660300002)(52536014)(8676002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?7ksOlKLTNF/q2SBtGXGLvwVLX+FHqshhIHCSZNiuCjQ/JwFWeM6N0TSoZA?=
- =?iso-8859-1?Q?YmbIFPCLVaUwRBuFVT7XAJtgcY7bWHjsb8kN0ENdOfZG8fcO6PWNCezaqi?=
- =?iso-8859-1?Q?BVKNzbTVYpYMncfQhgIxO5JyOva5YNPjWPOLxv+4OJDpYZDLCkL8nFC5uq?=
- =?iso-8859-1?Q?U3YCqOz0JayCu7hGdL16zWCPDmwa2/rLPNVwe/ECSK3FaJLGkrANZqqb7i?=
- =?iso-8859-1?Q?HytLGnZ+DYItcE18VE/yfS4hv8b7zZKK7vWMP3DRX3KzFpE06MUKTCeSkb?=
- =?iso-8859-1?Q?4C9ONBJI3oRm9Sy6eBtwqCHiHjcNqEI3kfVA3iEjlv4PeHvgfMOv3pTwG2?=
- =?iso-8859-1?Q?GbgY/dUEnaPDbhYaA/4giFL+k4hymqwsA+bYtoTQpBBZv25uiaTYWRf6ov?=
- =?iso-8859-1?Q?Uviau13ehb98BPOgnPSNqXuuSAIwrijdZl2+JFcoWnGdIowskXVsM4g0Mm?=
- =?iso-8859-1?Q?J5BCZF26IqOrOI5ByBmL6M1uXU0SrNT/LUNdc4ivTyFzr4KEbLTOXvFSdm?=
- =?iso-8859-1?Q?1limyMUihOgcj+zCcJdahhdkAkNFFmo1L7bGjovA88LDt1Wa9RNqoez0e4?=
- =?iso-8859-1?Q?RCrCO4FHqJNWOBfTVCtTK61xtMBI6H4YZPLdxreQz9fgCH0jk1luMqqQN+?=
- =?iso-8859-1?Q?1HxQ3cAu3ydYaGm6Kdt+KfzIcuaFbjSMJ3kABD1bYjb2/kfLeZqkCgQk0a?=
- =?iso-8859-1?Q?5HzNDoghYaRzP/UlCrOjyNGjA68/BtHGk9pHnljuoru8IgPRI44S9W1HNh?=
- =?iso-8859-1?Q?kqpIe7t3vEJnNvEmMTNeS6bVcrn3jrfSPCURrcsw9GYxDmg35E6hh4KGbm?=
- =?iso-8859-1?Q?W+7IualG5Cctxb0Z+XWM/6ayz5tw7faH3AcEhQ7Nbg8/CCfIu8NxWdBHeC?=
- =?iso-8859-1?Q?tzku5VOU0cCHSAUH7s9iUIO3H6bUu6Swp7j6XHmDaerQbRgrL03ayrV2eI?=
- =?iso-8859-1?Q?b4cfgNaHYtKpJkK2CRQ2NofdhmAfBwwb/O4uy6R0BhvlQOZkBcsQ+0OiC+?=
- =?iso-8859-1?Q?qsGCh+TABVTyXtLWDsmp4IvWn/eETkNIQVpAddILSa33W0M2wUT+bUiXi6?=
- =?iso-8859-1?Q?LjidXmS0Kc9i56m4776HReMdVwdaA9N4Nj0hjxDIMgdnQxcRidNcAxq+Qg?=
- =?iso-8859-1?Q?W07pMMvfY5MSfSs/Ix6sgaff/ZRRbo6z5Bt0heSwUqwzTtGVZS2y7cs7UE?=
- =?iso-8859-1?Q?M5+ZbyssSJy4SJvyMoUzw4UZeFh1INoMDto1ZLp+yyPQqllr8TMWD7PMS6?=
- =?iso-8859-1?Q?yEMFiRKjdR3y+z/HmL2dkdEDVMFcgX286STynfPY+WeixDXE3edU5gFHdA?=
- =?iso-8859-1?Q?YaOuzuPj30fzQk0ZRaGYAt+7EOFOCxsjW2lGllhcekjvG1Ggq1MbjqiSMi?=
- =?iso-8859-1?Q?MhMtbVuWgR/i4FNon94uLNdDZ8AXLfyK+HPOk0nwzaoSQuQpdhyz3ZT3/Q?=
- =?iso-8859-1?Q?Y6e2XNW0c5/B1aFpbu1t5aa8p/QC7C5E//mMJ7DYSrX3BLgjlFlDpWDZma?=
- =?iso-8859-1?Q?WDRkx/zdLRX4ky0pnWAFfAEpLNKpzDryAkZ6zd0Ou2t5bLiDYNs7eZHiAl?=
- =?iso-8859-1?Q?zfU7ThFCo0Lv23Q9CKeZmCDfb8rdahwLm3bbzraprXs9b8Kzd3kARvKmYY?=
- =?iso-8859-1?Q?F/7FxI3ufYMr8=3D?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA89E69950
+	for <kvm@vger.kernel.org>; Fri,  9 Feb 2024 14:28:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707488888; cv=none; b=RJasGAjfcUhOYtT1HUVdPM99tjQD/0HTmj6yo2qDHDCMMtd788m4tUF6WE8ar4+ICYlqgFfQRE5+D0hnBQhkC/h8HIXymTLWlNFDXOMBCiO0+JT2TH3JP8LoMV2V959LRn3YEPi/lBzneM2AhAS4PW3BSe0LzQkj2kXJaqsO/nI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707488888; c=relaxed/simple;
+	bh=HUx7t17vxGA5IaYOV8ff1kr8+jU/9ANSxbnT6H9GSco=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=iMM/CC84efDH2bSK48N/93r1uYZxKmAGM+JDOlZwiyKZjGNItJwpUPAIyRdMFk28RVemjYeXlOTnFxIg9LZADlip0irCAWzSRPzOiZLPYrkzss/g7huvhFeS4s4zkaHWiXlu8T/MdIyUiGGUtc8x5Sb6QxqkELvn8s+sNtvej14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZXpPNRmQ; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-604b44e1dc9so19412497b3.1
+        for <kvm@vger.kernel.org>; Fri, 09 Feb 2024 06:28:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1707488886; x=1708093686; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=uCfsv6GrpUFnVCwcL3J5Wem8yNPUxVMsIIYMkBzD0b0=;
+        b=ZXpPNRmQeW+Sm8OzwxON1DpjmSlXeodKp3uxsBZq1Cg5uqJA8J7OR0zmKyk1akz2Yy
+         5EywEk/vM6zchQkTO/MSC9+Yucn6xjqlLJXS5II+SRuUGG5D3/myvb/anp4h/lhMlUIG
+         ZcZcRAnBDNFUNDeH/AEX9RhWOJlV1M6SbJDFo/Eax51+lByy3q3Dg7L8HJx5FRfGnOhl
+         sabcrTwvk8718sVD0CAGGXFZLyzHPoNW6pzR4LcloHCjJlb0MDm2i6LNBXTuYHY0+3L1
+         YbngJFU/xjyYwKCM/BH9Ajz03VQupmY8A4LEcC1lUozX9lXFnBzk7XDTJUskDv3PBTXF
+         fhHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707488886; x=1708093686;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uCfsv6GrpUFnVCwcL3J5Wem8yNPUxVMsIIYMkBzD0b0=;
+        b=l2Qq2VFjIrvR+W6H6iKl2m8OPM3HWL+4US6YVl6C/YUzV8VHSFz0adgqtZUvs0tptm
+         T4bErF/DVB4bkqeBwl+14APKrxgMniNgjhvxP3jtwOVzJNIUeoQw3Q0Pjhr50Z5Afwhb
+         7Eg9o/2QOzUP9DfWYSiycoWTf7yQKgxiY9bi7virfll93POjq73tb2BPWY283KXGIn/1
+         4N/Dzfcnrqc94BRuKVzyx38z2e7Fg0KN6cwn2rwGuglcd4lKee6/WSPiPhIaAwj70xVP
+         CM1DAAP0J6ypoylHs83E4pfkdOi247h/O15/TGuTrz6iQ6AVWk8ncQi5n7gaG6Hyr6FM
+         Lang==
+X-Gm-Message-State: AOJu0Yxuit/gQaQIOGa7G87oNWjZe2CzqvrIwAnByd8PMcTKAkLlvK04
+	jK4fg3jhgaqUTel0dy/m1wJcUdQRDXgRgAzIy9tfAzcK5tkyeIYuDMpE20TvVuyzTD/o9OVS1vx
+	wLQ==
+X-Google-Smtp-Source: AGHT+IHy+djrwH9lBwMcfClT+8pK1QZMj2IcA9F/oSlT9qX98kneABwsfBtcWfL+f67hdIOBZn1ACZ3Dunw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:6d82:0:b0:5ff:a885:65b with SMTP id
+ i124-20020a816d82000000b005ffa885065bmr252030ywc.10.1707488885935; Fri, 09
+ Feb 2024 06:28:05 -0800 (PST)
+Date: Fri, 9 Feb 2024 06:28:04 -0800
+In-Reply-To: <e7125fcb-52b1-4942-9ae7-c85049e92e5c@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR12MB7213.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cd5026b1-aba7-496b-5ece-08dc29791632
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Feb 2024 14:12:01.9622
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 2iQKyM0YD9nOE6ggGp+XQHrblNXVSVSSSIwqFVBLEeb8BIuwog8XqU7lKU0OPdvVNDtedyp92o2Oe4evBhiAEA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7296
+Mime-Version: 1.0
+References: <20231016115028.996656-1-michael.roth@amd.com> <20231016115028.996656-5-michael.roth@amd.com>
+ <e7125fcb-52b1-4942-9ae7-c85049e92e5c@arm.com>
+Message-ID: <ZcY2VRsRd03UQdF7@google.com>
+Subject: Re: [PATCH RFC gmem v1 4/8] KVM: x86: Add gmem hook for invalidating memory
+From: Sean Christopherson <seanjc@google.com>
+To: Steven Price <steven.price@arm.com>
+Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, "tabba@google.com" <tabba@google.com>, linux-coco@lists.linux.dev, 
+	linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	pbonzini@redhat.com, isaku.yamahata@intel.com, ackerleytng@google.com, 
+	vbabka@suse.cz, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
+	jroedel@suse.de, pankaj.gupta@amd.com
+Content-Type: text/plain; charset="us-ascii"
 
->>=0A=
->> +=A0=A0=A0=A0 switch (prot & (KVM_PGTABLE_PROT_DEVICE |=0A=
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 KVM_PGTABL=
-E_PROT_NORMAL_NC)) {=0A=
->> +=A0=A0=A0=A0 case 0:=0A=
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 attr =3D KVM_S2_MEMATTR(pgt, NORMA=
-L);=0A=
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 break;=0A=
->> +=A0=A0=A0=A0 case KVM_PGTABLE_PROT_DEVICE:=0A=
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (prot & KVM_PGTABLE_PROT_X)=0A=
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return -EI=
-NVAL;=0A=
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 attr =3D KVM_S2_MEMATTR(pgt, DEVIC=
-E_nGnRE);=0A=
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 break;=0A=
->> +=A0=A0=A0=A0 case KVM_PGTABLE_PROT_NORMAL_NC:=0A=
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 attr =3D KVM_S2_MEMATTR(pgt, NORMA=
-L_NC);=0A=
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 break;=0A=
->> +=A0=A0=A0=A0 default:=0A=
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 WARN_ON_ONCE(1);=0A=
->> +=A0=A0=A0=A0 }=0A=
->=0A=
-> Cosmetic nit, but I'd find this a little easier to read if the normal=0A=
-> case was the default (i.e. drop 'case 0') and we returned an error for=0A=
-> DEVICE | NC.=0A=
-=0A=
-Makes sense, will update the logic accordingly.=
+On Fri, Feb 09, 2024, Steven Price wrote:
+> On 16/10/2023 12:50, Michael Roth wrote:
+> > In some cases, like with SEV-SNP, guest memory needs to be updated in a
+> > platform-specific manner before it can be safely freed back to the host.
+> > Wire up arch-defined hooks to the .free_folio kvm_gmem_aops callback to
+> > allow for special handling of this sort when freeing memory in response
+> > to FALLOC_FL_PUNCH_HOLE operations and when releasing the inode, and go
+> > ahead and define an arch-specific hook for x86 since it will be needed
+> > for handling memory used for SEV-SNP guests.
+> 
+> Hi all,
+> 
+> Arm CCA has a similar need to prepare/unprepare memory (granule
+> delegate/undelegate using our terminology) before it is used for
+> protected memory.
+> 
+> However I see a problem with the current gmem implementation that the
+> "invalidations" are not precise enough for our RMI API. When punching a
+> hole in the memfd the code currently hits the same path (ending in
+> kvm_unmap_gfn_range()) as if a VMA is modified in the same range (for
+> the shared version).
+>
+> The Arm CCA architecture doesn't allow the protected memory to be removed and
+> refaulted without the permission of the guest (the memory contents would be
+> wiped in this case).
+
+TDX behaves almost exactly like CCA.  Well, that's not technically true, strictly
+speaking, as there are TDX APIs that do allow for *temporarily* marking mappings
+!PRESENT, but those aren't in play for invalidation events like this.
+
+SNP does allow zapping page table mappings, but fully removing a page, as PUNCH_HOLE
+would do, is destructive, so SNP also behaves the same way for all intents and
+purposes.
+
+> One option that I've considered is to implement a seperate CCA ioctl to
+> notify KVM whether the memory should be mapped protected.
+
+That's what KVM_SET_MEMORY_ATTRIBUTES+KVM_MEMORY_ATTRIBUTE_PRIVATE is for, no?
+
+> The invalidations would then be ignored on ranges that are currently
+> protected for this guest.
+
+That's backwards.  Invalidations on a guest_memfd should affect only *protected*
+mappings.  And for that, the plan/proposal is to plumb only_{shared,private} flags
+into "struct kvm_gfn_range"[1] so that guest_memfd invalidations don't zap shared
+mappings, and mmu_notifier invalidation don't zap private mappings.  Sample usage
+in the TDX context[2] (disclaimer, I'm pretty sure I didn't write most of that
+patch despite, I only provided a rough sketch).
+
+[1] https://lore.kernel.org/all/20231027182217.3615211-13-seanjc@google.com
+[2] https://lore.kernel.org/all/0b308fb6dd52bafe7153086c7f54bfad03da74b1.1705965635.git.isaku.yamahata@intel.com
+
+> This 'solves' the problem nicely except for the case where the VMM
+> deliberately punches holes in memory which the guest is using.
+
+I don't see what problem there is to solve in this case.  PUNCH_HOLE is destructive,
+so don't do that.
+
+> The issue in this case is that there's no way of failing the punch hole
+> operation - we can detect that the memory is in use and shouldn't be
+> freed, but this callback doesn't give the opportunity to actually block
+> the freeing of the memory.
+
+Why is this KVM's problem?  E.g. the same exact thing happens without guest_memfd
+if userspace munmap()s memory the guest is using.
+
+> Sadly there's no easy way to map from a physical page in a gmem back to
+> which VM (and where in the VM) the page is mapped. So actually ripping
+> the page out of the appropriate VM isn't really possible in this case.
+
+I don't follow.  guest_memfd has a 1:1 binding with a VM *and* a gfn, how can you
+not know what exactly needs to be invalidated?
+
+> How is this situation handled on x86? Is it possible to invalidate and
+> then refault a protected page without affecting the memory contents? My
+> guess is yes and that is a CCA specific problem - is my understanding
+> correct?
+> 
+> My current thoughts for CCA are one of three options:
+> 
+> 1. Represent shared and protected memory as two separate memslots. This
+> matches the underlying architecture more closely (the top address bit is
+> repurposed as a 'shared' flag), but I don't like it because it's a
+> deviation from other CoCo architectures (notably pKVM).
+> 
+> 2. Allow punch-hole to fail on CCA if the memory is mapped into the
+> guest's protected space. Again, this is CCA being different and also
+> creates nasty corner cases where the gmem descriptor could have to
+> outlive the VMM - so looks like a potential source of memory leaks.
+> 
+> 3. 'Fix' the invalidation to provide more precise semantics. I haven't
+> yet prototyped it but it might be possible to simply provide a flag from
+> kvm_gmem_invalidate_begin specifying that the invalidation is for the
+> protected memory. KVM would then only unmap the protected memory when
+> this flag is set (avoiding issues with VMA updates causing spurious unmaps).
+> 
+> Fairly obviously (3) is my preferred option, but it relies on the
+> guarantees that the "invalidation" is actually a precise set of
+> addresses where the memory is actually being freed.
+
+#3 is what we are planning for x86, and except for the only_{shared,private} flags,
+the requisite functionality should already be in Linus' tree, though it does need
+to be wired up for ARM.
 
