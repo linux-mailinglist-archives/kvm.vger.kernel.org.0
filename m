@@ -1,274 +1,93 @@
-Return-Path: <kvm+bounces-8537-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8538-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84F1C850CBA
-	for <lists+kvm@lfdr.de>; Mon, 12 Feb 2024 02:33:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4582C850D29
+	for <lists+kvm@lfdr.de>; Mon, 12 Feb 2024 05:29:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13DA6287C71
-	for <lists+kvm@lfdr.de>; Mon, 12 Feb 2024 01:33:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D725B1F25657
+	for <lists+kvm@lfdr.de>; Mon, 12 Feb 2024 04:29:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D0A41B299;
-	Mon, 12 Feb 2024 01:29:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 182DD7464;
+	Mon, 12 Feb 2024 04:28:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="G2/d7jz7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h7YIvV9e"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD49718AEA;
-	Mon, 12 Feb 2024 01:29:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB3586FBF
+	for <kvm@vger.kernel.org>; Mon, 12 Feb 2024 04:28:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707701362; cv=none; b=gCj1qnb+z4AijsXcndSDrDSu8w3uJlk95IMqINQg+wzN6FzdxCRfdaom7R1j1o4YNVorsAo6A80BSOmGnSq5al7DdbXDGfXPXCiQC5cRRWRhN4NlDusHOJo57StaD1ZvJK2LU5GYd/fE2nvKWE5cWfKzo/6D3tn+oHTNDg2iSh4=
+	t=1707712135; cv=none; b=NENXTvF0Fja+OoQvbxpxl6biaXN4H5ins5+ssXZDIS0MilDE629VC72++CFq2WZRGpgf8+HM04UK0JOG6Er26XEkm+kdPkmBB+Qafep0weVx8guuheyxPheSfv7LFIE+YOBKltFe4yhg+iYwDKnRDHkVX0Bv5hvPPHByJhuUVOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707701362; c=relaxed/simple;
-	bh=XBlWfviHQ2r7aBjkRLrI3TMQKAtXtxPcTjG5M5Y798c=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=CCZu6hA+v6EcdCxlwn9r9tl9guCwfJCCuHgACs4bal3P/ibNhtr0LWQRE/3NSyfMc7nQrv/xr3H0jN4BwvKwKVPyUgWMuTfEzy+cqB2MtVmUotSHnYUYV3S+s59TfETDxPyxQfPAu4uTlqkbJ53C8vP2NkfhBt42A6fFErjr3a0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=G2/d7jz7; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707701362; x=1739237362;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=XBlWfviHQ2r7aBjkRLrI3TMQKAtXtxPcTjG5M5Y798c=;
-  b=G2/d7jz795ci048Sz+ih2tE7OE6++9Leu1iyDLvzNA2Aga/X4ZjtKlf3
-   dLXsqY5SVoRF7s3ohfPUynbylIWr5zEW651qcOrlU3Ai2X6aPY331Ozre
-   bwK+b/mp/JEfMpXK+5jh+xgh9aEivCR485UuWaSjACaGtDO4kltyzFerg
-   M+MoXYoDZCDDUy6h5TF/Uy8umeHj3v2mUCbeNb1lUdfCMzhAxybDW6qU4
-   ANeUZCiKbbsahTiuGSVQNs61LfhGl62dHGCZHdQe9odNkjmsX5j09axFG
-   UX4WPlDCxcvkEwjJtTwM5Fm0NaUmJ8ZrzNEhPp4s+FbZyvbPsd9z7d59c
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10981"; a="5502222"
-X-IronPort-AV: E=Sophos;i="6.05,261,1701158400"; 
-   d="scan'208";a="5502222"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2024 17:29:21 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,261,1701158400"; 
-   d="scan'208";a="7132268"
-Received: from allen-box.sh.intel.com ([10.239.159.127])
-  by orviesa005.jf.intel.com with ESMTP; 11 Feb 2024 17:29:17 -0800
-From: Lu Baolu <baolu.lu@linux.intel.com>
-To: Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	Nicolin Chen <nicolinc@nvidia.com>
-Cc: Yi Liu <yi.l.liu@intel.com>,
-	Jacob Pan <jacob.jun.pan@linux.intel.com>,
-	Longfang Liu <liulongfang@huawei.com>,
-	Yan Zhao <yan.y.zhao@intel.com>,
-	Joel Granados <j.granados@samsung.com>,
-	iommu@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Lu Baolu <baolu.lu@linux.intel.com>,
-	Jason Gunthorpe <jgg@nvidia.com>
-Subject: [PATCH v13 16/16] iommu: Make iommu_report_device_fault() return void
-Date: Mon, 12 Feb 2024 09:22:27 +0800
-Message-Id: <20240212012227.119381-17-baolu.lu@linux.intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240212012227.119381-1-baolu.lu@linux.intel.com>
-References: <20240212012227.119381-1-baolu.lu@linux.intel.com>
+	s=arc-20240116; t=1707712135; c=relaxed/simple;
+	bh=Ee1ugbYUbMJORTVX/Jz/L9KQXUw2dDk0NnmGMbtvwz8=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=az44NIGUhvZvEmYsBwN5BVq6tHL2BfoxH1eGHRyH4ZZXChctwFWgo9fEkF/2dFnlKlku4dgaF1ankxS4WY8wkP/uCY9yMF9o3HRBWDZZSM0NpO2a2TeojV1mCfUKSwBCiUsSYRH4C8KImSFn8nOXnOBWEkpYyHl8gLD4HTQI0gY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h7YIvV9e; arc=none smtp.client-ip=209.85.219.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-6818a9fe380so17864986d6.2
+        for <kvm@vger.kernel.org>; Sun, 11 Feb 2024 20:28:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707712132; x=1708316932; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Ee1ugbYUbMJORTVX/Jz/L9KQXUw2dDk0NnmGMbtvwz8=;
+        b=h7YIvV9etbJB09THGF/PhRqepeOhRSJ6FageTtRFUrf9IcuB56G83cbWtA5mKCAE1E
+         /T1Nu82bqpyACVa8/sQgdaon3WiC/+2Zgkh31V/m57qCuhZVoJm4+vVJmgTtCH2SOf9X
+         v5Y4QbfETyrNHzpOfHuNjNFEH3XUVQHB6w64pukmUYEYifJEOE/F3F/ynyw6y+NxvZbP
+         h+ZMxwywxI3Q3W/7c7vE7GZDcw2wGHL+rBQHhr40qwpYZ/Z2gUaqis89i242DJgC379w
+         JQmxngf8R7RGuT5ZTy5y++IVhvxzNk8LnOl5Duam5URH0BMYx8YM1YpttdxZef8sjg3y
+         /sxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707712132; x=1708316932;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Ee1ugbYUbMJORTVX/Jz/L9KQXUw2dDk0NnmGMbtvwz8=;
+        b=OPsrBbvTUrTrO38nQsIeJSboBlayZoJMv1iZ+xbwLjSnqEGp8lG9fLlZqch+GI1euj
+         xm6xZw6IKSZOnpRx86yGQsN3eY2VFoTevJ3JR+V+kIO2rUMde6szNojzfNP1nc5uefmb
+         /NHTNmoVs/c/wnA3Js0e/CJeXKlBN+Xe/0RsnqE6KshIBnywpFcYTZV8I4A23V+htmdO
+         SfjOcIZI8Gx3DZjiG2tgcH8XN5Jr2GC35/zYiOZeCXSP0u6mdymAS2wBNNfD06mKa2F3
+         HUwMybwTXrrF/26he/wZ6QEE1FL2TE2kQAJRtpfKNIENloV22uPuZ6T7mXDsgP7qEinF
+         NVJQ==
+X-Gm-Message-State: AOJu0YzlCxZU8vQsulOdchawYQ3y5oNOIdhbm05J+RxDM0RIeNIpE/gO
+	C/7KLnb+jrxqSGNpAu2KPHg/6JEbXMhLqfNkPpDwSYymJj4nIhFlsWSWSkLqxfvmnRKTs7FRA34
+	NGW2Fy70rlSMNxq8308DjKmFReTs8d61XMRBwZw==
+X-Google-Smtp-Source: AGHT+IFzZIoGT7MG7ExH0C3bdNDbFg/R/5pe6a+nWY46F71sa98XiV8gbOTsILOByhGb9sZbocaFNPPHwGx6/8rtLy8=
+X-Received: by 2002:a0c:ca91:0:b0:68c:668b:c610 with SMTP id
+ a17-20020a0cca91000000b0068c668bc610mr6628239qvk.2.1707712132450; Sun, 11 Feb
+ 2024 20:28:52 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: lokesh jaliminche <lokesh.jaliminche@gmail.com>
+Date: Sun, 11 Feb 2024 20:28:41 -0800
+Message-ID: <CAKJOkCooV4MjSprReFA+C7MjqLzeA6uvpRKh3EqpS8Gk1vzgFw@mail.gmail.com>
+Subject: Question About QEMU KVM interaction for memory access
+To: kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-As the iommu_report_device_fault() has been converted to auto-respond a
-page fault if it fails to enqueue it, there's no need to return a code
-in any case. Make it return void.
+Hello KVM Community,
 
-Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
-Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-Reviewed-by: Kevin Tian <kevin.tian@intel.com>
----
- include/linux/iommu.h                       |  5 ++---
- drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c |  4 ++--
- drivers/iommu/intel/svm.c                   | 19 ++++++----------
- drivers/iommu/io-pgfault.c                  | 25 +++++++--------------
- 4 files changed, 19 insertions(+), 34 deletions(-)
+I hope you're all doing good. I'm trying to learn about QEMU kvm
+interaction. Especially about how read and write are performed to
+memory that's set up with memory_region_init_ram (QEMU API).
 
-diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-index 326aae1ab3a2..de839fd01bb8 100644
---- a/include/linux/iommu.h
-+++ b/include/linux/iommu.h
-@@ -1569,7 +1569,7 @@ struct iopf_queue *iopf_queue_alloc(const char *name);
- void iopf_queue_free(struct iopf_queue *queue);
- int iopf_queue_discard_partial(struct iopf_queue *queue);
- void iopf_free_group(struct iopf_group *group);
--int iommu_report_device_fault(struct device *dev, struct iopf_fault *evt);
-+void iommu_report_device_fault(struct device *dev, struct iopf_fault *evt);
- void iopf_group_response(struct iopf_group *group,
- 			 enum iommu_page_response_code status);
- #else
-@@ -1607,10 +1607,9 @@ static inline void iopf_free_group(struct iopf_group *group)
- {
- }
- 
--static inline int
-+static inline void
- iommu_report_device_fault(struct device *dev, struct iopf_fault *evt)
- {
--	return -ENODEV;
- }
- 
- static inline void iopf_group_response(struct iopf_group *group,
-diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-index 42eb59cb99f4..02580364acda 100644
---- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-+++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-@@ -1455,7 +1455,7 @@ arm_smmu_find_master(struct arm_smmu_device *smmu, u32 sid)
- /* IRQ and event handlers */
- static int arm_smmu_handle_evt(struct arm_smmu_device *smmu, u64 *evt)
- {
--	int ret;
-+	int ret = 0;
- 	u32 perm = 0;
- 	struct arm_smmu_master *master;
- 	bool ssid_valid = evt[0] & EVTQ_0_SSV;
-@@ -1511,7 +1511,7 @@ static int arm_smmu_handle_evt(struct arm_smmu_device *smmu, u64 *evt)
- 		goto out_unlock;
- 	}
- 
--	ret = iommu_report_device_fault(master->dev, &fault_evt);
-+	iommu_report_device_fault(master->dev, &fault_evt);
- out_unlock:
- 	mutex_unlock(&smmu->streams_mutex);
- 	return ret;
-diff --git a/drivers/iommu/intel/svm.c b/drivers/iommu/intel/svm.c
-index 2f8716636dbb..b644d57da841 100644
---- a/drivers/iommu/intel/svm.c
-+++ b/drivers/iommu/intel/svm.c
-@@ -561,14 +561,11 @@ static int prq_to_iommu_prot(struct page_req_dsc *req)
- 	return prot;
- }
- 
--static int intel_svm_prq_report(struct intel_iommu *iommu, struct device *dev,
--				struct page_req_dsc *desc)
-+static void intel_svm_prq_report(struct intel_iommu *iommu, struct device *dev,
-+				 struct page_req_dsc *desc)
- {
- 	struct iopf_fault event = { };
- 
--	if (!dev || !dev_is_pci(dev))
--		return -ENODEV;
--
- 	/* Fill in event data for device specific processing */
- 	event.fault.type = IOMMU_FAULT_PAGE_REQ;
- 	event.fault.prm.addr = (u64)desc->addr << VTD_PAGE_SHIFT;
-@@ -601,7 +598,7 @@ static int intel_svm_prq_report(struct intel_iommu *iommu, struct device *dev,
- 		event.fault.prm.private_data[0] = ktime_to_ns(ktime_get());
- 	}
- 
--	return iommu_report_device_fault(dev, &event);
-+	iommu_report_device_fault(dev, &event);
- }
- 
- static void handle_bad_prq_event(struct intel_iommu *iommu,
-@@ -704,12 +701,10 @@ static irqreturn_t prq_event_thread(int irq, void *d)
- 		if (!pdev)
- 			goto bad_req;
- 
--		if (intel_svm_prq_report(iommu, &pdev->dev, req))
--			handle_bad_prq_event(iommu, req, QI_RESP_INVALID);
--		else
--			trace_prq_report(iommu, &pdev->dev, req->qw_0, req->qw_1,
--					 req->priv_data[0], req->priv_data[1],
--					 iommu->prq_seq_number++);
-+		intel_svm_prq_report(iommu, &pdev->dev, req);
-+		trace_prq_report(iommu, &pdev->dev, req->qw_0, req->qw_1,
-+				 req->priv_data[0], req->priv_data[1],
-+				 iommu->prq_seq_number++);
- 		pci_dev_put(pdev);
- prq_advance:
- 		head = (head + sizeof(*req)) & PRQ_RING_MASK;
-diff --git a/drivers/iommu/io-pgfault.c b/drivers/iommu/io-pgfault.c
-index 6a325bff8164..06d78fcc79fd 100644
---- a/drivers/iommu/io-pgfault.c
-+++ b/drivers/iommu/io-pgfault.c
-@@ -176,26 +176,22 @@ static struct iopf_group *iopf_group_alloc(struct iommu_fault_param *iopf_param,
-  * freed after the device has stopped generating page faults (or the iommu
-  * hardware has been set to block the page faults) and the pending page faults
-  * have been flushed.
-- *
-- * Return: 0 on success and <0 on error.
-  */
--int iommu_report_device_fault(struct device *dev, struct iopf_fault *evt)
-+void iommu_report_device_fault(struct device *dev, struct iopf_fault *evt)
- {
- 	struct iommu_fault *fault = &evt->fault;
- 	struct iommu_fault_param *iopf_param;
- 	struct iopf_group abort_group = {};
- 	struct iopf_group *group;
--	int ret;
- 
- 	iopf_param = iopf_get_dev_fault_param(dev);
- 	if (WARN_ON(!iopf_param))
--		return -ENODEV;
-+		return;
- 
- 	if (!(fault->prm.flags & IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE)) {
--		ret = report_partial_fault(iopf_param, fault);
-+		report_partial_fault(iopf_param, fault);
- 		iopf_put_dev_fault_param(iopf_param);
- 		/* A request that is not the last does not need to be ack'd */
--		return ret;
- 	}
- 
- 	/*
-@@ -207,25 +203,21 @@ int iommu_report_device_fault(struct device *dev, struct iopf_fault *evt)
- 	 * leaving, otherwise partial faults will be stuck.
- 	 */
- 	group = iopf_group_alloc(iopf_param, evt, &abort_group);
--	if (group == &abort_group) {
--		ret = -ENOMEM;
-+	if (group == &abort_group)
- 		goto err_abort;
--	}
- 
- 	group->domain = get_domain_for_iopf(dev, fault);
--	if (!group->domain) {
--		ret = -EINVAL;
-+	if (!group->domain)
- 		goto err_abort;
--	}
- 
- 	/*
- 	 * On success iopf_handler must call iopf_group_response() and
- 	 * iopf_free_group()
- 	 */
--	ret = group->domain->iopf_handler(group);
--	if (ret)
-+	if (group->domain->iopf_handler(group))
- 		goto err_abort;
--	return 0;
-+
-+	return;
- 
- err_abort:
- 	iopf_group_response(group, IOMMU_PAGE_RESP_FAILURE);
-@@ -233,7 +225,6 @@ int iommu_report_device_fault(struct device *dev, struct iopf_fault *evt)
- 		__iopf_free_group(group);
- 	else
- 		iopf_free_group(group);
--	return ret;
- }
- EXPORT_SYMBOL_GPL(iommu_report_device_fault);
- 
--- 
-2.34.1
+My initial guess was that kvm_mmu_load might be responsible for this.
+However, after tracing I couldn't see these functions being called.
 
+Could you please help me by pointing out where in the KVM code I can
+find this information?
+
+Thanks a lot for your help!
+
+Best,
+Lokesh
 
