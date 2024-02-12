@@ -1,178 +1,165 @@
-Return-Path: <kvm+bounces-8544-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8545-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 445438510EA
-	for <lists+kvm@lfdr.de>; Mon, 12 Feb 2024 11:32:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB7798510FB
+	for <lists+kvm@lfdr.de>; Mon, 12 Feb 2024 11:34:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EEC532814AA
-	for <lists+kvm@lfdr.de>; Mon, 12 Feb 2024 10:32:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2F36AB22DD1
+	for <lists+kvm@lfdr.de>; Mon, 12 Feb 2024 10:34:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D2EF38F9A;
-	Mon, 12 Feb 2024 10:31:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDE1D38DE3;
+	Mon, 12 Feb 2024 10:34:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e+TYG2mD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iY6tXVjr"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 328D838DDD
-	for <kvm@vger.kernel.org>; Mon, 12 Feb 2024 10:31:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83CC9383AA
+	for <kvm@vger.kernel.org>; Mon, 12 Feb 2024 10:34:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707733904; cv=none; b=fiae//Q+Qkonv+sEgIuP5wTz0eXG4odosJo8RYgAHsoQN7nm89A1AHFIpu23A50nz4dk62bGYjFSc6s81xhxBwMHR4+AX/M2a/HXNLGRktx39JEQrJb5iIfbn7GNdWH8c8aeHQEnixo//RqyIF3DYN9yir7ZrYwJN4beTOItofQ=
+	t=1707734088; cv=none; b=gwVHR5yMQJ5O/KtBp1mRQmlqzeLK5viMjPuh++oj7X/Hikqrm7WSfYyde8jBB7xvVKwNE3/pHZFpzOvMTEioAAUpO33xoM60DYVDTZNXJb14VJ0TrsAt1f7G6/L0xqa9VfvJiuslKyGiKedMnRVlO7mUlgeUR8cNpXP9sSUdUQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707733904; c=relaxed/simple;
-	bh=czUfwp9Vd0O43dhgHlhoxm7n6b/o2RFsBWH5mKBRF/I=;
+	s=arc-20240116; t=1707734088; c=relaxed/simple;
+	bh=EoFkIvo0jVT7iACpJyA0SYfSyvqCf8/ZdX+R+C/HGAU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Jc2xO9R37Qyd282tgYeiL93T52L3E2hBqXarGOewG6fhCSR3hNa+dOALIlOM+0dJCODhmJcgGCOI66D7uRotFWBoaeyDDX3ji0nMQ2C3OsRWVZQYa/3t+pxx00BYyy1yg4ER3fGJQsjPQsrM+qRUCejZhbDOsZfxIOXUPrIQ4Oc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e+TYG2mD; arc=none smtp.client-ip=170.10.133.124
+	 To:Cc:Content-Type; b=MZDldCLqWLM1/4F8cb1l3cG/bX5wewYujz2istnNnnqtyaHfK1f0qFwYxMc9VALvCtp5V6KSi2CCAc0lWPznBswCki3QnRzmTOxb/uMTTjfDZqya23i3vf5xF1rrR6cfiornGAbN7YtjV6I1tBvibNBDOP+ag22kxMjYOrIBezU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iY6tXVjr; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707733902;
+	s=mimecast20190719; t=1707734085;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=1t318SRTxLpDaLWn2G/SymzKj/FNZHT6EAXxG8/aWeU=;
-	b=e+TYG2mDEwBUoLFlXNiRku+LXsUet0pbNa+LnEcvRyN4xeGpZfn7Sgo7vilUQfq5LobWiq
-	Uo0GnvGdxeR8p2BsuWPnpUUEImKsombBYpFhlFr1H+UYogtVT5CIEq3QRZ12EsYe4ugCAC
-	q10uCGO9ImfEAS1lHDJ0MUBiJ2rY/kE=
-Received: from mail-vs1-f70.google.com (mail-vs1-f70.google.com
- [209.85.217.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=tgpAN4/fM2uvng00mD2oqsBNpUIMHVV2+w/F9N6+DNQ=;
+	b=iY6tXVjrtklgXFCckOxwi4Hpy//bch5DOrjWBJa6hZmO56xJJXk/lf1rHuUFSWqwhN1jSo
+	UJQW5vZVhha2bhkO/Bby0z9pupgqxgn0xO6yuZ0gw5oskkMZjIoQ8FUT5/g8yfcEEH7FyG
+	v5wANCtFXLbRw9Li4grzcO6vgJI11yQ=
+Received: from mail-vs1-f72.google.com (mail-vs1-f72.google.com
+ [209.85.217.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-274-crLYnttlNQyA4GnDDZJD9Q-1; Mon, 12 Feb 2024 05:31:39 -0500
-X-MC-Unique: crLYnttlNQyA4GnDDZJD9Q-1
-Received: by mail-vs1-f70.google.com with SMTP id ada2fe7eead31-46d27678bbeso907855137.1
-        for <kvm@vger.kernel.org>; Mon, 12 Feb 2024 02:31:38 -0800 (PST)
+ us-mta-96-nJcp8mzTNeOVE7m5oeDJPg-1; Mon, 12 Feb 2024 05:34:43 -0500
+X-MC-Unique: nJcp8mzTNeOVE7m5oeDJPg-1
+Received: by mail-vs1-f72.google.com with SMTP id ada2fe7eead31-46d256241c1so940155137.0
+        for <kvm@vger.kernel.org>; Mon, 12 Feb 2024 02:34:43 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707733898; x=1708338698;
+        d=1e100.net; s=20230601; t=1707734082; x=1708338882;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=1t318SRTxLpDaLWn2G/SymzKj/FNZHT6EAXxG8/aWeU=;
-        b=DHCRTBBOeXgEZd2e5jCUUzsg3Sp5oDJg9DfFZinqbeIcDUbgLsdVYSNCiw6VTUlfAS
-         K5BS1NQ/z5nnECSAuh6sGnXoAcKcgKcLbsu0dXkBgBIZ45vw33b5pp3Cr7W1PIDXjMca
-         9ru92BGR7y4G+suSoTd1+Z1YOIVUxBEd2A9VWFGiwRjzY/WG1it3+LaBBLbFWu8iz2Uz
-         EkuIcpy/9OdZv2ySl8rGviHjbj+uGj07mujwFkNuENOf+ysluqu61r+WP9DkK1Gl+dJH
-         8McP2SOxjO8yQ/OBnUKxrcLBCS7+8d8uS2HBytXR2msmw2myqZNQI9XGCnAMfOnIUUWl
-         GVPw==
-X-Gm-Message-State: AOJu0YxHn0jK871+difixuV3t6lSBxdjUSZ+F7ENLs4jzDYZs0O2LBf2
-	i09kgLMdlvN0PR2OGKNijMUnod5rNgxz2x1BaaV8GRJ29tyVwidJK8y+/vJZkv4XsjOtSXj50JL
-	2j81xLcZo+RRkqALg9r2kpInSSbJGv+kByaAUkOpCR9pBWRlq9cS8Wrgrg2uSxekJwNx2vZ99qL
-	Z/lR6xiS23Ux9PyKewhUKuVcm4
-X-Received: by 2002:a05:6102:3161:b0:46d:240d:438c with SMTP id l1-20020a056102316100b0046d240d438cmr4076043vsm.27.1707733898461;
-        Mon, 12 Feb 2024 02:31:38 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEAYvRS4noCaEKl+zyb53gqyWRKi4M0jr6v0+jz+XbYaddB3PAXdhrXxq0wDIZfyRz3n9CnF4Xr88Nf35iyEnE=
-X-Received: by 2002:a05:6102:3161:b0:46d:240d:438c with SMTP id
- l1-20020a056102316100b0046d240d438cmr4076001vsm.27.1707733898047; Mon, 12 Feb
- 2024 02:31:38 -0800 (PST)
+        bh=tgpAN4/fM2uvng00mD2oqsBNpUIMHVV2+w/F9N6+DNQ=;
+        b=WcVBxKUxCay3nLAURyASS9XhJpUP6iAkKgx+ZyrhrpJ1DITsPIXdKAV/4V/I93gala
+         VUSfTPP39L5WMw1utq888GhzPS06Xv59/s9rV69Hf9JLXb9dIdandPsZIuWx/3SXp8z0
+         5EleHRoGL2auNxWgvr2FlzkxfxNr85ndpA3xCSzp5tIPNASbWRHut9g2dNlaHQSflvQD
+         IwTj4gj35cHZut6I7JouppMt3MaMotPUUcTNcIuZfHOLDQ5ve95/ojvBEBzfdU3kMT3n
+         SpyzzGMOXw1S9UaOiafrwrF4L0bKZTf9xYvYI9sUbHKgnI+GxVoxQGJWJP15YdStsiq/
+         UTPA==
+X-Gm-Message-State: AOJu0YxKIe54tB13rZ7QFMCqjr6UK8AzEjnMYmoXZWNTf2RTqt9HFnbx
+	yM7d7gEy1hqqBVOykj5UB5PYyP4n5lvVqOAQjQ+Gfb1kw1V+YPbAPCePGkyIeWIcSF8uPCD1Y0z
+	IR9NidMCO1AHCBpkmhwbWIp8rIe1rW0uD9EgSilJyYcTsFX31cAEKhEgSK7vf4UmakQo23g9wgF
+	RFXYYBakiUe6QHpg19muOjQu7C
+X-Received: by 2002:a05:6102:116f:b0:46d:2d95:5c15 with SMTP id k15-20020a056102116f00b0046d2d955c15mr3800831vsg.13.1707734081984;
+        Mon, 12 Feb 2024 02:34:41 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGMKwEPA7aCJ3CTH/U8+IoQs6Vt+T3sXtGQG3F/44PHdppD0ZaTuixrHMSXjQ4m9T3C19OL3I7hoVosabGmzsI=
+X-Received: by 2002:a05:6102:116f:b0:46d:2d95:5c15 with SMTP id
+ k15-20020a056102116f00b0046d2d955c15mr3800789vsg.13.1707734080219; Mon, 12
+ Feb 2024 02:34:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231230172351.574091-1-michael.roth@amd.com> <20231230172351.574091-10-michael.roth@amd.com>
-In-Reply-To: <20231230172351.574091-10-michael.roth@amd.com>
+References: <cover.1705965634.git.isaku.yamahata@intel.com> <d99863c474b8a3d9e413fbf940bf6891d2ce319e.1705965635.git.isaku.yamahata@intel.com>
+In-Reply-To: <d99863c474b8a3d9e413fbf940bf6891d2ce319e.1705965635.git.isaku.yamahata@intel.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 12 Feb 2024 11:31:26 +0100
-Message-ID: <CABgObfanrHTL429Cr8tcMGqs-Ov+6LWeQbzghvjQiGu9tz0EUA@mail.gmail.com>
-Subject: Re: [PATCH v11 09/35] KVM: x86: Determine shared/private faults based
- on vm_type
-To: Michael Roth <michael.roth@amd.com>
-Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org, 
-	linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org, 
-	tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de, 
-	thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, seanjc@google.com, 
-	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org, 
-	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com, 
-	peterz@infradead.org, srinivas.pandruvada@linux.intel.com, 
-	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, 
-	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com, 
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com, 
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
-	pankaj.gupta@amd.com, liam.merwick@oracle.com, zhi.a.wang@intel.com
+Date: Mon, 12 Feb 2024 11:34:28 +0100
+Message-ID: <CABgObfbu1-Ok607uYdo4DzwZf8ZGVQnvHU+y9_M1Zae55K5xwQ@mail.gmail.com>
+Subject: Re: [PATCH v18 041/121] KVM: x86/mmu: Allow per-VM override of the
+ TDP max page level
+To: isaku.yamahata@intel.com
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	isaku.yamahata@gmail.com, erdemaktas@google.com, 
+	Sean Christopherson <seanjc@google.com>, Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>, 
+	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com, 
+	Sean Christopherson <sean.j.christopherson@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Dec 30, 2023 at 6:24=E2=80=AFPM Michael Roth <michael.roth@amd.com>=
- wrote:
+On Tue, Jan 23, 2024 at 12:55=E2=80=AFAM <isaku.yamahata@intel.com> wrote:
 >
-> For KVM_X86_SNP_VM, only the PFERR_GUEST_ENC_MASK flag is needed to
-> determine with an #NPF is due to a private/shared access by the guest.
-> Implement that handling here. Also add handling needed to deal with
-> SNP guests which in some cases will make MMIO accesses with the
-> encryption bit.
+> From: Sean Christopherson <sean.j.christopherson@intel.com>
 >
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> ---
->  arch/x86/kvm/mmu/mmu.c          | 12 ++++++++++--
->  arch/x86/kvm/mmu/mmu_internal.h | 20 +++++++++++++++++++-
->  2 files changed, 29 insertions(+), 3 deletions(-)
+> TDX requires special handling to support large private page.  For
+> simplicity, only support 4K page for TD guest for now.  Add per-VM maximu=
+m
+> page level support to support different maximum page sizes for TD guest a=
+nd
+> conventional VMX guest.
 >
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index d3fbfe0686a0..61213f6648a1 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -4331,6 +4331,7 @@ static int kvm_faultin_pfn_private(struct kvm_vcpu =
-*vcpu,
->  static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_faul=
-t *fault)
->  {
->         struct kvm_memory_slot *slot =3D fault->slot;
-> +       bool private_fault =3D fault->is_private;
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Acked-by: Kai Huang <kai.huang@intel.com>
 
-I think it's nicer to just make the fault !is_private in
-kvm_mmu_do_page_fault().
-
-> +static bool kvm_mmu_fault_is_private(struct kvm *kvm, gpa_t gpa, u64 err=
-)
-> +{
-> +       bool private_fault =3D false;
-> +
-> +       if (kvm_is_vm_type(kvm, KVM_X86_SNP_VM)) {
-> +               private_fault =3D !!(err & PFERR_GUEST_ENC_MASK);
-> +       } else if (kvm_is_vm_type(kvm, KVM_X86_SW_PROTECTED_VM)) {
-> +               /*
-> +                * This handling is for gmem self-tests and guests that t=
-reat
-> +                * userspace as the authority on whether a fault should b=
-e
-> +                * private or not.
-> +                */
-> +               private_fault =3D kvm_mem_is_private(kvm, gpa >> PAGE_SHI=
-FT);
-> +       }
-
-Any reason to remove the is_private page fault that was there in
-previous versions of the patch?  I don't really like having both TDX
-and SVM-specific code in this function.
+Please reimplement this on top of "KVM: x86: Add gmem hook for
+determining max NPT mapping level" from the SEV-SNP series.
 
 Paolo
 
-> +       return private_fault;
-> +}
+
+> ---
+>  arch/x86/include/asm/kvm_host.h | 1 +
+>  arch/x86/kvm/mmu/mmu.c          | 2 ++
+>  arch/x86/kvm/mmu/mmu_internal.h | 2 +-
+>  3 files changed, 4 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_h=
+ost.h
+> index 430d7bd7c37c..313519edd79e 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1283,6 +1283,7 @@ struct kvm_arch {
+>         unsigned long n_requested_mmu_pages;
+>         unsigned long n_max_mmu_pages;
+>         unsigned int indirect_shadow_pages;
+> +       int tdp_max_page_level;
+>         u8 mmu_valid_gen;
+>         struct hlist_head mmu_page_hash[KVM_NUM_MMU_PAGES];
+>         struct list_head active_mmu_pages;
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 54d4c8f1ba68..e93bc16a5e9b 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -6307,6 +6307,8 @@ void kvm_mmu_init_vm(struct kvm *kvm)
+>
+>         kvm->arch.split_desc_cache.kmem_cache =3D pte_list_desc_cache;
+>         kvm->arch.split_desc_cache.gfp_zero =3D __GFP_ZERO;
 > +
->  /*
->   * Return values of handle_mmio_page_fault(), mmu.page_fault(), fast_pag=
-e_fault(),
->   * and of course kvm_mmu_do_page_fault().
-> @@ -298,7 +316,7 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vc=
+> +       kvm->arch.tdp_max_page_level =3D KVM_MAX_HUGEPAGE_LEVEL;
+>  }
+>
+>  static void mmu_free_vm_memory_caches(struct kvm *kvm)
+> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_inter=
+nal.h
+> index 0443bfcf5d9c..2b9377442927 100644
+> --- a/arch/x86/kvm/mmu/mmu_internal.h
+> +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> @@ -296,7 +296,7 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vc=
 pu *vcpu, gpa_t cr2_or_gpa,
->                 .max_level =3D KVM_MAX_HUGEPAGE_LEVEL,
+>                 .nx_huge_page_workaround_enabled =3D
+>                         is_nx_huge_page_enabled(vcpu->kvm),
+>
+> -               .max_level =3D KVM_MAX_HUGEPAGE_LEVEL,
+> +               .max_level =3D vcpu->kvm->arch.tdp_max_page_level,
 >                 .req_level =3D PG_LEVEL_4K,
 >                 .goal_level =3D PG_LEVEL_4K,
-> -               .is_private =3D kvm_mem_is_private(vcpu->kvm, cr2_or_gpa =
->> PAGE_SHIFT),
-> +               .is_private =3D kvm_mmu_fault_is_private(vcpu->kvm, cr2_o=
-r_gpa, err),
 >         };
->         int r;
->
 > --
 > 2.25.1
 >
