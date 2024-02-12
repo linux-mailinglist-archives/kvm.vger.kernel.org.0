@@ -1,125 +1,170 @@
-Return-Path: <kvm+bounces-8549-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8550-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 892148512A4
-	for <lists+kvm@lfdr.de>; Mon, 12 Feb 2024 12:51:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D74258512AF
+	for <lists+kvm@lfdr.de>; Mon, 12 Feb 2024 12:53:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC34E1C220AE
-	for <lists+kvm@lfdr.de>; Mon, 12 Feb 2024 11:51:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 077491C220B2
+	for <lists+kvm@lfdr.de>; Mon, 12 Feb 2024 11:53:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72A6239AE1;
-	Mon, 12 Feb 2024 11:51:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F96339AD4;
+	Mon, 12 Feb 2024 11:52:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jNRa8rWT"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="dgS4ZctN"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99E0D39860;
-	Mon, 12 Feb 2024 11:51:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCA8339FF2;
+	Mon, 12 Feb 2024 11:52:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707738706; cv=none; b=Ny+JWZE2B5usAFeBeowN/9u7quLE4upACQU7CRyKNiFu9PtD1t3HfzmxZIzsh00uCuxTw7lI+0c0uJSte/pMCWArOMfpjS4vlZRVcdjzI0TXvhcVviMraGKad3k3DZWJCuwfuvw4lguvawNvvwF6Sr2mf7/12vuwyPY7pLEIpn4=
+	t=1707738739; cv=none; b=iXhEv3+Ag+1qV/UCQ74veUmg5/afhHbPuNZ/8aVGTXtZmFaoRAAFNrLXjXKwNkp9JrcGJxTDPhuLf295AE4YKX2d+0wgvuNqnrFEdEB1CkYHPq8FJnqfctXzexdvUwcy6orudb8TRKB06qjaD//Q/PmeKltYK/yz/J357E6gS8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707738706; c=relaxed/simple;
-	bh=bTVJvlBr8xA7AJ8ry9czvvHc5Z9HCrBIlnOGVk+k5kc=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Lm58nMLKjhXFzJizaa8lswWYHELFv5y73ulS1hbqUC0CdMqhkb/gvcxb0lhW3ylO3jCB/I0cXHfL2YgErUyln1UaeDUJgJcUxywHCX7ONoK7f/e6RBBIEqNTOgnk7SKBRe+bToprrOr1aBnTpU4BNLaPHpxiL8BIA0Q7HyApTmg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jNRa8rWT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF1D3C433C7;
-	Mon, 12 Feb 2024 11:51:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707738706;
-	bh=bTVJvlBr8xA7AJ8ry9czvvHc5Z9HCrBIlnOGVk+k5kc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jNRa8rWTI8Tc3Pr4lUPjevvzTe7pAKhaadCCx0fkI019EIQ18Zdr6dJy3WPzLYCbD
-	 uCOjznDFiOybYCIq/C8Z4opYCEcxkGGWHuSOcDqLSsM4SwNstzL/qc54RqeV45IdxE
-	 rDWg9wmVSYMIeP+WQgrYSZmzHIHFVANpFtVGOtve2Y57b4a2IRAsZRkIcUOFjzunE1
-	 w5XReuwsR865lfiQmt6n9ninpXl24MCqdW1mjY4znTQbot3W2I9YzG83YR7p65dIQJ
-	 R8iKRkp6A4VaQNLEsot+ptjtRg45bfkP2VW1MJIcRaZB9sEYFnCFYX4YvF3DI4PX1w
-	 nZiyVOBKgHBVg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rZUqd-002OGl-Ck;
-	Mon, 12 Feb 2024 11:51:43 +0000
-Date: Mon, 12 Feb 2024 11:51:42 +0000
-Message-ID: <86frxx6gtt.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	David Matlack <dmatlack@google.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Sean Christopherson <seanjc@google.com>,
-	Fuad Tabba <tabba@google.com>,
-	Shaoqin Huang <shahuang@redhat.com>,
-	Chao Peng <chao.p.peng@linux.intel.com>,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: fix kvm_mmu_memory_cache allocation warning
-In-Reply-To: <20240212112419.1186065-1-arnd@kernel.org>
-References: <20240212112419.1186065-1-arnd@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1707738739; c=relaxed/simple;
+	bh=R5Siob6CCLBGrDAD5GuIEDn6D5MDxIAanPSGgDwFZ98=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=B0Ysdg2xK8hQOpCUSVvSwXV/kxNb5EtILB7zINgB2O7itGYjxvqlMMr5SmB8ynRNspZLykP4VYiTXk1oYoZ4UNFIe0BQ7uQ26+pbfBplaNTDJVF7gTfkhWWFIKlADFI04qrBzPxmUD33d9YnbqIkbT/u4boQ+ReSmLN/bE54DYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=dgS4ZctN; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41CBROGu023509;
+	Mon, 12 Feb 2024 11:52:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=S7o9Z6pwsmsdDFKwNn54jtm3khMYkc+v9Z3xJfxFfHs=;
+ b=dgS4ZctNcMwpKjt6vLY6n/XHCmYfAcl6YGl3zPppOusOtLnZyShx9xnlBlwyuBH5pkOu
+ t3Krd8eiubOMSgUE1MBhuPNYFGXLWO+HLApKpnjLu7Tl/qlcZjptTRZ/bwri9WfpKbvO
+ bbxunnH0rtV4A/I09JSCpN5tFzJSkwkNdeSDsBLbhKiSV9VIvJN8hbeQRdfAaHcWe7lm
+ tick52tBzvY/11FfuZErJSjm/DsaDYxLzVGq7+W2rS+fVdY6p6wvVC1EI/m8CvslspHE
+ Rp84+H4CYtPAJ9EoUvoXRvuKs3q267eQd65r9hgyhNWNH6KAr+Xa1H60hK1gQEGkaCqR 6g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w7jferhjp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 12 Feb 2024 11:52:14 +0000
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41CBmnXV023786;
+	Mon, 12 Feb 2024 11:52:14 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w7jferhj6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 12 Feb 2024 11:52:14 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 41CBVDuk009680;
+	Mon, 12 Feb 2024 11:52:13 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3w6npkg09n-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 12 Feb 2024 11:52:13 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 41CBq7sd12321422
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 12 Feb 2024 11:52:10 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D085220040;
+	Mon, 12 Feb 2024 11:52:07 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0F9F020043;
+	Mon, 12 Feb 2024 11:52:07 +0000 (GMT)
+Received: from osiris (unknown [9.171.5.16])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Mon, 12 Feb 2024 11:52:06 +0000 (GMT)
+Date: Mon, 12 Feb 2024 12:52:05 +0100
+From: Heiko Carstens <hca@linux.ibm.com>
+To: Heiko Carstens <hca@linux.ibm.com>
+Cc: Eric Farman <farman@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v1 1/2] KVM: s390: load guest access registers in MEM_OP
+ ioctl
+Message-ID: <20240212115205.9156-C-hca@linux.ibm.com>
+References: <20240209204539.4150550-1-farman@linux.ibm.com>
+ <20240209204539.4150550-2-farman@linux.ibm.com>
+ <20240212102130.9156-A-hca@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: arnd@kernel.org, pbonzini@redhat.com, dmatlack@google.com, arnd@arndb.de, seanjc@google.com, tabba@google.com, shahuang@redhat.com, chao.p.peng@linux.intel.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240212102130.9156-A-hca@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 2L_VlrAdg7PrRTjoy4XmK8pxi8ZAcn5z
+X-Proofpoint-GUID: Fesulud__aAsKbL5xcIrXceyoXtnPpGF
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-12_09,2024-02-12_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ lowpriorityscore=0 malwarescore=0 spamscore=0 phishscore=0 mlxscore=0
+ bulkscore=0 impostorscore=0 clxscore=1015 priorityscore=1501
+ mlxlogscore=540 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2311290000 definitions=main-2402120090
 
-On Mon, 12 Feb 2024 11:24:10 +0000,
-Arnd Bergmann <arnd@kernel.org> wrote:
-> 
-> From: Arnd Bergmann <arnd@arndb.de>
-> 
-> gcc-14 notices that the arguments to kvmalloc_array() are mixed up:
-> 
-> arch/x86/kvm/../../../virt/kvm/kvm_main.c: In function '__kvm_mmu_topup_memory_cache':
-> arch/x86/kvm/../../../virt/kvm/kvm_main.c:424:53: error: 'kvmalloc_array' sizes specified with 'sizeof' in the earlier argument and not in the later argument [-Werror=calloc-transposed-args]
->   424 |                 mc->objects = kvmalloc_array(sizeof(void *), capacity, gfp);
->       |                                                     ^~~~
-> arch/x86/kvm/../../../virt/kvm/kvm_main.c:424:53: note: earlier argument should specify number of elements, later size of each element
-> 
-> The code still works correctly, but the incorrect order prevents the compiler
-> from properly tracking the object sizes.
-> 
-> Fixes: 837f66c71207 ("KVM: Allow for different capacities in kvm_mmu_memory_cache structs")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
->  virt/kvm/kvm_main.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 8f03b56dafbd..4c48f61cae35 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -421,7 +421,7 @@ int __kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int capacity,
->  		if (WARN_ON_ONCE(!capacity))
->  			return -EIO;
->  
-> -		mc->objects = kvmalloc_array(sizeof(void *), capacity, gfp);
-> +		mc->objects = kvmalloc_array(capacity, sizeof(void *), gfp);
->  		if (!mc->objects)
->  			return -ENOMEM;
->  
+On Mon, Feb 12, 2024 at 11:21:30AM +0100, Heiko Carstens wrote:
+> Or maybe a TIF flag with different semantics: "guest save area does not
+> reflect current state - which is within registers".
 
-Huh, well spotted GCC. And thanks Arnd for the fix.
+Something like the below; untested of course. But I guess there must be
+some arch specific vcpu flags, which can be used to achieve the same?
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+diff --git a/arch/s390/include/asm/thread_info.h b/arch/s390/include/asm/thread_info.h
+index a674c7d25da5..b9ff8b125fb8 100644
+--- a/arch/s390/include/asm/thread_info.h
++++ b/arch/s390/include/asm/thread_info.h
+@@ -69,6 +69,7 @@ void arch_setup_new_exec(void);
+ #define TIF_PATCH_PENDING	5	/* pending live patching update */
+ #define TIF_PGSTE		6	/* New mm's will use 4K page tables */
+ #define TIF_NOTIFY_SIGNAL	7	/* signal notifications exist */
++#define TIF_KVM_ACRS		8	/* access registers contain guest content */
+ #define TIF_ISOLATE_BP_GUEST	9	/* Run KVM guests with isolated BP */
+ #define TIF_PER_TRAP		10	/* Need to handle PER trap on exit to usermode */
+ 
+diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
+index 5bfcc50c1a68..b0ef242d2371 100644
+--- a/arch/s390/kvm/gaccess.c
++++ b/arch/s390/kvm/gaccess.c
+@@ -391,7 +391,8 @@ static int ar_translation(struct kvm_vcpu *vcpu, union asce *asce, u8 ar,
+ 	if (ar >= NUM_ACRS)
+ 		return -EINVAL;
+ 
+-	save_access_regs(vcpu->run->s.regs.acrs);
++	if (test_thread_flag(TIF_KVM_ACRS))
++		save_access_regs(vcpu->run->s.regs.acrs);
+ 	alet.val = vcpu->run->s.regs.acrs[ar];
+ 
+ 	if (ar == 0 || alet.val == 0) {
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index ea63ac769889..3ee0913639d5 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -4951,6 +4951,7 @@ static void sync_regs(struct kvm_vcpu *vcpu)
+ 	}
+ 	save_access_regs(vcpu->arch.host_acrs);
+ 	restore_access_regs(vcpu->run->s.regs.acrs);
++	set_thread_flag(TIF_KVM_ACRS);
+ 	/* save host (userspace) fprs/vrs */
+ 	save_fpu_regs();
+ 	vcpu->arch.host_fpregs.fpc = current->thread.fpu.fpc;
+@@ -5020,6 +5021,7 @@ static void store_regs(struct kvm_vcpu *vcpu)
+ 	kvm_run->s.regs.pfs = vcpu->arch.pfault_select;
+ 	kvm_run->s.regs.pfc = vcpu->arch.pfault_compare;
+ 	save_access_regs(vcpu->run->s.regs.acrs);
++	clear_thread_flag(TIF_KVM_ACRS);
+ 	restore_access_regs(vcpu->arch.host_acrs);
+ 	/* Save guest register state */
+ 	save_fpu_regs();
 
