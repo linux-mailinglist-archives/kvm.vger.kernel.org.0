@@ -1,170 +1,168 @@
-Return-Path: <kvm+bounces-8550-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8551-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D74258512AF
-	for <lists+kvm@lfdr.de>; Mon, 12 Feb 2024 12:53:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D9CE851381
+	for <lists+kvm@lfdr.de>; Mon, 12 Feb 2024 13:24:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 077491C220B2
-	for <lists+kvm@lfdr.de>; Mon, 12 Feb 2024 11:53:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C86AE281680
+	for <lists+kvm@lfdr.de>; Mon, 12 Feb 2024 12:24:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F96339AD4;
-	Mon, 12 Feb 2024 11:52:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 989C039FF8;
+	Mon, 12 Feb 2024 12:24:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="dgS4ZctN"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="vHN6aOep"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCA8339FF2;
-	Mon, 12 Feb 2024 11:52:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9444A39AFE
+	for <kvm@vger.kernel.org>; Mon, 12 Feb 2024 12:24:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707738739; cv=none; b=iXhEv3+Ag+1qV/UCQ74veUmg5/afhHbPuNZ/8aVGTXtZmFaoRAAFNrLXjXKwNkp9JrcGJxTDPhuLf295AE4YKX2d+0wgvuNqnrFEdEB1CkYHPq8FJnqfctXzexdvUwcy6orudb8TRKB06qjaD//Q/PmeKltYK/yz/J357E6gS8U=
+	t=1707740652; cv=none; b=Di2vqBwni5425HBQ3w9n27rLCIpRKYP0SN4t9Kh9Jn4AZ+Y5qb2UJgvLTwO65NKw3cyf/h6VaZW9Jngv68nwHILNIlkkp09RNnAVITtxy6oqlyXwbgzpwPdEXOelTcUgmzfqyevPrswlNKbPLtdWT/dCByONo1dNs70zskphWlQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707738739; c=relaxed/simple;
-	bh=R5Siob6CCLBGrDAD5GuIEDn6D5MDxIAanPSGgDwFZ98=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B0Ysdg2xK8hQOpCUSVvSwXV/kxNb5EtILB7zINgB2O7itGYjxvqlMMr5SmB8ynRNspZLykP4VYiTXk1oYoZ4UNFIe0BQ7uQ26+pbfBplaNTDJVF7gTfkhWWFIKlADFI04qrBzPxmUD33d9YnbqIkbT/u4boQ+ReSmLN/bE54DYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=dgS4ZctN; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41CBROGu023509;
-	Mon, 12 Feb 2024 11:52:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=S7o9Z6pwsmsdDFKwNn54jtm3khMYkc+v9Z3xJfxFfHs=;
- b=dgS4ZctNcMwpKjt6vLY6n/XHCmYfAcl6YGl3zPppOusOtLnZyShx9xnlBlwyuBH5pkOu
- t3Krd8eiubOMSgUE1MBhuPNYFGXLWO+HLApKpnjLu7Tl/qlcZjptTRZ/bwri9WfpKbvO
- bbxunnH0rtV4A/I09JSCpN5tFzJSkwkNdeSDsBLbhKiSV9VIvJN8hbeQRdfAaHcWe7lm
- tick52tBzvY/11FfuZErJSjm/DsaDYxLzVGq7+W2rS+fVdY6p6wvVC1EI/m8CvslspHE
- Rp84+H4CYtPAJ9EoUvoXRvuKs3q267eQd65r9hgyhNWNH6KAr+Xa1H60hK1gQEGkaCqR 6g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w7jferhjp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 12 Feb 2024 11:52:14 +0000
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41CBmnXV023786;
-	Mon, 12 Feb 2024 11:52:14 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w7jferhj6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 12 Feb 2024 11:52:14 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 41CBVDuk009680;
-	Mon, 12 Feb 2024 11:52:13 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3w6npkg09n-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 12 Feb 2024 11:52:13 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 41CBq7sd12321422
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 12 Feb 2024 11:52:10 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D085220040;
-	Mon, 12 Feb 2024 11:52:07 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0F9F020043;
-	Mon, 12 Feb 2024 11:52:07 +0000 (GMT)
-Received: from osiris (unknown [9.171.5.16])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Mon, 12 Feb 2024 11:52:06 +0000 (GMT)
-Date: Mon, 12 Feb 2024 12:52:05 +0100
-From: Heiko Carstens <hca@linux.ibm.com>
-To: Heiko Carstens <hca@linux.ibm.com>
-Cc: Eric Farman <farman@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v1 1/2] KVM: s390: load guest access registers in MEM_OP
- ioctl
-Message-ID: <20240212115205.9156-C-hca@linux.ibm.com>
-References: <20240209204539.4150550-1-farman@linux.ibm.com>
- <20240209204539.4150550-2-farman@linux.ibm.com>
- <20240212102130.9156-A-hca@linux.ibm.com>
+	s=arc-20240116; t=1707740652; c=relaxed/simple;
+	bh=enGcxkA/imgb+5ygnxbIY0QQCaD86a1hixHI14ZUv1I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SyVR6/qAEZepEhLlPZbtb0wE+Nd4Z1FDvl4JelkGGHD/aNAsGL0/aldxWFTHh05syytV22Z5/Uosp17iaG8/YO6E4Fx6PxjGszpHop4kEXMCuNkTbfGnld9ij4IPJxYZ32JkLi0ZsjZqSyEsox0GPulwpVFFMqI8+dol+yH0a+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=vHN6aOep; arc=none smtp.client-ip=209.85.166.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-363dd27c082so9827995ab.0
+        for <kvm@vger.kernel.org>; Mon, 12 Feb 2024 04:24:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1707740649; x=1708345449; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5CQJAbVN1hEJxIfRK6BeBiBHbVNEAmKsPHC3r9j+pPA=;
+        b=vHN6aOepVj8Pl16NHWtT4f4BrkJD/rHERubcAQ41gB5mXJlewVrqesGHuusI/nEwrt
+         5sniX13mRgfmWYpY/PaFh5xSqv3Fq41IxpFx6LyvXzPF7xN26+9NkqfllRfH91C4DiDt
+         hNpk2I7Kz/HcKvSOyj6NPN9CfY6+r01Zx8lancN5OcAOvRHjq5ZPF/2VR8mOwTPXCcWN
+         EWOVK5LtPKyGhrGdMv3es5y0x7tlFX9kcBlCS0pHyTjISLJafDxVoe9X+qFFJbpOSuZ0
+         iYXNLcMt+G3ROa5cougn4efvJNsPQDL6EIQ3cTQO1vVv9z7+fgzCscrWcZcy+SbAfi0x
+         mobA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707740649; x=1708345449;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5CQJAbVN1hEJxIfRK6BeBiBHbVNEAmKsPHC3r9j+pPA=;
+        b=hj0KTRrKEWH1xS5MMQkeRRi6iQi7DpvD070Y51U2z8cDCTzQ0eQ7og8dvqryEgb1wd
+         oHVIRCWjvp1z+LR+n0rDRc5kid12FAACiqW8rnYSn017fQG1pkPa95+HS9VmP+LpOL1F
+         0saF9jdxRw6NMQOoy5saAkLrJCb2Z3B848P/zB6sDc4bbCfpSiPrbqB0Asc7hd6bTtvZ
+         1fopTzNX/7gXm4uDE6WqL3S0YTU0i/inS9Smcd5F8oMaUZdukzm+mpLqRR9EloOVPuEm
+         BoWTSLFD5WzklbZdqBXBGXfg6iEVxjJ+kLBIcPiXKVY0adbT89ZyNhS8p5FOuX5YcMRB
+         F0kg==
+X-Gm-Message-State: AOJu0YyeHlahrW1ejWncbvti56atihJOdbxWrPZLXV40+qkwPgk3cDwD
+	TGKPDAZmHHI0n8VSc+978G8QIWnMKxcuFSiD5CXf5lTEc910dlsMBlKDfmW6W02JPDTo9SHB6TD
+	QMLG33FdrRDmsfxWb5d03vaJHN7znsXYvZcXYpA==
+X-Google-Smtp-Source: AGHT+IGzhXfq5zT3FYgC1LPkY3wsC1WD62YVWVgEP5W8s001037XANdQn59nNXrbCGSEhsi8pEoYiewroYfMiW87JoM=
+X-Received: by 2002:a92:caca:0:b0:363:e7ff:f378 with SMTP id
+ m10-20020a92caca000000b00363e7fff378mr8506844ilq.28.1707740649498; Mon, 12
+ Feb 2024 04:24:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240212102130.9156-A-hca@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 2L_VlrAdg7PrRTjoy4XmK8pxi8ZAcn5z
-X-Proofpoint-GUID: Fesulud__aAsKbL5xcIrXceyoXtnPpGF
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-12_09,2024-02-12_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- lowpriorityscore=0 malwarescore=0 spamscore=0 phishscore=0 mlxscore=0
- bulkscore=0 impostorscore=0 clxscore=1015 priorityscore=1501
- mlxlogscore=540 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2311290000 definitions=main-2402120090
+References: <cover.1705916069.git.haibo1.xu@intel.com>
+In-Reply-To: <cover.1705916069.git.haibo1.xu@intel.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Mon, 12 Feb 2024 17:53:58 +0530
+Message-ID: <CAAhSdy2wFzk0h5MiM5y9Fij0HyWake=7vNuV1MExUxkEtMWShw@mail.gmail.com>
+Subject: Re: [PATCH v5 00/12] RISCV: Add kvm Sstc timer selftests
+To: Haibo Xu <haibo1.xu@intel.com>
+Cc: xiaobo55x@gmail.com, ajones@ventanamicro.com, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Atish Patra <atishp@atishpatra.org>, 
+	Guo Ren <guoren@kernel.org>, Conor Dooley <conor.dooley@microchip.com>, 
+	Mayuresh Chitale <mchitale@ventanamicro.com>, wchen <waylingii@gmail.com>, 
+	Greentime Hu <greentime.hu@sifive.com>, Jisheng Zhang <jszhang@kernel.org>, 
+	Samuel Holland <samuel@sholland.org>, Minda Chen <minda.chen@starfivetech.com>, 
+	Sean Christopherson <seanjc@google.com>, Peter Xu <peterx@redhat.com>, Like Xu <likexu@tencent.com>, 
+	Vipin Sharma <vipinsh@google.com>, Thomas Huth <thuth@redhat.com>, 
+	Aaron Lewis <aaronlewis@google.com>, 
+	Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>, linux-kernel@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 12, 2024 at 11:21:30AM +0100, Heiko Carstens wrote:
-> Or maybe a TIF flag with different semantics: "guest save area does not
-> reflect current state - which is within registers".
+On Mon, Jan 22, 2024 at 3:15=E2=80=AFPM Haibo Xu <haibo1.xu@intel.com> wrot=
+e:
+>
+> The RISC-V arch_timer selftests is used to validate Sstc timer
+> functionality in a guest, which sets up periodic timer interrupts
+> and check the basic interrupt status upon its receipt.
+>
+> This KVM selftests was ported from aarch64 arch_timer and tested
+> with Linux v6.7-rc8 on a Qemu riscv64 virt machine.
+>
+> ---
+> Changed since v4:
+>   * Rebased to Linux 6.7-rc8
+>   * Added new patch(2/12) to clean up the data type in struct test_args
+>   * Re-ordered patch(11/11) in v4 to patch(3/12)
+>   * Changed the timer_err_margin_us type from int to uint32_t
+>
+> Haibo Xu (11):
+>   KVM: arm64: selftests: Data type cleanup for arch_timer test
+>   KVM: arm64: selftests: Enable tuning of error margin in arch_timer
+>     test
+>   KVM: arm64: selftests: Split arch_timer test code
+>   KVM: selftests: Add CONFIG_64BIT definition for the build
+>   tools: riscv: Add header file csr.h
+>   tools: riscv: Add header file vdso/processor.h
+>   KVM: riscv: selftests: Switch to use macro from csr.h
+>   KVM: riscv: selftests: Add exception handling support
+>   KVM: riscv: selftests: Add guest helper to get vcpu id
+>   KVM: riscv: selftests: Change vcpu_has_ext to a common function
+>   KVM: riscv: selftests: Add sstc timer test
+>
+> Paolo Bonzini (1):
+>   selftests/kvm: Fix issues with $(SPLIT_TESTS)
 
-Something like the below; untested of course. But I guess there must be
-some arch specific vcpu flags, which can be used to achieve the same?
+Rebased on Linux-6.8-rc4 and queued this series for Linux-6.9
 
-diff --git a/arch/s390/include/asm/thread_info.h b/arch/s390/include/asm/thread_info.h
-index a674c7d25da5..b9ff8b125fb8 100644
---- a/arch/s390/include/asm/thread_info.h
-+++ b/arch/s390/include/asm/thread_info.h
-@@ -69,6 +69,7 @@ void arch_setup_new_exec(void);
- #define TIF_PATCH_PENDING	5	/* pending live patching update */
- #define TIF_PGSTE		6	/* New mm's will use 4K page tables */
- #define TIF_NOTIFY_SIGNAL	7	/* signal notifications exist */
-+#define TIF_KVM_ACRS		8	/* access registers contain guest content */
- #define TIF_ISOLATE_BP_GUEST	9	/* Run KVM guests with isolated BP */
- #define TIF_PER_TRAP		10	/* Need to handle PER trap on exit to usermode */
- 
-diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
-index 5bfcc50c1a68..b0ef242d2371 100644
---- a/arch/s390/kvm/gaccess.c
-+++ b/arch/s390/kvm/gaccess.c
-@@ -391,7 +391,8 @@ static int ar_translation(struct kvm_vcpu *vcpu, union asce *asce, u8 ar,
- 	if (ar >= NUM_ACRS)
- 		return -EINVAL;
- 
--	save_access_regs(vcpu->run->s.regs.acrs);
-+	if (test_thread_flag(TIF_KVM_ACRS))
-+		save_access_regs(vcpu->run->s.regs.acrs);
- 	alet.val = vcpu->run->s.regs.acrs[ar];
- 
- 	if (ar == 0 || alet.val == 0) {
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index ea63ac769889..3ee0913639d5 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -4951,6 +4951,7 @@ static void sync_regs(struct kvm_vcpu *vcpu)
- 	}
- 	save_access_regs(vcpu->arch.host_acrs);
- 	restore_access_regs(vcpu->run->s.regs.acrs);
-+	set_thread_flag(TIF_KVM_ACRS);
- 	/* save host (userspace) fprs/vrs */
- 	save_fpu_regs();
- 	vcpu->arch.host_fpregs.fpc = current->thread.fpu.fpc;
-@@ -5020,6 +5021,7 @@ static void store_regs(struct kvm_vcpu *vcpu)
- 	kvm_run->s.regs.pfs = vcpu->arch.pfault_select;
- 	kvm_run->s.regs.pfc = vcpu->arch.pfault_compare;
- 	save_access_regs(vcpu->run->s.regs.acrs);
-+	clear_thread_flag(TIF_KVM_ACRS);
- 	restore_access_regs(vcpu->arch.host_acrs);
- 	/* Save guest register state */
- 	save_fpu_regs();
+Thanks,
+Anup
+
+>
+>  tools/arch/riscv/include/asm/csr.h            | 541 ++++++++++++++++++
+>  tools/arch/riscv/include/asm/vdso/processor.h |  32 ++
+>  tools/testing/selftests/kvm/Makefile          |  27 +-
+>  .../selftests/kvm/aarch64/arch_timer.c        | 295 +---------
+>  tools/testing/selftests/kvm/arch_timer.c      | 259 +++++++++
+>  .../selftests/kvm/include/aarch64/processor.h |   4 -
+>  .../selftests/kvm/include/kvm_util_base.h     |   9 +
+>  .../selftests/kvm/include/riscv/arch_timer.h  |  71 +++
+>  .../selftests/kvm/include/riscv/processor.h   |  65 ++-
+>  .../testing/selftests/kvm/include/test_util.h |   2 +
+>  .../selftests/kvm/include/timer_test.h        |  45 ++
+>  .../selftests/kvm/lib/riscv/handlers.S        | 101 ++++
+>  .../selftests/kvm/lib/riscv/processor.c       |  87 +++
+>  .../testing/selftests/kvm/riscv/arch_timer.c  | 111 ++++
+>  .../selftests/kvm/riscv/get-reg-list.c        |  11 +-
+>  15 files changed, 1353 insertions(+), 307 deletions(-)
+>  create mode 100644 tools/arch/riscv/include/asm/csr.h
+>  create mode 100644 tools/arch/riscv/include/asm/vdso/processor.h
+>  create mode 100644 tools/testing/selftests/kvm/arch_timer.c
+>  create mode 100644 tools/testing/selftests/kvm/include/riscv/arch_timer.=
+h
+>  create mode 100644 tools/testing/selftests/kvm/include/timer_test.h
+>  create mode 100644 tools/testing/selftests/kvm/lib/riscv/handlers.S
+>  create mode 100644 tools/testing/selftests/kvm/riscv/arch_timer.c
+>
+> --
+> 2.34.1
+>
 
