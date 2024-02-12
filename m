@@ -1,118 +1,99 @@
-Return-Path: <kvm+bounces-8574-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8575-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEC7A851E9B
-	for <lists+kvm@lfdr.de>; Mon, 12 Feb 2024 21:25:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36F57851F3B
+	for <lists+kvm@lfdr.de>; Mon, 12 Feb 2024 22:10:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F189A1C2205C
-	for <lists+kvm@lfdr.de>; Mon, 12 Feb 2024 20:25:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C8A081F22DCA
+	for <lists+kvm@lfdr.de>; Mon, 12 Feb 2024 21:10:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBF15487A7;
-	Mon, 12 Feb 2024 20:24:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D29904CB22;
+	Mon, 12 Feb 2024 21:10:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="huo7uteC"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="d9ei9th8"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
+Received: from out-185.mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E232482CA
-	for <kvm@vger.kernel.org>; Mon, 12 Feb 2024 20:24:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D59AD4B5CD
+	for <kvm@vger.kernel.org>; Mon, 12 Feb 2024 21:10:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707769490; cv=none; b=tSw/Ki7QkG88gKLQgt8oa6NrBZ8lYH5VoKGw+TIw5ZZZLFkGvLs/8xTYY8CSKt22EaF2bkH8BsXKSM1J1FRILhE6V4ea1nNYPkWD826nZsHEBHHf0IJ/NAEUU/Oe21OrXaIJJeZHq1qLb3ydysidreXszYKwefVYMeqzZZwsL+g=
+	t=1707772213; cv=none; b=Row7jR60f1ISVp4oZgj5OPiyRDfM37DRPSBHRMAl9DiqDeWYsa7J8/fb2jV9IRObpKGt7Yn/e34eZSI66ZVkKcws6hsw0DG3gljzn6Nzk3NrjqyLaMgZW1i1wqFPQufyXptTPin1ehX2jZBM7uEoUQmsWOALbk0v/qbTmSP3ODA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707769490; c=relaxed/simple;
-	bh=EW1iwgQRXKT66+pbcKRYd+o9vCcGD15QbpagYfyY78A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y8AwQ8IgEFRRR7tYcyYRWlPSYXDnBfHdfVgAvpVXBZ4ZzPGsbvBbXe6f5kFlqk1RAMJWeSfIWF3pBQBE8VT6A1/59Ncaj/JG6bzWBqZ5MOHSKE6HQku9eF3lCaYkCKiMKlegl93ERGsTqHw62RYJEQjZUuQwlI3xKYqtw7HvN5U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=huo7uteC; arc=none smtp.client-ip=95.215.58.179
+	s=arc-20240116; t=1707772213; c=relaxed/simple;
+	bh=V2K3Tqa8gFu4PA1KW3ElYY3Gm+CaB0UlpxRc/Dm88V4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hKkaMtUzd8Zi3Tdgqdknew/x2KudW6Qy6jjydhfzFHD8gz/aWWYRAwSesf3erDY3xXG7R9P9AJ3bseC2DNDnhJ7czQvka59nzYqyiCv8gxoJoZFlAmbtIvqE5KgrmFdvBFMDkwUwzCVawhxLawaMO1dKb34qCzAekc8VBlezyVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=d9ei9th8; arc=none smtp.client-ip=95.215.58.185
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Mon, 12 Feb 2024 20:24:36 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1707769486;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=i4xg3mWKHsd+1fYsNi4Rtxp1tHHU5nJ+XHR6qN8at3A=;
-	b=huo7uteCfELHBo8TMxLabpBxYmnmzdwnN/sLcsP79jePf7Mc8c3/ILRzwhsJOrGHEPkbR0
-	Lfz4a2Uc0mYAV80Yt4bS38aTzrhDI9TTjC4BCAus3jHCiReJKZ0qQEjMGD5T2Uq1fuQlKc
-	MJLrzegOaL66bjag9WKDbaF9pWlQRPY=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1707772207;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ho2ychX5rzcZXGqMft5IUPj+UTWREdBWn8Koftkvhk0=;
+	b=d9ei9th8fcogKE0TDUvOgUz6IIwo3rQmVdChHOVKeZ0S1+n3rZ3FgUStc9VVsDUEbJD1R0
+	QoYZvxKJJftGdkfCirawYzO+KT4wFkeMK6+LPwuPxr53YfunovI0mDgz94yL2bPbkItKAU
+	SVfmES5t3kgv86WmHRXSt1oGwe5f5kY=
 From: Oliver Upton <oliver.upton@linux.dev>
-To: ankita@nvidia.com
-Cc: jgg@nvidia.com, maz@kernel.org, james.morse@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	reinette.chatre@intel.com, surenb@google.com, stefanha@redhat.com,
-	brauner@kernel.org, catalin.marinas@arm.com, will@kernel.org,
-	mark.rutland@arm.com, alex.williamson@redhat.com,
-	kevin.tian@intel.com, yi.l.liu@intel.com, ardb@kernel.org,
-	akpm@linux-foundation.org, andreyknvl@gmail.com,
-	wangjinchao@xfusion.com, gshan@redhat.com, shahuang@redhat.com,
-	ricarkol@google.com, linux-mm@kvack.org, lpieralisi@kernel.org,
-	rananta@google.com, ryan.roberts@arm.com, david@redhat.com,
-	linus.walleij@linaro.org, bhe@redhat.com, aniketa@nvidia.com,
-	cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com,
-	vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com,
-	jhubbard@nvidia.com, danw@nvidia.com, kvmarm@lists.linux.dev,
-	mochs@nvidia.com, zhiw@nvidia.com, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v7 0/4] kvm: arm64: allow the VM to select DEVICE_* and
- NORMAL_NC for IO memory
-Message-ID: <Zcp-hIlV-ZEu0Jou@linux.dev>
-References: <20240211174705.31992-1-ankita@nvidia.com>
+To: kvmarm@lists.linux.dev
+Cc: kvm@vger.kernel.org,
+	Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	linux-kernel@vger.kernel.org,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH] KVM: selftests: Print timer ctl register in ISTATUS assertion
+Date: Mon, 12 Feb 2024 21:09:33 +0000
+Message-ID: <20240212210932.3095265-2-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240211174705.31992-1-ankita@nvidia.com>
+Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-On Sun, Feb 11, 2024 at 11:17:01PM +0530, ankita@nvidia.com wrote:
-> From: Ankit Agrawal <ankita@nvidia.com>
-> 
-> Currently, KVM for ARM64 maps at stage 2 memory that is considered device
-> with DEVICE_nGnRE memory attributes; this setting overrides (per
-> ARM architecture [1]) any device MMIO mapping present at stage 1,
-> resulting in a set-up whereby a guest operating system cannot
-> determine device MMIO mapping memory attributes on its own but
-> it is always overridden by the KVM stage 2 default.
-> 
-> This set-up does not allow guest operating systems to select device
-> memory attributes independently from KVM stage-2 mappings
-> (refer to [1], "Combining stage 1 and stage 2 memory type attributes"),
-> which turns out to be an issue in that guest operating systems
-> (e.g. Linux) may request to map devices MMIO regions with memory
-> attributes that guarantee better performance (e.g. gathering
-> attribute - that for some devices can generate larger PCIe memory
-> writes TLPs) and specific operations (e.g. unaligned transactions)
-> such as the NormalNC memory type.
-> 
-> The default device stage 2 mapping was chosen in KVM for ARM64 since
-> it was considered safer (i.e. it would not allow guests to trigger
-> uncontained failures ultimately crashing the machine) but this
-> turned out to be asynchronous (SError) defeating the purpose.
-> 
-> For these reasons, relax the KVM stage 2 device memory attributes
-> from DEVICE_nGnRE to Normal-NC.
+Zenghui noted that the test assertion for the ISTATUS bit is printing
+the current timer value instead of the control register in the case of
+failure. While the assertion is sound, printing CNT isn't informative.
 
-Hi Ankit,
+Change things around to actually print the CTL register value instead.
 
-Thanks for being responsive in respinning the series according to the
-feedback. I think we're pretty close here, but it'd be good to address
-the comment / changelog feedback as well.
+Reported-by: Zenghui Yu <yuzenghui@huawei.com>
+Closes: https://lore.kernel.org/kvmarm/3188e6f1-f150-f7d0-6c2b-5b7608b0b012@huawei.com/
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+---
 
-Can you respin this once more? Hopefully we can get this stuff soaking
-in -next thereafter.
+Applies to kvmarm/next.
 
+ tools/testing/selftests/kvm/aarch64/arch_timer.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+index d5e8f365aa01..ab4b604d8ec0 100644
+--- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
++++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+@@ -160,7 +160,7 @@ static void guest_validate_irq(unsigned int intid,
+ 	__GUEST_ASSERT(xcnt >= cval,
+ 		       "xcnt = 0x%lx, cval = 0x%lx, xcnt_diff_us = 0x%lx",
+ 		       xcnt, cval, xcnt_diff_us);
+-	__GUEST_ASSERT(xctl & CTL_ISTATUS, "xcnt = 0x%lx", xcnt);
++	__GUEST_ASSERT(xctl & CTL_ISTATUS, "xctl = 0x%lx", xctl);
+ 
+ 	WRITE_ONCE(shared_data->nr_iter, shared_data->nr_iter + 1);
+ }
+
+base-commit: 680f749c272378a796388a3244bab53b5a952d67
 -- 
-Thanks,
-Oliver
+2.43.0.687.g38aa6559b0-goog
+
 
