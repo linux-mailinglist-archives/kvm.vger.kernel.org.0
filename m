@@ -1,82 +1,82 @@
-Return-Path: <kvm+bounces-8554-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8555-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7352085144B
-	for <lists+kvm@lfdr.de>; Mon, 12 Feb 2024 14:13:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D6A6851528
+	for <lists+kvm@lfdr.de>; Mon, 12 Feb 2024 14:31:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DDE031F21D76
-	for <lists+kvm@lfdr.de>; Mon, 12 Feb 2024 13:13:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA5B1287A6D
+	for <lists+kvm@lfdr.de>; Mon, 12 Feb 2024 13:31:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6A2C3A27B;
-	Mon, 12 Feb 2024 13:13:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C775C3D0DF;
+	Mon, 12 Feb 2024 13:16:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PQ13ahZq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ax2qBP3W"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31D7E3A1BE
-	for <kvm@vger.kernel.org>; Mon, 12 Feb 2024 13:13:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CD073D0BC
+	for <kvm@vger.kernel.org>; Mon, 12 Feb 2024 13:16:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707743592; cv=none; b=Skbz3tdQfvXP3Yy+y7+0HPm3g2rXeZYNx9pPdLA6Agsz3VrCACryvXh7s667b9uArh5JNsxlkBzJ24udpOIwO0gKkI3zHBVXdLEpY7yvHBz0sERc22huS4Ig1IbuhJQBD2nGrPPoA+XhEkkI6M+Nq2WszrcFq9XCA4gdreZyX7w=
+	t=1707743800; cv=none; b=PFDb2kYxoCeCEazMzYmz0pbqV+lz9D6LTsAkR94KTCSY+c9o3YW8wMjgfp/7UpliNuVGkAzGovGN/CdbbuhKsqsgzVIyUCD6Ov0waCumVEdSyOlHeXM+b6ABGWEk85RFdj2yumZqm1Dx8HuY30qPvwxZd1yrZXymzuEN8O6boMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707743592; c=relaxed/simple;
-	bh=VGqK2EXbpd35gsVz1xmG61zXP49yz5ANJzMkWNNw1mQ=;
+	s=arc-20240116; t=1707743800; c=relaxed/simple;
+	bh=mOmu6bKnnbQ/T3Bsy4O7zqo47TuFJtZ6E9Rx8rVgL9c=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=j/WP8ZINL7TPsk3NHb2dXsZid60AyvdQgfArT9VAreF8IeSIQRNh3k307wbF22czMKnNotGnfZ1SVEaVIwi1iktMAM5VQFaYTV9E6VjLl4TOo00vkPRkSK4+BoIL3Yk+gKCBUJHuQ0cQwk3kzJ/tdN9QcEUioQLaaoG3scZt3vM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PQ13ahZq; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=Ygrgh5fS+HX0rG3mK7M2WzoggQgxVURSWpgTSclxWMUPtSjuojMXzKJ7/HlC7JyAC/3XjyH4tNNmFq5ysfjBZ+J445zIgMPGizCqsqg12ic3FFnLDETmfiG6toBlT9bCMp3nPFD0JByAd+Yz8s+mS2rRe3Q3Uxt3NrYp8jx8fsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ax2qBP3W; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707743589;
+	s=mimecast20190719; t=1707743797;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=Hww63RycILkhWmUV7kV9IBG+ru1x1IcPxqyllH9PLOo=;
-	b=PQ13ahZqgTbzXYrgl4EWnRZgjZz9P/6+x7YHI1pL3K8obyu17OpW8Wl4K4a9+n5pYA9aUe
-	AOw8cbF2T3E4e31eVFQqsIpdNCwlg5MYYrJyIK4FEvg0jtChgYN4ugWwS6KQCWBSaOnltJ
-	lE0Hi/dAHBkDXElrX34/zzVbSsaoKwo=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=VzDYwK2iuJ4LmgQXwNgJ7Lf6QDDAqXO/glvGyId4yYE=;
+	b=Ax2qBP3WdKGjfsZ6fflYDcJHTkEnrLiWEjihqQo0dRIHqKvvZUxVdz/6u0mwhPNsCxhlP1
+	KFQPh09+m8pRMdD+3PYB8pLB9g1JsRRM0Y91icVf+xwCTNic0JStlHPvoqgNnVjeuTN9N2
+	KxmZwRNsUmLn37/xfjacXJfg20X41XE=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-633-wPZn73kPM_ugTxYodwNrMA-1; Mon, 12 Feb 2024 08:13:08 -0500
-X-MC-Unique: wPZn73kPM_ugTxYodwNrMA-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-33b2238ceceso1523496f8f.3
-        for <kvm@vger.kernel.org>; Mon, 12 Feb 2024 05:13:08 -0800 (PST)
+ us-mta-61-2k0yKSF-OVKjT9df7Z4jgA-1; Mon, 12 Feb 2024 08:16:34 -0500
+X-MC-Unique: 2k0yKSF-OVKjT9df7Z4jgA-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-33b14a51861so1589108f8f.0
+        for <kvm@vger.kernel.org>; Mon, 12 Feb 2024 05:16:33 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707743587; x=1708348387;
+        d=1e100.net; s=20230601; t=1707743793; x=1708348593;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
          :references:cc:to:content-language:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Hww63RycILkhWmUV7kV9IBG+ru1x1IcPxqyllH9PLOo=;
-        b=gc/20jVoUEbupu5YiGc2Lv3BYYEMgYrVY5UhJGm9wgt7Ex9CX8DMS6ErPYokIEBiMx
-         fxk4+naF/BAqCwZQQjUaRCccSyYLwmNjUiZs5QTm9r9XKVGZWKrMREM/RkqtrOzB/3gD
-         6EuhaanuIkVfmqgLVviqCHxCILAt1NLNwNuaYvTdQua3jzxgDY9Ft5H2ocDUW025KcYy
-         fdT8AITQ1H7JQnI1nvJ9ULksOSJv/t9Yt3jHpxy+Vx6VJqVezNG3SN72HoW2Njw25pVC
-         MQceFuIOHonPI93mZYA1nYHjCSc7Ny4Z5XomD/ZRPsYllfB7Q20WLDOySBnuQ9yGpszH
-         hTyg==
-X-Gm-Message-State: AOJu0Yx79+SgVPBpeM4KoiuzsM1D/iUulq4QGiU1JgJm8lPD41HnULMR
-	L5ARUJuc6/e3B/mPKv475OR52clz5CJFvb8IiVsBp4Te6LZK+Uy9z7IWGTmbsUxPAuO31r0YEVA
-	mg8mfRtoazgBJy8dN+hUbbKXBOS2MfD4PfVqXtK09TMr1YkV1YA==
-X-Received: by 2002:a5d:6486:0:b0:33b:2300:9cdc with SMTP id o6-20020a5d6486000000b0033b23009cdcmr7236107wri.46.1707743587332;
-        Mon, 12 Feb 2024 05:13:07 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEReINvzzr3H3VeDrYjZvaBxMo8PW95UvCVHUhmv21+hC5vvpCm8WTG48/ufAWGbGiAoJPPvA==
-X-Received: by 2002:a5d:6486:0:b0:33b:2300:9cdc with SMTP id o6-20020a5d6486000000b0033b23009cdcmr7236087wri.46.1707743586951;
-        Mon, 12 Feb 2024 05:13:06 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWWeeld+7JwdNTQDsO0jkryY+u3yAmckhW5SgRfY+5fV0ldQLhXXhSGIBvW6yxuM6zRKiccyP3VhYlPNRkp6gCsN4NupAgVtdA53/cZN1jEJvW9vV3mSCetbGX6LwDzEn3zJpuZsXFm6CNGtibvKcTPpb233CZ22JVAPXIXTCmZntQaFS3fMBEcrgnI0PEOEWpVW+Hm9hvrwz+t82XpzsFwC4KNE0TV5Sh19Rlmv0ziwCGeLv6DOUDBWNPVIegCMaIRSoF4C3Zxw2EcsDgQ7Lsdfdsf3B2iFGeDqjN3AUxGZ3OemCE3PMbXHE4Kp5lsdGr55YiNMKbg4GK7AyLyDeK+rhAstxl4MJn+9OumR2Hd4/9tgDhqDsHHZPr+k3UjsfQ4wSTI70zR71/k4RmpH5RXijU020/DjCK8qfsVVvuSrUVtfZ0QIqYeSYIwFksKpKipoURwJ7twbuLZXn5D30oieiRwXmKp4Vm3nm52Us+3cpnJcEJGqkrLeRn+mC+Wpwy1TthMiFKfJWwVJhcO/71VNGpHQTx+sFFbVl4PY/KqwO2U5snvWjBxpmXohzrw4PpUdu2a1f2iNR/J/GF5GwRBGzq8bNS/l3v0a3YGxtjyArrx3aA4MGFJ9kP3F8rxmUWSgmKN7EJwEDrBsbB/u6RofAe3tv4CwuGCyN/ggyOiX71r0C4FH6E/7DDH0RKkQrZl49ObylJ4I4dJjA6xWeWiM6Itpno30Zt1AfZU0jmMkv+JbKTuIG0MgjquGpaZV03XvGtbNbGcevA3XfoWU3l5KhPrsaAN5JyXobw0snxKWjQ7zZ0TIBqmYoAT5taJ1TGPlKfxQ3LXb3tCAcj8iT6R2XUgjIQCZWqsUa5jHxw8h0Q0R0Iq2MNqI2CYyC1zlXUc2Q0iF/lNw6SowtcdKTAUH8MyBD9YN2zO7Dp3Ml1iS1l08wSULWfQqgWMlRbGQBPpq2
- 4FEEQifKZjTIU02Tf7cbrbE3std9+7VYMZtSN8ow3ZMho9DSfMsFshcXi7IrBQjs3eaE6roSK1Ci0cvCQ6ZsaY50LI19L30xDdDEsJN60TWYUfLupgPQTHWE7JOryQy4zkCgzfF1srp0GLCDtV3PBfnctsJ5+KPMRBg+dlHvtAfRzm7TXFDOfiJd+Luhuksi21pxTg2vINRJheJIiGsbdMMYI9/ACXKt7i4+gB8H8st97ckVnIGfalVW/sWoJWe88CbAu5yy0wkW3eyV1EAf4W+IBe4Y6m83uKzJWFOhK4vYhveT/wkym+/0Eelze0DHYINSgRdvq8jojh
+        bh=VzDYwK2iuJ4LmgQXwNgJ7Lf6QDDAqXO/glvGyId4yYE=;
+        b=fHOmWjc3ntZ6aaeUuTzleVJ/nNN0n9mvsuIgNoUgpBM9he0+1OSzmYcdFuAB1JaalT
+         evD/yn3+PyWPIwAnbPNvo+1Z+q/tb9JYN71HG/MRwTnTqUs8CmZJVyucj+xuM2bhR9ah
+         FfgsO3IM6IphjpIMgPT5cKYYkcbvU5piqVaMlvpZByT15VjQ+sKVi7c5lTCpvsFaime4
+         74uyjqoBEe2nDZ9806Enj1jjIdI+NcKk1lWxcyYkkyraLXBDlnRxpemeSBEANz4ip7vf
+         t2NfHlaTlTedjAXSXoMVUugopesnLGhMjYakO1xGbJqHZsRkOISLH30vo0r1wCBNn7P3
+         u3Pg==
+X-Gm-Message-State: AOJu0YzDi7dbk+UXqA3j+mB3KxaNYaLLLuDI9hyIe1QSs2qu8a+BUV8H
+	pjJaljivSAzpvY8+fqQzLa5fMmcMnDfKkV7nqXjIK8UWdwqAZqbnSYG6BKm+j/eJdQgueNej6tA
+	fumsEJ5xCvf6cl/TfY48ElJqQzJ52tdmVeX7oTSZDbQpI51IRpg==
+X-Received: by 2002:adf:fe08:0:b0:33b:2fba:1ea8 with SMTP id n8-20020adffe08000000b0033b2fba1ea8mr4200513wrr.52.1707743792996;
+        Mon, 12 Feb 2024 05:16:32 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGxpBipBT3X0Dit4wAxSwyYUFXLETqTvvtgvVK9OQyhNeu7c1D+fK2Uy2PwFi2KixZcbrQThg==
+X-Received: by 2002:adf:fe08:0:b0:33b:2fba:1ea8 with SMTP id n8-20020adffe08000000b0033b2fba1ea8mr4200490wrr.52.1707743792624;
+        Mon, 12 Feb 2024 05:16:32 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWLYLeSLEG7e3LWjbCRQeUUwwjKwOp0UA0H5bXRyDYDGlbn5p9Uzq/h7qHON2mF8M/oLhRd6z2G0n/bh/DbNl4QHZ/TEV1YtjoDYtQloVAo0QXoy60jnrZa8ra4rQM4oruWjJfL4edsfAY8tYKQy192HX7aB+26OVmJ5I6wkDf3xiJBt0xQ4jnAgnXfOtqKwWbwYDs5JmiFiztMSeGa8XhRf3PQ2yByDazK81OLSw58jLsNr3/ixiE3v9Q4+t8sayNY7MHQYo9arpcYuji68swhVQ/+H2PIy+ZxcpILhiHiJD2eyCGToGaBydOhBXiwiw/1FpYMKW/VVNjZ3ee9mmUeOutHsce/p5xqucuPFeIib99cSjlhYGdCutX3NfOo9Hj/+mQ3lzivRBxKlkBkeGm2kBXuX4GkTd1aFBKgHXmFJADSmOm8mR+0E1UBAbYjlHZLNpySMPLeusSsJPWY45sAFpjNNd0qFJnDY46Gi1OT/6H+9PVuyB1gmnjaN8sJtXBmPzCNwxhKaa7e1CflLA46ZBUsYkv9PFsgyCnGqjSVbWFVHL2M8PFBl8SA708aufoKeJ4d0S4lr399pNrGCW69qgUIrbxER9VXU+ur+qXc+yvzSzOcGWxHdoLGk6o0Pqg4GnV3OwelOCZB1VLsAydUr1RVD1uYlLiv0R+F2w+fI6ZCwq9/eHRQHUxEdAxSKHiUcTUtZHALfa55bYUvnp8C6TAYOFNZ+JoNHiXDhs23K4sA48CV+hPGTRLdAGuVr6OxgxOdkOeN9/FkYdiRFBqDzs7FcnWyOvhRdJZAULWJ5tCNeltJqP02f6qNke+jDDyfV5J4v9aQSKzyKX1W7SH5cqLnMdW8d7+Ks1hEe5bUS6S29MFO61JQl0702IGBrVx4oZfbS4zb8iIjxhAQjLT0xj8NERSWMzUM02pVIyip0CcrGt8K1JgXSqkwpT1NviU0ts
+ d7CotME1W6l8UzjPo6PRP0ag1qOZqO8+yu5qTI1Lq9KZNzVCvIWjmBHoy/rmIYjCrYdjoePY8WfthaU+r1YmmQKbWrQWEAJ8Rwn0FuPn/Iyj59quAE4HcNeXI/m52PP86nY4tfP9ZiBIuBgTrrC5I0IUd0qrTHMni5BZgN3GYBebK7jPMU/LevwcFebUWCC9Ojg3fDArD85Ac/nGAmwtMpGx3ZzbcBvKEiL4qtiU4aJA71DQjEc2lxKRZpU3b/MwNe9Y7BZbJ0HKUko4MJkQCYRhKUqm19tENATR8lFC+L3XvnaY9wKW+CrBf+D37PZhXUR/9TCyItDNLR
 Received: from ?IPV6:2003:cb:c730:2200:7229:83b1:524e:283a? (p200300cbc7302200722983b1524e283a.dip0.t-ipconnect.de. [2003:cb:c730:2200:7229:83b1:524e:283a])
-        by smtp.gmail.com with ESMTPSA id x8-20020a5d6508000000b0033b1b01e4fcsm6805291wru.96.2024.02.12.05.13.04
+        by smtp.gmail.com with ESMTPSA id en8-20020a056000420800b0033b7d9c14desm3956966wrb.5.2024.02.12.05.16.30
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Feb 2024 05:13:06 -0800 (PST)
-Message-ID: <165363ba-d6cc-47a7-ab2a-d3a27a42f739@redhat.com>
-Date: Mon, 12 Feb 2024 14:13:04 +0100
+        Mon, 12 Feb 2024 05:16:32 -0800 (PST)
+Message-ID: <6ab142f0-bf66-4611-915d-938d58a277d3@redhat.com>
+Date: Mon, 12 Feb 2024 14:16:30 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -84,7 +84,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 2/4] mm: introduce new flag to indicate wc safe
+Subject: Re: [PATCH v7 4/4] vfio: convey kvm that the vfio-pci device is wc
+ safe
 Content-Language: en-US
 To: ankita@nvidia.com, jgg@nvidia.com, maz@kernel.org,
  oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com,
@@ -103,7 +104,7 @@ Cc: aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com,
  kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org
 References: <20240211174705.31992-1-ankita@nvidia.com>
- <20240211174705.31992-3-ankita@nvidia.com>
+ <20240211174705.31992-5-ankita@nvidia.com>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; keydata=
  xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -150,75 +151,53 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <20240211174705.31992-3-ankita@nvidia.com>
+In-Reply-To: <20240211174705.31992-5-ankita@nvidia.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 11.02.24 18:47, ankita@nvidia.com wrote:
 > From: Ankit Agrawal <ankita@nvidia.com>
 > 
-> Generalizing S2 setting from DEVICE_nGnRE to NormalNc for non PCI
-> devices may be problematic. E.g. GICv2 vCPU interface, which is
-> effectively a shared peripheral, can allow a guest to affect another
-> guest's interrupt distribution. The issue may be solved by limiting
-> the relaxation to mappings that have a user VMA. Still there is
-> insufficient information and uncertainity in the behavior of
-
-s/uncertainity/uncertainty/
-
-> non PCI drivers.
+> The code to map the MMIO in S2 as NormalNC is enabled when conveyed
+> that the device is WC safe using a new flag VM_ALLOW_ANY_UNCACHED.
 > 
-> Add a new flag VM_ALLOW_ANY_UNCACHED to indicate KVM that the device
-> is WC capable and these S2 changes can be extended to it. KVM can use
-> this flag to activate the code.
+> Make vfio-pci set the VM_ALLOW_ANY_UNCACHED flag.
 > 
+> This could be extended to other devices in the future once that
+> is deemed safe.
 
-MM people will stumble only over this commit at some point, looking for 
-details. It might make sense to add a bit more details on the underlying 
-problem (user space tables vs. stage-1 vs. stage-2) and why we want to 
-have a different mapping in user space compared to stage-1.
+Maybe add some more details how one could make a decision whether it 
+would be safe (either here or in patch #2).
 
-Then, describe that the VMA flag was found to be the simplest and 
-cleanest way to communicate this information from VFIO to KVM.
-
+> 
 > Suggested-by: Catalin Marinas <catalin.marinas@arm.com>
-> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+> Acked-by: Jason Gunthorpe <jgg@nvidia.com>
+> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 > Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
 > ---
->   include/linux/mm.h | 14 ++++++++++++++
->   1 file changed, 14 insertions(+)
+>   drivers/vfio/pci/vfio_pci_core.c | 6 +++++-
+>   1 file changed, 5 insertions(+), 1 deletion(-)
 > 
-> diff --git a/include/linux/mm.h b/include/linux/mm.h
-> index f5a97dec5169..59576e56c58b 100644
-> --- a/include/linux/mm.h
-> +++ b/include/linux/mm.h
-> @@ -391,6 +391,20 @@ extern unsigned int kobjsize(const void *objp);
->   # define VM_UFFD_MINOR		VM_NONE
->   #endif /* CONFIG_HAVE_ARCH_USERFAULTFD_MINOR */
+> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+> index 1cbc990d42e0..eba2146202f9 100644
+> --- a/drivers/vfio/pci/vfio_pci_core.c
+> +++ b/drivers/vfio/pci/vfio_pci_core.c
+> @@ -1862,8 +1862,12 @@ int vfio_pci_core_mmap(struct vfio_device *core_vdev, struct vm_area_struct *vma
+>   	/*
+>   	 * See remap_pfn_range(), called from vfio_pci_fault() but we can't
+>   	 * change vm_flags within the fault handler.  Set them now.
+> +	 *
+> +	 * Set an additional flag VM_ALLOW_ANY_UNCACHED to convey kvm that
+> +	 * the device is wc safe.
+>   	 */
+> -	vm_flags_set(vma, VM_IO | VM_PFNMAP | VM_DONTEXPAND | VM_DONTDUMP);
+> +	vm_flags_set(vma, VM_ALLOW_ANY_UNCACHED | VM_IO | VM_PFNMAP |
+> +			VM_DONTEXPAND | VM_DONTDUMP);
+>   	vma->vm_ops = &vfio_pci_mmap_ops;
 >   
-> +/*
-> + * This flag is used to connect VFIO to arch specific KVM code. It
-> + * indicates that the memory under this VMA is safe for use with any
-> + * non-cachable memory type inside KVM. Some VFIO devices, on some
-> + * platforms, are thought to be unsafe and can cause machine crashes
-> + * if KVM does not lock down the memory type.
-> + */
-> +#ifdef CONFIG_64BIT
-> +#define VM_ALLOW_ANY_UNCACHED_BIT	39
-> +#define VM_ALLOW_ANY_UNCACHED		BIT(VM_ALLOW_ANY_UNCACHED_BIT)
-> +#else
-> +#define VM_ALLOW_ANY_UNCACHED		VM_NONE
-> +#endif
-> +
->   /* Bits set in the VMA until the stack is in its final location */
->   #define VM_STACK_INCOMPLETE_SETUP (VM_RAND_READ | VM_SEQ_READ | VM_STACK_EARLY)
->   
+>   	return 0;
 
-It's not perfect (very VFIO <-> KVM specific right now, VMA flags feel a 
-bit wrong), but it certainly easier and cleaner than any alternatives I 
-could think of.
-
-Acked-by: David Hildenbrand <david@redhat.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
 -- 
 Cheers,
