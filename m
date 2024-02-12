@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-8562-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8563-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94CAC8519F5
-	for <lists+kvm@lfdr.de>; Mon, 12 Feb 2024 17:48:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A7398519F8
+	for <lists+kvm@lfdr.de>; Mon, 12 Feb 2024 17:49:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B97451C21D51
-	for <lists+kvm@lfdr.de>; Mon, 12 Feb 2024 16:48:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE5571C21CFD
+	for <lists+kvm@lfdr.de>; Mon, 12 Feb 2024 16:48:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 898D93D3BF;
-	Mon, 12 Feb 2024 16:48:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C3723D555;
+	Mon, 12 Feb 2024 16:48:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="DrNhryt3"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="G5WmLzJu"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2052.outbound.protection.outlook.com [40.107.237.52])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2054.outbound.protection.outlook.com [40.107.94.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03DCA3B2A4;
-	Mon, 12 Feb 2024 16:48:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9D653C699;
+	Mon, 12 Feb 2024 16:48:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.54
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707756501; cv=fail; b=IhEXzYqDXOntkNH3NXjHW0tHoMy55SwrE2ikEKWPLyGaQDdwsLfQTIFK8OlFks6YwLhKHeZ8P4e+JGK5g5o0moe2wx1A+X0BvIQI6E1nqLLGyGRADQlkfvYrvk4kjcav9dtieEbCUIk87/1q5Aacy6bLHaqmhKBvKAem3tYpgBk=
+	t=1707756521; cv=fail; b=P1HCSJGy5wHPpgoTre8M2aWEDP5RXW0MTpgEDu2qrzf8P9XjoTfex1f/zyzQFJxQYfKhTltLDM+swVXeQYaL42tLd6dTvW3LV7xqS2gScnOBW/GSPYsHEV68FFQb2dBiklIsXFaAhvjYYWsCDpy30/aY/Ac2ZgSKpbTIqSD547U=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707756501; c=relaxed/simple;
-	bh=3k5k5qee6eWk7LEhWrYbQZGd9WjyTJHdUL9kGVhJafo=;
+	s=arc-20240116; t=1707756521; c=relaxed/simple;
+	bh=l7OAEpOSeipd+I7UPuUvvIEjro6bxpmH/wjc3SmpjXw=;
 	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OBDKkFdbJlROKVuJrfv99Ssf5qU5LjncgoRXqRFJsqBbDgAuygUEcQbUasRExZyeq5cVqHQA43LQGEbSSrkfasNWE85SdG0f3iLZurwOMs06s0cefsd93yRL5IowQ5p06WGTQAXtzN1RBy4r4mx4HaDjwbViNPuLlNJiqMPBV20=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=DrNhryt3; arc=fail smtp.client-ip=40.107.237.52
+	 Content-Type:Content-Disposition:In-Reply-To; b=En6Mb3ib15Zx8CvY/gu8LhlfXPT6/bpMkQXavw3++Yvk+fn2pimotW6uErUOhp9myiRS6G2EpZgUCWCffO9p3c3uT+uLAZQJ4iaAFwKeAGgdTHNvQYquwJkYT8XAojQoSSFqHLa3kMiBnHhqETiHDuAu3EampDEzqjracvkJIG0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=G5WmLzJu; arc=fail smtp.client-ip=40.107.94.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CHJRIEz9w4JU/01ioo/csFEuM71FACpGPYCbxVlAO+AFOYM1kaq+0t1SQ7RO6b1qLCjKPcbQ6rp+eIibhl7it2nfWlmaqkflkxrIRiUOYjgrBM79NfdBjU/FObD39NBj5usa+/Gm94+pH774wywnLkhPgQJeEqCbzXKlnZUgdPUT0FrA/YfzT8IG7Y5SZdzfJu5dzKB0QrzfpCHhokcjJqh2qzZtCXNDkkhRD+aUhxF22FS0/Kxmn2vfm4cq/Ap2d+i/YkAOSiHhZb0FKNK/AyiZpSc616c84QzYRyhjMaUf+BTa6nm9SgqXpaR/L9QGQRBxSqCM4dTSEK3vjKCNdA==
+ b=VUddeyoPkPO/20q+ZoUGIk0dN1732sIBPvfUUKVowQejtn9HjJWFpDEU8P4MUC6fX0OWhDHTOOwqkbhcZuZ01LvYQuROa9NR2D3Wg0w7sGYuRUQGMxHNdQu93FxvO7F5YhMncX3W4EahP0v8pNmqNBQSeLug2v5uNb6fE1UjedGA7dwRgT7HYJ6LzPvX6fhBMtCVFMyIQF+a7VMK/Hxe+eIX1SwmNxLfbGU5LjZqnkNWH/JxYUDU5UNwxEBeSE3pc5aLBQQTXNFXIWcrGWDa56tEgtRjNRRj1vUKxya9C+n6+1t9Kfmdi0xcjsrmrc1Nz37cgls0dMp03k6vPSzcMA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZbMuACD0lPfGD5S/QtazwiBrPKqspUoJ+tvsxoWNemk=;
- b=f48lPEn3Pgmy5/SwyMkLVc19dAg9uxD2H3CA7X4LdA4U3FEcKb4ahl0MrPvXcJRdX851op074RJp0P6ZoA5vt8IQ42PG6XrT1UYIALZNkP8K13ymb7LXPP+tIBdhfFjzs4ZKqFrZ+TmdBpnaY0lvLCaUkjWpP81yyhBpU+9COE2jdECPemFvRRRaSkMqsVdw4Zbdwg6u0YX2rdgf9fly5/4GdwybicsuZ1mvWMSKDaPNrH0UbfxsYJe9AYCJmSrojJw5HKRhOnKDqeMtd9xsJQ8JFuy1a1ZDCgempMY++WubsZQAjWpmL2ZJ7SEjGydZrZZiF8oibz3JCzHKuArzJg==
+ bh=y6fuWCc0jG1unLA95FAG0wKoLIczJavaPCUrOzohaZM=;
+ b=GBvOgtU14V01brxDBkGCKeG8EefQaeWZrucygvHQIIxwHDWNU+XI6ObJGZ/6cXtqP/Sx40ob//OY2ZlXz5aT173QFWHiGXFByEE4MNz6DolIgwGeX85ohNosY3396OnKQAbCq0FWTzvZ4TNRprWHRSffM3I0oX6SmT2Imw2DSltBwhMiMSPL8OI+LTomcN/wxhmsu3x1A3dR7Da1ylJnq3qTXN2w+NwVKz/WzKBjkuaO3r/1w66rTMM7aSOJfWx7ZtANVjr7lReDd19pzg6eqKvS2AAy/Edg1qaWitAkz3AD/igdNH71rcrgtYPYiOJL/FY6mKijJoyESFWZe7rOAw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZbMuACD0lPfGD5S/QtazwiBrPKqspUoJ+tvsxoWNemk=;
- b=DrNhryt3SiQMZIiViEdy6LKSmFT1udyzL9QY04q9jiHVmSNhq2bOhH/R8dSP3iwdjcO8H+f+urN0e9SGEBMrf1awUYMNgy3F4eF62hH3YPpYOH6HoZmeeS1w/hRwrzu1AiJS6lV0jPiUI8oVJakkHI8jJ6vfyxPu954TqfpkqyA=
-Received: from SJ0PR03CA0369.namprd03.prod.outlook.com (2603:10b6:a03:3a1::14)
- by IA1PR12MB6578.namprd12.prod.outlook.com (2603:10b6:208:3a2::8) with
+ bh=y6fuWCc0jG1unLA95FAG0wKoLIczJavaPCUrOzohaZM=;
+ b=G5WmLzJuRtvFKYpAg73RvkuA6OqpKO9HOeaQCHAyGcwCuPysD8s0BqguqVSPA+FtDNygsrgVmRuMNpt7PP1CkLFXwPqAPDmWirq6am7tUL2qBm8vGKabpTitQDaeG6rN/VOufK+n41Oo3tjRxfrxdY/Zjw2str5+BqeHRgFW+OU=
+Received: from SJ0PR03CA0383.namprd03.prod.outlook.com (2603:10b6:a03:3a1::28)
+ by DM4PR12MB6253.namprd12.prod.outlook.com (2603:10b6:8:a6::12) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.10; Mon, 12 Feb
- 2024 16:48:16 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.24; Mon, 12 Feb
+ 2024 16:48:36 +0000
 Received: from SJ1PEPF00001CEA.namprd03.prod.outlook.com
- (2603:10b6:a03:3a1:cafe::81) by SJ0PR03CA0369.outlook.office365.com
- (2603:10b6:a03:3a1::14) with Microsoft SMTP Server (version=TLS1_2,
+ (2603:10b6:a03:3a1:cafe::21) by SJ0PR03CA0383.outlook.office365.com
+ (2603:10b6:a03:3a1::28) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.38 via Frontend
- Transport; Mon, 12 Feb 2024 16:48:16 +0000
+ Transport; Mon, 12 Feb 2024 16:48:36 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -65,15 +65,15 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
  SJ1PEPF00001CEA.mail.protection.outlook.com (10.167.242.26) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7249.19 via Frontend Transport; Mon, 12 Feb 2024 16:48:15 +0000
+ 15.20.7249.19 via Frontend Transport; Mon, 12 Feb 2024 16:48:36 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Mon, 12 Feb
- 2024 10:48:14 -0600
-Date: Mon, 12 Feb 2024 10:42:27 -0600
+ 2024 10:48:35 -0600
+Date: Mon, 12 Feb 2024 10:47:59 -0600
 From: Michael Roth <michael.roth@amd.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-CC: Sean Christopherson <seanjc@google.com>, <kvm@vger.kernel.org>,
+To: Sean Christopherson <seanjc@google.com>
+CC: Paolo Bonzini <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
 	<linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
 	<linux-crypto@vger.kernel.org>, <x86@kernel.org>,
 	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
@@ -86,15 +86,14 @@ CC: Sean Christopherson <seanjc@google.com>, <kvm@vger.kernel.org>,
 	<kirill@shutemov.name>, <ak@linux.intel.com>, <tony.luck@intel.com>,
 	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
 	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>,
-	Isaku Yamahata <isaku.yamahata@intel.com>
-Subject: Re: [PATCH v11 06/35] KVM: x86/mmu: Pass around full 64-bit error
- code for KVM page faults
-Message-ID: <20240212164227.e3647svomtqfld6l@amd.com>
+	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>
+Subject: Re: [PATCH v11 09/35] KVM: x86: Determine shared/private faults
+ based on vm_type
+Message-ID: <20240212164759.35cb7gds4p2inprg@amd.com>
 References: <20231230172351.574091-1-michael.roth@amd.com>
- <20231230172351.574091-7-michael.roth@amd.com>
- <ZcKb6VGbNZHlQkzg@google.com>
- <CABgObfbMuU5axeCYykXitrKGgV5Zw-BB843--Gp4t_rLe2=gPw@mail.gmail.com>
+ <20231230172351.574091-10-michael.roth@amd.com>
+ <CABgObfanrHTL429Cr8tcMGqs-Ov+6LWeQbzghvjQiGu9tz0EUA@mail.gmail.com>
+ <ZcpG6Ul4_8xAsnuy@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -104,68 +103,73 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABgObfbMuU5axeCYykXitrKGgV5Zw-BB843--Gp4t_rLe2=gPw@mail.gmail.com>
+In-Reply-To: <ZcpG6Ul4_8xAsnuy@google.com>
 X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CEA:EE_|IA1PR12MB6578:EE_
-X-MS-Office365-Filtering-Correlation-Id: 539bbb21-d96c-49a9-37a4-08dc2bea68c5
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CEA:EE_|DM4PR12MB6253:EE_
+X-MS-Office365-Filtering-Correlation-Id: 33846d7f-4fef-4026-5e57-08dc2bea7510
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	4Fk5yvYvVP0prrbHP8jhVTIL7n0M9nEIqP55WWP3quTRoCpHpjnJq/BYVbw5IdNLljDHrBzUiRIHQJnUPVTPhw0ewNGLZb8w3CYt5WFTAxmnz1AX4+DFkR+67oqWrQrowu2aO4IbY3+vUIqw32xxTK3Uy4/crs+3Ys7ScPMs0lSvLiKQsaRx2Fesfd9BMF7GqLIdWmS+t90SIzVjkD27LjLcOjESuhl+QqF3L1O5BwiZoYXVDpCZ/qPUavXp/S4gC307ClD+o2/4bFQYS4tha8Ry4xdSgixbz4lk99RWSzY5412TGj4Uw3E3InL4LC5LbdEh3yb81cJdZV7k04r1nohbWQfuEILqJUMmq85MwfA2qMZ9WX60QrsY/MTMHedSd2pzeHH7bu4fw9gxLX8uFVI+kmTSKgMJdP97QgBIzCDOwcaX7ZOj6QeAR/rm3vtAntHKxhHte17hrwBxLd3HxybhfuPYoocqa0lgj+IdicDiVuhrn6oUD9iLyQgZYt7eWqvljMqFQRCgIfFpPO750VB0Dhh33s67E4l97DVQsFcI8PXJju6Y1TJXKXFuncfz/b59Nh/z6pthBkywqWFL+w==
+	yrP/NggfU4d85NfP6WNH+aZMKyPZvL/Mm8TB3QCQiq2EaCKmRbdIrmvq7z9a29jG1yMaTOINWI6+SY+qgq9wU/6fvM22J6U4dYbtNML2wvqpi/fo7UC46fScodjFwztqAqCDc8edlefbfEkKAH4vIPJpL2HZ4ubey6KfiOLGlyFCobuDma46bgA56eo8eH7OZv1Kvdmrr3GIhXbrYE98j47TfvVvi8mjRhAeRDpivXteVPoPCPcYYPkdr/s9EEec/J01wfE2W5LmD9qnzlV8yLjeGF9kkWKokRfYc79VBHIR9ODBWm0oP4kgsE2pIyxSIY5i+PqI0scuSxWD8SJSUyppL6kag99pilkg+frF3TOh7yW0JcHSo6gNJJBcVzpCyj5BoiBPa4j7VuOEr1idycYeO/EVgkxj5LJIIvVUsSsqIVVK1tbXtgrG7JM0oiQWXDO+l1KrPjV3t/j4r/37WLmcBHWNSm2kHlXjNDgHPY+bIdJid7G6neNpvM/KwPQ65CUDV+30RaS7z2F4+i8k5QMalD5sHnQQoGDVrDEEbM1su4wrvTZCslpQZVxd2N1UE09pQWmv5Qnyhdp3tE+ZDGv+qJUktUsMOtV1dcQaZEVObYi2YNQXRzUyapukAxFi
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(136003)(39860400002)(396003)(346002)(376002)(230922051799003)(82310400011)(186009)(1800799012)(451199024)(64100799003)(36840700001)(40470700004)(46966006)(8936002)(2906002)(7416002)(5660300002)(8676002)(7406005)(4326008)(41300700001)(44832011)(356005)(81166007)(83380400001)(86362001)(36756003)(336012)(26005)(54906003)(16526019)(426003)(2616005)(82740400003)(316002)(478600001)(70586007)(6916009)(966005)(1076003)(6666004)(70206006)(53546011);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(376002)(136003)(396003)(39860400002)(346002)(230922051799003)(451199024)(1800799012)(64100799003)(186009)(82310400011)(40470700004)(36840700001)(46966006)(26005)(83380400001)(426003)(336012)(41300700001)(1076003)(2616005)(16526019)(44832011)(8676002)(4326008)(8936002)(478600001)(82740400003)(356005)(966005)(81166007)(70206006)(70586007)(36756003)(316002)(6916009)(86362001)(54906003)(6666004)(53546011)(7416002)(2906002)(7406005)(5660300002)(66899024);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Feb 2024 16:48:15.7989
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Feb 2024 16:48:36.4866
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 539bbb21-d96c-49a9-37a4-08dc2bea68c5
+X-MS-Exchange-CrossTenant-Network-Message-Id: 33846d7f-4fef-4026-5e57-08dc2bea7510
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	SJ1PEPF00001CEA.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6578
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6253
 
-On Mon, Feb 12, 2024 at 11:00:27AM +0100, Paolo Bonzini wrote:
-> On Tue, Feb 6, 2024 at 9:52 PM Sean Christopherson <seanjc@google.com> wrote:
-> >
-> > On Sat, Dec 30, 2023, Michael Roth wrote:
-> > > In some cases the full 64-bit error code for the KVM page fault will be
-> > > needed to determine things like whether or not a fault was for a private
-> > > or shared guest page, so update related code to accept the full 64-bit
-> > > value so it can be plumbed all the way through to where it is needed.
+On Mon, Feb 12, 2024 at 08:27:21AM -0800, Sean Christopherson wrote:
+> On Mon, Feb 12, 2024, Paolo Bonzini wrote:
+> > On Sat, Dec 30, 2023 at 6:24 PM Michael Roth <michael.roth@amd.com> wrote:
 > > >
-> > > The accessors of fault->error_code are changed as follows:
+> > > For KVM_X86_SNP_VM, only the PFERR_GUEST_ENC_MASK flag is needed to
+> > > determine with an #NPF is due to a private/shared access by the guest.
+> > > Implement that handling here. Also add handling needed to deal with
+> > > SNP guests which in some cases will make MMIO accesses with the
+> > > encryption bit.
 > > >
-> > > - FNAME(page_fault): change to explicitly use lower_32_bits() since that
-> > >                      is no longer done in kvm_mmu_page_fault()
-> > > - kvm_mmu_page_fault(): explicit mask with PFERR_RSVD_MASK,
-> > >                         PFERR_NESTED_GUEST_PAGE
-> > > - mmutrace: changed u32 -> u64
-> > >
-> > > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> > > Link: https://lore.kernel.org/kvm/20230612042559.375660-1-michael.roth@amd.com/T/#mbd0b20c9a2cf50319d5d2a27b63f73c772112076
-> > > [mdr: drop references/changes to code not in current gmem tree, update
-> > >       commit message]
 > > > Signed-off-by: Michael Roth <michael.roth@amd.com>
-> >
-> > I assume Isaku is the original author?  If so, that's missing from this patch.
+> > > ---
+> > >  arch/x86/kvm/mmu/mmu.c          | 12 ++++++++++--
+> > >  arch/x86/kvm/mmu/mmu_internal.h | 20 +++++++++++++++++++-
+> > >  2 files changed, 29 insertions(+), 3 deletions(-)
+> > >
+> > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > > index d3fbfe0686a0..61213f6648a1 100644
+> > > --- a/arch/x86/kvm/mmu/mmu.c
+> > > +++ b/arch/x86/kvm/mmu/mmu.c
+> > > @@ -4331,6 +4331,7 @@ static int kvm_faultin_pfn_private(struct kvm_vcpu *vcpu,
+> > >  static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+> > >  {
+> > >         struct kvm_memory_slot *slot = fault->slot;
+> > > +       bool private_fault = fault->is_private;
+> > 
+> > I think it's nicer to just make the fault !is_private in
+> > kvm_mmu_do_page_fault().
 > 
-> The root of this patch seem to be in a reply to "KVM: x86: Add
-> 'fault_is_private' x86 op"
-> (https://patchew.org/linux/20230220183847.59159-1-michael.roth@amd.com/20230220183847.59159-2-michael.roth@amd.com/),
-> so yes.
+> Yeah.  I'm starting to recall more of this discussion.  This is one of the reasons
+> I suggested/requested stuffing the error code to piggy-back the new SNP bit; doing
+> so allows is_private to be computed from the get-go without needing any vendor
+> specific hooks.
 
-Yes this is Isaku's patch, I think the authorship got mangled during a rebase.
-I'll make sure to get that fixed up.
+Makes sense to me. Based on your suggestion here:
+
+  https://lore.kernel.org/kvm/ZcUO5sFEAIH68JIA@google.com/
+
+I was planning to drop this patch and adopt the TDX implementation:
+
+  https://github.com/intel/tdx/commit/3717a903ef453aa7b62e7eb65f230566b7f158d4
 
 -Mike
-
-> 
-> Paolo
-> 
 
