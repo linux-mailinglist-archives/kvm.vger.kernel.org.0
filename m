@@ -1,82 +1,82 @@
-Return-Path: <kvm+bounces-8553-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8554-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA77B851411
-	for <lists+kvm@lfdr.de>; Mon, 12 Feb 2024 14:06:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7352085144B
+	for <lists+kvm@lfdr.de>; Mon, 12 Feb 2024 14:13:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE9191C23107
-	for <lists+kvm@lfdr.de>; Mon, 12 Feb 2024 13:06:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DDE031F21D76
+	for <lists+kvm@lfdr.de>; Mon, 12 Feb 2024 13:13:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A2BB3A1C4;
-	Mon, 12 Feb 2024 13:06:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6A2C3A27B;
+	Mon, 12 Feb 2024 13:13:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cuAxuW/P"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PQ13ahZq"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E217E39FE0
-	for <kvm@vger.kernel.org>; Mon, 12 Feb 2024 13:06:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31D7E3A1BE
+	for <kvm@vger.kernel.org>; Mon, 12 Feb 2024 13:13:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707743203; cv=none; b=M4kExIy0yPWmeQZXL1zDjGtwjN0xhXSfxwVOrpkGvpUSZWOKyCKWliyxb4gQilx1Diw1sfEPACqP2CjHJmXlm0ED9/w77qlheVMzy9BjZ/F+CBkXpPjbmfH/cUORTSEs++PJqd0xtHZYu/BzUAgBuX06ROayv3UP9/XEGQVUebA=
+	t=1707743592; cv=none; b=Skbz3tdQfvXP3Yy+y7+0HPm3g2rXeZYNx9pPdLA6Agsz3VrCACryvXh7s667b9uArh5JNsxlkBzJ24udpOIwO0gKkI3zHBVXdLEpY7yvHBz0sERc22huS4Ig1IbuhJQBD2nGrPPoA+XhEkkI6M+Nq2WszrcFq9XCA4gdreZyX7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707743203; c=relaxed/simple;
-	bh=wqNsTaiLJuLcjH0ji/72VXkl0tYbQK9jEQcZxwyUXn8=;
+	s=arc-20240116; t=1707743592; c=relaxed/simple;
+	bh=VGqK2EXbpd35gsVz1xmG61zXP49yz5ANJzMkWNNw1mQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ACCSUKGjOxdfRmahbiE+B20u3JBGgO8gU4n5XNaE/CsPPrj89rP+NrgnnfUnIK+cCLMc2OdgcV49FWs3PnhspFKxaFlMO9Psc3zLrF/Lvl5vjYpfd4pyxPUJeDVYUn5SNkc4fuzAtf7HMt6cW5WZHPxCfMkX9/TZkk9+N/FLq8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cuAxuW/P; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=j/WP8ZINL7TPsk3NHb2dXsZid60AyvdQgfArT9VAreF8IeSIQRNh3k307wbF22czMKnNotGnfZ1SVEaVIwi1iktMAM5VQFaYTV9E6VjLl4TOo00vkPRkSK4+BoIL3Yk+gKCBUJHuQ0cQwk3kzJ/tdN9QcEUioQLaaoG3scZt3vM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PQ13ahZq; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707743201;
+	s=mimecast20190719; t=1707743589;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=WDWwBBM+E91ZU6bnMPP22WeGEpsgO4NhaElCMSoXp58=;
-	b=cuAxuW/PQ8xTSovhZZZRBs5fZsi9BwZ5NTRI/6csyNi/NDp7RrPPoeJ/Tz3A2XADm/9L4/
-	ar1/um0uN74Uf6cgr/YXZ0XY463aqPkXv5KZtZh1vCjP17rRqVYJyqhf5EMd3dT5DMCGwH
-	zzlZHImXkCgI/Pxdm/Lw/EDIM+y9FeA=
-Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
- [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=Hww63RycILkhWmUV7kV9IBG+ru1x1IcPxqyllH9PLOo=;
+	b=PQ13ahZqgTbzXYrgl4EWnRZgjZz9P/6+x7YHI1pL3K8obyu17OpW8Wl4K4a9+n5pYA9aUe
+	AOw8cbF2T3E4e31eVFQqsIpdNCwlg5MYYrJyIK4FEvg0jtChgYN4ugWwS6KQCWBSaOnltJ
+	lE0Hi/dAHBkDXElrX34/zzVbSsaoKwo=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-298-edKPWD5ZMyeFmjTKLBSSvg-1; Mon, 12 Feb 2024 08:06:39 -0500
-X-MC-Unique: edKPWD5ZMyeFmjTKLBSSvg-1
-Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-5116e3cce79so2690278e87.2
-        for <kvm@vger.kernel.org>; Mon, 12 Feb 2024 05:06:39 -0800 (PST)
+ us-mta-633-wPZn73kPM_ugTxYodwNrMA-1; Mon, 12 Feb 2024 08:13:08 -0500
+X-MC-Unique: wPZn73kPM_ugTxYodwNrMA-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-33b2238ceceso1523496f8f.3
+        for <kvm@vger.kernel.org>; Mon, 12 Feb 2024 05:13:08 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707743198; x=1708347998;
+        d=1e100.net; s=20230601; t=1707743587; x=1708348387;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
          :references:cc:to:content-language:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WDWwBBM+E91ZU6bnMPP22WeGEpsgO4NhaElCMSoXp58=;
-        b=lKur95plPjRSs2bmG9xUR4UGDg57+z/AeNu/eQbmzqOQf6yvuPQ61V5B7yvvgcfsRg
-         h8yF8bdKKtmM0Wo9rJcq/yGkJRs5u9dDU//d7ienBzmx2bFuy3sG8zkPddDCjuAPQomp
-         zhcxAmvV5Tm2RBHlkYNpOvOutQHaQ7MwAiOhNxg6Co2d+AqRpyQNCV49elLuyK0AA9kT
-         K5+l6X3sIloxciRb9QxQmLuIXMLNfs2qszdh/e8s23hzD9/bgLTFncxpfHCPsMi4RK0g
-         uGqd3A4Z74HbS3D6PcRLC57og3DbQV1bIM3phXphIkPCvQhDeswet3nrW+3j+pUcLhBX
-         0rXQ==
-X-Gm-Message-State: AOJu0YycPZ87hh4sJu/12LALFdHZO2c6uKxkFSua+/OFYUWgDvood8T6
-	An4jFmi8JZEhZBJLMoLElNYJw0VdDSwQdBmegHjl2G4ittYSfJ2zEKDR+FidJU2mlATkR8Ht9g6
-	ARYFSJxJQ/eI3/xK18B0LK2vTFggau1jqykAouyv7R6vX4R0LQw==
-X-Received: by 2002:ac2:484e:0:b0:511:82b5:b484 with SMTP id 14-20020ac2484e000000b0051182b5b484mr3671297lfy.64.1707743198001;
-        Mon, 12 Feb 2024 05:06:38 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEAi+y4C0q8Pj8RrJ7Auc1O4J3dTFjnTSp79xOJnXlMZlLNC1sCSpKdTZmKkS2ODIqClDBGHg==
-X-Received: by 2002:ac2:484e:0:b0:511:82b5:b484 with SMTP id 14-20020ac2484e000000b0051182b5b484mr3671254lfy.64.1707743197527;
-        Mon, 12 Feb 2024 05:06:37 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVXC8dM/g488xbOderXCs0dcp21CcwsLFJHR6YjVOxLWNicm8D/FidrCQhXbQYYPXxP52FQn6GG6VS87CK34RcDM5er9ZOju/TaFSRP5Vpmzu6TqjOW2LMQnF3BbnYMLVP1uHrFHPG0v8N5KFXtd09uerHdjz+fhgi+uLxz7BoPg08zwBh1doJbrsgvvrmypqtOfc4y/zmqECoVg6kbZMoFr1VLc1Uhx9+j903DvZR3LMFGsefY+vF2dw+omnf6cDEOkJL/EEYByXjlD3Bi3MnhLsQnf91b07gLGtSs3VJeKLMdKOY//OjJsCnUva0YKI6swT0sg5VplGAwiG8TiipWfkP4Dkuo+CJy6ZdLfdyPrY/uWjQRQPQ5JLXCq8/B4P6wsn4QEpLeM/OzTu1HD2+I92rn6S/dlq0FbWlwlDV7M3SZLPn72BkiZSW2KrQNpYej7sCjrZxy5j6Ar9j6oS5jhbq2Q9ebBuZ81uny5MKkl0vQMNDUoaEfyNOk2Sv/eofaXbkNVypvTg6d299CrApmhqZ//8eVLqWSYV124AAQLp/ezhBtmhkgLN5cbYX9GZAKGwqEVGrkBDvluzSOJECKk765SluUSMDGuBXIa3ueBGkl4Ds7Elh+eSp6LYL1++VFijkYYUu1o6I02DPsqLKsVAZQx4OV5PILjXyGqx48Na+Ep/o+TOHK5TPg9cyO+CDQGD7fwO3mLgVWpn6Yb4BPDPYs2eanp7zukA0iIqseJiOx/CD8z84YqyHqV+78e0WjMdIcw6BUp/JoMtOVURx6X5ADMonU1DZ+F2UqFSdiCU/C+3r1QKmSwSiaW9J3QpiwZUoHqnaK/SIurVbzLe9w4mFoqc3d/AuD8zZ7xc9SetcFkQ99ywYqdtP5T2CxgTRe2LwsDcmxg4A5QfnmdeAfZ1CteF7hcwmX0qnkJwDd1O7u7G+nMAMphnaovdvLYk1sVt
- Md5KQ94VW9wGUPPwNPZJdsinJnIcn9kBO2w/U5jPqBpfdDTnAswC0qn1g5umFVUiqHB7gH/w04Ns6+L+Hw64YEAKguyQnn/LW8NySO0AhQ2oqgT5AVK2VnmPAeTcgm15OdeIheJPcqNj4x3yAtrIXcwl46Vd/Aqxy+tOLzx02FdOiPiqrALlh8gN7c0CuQBdNU9MMrQMTMC8BDjUbgK+3Q+HIdsVgFFmYhvzdlFUrv7NaWu0yT4hafOLsnnEQoZonKGeQjZsZsvCT457uNFhuE8WfZD0/rKQwSKH6k9FVEUxWmVNC3Zzuz+PpwBigCJCDwsn+yD2q1eiAmUgSmfQ==
+        bh=Hww63RycILkhWmUV7kV9IBG+ru1x1IcPxqyllH9PLOo=;
+        b=gc/20jVoUEbupu5YiGc2Lv3BYYEMgYrVY5UhJGm9wgt7Ex9CX8DMS6ErPYokIEBiMx
+         fxk4+naF/BAqCwZQQjUaRCccSyYLwmNjUiZs5QTm9r9XKVGZWKrMREM/RkqtrOzB/3gD
+         6EuhaanuIkVfmqgLVviqCHxCILAt1NLNwNuaYvTdQua3jzxgDY9Ft5H2ocDUW025KcYy
+         fdT8AITQ1H7JQnI1nvJ9ULksOSJv/t9Yt3jHpxy+Vx6VJqVezNG3SN72HoW2Njw25pVC
+         MQceFuIOHonPI93mZYA1nYHjCSc7Ny4Z5XomD/ZRPsYllfB7Q20WLDOySBnuQ9yGpszH
+         hTyg==
+X-Gm-Message-State: AOJu0Yx79+SgVPBpeM4KoiuzsM1D/iUulq4QGiU1JgJm8lPD41HnULMR
+	L5ARUJuc6/e3B/mPKv475OR52clz5CJFvb8IiVsBp4Te6LZK+Uy9z7IWGTmbsUxPAuO31r0YEVA
+	mg8mfRtoazgBJy8dN+hUbbKXBOS2MfD4PfVqXtK09TMr1YkV1YA==
+X-Received: by 2002:a5d:6486:0:b0:33b:2300:9cdc with SMTP id o6-20020a5d6486000000b0033b23009cdcmr7236107wri.46.1707743587332;
+        Mon, 12 Feb 2024 05:13:07 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEReINvzzr3H3VeDrYjZvaBxMo8PW95UvCVHUhmv21+hC5vvpCm8WTG48/ufAWGbGiAoJPPvA==
+X-Received: by 2002:a5d:6486:0:b0:33b:2300:9cdc with SMTP id o6-20020a5d6486000000b0033b23009cdcmr7236087wri.46.1707743586951;
+        Mon, 12 Feb 2024 05:13:06 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWWeeld+7JwdNTQDsO0jkryY+u3yAmckhW5SgRfY+5fV0ldQLhXXhSGIBvW6yxuM6zRKiccyP3VhYlPNRkp6gCsN4NupAgVtdA53/cZN1jEJvW9vV3mSCetbGX6LwDzEn3zJpuZsXFm6CNGtibvKcTPpb233CZ22JVAPXIXTCmZntQaFS3fMBEcrgnI0PEOEWpVW+Hm9hvrwz+t82XpzsFwC4KNE0TV5Sh19Rlmv0ziwCGeLv6DOUDBWNPVIegCMaIRSoF4C3Zxw2EcsDgQ7Lsdfdsf3B2iFGeDqjN3AUxGZ3OemCE3PMbXHE4Kp5lsdGr55YiNMKbg4GK7AyLyDeK+rhAstxl4MJn+9OumR2Hd4/9tgDhqDsHHZPr+k3UjsfQ4wSTI70zR71/k4RmpH5RXijU020/DjCK8qfsVVvuSrUVtfZ0QIqYeSYIwFksKpKipoURwJ7twbuLZXn5D30oieiRwXmKp4Vm3nm52Us+3cpnJcEJGqkrLeRn+mC+Wpwy1TthMiFKfJWwVJhcO/71VNGpHQTx+sFFbVl4PY/KqwO2U5snvWjBxpmXohzrw4PpUdu2a1f2iNR/J/GF5GwRBGzq8bNS/l3v0a3YGxtjyArrx3aA4MGFJ9kP3F8rxmUWSgmKN7EJwEDrBsbB/u6RofAe3tv4CwuGCyN/ggyOiX71r0C4FH6E/7DDH0RKkQrZl49ObylJ4I4dJjA6xWeWiM6Itpno30Zt1AfZU0jmMkv+JbKTuIG0MgjquGpaZV03XvGtbNbGcevA3XfoWU3l5KhPrsaAN5JyXobw0snxKWjQ7zZ0TIBqmYoAT5taJ1TGPlKfxQ3LXb3tCAcj8iT6R2XUgjIQCZWqsUa5jHxw8h0Q0R0Iq2MNqI2CYyC1zlXUc2Q0iF/lNw6SowtcdKTAUH8MyBD9YN2zO7Dp3Ml1iS1l08wSULWfQqgWMlRbGQBPpq2
+ 4FEEQifKZjTIU02Tf7cbrbE3std9+7VYMZtSN8ow3ZMho9DSfMsFshcXi7IrBQjs3eaE6roSK1Ci0cvCQ6ZsaY50LI19L30xDdDEsJN60TWYUfLupgPQTHWE7JOryQy4zkCgzfF1srp0GLCDtV3PBfnctsJ5+KPMRBg+dlHvtAfRzm7TXFDOfiJd+Luhuksi21pxTg2vINRJheJIiGsbdMMYI9/ACXKt7i4+gB8H8st97ckVnIGfalVW/sWoJWe88CbAu5yy0wkW3eyV1EAf4W+IBe4Y6m83uKzJWFOhK4vYhveT/wkym+/0Eelze0DHYINSgRdvq8jojh
 Received: from ?IPV6:2003:cb:c730:2200:7229:83b1:524e:283a? (p200300cbc7302200722983b1524e283a.dip0.t-ipconnect.de. [2003:cb:c730:2200:7229:83b1:524e:283a])
-        by smtp.gmail.com with ESMTPSA id k14-20020a056000004e00b0033afc81fc00sm6714883wrx.41.2024.02.12.05.06.35
+        by smtp.gmail.com with ESMTPSA id x8-20020a5d6508000000b0033b1b01e4fcsm6805291wru.96.2024.02.12.05.13.04
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Feb 2024 05:06:37 -0800 (PST)
-Message-ID: <30493284-53f6-4172-a9e1-cb9052acced4@redhat.com>
-Date: Mon, 12 Feb 2024 14:06:35 +0100
+        Mon, 12 Feb 2024 05:13:06 -0800 (PST)
+Message-ID: <165363ba-d6cc-47a7-ab2a-d3a27a42f739@redhat.com>
+Date: Mon, 12 Feb 2024 14:13:04 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -84,28 +84,26 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 0/4] kvm: arm64: allow the VM to select DEVICE_* and
- NORMAL_NC for IO memory
+Subject: Re: [PATCH v7 2/4] mm: introduce new flag to indicate wc safe
 Content-Language: en-US
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: ankita@nvidia.com, maz@kernel.org, oliver.upton@linux.dev,
- james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
- reinette.chatre@intel.com, surenb@google.com, stefanha@redhat.com,
- brauner@kernel.org, catalin.marinas@arm.com, will@kernel.org,
- mark.rutland@arm.com, alex.williamson@redhat.com, kevin.tian@intel.com,
- yi.l.liu@intel.com, ardb@kernel.org, akpm@linux-foundation.org,
- andreyknvl@gmail.com, wangjinchao@xfusion.com, gshan@redhat.com,
- shahuang@redhat.com, ricarkol@google.com, linux-mm@kvack.org,
- lpieralisi@kernel.org, rananta@google.com, ryan.roberts@arm.com,
- linus.walleij@linaro.org, bhe@redhat.com, aniketa@nvidia.com,
- cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com,
- vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com,
- jhubbard@nvidia.com, danw@nvidia.com, kvmarm@lists.linux.dev,
- mochs@nvidia.com, zhiw@nvidia.com, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: ankita@nvidia.com, jgg@nvidia.com, maz@kernel.org,
+ oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com,
+ yuzenghui@huawei.com, reinette.chatre@intel.com, surenb@google.com,
+ stefanha@redhat.com, brauner@kernel.org, catalin.marinas@arm.com,
+ will@kernel.org, mark.rutland@arm.com, alex.williamson@redhat.com,
+ kevin.tian@intel.com, yi.l.liu@intel.com, ardb@kernel.org,
+ akpm@linux-foundation.org, andreyknvl@gmail.com, wangjinchao@xfusion.com,
+ gshan@redhat.com, shahuang@redhat.com, ricarkol@google.com,
+ linux-mm@kvack.org, lpieralisi@kernel.org, rananta@google.com,
+ ryan.roberts@arm.com, linus.walleij@linaro.org, bhe@redhat.com
+Cc: aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com,
+ targupta@nvidia.com, vsethi@nvidia.com, acurrid@nvidia.com,
+ apopple@nvidia.com, jhubbard@nvidia.com, danw@nvidia.com,
+ kvmarm@lists.linux.dev, mochs@nvidia.com, zhiw@nvidia.com,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org
 References: <20240211174705.31992-1-ankita@nvidia.com>
- <aa6c1708-d6ac-46f7-b7ab-e97a273a90c2@redhat.com>
- <20240212125654.GV10476@nvidia.com>
+ <20240211174705.31992-3-ankita@nvidia.com>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; keydata=
  xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -152,133 +150,75 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <20240212125654.GV10476@nvidia.com>
+In-Reply-To: <20240211174705.31992-3-ankita@nvidia.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi Jason,
+On 11.02.24 18:47, ankita@nvidia.com wrote:
+> From: Ankit Agrawal <ankita@nvidia.com>
+> 
+> Generalizing S2 setting from DEVICE_nGnRE to NormalNc for non PCI
+> devices may be problematic. E.g. GICv2 vCPU interface, which is
+> effectively a shared peripheral, can allow a guest to affect another
+> guest's interrupt distribution. The issue may be solved by limiting
+> the relaxation to mappings that have a user VMA. Still there is
+> insufficient information and uncertainity in the behavior of
 
-Thanks for all the details (some might be valuable to document in more 
-detail, but I'm not that experienced with all of the mapping types on 
-arm64, so it might "just be me").
+s/uncertainity/uncertainty/
 
-> It is worse that some hand wavey "side effect". If you map memory with
-> NORMAL_NC (ie for write combining) then writel() doesn't work
-> correctly at all.
+> non PCI drivers.
 > 
-> The memory must be mapped according to which kernel APIs the actual
-> driver in the VM will use. writel() vs __iowrite64_copy().
+> Add a new flag VM_ALLOW_ANY_UNCACHED to indicate KVM that the device
+> is WC capable and these S2 changes can be extended to it. KVM can use
+> this flag to activate the code.
 > 
->> We can trigger both cases right now inside VMs, where we want the device
->> driver to actually make the decision.
+
+MM people will stumble only over this commit at some point, looking for 
+details. It might make sense to add a bit more details on the underlying 
+problem (user space tables vs. stage-1 vs. stage-2) and why we want to 
+have a different mapping in user space compared to stage-1.
+
+Then, describe that the VMA flag was found to be the simplest and 
+cleanest way to communicate this information from VFIO to KVM.
+
+> Suggested-by: Catalin Marinas <catalin.marinas@arm.com>
+> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
+> ---
+>   include/linux/mm.h | 14 ++++++++++++++
+>   1 file changed, 14 insertions(+)
 > 
-> Yes
+> diff --git a/include/linux/mm.h b/include/linux/mm.h
+> index f5a97dec5169..59576e56c58b 100644
+> --- a/include/linux/mm.h
+> +++ b/include/linux/mm.h
+> @@ -391,6 +391,20 @@ extern unsigned int kobjsize(const void *objp);
+>   # define VM_UFFD_MINOR		VM_NONE
+>   #endif /* CONFIG_HAVE_ARCH_USERFAULTFD_MINOR */
 >   
->> (2) For a VM, that device driver lives inside the VM, for DPDK and friends,
->> it lives in user space. They have this information.
-> 
-> Yes
+> +/*
+> + * This flag is used to connect VFIO to arch specific KVM code. It
+> + * indicates that the memory under this VMA is safe for use with any
+> + * non-cachable memory type inside KVM. Some VFIO devices, on some
+> + * platforms, are thought to be unsafe and can cause machine crashes
+> + * if KVM does not lock down the memory type.
+> + */
+> +#ifdef CONFIG_64BIT
+> +#define VM_ALLOW_ANY_UNCACHED_BIT	39
+> +#define VM_ALLOW_ANY_UNCACHED		BIT(VM_ALLOW_ANY_UNCACHED_BIT)
+> +#else
+> +#define VM_ALLOW_ANY_UNCACHED		VM_NONE
+> +#endif
+> +
+>   /* Bits set in the VMA until the stack is in its final location */
+>   #define VM_STACK_INCOMPLETE_SETUP (VM_RAND_READ | VM_SEQ_READ | VM_STACK_EARLY)
 >   
->> We only focus here on optimizing (fixing?) the mapping for VMs, DPDK is out
->> of the picture.
-> 
-> DPDK will be solved through some VFIO ioctl, we know how to do it,
-> just nobody has cared enough to do it.
 
-Good!
+It's not perfect (very VFIO <-> KVM specific right now, VMA flags feel a 
+bit wrong), but it certainly easier and cleaner than any alternatives I 
+could think of.
 
-> 
->> So we want to allow the VM to achieve a WC/NC mapping by using a
->> relaxed (NC) mapping in stage-1. Whatever is set in stage-2 wins.
-> 
-> Yes
->   
->>
->> (3) vfio knows whether using WC (and NC?) could be problematic, and must
->> forbid it, if that is the case. There are cases where we could otherwise
->> cause harm (bring down the host?). We must keep mapping the memory as
->> DEVICE_nGnRE when in doubt.
-> 
-> Yes, there is an unspecific fear that on ARM platforms using NORMAL_NC
-> in the wrong way can trigger a catastrophic error and kill the
-> host. There is no way to know if the platform has this bug, so the
-> agreement was to be conservative and only allow it for vfio-pci, based
-> on some specific details of how PCI has to be implemented and ARM
-> guidance on PCI integration..
-> 
->> Now, what the new mmap() flag does is tell the world "using the wrong
->> mapping type cannot bring down the host", and KVM uses that to use a
->> different mapping type (NC) in stage-1 as setup by vfio in the user space
->> page tables.
-> 
-> The inverse meaning, we assume VMAs with the flag can bring down the
-> host, but yes.
-
-Got it, will have a closer look at the patch soon.
-
-> 
->> I was trying to find ways of avoiding a mmap() flag and was hoping that we
->> could just use a PTE bit that does not have semantics in VM_PFNMAP mappings.
->> Unfortunately, arm64 does not support uffd-wp, which I had in mind, so it's
->> not that easy.
-> 
-> Seems like a waste of a valuable PTE bit to me.
-
-It would rather have been "it's already unused there, so let's reuse 
-it". But there was no such low-hanging gruit.
-
-> 
->> Further, I was wondering if there would be a way to let DPDK similarly
->> benefit, because it looks like we are happily ignoring that (I was told they
->> apply some hacks to work around that).
-> 
-> dpdk doesn't need the VMA bit, we know how to solve it with vfio
-> ioctls, it is very straightforward. dpdk just does a ioctl & mmap and
-> VFIO will create a vma with pgprote_writecombine(). Completely
-> trivial, the only nasty bit is fitting this into the VFIO uAPI.
-
-That's what I thought.
-
-> 
->> (a) User space tells VFIO which parts of a BAR it would like to have mapped
->> differently. For QEMU, this would mean, requesting a NC mapping for the
->> whole BAR. For DPDK, it could mean requesting different types for parts of a
->> BAR.
-> 
-> We don't want to have have the memory mapped as NC in qemu. As I said
-> above if it is mapped NC then writel() doesn't work. We can't have
-> conflicting mappings that go toward NC when the right answer is
-> DEVICE.
-
-I was wondering who would trigger that, but as I read below it could be 
-MMIO emulation.
-
-> 
-> writel() on NC will malfunction.
-> 
-> __iowrite64_copy() on DEVICE will be functionally correct but slower.
-> 
-> The S2 mapping that KVM creates is special because it doesn't actually
-> map it once the VM kernel gets started. The VM kernel always supplies
-> a S1 table that sets the correct type.
-> 
-> So if qemu has DEVICE, the S2 has NC and the VM's S1 has DEVICE then
-> the mapping is realiably made to be DEVICE. The hidden S2 doesn't
-> cause a problem.
-> 
->> That would mean, that we would map NC already in QEMU. I wonder if that
->> could be a problem with read speculation, even if QEMU never really accesses
->> that mmap'ed region.
-> 
-> Also correct.
-> 
-> Further, qemu may need to do emulation for MMIO in various cases and
-> the qemu logic for this requires a DEVICE mapping or the emulation
-> will malfunction.
-> 
-> Using NC in qemu is off the table.
-
-Good, thanks for the details, all makes sense to me.
+Acked-by: David Hildenbrand <david@redhat.com>
 
 -- 
 Cheers,
