@@ -1,45 +1,47 @@
-Return-Path: <kvm+bounces-8594-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8595-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 348D5852C4D
-	for <lists+kvm@lfdr.de>; Tue, 13 Feb 2024 10:33:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E115E852C4E
+	for <lists+kvm@lfdr.de>; Tue, 13 Feb 2024 10:33:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 634311C231F9
-	for <lists+kvm@lfdr.de>; Tue, 13 Feb 2024 09:33:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 682561F25545
+	for <lists+kvm@lfdr.de>; Tue, 13 Feb 2024 09:33:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB082225A9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7DD8225CB;
 	Tue, 13 Feb 2024 09:33:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mtFtMFbU"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vo8RB2qf"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FD1122319
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D36CB224C6
 	for <kvm@vger.kernel.org>; Tue, 13 Feb 2024 09:33:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707816799; cv=none; b=Yhgv/wtbKeI4n3c+W0F7sb/dMg3PXQZsKCPt4q+E0U2fQTGmqoMuSZ3GRfqbn7U1FSkSnDeBO12xLmubhN6ndy6FFmggrCop5wh4mxsD9ZRzgOHYaKDa+OKaFjaXVN8iWoEeReCX7mHWtBveErue4MBPPCIlerup+vQsuHVoQrY=
+	t=1707816799; cv=none; b=s/lc2nAkXwk9Bo3J/ptznD9GfOzd/CS+kdqy6ngVwpLdyqVOsVPIW9yW98ErVqnZu3cf6tjoKravWz/hO028m5QjMySSYYqf/nAI9Ts0FtKs6+Z0AcUNup1JqgWFj8p3pHwsLWuqwlgLLjdFM7/VFLY672YpfvT2ZCZ5xzN3WQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1707816799; c=relaxed/simple;
-	bh=pqrF3xPTx1xmxqP1iL+dG5WfH700VcJkBHMegIvgDus=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=A8N9KN50BRGnATc4cbtbtcETXxnalWeyHAUxV/xx6NH7q3lcUxeTZjhi10fRl4r53coFeavf6obzKp7SX9PVRWUvK2mJnna+7QNIlkuXMOoxOXLmZ+24qrWF81TzxIpt6+PIOPfwl2uCjQzF1q8gsfkZV7hKBR17DjTDAGiex7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mtFtMFbU; arc=none smtp.client-ip=95.215.58.178
+	bh=bwAh/HjIrt1hqUnlvYVrZwrrMVLgoGSwee3tzVmP50s=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=OG2muiUO6/q1zmWw9Bii7hocnIxsWn1D5Ucadbe08R4FZ1X9qzXfjuO0+GuMrtgJAZ3DxGj6OeU7J22oa56O03DGWu4gHSjhUTH/a8+cmiRctTKE3jlvrJ/jhSctm5IjnQtPE27F9OI2qSp0K8i0OuEMU2dgBMrqSAxjDElWmNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vo8RB2qf; arc=none smtp.client-ip=95.215.58.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1707816792;
+	t=1707816794;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=NUCDH79BK5F5dDhUzT0JOtT9z48X42DlZfGByqCjqeE=;
-	b=mtFtMFbUyrNIyeJlPry/n5yCkzLHSrmTQs4DzjSh2Gw1htrh/ezDt3vUAmeuRspy1e2NgB
-	kjQI9ej2a9mUnZHLoXM9XZ0jJKEcZDClCg0+3S0OEcZ+pAEnpafmrvCe8TE4QTcrAbVXiY
-	4PQfOo/vRdB/MoNNVvnj7CMfaS94rRc=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cyUnvVECpp/8iTljvXmQPWzrvEO1ZBGnoQKIdU51DBU=;
+	b=vo8RB2qfGqEonVTQPePSakr2QqTty/7P7NdKqNQyptvl5bDfkijfU1kXX6vvVTY6dFU+c3
+	HogKV3EfdrrPBOPunsoemPi/WzmFuHTnAflQrWwQm5WlW5x/RrSrKna+v5kRUktY0CUQnw
+	ARsEvSc++Dh03U+obakDaYrOC/LfaT8=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: kvm@vger.kernel.org,
@@ -49,9 +51,11 @@ Cc: kvm@vger.kernel.org,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	linux-kernel@vger.kernel.org,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v2 00/23] KVM: arm64: Improvements to LPI injection
-Date: Tue, 13 Feb 2024 09:32:37 +0000
-Message-ID: <20240213093250.3960069-1-oliver.upton@linux.dev>
+Subject: [PATCH v2 01/23] KVM: arm64: Add tracepoints + stats for LPI cache effectiveness
+Date: Tue, 13 Feb 2024 09:32:38 +0000
+Message-ID: <20240213093250.3960069-2-oliver.upton@linux.dev>
+In-Reply-To: <20240213093250.3960069-1-oliver.upton@linux.dev>
+References: <20240213093250.3960069-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -61,143 +65,188 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-For full details on the what/why, please see the cover letter in v1.
+LPI translation and injection has been shown to have a significant
+impact on the performance of VM workloads, so it probably makes sense to
+add some signals in this area.
 
-Apologies for the delay on v2, I wanted to spend some time to get a
-microbenchmark in place to slam the ITS code pretty hard, and based on
-the results I'm glad I did.
+Introduce the concept of a KVM tracepoint that associates with a VM
+stat and use it for the LPI translation cache tracepoints. It isn't too
+uncommon for a kernel hacker to attach to tracepoints, while at the same
+time userspace may open a 'binary stats' FD to peek at the corresponding
+VM stats.
 
-The test is built around having vCPU threads and device threads, where
-each device can signal a particular number of event IDs (alien, right?)
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+---
+ arch/arm64/include/asm/kvm_host.h |  3 ++
+ arch/arm64/kvm/guest.c            |  5 ++-
+ arch/arm64/kvm/vgic/trace.h       | 66 +++++++++++++++++++++++++++++++
+ arch/arm64/kvm/vgic/vgic-its.c    | 14 ++++++-
+ include/linux/kvm_host.h          |  4 ++
+ 5 files changed, 89 insertions(+), 3 deletions(-)
 
-Anyway, here are the results of that test in some carefully-selected
-examples:
-
-+----------------------------+---------------------+------------------------------+
-|           Config           | v6.8-rc1 (LPIs/sec) | v6.8-rc1 + series (LPIs/sec) |
-+----------------------------+---------------------+------------------------------+
-| -v 1 -d 1 -e 1 -i 1000000  |           780151.37 |                   1255291.00 |
-| -v 16 -d 16 -e 16 -i 10000 |           437081.55 |                   5078225.70 |
-| -v 16 -d 16 -e 17 -i 10000 |           506446.50 |                   1126118.10 |
-| -v 64 -d 64 -e 1 -i 100000 |           295097.03 |                   5565964.87 |
-| -v 1 -d 1 -e 17 -i 1000    |           732934.43 |                       149.24 |
-+----------------------------+---------------------+------------------------------+
-
-While there is an 18x improvement in the scaled-out config (64 vCPUs, 64
-devices, 1 event per device), there is an extremely disappointing 4911x
-regression in the example that effectively forces a cache eviction for
-every lookup.
-
-Clearly the RCU synchronization is a bounding issue in this case. I
-think other scenarios where the cache is overcommitted (16 vCPUs, 16
-devices, 17 events / device) are able to hide effects somewhat, as other
-threads can make forward progress while others are stuck waiting on RCU.
-
-A few ideas on next steps:
-
- 1) Rework the lpi_list_lock as an rwlock. This would obviate the need
-    for RCU protection in the LPI cache as well as memory allocations on
-    the injection path. This is actually what I had in the internal
-    version of the series, although it was very incomplete.
-
-    I'd expect this to nullify the improvement on the
-    slightly-overcommitted case and 'fix' the pathological case.
-
- 2) call_rcu() and move on. This feels somewhat abusive of the API, as
-    the guest can flood the host with RCU callbacks, but I wasn't able
-    to make my machine fall over in any mean configuration of the test.
-
-    I haven't studied the degree to which such a malicious VM could
-    adversely affect neighboring workloads.
-
- 3) Redo the whole ITS representation with xarrays and allow RCU readers
-    outside of the ITS lock. I haven't fully thought this out, and if we
-    pursue this option then we will need a secondary data structure to
-    track where ITSes have been placed in guest memory to avoid taking
-    the SRCU lock. We can then stick RCU synchronization in ITS command
-    processing, which feels right to me, and dump the translation cache
-    altogether.
-
-    I'd expect slightly worse average case performance in favor of more
-    consistent performance.
-
-Even though it is more work, I'm slightly in favor of (3) as it is a
-net reduction in overall complexity of the ITS implementation. But, I
-wanted to send out what I had to guage opinions on these options, and
-get feedback on the first 10 patches which are an overall win.
-
-v1: https://lore.kernel.org/kvmarm/20240124204909.105952-1-oliver.upton@linux.dev/
-
-v1 -> v2:
- - Add the microbenchmark
- - Add tracepoints / VM stats for the important bits of LPI injection.
-   This was extremely useful for making sense of test results.
- - Fix a silly lock imbalance on error path in vgic_add_lpi() (Dan)
- - Constrain xas_for_each() based on the properties of the INTID space
-   (Marc)
- - Remove some missed vestiges of the LPI linked-list (Marc)
- - Explicitly free unused cache entry on failed insertion race (Marc)
- - Don't explode people's machines with a boatload of xchg() (I said it
-   was WIP!) (Marc)
-
-Oliver Upton (23):
-  KVM: arm64: Add tracepoints + stats for LPI cache effectiveness
-  KVM: arm64: vgic: Store LPIs in an xarray
-  KVM: arm64: vgic: Use xarray to find LPI in vgic_get_lpi()
-  KVM: arm64: vgic-v3: Iterate the xarray to find pending LPIs
-  KVM: arm64: vgic-its: Walk the LPI xarray in vgic_copy_lpi_list()
-  KVM: arm64: vgic: Get rid of the LPI linked-list
-  KVM: arm64: vgic: Use atomics to count LPIs
-  KVM: arm64: vgic: Free LPI vgic_irq structs in an RCU-safe manner
-  KVM: arm64: vgic: Rely on RCU protection in vgic_get_lpi()
-  KVM: arm64: vgic: Ensure the irq refcount is nonzero when taking a ref
-  KVM: arm64: vgic: Don't acquire the lpi_list_lock in vgic_put_irq()
-  KVM: arm64: vgic-its: Lazily allocate LPI translation cache
-  KVM: arm64: vgic-its: Pick cache victim based on usage count
-  KVM: arm64: vgic-its: Protect cached vgic_irq pointers with RCU
-  KVM: arm64: vgic-its: Treat the LPI translation cache as an rculist
-  KVM: arm64: vgic-its: Rely on RCU to protect translation cache reads
-  KVM: selftests: Align with kernel's GIC definitions
-  KVM: selftests: Standardise layout of GIC frames
-  KVM: selftests: Add a minimal library for interacting with an ITS
-  KVM: selftests: Add helper for enabling LPIs on a redistributor
-  KVM: selftests: Use MPIDR_HWID_BITMASK from cputype.h
-  KVM: selftests: Hack in support for aligned page allocations
-  KVM: selftests: Add stress test for LPI injection
-
- arch/arm64/include/asm/kvm_host.h             |   3 +
- arch/arm64/kvm/guest.c                        |   5 +-
- arch/arm64/kvm/vgic/trace.h                   |  66 ++
- arch/arm64/kvm/vgic/vgic-debug.c              |   2 +-
- arch/arm64/kvm/vgic/vgic-init.c               |   7 +-
- arch/arm64/kvm/vgic/vgic-its.c                | 220 ++++---
- arch/arm64/kvm/vgic/vgic-v3.c                 |   3 +-
- arch/arm64/kvm/vgic/vgic.c                    |  56 +-
- arch/arm64/kvm/vgic/vgic.h                    |  15 +-
- include/kvm/arm_vgic.h                        |  10 +-
- include/linux/kvm_host.h                      |   4 +
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/aarch64/arch_timer.c        |   8 +-
- .../testing/selftests/kvm/aarch64/psci_test.c |   2 +
- .../testing/selftests/kvm/aarch64/vgic_irq.c  |  15 +-
- .../selftests/kvm/aarch64/vgic_lpi_stress.c   | 388 ++++++++++++
- .../kvm/aarch64/vpmu_counter_access.c         |   6 +-
- .../selftests/kvm/dirty_log_perf_test.c       |   5 +-
- .../selftests/kvm/include/aarch64/gic.h       |  15 +-
- .../selftests/kvm/include/aarch64/gic_v3.h    | 586 +++++++++++++++++-
- .../selftests/kvm/include/aarch64/processor.h |   2 -
- .../selftests/kvm/include/aarch64/vgic.h      |  27 +-
- .../selftests/kvm/include/kvm_util_base.h     |   2 +
- tools/testing/selftests/kvm/lib/aarch64/gic.c |  18 +-
- .../selftests/kvm/lib/aarch64/gic_private.h   |   4 +-
- .../selftests/kvm/lib/aarch64/gic_v3.c        |  69 ++-
- .../testing/selftests/kvm/lib/aarch64/vgic.c  | 337 +++++++++-
- tools/testing/selftests/kvm/lib/kvm_util.c    |  27 +-
- 28 files changed, 1641 insertions(+), 262 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/aarch64/vgic_lpi_stress.c
-
-
-base-commit: 6613476e225e090cc9aad49be7fa504e290dd33d
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 21c57b812569..6f88b76373a5 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -966,6 +966,9 @@ static inline bool __vcpu_write_sys_reg_to_cpu(u64 val, int reg)
+ 
+ struct kvm_vm_stat {
+ 	struct kvm_vm_stat_generic generic;
++	u64 vgic_its_trans_cache_hit;
++	u64 vgic_its_trans_cache_miss;
++	u64 vgic_its_trans_cache_victim;
+ };
+ 
+ struct kvm_vcpu_stat {
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index aaf1d4939739..354d67251fc2 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -30,7 +30,10 @@
+ #include "trace.h"
+ 
+ const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
+-	KVM_GENERIC_VM_STATS()
++	KVM_GENERIC_VM_STATS(),
++	STATS_DESC_COUNTER(VM, vgic_its_trans_cache_hit),
++	STATS_DESC_COUNTER(VM, vgic_its_trans_cache_miss),
++	STATS_DESC_COUNTER(VM, vgic_its_trans_cache_victim)
+ };
+ 
+ const struct kvm_stats_header kvm_vm_stats_header = {
+diff --git a/arch/arm64/kvm/vgic/trace.h b/arch/arm64/kvm/vgic/trace.h
+index 83c64401a7fc..ff6423f22c91 100644
+--- a/arch/arm64/kvm/vgic/trace.h
++++ b/arch/arm64/kvm/vgic/trace.h
+@@ -27,6 +27,72 @@ TRACE_EVENT(vgic_update_irq_pending,
+ 		  __entry->vcpu_id, __entry->irq, __entry->level)
+ );
+ 
++TRACE_EVENT(vgic_its_trans_cache_hit,
++	TP_PROTO(__u64 db_addr, __u32 device_id, __u32 event_id, __u32 intid),
++	TP_ARGS(db_addr, device_id, event_id, intid),
++
++	TP_STRUCT__entry(
++		__field(	__u64,		db_addr		)
++		__field(	__u32,		device_id	)
++		__field(	__u32,		event_id	)
++		__field(	__u32,		intid		)
++	),
++
++	TP_fast_assign(
++		__entry->db_addr	= db_addr;
++		__entry->device_id	= device_id;
++		__entry->event_id	= event_id;
++		__entry->intid		= intid;
++	),
++
++	TP_printk("DB: %016llx, device_id %u, event_id %u, intid %u",
++                  __entry->db_addr, __entry->device_id, __entry->event_id,
++                  __entry->intid)
++);
++
++TRACE_EVENT(vgic_its_trans_cache_miss,
++	TP_PROTO(__u64 db_addr, __u32 device_id, __u32 event_id),
++	TP_ARGS(db_addr, device_id, event_id),
++
++	TP_STRUCT__entry(
++		__field(	__u64,		db_addr		)
++		__field(	__u32,		device_id	)
++		__field(	__u32,		event_id	)
++	),
++
++	TP_fast_assign(
++		__entry->db_addr	= db_addr;
++		__entry->device_id	= device_id;
++		__entry->event_id	= event_id;
++	),
++
++	TP_printk("DB: %016llx, device_id %u, event_id %u",
++                  __entry->db_addr, __entry->device_id, __entry->event_id)
++);
++
++TRACE_EVENT(vgic_its_trans_cache_victim,
++	TP_PROTO(__u64 db_addr, __u32 device_id, __u32 event_id, __u32 intid),
++	TP_ARGS(db_addr, device_id, event_id, intid),
++
++	TP_STRUCT__entry(
++		__field(	__u64,		db_addr		)
++		__field(	__u32,		device_id	)
++		__field(	__u32,		event_id	)
++		__field(	__u32,		intid		)
++	),
++
++	TP_fast_assign(
++		__entry->db_addr	= db_addr;
++		__entry->device_id	= device_id;
++		__entry->event_id	= event_id;
++		__entry->intid		= intid;
++	),
++
++	TP_printk("DB: %016llx, device_id %u, event_id %u, intid %u",
++                  __entry->db_addr, __entry->device_id, __entry->event_id,
++                  __entry->intid)
++);
++
+ #endif /* _TRACE_VGIC_H */
+ 
+ #undef TRACE_INCLUDE_PATH
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index e2764d0ffa9f..59179268ac2d 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -20,6 +20,7 @@
+ #include <asm/kvm_arm.h>
+ #include <asm/kvm_mmu.h>
+ 
++#include "trace.h"
+ #include "vgic.h"
+ #include "vgic-mmio.h"
+ 
+@@ -636,8 +637,11 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
+ 	 * to the interrupt, so drop the potential reference on what
+ 	 * was in the cache, and increment it on the new interrupt.
+ 	 */
+-	if (cte->irq)
++	if (cte->irq) {
++		KVM_VM_TRACE_EVENT(kvm, vgic_its_trans_cache_victim, cte->db,
++				   cte->devid, cte->eventid, cte->irq->intid);
+ 		__vgic_put_lpi_locked(kvm, cte->irq);
++	}
+ 
+ 	vgic_get_irq_kref(irq);
+ 
+@@ -767,8 +771,14 @@ int vgic_its_inject_cached_translation(struct kvm *kvm, struct kvm_msi *msi)
+ 
+ 	db = (u64)msi->address_hi << 32 | msi->address_lo;
+ 	irq = vgic_its_check_cache(kvm, db, msi->devid, msi->data);
+-	if (!irq)
++	if (!irq) {
++		KVM_VM_TRACE_EVENT(kvm, vgic_its_trans_cache_miss, db, msi->devid,
++				   msi->data);
+ 		return -EWOULDBLOCK;
++	}
++
++	KVM_VM_TRACE_EVENT(kvm, vgic_its_trans_cache_hit, db, msi->devid,
++			   msi->data, irq->intid);
+ 
+ 	raw_spin_lock_irqsave(&irq->irq_lock, flags);
+ 	irq->pending_latch = true;
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 7e7fd25b09b3..846b447b6798 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1927,6 +1927,10 @@ struct _kvm_stats_desc {
+ 			HALT_POLL_HIST_COUNT),				       \
+ 	STATS_DESC_IBOOLEAN(VCPU_GENERIC, blocking)
+ 
++#define KVM_VM_TRACE_EVENT(vm, event, ...)					\
++	((vm)->stat.event)++; trace_## event(__VA_ARGS__)
++
++
+ extern struct dentry *kvm_debugfs_dir;
+ 
+ ssize_t kvm_stats_read(char *id, const struct kvm_stats_header *header,
 -- 
 2.43.0.687.g38aa6559b0-goog
 
