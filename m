@@ -1,91 +1,111 @@
-Return-Path: <kvm+bounces-8592-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8593-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E56CD8527DF
-	for <lists+kvm@lfdr.de>; Tue, 13 Feb 2024 04:45:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 260C7852AEE
+	for <lists+kvm@lfdr.de>; Tue, 13 Feb 2024 09:23:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7B1F8B22D71
-	for <lists+kvm@lfdr.de>; Tue, 13 Feb 2024 03:45:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2C86281C68
+	for <lists+kvm@lfdr.de>; Tue, 13 Feb 2024 08:23:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A2A910A37;
-	Tue, 13 Feb 2024 03:44:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E34721104;
+	Tue, 13 Feb 2024 08:21:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PoaFizk0"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Jgi+hOLa";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="3Oqp1suo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 603C310A0E
-	for <kvm@vger.kernel.org>; Tue, 13 Feb 2024 03:44:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFDAB1DFE5;
+	Tue, 13 Feb 2024 08:21:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707795898; cv=none; b=BH+STyknOpU9X0kFDUhOsazEvmft14vEi6jEsXejP3Y5mGilGUdEQbZ6lUDTbUKoWAY/mNvvDYd9GaY6uvNLOPxacLBe3GJ0UtHEySpZA3fboAX8o85H+ODsZGPsyV7tQkrPfR4k4npGN3HYP+bBwMqnzO8A+hrZAdFY8edDDV4=
+	t=1707812511; cv=none; b=dqVFkp3qDY6Lw9PgYtnOSuY9uiXqWFhcQU29FJD7Ew8kaxYRZ26o3NVKTSpNXnouRcj5C67BFd9hRIeTl86pSg8Ei6UIuBkFXKisd1tN0tebXiyPY4nlb62mMMZIOwHSbB+KN9x2uUTwK9UflSZSJNB56/qxftiT6IJlVpSambc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707795898; c=relaxed/simple;
-	bh=JwAyQWe7miwq6SVX7IfW52aLND0+2gi89T9lvHbisTo=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=n2qIpUPlioCj7qFWWwVho0wrXmVSuf55xnF0lDeG0ltYTG4b3QHEzllQHuQYoQQ6uKjW27thQXs3xjkCOmzYtWF+EK/HpU36S7C/5ATYRJRxzAaNm+Hp3/Hf8QnZ49QEMAau6INOhBh2hq7cBO758MfY48hQlXSa2Jeu3oxnS1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PoaFizk0; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5d8bff2b792so3980621a12.1
-        for <kvm@vger.kernel.org>; Mon, 12 Feb 2024 19:44:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707795897; x=1708400697; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Gp/byxLraC807sITtGRawodDTA1fNMfQwGWNUUbWF5s=;
-        b=PoaFizk0Sk9zLTJeuX4QBaK9mLQkM2HIK6awDJhDVIP94TKx9cnp6P2R7tMkhvPFrs
-         WkkwejOzMLin2jb6UW9eI0s/OmPAuLiD2PlZSjmOiDU0WDvw5QzSUbspaQPPTv93J6iq
-         k9h+4diSW/suYzS66quIOohruHvOxm2t5O/bYYxnl0WvSksBXw8WOPXwHQs94V9LvgWy
-         BKQfoCaniZ0YhWJPFpgWC4aEnp/TKes83esbiCasq+rsgIrniZpUqk+3psATHWSPcmDT
-         3/Ngcr85kxVXHAJNO6qJgCwQLnCP9oBo+wR+yu3E+di/NT0nJnpySN0BMKZqkhfAeOHS
-         XN5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707795897; x=1708400697;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Gp/byxLraC807sITtGRawodDTA1fNMfQwGWNUUbWF5s=;
-        b=kSOeT1cE6JMJSKVzZaN5DXz43QZSEajFlp3kFafXVVVIDoO7rTrVmNaZ2rSj9hB2Gz
-         kXx6dcSHKAUr2FXb3w3+J/SBYsPYtnM5ax8mmHg0qMw4HlU+skdwxA1iAVRS8y+9dDH7
-         sT+/fIC4HqvG9zsqRENg/5mf8knjc72as3vjgh4tTmfAAELl1NrVjMrNtwbR4hRLc+fR
-         9ULscB0+UwufUTSXVsL6GbE6GZMWWLB0AMEbRGJ2IHyDCk5m3/jmT9ni3c0RMefoKKtN
-         +5K+pBx+xH1oHPVlYoN+K4W2/Qys8UaTuhPryVLntf0Ls9xDn8iWKvnJFChnoWpbCIEe
-         gYgw==
-X-Forwarded-Encrypted: i=1; AJvYcCW62lZRHqGbTre6ulIfSrmuLe04L9MxwLmMOgQobp5y/aej2FYijJv1JKYXJ18tt5LHzecf7WrTzNX/EeKDycWfZLfO
-X-Gm-Message-State: AOJu0YxDZGf2zcaCMEX5SbDggujYlRvXKVZYCcmJAClLB2fuZ7arFAgp
-	P5dzvDMMc3Omb/kzgzzGMe7OTaeCLARsad4Axx/El9A2f5REOduEesW6K7SA0K90slH9zcocb9w
-	7aw==
-X-Google-Smtp-Source: AGHT+IGGI8Fty4SnswScI0YALjv0to7a7pfcE8bH+CFvNEGLJ/DcJmrEz5SnXPWzfMn3EDSiz3p6QME0aDg=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a65:6e85:0:b0:5d8:af18:eee0 with SMTP id
- bm5-20020a656e85000000b005d8af18eee0mr107250pgb.12.1707795896559; Mon, 12 Feb
- 2024 19:44:56 -0800 (PST)
-Date: Mon, 12 Feb 2024 19:44:55 -0800
-In-Reply-To: <20230911021637.1941096-3-stevensd@google.com>
+	s=arc-20240116; t=1707812511; c=relaxed/simple;
+	bh=ZYN3fgZ1tGHxq6qadPhlItMQrukownl7I8z2psyXd50=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=GbXB4bcvFQvVup+UwK23EBbp/oQ5pbciHLOHuEnftZA/Jr63iyydACQBwFC6pFrQN7WcfKXeoyVefgoghv89KLmO9sHar7lUZ80ZlEPZvpGQwXDQjUNIpCsnR0KNOocOE4nr7lrk+WilNr3bASL+NWwcDay1Rj1Kww4MGrsos0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Jgi+hOLa; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=3Oqp1suo; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1707812507;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uNP018TzEdyi2awCaDDsbZbsgpQqF7Eu571Tlmw7Oro=;
+	b=Jgi+hOLaQsr/UGFvcL5OIaoAo00LqK+tQ1fuJFUzA9wBnjsA4xbszrZYGy803tdheNSPGM
+	zr883ldWnjRSzLeyQcIw2nmLk8s+w94aUew8D2hn5IF51Bq8BNrbSVtFXicpLBLE4yn7WZ
+	ZfNcEzdKS6ANDhFp1NdSLoCCOqnBACdTHGWJgWEADDJgy1M0OMKls+dMmEYnkEx5VQwVFu
+	fF5Cb+g1bcRVGQMN5jjJa+934B9iHLiWmylGP83jdQuQ0hsOoGNFuZgMyU9Wcxce0/VNsY
+	zqSJ6yabMu+PEdtFO/c9rPEgWfBUTSGBA/KXOHEfsLlRShX+YrQXSkM7qW9IcQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1707812507;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uNP018TzEdyi2awCaDDsbZbsgpQqF7Eu571Tlmw7Oro=;
+	b=3Oqp1suoZ6wKVGQaFsmcPpdmcAAxud3CbvcTrk1PhzLGEQYHHO6TEDTa8nhmEnA8N6GRbF
+	y12ONlpFeQ90J5CQ==
+To: Jacob Pan <jacob.jun.pan@linux.intel.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, X86 Kernel <x86@kernel.org>,
+ iommu@lists.linux.dev, Lu Baolu <baolu.lu@linux.intel.com>,
+ kvm@vger.kernel.org, Dave Hansen <dave.hansen@intel.com>, Joerg Roedel
+ <joro@8bytes.org>, "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov
+ <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>, Raj Ashok
+ <ashok.raj@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>,
+ maz@kernel.org, peterz@infradead.org, seanjc@google.com, Robin Murphy
+ <robin.murphy@arm.com>, jacob.jun.pan@linux.intel.com
+Subject: Re: [PATCH RFC 12/13] iommu/vt-d: Add a helper to retrieve PID address
+In-Reply-To: <20240126153047.5e42e5d0@jacob-builder>
+References: <20231112041643.2868316-1-jacob.jun.pan@linux.intel.com>
+ <20231112041643.2868316-13-jacob.jun.pan@linux.intel.com>
+ <874jgvuls0.ffs@tglx> <20240126153047.5e42e5d0@jacob-builder>
+Date: Tue, 13 Feb 2024 09:21:47 +0100
+Message-ID: <87le7oixk4.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20230911021637.1941096-1-stevensd@google.com> <20230911021637.1941096-3-stevensd@google.com>
-Message-ID: <Zcrlt0xHdRubEDLJ@google.com>
-Subject: Re: [PATCH v9 2/6] KVM: mmu: Introduce __kvm_follow_pfn function
-From: Sean Christopherson <seanjc@google.com>
-To: David Stevens <stevensd@chromium.org>
-Cc: Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	Zhi Wang <zhi.wang.linux@gmail.com>, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain
 
-On Mon, Sep 11, 2023, David Stevens wrote:
-> From: David Stevens <stevensd@chromium.org>
-> 
-> Introduce __kvm_follow_pfn, which will replace __gfn_to_pfn_memslot.
+On Fri, Jan 26 2024 at 15:30, Jacob Pan wrote:
+> On Wed, 06 Dec 2023 21:19:11 +0100, Thomas Gleixner <tglx@linutronix.de>
+> wrote:
+>> > +static u64 get_pi_desc_addr(struct irq_data *irqd)
+>> > +{
+>> > +	int cpu =
+>> > cpumask_first(irq_data_get_effective_affinity_mask(irqd));  
+>> 
+>> The effective affinity mask is magically correct when this is called?
+>> 
+> My understanding is that remappable device MSIs have the following
+> hierarchy,e.g.
 
-Belated question: why is there no kvm_follow_pfn()?
+SNIP
+
+> Here the parent APIC chip does apic_set_affinity() which will set up
+> effective mask before posted MSI affinity change.
+>
+> Maybe I missed some cases?
+
+The function is only used in intel_ir_reconfigure_irte_posted() in the
+next patch, but it's generally available. So I asked that question
+because if it's called in some other context then it's going to be not
+guaranteed.
+
+That also begs the question why this function exists in the first
+place. This really can be part of intel_ir_reconfigure_irte_posted(),
+which makes it clear what the context is, no?
+
+Thanks,
+
+        tglx
 
