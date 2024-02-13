@@ -1,496 +1,209 @@
-Return-Path: <kvm+bounces-8617-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8618-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C000852CF5
-	for <lists+kvm@lfdr.de>; Tue, 13 Feb 2024 10:51:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F17CF852EDF
+	for <lists+kvm@lfdr.de>; Tue, 13 Feb 2024 12:15:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C169B1F23741
-	for <lists+kvm@lfdr.de>; Tue, 13 Feb 2024 09:51:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67CAC1F26FD4
+	for <lists+kvm@lfdr.de>; Tue, 13 Feb 2024 11:15:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FC2F56741;
-	Tue, 13 Feb 2024 09:43:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDA8E364B6;
+	Tue, 13 Feb 2024 11:14:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lYJQgbKH"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="roHUmk7o"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D9B05646E
-	for <kvm@vger.kernel.org>; Tue, 13 Feb 2024 09:43:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16A7833CD2
+	for <kvm@vger.kernel.org>; Tue, 13 Feb 2024 11:14:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707817433; cv=none; b=H57KiP6JTNizEoGCx0DK8AZtk1JSwK5Kfm5Y5gzVkN84p1Nw1ph7bvEKAgwTlrDNWG5CPofmGJMLhzGxQeCttrDzjyIQJ5vCXeeMt27mOwlb14FvtqXUaYfnn2wv8tNC5HGj2VGtIw7BVNBfdPq1Lt20OfRD88tp4p3Yt0I9oPI=
+	t=1707822883; cv=none; b=E/g5xRs22nnB9lxIJC8zVtPBhruY4Jg/tOJZ9chp4+raGpqEVBVS3ZpKHlrrxY17BN/BWs4j+102tCVFTPHcQH1ro0N9ra2s8lF1H68ikw55KumipYvPRh8IG7WMeJi/nfeBvkMSRLpZm+UIa0Oi5q6fW7ZX3A9gz1xEP4jz6Ww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707817433; c=relaxed/simple;
-	bh=EV24iNdzDT2nEj7Q1vml0ardEk2Nqgw3CUGt3h9w/3I=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YRdSkxOY3GUnR6H4ibDOtvz/xtUDjbUxgG3jT3bKLxrygAlvm7aOddcR2pRN8ZODWBK/fUJnxwTtj7Yy8c9ShRodNNPY1Hfz62eeEZvrB7MCFkKGlJruSD5gKmTsxAEXKr+51RqNuHsGnh2NAl/nfcwTz6JurbIF4Y1qJ4nZAfI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lYJQgbKH; arc=none smtp.client-ip=91.218.175.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1707817429;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=H13Cz6CLHkaFtkIfr3ij1xpNFb/J5ZQsFY/+Jqrv/6c=;
-	b=lYJQgbKHGs5rTKG8xSw+PjdRNhoA6IMdh3A+K7IvmYSODoqaXsQ3KOr34W0wdEhnkfNsRc
-	M3S6tIxLTOfED1QPyMkXT0QWLO6H1zFIRS8Jsfsv5rQMOtH/+xkp5BJjLY5x9riqVLUbi+
-	S3gze4o6ow2WHJXQgwJgbUG8TyMJiQk=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: kvm@vger.kernel.org,
-	Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-kernel@vger.kernel.org,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v2 23/23] KVM: selftests: Add stress test for LPI injection
-Date: Tue, 13 Feb 2024 09:43:34 +0000
-Message-ID: <20240213094334.3963630-1-oliver.upton@linux.dev>
-In-Reply-To: <20240213093250.3960069-1-oliver.upton@linux.dev>
-References: <20240213093250.3960069-1-oliver.upton@linux.dev>
+	s=arc-20240116; t=1707822883; c=relaxed/simple;
+	bh=YvDdIjtBl1xRPij1eJggRa9vZ44OFLNug4Fl60nUGQw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=qNIyacRmvypF/Gz+ZWKstOG1qrZyzVHPi1G9MEVFPIMu51w7L8D39peD7EyPyRXXej81VGIByTv5/Wgsgyw1xd0Q5w8/xYJ8IkCqqJ/FPYwiUiBqN36xd6xsuFNXYeNkDl03wElFYyHqtxZgPjWoG/pD1btuT3LrCnWZ6oQlY9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=roHUmk7o; arc=none smtp.client-ip=210.118.77.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20240213111439euoutp02acc181728db69ece35ff585dadfaafb9~zZ9w1uzX91895418954euoutp02W
+	for <kvm@vger.kernel.org>; Tue, 13 Feb 2024 11:14:39 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20240213111439euoutp02acc181728db69ece35ff585dadfaafb9~zZ9w1uzX91895418954euoutp02W
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1707822879;
+	bh=JR0PkD7vN0S2u5oYVHNJ2+NXefBzmZZ86e5RWc8Zdjg=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=roHUmk7oMGRDWkJAGxOZzOJ+9e/jdiDnnCJ69HEjRB8y59i1O8QM1MtQrsQ/DItmr
+	 oA1poGSELPzSn8cZNgYnVIrmjXxm+up2dRWY18xhknQA9H5oahMSZPrhwF+hMNUBbq
+	 zLsxxGSpN1A07Isl/lfAHSUFUIBo4MiItbTc2Tw0=
+Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
+	eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+	20240213111438eucas1p1b9b33ba0d17d84dd16cad2d56ad751cc~zZ9wdeq5Y3046730467eucas1p1M;
+	Tue, 13 Feb 2024 11:14:38 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+	eusmges3new.samsung.com (EUCPMTA) with SMTP id 1A.36.09552.E1F4BC56; Tue, 13
+	Feb 2024 11:14:38 +0000 (GMT)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+	20240213111438eucas1p2a98c23ee227dbb956dd07e7bd05798d5~zZ9wCDZks0418404184eucas1p29;
+	Tue, 13 Feb 2024 11:14:38 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+	eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20240213111438eusmtrp18d26e72e3ba5d91eaa360d6f7a6bc8ea~zZ9wBYMkM1666016660eusmtrp1k;
+	Tue, 13 Feb 2024 11:14:38 +0000 (GMT)
+X-AuditID: cbfec7f5-83dff70000002550-e8-65cb4f1e5cb4
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+	eusmgms2.samsung.com (EUCPMTA) with SMTP id 95.0A.10702.E1F4BC56; Tue, 13
+	Feb 2024 11:14:38 +0000 (GMT)
+Received: from [106.210.134.192] (unknown [106.210.134.192]) by
+	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20240213111437eusmtip276cd474e1d4d3d635e59b0b7e7840c13~zZ9vdlxgY0826408264eusmtip2C;
+	Tue, 13 Feb 2024 11:14:37 +0000 (GMT)
+Message-ID: <5b2d8fee-9d0f-48f7-b9ec-b86e95387a61@samsung.com>
+Date: Tue, 13 Feb 2024 12:14:37 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] arm64: cpufeatures: Only check for NV1 if NV is
+ present
+Content-Language: en-US
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: James Morse <james.morse@arm.com>, Suzuki K Poulose
+	<suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu
+	<yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, Will
+	Deacon <will@kernel.org>
+From: Marek Szyprowski <m.szyprowski@samsung.com>
+In-Reply-To: <20240212144736.1933112-3-maz@kernel.org>
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-Brightmail-Tracker: H4sIAAAAAAAAA01SaUwTYRDNt7st28biUopMUIs2QIKJCB5kVVIVian+UCBo4hG1kQ2gLWAL
+	iEa0KEGpckQt0HoAQblEhZZDDaKAWglIFCIBRPAWK1QIXkiCsq4o/96bmffezJePxMVmnhsZ
+	FR3HaKKVKhlfSNQ8HGtbKN3UwvieyvamPxedRnR/fTFGXzDsp21VTQRtftPJo29daObRhrFB
+	Pm18/hzRKb3L6O4rFQ6rhYryS+VIkXJ/iKcwl6XxFQU6A66wXD6qGLAYkWLULA122CYMCGdU
+	UQmMZpF8tzDyTWolL9YmScwpHMd06LGTHglIoJZCh/4YpkdCUkyVILg6XIVz5AuCuqIfPI6M
+	ImgwWNCUJKPXjrhGMYIJwwSfIyMIqgfsk3qSFFFysJfOZQUE5QnGExkYi0WUEzQb3xIsdqHc
+	ob8n14HFzlQo3CtjowUkTrlCz9u8P/MSKgEsHy8SrD9O2RA0Fxbz2Aaf8gP9kJ7PYgHlD8aL
+	DwlO7A7Hq8/j3KYnBFBQsojdB6ggqH6wgSs7g81a5cDhOdBy9vQf/8lxBPnj/RhHshDoPvT8
+	PXkl9Lb95LNGOOUNN27/9VwDxjQVBx2ha8iJ28ARztTk4FxZBCdTxZyHF5is1/+lNjxpx7OQ
+	zDTtUUzTjjdNu8X0PzYfEWXIlYnXqiMY7ZJo5oCPVqnWxkdH+OyJUZvR5LdqmbB+vYlKbCM+
+	jQgjUSMCEpdJRO25jxixKFx58BCjidmliVcx2kY0myRkriLPcHdGTEUo45h9DBPLaKa6GClw
+	02EF27tezErK9ldq1Oc+Ehkvj8jmC5/5j3bkdqY1793amfytJS4zjCHen5X3rFORKR4Wx/KK
+	OImkritnWGEN6qgfqeje9ypQHNyHvO1ex7f8Sk+11slvxrskZh9UA71CtLhGfiO2NKAs865k
+	+VpysSw7BI8Vq6RD4x6tds0y38japHfzvu+45uJLpuxRabuyBhNH+mfWjj39GebfLYw6sF26
+	ttx38NxyXWub+0JLyMCdvMOvV11Pn+B1rB+WnezdHRjwva00tKg9Yk79kswEbBCFSDf+So5Z
+	c6hy6bYtSfIvM2qH+zb/ECdurs7zav2Ehzh77jw861nh7cp1j2qcmuaPFcsIbaTSbwGu0Sp/
+	A43j7SPFAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrOIsWRmVeSWpSXmKPExsVy+t/xe7py/qdTDR728lm8X9bDaHF/33Im
+	izlTCy1ebTnMYrHp8TVWi51zTrJaTP35hs1i5u3bjBYtd0wtbi7dwO7A5bFm3hpGj5Yjb1k9
+	Nq3qZPNY2DCV2WPzknqPF5tnMnp83iQXwB6lZ1OUX1qSqpCRX1xiqxRtaGGkZ2hpoWdkYqln
+	aGwea2VkqqRvZ5OSmpNZllqkb5egl/G4bSNrwSuRiumLfzM1MJ4V7GLk5JAQMJHou/OOsYuR
+	i0NIYCmjxL9Pv5ghEjISJ6c1sELYwhJ/rnWxQRS9Z5Q4vXgVUBEHB6+AncS7lbIgNSwCqhIz
+	2/uYQGxeAUGJkzOfsIDYogLyEvdvzWAHsYUFgiQOrNoCNp9ZQFzi1pP5YPUiAmUSL84dAzuC
+	WeAVo0TLiyvsEMu2Mkp0fwfJcHKwCRhKdL0FuYKTg1PATGLm3GMsEJPMJLq2djFC2PISzVtn
+	M09gFJqF5JBZSBbOQtIyC0nLAkaWVYwiqaXFuem5xUZ6xYm5xaV56XrJ+bmbGIExuu3Yzy07
+	GFe++qh3iJGJg/EQowQHs5II76UZJ1KFeFMSK6tSi/Lji0pzUosPMZoCQ2Mis5Rocj4wSeSV
+	xBuaGZgamphZGphamhkrifN6FnQkCgmkJ5akZqemFqQWwfQxcXBKNTDN3+i2f7rBg6ZS0c+n
+	Ux+bVWbc6hPWiN+brPb7lPG91/mKTHcLRZat1mgKufFqqXyvdfGR8zMjp6a5d9m3nFj2O2OH
+	z36vzp7VuvJZcZqJsx4tDmKK0Erzt+ibkWHCJ2quuNbp2iOnW2z9jjVXHoubfN3wQqWyL6LS
+	/cc2h49bVth8KvmUJPJs0vxEQfMXbByfVbTM6gINep78fGvhWRI2539HuPYj27tCG9sveJQ8
+	S9khdf3qvgt/VtoelwkwV4icx2Xzp3XtiZf/vwtkLPxUu956UsefO1eNjkns3r8mvjllerzN
+	+aWqx8oyerJ5k84c+/msdV3wltYWPsugOZfldT02Z1/ev1x6H9Nj9i1KLMUZiYZazEXFiQDc
+	yv0uWgMAAA==
+X-CMS-MailID: 20240213111438eucas1p2a98c23ee227dbb956dd07e7bd05798d5
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20240212144758eucas1p1345ba6f2000c10a4b33f8575f0a8d22b
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20240212144758eucas1p1345ba6f2000c10a4b33f8575f0a8d22b
+References: <20240212144736.1933112-1-maz@kernel.org>
+	<CGME20240212144758eucas1p1345ba6f2000c10a4b33f8575f0a8d22b@eucas1p1.samsung.com>
+	<20240212144736.1933112-3-maz@kernel.org>
 
-Now that all the infrastructure is in place, add a test to stress KVM's
-LPI injection. Keep a 1:1 mapping of device IDs to signalling threads,
-allowing the user to scale up/down the sender side of an LPI. Make use
-of the new VM stats for the translation cache to estimate the
-translation hit rate.
+Hi
 
-Since the primary focus of the test is on performance, you'll notice
-that the guest code is not pedantic about the LPIs it receives. Counting
-the number of LPIs would require synchronization between the device and
-vCPU threads to avoid coalescing and would get in the way of performance
-numbers.
+On 12.02.2024 15:47, Marc Zyngier wrote:
+> We handle ID_AA64MMFR4_EL1.E2H0 being 0 as NV1 being present.
+> However, this is only true if FEAT_NV is implemented.
+>
+> Add the required check to has_nv1(), avoiding spuriously advertising
+> NV1 on HW that doesn't have NV at all.
+>
+> Fixes: da9af5071b25 ("arm64: cpufeature: Detect HCR_EL2.NV1 being RES0")
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/aarch64/vgic_lpi_stress.c   | 388 ++++++++++++++++++
- 2 files changed, 389 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/aarch64/vgic_lpi_stress.c
+This patch in turn introduces the following warning during boot 
+(observed on today's linux-next):
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 492e937fab00..8a240d20ec5e 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -153,6 +153,7 @@ TEST_GEN_PROGS_aarch64 += aarch64/smccc_filter
- TEST_GEN_PROGS_aarch64 += aarch64/vcpu_width_config
- TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
- TEST_GEN_PROGS_aarch64 += aarch64/vgic_irq
-+TEST_GEN_PROGS_aarch64 += aarch64/vgic_lpi_stress
- TEST_GEN_PROGS_aarch64 += aarch64/vpmu_counter_access
- TEST_GEN_PROGS_aarch64 += access_tracking_perf_test
- TEST_GEN_PROGS_aarch64 += demand_paging_test
-diff --git a/tools/testing/selftests/kvm/aarch64/vgic_lpi_stress.c b/tools/testing/selftests/kvm/aarch64/vgic_lpi_stress.c
-new file mode 100644
-index 000000000000..d557d907728a
---- /dev/null
-+++ b/tools/testing/selftests/kvm/aarch64/vgic_lpi_stress.c
-@@ -0,0 +1,388 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * vgic_lpi_stress - Stress test for KVM's ITS emulation
-+ *
-+ * Copyright (c) 2024 Google LLC
-+ */
-+
-+#include <linux/sizes.h>
-+#include <pthread.h>
-+#include <sys/sysinfo.h>
-+
-+#include "kvm_util.h"
-+#include "gic.h"
-+#include "gic_v3.h"
-+#include "processor.h"
-+#include "ucall.h"
-+#include "vgic.h"
-+
-+#define TEST_MEMSLOT_INDEX	1
-+
-+#define GIC_LPI_OFFSET	8192
-+
-+static u32 nr_vcpus = 1;
-+static u32 nr_devices = 1;
-+static u32 nr_event_ids = 16;
-+static size_t nr_iterations = 1000;
-+static vm_paddr_t gpa_base;
-+
-+static struct kvm_vm *vm;
-+static struct kvm_vcpu **vcpus;
-+static struct vgic_its *its;
-+static int gic_fd;
-+
-+static bool request_vcpus_stop;
-+
-+static void guest_irq_handler(struct ex_regs *regs)
-+{
-+	u32 intid = gic_get_and_ack_irq();
-+
-+	if (intid == IAR_SPURIOUS)
-+		return;
-+
-+	GUEST_ASSERT(intid >= GIC_LPI_OFFSET);
-+	gic_set_eoi(intid);
-+}
-+
-+static void guest_code(size_t nr_lpis)
-+{
-+	gic_init(GIC_V3, nr_vcpus);
-+
-+	GUEST_SYNC(0);
-+
-+	/*
-+	 * Don't use WFI here to avoid blocking the vCPU thread indefinitely and
-+	 * never getting the stop singal.
-+	 */
-+	while (!READ_ONCE(request_vcpus_stop))
-+		cpu_relax();
-+
-+	GUEST_DONE();
-+}
-+
-+static void setup_memslot(void)
-+{
-+	size_t pages;
-+	size_t sz;
-+
-+	/*
-+	 * For the ITS:
-+	 *  - A single level device table
-+	 *  - A single level collection table
-+	 *  - The command queue
-+	 *  - An ITT for each device
-+	 */
-+	sz = (3 + nr_devices) * SZ_64K;
-+
-+	/*
-+	 * For the redistributors:
-+	 *  - A shared LPI configuration table
-+	 *  - An LPI pending table for each vCPU
-+	 */
-+	sz += (1 + nr_vcpus) * SZ_64K;
-+
-+	pages = sz / vm->page_size;
-+	gpa_base = ((vm_compute_max_gfn(vm) + 1) * vm->page_size) - sz;
-+	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, gpa_base,
-+				    TEST_MEMSLOT_INDEX, pages, 0);
-+}
-+
-+#define LPI_PROP_DEFAULT_PRIO	0xa0
-+
-+static void configure_lpis(vm_paddr_t prop_table)
-+{
-+	u8 *tbl = addr_gpa2hva(vm, prop_table);
-+	size_t i;
-+
-+	for (i = 0; i < (nr_devices * nr_event_ids); i++) {
-+		tbl[i] = LPI_PROP_DEFAULT_PRIO |
-+			 LPI_PROP_GROUP1 |
-+			 LPI_PROP_ENABLED;
-+	}
-+}
-+
-+static void setup_gic(void)
-+{
-+	vm_paddr_t coll_table, device_table, cmdq_base;
-+
-+	gic_fd = vgic_v3_setup(vm, nr_vcpus, 64);
-+	__TEST_REQUIRE(gic_fd >= 0, "Failed to create GICv3");
-+
-+	coll_table = vm_phy_pages_alloc_aligned(vm, SZ_64K / vm->page_size,
-+						gpa_base, TEST_MEMSLOT_INDEX);
-+	device_table = vm_phy_pages_alloc_aligned(vm, SZ_64K / vm->page_size,
-+						  gpa_base, TEST_MEMSLOT_INDEX);
-+	cmdq_base = vm_phy_pages_alloc_aligned(vm, SZ_64K / vm->page_size,
-+					       gpa_base, TEST_MEMSLOT_INDEX);
-+
-+	its = vgic_its_setup(vm, coll_table, SZ_64K,
-+			     device_table, SZ_64K, cmdq_base, SZ_64K);
-+}
-+
-+static void setup_its_mappings(void)
-+{
-+	u32 coll_id, device_id, event_id, intid = GIC_LPI_OFFSET;
-+
-+	for (coll_id = 0; coll_id < nr_vcpus; coll_id++)
-+		vgic_its_send_mapc_cmd(its, vcpus[coll_id], coll_id, true);
-+
-+	/* Round-robin the LPIs to all of the vCPUs in the VM */
-+	coll_id = 0;
-+	for (device_id = 0; device_id < nr_devices; device_id++) {
-+		vm_paddr_t itt_base = vm_phy_pages_alloc_aligned(vm, SZ_64K / vm->page_size,
-+								 gpa_base, TEST_MEMSLOT_INDEX);
-+
-+		vgic_its_send_mapd_cmd(its, device_id, itt_base, SZ_64K, true);
-+
-+		for (event_id = 0; event_id < nr_event_ids; event_id++) {
-+			vgic_its_send_mapti_cmd(its, device_id, event_id, coll_id,
-+						intid++);
-+
-+			coll_id = (coll_id + 1) % nr_vcpus;
-+		}
-+	}
-+}
-+
-+static void setup_rdists_for_lpis(void)
-+{
-+	size_t i;
-+
-+	vm_paddr_t prop_table = vm_phy_pages_alloc_aligned(vm, SZ_64K / vm->page_size,
-+							   gpa_base, TEST_MEMSLOT_INDEX);
-+
-+	configure_lpis(prop_table);
-+
-+	for (i = 0; i < nr_vcpus; i++) {
-+		vm_paddr_t pend_table;
-+
-+		pend_table = vm_phy_pages_alloc_aligned(vm, SZ_64K / vm->page_size,
-+							gpa_base, TEST_MEMSLOT_INDEX);
-+
-+		vgic_rdist_enable_lpis(gic_fd, vcpus[i], prop_table, SZ_64K, pend_table);
-+	}
-+}
-+
-+static void invalidate_all_rdists(void)
-+{
-+	int i;
-+
-+	for (i = 0; i < nr_vcpus; i++)
-+		vgic_its_send_invall_cmd(its, i);
-+}
-+
-+static void signal_lpi(u32 device_id, u32 event_id)
-+{
-+	vm_paddr_t db_addr = GITS_BASE_GPA + GITS_TRANSLATER;
-+
-+	struct kvm_msi msi = {
-+		.address_lo	= db_addr,
-+		.address_hi	= db_addr >> 32,
-+		.data		= event_id,
-+		.devid		= device_id,
-+		.flags		= KVM_MSI_VALID_DEVID,
-+	};
-+
-+	/*
-+	 * KVM_SIGNAL_MSI returns 1 if the MSI wasn't 'blocked' by the VM,
-+	 * which for arm64 implies having a valid translation in the ITS.
-+	 */
-+	TEST_ASSERT(__vm_ioctl(vm, KVM_SIGNAL_MSI, &msi) == 1,
-+		    "KVM_SIGNAL_MSI ioctl failed");
-+}
-+
-+static pthread_barrier_t test_setup_barrier;
-+static pthread_barrier_t test_start_barrier;
-+
-+static void *lpi_worker_thread(void *data)
-+{
-+	u32 device_id = (size_t)data;
-+	u32 event_id;
-+	size_t i;
-+
-+	pthread_barrier_wait(&test_start_barrier);
-+
-+	for (i = 0; i < nr_iterations; i++)
-+		for (event_id = 0; event_id < nr_event_ids; event_id++)
-+			signal_lpi(device_id, event_id);
-+
-+	return NULL;
-+}
-+
-+static void *vcpu_worker_thread(void *data)
-+{
-+	struct kvm_vcpu *vcpu = data;
-+	struct ucall uc;
-+
-+	while (true) {
-+		vcpu_run(vcpu);
-+
-+		switch (get_ucall(vcpu, &uc)) {
-+		case UCALL_SYNC:
-+			/*
-+			 * Tell the main thread to complete its last bit of
-+			 * setup and wait for the signal to start the test.
-+			 */
-+			pthread_barrier_wait(&test_setup_barrier);
-+			pthread_barrier_wait(&test_start_barrier);
-+			break;
-+		case UCALL_DONE:
-+			return NULL;
-+		case UCALL_ABORT:
-+			REPORT_GUEST_ASSERT(uc);
-+			break;
-+		default:
-+			TEST_FAIL("Unknown ucall: %lu", uc.cmd);
-+		}
-+	}
-+
-+	return NULL;
-+}
-+
-+static void report_stats(struct timespec delta)
-+{
-+	u64 cache_hits, cache_misses, cache_accesses;
-+	double nr_lpis;
-+	double time;
-+
-+	nr_lpis = nr_devices * nr_event_ids * nr_iterations;
-+
-+	time = delta.tv_sec;
-+	time += ((double)delta.tv_nsec) / NSEC_PER_SEC;
-+
-+	pr_info("Rate: %.2f LPIs/sec\n", nr_lpis / time);
-+
-+	__vm_get_stat(vm, "vgic_its_trans_cache_hit", &cache_hits, 1);
-+	__vm_get_stat(vm, "vgic_its_trans_cache_miss", &cache_misses, 1);
-+
-+	cache_accesses = cache_hits + cache_misses;
-+
-+	pr_info("Translation Cache\n");
-+	pr_info("  %lu hits\n", cache_hits);
-+	pr_info("  %lu misses\n", cache_misses);
-+	pr_info("  %.2f%% hit rate\n", 100 * (((double)cache_hits) / cache_accesses));
-+}
-+
-+static void run_test(void)
-+{
-+	pthread_t *lpi_threads = malloc(nr_devices * sizeof(pthread_t));
-+	pthread_t *vcpu_threads = malloc(nr_vcpus * sizeof(pthread_t));
-+	struct timespec start, delta;
-+	size_t i;
-+
-+	TEST_ASSERT(lpi_threads && vcpu_threads, "Failed to allocate pthread arrays");
-+
-+	/* Only the vCPU threads need to do setup before starting the VM. */
-+	pthread_barrier_init(&test_setup_barrier, NULL, nr_vcpus + 1);
-+	pthread_barrier_init(&test_start_barrier, NULL, nr_devices + nr_vcpus + 1);
-+
-+	for (i = 0; i < nr_vcpus; i++)
-+		pthread_create(&vcpu_threads[i], NULL, vcpu_worker_thread, vcpus[i]);
-+
-+	for (i = 0; i < nr_devices; i++)
-+		pthread_create(&lpi_threads[i], NULL, lpi_worker_thread, (void *)i);
-+
-+	pthread_barrier_wait(&test_setup_barrier);
-+
-+	/*
-+	 * Setup LPIs for the VM after the guest has initialized the GIC. Yes,
-+	 * this is weird to be doing in userspace, but creating ITS translations
-+	 * requires allocating an ITT for every device.
-+	 */
-+	setup_rdists_for_lpis();
-+	setup_its_mappings();
-+	invalidate_all_rdists();
-+
-+	clock_gettime(CLOCK_MONOTONIC, &start);
-+	pthread_barrier_wait(&test_start_barrier);
-+
-+	for (i = 0; i < nr_devices; i++)
-+		pthread_join(lpi_threads[i], NULL);
-+
-+	delta = timespec_elapsed(start);
-+	write_guest_global(vm, request_vcpus_stop, true);
-+
-+	for (i = 0; i < nr_vcpus; i++)
-+		pthread_join(vcpu_threads[i], NULL);
-+
-+	report_stats(delta);
-+}
-+
-+static void setup_vm(void)
-+{
-+	int i;
-+
-+	vcpus = malloc(nr_vcpus * sizeof(struct kvm_vcpu));
-+	TEST_ASSERT(vcpus, "Failed to allocate vCPU array");
-+
-+	vm = vm_create_with_vcpus(nr_vcpus, guest_code, vcpus);
-+
-+	vm_init_descriptor_tables(vm);
-+	for (i = 0; i < nr_vcpus; i++)
-+		vcpu_init_descriptor_tables(vcpus[i]);
-+
-+	vm_install_exception_handler(vm, VECTOR_IRQ_CURRENT, guest_irq_handler);
-+
-+	setup_memslot();
-+
-+	setup_gic();
-+
-+	/* gic_init() demands the number of vCPUs in the VM */
-+	sync_global_to_guest(vm, nr_vcpus);
-+}
-+
-+static void destroy_vm(void)
-+{
-+	vgic_its_destroy(its);
-+	close(gic_fd);
-+	kvm_vm_free(vm);
-+	free(vcpus);
-+}
-+
-+static void pr_usage(const char *name)
-+{
-+	pr_info("%s [-v NR_VCPUS] [-d NR_DEVICES] [-e NR_EVENTS] [-i ITERS] -h\n", name);
-+	pr_info("  -v:\tnumber of vCPUs (default: %u)\n", nr_vcpus);
-+	pr_info("  -d:\tnumber of devices (default: %u)\n", nr_devices);
-+	pr_info("  -e:\tnumber of event IDs per device (default: %u)\n", nr_event_ids);
-+	pr_info("  -i:\tnumber of iterations (default: %lu)\n", nr_iterations);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	u32 nr_threads;
-+	int c;
-+
-+	while ((c = getopt(argc, argv, "hv:d:e:i:")) != -1) {
-+		switch (c) {
-+		case 'v':
-+			nr_vcpus = atoi(optarg);
-+			break;
-+		case 'd':
-+			nr_devices = atoi(optarg);
-+			break;
-+		case 'e':
-+			nr_event_ids = atoi(optarg);
-+			break;
-+		case 'i':
-+			nr_iterations = strtoul(optarg, NULL, 0);
-+			break;
-+		case 'h':
-+		default:
-+			pr_usage(argv[0]);
-+			return 1;
-+		}
-+	}
-+
-+	nr_threads = nr_vcpus + nr_devices;
-+	if (nr_threads > get_nprocs())
-+		pr_info("WARNING: running %u threads on %d CPUs; performance is degraded.\n",
-+			 nr_threads, get_nprocs());
-+
-+	setup_vm();
-+
-+	run_test();
-+
-+	destroy_vm();
-+
-+	return 0;
-+}
+CPU: All CPU(s) started at EL2
+CPU features: detected: 32-bit EL0 Support
+CPU features: detected: 32-bit EL1 Support
+CPU features: detected: CRC32 instructions
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 1 at arch/arm64/kernel/cpufeature.c:3369 
+this_cpu_has_cap+0x18/0x70
+Modules linked in:
+CPU: 0 PID: 1 Comm: swapper/0 Not tainted 6.8.0-rc4-next-20240213 #8014
+Hardware name: Khadas VIM3 (DT)
+pstate: 80000005 (Nzcv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+pc : this_cpu_has_cap+0x18/0x70
+lr : has_nv1+0x24/0xcc
+...
+Call trace:
+  this_cpu_has_cap+0x18/0x70
+  update_cpu_capabilities+0x50/0x134
+  setup_system_features+0x30/0x120
+  smp_cpus_done+0x48/0xb4
+  smp_init+0x7c/0x8c
+  kernel_init_freeable+0x18c/0x4e4
+  kernel_init+0x20/0x1d8
+  ret_from_fork+0x10/0x20
+irq event stamp: 2846
+hardirqs last  enabled at (2845): [<ffff80008012cf5c>] 
+console_unlock+0x164/0x190
+hardirqs last disabled at (2846): [<ffff80008123a078>] el1_dbg+0x24/0x8c
+softirqs last  enabled at (2842): [<ffff800080010a60>] 
+__do_softirq+0x4a0/0x4e8
+softirqs last disabled at (2827): [<ffff8000800169b0>] 
+____do_softirq+0x10/0x1c
+---[ end trace 0000000000000000 ]---
+alternatives: applying system-wide alternatives
+
+
+> ---
+>   arch/arm64/kernel/cpufeature.c | 5 +++--
+>   1 file changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> index 2f8958f27e9e..3421b684d340 100644
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -1812,8 +1812,9 @@ static bool has_nv1(const struct arm64_cpu_capabilities *entry, int scope)
+>   		{}
+>   	};
+>   
+> -	return !(has_cpuid_feature(entry, scope) ||
+> -		 is_midr_in_range_list(read_cpuid_id(), nv1_ni_list));
+> +	return (this_cpu_has_cap(ARM64_HAS_NESTED_VIRT) &&
+> +		!(has_cpuid_feature(entry, scope) ||
+> +		  is_midr_in_range_list(read_cpuid_id(), nv1_ni_list)));
+>   }
+>   
+>   #if defined(ID_AA64MMFR0_EL1_TGRAN_LPA2) && defined(ID_AA64MMFR0_EL1_TGRAN_2_SUPPORTED_LPA2)
+
+Best regards
 -- 
-2.43.0.687.g38aa6559b0-goog
+Marek Szyprowski, PhD
+Samsung R&D Institute Poland
 
 
