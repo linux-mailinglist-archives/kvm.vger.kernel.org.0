@@ -1,162 +1,196 @@
-Return-Path: <kvm+bounces-8622-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8623-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF05D85337A
-	for <lists+kvm@lfdr.de>; Tue, 13 Feb 2024 15:45:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E9A58533A3
+	for <lists+kvm@lfdr.de>; Tue, 13 Feb 2024 15:53:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 254931F28B0B
-	for <lists+kvm@lfdr.de>; Tue, 13 Feb 2024 14:45:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FD301C27AEC
+	for <lists+kvm@lfdr.de>; Tue, 13 Feb 2024 14:53:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58BE25EE97;
-	Tue, 13 Feb 2024 14:44:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92CD558105;
+	Tue, 13 Feb 2024 14:53:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="irM0pIq9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kOW8HNlw"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B98A95EE76
-	for <kvm@vger.kernel.org>; Tue, 13 Feb 2024 14:44:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBED43613A;
+	Tue, 13 Feb 2024 14:53:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707835496; cv=none; b=S1rOz5vSK0uJfnW+wIc/7lqLxXmQx6v7/okXRU9LfaM6SJT6kA0qdhtVi9Ikt7IHQB2roFHtJxR74PkYMpCHHTT2Q5ZP6HZsEbqJUWANJl7jYODh69jyWSGzQTQdDoA4ikaZHzmCm+bVTxXZqVZ3NC8zESuuPUE8wVesGaITxWw=
+	t=1707836014; cv=none; b=YWCim+5O/P0YgI2jFXVo/FnN7fANYqN/2wuoFIcNiZ97yS65/f9dDns1axzKM3Zc4OO6ugYHYH2dwXEp1oJ4iM/d/lbCmi6OurIcBA6CfYHTt+IvSQwNEWKX122+c1ODhH1alg5nD5zvCVmcTifzBgAUkEQtrRWRq/WKj7wlAUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707835496; c=relaxed/simple;
-	bh=zrp1jYmeufkgvEJ++dKa30QKIP/asFvdIN1B35Li7yY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eB6i1K/SaP2YmbfA2eOcRCahQsO1mqdaXbTq0mW84sN2FhbDa4GCIWJeGPLy3dOZHeibITk7JvuPn+BMjk+8Wf++JKE8JhivvGgEyMEs4YVtl6XuwPL3zYTZQGDmWJMgtqZaTawMMs5MkZER0uCPX+QnW+bUkPXvpA9ghqoCe8c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=irM0pIq9; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707835493;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4DLK0DUt5g/OoNKxvjhPb6fsxTrNbXXf8Ovb5F/JdWE=;
-	b=irM0pIq9hcHx77zKbSdaF8pImET/cdVook1DDd3TSl7io9slqq2IrVfm80xuorfZ3ETaJ+
-	eA+96oNif+eE3c/0sHNSSjyP36ejfd2QXenIN3AkfOsDc00LnvrwrrGKjOOjUSEFNvsvMp
-	L/d0iVWqKUrOBMqODf/57qDVKia4i4E=
-Received: from mail-ua1-f69.google.com (mail-ua1-f69.google.com
- [209.85.222.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-331-wF4fQ0smMBeJjmkAyS6TPw-1; Tue, 13 Feb 2024 09:44:50 -0500
-X-MC-Unique: wF4fQ0smMBeJjmkAyS6TPw-1
-Received: by mail-ua1-f69.google.com with SMTP id a1e0cc1a2514c-7d302c6a708so3747886241.0
-        for <kvm@vger.kernel.org>; Tue, 13 Feb 2024 06:44:50 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707835490; x=1708440290;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4DLK0DUt5g/OoNKxvjhPb6fsxTrNbXXf8Ovb5F/JdWE=;
-        b=VNDc8abYIqNbpp4UFxZuev1Yv3QRdDNk5zMYxMpcMe/6g/zkyBHdBiymjXp5NUEMkX
-         qUhgUxxrU7Po+tSfMCZ9Np6T8ZT7fpFFiiK81TGHcXc56pfE06YwxYLykWWtYUK4Z2Aj
-         /1JpxczS7xqnxQ0rXQWN1bnaPw7h5BnYaT/DQhLkASCALR09mGdv1T8yjjEQIcx/2sOM
-         KhaIDnyAlpb7wx8/GsmZmkBvfgv0f6G5tgA0eN1VUIocKiFCIz/hIKALPDt27yDFSNjF
-         moaJTwCQ7Uy+9Fr5EByLa1VDlZ5HNMSN54hxINuMbMzmbvNCEY6+ENCEGDR+xO2/+G4z
-         jDHA==
-X-Forwarded-Encrypted: i=1; AJvYcCXNYE3sBgAWp1GIK4HbFBPaw2jRLabtI+h2LLSdArV4J477bJnlHX9ortHC60JkIcWejzzqU/nQW29sBWO9XQ7QkoyV
-X-Gm-Message-State: AOJu0Yw6R64txku11sORjXGuOeBI1HFk7huM7Kun0RYrIPpnycvV37N6
-	dr2TKC4+8MZQLSt0JV3jPheQMETAB2WTrk7HHWt2v5lNfz6z8nPVavqU+MTyYxMJlXYE8dk6RmV
-	Dcwp3ncHGmebAllRCqNc6kIyGrR3Ss8BZ7d04fi1Aw9U2cqY9eAag38QrYLXzlsfatlYS1Z7Fjm
-	m0CgFhMr3pYQxWR3HKPLsPoxY7
-X-Received: by 2002:a05:6102:2c4:b0:46d:6e11:c0fd with SMTP id h4-20020a05610202c400b0046d6e11c0fdmr8106178vsh.30.1707835489556;
-        Tue, 13 Feb 2024 06:44:49 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEpLqH2ZnuQY8Xy72ouPWk8IrE0MHvEY8tBhHWMixdHCeUQ+OlENP0m40KanyJY0c/J8dOR5ljyqX+pphnSBUU=
-X-Received: by 2002:a05:6102:2c4:b0:46d:6e11:c0fd with SMTP id
- h4-20020a05610202c400b0046d6e11c0fdmr8106166vsh.30.1707835489264; Tue, 13 Feb
- 2024 06:44:49 -0800 (PST)
+	s=arc-20240116; t=1707836014; c=relaxed/simple;
+	bh=ljQZdVGWJEpWfmO6ZylQWXmSd4XObpE6ZnEzEXs+2eU=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PHrzCxinFb2+2QZPoMI29by/7l57Xvm9jFxU+uz+aEwxEt05IJYhdMbsbXPn7cI1QWwy0kr4A2RQ7kZvMZGaOH3UCeB/waLw9y6WI2rETRHGwk4fQiQmcsuHPjUoUeWL+wA2+tiSxW1Wg1Ps3sgvNXUBJr3eniZhC/HhajE95ms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kOW8HNlw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49692C433C7;
+	Tue, 13 Feb 2024 14:53:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707836014;
+	bh=ljQZdVGWJEpWfmO6ZylQWXmSd4XObpE6ZnEzEXs+2eU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=kOW8HNlwig356NaVhnMKvG5L9/uvgEo7oVieXYlekvBUwu94crOOHFLyGJLVhBYzS
+	 RqLWS1e8OlAt5u6fm/k9Wq8ABC37uCh0I6iBOTVetiwhxzw0qMyC+tk8R7NV8s3LEp
+	 Rb3Bjt67Bj1loq8tNg8SWettwgTVvYDPtfKXpYti1k9YFd/vFm9KYL/dYoCS2HH0Ej
+	 pfrfm+emRF/L3f/W9gXlNySqM3BkcdWEL6rJSzY0NsudtudyimrSYqawK0z/VYmlfD
+	 HRc//HVHCYV8vy4tmp4TP4Z15jN543Dz8mwtdO23XZHmQL4lkj6kJvh2NS1z47bEmT
+	 18KgucW5WFIkQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rZuA7-002oJK-T0;
+	Tue, 13 Feb 2024 14:53:31 +0000
+Date: Tue, 13 Feb 2024 14:53:31 +0000
+Message-ID: <86a5o45sb8.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Eric Auger <eauger@redhat.com>
+Cc: Jing Zhang <jingzhangos@google.com>,
+	KVM <kvm@vger.kernel.org>,
+	KVMARM <kvmarm@lists.linux.dev>,
+	ARMLinux <linux-arm-kernel@lists.infradead.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Will Deacon <will@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	Suraj Jitindar Singh <surajjs@amazon.com>,
+	Cornelia Huck
+ <cohuck@redhat.com>,
+	Shaoqin Huang <shahuang@redhat.com>,
+	Sebastian Ott <sebott@redhat.com>
+Subject: Re: [PATCH v1 2/4] KVM: arm64: Document KVM_ARM_GET_REG_WRITABLE_MASKS
+In-Reply-To: <82b72bd2-c079-40c3-90b8-30174f2a8fe0@redhat.com>
+References: <20230919175017.538312-1-jingzhangos@google.com>
+	<20230919175017.538312-3-jingzhangos@google.com>
+	<82b72bd2-c079-40c3-90b8-30174f2a8fe0@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240209183743.22030-1-pbonzini@redhat.com> <ZcZ_m5By49jsKNXn@google.com>
- <CABgObfaum2=MpXE2kJsETe31RqWnXJQWBQ2iCMvFUoJXJkhF+w@mail.gmail.com> <ZcrX_4vbXNxiQYtM@google.com>
-In-Reply-To: <ZcrX_4vbXNxiQYtM@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 13 Feb 2024 15:44:37 +0100
-Message-ID: <CABgObfY=aGJNMk4CYb7nvauBWLJVbwVaA69bOK4bLteH7YyBNA@mail.gmail.com>
-Subject: Re: [PATCH 00/10] KVM: SEV: allow customizing VMSA features
-To: Sean Christopherson <seanjc@google.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, michael.roth@amd.com, 
-	aik@amd.com, isaku.yamahata@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: eauger@redhat.com, jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, will@kernel.org, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, tabba@google.com, surajjs@amazon.com, cohuck@redhat.com, shahuang@redhat.com, sebott@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Feb 13, 2024 at 3:46=E2=80=AFAM Sean Christopherson <seanjc@google.=
-com> wrote:
->   __u32 flags;
->   __u32 vm_type;
->   union {
->         struct tdx;
->         struct sev;
->         struct sev_es;
->         struct sev_snp;
->         __u8 pad[<big size>]
->   };
->
-> Rinse and repeat for APIs that have a common purpose, but different paylo=
-ads.
->
-> Similar to KVM_{SET,GET}_NESTED_STATE, where the data is wildly different=
-, and
-> there's very little overlap between {svm,vmx}_set_nested_state(), I find =
-it quite
-> valuable to have a single set of APIs.  E.g. I don't have to translate be=
-tween
-> VMX and SVM terminology when thinking about the APIs, when discussing the=
-m, etc.
->
-> That's especially true for all this CoCo goo, where the names are ridicul=
-ously
-> divergent, and often not exactly intuitive.  E.g. LAUNCH_MEASURE reads li=
-ke
-> "measure the launch", but surprise, it's "get the measurement".
+Hey Eric,
 
-I agree, but then you'd have to do things like "CPUID data is passed
-via UPDATE_DATA for SEV and INIT_VM for TDX (and probably not at all
-for pKVM)". And in one case the firmware may prefer to encrypt in
-place, in the other you cannot do that at all.
+On Tue, 13 Feb 2024 13:59:31 +0000,
+Eric Auger <eauger@redhat.com> wrote:
+> 
+> Hi,
+> 
+> On 9/19/23 19:50, Jing Zhang wrote:
+> > Add some basic documentation on how to get feature ID register writable
+> > masks from userspace.
+> > 
+> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > ---
+> >  Documentation/virt/kvm/api.rst | 42 ++++++++++++++++++++++++++++++++++
+> >  1 file changed, 42 insertions(+)
+> > 
+> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> > index 21a7578142a1..2defb5e198ce 100644
+> > --- a/Documentation/virt/kvm/api.rst
+> > +++ b/Documentation/virt/kvm/api.rst
+> > @@ -6070,6 +6070,48 @@ writes to the CNTVCT_EL0 and CNTPCT_EL0 registers using the SET_ONE_REG
+> >  interface. No error will be returned, but the resulting offset will not be
+> >  applied.
+> >  
+> > +4.139 KVM_ARM_GET_REG_WRITABLE_MASKS
+> > +-------------------------------------------
+> > +
+> > +:Capability: KVM_CAP_ARM_SUPPORTED_FEATURE_ID_RANGES
+> > +:Architectures: arm64
+> > +:Type: vm ioctl
+> > +:Parameters: struct reg_mask_range (in/out)
+> > +:Returns: 0 on success, < 0 on error
+> > +
+> > +
+> > +::
+> > +
+> > +        #define ARM64_FEATURE_ID_SPACE_SIZE	(3 * 8 * 8)
+> > +        #define ARM64_FEATURE_ID_RANGE_IDREGS	BIT(0)
+> > +
+> > +        struct reg_mask_range {
+> > +                __u64 addr;             /* Pointer to mask array */
+> > +                __u32 range;            /* Requested range */
+> > +                __u32 reserved[13];
+> > +        };
+> > +
+> > +This ioctl copies the writable masks for Feature ID registers to userspace.
+> > +The Feature ID space is defined as the AArch64 System register space with
+> > +op0==3, op1=={0, 1, 3}, CRn==0, CRm=={0-7}, op2=={0-7}.
+> when attempting a migration between Ampere Altra and ThunderXv2 the
+> first hurdle is to handle a failure when writing ICC_CTLR_EL1
+> (3.0.12.12.4) on dest. This reg is outside of the scope of the above
+> single range (BIT(0)).
 
-There was a reason why SVM support was not added from the beginning.
-Before adding nested get/set support for SVM, the whole nested
-virtualization was made as similar as possible in design and
-functionality to VMX. Of course it cannot be entirely the same, but
-for example they share the overall idea that pending events and L2
-state are taken from vCPU state; kvm_nested_state only stores global
-processor state (VMXON/VMCS pointers on VMX, and GIF on SVM) and,
-while in guest mode, L1 state and control bits. This ensures that the
-same userspace flow can work for both VMX and SVM. However, in this
-case we can't really control what is done in firmware.
+Indeed. But more importantly, this isn't really an ID register. Plenty
+of variable bits in there.
 
-> The effort doesn't seem huge, so long as we don't try to make the paramet=
-ers
-> common across vendor code.  The list of APIs doesn't seem insurmountable =
-(note,
-> I'm not entirely sure these are correct mappings):
+> This may be questionable if we want to migrate between those types of
+> machines but the goal is to exercise different scenarios to have a
+> gloval view of the problems.
 
-While the effort isn't huge, the benefit is also pretty small, which
-comes to a second big difference with GET/SET_NESTED_STATE: because
-there is a GET ioctl, we have the possibility of retrieving the "black
-box" and passing it back. With CoCo it's anyway userspace's task to
-fill in the parameter structs. I just don't see the possibility of
-sharing any code except the final ioctl, which to be honest is not
-much to show. And the higher price might be in re-reviewing code that
-has already been reviewed, both in KVM and in userspace.
+I think this is a valuable experiment, and we should definitely
+explore this sort of things (as I cannot see the diversity of ARM
+system slowing down any time soon).
 
-Paolo
+> 
+> This reg exposes some RO capabilities such as ExtRange, A3V, SEIS,
+> IDBits, ...
+> So to get the migration going further I would need to tweek this on the
+> source - for instance I guess SEIS could be reset despite the host HW
+> cap - without making too much trouble.
 
->   create
->   init VM   (LAUNCH_START / TDH.MNG.INIT)
->   update    (LAUNCH_UPDATE_DATA / TDH.MEM.PAGE.ADD+TDH.MR.EXTEND)
->   init vCPU (LAUNCH_UPDATE_VMSA / TDH.VP.INIT)
->   finalize  (LAUNCH_FINISH / TDH.MR.FINALIZE)
+I'm not sure SEIS is such an easy one: if you promised the guest that
+it would never get an SError doing the most stupid things (SEIS=0), it
+really shouldn't get one after migration. If you advertised it on the
+source HW (Altra), a migration to TX2 would be fine.
 
+The other bits are possible to change depending on the requirements of
+the VM (aff3, IDBits), and ExtRange should always be set to 0 (because
+our GIC implementation doesn't support EPPI/ESPI).
+
+The really ugly part here is that if you want to affect these bits,
+you will need to trap and emulate the access. Not a big deal, but in
+the absence of FGT, you will need to handle the full Common trap
+group, which is going to slow things down (you will have to trap
+ICV_PMR_EL1, for example).
+
+> What would you recommend, adding a new range? But I guess we need to
+> design ranges carefully otherwise we may be quickly limited by the
+> number of flag bits.
+
+I can see a need to adding a range that would cover non-ID registers
+that have RO fields. But we also need to consider the case of EL2
+registers that take part in this.
+
+For example, ICV_CTLR_EL1 and ICH_VTR_EL2 and deeply linked, and share
+some fields. Without NV, no need to expose HCR_VTR_EL2. With NV, this
+register actually drives ICV_CTLR_EL1.
+
+So careful planning is required here, and the impact of this measured.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
