@@ -1,196 +1,88 @@
-Return-Path: <kvm+bounces-8623-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8624-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E9A58533A3
-	for <lists+kvm@lfdr.de>; Tue, 13 Feb 2024 15:53:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 018978533BB
+	for <lists+kvm@lfdr.de>; Tue, 13 Feb 2024 15:55:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FD301C27AEC
-	for <lists+kvm@lfdr.de>; Tue, 13 Feb 2024 14:53:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 33EDC1C21D28
+	for <lists+kvm@lfdr.de>; Tue, 13 Feb 2024 14:55:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92CD558105;
-	Tue, 13 Feb 2024 14:53:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 098035F563;
+	Tue, 13 Feb 2024 14:54:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kOW8HNlw"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="js+XN5kI"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBED43613A;
-	Tue, 13 Feb 2024 14:53:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 089BF57873;
+	Tue, 13 Feb 2024 14:54:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707836014; cv=none; b=YWCim+5O/P0YgI2jFXVo/FnN7fANYqN/2wuoFIcNiZ97yS65/f9dDns1axzKM3Zc4OO6ugYHYH2dwXEp1oJ4iM/d/lbCmi6OurIcBA6CfYHTt+IvSQwNEWKX122+c1ODhH1alg5nD5zvCVmcTifzBgAUkEQtrRWRq/WKj7wlAUI=
+	t=1707836071; cv=none; b=jZMhjCXDqm18DnokOqFjW0esCJyM2UEKW2oihwIBiQMqvfqlzCGyLzsox9BLtAAseI7ktplfx0/X+hMuF/x3qDsDTQfFDiasRtPu8JMNASkj4PTPWINfCY1MyvrSYSH4w/DOApYz94dy5J8bG4VTynqcCWmu55fssTd96mTXw4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707836014; c=relaxed/simple;
-	bh=ljQZdVGWJEpWfmO6ZylQWXmSd4XObpE6ZnEzEXs+2eU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PHrzCxinFb2+2QZPoMI29by/7l57Xvm9jFxU+uz+aEwxEt05IJYhdMbsbXPn7cI1QWwy0kr4A2RQ7kZvMZGaOH3UCeB/waLw9y6WI2rETRHGwk4fQiQmcsuHPjUoUeWL+wA2+tiSxW1Wg1Ps3sgvNXUBJr3eniZhC/HhajE95ms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kOW8HNlw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49692C433C7;
-	Tue, 13 Feb 2024 14:53:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707836014;
-	bh=ljQZdVGWJEpWfmO6ZylQWXmSd4XObpE6ZnEzEXs+2eU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=kOW8HNlwig356NaVhnMKvG5L9/uvgEo7oVieXYlekvBUwu94crOOHFLyGJLVhBYzS
-	 RqLWS1e8OlAt5u6fm/k9Wq8ABC37uCh0I6iBOTVetiwhxzw0qMyC+tk8R7NV8s3LEp
-	 Rb3Bjt67Bj1loq8tNg8SWettwgTVvYDPtfKXpYti1k9YFd/vFm9KYL/dYoCS2HH0Ej
-	 pfrfm+emRF/L3f/W9gXlNySqM3BkcdWEL6rJSzY0NsudtudyimrSYqawK0z/VYmlfD
-	 HRc//HVHCYV8vy4tmp4TP4Z15jN543Dz8mwtdO23XZHmQL4lkj6kJvh2NS1z47bEmT
-	 18KgucW5WFIkQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rZuA7-002oJK-T0;
-	Tue, 13 Feb 2024 14:53:31 +0000
-Date: Tue, 13 Feb 2024 14:53:31 +0000
-Message-ID: <86a5o45sb8.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Eric Auger <eauger@redhat.com>
-Cc: Jing Zhang <jingzhangos@google.com>,
-	KVM <kvm@vger.kernel.org>,
-	KVMARM <kvmarm@lists.linux.dev>,
-	ARMLinux <linux-arm-kernel@lists.infradead.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Will Deacon <will@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Suraj Jitindar Singh <surajjs@amazon.com>,
-	Cornelia Huck
- <cohuck@redhat.com>,
-	Shaoqin Huang <shahuang@redhat.com>,
-	Sebastian Ott <sebott@redhat.com>
-Subject: Re: [PATCH v1 2/4] KVM: arm64: Document KVM_ARM_GET_REG_WRITABLE_MASKS
-In-Reply-To: <82b72bd2-c079-40c3-90b8-30174f2a8fe0@redhat.com>
-References: <20230919175017.538312-1-jingzhangos@google.com>
-	<20230919175017.538312-3-jingzhangos@google.com>
-	<82b72bd2-c079-40c3-90b8-30174f2a8fe0@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1707836071; c=relaxed/simple;
+	bh=G4LX9kvo4BgwHGeUq7JLs9/XHpEGSlotttquVOhu24o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nsnH/kVzFjcRqgVC09THc0CZ9vLZDDk2FI7qmIzkbmp2wWyOYHpntxJjXFtlyXQVdG+/piHVfjz4etM73yfT6N7KrxL6QOaTYTzsESodd3WmcBImoVMQnCavDvs7/aFsOXscXm+Xrm7SK4tr1vcCcLaqfHp2NH1vGEX6/RkUOWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=js+XN5kI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05104C43399;
+	Tue, 13 Feb 2024 14:54:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1707836070;
+	bh=G4LX9kvo4BgwHGeUq7JLs9/XHpEGSlotttquVOhu24o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=js+XN5kIZ2oj49KFq7EeQPD3BbeGrnnYa+LVtQvb+QaepYq6jIdyLRR7/tlQIf3W2
+	 1Ij4Nqv8Ks33RuRMDmxroWfMDoOv1XgKZvCRhiDx3DeRtr6+djHMeQfUT69sVtE3nM
+	 9VNTEtTUQjJIi1kgpqzOHU1uvkIOwDX/lr2NhCM8=
+Date: Tue, 13 Feb 2024 15:54:27 +0100
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Ajay Kaher <ajay.kaher@broadcom.com>
+Cc: stable@vger.kernel.org, mst@redhat.com, jasowang@redhat.com,
+	kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	alexey.makhalov@broadcom.com, vasavi.sirnapalli@broadcom.com,
+	Prathu Baronia <prathubaronia2011@gmail.com>
+Subject: Re: [PATCH v6.1.y-v4.19.y] vhost: use kzalloc() instead of kmalloc()
+ followed by memset()
+Message-ID: <2024021348-always-splendid-c1f8@gregkh>
+References: <1707110377-1483-1-git-send-email-ajay.kaher@broadcom.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: eauger@redhat.com, jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, will@kernel.org, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, tabba@google.com, surajjs@amazon.com, cohuck@redhat.com, shahuang@redhat.com, sebott@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1707110377-1483-1-git-send-email-ajay.kaher@broadcom.com>
 
-Hey Eric,
-
-On Tue, 13 Feb 2024 13:59:31 +0000,
-Eric Auger <eauger@redhat.com> wrote:
+On Mon, Feb 05, 2024 at 10:49:37AM +0530, Ajay Kaher wrote:
+> From: Prathu Baronia <prathubaronia2011@gmail.com>
 > 
-> Hi,
+> From: Prathu Baronia <prathubaronia2011@gmail.com>
 > 
-> On 9/19/23 19:50, Jing Zhang wrote:
-> > Add some basic documentation on how to get feature ID register writable
-> > masks from userspace.
-> > 
-> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> > ---
-> >  Documentation/virt/kvm/api.rst | 42 ++++++++++++++++++++++++++++++++++
-> >  1 file changed, 42 insertions(+)
-> > 
-> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> > index 21a7578142a1..2defb5e198ce 100644
-> > --- a/Documentation/virt/kvm/api.rst
-> > +++ b/Documentation/virt/kvm/api.rst
-> > @@ -6070,6 +6070,48 @@ writes to the CNTVCT_EL0 and CNTPCT_EL0 registers using the SET_ONE_REG
-> >  interface. No error will be returned, but the resulting offset will not be
-> >  applied.
-> >  
-> > +4.139 KVM_ARM_GET_REG_WRITABLE_MASKS
-> > +-------------------------------------------
-> > +
-> > +:Capability: KVM_CAP_ARM_SUPPORTED_FEATURE_ID_RANGES
-> > +:Architectures: arm64
-> > +:Type: vm ioctl
-> > +:Parameters: struct reg_mask_range (in/out)
-> > +:Returns: 0 on success, < 0 on error
-> > +
-> > +
-> > +::
-> > +
-> > +        #define ARM64_FEATURE_ID_SPACE_SIZE	(3 * 8 * 8)
-> > +        #define ARM64_FEATURE_ID_RANGE_IDREGS	BIT(0)
-> > +
-> > +        struct reg_mask_range {
-> > +                __u64 addr;             /* Pointer to mask array */
-> > +                __u32 range;            /* Requested range */
-> > +                __u32 reserved[13];
-> > +        };
-> > +
-> > +This ioctl copies the writable masks for Feature ID registers to userspace.
-> > +The Feature ID space is defined as the AArch64 System register space with
-> > +op0==3, op1=={0, 1, 3}, CRn==0, CRm=={0-7}, op2=={0-7}.
-> when attempting a migration between Ampere Altra and ThunderXv2 the
-> first hurdle is to handle a failure when writing ICC_CTLR_EL1
-> (3.0.12.12.4) on dest. This reg is outside of the scope of the above
-> single range (BIT(0)).
-
-Indeed. But more importantly, this isn't really an ID register. Plenty
-of variable bits in there.
-
-> This may be questionable if we want to migrate between those types of
-> machines but the goal is to exercise different scenarios to have a
-> gloval view of the problems.
-
-I think this is a valuable experiment, and we should definitely
-explore this sort of things (as I cannot see the diversity of ARM
-system slowing down any time soon).
-
+> commit 4d8df0f5f79f747d75a7d356d9b9ea40a4e4c8a9 upstream
 > 
-> This reg exposes some RO capabilities such as ExtRange, A3V, SEIS,
-> IDBits, ...
-> So to get the migration going further I would need to tweek this on the
-> source - for instance I guess SEIS could be reset despite the host HW
-> cap - without making too much trouble.
+> Use kzalloc() to allocate new zeroed out msg node instead of
+> memsetting a node allocated with kmalloc().
+> 
+> Signed-off-by: Prathu Baronia <prathubaronia2011@gmail.com>
+> Message-Id: <20230522085019.42914-1-prathubaronia2011@gmail.com>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+> [Ajay: This is a security fix as per CVE-2024-0340]
 
-I'm not sure SEIS is such an easy one: if you promised the guest that
-it would never get an SError doing the most stupid things (SEIS=0), it
-really shouldn't get one after migration. If you advertised it on the
-source HW (Altra), a migration to TX2 would be fine.
+And this is why I am so grumpy about Red Hat and CVEs, they know how to
+let us know about stuff like this, but no.  Hopefully, someday soon,
+they will soon not be allowed to do this anymore.
 
-The other bits are possible to change depending on the requirements of
-the VM (aff3, IDBits), and ExtRange should always be set to 0 (because
-our GIC implementation doesn't support EPPI/ESPI).
+{sigh}
 
-The really ugly part here is that if you want to affect these bits,
-you will need to trap and emulate the access. Not a big deal, but in
-the absence of FGT, you will need to handle the full Common trap
-group, which is going to slow things down (you will have to trap
-ICV_PMR_EL1, for example).
+Now queued up, thanks.
 
-> What would you recommend, adding a new range? But I guess we need to
-> design ranges carefully otherwise we may be quickly limited by the
-> number of flag bits.
-
-I can see a need to adding a range that would cover non-ID registers
-that have RO fields. But we also need to consider the case of EL2
-registers that take part in this.
-
-For example, ICV_CTLR_EL1 and ICH_VTR_EL2 and deeply linked, and share
-some fields. Without NV, no need to expose HCR_VTR_EL2. With NV, this
-register actually drives ICV_CTLR_EL1.
-
-So careful planning is required here, and the impact of this measured.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+greg k-h
 
