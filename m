@@ -1,97 +1,130 @@
-Return-Path: <kvm+bounces-8579-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8580-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FCFC85269C
-	for <lists+kvm@lfdr.de>; Tue, 13 Feb 2024 02:38:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D73A08526D2
+	for <lists+kvm@lfdr.de>; Tue, 13 Feb 2024 02:44:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 953C9B25A4B
-	for <lists+kvm@lfdr.de>; Tue, 13 Feb 2024 01:38:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B8AA1F2432F
+	for <lists+kvm@lfdr.de>; Tue, 13 Feb 2024 01:44:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AAE722615;
-	Tue, 13 Feb 2024 00:57:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF63078B46;
+	Tue, 13 Feb 2024 01:04:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VWQuaStS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="F22wHHPl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00B1617FE
-	for <kvm@vger.kernel.org>; Tue, 13 Feb 2024 00:57:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9176379DB6;
+	Tue, 13 Feb 2024 01:04:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.55.52.88
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707785837; cv=none; b=QMn4yMZLVLiJRSymm/KaFmHDdP65M5IAueivNUY5Nx/uRBgDMdnePw90Oy/6ZZ6Gxv9Fw/K+nTCw16Ec/6jEljx3/uAt3BeHo7SNjxOVpTPfPDOlq1JNEj5AHXqCDuYfZadhPekr0+B+5VhVcK6wmcL3KhO/v1TsatAauTJAl8k=
+	t=1707786275; cv=none; b=W8sum9mhpUEmAYhXZYH/6nK2ALGSFuDs/3Nzt1QlRp+Xq57YV6l6sg6i/26bgeNlfGmLAMv/lGMMpGn++cNPPRJvc/LDhAIAy2zRAcC6xpJMZ5Naz/JmA1FH8YjZzIVBWOafwD9LT8xEF5/S1f/KIEwHI5mXYvqMnBJLVqAvJ2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707785837; c=relaxed/simple;
-	bh=xTXIDHG2wJphSzrFpnX801otcYVQ7IDuiyEbbp9hOk8=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=gVuQYN5ZV/gS+GUWzhwiQ27whzg3g1wnSIPmLW+7uS+uqbTfEeIZLKYvCpmK+mFxnW94WYJvQ085WjrFQ7sxkwpdS2NAA0jlYuCjKL+shiBWycJ0qs8+w0fWttNkWDiEJFCjrve+N3oNmAhRTLjbFxNgX7ZqIgG1psV37jauKDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VWQuaStS; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6e0a461e125so1832158b3a.3
-        for <kvm@vger.kernel.org>; Mon, 12 Feb 2024 16:57:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707785835; x=1708390635; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JBIur676zT6P6eG98QMheQvfYDK752Rf+DKu7jIji2U=;
-        b=VWQuaStSiUdUA7/CqEV4VucfLSFTRVqNm3lPt7gxYs7AkZZ1xrjoSja9yGdF3FPVdJ
-         +KxcF/utFfhTIohf9gFBnthhTOYV0bBxTnbeGDxaaksUJnGcCUjYwxExOpOUUhhVGLIP
-         IEq+Z0W77D9EeyxjWoY44LU4xm7O9JbltbWOnQi3hBNQOx5EStIX0ULf3V1IYsTWPLEp
-         0h6uNBKcrH0u8QxJNX1ndYYzd3ZNWf9umErjRcnsinDqLvnRNTP+5w1JrW0AaOVxIYx2
-         1u444yhCPGD+PqDVYzpLSGCSsMgwAJqqH/zXtZ4bWTAMWF9pl9u86iK4QBBebqw5b8Nb
-         TYxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707785835; x=1708390635;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JBIur676zT6P6eG98QMheQvfYDK752Rf+DKu7jIji2U=;
-        b=rN8XX6DnzuJK64CMMYBrVIJ3ZscTGoYw+W6joOTg6lrZF2eLf98RfOxUs5OmxE46jx
-         08kdOhp34MVIVgEqj18/9NPKwkvgKHXWbKhMASBra/S29yYRElMkrEvzm/FwLueBZ/pz
-         eHtvFRwq8UovcClUm6gS5Z1WLMVu7LgilXUZT5+w5/kBBZ3P+eqWVCS0gOclv1l2VzqC
-         kCxtGsxUHNekN0qgg+ELMq5h0f8OAEBfNWQleddCu1QK31dAhgFtlWQTKLF4wmN9ffNN
-         skyo7KIst0Z0x0SPpET5wYxpQn0v9u52TukLXBgU/c8w8NUim6aCwU3fjAO8TPfucLV3
-         dJMw==
-X-Gm-Message-State: AOJu0YxZeeotCVu/vpURIjvu+6jYmEEbZMhLrd+6a04vrSmiTdaRHmHG
-	/+We96j2l/dAQ2or0PHkiw5Yp057Fg5+i8iO9sYD4yHF2LbuikPpRcUrApSrsmbO2/JJ6zJapXo
-	whA==
-X-Google-Smtp-Source: AGHT+IGkT++R3hxv+8HWbuPSSQjWt7Da93fgLYOCgw6aiV7tvgUL+Wq5ZRgmR8ln7k1UmOJhD4eSF98azzA=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:939c:b0:6e0:f6ed:cf32 with SMTP id
- ka28-20020a056a00939c00b006e0f6edcf32mr53269pfb.5.1707785835275; Mon, 12 Feb
- 2024 16:57:15 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Mon, 12 Feb 2024 16:57:10 -0800
+	s=arc-20240116; t=1707786275; c=relaxed/simple;
+	bh=rPkyRn3h/xI5tyHZCWp4P0ZLlst3DRj0eD9GNA7385w=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kxUB/ym7E6BhOITI9e9CD9EDZrH9e5JC0llLxEYtAZZ73/5iCiKRNSgq8d2FPEETEoOIuXqErhzvQCnCOiiYa74who+sa7kOS908w/IkXO5LkC6ljy3V4o3t5HvkT6JdNNSe8YYY+FkKnAfPIFqfbj4lJKg3RrhlrOAd9LqljtA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=F22wHHPl; arc=none smtp.client-ip=192.55.52.88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707786273; x=1739322273;
+  h=date:from:to:cc:subject:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=rPkyRn3h/xI5tyHZCWp4P0ZLlst3DRj0eD9GNA7385w=;
+  b=F22wHHPlYgipUYHDbf6oRD3GhgQO7NR1D1AxvQa/7XlWIQ6RzOSN352u
+   /Mhhm06dUwy91yOlf+LRWPFP1PkuG+SyL4OkN2jj1NRybx18Vk6xeNHjt
+   cZYHCYqFqTQFvUpMIISHVqrFpHTlZzxQcO692a+Nt/kMNz9KkfKF+Zfkj
+   FpBgTGJ9fQyT92Ci7wXFsILSBrcAjcyzvtyD4vzlyTHtyLbf/NCynNl8c
+   K/BKW5lMjbefExriKGp8NVzYcZklE/ItB1VrQbERSI/1DYH1fM5IfUH3F
+   MgC5+tevTh/bi94gRAubaZTshaMncVlSug3+WwPMjxFLCBniXS6f0Wsc/
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10982"; a="436927567"
+X-IronPort-AV: E=Sophos;i="6.06,155,1705392000"; 
+   d="scan'208";a="436927567"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2024 17:04:32 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10982"; a="911650880"
+X-IronPort-AV: E=Sophos;i="6.06,155,1705392000"; 
+   d="scan'208";a="911650880"
+Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.24.100.114])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2024 17:04:32 -0800
+Date: Mon, 12 Feb 2024 17:10:00 -0800
+From: Jacob Pan <jacob.jun.pan@linux.intel.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: LKML <linux-kernel@vger.kernel.org>, X86 Kernel <x86@kernel.org>, Peter
+ Zijlstra <peterz@infradead.org>, iommu@lists.linux.dev, Thomas Gleixner
+ <tglx@linutronix.de>, Lu Baolu <baolu.lu@linux.intel.com>,
+ kvm@vger.kernel.org, Dave Hansen <dave.hansen@intel.com>, Joerg Roedel
+ <joro@8bytes.org>, "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov
+ <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>, Paul Luse
+ <paul.e.luse@intel.com>, Dan Williams <dan.j.williams@intel.com>, Raj Ashok
+ <ashok.raj@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>,
+ maz@kernel.org, seanjc@google.com, Robin Murphy <robin.murphy@arm.com>,
+ jacob.jun.pan@linux.intel.com, "Lantz, Philip" <philip.lantz@intel.com>
+Subject: Re: [PATCH 00/15] Coalesced Interrupt Delivery with posted MSI
+Message-ID: <20240212171000.253813ee@jacob-builder>
+In-Reply-To: <2aa290eb-ec4b-43b1-87db-4df8ccbeaa37@kernel.dk>
+References: <20240126234237.547278-1-jacob.jun.pan@linux.intel.com>
+	<051cf099-9ecf-4f5a-a3ac-ee2d63a62fa6@kernel.dk>
+	<20240209094307.4e7eacd0@jacob-builder>
+	<9285b29c-6556-46db-b0bb-7a85ad40d725@kernel.dk>
+	<20240212102742.34e1e2c2@jacob-builder>
+	<2aa290eb-ec4b-43b1-87db-4df8ccbeaa37@kernel.dk>
+Organization: OTC
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.43.0.687.g38aa6559b0-goog
-Message-ID: <20240213005710.672448-1-seanjc@google.com>
-Subject: [GIT PULL (sort of)] KVM: x86: fixes and selftests fixes/cleanups
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-I have two pull requests for 6.8, but I goofed (or maybe raced with you
-pushing to kvm/master), and based everything on 6.8-rc2 instead of 6.8-rc1 as
-you did.  And so of course the pull requests would bring in waaaaay more than
-just the intended KVM changes.
+Hi Jens,
 
-Can I bribe you to do a back merge of 6.8-rc2, so that my pull requests don't
-make me look like a complete idiot?
+On Mon, 12 Feb 2024 11:36:42 -0700, Jens Axboe <axboe@kernel.dk> wrote:
 
-It's not the end of the world for me to rebase, but I'd prefer not to throw
-away the hashes and the time the commits have spent in -next.
+> > For the record, here is my set up and performance data for 4 Samsung
+> > disks. IOPS increased from 1.6M per disk to 2.1M. One difference I
+> > noticed is that IRQ throughput is improved instead of reduction with
+> > this patch on my setup. e.g. BEFORE: 185545/sec/vector 
+> >      AFTER:  220128  
+> 
+> I'm surprised at the rates being that low, and if so, why the posted MSI
+> makes a difference? Usually what I've seen for IRQ being slower than
+> poll is if interrupt delivery is unreasonably slow on that architecture
+> of machine. But ~200k/sec isn't that high at all.
 
-FWIW, the two tags are:
+Even at ~200k/sec, I am seeing around 75% ratio between posted interrupt
+notification and MSIs. i.e. for every 4 MSIs, we save one CPU notification.
+That might be where the savings come from.
 
- https://github.com/kvm-x86/linux.git tags/kvm-x86-fixes-6.8-rcN
- https://github.com/kvm-x86/linux.git tags/kvm-x86-selftests-6.8-rcN
+I was expecting an even or reduction in CPU notifications but more MSI
+throughput. Instead, Optane gets less MSIs/sec as your data shows.
+
+Is it possible to get the interrupt coalescing ratio on your set up? ie.
+PMN count in cat /proc/interrupts divided by total NVME MSIs.
+
+Here is a summary of my testing on 4 Samsung Gen 5 drives:
+test cases		IOPS*1000	ints/sec(MSI)*
+=================================================
+aio 			6348		182218
+io_uring		6895		207932
+aio w/ posted MSI	8295		185545
+io_uring w/ post MSI	8811		220128
+io_uring poll_queue	13000		0
+================================================
+
+
+Thanks,
+
+Jacob
 
