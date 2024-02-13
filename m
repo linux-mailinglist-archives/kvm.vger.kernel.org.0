@@ -1,209 +1,319 @@
-Return-Path: <kvm+bounces-8618-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8619-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F17CF852EDF
-	for <lists+kvm@lfdr.de>; Tue, 13 Feb 2024 12:15:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 049E2853164
+	for <lists+kvm@lfdr.de>; Tue, 13 Feb 2024 14:09:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67CAC1F26FD4
-	for <lists+kvm@lfdr.de>; Tue, 13 Feb 2024 11:15:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B07B328567D
+	for <lists+kvm@lfdr.de>; Tue, 13 Feb 2024 13:09:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDA8E364B6;
-	Tue, 13 Feb 2024 11:14:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F79251C34;
+	Tue, 13 Feb 2024 13:09:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="roHUmk7o"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gdJBkUPO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16A7833CD2
-	for <kvm@vger.kernel.org>; Tue, 13 Feb 2024 11:14:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.12
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707822883; cv=none; b=E/g5xRs22nnB9lxIJC8zVtPBhruY4Jg/tOJZ9chp4+raGpqEVBVS3ZpKHlrrxY17BN/BWs4j+102tCVFTPHcQH1ro0N9ra2s8lF1H68ikw55KumipYvPRh8IG7WMeJi/nfeBvkMSRLpZm+UIa0Oi5q6fW7ZX3A9gz1xEP4jz6Ww=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707822883; c=relaxed/simple;
-	bh=YvDdIjtBl1xRPij1eJggRa9vZ44OFLNug4Fl60nUGQw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=qNIyacRmvypF/Gz+ZWKstOG1qrZyzVHPi1G9MEVFPIMu51w7L8D39peD7EyPyRXXej81VGIByTv5/Wgsgyw1xd0Q5w8/xYJ8IkCqqJ/FPYwiUiBqN36xd6xsuFNXYeNkDl03wElFYyHqtxZgPjWoG/pD1btuT3LrCnWZ6oQlY9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=roHUmk7o; arc=none smtp.client-ip=210.118.77.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20240213111439euoutp02acc181728db69ece35ff585dadfaafb9~zZ9w1uzX91895418954euoutp02W
-	for <kvm@vger.kernel.org>; Tue, 13 Feb 2024 11:14:39 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20240213111439euoutp02acc181728db69ece35ff585dadfaafb9~zZ9w1uzX91895418954euoutp02W
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1707822879;
-	bh=JR0PkD7vN0S2u5oYVHNJ2+NXefBzmZZ86e5RWc8Zdjg=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=roHUmk7oMGRDWkJAGxOZzOJ+9e/jdiDnnCJ69HEjRB8y59i1O8QM1MtQrsQ/DItmr
-	 oA1poGSELPzSn8cZNgYnVIrmjXxm+up2dRWY18xhknQA9H5oahMSZPrhwF+hMNUBbq
-	 zLsxxGSpN1A07Isl/lfAHSUFUIBo4MiItbTc2Tw0=
-Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-	20240213111438eucas1p1b9b33ba0d17d84dd16cad2d56ad751cc~zZ9wdeq5Y3046730467eucas1p1M;
-	Tue, 13 Feb 2024 11:14:38 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-	eusmges3new.samsung.com (EUCPMTA) with SMTP id 1A.36.09552.E1F4BC56; Tue, 13
-	Feb 2024 11:14:38 +0000 (GMT)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-	20240213111438eucas1p2a98c23ee227dbb956dd07e7bd05798d5~zZ9wCDZks0418404184eucas1p29;
-	Tue, 13 Feb 2024 11:14:38 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-	eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20240213111438eusmtrp18d26e72e3ba5d91eaa360d6f7a6bc8ea~zZ9wBYMkM1666016660eusmtrp1k;
-	Tue, 13 Feb 2024 11:14:38 +0000 (GMT)
-X-AuditID: cbfec7f5-83dff70000002550-e8-65cb4f1e5cb4
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-	eusmgms2.samsung.com (EUCPMTA) with SMTP id 95.0A.10702.E1F4BC56; Tue, 13
-	Feb 2024 11:14:38 +0000 (GMT)
-Received: from [106.210.134.192] (unknown [106.210.134.192]) by
-	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20240213111437eusmtip276cd474e1d4d3d635e59b0b7e7840c13~zZ9vdlxgY0826408264eusmtip2C;
-	Tue, 13 Feb 2024 11:14:37 +0000 (GMT)
-Message-ID: <5b2d8fee-9d0f-48f7-b9ec-b86e95387a61@samsung.com>
-Date: Tue, 13 Feb 2024 12:14:37 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9348C4CB22;
+	Tue, 13 Feb 2024 13:08:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707829739; cv=fail; b=jRKAT4y04P615u78OmttgBCNWtqZBJI/TTCrJVvtUNczO3+DVEwvsRxFcKTA2ZUiYR7mLVslV86ywZr0VwymAoGjevHr40DASsOLVy7NMMV6+eaV0UIDJ+fipirON8GtU1UkPDzX1Cmwh8Posob9wnyV0+dxTRrmVFVhieAGRGg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707829739; c=relaxed/simple;
+	bh=j0EotAiQtA+ne4l4f8zwEp1PPv0k4pUA+KhprLuED7w=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=hXFv06w6zA0l6dAvIluCuIliMXvzeIzZTs6MlwRH9nz97qi37zop1NWSmqmn6DUjoUR5vgOpg3IRLNu+vqGBJo766DYfHVHEdL5cmvkPiTElQBuYDB0QrgbhMzlgiPPnVSx1uOJxnR2bhiwWEkoOwbEWnxaIObkSKPMbL/54Dho=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gdJBkUPO; arc=fail smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707829737; x=1739365737;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=j0EotAiQtA+ne4l4f8zwEp1PPv0k4pUA+KhprLuED7w=;
+  b=gdJBkUPO6FcnDeVR/2ql+gwzGeDYjJpBj5C+ppfnSoY79NFE23P25DVR
+   JQHRQb5j2gsgwwK84uNjZZwPZYeTHeUvHAcXk7sNwWooQr/LW2MWKNQ40
+   JxmHBt62dSM0Kd3HvXc9H4feJw1F32ZsOdBRarjq+9bXKWvL7uU8ntkPX
+   DYVI73ZGTo4QsF2h7cIG8AMjO8DASIdAhBw4Cm6S9d+hF889G4IIGpyI0
+   BrulCVPQGTjtrNgbaNHkP/3AFG7YvTGxcLaHJGy5kNVDccdAYcW6B2aro
+   mcshT95nHytaIpt7f0YcqpbqPYRI30PGESwfkqRDtxP4jXJIgWAhBiQVh
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10982"; a="1986094"
+X-IronPort-AV: E=Sophos;i="6.06,157,1705392000"; 
+   d="scan'208";a="1986094"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2024 05:08:56 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,157,1705392000"; 
+   d="scan'208";a="2850803"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmviesa009.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 13 Feb 2024 05:08:55 -0800
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 13 Feb 2024 05:08:55 -0800
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Tue, 13 Feb 2024 05:08:55 -0800
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.40) by
+ edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 13 Feb 2024 05:08:54 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=I3AlXufyfCQfolsHEdYbKFZO+RemYEdCV7KwDcM7CCTwzvUW1Me2nphBtK1Zv3DB2n/KdooLvpUjPxFT+IU1810l2NeEnuPq74jXLM8kB21FqhA28NzygprE6HlFNAtfEjvH1xTYzL8k4dKxN6Q/AMFJv46tCryMoFKVB3OLuwbHFgXxR0DqFdIpOUOCoCcoskN0sju6njH+8o3WWBIeszOwfUyht2j2wdywyt9b3rdrJ3k8xlayV5KG7P3yHMinRTBxb60MDUjq8QnC5np2VY5PjuK45MLC0HZxeVQ1kUQVhIF7yequwhyhG/hjt57vgbMoWvuzSljOzv6iy1C7bw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=PJLYeqqD0pkGez8tSikdUS15WAKhDHjOtM5Gm8uYTNQ=;
+ b=RmpShSazJbzzrgE5f3L0W1LvckyPhHyq9XnMtK8Ny5Mvhr2ohUMciH6TJagJ0pmc8X88GI7lq9ga+71z4gbcXopoQDCKS5Iz8/GXUNHXpzthsRhDl4Bj9BEtfbhXRqF+7FUAI9jmUepfl/EfxP/WAitmvxsQXgHo2di9SNbrA4Xka9DZeKi3D73O9Wzj7x//aMZAPwz19+lgCQO0rYEQLvGvwakAI6qFCFt7rPhehfWEUCx1VWRXbK1adONADOAEcyg68hR2WaACzPpWbWGiH+FQdCi5dcP27htk6dzYVVATqJQNv37yHQhKW8xndrmfFZMFVn4Kjj2/nwTEUwuXgQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DM4PR11MB5502.namprd11.prod.outlook.com (2603:10b6:5:39e::23)
+ by SJ0PR11MB4861.namprd11.prod.outlook.com (2603:10b6:a03:2ac::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.39; Tue, 13 Feb
+ 2024 13:08:47 +0000
+Received: from DM4PR11MB5502.namprd11.prod.outlook.com
+ ([fe80::502d:eb38:b486:eef0]) by DM4PR11MB5502.namprd11.prod.outlook.com
+ ([fe80::502d:eb38:b486:eef0%4]) with mapi id 15.20.7270.031; Tue, 13 Feb 2024
+ 13:08:47 +0000
+From: "Zeng, Xin" <xin.zeng@intel.com>
+To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+CC: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, qat-linux <qat-linux@intel.com>,
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>, "jgg@nvidia.com"
+	<jgg@nvidia.com>, "yishaih@nvidia.com" <yishaih@nvidia.com>, "Tian, Kevin"
+	<kevin.tian@intel.com>, "Cao, Yahui" <yahui.cao@intel.com>
+Subject: RE: [PATCH 10/10] vfio/qat: Add vfio_pci driver for Intel QAT VF
+ devices
+Thread-Topic: [PATCH 10/10] vfio/qat: Add vfio_pci driver for Intel QAT VF
+ devices
+Thread-Index: AQHaVSVFJ9K0TVMQD0C9btTtb+JmirEAZyqAgAFFQ1A=
+Date: Tue, 13 Feb 2024 13:08:47 +0000
+Message-ID: <DM4PR11MB55025C3ECE1896D9C5CA4E86884F2@DM4PR11MB5502.namprd11.prod.outlook.com>
+References: <20240201153337.4033490-1-xin.zeng@intel.com>
+ <20240201153337.4033490-11-xin.zeng@intel.com>
+ <972cc8a41a8549d19ed897ee7335f9e0@huawei.com>
+In-Reply-To: <972cc8a41a8549d19ed897ee7335f9e0@huawei.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM4PR11MB5502:EE_|SJ0PR11MB4861:EE_
+x-ms-office365-filtering-correlation-id: ee2c3493-975a-424e-3ed6-08dc2c94ea1a
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: bQSbIXdI9TbPTdXJdCdoxBXpAKTyg6kAXG8VArdkayBWjeYzY2rymtwQB4VSLJvnRLpq/KnqPneYwqwieKuADFEUOMQ+ZBg9/hqwIJkTyMUTbFxMeR5VuvWscAfj1mdQsKT1qrLaqfwITQuD5mQ1+XoaqvqvKZ/ak3aeCaQ8T/YxExXa7qjvtzDBxJuV0TazthEnerO+9IAJnuej7cRe+duROycLSxDg0uKD9KDAOABVdG6oW36jwpDY7OIZXw5ZnwkdEyEN9ESlvZIWp1Wv/5m2EmyxkTvNn2aHJLc9MbDTYAl1qC9+33teTo5ZylM1g1LmD+5P5Vt580SLg4rWbKvF/J7MWjhB1/aKhLU/Ir3tAVHMfEYCEI33gIWGOlqFa9B6VmzyaC/3VHcyLmRBEiQ+FE9HAySfEUurB5127pfY73BxF0DcQj/aB2NEd90SXAKLR7yb0O4KqLc9nmU8F+eslMvPSOEfuHvodo04+MiPlkTBByKpfwhcAWsHztpRI38VG13r+8veOO0qbIfCS/mRTEQ4gYwg84AgvSlO/Zb2MloqHsEeCTvfWPcsuPfK//sUdHCrvhWYBzzGsMT2HxVVQ9cr7bVQKGQpbM3W25RWt4uyomlYPCofBqUZB9Q6
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB5502.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(366004)(376002)(39860400002)(346002)(396003)(230922051799003)(1800799012)(186009)(64100799003)(451199024)(4326008)(2906002)(8676002)(8936002)(5660300002)(52536014)(83380400001)(107886003)(26005)(38100700002)(33656002)(82960400001)(122000001)(86362001)(38070700009)(64756008)(66446008)(66556008)(76116006)(6916009)(66946007)(316002)(54906003)(7696005)(6506007)(66476007)(53546011)(9686003)(478600001)(71200400001)(55016003)(41300700001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?xUAhQAk3eOXjN1SaZ0vssa/AYqbYyQ+7gM+Na4i/pw70VJR5CgSk4+qJmA0B?=
+ =?us-ascii?Q?wEDOT6dAesKj0czvGPCp31N4kNugwH0zTIMQUx8UCQGYRO5Vkmb03PDHixQi?=
+ =?us-ascii?Q?ujY6gWdkjXm135e/5gU1Q6ukDps3Pf5fz6l3oaoHeA6PDSKuaCqinvsyGIbL?=
+ =?us-ascii?Q?zhDCXbwJXPW66jVUMwQZtMIDMo/VxTmidKMnkVTTyxblwq1SyLDWRFWb2OLu?=
+ =?us-ascii?Q?Lx9YGHyAbXCehG4b8JgzLWkVu8S5md+jkuAD/1T0PaSyAn/EcshgXdibm1R1?=
+ =?us-ascii?Q?kB0+JMy8dPN0DiUfr8V9RF8Fp602dM4uAd+ghJ76KtLPwBG7iriL4BOqXO39?=
+ =?us-ascii?Q?YxEpI4UMMMjPIQM9oct5TWWdb2K8giygz3d2MIfoDWHU8ZXrPc0VCNzBgaRb?=
+ =?us-ascii?Q?sVNZzckA/lqAaMmqsKTR6HPW1R/e8rRrQ0B/MCn0Ord3lOFFi9NASh/NdAQl?=
+ =?us-ascii?Q?OgeXYvr677IFL+g4Y6L63rk/shKvGMcolfdnhqb0f4IvW7Ht8Dxr75rubBs9?=
+ =?us-ascii?Q?UYej2pTYJjDXmZF3IXpuMPQYQO8X8hldy98dUO3frFFdy2GilzMLAIRxy7RN?=
+ =?us-ascii?Q?afgeQvmyU9jLLGvUOr5mbaG2LTN2/Unjdq6o+s1zob0V5/WQ+ZtZj2FHkn+u?=
+ =?us-ascii?Q?5S9sT01RKjyqDidmnBzMittuhJ/72S4OC2xybm9N/QaQ0qbTrU+0kT9iurFd?=
+ =?us-ascii?Q?ZsAGUgcFscWjkFiFDsNwzaEHLJQssAiF5hEDa3sqWvPwt9Dn5safMdysU1k/?=
+ =?us-ascii?Q?9YBHW5H+GwbO9BU/urTQWOa5LVJ0VQYCHv+tMmN0VtLU6sAxmO6bYOpxeD05?=
+ =?us-ascii?Q?YwgI/Tz1X6kgPT6Y3YgJiLNtulNqnD5q8MRuh9CUAq+mComjgaDUIo58Axir?=
+ =?us-ascii?Q?EnUmyB6zeTLL2mkfDHPsNZfFkG/F9SuOswxTloBWfPumbqO+j+hP51TpSIMe?=
+ =?us-ascii?Q?Hayk1mrfpI5aa/xc4nj+/OrKZkVsCDXOdUUzVVjXD7rApIae3OmnRYNJMgZY?=
+ =?us-ascii?Q?wjtRlxMS425RvO5xNDzueHTwdU3oSwN1zLA0bT1iUwVm60zMmFtqo3sjvyNv?=
+ =?us-ascii?Q?W9ijirAi2gXd4dSNmGrJRN65p3t+E1kInOCH+z++bxIEgqEQWqmGNJd6vsdE?=
+ =?us-ascii?Q?5WdzEY/kGs+vbq7g/1nm0jT5DkpXricRcUfCclsvU7sgSWRmiw9HySh5+W6P?=
+ =?us-ascii?Q?D7sFDX3QPzornlXK0cV6qg1VdWDx12S3/IK6th90VMthPWrDbF7GfpOZ088m?=
+ =?us-ascii?Q?7wJqXW/5hDBsElWy7yBnHwf6i4MSHCoG6crRsyV0p6UUC5jXaBEzMMwO8RGA?=
+ =?us-ascii?Q?L8v5Vb80VHupb3gPBwH9+sEjbbSSQMCdx1eX50JZeU0DJgnKti7P4jaND7dE?=
+ =?us-ascii?Q?VdN0Og8W3oV390V6XKYZRWxHMlfoLABgBrsC/V9kdlQ6j3sMzTHoKbv9i1Zd?=
+ =?us-ascii?Q?DrFbWY4EP1VG7QB1Pf9wphvxxwnmEQLOtNlB2SGPp2+wsaNQV7PxiGsNp2RL?=
+ =?us-ascii?Q?SwWTikmDYhFVAs5XALCWkVunZshYJzTQ1LpP9h+CUEDxeE4/lSbwQ/5NXbLM?=
+ =?us-ascii?Q?mf+aqCvLzD4j6/mYv9ZobNZ1gjE8tndukiaioCe1?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] arm64: cpufeatures: Only check for NV1 if NV is
- present
-Content-Language: en-US
-To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-Cc: James Morse <james.morse@arm.com>, Suzuki K Poulose
-	<suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu
-	<yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, Will
-	Deacon <will@kernel.org>
-From: Marek Szyprowski <m.szyprowski@samsung.com>
-In-Reply-To: <20240212144736.1933112-3-maz@kernel.org>
-Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA01SaUwTYRDNt7st28biUopMUIs2QIKJCB5kVVIVian+UCBo4hG1kQ2gLWAL
-	iEa0KEGpckQt0HoAQblEhZZDDaKAWglIFCIBRPAWK1QIXkiCsq4o/96bmffezJePxMVmnhsZ
-	FR3HaKKVKhlfSNQ8HGtbKN3UwvieyvamPxedRnR/fTFGXzDsp21VTQRtftPJo29daObRhrFB
-	Pm18/hzRKb3L6O4rFQ6rhYryS+VIkXJ/iKcwl6XxFQU6A66wXD6qGLAYkWLULA122CYMCGdU
-	UQmMZpF8tzDyTWolL9YmScwpHMd06LGTHglIoJZCh/4YpkdCUkyVILg6XIVz5AuCuqIfPI6M
-	ImgwWNCUJKPXjrhGMYIJwwSfIyMIqgfsk3qSFFFysJfOZQUE5QnGExkYi0WUEzQb3xIsdqHc
-	ob8n14HFzlQo3CtjowUkTrlCz9u8P/MSKgEsHy8SrD9O2RA0Fxbz2Aaf8gP9kJ7PYgHlD8aL
-	DwlO7A7Hq8/j3KYnBFBQsojdB6ggqH6wgSs7g81a5cDhOdBy9vQf/8lxBPnj/RhHshDoPvT8
-	PXkl9Lb95LNGOOUNN27/9VwDxjQVBx2ha8iJ28ARztTk4FxZBCdTxZyHF5is1/+lNjxpx7OQ
-	zDTtUUzTjjdNu8X0PzYfEWXIlYnXqiMY7ZJo5oCPVqnWxkdH+OyJUZvR5LdqmbB+vYlKbCM+
-	jQgjUSMCEpdJRO25jxixKFx58BCjidmliVcx2kY0myRkriLPcHdGTEUo45h9DBPLaKa6GClw
-	02EF27tezErK9ldq1Oc+Ehkvj8jmC5/5j3bkdqY1793amfytJS4zjCHen5X3rFORKR4Wx/KK
-	OImkritnWGEN6qgfqeje9ypQHNyHvO1ex7f8Sk+11slvxrskZh9UA71CtLhGfiO2NKAs865k
-	+VpysSw7BI8Vq6RD4x6tds0y38japHfzvu+45uJLpuxRabuyBhNH+mfWjj39GebfLYw6sF26
-	ttx38NxyXWub+0JLyMCdvMOvV11Pn+B1rB+WnezdHRjwva00tKg9Yk79kswEbBCFSDf+So5Z
-	c6hy6bYtSfIvM2qH+zb/ECdurs7zav2Ehzh77jw861nh7cp1j2qcmuaPFcsIbaTSbwGu0Sp/
-	A43j7SPFAwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrOIsWRmVeSWpSXmKPExsVy+t/xe7py/qdTDR728lm8X9bDaHF/33Im
-	izlTCy1ebTnMYrHp8TVWi51zTrJaTP35hs1i5u3bjBYtd0wtbi7dwO7A5bFm3hpGj5Yjb1k9
-	Nq3qZPNY2DCV2WPzknqPF5tnMnp83iQXwB6lZ1OUX1qSqpCRX1xiqxRtaGGkZ2hpoWdkYqln
-	aGwea2VkqqRvZ5OSmpNZllqkb5egl/G4bSNrwSuRiumLfzM1MJ4V7GLk5JAQMJHou/OOsYuR
-	i0NIYCmjxL9Pv5ghEjISJ6c1sELYwhJ/rnWxQRS9Z5Q4vXgVUBEHB6+AncS7lbIgNSwCqhIz
-	2/uYQGxeAUGJkzOfsIDYogLyEvdvzWAHsYUFgiQOrNoCNp9ZQFzi1pP5YPUiAmUSL84dAzuC
-	WeAVo0TLiyvsEMu2Mkp0fwfJcHKwCRhKdL0FuYKTg1PATGLm3GMsEJPMJLq2djFC2PISzVtn
-	M09gFJqF5JBZSBbOQtIyC0nLAkaWVYwiqaXFuem5xUZ6xYm5xaV56XrJ+bmbGIExuu3Yzy07
-	GFe++qh3iJGJg/EQowQHs5II76UZJ1KFeFMSK6tSi/Lji0pzUosPMZoCQ2Mis5Rocj4wSeSV
-	xBuaGZgamphZGphamhkrifN6FnQkCgmkJ5akZqemFqQWwfQxcXBKNTDN3+i2f7rBg6ZS0c+n
-	Ux+bVWbc6hPWiN+brPb7lPG91/mKTHcLRZat1mgKufFqqXyvdfGR8zMjp6a5d9m3nFj2O2OH
-	z36vzp7VuvJZcZqJsx4tDmKK0Erzt+ibkWHCJ2quuNbp2iOnW2z9jjVXHoubfN3wQqWyL6LS
-	/cc2h49bVth8KvmUJPJs0vxEQfMXbByfVbTM6gINep78fGvhWRI2539HuPYj27tCG9sveJQ8
-	S9khdf3qvgt/VtoelwkwV4icx2Xzp3XtiZf/vwtkLPxUu956UsefO1eNjkns3r8mvjllerzN
-	+aWqx8oyerJ5k84c+/msdV3wltYWPsugOZfldT02Z1/ev1x6H9Nj9i1KLMUZiYZazEXFiQDc
-	yv0uWgMAAA==
-X-CMS-MailID: 20240213111438eucas1p2a98c23ee227dbb956dd07e7bd05798d5
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20240212144758eucas1p1345ba6f2000c10a4b33f8575f0a8d22b
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20240212144758eucas1p1345ba6f2000c10a4b33f8575f0a8d22b
-References: <20240212144736.1933112-1-maz@kernel.org>
-	<CGME20240212144758eucas1p1345ba6f2000c10a4b33f8575f0a8d22b@eucas1p1.samsung.com>
-	<20240212144736.1933112-3-maz@kernel.org>
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB5502.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ee2c3493-975a-424e-3ed6-08dc2c94ea1a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Feb 2024 13:08:47.3861
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: q9BVodFQX8pwMSShZVLSKhEbxpq4VA+HxowDqNDTevq9ys1JhfKPsWv3MVRZo0JwW8+MIC5KuQwjJ3ILTBBhvw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB4861
+X-OriginatorOrg: intel.com
 
-Hi
+Thanks for the comments, Shameer.
 
-On 12.02.2024 15:47, Marc Zyngier wrote:
-> We handle ID_AA64MMFR4_EL1.E2H0 being 0 as NV1 being present.
-> However, this is only true if FEAT_NV is implemented.
->
-> Add the required check to has_nv1(), avoiding spuriously advertising
-> NV1 on HW that doesn't have NV at all.
->
-> Fixes: da9af5071b25 ("arm64: cpufeature: Detect HCR_EL2.NV1 being RES0")
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> -----Original Message-----
+> From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> Sent: Thursday, February 8, 2024 8:17 PM
+> To: Zeng, Xin <xin.zeng@intel.com>; herbert@gondor.apana.org.au;
+> alex.williamson@redhat.com; jgg@nvidia.com; yishaih@nvidia.com; Tian, Kev=
+in
+> <kevin.tian@intel.com>
+> Cc: linux-crypto@vger.kernel.org; kvm@vger.kernel.org; qat-linux <qat-
+> linux@intel.com>; Cao, Yahui <yahui.cao@intel.com>
+> Subject: RE: [PATCH 10/10] vfio/qat: Add vfio_pci driver for Intel QAT VF=
+ devices
+>=20
+>=20
+> > +static struct qat_vf_migration_file *
+> > +qat_vf_save_device_data(struct qat_vf_core_device *qat_vdev)
+> > +{
+> > +	struct qat_vf_migration_file *migf;
+> > +	int ret;
+> > +
+> > +	migf =3D kzalloc(sizeof(*migf), GFP_KERNEL);
+> > +	if (!migf)
+> > +		return ERR_PTR(-ENOMEM);
+> > +
+> > +	migf->filp =3D anon_inode_getfile("qat_vf_mig", &qat_vf_save_fops,
+> > migf, O_RDONLY);
+> > +	ret =3D PTR_ERR_OR_ZERO(migf->filp);
+> > +	if (ret) {
+> > +		kfree(migf);
+> > +		return ERR_PTR(ret);
+> > +	}
+> > +
+> > +	stream_open(migf->filp->f_inode, migf->filp);
+> > +	mutex_init(&migf->lock);
+> > +
+> > +	ret =3D qat_vdev->mdev->ops->save_state(qat_vdev->mdev);
+> > +	if (ret) {
+> > +		fput(migf->filp);
+> > +		kfree(migf);
+>=20
+> Probably don't need that kfree(migf) here as fput() -->  qat_vf_release_f=
+ile () will
+> do that.
 
-This patch in turn introduces the following warning during boot 
-(observed on today's linux-next):
+Thanks, it's redundant, will update it in next version.
 
-CPU: All CPU(s) started at EL2
-CPU features: detected: 32-bit EL0 Support
-CPU features: detected: 32-bit EL1 Support
-CPU features: detected: CRC32 instructions
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 1 at arch/arm64/kernel/cpufeature.c:3369 
-this_cpu_has_cap+0x18/0x70
-Modules linked in:
-CPU: 0 PID: 1 Comm: swapper/0 Not tainted 6.8.0-rc4-next-20240213 #8014
-Hardware name: Khadas VIM3 (DT)
-pstate: 80000005 (Nzcv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-pc : this_cpu_has_cap+0x18/0x70
-lr : has_nv1+0x24/0xcc
-...
-Call trace:
-  this_cpu_has_cap+0x18/0x70
-  update_cpu_capabilities+0x50/0x134
-  setup_system_features+0x30/0x120
-  smp_cpus_done+0x48/0xb4
-  smp_init+0x7c/0x8c
-  kernel_init_freeable+0x18c/0x4e4
-  kernel_init+0x20/0x1d8
-  ret_from_fork+0x10/0x20
-irq event stamp: 2846
-hardirqs last  enabled at (2845): [<ffff80008012cf5c>] 
-console_unlock+0x164/0x190
-hardirqs last disabled at (2846): [<ffff80008123a078>] el1_dbg+0x24/0x8c
-softirqs last  enabled at (2842): [<ffff800080010a60>] 
-__do_softirq+0x4a0/0x4e8
-softirqs last disabled at (2827): [<ffff8000800169b0>] 
-____do_softirq+0x10/0x1c
----[ end trace 0000000000000000 ]---
-alternatives: applying system-wide alternatives
+>=20
+> > +static int qat_vf_pci_get_data_size(struct vfio_device *vdev,
+> > +				    unsigned long *stop_copy_length)
+> > +{
+> > +	struct qat_vf_core_device *qat_vdev =3D container_of(vdev,
+> > +			struct qat_vf_core_device, core_device.vdev);
+> > +
+> > +	*stop_copy_length =3D qat_vdev->mdev->state_size;
+>=20
+> Do we need a lock here or this is not changing?
 
+Yes, will update it in next version.
 
-> ---
->   arch/arm64/kernel/cpufeature.c | 5 +++--
->   1 file changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index 2f8958f27e9e..3421b684d340 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -1812,8 +1812,9 @@ static bool has_nv1(const struct arm64_cpu_capabilities *entry, int scope)
->   		{}
->   	};
->   
-> -	return !(has_cpuid_feature(entry, scope) ||
-> -		 is_midr_in_range_list(read_cpuid_id(), nv1_ni_list));
-> +	return (this_cpu_has_cap(ARM64_HAS_NESTED_VIRT) &&
-> +		!(has_cpuid_feature(entry, scope) ||
-> +		  is_midr_in_range_list(read_cpuid_id(), nv1_ni_list)));
->   }
->   
->   #if defined(ID_AA64MMFR0_EL1_TGRAN_LPA2) && defined(ID_AA64MMFR0_EL1_TGRAN_2_SUPPORTED_LPA2)
+>=20
+> > +	return 0;
+> > +}
+> > +
+> > +static const struct vfio_migration_ops qat_vf_pci_mig_ops =3D {
+> > +	.migration_set_state =3D qat_vf_pci_set_device_state,
+> > +	.migration_get_state =3D qat_vf_pci_get_device_state,
+> > +	.migration_get_data_size =3D qat_vf_pci_get_data_size,
+> > +};
+> > +
+> > +static void qat_vf_pci_release_dev(struct vfio_device *core_vdev)
+> > +{
+> > +	struct qat_vf_core_device *qat_vdev =3D container_of(core_vdev,
+> > +			struct qat_vf_core_device, core_device.vdev);
+> > +
+> > +	qat_vdev->mdev->ops->cleanup(qat_vdev->mdev);
+> > +	qat_vfmig_destroy(qat_vdev->mdev);
+> > +	mutex_destroy(&qat_vdev->state_mutex);
+> > +	vfio_pci_core_release_dev(core_vdev);
+> > +}
+> > +
+> > +static int qat_vf_pci_init_dev(struct vfio_device *core_vdev)
+> > +{
+> > +	struct qat_vf_core_device *qat_vdev =3D container_of(core_vdev,
+> > +			struct qat_vf_core_device, core_device.vdev);
+> > +	struct qat_migdev_ops *ops;
+> > +	struct qat_mig_dev *mdev;
+> > +	struct pci_dev *parent;
+> > +	int ret, vf_id;
+> > +
+> > +	core_vdev->migration_flags =3D VFIO_MIGRATION_STOP_COPY |
+> > VFIO_MIGRATION_P2P;
+> > +	core_vdev->mig_ops =3D &qat_vf_pci_mig_ops;
+> > +
+> > +	ret =3D vfio_pci_core_init_dev(core_vdev);
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > +	mutex_init(&qat_vdev->state_mutex);
+> > +	spin_lock_init(&qat_vdev->reset_lock);
+> > +
+> > +	parent =3D qat_vdev->core_device.pdev->physfn;
+>=20
+> Can we use pci_physfn() here?
 
-Best regards
--- 
-Marek Szyprowski, PhD
-Samsung R&D Institute Poland
+Sure, will update it in next version.
+
+>=20
+> > +	vf_id =3D pci_iov_vf_id(qat_vdev->core_device.pdev);
+> > +	if (!parent || vf_id < 0) {
+>=20
+> Also if the pci_iov_vf_id() return success I don't think you need to
+> check for parent and can use directly below.
+
+OK, will update it in next version.
+
+>=20
+> > +		ret =3D -ENODEV;
+> > +		goto err_rel;
+> > +	}
+> > +
+> > +	mdev =3D qat_vfmig_create(parent, vf_id);
+> > +	if (IS_ERR(mdev)) {
+> > +		ret =3D PTR_ERR(mdev);
+> > +		goto err_rel;
+> > +	}
+> > +
+> > +	ops =3D mdev->ops;
+> > +	if (!ops || !ops->init || !ops->cleanup ||
+> > +	    !ops->open || !ops->close ||
+> > +	    !ops->save_state || !ops->load_state ||
+> > +	    !ops->suspend || !ops->resume) {
+> > +		ret =3D -EIO;
+> > +		dev_err(&parent->dev, "Incomplete device migration ops
+> > structure!");
+> > +		goto err_destroy;
+> > +	}
+>=20
+> If all these ops are a must why cant we move the check inside the
+> qat_vfmig_create()?
+> Or rather call them explicitly as suggested by Jason.
+
+We can do it, but it might make sense to leave the check to the APIs' user
+as some of these ops interfaces might be optional for other QAT variant dri=
+ver
+in future.
+
+Thanks,
+Xin
 
 
