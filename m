@@ -1,182 +1,125 @@
-Return-Path: <kvm+bounces-8677-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8678-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D55448549A4
-	for <lists+kvm@lfdr.de>; Wed, 14 Feb 2024 13:52:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CAE78549A8
+	for <lists+kvm@lfdr.de>; Wed, 14 Feb 2024 13:53:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B14E1F22461
-	for <lists+kvm@lfdr.de>; Wed, 14 Feb 2024 12:52:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 512A91F22C61
+	for <lists+kvm@lfdr.de>; Wed, 14 Feb 2024 12:53:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D95953E2D;
-	Wed, 14 Feb 2024 12:50:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A72F52F6D;
+	Wed, 14 Feb 2024 12:51:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="WcdFLlaa"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="GMN/CsU+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D14E01A731
-	for <kvm@vger.kernel.org>; Wed, 14 Feb 2024 12:50:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3F3F52F85
+	for <kvm@vger.kernel.org>; Wed, 14 Feb 2024 12:51:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707915015; cv=none; b=CqgucXYFGFuwYPDDXZKv6eWsl4FL3K2Wsw/10bftL6JTJnL648EYvKeIQ9Ylh44E1vf0eRWv/ZG6qwQW8CVz7UMyvZUWLWJjrQQG0rcbzjcClC7s3eeFNUA55wjjYY/kZUBj8tNAazxL1CL0Qjysnn5mx9yF55jzRnlhLbYnEA4=
+	t=1707915088; cv=none; b=hafKB5kY3svZfnwj5uout/gydv9aBymAKkpbli789qAA7h/+L45Lh9s7XdmrDl3RSDKJlI5qDRjs/2dk60FPgjvWmCnT/Olu5grtTorCe7xeK47p2beU+ycmN5UFu+8DbuZPIHWmYeDCPyriq4pRK1mKu4shLYRkq3oagkgZmDc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707915015; c=relaxed/simple;
-	bh=KpjBVrl5aQuEGzI803dJi8LHosgzPGbHu6PQfze70eM=;
+	s=arc-20240116; t=1707915088; c=relaxed/simple;
+	bh=NRKgQ5xd7aPjDmfzvh3+L8eHFdNy88jlx9DFG955+Dw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XdBLLoawnc7rsLa7YCkPSaBU8NwalLJ1pYJyGe6GsLZuGSZcqA+pc7HN2Ox3zQqIfgsi6N4FHW2AdWluBg9oSDp4LO0xM19egoaZ1pmUXEZX+dpTPZM39ddVM76r/B0b23M5ixYvneiipZwrGK1tjWtaPF9Wtm5EW6g2uZ5i2Vw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=WcdFLlaa; arc=none smtp.client-ip=209.85.167.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-511570b2f49so645916e87.1
-        for <kvm@vger.kernel.org>; Wed, 14 Feb 2024 04:50:13 -0800 (PST)
+	 To:Cc:Content-Type; b=JzlxfInkFKpF9F8aM6SF8r8nokZpQviBcVwpleVEjEKfQNq9a5cg0HhiE5W5AVWmKjv5YhWIyiP1b/XerWKQVGFRag+tIzGxo8H2/GceYAjPG6qjCYpXZkerUTEn8itF7Pi3YxMWOMqGaNnAVTyMMWfDBtZvL8Qu5mahotA3nUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=GMN/CsU+; arc=none smtp.client-ip=209.85.166.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-363a76d0c71so28886545ab.1
+        for <kvm@vger.kernel.org>; Wed, 14 Feb 2024 04:51:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1707915012; x=1708519812; darn=vger.kernel.org;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1707915086; x=1708519886; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1AMykLLGhEQwe/ayb8QFjtzszmK1UF91DSb771zya9A=;
-        b=WcdFLlaawsWV863AQOogIuEimZPu/S4Tct6X/YzPAWE1D+YHNUI217k/5EJgvcju1k
-         vMBlD+p7qWdC+kPN8eHZlLtV2ehhM5mL60EtLsrYovz4GTzNctx+BjNZFAvdsS+vQl6Q
-         y4cQweTO9EcwvnTz9XIvB24JNLT/uEoOiV4cjLat2nm7R2GceF0e7kMT7KYtBYqyfUBF
-         h1BUGLslZkMJrmpFGLsKyXqFdtMXL985hdKNKuVRxaSHs8+KBov7yfCy7rwpvjd5DEOB
-         uFWTwySr2EWUZvp0bdB5ZjEOjByIbvXXSzJA4sgtvOTEDvwK3I4jUVTSokySKXVjZ0K3
-         TBHQ==
+        bh=dlE+5//qS+/xZnz7hlxef6HTqWg9D1lQXch4tJvR30k=;
+        b=GMN/CsU+JtX/rxo+stTZpjzBVWaxS2Zjw8ryhnGudHOZuC7ryKiPBWNuofGyKdu8DX
+         ziqitmfEG71A04j4AqFP6y/Pg4Ec9rAEuAw527zqjloO2YWG9aF6VIqMqm+tBckh6hlE
+         2qWr2dJ7Qhw0vrzBEOScN7jZyBlqDBr3Ghu+WalhVEedMKZRsQnYIaFlOcD8Q0axbBDP
+         UYdTnWyg9mTGYSA/RmbH8g9FMZspBd+PZUA/uZ5qt2qZWmHel6CaS4/nDOTK2AduGr7m
+         HWuNs1SkPZdE4yiwZeuhEl88hSU1lu8g5eLxAlVJ2BLRW8d7Fail2SxeuwTFr6diRN3Q
+         D9bw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707915012; x=1708519812;
+        d=1e100.net; s=20230601; t=1707915086; x=1708519886;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=1AMykLLGhEQwe/ayb8QFjtzszmK1UF91DSb771zya9A=;
-        b=Khmg1uQRcuCz2az/CKSYZRvRcwvI4cc/8cWsiQVEVQWwXErG7cQwkLitXG/yOQY2+L
-         mRwgiYwfyNL6WohjYQ3aALbPo/EGYwCJh1libQazWUoCR2jdtlr90YQw2PNl+zp8jXrL
-         TkXFsjFILNdYNVm37BhRTsL3PceiGYV66j3MkktKvIimNCS8jq4hGHsiIe7ONWFaFQn2
-         3xjPDT/JFtgOS8n4BK/4m/+QnV4jQfZFuSC5Um+vMQa6hnBbgLCZ5fAVRMN0SiUJkc7D
-         nvVe2QcZE/H346Un301U264j+Qs5tKiFNPqyQu1pINQrgcV8h8pczd11lBL775rgYE7k
-         kYFA==
-X-Gm-Message-State: AOJu0YyxJVMR8MhynsxCaGP0yByVEk1VGwfmuYpG82wnwc40MznguUj6
-	ecm8AHjrbLIi8psVSzEI7oI+qQU9Qhknh7mPpUDnAUvwZqbLohhRKsG1VQf4nG3mYEu2J1CelpG
-	favli+HrEvgDW9hCZ53Gt0krRS94F01MqlDeaIw==
-X-Google-Smtp-Source: AGHT+IF7lALDcbF5Q4R3nObQ/8vNabeZYsaSldg7JH1sBIcNmbrPAvYfOnO2znsaCZflsROdJRWeT9t+nrpLeoSNNk8=
-X-Received: by 2002:a05:6512:3d17:b0:511:ac5c:e02f with SMTP id
- d23-20020a0565123d1700b00511ac5ce02fmr531327lfv.8.1707915011510; Wed, 14 Feb
- 2024 04:50:11 -0800 (PST)
+        bh=dlE+5//qS+/xZnz7hlxef6HTqWg9D1lQXch4tJvR30k=;
+        b=Lvpm0OdmlWKWRA+psAJtjq73GPCNfuqsbsd/bRnP+lXGFALjs/Q1bU7sc+x8Y1n7/m
+         uYq3GUTBvRao70mM+xLOzb+74/sw/YA37tP6o4zPKBrR+R55YEC0lKLkN1tKg6/3iw/f
+         M3a3xSly2Gm4MD3JzFwo8rsdvR9vrm/eJyRfLXf9sAZmGKFYjAFqFCqGU3flXF9+Zxon
+         3/6n6lrx6GFYjF8gYiWMWcUC3P1mLopSJo0npxEFmJz1HMqZzfv0IEtQTbBJf9iKgkRW
+         nF66PNvmDRQhrFvoRVyCKksTvfoLER7S01Vq+yrxVSV4g7ShHVpq7D36rXZ5kEm0H44m
+         wMMg==
+X-Gm-Message-State: AOJu0YzVMZ+S2ws48VAbfc66YXEQs9FM2PDSL42ULehWkX2tKW3gYvxH
+	r+57CSS4lo8dc+53NtdlflsEHfqfLPH9d2LMqj4swwdf7lHMD4+iUmF8ogKDr4ATlWouwOJToUO
+	FCD3F1r2a/hxacJMrq4KdIlWXHzbxr8APZq52MQza4cIKL1Yp
+X-Google-Smtp-Source: AGHT+IH5toyAKQlgoY81U4oGqHLgZSdDjfNlcaKzl8FQBh03URGRSr3wa3VhmieTugA3aFbkkerPGoHhFFR6gmHxn34=
+X-Received: by 2002:a05:6e02:52c:b0:363:c3d7:ad0f with SMTP id
+ h12-20020a056e02052c00b00363c3d7ad0fmr3220365ils.28.1707915085769; Wed, 14
+ Feb 2024 04:51:25 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240206074931.22930-1-duchao@eswincomputing.com> <20240206074931.22930-2-duchao@eswincomputing.com>
-In-Reply-To: <20240206074931.22930-2-duchao@eswincomputing.com>
-From: Anup Patel <apatel@ventanamicro.com>
-Date: Wed, 14 Feb 2024 18:19:59 +0530
-Message-ID: <CAK9=C2VZ1t3ctTWKiqeKOALjLh0kJgzVEsZvM=xfc2j7yQOEcQ@mail.gmail.com>
-Subject: Re: [PATCH v1 1/3] RISC-V: KVM: Implement kvm_arch_vcpu_ioctl_set_guest_debug()
+References: <20240206074931.22930-1-duchao@eswincomputing.com> <20240206074931.22930-3-duchao@eswincomputing.com>
+In-Reply-To: <20240206074931.22930-3-duchao@eswincomputing.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Wed, 14 Feb 2024 18:21:14 +0530
+Message-ID: <CAAhSdy0xYr6jKRdYzTTGfTe26WUC352u1HFd727z7EXA+8AnCQ@mail.gmail.com>
+Subject: Re: [PATCH v1 2/3] RISC-V: KVM: Handle breakpoint exits for VCPU
 To: Chao Du <duchao@eswincomputing.com>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, anup@brainfault.org, 
-	atishp@atishpatra.org, pbonzini@redhat.com, shuah@kernel.org, 
-	dbarboza@ventanamicro.com, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu, duchao713@qq.com
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, atishp@atishpatra.org, 
+	pbonzini@redhat.com, shuah@kernel.org, dbarboza@ventanamicro.com, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
+	duchao713@qq.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Tue, Feb 6, 2024 at 1:22=E2=80=AFPM Chao Du <duchao@eswincomputing.com> =
 wrote:
 >
-> kvm_vm_ioctl_check_extension(): Return 1 if KVM_CAP_SET_GUEST_DEBUG is
-> being checked.
->
-> kvm_arch_vcpu_ioctl_set_guest_debug(): Update the guest_debug flags
-> from userspace accordingly. Route the breakpoint exceptions to HS mode
-> if the VM is being debugged by userspace, by clearing the corresponding
-> bit in hedeleg CSR.
+> Exit to userspace for breakpoint traps. Set the exit_reason as
+> KVM_EXIT_DEBUG before exit.
 >
 > Signed-off-by: Chao Du <duchao@eswincomputing.com>
-> ---
->  arch/riscv/include/uapi/asm/kvm.h |  1 +
->  arch/riscv/kvm/vcpu.c             | 15 +++++++++++++--
->  arch/riscv/kvm/vm.c               |  1 +
->  3 files changed, 15 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/=
-asm/kvm.h
-> index d6b7a5b95874..8890977836f0 100644
-> --- a/arch/riscv/include/uapi/asm/kvm.h
-> +++ b/arch/riscv/include/uapi/asm/kvm.h
-> @@ -17,6 +17,7 @@
->
->  #define __KVM_HAVE_IRQ_LINE
->  #define __KVM_HAVE_READONLY_MEM
-> +#define __KVM_HAVE_GUEST_DEBUG
->
->  #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
->
-> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> index b5ca9f2e98ac..6cee974592ac 100644
-> --- a/arch/riscv/kvm/vcpu.c
-> +++ b/arch/riscv/kvm/vcpu.c
-> @@ -475,8 +475,19 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu =
-*vcpu,
->  int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
->                                         struct kvm_guest_debug *dbg)
->  {
-> -       /* TODO; To be implemented later. */
-> -       return -EINVAL;
-> +       if (dbg->control & KVM_GUESTDBG_ENABLE) {
-> +               if (vcpu->guest_debug !=3D dbg->control) {
-> +                       vcpu->guest_debug =3D dbg->control;
-> +                       csr_clear(CSR_HEDELEG, BIT(EXC_BREAKPOINT));
-> +               }
-> +       } else {
-> +               if (vcpu->guest_debug !=3D 0) {
-> +                       vcpu->guest_debug =3D 0;
-> +                       csr_set(CSR_HEDELEG, BIT(EXC_BREAKPOINT));
-> +               }
-> +       }
 
-This is broken because directly setting breakpoint exception delegation
-in CSR also affects other VCPUs running on the same host CPU.
+Looks good to me.
 
-To address the above, we should do the following:
-1) Add "unsigned long hedeleg" in "struct kvm_vcpu_config" which
-   is pre-initialized in kvm_riscv_vcpu_setup_config() without setting
-   EXC_BREAKPOINT bit.
-2) The kvm_arch_vcpu_ioctl_set_guest_debug() should only set/clear
-    EXC_BREAKPOINT bit in "hedeleg" of "struct kvm_vcpu_config".
-3) The kvm_riscv_vcpu_swap_in_guest_state() must write the
-     HEDELEG csr before entering the Guest/VM.
+Reviewed-by: Anup Patel <anup@brainfault.org>
 
 Regards,
 Anup
 
-> +
-> +       return 0;
->  }
+> ---
+>  arch/riscv/kvm/vcpu_exit.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 >
->  static void kvm_riscv_vcpu_setup_config(struct kvm_vcpu *vcpu)
-> diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
-> index ce58bc48e5b8..7396b8654f45 100644
-> --- a/arch/riscv/kvm/vm.c
-> +++ b/arch/riscv/kvm/vm.c
-> @@ -186,6 +186,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, lon=
-g ext)
->         case KVM_CAP_READONLY_MEM:
->         case KVM_CAP_MP_STATE:
->         case KVM_CAP_IMMEDIATE_EXIT:
-> +       case KVM_CAP_SET_GUEST_DEBUG:
->                 r =3D 1;
+> diff --git a/arch/riscv/kvm/vcpu_exit.c b/arch/riscv/kvm/vcpu_exit.c
+> index 2415722c01b8..5761f95abb60 100644
+> --- a/arch/riscv/kvm/vcpu_exit.c
+> +++ b/arch/riscv/kvm/vcpu_exit.c
+> @@ -204,6 +204,10 @@ int kvm_riscv_vcpu_exit(struct kvm_vcpu *vcpu, struc=
+t kvm_run *run,
+>                 if (vcpu->arch.guest_context.hstatus & HSTATUS_SPV)
+>                         ret =3D kvm_riscv_vcpu_sbi_ecall(vcpu, run);
 >                 break;
->         case KVM_CAP_NR_VCPUS:
+> +       case EXC_BREAKPOINT:
+> +               run->exit_reason =3D KVM_EXIT_DEBUG;
+> +               ret =3D 0;
+> +               break;
+>         default:
+>                 break;
+>         }
 > --
 > 2.17.1
 >
->
-> --
-> kvm-riscv mailing list
-> kvm-riscv@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/kvm-riscv
 
