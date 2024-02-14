@@ -1,135 +1,118 @@
-Return-Path: <kvm+bounces-8710-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8711-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D24268553CE
-	for <lists+kvm@lfdr.de>; Wed, 14 Feb 2024 21:16:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C51C855468
+	for <lists+kvm@lfdr.de>; Wed, 14 Feb 2024 21:55:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E6891F2333D
-	for <lists+kvm@lfdr.de>; Wed, 14 Feb 2024 20:16:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF4E81C22326
+	for <lists+kvm@lfdr.de>; Wed, 14 Feb 2024 20:55:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E566113DBBD;
-	Wed, 14 Feb 2024 20:16:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 279B813EFF3;
+	Wed, 14 Feb 2024 20:55:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VYFjoJX5"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Pk1ICBHh"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19A2B13DB9F;
-	Wed, 14 Feb 2024 20:16:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E70F213EFF2
+	for <kvm@vger.kernel.org>; Wed, 14 Feb 2024 20:55:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707941787; cv=none; b=HL8t4CqWyN34YgYn/73PT/bchuZTriGw9KxNnuQSA+t+/blLMTVQ8PXIr4WJSrVffWmy+MSlV/HYkc4k/I7jTgMjSQsdz1EUY87HifpSOYyqEmMn43n2MNIcn+flHVhfdp8SGd187hShrSFfAThzfxlMZaoSTKURkiG8iY60Z+g=
+	t=1707944124; cv=none; b=h6EhCZdFkuMAuVtsnhdoUAf5x7PGARCj6r00GCiULuHVj5ZKO0g6rydGIR3v9T5zv66lXAnjmkPE4YGu5XMyGt+5AEzVOkrD8e4GNXnuzaIbL+eT1kzcBl/G7LrbCNihLOe3jddthFHg8GDup/SGpOTetVHs7ZG6El/dsOeJ6h4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707941787; c=relaxed/simple;
-	bh=m48ScHz01LrC5ODGklW8vI2Tg3kZV3wo3kXFm58JWJw=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=c+3aZPRYCxFy3qNTk8vF7dSz1wYJ4CXWYE9QLZJ0MBX7Ne3v/aDbvV/zQYGubedkgdqDq2TlUD4y1bn960MtEMBZkl+ZBVi8HObI+J2mP3/Fyspd0qqOj8fgDJhr4EoDhNHZihw2hvbLFWELpUB+G/sW725TX7FaZwpGrNoYnrM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VYFjoJX5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78F37C433F1;
-	Wed, 14 Feb 2024 20:16:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707941786;
-	bh=m48ScHz01LrC5ODGklW8vI2Tg3kZV3wo3kXFm58JWJw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=VYFjoJX5/XIUVyjrzowPYK1H26pv6+cowKdJ5tPwIUAGpLwwlVKx8ikQnnol+Obvv
-	 hyylNjPsdOwfj8b+3r+odjV42Roke+V9O9zp6LN5fIl/IE90hG8GjKFT4kJAiFzTVd
-	 dGYW0OXvg2jQPhjgF5XyuNYl1a69JIseb1oABrBk30DBI8usfowLVejTXdtoyX2kgC
-	 fbVBGDDb+4LQK/jA8gcPua0+ddVzOEb0xTWeg03XjwMjTw9Qr+8cHSbMkV4RuyWYwE
-	 MyHyGCeu212J6CDVcaRkPp6Fw4Ks8fk8Q8xuGY0K/WGB6RUEHxLJODD+edN0yusl75
-	 umt5Rao0p+9rg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1raLg8-003GNh-33;
-	Wed, 14 Feb 2024 20:16:24 +0000
-Date: Wed, 14 Feb 2024 20:16:23 +0000
-Message-ID: <86ttma4x9k.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Eric Auger <eauger@redhat.com>
-Cc: Jing Zhang <jingzhangos@google.com>,
-	KVM <kvm@vger.kernel.org>,
-	KVMARM <kvmarm@lists.linux.dev>,
-	ARMLinux <linux-arm-kernel@lists.infradead.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Will Deacon <will@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
+	s=arc-20240116; t=1707944124; c=relaxed/simple;
+	bh=3iFXhBXrEO5fMGfS3YlOFuiqKJb2jToIVEM1adjf3KE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fXyWIUv3oxnSFCrUApeDIoKiGw9zlJiVCGd2VZF0mNRmr9uUTJNAl8ADE7WeGB5s6c+k3eJyyu7UzLxtjzjkLEdyC9BT3zCiZJrzWzJf3Ror41Awr4iK/oRXAhhtT2fdVFl6TMXGEHgY1yUpc2+H/KiNGE5tSScafaWz3TkaYXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Pk1ICBHh; arc=none smtp.client-ip=91.218.175.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Wed, 14 Feb 2024 12:55:11 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1707944119;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xo8269aewKOfShv/31KAAKnpB/F7S+Kl3+Lk1/FPD3g=;
+	b=Pk1ICBHhIE2T5qz5LlX4RF1DHCijddx53Q7QHWurpgjANNIC33z13Uq6ipi2CzOcOeqdhg
+	w/lP6rjgfoYdEZWWP+xT9pzh+YW4UGPBq4xUkainwHB4dsNoMuCAhDvTmTjjN/6DiCOZ6p
+	/k8iGjl1Iy8+O/twNjnbNz7WKb+nXKs=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
 	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Suraj Jitindar Singh <surajjs@amazon.com>,
-	Cornelia Huck
- <cohuck@redhat.com>,
-	Shaoqin Huang <shahuang@redhat.com>,
-	Sebastian Ott <sebott@redhat.com>
-Subject: Re: [PATCH v1 2/4] KVM: arm64: Document KVM_ARM_GET_REG_WRITABLE_MASKS
-In-Reply-To: <25434f0e-d9c9-45dc-82a1-7466bc59a6e2@redhat.com>
-References: <20230919175017.538312-1-jingzhangos@google.com>
-	<20230919175017.538312-3-jingzhangos@google.com>
-	<82b72bd2-c079-40c3-90b8-30174f2a8fe0@redhat.com>
-	<86a5o45sb8.wl-maz@kernel.org>
-	<25434f0e-d9c9-45dc-82a1-7466bc59a6e2@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Zenghui Yu <yuzenghui@huawei.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 19/23] KVM: selftests: Add a minimal library for
+ interacting with an ITS
+Message-ID: <Zc0orzU-CeKEyx3j@linux.dev>
+References: <20240213093250.3960069-1-oliver.upton@linux.dev>
+ <20240213094114.3961683-1-oliver.upton@linux.dev>
+ <86zfw33qae.wl-maz@kernel.org>
+ <Zc0NsFm40nIqTmRf@linux.dev>
+ <86v86q4xkf.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: eauger@redhat.com, jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, will@kernel.org, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, tabba@google.com, surajjs@amazon.com, cohuck@redhat.com, shahuang@redhat.com, sebott@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86v86q4xkf.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-Hi Eric,
-
-On Wed, 14 Feb 2024 18:07:58 +0000,
-Eric Auger <eauger@redhat.com> wrote:
-> 
-> > I'm not sure SEIS is such an easy one: if you promised the guest that
-> > it would never get an SError doing the most stupid things (SEIS=0), it
-> > really shouldn't get one after migration. If you advertised it on the
-> > source HW (Altra), a migration to TX2 would be fine.
-> I see. Indeed for sure we must make sure KVM cannot inject SEIs in the
-> guest if SEIS is not advertised on guest side.
-
-The problem isn't KVM injecting an SError, but the HW doing it (that's
-what SEIS indicates). On some HW, it only takes an old enough EFI
-build to trigger those.
-
-> In this case SEIS is 0 on src Altra. On dst TX2 ich_vtr_el2 advertises
-> it and host seis =1 causing set_gic_ctlr to fail (vgic-sys-reg-v3.c).
-> 
+On Wed, Feb 14, 2024 at 08:09:52PM +0000, Marc Zyngier wrote:
+> > If the order of restore from userspace is CBASER, CWRITER, CREADR then
+> > we **wind up replaying the entire command queue**. While insane, I'm
+> > pretty sure it is legal for the guest to write garbage after the read
+> > pointer has moved past a particular command index.
 > > 
-> > The other bits are possible to change depending on the requirements of
-> > the VM (aff3, IDBits), and ExtRange should always be set to 0 (because
-> > our GIC implementation doesn't support EPPI/ESPI).
+> > Fsck!!!
+> 
+> This is documented Documentation/virt/kvm/devices/arm-vgic-its.rst to
+> some extent, and it is allowed for the guest to crap itself on behalf
+> of userspace if the ordering isn't respected.
+
+Ah, fair, I missed the documentation here. If we require userspace to
+write CTLR last then we _should_ be fine, but damn is this a tricky set
+of expectations.
+
+> > So, how about we do this:
 > > 
-> > The really ugly part here is that if you want to affect these bits,
-> > you will need to trap and emulate the access. Not a big deal, but in
-> > the absence of FGT, you will need to handle the full Common trap
-> > group, which is going to slow things down (you will have to trap
-> > ICV_PMR_EL1, for example).
-> Would it be sensible to simplify things and only support the new range
-> if FGT is supported?
+> >  - Provide a uaccess hook for CWRITER that changes the write-pointer
+> >    without processing any commands
+> > 
+> >  - Assert an invariant that at any time CWRITER or CREADR are read from
+> >    userspace that CREADR == CWRITER. Fail the ioctl and scream if that
+> >    isn't the case, so that way we never need to worry about processing
+> >    'in-flight' commands at the destination.
+> 
+> Are we guaranteed that we cannot ever see CWRITER != CREADR at VM
+> dumping time? I'm not convinced that we cannot preempt the vcpu thread
+> at the right spot, specially given that you can have an arbitrary
+> large batch of commands to execute.
+> 
+> Just add a page-fault to the mix, and a signal pending. Pronto, you
+> see a guest exit and you should be able to start dumping things
+> without the ITS having processed much. I haven't tried, but that
+> doesn't seem totally unlikely.
 
-I'm not sure that helps. The only FGT that covers the GIC is for
-ICC_IGRPENn_EL1, and we don't care much about that guy. So
-ICH_VMCR_EL2.TC it is, and that sucks a bit. But if that's what you
-want to show, you don't have a choice.
+Well, we would need to run all userspace reads and writes through the
+cmd_lock in this case, which is what we already do for the CREADR
+uaccess hook. To me the 'racy' queue accessors only make sense for guest
+accesses, since the driver is expecting to poll for completion in that
+case.
 
-Thanks,
-
-	M.
+Otherwise we decide the existing rules for restoring the ITS are fine
+and I get to keep my funky driver :)
 
 -- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+Oliver
 
