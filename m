@@ -1,48 +1,48 @@
-Return-Path: <kvm+bounces-8658-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8654-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEB75854714
-	for <lists+kvm@lfdr.de>; Wed, 14 Feb 2024 11:24:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D53278546F0
+	for <lists+kvm@lfdr.de>; Wed, 14 Feb 2024 11:16:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A158286F27
-	for <lists+kvm@lfdr.de>; Wed, 14 Feb 2024 10:24:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7342A1F2250F
+	for <lists+kvm@lfdr.de>; Wed, 14 Feb 2024 10:16:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4777818E14;
-	Wed, 14 Feb 2024 10:24:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27A171759D;
+	Wed, 14 Feb 2024 10:16:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=xen0n.name header.i=@xen0n.name header.b="cOXRPrNH"
+	dkim=pass (1024-bit key) header.d=xen0n.name header.i=@xen0n.name header.b="GlwHXq5K"
 X-Original-To: kvm@vger.kernel.org
 Received: from mailbox.box.xen0n.name (mail.xen0n.name [115.28.160.31])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A31C17580;
-	Wed, 14 Feb 2024 10:24:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC7B6171AC;
+	Wed, 14 Feb 2024 10:16:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.28.160.31
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707906251; cv=none; b=Qf1eM5pBlmM4diWjd0xnMZTc3II49uzoy/QGSwRmoUXPwncFQHXJoFl/PS9RwVShM5dhrZAn19tHmVAmdMFjD6fbyPzle5SCEiM4Skv09G3vC2hXhreYsUK8b4dIXiGQkUu0fNMISBms+8AefoDuOkS712vBZr9FMgyJVkld0cE=
+	t=1707905776; cv=none; b=FIODYYogxAa11CEkW/fGtmx/kKMzXlz0nmGQ8wqsgrc04OO0eAjNW8TR3DwRdcbMj9u245URdGWhzCYHnJ6uE3gwgM/AmA3R2jjdni6RG2MzLgZVDEA1GtI35FqUVL3l6F/Ll1MmoZizonbGOAJ94gn1bET+Ml/YuQe7nIpppIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707906251; c=relaxed/simple;
-	bh=UEF3EtzASKcetwcq4bXXyQ5NmYXr4KVcBieRDjHk7ok=;
+	s=arc-20240116; t=1707905776; c=relaxed/simple;
+	bh=eTiNyXEgBPCIo0Ta8sYgjRV8p1Xz0hDcVMygIqs3U3E=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AmF+v2zuuLJ+cZXvpiGtgGFjtsOdQ3BrWdjiYCtA4X3BKb6Dhuth1CaUnnzfxtsYpApDVILM/9nMkCaLHMWi1YLa5neZSkVHz/fgldzO9dQWPeKdQ7vl4eOzbVsoQnsQrkL/EdSDCwN8QMrWUSiB1HSbMhBu2k5pKdH6+I9h1WU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xen0n.name; spf=pass smtp.mailfrom=xen0n.name; dkim=pass (1024-bit key) header.d=xen0n.name header.i=@xen0n.name header.b=cOXRPrNH; arc=none smtp.client-ip=115.28.160.31
+	 MIME-Version; b=B5mwd8xgekWIEmHy+vF+v+ucle1Ufa2ZiCOtLm86cDh0gNHTttCFWe9V6N8fd82yIsaJo9lcyFREDdIqaio30wMzkjTrm9xQhirtYjEwxr5sJRAEUBCqP8s55BKeWuMj3q9yBH3mO5cBTfkDewuYUkki7LAIPGZsCeDGPm2PXYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xen0n.name; spf=pass smtp.mailfrom=xen0n.name; dkim=pass (1024-bit key) header.d=xen0n.name header.i=@xen0n.name header.b=GlwHXq5K; arc=none smtp.client-ip=115.28.160.31
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xen0n.name
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xen0n.name
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xen0n.name; s=mail;
-	t=1707905768; bh=UEF3EtzASKcetwcq4bXXyQ5NmYXr4KVcBieRDjHk7ok=;
+	t=1707905769; bh=eTiNyXEgBPCIo0Ta8sYgjRV8p1Xz0hDcVMygIqs3U3E=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=cOXRPrNHUvE8DHxSgDP4KOW6f/OrLuGnwlp5dJvrkprvNZtiBseCBWzy34+S2cOTV
-	 dKjfN/r4Z98QKBWNK3waITUgB5aV9t5UEheqlf46SUTbg2tDX5NboTSAp6G3iaD3Xv
-	 rGeZl+8u96PemsRIQ8TRmwxJnF7t4DD5z+er+/dM=
+	b=GlwHXq5KtlJN3WjzDugZTkyJEy5LHE+ExYx073zzj48EYrqsL7zgxjG0jH/CXdUWu
+	 lHC5BxTxuznnRWa29bxkSyDY9QBTn3MlyULKk31DvSXmHgOaImFsYVGo+Dmwyixr+h
+	 HhHqPrIQO+kYbav4MpoP9qcNYRLyGihzdZ4frvdI=
 Received: from ld50.lan (unknown [IPv6:240e:388:8d00:6500:5531:eef6:1274:cebe])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mailbox.box.xen0n.name (Postfix) with ESMTPSA id A1FE5601C6;
-	Wed, 14 Feb 2024 18:16:08 +0800 (CST)
+	by mailbox.box.xen0n.name (Postfix) with ESMTPSA id 9843160562;
+	Wed, 14 Feb 2024 18:16:09 +0800 (CST)
 From: WANG Xuerui <kernel@xen0n.name>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Huacai Chen <chenhuacai@kernel.org>
@@ -52,9 +52,9 @@ Cc: Tianrui Zhao <zhaotianrui@loongson.cn>,
 	loongarch@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	WANG Xuerui <git@xen0n.name>
-Subject: [PATCH for-6.8 4/5] KVM: LoongArch: Streamline control flow of kvm_check_cpucfg
-Date: Wed, 14 Feb 2024 18:15:56 +0800
-Message-ID: <20240214101557.2900512-5-kernel@xen0n.name>
+Subject: [PATCH for-6.8 5/5] KVM: LoongArch: Clean up comments of _kvm_get_cpucfg_mask and kvm_check_cpucfg
+Date: Wed, 14 Feb 2024 18:15:57 +0800
+Message-ID: <20240214101557.2900512-6-kernel@xen0n.name>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240214101557.2900512-1-kernel@xen0n.name>
 References: <20240214101557.2900512-1-kernel@xen0n.name>
@@ -68,58 +68,73 @@ Content-Transfer-Encoding: 8bit
 
 From: WANG Xuerui <git@xen0n.name>
 
-All the checks currently done in kvm_check_cpucfg can be realized with
-early returns, so just do that to avoid extra cognitive burden related
-to the return value handling.
-
-The default branch is unreachable because of the earlier validation by
-_kvm_get_cpucfg_mask, so mark it as such too to make things clearer.
+Remove comments that are merely restatement of the code nearby, and
+paraphrase the rest so they read more natural for English speakers (that
+lack understanding of Chinese grammar). No functional changes.
 
 Signed-off-by: WANG Xuerui <git@xen0n.name>
 ---
- arch/loongarch/kvm/vcpu.c | 23 +++++++++++------------
- 1 file changed, 11 insertions(+), 12 deletions(-)
+ arch/loongarch/kvm/vcpu.c | 26 +++++++++++---------------
+ 1 file changed, 11 insertions(+), 15 deletions(-)
 
 diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
-index e973500611b4..9e108ffaba30 100644
+index 9e108ffaba30..ff51d6ba59aa 100644
 --- a/arch/loongarch/kvm/vcpu.c
 +++ b/arch/loongarch/kvm/vcpu.c
-@@ -339,24 +339,23 @@ static int kvm_check_cpucfg(int id, u64 val)
- 		/* CPUCFG2 features checking */
- 		if (val & ~mask)
- 			/* The unsupported features should not be set */
--			ret = -EINVAL;
--		else if (!(val & CPUCFG2_LLFTP))
-+			return -EINVAL;
-+		if (!(val & CPUCFG2_LLFTP))
- 			/* The LLFTP must be set, as guest must has a constant timer */
--			ret = -EINVAL;
--		else if ((val & CPUCFG2_FP) && (!(val & CPUCFG2_FPSP) || !(val & CPUCFG2_FPDP)))
-+			return -EINVAL;
-+		if ((val & CPUCFG2_FP) && (!(val & CPUCFG2_FPSP) || !(val & CPUCFG2_FPDP)))
- 			/* Single and double float point must both be set when enable FP */
--			ret = -EINVAL;
--		else if ((val & CPUCFG2_LSX) && !(val & CPUCFG2_FP))
-+			return -EINVAL;
-+		if ((val & CPUCFG2_LSX) && !(val & CPUCFG2_FP))
- 			/* FP should be set when enable LSX */
--			ret = -EINVAL;
--		else if ((val & CPUCFG2_LASX) && !(val & CPUCFG2_LSX))
-+			return -EINVAL;
-+		if ((val & CPUCFG2_LASX) && !(val & CPUCFG2_LSX))
- 			/* LSX, FP should be set when enable LASX, and FP has been checked before. */
--			ret = -EINVAL;
--		break;
-+			return -EINVAL;
-+		return 0;
- 	default:
--		break;
-+		unreachable();
- 	}
--	return ret;
- }
+@@ -302,20 +302,14 @@ static int _kvm_get_cpucfg_mask(int id, u64 *v)
+ {
+ 	switch (id) {
+ 	case 2:
+-		/* Return CPUCFG2 features which have been supported by KVM */
++		/* CPUCFG2 features unconditionally supported by KVM */
+ 		*v = CPUCFG2_FP     | CPUCFG2_FPSP  | CPUCFG2_FPDP     |
+ 		     CPUCFG2_FPVERS | CPUCFG2_LLFTP | CPUCFG2_LLFTPREV |
+ 		     CPUCFG2_LAM;
+-		/*
+-		 * If LSX is supported by CPU, it is also supported by KVM,
+-		 * as we implement it.
+-		 */
++		/* If LSX is supported by the host, then it is also supported by KVM */
+ 		if (cpu_has_lsx)
+ 			*v |= CPUCFG2_LSX;
+-		/*
+-		 * if LASX is supported by CPU, it is also supported by KVM,
+-		 * as we implement it.
+-		 */
++		/* Same with LASX */
+ 		if (cpu_has_lasx)
+ 			*v |= CPUCFG2_LASX;
  
- static int kvm_get_one_reg(struct kvm_vcpu *vcpu,
+@@ -336,21 +330,23 @@ static int kvm_check_cpucfg(int id, u64 val)
+ 
+ 	switch (id) {
+ 	case 2:
+-		/* CPUCFG2 features checking */
+ 		if (val & ~mask)
+-			/* The unsupported features should not be set */
++			/* Unsupported features should not be set */
+ 			return -EINVAL;
+ 		if (!(val & CPUCFG2_LLFTP))
+-			/* The LLFTP must be set, as guest must has a constant timer */
++			/* Guests must have a constant timer */
+ 			return -EINVAL;
+ 		if ((val & CPUCFG2_FP) && (!(val & CPUCFG2_FPSP) || !(val & CPUCFG2_FPDP)))
+-			/* Single and double float point must both be set when enable FP */
++			/* Single and double float point must both be set when FP is enabled */
+ 			return -EINVAL;
+ 		if ((val & CPUCFG2_LSX) && !(val & CPUCFG2_FP))
+-			/* FP should be set when enable LSX */
++			/* LSX is architecturally defined to imply FP */
+ 			return -EINVAL;
+ 		if ((val & CPUCFG2_LASX) && !(val & CPUCFG2_LSX))
+-			/* LSX, FP should be set when enable LASX, and FP has been checked before. */
++			/*
++			 * LASX is architecturally defined to imply LSX and FP
++			 * FP is checked just above
++			 */
+ 			return -EINVAL;
+ 		return 0;
+ 	default:
 -- 
 2.43.0
 
