@@ -1,114 +1,415 @@
-Return-Path: <kvm+bounces-8695-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8697-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6039855008
-	for <lists+kvm@lfdr.de>; Wed, 14 Feb 2024 18:24:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4C36855062
+	for <lists+kvm@lfdr.de>; Wed, 14 Feb 2024 18:33:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61B3928FA48
-	for <lists+kvm@lfdr.de>; Wed, 14 Feb 2024 17:24:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E330D1C29172
+	for <lists+kvm@lfdr.de>; Wed, 14 Feb 2024 17:33:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C45612881C;
-	Wed, 14 Feb 2024 17:20:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD25884FDD;
+	Wed, 14 Feb 2024 17:32:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="r6JG2eiX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SSM67TSw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3299A12838C
-	for <kvm@vger.kernel.org>; Wed, 14 Feb 2024 17:20:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBFEA84FB0;
+	Wed, 14 Feb 2024 17:32:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707931208; cv=none; b=ogf5Ijnjr1LrUv1MDrIyf+ZMoxNSPy77Af1ac2S+h7461y2EHxPo2DTnEG3QpSPZ/kFQ8cxHjdoUihA600iRDBO0Q3hZbT2Vq/b0UkVZ7nlIqRLxewSqzkh/9SLqSy5HEBscBWAbvNfPQfKrTBysb/vb/xFJSZKkpQqO+BDEDDc=
+	t=1707931950; cv=none; b=NNUdskc0BPj4D+gKWqr9G/L9BxGG9GVII9yADAg3bpKe6TtK3TWJTZmdCy3Ka9qkn1RH2ktyeDr2AM04m74MctsDBKar0uCm3vkLNOZc6R4R4yxucEbqb1w6v9PPtVP6IYuYEG3ABAOyEaS+02+w4gLTqjOwfpBowu52egqs5O8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707931208; c=relaxed/simple;
-	bh=CGTeedDrb3fyQ8bw9v9S81c0WOzEdAHLsmIJvQpyzxk=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=vC9Y66N33Zcpu6w9YU5nfiyvKyVIIj2aD6MTZra0xz259sft9xeb8lKCjiVH8IrPACYko/qCKTX4CNw8ZK6+K/jOPeTzx0K/1NAkemqC4BJoR9WisGxDYoMi9mab2FJQCrNBRDZpep3cdIrYq/RyjIONtUHKfJbaFl+uCcKuhnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=r6JG2eiX; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc647f65573so10598329276.2
-        for <kvm@vger.kernel.org>; Wed, 14 Feb 2024 09:20:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707931206; x=1708536006; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZF5AWKakK2HlgjgZFF550I1BoQfMgek2mcRM5DDAG6E=;
-        b=r6JG2eiXct8YmWSo0hfoxN6uaRFVEhimMkK0LYq4TpHMWzs3V+pUD8x2W70chF069b
-         pIPWW2BDuQhg70iplYrbhU0e7tyj1i7IppnVagiSvlu6E+wY0ponb8rDjS8uHonhxFZF
-         L6NDbaGOU7keBMdPVA3YfzYTYXq30utJsMKu9zw5JGqUQggzA6drtJHvNGmdUPwl5/8q
-         Q0hEqhi56pGKW+VpyDy6haYcSS/gkUt8wdA9f1YTRZVzq53e5b0u1A/AHcRjrGwtoAxx
-         RDAlBUQ/QKSxMd1l/H64H0cXhWgfVU6/9DSz3b4hsLcf0tSx/zPJQY2rjZXTqSEJye+e
-         neRw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707931206; x=1708536006;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZF5AWKakK2HlgjgZFF550I1BoQfMgek2mcRM5DDAG6E=;
-        b=ZctuiIdKQru1klPo3V331WUmC6LRgX1+r5tI+4GTO6BOZ7saFAg7//pKliNih+OPDZ
-         SJyjym/xVIjT0ng5CQIgonbJ3+g4gR52mNzo2H/7S+8oZswyS63pn7A4UEEaAcR2RU3g
-         ScJ8kEfD6jhIDxwkELyBnUnEgrEr3IXTAp7FpqyG3MMfkPfjBEow9bu889ntBIvCwgIA
-         Lfj/XzISzlQERahWRrRtBw4VjyNVXVL8s8sGzWqjbZ1MnhyqnvIKTvLWUseeR8JdgIa0
-         w87tUwQuTaXdYsoQSxaK4KYe1FMJtb4KSBCs4Pt5RFA82SfUCGvSZDPhkyiHYHcZ+xZT
-         ddQw==
-X-Forwarded-Encrypted: i=1; AJvYcCXWHQVoGa9pTaabEA87lIwTkg2Hr9Vs1MDf6xS3BzNvA7rnW3tYYaIoMPWRnlqP4uwLvJrQc7E7w6703mgLZ0IoTTBO
-X-Gm-Message-State: AOJu0YwPc2phon9cFyjVuV091ltAfpiW2oNDxUO3GNNbK2cugeFCQOQw
-	c+0nuLSUxNI/9lGG2DwphPzb1Kz0w4f735Gr5QIcmbw36km+lqD8H8mLvwnHlrbNx2xUCdsE6ch
-	Neg==
-X-Google-Smtp-Source: AGHT+IGgjPwvf/mN0OzfYNwubY737oAtMzdz5XSx634JXC4ZSz9+tF0ZnJ1RYyc/PujEtCEMvEC4Xjp7Kmw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:ae5a:0:b0:dcd:3172:7265 with SMTP id
- g26-20020a25ae5a000000b00dcd31727265mr651230ybe.8.1707931206199; Wed, 14 Feb
- 2024 09:20:06 -0800 (PST)
-Date: Wed, 14 Feb 2024 09:20:04 -0800
-In-Reply-To: <Zcq0qwfjrOYPeR1h@google.com>
+	s=arc-20240116; t=1707931950; c=relaxed/simple;
+	bh=Gdt6QWQ/tNpbmVUFRpOHJ0ZYJgZdr336s5CjL14q0dg=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YIo8Cx47zFx6idPD4plX0qVDnex/5OHJG1VQb/vZ0QxwjXEQxuz7rgefRX71nc/0SiC1D8vmzGR8fM4BMZQkNVW6zXK8pUE3KXi6OR9lDQkvmRfdAj3o8+IQCfbkzGQV193axro7lck/S87jpYFbWRxo/iZJ0YL5mMmE0FfZn5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SSM67TSw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D107C433C7;
+	Wed, 14 Feb 2024 17:32:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707931949;
+	bh=Gdt6QWQ/tNpbmVUFRpOHJ0ZYJgZdr336s5CjL14q0dg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=SSM67TSw1cGhig7Qz9dRwfzWux4TZQkv3D9xpUi7gwkT+0aXTrekhPv97JB0Ii+kT
+	 DaS4MVlJkgv7eDCaNxGh4dh5LIfzaK92NZsqcd60a0xIIuUUAenrr7FQNZsNwxoY1w
+	 wkBebL4l3DR92TtJUlXoPYNBVw32RXgaDAlpmzLMLUk7mVMlTAhWpIOEhet5guXwSh
+	 PlytIGys4OLDxTRkOuCO4paR2oRjX7ZL9s/mndIuSzh4lKTB5dLN+1PK7ILTsq+gNl
+	 /Qp+L/oyjLu1VJaXNg36UJiAOBRs+QPpqqwUZSM1q/favo1SXaAHWoXPtmRKQk3L1h
+	 rvJJA65qed5mw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1raJ7T-003Dll-1q;
+	Wed, 14 Feb 2024 17:32:27 +0000
+Date: Wed, 14 Feb 2024 17:32:25 +0000
+Message-ID: <86zfw33qae.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 19/23] KVM: selftests: Add a minimal library for interacting with an ITS
+In-Reply-To: <20240213094114.3961683-1-oliver.upton@linux.dev>
+References: <20240213093250.3960069-1-oliver.upton@linux.dev>
+	<20240213094114.3961683-1-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <CAKwvOdk_obRUkD6WQHhS9uoFVe3HrgqH5h+FpqsNNgmj4cmvCQ@mail.gmail.com>
- <DM6PR02MB40587AD6ABBF1814E9CCFA7CB84B2@DM6PR02MB4058.namprd02.prod.outlook.com>
- <CAHk-=wi3p5C1n03UYoQhgVDJbh_0ogCpwbgVGnOdGn6RJ6hnKA@mail.gmail.com>
- <ZcZyWrawr1NUCiQZ@google.com> <CAKwvOdmKaYYxf7vjvPf2vbn-Ly+4=JZ_zf+OcjYOkWCkgyU_kA@mail.gmail.com>
- <CAHk-=wgEABCwu7HkJufpWC=K7u_say8k6Tp9eHvAXFa4DNXgzQ@mail.gmail.com>
- <CAHk-=wgBt9SsYjyHWn1ZH5V0Q7P6thqv_urVCTYqyWNUWSJ6_g@mail.gmail.com>
- <CAFULd4ZUa56KDLXSoYjoQkX0BcJwaipy3ZrEW+0tbi_Lz3FYAw@mail.gmail.com>
- <CAHk-=wiKq0bNqGDsh2dmYOeKub9dm8HaMHEJj-0XDvG-9m4JQQ@mail.gmail.com> <Zcq0qwfjrOYPeR1h@google.com>
-Message-ID: <Zcz2RKR-1uRaydKv@google.com>
-Subject: Re: [PATCH] Kconfig: Explicitly disable asm goto w/ outputs on gcc-11
- (and earlier)
-From: Sean Christopherson <seanjc@google.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Uros Bizjak <ubizjak@gmail.com>, Nick Desaulniers <ndesaulniers@google.com>, 
-	Jakub Jelinek <jakub@redhat.com>, "Andrew Pinski (QUIC)" <quic_apinski@quicinc.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, 
-	Peter Zijlstra <peterz@infradead.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Feb 12, 2024, Sean Christopherson wrote:
-> On Sun, Feb 11, 2024, Linus Torvalds wrote:
-> > On Sun, 11 Feb 2024 at 03:12, Uros Bizjak <ubizjak@gmail.com> wrote:
-> > >
-> > > I'd suggest the original poster to file a bug report in the GCC
-> > > bugzilla. This way, the bug can be properly analysed and eventually
-> > > fixed. The detailed instructions are available at
-> > > https://gcc.gnu.org/bugs/
-> > 
-> > Yes, please. Sean?
-> > 
-> > In order to *not* confuse it with the "asm goto with output doesn't
-> > imply volatile" bugs, could you make a bug report that talks purely
-> > about the code generation issue that happens even with a manually
-> > added volatile (your third code sequence in your original email)?
+On Tue, 13 Feb 2024 09:41:14 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Will do.  Got a bug report ready, just waiting for a GCC Bugzilla account to be
-> created for me so I can file it...
+> A prerequisite of testing LPI injection performance is of course
+> instantiating an ITS for the guest. Add a small library for creating an
+> ITS and interacting with it *from userspace*.
+> 
+> Yep, you read that right. KVM unintentionally allows userspace to send
+> commands to the virtual ITS via the command queue. Besides adding test
+> coverage for an elusive UAPI, interacting with the ITS in userspace
+> simplifies the handling of commands that need to allocate memory, like a
+> MAPD command with an ITT.
 
-https://gcc.gnu.org/bugzilla/show_bug.cgi?id=113921
+I don't mean to derail the party, but I really think we should plug
+this hole. Either that, or we make it an official interface for state
+restore. And don't we all love to have multiple interfaces to do the
+same thing?
+
+>
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  .../selftests/kvm/include/aarch64/gic.h       |   7 +-
+>  .../selftests/kvm/include/aarch64/vgic.h      |  20 ++
+>  .../testing/selftests/kvm/lib/aarch64/vgic.c  | 241 ++++++++++++++++++
+>  3 files changed, 267 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/aarch64/gic.h b/tools/testing/selftests/kvm/include/aarch64/gic.h
+> index 16d944486e9c..abb41d67880c 100644
+> --- a/tools/testing/selftests/kvm/include/aarch64/gic.h
+> +++ b/tools/testing/selftests/kvm/include/aarch64/gic.h
+> @@ -11,7 +11,12 @@ enum gic_type {
+>  	GIC_TYPE_MAX,
+>  };
+>  
+> -#define GICD_BASE_GPA		0x8000000ULL
+> +/*
+> + * Note that the redistributor frames are at the end, as the range scales
+> + * with the number of vCPUs in the VM.
+> + */
+> +#define GITS_BASE_GPA		0x8000000ULL
+> +#define GICD_BASE_GPA		(GITS_BASE_GPA + SZ_128K)
+>  #define GICR_BASE_GPA		(GICD_BASE_GPA + SZ_64K)
+>  
+>  /* The GIC is identity-mapped into the guest at the time of setup. */
+> diff --git a/tools/testing/selftests/kvm/include/aarch64/vgic.h b/tools/testing/selftests/kvm/include/aarch64/vgic.h
+> index ce19aa0a8360..d45b2902439d 100644
+> --- a/tools/testing/selftests/kvm/include/aarch64/vgic.h
+> +++ b/tools/testing/selftests/kvm/include/aarch64/vgic.h
+> @@ -32,4 +32,24 @@ void kvm_irq_write_isactiver(int gic_fd, uint32_t intid, struct kvm_vcpu *vcpu);
+>  
+>  #define KVM_IRQCHIP_NUM_PINS	(1020 - 32)
+>  
+> +struct vgic_its {
+> +	int	its_fd;
+> +	void 	*cmdq_hva;
+> +	size_t	cmdq_size;
+> +};
+> +
+> +struct vgic_its *vgic_its_setup(struct kvm_vm *vm,
+> +				vm_paddr_t coll_tbl, size_t coll_tbl_sz,
+> +				vm_paddr_t device_tbl, size_t device_tbl_sz,
+> +				vm_paddr_t cmdq, size_t cmdq_size);
+> +void vgic_its_destroy(struct vgic_its *its);
+> +
+> +void vgic_its_send_mapd_cmd(struct vgic_its *its, u32 device_id,
+> +		            vm_paddr_t itt_base, size_t itt_size, bool valid);
+> +void vgic_its_send_mapc_cmd(struct vgic_its *its, struct kvm_vcpu *vcpu,
+> +			    u32 collection_id, bool valid);
+> +void vgic_its_send_mapti_cmd(struct vgic_its *its, u32 device_id,
+> +			     u32 event_id, u32 collection_id, u32 intid);
+> +void vgic_its_send_invall_cmd(struct vgic_its *its, u32 collection_id);
+> +
+>  #endif // SELFTEST_KVM_VGIC_H
+> diff --git a/tools/testing/selftests/kvm/lib/aarch64/vgic.c b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
+> index ac55b6c2e915..fc7b4fbe6453 100644
+> --- a/tools/testing/selftests/kvm/lib/aarch64/vgic.c
+> +++ b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
+> @@ -12,6 +12,7 @@
+>  #include "vgic.h"
+>  #include "gic.h"
+>  #include "gic_v3.h"
+> +#include "processor.h"
+>  
+>  /*
+>   * vGIC-v3 default host setup
+> @@ -166,3 +167,243 @@ void kvm_irq_write_isactiver(int gic_fd, uint32_t intid, struct kvm_vcpu *vcpu)
+>  {
+>  	vgic_poke_irq(gic_fd, intid, vcpu, GICD_ISACTIVER);
+>  }
+> +
+> +static u64 vgic_its_read_reg(int its_fd, unsigned long offset)
+> +{
+> +	u64 attr;
+> +
+> +	kvm_device_attr_get(its_fd, KVM_DEV_ARM_VGIC_GRP_ITS_REGS,
+> +			    offset, &attr);
+> +	return attr;
+> +}
+> +
+> +static void vgic_its_write_reg(int its_fd, unsigned long offset, u64 val)
+> +{
+> +	kvm_device_attr_set(its_fd, KVM_DEV_ARM_VGIC_GRP_ITS_REGS,
+> +			    offset, &val);
+> +}
+> +
+> +static unsigned long vgic_its_find_baser(int its_fd, unsigned int type)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < GITS_BASER_NR_REGS; i++) {
+> +		u64 baser;
+> +		unsigned long offset = GITS_BASER + (i * sizeof(baser));
+> +
+> +		baser = vgic_its_read_reg(its_fd, offset);
+> +		if (GITS_BASER_TYPE(baser) == type)
+> +			return offset;
+> +	}
+> +
+> +	TEST_FAIL("Couldn't find an ITS BASER of type %u", type);
+> +	return -1;
+> +}
+> +
+> +static void vgic_its_install_table(int its_fd, unsigned int type, vm_paddr_t base,
+> +				   size_t size)
+> +{
+> +	unsigned long offset = vgic_its_find_baser(its_fd, type);
+> +	u64 baser;
+> +
+> +	baser = ((size / SZ_64K) - 1) |
+> +		GITS_BASER_PAGE_SIZE_64K |
+> +		GITS_BASER_InnerShareable |
+> +		base |
+> +		GITS_BASER_RaWaWb |
+> +		GITS_BASER_VALID;
+> +
+> +	vgic_its_write_reg(its_fd, offset, baser);
+> +}
+> +
+> +static void vgic_its_install_cmdq(int its_fd, vm_paddr_t base, size_t size)
+> +{
+> +	u64 cbaser;
+> +
+> +	cbaser = ((size / SZ_4K) - 1) |
+> +		 GITS_CBASER_InnerShareable |
+> +		 base |
+> +		 GITS_CBASER_RaWaWb |
+> +		 GITS_CBASER_VALID;
+> +
+> +	vgic_its_write_reg(its_fd, GITS_CBASER, cbaser);
+> +}
+> +
+> +struct vgic_its *vgic_its_setup(struct kvm_vm *vm,
+> +				vm_paddr_t coll_tbl, size_t coll_tbl_sz,
+> +				vm_paddr_t device_tbl, size_t device_tbl_sz,
+> +				vm_paddr_t cmdq, size_t cmdq_size)
+> +{
+> +	int its_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_ITS);
+> +	struct vgic_its *its = malloc(sizeof(struct vgic_its));
+> +	u64 attr, ctlr;
+> +
+> +	attr = GITS_BASE_GPA;
+> +	kvm_device_attr_set(its_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> +			    KVM_VGIC_ITS_ADDR_TYPE, &attr);
+> +
+> +	kvm_device_attr_set(its_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
+> +			    KVM_DEV_ARM_VGIC_CTRL_INIT, NULL);
+> +
+> +	vgic_its_install_table(its_fd, GITS_BASER_TYPE_COLLECTION, coll_tbl,
+> +			       coll_tbl_sz);
+> +	vgic_its_install_table(its_fd, GITS_BASER_TYPE_DEVICE, device_tbl,
+> +			       device_tbl_sz);
+> +
+> +	vgic_its_install_cmdq(its_fd, cmdq, cmdq_size);
+> +
+> +	ctlr = vgic_its_read_reg(its_fd, GITS_CTLR);
+> +	ctlr |= GITS_CTLR_ENABLE;
+> +	vgic_its_write_reg(its_fd, GITS_CTLR, ctlr);
+> +
+> +	*its = (struct vgic_its) {
+> +		.its_fd		= its_fd,
+> +		.cmdq_hva	= addr_gpa2hva(vm, cmdq),
+> +		.cmdq_size	= cmdq_size,
+> +	};
+> +
+> +	return its;
+> +}
+> +
+> +void vgic_its_destroy(struct vgic_its *its)
+> +{
+> +	close(its->its_fd);
+> +	free(its);
+> +}
+> +
+> +struct its_cmd_block {
+> +	union {
+> +		u64	raw_cmd[4];
+> +		__le64	raw_cmd_le[4];
+> +	};
+> +};
+> +
+> +static inline void its_fixup_cmd(struct its_cmd_block *cmd)
+> +{
+> +	/* Let's fixup BE commands */
+> +	cmd->raw_cmd_le[0] = cpu_to_le64(cmd->raw_cmd[0]);
+> +	cmd->raw_cmd_le[1] = cpu_to_le64(cmd->raw_cmd[1]);
+> +	cmd->raw_cmd_le[2] = cpu_to_le64(cmd->raw_cmd[2]);
+> +	cmd->raw_cmd_le[3] = cpu_to_le64(cmd->raw_cmd[3]);
+> +}
+> +
+> +static void its_mask_encode(u64 *raw_cmd, u64 val, int h, int l)
+> +{
+> +	u64 mask = GENMASK_ULL(h, l);
+> +	*raw_cmd &= ~mask;
+> +	*raw_cmd |= (val << l) & mask;
+> +}
+> +
+> +static void its_encode_cmd(struct its_cmd_block *cmd, u8 cmd_nr)
+> +{
+> +	its_mask_encode(&cmd->raw_cmd[0], cmd_nr, 7, 0);
+> +}
+> +
+> +static void its_encode_devid(struct its_cmd_block *cmd, u32 devid)
+> +{
+> +	its_mask_encode(&cmd->raw_cmd[0], devid, 63, 32);
+> +}
+> +
+> +static void its_encode_event_id(struct its_cmd_block *cmd, u32 id)
+> +{
+> +	its_mask_encode(&cmd->raw_cmd[1], id, 31, 0);
+> +}
+> +
+> +static void its_encode_phys_id(struct its_cmd_block *cmd, u32 phys_id)
+> +{
+> +	its_mask_encode(&cmd->raw_cmd[1], phys_id, 63, 32);
+> +}
+> +
+> +static void its_encode_size(struct its_cmd_block *cmd, u8 size)
+> +{
+> +	its_mask_encode(&cmd->raw_cmd[1], size, 4, 0);
+> +}
+> +
+> +static void its_encode_itt(struct its_cmd_block *cmd, u64 itt_addr)
+> +{
+> +	its_mask_encode(&cmd->raw_cmd[2], itt_addr >> 8, 51, 8);
+> +}
+> +
+> +static void its_encode_valid(struct its_cmd_block *cmd, int valid)
+> +{
+> +	its_mask_encode(&cmd->raw_cmd[2], !!valid, 63, 63);
+> +}
+> +
+> +static void its_encode_target(struct its_cmd_block *cmd, u64 target_addr)
+> +{
+> +	its_mask_encode(&cmd->raw_cmd[2], target_addr >> 16, 51, 16);
+> +}
+> +
+> +static void its_encode_collection(struct its_cmd_block *cmd, u16 col)
+> +{
+> +	its_mask_encode(&cmd->raw_cmd[2], col, 15, 0);
+> +}
+> +
+> +static void vgic_its_send_cmd(struct vgic_its *its, struct its_cmd_block *cmd)
+> +{
+> +	u64 cwriter = vgic_its_read_reg(its->its_fd, GITS_CWRITER);
+> +	struct its_cmd_block *dst = its->cmdq_hva + cwriter;
+> +	u64 next;
+> +
+> +	its_fixup_cmd(cmd);
+> +
+> +	WRITE_ONCE(*dst, *cmd);
+> +	dsb(ishst);
+> +
+> +	next = (cwriter + sizeof(*cmd)) % its->cmdq_size;
+> +	vgic_its_write_reg(its->its_fd, GITS_CWRITER, next);
+> +
+> +	TEST_ASSERT(vgic_its_read_reg(its->its_fd, GITS_CREADR) == next,
+> +		    "ITS didn't process command at offset: %lu\n", cwriter);
+> +}
+> +
+> +void vgic_its_send_mapd_cmd(struct vgic_its *its, u32 device_id,
+> +		            vm_paddr_t itt_base, size_t itt_size, bool valid)
+> +{
+> +	struct its_cmd_block cmd = {};
+> +
+> +	its_encode_cmd(&cmd, GITS_CMD_MAPD);
+> +	its_encode_devid(&cmd, device_id);
+> +	its_encode_size(&cmd, ilog2(itt_size) - 1);
+> +	its_encode_itt(&cmd, itt_base);
+> +	its_encode_valid(&cmd, valid);
+> +
+> +	vgic_its_send_cmd(its, &cmd);
+> +}
+> +
+> +void vgic_its_send_mapc_cmd(struct vgic_its *its, struct kvm_vcpu *vcpu,
+> +			    u32 collection_id, bool valid)
+> +{
+> +	struct its_cmd_block cmd = {};
+> +
+> +	its_encode_cmd(&cmd, GITS_CMD_MAPC);
+> +	its_encode_collection(&cmd, collection_id);
+> +	its_encode_target(&cmd, vcpu->id);
+> +	its_encode_valid(&cmd, valid);
+> +
+> +	vgic_its_send_cmd(its, &cmd);
+> +}
+> +
+> +void vgic_its_send_mapti_cmd(struct vgic_its *its, u32 device_id,
+> +			     u32 event_id, u32 collection_id, u32 intid)
+> +{
+> +	struct its_cmd_block cmd = {};
+> +
+> +	its_encode_cmd(&cmd, GITS_CMD_MAPTI);
+> +	its_encode_devid(&cmd, device_id);
+> +	its_encode_event_id(&cmd, event_id);
+> +	its_encode_phys_id(&cmd, intid);
+> +	its_encode_collection(&cmd, collection_id);
+> +
+> +	vgic_its_send_cmd(its, &cmd);
+> +}
+> +
+> +void vgic_its_send_invall_cmd(struct vgic_its *its, u32 collection_id)
+> +{
+> +	struct its_cmd_block cmd = {};
+> +
+> +	its_encode_cmd(&cmd, GITS_CMD_INVALL);
+> +	its_encode_collection(&cmd, collection_id);
+> +
+> +	vgic_its_send_cmd(its, &cmd);
+> +}
+
+Holy crap, that's a whole ITS driver in loserspace. *mindblown*.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
