@@ -1,146 +1,182 @@
-Return-Path: <kvm+bounces-8676-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8677-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFBD2854961
-	for <lists+kvm@lfdr.de>; Wed, 14 Feb 2024 13:40:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D55448549A4
+	for <lists+kvm@lfdr.de>; Wed, 14 Feb 2024 13:52:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 80E32B26FFC
-	for <lists+kvm@lfdr.de>; Wed, 14 Feb 2024 12:40:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B14E1F22461
+	for <lists+kvm@lfdr.de>; Wed, 14 Feb 2024 12:52:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ECEE54BED;
-	Wed, 14 Feb 2024 12:38:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D95953E2D;
+	Wed, 14 Feb 2024 12:50:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="RTcdItvK"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="WcdFLlaa"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43CF054BC7
-	for <kvm@vger.kernel.org>; Wed, 14 Feb 2024 12:38:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D14E01A731
+	for <kvm@vger.kernel.org>; Wed, 14 Feb 2024 12:50:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707914309; cv=none; b=NwYQMQsxIcQKY8Eam3zi6x21i1Fr+GIgXDnCvM/oEX4aNpyIJs2PJi8su8z64HgYTbbHouaSZGwtVeB8wBQR2p4jdEANRZxTGtzflgQ7RgpVNBcxjy3630AIml6KDRg7e3g+bGfMfkWEnWZpgbiUFC5z9sBL7Yebb7v2fd5Sd9Y=
+	t=1707915015; cv=none; b=CqgucXYFGFuwYPDDXZKv6eWsl4FL3K2Wsw/10bftL6JTJnL648EYvKeIQ9Ylh44E1vf0eRWv/ZG6qwQW8CVz7UMyvZUWLWJjrQQG0rcbzjcClC7s3eeFNUA55wjjYY/kZUBj8tNAazxL1CL0Qjysnn5mx9yF55jzRnlhLbYnEA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707914309; c=relaxed/simple;
-	bh=2Q4nmJxL8PyzVuzCrgLSok65VnBv52aekZnQ81VzKko=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=QtUfHNbRO00tu6TuAkfStdIxKig399VClafZkXeU4mHwhMecd40THP6MAXwQ2+eBzfuIlgD/dhaHe5ZXzF+O2jf1UY3IRYl+xEMX1G2MSszVy7QjgNEATarfEVZZtmZ+ZWUap34tgWNPmjvHFh46xRI/NEAWaBM07HzTRrGNJ90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=RTcdItvK; arc=none smtp.client-ip=209.85.214.169
+	s=arc-20240116; t=1707915015; c=relaxed/simple;
+	bh=KpjBVrl5aQuEGzI803dJi8LHosgzPGbHu6PQfze70eM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XdBLLoawnc7rsLa7YCkPSaBU8NwalLJ1pYJyGe6GsLZuGSZcqA+pc7HN2Ox3zQqIfgsi6N4FHW2AdWluBg9oSDp4LO0xM19egoaZ1pmUXEZX+dpTPZM39ddVM76r/B0b23M5ixYvneiipZwrGK1tjWtaPF9Wtm5EW6g2uZ5i2Vw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=WcdFLlaa; arc=none smtp.client-ip=209.85.167.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1d911c2103aso27685925ad.0
-        for <kvm@vger.kernel.org>; Wed, 14 Feb 2024 04:38:28 -0800 (PST)
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-511570b2f49so645916e87.1
+        for <kvm@vger.kernel.org>; Wed, 14 Feb 2024 04:50:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1707914307; x=1708519107; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=ventanamicro.com; s=google; t=1707915012; x=1708519812; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NHKjtl+TiQN3xkVjk4Gl68ZjMVAysMTJP3yyqxhX3IM=;
-        b=RTcdItvKtzRGfWBTIhMRyrYHPEk/0/b1NM/KPNPc6oSFOqui452MWjkHTE8YVWKPx5
-         bIyr3N7kKGaXtNB9YX1HVQwTh9qHS5hnYdh0tDRQIXwTfd1KrJ3gWoUD2abCt5pj+/4e
-         gUEghV303Vki9FY61b5fC8r1KuwMwSCjafb9fiFMyktImjvvhPX56dymmcrhPR5qmU+U
-         TOPE62FKb188XcJ/kEAPj5jsxPiGdi93dLacINavt/JDqxo2mQGevCHH2w4JfNBKPEUS
-         yWXW34+VPiTXKH7pziaUYNn4MK8/1IVHSbYgt2M8g9peASd9A3vEAEn/SQPaMgJx+1kI
-         xZjg==
+        bh=1AMykLLGhEQwe/ayb8QFjtzszmK1UF91DSb771zya9A=;
+        b=WcdFLlaawsWV863AQOogIuEimZPu/S4Tct6X/YzPAWE1D+YHNUI217k/5EJgvcju1k
+         vMBlD+p7qWdC+kPN8eHZlLtV2ehhM5mL60EtLsrYovz4GTzNctx+BjNZFAvdsS+vQl6Q
+         y4cQweTO9EcwvnTz9XIvB24JNLT/uEoOiV4cjLat2nm7R2GceF0e7kMT7KYtBYqyfUBF
+         h1BUGLslZkMJrmpFGLsKyXqFdtMXL985hdKNKuVRxaSHs8+KBov7yfCy7rwpvjd5DEOB
+         uFWTwySr2EWUZvp0bdB5ZjEOjByIbvXXSzJA4sgtvOTEDvwK3I4jUVTSokySKXVjZ0K3
+         TBHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707914307; x=1708519107;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1707915012; x=1708519812;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=NHKjtl+TiQN3xkVjk4Gl68ZjMVAysMTJP3yyqxhX3IM=;
-        b=gNauOW/VTVY2jmPDuPUMXf9O4LnAv+TD0fc6N2tkG/4SktopRYMHUlfmvVf15IPIBl
-         hpe7P8b1lcWcy8eT4e9+Wc7Hcw8lTBWFHdDKWSC4JbRMhT/+xR/axbYfiGFAf54BquFj
-         Q8hspMnu7uSeDgAEpMoYvKod/FFNkxjD8ZDDbV8x+FBnUHlXBTG9Gpg3ExOD3rHtNXR9
-         fJAoSYLy2vDl+QYNgVycgQjOdAEa1GhojGR6FkutCMX8dFqcECi1W6SJc1tfgSoOlOnO
-         StFODM5IKzUKuMU+3Tn476keLIenxPK9R72I/glJhyIGiaTisSC84irLIfvGGEWeTExc
-         LUzw==
-X-Forwarded-Encrypted: i=1; AJvYcCX+aJgPlKOhacYIJ9KYWLv0M1ivkrSnk6OW5m0c2hE2I5yPZuLvXbL+IannBjD9QoczZwjCbGJ6BLkTnDmc6Jx5OMVO
-X-Gm-Message-State: AOJu0YyficTLD6OC9KmWtv7dPRQDyaXdlFAedIMrygLvd9lhd0rA8Ica
-	bHYCEt0O9YTGb2ZKaUxbVfn+UzC/LiqvDtdbwm/0sn2CJ2tYlxre8Ry827KYBZQ=
-X-Google-Smtp-Source: AGHT+IE4eB6K18FO+NV+30jFVOFBt5sQrSmihTsDMjky3cQtyum08b1pUVZK7T/7CIdCYEPbGH9Wqw==
-X-Received: by 2002:a17:902:eb89:b0:1db:68d5:6281 with SMTP id q9-20020a170902eb8900b001db68d56281mr717883plg.35.1707914307513;
-        Wed, 14 Feb 2024 04:38:27 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCU6JYSlk0nXCb0cCSJmJVtMcA3/mi/wxVgTU49YydRY51DqTvVP0HOsuMu+uEiHFW5vdTQBkqUZY9o5tBwRP6TqnEv+nZnUhap2OH+nfGTbEt3lY/Ae/q4i9vdc/StMRf+9juoiTb/5jO4vlL/PqQK3OjSqQ5dh7uzMrrlFalyKWpy+t+tn0Fo0/V2Tp2w0HKwrTY7LYbYAtv4VlJgxcpzDN8v0xk6gU0lKQbcRYPrLUTNWXKMg7VyqN9gdLEg1/FaCxccjnyp/qaIA0HjWXBKEUDaA1hBUn+wc2bETB9VvFzfzckufJ8BKYSQzn3cTVYx9swbNbLAACI5d2s7kS1aF8ZwYTw3o9N7OZFInjwG0TMXNnyBL31t5GwmjElQXq09vk4owgaVGpVZDJGgc292s+M5meW0j8nnGCPfgm/rfrIQxUno++Ly0eMQ/Ng==
-Received: from anup-ubuntu-vm.localdomain ([171.76.87.178])
-        by smtp.gmail.com with ESMTPSA id o20-20020a170902e29400b001d9b749d281sm3041419plc.53.2024.02.14.04.38.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Feb 2024 04:38:27 -0800 (PST)
-From: Anup Patel <apatel@ventanamicro.com>
-To: Paolo Bonzini <pbonzini@redhat.com>,
-	Atish Patra <atishp@atishpatra.org>,
-	Shuah Khan <shuah@kernel.org>
-Cc: Palmer Dabbelt <palmer@dabbelt.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Andrew Jones <ajones@ventanamicro.com>,
-	Anup Patel <anup@brainfault.org>,
-	kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org,
-	linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Anup Patel <apatel@ventanamicro.com>
-Subject: [PATCH 5/5] KVM: riscv: selftests: Add Zacas extension to get-reg-list test
-Date: Wed, 14 Feb 2024 18:07:57 +0530
-Message-Id: <20240214123757.305347-6-apatel@ventanamicro.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240214123757.305347-1-apatel@ventanamicro.com>
-References: <20240214123757.305347-1-apatel@ventanamicro.com>
+        bh=1AMykLLGhEQwe/ayb8QFjtzszmK1UF91DSb771zya9A=;
+        b=Khmg1uQRcuCz2az/CKSYZRvRcwvI4cc/8cWsiQVEVQWwXErG7cQwkLitXG/yOQY2+L
+         mRwgiYwfyNL6WohjYQ3aALbPo/EGYwCJh1libQazWUoCR2jdtlr90YQw2PNl+zp8jXrL
+         TkXFsjFILNdYNVm37BhRTsL3PceiGYV66j3MkktKvIimNCS8jq4hGHsiIe7ONWFaFQn2
+         3xjPDT/JFtgOS8n4BK/4m/+QnV4jQfZFuSC5Um+vMQa6hnBbgLCZ5fAVRMN0SiUJkc7D
+         nvVe2QcZE/H346Un301U264j+Qs5tKiFNPqyQu1pINQrgcV8h8pczd11lBL775rgYE7k
+         kYFA==
+X-Gm-Message-State: AOJu0YyxJVMR8MhynsxCaGP0yByVEk1VGwfmuYpG82wnwc40MznguUj6
+	ecm8AHjrbLIi8psVSzEI7oI+qQU9Qhknh7mPpUDnAUvwZqbLohhRKsG1VQf4nG3mYEu2J1CelpG
+	favli+HrEvgDW9hCZ53Gt0krRS94F01MqlDeaIw==
+X-Google-Smtp-Source: AGHT+IF7lALDcbF5Q4R3nObQ/8vNabeZYsaSldg7JH1sBIcNmbrPAvYfOnO2znsaCZflsROdJRWeT9t+nrpLeoSNNk8=
+X-Received: by 2002:a05:6512:3d17:b0:511:ac5c:e02f with SMTP id
+ d23-20020a0565123d1700b00511ac5ce02fmr531327lfv.8.1707915011510; Wed, 14 Feb
+ 2024 04:50:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240206074931.22930-1-duchao@eswincomputing.com> <20240206074931.22930-2-duchao@eswincomputing.com>
+In-Reply-To: <20240206074931.22930-2-duchao@eswincomputing.com>
+From: Anup Patel <apatel@ventanamicro.com>
+Date: Wed, 14 Feb 2024 18:19:59 +0530
+Message-ID: <CAK9=C2VZ1t3ctTWKiqeKOALjLh0kJgzVEsZvM=xfc2j7yQOEcQ@mail.gmail.com>
+Subject: Re: [PATCH v1 1/3] RISC-V: KVM: Implement kvm_arch_vcpu_ioctl_set_guest_debug()
+To: Chao Du <duchao@eswincomputing.com>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, anup@brainfault.org, 
+	atishp@atishpatra.org, pbonzini@redhat.com, shuah@kernel.org, 
+	dbarboza@ventanamicro.com, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, duchao713@qq.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The KVM RISC-V allows Zacas extension for Guest/VM so let us
-add this extension to get-reg-list test.
+On Tue, Feb 6, 2024 at 1:22=E2=80=AFPM Chao Du <duchao@eswincomputing.com> =
+wrote:
+>
+> kvm_vm_ioctl_check_extension(): Return 1 if KVM_CAP_SET_GUEST_DEBUG is
+> being checked.
+>
+> kvm_arch_vcpu_ioctl_set_guest_debug(): Update the guest_debug flags
+> from userspace accordingly. Route the breakpoint exceptions to HS mode
+> if the VM is being debugged by userspace, by clearing the corresponding
+> bit in hedeleg CSR.
+>
+> Signed-off-by: Chao Du <duchao@eswincomputing.com>
+> ---
+>  arch/riscv/include/uapi/asm/kvm.h |  1 +
+>  arch/riscv/kvm/vcpu.c             | 15 +++++++++++++--
+>  arch/riscv/kvm/vm.c               |  1 +
+>  3 files changed, 15 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/=
+asm/kvm.h
+> index d6b7a5b95874..8890977836f0 100644
+> --- a/arch/riscv/include/uapi/asm/kvm.h
+> +++ b/arch/riscv/include/uapi/asm/kvm.h
+> @@ -17,6 +17,7 @@
+>
+>  #define __KVM_HAVE_IRQ_LINE
+>  #define __KVM_HAVE_READONLY_MEM
+> +#define __KVM_HAVE_GUEST_DEBUG
+>
+>  #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
+>
+> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+> index b5ca9f2e98ac..6cee974592ac 100644
+> --- a/arch/riscv/kvm/vcpu.c
+> +++ b/arch/riscv/kvm/vcpu.c
+> @@ -475,8 +475,19 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu =
+*vcpu,
+>  int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
+>                                         struct kvm_guest_debug *dbg)
+>  {
+> -       /* TODO; To be implemented later. */
+> -       return -EINVAL;
+> +       if (dbg->control & KVM_GUESTDBG_ENABLE) {
+> +               if (vcpu->guest_debug !=3D dbg->control) {
+> +                       vcpu->guest_debug =3D dbg->control;
+> +                       csr_clear(CSR_HEDELEG, BIT(EXC_BREAKPOINT));
+> +               }
+> +       } else {
+> +               if (vcpu->guest_debug !=3D 0) {
+> +                       vcpu->guest_debug =3D 0;
+> +                       csr_set(CSR_HEDELEG, BIT(EXC_BREAKPOINT));
+> +               }
+> +       }
 
-Signed-off-by: Anup Patel <apatel@ventanamicro.com>
----
- tools/testing/selftests/kvm/riscv/get-reg-list.c | 4 ++++
- 1 file changed, 4 insertions(+)
+This is broken because directly setting breakpoint exception delegation
+in CSR also affects other VCPUs running on the same host CPU.
 
-diff --git a/tools/testing/selftests/kvm/riscv/get-reg-list.c b/tools/testing/selftests/kvm/riscv/get-reg-list.c
-index 5429453561d7..d334c4c9765f 100644
---- a/tools/testing/selftests/kvm/riscv/get-reg-list.c
-+++ b/tools/testing/selftests/kvm/riscv/get-reg-list.c
-@@ -47,6 +47,7 @@ bool filter_reg(__u64 reg)
- 	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_SVINVAL:
- 	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_SVNAPOT:
- 	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_SVPBMT:
-+	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZACAS:
- 	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZBA:
- 	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZBB:
- 	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZBC:
-@@ -411,6 +412,7 @@ static const char *isa_ext_single_id_to_str(__u64 reg_off)
- 		KVM_ISA_EXT_ARR(SVINVAL),
- 		KVM_ISA_EXT_ARR(SVNAPOT),
- 		KVM_ISA_EXT_ARR(SVPBMT),
-+		KVM_ISA_EXT_ARR(ZACAS),
- 		KVM_ISA_EXT_ARR(ZBA),
- 		KVM_ISA_EXT_ARR(ZBB),
- 		KVM_ISA_EXT_ARR(ZBC),
-@@ -933,6 +935,7 @@ KVM_ISA_EXT_SIMPLE_CONFIG(sstc, SSTC);
- KVM_ISA_EXT_SIMPLE_CONFIG(svinval, SVINVAL);
- KVM_ISA_EXT_SIMPLE_CONFIG(svnapot, SVNAPOT);
- KVM_ISA_EXT_SIMPLE_CONFIG(svpbmt, SVPBMT);
-+KVM_ISA_EXT_SIMPLE_CONFIG(zacas, ZACAS);
- KVM_ISA_EXT_SIMPLE_CONFIG(zba, ZBA);
- KVM_ISA_EXT_SIMPLE_CONFIG(zbb, ZBB);
- KVM_ISA_EXT_SIMPLE_CONFIG(zbc, ZBC);
-@@ -987,6 +990,7 @@ struct vcpu_reg_list *vcpu_configs[] = {
- 	&config_svinval,
- 	&config_svnapot,
- 	&config_svpbmt,
-+	&config_zacas,
- 	&config_zba,
- 	&config_zbb,
- 	&config_zbc,
--- 
-2.34.1
+To address the above, we should do the following:
+1) Add "unsigned long hedeleg" in "struct kvm_vcpu_config" which
+   is pre-initialized in kvm_riscv_vcpu_setup_config() without setting
+   EXC_BREAKPOINT bit.
+2) The kvm_arch_vcpu_ioctl_set_guest_debug() should only set/clear
+    EXC_BREAKPOINT bit in "hedeleg" of "struct kvm_vcpu_config".
+3) The kvm_riscv_vcpu_swap_in_guest_state() must write the
+     HEDELEG csr before entering the Guest/VM.
 
+Regards,
+Anup
+
+> +
+> +       return 0;
+>  }
+>
+>  static void kvm_riscv_vcpu_setup_config(struct kvm_vcpu *vcpu)
+> diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
+> index ce58bc48e5b8..7396b8654f45 100644
+> --- a/arch/riscv/kvm/vm.c
+> +++ b/arch/riscv/kvm/vm.c
+> @@ -186,6 +186,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, lon=
+g ext)
+>         case KVM_CAP_READONLY_MEM:
+>         case KVM_CAP_MP_STATE:
+>         case KVM_CAP_IMMEDIATE_EXIT:
+> +       case KVM_CAP_SET_GUEST_DEBUG:
+>                 r =3D 1;
+>                 break;
+>         case KVM_CAP_NR_VCPUS:
+> --
+> 2.17.1
+>
+>
+> --
+> kvm-riscv mailing list
+> kvm-riscv@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/kvm-riscv
 
