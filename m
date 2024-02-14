@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-8708-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8709-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4880785539B
-	for <lists+kvm@lfdr.de>; Wed, 14 Feb 2024 21:01:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 548EB8553B3
+	for <lists+kvm@lfdr.de>; Wed, 14 Feb 2024 21:10:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D994D1F25FA3
-	for <lists+kvm@lfdr.de>; Wed, 14 Feb 2024 20:01:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 872541C2609F
+	for <lists+kvm@lfdr.de>; Wed, 14 Feb 2024 20:10:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6799A13DBA1;
-	Wed, 14 Feb 2024 20:01:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B83D13A888;
+	Wed, 14 Feb 2024 20:09:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TabFiwUh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NwRLB3iD"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BF121E4B7;
-	Wed, 14 Feb 2024 20:01:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1EF613DB9F;
+	Wed, 14 Feb 2024 20:09:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707940883; cv=none; b=E+m6blLONlBHtKvJXJVVbeQtmEFwwc0ABjP6t5acN+X5u5F8QV7YGSdI2BlVuFwE8qnnhIuH+qfw9PBUaPJPOfLz+O1SUyHNWYwvxS2wpZGC8tect6wnoV7bNp0wEK7cWMYxXjgq+IlCrwx6QXsmEEcDwxTopSi+uUi5k+W55lg=
+	t=1707941395; cv=none; b=O7FQAxmGTshPVkyHMkFbLBCQkZ1aeB37Upqy12eYbsYc+arHhpKG+2n0XXzxVVN/QkdE2tpWvUlYzY9r/hZ7aQYlbxkhsK6F+oWUvV53fzYN2BaH9PvhvXIztgi1lJb4+ih2AsoAVbE21NMIdjYimGckBppEOfKmF60L6DmTsrw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707940883; c=relaxed/simple;
-	bh=5K2WUn7NWr2ouERBIwh/bkIaCWPjJwbZxQ4mhPJU38M=;
+	s=arc-20240116; t=1707941395; c=relaxed/simple;
+	bh=4azwoIdbG/L/6RFnx1ncMgHMgVCWQZsgXPP6KuYxyxM=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CdUcp/APOY72Pf5+OoP6iAhYDRS+opwN7lDnSAppeLmhEFzncZY4zf4iauJ69Os41DdX4ZXXfYl/PXKfT5/KavJDTucIhnAfq0xvMHU14h0ajkv/R3qmj0ixVA9cle/TCuojZzW6PGXS+P3vrWUYPbzchbFfK32YvYAS9nHSpWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TabFiwUh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A529C433F1;
-	Wed, 14 Feb 2024 20:01:23 +0000 (UTC)
+	 MIME-Version:Content-Type; b=cs3UaD6cjgKpqz5vwgdeU+LZqXTiyaJXyFjLu/BvlveXhruq07rAxltmGlaImgbzyeSwdYFI2ZOhzLvfJqtJXro3ytyCw24KBvpkBquB3UsEI7flQEbLV+iiB70H3SOXEa8llkmGy8R2dWaTX8cwSyl7tNysLrzNOxe3HNOIqs0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NwRLB3iD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39CE9C433C7;
+	Wed, 14 Feb 2024 20:09:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707940883;
-	bh=5K2WUn7NWr2ouERBIwh/bkIaCWPjJwbZxQ4mhPJU38M=;
+	s=k20201202; t=1707941395;
+	bh=4azwoIdbG/L/6RFnx1ncMgHMgVCWQZsgXPP6KuYxyxM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=TabFiwUhrpgZtkQqgIS6buAF5wO7edIU7TzZN7bwb53XohYw2ZyyKROMmVrcCOb+d
-	 zPlFl+GCAj0Kg1k8Lc3rnbHbA/7izh8EHK0bcOIoslFyt/j8s0g0cbyIP58dtCfDBp
-	 yc11Wbtle+tQ08MjwC+XDB9usxyDR6Z4b6bZ0QmRutoZunwpOALIbHaPno3x+mdh/B
-	 /8GxDBlsctQJ1dRarDaVe2frX8y0XeZl5aREMGPa+N084xWR6V98dnf21hk7405ULN
-	 VOeGCZwDu0uNEs79kGxqF00BoCs6f5oObRWVH404vEPyaqFrtsuQLvJ049M2Iy4u9q
-	 NEVYGbLijFbzA==
+	b=NwRLB3iDFB91KJiT18wZmerQ+hDWKgGjk1X4ykBWIzKrrUnLS2zbOeE/en64tqWvT
+	 axQWgz9jfEAhZpnVWUA8ssURc1jKUHZ/bZeRz3J8OoriEjDCkP9IOqk9OsXonLc/7w
+	 x7BzyIqIAazjivTJTVocrBP5zJ8mnatvXnN0IHF+4GQEC+ay4YEcJAjMbu3iwp9T6j
+	 1ew4dU0T1M9zB7omd6WFLZbIkqN3eV0RxmUEMktHcwuMOFRVXFW70OZcQTK2mujN3q
+	 d8FU+D5dLG+iPg293XSEszOaYZ63gCeTMIH2TsxmvhJlqP2BleTbfKv8DZP585JNaD
+	 z7NzcLFP2A5lA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1raLRZ-003GBr-15;
-	Wed, 14 Feb 2024 20:01:21 +0000
-Date: Wed, 14 Feb 2024 20:01:19 +0000
-Message-ID: <86wmr64xyo.wl-maz@kernel.org>
+	id 1raLZo-003GHt-SZ;
+	Wed, 14 Feb 2024 20:09:52 +0000
+Date: Wed, 14 Feb 2024 20:09:52 +0000
+Message-ID: <86v86q4xkf.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
@@ -57,12 +57,12 @@ Cc: kvmarm@lists.linux.dev,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 07/23] KVM: arm64: vgic: Use atomics to count LPIs
-In-Reply-To: <Zc0HIorNZG9KG5Mg@linux.dev>
+Subject: Re: [PATCH v2 19/23] KVM: selftests: Add a minimal library for interacting with an ITS
+In-Reply-To: <Zc0NsFm40nIqTmRf@linux.dev>
 References: <20240213093250.3960069-1-oliver.upton@linux.dev>
-	<20240213093250.3960069-8-oliver.upton@linux.dev>
-	<861q9f56x6.wl-maz@kernel.org>
-	<Zc0HIorNZG9KG5Mg@linux.dev>
+	<20240213094114.3961683-1-oliver.upton@linux.dev>
+	<86zfw33qae.wl-maz@kernel.org>
+	<Zc0NsFm40nIqTmRf@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -78,52 +78,64 @@ X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kern
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 14 Feb 2024 18:32:02 +0000,
+On Wed, 14 Feb 2024 19:00:00 +0000,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Hey,
+> On Wed, Feb 14, 2024 at 05:32:25PM +0000, Marc Zyngier wrote:
+> > On Tue, 13 Feb 2024 09:41:14 +0000,
+> > Oliver Upton <oliver.upton@linux.dev> wrote:
+> > > 
+> > > A prerequisite of testing LPI injection performance is of course
+> > > instantiating an ITS for the guest. Add a small library for creating an
+> > > ITS and interacting with it *from userspace*.
+> > > 
+> > > Yep, you read that right. KVM unintentionally allows userspace to send
+> > > commands to the virtual ITS via the command queue. Besides adding test
+> > > coverage for an elusive UAPI, interacting with the ITS in userspace
+> > > simplifies the handling of commands that need to allocate memory, like a
+> > > MAPD command with an ITT.
+> > 
+> > I don't mean to derail the party, but I really think we should plug
+> > this hole. Either that, or we make it an official interface for state
+> > restore. And don't we all love to have multiple interfaces to do the
+> > same thing?
 > 
-> On Wed, Feb 14, 2024 at 04:47:49PM +0000, Marc Zyngier wrote:
-> > I'd like to propose an alternative approach here. I've always hated
-> > this "copy a bunch of INTIDs" thing,
+> Ok, I've thought about it a bit more and I'm fully convinced we need to
+> shut the door on this stupidity.
 > 
-> Agree. 
+> We expect CREADR == CWRITER at the time userspace saves the ITS
+> registers, but we have a *hideous* ordering issue on the restore path.
 > 
-> > and the only purpose of this
-> > silly counter is to dimension the resulting array.
+> If the order of restore from userspace is CBASER, CWRITER, CREADR then
+> we **wind up replaying the entire command queue**. While insane, I'm
+> pretty sure it is legal for the guest to write garbage after the read
+> pointer has moved past a particular command index.
 > 
-> Well, we also use it to trivially print the number of LPIs for a
-> particular vgic in the debug interface.
+> Fsck!!!
 
-I think we can get survive this... ;-)
+This is documented Documentation/virt/kvm/devices/arm-vgic-its.rst to
+some extent, and it is allowed for the guest to crap itself on behalf
+of userspace if the ordering isn't respected.
 
+> So, how about we do this:
 > 
-> > Could we instead rely on an xarray marking a bunch of entries (the
-> > ones we want to 'copy'), and get the reader to clear these marks once
-> > done?
+>  - Provide a uaccess hook for CWRITER that changes the write-pointer
+>    without processing any commands
 > 
-> I think that'd work. I'm trying to convince myself we don't have bugs
-> lurking in some of the existing usage of vgic_copy_lpi_list()...
-> 
-> > Of course, we only have 3 marks, so that's a bit restrictive from a
-> > concurrency perspective, but since most callers hold a lock, it should
-> > be OK.
-> 
-> They all hold *a* lock, but maybe not the same one! :)
+>  - Assert an invariant that at any time CWRITER or CREADR are read from
+>    userspace that CREADR == CWRITER. Fail the ioctl and scream if that
+>    isn't the case, so that way we never need to worry about processing
+>    'in-flight' commands at the destination.
 
-Indeed. But as long as there isn't more than 3 locks (and that the
-xarray is OK being concurrently updated with marks), we're good!
+Are we guaranteed that we cannot ever see CWRITER != CREADR at VM
+dumping time? I'm not convinced that we cannot preempt the vcpu thread
+at the right spot, specially given that you can have an arbitrary
+large batch of commands to execute.
 
-> Maybe we should serialize the use of markers on the LPI list on the
-> config_lock. A slight misuse, but we need a mutex since we're poking at
-> guest memory. Then we can go through the whole N-dimensional locking
-> puzzle and convince ourselves it is still correct.
-
-Maybe. This thing is already seeing so many abuses that one more may
-not matter much. Need to see how it fits in the whole hierarchy of
-GIC-related locks...
-
-Thanks,
+Just add a page-fault to the mix, and a signal pending. Pronto, you
+see a guest exit and you should be able to start dumping things
+without the ITS having processed much. I haven't tried, but that
+doesn't seem totally unlikely.
 
 	M.
 
