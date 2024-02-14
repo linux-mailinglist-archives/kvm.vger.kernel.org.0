@@ -1,176 +1,250 @@
-Return-Path: <kvm+bounces-8718-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8719-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88281855887
-	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 02:01:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3320C8558A6
+	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 02:20:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F09B11F27F86
-	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 01:01:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6113EB2614E
+	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 01:20:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B25D779DF;
-	Thu, 15 Feb 2024 01:00:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94AC91378;
+	Thu, 15 Feb 2024 01:20:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LYlYTTS6"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="5YDzy3l5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2058.outbound.protection.outlook.com [40.107.92.58])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 464653D6D
-	for <kvm@vger.kernel.org>; Thu, 15 Feb 2024 01:00:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707958816; cv=none; b=sd5pRDUQu1RE1FUm2bwS0ySMgeZNSO8yGZSmy7dszNnG37yKCzA20PCYvjzE2i4phuVUM/TZZUqkQnqLGkQ+oDMsSRzV6pM3YA7MPltx1zO6r38fn2YzR71hl0hejVisCaIg6BGlltrMO/7urtXQFjskgpfNX9E5WUgZc4kir1c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707958816; c=relaxed/simple;
-	bh=Wf4UDyoxn2kT2aM4troTO93XPUaqMcnsOBDPFbW/SkM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=TnQ6LmD/V1wPM3pmOvzV5C0LlJR210OGIQ4BLQ0AB8VL1J+GFWgqsekadu6/zwMRxxbFoSBrTShdZcYKpsKFh0D/zowyQ6N+m5Rv5JMxiHVfrV2E+6zG3o+vF30g40zcDjdvdIC4ObBw3XoDplF/cwbW3GevlwaFjKdoGXpJOzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LYlYTTS6; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-6e0f6e2a44bso400111b3a.3
-        for <kvm@vger.kernel.org>; Wed, 14 Feb 2024 17:00:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707958812; x=1708563612; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=THBGYEvhQX0rLSUutlty+Y9Xa/noirUlucPH6YPlG7k=;
-        b=LYlYTTS61aYDoyYVk1Rn6qB7AKtPQbPvtdiVI5xm5zO+MfFVFNETmY3NT5HDAvMoJ8
-         20ndF524d/cg50tNvpxafVHuzqzMBOMmbhyEzMUJcDZkgQLcdUQcumyxp+LYqnRWzT25
-         psfq5vAPudyTDzYt/FowvBXyHCRprh3AZthk0DODfeaSNnE2AqL+WB4M4y++57sl1C6l
-         XLQ2Quzy6iwpxNO2efCIEogsJa2jU4bIvWi64D/Sf7Wkdm1lJAVHmF0YRhtbVf8WmXmE
-         QefMR8Mjx+yh8UvAUVvIlGopJbgD2MgyiztVvV5gAliZp8l0CM8CfMt0/+mTqZQv0/GZ
-         AZsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707958812; x=1708563612;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=THBGYEvhQX0rLSUutlty+Y9Xa/noirUlucPH6YPlG7k=;
-        b=Dnp/qC2ql/++i8M60fihbHXQYMkAze6hkrCFOzl1AOoH4gxu1I7V+k9ri5BqG4CIRu
-         5yUoLIP30g8DFs91yy9ZaxQOMrVwCyFdnC/GPNwmzmhC/LfCCdVAuJKwpdYJ11AhMA38
-         UEsOGxI1cz0gjoO2ZXlrMlTRPPiVcV1uDnF6AKso/TwqGEhkmZ87IywKXopGchLj8P7Z
-         jRAyPBNYavRKM0G6uKfxhOEeO+Ws7LHhWKM1o//6dEygnOmhKgjm+I+7vBtcOKYxpKQ/
-         7gJCljShZmjMaYLGXBodnps4MRVimgwcqiEl8BbOxeWbPlks/efRQyovtxma/ThLPpKb
-         9hvg==
-X-Gm-Message-State: AOJu0YwVm1gT+cGS+9dbnEFcQwwue+SCV5m7JTPC0APBATpMGXN7Mi4q
-	+Bh+lXGuPIPIQCQpeLVyonIhXmxBZwWUpnTzdJQmfJSjfX4wMrStAyA5gdynd0v8YwyfiwQAInZ
-	HYA==
-X-Google-Smtp-Source: AGHT+IEStBd+icuQ7JfYkpal9lHt3H+yQK5HyweUIHDTPfNjaxBHmFup6/mXtTX+KtrfCtylz5irAboczJA=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:1898:b0:6e0:e2f8:cf30 with SMTP id
- x24-20020a056a00189800b006e0e2f8cf30mr36898pfh.0.1707958812693; Wed, 14 Feb
- 2024 17:00:12 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 14 Feb 2024 17:00:04 -0800
-In-Reply-To: <20240215010004.1456078-1-seanjc@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACD6FEC7;
+	Thu, 15 Feb 2024 01:20:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.58
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707960017; cv=fail; b=LZPqJ8zIZm1jpFhL54YRZesNh5ZD9IY1p2XqwlcbWoqXQjGiAqRDDr6olFrSY+cxOyITrBL2eH2vD3pj07N+PiXhavsVe/U8NYzvrYYhM1EhnZL3lD3cTV2uYoSWIyA014kaWeYwsRVlYVScaHcxbjc6ee9Hc+MnAX8S2sa+Z8o=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707960017; c=relaxed/simple;
+	bh=alLSF8u/6wuDJod/Bf0sy6BQHnQlfJuKIGDmR7oVKwo=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RNnUmkhNxgb/4p1mTbREzQBjmxofsEAqirHVEYXaEwx//I5iQz9ex3IZSnHKbLYMLtdPHwaBW2p4L25OvDRhrjqqpicpmIpyqqdVIvY7QZqJ+j+BiSuCAMQhKOUlrnzTupHHuK/P+JUUo4jWc3P+KmGY3H1Zf/My4tPCn26Zw94=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=5YDzy3l5; arc=fail smtp.client-ip=40.107.92.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ZbdJVqLUCu7Ab4MfeRiSyUHCGRhZ4sSxIQ42HDEc+KPJA7XVu6vdYJlh5Z8H0791CwtmiKSo1RhLo046mgHfM7vIGfZj9v54uZLlH0oOyIhA0olUhczQf1McJyS/4lmjRhx81OGp5E3pvo9igcaQUjI5MAdtRAEIvvNgn4gMX21+nVF8Lc0qBNTPUZVtVZg725gDwIhVY7NfsBZX/Wqbm0QjDi0I0Clr2i2CQgPUnzzCrcnJPueN7xZSBNjIhIthm8PEFVxdCeWMOoDIdZeA+AyQEWqGpdcnmMTOgNhTAbrJBcPLsMrirQsyYsUcXy5JiBK5lSHO+KhNqX8PJhI3LQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xgKL/hXOOAZgcNkaNwZlop53mA2YCOO0SKALl4M78uM=;
+ b=Q3UVZ8dyY/X4hsbP7njt6VVAQVdyDJz1vffGRL+9sF2x/uQ0awaAq6QXNi/cGKmQ+DFCBLNwCl+000VmNck849vSA20l/S92o9IZlXqngB3doM4WrYZ3cNcRy5DE21RDUXbGeXdLesuTF4cJAnSiuyz/s+D9YJ45kL0MvY/011/MucQCmY2uQGBtzO+mni1Bq2+ii2C6fOt7wdEZZps0MYJTNwUAe46C5Kz9mWM2RyS3uWqIGsQC4nD8BaXV6pmoW4lFYuSXIFUzXb3HCpYYhywrvB7/UvWz7j+vJDMgUqCUMcuU+eW5HgKi7/RrsxjGX7T1RXYBopiY1WoTmNELvw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xgKL/hXOOAZgcNkaNwZlop53mA2YCOO0SKALl4M78uM=;
+ b=5YDzy3l5dkShcRBAoSQoU5Z1dYBwcrR2Of3EYOW/NxKofIxuLRfQMq0qY/SKXDs8Z80+jpXKlW0oGPN/iOo9zdlvB1fr6yrQgM0dM4U3PF94EsIOHT5SP0W2nR0MXHKmdsmEVpLCCdFlYmcVyggiAn8H1eq1tkDWyyw6wgN7t4c=
+Received: from CH2PR19CA0027.namprd19.prod.outlook.com (2603:10b6:610:4d::37)
+ by DS7PR12MB5742.namprd12.prod.outlook.com (2603:10b6:8:71::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.27; Thu, 15 Feb
+ 2024 01:20:12 +0000
+Received: from CH2PEPF000000A0.namprd02.prod.outlook.com
+ (2603:10b6:610:4d:cafe::8) by CH2PR19CA0027.outlook.office365.com
+ (2603:10b6:610:4d::37) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.26 via Frontend
+ Transport; Thu, 15 Feb 2024 01:20:12 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CH2PEPF000000A0.mail.protection.outlook.com (10.167.244.26) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7292.25 via Frontend Transport; Thu, 15 Feb 2024 01:20:12 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 14 Feb
+ 2024 19:20:11 -0600
+Date: Wed, 14 Feb 2024 16:50:41 -0600
+From: Michael Roth <michael.roth@amd.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+CC: <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+	<seanjc@google.com>, <aik@amd.com>, <isaku.yamahata@intel.com>
+Subject: Re: [PATCH 01/10] KVM: SEV: fix compat ABI for KVM_MEMORY_ENCRYPT_OP
+Message-ID: <20240214225041.lmlgchx76eapcx2o@amd.com>
+References: <20240209183743.22030-1-pbonzini@redhat.com>
+ <20240209183743.22030-2-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240215010004.1456078-1-seanjc@google.com>
-X-Mailer: git-send-email 2.43.0.687.g38aa6559b0-goog
-Message-ID: <20240215010004.1456078-3-seanjc@google.com>
-Subject: [PATCH 2/2] KVM: selftests: Test forced instruction emulation in
- dirty log test (x86 only)
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	David Matlack <dmatlack@google.com>, Pasha Tatashin <tatashin@google.com>, 
-	Michael Krebs <mkrebs@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240209183743.22030-2-pbonzini@redhat.com>
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH2PEPF000000A0:EE_|DS7PR12MB5742:EE_
+X-MS-Office365-Filtering-Correlation-Id: fbea498f-351d-4392-0628-08dc2dc441f6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	eedbkjyBTSQwz/RQiCLPjCXYk+i5o4fFsCsQ4y7oFiNi6dwUe3ci7rnG7sDKKCBLy/J768imA/I64Or3u6swKcJ2dsJUluk88pngtIKAKpWFUw2+KaYLfY+siNoqJWtb4+DY/+fbDu6V7vH76+TrI6KHJHmCXXaYQguiImHc+pCNTw6WBFt8fHUh99iMEf6JNgy6TYoCAM6qio/Yy8hBkufXw1zN7X8Qxf1/MZML3ptDFhHjr4Dn+87sqLy1KBvYEL1uT8mehPkycWkes6VdwWQ2Qw9mk78UIeUQykc8gATY7JurhTHzxXkvR3odnm1e6SmLT0I4zBaN8s8HOHzHMq8y5JwVJaIEaKeMcg3P1wO0+elWTCuDjSp/VdyDflanqmmjtEvykAvLnzCHgDtiNPSbF9VdXVPlI2z9lFt8A+i/FuHf8GDP/bY8T0izqgbdZFYE+JNEJdYSqLHaM2Vs3UNo3WnCJdNf/ilQPYUdtVrgpcSqREXoPTC6g+kHNZW8BI3ReDsbltOf1opAcWamdx2kDAsj5MOeSJe1BTU8aRkdeDiTGL2Ofk/zT9wdFOIxljv0hTmMPpNiNU+yMiGaB8Zty07Lh6CLwKSSN1M4yz9h0Y+c4UxFovWbnzZo3yHBPL0aEiV5HvUT1Tn9Qj6j24JGzpTtpG9CRvK1xz0WA6g=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(136003)(376002)(346002)(396003)(39860400002)(230922051799003)(82310400011)(64100799003)(451199024)(1800799012)(186009)(36860700004)(46966006)(40470700004)(336012)(83380400001)(86362001)(316002)(2616005)(70586007)(6916009)(6666004)(82740400003)(478600001)(44832011)(5660300002)(426003)(54906003)(81166007)(2906002)(70206006)(1076003)(26005)(8676002)(4326008)(16526019)(8936002)(36756003)(356005)(41300700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Feb 2024 01:20:12.2625
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: fbea498f-351d-4392-0628-08dc2dc441f6
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH2PEPF000000A0.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB5742
 
-Add forced emulation of MOV and LOCK CMPXCHG instructions in the dirty log
-test's guest code to verify that KVM's emulator marks pages dirty as
-expected (and obviously to verify the emulator works at all).  In the long
-term, the guest code would ideally hammer more of KVM's emulator, but for
-starters, cover the two major paths: writes and atomics.
+On Fri, Feb 09, 2024 at 01:37:33PM -0500, Paolo Bonzini wrote:
+> The data structs for KVM_MEMORY_ENCRYPT_OP have different sizes for 32- and 64-bit
+> kernels, but they do not make any attempt to convert from one ABI to the other.
+> Fix this by adding the appropriate padding.
+> 
+> No functional change intended for 64-bit userspace.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-To minimize #ifdeffery, wrap only the related code that is x86 specific,
-unnecessariliy synchronizing an extra boolean to the guest is far from the
-end of the world.
+Reviewed-by: Michael Roth <michael.roth@amd.com>
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- tools/testing/selftests/kvm/dirty_log_test.c | 36 ++++++++++++++++++--
- 1 file changed, 33 insertions(+), 3 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
-index eaad5b20854c..ff1d1c7f05d8 100644
---- a/tools/testing/selftests/kvm/dirty_log_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_test.c
-@@ -92,6 +92,29 @@ static uint64_t guest_test_phys_mem;
-  */
- static uint64_t guest_test_virt_mem = DEFAULT_GUEST_TEST_MEM;
- 
-+static bool is_forced_emulation_enabled;
-+
-+static void guest_write_memory(uint64_t *mem, uint64_t val, uint64_t rand)
-+{
-+#ifdef __x86_64__
-+	if (is_forced_emulation_enabled && (rand & 1)) {
-+		if (rand & 2) {
-+			__asm__ __volatile__(KVM_FEP "movq %1, %0"
-+					     : "+m" (*mem)
-+					     : "r" (val) : "memory");
-+		} else {
-+			uint64_t __old = READ_ONCE(*mem);
-+
-+			__asm__ __volatile__(KVM_FEP LOCK_PREFIX "cmpxchgq %[new], %[ptr]"
-+					     : [ptr] "+m" (*mem), [old] "+a" (__old)
-+					     : [new]"r" (val) : "memory", "cc");
-+		}
-+	} else
-+#endif
-+
-+	*mem = val;
-+}
-+
- /*
-  * Continuously write to the first 8 bytes of a random pages within
-  * the testing memory region.
-@@ -114,11 +137,13 @@ static void guest_code(void)
- 
- 	while (true) {
- 		for (i = 0; i < TEST_PAGES_PER_LOOP; i++) {
-+			uint64_t rand = READ_ONCE(random_array[i]);
-+
- 			addr = guest_test_virt_mem;
--			addr += (READ_ONCE(random_array[i]) % guest_num_pages)
--				* guest_page_size;
-+			addr += (rand % guest_num_pages) * guest_page_size;
- 			addr = align_down(addr, host_page_size);
--			*(uint64_t *)addr = READ_ONCE(iteration);
-+
-+			guest_write_memory((void *)addr, READ_ONCE(iteration), rand);
- 		}
- 
- 		/* Tell the host that we need more random numbers */
-@@ -772,6 +797,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 	sync_global_to_guest(vm, guest_page_size);
- 	sync_global_to_guest(vm, guest_test_virt_mem);
- 	sync_global_to_guest(vm, guest_num_pages);
-+	sync_global_to_guest(vm, is_forced_emulation_enabled);
- 
- 	/* Start the iterations */
- 	iteration = 1;
-@@ -875,6 +901,10 @@ int main(int argc, char *argv[])
- 	int opt, i;
- 	sigset_t sigset;
- 
-+#ifdef __x86_64__
-+	is_forced_emulation_enabled = kvm_is_forced_emulation_enabled();
-+#endif
-+
- 	sem_init(&sem_vcpu_stop, 0, 0);
- 	sem_init(&sem_vcpu_cont, 0, 0);
- 
--- 
-2.43.0.687.g38aa6559b0-goog
-
+> ---
+>  arch/x86/include/uapi/asm/kvm.h | 23 +++++++++++++++++++++++
+>  1 file changed, 23 insertions(+)
+> 
+> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+> index 0ad6bda1fc39..b305daff056e 100644
+> --- a/arch/x86/include/uapi/asm/kvm.h
+> +++ b/arch/x86/include/uapi/asm/kvm.h
+> @@ -687,6 +687,7 @@ enum sev_cmd_id {
+>  
+>  struct kvm_sev_cmd {
+>  	__u32 id;
+> +	__u32 pad0;
+>  	__u64 data;
+>  	__u32 error;
+>  	__u32 sev_fd;
+> @@ -697,28 +698,35 @@ struct kvm_sev_launch_start {
+>  	__u32 policy;
+>  	__u64 dh_uaddr;
+>  	__u32 dh_len;
+> +	__u32 pad0;
+>  	__u64 session_uaddr;
+>  	__u32 session_len;
+> +	__u32 pad1;
+>  };
+>  
+>  struct kvm_sev_launch_update_data {
+>  	__u64 uaddr;
+>  	__u32 len;
+> +	__u32 pad0;
+>  };
+>  
+>  
+>  struct kvm_sev_launch_secret {
+>  	__u64 hdr_uaddr;
+>  	__u32 hdr_len;
+> +	__u32 pad0;
+>  	__u64 guest_uaddr;
+>  	__u32 guest_len;
+> +	__u32 pad1;
+>  	__u64 trans_uaddr;
+>  	__u32 trans_len;
+> +	__u32 pad2;
+>  };
+>  
+>  struct kvm_sev_launch_measure {
+>  	__u64 uaddr;
+>  	__u32 len;
+> +	__u32 pad0;
+>  };
+>  
+>  struct kvm_sev_guest_status {
+> @@ -731,33 +739,43 @@ struct kvm_sev_dbg {
+>  	__u64 src_uaddr;
+>  	__u64 dst_uaddr;
+>  	__u32 len;
+> +	__u32 pad0;
+>  };
+>  
+>  struct kvm_sev_attestation_report {
+>  	__u8 mnonce[16];
+>  	__u64 uaddr;
+>  	__u32 len;
+> +	__u32 pad0;
+>  };
+>  
+>  struct kvm_sev_send_start {
+>  	__u32 policy;
+> +	__u32 pad0;
+>  	__u64 pdh_cert_uaddr;
+>  	__u32 pdh_cert_len;
+> +	__u32 pad1;
+>  	__u64 plat_certs_uaddr;
+>  	__u32 plat_certs_len;
+> +	__u32 pad2;
+>  	__u64 amd_certs_uaddr;
+>  	__u32 amd_certs_len;
+> +	__u32 pad3;
+>  	__u64 session_uaddr;
+>  	__u32 session_len;
+> +	__u32 pad4;
+>  };
+>  
+>  struct kvm_sev_send_update_data {
+>  	__u64 hdr_uaddr;
+>  	__u32 hdr_len;
+> +	__u32 pad0;
+>  	__u64 guest_uaddr;
+>  	__u32 guest_len;
+> +	__u32 pad1;
+>  	__u64 trans_uaddr;
+>  	__u32 trans_len;
+> +	__u32 pad2;
+>  };
+>  
+>  struct kvm_sev_receive_start {
+> @@ -765,17 +783,22 @@ struct kvm_sev_receive_start {
+>  	__u32 policy;
+>  	__u64 pdh_uaddr;
+>  	__u32 pdh_len;
+> +	__u32 pad0;
+>  	__u64 session_uaddr;
+>  	__u32 session_len;
+> +	__u32 pad1;
+>  };
+>  
+>  struct kvm_sev_receive_update_data {
+>  	__u64 hdr_uaddr;
+>  	__u32 hdr_len;
+> +	__u32 pad0;
+>  	__u64 guest_uaddr;
+>  	__u32 guest_len;
+> +	__u32 pad1;
+>  	__u64 trans_uaddr;
+>  	__u32 trans_len;
+> +	__u32 pad2;
+>  };
+>  
+>  #define KVM_X2APIC_API_USE_32BIT_IDS            (1ULL << 0)
+> -- 
+> 2.39.0
+> 
+> 
 
