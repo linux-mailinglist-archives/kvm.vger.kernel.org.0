@@ -1,144 +1,120 @@
-Return-Path: <kvm+bounces-8693-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8694-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C746A854F05
-	for <lists+kvm@lfdr.de>; Wed, 14 Feb 2024 17:48:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01545854F3D
+	for <lists+kvm@lfdr.de>; Wed, 14 Feb 2024 17:57:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52CDC284B44
-	for <lists+kvm@lfdr.de>; Wed, 14 Feb 2024 16:48:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0BC7283DE0
+	for <lists+kvm@lfdr.de>; Wed, 14 Feb 2024 16:57:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39557604C5;
-	Wed, 14 Feb 2024 16:47:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B1C760887;
+	Wed, 14 Feb 2024 16:57:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AIO2g2/C"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="bcp4Da1B"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F1C95D49C;
-	Wed, 14 Feb 2024 16:47:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52347604D9;
+	Wed, 14 Feb 2024 16:57:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707929273; cv=none; b=QIqEOVBaqNR0lueOLhVlMQ05URW7PssWCwp/O2pOG0R8WaZUtEOGJNWvChqIFyBpsl7lpwJXPScpc96oZpQ0aJ9r6hpCTJp+cQiEK/9wX7DiRP77W11+P6NEX6q2g0wMkLIuZTqZN0Yadt5cRrDO47dF4ii3t6pXrzaJQWypE50=
+	t=1707929829; cv=none; b=l+TXiAczdAh+48ZrnUBrp3qrfnRwbEd6nVvCOPRu20A8C4jRc+D0hhSz4Giq/MHSqHQHd9PvOry60k4Ro9xtdpyn7GBkxiVfdST/Xz13OkjbHtm20Jvc8/AMCQYmYP6u33ONiE4SuYzdPGwFxGYYiCzW9SMSgtoU8pk6xIVHtbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707929273; c=relaxed/simple;
-	bh=DnnQl04MGaYTNcKzbKois0ch8l8Y5ji0lievz5/HVOI=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=C1J5aMzmrKsPtzT1ZqFR4fc5JAggB1jJEdRFQKJlv0jEPpP3RZCa/ve2b2F0IP+F8rwPi57hpr3RzAEfqVN3JzWrp+K/FJHX1+aJEdoluLyW9YuW60yxd8TOoblW6PI9D8/RpYHHtlm6b+HkesKKlEVOxY3LAN8DkLDeiQg1vws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AIO2g2/C; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9A96C433C7;
-	Wed, 14 Feb 2024 16:47:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707929272;
-	bh=DnnQl04MGaYTNcKzbKois0ch8l8Y5ji0lievz5/HVOI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=AIO2g2/CDd7ZJszKQwdaQI7N/ZVQqYEXaj7zK110O6TotyGDGa+gwxyWgxlUb4XJ4
-	 byojqWaanu5+ALMOkbJLvbhNOl2xVtQXjz5gIa9fHlAN0Skn78r83EiIG4TOdyLPFQ
-	 n/K9uLUzdsSHPGhUhCB0aHxgL241tEhKbpSrTEMkifCOK3Z6CNCDqerE60rxKmMknS
-	 rNUGE6IsJ+X0o+0OU1ZDWt8YcZi6zxXzqAoFIbG8uHgdpC1VusHBcqhes93cnvbiv8
-	 bGvjU+V8TKUo7yaXVqz1gYjM1EYZaLiqOtNAFmAr70RH18B42zvQdLUm7GhyZucL+9
-	 Uns4wZXQtTCZg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1raIQI-003Cnr-D8;
-	Wed, 14 Feb 2024 16:47:50 +0000
-Date: Wed, 14 Feb 2024 16:47:49 +0000
-Message-ID: <861q9f56x6.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 07/23] KVM: arm64: vgic: Use atomics to count LPIs
-In-Reply-To: <20240213093250.3960069-8-oliver.upton@linux.dev>
-References: <20240213093250.3960069-1-oliver.upton@linux.dev>
-	<20240213093250.3960069-8-oliver.upton@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1707929829; c=relaxed/simple;
+	bh=biuzYcQMelgQl+J54Kbot+3JqcMvoeGyuw3X50yl3uo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Doth6bbzK9QQxGdZQ7ypCOWBdct5BFDMGquFXIlADHU0qBWMLNDfiCuZF1gLQWVHBSkqMGmSlfJXc2CUIoLr+Sv9w7MN1gGIckWxcSGr2iN4v3QncSm0QCi1wwjDbw5GMIJDpsoT9C4j9ul7VAfoC+rr4CinoFGjlAuVddjx5fU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=bcp4Da1B; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from [100.66.32.72] (unknown [108.143.43.187])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 4C6E120B2000;
+	Wed, 14 Feb 2024 08:56:59 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 4C6E120B2000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1707929827;
+	bh=ckiTjQJyYMqOqp6nmIcopayJUmMXUp+ALCH4tNreFgA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=bcp4Da1BitmockWhF96LYrtqTtYF1wsfqg1TsvWy2uwN7ngUJtjxpHOsFsOFkYRJo
+	 Oc1JJKqKMD6tBVucLCv3I/J+wJYE56PeZVCCO7qQ3ND3CBRPqEuGxsTyjNc2QPe9EQ
+	 6yEqS9dEv9MTe2x16MuoGJbktHyukuLjD1rAvyRk=
+Message-ID: <b6f00233-0cbf-4d9a-aa8b-babc8a9ca696@linux.microsoft.com>
+Date: Wed, 14 Feb 2024 17:56:56 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 04/26] x86/sev: Add the host SEV-SNP initialization
+ support
+To: Borislav Petkov <bp@alien8.de>, Michael Roth <michael.roth@amd.com>
+Cc: x86@kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+ linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+ jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
+ pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+ jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
+ slp@redhat.com, pgonda@google.com, peterz@infradead.org,
+ srinivas.pandruvada@linux.intel.com, rientjes@google.com, tobin@ibm.com,
+ vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+ tony.luck@intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+ alpergun@google.com, jarkko@kernel.org, ashish.kalra@amd.com,
+ nikunj.dadhania@amd.com, pankaj.gupta@amd.com,
+ "liam.merwick@oracle.com Brijesh Singh" <brijesh.singh@amd.com>
+References: <20231230161954.569267-1-michael.roth@amd.com>
+ <20231230161954.569267-5-michael.roth@amd.com>
+ <f60c5fe0-9909-468d-8160-34d5bae39305@linux.microsoft.com>
+ <20240105160916.GDZZgprE8T6xbbHJ9E@fat_crate.local>
+ <20240105162142.GEZZgslgQCQYI7twat@fat_crate.local>
+ <0c4aac73-10d8-4e47-b6a8-f0c180ba1900@linux.microsoft.com>
+ <20240108170418.GDZZwrEiIaGuMpV0B0@fat_crate.local>
+ <b5b57b60-1573-44f4-8161-e2249eb6f9b6@linux.microsoft.com>
+ <20240109122906.GCZZ08Esh86vhGwVx1@fat_crate.local>
+ <20240109124440.GDZZ0/uDY9RRPIOxOB@fat_crate.local>
+Content-Language: en-US
+From: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+In-Reply-To: <20240109124440.GDZZ0/uDY9RRPIOxOB@fat_crate.local>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, 13 Feb 2024 09:32:44 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On 09/01/2024 13:44, Borislav Petkov wrote:
+> On Tue, Jan 09, 2024 at 01:29:06PM +0100, Borislav Petkov wrote:
+>> At least three issues I see with that:
+>>
+>> - the allocation can fail so it is a lot more convenient when the
+>>   firmware prepares it
+>>
+>> - the RMP_BASE and RMP_END writes need to be verified they actially did
+>>   set up the RMP range because if they haven't, you might as well
+>>   throw SNP security out of the window. In general, letting the kernel
+>>   do the RMP allocation needs to be verified very very thoroughly.
+>>
+>> - a future feature might make this more complicated
 > 
-> Switch to using atomics for LPI accounting, allowing vgic_irq references
-> to be dropped in parallel.
+> - What do you do if you boot on a system which has the RMP already
+>   allocated in the BIOS?
 > 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/arm64/kvm/vgic/vgic-debug.c | 2 +-
->  arch/arm64/kvm/vgic/vgic-its.c   | 4 ++--
->  arch/arm64/kvm/vgic/vgic.c       | 2 +-
->  include/kvm/arm_vgic.h           | 4 ++--
->  4 files changed, 6 insertions(+), 6 deletions(-)
+> - How do you detect that it is the L1 kernel that must allocate the RMP?
 > 
-> diff --git a/arch/arm64/kvm/vgic/vgic-debug.c b/arch/arm64/kvm/vgic/vgic-debug.c
-> index 85606a531dc3..389025ce7749 100644
-> --- a/arch/arm64/kvm/vgic/vgic-debug.c
-> +++ b/arch/arm64/kvm/vgic/vgic-debug.c
-> @@ -149,7 +149,7 @@ static void print_dist_state(struct seq_file *s, struct vgic_dist *dist)
->  	seq_printf(s, "vgic_model:\t%s\n", v3 ? "GICv3" : "GICv2");
->  	seq_printf(s, "nr_spis:\t%d\n", dist->nr_spis);
->  	if (v3)
-> -		seq_printf(s, "nr_lpis:\t%d\n", dist->lpi_list_count);
-> +		seq_printf(s, "nr_lpis:\t%d\n", atomic_read(&dist->lpi_count));
->  	seq_printf(s, "enabled:\t%d\n", dist->enabled);
->  	seq_printf(s, "\n");
->  
-> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-> index c68164d6cba0..048226812974 100644
-> --- a/arch/arm64/kvm/vgic/vgic-its.c
-> +++ b/arch/arm64/kvm/vgic/vgic-its.c
-> @@ -97,7 +97,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
->  		goto out_unlock;
->  	}
->  
-> -	dist->lpi_list_count++;
-> +	atomic_inc(&dist->lpi_count);
->  
->  out_unlock:
->  	if (ret)
-> @@ -345,7 +345,7 @@ int vgic_copy_lpi_list(struct kvm *kvm, struct kvm_vcpu *vcpu, u32 **intid_ptr)
->  	 * command). If coming from another path (such as enabling LPIs),
->  	 * we must be careful not to overrun the array.
->  	 */
-> -	irq_count = READ_ONCE(dist->lpi_list_count);
-> +	irq_count = atomic_read(&dist->lpi_count);
+> - Why can't you use the BIOS allocated RMP in your scenario too instead
+>   of the L1 kernel allocating it?
+> 
+> - ...
+> 
+> I might think of more.
+> 
 
-I'd like to propose an alternative approach here. I've always hated
-this "copy a bunch of INTIDs" thing, and the only purpose of this
-silly counter is to dimension the resulting array.
+Sorry for not replying back sooner.
 
-Could we instead rely on an xarray marking a bunch of entries (the
-ones we want to 'copy'), and get the reader to clear these marks once
-done?
+I agree, lets get the base SNP stuff in and then talk about extensions.
 
-Of course, we only have 3 marks, so that's a bit restrictive from a
-concurrency perspective, but since most callers hold a lock, it should
-be OK.
+I want to sync up with Michael to make sure he's onboard with what I'm
+proposing. I'll add more design/documentation/usecase descriptions with the
+next submission and will make sure to address all the issues you brought up.
 
-What do you think?
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Jeremi
 
