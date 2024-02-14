@@ -1,188 +1,319 @@
-Return-Path: <kvm+bounces-8642-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8643-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 712FC853F3D
-	for <lists+kvm@lfdr.de>; Tue, 13 Feb 2024 23:55:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B2D48540E3
+	for <lists+kvm@lfdr.de>; Wed, 14 Feb 2024 01:46:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 942BD1C268B0
-	for <lists+kvm@lfdr.de>; Tue, 13 Feb 2024 22:55:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16E4428AA7A
+	for <lists+kvm@lfdr.de>; Wed, 14 Feb 2024 00:46:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2E9262814;
-	Tue, 13 Feb 2024 22:55:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7BE1A958;
+	Wed, 14 Feb 2024 00:46:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OkhY7/Uc"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="V/LTTnT6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59A93627EA
-	for <kvm@vger.kernel.org>; Tue, 13 Feb 2024 22:55:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707864941; cv=none; b=JkfLQCC8+omIsS1I2IEWNdAVlnKGdS8HqiUFyyRkADPRc0EzJCdQiH1AV1yV9Ps5yTxZlyVZnezE36PHQ7QoKuNY2dn5+cdqMS3M6PpsHSkHQpCc7Wjb3cFJB5T2SRuMIuC71F5x3O9GXlvUkOY205cLZB4dOVMl81XkVgioqlw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707864941; c=relaxed/simple;
-	bh=6bIqARQafQOI+oOtGpkDwD/hAKfwxg9IRBSpXMr1j2k=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Y+KMvRIyNC9c1Ro7iKtuEEEvfgHPy5aa6bbp8pvq8gPgBqe6/rAJGZHtSoai4Wy1jjz726bsDSnroKiXYxE/6a8UsshLi3iC4I+WI4WAXrpsvZgK81o3hp4WifdUZi9VS0bKdkpX4oz2Wz1UBDyLwxR+TgTJ6Ejem8Zqp9YdHRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OkhY7/Uc; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-60788151153so16767217b3.3
-        for <kvm@vger.kernel.org>; Tue, 13 Feb 2024 14:55:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707864939; x=1708469739; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yOy1BgJS5o8h8aPqelg2Ns2PMEIFHBsWcoJeNJUIqbM=;
-        b=OkhY7/Uc5pdzHaQJedn14SwNRvQ7XjC9Me7vCg/8VGV/cyeOXvHqZW1E3RAZco8Xz1
-         mFYvBiIrJTmW2suBEwon8SQV41vq6nvxxLjxz70QgAclBGTZfCjPSEZS1ncLxuOn1usb
-         GwB+84T5gdSO03zVf3MOBhhNxpJfiN5joAg2952rZLfCSXbg8+jwqyaCXKCsvst3QPnw
-         RtDcnqK4u05GrEdG+RRZ9L7/bBxx0eXyKMNTV7z7E0MwRUxlRiqzHOzibNoaKCgSVoem
-         mIdAchgarCGkbHzCcTAtXdst7II59zIsd5nqDg2jzhNEIhn3+WBydA5/fZOz2LoLYQ5Q
-         Rtyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707864939; x=1708469739;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yOy1BgJS5o8h8aPqelg2Ns2PMEIFHBsWcoJeNJUIqbM=;
-        b=lUAwmwqqThCA+Kvo21nnQ1IUiEqNVrNiq08qg+vmwHPPhCfqZHiG069XppBNFwou+1
-         ND5p90rx4rod0/8KgzoiZZSDy0qScXJFJWDfnU7TQ6vfT51W8Tc+3Y8Bncf6Yu62kqRK
-         Zv0y5bZ8yYxoCd8TXMWQlQzMErbyIlO7Kbu0d77GmNhPVxtZFMdGB0ZnW9/z0gBFQu++
-         JSNqIcHjgc5MMQXqqhhioh5jvPeeQoSXEIK/qw97p4lU5ev8EzSzGmwJb9KchBYbMBg+
-         04gIYc37Wb8UdcIqqeDuAzLtxg/bMjCBQ8NZ+8glgEp3osfVXx2blZ9vgN/hkrIxp7cb
-         pVuw==
-X-Forwarded-Encrypted: i=1; AJvYcCVMHs6sAVhdOD5vdy49Dzu5NY78o88r5XOHrEVEHekBEmGhwN7J6qKwm2beWWGRMX1rDXijUR4NJtUyNbvkGzDq7zOA
-X-Gm-Message-State: AOJu0Yxq16BvZsxQ0zvsY0cfKrXbsmAfTQDO7JTLD3H2cOtgcBELFhAo
-	n0FlBnGnk0duqDb3jCD1tjEGijsr12mibxiebx/KsRMnBnfYbK2tP5tgnKcOFc+uK7D+pJizWWw
-	igQ==
-X-Google-Smtp-Source: AGHT+IHQAzS7C+vwrTRQVHpAmuOQZwuyBYtRsp3POOJXEkDoJbxX2Fsa92TFul5jA7j0r3yWScgxyMN80k8=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:100f:b0:dc2:5273:53f9 with SMTP id
- w15-20020a056902100f00b00dc2527353f9mr33046ybt.1.1707864939382; Tue, 13 Feb
- 2024 14:55:39 -0800 (PST)
-Date: Tue, 13 Feb 2024 14:55:37 -0800
-In-Reply-To: <20240206182032.1596-2-xin3.li@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90CA57F;
+	Wed, 14 Feb 2024 00:46:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707871569; cv=fail; b=uqcnn0qXP1rzuCmzZrcyQaZiFWMSglP4nzJZJ62OcPqOlDd2Ot67P0ocIa0HXC1+SpaWHqJRNqnJWVTd6FvS5WWr4Y5P19pbsADjY4YuXiEVQPfIoV2ynnArY/esp52OHtRpAOrb1ENrRBDkoaqyBUXSsFawVidOAuCaM4kxv3U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707871569; c=relaxed/simple;
+	bh=IA/noqPb9ie1L+Bn2tla9MPVramEQm1KXGx2jrR4Ad0=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=b01sRkrGUumFbyoK3RTcyYqwLHCmXmIYtzjOqb09ib6opMVrdcTtyznEcbyMeQJ5rJDTxli0vgqVV2HhcL47eZOpg8L1dGIhxFvjVZsVyynpi9hCNoEz2dxxFBf2FoawCd8qpnBJzHOfZk+Q47P2xRn7lmMxE8B2cR5/icH8sm0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=V/LTTnT6; arc=fail smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707871566; x=1739407566;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=IA/noqPb9ie1L+Bn2tla9MPVramEQm1KXGx2jrR4Ad0=;
+  b=V/LTTnT6KKiRxeCnUERCpF6jLI72nPrBA410JuMkC0nXtFl4RjThvwPD
+   70B7M88cc7o+76UnGqsoFrOKi2M7fEx3izwqFlObzq7pzRCOjJfkT9Wuz
+   PzhuBc0WHS8GHiVB0KMidb1ev99gWFFlDk/NMOGb29JWJeCJJWvkMcGbq
+   vO11j5mjQd0yKg4dXH3T9Y7myofe4tJdPjXeQ5ZM8PNfVURvbwCLtGyM0
+   xKK0p/fNhm+FexmcWYe+KCZrsWIelphuR8qA4UN3UZU7d83/kS/lf9DZR
+   xSGAaW+TapDYonKv8NNIKXRnc/MGSjLswzTILLy9Hcip/Qal2KedNDzJo
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10982"; a="27350195"
+X-IronPort-AV: E=Sophos;i="6.06,158,1705392000"; 
+   d="scan'208";a="27350195"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2024 16:46:05 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,158,1705392000"; 
+   d="scan'208";a="7696055"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orviesa003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 13 Feb 2024 16:46:05 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 13 Feb 2024 16:46:03 -0800
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 13 Feb 2024 16:46:03 -0800
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Tue, 13 Feb 2024 16:46:03 -0800
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.169)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 13 Feb 2024 16:46:02 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=oD7QV1SC5y1R60tWrJrj/N1Gejj7MJE2U8JFByNtTCYFqFZQnwb3Xse4hGAeocaDKB6LQ1GjWSHBqYK5qkM9AJg2iWdokHNpHA4JM56rsoviOaYOAb9DEuvSMkaKFzcNNIafP0Wx4rqdfNsXUX1b5dk7/uC2tvLg8ez2954/avsm9jcnJGEWuaEIUSBdyuSM02UGk5G/46BaLjHupcRb1mSmwyWbe1sZZx521/zqVAXLbth2fQJlZpbU2V8rDxpr3cyzzSgE7aMn7v9auoaLMPVaK9Emh8UroQuaPhRe0xyjqzb6qpnaiy49+eRoVQPPKoYLAtpCWTIjn0bSNtW+0Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BGKffyh9wE7OMeMNJoKmvSny1pQsluC89jeaS/zG9w8=;
+ b=LgWpy4296VqHlFJkobzT5Pe8Q6lZjZzQZK5SbYtB8ACDXL/V5BOXMe8dLDUiw/2OCcRDDnJUtP95TYtMk46uZBW44GaaXkw1CEzTCPaz1D9rydMXDJVubIA2m+MagOX5GBFU8LiqUzW6hai1OLD2SJpGDonG5Q62D3vyUAVYY7czkMx8KFdmSCxeRrwCP8azbguftTqf6RSVV6eGS9NJeHcoXj7QvugZp0wMIsRtRh1qNRDLjnDkEUKdaqBZ0eAKLtN9ucNYredFwEVyCD0yrhtu+8oVkZSmCDHTsMjANeb6egzcBWlLt1Dv5/k3BYWOPaxIb4mga9WC3NCBiDmuGQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from SA1PR11MB6734.namprd11.prod.outlook.com (2603:10b6:806:25d::22)
+ by CYXPR11MB8689.namprd11.prod.outlook.com (2603:10b6:930:d8::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.33; Wed, 14 Feb
+ 2024 00:46:00 +0000
+Received: from SA1PR11MB6734.namprd11.prod.outlook.com
+ ([fe80::8ccb:4e83:8802:c277]) by SA1PR11MB6734.namprd11.prod.outlook.com
+ ([fe80::8ccb:4e83:8802:c277%4]) with mapi id 15.20.7270.036; Wed, 14 Feb 2024
+ 00:46:00 +0000
+From: "Li, Xin3" <xin3.li@intel.com>
+To: Sean Christopherson <seanjc@google.com>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com"
+	<pbonzini@redhat.com>, "tglx@linutronix.de" <tglx@linutronix.de>,
+	"mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "x86@kernel.org"
+	<x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>, "Yang, Weijiang"
+	<weijiang.yang@intel.com>, "Huang, Kai" <kai.huang@intel.com>
+Subject: RE: [PATCH v5 1/2] KVM: VMX: Cleanup VMX basic information defines
+ and usages
+Thread-Topic: [PATCH v5 1/2] KVM: VMX: Cleanup VMX basic information defines
+ and usages
+Thread-Index: AQHaWS3TKLWZzVt2oEy7w+XgclJ8GbEI6uCAgAAZ+hA=
+Date: Wed, 14 Feb 2024 00:46:00 +0000
+Message-ID: <SA1PR11MB67347AE5FD9A8710F3921D13A84E2@SA1PR11MB6734.namprd11.prod.outlook.com>
+References: <20240206182032.1596-1-xin3.li@intel.com>
+ <Zcvxf-fjYhsn_l1F@google.com>
+In-Reply-To: <Zcvxf-fjYhsn_l1F@google.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA1PR11MB6734:EE_|CYXPR11MB8689:EE_
+x-ms-office365-filtering-correlation-id: 0229a6e8-0d23-40c9-f1a5-08dc2cf65051
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: pdbzFkrQp4LbtTOEs5NGBA3rmCjA72SOlqm1if9V+uebYz+NTGs38ZX3Kg7r0IKurg1CcLPZKJDbVp8cyozxfXlLkZE8mBANHEFEwjLxRKJzZuWDgPQpiPwpWoUtXvZPAW0cLJ8IM4S36p9draA65c7lEDg1yo6+rsDaVqh3KDlCsGJ+0tZWhgIZSYivGdNhqzJPHIc/Oofcdb+xlRtofHPpLgCSsVbDQxF80+C6l5ZK2VzWgfQn1/pTCOzYwm0UeAxooQiXyYS3x6azW0AvnOg19qVNCArtoMs7+AOPI1Krr9abI6mubIxQBfF/Ht0dcwD3ZImQhRQ7W4cE0wSXQ+Hve8ZXDkFI+TEhNSHs7PVS8vaShcbi00d5KYRgQZzyazt/pXVgkCrIHjwdTlClNaJ80tAY2WLojCHC/YnejuH23oXHbEDnhi1mqeCpEXM0Yz4J/FuISwa/xFJe7z8Rlp17I+9feX6N5/E6McvUVZIIhupAbXPh433eW09v/HPa1RzhZR6HNhOOXohp/ybqWVIxyq4OHMkg9xl1+PG1FLDijlcFRhHa8ZVlIRC4PBPmHNa8oYQ3TpOO6xQeCZ+rvqiTnAT15G40A4ZfC7rIR3c=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR11MB6734.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(346002)(396003)(136003)(366004)(376002)(230922051799003)(451199024)(186009)(64100799003)(1800799012)(38100700002)(41300700001)(71200400001)(86362001)(33656002)(38070700009)(55016003)(7416002)(4326008)(478600001)(66476007)(8936002)(2906002)(64756008)(6916009)(5660300002)(66446008)(66946007)(76116006)(8676002)(52536014)(66556008)(6506007)(7696005)(9686003)(316002)(966005)(82960400001)(54906003)(122000001)(83380400001)(26005);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?MhxVGrhcu3QyFA0B+v2g2QTByvvbTrDudFyAQM0i1roW18ZkUzbhJjVIWg1p?=
+ =?us-ascii?Q?D8p515Rl+3UOkBFetGE2ivX75IBxtce+H4wAlXCBD0Bwy2rVY2SPrKmi2gu2?=
+ =?us-ascii?Q?LSqoMluZH5wDZnozxb9nESuOxeGTZFOytkNa0+N81kufb62mwKdt6IKsSLKu?=
+ =?us-ascii?Q?eoFt6zSjy5FZcA1xcjwn0nZlvT/ii3M6hZ/17BWlHDDT9f7V0+GCFTasg0VF?=
+ =?us-ascii?Q?UM+DQFCkAAe7MlIWhwdkCWo7YF5laW1SKQ51rso4KDUwjlwGE7k5zbkFoQW6?=
+ =?us-ascii?Q?LCZNiZnYWuxPoLfJ5BUjC92gOu5s4nbo5/+PVTt1pTlcTbkO+Opy1b+Z/ulc?=
+ =?us-ascii?Q?rKNmFE+/pbjDRMvNx8MDPGzZIIE8xlV/alg6XyXOIWGwdiBfti+S6kLB2JeJ?=
+ =?us-ascii?Q?Yc9BdPwfWlpVllpgwSjcPWekDY0ExNYvWcncUPLI1BZhicSHv4D5RgeKnmEE?=
+ =?us-ascii?Q?3N//60YVOJgFbaIt03+sXwItDlcihQkiOWZq1QE43VytfvBkK7qR3Y04R3yO?=
+ =?us-ascii?Q?8sEH4HFbDeZKQfF8Gk8x1fk/z50eKu6bgMOc4GMk8N3Wm/4YS65FUP+Oe0Y9?=
+ =?us-ascii?Q?GHJFNkLfOZJ+zfxM5jQkhJUt0LXSk4BKBVLynXtfQ3mdbx62cd9ueoUm/t1z?=
+ =?us-ascii?Q?Gi0eSGzKfYJdVMHQd+l5U03YoQOzWLzNnHZYQaN7nAuZICGYJcIdq6EhDGPS?=
+ =?us-ascii?Q?TpiKr64gpGxKHADK4iE1aGJAJki/mAPhv8cmVTRgZDG6LSouv9Dg8pfhJ5PH?=
+ =?us-ascii?Q?c5k/GnkCeHxdKTpqainm/GRvgj2hTHVH1pOvNGeMKRlWBRwrjngZUBIMGQTS?=
+ =?us-ascii?Q?VgR3JUK20bPkkKSKXVBZshXYWmK7g1yShNegsgfnof09gu80bVcuTNP26NNL?=
+ =?us-ascii?Q?/pzj7WeY+Dy0p3FeOieg9/G/ezBBZgOwIXbkJPCTd5qwxW5MsWdd64YVg4h6?=
+ =?us-ascii?Q?8PJgioOfni1HfdEIvXzUC3CdF8eF9IIdO/J/N7o76v+GtqqNMelvL01c8p1s?=
+ =?us-ascii?Q?VigLY+bLP6v0qmB98c57232Smwl2BaJsATVIZnbTk5ZWzeaIbbfpwerTGZZw?=
+ =?us-ascii?Q?rjpczL4LgTtu+maDrOZZrsOsCVLzARFTQKiZHAPY5aeYoVnP8DzlRwQrg7sN?=
+ =?us-ascii?Q?6OHtV3d+Hw/WSuZDumKxhvt2067uib/+iqgWWxg/z2DpmzB0+Nv+TrIb9Diy?=
+ =?us-ascii?Q?MaEYc9TXVIZODcEvpDdlDmGuSmVyIxvFKu06IoQKVyf/In/OgbeIQv9SsFp9?=
+ =?us-ascii?Q?AeRoFDxT6QUwQrYnjxGaFFB7rP/AgBKlmh+2+pN9KAOU3i6DAAf6rjlRuY+d?=
+ =?us-ascii?Q?UKr4GZzF5/1B6qXp0fqNjc709jf+DEBVrk+iEWH4Uls+IpvzczLuoW9odzzH?=
+ =?us-ascii?Q?YKRMk39t1i55hiVwuYN97AjI8dRCZO5/HMQ8mDzDc89p17aFbLOz5zvIWJ1J?=
+ =?us-ascii?Q?7zLRtdXPDkJdhZ94CwcKLiLipdzzTf4j5ypx/AuQ49QIqcUHFI29oOw7YYzo?=
+ =?us-ascii?Q?3OVwXml/5aiSUJb3qTLQJDaYEqbxR3a06E/AWPuPyzu2HTrQAAwDttfVcC0p?=
+ =?us-ascii?Q?wr+mr3okVV0hoz/Kx30=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240206182032.1596-1-xin3.li@intel.com> <20240206182032.1596-2-xin3.li@intel.com>
-Message-ID: <ZcvzaZBKUKsKr6BN@google.com>
-Subject: Re: [PATCH v5 2/2] KVM: VMX: Cleanup VMX misc information defines and usages
-From: Sean Christopherson <seanjc@google.com>
-To: Xin Li <xin3.li@intel.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, pbonzini@redhat.com, 
-	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
-	weijiang.yang@intel.com, kai.huang@intel.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR11MB6734.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0229a6e8-0d23-40c9-f1a5-08dc2cf65051
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Feb 2024 00:46:00.0608
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ciWQOaK56i9aP+8IVBMLTN/Zty7pokQ6bMnyZrYbG5U1v2huDkD3fn9/G5ywJwVHJVmDHInaaJNoALtsBSBeNg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYXPR11MB8689
+X-OriginatorOrg: intel.com
 
-On Tue, Feb 06, 2024, Xin Li wrote:
-> Define VMX misc information fields with BIT_ULL()/GENMASK_ULL(), and move
-> VMX misc field macros to vmx.h if used in multiple files or where they are
-> used only once.
+> Please send cover letters for series with more than one patch, even if th=
+ere are
+> only two patches.  At the very least, cover letters are a convenient loca=
+tion to
+> provide feedback/communication for the series as a whole.
 
-Yeah, no.  This changelog doesn't even begin to cover what all is going on here,
-and as with the first patch, this obviously needs to be split into multiple
-patches.
+Kai also said so...  I'll take it as a standard practice.
 
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 80fea1875948..a9dfda2cbca3 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -917,6 +917,8 @@ static int nested_vmx_store_msr_check(struct kvm_vcpu *vcpu,
->  	return 0;
->  }
->  
-> +#define VMX_MISC_MSR_LIST_MULTIPLIER	512
-> +
->  static u32 nested_vmx_max_atomic_switch_msrs(struct kvm_vcpu *vcpu)
->  {
->  	struct vcpu_vmx *vmx = to_vmx(vcpu);
-> @@ -1315,18 +1317,34 @@ vmx_restore_control_msr(struct vcpu_vmx *vmx, u32 msr_index, u64 data)
->  	return 0;
->  }
->  
-> +#define VMX_MISC_SAVE_EFER_LMA		BIT_ULL(5)
-> +#define VMX_MISC_ACTIVITY_STATE_BITMAP	GENMASK_ULL(8, 6)
-> +#define VMX_MISC_ACTIVITY_HLT		BIT_ULL(6)
-> +#define VMX_MISC_ACTIVITY_WAIT_SIPI	BIT_ULL(8)
-> +#define VMX_MISC_RDMSR_IN_SMM		BIT_ULL(15)
-> +#define VMX_MISC_VMXOFF_BLOCK_SMI	BIT_ULL(28)
+>  Instead, I need to put it here:
+>=20
+> I'll send a v6 with all of my suggestions incorporated.
 
-Gah, my bad.  I misread a comment in v1, and gave nonsensical feedback.  I thought
-the comment was saying that #defines for the *reserved* bits should be in vmx.h
-but you were talking about moving existing defines from msr-index.h to vmx.h.
-Defining feature bits in nested.c, and thus splitting the VMX_MISC feature bit
-definitions across multiple locations, doesn't make any sense.  Sorry for the
-confusion.
+Perfect!
 
- : > Probably should also move VMX MSR field defs from msr-index.h to
- : > a vmx header file.
- : 
- : Why bother putting them in a header?  As above, it's extremely unlikely anything
- : besides vmx_restore_vmx_basic() will ever care about exactly which bits are
- : reserved.
+>  I like the cleanups, but
+> there are too many process issues to fixup when applying, a few things th=
+at I
+> straight up disagree with, and more aggressive memtype related changes th=
+at can
+> be done in the context of this series.
+>=20
+> > @@ -505,8 +521,6 @@ enum vmcs_field {
+> >  #define VMX_EPTP_PWL_5				0x20ull
+> >  #define VMX_EPTP_AD_ENABLE_BIT			(1ull << 6)
+> >  #define VMX_EPTP_MT_MASK			0x7ull
+> > -#define VMX_EPTP_MT_WB				0x6ull
+> > -#define VMX_EPTP_MT_UC				0x0ull
+>=20
+> I would strongly prefer to keep the VMX_EPTP_MT_WB and VMX_EPTP_MT_UC
+> defines,
+> at least so long as KVM is open coding reads and writes to the EPTP.  E.g=
+. if
+> someone wants to do a follow-up series that adds wrappers to decode/encod=
+e
+> the
+> memtype (and other fiels) from/to EPTP values, then I'd be fine dropping =
+these.
+>=20
+> But this:
+>=20
+>=20
+> 	/* Check for memory type validity */
+> 	switch (new_eptp & VMX_EPTP_MT_MASK) {
+> 	case MEM_TYPE_UC:
+> 		if (CC(!(vmx->nested.msrs.ept_caps & VMX_EPTP_UC_BIT)))
+> 			return false;
+> 		break;
+> 	case MEM_TYPE_WB:
+> 		if (CC(!(vmx->nested.msrs.ept_caps & VMX_EPTP_WB_BIT)))
+> 			return false;
+> 		break;
+> 	default:
+> 		return false;
+> 	}
+>=20
+> looks wrong and is actively confusing, especially when the code below it =
+does:
+>=20
+> 	/* Page-walk levels validity. */
+> 	switch (new_eptp & VMX_EPTP_PWL_MASK) {
+> 	case VMX_EPTP_PWL_5:
+> 		if (CC(!(vmx->nested.msrs.ept_caps &
+> VMX_EPT_PAGE_WALK_5_BIT)))
+> 			return false;
+> 		break;
+> 	case VMX_EPTP_PWL_4:
+> 		if (CC(!(vmx->nested.msrs.ept_caps &
+> VMX_EPT_PAGE_WALK_4_BIT)))
+> 			return false;
+> 		break;
+> 	default:
+> 		return false;
+> 	}
+>
 
-> +#define VMX_MISC_FEATURES_MASK			\
-> +	(VMX_MISC_SAVE_EFER_LMA |		\
-> +	 VMX_MISC_ACTIVITY_STATE_BITMAP |	\
-> +	 VMX_MISC_INTEL_PT |			\
-> +	 VMX_MISC_RDMSR_IN_SMM |		\
-> +	 VMX_MISC_VMXOFF_BLOCK_SMI |		\
-> +	 VMX_MISC_VMWRITE_SHADOW_RO_FIELDS |	\
-> +	 VMX_MISC_ZERO_LEN_INS)
-> +
-> +#define VMX_MISC_RESERVED_BITS			\
-> +	(BIT_ULL(31) | GENMASK_ULL(13, 9))
-> +
->  static inline bool nested_cpu_has_zero_length_injection(struct kvm_vcpu *vcpu)
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index dc163a580f98..96f0d65dea45 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -2570,7 +2570,6 @@ static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
->  	u32 _vmexit_control = 0;
->  	u32 _vmentry_control = 0;
->  	u64 basic_msr;
-> -	u64 misc_msr;
->  	int i;
->  
->  	/*
-> @@ -2704,8 +2703,6 @@ static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
->  	if (vmx_basic_vmcs_mem_type(basic_msr) != MEM_TYPE_WB)
->  		return -EIO;
->  
-> -	rdmsrl(MSR_IA32_VMX_MISC, misc_msr);
-> -
->  	vmcs_conf->basic = basic_msr;
->  	vmcs_conf->pin_based_exec_ctrl = _pin_based_exec_control;
->  	vmcs_conf->cpu_based_exec_ctrl = _cpu_based_exec_control;
-> @@ -2713,7 +2710,8 @@ static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
->  	vmcs_conf->cpu_based_3rd_exec_ctrl = _cpu_based_3rd_exec_control;
->  	vmcs_conf->vmexit_ctrl         = _vmexit_control;
->  	vmcs_conf->vmentry_ctrl        = _vmentry_control;
-> -	vmcs_conf->misc	= misc_msr;
-> +
-> +	rdmsrl(MSR_IA32_VMX_MISC, vmcs_conf->misc);
+I see your point here.  But "#define VMX_EPTP_MT_WB	0x6ull" seems to define
+its own memory type 0x6.  I think what we want is:
 
-No, keep the local variable.  It's unlikely KVM will require a feature that is
-enumerated in VMX_MISC, but it's not impossible, at which point we'd have to revert
-this change.
+/* in a pat/mtrr header */
+#define MEM_TYPE_WB 0x6
 
-And more importantly, if we messed up and forgot to revert this change, it's
-slightly more like that the compiler will fail to detect an "uninitialized" access,
-e.g. if vmcs_conf->misc were read before it was filled by rdmsrl().
+/* vmx.h */
+#define VMX_EPTP_MT_WB	MEM_TYPE_WB
 
-Uninitialized in quotes because the usage from hardware_setup() isn't truly
-uninitialized, i.e. it will be zeros.  If we had a bug as above, we'd be relying
-on the compiler to see that vmx_check_processor_compat()'s vmx_cap can get used
-uninitialized, whereas the current code should be easily flagged if misc_msr is
-used before it's written.
+if it's not regarded as another layer of indirect.
+
+> >  static inline bool cpu_has_virtual_nmis(void)
+> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> > index 994e014f8a50..80fea1875948 100644
+> > --- a/arch/x86/kvm/vmx/nested.c
+> > +++ b/arch/x86/kvm/vmx/nested.c
+> > @@ -1226,23 +1226,29 @@ static bool is_bitwise_subset(u64 superset, u64
+> subset, u64 mask)
+> >  	return (superset | subset) =3D=3D superset;
+> >  }
+> >
+> > +#define VMX_BASIC_FEATURES_MASK			\
+> > +	(VMX_BASIC_DUAL_MONITOR_TREATMENT |	\
+> > +	 VMX_BASIC_INOUT |			\
+> > +	 VMX_BASIC_TRUE_CTLS)
+> > +
+> > +#define VMX_BASIC_RESERVED_BITS			\
+> > +	(GENMASK_ULL(63, 56) | GENMASK_ULL(47, 45) | BIT_ULL(31))
+>=20
+> Looking at this with fresh eyes, I think #defines are overkill.  There is=
+ zero
+> chance anything other than vmx_restore_vmx_basic() will use these, and th=
+e
+> feature
+> bits mask is rather weird.  It's not a mask of features that KVM supports=
+, it's
+> a mask of feature *bits* that KVM knows about.
+>=20
+> So rather than add #defines, I think we can keep "const u64" variables, b=
+ut split
+> into feature_bits and reserved_bits (the latter will have open coded
+> GENMASK_ULL()
+> usage, whereas the former will not).
+>=20
+> BUILD_BUG_ON() is fancy enough that it can detect overlap.
+
+Sounds reasonable to me.
+
+>=20
+> > +#define VMX_BSAIC_VMCS12_SIZE	((u64)VMCS12_SIZE << 32)
+>=20
+> Typo.
+
+Sigh!
+
+>=20
+> > +#define VMX_BASIC_MEM_TYPE_WB	(MEM_TYPE_WB << 50)
+>=20
+> I don't see any value in either of these.  In fact, I find them both to b=
+e far
+> more confusing, and much more likely to be incorrectly used.
+>=20
+> Back in v1, when I said "don't bother with shift #defines", I was very sp=
+ecifically
+> talking about feature bits where defining the bit shift is an extra, poin=
+tless
+> layer.  I even (tried) to clarify that.
+
+Another review comment got me lost here:
+https://lore.kernel.org/kvm/2158ef3c5ce2de96c970b49802b7e1dba8b704d6.camel@=
+intel.com/
 
