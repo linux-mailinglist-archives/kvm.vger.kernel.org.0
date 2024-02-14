@@ -1,168 +1,144 @@
-Return-Path: <kvm+bounces-8692-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8693-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0440C854EE7
-	for <lists+kvm@lfdr.de>; Wed, 14 Feb 2024 17:44:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C746A854F05
+	for <lists+kvm@lfdr.de>; Wed, 14 Feb 2024 17:48:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 66BDCB2D904
-	for <lists+kvm@lfdr.de>; Wed, 14 Feb 2024 16:37:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52CDC284B44
+	for <lists+kvm@lfdr.de>; Wed, 14 Feb 2024 16:48:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29A0264CC9;
-	Wed, 14 Feb 2024 16:34:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39557604C5;
+	Wed, 14 Feb 2024 16:47:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=xen0n.name header.i=@xen0n.name header.b="Jnf8OFkq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AIO2g2/C"
 X-Original-To: kvm@vger.kernel.org
-Received: from mailbox.box.xen0n.name (mail.xen0n.name [115.28.160.31])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C35B762158;
-	Wed, 14 Feb 2024 16:34:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.28.160.31
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F1C95D49C;
+	Wed, 14 Feb 2024 16:47:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707928448; cv=none; b=nA0NK+qZi8gywYfOFCQtVQn7PgvIaUiXrw+h6KO42LX1AGPPlGbYvRDtHom+ZkCz6mQ44E/NGNd8hGEWTniZfCZ8qlkLSiRnimvHA1ma8gzUqgbxehwa59D5hZWwLdyxLSZdHTJYytNQxJu7iGWlHw14s6bhBsvGI4dpaHpBscU=
+	t=1707929273; cv=none; b=QIqEOVBaqNR0lueOLhVlMQ05URW7PssWCwp/O2pOG0R8WaZUtEOGJNWvChqIFyBpsl7lpwJXPScpc96oZpQ0aJ9r6hpCTJp+cQiEK/9wX7DiRP77W11+P6NEX6q2g0wMkLIuZTqZN0Yadt5cRrDO47dF4ii3t6pXrzaJQWypE50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707928448; c=relaxed/simple;
-	bh=PcrXxYoGFClCitVwkysGKdmr3Nu5wkP9upQVqRlzsuo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VJcQRd1OhZs5Do8xqTfYBw9qJoafwBv0bYGMkIuO1Zsnmp7ze+dNLMuiRD1xcWGv88fg4RQIe3HRI6wQWdxw3nXEwrg6A7jVrm/mk6Ff4NjGdYjmFy0r6PJjFZcZy1QCt4Vu5wE0YiMTYS8TwMGpniM2aYAN2Kx0h2vt9PBcmCA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xen0n.name; spf=pass smtp.mailfrom=xen0n.name; dkim=pass (1024-bit key) header.d=xen0n.name header.i=@xen0n.name header.b=Jnf8OFkq; arc=none smtp.client-ip=115.28.160.31
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xen0n.name
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xen0n.name
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xen0n.name; s=mail;
-	t=1707928443; bh=PcrXxYoGFClCitVwkysGKdmr3Nu5wkP9upQVqRlzsuo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Jnf8OFkqtVlmQbPloTxNCJMJsQq5QNPAnVRqPabXSB43Whlxp1YmtdU/jbD4S+vkl
-	 HrAa37q3eBKxbJD2mOYrm7x3gELhFslp8k1/Mb6FI5uP7dUC5jAGRt4WnJ1Zu3JE05
-	 sU06Y5IQ5LoRTkJoOE8X8heQBpWmokFLBM0m74xw=
-Received: from ld50.lan (unknown [IPv6:240e:388:8d00:6500:42e8:c06f:a0dc:12f8])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mailbox.box.xen0n.name (Postfix) with ESMTPSA id 995CA60562;
-	Thu, 15 Feb 2024 00:34:03 +0800 (CST)
-From: WANG Xuerui <kernel@xen0n.name>
-To: Paolo Bonzini <pbonzini@redhat.com>,
-	Huacai Chen <chenhuacai@kernel.org>
-Cc: Tianrui Zhao <zhaotianrui@loongson.cn>,
-	Bibo Mao <maobibo@loongson.cn>,
+	s=arc-20240116; t=1707929273; c=relaxed/simple;
+	bh=DnnQl04MGaYTNcKzbKois0ch8l8Y5ji0lievz5/HVOI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=C1J5aMzmrKsPtzT1ZqFR4fc5JAggB1jJEdRFQKJlv0jEPpP3RZCa/ve2b2F0IP+F8rwPi57hpr3RzAEfqVN3JzWrp+K/FJHX1+aJEdoluLyW9YuW60yxd8TOoblW6PI9D8/RpYHHtlm6b+HkesKKlEVOxY3LAN8DkLDeiQg1vws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AIO2g2/C; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9A96C433C7;
+	Wed, 14 Feb 2024 16:47:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707929272;
+	bh=DnnQl04MGaYTNcKzbKois0ch8l8Y5ji0lievz5/HVOI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=AIO2g2/CDd7ZJszKQwdaQI7N/ZVQqYEXaj7zK110O6TotyGDGa+gwxyWgxlUb4XJ4
+	 byojqWaanu5+ALMOkbJLvbhNOl2xVtQXjz5gIa9fHlAN0Skn78r83EiIG4TOdyLPFQ
+	 n/K9uLUzdsSHPGhUhCB0aHxgL241tEhKbpSrTEMkifCOK3Z6CNCDqerE60rxKmMknS
+	 rNUGE6IsJ+X0o+0OU1ZDWt8YcZi6zxXzqAoFIbG8uHgdpC1VusHBcqhes93cnvbiv8
+	 bGvjU+V8TKUo7yaXVqz1gYjM1EYZaLiqOtNAFmAr70RH18B42zvQdLUm7GhyZucL+9
+	 Uns4wZXQtTCZg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1raIQI-003Cnr-D8;
+	Wed, 14 Feb 2024 16:47:50 +0000
+Date: Wed, 14 Feb 2024 16:47:49 +0000
+Message-ID: <861q9f56x6.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
-	loongarch@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	WANG Xuerui <git@xen0n.name>
-Subject: [PATCH for-6.8 v2 4/4] KVM: LoongArch: Streamline kvm_check_cpucfg and improve comments
-Date: Thu, 15 Feb 2024 00:33:57 +0800
-Message-ID: <20240214163358.2913090-5-kernel@xen0n.name>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240214163358.2913090-1-kernel@xen0n.name>
-References: <20240214163358.2913090-1-kernel@xen0n.name>
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 07/23] KVM: arm64: vgic: Use atomics to count LPIs
+In-Reply-To: <20240213093250.3960069-8-oliver.upton@linux.dev>
+References: <20240213093250.3960069-1-oliver.upton@linux.dev>
+	<20240213093250.3960069-8-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-From: WANG Xuerui <git@xen0n.name>
+On Tue, 13 Feb 2024 09:32:44 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> Switch to using atomics for LPI accounting, allowing vgic_irq references
+> to be dropped in parallel.
+> 
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/kvm/vgic/vgic-debug.c | 2 +-
+>  arch/arm64/kvm/vgic/vgic-its.c   | 4 ++--
+>  arch/arm64/kvm/vgic/vgic.c       | 2 +-
+>  include/kvm/arm_vgic.h           | 4 ++--
+>  4 files changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-debug.c b/arch/arm64/kvm/vgic/vgic-debug.c
+> index 85606a531dc3..389025ce7749 100644
+> --- a/arch/arm64/kvm/vgic/vgic-debug.c
+> +++ b/arch/arm64/kvm/vgic/vgic-debug.c
+> @@ -149,7 +149,7 @@ static void print_dist_state(struct seq_file *s, struct vgic_dist *dist)
+>  	seq_printf(s, "vgic_model:\t%s\n", v3 ? "GICv3" : "GICv2");
+>  	seq_printf(s, "nr_spis:\t%d\n", dist->nr_spis);
+>  	if (v3)
+> -		seq_printf(s, "nr_lpis:\t%d\n", dist->lpi_list_count);
+> +		seq_printf(s, "nr_lpis:\t%d\n", atomic_read(&dist->lpi_count));
+>  	seq_printf(s, "enabled:\t%d\n", dist->enabled);
+>  	seq_printf(s, "\n");
+>  
+> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> index c68164d6cba0..048226812974 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> @@ -97,7 +97,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
+>  		goto out_unlock;
+>  	}
+>  
+> -	dist->lpi_list_count++;
+> +	atomic_inc(&dist->lpi_count);
+>  
+>  out_unlock:
+>  	if (ret)
+> @@ -345,7 +345,7 @@ int vgic_copy_lpi_list(struct kvm *kvm, struct kvm_vcpu *vcpu, u32 **intid_ptr)
+>  	 * command). If coming from another path (such as enabling LPIs),
+>  	 * we must be careful not to overrun the array.
+>  	 */
+> -	irq_count = READ_ONCE(dist->lpi_list_count);
+> +	irq_count = atomic_read(&dist->lpi_count);
 
-All the checks currently done in kvm_check_cpucfg can be realized with
-early returns, so just do that to avoid extra cognitive burden related
-to the return value handling.
+I'd like to propose an alternative approach here. I've always hated
+this "copy a bunch of INTIDs" thing, and the only purpose of this
+silly counter is to dimension the resulting array.
 
-The default branch should be unreachable because of the earlier
-validation by _kvm_get_cpucfg_mask, so we warn in case it is actually
-reached and return -EINVAL in that case too.
+Could we instead rely on an xarray marking a bunch of entries (the
+ones we want to 'copy'), and get the reader to clear these marks once
+done?
 
-While at it, clean up comments of _kvm_get_cpucfg_mask and
-kvm_check_cpucfg, by removing comments that are merely restatement of
-the code nearby, and paraphrasing the rest so they read more natural
-for English speakers (that likely are not familiar with the actual
-Chinese-influenced grammar).
+Of course, we only have 3 marks, so that's a bit restrictive from a
+concurrency perspective, but since most callers hold a lock, it should
+be OK.
 
-No functional changes intended.
+What do you think?
 
-Signed-off-by: WANG Xuerui <git@xen0n.name>
----
- arch/loongarch/kvm/vcpu.c | 45 +++++++++++++++++----------------------
- 1 file changed, 20 insertions(+), 25 deletions(-)
+	M.
 
-diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
-index e973500611b4..b467a44e670a 100644
---- a/arch/loongarch/kvm/vcpu.c
-+++ b/arch/loongarch/kvm/vcpu.c
-@@ -302,20 +302,16 @@ static int _kvm_get_cpucfg_mask(int id, u64 *v)
- {
- 	switch (id) {
- 	case 2:
--		/* Return CPUCFG2 features which have been supported by KVM */
-+		/* CPUCFG2 features unconditionally supported by KVM */
- 		*v = CPUCFG2_FP     | CPUCFG2_FPSP  | CPUCFG2_FPDP     |
- 		     CPUCFG2_FPVERS | CPUCFG2_LLFTP | CPUCFG2_LLFTPREV |
- 		     CPUCFG2_LAM;
- 		/*
--		 * If LSX is supported by CPU, it is also supported by KVM,
--		 * as we implement it.
-+		 * For the ISA extensions listed below, if one is supported
-+		 * by the host, then it is also supported by KVM.
- 		 */
- 		if (cpu_has_lsx)
- 			*v |= CPUCFG2_LSX;
--		/*
--		 * if LASX is supported by CPU, it is also supported by KVM,
--		 * as we implement it.
--		 */
- 		if (cpu_has_lasx)
- 			*v |= CPUCFG2_LASX;
- 
-@@ -336,27 +332,26 @@ static int kvm_check_cpucfg(int id, u64 val)
- 
- 	switch (id) {
- 	case 2:
--		/* CPUCFG2 features checking */
- 		if (val & ~mask)
--			/* The unsupported features should not be set */
--			ret = -EINVAL;
--		else if (!(val & CPUCFG2_LLFTP))
--			/* The LLFTP must be set, as guest must has a constant timer */
--			ret = -EINVAL;
--		else if ((val & CPUCFG2_FP) && (!(val & CPUCFG2_FPSP) || !(val & CPUCFG2_FPDP)))
--			/* Single and double float point must both be set when enable FP */
--			ret = -EINVAL;
--		else if ((val & CPUCFG2_LSX) && !(val & CPUCFG2_FP))
--			/* FP should be set when enable LSX */
--			ret = -EINVAL;
--		else if ((val & CPUCFG2_LASX) && !(val & CPUCFG2_LSX))
--			/* LSX, FP should be set when enable LASX, and FP has been checked before. */
--			ret = -EINVAL;
--		break;
-+			/* Unsupported features should not be set */
-+			return -EINVAL;
-+		if (!(val & CPUCFG2_LLFTP))
-+			/* Guests must have a constant timer */
-+			return -EINVAL;
-+		if ((val & CPUCFG2_FP) && (!(val & CPUCFG2_FPSP) || !(val & CPUCFG2_FPDP)))
-+			/* Single and double float point must both be set when FP is enabled */
-+			return -EINVAL;
-+		if ((val & CPUCFG2_LSX) && !(val & CPUCFG2_FP))
-+			/* LSX architecturally implies FP but val does not satisfy that */
-+			return -EINVAL;
-+		if ((val & CPUCFG2_LASX) && !(val & CPUCFG2_LSX))
-+			/* LASX architecturally implies LSX and FP but val does not satisfy that */
-+			return -EINVAL;
-+		return 0;
- 	default:
--		break;
-+		WARN_ON_ONCE(1);
-+		return -EINVAL;
- 	}
--	return ret;
- }
- 
- static int kvm_get_one_reg(struct kvm_vcpu *vcpu,
 -- 
-2.43.0
-
+Without deviation from the norm, progress is not possible.
 
