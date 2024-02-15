@@ -1,126 +1,109 @@
-Return-Path: <kvm+bounces-8742-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8743-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4628F855E71
-	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 10:44:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0543C855ECE
+	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 11:11:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02B072819B9
-	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 09:44:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ACCC81F25544
+	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 10:11:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE1A750A73;
-	Thu, 15 Feb 2024 09:44:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF84E6994D;
+	Thu, 15 Feb 2024 10:11:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ho3gUMdC"
+	dkim=pass (1024-bit key) header.d=xen0n.name header.i=@xen0n.name header.b="D8rhLhfm"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailbox.box.xen0n.name (mail.xen0n.name [115.28.160.31])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D06A482C7;
-	Thu, 15 Feb 2024 09:44:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7B42679FE;
+	Thu, 15 Feb 2024 10:11:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.28.160.31
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707990250; cv=none; b=g8KYUglBytp92XU+cyOSyOin0BlaDVNZvOAK72uM4MISZjspp1v3vpbtNppsELbfHkTColPenhsETC4nlCqooZ4qXwLPz+K907vYS7g8yjrn6J84bGsglIBru6wgR6pRIGPL8v6UQ+txKgD9A3w9cMdZXnlpmOXbILb/uJyQX3Q=
+	t=1707991880; cv=none; b=Y5tZURc/NxGG7sKmg8zMUHFQznINMJlVuWKG2uXAsRzbU7vRC+a4atgyB+e6bO+2D8h8AWGDJaze/4wvZk7BkzTfW7hY6rq6MHQICR2iOmHDk3IG4Bl7MQahA2ZR2ulKE1+ITEElxHHM8+NikdUn42Qly2F9HNK7whlMZPu6ntM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707990250; c=relaxed/simple;
-	bh=NWspp6vFhXCaH1t40eZE2OkjP7lfHkq9fLzAHD5BjZc=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gwX4Y8lXTolsRzi+UKCq/ZB47M2XwiJOWa6rDceAQBzv701oqfuV1YkZJUg1dF/qpBaHeEbGgeI13xCoab0CKbQHPQmPGNEjrFyIdJjK2aCCK7v6Ad4J1vf6u/zJCALXTKt2E5enUcmDK95tqKLfm0qLklJa1/f5hDFKzW4Z1RE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ho3gUMdC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74155C433F1;
-	Thu, 15 Feb 2024 09:44:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707990249;
-	bh=NWspp6vFhXCaH1t40eZE2OkjP7lfHkq9fLzAHD5BjZc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Ho3gUMdC01T2IXbfggxAQMxOzxsSXLUKmRlBBcT3ak83XcVCjGhzMn7/YyKQcKKBz
-	 w3SmhRGG9h1p9y4v+1MvS9fXDSw3AvGfr3/DWNvMOKOoMtcJ4QxzQMa6BKzKL/n5hM
-	 VsXGXQLLFkK98cJgJu3BpdR5EIE+kwpu2/a4yih8aYhiC6c9BW4o2mIKlFwU86TiVc
-	 yvUnkwPhw9Yp5WPiqX56/ttlTufO+XbGPCQZfUaZxSh4u8NY1Lsf8nZpzM26c8VmGr
-	 jJP04Jk/NvqpZRaOFeqQ19Dhxqe5S6SZGm+o9i4+kwptkfBuvWO1CRM0H37ndL6jSQ
-	 x5IHJTVn7nfOA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1raYHn-003Qt3-48;
-	Thu, 15 Feb 2024 09:44:07 +0000
-Date: Thu, 15 Feb 2024 09:44:06 +0000
-Message-ID: <86sf1u3vvd.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 07/23] KVM: arm64: vgic: Use atomics to count LPIs
-In-Reply-To: <Zc1GMFjvy_f1KsXr@linux.dev>
-References: <20240213093250.3960069-1-oliver.upton@linux.dev>
-	<20240213093250.3960069-8-oliver.upton@linux.dev>
-	<861q9f56x6.wl-maz@kernel.org>
-	<Zc0HIorNZG9KG5Mg@linux.dev>
-	<86wmr64xyo.wl-maz@kernel.org>
-	<Zc1GMFjvy_f1KsXr@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1707991880; c=relaxed/simple;
+	bh=xW+SMn0yzEP/atgRxvcp9tLl5suSkW1RNJRYWpnVzMw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=evIdEcEJWOsMfS5pcffuz/4WxaBspfrhk+T3T7bg/RubsFJ+qA8fRZs1oxgpFZSby1iUNNYVgJRpDwYGB4KkoPw/QM8NTBKpd9Ll1Jx0/2taa49NUZNKBRrVMuWwP7pPMuG3HVfdkrGa/NksjYgaft85mKcKa9S/FTT6lzBD7DE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xen0n.name; spf=pass smtp.mailfrom=xen0n.name; dkim=pass (1024-bit key) header.d=xen0n.name header.i=@xen0n.name header.b=D8rhLhfm; arc=none smtp.client-ip=115.28.160.31
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xen0n.name
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xen0n.name
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xen0n.name; s=mail;
+	t=1707991875; bh=xW+SMn0yzEP/atgRxvcp9tLl5suSkW1RNJRYWpnVzMw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=D8rhLhfmUsPVebdqxjmKjA3kZ3+hs01T1ZODKFHrBEuL4KR0WjE5tXdkjPjXvRuGC
+	 f2gVDGHZAr8bLZnWPJ8TFOcxDgRaNTPVeZZ+rtAJ04TTcR6/DMpX+OXJFmodbBg79o
+	 /1mtIiq5IregwWfi0EnZt1u/F/zuZWlae+14ueb0=
+Received: from [28.0.0.1] (unknown [49.93.119.4])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mailbox.box.xen0n.name (Postfix) with ESMTPSA id 0960E60114;
+	Thu, 15 Feb 2024 18:11:14 +0800 (CST)
+Message-ID: <0f4d83e2-bff9-49d9-8066-9f194ce96306@xen0n.name>
+Date: Thu, 15 Feb 2024 18:11:14 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 0/6] LoongArch: Add pv ipi support on LoongArch VM
+Content-Language: en-US
+To: Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
+ Tianrui Zhao <zhaotianrui@loongson.cn>, Juergen Gross <jgross@suse.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Cc: loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
+ virtualization@lists.linux.dev, kvm@vger.kernel.org
+References: <20240201031950.3225626-1-maobibo@loongson.cn>
+From: WANG Xuerui <kernel@xen0n.name>
+In-Reply-To: <20240201031950.3225626-1-maobibo@loongson.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, 14 Feb 2024 23:01:04 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+Hi,
+
+On 2/1/24 11:19, Bibo Mao wrote:
+> [snip]
+>
+> Here is the microbenchmarck data with perf bench futex wake case on 3C5000
+> single-way machine, there are 16 cpus on 3C5000 single-way machine, VM
+> has 16 vcpus also. The benchmark data is ms time unit to wakeup 16 threads,
+> the performance is higher if data is smaller.
 > 
-> On Wed, Feb 14, 2024 at 08:01:19PM +0000, Marc Zyngier wrote:
-> > > > Of course, we only have 3 marks, so that's a bit restrictive from a
-> > > > concurrency perspective, but since most callers hold a lock, it should
-> > > > be OK.
-> > > 
-> > > They all hold *a* lock, but maybe not the same one! :)
-> > 
-> > Indeed. But as long as there isn't more than 3 locks (and that the
-> > xarray is OK being concurrently updated with marks), we're good!
+> perf bench futex wake, Wokeup 16 of 16 threads in ms
+> --physical machine--   --VM original--   --VM with pv ipi patch--
+>    0.0176 ms               0.1140 ms            0.0481 ms
 > 
-> Oh, you mean to give each existing caller their own mark?
-
-Well, each caller "class". Where "class" means "holding look
-'foo'". Same lock, same mark. With a maximum of 3 (and I think we can
-get away with 2).
-
-> > > Maybe we should serialize the use of markers on the LPI list on the
-> > > config_lock. A slight misuse, but we need a mutex since we're poking at
-> > > guest memory. Then we can go through the whole N-dimensional locking
-> > > puzzle and convince ourselves it is still correct.
-> > 
-> > Maybe. This thing is already seeing so many abuses that one more may
-> > not matter much. Need to see how it fits in the whole hierarchy of
-> > GIC-related locks...
+> ---
+> Change in V4:
+>    1. Modfiy pv ipi hook function name call_func_ipi() and
+> call_func_single_ipi() with send_ipi_mask()/send_ipi_single(), since pv
+> ipi is used for both remote function call and reschedule notification.
+>    2. Refresh changelog.
 > 
-> It doesn't work. We have it that the config_lock needs to be taken
-> outside the its_lock.
-> 
-> Too many damn locks!
+> Change in V3:
+>    1. Add 128 vcpu ipi multicast support like x86
+>    2. Change cpucfg base address from 0x10000000 to 0x40000000, in order
+> to avoid confliction with future hw usage
+>    3. Adjust patch order in this patchset, move patch
+> Refine-ipi-ops-on-LoongArch-platform to the first one.
 
-Well, the joys of emulating highly complex HW with a braindead
-programming interface. I'd explore the above suggestion to avoid
-introducing a new lock, if at all possible.
-
-Thanks,
-
-	M.
+Sorry for the late reply (and Happy Chinese New Year), and thanks for 
+providing microbenchmark numbers! But it seems the more comprehensive 
+CoreMark results were omitted (that's also absent in v3)? While the 
+changes between v4 and v2 shouldn't be performance-sensitive IMO (I 
+haven't checked carefully though), it could be better to showcase the 
+improvements / non-harmfulness of the changes and make us confident in 
+accepting the changes.
 
 -- 
-Without deviation from the norm, progress is not possible.
+WANG "xen0n" Xuerui
+
+Linux/LoongArch mailing list: https://lore.kernel.org/loongarch/
+
 
