@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-8835-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8836-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CD4D857202
-	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 00:54:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90D9D857203
+	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 00:54:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A5E3A285E56
-	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 23:54:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C37A71C226A0
+	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 23:54:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6127414600C;
-	Thu, 15 Feb 2024 23:54:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6047A14601F;
+	Thu, 15 Feb 2024 23:54:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ziL+fp5V"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jsSflqiJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3203145B15
-	for <kvm@vger.kernel.org>; Thu, 15 Feb 2024 23:54:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02C50145FF0
+	for <kvm@vger.kernel.org>; Thu, 15 Feb 2024 23:54:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708041255; cv=none; b=m8qAEjDG6j0syCkrR3cniWZei0gYyzNf0SyAOry5hw7aDaMkpO8JrjvyDM/t747xKME5FSG0m43u3PawjhD+7lYHIGjKd5mJolf1yTNUw5VLtJvAbOJN4g0BN0VKsl3UaC0tVAcDTdElkU8GaWffn3CpKar6xEqZGHR+t1bQX3U=
+	t=1708041256; cv=none; b=qpQlVB0QQEB/XgngW6KhM1OmNXbmW+sEW3TUzKZi2DhBWTiC70rhJ0O6UFRwQU0kI/oXHrHSTNi6QhVMQPqNEs7wO6dDwfCPA1VCKkAIOWg7pY3xX5Lc2ieKSCF7ReBs7zITuQDzqb/iw3BN3QLxZNbZbV6WB0dkGwxIqP/j9NM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708041255; c=relaxed/simple;
-	bh=hE7An6neuPVvOGcFnrnVMg3xQPxzurJcj0TyW5C9ZWo=;
+	s=arc-20240116; t=1708041256; c=relaxed/simple;
+	bh=OMyN7fHzEfLgoBye4T8ZSNiYVwuoMrC6dnIEAZg3ngg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=t7q9ZaPcYCY2nA3HE7WjtWOTpavt46H6A2eucC//NVFOr845rQomvHoaFqmvCmyxoBEyfwLjPeb7QrBIUvUzZLzdmVqwzGkmrQuuHLrIA0/YdxoqrRx0BWUuwVwvVqlKz+gRO7+mGdf+90nY5oYSR/hhHu2Lou1nZiRvf0dxKNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--amoorthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ziL+fp5V; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=YSamIkAZB+r2D6AJ+IdNoc3h8+3wVgb/d+vOZaEItFqgenKQFJGTZfal7ZFC3/QEIgA1JGEahRWubZF/A6tsyaBI25DOVLcqqhf2P8W8Hz8uA9CoWMWKMwHD8y2ZXPqx8F60cv9X+kOh8VGYlJpWIArQ9z+nt3JbZer4r/FMoh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--amoorthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jsSflqiJ; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--amoorthy.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc64e0fc7c8so1969245276.2
-        for <kvm@vger.kernel.org>; Thu, 15 Feb 2024 15:54:13 -0800 (PST)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dcc15b03287so2043909276.3
+        for <kvm@vger.kernel.org>; Thu, 15 Feb 2024 15:54:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708041253; x=1708646053; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1708041254; x=1708646054; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yo/o9LY2I9nX5aBe59uiruEUtYqrrYJs95LrQhRBOZE=;
-        b=ziL+fp5VHJaRoO8k+aNtpQ+lNiGBHzqtLxRID1Ri6s344KY6IwPV0MsolH2kVJplMv
-         lLfDNXrvVE3larf0F9J0RX80uL2GhpcvuQVXtu+T2Z7hHt3DqYCnGgGgQVsk1x7CxDHn
-         j3riqpvPXvKpTUOzKmPOD4XVYVEDsikbAIAo2aOZoWwfCqDPPn+cz60xIp0CTMIxl4UR
-         13VrYSudnuiHOKJ1jpCYO3LAXiFizwDYYXlbJSD4d40CW0UQfiXeNCF8m6k0iCSS+qm7
-         /hmJIlCbWGZ8DrXwGWClCQh8Gx7CZlWT9tP9m4ZYyxO3dXc/gUiEaopA4V4+XG2Jop77
-         GReQ==
+        bh=jBD0v9lfe/Rw/ET2I01vheD5aGv2zWzm/5LdmhbgJC4=;
+        b=jsSflqiJGSC6ps15oKMCnGRb+vWgLzNEJVqlcvbd4s455JGS3nt7dwCGe3w+nGbWLl
+         aOCCZg5ZtKMlph2MoJFVPs+Ehl1oc9t4NB9kgvroh+gz5cQdpX/KPTptcvRPNcKRFGzM
+         /FtjwgV5g0iaCoIFSyx/ImGZkX3UEEXEuW5g+hjcNbnDJb6puakIgtVKSdVYTlNhwSsr
+         ItrSoBw+ebGTg8DCasLDuf9/AUaoSb21FekVFK63luPmZelxtvjo8DS+MiCX6CjBczyd
+         /GO26OhxX0xocKAYzFRuLK+F9frUXj1Bon9cA4KAymnLFTq+IgNHPvx2u6iOCDO8YRng
+         hgpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708041253; x=1708646053;
+        d=1e100.net; s=20230601; t=1708041254; x=1708646054;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yo/o9LY2I9nX5aBe59uiruEUtYqrrYJs95LrQhRBOZE=;
-        b=ag8vLmOwXPYa1di6PDysqjIK29dbrIY8TOD0w2VkB0zu5GorjWM/LVNGOQKKL6Gr35
-         Ry3hRCRGVHyeIMpS4RU31MYNcGaF/j38gBxqMgWw8CMryTf0pUtxKXlMsC/nTR4Nkr6Z
-         ZJHW0upK/w/w9ZEjcmkEQYcFxovU4HHLFWM7pcM9g36L8ojwGiLUlsZ2Kr0wvFs0nEgA
-         /vBab4zwyaxzEBFLHj48ygp5bNfIE2TWMCFnfROABLAw7UZ0fwxY+kWjQxfGauabJTu1
-         QOvRjRhU9SvuFkfL9JSXPHD3vmQTj2spQ2/x1ot6+Ih7qobJwqiIAm6aX82aEtRCraKk
-         7IvA==
-X-Forwarded-Encrypted: i=1; AJvYcCWV15W0mGyM7pIKwCR9cjMKfgfQA+NrEFShUrIRUHvsaofD1fyv/Ze+uMX0U3cXuVptJNuDF0MZ1lw5T7pkpiNF2pKx
-X-Gm-Message-State: AOJu0Yws0W4t8Haf5JI97kRWKqsYYgnc5JFKnXzy2GK+FqP23op/J1G3
-	/j5xAsHzzDkQNWbVPSgX2Xmmn/IeGmRNWuHDU2qBVxr5LsTkdJybnUH0aBr5quBrlhse1ny5Ggh
-	YIav4vp3MAw==
-X-Google-Smtp-Source: AGHT+IEKdbXqNVReTvl5F0UombK5sQ0Ti7UMHJ2sVJ221GtcNLTwHyT9qTykKRnqFVP6BOtF0+Av1SRu6Gg7sw==
+        bh=jBD0v9lfe/Rw/ET2I01vheD5aGv2zWzm/5LdmhbgJC4=;
+        b=WGIRh4NcpUUv9HYKHOp0pcDNM00JaOfZqT/PiZZtGZJwEaAqKL8q8R6N2MmOAx47c5
+         FedaxTOnHT7kc7pHauMJYmSpRazBuJ/LlPO08H3r9FkQ5SGbp+ZJGti93X9yKaP79Bld
+         sED9TXMjCv7sFCIQa0rTStvJi/vwxBvUiIt+SQqkGJlWrrqgvWCe2kDSCkZ1dyldxNLa
+         sCGkLqQXzZmndCPlnQHwkqdc4zwO2SmLjY9vFSKIlD++1khH58HfZRmsWUFz6kthR1Gf
+         Rfm2Tv6ILZqfJMe3hStm04ibM6fROu2WJhttAkDFnpQsBtOJ/CWL0bCintIWi/m0fdJ1
+         hINw==
+X-Forwarded-Encrypted: i=1; AJvYcCXYgZQkAeh+CfWc3qa30x3h3vJGa3TPcD+pYcEsOD/bwQHmcPrxO4aHxZ7vi7at868INS4WsEuyGAoYCEPT+oFmGvm/
+X-Gm-Message-State: AOJu0Yz3fLeA2DL8YaAIoXiXAzKDGjkwo2zpsAHy2QsZkUzt+tDHjsbc
+	bGu4F7dHinesQ7HOHxxiZYEDv5+0+fD9d/SYtu44m+4TUGLlT+8Q8Ot5oLdWDGxCIAJLo19tDGg
+	4UV1fyRRx0g==
+X-Google-Smtp-Source: AGHT+IFG6eQ7U1pvB32UpE/Y9o390fzwKxrTI+bmqgzS9btoriiRyB8NESOhZyB5uyLvr3E+n4pE3rTBJf6EHA==
 X-Received: from laogai.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2c9])
- (user=amoorthy job=sendgmr) by 2002:a05:6902:1001:b0:dcc:79ab:e522 with SMTP
- id w1-20020a056902100100b00dcc79abe522mr129806ybt.11.1708041253060; Thu, 15
- Feb 2024 15:54:13 -0800 (PST)
-Date: Thu, 15 Feb 2024 23:53:53 +0000
+ (user=amoorthy job=sendgmr) by 2002:a05:6902:d47:b0:dcb:611c:9055 with SMTP
+ id cs7-20020a0569020d4700b00dcb611c9055mr129053ybb.5.1708041254107; Thu, 15
+ Feb 2024 15:54:14 -0800 (PST)
+Date: Thu, 15 Feb 2024 23:53:54 +0000
 In-Reply-To: <20240215235405.368539-1-amoorthy@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,8 +74,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240215235405.368539-1-amoorthy@google.com>
 X-Mailer: git-send-email 2.44.0.rc0.258.g7320e95886-goog
-Message-ID: <20240215235405.368539-3-amoorthy@google.com>
-Subject: [PATCH v7 02/14] KVM: Add function comments for __kvm_read/write_guest_page()
+Message-ID: <20240215235405.368539-4-amoorthy@google.com>
+Subject: [PATCH v7 03/14] KVM: Documentation: Make note of the
+ KVM_MEM_GUEST_MEMFD memslot flag
 From: Anish Moorthy <amoorthy@google.com>
 To: seanjc@google.com, oliver.upton@linux.dev, maz@kernel.org, 
 	kvm@vger.kernel.org, kvmarm@lists.linux.dev
@@ -84,35 +85,47 @@ Cc: robert.hoo.linux@gmail.com, jthoughton@google.com, amoorthy@google.com,
 	nadav.amit@gmail.com, isaku.yamahata@gmail.com, kconsul@linux.vnet.ibm.com
 Content-Type: text/plain; charset="UTF-8"
 
-The (gfn, data, offset, len) order of parameters is a little strange
-since "offset" applies to "gfn" rather than to "data". Add function
-comments to make things perfectly clear.
+The documentation for KVM_SET_USER_MEMORY_REGION2 describes what the
+flag does, but the flag itself is absent from where the other memslot
+flags are listed. Add it.
 
 Signed-off-by: Anish Moorthy <amoorthy@google.com>
 ---
- virt/kvm/kvm_main.c | 2 ++
- 1 file changed, 2 insertions(+)
+ Documentation/virt/kvm/api.rst | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 46e7b8dbb3d8..7186d301d617 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -3304,6 +3304,7 @@ static int next_segment(unsigned long len, int offset)
- 		return len;
- }
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 3ec0b7a455a0..8f75fca2294e 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -1352,6 +1352,7 @@ yet and must be cleared on entry.
+   /* for kvm_userspace_memory_region::flags */
+   #define KVM_MEM_LOG_DIRTY_PAGES	(1UL << 0)
+   #define KVM_MEM_READONLY	(1UL << 1)
++  #define KVM_MEM_GUEST_MEMFD      (1UL << 2)
  
-+/* Copy @len bytes from guest memory at '(@gfn * PAGE_SIZE) + @offset' to @data */
- static int __kvm_read_guest_page(struct kvm_memory_slot *slot, gfn_t gfn,
- 				 void *data, int offset, int len)
- {
-@@ -3405,6 +3406,7 @@ int kvm_vcpu_read_guest_atomic(struct kvm_vcpu *vcpu, gpa_t gpa,
- }
- EXPORT_SYMBOL_GPL(kvm_vcpu_read_guest_atomic);
+ This ioctl allows the user to create, modify or delete a guest physical
+ memory slot.  Bits 0-15 of "slot" specify the slot id and this value
+@@ -1382,12 +1383,16 @@ It is recommended that the lower 21 bits of guest_phys_addr and userspace_addr
+ be identical.  This allows large pages in the guest to be backed by large
+ pages in the host.
  
-+/* Copy @len bytes from @data into guest memory at '(@gfn * PAGE_SIZE) + @offset' */
- static int __kvm_write_guest_page(struct kvm *kvm,
- 				  struct kvm_memory_slot *memslot, gfn_t gfn,
- 			          const void *data, int offset, int len)
+-The flags field supports two flags: KVM_MEM_LOG_DIRTY_PAGES and
+-KVM_MEM_READONLY.  The former can be set to instruct KVM to keep track of
++The flags field supports three flags
++
++1.  KVM_MEM_LOG_DIRTY_PAGES: can be set to instruct KVM to keep track of
+ writes to memory within the slot.  See KVM_GET_DIRTY_LOG ioctl to know how to
+-use it.  The latter can be set, if KVM_CAP_READONLY_MEM capability allows it,
++use it.
++2.  KVM_MEM_READONLY: can be set, if KVM_CAP_READONLY_MEM capability allows it,
+ to make a new slot read-only.  In this case, writes to this memory will be
+ posted to userspace as KVM_EXIT_MMIO exits.
++3.  KVM_MEM_GUEST_MEMFD: see KVM_SET_USER_MEMORY_REGION2. This flag is
++incompatible with KVM_SET_USER_MEMORY_REGION.
+ 
+ When the KVM_CAP_SYNC_MMU capability is available, changes in the backing of
+ the memory region are automatically reflected into the guest.  For example, an
 -- 
 2.44.0.rc0.258.g7320e95886-goog
 
