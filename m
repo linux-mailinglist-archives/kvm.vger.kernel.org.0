@@ -1,133 +1,182 @@
-Return-Path: <kvm+bounces-8784-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8798-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D43AA85680B
-	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 16:38:54 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A36C8568A9
+	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 17:02:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB9711C22973
-	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 15:38:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2C8FAB21DCB
+	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 16:02:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4452513398E;
-	Thu, 15 Feb 2024 15:37:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AA231339A3;
+	Thu, 15 Feb 2024 16:01:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fnRNpVvc"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="NFkFYSZL"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63CD6133417;
-	Thu, 15 Feb 2024 15:37:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A677D20B3D;
+	Thu, 15 Feb 2024 16:01:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708011468; cv=none; b=Kvnyl7+WOhRaIAQUR2Ip05KVYhBibN9ScMKUD9JkI7WIMusXXnFe4PMGcOXEMBTW4PfrqBQ5Y3qm1NcBcAHrwVy8cXh1AQy60oNyDQ7lizPgBcwK77u3YeH1MS7HDN5lGBUvHNPL71yPScsYRjSzE4sbAjPjsOdK0jil3xUsJKk=
+	t=1708012909; cv=none; b=BTLa1M6o0cKg6eFSGsgJCEdq+hGjFvouCieS7SiJJND3tBYitlGqyn4GgtJp93U2mWGWIEXC3ATehgO4m4xV8tJ4NxGcTL2kSAa4VG9oWqqacBgAKUAuT4NNZX03TxP0t6cbGTp/O6UqK4qtM8GzIrz+V83kszlNa4QgT5T3aq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708011468; c=relaxed/simple;
-	bh=epnqDWcnhsCvgG8kTNd2ESNKS8KdAlToJJsau8BMXIc=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fqd7swddS0Lf7lOsvRQauWLqkCngJsv+xOfXzbCgvFHkqdAk+Lf5lYpHzrjxhmC0M9oGVB26o2zAuWh0ik/Rf/U9HBQRidgp5L+ysdSsfECUGYp59ubxihxd8fI1wHqT5PEpSVeQsaPtCH3yNF8xjtKxJQb4J/t0hLNlM7C4HMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fnRNpVvc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8EA5C433F1;
-	Thu, 15 Feb 2024 15:37:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708011467;
-	bh=epnqDWcnhsCvgG8kTNd2ESNKS8KdAlToJJsau8BMXIc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fnRNpVvcgGMxdGApcy7TF29tirSa8C8+JxMTmSMPju7g0ZJMbUtGqichvYZSP+Cvy
-	 1UH+zm1VYtXWmZZCvRHHCVY6ThHOj9dYo5g5wrQlVV82SfTl/uN1iCQuDsV1B6gp96
-	 AaxASn+DTHmY5GpcHLPBZh8yYNrbY/ExsiDEte20tS2y2HBGiZzycjx5ynhNtNjtxB
-	 abStxkeTu28p/IN886ODSYyYVYcojM592btmkZHl60Ivou0y71N1TJlqfhU8lWaP9N
-	 Cy8xkYpxZQqqnKpUcWwdmsMt0GGz2J/kiNioZSSyJhypqNSEy6V8/YkmshLMV/YJlR
-	 6qlD14QTLTErw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rado1-003YAI-Iw;
-	Thu, 15 Feb 2024 15:37:45 +0000
-Date: Thu, 15 Feb 2024 15:37:45 +0000
-Message-ID: <86jzn54u2e.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 00/23] KVM: arm64: Improvements to LPI injection
-In-Reply-To: <Zc0JG8pNRanuXzvR@linux.dev>
-References: <20240213093250.3960069-1-oliver.upton@linux.dev>
-	<86y1bn3pse.wl-maz@kernel.org>
-	<Zc0JG8pNRanuXzvR@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1708012909; c=relaxed/simple;
+	bh=V3kpBue3P3meAyX+1HSi9AH3VSVEyzeJ+FuYYhoELcE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lO4FXJyvjAjH0UDvaIDq/Z17eJ+etOAil441iNYg/UWMbKkhCxwiPrSIO53rFx9kXH2gOdDkMMK15iV/3ynZW6Tkp4OHC67rwYKG6wC7F7nownXFDX3Ks75TMu7RqXeXUYxaxv/8RRmSKbIUrffPv/3dXP1rArEUHMoizH8axG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=NFkFYSZL; arc=none smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41FFTYlw030199;
+	Thu, 15 Feb 2024 16:01:40 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2023-11-20; bh=+NjmOTX3CsrKN1v5/+XuTP0aoVY5fQmXlmcThaiCXH4=;
+ b=NFkFYSZLrPtrxgh2N8fN+nX/gLb4b2KU4Bk++MesbmxvSabk1AyZQHh3jHbi9OQGrGAF
+ YyG/Vtf/YAxVRgVlZZIZSD8gs5sopt5Ey0pauMOqN9149BYUygPxWcl3FoaWqBGeuy+O
+ 90n5DU9Xw9kBG5qj+NCX8pf/pW+H8X70rpgG6vCBWEaWbhoDukbH/AOcbU2pkLillhNF
+ c89HUllMJ8w33R5z2e9axw7mFw63LvoUkNB7f/mv62f3CUIprOz4CZ/p6an7fYJCR8zW
+ ZRsXA8FE/koV6iatHRKx1GgSJcCA/n+xPttM+n6tM18GR+AGbjjjD5LpsMXCcWJdwhJM oA== 
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3w91f02t8u-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 15 Feb 2024 16:01:39 +0000
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 41FFZh9Z013875;
+	Thu, 15 Feb 2024 16:01:38 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3w6apdker0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 15 Feb 2024 16:01:38 +0000
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41FG1cZS031601;
+	Thu, 15 Feb 2024 16:01:38 GMT
+Received: from alaljime-dev-e4flex-vm.osdevelopmeniad.oraclevcn.com (alaljime-dev-e4flex-vm.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.249.106])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3w6apdkep6-1;
+	Thu, 15 Feb 2024 16:01:38 +0000
+From: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
+To: kvm@vger.kernel.org
+Cc: seanjc@google.com, pbonzini@redhat.com, linux-kernel@vger.kernel.org,
+        joao.m.martins@oracle.com, boris.ostrovsky@oracle.com,
+        mark.kanda@oracle.com, suravee.suthikulpanit@amd.com,
+        mlevitsk@redhat.com, alejandro.j.jimenez@oracle.com
+Subject: [RFC 0/3] Export APICv-related state via binary stats interface
+Date: Thu, 15 Feb 2024 16:01:33 +0000
+Message-Id: <20240215160136.1256084-1-alejandro.j.jimenez@oracle.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-15_14,2024-02-14_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=939 adultscore=0
+ suspectscore=0 mlxscore=0 phishscore=0 bulkscore=0 malwarescore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2402150128
+X-Proofpoint-ORIG-GUID: j0Kt_fpUjNlkODnGPzdp7ycg9RdnpFVL
+X-Proofpoint-GUID: j0Kt_fpUjNlkODnGPzdp7ycg9RdnpFVL
 
-On Wed, 14 Feb 2024 18:40:27 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> On Wed, Feb 14, 2024 at 05:43:13PM +0000, Marc Zyngier wrote:
-> > On Tue, 13 Feb 2024 09:32:37 +0000,
-> > Oliver Upton <oliver.upton@linux.dev> wrote:
-> > > 
-> > > For full details on the what/why, please see the cover letter in v1.
-> > > 
-> > > Apologies for the delay on v2, I wanted to spend some time to get a
-> > > microbenchmark in place to slam the ITS code pretty hard, and based on
-> > > the results I'm glad I did.
-> > 
-> > [...]
-> > 
-> > Buglets and potential improvements aside, I like the smell of this. At
-> > least the first handful of patches could easily be taken as a separate
-> > improvement series.
-> > 
-> > Let me know how you'd like to play this.
-> 
-> Yeah, I think there's 3 independent series here if we want to take the
-> initial improvements:
-> 
->  - Address contention around vgic_get_irq() / vgic_put_irq() with the
->    first 10 patches. Appears there is violent agreement these are good
->    to go.
-> 
->  - Changing out the translation cache into a per-ITS xarray
-> 
->  - A final series cleaning up a lot of the warts we have in LPI
->    management, like vgic_copy_lpi_list(). I believe we can get rid of
->    the lpi_list_lock as well, but this needs to be ordered after the
->    first 2.
-> 
-> I'd really like to de-risk the performance changes from the cleanups, as
-> I'm convinced they're going to have their own respective piles of bugs.
-> 
-> How does that sound?
+The goal of this RFC is to agree on a mechanism for querying the state (and
+related stats) of APICv/AVIC. I clearly have an AVIC bias when approaching this
+topic since that is the side that I have mostly looked at, and has the greater
+number of possible inhibits, but I believe the argument applies for both
+vendor's technologies.
 
-Yup, I'd be on board with that. If you can respin the first part with
-bugs fixed and without the stats, that'd be great. We can further
-bikeshed on the rest in the 6.10 time frame.
+Currently, a user or monitoring app trying to determine if APICv is actually
+being used needs implementation-specific knowlegde in order to look for specific
+types of #VMEXIT (i.e. AVIC_INCOMPLETE_IPI/AVIC_NOACCEL), checking GALog events
+by watching /proc/interrupts for AMD-Vi*-GA, etc. There are existing tracepoints
+(e.g. kvm_apicv_accept_irq, kvm_avic_ga_log) that make this task easier, but
+tracefs is not viable in some scenarios. Adding kvm debugfs entries has similar
+downsides. Suravee has previously proposed a new IOCTL interface[0] to expose
+this information, but there has not been any development in that direction.
+Sean has mentioned a preference for using BPF to extract info from the current
+tracepoints, which would require reworking existing structs to access some
+desired data, but as far as I know there isn't any work done on that approach
+yet.
 
-Also please Cc: Eric Auger, as he dealt with a lot of the ITS
-save/restore stuff.
+Recently Joao mentioned another alternative: the binary stats framework that is
+already supported by kernel[1] and QEMU[2]. This RFC has minimal code changes to
+expose the relevant info based on the existing data types the framework already
+supports. If there is consensus on using this approach, I can expand the fd
+stats subsystem to include other data types (e.g. a bitmap type for exposing the
+inhibit reasons), as well as adding documentation on KVM explaining which stats
+are relevant for APICv and how to query them.
 
-Thanks,
+A basic example of retrieving the stats via qmp-shell, showing both a VM and
+per-vCPU case:
 
-	M.
+# /usr/local/bin/qmp-shell --pretty ./qmp-sock
 
+(QEMU) query-stats target=vm providers=[{'provider':'kvm','names':['apicv_inhibited']}]
+{
+    "return": [
+        {
+            "provider": "kvm",
+            "stats": [
+                {
+                    "name": "apicv_inhibited",
+                    "value": false
+                }
+            ]
+        }
+    ]
+}
+
+(QEMU) query-stats target=vcpu vcpus=['/machine/unattached/device[0]'] providers=[{'provider':'kvm','names':['apicv_accept_irq','ga_log_event']}]
+{
+    "return": [
+        {
+            "provider": "kvm",
+            "qom-path": "/machine/unattached/device[0]",
+            "stats": [
+                {
+                    "name": "ga_log_event",
+                    "value": 98
+                },
+                {
+                    "name": "apicv_accept_irq",
+                    "value": 166920
+                }
+            ]
+        }
+    ]
+}
+
+If other alternatives are preferred, please let's use this thread to discuss and
+I can take a shot at implementing the desired solution.
+
+Regards,
+Alejandro
+
+[0] https://lore.kernel.org/qemu-devel/7e0d22fa-b9b0-ad1a-3a37-a450ec5d73e8@amd.com/
+[1] https://lore.kernel.org/all/20210618222709.1858088-1-jingzhangos@google.com/
+[2] https://lore.kernel.org/qemu-devel/20220530150714.756954-1-pbonzini@redhat.com/
+
+Alejandro Jimenez (3):
+  x86: KVM: stats: Add a stat to report status of APICv inhibition
+  x86: KVM: stats: Add stat counter for IRQs injected via APICv
+  x86: KVM: stats: Add a stat counter for GALog events
+
+ arch/x86/include/asm/kvm_host.h |  3 +++
+ arch/x86/kvm/svm/avic.c         |  4 +++-
+ arch/x86/kvm/svm/svm.c          |  3 +++
+ arch/x86/kvm/vmx/vmx.c          |  2 ++
+ arch/x86/kvm/x86.c              | 12 +++++++++++-
+ 5 files changed, 22 insertions(+), 2 deletions(-)
+
+
+base-commit: 7455665a3521aa7b56245c0a2810f748adc5fdd4
 -- 
-Without deviation from the norm, progress is not possible.
+2.39.3
+
 
