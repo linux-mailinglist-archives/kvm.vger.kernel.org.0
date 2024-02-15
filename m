@@ -1,108 +1,117 @@
-Return-Path: <kvm+bounces-8820-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8821-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FB80856DAC
-	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 20:26:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A625A856E13
+	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 20:55:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E03AB289ECB
-	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 19:26:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D75491C22A12
+	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 19:55:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F40D13A246;
-	Thu, 15 Feb 2024 19:26:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7A3313A89F;
+	Thu, 15 Feb 2024 19:55:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KbQMmF8V"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vOopWdvt"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AECE31369AD
-	for <kvm@vger.kernel.org>; Thu, 15 Feb 2024 19:26:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CD8D13A86E
+	for <kvm@vger.kernel.org>; Thu, 15 Feb 2024 19:55:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708025209; cv=none; b=c6KE9VO4SboGyVeZBl5h/qT6pNbSPCGzc5SW2BvIpbR16u6luKygL+h2BtuXJHAjxQ2egkM8vDFtnD9HTDyM/ITrt8usmrG2pPUHzau1USnqP0ZqWTgOyhrAcjQfYEBiW5SZlTjLUina/FSUCWEdaChAiESmhh0S1oBaJjefACM=
+	t=1708026934; cv=none; b=l16JauoI/yOoZML99gYFv+QIvJ49Jr3vAmAfJmihcNCk9bCITSM53qJhszFjh3TsJUcfe+K19ANBLu0JKmhr6klDvs4QG5HUrjriZ1fqYpTuCAt7dY8zd7Ny8j0w3wCbIGIgRnxhVsh94KQqLzyqH6u2Tqn+d5tShz0xTEknefE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708025209; c=relaxed/simple;
-	bh=g4gXRysjrS/kTYtCYP5fJsXncbyru7gzlRYm/zwv35E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=W7/6UmzjaNX4FuXmkWr76WA+/JwGu2hOUvChw6i9qyxSZc6C/u2EUEhKp320O3C0v1L9Dy+nM74+DhQEZVXeYGhIxwa/q6CDX1CuL/O9IuOIX/XmrA9Vg6LxMhiS+WUXQ5Bxndq+vR54ECDNWh90+wXFkZH+T49mJk3LfHYzPhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KbQMmF8V; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708025206;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:in-reply-to:in-reply-to:  references:references;
-	bh=WSM2q6F8oVeBLvSk9HF07rvPb1zaTwpR9ptolNDGCHY=;
-	b=KbQMmF8VgAHzNvgSHmytTtfI8ssbC5OC8eKTF+rV6RaVbf6irU6z21ATHdfVfz8FDub2Kf
-	1rnxHQvcHPj7RBP9l6WKpMa8ElYUlIbmlfExXQUyTFB3wc8wWfqD8vsWL84aNAWikr0jC8
-	lUIgFkcm6aEfqkCAT1nc6iwAq+ybG/g=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-388-xecKsAMlMmyXGwzhHfmc4Q-1; Thu,
- 15 Feb 2024 14:26:40 -0500
-X-MC-Unique: xecKsAMlMmyXGwzhHfmc4Q-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0783C1C05AD4;
-	Thu, 15 Feb 2024 19:26:39 +0000 (UTC)
-Received: from tucnak.zalov.cz (unknown [10.39.192.8])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id B42E611D1803;
-	Thu, 15 Feb 2024 19:26:38 +0000 (UTC)
-Received: from tucnak.zalov.cz (localhost [127.0.0.1])
-	by tucnak.zalov.cz (8.17.1/8.17.1) with ESMTPS id 41FJQZ3G1235764
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Thu, 15 Feb 2024 20:26:35 +0100
-Received: (from jakub@localhost)
-	by tucnak.zalov.cz (8.17.1/8.17.1/Submit) id 41FJQWEK1235763;
-	Thu, 15 Feb 2024 20:26:32 +0100
-Date: Thu, 15 Feb 2024 20:26:32 +0100
-From: Jakub Jelinek <jakub@redhat.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Uros Bizjak <ubizjak@gmail.com>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        "Andrew Pinski (QUIC)" <quic_apinski@quicinc.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH] Kconfig: Explicitly disable asm goto w/ outputs on
- gcc-11 (and earlier)
-Message-ID: <Zc5laJzgwSPtHCTe@tucnak>
-Reply-To: Jakub Jelinek <jakub@redhat.com>
-References: <ZcZyWrawr1NUCiQZ@google.com>
- <CAKwvOdmKaYYxf7vjvPf2vbn-Ly+4=JZ_zf+OcjYOkWCkgyU_kA@mail.gmail.com>
- <CAHk-=wgEABCwu7HkJufpWC=K7u_say8k6Tp9eHvAXFa4DNXgzQ@mail.gmail.com>
- <CAHk-=wgBt9SsYjyHWn1ZH5V0Q7P6thqv_urVCTYqyWNUWSJ6_g@mail.gmail.com>
- <CAFULd4ZUa56KDLXSoYjoQkX0BcJwaipy3ZrEW+0tbi_Lz3FYAw@mail.gmail.com>
- <CAHk-=wiRQKkgUSRsLHNkgi3M4M-mwPq+9-RST=neGibMR=ubUw@mail.gmail.com>
- <CAHk-=wh2LQtWKNpV-+0+saW0+6zvQdK6vd+5k1yOEp_H_HWxzQ@mail.gmail.com>
- <Zc3NvWhOK//UwyJe@tucnak>
- <CAHk-=wiar+J2t6C5k6T8hZXGu0HDj3ZjH9bNGFBkkQOHj4Xkog@mail.gmail.com>
- <CAHk-=wjLFrbAVq6bxjGk+cAuafRgW8-6fxjsWzdxngM-fy_cew@mail.gmail.com>
+	s=arc-20240116; t=1708026934; c=relaxed/simple;
+	bh=kT5YoBgoPZ0lLO55VRtAadBAv4FxNR0YQTQAqq356es=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=m4Y6dLUc1qkZgEqFG9bSjveI7yYcO9S0wwwzJ1BxR4O5ssohlvey611OQ4bMyY9JIW9L7joavqWRUQncpl3w/J6yATn5kMT7EcGcFPlvaBTS48MPr6LMa+f18BU2yhxGsZBRqot6iyKXm3RJnMHEiJ6zTBkr6G/tHft3tReIAPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vOopWdvt; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-602dae507caso21718587b3.0
+        for <kvm@vger.kernel.org>; Thu, 15 Feb 2024 11:55:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1708026931; x=1708631731; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=S+ytbs/OlyKZvUUYHvg+QSwbP7J8EV4VQfdwZAf3qxo=;
+        b=vOopWdvt93Hcbgkx7FHYmHUtYfT5N7GfvPQdRvDaT9D5f1z7lP627a8GUUa2CilUAZ
+         Cp3U47D2bO3Ycjo9zZ6/XRnm2nIX5ZmZW+5WyodUPYCJWtOKgveXOhTD8bbs9sqbg9il
+         8VV1lEZ2uwo2UcWFIoXbkZXY/fW0qX2XIobf7YxVC9k8EJ1qGRzK7684+VEp1fu92C+v
+         ADI3x77jhQIuPtv9+jMSzHhS2oEkM/4PzKNAMXFngwEEgjifK2/Qff2oN+lUWR9P/lob
+         ihKu3Rl69gIR44nr6r9J24/28xnXgmnaKwu/7Unco6QHPkXZqT82YKTFB+7w2bTrSamX
+         xRAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708026931; x=1708631731;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=S+ytbs/OlyKZvUUYHvg+QSwbP7J8EV4VQfdwZAf3qxo=;
+        b=JKX4rYgFkr12jo/VOOwfjld/wu4kX5X1nwx72t2FnZIv9z6m2z58amnqaDV3VF2z1Z
+         L6LhKxgnqGD2ENyr9nAp5BWZL6wLw5mgTrx4srK7V+4BOKs5VH9Xi1hEQ6UHFbaFPSWL
+         +ttyc1TTl/aABaXZrp/o570/u37ggjd6OtS9mXvC/DMd0/Wt2f59hAnTLs93rmYiLEZt
+         g4yl5V9SixQUbNm+dlX48+6sC+Px+2zPr1JUFMVSYDajPku3nGdh0gOCqWcXoS40aghg
+         wpw2pgd1ScWbn43Fivvl8Plpc5TD7eGsGkL7rU/RAsTv0DWJdS+eIs6O2xtt04HRGSkh
+         RgsA==
+X-Forwarded-Encrypted: i=1; AJvYcCUd279XMVnVRm5XHkYiN0bV23/3dGbfLNnIJENt7laFuw3BULelZZxJocRkyUP4oUqLMx2wIWQbBNj2kr0BZDf+Tono
+X-Gm-Message-State: AOJu0YwJe5K1nDxFlzCg+fh+9sntRw8JsxpvznA5UjXMTj82L5eh8TTE
+	MC38wkrtVDlsfbs5+y1U6mJvQb8ezG/ijlzuyZ+QShTGojpdImCxbTa4FhivMtwFxAzWph4Ik0G
+	Q8g==
+X-Google-Smtp-Source: AGHT+IG04njOW89dgCobRztopxDWGJ70SPl/1yBF3/h9CXtghLVsshGy50Hx8eZcwGq/tfqEm9M4YoyGBb8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1885:b0:dc6:207e:e8b1 with SMTP id
+ cj5-20020a056902188500b00dc6207ee8b1mr622114ybb.2.1708026931610; Thu, 15 Feb
+ 2024 11:55:31 -0800 (PST)
+Date: Thu, 15 Feb 2024 11:55:30 -0800
+In-Reply-To: <20240215133631.136538-1-max.kellermann@ionos.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHk-=wjLFrbAVq6bxjGk+cAuafRgW8-6fxjsWzdxngM-fy_cew@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
+Mime-Version: 1.0
+References: <20240215133631.136538-1-max.kellermann@ionos.com>
+Message-ID: <Zc5sMmT20kQmjYiq@google.com>
+Subject: Re: [PATCH] arch/x86/entry_fred: don't set up KVM IRQs if KVM is disabled
+From: Sean Christopherson <seanjc@google.com>
+To: Max Kellermann <max.kellermann@ionos.com>
+Cc: hpa@zytor.com, x86@kernel.org, linux-kernel@vger.kernel.org, 
+	Stephen Rothwell <sfr@canb.auug.org.au>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Feb 15, 2024 at 11:17:44AM -0800, Linus Torvalds wrote:
-> but the manual addition of 'volatile' is unconditional.
++Paolo and Stephen
 
-That is just fine.  The extra keyword is not wrong, it is just redundant
-with fixed compilers, where it doesn't change anything in the behavior.
+FYI, there's a build failure in -next due to a collision between kvm/next and
+tip/x86/fred.  The above makes everything happy.
 
-	Jakub
-
+On Thu, Feb 15, 2024, Max Kellermann wrote:
+> When KVM is disabled, the POSTED_INTR_* macros do not exist, and the
+> build fails.
+> 
+> Fixes: 14619d912b65 ("x86/fred: FRED entry/exit and dispatch code")
+> Signed-off-by: Max Kellermann <max.kellermann@ionos.com>
+> ---
+>  arch/x86/entry/entry_fred.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/arch/x86/entry/entry_fred.c b/arch/x86/entry/entry_fred.c
+> index ac120cbdaaf2..660b7f7f9a79 100644
+> --- a/arch/x86/entry/entry_fred.c
+> +++ b/arch/x86/entry/entry_fred.c
+> @@ -114,9 +114,11 @@ static idtentry_t sysvec_table[NR_SYSTEM_VECTORS] __ro_after_init = {
+>  
+>  	SYSVEC(IRQ_WORK_VECTOR,			irq_work),
+>  
+> +#if IS_ENABLED(CONFIG_KVM)
+>  	SYSVEC(POSTED_INTR_VECTOR,		kvm_posted_intr_ipi),
+>  	SYSVEC(POSTED_INTR_WAKEUP_VECTOR,	kvm_posted_intr_wakeup_ipi),
+>  	SYSVEC(POSTED_INTR_NESTED_VECTOR,	kvm_posted_intr_nested_ipi),
+> +#endif
+>  };
+>  
+>  static bool fred_setup_done __initdata;
+> -- 
+> 2.39.2
 
