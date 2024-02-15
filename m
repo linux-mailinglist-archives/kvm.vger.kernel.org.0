@@ -1,134 +1,122 @@
-Return-Path: <kvm+bounces-8807-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8808-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93C32856AB5
-	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 18:16:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CF0B856B1D
+	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 18:36:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2CA0E1F21A78
-	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 17:16:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9E031B23A2E
+	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 17:28:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF377136676;
-	Thu, 15 Feb 2024 17:16:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 790071369AA;
+	Thu, 15 Feb 2024 17:28:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VtcsuB2m"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC2F0136640
-	for <kvm@vger.kernel.org>; Thu, 15 Feb 2024 17:16:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FA1B1339B2
+	for <kvm@vger.kernel.org>; Thu, 15 Feb 2024 17:28:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708017370; cv=none; b=TvdwzJvF5RECZCWT4U5tvdBaM0In2fUOe1nVWn0zkOiIf74geduJVnndI15NPUVwBZW47G1g/OHZPHA9X7GDem+psEPSpGGkJBpG6rsE+uD6EUmTqwivb+GwEVSyOWcKFMNbDjZ+ixf11FeTDqGMxWTS/6zcihiLaWV+VYnzzks=
+	t=1708018116; cv=none; b=uCKHjfSEWTxX6cSYCI1yJ8VK5Dlyw7yAJbU1DO9Gs4FYPZ5Dv9QjqSGvtL/KqOnmroIKX1Qio5ZdwCi6AJpnzjgQ8YlEVKb8WSk5NS2lUn88BDWqnzVDSrZSS1AklOJcfmkOdBKMqDwTxU1iRjAlo9fxvVvsNHyzj0yq9oV0KN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708017370; c=relaxed/simple;
-	bh=zxz0QrYMAAaMuEw9ynoZ7NA8W5JxzJkBnWva1dxS7gU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Nz01H7Hlv4pyxFCCjc4iGCjbCCyrRuQBzi7LGoTtJmXEaJEsBqzm+2h1yO6YVbc9P9WS7eN2+VFflR3zytgZEKtCxpM2JaSSgeLsP+MJ78sAmRchy+lIx1tT9wF05ALK+uCMbmDtcq1VSsoNS2HDLn1/W2FRBbxuXoIW59g75xs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 127911FB;
-	Thu, 15 Feb 2024 09:16:48 -0800 (PST)
-Received: from raptor (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D392A3F766;
-	Thu, 15 Feb 2024 09:16:04 -0800 (PST)
-Date: Thu, 15 Feb 2024 17:16:01 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: Shaoqin Huang <shahuang@redhat.com>, kvmarm@lists.linux.dev,
-	Nikos Nikoleris <nikos.nikoleris@arm.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
-	Nico Boehr <nrb@linux.ibm.com>, David Woodhouse <dwmw@amazon.co.uk>,
-	Nadav Amit <namit@vmware.com>, kvm@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org
-Subject: Re: [kvm-unit-tests PATCH v1 01/18] Makefile: Define __ASSEMBLY__
- for assembly files
-Message-ID: <Zc5G0Uu1QxJ1Qt36@raptor>
-References: <20231130090722.2897974-1-shahuang@redhat.com>
- <20231130090722.2897974-2-shahuang@redhat.com>
- <20240115-0c41f7d4aa09b7b82613faa8@orel>
- <Zc42ZJYMFpXpM4mD@raptor>
- <20240215-f2a2e3798b1f64923417df00@orel>
+	s=arc-20240116; t=1708018116; c=relaxed/simple;
+	bh=dHZd5Ku4cKnaQTeuYbLj3B5g+jqGKkqQ49mVjgl6HnE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ae6ghg21wMTkPYdBRZ284ojKxVl8R+ogtI8+Tq5B5ypRXC99sAXPKXNkmyIwjWVwlPkf7e/qSZ/In2LFq9n5liASanmNjmXXSiy0qraXdsqC9mFrh4ZQLGEjP0NQsYVBa0SreQ1LcRP6JMArx30lcL9SbqovYqyxel9nmOVebXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VtcsuB2m; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1708018114;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dHZd5Ku4cKnaQTeuYbLj3B5g+jqGKkqQ49mVjgl6HnE=;
+	b=VtcsuB2mzKcEaqozEMdun+1FASo/FSCTRk8o0ycwvtyV1c7ZaauHNOXIdgBS+m3fJmylYl
+	31uV+w2VMpW1yKWxJzmyTM7egEPQoHUKVK7jg/gxfsphXh+ctxMdqleIlrS4sYi+fweUra
+	Hn7v3abbvSozxVbOHaUPIBQAlXMV0ho=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-80-C1zC44KYMDK8x1UiAyLcgw-1; Thu, 15 Feb 2024 12:28:32 -0500
+X-MC-Unique: C1zC44KYMDK8x1UiAyLcgw-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-337a9795c5cso719801f8f.2
+        for <kvm@vger.kernel.org>; Thu, 15 Feb 2024 09:28:32 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708018111; x=1708622911;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dHZd5Ku4cKnaQTeuYbLj3B5g+jqGKkqQ49mVjgl6HnE=;
+        b=WNvkBERnzr3t6J/86QRfFFkqmu1kglH8RGuJ7CtnKPmwktIVBI78goBtO/FMNwdpYa
+         0wOU1AE1PuuS3bP6hd1/FSo0rf8LiOl7xXe8L2tyoJMiYTDnKfYt6KGiBTgHQMfRESaW
+         RBvD5bBJ+1/Y3BICwZM2as9zwMTxN/BuAG0Fwm3HMtajwNkZ1VX/3YSTZnSznhdul6tA
+         JCk+M+7MjlbfXlnHL1WVEaDZUomrYXI0kRcEKo3lvTAU97pdr4hBw8mwq289mD+9pSI2
+         oJRu9SkCJC93O6ILzT0YsctagmYDYJ7IdMBstAgqFcNXuh4c0z202nt476fKgY/fSIN2
+         T/hA==
+X-Forwarded-Encrypted: i=1; AJvYcCXu9E6CZBZzM89XREcxBwYfuXWc+zPAu1WgNE6veSGbeeicgPXSZyP0llvZtxVyCmh6W59qDzEjG2326KJ1mUcnCvYv
+X-Gm-Message-State: AOJu0YwMEWnvaGligf8A3/WdNWdYBW1glxxjGXnJKFG5y5GKlJ93oh1A
+	6eJQWg5qJ2Catvccr2qOv0gQ8H2WLdlGw1aR3n2QUreRC8Rt+RREb0sBOFa8KV7W4dz3x3jhMCG
+	KunfyMje4B/0dDdyGEg9b7HA4Rn8ygj71sIciu9v4sI7Qad4YMYVvYZPVnulhoRD15M9MrdGML8
+	P45JDm2anGjtVT2MuXGqg4iRyU
+X-Received: by 2002:adf:e70a:0:b0:33b:697c:1fc6 with SMTP id c10-20020adfe70a000000b0033b697c1fc6mr1728115wrm.20.1708018111227;
+        Thu, 15 Feb 2024 09:28:31 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGFvsu31+8oSt1VvAhl78DRahpkJxHYyoUVkf44jL3ze3T4AcbebuNJqhIs3oFW2TjAkTKdYlKbVjAlBEhbG0g=
+X-Received: by 2002:adf:e70a:0:b0:33b:697c:1fc6 with SMTP id
+ c10-20020adfe70a000000b0033b697c1fc6mr1728104wrm.20.1708018110911; Thu, 15
+ Feb 2024 09:28:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240215-f2a2e3798b1f64923417df00@orel>
+References: <20240209183743.22030-1-pbonzini@redhat.com> <20240209183743.22030-10-pbonzini@redhat.com>
+ <20240215013415.bmlsmt7tmebmgtkh@amd.com> <ddabdb1f-9b33-4576-a47f-f19fe5ca6b7e@redhat.com>
+ <20240215144422.st2md65quv34d4tk@amd.com>
+In-Reply-To: <20240215144422.st2md65quv34d4tk@amd.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 15 Feb 2024 18:28:18 +0100
+Message-ID: <CABgObfb1YSa0KrxsFJmCoCSEDZ7OGgSyDuCpn1Bpo__My-ZxAg@mail.gmail.com>
+Subject: Re: [PATCH 09/10] KVM: SEV: introduce KVM_SEV_INIT2 operation
+To: Michael Roth <michael.roth@amd.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, seanjc@google.com, 
+	aik@amd.com, isaku.yamahata@intel.com, thomas.lendacky@amd.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Drew,
+On Thu, Feb 15, 2024 at 3:44=E2=80=AFPM Michael Roth <michael.roth@amd.com>=
+ wrote:
+> What I mean is that if userspace is modified for these checks, it's
+> reasonable to also inform them that only VMSA features present in
+> those older kernels (i.e. debug-swap) will be available via KVM_SEV_INIT,
+> and for anything else they will need to use KVM_SEV_INIT.
+>
+> That way we can provide clear documentation on what to expect regarding
+> VMSA features for KVM_SEV_INIT and not have to have the "undefined"
+> wording: it'll never use anything other than debug-swap depending on the
+> module param setting.
 
-On Thu, Feb 15, 2024 at 05:32:22PM +0100, Andrew Jones wrote:
-> On Thu, Feb 15, 2024 at 04:05:56PM +0000, Alexandru Elisei wrote:
-> > Hi Drew,
-> > 
-> > On Mon, Jan 15, 2024 at 01:44:17PM +0100, Andrew Jones wrote:
-> > > On Thu, Nov 30, 2023 at 04:07:03AM -0500, Shaoqin Huang wrote:
-> > > > From: Alexandru Elisei <alexandru.elisei@arm.com>
-> > > > 
-> > > > There are 25 header files today (found with grep -r "#ifndef __ASSEMBLY__)
-> > > > with functionality relies on the __ASSEMBLY__ prepocessor constant being
-> > > > correctly defined to work correctly. So far, kvm-unit-tests has relied on
-> > > > the assembly files to define the constant before including any header
-> > > > files which depend on it.
-> > > > 
-> > > > Let's make sure that nobody gets this wrong and define it as a compiler
-> > > > constant when compiling assembly files. __ASSEMBLY__ is now defined for all
-> > > > .S files, even those that didn't set it explicitely before.
-> > > > 
-> > > > Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
-> > > > Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
-> > > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > > > Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
-> > > > ---
-> > > >  Makefile           | 5 ++++-
-> > > >  arm/cstart.S       | 1 -
-> > > >  arm/cstart64.S     | 1 -
-> > > >  powerpc/cstart64.S | 1 -
-> > > >  4 files changed, 4 insertions(+), 4 deletions(-)
-> > > > 
-> > > > diff --git a/Makefile b/Makefile
-> > > > index 602910dd..27ed14e6 100644
-> > > > --- a/Makefile
-> > > > +++ b/Makefile
-> > > > @@ -92,6 +92,9 @@ CFLAGS += -Woverride-init -Wmissing-prototypes -Wstrict-prototypes
-> > > >  
-> > > >  autodepend-flags = -MMD -MP -MF $(dir $*).$(notdir $*).d
-> > > >  
-> > > > +AFLAGS  = $(CFLAGS)
-> > > > +AFLAGS += -D__ASSEMBLY__
-> > > > +
-> > > >  LDFLAGS += -nostdlib $(no_pie) -z noexecstack
-> > > >  
-> > > >  $(libcflat): $(cflatobjs)
-> > > > @@ -113,7 +116,7 @@ directories:
-> > > >  	@mkdir -p $(OBJDIRS)
-> > > >  
-> > > >  %.o: %.S
-> > > > -	$(CC) $(CFLAGS) -c -nostdlib -o $@ $<
-> > > > +	$(CC) $(AFLAGS) -c -nostdlib -o $@ $<
-> > > 
-> > > I think we can drop the two hunks above from this patch and just rely on
-> > > the compiler to add __ASSEMBLY__ for us when compiling assembly files.
-> > 
-> > I think the precompiler adds __ASSEMBLER__, not __ASSEMBLY__ [1]. Am I
-> > missing something?
-> > 
-> > [1] https://gcc.gnu.org/onlinedocs/cpp/macros/predefined-macros.html#c.__ASSEMBLER__
-> 
-> You're right. I'm not opposed to changing all the __ASSEMBLY__ references
-> to __ASSEMBLER__. I'll try to do that at some point unless you beat me to
-> it.
+Ah, I agree.
 
-Actually, I quite prefer the Linux style of using __ASSEMBLY__ instead of
-__ASSEMBLER__, because it makes reusing Linux files easier. That, and the
-habit formed by staring at Linux assembly files.
+> That seems reasonable, but the main thing I was hoping to avoid was
+> another round of VMSA features changing out from underneath the covers
+> again. The module param setting is something we've needed to convey
+> internally/externally a good bit due to the fallout and making this
+> change would lead to another repeat. Not the end of the world but would
+> be nice to avoid if possible.
 
-Thanks,
-Alex
+The fallout was caused by old kernels not supporting debug-swap and
+now by failing measurements. As far as I know there is no downside of
+leaving it disabled by default, and it will fix booting old guest
+kernels.
+
+Paolo
+
 
