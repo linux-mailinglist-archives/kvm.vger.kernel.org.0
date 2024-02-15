@@ -1,460 +1,174 @@
-Return-Path: <kvm+bounces-8771-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8772-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4B28856627
-	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 15:42:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B5BA856632
+	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 15:44:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E0FD282741
-	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 14:42:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5724283A0C
+	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 14:44:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1B6E132C08;
-	Thu, 15 Feb 2024 14:42:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC03B132481;
+	Thu, 15 Feb 2024 14:44:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Deo7draH"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="mhpBtryY"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2077.outbound.protection.outlook.com [40.107.93.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D59513249A
-	for <kvm@vger.kernel.org>; Thu, 15 Feb 2024 14:42:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708008135; cv=none; b=ARPnsXkJ5Xb4pBZwtpURUk6dRqr3jNlvvQg0kYV+Drdv2VlE2tkltW25xXIJW/NzvuXx9Ar/VBImFRqQU4GvXG1UHp8ugSa5mfWqB6MF5zsyYI9tsQHHLUIYJ0Sdy1k4lzJjCObhKo4jOMhX80ioEu643Ox+YPTVoJQHChe3dBs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708008135; c=relaxed/simple;
-	bh=KVQXyddDCqFOkaQkPG/3aBE9fjuhRZsKr40SbrA8X64=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Yrz/vx9xonEoHnmi6LJ1xh+GU6Pa7aH+A4fzBKyApwJ4yLvrak+vGM8Hs7za11F+Ix6NqW728jmEsXGd8m1isWP1rCyad15v3UQJI2/8fQB9Pv40BPRJVoWZ4nzzgenc3xPNGMJo92rCtvMlB6Q/dx8Y6UQvjit71pOyu78t0SU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Deo7draH; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708008132;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DU/I58QZ3iymbaVm/jdmROBBRbIzgpeEc0Gm3Gdul0M=;
-	b=Deo7draHrd1g7sx8BIEcfj7XmdGTzid/qcHHXUWdU9kDWwPZZSRRlzZHh8DmBp0gnbhJfo
-	Ew55uDiJweGOXsvxsjrpKTIGaANEOO0tn8ZgBNZJUe+67zicZVBW5DC7HLgzNRFZXNHPqy
-	Tz0EpYzl5IxOYYbWuD/avSkD2vsHapk=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-591-ZYRs4SacOiWhNoQhDomu6g-1; Thu, 15 Feb 2024 09:42:10 -0500
-X-MC-Unique: ZYRs4SacOiWhNoQhDomu6g-1
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-7817253831cso118535785a.0
-        for <kvm@vger.kernel.org>; Thu, 15 Feb 2024 06:42:10 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708008130; x=1708612930;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DU/I58QZ3iymbaVm/jdmROBBRbIzgpeEc0Gm3Gdul0M=;
-        b=FWwf2p4CENLKsUgJoww7mKxsUCwk+QxQjcD40YLua1znuO1/j+RTf0g2OK4o0Fzvt5
-         MXLAI2DhcrKGPpNTsHsqcR7m6nBLOg0hORo9GFbcwhTFmCEZtGPw4BJgHxdMfVmzQpOr
-         VJQUMcfWukGu+C9s49nepVq+SoeJ0c84kqlhR2RPvycSVOEzWfp/wD3dYiViIoPk2q8w
-         1wJ0kTtRFFxQqGZn3aAyMJkseRrOGcTi51YAcMpPhOVHYoiwYD3eO8xnp5+OmbSYgDMX
-         eiSrMM1YuvTN2pOrTk2mL94dKquExoUz+2VuHmMskwWSAJHMzh9Qeh0G03qecpq/cPKQ
-         SxKg==
-X-Forwarded-Encrypted: i=1; AJvYcCUSwEAlR+SgciDGB2721bWBaWzfibdOnwR5Jx65Y71WIWJ518qqmzO8MrhMv8wuyrwfSLA52puFxotMnnJwRJawxaql
-X-Gm-Message-State: AOJu0YwaCo7NJdj2xctW+ERCTeeT1JjLzBBsHBwfOSnUDUe8yL5hrJRi
-	U7QsEdvUoZsfR62s17fvjXdcc4PiN5C9WJAdtSwxRD0+3cv9kpJuGqgDWLuMJrvn1Ohl936/Rxv
-	VNLjTF7S5oSVqlukwYNnmpNUaz0HYKkIXZT3QlyltoyBwVX26nw==
-X-Received: by 2002:a05:620a:13e4:b0:785:c28b:d86c with SMTP id h4-20020a05620a13e400b00785c28bd86cmr2100297qkl.66.1708008129719;
-        Thu, 15 Feb 2024 06:42:09 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFvzVNXhi8rT3Pn+sH7a3Nu8FXV4LGRfEWLSlX73VFVdckv4Ow3Ck6pFZ7Hck6w0K2drJHXMA==
-X-Received: by 2002:a05:620a:13e4:b0:785:c28b:d86c with SMTP id h4-20020a05620a13e400b00785c28bd86cmr2100269qkl.66.1708008129385;
-        Thu, 15 Feb 2024 06:42:09 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id p21-20020a05620a113500b00783f77b968fsm636620qkk.109.2024.02.15.06.42.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 Feb 2024 06:42:08 -0800 (PST)
-Message-ID: <a456cae7-037a-4e11-979b-a7bacc0fe850@redhat.com>
-Date: Thu, 15 Feb 2024 15:42:05 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 532D613246B;
+	Thu, 15 Feb 2024 14:44:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.77
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708008286; cv=fail; b=Cy5BTt+Jhs6l1O6HZ2VXuHmA69BzDkHuNuwkaVOerdaCLAwqKgmnjs5KfbaWSxJxbRIyenN8UgLnZ6IG2dHwnnpNuzgjqdKnXq8P3OGMZgIKPYQIiShWVLJSbb2ucnK+TyvWtsAHz/GBTTpjm8eM5Efk57D45Ka8imKEVQR5Eno=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708008286; c=relaxed/simple;
+	bh=izLqfiA7ApahZ8v1vmn72CesjnX7mwtpl6vO52Clr2g=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P9sDxoHYo4K8vpQfEdSPVg0ZC8kZeQqmUqgaBVNU2cLC2cALWMPWLUQd6u6MUz8fRuVPs6y9uucPRtmPrWpxyIO2dT9uPOM7BTYP8RJK6MCbkGs8qqXKH/mBrSlkHEM2M5vBzNkWS7dhVbtFcCWT0vVUVMfVx6YONcI32bhuibU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=mhpBtryY; arc=fail smtp.client-ip=40.107.93.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QaSQOwUNKDNhGktlxfaWNKh39rQkuOkSvTvSa8ppAXqbHK5M1BSHMwdUUi4/8s+mE/3kWq326TpUrNEADbVJED1MvoYPUcZafnOvxKx7iO08IfykKw33YnSZCOCknuxihBa4N0f1MTWNrGa1Ax2BMl0rK9ZO/45jqVM85loYRGABkLXtd/d19Wp79WFj3WKRoJmgcWCd70YS2FYKud3wk9rNVaFmhR7rqPlQxlfdIY7PlMoZUJZFVji8NTzEWXUO4/U7zqh7byjC5te8MN3JP5QvCf0p1tbkIq3QrjxMPPLWUC3c26v453RK8irg+PJKUanp5osZlVkIzReHlo/hvg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8rbrcwpbZs66Lfa4r/wrPyadOPRAk8wThy6DqmnniVY=;
+ b=G6dnANiSkBJsk6GYXO02kbbaSwqjFxDY+offpIq23h3+pfFMDkYsYwMF+aHqZ2R0pfwLykmgUFUEis/VpOFZtSDHoAU7MWDU3/Hge65BYD8kyUmm2kujqeJe2TB1w/ixuoIL7JYe32FrJdhSAe2Xm3Ob82F90YPQ+WVe04YdOxayo7bbT1FcLIgItOK4SLx/rgSh59BYe5pqn/L3uRPwNXq+bPF+3TUaIvVpbfOuxDfB/3ya7qE+YcS8i4A7sfiXR7PqQDnc3lzhwyyavEzCgja/SzrhFtrndiIPviqHH4fHUjqIHFDZIgJPbcKXZYM2kjgYab1LL66/PRO54w+/gQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8rbrcwpbZs66Lfa4r/wrPyadOPRAk8wThy6DqmnniVY=;
+ b=mhpBtryYHzMR/pB4yvpZxnFoPAzAPMEmoEW07NZAyAb+lpv5Cvp1H//us0BEJ6Lqt9lrl5wY7BSs1/6SJDCtnNzN2I1YP7UUt4Sul4ipAlSNas8OTMSPRm9OnN02IJ2Keu24ML0hQjOcesJBDGhe0+N08zJwKFPGEnzkchjp240=
+Received: from BN9PR03CA0663.namprd03.prod.outlook.com (2603:10b6:408:10e::8)
+ by CY8PR12MB7730.namprd12.prod.outlook.com (2603:10b6:930:85::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.25; Thu, 15 Feb
+ 2024 14:44:40 +0000
+Received: from BN1PEPF00004682.namprd03.prod.outlook.com
+ (2603:10b6:408:10e:cafe::55) by BN9PR03CA0663.outlook.office365.com
+ (2603:10b6:408:10e::8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.26 via Frontend
+ Transport; Thu, 15 Feb 2024 14:44:40 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN1PEPF00004682.mail.protection.outlook.com (10.167.243.88) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7292.25 via Frontend Transport; Thu, 15 Feb 2024 14:44:40 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 15 Feb
+ 2024 08:44:39 -0600
+Date: Thu, 15 Feb 2024 08:44:22 -0600
+From: Michael Roth <michael.roth@amd.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+CC: <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+	<seanjc@google.com>, <aik@amd.com>, <isaku.yamahata@intel.com>,
+	<thomas.lendacky@amd.com>
+Subject: Re: [PATCH 09/10] KVM: SEV: introduce KVM_SEV_INIT2 operation
+Message-ID: <20240215144422.st2md65quv34d4tk@amd.com>
+References: <20240209183743.22030-1-pbonzini@redhat.com>
+ <20240209183743.22030-10-pbonzini@redhat.com>
+ <20240215013415.bmlsmt7tmebmgtkh@amd.com>
+ <ddabdb1f-9b33-4576-a47f-f19fe5ca6b7e@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 4/5] KVM: selftests: aarch64: Introduce
- pmu_event_filter_test
-Content-Language: en-US
-To: Oliver Upton <oliver.upton@linux.dev>, Shaoqin Huang <shahuang@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
- Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
- James Morse <james.morse@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-References: <20240202025659.5065-1-shahuang@redhat.com>
- <20240202025659.5065-5-shahuang@redhat.com> <ZbypAAFEHweTDUJK@linux.dev>
-From: Eric Auger <eauger@redhat.com>
-In-Reply-To: <ZbypAAFEHweTDUJK@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <ddabdb1f-9b33-4576-a47f-f19fe5ca6b7e@redhat.com>
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN1PEPF00004682:EE_|CY8PR12MB7730:EE_
+X-MS-Office365-Filtering-Correlation-Id: d9e82e3c-ca80-4e27-0ab2-08dc2e34a3f4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	PUmCLJsc79Cug056jHERzyDSxBDuTXS58rl6JbomBB0Dx6tRiSNMtQOKOrHXSej9HYZXsT75CKxgmAPBuId0QEU4qhYsP/2NMpYgfpxsEPnBZQYhlNndXRSt17lsxI0CvVeb+TU+2TeKHwJPmw/iCLa//b0lR4M5xqknEU6sWwy+Oawfi9n+C0TbaYBtC6Nx5cF+SHCL8HHsLgF+BxtAB1eCYYxrp2wzQ2BIPyJR72JHbGCFoAVo6nSNrASXnpKN58HSlcG9mO8vlaCCtkjqMb2w4c65rKZP5Fp3jU5E6AMWGcAQLV3h+jjyKL0nG204SBP64ydlSf4khdOb7u4GuFTzTPHYj4Dj7WMC4xy8O6tOpP356+kcQcBTvyuSF7ujCMW9rICxNiDg793in3K4ALoNUBtHFzgo/DTid82Z0+mutwAvnUYPS13bt9L0hbOWJ9wRE6b7rvjD9flvCA2mYKqJzaA499NsTU3NCZlbsPyb2ugdeEbe/KhKfcjHPg4MFVzhPnkytHc2LjV94Chy9K9s0u28ZkZkhvQZLfHwjZBGCJbgPhYE9akv8w/0l/3XkQMl/uDecDpsNXBJ2XoBsTTBYwDXkNUnhhn0cdZ9WeBki5Ol31u8vSgkks7UlzsD0mSQB7kFSkg8KdsAYY52OYmxiLpxVmS+nwpZgkIZaEA=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(376002)(39860400002)(136003)(346002)(396003)(230273577357003)(230922051799003)(451199024)(64100799003)(1800799012)(186009)(82310400011)(36860700004)(40470700004)(46966006)(44832011)(2906002)(53546011)(2616005)(1076003)(6916009)(83380400001)(8936002)(26005)(4326008)(70206006)(336012)(16526019)(426003)(70586007)(8676002)(5660300002)(81166007)(478600001)(41300700001)(82740400003)(86362001)(356005)(6666004)(316002)(36756003)(54906003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Feb 2024 14:44:40.2218
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: d9e82e3c-ca80-4e27-0ab2-08dc2e34a3f4
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN1PEPF00004682.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7730
 
-Hi Shaoqin,
+On Thu, Feb 15, 2024 at 02:44:47PM +0100, Paolo Bonzini wrote:
+> On 2/15/24 02:34, Michael Roth wrote:
+> > > +        struct struct kvm_sev_init {
+> > Missing the vm_type param here.
+> 
+> It can go away in the struct actually.  Also, "struct struct".
+> 
+> > > +If the ``KVM_X86_SEV_VMSA_FEATURES`` attribute does not exist, the hypervisor only
+> > > +supports KVM_SEV_INIT and KVM_SEV_ES_INIT.  In that case the set of VMSA features is
+> > > +undefined.
+> > 
+> > It's hard to imagine userspace implementation support for querying
+> > KVM_X86_SEV_VMSA_FEATURES but still insisting on KVM_SEV_INIT.
+> 
+> ... except for backwards compatibility with old kernels.  For example, the
+> VMM could first invoke HAS_DEVICE_ATTR, and then fall back to KVM_SEV_INIT
+> after checking that the user did not explicitly request or forbid one or
+> more VMSA features.
 
-On 2/2/24 09:34, Oliver Upton wrote:
-> On Thu, Feb 01, 2024 at 09:56:53PM -0500, Shaoqin Huang wrote:
->> Introduce pmu_event_filter_test for arm64 platforms. The test configures
->> PMUv3 for a vCPU, and sets different pmu event filters for the vCPU, and
->> check if the guest can see those events which user allow and can't use
->> those events which use deny.
->>
->> This test refactor the create_vpmu_vm() and make it a wrapper for
->> __create_vpmu_vm(), which allows some extra init code before
->> KVM_ARM_VCPU_PMU_V3_INIT.
->>
->> And this test use the KVM_ARM_VCPU_PMU_V3_FILTER attribute to set the
->> pmu event filter in KVM. And choose to filter two common event
->> branches_retired and instructions_retired, and let the guest to check if
->> it see the right pmceid register.
->>
->> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
->> ---
->>  tools/testing/selftests/kvm/Makefile          |   1 +
->>  .../kvm/aarch64/pmu_event_filter_test.c       | 219 ++++++++++++++++++
->>  .../selftests/kvm/include/aarch64/vpmu.h      |   4 +
->>  .../testing/selftests/kvm/lib/aarch64/vpmu.c  |  14 +-
->>  4 files changed, 236 insertions(+), 2 deletions(-)
->>  create mode 100644 tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
->>
->> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
->> index 709a70b31ca2..733ec86a3385 100644
->> --- a/tools/testing/selftests/kvm/Makefile
->> +++ b/tools/testing/selftests/kvm/Makefile
->> @@ -148,6 +148,7 @@ TEST_GEN_PROGS_aarch64 += aarch64/arch_timer
->>  TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
->>  TEST_GEN_PROGS_aarch64 += aarch64/hypercalls
->>  TEST_GEN_PROGS_aarch64 += aarch64/page_fault_test
->> +TEST_GEN_PROGS_aarch64 += aarch64/pmu_event_filter_test
->>  TEST_GEN_PROGS_aarch64 += aarch64/psci_test
->>  TEST_GEN_PROGS_aarch64 += aarch64/set_id_regs
->>  TEST_GEN_PROGS_aarch64 += aarch64/smccc_filter
->> diff --git a/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
->> new file mode 100644
->> index 000000000000..d280382f362f
->> --- /dev/null
->> +++ b/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
->> @@ -0,0 +1,219 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +/*
->> + * pmu_event_filter_test - Test user limit pmu event for guest.
->> + *
->> + * Copyright (c) 2023 Red Hat, Inc.
->> + *
->> + * This test checks if the guest only see the limited pmu event that userspace
->> + * sets, if the guest can use those events which user allow, and if the guest
->> + * can't use those events which user deny.
->> + * This test runs only when KVM_CAP_ARM_PMU_V3, KVM_ARM_VCPU_PMU_V3_FILTER
->> + * is supported on the host.
->> + */
->> +#include <kvm_util.h>
->> +#include <processor.h>
->> +#include <vgic.h>
->> +#include <vpmu.h>
->> +#include <test_util.h>
->> +#include <perf/arm_pmuv3.h>
->> +
->> +struct pmce{
-> 
-> Missing whitespace before curly brace.
-> 
-> Also -- pmce is an odd name. Maybe common_event_ids or pmu_id_regs.
-> 
->> +	uint64_t pmceid0;
->> +	uint64_t pmceid1;
->> +} supported_pmce, guest_pmce;
-> 
-> maybe "max_*" and "expected_*". It took me a bit to understand that
-> guest_pmce feeds in your expected PMCEID values.
-> 
->> +static struct vpmu_vm *vpmu_vm;
->> +
->> +#define FILTER_NR 10
->> +
->> +struct test_desc {
->> +	const char *name;
->> +	struct kvm_pmu_event_filter filter[FILTER_NR];
->> +};
->> +
->> +#define __DEFINE_FILTER(base, num, act)		\
->> +	((struct kvm_pmu_event_filter) {	\
->> +		.base_event	= base,		\
->> +		.nevents	= num,		\
->> +		.action		= act,		\
->> +	})
->> +
->> +#define DEFINE_FILTER(base, act) __DEFINE_FILTER(base, 1, act)
->> +
->> +#define EMPTY_FILTER	{ 0 }
->> +
->> +#define SW_INCR		0x0
->> +#define INST_RETIRED	0x8
->> +#define BR_RETIRED	0x21
-> 
-> These event numbers are already defined in tools/include/perf/arm_pmuv3.h,
-> use those instead.
-> 
->> +static void guest_code(void)
->> +{
->> +	uint64_t pmceid0 = read_sysreg(pmceid0_el0);
->> +	uint64_t pmceid1 = read_sysreg(pmceid1_el0);
->> +
->> +	GUEST_ASSERT_EQ(guest_pmce.pmceid0, pmceid0);
->> +	GUEST_ASSERT_EQ(guest_pmce.pmceid1, pmceid1);
->> +
->> +	GUEST_DONE();
->> +}
->> +
->> +static void guest_get_pmceid(void)
->> +{
->> +	supported_pmce.pmceid0 = read_sysreg(pmceid0_el0);
->> +	supported_pmce.pmceid1 = read_sysreg(pmceid1_el0);
->> +
->> +	GUEST_DONE();
->> +}
->> +
->> +static void pmu_event_filter_init(struct vpmu_vm *vm, void *arg)
-> 
-> Why are you obfuscating the pointer to the filter array?
-> 
->> +{
->> +	struct kvm_device_attr attr = {
->> +		.group	= KVM_ARM_VCPU_PMU_V3_CTRL,
->> +		.attr	= KVM_ARM_VCPU_PMU_V3_FILTER,
->> +	};
->> +	struct kvm_pmu_event_filter *filter = (struct kvm_pmu_event_filter *)arg;
->> +
->> +	while (filter && filter->nevents != 0) {
->> +		attr.addr = (uint64_t)filter;
->> +		vcpu_ioctl(vm->vcpu, KVM_SET_DEVICE_ATTR, &attr);
-> 
-> Again, kvm_device_attr_set() the right helper to use.
-> 
->> +static void set_pmce(struct pmce *pmce, int action, int event)
->> +{
->> +	int base = 0;
->> +	uint64_t *pmceid = NULL;
->> +
->> +	if (event >= 0x4000) {
->> +		event -= 0x4000;
->> +		base = 32;
->> +	}
->> +
->> +	if (event >= 0 && event <= 0x1F) {
->> +		pmceid = &pmce->pmceid0;
->> +	} else if (event >= 0x20 && event <= 0x3F) {
->> +		event -= 0x20;
->> +		pmceid = &pmce->pmceid1;
->> +	} else {
->> +		return;
->> +	}
->> +
->> +	event += base;
->> +	if (action == KVM_PMU_EVENT_ALLOW)
->> +		*pmceid |= BIT(event);
->> +	else
->> +		*pmceid &= ~BIT(event);
->> +}
->> +
->> +static void prepare_guest_pmce(struct kvm_pmu_event_filter *filter)
->> +{
->> +	struct pmce pmce_mask = { ~0, ~0 };
->> +	bool first_filter = true;
->> +
->> +	while (filter && filter->nevents != 0) {
->> +		if (first_filter) {
->> +			if (filter->action == KVM_PMU_EVENT_ALLOW)
->> +				memset(&pmce_mask, 0, sizeof(pmce_mask));
->> +			first_filter = false;
->> +		}
->> +
->> +		set_pmce(&pmce_mask, filter->action, filter->base_event);
->> +		filter++;
->> +	}
->> +
->> +	guest_pmce.pmceid0 = supported_pmce.pmceid0 & pmce_mask.pmceid0;
->> +	guest_pmce.pmceid1 = supported_pmce.pmceid1 & pmce_mask.pmceid1;
->> +}
-> 
-> Why do you need to do this? Can't you tell the guests what events to
-> expect and have it make sense of the PMCEID values it sees?
-> 
-> You could, for example, pass in a pointer to the test descriptor as an
-> argument.
-> 
->> +static void run_test(struct test_desc *t)
->> +{
->> +	pr_debug("Test: %s\n", t->name);
-> 
-> You may as well just pr_info() this thing.
-> 
->> +	create_vpmu_vm_with_filter(guest_code, t->filter);
->> +	prepare_guest_pmce(t->filter);
->> +	sync_global_to_guest(vpmu_vm->vm, guest_pmce);
->> +
->> +	run_vcpu(vpmu_vm->vcpu);
->> +
->> +	destroy_vpmu_vm(vpmu_vm);
->> +}
->> +
->> +static struct test_desc tests[] = {
->> +	{"without_filter", { EMPTY_FILTER }},
->> +	{"member_allow_filter",
->> +	 {DEFINE_FILTER(SW_INCR, 0), DEFINE_FILTER(INST_RETIRED, 0),
->> +	  DEFINE_FILTER(BR_RETIRED, 0), EMPTY_FILTER}},
->> +	{"member_deny_filter",
->> +	 {DEFINE_FILTER(SW_INCR, 1), DEFINE_FILTER(INST_RETIRED, 1),
->> +	  DEFINE_FILTER(BR_RETIRED, 1), EMPTY_FILTER}},
->> +	{"not_member_deny_filter",
->> +	 {DEFINE_FILTER(SW_INCR, 1), EMPTY_FILTER}},
->> +	{"not_member_allow_filter",
->> +	 {DEFINE_FILTER(SW_INCR, 0), EMPTY_FILTER}},
-from a strict uapi testing you are not testing
-- "Cancelling" a filter by registering the opposite action for the same
-range doesn't change the default action.
-- Event 0 (SW_INCR)
-- Filtering event 0x1E (CHAIN) has no effect either
-- Filtering the cycle counter is possible using event 0x11 (CPU_CYCLES).
+What I mean is that if userspace is modified for these checks, it's
+reasonable to also inform them that only VMSA features present in
+those older kernels (i.e. debug-swap) will be available via KVM_SEV_INIT,
+and for anything else they will need to use KVM_SEV_INIT.
 
-Documentation/virt/kvm/devices/vcpu.rst
-
-Then it obviously depends on how much coverage of the API you want/can
-afford to reach.
-
-Eric
+That way we can provide clear documentation on what to expect regarding
+VMSA features for KVM_SEV_INIT and not have to have the "undefined"
+wording: it'll never use anything other than debug-swap depending on the
+module param setting.
 
 > 
-> Why is the filter array special enough to get its own sentinel macro
-> but...
+> > Maybe it
+> > would be better to just lock in that VMSA_FEATURES at what is currently
+> > supported: DEBUG_SWAP=on/off depending on the kvm_amd module param, and
+> > then for all other features require opt-in via KVM_SEV_INIT2, and then
+> > bake that into the documentation. That way way they could still reference
+> > this documentation to properly calculate measurements for older/existing
+> > VMM implementations.
 > 
->> +	{ 0 }
-> 
-> ... the test descriptor array is okay to use a 'raw' initialization. My
-> vote is to drop the macro, zero-initializing a struct in an array is an
-> extremely common pattern in the kernel.
-> 
-> Also, these descriptors are dense and hard to read. Working with an
-> example:
-> 
-> 	{
-> 		.name = "member_allow_filter",
-> 		.filter = {
-> 			DEFINE_FILTER(SW_INCR, 0),
-> 			DEFINE_FILTER(INST_RETIRED, 0),
-> 			DEFINE_FILTER(BR_RETIRED, 0),
-> 			{ 0 }
-> 		},
-> 	}
-> 
-> See how much more readable that is?
-> 
->> +};
->> +
->> +static void for_each_test(void)
->> +{
->> +	struct test_desc *t;
->> +
->> +	for (t = &tests[0]; t->name; t++)
->> +		run_test(t);
->> +}
-> 
-> for_each_test() sounds like an iterator, but this is not. Call it
-> run_tests()
-> 
->> +static bool kvm_supports_pmu_event_filter(void)
->> +{
->> +	int r;
->> +
->> +	vpmu_vm = create_vpmu_vm(guest_code);
->> +
->> +	r = __kvm_has_device_attr(vpmu_vm->vcpu->fd, KVM_ARM_VCPU_PMU_V3_CTRL,
->> +				  KVM_ARM_VCPU_PMU_V3_FILTER);
->> +
->> +	destroy_vpmu_vm(vpmu_vm);
->> +	return !r;
->> +}
-> 
-> TBH, I don't really care much about the test probing for the event
-> filter UAPI. It has been upstream for a while, and if folks are trying
-> to run selftests at HEAD on an old kernel then that's their business.
-> 
-> The other prerequisites make more sense since they actually check if HW
-> features are present.
-> 
->> +static bool host_pmu_supports_events(void)
->> +{
->> +	vpmu_vm = create_vpmu_vm(guest_get_pmceid);
->> +
->> +	memset(&supported_pmce, 0, sizeof(supported_pmce));
->> +	sync_global_to_guest(vpmu_vm->vm, supported_pmce);
->> +	run_vcpu(vpmu_vm->vcpu);
->> +	sync_global_from_guest(vpmu_vm->vm, supported_pmce);
->> +	destroy_vpmu_vm(vpmu_vm);
->> +
->> +	return supported_pmce.pmceid0 & (BR_RETIRED | INST_RETIRED);
->> +}
-> 
-> This helper says its probing the host PMU, but you're actually firing up a
-> VM to do it.
-> 
-> The events supported by a particular PMU instance are readily available
-> in sysfs. Furthermore, you can tell KVM to select the exact host PMU
-> instance you probe.
-> 
->> diff --git a/tools/testing/selftests/kvm/lib/aarch64/vpmu.c b/tools/testing/selftests/kvm/lib/aarch64/vpmu.c
->> index b3de8fdc555e..76ea03d607f1 100644
->> --- a/tools/testing/selftests/kvm/lib/aarch64/vpmu.c
->> +++ b/tools/testing/selftests/kvm/lib/aarch64/vpmu.c
->> @@ -7,8 +7,9 @@
->>  #include <vpmu.h>
->>  #include <perf/arm_pmuv3.h>
->>  
->> -/* Create a VM that has one vCPU with PMUv3 configured. */
->> -struct vpmu_vm *create_vpmu_vm(void *guest_code)
->> +struct vpmu_vm *__create_vpmu_vm(void *guest_code,
->> +				 void (*init_pmu)(struct vpmu_vm *vm, void *arg),
->> +				 void *arg)
->>  {
->>  	struct kvm_vcpu_init init;
->>  	uint8_t pmuver;
->> @@ -50,12 +51,21 @@ struct vpmu_vm *create_vpmu_vm(void *guest_code)
->>  		    "Unexpected PMUVER (0x%x) on the vCPU with PMUv3", pmuver);
->>  
->>  	/* Initialize vPMU */
->> +	if (init_pmu)
->> +		init_pmu(vpmu_vm, arg);
->> +
->>  	vcpu_ioctl(vpmu_vm->vcpu, KVM_SET_DEVICE_ATTR, &irq_attr);
->>  	vcpu_ioctl(vpmu_vm->vcpu, KVM_SET_DEVICE_ATTR, &init_attr);
->>  
->>  	return vpmu_vm;
->>  }
->>  
->> +/* Create a VM that has one vCPU with PMUv3 configured. */
->> +struct vpmu_vm *create_vpmu_vm(void *guest_code)
->> +{
->> +	return __create_vpmu_vm(guest_code, NULL, NULL);
->> +}
->> +
-> 
-> Ok. This completely proves my point in the other patch. You already need
-> to refactor this helper to cram in what you're trying to do. Think of
-> ways to move the code that is actually common into libraries and leave
-> the rest to the tests themselves.
-> 
-> Some slight code duplication isn't the end of the world if it avoids
-> churning libraries every time someone wants to add a widget.
-> 
+> Thinking more about it, I think all features including debug_swap should be
+> disabled with the old SEV_INIT/SEV_ES_INIT.  Because the features need to
+> match between the VMM and the measurement calculation, they need to be added
+> explicitly on e.g. the QEMU command line.
 
-Eric
+That seems reasonable, but the main thing I was hoping to avoid was
+another round of VMSA features changing out from underneath the covers
+again. The module param setting is something we've needed to convey
+internally/externally a good bit due to the fallout and making this
+change would lead to another repeat. Not the end of the world but would
+be nice to avoid if possible.
 
+-Mike
+
+> 
+> Paolo
+> 
 
