@@ -1,132 +1,130 @@
-Return-Path: <kvm+bounces-8811-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8812-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D56B4856BBD
-	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 18:58:21 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15B79856C20
+	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 19:08:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F3851F20F26
-	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 17:58:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F24A9B248B7
+	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 18:08:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A21C51386B7;
-	Thu, 15 Feb 2024 17:58:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B79DD1384B7;
+	Thu, 15 Feb 2024 18:08:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yTMCUNr/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BRnOkFZ3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3140A1386A9
-	for <kvm@vger.kernel.org>; Thu, 15 Feb 2024 17:57:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F0FE1369AD
+	for <kvm@vger.kernel.org>; Thu, 15 Feb 2024 18:08:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708019881; cv=none; b=FaYdSyKt7ZakM9cUn5856bSbILvYroRplZUW7JUEhdz0TVqsiKqKrwu6Y7Q8xBA5DwXOtNO+JbrNVkOeEpZIAWHJp2vOtbkXSMYFmIm7/YS62ZU4EzEaW+T33TVlCz+KIHJUORX/MOVtKXAANLQZltlE8S6aGuhVUrnAmL51+LU=
+	t=1708020506; cv=none; b=aGEtblBDH9x/o/eOWkt/Yb/pe5ZYAbV4NrrOGR4dJIGFHI4pI85jhd13iYFMxhtIbS8Yqjq/NqP1IqGz/A5qVKj7R15hrFlCKrjNsQTiSr3IzsJZEkKow668/qhW7N28seBFGgTZauXfiKrSWSZKKAMfy+WiyISf6PQjmwJSYIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708019881; c=relaxed/simple;
-	bh=pBbPhTflFUG6wHN9o12IuzojR1JaaY/ff6CYDQHeD7Q=;
+	s=arc-20240116; t=1708020506; c=relaxed/simple;
+	bh=lA8uWfKDTswhUYSt0szr4iG14O2IbQR7ZiKLS2FP2UY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nh+14yc7B/RcFrKJM99tzO2+2HIY9Y0paY6IrOBfDVtR2905LUrt2M8RF376E6zuBbLSSe1CuswM3U3w0Fbd8h9cuOEoeVOTs0zMnp0ncA3D/xvBlAjIjbgW1Fo8WRCBBQb+KqpzMRBaga8pmA9QFN33EL2L9rq+kUxON2+HO7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yTMCUNr/; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-411a5b8765bso7192325e9.1
-        for <kvm@vger.kernel.org>; Thu, 15 Feb 2024 09:57:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708019878; x=1708624678; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JpqTtw6FYrW3PoFuWsqUH7t3JUAVgmdouNuTTew3X4Y=;
-        b=yTMCUNr/4KwtsP4+kfFodczTFFFdY3YeO9sMr+PvazdgVxC5jGwGmu8mL/HTVMOmyJ
-         Va+m01Z5YsJxa1M9bqDaeRCBy0AUj8t8Uy+0z3/JPHoh4fT460sSGIZCBH2U+oU8xrq3
-         BCVT4g7KUIxfYOtA86L4ITyyUyIl1k8y0+oIX3/OAFHZ3oJVB5JmRSu96KA0l5E5ARin
-         WpjD06JmbgoLDmivTsBPOHt9KvvFIYquCe7yFE8kZ7aBc+XTMfZpRY/L8N8qs6+AvQs8
-         l9iH0o3y31Cv6pLb4sNWixt5qv5zrc4ZMgNwHUhlzJ/QACd44IzQDO8lTKzRODxa7CcC
-         L2hA==
+	 To:Cc:Content-Type; b=TkL7eflOFIJkpTy04cL2EAwKAll8yjEJI5wdHvNA04Qpx/i3cQOjTttP/hA1mDP0xQeRniNae+wV2Rokh8giqeVeVXP/n5R77yaJulbS5TgLmM0Ydz6NJCsI6m238Sv9MCMNuD1Hop9ToKwu2gNOSjmY2mx+dEOWhIspYnp7r/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BRnOkFZ3; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1708020501;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hnmBz4W0WlRvmkbmmS8uJZWQuvZ3cJwME84PlXfuzx0=;
+	b=BRnOkFZ3w+KDP7YK9KoGpprmbFGqZsJcREA5U4nBSO18Wh8xwe29tSRxo9tRkjEHmtE46h
+	fgMdLojJpgi8Z+2yerR2XswhjB+7sEHiH9z1k4EwkWXYc9M8wleYeZQ9WZs6UXBy/eZohz
+	lv0XEbWEZvn3Q9envM2Mg9G4G9cgxGU=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-623-dag_HxahNNS4x38qtMvH6g-1; Thu, 15 Feb 2024 13:08:20 -0500
+X-MC-Unique: dag_HxahNNS4x38qtMvH6g-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4120faa1dacso5444785e9.2
+        for <kvm@vger.kernel.org>; Thu, 15 Feb 2024 10:08:20 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708019878; x=1708624678;
+        d=1e100.net; s=20230601; t=1708020499; x=1708625299;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=JpqTtw6FYrW3PoFuWsqUH7t3JUAVgmdouNuTTew3X4Y=;
-        b=kw9FoecxyddtuHgdaUX5rPoZ2cNuU8UkdQts5rKwxQ6ChGsujTjoZ4FrvoRj2UyE3W
-         36FyfFP5+b3lwCQ6O0F3XHb61lzvpD9O6nI1p/lXnovQMda9iMNW8I5UIdQzK1tUZNx7
-         wK6G+8ZGTS+Zx/Ta/KtSynQ4Fd1Ng1Z4nW3cv1v0+8LbGdcbWFaD30m26LuffEe8MkbQ
-         jFaF/UxSElv/NjZzHxX1Qz/LDPKPypbf8AXE0tFQTEwixXZd3716wYx2v6atQd8jd1gf
-         6tRfoF0nIi5+yXBul6VVGJ5j12q9uyRlc0SWow4DigyyH+sD1MMOfNQZTnZ4hvN4xnN4
-         HJcg==
-X-Forwarded-Encrypted: i=1; AJvYcCVc1kKxCVZN7RRFoy3kC26CmlnXk54dtE9JGu/Rz2w4RymZzrLTE9+PBvkEri0nutH02aZQ5oC3sp1g5WbPlKF5Kuay
-X-Gm-Message-State: AOJu0YwLSh9NVddiQm2DVy10DAb08fpdLCrN+bNxg00Rin0xVnCiAA7f
-	66k5rw4IyyjmtGI5FFdveZdPZ7KqmP7SlaCpldKvt3e/TM852sMLHfKg5R+W/EOdBOaVaEkUgcs
-	kfExAt87PeriZ43aB735k+GTrnGtAU50UHQQx
-X-Google-Smtp-Source: AGHT+IEp6ui6I2cesALfvxXVIbye1QcTH0l5ylN0OoIRmAT/rFJ/jWZYvt1ckNWO8K0z1iI+7MukerEQbd4EctdVzRY=
-X-Received: by 2002:a05:600c:1d16:b0:410:e91d:fa6c with SMTP id
- l22-20020a05600c1d1600b00410e91dfa6cmr2266070wms.2.1708019878367; Thu, 15 Feb
- 2024 09:57:58 -0800 (PST)
+        bh=hnmBz4W0WlRvmkbmmS8uJZWQuvZ3cJwME84PlXfuzx0=;
+        b=XwY38rZhjhRTDZ4s05VaP6T70lnXxzx9+ateMKwS4opk7XFviEJs/PzGYlakSswPqE
+         aCHg9ob0YH9lm6XrUus+vf6+rvN4gwCVyrCunzMctndEQhEhvLK0QgydM4HiPXinl8us
+         bgDwcf5JRbUqHEuBu6+m/j+/ECIoXVZq3X6K8gYrT8G0J4KpzQEOcgRO+kyCq1DioeqY
+         EIegK66tDf4nYuZvGWNCxhYg++4ZENi6H04JwDt60ZC5ossHgHYtGKoZiE2qvbxSr+52
+         DmwYXExulDmAK9xPgdhUEMkzhkQ6mrnz6AZSopLj+O2rtgkN9/tWHgzWGQ2kBDNo9Wvo
+         nsiA==
+X-Forwarded-Encrypted: i=1; AJvYcCW32+RxgJ1wgJWwG/HoZziEqqGcVHMEfieZTaVZF+Mi5tTUsW2b1afHirWwj86KsE/aiBzV/BWB9P8Q2CIzi3NtlJhY
+X-Gm-Message-State: AOJu0Ywz3q3th6c+CnfyWHKn10iQ5HMNFYVdXxV2qAucjNY7JvdQ2rRA
+	LN0G9dF40K1LnxW9yTWadACmiyjcsZfZfhmTPh2BSkwcUjiE2WTKkVGJXYq9qLmDASuLy4IkEgk
+	xcBFnfbwlFZoy7u/8ByviBXtVfd/bttEi+Tc4JgQVNmkrhfCVf07ZA3mjFZq2ZzMLLvd0fP9gub
+	aW91AiXSdyM/VWMrYX93YIkrZA
+X-Received: by 2002:a05:6000:1ac6:b0:33b:1bcc:7ed9 with SMTP id i6-20020a0560001ac600b0033b1bcc7ed9mr2414646wry.44.1708020499271;
+        Thu, 15 Feb 2024 10:08:19 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGyOBx2D7FF89GxYJanOXARZNUqXAQM8c3U4pdS7RlP/P/IdLC8GDGRKdBrw4p6ppAf6jA3EKkXQjbhgdYesJU=
+X-Received: by 2002:a05:6000:1ac6:b0:33b:1bcc:7ed9 with SMTP id
+ i6-20020a0560001ac600b0033b1bcc7ed9mr2414635wry.44.1708020498985; Thu, 15 Feb
+ 2024 10:08:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240215010004.1456078-1-seanjc@google.com> <20240215010004.1456078-2-seanjc@google.com>
-In-Reply-To: <20240215010004.1456078-2-seanjc@google.com>
-From: David Matlack <dmatlack@google.com>
-Date: Thu, 15 Feb 2024 09:57:29 -0800
-Message-ID: <CALzav=c0MFB7UG7yaXB3bAFampYO_xN=5Pjao6La55wy4cwjSw@mail.gmail.com>
-Subject: Re: [PATCH 1/2] KVM: x86: Mark target gfn of emulated atomic
- instruction as dirty
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Pasha Tatashin <tatashin@google.com>, Michael Krebs <mkrebs@google.com>
+References: <20240209183743.22030-1-pbonzini@redhat.com> <20240209183743.22030-10-pbonzini@redhat.com>
+ <20240215013415.bmlsmt7tmebmgtkh@amd.com> <ddabdb1f-9b33-4576-a47f-f19fe5ca6b7e@redhat.com>
+ <20240215144422.st2md65quv34d4tk@amd.com> <CABgObfb1YSa0KrxsFJmCoCSEDZ7OGgSyDuCpn1Bpo__My-ZxAg@mail.gmail.com>
+ <20240215175456.yg3rck76t2k77ttg@amd.com>
+In-Reply-To: <20240215175456.yg3rck76t2k77ttg@amd.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 15 Feb 2024 19:08:06 +0100
+Message-ID: <CABgObfa_ktGybPcai=OgBbYMMvm4jS_Hehc-cdLdFoev68z-GQ@mail.gmail.com>
+Subject: Re: [PATCH 09/10] KVM: SEV: introduce KVM_SEV_INIT2 operation
+To: Michael Roth <michael.roth@amd.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, seanjc@google.com, 
+	aik@amd.com, isaku.yamahata@intel.com, thomas.lendacky@amd.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 14, 2024 at 5:00=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
+On Thu, Feb 15, 2024 at 6:55=E2=80=AFPM Michael Roth <michael.roth@amd.com>=
+ wrote:
+> > The fallout was caused by old kernels not supporting debug-swap and
+> > now by failing measurements. As far as I know there is no downside of
+> > leaving it disabled by default, and it will fix booting old guest
+> > kernels.
 >
-> When emulating an atomic access on behalf of the guest, mark the target
-> gfn dirty if the CMPXCHG by KVM is attempted and doesn't fault.  This
-> fixes a bug where KVM effectively corrupts guest memory during live
-> migration by writing to guest memory without informing userspace that the
-> page is dirty.
+> Yah, agreed on older guest kernels, but it's the measurement side of thin=
+gs
+> where we'd expect some additional fallout. The guidance was essentially t=
+hat
+> if you run a newer host kernel with debug-swap support, you need either n=
+eed
+> to:
 >
-> Marking the page dirty got unintentionally dropped when KVM's emulated
-> CMPXCHG was converted to do a user access.  Before that, KVM explicitly
-> mapped the guest page into kernel memory, and marked the page dirty durin=
-g
-> the unmap phase.
->
-> Mark the page dirty even if the CMPXCHG fails, as the old data is written
-> back on failure, i.e. the page is still written.  The value written is
-> guaranteed to be the same because the operation is atomic, but KVM's ABI
-> is that all writes are dirty logged regardless of the value written.  And
-> more importantly, that's what KVM did before the buggy commit.
->
-> Huge kudos to the folks on the Cc list (and many others), who did all the
-> actual work of triaging and debugging.
->
-> Fixes: 1c2361f667f3 ("KVM: x86: Use __try_cmpxchg_user() to emulate atomi=
-c accesses")
+>   a) update your measurements to account for the additional VMSA feature
+>   b) disable debug-swap param to maintain previous behavior/measurement
 
-I'm only half serious but... Should we just revert this commit?
+Out of curiosity, where was this documented? While debug-swap was a
+pretty obvious culprit of the failed measurement, I didn't see any
+mention to it anywhere (and also didn't see any mention that old
+kernels would fail to boot in the KVM patches---which would have been
+a pretty clear indication that something like these patches was
+needed).
 
-This commit claims that kvm_vcpu_map() is unsafe because it can race
-with mremap(). But there are many other places where KVM uses
-kvm_vcpu_map() (e.g. nested VMX). It seems like KVM is just not
-compatible with mremap() until we address all the users of
-kvm_vcpu_map(). Patching _just_ emulator_cmpxchg_emulated() seems
-silly but maybe I'm missing some context on what led to commit
-1c2361f667f3 being written.
+> So those who'd taken approach a) would see another unexpected measurement
+> change when they eventually update to a newer kernel.
 
-kvm_vcpu_map/unmap() might not be the best interface, but it serves as
-a common choke-point for mapping guest memory to access in KVM. This
-is helpful for avoiding missed dirty logging updates (obviously) and
-will be even more helpful if we add support for freezing guest memory
-and "KVM Userfault" (as discussed in the 1/3 PUCK). I think we all
-agree we should do more of this (common choke points), not less. If
-there's a usecase for mremap()ing guest memory, we should make
-kvm_vcpu_map() play nice with mmu_notifiers.
+But they'd see it anyway if userspace starts disabling it by default.
+In general, enabling _anything_ by default is a mistake in either KVM
+or userspace if you care about guest ABI (which you obviously do in
+the case of confidential computing).
+
+Paolo
+
 
