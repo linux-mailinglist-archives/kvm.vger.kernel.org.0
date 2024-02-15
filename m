@@ -1,221 +1,142 @@
-Return-Path: <kvm+bounces-8763-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8764-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24A378563E9
-	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 14:03:02 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 872CD856497
+	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 14:39:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C88D528A49F
-	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 13:03:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 73876B2CF11
+	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 13:35:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2423012FB29;
-	Thu, 15 Feb 2024 13:02:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 308E2130AFC;
+	Thu, 15 Feb 2024 13:35:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CRTGEx/j"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LdUzMAYS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A770212BF06;
-	Thu, 15 Feb 2024 13:02:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE57D12BE88
+	for <kvm@vger.kernel.org>; Thu, 15 Feb 2024 13:35:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708002156; cv=none; b=L2mQ4DPWuK29N3WnwoywNRIpgxzpLX3nNRF5xfgSyjVxb198OT9E8mIFmWVouajHs2U3rCwLF4tCuWOoGdUp5DSJVXiNOn7E07BfuYXe5KZN6CEmkIcsqXDquUABVTD1Uc49IUeLRgHjlLJZTYmA8p1XIUouKCZLmt7HVXbqin8=
+	t=1708004150; cv=none; b=egFowOSOg+eXyuIovkuT4X1kUQ2vx1WSXXtacjlQhIhxAf5AsaQ2k7MwCH+Il8fMQEdurLxI/MNcs43TbKFIiYHqSltgpoTmoQ9p9mO/bTFDPLN6q5CvEtqSe/+WWRtnO9Gjk8pqwcmv/ZOy8Pc//hb5kB3NJ1xSydhN0VN3dvY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708002156; c=relaxed/simple;
-	bh=rFnluREXCTsXDodZeJ12RC10HbHmX2bC2fcQYUPV5bQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nysj6F2uEfvgk80cONQPZrz98nE7qTKVutq1yFi5WzLpvlJ/UOnP38xJJ+Z9zJfeGdB4TV79fjqSJZM8PDFtaVwDC0IePv7OdwtHajiZhNof3YByJXjzYRofpSGxNxAGHGF7ggL+LMKR36H7wl9V6TbhD/H6hgFsujT9W0MptYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CRTGEx/j; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708002154; x=1739538154;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=rFnluREXCTsXDodZeJ12RC10HbHmX2bC2fcQYUPV5bQ=;
-  b=CRTGEx/jtbXPFdhSZh4sUI9T2F1lsYycMKmkCQescyPWJEY08dkT2RcZ
-   YGbyYbkFEVARjalMhNaCTGvRUhwYVr4BZ34/p+CwgYJECGOUyLJPv+KYd
-   VGTnjqaiAmfz7R78aVMsHqVxzfjjb/xP33pEDU9O0DdopdVz+REFLMZnF
-   OiflknJNiP9Fr1TLX+/p5nqw0jKV0nzIVTA4HSOX4pui9GJG0EiSQZMeV
-   3CNapgRqOhfNCJVgxM74IbbF60X+Lco2VgkLt4Vz4GD467RzqcpGFpNQL
-   J6a3SnEGuAB0BnHl+lBFaHBlpoklOnvXx3AEpcdmEVfY77PKzMuUUco/n
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10984"; a="27534020"
-X-IronPort-AV: E=Sophos;i="6.06,161,1705392000"; 
-   d="scan'208";a="27534020"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Feb 2024 05:02:33 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,161,1705392000"; 
-   d="scan'208";a="3596575"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by orviesa010.jf.intel.com with ESMTP; 15 Feb 2024 05:02:32 -0800
-Date: Thu, 15 Feb 2024 20:58:43 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Li RongQing <lirongqing@baidu.com>,
-	Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: [PATCH 1/2] KVM: x86: Move "KVM no-APIC vCPU" key management
- into local APIC code
-Message-ID: <Zc4Kgz9et4uzlp/a@yilunxu-OptiPlex-7050>
-References: <20240209222047.394389-1-seanjc@google.com>
- <20240209222047.394389-2-seanjc@google.com>
+	s=arc-20240116; t=1708004150; c=relaxed/simple;
+	bh=20piVqpde4RqY3y0TzGE+6g2PggMnDnosLc4y+UW99s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rX06Lg3YNeOqMMx40qyPHk+RRAeNeaRIYEaNLW/2gADI3jPik4w04s/ifALa8kf/VkyTwgErX2ucCQi3lY4I5pluScLdhstwQ7QJ/df8BIcdySP9XQRLj7DEbLGS7ZPiY2wSSSujjQgVJ5bl57YqGscMYBk6yQhTSW+/9osXRic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LdUzMAYS; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1708004147;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=20piVqpde4RqY3y0TzGE+6g2PggMnDnosLc4y+UW99s=;
+	b=LdUzMAYSKrK+ZFxg+UcWSogaYIjQZiuB65uNhu6RSkwCDffpTLizGXmVp8P/RiBKoANYqr
+	2cr81h3hcOPMzXFJN8Xd94HClX5mxQWHttqHgP5ZDjvXEO+T+GeqHImpoy0XdciYpHRavW
+	nPqeH2bLhFdKS/jibjm2+0UKwBdFPyo=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-93-echnFo5vNV63Du6KFH1QTA-1; Thu, 15 Feb 2024 08:35:46 -0500
+X-MC-Unique: echnFo5vNV63Du6KFH1QTA-1
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-5611e1da4c6so610211a12.1
+        for <kvm@vger.kernel.org>; Thu, 15 Feb 2024 05:35:46 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708004145; x=1708608945;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=20piVqpde4RqY3y0TzGE+6g2PggMnDnosLc4y+UW99s=;
+        b=Tq9Xog3w7salgbK6FXOeZfTnwmCyrm/2jYlPsjm5VoS8y7gF1EGVmxIwTnRPAdQRM4
+         GuJBxPXibxmhe4dh4eWvKlNGJ2ycZTFCWGnNtXsXGiV40sLGWpHMS4aqzVz+OSBLwiiG
+         nqW/cxnT+n0JY9N7LrvMuo0QLPAIHxWf88BrTwT7XqTx1dfTGtNoTrOaj5QSdLoU3JEA
+         edtwpKl0TVKLSNk2pTsfBSPIuDuPbqzZ+AxSAmTMAm6/yw1LMY9nNc/q4o3m/sIeNVvz
+         h6N0wE/BGQM6i07ceT/M02q5J2CdvW5cozR78JvQJBSfyxDSwgMJblLC9I/8w2B11A5K
+         ejZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXFHWg6z4hyCy57kDUeVN/112jy3QKHtxpEEq6JI+VwdYroa6B6oXJbdxDVAqprjZdcGnDcs365XI+znsao6x6SMugX
+X-Gm-Message-State: AOJu0YwSG9o3dB0idBNur20Fn2gRdk5gViUB5OetyhwQX3E/BkcY8RZc
+	gxm3swdQr3j09ecgWrzgG2wKrIYajJIvseqPbFAoMcZ2NfH/L5WzWvHaI/3GeQE7FNjkPOYHst8
+	7ybtZNUImw70kZHdkwvqxP9L7nI7JfK1p2+kj+ANdyu6fsaJYpw==
+X-Received: by 2002:a17:906:e209:b0:a3d:a650:e5c with SMTP id gf9-20020a170906e20900b00a3da6500e5cmr817629ejb.29.1708004145425;
+        Thu, 15 Feb 2024 05:35:45 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHvwTkJbVnAshk1LTQZ19nIFvBJCziSBfAoCbrYbPMpTlj1lX6UFxd9eoPIyuhNE2CuS09YfA==
+X-Received: by 2002:a17:906:e209:b0:a3d:a650:e5c with SMTP id gf9-20020a170906e20900b00a3da6500e5cmr817609ejb.29.1708004145089;
+        Thu, 15 Feb 2024 05:35:45 -0800 (PST)
+Received: from [192.168.1.174] ([151.64.123.201])
+        by smtp.googlemail.com with ESMTPSA id o15-20020a1709061b0f00b00a3dabd0fdddsm238738ejg.15.2024.02.15.05.35.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 15 Feb 2024 05:35:44 -0800 (PST)
+Message-ID: <de6f7789-a9a5-4ff0-b0a0-3f0e9b439580@redhat.com>
+Date: Thu, 15 Feb 2024 14:35:43 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240209222047.394389-2-seanjc@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 07/10] KVM: x86: Add is_vm_type_supported callback
+Content-Language: en-US
+To: Michael Roth <michael.roth@amd.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, seanjc@google.com,
+ aik@amd.com, isaku.yamahata@intel.com
+References: <20240209183743.22030-1-pbonzini@redhat.com>
+ <20240209183743.22030-8-pbonzini@redhat.com>
+ <20240215003358.pjqfz3zik3s26nwt@amd.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <20240215003358.pjqfz3zik3s26nwt@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Feb 09, 2024 at 02:20:46PM -0800, Sean Christopherson wrote:
-> Move incrementing and decrementing of kvm_has_noapic_vcpu into
-> kvm_create_lapic() and kvm_free_lapic() respectively to fix a benign bug
-> bug where KVM fails to decrement the count if vCPU creation ultimately
-  ^
+On 2/15/24 01:33, Michael Roth wrote:
+>> +bool __kvm_is_vm_type_supported(unsigned long type);
+> It's not really clear from this patch/commit message why the export is
+> needed at this stage.
 
-remove the duplicate word, others LGTM.
+Yep, I'll remove it.
 
-Reviewed-by: Xu Yilun <yilun.xu@linux.intel.com>
+Paolo
 
-> fails, e.g. due to a memory allocation failing.
-> 
-> Note, the bug is benign as kvm_has_noapic_vcpu is used purely to optimize
-> lapic_in_kernel() checks, and that optimization is quite dubious.  That,
-> and practically speaking no setup that cares at all about performance runs
-> with a userspace local APIC.
-> 
-> Reported-by: Li RongQing <lirongqing@baidu.com>
-> Cc: Maxim Levitsky <mlevitsk@redhat.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/lapic.c | 27 ++++++++++++++++++++++++++-
->  arch/x86/kvm/x86.c   | 29 +++--------------------------
->  2 files changed, 29 insertions(+), 27 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 3242f3da2457..681f6d82d015 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -124,6 +124,9 @@ static inline int __apic_test_and_clear_vector(int vec, void *bitmap)
->  	return __test_and_clear_bit(VEC_POS(vec), (bitmap) + REG_POS(vec));
->  }
->  
-> +__read_mostly DEFINE_STATIC_KEY_FALSE(kvm_has_noapic_vcpu);
-> +EXPORT_SYMBOL_GPL(kvm_has_noapic_vcpu);
-> +
->  __read_mostly DEFINE_STATIC_KEY_DEFERRED_FALSE(apic_hw_disabled, HZ);
->  __read_mostly DEFINE_STATIC_KEY_DEFERRED_FALSE(apic_sw_disabled, HZ);
->  
-> @@ -2466,8 +2469,10 @@ void kvm_free_lapic(struct kvm_vcpu *vcpu)
->  {
->  	struct kvm_lapic *apic = vcpu->arch.apic;
->  
-> -	if (!vcpu->arch.apic)
-> +	if (!vcpu->arch.apic) {
-> +		static_branch_dec(&kvm_has_noapic_vcpu);
->  		return;
-> +	}
->  
->  	hrtimer_cancel(&apic->lapic_timer.timer);
->  
-> @@ -2809,6 +2814,11 @@ int kvm_create_lapic(struct kvm_vcpu *vcpu, int timer_advance_ns)
->  
->  	ASSERT(vcpu != NULL);
->  
-> +	if (!irqchip_in_kernel(vcpu->kvm)) {
-> +		static_branch_inc(&kvm_has_noapic_vcpu);
-> +		return 0;
-> +	}
-> +
->  	apic = kzalloc(sizeof(*apic), GFP_KERNEL_ACCOUNT);
->  	if (!apic)
->  		goto nomem;
-> @@ -2844,6 +2854,21 @@ int kvm_create_lapic(struct kvm_vcpu *vcpu, int timer_advance_ns)
->  	static_branch_inc(&apic_sw_disabled.key); /* sw disabled at reset */
->  	kvm_iodevice_init(&apic->dev, &apic_mmio_ops);
->  
-> +	/*
-> +	 * Defer evaluating inhibits until the vCPU is first run, as this vCPU
-> +	 * will not get notified of any changes until this vCPU is visible to
-> +	 * other vCPUs (marked online and added to the set of vCPUs).
-> +	 *
-> +	 * Opportunistically mark APICv active as VMX in particularly is highly
-> +	 * unlikely to have inhibits.  Ignore the current per-VM APICv state so
-> +	 * that vCPU creation is guaranteed to run with a deterministic value,
-> +	 * the request will ensure the vCPU gets the correct state before VM-Entry.
-> +	 */
-> +	if (enable_apicv) {
-> +		apic->apicv_active = true;
-> +		kvm_make_request(KVM_REQ_APICV_UPDATE, vcpu);
-> +	}
-> +
->  	return 0;
->  nomem_free_apic:
->  	kfree(apic);
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index b66c45e7f6f8..59119157bd20 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -12053,27 +12053,9 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->  	if (r < 0)
->  		return r;
->  
-> -	if (irqchip_in_kernel(vcpu->kvm)) {
-> -		r = kvm_create_lapic(vcpu, lapic_timer_advance_ns);
-> -		if (r < 0)
-> -			goto fail_mmu_destroy;
-> -
-> -		/*
-> -		 * Defer evaluating inhibits until the vCPU is first run, as
-> -		 * this vCPU will not get notified of any changes until this
-> -		 * vCPU is visible to other vCPUs (marked online and added to
-> -		 * the set of vCPUs).  Opportunistically mark APICv active as
-> -		 * VMX in particularly is highly unlikely to have inhibits.
-> -		 * Ignore the current per-VM APICv state so that vCPU creation
-> -		 * is guaranteed to run with a deterministic value, the request
-> -		 * will ensure the vCPU gets the correct state before VM-Entry.
-> -		 */
-> -		if (enable_apicv) {
-> -			vcpu->arch.apic->apicv_active = true;
-> -			kvm_make_request(KVM_REQ_APICV_UPDATE, vcpu);
-> -		}
-> -	} else
-> -		static_branch_inc(&kvm_has_noapic_vcpu);
-> +	r = kvm_create_lapic(vcpu, lapic_timer_advance_ns);
-> +	if (r < 0)
-> +		goto fail_mmu_destroy;
->  
->  	r = -ENOMEM;
->  
-> @@ -12194,8 +12176,6 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
->  	srcu_read_unlock(&vcpu->kvm->srcu, idx);
->  	free_page((unsigned long)vcpu->arch.pio_data);
->  	kvfree(vcpu->arch.cpuid_entries);
-> -	if (!lapic_in_kernel(vcpu))
-> -		static_branch_dec(&kvm_has_noapic_vcpu);
->  }
->  
->  void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
-> @@ -12472,9 +12452,6 @@ bool kvm_vcpu_is_bsp(struct kvm_vcpu *vcpu)
->  	return (vcpu->arch.apic_base & MSR_IA32_APICBASE_BSP) != 0;
->  }
->  
-> -__read_mostly DEFINE_STATIC_KEY_FALSE(kvm_has_noapic_vcpu);
-> -EXPORT_SYMBOL_GPL(kvm_has_noapic_vcpu);
-> -
->  void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu)
->  {
->  	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-> -- 
-> 2.43.0.687.g38aa6559b0-goog
-> 
-> 
 
