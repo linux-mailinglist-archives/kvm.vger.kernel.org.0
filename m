@@ -1,158 +1,108 @@
-Return-Path: <kvm+bounces-8819-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8820-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1948C856D85
-	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 20:18:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FB80856DAC
+	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 20:26:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4D5628EBE8
-	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 19:18:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E03AB289ECB
+	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 19:26:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8FF913A254;
-	Thu, 15 Feb 2024 19:18:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F40D13A246;
+	Thu, 15 Feb 2024 19:26:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="FLQMcszJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KbQMmF8V"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F212913A247
-	for <kvm@vger.kernel.org>; Thu, 15 Feb 2024 19:18:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AECE31369AD
+	for <kvm@vger.kernel.org>; Thu, 15 Feb 2024 19:26:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708024686; cv=none; b=TkvT5r5JV16Zx7URPV0l/8OuP4tkCGd56dtbu+rhBLegv09NX6vyFwVkJ1hAg53aBS+1iJsellqjpFzYV2N/rSU7D5+yuQP7ty8pb5PcMrIRsb1M4pZuHVjzfq7y3NoaEw8mCHgYMQkz0iKc2HVgP/CbTiracHzVxw7RDRiq6Kc=
+	t=1708025209; cv=none; b=c6KE9VO4SboGyVeZBl5h/qT6pNbSPCGzc5SW2BvIpbR16u6luKygL+h2BtuXJHAjxQ2egkM8vDFtnD9HTDyM/ITrt8usmrG2pPUHzau1USnqP0ZqWTgOyhrAcjQfYEBiW5SZlTjLUina/FSUCWEdaChAiESmhh0S1oBaJjefACM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708024686; c=relaxed/simple;
-	bh=o3id02ShTaAJP/qkPl05c1vDDNiTkgunU+ojuRRB+Nk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=q2ETdp750bvrAeNHm0UwkYL+hv3c+ASgSOtWmkO7/YLIW91fTB/joRKbnHyuDeGzBWv4kzopy6EUk2YWzhrS8PPuSl/eSwVF+HZv1gqsqV989g54jz8t7AD4CNSRu5dZhof7zdquSqWYXxBNzYJsZqwAxOhCEzZswqKU4FlC8FI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=FLQMcszJ; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-563d56ee65cso429564a12.2
-        for <kvm@vger.kernel.org>; Thu, 15 Feb 2024 11:18:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1708024683; x=1708629483; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=KITCyNjL2swPBA9ngw1xqwUThE0CIbT81b+KJugWYzs=;
-        b=FLQMcszJSnXEOxj9lap5AlQXdTlVLiuUJ2FR4jzmrn4Cpsv30SbyxE7dEVXF+D9RSn
-         O5YuNGMXWB/l965R7J3GJBwqS6sz0B2TPeumnz4JShSRXLJ5vpq9AT9smcf/oB4BHSoN
-         sx+ZjRnp3CnGGadIqCuaN+cXLLU6zuGid7Dy0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708024683; x=1708629483;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KITCyNjL2swPBA9ngw1xqwUThE0CIbT81b+KJugWYzs=;
-        b=swpVgkua4vZ8gKAjeNh1V+S9hHTsSk7lJ8OYlkQRwysxhk0SSFSZEtpmRuGx1az91e
-         KD4HNRllM/XKYSL2soSe/x7XnukuWzTuqjzuA7eipxfj44GOUo9E9TYHpgFWCUbnsIJ0
-         sA9aA82Kwzwf0qgipAs290CAHfSMfVQXqUPgRd3NYoJ+Ek78bopVEAc9faTQTCc5VS/o
-         EdbKxObfur+B/+ArhyIyHkbGQQLH8ePVeEixv5TLO1sW4L3/3QKri1tzamXJNbdvBUSA
-         D0krDdkoTnP6ORR3Ebky95M0yg218/XzyYBpTtk5IsEF66PeVvQ7k9PRA9l3ZmTQ731q
-         /q7A==
-X-Forwarded-Encrypted: i=1; AJvYcCUK7SA9umrDsm03vZHWT6SJNZrnc9JK0PncWI2DGu1+RYJNJbJn8msPAlKfH+gEaTYwFOvgMLl51wxVNU9DmLQb3o7D
-X-Gm-Message-State: AOJu0Yxe8dr+eQmy1ONvH2HmxqPgJ+4PzpErT9QoYlslij4ByHNxfRqp
-	obJuiODvERy0wxgPRz3OrF0GzNJ3CnpoCPy2M3wivKUIa/JVKKTem5hlWy/B74ggLz9hbUpR7s+
-	uAeY=
-X-Google-Smtp-Source: AGHT+IETfR5pWg+cU5XAt5VxCiX7fy2mdkUjfQrZlpwF+OpsGvOZkOTdpp1zd2DXO9yMtT85KEwsRA==
-X-Received: by 2002:a17:906:1b59:b0:a38:7541:36f6 with SMTP id p25-20020a1709061b5900b00a38754136f6mr2010031ejg.21.1708024683028;
-        Thu, 15 Feb 2024 11:18:03 -0800 (PST)
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com. [209.85.208.47])
-        by smtp.gmail.com with ESMTPSA id vo6-20020a170907a80600b00a3cf8cb80c1sm829799ejc.156.2024.02.15.11.18.01
-        for <kvm@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 Feb 2024 11:18:01 -0800 (PST)
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-55ee686b5d5so1636104a12.0
-        for <kvm@vger.kernel.org>; Thu, 15 Feb 2024 11:18:01 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWWjDNBe9EWMk/pI71Kdbv52j2Cndx3cx8NwL/RNjIuXPmOchG1l0MkXkVf25epWi7FFG5/So8CgxfifTDLmehDGWeo
-X-Received: by 2002:aa7:c31a:0:b0:55f:d95c:923 with SMTP id
- l26-20020aa7c31a000000b0055fd95c0923mr2173374edq.25.1708024681342; Thu, 15
- Feb 2024 11:18:01 -0800 (PST)
+	s=arc-20240116; t=1708025209; c=relaxed/simple;
+	bh=g4gXRysjrS/kTYtCYP5fJsXncbyru7gzlRYm/zwv35E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=W7/6UmzjaNX4FuXmkWr76WA+/JwGu2hOUvChw6i9qyxSZc6C/u2EUEhKp320O3C0v1L9Dy+nM74+DhQEZVXeYGhIxwa/q6CDX1CuL/O9IuOIX/XmrA9Vg6LxMhiS+WUXQ5Bxndq+vR54ECDNWh90+wXFkZH+T49mJk3LfHYzPhw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KbQMmF8V; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1708025206;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:in-reply-to:in-reply-to:  references:references;
+	bh=WSM2q6F8oVeBLvSk9HF07rvPb1zaTwpR9ptolNDGCHY=;
+	b=KbQMmF8VgAHzNvgSHmytTtfI8ssbC5OC8eKTF+rV6RaVbf6irU6z21ATHdfVfz8FDub2Kf
+	1rnxHQvcHPj7RBP9l6WKpMa8ElYUlIbmlfExXQUyTFB3wc8wWfqD8vsWL84aNAWikr0jC8
+	lUIgFkcm6aEfqkCAT1nc6iwAq+ybG/g=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-388-xecKsAMlMmyXGwzhHfmc4Q-1; Thu,
+ 15 Feb 2024 14:26:40 -0500
+X-MC-Unique: xecKsAMlMmyXGwzhHfmc4Q-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0783C1C05AD4;
+	Thu, 15 Feb 2024 19:26:39 +0000 (UTC)
+Received: from tucnak.zalov.cz (unknown [10.39.192.8])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id B42E611D1803;
+	Thu, 15 Feb 2024 19:26:38 +0000 (UTC)
+Received: from tucnak.zalov.cz (localhost [127.0.0.1])
+	by tucnak.zalov.cz (8.17.1/8.17.1) with ESMTPS id 41FJQZ3G1235764
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Thu, 15 Feb 2024 20:26:35 +0100
+Received: (from jakub@localhost)
+	by tucnak.zalov.cz (8.17.1/8.17.1/Submit) id 41FJQWEK1235763;
+	Thu, 15 Feb 2024 20:26:32 +0100
+Date: Thu, 15 Feb 2024 20:26:32 +0100
+From: Jakub Jelinek <jakub@redhat.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Uros Bizjak <ubizjak@gmail.com>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        "Andrew Pinski (QUIC)" <quic_apinski@quicinc.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH] Kconfig: Explicitly disable asm goto w/ outputs on
+ gcc-11 (and earlier)
+Message-ID: <Zc5laJzgwSPtHCTe@tucnak>
+Reply-To: Jakub Jelinek <jakub@redhat.com>
+References: <ZcZyWrawr1NUCiQZ@google.com>
+ <CAKwvOdmKaYYxf7vjvPf2vbn-Ly+4=JZ_zf+OcjYOkWCkgyU_kA@mail.gmail.com>
+ <CAHk-=wgEABCwu7HkJufpWC=K7u_say8k6Tp9eHvAXFa4DNXgzQ@mail.gmail.com>
+ <CAHk-=wgBt9SsYjyHWn1ZH5V0Q7P6thqv_urVCTYqyWNUWSJ6_g@mail.gmail.com>
+ <CAFULd4ZUa56KDLXSoYjoQkX0BcJwaipy3ZrEW+0tbi_Lz3FYAw@mail.gmail.com>
+ <CAHk-=wiRQKkgUSRsLHNkgi3M4M-mwPq+9-RST=neGibMR=ubUw@mail.gmail.com>
+ <CAHk-=wh2LQtWKNpV-+0+saW0+6zvQdK6vd+5k1yOEp_H_HWxzQ@mail.gmail.com>
+ <Zc3NvWhOK//UwyJe@tucnak>
+ <CAHk-=wiar+J2t6C5k6T8hZXGu0HDj3ZjH9bNGFBkkQOHj4Xkog@mail.gmail.com>
+ <CAHk-=wjLFrbAVq6bxjGk+cAuafRgW8-6fxjsWzdxngM-fy_cew@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAKwvOdk_obRUkD6WQHhS9uoFVe3HrgqH5h+FpqsNNgmj4cmvCQ@mail.gmail.com>
- <DM6PR02MB40587AD6ABBF1814E9CCFA7CB84B2@DM6PR02MB4058.namprd02.prod.outlook.com>
- <CAHk-=wi3p5C1n03UYoQhgVDJbh_0ogCpwbgVGnOdGn6RJ6hnKA@mail.gmail.com>
- <ZcZyWrawr1NUCiQZ@google.com> <CAKwvOdmKaYYxf7vjvPf2vbn-Ly+4=JZ_zf+OcjYOkWCkgyU_kA@mail.gmail.com>
- <CAHk-=wgEABCwu7HkJufpWC=K7u_say8k6Tp9eHvAXFa4DNXgzQ@mail.gmail.com>
- <CAHk-=wgBt9SsYjyHWn1ZH5V0Q7P6thqv_urVCTYqyWNUWSJ6_g@mail.gmail.com>
- <CAFULd4ZUa56KDLXSoYjoQkX0BcJwaipy3ZrEW+0tbi_Lz3FYAw@mail.gmail.com>
- <CAHk-=wiRQKkgUSRsLHNkgi3M4M-mwPq+9-RST=neGibMR=ubUw@mail.gmail.com>
- <CAHk-=wh2LQtWKNpV-+0+saW0+6zvQdK6vd+5k1yOEp_H_HWxzQ@mail.gmail.com>
- <Zc3NvWhOK//UwyJe@tucnak> <CAHk-=wiar+J2t6C5k6T8hZXGu0HDj3ZjH9bNGFBkkQOHj4Xkog@mail.gmail.com>
-In-Reply-To: <CAHk-=wiar+J2t6C5k6T8hZXGu0HDj3ZjH9bNGFBkkQOHj4Xkog@mail.gmail.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Thu, 15 Feb 2024 11:17:44 -0800
-X-Gmail-Original-Message-ID: <CAHk-=wjLFrbAVq6bxjGk+cAuafRgW8-6fxjsWzdxngM-fy_cew@mail.gmail.com>
-Message-ID: <CAHk-=wjLFrbAVq6bxjGk+cAuafRgW8-6fxjsWzdxngM-fy_cew@mail.gmail.com>
-Subject: Re: [PATCH] Kconfig: Explicitly disable asm goto w/ outputs on gcc-11
- (and earlier)
-To: Jakub Jelinek <jakub@redhat.com>
-Cc: Uros Bizjak <ubizjak@gmail.com>, Nick Desaulniers <ndesaulniers@google.com>, 
-	Sean Christopherson <seanjc@google.com>, "Andrew Pinski (QUIC)" <quic_apinski@quicinc.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, 
-	Peter Zijlstra <peterz@infradead.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wjLFrbAVq6bxjGk+cAuafRgW8-6fxjsWzdxngM-fy_cew@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-On Thu, 15 Feb 2024 at 10:25, Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> On Thu, 15 Feb 2024 at 00:39, Jakub Jelinek <jakub@redhat.com> wrote:
-> >
-> > Can it be guarded with
-> > #if GCC_VERSION < 140100
->
-> Ack. I'll update the workaround to do that, and add the new and
-> improved bugzilla pointer.
+On Thu, Feb 15, 2024 at 11:17:44AM -0800, Linus Torvalds wrote:
+> but the manual addition of 'volatile' is unconditional.
 
-.. and I also followed your suggestion to just consider any gcc-14
-snapshots as fixed. That seemed safe, considering that in practice the
-actual bug that Sean reported seems to not actually trigger with any
-gcc version 12.1+ as per your bisect (and my minimal testing).
+That is just fine.  The extra keyword is not wrong, it is just redundant
+with fixed compilers, where it doesn't change anything in the behavior.
 
-HOWEVER, when I was working through this, I noted that the *other*
-part of the workaround (the "missing volatile") doesn't seem to have
-been backported as aggressively.
+	Jakub
 
-IOW, I find that "Mark asm goto with outputs as volatile" in the
-gcc-12 and gcc-13 branches, but not in gcc-11.
-
-So I did end up making the default "asm_goto_output()" macro always
-use "asm volatile goto()", so that we don't have to worry about the
-other gcc issue.
-
-End result: the extra empty asm barrier is now dependent on gcc
-version in my tree, but the manual addition of 'volatile' is
-unconditional.
-
-Because it looks to me like gcc-11.5 will have your fix for the pseudo
-ordering, but not Andrew Pinski's fix for missing a volatile.
-
-Anyway, since the version dependencies were complex enough, I ended up
-going with putting that logic in our Kconfig files, rather than making
-the gcc-specific header file an ugly mess of #if's.
-
-Our Kconfig files are pretty much designed for having complicated
-configuration dependencies, so it ends up being quite natural there:
-
-  config GCC_ASM_GOTO_OUTPUT_WORKAROUND
-        bool
-        depends on CC_IS_GCC && CC_HAS_ASM_GOTO_OUTPUT
-        # Fixed in GCC 14.1, 13.3, 12.4 and 11.5
-        # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=113921
-        default y if GCC_VERSION < 110500
-        default y if GCC_VERSION >= 120000 && GCC_VERSION < 120400
-        default y if GCC_VERSION >= 130000 && GCC_VERSION < 130300
-
-and having those kinds of horrid expressions as preprocessor code
-included in every single compilation unit seemed just nasty.
-
-              Linus
 
