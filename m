@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-8736-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8737-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73EFB855D2B
-	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 10:01:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AC089855D2D
+	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 10:01:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C66528BEB0
-	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 09:01:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67E4528CC93
+	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 09:01:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3119F1BC5A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D90261CA98;
 	Thu, 15 Feb 2024 08:58:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="YC+l+PUr"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="V1dZ8wGT"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0F941B957;
-	Thu, 15 Feb 2024 08:58:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 926D91B966;
+	Thu, 15 Feb 2024 08:58:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707987495; cv=none; b=PG7M/xGq1siRpui23DY+TcPrcK3HeyX4n9QUpW/L9q3bqZGGPx74uyO7XYRscJ5OJYKUQbk1u8nlPQ2l+eaNJOQ/WJUpZ3C31x3KJncYguPSXFAZBQudKR/Ws+/jb/7i087WY4WwXAMJK84QLmE9Kmd+8SFt3YdpzvDRitAG6hk=
+	t=1707987496; cv=none; b=WNCKsC64LpZmlR7KASA1AcURm4jUt/efdBVWYLBg8eR+dEzyskZVAMyoWnmx9+bg1MAkAV2MqyZ28YyosL9GZeuCDN8UmAPLGG+xajEI9o9Z1h7mK+8qMOV2q3jWX9TY6QgBGg15WyZhWM98Z95oxx7YuBpUKDsHXL9dkIRIcfA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707987495; c=relaxed/simple;
-	bh=k7bPu+gk7Cd3HeftqicW+V1b6QVdrKTlCbgVbfhaERo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=SZqv+GMel7eJLC6dU7XhMRS5sj/v8ctPSIpzZcyECawjb47cz13EGrER/MZiKwEtQKl4mS/DqrZDx6/PY2lpAQiqpdLoxOKxe66TB0zcyigjTMavgH8Gx5nWxcx/1pqrL4ZZWsWiz0+wXD1omIdGoE8NI5WcPWPpjQ2MO5L2c1s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=YC+l+PUr; arc=none smtp.client-ip=205.220.165.32
+	s=arc-20240116; t=1707987496; c=relaxed/simple;
+	bh=0yDZe5Gug3G88eQxog9P6hpCmjQ2/vQHDkmYBm8PlKY=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=fiQim1EXd6nFAWf1qDxLx54MdUHiHOlgg+ami5B63mK8DEYMxPVfxj4N2AoNweH7XdHjIQP91YhaHfWp8Gw/lDGBA6Fqtjb5efih+s6AHJyuTlJ1aHd/ovEmUEZQwrMmKe7IuT+yMHqrwWs/VJTL5VwvrwccOg2qhaWAwpRopdw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=V1dZ8wGT; arc=none smtp.client-ip=205.220.165.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41F6iQ1A013781;
-	Thu, 15 Feb 2024 08:57:39 GMT
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41F6iQBu013773;
+	Thu, 15 Feb 2024 08:57:43 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references; s=corp-2023-11-20;
- bh=hlNIjt1lJtZP47W7eO4KvEIII2+KWpAFpv+PlhUsURU=;
- b=YC+l+PUrMU5xBqA3hq5Ym58t6zY7CWPc4uYSBWvHEueWoJE5dL/FHQon3qwvOhNsOmVT
- TGHG20yQgpgfYShmuseYEPcpslkrzpYmaPFXw6fEpA0mRShnQpodYDoWOyA/nxGpSGnE
- OS+4xtCJEQWlgPqNu3YZyTNf5gPWQp2BuVgHuc1zrb18f/coAUr7eBIQ1gqqUux0AdT3
- o6854UF23FxKthuiawWppPdx874M4D0pWvqPLflguM1Rqza6RiQtY5BvoimwKgiihRDQ
- z+tUYV5TXsSEBVyfZueWGf+2AIBxMI1Qg+xCGGXmnFGWj/tDWkInOAifBDTxfb1rsbSJ RA== 
+ bh=jwgRCWyFl1O7epx0x8iWWiua+ulnxF3yCh67glyLBKk=;
+ b=V1dZ8wGTWncD6/oeL4npJv5r3qB9QQyQ354M+jNqsYr9rnpvDUERlOeH+NdbrBKgQ6CS
+ pOGHTJtca0j8dyy22O/OtRTqFnTr7RbEvG0ScNGOMiV3GDRqjUKRc94NQe4V1Ist/uYj
+ H+v5isde01nAQcPUE77GPN2aYudxmg24uUwSoyKCsjM//ueSpjBodcZN4B55mcedlw56
+ 3k6f8+16qhIF5BzQZcFF/Nqyg8sn96TW6nVezl9+8p+DMMZEX0zN6E9tlPBEHDTw6bJe
+ iLyOgZ0DNR6GRR0DkJKhw2rGtVlKfwuH1X5OW0XCBPQVfE294RnfKgOLP7XWQLevvGqM YQ== 
 Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3w92s71e5t-1
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3w92s71e5x-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 15 Feb 2024 08:57:39 +0000
+	Thu, 15 Feb 2024 08:57:42 +0000
 Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 41F7oN7n015119;
-	Thu, 15 Feb 2024 08:57:38 GMT
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 41F8qUA6015081;
+	Thu, 15 Feb 2024 08:57:42 GMT
 Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3w5yka73re-1
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3w5yka73ts-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 15 Feb 2024 08:57:38 +0000
+	Thu, 15 Feb 2024 08:57:42 +0000
 Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41F8vDd1033748;
-	Thu, 15 Feb 2024 08:57:37 GMT
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41F8vDd3033748;
+	Thu, 15 Feb 2024 08:57:41 GMT
 Received: from mihai.localdomain (ban25x6uut25.us.oracle.com [10.153.73.25])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3w5yka73cg-7;
-	Thu, 15 Feb 2024 08:57:37 +0000
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3w5yka73cg-8;
+	Thu, 15 Feb 2024 08:57:41 +0000
 From: Mihai Carabas <mihai.carabas@oracle.com>
 To: linux-arm-kernel@lists.infradead.org
 Cc: kvm@vger.kernel.org, linux-pm@vger.kernel.org,
@@ -70,9 +70,9 @@ Cc: kvm@vger.kernel.org, linux-pm@vger.kernel.org,
         joao.m.martins@oracle.com, juerg.haefliger@canonical.com,
         mic@digikod.net, mihai.carabas@oracle.com, arnd@arndb.de,
         ankur.a.arora@oracle.com
-Subject: [PATCH v4 6/8] cpuidle-haltpoll: ARM64 support
-Date: Thu, 15 Feb 2024 09:41:48 +0200
-Message-Id: <1707982910-27680-7-git-send-email-mihai.carabas@oracle.com>
+Subject: [PATCH v4 7/8] cpuidle/poll_state: replace cpu_relax with smp_cond_load_relaxed
+Date: Thu, 15 Feb 2024 09:41:49 +0200
+Message-Id: <1707982910-27680-8-git-send-email-mihai.carabas@oracle.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1707982910-27680-1-git-send-email-mihai.carabas@oracle.com>
 References: <1707982910-27680-1-git-send-email-mihai.carabas@oracle.com>
@@ -83,50 +83,57 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 bulksc
  phishscore=0 adultscore=0 spamscore=0 mlxlogscore=999 malwarescore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
  definitions=main-2402150069
-X-Proofpoint-GUID: DKEm_88vuEAgYfwqE-BtVNjQU26GaIam
-X-Proofpoint-ORIG-GUID: DKEm_88vuEAgYfwqE-BtVNjQU26GaIam
+X-Proofpoint-GUID: yJ-iS1FTL20fHuvoqISXh1LxTLdGOEcN
+X-Proofpoint-ORIG-GUID: yJ-iS1FTL20fHuvoqISXh1LxTLdGOEcN
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 
-From: Joao Martins <joao.m.martins@oracle.com>
+cpu_relax on ARM64 does a simple "yield". Thus we replace it with
+smp_cond_load_relaxed which basically does a "wfe".
 
-To test whether it's a guest or not for the default cases, the haltpoll
-driver uses the kvm_para* helpers to find out if it's a guest or not.
-
-ARM64 doesn't have or defined any of these, so it remains disabled on
-the default. Although it allows to be force-loaded.
-
-Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
+Suggested-by: Peter Zijlstra <peterz@infradead.org>
 Signed-off-by: Mihai Carabas <mihai.carabas@oracle.com>
 ---
- drivers/cpuidle/Kconfig | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/cpuidle/poll_state.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/cpuidle/Kconfig b/drivers/cpuidle/Kconfig
-index cac5997dca50..067927eda466 100644
---- a/drivers/cpuidle/Kconfig
-+++ b/drivers/cpuidle/Kconfig
-@@ -35,7 +35,7 @@ config CPU_IDLE_GOV_TEO
+diff --git a/drivers/cpuidle/poll_state.c b/drivers/cpuidle/poll_state.c
+index 9b6d90a72601..1e45be906e72 100644
+--- a/drivers/cpuidle/poll_state.c
++++ b/drivers/cpuidle/poll_state.c
+@@ -13,6 +13,7 @@
+ static int __cpuidle poll_idle(struct cpuidle_device *dev,
+ 			       struct cpuidle_driver *drv, int index)
+ {
++	unsigned long ret;
+ 	u64 time_start;
  
- config CPU_IDLE_GOV_HALTPOLL
- 	bool "Haltpoll governor (for virtualized systems)"
--	depends on KVM_GUEST
-+	depends on (X86 && KVM_GUEST) || ARM64
- 	help
- 	  This governor implements haltpoll idle state selection, to be
- 	  used in conjunction with the haltpoll cpuidle driver, allowing
-@@ -73,7 +73,7 @@ endmenu
+ 	time_start = local_clock_noinstr();
+@@ -26,12 +27,16 @@ static int __cpuidle poll_idle(struct cpuidle_device *dev,
  
- config HALTPOLL_CPUIDLE
- 	tristate "Halt poll cpuidle driver"
--	depends on X86 && KVM_GUEST
-+	depends on (X86 && KVM_GUEST) || ARM64
- 	select CPU_IDLE_GOV_HALTPOLL
- 	default y
- 	help
+ 		limit = cpuidle_poll_time(drv, dev);
+ 
+-		while (!need_resched()) {
+-			cpu_relax();
+-			if (loop_count++ < POLL_IDLE_RELAX_COUNT)
+-				continue;
+-
++		for (;;) {
+ 			loop_count = 0;
++
++			ret = smp_cond_load_relaxed(&current_thread_info()->flags,
++						    VAL & _TIF_NEED_RESCHED ||
++						    loop_count++ >= POLL_IDLE_RELAX_COUNT);
++
++			if (!(ret & _TIF_NEED_RESCHED))
++				break;
++
+ 			if (local_clock_noinstr() - time_start > limit) {
+ 				dev->poll_time_limit = true;
+ 				break;
 -- 
 1.8.3.1
 
