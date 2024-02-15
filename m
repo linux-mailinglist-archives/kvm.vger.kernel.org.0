@@ -1,60 +1,59 @@
-Return-Path: <kvm+bounces-8822-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8823-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF8C5856E60
-	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 21:13:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AFA5856E69
+	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 21:15:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E2A62881C2
-	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 20:13:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 40B9B1F21C4C
+	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 20:15:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59FD613AA41;
-	Thu, 15 Feb 2024 20:13:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6A0013B28E;
+	Thu, 15 Feb 2024 20:15:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="l0gOqppm"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="XEP/k07f"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27F5441A81
-	for <kvm@vger.kernel.org>; Thu, 15 Feb 2024 20:13:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54FAA13AA4F
+	for <kvm@vger.kernel.org>; Thu, 15 Feb 2024 20:15:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708027989; cv=none; b=vFbtEP4RqIsZTzpotBbfdzeSmc4gjvcrQVcPfQxfuCICoD9H4Uy/AvMY9/DLHygiQIB0LlcUy2tqPzAkfTMnydQlYj7Ij/5vXMxladH4hcZZ2bw0Ve3xiJN4zsfIqvRpBTQVYF8pEMeDiuOdqjSmvhW8fzCaefGjnldKs6Tp55Y=
+	t=1708028110; cv=none; b=bbjx9Y6ZOq/wElYUiP4Y4uPME/sSzRCuA05VIyTOoxtW4AnrlZtBPJmcak+4ta8OqQ+gO1ebUox0RI/75yjbXLUgaov3r3WWKXvTnPHIUhZ86kn0clqXlP+utFVISO21LlixakBMW8/4zcw9dlgsq05Av3zON2xt3FsrOj/vC6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708027989; c=relaxed/simple;
-	bh=qOqvElTaarBcrxNDQK0w6KO5cXuq7tPFNungF5/n584=;
+	s=arc-20240116; t=1708028110; c=relaxed/simple;
+	bh=KtSlZAZEM4MerD+7iGc6Kd7M/eunyWwhgefG5ILU9M4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GvCoBBBOk842rW6CwigIlxnzwZM6iiwE2NF6DRahPwOCUBUdw1TOfpCrrwoI0g6t3RrREvJCGyBrsNPz5+/XU7ztX7JSCxWh3u00YWFBFstYre+6mCyfMH8O7cP2218szfpkTnDiOE/aD8TIqZbPlMMcHt9pMCFSyGVpgD5G6BQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=l0gOqppm; arc=none smtp.client-ip=95.215.58.172
+	 Content-Type:Content-Disposition:In-Reply-To; b=rPYFj28WYbrB48TCow0r+RP5imHfb6SsoHRhZZ4MBScdTaZCX6w/cXCbpulBqfaWXwhRYMSRf4NHuiAIo5KMoa3zx1blW5S0+icT+Aaq+ddlmIGm5KDut9xaPe3k8kvi+kK9PDLQm2SD9r9iN5caoZSugubseDjjXFU7bXmgZnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=XEP/k07f; arc=none smtp.client-ip=91.218.175.184
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Thu, 15 Feb 2024 20:13:00 +0000
+Date: Thu, 15 Feb 2024 20:15:00 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1708027985;
+	t=1708028106;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=gKIub81Sc4Nl7uCdniCI0jeJfd0LuO+w541ahUUiUW4=;
-	b=l0gOqppm1Q6KVADGlmEX/Qv2lrl2UtknDOpK8InCI9cnIPEVogV/zsySi6pGfUM6W71ZCQ
-	izbiieMZAhkmttwc4s6yZju8UGSEbkW7dAeOfDdt2lb9m7e9QgHkZW08JeoV5HYKX0hMMh
-	KnmJrgqQgGxD4R4SvUTJ5H8PQq/CEAU=
+	bh=5uwlfDYuFJvuqLH4pa8qd6E84geWbBOm7pjVTTBFxmE=;
+	b=XEP/k07fKmoIyNq8fd5yN5fw4v1roiz/KUhfmrWsHqEYGM6Ivtr+lWJ+eYW5pHFsJzp1cN
+	iZ12zj6kH8gfqAMlrtP4/keZ0jpkNSwe4pwFGHrCJfPx1j4/kZBZusBRblQLzo8S159twB
+	fN+TnqU3YSD9oaSoN0HHOpqt/lghqOY=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
-	Pasha Tatashin <tatashin@google.com>,
-	Michael Krebs <mkrebs@google.com>
-Subject: Re: [PATCH 2/2] KVM: selftests: Test forced instruction emulation in
- dirty log test (x86 only)
-Message-ID: <Zc5wTHuphbg3peZ9@linux.dev>
-References: <20240215010004.1456078-1-seanjc@google.com>
- <20240215010004.1456078-3-seanjc@google.com>
- <Zc3JcNVhghB0Chlz@linux.dev>
- <Zc5c7Af-N71_RYq0@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 00/23] KVM: arm64: Improvements to LPI injection
+Message-ID: <Zc5wxKnqHomScT2f@linux.dev>
+References: <20240213093250.3960069-1-oliver.upton@linux.dev>
+ <86y1bn3pse.wl-maz@kernel.org>
+ <Zc0JG8pNRanuXzvR@linux.dev>
+ <86jzn54u2e.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -63,21 +62,27 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Zc5c7Af-N71_RYq0@google.com>
+In-Reply-To: <86jzn54u2e.wl-maz@kernel.org>
 X-Migadu-Flow: FLOW_OUT
 
-On Thu, Feb 15, 2024 at 10:50:20AM -0800, Sean Christopherson wrote:
-> Yeah, the funky flow I concocted was done purely to have the "no emulation" path
-> fall through to the common "*mem = val".  I don't have a strong preference, I
-> mentally flipped a coin on doing that versus what you suggested, and apparently
-> chose poorly :-)
+On Thu, Feb 15, 2024 at 03:37:45PM +0000, Marc Zyngier wrote:
+> > I'd really like to de-risk the performance changes from the cleanups, as
+> > I'm convinced they're going to have their own respective piles of bugs.
+> > 
+> > How does that sound?
+> 
+> Yup, I'd be on board with that. If you can respin the first part with
+> bugs fixed and without the stats, that'd be great. We can further
+> bikeshed on the rest in the 6.10 time frame.
 
-Oh, I could definitely tell this was intentional :) But really if folks
-are going to add more flavors of emulated instructions to the x86
-implementation (which they should) then it might make sense to just have
-an x86-specific function.
+Cool. That makes things much easier to manage. I'll respin the get / put
+improvements shortly, and hopefully this time I actually fix the stupid
+lock imbalance :)
 
-But again, it's selftests, who cares! /s
+> Also please Cc: Eric Auger, as he dealt with a lot of the ITS
+> save/restore stuff.
+
+Always happy to designate another victim to review my crap.
 
 -- 
 Thanks,
