@@ -1,138 +1,146 @@
-Return-Path: <kvm+bounces-8817-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8818-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12ADE856D21
-	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 19:50:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DE4C856D6E
+	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 20:13:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA3CD1F2210B
-	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 18:50:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0B2A1C2181E
+	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 19:13:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BB8413959A;
-	Thu, 15 Feb 2024 18:50:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D9A1139567;
+	Thu, 15 Feb 2024 19:13:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IUPyxFP5"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KcGlo1nP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F98E1386C2
-	for <kvm@vger.kernel.org>; Thu, 15 Feb 2024 18:50:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D6DA3D6D
+	for <kvm@vger.kernel.org>; Thu, 15 Feb 2024 19:13:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708023024; cv=none; b=eBUdEcKvaMzCvZtVaK47d3yeC1nTYoUQmgP94+cX9Fj2nUV3kbY4k5SWT8zIDdyFcGH2XXkt337qdoK71w6zcrAKeSxmbyh2Vf8lv89MMw5rZ48GFG3uf8QDh8e/UjhwCuFlEYqX1ojIqzwt93Co2MVrqENSm1g2IhExZqKWavY=
+	t=1708024419; cv=none; b=g5SRIRsgCvuudUM6WyU++WRyJFNW0bBRfXiCF4tT0/xQocNS31Z7MiGXaINPmyuPZ4YoTU8KvBtW/HUUIJ0mUN9Sx2mEJP6aqwdOiOyL1PVToygYygkVdA7VQ/JPTkk1aZJbxJ0BKmP2DCb4a3fGHxzhBW7shOsedU5izRHl2h4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708023024; c=relaxed/simple;
-	bh=JpEzUCBeX+owqBCYPKaXJjOzHnXj1NY746oEq9OlCi8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Wb5r2BKeztJp96YOWC8it3vLAZb/V/wGSsIjWhDeVo5HxJYfFHhqwOy0+mM7bwv2xTarSjP6XpRsz9gDkGz+OWnL34IEIWMQcWcN4j0SUAy2mHIAiO/YGMZTOn2S4+FSoqdwr1FR0Ru95CIE6uvigeXvTh72xSPK/pZyCaEWfwM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IUPyxFP5; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6e0a67a5de3so1214277b3a.2
-        for <kvm@vger.kernel.org>; Thu, 15 Feb 2024 10:50:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708023022; x=1708627822; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=S3bMta7GBZrhe8IxMh4Lf+am/5b/Yofjvcb78FJ+XDg=;
-        b=IUPyxFP5HPnTZOHOgf+RafJFVwgQAZeJHXuLBJwY4DLw2mD8sRMxpkBL/kqukNNXKo
-         RhnvWGFe8Uf2rT7Kuf1FrPj6cruPUhmRz72uclEXA1LULPrtb3Jd3nlYmsvHgYpAkmYC
-         x160mqY+Txxc/PAp/W0WNaRt56z9qQaPxlnd47NTu37BYqZ/Romturcg6wgwtwCoRf+n
-         Apy1J1LNEsh4W6T4DQE8IEMlwNEAOFmSqye90Lp228zjqTyGc3+TqEshUv+jdLNCpb33
-         3O7WEhr8KA+uL+aijCPqpjfJqt6N9+XOQi/+ZzapTiK4T9rLJISTE5ieI/qrbkhQkoS7
-         W8Pg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708023022; x=1708627822;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=S3bMta7GBZrhe8IxMh4Lf+am/5b/Yofjvcb78FJ+XDg=;
-        b=KrBUVh3gtZh3vrrxVsbsBiKzFZcXIgCwTLXF+G8KCXVg5iHwTN5fWAwNStvmctVo9L
-         JG4w4qGy8CCkpiwBkZtmvR3L6HX9q7iCA6kLc9a3LzbpU/nzF+jG+H7kIX5m9waFRoWx
-         YeS6JS9gkJ1LFcrfgCuUaME6YGUTv38gi7jUkSjCTerKxt8fWKG8C67S8h9E5FkGK6rx
-         E09eMRog+Kno5qhn1SyBVkjShC04jMTq6IKeeOq0jHUmx/64fS2KnD6VcP8SuLGrLdTw
-         zrum8vFwZ8RweJvsNHdmqLkvuckslS7VMgXLswJq6154hwB7My/Ru4QJNRkK9xIbpitI
-         IYzA==
-X-Forwarded-Encrypted: i=1; AJvYcCVROwO/tFvuHVfXUJzz2gsmaZbR07y4Rxk7mnX42s+pruIiPx5FEHI+Dws0CnOWxuvp0S+7g5L7ylFA0fUOJc6cByHH
-X-Gm-Message-State: AOJu0YygXuOpUYEk8kGem66mdoy19+rsC+HSckIZ3jAau5kHuzUtMx8C
-	rqiSojWTl8wbMSMCcTgf8vwM9X6KLNK784ZscoGer5GdW9N3Wd1tVm1uVz5tcDBvbGUPf2BkKi8
-	lpQ==
-X-Google-Smtp-Source: AGHT+IGAr8CFXsoq9Zfz/iCW9/M0F+HzczG16axpvRh8uinokkjMkkzuQYAfnpmSaSbkeniZmnVdSVdtwLM=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:2d29:b0:6e0:e2f8:cf3c with SMTP id
- fa41-20020a056a002d2900b006e0e2f8cf3cmr110511pfb.3.1708023022352; Thu, 15 Feb
- 2024 10:50:22 -0800 (PST)
-Date: Thu, 15 Feb 2024 10:50:20 -0800
-In-Reply-To: <Zc3JcNVhghB0Chlz@linux.dev>
+	s=arc-20240116; t=1708024419; c=relaxed/simple;
+	bh=UOfSR5dAnNwpx93Y4Nky26QyqpwV840FSSHolrLdk6I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FKQjzoTgRcS2NKnWBZ6S0igGITQfE6XxFtGnQaFv9kjj/qygpZgeBzekBXCZCE0zeyo6Y6XiMCddmKihCRzVp3AevUvIqsl59zDLbcDhMAnMYayEvJauvN8C4kx5/meymJIVV1V3KD8FyZjRkvQ28mdEVeU1VsedhyKf85P+vpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KcGlo1nP; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Thu, 15 Feb 2024 20:13:30 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1708024415;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+sM3XuJbo/imwLbmrYIvBwXd4yxReBWwfCSoEs0rupM=;
+	b=KcGlo1nPfVAJTNCWIozLp9o1WacJwy2+q4qL5TI39E572kA1yum8gibQzOeDIt4S3m0L9K
+	AO16faP/P32D3nwchObpTbH95lbSluFZjkM2ognP472qS0mPc7gwiKBVMSnHUmTSpYm+GK
+	D4NiqzXqoZAJv1AF4Z0mYzOs94ox/lo=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: Shaoqin Huang <shahuang@redhat.com>, kvmarm@lists.linux.dev, 
+	Nikos Nikoleris <nikos.nikoleris@arm.com>, Eric Auger <eric.auger@redhat.com>, 
+	Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, Nico Boehr <nrb@linux.ibm.com>, 
+	David Woodhouse <dwmw@amazon.co.uk>, Nadav Amit <namit@vmware.com>, kvm@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org
+Subject: Re: [kvm-unit-tests PATCH v1 01/18] Makefile: Define __ASSEMBLY__
+ for assembly files
+Message-ID: <20240215-8527d5fd0c830d5d8d07f668@orel>
+References: <20231130090722.2897974-1-shahuang@redhat.com>
+ <20231130090722.2897974-2-shahuang@redhat.com>
+ <20240115-0c41f7d4aa09b7b82613faa8@orel>
+ <Zc42ZJYMFpXpM4mD@raptor>
+ <20240215-f2a2e3798b1f64923417df00@orel>
+ <Zc5G0Uu1QxJ1Qt36@raptor>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240215010004.1456078-1-seanjc@google.com> <20240215010004.1456078-3-seanjc@google.com>
- <Zc3JcNVhghB0Chlz@linux.dev>
-Message-ID: <Zc5c7Af-N71_RYq0@google.com>
-Subject: Re: [PATCH 2/2] KVM: selftests: Test forced instruction emulation in
- dirty log test (x86 only)
-From: Sean Christopherson <seanjc@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	David Matlack <dmatlack@google.com>, Pasha Tatashin <tatashin@google.com>, 
-	Michael Krebs <mkrebs@google.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zc5G0Uu1QxJ1Qt36@raptor>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Feb 15, 2024, Oliver Upton wrote:
-> On Wed, Feb 14, 2024 at 05:00:04PM -0800, Sean Christopherson wrote:
-> > Add forced emulation of MOV and LOCK CMPXCHG instructions in the dirty log
-> > test's guest code to verify that KVM's emulator marks pages dirty as
-> > expected (and obviously to verify the emulator works at all).  In the long
-> > term, the guest code would ideally hammer more of KVM's emulator, but for
-> > starters, cover the two major paths: writes and atomics.
+On Thu, Feb 15, 2024 at 05:16:01PM +0000, Alexandru Elisei wrote:
+> Hi Drew,
+> 
+> On Thu, Feb 15, 2024 at 05:32:22PM +0100, Andrew Jones wrote:
+> > On Thu, Feb 15, 2024 at 04:05:56PM +0000, Alexandru Elisei wrote:
+> > > Hi Drew,
+> > > 
+> > > On Mon, Jan 15, 2024 at 01:44:17PM +0100, Andrew Jones wrote:
+> > > > On Thu, Nov 30, 2023 at 04:07:03AM -0500, Shaoqin Huang wrote:
+> > > > > From: Alexandru Elisei <alexandru.elisei@arm.com>
+> > > > > 
+> > > > > There are 25 header files today (found with grep -r "#ifndef __ASSEMBLY__)
+> > > > > with functionality relies on the __ASSEMBLY__ prepocessor constant being
+> > > > > correctly defined to work correctly. So far, kvm-unit-tests has relied on
+> > > > > the assembly files to define the constant before including any header
+> > > > > files which depend on it.
+> > > > > 
+> > > > > Let's make sure that nobody gets this wrong and define it as a compiler
+> > > > > constant when compiling assembly files. __ASSEMBLY__ is now defined for all
+> > > > > .S files, even those that didn't set it explicitely before.
+> > > > > 
+> > > > > Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+> > > > > Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+> > > > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > > > > Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
+> > > > > ---
+> > > > >  Makefile           | 5 ++++-
+> > > > >  arm/cstart.S       | 1 -
+> > > > >  arm/cstart64.S     | 1 -
+> > > > >  powerpc/cstart64.S | 1 -
+> > > > >  4 files changed, 4 insertions(+), 4 deletions(-)
+> > > > > 
+> > > > > diff --git a/Makefile b/Makefile
+> > > > > index 602910dd..27ed14e6 100644
+> > > > > --- a/Makefile
+> > > > > +++ b/Makefile
+> > > > > @@ -92,6 +92,9 @@ CFLAGS += -Woverride-init -Wmissing-prototypes -Wstrict-prototypes
+> > > > >  
+> > > > >  autodepend-flags = -MMD -MP -MF $(dir $*).$(notdir $*).d
+> > > > >  
+> > > > > +AFLAGS  = $(CFLAGS)
+> > > > > +AFLAGS += -D__ASSEMBLY__
+> > > > > +
+> > > > >  LDFLAGS += -nostdlib $(no_pie) -z noexecstack
+> > > > >  
+> > > > >  $(libcflat): $(cflatobjs)
+> > > > > @@ -113,7 +116,7 @@ directories:
+> > > > >  	@mkdir -p $(OBJDIRS)
+> > > > >  
+> > > > >  %.o: %.S
+> > > > > -	$(CC) $(CFLAGS) -c -nostdlib -o $@ $<
+> > > > > +	$(CC) $(AFLAGS) -c -nostdlib -o $@ $<
+> > > > 
+> > > > I think we can drop the two hunks above from this patch and just rely on
+> > > > the compiler to add __ASSEMBLY__ for us when compiling assembly files.
+> > > 
+> > > I think the precompiler adds __ASSEMBLER__, not __ASSEMBLY__ [1]. Am I
+> > > missing something?
+> > > 
+> > > [1] https://gcc.gnu.org/onlinedocs/cpp/macros/predefined-macros.html#c.__ASSEMBLER__
 > > 
-> > To minimize #ifdeffery, wrap only the related code that is x86 specific,
-> > unnecessariliy synchronizing an extra boolean to the guest is far from the
-> > end of the world.
+> > You're right. I'm not opposed to changing all the __ASSEMBLY__ references
+> > to __ASSEMBLER__. I'll try to do that at some point unless you beat me to
+> > it.
 > 
-> Meh, I wouldn't say the end result in guest_write_memory() is that
-> pretty. Just ifdef the whole function and provide a generic implementation
-> for the other architectures.
-> 
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  tools/testing/selftests/kvm/dirty_log_test.c | 36 ++++++++++++++++++--
-> >  1 file changed, 33 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
-> > index eaad5b20854c..ff1d1c7f05d8 100644
-> > --- a/tools/testing/selftests/kvm/dirty_log_test.c
-> > +++ b/tools/testing/selftests/kvm/dirty_log_test.c
-> > @@ -92,6 +92,29 @@ static uint64_t guest_test_phys_mem;
-> >   */
-> >  static uint64_t guest_test_virt_mem = DEFAULT_GUEST_TEST_MEM;
-> >  
-> > +static bool is_forced_emulation_enabled;
-> > +
-> > +static void guest_write_memory(uint64_t *mem, uint64_t val, uint64_t rand)
-> > +{
-> > +#ifdef __x86_64__
-> > +	if (is_forced_emulation_enabled && (rand & 1)) {
-> > +		if (rand & 2) {
-> 
-> Can't you invert the logic and drop a level of indentation?
-> 
-> 	if (!(is_forced_emulation_enabled && (rand & 1))) {
-> 		*mem = val;
-> 	} else if (rand & 2) {
-> 		movq
-> 	} else {
-> 		cmpxchg8b
-> 	}
+> Actually, I quite prefer the Linux style of using __ASSEMBLY__ instead of
+> __ASSEMBLER__, because it makes reusing Linux files easier. That, and the
+> habit formed by staring at Linux assembly files.
 
-Yeah, the funky flow I concocted was done purely to have the "no emulation" path
-fall through to the common "*mem = val".  I don't have a strong preference, I
-mentally flipped a coin on doing that versus what you suggested, and apparently
-chose poorly :-)
+Those are good arguments and also saves the churn. OK, let's keep this
+patch and __ASSEMBLY__
+
+Thanks,
+drew
 
