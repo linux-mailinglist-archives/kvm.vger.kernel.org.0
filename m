@@ -1,186 +1,171 @@
-Return-Path: <kvm+bounces-8824-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8827-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BAF4856EBD
-	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 21:44:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D316856EEF
+	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 21:54:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A0D41F28A43
-	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 20:44:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC9F9288629
+	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 20:54:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 840E613B2A7;
-	Thu, 15 Feb 2024 20:44:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 532A313DB90;
+	Thu, 15 Feb 2024 20:53:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ebjrGlFZ"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="U5Vsw+Ey"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2066.outbound.protection.outlook.com [40.107.244.66])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C307132461;
-	Thu, 15 Feb 2024 20:44:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.66
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708029865; cv=fail; b=efWXTeFSNbEodSBebOLBKUwOdyK5dToF2PrljaizqTjIWg5hgCESgLWx8Kw8eSGF5gXMH0URe/lNHgWaKaBW5rSTJNhrNwzDlDtRWvGN32L3bAcZ8jZQ0BhjWK5d7bzSFQ3VK22OyVaEi7h/Z7JGx4BKGwSIyWYMv8/PnscE0vA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708029865; c=relaxed/simple;
-	bh=5BZdltKvKXTjNqo3fnFc8k5zsmubx/h7ubbE1+L/mis=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XNE+rNrpV01ZjERP2GTsNa9xtVyTREVQ6/720Ftx2zGmeOxxnyk9bb22S05xFRSOPdMxVgXndLSJoaCy+c5hAY1mRyyKm8AxuHFSREK5NL3Oiu4wiQM2MZI7fUeIdMn9iDP9dnn4jOABWww/pkZby4rYOmzOj+ODlvA4mVFg4AA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ebjrGlFZ; arc=fail smtp.client-ip=40.107.244.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=eATmGDpCERJSF6JBXDqHfzqK6YHjWj8f+JHj5S8XZ/t/R/Fi4VaJ71GYZK73HTGAbWmsQGYCrwUJjBEXrbzIcNxy2cF4wyKZ1b6FjMvIHDgUTJZiflj4q21IQR9s6tG78kj8hnktobl0YtkQ9M3/lx+MJ9TJzMg7qIvsclj0m5llKZhsoAPgoU/vsWMDL3T8QMDOSyGNG1fBo7vPdXaSfN+0kW8ID3q0o7T6w38qyMzWk0U6FJ2P+outOShtskE7odJyPbJLeHR+fjo26Vf5uoMpuaPJSFE/CiQrfnS8Q23LN68f4ZMUjB4Bg9Mr8TEtxxbsRX+CFcYiRV73qOfOpg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KslAoD7x8nbJOpdz1fEVgQWtR94WfutxOv4uSu2GbFA=;
- b=CltfGO09JQDmbMFf24LnxUhgaUIVx+pBfSak5SdXXgKqPFbokvoBiYtkwcVCGyQrFQqW8nUz9xlU3Xy6zJ+yJjyx5UgjYZfOdxRF6a6QWV5bNn2r0bK96C6eVihgPegPTDkT31utfHxkmFHXrHEYr7KtJjMyViVyD1X32a3vpzDQbMy0skmm7dsgFtkbbfslXwMGEed2AUHdZ1El07n0P7KzDjGKCBRAteE0qSuIoWGk0ZFvKiKHb7l2Bd3wp3KXMobH33wym+t3eunOeKjQFD9vRtSF7TeTD5cpqpyQwJVcZnSUu9rk5LR3KRZv+NS+kJ7HiVeW0RiqFYVAJ7gk+g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KslAoD7x8nbJOpdz1fEVgQWtR94WfutxOv4uSu2GbFA=;
- b=ebjrGlFZrOI2r1+ztSP+IfpIVxmA0wBw0oyqYDeKe3/OjQHcYlmMpNP8QCbWwNbQtd7iLii3ZgQRF2dHoaN7LP4oU12jCc8OBd+SRHPjE76W1GO78Vx/i/fJC72dbPEy/jDdPt7kWjQ2ElxyfcLC3I8DmsvZUfEbnvz6UTLK5H4=
-Received: from BYAPR06CA0052.namprd06.prod.outlook.com (2603:10b6:a03:14b::29)
- by SJ0PR12MB6805.namprd12.prod.outlook.com (2603:10b6:a03:44f::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.25; Thu, 15 Feb
- 2024 20:44:21 +0000
-Received: from SJ5PEPF000001CD.namprd05.prod.outlook.com
- (2603:10b6:a03:14b:cafe::de) by BYAPR06CA0052.outlook.office365.com
- (2603:10b6:a03:14b::29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.40 via Frontend
- Transport; Thu, 15 Feb 2024 20:44:21 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SJ5PEPF000001CD.mail.protection.outlook.com (10.167.242.42) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7292.25 via Frontend Transport; Thu, 15 Feb 2024 20:44:21 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 15 Feb
- 2024 14:44:20 -0600
-Date: Thu, 15 Feb 2024 14:44:02 -0600
-From: Michael Roth <michael.roth@amd.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-CC: <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-	<seanjc@google.com>, <aik@amd.com>, <isaku.yamahata@intel.com>,
-	<thomas.lendacky@amd.com>, <Larry.Dewey@amd.com>
-Subject: Re: [PATCH 09/10] KVM: SEV: introduce KVM_SEV_INIT2 operation
-Message-ID: <20240215204402.7crlvwa7rjy2k7zn@amd.com>
-References: <20240209183743.22030-1-pbonzini@redhat.com>
- <20240209183743.22030-10-pbonzini@redhat.com>
- <20240215013415.bmlsmt7tmebmgtkh@amd.com>
- <ddabdb1f-9b33-4576-a47f-f19fe5ca6b7e@redhat.com>
- <20240215144422.st2md65quv34d4tk@amd.com>
- <CABgObfb1YSa0KrxsFJmCoCSEDZ7OGgSyDuCpn1Bpo__My-ZxAg@mail.gmail.com>
- <20240215175456.yg3rck76t2k77ttg@amd.com>
- <CABgObfa_ktGybPcai=OgBbYMMvm4jS_Hehc-cdLdFoev68z-GQ@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1B2613AA42;
+	Thu, 15 Feb 2024 20:53:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708030438; cv=none; b=EMRnxVZVUupvk816erem4KVV4SlOhM9IAyOVgrLyLVdt572nQTSEaI2TFJcKGxClwRpNNuqR64t/bNabycK4GmvzHgUeEex3lPh8ATvAOUaZblSYoFHTxKuXNG3l/9b9sJtX5qprsq733E2DvaL+b7QjovHEJdwea6m732r6Sko=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708030438; c=relaxed/simple;
+	bh=BGgCO7bO624n30v5TJ5s8FoIEfRZT2PlRQJKkpcibKc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=q3itp/l8c9DWoP2dMWMfed+969pQZYAg/pJNKnaPLcWrfmtf0CevMkNQOpTfdTB8oFC9mL2IqbaVjUSG3yjJGEYMGez/y1g8a0hj5kVbw6nCN+SzBVC7CfHxRqpX3xgGTFalzG+5TnrRU1brD2CgcT6dz4r9maWBq7mSyCBTFuM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=U5Vsw+Ey; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41FJl6tP029502;
+	Thu, 15 Feb 2024 20:53:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=lkiUo3f3sEeZpd15clopN9yMDKzXq+pvRMoZ9L8t5hI=;
+ b=U5Vsw+Ey5ecbGhIj5uEUxnXbpyJvsCufwmVnkdCnk4wrQLQzMqjyQfMPUWzTHvr1gflg
+ u9WQHVBT5s5pN3iKvFgidCpMJsaWjGQqIF5sEIz/CTlXxK/+i6pHH6e9eua0/AaetTXZ
+ Ye6npI/6Jr/oRHhY1bBH6+zzEmTe7KjaKJO4P3p/s/rtBpOo+16W48EH8w0dUMwsBDSp
+ ZxFp5qpMWkTIxP0D/ezX9kzT2kJRTd2+fJWibf3nLWCAF6+qqI5+Co2G89dXMmbNYBCD
+ dxlPM5I87uLGTWTxLWsBOAQPP6KSu3EMmiRcTVC7uRARtPgSIodH/4AnMPOPBP9hPI4r EA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w9q0v4gpn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 15 Feb 2024 20:53:52 +0000
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41FJuADv027301;
+	Thu, 15 Feb 2024 20:53:52 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w9q0v4gpa-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 15 Feb 2024 20:53:52 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 41FIAT4W009728;
+	Thu, 15 Feb 2024 20:53:51 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3w6p636srs-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 15 Feb 2024 20:53:50 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 41FKrkpO44958274
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 15 Feb 2024 20:53:48 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1DF2F20043;
+	Thu, 15 Feb 2024 20:53:46 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0D3F820040;
+	Thu, 15 Feb 2024 20:53:46 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Thu, 15 Feb 2024 20:53:46 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
+	id D3D2FE034A; Thu, 15 Feb 2024 21:53:45 +0100 (CET)
+From: Eric Farman <farman@linux.ibm.com>
+To: Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>
+Cc: Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, Eric Farman <farman@linux.ibm.com>
+Subject: [PATCH v2 0/2] KVM: s390: Fix AR parameter in MEM_OP ioctl
+Date: Thu, 15 Feb 2024 21:53:42 +0100
+Message-Id: <20240215205344.2562020-1-farman@linux.ibm.com>
+X-Mailer: git-send-email 2.40.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: u6JhSUsnJunqZDij1BXRo45GgPCInAxG
+X-Proofpoint-GUID: 65SWgHkjGRFrE_4xejYXhZEGyh4wclx6
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABgObfa_ktGybPcai=OgBbYMMvm4jS_Hehc-cdLdFoev68z-GQ@mail.gmail.com>
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF000001CD:EE_|SJ0PR12MB6805:EE_
-X-MS-Office365-Filtering-Correlation-Id: 19c60733-9ac7-4891-8ffc-08dc2e66e324
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	qD9A3HjcFRqHMX03LtHed/TKVtA6EqfAj+xSW2Ud3d9gM8f04j5Pw8rEc6Ietg3qL8Jif6HYBeXbWOiFME1skXVVA1lB5vIftZBXPLPoWH+1i8Ton7lDhAkO454gl08/TZXfV9ZjF3gBunwnAON6wASP6v/gyfqHhVlFMA1dPhOAu71+s9kCE1pnrakFobYaZRy+H9XguMy4hP+KwspZq/UWeu6K3g1XlpmScdYygFSc1oKhLSyqqm5DO91kwBrLiC1k/u682Fb04AqUXcZyRvKCZ1bahux5GaB8u7sck3T7N4olIJjCb9rUpVcbb7S1q6Dt0xRN5TfBZf24N2NyEK3Say+jUVy/CSalSLIZkTM5AGo1LZ5z+52mz00M2Hog6FrwbrOusIESmSJoSmgFbZ+MOcffMq79m++VEDDcpdvljR7Udp6kb0vq9t+24PiwkEBOFJnyqQhfxmM3taEwgp2W9uYrdhjzNw+iWh3pdt2zUIqyudNMwCAKmonhAeEypoTx+3A1p+UGS2C0kdQUt0ZqktGWEk6mCqYVcTD1SkvqSjfquTRyRt7bXJ/INTA/h7jw957tZ2Ge6K5is7MYUB+tcw5S1wCp7dY9NmeKKwLwG4fk1dYT0KkuA6omQLsN8UZOkjKv+JfslSHULMYjqfkqb3GxUj6IelCanWzGulw=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(346002)(376002)(136003)(39860400002)(396003)(230922051799003)(230273577357003)(82310400011)(451199024)(1800799012)(64100799003)(36860700004)(186009)(40470700004)(46966006)(6916009)(478600001)(1076003)(53546011)(8936002)(8676002)(5660300002)(336012)(83380400001)(16526019)(26005)(4326008)(70206006)(70586007)(426003)(54906003)(316002)(6666004)(356005)(82740400003)(81166007)(41300700001)(86362001)(2906002)(36756003)(2616005)(44832011);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Feb 2024 20:44:21.0883
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 19c60733-9ac7-4891-8ffc-08dc2e66e324
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF000001CD.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6805
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-15_19,2024-02-14_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
+ suspectscore=0 phishscore=0 mlxlogscore=682 clxscore=1015 impostorscore=0
+ malwarescore=0 lowpriorityscore=0 spamscore=0 bulkscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2402150167
 
-On Thu, Feb 15, 2024 at 07:08:06PM +0100, Paolo Bonzini wrote:
-> On Thu, Feb 15, 2024 at 6:55 PM Michael Roth <michael.roth@amd.com> wrote:
-> > > The fallout was caused by old kernels not supporting debug-swap and
-> > > now by failing measurements. As far as I know there is no downside of
-> > > leaving it disabled by default, and it will fix booting old guest
-> > > kernels.
-> >
-> > Yah, agreed on older guest kernels, but it's the measurement side of things
-> > where we'd expect some additional fallout. The guidance was essentially that
-> > if you run a newer host kernel with debug-swap support, you need either need
-> > to:
-> >
-> >   a) update your measurements to account for the additional VMSA feature
-> >   b) disable debug-swap param to maintain previous behavior/measurement
-> 
-> Out of curiosity, where was this documented? While debug-swap was a
-> pretty obvious culprit of the failed measurement, I didn't see any
-> mention to it anywhere (and also didn't see any mention that old
-> kernels would fail to boot in the KVM patches---which would have been
-> a pretty clear indication that something like these patches was
-> needed).
+Hi Christian, Janosch, Heiko,
 
-Yes, this was reactive rather than proactive guidance unfortunately,
-resulting from various internal/external bug reports where we needed to
-suggest the above-mentioned options.
+Here is a new version for the AR/MEM_OP issue I'm attempting to address,
+with Heiko's feedback to v1.
 
-In retrospect, I think we would've handled things differently as well.
-Which is why I'm hoping it's possible to ease the pain of another
-potential measurement change for those who've since incorporated
-debug-swap into their measurement workflow. But maybe it's not
-realistic...
+Patch 1 performs the host/guest access register swap that Christian
+suggested (instead of a full sync_reg/store_reg process).
 
-> 
-> > So those who'd taken approach a) would see another unexpected measurement
-> > change when they eventually update to a newer kernel.
-> 
-> But they'd see it anyway if userspace starts disabling it by default.
+Patch 2 provides a selftest patch that exercises this scenario.
+Applying patch 2 without patch 1 fails in the following way:
 
-My thinking was that this wording would be specific to KVM_SEV_INIT, as
-opposed to KVM_SEV_INIT2 where disabling all features by default should
-absolutely be the way to go.
+[eric@host linux]# ./tools/testing/selftests/kvm/s390x/memop
+TAP version 13
+1..16
+ok 1 simple copy
+ok 2 generic error checks
+ok 3 copy with storage keys
+ok 4 cmpxchg with storage keys
+ok 5 concurrently cmpxchg with storage keys
+ok 6 copy with key storage protection override
+ok 7 copy with key fetch protection
+ok 8 copy with key fetch protection override
+==== Test Assertion Failure ====
+  s390x/memop.c:186: !r
+  pid=5720 tid=5720 errno=4 - Interrupted system call
+     1	0x00000000010042af: memop_ioctl at memop.c:186 (discriminator 3)
+     2	0x0000000001006697: test_copy_access_register at memop.c:400 (discriminator 2)
+     3	0x0000000001002aaf: main at memop.c:1181
+     4	0x000003ffaec33a5b: ?? ??:0
+     5	0x000003ffaec33b5d: ?? ??:0
+     6	0x0000000001002ba9: _start at ??:?
+  KVM_S390_MEM_OP failed, rc: 40 errno: 4 (Interrupted system call)
 
-But realistically, it's not easy for a user to tell whether their VMM is
-using KVM_SEV_INIT vs KVM_SEV_INIT2, and it does seem possible that
-having the defaults be different between the 2 would also cause some
-pain down the road since even in looking at the documentation it
-wouldn't be immediately clear whether or not debug-swap would be enabled.
+Thoughts on this approach?
 
-So maybe your approach of always disabling by default and requiring
-userspace to opt-in would be better in the long-run since this behavior
-is fairly new from a distro perspective and it's likely only
-developers/early adopters that we'd be sticking the genie back in the
-bottle for.
+Thanks,
+Eric
 
--Mike
+Changes:
+v2:
+	[HC] Add a flag to indicate access registers have been loaded
+v1: https://lore.kernel.org/r/20240209204539.4150550-1-farman@linux.ibm.com/
+	[CB] Store access registers around memop ioctl
+	[JF] Add a kernel selftest 
+RFC: https://lore.kernel.org/r/20240131205832.2179029-1-farman@linux.ibm.com/
 
-> In general, enabling _anything_ by default is a mistake in either KVM
-> or userspace if you care about guest ABI (which you obviously do in
-> the case of confidential computing).
-> 
-> Paolo
-> 
+Eric Farman (2):
+  KVM: s390: load guest access registers in MEM_OP ioctl
+  KVM: s390: selftests: memop: add a simple AR test
+
+ arch/s390/include/asm/kvm_host.h          |  1 +
+ arch/s390/kvm/gaccess.c                   |  2 ++
+ arch/s390/kvm/kvm-s390.c                  | 11 +++++++++
+ tools/testing/selftests/kvm/s390x/memop.c | 28 +++++++++++++++++++++++
+ 4 files changed, 42 insertions(+)
+
+-- 
+2.40.1
+
 
