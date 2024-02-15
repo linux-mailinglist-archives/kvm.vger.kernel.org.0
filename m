@@ -1,132 +1,133 @@
-Return-Path: <kvm+bounces-8731-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8733-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4EF1855CA3
-	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 09:40:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D06C855D74
+	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 10:11:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 53FD7284563
-	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 08:40:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A9D31B2AD55
+	for <lists+kvm@lfdr.de>; Thu, 15 Feb 2024 09:00:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8966414006;
-	Thu, 15 Feb 2024 08:39:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1165A18038;
+	Thu, 15 Feb 2024 08:58:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Oy65GiHF"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="WRi9b08m"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA3D9134AF
-	for <kvm@vger.kernel.org>; Thu, 15 Feb 2024 08:39:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A17DE13AFB;
+	Thu, 15 Feb 2024 08:58:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707986378; cv=none; b=Vj8eo0hgSYaBQ/TQx5EXMV/JTWw4ubFcJler8F0UfUVYY75Q3FmzlVjNz2sL6VhlQD5dIGLZg5XHTaccYWZqyihCz0XdjgvIaBr+qZS5DUMxNYapiDYejavKLYjT230YeRh/8lkbIjGurcllJJVV+28rcoGUM5GKwY4xZwkzbg8=
+	t=1707987488; cv=none; b=uU22jSrqzDwWSWJ1kdZEkdVqla9GuFsjusfD/ogOJNxNg6hKIZntlAG8Y/p1gELgeVhjn5Ntr2r6KIxe/XM0+dqJpkxLsN3XGW7RYupvpmzVkKmmlxznKbtN88qSyZhNfqrc1I2rruySBqDDgFg6duJWMINLIbmL2xTa612X1R0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707986378; c=relaxed/simple;
-	bh=nU2GWl8pjQTzoRKcy5LbXTwzOcvRte+6I5y9OLsNnfc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oSgZzSf8Ap5ufStocPXV2DD1scCuX8p1dXKRUscgnKzTpditXShfjCX5zOOSScF4+fADXQdRGtEaZ62iYoLgin6TLaoh6EaBigTaetdKMVq1wuMVgUsZFn79KbnM1EnkGfxQZGZiH0Gl+3SySBTgL5TYUHs1a7Xf24eyEcoRCj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Oy65GiHF; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707986375;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:in-reply-to:in-reply-to:  references:references;
-	bh=bakj0FATNvoSdsfDbqmxKCUpth/6U6kxf5U1T4MpHTM=;
-	b=Oy65GiHF3n1MqHhGE6GPSJfWgwS1Tae5ZiemPq8wocRDQeeTyksLgiKYNVv80ppR07iaQa
-	XprdqsI8Wqwprk9PgubyJ7vQKnc2JDvMKu+amfHS2hk4s2qUSB1gMvBDtezQ9NdX/HAlmg
-	kzQ0fRzu8jgFSHqm3IijCW0yKIA8mNI=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-594-AvOsWZVoPEKLoWO4iKeIkQ-1; Thu,
- 15 Feb 2024 03:39:32 -0500
-X-MC-Unique: AvOsWZVoPEKLoWO4iKeIkQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B67BA280A9A8;
-	Thu, 15 Feb 2024 08:39:31 +0000 (UTC)
-Received: from tucnak.zalov.cz (unknown [10.39.192.8])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 73F0E20110C4;
-	Thu, 15 Feb 2024 08:39:31 +0000 (UTC)
-Received: from tucnak.zalov.cz (localhost [127.0.0.1])
-	by tucnak.zalov.cz (8.17.1/8.17.1) with ESMTPS id 41F8dR9K1207786
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Thu, 15 Feb 2024 09:39:28 +0100
-Received: (from jakub@localhost)
-	by tucnak.zalov.cz (8.17.1/8.17.1/Submit) id 41F8dPiY1207783;
-	Thu, 15 Feb 2024 09:39:25 +0100
-Date: Thu, 15 Feb 2024 09:39:25 +0100
-From: Jakub Jelinek <jakub@redhat.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Uros Bizjak <ubizjak@gmail.com>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        "Andrew Pinski (QUIC)" <quic_apinski@quicinc.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH] Kconfig: Explicitly disable asm goto w/ outputs on
- gcc-11 (and earlier)
-Message-ID: <Zc3NvWhOK//UwyJe@tucnak>
-Reply-To: Jakub Jelinek <jakub@redhat.com>
-References: <CAKwvOdk_obRUkD6WQHhS9uoFVe3HrgqH5h+FpqsNNgmj4cmvCQ@mail.gmail.com>
- <DM6PR02MB40587AD6ABBF1814E9CCFA7CB84B2@DM6PR02MB4058.namprd02.prod.outlook.com>
- <CAHk-=wi3p5C1n03UYoQhgVDJbh_0ogCpwbgVGnOdGn6RJ6hnKA@mail.gmail.com>
- <ZcZyWrawr1NUCiQZ@google.com>
- <CAKwvOdmKaYYxf7vjvPf2vbn-Ly+4=JZ_zf+OcjYOkWCkgyU_kA@mail.gmail.com>
- <CAHk-=wgEABCwu7HkJufpWC=K7u_say8k6Tp9eHvAXFa4DNXgzQ@mail.gmail.com>
- <CAHk-=wgBt9SsYjyHWn1ZH5V0Q7P6thqv_urVCTYqyWNUWSJ6_g@mail.gmail.com>
- <CAFULd4ZUa56KDLXSoYjoQkX0BcJwaipy3ZrEW+0tbi_Lz3FYAw@mail.gmail.com>
- <CAHk-=wiRQKkgUSRsLHNkgi3M4M-mwPq+9-RST=neGibMR=ubUw@mail.gmail.com>
- <CAHk-=wh2LQtWKNpV-+0+saW0+6zvQdK6vd+5k1yOEp_H_HWxzQ@mail.gmail.com>
+	s=arc-20240116; t=1707987488; c=relaxed/simple;
+	bh=qlzyj+96ZrnytPQobnPb0r/WF8j47o3LcA2aSb8TKyA=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=hQyeIoTCpTMkeGuRsDjNbKTovHJ3Wy0ecbUcTs2N5r5hv4PniiwRqaKCRAocqwx29Es5jiE0p0YW1B+iC3wbbIL4Daet5vL1V4PIQ8m1pk602R+nn0xNH/IgPK4sLErBE0py44ibCz5bXnypTzfwj90FYoaP2xoiMoRNslOAWmY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=WRi9b08m; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41F6hvO5031013;
+	Thu, 15 Feb 2024 08:57:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references; s=corp-2023-11-20;
+ bh=jvWR7NadDlFzwGkQ9GO0hvSkDG29BscyHclo7q5ReKo=;
+ b=WRi9b08m9JZKxZQtqSdGDNGMJmfgsXFaXifrH7kiE2hTFz2TUI+Q6XxPldhhFkCaVw72
+ waBjiKtL2PDEUVvA784P4MiIMApM7zqObVd+8dcalPugRvgieK3Qjf4zkKlpsuyPFDje
+ erx5W+eTal5sFRp5m1ILpVyWF36D5O1XZUNZK5FQp75bgriOQQX7f3ejSy8DER0TqTVf
+ kVQCcegr1Uq4Z7ToTUpPrYYs9PLTq+8wtE2Li4m8SmUjcZcx0GsvgngNWszLq1K8+3GO
+ nZ5aLwBzZt3g5fJj1cPgFLio2aHDdRxFYsDQKZSBnEphrlMVmMqYOPkexAJLauGHGeEd /Q== 
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3w92db1g5c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 15 Feb 2024 08:57:26 +0000
+Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 41F7Lq25015051;
+	Thu, 15 Feb 2024 08:57:25 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3w5yka73k2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 15 Feb 2024 08:57:25 +0000
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41F8vDct033748;
+	Thu, 15 Feb 2024 08:57:24 GMT
+Received: from mihai.localdomain (ban25x6uut25.us.oracle.com [10.153.73.25])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3w5yka73cg-4;
+	Thu, 15 Feb 2024 08:57:24 +0000
+From: Mihai Carabas <mihai.carabas@oracle.com>
+To: linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
+        hpa@zytor.com, pbonzini@redhat.com, wanpengli@tencent.com,
+        vkuznets@redhat.com, rafael@kernel.org, daniel.lezcano@linaro.org,
+        akpm@linux-foundation.org, pmladek@suse.com, peterz@infradead.org,
+        dianders@chromium.org, npiggin@gmail.com, rick.p.edgecombe@intel.com,
+        joao.m.martins@oracle.com, juerg.haefliger@canonical.com,
+        mic@digikod.net, mihai.carabas@oracle.com, arnd@arndb.de,
+        ankur.a.arora@oracle.com
+Subject: [PATCH v4 3/8] governors/haltpoll: Drop kvm_para_available() check
+Date: Thu, 15 Feb 2024 09:41:45 +0200
+Message-Id: <1707982910-27680-4-git-send-email-mihai.carabas@oracle.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1707982910-27680-1-git-send-email-mihai.carabas@oracle.com>
+References: <1707982910-27680-1-git-send-email-mihai.carabas@oracle.com>
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-15_08,2024-02-14_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 bulkscore=0 suspectscore=0
+ phishscore=0 adultscore=0 spamscore=0 mlxlogscore=999 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
+ definitions=main-2402150069
+X-Proofpoint-GUID: 6QwEybfJDMqlGTaCvgEBGb9IQtnd8AGQ
+X-Proofpoint-ORIG-GUID: 6QwEybfJDMqlGTaCvgEBGb9IQtnd8AGQ
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHk-=wh2LQtWKNpV-+0+saW0+6zvQdK6vd+5k1yOEp_H_HWxzQ@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
 
-On Wed, Feb 14, 2024 at 04:11:05PM -0800, Linus Torvalds wrote:
-> On Wed, 14 Feb 2024 at 10:43, Linus Torvalds
-> <torvalds@linux-foundation.org> wrote:
-> >
-> > Based on the current state of
-> >
-> >     https://gcc.gnu.org/bugzilla/show_bug.cgi?id=113921
-> >
-> > I would suggest this attached kernel patch [...]
-> 
-> Well, that "current state" didn't last long, and it looks like Jakub
-> found the real issue and posted a suggested fix.
-> 
-> Anyway, the end result is that the current kernel situation - that
-> adds the workaround for all gcc versions - is the best that we can do
-> for now.
+From: Joao Martins <joao.m.martins@oracle.com>
 
-Can it be guarded with
-#if GCC_VERSION < 140100
-so that it isn't forgotten?  GCC 14.1 certainly will have a fix for this
-(so will GCC 13.3, 12.4 and 11.5).
-Maybe it would be helpful to use
-#if GCC_VERSION < 140000
-while it is true that no GCC 14 snapshots until today (or whenever the fix
-will be committed) have the fix, for GCC trunk it is up to the distros
-to use the latest snapshot if they use it at all and would allow better
-testing of the kernel code without the workaround, so that if there are
-other issues they won't be discovered years later.  Most userland code
-doesn't actually use asm goto with outputs...
+This is duplicated already in the haltpoll idle driver,
+and there's no need to re-check KVM guest availability in
+the governor.
 
-	Jakub
+Either guests uses the module which explicitly selects this
+governor, and given that it has the lowest rating of all governors
+(menu=20,teo=19,ladder=10/25,haltpoll=9) means that unless it's
+the only one compiled in, it won't be selected.
+
+Dropping such check also allows to test haltpoll in baremetal.
+
+Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
+Signed-off-by: Mihai Carabas <mihai.carabas@oracle.com>
+Acked-by: Rafael J. Wysocki <rafael@kernel.org>
+---
+ drivers/cpuidle/governors/haltpoll.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/drivers/cpuidle/governors/haltpoll.c b/drivers/cpuidle/governors/haltpoll.c
+index 1dff3a52917d..c9b69651d377 100644
+--- a/drivers/cpuidle/governors/haltpoll.c
++++ b/drivers/cpuidle/governors/haltpoll.c
+@@ -143,10 +143,7 @@ static int haltpoll_enable_device(struct cpuidle_driver *drv,
+ 
+ static int __init init_haltpoll(void)
+ {
+-	if (kvm_para_available())
+-		return cpuidle_register_governor(&haltpoll_governor);
+-
+-	return 0;
++	return cpuidle_register_governor(&haltpoll_governor);
+ }
+ 
+ postcore_initcall(init_haltpoll);
+-- 
+1.8.3.1
 
 
