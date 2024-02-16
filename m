@@ -1,161 +1,79 @@
-Return-Path: <kvm+bounces-8903-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8904-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD04185858E
-	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 19:45:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F64C8585CD
+	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 19:52:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79B0B284B7B
-	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 18:45:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD6EB2894C8
+	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 18:52:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 458C11487EC;
-	Fri, 16 Feb 2024 18:42:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C136137C3E;
+	Fri, 16 Feb 2024 18:52:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DLxdkdtb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N4uy0BTp"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 042E514830C
-	for <kvm@vger.kernel.org>; Fri, 16 Feb 2024 18:42:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 824A1135A51;
+	Fri, 16 Feb 2024 18:51:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708108948; cv=none; b=Pf1y1N74mQZ5iOMnDcDI1FZXYY1wLcIsvRlAxKuhy8aDOMMYPOFddBGU1xM7EtJbisaHmHKi2kVgL3259t5gOpP3cf1fjIgBmj5bq521YnW4CTE4qOIpGRVQ76hdH5NSgaAW5mMP64QBKbrkHculg47JWd7f6+9nFioOGULaQf0=
+	t=1708109519; cv=none; b=AXNi2z1zhgKcmQnFvKTYM4VZlxw0zajmbgdYtAtK46t76T+9S+wsep+33EAN8qSBIEBIoXiE4V+b4jd+iZXvZac+EhD0ZJyFh+AlQ9fQ5SXh+TVo1angul8qIxRQ5caWcv4fxWXrm2gDawkAyJLCNXNe4fmBLXtK+1xeijuhJFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708108948; c=relaxed/simple;
-	bh=YOt99fgiOeGafpp1nEhSIUqA34CgCiK6op8GicPElws=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gqEmEcP0YzR9BYDhzsJFIA34Jd3Ry6nhRF0MspISQadu82KTlPwh5ZYeJp7vKGBQnvQRR6LQLCFwjBjXl4rs/jPfgyrnc+Q9rB64blZ52KadkaBvO7wf5lmmJXXdXZEjFVNjhb8O8xaHcfhv5FSBEQ4w9DCo6pqwBp3viDezd2U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=DLxdkdtb; arc=none smtp.client-ip=91.218.175.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1708108944;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+6/2b6cdY93cfhwg+wgl1iJpv6T7icr8cPzff5WRiiM=;
-	b=DLxdkdtbNwcuA4gLo4jd1yD05qIOD+omQNvakwfPpgTo6UMoTeIbl9XzhWZhJZwtRffA+j
-	S6COGILK/oPKkNX85TmWz314nYUf1N7NFk3Rob9ONKeUXrHUuFrI9W4PpXWgZer+wkhrb/
-	NjTdniGek0pEoQhqcV0ARz6GeS0cHrQ=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: kvm@vger.kernel.org,
-	Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-kernel@vger.kernel.org,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v3 10/10] KVM: arm64: vgic: Don't acquire the lpi_list_lock in vgic_put_irq()
-Date: Fri, 16 Feb 2024 18:41:53 +0000
-Message-ID: <20240216184153.2714504-11-oliver.upton@linux.dev>
-In-Reply-To: <20240216184153.2714504-1-oliver.upton@linux.dev>
-References: <20240216184153.2714504-1-oliver.upton@linux.dev>
+	s=arc-20240116; t=1708109519; c=relaxed/simple;
+	bh=z1wEHUsx8sHtbllePsy0F6JldriJlX548LiYZM+POiY=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=fPZeXsVnYe9Vpkpx1s1DXjNhrb8RkSbbuOeYqeYCHQYMQwCkD2F6njfa5tI0bkQrXq7IHYTG2btIOvcrWlvX2H6wUpwh47V65oPvalWENtW3A9grTrN5VTmBrxlec4z4lPzjxnoVAIWmHbLOhtHYBGxqOg3UTJTfHJWMpv8DPF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N4uy0BTp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 585DAC433C7;
+	Fri, 16 Feb 2024 18:51:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708109519;
+	bh=z1wEHUsx8sHtbllePsy0F6JldriJlX548LiYZM+POiY=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=N4uy0BTpCOQxCLKVnVo8dcLA+5KUZ1AjSVs9amcy8kCwPmY3FIRaMECzD4EMRh5mN
+	 2wYRBqPjwppAiODRVzC9yrlmJ08soDZQLiJLZbB/2Sk+luvq3E1xSgK9/7GictWwor
+	 hA1OlOMWnybdThxHPKkm6ysHmdYl+5K8YzbF1afrRFdrB/fXGhF+JEOsUaaedHEPCP
+	 2hU74pisTlbW4ACErRCGgjJPwRUFgJh2Hvzp7die1qoUfWnLky9MM5bvORnsseg9AU
+	 fAFsGVclLib4Gr5MoeForlyyBZiJgJFz1U0r7ggs0nI76UwV7tg4V+w8OsPGZslxRG
+	 lOev0EwKAq6/Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 42692D84BCD;
+	Fri, 16 Feb 2024 18:51:59 +0000 (UTC)
+Subject: Re: [GIT PULL] KVM fixes and cleanups for 6.8-rc5
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20240216171030.12745-1-pbonzini@redhat.com>
+References: <20240216171030.12745-1-pbonzini@redhat.com>
+X-PR-Tracked-List-Id: <kvm.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20240216171030.12745-1-pbonzini@redhat.com>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+X-PR-Tracked-Commit-Id: 9895ceeb5cd61092f147f8d611e2df575879dd6f
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 683b783c2093e0172738f899ba188bc406b0595f
+Message-Id: <170810951926.23532.3882456779664688966.pr-tracker-bot@kernel.org>
+Date: Fri, 16 Feb 2024 18:51:59 +0000
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: torvalds@linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-The LPI xarray's xa_lock is sufficient for synchronizing writers when
-freeing a given LPI. Furthermore, readers can only take a new reference
-on an IRQ if it was already nonzero.
+The pull request you sent on Fri, 16 Feb 2024 12:10:30 -0500:
 
-Stop taking the lpi_list_lock unnecessarily and get rid of
-__vgic_put_lpi_locked().
+> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- arch/arm64/kvm/vgic/vgic-its.c |  4 ++--
- arch/arm64/kvm/vgic/vgic.c     | 21 ++++-----------------
- arch/arm64/kvm/vgic/vgic.h     |  1 -
- 3 files changed, 6 insertions(+), 20 deletions(-)
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/683b783c2093e0172738f899ba188bc406b0595f
 
-diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index c3d1bca0b458..d84cb7618c59 100644
---- a/arch/arm64/kvm/vgic/vgic-its.c
-+++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -647,7 +647,7 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
- 	 * was in the cache, and increment it on the new interrupt.
- 	 */
- 	if (cte->irq)
--		__vgic_put_lpi_locked(kvm, cte->irq);
-+		vgic_put_irq(kvm, cte->irq);
- 
- 	/*
- 	 * The irq refcount is guaranteed to be nonzero while holding the
-@@ -684,7 +684,7 @@ void vgic_its_invalidate_cache(struct kvm *kvm)
- 		if (!cte->irq)
- 			break;
- 
--		__vgic_put_lpi_locked(kvm, cte->irq);
-+		vgic_put_irq(kvm, cte->irq);
- 		cte->irq = NULL;
- 	}
- 
-diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index 2a288d6c0be7..c8208f81fdc8 100644
---- a/arch/arm64/kvm/vgic/vgic.c
-+++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -110,13 +110,13 @@ static void vgic_irq_release(struct kref *ref)
- {
- }
- 
--/*
-- * Drop the refcount on the LPI. Must be called with lpi_list_lock held.
-- */
--void __vgic_put_lpi_locked(struct kvm *kvm, struct vgic_irq *irq)
-+void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
- {
- 	struct vgic_dist *dist = &kvm->arch.vgic;
- 
-+	if (irq->intid < VGIC_MIN_LPI)
-+		return;
-+
- 	if (!kref_put(&irq->refcount, vgic_irq_release))
- 		return;
- 
-@@ -126,19 +126,6 @@ void __vgic_put_lpi_locked(struct kvm *kvm, struct vgic_irq *irq)
- 	kfree_rcu(irq, rcu);
- }
- 
--void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
--{
--	struct vgic_dist *dist = &kvm->arch.vgic;
--	unsigned long flags;
--
--	if (irq->intid < VGIC_MIN_LPI)
--		return;
--
--	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
--	__vgic_put_lpi_locked(kvm, irq);
--	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
--}
--
- void vgic_flush_pending_lpis(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-index f874b9932c5a..0c2b82de8fa3 100644
---- a/arch/arm64/kvm/vgic/vgic.h
-+++ b/arch/arm64/kvm/vgic/vgic.h
-@@ -180,7 +180,6 @@ vgic_get_mmio_region(struct kvm_vcpu *vcpu, struct vgic_io_device *iodev,
- 		     gpa_t addr, int len);
- struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
- 			      u32 intid);
--void __vgic_put_lpi_locked(struct kvm *kvm, struct vgic_irq *irq);
- void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq);
- bool vgic_get_phys_line_level(struct vgic_irq *irq);
- void vgic_irq_set_phys_pending(struct vgic_irq *irq, bool pending);
+Thank you!
+
 -- 
-2.44.0.rc0.258.g7320e95886-goog
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
