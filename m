@@ -1,104 +1,112 @@
-Return-Path: <kvm+bounces-8888-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8890-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0076E8583DA
-	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 18:16:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 832FE858403
+	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 18:22:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 94CA11F27E14
-	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 17:16:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 23AF81F29EBB
+	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 17:22:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF1AC2E641;
-	Fri, 16 Feb 2024 17:13:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LyvjPkHR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70CE613175D;
+	Fri, 16 Feb 2024 17:22:03 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from zero.eik.bme.hu (zero.eik.bme.hu [152.66.115.2])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE0B5130E3C;
-	Fri, 16 Feb 2024 17:13:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 998FB12FB1E
+	for <kvm@vger.kernel.org>; Fri, 16 Feb 2024 17:21:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=152.66.115.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708103595; cv=none; b=FhNjEBzAk5jBcHW7RaUbACvweH9uW/kFZcPu631kx7Gb7s0q+i9hHt8DqimnQDtovo6/wWY+zKHdQDiKimjNS4+xvgAoQFRpl9qNPPXQtHLHhC6W6QOynCP8uD9eJh6QgvOcs25zptlNwjq+oii0RDIIcOXvNpiO85yUkIWx5v0=
+	t=1708104122; cv=none; b=iRE+XklbiCk+30dFKc/ScyZ8cYblfIQd0J+kqjVuiQCVfcDAXLz/Q+/uyobnDBKKV8ey3WT/A004INJrfjDtGfHgUYaSO3imvyFCLytrq2K/Zdt5/CWNcL3UzYc2HukKR4di0OfDxPzYxhZLZmFIIzQTzpHqrOt8xMbSc0H2bzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708103595; c=relaxed/simple;
-	bh=kQ0H/sNCQPwBmNusOIBS5iWhM6nmH7hfh3eYJZ4zLjw=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=drNl04cGeRDAMivqPBFn5pnZEE57qipMV2HeYtKuPFR/k3QoyJ38jR6KrZJ0hZ0aFD/gIoiSmfMOPGtzwYaTFF4FpViEuYlZnVZ5FLBdhaVgf5rp0q+DGaKdm4s0C4wr+swW2T0Im2kDglcfxlw5fNsSz79Atk2G8QdQJNQnhNY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LyvjPkHR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEAA5C433F1;
-	Fri, 16 Feb 2024 17:13:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708103594;
-	bh=kQ0H/sNCQPwBmNusOIBS5iWhM6nmH7hfh3eYJZ4zLjw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LyvjPkHRfPJnvy+KgUErXwGzLnSj9SB07qpiXXw3ah9U/PWYAwnHmimfWyoqtQ2U8
-	 KeuN7x4lqeuJAdBPahhcQYalW0qQr4hnpqPQn0WisKo7uFTYxBhY2wrS3C+XqqLgz1
-	 TcmebNQBsZSSWj4eMq40uno8d3Ec3Dnsu/Ox3hp40hrfELwTTWTD/DYbjHiS2HjN1U
-	 UEoo/qI8bkB9NXGs6U3o+Sq+51SN9auLEXCegGG1aVwnuAjiyaF9NoMC+9toIHrkjG
-	 l1ZR1QDVdmGXUFNXEA+u8eLmibIlKbf/DKAUCuPvLY3EBvTXG1J4SiK0Hee/apG9BY
-	 Ae/cvZmNb1Obg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rb1lu-003v2X-MX;
-	Fri, 16 Feb 2024 17:13:12 +0000
-Date: Fri, 16 Feb 2024 17:13:10 +0000
-Message-ID: <86h6i849jt.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvm@vger.kernel.org,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	aneesh.kumar@kernel.org,
-	naveen.n.rao@linux.ibm.com,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Sebastian Ene <sebastianene@google.com>
-Subject: Re: [PATCH] KVM: Get rid of return value from kvm_arch_create_vm_debugfs()
-In-Reply-To: <20240216155941.2029458-1-oliver.upton@linux.dev>
-References: <20240216155941.2029458-1-oliver.upton@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1708104122; c=relaxed/simple;
+	bh=Ed30OCZAdoF8Up2WZYZxw1FU204rfgcdQDiBi0TzIS8=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=BEMyKWa4Ebd51MWnMRNSfczBx6sD5IBPj38blxII5Zq6PseKTixSG9Q74yL1vbOEiEVw1RO5PIEqcqw7MT2oeJWd/QCqCeMT6CvA1SeJi75Z9QiNTp11A7SYZWSq9yP9ss0NHGX7hlKhn0dNrnKBEqxLGbKVAt1UKlR8AMAYgr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=eik.bme.hu; spf=pass smtp.mailfrom=eik.bme.hu; arc=none smtp.client-ip=152.66.115.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=eik.bme.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eik.bme.hu
+Received: from zero.eik.bme.hu (localhost [127.0.0.1])
+	by zero.eik.bme.hu (Postfix) with ESMTP id 5C6E74E602C;
+	Fri, 16 Feb 2024 18:14:30 +0100 (CET)
+X-Virus-Scanned: amavisd-new at eik.bme.hu
+Received: from zero.eik.bme.hu ([127.0.0.1])
+	by zero.eik.bme.hu (zero.eik.bme.hu [127.0.0.1]) (amavisd-new, port 10028)
+	with ESMTP id EYdyYLLXg6O4; Fri, 16 Feb 2024 18:14:28 +0100 (CET)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+	id 5FF054E601F; Fri, 16 Feb 2024 18:14:28 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by zero.eik.bme.hu (Postfix) with ESMTP id 5AD457456B4;
+	Fri, 16 Feb 2024 18:14:28 +0100 (CET)
+Date: Fri, 16 Feb 2024 18:14:28 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@linaro.org>
+cc: qemu-devel@nongnu.org, 
+    =?ISO-8859-15?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>, 
+    Eduardo Habkost <eduardo@habkost.net>, qemu-arm@nongnu.org, 
+    kvm@vger.kernel.org, Peter Maydell <peter.maydell@linaro.org>, 
+    Igor Mitsyanko <i.mitsyanko@gmail.com>, 
+    "Michael S. Tsirkin" <mst@redhat.com>, 
+    Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, 
+    Paolo Bonzini <pbonzini@redhat.com>, 
+    Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH 1/6] hw/arm: Inline sysbus_create_simple(PL110 / PL111)
+In-Reply-To: <20240216153517.49422-2-philmd@linaro.org>
+Message-ID: <bcfd3f9d-04e3-79c9-c15f-c3c8d7669bdb@eik.bme.hu>
+References: <20240216153517.49422-1-philmd@linaro.org> <20240216153517.49422-2-philmd@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvm@vger.kernel.org, npiggin@gmail.com, mpe@ellerman.id.au, christophe.leroy@csgroup.eu, aneesh.kumar@kernel.org, naveen.n.rao@linux.ibm.com, seanjc@google.com, pbonzini@redhat.com, linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, sebastianene@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="3866299591-368854593-1708103668=:41653"
 
-On Fri, 16 Feb 2024 15:59:41 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> The general expectation with debugfs is that any initialization failure
-> is nonfatal. Nevertheless, kvm_arch_create_vm_debugfs() allows
-> implementations to return an error and kvm_create_vm_debugfs() allows
-> that to fail VM creation.
-> 
-> Change to a void return to discourage architectures from making debugfs
-> failures fatal for the VM. Seems like everyone already had the right
-> idea, as all implementations already return 0 unconditionally.
-> 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-Acked-by: Marc Zyngier <maz@kernel.org>
+--3866299591-368854593-1708103668=:41653
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8BIT
 
-	M.
+On Fri, 16 Feb 2024, Philippe Mathieu-Daudé wrote:
+> We want to set another qdev property (a link) for the pl110
+> and pl111 devices, we can not use sysbus_create_simple() which
+> only passes sysbus base address and IRQs as arguments. Inline
+> it so we can set the link property in the next commit.
+>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+> ---
+> hw/arm/realview.c    |  5 ++++-
+> hw/arm/versatilepb.c |  6 +++++-
+> hw/arm/vexpress.c    | 10 ++++++++--
+> 3 files changed, 17 insertions(+), 4 deletions(-)
+>
+> diff --git a/hw/arm/realview.c b/hw/arm/realview.c
+> index 9058f5b414..77300e92e5 100644
+> --- a/hw/arm/realview.c
+> +++ b/hw/arm/realview.c
+> @@ -238,7 +238,10 @@ static void realview_init(MachineState *machine,
+>     sysbus_create_simple("pl061", 0x10014000, pic[7]);
+>     gpio2 = sysbus_create_simple("pl061", 0x10015000, pic[8]);
+>
+> -    sysbus_create_simple("pl111", 0x10020000, pic[23]);
+> +    dev = qdev_new("pl111");
+> +    sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
+> +    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0x10020000);
+> +    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[23]);
 
--- 
-Without deviation from the norm, progress is not possible.
+Not directly related to this patch but this blows up 1 line into 4 just to 
+allow setting a property. Maybe just to keep some simplicity we'd rather 
+need either a sysbus_realize_simple function that takes a sysbus device 
+instead of the name and does not create the device itself or some way to 
+pass properties to sysbus create simple (but the latter may not be easy to 
+do in a generic way so not sure about that). What do you think?
+
+Regards,
+BALATON Zoltan
+--3866299591-368854593-1708103668=:41653--
 
