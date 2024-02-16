@@ -1,70 +1,73 @@
-Return-Path: <kvm+bounces-8872-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8873-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9724F85816D
-	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 16:40:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 787CA85816F
+	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 16:40:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52EED282E8D
-	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 15:40:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E42591F210F5
+	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 15:40:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85864130AE2;
-	Fri, 16 Feb 2024 15:35:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BE4A130AF3;
+	Fri, 16 Feb 2024 15:35:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xLm/Hbfz"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="b0AZIloY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4DFF130ADB
-	for <kvm@vger.kernel.org>; Fri, 16 Feb 2024 15:35:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 430CF12F395
+	for <kvm@vger.kernel.org>; Fri, 16 Feb 2024 15:35:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708097724; cv=none; b=mPOsdOFeurXVNHH7ngTmM06RkXiKnOEhwKfT4zu63WF1dpvr/g8sFkbcXZU2Rm7ayvBWiIy8frx9Cp1i2RUKORsE8Z8F7p6YFUk4uSEw84a0ygLL7RNVsT6p+Ee2YhwDnvplOXhw1mAsEqGNvVOCdG3Q5F6A8t3xbzx7sRGeV4E=
+	t=1708097731; cv=none; b=hKuHKOxo5o554uCCwMAaeqla3OpUJqENFlKWZtJHX4Cd/YvNmlHX5S9DFoRUXX6S4vmQpvvE6gqj6DJBme6ugtDS5hxkVMXSg0MRKmQDxEMb/WWDFwcX3zungiUhCcVyToW1oCnlWAHlNfOX+93aSihyOfaI1uiYmGCIAEt5FXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708097724; c=relaxed/simple;
-	bh=PcOyVFEf0gri4XIpAngb4HT6m4AtQ68QfmxDWpKq9f0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fGLQ8aLA7ZD3U0vDIxTUsiid+QSB0I8Qx2y0t1VnbhEN9FXBeKY0BaAbPNNWNbMD8O8ETF91SLv/nJe4/ytq5R4dE03Y65Ga2IHkuYNDzqPtgyH80ijVk868tYWeN2k41d0ov0Q8prZkB2a/A9pxgr6Vo5gN7D4RI4AY1MPKJgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=xLm/Hbfz; arc=none smtp.client-ip=209.85.218.52
+	s=arc-20240116; t=1708097731; c=relaxed/simple;
+	bh=aOCi2jxVMoX2vXApcp8pAfB018JsB+6pqRTrSNXkR8k=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sK64VsrO2Mu/LBJe9JTiUIE+lc2GZ4hJY1zB96W1EEdrmKXnQA9WTJEjcNicK0t6E1GSp8iVkFJzIwyvPok/0oEg1V/YIzhDxSnFlEiwl+H9DHnbmW0JBhVM/u1zgRjFgRc7l2LijEdFwkmCl5yPOlDLFkv8yiyvpG3lvoHbKAg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=b0AZIloY; arc=none smtp.client-ip=209.85.167.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a3e05775ab9so17263366b.2
-        for <kvm@vger.kernel.org>; Fri, 16 Feb 2024 07:35:22 -0800 (PST)
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5114fa38434so2542802e87.0
+        for <kvm@vger.kernel.org>; Fri, 16 Feb 2024 07:35:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1708097721; x=1708702521; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=5HOBSsoYfdBIXejJenW3gKcLKAp6yUaDTVDJ5Gv25Ps=;
-        b=xLm/Hbfzlu+JKKqlUgBqI+/B5FnyzZdWYWkSvd2BERvSXXMG3MeOLLyfevsG31lkuK
-         J9Lm/pbWvu5kjWoHxpM0CKJTCkrrNjWe1wIMtBNoxg01ApJozLhQ+cWkRmH9XR8mSnck
-         Z2QqKvREwaOoIcdCW4Phr59fvuPNkPIPvz6buR5IA0QyoJVN9hR7Fg1P/riHJs7f8HmR
-         gSQdLMVNz5vudIFcGIwDiLvvm5NyXeQ2wXWw058pRJr9BSeEM1qBuJQW2iXFOd1Ybi14
-         FFGlWHzCfMWYGVYwTLbCLwBm48Odny8srlabYDek8EcXNXBRYojaVXHCoo0rftvrVmJd
-         clIA==
+        d=linaro.org; s=google; t=1708097727; x=1708702527; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kV0Ad1FDMlSK0WAR0PyajC3eAS8o+2asLjvJepPvncc=;
+        b=b0AZIloYW1/1PYxSKmUp6Q6y4ah3qqOWNhLT7NQl0mFw7Cwuo87QtJO6ty6tm+19lu
+         P1/yVOqkHzX49gfjFbx5+wnA9KeAHFFtrox4rweuva/+SdzkdTEnvFd4PqjqK0s4NRwE
+         zwSfclSQE6Dh4oSFhALo4/wscxp9vGQlaehUtIeoq2WOLJj+FYbAs7eI2UqP93oFu8Cj
+         ZMyxI6sDgUgXG0opkcue9WT+FpxWO91swuZNY/4L+6ZAhCzInFdk3SIl5HpZa1+pJE6t
+         BdxwRSooTgT5X64CLM8SewY1T5dDqeqlggXm0tv1Sp/sYbnDNsAYb4SAaYVlAWfnb2QU
+         1qoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708097721; x=1708702521;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5HOBSsoYfdBIXejJenW3gKcLKAp6yUaDTVDJ5Gv25Ps=;
-        b=GK23Jy2/eoErXpGAHOpocJva3vvr4OxEou/7sQiZhFWdfN09XsCvFUwZcQSB6EDPHk
-         5VWG3wkCxILEF3asl3R/ZBHY769lwkJxC1L1bT1RsGYwNKgPX9kEXAqT7qS5b+z1d3dG
-         5FAwoSZA0Yj2CUVBnAtcnaRz4TzLCCmK4cTRZw2ot5UYVb1BSA/vOLZ1CEUexzdxXfMZ
-         yVfen+83W2sQ7tD6jh/SVZj+kXVvfICNJmMVVvQyzhgw6JBRDc33qCqvyXjw7mSW9Lh6
-         cLekxH/82qglZ/V5Ik44yepbRf1mN/c4oZSDo7a1RPdwHZOt0NXzh1Eb5d1C7Imi8H0d
-         lYVw==
-X-Forwarded-Encrypted: i=1; AJvYcCV5CFyPW/ouCT8VfjHS4y/wxdp+mNMBDx7fd+EtW625mMZWqUgo6meTuo6X9tLSRXlARQeRxrDa+YB22ISLEJJkUtg3
-X-Gm-Message-State: AOJu0YwbCVmDDANmGyRHQblkt6kNFhrs9N8SGHHMAB93rqaCvS/1byfy
-	cjOWQFVLRuScdnBA+o7F9Do1436oi1HLHVRWaM88aoLxJ6lEVv5wGhQmFaUKVNM=
-X-Google-Smtp-Source: AGHT+IGNmgGH50mBITVJX2YF+q7t94xFy9AFmwyf0NoIqAfPCc9XxsBjfL9Fg2OGn0M5lytBsv2j4A==
-X-Received: by 2002:a17:906:8c6:b0:a3d:d9a1:e84e with SMTP id o6-20020a17090608c600b00a3dd9a1e84emr1587399eje.38.1708097720897;
-        Fri, 16 Feb 2024 07:35:20 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708097727; x=1708702527;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kV0Ad1FDMlSK0WAR0PyajC3eAS8o+2asLjvJepPvncc=;
+        b=PnAOKE63wmR9J7g+NKmqWBICbppDoitygwLZ0dmEt7qQ4ohEZtYgadSv8/5Q3MLgk/
+         zYqNrUzyEwEb6mgZ+39yOUCOxorn8YXXjZJsHQKVbRmfqxENal8OXkYV71g7Hn5F7Nc+
+         haZcaLg3D+7Ixeh9aDjlGcm9Xa0ZNsNfyEYIqd+rL/5g7p0DwDvQDVnZXBe4W0e48Tmy
+         ljywIFiP4vOlWPXfdm2LdqGPePR2uiL54XozsTYEwGMVS2cBN5Lrf45Nz6yXeuhuZEGT
+         RTpgMc5SCj9jBgdVWNn+5b4k9yUDn6Gq35ZvLsFjrCHSbnEWDNoxWpVtHyq1qKwXA1Is
+         3ZoA==
+X-Forwarded-Encrypted: i=1; AJvYcCV54LPee7iqdnBoPsesDgJ5fbTvodmM9khn/H+F4bLaTI38diqby71qlskWqVDm31Vz8bcGzPHH+RiBfOPkQZ02HdlJ
+X-Gm-Message-State: AOJu0YwFXtarvnGujWSf7KsFBlKXwtok5KSMF19oUlDRvXRigdMQMK7z
+	nLX0eFX/wTcOljRlwJ52e/qWJ4hOlD4Z78zF4ypvs52raOx9VUI6BTh0WmsxUvuA1um2DE6t8aP
+	T
+X-Google-Smtp-Source: AGHT+IGfgXbpqZgKjNCGN8KVVHtzk2yqUaFF2+wmjjuAVnYD5GbeKX6Jl3GUMNEQNUdVj+AH74b60A==
+X-Received: by 2002:a05:6512:20ce:b0:511:78bb:1a4d with SMTP id u14-20020a05651220ce00b0051178bb1a4dmr3559454lfr.17.1708097727158;
+        Fri, 16 Feb 2024 07:35:27 -0800 (PST)
 Received: from m1x-phil.lan ([176.187.210.246])
-        by smtp.gmail.com with ESMTPSA id lj8-20020a170907188800b00a3dd52e758bsm45098ejc.100.2024.02.16.07.35.18
+        by smtp.gmail.com with ESMTPSA id rn28-20020a170906d93c00b00a36c5b01ef3sm42951ejb.225.2024.02.16.07.35.25
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Fri, 16 Feb 2024 07:35:19 -0800 (PST)
+        Fri, 16 Feb 2024 07:35:26 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
@@ -78,41 +81,101 @@ Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	Richard Henderson <richard.henderson@linaro.org>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Subject: [PATCH 0/6] hw: Remove sysbus_address_space()
-Date: Fri, 16 Feb 2024 16:35:11 +0100
-Message-ID: <20240216153517.49422-1-philmd@linaro.org>
+Subject: [PATCH 1/6] hw/arm: Inline sysbus_create_simple(PL110 / PL111)
+Date: Fri, 16 Feb 2024 16:35:12 +0100
+Message-ID: <20240216153517.49422-2-philmd@linaro.org>
 X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20240216153517.49422-1-philmd@linaro.org>
+References: <20240216153517.49422-1-philmd@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Pass address space as link property for devices where
-it seems to matter, otherwise just use get_system_memory().
+We want to set another qdev property (a link) for the pl110
+and pl111 devices, we can not use sysbus_create_simple() which
+only passes sysbus base address and IRQs as arguments. Inline
+it so we can set the link property in the next commit.
 
-Philippe Mathieu-Daudé (6):
-  hw/arm: Inline sysbus_create_simple(PL110 / PL111)
-  hw/display/pl110: Pass frame buffer memory region as link property
-  hw/arm/exynos4210: Inline sysbus_create_varargs(EXYNOS4210_FIMD)
-  hw/display/exynos4210_fimd: Pass frame buffer memory region as link
-  hw/i386/kvmvapic: Inline sysbus_address_space()
-  hw/sysbus: Remove now unused sysbus_address_space()
+Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+---
+ hw/arm/realview.c    |  5 ++++-
+ hw/arm/versatilepb.c |  6 +++++-
+ hw/arm/vexpress.c    | 10 ++++++++--
+ 3 files changed, 17 insertions(+), 4 deletions(-)
 
- include/hw/sysbus.h          |  1 -
- hw/arm/exynos4210.c          | 12 +++++++-----
- hw/arm/realview.c            |  7 ++++++-
- hw/arm/versatilepb.c         |  8 +++++++-
- hw/arm/vexpress.c            | 15 +++++++++++++--
- hw/core/sysbus.c             |  5 -----
- hw/display/exynos4210_fimd.c | 19 ++++++++++++++++---
- hw/display/pl110.c           | 20 ++++++++++++++++----
- hw/i386/kvmvapic.c           | 12 ++++++------
- 9 files changed, 71 insertions(+), 28 deletions(-)
-
+diff --git a/hw/arm/realview.c b/hw/arm/realview.c
+index 9058f5b414..77300e92e5 100644
+--- a/hw/arm/realview.c
++++ b/hw/arm/realview.c
+@@ -238,7 +238,10 @@ static void realview_init(MachineState *machine,
+     sysbus_create_simple("pl061", 0x10014000, pic[7]);
+     gpio2 = sysbus_create_simple("pl061", 0x10015000, pic[8]);
+ 
+-    sysbus_create_simple("pl111", 0x10020000, pic[23]);
++    dev = qdev_new("pl111");
++    sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0x10020000);
++    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[23]);
+ 
+     dev = sysbus_create_varargs("pl181", 0x10005000, pic[17], pic[18], NULL);
+     /* Wire up MMC card detect and read-only signals. These have
+diff --git a/hw/arm/versatilepb.c b/hw/arm/versatilepb.c
+index d10b75dfdb..7e04b23af8 100644
+--- a/hw/arm/versatilepb.c
++++ b/hw/arm/versatilepb.c
+@@ -299,7 +299,11 @@ static void versatile_init(MachineState *machine, int board_id)
+ 
+     /* The versatile/PB actually has a modified Color LCD controller
+        that includes hardware cursor support from the PL111.  */
+-    dev = sysbus_create_simple("pl110_versatile", 0x10120000, pic[16]);
++    dev = qdev_new("pl110_versatile");
++    sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0x10120000);
++    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[16]);
++
+     /* Wire up the mux control signals from the SYS_CLCD register */
+     qdev_connect_gpio_out(sysctl, 0, qdev_get_gpio_in(dev, 0));
+ 
+diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
+index aa5f3ca0d4..671986c21e 100644
+--- a/hw/arm/vexpress.c
++++ b/hw/arm/vexpress.c
+@@ -276,6 +276,7 @@ static void a9_daughterboard_init(VexpressMachineState *vms,
+ {
+     MachineState *machine = MACHINE(vms);
+     MemoryRegion *sysmem = get_system_memory();
++    DeviceState *dev;
+ 
+     if (ram_size > 0x40000000) {
+         /* 1GB is the maximum the address space permits */
+@@ -297,7 +298,9 @@ static void a9_daughterboard_init(VexpressMachineState *vms,
+     /* Daughterboard peripherals : 0x10020000 .. 0x20000000 */
+ 
+     /* 0x10020000 PL111 CLCD (daughterboard) */
+-    sysbus_create_simple("pl111", 0x10020000, pic[44]);
++    dev = qdev_new("pl111");
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0x10020000);
++    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[44]);
+ 
+     /* 0x10060000 AXI RAM */
+     /* 0x100e0000 PL341 Dynamic Memory Controller */
+@@ -650,7 +653,10 @@ static void vexpress_common_init(MachineState *machine)
+ 
+     /* VE_COMPACTFLASH: not modelled */
+ 
+-    sysbus_create_simple("pl111", map[VE_CLCD], pic[14]);
++    dev = qdev_new("pl111");
++    sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, map[VE_CLCD]);
++    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[14]);
+ 
+     dinfo = drive_get(IF_PFLASH, 0, 0);
+     pflash0 = ve_pflash_cfi01_register(map[VE_NORFLASH0], "vexpress.flash0",
 -- 
 2.41.0
 
