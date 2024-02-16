@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-8874-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8875-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C75C858170
-	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 16:40:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18C1B858171
+	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 16:40:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28322283699
-	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 15:40:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B6CC1C21FAE
+	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 15:40:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96D56130E26;
-	Fri, 16 Feb 2024 15:35:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2972C130E38;
+	Fri, 16 Feb 2024 15:35:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LN3XpByc"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="giCt/cdN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE8E8130E20
-	for <kvm@vger.kernel.org>; Fri, 16 Feb 2024 15:35:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ED10130AD7
+	for <kvm@vger.kernel.org>; Fri, 16 Feb 2024 15:35:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708097736; cv=none; b=tvBzZmkkV8kKQyqjgcd1wK8KPUUgUPAE4ddOVH9XYaLcoO61J4XeG2ftD6PMmzwfl0u9clCR3v5/z1UISqAnojQmiZKGV/F+s4esK5AkfuuV9w/1oysn0ea9PX75G7ysi6X244sFNR4bOeqByC8OWqbtCUNXNeX27hvctzGIS8Y=
+	t=1708097742; cv=none; b=JIaaq72On+D55X9vWio3McBAeXkvw/P3CwbN5qQERD+HXH6H9rhS53jvhgkck8Ztu0/LC3MNM5xsFIcWB9Iijy0hjcv+6vPrGdSAZDCd3TBCWRnw2h+PwS/symbsJHwh3CmFoAKmTj08h8yWX8soCr8kf9kHLh0wTu7oEBrLvzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708097736; c=relaxed/simple;
-	bh=x0kmFl2uKKB9P/8zejfgoB5FyDQIfKAf8JXzo8x1zOQ=;
+	s=arc-20240116; t=1708097742; c=relaxed/simple;
+	bh=j7kGj0gaCP81pdVf2jNljACEQYSAij8Itt1Edeo2yno=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=R+EpnVdUP0mtjmM+80ci3jMyyU2NlpgqJXKPniwOeyeIk/6rDFKzkUKPghevjqOmcyTg3Rj73b33F1rS/u2LurFMfIXVhTTAbS7KZeS3Q95Q6NnOpKHsbswF4kR3vr2pu8iSSUGWB2Vd2sd8rjWtHjNVQt+5a8xUu3NJS2131wE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=LN3XpByc; arc=none smtp.client-ip=209.85.218.45
+	 MIME-Version:Content-Type; b=oqjNU3v1uNjTyFvan01Q9V1ReNX4/NzmHmmetHibv+ekB14caTRNCt0ArwYJYJNymQRbC1CvGVuCe5Y6yjHizLtYfHp8+oqyODq7x1d8rrabVSq7FI6uUR+aiggBKjcTOIX2QzkPQRniYCLvakVDvaMvgtjG+VBGbf95d8l/yTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=giCt/cdN; arc=none smtp.client-ip=209.85.218.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a2a17f3217aso281131566b.2
-        for <kvm@vger.kernel.org>; Fri, 16 Feb 2024 07:35:34 -0800 (PST)
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a26fa294e56so329481866b.0
+        for <kvm@vger.kernel.org>; Fri, 16 Feb 2024 07:35:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1708097733; x=1708702533; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1708097739; x=1708702539; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wZ1SK8UcIGNjoS5oUCJZaLlSaFI2o9jBSpbbsKbpCUU=;
-        b=LN3XpBycF5Tu2pS+9qyb6Xu231OKJOCALguKEfAo1udvrmk3OJ4UKMvdm+/f2vTJ2A
-         lmTOdBq1vSWOg/g2kd9RkAWgKuUIjUY7/lgl4pV4dbwSM5GOYBkH+DpP+zxC3OaWA/SQ
-         hAG66iffuaqzvDvrFAV8K5MR/IV0VW9MGwSiEAeQXWZGjb3LxwuVH5AIoFZASA2HcjC3
-         sgPdV8wXR1u86tXCIuTmQxam17Fbm+Cg/zyDtJkC9X2UJVTT8rlvHWW/xOfA334lfyUU
-         CDTBRMETTxmxH46oHJyZDz8asz9Q2ok/gxq9Uz37D16sdk0OK2efvI4gBVm7dubrX2wU
-         lXCA==
+        bh=FHq12xVLql3ZjDkC8k2lRJAF5RJwUJ4vzRZ5Ca5vbxw=;
+        b=giCt/cdNaFx/WHznZK5L6SnY4akyPMZdFSqt0Fw4kyE7vJj9R8X37++cLsnmHuWrk+
+         Z1FX0jisMyjoWbVptvx5XkgAq4ZiigdsG+91Yv1nwY63DLjARQ8suGfp6W3NJfFxtzaq
+         MRBcnHm4AbVYUdN7YK61kRO5UUo+wFtgYKBS1ytHAFv8KG92/267dOKdeNWPjQMH1OKc
+         a1jDGIUvepgHScAonqZJY6KwFBu9VYB329XpyjUwzUpMuc1NITXJETvp0iZdMTEk4KPg
+         mb8tldPVBccLo6z3ccWbPFvZMaMbZidGhHVXSAizYCWAvMFnzmi6Lh3opGzpebkgw++e
+         /msw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708097733; x=1708702533;
+        d=1e100.net; s=20230601; t=1708097739; x=1708702539;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=wZ1SK8UcIGNjoS5oUCJZaLlSaFI2o9jBSpbbsKbpCUU=;
-        b=NdnKx5guybWti73x6x4rUE6yzhpT0QhVTw641GyFz+uk/waQHvzaPaxzkok4QsQJwk
-         2O6ZUq1XjsQ25rPtzzUc2LLJwzI0u+iqVxSzaqwK9W4/bqBzPxWrCDHTNqHyhWq4Gz4H
-         hyih2tFXQcSTr/t9Vj4ZqZg0IeN152gXtQ4bHaXCU45aIJHTzYHF44GydOUcms6H7IDS
-         6yEDBS4qSJOx03uRyOhhjzN96evDBrTAXNIt6+ZpG5o/py6lBjo+Mh9Xdw+m1qCUytqv
-         6Dqu4EE+HAxNbVc1JORzOXvYVTP51/j1PHM5qbEtX4uTh21up11/pqwoUE+RfKQ8R8Sv
-         SmxA==
-X-Forwarded-Encrypted: i=1; AJvYcCUBUiE6S8kf1cXIA3ujtL0beAE8WZrns3pllvlwAtIeAbrcvNgC/osQl8Z5otgShj1tJ93A3AdOjxi1EsQM2EQYItlJ
-X-Gm-Message-State: AOJu0Yze1N+UZksaOHJSrR+zXaLDktyYWegQmavazo9GFSoVb7W9c+zP
-	Oe0EcCUCuh2l0yGwgcLr/jBhTwK29v7k84H+cePIjBRVRh/cuUeE3Uia7dkngak=
-X-Google-Smtp-Source: AGHT+IH9BTAcIohzCR8eVt3EE/x7HR0y4dxLNcTYXzXwSeNEodcpT2ESRISuFuitM7rP6Rj400gYrw==
-X-Received: by 2002:a17:907:119c:b0:a3d:4037:73e7 with SMTP id uz28-20020a170907119c00b00a3d403773e7mr3369329ejb.48.1708097733048;
-        Fri, 16 Feb 2024 07:35:33 -0800 (PST)
+        bh=FHq12xVLql3ZjDkC8k2lRJAF5RJwUJ4vzRZ5Ca5vbxw=;
+        b=Npp9BkPie+pr6AuwIwhVIwinxvK5SsZu63Amlk2UFKx0OV3qtlCBG8fVH631pmhB+C
+         wGRWTHnZjbu/dUvseMTYtEyMNrs1o7H+yCpB1GeHCymnmTbaXAOkRN734DrrRxsD5w3J
+         9hOtfUrF0AWHUSEKCBAxRsWRxN8NfHGmzGkQu8HqYprhJx4vhj90lcPA0z6pZbH5jF5L
+         MtnSZExPrkIS80cQd396uyxI+5NCmO36BoVoBYEwLPLRvXitNTes9gDy+fJTOhjKhiwz
+         Vl7utQ0+YIjxVlYWr0Um6o7HS/vkYQ0WNExYc+suBR7cr35TTjjCeQ3SDp4qXRnoEhE7
+         txrw==
+X-Forwarded-Encrypted: i=1; AJvYcCVMveeCvJgWNofntM40iN36DicqJwacDirhbDKHS3kmgHD/OmxQiEUTiBFCsgZc+r+P98nv82U3y7DOCs5vwIIiAsEq
+X-Gm-Message-State: AOJu0YzZHtswuL0nf0XgW31xkk1bCpPqfcqfnaVTDuSx3ikpjgrD3GZo
+	9h8gt5EEbste+4dDmtxo8SgxJ3q2WyKFyJmsEIVqORG0lqixLfCW/DsuKqwHkx4=
+X-Google-Smtp-Source: AGHT+IEi6meqrapeqjO4OgHfp/p6JY/NLaWMf9AKL7DDim/5nYeDiOvwjmctPUdudVyzB5T7NpBDLw==
+X-Received: by 2002:a17:907:b9c6:b0:a3d:2e34:30a5 with SMTP id xa6-20020a170907b9c600b00a3d2e3430a5mr3626388ejc.29.1708097738898;
+        Fri, 16 Feb 2024 07:35:38 -0800 (PST)
 Received: from m1x-phil.lan ([176.187.210.246])
-        by smtp.gmail.com with ESMTPSA id qw17-20020a170906fcb100b00a3d25d35ca5sm52716ejb.16.2024.02.16.07.35.31
+        by smtp.gmail.com with ESMTPSA id tl7-20020a170907c30700b00a3d1458523esm52110ejc.29.2024.02.16.07.35.37
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Fri, 16 Feb 2024 07:35:32 -0800 (PST)
+        Fri, 16 Feb 2024 07:35:38 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
@@ -80,9 +80,9 @@ Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	Richard Henderson <richard.henderson@linaro.org>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Subject: [PATCH 2/6] hw/display/pl110: Pass frame buffer memory region as link property
-Date: Fri, 16 Feb 2024 16:35:13 +0100
-Message-ID: <20240216153517.49422-3-philmd@linaro.org>
+Subject: [PATCH 3/6] hw/arm/exynos4210: Inline sysbus_create_varargs(EXYNOS4210_FIMD)
+Date: Fri, 16 Feb 2024 16:35:14 +0100
+Message-ID: <20240216153517.49422-4-philmd@linaro.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20240216153517.49422-1-philmd@linaro.org>
 References: <20240216153517.49422-1-philmd@linaro.org>
@@ -95,152 +95,39 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Add the PL110::'framebuffer-memory' property. Have the different
-ARM boards set it. We don't need to call sysbus_address_space()
-anymore.
+We want to set another qdev property (a link) for the FIMD
+device, we can not use sysbus_create_varargs() which only
+passes sysbus base address and IRQs as arguments. Inline
+it so we can set the link property in the next commit.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- hw/arm/realview.c    |  2 ++
- hw/arm/versatilepb.c |  2 ++
- hw/arm/vexpress.c    |  5 +++++
- hw/display/pl110.c   | 20 ++++++++++++++++----
- 4 files changed, 25 insertions(+), 4 deletions(-)
+ hw/arm/exynos4210.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/hw/arm/realview.c b/hw/arm/realview.c
-index 77300e92e5..b186f965c6 100644
---- a/hw/arm/realview.c
-+++ b/hw/arm/realview.c
-@@ -239,6 +239,8 @@ static void realview_init(MachineState *machine,
-     gpio2 = sysbus_create_simple("pl061", 0x10015000, pic[8]);
- 
-     dev = qdev_new("pl111");
-+    object_property_set_link(OBJECT(dev), "framebuffer-memory",
-+                             OBJECT(sysmem), &error_fatal);
-     sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
-     sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0x10020000);
-     sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[23]);
-diff --git a/hw/arm/versatilepb.c b/hw/arm/versatilepb.c
-index 7e04b23af8..d48235453e 100644
---- a/hw/arm/versatilepb.c
-+++ b/hw/arm/versatilepb.c
-@@ -300,6 +300,8 @@ static void versatile_init(MachineState *machine, int board_id)
-     /* The versatile/PB actually has a modified Color LCD controller
-        that includes hardware cursor support from the PL111.  */
-     dev = qdev_new("pl110_versatile");
-+    object_property_set_link(OBJECT(dev), "framebuffer-memory",
-+                             OBJECT(sysmem), &error_fatal);
-     sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
-     sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0x10120000);
-     sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[16]);
-diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
-index 671986c21e..de815d84cc 100644
---- a/hw/arm/vexpress.c
-+++ b/hw/arm/vexpress.c
-@@ -299,6 +299,9 @@ static void a9_daughterboard_init(VexpressMachineState *vms,
- 
-     /* 0x10020000 PL111 CLCD (daughterboard) */
-     dev = qdev_new("pl111");
-+    object_property_set_link(OBJECT(dev), "framebuffer-memory",
-+                             OBJECT(sysmem), &error_fatal);
-+    sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
-     sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0x10020000);
-     sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[44]);
- 
-@@ -654,6 +657,8 @@ static void vexpress_common_init(MachineState *machine)
-     /* VE_COMPACTFLASH: not modelled */
- 
-     dev = qdev_new("pl111");
-+    object_property_set_link(OBJECT(dev), "framebuffer-memory",
-+                             OBJECT(sysmem), &error_fatal);
-     sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
-     sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, map[VE_CLCD]);
-     sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[14]);
-diff --git a/hw/display/pl110.c b/hw/display/pl110.c
-index 4b83db9322..7f145bbdba 100644
---- a/hw/display/pl110.c
-+++ b/hw/display/pl110.c
-@@ -10,6 +10,7 @@
- #include "qemu/osdep.h"
- #include "hw/irq.h"
- #include "hw/sysbus.h"
-+#include "hw/qdev-properties.h"
- #include "migration/vmstate.h"
- #include "ui/console.h"
- #include "framebuffer.h"
-@@ -17,6 +18,7 @@
- #include "qemu/timer.h"
- #include "qemu/log.h"
- #include "qemu/module.h"
-+#include "qapi/error.h"
- #include "qom/object.h"
- 
- #define PL110_CR_EN   0x001
-@@ -74,6 +76,7 @@ struct PL110State {
-     uint32_t palette[256];
-     uint32_t raw_palette[128];
-     qemu_irq irq;
-+    MemoryRegion *fbmem;
- };
- 
- static int vmstate_pl110_post_load(void *opaque, int version_id);
-@@ -210,7 +213,6 @@ static int pl110_enabled(PL110State *s)
- static void pl110_update_display(void *opaque)
- {
-     PL110State *s = (PL110State *)opaque;
--    SysBusDevice *sbd;
-     DisplaySurface *surface = qemu_console_surface(s->con);
-     drawfn fn;
-     int src_width;
-@@ -222,8 +224,6 @@ static void pl110_update_display(void *opaque)
-         return;
+diff --git a/hw/arm/exynos4210.c b/hw/arm/exynos4210.c
+index 57c77b140c..ab18836943 100644
+--- a/hw/arm/exynos4210.c
++++ b/hw/arm/exynos4210.c
+@@ -769,11 +769,13 @@ static void exynos4210_realize(DeviceState *socdev, Error **errp)
      }
  
--    sbd = SYS_BUS_DEVICE(s);
--
-     if (s->cr & PL110_CR_BGR)
-         bpp_offset = 0;
-     else
-@@ -290,7 +290,7 @@ static void pl110_update_display(void *opaque)
-     first = 0;
-     if (s->invalidate) {
-         framebuffer_update_memory_section(&s->fbsection,
--                                          sysbus_address_space(sbd),
-+                                          s->fbmem,
-                                           s->upbase,
-                                           s->rows, src_width);
-     }
-@@ -535,11 +535,22 @@ static const GraphicHwOps pl110_gfx_ops = {
-     .gfx_update  = pl110_update_display,
- };
- 
-+static Property pl110_properties[] = {
-+    DEFINE_PROP_LINK("framebuffer-memory", PL110State, fbmem,
-+                     TYPE_MEMORY_REGION, MemoryRegion *),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
- static void pl110_realize(DeviceState *dev, Error **errp)
- {
-     PL110State *s = PL110(dev);
-     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
- 
-+    if (!s->fbmem) {
-+        error_setg(errp, "'framebuffer-memory' property was not set");
-+        return;
+     /*** Display controller (FIMD) ***/
+-    sysbus_create_varargs("exynos4210.fimd", EXYNOS4210_FIMD0_BASE_ADDR,
+-            s->irq_table[exynos4210_get_irq(11, 0)],
+-            s->irq_table[exynos4210_get_irq(11, 1)],
+-            s->irq_table[exynos4210_get_irq(11, 2)],
+-            NULL);
++    dev = qdev_new("exynos4210.fimd");
++    busdev = SYS_BUS_DEVICE(dev);
++    sysbus_realize_and_unref(busdev, &error_fatal);
++    sysbus_mmio_map(busdev, 0, EXYNOS4210_FIMD0_BASE_ADDR);
++    for (n = 0; n < 3; n++) {
++        sysbus_connect_irq(busdev, n, s->irq_table[exynos4210_get_irq(11, n)]);
 +    }
-+
-     memory_region_init_io(&s->iomem, OBJECT(s), &pl110_ops, s, "pl110", 0x1000);
-     sysbus_init_mmio(sbd, &s->iomem);
-     sysbus_init_irq(sbd, &s->irq);
-@@ -577,6 +588,7 @@ static void pl110_class_init(ObjectClass *klass, void *data)
-     set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
-     dc->vmsd = &vmstate_pl110;
-     dc->realize = pl110_realize;
-+    device_class_set_props(dc, pl110_properties);
- }
  
- static const TypeInfo pl110_info = {
+     sysbus_create_simple(TYPE_EXYNOS4210_EHCI, EXYNOS4210_EHCI_BASE_ADDR,
+             s->irq_table[exynos4210_get_irq(28, 3)]);
 -- 
 2.41.0
 
