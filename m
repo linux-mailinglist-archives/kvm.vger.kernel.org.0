@@ -1,147 +1,213 @@
-Return-Path: <kvm+bounces-8884-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8885-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CBAE858357
-	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 18:03:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8778858359
+	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 18:03:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C8686B24865
-	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 17:03:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8EF9A285812
+	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 17:03:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21A86130E3A;
-	Fri, 16 Feb 2024 17:03:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA406130E3A;
+	Fri, 16 Feb 2024 17:03:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UgfCPNZb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JFhP09vz"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9F7B1E86B
-	for <kvm@vger.kernel.org>; Fri, 16 Feb 2024 17:02:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BCA7219ED
+	for <kvm@vger.kernel.org>; Fri, 16 Feb 2024 17:03:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708102980; cv=none; b=kH3nt1zLuej+8a+yPuf++ExG/Ft5p0PqeBDQAZuXJlMAY1DIfXhhjB5J1Q/scdwvBkashotEEUsrh/4Q/7ocAZpYiDmU1WaqMM6g697mWprh71VnC9HnkWGNkKUIEdoAkJq3bbkyd/cf7aVt7xW33aiGAj/0QdhyRiOnhRqkxpg=
+	t=1708103015; cv=none; b=LO8dcxUYOAwR4eiQbPIC3XCJie60L2rNMIUGISHgGmXLIQYJf1w8+3bSKeDN6a6DMnpUe7EhH/gYJJfBCjOzNiVDwiWHxN9aOxn2HPSGMuQAhc/lrmP5KvLXH5haA2dVFOkcOQshYqxMiK3nBGgAlP6iEShiKwucBBkaixL9T98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708102980; c=relaxed/simple;
-	bh=zwGqJ2fkeXVi3yXrrkK8rAprQjwepMa3oWgrp7ecopE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EvDemqdd5IMmK7toHXj+actEJSwDgHtZ1owpevikCPXveYPSnBXoEnh2Mez4rVlvaTBueZIPbpueqix/B8i6b5B5KQ4zwh6cFX6Bg9X38Av06fMRPZxqlG3vrgs8HziVvVA1H3NuD9ZY0xQwvklcMsdJBe5U79msabNOXoMEDY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UgfCPNZb; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708102977;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XCF50IBRGmP/fByMsTs/u54G4bp+bCTmfaSrPpKQ1uo=;
-	b=UgfCPNZbRMvIv2dg5V0Z40DEqaer0tkkohm+MRNpVMaAd4CXPZQUtYd3f/+UREHbsYz9Qp
-	p3HOXEqtRuYmby/9ioSvqytwQwcilQ5EKc4StLloXMfeVXhe2A6/w7LttNiDdr7T0TIhN/
-	rbhO+kLtAeSaMqbqaDHF4VfOdcdIqIg=
-Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
- [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-386-giRYvwykO5eZdQQCivptcw-1; Fri, 16 Feb 2024 12:02:56 -0500
-X-MC-Unique: giRYvwykO5eZdQQCivptcw-1
-Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2d0be4e5cf2so10995551fa.0
-        for <kvm@vger.kernel.org>; Fri, 16 Feb 2024 09:02:55 -0800 (PST)
+	s=arc-20240116; t=1708103015; c=relaxed/simple;
+	bh=x+OyUheZkOLmrmxRXV2DwJisBsuE5dlS0nGw3qHzNmA=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=hRnJHaCQIaudr49azIonyheOTvEdXoREj3n67JQDsW6WU7t5HK/5HRNcVzAEUN9elt5VdP5EEMIOzvMedir0+35A0ozVTAY3AiKLzON3C8BAg82Lz3OWtqHvIlXvj4RxLcaz0fSCDD6LOtwALClMAxuo+DrQ8fqx0SA3tH9191E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JFhP09vz; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dcc05887ee9so1593179276.1
+        for <kvm@vger.kernel.org>; Fri, 16 Feb 2024 09:03:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1708103013; x=1708707813; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jSjwEV6mZP9dDWBaOFoNSK/PtiDDO4b/rWPQcC9pvsg=;
+        b=JFhP09vzd8Ur/NChpd8ZrTmHN7LSXQyyGUDRWoXCv3UwIU/X8jYeyykWqKJMTLV7M2
+         DJyR4U481v9BB7G++dF4fFfhueGJrwYUtQbrg9q2KBvuT1fraKzxwywW7GDlYYvQxKzD
+         31T1Zbj0uMwLRMvLBhuzRsYgygaoGtgM5u6rBFCuKxlfhmMOzFO1bM0TLc4MxcUWLMtR
+         CUv1jvPz6GASn6ROREA2xaBnErmRsjFRn+Xw7NG5VFA3iMjh93PboTHS3X0Ib54YDoxq
+         NAkxzqFXFZTUdgY3g/jL0M2oz+1dLf6LRdHNbtdT7ROPsiOwBVzaFRa+kXgIWK9CEV+j
+         cMLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708102974; x=1708707774;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XCF50IBRGmP/fByMsTs/u54G4bp+bCTmfaSrPpKQ1uo=;
-        b=RWwPsyjTSl0Xq4NkViwg1kU/R9iFFMfus9YN9FEmYR2k4840ErsePEWZDCC9L6mcot
-         s/AV0v9gmAg6FgrDPQY6CItrb8TndShxzQcEtNbl7x6OF0981qC04QIjM6RMnf950tgP
-         w5j9U8k/v1ytQ+u/k7Caqd3XceoHATghhwlbWe5Rfx0ShezFEDTDZOuaQhhZz3pIJdwJ
-         hsmnHrgwreedxzej7G7wAUjwZVroIIjTP9zQY2wm3l3iXSgZqW+tc09HFDGY9CsWvVPH
-         gRNRnCum7S/91AtdMgJIaMOSCllafH/vaY9ZuntCw8UHLJsHoNRr+E9VYRIbC9cMlnj6
-         Shtg==
-X-Forwarded-Encrypted: i=1; AJvYcCVZcnFy35H368lh4f7PAh8w0xEmyUfaWr2XUd3uBbo8aisiFDa5sXYYN+tBt6FCllVrlFVX2BcX5xPVwlSUNcrNhFrv
-X-Gm-Message-State: AOJu0YwLlQ2WUDqsTEBeIC0QoP04nW7/+dpBnyLOJPDSKWnwW1BDRnfL
-	PCmTgP+B+GiMiYD6c6JymA29W0uANY/G18GcvPqA9f7xWkixHq3MlYpN88mGIEhnWbU3ddpOfhx
-	3Qy8VHGSVIfYO82fdXf+2zypDazC5Kw2lLiTHQdeSXoWIWB+eCJYOkAJiHUCuhkivKbE6VMes6c
-	NOez0nyuOtsecAxZVYApIUDMwt
-X-Received: by 2002:a2e:8812:0:b0:2d0:99b7:e68c with SMTP id x18-20020a2e8812000000b002d099b7e68cmr3187977ljh.15.1708102974552;
-        Fri, 16 Feb 2024 09:02:54 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGGN6nw3gQobDUDZcnFDlf7+jbQOPBJzQ28faqnSRYOwwYW67ZgndKNx5rvCkm2md+nuH+eEh+bF32F9J7zeB4=
-X-Received: by 2002:a2e:8812:0:b0:2d0:99b7:e68c with SMTP id
- x18-20020a2e8812000000b002d099b7e68cmr3187960ljh.15.1708102974223; Fri, 16
- Feb 2024 09:02:54 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708103013; x=1708707813;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jSjwEV6mZP9dDWBaOFoNSK/PtiDDO4b/rWPQcC9pvsg=;
+        b=rbJY4jGPZ+Hl7dr9OAQfksWTu25gcK0XB9p3xmHZ7HhiSdj46imTFjg1Sgnj+WzOXz
+         5vxgpM8AgePLZX13BEzRRkaKDvlZATGsm0RXa3Zc0SEFnVPi00Z0fmLUZecmMh5wWjOv
+         CBT0hmC0ZSZ0jqrb99I9UOWTgoSQDRu5lNNhEBal3VOyl293shKl8YtjC7yqm5rAXr17
+         QAAti5BfrqEbMrWCyOeHYsifXPLwYWT/GEPnxb9NYeqReu6zFIe0Okx8BEnAdFOD+4NO
+         U5+aGdzPyjJ1eve7u7GOAl9fkq/1xh9d9KsXlhQk1F6IkxQDDQ/lkSUCQsZrCdYM9hHL
+         JRHw==
+X-Forwarded-Encrypted: i=1; AJvYcCV0j3RAiEiPWx41P1vAG59OZEp08Z9ijqixLEqG+CNYRIOhzKVQWLq4ZKBou25DAG4JcEi5BdBCGELkwLTl5jT//w1S
+X-Gm-Message-State: AOJu0YxI5BANjzUgm3/wLlojviU5mUUvuLKTwszacn44RjW3Cfr6nImP
+	2ebF5xQaBQTLgdK0Mvl2Cc+dBwTNCHvVS5ISFBopGSXcywpwSb3SNWxx+MkJYHbAdc6wQ1hAF1L
+	QjQ==
+X-Google-Smtp-Source: AGHT+IHp1ru1ym1MOeIsh/L/7YFwB33JnFl5QGD7UpvfqU3NoR29oVAhAcaA5dbK4aF5jKPPzeQH1neroQg=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:10c3:b0:dc6:ebd4:cca2 with SMTP id
+ w3-20020a05690210c300b00dc6ebd4cca2mr197453ybu.11.1708103013199; Fri, 16 Feb
+ 2024 09:03:33 -0800 (PST)
+Date: Fri, 16 Feb 2024 09:03:31 -0800
+In-Reply-To: <Zc-FXbxEfPNddiiL@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240215152935.3093768-1-maz@kernel.org>
-In-Reply-To: <20240215152935.3093768-1-maz@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 16 Feb 2024 18:02:42 +0100
-Message-ID: <CABgObfZAr77NxyoMCih1+hVQ9=Usu9p+yqkoqdCBQSuWwPvv1Q@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.8, take #2
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>, Ricardo Koller <ricarkol@google.com>, 
-	Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20240215010004.1456078-1-seanjc@google.com> <20240215010004.1456078-3-seanjc@google.com>
+ <Zc3JcNVhghB0Chlz@linux.dev> <Zc5c7Af-N71_RYq0@google.com>
+ <Zc5wTHuphbg3peZ9@linux.dev> <Zc6DPEWcHh-TKCSD@google.com>
+ <Zc6d6fwakreoVtN5@linux.dev> <Zc6rmksmgZ31fd-K@google.com> <Zc-FXbxEfPNddiiL@linux.dev>
+Message-ID: <Zc-VY7yS5aDxMIp6@google.com>
+Subject: Re: [PATCH 2/2] KVM: selftests: Test forced instruction emulation in
+ dirty log test (x86 only)
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	David Matlack <dmatlack@google.com>, Pasha Tatashin <tatashin@google.com>, 
+	Michael Krebs <mkrebs@google.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Feb 15, 2024 at 4:29=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote=
-:
->
-> Hi Paolo,
->
-> Another week, another very small pull request. This time, the bug is
-> irritating enough that I want it fixed and backported right away. It
-> has only been found by inspection (thanks Will!), but once you've seen
-> it, you can unsee it.
->
-> If you haven't pulled the previous tag [1], you'll get both for free.
->
-> Please pull,
+On Fri, Feb 16, 2024, Oliver Upton wrote:
+> On Thu, Feb 15, 2024 at 04:26:02PM -0800, Sean Christopherson wrote:
+> > On Thu, Feb 15, 2024, Oliver Upton wrote:
+> > > On Thu, Feb 15, 2024 at 01:33:48PM -0800, Sean Christopherson wrote:
+> > > 
+> > > [...]
+> > > 
+> > > > +/* TODO: Expand this madness to also support u8, u16, and u32 operands. */
+> > > > +#define vcpu_arch_put_guest(mem, val, rand) 						\
+> > > > +do {											\
+> > > > +	if (!is_forced_emulation_enabled || !(rand & 1)) {				\
+> > > > +		*mem = val;								\
+> > > > +	} else if (rand & 2) {								\
+> > > > +		__asm__ __volatile__(KVM_FEP "movq %1, %0"				\
+> > > > +				     : "+m" (*mem)					\
+> > > > +				     : "r" (val) : "memory");				\
+> > > > +	} else {									\
+> > > > +		uint64_t __old = READ_ONCE(*mem);					\
+> > > > +											\
+> > > > +		__asm__ __volatile__(KVM_FEP LOCK_PREFIX "cmpxchgq %[new], %[ptr]"	\
+> > > > +				     : [ptr] "+m" (*mem), [old] "+a" (__old)		\
+> > > > +				     : [new]"r" (val) : "memory", "cc");		\
+> > > > +	}										\
+> > > > +} while (0)
+> > > > +
+> > > 
+> > > Last bit of bikeshedding then I'll go... Can you just use a C function
+> > > and #define it so you can still do ifdeffery to slam in a default
+> > > implementation?
+> > 
+> > Yes, but the macro shenanigans aren't to create a default, they're to set the
+> > stage for expanding to other sizes without having to do:
+> > 
+> >   vcpu_arch_put_guest{8,16,32,64}()
+> > 
+> > or if we like bytes instead of bits:
+> > 
+> >   vcpu_arch_put_guest{1,2,4,8}()
+> > 
+> > I'm not completely against that approach; it's not _that_ much copy+paste
+> > boilerplate, but it's enough that I think that macros would be a clear win,
+> > especially if we want to expand what instructions are used.
+> 
+> Oh, I see what you're after. Yeah, macro shenanigans are the only way
+> out then. Wasn't clear to me if the interface you wanted w/ the selftest
+> was a u64 write that you cracked into multiple writes behind the
+> scenes.
 
-Pulled, thanks.
+I don't want to split u64 into multiple writes, as that would really violate the
+principle of least surprise.  Even the RMW of the CMPXCHG is pushing things.
 
-Paolo
+What I want is to provide an API that can be used by tests to generate guest writes
+for the native/common sizes.  E.g. so that xen_shinfo_test can write 8-bit fields
+using the APIs (don't ask me how long it took me to find a decent example that
+wasn't using a 64-bit value :-) ).
 
->         M.
->
-> [1] https://lore.kernel.org/r/20240207144611.1128848-1-maz@kernel.org
->
->
-> The following changes since commit 42dfa94d802a48c871e2017cbf86153270c866=
-32:
->
->   KVM: arm64: Do not source virt/lib/Kconfig twice (2024-02-04 13:08:28 +=
-0000)
-> are available in the Git repository at:
->
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kv=
-marm-fixes-6.8-2
->
-> for you to fetch changes up to c60d847be7b8e69e419e02a2b3d19c2842a3c35d:
->
->   KVM: arm64: Fix double-free following kvm_pgtable_stage2_free_unlinked(=
-) (2024-02-13 19:22:03 +0000)
->
-> ----------------------------------------------------------------
-> KVM/arm64 fixes for 6.8, take #2
->
-> - Avoid dropping the page refcount twice when freeing an unlinked
->   page-table subtree.
->
-> ----------------------------------------------------------------
-> Will Deacon (1):
->       KVM: arm64: Fix double-free following kvm_pgtable_stage2_free_unlin=
-ked()
->
->  arch/arm64/kvm/hyp/pgtable.c | 2 --
->  1 file changed, 2 deletions(-)
->
+	struct vcpu_info {
+		uint8_t evtchn_upcall_pending;
+		uint8_t evtchn_upcall_mask;
+		unsigned long evtchn_pending_sel;
+		struct arch_vcpu_info arch;
+		struct pvclock_vcpu_time_info time;
+	}; /* 64 bytes (x86) */
 
+	vcpu_arch_put_guest(vi->evtchn_upcall_pending, 0);
+	vcpu_arch_put_guest(vi->evtchn_pending_sel, 0);
+
+And of course fleshing that out poked a bunch of holes in my plan, so after a
+bit of scope screep...
+
+---
+#define vcpu_arch_put_guest(mem, __val) 						\
+do {											\
+	const typeof(mem) val = (__val);						\
+											\
+	if (!is_forced_emulation_enabled || guest_random_bool(&guest_rng)) {		\
+		(mem) = val;								\
+	} else if (guest_random_bool(&guest_rng)) {					\
+		__asm__ __volatile__(KVM_FEP "mov %1, %0"				\
+				     : "+m" (mem)					\
+				     : "r" (val) : "memory");				\
+	} else {									\
+		uint64_t __old = READ_ONCE(mem);					\
+											\
+		__asm__ __volatile__(KVM_FEP LOCK_PREFIX "cmpxchg %[new], %[ptr]"	\
+				     : [ptr] "+m" (mem), [old] "+a" (__old)		\
+				     : [new]"r" (val) : "memory", "cc");		\
+	}										\
+} while (0)
+---
+
+Where guest_rng is a global pRNG instance
+
+	struct guest_random_state {
+		uint32_t seed;
+	};
+
+	extern uint32_t guest_random_seed;
+	extern struct guest_random_state guest_rng;
+
+that's configured with a completely random seed by default, but can be overriden
+by tests for determinism, e.g. in dirty_log_perf_test
+
+  void __attribute((constructor)) kvm_selftest_init(void)
+  {
+	/* Tell stdout not to buffer its content. */
+	setbuf(stdout, NULL);
+
+	guest_random_seed = random();
+
+	kvm_selftest_arch_init();
+  }
+
+and automatically configured for each VM.
+
+	pr_info("Random seed: 0x%x\n", guest_random_seed);
+	guest_rng = new_guest_random_state(guest_random_seed);
+	sync_global_to_guest(vm, guest_rng);
+
+	kvm_arch_vm_post_create(vm);
+
+Long term, I want to get to the point where the library code supports specifying
+a seed for every test, i.e. so that every test that uses the pRNG can be as
+deterministic as possible.  But that's definitely a future problem :-)
 
