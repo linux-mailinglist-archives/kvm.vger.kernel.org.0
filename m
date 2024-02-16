@@ -1,158 +1,143 @@
-Return-Path: <kvm+bounces-8867-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8868-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C59FB857E70
-	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 15:02:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B638857E86
+	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 15:03:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 667371F2851D
-	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 14:02:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 759CD1C219C5
+	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 14:03:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B74812AAD9;
-	Fri, 16 Feb 2024 14:02:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5675712C54E;
+	Fri, 16 Feb 2024 14:03:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SvD5dpf5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RntgdMrA"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6172512C550
-	for <kvm@vger.kernel.org>; Fri, 16 Feb 2024 14:02:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3C5512A17B;
+	Fri, 16 Feb 2024 14:03:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708092148; cv=none; b=NG/0yndtyOuhWnOu9/C8BAZRdAv0iuOh7zLpFrSlxY0htdNeXm9dvEr7+GkVYGETL6NzbGjpMQYljQRYY1lNZ9i2y0sha66lsMhfdh75iWYGZW/mP4TF5OuzwEmwLRi5Ywj6INLpbT5xJDc7JgW5fhpmDhmzI3gfCt6C4GqaheU=
+	t=1708092221; cv=none; b=Z2w+Pt2TnZYkkPxv1UPFgfZiG+UO+bNwBme/mSoodsIjVYKR+tr1dzELKEvjLXex8iAK2cbdxiHCb8T5C1OArIsHDiuBuyXsCoNR7EOIxTpRP1e9JKGH6Oznm9TCvFTHjqfbQW3HeYSTa3Bcubz4hcO+nP2jH1MqCPHJCa/5c00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708092148; c=relaxed/simple;
-	bh=K6LB6+MemA9fj3a/ZAx6PykgqUbVt5cwV8Jss8rIfdA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=owMP5i6C0vGTZpq7SUwzVg6KXdTKhnEqBk/fo80C4GenhHHSJRbl0BSiIp2jv7scseK3VEsLYBXadC5/yQX6YbNv9k2Ag4OH7vzb44SMHcBehDbubZXTxTMhnfuWWtHdnVwseIRAtY5ipII5/XxLcvcjxe6erUZ95ty3MWqvhu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SvD5dpf5; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708092143;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=FhaTO4DXP/qUKknQgbcg7AfYeRWWKpGtUjyGYREPOM0=;
-	b=SvD5dpf5I30ZXnWH3biz0M3lxR1GgS14HVV6D47fDOdnwBhpTLd2MJx1IeASttjLsMxMiV
-	RJ2ALvPl4vBeXFmbPGF4nvxvyKEptjudaUNK3jiomDI1xOw07x9CT210Yta6hjMVSndxJl
-	piNuFfBXUeyA13TYxXcyrywL3bRP8XY=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-335-PyC4bJcdN-2Mq5uo3tMMUw-1; Fri,
- 16 Feb 2024 09:02:18 -0500
-X-MC-Unique: PyC4bJcdN-2Mq5uo3tMMUw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EF80638125B1;
-	Fri, 16 Feb 2024 14:02:13 +0000 (UTC)
-Received: from thuth-p1g4.redhat.com (unknown [10.39.192.46])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 66A0F2166B4F;
-	Fri, 16 Feb 2024 14:02:11 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: Andrew Jones <andrew.jones@linux.dev>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	kvm@vger.kernel.org,
-	Nicholas Piggin <npiggin@gmail.com>
-Cc: kvmarm@lists.linux.dev
-Subject: [kvm-unit-tests PATCH] lib/arm/io: Fix calling getchar() multiple times
-Date: Fri, 16 Feb 2024 15:02:10 +0100
-Message-ID: <20240216140210.70280-1-thuth@redhat.com>
+	s=arc-20240116; t=1708092221; c=relaxed/simple;
+	bh=fU0hwmRGyFTOLSAjpHgGpOPMJ/0TXEpq6Pv7k51TnvE=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:References:
+	 In-Reply-To:Content-Type; b=A00hsDCRQFaVdIhjoAKXowit4YJ7Wgu+XD4d8i/WMvYg4c/jgHUvRE40SU75N7JCH8bFNnlTY1mLOCyQkCTbHn7mviRZq948vYpcYYwJg+nipmCAnGTuD+Ru66L544wNtAznKF27a4T/sYLqYlZliWJsgr77vmBNDz0uueKPEsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RntgdMrA; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-3394ca0c874so552494f8f.2;
+        Fri, 16 Feb 2024 06:03:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708092218; x=1708697018; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :references:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=jrZU1p4bqROFpqXXAVPV54W+msblPmb4h2fJiYyz+t4=;
+        b=RntgdMrAaPVOeC6xckt0BKHNN17uQK9Lwwpo3C7f1Md/n4MmAQTMzoT8661p0FvuiC
+         OaLUrT4vV5hKI6OcZ05EZbg9fniig7CrRe4XxEr9B/vNZnnQlwFNlboyDer1npsXWtP0
+         6a4g6UTAtT4GDcLEiLRjed5catI/fn1buYhu7gHAd24XeV86kMeJoDmcjgyM94eDQUBI
+         Y6IxSkNDc7nYiGShZgUMhsS1HGpyy+/BItRl2ztpLz95n0UARq+I2J8NjEtqcf5RAW30
+         2nM2FRHlhmC3LGmmxv2NXd3WlYUuOn7uN1tr2zBXRzVPaQhL9lGXaqkerueWogJ/CZWY
+         daHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708092218; x=1708697018;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :references:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jrZU1p4bqROFpqXXAVPV54W+msblPmb4h2fJiYyz+t4=;
+        b=F2b6ejFUjPjtf7VX8V3r8zNHA02UjYdAzi/j5iZsd1whFeGTo+E5X8sF7/2F0GjFsK
+         ZWsbU6bfd3YZLH57uQCsJPXX9iyqUgD39K2TOi++sd14pQFm72NTbNBJ5bnI1Uz7m5Pw
+         H9ZbuCXcnYAg0aBmgfpd6yfC7lF8FZgOoTNcYzC51p4i0DihNN8IPTTwKRvWOFQIkLGN
+         JwBA/ME5bvQPPacu15UkM0kJ1IyFMCZVodXcaicokKb78k/WUxY3kyT2OB/H3M+fpzg8
+         70lUTkpITxB1vng5KwXpPDeJuGrRjhzcG6nzyq+jF6cIiQDIdJ6E0/PPQ/jsWDN9WLFM
+         yY1A==
+X-Forwarded-Encrypted: i=1; AJvYcCU4JGz0uBMK9U5zvIiOqbYntWIiakaHTjK2YYWDDiDBG4a8qpo2hVqyEfDPE5q8iT/I5+Ff06bOWBMJ2NWNyDBV2TCXv1jOY9MksBLZx54/rFbzsqdEuRfNpr8ZW8z1Zo6q6i1U2+8i8NTaQcymqKTRkcWniK4yNUENmmMfB+IJ8f0Kxjr2wUPTru7AK/HC0FdTZrOgtRRWkEsVUQnbz7qfwk9KPui1oLNr93jAHmToeMsBdInii2CRkA==
+X-Gm-Message-State: AOJu0Ywg4EubUlpsNKvDmlAdq8S0oUCgf03vLyu9vtaHTFXoDrtHFpPL
+	5eNlIgaKC1ttJrcWVPlIHs/yYXh4ZbFvrJeluUTB72WRzPCWrIDJ
+X-Google-Smtp-Source: AGHT+IGlmQaMTRNrUCkgqD5x0iLG0XTzBquhOs3ZOzxy3JwdHfWyExLj/iT06IsbaC6HFAePFRpmFA==
+X-Received: by 2002:a5d:4b50:0:b0:33c:e32f:fb7e with SMTP id w16-20020a5d4b50000000b0033ce32ffb7emr4200150wrs.2.1708092217730;
+        Fri, 16 Feb 2024 06:03:37 -0800 (PST)
+Received: from [192.168.14.15] (54-240-197-232.amazon.com. [54.240.197.232])
+        by smtp.gmail.com with ESMTPSA id u5-20020a056000038500b0033b66ce7ae9sm2357799wrf.84.2024.02.16.06.03.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 16 Feb 2024 06:03:37 -0800 (PST)
+From: Paul Durrant <xadimgnik@gmail.com>
+X-Google-Original-From: Paul Durrant <paul@xen.org>
+Message-ID: <df6ad8b9-4e53-4357-ab17-e9af62342849@xen.org>
+Date: Fri, 16 Feb 2024 14:03:33 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
+User-Agent: Mozilla Thunderbird
+Reply-To: paul@xen.org
+Subject: Re: [PATCH v13 21/21] KVM: pfncache: rework __kvm_gpc_refresh() to
+ fix locking issues
+To: David Woodhouse <dwmw2@infradead.org>, Paolo Bonzini
+ <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>,
+ Sean Christopherson <seanjc@google.com>, Thomas Gleixner
+ <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+ Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-s390@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20240215152916.1158-1-paul@xen.org>
+ <20240215152916.1158-22-paul@xen.org>
+ <23e7ec31a67a73fe94b2b04dbca26ea5ca1ea238.camel@infradead.org>
+Content-Language: en-US
+Organization: Xen Project
+In-Reply-To: <23e7ec31a67a73fe94b2b04dbca26ea5ca1ea238.camel@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-getchar() can currently only be called once on arm since the implementation
-is a little bit too  naïve: After the first character has arrived, the
-data register never gets set to zero again. To properly check whether a
-byte is available, we need to check the "RX fifo empty" on the pl011 UART
-or the "RX data ready" bit on the ns16550a UART instead.
+On 16/02/2024 13:04, David Woodhouse wrote:
+> On Thu, 2024-02-15 at 15:29 +0000, Paul Durrant wrote:
+>> From: David Woodhouse <dwmw@amazon.co.uk>
+>>
+>> This function can race with kvm_gpc_deactivate(), which does not take
+>> the ->refresh_lock. This means kvm_gpc_deactivate() can wipe the ->pfn
+>> and ->khva fields, and unmap the latter, while hva_to_pfn_retry() has
+>> temporarily dropped its write lock on gpc->lock.
+> 
+> Let's drop this from your series for now, as it's contentious.
+> 
+> Sean didn't like calling it a 'fix', which I had conceded and reworked
+> the commit message. It was on the list somewhere, and also in
+> https://git.infradead.org/users/dwmw2/linux.git/commitdiff/f19755000a7
+> 
+> I *also* think we should do this simpler one:
+> https://git.infradead.org/users/dwmw2/linux.git/commitdiff/cc69506d19a
+> ... which almost makes the first one unnecessary, but I think we should
+> do it *anyway* because the rwlock abuse it fixes is kind of awful.
+> 
+> And while we still can't actually *identify* the race condition that
+> led to a dereference of a NULL gpc->khva while holding the read lock
+> and gpc->valid and gpc->active both being true... I'll eat my hat if
+> cleaning up and simplifying the locking (and making it self-contained)
+> *doesn't* fix it.
+> 
+> But either way, it isn't really part of your series. The only reason it
+> was tacked on the end was because it would have merge conflicts with
+> your series, which had been outstanding for months already.
+> 
+> So drop this one, and I'll work this bit out with Sean afterwards.
 
-With this proper check in place, we can finally also get rid of the
-ugly assert(count < 16) statement here.
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- lib/arm/io.c | 34 ++++++++++++++--------------------
- 1 file changed, 14 insertions(+), 20 deletions(-)
-
-diff --git a/lib/arm/io.c b/lib/arm/io.c
-index c15e57c4..836fa854 100644
---- a/lib/arm/io.c
-+++ b/lib/arm/io.c
-@@ -28,6 +28,7 @@ static struct spinlock uart_lock;
-  */
- #define UART_EARLY_BASE (u8 *)(unsigned long)CONFIG_UART_EARLY_BASE
- static volatile u8 *uart0_base = UART_EARLY_BASE;
-+bool is_pl011_uart;
- 
- static void uart0_init_fdt(void)
- {
-@@ -59,7 +60,10 @@ static void uart0_init_fdt(void)
- 			abort();
- 		}
- 
-+		is_pl011_uart = (i == 0);
- 	} else {
-+		is_pl011_uart = !fdt_node_check_compatible(dt_fdt(), ret,
-+		                                           "arm,pl011");
- 		ret = dt_pbus_translate_node(ret, 0, &base);
- 		assert(ret == 0);
- 	}
-@@ -111,31 +115,21 @@ void puts(const char *s)
- 	spin_unlock(&uart_lock);
- }
- 
--static int do_getchar(void)
-+int __getchar(void)
- {
--	int c;
-+	int c = -1;
- 
- 	spin_lock(&uart_lock);
--	c = readb(uart0_base);
--	spin_unlock(&uart_lock);
--
--	return c ?: -1;
--}
--
--/*
-- * Minimalist implementation for migration completion detection.
-- * Without FIFOs enabled on the QEMU UART device we just read
-- * the data register: we cannot read more than 16 characters.
-- */
--int __getchar(void)
--{
--	int c = do_getchar();
--	static int count;
- 
--	if (c != -1)
--		++count;
-+	if (is_pl011_uart) {
-+		if (!(readb(uart0_base + 6 * 4) & 0x10))  /* RX not empty? */
-+			c = readb(uart0_base);
-+	} else {
-+		if (readb(uart0_base + 5) & 0x01)         /* RX data ready? */
-+			c = readb(uart0_base);
-+	}
- 
--	assert(count < 16);
-+	spin_unlock(&uart_lock);
- 
- 	return c;
- }
--- 
-2.43.0
-
+Ok. Sean, I assume that since this is the last patch in the series it's 
+superfluous for me to post a v14 just for this?
 
