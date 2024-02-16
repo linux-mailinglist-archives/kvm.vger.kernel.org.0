@@ -1,137 +1,220 @@
-Return-Path: <kvm+bounces-8878-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8879-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79968858174
-	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 16:40:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 309648581AD
+	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 16:48:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3080E1F21367
-	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 15:40:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC27028A62D
+	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 15:48:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC8BE131738;
-	Fri, 16 Feb 2024 15:36:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Cyd3lW1F"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52BCC12FB20;
+	Fri, 16 Feb 2024 15:47:57 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B7B6130E4A
-	for <kvm@vger.kernel.org>; Fri, 16 Feb 2024 15:35:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F02512F373
+	for <kvm@vger.kernel.org>; Fri, 16 Feb 2024 15:47:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708097760; cv=none; b=rYuN6DHe4UDGJEK2P7HK2bL9WpTsaI0u54hZiiZ6iMiNPEsodMPKHjZGs0twksKbNEgmUVqK5992bkTRmruC0PYkvqGZeNU0/BthnO9zcJ7krJ6+Icr2qE0w7q9dflUUuWWW4IC39+ITbNO3oeE/eRaUECRQrQ3ap85dV4SIQDU=
+	t=1708098476; cv=none; b=ARqRx2Ei+T7F5KxckV0dD2j1LvwdD+tNTg7fWY/kv3uyePdNo1uO4e7sMDQdyJdRzt2G4WylrBhHBzbsgKhuUkfAwSenpd3jxvnB+n7o0xCCcw37qoJylILX2v/X0Gp41AOnF3ad4wg1lYOfaidoN7lg7AX439/+AKD6I9IDOaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708097760; c=relaxed/simple;
-	bh=fixOx+DdCCs3/qzHLRZOIn8B/mfiHSNF8Fmdld4Lyc8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qIKLEs1thsGCTD6dZ3OSB6q7UG6FqXlR64I+NulIyZFE0Fsb326H0Z4Z/M5X9lbK0ZV15U/XaiUgybWlBRypwO1V7XIPIhy9aJhfcCHNx9iV2sRLpPVYENgnaIQKTnRUmol2x7tBoTXgiqcpHo1wtRwjlzlAJtsaX9q/pKP0tpo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Cyd3lW1F; arc=none smtp.client-ip=209.85.218.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a293f2280c7so306498866b.1
-        for <kvm@vger.kernel.org>; Fri, 16 Feb 2024 07:35:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1708097756; x=1708702556; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hOmGAqEBBOEy9P6DsYyadVIEFCheEXAYvta8nSQ9bhE=;
-        b=Cyd3lW1F5/UTLDcmtDpZ8SS4o2NQArA05vLGLPgy6PK/2V+Ac+YYUObB4YMXvVgD8l
-         40q+r5J7lbdICVTOfB9D3paeL9ZrFrDQkm92ImvqBsV4r8vKFLmmyQiOGuNUWEbTMtkY
-         wva+j9zZ+N5ICl0/77QtsTlc0C9Q0uA6OhYruG8EjJMoIohTQ7W+8lPsFG8bAEGYI3Cu
-         WjP4o3P9erxDu434M5L0LT8odlwt24LWh3J1x7ubCatEnoABN43sj6PVIU6bP1XaQfR5
-         Bh3CqhY1eIz9YblxopyhuY0SXIUkDDcfLqkLubljtxD0IhWXTqHeXSuTtS2mMzNHLbsX
-         p/Cg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708097756; x=1708702556;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hOmGAqEBBOEy9P6DsYyadVIEFCheEXAYvta8nSQ9bhE=;
-        b=QqrPmc9v2s7v24QzdLhdfiAFY+vE+cmcis29DlnB/W8zCakPgAzbJrZ/aJIsOtXHJJ
-         C5CBc5qkkJ7KhUtIw4WYO/rnd+RkpSbHfOBB/9TsMytu7R/1IRJeBGRmUGUdsr4pJ2Ed
-         OzjLsyXSGph3ifH+vP0eD6pe2luDYrO/6vLgQXQsN7PZBOm06IMRxiqGNJDgNnE5e+GQ
-         UCMNdh2iIH3fDRQUZCPzhwDMKUf3MIBQSKHj1HQIW+e3rq64qAIBKynjDtPcVuUr4Dog
-         rhbpEAM/SQAdOw9wa+CJmCuh3HlOXBYhpP4uAvOrnUZQf2jrQqf/PozcKWD3de8+jcsI
-         VcqQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUNtUP7+ildumBUsEPp5LweicE7j0c5H2jqKogwM2fdAVQXJGAiwa7xcuTsfB16c3hgq1Ekc0Ey4DFvRmKKFl7XxvZ2
-X-Gm-Message-State: AOJu0YwehybxiM3TN+DlxffetieSAL9c3b8xCVcuoNFJsxWWl5uSyM3D
-	8fxA+eji6XhjMk1ZizlEOdGM5LVPBgS2VDs+v3VFpqYob8Azsq+jIIhYQK3859A=
-X-Google-Smtp-Source: AGHT+IGBmhb6VOfB2zCo0LEpA88KaKbBg1ovfqo3KF7CJB2va+ushmG+IzCBDpkcDMp91+krbOftmg==
-X-Received: by 2002:a17:906:c415:b0:a3d:7d6b:2dc3 with SMTP id u21-20020a170906c41500b00a3d7d6b2dc3mr3608466ejz.73.1708097756627;
-        Fri, 16 Feb 2024 07:35:56 -0800 (PST)
-Received: from m1x-phil.lan ([176.187.210.246])
-        by smtp.gmail.com with ESMTPSA id fy22-20020a170906b7d600b00a3cf4e8fdf5sm44841ejb.150.2024.02.16.07.35.55
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Fri, 16 Feb 2024 07:35:56 -0800 (PST)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	qemu-arm@nongnu.org,
-	kvm@vger.kernel.org,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Igor Mitsyanko <i.mitsyanko@gmail.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Subject: [PATCH 6/6] hw/sysbus: Remove now unused sysbus_address_space()
-Date: Fri, 16 Feb 2024 16:35:17 +0100
-Message-ID: <20240216153517.49422-7-philmd@linaro.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20240216153517.49422-1-philmd@linaro.org>
-References: <20240216153517.49422-1-philmd@linaro.org>
+	s=arc-20240116; t=1708098476; c=relaxed/simple;
+	bh=ePAM1xu/hzDpmCmPX992sRfMOfQHjbkEuROYc3V3MVE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BQibzk8HCfwhVdV/0ygmnZuWzyLUn5vAYqXxUdUKGbOdAIqZE7GySMOlaF6oVaAczaJgT6iEGtwyz1Xz7WBqVdqfQ3OLpPuDF6wKt2w3UObHN1MiibhW0wvm+7HvnggSCxKnGTiYrX6XTuvja6dlbhwd5QrGo9dTlEo7KULF3Yk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D3050DA7;
+	Fri, 16 Feb 2024 07:48:27 -0800 (PST)
+Received: from raptor (unknown [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EC7BE3F694;
+	Fri, 16 Feb 2024 07:47:44 -0800 (PST)
+Date: Fri, 16 Feb 2024 15:47:41 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Shaoqin Huang <shahuang@redhat.com>
+Cc: Andrew Jones <andrew.jones@linux.dev>, kvmarm@lists.linux.dev,
+	David Woodhouse <dwmw@amazon.co.uk>,
+	Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org,
+	Laurent Vivier <lvivier@redhat.com>, linuxppc-dev@lists.ozlabs.org,
+	Nadav Amit <namit@vmware.com>, Nico Boehr <nrb@linux.ibm.com>,
+	Nikos Nikoleris <nikos.nikoleris@arm.com>,
+	Thomas Huth <thuth@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v1 00/18] arm/arm64: Rework cache
+ maintenance at boot
+Message-ID: <Zc-DnSvmJbT4Lk73@raptor>
+References: <20231130090722.2897974-1-shahuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231130090722.2897974-1-shahuang@redhat.com>
 
-sysbus_address_space() is not more used, remove it.
+Hi,
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
----
- include/hw/sysbus.h | 1 -
- hw/core/sysbus.c    | 5 -----
- 2 files changed, 6 deletions(-)
+On Thu, Nov 30, 2023 at 04:07:02AM -0500, Shaoqin Huang wrote:
+> Hi,
+> 
+> I'm posting Alexandru's patch set[1] rebased on the latest branch with the
+> conflicts being resolved. No big changes compare to its original code.
+> 
+> As this version 1 of this series was posted one years ago, I would first let you
+> recall it, what's the intention of this series and what this series do. You can
+> view it by click the link[2] and view the cover-letter.
+> 
+> Since when writing the series[1], the efi support for arm64[3] hasn't been
+> merged into the kvm-unit-tests, but now the efi support for arm64 has been
+> merged. Directly rebase the series[1] onto the latest branch will break the efi
+> tests. This is mainly because the Patch #15 ("arm/arm64: Enable the MMU early")
+> moves the mmu_enable() out of the setup_mmu(), which causes the efi test will
+> not enable the mmu. So I do a small change in the efi_mem_init() which makes the
+> efi test also enable the MMU early, and make it works.
+> 
+> And another change should be noticed is in the Patch #17 ("arm/arm64: Perform
+> dcache maintenance"). In the efi_mem_init(), it will disable the mmu, and build
+> a new pagetable and re-enable the mmu, if the asm_mmu_disable clean and
+> invalidate the data caches for entire memory, we don't need to care the dcache
+> and after mmu disabled, we use the mmu_setup_early() to re-enable the mmu, which
+> takes care all the cache maintenance. But the situation changes since the Patch
+> #18 ("arm/arm64: Rework the cache maintenance in asm_mmu_disable") only clean
+> and invalidate the data caches for the stack memory area. So we need to clean
+> and invalidate the data caches manually before disable the mmu, I'm not
+> confident about current cache maintenance at the efi setup patch, so I ask for
+> your help to review it if it's right or not.
+> 
+> And I also drop one patch ("s390: Do not use the physical allocator") from[1]
+> since this cause s390 test to fail.
 
-diff --git a/include/hw/sysbus.h b/include/hw/sysbus.h
-index 3564b7b6a2..01d4a400c6 100644
---- a/include/hw/sysbus.h
-+++ b/include/hw/sysbus.h
-@@ -85,7 +85,6 @@ void sysbus_mmio_map_overlap(SysBusDevice *dev, int n, hwaddr addr,
- void sysbus_mmio_unmap(SysBusDevice *dev, int n);
- void sysbus_add_io(SysBusDevice *dev, hwaddr addr,
-                    MemoryRegion *mem);
--MemoryRegion *sysbus_address_space(SysBusDevice *dev);
- 
- bool sysbus_realize(SysBusDevice *dev, Error **errp);
- bool sysbus_realize_and_unref(SysBusDevice *dev, Error **errp);
-diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
-index 35f902b582..5524287730 100644
---- a/hw/core/sysbus.c
-+++ b/hw/core/sysbus.c
-@@ -304,11 +304,6 @@ void sysbus_add_io(SysBusDevice *dev, hwaddr addr,
-     memory_region_add_subregion(get_system_io(), addr, mem);
- }
- 
--MemoryRegion *sysbus_address_space(SysBusDevice *dev)
--{
--    return get_system_memory();
--}
--
- static void sysbus_device_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *k = DEVICE_CLASS(klass);
--- 
-2.41.0
+This is unfortunate. What tests do you see failing?
 
+I wrote the s390x patch so I can justify dropping the locking in the
+physical allocator. And I wanted to drop the locking so I wouldn't have to
+do maintenance operation on the spinlock.
+
+Because of how kvm-unit-tests implements spinlocks for arm/arm64, they
+don't protect against concurrent accesses when the MMU is turned off. And
+because arm and arm64 use the physical allocator during the test boot
+sequence, not during a test, using a spin lock is also useless since there
+will be no concurrent accesses (the boot phase is done on a single CPU).
+
+But since replacing the physical allocator causes test failures for s390x,
+looks like the physical will still be needed to tests, and that requires
+having the spinlock.
+
+I guess the best approach would be to teach the physical allocator to do
+cache maintenance on the spinlock. We might as well, since the UART needs
+it too, and I don't think this series addresses that.
+
+Thanks,
+Alex
+
+> 
+> This series may include bug, so I really appreciate your review to improve this
+> series together.
+> 
+> You can get the code from:
+> 
+> $ git clone https://gitlab.com/shahuang/kvm-unit-tests.git \
+> 	-b arm-arm64-rework-cache-maintenance-at-boot-v1
+> 
+> [1] https://gitlab.arm.com/linux-arm/kvm-unit-tests-ae/-/tree/arm-arm64-rework-cache-maintenance-at-boot-v2-wip2
+> [2] https://lore.kernel.org/all/20220809091558.14379-1-alexandru.elisei@arm.com/
+> [3] https://patchwork.kernel.org/project/kvm/cover/20230530160924.82158-1-nikos.nikoleris@arm.com/
+> 
+> Changelog:
+> ----------
+> RFC->v1:
+>   - Gathered Reviewed-by tags.
+>   - Various changes to commit messages and comments to hopefully make the code
+>     easier to understand.
+>   - Patches #8 ("lib/alloc_phys: Expand documentation with usage and limitations")
+>     are new.
+>   - Folded patch "arm: page.h: Add missing libcflat.h include" into #17
+>     ("arm/arm64: Perform dcache maintenance at boot").
+>   - Reordered the series to group patches that touch aproximately the same code
+>     together - the patches that change the physical allocator are now first,
+>     followed come the patches that change how the secondaries are brought online.
+>   - Fixed several nasty bugs where the r4 register was being clobbered in the arm
+>     assembly.
+>   - Unmap the early UART address if the DTB address does not match the early
+>     address.
+>   - Added dcache maintenance when a page table is modified with the MMU disabled.
+>   - Moved the cache maintenance when disabling the MMU to be executed before the
+>     MMU is disabled.
+>   - Rebase it on lasted branch which efi support has been merged.
+>   - Make the efi test also enable MMU early.
+>   - Add cache maintenance on efi setup path especially before mmu_disable.
+> 
+> RFC: https://lore.kernel.org/all/20220809091558.14379-1-alexandru.elisei@arm.com/
+> 
+> Alexandru Elisei (18):
+>   Makefile: Define __ASSEMBLY__ for assembly files
+>   powerpc: Replace the physical allocator with the page allocator
+>   lib/alloc_phys: Initialize align_min
+>   lib/alloc_phys: Consolidate allocate functions into memalign_early()
+>   lib/alloc_phys: Remove locking
+>   lib/alloc_phys: Remove allocation accounting
+>   lib/alloc_phys: Add callback to perform cache maintenance
+>   lib/alloc_phys: Expand documentation with usage and limitations
+>   arm/arm64: Zero secondary CPUs' stack
+>   arm/arm64: Allocate secondaries' stack using the page allocator
+>   arm/arm64: assembler.h: Replace size with end address for
+>     dcache_by_line_op
+>   arm/arm64: Add C functions for doing cache maintenance
+>   arm/arm64: Configure secondaries' stack before enabling the MMU
+>   arm/arm64: Use pgd_alloc() to allocate mmu_idmap
+>   arm/arm64: Enable the MMU early
+>   arm/arm64: Map the UART when creating the translation tables
+>   arm/arm64: Perform dcache maintenance at boot
+>   arm/arm64: Rework the cache maintenance in asm_mmu_disable
+> 
+>  Makefile                   |   5 +-
+>  arm/Makefile.arm           |   4 +-
+>  arm/Makefile.arm64         |   4 +-
+>  arm/Makefile.common        |   6 +-
+>  arm/cstart.S               |  71 +++++++++++++++------
+>  arm/cstart64.S             |  76 +++++++++++++++++------
+>  lib/alloc_phys.c           | 122 ++++++++++++-------------------------
+>  lib/alloc_phys.h           |  28 ++++++---
+>  lib/arm/asm/assembler.h    |  15 ++---
+>  lib/arm/asm/cacheflush.h   |   1 +
+>  lib/arm/asm/mmu-api.h      |   1 +
+>  lib/arm/asm/mmu.h          |   6 --
+>  lib/arm/asm/page.h         |   2 +
+>  lib/arm/asm/pgtable.h      |  39 ++++++++++--
+>  lib/arm/asm/thread_info.h  |   3 +-
+>  lib/arm/cache.S            |  89 +++++++++++++++++++++++++++
+>  lib/arm/io.c               |  31 ++++++++++
+>  lib/arm/io.h               |   3 +
+>  lib/arm/mmu.c              |  37 ++++++++---
+>  lib/arm/processor.c        |   1 -
+>  lib/arm/setup.c            |  82 +++++++++++++++++++++----
+>  lib/arm/smp.c              |   5 ++
+>  lib/arm64/asm/assembler.h  |  11 ++--
+>  lib/arm64/asm/cacheflush.h |  37 +++++++++++
+>  lib/arm64/asm/mmu.h        |   5 --
+>  lib/arm64/asm/pgtable.h    |  50 +++++++++++++--
+>  lib/arm64/cache.S          |  85 ++++++++++++++++++++++++++
+>  lib/arm64/processor.c      |   1 -
+>  lib/devicetree.c           |   2 +-
+>  lib/powerpc/setup.c        |   9 ++-
+>  powerpc/Makefile.common    |   1 +
+>  powerpc/cstart64.S         |   1 -
+>  powerpc/spapr_hcall.c      |   5 +-
+>  33 files changed, 642 insertions(+), 196 deletions(-)
+>  create mode 100644 lib/arm/asm/cacheflush.h
+>  create mode 100644 lib/arm/cache.S
+>  create mode 100644 lib/arm64/asm/cacheflush.h
+>  create mode 100644 lib/arm64/cache.S
+> 
+> -- 
+> 2.40.1
+> 
 
