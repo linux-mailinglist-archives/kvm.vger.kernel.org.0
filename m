@@ -1,48 +1,47 @@
-Return-Path: <kvm+bounces-8859-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8860-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DC0B857848
-	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 09:59:45 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 450FD8578F9
+	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 10:38:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45B1028A3E4
-	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 08:59:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CB9C4B23980
+	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 09:38:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 259FA1C68D;
-	Fri, 16 Feb 2024 08:58:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 297171BC46;
+	Fri, 16 Feb 2024 09:38:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=xen0n.name header.i=@xen0n.name header.b="PUip6ZK8"
+	dkim=pass (1024-bit key) header.d=xen0n.name header.i=@xen0n.name header.b="mOrfbXlS"
 X-Original-To: kvm@vger.kernel.org
 Received: from mailbox.box.xen0n.name (mail.xen0n.name [115.28.160.31])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E9F81B953;
-	Fri, 16 Feb 2024 08:58:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FF441BDC9;
+	Fri, 16 Feb 2024 09:38:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.28.160.31
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708073918; cv=none; b=ZX35v7tIBmobjVExTeOD2r/kOLpQYJlntLqEB4EDLD/WAEyDm258uzCz4UQGjU3SDdMpfQHrBVvyttu9ENLCr3dI89wsITqCcT1CgY/lTAk7oKQZw2+/BxsdWciUPlS96EjHDBEciCFh3xtS0VOcAv7NnZa9haY6xDa92wGUAQQ=
+	t=1708076286; cv=none; b=Oz9qNlzq6D/oply0gxTtNE5c32b8x24jdQE9il/rHYGkO63GuJ+AGO4MfL1y4i40Qrn5a+23FEyysBhvJo9inMDhfBQOueAwvMGC9B+eVwzgemEDRuEZUbQy4vYWcrGYxqcf2+mTSZx4v/33cdmkSygQiBCgzavX53DBtYhHUO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708073918; c=relaxed/simple;
-	bh=DtEFhAQEuWhcL2m4hc/lngoLoAxoNkQBWWwvuXD4w1w=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bhO6LEFQ+GPRzTTXuKvaD36daOeo8pJHKkQ55AyagO7fuqo3tgADefSeOKEIEuAHim2ivfhA3PUg0lDiDcMM8Lit/9uNXlRKvx7waAKHbpRINOtk7ofUL7AwZccjLExevy4w0v6omPdWoyoe/uIIssBzmAFSyTKKAw3m/fn3QyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xen0n.name; spf=pass smtp.mailfrom=xen0n.name; dkim=pass (1024-bit key) header.d=xen0n.name header.i=@xen0n.name header.b=PUip6ZK8; arc=none smtp.client-ip=115.28.160.31
+	s=arc-20240116; t=1708076286; c=relaxed/simple;
+	bh=S4hpCs8mNTdKHxWWEnw+nDGq+xcgWq2m0IKCw72/mp8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TESluJq5zW9xYHUSP2v9VWz/zXgT/Y/o143o6MV1TAjx2HcN2IdU4IWI5tn1HWLszs9FcMCCMvJF3XvaF8F1jmOIWyw42b7yBd+xhZDf7WkJ/V9ShxpDFkxSzbUC+Qn+bTh+GuXlmIImm7odU7k4GAd9eheHxg9ZxaaBdUTjp1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xen0n.name; spf=pass smtp.mailfrom=xen0n.name; dkim=pass (1024-bit key) header.d=xen0n.name header.i=@xen0n.name header.b=mOrfbXlS; arc=none smtp.client-ip=115.28.160.31
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xen0n.name
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xen0n.name
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xen0n.name; s=mail;
-	t=1708073912; bh=DtEFhAQEuWhcL2m4hc/lngoLoAxoNkQBWWwvuXD4w1w=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=PUip6ZK8USok+nSkBCfF6TN6ppP63mPKCpNJ/IxLhek+TKsh91DmC5X7OcsUq7EC8
-	 JbuIfcen2SFLgSRZmMmrjkj9sdPUJdvHE337ASlx88hHjt5+v1e/vfQEYmx0XKLuWr
-	 JlDawwSjaaOOu7jwhyvAFKYSInK99C28SQNol3Do=
+	t=1708076281; bh=S4hpCs8mNTdKHxWWEnw+nDGq+xcgWq2m0IKCw72/mp8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=mOrfbXlSvKtZhwLbSLbBGTKJ/5vsHngfqKWqP/KaeMxMBwuu2ncaG8cc1IUopw162
+	 3IgsuChX7PaksEF3Uf7S3rSjyZ0JN2jMtOzvnfUyXdsv3zHdtjkE0NuDeJPfjT7YS8
+	 lzAJILesZ/KCskGt4d2GAnz13wBs1VyjUf5cWHgc=
 Received: from ld50.lan (unknown [IPv6:240e:388:8d00:6500:cda4:aa27:b0f6:1748])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mailbox.box.xen0n.name (Postfix) with ESMTPSA id 6FCF0601C6;
-	Fri, 16 Feb 2024 16:58:32 +0800 (CST)
+	by mailbox.box.xen0n.name (Postfix) with ESMTPSA id 1240360114;
+	Fri, 16 Feb 2024 17:38:00 +0800 (CST)
 From: WANG Xuerui <kernel@xen0n.name>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Huacai Chen <chenhuacai@kernel.org>
@@ -52,12 +51,10 @@ Cc: Tianrui Zhao <zhaotianrui@loongson.cn>,
 	loongarch@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	WANG Xuerui <git@xen0n.name>
-Subject: [PATCH for-6.8 v3 3/3] LoongArch: KVM: Streamline kvm_check_cpucfg and improve comments
-Date: Fri, 16 Feb 2024 16:58:22 +0800
-Message-ID: <20240216085822.3032984-4-kernel@xen0n.name>
+Subject: [PATCH RESEND for-6.8 v3 0/3] KVM: LoongArch: Fix wrong CPUCFG ID handling
+Date: Fri, 16 Feb 2024 17:37:56 +0800
+Message-ID: <20240216093759.3038760-1-kernel@xen0n.name>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240216085822.3032984-1-kernel@xen0n.name>
-References: <20240216085822.3032984-1-kernel@xen0n.name>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -68,94 +65,57 @@ Content-Transfer-Encoding: 8bit
 
 From: WANG Xuerui <git@xen0n.name>
 
-All the checks currently done in kvm_check_cpucfg can be realized with
-early returns, so just do that to avoid extra cognitive burden related
-to the return value handling.
+Hi,
 
-While at it, clean up comments of _kvm_get_cpucfg_mask and
-kvm_check_cpucfg, by removing comments that are merely restatement of
-the code nearby, and paraphrasing the rest so they read more natural
-for English speakers (that likely are not familiar with the actual
-Chinese-influenced grammar).
+(Sorry for the noise; in the previous revision the patch 1 contained a
+syntax error. I've also added a Fixes: tag for the KVM LASX support
+commit while at it.)
 
-No functional changes intended.
+While trying to add loongarch to the Rust kvm-bindings crate, I
+accidentally discovered faulty logic in the handling of CPUCFG IDs
+("leaves" for those more familiar with x86), that could result in
+incorrectly accepting every possible int for the ID; fortunately it is
+6.8 material that hasn't seen a release yet, so a fix is possible.
 
-Signed-off-by: WANG Xuerui <git@xen0n.name>
----
- arch/loongarch/kvm/vcpu.c | 44 +++++++++++++++++++--------------------
- 1 file changed, 21 insertions(+), 23 deletions(-)
+The first patch contains the fix, while the rest are general
+drive-by refactoring and comment cleanups.
 
-diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
-index d86da3811bea..a241db6d77a6 100644
---- a/arch/loongarch/kvm/vcpu.c
-+++ b/arch/loongarch/kvm/vcpu.c
-@@ -302,20 +302,16 @@ static int _kvm_get_cpucfg_mask(int id, u64 *v)
- {
- 	switch (id) {
- 	case 2:
--		/* Return CPUCFG2 features which have been supported by KVM */
-+		/* CPUCFG2 features unconditionally supported by KVM */
- 		*v = CPUCFG2_FP     | CPUCFG2_FPSP  | CPUCFG2_FPDP     |
- 		     CPUCFG2_FPVERS | CPUCFG2_LLFTP | CPUCFG2_LLFTPREV |
- 		     CPUCFG2_LAM;
- 		/*
--		 * If LSX is supported by CPU, it is also supported by KVM,
--		 * as we implement it.
-+		 * For the ISA extensions listed below, if one is supported
-+		 * by the host, then it is also supported by KVM.
- 		 */
- 		if (cpu_has_lsx)
- 			*v |= CPUCFG2_LSX;
--		/*
--		 * if LASX is supported by CPU, it is also supported by KVM,
--		 * as we implement it.
--		 */
- 		if (cpu_has_lasx)
- 			*v |= CPUCFG2_LASX;
- 
-@@ -345,24 +341,26 @@ static int kvm_check_cpucfg(int id, u64 val)
- 
- 	switch (id) {
- 	case 2:
--		/* CPUCFG2 features checking */
--		else if (!(val & CPUCFG2_LLFTP))
--			/* The LLFTP must be set, as guest must has a constant timer */
--			ret = -EINVAL;
--		else if ((val & CPUCFG2_FP) && (!(val & CPUCFG2_FPSP) || !(val & CPUCFG2_FPDP)))
--			/* Single and double float point must both be set when enable FP */
--			ret = -EINVAL;
--		else if ((val & CPUCFG2_LSX) && !(val & CPUCFG2_FP))
--			/* FP should be set when enable LSX */
--			ret = -EINVAL;
--		else if ((val & CPUCFG2_LASX) && !(val & CPUCFG2_LSX))
--			/* LSX, FP should be set when enable LASX, and FP has been checked before. */
--			ret = -EINVAL;
--		break;
-+		if (!(val & CPUCFG2_LLFTP))
-+			/* Guests must have a constant timer */
-+			return -EINVAL;
-+		if ((val & CPUCFG2_FP) && (!(val & CPUCFG2_FPSP) || !(val & CPUCFG2_FPDP)))
-+			/* Single and double float point must both be set when FP is enabled */
-+			return -EINVAL;
-+		if ((val & CPUCFG2_LSX) && !(val & CPUCFG2_FP))
-+			/* LSX architecturally implies FP but val does not satisfy that */
-+			return -EINVAL;
-+		if ((val & CPUCFG2_LASX) && !(val & CPUCFG2_LSX))
-+			/* LASX architecturally implies LSX and FP but val does not satisfy that */
-+			return -EINVAL;
-+		return 0;
- 	default:
--		break;
-+		/*
-+		 * Values for the other CPUCFG IDs are not being further validated
-+		 * besides the mask check above.
-+		 */
-+		return 0;
- 	}
--	return ret;
- }
- 
- static int kvm_get_one_reg(struct kvm_vcpu *vcpu,
+Although it is currently the Chinese holiday season, Huacai told me
+over IM that he's able to test the series and handle the upstreaming, so
+going through the loongarch tree seems to be the way forward for the
+series.
+
+v3 changes:
+
+- Fixed the validation by accepting every CPUCFG IDs from 0 to 20
+  inclusive, instead of only 2; this was a misunderstanding of mine
+  regarding the userland. (currently the only known user, the QEMU
+  target/loongarch KVM code, expects to be able to set all these 21
+  CPUCFG leaves, even though 7~15 are undefined according to the
+  LoongArch reference manual.) This also had the effect of squashing the
+  first 2 patches.
+- Made the _kvm_get_cpucfg_mask return a mask in all valid cases,
+  allowing the mask check to be lifted out of the CPUCFG2 case.
+- Swapped the "LoongArch:" and "KVM:" tags because right now the patches
+  are likely to reach mainline through the loongarch tree, and having
+  the "LoongArch:" prefix first is the convention here.
+
+v2 changes:
+
+- Squashed the v1 patches 4 and 5 according to Huacai's review
+- Reworded comments according to Huacai's suggestion
+- Use WARN_ON_ONCE (instead of BUG) to replace unreachable() for not
+  crashing the kernel (per checkpatch.pl suggestion)
+
+WANG Xuerui (3):
+  LoongArch: KVM: Fix input validation of _kvm_get_cpucfg and
+    kvm_check_cpucfg
+  LoongArch: KVM: Rename _kvm_get_cpucfg to _kvm_get_cpucfg_mask
+  LoongArch: KVM: Streamline kvm_check_cpucfg and improve comments
+
+ arch/loongarch/kvm/vcpu.c | 81 ++++++++++++++++++---------------------
+ 1 file changed, 38 insertions(+), 43 deletions(-)
+
 -- 
 2.43.0
 
