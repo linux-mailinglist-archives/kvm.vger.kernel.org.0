@@ -1,161 +1,134 @@
-Return-Path: <kvm+bounces-8906-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8907-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2123B8585FE
-	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 20:08:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFCA085866C
+	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 20:54:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 572331C212B8
-	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 19:08:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BC8D284353
+	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 19:54:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B14D135A64;
-	Fri, 16 Feb 2024 19:08:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC762137C29;
+	Fri, 16 Feb 2024 19:54:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="HYRKv2rr"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="w9xQijV8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E95BA149DF2;
-	Fri, 16 Feb 2024 19:08:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21E5F12A158
+	for <kvm@vger.kernel.org>; Fri, 16 Feb 2024 19:54:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708110492; cv=none; b=ueD90etpaUO1N5k9lWJeuxF72RO14pNcJ5elroWFSeIOzKauGV3g3eikq0Si3UhYA0JSJE9X3wEfHAL1+B2lnB/xTu6Do/gD5yFSNyaxZ0taJbo6oOKaOAjoFRkMC3XvjBD1LLsTB4TLa6UQVSXJnNaL3+tLSCJ9GrZ9vHDnKJQ=
+	t=1708113265; cv=none; b=WzfRSrGNa1sqK1n3VEGloa257N75RQPrBpEqhruDDvv4K0lgqNWLUZbEI34ASR03uHqTConQ1uNpPMfU4AUrBtfACL5QUKn78IaYNqohH+P9Up9cbawED2jdzz9C+ieuvfk+wKeMyM0FqTDT4zVIJI5rH/cnk4TT52Gs23Lm3eM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708110492; c=relaxed/simple;
-	bh=1Lzk/qLUqo85syLXWWX90eY+tE6yR2Lqoi9ZQhJpHb4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=T8Co74qOruZPvHkoSu+0+9eiYXXtVSUpzv3lm49utMKq23x8gDcjG5cmp7HBvL+vKkbnjAFvLn9pREX2KTG09baWcJA3p3RBipHhz1FQbXkCp57LSN+fbU+wuAtHA9HQgZt6RpFXKSf155cr/Rf04gRbSCnFmI0/vjWEpIyfV+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=HYRKv2rr; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41GJ0nPP024522;
-	Fri, 16 Feb 2024 19:08:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=KGQChMAbXdLKziD1hj/y+lLvgF4ERGCjgxQfyeNgNsw=;
- b=HYRKv2rrBNqZCrpmoMRPO81jYmKughPI7C6i6OKb9OW0/CKothjca1B8Kt5ZQcwZ1O3H
- KurS3j96oYP0/Apsc0WSao8bKWxtf/ixm3k+Ifapukz4wXCQkwHbGVl4DOmCsiQN2+tP
- pcrHqs/8xqRrqtHkz5iZlS+QQfOJjS2HaZmG8WEzD4EPERbDhIHqASYDs+Xw8wvOlx7i
- NwoOrUcRIE6PQC2lzU3famscqb7sFKYStMd0x7YhT88s95+k8mQO5P5eA5JrZCN5k3u0
- VOkHRHQnwFrVbBPCp9tNN1PKBIQXmTVMyQj+cxZ12UTYhFjhVwgHkxxib5RKzssdqKuL 3g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wacst8vu1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 16 Feb 2024 19:08:09 +0000
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41GJ12jq025827;
-	Fri, 16 Feb 2024 19:08:09 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wacst8vts-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 16 Feb 2024 19:08:09 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 41GJ1pVQ016184;
-	Fri, 16 Feb 2024 19:08:08 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3w6myn55dg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 16 Feb 2024 19:08:08 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 41GJ83iw15794922
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 16 Feb 2024 19:08:05 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 042742004F;
-	Fri, 16 Feb 2024 19:08:03 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 911BD2004E;
-	Fri, 16 Feb 2024 19:08:02 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.171.26.169])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Fri, 16 Feb 2024 19:08:02 +0000 (GMT)
-Date: Fri, 16 Feb 2024 20:08:01 +0100
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: Thomas Huth <thuth@redhat.com>
-Cc: kvm@vger.kernel.org, Janosch Frank <frankja@linux.ibm.com>,
-        Nico
- =?UTF-8?B?QsO2aHI=?= <nrb@linux.ibm.com>,
-        linux-s390@vger.kernel.org, David
- Hildenbrand <david@redhat.com>,
-        Jan Richter <jarichte@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH] s390x/snippets/c/sie-dat: Fix compiler
- warning with GCC 11.2
-Message-ID: <20240216200801.7be160d1@p-imbrenda>
-In-Reply-To: <20240216190048.83801-1-thuth@redhat.com>
-References: <20240216190048.83801-1-thuth@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1708113265; c=relaxed/simple;
+	bh=DWbIemeaauxg4DKlDBXcAuMujE6346YfXHGb9GOQhxY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pUy/bkm5NG2MlzQmULPUZZMPRLfdMgZn75Jt7yj4toBB7BzMtMeVjfFAfnD/Z2ROBjHFMfXJQCBh0fGZY68g+wJTzA8aT3OQuExagbt/LCQzY6PAU6+aJJPOOxT2dTWqjpOxUhnHUzzQTcD0JHcA37ehki1DGE7ABqfLO+3jCdE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=w9xQijV8; arc=none smtp.client-ip=209.85.208.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2d21cdbc85bso10029111fa.2
+        for <kvm@vger.kernel.org>; Fri, 16 Feb 2024 11:54:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1708113261; x=1708718061; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fTvzKYXRxk2Xk+NKT9N6TKpQ1vRzkheOt6rJHqBctwc=;
+        b=w9xQijV8N9CTcEb5OZnCf4kOEziWE8KoDly1jNO0mKON5vejk/EqilqteCruWSXMJA
+         8I7Eiogq1yuDSoxE0HRyqqQyWwRfU/rWX42x2mZzhwZD4raIoiDKsUJd/vFCiNx5CxrR
+         OauuR4YT3lug12oRKH/rwXSRMbLrc0A3lPq+7vKXDzB47A1/CQlCT9sW3O2/9e4nZswJ
+         aA8rraWkTYwOkSx1UqTw0PNkl+UCKFT0mc2QNdcBRxOZWh/Xb36v3R82I69xccNU89+k
+         L14wTrkQH88ik6JV/kMqACLyjpYXE6wnugYzCxnRasEX+gA/B3zdHEl1OkBwUlL7y4YL
+         vEpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708113261; x=1708718061;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fTvzKYXRxk2Xk+NKT9N6TKpQ1vRzkheOt6rJHqBctwc=;
+        b=JT2Cc2l4I/FoIRqAwPUioo/zQNpmStPcP9hyNs4ZsXrwCcNDilslIbF6e+ZpS3UfCz
+         tZd1FvLox6vG4KG6pzTwB6WW+PjtoAeW9wd4BQo19vjcKPaAhjeW9wKlRLyIqCyM+PkY
+         V3WjKeEI0n6Cd9pg3K80cdljRTv84sbG6ChJ0FCB4b7iyQLoo/oPD9If9Nk6IO9OjXYD
+         9QOfs//Wwyq9wrjT2bS0z6sUyZMoZtedKFQytnqA+x0ksNixiYjGG8jcGgFWF5M++VPY
+         K4NlMj4/4IGdHnqpWA4ykwumHBgx32/S6dDzQpkP6/gfOh+LrMfp6MgJIZv2m8KpYKsD
+         wazg==
+X-Forwarded-Encrypted: i=1; AJvYcCVsTNMbJv6IcH2pl/zXsE6ly2VzBmm3X37Edl/99nM2IMMgBUJTjPZ1vMWRpmBkEq9RlDrCaFmxGke1mBth17bRUw2K
+X-Gm-Message-State: AOJu0YwinBVHvq913Qeujnb5Q1NAhh2goghMjJ4zYVwH84w7EwrKZAzq
+	/7+/33yh9C/T2UyLT8xy/oOiTpm/5tYo3UjwazyEczVqrKjyAGK8XaKwRHcmkeQ=
+X-Google-Smtp-Source: AGHT+IFzjk+5T9BmuEZRICqcvnwesA2RMuuDU+Whj7S6bON3OfQ97tljdqKynRbPhDdS0PqMyMTtMg==
+X-Received: by 2002:ac2:4209:0:b0:511:9250:1ba5 with SMTP id y9-20020ac24209000000b0051192501ba5mr3733969lfh.36.1708113261126;
+        Fri, 16 Feb 2024 11:54:21 -0800 (PST)
+Received: from [192.168.69.100] ([176.187.210.246])
+        by smtp.gmail.com with ESMTPSA id b26-20020ac2563a000000b0051178d2f592sm55689lff.236.2024.02.16.11.54.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 16 Feb 2024 11:54:20 -0800 (PST)
+Message-ID: <2f8ec2e2-c4c7-48c3-9c3d-3e20bc3d6b9b@linaro.org>
+Date: Fri, 16 Feb 2024 20:54:01 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: DERDqV-VYFQAjyUWD5T9PsMd8N0yVJdk
-X-Proofpoint-GUID: fQJFAT8YBTkdQAB5uZ8z3ZqeTxeGb42X
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-16_18,2024-02-16_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 adultscore=0
- clxscore=1015 phishscore=0 malwarescore=0 bulkscore=0 suspectscore=0
- mlxscore=0 priorityscore=1501 spamscore=0 mlxlogscore=999
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2402160149
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/6] hw/arm: Inline sysbus_create_simple(PL110 / PL111)
+Content-Language: en-US
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?=
+ <berrange@redhat.com>, Eduardo Habkost <eduardo@habkost.net>,
+ qemu-arm@nongnu.org, kvm@vger.kernel.org,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Igor Mitsyanko <i.mitsyanko@gmail.com>, "Michael S. Tsirkin"
+ <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>
+References: <20240216153517.49422-1-philmd@linaro.org>
+ <20240216153517.49422-2-philmd@linaro.org>
+ <bcfd3f9d-04e3-79c9-c15f-c3c8d7669bdb@eik.bme.hu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+In-Reply-To: <bcfd3f9d-04e3-79c9-c15f-c3c8d7669bdb@eik.bme.hu>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri, 16 Feb 2024 20:00:48 +0100
-Thomas Huth <thuth@redhat.com> wrote:
+On 16/2/24 18:14, BALATON Zoltan wrote:
+> On Fri, 16 Feb 2024, Philippe Mathieu-Daudé wrote:
+>> We want to set another qdev property (a link) for the pl110
+>> and pl111 devices, we can not use sysbus_create_simple() which
+>> only passes sysbus base address and IRQs as arguments. Inline
+>> it so we can set the link property in the next commit.
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+>> ---
+>> hw/arm/realview.c    |  5 ++++-
+>> hw/arm/versatilepb.c |  6 +++++-
+>> hw/arm/vexpress.c    | 10 ++++++++--
+>> 3 files changed, 17 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/hw/arm/realview.c b/hw/arm/realview.c
+>> index 9058f5b414..77300e92e5 100644
+>> --- a/hw/arm/realview.c
+>> +++ b/hw/arm/realview.c
+>> @@ -238,7 +238,10 @@ static void realview_init(MachineState *machine,
+>>     sysbus_create_simple("pl061", 0x10014000, pic[7]);
+>>     gpio2 = sysbus_create_simple("pl061", 0x10015000, pic[8]);
+>>
+>> -    sysbus_create_simple("pl111", 0x10020000, pic[23]);
+>> +    dev = qdev_new("pl111");
+>> +    sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
+>> +    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0x10020000);
+>> +    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[23]);
+> 
+> Not directly related to this patch but this blows up 1 line into 4 just 
+> to allow setting a property. Maybe just to keep some simplicity we'd 
+> rather need either a sysbus_realize_simple function that takes a sysbus 
+> device instead of the name and does not create the device itself or some 
+> way to pass properties to sysbus create simple (but the latter may not 
+> be easy to do in a generic way so not sure about that). What do you think?
 
-> GCC 11.2.1 from RHEL 9.0 complains:
->=20
->  s390x/snippets/c/sie-dat.c: In function =E2=80=98main=E2=80=99:
->  s390x/snippets/c/sie-dat.c:51:22: error: writing 1 byte into a region of=
- size 0 [-Werror=3Dstringop-overflow=3D]
->     51 |         *invalid_ptr =3D 42;
->        |         ~~~~~~~~~~~~~^~~~
->  cc1: all warnings being treated as errors
->=20
-> Let's use the OPAQUE_PTR() macro here too, which we already used
-> in other spots to fix similar -Wstringop-overflow warnings.
->=20
-> Reported-by: Jan Richter <jarichte@redhat.com>
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-
-> ---
->  s390x/snippets/c/sie-dat.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->=20
-> diff --git a/s390x/snippets/c/sie-dat.c b/s390x/snippets/c/sie-dat.c
-> index ecfcb60e..9d89801d 100644
-> --- a/s390x/snippets/c/sie-dat.c
-> +++ b/s390x/snippets/c/sie-dat.c
-> @@ -9,6 +9,7 @@
->   */
->  #include <libcflat.h>
->  #include <asm-generic/page.h>
-> +#include <asm/mem.h>
->  #include "sie-dat.h"
-> =20
->  static uint8_t test_pages[GUEST_TEST_PAGE_COUNT * PAGE_SIZE] __attribute=
-__((__aligned__(PAGE_SIZE)));
-> @@ -47,7 +48,7 @@ int main(void)
->  	force_exit();
-> =20
->  	/* the first unmapped address */
-> -	invalid_ptr =3D (uint8_t *)(GUEST_TOTAL_PAGE_COUNT * PAGE_SIZE);
-> +	invalid_ptr =3D OPAQUE_PTR(GUEST_TOTAL_PAGE_COUNT * PAGE_SIZE);
->  	*invalid_ptr =3D 42;
-> =20
->  	/* indicate we've written the non-allowed page (should never get here) =
-*/
-
+Unfortunately sysbus doesn't scale in heterogeneous setup.
 
