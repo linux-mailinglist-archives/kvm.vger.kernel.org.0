@@ -1,94 +1,196 @@
-Return-Path: <kvm+bounces-8870-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8871-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8B38857F29
-	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 15:20:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C03C85801A
+	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 16:04:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 83EF61F264DA
-	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 14:20:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 607471C21384
+	for <lists+kvm@lfdr.de>; Fri, 16 Feb 2024 15:04:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2260512D769;
-	Fri, 16 Feb 2024 14:20:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50F0412F38A;
+	Fri, 16 Feb 2024 15:04:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=8bytes.org header.i=@8bytes.org header.b="Sk58NeRY"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FnfYu1yV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.8bytes.org (mail.8bytes.org [85.214.250.239])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17F8F12BF24;
-	Fri, 16 Feb 2024 14:20:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.250.239
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708093221; cv=none; b=LP5q57x9DiCmOaP5mGmaJ/1gmQr6rJgegrNOOI0mn5VMrkzExKx/4BEtf60+fdBqUkQpvX6C7lB+aK31bhrrKEzLeW6VijHmJlRo+pqPq13TLsUN8bQVHtJq+XEbW8dkGRSzPUA5mYhmbJ9MWYpCtfU4DJ7wp7IFcwZs1/rxzTo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708093221; c=relaxed/simple;
-	bh=bNxzB1iXQnVUL8kOxK+D7Fyr91Yu17rlVKWuwF3UjJA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RzJa2vajvIlULst/OXmh6xyjNLUbBmWav1o8dKH7nytWjs9e+eC7693d8XCrhVYkbdk6ctgWxlgmsTs3iIcv/8UQlTXTPjCsA+Joe96SOv4mmhfENDbiJyjL5G9e6g+pZmV5IPR4ZO61fh2yA2tWEw9nA06gdw2NOu6UtKM4Anw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=8bytes.org; spf=pass smtp.mailfrom=8bytes.org; dkim=pass (2048-bit key) header.d=8bytes.org header.i=@8bytes.org header.b=Sk58NeRY; arc=none smtp.client-ip=85.214.250.239
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=8bytes.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=8bytes.org
-Received: from 8bytes.org (p4ffe0c3c.dip0.t-ipconnect.de [79.254.12.60])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by mail.8bytes.org (Postfix) with ESMTPSA id A60FC1C462F;
-	Fri, 16 Feb 2024 15:20:17 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=8bytes.org;
-	s=default; t=1708093217;
-	bh=bNxzB1iXQnVUL8kOxK+D7Fyr91Yu17rlVKWuwF3UjJA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Sk58NeRYOzA7VCTE6M4STJkXGudBbVh3xWbOFXBaIE0CIjO0bDoba2613m3xMEJkf
-	 Dz9zn4e+gu4809m5AYYcGtvASkTplVee+A0Zko251ZSTNH+aj9jdEY9FZoGz+O7xYu
-	 VWzFSTmzl3vvTkciReKFX2RIIuJ5at2pzeVqKE0ym3WXBiDY9u8pZRGUEy7KsSaZj+
-	 MgDtC2gXI2gIz4wpzn4CrnG4gGD3QC5zJnT67HcX/KeUdk8hYKUCfT4NsTZukP3aD0
-	 Z3VATvpm0DXr3vH6k+1ivJ6fGqZXzl8fs+J/mcWLXtOZF3aRzoQRkxT0DfRZwPgoo+
-	 TTG0g4f3RIRkA==
-Date: Fri, 16 Feb 2024 15:20:16 +0100
-From: Joerg Roedel <joro@8bytes.org>
-To: Lu Baolu <baolu.lu@linux.intel.com>
-Cc: Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	Nicolin Chen <nicolinc@nvidia.com>, Yi Liu <yi.l.liu@intel.com>,
-	Jacob Pan <jacob.jun.pan@linux.intel.com>,
-	Longfang Liu <liulongfang@huawei.com>,
-	Yan Zhao <yan.y.zhao@intel.com>,
-	Joel Granados <j.granados@samsung.com>, iommu@lists.linux.dev,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v13 00/16] iommu: Prepare to deliver page faults to user
- space
-Message-ID: <Zc9vIMa_DarGHVZq@8bytes.org>
-References: <20240212012227.119381-1-baolu.lu@linux.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F69612C7F3
+	for <kvm@vger.kernel.org>; Fri, 16 Feb 2024 15:04:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708095889; cv=none; b=MNBr8iJqqb8+jcvCogv9YuYbGQzY1WllbFnAHe4CCHuLfvh8oLNbIJx2y3CJcsYLinADp5TP9T8PkBTrI2TndMeFvScF5P83Pg8KNDtnSzRaVgl2XREA2l7xMZDAJYLTCYwohDwQlSltD/KDdliSfdBAbpjoYLR7eaJFD9hbpxY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708095889; c=relaxed/simple;
+	bh=V0JkYqvTn+uVSE1L+dG0IYgFoeuyTuFYuLokOngLHfA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=oAJHx7baW4ZaJpJesrD1cSYJEloJ5gDW5+qp+9OIbfKJniKhgSBu+2t2oVylkMJ87qIMbqpe5wwxY+YcPAkTAxsejnNb7mxRpM4kYAbrZdxjUL8EIUP/DGQVQAz8MsR31Li2sPXJVy+H6akuxq/rMWyih1hTqP0BDSpyjphLUVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=FnfYu1yV; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a3c1a6c10bbso277534866b.3
+        for <kvm@vger.kernel.org>; Fri, 16 Feb 2024 07:04:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1708095886; x=1708700686; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=IgMGnwDJJp9CianhhLKV4Wm1OtNzAWG/gtuYlfJ5Kdg=;
+        b=FnfYu1yVhb1iCg5V17YgSDrisXqKo0UqTLrQE5PT6+cFvL4A3sW3l0aDxhgMgFxJlt
+         XrIeTtB5T5nLxWFi85Xnqs2SYw3NHBZLkNceEirSdcHzuFbecCpDDJsyIdtP4PGihusM
+         LavZGO3oFRuoETC2LTMxMwmryXvuP4L+dp7snhD5ZELrh6vfXF4ACEcaEhWj0kpOoG7c
+         4gtEvl52a8netsnGEy80OqWxrXy4m9EATQGfz2zSLiezuKAuMPBmxcDXnWxNDlAQyhmQ
+         2u3/r1Eb22NRiM/hZlgrkUnuzdBiFRdUT+jyqrWyQAme1qX4VjUnvYm8c51CB5SH4p/j
+         TdUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708095886; x=1708700686;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IgMGnwDJJp9CianhhLKV4Wm1OtNzAWG/gtuYlfJ5Kdg=;
+        b=X0GdxjKbX+OLgSBOAcOTt1M4niU5tXvh111bqFFSlRVz1G3t0OHEpHYAPtpxCGdiu/
+         ChmQikPfUpvE3D/EVClo+bkf/5tiX5fc3WuhFB9dT15eVCx08GtSAyUWO54lUtv/15uW
+         uum2Kr+1cT+PQKHfeX1CDNoTTiWU5ofVv+7GmPBzk0dBqbCJRRVDz5NB4sEpxY/dR5Fk
+         6Wessjq82D2P3sEAL67vvoETJMPDozqWa/Xkqst5ZeTsHsjAX7Zn5BZDDBqjQ62EMMi9
+         Vx65RuOF132wxesrGezfwnhQLrUXai5ZO7fEJWugqUPdwdADMv+bVv8sZmcwtt+5vAec
+         qfjg==
+X-Forwarded-Encrypted: i=1; AJvYcCWofWW0CST6sZIPZiHcvlJmY+SgU/Z8O3ox+PoWqu09gGryjl5W67yW/0hVaZj8ekZjS4yo/4ANzC82XQpDrwsN3UeD
+X-Gm-Message-State: AOJu0YyrFnUJQIRNcYZzMNH+26SRra2lyH4iG8SxFEVlrrfNnulH3cj3
+	P1b7LSqmd0Bx3S47M49km1IKap3rKw8oTVsHXIn8scnkeADkwxyK3JnbqBytcmZKAoa/4o+r5ra
+	T
+X-Google-Smtp-Source: AGHT+IEyR9s9gmGSVwo9B83uKFpZp+AMJ+H9XSuex4SN4sutNHsSVLGhT4D3PECIl4DYIV6TzmZwdw==
+X-Received: by 2002:a17:906:a881:b0:a3d:8466:d355 with SMTP id ha1-20020a170906a88100b00a3d8466d355mr3635489ejb.19.1708095885825;
+        Fri, 16 Feb 2024 07:04:45 -0800 (PST)
+Received: from m1x-phil.lan ([176.187.210.246])
+        by smtp.gmail.com with ESMTPSA id qw13-20020a1709066a0d00b00a3df2b849a5sm14099ejc.155.2024.02.16.07.04.43
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Fri, 16 Feb 2024 07:04:45 -0800 (PST)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	kvm@vger.kernel.org,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	=?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+Subject: [PATCH] hw/sysbus: Inline and remove sysbus_add_io()
+Date: Fri, 16 Feb 2024 16:04:41 +0100
+Message-ID: <20240216150441.45681-1-philmd@linaro.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240212012227.119381-1-baolu.lu@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Mon, Feb 12, 2024 at 09:22:11AM +0800, Lu Baolu wrote:
-> Lu Baolu (16):
->   iommu: Move iommu fault data to linux/iommu.h
->   iommu/arm-smmu-v3: Remove unrecoverable faults reporting
->   iommu: Remove unrecoverable fault data
->   iommu: Cleanup iopf data structure definitions
->   iommu: Merge iopf_device_param into iommu_fault_param
->   iommu: Remove iommu_[un]register_device_fault_handler()
->   iommu: Merge iommu_fault_event and iopf_fault
->   iommu: Prepare for separating SVA and IOPF
->   iommu: Make iommu_queue_iopf() more generic
->   iommu: Separate SVA and IOPF
->   iommu: Refine locking for per-device fault data management
->   iommu: Use refcount for fault data access
->   iommu: Improve iopf_queue_remove_device()
->   iommu: Track iopf group instead of last fault
->   iommu: Make iopf_group_response() return void
->   iommu: Make iommu_report_device_fault() return void
+sysbus_add_io(...) is a simple wrapper to
+memory_region_add_subregion(get_system_io(), ...).
+It is used in 3 places; inline it directly.
 
-Applied, thanks Baolu.
+Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+---
+ include/hw/sysbus.h | 2 --
+ hw/core/sysbus.c    | 6 ------
+ hw/i386/kvmvapic.c  | 2 +-
+ hw/mips/mipssim.c   | 2 +-
+ hw/nvram/fw_cfg.c   | 5 +++--
+ 5 files changed, 5 insertions(+), 12 deletions(-)
+
+diff --git a/include/hw/sysbus.h b/include/hw/sysbus.h
+index 3564b7b6a2..14dbc22d0c 100644
+--- a/include/hw/sysbus.h
++++ b/include/hw/sysbus.h
+@@ -83,8 +83,6 @@ void sysbus_mmio_map(SysBusDevice *dev, int n, hwaddr addr);
+ void sysbus_mmio_map_overlap(SysBusDevice *dev, int n, hwaddr addr,
+                              int priority);
+ void sysbus_mmio_unmap(SysBusDevice *dev, int n);
+-void sysbus_add_io(SysBusDevice *dev, hwaddr addr,
+-                   MemoryRegion *mem);
+ MemoryRegion *sysbus_address_space(SysBusDevice *dev);
+ 
+ bool sysbus_realize(SysBusDevice *dev, Error **errp);
+diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
+index 35f902b582..9f1d5b2d6d 100644
+--- a/hw/core/sysbus.c
++++ b/hw/core/sysbus.c
+@@ -298,12 +298,6 @@ static char *sysbus_get_fw_dev_path(DeviceState *dev)
+     return g_strdup(qdev_fw_name(dev));
+ }
+ 
+-void sysbus_add_io(SysBusDevice *dev, hwaddr addr,
+-                       MemoryRegion *mem)
+-{
+-    memory_region_add_subregion(get_system_io(), addr, mem);
+-}
+-
+ MemoryRegion *sysbus_address_space(SysBusDevice *dev)
+ {
+     return get_system_memory();
+diff --git a/hw/i386/kvmvapic.c b/hw/i386/kvmvapic.c
+index f2b0aff479..3be64fba3b 100644
+--- a/hw/i386/kvmvapic.c
++++ b/hw/i386/kvmvapic.c
+@@ -727,7 +727,7 @@ static void vapic_realize(DeviceState *dev, Error **errp)
+     VAPICROMState *s = VAPIC(dev);
+ 
+     memory_region_init_io(&s->io, OBJECT(s), &vapic_ops, s, "kvmvapic", 2);
+-    sysbus_add_io(sbd, VAPIC_IO_PORT, &s->io);
++    memory_region_add_subregion(get_system_io(), VAPIC_IO_PORT, &s->io);
+     sysbus_init_ioports(sbd, VAPIC_IO_PORT, 2);
+ 
+     option_rom[nb_option_roms].name = "kvmvapic.bin";
+diff --git a/hw/mips/mipssim.c b/hw/mips/mipssim.c
+index a12427b6c8..57c8c33e2b 100644
+--- a/hw/mips/mipssim.c
++++ b/hw/mips/mipssim.c
+@@ -226,7 +226,7 @@ mips_mipssim_init(MachineState *machine)
+         qdev_prop_set_uint8(dev, "endianness", DEVICE_LITTLE_ENDIAN);
+         sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
+         sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, env->irq[4]);
+-        sysbus_add_io(SYS_BUS_DEVICE(dev), 0x3f8,
++        memory_region_add_subregion(get_system_io(), 0x3f8,
+                       sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0));
+     }
+ 
+diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+index e85493d513..6d6b17462d 100644
+--- a/hw/nvram/fw_cfg.c
++++ b/hw/nvram/fw_cfg.c
+@@ -1142,6 +1142,7 @@ FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
+     SysBusDevice *sbd;
+     FWCfgIoState *ios;
+     FWCfgState *s;
++    MemoryRegion *iomem = get_system_io();
+     bool dma_requested = dma_iobase && dma_as;
+ 
+     dev = qdev_new(TYPE_FW_CFG_IO);
+@@ -1155,7 +1156,7 @@ FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
+     sbd = SYS_BUS_DEVICE(dev);
+     sysbus_realize_and_unref(sbd, &error_fatal);
+     ios = FW_CFG_IO(dev);
+-    sysbus_add_io(sbd, iobase, &ios->comb_iomem);
++    memory_region_add_subregion(iomem, iobase, &ios->comb_iomem);
+ 
+     s = FW_CFG(dev);
+ 
+@@ -1163,7 +1164,7 @@ FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
+         /* 64 bits for the address field */
+         s->dma_as = dma_as;
+         s->dma_addr = 0;
+-        sysbus_add_io(sbd, dma_iobase, &s->dma_iomem);
++        memory_region_add_subregion(iomem, dma_iobase, &s->dma_iomem);
+     }
+ 
+     return s;
+-- 
+2.41.0
+
 
