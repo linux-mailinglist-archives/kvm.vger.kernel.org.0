@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-8938-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8939-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 919D7858C6E
-	for <lists+kvm@lfdr.de>; Sat, 17 Feb 2024 02:06:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5268D858C71
+	for <lists+kvm@lfdr.de>; Sat, 17 Feb 2024 02:06:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B63491C20F78
-	for <lists+kvm@lfdr.de>; Sat, 17 Feb 2024 01:06:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76BAE1C20AB3
+	for <lists+kvm@lfdr.de>; Sat, 17 Feb 2024 01:06:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C027C3CF56;
-	Sat, 17 Feb 2024 00:59:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E54553F9D0;
+	Sat, 17 Feb 2024 00:59:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="zRcBWut3"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="0ERtyIzF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oa1-f44.google.com (mail-oa1-f44.google.com [209.85.160.44])
+Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 119A1383AB
-	for <kvm@vger.kernel.org>; Sat, 17 Feb 2024 00:59:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8294E3C082
+	for <kvm@vger.kernel.org>; Sat, 17 Feb 2024 00:59:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708131546; cv=none; b=sgmU+D6/9PvwXijhOU+7j7XEYgLjERH/0lZoR3GuemzqqHGNAe9bvS+kWQ5AUVwzK8ATiV8VNP2sLZlzleVMXo0xbAlRNqTOOtLr50wXiULhWa1g5CYgnL6KMwMxZ5KoCWbdQAcZSpQXYeOorXdd9D3vQqYdF6JzRMmn8oJiRRU=
+	t=1708131549; cv=none; b=r2L6vodheNk46itjLb0VoYBhWmaUIsZ9azvcA9XfdkCim0SFbHmsEwVL8jdcm2gegENGnm8yYn8HjHHn6NRI6NVKPb0O3sxy1BCBj5ZC7x6ntZ9hE5CheYPMisTSaz0wD2z6v9oUeCjWac14L317FI8xb0pGGvuGigw+a9iz8bM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708131546; c=relaxed/simple;
-	bh=Ya/XJ2BT1y/8netb6r38TrbSiZPgoHRnwGgVEj7mjLI=;
+	s=arc-20240116; t=1708131549; c=relaxed/simple;
+	bh=osmo9iVSqMNbUFvao8pXhJqFdDiZLR1ciOsr86k36JI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Rzd+5UE+AlL5QqUNEi/40ZjJSFO9ugYB+U6YAVeqFKwj8KXDWdSdXic57XEAD8ULi09keW/c/OzpM75zb0rO+a9O0Ptwp7L5YeuaIGNtNVtMf+KvA1x0g1QeP6H/f1mkk0b/JVn0TDkooEFLURx2B68nDAuKDyxpxcQWCp6KTHI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=zRcBWut3; arc=none smtp.client-ip=209.85.160.44
+	 MIME-Version; b=KHNr+7k8PSChRNtAGfhh17Px1VQoAm8EIGw00yz9rwjHfXIqDX0egFsMSup2PQwKEvnP91RZdbyHFOs7ehIpxODUGbqQtZFUq+xThna0cgDWo+BkiKfb3w/qKUkO1wlh2hBBlG+qQgxmpUot6P/5L5zscuzlX0xhvlGct91pEqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=0ERtyIzF; arc=none smtp.client-ip=209.85.166.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-oa1-f44.google.com with SMTP id 586e51a60fabf-21432e87455so883210fac.1
-        for <kvm@vger.kernel.org>; Fri, 16 Feb 2024 16:59:04 -0800 (PST)
+Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-7bf2c826a5aso115220739f.0
+        for <kvm@vger.kernel.org>; Fri, 16 Feb 2024 16:59:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1708131544; x=1708736344; darn=vger.kernel.org;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1708131546; x=1708736346; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5vDBckQYWb4Du0H7yzxJq6wilfl8k4fp2vqlUJD6o0E=;
-        b=zRcBWut3qUJoRlhpLenL/xuQkn+Otm0lxoDneVn8x+LMh07BjbeAjVhfxRNJcMI9rz
-         RV+jICeQq3nXoKGvqWX4kzQnv990v5r6FjOI3b++PkVzYlOuqd7KVWFXSzOCZeAFTc2r
-         GVRBVXwv0bcYIqHbcWgF6wwAB97bW7944wPAx6Ass+57ffTQVWV2OFmyLlDp5A7rRdwK
-         VyG8qNZavf4f5HsAoFB6NYKuBzIf3J9TiTZ5oHYmWFDKCwiCgToGMUiV1aFG9XMpqd2I
-         1706Whong9dVsYQtugESgecqqgUIN6BIoH6EK6pnBuoevnmFSmhGTYK/Qp7tR8zRPKgo
-         ClKw==
+        bh=Lkx6F3sDxrDVxzkfg/gwx98H53iZQ+xAtDorLNCTdGY=;
+        b=0ERtyIzFowQI/dqyFP48mX8Em31tjyRQilNnwthZnKVNBW5mdFHRbsqs2A7Hy8NxLF
+         PFhY/0fzaKLikY1tDpg24eiGYWHI37XE+BFuZQTFvNjw4BaCDjG1wKlZu0R8ljsHVWg8
+         rXw2v092r5WtQ5iVP9F0yccNVhtDkIxef62dRmY7O7VfEL8ZnyzCb+KtfqqSqLEtEHsa
+         X10ILu2ropeNaiOOyarjWBQqKiRsJsLvjGysWKeYLkf7qylVYvukl67+hO9jW6pRXbMo
+         E1dLqmL6a8c8G+w1KVtIDWzH1BWNwmYtHNpjIJU8wxJoTnXjgfY3LWy+9ZEOp16ISWG0
+         V1VQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708131544; x=1708736344;
+        d=1e100.net; s=20230601; t=1708131546; x=1708736346;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=5vDBckQYWb4Du0H7yzxJq6wilfl8k4fp2vqlUJD6o0E=;
-        b=AWcnC5dXqsg9ZnShaawwRNa1b2ZcuCDo7S5tVgtTqQYwKRqBGj4u0mN2OrfGfM9OiV
-         m5KQoa4sWjMj4IpEyCoEt5LTLoD4Kixiq6rblGtd0M7TeOf1kx13iiPi6gWVBDQREM7d
-         4oUZA+/MC54I6tjQRNRQyPfY36+wLbExtAZL5HMjuuZDPu7p/ObuYyJ4D7IOjgSUImho
-         MA1DC1FS4uMkOdqJD9loWhRSrUFE9yPiMKOfn6LmVwTrGJA7EDhAg8Dat0LWbb+0ul3M
-         Zs7h7OszYlKv4W27I+RqhIj2l2lSjd4ogoCAMm2/kTCRaPkAj5glPVjSsTObkT8eE7Fo
-         /C5w==
-X-Forwarded-Encrypted: i=1; AJvYcCWU4ay1vMtseBN2+vKR/I1hDFH5aU3YfUDE0QkTVe2GzlFmiEPe1M9sZ1ItQSUi+a3xL0bxqm8Jkn4yKIBIwNb03//M
-X-Gm-Message-State: AOJu0YyW1dpZsofRjFJzsSY6YFgJyxMH0iv1NGOgEPiWTog343QM1lRF
-	gN14J3pUGhdZ6XwtT+u21VdrSGSXRjmcBoL4bABhsAF1Nmq1XNMIWgolO1i4o3I=
-X-Google-Smtp-Source: AGHT+IHqkQqjQYTImWOgjE8Z+USH8QzipcCkOvNcsVcXAj1JgydRRCEivR2TUgJmzC2SDHg1vvWlZA==
-X-Received: by 2002:a05:6870:478a:b0:21e:698f:5c91 with SMTP id c10-20020a056870478a00b0021e698f5c91mr3327913oaq.41.1708131544105;
-        Fri, 16 Feb 2024 16:59:04 -0800 (PST)
+        bh=Lkx6F3sDxrDVxzkfg/gwx98H53iZQ+xAtDorLNCTdGY=;
+        b=jNatjwTjVymWO+w+oobrowUrGkSWsZrPujIjK2o0xatzW5SUPOZJhMdKyj76KSLIE6
+         LVlAo4aiWl84Hv69Hwez9kySGGGWuPUx2YeJxvG0Iw2rPTfKe/KTR0lo4/iyniHUuarL
+         Z9PrGNqM/qV5bh8JQ82rEAhkwySE6DVCcKov2iJv0H97WQPU2ZANmFnqB6U8ufCFcWBz
+         JOPle6usgBFzFDjC0K7ABeasjzInhktiIN/gM/3hlnq1ufpdOIfhV7k9JLh/cgmYZWl+
+         SV3fPXxB+QS48CApwi1I90tBcbn/vubpllq28aI0MaND2DLGfGYzjQycz0qjVpTlGFHy
+         MCIQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUOFdxNPW0IxYxVnwwk22egmh6dD6+zyXFlcZlAdsXhWqd6xFa68Oq4yjWLKzNsmi9nxQ7Va7LeK/sPuN3lDYvDg4Hy
+X-Gm-Message-State: AOJu0Yzz7B9EVxqdTPo0o/OLPDi8e4genqnqoeIwzmtgXI82ZausFQPl
+	d2GUCdQs0+bOzueJQY71oj8c54LcYqBb7Rl3LtUgg1IgQ8rTpcW6eZSPhC8MmJU=
+X-Google-Smtp-Source: AGHT+IEe3ejDyxspMJxarQru2mpOZGVU3gTQalogFZ4IV/qmTtJpwp0XG9IR02+mun9kkUrwLV3/Rw==
+X-Received: by 2002:a05:6602:2766:b0:7c4:9618:5fcb with SMTP id l6-20020a056602276600b007c496185fcbmr7195778ioe.8.1708131546705;
+        Fri, 16 Feb 2024 16:59:06 -0800 (PST)
 Received: from atishp.ba.rivosinc.com ([64.71.180.162])
-        by smtp.gmail.com with ESMTPSA id d188-20020a6336c5000000b005dc89957e06sm487655pga.71.2024.02.16.16.59.01
+        by smtp.gmail.com with ESMTPSA id d188-20020a6336c5000000b005dc89957e06sm487655pga.71.2024.02.16.16.59.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Feb 2024 16:59:03 -0800 (PST)
+        Fri, 16 Feb 2024 16:59:06 -0800 (PST)
 From: Atish Patra <atishp@rivosinc.com>
 To: linux-kernel@vger.kernel.org
 Cc: Atish Patra <atishp@rivosinc.com>,
@@ -111,9 +111,9 @@ Cc: Atish Patra <atishp@rivosinc.com>,
 	Will Deacon <will@kernel.org>,
 	kaiwenxue1@gmail.com,
 	Yang Jihong <yangjihong1@huawei.com>
-Subject: [PATCH RFC 19/20] RISC-V: Add hwprobe support for Counter delegation extensions
-Date: Fri, 16 Feb 2024 16:57:37 -0800
-Message-Id: <20240217005738.3744121-20-atishp@rivosinc.com>
+Subject: [PATCH RFC 20/20] tools/perf: Detect if platform supports counter delegation
+Date: Fri, 16 Feb 2024 16:57:38 -0800
+Message-Id: <20240217005738.3744121-21-atishp@rivosinc.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240217005738.3744121-1-atishp@rivosinc.com>
 References: <20240217005738.3744121-1-atishp@rivosinc.com>
@@ -125,68 +125,122 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Even though the counter delegation extensions are all S-mode extension,
-perf tool can use it decide whether it wants to map standard events
-or not. Remapping is not required for if SBI PMU is being used
-for hardware events.
+The perf tool currently remap the standard events to the encoding
+specified by the platform in the json file. We need that only if
+the counter delegation extension is present. Otherwise, SBI PMU
+interface is used which defines the encoding for all standard
+events.
+
+The hwprobe mechanism can be used to detect the presence of these
+extensions and remap the encoding space only in that case.
 
 Signed-off-by: Atish Patra <atishp@rivosinc.com>
 ---
- Documentation/arch/riscv/hwprobe.rst  | 10 ++++++++++
- arch/riscv/include/uapi/asm/hwprobe.h |  4 ++++
- arch/riscv/kernel/sys_hwprobe.c       |  3 +++
- 3 files changed, 17 insertions(+)
+ tools/perf/arch/riscv/util/Build    |  1 +
+ tools/perf/arch/riscv/util/evlist.c |  3 ++-
+ tools/perf/arch/riscv/util/pmu.c    | 41 +++++++++++++++++++++++++++++
+ tools/perf/arch/riscv/util/pmu.h    | 11 ++++++++
+ 4 files changed, 55 insertions(+), 1 deletion(-)
+ create mode 100644 tools/perf/arch/riscv/util/pmu.c
+ create mode 100644 tools/perf/arch/riscv/util/pmu.h
 
-diff --git a/Documentation/arch/riscv/hwprobe.rst b/Documentation/arch/riscv/hwprobe.rst
-index b2bcc9eed9aa..77fa0ed09366 100644
---- a/Documentation/arch/riscv/hwprobe.rst
-+++ b/Documentation/arch/riscv/hwprobe.rst
-@@ -188,6 +188,16 @@ The following keys are defined:
-        manual starting from commit 95cf1f9 ("Add changes requested by Ved
-        during signoff")
+diff --git a/tools/perf/arch/riscv/util/Build b/tools/perf/arch/riscv/util/Build
+index b581fb3d8677..2358f0666e8d 100644
+--- a/tools/perf/arch/riscv/util/Build
++++ b/tools/perf/arch/riscv/util/Build
+@@ -1,6 +1,7 @@
+ perf-y += perf_regs.o
+ perf-y += header.o
+ perf-y += evlist.o
++perf-y += pmu.o
  
-+  * :c:macro:`RISCV_HWPROBE_EXT_SMCDELEG`: The Smcdeleg extension is supported as
-+       defined in the RISC-V Counter Delegation extension manual starting from
-+       commit ff61c1f ("switch to v1.0.0 and frozen")
-+  * :c:macro:`RISCV_HWPROBE_EXT_SSCCFG`: The Ssccfg extension is supported as
-+       defined in the RISC-V Counter Delegation extension manual starting from
-+       commit ff61c1f ("switch to v1.0.0 and frozen")
-+  * :c:macro:`RISCV_HWPROBE_EXT_SSCSRIND`: The Sscsrind extension is supported as
-+       defined in the RISC-V Indirect CSR extension manual starting from
-+       commit a28625c ("mark spec as frozen")
+ perf-$(CONFIG_DWARF) += dwarf-regs.o
+ perf-$(CONFIG_LIBDW_DWARF_UNWIND) += unwind-libdw.o
+diff --git a/tools/perf/arch/riscv/util/evlist.c b/tools/perf/arch/riscv/util/evlist.c
+index 9ad287c6f396..aa7eef7280ca 100644
+--- a/tools/perf/arch/riscv/util/evlist.c
++++ b/tools/perf/arch/riscv/util/evlist.c
+@@ -6,6 +6,7 @@
+ #include "util/parse-events.h"
+ #include "util/event.h"
+ #include "evsel.h"
++#include "pmu.h"
+ 
+ static int pmu_update_cpu_stdevents_callback(const struct pmu_event *pe,
+ 					     const struct pmu_events_table *table __maybe_unused,
+@@ -41,7 +42,7 @@ int arch_evlist__override_default_attrs(struct evlist *evlist, const char *pmu_n
+ 							  "iTLB-load-misses"};
+ 	unsigned int i, len = sizeof(overriden_event_arr) / sizeof(char *);
+ 
+-	if (!pmu)
++	if (!pmu || !perf_pmu_riscv_cdeleg_present())
+ 		return 0;
+ 
+ 	for (i = 0; i < len; i++) {
+diff --git a/tools/perf/arch/riscv/util/pmu.c b/tools/perf/arch/riscv/util/pmu.c
+new file mode 100644
+index 000000000000..79f0974e27f8
+--- /dev/null
++++ b/tools/perf/arch/riscv/util/pmu.c
+@@ -0,0 +1,41 @@
++// SPDX-License-Identifier: GPL-2.0
 +
- * :c:macro:`RISCV_HWPROBE_KEY_CPUPERF_0`: A bitmask that contains performance
-   information about the selected set of processors.
- 
-diff --git a/arch/riscv/include/uapi/asm/hwprobe.h b/arch/riscv/include/uapi/asm/hwprobe.h
-index 9f2a8e3ff204..fb7c6bd6822a 100644
---- a/arch/riscv/include/uapi/asm/hwprobe.h
-+++ b/arch/riscv/include/uapi/asm/hwprobe.h
-@@ -59,6 +59,10 @@ struct riscv_hwprobe {
- #define		RISCV_HWPROBE_EXT_ZTSO		(1ULL << 33)
- #define		RISCV_HWPROBE_EXT_ZACAS		(1ULL << 34)
- #define		RISCV_HWPROBE_EXT_ZICOND	(1ULL << 35)
-+#define		RISCV_HWPROBE_EXT_SSCSRIND	(1ULL << 36)
-+#define		RISCV_HWPROBE_EXT_SMCDELEG	(1ULL << 37)
-+#define		RISCV_HWPROBE_EXT_SSCCFG	(1ULL << 38)
++/*
++ * Copyright Rivos Inc 2024
++ * Author(s): Atish Patra <atishp@rivosinc.com>
++ */
 +
- #define RISCV_HWPROBE_KEY_CPUPERF_0	5
- #define		RISCV_HWPROBE_MISALIGNED_UNKNOWN	(0 << 0)
- #define		RISCV_HWPROBE_MISALIGNED_EMULATED	(1 << 0)
-diff --git a/arch/riscv/kernel/sys_hwprobe.c b/arch/riscv/kernel/sys_hwprobe.c
-index a7c56b41efd2..befb6582b1ce 100644
---- a/arch/riscv/kernel/sys_hwprobe.c
-+++ b/arch/riscv/kernel/sys_hwprobe.c
-@@ -111,6 +111,9 @@ static void hwprobe_isa_ext0(struct riscv_hwprobe *pair,
- 		EXT_KEY(ZTSO);
- 		EXT_KEY(ZACAS);
- 		EXT_KEY(ZICOND);
-+		EXT_KEY(SSCSRIND);
-+		EXT_KEY(SMCDELEG);
-+		EXT_KEY(SSCCFG);
- 
- 		if (has_vector()) {
- 			EXT_KEY(ZVBB);
++#include <string.h>
++#include <stdio.h>
++#include <asm/hwprobe.h>
++#include <unistd.h>
++#include <sys/syscall.h>
++
++#include "pmu.h"
++
++static bool counter_deleg_present;
++
++bool perf_pmu_riscv_cdeleg_present(void)
++{
++	return counter_deleg_present;
++}
++
++void perf_pmu__arch_init(struct perf_pmu *pmu __maybe_unused)
++{
++	struct riscv_hwprobe isa_ext;
++	int ret;
++
++	isa_ext.key = RISCV_HWPROBE_KEY_IMA_EXT_0;
++
++	ret = syscall(__NR_riscv_hwprobe, &isa_ext, 1, 0, NULL, 0);
++	if (ret)
++		return;
++
++	if (isa_ext.key < 0)
++		return;
++
++	if ((isa_ext.value & RISCV_HWPROBE_EXT_SSCSRIND) &&
++	    (isa_ext.value & RISCV_HWPROBE_EXT_SMCDELEG) &&
++	    (isa_ext.value & RISCV_HWPROBE_EXT_SSCCFG))
++		counter_deleg_present = true;
++}
+diff --git a/tools/perf/arch/riscv/util/pmu.h b/tools/perf/arch/riscv/util/pmu.h
+new file mode 100644
+index 000000000000..21f33f7d323d
+--- /dev/null
++++ b/tools/perf/arch/riscv/util/pmu.h
+@@ -0,0 +1,11 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++
++#ifndef __RISCV_UTIL_PMU_H
++#define __RISCV_UTIL_PMU_H
++
++#include "../../../util/pmu.h"
++
++
++bool perf_pmu_riscv_cdeleg_present(void);
++
++#endif
 -- 
 2.34.1
 
