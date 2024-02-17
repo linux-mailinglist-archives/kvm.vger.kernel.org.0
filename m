@@ -1,103 +1,145 @@
-Return-Path: <kvm+bounces-8940-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8941-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8AF6858CAD
-	for <lists+kvm@lfdr.de>; Sat, 17 Feb 2024 02:15:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99AA6858CC4
+	for <lists+kvm@lfdr.de>; Sat, 17 Feb 2024 02:34:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 59D621F22687
-	for <lists+kvm@lfdr.de>; Sat, 17 Feb 2024 01:15:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1D7D1C21E4D
+	for <lists+kvm@lfdr.de>; Sat, 17 Feb 2024 01:34:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58BF117727;
-	Sat, 17 Feb 2024 01:15:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E64B1773D;
+	Sat, 17 Feb 2024 01:34:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pU9NiicI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wAkhB+tE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B1D7EAE5
-	for <kvm@vger.kernel.org>; Sat, 17 Feb 2024 01:15:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0434E149E08
+	for <kvm@vger.kernel.org>; Sat, 17 Feb 2024 01:34:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708132521; cv=none; b=HQHzcOjHigsa710qU+jwJDGdvchwApQ9BsVRpkdmjL0HldBv4c4TXkpv8LJz/mgwjDjjgbdqhhgqztM946nHXtLUXqjZl8SB2Q6U89ZLp+vUlN/ZwxdDhFxNT2ncbEQsYxJrXrZ1HpP/QF4zy28mdzSCpn1+/4Ewx5/s1y6xXUE=
+	t=1708133677; cv=none; b=JY3Hn2bD95i9TTAIbP7IHOxTicnWh8b7lLJFSP8hlXVK7Web9PSvC+yk9Y65wzMwTVhiCH3RWbQUR0y3SMYBMoy3KpRSthfLV5r/GEv0Lb9SLXDVIM6IEKjPDJuckcrWzvpcfcfGMYQelFfeCjuz6Vn5HjHQToQ9zCh2uZMtXv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708132521; c=relaxed/simple;
-	bh=ZLpzPkaQVf3vPQXMg5o0TPQW1auuMvt5zHLMK/s9MLQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=HLTfCAFiqNuKfvxXC8K8MG5NoguMdui1uQTgXqzShOIa0YKF3M0eMKCoN3flHz8Wos6nEiRbpaxzBhV3qVO2ULOEIl9S/wxr34u7NevB/UFiW81Tznne8Nlhu/7IdW+oqXWIBagZgYhjczuxR4ac6hG7yVlK7HB6ZjLmdWs+xoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pU9NiicI; arc=none smtp.client-ip=209.85.215.202
+	s=arc-20240116; t=1708133677; c=relaxed/simple;
+	bh=CCqhL6OxPySMxyCsemMfR4OsGPip9sZrMtAildgv/eo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=t/dITGZZAhv/HzTPdI9AqD1f8RZGVd2LEb5Ot4euNSb0MtFY6GEEYcSesoDlM+Ju9/IlppWBqj+85YXhCE1nkZjMk/tTcL7rtLF6MpEpJ6s50mxtkYhkKeHePhoBsxlDJ3CmgqWzj/zE7bOYXdRXbn1kaNzQ71+yV/APSnfxVKA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wAkhB+tE; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-5dc992f8c8aso2657780a12.3
-        for <kvm@vger.kernel.org>; Fri, 16 Feb 2024 17:15:19 -0800 (PST)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-607c9677a91so47986747b3.2
+        for <kvm@vger.kernel.org>; Fri, 16 Feb 2024 17:34:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708132519; x=1708737319; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4LBEMe2qsSCAfEzNdzegJHhWuWUWp8q/u+78ScdPwFM=;
-        b=pU9NiicIBS/T1qFm818l485nxSBrpnbAiJA4YrTD6ZDPVsvhJeEuqMD7BLUGMbZpGm
-         y4FL1d1wV3g+FaDt4dtGuuBiaIynd3SE5ZQ6P0uiBlKiUSDs4LLy1BpXuc1FL+EB8f5+
-         tNvWy6G2OYDleJGksPV7lBuL8VYzOIGjNKrYy67XyOGGoAD36SCVZESWbr4uK18BJQj5
-         o2w43D3/OWWpxVdd1eK5BHf4vZIhPfvlGyLYe2B3IcqZwaLah1AYqfRJJCl1VbQZjtxa
-         MXFpbmlKhW/SUfBmmGhyOo/EBALXobo+nYxcmKJODIRcVPYrkpAV0xj+ZQDfG4rnu+P+
-         cGXg==
+        d=google.com; s=20230601; t=1708133675; x=1708738475; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8V5hHcKHjHM46B61QGfRSvoByqou28ucJRHIA1LXfY4=;
+        b=wAkhB+tEONLD159y9q1s+Zosg36Ov8TCx7tHzZi1AR4jTAAeNBujBvtR2UZZWYw0Ai
+         DzMxSjjASzRXaM8yILTkC7ZJ6SswyIaOi+/QRvWoOc4qXUCANQeFvdlMnDppze3sLRUt
+         vltV2m9mSIR0o2oRa9wXeRixwo7t0PcbG2TpcvkxA8U+nSzspj0CVhiVW4FSHPwxFXqF
+         IQOhlaBc1eXJVWsaplRo1xARbBpzMQZTMJy3NM/Ste8iCR45wa5FWR2Kzmrxou9UHWcG
+         kKRDj+X1Yx2iaE2yly9WijygJtYW9rj3K1eGleCyigJSKehOY/vg/aTAKX1vIqSdWzcJ
+         LkUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708132519; x=1708737319;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4LBEMe2qsSCAfEzNdzegJHhWuWUWp8q/u+78ScdPwFM=;
-        b=kZuG1S+WL181ofF1CQtrAtBUxpUCLU1C4bRPAAkD+QyheHwU4Xy38kVm7XbdWkY/5B
-         y9c0YS+2UF4yQnZs4ZOROWgeKITZ0xVfo8iTGPYz0YwwLZCp1aQaRLRFrGO8/6rq4j56
-         /ccbjczP2r2IBzpdg6kh3a2SV3lfBYKI3CBGbhbnSFelwoDAVmz0SCQb4UhPkuEcTadt
-         /lTypfnFpkd7O4EuU5T9GDT/MVYNSC0XdXG/GPhWKQbbCKv+U93WdP9bPvKyg0FdHx2k
-         8wPXhCnYvRjxzKfASGGBbI0uYrVsZgrmYheN3scULhSVY/r9EsAuI/VLWPicu42QPLK5
-         Mlhg==
-X-Gm-Message-State: AOJu0Yz57Jooh1aLCo87mH8o5IhqgRtuY/z/IV340oWFWpRq5BYB7/bZ
-	0Y/RPUhXZuqePJUG6LzjdOpFGlMIERKy77q7p9FyhUxZXIQDeGbqVSzgGOznfqU7TT12tdBNuCN
-	5Zg==
-X-Google-Smtp-Source: AGHT+IFVkQ9NvXY6j/sr7qRJV7g3L2FAzP7Bjq0b5BlAdMognqEtCrekhuZo7id9NSWv8WxOXOoIKWFJ+jA=
+        d=1e100.net; s=20230601; t=1708133675; x=1708738475;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8V5hHcKHjHM46B61QGfRSvoByqou28ucJRHIA1LXfY4=;
+        b=JDLShS6+0e0AiFV7XQDBTTZ/It/YGI4klb98tonFodcqUmQq4DahgUE+tZFo42+zYX
+         Cg64VWDPGaKzE676G1AdP6B1L/osmGe62Q5JQTPqMOA0CnmwGFC+FjNIHc3kLkUWpA2o
+         WEc41AZdY9H9h17gaEnA2ovAe8EQBl3/S4HnuMcWBYcIeRNqj4TrfN6SiqbBhLU0g5tu
+         3VzbAHIb8vSZ/VAProdXu2RkMCjS1H7dx52+8BFWtwn3qaZoQsKePqr/T1orxHlrtAo4
+         nT7kKg8D75ziI8O6lGt/Jz0arrPsoLaRve+EZdbaNf7qGGhFvS5hPWmTosaMwuVzkjKr
+         4Pig==
+X-Gm-Message-State: AOJu0YzcYg3N5SAN5b2LqwgaQQ0nFU3IcsCNQG4Y1ksDSmTYFjioDpA4
+	2v5NF4gCxwpaJaJltB8M4k3VvwTYojBI1C1wep8sGlBHd6bSNYzrJ4H5tOXTnIiptA+vWQzb1Ry
+	3aQ==
+X-Google-Smtp-Source: AGHT+IG0DHiqUTZsUTS2w3YWIcyHBEsYUAn1JoY6wCyJEjknjPqwSUtfcLN8FjWW2R1v791xocVrgyeJfXY=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:d4c2:b0:1db:7d2a:8cc3 with SMTP id
- o2-20020a170902d4c200b001db7d2a8cc3mr281265plg.6.1708132519505; Fri, 16 Feb
- 2024 17:15:19 -0800 (PST)
-Date: Fri, 16 Feb 2024 17:02:29 -0800
-In-Reply-To: <20240215010004.1456078-1-seanjc@google.com>
+ (user=seanjc job=sendgmr) by 2002:a0d:d496:0:b0:608:d1d:d8d6 with SMTP id
+ w144-20020a0dd496000000b006080d1dd8d6mr181981ywd.7.1708133674935; Fri, 16 Feb
+ 2024 17:34:34 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Fri, 16 Feb 2024 17:34:30 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240215010004.1456078-1-seanjc@google.com>
 X-Mailer: git-send-email 2.44.0.rc0.258.g7320e95886-goog
-Message-ID: <170813138426.2064122.1636080722842815115.b4-ty@google.com>
-Subject: Re: [PATCH 0/2] KVM: x86: Fix dirty logging of emulated atomics
+Message-ID: <20240217013430.2079561-1-seanjc@google.com>
+Subject: [PATCH] KVM: SVM: Flush pages under kvm->lock to fix UAF in svm_register_enc_region()
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	David Matlack <dmatlack@google.com>, Pasha Tatashin <tatashin@google.com>, 
-	Michael Krebs <mkrebs@google.com>
-Content-Type: text/plain; charset="utf-8"
+	Gabe Kirkpatrick <gkirkpatrick@google.com>, Josh Eads <josheads@google.com>, 
+	Peter Gonda <pgonda@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 14 Feb 2024 17:00:02 -0800, Sean Christopherson wrote:
-> Fix a bug in KVM's emulator where the target page of an atomic write isn't
-> marked dirty, and enhance the dirty_log_test selftest to serve as
-> a regression test by conditionally doing forced emulation of guest writes.
-> 
-> Note, the selftest depends on several patches that are sitting in
-> `kvm-x86 pmu`, so I'll likely take the selftest through that branch (eww).
-> 
-> [...]
+Do the cache flush of converted pages in svm_register_enc_region() before
+dropping kvm->lock to fix use-after-free issues where region and/or its
+array of pages could be freed by a different task, e.g. if userspace has
+__unregister_enc_region_locked() already queued up for the region.
 
-Applied the fix itself to kvm-x86 fixes, I'll follow up with a heftier version
-of the selftest patch for 6.9.
+Note, the "obvious" alternative of using local variables doesn't fully
+resolve the bug, as region->pages is also dynamically allocated.  I.e. the
+region structure itself would be fine, but region->pages could be freed.
 
-[1/2] KVM: x86: Mark target gfn of emulated atomic instruction as dirty
-      https://github.com/kvm-x86/linux/commit/910c57dfa4d1
+Flushing multiple pages under kvm->lock is unfortunate, but the entire
+flow is a rare slow path, and the manual flush is only needed on CPUs that
+lack coherency for encrypted memory.
 
---
-https://github.com/kvm-x86/linux/tree/next
+Fixes: 19a23da53932 ("Fix unsynchronized access to sev members through svm_register_enc_region")
+Reported-by: Gabe Kirkpatrick <gkirkpatrick@google.com>
+Cc: Josh Eads <josheads@google.com>
+Cc: Peter Gonda <pgonda@google.com>
+Cc: stable@vger.kernel.org
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/svm/sev.c | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
+
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index f06f9e51ad9d..cbc626dc8795 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -1981,20 +1981,22 @@ int sev_mem_enc_register_region(struct kvm *kvm,
+ 		goto e_free;
+ 	}
+ 
+-	region->uaddr = range->addr;
+-	region->size = range->size;
+-
+-	list_add_tail(&region->list, &sev->regions_list);
+-	mutex_unlock(&kvm->lock);
+-
+ 	/*
+ 	 * The guest may change the memory encryption attribute from C=0 -> C=1
+ 	 * or vice versa for this memory range. Lets make sure caches are
+ 	 * flushed to ensure that guest data gets written into memory with
+-	 * correct C-bit.
++	 * correct C-bit.  Note, this must be done before dropping kvm->lock,
++	 * as region and its array of pages can be freed by a different task
++	 * once kvm->lock is released.
+ 	 */
+ 	sev_clflush_pages(region->pages, region->npages);
+ 
++	region->uaddr = range->addr;
++	region->size = range->size;
++
++	list_add_tail(&region->list, &sev->regions_list);
++	mutex_unlock(&kvm->lock);
++
+ 	return ret;
+ 
+ e_free:
+
+base-commit: 7455665a3521aa7b56245c0a2810f748adc5fdd4
+-- 
+2.44.0.rc0.258.g7320e95886-goog
+
 
