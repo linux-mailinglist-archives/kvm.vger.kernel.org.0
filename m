@@ -1,75 +1,66 @@
-Return-Path: <kvm+bounces-8958-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8959-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96A45858ED4
-	for <lists+kvm@lfdr.de>; Sat, 17 Feb 2024 11:53:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 439F7858F15
+	for <lists+kvm@lfdr.de>; Sat, 17 Feb 2024 12:25:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B2B531C20C5D
-	for <lists+kvm@lfdr.de>; Sat, 17 Feb 2024 10:53:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B018A1F21887
+	for <lists+kvm@lfdr.de>; Sat, 17 Feb 2024 11:25:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F0EA53E13;
-	Sat, 17 Feb 2024 10:53:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7992665BC0;
+	Sat, 17 Feb 2024 11:25:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="hFj/4baH"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="qRYazAuS"
 X-Original-To: kvm@vger.kernel.org
 Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C24D200B1;
-	Sat, 17 Feb 2024 10:53:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3348651AF
+	for <kvm@vger.kernel.org>; Sat, 17 Feb 2024 11:25:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708167192; cv=none; b=Y5UOM0CAWIEtWGUWFPBiyzI0BVp+5hIYo54rh1w/EG0FQs1/t4DLcM6Tfz8Mhkt5Y6A7TvgSfl4K5WW4W3bnOYoHREaarkWxoULQWreDfbTTtRbA4tRy/fZBvkPTwV3jSaCSKPXa5MkBFNKf1RR6tB357cjPIQpFuplc0uWJ7TU=
+	t=1708169145; cv=none; b=PrAzYQUGNcit3hpjG6ebcnHexeX5ghs+L9GsbGs0g/Y2eJW0yhlbcf3ZEpqtCRMMyqTueyXeuyAV6gKEIBfHgw5Md6Ux0JDXAW9tTI4kLb4Iv71PFvtOy/eQBbop+TG3n+SvtyMM433ep0CJNA8bn7QVLz45Fe2qsKGrcpcqktw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708167192; c=relaxed/simple;
-	bh=NqRJpd3fdw1O35swSw0WFS0IoVvXgxrLFCTOxA/foNE=;
+	s=arc-20240116; t=1708169145; c=relaxed/simple;
+	bh=67U1z1vi74lG0cP0RYj4IrodpBTGTUWdtBah6iLhaX0=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=GUI8twpI7nOpcH4kh9jrhVHSb84YD0rPe+zEhFfbSzTWilp5X4Oa89wmf05rHmvkb21gwLdtIgLAZzWDsJZxNCYwDBxDYm9Ox7gd0nlK3c1DzzFpLsoJTKfe1HZV1Wd81JfoGV9X6yzjOJDtdaI0mp0T6PknJwVB+wI8Qd+x0Js=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=hFj/4baH; arc=none smtp.client-ip=90.155.50.34
+	 Content-Type:MIME-Version; b=QuI4U7qBydBnfgRKpBtP1ZCMZd1qBE0JGaEpQU6pR8IwlzI0MdBnshZofNjnvuy6Ku88et1WBZIESh5H7yUkjQbExuscgYPoNNfFwYSrqkgPQKEbfe/b41T0LiKxvCZcuQWahFyKrG5TZ261l8pwhbKrEnn2l//5SnF90b6pQF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=qRYazAuS; arc=none smtp.client-ip=90.155.50.34
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
 	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=NqRJpd3fdw1O35swSw0WFS0IoVvXgxrLFCTOxA/foNE=; b=hFj/4baHdi6Og624rxn8HAmkiZ
-	CyYM0/UfGPawEXxyl3cu+sfiFPK5g5EgmtEFJno8Qf0xYZN8Tu3hghckbLjtdxI5FZiJnQrFYsXgx
-	8SlYlOUSNjjOMwBM+Seb1RNbUfTT2esqmiv8HOydqWI6v/x2XCBg+D5vad0RRuNvpQOOczJ3eiOIq
-	HjTHiNqEYil8AVMwi+UQOphdaco32qHDd98GhGShUQloqXTi4RxYACG/Xow4zWCfcOW3pb+7ApSpy
-	UXj2ne03kXgclPkDZVOt+HI8W1qvFhxNqi9Hoj1FLZyHM7g2/YwP9qwDYwM0i5r6IedN32+9CkORW
-	6ZCe1lKw==;
+	bh=Qg4rNNWTGXXzd8UUPIcY6syaw/3A/THrY06EV8tg8co=; b=qRYazAuS8Z7FPb2pB/wC9K2NP3
+	/5/sax+kUbFhu4KWvWiZs9wDzfS5XaqROewZokonoOQYp7XSsEERpoJF8hoXiPbBqNMn0UXgzAdac
+	y9MQLGHJumUGvu4jyUHr6Ymtg85L9oPHNhVfcnW0CMVzBpTNrh8v/dMArlf6RfzdOr3y5mzvvLpBs
+	F4xTsrA0dQYdc7R+fpUelPHxiHkU01AOBlm8iGpnGLNboKxcqqJSkJgknmXSCV0g7lO4oGxThuEgt
+	jxBmDNw89K9hHxhrr4XZ6IULVZEh4B9LtGbm3LtkOZD6EWDF9L0f1IkNIX2ao0nbS17RXblLtPpwl
+	RdjrhGvg==;
 Received: from [2001:8b0:10b:5:eb46:d4a:e92b:99eb] (helo=u3832b3a9db3152.ant.amazon.com)
 	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rbIJN-00000007E1B-0Lgi;
-	Sat, 17 Feb 2024 10:52:50 +0000
-Message-ID: <1192d7c0bafcfe47c1822afe09c25fda0a42a012.camel@infradead.org>
-Subject: Re: [PATCH v13 21/21] KVM: pfncache: rework __kvm_gpc_refresh() to
- fix locking issues
+	id 1rbIp8-00000007HfE-3GKK;
+	Sat, 17 Feb 2024 11:25:40 +0000
+Message-ID: <d32cbea3527f4b41daaf522f2c0210365647931c.camel@infradead.org>
+Subject: Re: [PATCH v4] KVM: x86/xen: Inject vCPU upcall vector when local
+ APIC is enabled
 From: David Woodhouse <dwmw2@infradead.org>
-To: Sean Christopherson <seanjc@google.com>, paul@xen.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
- Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank
- <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, David
- Hildenbrand <david@redhat.com>, Heiko Carstens <hca@linux.ibm.com>, Vasily
- Gorbik <gor@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+To: Michal Luczaj <mhal@rbox.co>, kvm <kvm@vger.kernel.org>
+Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>,  Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar
+ <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
  <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin"
- <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org, 
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-s390@vger.kernel.org, linux-kselftest@vger.kernel.org
-Date: Sat, 17 Feb 2024 10:52:49 +0000
-In-Reply-To: <Zc-EwMoijOo7w49N@google.com>
-References: <20240215152916.1158-1-paul@xen.org>
-	 <20240215152916.1158-22-paul@xen.org>
-	 <23e7ec31a67a73fe94b2b04dbca26ea5ca1ea238.camel@infradead.org>
-	 <df6ad8b9-4e53-4357-ab17-e9af62342849@xen.org>
-	 <Zc-EwMoijOo7w49N@google.com>
+ <hpa@zytor.com>,  Paul Durrant <paul@xen.org>
+Date: Sat, 17 Feb 2024 11:25:39 +0000
+In-Reply-To: <2379a9bc-a679-4b96-831b-13ab6779189b@rbox.co>
+References: <6150a0a8c3d911c6c2ada23c0b9c8b35991bd235.camel@infradead.org>
+	 <2379a9bc-a679-4b96-831b-13ab6779189b@rbox.co>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-sx6mMka9qnrwIyn9LeQR"
+	boundary="=-9/6szMNsRF4gzoDND9Wp"
 User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -80,22 +71,42 @@ MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
 
---=-sx6mMka9qnrwIyn9LeQR
+--=-9/6szMNsRF4gzoDND9Wp
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2024-02-16 at 07:52 -0800, Sean Christopherson wrote:
->=20
-> FWIW, I'm not opposed to overhauling the gpc locking, I agree it's a mess=
-.=C2=A0 I just
-> want to proceed slower than I would for a fix, it's a lot to digest.
+On Wed, 2024-02-14 at 17:32 +0100, Michal Luczaj wrote:
+> As I understand, splat here is due to APIC map being gone (because of phy=
+sical
+> APIC ID aliasing?), but I'm not sure what is the expected behaviour.
 
-Agreed. I'll do a *really* simple expansion of ->refresh_lock for the fix, =
-and
-then cleaning up the rwlock abuse can come later (at the very end of
-the series I'm about to post, so it can be ignored for now).
+Good catch, thank you.
 
---=-sx6mMka9qnrwIyn9LeQR
+	/* The fast version will always work for physical unicast */
+	WARN_ON_ONCE(!kvm_irq_delivery_to_apic_fast(v->kvm, NULL, &irq, &r, NULL))=
+;
+
+So the comment is wrong, we *can't* rely on it being unicast. With APIC
+ID aliasing, it ends up being multicast. But I think we can just do
+this:
+
+--- a/arch/x86/kvm/xen.c
++++ b/arch/x86/kvm/xen.c
+@@ -580,8 +580,7 @@ void kvm_xen_inject_vcpu_vector(struct kvm_vcpu *v)
+        irq.delivery_mode =3D APIC_DM_FIXED;
+        irq.level =3D 1;
+=20
+-       /* The fast version will always work for physical unicast */
+-       WARN_ON_ONCE(!kvm_irq_delivery_to_apic_fast(v->kvm, NULL, &irq, &r,=
+ NULL));
++       kvm_irq_delivery_to_apic(v->kvm, NULL, &irq, NULL);
+ }
+=20
+ /*
+
+
+
+--=-9/6szMNsRF4gzoDND9Wp
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -187,25 +198,25 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwMjE3MTA1MjQ5WjAvBgkqhkiG9w0BCQQxIgQgsEguugUE
-kuFg4gJUE/Ez31rZoETFDqZg+Ok1MFvCpgUwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwMjE3MTEyNTM5WjAvBgkqhkiG9w0BCQQxIgQgfk9Km7kL
+U8qJ5RMov6BBm8QjsASte48ThBG1C6Tf07Mwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBclBp7gaMKk+E9XbjrSUjPODw43IvHxA3W
-6qP8WmRFYXyfP0+EuQqOOp0ayim0yXgURDImyLHbboGd7yCw+ryRbehn93azGeA2bQmgOBPTANkE
-09/b4DaiiDf/GuC2QmqTdH/IJnjCi44pPrb3if8O4916iG34Q613jb2jJ/miGRUQJnLh4HIGHJro
-HFylZFteqry71DDQOHq2EXrplVEFcPI5i5OpS4vqM+EfHxnPgfQmdp9+tToqMwWdsxf8zYK88SWc
-rsQFUh9c0jUnWhuCOio8W8Zkgy/qnZ37OEJP+TUjOBKO62pu3OCJ5m47sZ9PzGqTFzMPwqW0pCRY
-dh0pQZnrKSHJFQidO3ATPffstysvVcm3vXTkZpIZLekf+zs3l+PVbkUpmGTxrxaYkkZSv6OAbwJn
-RSYH2xB51y2mg8NDZXoJ3sSiU8RDAM3HRGP3nqXeG8J0vD4W3jqNt2T6v61Ns28d/qdcxB0PDOnY
-ry8jX2wlceQmvBJDfHhfjN+u4H4msHySdxxZiQqn5fBWnIXyb69qO8SE6a7GHlBaHp2r7+nkehQH
-ux6tE1Z1YEKkhMshaXC6Kw8XdfZ5eNZuzQsSxVKdH6OSppaf/iODf11yO0WxXE3oFllvv9vvgykh
-fnIJtViElNis3w1STg4D1Foc1jF81KG5z97vYkmHjgAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAOwJ4ZQw44GffNeEXSjORYGt1ISv+cpyf/
+INp2N7Q/5804L6x9WX1kRBFBk+uJy8+H8+Q85RZ8Susl4YmkmbMEZpzqnSdrLsTmIduWMJmF24Lk
+HgOx8JYIaQNdLN/OKguKnSmXcAJCSk3oZMsUCIuc+RRcCr8QAd8osIJrfHzfLK94Z2DQoPeHPLae
+c0iPh8eE5WplwHiDSarQSvUSN74aJq5Wy9DWoaOZKcqCFyZWzIsFwzVbB3/Vs0T4vPhKYhACWqXI
+JZTaG0LQrioyIY8gCA+9791E3k/GH2IEgi4KCHiV7lp5vH57C0J5MOHckF1VK8Xumbz1SF7VF9Yw
+pT+pPEQjM6r2jiS8PYL3UFkAK/fE+BBDHvSMYGrZBbyoYBU24TfOsh8B/fwelL4oO3vtERaM3ref
+DzbAPrUELd7FugxlK5evTJsaG5/JvRMebZhCa8ZlYsgLrfHTnVOnPH2Hn/FLmCIJW1tBIB2mzhVc
+JnvJ2FOHLjLExb3Jp4JPWIzUXddCsLWAWOfyopUyPZ6WSBl2nc6QV0VcvYfQUc3GRQoY7uO4dgO1
+0qFKGWiWmWtvQqDd+TnBLADbN8kk1qm+1hugN+90Dm2tgkjHoEPfnvImrlBe28NowDCqqakQGIjN
+T9BmKcDflla/iBn7hSaHOfEazqrsR8j6zln6siMcBAAAAAAAAA==
 
 
---=-sx6mMka9qnrwIyn9LeQR--
+--=-9/6szMNsRF4gzoDND9Wp--
 
