@@ -1,175 +1,116 @@
-Return-Path: <kvm+bounces-8983-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8984-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CB4F859510
-	for <lists+kvm@lfdr.de>; Sun, 18 Feb 2024 07:41:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 04A858595C3
+	for <lists+kvm@lfdr.de>; Sun, 18 Feb 2024 09:47:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34272282500
-	for <lists+kvm@lfdr.de>; Sun, 18 Feb 2024 06:41:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B523C28199E
+	for <lists+kvm@lfdr.de>; Sun, 18 Feb 2024 08:47:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE506CA6B;
-	Sun, 18 Feb 2024 06:41:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QIirGwTq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C77FF11196;
+	Sun, 18 Feb 2024 08:47:10 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 216F763A9;
-	Sun, 18 Feb 2024 06:41:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2F5A149E17;
+	Sun, 18 Feb 2024 08:47:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708238476; cv=none; b=NN1Wn+s5C4Oq71q9Mkt2+R12Yb7AyPwmmro3WmisqKkYpMvljKgUPjbO0Ch0ZJThMvfCaez72myPLmtceJqOh7Ji9Tt1Nx01wz7W56KmfKPV2s/VIovoxXtnqzcSytLs24dVLT6CC+tfUIFjU+zjQGWSQRD19FBPDLduwIyO8QA=
+	t=1708246030; cv=none; b=iWmfsuN8JvvJmX96GKYoxwjx4Y8r5f8Y6YMzoMDA2yBWR4FWqeLQIkcjYQc+CkJJqHVaixia8ZotEkribZWzGSOKYLpjLnISLjbq7U4sZLVCeKyyeG6LpLdrQMUxvtFOT3XSdr7A4UQ2DUfxtKLZk6OwMS+SvFrDGkLAeu3Y3Oc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708238476; c=relaxed/simple;
-	bh=iuQbiFx2hJLfWb+6L78zmyCOPRaRIT6gS+4sPUW3K4I=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=efMKckdG/nwfhPr1zMhwdH1j9eujlW8ha+5sjWSj+ZungxMVyNYMk0WRGME6YtKYmc9oz8NEaYTIGY8CsE4RIBDPAubH2O3qXzIlsUzAU4AV8jgn2kClZaOFuY/L2HdX2hng4ThjwaNZ0R/HUvQMDb1VXBeolW8wmdj2JGi5V5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QIirGwTq; arc=none smtp.client-ip=209.85.208.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2d22fa5c822so7706281fa.2;
-        Sat, 17 Feb 2024 22:41:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708238473; x=1708843273; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Q0Y6u+5ShCMCnWeHjQjEcItSyrNAyQ4PzYVN7xsknZY=;
-        b=QIirGwTqqGyHzI+XMVjKhstg12wSmSuwqE85Cm0b2iqvZBeh1RRlO5opcUJra4Gs0T
-         rJAuOeFJarGA0FPjgLFlrX3oXe2Lz6bMlHvjvLL0fgyse7jZ/GOAe8YTBC2esWgsbnkG
-         u5uvCs2NKmYAvZfG50NLFfhkwGtqcD617x+HFEN5egfehzuyIYWBHaeaoW19lf46asFo
-         7SIulg2A94je5tqDLSwgKa0whJEV8P3FDCrxPItnanzH9ueQGciXSgpZWyvkV3B83dYk
-         ZFrFVu2Ojlqz+8kAn0RC3Zv2dha9vsmjKV/Ng3uapH79U6lv4SxdUktpcHWF/KanSga+
-         EBBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708238473; x=1708843273;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Q0Y6u+5ShCMCnWeHjQjEcItSyrNAyQ4PzYVN7xsknZY=;
-        b=ppdPsXlAZMh8s3x9UkMeAwJ51c92DY0vOxs4iAMdu7KizaG2XSvKDt1r7fG/SL2WnA
-         mfQgkV8Fzxu21/omeiBMCLzgcOQgG4rjc5jeSxx+Q3FCe2gL4vqtdPIl3292c2rJVtXj
-         OYN6hAofKTm2AMH5unAetpw5h9WXMj92JRWL0Cqq6ILGpqYx51N8y5c1ObMmNP4ufjNg
-         JPlSVPG1IvvoJDepeikLnHEWBrOah8gRQf/Az1SzKxLMXT8J0fiVukQp5cjJyT45JUcM
-         THsgvWtSg09lLitRiiT9q8sZGmCopAJqectzjOliTZTzylbTC3Y5dmDL/gsdS/uswv89
-         Sbsw==
-X-Forwarded-Encrypted: i=1; AJvYcCWclt3JhtVlS8S1mIAmtT+HvkAWTTnBwjIlIc9Gamm6iTNQro4FAUdq/SS/jbU7HEiKkXkdcPOxDwxIbn9Jgy/872SsCXViFvLwcOi+IqZ5EJxNZbkEBDnRvDslq8GaPgGrsDo5M6iR7XPnCDNMEVUhsV707ed2ie22K1/Al9styPLu
-X-Gm-Message-State: AOJu0YwQU/GwuaB/6SIEw8zxCmBBSD1CnbliYbMX3SMZvRSnihmZC+DJ
-	VQ7uC4e91x8EyisL78NUFiolAYYF3bziR4iChb4sMuVU+E3s6KkrREnizwIC6R7kpDXjA+Guqml
-	LLhYC9pPIuvIz9lYMjjYaajQteFw=
-X-Google-Smtp-Source: AGHT+IEU/ZiwgqWrDWfItsbjFQF1nhRZH5qrkBorAITC5xFGNJCVzU/oI+JZS45+PPkqBNqvb8/D/bZalu0eAbcSmoY=
-X-Received: by 2002:a2e:8684:0:b0:2d2:3913:5c4 with SMTP id
- l4-20020a2e8684000000b002d2391305c4mr54562lji.37.1708238472941; Sat, 17 Feb
- 2024 22:41:12 -0800 (PST)
+	s=arc-20240116; t=1708246030; c=relaxed/simple;
+	bh=r57VIygo4McbMJy7ObYDVyZ9K85AZDXtGaqReM398zI=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=KNLmmNM+IVYL4We/SG9ry1fHNDdzbBAo1G/yHxbTdGU2FNDYc00yRCEc6bozH+5qYqAaqWUfEXqa1BlESzjXj3YC/9xiMlvhpLrJdrnYbW4hjV39It0A0vT5Z+uKlpzAYrwZBHAZw/94k1rqdNLuh+7ig4MCQ8MyEJcA+tFeU7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4TczlS4hMQz1xnjr;
+	Sun, 18 Feb 2024 16:45:40 +0800 (CST)
+Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
+	by mail.maildlp.com (Postfix) with ESMTPS id E67E51A0172;
+	Sun, 18 Feb 2024 16:46:59 +0800 (CST)
+Received: from [10.174.185.179] (10.174.185.179) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Sun, 18 Feb 2024 16:46:58 +0800
+Subject: Re: [PATCH v3 04/10] KVM: arm64: vgic-its: Walk the LPI xarray in
+ vgic_copy_lpi_list()
+To: Oliver Upton <oliver.upton@linux.dev>
+CC: <kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>, Marc Zyngier
+	<maz@kernel.org>, James Morse <james.morse@arm.com>, Suzuki K Poulose
+	<suzuki.poulose@arm.com>, <linux-kernel@vger.kernel.org>
+References: <20240216184153.2714504-1-oliver.upton@linux.dev>
+ <20240216184153.2714504-5-oliver.upton@linux.dev>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <beca07ad-833e-ca68-2fe7-a30a2cb9faef@huawei.com>
+Date: Sun, 18 Feb 2024 16:46:53 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1705916069.git.haibo1.xu@intel.com> <CAAhSdy2wFzk0h5MiM5y9Fij0HyWake=7vNuV1MExUxkEtMWShw@mail.gmail.com>
-In-Reply-To: <CAAhSdy2wFzk0h5MiM5y9Fij0HyWake=7vNuV1MExUxkEtMWShw@mail.gmail.com>
-From: Haibo Xu <xiaobo55x@gmail.com>
-Date: Sun, 18 Feb 2024 14:41:00 +0800
-Message-ID: <CAJve8okkfvdRtvh8onQYL7_bmv9ntrViP54u805fQMq3apWFcQ@mail.gmail.com>
-Subject: Re: [PATCH v5 00/12] RISCV: Add kvm Sstc timer selftests
-To: Anup Patel <anup@brainfault.org>
-Cc: Haibo Xu <haibo1.xu@intel.com>, ajones@ventanamicro.com, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Atish Patra <atishp@atishpatra.org>, 
-	Guo Ren <guoren@kernel.org>, Conor Dooley <conor.dooley@microchip.com>, 
-	Mayuresh Chitale <mchitale@ventanamicro.com>, wchen <waylingii@gmail.com>, 
-	Greentime Hu <greentime.hu@sifive.com>, Jisheng Zhang <jszhang@kernel.org>, 
-	Samuel Holland <samuel@sholland.org>, Minda Chen <minda.chen@starfivetech.com>, 
-	Sean Christopherson <seanjc@google.com>, Peter Xu <peterx@redhat.com>, Like Xu <likexu@tencent.com>, 
-	Vipin Sharma <vipinsh@google.com>, Thomas Huth <thuth@redhat.com>, 
-	Aaron Lewis <aaronlewis@google.com>, 
-	Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>, linux-kernel@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20240216184153.2714504-5-oliver.upton@linux.dev>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
 
-On Mon, Feb 12, 2024 at 8:24=E2=80=AFPM Anup Patel <anup@brainfault.org> wr=
-ote:
->
-> On Mon, Jan 22, 2024 at 3:15=E2=80=AFPM Haibo Xu <haibo1.xu@intel.com> wr=
-ote:
-> >
-> > The RISC-V arch_timer selftests is used to validate Sstc timer
-> > functionality in a guest, which sets up periodic timer interrupts
-> > and check the basic interrupt status upon its receipt.
-> >
-> > This KVM selftests was ported from aarch64 arch_timer and tested
-> > with Linux v6.7-rc8 on a Qemu riscv64 virt machine.
-> >
-> > ---
-> > Changed since v4:
-> >   * Rebased to Linux 6.7-rc8
-> >   * Added new patch(2/12) to clean up the data type in struct test_args
-> >   * Re-ordered patch(11/11) in v4 to patch(3/12)
-> >   * Changed the timer_err_margin_us type from int to uint32_t
-> >
-> > Haibo Xu (11):
-> >   KVM: arm64: selftests: Data type cleanup for arch_timer test
-> >   KVM: arm64: selftests: Enable tuning of error margin in arch_timer
-> >     test
-> >   KVM: arm64: selftests: Split arch_timer test code
-> >   KVM: selftests: Add CONFIG_64BIT definition for the build
-> >   tools: riscv: Add header file csr.h
-> >   tools: riscv: Add header file vdso/processor.h
-> >   KVM: riscv: selftests: Switch to use macro from csr.h
-> >   KVM: riscv: selftests: Add exception handling support
-> >   KVM: riscv: selftests: Add guest helper to get vcpu id
-> >   KVM: riscv: selftests: Change vcpu_has_ext to a common function
-> >   KVM: riscv: selftests: Add sstc timer test
-> >
-> > Paolo Bonzini (1):
-> >   selftests/kvm: Fix issues with $(SPLIT_TESTS)
->
-> Rebased on Linux-6.8-rc4 and queued this series for Linux-6.9
->
+On 2024/2/17 2:41, Oliver Upton wrote:
+> Start iterating the LPI xarray in anticipation of removing the LPI
+> linked-list.
+> 
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/kvm/vgic/vgic-its.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> index fb2d3c356984..9ce2edfadd11 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> @@ -335,6 +335,7 @@ static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
+>  int vgic_copy_lpi_list(struct kvm *kvm, struct kvm_vcpu *vcpu, u32 **intid_ptr)
+>  {
+>  	struct vgic_dist *dist = &kvm->arch.vgic;
+> +	XA_STATE(xas, &dist->lpi_xa, GIC_LPI_OFFSET);
+>  	struct vgic_irq *irq;
+>  	unsigned long flags;
+>  	u32 *intids;
+> @@ -353,7 +354,9 @@ int vgic_copy_lpi_list(struct kvm *kvm, struct kvm_vcpu *vcpu, u32 **intid_ptr)
+>  		return -ENOMEM;
+>  
+>  	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
+> -	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
+> +	rcu_read_lock();
+> +
+> +	xas_for_each(&xas, irq, INTERRUPT_ID_BITS_ITS) {
 
-Thanks!
+We should use '1 << INTERRUPT_ID_BITS_ITS - 1' to represent the maximum
+LPI interrupt ID.
 
-> Thanks,
-> Anup
->
-> >
-> >  tools/arch/riscv/include/asm/csr.h            | 541 ++++++++++++++++++
-> >  tools/arch/riscv/include/asm/vdso/processor.h |  32 ++
-> >  tools/testing/selftests/kvm/Makefile          |  27 +-
-> >  .../selftests/kvm/aarch64/arch_timer.c        | 295 +---------
-> >  tools/testing/selftests/kvm/arch_timer.c      | 259 +++++++++
-> >  .../selftests/kvm/include/aarch64/processor.h |   4 -
-> >  .../selftests/kvm/include/kvm_util_base.h     |   9 +
-> >  .../selftests/kvm/include/riscv/arch_timer.h  |  71 +++
-> >  .../selftests/kvm/include/riscv/processor.h   |  65 ++-
-> >  .../testing/selftests/kvm/include/test_util.h |   2 +
-> >  .../selftests/kvm/include/timer_test.h        |  45 ++
-> >  .../selftests/kvm/lib/riscv/handlers.S        | 101 ++++
-> >  .../selftests/kvm/lib/riscv/processor.c       |  87 +++
-> >  .../testing/selftests/kvm/riscv/arch_timer.c  | 111 ++++
-> >  .../selftests/kvm/riscv/get-reg-list.c        |  11 +-
-> >  15 files changed, 1353 insertions(+), 307 deletions(-)
-> >  create mode 100644 tools/arch/riscv/include/asm/csr.h
-> >  create mode 100644 tools/arch/riscv/include/asm/vdso/processor.h
-> >  create mode 100644 tools/testing/selftests/kvm/arch_timer.c
-> >  create mode 100644 tools/testing/selftests/kvm/include/riscv/arch_time=
-r.h
-> >  create mode 100644 tools/testing/selftests/kvm/include/timer_test.h
-> >  create mode 100644 tools/testing/selftests/kvm/lib/riscv/handlers.S
-> >  create mode 100644 tools/testing/selftests/kvm/riscv/arch_timer.c
-> >
-> > --
-> > 2.34.1
-> >
+>  		if (i == irq_count)
+>  			break;
+>  		/* We don't need to "get" the IRQ, as we hold the list lock. */
+> @@ -361,6 +364,8 @@ int vgic_copy_lpi_list(struct kvm *kvm, struct kvm_vcpu *vcpu, u32 **intid_ptr)
+>  			continue;
+>  		intids[i++] = irq->intid;
+>  	}
+> +
+> +	rcu_read_unlock();
+>  	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
+>  
+>  	*intid_ptr = intids;
+
+Thanks,
+Zenghui
 
