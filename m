@@ -1,205 +1,131 @@
-Return-Path: <kvm+bounces-9104-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9105-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDBF385AC4F
-	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 20:49:53 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB98985ADE6
+	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 22:42:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1B555B23CE6
-	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 19:49:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 77B94B236FA
+	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 21:42:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7725C524A6;
-	Mon, 19 Feb 2024 19:44:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DE1E53E2B;
+	Mon, 19 Feb 2024 21:42:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R5/c1S63"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="D8W6g3xF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24B7450A87
-	for <kvm@vger.kernel.org>; Mon, 19 Feb 2024 19:44:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 251E753E3E
+	for <kvm@vger.kernel.org>; Mon, 19 Feb 2024 21:42:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708371898; cv=none; b=aXBwVR1+oMhdeqdhKr486+bZ18+rbUcamiM5bGJos23xbbU729xaavhaaUzETRVgRvQKA6fKRbLwPEhhDFqT08mokk11NyEoG1Bm0a/c8g/M0jpjtNEsBqi7NfMX5zj68xTLEErbEimfHFowYh/c417d2SQQiBEgGDxPhepZqGg=
+	t=1708378932; cv=none; b=ZyaLKhoITZ9km202SGGKszZOcLWPS7E8CK16Nla3G7fTDCb8mR5iS9ACt/Z+PJoNf2gA6dUnP6UYgG4sMFgfZkHKx1a4G+OEMsqN7Nr9Oj2Z+7wH7Qt5khdm/+WMkX8KtaFHqIQkeyZCSU/+JMTEIUQeXMPKX48YaXqWsV/HDbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708371898; c=relaxed/simple;
-	bh=E+Xy2XRAda90xzmpOCLVMCWvUSqK/cSM1uqpdDqY9Ho=;
+	s=arc-20240116; t=1708378932; c=relaxed/simple;
+	bh=X/JQNewlP0vjO6jTDKr0e8KEBVYmNgVrFfyXrgV4mFQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=hbGIr4fdiGRhHc/Fjcu4ic4f9RayxJ1CCm21+/gxdX8KbENVUo1TBYwWm362GySL49QiMIUjA7lhm3ROPucbiiJwUOStebUmr/4yiKnxP4UbVHQ2SxbsTXQf/shSg8A+T6IyrczJ4b9vWJ6lXmdVYNq8ZDY5niI2CMP+SRu2doY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=R5/c1S63; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=O7w/dlw08FhrH1N0eV1gMcd0H0mZWvwuZVPEbpyRoL23oMXd0fAhGg13CbZoRM4ugPxybNUxbsoYy3qBuXaeQYyfnCUyy1nIxKukjsC0q2gWyYQL2/bGZtNJRE17J7pxClTtWM4Knzmw2pIxEQibQhyffwXdFyZtmsprvO1VjxQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=D8W6g3xF; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6e476b2010cso302115b3a.2
-        for <kvm@vger.kernel.org>; Mon, 19 Feb 2024 11:44:56 -0800 (PST)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5d8dbe37d56so4479338a12.0
+        for <kvm@vger.kernel.org>; Mon, 19 Feb 2024 13:42:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708371896; x=1708976696; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1708378928; x=1708983728; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1xGRRXyfAJwY+Wlb9SNUfV/3zxIlLDfOMm4MGEnvLX4=;
-        b=R5/c1S63IUGrXtZIfZf9Z7BWbp9cF4qo6jcU4VwqbSIT/JiXEd/021Kt9XvGwGEbJH
-         SkRq+S9tabxJLQ1kiF6gXS4dgYOEELtYJiDPIii0xKpak0MoZus6jvIDIAnvG21ZBFfh
-         FYhfUEclkNCEBNBOfc0s4vfxlBCSmujs+SqYXCP4uFvMTYwTpkNCzYHrg1HI470w8QxM
-         faS+d8FoMLHhJjE26nO4kQrITWBHHXX2F1PbG6wLpwqlY2uYwFx83K4zzfDmiLOrijCL
-         6EdzkllviQE/wGWhxaHnTYepCkzk/JkpUkNHsu07xFqS6ex6gknSSz3492Q1/XJb0mox
-         +dWA==
+        bh=g8pCPeHHqio6jkpHM74ywYCDIbICUYC0WuI3ZsK0Xes=;
+        b=D8W6g3xFdxsLnpo9T3gSkE+PwxH+Rz3RgvW2UCiVvziW27U7KYoVdlK5E45sITSc7x
+         MuKfqe+bIhFbWfSgsNTJqnF2g5lp7sEwCnDxw/jyJuzo2pJWeZwe7yBZR/1eAmIA3WH7
+         Jt9ls/brQsJoJ8Pd3y5TnwiXKoxNYzYkd2AKSg1bn+qvwVt75gSxmf7AuxcL9VgEJ3Gf
+         /O+OsrYF8ko4cWiZCWk1OXhugUk6K+uUJieP9eci7xUSiLniMY3LTi35gDCzaIbZbn+d
+         JR6gIYnAvpw+QlBT/ecpHXxB84cy4qAvW6lSQh5pHYKMtHQnLkweiD0CypSA166rnb4u
+         kDIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708371896; x=1708976696;
+        d=1e100.net; s=20230601; t=1708378928; x=1708983728;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1xGRRXyfAJwY+Wlb9SNUfV/3zxIlLDfOMm4MGEnvLX4=;
-        b=inlipE4z5mzV9YYa5lgAWUowc16ubWbC6bBj+VDOD6IVXHcGYjgDO7U8wncTvoG+Eg
-         Sf6qFeX0WEPp6za6SqTse1B85vgp7UZNKJIqB5lgWIsuC/OeWvEnDWBWVLFcswFSKmFr
-         p0zwGuH807SEDoJVCdpfWY5vGoFWOL+Eul1+uQtQMRrAbkJHHeK/d86OrYdsJrW3nhM8
-         HkrUveiD9luH3sOlpnm/sWfRdvy1Kd7iHHYJR1Mt+O2366d2XJo4GYNW1vsh3+9CXMxe
-         ExfqQs/ytbmWGyQXZr4+8ib/XV+JdnwHI++Z7kC8s3fWmLu2mG19IPLb2/CXNpNp8X69
-         tBcw==
-X-Forwarded-Encrypted: i=1; AJvYcCXEak2kgoZjr8F9Y0xJyDaBHFJks2rsMxN+TjZgQFECT/aLrT5Ey7xCEhc/JtNn80IBhbHK81OuqCj6dzsAdNWPMqJn
-X-Gm-Message-State: AOJu0YzcTHce9sKxG4cbPExzqosPSXvtX7EbLmAO2q0GsM4Zg0LeWyPq
-	YlLvHiLXTXeKYwAM4bl/2g42S5yAS5t9FqrdrCxY47CCvweDo7bsjUGa6JVyeXjULzydUYfuTLD
-	CKA==
-X-Google-Smtp-Source: AGHT+IFP2T1zEx5S93e9oVxdi/AGEcBSSYh8ZheEXs/7uYVwv3k/2CWQKj8iLMKA24rEr82FH9G/554PTh0=
+        bh=g8pCPeHHqio6jkpHM74ywYCDIbICUYC0WuI3ZsK0Xes=;
+        b=BsVIfgRrWie3GnSuNmTD5fMrBTHvQJGCTiqadK4BT2tRJ0+LgUn2dR5N6C/eVQ71ok
+         ewu6nokjMRDcBb7sgujrV0PcTG0FCC1NCmo+UGIiSgVZsYTQsKxC2WeiQCIAXIPysTog
+         ZKsVsTkMk0yKVruWXUaH4nUx5htKabD8cM0Z9rBtkLHl83ubxkDwvzxTt+Kl5XGZWXvc
+         tMAWGSbuFYrakYXBtQBu4YeYUj8LPyZMeXjvD+9wErF6QKe0xTZtGMwwpiMOGoPZKygR
+         +dInnG9b1ldnW4isX+t7yqXixNPRDLa8A7PG+qRJ7AH07HqHzNsgVqeQHLTdEtRRxlwq
+         j1GA==
+X-Forwarded-Encrypted: i=1; AJvYcCV+jC8eIGnsGGIeVVTgkdzpf+s5z5rIIJGJXXymX9TZ5vEjsMy/xb+MrAJWLorLDmH6WSpSmzF3OY05GjwdaKy9Y8HO
+X-Gm-Message-State: AOJu0YyHEr+f8zD5YeXFpFvHf+vLLSlLjZsYUDbQ47Vsf+G8OIcftWxV
+	vxzkCGril/Fmg7R1OpQ/+O5KbpTLJh20UP6m3Xt4kQd3CGWspFtWfHZXCBFaUk5gBCnC3XRvpvy
+	qlw==
+X-Google-Smtp-Source: AGHT+IHqdE3KIsgW0NC+8GHUODTOmDylpK2DdX8ikWVklG5BvSIeuNAnpXNIboNkdrJqpTmuvilDIVPPeCY=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:92a5:b0:6e0:3bc0:6b27 with SMTP id
- jw37-20020a056a0092a500b006e03bc06b27mr448258pfb.3.1708371895717; Mon, 19 Feb
- 2024 11:44:55 -0800 (PST)
-Date: Mon, 19 Feb 2024 11:44:54 -0800
-In-Reply-To: <ZdLOjuCP2pDjhsJl@yzhao56-desk.sh.intel.com>
+ (user=seanjc job=sendgmr) by 2002:a65:6742:0:b0:5db:e194:873f with SMTP id
+ c2-20020a656742000000b005dbe194873fmr35852pgu.10.1708378927816; Mon, 19 Feb
+ 2024 13:42:07 -0800 (PST)
+Date: Mon, 19 Feb 2024 13:42:06 -0800
+In-Reply-To: <20240215152916.1158-5-paul@xen.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240209222858.396696-1-seanjc@google.com> <20240209222858.396696-4-seanjc@google.com>
- <ZdLOjuCP2pDjhsJl@yzhao56-desk.sh.intel.com>
-Message-ID: <ZdOvttFKP1VVgrsA@google.com>
-Subject: Re: [PATCH v4 3/4] KVM: x86/mmu: Move slot checks from
- __kvm_faultin_pfn() to kvm_faultin_pfn()
+References: <20240215152916.1158-1-paul@xen.org> <20240215152916.1158-5-paul@xen.org>
+Message-ID: <ZdPLLsdNnAb5eXiZ@google.com>
+Subject: Re: [PATCH v13 04/21] KVM: pfncache: add a mark-dirty helper
 From: Sean Christopherson <seanjc@google.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Friedrich Weber <f.weber@proxmox.com>, Kai Huang <kai.huang@intel.com>, 
-	Yuan Yao <yuan.yao@linux.intel.com>, Xu Yilun <yilun.xu@linux.intel.com>, 
-	Yu Zhang <yu.c.zhang@linux.intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Fuad Tabba <tabba@google.com>, Michael Roth <michael.roth@amd.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, David Matlack <dmatlack@google.com>
+To: Paul Durrant <paul@xen.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, David Hildenbrand <david@redhat.com>, 
+	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
+	Alexander Gordeev <agordeev@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, David Woodhouse <dwmw2@infradead.org>, Shuah Khan <shuah@kernel.org>, 
+	kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-s390@vger.kernel.org, linux-kselftest@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 
-+Jim
+On Thu, Feb 15, 2024, Paul Durrant wrote:
+> +/**
+> + * kvm_gpc_mark_dirty_in_slot - mark a cached guest page as dirty.
+> + *
+> + * @gpc:	   struct gfn_to_pfn_cache object.
 
-On Mon, Feb 19, 2024, Yan Zhao wrote:
-> On Fri, Feb 09, 2024 at 02:28:57PM -0800, Sean Christopherson wrote:
-> > @@ -4406,6 +4379,37 @@ static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
-> >  	fault->mmu_seq = vcpu->kvm->mmu_invalidate_seq;
-> >  	smp_rmb();
-> >  
-> > +	if (!slot)
-> > +		goto faultin_pfn;
-> > +
-> > +	/*
-> > +	 * Retry the page fault if the gfn hit a memslot that is being deleted
-> > +	 * or moved.  This ensures any existing SPTEs for the old memslot will
-> > +	 * be zapped before KVM inserts a new MMIO SPTE for the gfn.
-> > +	 */
-> > +	if (slot->flags & KVM_MEMSLOT_INVALID)
-> > +		return RET_PF_RETRY;
-> > +
-> > +	if (!kvm_is_visible_memslot(slot)) {
-> > +		/* Don't expose KVM's internal memslots to L2. */
-> > +		if (is_guest_mode(vcpu)) {
-> > +			fault->slot = NULL;
-> > +			fault->pfn = KVM_PFN_NOSLOT;
-> > +			fault->map_writable = false;
-> > +			return RET_PF_CONTINUE;
-> Call kvm_handle_noslot_fault() to replace returning RET_PF_CONTINUE?
+Meh, just omit the kerneldoc comment.  
 
-Oof.  Yes.  But there is a pre-existing bug here too, though it's very theoretical
-and unlikely to ever cause problems.
+> + */
+> +static inline void kvm_gpc_mark_dirty_in_slot(struct gfn_to_pfn_cache *gpc)
+> +{
+> +	lockdep_assert_held(&gpc->lock);
+> +	if (gpc->memslot)
+> +		mark_page_dirty_in_slot(gpc->kvm, gpc->memslot,
+> +					gpc->gpa >> PAGE_SHIFT);
 
-If KVM is using TDP, but L1 is using shadow paging for L2, then routing through
-kvm_handle_noslot_fault() will incorrectly cache the gfn as MMIO, and create an
-MMIO SPTE.  Creating an MMIO SPTE is ok, but only because kvm_mmu_page_role.guest_mode
-ensure KVM uses different roots for L1 vs. L2.  But mmio_gfn will remain valid,
-and could (quite theoretically) cause KVM to incorrectly treat an L1 access to
-the private TSS or identity mapped page tables as MMIO.
+It's kinda silly, but I think it's worth landing this below gpa_to_gfn() so that
+there's no need to open code the shift.
 
-Furthermore, this check doesn't actually prevent exposing KVM's internal memslots
-to L2, it simply forces KVM to emulate the access.  In most cases, that will trigger
-MMIO, amusingly due to filling arch.mmio_gfn.  And vcpu_is_mmio_gpa() always
-treats APIC accesses as MMIO, so those are fine.  But the private TSS and identity
-mapped page tables could go either way (MMIO or access the private memslot's backing
-memory).
+And I have a (very) slight preference for an early return.
 
-We could "fix" the issue by forcing MMIO emulation for L2 access to all internal
-memslots, not just to the APIC.  But I think that's actually less correct than
-letting L2 access the private TSS and indentity mapped page tables (not to mention
-that I can't imagine anyone cares what KVM does in this case).  From L1's perspective,
-there is R/W memory at those memslot, the memory just happens to be initialized
-with non-zero data, and I don't see a good argument for hiding that memory from L2.
-Making the memory disappear is far more magical than the memory existing in the
-first place.
+static inline void kvm_gpc_mark_dirty_in_slot(struct gfn_to_pfn_cache *gpc)
+{
+	lockdep_assert_held(&gpc->lock);
 
-The APIC access page is special because KVM _must_ emulate the access to do the
-right thing.  And despite what commit 3a2936dedd20 ("kvm: mmu: Don't expose private
-memslots to L2") said, it's not just when L1 is accelerating L2's virtual APIC,
-it's just as important (likely *more* imporant* for correctness when L1 is passing
-through its own APIC to L2.
+	if (!gpc->memslot)
+		return;
 
-Unless I'm missing someting, I think it makes sense to throw in the below before
-moving code around.
+	mark_page_dirty_in_slot(gpc->kvm, gpc->memslot, gpa_to_gfn(gpc->gpa));
+}
 
-Ouch, and looking at this further, patch 1 introduced a bug (technically) by caching
-fault->slot; in this case KVM will unnecessarily check mmu_notifiers.  That's
-obviously a very benign bug, as a false positive just means an unnecessary retry,
-but yikes.
-
---
-Subject: [PATCH] KVM: x86/mmu: Don't force emulation of L2 accesses to
- non-APIC internal slots
-
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/mmu/mmu.c | 17 +++++++++++++----
- 1 file changed, 13 insertions(+), 4 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 488f522f09c6..4ce824cec5b9 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4341,8 +4341,18 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 	if (slot && (slot->flags & KVM_MEMSLOT_INVALID))
- 		return RET_PF_RETRY;
- 
--	if (!kvm_is_visible_memslot(slot)) {
--		/* Don't expose private memslots to L2. */
-+	if (slot && slot->id == APIC_ACCESS_PAGE_PRIVATE_MEMSLOT) {
-+		/*
-+		 * Don't map L1's APIC access page into L2, KVM doesn't support
-+		 * using APICv/AVIC to accelerate L2 accesses to L1's APIC,
-+		 * i.e. the access needs to be emulated.  Emulating access to
-+		 * L1's APIC is also correct if L1 is accelerating L2's own
-+		 * virtual APIC, but for some reason L1 also maps _L1's_ APIC
-+		 * into L2.  Note, vcpu_is_mmio_gpa() always treats access to
-+		 * the APIC as MMIO.  Allow an MMIO SPTE to be created, as KVM
-+		 * uses different roots for L1 vs. L2, i.e. there is no danger
-+		 * of breaking APICv/AVIC for L1.
-+		 */
- 		if (is_guest_mode(vcpu)) {
- 			fault->slot = NULL;
- 			fault->pfn = KVM_PFN_NOSLOT;
-@@ -4355,8 +4365,7 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 		 * MMIO SPTE.  That way the cache doesn't need to be purged
- 		 * when the AVIC is re-enabled.
- 		 */
--		if (slot && slot->id == APIC_ACCESS_PAGE_PRIVATE_MEMSLOT &&
--		    !kvm_apicv_activated(vcpu->kvm))
-+		if (!kvm_apicv_activated(vcpu->kvm))
- 			return RET_PF_EMULATE;
- 	}
- 
-
-base-commit: ec98c2c1a07fb341ba2230eab9a31065d12d9de6
--- 
+> +}
+> +
+>  void kvm_sigset_activate(struct kvm_vcpu *vcpu);
+>  void kvm_sigset_deactivate(struct kvm_vcpu *vcpu);
+>  
+> -- 
+> 2.39.2
+> 
 
