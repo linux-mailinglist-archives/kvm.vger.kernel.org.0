@@ -1,196 +1,373 @@
-Return-Path: <kvm+bounces-9067-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9068-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB9AE859FCD
-	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 10:37:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 824A7859FD6
+	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 10:39:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0BD01C211AD
-	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 09:37:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 07D361F21787
+	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 09:39:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E23028684;
-	Mon, 19 Feb 2024 09:36:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61A6524A06;
+	Mon, 19 Feb 2024 09:38:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="iMsPSz5j"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mVSnOFwx"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2083.outbound.protection.outlook.com [40.107.101.83])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C76225627;
-	Mon, 19 Feb 2024 09:36:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.83
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708335391; cv=fail; b=rZkLLVyzyi0X4KOFr2jRwm/dB1tjiATRh8Mk7tQRqdlfDzviN7o7d+3uRHvtZLB85dHeSaoRZ3gWP3JQWCmKheojeixnTjdHcRwoQGMd2vL1uIcFpfXZzjXjlUbLHsXtkdgpPTjwyApA+cI50b49u5Eb0B9f/a35OsQ7d6Xk57U=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708335391; c=relaxed/simple;
-	bh=Hu2ka960XbAcKJ3drws4ddvcTGReWGESk/w8lot58zQ=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=lg6HciopezTO4LWYwJP6vy4ncDN0eIANm2j7r3zI0c//yf+s3861IhYFIc4hL/mpsg1eVkljFDtWn7RCMWoWPRLz0mqMACtQ0xGYJughEBkHcT5AEeQNuLL6//epwB9+Qte10fsldiaLm9gw8LnxAkfoW/xxBXgknVUk+QD0GAY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=iMsPSz5j; arc=fail smtp.client-ip=40.107.101.83
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=U14QDRcDT2B/M4OOThqEZ9dgt3xoH/r66jrmYEst+XVcwxUciy+ldillui+TSepJ1IXLhFTCpN4RdmBEIa1XEnmwdsHRrGCQ6QMYPrl0BxVYKDfoizeWNzNoV30VyaFZKtmqaZ0KKm8k6RSHYl8qWZc3BRkGd6i0MLNrXM6HGdINPuF0kHNfAlupQ2pYvzArdYOCs2HeTK4qawC//0W60oUFetivnTWOufacBOFd5Pjye4VlGGe9nJdKJw3CIC9hnboEP62tJ6C+1f8+8Y+EM95l3g/jZ0p4EgF/hTP7pJ5mGz8BziDRrovMDJmjgXcP3mpusdwqtzB1fGZr6MfwDA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Hu2ka960XbAcKJ3drws4ddvcTGReWGESk/w8lot58zQ=;
- b=V/xEc/qJDlQLghwIyAPn58cD7mjqhEM6k9l0UDTfqo+jbsxEzaP3ApGfz5oQNAW0vC4PbPSIaBdxCnrFmvU4eVUp9dKwswolAZYR/ynjJmt9qDxpbX855VxFH0vE6jdXqHNrlS+4+m8M1uMq60Igy+HPcTmdz6Lv6F047mxl/J4MXX8J4fh+Ax25U6/tcVTTHGSV+dZaKeg2hkk9f5uUaQftDKC0l/YiwJTgO+Q5EO3Wy69D11Tdf0ohzwPCMICSv+gFY7CPnPXTUQ0XYDrUMAPFmcrCDbVRHhIVP7CWWADPiy7xGtvN3GD6DPxbUpZdOdBiNRKYcE1dp+k+H94kRg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Hu2ka960XbAcKJ3drws4ddvcTGReWGESk/w8lot58zQ=;
- b=iMsPSz5jijkHpbfK5dhnTHIIUDisL6BLSOX68fEO5V8F+u7OFpnRYZIhkZ0zSM+XX2Kh5I4I+sq53x+ppR1UwAce1Do1NBzCZht9vYH5CqH/VONY8DxiDQiPcRQBenGwo4Ls92w/xnhPQBaYKgvRIwOEmmNWttjnXO6VlwAyEyAGel2avUp+1V99nDZPvkQHLCS1l5w7eyPw8fEsA83obgwt1SZGTfFbJ1Al5ImtIA3/W0vb1X4Yq87iRfu/R9oYE7MCB3kZ4C00iR2OjpeEB9A0/WQxnv2hP/U2Xa5O1Yhu2kywKY4/stn6d/+EPFBfuom4jsCVLoBKOOP+/ctzAw==
-Received: from SA1PR12MB7199.namprd12.prod.outlook.com (2603:10b6:806:2bc::21)
- by LV2PR12MB5775.namprd12.prod.outlook.com (2603:10b6:408:179::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.19; Mon, 19 Feb
- 2024 09:36:26 +0000
-Received: from SA1PR12MB7199.namprd12.prod.outlook.com
- ([fe80::284c:211f:16dc:f7b2]) by SA1PR12MB7199.namprd12.prod.outlook.com
- ([fe80::284c:211f:16dc:f7b2%5]) with mapi id 15.20.7316.016; Mon, 19 Feb 2024
- 09:36:26 +0000
-From: Ankit Agrawal <ankita@nvidia.com>
-To: Zhi Wang <zhi.wang.linux@gmail.com>
-CC: Jason Gunthorpe <jgg@nvidia.com>, "alex.williamson@redhat.com"
-	<alex.williamson@redhat.com>, Yishai Hadas <yishaih@nvidia.com>,
-	"shameerali.kolothum.thodi@huawei.com"
-	<shameerali.kolothum.thodi@huawei.com>, "kevin.tian@intel.com"
-	<kevin.tian@intel.com>, "mst@redhat.com" <mst@redhat.com>,
-	"eric.auger@redhat.com" <eric.auger@redhat.com>, "jgg@ziepe.ca"
-	<jgg@ziepe.ca>, "oleksandr@natalenko.name" <oleksandr@natalenko.name>,
-	"clg@redhat.com" <clg@redhat.com>, "satyanarayana.k.v.p@intel.com"
-	<satyanarayana.k.v.p@intel.com>, "brett.creeley@amd.com"
-	<brett.creeley@amd.com>, "horms@kernel.org" <horms@kernel.org>,
-	"shannon.nelson@amd.com" <shannon.nelson@amd.com>, Aniket Agashe
-	<aniketa@nvidia.com>, Neo Jia <cjia@nvidia.com>, Kirti Wankhede
-	<kwankhede@nvidia.com>, "Tarun Gupta (SW-GPU)" <targupta@nvidia.com>, Vikram
- Sethi <vsethi@nvidia.com>, Andy Currid <acurrid@nvidia.com>, Alistair Popple
-	<apopple@nvidia.com>, John Hubbard <jhubbard@nvidia.com>, Dan Williams
-	<danw@nvidia.com>, "Anuj Aggarwal (SW-GPU)" <anuaggarwal@nvidia.com>, Matt
- Ochs <mochs@nvidia.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"virtualization@lists.linux-foundation.org"
-	<virtualization@lists.linux-foundation.org>
-Subject: Re: [PATCH v18 3/3] vfio/nvgrace-gpu: Add vfio pci variant module for
- grace hopper
-Thread-Topic: [PATCH v18 3/3] vfio/nvgrace-gpu: Add vfio pci variant module
- for grace hopper
-Thread-Index: AQHaYISKEq7ts7f4oEyo6sBByW/RK7ERawGAgAABoO0=
-Date: Mon, 19 Feb 2024 09:36:26 +0000
-Message-ID:
- <SA1PR12MB7199C1C570B00C78311666D2B0512@SA1PR12MB7199.namprd12.prod.outlook.com>
-References: <20240216030128.29154-1-ankita@nvidia.com>
-	<20240216030128.29154-4-ankita@nvidia.com>
- <20240219112839.000060df.zhi.wang.linux@gmail.com>
-In-Reply-To: <20240219112839.000060df.zhi.wang.linux@gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA1PR12MB7199:EE_|LV2PR12MB5775:EE_
-x-ms-office365-filtering-correlation-id: 8a061421-59cf-43c6-0b0f-08dc312e3e60
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- us8JyJM6KEd6TcE1UCPrXi5FFx8fiUb1ZBM5ynQilcBcitpJ1g2hZ33nxhrXrrFVzkPDWuRv/2DWa7ndlYhNMhYrX3ezCI+KqSM3MGtEj+cuPxZA/1jiu7BBZ7v6O/oSqT2yJUxDfFzwsyLzZOnXxjZ113YRGM0YEV9b30Gam85CnxVJbPzNsPs6ogtT8iAyyWCPdrs7QilnHPF/IxPixM+yRwvp2ogfKmwO0op1suqoao+oIxDu5VzV7ZUmNx0MdwKkYOt829EFGSjqyZSa+6tch4PN+N01XF4hmdmaXyh0bVKGCueQbCUo6P3cncIN8o6+AKcxxuQvYQ7Cjy1k2VEStKPKpRRheRpVS1+4uzFTaq1x+6cUsOyUKEYVk4VX3paGf+Cp50omNsAdtTCe26r9OIRHCeHYe6pouP34Dj9uoQHLxlCYQ159nEF4ShxY1+kHZ4RDbB99cjF/Y+V04r+w/4x54eyoH3zdMN8iKW/HM3XcPkZlh2427+gjjOF3n+qIk0cr5nQIzxU8APkKdwuBQNK+W2BYvyQrS9e40Ibrw7XbOCp9jYEvnddhTtyKb0zZk7Yh7rfxwMMKxUkTSL7+2AkTN0cYxT90v26GKa/T2SQf6nGMeKfARTtgpTN/
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR12MB7199.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(39860400002)(376002)(396003)(366004)(230922051799003)(186009)(64100799003)(451199024)(1800799012)(2906002)(5660300002)(7416002)(55016003)(26005)(66446008)(76116006)(91956017)(8936002)(64756008)(66556008)(66476007)(6916009)(4326008)(66946007)(316002)(52536014)(41300700001)(83380400001)(38070700009)(8676002)(86362001)(33656002)(9686003)(71200400001)(478600001)(54906003)(6506007)(7696005)(38100700002)(122000001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?W7m6vDrpfM0WC7XfL2WutBCZ9MdXjSqfUJXRhOuqsQFtPo2CCzCznVsruA?=
- =?iso-8859-1?Q?4sru+OqzRgLAbIxlzRBkDbk0NORGLN5+jtPcOw641IKutIGhtII5njW59V?=
- =?iso-8859-1?Q?bfWYFQbLEaQj1OpF2gdZoYiLulpQpe8k8+vYvrEfZ4GvkCY5uYFQqEFzpE?=
- =?iso-8859-1?Q?iKblNFMFFAxb+os+NWtsYH8UfJHhnK+gR5UjJculFh2l20Ve3QihBBDp4j?=
- =?iso-8859-1?Q?kA3ceOE4FfYRCp4wjS9IpX8DGdbIZM3qwLk5fQ1MPUrFWfnT2zxHQ+LR/O?=
- =?iso-8859-1?Q?omzw7vvqOqs3FQZdH+JyfuLEGzIHWD6kIphUm+qU0CRviSoOsmaK/6/CPh?=
- =?iso-8859-1?Q?QsSYoVNYMHbliI3xPLPpq8xIxQK5GbINf2F14uuVjGg94Yl0FlQWB3OBZd?=
- =?iso-8859-1?Q?HBoMdC6WQb34k3IfFWRBMvfV/pThLPzheBaAm0dVfCvpy93CFVaCI9MXbR?=
- =?iso-8859-1?Q?mpz8LKgIFSBxF12uyMuYADZ0onaLJDWsZY/9EEXmVuFcPI5fKNjK09QOoT?=
- =?iso-8859-1?Q?UspJnxA6MYLG6nlw76hatxyLly78MHJy/X1IWS1/RrmwPNchKK5Z5yqaS3?=
- =?iso-8859-1?Q?HT5SHqZ3tyBwWiqxKll7g0h+ZUK1KEWSO87rRl7Wb1seHLno+xDVIACNop?=
- =?iso-8859-1?Q?s5qjQcguudJOZS2RZqpjgSP2aO8TeMEh0YxPlvkqmaW1Ln8yophcRvOPY5?=
- =?iso-8859-1?Q?a4bsVpiz6jKqM0jjhXAIqjnZaVra2kgRDrhVc7P2kQn/ew+kFrKTqRbmfQ?=
- =?iso-8859-1?Q?TYL6UYNaki3UC+myePWWm/Zsz9wsuRhElB6Oe3vH7eJzODRtdqGUmo3/C1?=
- =?iso-8859-1?Q?rvI6eW8mwrYIDHA1S5rXdWDJtRf+Pl+0XPKuUiSzYdPsU3cUi8p1iPBvGF?=
- =?iso-8859-1?Q?ADWZ7KA/zzfk423e2Clr6jn5LRD24CiFb/dqs8eQxE0AvCPBf9ezrqVDwI?=
- =?iso-8859-1?Q?k9fKnu38mv28YE4QWSQnM/dYrlampyiFRpf9DbaWvhqjBfgOzsoqttdxMj?=
- =?iso-8859-1?Q?iibjpkm0LbfBzMPTHJSIg8BM5AYiX6k7i2pMHxq9D545BYvZR+xU28eq0R?=
- =?iso-8859-1?Q?2Vwcj1DShmYasg/Ri/y9Pul0DabJ/d21+ZO7uq7qVgPRXNFhpoAxfpC44W?=
- =?iso-8859-1?Q?Og6oTNvE9+MuyKvbdBNJoERyebMOiaNlCSmCm0M6/Uu/I10033KZHM39NX?=
- =?iso-8859-1?Q?nT1ZMs2vArAKLnRaG1H7eqPjWVCT55LpmfnF/khyTs56XFQN0nAojYSadL?=
- =?iso-8859-1?Q?qSD6f6ZR9/ZwNtzNZudxV2MrMy30llgw/qf/0/MOPhtwclxFY/Qn2N3j6p?=
- =?iso-8859-1?Q?KI096Et/yiekF7ZBqFVMgs3/sAe9+s/dyDZ5NdRLbGE6ekM9hqVWjM72Yd?=
- =?iso-8859-1?Q?vB95Grj39/XQ5ROM/7NPkgBCbcYBdEIuvGHtgEEfD1a5v7mEnJIsZx2hTO?=
- =?iso-8859-1?Q?SrwNJmAvOenc5bpEDqnXbJBtd7ACHlq7PjvOVqITsu3mwJ02Ck0i7JXhoo?=
- =?iso-8859-1?Q?/wx9FkdsmzCtfjNa4W7Sd1zqq6NddMsb75x6RHlhT26w/pyqwZSGPf6Lzj?=
- =?iso-8859-1?Q?iTfL6IBa75pDfk6ShIUK4zVGdkq/vX8KVa1OrtIYuMAcdtoy5MorPA7btg?=
- =?iso-8859-1?Q?X/DhtmaEQkuWw=3D?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 755FC2560B;
+	Mon, 19 Feb 2024 09:38:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708335531; cv=none; b=NZJYtzsri3Ae+J1xxvcJgd0CUtCh4RfFQ6P2/9HFeLbRXJe4NZa/8YYwX8dchQSQsjs7n2UTBcJpLHrt8EkNx6gklsS9VRR4GSValEgrJlpxSQ5X3g4SXq3I5huYHj77kA7k46GMVIAxUnp0ifDUS9bWkRw+28mpUNoaxae5HsU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708335531; c=relaxed/simple;
+	bh=jc3LBUVtway1vGTolYxXisE/4dUQ5PTWqaduGD770pE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CQ2atlzMj3xhv4byg/Bd0tR60FvvuYwJjtlRGdXs8RM1R2r0HBaZSmtoBTPGKwDvLzJZ0FYr+g9HR1A3UWPVvwL10aYOBquRMsAO0eny2fjNo3M0PsgaNWWAqjjJWq1oYSctw27ruk3Q985Lodd9SNyUKK8G2IHeXlE9TopO61A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mVSnOFwx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16096C43394;
+	Mon, 19 Feb 2024 09:38:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708335531;
+	bh=jc3LBUVtway1vGTolYxXisE/4dUQ5PTWqaduGD770pE=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=mVSnOFwxoEmv5z69wlrNPiYnP/JtBXZGvb2fXnMIncaKQxnm8o1/gZAZA61mqT/WP
+	 IL7kddbj6k3AXyp4pRsdY47W55kZRYF5rIR+uyaEr716Pkn+UPTKiWnnzJE582QNTq
+	 rxU9nrGwVj0WymKQXPWFB1bKkHjO6p3fNhBIN3EWc1+E47Znajm5DAHe9DxEfK3jH3
+	 ZEdOwaxtCTgs0J42VtP6PCjvkEQOpysHOWU9QMoodY5KXOOwu/0MXa5TlVDT+8Qh/V
+	 EXkgrm8ThPFmMwwPbApT4RcXBLr+ueLiSpvEOodG8DIR+UE3J2Sw8lbV5BRqrUuriN
+	 QUWSA8PQYhMvQ==
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-563f675be29so3070927a12.0;
+        Mon, 19 Feb 2024 01:38:50 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVwow6yZLQ3jGBwpWDHiiSvvfh57a/thysOxBwzzIGmiyzJ3LOXpC1FC4BjvsV832xQULjdie/p6JBUZJCMkAMkh91JfXo0MblE6clS0ffm0v77udbLSz0kw2hkgCHX8OH2
+X-Gm-Message-State: AOJu0YxXd1/IkaYIOvt11VPBEMRPCo7Ba9JrllsKVswDUr41fDWNqVEl
+	fa1Wxxp1+WoK9zPpI8fK9snsG6nFRRL2d0i8DQjzk61Gu45Y3upOQVMNo2CqaaN2KI9TYQqAjML
+	Ac93WSiFrCsw5egU3k9U4UcTU0sg=
+X-Google-Smtp-Source: AGHT+IE02Je77TAG6hdG7xZ1GJAMfud3RHKcsINYlTB1mt7PGcsVr5gsnSzlqPCwtdI7QHTip0RT3+B+CsDtncoHLk0=
+X-Received: by 2002:aa7:c655:0:b0:561:8918:9f5d with SMTP id
+ z21-20020aa7c655000000b0056189189f5dmr7815076edr.20.1708335529394; Mon, 19
+ Feb 2024 01:38:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR12MB7199.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8a061421-59cf-43c6-0b0f-08dc312e3e60
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Feb 2024 09:36:26.4475
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: JN19g+Mjaq3PNcxunR0eToRyBfiZvCsIIQHGySDzJMAhe70SOyOyyiLjya2JfKIxs+TiDoYK9uM6z7MjdySWjg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5775
+References: <20240201031950.3225626-1-maobibo@loongson.cn> <20240201031950.3225626-5-maobibo@loongson.cn>
+ <CAAhV-H7dXsU+WM172PWi_m8TYpYmzG_SW-vVQcdnOdETUxQ9+w@mail.gmail.com>
+ <63f8bd29-c0da-167b-187d-61c56eb081a6@loongson.cn> <CAAhV-H6HQHyu=0zyv6FVLRJTkOcmnkLk5h361yGd2igYnuMMng@mail.gmail.com>
+ <4dcbd5b2-ba69-e254-b3bb-75a75e5f9215@loongson.cn>
+In-Reply-To: <4dcbd5b2-ba69-e254-b3bb-75a75e5f9215@loongson.cn>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Mon, 19 Feb 2024 17:38:45 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H7UyOX6ifKzUdTQiPuueOwsBUO2Jhtfcb832Gc0DTpQKQ@mail.gmail.com>
+Message-ID: <CAAhV-H7UyOX6ifKzUdTQiPuueOwsBUO2Jhtfcb832Gc0DTpQKQ@mail.gmail.com>
+Subject: Re: [PATCH v4 4/6] LoongArch: Add paravirt interface for guest kernel
+To: maobibo <maobibo@loongson.cn>
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, Juergen Gross <jgross@suse.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, loongarch@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, 
+	kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
->> diff --git a/drivers/vfio/pci/nvgrace-gpu/main.c=0A=
->> b/drivers/vfio/pci/nvgrace-gpu/main.c new file mode 100644=0A=
->> index 000000000000..5a251a6a782e=0A=
->> --- /dev/null=0A=
->> +++ b/drivers/vfio/pci/nvgrace-gpu/main.c=0A=
->> @@ -0,0 +1,888 @@=0A=
->> +// SPDX-License-Identifier: GPL-2.0-only=0A=
->> +/*=0A=
->> + * Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights=0A=
->> reserved=0A=
->> + */=0A=
->> +=0A=
->> +#include <linux/vfio_pci_core.h>=0A=
->> +#include <linux/sizes.h>=0A=
->> +=0A=
->=0A=
-> Let's keep the header inclusion in an alphabet order.=0A=
->=0A=
-> With that addressed,=0A=
->=0A=
-> Reviewed-by: Zhi Wang <zhi.wang.linux@gmail.com>=0A=
-=0A=
-Yes, will adjust that. Thanks!=0A=
-=0A=
->> +/*=0A=
->> + * The device memory usable to the workloads running in the VM is=0A=
->> cached=0A=
->> + * and showcased as a 64b device BAR (comprising of BAR4 and BAR5=0A=
->> region)=0A=
->> + * to the VM and is represented as usemem.=0A=
->> + * Moreover, the VM GPU device driver needs a non-cacheable region to=
-=0A=
->> + * support the MIG feature. This region is also exposed as a 64b BAR=0A=
->> + * (comprising of BAR2 and BAR3 region) and represented as resmem.=0A=
->> + */=0A=
->> +#define RESMEM_REGION_INDEX VFIO_PCI_BAR2_REGION_INDEX=0A=
->> +#define USEMEM_REGION_INDEX VFIO_PCI_BAR4_REGION_INDEX=0A=
+On Mon, Feb 19, 2024 at 5:21=E2=80=AFPM maobibo <maobibo@loongson.cn> wrote=
+:
+>
+>
+>
+> On 2024/2/19 =E4=B8=8B=E5=8D=884:48, Huacai Chen wrote:
+> > On Mon, Feb 19, 2024 at 12:11=E2=80=AFPM maobibo <maobibo@loongson.cn> =
+wrote:
+> >>
+> >>
+> >>
+> >> On 2024/2/19 =E4=B8=8A=E5=8D=8810:42, Huacai Chen wrote:
+> >>> Hi, Bibo,
+> >>>
+> >>> On Thu, Feb 1, 2024 at 11:19=E2=80=AFAM Bibo Mao <maobibo@loongson.cn=
+> wrote:
+> >>>>
+> >>>> The patch adds paravirt interface for guest kernel, function
+> >>>> pv_guest_initi() firstly checks whether system runs on VM mode. If k=
+ernel
+> >>>> runs on VM mode, it will call function kvm_para_available() to detec=
+t
+> >>>> whether current VMM is KVM hypervisor. And the paravirt function can=
+ work
+> >>>> only if current VMM is KVM hypervisor, since there is only KVM hyper=
+visor
+> >>>> supported on LoongArch now.
+> >>>>
+> >>>> This patch only adds paravirt interface for guest kernel, however th=
+ere
+> >>>> is not effective pv functions added here.
+> >>>>
+> >>>> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+> >>>> ---
+> >>>>    arch/loongarch/Kconfig                        |  9 ++++
+> >>>>    arch/loongarch/include/asm/kvm_para.h         |  7 ++++
+> >>>>    arch/loongarch/include/asm/paravirt.h         | 27 ++++++++++++
+> >>>>    .../include/asm/paravirt_api_clock.h          |  1 +
+> >>>>    arch/loongarch/kernel/Makefile                |  1 +
+> >>>>    arch/loongarch/kernel/paravirt.c              | 41 ++++++++++++++=
++++++
+> >>>>    arch/loongarch/kernel/setup.c                 |  2 +
+> >>>>    7 files changed, 88 insertions(+)
+> >>>>    create mode 100644 arch/loongarch/include/asm/paravirt.h
+> >>>>    create mode 100644 arch/loongarch/include/asm/paravirt_api_clock.=
+h
+> >>>>    create mode 100644 arch/loongarch/kernel/paravirt.c
+> >>>>
+> >>>> diff --git a/arch/loongarch/Kconfig b/arch/loongarch/Kconfig
+> >>>> index 10959e6c3583..817a56dff80f 100644
+> >>>> --- a/arch/loongarch/Kconfig
+> >>>> +++ b/arch/loongarch/Kconfig
+> >>>> @@ -585,6 +585,15 @@ config CPU_HAS_PREFETCH
+> >>>>           bool
+> >>>>           default y
+> >>>>
+> >>>> +config PARAVIRT
+> >>>> +       bool "Enable paravirtualization code"
+> >>>> +       depends on AS_HAS_LVZ_EXTENSION
+> >>>> +       help
+> >>>> +          This changes the kernel so it can modify itself when it i=
+s run
+> >>>> +         under a hypervisor, potentially improving performance sign=
+ificantly
+> >>>> +         over full virtualization.  However, when run without a hyp=
+ervisor
+> >>>> +         the kernel is theoretically slower and slightly larger.
+> >>>> +
+> >>>>    config ARCH_SUPPORTS_KEXEC
+> >>>>           def_bool y
+> >>>>
+> >>>> diff --git a/arch/loongarch/include/asm/kvm_para.h b/arch/loongarch/=
+include/asm/kvm_para.h
+> >>>> index 9425d3b7e486..41200e922a82 100644
+> >>>> --- a/arch/loongarch/include/asm/kvm_para.h
+> >>>> +++ b/arch/loongarch/include/asm/kvm_para.h
+> >>>> @@ -2,6 +2,13 @@
+> >>>>    #ifndef _ASM_LOONGARCH_KVM_PARA_H
+> >>>>    #define _ASM_LOONGARCH_KVM_PARA_H
+> >>>>
+> >>>> +/*
+> >>>> + * Hypcall code field
+> >>>> + */
+> >>>> +#define HYPERVISOR_KVM                 1
+> >>>> +#define HYPERVISOR_VENDOR_SHIFT                8
+> >>>> +#define HYPERCALL_CODE(vendor, code)   ((vendor << HYPERVISOR_VENDO=
+R_SHIFT) + code)
+> >>>> +
+> >>>>    /*
+> >>>>     * LoongArch hypcall return code
+> >>>>     */
+> >>>> diff --git a/arch/loongarch/include/asm/paravirt.h b/arch/loongarch/=
+include/asm/paravirt.h
+> >>>> new file mode 100644
+> >>>> index 000000000000..b64813592ba0
+> >>>> --- /dev/null
+> >>>> +++ b/arch/loongarch/include/asm/paravirt.h
+> >>>> @@ -0,0 +1,27 @@
+> >>>> +/* SPDX-License-Identifier: GPL-2.0 */
+> >>>> +#ifndef _ASM_LOONGARCH_PARAVIRT_H
+> >>>> +#define _ASM_LOONGARCH_PARAVIRT_H
+> >>>> +
+> >>>> +#ifdef CONFIG_PARAVIRT
+> >>>> +#include <linux/static_call_types.h>
+> >>>> +struct static_key;
+> >>>> +extern struct static_key paravirt_steal_enabled;
+> >>>> +extern struct static_key paravirt_steal_rq_enabled;
+> >>>> +
+> >>>> +u64 dummy_steal_clock(int cpu);
+> >>>> +DECLARE_STATIC_CALL(pv_steal_clock, dummy_steal_clock);
+> >>>> +
+> >>>> +static inline u64 paravirt_steal_clock(int cpu)
+> >>>> +{
+> >>>> +       return static_call(pv_steal_clock)(cpu);
+> >>>> +}
+> >>> The steal time code can be removed in this patch, I think.
+> >>>
+> >> Originally I want to remove this piece of code, but it fails to compil=
+e
+> >> if CONFIG_PARAVIRT is selected. Here is reference code, function
+> >> paravirt_steal_clock() must be defined if CONFIG_PARAVIRT is selected.
+> >>
+> >> static __always_inline u64 steal_account_process_time(u64 maxtime)
+> >> {
+> >> #ifdef CONFIG_PARAVIRT
+> >>           if (static_key_false(&paravirt_steal_enabled)) {
+> >>                   u64 steal;
+> >>
+> >>                   steal =3D paravirt_steal_clock(smp_processor_id());
+> >>                   steal -=3D this_rq()->prev_steal_time;
+> >>                   steal =3D min(steal, maxtime);
+> >>                   account_steal_time(steal);
+> >>                   this_rq()->prev_steal_time +=3D steal;
+> >>
+> >>                   return steal;
+> >>           }
+> >> #endif
+> >>           return 0;
+> >> }
+> > OK, then keep it.
+> >
+> >>
+> >>>> +
+> >>>> +int pv_guest_init(void);
+> >>>> +#else
+> >>>> +static inline int pv_guest_init(void)
+> >>>> +{
+> >>>> +       return 0;
+> >>>> +}
+> >>>> +
+> >>>> +#endif // CONFIG_PARAVIRT
+> >>>> +#endif
+> >>>> diff --git a/arch/loongarch/include/asm/paravirt_api_clock.h b/arch/=
+loongarch/include/asm/paravirt_api_clock.h
+> >>>> new file mode 100644
+> >>>> index 000000000000..65ac7cee0dad
+> >>>> --- /dev/null
+> >>>> +++ b/arch/loongarch/include/asm/paravirt_api_clock.h
+> >>>> @@ -0,0 +1 @@
+> >>>> +#include <asm/paravirt.h>
+> >>>> diff --git a/arch/loongarch/kernel/Makefile b/arch/loongarch/kernel/=
+Makefile
+> >>>> index 3c808c680370..662e6e9de12d 100644
+> >>>> --- a/arch/loongarch/kernel/Makefile
+> >>>> +++ b/arch/loongarch/kernel/Makefile
+> >>>> @@ -48,6 +48,7 @@ obj-$(CONFIG_MODULES)         +=3D module.o module=
+-sections.o
+> >>>>    obj-$(CONFIG_STACKTRACE)       +=3D stacktrace.o
+> >>>>
+> >>>>    obj-$(CONFIG_PROC_FS)          +=3D proc.o
+> >>>> +obj-$(CONFIG_PARAVIRT)         +=3D paravirt.o
+> >>>>
+> >>>>    obj-$(CONFIG_SMP)              +=3D smp.o
+> >>>>
+> >>>> diff --git a/arch/loongarch/kernel/paravirt.c b/arch/loongarch/kerne=
+l/paravirt.c
+> >>>> new file mode 100644
+> >>>> index 000000000000..21d01d05791a
+> >>>> --- /dev/null
+> >>>> +++ b/arch/loongarch/kernel/paravirt.c
+> >>>> @@ -0,0 +1,41 @@
+> >>>> +// SPDX-License-Identifier: GPL-2.0
+> >>>> +#include <linux/export.h>
+> >>>> +#include <linux/types.h>
+> >>>> +#include <linux/jump_label.h>
+> >>>> +#include <linux/kvm_para.h>
+> >>>> +#include <asm/paravirt.h>
+> >>>> +#include <linux/static_call.h>
+> >>>> +
+> >>>> +struct static_key paravirt_steal_enabled;
+> >>>> +struct static_key paravirt_steal_rq_enabled;
+> >>>> +
+> >>>> +static u64 native_steal_clock(int cpu)
+> >>>> +{
+> >>>> +       return 0;
+> >>>> +}
+> >>>> +
+> >>>> +DEFINE_STATIC_CALL(pv_steal_clock, native_steal_clock);
+> >>> The steal time code can be removed in this patch, I think.
+> >> Ditto, the same reason with above.
+> >>>
+> >>>> +
+> >>>> +static bool kvm_para_available(void)
+> >>>> +{
+> >>>> +       static int hypervisor_type;
+> >>>> +       int config;
+> >>>> +
+> >>>> +       if (!hypervisor_type) {
+> >>>> +               config =3D read_cpucfg(CPUCFG_KVM_SIG);
+> >>>> +               if (!memcmp(&config, KVM_SIGNATURE, 4))
+> >>>> +                       hypervisor_type =3D HYPERVISOR_KVM;
+> >>>> +       }
+> >>>> +
+> >>>> +       return hypervisor_type =3D=3D HYPERVISOR_KVM;
+> >>>> +}
+> >>>> +
+> >>>> +int __init pv_guest_init(void)
+> >>>> +{
+> >>>> +       if (!cpu_has_hypervisor)
+> >>>> +               return 0;
+> >>>> +       if (!kvm_para_available())
+> >>>> +               return 0;
+> >>>> +
+> >>>> +       return 1;
+> >>>> +}
+> >>>> diff --git a/arch/loongarch/kernel/setup.c b/arch/loongarch/kernel/s=
+etup.c
+> >>>> index edf2bba80130..de5c36dccc49 100644
+> >>>> --- a/arch/loongarch/kernel/setup.c
+> >>>> +++ b/arch/loongarch/kernel/setup.c
+> >>>> @@ -43,6 +43,7 @@
+> >>>>    #include <asm/efi.h>
+> >>>>    #include <asm/loongson.h>
+> >>>>    #include <asm/numa.h>
+> >>>> +#include <asm/paravirt.h>
+> >>>>    #include <asm/pgalloc.h>
+> >>>>    #include <asm/sections.h>
+> >>>>    #include <asm/setup.h>
+> >>>> @@ -367,6 +368,7 @@ void __init platform_init(void)
+> >>>>           pr_info("The BIOS Version: %s\n", b_info.bios_version);
+> >>>>
+> >>>>           efi_runtime_init();
+> >>>> +       pv_guest_init();
+> >>> I prefer use CONFIG_PARAVIRT here, though you have a dummy version fo=
+r
+> >>> !CONFIG_PARAVIRT, I think it is better to let others clearly know tha=
+t
+> >>> PARAVIRT is an optional feature.
+> >> I remember that there is rule that CONFIG_xxx had better be used in
+> >> header files rather than c code, so that the code looks neat. Am I wro=
+ng?
+> > That depends on what we want, sometimes we want to hide the details,
+> > but sometimes we want to give others a notice.
+> I want to keep code clean here :)
+>
+> >
+> > And there is another problem: if you want to centralize all pv init
+> > functions, it is better to use pv_features_init() rather than
+> > pv_guest_init(); if you want to give each feature an init function,
+> > then we don't need pv_guest_init here, and we can then add a
+> > pv_ipi_init() in the last patch.
+> Currently I have no idea how to add other pv features like pv
+> stealtimer, I will consider this when adding other pv features.
+> pv_ipi_init/pv_guest_init is both ok for me, pv_ipi_init is better for no=
+w.
+Then you want to add an init function for each feature, so please
+rename to pv_ipi_init(), move to the last patch and in
+loongson_smp_setup().
+
+Huacai
+
+>
+> Regards
+> Bibo Mao
+>
+> >
+> > Huacai
+> >
+> >>
+> >> Regards
+> >> Bibo Mao
+> >>>
+> >>> Huacai
+> >>>
+> >>>
+> >>> Huacai
+> >>>>    }
+> >>>>
+> >>>>    static void __init check_kernel_sections_mem(void)
+> >>>> --
+> >>>> 2.39.3
+> >>>>
+> >>>>
+> >>
+>
 
