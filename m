@@ -1,79 +1,80 @@
-Return-Path: <kvm+bounces-9009-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9010-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84F69859C6C
-	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 07:56:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 002E6859C76
+	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 07:59:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E0511C215DB
-	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 06:56:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 250491C2166F
+	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 06:59:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CFDD208BB;
-	Mon, 19 Feb 2024 06:56:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 064AA20328;
+	Mon, 19 Feb 2024 06:59:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NrcYuW4y"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cLdnaeVA"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B5BA200D9
-	for <kvm@vger.kernel.org>; Mon, 19 Feb 2024 06:56:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1E8C20303
+	for <kvm@vger.kernel.org>; Mon, 19 Feb 2024 06:59:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708325793; cv=none; b=lzpFVpf2iMS/+j1ib8vEhdjC5+9PGnPVJark9Q9ZukChhXZ4Ff9nybScFOf1kZtb7PbZBTfh56a51+4x+dVntnAnGKhHrrlg0cXKhRLydJVGAk9/GGOGp79CEXIzQB35z/POaccVWRli/nMDbmY6k/RGyEvB/Z2QBjevFEFWhPQ=
+	t=1708325971; cv=none; b=lonkJ8Zq5NBfAs7kQnFgOj0MdIYs0jra2Nh6hHD9KYU3nY/cDJcIfFsXb33J4aBJbBeGeQ7hdrQ91SEgC7EwRY3fYKpdLH0cVE3coCdAixzpOKZmsMY6/WZ0kqDxbRJ8KzFuAQMUrB/wkEyGpdIfyh8Uek7Wvkev4xy7Cx034xU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708325793; c=relaxed/simple;
-	bh=8+22TydQJilP2WbzZnUx+4i+iy512mDyjD49Ih9x9xI=;
+	s=arc-20240116; t=1708325971; c=relaxed/simple;
+	bh=pnDgn1er2Ravf+AmiLpvwrN35AQML3UDFHcrcTpZMOA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TTZrO24osk3DrzCHVO4FuL0f6aeYoInhuQmTyhp8vM18n+7ThZe/u6l6PBhr+tRpPfWnwz1exWo6gnSFy9gwmtZnZ7sKXUlGSsXGE4H5xDks9GLM/g2op7dtVVOo0/4+9jiku/Y5M8WnsQ/LbxCLPR1bj0dY/Md52akG+7cZ0iA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NrcYuW4y; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=Mbg32ZoQC2G+GxvnKlV+R9vJKUc7USSSL8B0UUYhu6/jjdaYnUidxrYoHP30YuuVO23+86TbWWuCRPCOooDwTppfoAoPCRt1smiteOKDjMfOBxenZDqEL3PUHkQQCqkQru8aSPmkh1B6+SvBC4J3mDUwVaGq5T+/ZT9w4mSTJS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cLdnaeVA; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708325789;
+	s=mimecast20190719; t=1708325968;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=YE5SUQ6P85lCv9ueDPInmuqKDSZltz/dw8thQgaLw/U=;
-	b=NrcYuW4ygG1Ht7dvPB7LQzxvrRKfF0M0ILWj1gWEavQcixq0Gp7lwwkcB9CAU/AHRo7qED
-	FA3pL9K5ijbhu3ja9vnT9vbkrSR9fygXVsd/lxWvNf7LUqLXUxTrH1BqnvHaurFfAT6oi+
-	7BDMXyh8YosinpeG1YyT8RSVFEMLWZU=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=9lAmpJMZGjRI05pN4Ggw5rJdGick7SVDlwHgWjYBno8=;
+	b=cLdnaeVA9GpeTjOtviCnAVTWSXiToTgH0jJRSfSmKiPJ7P5Ob1uD1Bh3lUkzvSVG+Asvoh
+	riqsme2yoswSwl33z1Nsq0+zaFgPap/+vUvoYDlZRd67vtaWwkEzIkAoqP/dDiAORKstn7
+	Ey9v5kItW3S3ZXrO8BYnKjButsREP9U=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-159-q1VjsuJKOxyVyzYsy-WQNQ-1; Mon, 19 Feb 2024 01:56:27 -0500
-X-MC-Unique: q1VjsuJKOxyVyzYsy-WQNQ-1
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-78319f64126so373604585a.3
-        for <kvm@vger.kernel.org>; Sun, 18 Feb 2024 22:56:27 -0800 (PST)
+ us-mta-642-bBTWiLffPiCYE8xQpyujbg-1; Mon, 19 Feb 2024 01:59:27 -0500
+X-MC-Unique: bBTWiLffPiCYE8xQpyujbg-1
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-68f75058f07so5015246d6.0
+        for <kvm@vger.kernel.org>; Sun, 18 Feb 2024 22:59:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708325787; x=1708930587;
+        d=1e100.net; s=20230601; t=1708325967; x=1708930767;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YE5SUQ6P85lCv9ueDPInmuqKDSZltz/dw8thQgaLw/U=;
-        b=Ozor2y8uyc4jsVeRbItIwwDh61H8PT99Fs4QTcBktwKrlPh2qeP65N6KB/hmJJjFAb
-         euS+Ky8IRtFAH+PkbRSAnobSyifRQ+mX/Cby8tnoS1a1thPB4Zd9VOI4zYDGpbSCrNWH
-         py2yZqGpGsx176x7PR/KAbBmQRoG23x9fllYO8C8Oj+iz75X662chW0iVhKkPeKMFZB1
-         TBm2Lza1BaKY7KIfgspRk425w46UqcZDuNlSvOJrUu80/v4JPeg5QkPxfL+0DOe5Q5xD
-         2ZGx01qXmAXa8aG4Fhq5Hm3HBAqWN8bgWmVEqrD/8Ieblh6lDqh3x0blDbiUlDkqech1
-         3gFQ==
-X-Gm-Message-State: AOJu0YwliVH4a92d3OX6/MXLiqYepb7ztzSX6f5h9gb1Rakua9RiTi4i
-	1FdFqeV3qbyFWHbksQLY8KHixKFsxkTL4M9xL+aG22bec0ujFLJr4yDotrp6j2tLqx0Yq3O1CJe
-	yV/PE6TTfeewVOZs1O21z30w2Lrq4cabyoPf5N8ZoMjjpTY7ozg==
-X-Received: by 2002:ac8:5d8b:0:b0:42c:54d6:99fb with SMTP id d11-20020ac85d8b000000b0042c54d699fbmr15624792qtx.55.1708325787473;
-        Sun, 18 Feb 2024 22:56:27 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFTOW/vjFnoKRoExIXffu9pU0oDU4E/siRxT5/SvPfw5icjpuTChge/eWrQhyvNO1ncSWTERQ==
-X-Received: by 2002:ac8:5d8b:0:b0:42c:54d6:99fb with SMTP id d11-20020ac85d8b000000b0042c54d699fbmr15624786qtx.55.1708325787202;
-        Sun, 18 Feb 2024 22:56:27 -0800 (PST)
+        bh=9lAmpJMZGjRI05pN4Ggw5rJdGick7SVDlwHgWjYBno8=;
+        b=Kr297eXz1WYmYNe22Er0behELUKm7txelUs55YmenG+o7xVzFQxaDQidoO7GrISWYo
+         wz6KEzfVWEvymQcvdidmE9ib34tiMx2ryLODywRq5nTje4tQr4oVjY03kxH0V4FeS4Sv
+         htpuQmOOlvUCeoTiSIobof95G5MXv60093BKmkLdwFanTawaOsME1mOhI7CdNhoThsXG
+         dABHd6C56ftbzdL8+jDoCQKnTzkE3DxulTPhK94Zyix+din0dkqexIxN0hZR1bxAlC5/
+         W1iMgYMzj19y1OKsXMh2x+tJfwFz2Z9Y7JH7IoJfIitqiB/4NhDlTpfzigGGmEfEYIeD
+         F1Lw==
+X-Forwarded-Encrypted: i=1; AJvYcCXRlDpzW1+Gl/D0Tn2G+S2UirwcaMtXI1s/Ib0E2tha61vbn13fYZhazAY98Z4kfjtCQaWu4/LntNEVSuhyBIkDvyK4
+X-Gm-Message-State: AOJu0YxlohpmrqZHBvhbSpOBHk0SxFi+Yzc3hu79dOxlSlE8OBu/ywGE
+	DCIY8BG6R26p3oYel22hUVUzliM8Xq3E9WR1ckkoTjUqe20ZAyAgwUTUaLfd267S92qUgAtzSRh
+	P9+FAQCy2XHCOPkyg2IKBq1wEdhD/qKzHku0OqZNDNc1YyQZALg==
+X-Received: by 2002:ad4:5743:0:b0:68f:280f:14cc with SMTP id q3-20020ad45743000000b0068f280f14ccmr14447397qvx.35.1708325966718;
+        Sun, 18 Feb 2024 22:59:26 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFgnlRSnONDJ53KL8ZFuXHJRZyEF/cTiDyOAL0DWKWXtHHXKufuUWM4qHXKB1yOHdRCHIt4sQ==
+X-Received: by 2002:ad4:5743:0:b0:68f:280f:14cc with SMTP id q3-20020ad45743000000b0068f280f14ccmr14447386qvx.35.1708325966485;
+        Sun, 18 Feb 2024 22:59:26 -0800 (PST)
 Received: from [192.168.0.9] (ip-109-43-177-48.web.vodafone.de. [109.43.177.48])
-        by smtp.gmail.com with ESMTPSA id e7-20020ac85dc7000000b0042c50e1adf3sm2254061qtx.95.2024.02.18.22.56.22
+        by smtp.gmail.com with ESMTPSA id od15-20020a0562142f0f00b0068f752195b5sm447274qvb.86.2024.02.18.22.59.24
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 18 Feb 2024 22:56:26 -0800 (PST)
-Message-ID: <4d73467d-2091-4342-87a1-822f4aeb8b70@redhat.com>
-Date: Mon, 19 Feb 2024 07:56:20 +0100
+        Sun, 18 Feb 2024 22:59:26 -0800 (PST)
+Message-ID: <4986756f-6230-421b-9601-054c6c2969e8@redhat.com>
+Date: Mon, 19 Feb 2024 07:59:23 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -81,23 +82,15 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v4 8/8] migration: add a migration selftest
+Subject: Re: [kvm-unit-tests PATCH] lib/arm/io: Fix calling getchar() multiple
+ times
 Content-Language: en-US
-To: Nicholas Piggin <npiggin@gmail.com>
-Cc: kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>,
- Shaoqin Huang <shahuang@redhat.com>, Andrew Jones <andrew.jones@linux.dev>,
- Nico Boehr <nrb@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Eric Auger <eric.auger@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Marc Hartmayer
- <mhartmay@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
- linux-s390@vger.kernel.org, kvmarm@lists.linux.dev,
- kvm-riscv@lists.infradead.org
-References: <20240209091134.600228-1-npiggin@gmail.com>
- <20240209091134.600228-9-npiggin@gmail.com>
- <abbcbb47-1ae7-4793-a918-dede8dcaf07f@redhat.com>
- <CZ7673PUQ853.DB10GSBEZ65Z@wheely>
+To: Nicholas Piggin <npiggin@gmail.com>, Andrew Jones
+ <andrew.jones@linux.dev>, Alexandru Elisei <alexandru.elisei@arm.com>,
+ Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org
+Cc: kvmarm@lists.linux.dev
+References: <20240216140210.70280-1-thuth@redhat.com>
+ <CZ7AJ4JK5805.2N5QS85IP42QZ@wheely>
 From: Thomas Huth <thuth@redhat.com>
 Autocrypt: addr=thuth@redhat.com; keydata=
  xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
@@ -141,54 +134,39 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <CZ7673PUQ853.DB10GSBEZ65Z@wheely>
+In-Reply-To: <CZ7AJ4JK5805.2N5QS85IP42QZ@wheely>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 17/02/2024 08.19, Nicholas Piggin wrote:
-> On Fri Feb 16, 2024 at 9:15 PM AEST, Thomas Huth wrote:
->> On 09/02/2024 10.11, Nicholas Piggin wrote:
->>> Add a selftest for migration support in  guest library and test harness
->>> code. It performs migrations in a tight loop to irritate races and bugs
->>> in the test harness code.
->>>
->>> Include the test in arm, s390, powerpc.
->>>
->>> Acked-by: Claudio Imbrenda <imbrenda@linux.ibm.com> (s390x)
->>> Reviewed-by: Thomas Huth <thuth@redhat.com>
->>> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
->>> ---
->>>    arm/Makefile.common          |  1 +
->>>    arm/selftest-migration.c     |  1 +
->>>    arm/unittests.cfg            |  6 ++++++
+On 17/02/2024 11.43, Nicholas Piggin wrote:
+> On Sat Feb 17, 2024 at 12:02 AM AEST, Thomas Huth wrote:
+>> getchar() can currently only be called once on arm since the implementation
+>> is a little bit too  naïve: After the first character has arrived, the
+>> data register never gets set to zero again. To properly check whether a
+>> byte is available, we need to check the "RX fifo empty" on the pl011 UART
+>> or the "RX data ready" bit on the ns16550a UART instead.
 >>
->>    Hi Nicholas,
+>> With this proper check in place, we can finally also get rid of the
+>> ugly assert(count < 16) statement here.
 >>
->> I just gave the patches a try, but the arm test seems to fail for me: Only
->> the first getchar() seems to wait for a character, all the subsequent ones
->> don't wait anymore and just continue immediately ... is this working for
->> you? Or do I need another patch on top?
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > 
-> Hey sorry missed this comment....
+> Nice, thanks for fixing this up.
 > 
-> It does seem to work for me, I've mostly tested pseries but I did test
-> others too (that's how I saw the arm getchar limit).
-> 
-> How are you observing it not waiting for migration?
+> I see what you mean about multi-migration not waiting. It seems
+> to be an arm issue, ppc works properly.
 
-According to you other mail, I think you figured it out already, but just 
-for the records: You can see it when running the guest manually, e.g. 
-something like:
+Yes, it's an arm issue. s390x also works fine.
 
-  qemu-system-aarch64 -nodefaults -machine virt -accel tcg -cpu cortex-a57 \
-    -device virtio-serial-device -device virtconsole,chardev=ctd \
-    -chardev testdev,id=ctd -device pci-testdev -display none \
-    -serial mon:stdio -kernel arm/selftest-migration.flat -smp 1
+> This patch changed things
+> so it works a bit better (or at least differently) now, but
+> still has some bugs. Maybe buggy uart migration?
 
-Without my "lib/arm/io: Fix calling getchar() multiple times" patch, the 
-guest only waits during the first getchar(), all the others simply return 
-immediately.
+I'm also seeing hangs when running the arm migration-test multiple times, 
+but also without my UART patch here - so I assume the problem is not really 
+related to the UART?
 
   Thomas
+
 
 
