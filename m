@@ -1,58 +1,58 @@
-Return-Path: <kvm+bounces-9029-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9031-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7DBD859D91
-	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 08:55:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FC70859D96
+	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 08:55:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6DF1528108C
-	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 07:55:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3CC76280DAA
+	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 07:55:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB7A43839D;
-	Mon, 19 Feb 2024 07:47:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9977F3C062;
+	Mon, 19 Feb 2024 07:47:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UvRWKZxG"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="k1UXkp0H"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9444633CCF;
-	Mon, 19 Feb 2024 07:47:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B02EF364BF;
+	Mon, 19 Feb 2024 07:47:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708328875; cv=none; b=mGvcsJ5UayJM7LNaKOyV2ytz1npTI478UyMrpqcASHRfkSk2wpOY+NaMlBI1XmcYRP7o1f+IOWdscfeOftll2yqhP4b4TBFVQbw0YgoNQpaCOMJ81bgBzS5F1rmdBLB5ZXJJtMQLzrJC3KuArVK0v/3WMlVMjKQlY5dYXUu3FNU=
+	t=1708328876; cv=none; b=RnZ6GH9yMEjBO5Bjmjv0cMBA+Fs0rArfCzIolfS6f+Ddpxg8U10guD+n9r4MeqPhPkQqrJvLpMGIKc/LR93XDEmMxfhp3UXRn2mFbCToq68HfmFfFiLab9XN2IRVLEvSS1ktIgiPnl8+Vr8dlrAoH2swacqv43hDJY4vzz8VsxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708328875; c=relaxed/simple;
-	bh=wNeCjQtUEjXraB2FnEYbRot7k1BW8WqNJpaCluw2O8M=;
+	s=arc-20240116; t=1708328876; c=relaxed/simple;
+	bh=2KNY8GVHtyU72UPtEQPzxT100cFv4ieC6pwN9/mckEI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UP+9eIbaz5mlAwXTVVCMz2E5f5ETH4gbwG9UnaM9K1HtrJMjsWtdxgzwQYJ/15D4WOMCKnRBpp8gRKXCW++KSMsM84g2dsz+IMh7+x1FJj1ppNMstz5Jq3xaxtU+LMgmxISd/3K4uJoZrp5ju0m6KWSSNd5CSZjRBAHw91yFIQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UvRWKZxG; arc=none smtp.client-ip=198.175.65.16
+	 MIME-Version; b=VRYdjof+77B9R/SyEP9/OhoUMzL0OVJhkklhJoML8dQ911jF9eZ6U0WG/TGomvJTY+MHSI7k/4DDWtCMplmOWcmSeMtlcWGBbNx4pDZlAYNOCotCelhqvTpOdrvnvra8W9XjZobf1VuaGfk3268+hZ2jGhjhoGcbosfTPcQ3YNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=k1UXkp0H; arc=none smtp.client-ip=198.175.65.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708328873; x=1739864873;
+  t=1708328874; x=1739864874;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=wNeCjQtUEjXraB2FnEYbRot7k1BW8WqNJpaCluw2O8M=;
-  b=UvRWKZxG6kBbz9myC8so8/gBU4U8n2s39t4P6zUbdOccsdL/gRs0/Ru5
-   NoHrNryz/wisaGJtw90BXmFR5Baayz782lF1ZNG384kVU32xlfmAPgSn2
-   YZY49NW2Gwi9UgbqR6m0CSfuZBBNB8cc8PkfZWiLu87nGjREDJi0DptAn
-   GkSf2vcmaMQf9EOEfWpcGFqueHeqOx86QhAQsRS+Pdxowcadth/30/hiy
-   21OJwtJPDg9h7zOcaXVt6vWjBXYruKwGrCv6lNtDp4mnTWA5rCADGMFBm
-   lX2Z0p409D6JGHH0C7Pf7aDGLIxNc64eYzO+81H23dusnelndTBQDvI1J
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10988"; a="2535107"
+  bh=2KNY8GVHtyU72UPtEQPzxT100cFv4ieC6pwN9/mckEI=;
+  b=k1UXkp0HFkXQNZh+9ba2xhzUzwOIaruf4u+vdrwy4WdR4PLSFVtodRk0
+   RUyLAh5MczeOpRXpB6+asfs1YA47a4zfiXmCBiBnvGKUYK1cTjzsCYZxH
+   ZZgXgE6X+wwX82MUUgR8SqAcrVrSe+yQfJiaaz7W575OYPckNN2gInZUT
+   0x7R4vni7FwbT/2q7KWWsjtHsykk+6z36GVg+357vJsf+rRTngneFyW7A
+   N8brC8DQYhetKtvjk6bRzjL1VedA8FhC2ahUddGGm9ZK1AXm3SIEHOm18
+   4y85kisbR7ZZLcXOVIsM05jQ9rLGhdiMm8xbluBy0iUit1QnX5yyYv2Gr
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10988"; a="2535123"
 X-IronPort-AV: E=Sophos;i="6.06,170,1705392000"; 
-   d="scan'208";a="2535107"
+   d="scan'208";a="2535123"
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
   by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2024 23:47:44 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10988"; a="826966105"
+X-IronPort-AV: E=McAfee;i="6600,9927,10988"; a="826966108"
 X-IronPort-AV: E=Sophos;i="6.06,170,1705392000"; 
-   d="scan'208";a="826966105"
+   d="scan'208";a="826966108"
 Received: from jf.jf.intel.com (HELO jf.intel.com) ([10.165.9.183])
   by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2024 23:47:43 -0800
 From: Yang Weijiang <weijiang.yang@intel.com>
@@ -68,9 +68,9 @@ Cc: peterz@infradead.org,
 	mlevitsk@redhat.com,
 	john.allen@amd.com,
 	weijiang.yang@intel.com
-Subject: [PATCH v10 16/27] KVM: x86: Add fault checks for guest CR4.CET setting
-Date: Sun, 18 Feb 2024 23:47:22 -0800
-Message-ID: <20240219074733.122080-17-weijiang.yang@intel.com>
+Subject: [PATCH v10 17/27] KVM: x86: Report KVM supported CET MSRs as to-be-saved
+Date: Sun, 18 Feb 2024 23:47:23 -0800
+Message-ID: <20240219074733.122080-18-weijiang.yang@intel.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240219074733.122080-1-weijiang.yang@intel.com>
 References: <20240219074733.122080-1-weijiang.yang@intel.com>
@@ -82,43 +82,90 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Check potential faults for CR4.CET setting per Intel SDM requirements.
-CET can be enabled if and only if CR0.WP == 1, i.e. setting CR4.CET ==
-1 faults if CR0.WP == 0 and setting CR0.WP == 0 fails if CR4.CET == 1.
+Add CET MSRs to the list of MSRs reported to userspace if the feature,
+i.e. IBT or SHSTK, associated with the MSRs is supported by KVM.
 
-Co-developed-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
+SSP can only be read via RDSSP. Writing even requires destructive and
+potentially faulting operations such as SAVEPREVSSP/RSTORSSP or
+SETSSBSY/CLRSSBSY. Let the host use a pseudo-MSR that is just a wrapper
+for the GUEST_SSP field of the VMCS.
+
+Suggested-by: Chao Gao <chao.gao@intel.com>
 Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-Reviewed-by: Chao Gao <chao.gao@intel.com>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/x86/kvm/x86.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ arch/x86/include/uapi/asm/kvm_para.h |  1 +
+ arch/x86/kvm/vmx/vmx.c               |  2 ++
+ arch/x86/kvm/x86.c                   | 18 ++++++++++++++++++
+ 3 files changed, 21 insertions(+)
 
+diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uapi/asm/kvm_para.h
+index 605899594ebb..9d08c0bec477 100644
+--- a/arch/x86/include/uapi/asm/kvm_para.h
++++ b/arch/x86/include/uapi/asm/kvm_para.h
+@@ -58,6 +58,7 @@
+ #define MSR_KVM_ASYNC_PF_INT	0x4b564d06
+ #define MSR_KVM_ASYNC_PF_ACK	0x4b564d07
+ #define MSR_KVM_MIGRATION_CONTROL	0x4b564d08
++#define MSR_KVM_SSP	0x4b564d09
+ 
+ struct kvm_steal_time {
+ 	__u64 steal;
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 9239a89dea22..46042bc6e2fa 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7007,6 +7007,8 @@ static bool vmx_has_emulated_msr(struct kvm *kvm, u32 index)
+ 	case MSR_AMD64_TSC_RATIO:
+ 		/* This is AMD only.  */
+ 		return false;
++	case MSR_KVM_SSP:
++		return kvm_cpu_cap_has(X86_FEATURE_SHSTK);
+ 	default:
+ 		return true;
+ 	}
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 906307757159..5f5df7e38d3d 100644
+index 5f5df7e38d3d..c0ed69353674 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -1006,6 +1006,9 @@ int kvm_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
- 	    (is_64_bit_mode(vcpu) || kvm_is_cr4_bit_set(vcpu, X86_CR4_PCIDE)))
- 		return 1;
+@@ -1476,6 +1476,9 @@ static const u32 msrs_to_save_base[] = {
  
-+	if (!(cr0 & X86_CR0_WP) && kvm_is_cr4_bit_set(vcpu, X86_CR4_CET))
-+		return 1;
-+
- 	static_call(kvm_x86_set_cr0)(vcpu, cr0);
+ 	MSR_IA32_XFD, MSR_IA32_XFD_ERR,
+ 	MSR_IA32_XSS,
++	MSR_IA32_U_CET, MSR_IA32_S_CET,
++	MSR_IA32_PL0_SSP, MSR_IA32_PL1_SSP, MSR_IA32_PL2_SSP,
++	MSR_IA32_PL3_SSP, MSR_IA32_INT_SSP_TAB,
+ };
  
- 	kvm_post_set_cr0(vcpu, old_cr0, cr0);
-@@ -1217,6 +1220,9 @@ int kvm_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
- 			return 1;
+ static const u32 msrs_to_save_pmu[] = {
+@@ -1579,6 +1582,7 @@ static const u32 emulated_msrs_all[] = {
+ 
+ 	MSR_K7_HWCR,
+ 	MSR_KVM_POLL_CONTROL,
++	MSR_KVM_SSP,
+ };
+ 
+ static u32 emulated_msrs[ARRAY_SIZE(emulated_msrs_all)];
+@@ -7441,6 +7445,20 @@ static void kvm_probe_msr_to_save(u32 msr_index)
+ 		if (!kvm_caps.supported_xss)
+ 			return;
+ 		break;
++	case MSR_IA32_U_CET:
++	case MSR_IA32_S_CET:
++		if (!kvm_cpu_cap_has(X86_FEATURE_SHSTK) &&
++		    !kvm_cpu_cap_has(X86_FEATURE_IBT))
++			return;
++		break;
++	case MSR_IA32_INT_SSP_TAB:
++		if (!kvm_cpu_cap_has(X86_FEATURE_LM))
++			return;
++		fallthrough;
++	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
++		if (!kvm_cpu_cap_has(X86_FEATURE_SHSTK))
++			return;
++		break;
+ 	default:
+ 		break;
  	}
- 
-+	if ((cr4 & X86_CR4_CET) && !kvm_is_cr0_bit_set(vcpu, X86_CR0_WP))
-+		return 1;
-+
- 	static_call(kvm_x86_set_cr4)(vcpu, cr4);
- 
- 	kvm_post_set_cr4(vcpu, old_cr4, cr4);
 -- 
 2.43.0
 
