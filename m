@@ -1,61 +1,77 @@
-Return-Path: <kvm+bounces-9046-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9047-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 579A0859EE0
-	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 09:54:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D253859EFE
+	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 10:00:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F6AE2817A1
-	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 08:54:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D706C281949
+	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 09:00:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DAED224DA;
-	Mon, 19 Feb 2024 08:54:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E81E5224C9;
+	Mon, 19 Feb 2024 09:00:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Up/v4S31"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U/Ox/69o"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD76021362;
-	Mon, 19 Feb 2024 08:54:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35AEB2232B
+	for <kvm@vger.kernel.org>; Mon, 19 Feb 2024 09:00:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708332875; cv=none; b=SSgTBY5nrQf+ZrveiA/tSNJ6Sm/UvZk8nnvZJgnj9KJzUKOqIAQt3L8nSaC1XUkM+txahhbcGk5Gcv6scUaoa05iLaztSJM/ZCm+kJED/1icmykmkp9jBb04XXtBeMcLQxLbTcuaNn3kKzbBbu0m5BlyBB3ZDuZ44qjRetos9pE=
+	t=1708333241; cv=none; b=lVaK1qNiNwnVkJaw5kzHr6WcAnyc8CvlQ0YlSJ3zmops3L51bFO6RJ2EVabCFM9kEHupGDuXi6xYG7rBUyFiSJNKlREN6HP4odYFtVMoA/zGhec9K2UH3ngYRaoo35VyIVBpkKsrcfKR+CkViXYe+iDxYvr+6cP7d0PDf1TIK9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708332875; c=relaxed/simple;
-	bh=OrrbkCygvoUCodvx8CWHRJR1R9gpqIq+eNds+ye+OB0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jI7HvHW1aVjxZpp9GWXY2BDvdZvnwbIeIOzojAAM3Uy5IbJ/trRP5SNIWKdsLHZIhGeb5116gHIhy7+5ABu8GKtqn9rPcb3s/EhR6OF5Lx0g1ZPRvQJd9EniF6T0NpLcxpN8i4N2EuPiHHA07Zr6czX8kWKCsV7L8WKYdx5YY7s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Up/v4S31; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708332874; x=1739868874;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=OrrbkCygvoUCodvx8CWHRJR1R9gpqIq+eNds+ye+OB0=;
-  b=Up/v4S31A3vH+DmvO1cBxwoQRj8Esy1ZBglKI02hL/q5wQO+OqQNdk3d
-   FxovpYOtfM7X2xHbvkpXd6kNNgehvVIW/7j6xYa7vqdi5DDp142T7rNcZ
-   Sd5KQqZPbVQVYclZIcOQxFaJoMuOzRlnNt/jIP+nJJr1yv5FHd4PAT901
-   bMmmXmnPkHA0MGRJBLqOnZt9EfZz3vVfmpT2ktIvzhYCWIlvth96YNapb
-   aAvd7hLpKYu8oxI715uF7GBXHMwreMVrr1ZqfCgYm1lC3YuxHyShP5UTV
-   F3pfG5Y1N57o/I7xs8tH774WUOxB7DHeWiqOZcN57mTHXjEBvlW6dZ7vx
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10988"; a="2507350"
-X-IronPort-AV: E=Sophos;i="6.06,170,1705392000"; 
-   d="scan'208";a="2507350"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2024 00:54:32 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,170,1705392000"; 
-   d="scan'208";a="9040195"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.1.66]) ([10.238.1.66])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2024 00:54:30 -0800
-Message-ID: <b8fb2a97-d593-4c0f-aefc-6156740a0b6a@linux.intel.com>
-Date: Mon, 19 Feb 2024 16:54:27 +0800
+	s=arc-20240116; t=1708333241; c=relaxed/simple;
+	bh=bQVchDmRpI3eFwvt/On1NFftv5is9+1ce6JpTNm01iU=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=ifULGMR/s0uQbIXAIpQxxRRAe/W8CSEVPUXEFgIsjyA7IqbqFS1TNoZR/ZwY548H5XDZvltqtK93UWcp3T6AlCVqCRgY6j+LVsewSPSrBYu1uVhQ3CY3srCpKTZumRZNKbkgkR6mIqkVLSgc4tsdL4xxlwzYsL0cZcnrlYynHqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U/Ox/69o; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-40fb3b5893eso19974695e9.0
+        for <kvm@vger.kernel.org>; Mon, 19 Feb 2024 01:00:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708333237; x=1708938037; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=io6PG17kPlTD2eQRx4OpTm4H59Obcg8d8aCXOG7mSRs=;
+        b=U/Ox/69okdeKol3uIuPEjug8ROEPENQPDMrzIN/YwghNQoofcrDQBJeASnha9yOfeW
+         mWrqwj0Il7rxT3OeDTeTbgwG5XHFkGRkC1JrxzwzagqS5Uru97c60e+LVJytGyPDFhr8
+         CxcuFC2oj+KU2CGbjmj6PD2BPc/f1+p9D3YyOvrJOF6+WQ9IVTMCpjyafQjzmjlYxsmP
+         SuiyG4k/tKPgMLCAp31U1eX7T8loJh1h6j5pIF1HsgjtSMBRrlEAih6KrLQUXXYr4lSC
+         sliDPOsVUBOkHCFeCALDU5hNK3sDgYcp0IoJusqr5/F6S5VxfaPKMWbhDX5RLUMQS31/
+         EKBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708333237; x=1708938037;
+        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=io6PG17kPlTD2eQRx4OpTm4H59Obcg8d8aCXOG7mSRs=;
+        b=adaPA+mbfTZtAZfeh0aXuk+gsVOFFmyESYIEt5/ckVWc/0COvCJtuXEgJIp72rtxAc
+         wFjmQL7tOw85E3IO/W9sDwvlu+ur/Db2fE9SwSc6Ht1Xu31+tZGto54IXUJwLcinIAsd
+         84rxesfwJJ+XMeAZr1wfXRuLfXErzao8DituFcdcHP2pgZ/7f+CbmxvZGRg2g/iO7DlP
+         pXMQ/qaewJ0dU34EUQub2XNz4jwrsXKAl4lin2uplObifRgUneFbqy+dW+3gwYKCPkxc
+         250rX5T8b1krm0Nb/M45VLphbrXJ0Lbw6qUtRR3WBAanquVCS7vNlh89NBvdlfZQsXW3
+         TGbA==
+X-Forwarded-Encrypted: i=1; AJvYcCVoTgrpQMDrYo5wDv4K2VAJhnWnTlweOpa2KaT9pJgZmaT1bBc0KOLrsCIvJ8hqdXTtGLt1zf1yWCjBPKD//MuJZqtR
+X-Gm-Message-State: AOJu0YyBa5ejlTzyUjEVgeulnrJ3ub9TPBsJWgjFUUz3Rt0TwZzX5Tr4
+	gaZiV1xDYqqn2/WBmljhED0fge290t7Q7N5yNNGKfc8VhZB5k7aa
+X-Google-Smtp-Source: AGHT+IHp12v9U8Mwo+jv3pya3QBaw4tGIQG7Vkbdip7znwiCBoUvoZeZxWYdX6xJxPqZ66SY1zUbVQ==
+X-Received: by 2002:a05:600c:4507:b0:412:6170:a178 with SMTP id t7-20020a05600c450700b004126170a178mr2613767wmo.29.1708333236541;
+        Mon, 19 Feb 2024 01:00:36 -0800 (PST)
+Received: from [192.168.6.211] (54-240-197-236.amazon.com. [54.240.197.236])
+        by smtp.gmail.com with ESMTPSA id h5-20020a05600c350500b004124219a8c9sm10431210wmq.32.2024.02.19.01.00.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 19 Feb 2024 01:00:36 -0800 (PST)
+From: Paul Durrant <xadimgnik@gmail.com>
+X-Google-Original-From: Paul Durrant <paul@xen.org>
+Message-ID: <fae10155-f5b3-4fc6-8a9c-dfcbb39b0718@xen.org>
+Date: Mon, 19 Feb 2024 09:00:35 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -63,310 +79,156 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v18 064/121] KVM: TDX: Create initial guest memory
-To: isaku.yamahata@intel.com
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
- erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
- Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
- chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
- gkirkpatrick@google.com
-References: <cover.1705965634.git.isaku.yamahata@intel.com>
- <97bb1f2996d8a7b828cd9e3309380d1a86ca681b.1705965635.git.isaku.yamahata@intel.com>
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <97bb1f2996d8a7b828cd9e3309380d1a86ca681b.1705965635.git.isaku.yamahata@intel.com>
+Reply-To: paul@xen.org
+Subject: Re: [PATCH 4/6] KVM: pfncache: simplify locking and make more
+ self-contained
+Content-Language: en-US
+To: David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org
+Cc: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Michal Luczaj <mhal@rbox.co>,
+ David Woodhouse <dwmw@amazon.co.uk>
+References: <20240217114017.11551-1-dwmw2@infradead.org>
+ <20240217114017.11551-5-dwmw2@infradead.org>
+Organization: Xen Project
+In-Reply-To: <20240217114017.11551-5-dwmw2@infradead.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-
-
-On 1/23/2024 7:53 AM, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
->
-> Because the guest memory is protected in TDX, the creation of the initial
-> guest memory requires a dedicated TDX module API, tdh_mem_page_add, instead
-> of directly copying the memory contents into the guest memory in the case
-> of the default VM type.  KVM MMU page fault handler callback,
-> private_page_add, handles it.
-
-The changelog is stale?  Do you mean "set_private_spte"?
-
->
-> Define new subcommand, KVM_TDX_INIT_MEM_REGION, of VM-scoped
-> KVM_MEMORY_ENCRYPT_OP.  It assigns the guest page, copies the initial
-> memory contents into the guest memory, encrypts the guest memory.  At the
-> same time, optionally it extends memory measurement of the TDX guest.  It
-> calls the KVM MMU page fault(EPT-violation) handler to trigger the
-> callbacks for it.
->
-> Reported-by: gkirkpatrick@google.com
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
->
+On 17/02/2024 11:27, David Woodhouse wrote:
+> From: David Woodhouse <dwmw@amazon.co.uk>
+> 
+> The locking on the gfn_to_pfn_cache is... interesting. And awful.
+> 
+> There is a rwlock in ->lock which readers take to ensure protection
+> against concurrent changes. But __kvm_gpc_refresh() makes assumptions
+> that certain fields will not change even while it drops the write lock
+> and performs MM operations to revalidate the target PFN and kernel
+> mapping.
+> 
+> Commit 93984f19e7bc ("KVM: Fully serialize gfn=>pfn cache refresh via
+> mutex") partly addressed that — not by fixing it, but by adding a new
+> mutex, ->refresh_lock. This prevented concurrent __kvm_gpc_refresh()
+> calls on a given gfn_to_pfn_cache, but is still only a partial solution.
+> 
+> There is still a theoretical race where __kvm_gpc_refresh() runs in
+> parallel with kvm_gpc_deactivate(). While __kvm_gpc_refresh() has
+> dropped the write lock, kvm_gpc_deactivate() clears the ->active flag
+> and unmaps ->khva. Then __kvm_gpc_refresh() determines that the previous
+> ->pfn and ->khva are still valid, and reinstalls those values into the
+> structure. This leaves the gfn_to_pfn_cache with the ->valid bit set,
+> but ->active clear. And a ->khva which looks like a reasonable kernel
+> address but is actually unmapped.
+> 
+> All it takes is a subsequent reactivation to cause that ->khva to be
+> dereferenced. This would theoretically cause an oops which would look
+> something like this:
+> 
+> [1724749.564994] BUG: unable to handle page fault for address: ffffaa3540ace0e0
+> [1724749.565039] RIP: 0010:__kvm_xen_has_interrupt+0x8b/0xb0
+> 
+> I say "theoretically" because theoretically, that oops that was seen in
+> production cannot happen. The code which uses the gfn_to_pfn_cache is
+> supposed to have its *own* locking, to further paper over the fact that
+> the gfn_to_pfn_cache's own papering-over (->refresh_lock) of its own
+> rwlock abuse is not sufficient.
+> 
+> For the Xen vcpu_info that external lock is the vcpu->mutex, and for the
+> shared info it's kvm->arch.xen.xen_lock. Those locks ought to protect
+> the gfn_to_pfn_cache against concurrent deactivation vs. refresh in all
+> but the cases where the vcpu or kvm object is being *destroyed*, in
+> which case the subsequent reactivation should never happen.
+> 
+> Theoretically.
+> 
+> Nevertheless, this locking abuse is awful and should be fixed, even if
+> no clear explanation can be found for how the oops happened. So expand
+> the use of the ->refresh_lock mutex to ensure serialization of
+> activate/deactivate vs. refresh and make the pfncache locking entirely
+> self-sufficient.
+> 
+> This means that a future commit can simplify the locking in the callers,
+> such as the Xen emulation code which has an outstanding problem with
+> recursive locking of kvm->arch.xen.xen_lock, which will no longer be
+> necessary.
+> 
+> The rwlock abuse described above is still not best practice, although
+> it's harmless now that the ->refresh_lock is held for the entire duration
+> while the offending code drops the write lock, does some other stuff,
+> then takes the write lock again and assumes nothing changed. That can
+> also be fixed^W cleaned up in a subsequent commit, but this commit is
+> a simpler basis for the Xen deadlock fix mentioned above.
+> 
+> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 > ---
-> v18:
-> - rename tdx_sept_page_add() -> tdx_mem_page_add().
-> - open code tdx_measure_page() into tdx_mem_page_add().
-> - remove the change of tools/arch/x86/include/uapi/asm/kvm.h.
->
-> v15 -> v16:
-> - add check if nr_pages isn't large with
->    (nr_page << PAGE_SHIFT) >> PAGE_SHIFT
->
-> v14 -> v15:
-> - add a check if TD is finalized or not to tdx_init_mem_region()
-> - return -EAGAIN when partial population
-> ---
->   arch/x86/include/uapi/asm/kvm.h |   9 ++
->   arch/x86/kvm/mmu/mmu.c          |   1 +
->   arch/x86/kvm/vmx/tdx.c          | 160 +++++++++++++++++++++++++++++++-
->   arch/x86/kvm/vmx/tdx.h          |   2 +
->   4 files changed, 169 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-> index 4000a2e087a8..9fda7c90b7b5 100644
-> --- a/arch/x86/include/uapi/asm/kvm.h
-> +++ b/arch/x86/include/uapi/asm/kvm.h
-> @@ -572,6 +572,7 @@ enum kvm_tdx_cmd_id {
->   	KVM_TDX_CAPABILITIES = 0,
->   	KVM_TDX_INIT_VM,
->   	KVM_TDX_INIT_VCPU,
-> +	KVM_TDX_INIT_MEM_REGION,
+>   virt/kvm/pfncache.c | 32 +++++++++++++++++++++-----------
+>   1 file changed, 21 insertions(+), 11 deletions(-)
+> 
+> diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
+> index a60d8f906896..79a3ef7c6d04 100644
+> --- a/virt/kvm/pfncache.c
+> +++ b/virt/kvm/pfncache.c
+> @@ -255,12 +255,7 @@ static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned l
+>   	if (page_offset + len > PAGE_SIZE)
+>   		return -EINVAL;
 >   
->   	KVM_TDX_CMD_NR_MAX,
->   };
-> @@ -649,4 +650,12 @@ struct kvm_tdx_init_vm {
->   	struct kvm_cpuid2 cpuid;
->   };
+> -	/*
+> -	 * If another task is refreshing the cache, wait for it to complete.
+> -	 * There is no guarantee that concurrent refreshes will see the same
+> -	 * gpa, memslots generation, etc..., so they must be fully serialized.
+> -	 */
+> -	mutex_lock(&gpc->refresh_lock);
+> +	lockdep_assert_held(&gpc->refresh_lock);
 >   
-> +#define KVM_TDX_MEASURE_MEMORY_REGION	(1UL << 0)
-> +
-> +struct kvm_tdx_init_mem_region {
-> +	__u64 source_addr;
-> +	__u64 gpa;
-> +	__u64 nr_pages;
-> +};
-> +
->   #endif /* _ASM_X86_KVM_H */
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 26d215e85b76..fc258f112e73 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -5663,6 +5663,7 @@ int kvm_mmu_load(struct kvm_vcpu *vcpu)
->   out:
->   	return r;
->   }
-> +EXPORT_SYMBOL(kvm_mmu_load);
+>   	write_lock_irq(&gpc->lock);
 >   
->   void kvm_mmu_unload(struct kvm_vcpu *vcpu)
->   {
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index 4cbcedff4f16..1a5a91b99de9 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -591,6 +591,69 @@ static int tdx_mem_page_aug(struct kvm *kvm, gfn_t gfn,
->   	return 0;
->   }
+> @@ -346,8 +341,6 @@ static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned l
+>   out_unlock:
+>   	write_unlock_irq(&gpc->lock);
 >   
-> +static int tdx_mem_page_add(struct kvm *kvm, gfn_t gfn,
-> +			    enum pg_level level, kvm_pfn_t pfn)
-> +{
-> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> +	hpa_t hpa = pfn_to_hpa(pfn);
-> +	gpa_t gpa = gfn_to_gpa(gfn);
-> +	struct tdx_module_args out;
-> +	hpa_t source_pa;
-> +	bool measure;
-> +	u64 err;
-> +	int i;
-> +
-> +	/*
-> +	 * KVM_INIT_MEM_REGION, tdx_init_mem_region(), supports only 4K page
-> +	 * because tdh_mem_page_add() supports only 4K page.
-> +	 */
-> +	if (KVM_BUG_ON(level != PG_LEVEL_4K, kvm))
-> +		return -EINVAL;
-> +
-> +	/*
-> +	 * In case of TDP MMU, fault handler can run concurrently.  Note
-> +	 * 'source_pa' is a TD scope variable, meaning if there are multiple
-> +	 * threads reaching here with all needing to access 'source_pa', it
-> +	 * will break.  However fortunately this won't happen, because below
-> +	 * TDH_MEM_PAGE_ADD code path is only used when VM is being created
-> +	 * before it is running, using KVM_TDX_INIT_MEM_REGION ioctl (which
-> +	 * always uses vcpu 0's page table and protected by vcpu->mutex).
-> +	 */
-> +	if (KVM_BUG_ON(kvm_tdx->source_pa == INVALID_PAGE, kvm)) {
-> +		tdx_unpin(kvm, pfn);
-> +		return -EINVAL;
-> +	}
-> +
-> +	source_pa = kvm_tdx->source_pa & ~KVM_TDX_MEASURE_MEMORY_REGION;
-> +	measure = kvm_tdx->source_pa & KVM_TDX_MEASURE_MEMORY_REGION;
-> +	kvm_tdx->source_pa = INVALID_PAGE;
-> +
-> +	do {
-> +		err = tdh_mem_page_add(kvm_tdx->tdr_pa, gpa, hpa, source_pa,
-> +				       &out);
-> +		/*
-> +		 * This path is executed during populating initial guest memory
-> +		 * image. i.e. before running any vcpu.  Race is rare.
-> +		 */
-> +	} while (unlikely(err == TDX_ERROR_SEPT_BUSY));
-
-For page add, since pages are added one by one, there should be no such
-error, right?
-
-> +	if (KVM_BUG_ON(err, kvm)) {
-> +		pr_tdx_error(TDH_MEM_PAGE_ADD, err, &out);
-> +		tdx_unpin(kvm, pfn);
-> +		return -EIO;
-> +	} else if (measure) {
-> +		for (i = 0; i < PAGE_SIZE; i += TDX_EXTENDMR_CHUNKSIZE) {
-> +			err = tdh_mr_extend(kvm_tdx->tdr_pa, gpa + i, &out);
-> +			if (KVM_BUG_ON(err, &kvm_tdx->kvm)) {
-> +				pr_tdx_error(TDH_MR_EXTEND, err, &out);
-> +				break;
-> +			}
-> +		}
-> +	}
-> +
-> +	return 0;
-> +
-> +}
-> +
->   static int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
->   				     enum pg_level level, kvm_pfn_t pfn)
->   {
-> @@ -613,9 +676,7 @@ static int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
->   	if (likely(is_td_finalized(kvm_tdx)))
->   		return tdx_mem_page_aug(kvm, gfn, level, pfn);
->   
-> -	/* TODO: tdh_mem_page_add() comes here for the initial memory. */
+> -	mutex_unlock(&gpc->refresh_lock);
 > -
-> -	return 0;
-> +	return tdx_mem_page_add(kvm, gfn, level, pfn);
->   }
+>   	if (unmap_old)
+>   		gpc_unmap(old_pfn, old_khva);
 >   
->   static int tdx_sept_drop_private_spte(struct kvm *kvm, gfn_t gfn,
-> @@ -1322,6 +1383,96 @@ void tdx_flush_tlb_current(struct kvm_vcpu *vcpu)
->   	tdx_track(vcpu->kvm);
->   }
+> @@ -356,16 +349,24 @@ static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned l
 >   
-> +#define TDX_SEPT_PFERR	(PFERR_WRITE_MASK | PFERR_GUEST_ENC_MASK)
+>   int kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, unsigned long len)
+>   {
+> -	unsigned long uhva = gpc->uhva;
+> +	unsigned long uhva;
+> +	int ret;
 > +
-> +static int tdx_init_mem_region(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
-> +{
-> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> +	struct kvm_tdx_init_mem_region region;
-> +	struct kvm_vcpu *vcpu;
-> +	struct page *page;
-> +	int idx, ret = 0;
-> +	bool added = false;
+> +	mutex_lock(&gpc->refresh_lock);
+>   
+>   	/*
+>   	 * If the GPA is valid then invalidate the HVA, otherwise
+>   	 * __kvm_gpc_refresh() will fail its strict either/or address check.
+>   	 */
+> +	uhva = gpc->uhva;
+>   	if (!kvm_is_error_gpa(gpc->gpa))
+>   		uhva = KVM_HVA_ERR_BAD;
+>   
+> -	return __kvm_gpc_refresh(gpc, gpc->gpa, uhva, len);
+> +	ret = __kvm_gpc_refresh(gpc, gpc->gpa, uhva, len);
 > +
-> +	/* Once TD is finalized, the initial guest memory is fixed. */
-> +	if (is_td_finalized(kvm_tdx))
-> +		return -EINVAL;
-> +
-> +	/* The BSP vCPU must be created before initializing memory regions. */
-> +	if (!atomic_read(&kvm->online_vcpus))
-> +		return -EINVAL;
-> +
-> +	if (cmd->flags & ~KVM_TDX_MEASURE_MEMORY_REGION)
-> +		return -EINVAL;
-> +
-> +	if (copy_from_user(&region, (void __user *)cmd->data, sizeof(region)))
-> +		return -EFAULT;
-> +
-> +	/* Sanity check */
-> +	if (!IS_ALIGNED(region.source_addr, PAGE_SIZE) ||
-> +	    !IS_ALIGNED(region.gpa, PAGE_SIZE) ||
-> +	    !region.nr_pages ||
-> +	    region.nr_pages & GENMASK_ULL(63, 63 - PAGE_SHIFT) ||
-> +	    region.gpa + (region.nr_pages << PAGE_SHIFT) <= region.gpa ||
-> +	    !kvm_is_private_gpa(kvm, region.gpa) ||
-> +	    !kvm_is_private_gpa(kvm, region.gpa + (region.nr_pages << PAGE_SHIFT)))
-> +		return -EINVAL;
-> +
-> +	vcpu = kvm_get_vcpu(kvm, 0);
-> +	if (mutex_lock_killable(&vcpu->mutex))
-> +		return -EINTR;
-> +
-> +	vcpu_load(vcpu);
-> +	idx = srcu_read_lock(&kvm->srcu);
-> +
-> +	kvm_mmu_reload(vcpu);
-> +
-> +	while (region.nr_pages) {
-> +		if (signal_pending(current)) {
-> +			ret = -ERESTARTSYS;
-> +			break;
-> +		}
-> +
-> +		if (need_resched())
-> +			cond_resched();
-> +
-> +		/* Pin the source page. */
-> +		ret = get_user_pages_fast(region.source_addr, 1, 0, &page);
-> +		if (ret < 0)
-> +			break;
-> +		if (ret != 1) {
-> +			ret = -ENOMEM;
-> +			break;
-> +		}
-> +
-> +		kvm_tdx->source_pa = pfn_to_hpa(page_to_pfn(page)) |
-> +				     (cmd->flags & KVM_TDX_MEASURE_MEMORY_REGION);
-> +
-> +		ret = kvm_mmu_map_tdp_page(vcpu, region.gpa, TDX_SEPT_PFERR,
-> +					   PG_LEVEL_4K);
-> +		put_page(page);
-> +		if (ret)
-> +			break;
-> +
-> +		region.source_addr += PAGE_SIZE;
-> +		region.gpa += PAGE_SIZE;
-> +		region.nr_pages--;
-> +		added = true;
-> +	}
-> +
-> +	srcu_read_unlock(&kvm->srcu, idx);
-> +	vcpu_put(vcpu);
-> +
-> +	mutex_unlock(&vcpu->mutex);
-> +
-> +	if (added && region.nr_pages > 0)
-> +		ret = -EAGAIN;
-> +	if (copy_to_user((void __user *)cmd->data, &region, sizeof(region)))
-> +		ret = -EFAULT;
+> +	mutex_unlock(&gpc->refresh_lock);
 > +
 > +	return ret;
-> +}
-> +
->   int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
->   {
->   	struct kvm_tdx_cmd tdx_cmd;
-> @@ -1341,6 +1492,9 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
->   	case KVM_TDX_INIT_VM:
->   		r = tdx_td_init(kvm, &tdx_cmd);
->   		break;
-> +	case KVM_TDX_INIT_MEM_REGION:
-> +		r = tdx_init_mem_region(kvm, &tdx_cmd);
-> +		break;
->   	default:
->   		r = -EINVAL;
->   		goto out;
-> diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-> index 783ce329d7da..d589a2caedfb 100644
-> --- a/arch/x86/kvm/vmx/tdx.h
-> +++ b/arch/x86/kvm/vmx/tdx.h
-> @@ -17,6 +17,8 @@ struct kvm_tdx {
->   	u64 xfam;
->   	int hkid;
+>   }
 >   
-> +	hpa_t source_pa;
-> +
->   	bool finalized;
->   	atomic_t tdh_mem_track;
+>   void kvm_gpc_init(struct gfn_to_pfn_cache *gpc, struct kvm *kvm)
+> @@ -377,12 +378,16 @@ void kvm_gpc_init(struct gfn_to_pfn_cache *gpc, struct kvm *kvm)
+>   	gpc->pfn = KVM_PFN_ERR_FAULT;
+>   	gpc->gpa = INVALID_GPA;
+>   	gpc->uhva = KVM_HVA_ERR_BAD;
+> +	gpc->active = gpc->valid = false;
+
+Not strictly necessary if the comment above the function prototype in 
+kvm_host.h is to be believed, but no harm.
+
+Reviewed-by: Paul Durrant <paul@xen.org>
+
+>   }
 >   
 
 
