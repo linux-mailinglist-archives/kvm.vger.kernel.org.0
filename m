@@ -1,74 +1,74 @@
-Return-Path: <kvm+bounces-9094-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9095-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B509F85A5D6
-	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 15:23:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E052485A5F6
+	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 15:32:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A1FB282322
-	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 14:23:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 466E7B211F3
+	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 14:32:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BFF82E419;
-	Mon, 19 Feb 2024 14:23:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27D011EA84;
+	Mon, 19 Feb 2024 14:31:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DFSdYjzo"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XDjecjDo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88A4C374F5
-	for <kvm@vger.kernel.org>; Mon, 19 Feb 2024 14:23:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F9CF1DFC5
+	for <kvm@vger.kernel.org>; Mon, 19 Feb 2024 14:31:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708352625; cv=none; b=hcSYhaUgr+5N1GlLtepl4XpjIK0YqiDWrwFoEALIhN43yt9Bu/AGLtdhvbM8KnbXDhS2FHzVwXhXV2wCk4TJ5OGtAlddxnoVKendtKjDIhCtNktLd8ndhe0gfsGidmc0BicGMkdRcxjZFNT1Ri8HQGZTeuKGCc5t/PV2ViAkFyk=
+	t=1708353110; cv=none; b=HEauVQgu/3LPJPl4zJtPfh5AZU8ER57cfNypNO4SZrss/SaVP6DNwL+GmFcUnRzMVi1WK49Z/DfV0k5ibfFmeaPaXcOIkdmbMMqIf831m2wfXC+tLZYlxTKf2nhjhS6ANf17vEziI7aYNMpwXa4Bba3+yxjVwu7wRuFJ1OcDgRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708352625; c=relaxed/simple;
-	bh=SUhfK829Y+oM/GBiH7Fk1PS+v5a1KyCKm1UKtSI5pKY=;
+	s=arc-20240116; t=1708353110; c=relaxed/simple;
+	bh=KrmZW1fftBQBBkiWpNTvmkLK+NoP/cqljE3dT7yFIyg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MqFtnLQBOwanelbatHl7zXJQhcdBnNG6shvboijWCgFTIAWVG4MovuVDmhHZJnriYPy16BXYHf24Om/qNCUmLJD45K+jOtTavA8IsB0LPn2gQjA+BKcpB0g1p54+GpiEKccj5XZBwWrkiyEdepAhwZ1GCdNXWIZT19XNrXUC8pQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=DFSdYjzo; arc=none smtp.client-ip=209.85.208.174
+	 In-Reply-To:Content-Type; b=hdDonRSWb8IrtA5OOIxTGcVMSIcjSC2NjpCVS37sRZ2V/2N5uExH21CAWTYNFEu46Fc9hC/5PEpN3Lndl0aq5aF2EmhpFAIxdG2BsXpBv2hw4YWgGznsC4tIra7MyrqYCUahT0LVxtcr7zWKgewSzAH0jIlmg+Y0FXzw9CkeGVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=XDjecjDo; arc=none smtp.client-ip=209.85.221.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2d0b4ea773eso55599671fa.0
-        for <kvm@vger.kernel.org>; Mon, 19 Feb 2024 06:23:42 -0800 (PST)
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3394bec856fso3096482f8f.0
+        for <kvm@vger.kernel.org>; Mon, 19 Feb 2024 06:31:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1708352620; x=1708957420; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1708353106; x=1708957906; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=mnDDTtlItDfPp9YM6wZ4fhPF4cOhRwX1C0WTfTez+m0=;
-        b=DFSdYjzoTfA6zN24F6U9VMA0AA+qdJ+hsjZHvM06egPsPYoNYws0hIwOWtnPncPeH9
-         GH8YO2hhwb9S43JqytRpRZ3sQ2CjO7qA1KVcaa5o13qwZgrd2L/vx4b3daekZR8sVNoq
-         Z3QG2pE0IrPqR5bViwrkLZrJ/fFeWdPOPm39ytAYBOZPdHm0MN8w6MWj2bIvf1yAcIm+
-         qg7MyAVW6GNRcq336depN8En5G12iVgYd/PumPJHtPyMPZlqbaBR4pVhh2hELRz12ka6
-         NNbWwca4/WUjFD3T/aMqn0fJ6ygv1kNNxVU6jIa45OLgJ0hctfHtR38S1Ww5I7aKmmbC
-         kCXw==
+        bh=wb7GI7NapM+t0rzPIi4HiIJwL6bw4e6Ou5xFgI57zK8=;
+        b=XDjecjDoQCtAoQBGl05Kwc4yHoxutWYhSuO19ILZY2y6QC6QoCfeCSz0ZtDN2ykf6z
+         wTrDN+4HhjcN1G0p1hItMIEYxhqH8qs5xgJk2j5f+fr0v0PF17FC2UPvpjvq+Pgzx9xJ
+         +Era+fJ2oQE/jeUYKvABjQ6FzppuZlG+FdhSX5jEXsHcfRSDeHl0a94eXR8zNYkHTOQO
+         mTbnFYcin+VdHxO57Kyf6tJjjTWjC68ZoeykGK80bVrubMjQLzshoxP/izlj0NGX9bJS
+         4NnXdSqJbWbBLbVPGpMSrig4i+3twYqlZoyc+HePQgXyEAMZpJWSblL4M2Cefmw7qizz
+         bEEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708352620; x=1708957420;
+        d=1e100.net; s=20230601; t=1708353106; x=1708957906;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mnDDTtlItDfPp9YM6wZ4fhPF4cOhRwX1C0WTfTez+m0=;
-        b=OlJ3xFvtP0uV4umOQt1gKuICyJEw24lZZmae0qp22+zJ+4sUb1Zlrf3ewjRqrtiSqA
-         KHUITq3fs43OTkliJtZalA86ySU5JnSsNbOJGnTUKA/db57ggyAZ0BAZAN5p+bqUbW+H
-         x2PTpU4PP4xS85CxGrqoPFZ0UA1vW1BlulzaMd+H8uHhtCD3oj1WLAnCXpADT0LusfUx
-         q8p4YQtljV8P1kdzvNGhxbh7nOkTQhyV08xWumr5A9QLSxH1gNK+1Soq3/DP24fZSdO+
-         O5wX9YzlVGI9NDrM51cwNRT0pyE+p491APxe/1CjOFxAM3xfNUVAdag4nvhaQtIG0esp
-         Im+w==
-X-Forwarded-Encrypted: i=1; AJvYcCWJLDMb5XyDGJ0xmMBD2AoTczRh9Tp2XJU9aNBYMWOrsLbs+pm0X5SD8GKp5/fQ4phJaBLFVLrwQxbg0u00TdU82iN3
-X-Gm-Message-State: AOJu0YyUkTD3b5Z2qx5tK6wFOURDOAWlmMnJOS6UA8AG9jOA1CVlCPkj
-	07zZk8CQkx9zNYdTdlRyTGIVNGS4mRpEmuh6e9SgRsR4WpcHLknfFGkRPIs4B00=
-X-Google-Smtp-Source: AGHT+IEqpZ5zb0feebO8red8/Sw1NYW1UodRBiH/bxq1MisB1DILduX4ZjniHvxcNj577PKlT0HjAQ==
-X-Received: by 2002:a2e:8546:0:b0:2d2:4474:2e69 with SMTP id u6-20020a2e8546000000b002d244742e69mr100766ljj.9.1708352620437;
-        Mon, 19 Feb 2024 06:23:40 -0800 (PST)
+        bh=wb7GI7NapM+t0rzPIi4HiIJwL6bw4e6Ou5xFgI57zK8=;
+        b=GvW5hbBJ8ruNyB/AtKItWqYp+mldCoVyo108ThaCH0gqNnyVnvlzVuomzYysa4Fvib
+         sb6F9MrGfvA37MwTV2eV+RQ9kD0tPig5wWyNC7o44tyNHks+EEcDJVI949H0vOPUK49D
+         0txwVxlnk187OuRJ2b+qqiWYBJMFJqaoU8/kYu2lX/+aQV9NXGbAK1LzpTtJnIEOPoGc
+         IGBMiaNwbSPv2u5EdI6E+EP8c4fMREqDszUZD7CrwQysCIKS0++sP0ldra0oUYGG9ISf
+         i+mjmMhPgRxEAFWxKKbZe/CdaoLL1C2evYQ44V5zoei/SQFSb6JgCrvlBftJV4vI/UCK
+         e31w==
+X-Forwarded-Encrypted: i=1; AJvYcCVvMO+o7iXqVJNCl7nKxqDhNWH1jyFmujjxWiyecfBfm286yo4O12xOzPl4PNbD8ZHWemIK91BY0XqMxsCjiCSxLZRI
+X-Gm-Message-State: AOJu0Yzro/S8PPYt/0zEUa0W6vJ2cNkSgmtlm94HJTHF+6nkLmXPTdKy
+	ErKWKRcP5DLvOSh6hTfGkVfrxspQtHerOUXnGFqVvOC4UFyChYounGSPUHMmSss=
+X-Google-Smtp-Source: AGHT+IEJij6OkrmaTcUiB0FPMJtScEVyycN9s58HnC17X+QmJAiY9+0gpQ/VrUMlLyv2ajv97HLtnw==
+X-Received: by 2002:a05:600c:4f91:b0:412:5f08:b508 with SMTP id n17-20020a05600c4f9100b004125f08b508mr4564677wmq.9.1708353106502;
+        Mon, 19 Feb 2024 06:31:46 -0800 (PST)
 Received: from [192.168.69.100] ([176.176.181.220])
-        by smtp.gmail.com with ESMTPSA id s6-20020a05600c45c600b00412696bd7d9sm1590167wmo.41.2024.02.19.06.23.38
+        by smtp.gmail.com with ESMTPSA id z19-20020a7bc7d3000000b00411e1574f7fsm11372225wmk.44.2024.02.19.06.31.44
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 19 Feb 2024 06:23:39 -0800 (PST)
-Message-ID: <ff91fafa-1f6d-442f-adf5-f7a6e108cea7@linaro.org>
-Date: Mon, 19 Feb 2024 15:23:37 +0100
+        Mon, 19 Feb 2024 06:31:46 -0800 (PST)
+Message-ID: <8f17b07b-5032-4782-a83f-7cf1dd760168@linaro.org>
+Date: Mon, 19 Feb 2024 15:31:43 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -78,14 +78,14 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH 1/6] hw/arm: Inline sysbus_create_simple(PL110 / PL111)
 Content-Language: en-US
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Peter Maydell <peter.maydell@linaro.org>
-Cc: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <eduardo@habkost.net>, qemu-arm@nongnu.org,
- kvm@vger.kernel.org, Igor Mitsyanko <i.mitsyanko@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+To: BALATON Zoltan <balaton@eik.bme.hu>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?=
+ <berrange@redhat.com>, Eduardo Habkost <eduardo@habkost.net>,
+ qemu-arm@nongnu.org, kvm@vger.kernel.org,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Igor Mitsyanko <i.mitsyanko@gmail.com>, "Michael S. Tsirkin"
+ <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
  Paolo Bonzini <pbonzini@redhat.com>,
  Richard Henderson <richard.henderson@linaro.org>,
  Markus Armbruster <armbru@redhat.com>,
@@ -99,62 +99,173 @@ References: <20240216153517.49422-1-philmd@linaro.org>
  <2b9ea923-c4f9-4ee4-8ed2-ba9f62c15579@linaro.org>
  <6b5758d6-f464-2461-f9dd-71d2e15b610a@eik.bme.hu>
  <bc5929e4-1782-4719-8231-fe04a9719c40@ilande.co.uk>
- <CAFEAcA-Mvd4NVY2yDgNEdjZ_YPrN93PDZRyfCi7JyCjmPs4gAQ@mail.gmail.com>
- <0a31f410-415d-474b-bcea-9cb18f41aeb2@ilande.co.uk>
+ <8115d26c-458a-74d0-6c85-bc03b2f99011@eik.bme.hu>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-In-Reply-To: <0a31f410-415d-474b-bcea-9cb18f41aeb2@ilande.co.uk>
+In-Reply-To: <8115d26c-458a-74d0-6c85-bc03b2f99011@eik.bme.hu>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 19/2/24 14:33, Mark Cave-Ayland wrote:
-> On 19/02/2024 13:05, Peter Maydell wrote:
-> 
->> On Mon, 19 Feb 2024 at 12:49, Mark Cave-Ayland
->> <mark.cave-ayland@ilande.co.uk> wrote:
+On 19/2/24 14:57, BALATON Zoltan wrote:
+> On Mon, 19 Feb 2024, Mark Cave-Ayland wrote:
+>> On 19/02/2024 12:00, BALATON Zoltan wrote:
+>>> On Mon, 19 Feb 2024, Philippe Mathieu-Daudé wrote:
+>>>> On 19/2/24 12:27, BALATON Zoltan wrote:
+>>>>> On Mon, 19 Feb 2024, Philippe Mathieu-Daudé wrote:
+>>>>>> On 16/2/24 20:54, Philippe Mathieu-Daudé wrote:
+>>>>>>> On 16/2/24 18:14, BALATON Zoltan wrote:
+>>>>>>>> On Fri, 16 Feb 2024, Philippe Mathieu-Daudé wrote:
+>>>>>>>>> We want to set another qdev property (a link) for the pl110
+>>>>>>>>> and pl111 devices, we can not use sysbus_create_simple() which
+>>>>>>>>> only passes sysbus base address and IRQs as arguments. Inline
+>>>>>>>>> it so we can set the link property in the next commit.
+>>>>>>>>>
+>>>>>>>>> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+>>>>>>>>> ---
+>>>>>>>>> hw/arm/realview.c    |  5 ++++-
+>>>>>>>>> hw/arm/versatilepb.c |  6 +++++-
+>>>>>>>>> hw/arm/vexpress.c    | 10 ++++++++--
+>>>>>>>>> 3 files changed, 17 insertions(+), 4 deletions(-)
+>>>>>>>>>
+>>>>>>>>> diff --git a/hw/arm/realview.c b/hw/arm/realview.c
+>>>>>>>>> index 9058f5b414..77300e92e5 100644
+>>>>>>>>> --- a/hw/arm/realview.c
+>>>>>>>>> +++ b/hw/arm/realview.c
+>>>>>>>>> @@ -238,7 +238,10 @@ static void realview_init(MachineState 
+>>>>>>>>> *machine,
+>>>>>>>>>     sysbus_create_simple("pl061", 0x10014000, pic[7]);
+>>>>>>>>>     gpio2 = sysbus_create_simple("pl061", 0x10015000, pic[8]);
+>>>>>>>>>
+>>>>>>>>> -    sysbus_create_simple("pl111", 0x10020000, pic[23]);
+>>>>>>>>> +    dev = qdev_new("pl111");
+>>>>>>>>> +    sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
+>>>>>>>>> +    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0x10020000);
+>>>>>>>>> +    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[23]);
+>>>>>>>>
+>>>>>>>> Not directly related to this patch but this blows up 1 line into 
+>>>>>>>> 4 just to allow setting a property. Maybe just to keep some 
+>>>>>>>> simplicity we'd rather need either a sysbus_realize_simple 
+>>>>>>>> function that takes a sysbus device instead of the name and does 
+>>>>>>>> not create the device itself or some way to pass properties to 
+>>>>>>>> sysbus create simple (but the latter may not be easy to do in a 
+>>>>>>>> generic way so not sure about that). What do you think?
+>>>>>>>
+>>>>>>> Unfortunately sysbus doesn't scale in heterogeneous setup.
+>>>>>>
+>>>>>> Regarding the HW modelling API complexity you are pointing at, we'd
+>>>>>> like to move from the current imperative programming paradigm to a
+>>>>>> declarative one, likely DSL driven. Meanwhile it is being 
+>>>>>> investigated
+>>>>>> (as part of "Dynamic Machine"), I'm trying to get the HW APIs right
+>>>>>
+>>>>> I'm aware of that activity but we're currently still using board 
+>>>>> code to construct machines and probably will continue to do so for 
+>>>>> a while. Also because likely not all current machines will be 
+>>>>> converted to new declarative way so having a convenient API for 
+>>>>> that is still useful.
+>>>>>
+>>>>> (As for the language to describe the devices of a machine and their 
+>>>>> connections declaratively the device tree does just that but dts is 
+>>>>> not a very user friendly descrtiption language so I haven't brought 
+>>>>> that up as a possibility. But you may still could get some clues by 
+>>>>> looking at the problems it had to solve to at least get a 
+>>>>> requirements for the machine description language.)
+>>>>>
+>>>>>> for heterogeneous emulation. Current price to pay is a verbose
+>>>>>> imperative QDev API, hoping we'll get later a trivial declarative one
+>>>>>> (like this single sysbus_create_simple call), where we shouldn't 
+>>>>>> worry
+>>>>>> about the order of low level calls, whether to use link or not, etc.
+>>>>>
+>>>>> Having a detailed low level API does not prevent a more convenient 
+>>>>> for current use higher level API on top so keeping that around for 
+>>>>> current machines would allow you to chnage the low level API 
+>>>>> without having to change all the board codes because you's only 
+>>>>> need to update the simple high level API.
+>>>>
+>>>> So what is your suggestion here, add a new complex helper to keep
+>>>> a one-line style?
+>>>>
+>>>> DeviceState *sysbus_create_simple_dma_link(const char *typename,
+>>>>                                           hwaddr baseaddr,
+>>>>                                           const char *linkname,
+>>>>                                           Object *linkobj,
+>>>>                                           qemu_irq irq);
 >>>
->>> On 19/02/2024 12:00, BALATON Zoltan wrote:
->>>> For new people trying to contribute to QEMU QDev is overwhelming so 
->>>> having some way
->>>> to need less of it to do simple things would help them to get started.
->>>
->>> It depends what how you define "simple": for QEMU developers most 
->>> people search for
->>> similar examples in the codebase and copy/paste them. I'd much rather 
->>> have a slightly
->>> longer, but consistent API for setting properties rather than coming 
->>> up with many
->>> special case wrappers that need to be maintained just to keep the 
->>> line count down for
->>> "simplicity".
->>>
->>> I think that Phil's approach here is the best one for now, 
->>> particularly given that it
->>> allows us to take another step towards heterogeneous machines. As the 
->>> work in this
->>> area matures it might be that we can consider other approaches, but 
->>> that's not a
->>> decision that can be made right now and so shouldn't be a reason to 
->>> block this change.
+>>> I think just having sysbus_realize_simple that does the same as 
+>>> sysbus_create_simple minus creating the device would be enough 
+>>> because then the cases where you need to set properties could still 
+>>> use it after qdev_new or init and property_set but hide the realize 
+>>> and connecting the device behind this single call.
 >>
->> Mmm. It's unfortunate that we're working with C, so we're a bit limited
->> in what tools we have to try to make a better and lower-boilerplate
->> interface for the "create, configure, realize and wire up devices" task.
->> (I think you could do much better in a higher level language...)
->> sysbus_create_simple() was handy at the time, but it doesn't work so
->> well for more complicated SoC-based boards. It's noticeable that
->> if you look at the code that uses it, it's almost entirely the older
->> and less maintained board models, especially those which don't actually
->> model an SoC and just have the board code create all the devices.
+>> I can't say I'm a fan of sysbus_create_simple() because its use of 
+>> varargs to populate qdev properties is based upon the assumptions that 
+>> the properties defined with device_class_set_props() are stored in a 
+>> list. I can see there could be potential in future to store properties 
+>> in other structures such as a hash, and keeping this API would prevent 
+>> this change. FWIW my personal preference would be to remove this API 
+>> completely.
+>>
+>>>> I wonder why this is that important since you never modified
+>>>> any of the files changed by this series:
+>>>
+>>> For new people trying to contribute to QEMU QDev is overwhelming so 
+>>> having some way to need less of it to do simple things would help 
+>>> them to get started.
+>>
+>> It depends what how you define "simple": for QEMU developers most 
+>> people search for similar examples in the codebase and copy/paste 
+>> them. I'd much rather have a slightly longer, but consistent API for 
+>> setting properties rather than coming up with many special case 
+>> wrappers that need to be maintained just to keep the line count down 
+>> for "simplicity".
 > 
-> Yeah I was thinking that you'd use the DSL (e.g. YAML templates or 
-> similar) to provide some of the boilerplating around common actions, 
-> rather than the C API itself. Even better, once everything has been 
-> moved to use a DSL then the C API shouldn't really matter so much as it 
-> is no longer directly exposed to the user.
+> It's not just about keeping the line count down, although that helps 
+> with readablility, it's simpler to see what the code does if one has to 
+> go through less QDev and QOM details, and new people are unfamiliar with 
+> those so when they see the five lines creating the single device they 
+> won't get what it does while a sysbus_create_simple call is very self 
+> explaining. Maybe sysbus_create_simple is not the best API and not one 
+> we can keep but by point is that as long as we have board code and it's 
+> the main way to create machines that developers have to work with then 
+> we should have some simple API to do that and don't leave them with only 
+> low level QOM and QDev calls that are not high level enough to creare a 
+> machine conveniently. If the direction is to eventually don't need any 
+> code to create a machine then don't spend much time on designing that 
+> API but at least keep what we have as long as it's possible. Removing 
+> the device creation from sysbus_create_simple is not a big change but 
+> allows board code to keep using it for now instead of ending up an 
+> unreadable low level calls that makes it harder to see at a glance what 
+> a board consists of.
+> 
+>> I think that Phil's approach here is the best one for now, 
+>> particularly given that it allows us to take another step towards 
+>> heterogeneous machines. As the work in this area matures it might be 
+>> that we can consider other approaches, but that's not a decision that 
+>> can be made right now and so shouldn't be a reason to block this change.
+> 
+> I did not say this patch should not be accepred or anything like that. 
+> Just if there's a way with not too much work to make this simpler (as in 
+> more readable and understandable for people not familiar with low levels 
+> of QEMU) then I think that's worth trying and keeping at least most of 
+> the functions of sysbus_create_simple as sysbus_realize_simple is not 
+> much work to do but avoids blowing up the board code with a lot of low 
+> level QOM stuff that I'd rather keep out of there unless it could be 
+> made less overwhelming and verbose. Also keeping a higher level API for 
+> board code would help this refactoring because if the low level calls 
+> are not all over the board code then they would need to change less as 
+> the changes could be done within the higher level API implementation.
+> 
+> But at the end this is just my opinion and Philippe is free to do what 
+> he wants. I ust shared this view point in case he can take it into 
+> account but if not then it's not the end of the world.
 
-Something similar was discussed with Markus and Manos. Although the
-first step we noticed is to unify the QDev API -- making it verbose --
-to figure what we need to expose in the DSL. Doing it the other way
-(starting a DSL and trying to adapt it to all QEMU models) seemed a
-waste of time. At least for our current human resources.
+Thanks for being open to experiments. I'm not trying to attack you here,
+but to not ignore any community concerns as yours. While you have a deep
+knowledge of QEMU internals you also try to keep it simple for new devs,
+and we really want to keep the project attractive enough to new people.
+
+I hope a declarative HW modelling language will simplify the current
+situation, so developers would focus on HW modelling rather than C
+implementations and their bugs. Users would focus on the (simple) DSL
+and not the C API. To get there we need to start somewhere...
 
