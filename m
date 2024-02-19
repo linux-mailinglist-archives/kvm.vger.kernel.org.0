@@ -1,687 +1,178 @@
-Return-Path: <kvm+bounces-9049-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9050-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B891E859F04
-	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 10:02:53 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FA75859F58
+	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 10:12:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6FBCB281FC3
-	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 09:02:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7A3A8B20A1B
+	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 09:12:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D201224D7;
-	Mon, 19 Feb 2024 09:02:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6A2622EF7;
+	Mon, 19 Feb 2024 09:12:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z3BVQrUP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GNal29Mv"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F33A20DFD;
-	Mon, 19 Feb 2024 09:02:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708333364; cv=none; b=TGz8ONAfCxCHYiLj0A3hmEDHuohZRHqlN3PNpuDtshG1afcgH9LwwOnVMLsD48l1+dPJIpCd+h9+d8Tobje5zo1Fngz37vcX2C/mSm1WC60VY7xjbo0hRWheVaRg5eLn5cCI2bm2xxMhSdcbziPccv3W7+0N7YI83u/We79hM98=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708333364; c=relaxed/simple;
-	bh=rwZ8N8OBnkbm/yQuZxfoRKtnYZz0nNKEUWDBDVyvFY8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LB1LXbEioNf9M2mQKPNg6bcrKvKW3sNKUmxtf+LXVSSWLFko2twh4BRF19BcXQq5VsP59/ubnwRaqS55ieyEaO0485KdAfQCxBYt/d/rdy0Z4h9fiF77Uj9lyYsLe2oXvMubzQ83pltubxpWWhE39KbqcfiixHTvIrp4V9OMo5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z3BVQrUP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0833FC43394;
-	Mon, 19 Feb 2024 09:02:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708333364;
-	bh=rwZ8N8OBnkbm/yQuZxfoRKtnYZz0nNKEUWDBDVyvFY8=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=Z3BVQrUPmMkuh3cGc8pue0xg21A2afo/hIU17LIRlkTlyLvGM44H47y6z2JqLWq4O
-	 NyONN8gBudA/yic/AL7XabVWi/eRZeKQtAu40V/4N7wzmxH2xgE8jCBobYWQJK/mcd
-	 rdkZ9JqcVp80jCqx+megFd96zL0S4j6zvjkBYRsb7u1RkvkbLo/F9jRSfwRPP/SLaQ
-	 DcveueoGoNtkZ5QbdGICUNU0IPuddeOfKq5oW2I+aulSVZuHboxioj9dJp4z4+dq/9
-	 6dvcivvThH3WiivPbiY4mljeHG6lFNy9BpCupE5PCy9166+0Z1uhcmR1LCSbuAXsBW
-	 ah32dSOV0FJqg==
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5645960cd56so1223112a12.1;
-        Mon, 19 Feb 2024 01:02:43 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUZkbGfkiLOcI3zSpA92VoiCrCZp25u6vlrPxf78UnsmsqeNyKk1KDBrSLqtrOgbHWLv8lsrLBGIC0DvUqG2OvaVnPLRbOWXdEChlFzgF3qbh0hnVq5qRJ8N5G9ent+TUH2
-X-Gm-Message-State: AOJu0Yz4toNmAEodkraLrrhyJhXIiYZ3jglTBzTriV8Dx3dJPGw5HVo7
-	+hbl24nXheWCeKHw2p7nevdJs9Arfzb05jzwpyX8RLKHWKoNt5CSSUv1KtD6Q3lJYvjNE8BWrku
-	GNJv1q8Joo14LslGVXaAQsV+cwlA=
-X-Google-Smtp-Source: AGHT+IGy/LMZ9FL4UbJpTQrTl1Nbo2BEoFr9NRYRn4R+JcW9DrNYbA5mVTOHD6qw3+pvJjFqGdaU6ZslpNSg8t5YKj8=
-X-Received: by 2002:aa7:d508:0:b0:564:5407:ce22 with SMTP id
- y8-20020aa7d508000000b005645407ce22mr2085114edq.21.1708333362282; Mon, 19 Feb
- 2024 01:02:42 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1148A224DA;
+	Mon, 19 Feb 2024 09:12:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708333931; cv=fail; b=RTI38dEOGBV6CG8jviCe7lH3qQy/o03DMcr2awrv10jhhAMP8JZPg3prXxmDE4gPBsshnl43gRuRd6+gKEYVXVKrypPO2BQ5xdM0qffzREELQpZCgkcCXOsScfnZ1djwVon982+i3Rrf5j/WSqZ769F2eef+FcPgJp3AMIqcmss=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708333931; c=relaxed/simple;
+	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=OTjt7dAme1C8jFUzYEWXHEAlKWv+7hb0CdkNOk7U/7PAqN8TfeRDDpVX4nG5bdas0oEjaIYxThjTPlB5CwKZO+gSe8g+pK54PQPoWyT6XMt3CXRMMI198nRChpB4qbdUBj4DKfVHb5vJ/W3dWWzgMSxkMh+YOKL8InACRIfPbBk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GNal29Mv; arc=fail smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708333930; x=1739869930;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=frcCV1k9oG9oKj3dpUqdJg1PxRT2RSN/XKdLCPjaYaY=;
+  b=GNal29MvMcBFHrDsbIrY6+P1QfFhyyx48haMrutVczrdolHZ4BIw11Ct
+   qg3QwQ+u9JeaDaCKkecGaR39PnwvOT59XaP4M5fIV25jUVjgdDMJK89zE
+   hpK/qVFJJw+tpoMEIPNKap8CiiexLfKNar6gCbL97kYrVQo6HVpHAqluM
+   4SLCoHlAAm4CbLNXZpdWDZ92TtA7zJB447IgEbUteSC/8tPLeXH56CkZu
+   2rTJTXalGQAHdVoUE81NzqsklkYhnrX1bXItXHeQ1o9rHOiFJEQnJmIrL
+   UR+3BiAJ4nvfMCFkefKKzhQQidhzpYCwnDvrxGQy5LP4xGpK6IODiV/Th
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10988"; a="19933490"
+X-IronPort-AV: E=Sophos;i="6.06,170,1705392000"; 
+   d="scan'208";a="19933490"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2024 01:12:06 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10988"; a="936260073"
+X-IronPort-AV: E=Sophos;i="6.06,170,1705392000"; 
+   d="scan'208";a="936260073"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmsmga001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 19 Feb 2024 01:12:06 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 19 Feb 2024 01:12:05 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Mon, 19 Feb 2024 01:12:05 -0800
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.41) by
+ edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 19 Feb 2024 01:12:05 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bKZ4jE9e9F5RiRW9ScOAknEwGX3QsFZi6YDU8nuouSqEbePplIS3wNxv6D7QB67Y3Kjoq83m/IwJgmhz2CMlz+m69a+7IG/61HXg1PZb8JOzzO68aHeinAxF3Tc8uWQDmc2gEKnPccnxU091vdGsgsvWbJSgh589jN9T0pbxc2iQV61rBl6yzipunDybHNnNpsb0UscgGf04K6zuGh1Dvrw0Yq/qiAZ0ta48XDVEK1OBsrBv6Tly8jpLRiUi3MjYjTr3Hz5qpoco9LaoPuLxAU3c7YqqiH0yF39gcW+Y+VOefsISWBDkzzjAxtTa5MoRcnDHApmCIM0wwVU/IKbkKw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
+ b=Wps88IhknK4qPdAACKpa6NMVU0kT7xnP8hGbQ08he5ceDsO1yuta+krp6HweEq6kdkYdrzgYdMa2beY3gNmezuwkLRttoLE5cmsLD2SeMp0LHp4V/Sth/OfgVEbPIMZ1YlQSaeL9spryNXNQ6AwYd/t/QX6whKeElNtrTLCl63R+UDRQLGIYuF82ictyyWUdIWRW/DignGgmrhrF8CgnqbF+7+/jtgNWXPznw8NK7gzmlnii5olt/8VYpOQ2kyw0BTwcmmry+oQXkv2Wm1kP06t8aVt2NMa+N4tFH5y9mzDDt4iKJWyz9Z6OcOCUBbXiT0RLHgMYBghybRIgcEUgzA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
+ by PH0PR11MB5015.namprd11.prod.outlook.com (2603:10b6:510:39::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.34; Mon, 19 Feb
+ 2024 09:12:04 +0000
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::ff69:9925:693:c5ab]) by BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::ff69:9925:693:c5ab%6]) with mapi id 15.20.7292.033; Mon, 19 Feb 2024
+ 09:12:04 +0000
+From: "Huang, Kai" <kai.huang@intel.com>
+To: "seanjc@google.com" <seanjc@google.com>, "Zhao, Yan Y"
+	<yan.y.zhao@intel.com>
+CC: "dmatlack@google.com" <dmatlack@google.com>, "yu.c.zhang@linux.intel.com"
+	<yu.c.zhang@linux.intel.com>, "chao.p.peng@linux.intel.com"
+	<chao.p.peng@linux.intel.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "f.weber@proxmox.com" <f.weber@proxmox.com>,
+	"tabba@google.com" <tabba@google.com>, "yuan.yao@linux.intel.com"
+	<yuan.yao@linux.intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"michael.roth@amd.com" <michael.roth@amd.com>, "pbonzini@redhat.com"
+	<pbonzini@redhat.com>, "yilun.xu@linux.intel.com" <yilun.xu@linux.intel.com>,
+	"Yamahata, Isaku" <isaku.yamahata@intel.com>
+Subject: Re: [PATCH v4 3/4] KVM: x86/mmu: Move slot checks from
+ __kvm_faultin_pfn() to kvm_faultin_pfn()
+Thread-Topic: [PATCH v4 3/4] KVM: x86/mmu: Move slot checks from
+ __kvm_faultin_pfn() to kvm_faultin_pfn()
+Thread-Index: AQHaW6dsgcZvfprhkEui2Cpmk/oNjbERFIEAgABblYA=
+Date: Mon, 19 Feb 2024 09:12:03 +0000
+Message-ID: <5e0b8c9eb9a0f8c917c6deea64827b53c51efe0c.camel@intel.com>
+References: <20240209222858.396696-1-seanjc@google.com>
+	 <20240209222858.396696-4-seanjc@google.com>
+	 <ZdLOjuCP2pDjhsJl@yzhao56-desk.sh.intel.com>
+In-Reply-To: <ZdLOjuCP2pDjhsJl@yzhao56-desk.sh.intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|PH0PR11MB5015:EE_
+x-ms-office365-filtering-correlation-id: da014862-fd8c-4944-3c3a-08dc312ad6b8
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: XmMvQ9DODtcUyl0ddJfKyJFrn7MFfYOjLWhTPWaxrAnxiz4KJuowapz4F72xraaJCuHDRpQmf2mosRDBwHBRLZYhtQ1SqscA1Pt27sG7E0NzBIo7RpiHGcvBRVtNbjS8+lLanHmgIvBc/aboqJ0Ol3yAyU3qPfPNnzVJHuRvJ8YQQi2kVTRURYAxTmWUC3CZWJaNIKCdN/hErhZY+v5qFsYpkZzoTlhxs9RmODPgXFOk5L0WElA/o2EaVEjkR9uehL6kfeWUNWX23Qn6zCh4NkLfWZ/xpUXlDAfJdhAv9u7Aef7h5jVIFfwc3rNU9pEtVUQ0UxeK+tvzg4MOFt0TUVzPR/Csvm0FY2Zoo2LbfDg=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(346002)(366004)(39860400002)(376002)(136003)(230922051799003)(1800799012)(186009)(451199024)(64100799003)(54906003)(110136005)(71200400001)(316002)(7416002)(2906002)(4326008)(4270600006)(66946007)(66556008)(64756008)(66446008)(66476007)(8936002)(76116006)(8676002)(86362001)(6636002)(41300700001)(6486002)(6512007)(38070700009)(36756003)(2616005)(26005)(6506007)(478600001)(122000001)(73894004)(621065003)(82960400001)(38100700002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?iso-8859-1?Q?Lo/3SAiHlNABbdHGHTAj9fD+f2Oxc+QsWPqfJj+X/FQZbaUrIzQIg6EBrv?=
+ =?iso-8859-1?Q?VI+IT7tlF0/DZI/pn6BHfaBY/uxgWt9zI2BIvnagu0jNe8GOMjbm48x7m+?=
+ =?iso-8859-1?Q?albv+4KzMRcBLTz/DaxsPiNGNHfC/VkDzdWKMy6xHyezHUDFkKNoA3Ong/?=
+ =?iso-8859-1?Q?unBbSyOUJSwTcGIB2tKYA4jUTLEipnivBRc4xNyzOj9klidEb3pVytb3h/?=
+ =?iso-8859-1?Q?2v+q7rdjYRfwqlKrCjobAauBy2Na5pytnoDG7UMNaQQOYM/wCUKXTx3nU1?=
+ =?iso-8859-1?Q?roiNkJ2FMaJgq21BYric90oxVKJx2I9BvDswmkuA2SQLaWNUyhxuKaCE0q?=
+ =?iso-8859-1?Q?RIQFJxciKLivIAJhcc2akde5jzOrbk6r/G3phMm0RJO6VtkC77A5/xqi5G?=
+ =?iso-8859-1?Q?SGhb6VJYmDBRcKsZvMJzxO/97T1O0mHFd/gNMh5keFd6gGBnUNNfR3jmJc?=
+ =?iso-8859-1?Q?UAMdJ2+raGKe5jukWMpXDFBOJGOUFTy9CeX2oE4Tgzi6vRsfTU6FL1UKG9?=
+ =?iso-8859-1?Q?uQ7IwV0/uAuO9hU4x6Zn+y+SOiIyeTBZWotbmuy2XrA4ZtkL8RTjgvaLR/?=
+ =?iso-8859-1?Q?zZNwV/2go1DgDZDrY6JEoePxZeb7VO504HF6EVPe/nHovbuQF6RSvj03JI?=
+ =?iso-8859-1?Q?ZvwD9HrbPDYoATqpw7hFp0OU/YUx/7b6qkqpLjyq+7znB2dJXgQYfN6jRZ?=
+ =?iso-8859-1?Q?bU96gnZR4VLSVf8H5LCkyfb9qNU3G0XKnQXpCFk+PJvccIeHDs8ZzFUWyJ?=
+ =?iso-8859-1?Q?dyYNE7NWPmaOND2e/ZKQ8TsZq4WZ1R4qwrIwMrAZJIJ6vNK1Dm/lxbuxhz?=
+ =?iso-8859-1?Q?aMalZOsaRacQ/rPTandgrFtQLEJW9/jUo+SAfVV4nkl/OpwnXHBv+eZ4sb?=
+ =?iso-8859-1?Q?fKW5ryn2KGM5+qnkcd7Duv64uAGcw/8tf/Sd9ZrH2WsEWoR5uiZDShyCs/?=
+ =?iso-8859-1?Q?0KJfS0AUNfNEkJtht/mfYtCDwEtuql4I+rziRsSEUWmB+zWVJ9laCcIgmS?=
+ =?iso-8859-1?Q?27hIzZBBVOlsePv4LquzZ2+3m7+4R7//o2xybWsl5moKLcH4U79JQ1uX2F?=
+ =?iso-8859-1?Q?0eLHAmXbP+PEuGtUqEjqIhpttwXaD/1uTLted/OZ3LAbv/w8JqaQGwM3Vo?=
+ =?iso-8859-1?Q?9jadwLDdCl7hP8DA1EQ52kmdPwqvBdfXaMbozKaEC5CwtXyUCU8OxdZ1W2?=
+ =?iso-8859-1?Q?5inXwhZNRM3w77PMD638v8KyI3N/O0UaZp/sn1TzuwoTI24bYDuNiwfw9W?=
+ =?iso-8859-1?Q?xLDo8o6NLf81OrJUXi8LJs9kyi6SrCssQlKLSL6A0I5w5aZZtcNmgviNCx?=
+ =?iso-8859-1?Q?F4HsFaRryicm0O7uwhWXu7KmAxNzz8Dn6l/e0Mg1DE0kbfxT2TopGqzaRw?=
+ =?iso-8859-1?Q?qUdOXrEp8epdI2imEfMRcIreuFthYDU4nfQ7c8jn62bn0mDhnjMjeSST38?=
+ =?iso-8859-1?Q?hZKgCy30EX3Cu4qVa/vzvH1kxUSycltUWDbKS4oHlyVdZ01W9Kp0BhHlXm?=
+ =?iso-8859-1?Q?xldekxQxrEcPQ3aNrf3yDIsy3c2uENnS8lAN+1c0pCiICYjPPOJ3Ly6WkP?=
+ =?iso-8859-1?Q?759QLgDHVvGzTn2fm2n/sHv9CVTI8Hh9gDgq9ujw4627Poq26TqrKYp8Ms?=
+ =?iso-8859-1?Q?K6mOD6kiHwHvbfOZWJVd6936lxhpt8CjToV/pnUhtmYCnRUrsvLkH9hQ?=
+ =?iso-8859-1?Q?=3D=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240201031950.3225626-1-maobibo@loongson.cn> <20240201031950.3225626-7-maobibo@loongson.cn>
- <CAAhV-H6RTUWF9cUwCGhLxfaeSqAp+a4uw8fy8brGT9LumU5tdA@mail.gmail.com>
- <a52a9cfe-0c8a-dd10-2d5c-eb2817deb3da@loongson.cn> <CAAhV-H4gq=dpvkpRGEa--MtQ3-bAXgehvWQxK3jQOwZEU1Gtag@mail.gmail.com>
- <03f855ff-0eb7-b4ea-f5ec-4efb0d711f45@loongson.cn>
-In-Reply-To: <03f855ff-0eb7-b4ea-f5ec-4efb0d711f45@loongson.cn>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Mon, 19 Feb 2024 17:02:40 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H6ZK8he1MMid_=wa4EkspMFO=xBs006ocL-kvkmQzwaPA@mail.gmail.com>
-Message-ID: <CAAhV-H6ZK8he1MMid_=wa4EkspMFO=xBs006ocL-kvkmQzwaPA@mail.gmail.com>
-Subject: Re: [PATCH v4 6/6] LoongArch: Add pv ipi support on LoongArch system
-To: maobibo <maobibo@loongson.cn>
-Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, Juergen Gross <jgross@suse.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, loongarch@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, 
-	kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: da014862-fd8c-4944-3c3a-08dc312ad6b8
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Feb 2024 09:12:04.0098
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: OhNAZKYvvGCEaT3cNV6IYOZ+jUZbfsEjwVF02jz/vqq3Zg458Ml4AUHf4HmkQjHLp4NQOkoHzy6IcfayC2OWZQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5015
+X-OriginatorOrg: intel.com
 
-On Mon, Feb 19, 2024 at 3:37=E2=80=AFPM maobibo <maobibo@loongson.cn> wrote=
-:
->
->
->
-> On 2024/2/19 =E4=B8=8B=E5=8D=883:16, Huacai Chen wrote:
-> > On Mon, Feb 19, 2024 at 12:18=E2=80=AFPM maobibo <maobibo@loongson.cn> =
-wrote:
-> >>
-> >>
-> >>
-> >> On 2024/2/19 =E4=B8=8A=E5=8D=8810:45, Huacai Chen wrote:
-> >>> Hi, Bibo,
-> >>>
-> >>> On Thu, Feb 1, 2024 at 11:20=E2=80=AFAM Bibo Mao <maobibo@loongson.cn=
-> wrote:
-> >>>>
-> >>>> On LoongArch system, ipi hw uses iocsr registers, there is one iocsr
-> >>>> register access on ipi sending, and two iocsr access on ipi receivin=
-g
-> >>>> which is ipi interrupt handler. On VM mode all iocsr registers
-> >>>> accessing will cause VM to trap into hypervisor. So with ipi hw
-> >>>> notification once there will be three times of trap.
-> >>>>
-> >>>> This patch adds pv ipi support for VM, hypercall instruction is used
-> >>>> to ipi sender, and hypervisor will inject SWI on the VM. During SWI
-> >>>> interrupt handler, only estat CSR register is written to clear irq.
-> >>>> Estat CSR register access will not trap into hypervisor. So with pv =
-ipi
-> >>>> supported, pv ipi sender will trap into hypervsor one time, pv ipi
-> >>>> revicer will not trap, there is only one time of trap.
-> >>>>
-> >>>> Also this patch adds ipi multicast support, the method is similar wi=
-th
-> >>>> x86. With ipi multicast support, ipi notification can be sent to at =
-most
-> >>>> 128 vcpus at one time. It reduces trap times into hypervisor greatly=
-.
-> >>>>
-> >>>> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
-> >>>> ---
-> >>>>    arch/loongarch/include/asm/hardirq.h   |   1 +
-> >>>>    arch/loongarch/include/asm/kvm_host.h  |   1 +
-> >>>>    arch/loongarch/include/asm/kvm_para.h  | 124 ++++++++++++++++++++=
-+++++
-> >>>>    arch/loongarch/include/asm/loongarch.h |   1 +
-> >>>>    arch/loongarch/kernel/irq.c            |   2 +-
-> >>>>    arch/loongarch/kernel/paravirt.c       | 113 ++++++++++++++++++++=
-++
-> >>>>    arch/loongarch/kernel/smp.c            |   2 +-
-> >>>>    arch/loongarch/kvm/exit.c              |  73 ++++++++++++++-
-> >>>>    arch/loongarch/kvm/vcpu.c              |   1 +
-> >>>>    9 files changed, 314 insertions(+), 4 deletions(-)
-> >>>>
-> >>>> diff --git a/arch/loongarch/include/asm/hardirq.h b/arch/loongarch/i=
-nclude/asm/hardirq.h
-> >>>> index 9f0038e19c7f..8a611843c1f0 100644
-> >>>> --- a/arch/loongarch/include/asm/hardirq.h
-> >>>> +++ b/arch/loongarch/include/asm/hardirq.h
-> >>>> @@ -21,6 +21,7 @@ enum ipi_msg_type {
-> >>>>    typedef struct {
-> >>>>           unsigned int ipi_irqs[NR_IPI];
-> >>>>           unsigned int __softirq_pending;
-> >>>> +       atomic_t messages ____cacheline_aligned_in_smp;
-> >>> Do we really need atomic_t? A plain "unsigned int" can reduce cost
-> >>> significantly.
-> >> For IPI, there are multiple senders and one receiver, the sender uses
-> >> atomic_fetch_or(action, &info->messages) and the receiver uses
-> >> atomic_xchg(&info->messages, 0) to clear message.
-> >>
-> >> There needs sync mechanism between senders and receiver, atomic is the
-> >> most simple method.
-> > At least from receiver side, the native IPI doesn't need atomic for
-> > read and clear:
-> > static u32 ipi_read_clear(int cpu)
-> > {
-> >          u32 action;
-> >
-> >          /* Load the ipi register to figure out what we're supposed to =
-do */
-> >          action =3D iocsr_read32(LOONGARCH_IOCSR_IPI_STATUS);
-> >          /* Clear the ipi register to clear the interrupt */
-> >          iocsr_write32(action, LOONGARCH_IOCSR_IPI_CLEAR);
-> >          wbflush();
-> It is because on physical hardware it is two IOCSR registers and also
-> there is no method to use atomic read and clear method for IOCSR register=
-s.
->
-> However if ipi message is stored on ddr memory, atomic read/clear can
-> used. Your can compare price of one iocsr_read32 + one iocsr_write32 +
-> wbflush with one atomic_xchg(&info->messages, 0)
-atomic ops is of course cheaper than iocsr, but unsigned int is even cheape=
-r.
 
->
-> Regards
-> Bibo Mao
-> >
-> >          return action;
-> > }
-> >
-> >>>
-> >>>>    } ____cacheline_aligned irq_cpustat_t;
-> >>>>
-> >>>>    DECLARE_PER_CPU_SHARED_ALIGNED(irq_cpustat_t, irq_stat);
-> >>>> diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/=
-include/asm/kvm_host.h
-> >>>> index 57399d7cf8b7..1bf927e2bfac 100644
-> >>>> --- a/arch/loongarch/include/asm/kvm_host.h
-> >>>> +++ b/arch/loongarch/include/asm/kvm_host.h
-> >>>> @@ -43,6 +43,7 @@ struct kvm_vcpu_stat {
-> >>>>           u64 idle_exits;
-> >>>>           u64 cpucfg_exits;
-> >>>>           u64 signal_exits;
-> >>>> +       u64 hvcl_exits;
-> >>> hypercall_exits is better.
-> >> yeap, hypercall_exits is better, will fix in next version.
-> >>>
-> >>>>    };
-> >>>>
-> >>>>    #define KVM_MEM_HUGEPAGE_CAPABLE       (1UL << 0)
-> >>>> diff --git a/arch/loongarch/include/asm/kvm_para.h b/arch/loongarch/=
-include/asm/kvm_para.h
-> >>>> index 41200e922a82..a25a84e372b9 100644
-> >>>> --- a/arch/loongarch/include/asm/kvm_para.h
-> >>>> +++ b/arch/loongarch/include/asm/kvm_para.h
-> >>>> @@ -9,6 +9,10 @@
-> >>>>    #define HYPERVISOR_VENDOR_SHIFT                8
-> >>>>    #define HYPERCALL_CODE(vendor, code)   ((vendor << HYPERVISOR_VEN=
-DOR_SHIFT) + code)
-> >>>>
-> >>>> +#define KVM_HC_CODE_SERVICE            0
-> >>>> +#define KVM_HC_SERVICE                 HYPERCALL_CODE(HYPERVISOR_KV=
-M, KVM_HC_CODE_SERVICE)
-> >>>> +#define  KVM_HC_FUNC_IPI               1
-> >>> Change HC to HCALL is better.
-> >> will modify in next version.
-> >>>
-> >>>> +
-> >>>>    /*
-> >>>>     * LoongArch hypcall return code
-> >>>>     */
-> >>>> @@ -16,6 +20,126 @@
-> >>>>    #define KVM_HC_INVALID_CODE            -1UL
-> >>>>    #define KVM_HC_INVALID_PARAMETER       -2UL
-> >>>>
-> >>>> +/*
-> >>>> + * Hypercalls interface for KVM hypervisor
-> >>>> + *
-> >>>> + * a0: function identifier
-> >>>> + * a1-a6: args
-> >>>> + * Return value will be placed in v0.
-> >>>> + * Up to 6 arguments are passed in a1, a2, a3, a4, a5, a6.
-> >>>> + */
-> >>>> +static __always_inline long kvm_hypercall(u64 fid)
-> >>>> +{
-> >>>> +       register long ret asm("v0");
-> >>>> +       register unsigned long fun asm("a0") =3D fid;
-> >>>> +
-> >>>> +       __asm__ __volatile__(
-> >>>> +               "hvcl "__stringify(KVM_HC_SERVICE)
-> >>>> +               : "=3Dr" (ret)
-> >>>> +               : "r" (fun)
-> >>>> +               : "memory"
-> >>>> +               );
-> >>>> +
-> >>>> +       return ret;
-> >>>> +}
-> >>>> +
-> >>>> +static __always_inline long kvm_hypercall1(u64 fid, unsigned long a=
-rg0)
-> >>>> +{
-> >>>> +       register long ret asm("v0");
-> >>>> +       register unsigned long fun asm("a0") =3D fid;
-> >>>> +       register unsigned long a1  asm("a1") =3D arg0;
-> >>>> +
-> >>>> +       __asm__ __volatile__(
-> >>>> +               "hvcl "__stringify(KVM_HC_SERVICE)
-> >>>> +               : "=3Dr" (ret)
-> >>>> +               : "r" (fun), "r" (a1)
-> >>>> +               : "memory"
-> >>>> +               );
-> >>>> +
-> >>>> +       return ret;
-> >>>> +}
-> >>>> +
-> >>>> +static __always_inline long kvm_hypercall2(u64 fid,
-> >>>> +               unsigned long arg0, unsigned long arg1)
-> >>>> +{
-> >>>> +       register long ret asm("v0");
-> >>>> +       register unsigned long fun asm("a0") =3D fid;
-> >>>> +       register unsigned long a1  asm("a1") =3D arg0;
-> >>>> +       register unsigned long a2  asm("a2") =3D arg1;
-> >>>> +
-> >>>> +       __asm__ __volatile__(
-> >>>> +                       "hvcl "__stringify(KVM_HC_SERVICE)
-> >>>> +                       : "=3Dr" (ret)
-> >>>> +                       : "r" (fun), "r" (a1), "r" (a2)
-> >>>> +                       : "memory"
-> >>>> +                       );
-> >>>> +
-> >>>> +       return ret;
-> >>>> +}
-> >>>> +
-> >>>> +static __always_inline long kvm_hypercall3(u64 fid,
-> >>>> +       unsigned long arg0, unsigned long arg1, unsigned long arg2)
-> >>>> +{
-> >>>> +       register long ret asm("v0");
-> >>>> +       register unsigned long fun asm("a0") =3D fid;
-> >>>> +       register unsigned long a1  asm("a1") =3D arg0;
-> >>>> +       register unsigned long a2  asm("a2") =3D arg1;
-> >>>> +       register unsigned long a3  asm("a3") =3D arg2;
-> >>>> +
-> >>>> +       __asm__ __volatile__(
-> >>>> +               "hvcl "__stringify(KVM_HC_SERVICE)
-> >>>> +               : "=3Dr" (ret)
-> >>>> +               : "r" (fun), "r" (a1), "r" (a2), "r" (a3)
-> >>>> +               : "memory"
-> >>>> +               );
-> >>>> +
-> >>>> +       return ret;
-> >>>> +}
-> >>>> +
-> >>>> +static __always_inline long kvm_hypercall4(u64 fid,
-> >>>> +               unsigned long arg0, unsigned long arg1, unsigned lon=
-g arg2,
-> >>>> +               unsigned long arg3)
-> >>>> +{
-> >>>> +       register long ret asm("v0");
-> >>>> +       register unsigned long fun asm("a0") =3D fid;
-> >>>> +       register unsigned long a1  asm("a1") =3D arg0;
-> >>>> +       register unsigned long a2  asm("a2") =3D arg1;
-> >>>> +       register unsigned long a3  asm("a3") =3D arg2;
-> >>>> +       register unsigned long a4  asm("a4") =3D arg3;
-> >>>> +
-> >>>> +       __asm__ __volatile__(
-> >>>> +               "hvcl "__stringify(KVM_HC_SERVICE)
-> >>>> +               : "=3Dr" (ret)
-> >>>> +               : "r"(fun), "r" (a1), "r" (a2), "r" (a3), "r" (a4)
-> >>>> +               : "memory"
-> >>>> +               );
-> >>>> +
-> >>>> +       return ret;
-> >>>> +}
-> >>>> +
-> >>>> +static __always_inline long kvm_hypercall5(u64 fid,
-> >>>> +               unsigned long arg0, unsigned long arg1, unsigned lon=
-g arg2,
-> >>>> +               unsigned long arg3, unsigned long arg4)
-> >>>> +{
-> >>>> +       register long ret asm("v0");
-> >>>> +       register unsigned long fun asm("a0") =3D fid;
-> >>>> +       register unsigned long a1  asm("a1") =3D arg0;
-> >>>> +       register unsigned long a2  asm("a2") =3D arg1;
-> >>>> +       register unsigned long a3  asm("a3") =3D arg2;
-> >>>> +       register unsigned long a4  asm("a4") =3D arg3;
-> >>>> +       register unsigned long a5  asm("a5") =3D arg4;
-> >>>> +
-> >>>> +       __asm__ __volatile__(
-> >>>> +               "hvcl "__stringify(KVM_HC_SERVICE)
-> >>>> +               : "=3Dr" (ret)
-> >>>> +               : "r"(fun), "r" (a1), "r" (a2), "r" (a3), "r" (a4), =
-"r" (a5)
-> >>>> +               : "memory"
-> >>>> +               );
-> >>>> +
-> >>>> +       return ret;
-> >>>> +}
-> >>>> +
-> >>>> +
-> >>>>    static inline unsigned int kvm_arch_para_features(void)
-> >>>>    {
-> >>>>           return 0;
-> >>>> diff --git a/arch/loongarch/include/asm/loongarch.h b/arch/loongarch=
-/include/asm/loongarch.h
-> >>>> index a1d22e8b6f94..0ad36704cb4b 100644
-> >>>> --- a/arch/loongarch/include/asm/loongarch.h
-> >>>> +++ b/arch/loongarch/include/asm/loongarch.h
-> >>>> @@ -167,6 +167,7 @@
-> >>>>    #define CPUCFG_KVM_SIG                 CPUCFG_KVM_BASE
-> >>>>    #define  KVM_SIGNATURE                 "KVM\0"
-> >>>>    #define CPUCFG_KVM_FEATURE             (CPUCFG_KVM_BASE + 4)
-> >>>> +#define  KVM_FEATURE_PV_IPI            BIT(1)
-> >>>>
-> >>>>    #ifndef __ASSEMBLY__
-> >>>>
-> >>>> diff --git a/arch/loongarch/kernel/irq.c b/arch/loongarch/kernel/irq=
-.c
-> >>>> index ce36897d1e5a..4863e6c1b739 100644
-> >>>> --- a/arch/loongarch/kernel/irq.c
-> >>>> +++ b/arch/loongarch/kernel/irq.c
-> >>>> @@ -113,5 +113,5 @@ void __init init_IRQ(void)
-> >>>>                           per_cpu(irq_stack, i), per_cpu(irq_stack, =
-i) + IRQ_STACK_SIZE);
-> >>>>           }
-> >>>>
-> >>>> -       set_csr_ecfg(ECFGF_IP0 | ECFGF_IP1 | ECFGF_IP2 | ECFGF_IPI |=
- ECFGF_PMC);
-> >>>> +       set_csr_ecfg(ECFGF_SIP0 | ECFGF_IP0 | ECFGF_IP1 | ECFGF_IP2 =
-| ECFGF_IPI | ECFGF_PMC);
-> >>>>    }
-> >>>> diff --git a/arch/loongarch/kernel/paravirt.c b/arch/loongarch/kerne=
-l/paravirt.c
-> >>>> index 21d01d05791a..7a8319df401c 100644
-> >>>> --- a/arch/loongarch/kernel/paravirt.c
-> >>>> +++ b/arch/loongarch/kernel/paravirt.c
-> >>>> @@ -1,6 +1,7 @@
-> >>>>    // SPDX-License-Identifier: GPL-2.0
-> >>>>    #include <linux/export.h>
-> >>>>    #include <linux/types.h>
-> >>>> +#include <linux/interrupt.h>
-> >>>>    #include <linux/jump_label.h>
-> >>>>    #include <linux/kvm_para.h>
-> >>>>    #include <asm/paravirt.h>
-> >>>> @@ -16,6 +17,104 @@ static u64 native_steal_clock(int cpu)
-> >>>>
-> >>>>    DEFINE_STATIC_CALL(pv_steal_clock, native_steal_clock);
-> >>>>
-> >>>> +#ifdef CONFIG_SMP
-> >>>> +static void pv_send_ipi_single(int cpu, unsigned int action)
-> >>>> +{
-> >>>> +       unsigned int min, old;
-> >>>> +       unsigned long bitmap =3D 0;
-> >>>> +       irq_cpustat_t *info =3D &per_cpu(irq_stat, cpu);
-> >>>> +
-> >>>> +       action =3D BIT(action);
-> >>>> +       old =3D atomic_fetch_or(action, &info->messages);
-> >>>> +       if (old =3D=3D 0) {
-> >>>> +               min =3D cpu_logical_map(cpu);
-> >>>> +               bitmap =3D 1;
-> >>>> +               kvm_hypercall3(KVM_HC_FUNC_IPI, bitmap, 0, min);
-> >>>> +       }
-> >>>> +}
-> >>>> +
-> >>>> +#define KVM_IPI_CLUSTER_SIZE           (2 * BITS_PER_LONG)
-> >>>> +static void pv_send_ipi_mask(const struct cpumask *mask, unsigned i=
-nt action)
-> >>>> +{
-> >>>> +       unsigned int cpu, i, min =3D 0, max =3D 0, old;
-> >>>> +       __uint128_t bitmap =3D 0;
-> >>>> +       irq_cpustat_t *info;
-> >>>> +
-> >>>> +       if (cpumask_empty(mask))
-> >>>> +               return;
-> >>>> +
-> >>>> +       action =3D BIT(action);
-> >>>> +       for_each_cpu(i, mask) {
-> >>>> +               info =3D &per_cpu(irq_stat, i);
-> >>>> +               old =3D atomic_fetch_or(action, &info->messages);
-> >>>> +               if (old)
-> >>>> +                       continue;
-> >>>> +
-> >>>> +               cpu =3D cpu_logical_map(i);
-> >>>> +               if (!bitmap) {
-> >>>> +                       min =3D max =3D cpu;
-> >>>> +               } else if (cpu > min && cpu < min + KVM_IPI_CLUSTER_=
-SIZE) {
-> >>>> +                       max =3D cpu > max ? cpu : max;
-> >>>> +               } else if (cpu < min && (max - cpu) < KVM_IPI_CLUSTE=
-R_SIZE) {
-> >>>> +                       bitmap <<=3D min - cpu;
-> >>>> +                       min =3D cpu;
-> >>>> +               } else {
-> >>>> +                       /*
-> >>>> +                        * Physical cpuid is sorted in ascending ord=
-er ascend
-> >>>> +                        * for the next mask calculation, send IPI h=
-ere
-> >>>> +                        * directly and skip the remainding cpus
-> >>>> +                        */
-> >>>> +                       kvm_hypercall3(KVM_HC_FUNC_IPI, (unsigned lo=
-ng)bitmap,
-> >>>> +                               (unsigned long)(bitmap >> BITS_PER_L=
-ONG), min);
-> >>>> +                       min =3D max =3D cpu;
-> >>>> +                       bitmap =3D 0;
-> >>>> +               }
-> >>>> +               __set_bit(cpu - min, (unsigned long *)&bitmap);
-> >>>> +       }
-> >>>> +
-> >>>> +       if (bitmap)
-> >>>> +               kvm_hypercall3(KVM_HC_FUNC_IPI, (unsigned long)bitma=
-p,
-> >>>> +                               (unsigned long)(bitmap >> BITS_PER_L=
-ONG), min);
-> >>>> +}
-> >>>> +
-> >>>> +static irqreturn_t loongson_do_swi(int irq, void *dev)
-> >>>> +{
-> >>>> +       irq_cpustat_t *info;
-> >>>> +       long action;
-> >>>> +
-> >>>> +       clear_csr_estat(1 << INT_SWI0);
-> >>>> +
-> >>>> +       info =3D this_cpu_ptr(&irq_stat);
-> >>>> +       do {
-> >>>> +               action =3D atomic_xchg(&info->messages, 0);
-> >>>> +               if (action & SMP_CALL_FUNCTION) {
-> >>>> +                       generic_smp_call_function_interrupt();
-> >>>> +                       info->ipi_irqs[IPI_CALL_FUNCTION]++;
-> >>>> +               }
-> >>>> +
-> >>>> +               if (action & SMP_RESCHEDULE) {
-> >>>> +                       scheduler_ipi();
-> >>>> +                       info->ipi_irqs[IPI_RESCHEDULE]++;
-> >>>> +               }
-> >>>> +       } while (action);
-> >>>> +
-> >>>> +       return IRQ_HANDLED;
-> >>>> +}
-> >>>> +
-> >>>> +static void pv_init_ipi(void)
-> >>>> +{
-> >>>> +       int r, swi0;
-> >>>> +
-> >>>> +       swi0 =3D get_percpu_irq(INT_SWI0);
-> >>>> +       if (swi0 < 0)
-> >>>> +               panic("SWI0 IRQ mapping failed\n");
-> >>>> +       irq_set_percpu_devid(swi0);
-> >>>> +       r =3D request_percpu_irq(swi0, loongson_do_swi, "SWI0", &irq=
-_stat);
-> >>>> +       if (r < 0)
-> >>>> +               panic("SWI0 IRQ request failed\n");
-> >>>> +}
-> >>>> +#endif
-> >>>> +
-> >>>>    static bool kvm_para_available(void)
-> >>>>    {
-> >>>>           static int hypervisor_type;
-> >>>> @@ -32,10 +131,24 @@ static bool kvm_para_available(void)
-> >>>>
-> >>>>    int __init pv_guest_init(void)
-> >>>>    {
-> >>>> +       int feature;
-> >>>> +
-> >>>>           if (!cpu_has_hypervisor)
-> >>>>                   return 0;
-> >>>>           if (!kvm_para_available())
-> >>>>                   return 0;
-> >>>>
-> >>>> +       /*
-> >>>> +        * check whether KVM hypervisor supports pv_ipi or not
-> >>>> +        */
-> >>>> +#ifdef CONFIG_SMP
-> >>>> +       feature =3D read_cpucfg(CPUCFG_KVM_FEATURE);
-> >>> This line can be moved out of CONFIG_SMP, especially features will
-> >>> increase in future.
-> >> Good suggestion, will modify in next version.
-> >>
-> >> Regards
-> >> Bibo Mao
-> >>>
-> >>> Huacai
-> >>>
-> >>>> +       if (feature & KVM_FEATURE_PV_IPI) {
-> >>>> +               smp_ops.init_ipi                =3D pv_init_ipi;
-> >>>> +               smp_ops.send_ipi_single         =3D pv_send_ipi_sing=
-le;
-> >>>> +               smp_ops.send_ipi_mask           =3D pv_send_ipi_mask=
-;
-> >>>> +       }
-> >>>> +#endif
-> >>>> +
-> >>>>           return 1;
-> >>>>    }
-> >>>> diff --git a/arch/loongarch/kernel/smp.c b/arch/loongarch/kernel/smp=
-.c
-> >>>> index 3d3ec07d1ec4..d50443879353 100644
-> >>>> --- a/arch/loongarch/kernel/smp.c
-> >>>> +++ b/arch/loongarch/kernel/smp.c
-> >>>> @@ -285,7 +285,7 @@ void loongson_boot_secondary(int cpu, struct tas=
-k_struct *idle)
-> >>>>    void loongson_init_secondary(void)
-> >>>>    {
-> >>>>           unsigned int cpu =3D smp_processor_id();
-> >>>> -       unsigned int imask =3D ECFGF_IP0 | ECFGF_IP1 | ECFGF_IP2 |
-> >>>> +       unsigned int imask =3D ECFGF_SIP0 | ECFGF_IP0 | ECFGF_IP1 | =
-ECFGF_IP2 |
-> >>>>                                ECFGF_IPI | ECFGF_PMC | ECFGF_TIMER;
-> >>>>
-> >>>>           change_csr_ecfg(ECFG0_IM, imask);
-> >>>> diff --git a/arch/loongarch/kvm/exit.c b/arch/loongarch/kvm/exit.c
-> >>>> index f4e4df05f578..189b70bad825 100644
-> >>>> --- a/arch/loongarch/kvm/exit.c
-> >>>> +++ b/arch/loongarch/kvm/exit.c
-> >>>> @@ -227,6 +227,9 @@ static int kvm_emu_cpucfg(struct kvm_vcpu *vcpu,=
- larch_inst inst)
-> >>>>           case CPUCFG_KVM_SIG:
-> >>>>                   vcpu->arch.gprs[rd] =3D *(unsigned int *)KVM_SIGNA=
-TURE;
-> >>>>                   break;
-> >>>> +       case CPUCFG_KVM_FEATURE:
-> >>>> +               vcpu->arch.gprs[rd] =3D KVM_FEATURE_PV_IPI;
-> >>>> +               break;
-> >>>>           default:
-> >>>>                   vcpu->arch.gprs[rd] =3D 0;
-> >>>>                   break;
-> >>>> @@ -699,12 +702,78 @@ static int kvm_handle_lasx_disabled(struct kvm=
-_vcpu *vcpu)
-> >>>>           return RESUME_GUEST;
-> >>>>    }
-> >>>>
-> >>>> +static int kvm_pv_send_ipi(struct kvm_vcpu *vcpu)
-> >>>> +{
-> >>>> +       unsigned long ipi_bitmap;
-> >>>> +       unsigned int min, cpu, i;
-> >>>> +       struct kvm_vcpu *dest;
-> >>>> +
-> >>>> +       min =3D vcpu->arch.gprs[LOONGARCH_GPR_A3];
-> >>>> +       for (i =3D 0; i < 2; i++) {
-> >>>> +               ipi_bitmap =3D vcpu->arch.gprs[LOONGARCH_GPR_A1 + i]=
-;
-> >>>> +               if (!ipi_bitmap)
-> >>>> +                       continue;
-> >>>> +
-> >>>> +               cpu =3D find_first_bit((void *)&ipi_bitmap, BITS_PER=
-_LONG);
-> >>>> +               while (cpu < BITS_PER_LONG) {
-> >>>> +                       dest =3D kvm_get_vcpu_by_cpuid(vcpu->kvm, cp=
-u + min);
-> >>>> +                       cpu =3D find_next_bit((void *)&ipi_bitmap, B=
-ITS_PER_LONG,
-> >>>> +                                               cpu + 1);
-> >>>> +                       if (!dest)
-> >>>> +                               continue;
-> >>>> +
-> >>>> +                       /*
-> >>>> +                        * Send SWI0 to dest vcpu to emulate IPI int=
-errupt
-> >>>> +                        */
-> >>>> +                       kvm_queue_irq(dest, INT_SWI0);
-> >>>> +                       kvm_vcpu_kick(dest);
-> >>>> +               }
-> >>>> +       }
-> >>>> +
-> >>>> +       return 0;
-> >>>> +}
-> >>>> +
-> >>>> +/*
-> >>>> + * hypcall emulation always return to guest, Caller should check re=
-tval.
-> >>>> + */
-> >>>> +static void kvm_handle_pv_hcall(struct kvm_vcpu *vcpu)
-> >>> Rename to kvm_handle_hypecall_service() is better.
-> >>>
-> >>>
-> >>> Huacai
-> >>>> +{
-> >>>> +       unsigned long func =3D vcpu->arch.gprs[LOONGARCH_GPR_A0];
-> >>>> +       long ret;
-> >>>> +
-> >>>> +       switch (func) {
-> >>>> +       case KVM_HC_FUNC_IPI:
-> >>>> +               kvm_pv_send_ipi(vcpu);
-> >>>> +               ret =3D KVM_HC_STATUS_SUCCESS;
-> >>>> +               break;
-> >>>> +       default:
-> >>>> +               ret =3D KVM_HC_INVALID_CODE;
-> >>>> +               break;
-> >>>> +       };
-> >>>> +
-> >>>> +       vcpu->arch.gprs[LOONGARCH_GPR_A0] =3D ret;
-> >>>> +}
-> >>>> +
-> >>>>    static int kvm_handle_hypcall(struct kvm_vcpu *vcpu)
-> >>>>    {
-> >>>> +       larch_inst inst;
-> >>>> +       unsigned int code;
-> >>>> +
-> >>>> +       inst.word =3D vcpu->arch.badi;
-> >>>> +       code =3D inst.reg0i15_format.immediate;
-> >>>>           update_pc(&vcpu->arch);
-> >>>>
-> >>>> -       /* Treat it as noop intruction, only set return value */
-> >>>> -       vcpu->arch.gprs[LOONGARCH_GPR_A0] =3D KVM_HC_INVALID_CODE;
-> >>>> +       switch (code) {
-> >>>> +       case KVM_HC_SERVICE:
-> >>>> +               vcpu->stat.hvcl_exits++;
-> >>>> +               kvm_handle_pv_hcall(vcpu);
-> >>>> +               break;
-> >>>> +       default:
-> >>>> +               /* Treat it as noop intruction, only set return valu=
-e */
-> >>>> +               vcpu->arch.gprs[LOONGARCH_GPR_A0] =3D KVM_HC_INVALID=
-_CODE;
-> >>>> +               break;
-> >>>> +       }
-> >>>> +
-> >>>>           return RESUME_GUEST;
-> >>>>    }
-> >>>>
-> >>>> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
-> >>>> index 97ca9c7160e6..80e05ba9b48d 100644
-> >>>> --- a/arch/loongarch/kvm/vcpu.c
-> >>>> +++ b/arch/loongarch/kvm/vcpu.c
-> >>>> @@ -19,6 +19,7 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[]=
- =3D {
-> >>>>           STATS_DESC_COUNTER(VCPU, idle_exits),
-> >>>>           STATS_DESC_COUNTER(VCPU, cpucfg_exits),
-> >>>>           STATS_DESC_COUNTER(VCPU, signal_exits),
-> >>>> +       STATS_DESC_COUNTER(VCPU, hvcl_exits)
-> >>>>    };
-> >>>>
-> >>>>    const struct kvm_stats_header kvm_vcpu_stats_header =3D {
-> >>>> --
-> >>>> 2.39.3
-> >>>>
-> >>
->
 
