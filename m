@@ -1,223 +1,279 @@
-Return-Path: <kvm+bounces-8999-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9005-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 788DC859B18
-	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 04:41:18 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEB3E859B4B
+	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 05:14:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 059701F220BC
-	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 03:41:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DCF21B20D9E
+	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 04:14:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B87024A3B;
-	Mon, 19 Feb 2024 03:41:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6874AF9F4;
+	Mon, 19 Feb 2024 04:14:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ma6SllY4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SPC5jNfC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8BB24405;
-	Mon, 19 Feb 2024 03:41:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B145DEAD3;
+	Mon, 19 Feb 2024 04:14:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.18
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708314070; cv=fail; b=qjaaEPs4DhZLaPjNTa82XgLTCaE589dVL4rzHpb6W00BzMQ3fR9y/6wS4ot5QoKEwF+DauY1trjj83y7SQYdfG4zQH+r6IEXW/ukwrlUJoxn+I4DtzPvAuKLIgsuSEj3CLHo/6pYhqkTE4RZrg/f6sazHZDVn5E2+EcHrqDRJ8Q=
+	t=1708316044; cv=fail; b=QB7p8yDWM8TOyx5QfdT0KmurmsUoc1PeMK+L7M1rf7F+zgZnPsKDDfTZTXvU0MJZwE8mQF9HE8W6cmEGWmFwfC2Xw4t2HysLp4t1rZDYynWaJ72M5s0rGy38SUiuIKwa/ZoNkqpAXvspWDh7nrPWdNzdzxl0aO54bUBFCBjgbyI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708314070; c=relaxed/simple;
-	bh=Sb2eZ+5DLqGYV7jIqfDgdDZKPs4ujOzzhHSqnfi5fEw=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=u5pdtpGs6TrvIQ7TxokLfWGFbppF/0PL14scoxpasTeWt1eZhrMAfWIx4CMYjehZ9d+z0MFRQejtcITKBjCoNJKprm1Rr00RpS4EVwXIF82ep5LWTKxoNweOKrI1zvw3ZPm4BQKkMH1R4tV0L4/hCu+XSQ/cPtgcRCGgUl5uM9Y=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ma6SllY4; arc=fail smtp.client-ip=198.175.65.10
+	s=arc-20240116; t=1708316044; c=relaxed/simple;
+	bh=CXJGus7sPRaDuNXZFTDK1iJauZ+74ZM/nV3iiyiURCU=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=XZ9vi9O7m81StkKuaHRSanfrrcUsVzpOXKftQksgPXm9F6ZUOBQurwT2mMNsFJQKZKM0Mn5feiL1D5M2ybqgC55lalscFn2FF5/weKPwGOxcYZxTX2HWsFDMo08mUCTBRvAcr78Bz7UjU4WVpixJPntnEzrKLyCaJuYlqUpp0W0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SPC5jNfC; arc=fail smtp.client-ip=192.198.163.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708314068; x=1739850068;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=Sb2eZ+5DLqGYV7jIqfDgdDZKPs4ujOzzhHSqnfi5fEw=;
-  b=ma6SllY4SQxRmfWSC6UEvyD46Kpuxn430JUCG+40s5vOH9aCuusMcZ2y
-   yoOIddVsZzD2qbAFo8n4AumB3szpVeknoaUri4MwLST2ABL57TZNnbi6d
-   4mybIQJG3gTxB1TC9PbSXcm4dDwkXnidds1DjSqkwx0lLyx/NJsskMw8X
-   SwHiFhSjFCQWHNGxrGiRP+RUjyVzqoJbFm5/v3cA8mVIpylhNIPy6lJnt
-   BQrzWLKr6B3ww0UbLvwRizs0q5dLLYb6Nr4aSV9vE0AVEVkxtfU4ukewW
-   R93zZUkthdPAeQMV2WVYfME9ZLWwqP1tnCscEsNzlaO6YU67jpYvWeYbL
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10988"; a="19806126"
+  t=1708316043; x=1739852043;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   in-reply-to:mime-version;
+  bh=CXJGus7sPRaDuNXZFTDK1iJauZ+74ZM/nV3iiyiURCU=;
+  b=SPC5jNfClJl3Ams6jXBnHkLBf49qul7BM/wJk1EDFTCLMYZNHQx1nrs7
+   HIbrPP5MC1ZXxUwNnFO4YidX5Mnl6Tpoc2OoKy3F3HmwTbdBdqcQDofgZ
+   HTB69fanGlTS+tDlhCcyz/U/t4oz1NnQdm8EkQ8UQP0qYyYrp6IeUBn8d
+   Kmz70frn3h+zRllEPftcYGLfSFeCByZJ86Zq8x6nNgE1nDtpYelEDKgbw
+   NvsSPVK+dt9LQPpAsWZbHUDW/zSi5TiO8L3bTZssdnG5mx4NRpZMSgeR8
+   OW2gCd6vJJK1z0A5YGxCvWSRcB+5GAwqLD8YF7Y3K218iiU3UwMDKi2//
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10988"; a="2253330"
 X-IronPort-AV: E=Sophos;i="6.06,170,1705392000"; 
-   d="scan'208";a="19806126"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2024 19:41:07 -0800
+   d="scan'208";a="2253330"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2024 20:14:02 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,170,1705392000"; 
-   d="scan'208";a="4333353"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by fmviesa010.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 18 Feb 2024 19:41:07 -0800
-Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+   d="scan'208";a="4731155"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orviesa006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 18 Feb 2024 20:14:00 -0800
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Sun, 18 Feb 2024 19:41:06 -0800
+ 15.1.2507.35; Sun, 18 Feb 2024 20:13:59 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Sun, 18 Feb 2024 20:13:58 -0800
 Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Sun, 18 Feb 2024 19:41:06 -0800
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.41) by
+ 15.1.2507.35 via Frontend Transport; Sun, 18 Feb 2024 20:13:58 -0800
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.40) by
  edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Sun, 18 Feb 2024 19:41:06 -0800
+ 15.1.2507.35; Sun, 18 Feb 2024 20:13:58 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=a+G6a1CCMjsA0U2g7C7UblRazoGNVN/+OoA1r/EJ56PY1O6c4yqYcYfZPMYyN8wDgOZiDH9PQep1o1sOjMDTtrD2PsfSf9f/OrENOZ7aEsXTsUQ/tuEnvKvXRydIB01BOgBiRfJrCagNH8RmXAW6Ec59/Y0NhaBwTf5n9/hhG7hFzIc7kKqlMzJzgtwMXYpq9XM9HRm4s2nVTyygsMPpTxuKm6YrspbHBpgriFCKpxECG3ned9tKbENKLjDHXzt3p7eTCyNIx3dPp8Pi0QHYU6W/s9ZdzIdzA1SQiMPDkwfD16vLk9rgNOzEjx39ob0AqSkKucJyFtCC9GKKSLeefg==
+ b=ahStLxcsaDqmKAz+1rhFWWmqUCFxByzKpWSQvGo+WxPPO8h2hQI37OG8rHEjhe5dCZi/cnQor6KgNpsyT5wHQLt+1KXGqotLNF9dK7KICWecq1W/sAYgCEytqpB4k6KuzVXKza7iKDQGJRtP04gOA1Db7+ApGmWS4fn041FGwi3qNRSAJZpqjvVe2fLta0M/ZJsPrTYRIaI5mW7JljQ0ftL6XYDXHj1KZTs642fyc45cr5IyNnX1vCCV8fOQ9FF1HqaEGEOKhP6wKsguRTLQnjOdlN+5slOu0VfxrB46klYnHq399HqupTAhX6p9n6az7R0YjSgSkYvXJ34+foKJCg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UbNIxFweh6/J4f9tqQDfikZVoCGqtXGArn4U9f+qyJ4=;
- b=UvvsGvmz4rEcSzLKlof3Zhu/vxIsmwFdfGr4RjmAWpA/Gg8BmIYN88YCFlvpdKiFbcu/sJJRi6SoHRrKg09IvpNOvX078KVVeQT0uPUYrmmXVb1BaGk1TKZNgd9TtU4cFKl5FOcoHZkw1vIhU11XDoYgdJvAca/sQY2ijVrVsv00MjouifWdB7DY7SvXCHf74W+dIxiwbNXTEpyU/NTq/snK3hENHihbBo9jhRnEKTk1YKkhIjg8zM2XnrtYec2UqJ4OrI8kEBAWHM4pS4Yh0rOfaVk6jEyJagbFWTASXo+S92CeZmq+q0usTNZHoqL5nRKwtIYCkxh2iwX5u0G5vg==
+ bh=MSFWz3pQZlMEPwwpBmyFHXge89oc9dakGEoXQ9dNjok=;
+ b=HDh9czLJkBoZpGmHV9ixFpXKT1fXec3wAO0dogRmFcGeAB7tpblOkTDUynGh7o5GRkLcyXbl9FMtIZ1pW4gdMcZykL4aH1sQThA84JkJ+O4WjOQA/0wIyyRAnTpN7t8LaNNsIO3LfbuzK6CCzWK5NurYXqRAlGW8F6PZ+90B1uTv/ZP7Jx26ZuBTr1+TVstvPgXaZK10i/1fskpWLHUFWvxT9819VAeNoy6+UBwLFb596wthvZw3Coy+eTdTBZB+KCpR8euHG4lTlUXPlDNQdoEajwuQc65ms1gJBUU4KmN9CO0tDIJpp5DiCTiGfEJSk0Ai5XsxWueVdYEczGy87Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
-Received: from DM8PR11MB5687.namprd11.prod.outlook.com (2603:10b6:8:22::7) by
- MW4PR11MB6983.namprd11.prod.outlook.com (2603:10b6:303:226::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.37; Mon, 19 Feb
- 2024 03:41:04 +0000
-Received: from DM8PR11MB5687.namprd11.prod.outlook.com
- ([fe80::7776:7cd5:2c6a:1e9d]) by DM8PR11MB5687.namprd11.prod.outlook.com
- ([fe80::7776:7cd5:2c6a:1e9d%3]) with mapi id 15.20.7292.036; Mon, 19 Feb 2024
- 03:41:04 +0000
-From: "Wan, Siming" <siming.wan@intel.com>
-To: Kamlesh Gurudasani <kamlesh@ti.com>, "Zeng, Xin" <xin.zeng@intel.com>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>, "jgg@nvidia.com"
-	<jgg@nvidia.com>, "yishaih@nvidia.com" <yishaih@nvidia.com>,
-	"shameerali.kolothum.thodi@huawei.com"
-	<shameerali.kolothum.thodi@huawei.com>, "Tian, Kevin" <kevin.tian@intel.com>
-CC: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, qat-linux <qat-linux@intel.com>,
-	"Zeng, Xin" <xin.zeng@intel.com>
-Subject: RE: [EXTERNAL] [PATCH 07/10] crypto: qat - add bank save and restore
- flows
-Thread-Topic: [EXTERNAL] [PATCH 07/10] crypto: qat - add bank save and restore
- flows
-Thread-Index: AQHaVSVB/m38AurFzkKxVGnzjrvP0LD50xgAgBdMZaA=
-Date: Mon, 19 Feb 2024 03:41:04 +0000
-Message-ID: <DM8PR11MB56875F986E6BC02D408CB4708E512@DM8PR11MB5687.namprd11.prod.outlook.com>
-References: <20240201153337.4033490-1-xin.zeng@intel.com>
- <20240201153337.4033490-8-xin.zeng@intel.com>
- <87o7cwzn1t.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
-In-Reply-To: <87o7cwzn1t.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
+Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM8PR11MB5687:EE_|MW4PR11MB6983:EE_
-x-ms-office365-filtering-correlation-id: 68c42700-edec-43d4-a333-08dc30fc9982
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: dqhhW8GsSviHn4+icbtS0QNDC5TZA1oT73+/Rsg/9eyMSdOwdh1aZaCVdWxaHZhFfxsOrQTFgL6BOJodnBi9foztFshd1ALkO8nLli9MHY8mt1Y3qsPDMvXF1DwGZ6MHYW8+tW9Z/E2JQFLbUiz/+p7NWCoTyLRmPSEnxFdbKFU6n73J6MUkBhRPXbj2j1Ds+v/0tp/YnfKEeQKcN03VTqYxzexjvIg0GAQ5YJwtuG3bMDnlidfoXIjVbPwqpgMYoZNX7DlEfi8wxAiDB13A4FpBiqNhtG0fDH4b+aVqSaUU2neCXlymSGrGpnXKJ7MG4J9OHgUogiJln3fRq/O7sIKHlKljDfPC0tIkCgelf+AzFoRfDmG4C8weX97P5YWXlasIre2Ap4ZawY53zW0mMIpRvLEDwDpvLkpkmUR//mJpBGqHCG0AZB27Z0RLiQAuCvYr/oHVT66idan9GuS6Dw5PeVFZ/stv5pC0XR8IC8tqGhkKz6D7hXb/CWjkBPPhPMGHo0KVkUKMPVg11A9q8PGyF4VQRYlxMh49HwLeDzdbBxIGdr5+XC5OtMIlTYqnOXd5zyOgvdB+VqJ8uTujcu0fqe5QSdt0HiBbxloIhy0+q5hKYPmOg2pkB2jOQb+EOh0qum7hCmwrJyjf1menzg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR11MB5687.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(136003)(366004)(39860400002)(396003)(376002)(230273577357003)(230922051799003)(1800799012)(64100799003)(186009)(451199024)(6636002)(110136005)(316002)(54906003)(41300700001)(55016003)(15650500001)(2906002)(64756008)(66446008)(66476007)(66556008)(66946007)(76116006)(5660300002)(4326008)(8676002)(8936002)(83380400001)(86362001)(52536014)(71200400001)(921011)(478600001)(26005)(9686003)(38070700009)(53546011)(6506007)(7696005)(38100700002)(107886003)(33656002)(82960400001)(122000001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?2H+p/KCSA5or/q3emjRq20LU+NYQDDDk6WBEiZB4e3dfC14ODdmW8wPMFyja?=
- =?us-ascii?Q?B2rsYrf9z92+A87iQM5Dg4uaiFff9xZwpr33Neav/hZWXvaDgANdMNTcxvSz?=
- =?us-ascii?Q?P4hAJEz0Nnp25cvB1qDYAUIsKq1vTZeWk1HNKumzEwY6FA0YFHwUjIFdGicw?=
- =?us-ascii?Q?v/0qUS6/stRSnd0osh4nltfifPmz2lUsNJ5HWvPp5LBY5cPI1JEWJjdchqC5?=
- =?us-ascii?Q?1XRDo4xq62hTAdsApXPuns6yaq35MLw0eWaOcF19NxmnQgus+9/F0UMNmS0F?=
- =?us-ascii?Q?tk85Uya/h3KqnB40i7ZgcNTPmBsXVEkh2Tq3uIoewNSZwWX2TQOATgsPg5/C?=
- =?us-ascii?Q?i5Hgkh4hZiUt6gMyTBWQfpc5WzQAwjsmf1EQVSjtX0EgIzimwF/ltHWx4a3G?=
- =?us-ascii?Q?I9k4LtOM/TzJ1T4cD8q7GpPqBDLv3PvYeTXbGR5k5KuN5/lSnCfiIDXsNhEd?=
- =?us-ascii?Q?rTgRadIqME5hrz+osrtk4dkwaUH2FyYN1cOK52PJgFzOUJCbYj3TzlAi2+Vd?=
- =?us-ascii?Q?7wCG/lF7tr4NM79FmXyeOJsA00zj2BM+HKQTwP4xIER5D5HCMMR7tteDU8Mj?=
- =?us-ascii?Q?EXhvRXEGVgUpwEG1zEuOAIpygZHeqpFw1QffSa6QBlbxbB2wK4O7lE+0fNTY?=
- =?us-ascii?Q?V76LanP3e+K7ay/P8KF4Dwym4jb8qNkEBqfd1tFARNqQS9IWKwkJs1sMYG3+?=
- =?us-ascii?Q?PJ5UeafHur052ZX+LPjPxMjIGwgpaq+7mGy4T3E2nFFQ5QR+aDk+ojUZBUHQ?=
- =?us-ascii?Q?jLjtWef0DjxmW8HKxvinvaQsFJm4x+SQxTwNKcdrVeVIxfRmTFn4TNbOcSuY?=
- =?us-ascii?Q?RfitBr8RcTfmfthqKJdk7AeJbsEFdor0BFz3rDdip1GcCtSGyS7kGate5PLe?=
- =?us-ascii?Q?8sirut8K3o4eMJRd0mvuH/yKX7dpoJavXHBuWobYwSj0+Bwzz56ID9FsT/2w?=
- =?us-ascii?Q?awej4r8uckPwNqqeHPxqsz1wD7QDw/nZfbD6b2MGBnEm9q6awFW6e8wqTWks?=
- =?us-ascii?Q?mhDaYuQqdm48YfpBT7oifEequdKngCp0m7jKucFEqXBT4W2//jj73Wn3UF4a?=
- =?us-ascii?Q?Q4enE7+82m3+NgYfcUO85pwtDivfbTyVxrqDVo78tnfiu9Qo6kZ0RNtOnj+R?=
- =?us-ascii?Q?kB0mun1/UOF32exEfCLchsOz7xbVfF2tacMDtoc85lpvCz8eh2RMrOwQe4/b?=
- =?us-ascii?Q?p6eWPVBiei57NgI4j4p0Pb1GtsIkNDfjYz+UMrzPQYiJbSOQa9chO+71Iybu?=
- =?us-ascii?Q?84LyBzrvi4KVoWbs+QpFso7dQJl+Q3b0DBxvSPgwDatZTXIk+nea1uXlD1B2?=
- =?us-ascii?Q?Fd/R5qvQiao5+t2tfvB2uFBlIA0msWfqOPAqB6N/LsR9958y4dBLyiwrd6Tv?=
- =?us-ascii?Q?q/1yMCpnPf9Ve1ovY8hEkWfwKA+ptfTCrE5JNP3+xPf+JRGD7zYv/tVmG2oZ?=
- =?us-ascii?Q?/MhCQDqVL7+CSQiBJ0C2eWSBtUcTgYWZjWJEpIOmOQB7JdJZL1zM2P2G4v+F?=
- =?us-ascii?Q?6Xvi1RMzw1OZ9/sa7Bu1H8TKtp5+r4Dc5b6Jbqn5flPMDXQi+e75LdwVrL7h?=
- =?us-ascii?Q?NJTCmiVDZbrMQW5TRGY9wGfg9K/5qcFUF3uJ5D07?=
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
+ LV2PR11MB5973.namprd11.prod.outlook.com (2603:10b6:408:14e::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.34; Mon, 19 Feb
+ 2024 04:13:56 +0000
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::81e3:37ec:f363:689e]) by DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::81e3:37ec:f363:689e%6]) with mapi id 15.20.7292.036; Mon, 19 Feb 2024
+ 04:13:56 +0000
+Date: Mon, 19 Feb 2024 11:44:14 +0800
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Sean Christopherson <seanjc@google.com>
+CC: Paolo Bonzini <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Friedrich Weber <f.weber@proxmox.com>, "Kai
+ Huang" <kai.huang@intel.com>, Yuan Yao <yuan.yao@linux.intel.com>, Xu Yilun
+	<yilun.xu@linux.intel.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, Chao Peng
+	<chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, Michael Roth
+	<michael.roth@amd.com>, Isaku Yamahata <isaku.yamahata@intel.com>, "David
+ Matlack" <dmatlack@google.com>
+Subject: Re: [PATCH v4 3/4] KVM: x86/mmu: Move slot checks from
+ __kvm_faultin_pfn() to kvm_faultin_pfn()
+Message-ID: <ZdLOjuCP2pDjhsJl@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20240209222858.396696-1-seanjc@google.com>
+ <20240209222858.396696-4-seanjc@google.com>
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+In-Reply-To: <20240209222858.396696-4-seanjc@google.com>
+X-ClientProxiedBy: SGXP274CA0022.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:b8::34)
+ To DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|LV2PR11MB5973:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9897641f-d060-4e7b-83cd-08dc310130e5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 0sksHwTb/4XCSDzP3rgllyP1jI2UPVjhkLjaWaT4YyQHKWM0g92YhAUojurQN7eLGnKQMxLzwQpOIGrV9KE4OYYV3hxxcAd+umNl3QfckN8aj4HFUrtpnSlkkuSQnuCD9OlIO45E2cr3L9Q1/JPeCdvmX3wkH1OHpVDGcN70yhiNKx83wa5sS96pZLrpxF9HXOHLLsAJChgu6tQn/sBOFi7ejbWO1S5QJDici2scbLbfE8ZXucN1Fxe2HuVUmqPLi81Ulfh0NKR6VeM/H1L8isPjh5Wx+ow+LLpnAv6z3uys6GMqkRYaN5u/QvOVOExouxPoqGxF2VlEYHCZd0mQUuJAC8E59eSc5BU/GKjjaWJXfQUHZ7hQzmG7gzNWbshfvrGmE+YvV1slEr/UO2toUZRs2EySeOH+q33ISX5r83wu7+VVw9BS74GblD2zKRSyvyMkQbmGdZQzgxZ2X72idYIG9mevAI8tc1NhHLrs5JeTfhCUQaluYG2CIAygsmf/4VS4lV0EntKuSUvh1zMTf2HT0xTxxoN080t9fK0ndfokLwy7ueYcfDuJ8ByelInE
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(39860400002)(346002)(376002)(396003)(136003)(230922051799003)(451199024)(1800799012)(186009)(64100799003)(8676002)(26005)(41300700001)(83380400001)(8936002)(6916009)(4326008)(66476007)(66556008)(66946007)(316002)(478600001)(6486002)(6506007)(6512007)(6666004)(54906003)(82960400001)(38100700002)(86362001)(5660300002)(7416002)(2906002)(3450700001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?dZvtnR7bdwLPUBLuAQ/DJR59E4BHw/C4CbCmLY7Q3s1RunAwI7Kg1QqK0PUz?=
+ =?us-ascii?Q?ZoyErrZkQhaKMhfV6IyqjTbCCH9MLC7dwF5w64Gj4MvNNS2AIxLDFL+5C454?=
+ =?us-ascii?Q?OZN2+L3XVvxjMRufdyH87ENchfSeudjqo+WZjuLKQMnIs5x6Bc7BEvjCzA/6?=
+ =?us-ascii?Q?0uB+2kpE5lu4CpKOLI4vZEQDf2vf68mqAyyeRklXc6vKIEAGJwwPO1iEJv48?=
+ =?us-ascii?Q?/NMIrIhrYHlibeCx2KCfEQRXXA/KVDfFEaBp+yM9NyGIHW3Y3A7bLRRGf1Pw?=
+ =?us-ascii?Q?xNTq6jUezQ2M5V44rkFEnjuZNvppjgR6H9zKyzH/CtVMAVfmdmQ7BiM2Ev1I?=
+ =?us-ascii?Q?pjZ1NMCE0vCkjYCkIcBxXB82Y3voDACIxjXQ0umvPaB6d9N3WTTMhbVYOe3R?=
+ =?us-ascii?Q?waKvYu7TN4tGwZlXKRX9n09bKL3CnkDSdHuha2oT/nY/e8II4ywldfMd6eaL?=
+ =?us-ascii?Q?pu3v2FRXEJWfsQmUfoxNatmomAZ8IwQ6PFtKGA9D+csa2ITmXxmtGkLJbNQ5?=
+ =?us-ascii?Q?LGiVsErVJn3rMdwuldq2xkMVUkLYZeI5uPSTQChBLCPppWvCHRJ/Pcy/IXBk?=
+ =?us-ascii?Q?d2iEdWheJSl2vSd00jrEYqlJYtssosDxTy2n23muoyjLK2ys58hKLc3gJNt3?=
+ =?us-ascii?Q?pvozWzneDKUS3clzqzhRrfdK3UAMpOKpsgQIZS1bbniFmFg1T5h0HBvSqGMC?=
+ =?us-ascii?Q?KWqlsjA9qIChmfB24nQ51yWDeqDVmv9SBFwREk6TajdZeOsP8hNW/epe7O8K?=
+ =?us-ascii?Q?/97Oa3HqsouFtZBdXg/li+DXDm0BYQ/4hc6QsOVJt1BWnTRUzcTI1USb6LTG?=
+ =?us-ascii?Q?5Ogv4Llg18XwD9LeMb55WPUbji7w4JC/1aNd9g5C9LgN4o5veeED9gqdcPaQ?=
+ =?us-ascii?Q?J+Zq+S5x665EMDUvrtbUkvm7Y6p2XU7CtdhPuUNOlDMWLotvRrmINWrxw0aH?=
+ =?us-ascii?Q?XpmvCTN/AUrqx+G3/leS8/VwBa72Upo4Ao3VmyNMho8tZsbtV2jUB0PXeaFr?=
+ =?us-ascii?Q?iVxMnBSvY7Hv8FbfWVcWZ8TBpjS9NnJ1PVqJpTjz3c85+eP+wi/O7oQa7GtV?=
+ =?us-ascii?Q?j8P0pgyhH9qtlYozCDh+QCAaD4L9kd9Fl8FgKt+poZYHiZ1CgTQgo8QNaa5j?=
+ =?us-ascii?Q?M8dFAGZlvichpGavCqgyu03q/sMc+Pq667Ig81YDbT3g/e53fx+zH0LILESH?=
+ =?us-ascii?Q?J3IbqlUqBVewsNuqJuwRJiDq+fHx8YnbY3PWfHsaRKViGKgE5NsRBkeKFES8?=
+ =?us-ascii?Q?sSZSrTTSbJZBikZJN7JmB/yqXNt3YRG2DflGQJ2fPICBXV36j7X0V6cs++Hb?=
+ =?us-ascii?Q?mVKS420bd5e5TJUHbD7ryM/GIf4JDNHCf9B8YNyM/b0TGGz26u3YN9WKDJ1S?=
+ =?us-ascii?Q?t9aHPVt4gfei40r8eVf5yrgPorkpWRIgzV+fTqFttRywF9hPMSrtkRDOjNEh?=
+ =?us-ascii?Q?K6C87FHYXS18+cEQMWSIxQv4vMvOs8k7jjivWFY8K/py21XNVpM996DtB9s2?=
+ =?us-ascii?Q?BqIwnE6zVbtcUT4zLRniQCS/PXhhisLcEoEf/WwvBHsEubEAnPcktm0GSCtP?=
+ =?us-ascii?Q?YzHoxq/M4Z3Eqhut41998Cxn1HjEhhUn/pCgt51r?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9897641f-d060-4e7b-83cd-08dc310130e5
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR11MB5687.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 68c42700-edec-43d4-a333-08dc30fc9982
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Feb 2024 03:41:04.4802
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2024 04:13:56.6056
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 6ILrHAIOqiL7jHnmCg1YZvokdlgZ00up5pZxzrbLyIwAnsfx0/79OT/qBg9S80wxA/dAAc/D9PgvtdsKrjCEJg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB6983
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: wJt7pvVJyvYEDB+/LiM//YHkydzzVkSKLTWF5ixCo6c8x4iansUN8CMhx8KE8GsoMcfqNnZ9/RDILQcCQfnGoA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR11MB5973
 X-OriginatorOrg: intel.com
 
-From: Kamlesh Gurudasani <kamlesh@ti.com>=20
-Sent: Sunday, February 4, 2024 3:50 PM
-To: Zeng, Xin <xin.zeng@intel.com>; herbert@gondor.apana.org.au; alex.willi=
-amson@redhat.com; jgg@nvidia.com; yishaih@nvidia.com; shameerali.kolothum.t=
-hodi@huawei.com; Tian, Kevin <kevin.tian@intel.com>
-Cc: linux-crypto@vger.kernel.org; kvm@vger.kernel.org; qat-linux <qat-linux=
-@intel.com>; Wan, Siming <siming.wan@intel.com>; Zeng, Xin <xin.zeng@intel.=
-com>
-Subject: Re: [EXTERNAL] [PATCH 07/10] crypto: qat - add bank save and resto=
-re flows
+On Fri, Feb 09, 2024 at 02:28:57PM -0800, Sean Christopherson wrote:
+> Move the checks related to the validity of an access to a memslot from the
+> inner __kvm_faultin_pfn() to its sole caller, kvm_faultin_pfn().  This
+> allows emulating accesses to the APIC access page, which don't need to
+> resolve a pfn, even if there is a relevant in-progress mmu_notifier
+> invalidation.  Ditto for accesses to KVM internal memslots from L2, which
+> KVM also treats as emulated MMIO.
+> 
+> More importantly, this will allow for future cleanup by having the
+> "no memslot" case bail from kvm_faultin_pfn() very early on.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 62 ++++++++++++++++++++++--------------------
+>  1 file changed, 33 insertions(+), 29 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 50bfaa53f3f2..505fc7eef533 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -4333,33 +4333,6 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+>  	struct kvm_memory_slot *slot = fault->slot;
+>  	bool async;
+>  
+> -	/*
+> -	 * Retry the page fault if the gfn hit a memslot that is being deleted
+> -	 * or moved.  This ensures any existing SPTEs for the old memslot will
+> -	 * be zapped before KVM inserts a new MMIO SPTE for the gfn.
+> -	 */
+> -	if (slot && (slot->flags & KVM_MEMSLOT_INVALID))
+> -		return RET_PF_RETRY;
+> -
+> -	if (!kvm_is_visible_memslot(slot)) {
+> -		/* Don't expose private memslots to L2. */
+> -		if (is_guest_mode(vcpu)) {
+> -			fault->slot = NULL;
+> -			fault->pfn = KVM_PFN_NOSLOT;
+> -			fault->map_writable = false;
+> -			return RET_PF_CONTINUE;
+> -		}
+> -		/*
+> -		 * If the APIC access page exists but is disabled, go directly
+> -		 * to emulation without caching the MMIO access or creating a
+> -		 * MMIO SPTE.  That way the cache doesn't need to be purged
+> -		 * when the AVIC is re-enabled.
+> -		 */
+> -		if (slot && slot->id == APIC_ACCESS_PAGE_PRIVATE_MEMSLOT &&
+> -		    !kvm_apicv_activated(vcpu->kvm))
+> -			return RET_PF_EMULATE;
+> -	}
+> -
+>  	if (fault->is_private)
+>  		return kvm_faultin_pfn_private(vcpu, fault);
+>  
+> @@ -4406,6 +4379,37 @@ static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+>  	fault->mmu_seq = vcpu->kvm->mmu_invalidate_seq;
+>  	smp_rmb();
+>  
+> +	if (!slot)
+> +		goto faultin_pfn;
+> +
+> +	/*
+> +	 * Retry the page fault if the gfn hit a memslot that is being deleted
+> +	 * or moved.  This ensures any existing SPTEs for the old memslot will
+> +	 * be zapped before KVM inserts a new MMIO SPTE for the gfn.
+> +	 */
+> +	if (slot->flags & KVM_MEMSLOT_INVALID)
+> +		return RET_PF_RETRY;
+> +
+> +	if (!kvm_is_visible_memslot(slot)) {
+> +		/* Don't expose KVM's internal memslots to L2. */
+> +		if (is_guest_mode(vcpu)) {
+> +			fault->slot = NULL;
+> +			fault->pfn = KVM_PFN_NOSLOT;
+> +			fault->map_writable = false;
+> +			return RET_PF_CONTINUE;
+Call kvm_handle_noslot_fault() to replace returning RET_PF_CONTINUE?
 
-Xin Zeng <xin.zeng@intel.com> writes:
-
-> This message was sent from outside of Texas Instruments.=20
-> Do not click links or open attachments unless you recognize the source of=
- this email and know the content is safe.=20
-> =20
-> From: Siming Wan <siming.wan@intel.com>
->
-> Add logic to save, restore, quiesce and drain a ring bank for QAT GEN4=20
-> devices.
-> This allows to save and restore the state of a Virtual Function (VF)=20
-> and will be used to implement VM live migration.
->
-> Signed-off-by: Siming Wan <siming.wan@intel.com>
-> Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> Reviewed-by: Xin Zeng <xin.zeng@intel.com>
-> Signed-off-by: Xin Zeng <xin.zeng@intel.com>
-...
-> +#define CHECK_STAT(op, expect_val, name, args...) \ ({ \
-> +	u32 __expect_val =3D (expect_val); \
-> +	u32 actual_val =3D op(args); \
-> +	if (__expect_val !=3D actual_val) \
-> +		pr_err("QAT: Fail to restore %s register. Expected 0x%x, but actual is=
- 0x%x\n", \
-> +			name, __expect_val, actual_val); \
-> +	(__expect_val =3D=3D actual_val) ? 0 : -EINVAL; \
-I was wondering if this can be done like following, saves repeat comparison=
-.
-
-(__expect_val =3D=3D actual_val) ? 0 : (pr_err("QAT: Fail to restore %s \
-                                          register. Expected 0x%x, \
-                                          but actual is 0x%x\n", \
-                 			  name, __expect_val, \
-                                          actual_val), -EINVAL); \ Regards,=
- Kamlesh
-
-> +})
-...
-
-
-Thanks for your comments! Will update.
+> +		}
+> +
+> +		/*
+> +		 * If the APIC access page exists but is disabled, go directly
+> +		 * to emulation without caching the MMIO access or creating a
+> +		 * MMIO SPTE.  That way the cache doesn't need to be purged
+> +		 * when the AVIC is re-enabled.
+> +		 */
+> +		if (slot->id == APIC_ACCESS_PAGE_PRIVATE_MEMSLOT &&
+> +		    !kvm_apicv_activated(vcpu->kvm))
+> +			return RET_PF_EMULATE;
+> +	}
+> +
+>  	/*
+>  	 * Check for a relevant mmu_notifier invalidation event before getting
+>  	 * the pfn from the primary MMU, and before acquiring mmu_lock.
+> @@ -4427,10 +4431,10 @@ static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+>  	 * *guaranteed* to need to retry, i.e. waiting until mmu_lock is held
+>  	 * to detect retry guarantees the worst case latency for the vCPU.
+>  	 */
+> -	if (!slot &&
+> -	    mmu_invalidate_retry_gfn_unsafe(vcpu->kvm, fault->mmu_seq, fault->gfn))
+> +	if (mmu_invalidate_retry_gfn_unsafe(vcpu->kvm, fault->mmu_seq, fault->gfn))
+>  		return RET_PF_RETRY;
+>  
+> +faultin_pfn:
+>  	ret = __kvm_faultin_pfn(vcpu, fault);
+>  	if (ret != RET_PF_CONTINUE)
+>  		return ret;
+> -- 
+> 2.43.0.687.g38aa6559b0-goog
+> 
 
