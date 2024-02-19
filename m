@@ -1,144 +1,173 @@
-Return-Path: <kvm+bounces-9074-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9075-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12C8785A29E
-	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 12:58:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFF0F85A2BF
+	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 13:02:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 252321C23161
-	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 11:58:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 876E328556F
+	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 12:02:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92A302E40E;
-	Mon, 19 Feb 2024 11:58:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dZyw+qnN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BE5C2E63C;
+	Mon, 19 Feb 2024 12:01:06 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from zero.eik.bme.hu (zero.eik.bme.hu [152.66.115.2])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F85E2E3EF
-	for <kvm@vger.kernel.org>; Mon, 19 Feb 2024 11:58:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8F542D046
+	for <kvm@vger.kernel.org>; Mon, 19 Feb 2024 12:01:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=152.66.115.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708343907; cv=none; b=tSN0khj/k2BzCo/FEkttWSyhPPSxRqE5KhvD+EVuBSH0YzI37DiIHZh5P3BoQMt+AYb+LKnIQLUim4TTr3/g/H/F8KcTdAd3rISru0hWZBnR38ibFOy/0YfHg4Gxo4kxqq1VXLJDFjifosW2ZOsCyBPVpc+ruFwCKJt01VKW53o=
+	t=1708344065; cv=none; b=NXRLDlcSBXEmerLbIzsLFAnbcTHCzIShDmjgJW7SqypSbVpAjf6Pq+Ps5yHNWI0aSL8jwYznwCTCUAvhclHVlXfWuksvuxdoaj5ELaZ6VYSBTx3ofbprjBQfZXSZPn85nQ2KNColvP8W9Rs1bPLcg1fS4FDqhM7nvM35HCWbmiw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708343907; c=relaxed/simple;
-	bh=nJstLW9esmyElWFns2CzFB95hhSHbzyVH5WsxNSFQ2U=;
-	h=Mime-Version:Content-Type:Date:Message-Id:To:Cc:Subject:From:
-	 References:In-Reply-To; b=XIv7KqGAU0TJlM3GN8wO1EPDpnATvwXGo6eE0bivSQXdtujH1ntodn/7+VPx0YlTAxyJivuP5DuvQDHFxwLm/SaNJHbZ/dE4lS60qoInciTGxHpjcD3kyG9KNRHhEokS/F2hE/6IAwCCVMeQdodWQg7My3MqD4HtwpE7whzplms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dZyw+qnN; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1dba6b9b060so18310045ad.1
-        for <kvm@vger.kernel.org>; Mon, 19 Feb 2024 03:58:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708343906; x=1708948706; darn=vger.kernel.org;
-        h=in-reply-to:references:from:subject:cc:to:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qtKD19qauwfMDNEwLgCb7I5KxV73UoCs2lBAo1NZd7g=;
-        b=dZyw+qnNm6wzSFG009nvrPaI0IzNMez0J8mlvd61lVaa2452EQDp5YxDro+YZmNQpS
-         BZQaXTilvuBdA8B8lkfO4sCZX7zEoicR/l/AdxJkDRJ+9UdQwqL9K4UB0HcGf8dW3szz
-         ane459A5s/tLNLd7I8POVhqguUyQ68AGxEiRmIQbQ+DkD0OTrvhgChJlKgxeWBT18Fmd
-         /lBGfFgA7ULI/YN3pY9S7T76RRuP2p9X/hr7nlPUy1NuhTfS1YPLgxYrbLfKpuvloN5V
-         /EL/QuQFvI8RTMQo6abl82jEcr4QI6jy+RJowW7uiB0fitLPe0ofyBRg8NYqWmKrdSwu
-         2bLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708343906; x=1708948706;
-        h=in-reply-to:references:from:subject:cc:to:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=qtKD19qauwfMDNEwLgCb7I5KxV73UoCs2lBAo1NZd7g=;
-        b=tA4Jq7RXKkGEorXH9acEuvksnnQgrmkCTzid2bk0NWbugH/Q2RDQmKaRrXzHlDpHkI
-         rzefg42PLCD3XIplu8LO5jXTAIxZOuO8rWgnIzbxfXK0+6wnSQ5mMMtyMKAGBIrux/sC
-         JifwTXqbir3sM9WLroMeXWJVIWV2foYp7D50BKZma2mF5+V8p5LxeC13gChI3GZn8nv9
-         1LxfCygVfr5atKxbs0yXA/MMaJWspj1creah3dIeX/dz4eLhgFFWVCDw3VUsBHtbKSOv
-         85auI3kVeqdxe4ri0fanrs/pOG/44RgYp01r6uFRRTIGFRwd3p3+H8LlVffOciHk+IVF
-         k2Wg==
-X-Forwarded-Encrypted: i=1; AJvYcCWTLfGUmFYkdcXoCrFl9Z7P+qIeD8Tsr0in58VzYRKuMlxTVQcVz0rMTMczbvahM/W3/SrQ39KC63oYh6miMrCF2EAf
-X-Gm-Message-State: AOJu0Yxu4eOV6WK4cc6KbC7K7UcA0IaeeLqLGIAQcvdcfxe2lPyaVlmK
-	XEjFXNRzFFjCiWKmb5p8s+eJaj3MPIwznKlwNvWEOQZDZbQBQXgV
-X-Google-Smtp-Source: AGHT+IE9b6RC9oHbAhWZTL2lD+mu5223dNrNzrbJxmVB0cgYIkGUcQQPDPnjzMu1ezsyMOuXvHSLQg==
-X-Received: by 2002:a17:902:e84a:b0:1db:e41f:bab with SMTP id t10-20020a170902e84a00b001dbe41f0babmr5023569plg.32.1708343905564;
-        Mon, 19 Feb 2024 03:58:25 -0800 (PST)
-Received: from localhost (123-243-155-241.static.tpgi.com.au. [123.243.155.241])
-        by smtp.gmail.com with ESMTPSA id t12-20020a1709028c8c00b001d949393c50sm4178505plo.187.2024.02.19.03.58.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 19 Feb 2024 03:58:25 -0800 (PST)
+	s=arc-20240116; t=1708344065; c=relaxed/simple;
+	bh=cxA7gQLvZSKcXffwfifKt9TX7qH1ihmeauswrRijVq4=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=rFweUa49iT3zxyc7JYbZfePytv0P7I19CbmZZ22CzIGc5xFkIfQjNK85R1icw7N411ysjx4XLLwdU3KHTRhx4YmpCnc8JpGrOVpstoMXjkQp4EgqnBC1BjrDRlvXGZ1KugwNEy+1GMfGf0l2Kz6zZl+RpNPCzViEIhQwGcSo8F4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=eik.bme.hu; spf=pass smtp.mailfrom=eik.bme.hu; arc=none smtp.client-ip=152.66.115.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=eik.bme.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eik.bme.hu
+Received: from zero.eik.bme.hu (localhost [127.0.0.1])
+	by zero.eik.bme.hu (Postfix) with ESMTP id C43534E6003;
+	Mon, 19 Feb 2024 13:01:00 +0100 (CET)
+X-Virus-Scanned: amavisd-new at eik.bme.hu
+Received: from zero.eik.bme.hu ([127.0.0.1])
+	by zero.eik.bme.hu (zero.eik.bme.hu [127.0.0.1]) (amavisd-new, port 10028)
+	with ESMTP id HmYGrJ2q1YiC; Mon, 19 Feb 2024 13:00:58 +0100 (CET)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+	id C9CA84E6026; Mon, 19 Feb 2024 13:00:58 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by zero.eik.bme.hu (Postfix) with ESMTP id C7EBC7456B4;
+	Mon, 19 Feb 2024 13:00:58 +0100 (CET)
+Date: Mon, 19 Feb 2024 13:00:58 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@linaro.org>
+cc: qemu-devel@nongnu.org, 
+    =?ISO-8859-15?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>, 
+    Eduardo Habkost <eduardo@habkost.net>, qemu-arm@nongnu.org, 
+    kvm@vger.kernel.org, Peter Maydell <peter.maydell@linaro.org>, 
+    Igor Mitsyanko <i.mitsyanko@gmail.com>, 
+    "Michael S. Tsirkin" <mst@redhat.com>, 
+    Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, 
+    Paolo Bonzini <pbonzini@redhat.com>, 
+    Richard Henderson <richard.henderson@linaro.org>, 
+    Markus Armbruster <armbru@redhat.com>, 
+    Manos Pitsidianakis <manos.pitsidianakis@linaro.org>
+Subject: Re: [PATCH 1/6] hw/arm: Inline sysbus_create_simple(PL110 / PL111)
+In-Reply-To: <2b9ea923-c4f9-4ee4-8ed2-ba9f62c15579@linaro.org>
+Message-ID: <6b5758d6-f464-2461-f9dd-71d2e15b610a@eik.bme.hu>
+References: <20240216153517.49422-1-philmd@linaro.org> <20240216153517.49422-2-philmd@linaro.org> <bcfd3f9d-04e3-79c9-c15f-c3c8d7669bdb@eik.bme.hu> <2f8ec2e2-c4c7-48c3-9c3d-3e20bc3d6b9b@linaro.org> <b40fd79f-4d41-4e04-90c1-6f4b2fde811d@linaro.org>
+ <00e2b898-3c5f-d19c-fddc-e657306e071f@eik.bme.hu> <2b9ea923-c4f9-4ee4-8ed2-ba9f62c15579@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Mon, 19 Feb 2024 21:58:20 +1000
-Message-Id: <CZ91DDIGOAMM.3RLL24M34FXGK@wheely>
-To: "Thomas Huth" <thuth@redhat.com>, "Andrew Jones"
- <andrew.jones@linux.dev>, "Alexandru Elisei" <alexandru.elisei@arm.com>,
- "Eric Auger" <eric.auger@redhat.com>, <kvm@vger.kernel.org>
-Cc: <kvmarm@lists.linux.dev>
-Subject: Re: [kvm-unit-tests PATCH] lib/arm/io: Fix calling getchar()
- multiple times
-From: "Nicholas Piggin" <npiggin@gmail.com>
-X-Mailer: aerc 0.15.2
-References: <20240216140210.70280-1-thuth@redhat.com>
- <CZ7AJ4JK5805.2N5QS85IP42QZ@wheely>
- <4986756f-6230-421b-9601-054c6c2969e8@redhat.com>
-In-Reply-To: <4986756f-6230-421b-9601-054c6c2969e8@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="3866299591-1407859581-1708344058=:44613"
 
-On Mon Feb 19, 2024 at 4:59 PM AEST, Thomas Huth wrote:
-> On 17/02/2024 11.43, Nicholas Piggin wrote:
-> > On Sat Feb 17, 2024 at 12:02 AM AEST, Thomas Huth wrote:
-> >> getchar() can currently only be called once on arm since the implement=
-ation
-> >> is a little bit too  na=C3=AFve: After the first character has arrived=
-, the
-> >> data register never gets set to zero again. To properly check whether =
-a
-> >> byte is available, we need to check the "RX fifo empty" on the pl011 U=
-ART
-> >> or the "RX data ready" bit on the ns16550a UART instead.
-> >>
-> >> With this proper check in place, we can finally also get rid of the
-> >> ugly assert(count < 16) statement here.
-> >>
-> >> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> >=20
-> > Nice, thanks for fixing this up.
-> >=20
-> > I see what you mean about multi-migration not waiting. It seems
-> > to be an arm issue, ppc works properly.
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
+
+--3866299591-1407859581-1708344058=:44613
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8BIT
+
+On Mon, 19 Feb 2024, Philippe Mathieu-Daudé wrote:
+> On 19/2/24 12:27, BALATON Zoltan wrote:
+>> On Mon, 19 Feb 2024, Philippe Mathieu-Daudé wrote:
+>>> On 16/2/24 20:54, Philippe Mathieu-Daudé wrote:
+>>>> On 16/2/24 18:14, BALATON Zoltan wrote:
+>>>>> On Fri, 16 Feb 2024, Philippe Mathieu-Daudé wrote:
+>>>>>> We want to set another qdev property (a link) for the pl110
+>>>>>> and pl111 devices, we can not use sysbus_create_simple() which
+>>>>>> only passes sysbus base address and IRQs as arguments. Inline
+>>>>>> it so we can set the link property in the next commit.
+>>>>>> 
+>>>>>> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+>>>>>> ---
+>>>>>> hw/arm/realview.c    |  5 ++++-
+>>>>>> hw/arm/versatilepb.c |  6 +++++-
+>>>>>> hw/arm/vexpress.c    | 10 ++++++++--
+>>>>>> 3 files changed, 17 insertions(+), 4 deletions(-)
+>>>>>> 
+>>>>>> diff --git a/hw/arm/realview.c b/hw/arm/realview.c
+>>>>>> index 9058f5b414..77300e92e5 100644
+>>>>>> --- a/hw/arm/realview.c
+>>>>>> +++ b/hw/arm/realview.c
+>>>>>> @@ -238,7 +238,10 @@ static void realview_init(MachineState *machine,
+>>>>>>     sysbus_create_simple("pl061", 0x10014000, pic[7]);
+>>>>>>     gpio2 = sysbus_create_simple("pl061", 0x10015000, pic[8]);
+>>>>>> 
+>>>>>> -    sysbus_create_simple("pl111", 0x10020000, pic[23]);
+>>>>>> +    dev = qdev_new("pl111");
+>>>>>> +    sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
+>>>>>> +    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0x10020000);
+>>>>>> +    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[23]);
+>>>>> 
+>>>>> Not directly related to this patch but this blows up 1 line into 4 just 
+>>>>> to allow setting a property. Maybe just to keep some simplicity we'd 
+>>>>> rather need either a sysbus_realize_simple function that takes a sysbus 
+>>>>> device instead of the name and does not create the device itself or some 
+>>>>> way to pass properties to sysbus create simple (but the latter may not 
+>>>>> be easy to do in a generic way so not sure about that). What do you 
+>>>>> think?
+>>>> 
+>>>> Unfortunately sysbus doesn't scale in heterogeneous setup.
+>>> 
+>>> Regarding the HW modelling API complexity you are pointing at, we'd
+>>> like to move from the current imperative programming paradigm to a
+>>> declarative one, likely DSL driven. Meanwhile it is being investigated
+>>> (as part of "Dynamic Machine"), I'm trying to get the HW APIs right
+>> 
+>> I'm aware of that activity but we're currently still using board code to 
+>> construct machines and probably will continue to do so for a while. Also 
+>> because likely not all current machines will be converted to new 
+>> declarative way so having a convenient API for that is still useful.
+>> 
+>> (As for the language to describe the devices of a machine and their 
+>> connections declaratively the device tree does just that but dts is not a 
+>> very user friendly descrtiption language so I haven't brought that up as a 
+>> possibility. But you may still could get some clues by looking at the 
+>> problems it had to solve to at least get a requirements for the machine 
+>> description language.)
+>> 
+>>> for heterogeneous emulation. Current price to pay is a verbose
+>>> imperative QDev API, hoping we'll get later a trivial declarative one
+>>> (like this single sysbus_create_simple call), where we shouldn't worry
+>>> about the order of low level calls, whether to use link or not, etc.
+>> 
+>> Having a detailed low level API does not prevent a more convenient for 
+>> current use higher level API on top so keeping that around for current 
+>> machines would allow you to chnage the low level API without having to 
+>> change all the board codes because you's only need to update the simple 
+>> high level API.
 >
-> Yes, it's an arm issue. s390x also works fine.
+> So what is your suggestion here, add a new complex helper to keep
+> a one-line style?
 >
-> > This patch changed things
-> > so it works a bit better (or at least differently) now, but
-> > still has some bugs. Maybe buggy uart migration?
->
-> I'm also seeing hangs when running the arm migration-test multiple times,=
-=20
-> but also without my UART patch here - so I assume the problem is not real=
-ly=20
-> related to the UART?
+> DeviceState *sysbus_create_simple_dma_link(const char *typename,
+>                                           hwaddr baseaddr,
+>                                           const char *linkname,
+>                                           Object *linkobj,
+>                                           qemu_irq irq);
 
-Yeah, I ended up figuring it out. A 11 year old TCG migration memory
-corruption bug!
+I think just having sysbus_realize_simple that does the same as 
+sysbus_create_simple minus creating the device would be enough because 
+then the cases where you need to set properties could still use it after 
+qdev_new or init and property_set but hide the realize and connecting the 
+device behind this single call.
 
-https://lists.gnu.org/archive/html/qemu-devel/2024-02/msg03486.html
+> I wonder why this is that important since you never modified
+> any of the files changed by this series:
 
-All the weirdness was just symptoms of that. The hang that arm usually
-got was target machine trying to lock the uart spinlock that is already
-locked (because the unlock store got lost in migration).
+For new people trying to contribute to QEMU QDev is overwhelming so having 
+some way to need less of it to do simple things would help them to get 
+started.
 
-powerpc and s390x were just luckier in avoiding the race, maybe the way
-their translation blocks around getchar code were constructed made the
-problem not show up easily or at all. I did end up causing problems
-for them by rearranging the code (test case is linked in that msg).
-
-Thanks,
-Nick
+Regards,
+BALATON Zoltan
+--3866299591-1407859581-1708344058=:44613--
 
