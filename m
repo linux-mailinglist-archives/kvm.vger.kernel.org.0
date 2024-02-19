@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-9054-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9052-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 556A0859F80
-	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 10:20:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51CC2859F7F
+	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 10:20:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11BC22834FF
-	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 09:20:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 843CA1C21CBC
+	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 09:20:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3830B24A0A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FCE024A06;
 	Mon, 19 Feb 2024 09:20:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rmMmWLNn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rOAU80Ko"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5654822F0E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 564D922F02;
 	Mon, 19 Feb 2024 09:20:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708334424; cv=none; b=EMzr72wQZIzjxXNb37Zk8Q7uYCZBCiwZoyUIBcmqE16oSM1mJFSPa8ruqkvy3ZzTgYb1wpgAwWumMIYsJTHwi7LtenFn2QrVrp/VRxSHNQxPIBbDiwo9IoCBsbgKD71J1Ixa1LD1kR7f2uSU9jQjoWAoBOd7etAORHibEqhPMG0=
+	t=1708334424; cv=none; b=ma90FXyCFnTbxb/kAdBohNO4S/MrKsfkz3pJPZeYfiwnMzijHjUtaWCc5CvLaff7Q4NAP0v8m6N54CfR+NQYaYUq1Hri4gMjj1XlAfsDhYv+ZBY34vxKl0w4RXC84Ej/H4BvcRq0GVnfjDWIeid5sBtTOtOBKL51OeeUJsRWKAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1708334424; c=relaxed/simple;
-	bh=o1Ph3OO1c4EdF4VuyObf2uVzB4bNnlJcJufbMYmIJXA=;
+	bh=vgRLwq7Xgg3mkOBLCbxDTHOAAGNZox10P/aUL125qb4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=mBcNx1iivMIw5n98sYBEHiTFnM0/tKF/JgYx1d0KsJUhNJMolHff0vOL/D003fPaajDmXxRvfAEaoR4CSwzFdD3RKDmYmg8AfppEE7FaZOfkSB94sfNsX3BG98iHjSfBOY1zf1tH/ujdwr1WNQaOEDFiP8Uxjm6i9SBgZgWQ+38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rmMmWLNn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE317C43394;
+	 MIME-Version; b=PG3B630JU7LKSwpj5Ag/mRvPNJK8ufL+tUlsZFSuPZaU0SfeyPYBOXY6qfLCiIpV+G7v0/bRBt7RFgtfKlNR/fCOYfuoMAhiXfL+m2u0dnJiMbyBXyrkm9mqN3Vov4Sj46Aqt9+3K2hhVoPjiTos/bGJ7r3T9qHWdXGje56/1lM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rOAU80Ko; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EAAB4C43399;
 	Mon, 19 Feb 2024 09:20:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708334423;
-	bh=o1Ph3OO1c4EdF4VuyObf2uVzB4bNnlJcJufbMYmIJXA=;
+	s=k20201202; t=1708334424;
+	bh=vgRLwq7Xgg3mkOBLCbxDTHOAAGNZox10P/aUL125qb4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rmMmWLNnjtkQ+2UxibAZipLUgaukJLI7EIA74lJdrMxEGlnZ93hie/shHjn0e4knL
-	 fQxU0qv3r/MT66AVw4gL+xSXbX4tx0YYA8Udscr0GkaGsISoVfVlRVvHQQBTcko2+6
-	 qKxYxUcMqfbypa6m5MTU1VvK25a6TuKyVubQ0efiqMaESRhfhyRcXEOAwQi/ZYG5Zt
-	 +DTQUag20T6wENZobhbiwa1Grq0j+zd4ea7zW8YwFgEcrJmceNiOpcMiUiKDrPIjhV
-	 xUVQ9Q/VDd9jl5FUZd2XWHdiyetUdwUBY32/TJ4lFl+/YonqUmk1wSr8jmvgdmF8hv
-	 1ODKvzQjFnUwg==
+	b=rOAU80Kops03hFfKf2Qg0pH6J12Cgt64kR7juF/o0W+hjzDrqaPgy/R/SPjXnJFhD
+	 cghurczpI28Hwv/pTRxM6jRqjmvr3h8ocdNkQw+xHGgd4gGoAYM1Ssm0wk/TTLPHba
+	 apQwAkgBrm4E06nhVyDrsQzikEHCVzvfKXXBXMYhL5TaA7xCcZH+hEbYBewkRg38w+
+	 +943CVkdGvmSFLxCIIIP1vbjM2jHy+p6//WGu4tdV3VhRd6oIyXSFvuQ3i8c+IAR2f
+	 iUQrFky1iDNHx9Gdn1XDG5PFsoc8JOmuMrJGlUrfRVOXFr+swtPmYa4ZgSkRFeNE45
+	 Ab32fs76aSWlg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rbzoz-004WBZ-SP;
-	Mon, 19 Feb 2024 09:20:21 +0000
+	id 1rbzp0-004WBZ-1r;
+	Mon, 19 Feb 2024 09:20:22 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -57,9 +57,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>
-Subject: [PATCH 02/13] KVM: arm64: Clarify ESR_ELx_ERET_ISS_ERET*
-Date: Mon, 19 Feb 2024 09:20:03 +0000
-Message-Id: <20240219092014.783809-3-maz@kernel.org>
+Subject: [PATCH 03/13] KVM: arm64: nv: Drop VCPU_HYP_CONTEXT flag
+Date: Mon, 19 Feb 2024 09:20:04 +0000
+Message-Id: <20240219092014.783809-4-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240219092014.783809-1-maz@kernel.org>
 References: <20240219092014.783809-1-maz@kernel.org>
@@ -75,56 +75,54 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-The ESR_ELx_ERET_ISS_ERET* macros are a bit confusing:
-
-- ESR_ELx_ERET_ISS_ERET really indicates that we have trapped an
-  ERETA* instruction, as opposed to an ERET
-
-- ESR_ELx_ERET_ISS_ERETA reallu indicates that we have trapped
-  an ERETAB instruction, as opposed to an ERETAA.
-
-Repaint the two helpers such as:
-
-- ESR_ELx_ERET_ISS_ERET becomes ESR_ELx_ERET_ISS_ERETA
-
-- ESR_ELx_ERET_ISS_ERETA becomes ESR_ELx_ERET_ISS_ERETAB
-
-At the same time, use BIT() instead of raw values.
+It has become obvious that HCR_EL2.NV serves the exact same use
+as VCPU_HYP_CONTEXT, only in an architectural way. So just drop
+the flag for good.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/esr.h | 4 ++--
- arch/arm64/kvm/handle_exit.c | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ arch/arm64/include/asm/kvm_host.h | 2 --
+ arch/arm64/kvm/hyp/vhe/switch.c   | 7 +------
+ 2 files changed, 1 insertion(+), 8 deletions(-)
 
-diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-index 353fe08546cf..72c7810ccf2c 100644
---- a/arch/arm64/include/asm/esr.h
-+++ b/arch/arm64/include/asm/esr.h
-@@ -290,8 +290,8 @@
- 		 ESR_ELx_SYS64_ISS_OP2_SHIFT))
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index a5ec4c7d3966..75eb8e170515 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -816,8 +816,6 @@ struct kvm_vcpu_arch {
+ #define DEBUG_STATE_SAVE_SPE	__vcpu_single_flag(iflags, BIT(5))
+ /* Save TRBE context if active  */
+ #define DEBUG_STATE_SAVE_TRBE	__vcpu_single_flag(iflags, BIT(6))
+-/* vcpu running in HYP context */
+-#define VCPU_HYP_CONTEXT	__vcpu_single_flag(iflags, BIT(7))
  
- /* ISS field definitions for ERET/ERETAA/ERETAB trapping */
--#define ESR_ELx_ERET_ISS_ERET		0x2
--#define ESR_ELx_ERET_ISS_ERETA		0x1
-+#define ESR_ELx_ERET_ISS_ERETA		BIT(1)
-+#define ESR_ELx_ERET_ISS_ERETAB		BIT(0)
+ /* SVE enabled for host EL0 */
+ #define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index 1581df6aec87..58415783fd53 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -197,7 +197,7 @@ static void early_exit_filter(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	 * If we were in HYP context on entry, adjust the PSTATE view
+ 	 * so that the usual helpers work correctly.
+ 	 */
+-	if (unlikely(vcpu_get_flag(vcpu, VCPU_HYP_CONTEXT))) {
++	if (unlikely(read_sysreg(hcr_el2) & HCR_NV)) {
+ 		u64 mode = *vcpu_cpsr(vcpu) & (PSR_MODE_MASK | PSR_MODE32_BIT);
  
- /*
-  * ISS field definitions for floating-point exception traps
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 617ae6dea5d5..0646c623d1da 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -219,7 +219,7 @@ static int kvm_handle_ptrauth(struct kvm_vcpu *vcpu)
+ 		switch (mode) {
+@@ -240,11 +240,6 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+ 	sysreg_restore_guest_state_vhe(guest_ctxt);
+ 	__debug_switch_to_guest(vcpu);
  
- static int kvm_handle_eret(struct kvm_vcpu *vcpu)
- {
--	if (kvm_vcpu_get_esr(vcpu) & ESR_ELx_ERET_ISS_ERET)
-+	if (kvm_vcpu_get_esr(vcpu) & ESR_ELx_ERET_ISS_ERETA)
- 		return kvm_handle_ptrauth(vcpu);
- 
- 	/*
+-	if (is_hyp_ctxt(vcpu))
+-		vcpu_set_flag(vcpu, VCPU_HYP_CONTEXT);
+-	else
+-		vcpu_clear_flag(vcpu, VCPU_HYP_CONTEXT);
+-
+ 	do {
+ 		/* Jump in the fire! */
+ 		exit_code = __guest_enter(vcpu);
 -- 
 2.39.2
 
