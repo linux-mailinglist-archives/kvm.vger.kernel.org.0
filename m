@@ -1,70 +1,69 @@
-Return-Path: <kvm+bounces-8996-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-8997-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7B42859ACB
-	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 03:41:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9690859ACE
+	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 03:42:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 925982814E0
-	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 02:41:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 217262813F0
+	for <lists+kvm@lfdr.de>; Mon, 19 Feb 2024 02:42:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D2E34400;
-	Mon, 19 Feb 2024 02:41:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B387A3C30;
+	Mon, 19 Feb 2024 02:42:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S+OGnFGN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ECg+JqKa"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9722BEDD;
-	Mon, 19 Feb 2024 02:41:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBD171FB3;
+	Mon, 19 Feb 2024 02:42:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708310472; cv=none; b=s1R8H3wTOEPn9wvvlSM0FtCFBbIsFZOpNyU4lNZoRuz0urR4g6ZmcVxgZpkPEtKrz7HDOvrm+oHDTdYwFEsM//2L09UkuIY5857t6db1dP3E9HTAHWMBgEytiK0rrVq86gWtuPf4uKLQZsKNmX269egWVRd4Un49bhsLZMN6LMI=
+	t=1708310558; cv=none; b=FAO+yhcwDCx70S1fCqciYXgJbL+YZq07USnyMAawYzyopdsD9bZT5s6g5l6LHO585CT+peuXyGgiRggp9/ZOoblcmSQBCUo5njdUDoxWNzrj0OaoWzRDXgMgCX/Vm1yPTl3WyY8aRwSECYfJGbrETJhuW4PrwuTRVM6Vgruk9eg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708310472; c=relaxed/simple;
-	bh=n/DOB7UnLd+txgeMjMhK1a3w80QrfLgIcdMDu/kmSzg=;
+	s=arc-20240116; t=1708310558; c=relaxed/simple;
+	bh=9eS8p4zQXK+QfbnY/+cqnnC0ZGwjNn2ED2zDqwqqimg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mG+EnxwE+F5rUSggWUjMZUdtnecw+I607VSAQnHQenXEeFy7lDKAItuQMyI2FDilaNygr/m/QtpZLb3gBV+I5k2BVlmW7yDwVNLtJ/mhfLlUNhtf/Cg/QEPqmBWZyuq3CU/tabP5fIKejOC7av+cJz1j9bcGCKPlQF4Vts7CKNQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S+OGnFGN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 127CAC43394;
-	Mon, 19 Feb 2024 02:41:12 +0000 (UTC)
+	 To:Cc:Content-Type; b=rtSyn7uxsOz9p++M2r1njh3hCow8hoj1Zh0qffftc9to988VdhuFSyUTAnMuLR1/Z3HzsEq+kd2U9InzBCu45HnNzbmezXB54IzlH7kw1VsIOf82fiFT0RiOAAsKoouyEfM/nvKkH/8km3/qh5y5fVlukLmxS2shvRrKzbctNQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ECg+JqKa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0134C433A6;
+	Mon, 19 Feb 2024 02:42:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708310472;
-	bh=n/DOB7UnLd+txgeMjMhK1a3w80QrfLgIcdMDu/kmSzg=;
+	s=k20201202; t=1708310558;
+	bh=9eS8p4zQXK+QfbnY/+cqnnC0ZGwjNn2ED2zDqwqqimg=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=S+OGnFGNjWQfCbxi9spgZO3ZgUu3iOx4/IVtMC2fFZ1mdPkopxJNgaGV7YNl5O7X+
-	 mEVDqZweuwbhJ6sX2pScf6dvDARQ4l2kEomupAXAGWFr3K+ynwdjQ2cke5DT4AkfrF
-	 R/wpzatt+FZBsoo3Y6rMTePM6W8ZoD0bqdV6sqK1rSwQ6dcLVRWn1iZOi9GzTpKfiB
-	 BM22TPSOuMhGC59jx0aXXcsrHyyyWw4z9duVkfuC2qlqsTlvOxEdZujISm3LdvaMFP
-	 fdhZ1heA5dujJoTOaIhh4fEb5cTOZHYVmjR+FB1uzIgOCE2CIMpIjUjUMpDNOnmy2K
-	 Z4U7QbFqnnZew==
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-512b700c8ebso249391e87.0;
-        Sun, 18 Feb 2024 18:41:11 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWQobqZhGdFsMc7FnEXUQ0YVSkNl7m1vRWllC/7Zgj9hLXkuJhW735sUuRpbcWnFeZLqX9gsKFwKd7iWwUolqzdPvPe4rMvZUP0CGtwUDusaGsMmayFg42QMSxFkt0BNJ2P
-X-Gm-Message-State: AOJu0YxEUmW3wB8RMOcVeqHtD8zkh3uIZqQVhhCg6s6g9LTqAlkFKlyU
-	IWQsvo20GZpJ62G3gPtBXBPq83mNHdjM2UuFICqtSMfOlgGdVKptlnGaxQrbs8YK2kQbsQKTVMz
-	CFv0E/PDrZq7LU/NV7VlpNY1xftM=
-X-Google-Smtp-Source: AGHT+IGkf86sxr3E88riN9LY+fLnYRXO7KBtdBQuStB4h/v7RHbcSd+YPmDerO6Lb24C5vHUo5MWSE1B85bs0/AHILI=
-X-Received: by 2002:a05:6512:3d9e:b0:511:61b4:65c1 with SMTP id
- k30-20020a0565123d9e00b0051161b465c1mr8974984lfv.39.1708310470192; Sun, 18
- Feb 2024 18:41:10 -0800 (PST)
+	b=ECg+JqKaXHCHcmbtKPFiYqw9gPpZvbPWu+TCbSjv+XAUXOPQt1H6KKcVT0WKkS46y
+	 mdajhbZgKfaGiwnh2/Mi/ya00EmB5ykz5h73WwVGODZZwIzEapRPCIixfd3EApxCRI
+	 eNyHko1BOTalMcu8+/RgzjulLfxC5q7UN1e45DgY4tBct3BakSHmZpczLV5elefRZO
+	 zGS2MS6//jix2SByrolbDFCKGv3RkRwdQHYCTtWn+Ahks+4rmnNuLe0eZHmqmLF4IS
+	 yzXzWkRyfCuvaKBcsRQvvECSzGXh0zcv6BIArPjtJbqSUjuvmLXt5XSJ06zYnFgvRY
+	 afb4m2K7BVLBQ==
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-512b36bb97eso344447e87.1;
+        Sun, 18 Feb 2024 18:42:38 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXqMfDHcUwangtFkCDleVICGVAuwkbFJLwIDTsJFY2MPMKJXT8esvAsskjJoPpWHGAx9tHHc1HSKXBxLPnP8heF6nWNFDeuI339LAqLTEmhZRpILNK91c67V7oFYFdMunOK
+X-Gm-Message-State: AOJu0YzRi6nRMke/fus86je7uF0L9Cmhqmj/FJ+J2ZYSLwF2aEdK3oBV
+	kzjdNmoj1zkB1XiRjod7WYLbzTotV5++F9vuT0OPIgY9EDhz10gTWafqO1MM74vhnPH+kJA6p4/
+	J2qpSZXNt7N2pOp4ECbZeeiG0tf0=
+X-Google-Smtp-Source: AGHT+IFih8FMaRh4XkYmYjWWMY3dOBWdViA/S8qVJ6uitg1YCTaF2WSsy79D2iTbUoqbmWGGL99mVoBXtQ3Y+uk0Cyc=
+X-Received: by 2002:a05:6512:230a:b0:510:323d:6401 with SMTP id
+ o10-20020a056512230a00b00510323d6401mr8619302lfu.53.1708310556963; Sun, 18
+ Feb 2024 18:42:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240201031950.3225626-1-maobibo@loongson.cn> <20240201031950.3225626-3-maobibo@loongson.cn>
-In-Reply-To: <20240201031950.3225626-3-maobibo@loongson.cn>
+References: <20240201031950.3225626-1-maobibo@loongson.cn> <20240201031950.3225626-5-maobibo@loongson.cn>
+In-Reply-To: <20240201031950.3225626-5-maobibo@loongson.cn>
 From: Huacai Chen <chenhuacai@kernel.org>
-Date: Mon, 19 Feb 2024 10:41:07 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H4f=m2xX7_WF3YkRbxWyVAyBLemNv3OVq-AbqtsKKtCyA@mail.gmail.com>
-Message-ID: <CAAhV-H4f=m2xX7_WF3YkRbxWyVAyBLemNv3OVq-AbqtsKKtCyA@mail.gmail.com>
-Subject: Re: [PATCH v4 2/6] LoongArch: KVM: Add hypercall instruction
- emulation support
+Date: Mon, 19 Feb 2024 10:42:35 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H7dXsU+WM172PWi_m8TYpYmzG_SW-vVQcdnOdETUxQ9+w@mail.gmail.com>
+Message-ID: <CAAhV-H7dXsU+WM172PWi_m8TYpYmzG_SW-vVQcdnOdETUxQ9+w@mail.gmail.com>
+Subject: Re: [PATCH v4 4/6] LoongArch: Add paravirt interface for guest kernel
 To: Bibo Mao <maobibo@loongson.cn>
 Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, Juergen Gross <jgross@suse.com>, 
 	Paolo Bonzini <pbonzini@redhat.com>, loongarch@lists.linux.dev, 
@@ -78,111 +77,211 @@ Hi, Bibo,
 On Thu, Feb 1, 2024 at 11:19=E2=80=AFAM Bibo Mao <maobibo@loongson.cn> wrot=
 e:
 >
-> On LoongArch system, hypercall instruction is supported when system
-> runs on VM mode. This patch adds dummy function with hypercall
-> instruction emulation, rather than inject EXCCODE_INE invalid
-> instruction exception.
+> The patch adds paravirt interface for guest kernel, function
+> pv_guest_initi() firstly checks whether system runs on VM mode. If kernel
+> runs on VM mode, it will call function kvm_para_available() to detect
+> whether current VMM is KVM hypervisor. And the paravirt function can work
+> only if current VMM is KVM hypervisor, since there is only KVM hypervisor
+> supported on LoongArch now.
+>
+> This patch only adds paravirt interface for guest kernel, however there
+> is not effective pv functions added here.
 >
 > Signed-off-by: Bibo Mao <maobibo@loongson.cn>
 > ---
->  arch/loongarch/include/asm/Kbuild      |  1 -
->  arch/loongarch/include/asm/kvm_para.h  | 26 ++++++++++++++++++++++++++
->  arch/loongarch/include/uapi/asm/Kbuild |  2 --
->  arch/loongarch/kvm/exit.c              | 10 ++++++++++
->  4 files changed, 36 insertions(+), 3 deletions(-)
->  create mode 100644 arch/loongarch/include/asm/kvm_para.h
->  delete mode 100644 arch/loongarch/include/uapi/asm/Kbuild
+>  arch/loongarch/Kconfig                        |  9 ++++
+>  arch/loongarch/include/asm/kvm_para.h         |  7 ++++
+>  arch/loongarch/include/asm/paravirt.h         | 27 ++++++++++++
+>  .../include/asm/paravirt_api_clock.h          |  1 +
+>  arch/loongarch/kernel/Makefile                |  1 +
+>  arch/loongarch/kernel/paravirt.c              | 41 +++++++++++++++++++
+>  arch/loongarch/kernel/setup.c                 |  2 +
+>  7 files changed, 88 insertions(+)
+>  create mode 100644 arch/loongarch/include/asm/paravirt.h
+>  create mode 100644 arch/loongarch/include/asm/paravirt_api_clock.h
+>  create mode 100644 arch/loongarch/kernel/paravirt.c
 >
-> diff --git a/arch/loongarch/include/asm/Kbuild b/arch/loongarch/include/a=
-sm/Kbuild
-> index 93783fa24f6e..22991a6f0e2b 100644
-> --- a/arch/loongarch/include/asm/Kbuild
-> +++ b/arch/loongarch/include/asm/Kbuild
-> @@ -23,4 +23,3 @@ generic-y +=3D poll.h
->  generic-y +=3D param.h
->  generic-y +=3D posix_types.h
->  generic-y +=3D resource.h
-> -generic-y +=3D kvm_para.h
+> diff --git a/arch/loongarch/Kconfig b/arch/loongarch/Kconfig
+> index 10959e6c3583..817a56dff80f 100644
+> --- a/arch/loongarch/Kconfig
+> +++ b/arch/loongarch/Kconfig
+> @@ -585,6 +585,15 @@ config CPU_HAS_PREFETCH
+>         bool
+>         default y
+>
+> +config PARAVIRT
+> +       bool "Enable paravirtualization code"
+> +       depends on AS_HAS_LVZ_EXTENSION
+> +       help
+> +          This changes the kernel so it can modify itself when it is run
+> +         under a hypervisor, potentially improving performance significa=
+ntly
+> +         over full virtualization.  However, when run without a hypervis=
+or
+> +         the kernel is theoretically slower and slightly larger.
+> +
+>  config ARCH_SUPPORTS_KEXEC
+>         def_bool y
+>
 > diff --git a/arch/loongarch/include/asm/kvm_para.h b/arch/loongarch/inclu=
 de/asm/kvm_para.h
-> new file mode 100644
-> index 000000000000..9425d3b7e486
-> --- /dev/null
+> index 9425d3b7e486..41200e922a82 100644
+> --- a/arch/loongarch/include/asm/kvm_para.h
 > +++ b/arch/loongarch/include/asm/kvm_para.h
-> @@ -0,0 +1,26 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +#ifndef _ASM_LOONGARCH_KVM_PARA_H
-> +#define _ASM_LOONGARCH_KVM_PARA_H
-> +
+> @@ -2,6 +2,13 @@
+>  #ifndef _ASM_LOONGARCH_KVM_PARA_H
+>  #define _ASM_LOONGARCH_KVM_PARA_H
+>
 > +/*
-> + * LoongArch hypcall return code
-Maybe using "hypercall" in comments is better.
-
+> + * Hypcall code field
 > + */
-> +#define KVM_HC_STATUS_SUCCESS          0
-> +#define KVM_HC_INVALID_CODE            -1UL
-> +#define KVM_HC_INVALID_PARAMETER       -2UL
-Maybe KVM_HCALL_SUCCESS/KVM_HCALL_INVALID_CODE/KVM_HCALL_PARAMETER is bette=
-r.
+> +#define HYPERVISOR_KVM                 1
+> +#define HYPERVISOR_VENDOR_SHIFT                8
+> +#define HYPERCALL_CODE(vendor, code)   ((vendor << HYPERVISOR_VENDOR_SHI=
+FT) + code)
+> +
+>  /*
+>   * LoongArch hypcall return code
+>   */
+> diff --git a/arch/loongarch/include/asm/paravirt.h b/arch/loongarch/inclu=
+de/asm/paravirt.h
+> new file mode 100644
+> index 000000000000..b64813592ba0
+> --- /dev/null
+> +++ b/arch/loongarch/include/asm/paravirt.h
+> @@ -0,0 +1,27 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +#ifndef _ASM_LOONGARCH_PARAVIRT_H
+> +#define _ASM_LOONGARCH_PARAVIRT_H
+> +
+> +#ifdef CONFIG_PARAVIRT
+> +#include <linux/static_call_types.h>
+> +struct static_key;
+> +extern struct static_key paravirt_steal_enabled;
+> +extern struct static_key paravirt_steal_rq_enabled;
+> +
+> +u64 dummy_steal_clock(int cpu);
+> +DECLARE_STATIC_CALL(pv_steal_clock, dummy_steal_clock);
+> +
+> +static inline u64 paravirt_steal_clock(int cpu)
+> +{
+> +       return static_call(pv_steal_clock)(cpu);
+> +}
+The steal time code can be removed in this patch, I think.
+
+> +
+> +int pv_guest_init(void);
+> +#else
+> +static inline int pv_guest_init(void)
+> +{
+> +       return 0;
+> +}
+> +
+> +#endif // CONFIG_PARAVIRT
+> +#endif
+> diff --git a/arch/loongarch/include/asm/paravirt_api_clock.h b/arch/loong=
+arch/include/asm/paravirt_api_clock.h
+> new file mode 100644
+> index 000000000000..65ac7cee0dad
+> --- /dev/null
+> +++ b/arch/loongarch/include/asm/paravirt_api_clock.h
+> @@ -0,0 +1 @@
+> +#include <asm/paravirt.h>
+> diff --git a/arch/loongarch/kernel/Makefile b/arch/loongarch/kernel/Makef=
+ile
+> index 3c808c680370..662e6e9de12d 100644
+> --- a/arch/loongarch/kernel/Makefile
+> +++ b/arch/loongarch/kernel/Makefile
+> @@ -48,6 +48,7 @@ obj-$(CONFIG_MODULES)         +=3D module.o module-sect=
+ions.o
+>  obj-$(CONFIG_STACKTRACE)       +=3D stacktrace.o
+>
+>  obj-$(CONFIG_PROC_FS)          +=3D proc.o
+> +obj-$(CONFIG_PARAVIRT)         +=3D paravirt.o
+>
+>  obj-$(CONFIG_SMP)              +=3D smp.o
+>
+> diff --git a/arch/loongarch/kernel/paravirt.c b/arch/loongarch/kernel/par=
+avirt.c
+> new file mode 100644
+> index 000000000000..21d01d05791a
+> --- /dev/null
+> +++ b/arch/loongarch/kernel/paravirt.c
+> @@ -0,0 +1,41 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +#include <linux/export.h>
+> +#include <linux/types.h>
+> +#include <linux/jump_label.h>
+> +#include <linux/kvm_para.h>
+> +#include <asm/paravirt.h>
+> +#include <linux/static_call.h>
+> +
+> +struct static_key paravirt_steal_enabled;
+> +struct static_key paravirt_steal_rq_enabled;
+> +
+> +static u64 native_steal_clock(int cpu)
+> +{
+> +       return 0;
+> +}
+> +
+> +DEFINE_STATIC_CALL(pv_steal_clock, native_steal_clock);
+The steal time code can be removed in this patch, I think.
+
+> +
+> +static bool kvm_para_available(void)
+> +{
+> +       static int hypervisor_type;
+> +       int config;
+> +
+> +       if (!hypervisor_type) {
+> +               config =3D read_cpucfg(CPUCFG_KVM_SIG);
+> +               if (!memcmp(&config, KVM_SIGNATURE, 4))
+> +                       hypervisor_type =3D HYPERVISOR_KVM;
+> +       }
+> +
+> +       return hypervisor_type =3D=3D HYPERVISOR_KVM;
+> +}
+> +
+> +int __init pv_guest_init(void)
+> +{
+> +       if (!cpu_has_hypervisor)
+> +               return 0;
+> +       if (!kvm_para_available())
+> +               return 0;
+> +
+> +       return 1;
+> +}
+> diff --git a/arch/loongarch/kernel/setup.c b/arch/loongarch/kernel/setup.=
+c
+> index edf2bba80130..de5c36dccc49 100644
+> --- a/arch/loongarch/kernel/setup.c
+> +++ b/arch/loongarch/kernel/setup.c
+> @@ -43,6 +43,7 @@
+>  #include <asm/efi.h>
+>  #include <asm/loongson.h>
+>  #include <asm/numa.h>
+> +#include <asm/paravirt.h>
+>  #include <asm/pgalloc.h>
+>  #include <asm/sections.h>
+>  #include <asm/setup.h>
+> @@ -367,6 +368,7 @@ void __init platform_init(void)
+>         pr_info("The BIOS Version: %s\n", b_info.bios_version);
+>
+>         efi_runtime_init();
+> +       pv_guest_init();
+I prefer use CONFIG_PARAVIRT here, though you have a dummy version for
+!CONFIG_PARAVIRT, I think it is better to let others clearly know that
+PARAVIRT is an optional feature.
 
 Huacai
 
-> +
-> +static inline unsigned int kvm_arch_para_features(void)
-> +{
-> +       return 0;
-> +}
-> +
-> +static inline unsigned int kvm_arch_para_hints(void)
-> +{
-> +       return 0;
-> +}
-> +
-> +static inline bool kvm_check_and_clear_guest_paused(void)
-> +{
-> +       return false;
-> +}
-> +#endif /* _ASM_LOONGARCH_KVM_PARA_H */
-> diff --git a/arch/loongarch/include/uapi/asm/Kbuild b/arch/loongarch/incl=
-ude/uapi/asm/Kbuild
-> deleted file mode 100644
-> index 4aa680ca2e5f..000000000000
-> --- a/arch/loongarch/include/uapi/asm/Kbuild
-> +++ /dev/null
-> @@ -1,2 +0,0 @@
-> -# SPDX-License-Identifier: GPL-2.0
-> -generic-y +=3D kvm_para.h
-> diff --git a/arch/loongarch/kvm/exit.c b/arch/loongarch/kvm/exit.c
-> index ed1d89d53e2e..d15c71320a11 100644
-> --- a/arch/loongarch/kvm/exit.c
-> +++ b/arch/loongarch/kvm/exit.c
-> @@ -685,6 +685,15 @@ static int kvm_handle_lasx_disabled(struct kvm_vcpu =
-*vcpu)
->         return RESUME_GUEST;
+
+Huacai
 >  }
 >
-> +static int kvm_handle_hypcall(struct kvm_vcpu *vcpu)
-> +{
-> +       update_pc(&vcpu->arch);
-> +
-> +       /* Treat it as noop intruction, only set return value */
-> +       vcpu->arch.gprs[LOONGARCH_GPR_A0] =3D KVM_HC_INVALID_CODE;
-> +       return RESUME_GUEST;
-> +}
-> +
->  /*
->   * LoongArch KVM callback handling for unimplemented guest exiting
->   */
-> @@ -716,6 +725,7 @@ static exit_handle_fn kvm_fault_tables[EXCCODE_INT_ST=
-ART] =3D {
->         [EXCCODE_LSXDIS]                =3D kvm_handle_lsx_disabled,
->         [EXCCODE_LASXDIS]               =3D kvm_handle_lasx_disabled,
->         [EXCCODE_GSPR]                  =3D kvm_handle_gspr,
-> +       [EXCCODE_HVC]                   =3D kvm_handle_hypcall,
->  };
->
->  int kvm_handle_fault(struct kvm_vcpu *vcpu, int fault)
+>  static void __init check_kernel_sections_mem(void)
 > --
 > 2.39.3
+>
 >
 
