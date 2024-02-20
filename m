@@ -1,189 +1,188 @@
-Return-Path: <kvm+bounces-9201-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9202-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FBB285BF85
-	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 16:10:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A18585BFA8
+	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 16:16:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 57DE3B223BB
-	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 15:10:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 410A21F23ABE
+	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 15:16:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34B6576020;
-	Tue, 20 Feb 2024 15:10:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eqrFzoWg"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF9D67602A;
+	Tue, 20 Feb 2024 15:16:06 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C6CF71B4A
-	for <kvm@vger.kernel.org>; Tue, 20 Feb 2024 15:10:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B224774E30
+	for <kvm@vger.kernel.org>; Tue, 20 Feb 2024 15:16:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708441843; cv=none; b=DW6EOYgTNWNtN+Py9Q0e42QjxKltbDhwYTLG+p8mj3hf7FsYSa1pP311T1SAcJRVy83JTJe3syHwxAlwBspNF5hHxXjmaYyQAUojmbInNVDnIwZFSmK6HullKet8QcI9Ig8ZRb/sdvWMUd1wxw4BSR0RS3BKKZLmmA10+vy2UUg=
+	t=1708442166; cv=none; b=s5cdYll8qHp2L5iZSu5G3/mVvA4shOx5ygEb6v0Qi9W0Xiv5T2fbvMNBxPPq2EiA/NBkkbJvfuos6hYCJZrZL32XTHpBDXE1OPBG8DqBhVDR40kHItgyFxojIVxbRCncLZB+3vH6D76PCJe/W1iaMB0y3JH8aqHOgx1o7I6VIS8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708441843; c=relaxed/simple;
-	bh=MNul5Z8YS8ETylWhyngw23B0/F5Ht+fLakLw7oSXUeU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fE1PRacUcyju8pdrXm4yIELqCAeRR0bQ/rWBh1Qwuia4q/extzWllbD9FVt32SSgaKPdMESrl9Gp53Q5AH74WkNSJ9dZebLI5dsf/H05I/30k4FaoC1c8GwexDjFDNvrhXKtBpLioZh3TdJyT5m7yPmZTZjAR3d97mAsc+SL77U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eqrFzoWg; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708441842; x=1739977842;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=MNul5Z8YS8ETylWhyngw23B0/F5Ht+fLakLw7oSXUeU=;
-  b=eqrFzoWg0ipitX6cK0nLdnN4IMHl7i0dpudU51IfUo2hwwyU+koS0woa
-   DGN9OQnCWiacSruHD1so8FM6NuR1C4KWosOjbAIvZwHJ3nkO1o8kai287
-   nRTByNx+td3+28o4pu3NdGdnrRD8gbdpRAfhBLy6be1gF+EUHw2yCZTyz
-   No6gwZuuEMNO1mk3lQpO9v5X9sq+IsJS3FbcLvhcWQ40tmhCTfJFAGUm7
-   AueVln/xqUNCB48YMc/yWAvcdOkQn4PSh+4chK3Z69TncOIQL0ScH5S3R
-   w9fLX8HwqN51Aw5xshn5MB/NvuY/iLQYjnmz3jqpJ5UYu7pMiEmoWfFOC
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10990"; a="13960861"
-X-IronPort-AV: E=Sophos;i="6.06,174,1705392000"; 
-   d="scan'208";a="13960861"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2024 07:10:39 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,174,1705392000"; 
-   d="scan'208";a="4845066"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.12.199]) ([10.93.12.199])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2024 07:10:33 -0800
-Message-ID: <cf9e91ea-825a-444c-9625-a571fdc3265a@intel.com>
-Date: Tue, 20 Feb 2024 23:10:29 +0800
+	s=arc-20240116; t=1708442166; c=relaxed/simple;
+	bh=R2L5t2PPpijixcH4eTUlchi9RHZP1nmoGuV8hs5450s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AJ6M17YbgHbj2g//t5zHb0SSsy3bK/9u5UPzuX3nSMYLe5C4kf2+z2dYWOdbJDRP+/ElycxKa7Tcn5WD0wRuSX9WW/vYW/igocDs7swvTthFeQ56zLZdFWfzxLJJ0hs3Rdvs5KuivexlQxPUXhDmArylTaB/fNxr7tldPZfjfDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 008E4FEC;
+	Tue, 20 Feb 2024 07:16:43 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A34E53F73F;
+	Tue, 20 Feb 2024 07:16:02 -0800 (PST)
+Date: Tue, 20 Feb 2024 15:16:00 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH 04/13] KVM: arm64: nv: Configure HCR_EL2 for FEAT_NV2
+Message-ID: <20240220151600.GC8575@e124191.cambridge.arm.com>
+References: <20240219092014.783809-1-maz@kernel.org>
+ <20240219092014.783809-5-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 29/66] i386/tdx: Support user configurable
- mrconfigid/mrowner/mrownerconfig
-Content-Language: en-US
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, David Hildenbrand
- <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
- <philmd@linaro.org>, Cornelia Huck <cohuck@redhat.com>,
- =?UTF-8?Q?Daniel_P=2EBerrang=C3=A9?= <berrange@redhat.com>,
- Eric Blake <eblake@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
- qemu-devel@nongnu.org, kvm@vger.kernel.org,
- Michael Roth <michael.roth@amd.com>, Sean Christopherson
- <seanjc@google.com>, Claudio Fontana <cfontana@suse.de>,
- Gerd Hoffmann <kraxel@redhat.com>, Isaku Yamahata
- <isaku.yamahata@gmail.com>, Chenyi Qiang <chenyi.qiang@intel.com>
-References: <20240125032328.2522472-1-xiaoyao.li@intel.com>
- <20240125032328.2522472-30-xiaoyao.li@intel.com>
- <875xykfwmf.fsf@pond.sub.org>
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <875xykfwmf.fsf@pond.sub.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240219092014.783809-5-maz@kernel.org>
 
-On 2/19/2024 8:48 PM, Markus Armbruster wrote:
-> Xiaoyao Li <xiaoyao.li@intel.com> writes:
-> 
->> From: Isaku Yamahata <isaku.yamahata@intel.com>
->>
->> Three sha384 hash values, mrconfigid, mrowner and mrownerconfig, of a TD
->> can be provided for TDX attestation. Detailed meaning of them can be
->> found: https://lore.kernel.org/qemu-devel/31d6dbc1-f453-4cef-ab08-4813f4e0ff92@intel.com/
->>
->> Allow user to specify those values via property mrconfigid, mrowner and
->> mrownerconfig. They are all in base64 format.
->>
->> example
->> -object tdx-guest, \
->>    mrconfigid=ASNFZ4mrze8BI0VniavN7wEjRWeJq83vASNFZ4mrze8BI0VniavN7wEjRWeJq83v,\
->>    mrowner=ASNFZ4mrze8BI0VniavN7wEjRWeJq83vASNFZ4mrze8BI0VniavN7wEjRWeJq83v,\
->>    mrownerconfig=ASNFZ4mrze8BI0VniavN7wEjRWeJq83vASNFZ4mrze8BI0VniavN7wEjRWeJq83v
->>
->> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
->> Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
->> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
->>
->> ---
->> Changes in v4:
->>   - describe more of there fields in qom.json
->>   - free the old value before set new value to avoid memory leak in
->>     _setter(); (Daniel)
->>
->> Changes in v3:
->>   - use base64 encoding instread of hex-string;
->> ---
->>   qapi/qom.json         | 14 ++++++-
->>   target/i386/kvm/tdx.c | 87 +++++++++++++++++++++++++++++++++++++++++++
->>   target/i386/kvm/tdx.h |  3 ++
->>   3 files changed, 103 insertions(+), 1 deletion(-)
->>
->> diff --git a/qapi/qom.json b/qapi/qom.json
->> index 2177f3101382..15445f9e41fc 100644
->> --- a/qapi/qom.json
->> +++ b/qapi/qom.json
->> @@ -905,10 +905,22 @@
->>   #     pages.  Some guest OS (e.g., Linux TD guest) may require this to
->>   #     be set, otherwise they refuse to boot.
->>   #
->> +# @mrconfigid: ID for non-owner-defined configuration of the guest TD,
->> +#     e.g., run-time or OS configuration.  base64 encoded SHA384 digest.
-> 
-> "base64 encoded SHA384" is not a sentence.
-> 
-> Double-checking: the data being hashed here is the "non-owner-defined
-> configuration of the guest TD", and the resulting hash is the "ID"?
+Hi,
 
-yes. The "ID" here means the resulting hash.
+On Mon, Feb 19, 2024 at 09:20:05AM +0000, Marc Zyngier wrote:
+> Add the HCR_EL2 configuration for FEAT_NV2, adding the required
+> bits for running a guest hypervisor, and overall merging the
+> allowed bits provided by the guest.
+> 
+> This heavily replies on unavaliable features being sanitised
+> when the HCR_EL2 shadow register is accessed, and only a couple
+> of bits must be explicitly disabled.
+> 
+> Non-NV guests are completely unaffected by any of this.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/sysreg.h         |  1 +
+>  arch/arm64/kvm/hyp/include/hyp/switch.h |  4 +--
+>  arch/arm64/kvm/hyp/nvhe/switch.c        |  2 +-
+>  arch/arm64/kvm/hyp/vhe/switch.c         | 34 ++++++++++++++++++++++++-
+>  4 files changed, 36 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index 9e8999592f3a..a5361d9032a4 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -498,6 +498,7 @@
+>  #define SYS_TCR_EL2			sys_reg(3, 4, 2, 0, 2)
+>  #define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
+>  #define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
+> +#define SYS_VNCR_EL2			sys_reg(3, 4, 2, 2, 0)
+>  
+>  #define SYS_TRFCR_EL2			sys_reg(3, 4, 1, 2, 1)
+>  #define SYS_VNCR_EL2			sys_reg(3, 4, 2, 2, 0)
 
-The reason to use "ID" here because in the TDX spec, it's description is
+I'm seeing double! (SYS_VNCR_EL2 is already defined a few lines down)
 
-   Software-defined ID for non-owner-defined configuration of the guest
-   TD - e.g., run-time or OS configuration.
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index e3fcf8c4d5b4..f5f701f309a9 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -271,10 +271,8 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
+>  	__deactivate_traps_hfgxtr(vcpu);
+>  }
+>  
+> -static inline void ___activate_traps(struct kvm_vcpu *vcpu)
+> +static inline void ___activate_traps(struct kvm_vcpu *vcpu, u64 hcr)
+>  {
+> -	u64 hcr = vcpu->arch.hcr_el2;
+> -
+>  	if (cpus_have_final_cap(ARM64_WORKAROUND_CAVIUM_TX2_219_TVM))
+>  		hcr |= HCR_TVM;
+>  
+> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+> index c50f8459e4fc..4103625e46c5 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+> @@ -40,7 +40,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+>  {
+>  	u64 val;
+>  
+> -	___activate_traps(vcpu);
+> +	___activate_traps(vcpu, vcpu->arch.hcr_el2);
+>  	__activate_traps_common(vcpu);
+>  
+>  	val = vcpu->arch.cptr_el2;
+> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> index 58415783fd53..29f59c374f7a 100644
+> --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> @@ -33,11 +33,43 @@ DEFINE_PER_CPU(struct kvm_host_data, kvm_host_data);
+>  DEFINE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
+>  DEFINE_PER_CPU(unsigned long, kvm_hyp_vector);
+>  
+> +/*
+> + * HCR_EL2 bits that the NV guest can freely change (no RES0/RES1
+> + * semantics, irrespective of the configuration), but that cannot be
+> + * applied to the actual HW as things would otherwise break badly.
+> + *
+> + * - TGE: we want to use EL1, which is incompatible with it being set
 
-If ID is confusing, how about
+Can you make this a bit clearer:
 
-   SHA384 hash of non-owner-defined configuration of the guest TD, e.g.,
-   run-time of OS configuration.  It's base64 encoded.
+	we want the guest to use EL1
 
->> +#
->> +# @mrowner: ID for the guest TD’s owner.  base64 encoded SHA384 digest.
-> 
-> Likewise.
-> 
->> +#
->> +# @mrownerconfig: ID for owner-defined configuration of the guest TD,
->> +#     e.g., specific to the workload rather than the run-time or OS.
->> +#     base64 encoded SHA384 digest.
-> 
-> Likewise.
-> 
->> +#
->>   # Since: 9.0
->>   ##
->>   { 'struct': 'TdxGuestProperties',
->> -  'data': { '*sept-ve-disable': 'bool' } }
->> +  'data': { '*sept-ve-disable': 'bool',
->> +            '*mrconfigid': 'str',
->> +            '*mrowner': 'str',
->> +            '*mrownerconfig': 'str' } }
-> 
-> The new members are optional, but their description in the doc comment
-> doesn't explain behavior when present vs. behavior when absent.
-> 
->>   
->>   ##
->>   # @ThreadContextProperties:
-> 
-> [...]
-> 
-> 
+Assuming I've understood correctly. I first read it as 'we' == kvm.
 
+> + *
+> + * - API/APK: for hysterical raisins, we enable PAuth lazily, which
+> + *   means that the guest's bits cannot be directly applied (we really
+> + *   want to see the traps). Revisit this at some point.
+> + */
+> +#define NV_HCR_GUEST_EXCLUDE	(HCR_TGE | HCR_API | HCR_APK)
+> +
+> +static u64 __compute_hcr(struct kvm_vcpu *vcpu)
+> +{
+> +	u64 hcr = vcpu->arch.hcr_el2;
+> +
+> +	if (!vcpu_has_nv(vcpu))
+> +		return hcr;
+> +
+> +	if (is_hyp_ctxt(vcpu)) {
+> +		hcr |= HCR_NV | HCR_NV2 | HCR_AT | HCR_TTLB;
+> +
+> +		if (!vcpu_el2_e2h_is_set(vcpu))
+> +			hcr |= HCR_NV1;
+> +
+> +		write_sysreg_s(vcpu->arch.ctxt.vncr_array, SYS_VNCR_EL2);
+> +	}
+> +
+> +	return hcr | (__vcpu_sys_reg(vcpu, HCR_EL2) & ~NV_HCR_GUEST_EXCLUDE);
+> +}
+> +
+>  static void __activate_traps(struct kvm_vcpu *vcpu)
+>  {
+>  	u64 val;
+>  
+> -	___activate_traps(vcpu);
+> +	___activate_traps(vcpu, __compute_hcr(vcpu));
+>  
+>  	if (has_cntpoff()) {
+>  		struct timer_map map;
+
+Otherwise,
+
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+
+Thanks,
+Joey
 
