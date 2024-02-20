@@ -1,256 +1,171 @@
-Return-Path: <kvm+bounces-9170-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9171-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64F4085B8EF
-	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 11:22:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B80F685B99D
+	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 11:53:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C43841F260E6
-	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 10:22:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6DB192853FA
+	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 10:53:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0799612C6;
-	Tue, 20 Feb 2024 10:22:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAA2565BAC;
+	Tue, 20 Feb 2024 10:53:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TU7e7pDP"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BDCC5FDC5
-	for <kvm@vger.kernel.org>; Tue, 20 Feb 2024 10:22:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29DDF664A9;
+	Tue, 20 Feb 2024 10:53:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708424558; cv=none; b=Fnojcqzeo/Lyk2VepF0gZ2nFGYcWwETqmqAn+FxQNESEowbXhQi5YeXfSWLCeRdW5qWrAPxOvR18SldCCugyYoDjRp1KcQKL+qVXLCb+PAoRFukNNPsrIcyk/ALSP1qoZiiw/GTiuSuZpcMEGb1f9RcMcZsxbfWfunBoOzhNz80=
+	t=1708426403; cv=none; b=C93xxsU9Gq5wEgYZFBs14wgnxL25TY/J/2+lk7iRqX41s/r86M5dXsfnU854XnJj/22u+NmjfENIoTZikQKOc/ihfk1pB4Rz/ySu76dvrdXp1JuxqA4t8NKCkQ5RW9eeseeH5jMhW8tCjqSy9WV19THvuMFxPf3PZ0I3Naxivyc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708424558; c=relaxed/simple;
-	bh=/VqLVMvwa2XWdYu6FEqTeiDwLlBH7WA1gb9JFElUk/U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JbxDX1AEa4enKZ+FCfHkbe37e1b6iXtI0rTtJummNlk0MfLzDnezcMD5mxPSAZWDlLyzB2xXyMNyzqv5yivF93mwezC5vR2P/EirL/KHTbn0g0nEwI/gn05k/BDaW48yCQY89w5cdCtrDHz9OD3shPMiby+WxkXWJbGnGVSE4AI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A8C2AFEC;
-	Tue, 20 Feb 2024 02:23:14 -0800 (PST)
-Received: from raptor (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 68DA23F762;
-	Tue, 20 Feb 2024 02:22:34 -0800 (PST)
-Date: Tue, 20 Feb 2024 10:22:25 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Nicholas Piggin <npiggin@gmail.com>
-Cc: Thomas Huth <thuth@redhat.com>, Andrew Jones <andrew.jones@linux.dev>,
-	Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [kvm-unit-tests PATCH] lib/arm/io: Fix calling getchar()
- multiple times
-Message-ID: <ZdR9Yb-XGKyuhFOL@raptor>
-References: <20240216140210.70280-1-thuth@redhat.com>
- <ZdOIJfvVm7C23ZdZ@raptor>
- <CZ9S150A3M1Y.1HVL51OVY2ZW8@wheely>
+	s=arc-20240116; t=1708426403; c=relaxed/simple;
+	bh=WcrPPnFdIaTswNzGGLNCjpYeRfDUJLHsrVeXfxJS7Wk=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=YTThp2efe7emMzZsHqJ+aDVRGQGQfnTC3T8ouv6S+fLj90pkGN6NfS4tWT34bQVXFso4Q0CN+8Mhy8358EmKHPHVjypY25rCdVsP+B0XIAXdmsOAwnb/M/T4Nc8ZpsiwpUGPh6yvZdy2MWUzYJz5F5y0mErrnphBcoOcPRwKjLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TU7e7pDP; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3394bec856fso3600667f8f.0;
+        Tue, 20 Feb 2024 02:53:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708426400; x=1709031200; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2Kk7TVBPE2HlTc1l9Sm4itMeOxxlwuSodhj0pqtVmHM=;
+        b=TU7e7pDP24TYuKARhHMIpwW55U49f5b5/PudxMBWTvNeKd9OHCk583W8CUl61O0loj
+         trxrqBIP32qju7gLSNWU1J83hO3wW+EadX28rggK7yR6wha4AdiGn/T/D4j/Po1r2AjM
+         h7FzLqBwei0ShQBtIfqolWxi3/X7p7j1TcJ0BaePblskZTihqaZcPEBt4Ely4wHyBkxD
+         /z79p9HHYgVseW5Uq3HXmqSIiIyicxOK+tMxM6QvDVGihInDVI01G4E3T55QFrO9y/eC
+         NfIzAUbsVvN5CqObIR+AxeNlHJ9G5ScKqDWr2p7+IaQsef0y2OYqirBb5lKJUetYdqH2
+         HD4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708426400; x=1709031200;
+        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2Kk7TVBPE2HlTc1l9Sm4itMeOxxlwuSodhj0pqtVmHM=;
+        b=c2s7dfBOs93FR7GsgDlri+6XLVdl4l4ktDiAsjAHAz3+hhTma0V3na8GAx2ppJQXWg
+         6aLOUgESIaGVr03sJhfMWmcMEaAxROwOvC5TPkJdO6sDwjNy75sYouE/LgDB4119qqmS
+         RwU9PX5JS8Hh02MCtacAeGLmyBrq+zWN6h3I0x0SaiIl19EzFsNNpcj7VqzIv4vvejEw
+         uZ+iFDnOpU4F1vPPWRbF2WAW/BW6glXzVwSThtQiLEFT5ADXkHfTUZ2zUnpy5M5MPW32
+         93lP5Cff8Ww6C0vqshr3Ov+jonw4fKnEzqH43j0lYkJMBOBn/31HeGSiNJHQCCJ33NP4
+         I66g==
+X-Forwarded-Encrypted: i=1; AJvYcCWQx7LrfKPoA2JHEgQG7YCgaK5BBXEOl3oWE37zHUPwJ42hYjflTYAAlFNplejujq035HqRM2sf48v6Wi50M4eOWOE2bgxpyOW/fF3C9ZKyeOtfFEvp76gktOOA7rhbv6oQtE9MAjAkm/yokAsUgTGWgQ199jfL42m+dwCQbKHjYomg5HGFDcEHQwx1YiauEKm+Do2n1/IaiMuJNBc6P9y8y0LNCYXF6/j7l1EKQRv2OljDxZT9yvvv0Q==
+X-Gm-Message-State: AOJu0Yw8oXJDhpl/MLOGjFGVWm0YJGKw5AQON4vdvntSeOf9hj+69q65
+	7cB7ahmXljegQJrkgXH+TpqHnMpVZXycNhhkvGGz/CdES3l2QcaQ
+X-Google-Smtp-Source: AGHT+IH7465FJ5bRclP1AsBPW6J2ByerjfrQoZxMhpklVxMUbyc5bzfafg2vxzaK3n/7AH+GNoFpcw==
+X-Received: by 2002:a5d:5345:0:b0:33d:1bd1:8ae2 with SMTP id t5-20020a5d5345000000b0033d1bd18ae2mr9759369wrv.19.1708426400183;
+        Tue, 20 Feb 2024 02:53:20 -0800 (PST)
+Received: from [192.168.10.18] (54-240-197-233.amazon.com. [54.240.197.233])
+        by smtp.gmail.com with ESMTPSA id h5-20020a05600016c500b0033d60cba289sm3750737wrf.68.2024.02.20.02.53.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 Feb 2024 02:53:19 -0800 (PST)
+From: Paul Durrant <xadimgnik@gmail.com>
+X-Google-Original-From: Paul Durrant <paul@xen.org>
+Message-ID: <0ba3a87b-7596-466c-9415-7af28c95dd1e@xen.org>
+Date: Tue, 20 Feb 2024 10:53:18 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CZ9S150A3M1Y.1HVL51OVY2ZW8@wheely>
+User-Agent: Mozilla Thunderbird
+Reply-To: paul@xen.org
+Subject: Re: [PATCH v13 00/21] KVM: xen: update shared_info and vcpu_info
+ handling
+Content-Language: en-US
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+ David Woodhouse <dwmw2@infradead.org>, Shuah Khan <shuah@kernel.org>,
+ kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <20240215152916.1158-1-paul@xen.org> <ZdPQ_AcbTYMtArFJ@google.com>
+ <f85098ba-b56e-455a-9b73-909d71cf0b51@xen.org>
+Organization: Xen Project
+In-Reply-To: <f85098ba-b56e-455a-9b73-909d71cf0b51@xen.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi,
-
-On Tue, Feb 20, 2024 at 06:51:51PM +1000, Nicholas Piggin wrote:
-> On Tue Feb 20, 2024 at 2:56 AM AEST, Alexandru Elisei wrote:
-> > Hi,
-> >
-> > Thanks for writing this. I've tested it with kvmtool, which emulates a 8250
-> > UART:
-> >
-> > Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> >
-> > This fixes a longstanding bug with kvmtool, where migrate_once() would read
-> > the last character that was sent, and then think that migration was
-> > completed even though it was never performed.
-> >
-> > While we are on the subject of migration:
-> >
-> > SKIP: gicv3: its-migration: Test requires at least 4 vcpus
-> > Now migrate the VM, then press a key to continue...
-> > INFO: gicv3: its-migration: Migration complete
-> > SUMMARY: 1 tests, 1 skipped
-> >
-> > That's extremely confusing. Why is migrate_once() executed after the
-> > test_its_pending() function call without checking if the test was skipped?
+On 20/02/2024 09:14, Paul Durrant wrote:
+> On 19/02/2024 22:06, Sean Christopherson wrote:
+>> On Thu, Feb 15, 2024, Paul Durrant wrote:
+>>> David Woodhouse (1):
+>>>    KVM: pfncache: rework __kvm_gpc_refresh() to fix locking issues
+>>>
+>>> Paul Durrant (19):
+>>>    KVM: pfncache: Add a map helper function
+>>>    KVM: pfncache: remove unnecessary exports
+>>>    KVM: x86/xen: mark guest pages dirty with the pfncache lock held
+>>>    KVM: pfncache: add a mark-dirty helper
+>>>    KVM: pfncache: remove KVM_GUEST_USES_PFN usage
+>>>    KVM: pfncache: stop open-coding offset_in_page()
+>>>    KVM: pfncache: include page offset in uhva and use it consistently
+>>>    KVM: pfncache: allow a cache to be activated with a fixed (userspace)
+>>>      HVA
+>>>    KVM: x86/xen: separate initialization of shared_info cache and 
+>>> content
+>>>    KVM: x86/xen: re-initialize shared_info if guest (32/64-bit) mode is
+>>>      set
+>>>    KVM: x86/xen: allow shared_info to be mapped by fixed HVA
+>>>    KVM: x86/xen: allow vcpu_info to be mapped by fixed HVA
+>>>    KVM: selftests: map Xen's shared_info page using HVA rather than GFN
+>>>    KVM: selftests: re-map Xen's vcpu_info using HVA rather than GPA
+>>>    KVM: x86/xen: advertize the KVM_XEN_HVM_CONFIG_SHARED_INFO_HVA
+>>>      capability
+>>>    KVM: x86/xen: split up kvm_xen_set_evtchn_fast()
+>>>    KVM: x86/xen: don't block on pfncache locks in
+>>>      kvm_xen_set_evtchn_fast()
+>>>    KVM: pfncache: check the need for invalidation under read lock first
+>>>    KVM: x86/xen: allow vcpu_info content to be 'safely' copied
+>>>
+>>> Sean Christopherson (1):
+>>>    KVM: s390: Refactor kvm_is_error_gpa() into kvm_is_gpa_in_memslot()
+>>>
+>>>   Documentation/virt/kvm/api.rst                |  53 ++-
+>>>   arch/s390/kvm/diag.c                          |   2 +-
+>>>   arch/s390/kvm/gaccess.c                       |  14 +-
+>>>   arch/s390/kvm/kvm-s390.c                      |   4 +-
+>>>   arch/s390/kvm/priv.c                          |   4 +-
+>>>   arch/s390/kvm/sigp.c                          |   2 +-
+>>>   arch/x86/kvm/x86.c                            |   7 +-
+>>>   arch/x86/kvm/xen.c                            | 361 +++++++++++------
+>>>   include/linux/kvm_host.h                      |  49 ++-
+>>>   include/linux/kvm_types.h                     |   8 -
+>>>   include/uapi/linux/kvm.h                      |   9 +-
+>>>   .../selftests/kvm/x86_64/xen_shinfo_test.c    |  59 ++-
+>>>   virt/kvm/pfncache.c                           | 382 ++++++++++--------
+>>>   13 files changed, 591 insertions(+), 363 deletions(-)
+>>
+>> Except for the read_trylock() patch, just a few nits that I can fixup 
+>> when
+>> applying, though I'll defeinitely want your eyeballs on the end result 
+>> as they
+>> tweaks aren't _that_ trivial.
+>>
+>> Running tests now, if all goes well I'll push to kvm-x86 within the hour.
 > 
-> Seems not too hard, incremental patch on top of multi migration
-> series below. After this series is merged I can try that (s390
-> could benefit with some changes too).
-
-Thank you for having a look at this so quickly. The changes to the gic test
-look good to me.
-
-As an alternative, have you considered modifying the test harness to parse
-the SKIP message, and if the test is in the migration group to not mark it
-as a migration failure? That would require that the test name printed by a
-test matches the test name from unittests.cfg (should probably be the case
-already), but any new migration tests will just work, without having to put
-migrate_skip() at each failure point.
-
-Thanks,
-Alex
-
+> Oh, I read this last and you already made the changes :-) I'll check 
+> kvm-x86. Thanks.
 > 
-> Thanks,
-> Nick
-> 
-> ---
-> diff --git a/arm/gic.c b/arm/gic.c
-> index c950b0d15..bbf828f17 100644
-> --- a/arm/gic.c
-> +++ b/arm/gic.c
-> @@ -782,13 +782,15 @@ static void test_its_migration(void)
->  	struct its_device *dev2, *dev7;
->  	cpumask_t mask;
->  
-> -	if (its_setup1())
-> +	if (its_setup1()) {
-> +		migrate_skip();
->  		return;
-> +	}
->  
->  	dev2 = its_get_device(2);
->  	dev7 = its_get_device(7);
->  
-> -	migrate_once();
-> +	migrate();
->  
->  	stats_reset();
->  	cpumask_clear(&mask);
-> @@ -819,8 +821,10 @@ static void test_migrate_unmapped_collection(void)
->  	int pe0 = 0;
->  	u8 config;
->  
-> -	if (its_setup1())
-> +	if (its_setup1()) {
-> +		migrate_skip();
->  		return;
-> +	}
->  
->  	if (!errata(ERRATA_UNMAPPED_COLLECTIONS)) {
->  		report_skip("Skipping test, as this test hangs without the fix. "
-> @@ -836,7 +840,7 @@ static void test_migrate_unmapped_collection(void)
->  	its_send_mapti(dev2, 8192, 0, col);
->  	gicv3_lpi_set_config(8192, LPI_PROP_DEFAULT);
->  
-> -	migrate_once();
-> +	migrate();
->  
->  	/* on the destination, map the collection */
->  	its_send_mapc(col, true);
-> @@ -875,8 +879,10 @@ static void test_its_pending_migration(void)
->  	void *ptr;
->  	int i;
->  
-> -	if (its_prerequisites(4))
-> +	if (its_prerequisites(4)) {
-> +		migrate_skip();
->  		return;
-> +	}
->  
->  	dev = its_create_device(2 /* dev id */, 8 /* nb_ites */);
->  	its_send_mapd(dev, true);
-> @@ -923,7 +929,7 @@ static void test_its_pending_migration(void)
->  	gicv3_lpi_rdist_enable(pe0);
->  	gicv3_lpi_rdist_enable(pe1);
->  
-> -	migrate_once();
-> +	migrate();
->  
->  	/* let's wait for the 256 LPIs to be handled */
->  	mdelay(1000);
-> @@ -970,17 +976,14 @@ int main(int argc, char **argv)
->  	} else if (!strcmp(argv[1], "its-migration")) {
->  		report_prefix_push(argv[1]);
->  		test_its_migration();
-> -		migrate_once();
->  		report_prefix_pop();
->  	} else if (!strcmp(argv[1], "its-pending-migration")) {
->  		report_prefix_push(argv[1]);
->  		test_its_pending_migration();
-> -		migrate_once();
->  		report_prefix_pop();
->  	} else if (!strcmp(argv[1], "its-migrate-unmapped-collection")) {
->  		report_prefix_push(argv[1]);
->  		test_migrate_unmapped_collection();
-> -		migrate_once();
->  		report_prefix_pop();
->  	} else if (strcmp(argv[1], "its-introspection") == 0) {
->  		report_prefix_push(argv[1]);
-> diff --git a/lib/migrate.c b/lib/migrate.c
-> index 92d1d957d..dde43a90e 100644
-> --- a/lib/migrate.c
-> +++ b/lib/migrate.c
-> @@ -43,3 +43,13 @@ void migrate_once(void)
->  	migrated = true;
->  	migrate();
->  }
-> +
-> +/*
-> + * When the test has been started in migration mode, but the test case is
-> + * skipped and no migration point is reached, this can be used to tell the
-> + * harness not to mark it as a failure to migrate.
-> + */
-> +void migrate_skip(void)
-> +{
-> +	puts("Skipped VM migration (quiet)\n");
-> +}
-> diff --git a/lib/migrate.h b/lib/migrate.h
-> index 95b9102b0..db6e0c501 100644
-> --- a/lib/migrate.h
-> +++ b/lib/migrate.h
-> @@ -9,3 +9,5 @@
->  void migrate(void);
->  void migrate_quiet(void);
->  void migrate_once(void);
-> +
-> +void migrate_skip(void);
-> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-> index 2214d940c..3257d5218 100644
-> --- a/scripts/arch-run.bash
-> +++ b/scripts/arch-run.bash
-> @@ -152,7 +152,9 @@ run_migration ()
->  		-chardev socket,id=mon,path=${src_qmp},server=on,wait=off \
->  		-mon chardev=mon,mode=control > ${src_outfifo} &
->  	live_pid=$!
-> -	cat ${src_outfifo} | tee ${src_out} | grep -v "Now migrate the VM (quiet)" &
-> +	cat ${src_outfifo} | tee ${src_out} | \
-> +		grep -v "Now migrate the VM (quiet)" | \
-> +		grep -v "Skipped VM migration (quiet)" &
->  
->  	# Start the first destination QEMU machine in advance of the test
->  	# reaching the migration point, since we expect at least one migration.
-> @@ -190,16 +192,22 @@ do_migration ()
->  		-mon chardev=mon,mode=control -incoming unix:${dst_incoming} \
->  		< <(cat ${dst_infifo}) > ${dst_outfifo} &
->  	incoming_pid=$!
-> -	cat ${dst_outfifo} | tee ${dst_out} | grep -v "Now migrate the VM (quiet)" &
-> +	cat ${dst_outfifo} | tee ${dst_out} | \
-> +		grep -v "Now migrate the VM (quiet)" | \
-> +		grep -v "Skipped VM migration (quiet)" &
->  
->  	# The test must prompt the user to migrate, so wait for the
->  	# "Now migrate VM" console message.
->  	while ! grep -q -i "Now migrate the VM" < ${src_out} ; do
->  		if ! ps -p ${live_pid} > /dev/null ; then
-> -			echo "ERROR: Test exit before migration point." >&2
->  			echo > ${dst_infifo}
-> -			qmp ${src_qmp} '"quit"'> ${src_qmpout} 2>/dev/null
->  			qmp ${dst_qmp} '"quit"'> ${dst_qmpout} 2>/dev/null
-> +			if grep -q -i "Skipped VM migration" < ${src_out} ; then
-> +				wait ${live_pid}
-> +				return $?
-> +			fi
-> +			echo "ERROR: Test exit before migration point." >&2
-> +			qmp ${src_qmp} '"quit"'> ${src_qmpout} 2>/dev/null
->  			return 3
->  		fi
->  		sleep 0.1
+
+I checked the patches you amended. All LGTM and my tests are fine too.
 
