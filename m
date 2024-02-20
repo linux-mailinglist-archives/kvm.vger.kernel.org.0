@@ -1,99 +1,107 @@
-Return-Path: <kvm+bounces-9203-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9204-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A96985BFB2
-	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 16:19:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9220C85C000
+	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 16:33:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E3941C21474
-	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 15:19:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 30F1F1F248A5
+	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 15:33:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77CFF7602D;
-	Tue, 20 Feb 2024 15:19:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0B2B7604E;
+	Tue, 20 Feb 2024 15:33:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3cpdQCDy"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF3C374E3A
-	for <kvm@vger.kernel.org>; Tue, 20 Feb 2024 15:18:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B7947602F
+	for <kvm@vger.kernel.org>; Tue, 20 Feb 2024 15:33:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708442341; cv=none; b=r86dG/8K1hHAMyp5p3Y+EYX6WLZBQBSJkX1JgPlTb4aCvr9hT2lHMcyy02iWtMcIi3FOry1vIU6XiPLQvoIS3/K404LJbvOt9sNpT15oK54WMvvWx98cXatRXDCXDbkflm1sK57uPCEqWg4C1FQiupZey5CubDzIRGyMvKDrsOg=
+	t=1708443225; cv=none; b=rPVCnW7/iZSfJZJb4UxGm2Arx+SZVMawQnbypDQ2xuMmyIrGan3NPgG/wunUOrRaic8C1PwpX18u31k7b9YBs0NtOly1TIw+NuuNfbIlI9IYSNgcuDQLAdH19lSnAgEKH4jZCGr0zzs6msZ82LcN3JTjUWpK02FfRA5jcFIHZ5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708442341; c=relaxed/simple;
-	bh=8M1w/VdbQnHgutFm242Apw7ANRyCWUvBTMdLcLoDsjs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PFXzteDi3odlIsQBp8fSgLtHCB1DCSEHhN1FoJThTX0xGviTfTcnn2+dJlvf3/ZyJE8Xrkg5XjjEgydc8z0ZOUgR/V/L9jfXG2I8Mgc6VIQ8yTiUXGmm2aO4sEkli2UkOYjMbNRRVNEu4ENbRtQ8XzXI2pq9sdSmu9mrM8EoUIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3728EFEC;
-	Tue, 20 Feb 2024 07:19:38 -0800 (PST)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D9B093F73F;
-	Tue, 20 Feb 2024 07:18:57 -0800 (PST)
-Date: Tue, 20 Feb 2024 15:18:51 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH 02/13] KVM: arm64: Clarify ESR_ELx_ERET_ISS_ERET*
-Message-ID: <20240220151851.GA57578@e124191.cambridge.arm.com>
-References: <20240219092014.783809-1-maz@kernel.org>
- <20240219092014.783809-3-maz@kernel.org>
- <20240220113127.GB16168@e124191.cambridge.arm.com>
- <861q9748ut.wl-maz@kernel.org>
- <20240220132350.GB8575@e124191.cambridge.arm.com>
- <86zfvv2qys.wl-maz@kernel.org>
+	s=arc-20240116; t=1708443225; c=relaxed/simple;
+	bh=7D7kf8p8aX2ZzflAMDnkhBwWgiUvsRg8uan55wPtdeo=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=H0DUe3yxUVL51qhQhn8EkVgQs40VP7leL9rpRmit3zSWBWw60GEp7hhPxdIm1aTmbO0bZgjkqwEc5hlFWQKrBYWRp0NcJJuGY5mAwr34pLnvdCvpMWb1S35ZUZGrN2jmlUOdiQ8hBUAEYPJ2VWf7e634yWA2Bsp3JwckPm9j1/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3cpdQCDy; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-607e56f7200so45451757b3.2
+        for <kvm@vger.kernel.org>; Tue, 20 Feb 2024 07:33:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1708443222; x=1709048022; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1fzOe/J4kuriO/maOGNH55dN19fVKQtEmyIcU4m9sns=;
+        b=3cpdQCDyg0mp5DZW2QTFvCcek4NqeDX7/LxCgHwuElM503dUoBSO7gIT1zXFtIJoJk
+         Eqrfn3tQlO17zTIzFUB5Da0CpBVfAvgOvjTuzPeLRyqGkd3rW5zKtdM6laTGO/dw3B5u
+         EcKxClAj1BrDglpYlG9x8rSdRLTNcFa+vPjHpaDq2PG7n8LWl0/PRern/zFiBMyNvxsk
+         hgWsLiCYmfUMjvmN5Hsedn3k1BFFML47uUqPRqS6ntAraoVtSVWuWqLXNCIKV0npv5vX
+         2jVBdx7V5bsKNZ01R9eOsrIa5l7iHQ0RSqopNvC/mfGngYDFlJ/WDHPyyVZLo/g5VPHR
+         u6bg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708443222; x=1709048022;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1fzOe/J4kuriO/maOGNH55dN19fVKQtEmyIcU4m9sns=;
+        b=vG00uL09i0nUfp2Y2hsAmQG7gNJykmTkWIWfR38HTBBivZQxOOhP41M5W8gERN29PW
+         3SATv37POqoj7y9xbKvmx9FRewnByx+GXpU598WlJk+PKGQ6hSb3IUGSGE9BpHesh9oT
+         4+UFIOi4kVv/cck8WDt4VPrJy7J58AIJfNoSC0LOJ7PIt73efotzSquBKZCG/yLTwRI5
+         Hgm9tZOCiHStDvvVpgmWjhOzEYe41EOO7pVLA+7YWGJbr9VqMM7HhzCpddEagPUduE9a
+         5Om8ZFXA7SHedshXUzmy6/Hoi3x56PCynvYCfquYIeG90t0X2yTRlfB8CwlafishLPiJ
+         MfFA==
+X-Forwarded-Encrypted: i=1; AJvYcCWzD7YAbv+WcxFEZPp2u/dPtxP11/9afi529xF04PaPrmH5hi64Mj019k07lSezi8CbX0KQVx/4ksWC81kRIjO8IZb3
+X-Gm-Message-State: AOJu0Yw9X9x0FLqOSVsVSsVEa0tDJhKvknOhWA99tFKkvgGBiYQ5eppy
+	0q3TAhk2/H+6zeiHRwC800ILrKTgMPD5G5mDiHrP5vlREKvHSz2ifM2AES+pOuJu7wslFBwv+TX
+	+Cw==
+X-Google-Smtp-Source: AGHT+IHV2QTvanF7VyH48/qvRHmtqg+UWhaoc+cyGK8cObSo3PadCiUndGKk4nt1DLGsJf5NFU55wseFcsE=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:4f83:0:b0:608:6c70:8d6 with SMTP id
+ d125-20020a814f83000000b006086c7008d6mr178184ywb.2.1708443222505; Tue, 20 Feb
+ 2024 07:33:42 -0800 (PST)
+Date: Tue, 20 Feb 2024 07:33:40 -0800
+In-Reply-To: <20240220134800.40efe653@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86zfvv2qys.wl-maz@kernel.org>
+Mime-Version: 1.0
+References: <20240220134800.40efe653@canb.auug.org.au>
+Message-ID: <ZdTGRQJIO0Te8zF8@google.com>
+Subject: Re: linux-next: manual merge of the kvm-x86 tree with the kvm tree
+From: Sean Christopherson <seanjc@google.com>
+To: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>, 
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
+	Linux Next Mailing List <linux-next@vger.kernel.org>, Paul Durrant <pdurrant@amazon.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Feb 20, 2024 at 01:41:15PM +0000, Marc Zyngier wrote:
-> On Tue, 20 Feb 2024 13:23:50 +0000,
-> Joey Gouly <joey.gouly@arm.com> wrote:
-> > 
-> > On Tue, Feb 20, 2024 at 12:29:30PM +0000, Marc Zyngier wrote:
-> > > On Tue, 20 Feb 2024 11:31:27 +0000,
-> > > Joey Gouly <joey.gouly@arm.com> wrote:
-> > > > 
-> > > > If this part is confusing due to the name, maybe introduce a function in esr.h
-> > > > esr_is_pac_eret() (name pending bikeshedding)?
-> > > 
-> > > That's indeed a better option. Now for the bikeshed aspect:
-> > > 
-> > > - esr_iss_is_eretax(): check for ESR_ELx_ERET_ISS_ERET being set
-> > > 
-> > > - esr_iss_is_eretab(): check for ESR_ELx_ERET_ISS_ERETA being set
-> > > 
-> > > Thoughts?
-> > > 
-> > 
-> > I was trying to avoid the ERETA* confusion by suggesting 'pac_eret', but if I
-> > were to pick between your options I'd pick esr_iss_is_eretax().
+On Tue, Feb 20, 2024, Stephen Rothwell wrote:
+> Hi all,
 > 
-> It's not an either/or situation. We actually need both:
+> Today's linux-next merge of the kvm-x86 tree got a conflict in:
 > 
-> - esr_iss_is_eretax() being true tells you that you need to
->   authenticate the ERET
+>   include/uapi/linux/kvm.h
 > 
-> - esr_iss_is_eretab() tells you that you need to use the A or B key
+> between commit:
+> 
+>   bcac0477277e ("KVM: x86: move x86-specific structs to uapi/asm/kvm.h")
+> 
+> from the kvm tree and commits:
+> 
+>   01a871852b11 ("KVM: x86/xen: allow shared_info to be mapped by fixed HVA")
+>   3a0c9c41959d ("KVM: x86/xen: allow vcpu_info to be mapped by fixed HVA")
+> 
+> from the kvm-x86 tree.
 
-Oh right, yes that makes sense (please add a brief comment like ^ above the
-functions)
+/facepalm
 
-Thanks,
-Joey
+I asked Paolo for a topic branch specifically to avoid this conflict, and then
+managed to forget about it.  I'll rebase the xen patches and force push.
 
