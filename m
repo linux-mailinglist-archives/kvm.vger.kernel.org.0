@@ -1,195 +1,215 @@
-Return-Path: <kvm+bounces-9210-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9212-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7E4A85C0A2
-	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 17:04:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69F4585C0E7
+	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 17:15:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD7DE1C22A5B
-	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 16:04:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA69B1F23832
+	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 16:15:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07BA4768FA;
-	Tue, 20 Feb 2024 16:03:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EB4676C60;
+	Tue, 20 Feb 2024 16:15:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MHdsABFU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="epE+I2EV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54CD769E1C;
-	Tue, 20 Feb 2024 16:03:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02CD076908
+	for <kvm@vger.kernel.org>; Tue, 20 Feb 2024 16:15:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708445036; cv=none; b=Cis9i6huIz7kK0Qm9yoob4kmV9iscdFEp0ito4W2uXrNo/XSac3K/L8yCb2ZDXaGTpU10fE4ctaQjFVVicwq4PNjUZ4XP39Kbl8RjIn/u6dvYkCgRECPi6g+L3YbsQ/0orzpLUWqcPsS4cFzdJxf3WdZsTYv9t2sCytzKteqRlM=
+	t=1708445723; cv=none; b=qNsVAQz15p93wuinp7ClXtdgeaiXqLzYYlXLx1Su6T/oFwo1HM1lYz4TJaS1ETV+Pm6o77jKqpktU6MbZUkJ9YDMwKtHtDmCXz6azM7vvzyc8SRmu4B0YNaER8RB3SjxrxmkvH22dHHLh8k2nqm5fM7ZvE5gV46fK5vB1mTlZ04=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708445036; c=relaxed/simple;
-	bh=AhiaIIjBV0cH5PQyZ5c32LP80z8tJP7FX4K7m6lMZLU=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:References:
-	 In-Reply-To:Content-Type; b=FlubF4deJeHE4gH9D3NcQhBdPtgg1/8I+m77ihXV8KTFHSvK96zZNI7aUcH5iJyF05ok2MPFpWz79TvkKayVT9qHI4oPUpxHlx4LMdS9n6ktdyx3Lg8gUJvVqetj5oFRmVLTL8LVlohuntQaxreBzxNzRyl9jkB7uwzftSBbxT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MHdsABFU; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4126aee00b2so12136445e9.3;
-        Tue, 20 Feb 2024 08:03:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708445032; x=1709049832; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :references:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=NsEOewE8a9LUqZdGpQ0sg6Y8GWXfE7D0W1/CTdE5oVU=;
-        b=MHdsABFUEsqqwCw9JuaNbMTaVeJwVhW+LZPXqxOGPLGJQ3Fp8aC58RaXrY7sWniMRV
-         QD7yRCwJk6faIBTgZ2j4lC3faokHmGUtrRAYrQZK9LArvXCKXTsXQbphDUXqifDVJgDq
-         ycBrnrmHTX5c0ARwaaLOdjsmdTHoODhvXqeh4zVNi1TZdohyiXlYeB8qnW5mA0KdB1C/
-         bNa5pRDQjv6s8e0Z1l8odENVTFzNisl5jEumjIpTDZZz62USw7pRQ+KGtKku9mA97iml
-         SUUZwEKeJdm11cybPS3yyga7+EqtATLYG5ElY9PTi6QDA1J68RJxDcDMcVnueuprDqsR
-         RTPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708445032; x=1709049832;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :references:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NsEOewE8a9LUqZdGpQ0sg6Y8GWXfE7D0W1/CTdE5oVU=;
-        b=OySj1WKJ1JZ3p1ykJyA/M6JB7lgz9NhuifkDocINetB/bpKuJ94ABeALRVQ1UPv3S2
-         4fvzKxXEuyAMNA42MLRavbUiXXFn6d6NKyMBhYTmpo15yFRSFIARYC+ibc2hWMKauB5j
-         Wz2gWtjfJNFKN7fvOk6vAC2HeGWHguPC7T9NPDpw2ZJjHDcMyuktGymXSNUman5XbShF
-         n2VCYUSK0OxgEOpgMjmGxZZLFZ6dFmjUt3vUry5kDnK8DU0HrkINEkPwRDSk95G5l6y9
-         5byHpe7cqAZJn3kPVKTFpcZPJkRaldiSqiH14TC4RAoXUHJmd7LjQ06P3+gJIy3JGJbb
-         0HjQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXbLchUY3aVGCSVjcI/+rpTO2xdbvssaA+Bf7vxJ5sQI84sfkO6fZnQXG818uvj8cyGtaGDjG7MaDUHMkgAry+1DeIAt01csWe+fpNnhDHoFv958paurrEgBG6K2kQZ5cVqyBOKvM5WN7QP/KIBC+RG+Z8Qs7ScdrDKTIYTVQwpGBFvNWWM6QJLSnVWaDQcukq5krKMXOguGrlSmyaaJhvlrGcagsJSFf3JnJXl/QYuuRAbRy0Y8IfktQ==
-X-Gm-Message-State: AOJu0YxvFd7TfJxVwEmwQybYq8x03FiUcJ/BWf59ZcyKnGJ6QOc6fczp
-	vI5u2AYoi61ixV0/mSAUJW9RbMdNMDlJlfYtHhYmPMgJpYzj46JT
-X-Google-Smtp-Source: AGHT+IFz1o8lFmhShbnKg9eJ+Z3iu+6mmlFKkdnH7xFYAQxzvTVtnL2B01la+pa7bfj5zUx3PQSB5w==
-X-Received: by 2002:adf:ee8b:0:b0:33d:174b:6a3c with SMTP id b11-20020adfee8b000000b0033d174b6a3cmr7851507wro.59.1708445032347;
-        Tue, 20 Feb 2024 08:03:52 -0800 (PST)
-Received: from [192.168.10.18] (54-240-197-225.amazon.com. [54.240.197.225])
-        by smtp.gmail.com with ESMTPSA id n14-20020a5d420e000000b0033d282c7537sm11398333wrq.23.2024.02.20.08.03.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Feb 2024 08:03:52 -0800 (PST)
-From: Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: Paul Durrant <paul@xen.org>
-Message-ID: <05973da0-f68c-4c84-8806-bdba92f2ed6e@xen.org>
-Date: Tue, 20 Feb 2024 16:03:49 +0000
+	s=arc-20240116; t=1708445723; c=relaxed/simple;
+	bh=SUXEC4WxQii//gTBmi+NPiWcpKzR+deKzND3uqVfzOc=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=f7Xy3ZkQdjW62y9Wt62l3OIrCnjDznlAe+scrRTZE86RMW62OLw9xqIY41tgghX37/g036RbtQFw3QDjdyxv7aoGkfn2durEH8PcQnUUUORvdcAKNWVs9X417R9inlZRnld/LbjLTQSLEfBLUmiM33WIxXUt2QcwXPqvZMaVHZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=epE+I2EV; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1708445701;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=T7u28xwIheG3uxovuWZOpEtSYb8aZ/auv1OID/d5NrA=;
+	b=epE+I2EVnjdC1JhU+soqHdtvMNC9uSmu51WG0J0MwgqFdJo14ryCcpi4trr0We3/6WsDgg
+	gMCVpSIoZi4xwhBLF1aBw8LQyGpCUWYAr52CiBeO9dbjj0jHHw89oRmLC+RSXZ1QGcYLr4
+	iNyr8xSfpAjo0elTPB05CYjzkov7up8=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-444-jbZ68DtwOku-M8uuakTlmw-1; Tue,
+ 20 Feb 2024 11:14:58 -0500
+X-MC-Unique: jbZ68DtwOku-M8uuakTlmw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 99F3E3814582;
+	Tue, 20 Feb 2024 16:14:57 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.39.192.55])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3C22810802;
+	Tue, 20 Feb 2024 16:14:57 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id 07D0B21E6740; Tue, 20 Feb 2024 17:14:55 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,  David Hildenbrand
+ <david@redhat.com>,  Igor Mammedov <imammedo@redhat.com>,  "Michael S .
+ Tsirkin" <mst@redhat.com>,  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+  Richard Henderson <richard.henderson@linaro.org>,  Peter Xu
+ <peterx@redhat.com>,  Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?=
+ <philmd@linaro.org>,
+  Cornelia Huck <cohuck@redhat.com>,  Daniel =?utf-8?Q?P=2EBerrang=C3=A9?=
+ <berrange@redhat.com>,  Eric Blake <eblake@redhat.com>,  Marcelo Tosatti
+ <mtosatti@redhat.com>,  qemu-devel@nongnu.org,  kvm@vger.kernel.org,
+  Michael Roth <michael.roth@amd.com>,  Sean Christopherson
+ <seanjc@google.com>,  Claudio Fontana <cfontana@suse.de>,  Gerd Hoffmann
+ <kraxel@redhat.com>,  Isaku Yamahata <isaku.yamahata@gmail.com>,  Chenyi
+ Qiang <chenyi.qiang@intel.com>
+Subject: Re: [PATCH v4 29/66] i386/tdx: Support user configurable
+ mrconfigid/mrowner/mrownerconfig
+In-Reply-To: <cf9e91ea-825a-444c-9625-a571fdc3265a@intel.com> (Xiaoyao Li's
+	message of "Tue, 20 Feb 2024 23:10:29 +0800")
+References: <20240125032328.2522472-1-xiaoyao.li@intel.com>
+	<20240125032328.2522472-30-xiaoyao.li@intel.com>
+	<875xykfwmf.fsf@pond.sub.org>
+	<cf9e91ea-825a-444c-9625-a571fdc3265a@intel.com>
+Date: Tue, 20 Feb 2024 17:14:55 +0100
+Message-ID: <87le7f3yf4.fsf@pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: paul@xen.org
-Subject: Re: [PATCH v13 00/21] KVM: xen: update shared_info and vcpu_info
- handling
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
- <agordeev@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
- David Woodhouse <dwmw2@infradead.org>, Shuah Khan <shuah@kernel.org>,
- kvm@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20240215152916.1158-1-paul@xen.org>
- <170838297541.2281798.7838961694439257911.b4-ty@google.com>
-Content-Language: en-US
-Organization: Xen Project
-In-Reply-To: <170838297541.2281798.7838961694439257911.b4-ty@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 
-On 20/02/2024 15:55, Sean Christopherson wrote:
-> On Thu, 15 Feb 2024 15:28:55 +0000, Paul Durrant wrote:
->> From: Paul Durrant <pdurrant@amazon.com>
->>
->> This series contains a new patch from Sean added since v12 [1]:
->>
->> * KVM: s390: Refactor kvm_is_error_gpa() into kvm_is_gpa_in_memslot()
->>
->> This frees up the function name kvm_is_error_gpa() such that it can then be
->> re-defined in:
->>
+Xiaoyao Li <xiaoyao.li@intel.com> writes:
+
+> On 2/19/2024 8:48 PM, Markus Armbruster wrote:
+>> Xiaoyao Li <xiaoyao.li@intel.com> writes:
+>>=20
+>>> From: Isaku Yamahata <isaku.yamahata@intel.com>
+>>>
+>>> Three sha384 hash values, mrconfigid, mrowner and mrownerconfig, of a TD
+>>> can be provided for TDX attestation. Detailed meaning of them can be
+>>> found: https://lore.kernel.org/qemu-devel/31d6dbc1-f453-4cef-ab08-4813f=
+4e0ff92@intel.com/
+>>>
+>>> Allow user to specify those values via property mrconfigid, mrowner and
+>>> mrownerconfig. They are all in base64 format.
+>>>
+>>> example
+>>> -object tdx-guest, \
+>>>    mrconfigid=3DASNFZ4mrze8BI0VniavN7wEjRWeJq83vASNFZ4mrze8BI0VniavN7wE=
+jRWeJq83v,\
+>>>    mrowner=3DASNFZ4mrze8BI0VniavN7wEjRWeJq83vASNFZ4mrze8BI0VniavN7wEjRW=
+eJq83v,\
+>>>    mrownerconfig=3DASNFZ4mrze8BI0VniavN7wEjRWeJq83vASNFZ4mrze8BI0VniavN=
+7wEjRWeJq83v
+>>>
+>>> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+>>> Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>>>
+>>> ---
+>>> Changes in v4:
+>>>   - describe more of there fields in qom.json
+>>>   - free the old value before set new value to avoid memory leak in
+>>>     _setter(); (Daniel)
+>>>
+>>> Changes in v3:
+>>>   - use base64 encoding instread of hex-string;
+>>> ---
+>>>   qapi/qom.json         | 14 ++++++-
+>>>   target/i386/kvm/tdx.c | 87 +++++++++++++++++++++++++++++++++++++++++++
+>>>   target/i386/kvm/tdx.h |  3 ++
+>>>   3 files changed, 103 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/qapi/qom.json b/qapi/qom.json
+>>> index 2177f3101382..15445f9e41fc 100644
+>>> --- a/qapi/qom.json
+>>> +++ b/qapi/qom.json
+>>> @@ -905,10 +905,22 @@
+>>>   #     pages.  Some guest OS (e.g., Linux TD guest) may require this to
+>>>   #     be set, otherwise they refuse to boot.
+>>>   #
+>>> +# @mrconfigid: ID for non-owner-defined configuration of the guest TD,
+>>> +#     e.g., run-time or OS configuration.  base64 encoded SHA384 diges=
+t.
+>>=20
+>> "base64 encoded SHA384" is not a sentence.
+>>=20
+>> Double-checking: the data being hashed here is the "non-owner-defined
+>> configuration of the guest TD", and the resulting hash is the "ID"?
+>
+> yes. The "ID" here means the resulting hash.
+>
+> The reason to use "ID" here because in the TDX spec, it's description is
+>
+>    Software-defined ID for non-owner-defined configuration of the guest
+>    TD - e.g., run-time or OS configuration.
+>
+> If ID is confusing, how about
+>
+>    SHA384 hash of non-owner-defined configuration of the guest TD, e.g.,
+>    run-time of OS configuration.  It's base64 encoded.
+
+I guess staying close to the TDX spec makes sense.
+
+We still need to mention the base64 encoding.
+
+What about something like
+
+     ID for non-owner-defined configuration of the guest TD, e.g.,
+     run-time or OS configuration (base64 encoded SHA384 digest)
+
+or, if we decide that the fact it's SHA384 digest is irrelevant for QMP
+
+     ID for non-owner-defined configuration of the guest TD, e.g.,
+     run-time or OS configuration (base64 encoded)
+
+>>> +#
+>>> +# @mrowner: ID for the guest TD=E2=80=99s owner.  base64 encoded SHA38=
+4 digest.
+>>=20
+>> Likewise.
+>>=20
+>>> +#
+>>> +# @mrownerconfig: ID for owner-defined configuration of the guest TD,
+>>> +#     e.g., specific to the workload rather than the run-time or OS.
+>>> +#     base64 encoded SHA384 digest.
+>>=20
+>> Likewise.
+>>=20
+>>> +#
+>>>   # Since: 9.0
+>>>   ##
+>>>   { 'struct': 'TdxGuestProperties',
+>>> -  'data': { '*sept-ve-disable': 'bool' } }
+>>> +  'data': { '*sept-ve-disable': 'bool',
+>>> +            '*mrconfigid': 'str',
+>>> +            '*mrowner': 'str',
+>>> +            '*mrownerconfig': 'str' } }
+>>=20
+>> The new members are optional, but their description in the doc comment
+>> doesn't explain behavior when present vs. behavior when absent.
+>>=20
+>>>=20=20=20
+>>>   ##
+>>>   # @ThreadContextProperties:
+>>=20
 >> [...]
-> 
-> *sigh*
-> 
-> I forgot to hit "send" on this yesterday.  But lucky for me, that worked out in
-> my favor as I needed to rebase on top of kvm/kvm-uapi to avoid pointless conflicts
-> in the uapi headeres.
-> 
-> So....
-> 
-> Applied to kvm-x86 xen, minus 18 and 19 (trylock stuff) and 21 (locking cleanup
-> that we're doing elsewhere).
-> 
-
-Looks like you meant 17 & 18?
-
-> Paul and David, please take (another) look at the end result to make sure you don't
-> object to any of my tweaks and that I didn't botch anything.
-> 
-
-What was the issue with 17? It was reasonable clean-up and I'd like to 
-keep it even without 18 being applied (and I totally understand your 
-reasons for that).
-
-> s390 folks, I'm applying/pushing now to get it into -next asap, but I'll make
-> sure to get acks/reviews on patch 08/21 before I do anything else with this
-> branch/series.
-> 
-> Thanks!
-> 
-> [01/21] KVM: pfncache: Add a map helper function
->          https://github.com/kvm-x86/linux/commit/f39b80e3ff12
-> [02/21] KVM: pfncache: remove unnecessary exports
->          https://github.com/kvm-x86/linux/commit/41496fffc0e1
-> [03/21] KVM: x86/xen: mark guest pages dirty with the pfncache lock held
->          https://github.com/kvm-x86/linux/commit/4438355ec6e1
-> [04/21] KVM: pfncache: add a mark-dirty helper
->          https://github.com/kvm-x86/linux/commit/78b74638eb6d
-> [05/21] KVM: pfncache: remove KVM_GUEST_USES_PFN usage
->          https://github.com/kvm-x86/linux/commit/a4bff3df5147
-> [06/21] KVM: pfncache: stop open-coding offset_in_page()
->          https://github.com/kvm-x86/linux/commit/53e63e953e14
-> [07/21] KVM: pfncache: include page offset in uhva and use it consistently
->          https://github.com/kvm-x86/linux/commit/406c10962a4c
-> [08/21] KVM: s390: Refactor kvm_is_error_gpa() into kvm_is_gpa_in_memslot()
->          https://github.com/kvm-x86/linux/commit/9e7325acb3dc
-> [09/21] KVM: pfncache: allow a cache to be activated with a fixed (userspace) HVA
->          https://github.com/kvm-x86/linux/commit/721f5b0dda78
-> [10/21] KVM: x86/xen: separate initialization of shared_info cache and content
->          https://github.com/kvm-x86/linux/commit/c01c55a34f28
-> [11/21] KVM: x86/xen: re-initialize shared_info if guest (32/64-bit) mode is set
->          https://github.com/kvm-x86/linux/commit/21b99e4d6db6
-> [12/21] KVM: x86/xen: allow shared_info to be mapped by fixed HVA
->          https://github.com/kvm-x86/linux/commit/10dcbfc46724
-> [13/21] KVM: x86/xen: allow vcpu_info to be mapped by fixed HVA
->          https://github.com/kvm-x86/linux/commit/16877dd45f98
-> [14/21] KVM: selftests: map Xen's shared_info page using HVA rather than GFN
->          https://github.com/kvm-x86/linux/commit/95c27ed8619b
-> [15/21] KVM: selftests: re-map Xen's vcpu_info using HVA rather than GPA
->          https://github.com/kvm-x86/linux/commit/5359bf19a3f0
-> [16/21] KVM: x86/xen: advertize the KVM_XEN_HVM_CONFIG_SHARED_INFO_HVA capability
->          https://github.com/kvm-x86/linux/commit/49668ce7e1ae
-> [17/21] KVM: x86/xen: split up kvm_xen_set_evtchn_fast()
->          (not applied)
-> [18/21] KVM: x86/xen: don't block on pfncache locks in kvm_xen_set_evtchn_fast()
->          (not applied)
-> [19/21] KVM: pfncache: check the need for invalidation under read lock first
->          https://github.com/kvm-x86/linux/commit/21dadfcd665e
-> [20/21] KVM: x86/xen: allow vcpu_info content to be 'safely' copied
->          https://github.com/kvm-x86/linux/commit/dadeabc3b6fa
-> [21/21] KVM: pfncache: rework __kvm_gpc_refresh() to fix locking issues
->          (not applied)
-> 
-> --
-> https://github.com/kvm-x86/linux/tree/next
+>>=20
+>>=20
 
 
