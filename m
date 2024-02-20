@@ -1,187 +1,273 @@
-Return-Path: <kvm+bounces-9197-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9198-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CB9885BE99
-	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 15:20:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35DCC85BEBD
+	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 15:27:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B70CC28445A
-	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 14:20:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8EA22286023
+	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 14:27:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FE276BB2B;
-	Tue, 20 Feb 2024 14:20:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5F496BB3A;
+	Tue, 20 Feb 2024 14:27:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="L9JpffPE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kyz/qTHY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7DA66A8DB;
-	Tue, 20 Feb 2024 14:20:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0A2B33D2;
+	Tue, 20 Feb 2024 14:27:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708438804; cv=none; b=hODj1XvZ0AK9QOsD6cOnODoPNHce6WHljxIT48soCTSDYN7vo2qsouwBFvx+RE/YED109pij89R9qo4vNEPrH+/lZDfFfThAIllFlLvZocI5/0KlBiBH25reLVXDALIuQ6gI5iftLcG9pP5tgF2vZZXNKTkXDN5xvFfhpMPDdWo=
+	t=1708439256; cv=none; b=kblZdTC7feQbyFY2K1Xp98NWa+d8VSMhBtfBGYK2rWcJbVIaj9ux9ePpyN8vcOA/YPnSIWVy0Y9L2tYx6Ck5a3i78GsQleGE5m5a/cdlGVXwfQqEDCsNkgAzh4wuE1t1IpEYh/c2VzuSbKPvh3RNVZ7nwikVuBB/Dt1vjxx8AU8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708438804; c=relaxed/simple;
-	bh=DHN5JZJpFFBaDrEQwwTJ1WOLN2wJHRgyQI4rjHU4SQo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ecsId0DPQauaXq/ge38NoB+sRJ3Fuy0YhNnU/dA7a0biIkoAER/390gEA2Paa3ATJtnT4Oo2Uv2RwX1dKEbtqGi9ZM3bE7vsaCiF7QSpamWbx31FtfG1bwgCAZLruItsJZ1wfi59vUIc3CzlJjVpDOyIeg/4Xqz4ZwEYHZyf5Kw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=L9JpffPE; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41KDQ2AS026059;
-	Tue, 20 Feb 2024 14:19:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=KQiekoHt2EdmLlpVIfRUG6QpYFxWo54OQiEohF/20+4=;
- b=L9JpffPEeAnJkFhobAwyh3pJVpIFUnksDm8L7S56c4+dTvds3KXa2+RIkdHn0VhEu6oq
- ihU4jxVSbFYs83EE411Gks4PYDPGEKyg04E1Yl6SbaWuueMwcw9Iicgp2tL3m9QieYAx
- 9wMkoDoxbEShQ4vWWFLqsNIORBcoExQ81DeNmPjDwwQAx6qiXX12GnzzKPmhyhwr920H
- WY2NQiu5HjuW8frsEX2ywKhVbKRM4tRUdurNiUUFetfev9eYXi3JwuCM7P+EPHMRKye6
- 4SCgU8KYrnQ13plrq6m6YOfaIYWFXfwaXfokzYugsh3iCFf2CvCIodCz6INUmkcm+yvG Pg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wctt3d7mp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 20 Feb 2024 14:19:59 +0000
-Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41KDeuJn015124;
-	Tue, 20 Feb 2024 14:19:58 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wctt3d7m4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 20 Feb 2024 14:19:58 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 41KD551g031153;
-	Tue, 20 Feb 2024 14:19:57 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3wb9bkr6gv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 20 Feb 2024 14:19:57 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 41KEJqm728377710
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 20 Feb 2024 14:19:54 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 595FB20063;
-	Tue, 20 Feb 2024 14:19:52 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 93EB02005A;
-	Tue, 20 Feb 2024 14:19:51 +0000 (GMT)
-Received: from [9.171.35.38] (unknown [9.171.35.38])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 20 Feb 2024 14:19:51 +0000 (GMT)
-Message-ID: <c64a7f44-2407-472d-8197-995b38ae2214@linux.ibm.com>
-Date: Tue, 20 Feb 2024 15:19:51 +0100
+	s=arc-20240116; t=1708439256; c=relaxed/simple;
+	bh=VMv32jY7H+HHK/arSBLkv4rdOEhQErLV+AIurutpmw8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=W1wpOvNzz7+x9kP7ENA/dTDgBd5k3/BisbuaUSu+Ajg4eIjVE9uqtUgfw00aRnAPH7WQHAIIXuPWZ4ZkZ8Td15w7jYQ0bJaLdti5WUyQxIwhZeEYK1IoCM64K2mONdKfyuyUwX2t/i1Lu8TVmG8/ujOujJWdVTh/Z+yn3ApO09A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kyz/qTHY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94950C433C7;
+	Tue, 20 Feb 2024 14:27:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708439255;
+	bh=VMv32jY7H+HHK/arSBLkv4rdOEhQErLV+AIurutpmw8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Kyz/qTHYzLTyBGZG6efrvngzW/VUQF9u2tgArPCRyP7Z5pv4qZwsFFkPBtWpFstoZ
+	 /YF+R7R1vkVL4S/TkaKJ+rYgesLB4ca1KXgJDev7yLsitFhwjez2ii/w+SbcqXFLGJ
+	 +ScrKx6KbS+nA1RerVQKRHIl6ZsCRdl5WrvsAVOorcxSyX74GsWja6yoC9/C8CXfvt
+	 PvXoGIkpEg2413/iIopyHs+wkoVOoTMoii379+VxX68081x50zpCpsbBbl1wl4NmWr
+	 T4/w8IztOdWy5kRtcognPGf2j2YWV3vzWA0CsAl50yJx4+ToByQuUmBT2alo+kzw7z
+	 encc+p0SIjhfQ==
+Date: Tue, 20 Feb 2024 15:27:22 +0100
+From: Lorenzo Pieralisi <lpieralisi@kernel.org>
+To: ankita@nvidia.com
+Cc: jgg@nvidia.com, maz@kernel.org, oliver.upton@linux.dev,
+	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	reinette.chatre@intel.com, surenb@google.com, stefanha@redhat.com,
+	brauner@kernel.org, catalin.marinas@arm.com, will@kernel.org,
+	mark.rutland@arm.com, alex.williamson@redhat.com,
+	kevin.tian@intel.com, yi.l.liu@intel.com, ardb@kernel.org,
+	akpm@linux-foundation.org, andreyknvl@gmail.com,
+	wangjinchao@xfusion.com, gshan@redhat.com, shahuang@redhat.com,
+	ricarkol@google.com, linux-mm@kvack.org, rananta@google.com,
+	ryan.roberts@arm.com, david@redhat.com, linus.walleij@linaro.org,
+	bhe@redhat.com, aniketa@nvidia.com, cjia@nvidia.com,
+	kwankhede@nvidia.com, targupta@nvidia.com, vsethi@nvidia.com,
+	acurrid@nvidia.com, apopple@nvidia.com, jhubbard@nvidia.com,
+	danw@nvidia.com, kvmarm@lists.linux.dev, mochs@nvidia.com,
+	zhiw@nvidia.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v8 1/4] kvm: arm64: introduce new flag for non-cacheable
+ IO memory
+Message-ID: <ZdS2yl1kzZv/h+vH@lpieralisi>
+References: <20240220072926.6466-1-ankita@nvidia.com>
+ <20240220072926.6466-2-ankita@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/2] KVM: s390: fix access register usage in ioctls
-Content-Language: en-US
-To: Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Claudio Imbrenda
- <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>
-Cc: Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-References: <20240216213616.3819805-1-farman@linux.ibm.com>
- <20240216213616.3819805-2-farman@linux.ibm.com>
- <1d9fef3d-b793-43fc-a3f9-4ff087bc899f@linux.ibm.com>
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- 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
-In-Reply-To: <1d9fef3d-b793-43fc-a3f9-4ff087bc899f@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: ipFURYuOq1B7p5bGBlNHnjUdwCH4vral
-X-Proofpoint-GUID: LzFwYwU1KrEMQJD2A9fjgEJ5hLVDdFf1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-20_06,2024-02-20_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxscore=0
- phishscore=0 spamscore=0 suspectscore=0 lowpriorityscore=0 impostorscore=0
- mlxlogscore=918 priorityscore=1501 clxscore=1011 bulkscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2402200103
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240220072926.6466-2-ankita@nvidia.com>
 
-On 2/20/24 15:15, Christian Borntraeger wrote:
+On Tue, Feb 20, 2024 at 12:59:23PM +0530, ankita@nvidia.com wrote:
+> From: Ankit Agrawal <ankita@nvidia.com>
 > 
+> Currently, KVM for ARM64 maps at stage 2 memory that is considered device
+> (i.e. it is not RAM) with DEVICE_nGnRE memory attributes; this setting
+> overrides (as per the ARM architecture [1]) any device MMIO mapping
+> present at stage 1, resulting in a set-up whereby a guest operating
+> system cannot determine device MMIO mapping memory attributes on its
+> own but it is always overridden by the KVM stage 2 default.
 > 
-> Am 16.02.24 um 22:36 schrieb Eric Farman:
->> The routine ar_translation() can be reached by both the instruction
->> intercept path (where the access registers had been loaded with the
->> guest register contents), and the MEM_OP ioctls (which hadn't).
->> Since this routine saves the current registers to vcpu->run,
->> this routine erroneously saves host registers into the guest space.
->>
->> Introduce a boolean in the kvm_vcpu_arch struct to indicate whether
->> the registers contain guest contents. If they do (the instruction
->> intercept path), the save can be performed and the AR translation
->> is done just as it is today. If they don't (the MEM_OP path), the
->> AR can be read from vcpu->run without stashing the current contents.
->>
->> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> This set-up does not allow guest operating systems to select device
+> memory attributes independently from KVM stage-2 mappings
+> (refer to [1], "Combining stage 1 and stage 2 memory type attributes"),
+> which turns out to be an issue in that guest operating systems
+> (e.g. Linux) may request to map devices MMIO regions with memory
+> attributes that guarantee better performance (e.g. gathering
+> attribute - that for some devices can generate larger PCIe memory
+> writes TLPs) and specific operations (e.g. unaligned transactions)
+> such as the NormalNC memory type.
+> 
+> The default device stage 2 mapping was chosen in KVM for ARM64 since
+> it was considered safer (i.e. it would not allow guests to trigger
+> uncontained failures ultimately crashing the machine) but this
+> turned out to be asynchronous (SError) defeating the purpose.
+> 
+> Failures containability is a property of the platform and is independent
+> from the memory type used for MMIO device memory mappings.
+> 
+> Actually, DEVICE_nGnRE memory type is even more problematic than
+> Normal-NC memory type in terms of faults containability in that e.g.
+> aborts triggered on DEVICE_nGnRE loads cannot be made, architecturally,
+> synchronous (i.e. that would imply that the processor should issue at
+> most 1 load transaction at a time - it cannot pipeline them - otherwise
+> the synchronous abort semantics would break the no-speculation attribute
+> attached to DEVICE_XXX memory).
+> 
+> This means that regardless of the combined stage1+stage2 mappings a
+> platform is safe if and only if device transactions cannot trigger
+> uncontained failures and that in turn relies on platform capabilities
+> and the device type being assigned (i.e. PCIe AER/DPC error containment
+> and RAS architecture[3]); therefore the default KVM device stage 2
+> memory attributes play no role in making device assignment safer
+> for a given platform (if the platform design adheres to design
+> guidelines outlined in [3]) and therefore can be relaxed.
+> 
+> For all these reasons, relax the KVM stage 2 device memory attributes
+> from DEVICE_nGnRE to Normal-NC.
+> 
+> The NormalNC was chosen over a different Normal memory type default
+> at stage-2 (e.g. Normal Write-through) to avoid cache allocation/snooping.
+> 
+> Relaxing S2 KVM device MMIO mappings to Normal-NC is not expected to
+> trigger any issue on guest device reclaim use cases either (i.e. device
+> MMIO unmap followed by a device reset) at least for PCIe devices, in that
+> in PCIe a device reset is architected and carried out through PCI config
+> space transactions that are naturally ordered with respect to MMIO
+> transactions according to the PCI ordering rules.
+> 
+> Having Normal-NC S2 default puts guests in control (thanks to
+> stage1+stage2 combined memory attributes rules [1]) of device MMIO
+> regions memory mappings, according to the rules described in [1]
+> and summarized here ([(S1) - stage1], [(S2) - stage 2]):
+> 
+> S1           |  S2           | Result
+> NORMAL-WB    |  NORMAL-NC    | NORMAL-NC
+> NORMAL-WT    |  NORMAL-NC    | NORMAL-NC
+> NORMAL-NC    |  NORMAL-NC    | NORMAL-NC
+> DEVICE<attr> |  NORMAL-NC    | DEVICE<attr>
+> 
+> It is worth noting that currently, to map devices MMIO space to user
+> space in a device pass-through use case the VFIO framework applies memory
+> attributes derived from pgprot_noncached() settings applied to VMAs, which
+> result in device-nGnRnE memory attributes for the stage-1 VMM mappings.
+> 
+> This means that a userspace mapping for device MMIO space carried
+> out with the current VFIO framework and a guest OS mapping for the same
+> MMIO space may result in a mismatched alias as described in [2].
+> 
+> Defaulting KVM device stage-2 mappings to Normal-NC attributes does not
+> change anything in this respect, in that the mismatched aliases would
+> only affect (refer to [2] for a detailed explanation) ordering between
+> the userspace and GuestOS mappings resulting stream of transactions
+> (i.e. it does not cause loss of property for either stream of
+> transactions on its own), which is harmless given that the userspace
+> and GuestOS access to the device is carried out through independent
+> transactions streams.
+> 
+> A Normal-NC flag is not present today. So add a new kvm_pgtable_prot
+> (KVM_PGTABLE_PROT_NORMAL_NC) flag for it, along with its
+> corresponding PTE value 0x5 (0b101) determined from [1].
+> 
+> Lastly, adapt the stage2 PTE property setter function
+> (stage2_set_prot_attr) to handle the NormalNC attribute.
+> 
+> [1] section D8.5.5 - DDI0487J_a_a-profile_architecture_reference_manual.pdf
+> [2] section B2.8 - DDI0487J_a_a-profile_architecture_reference_manual.pdf
+> [3] sections 1.7.7.3/1.8.5.2/appendix C - DEN0029H_SBSA_7.1.pdf
 > 
 
-Just spoke with Christian since that's a mixed signal.
+A couple of Link: tags would not hurt in my opinion, lest we forget:
 
-To move this over the s390 tree:
-> Acked-by: Christian Borntraeger <borntraeger@linux.ibm.com>
+Link: https://lore.kernel.org/r/20230907181459.18145-2-ankita@nvidia.com/
+Link: https://lore.kernel.org/r/20231205033015.10044-1-ankita@nvidia.com
 
-For the Patch in general:
-> Reviewed-by: Christian Borntraeger <borntraeger@linux.ibm.com>
-
+> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
+> ---
+>  arch/arm64/include/asm/kvm_pgtable.h |  2 ++
+>  arch/arm64/include/asm/memory.h      |  2 ++
+>  arch/arm64/kvm/hyp/pgtable.c         | 24 +++++++++++++++++++-----
+>  3 files changed, 23 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index cfdf40f734b1..19278dfe7978 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -197,6 +197,7 @@ enum kvm_pgtable_stage2_flags {
+>   * @KVM_PGTABLE_PROT_W:		Write permission.
+>   * @KVM_PGTABLE_PROT_R:		Read permission.
+>   * @KVM_PGTABLE_PROT_DEVICE:	Device attributes.
+> + * @KVM_PGTABLE_PROT_NORMAL_NC:	Normal noncacheable attributes.
+>   * @KVM_PGTABLE_PROT_SW0:	Software bit 0.
+>   * @KVM_PGTABLE_PROT_SW1:	Software bit 1.
+>   * @KVM_PGTABLE_PROT_SW2:	Software bit 2.
+> @@ -208,6 +209,7 @@ enum kvm_pgtable_prot {
+>  	KVM_PGTABLE_PROT_R			= BIT(2),
+>  
+>  	KVM_PGTABLE_PROT_DEVICE			= BIT(3),
+> +	KVM_PGTABLE_PROT_NORMAL_NC		= BIT(4),
+>  
+>  	KVM_PGTABLE_PROT_SW0			= BIT(55),
+>  	KVM_PGTABLE_PROT_SW1			= BIT(56),
+> diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
+> index d82305ab420f..449ca2ff1df6 100644
+> --- a/arch/arm64/include/asm/memory.h
+> +++ b/arch/arm64/include/asm/memory.h
+> @@ -173,6 +173,7 @@
+>   * Memory types for Stage-2 translation
+>   */
+>  #define MT_S2_NORMAL		0xf
+> +#define MT_S2_NORMAL_NC		0x5
+>  #define MT_S2_DEVICE_nGnRE	0x1
+>  
+>  /*
+> @@ -180,6 +181,7 @@
+>   * Stage-2 enforces Normal-WB and Device-nGnRE
+>   */
+>  #define MT_S2_FWB_NORMAL	6
+> +#define MT_S2_FWB_NORMAL_NC	5
+>  #define MT_S2_FWB_DEVICE_nGnRE	1
+>  
+>  #ifdef CONFIG_ARM64_4K_PAGES
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index ab9d05fcf98b..3fae5830f8d2 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -717,15 +717,29 @@ void kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
+>  static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot prot,
+>  				kvm_pte_t *ptep)
+>  {
+> -	bool device = prot & KVM_PGTABLE_PROT_DEVICE;
+> -	kvm_pte_t attr = device ? KVM_S2_MEMATTR(pgt, DEVICE_nGnRE) :
+> -			    KVM_S2_MEMATTR(pgt, NORMAL);
+> +	kvm_pte_t attr;
+>  	u32 sh = KVM_PTE_LEAF_ATTR_LO_S2_SH_IS;
+>  
+> +	switch (prot & (KVM_PGTABLE_PROT_DEVICE |
+> +			KVM_PGTABLE_PROT_NORMAL_NC)) {
+> +	case KVM_PGTABLE_PROT_DEVICE | KVM_PGTABLE_PROT_NORMAL_NC:
+> +		return -EINVAL;
+> +	case KVM_PGTABLE_PROT_DEVICE:
+> +		if (prot & KVM_PGTABLE_PROT_X)
+> +			return -EINVAL;
+> +		attr = KVM_S2_MEMATTR(pgt, DEVICE_nGnRE);
+> +		break;
+> +	case KVM_PGTABLE_PROT_NORMAL_NC:
+> +		if (prot & KVM_PGTABLE_PROT_X)
+> +			return -EINVAL;
+> +		attr = KVM_S2_MEMATTR(pgt, NORMAL_NC);
+> +		break;
+> +	default:
+> +		attr = KVM_S2_MEMATTR(pgt, NORMAL);
+> +	}
+> +
+>  	if (!(prot & KVM_PGTABLE_PROT_X))
+>  		attr |= KVM_PTE_LEAF_ATTR_HI_S2_XN;
+> -	else if (device)
+> -		return -EINVAL;
+>  
+>  	if (prot & KVM_PGTABLE_PROT_R)
+>  		attr |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
+> -- 
+> 2.34.1
+> 
 
