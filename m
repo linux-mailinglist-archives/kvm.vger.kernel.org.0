@@ -1,86 +1,85 @@
-Return-Path: <kvm+bounces-9168-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9169-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D5DF85B831
-	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 10:51:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A922C85B857
+	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 10:56:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0D550B248B4
-	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 09:51:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 490CE1F294B9
+	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 09:56:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AB936351F;
-	Tue, 20 Feb 2024 09:49:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Ejkd3q1q"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DC6860BBC;
+	Tue, 20 Feb 2024 09:56:11 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 436B9634E3;
-	Tue, 20 Feb 2024 09:49:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D53F260244;
+	Tue, 20 Feb 2024 09:56:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708422565; cv=none; b=DSb7J9AT7+IIp8yWgkh5c/4cIqYx752JCCjMacdBZrNIWBYzSBS9BDXoo6gLvsx6L57S7Swb3n+Ptf+jyCBOycjykWD03cnYihgEd5p37Kfndrd/2qcP17U0ncruK/X4XiBS7zF3K5KFpdKbsiMhuTcuaOklG5BcSh0k0eYwy7o=
+	t=1708422970; cv=none; b=USu5Pj4+lDUwa6j5cQdkDnAq/ZCwBfu/JVJXsxKPRbhKJRDBjY9BqULAkx2dZHUOWHvEjQha5OoivUxHEalg+pOAOIOes6UVm6EZd5KMMZjn+HNC7uDvIlNpuyV8clYi9fgb0tnLv6sJpdwtQeMYpG1FtjgMkbzk2PE7vZsTLrA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708422565; c=relaxed/simple;
-	bh=sNUETDST/v8hQGqSf1wePFn/eaKqyg242+p8bl9EfMU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sZBmu6v9jPq6+upu5HZ/3LYIC93ymSqdsuFg5S/O3oey38abM3VMPNqcnNxhNTLgo0gsyOr6W8lUjjLXeOXPmipqKLpl08I/vVXxhLgLXnRxM3CF6w55TLfEEtvUBfqqm8K20iROXFexuO0GyBeMiu/6rnKh14vqaKvE9DSFkF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Ejkd3q1q; arc=none smtp.client-ip=115.124.30.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1708422560; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=KVGuMbs0Ek78rNZXhgXCoIlF0qOOV7+uQghBDmhesIA=;
-	b=Ejkd3q1qWMLFUU+gv9DjfIC2T7WYX3bdfUroJmraAP7rQ1ykqAcaeb55KrtpAzkw3BEojgV7gJGArOCi46RwSqq+GZTJQWiFStKbFYHWOAdvl/QZsLApvci+u1n10wPONJlimOzyTOevtp2cpws4eJk0F6QmgqGAuE1OMYWtNzc=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R561e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=yaoma@linux.alibaba.com;NM=1;PH=DS;RN=15;SR=0;TI=SMTPD_---0W0wRtoq_1708422556;
-Received: from 30.178.67.228(mailfrom:yaoma@linux.alibaba.com fp:SMTPD_---0W0wRtoq_1708422556)
-          by smtp.aliyun-inc.com;
-          Tue, 20 Feb 2024 17:49:18 +0800
-Message-ID: <335d1e82-8e70-475d-a4d5-12dbbd7ca660@linux.alibaba.com>
-Date: Tue, 20 Feb 2024 17:49:16 +0800
+	s=arc-20240116; t=1708422970; c=relaxed/simple;
+	bh=neaD1FxsjzQ5jsLnH0UcC4xovILhlo04Z/jp6nHSC7k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uZXHdACqpX/sAp12eBWSMhd46APuS90zyStuXHbi23gxqQ/0CN+GJ65GNUIwJkbPLJQvmi8HAXg76C13rDDLBry//9eHnxtS/Nud9fQtO3hwdnFzeUW/ug+mAwPAcOWnClbr8cyrXiSeBsOCm1P8IY5E+wExf3fh4s1y2c3Erno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDD13C433C7;
+	Tue, 20 Feb 2024 09:56:02 +0000 (UTC)
+Date: Tue, 20 Feb 2024 09:56:00 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: ankita@nvidia.com
+Cc: jgg@nvidia.com, maz@kernel.org, oliver.upton@linux.dev,
+	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	reinette.chatre@intel.com, surenb@google.com, stefanha@redhat.com,
+	brauner@kernel.org, will@kernel.org, mark.rutland@arm.com,
+	alex.williamson@redhat.com, kevin.tian@intel.com,
+	yi.l.liu@intel.com, ardb@kernel.org, akpm@linux-foundation.org,
+	andreyknvl@gmail.com, wangjinchao@xfusion.com, gshan@redhat.com,
+	shahuang@redhat.com, ricarkol@google.com, linux-mm@kvack.org,
+	lpieralisi@kernel.org, rananta@google.com, ryan.roberts@arm.com,
+	david@redhat.com, linus.walleij@linaro.org, bhe@redhat.com,
+	aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com,
+	targupta@nvidia.com, vsethi@nvidia.com, acurrid@nvidia.com,
+	apopple@nvidia.com, jhubbard@nvidia.com, danw@nvidia.com,
+	kvmarm@lists.linux.dev, mochs@nvidia.com, zhiw@nvidia.com,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v8 4/4] vfio: convey kvm that the vfio-pci device is wc
+ safe
+Message-ID: <ZdR3MI_4pqV0EZcR@arm.com>
+References: <20240220072926.6466-1-ankita@nvidia.com>
+ <20240220072926.6466-5-ankita@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv8 2/2] watchdog/softlockup: report the most frequent
- interrupts
-Content-Language: en-US
-To: Thomas Gleixner <tglx@linutronix.de>, dianders@chromium.org,
- pmladek@suse.com, akpm@linux-foundation.org, kernelfans@gmail.com,
- liusong@linux.alibaba.com, deller@gmx.de, npiggin@gmail.com,
- jan.kiszka@siemens.com, kbingham@kernel.org
-Cc: linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-parisc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- kvm@vger.kernel.org
-References: <20240219161920.15752-1-yaoma@linux.alibaba.com>
- <20240219161920.15752-3-yaoma@linux.alibaba.com> <87le7fiiku.ffs@tglx>
-From: Bitao Hu <yaoma@linux.alibaba.com>
-In-Reply-To: <87le7fiiku.ffs@tglx>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240220072926.6466-5-ankita@nvidia.com>
 
-Hi,
+On Tue, Feb 20, 2024 at 12:59:26PM +0530, ankita@nvidia.com wrote:
+> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+> index 1cbc990d42e0..c93bea18fc4b 100644
+> --- a/drivers/vfio/pci/vfio_pci_core.c
+> +++ b/drivers/vfio/pci/vfio_pci_core.c
+> @@ -1862,8 +1862,24 @@ int vfio_pci_core_mmap(struct vfio_device *core_vdev, struct vm_area_struct *vma
+>  	/*
+>  	 * See remap_pfn_range(), called from vfio_pci_fault() but we can't
+>  	 * change vm_flags within the fault handler.  Set them now.
+> +	 *
+> +	 * VM_ALLOW_ANY_UNCACHED: The VMA flag is implemented for ARM64,
+> +	 * allowing KVM stage 2 device mapping attributes to use Normal-NC
+> +	 * rather than DEVICE_nGnRE, which allows guest mappings
+> +	 * supporting combining attributes (WC). ARM does not
 
-On 2024/2/20 17:35, Thomas Gleixner wrote:
-> On Tue, Feb 20 2024 at 00:19, Bitao Hu wrote:
->>   arch/mips/dec/setup.c                |   2 +-
->>   arch/parisc/kernel/smp.c             |   2 +-
->>   arch/powerpc/kvm/book3s_hv_rm_xics.c |   2 +-
->>   include/linux/irqdesc.h              |   9 ++-
->>   include/linux/kernel_stat.h          |   4 +
->>   kernel/irq/internals.h               |   2 +-
->>   kernel/irq/irqdesc.c                 |  34 ++++++--
->>   kernel/irq/proc.c                    |   9 +--
-> 
-> This really wants to be split into two patches. Interrupt infrastructure
-> first and then the actual usage site in the watchdog code.
-> 
-Okay, I will split it into two patches.
+Nitpick: "supporting write-combining" (if you plan to respin).
+
+-- 
+Catalin
 
