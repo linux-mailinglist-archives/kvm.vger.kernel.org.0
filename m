@@ -1,182 +1,155 @@
-Return-Path: <kvm+bounces-9219-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9220-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D042085C1F0
-	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 18:03:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 490B485C208
+	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 18:07:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE4C31C23F73
-	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 17:03:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3B0E281A70
+	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 17:07:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 815D476900;
-	Tue, 20 Feb 2024 17:03:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 445A376C9A;
+	Tue, 20 Feb 2024 17:07:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="alxgrhxt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lAI/MB9o"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2066.outbound.protection.outlook.com [40.107.237.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E2EB1C2E;
-	Tue, 20 Feb 2024 17:03:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.66
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708448604; cv=fail; b=Bj6XESxPtWU+CqzekzR2r4F345hwUy62109vjDLZ9oGOuqpmRjttkGCmAmpgqwyBcynxOo6/Dz0rwirM8WRJDscSMWN+58rxqRcQzIkycJ3j7TWkjjj0M/4+NJ6lIjF5+pAWFneeC+zpNwJ2JW70+IFICP8s+DaZU47gxDgnyUc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708448604; c=relaxed/simple;
-	bh=Du2OpseH9TohpB59gHs9Cw88wMIbqTvcchUGBfP2o8A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=ll2SRKlqlK82k5m+sEc/gl6kkAJuEsGMn1lpyxmntYB4dLxPumPjsRHzWQchm1v05ZHno4yYCKNoI1YOQKICJekiMOZwjbH7UvZYrEWC/cQxE4pSq2cdtFl34WWIFB+odn1tLDG0Irr0EOUT5zLiD7p4c2AFKBhrxsuocfWEfrk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=alxgrhxt; arc=fail smtp.client-ip=40.107.237.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=i85g1vbccH7Q6N4kcKmKEIceycwRHhfMlFnvzJR6mUyE/y4sM96R4hxhP0qILcdfqMfkU+Trxt9Kd97EViX5I4Q8fz0ns6YMGO4wz0SRO9/52puMbNwWE8zgPBs0ebuDyRhkEE7+289XSMm+Wdw1D1NmootlhklzrtDd9e1IsiRO3qHLivlpSgX95WXvEJ2JSvN8RSwuPFX9U/LM8QlDjKIkb25Wx4LboYzC1h/kWJTanEM4LSQ/j5eGWoTr2qYjoKMwVhjXWoPUCzJ1nnmyNme1YpjeqRk32639dk3E5NUqW0dHzGhH0NlyFQ3Hfx3zuhK0OIQ/Pv6ts2sYdV7jWg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tievG4WqY2pyjvXPR3B62dm1kXkivcnYmmXA7vwYLdI=;
- b=oO0c4kpf2k2AAw6qqBSuQP2ISAzc622ATYZ63aViuzoz5f/ER7aqH+/1PawslWA2pIniv86VNWWwUqPojUbWyU5wKjqsWCn8IhzB/AN78Wy8Qv3tPhpwqETF9DBj7FHuKZtxGiMjnUd1qO9z8gh4/IiSunf3Os4xXnp5rCFsd0KxfhjyidXRzg6m+g3Npq2vEIr6SEosTAWx/ka3tyxKSoRnmSVKDQZWfjygD9qYWCyVoa/Ewn+gLGhN4jFeduUPYTZyMZIUyeHGiQfQSxfph9BU8Oh7EGQMWSytJKBXMEBNxL/88UFdLowPfGCR0kMlzoUJVyunZQU/vs2cuvfbJQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tievG4WqY2pyjvXPR3B62dm1kXkivcnYmmXA7vwYLdI=;
- b=alxgrhxt2NrsYwk+wh5FdBD7IysX4oqaz7i5veM17D4bjAjSCyLEB0S2StgJbBC/Pas1Y1bL9oHapo8K/ZxIcRqnuHZv7oChiMgRNsm2Cg7jDedcIRX9Yl83OueaifCZ11SlWSmFH7HNUYYzH20/anHYDLCTgI9aWFwkQNqibt5GEMkycus8o4jht4Ve11cRnURwNtLqhxNkFykcoPLXpcekZiUm9WcTnJwoibPon6TjiVCCVhW/rg88JG6m59nRefiuHKchbgBxqehCuVFFjA59swuoMwP1yYIZA9yfUiTFYfbLBbVs/22ZnhNXucIuqhcelUF2YH+fjqHwbH9tRQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by DM4PR12MB8521.namprd12.prod.outlook.com (2603:10b6:8:17e::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.19; Tue, 20 Feb
- 2024 17:03:16 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::96dd:1160:6472:9873]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::96dd:1160:6472:9873%6]) with mapi id 15.20.7316.018; Tue, 20 Feb 2024
- 17:03:16 +0000
-Date: Tue, 20 Feb 2024 13:03:15 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: "Zeng, Xin" <xin.zeng@intel.com>
-Cc: Yishai Hadas <yishaih@nvidia.com>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"shameerali.kolothum.thodi@huawei.com" <shameerali.kolothum.thodi@huawei.com>,
-	"Tian, Kevin" <kevin.tian@intel.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	qat-linux <qat-linux@intel.com>, "Cao, Yahui" <yahui.cao@intel.com>
-Subject: Re: [PATCH 10/10] vfio/qat: Add vfio_pci driver for Intel QAT VF
- devices
-Message-ID: <20240220170315.GO13330@nvidia.com>
-References: <20240201153337.4033490-1-xin.zeng@intel.com>
- <20240201153337.4033490-11-xin.zeng@intel.com>
- <20240206125500.GC10476@nvidia.com>
- <DM4PR11MB550222F7A5454DF9DBEE7FEC884B2@DM4PR11MB5502.namprd11.prod.outlook.com>
- <20240209121045.GP10476@nvidia.com>
- <e740d9ec-6783-4777-b984-98262566974c@nvidia.com>
- <DM4PR11MB550274B713F6AE416CDF7FDB88532@DM4PR11MB5502.namprd11.prod.outlook.com>
- <20240220132459.GM13330@nvidia.com>
- <DM4PR11MB5502BE3CC8BD098584F31E8D88502@DM4PR11MB5502.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DM4PR11MB5502BE3CC8BD098584F31E8D88502@DM4PR11MB5502.namprd11.prod.outlook.com>
-X-ClientProxiedBy: MN2PR18CA0020.namprd18.prod.outlook.com
- (2603:10b6:208:23c::25) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C92F176911;
+	Tue, 20 Feb 2024 17:07:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708448843; cv=none; b=QVQPY2D654ddAIxtcnN5BHq2OaAPAqK6bSACsEcif4ID/de3P8GJqEzX7WLjuP25w6U9icL+Eh1Ulbv2sRnQWXowMYPgRJSeQui3xN0l11LlL9ZKzxOiN7wKYdDkMFXKk4ye2/dgJsKuMulRsGD8Rg3BR3Uo2jYOebNZgYdQHn8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708448843; c=relaxed/simple;
+	bh=mtYh4pPl8nUvoS1cpHihY1SAedbSQ4SPzAugmWQRuzg=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=Y9tKtrsX/ngBqg2MyKGA5LjNzCCY1VRsJE0ImIUWu1g9u+j94OdLqEUQitNKFf73JnSGMgYx9GS8mpftAmGAOlv8nGzW0C84lcGdRk6hgrXYJYJAhJMGKFLLb19SBNOYIlYyovHsU1wZQtlmHYiqQrgPxy7vQIXb7+zvlsYkJ9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lAI/MB9o; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4127109686fso3954715e9.2;
+        Tue, 20 Feb 2024 09:07:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708448840; x=1709053640; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=bS6mzlS2FvG30g8kCU8KyMPeOwgxgcQl7tVtSUw6YUE=;
+        b=lAI/MB9oFbzyaNZfoz840sx0CMM+mGzBvK2b4ln1Kge5yPZFBIpP1VhXIMjjkj5uNC
+         psYZuPFBvfwISobjsRTN5bRv2T8Q0EdRlT/YL7F9WT1uU+nsAKDLkoIyrHbDkzp6iW8t
+         Gx1B5I9MqU6bHy32svhJ/WpZGVlbTipSXdZWysjNKWFplkOvID1ULrNV1KuG17xFdcm1
+         00Oka3gVCTwKqysWHTLrHVcE/7Iv/hBcdu+cqjoc3aDmUjUVRnoJdGauABsIQLw50BiM
+         XRiYd+FmDrG9OHKvc4B8rOPut2GYuHpsPHj2MD1dTKD4sq5hSET/4QlCs/68MBqLEgyi
+         +tCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708448840; x=1709053640;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bS6mzlS2FvG30g8kCU8KyMPeOwgxgcQl7tVtSUw6YUE=;
+        b=Ls2mFvTLZTSzKWqfZHsXXNN/4lthFSDbZ55S+lxCuXzdYHJyFZcX5YphIHpwCd6m5y
+         NdDqALDIWnmhLEYhYTyXN7NCCitmAKDak7znOh3QR/DwMdaNTDDoHuaSWPebZAR6dmEi
+         Oe6rZ9SHI/gxubn992Go3jnxmcLq2eF/60bDYzQqxirc4H+Zi1RQVEjF4HArMUbS4l9h
+         AtJnEbKuIDGsT5SxaNaELPddBVWPnViE2kl/JSTDNIa9N61GYUR9xgF2LQYAZ+1Qsfz7
+         Rmwuxjcto8FnNngTYIrWM00d6Y16OlV0KHo68xEArn5DAvG7pUSua7DndSzcUMYIPZSs
+         E4dA==
+X-Forwarded-Encrypted: i=1; AJvYcCXRo17lhE6TcalT23u+VRU6rPP0Fdnh3HpZs2WRzD7zwrqzyKji8fdz9gpUIElbHNZqHs8tpczVlm2NaZp8iy944sscg6+MZ1MHLBysxFch/A732Q5/qw1BECaukZcAUrBKGEOc4+kLRtbheSY6p8PoHycPPBMUDc52vIIqhF7QNqNDq9XZyPS4kxu23b/QxrdwxuQWSmAYU+VYWzpkvMRcqkVkmjVjVX0lk3P0R6KwBHg3/Y1NBfi+qg==
+X-Gm-Message-State: AOJu0Yw0/jww1HVDaa96CwiGtPtcQ/dQkCIXvH+3a4ePzF5mRuElCuuI
+	vuMis8O8cXD2iXuCkXrY/WPq4zInCou5KGFAw6gNLYIUVzVvprJ7
+X-Google-Smtp-Source: AGHT+IGKDgeb1b4/RZMqZUijqCwIZaYIC4U3t4wwvNhBDBJASOb+1pT/1HGi9975hFGHmqQ0PDn8dQ==
+X-Received: by 2002:a05:600c:1c93:b0:412:6dd4:1001 with SMTP id k19-20020a05600c1c9300b004126dd41001mr2072917wms.16.1708448839929;
+        Tue, 20 Feb 2024 09:07:19 -0800 (PST)
+Received: from [192.168.10.18] (54-240-197-233.amazon.com. [54.240.197.233])
+        by smtp.gmail.com with ESMTPSA id o20-20020a05600c4fd400b00412590eee7csm12231744wmq.10.2024.02.20.09.07.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 Feb 2024 09:07:19 -0800 (PST)
+From: Paul Durrant <xadimgnik@gmail.com>
+X-Google-Original-From: Paul Durrant <paul@xen.org>
+Message-ID: <bd028731-bc98-4735-a7f9-9b4ef9c00668@xen.org>
+Date: Tue, 20 Feb 2024 17:07:17 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DM4PR12MB8521:EE_
-X-MS-Office365-Filtering-Correlation-Id: 69c4d28f-dc78-4e13-ce6b-08dc3235d4c2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	X3xwSys2v+wA7Du88sYA0n1M0hf55vb4nGFEPeEPl9HUyA2gHGc/Q4cd7k6m6TOSD0Vrs96DthFXv2fyRf4ViwiK4auF4WfxmWeFrsVUhq4wdAG8v1J3ed2mrKMXzX7Hnde4AgP9dMzTwUEy3K3mRTSXXVfu3xlTlkL9IdBJIbvFl/F4XpBnz/xyGO59/RBDW21GwlRE1ukAzDVdSa9//MXnbDQ82okD54xo5NODYK94m8U1bnZegm4AtREoKkE6Jzq0n6Bzsq3fVLBW2ZD/r1k2hqD031IzV2D6CJVGTGBBmDrY4zAqwR2GztXDvaF/jaCj56Rbu/dkRFer8m3w8UjpWasFwaiQSo7Mz/UIeoYjp4axCEXc9PxW2EO+sH+iotIs4pHo3MKhapC2Yl4BWwa4bgtbwn+CnWjc1LTelTPJaCaWgU0MD7/OgYRNFGGvxa3QXq7KpMeuxvKZCIkUnjFu6PXV1u9Bh8G4YsACy3fU8tybV3zeAZ2dtbUnfyhZ9xUYLZDy3lDhx3ljPwJkFVNW2fHsqdREvNFqr0ITBHU=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?ZZBB7jgT1JORmH19iJ+tQBTinmfmnfr5XScTJMgjmbd6r5aaOLJ/ghoTsKES?=
- =?us-ascii?Q?uA9SVnXwGXYw1usQPQjG7T0M+0YVwtkdkcQTrO533jRPC3Aizcl0DYevQppD?=
- =?us-ascii?Q?HfGafOg+YqR+b2h0lc/jI0/x1IKRQsIhcNWc29sFr31Vj0Ky32Ri6sHRfGNP?=
- =?us-ascii?Q?MdlW+Z+FoeaN3GEdHEPaaAD2ECvaAm+EwVRkbd8KdMZEMDDlDt8LgzIhqfLs?=
- =?us-ascii?Q?cNFtNk6YUsAUq07OUtJiqrcCGuASu6Lk6+afr2AWfdSypVHNZK4YUVg9xnFd?=
- =?us-ascii?Q?4figmZMyW+s9I7oHSRXcDS+n6yA4e+TJrUU0tPCEvXtY+rTXUnyjBI+4my/1?=
- =?us-ascii?Q?GquPPG+4G8m0fKkWjnGxz/C8wxXfh39roa0bktiOPxhBRobXjNQ3tZARzgmv?=
- =?us-ascii?Q?gLvJGz64NhBZb4WOU4efqEW6IQcKUknLi4v+l5wKl7ILERa73iVRixX6VFyS?=
- =?us-ascii?Q?fF/K5NRZulknKslm6g3BZlM0JpOh6lQTqPzKZjTkuQCky8MoGtR/hiqNbPuY?=
- =?us-ascii?Q?Aa3hdlTzBxDzizm6TZ/4XSt6SkLoANIzUegdGBeE9tlGDrsbSeB+A6YZcdSn?=
- =?us-ascii?Q?uBdjzdbts6PUFjAzHInaO5Yc2G5VibKwcVCF0AHz6lRLpydXzAwJgxeb0o1Q?=
- =?us-ascii?Q?xmfnKl0/vgiHoDxD5uzY3lpbt6pAM8qh/hf4BH1IVO7Ke3y9OLZNpqeDnBWM?=
- =?us-ascii?Q?z9y/mCNXuc1MshuMu+OGggmyvFr86NTp7JRAtNGiy7eThA4ra2f1Q9pIEYh+?=
- =?us-ascii?Q?A+WT/2f36A9F80nKvfhP3UB/VFyfMU5ZRO2r1Vl/RyW8cd4WFXrFigFix6vL?=
- =?us-ascii?Q?OKx1HfsYMuWgdg9Pl4R0tALM3LOhVyFDFAAAgHxXtxayH2hz9f9V1V5/Avh0?=
- =?us-ascii?Q?VLwaY0X1HWeg1DSqVn0p4Hcfoh5BV5ofnZAQvSUijtcjjFOC7xcHOzOf9Qe1?=
- =?us-ascii?Q?5vQf6TZpP6zweN4H8QrGOefDppNDzyICyua49d+TAPyXglMxUPHzqLHOwl7w?=
- =?us-ascii?Q?iFJ+HxiuFreBDwxbwWgFYP3KB1lbXVtDaIeRtPiUkfdDDDhWrqb8aiWheqUW?=
- =?us-ascii?Q?/ZO/8mynGjn6/3Vd/Y0hvvylXnqPAtCc9FOJh/E4nmlax+6tKjHSzcBUrqGp?=
- =?us-ascii?Q?/KDKXbxdUozjPATf8M2QXsOMt7sTHBrqq/eUz4C/85wSqz0FShUKvBDk9iNP?=
- =?us-ascii?Q?57CZ4AGpT0FkksRdxldDWs1tmgztR7CQeGar14aE5D50UO5230Hel0XcTwyC?=
- =?us-ascii?Q?/z45HIQEbpNfKWMevK5VLeRnoAMqHBK/xjs/ZQKAGuES1X6/Iy5jNnC5/ZLw?=
- =?us-ascii?Q?TmVS001KKQqXKWqCpKE3660asrijKcQ4Vm4pncHsjtJH3Wwzx/pHrKI0n0/7?=
- =?us-ascii?Q?kWMJPnjdjahAdb2IRZF3AuNBlLG3xShRIorJpFU8KjyL75bRZNgtJwDfvwlo?=
- =?us-ascii?Q?On2cbHReIRk3XRjI711QQjVW02YNyQLHtTbvpoxQxxFDgB9G2KPzRl43L2qA?=
- =?us-ascii?Q?O1g3gW66BL2KH8bTDmLDKZTH0owHmmHf0l1jDuV4aQPV6iamR2LqHTWiY2w+?=
- =?us-ascii?Q?GgIaqUxxWrPKhFm3qWRgqCxyPh3VfIL3a1vuWBlo?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 69c4d28f-dc78-4e13-ce6b-08dc3235d4c2
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2024 17:03:16.6965
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: sMyhgDbH3RDQnY4Kf0nDWSSP5zbwuacoU63M2+OBEtWYO78HbkCqR7I6xVIO2aYl
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB8521
+User-Agent: Mozilla Thunderbird
+Reply-To: paul@xen.org
+Subject: Re: [PATCH v13 00/21] KVM: xen: update shared_info and vcpu_info
+ handling
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+ David Woodhouse <dwmw2@infradead.org>, Shuah Khan <shuah@kernel.org>,
+ kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <20240215152916.1158-1-paul@xen.org>
+ <170838297541.2281798.7838961694439257911.b4-ty@google.com>
+ <05973da0-f68c-4c84-8806-bdba92f2ed6e@xen.org> <ZdTQCuWor4ipxW6E@google.com>
+Content-Language: en-US
+Organization: Xen Project
+In-Reply-To: <ZdTQCuWor4ipxW6E@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Feb 20, 2024 at 03:53:08PM +0000, Zeng, Xin wrote:
-> On Tuesday, February 20, 2024 9:25 PM, Jason Gunthorpe wrote:
-> > To: Zeng, Xin <xin.zeng@intel.com>
-> > Cc: Yishai Hadas <yishaih@nvidia.com>; herbert@gondor.apana.org.au;
-> > alex.williamson@redhat.com; shameerali.kolothum.thodi@huawei.com; Tian,
-> > Kevin <kevin.tian@intel.com>; linux-crypto@vger.kernel.org;
-> > kvm@vger.kernel.org; qat-linux <qat-linux@intel.com>; Cao, Yahui
-> > <yahui.cao@intel.com>
-> > Subject: Re: [PATCH 10/10] vfio/qat: Add vfio_pci driver for Intel QAT VF devices
-> > 
-> > On Sat, Feb 17, 2024 at 04:20:20PM +0000, Zeng, Xin wrote:
-> > 
-> > > Thanks for this information, but this flow is not clear to me why it
-> > > cause deadlock. From this flow, CPU0 is not waiting for any resource
-> > > held by CPU1, so after CPU0 releases mmap_lock, CPU1 can continue
-> > > to run. Am I missing something?
-> > 
-> > At some point it was calling copy_to_user() under the state
-> > mutex. These days it doesn't.
-> > 
-> > copy_to_user() would nest the mm_lock under the state mutex which is a
-> > locking inversion.
-> > 
-> > So I wonder if we still have this problem now that the copy_to_user()
-> > is not under the mutex?
+On 20/02/2024 16:15, Sean Christopherson wrote:
+> On Tue, Feb 20, 2024, Paul Durrant wrote:
+>> On 20/02/2024 15:55, Sean Christopherson wrote:
+>>> On Thu, 15 Feb 2024 15:28:55 +0000, Paul Durrant wrote:
+>>>> From: Paul Durrant <pdurrant@amazon.com>
+>>>>
+>>>> This series contains a new patch from Sean added since v12 [1]:
+>>>>
+>>>> * KVM: s390: Refactor kvm_is_error_gpa() into kvm_is_gpa_in_memslot()
+>>>>
+>>>> This frees up the function name kvm_is_error_gpa() such that it can then be
+>>>> re-defined in:
+>>>>
+>>>> [...]
+>>>
+>>> *sigh*
+>>>
+>>> I forgot to hit "send" on this yesterday.  But lucky for me, that worked out in
+>>> my favor as I needed to rebase on top of kvm/kvm-uapi to avoid pointless conflicts
+>>> in the uapi headeres.
+>>>
+>>> So....
+>>>
+>>> Applied to kvm-x86 xen, minus 18 and 19 (trylock stuff) and 21 (locking cleanup
+>>> that we're doing elsewhere).
+>>>
+>>
+>> Looks like you meant 17 & 18?
 > 
-> In protocol v2, we still have the scenario in precopy_ioctl where copy_to_user is
-> called under state_mutex.
+> Doh, yes.
+> 
+>>> Paul and David, please take (another) look at the end result to make sure you don't
+>>> object to any of my tweaks and that I didn't botch anything.
+>>>
+>>
+>> What was the issue with 17? It was reasonable clean-up and I'd like to keep
+>> it even without 18 being applied (and I totally understand your reasons for
+>> that).
+> 
+> I omitted it purely to avoid creating an unnecessary dependency for the trylock
+> patch.  That way the trylock patch (or whatever it morphs into) can be applied on
+> any branch (along with the cleanup), i.e. doesn't need to be taken through kvm-x86/xen.
 
-Why? Does mlx5 do that? It looked Ok to me:
-
-        mlx5vf_state_mutex_unlock(mvdev);
-        if (copy_to_user((void __user *)arg, &info, minsz))
-                return -EFAULT;
-
-Jason
+Ok, personally I don't see the dependency being an issue. I suspect it 
+will be a while before we decide what to do about the locking issue... 
+particularly since David is out this week, as he says.
 
