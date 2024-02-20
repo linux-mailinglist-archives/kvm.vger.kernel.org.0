@@ -1,72 +1,157 @@
-Return-Path: <kvm+bounces-9185-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9184-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A250A85BC2A
-	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 13:30:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9220D85BC25
+	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 13:29:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 436011F23464
-	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 12:30:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F8372820BC
+	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 12:29:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20482692EE;
-	Tue, 20 Feb 2024 12:30:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55BAA6931F;
+	Tue, 20 Feb 2024 12:29:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uQuCyfOG"
 X-Original-To: kvm@vger.kernel.org
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0798D433D0;
-	Tue, 20 Feb 2024 12:30:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76ABA67C70;
+	Tue, 20 Feb 2024 12:29:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708432212; cv=none; b=I35+WfYJ02FQxAN8xFGxfuM9QN8eAPsV4utBto9yzUiazxAeDsis0rI0ZhY3kDtMWs9hbMveZKURxE+lHqULOHW8SB6GPaNX01QTBCTjT9eCa17MM00yXBdjJdwnCse1bFa7IZS1ru482F8Pazjs259rpxc7BuDHM4cN9tq0PGY=
+	t=1708432173; cv=none; b=NMnG7VsJ/C0AW+cI6cLZqrPyx7giF/B/pVmL1V+GJ8/8DEstvCxlE3mtvIEfsK71+23152Lt4uIwjfqaqO0TaB5aNZZhEGim6DPEk/h51qgaQsVt/SNCMC0AeFykB2p0K5j2duJDWfn46jT9HlAIGJQnA7Dho585OA3UES1YuqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708432212; c=relaxed/simple;
-	bh=Ldn+RYfAL5iEmTzaxh/qozaEEdrntxxBOHPfnWMDxOc=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=EOIGNsUXhUt0gLPTz8+3ElfxNkLRLCEGjKC5izEo1grVoHAfhUNvdFq6KJ+HE6dr0VO0+C4lGAJvpNXexRS2rnxe64GGQeb49uKGGeQlHk+9uefj2eV2tZZOYGfQ8NuirRthcuKq1DUIc98+yMBofkN9/029jnZzPvVJPlc5/nI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4TfJdX1b7Kz4wxZ;
-	Tue, 20 Feb 2024 23:30:08 +1100 (AEDT)
-From: Michael Ellerman <patch-notifications@ellerman.id.au>
-To: linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, Amit Machhiwal <amachhiw@linux.ibm.com>
-Cc: Vaibhav Jain <vaibhav@linux.ibm.com>, Nicholas Piggin <npiggin@gmail.com>, Jordan Niethe <jniethe5@gmail.com>, Vaidyanathan Srinivasan <svaidy@linux.ibm.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>, "Naveen N . Rao" <naveen.n.rao@linux.ibm.com>, Christophe Leroy <christophe.leroy@csgroup.eu>, linux-kernel@vger.kernel.org
-In-Reply-To: <20240207054526.3720087-1-amachhiw@linux.ibm.com>
-References: <20240207054526.3720087-1-amachhiw@linux.ibm.com>
-Subject: Re: [PATCH v4] KVM: PPC: Book3S HV: Fix L2 guest reboot failure due to empty 'arch_compat'
-Message-Id: <170843210068.1280904.12521172425579669086.b4-ty@ellerman.id.au>
-Date: Tue, 20 Feb 2024 23:28:20 +1100
+	s=arc-20240116; t=1708432173; c=relaxed/simple;
+	bh=8m22g+Ahfu3JukKQ7xiuwIYdtui1QkCaMrKFG3Bu9fU=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Q5FRMz5wvBBmLHoJUxTH4mX1vS/B5vSD+7SkALIydiNXuUwV1lzQfavi+AZ6McqRFaWKVq/k+x0ptsMEBpejcRqMmZ5HujoTCOHdzg9AdnQQpVeHgu7PaS4S+RRHoYohj4DFwp8KlJO2L+U7QJX7VuEHWyqzbDYs+YV5t7Zbj3s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uQuCyfOG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCA0DC433C7;
+	Tue, 20 Feb 2024 12:29:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708432172;
+	bh=8m22g+Ahfu3JukKQ7xiuwIYdtui1QkCaMrKFG3Bu9fU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=uQuCyfOG4bp8RrQpn+lVdvcAZoRCBCAlEG+yZxD0pRwstT3HJZfFLDbjwxYgRHoHB
+	 Nso1OCmPwW7EE/zYVpUm2Af+tUa8bfIQOq/Vlh0eImfNw7xaWyP9RUZy3e+pkkON3h
+	 oWuMEgO9f5PtDD/GQNSTFds+VQ0s2bQIcg6ixKGD4Ka2MW+otrW0GYYWt7SfAfmXGR
+	 9QS8vJZMOUTj9rpNDpubEB7Se8JH6PzkCrFwU6X9kavVMDIagE6u1VLSTNjMD6TW8q
+	 GuM/RWVJpXwmlM1Sa+HiB8k2s4kCZQXhyo+tN2Mmup04eLAAZ9k8ipg11+iryobi0r
+	 3vhMfx+j77jMg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rcPFa-004uw3-On;
+	Tue, 20 Feb 2024 12:29:30 +0000
+Date: Tue, 20 Feb 2024 12:29:30 +0000
+Message-ID: <861q9748ut.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH 02/13] KVM: arm64: Clarify ESR_ELx_ERET_ISS_ERET*
+In-Reply-To: <20240220113127.GB16168@e124191.cambridge.arm.com>
+References: <20240219092014.783809-1-maz@kernel.org>
+	<20240219092014.783809-3-maz@kernel.org>
+	<20240220113127.GB16168@e124191.cambridge.arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 07 Feb 2024 11:15:26 +0530, Amit Machhiwal wrote:
-> Currently, rebooting a pseries nested qemu-kvm guest (L2) results in
-> below error as L1 qemu sends PVR value 'arch_compat' == 0 via
-> ppc_set_compat ioctl. This triggers a condition failure in
-> kvmppc_set_arch_compat() resulting in an EINVAL.
+On Tue, 20 Feb 2024 11:31:27 +0000,
+Joey Gouly <joey.gouly@arm.com> wrote:
 > 
-> qemu-system-ppc64: Unable to set CPU compatibility mode in KVM: Invalid
-> argument
+> On Mon, Feb 19, 2024 at 09:20:03AM +0000, Marc Zyngier wrote:
+> > The ESR_ELx_ERET_ISS_ERET* macros are a bit confusing:
+> > 
+> > - ESR_ELx_ERET_ISS_ERET really indicates that we have trapped an
+> >   ERETA* instruction, as opposed to an ERET
+> > 
+> > - ESR_ELx_ERET_ISS_ERETA reallu indicates that we have trapped
+> >   an ERETAB instruction, as opposed to an ERETAA.
+> > 
+> > Repaint the two helpers such as:
+> > 
+> > - ESR_ELx_ERET_ISS_ERET becomes ESR_ELx_ERET_ISS_ERETA
+> > 
+> > - ESR_ELx_ERET_ISS_ERETA becomes ESR_ELx_ERET_ISS_ERETAB
+> > 
+> > At the same time, use BIT() instead of raw values.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > 
-> [...]
+> I'm somewhat against this, as the original names are what the Arm
+> ARM specifies.
 
-Applied to powerpc/fixes.
+I don't disagree, but that doesn't make the ARM ARM right! ;-)
 
-[1/1] KVM: PPC: Book3S HV: Fix L2 guest reboot failure due to empty 'arch_compat'
-      https://git.kernel.org/powerpc/c/20c8c4dafe93e82441583e93bd68c0d256d7bed4
+> 
+> > ---
+> >  arch/arm64/include/asm/esr.h | 4 ++--
+> >  arch/arm64/kvm/handle_exit.c | 2 +-
+> >  2 files changed, 3 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+> > index 353fe08546cf..72c7810ccf2c 100644
+> > --- a/arch/arm64/include/asm/esr.h
+> > +++ b/arch/arm64/include/asm/esr.h
+> > @@ -290,8 +290,8 @@
+> >  		 ESR_ELx_SYS64_ISS_OP2_SHIFT))
+> >  
+> >  /* ISS field definitions for ERET/ERETAA/ERETAB trapping */
+> > -#define ESR_ELx_ERET_ISS_ERET		0x2
+> > -#define ESR_ELx_ERET_ISS_ERETA		0x1
+> > +#define ESR_ELx_ERET_ISS_ERETA		BIT(1)
+> > +#define ESR_ELx_ERET_ISS_ERETAB		BIT(0)
+> >  
+> >  /*
+> >   * ISS field definitions for floating-point exception traps
+> > diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> > index 617ae6dea5d5..0646c623d1da 100644
+> > --- a/arch/arm64/kvm/handle_exit.c
+> > +++ b/arch/arm64/kvm/handle_exit.c
+> > @@ -219,7 +219,7 @@ static int kvm_handle_ptrauth(struct kvm_vcpu *vcpu)
+> >  
+> >  static int kvm_handle_eret(struct kvm_vcpu *vcpu)
+> >  {
+> > -	if (kvm_vcpu_get_esr(vcpu) & ESR_ELx_ERET_ISS_ERET)
+> > +	if (kvm_vcpu_get_esr(vcpu) & ESR_ELx_ERET_ISS_ERETA)
+> 
+> If this part is confusing due to the name, maybe introduce a function in esr.h
+> esr_is_pac_eret() (name pending bikeshedding)?
 
-cheers
+That's indeed a better option. Now for the bikeshed aspect:
+
+- esr_iss_is_eretax(): check for ESR_ELx_ERET_ISS_ERET being set
+
+- esr_iss_is_eretab(): check for ESR_ELx_ERET_ISS_ERETA being set
+
+Thoughts?
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
