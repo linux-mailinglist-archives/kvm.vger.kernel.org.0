@@ -1,215 +1,134 @@
-Return-Path: <kvm+bounces-9212-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9211-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69F4585C0E7
-	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 17:15:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C7EC85C0E5
+	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 17:15:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA69B1F23832
-	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 16:15:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CFA2B1C219D5
+	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 16:15:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EB4676C60;
-	Tue, 20 Feb 2024 16:15:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 175537640D;
+	Tue, 20 Feb 2024 16:15:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="epE+I2EV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dTxSX285"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02CD076908
-	for <kvm@vger.kernel.org>; Tue, 20 Feb 2024 16:15:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37B9676400
+	for <kvm@vger.kernel.org>; Tue, 20 Feb 2024 16:15:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708445723; cv=none; b=qNsVAQz15p93wuinp7ClXtdgeaiXqLzYYlXLx1Su6T/oFwo1HM1lYz4TJaS1ETV+Pm6o77jKqpktU6MbZUkJ9YDMwKtHtDmCXz6azM7vvzyc8SRmu4B0YNaER8RB3SjxrxmkvH22dHHLh8k2nqm5fM7ZvE5gV46fK5vB1mTlZ04=
+	t=1708445718; cv=none; b=r86K8uhIduelGgwwVBXLDce2/h+jNod/J5GbKFQjQsyDsGWUuuJJmvMbambdhQXrzet1wQjn+KatAIr6zxXXaYCNHTdreegC0ZgJ5AoZDwrgdUX8OXERHrd8Z8aKXrAwIYQDEnq/OUCNZdvec+TuwiG9klbmIkjDs5IJEeUtWrw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708445723; c=relaxed/simple;
-	bh=SUXEC4WxQii//gTBmi+NPiWcpKzR+deKzND3uqVfzOc=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=f7Xy3ZkQdjW62y9Wt62l3OIrCnjDznlAe+scrRTZE86RMW62OLw9xqIY41tgghX37/g036RbtQFw3QDjdyxv7aoGkfn2durEH8PcQnUUUORvdcAKNWVs9X417R9inlZRnld/LbjLTQSLEfBLUmiM33WIxXUt2QcwXPqvZMaVHZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=epE+I2EV; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708445701;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=T7u28xwIheG3uxovuWZOpEtSYb8aZ/auv1OID/d5NrA=;
-	b=epE+I2EVnjdC1JhU+soqHdtvMNC9uSmu51WG0J0MwgqFdJo14ryCcpi4trr0We3/6WsDgg
-	gMCVpSIoZi4xwhBLF1aBw8LQyGpCUWYAr52CiBeO9dbjj0jHHw89oRmLC+RSXZ1QGcYLr4
-	iNyr8xSfpAjo0elTPB05CYjzkov7up8=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-444-jbZ68DtwOku-M8uuakTlmw-1; Tue,
- 20 Feb 2024 11:14:58 -0500
-X-MC-Unique: jbZ68DtwOku-M8uuakTlmw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 99F3E3814582;
-	Tue, 20 Feb 2024 16:14:57 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.39.192.55])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3C22810802;
-	Tue, 20 Feb 2024 16:14:57 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 07D0B21E6740; Tue, 20 Feb 2024 17:14:55 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,  David Hildenbrand
- <david@redhat.com>,  Igor Mammedov <imammedo@redhat.com>,  "Michael S .
- Tsirkin" <mst@redhat.com>,  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-  Richard Henderson <richard.henderson@linaro.org>,  Peter Xu
- <peterx@redhat.com>,  Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?=
- <philmd@linaro.org>,
-  Cornelia Huck <cohuck@redhat.com>,  Daniel =?utf-8?Q?P=2EBerrang=C3=A9?=
- <berrange@redhat.com>,  Eric Blake <eblake@redhat.com>,  Marcelo Tosatti
- <mtosatti@redhat.com>,  qemu-devel@nongnu.org,  kvm@vger.kernel.org,
-  Michael Roth <michael.roth@amd.com>,  Sean Christopherson
- <seanjc@google.com>,  Claudio Fontana <cfontana@suse.de>,  Gerd Hoffmann
- <kraxel@redhat.com>,  Isaku Yamahata <isaku.yamahata@gmail.com>,  Chenyi
- Qiang <chenyi.qiang@intel.com>
-Subject: Re: [PATCH v4 29/66] i386/tdx: Support user configurable
- mrconfigid/mrowner/mrownerconfig
-In-Reply-To: <cf9e91ea-825a-444c-9625-a571fdc3265a@intel.com> (Xiaoyao Li's
-	message of "Tue, 20 Feb 2024 23:10:29 +0800")
-References: <20240125032328.2522472-1-xiaoyao.li@intel.com>
-	<20240125032328.2522472-30-xiaoyao.li@intel.com>
-	<875xykfwmf.fsf@pond.sub.org>
-	<cf9e91ea-825a-444c-9625-a571fdc3265a@intel.com>
-Date: Tue, 20 Feb 2024 17:14:55 +0100
-Message-ID: <87le7f3yf4.fsf@pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1708445718; c=relaxed/simple;
+	bh=Ey6ErHBVbqQQFaARRSSxWyFZtNcBtj/qBDxHXsIykls=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=a5cfwlkCZ2zE71Mm54wzMVUM7cjtKQtWIlz9J2Aha6Zjs7j/972O5veD+KUAV8kisH3a9flH7416m1OZL+PvtypOVV9eBIRPaCpd6s0XK5bjIIn/yBVmzvzWt2ReGKxr8D7KbZc5jizHGTR/JDmaVZwj4bgvjxplFw8sf38ymCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dTxSX285; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dcc05887ee9so6156254276.1
+        for <kvm@vger.kernel.org>; Tue, 20 Feb 2024 08:15:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1708445708; x=1709050508; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=gGVaEpoRy83RsqKWj1BDNY8ZLAKIFU3H8chjcBdzZQ4=;
+        b=dTxSX285wINLcioxkombr9MEQCvXPobFahkDQ2lvGX6ul7kYwAp1vItnlUC1ZVavMz
+         BnG+UjuDNyIFZcTkCBpgeCa0S8Hipa7Q4//YuGIybW2fTdvlG4r6KM6uhcdqha+tTif6
+         wNJhmMjpQ8Spt7jw1F+GRSAvETTnQHP7aFJmsxOZ07nCTm8Yh8ZgmqUiownXRHzPtiCL
+         5p4X5vH0Y6va2UZEmkuXGAmiou5GMjN18X5MWNW1wjJLMKzvqqzfJqBPdV3kESleQ0vK
+         C+Xj2iOzvjcmrqTMDb/TVaTMdk5nLYvQLMcnLl4AoesGBfvCy8J21iqCCXEO7SpipZ+8
+         1KiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708445708; x=1709050508;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gGVaEpoRy83RsqKWj1BDNY8ZLAKIFU3H8chjcBdzZQ4=;
+        b=No+GmvZtnqdToZ8vt41D/aSZ8zNp1ZSuQYrf08ln0TgKkAG5spSwOXsZKQWUjC2E/N
+         MajGmozdI5iW3OIdS8Bc20aOxlbsoENUzH2ULp/9IlHtViDOTxK9seM35eTFD7bXFnaC
+         9izjGNSPcmhGCVmg3lWJIjSwXx7ie0iSPOrbXfLhHVpkWXL5Om5Ept52l+fsZEocplZ0
+         FE0tkTv5+kJXtA/bAs1Nrgr4nyHntlWgS+oK/Q7jAp/wHz9DpKEMf0lOGkdLi7TlCQOt
+         JQIOLY1/ZZAEWbyGvzCegHD+HABZxO2RvIK6bZexaa4LzAOuR+PZSVaRuXFlnGHqPCja
+         yLCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUxBIpcENPBjd2axo0Qm/JCwB1SRby/aGr1b6HuAWzH+n+WAj3cYXQupdpzHH7WWNIEfJ8LDeu1hyWL4mACw8Jn/vww
+X-Gm-Message-State: AOJu0YySzMX7Frzzmt9k7mmKizdmN+tHSfnlGACkzWPwSm30hyGHWalP
+	AHkBPKFsdzSmznSg0GMCsHn1XLfPhrRio48QvEnkboXZZ97t834lvTJUrpTQdVcLR/cEi7tHE3I
+	kyA==
+X-Google-Smtp-Source: AGHT+IHOl1ZsAPNJTwpqdmUVaVuTbX0oezG+zWKz4lEs+PmYyLIBMZWVYtpKpRe+ZKQU8wz9tv5wxLQvY2M=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1547:b0:dc7:3189:4e75 with SMTP id
+ r7-20020a056902154700b00dc731894e75mr587165ybu.3.1708445707962; Tue, 20 Feb
+ 2024 08:15:07 -0800 (PST)
+Date: Tue, 20 Feb 2024 08:15:06 -0800
+In-Reply-To: <05973da0-f68c-4c84-8806-bdba92f2ed6e@xen.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
+Mime-Version: 1.0
+References: <20240215152916.1158-1-paul@xen.org> <170838297541.2281798.7838961694439257911.b4-ty@google.com>
+ <05973da0-f68c-4c84-8806-bdba92f2ed6e@xen.org>
+Message-ID: <ZdTQCuWor4ipxW6E@google.com>
+Subject: Re: [PATCH v13 00/21] KVM: xen: update shared_info and vcpu_info handling
+From: Sean Christopherson <seanjc@google.com>
+To: paul@xen.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, David Hildenbrand <david@redhat.com>, 
+	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
+	Alexander Gordeev <agordeev@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, David Woodhouse <dwmw2@infradead.org>, Shuah Khan <shuah@kernel.org>, 
+	kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-s390@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-Xiaoyao Li <xiaoyao.li@intel.com> writes:
+On Tue, Feb 20, 2024, Paul Durrant wrote:
+> On 20/02/2024 15:55, Sean Christopherson wrote:
+> > On Thu, 15 Feb 2024 15:28:55 +0000, Paul Durrant wrote:
+> > > From: Paul Durrant <pdurrant@amazon.com>
+> > > 
+> > > This series contains a new patch from Sean added since v12 [1]:
+> > > 
+> > > * KVM: s390: Refactor kvm_is_error_gpa() into kvm_is_gpa_in_memslot()
+> > > 
+> > > This frees up the function name kvm_is_error_gpa() such that it can then be
+> > > re-defined in:
+> > > 
+> > > [...]
+> > 
+> > *sigh*
+> > 
+> > I forgot to hit "send" on this yesterday.  But lucky for me, that worked out in
+> > my favor as I needed to rebase on top of kvm/kvm-uapi to avoid pointless conflicts
+> > in the uapi headeres.
+> > 
+> > So....
+> > 
+> > Applied to kvm-x86 xen, minus 18 and 19 (trylock stuff) and 21 (locking cleanup
+> > that we're doing elsewhere).
+> > 
+> 
+> Looks like you meant 17 & 18?
 
-> On 2/19/2024 8:48 PM, Markus Armbruster wrote:
->> Xiaoyao Li <xiaoyao.li@intel.com> writes:
->>=20
->>> From: Isaku Yamahata <isaku.yamahata@intel.com>
->>>
->>> Three sha384 hash values, mrconfigid, mrowner and mrownerconfig, of a TD
->>> can be provided for TDX attestation. Detailed meaning of them can be
->>> found: https://lore.kernel.org/qemu-devel/31d6dbc1-f453-4cef-ab08-4813f=
-4e0ff92@intel.com/
->>>
->>> Allow user to specify those values via property mrconfigid, mrowner and
->>> mrownerconfig. They are all in base64 format.
->>>
->>> example
->>> -object tdx-guest, \
->>>    mrconfigid=3DASNFZ4mrze8BI0VniavN7wEjRWeJq83vASNFZ4mrze8BI0VniavN7wE=
-jRWeJq83v,\
->>>    mrowner=3DASNFZ4mrze8BI0VniavN7wEjRWeJq83vASNFZ4mrze8BI0VniavN7wEjRW=
-eJq83v,\
->>>    mrownerconfig=3DASNFZ4mrze8BI0VniavN7wEjRWeJq83vASNFZ4mrze8BI0VniavN=
-7wEjRWeJq83v
->>>
->>> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
->>> Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
->>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
->>>
->>> ---
->>> Changes in v4:
->>>   - describe more of there fields in qom.json
->>>   - free the old value before set new value to avoid memory leak in
->>>     _setter(); (Daniel)
->>>
->>> Changes in v3:
->>>   - use base64 encoding instread of hex-string;
->>> ---
->>>   qapi/qom.json         | 14 ++++++-
->>>   target/i386/kvm/tdx.c | 87 +++++++++++++++++++++++++++++++++++++++++++
->>>   target/i386/kvm/tdx.h |  3 ++
->>>   3 files changed, 103 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/qapi/qom.json b/qapi/qom.json
->>> index 2177f3101382..15445f9e41fc 100644
->>> --- a/qapi/qom.json
->>> +++ b/qapi/qom.json
->>> @@ -905,10 +905,22 @@
->>>   #     pages.  Some guest OS (e.g., Linux TD guest) may require this to
->>>   #     be set, otherwise they refuse to boot.
->>>   #
->>> +# @mrconfigid: ID for non-owner-defined configuration of the guest TD,
->>> +#     e.g., run-time or OS configuration.  base64 encoded SHA384 diges=
-t.
->>=20
->> "base64 encoded SHA384" is not a sentence.
->>=20
->> Double-checking: the data being hashed here is the "non-owner-defined
->> configuration of the guest TD", and the resulting hash is the "ID"?
->
-> yes. The "ID" here means the resulting hash.
->
-> The reason to use "ID" here because in the TDX spec, it's description is
->
->    Software-defined ID for non-owner-defined configuration of the guest
->    TD - e.g., run-time or OS configuration.
->
-> If ID is confusing, how about
->
->    SHA384 hash of non-owner-defined configuration of the guest TD, e.g.,
->    run-time of OS configuration.  It's base64 encoded.
+Doh, yes.
 
-I guess staying close to the TDX spec makes sense.
+> > Paul and David, please take (another) look at the end result to make sure you don't
+> > object to any of my tweaks and that I didn't botch anything.
+> > 
+> 
+> What was the issue with 17? It was reasonable clean-up and I'd like to keep
+> it even without 18 being applied (and I totally understand your reasons for
+> that).
 
-We still need to mention the base64 encoding.
-
-What about something like
-
-     ID for non-owner-defined configuration of the guest TD, e.g.,
-     run-time or OS configuration (base64 encoded SHA384 digest)
-
-or, if we decide that the fact it's SHA384 digest is irrelevant for QMP
-
-     ID for non-owner-defined configuration of the guest TD, e.g.,
-     run-time or OS configuration (base64 encoded)
-
->>> +#
->>> +# @mrowner: ID for the guest TD=E2=80=99s owner.  base64 encoded SHA38=
-4 digest.
->>=20
->> Likewise.
->>=20
->>> +#
->>> +# @mrownerconfig: ID for owner-defined configuration of the guest TD,
->>> +#     e.g., specific to the workload rather than the run-time or OS.
->>> +#     base64 encoded SHA384 digest.
->>=20
->> Likewise.
->>=20
->>> +#
->>>   # Since: 9.0
->>>   ##
->>>   { 'struct': 'TdxGuestProperties',
->>> -  'data': { '*sept-ve-disable': 'bool' } }
->>> +  'data': { '*sept-ve-disable': 'bool',
->>> +            '*mrconfigid': 'str',
->>> +            '*mrowner': 'str',
->>> +            '*mrownerconfig': 'str' } }
->>=20
->> The new members are optional, but their description in the doc comment
->> doesn't explain behavior when present vs. behavior when absent.
->>=20
->>>=20=20=20
->>>   ##
->>>   # @ThreadContextProperties:
->>=20
->> [...]
->>=20
->>=20
-
+I omitted it purely to avoid creating an unnecessary dependency for the trylock
+patch.  That way the trylock patch (or whatever it morphs into) can be applied on
+any branch (along with the cleanup), i.e. doesn't need to be taken through kvm-x86/xen.
 
