@@ -1,145 +1,144 @@
-Return-Path: <kvm+bounces-9214-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9215-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C5AD85C129
-	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 17:23:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45B8685C141
+	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 17:26:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A0191F226D1
-	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 16:23:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 785D61C22B1F
+	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 16:26:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0045879DBE;
-	Tue, 20 Feb 2024 16:20:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B39176C9D;
+	Tue, 20 Feb 2024 16:22:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hnH3DEK1"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="hNkl1r8M"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F086079939
-	for <kvm@vger.kernel.org>; Tue, 20 Feb 2024 16:20:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD31D763EF;
+	Tue, 20 Feb 2024 16:22:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708446041; cv=none; b=JQP5SX6TlHu+KtNtep7K+4T6ap/xfXrfx6dHTVxkKSVuA7ZNRtdo5csC1FTgjDNOrkHZMtFjan8p+GPl6fG0fMpgKV/cTeQmr3xZS0/ArzW6kzRt5HozvzAf8RET0I73wYNiY2t43/+bo3CmHY6GygPA5Edhvqw0t2WmEx5poIk=
+	t=1708446144; cv=none; b=oDhj09IglQpjDJOd0gz5VwT9p9edaZro4VIsEPl82bg0JuKgY7nK1DhuF/CsmZUFgo3TQCqAxl3cFscJaVQaibN+vcdomMhGVkz3CdOrzxF4E6VsQG5hDBqj75KZIX+tlIBSIEssyvzVYjE+Q7/60OFBZ+VPZroCzSx3lQGYxAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708446041; c=relaxed/simple;
-	bh=tkQx8P4cA4yFykrMvurCrO/U9EcQdI6W6X9CrUgTWAE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=fINQlu80x0U1D605vUqHsXbFCg0J5e8umgaKPS5v0WpHmrfCiKiDzX4By2wsknbRAzKlgyRE5avxvhaneZJPeVTtzsFuPfFBYz509Q5b0jyifkQM7lFVMlVxyBd5gJ4jQ4g9R2jvcRcwebrV7AW4QiLq5WJdeZWkHjd5RLP/O8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hnH3DEK1; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1db90f7b92bso52075255ad.0
-        for <kvm@vger.kernel.org>; Tue, 20 Feb 2024 08:20:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708446038; x=1709050838; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gaBNvIG1XlI7Rma4r4ZehqM6i4uIMsjEXoMFyCXLWog=;
-        b=hnH3DEK1TlZ9XwRPa83LdjKnfEDz6mvX3uvbNOKk5vlHxAcF/xGUsoDiW2kmphZJ8P
-         sSzYna9rcvjRU0qhgID4aqNAZCnYGaS7rkjVN74ZngY/yBpmP8AlzeLd7pY1SaEAIjuI
-         9xov93twffL7EOgDT1w8w9DHfjjiuHWQ4Pq1IzsCXV8iN8Ka/2MxdYq/TUU4/r1vZktI
-         YxIc5uaLt+QDWpwjB/5/5VM3dRkP7AL0S/Jdde+HuZFCJj/j3wJKppg6jTdT4bEzSnq1
-         DYB5xhRw4vik1jyn9upwPoZ/PsVFyfq+IxzVOtp7WOMrF7+wd+PDFjNftoT07ZP2HVTi
-         Ra5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708446038; x=1709050838;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gaBNvIG1XlI7Rma4r4ZehqM6i4uIMsjEXoMFyCXLWog=;
-        b=bDUnK+TVv4EerQd7ag89rGZULi9D0hcrML0dVoU2iSjsGHFUhDZ+DqdZwl9LHecpRJ
-         UPQwGJxzIpkySSWwNsWUPYkVzHeK8UKSmcgTX/dVUr9zmV+nxft/ENXqBvvXzzdEFItk
-         Dua4ehVoGk3tw1PCcszX0BCsRv0LlzFALpujC9574pdLmrJz+avtWZm3twcRf+JvJ7e5
-         5sq2A1HzMzKXKfCLOKCXmOEcWH+G4XoYh7/VcS3RRBeqHPLIoGvT7wMas3yX5iU9ZPx/
-         hbA/QNvyOhOfzjp49vybxbEunV3PG9nN92stsFA9wpH7UulwizkA7fuAKdJDslQIQv/Q
-         HJnw==
-X-Forwarded-Encrypted: i=1; AJvYcCWWyUmIR2T9g0YNpB6qXCni/rSFVD72wZU87eThZcrBumjmuGlUsRtFvhddt4aJalS/bHBL0mNoAOfNHWxtk5l7r7nh
-X-Gm-Message-State: AOJu0YxUa51ZESwA5QNTMS8zWxnWda0DFCHUBfRQ9sqyreBsEzKAo7ct
-	Wv1ckP6dwGuNLNCbG/juqwtB/Yjd3pBS1a1MzJwBFt6g1UqY0pEHrZNyLdHoUyjdd8XmX7C1wB8
-	Ymg==
-X-Google-Smtp-Source: AGHT+IHQi9e4VsipuZL3tTtt6H5NilJ+ksQWV/bXRNHygHBVBXjwpN+pFq6S26zUER6fkq27ZHG9pHuUsUo=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:e74d:b0:1db:e494:4b51 with SMTP id
- p13-20020a170902e74d00b001dbe4944b51mr268101plf.4.1708446038280; Tue, 20 Feb
- 2024 08:20:38 -0800 (PST)
-Date: Tue, 20 Feb 2024 08:20:36 -0800
-In-Reply-To: <Zc5MRqmspThUoB+n@AUS-L1-JOHALLEN.amd.com>
+	s=arc-20240116; t=1708446144; c=relaxed/simple;
+	bh=zFkxNm4XUPZy9yD4NN6KLdlxmc1jFsrfMD0v41KFIfU=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=ZWlRZvBNpzoIYIO12MNSiKtLhsOjsOUSMvQNSindWbVBMQhp7UJOQZSrV3PgmCMRqC+qpEMef4X2YSJAsUVAgmiazpjD2hVqqY2zkIgvJ7zW4TNv+FSo4Nso5VJwWyL0KmJEvGKe65I7munfGUQEMQLpKy2Br0jDTvBNtX1nZuc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=hNkl1r8M; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
+	MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:Sender
+	:Reply-To:Content-ID:Content-Description;
+	bh=BzeL9c/hzzSWVv3MKsT7A/KR/PSkHXr2fqH3rJbXD/E=; b=hNkl1r8MrK0h7XuvdH3qSHJNeK
+	4DIQ/6TbXd8tHEsUs6nBa1ZRa+mvZx+9488lzdh3/KTqrQ0C3lwKKlmpJRgESnI2Cl1UlQhANoNMW
+	lb6VNQKrBJVEbFg0uRuYRZMRR3424F3EmhNMQe/68gwhGaf2FeAax5t2GwozfYVtlY/7lV5PxpigP
+	K+1B2BLgRuEKJQBSyq5cpY96o/0NgaYJpXPktU357ig/qcuBMUx+gyj0/xu5MTq3puAkISEDb6c4q
+	omQGSCGfwiPYYEOdi3uLiBkGJQw/qKavQHZcDtirpOTVRgNclzOl1gQLCr1j5Ezqnk3ns9TSFFQn1
+	wkb0ZBAw==;
+Received: from [145.224.98.163] (helo=[127.0.0.1])
+	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rcSsW-0000000G1oT-0zRv;
+	Tue, 20 Feb 2024 16:21:56 +0000
+Date: Tue, 20 Feb 2024 17:21:52 +0100
+From: David Woodhouse <dwmw2@infradead.org>
+To: Sean Christopherson <seanjc@google.com>, paul@xen.org
+CC: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+ "H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>,
+ kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-s390@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v13_00/21=5D_KVM=3A_xen=3A_upda?= =?US-ASCII?Q?te_shared=5Finfo_and_vcpu=5Finfo_handling?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <ZdTQCuWor4ipxW6E@google.com>
+References: <20240215152916.1158-1-paul@xen.org> <170838297541.2281798.7838961694439257911.b4-ty@google.com> <05973da0-f68c-4c84-8806-bdba92f2ed6e@xen.org> <ZdTQCuWor4ipxW6E@google.com>
+Message-ID: <CFFFCD77-3B9E-4808-B084-E86F8EF265A7@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231010200220.897953-1-john.allen@amd.com> <20231010200220.897953-7-john.allen@amd.com>
- <5e413e05de559971cdc2d1a9281a8a271590f62b.camel@redhat.com>
- <ZUQvNIE9iU5TqJfw@google.com> <c077e005c64aa82c7eaf4252f322c4ca29a2d0af.camel@redhat.com>
- <Zc5MRqmspThUoB+n@AUS-L1-JOHALLEN.amd.com>
-Message-ID: <ZdTRVNt5GWXEKL8h@google.com>
-Subject: Re: [PATCH 6/9] KVM: SVM: Add MSR_IA32_XSS to the GHCB for hypervisor kernel
-From: Sean Christopherson <seanjc@google.com>
-To: John Allen <john.allen@amd.com>
-Cc: mlevitsk@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	pbonzini@redhat.com, weijiang.yang@intel.com, rick.p.edgecombe@intel.com, 
-	x86@kernel.org, thomas.lendacky@amd.com, bp@alien8.de
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
-On Thu, Feb 15, 2024, John Allen wrote:
-> On Tue, Nov 07, 2023 at 08:20:52PM +0200, Maxim Levitsky wrote:
-> > On Thu, 2023-11-02 at 16:22 -0700, Sean Christopherson wrote:
-> > > On Thu, Nov 02, 2023, Maxim Levitsky wrote:
-> > > > On Tue, 2023-10-10 at 20:02 +0000, John Allen wrote:
-> > > > > @@ -3032,6 +3037,9 @@ static void sev_es_init_vmcb(struct vcpu_svm *svm)
-> > > > >  		if (guest_cpuid_has(&svm->vcpu, X86_FEATURE_RDTSCP))
-> > > > >  			svm_clr_intercept(svm, INTERCEPT_RDTSCP);
-> > > > >  	}
-> > > > > +
-> > > > > +	if (kvm_caps.supported_xss)
-> > > > > +		set_msr_interception(vcpu, svm->msrpm, MSR_IA32_XSS, 1, 1);
-> > > > 
-> > > > This is not just a virtualization hole. This allows the guest to set MSR_IA32_XSS
-> > > > to whatever value it wants, and thus it might allow XSAVES to access some host msrs
-> > > > that guest must not be able to access.
-> > > > 
-> > > > AMD might not yet have such msrs, but on Intel side I do see various components
-> > > > like 'HDC State', 'HWP state' and such.
-> > > 
-> > > The approach AMD has taken with SEV-ES+ is to have ucode context switch everything
-> > > that the guest can access.  So, in theory, if/when AMD adds more XCR0/XSS-based
-> > > features, that state will also be context switched.
-> > > 
-> > > Don't get me wrong, I hate this with a passion, but it's not *quite* fatally unsafe,
-> > > just horrific.
-> > > 
-> > > > I understand that this is needed so that #VC handler could read this msr, and
-> > > > trying to read it will cause another #VC which is probably not allowed (I
-> > > > don't know this detail of SEV-ES)
-> > > > 
-> > > > I guess #VC handler should instead use a kernel cached value of this msr
-> > > > instead, or at least KVM should only allow reads and not writes to it.
-> > > 
-> > > Nope, doesn't work.  In addition to automatically context switching state, SEV-ES
-> > > also encrypts the guest state, i.e. KVM *can't* correctly virtualize XSS (or XCR0)
-> > > for the guest, because KVM *can't* load the guest's desired value into hardware.
-> > > 
-> > > The guest can do #VMGEXIT (a.k.a. VMMCALL) all it wants to request a certain XSS
-> > > or XCR0, and there's not a damn thing KVM can do to service the request.
-> > > 
-> > 
-> > Ah, I understand now. Everything makes sense, and yes, this is really ugly.
-> 
-> Hi Maxim and Sean,
-> 
-> It looks as though there are some broad changes that will need to happen
-> over the long term WRT to SEV-ES/SEV-SNP. In the short term, how would
-> you suggest I proceed with the SVM shstk series? Can we omit the SEV-ES
-> changes for now with an additional patch that disallows guest shstk when
-> SEV-ES is enabled? Subsequently, when we have a proper solution for the
-> concerns discussed here, we could submit another series for SEV-ES
-> support.
+On 20 February 2024 17:15:06 CET, Sean Christopherson <seanjc@google=2Ecom>=
+ wrote:
+>On Tue, Feb 20, 2024, Paul Durrant wrote:
+>> On 20/02/2024 15:55, Sean Christopherson wrote:
+>> > On Thu, 15 Feb 2024 15:28:55 +0000, Paul Durrant wrote:
+>> > > From: Paul Durrant <pdurrant@amazon=2Ecom>
+>> > >=20
+>> > > This series contains a new patch from Sean added since v12 [1]:
+>> > >=20
+>> > > * KVM: s390: Refactor kvm_is_error_gpa() into kvm_is_gpa_in_memslot=
+()
+>> > >=20
+>> > > This frees up the function name kvm_is_error_gpa() such that it can=
+ then be
+>> > > re-defined in:
+>> > >=20
+>> > > [=2E=2E=2E]
+>> >=20
+>> > *sigh*
+>> >=20
+>> > I forgot to hit "send" on this yesterday=2E  But lucky for me, that w=
+orked out in
+>> > my favor as I needed to rebase on top of kvm/kvm-uapi to avoid pointl=
+ess conflicts
+>> > in the uapi headeres=2E
+>> >=20
+>> > So=2E=2E=2E=2E
+>> >=20
+>> > Applied to kvm-x86 xen, minus 18 and 19 (trylock stuff) and 21 (locki=
+ng cleanup
+>> > that we're doing elsewhere)=2E
+>> >=20
+>>=20
+>> Looks like you meant 17 & 18?
+>
+>Doh, yes=2E
+>
+>> > Paul and David, please take (another) look at the end result to make =
+sure you don't
+>> > object to any of my tweaks and that I didn't botch anything=2E
+>> >=20
+>>=20
+>> What was the issue with 17? It was reasonable clean-up and I'd like to =
+keep
+>> it even without 18 being applied (and I totally understand your reasons=
+ for
+>> that)=2E
+>
+>I omitted it purely to avoid creating an unnecessary dependency for the t=
+rylock
+>patch=2E  That way the trylock patch (or whatever it morphs into) can be =
+applied on
+>any branch (along with the cleanup), i=2Ee=2E doesn't need to be taken th=
+rough kvm-x86/xen=2E
 
-The SEV-ES mess was already addressed by commit a26b7cd22546 ("KVM: SEV: Do not
-intercept accesses to MSR_IA32_XSS for SEV-ES guests").  Or is there more that's
-needed for shadow stacks?
+What about if (in_atomic() && read_trylock()) return -EAGAIN; else read_lo=
+ck();
+
+That way we don't have any even theoretical fairness issues because the tr=
+ylock can fail just *once* which kicks us to the slow path and that'll take=
+ the lock normally now=2E
+
+The condition might not actually be in_atomic() but I'm not working this w=
+eek and you get the idea=2E
 
