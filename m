@@ -1,110 +1,195 @@
-Return-Path: <kvm+bounces-9193-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9194-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41C5785BE06
-	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 15:04:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4481885BE68
+	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 15:16:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F018F286AFE
-	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 14:04:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3CCA41C21EF5
+	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 14:16:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D59E6A8A7;
-	Tue, 20 Feb 2024 14:04:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F22456A8CF;
+	Tue, 20 Feb 2024 14:16:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="p1PMzGAw"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="dLzjOEoE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F1815C5FC
-	for <kvm@vger.kernel.org>; Tue, 20 Feb 2024 14:04:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ED696A359;
+	Tue, 20 Feb 2024 14:15:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708437856; cv=none; b=UsmERZm10M8NlfqK6Yw7+UBnTZTicvPpcD16vlDwqOskGlNaXxUHf7+iBX6y25qbeNMINe4gb3uQT2Cd/nFBJ2xN0LNTzdjEtGdZjHiL+SJGKYOAyBl9BiPALtOgP+Ltb9LnA9j5Y1PnIVVbg55EdfVWcqKQ3etyOL17f3XD/6w=
+	t=1708438561; cv=none; b=j8KWvRfHB4adutLX9we9Wk2Rhbd1jSa3qldHQdh0ZpaNSv3YFGOpE2HMWBd0g4fx2hkWvKv2ZagYtKFtAUSb84gV4/nPnplyNteWNXO8tbov4kkypv5UkgWqK86xjg0Q9UlFKCSKVv9e6SXRPSbbLNbt63SYhBLVKhN+/oqzwyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708437856; c=relaxed/simple;
-	bh=CWUrJw1VxhsUVSPMHIW4mX4BcBEeYqkrmm0fbo82ap0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bVafA06otxRTJNuDmho6Fqs3JoAEj8uEJAkMKKnsVk32zhcA2qUGABQ2GFImtNdmYs7cSCBtEe9SZG0N4IbRDftTWrXoL5Zvh3hmuZTpJIWwrGpFA01YAo7VIpH82Wr7YSeQDnPm3mIN6o8aVbrwNmAkDdepwq9ZXBs4YlU4S/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=p1PMzGAw; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-564647bcdbfso2510636a12.2
-        for <kvm@vger.kernel.org>; Tue, 20 Feb 2024 06:04:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1708437853; x=1709042653; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7HcYmC+O/kaq/mMhRCiy/822wCYlWWBDeIseRTPuWak=;
-        b=p1PMzGAwpmb0BFhKYyvKR0J8yJqgk+x9wWTQLs2GvfRWmZoZxjtG6T/zDWaH2/RF8H
-         jpDXdNRiQg7pBMkjmr13fTk2UWPgKFaBkIFv4nd1AkdhfjIYBjOjTcXFGQ57VOVMeGUa
-         XmZRcuNCS5yn/5Qu239Y9f7IqoKS/3FA77zIMmF1xRvHPay9JFCDebkAuswWd07fh4M+
-         RMP92pry91rNx+E+xK+I4sSwOy1+fBxCbqJxdLrO5Hf9xRfbeWVxjb7lG1BC7cWKuFYY
-         opLfOBqz8qbi4Mp9hFw1inCJKI1QLNxILtvvv6VtS0mu/oUeHvRQXrp3FO2h2GzS62rp
-         YxSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708437853; x=1709042653;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7HcYmC+O/kaq/mMhRCiy/822wCYlWWBDeIseRTPuWak=;
-        b=MEOWsLm24hO98J+vgd1x0fXlF4JJuFJeqZecPWypg++/FL7hsIlKG8szPNLG7m4745
-         lmtyJFMXF+WgwOUhx0XvzCCB/FoiUKo1N+hdEqTfp8qRDrCL+bhyBibr01Rgdg+lrLbV
-         hm+dZlTjq4GYsIpVASeHZrngyXfC5M5AZw3gbxLRQcvDojK1FU+5QT7+PYaW7czV/Ccg
-         DxWvrzXgRDbvZuMPtHifG2A3QPKb/0s25ugAwaV19wqTScNz3wY9zfT/NAv54jY7sLvO
-         8+54QtHiHi/gzPVAQ9BGqXXMCgfgedMf/utHtfsS+9zbNhnhNP/wl19p+oCcfLigfQDn
-         J4MA==
-X-Forwarded-Encrypted: i=1; AJvYcCUYN6J+vMv401MikT3uUKKPLQNej8EtB2SEVzhm2vqlpsSPvJOxFUUFo11vILMefhZvTmV6yrdVXy2QvOJfx0/ZOKF8
-X-Gm-Message-State: AOJu0YwjrEuJWX1gQMY2NuDUoiQcMUYOWD8gaBJAxWF8mkB9zCbRsRdT
-	RdQD3kigE9+qyCT3Kgxs8ZNF6u1KTw0l85A2ZqgvqkIPqGRmfCgI5tUgDV9qRMBQ/Vyzn6nsF+d
-	kpZEEkk0JDjpzl5UdvbhlM2GMa096V1LTjudZGQ==
-X-Google-Smtp-Source: AGHT+IE3+Uo4bJoUcdMjVLgsrEPiRA1kRe4srUUoPb0q0r62EC6koPVaMf8zABaj4H18OjrZFBXRQVM4BsOHSwHfMTI=
-X-Received: by 2002:a05:6402:1b1a:b0:55f:f94d:cf76 with SMTP id
- by26-20020a0564021b1a00b0055ff94dcf76mr10101954edb.27.1708437852739; Tue, 20
- Feb 2024 06:04:12 -0800 (PST)
+	s=arc-20240116; t=1708438561; c=relaxed/simple;
+	bh=HArwwHt1hGrCTLbZ4EXs9mayU7DHCs/ZHiAeJX8lVqM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nwvOujw/W4hi3g8tMY1CqmAAaiqOB6ekYP8R0rqnfdGkfNN1a7j8I3Ay1VPbUxSbz7i8M9Wf1HZJZR3F2oVXn0saa0vL0WHoYzoH34Ymn/HgnzRfnnfu/13SsDIX1Kr1ttPYxGJ16ixledVYXr1LLJqdNXivHPs3+DMkOROEjbU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=dLzjOEoE; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41KDIurZ030093;
+	Tue, 20 Feb 2024 14:15:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=+FXltmwqBAJ8c6HHejlohDnfZv970OoqMm5SuRo1gdQ=;
+ b=dLzjOEoEggM3ZSd2bXhGztD1uOuNWd46b1u0woEhFAg7Fv+9XIgQ517+2Fm3il/rpoBr
+ t6EF+pDEq1CS7SSSVutk88GdMSJ/jvaM3whIUwHIDD/CHNzyI70d9NbcJeSohU8Pq1QJ
+ rEJd5n4HafCbA1aa/i26gMmcs328SBeiqSppa971J+MUeeEV33LmRcaMcUaWM5Pv/XR4
+ bG3z11DmzICQtBFyZ23F9XEX0nkje7JwFYqG30xba+WJbmG2qDZxGE2NT2s1rMibWnk6
+ HdLQ0nxX1nqZlfKlDSQYS9FzGh6WY7nUKXOBUTHo86xEiCf7fCOvSj3A9MbLGZC9ytNb oA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wcvuq9g9p-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 20 Feb 2024 14:15:55 +0000
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41KDJBAL030469;
+	Tue, 20 Feb 2024 14:15:55 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wcvuq9g9e-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 20 Feb 2024 14:15:54 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 41KD2BEB031187;
+	Tue, 20 Feb 2024 14:15:54 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3wb9bkr5yb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 20 Feb 2024 14:15:54 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 41KEFmJZ40305012
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 20 Feb 2024 14:15:50 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CCF432004E;
+	Tue, 20 Feb 2024 14:15:48 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 887842006A;
+	Tue, 20 Feb 2024 14:15:48 +0000 (GMT)
+Received: from [9.152.224.41] (unknown [9.152.224.41])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 20 Feb 2024 14:15:48 +0000 (GMT)
+Message-ID: <1d9fef3d-b793-43fc-a3f9-4ff087bc899f@linux.ibm.com>
+Date: Tue, 20 Feb 2024 15:15:48 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240216150441.45681-1-philmd@linaro.org>
-In-Reply-To: <20240216150441.45681-1-philmd@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 20 Feb 2024 14:04:01 +0000
-Message-ID: <CAFEAcA-SYyXN94cH2mmVynW7LPB-YoSQTZ_E0WH18ra0UGB7-g@mail.gmail.com>
-Subject: Re: [PATCH] hw/sysbus: Inline and remove sysbus_add_io()
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, 
-	Richard Henderson <richard.henderson@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>, kvm@vger.kernel.org, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, 
-	=?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, 
-	Eduardo Habkost <eduardo@habkost.net>, Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 1/2] KVM: s390: fix access register usage in ioctls
+To: Eric Farman <farman@linux.ibm.com>, Janosch Frank
+ <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>
+Cc: Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+References: <20240216213616.3819805-1-farman@linux.ibm.com>
+ <20240216213616.3819805-2-farman@linux.ibm.com>
+Content-Language: en-US
+From: Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <20240216213616.3819805-2-farman@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: FXHHK-5OvbhORVbEknDOPBn3A2lgbMKX
+X-Proofpoint-GUID: q4PucP4oAXJqoAo-RlP8oYU6jd640KKT
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-20_06,2024-02-20_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
+ phishscore=0 clxscore=1011 impostorscore=0 bulkscore=0 lowpriorityscore=0
+ mlxlogscore=999 malwarescore=0 mlxscore=0 priorityscore=1501 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
+ definitions=main-2402200102
 
-On Fri, 16 Feb 2024 at 15:05, Philippe Mathieu-Daud=C3=A9 <philmd@linaro.or=
-g> wrote:
->
-> sysbus_add_io(...) is a simple wrapper to
-> memory_region_add_subregion(get_system_io(), ...).
-> It is used in 3 places; inline it directly.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
+
+
+Am 16.02.24 um 22:36 schrieb Eric Farman:
+> The routine ar_translation() can be reached by both the instruction
+> intercept path (where the access registers had been loaded with the
+> guest register contents), and the MEM_OP ioctls (which hadn't).
+> Since this routine saves the current registers to vcpu->run,
+> this routine erroneously saves host registers into the guest space.
+> 
+> Introduce a boolean in the kvm_vcpu_arch struct to indicate whether
+> the registers contain guest contents. If they do (the instruction
+> intercept path), the save can be performed and the AR translation
+> is done just as it is today. If they don't (the MEM_OP path), the
+> AR can be read from vcpu->run without stashing the current contents.
+> 
+> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+
+Acked-by: Christian Borntraeger <borntraeger@linux.ibm.com>
+Reviewed-by: Christian Borntraeger <borntraeger@linux.ibm.com>
 > ---
->  include/hw/sysbus.h | 2 --
->  hw/core/sysbus.c    | 6 ------
->  hw/i386/kvmvapic.c  | 2 +-
->  hw/mips/mipssim.c   | 2 +-
->  hw/nvram/fw_cfg.c   | 5 +++--
->  5 files changed, 5 insertions(+), 12 deletions(-)
->
-
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
--- PMM
+>   arch/s390/include/asm/kvm_host.h | 1 +
+>   arch/s390/kvm/gaccess.c          | 3 ++-
+>   arch/s390/kvm/kvm-s390.c         | 3 +++
+>   3 files changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+> index 52664105a473..c86215eb4ca7 100644
+> --- a/arch/s390/include/asm/kvm_host.h
+> +++ b/arch/s390/include/asm/kvm_host.h
+> @@ -765,6 +765,7 @@ struct kvm_vcpu_arch {
+>   	__u64 cputm_start;
+>   	bool gs_enabled;
+>   	bool skey_enabled;
+> +	bool acrs_loaded;
+>   	struct kvm_s390_pv_vcpu pv;
+>   	union diag318_info diag318_info;
+>   };
+> diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
+> index 5bfcc50c1a68..b4c805092021 100644
+> --- a/arch/s390/kvm/gaccess.c
+> +++ b/arch/s390/kvm/gaccess.c
+> @@ -391,7 +391,8 @@ static int ar_translation(struct kvm_vcpu *vcpu, union asce *asce, u8 ar,
+>   	if (ar >= NUM_ACRS)
+>   		return -EINVAL;
+>   
+> -	save_access_regs(vcpu->run->s.regs.acrs);
+> +	if (vcpu->arch.acrs_loaded)
+> +		save_access_regs(vcpu->run->s.regs.acrs);
+>   	alet.val = vcpu->run->s.regs.acrs[ar];
+>   
+>   	if (ar == 0 || alet.val == 0) {
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index ea63ac769889..61092f0e0a66 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -3951,6 +3951,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>   				    KVM_SYNC_ARCH0 |
+>   				    KVM_SYNC_PFAULT |
+>   				    KVM_SYNC_DIAG318;
+> +	vcpu->arch.acrs_loaded = false;
+>   	kvm_s390_set_prefix(vcpu, 0);
+>   	if (test_kvm_facility(vcpu->kvm, 64))
+>   		vcpu->run->kvm_valid_regs |= KVM_SYNC_RICCB;
+> @@ -4951,6 +4952,7 @@ static void sync_regs(struct kvm_vcpu *vcpu)
+>   	}
+>   	save_access_regs(vcpu->arch.host_acrs);
+>   	restore_access_regs(vcpu->run->s.regs.acrs);
+> +	vcpu->arch.acrs_loaded = true;
+>   	/* save host (userspace) fprs/vrs */
+>   	save_fpu_regs();
+>   	vcpu->arch.host_fpregs.fpc = current->thread.fpu.fpc;
+> @@ -5021,6 +5023,7 @@ static void store_regs(struct kvm_vcpu *vcpu)
+>   	kvm_run->s.regs.pfc = vcpu->arch.pfault_compare;
+>   	save_access_regs(vcpu->run->s.regs.acrs);
+>   	restore_access_regs(vcpu->arch.host_acrs);
+> +	vcpu->arch.acrs_loaded = false;
+>   	/* Save guest register state */
+>   	save_fpu_regs();
+>   	vcpu->run->s.regs.fpc = current->thread.fpu.fpc;
 
