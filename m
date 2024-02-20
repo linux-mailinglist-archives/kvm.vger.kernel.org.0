@@ -1,157 +1,140 @@
-Return-Path: <kvm+bounces-9184-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9186-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9220D85BC25
-	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 13:29:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64BFA85BCFE
+	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 14:18:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F8372820BC
-	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 12:29:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FD412860CA
+	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 13:18:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55BAA6931F;
-	Tue, 20 Feb 2024 12:29:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uQuCyfOG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C212D6A038;
+	Tue, 20 Feb 2024 13:17:56 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76ABA67C70;
-	Tue, 20 Feb 2024 12:29:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E069E6A02C
+	for <kvm@vger.kernel.org>; Tue, 20 Feb 2024 13:17:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708432173; cv=none; b=NMnG7VsJ/C0AW+cI6cLZqrPyx7giF/B/pVmL1V+GJ8/8DEstvCxlE3mtvIEfsK71+23152Lt4uIwjfqaqO0TaB5aNZZhEGim6DPEk/h51qgaQsVt/SNCMC0AeFykB2p0K5j2duJDWfn46jT9HlAIGJQnA7Dho585OA3UES1YuqA=
+	t=1708435076; cv=none; b=feN5cmUEhxHkLwLXDoPGs+qkbIzVozHkaZyAxB1Ch6hd/AOIn2KIrfeExZUdapLohaOIWRUC+XFrKyMzxeNrps5J3MPzcOkaf34kXJpWuFyDBhbm7LzQ2l4t/KwUx+TtoywvnDr2ZWJXLCxHxP3ZVPaLikjR2UgMHTZjdI9wglU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708432173; c=relaxed/simple;
-	bh=8m22g+Ahfu3JukKQ7xiuwIYdtui1QkCaMrKFG3Bu9fU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Q5FRMz5wvBBmLHoJUxTH4mX1vS/B5vSD+7SkALIydiNXuUwV1lzQfavi+AZ6McqRFaWKVq/k+x0ptsMEBpejcRqMmZ5HujoTCOHdzg9AdnQQpVeHgu7PaS4S+RRHoYohj4DFwp8KlJO2L+U7QJX7VuEHWyqzbDYs+YV5t7Zbj3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uQuCyfOG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCA0DC433C7;
-	Tue, 20 Feb 2024 12:29:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708432172;
-	bh=8m22g+Ahfu3JukKQ7xiuwIYdtui1QkCaMrKFG3Bu9fU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=uQuCyfOG4bp8RrQpn+lVdvcAZoRCBCAlEG+yZxD0pRwstT3HJZfFLDbjwxYgRHoHB
-	 Nso1OCmPwW7EE/zYVpUm2Af+tUa8bfIQOq/Vlh0eImfNw7xaWyP9RUZy3e+pkkON3h
-	 oWuMEgO9f5PtDD/GQNSTFds+VQ0s2bQIcg6ixKGD4Ka2MW+otrW0GYYWt7SfAfmXGR
-	 9QS8vJZMOUTj9rpNDpubEB7Se8JH6PzkCrFwU6X9kavVMDIagE6u1VLSTNjMD6TW8q
-	 GuM/RWVJpXwmlM1Sa+HiB8k2s4kCZQXhyo+tN2Mmup04eLAAZ9k8ipg11+iryobi0r
-	 3vhMfx+j77jMg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rcPFa-004uw3-On;
-	Tue, 20 Feb 2024 12:29:30 +0000
-Date: Tue, 20 Feb 2024 12:29:30 +0000
-Message-ID: <861q9748ut.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
+	s=arc-20240116; t=1708435076; c=relaxed/simple;
+	bh=IQ1IawSk15lvCywSyyjE44czdLRNImvOxZoYSVgiFSA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I4F5BHjmUAqV770gz913zY6f8NdDkrNbHoywQCkhWT0fA/LJlDkx1kHQvHpp4O6gxLxK7xUbhUCfHkOpNq/CV4LwlijHN/9E/kvP3EDSxkOgyHDRranZE8KBHoG6iNamVlhAH+sJUUmt8tUmVCUk60xooOn8MlCvU9y4L+6ZUmQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 35C2EFEC;
+	Tue, 20 Feb 2024 05:18:32 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CE1053F73F;
+	Tue, 20 Feb 2024 05:17:51 -0800 (PST)
+Date: Tue, 20 Feb 2024 13:17:45 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH 02/13] KVM: arm64: Clarify ESR_ELx_ERET_ISS_ERET*
-In-Reply-To: <20240220113127.GB16168@e124191.cambridge.arm.com>
+Subject: Re: [PATCH 01/13] KVM: arm64: Harden __ctxt_sys_reg() against
+ out-of-range values
+Message-ID: <20240220131745.GA8575@e124191.cambridge.arm.com>
 References: <20240219092014.783809-1-maz@kernel.org>
-	<20240219092014.783809-3-maz@kernel.org>
-	<20240220113127.GB16168@e124191.cambridge.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <20240219092014.783809-2-maz@kernel.org>
+ <20240220112031.GA16168@e124191.cambridge.arm.com>
+ <8634tn4acv.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8634tn4acv.wl-maz@kernel.org>
 
-On Tue, 20 Feb 2024 11:31:27 +0000,
-Joey Gouly <joey.gouly@arm.com> wrote:
+On Tue, Feb 20, 2024 at 11:57:04AM +0000, Marc Zyngier wrote:
+> On Tue, 20 Feb 2024 11:20:31 +0000,
+> Joey Gouly <joey.gouly@arm.com> wrote:
+> > 
+> > On Mon, Feb 19, 2024 at 09:20:02AM +0000, Marc Zyngier wrote:
+> > > The unsuspecting kernel tinkerer can be easily confused into
+> > > writing something that looks like this:
+> > > 
+> > > 	ikey.lo = __vcpu_sys_reg(vcpu, SYS_APIAKEYLO_EL1);
+> > > 
+> > > which seems vaguely sensible, until you realise that the second
+> > > parameter is the encoding of a sysreg, and not the index into
+> > > the vcpu sysreg file... Debugging what happens in this case is
+> > 
+> > type safety :(
 > 
-> On Mon, Feb 19, 2024 at 09:20:03AM +0000, Marc Zyngier wrote:
-> > The ESR_ELx_ERET_ISS_ERET* macros are a bit confusing:
-> > 
-> > - ESR_ELx_ERET_ISS_ERET really indicates that we have trapped an
-> >   ERETA* instruction, as opposed to an ERET
-> > 
-> > - ESR_ELx_ERET_ISS_ERETA reallu indicates that we have trapped
-> >   an ERETAB instruction, as opposed to an ERETAA.
-> > 
-> > Repaint the two helpers such as:
-> > 
-> > - ESR_ELx_ERET_ISS_ERET becomes ESR_ELx_ERET_ISS_ERETA
-> > 
-> > - ESR_ELx_ERET_ISS_ERETA becomes ESR_ELx_ERET_ISS_ERETAB
-> > 
-> > At the same time, use BIT() instead of raw values.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> 
-> I'm somewhat against this, as the original names are what the Arm
-> ARM specifies.
+> Are you advocating for making everything a struct? Or something else?
 
-I don't disagree, but that doesn't make the ARM ARM right! ;-)
+No, merely lamenting the situation.
+
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 
 > 
-> > ---
-> >  arch/arm64/include/asm/esr.h | 4 ++--
-> >  arch/arm64/kvm/handle_exit.c | 2 +-
-> >  2 files changed, 3 insertions(+), 3 deletions(-)
 > > 
-> > diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-> > index 353fe08546cf..72c7810ccf2c 100644
-> > --- a/arch/arm64/include/asm/esr.h
-> > +++ b/arch/arm64/include/asm/esr.h
-> > @@ -290,8 +290,8 @@
-> >  		 ESR_ELx_SYS64_ISS_OP2_SHIFT))
-> >  
-> >  /* ISS field definitions for ERET/ERETAA/ERETAB trapping */
-> > -#define ESR_ELx_ERET_ISS_ERET		0x2
-> > -#define ESR_ELx_ERET_ISS_ERETA		0x1
-> > +#define ESR_ELx_ERET_ISS_ERETA		BIT(1)
-> > +#define ESR_ELx_ERET_ISS_ERETAB		BIT(0)
-> >  
-> >  /*
-> >   * ISS field definitions for floating-point exception traps
-> > diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> > index 617ae6dea5d5..0646c623d1da 100644
-> > --- a/arch/arm64/kvm/handle_exit.c
-> > +++ b/arch/arm64/kvm/handle_exit.c
-> > @@ -219,7 +219,7 @@ static int kvm_handle_ptrauth(struct kvm_vcpu *vcpu)
-> >  
-> >  static int kvm_handle_eret(struct kvm_vcpu *vcpu)
-> >  {
-> > -	if (kvm_vcpu_get_esr(vcpu) & ESR_ELx_ERET_ISS_ERET)
-> > +	if (kvm_vcpu_get_esr(vcpu) & ESR_ELx_ERET_ISS_ERETA)
+> > > an interesting exercise in head<->wall interactions.
+> > > 
+> > > As they often say: "Any resemblance to actual persons, living
+> > > or dead, or actual events is purely coincidental".
+> > > 
+> > > In order to save people's time, add some compile-time hardening
+> > > that will at least weed out the "stupidly out of range" values.
+> > > This will *not* catch anything that isn't a compile-time constant.
+> > > 
+> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > > ---
+> > >  arch/arm64/include/asm/kvm_host.h | 9 ++++++++-
+> > >  1 file changed, 8 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > > index 181fef12e8e8..a5ec4c7d3966 100644
+> > > --- a/arch/arm64/include/asm/kvm_host.h
+> > > +++ b/arch/arm64/include/asm/kvm_host.h
+> > > @@ -895,7 +895,7 @@ struct kvm_vcpu_arch {
+> > >   * Don't bother with VNCR-based accesses in the nVHE code, it has no
+> > >   * business dealing with NV.
+> > >   */
+> > > -static inline u64 *__ctxt_sys_reg(const struct kvm_cpu_context *ctxt, int r)
+> > > +static inline u64 *___ctxt_sys_reg(const struct kvm_cpu_context *ctxt, int r)
+> > 
+> > When in doubt, add more underscores!
 > 
-> If this part is confusing due to the name, maybe introduce a function in esr.h
-> esr_is_pac_eret() (name pending bikeshedding)?
+> That's the one true way.
+> 
+> > 
+> > >  {
+> > >  #if !defined (__KVM_NVHE_HYPERVISOR__)
+> > >  	if (unlikely(cpus_have_final_cap(ARM64_HAS_NESTED_VIRT) &&
+> > > @@ -905,6 +905,13 @@ static inline u64 *__ctxt_sys_reg(const struct kvm_cpu_context *ctxt, int r)
+> > >  	return (u64 *)&ctxt->sys_regs[r];
+> > >  }
+> > >  
+> > > +#define __ctxt_sys_reg(c,r)						\
+> > > +	({								\
+> > > +	    	BUILD_BUG_ON(__builtin_constant_p(r) &&			\
+> > > +			     (r) >= NR_SYS_REGS);			\
+> > > +		___ctxt_sys_reg(c, r);					\
+> > > +	})
+> > 
+> > I'm assuming the extra macro layer is to try make __builtin_constant_p() as
+> > effective as possible? Otherwise maybe it relies on the compiler inling the
+> > ___ctxt_sys_reg() function?
+> 
+> It's not about efficiency. It's about making it *work*. Otherwise,
+> lack of inlining will screw you over, and you may not check anything.
 
-That's indeed a better option. Now for the bikeshed aspect:
-
-- esr_iss_is_eretax(): check for ESR_ELx_ERET_ISS_ERET being set
-
-- esr_iss_is_eretab(): check for ESR_ELx_ERET_ISS_ERETA being set
-
-Thoughts?
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+Joey
 
