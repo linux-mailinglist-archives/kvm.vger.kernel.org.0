@@ -1,107 +1,226 @@
-Return-Path: <kvm+bounces-9204-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9205-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9220C85C000
-	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 16:33:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 92C5585C030
+	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 16:41:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 30F1F1F248A5
-	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 15:33:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0380A1F2296E
+	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 15:41:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0B2B7604E;
-	Tue, 20 Feb 2024 15:33:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2939B76058;
+	Tue, 20 Feb 2024 15:41:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3cpdQCDy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mZaPlmEQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B7947602F
-	for <kvm@vger.kernel.org>; Tue, 20 Feb 2024 15:33:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53B4B67C4E;
+	Tue, 20 Feb 2024 15:41:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708443225; cv=none; b=rPVCnW7/iZSfJZJb4UxGm2Arx+SZVMawQnbypDQ2xuMmyIrGan3NPgG/wunUOrRaic8C1PwpX18u31k7b9YBs0NtOly1TIw+NuuNfbIlI9IYSNgcuDQLAdH19lSnAgEKH4jZCGr0zzs6msZ82LcN3JTjUWpK02FfRA5jcFIHZ5w=
+	t=1708443687; cv=none; b=Wl4WFnW79Xm2enZUa+6rJn6Nb+MBmc22R/gTLzOxcB5l4rGDpxlgkcnjMSE6G6nrqgeXIGOLVwNiY+Zfqy5d/SfoT3nPnIewtMTcHAEUqDM+VdmyPboStbyoRcptSCahU0q2oxebWnj9tt7LKogKNVTvUTAKiMEj2axjQpEpyWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708443225; c=relaxed/simple;
-	bh=7D7kf8p8aX2ZzflAMDnkhBwWgiUvsRg8uan55wPtdeo=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=H0DUe3yxUVL51qhQhn8EkVgQs40VP7leL9rpRmit3zSWBWw60GEp7hhPxdIm1aTmbO0bZgjkqwEc5hlFWQKrBYWRp0NcJJuGY5mAwr34pLnvdCvpMWb1S35ZUZGrN2jmlUOdiQ8hBUAEYPJ2VWf7e634yWA2Bsp3JwckPm9j1/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3cpdQCDy; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-607e56f7200so45451757b3.2
-        for <kvm@vger.kernel.org>; Tue, 20 Feb 2024 07:33:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708443222; x=1709048022; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1fzOe/J4kuriO/maOGNH55dN19fVKQtEmyIcU4m9sns=;
-        b=3cpdQCDyg0mp5DZW2QTFvCcek4NqeDX7/LxCgHwuElM503dUoBSO7gIT1zXFtIJoJk
-         Eqrfn3tQlO17zTIzFUB5Da0CpBVfAvgOvjTuzPeLRyqGkd3rW5zKtdM6laTGO/dw3B5u
-         EcKxClAj1BrDglpYlG9x8rSdRLTNcFa+vPjHpaDq2PG7n8LWl0/PRern/zFiBMyNvxsk
-         hgWsLiCYmfUMjvmN5Hsedn3k1BFFML47uUqPRqS6ntAraoVtSVWuWqLXNCIKV0npv5vX
-         2jVBdx7V5bsKNZ01R9eOsrIa5l7iHQ0RSqopNvC/mfGngYDFlJ/WDHPyyVZLo/g5VPHR
-         u6bg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708443222; x=1709048022;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1fzOe/J4kuriO/maOGNH55dN19fVKQtEmyIcU4m9sns=;
-        b=vG00uL09i0nUfp2Y2hsAmQG7gNJykmTkWIWfR38HTBBivZQxOOhP41M5W8gERN29PW
-         3SATv37POqoj7y9xbKvmx9FRewnByx+GXpU598WlJk+PKGQ6hSb3IUGSGE9BpHesh9oT
-         4+UFIOi4kVv/cck8WDt4VPrJy7J58AIJfNoSC0LOJ7PIt73efotzSquBKZCG/yLTwRI5
-         Hgm9tZOCiHStDvvVpgmWjhOzEYe41EOO7pVLA+7YWGJbr9VqMM7HhzCpddEagPUduE9a
-         5Om8ZFXA7SHedshXUzmy6/Hoi3x56PCynvYCfquYIeG90t0X2yTRlfB8CwlafishLPiJ
-         MfFA==
-X-Forwarded-Encrypted: i=1; AJvYcCWzD7YAbv+WcxFEZPp2u/dPtxP11/9afi529xF04PaPrmH5hi64Mj019k07lSezi8CbX0KQVx/4ksWC81kRIjO8IZb3
-X-Gm-Message-State: AOJu0Yw9X9x0FLqOSVsVSsVEa0tDJhKvknOhWA99tFKkvgGBiYQ5eppy
-	0q3TAhk2/H+6zeiHRwC800ILrKTgMPD5G5mDiHrP5vlREKvHSz2ifM2AES+pOuJu7wslFBwv+TX
-	+Cw==
-X-Google-Smtp-Source: AGHT+IHV2QTvanF7VyH48/qvRHmtqg+UWhaoc+cyGK8cObSo3PadCiUndGKk4nt1DLGsJf5NFU55wseFcsE=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:4f83:0:b0:608:6c70:8d6 with SMTP id
- d125-20020a814f83000000b006086c7008d6mr178184ywb.2.1708443222505; Tue, 20 Feb
- 2024 07:33:42 -0800 (PST)
-Date: Tue, 20 Feb 2024 07:33:40 -0800
-In-Reply-To: <20240220134800.40efe653@canb.auug.org.au>
+	s=arc-20240116; t=1708443687; c=relaxed/simple;
+	bh=Rc2Iumg6kJhz1u6L7ZpPNjFfPAPoH7W2SUxWAqg8m5E=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GbatlnLQfquyZ1O+finswEM0WUTaJlZ5JbStxnHY68sCXB202r99umEn6A0qw8ekTuuAltydW/dCXNx1AovhbQ81c2mn7ZdTbfMNVGu3hfswabSvLeakYSmVKz2+zkB47L9pWWgNzLkii3Uop4WAFYxNWr53UXMF+NMvbmpeyZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mZaPlmEQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF1A7C433C7;
+	Tue, 20 Feb 2024 15:41:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708443686;
+	bh=Rc2Iumg6kJhz1u6L7ZpPNjFfPAPoH7W2SUxWAqg8m5E=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mZaPlmEQQUUiSUzRjJyIqol1tl/YTV7EUdYOyBExz5YqU2Y8xkUbTHsKQXwsYTwmc
+	 /frQrMYW0sxg3cqgUbi4AB7Ujl8MHeGlKKt0YJDHP425MJSls1seanDFz8n5ygo2eW
+	 ERelFApqfKztnMwqLGISv0XsHx+2h8XY8C3Du/jYba++eNhbaBnEx1O6VXY+yvf6JO
+	 lKrIUgUOe1HGNQwGZ+sqWqCclNcGiEjv3C7sdP5F5n5EfkW0J/CVN6bCjeUpH5KT+v
+	 I6O4Yqk3pv0V5VOJXgx6echjsquhdaRbwbel/sMCeFORX5Kud5WxR2y5ItxDfjqnui
+	 qplq8lljQqVSg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rcSFI-004xxT-8q;
+	Tue, 20 Feb 2024 15:41:24 +0000
+Date: Tue, 20 Feb 2024 15:41:23 +0000
+Message-ID: <86y1bf2lek.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH 04/13] KVM: arm64: nv: Configure HCR_EL2 for FEAT_NV2
+In-Reply-To: <20240220151600.GC8575@e124191.cambridge.arm.com>
+References: <20240219092014.783809-1-maz@kernel.org>
+	<20240219092014.783809-5-maz@kernel.org>
+	<20240220151600.GC8575@e124191.cambridge.arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240220134800.40efe653@canb.auug.org.au>
-Message-ID: <ZdTGRQJIO0Te8zF8@google.com>
-Subject: Re: linux-next: manual merge of the kvm-x86 tree with the kvm tree
-From: Sean Christopherson <seanjc@google.com>
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-	Linux Next Mailing List <linux-next@vger.kernel.org>, Paul Durrant <pdurrant@amazon.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Feb 20, 2024, Stephen Rothwell wrote:
-> Hi all,
+On Tue, 20 Feb 2024 15:16:00 +0000,
+Joey Gouly <joey.gouly@arm.com> wrote:
 > 
-> Today's linux-next merge of the kvm-x86 tree got a conflict in:
+> Hi,
 > 
->   include/uapi/linux/kvm.h
+> On Mon, Feb 19, 2024 at 09:20:05AM +0000, Marc Zyngier wrote:
+> > Add the HCR_EL2 configuration for FEAT_NV2, adding the required
+> > bits for running a guest hypervisor, and overall merging the
+> > allowed bits provided by the guest.
+> > 
+> > This heavily replies on unavaliable features being sanitised
+> > when the HCR_EL2 shadow register is accessed, and only a couple
+> > of bits must be explicitly disabled.
+> > 
+> > Non-NV guests are completely unaffected by any of this.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/sysreg.h         |  1 +
+> >  arch/arm64/kvm/hyp/include/hyp/switch.h |  4 +--
+> >  arch/arm64/kvm/hyp/nvhe/switch.c        |  2 +-
+> >  arch/arm64/kvm/hyp/vhe/switch.c         | 34 ++++++++++++++++++++++++-
+> >  4 files changed, 36 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> > index 9e8999592f3a..a5361d9032a4 100644
+> > --- a/arch/arm64/include/asm/sysreg.h
+> > +++ b/arch/arm64/include/asm/sysreg.h
+> > @@ -498,6 +498,7 @@
+> >  #define SYS_TCR_EL2			sys_reg(3, 4, 2, 0, 2)
+> >  #define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
+> >  #define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
+> > +#define SYS_VNCR_EL2			sys_reg(3, 4, 2, 2, 0)
+> >  
+> >  #define SYS_TRFCR_EL2			sys_reg(3, 4, 1, 2, 1)
+> >  #define SYS_VNCR_EL2			sys_reg(3, 4, 2, 2, 0)
 > 
-> between commit:
-> 
->   bcac0477277e ("KVM: x86: move x86-specific structs to uapi/asm/kvm.h")
-> 
-> from the kvm tree and commits:
-> 
->   01a871852b11 ("KVM: x86/xen: allow shared_info to be mapped by fixed HVA")
->   3a0c9c41959d ("KVM: x86/xen: allow vcpu_info to be mapped by fixed HVA")
-> 
-> from the kvm-x86 tree.
+> I'm seeing double! (SYS_VNCR_EL2 is already defined a few lines
+> down)
 
-/facepalm
+Ah, it got added by Miguel and my rebase didn't weed it out. It also
+doesn't help that SYS_TRFCR_EL2 is out of sequence... Anyway, I'll
+drop this, thanks for spotting it.
 
-I asked Paolo for a topic branch specifically to avoid this conflict, and then
-managed to forget about it.  I'll rebase the xen patches and force push.
+> 
+> > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > index e3fcf8c4d5b4..f5f701f309a9 100644
+> > --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > @@ -271,10 +271,8 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
+> >  	__deactivate_traps_hfgxtr(vcpu);
+> >  }
+> >  
+> > -static inline void ___activate_traps(struct kvm_vcpu *vcpu)
+> > +static inline void ___activate_traps(struct kvm_vcpu *vcpu, u64 hcr)
+> >  {
+> > -	u64 hcr = vcpu->arch.hcr_el2;
+> > -
+> >  	if (cpus_have_final_cap(ARM64_WORKAROUND_CAVIUM_TX2_219_TVM))
+> >  		hcr |= HCR_TVM;
+> >  
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+> > index c50f8459e4fc..4103625e46c5 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/switch.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+> > @@ -40,7 +40,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+> >  {
+> >  	u64 val;
+> >  
+> > -	___activate_traps(vcpu);
+> > +	___activate_traps(vcpu, vcpu->arch.hcr_el2);
+> >  	__activate_traps_common(vcpu);
+> >  
+> >  	val = vcpu->arch.cptr_el2;
+> > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> > index 58415783fd53..29f59c374f7a 100644
+> > --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> > @@ -33,11 +33,43 @@ DEFINE_PER_CPU(struct kvm_host_data, kvm_host_data);
+> >  DEFINE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
+> >  DEFINE_PER_CPU(unsigned long, kvm_hyp_vector);
+> >  
+> > +/*
+> > + * HCR_EL2 bits that the NV guest can freely change (no RES0/RES1
+> > + * semantics, irrespective of the configuration), but that cannot be
+> > + * applied to the actual HW as things would otherwise break badly.
+> > + *
+> > + * - TGE: we want to use EL1, which is incompatible with it being set
+> 
+> Can you make this a bit clearer:
+> 
+> 	we want the guest to use EL1
+> 
+> Assuming I've understood correctly. I first read it as 'we' == kvm.
+
+Sure thing, happy to update that.
+
+>> > + *
+> > + * - API/APK: for hysterical raisins, we enable PAuth lazily, which
+> > + *   means that the guest's bits cannot be directly applied (we really
+> > + *   want to see the traps). Revisit this at some point.
+> > + */
+> > +#define NV_HCR_GUEST_EXCLUDE	(HCR_TGE | HCR_API | HCR_APK)
+> > +
+> > +static u64 __compute_hcr(struct kvm_vcpu *vcpu)
+> > +{
+> > +	u64 hcr = vcpu->arch.hcr_el2;
+> > +
+> > +	if (!vcpu_has_nv(vcpu))
+> > +		return hcr;
+> > +
+> > +	if (is_hyp_ctxt(vcpu)) {
+> > +		hcr |= HCR_NV | HCR_NV2 | HCR_AT | HCR_TTLB;
+> > +
+> > +		if (!vcpu_el2_e2h_is_set(vcpu))
+> > +			hcr |= HCR_NV1;
+> > +
+> > +		write_sysreg_s(vcpu->arch.ctxt.vncr_array, SYS_VNCR_EL2);
+> > +	}
+> > +
+> > +	return hcr | (__vcpu_sys_reg(vcpu, HCR_EL2) & ~NV_HCR_GUEST_EXCLUDE);
+> > +}
+> > +
+> >  static void __activate_traps(struct kvm_vcpu *vcpu)
+> >  {
+> >  	u64 val;
+> >  
+> > -	___activate_traps(vcpu);
+> > +	___activate_traps(vcpu, __compute_hcr(vcpu));
+> >  
+> >  	if (has_cntpoff()) {
+> >  		struct timer_map map;
+> 
+> Otherwise,
+> 
+> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+
+Thanks!
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
