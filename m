@@ -1,158 +1,116 @@
-Return-Path: <kvm+bounces-9179-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9180-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0039285BB1E
-	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 12:57:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1BCD85BB32
+	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 12:58:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 33BD61C21E81
-	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 11:57:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 95D9B1F217AE
+	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 11:58:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8AFF67C4A;
-	Tue, 20 Feb 2024 11:57:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LU0/vz4j"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76B3467C4C;
+	Tue, 20 Feb 2024 11:58:12 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EBC967A16;
-	Tue, 20 Feb 2024 11:57:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A50166B2C
+	for <kvm@vger.kernel.org>; Tue, 20 Feb 2024 11:58:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708430228; cv=none; b=WBE5Q7gQ4RlvmOtCkdY03Jw9yeMv3vttVYr7kBitvTvgJ2hXdHGiw8n9GkAPrw9JGCRQ/STkZSM00KaLegK4+9mD+7Fq7ERlxl3UMQfOoRAp+owtw4fIUltzKKhCgv2SekbaP9ljQnzGlN/RzKS7LbiqcbhE8sKc9A7rzwI3LOk=
+	t=1708430292; cv=none; b=HevB/0jhVWon8OPF4ouEZJqL5rq6EQC+0UQQEDhjQ3s9qcNOs51kWXKdg7SEyeL7rgz1zYd/CHp532N+EgwYWtHEsfuTT+Hg7hzcQe6qfsZLSSHPgNuoZwv5w0jq3zCQJFhxfIBjgn64r06MC6MmZheSsEMmEq4/Zw1KHdJ8hCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708430228; c=relaxed/simple;
-	bh=8Nce/i/DtSEnqU882m4uZZHEkogE/ADUKlPVWKkOfMA=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kQpQF+cr/2SEiDxTM82Fddn7gQHLFyMXlw6+mbdsotXk3e0opgdpgTecbfhTRjupz5V6Fu4/ycAP3xRb2i2N2KPuAJL09OMONM0Wu2cYDSnL6oHsimqaZ9yNJeFXKlpiRn4Smh8Yx5oGWFGzEO0VBTa8TpAj5U8qRXoppvSPAAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LU0/vz4j; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 886DEC433C7;
-	Tue, 20 Feb 2024 11:57:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708430227;
-	bh=8Nce/i/DtSEnqU882m4uZZHEkogE/ADUKlPVWKkOfMA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LU0/vz4jnuMEn3+iUqSfhnqtybp2jz5W0KN9su+Ia5mbHqncFMmO0svfhV0Sw3HxW
-	 S3V6gfpMzbv+z4r7DBtvZmqX0eSot78SW0ea+vX6OAl5TuwVJBGN2MgLqUoZcJbjZ9
-	 70ghZfyUfic68hX+g1qaWNJFCtRxIU4zfYHAS1SK88repj0DhsoPmxewWxr52121pA
-	 lfdAFxBxNesfTxZizDVRKe89WiN6aQT40GmujdwlfuC4ECQoKvcPQFcX2cHscsYMU1
-	 WRYrQ1U0vcdyCkPKgusEiI96xG2XS93Lb2a0S/uJ1lvkWICJPKt8WYonQz4g7KxIKV
-	 FNTuA8vYxnz8Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rcOkD-004uFu-CO;
-	Tue, 20 Feb 2024 11:57:05 +0000
-Date: Tue, 20 Feb 2024 11:57:04 +0000
-Message-ID: <8634tn4acv.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
+	s=arc-20240116; t=1708430292; c=relaxed/simple;
+	bh=DoSyF9oBMF7hKFHPTOjGEgAD/7Q3cAcgAGoQkG7Ph7Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DBVuafzSJOwmeUqe3LJ1FZQIpTfJImD0zH7pu05tnmPuXIzRfWKMMe5aGBSV7+k1bsO68O/IrNa11uCTrz5MzN8+KUbxvZHtqB/tkluiXB+AVWThQJmIqrH1XLDUNx3pvCIsAk2wXRMx8ZYT8aJPD5tlMwjLbj1eNHKch/siLJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0A717FEC;
+	Tue, 20 Feb 2024 03:58:49 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9E9513F762;
+	Tue, 20 Feb 2024 03:58:08 -0800 (PST)
+Date: Tue, 20 Feb 2024 11:58:06 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH 01/13] KVM: arm64: Harden __ctxt_sys_reg() against out-of-range values
-In-Reply-To: <20240220112031.GA16168@e124191.cambridge.arm.com>
+Subject: Re: [PATCH 03/13] KVM: arm64: nv: Drop VCPU_HYP_CONTEXT flag
+Message-ID: <20240220115806.GC16168@e124191.cambridge.arm.com>
 References: <20240219092014.783809-1-maz@kernel.org>
-	<20240219092014.783809-2-maz@kernel.org>
-	<20240220112031.GA16168@e124191.cambridge.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <20240219092014.783809-4-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240219092014.783809-4-maz@kernel.org>
 
-On Tue, 20 Feb 2024 11:20:31 +0000,
-Joey Gouly <joey.gouly@arm.com> wrote:
+On Mon, Feb 19, 2024 at 09:20:04AM +0000, Marc Zyngier wrote:
+> It has become obvious that HCR_EL2.NV serves the exact same use
+> as VCPU_HYP_CONTEXT, only in an architectural way. So just drop
+> the flag for good.
 > 
-> On Mon, Feb 19, 2024 at 09:20:02AM +0000, Marc Zyngier wrote:
-> > The unsuspecting kernel tinkerer can be easily confused into
-> > writing something that looks like this:
-> > 
-> > 	ikey.lo = __vcpu_sys_reg(vcpu, SYS_APIAKEYLO_EL1);
-> > 
-> > which seems vaguely sensible, until you realise that the second
-> > parameter is the encoding of a sysreg, and not the index into
-> > the vcpu sysreg file... Debugging what happens in this case is
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 2 --
+>  arch/arm64/kvm/hyp/vhe/switch.c   | 7 +------
+>  2 files changed, 1 insertion(+), 8 deletions(-)
 > 
-> type safety :(
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index a5ec4c7d3966..75eb8e170515 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -816,8 +816,6 @@ struct kvm_vcpu_arch {
+>  #define DEBUG_STATE_SAVE_SPE	__vcpu_single_flag(iflags, BIT(5))
+>  /* Save TRBE context if active  */
+>  #define DEBUG_STATE_SAVE_TRBE	__vcpu_single_flag(iflags, BIT(6))
+> -/* vcpu running in HYP context */
+> -#define VCPU_HYP_CONTEXT	__vcpu_single_flag(iflags, BIT(7))
+>  
+>  /* SVE enabled for host EL0 */
+>  #define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
+> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> index 1581df6aec87..58415783fd53 100644
+> --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> @@ -197,7 +197,7 @@ static void early_exit_filter(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  	 * If we were in HYP context on entry, adjust the PSTATE view
+>  	 * so that the usual helpers work correctly.
+>  	 */
+> -	if (unlikely(vcpu_get_flag(vcpu, VCPU_HYP_CONTEXT))) {
+> +	if (unlikely(read_sysreg(hcr_el2) & HCR_NV)) {
+>  		u64 mode = *vcpu_cpsr(vcpu) & (PSR_MODE_MASK | PSR_MODE32_BIT);
+>  
+>  		switch (mode) {
+> @@ -240,11 +240,6 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+>  	sysreg_restore_guest_state_vhe(guest_ctxt);
+>  	__debug_switch_to_guest(vcpu);
+>  
+> -	if (is_hyp_ctxt(vcpu))
+> -		vcpu_set_flag(vcpu, VCPU_HYP_CONTEXT);
+> -	else
+> -		vcpu_clear_flag(vcpu, VCPU_HYP_CONTEXT);
+> -
+>  	do {
+>  		/* Jump in the fire! */
+>  		exit_code = __guest_enter(vcpu);
 
-Are you advocating for making everything a struct? Or something else?
+Makes sense to me.
 
-> 
-> > an interesting exercise in head<->wall interactions.
-> > 
-> > As they often say: "Any resemblance to actual persons, living
-> > or dead, or actual events is purely coincidental".
-> > 
-> > In order to save people's time, add some compile-time hardening
-> > that will at least weed out the "stupidly out of range" values.
-> > This will *not* catch anything that isn't a compile-time constant.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h | 9 ++++++++-
-> >  1 file changed, 8 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index 181fef12e8e8..a5ec4c7d3966 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -895,7 +895,7 @@ struct kvm_vcpu_arch {
-> >   * Don't bother with VNCR-based accesses in the nVHE code, it has no
-> >   * business dealing with NV.
-> >   */
-> > -static inline u64 *__ctxt_sys_reg(const struct kvm_cpu_context *ctxt, int r)
-> > +static inline u64 *___ctxt_sys_reg(const struct kvm_cpu_context *ctxt, int r)
-> 
-> When in doubt, add more underscores!
-
-That's the one true way.
-
-> 
-> >  {
-> >  #if !defined (__KVM_NVHE_HYPERVISOR__)
-> >  	if (unlikely(cpus_have_final_cap(ARM64_HAS_NESTED_VIRT) &&
-> > @@ -905,6 +905,13 @@ static inline u64 *__ctxt_sys_reg(const struct kvm_cpu_context *ctxt, int r)
-> >  	return (u64 *)&ctxt->sys_regs[r];
-> >  }
-> >  
-> > +#define __ctxt_sys_reg(c,r)						\
-> > +	({								\
-> > +	    	BUILD_BUG_ON(__builtin_constant_p(r) &&			\
-> > +			     (r) >= NR_SYS_REGS);			\
-> > +		___ctxt_sys_reg(c, r);					\
-> > +	})
-> 
-> I'm assuming the extra macro layer is to try make __builtin_constant_p() as
-> effective as possible? Otherwise maybe it relies on the compiler inling the
-> ___ctxt_sys_reg() function?
-
-It's not about efficiency. It's about making it *work*. Otherwise,
-lack of inlining will screw you over, and you may not check anything.
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 
 Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Joey
 
