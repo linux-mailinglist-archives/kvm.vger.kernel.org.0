@@ -1,164 +1,271 @@
-Return-Path: <kvm+bounces-9163-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9153-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8523E85B705
-	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 10:17:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AAC385B6ED
+	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 10:14:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A9EB41C2425B
-	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 09:17:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4EC2D281C1A
+	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 09:14:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 138E060DF1;
-	Tue, 20 Feb 2024 09:14:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAB115FB99;
+	Tue, 20 Feb 2024 09:11:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cETYwYuS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="S6XahKdw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AEC35D754;
-	Tue, 20 Feb 2024 09:14:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00F4557333
+	for <kvm@vger.kernel.org>; Tue, 20 Feb 2024 09:11:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708420469; cv=none; b=E63z4UwLydBdsOFg/JPehxHo3OaurKuUIOVoYblRNF2LkjE6sl4eAv5cjN0Hwmofdw4GEYQTwPlO+brxa03GXc35DXkAk6qDmNKPXhjlx6LStCGDvCOhSrqaGJTHVwKMj4RGTR4ZIS3g/rTLPBgcRUDYAWKL2eK1OyUPvoPrx7w=
+	t=1708420307; cv=none; b=Sq/xRmFT6D0Igc1gaPgvLxtk5wAB9TosOWODvvUGM48DOBteiYJdheShXJ4m8nQyN3Bg6Z69kaNGqC9u6FBqwcDLFyJwtjWFYRX/WwDGIvJT24yorb0WxuBUCXG4Q2SjnTGhVuTh+15a8oNSCH1rZ3OiftXSw1c2MokgrFZ1LZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708420469; c=relaxed/simple;
-	bh=RtTybUor9/LxymR5f14KPmgtgO8KSgVPbZN0ZPDUpNQ=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=c1zKKYlM5PlgKh5DoGg8xmHyZGsDKZbI8VgMy62Bl9YGLTCjMl/aIOm5Wi2tsJEDxuXzHDvKMi9xeguE3EdTnWN6bhvqGL0tZnfoNpbP9c/7++fu9S4xI4Ce4hRdtvvPOw83H8DtBVSzjEOb/4Pzu8UwEPAnQhcFPduuDHXHehU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cETYwYuS; arc=none smtp.client-ip=209.85.208.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2d241ff062cso18768511fa.3;
-        Tue, 20 Feb 2024 01:14:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708420466; x=1709025266; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=bHRJ5uavxHQACQ5cYO9Ea7N25IBRyUXaZPA2PXvjQX0=;
-        b=cETYwYuSNYFf8t7dqPDj/WupuK4boT7M8VWuFhuZjuE65CZXNDD9xhXS75NETbFWAz
-         P5hvaSs8TUPZDSGZM4eLy+Uu8B2bw3mUC0PFBCuUsc065mJ2/Q7t9RbIZJj3OuqJIo9k
-         nM5r8vFHpPT3Y0BoSq3jSJA7mMXs+RVLh0h6zr4qIEw4gKpL59R2v34V4D+3jVeCYJCc
-         oD4tuznzkLA0jBa8CLKb/LjvJiTj4uBx3Y8fSF4O06p0DFCeOF4ewmgnL8MC9YYzuwSt
-         CZT+T/Wj3vBRi/EjKDgBYBSy4fB4DO65iztA2jeQpirAKFjyNDwr26hlXj7EN7O0vQgK
-         ESAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708420466; x=1709025266;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bHRJ5uavxHQACQ5cYO9Ea7N25IBRyUXaZPA2PXvjQX0=;
-        b=RHK9oCmA35vj1fYMqh2D8YXCgDQaO685PYnYjlTCIh/HNZBr/rr+5EPSuOQdUMSVDJ
-         m7ymUnMguFRZ3i/PBEcuhp32mRm2Hz7JJp2YjyiJyjdDJO6GTehknSRN7UdY7NZIv51G
-         tzvXQnVBPbOcmS3/sDU5t+d2bu6Mh7uqe7wKRI4SwU2HtFDHYprnWLoYG0MShl8rQtlD
-         BBe3xWl/OzmRUD4QTlL7Renhv+t2NaRXqHZCcKocy2BY+TwUeWU2J+/N6/UTqtwak0MD
-         YKylPoSvpIzVfrC4xoqsVKMYsI1GFUVr816XVUhQTASZYxJ+EO114bhCGO6F3D1P2+I7
-         r8hg==
-X-Forwarded-Encrypted: i=1; AJvYcCWSnGxB+WIZNq35uFZrDqDfZ30OMg8iVuOUZX8GHoFYK+WPu83qDBIm3HLuayyHEBvCUXyqjZCt6Emf3h80/ds9yFINSmrcv9LWvAqBU2UATh2y6Lyq9CA2Im6JPTmHjzQk3CEBChdMZaT7ICPU3JQXHlmQ301XcU7wOHYt6xTaSsM1cdKe4c33xDjv8JBb608jUKWlXaCMUJf+VNVsNf47SIGqY5+QIy6ShSJJKAJ5V2mBDTuqLX0F6g==
-X-Gm-Message-State: AOJu0Yxyw3K5TR4BoCaYdn33QKH/bePzN/aTd6o/pM+sWCxLexgywh67
-	9YBFOsMZ0GShXXQnIPmnkCVK0/PRnmvvF4GTYTDaZ6hgvIQ2yRvI
-X-Google-Smtp-Source: AGHT+IFLd9RCl041APIPsfPJkZcwqeY3/oNw2kxk8d1G1VB7yLLZXzUgS2yvdkID6kLKaOeRKOkxZA==
-X-Received: by 2002:a2e:bc09:0:b0:2d2:38b6:661b with SMTP id b9-20020a2ebc09000000b002d238b6661bmr4331135ljf.33.1708420465340;
-        Tue, 20 Feb 2024 01:14:25 -0800 (PST)
-Received: from [10.24.67.19] ([15.248.2.239])
-        by smtp.gmail.com with ESMTPSA id bt21-20020a056000081500b0033d1f25b798sm12629258wrb.82.2024.02.20.01.14.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Feb 2024 01:14:25 -0800 (PST)
-From: Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: Paul Durrant <paul@xen.org>
-Message-ID: <f85098ba-b56e-455a-9b73-909d71cf0b51@xen.org>
-Date: Tue, 20 Feb 2024 09:14:23 +0000
+	s=arc-20240116; t=1708420307; c=relaxed/simple;
+	bh=brs8Wc8MtqC+jD4fj4w5YcCZt8grPE7rypv1O7XbwgM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hHk+k00CNYVNxwYPK2ToKZ0He/f6Id/NX/lvlLc2DdY7RXZM3tNxF45Y9y9Bf5cbfOSvf/oeH3dc8gHoC5m9OnbG1X8L7t5UNsY7vn87HVLqrrZeLuK+ivGKNaHkCLiDRrgpXw8YMFQKOB14aIPpkqf5Q0kvWHUTpG1thJ8xFsk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=S6XahKdw; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708420306; x=1739956306;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=brs8Wc8MtqC+jD4fj4w5YcCZt8grPE7rypv1O7XbwgM=;
+  b=S6XahKdwsWV6GdriUc6BinfWQGgaqHG2BMtNzU5AcIHo7k5i/+qdxgVY
+   gD2cU3yzRH+7lB2xhUJVRZKVOzRC5ptgIDuGjRmkdC8KJsgquaqy21/Vj
+   ZLc8+7CIFHeUOutjxOW2CsCHwIbQ3OPiIES/sL4opIwaUdO4puENW/Z61
+   ehNw7gkov+Oy+T7S+IneSgk5pQ7FBsYP6ZW/eiNBhHD5nuQn5nHYfXqJD
+   X8LvWyWAC06/aLDpSvGBKsgRO/KTKAj/Ci6szqCElmIx+a4OxgUTr9Vlx
+   WbI1CLYSRRH631YNxukmi9uaF/+1ccXXYClSXWTDBV5d1hQvh97Uee6AP
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10989"; a="2374955"
+X-IronPort-AV: E=Sophos;i="6.06,172,1705392000"; 
+   d="scan'208";a="2374955"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2024 01:11:45 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,172,1705392000"; 
+   d="scan'208";a="5012799"
+Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
+  by orviesa007.jf.intel.com with ESMTP; 20 Feb 2024 01:11:39 -0800
+From: Zhao Liu <zhao1.liu@linux.intel.com>
+To: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Yanan Wang <wangyanan55@huawei.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Eric Blake <eblake@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Sia Jee Heng <jeeheng.sia@starfivetech.com>
+Cc: qemu-devel@nongnu.org,
+	kvm@vger.kernel.org,
+	qemu-riscv@nongnu.org,
+	qemu-arm@nongnu.org,
+	Zhenyu Wang <zhenyu.z.wang@intel.com>,
+	Dapeng Mi <dapeng1.mi@linux.intel.com>,
+	Yongwei Ma <yongwei.ma@intel.com>,
+	Zhao Liu <zhao1.liu@intel.com>
+Subject: [RFC 0/8] Introduce SMP Cache Topology
+Date: Tue, 20 Feb 2024 17:24:56 +0800
+Message-Id: <20240220092504.726064-1-zhao1.liu@linux.intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: paul@xen.org
-Subject: Re: [PATCH v13 00/21] KVM: xen: update shared_info and vcpu_info
- handling
-Content-Language: en-US
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
- <agordeev@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
- David Woodhouse <dwmw2@infradead.org>, Shuah Khan <shuah@kernel.org>,
- kvm@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20240215152916.1158-1-paul@xen.org> <ZdPQ_AcbTYMtArFJ@google.com>
-Organization: Xen Project
-In-Reply-To: <ZdPQ_AcbTYMtArFJ@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 19/02/2024 22:06, Sean Christopherson wrote:
-> On Thu, Feb 15, 2024, Paul Durrant wrote:
->> David Woodhouse (1):
->>    KVM: pfncache: rework __kvm_gpc_refresh() to fix locking issues
->>
->> Paul Durrant (19):
->>    KVM: pfncache: Add a map helper function
->>    KVM: pfncache: remove unnecessary exports
->>    KVM: x86/xen: mark guest pages dirty with the pfncache lock held
->>    KVM: pfncache: add a mark-dirty helper
->>    KVM: pfncache: remove KVM_GUEST_USES_PFN usage
->>    KVM: pfncache: stop open-coding offset_in_page()
->>    KVM: pfncache: include page offset in uhva and use it consistently
->>    KVM: pfncache: allow a cache to be activated with a fixed (userspace)
->>      HVA
->>    KVM: x86/xen: separate initialization of shared_info cache and content
->>    KVM: x86/xen: re-initialize shared_info if guest (32/64-bit) mode is
->>      set
->>    KVM: x86/xen: allow shared_info to be mapped by fixed HVA
->>    KVM: x86/xen: allow vcpu_info to be mapped by fixed HVA
->>    KVM: selftests: map Xen's shared_info page using HVA rather than GFN
->>    KVM: selftests: re-map Xen's vcpu_info using HVA rather than GPA
->>    KVM: x86/xen: advertize the KVM_XEN_HVM_CONFIG_SHARED_INFO_HVA
->>      capability
->>    KVM: x86/xen: split up kvm_xen_set_evtchn_fast()
->>    KVM: x86/xen: don't block on pfncache locks in
->>      kvm_xen_set_evtchn_fast()
->>    KVM: pfncache: check the need for invalidation under read lock first
->>    KVM: x86/xen: allow vcpu_info content to be 'safely' copied
->>
->> Sean Christopherson (1):
->>    KVM: s390: Refactor kvm_is_error_gpa() into kvm_is_gpa_in_memslot()
->>
->>   Documentation/virt/kvm/api.rst                |  53 ++-
->>   arch/s390/kvm/diag.c                          |   2 +-
->>   arch/s390/kvm/gaccess.c                       |  14 +-
->>   arch/s390/kvm/kvm-s390.c                      |   4 +-
->>   arch/s390/kvm/priv.c                          |   4 +-
->>   arch/s390/kvm/sigp.c                          |   2 +-
->>   arch/x86/kvm/x86.c                            |   7 +-
->>   arch/x86/kvm/xen.c                            | 361 +++++++++++------
->>   include/linux/kvm_host.h                      |  49 ++-
->>   include/linux/kvm_types.h                     |   8 -
->>   include/uapi/linux/kvm.h                      |   9 +-
->>   .../selftests/kvm/x86_64/xen_shinfo_test.c    |  59 ++-
->>   virt/kvm/pfncache.c                           | 382 ++++++++++--------
->>   13 files changed, 591 insertions(+), 363 deletions(-)
-> 
-> Except for the read_trylock() patch, just a few nits that I can fixup when
-> applying, though I'll defeinitely want your eyeballs on the end result as they
-> tweaks aren't _that_ trivial.
-> 
-> Running tests now, if all goes well I'll push to kvm-x86 within the hour.
+From: Zhao Liu <zhao1.liu@intel.com>
 
-Oh, I read this last and you already made the changes :-) I'll check 
-kvm-x86. Thanks.
+Hi list,
+
+This's our proposal for supporting (SMP) cache topology in -smp as
+the following example:
+
+-smp 32,sockets=2,dies=2,modules=2,cores=2,threads=2,maxcpus=32,\
+     l1d-cache=core,l1i-cache=core,l2-cache=core,l3-cache=die
+
+With the new cache topology options ("l1d-cache", "l1i-cache",
+"l2-cache" and "l3-cache"), we could adjust the cache topology via -smp.
+
+This patch set is rebased on our i386 module series:
+https://lore.kernel.org/qemu-devel/20240131101350.109512-1-zhao1.liu@linux.intel.com/
+
+Since the ARM [1] and RISC-V [2] folks have similar needs for the cache
+topology, I also cc'd the ARM and RISC-V folks and lists.
+
+
+Welcome your feedback!
+
+
+Introduction
+============
+
+Background
+----------
+
+Intel client platforms (ADL/RPL/MTL) and E core server platforms (SRF)
+share the L2 cache domain among multiple E cores (in the same module).
+
+Thus we need a way to adjust the cache topology so that users could
+create the cache topology for Guest that is nearly identical to Host.
+
+This is necessary in cases where there are bound vCPUs, especially
+considering that Guest scheduling often takes into account the cache
+topology as well (e.g. Linux cluster aware scheduling, i.e. L2 cache
+scheduling).
+
+Previously, we introduced a x86 specific option to adjust the cache
+topology:
+
+-cpu x-l2-cache-topo=[core|module] [3]
+
+However, considering the needs of other arches, we re-implemented the
+generic cache topology (aslo in response to Michael's [4] and Daniel's
+comment [5]) in this series.
+
+
+Cache Topology Representation
+-----------------------------
+
+We consider to define the cache topology based on CPU topology level for
+two reasons:
+
+1. In practice, a cache will always be bound to the CPU container -
+   "CPU container" indicates to a set of CPUs that refer to a certain
+   level of CPU topology - where the cache is either private in that
+   CPU container or shared among multiple containers.
+
+2. The x86's cache-related CPUIDs encode cache topology based on APIC
+   ID's CPU topology layout. And the ACPI PPTT table that ARM/RISCV
+   relies on also requires CPU containers (CPU topology) to help
+   indicate the private shared hierarchy of the cache.
+
+Therefore, for SMP systems, it is natural to use the CPU topology
+hierarchy directly in QEMU to define the cache topology.
+
+And currently, separated L1 cache (L1 data cache and L1 instruction
+cache) with unified higher-level caches (e.g., unified L2 and L3
+caches), is the most common cache architectures.
+
+Thus, we define the topology for L1 D-cache, L1 I-cache, L2 cache and L3
+cache in MachineState as the basic cache topology support:
+
+typedef struct CacheTopology {
+    CPUTopoLevel l1d;
+    CPUTopoLevel l1i;
+    CPUTopoLevel l2;
+    CPUTopoLevel l3;
+} CacheTopology;
+
+Machines may also only support a subset of the cache topology
+to be configured in -smp by setting the SMP property of MachineClass:
+
+typedef struct {
+    ...
+    bool l1_separated_cache_supported;
+    bool l2_unified_cache_supported;
+    bool l3_unified_cache_supported;
+} SMPCompatProps;
+
+
+Cache Topology Configuration in -smp
+------------------------------------
+
+Further, we add new parameters to -smp:
+* l1d-cache=level
+* l1i-cache=level
+* l2-cache=level
+* l3-cache=level
+
+These cache topology parameters accept the strings of CPU topology
+levels (such as "drawer", "book", "socket", "die", "cluster", "module",
+"core" or "thread"). Exactly which topology level strings could be
+accepted as the parameter depends on the machine's support for the
+corresponding CPU topology level.
+
+Unsupported cache topology parameters will be omitted, and
+correspondingly, the target CPU's cache topology will use the its
+default cache topology setting.
+
+In this series, we add the cache topology support in -smp for x86 PC
+machine.
+
+The following example defines a 3-level cache topology hierarchy (L1
+D-cache per core, L1 I-cache per core, L2 cache per core and L3 cache per
+die) for PC machine.
+
+-smp 32,sockets=2,dies=2,modules=2,cores=2,threads=2,maxcpus=32,\
+     l1d-cache=core,l1i-cache=core,l2-cache=core,l3-cache=die
+
+
+Reference
+---------
+
+[1]: [ARM] Jonathan's proposal to adjust cache topology:
+     https://lore.kernel.org/qemu-devel/20230808115713.2613-2-Jonathan.Cameron@huawei.com/
+[2]: [RISC-V] Discussion between JeeHeng and Jonathan about cache
+     topology:
+     https://lore.kernel.org/qemu-devel/20240131155336.000068d1@Huawei.com/
+[3]: Previous x86 specific cache topology option:
+     https://lore.kernel.org/qemu-devel/20230914072159.1177582-22-zhao1.liu@linux.intel.com/
+[4]: Michael's comment about generic cache topology support:
+     https://lore.kernel.org/qemu-devel/20231003085516-mutt-send-email-mst@kernel.org/
+[5]: Daniel's question about how x86 support L2 cache domain (cluster)
+     configuration:
+     https://lore.kernel.org/qemu-devel/ZcUG0Uc8KylEQhUW@redhat.com/
+
+Thanks and Best Regards,
+Zhao
+
+---
+Zhao Liu (8):
+  hw/core: Rename CpuTopology to CPUTopology
+  hw/core: Move CPU topology enumeration into arch-agnostic file
+  hw/core: Define cache topology for machine
+  hw/core: Add cache topology options in -smp
+  i386/cpu: Support thread and module level cache topology
+  i386/cpu: Update cache topology with machine's configuration
+  i386/pc: Support cache topology in -smp for PC machine
+  qemu-options: Add the cache topology description of -smp
+
+ MAINTAINERS                     |   2 +
+ hw/core/cpu-topology.c          |  56 ++++++++++++++
+ hw/core/machine-smp.c           | 128 ++++++++++++++++++++++++++++++++
+ hw/core/machine.c               |   9 +++
+ hw/core/meson.build             |   1 +
+ hw/i386/pc.c                    |   3 +
+ hw/s390x/cpu-topology.c         |   6 +-
+ include/hw/boards.h             |  33 +++++++-
+ include/hw/core/cpu-topology.h  |  40 ++++++++++
+ include/hw/i386/topology.h      |  18 +----
+ include/hw/s390x/cpu-topology.h |   6 +-
+ qapi/machine.json               |  14 +++-
+ qemu-options.hx                 |  54 ++++++++++++--
+ system/vl.c                     |  15 ++++
+ target/i386/cpu.c               |  55 ++++++++++----
+ target/i386/cpu.h               |   2 +-
+ tests/unit/meson.build          |   3 +-
+ tests/unit/test-smp-parse.c     |  14 ++--
+ 18 files changed, 399 insertions(+), 60 deletions(-)
+ create mode 100644 hw/core/cpu-topology.c
+ create mode 100644 include/hw/core/cpu-topology.h
+
+-- 
+2.34.1
 
 
