@@ -1,204 +1,494 @@
-Return-Path: <kvm+bounces-9217-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9218-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A31085C181
-	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 17:34:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B703685C195
+	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 17:39:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D90131F25B98
-	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 16:34:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D957D1C218F7
+	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 16:39:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39214768E0;
-	Tue, 20 Feb 2024 16:34:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC599768E6;
+	Tue, 20 Feb 2024 16:39:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="WzbBY+4l"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="YzbVskrt"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2055.outbound.protection.outlook.com [40.107.220.55])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 633E9762E0;
-	Tue, 20 Feb 2024 16:33:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.55
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708446841; cv=fail; b=etDb12Ipnpru/qRTjlw9Rj58k+16fc2CT34ea9ycK2La+Zf4OK/tqRuW675zdnOg6urVEkLDNHZU/CfJalblOgGADkgRb9B6XbNxBlR8oz9Q4PTnbdfRyGxZStBWtzRdaMIibDGjzmNJpcfhxuYT/6Ngogf1vl5WI4club+/+FE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708446841; c=relaxed/simple;
-	bh=z39srBkrTDAZNHduh8HIF5Mx9Zj0GsEqgOHGsG7SLLE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=OEiD+U0XH9DO3DQY1BiEvDOgowkPEPeQ+1v3G1A5NmGDmOR0Q5S6XkEZfZZeQdxOO4wKLoCxyR9MjALpJa+t1zue5lx8Yp13Gpup4U5WWDn25WDUnJaloEJ/8TsYeywsLOgOydLwZcwGFHRJ08mL12TlUxFdBy5CtSdAWcK8HTM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=WzbBY+4l; arc=fail smtp.client-ip=40.107.220.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hIbdb3gB5gyKiojwNsdNKTmh80dTbScCkOM0qwFIka14Ptrs57Te7o1uS+iXRPwj7dSWl8E+07O/OK65jVR/zraql4rnB6893cchSwExsZsz2Hh4MPNniYwyh/kL58UNXYT/aCkID60wqkPmGp9sqsVG107zN8azba+zLbhS7Sv0w+iAylq3LMTLC3AvKOzRs9lUxDIIlD1xVGE/8/XTpbStBFZ6GEG7CbnsRdzmGWTIuFnJhqH6EOZmLadni0cFLSDgssqLz0VN5LPn4ccQP87nEXkeU8biplLcTFvOWNBDIQXhGHqx8GdXYHiCfRCO8+Q8XELTJpwBOkuqqNX7PA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Pzm9dQsZZZlGyztBulTM7Jnd4T669WDdnFIQNJbZWrE=;
- b=nHk+RuHKubSNWayrPiipRGdeYaGXXr5hgxlnKUiulUVzafHuiBpezLrDMFY8Z0XrxkUWdx8y08XdJ80cq4AZ9YzQ6pHjS5m6jQdvJ9zGs2tzWIdO5Nn7QaPcRRomiNWsaPRTlLjcQA3QSR7WloAbY9sYW5R18h7Y7Djl94NyPP2lWzgyMcNIuYcVJMM+Lc3e+G7a1y7vtqfBqtnzSws63CdAGBuyy/DUtFnKZU2CC/dlVCBnc6eLWpmlbxjBDgvCe4nEpommjYDARLvLuWJwoKUSD7Y+dI4JZigjYHaxQhcnDLymJq/fxlZWt5YR4FMpViS2ZQpvup+7n4uH0Q7AUw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Pzm9dQsZZZlGyztBulTM7Jnd4T669WDdnFIQNJbZWrE=;
- b=WzbBY+4lQj6b6sSAMENjVjLo+cCpoJdR6AyiFsWfQB7E3Bfo0x8LVXKIPhRtcjSROnslkK+Ruk0MsKIVz3AoQoxgYHTvKiosQak7Jqre4XDb2O58S5Se3YRUjD0UG2rzdZGIl8n9RuMwJEVp902QzeBG8iAb1xAyxbuFS2pGFZ8=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BL1PR12MB5995.namprd12.prod.outlook.com (2603:10b6:208:39b::20)
- by DM6PR12MB4185.namprd12.prod.outlook.com (2603:10b6:5:216::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.20; Tue, 20 Feb
- 2024 16:33:56 +0000
-Received: from BL1PR12MB5995.namprd12.prod.outlook.com
- ([fe80::319f:fe56:89b9:4638]) by BL1PR12MB5995.namprd12.prod.outlook.com
- ([fe80::319f:fe56:89b9:4638%5]) with mapi id 15.20.7316.018; Tue, 20 Feb 2024
- 16:33:56 +0000
-Date: Tue, 20 Feb 2024 10:33:46 -0600
-From: John Allen <john.allen@amd.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: mlevitsk@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	pbonzini@redhat.com, weijiang.yang@intel.com,
-	rick.p.edgecombe@intel.com, x86@kernel.org, thomas.lendacky@amd.com,
-	bp@alien8.de
-Subject: Re: [PATCH 6/9] KVM: SVM: Add MSR_IA32_XSS to the GHCB for
- hypervisor kernel
-Message-ID: <ZdTUap7xy8tu15QY@AUS-L1-JOHALLEN.amd.com>
-References: <20231010200220.897953-1-john.allen@amd.com>
- <20231010200220.897953-7-john.allen@amd.com>
- <5e413e05de559971cdc2d1a9281a8a271590f62b.camel@redhat.com>
- <ZUQvNIE9iU5TqJfw@google.com>
- <c077e005c64aa82c7eaf4252f322c4ca29a2d0af.camel@redhat.com>
- <Zc5MRqmspThUoB+n@AUS-L1-JOHALLEN.amd.com>
- <ZdTRVNt5GWXEKL8h@google.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZdTRVNt5GWXEKL8h@google.com>
-X-ClientProxiedBy: PH8PR07CA0031.namprd07.prod.outlook.com
- (2603:10b6:510:2cf::11) To BL1PR12MB5995.namprd12.prod.outlook.com
- (2603:10b6:208:39b::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB6F0762E0;
+	Tue, 20 Feb 2024 16:39:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708447149; cv=none; b=px/vV4cPGyn58/Cj6TaqpNQ9FcpPgK/6zAyMDOCRBtMxmqVNDmwEULyrtrlq1qDnUtfivWV1SK6jZqxY7CEOdMfQBvIFuUofoPSd7uiZ88CczbvtNV/uEBD1tU1rdF0PuNN2b/imbndpLBNgb0dnDrGwl8cOtibWdRbwGwQz9bg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708447149; c=relaxed/simple;
+	bh=e/MnLbL2WYfj0Tu9rlkFT0aLALqfVP0DcRYd3sXarZs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PewZ+5Bi2m5yWitK0Xz+Yk5ypoA+Q+cnLH9Pw9u93ATOCrpwBOLhYSUrFG9W6DeGLGGGk+GS/PgbJ0TiSTmtTgNWXJYHAvnoGOu6mx5hAQMCQbPthLf0wTTEncu4hIB2jCUYbHbDG+R4dOZQ0TohcZIcfhPxK0e6KSOuY9DvoJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=YzbVskrt; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41KGHfn4023031;
+	Tue, 20 Feb 2024 16:39:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=eHMzFEoMdrKnKvn9DpCqJVv75wgKI/Ci29V6vVGpV8I=;
+ b=YzbVskrtZsHJgTgawM+0gxup5gymXExKAuzkTGkoDVKfiIg07yg0SYaebcYt6Z1ye0Q4
+ Q2KNpfIrPsvGiD6vpqIiEpzkLFG/SKVbrzpXpghCrWj9idFDH2qqrb55804LVhKdU58v
+ tg0YHesihhpdo30kT26QcJviKOe3RhFuFUTc83vceEs6U8H4Ctqg7uNr3y9JQZgKilow
+ q8QehS71wdpGCHTR2cEWBwE9NAay+oPVHQOQ1q6cI2AHCeTKbXl8iYLRSC9wdoBQpEfo
+ +J9VqDRipde1VzB9dr5Xk9/TM6cL/OVGmPVoLnR/81CKXVRSBGL8CkH6jUHSMvxCTm+1 Ug== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wcyfh0p82-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 20 Feb 2024 16:39:05 +0000
+Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41KGbC2F019445;
+	Tue, 20 Feb 2024 16:39:05 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wcyfh0p7b-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 20 Feb 2024 16:39:04 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 41KFxY4w031138;
+	Tue, 20 Feb 2024 16:39:04 GMT
+Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3wb9bkrwav-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 20 Feb 2024 16:39:04 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 41KGd0l066585040
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 20 Feb 2024 16:39:02 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7ADC55806C;
+	Tue, 20 Feb 2024 16:39:00 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6E3D55805F;
+	Tue, 20 Feb 2024 16:38:59 +0000 (GMT)
+Received: from [9.61.172.126] (unknown [9.61.172.126])
+	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 20 Feb 2024 16:38:59 +0000 (GMT)
+Message-ID: <f05c83a9-bcc6-4963-98f4-72159673ba3a@linux.ibm.com>
+Date: Tue, 20 Feb 2024 11:38:58 -0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5995:EE_|DM6PR12MB4185:EE_
-X-MS-Office365-Filtering-Correlation-Id: e5c83641-5f2d-4fde-caae-08dc3231bb54
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	SEYgyXnmlXJVqICeDt6v1LS9Ogrqq4jPX42IIfzta58blymJ+lxeKPLG1zLMC1UWS0PcqBGjY7MY8ZzWbarauZHUTCx1L7/RNc6bN2uXsZMelBNQN8b4HkLAB9X2E3kGIQrG4gLCpl1QFdHsZV1btWmZVEORVpbLIBLWHcZRNi81k1ZF/F6cNhG5dsEJv9ei6UJ3PaETchM7TEQAwVOAonxYTwBQ9YYRttH3R4i+HcddtQefFewDW+xut5A9WlY9uY+K65u/BZN3KOJ0brz1G1cnE60+cwtilbviC6BTV88NOv9hMm+Kk68QHGgId1txAlyAyg8/nDcUiKfrVpPswXAZ5Kf9NzqJsUptYhEoeWdDDreelREr2zdVTUDo/OIgmLUJ/f4AGXEUQ52owlv4oG0n8Sh4QjYTbFuEEuTYPdJezloe+1RVDZsBT4GPrN4mx8biQpaJtOiaCQ1grW9G6vBNbUgblqbdCZwjDmD6Kbc3Ss3j+cwr0qBV7AUAtTrm729QUbqJ/qlymHtrD1JXs0jUns9M5euqhO6lBFKWdoo=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5995.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?PxSdARwT3TKExkt4O/MVTLXMmaSbwSHFsqbbLNmO8pNb1RP6vp38+3BRvL5o?=
- =?us-ascii?Q?G0jscx4TkhHgkhZ8n8apHgE9YNkJ6w0RkIQmZhHZJas1yX9jsf+gMsIcuLpl?=
- =?us-ascii?Q?6Dk4VPAZUC4z+uHgLlVofBbU+wuau8+lZGsCSpjINDJRdS8OmQO8Rr3Zr1Xi?=
- =?us-ascii?Q?KSXIonkmEMyIAtvX73xQWd45K65obUrZIo4mmfQKM7X3o986Qi91VtCTHEBy?=
- =?us-ascii?Q?RoR1AI38yQwV1q99DBJo9f0rr3YEX5opOmphHVmHGt5kbDc239wtM6uVnteW?=
- =?us-ascii?Q?F1qzRl/lIiCUHOtsz8bl+o2LCAZAHf53TlFeKDJlZr+FpjSQ82W8zvklqtMp?=
- =?us-ascii?Q?IBCm8mbJA4uNx270+9s950jSOK4t4WHgdt7VD8mo/o7Sqv6Mq7QIf3yTHEw+?=
- =?us-ascii?Q?wXouCEf3HCLoIUSxH2XAO4oBeMDsflzqpeUks4TvQ+WcaG+dFFpc2zSUh9AK?=
- =?us-ascii?Q?rtqkZLWpGjmVPkGiPxCTsaW3n1bE+NtkbWKBx1f5QsA6g4RR0iKaB39GpA33?=
- =?us-ascii?Q?HblvElgbzolCiRuaS9+no0tMpMnTSNOXna/A7yv2laxME4AMF9UC24lC+dSD?=
- =?us-ascii?Q?cc255F/wqHRuJpvV1yui5RXWk/KqKINp+GakPago+xnzLIEZsqEAa+Qf4hGi?=
- =?us-ascii?Q?pl8uRZloG6Z1dxb7+llL1/88dhkmjzgu/4muX7a7i4ofLSFCs0ClmNXZ0+os?=
- =?us-ascii?Q?EUrncX4WaxqWw2VciQ+xtR+V/CcLpTnpke7DHPE/TZ8xwELAZabqCL9O/WwE?=
- =?us-ascii?Q?fuutumDhapPyPyLSPhiagVkccQutGS1TbofWI4y9ttTWLFzKT5i49poBx9fA?=
- =?us-ascii?Q?Krzq+qH74Snp/qd4VFGLXiMPFStMKoJPMp5VZlf/RjxvrvrD87Gw6uWEtkEp?=
- =?us-ascii?Q?K71qPSN1+ws8Gyb/668a5jysZSvxnlojKjZ+xBnPogCa0D8pN0d2GZ8+yDsv?=
- =?us-ascii?Q?fhPVfwYDr0QOsW8jMFwBqnXUB/ZPisvHLuYjZnGiJuVKTMNZPqX1Gm6fpsGE?=
- =?us-ascii?Q?wzTBIKY8yOm13OLVqlkMqxC0dryjaTILzr/T9Qr5PAs5yj75mbIGZEaifF43?=
- =?us-ascii?Q?+fbIpAkofuCJL5pQynqlDkxNJQeVGdGiNlpLwUyolCVCsZxLBHj1lEA8k+3x?=
- =?us-ascii?Q?qO+aeDWKLzObtR95FTFpG2S/gN0KkBF/zyF2WS3W2HTrt7PrE4GuR/6UF0Es?=
- =?us-ascii?Q?RPxcXZ62e11MbyTD6eIblGCTbTY6C6YNpyUY+i32st8Zkz/K6yAwxLdAU8zk?=
- =?us-ascii?Q?7g483LujWh6SD3wuLtYmxyWseq2ZaeqCg/rIN+84fzjp9STTsUd+Vtri1WvH?=
- =?us-ascii?Q?b3+68G5DUC5soKXyFmkjTtdbjdwpbCWCVxTc0Ewem5bCN5KVEfcyt3RwjNWD?=
- =?us-ascii?Q?wfLvmZofII2xT4jCwF+gUghd72bdTwtMUjo8FCgHrTE6/54l6jgsh9QX2Bhs?=
- =?us-ascii?Q?6YRgxswVBsrAUlp/gotZui6WPvqULaFAveRAofIdPpb6jEr+u5dzClkyqVXm?=
- =?us-ascii?Q?5PpfGES0F/YPvW5ItFYFfvKEOL7HO+T0YxwpU5mENd6OnBBEmeLqxMZzN9Zi?=
- =?us-ascii?Q?gSm1+PrHEANKxSnV4/cPGrbUkzom0s4uvoJTS6ma?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e5c83641-5f2d-4fde-caae-08dc3231bb54
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5995.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2024 16:33:56.0324
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jNxDmPc+WbibZeBG1ADBeKMEkazF57WlsSP+Bl+pAEnLKhKaCk36QrcTxtzl9sdtlsx93HTBPbhuckb25WHEgg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4185
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH v4 2/7] s390x: Add guest 2 AP test
+Content-Language: en-US
+To: Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc: linux-s390@vger.kernel.org, imbrenda@linux.ibm.com, thuth@redhat.com,
+        david@redhat.com, nsg@linux.ibm.com, nrb@linux.ibm.com,
+        jjherne@linux.ibm.com
+References: <20240202145913.34831-1-frankja@linux.ibm.com>
+ <20240202145913.34831-3-frankja@linux.ibm.com>
+From: Anthony Krowiak <akrowiak@linux.ibm.com>
+In-Reply-To: <20240202145913.34831-3-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: dwAyVtmu-D7yO_j9NeWV18ulFldV-lN3
+X-Proofpoint-GUID: Et5MwRzd7D-Hv2Rq0w9lgflxKsylpjay
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-20_06,2024-02-20_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
+ adultscore=0 priorityscore=1501 mlxlogscore=999 phishscore=0
+ lowpriorityscore=0 malwarescore=0 clxscore=1011 spamscore=0 suspectscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2402200119
 
-On Tue, Feb 20, 2024 at 08:20:36AM -0800, Sean Christopherson wrote:
-> On Thu, Feb 15, 2024, John Allen wrote:
-> > On Tue, Nov 07, 2023 at 08:20:52PM +0200, Maxim Levitsky wrote:
-> > > On Thu, 2023-11-02 at 16:22 -0700, Sean Christopherson wrote:
-> > > > On Thu, Nov 02, 2023, Maxim Levitsky wrote:
-> > > > > On Tue, 2023-10-10 at 20:02 +0000, John Allen wrote:
-> > > > > > @@ -3032,6 +3037,9 @@ static void sev_es_init_vmcb(struct vcpu_svm *svm)
-> > > > > >  		if (guest_cpuid_has(&svm->vcpu, X86_FEATURE_RDTSCP))
-> > > > > >  			svm_clr_intercept(svm, INTERCEPT_RDTSCP);
-> > > > > >  	}
-> > > > > > +
-> > > > > > +	if (kvm_caps.supported_xss)
-> > > > > > +		set_msr_interception(vcpu, svm->msrpm, MSR_IA32_XSS, 1, 1);
-> > > > > 
-> > > > > This is not just a virtualization hole. This allows the guest to set MSR_IA32_XSS
-> > > > > to whatever value it wants, and thus it might allow XSAVES to access some host msrs
-> > > > > that guest must not be able to access.
-> > > > > 
-> > > > > AMD might not yet have such msrs, but on Intel side I do see various components
-> > > > > like 'HDC State', 'HWP state' and such.
-> > > > 
-> > > > The approach AMD has taken with SEV-ES+ is to have ucode context switch everything
-> > > > that the guest can access.  So, in theory, if/when AMD adds more XCR0/XSS-based
-> > > > features, that state will also be context switched.
-> > > > 
-> > > > Don't get me wrong, I hate this with a passion, but it's not *quite* fatally unsafe,
-> > > > just horrific.
-> > > > 
-> > > > > I understand that this is needed so that #VC handler could read this msr, and
-> > > > > trying to read it will cause another #VC which is probably not allowed (I
-> > > > > don't know this detail of SEV-ES)
-> > > > > 
-> > > > > I guess #VC handler should instead use a kernel cached value of this msr
-> > > > > instead, or at least KVM should only allow reads and not writes to it.
-> > > > 
-> > > > Nope, doesn't work.  In addition to automatically context switching state, SEV-ES
-> > > > also encrypts the guest state, i.e. KVM *can't* correctly virtualize XSS (or XCR0)
-> > > > for the guest, because KVM *can't* load the guest's desired value into hardware.
-> > > > 
-> > > > The guest can do #VMGEXIT (a.k.a. VMMCALL) all it wants to request a certain XSS
-> > > > or XCR0, and there's not a damn thing KVM can do to service the request.
-> > > > 
-> > > 
-> > > Ah, I understand now. Everything makes sense, and yes, this is really ugly.
-> > 
-> > Hi Maxim and Sean,
-> > 
-> > It looks as though there are some broad changes that will need to happen
-> > over the long term WRT to SEV-ES/SEV-SNP. In the short term, how would
-> > you suggest I proceed with the SVM shstk series? Can we omit the SEV-ES
-> > changes for now with an additional patch that disallows guest shstk when
-> > SEV-ES is enabled? Subsequently, when we have a proper solution for the
-> > concerns discussed here, we could submit another series for SEV-ES
-> > support.
-> 
-> The SEV-ES mess was already addressed by commit a26b7cd22546 ("KVM: SEV: Do not
-> intercept accesses to MSR_IA32_XSS for SEV-ES guests").  Or is there more that's
-> needed for shadow stacks?
+I made a couple of function name change suggestions, but those are not 
+critical:
 
-Ah, yes, you are right. That patch should address the controversial
-change discussed above at least. Patch 5/9 and 7/9 of this series also
-address different SEV-ES issues and will still need to included.
+Acked-by: Anthony Krowiak <akrowiak@linux.ibm.com>
 
-Thanks,
-John
+On 2/2/24 9:59 AM, Janosch Frank wrote:
+> Add a test that checks the exceptions for the PQAP, NQAP and DQAP
+> adjunct processor (AP) crypto instructions.
+>
+> Since triggering the exceptions doesn't require actual AP hardware,
+> this test can run without complicated setup.
+>
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>   s390x/Makefile      |   1 +
+>   s390x/ap.c          | 309 ++++++++++++++++++++++++++++++++++++++++++++
+>   s390x/unittests.cfg |   3 +
+>   3 files changed, 313 insertions(+)
+>   create mode 100644 s390x/ap.c
+>
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index 4f6c627d..6d28a5bf 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -42,6 +42,7 @@ tests += $(TEST_DIR)/exittime.elf
+>   tests += $(TEST_DIR)/ex.elf
+>   tests += $(TEST_DIR)/topology.elf
+>   tests += $(TEST_DIR)/sie-dat.elf
+> +tests += $(TEST_DIR)/ap.elf
+>   
+>   pv-tests += $(TEST_DIR)/pv-diags.elf
+>   pv-tests += $(TEST_DIR)/pv-icptcode.elf
+> diff --git a/s390x/ap.c b/s390x/ap.c
+> new file mode 100644
+> index 00000000..b3cee37a
+> --- /dev/null
+> +++ b/s390x/ap.c
+> @@ -0,0 +1,309 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * AP instruction G2 tests
+> + *
+> + * Copyright (c) 2024 IBM Corp
+> + *
+> + * Authors:
+> + *  Janosch Frank <frankja@linux.ibm.com>
+> + */
+> +
+> +#include <libcflat.h>
+> +#include <interrupt.h>
+> +#include <bitops.h>
+> +#include <alloc_page.h>
+> +#include <asm/facility.h>
+> +#include <asm/time.h>
+> +#include <ap.h>
+> +
+> +/* For PQAP PGM checks where we need full control over the input */
+> +static void pqap(unsigned long grs[3])
+> +{
+> +	asm volatile(
+> +		"	lgr	0,%[r0]\n"
+> +		"	lgr	1,%[r1]\n"
+> +		"	lgr	2,%[r2]\n"
+> +		"	.insn	rre,0xb2af0000,0,0\n" /* PQAP */
+> +		::  [r0] "d" (grs[0]), [r1] "d" (grs[1]), [r2] "d" (grs[2])
+> +		: "cc", "memory", "0", "1", "2");
+> +}
+> +
+> +static void test_pgms_pqap(void)
+
+
+If I saw this function name without having read the patch description, I 
+wouldn't have any idea what is being tested.
+
+Maybe test_pqap_pgm_chk?
+
+
+> +{
+> +	unsigned long grs[3] = {};
+> +	struct pqap_r0 *r0 = (struct pqap_r0 *)grs;
+> +	uint8_t *data = alloc_page();
+> +	uint16_t pgm;
+> +	int fails = 0;
+> +	int i;
+> +
+> +	report_prefix_push("pqap");
+> +
+> +	/* Wrong FC code */
+> +	report_prefix_push("invalid fc");
+> +	r0->fc = 42;
+
+
+Just out of curiosity, why 42? Why not some ridiculous number that will 
+never be used for a function code, like 4294967295?
+
+
+> +	expect_pgm_int();
+> +	pqap(grs);
+> +	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
+> +	memset(grs, 0, sizeof(grs));
+> +	report_prefix_pop();
+> +
+> +	report_prefix_push("invalid gr0 bits");
+> +	/*
+> +	 * GR0 bits 41 - 47 are defined 0 and result in a
+> +	 * specification exception if set to 1.
+> +	 */
+> +	for (i = 0; i < 48 - 41; i++) {
+> +		grs[0] = BIT(63 - 47 + i);
+> +
+> +		expect_pgm_int();
+> +		pqap(grs);
+> +		pgm = clear_pgm_int();
+> +
+> +		if (pgm != PGM_INT_CODE_SPECIFICATION) {
+> +			report_fail("fail on bit %d", 42 + i);
+> +			fails++;
+> +		}
+> +	}
+> +	report(!fails, "All bits tested");
+> +	memset(grs, 0, sizeof(grs));
+> +	fails = 0;
+> +	report_prefix_pop();
+> +
+> +	report_prefix_push("alignment");
+> +	report_prefix_push("fc=4");
+> +	r0->fc = PQAP_QUERY_AP_CONF_INFO;
+> +	grs[2] = (unsigned long)data;
+> +	for (i = 1; i < 8; i++) {
+> +		expect_pgm_int();
+> +		grs[2]++;
+> +		pqap(grs);
+> +		pgm = clear_pgm_int();
+> +		if (pgm != PGM_INT_CODE_SPECIFICATION) {
+> +			report_fail("fail on bit %d", i);
+> +			fails++;
+> +		}
+> +	}
+> +	report(!fails, "All alignments tested");
+> +	report_prefix_pop();
+> +	report_prefix_push("fc=6");
+> +	r0->fc = PQAP_BEST_AP;
+> +	grs[2] = (unsigned long)data;
+> +	for (i = 1; i < 8; i++) {
+> +		expect_pgm_int();
+> +		grs[2]++;
+> +		pqap(grs);
+> +		pgm = clear_pgm_int();
+> +		if (pgm != PGM_INT_CODE_SPECIFICATION) {
+> +			report_fail("fail on bit %d", i);
+> +			fails++;
+> +		}
+> +	}
+> +	report(!fails, "All alignments tested");
+> +	report_prefix_pop();
+> +	report_prefix_pop();
+> +
+> +	free_page(data);
+> +	report_prefix_pop();
+> +}
+> +
+> +static void test_pgms_nqap(void)
+
+
+Same as above:
+test_nqap_pgm_chk
+
+
+> +{
+> +	uint8_t gr0_zeroes_bits[] = {
+> +		32, 34, 35, 40
+> +	};
+> +	uint64_t gr0;
+> +	bool fail;
+> +	int i;
+> +
+> +	report_prefix_push("nqap");
+> +
+> +	/* Registers 0 and 1 are always used, the others are even/odd pairs */
+> +	report_prefix_push("spec");
+> +	report_prefix_push("r1");
+> +	expect_pgm_int();
+> +	asm volatile (
+> +		".insn	rre,0xb2ad0000,3,6\n"
+> +		: : : "cc", "memory", "0", "1", "2", "3", "4", "6", "7");
+> +	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
+> +	report_prefix_pop();
+> +
+> +	report_prefix_push("r2");
+> +	expect_pgm_int();
+> +	asm volatile (
+> +		".insn	rre,0xb2ad0000,2,7\n"
+> +		: : : "cc", "memory", "0", "1", "2", "3", "4", "6", "7");
+> +	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
+> +	report_prefix_pop();
+> +
+> +	report_prefix_push("both");
+> +	expect_pgm_int();
+> +	asm volatile (
+> +		".insn	rre,0xb2ad0000,3,7\n"
+> +		: : : "cc", "memory", "0", "1", "2", "3", "4", "6", "7");
+> +	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
+> +	report_prefix_pop();
+> +
+> +	report_prefix_push("len==0");
+> +	expect_pgm_int();
+> +	asm volatile (
+> +		"xgr	0,0\n"
+> +		"xgr	5,5\n"
+> +		".insn	rre,0xb2ad0000,2,4\n"
+> +		: : : "cc", "memory", "0", "1", "2", "3", "4", "5", "6", "7");
+> +	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
+> +	report_prefix_pop();
+> +
+> +	report_prefix_push("gr0_zero_bits");
+> +	fail = false;
+> +	for (i = 0; i < ARRAY_SIZE(gr0_zeroes_bits); i++) {
+> +		expect_pgm_int();
+> +		gr0 = BIT_ULL(63 - gr0_zeroes_bits[i]);
+> +		asm volatile (
+> +			"xgr	5,5\n"
+> +			"lghi	5, 128\n"
+> +			"lg	0, 0(%[val])\n"
+> +			".insn	rre,0xb2ad0000,2,4\n"
+> +			: : [val] "a" (&gr0)
+> +			: "cc", "memory", "0", "1", "2", "3", "4", "5", "6", "7");
+> +		if (clear_pgm_int() != PGM_INT_CODE_SPECIFICATION) {
+> +			report_fail("setting gr0 bit %d did not result in a spec exception",
+> +				    gr0_zeroes_bits[i]);
+> +			fail = true;
+> +		}
+> +	}
+> +	report(!fail, "set bit gr0 pgms");
+> +	report_prefix_pop();
+> +
+> +	report_prefix_pop();
+> +	report_prefix_pop();
+> +}
+> +
+> +static void test_pgms_dqap(void)
+
+
+Same as above:
+test_dqap_pgm_chk
+
+
+> +{
+> +	uint8_t gr0_zeroes_bits[] = {
+> +		33, 34, 35, 40, 41
+> +	};
+> +	uint64_t gr0;
+> +	bool fail;
+> +	int i;
+> +
+> +	report_prefix_push("dqap");
+> +
+> +	/* Registers 0 and 1 are always used, the others are even/odd pairs */
+> +	report_prefix_push("spec");
+> +	report_prefix_push("r1");
+> +	expect_pgm_int();
+> +	asm volatile (
+> +		".insn	rre,0xb2ae0000,3,6\n"
+> +		: : : "cc", "memory", "0", "1", "2", "3", "4", "6", "7");
+> +	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
+> +	report_prefix_pop();
+> +
+> +	report_prefix_push("r2");
+> +	expect_pgm_int();
+> +	asm volatile (
+> +		".insn	rre,0xb2ae0000,2,7\n"
+> +		: : : "cc", "memory", "0", "1", "2", "3", "4", "6", "7");
+> +	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
+> +	report_prefix_pop();
+> +
+> +	report_prefix_push("both");
+> +	expect_pgm_int();
+> +	asm volatile (
+> +		".insn	rre,0xb2ae0000,3,7\n"
+> +		: : : "cc", "memory", "0", "1", "2", "3", "4", "6", "7");
+> +	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
+> +	report_prefix_pop();
+> +
+> +	report_prefix_push("len==0");
+> +	expect_pgm_int();
+> +	asm volatile (
+> +		"xgr	0,0\n"
+> +		"xgr	5,5\n"
+> +		".insn	rre,0xb2ae0000,2,4\n"
+> +		: : : "cc", "memory", "0", "1", "2", "3", "4", "5", "6", "7");
+> +	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
+> +	report_prefix_pop();
+> +
+> +	report_prefix_push("gr0_zero_bits");
+> +	fail = false;
+> +	for (i = 0; i < ARRAY_SIZE(gr0_zeroes_bits); i++) {
+> +		expect_pgm_int();
+> +		gr0 = BIT_ULL(63 - gr0_zeroes_bits[i]);
+> +		asm volatile (
+> +			"xgr	5,5\n"
+> +			"lghi	5, 128\n"
+> +			"lg	0, 0(%[val])\n"
+> +			".insn	rre,0xb2ae0000,2,4\n"
+> +			: : [val] "a" (&gr0)
+> +			: "cc", "memory", "0", "1", "2", "3", "4", "5", "6", "7");
+> +		if (clear_pgm_int() != PGM_INT_CODE_SPECIFICATION) {
+> +			report_info("setting gr0 bit %d did not result in a spec exception",
+> +				    gr0_zeroes_bits[i]);
+> +			fail = true;
+> +		}
+> +	}
+> +	report(!fail, "set bit pgms");
+> +	report_prefix_pop();
+> +
+> +	report_prefix_pop();
+> +	report_prefix_pop();
+> +}
+> +
+> +static void test_priv(void)
+> +{
+> +	struct ap_config_info info = {};
+> +
+> +	report_prefix_push("privileged");
+> +
+> +	report_prefix_push("pqap");
+> +	expect_pgm_int();
+> +	enter_pstate();
+> +	ap_pqap_qci(&info);
+> +	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
+> +	report_prefix_pop();
+> +
+> +	/*
+> +	 * Enqueue and dequeue take too many registers so a simple
+> +	 * inline assembly makes more sense than using the library
+> +	 * functions.
+> +	 */
+> +	report_prefix_push("nqap");
+> +	expect_pgm_int();
+> +	enter_pstate();
+> +	asm volatile (
+> +		".insn	rre,0xb2ad0000,0,2\n"
+> +		: : : "cc", "memory", "0", "1", "2", "3");
+> +	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
+> +	report_prefix_pop();
+> +
+> +	report_prefix_push("dqap");
+> +	expect_pgm_int();
+> +	enter_pstate();
+> +	asm volatile (
+> +		".insn	rre,0xb2ae0000,0,2\n"
+> +		: : : "cc", "memory", "0", "1", "2", "3");
+> +	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
+> +	report_prefix_pop();
+> +
+> +	report_prefix_pop();
+> +}
+> +
+> +int main(void)
+> +{
+> +	report_prefix_push("ap");
+> +	if (!ap_check()) {
+> +		report_skip("AP instructions not available");
+> +		goto done;
+> +	}
+> +
+> +	test_priv();
+> +	test_pgms_pqap();
+> +	test_pgms_nqap();
+> +	test_pgms_dqap();
+> +
+> +done:
+> +	report_prefix_pop();
+> +	return report_summary();
+> +}
+> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+> index 018e4129..578375e4 100644
+> --- a/s390x/unittests.cfg
+> +++ b/s390x/unittests.cfg
+> @@ -386,3 +386,6 @@ file = sie-dat.elf
+>   
+>   [pv-attest]
+>   file = pv-attest.elf
+> +
+> +[ap]
+> +file = ap.elf
 
