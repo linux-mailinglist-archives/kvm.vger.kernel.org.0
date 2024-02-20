@@ -1,243 +1,181 @@
-Return-Path: <kvm+bounces-9112-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9113-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1B2E85B093
-	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 02:38:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B1E8385B0F6
+	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 03:48:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3783FB22260
-	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 01:38:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 162A3B22992
+	for <lists+kvm@lfdr.de>; Tue, 20 Feb 2024 02:48:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7416945942;
-	Tue, 20 Feb 2024 01:37:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0927941215;
+	Tue, 20 Feb 2024 02:48:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B5+Rcxno"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="sVuqROMi"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FC6E405EC
-	for <kvm@vger.kernel.org>; Tue, 20 Feb 2024 01:37:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 450EB2E405;
+	Tue, 20 Feb 2024 02:48:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708393073; cv=none; b=BMYN39DW/9GKzw6NygKQIr3HkfPlRMhZ1JcWzlw4Ka5R0UdQqR7lCD3UC7g8TL97mhPJ0GzreF0Ucd3Jk9dT6bOY6rQzCpavIN6fqcMgxEyxiio6M5iylpAkvlr/4h2BZgKUpqcNfjY8sju4yNdRDKTZ60f4MBKTikV2DFgDzGI=
+	t=1708397289; cv=none; b=p+/+47ZuGVG+jbN9n8WiwRKJyQYYQpcZ0+gz8ezoalf6IG8A0m1drvM3TS4eHDadryq0M95CxIwFscU2fawT7AkhVDDm0XqhvLvMQ274LBgdHpPILbDVGEkDMwvbhKdPJJsMxmQn727Fy0ySkMCWF4axCC1MDcA9NM7kRsuLJjw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708393073; c=relaxed/simple;
-	bh=tZhbd5SMUDQHUNl5Fq6WaKWET16FL5fhIAh4Vm93LO4=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=kZ1hcvPeBGurCSc8Lfd2RzDUBrjatYi50wF9cJL1wbUnA9zuombJ3UQNLv4RUnjyoqklH5cMbefNLuah9YT0D7ni/y4lyj82Xp6ZeIVIgg5jrjNJ++xKJoEowLJbmhpAu5bxRhT3Gz6jeukeWri898QdINdH5v3oU3V4OhuDwHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B5+Rcxno; arc=none smtp.client-ip=209.85.167.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-3c132695f1bso3817618b6e.2
-        for <kvm@vger.kernel.org>; Mon, 19 Feb 2024 17:37:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708393070; x=1708997870; darn=vger.kernel.org;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nFajET3gehPBC380UF5pOUPKWV3LT2rAo3DivAM+jaw=;
-        b=B5+RcxnoAb+vOpUmP4Blq56FepEVpX2BI1ibkaPupkPGiYb3IZcaHOGhZyqRfJEB13
-         FIMDJNWkk2wmYZpzCY5zbxkd9TtYOLkH0KMRW/sdx605WqKLRPAshUDkyLTFG9lGEcsr
-         LBj7DXD4s3txCfLQzbGUIiHbXUrvaEUENfvaEMFhKiltECB34dySI9VQMmv5Rm8+78W8
-         AYsWP8aVKdKs2vcV3gMsANsEhc2RHBzfMwCcW6Ye3bPs5f9Yu/xWes9QwYdkgcpV65NG
-         fpFzyhDli69OcxIpMrmcgUy+rtc/spkc6iygl8GsSODyopHVSuxwfjaTeKqk6OzW/CGZ
-         zI9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708393070; x=1708997870;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=nFajET3gehPBC380UF5pOUPKWV3LT2rAo3DivAM+jaw=;
-        b=q/tFMj+/7wsxLkH1BfyyBVsZVO2SaytkJSOXO699sgOYsZ/rkyd/pTh9opxe3IzpBp
-         pQ5ojusspgzdInoodoSP6SPO2PqZSgaVspS0vfHnvziZm68m3dI6cYJoWYn8JF1cavEW
-         RsDO+psdiXQqC2yU9zO9ogzd3OVxDkilMr43fqjJODy+lyUZYT53XuGp7/OGGn8FFMj0
-         vGxHzdJZ4EuP/3q/us2Ywnyey2GYn6qITJyXA5HF7ThwzZiLGm/LLmN4ktkKNSTzo3qB
-         Ot4ZvxhiIMYXHSQ0IlbpfUIof25O05nvnL3XfpDJ8NijXCp9B9jWfh7reo+RNuZ6D7RX
-         ms1A==
-X-Forwarded-Encrypted: i=1; AJvYcCVp0JAVxjoufc4+TAThEXY8dHgXU0DQYiF3P5OwsPlVUfTR7tqZPlRbs7bbKbaj428mNA7hxa8PIJ4hJKyuRuvCnPA4
-X-Gm-Message-State: AOJu0Yy55wV6QUKkBovUS7uIysVqq9ttYVQoIeEPCQUf9yghxPrYEOX7
-	DZ+KsQBvyhC14EjoqVDxDqkwVLHDBXXP++AecEePNR2zIKUxfDgT
-X-Google-Smtp-Source: AGHT+IEgavf6g8kYYQ/AYPYws0X7emy2nUHVxar1CkHBpLrZcENDqEXdzI0imvbnFzSVw0u4o8uh/w==
-X-Received: by 2002:a05:6358:e486:b0:176:d0a8:8df with SMTP id by6-20020a056358e48600b00176d0a808dfmr16032730rwb.8.1708393070162;
-        Mon, 19 Feb 2024 17:37:50 -0800 (PST)
-Received: from localhost (123-243-155-241.static.tpgi.com.au. [123.243.155.241])
-        by smtp.gmail.com with ESMTPSA id l9-20020a170902eb0900b001db63cfe07dsm5035906plb.283.2024.02.19.17.37.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 19 Feb 2024 17:37:49 -0800 (PST)
+	s=arc-20240116; t=1708397289; c=relaxed/simple;
+	bh=gW8PiThJNQZ5FS6YlG6JbBxKrlbLQJE1IW//TvIJxPw=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=DgCZAsjw2FvIeI+6I3oMgAkSTVn0zXkTeh5anoHqhxUIpm6Dm0t+3gDnzLbZbZf8l1nUV/o2dTh5CA/nTcwVPyOy4NuQxRJwr/98hbl1UgR0YY6voLHFjIgYF8Z9OrgmdT0WtPgcX9bqXZqTIvlOeM6M5Ibrhx7EL1VsijafhIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=sVuqROMi; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1708397282;
+	bh=Z4i2HgUFZGcYAnFlUo70X5l7wimYk9KDMghPc8ouFB0=;
+	h=Date:From:To:Cc:Subject:From;
+	b=sVuqROMiVrTxIczX4g1b2YhlfT9Y1oa/RcBKuXd1AY6eHRELs8EGsfq+sDYJce7rp
+	 go7p24EFHF/oYrTzLOojgEsPdeU7JGuX0Cd0L2QqBhUrCf9rJnuxsZDHnntOJAvQWU
+	 PIiDgq5+rhUYQTIWWWI1cN6OFzcBqSPU3hSAGCQo0/k/FXBcX28YZQVUEqilF9D2rr
+	 CljuIvaRPGeoRzFZT8MqxX0opl+SqCN7ZPD17GkMIsZ2Ok2vOtu+PbQftJZ4v4gHrM
+	 CP0CiasxhIyVCT/jxOHDLCOmrd7k/zWg2fFl6iZGLwIV6qKjd6nlf0pkRuciOWXkVk
+	 BXfjkcA+b9mGQ==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Tf3js5dmBz4wc7;
+	Tue, 20 Feb 2024 13:48:01 +1100 (AEDT)
+Date: Tue, 20 Feb 2024 13:48:00 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>
+Cc: KVM <kvm@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, Paul Durrant <pdurrant@amazon.com>
+Subject: linux-next: manual merge of the kvm-x86 tree with the kvm tree
+Message-ID: <20240220134800.40efe653@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/A144DtVpcjR0fVyttz24FeA";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+
+--Sig_/A144DtVpcjR0fVyttz24FeA
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 20 Feb 2024 11:37:44 +1000
-Message-Id: <CZ9ISRDH0OPM.CL3D0AK4NN8M@wheely>
-Cc: "Andrew Jones" <andrew.jones@linux.dev>, "Eric Auger"
- <eric.auger@redhat.com>, <kvm@vger.kernel.org>, <kvmarm@lists.linux.dev>
-Subject: Re: [kvm-unit-tests PATCH] lib/arm/io: Fix calling getchar()
- multiple times
-From: "Nicholas Piggin" <npiggin@gmail.com>
-To: "Alexandru Elisei" <alexandru.elisei@arm.com>, "Thomas Huth"
- <thuth@redhat.com>
-X-Mailer: aerc 0.15.2
-References: <20240216140210.70280-1-thuth@redhat.com>
- <ZdOIJfvVm7C23ZdZ@raptor>
-In-Reply-To: <ZdOIJfvVm7C23ZdZ@raptor>
 
-On Tue Feb 20, 2024 at 2:56 AM AEST, Alexandru Elisei wrote:
-> Hi,
->
-> Thanks for writing this. I've tested it with kvmtool, which emulates a 82=
-50
-> UART:
->
-> Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
->
-> This fixes a longstanding bug with kvmtool, where migrate_once() would re=
-ad
-> the last character that was sent, and then think that migration was
-> completed even though it was never performed.
->
-> While we are on the subject of migration:
->
-> SKIP: gicv3: its-migration: Test requires at least 4 vcpus
-> Now migrate the VM, then press a key to continue...
-> INFO: gicv3: its-migration: Migration complete
-> SUMMARY: 1 tests, 1 skipped
->
-> That's extremely confusing. Why is migrate_once() executed after the
-> test_its_pending() function call without checking if the test was skipped=
-?
+Hi all,
 
-Looks like it was done so the test is skipped without killing the harness
-due to expected migration point not being reached.
+Today's linux-next merge of the kvm-x86 tree got a conflict in:
 
-After the multi-migration series, you could just put a migrate_quiet()
-there as a quick fix.
+  include/uapi/linux/kvm.h
 
-But I'm thinking we could just remove the requirement for the harness
-to see at least 1 migration point. The test itself knows how many
-migrations it should perform, by how many times it calls migrate*().
-It is somewhat a sanity test against test being invoked the wrong way
-and not doing the migration, but how much is that worth...? Actually
-we could have a new sideband message like "VM migration is skipped"
-that doesn't do anything except tell the test harness to not fail
-due to missing migration point. That gets the best of both worlds,
-just needs tests to be updated.
+between commit:
 
-Thanks,
-Nick
+  bcac0477277e ("KVM: x86: move x86-specific structs to uapi/asm/kvm.h")
 
->
-> Nitpicks below.
->
-> On Fri, Feb 16, 2024 at 03:02:10PM +0100, Thomas Huth wrote:
-> > getchar() can currently only be called once on arm since the implementa=
-tion
-> > is a little bit too  na=C3=AFve: After the first character has arrived,=
- the
-> > data register never gets set to zero again. To properly check whether a
-> > byte is available, we need to check the "RX fifo empty" on the pl011 UA=
-RT
-> > or the "RX data ready" bit on the ns16550a UART instead.
-> >=20
-> > With this proper check in place, we can finally also get rid of the
-> > ugly assert(count < 16) statement here.
-> >=20
-> > Signed-off-by: Thomas Huth <thuth@redhat.com>
-> > ---
-> >  lib/arm/io.c | 34 ++++++++++++++--------------------
-> >  1 file changed, 14 insertions(+), 20 deletions(-)
-> >=20
-> > diff --git a/lib/arm/io.c b/lib/arm/io.c
-> > index c15e57c4..836fa854 100644
-> > --- a/lib/arm/io.c
-> > +++ b/lib/arm/io.c
-> > @@ -28,6 +28,7 @@ static struct spinlock uart_lock;
-> >   */
-> >  #define UART_EARLY_BASE (u8 *)(unsigned long)CONFIG_UART_EARLY_BASE
-> >  static volatile u8 *uart0_base =3D UART_EARLY_BASE;
-> > +bool is_pl011_uart;
-> > =20
-> >  static void uart0_init_fdt(void)
-> >  {
-> > @@ -59,7 +60,10 @@ static void uart0_init_fdt(void)
-> >  			abort();
-> >  		}
-> > =20
-> > +		is_pl011_uart =3D (i =3D=3D 0);
-> >  	} else {
-> > +		is_pl011_uart =3D !fdt_node_check_compatible(dt_fdt(), ret,
-> > +		                                           "arm,pl011");
-> >  		ret =3D dt_pbus_translate_node(ret, 0, &base);
-> >  		assert(ret =3D=3D 0);
-> >  	}
-> > @@ -111,31 +115,21 @@ void puts(const char *s)
-> >  	spin_unlock(&uart_lock);
-> >  }
-> > =20
-> > -static int do_getchar(void)
-> > +int __getchar(void)
-> >  {
-> > -	int c;
-> > +	int c =3D -1;
-> > =20
-> >  	spin_lock(&uart_lock);
-> > -	c =3D readb(uart0_base);
-> > -	spin_unlock(&uart_lock);
-> > -
-> > -	return c ?: -1;
-> > -}
-> > -
-> > -/*
-> > - * Minimalist implementation for migration completion detection.
-> > - * Without FIFOs enabled on the QEMU UART device we just read
-> > - * the data register: we cannot read more than 16 characters.
-> > - */
-> > -int __getchar(void)
-> > -{
-> > -	int c =3D do_getchar();
-> > -	static int count;
-> > =20
-> > -	if (c !=3D -1)
-> > -		++count;
-> > +	if (is_pl011_uart) {
-> > +		if (!(readb(uart0_base + 6 * 4) & 0x10))  /* RX not empty? */
->
-> I think it would be useful if the magic numbers were replaced by somethin=
-g
-> less opaque, something like:
->
-> 		if (!(readb(uart0_base + PL011_UARTFR) & PL011_UARTFR_RXFE))
->
-> > +			c =3D readb(uart0_base);
-> > +	} else {
-> > +		if (readb(uart0_base + 5) & 0x01)         /* RX data ready? */
->
-> Same as above, perhaps:
->
-> 		if (readb(uart0_base + UART16550_LSR) & UART16550_LSR_DR)
->
-> Naming of course being subject to taste.
->
-> Thanks,
-> Alex
->
-> > +			c =3D readb(uart0_base);
-> > +	}
-> > =20
-> > -	assert(count < 16);
-> > +	spin_unlock(&uart_lock);
-> > =20
-> >  	return c;
-> >  }
-> > --=20
-> > 2.43.0
-> >=20
+from the kvm tree and commits:
 
+  01a871852b11 ("KVM: x86/xen: allow shared_info to be mapped by fixed HVA")
+  3a0c9c41959d ("KVM: x86/xen: allow vcpu_info to be mapped by fixed HVA")
+
+from the kvm-x86 tree.
+
+I fixed it up (I used the former version of this file and applied the
+following fix up patch) and can carry the fix as necessary. This is now
+fixed as far as linux-next is concerned, but any non trivial conflicts
+should be mentioned to your upstream maintainer when your tree is
+submitted for merging.  You may also want to consider cooperating with
+the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Date: Tue, 20 Feb 2024 13:44:11 +1100
+Subject: [PATCH] fixup for code moving to arch/x86/include/uapi/asm/kvm.h
+
+Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
+---
+ arch/x86/include/uapi/asm/kvm.h | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kv=
+m.h
+index 0ad6bda1fc39..ad29984d5e39 100644
+--- a/arch/x86/include/uapi/asm/kvm.h
++++ b/arch/x86/include/uapi/asm/kvm.h
+@@ -549,6 +549,7 @@ struct kvm_x86_mce {
+ #define KVM_XEN_HVM_CONFIG_EVTCHN_SEND		(1 << 5)
+ #define KVM_XEN_HVM_CONFIG_RUNSTATE_UPDATE_FLAG	(1 << 6)
+ #define KVM_XEN_HVM_CONFIG_PVCLOCK_TSC_UNSTABLE	(1 << 7)
++#define KVM_XEN_HVM_CONFIG_SHARED_INFO_HVA	(1 << 8)
+=20
+ struct kvm_xen_hvm_config {
+ 	__u32 flags;
+@@ -567,9 +568,10 @@ struct kvm_xen_hvm_attr {
+ 		__u8 long_mode;
+ 		__u8 vector;
+ 		__u8 runstate_update_flag;
+-		struct {
++		union {
+ 			__u64 gfn;
+ #define KVM_XEN_INVALID_GFN ((__u64)-1)
++			__u64 hva;
+ 		} shared_info;
+ 		struct {
+ 			__u32 send_port;
+@@ -611,6 +613,8 @@ struct kvm_xen_hvm_attr {
+ #define KVM_XEN_ATTR_TYPE_XEN_VERSION		0x4
+ /* Available with KVM_CAP_XEN_HVM / KVM_XEN_HVM_CONFIG_RUNSTATE_UPDATE_FLA=
+G */
+ #define KVM_XEN_ATTR_TYPE_RUNSTATE_UPDATE_FLAG	0x5
++/* Available with KVM_CAP_XEN_HVM / KVM_XEN_HVM_CONFIG_SHARED_INFO_HVA */
++#define KVM_XEN_ATTR_TYPE_SHARED_INFO_HVA	0x6
+=20
+ struct kvm_xen_vcpu_attr {
+ 	__u16 type;
+@@ -618,6 +622,7 @@ struct kvm_xen_vcpu_attr {
+ 	union {
+ 		__u64 gpa;
+ #define KVM_XEN_INVALID_GPA ((__u64)-1)
++		__u64 hva;
+ 		__u64 pad[8];
+ 		struct {
+ 			__u64 state;
+@@ -648,6 +653,8 @@ struct kvm_xen_vcpu_attr {
+ #define KVM_XEN_VCPU_ATTR_TYPE_VCPU_ID		0x6
+ #define KVM_XEN_VCPU_ATTR_TYPE_TIMER		0x7
+ #define KVM_XEN_VCPU_ATTR_TYPE_UPCALL_VECTOR	0x8
++/* Available with KVM_CAP_XEN_HVM / KVM_XEN_HVM_CONFIG_SHARED_INFO_HVA */
++#define KVM_XEN_VCPU_ATTR_TYPE_VCPU_INFO_HVA	0x9
+=20
+ /* Secure Encrypted Virtualization command */
+ enum sev_cmd_id {
+--=20
+2.43.0
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/A144DtVpcjR0fVyttz24FeA
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmXUEuAACgkQAVBC80lX
+0Gzk5gf/ZqyZKU4mrYdDzO3ayPcqIfP0uGNR0Y9blW43TEkmk1AbzT5bzIPpOFZZ
+4vX2y2LfrfZkeo5pK1uiknq50Z8RwX3yyeYVM1W5/az/z8BHzsEuVbonw3vTjI2v
+3Ompv+y2Vs83d31ZCWqmNnuMhL95gDeiZJkr8uPs+wZ8UmHxzf12u7v6nTaeQXj9
+oosPhKo95u8ThiW4xHmkpDx6sRbX5l/kzaIUAj7r9GyX5zGbe2M75UHVPZe+dY2K
+7sLHKU+ccvEb8XdG7afg426byR8YmTdmGukYz8NM6xQQbwVTzcWsmeuK24UQXTpg
+5hIv1dpGhPos3I5s1Pk4gcKpvY67GA==
+=JsQc
+-----END PGP SIGNATURE-----
+
+--Sig_/A144DtVpcjR0fVyttz24FeA--
 
