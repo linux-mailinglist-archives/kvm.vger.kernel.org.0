@@ -1,140 +1,174 @@
-Return-Path: <kvm+bounces-9241-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9242-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDA2C85CE77
-	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 04:00:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C11F285CEB0
+	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 04:28:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64C851F232F8
-	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 03:00:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E4EBA1C21EEE
+	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 03:28:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F227F2BAE7;
-	Wed, 21 Feb 2024 03:00:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E28F738DD2;
+	Wed, 21 Feb 2024 03:28:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RD7dQ/ad"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AA6D79E2
-	for <kvm@vger.kernel.org>; Wed, 21 Feb 2024 03:00:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A77262E3FE;
+	Wed, 21 Feb 2024 03:28:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708484429; cv=none; b=PRvKeVtKmz9bFCydUtBEvB7lV/K/SiT7zBft9MEfoqQIf1I1foi2vJNCH5T3G5T0GRvHhMS2Nk+ekTPaOWutGg/OFGc9mElUcWwVKHzeef0X0ed8r/+Bxrb16nFwW758IfPfymX+3K/WatZsj8BwwbkUDXtEkWZPhSKgYfkblu4=
+	t=1708486104; cv=none; b=RKQRVjofFSC4rWL1dWUVzBX614OQFBsrH+SUV8nV0foSmEb5Y93eIJcc4cqBtPEBeTqoE9LfmLaLtvzYJVDqbT9cpFZlsyR7tn6EU7KhJVpZWE4QzaT32NprZq/UDCM20hGTl09pU8JMp0oRT0xt765sARJoZ0UxCNvJgyMj8TU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708484429; c=relaxed/simple;
-	bh=rkLKCDZNjb6J0IiHPCSnK1SOv3Zj9iEVmYNgMObi7/Y=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=TagSFBjKPTiHqVbzwKeasVm1tSTR4xGWC+faaI9BgJveylx21ZnemBG2gu/5LqRRYEiHJzlQ1benuGGvqWs2uXx3V2vd5XCc6jrp3wN5Ng8ZJvQ3SsfWYUVA7aXkpXcPoVpurQbs6FyplEKPx9IZiqrRm93IJ70Ei8epAYU0ha0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-36424431577so47950175ab.3
-        for <kvm@vger.kernel.org>; Tue, 20 Feb 2024 19:00:27 -0800 (PST)
+	s=arc-20240116; t=1708486104; c=relaxed/simple;
+	bh=00EYudbANOSaxNSrkwurD81lMrDxfKTUqVgu1v5tMY4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oWxC3DgP/dY/N1wHlsc6rXYfQtUKTSagcpwxuHsOFnjnMYAmqf8/LW5ZHRe4OjuRlvQkpF7ZW7G6bw8Ma16mQ1M6u6RTvNg/DYwkBifM5kMPYNQsqgJZ9usLx8ymR06SzOsBFi01gUrfv6WYiAHCaoDGhIW568oiSFisUo4AzZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RD7dQ/ad; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1dc13fb0133so1087405ad.3;
+        Tue, 20 Feb 2024 19:28:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708486101; x=1709090901; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ig+g0BUZSXifjVBy73OzZ9fIB5v/6NjxVeJ9J0qwojE=;
+        b=RD7dQ/adwDzYEKhGflBIrdFLE5qB7Vf8urwI6eeW80KdO6A91EcvqyRy2psTEbnvGT
+         tM20TRMUpUFNDo9tWbyuKOk//UiirdfgzqsMFlYQTRzvC8y9mhPOFWxYuV1/WwbDUbNM
+         azY2+vqWP2Qk1TrXyDMHwb802Y8f6FfWivyOxeGipD9dzg/C1Dgi+a8mW6wDU5a3Z1Yf
+         OQbV40VRWRO9uCyT2F84b2+lfARj20HFgDslde2VPzf9q5CufuoA4mHL+UiOX9nzgnq5
+         I6gIDaORPnlvobYbmBF3biFNj8VFCGeC5BuP4nlrTanOpt+RGCuXfpHjxW1zAk6ouK4a
+         P7cg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708484427; x=1709089227;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=HKC2FBRzuJ/NpphNyy1cXiWj+k3pGRIjMpvVMN1CXGA=;
-        b=sDXRqZG+rT81oPdqUWVFmLHqpKsn45C0YTlRS7yXRzuMDDaaXfoJh3ILZbnMOJK9sE
-         8+k98advB1T6c3qBJwt57IHon2JhlncnSTMLuSMaQqv2AoAiZWKJVBvub+EGjQ113DGQ
-         FgHmyOPiHBHC7ovB1xoAujgInK0PspzWJ55Z4Zzaxcl/UTS7Rpoi/By9JBJIwxLpUYm8
-         iPcUxjQHjsY0b/dH0A3Gvz9Z5XKiYiTrVT11f17xDD+WejP5kh1GD/2Wr+bC18w/qjcD
-         OvH4W9F/88ckkgXEE84q0xtBA0f4PzTsRzpOlpBxXZEZw4+u39U0j3Lm05/JkBnppHGw
-         5BNw==
-X-Forwarded-Encrypted: i=1; AJvYcCUDo1szlw04b0UVsjDLEpwM+aGB2FjZF9mYvwQ38oNDDFpJWnlveA+o0T21kek9U97Zu3UdkfvaHdVbRuOXePGhXX6O
-X-Gm-Message-State: AOJu0Yy3hJnMOzhk4MFJVkOo/8xiNspvAH4q659CT/fU8cX/xE4PvoT+
-	VDyriQ95WAInm2bjgEqMCex43IaYGl4w0EhfZDSjkgOtHMypIXIuubruczxRXkddzTsuomY6bqh
-	k9pe4JoOm+Cp08fYRPiaHAR24snOQ1A81BUIQqQd3Wp6VQ2cVmPMFfaE=
-X-Google-Smtp-Source: AGHT+IFhevZLLMLv1IVMNBUKv01dHF2q9cfQse+2XCEwbDYmSERfOxBEyUgWtenQFYc/t3MOcpGbZpvWrk5sSN0cP3XHp8gbRQvt
+        d=1e100.net; s=20230601; t=1708486101; x=1709090901;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ig+g0BUZSXifjVBy73OzZ9fIB5v/6NjxVeJ9J0qwojE=;
+        b=M0z7wSWxAq2pHAy4/QxPG7snL0lWFMD3yCJR16OVjP0uW/7iy04sBMbJVmlodCF+Dp
+         xxsFz9Y/yJf3UI3cRAxW31dyT22ZPG7tQkv9zxy9espQIYOI+gJCskELIvSrfVhULIlX
+         4JktEETSTz5LsTLag8xYOKfIuDhBDppc+bORt3UJGn+WqzRwBMX3TljrCh5nExc2GjSM
+         OpQ/s7pP6M8KDaqR9+QCdfqUtkLI0VK3miRWUsg0OYArKCtUVU0qNau9HMi2bRwOFINw
+         wbyVR555ri0JL08IVvVkaQWQaAL1iYIkNMBDeSoKOxG+UZgq97uQuIUHwwPWD9vySDkF
+         CnaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXyhFW0rukBJi7iCohM/Em7sXb3Etwsc5psk+sBcDZmjbsRKIvS93cOkObQKwXkcHiDwPmXCcT3FvX7NgOA8hj0w3xtkBJxYmrx9eFWL6sy74LA0G8/xlLr1K7hvswwaA==
+X-Gm-Message-State: AOJu0YzPH80+sgPfxFYCKhIqSZ1WLaDrflh/PdcuX9XyPNW+zP5vQBWO
+	lEd7BsSCgVpktuSMjuvXwfwXUe2bUGtlfkDPzIOsNZ6g9um9D+U1
+X-Google-Smtp-Source: AGHT+IENcbmlmxPUUYa5IPoB3qyzTiAzkVoX3rrNvUBxi29LRyMCLlj6+/WkLPi+Nhs8BmfBMPXIdQ==
+X-Received: by 2002:a17:902:b902:b0:1d9:8ddf:5fa0 with SMTP id bf2-20020a170902b90200b001d98ddf5fa0mr14621025plb.62.1708486100817;
+        Tue, 20 Feb 2024 19:28:20 -0800 (PST)
+Received: from wheely.local0.net (220-235-194-103.tpgi.com.au. [220.235.194.103])
+        by smtp.gmail.com with ESMTPSA id q7-20020a170902b10700b001dc214f7353sm1246457plr.249.2024.02.20.19.28.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Feb 2024 19:28:20 -0800 (PST)
+From: Nicholas Piggin <npiggin@gmail.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Nicholas Piggin <npiggin@gmail.com>,
+	kvm@vger.kernel.org,
+	Laurent Vivier <lvivier@redhat.com>,
+	"Shaoqin Huang" <shahuang@redhat.com>,
+	Andrew Jones <andrew.jones@linux.dev>,
+	Nico Boehr <nrb@linux.ibm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	David Hildenbrand <david@redhat.com>,
+	Marc Hartmayer <mhartmay@linux.ibm.com>,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-s390@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	kvm-riscv@lists.infradead.org
+Subject: [kvm-unit-tests PATCH v5 0/8] Multi-migration support
+Date: Wed, 21 Feb 2024 13:27:49 +1000
+Message-ID: <20240221032757.454524-1-npiggin@gmail.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1889:b0:365:3355:38fe with SMTP id
- o9-20020a056e02188900b00365335538femr402622ilu.5.1708484427281; Tue, 20 Feb
- 2024 19:00:27 -0800 (PST)
-Date: Tue, 20 Feb 2024 19:00:27 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000647d640611db8789@google.com>
-Subject: [syzbot] [kvm?] KMSAN: uninit-value in em_ret_near_imm
-From: syzbot <syzbot+c9aca2253922f806a75a@syzkaller.appspotmail.com>
-To: bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, mingo@redhat.com, 
-	pbonzini@redhat.com, seanjc@google.com, syzkaller-bugs@googlegroups.com, 
-	tglx@linutronix.de, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
+Now that strange arm64 hang is found to be QEMU bug, I'll repost.
+Since arm64 requires Thomas's uart patch and it is worse affected
+by the QEMU bug, I will just not build it on arm. The QEMU bug
+still affects powerpc (and presumably s390x) but it's not causing
+so much trouble for this test case.
 
-syzbot found the following issue on:
+I have another test case that can hit it reliably and doesn't
+cause crashes but that takes some harness and common lib work so
+I'll send that another time.
 
-HEAD commit:    0f1dd5e91e2b Merge tag 'sound-6.8-rc5' of git://git.kernel..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=17bec778180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e3dd779fba027968
-dashboard link: https://syzkaller.appspot.com/bug?extid=c9aca2253922f806a75a
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+Since v4:
+- Don't build selftest-migration on arm.
+- Reduce selftest-migration iterations from 100 to 30 to make the
+  test run faster (it's ~0.5s per migration).
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Since v3:
+- Addressed Thomas's review comments:
+- Patch 2 initrd cleanup unset the old variable in the correct place.
+- Patch 4 multi migration removed the extra wait for "Now migrate the
+  VM" message, and updated comments around it.
+- Patch 6 fix typo and whitespace in quiet migration support.
+- Patch 8 fix typo and whitespace in migration selftest.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/b6e52e101a62/disk-0f1dd5e9.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/64025c9168bf/vmlinux-0f1dd5e9.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/491e1a922dc9/bzImage-0f1dd5e9.xz
+Since v2:
+- Rebase on riscv port and auxvinfo fix was merged.
+- Clean up initrd cleanup moves more commands into the new cleanup
+  function from the trap handler comands (suggested by Thomas).
+- "arch-run: Clean up temporary files properly" patch is now renamed
+  to "arch-run: Fix TRAP handler..."
+- Fix TRAP handler patch has redone changelog to be more precise about
+  the problem and including recipe to recreate it.
+- Fix TRAP handler patch reworked slightly to remove the theoretical
+  race rather than just adding a comment about it.
+- Patch 3 was missing a couple of fixes that leaked into patch 4,
+  those are moved into patch 3.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+c9aca2253922f806a75a@syzkaller.appspotmail.com
+Thanks,
+Nick
 
-=====================================================
-BUG: KMSAN: uninit-value in assign_eip_near arch/x86/kvm/emulate.c:829 [inline]
-BUG: KMSAN: uninit-value in em_ret_near_imm+0x13c/0x580 arch/x86/kvm/emulate.c:3192
- assign_eip_near arch/x86/kvm/emulate.c:829 [inline]
- em_ret_near_imm+0x13c/0x580 arch/x86/kvm/emulate.c:3192
- x86_emulate_insn+0x1d87/0x5880 arch/x86/kvm/emulate.c:5292
- x86_emulate_instruction+0x13c9/0x30a0 arch/x86/kvm/x86.c:9175
- kvm_emulate_instruction arch/x86/kvm/x86.c:9255 [inline]
- complete_emulated_io arch/x86/kvm/x86.c:11212 [inline]
- complete_emulated_mmio+0x70b/0x8b0 arch/x86/kvm/x86.c:11272
- kvm_arch_vcpu_ioctl_run+0x1837/0xb890 arch/x86/kvm/x86.c:11384
- kvm_vcpu_ioctl+0xbfc/0x1770 arch/x86/kvm/../../../virt/kvm/kvm_main.c:4441
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:871 [inline]
- __se_sys_ioctl+0x225/0x410 fs/ioctl.c:857
- __x64_sys_ioctl+0x96/0xe0 fs/ioctl.c:857
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
+Nicholas Piggin (8):
+  arch-run: Fix TRAP handler recursion to remove temporary files
+    properly
+  arch-run: Clean up initrd cleanup
+  migration: use a more robust way to wait for background job
+  migration: Support multiple migrations
+  arch-run: rename migration variables
+  migration: Add quiet migration support
+  Add common/ directory for architecture-independent tests
+  migration: add a migration selftest
 
-Local variable eip created at:
- em_ret_near_imm+0x3a/0x580 arch/x86/kvm/emulate.c:3189
- x86_emulate_insn+0x1d87/0x5880 arch/x86/kvm/emulate.c:5292
+ arm/sieve.c                  |   2 +-
+ common/selftest-migration.c  |  29 ++++++
+ common/sieve.c               |  51 ++++++++++
+ lib/migrate.c                |  19 +++-
+ lib/migrate.h                |   2 +
+ powerpc/Makefile.common      |   1 +
+ powerpc/selftest-migration.c |   1 +
+ powerpc/unittests.cfg        |   4 +
+ riscv/sieve.c                |   2 +-
+ s390x/Makefile               |   1 +
+ s390x/selftest-migration.c   |   1 +
+ s390x/sieve.c                |   2 +-
+ s390x/unittests.cfg          |   4 +
+ scripts/arch-run.bash        | 177 +++++++++++++++++++++++++----------
+ x86/sieve.c                  |  52 +---------
+ 15 files changed, 240 insertions(+), 108 deletions(-)
+ create mode 100644 common/selftest-migration.c
+ create mode 100644 common/sieve.c
+ create mode 120000 powerpc/selftest-migration.c
+ create mode 120000 s390x/selftest-migration.c
+ mode change 100644 => 120000 x86/sieve.c
 
-CPU: 0 PID: 6232 Comm: syz-executor.3 Not tainted 6.8.0-rc4-syzkaller-00267-g0f1dd5e91e2b #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/25/2024
-=====================================================
+-- 
+2.42.0
 
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
