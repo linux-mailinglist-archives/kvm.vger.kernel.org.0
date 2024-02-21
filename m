@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-9289-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9290-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA54385D1C1
-	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 08:50:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9B0885D1EE
+	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 08:57:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 195ADB262F2
-	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 07:50:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED33A1C22D7B
+	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 07:57:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D467F3BB52;
-	Wed, 21 Feb 2024 07:50:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEE093BB46;
+	Wed, 21 Feb 2024 07:57:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="RDJNkKN2"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="rZqtaXPz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E16A83BB24;
-	Wed, 21 Feb 2024 07:50:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B852B3B1AB;
+	Wed, 21 Feb 2024 07:57:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708501813; cv=none; b=lWYv9VtWS3GFAYMdsjsVNNMCVa2NTKNb4kOZZJyP3FVix6wqJufoMYtgxD4TCnVZP83WoXOSh9/bIplyCumBNzEGfxWI3GkBqeLgKyaL49pW8m1venH9Os5Fi+ezqAqIA7kgCkwpEGPRA0NGbs6sDvyJWfoOBzvSfGPpe+kqVXw=
+	t=1708502259; cv=none; b=HITb3t29VksFrZT9lnpfq6tJGSDHlrUTiog0KmOisJTJD7d34WsWHHsVRM9fE1rM9whsX+jyIV0jq66WpLO7zuKuJG/DwiUS1iMTOvVz8VkXB8tRwF4v0xwQI11YrDFJezxabVQE7TAWl/1ih+NGSv0NALb7LAX+xVxrxKWwB8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708501813; c=relaxed/simple;
-	bh=zD7Lc1xdN0v3KVggsdtqiSYeeVXe3w6E0XNXx/Oiesc=;
+	s=arc-20240116; t=1708502259; c=relaxed/simple;
+	bh=pdIvFwT6ElHXEXaKjIJQ0cIfhRUQBgUVB+bNj6ghhH4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=arjT3trv8nWjRQhSbfnQZaPxUige/oDHn+fwDdKP0WS8O+tIbtewEarPea5zIFs2/biAoei2Blcx7P9i996d0f/RA+hqKnLRRtZBGzGsc80QU1ALAAaHixgb/V35zHbn4G34Vcm03nXzyhOJgXV8GCeIV9tShQE8s93MflzqHJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=RDJNkKN2; arc=none smtp.client-ip=148.163.158.5
+	 In-Reply-To:Content-Type; b=UONpyeb/yzWO9AbeaKDIXLua4DmtAsdHn1hSQsJ7MD5NoASglITAc6yo/oNAL1PtgQAXSwsD+2t7wLhBktBHcMlNfP09DucgEP0ug1+ADImkw/otRW7rCd6uUCDPXjcpHR3OR8AfTAq4NyshtmjSWiYgGwzOFRhGLjSgaatDgG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=rZqtaXPz; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41L70oLP009771;
-	Wed, 21 Feb 2024 07:50:06 GMT
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41L7tXQO001971;
+	Wed, 21 Feb 2024 07:57:37 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
  mime-version : subject : to : cc : references : from : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=MLK3n7vJ/rodBM8IFIUcFoO5D1rnlkE1IUUhBIzCEFI=;
- b=RDJNkKN2ZXhNYmYCFuok9HSMxsm1u4aL+ibBFC7ZNvwygIHedfyO4JOQ9qXX0kb+uO2a
- sHAeU0qDhoEyS2aueYi3Gf40sDBugS6tThGO+YlmBtJvMds4YZ+lcOIzs2dCP5bZKZJh
- VoFKHWV+Bgny1Obzt0oI4Gg96bh8unHslQCeckftH9OZqLiRJcHr9dRaqKGTgl8/jljS
- L+MtOYwtm5BQ3wTHfDlrtncLBpVr+VCobCyICvJNFkqKy8IbT1ONNZy1Cs+KNVT3Si2E
- 2IScacUcn0x6kUmf2rEsYpoB++fvPb9io8uUFWyJB0qZPz656FXJf3mmJx8bmbe+qj7c PA== 
+ bh=8GsfnWbJyjdtUyPK3VJ0a021A8Y3VbcpQLuqOk5/fhs=;
+ b=rZqtaXPzw1GMdZJDigBk5C3A+jfcRUIr33/2sTji0ghE3Q0fT247kfUwQ2T2fdSLGbkU
+ uURDy4NW/9DoHu9p1LzhZ1/QXXHoeLEyrKAMZloiXa+ESlQft9ya4HNs9aAtd26V6UlA
+ vZxfV0FUW4SVWpGyGYon092lKnmxqnRlHYiZxJCpu50Qyw2cWZ2jx1qmyPhKnTFcRJMF
+ 26y3ksfxKbxL+UzB72KtzNjm3uQb5BrZb+oxI6uZZeCUxuBIeCzgXBB6SFKXzJcMLLX/
+ WhIF0pPoHSgoujsKYIWPakh264R3+sIAQFegjTQV1q+BXwDEp7OEFwukfy0Vyrtsan7Z lA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wdaabbc1a-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wdcqp0pdr-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 21 Feb 2024 07:50:06 +0000
-Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41L7cSfJ030792;
-	Wed, 21 Feb 2024 07:50:05 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wdaabbc0j-1
+	Wed, 21 Feb 2024 07:57:36 +0000
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41L7uO9B006397;
+	Wed, 21 Feb 2024 07:57:36 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wdcqp0pd7-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 21 Feb 2024 07:50:05 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 41L7LcYR014347;
-	Wed, 21 Feb 2024 07:50:04 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3wb9u2n4ac-1
+	Wed, 21 Feb 2024 07:57:36 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 41L5qfJb009551;
+	Wed, 21 Feb 2024 07:57:34 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3wb84pdntd-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 21 Feb 2024 07:50:04 +0000
+	Wed, 21 Feb 2024 07:57:34 +0000
 Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 41L7nxe854067456
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 41L7vT2417302034
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 21 Feb 2024 07:50:01 GMT
+	Wed, 21 Feb 2024 07:57:31 GMT
 Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1FDE92004D;
-	Wed, 21 Feb 2024 07:49:59 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 104572004E;
+	Wed, 21 Feb 2024 07:57:29 +0000 (GMT)
 Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4E5C12004B;
-	Wed, 21 Feb 2024 07:49:58 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 6A75F20043;
+	Wed, 21 Feb 2024 07:57:28 +0000 (GMT)
 Received: from [9.179.10.137] (unknown [9.179.10.137])
 	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 21 Feb 2024 07:49:58 +0000 (GMT)
-Message-ID: <bbe1db67-386b-4738-83d5-6e02cd3c9d58@linux.ibm.com>
-Date: Wed, 21 Feb 2024 08:49:58 +0100
+	Wed, 21 Feb 2024 07:57:28 +0000 (GMT)
+Message-ID: <e1d9aa94-c63b-4214-a091-b2aee0cd21f9@linux.ibm.com>
+Date: Wed, 21 Feb 2024 08:57:28 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,19 +83,15 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 0/2] KVM: s390: Fix AR parameter in ioctl
-To: Eric Farman <farman@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>
-Cc: Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-References: <20240220211211.3102609-1-farman@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v4 2/7] s390x: Add guest 2 AP test
 Content-Language: en-US
+To: Anthony Krowiak <akrowiak@linux.ibm.com>, kvm@vger.kernel.org
+Cc: linux-s390@vger.kernel.org, imbrenda@linux.ibm.com, thuth@redhat.com,
+        david@redhat.com, nsg@linux.ibm.com, nrb@linux.ibm.com,
+        jjherne@linux.ibm.com
+References: <20240202145913.34831-1-frankja@linux.ibm.com>
+ <20240202145913.34831-3-frankja@linux.ibm.com>
+ <f05c83a9-bcc6-4963-98f4-72159673ba3a@linux.ibm.com>
 From: Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; keydata=
  xsFNBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
@@ -139,42 +135,125 @@ Autocrypt: addr=frankja@linux.ibm.com; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-In-Reply-To: <20240220211211.3102609-1-farman@linux.ibm.com>
+In-Reply-To: <f05c83a9-bcc6-4963-98f4-72159673ba3a@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: qB8gzdl8f3GLihn6YKSnm1CcQ0oSJars
-X-Proofpoint-ORIG-GUID: UgxMVbgEXnR1evLD7AWDlXXfDdfmsCMD
+X-Proofpoint-ORIG-GUID: zULjXn72SBO_M9StKvZ8GvMBrYnT3N_v
+X-Proofpoint-GUID: stL8Vw5xBwLumV7SsnIlfN2eSdklwD-i
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2024-02-20_06,2024-02-20_01,2023-05-22_02
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxscore=0
- lowpriorityscore=0 malwarescore=0 phishscore=0 impostorscore=0 spamscore=0
- priorityscore=1501 clxscore=1015 bulkscore=0 suspectscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2402210059
+ phishscore=0 impostorscore=0 malwarescore=0 mlxlogscore=999
+ priorityscore=1501 bulkscore=0 lowpriorityscore=0 spamscore=0
+ suspectscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2311290000 definitions=main-2402210061
 
-On 2/20/24 22:12, Eric Farman wrote:
-> Hi Janosch,
+On 2/20/24 17:38, Anthony Krowiak wrote:
+> I made a couple of function name change suggestions, but those are not
+> critical:
 > 
-> Here is a new (final?) version for the AR/MEM_OP issue I'm attempting to
-> address. Hopefully they can be picked up to whatever tree makes sense.
+> Acked-by: Anthony Krowiak <akrowiak@linux.ibm.com>
 > 
+> On 2/2/24 9:59 AM, Janosch Frank wrote:
+>> Add a test that checks the exceptions for the PQAP, NQAP and DQAP
+>> adjunct processor (AP) crypto instructions.
+>>
+>> Since triggering the exceptions doesn't require actual AP hardware,
+>> this test can run without complicated setup.
+>>
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> ---
+>>    s390x/Makefile      |   1 +
+>>    s390x/ap.c          | 309 ++++++++++++++++++++++++++++++++++++++++++++
+>>    s390x/unittests.cfg |   3 +
+>>    3 files changed, 313 insertions(+)
+>>    create mode 100644 s390x/ap.c
+>>
+>> diff --git a/s390x/Makefile b/s390x/Makefile
+>> index 4f6c627d..6d28a5bf 100644
+>> --- a/s390x/Makefile
+>> +++ b/s390x/Makefile
+>> @@ -42,6 +42,7 @@ tests += $(TEST_DIR)/exittime.elf
+>>    tests += $(TEST_DIR)/ex.elf
+>>    tests += $(TEST_DIR)/topology.elf
+>>    tests += $(TEST_DIR)/sie-dat.elf
+>> +tests += $(TEST_DIR)/ap.elf
+>>    
+>>    pv-tests += $(TEST_DIR)/pv-diags.elf
+>>    pv-tests += $(TEST_DIR)/pv-icptcode.elf
+>> diff --git a/s390x/ap.c b/s390x/ap.c
+>> new file mode 100644
+>> index 00000000..b3cee37a
+>> --- /dev/null
+>> +++ b/s390x/ap.c
+>> @@ -0,0 +1,309 @@
+>> +/* SPDX-License-Identifier: GPL-2.0-only */
+>> +/*
+>> + * AP instruction G2 tests
+>> + *
+>> + * Copyright (c) 2024 IBM Corp
+>> + *
+>> + * Authors:
+>> + *  Janosch Frank <frankja@linux.ibm.com>
+>> + */
+>> +
+>> +#include <libcflat.h>
+>> +#include <interrupt.h>
+>> +#include <bitops.h>
+>> +#include <alloc_page.h>
+>> +#include <asm/facility.h>
+>> +#include <asm/time.h>
+>> +#include <ap.h>
+>> +
+>> +/* For PQAP PGM checks where we need full control over the input */
+>> +static void pqap(unsigned long grs[3])
+>> +{
+>> +	asm volatile(
+>> +		"	lgr	0,%[r0]\n"
+>> +		"	lgr	1,%[r1]\n"
+>> +		"	lgr	2,%[r2]\n"
+>> +		"	.insn	rre,0xb2af0000,0,0\n" /* PQAP */
+>> +		::  [r0] "d" (grs[0]), [r1] "d" (grs[1]), [r2] "d" (grs[2])
+>> +		: "cc", "memory", "0", "1", "2");
+>> +}
+>> +
+>> +static void test_pgms_pqap(void)
+> 
+> 
+> If I saw this function name without having read the patch description, I
+> wouldn't have any idea what is being tested.
+> 
+> Maybe test_pqap_pgm_chk?
 
-I've got good and bad news for you :)
+If I'm not mistaken, then it should be consistent with the pgm checks 
+for other instructions but I don't mind renaming it.
 
-You need to re-base this patch set on Heiko's feature branch once my kvm 
-fpu patch is on there since the current version runs into conflicts with 
-Heiko's fpu rework. We'll contact you once that's the case. The patch 
-made it onto devel yesterday evening and I assumed you'd wait a bit 
-until sending a new version but I was mistaken.
+> 
+> 
+>> +{
+>> +	unsigned long grs[3] = {};
+>> +	struct pqap_r0 *r0 = (struct pqap_r0 *)grs;
+>> +	uint8_t *data = alloc_page();
+>> +	uint16_t pgm;
+>> +	int fails = 0;
+>> +	int i;
+>> +
+>> +	report_prefix_push("pqap");
+>> +
+>> +	/* Wrong FC code */
+>> +	report_prefix_push("invalid fc");
+>> +	r0->fc = 42;
+> 
+> 
+> Just out of curiosity, why 42? Why not some ridiculous number that will
+> never be used for a function code, like 4294967295?
 
+No particular reason.
 
-Apart from that, there's not much to do.
-Drop Christian's Acks, as I said, they were solely for the question if 
-we'll move your patches via Heiko's repo. Ack + rev-by doesn't make 
-sense anyway.
+Increasing the number would increase the buffer zone of invalid values 
+but there's currently only a hand full of values defined anyway.
+I might add a couple of 0s to this for the next version and call it a day.
 
-
-Tanks for taking on this problem and fixing it!
 
