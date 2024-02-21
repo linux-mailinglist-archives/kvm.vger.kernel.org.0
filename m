@@ -1,289 +1,188 @@
-Return-Path: <kvm+bounces-9314-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9315-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48ABA85E0C5
-	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 16:17:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CBF785E0D4
+	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 16:20:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CBD311F26F40
-	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 15:17:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0189628416E
+	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 15:20:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9C298004C;
-	Wed, 21 Feb 2024 15:17:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47A77811EB;
+	Wed, 21 Feb 2024 15:19:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=fjasle.eu header.i=@fjasle.eu header.b="pwJRn3gW"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="NlhitgrT"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.domeneshop.no (smtp.domeneshop.no [194.63.252.55])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E86DBC158;
-	Wed, 21 Feb 2024 15:17:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.63.252.55
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708528642; cv=none; b=e8Z25Bp4n+GeaW0NzxWZrr6Ge92I+Pen96ImAa7lfTe9j479hfb4dF4UP0vXMenvm1h/HkncR4HleRQhe8SFxoT3ImcGz/hr+6AvVkG1loY5MMASv+AXNKGsjfYcvJpmtSJd9+lQKhBWhT8CtpYyCI60jbAoz5WtbrXHKvyVth0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708528642; c=relaxed/simple;
-	bh=agYNnPPCIH97KdPKC1Nh/AulnVyocy0+9HILSckMPjo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bsHyo6km/7A+2vcIn5fBiKyK2A65zaWQzqPJb+JTud+71PdVpLg1/hGbhh2PV+fcu8oTFIfx5SlR3LJJe4+cvMCveJeu4zk2DiUthivfVBjVYi7U269F6ArUceFPmVu5MudM5tzB/Me0LfQRtnOclpU6ljrL86/wx+bsF8smeiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fjasle.eu; spf=pass smtp.mailfrom=fjasle.eu; dkim=pass (2048-bit key) header.d=fjasle.eu header.i=@fjasle.eu header.b=pwJRn3gW; arc=none smtp.client-ip=194.63.252.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fjasle.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fjasle.eu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=fjasle.eu;
-	s=ds202307; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=9oIgh7QORtk7teQwyM71RcR4VU3ANbMHY2WNi9H443M=; b=pwJRn3gWdD6aejhtap3HU+yeUl
-	iQ2W4LQ5bMVhHqaYWVNmdws1Nb4FqB74C2m6mhbtFtNUApeOKIdhCvzqqaM4+Cph1TzjjZ5KOwm3L
-	RZ0TW8amloLdHokN9UyYZ5OCt+/gioMZTT+oTZUE6A8DzgNaWsSh4YtDuz1lAcwosOWD6OnzLllXZ
-	odwelyI6Ht4gfCVmbZTRnGutXlbfnxi0nzymmkee8VbaWOKeF5KIKyjZzzbJ3hpjRHd3ICuRQSDG9
-	ilcBwKlqdlUD3TpK+t/ecNl6leBbZOSZfYqDhBAe9aDX5ZbbYj4xoJFDK5bFoKcoPvhzqk74EdfTZ
-	W4CCsuDA==;
-Received: from dynamic-176-000-161-131.176.0.pool.telefonica.de ([176.0.161.131]:27469 helo=bergen.fjasle.eu)
-	by smtp.domeneshop.no with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <nicolas@fjasle.eu>)
-	id 1rcoG6-00DNv3-WC;
-	Wed, 21 Feb 2024 16:11:43 +0100
-Date: Wed, 21 Feb 2024 16:11:36 +0100
-From: Nicolas Schier <nicolas@fjasle.eu>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: linux-kbuild@vger.kernel.org, Andy Lutomirski <luto@kernel.org>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Thomas Gleixner <tglx@linutronix.de>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH 1/2] kbuild: change tool coverage variables to take the
- path relative to $(obj)
-Message-ID: <ZdYSqKnJqiiBnQHu@bergen.fjasle.eu>
-References: <20240217055504.2059803-1-masahiroy@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C866680C03;
+	Wed, 21 Feb 2024 15:19:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708528770; cv=fail; b=rl2ljJmOi7dqttQMtKqSz6SMVMFZR/3OjZYXIJ48q9Z15ixplHB8EDYqiMc/gwjcMSqQKbrEfmYBk7310ouqmBkQ4Gu5umlgiYIUNQuP/MbNxh69Tf0UMtEvVNfGI805QVRe7o5kEzcCvhr7z2juhfrK6Ee+2NfCzWI+3en1I/I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708528770; c=relaxed/simple;
+	bh=5S6Sx6VfbI+dSbyKx5wk3pqWaxNTwG5G1HrROPJvv4s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=jWCcatlSxJHbplmHf8eqy3IFIq4D2CapVNKm/rtbXG5KYisHmynkxzbg+WFEz5ye4R1O8IELwhWox6JL3LMXBQW6pc2NCO2lNaQ6gLzTpxlH1PYKDl0u2jSKTFO+KLqnzL0/m8RGlB6ZuHiafMw1joVxeImDhiFG3dZFdgZyEOk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=NlhitgrT; arc=fail smtp.client-ip=40.107.236.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ORGuw/F/13YkCX3hGnkRUnYP6zzoNn+s/I6tJKP5tAFpAA5TIIMPLdlh4xnpMwsrRvN/DpoQQWB9Ha4z+MaNOx1VlaKiaenJ1VzdXJMjtFGS7Cc74tUNpUbJ+YxNrlJLaA4ZSE3caLZEw3gFdH8SBE/Tlxun8OJ4wP7ZjmZpQAe8UDz8yHnzIB5mS0HrsmdmBCO67jcbTG9e4uLjbmNU/frLKfJKnUbZaNcaw2EV6ZA/y5rrJljrDeXnYJKtTtEH9ll+YCTvSzURPCX47ROQaujdaDNmP46vNopmK/kPGTooF+ploEpgKMQwjE/EIQfBre/G04RS2l+t3Q7BXAeQ5g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rs1hDv/XmSFfX4I9cNghM7Duy8+QAhxL+BINxyhCKd8=;
+ b=EbIuZdITj/uRa9gCPEv+HQCFCmFN4XdaRgpOny0peXhIcVh+VYUZoKG1ka/1P0+hJv2Y2Mo7h395w9ahoLT/o/G7nKslwkUKElCOA9eo5m+mTIw0he4MXF+H4R6KAwi2SBDwl0kVhAvlspncDKs5HItlc5xwO9KcN5BpDAFdgafK2Pz7EMUoGl++XwPwjlbA/95Bv57hA4pezgjMk7ssxY89uGz/aAG/jkRLDOaXqdGyVOeytUOqF+9Bxw0KLZk22hFF9Sb9Oo9/tknScjZj083bIVepRH68ZeHgN5f9gngfuXOtXBnN9/LVzo4q5S9GnTkLLjFItND86qTZeEYjdQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rs1hDv/XmSFfX4I9cNghM7Duy8+QAhxL+BINxyhCKd8=;
+ b=NlhitgrTezkHsTASViztx0l3KADbnD00Oku5gaW4BjPGYWvy2CTHv/IMWz68eguXeSf92bP2rnPJvuvWAxq+bUpmN7RcUvkL+MM32FkgzbSqa2f4z2/K2LgtCXp8UPSBzp94kLCsX409ejwJL7sew4xevX7G2Bm7/76DU55wi5o47+8skSxVEUCdjGNQB+MHfPLHLV0fBVgLe5D6214m0kG1JyB+X6HVhpZ+UW2wqskLWfHTefjs+22wLEL09rfFj3PVUfdbFJ5sqgS9Q5CJWjWiKn7mqmUAAbG6HxkIGcGW/F0OnopLlkUMICjKWUdXlrGWzwOjkbMWMW6X1BODWg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by IA1PR12MB7496.namprd12.prod.outlook.com (2603:10b6:208:418::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.22; Wed, 21 Feb
+ 2024 15:19:24 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::96dd:1160:6472:9873]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::96dd:1160:6472:9873%6]) with mapi id 15.20.7316.023; Wed, 21 Feb 2024
+ 15:19:24 +0000
+Date: Wed, 21 Feb 2024 11:19:23 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Yi Liu <yi.l.liu@intel.com>
+Cc: joro@8bytes.org, kevin.tian@intel.com, baolu.lu@linux.intel.com,
+	alex.williamson@redhat.com, robin.murphy@arm.com,
+	eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
+	chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
+	iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, zhenzhong.duan@intel.com,
+	joao.m.martins@oracle.com
+Subject: Re: [PATCH rc 3/8] iommu/vt-d: Add missing iotlb flush for parent
+ domain
+Message-ID: <20240221151923.GU13330@nvidia.com>
+References: <20240208082307.15759-1-yi.l.liu@intel.com>
+ <20240208082307.15759-4-yi.l.liu@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240208082307.15759-4-yi.l.liu@intel.com>
+X-ClientProxiedBy: BL0PR02CA0137.namprd02.prod.outlook.com
+ (2603:10b6:208:35::42) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="5qX+0rpWSE2BInwC"
-Content-Disposition: inline
-In-Reply-To: <20240217055504.2059803-1-masahiroy@kernel.org>
-X-Operating-System: Debian GNU/Linux trixie/sid
-Jabber-ID: nicolas@jabber.no
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|IA1PR12MB7496:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7f860cb4-23b4-452d-82ee-08dc32f07c6b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	r5y4RnNsPU7es/Hx1xDz4GpHevxyUBcxT+mLcJa3OczOJ/b3fEDBqXUAZ1iRTl+rAhJgVv2bZKEc75VKNIG60MEpUnBvs8Fm979KGXQvxQTediaPdn34aMoPNta3Wy4ZX6RUp7wsodLu5PhNH5sLB57V3EFFCwKRiX1ZObtRfNIg2SFd4iRJD/okX0tblZ/4Q8OiQ2pu33x6toxV4dY7tj8f/SWBQgmoqTYS7dBqdnbd+p+HuYjtqKPmhzMvfV2PDGOAjbjnOzuvHSOHG8C0+b8s9LMfsEKcboFC5Xy9QOwyVj1cgpWfxinJdl4ARQt6tBabgxW+iTDdLWvchYi00hVst8yvWHp7v9uTJhvhxUeFQBpj7Sl5TKkn3zBGEoFpmwkohF2EpEZcSk5BVs8HPWFhrccRXqkL5Pb1X3r2kSd0beC15kmyQNoO9TNpTxRY2Zmg3b101lImwvfRYc3YVFusGRCap4HqvaiWwtcXG9yiWhZORAQPjHiko6GA5Q3zKzslWcB+WFmAAcD15BdLJ6EsW/yPcCCvqUYgaGRfjKY=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?/rgIpN7P0XxjfAInPjoSJwjaN/0T3yUxX/Ea2w8X/oSUvcZ1FEUquMW6cZcM?=
+ =?us-ascii?Q?HYeCQ4mpf8Jvq1U9cmTs/uftz3LhO5MYfTed+p6tvI0VCGZoCoFPE93aJBQ5?=
+ =?us-ascii?Q?+nF7GwqPo148oE5SKPPpiqK3hG4dstiLMuyDNz9sCWHQo9cyAgsMOi/VoZNp?=
+ =?us-ascii?Q?f4+5fPqRmGqJMafcFH04f0fjPICDCjE2xF83J+Jo98kNuVwH37xGZz6rFvoW?=
+ =?us-ascii?Q?KD87G65Y/vbPF16yq68uyCE7fmg6PttudK0QBUPKOkDrXuHiHxftHQE35l11?=
+ =?us-ascii?Q?fgnQs8FX9scLkLrOWRQ262k3CHqK03LXnoxCc90T6Kp30Lkglhif9FW1m+gY?=
+ =?us-ascii?Q?3S/6ymEojujMAmcySnbLs2c/c7hRHUl53RgcewVbxJ5IsmJG4b6xoSFpRsJn?=
+ =?us-ascii?Q?y0hABZ4qcChJiKr6y6xHdxV6sj3A3BtqmP3dgYGH7Oplheh4Muyx+T7HWwQu?=
+ =?us-ascii?Q?uoT16groX7aYJFfSPkMHyPU9/I5auzacDDjmqGMQpgCKFacynu/YvWPiKw7k?=
+ =?us-ascii?Q?CDz+ZlwQKeyqjMXZ1V348LQjlZnK/TsXoi3xHIlS1aD+UrBjVdWJ6SRSses0?=
+ =?us-ascii?Q?8s/SS5dLXV6R20DzofSIxZl0Y1BUUQ42VLjxATpBFPXt1X3aXDxWC6MEhcoj?=
+ =?us-ascii?Q?nmrix0kOJz3YlDoc3aWLwDdzsYq1YBw7fELjaJ7ywnp6qG6N061FMA0ioQPe?=
+ =?us-ascii?Q?JkG2NH2bKbxXUk73RwxFUctwjWooH0KVNbnGqZ58ffH6IPOHUGHbyxyq6HGI?=
+ =?us-ascii?Q?1iejQMrdKozklmbd4UqfLcmpusQayvuJ+VLFSdmPXHgHhkpHlNEHC6HjSwFw?=
+ =?us-ascii?Q?Ig9Je39Uw08GI2yGo0wvnpE4IHUJT5NSkDoLFeAcrnkW/47OG+9uwXcRvYUN?=
+ =?us-ascii?Q?D72jc8qlG0q1tPtwfdhp3jXq4P72qrGnHP++w9smZ3rEfZmThnkiFMj5o6zm?=
+ =?us-ascii?Q?3nbqhJuRzcnqkb27CzSxFKuCVRkVMRyIrjVeXo09G6rCm/zbrO5pYLvC9HyL?=
+ =?us-ascii?Q?xMX6NhqDW5doel0a+Ndya/RhEaa2yjcIBqqBmhfFqVM00OxHM2VazW1MmSAS?=
+ =?us-ascii?Q?3YKCmSjTSzPNtWBXyGC/ZMYAcVO0lT47q2CEU39sbsgsXgLW2eizLri9FcyG?=
+ =?us-ascii?Q?qvw/Soy6eLn+oJjwqywFW4vPK9++j7IyEHAHH2qjhQtad/c6dBdSF6R3shgL?=
+ =?us-ascii?Q?DjIItl7UyF0JfQYkNAsU7IsCJmMLM2dVwT1mUWIHqFGUobFws++H8EOwh4bu?=
+ =?us-ascii?Q?vV0BCrgP9lsasM6VtlzueArd8KdEUwjsh1hbmp8o54dK9GPV5FGmeNnBFl2v?=
+ =?us-ascii?Q?tTDsPy96FnMNAP9kJdzjijlHk+24daxs2SxYD347ehgam950fYyp684UWTDG?=
+ =?us-ascii?Q?rvGvN2bQiLKnR2dBnbzt06/TTZ15bRkmMDmzUYJblZeZ67ztb7FnOvoDI3T/?=
+ =?us-ascii?Q?3hWvZNIa+PbmV1ucYSz5bLC65kfFz/sA6dQ4VmoguKsojEjbt4PemMQhrR/G?=
+ =?us-ascii?Q?d25q+LJ9skJLJMzarH13+MUdqSSJc+SvjCR2X+1FXDfSG8o8W73JjTTJ/xoN?=
+ =?us-ascii?Q?g59YX7vr4ZSDvpfE1TcJWGK3/NTY0uKWvsasLppX?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7f860cb4-23b4-452d-82ee-08dc32f07c6b
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Feb 2024 15:19:24.2154
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 110qp9czq1osFlwZB1qts24y/sEk3WE1cjS9Aoiabzjt0ulCn9Uu6OkPtw/QzmfJ
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB7496
 
+On Thu, Feb 08, 2024 at 12:23:02AM -0800, Yi Liu wrote:
+> If a domain is used as the parent in nested translation its mappings might
+> be cached using DID of the nested domain. But the existing code ignores
+> this fact to only invalidate the iotlb entries tagged by the domain's own
+> DID.
 
---5qX+0rpWSE2BInwC
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> Loop the s1_domains list, if any, to invalidate all iotlb entries related
+> to the target s2 address range. According to VT-d spec there is no need for
+> software to explicitly flush the affected s1 cache. It's implicitly done by
+> HW when s2 cache is invalidated.
 
-On Sat 17 Feb 2024 14:55:03 GMT, Masahiro Yamada wrote:
-> Commit 54b8ae66ae1a ("kbuild: change *FLAGS_<basetarget>.o to take the
-> path relative to $(obj)") changed the syntax of per-file compiler flags.
->=20
-> The situation is the same for the following variables:
->=20
->   OBJECT_FILES_NON_STANDARD_<basetarget>.o
->   GCOV_PROFILE_<basetarget>.o
->   KASAN_SANITIZE_<basetarget>.o
->   KMSAN_SANITIZE_<basetarget>.o
->   KMSAN_ENABLE_CHECKS_<basetarget>.o
->   UBSAN_SANITIZE_<basetarget>.o
->   KCOV_INSTRUMENT_<basetarget>.o
->   KCSAN_SANITIZE_<basetarget>.o
->   KCSAN_INSTRUMENT_BARRIERS_<basetarget>.o
->=20
-> The <basetarget> is the filename of the target with its directory and
-> suffix stripped.
->=20
-> This syntax comes into a trouble when two files with the same basename
-> appear in one Makefile, for example:
->=20
->   obj-y +=3D dir1/foo.o
->   obj-y +=3D dir2/foo.o
->   OBJECT_FILES_NON_STANDARD_foo.o :=3D y
->=20
-> OBJECT_FILES_NON_STANDARD_foo.o is applied to both dir1/foo.o and
-> dir2/foo.o. This syntax is not flexbile enough to handle cases where
-> one of them is a standard object, but the other is not.
->=20
-> It is more sensible to use the relative path to the Makefile, like this:
->=20
->   obj-y +=3D dir1/foo.o
->   OBJECT_FILES_NON_STANDARD_dir1/foo.o :=3D y
->   obj-y +=3D dir2/foo.o
->   OBJECT_FILES_NON_STANDARD_dir2/foo.o :=3D y
->=20
-> To maintain the current behavior, I made adjustments to two Makefiles:
->=20
->  - arch/x86/entry/vdso/Makefile, which compiles vclock_gettime.o and
->    vdso32/vclock_gettime.o
->=20
->  - arch/x86/kvm/Makefile, which compiles vmx/vmenter.o and svm/vmenter.o
->=20
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> ---
->=20
->  arch/x86/entry/vdso/Makefile |  2 ++
->  arch/x86/kvm/Makefile        |  3 ++-
->  scripts/Makefile.build       |  2 +-
->  scripts/Makefile.lib         | 16 ++++++++--------
->  4 files changed, 13 insertions(+), 10 deletions(-)
->=20
-> diff --git a/arch/x86/entry/vdso/Makefile b/arch/x86/entry/vdso/Makefile
-> index 7a97b17f28b7..148adfdb2325 100644
-> --- a/arch/x86/entry/vdso/Makefile
-> +++ b/arch/x86/entry/vdso/Makefile
-> @@ -9,7 +9,9 @@ include $(srctree)/lib/vdso/Makefile
->  # Sanitizer runtimes are unavailable and cannot be linked here.
->  KASAN_SANITIZE			:=3D n
->  KMSAN_SANITIZE_vclock_gettime.o :=3D n
-> +KMSAN_SANITIZE_vdso32/vclock_gettime.o	:=3D n
->  KMSAN_SANITIZE_vgetcpu.o	:=3D n
-> +KMSAN_SANITIZE_vdso32/vgetcpu.o	:=3D n
-> =20
->  UBSAN_SANITIZE			:=3D n
->  KCSAN_SANITIZE			:=3D n
-> diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-> index 475b5fa917a6..a88bb14266b6 100644
-> --- a/arch/x86/kvm/Makefile
-> +++ b/arch/x86/kvm/Makefile
-> @@ -4,7 +4,8 @@ ccflags-y +=3D -I $(srctree)/arch/x86/kvm
->  ccflags-$(CONFIG_KVM_WERROR) +=3D -Werror
-> =20
->  ifeq ($(CONFIG_FRAME_POINTER),y)
-> -OBJECT_FILES_NON_STANDARD_vmenter.o :=3D y
-> +OBJECT_FILES_NON_STANDARD_vmx/vmenter.o :=3D y
-> +OBJECT_FILES_NON_STANDARD_svm/vmenter.o :=3D y
->  endif
-> =20
->  include $(srctree)/virt/kvm/Makefile.kvm
-> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-> index 4971f54c855e..256db2a0e984 100644
-> --- a/scripts/Makefile.build
-> +++ b/scripts/Makefile.build
-> @@ -214,7 +214,7 @@ endif # CONFIG_FTRACE_MCOUNT_USE_RECORDMCOUNT
->  # 'OBJECT_FILES_NON_STANDARD_foo.o :=3D 'y': skip objtool checking for a=
- file
->  # 'OBJECT_FILES_NON_STANDARD_foo.o :=3D 'n': override directory skip for=
- a file
-> =20
-> -is-standard-object =3D $(if $(filter-out y%, $(OBJECT_FILES_NON_STANDARD=
-_$(basetarget).o)$(OBJECT_FILES_NON_STANDARD)n),y)
-> +is-standard-object =3D $(if $(filter-out y%, $(OBJECT_FILES_NON_STANDARD=
-_$(target-stem).o)$(OBJECT_FILES_NON_STANDARD)n),y)
-> =20
->  $(obj)/%.o: objtool-enabled =3D $(if $(is-standard-object),$(if $(delay-=
-objtool),$(is-single-obj-m),y))
-> =20
-> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-> index b35d39022a30..328c0d77ed48 100644
-> --- a/scripts/Makefile.lib
-> +++ b/scripts/Makefile.lib
-> @@ -154,7 +154,7 @@ _cpp_flags     =3D $(KBUILD_CPPFLAGS) $(cppflags-y) $=
-(CPPFLAGS_$(target-stem).lds)
->  #
->  ifeq ($(CONFIG_GCOV_KERNEL),y)
->  _c_flags +=3D $(if $(patsubst n%,, \
-> -		$(GCOV_PROFILE_$(basetarget).o)$(GCOV_PROFILE)$(CONFIG_GCOV_PROFILE_AL=
-L)), \
-> +		$(GCOV_PROFILE_$(target-stem).o)$(GCOV_PROFILE)$(CONFIG_GCOV_PROFILE_A=
-LL)), \
->  		$(CFLAGS_GCOV))
->  endif
-> =20
-> @@ -165,29 +165,29 @@ endif
->  ifeq ($(CONFIG_KASAN),y)
->  ifneq ($(CONFIG_KASAN_HW_TAGS),y)
->  _c_flags +=3D $(if $(patsubst n%,, \
-> -		$(KASAN_SANITIZE_$(basetarget).o)$(KASAN_SANITIZE)y), \
-> +		$(KASAN_SANITIZE_$(target-stem).o)$(KASAN_SANITIZE)y), \
->  		$(CFLAGS_KASAN), $(CFLAGS_KASAN_NOSANITIZE))
->  endif
->  endif
-> =20
->  ifeq ($(CONFIG_KMSAN),y)
->  _c_flags +=3D $(if $(patsubst n%,, \
-> -		$(KMSAN_SANITIZE_$(basetarget).o)$(KMSAN_SANITIZE)y), \
-> +		$(KMSAN_SANITIZE_$(target-stem).o)$(KMSAN_SANITIZE)y), \
->  		$(CFLAGS_KMSAN))
->  _c_flags +=3D $(if $(patsubst n%,, \
-> -		$(KMSAN_ENABLE_CHECKS_$(basetarget).o)$(KMSAN_ENABLE_CHECKS)y), \
-> +		$(KMSAN_ENABLE_CHECKS_$(target-stem).o)$(KMSAN_ENABLE_CHECKS)y), \
->  		, -mllvm -msan-disable-checks=3D1)
->  endif
-> =20
->  ifeq ($(CONFIG_UBSAN),y)
->  _c_flags +=3D $(if $(patsubst n%,, \
-> -		$(UBSAN_SANITIZE_$(basetarget).o)$(UBSAN_SANITIZE)$(CONFIG_UBSAN_SANIT=
-IZE_ALL)), \
-> +		$(UBSAN_SANITIZE_$(target-stem).o)$(UBSAN_SANITIZE)$(CONFIG_UBSAN_SANI=
-TIZE_ALL)), \
->  		$(CFLAGS_UBSAN))
->  endif
-> =20
->  ifeq ($(CONFIG_KCOV),y)
->  _c_flags +=3D $(if $(patsubst n%,, \
-> -	$(KCOV_INSTRUMENT_$(basetarget).o)$(KCOV_INSTRUMENT)$(CONFIG_KCOV_INSTR=
-UMENT_ALL)), \
-> +	$(KCOV_INSTRUMENT_$(target-stem).o)$(KCOV_INSTRUMENT)$(CONFIG_KCOV_INST=
-RUMENT_ALL)), \
->  	$(CFLAGS_KCOV))
->  endif
-> =20
-> @@ -197,12 +197,12 @@ endif
->  #
->  ifeq ($(CONFIG_KCSAN),y)
->  _c_flags +=3D $(if $(patsubst n%,, \
-> -	$(KCSAN_SANITIZE_$(basetarget).o)$(KCSAN_SANITIZE)y), \
-> +	$(KCSAN_SANITIZE_$(target-stem).o)$(KCSAN_SANITIZE)y), \
->  	$(CFLAGS_KCSAN))
->  # Some uninstrumented files provide implied barriers required to avoid f=
-alse
->  # positives: set KCSAN_INSTRUMENT_BARRIERS for barrier instrumentation o=
-nly.
->  _c_flags +=3D $(if $(patsubst n%,, \
-> -	$(KCSAN_INSTRUMENT_BARRIERS_$(basetarget).o)$(KCSAN_INSTRUMENT_BARRIERS=
-)n), \
-> +	$(KCSAN_INSTRUMENT_BARRIERS_$(target-stem).o)$(KCSAN_INSTRUMENT_BARRIER=
-S)n), \
->  	-D__KCSAN_INSTRUMENT_BARRIERS__)
->  endif
-> =20
-> --=20
-> 2.40.1
->=20
+I had to look this up to understand what it means.. The HW caches
+per-DID and if you invalidate the DID's S2 then the HW flushes the S1
+as well within that DID only.
 
-Looks good to me!
+It doesn't mean that the S2 is globally shared across all the nesting
+translations (like ARM does), and you still have to iterate over every
+nesting DID.
 
-Reviewed-by: Nicolas Schier <nicolas@fjasle.eu>
+In light of that this design seems to have gone a bit off..
 
---5qX+0rpWSE2BInwC
-Content-Type: application/pgp-signature; name="signature.asc"
+A domain should have a list of places that need invalidation,
+specifically a list of DIDs and ATCs that need an invalidation to be
+issued.
 
------BEGIN PGP SIGNATURE-----
+Instead we now somehow have 4 different lists in the domain the
+invalidation code iterates over?
 
-iQIzBAABCAAdFiEEh0E3p4c3JKeBvsLGB1IKcBYmEmkFAmXWEqMACgkQB1IKcBYm
-Emmh5RAAsoH93ItGYSneI0D+OnqwrEyqw11ht+RFBPgQbdR3fN014CVhL5A9B1EG
-1Qa5v+IiOzX5p4kykduJchoYFpuZKBcimTOsTLnhp/QL8vfdR1mmiVHaKg3hhjUi
-NiEdFeeV2kWNzPf5jfIltmdiNTDyfR/nGiohEwgq+x9jq6uf05u/iPmFBgflw62o
-nGR7xu2dyM0+OntMX7LoMeZ5uSjwWeRiBX0czE8aJjp4iOCgDHle/JS9k2VQCgeS
-YPyyuRaSvKQg6arUFeYSGFjiN7fWw/WYVeDSkQPIUl/W7VzFfj0EfuIysN/b0Hzu
-cV0jkEP720Ytd4nDIWVgea1H1hsElKTU3N7sk4CfhOkIlkrU+2ARIE0bwbHLt6mZ
-I1HmPBBQoPlype+MwIzVP0YnRKjjDCoL0EecKL2mcGUY0W3g0lDbp2HXIeJ8rzt2
-c5BlEOo1SeX4xC3yMYXcpIQGFl1x8u3/RuY5jqeCryvJxvSwSwPWrRF66VG2ldmS
-3+ni4ydMpAd14E7cqnOqXpWr5k7Ygt3NLBN4RTYHkEmQgI2suPXxPS2AmzwL7hJm
-dmF1MIi+Qu2muEgCLqp04SnzXG5oDscWrDWdkxd+n2FLBFLWgBcsdQc+ozfzm/i8
-KtKHUMwHc4Xy2NDLthAciVxWbgf6UnRwuZhO4WPEEJ6Xb2pJyhQ=
-=409f
------END PGP SIGNATURE-----
+So I would think this:
 
---5qX+0rpWSE2BInwC--
+struct dmar_domain {
+	struct xarray iommu_array;	/* Attached IOMMU array */
+	struct list_head devices;	/* all devices' list */
+	struct list_head dev_pasids;	/* all attached pasids */
+	struct list_head s1_domains;
+
+Would make sense to be collapsed into one logical list of attached
+devices:
+
+struct intel_iommu_domain_attachment {
+   unsigned int did;
+   ioasid_t pasid;
+   struct device_domain_info *info;
+   list_head item;
+};
+
+When you attach a S1/S2 nest you allocate two of the above structs and
+one is linked on the S1 and one is linked on the S2..
+
+Jason
 
