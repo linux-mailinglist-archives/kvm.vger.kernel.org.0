@@ -1,154 +1,124 @@
-Return-Path: <kvm+bounces-9234-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9235-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAB2285CD9F
-	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 02:58:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AC45E85CDB3
+	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 03:05:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 774A61F245C1
-	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 01:58:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C8751F2587F
+	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 02:05:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6680E522C;
-	Wed, 21 Feb 2024 01:58:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CB1479E2;
+	Wed, 21 Feb 2024 02:04:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="sbiMOEKn"
 X-Original-To: kvm@vger.kernel.org
-Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC4BE468F
-	for <kvm@vger.kernel.org>; Wed, 21 Feb 2024 01:58:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.164.118
+Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3060C566A;
+	Wed, 21 Feb 2024 02:04:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708480717; cv=none; b=dTHg/0ordRA91M/0ioT5Q89lUalhsEnjGk3vaEvK2qaYj94akUg3+b/GiPmZjyXzDM3EVhIaCuzsURPsD0Nk8Uj/d+hkdlRYXOm6r2n8HDd686IS+VTSxkheMHtTTOhxDwyQZQYMhzJtkIuTHndQODxAO9a7ir8olUuz0oTGsuU=
+	t=1708481094; cv=none; b=VDY3JThvtujuGnnnhjDZKoebxQt907BsZZisx6U1NKYdL4/LFT7OMTyYO3npp1KwaggbgwcnhzPQCDV0SSUqgLp8VWF1sEkiD/ZwhF0C/uZNJ1vhJs5PUFenMzLzo15V/DMlQy/ZEMbd+jsP6lEefEAajyaS5/27MN3YbvDMzbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708480717; c=relaxed/simple;
-	bh=GPNgCmEriHPSRBvUfjnhVQbqNUp9ph+ebPP9pJY831s=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=IxjeY3H/u9HvmstlldHa6KNd3MZj1D1y+oPkflkSWsLQL4fWU1YHaGJ0cRYEbevh7+CzE3f4ht3f+v6fFBQ6d3ogi85yYVoGD44vdfv5wyFXAISMfrwzYA1y9a5sMzw6pF9ucr+0ARVR40re6QwI5+rNT6ZwmqybtKxGihk++Qc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=162.243.164.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
-Received: from duchao$eswincomputing.com ( [10.64.113.11] ) by
- ajax-webmail-app2 (Coremail) ; Wed, 21 Feb 2024 09:54:59 +0800 (GMT+08:00)
-Date: Wed, 21 Feb 2024 09:54:59 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: "Chao Du" <duchao@eswincomputing.com>
-To: "Anup Patel" <apatel@ventanamicro.com>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, anup@brainfault.org, 
-	atishp@atishpatra.org, pbonzini@redhat.com, shuah@kernel.org, 
-	dbarboza@ventanamicro.com, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, duchao713@qq.com
-Subject: Re: [PATCH v1 1/3] RISC-V: KVM: Implement
- kvm_arch_vcpu_ioctl_set_guest_debug()
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT6.0.3 build 20220420(169d3f8c)
- Copyright (c) 2002-2024 www.mailtech.cn
- mispb-72143050-eaf5-4703-89e0-86624513b4ce-eswincomputing.com
-In-Reply-To: <CAK9=C2XAEDfac+GQTD3jE2RLR+5ngNPedEE_G6tL4e2KByUZ1w@mail.gmail.com>
-References: <20240206074931.22930-1-duchao@eswincomputing.com>
- <20240206074931.22930-2-duchao@eswincomputing.com>
- <CAK9=C2VZ1t3ctTWKiqeKOALjLh0kJgzVEsZvM=xfc2j7yQOEcQ@mail.gmail.com>
- <4a5a30cd.18c.18dc4734699.Coremail.duchao@eswincomputing.com>
- <CAK9=C2XAEDfac+GQTD3jE2RLR+5ngNPedEE_G6tL4e2KByUZ1w@mail.gmail.com>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	s=arc-20240116; t=1708481094; c=relaxed/simple;
+	bh=ORbxc1aLPAjWIc3vkR5GtdqUtX005SNYWEsxv9OAOk8=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=I2WwqGHMgkKBchRCY5FkxBw66RzZcOvvW/W3M0WOgz/17siDBvNFQbc2xYMdGuxoFxCw7O37+QufNbYFw9WFiiechoEIDYLdn/l2LlO66Njero0F/k1oSszpSFkICQ5e0abrynF9DX0qAXKvvlJgKhitUlhcYBelBHDT5tT0jgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=sbiMOEKn; arc=none smtp.client-ip=115.124.30.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1708481089; h=Message-ID:Subject:Date:From:To;
+	bh=ORbxc1aLPAjWIc3vkR5GtdqUtX005SNYWEsxv9OAOk8=;
+	b=sbiMOEKn8YsHac7GFd2HpFkPp/HOfaG+QEE9BieQi/hhLVUhFJ7rmqrhU424MQvVrn0mxTjDTdk4MpsxcIzPFtU3cw3u/0GLit+rcLWYL1xhJZxH6osDXJHKl/q45G0sOC1B2Yb8vcCsOxJNeZQnoQCUxEIBetRhstw6k8N7NoE=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R921e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=36;SR=0;TI=SMTPD_---0W0yFyS._1708481086;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W0yFyS._1708481086)
+          by smtp.aliyun-inc.com;
+          Wed, 21 Feb 2024 10:04:47 +0800
+Message-ID: <1708481025.1893313-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH vhost 07/17] virtio: find_vqs: pass struct instead of multi parameters
+Date: Wed, 21 Feb 2024 10:03:45 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Halil Pasic <pasic@linux.ibm.com>
+Cc: Jason Wang <jasowang@redhat.com>,
+ virtualization@lists.linux.dev,
+ Richard Weinberger <richard@nod.at>,
+ Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+ Johannes Berg <johannes@sipsolutions.net>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Hans de Goede <hdegoede@redhat.com>,
+ =?utf-8?q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+ Vadim Pasternak <vadimp@nvidia.com>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Mathieu Poirier <mathieu.poirier@linaro.org>,
+ Cornelia Huck <cohuck@redhat.com>,
+ Eric Farman <farman@linux.ibm.com>,
+ Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Benjamin Berg <benjamin.berg@intel.com>,
+ Yang Li <yang.lee@linux.alibaba.com>,
+ linux-um@lists.infradead.org,
+ netdev@vger.kernel.org,
+ platform-driver-x86@vger.kernel.org,
+ linux-remoteproc@vger.kernel.org,
+ linux-s390@vger.kernel.org,
+ kvm@vger.kernel.org,
+ bpf@vger.kernel.org,
+ Halil Pasic <pasic@linux.ibm.com>
+References: <20240130114224.86536-1-xuanzhuo@linux.alibaba.com>
+ <20240130114224.86536-8-xuanzhuo@linux.alibaba.com>
+ <CACGkMEvb4N8kthr4qWXrLOh9v422OYhrYU6hQejusw-e5EacPw@mail.gmail.com>
+ <1706756442.5524123-1-xuanzhuo@linux.alibaba.com>
+ <20240220151815.5c867cce.pasic@linux.ibm.com>
+In-Reply-To: <20240220151815.5c867cce.pasic@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Message-ID: <61f5b01b.323.18dc95f8d58.Coremail.duchao@eswincomputing.com>
-X-Coremail-Locale: en_US
-X-CM-TRANSID:TQJkCgA3xtTzV9VlGt8QAA--.8727W
-X-CM-SenderInfo: xgxfxt3r6h245lqf0zpsxwx03jof0z/1tbiAgEODGXUxjMK5gACsr
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
 
-T24gMjAyNC0wMi0yMCAxMjo1NCwgQW51cCBQYXRlbCA8YXBhdGVsQHZlbnRhbmFtaWNyby5jb20+
-IHdyb3RlOgo+IAo+IE9uIFR1ZSwgRmViIDIwLCAyMDI0IGF0IDg6MzHigK9BTSBDaGFvIER1IDxk
-dWNoYW9AZXN3aW5jb21wdXRpbmcuY29tPiB3cm90ZToKPiA+Cj4gPiBPbiAyMDI0LTAyLTE0IDIx
-OjE5LCBBbnVwIFBhdGVsIDxhcGF0ZWxAdmVudGFuYW1pY3JvLmNvbT4gd3JvdGU6Cj4gPiA+Cj4g
-PiA+IE9uIFR1ZSwgRmViIDYsIDIwMjQgYXQgMToyMuKAr1BNIENoYW8gRHUgPGR1Y2hhb0Blc3dp
-bmNvbXB1dGluZy5jb20+IHdyb3RlOgo+ID4gPiA+Cj4gPiA+ID4ga3ZtX3ZtX2lvY3RsX2NoZWNr
-X2V4dGVuc2lvbigpOiBSZXR1cm4gMSBpZiBLVk1fQ0FQX1NFVF9HVUVTVF9ERUJVRyBpcwo+ID4g
-PiA+IGJlaW5nIGNoZWNrZWQuCj4gPiA+ID4KPiA+ID4gPiBrdm1fYXJjaF92Y3B1X2lvY3RsX3Nl
-dF9ndWVzdF9kZWJ1ZygpOiBVcGRhdGUgdGhlIGd1ZXN0X2RlYnVnIGZsYWdzCj4gPiA+ID4gZnJv
-bSB1c2Vyc3BhY2UgYWNjb3JkaW5nbHkuIFJvdXRlIHRoZSBicmVha3BvaW50IGV4Y2VwdGlvbnMg
-dG8gSFMgbW9kZQo+ID4gPiA+IGlmIHRoZSBWTSBpcyBiZWluZyBkZWJ1Z2dlZCBieSB1c2Vyc3Bh
-Y2UsIGJ5IGNsZWFyaW5nIHRoZSBjb3JyZXNwb25kaW5nCj4gPiA+ID4gYml0IGluIGhlZGVsZWcg
-Q1NSLgo+ID4gPiA+Cj4gPiA+ID4gU2lnbmVkLW9mZi1ieTogQ2hhbyBEdSA8ZHVjaGFvQGVzd2lu
-Y29tcHV0aW5nLmNvbT4KPiA+ID4gPiAtLS0KPiA+ID4gPiAgYXJjaC9yaXNjdi9pbmNsdWRlL3Vh
-cGkvYXNtL2t2bS5oIHwgIDEgKwo+ID4gPiA+ICBhcmNoL3Jpc2N2L2t2bS92Y3B1LmMgICAgICAg
-ICAgICAgfCAxNSArKysrKysrKysrKysrLS0KPiA+ID4gPiAgYXJjaC9yaXNjdi9rdm0vdm0uYyAg
-ICAgICAgICAgICAgIHwgIDEgKwo+ID4gPiA+ICAzIGZpbGVzIGNoYW5nZWQsIDE1IGluc2VydGlv
-bnMoKyksIDIgZGVsZXRpb25zKC0pCj4gPiA+ID4KPiA+ID4gPiBkaWZmIC0tZ2l0IGEvYXJjaC9y
-aXNjdi9pbmNsdWRlL3VhcGkvYXNtL2t2bS5oIGIvYXJjaC9yaXNjdi9pbmNsdWRlL3VhcGkvYXNt
-L2t2bS5oCj4gPiA+ID4gaW5kZXggZDZiN2E1Yjk1ODc0Li44ODkwOTc3ODM2ZjAgMTAwNjQ0Cj4g
-PiA+ID4gLS0tIGEvYXJjaC9yaXNjdi9pbmNsdWRlL3VhcGkvYXNtL2t2bS5oCj4gPiA+ID4gKysr
-IGIvYXJjaC9yaXNjdi9pbmNsdWRlL3VhcGkvYXNtL2t2bS5oCj4gPiA+ID4gQEAgLTE3LDYgKzE3
-LDcgQEAKPiA+ID4gPgo+ID4gPiA+ICAjZGVmaW5lIF9fS1ZNX0hBVkVfSVJRX0xJTkUKPiA+ID4g
-PiAgI2RlZmluZSBfX0tWTV9IQVZFX1JFQURPTkxZX01FTQo+ID4gPiA+ICsjZGVmaW5lIF9fS1ZN
-X0hBVkVfR1VFU1RfREVCVUcKPiA+ID4gPgo+ID4gPiA+ICAjZGVmaW5lIEtWTV9DT0FMRVNDRURf
-TU1JT19QQUdFX09GRlNFVCAxCj4gPiA+ID4KPiA+ID4gPiBkaWZmIC0tZ2l0IGEvYXJjaC9yaXNj
-di9rdm0vdmNwdS5jIGIvYXJjaC9yaXNjdi9rdm0vdmNwdS5jCj4gPiA+ID4gaW5kZXggYjVjYTlm
-MmU5OGFjLi42Y2VlOTc0NTkyYWMgMTAwNjQ0Cj4gPiA+ID4gLS0tIGEvYXJjaC9yaXNjdi9rdm0v
-dmNwdS5jCj4gPiA+ID4gKysrIGIvYXJjaC9yaXNjdi9rdm0vdmNwdS5jCj4gPiA+ID4gQEAgLTQ3
-NSw4ICs0NzUsMTkgQEAgaW50IGt2bV9hcmNoX3ZjcHVfaW9jdGxfc2V0X21wc3RhdGUoc3RydWN0
-IGt2bV92Y3B1ICp2Y3B1LAo+ID4gPiA+ICBpbnQga3ZtX2FyY2hfdmNwdV9pb2N0bF9zZXRfZ3Vl
-c3RfZGVidWcoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LAo+ID4gPiA+ICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICBzdHJ1Y3Qga3ZtX2d1ZXN0X2RlYnVnICpkYmcpCj4gPiA+
-ID4gIHsKPiA+ID4gPiAtICAgICAgIC8qIFRPRE87IFRvIGJlIGltcGxlbWVudGVkIGxhdGVyLiAq
-Lwo+ID4gPiA+IC0gICAgICAgcmV0dXJuIC1FSU5WQUw7Cj4gPiA+ID4gKyAgICAgICBpZiAoZGJn
-LT5jb250cm9sICYgS1ZNX0dVRVNUREJHX0VOQUJMRSkgewo+ID4gPiA+ICsgICAgICAgICAgICAg
-ICBpZiAodmNwdS0+Z3Vlc3RfZGVidWcgIT0gZGJnLT5jb250cm9sKSB7Cj4gPiA+ID4gKyAgICAg
-ICAgICAgICAgICAgICAgICAgdmNwdS0+Z3Vlc3RfZGVidWcgPSBkYmctPmNvbnRyb2w7Cj4gPiA+
-ID4gKyAgICAgICAgICAgICAgICAgICAgICAgY3NyX2NsZWFyKENTUl9IRURFTEVHLCBCSVQoRVhD
-X0JSRUFLUE9JTlQpKTsKPiA+ID4gPiArICAgICAgICAgICAgICAgfQo+ID4gPiA+ICsgICAgICAg
-fSBlbHNlIHsKPiA+ID4gPiArICAgICAgICAgICAgICAgaWYgKHZjcHUtPmd1ZXN0X2RlYnVnICE9
-IDApIHsKPiA+ID4gPiArICAgICAgICAgICAgICAgICAgICAgICB2Y3B1LT5ndWVzdF9kZWJ1ZyA9
-IDA7Cj4gPiA+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgY3NyX3NldChDU1JfSEVERUxFRywg
-QklUKEVYQ19CUkVBS1BPSU5UKSk7Cj4gPiA+ID4gKyAgICAgICAgICAgICAgIH0KPiA+ID4gPiAr
-ICAgICAgIH0KPiA+ID4KPiA+ID4gVGhpcyBpcyBicm9rZW4gYmVjYXVzZSBkaXJlY3RseSBzZXR0
-aW5nIGJyZWFrcG9pbnQgZXhjZXB0aW9uIGRlbGVnYXRpb24KPiA+ID4gaW4gQ1NSIGFsc28gYWZm
-ZWN0cyBvdGhlciBWQ1BVcyBydW5uaW5nIG9uIHRoZSBzYW1lIGhvc3QgQ1BVLgo+ID4gPgo+ID4g
-PiBUbyBhZGRyZXNzIHRoZSBhYm92ZSwgd2Ugc2hvdWxkIGRvIHRoZSBmb2xsb3dpbmc6Cj4gPiA+
-IDEpIEFkZCAidW5zaWduZWQgbG9uZyBoZWRlbGVnIiBpbiAic3RydWN0IGt2bV92Y3B1X2NvbmZp
-ZyIgd2hpY2gKPiA+ID4gICAgaXMgcHJlLWluaXRpYWxpemVkIGluIGt2bV9yaXNjdl92Y3B1X3Nl
-dHVwX2NvbmZpZygpIHdpdGhvdXQgc2V0dGluZwo+ID4gPiAgICBFWENfQlJFQUtQT0lOVCBiaXQu
-Cj4gPiA+IDIpIFRoZSBrdm1fYXJjaF92Y3B1X2lvY3RsX3NldF9ndWVzdF9kZWJ1ZygpIHNob3Vs
-ZCBvbmx5IHNldC9jbGVhcgo+ID4gPiAgICAgRVhDX0JSRUFLUE9JTlQgYml0IGluICJoZWRlbGVn
-IiBvZiAic3RydWN0IGt2bV92Y3B1X2NvbmZpZyIuCj4gPiA+IDMpIFRoZSBrdm1fcmlzY3ZfdmNw
-dV9zd2FwX2luX2d1ZXN0X3N0YXRlKCkgbXVzdCB3cml0ZSB0aGUKPiA+ID4gICAgICBIRURFTEVH
-IGNzciBiZWZvcmUgZW50ZXJpbmcgdGhlIEd1ZXN0L1ZNLgo+ID4gPgo+ID4gPiBSZWdhcmRzLAo+
-ID4gPiBBbnVwCj4gPiA+Cj4gPgo+ID4gVGhhbmtzIGZvciB0aGUgcmV2aWV3IGFuZCBkZXRhaWxl
-ZCBzdWdnZXN0aW9uLgo+ID4gTWF5YmUgd2UgY291bGQgbWFrZSBpdCBhIGJpdCBlYXNpZXI6Cj4g
-PiAxKSBUaGUga3ZtX2FyY2hfdmNwdV9pb2N0bF9zZXRfZ3Vlc3RfZGVidWcoKSBvbmx5IHVwZGF0
-ZSB2Y3B1LT5ndWVzdF9kZWJ1Zwo+ID4gICAgYWNjb3JkaW5nbHkuCj4gPiAyKSBUaGUga3ZtX3Jp
-c2N2X3ZjcHVfc3dhcF9pbl9ndWVzdF9zdGF0ZSgpIGNoZWNrIHZjcHUtPmd1ZXN0X2RlYnVnIGFu
-ZAo+ID4gICAgc2V0L2NsZWFyIHRoZSBIRURFTEVHIGNzciBhY2NvcmRpbmdseS4KPiA+Cj4gPiBD
-b3VsZCB5b3UgY29uZmlybSBpZiB0aGlzIGlzIE9LPwo+IAo+IFlvdXIgc3VnZ2VzdGlvbiB3aWxs
-IHdvcmsgYnV0IGl0IGFkZHMgYW4gYWRkaXRpb25hbCAiaWYgKCkiIGNoZWNrIGluCj4ga3ZtX3Jp
-c2N2X3ZjcHVfc3dhcF9pbl9ndWVzdF9zdGF0ZSgpIHdoaWNoIGlzIGluIHRoZSBob3QgcGF0aC4K
-PiAKClllcywgaXQgbWFrZXMgc2Vuc2UuCkkgd2lsbCBwcmVwYXJlIGEgVjIgcGF0Y2guCgpUaGFu
-a3MsCkNoYW8KCj4gSSBhbSBzdGlsbCBsZWFuaW5nIHRvd2FyZHMgd2hhdCBJIHN1Z2dlc3RlZC4K
-PiAKPiBSZWdhcmRzLAo+IEFudXAKPiAKPiA+IElmIHllcywgSSB3aWxsIHBvc3QgYW5vdGhlciBy
-ZXZpc2lvbi4KPiA+Cj4gPiBSZWdhcmRzLAo+ID4gQ2hhbwo+ID4KPiA+ID4gPiArCj4gPiA+ID4g
-KyAgICAgICByZXR1cm4gMDsKPiA+ID4gPiAgfQo+ID4gPiA+Cj4gPiA+ID4gIHN0YXRpYyB2b2lk
-IGt2bV9yaXNjdl92Y3B1X3NldHVwX2NvbmZpZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCj4gPiA+
-ID4gZGlmZiAtLWdpdCBhL2FyY2gvcmlzY3Yva3ZtL3ZtLmMgYi9hcmNoL3Jpc2N2L2t2bS92bS5j
-Cj4gPiA+ID4gaW5kZXggY2U1OGJjNDhlNWI4Li43Mzk2Yjg2NTRmNDUgMTAwNjQ0Cj4gPiA+ID4g
-LS0tIGEvYXJjaC9yaXNjdi9rdm0vdm0uYwo+ID4gPiA+ICsrKyBiL2FyY2gvcmlzY3Yva3ZtL3Zt
-LmMKPiA+ID4gPiBAQCAtMTg2LDYgKzE4Niw3IEBAIGludCBrdm1fdm1faW9jdGxfY2hlY2tfZXh0
-ZW5zaW9uKHN0cnVjdCBrdm0gKmt2bSwgbG9uZyBleHQpCj4gPiA+ID4gICAgICAgICBjYXNlIEtW
-TV9DQVBfUkVBRE9OTFlfTUVNOgo+ID4gPiA+ICAgICAgICAgY2FzZSBLVk1fQ0FQX01QX1NUQVRF
-Ogo+ID4gPiA+ICAgICAgICAgY2FzZSBLVk1fQ0FQX0lNTUVESUFURV9FWElUOgo+ID4gPiA+ICsg
-ICAgICAgY2FzZSBLVk1fQ0FQX1NFVF9HVUVTVF9ERUJVRzoKPiA+ID4gPiAgICAgICAgICAgICAg
-ICAgciA9IDE7Cj4gPiA+ID4gICAgICAgICAgICAgICAgIGJyZWFrOwo+ID4gPiA+ICAgICAgICAg
-Y2FzZSBLVk1fQ0FQX05SX1ZDUFVTOgo+ID4gPiA+IC0tCj4gPiA+ID4gMi4xNy4xCj4gPiA+ID4K
-PiA+ID4gPgo+ID4gPiA+IC0tCj4gPiA+ID4ga3ZtLXJpc2N2IG1haWxpbmcgbGlzdAo+ID4gPiA+
-IGt2bS1yaXNjdkBsaXN0cy5pbmZyYWRlYWQub3JnCj4gPiA+ID4gaHR0cDovL2xpc3RzLmluZnJh
-ZGVhZC5vcmcvbWFpbG1hbi9saXN0aW5mby9rdm0tcmlzY3YKPiA+IC0tCj4gPiBrdm0tcmlzY3Yg
-bWFpbGluZyBsaXN0Cj4gPiBrdm0tcmlzY3ZAbGlzdHMuaW5mcmFkZWFkLm9yZwo+ID4gaHR0cDov
-L2xpc3RzLmluZnJhZGVhZC5vcmcvbWFpbG1hbi9saXN0aW5mby9rdm0tcmlzY3YK
+On Tue, 20 Feb 2024 15:18:15 +0100, Halil Pasic <pasic@linux.ibm.com> wrote:
+> On Thu, 1 Feb 2024 11:00:42 +0800
+> Xuan Zhuo <xuanzhuo@linux.alibaba.com> wrote:
+>
+> > > > And squish the parameters from transport to a structure.
+> > >
+> > > The patch did more than what is described here, it also switch to use
+> > > a structure for vring_create_virtqueue() etc.
+> > >
+> > > Is it better to split?
+> >
+> > Sure.
+>
+> I understand there will be a v2. From virtio-ccw perspective I have
+> no objections.
+
+The next version is v1.
+
+That is posted.
+
+http://lore.kernel.org/all/20240202093951.120283-8-xuanzhuo@linux.alibaba.com
+http://lore.kernel.org/all/20240202093951.120283-9-xuanzhuo@linux.alibaba.com
+
+Thanks.
+
+
+>
+> Regards,
+> Halil
 
