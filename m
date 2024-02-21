@@ -1,177 +1,300 @@
-Return-Path: <kvm+bounces-9237-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9238-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF1BD85CDBF
-	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 03:10:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 51C5485CDC8
+	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 03:13:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2C431C216E6
-	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 02:10:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74C9B1C22498
+	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 02:13:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A00A75CB5;
-	Wed, 21 Feb 2024 02:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D43D63CB;
+	Wed, 21 Feb 2024 02:13:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Fh5Q7uaR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LYuSwZmc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E92A522C
-	for <kvm@vger.kernel.org>; Wed, 21 Feb 2024 02:10:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EA3A4C7E;
+	Wed, 21 Feb 2024 02:13:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708481427; cv=none; b=psqeCt1hMbcfoa9jSTecd4dn0Flt/npy+XeirEHAqbCR+nXVbrXLAYt0mnSsIwoFcu9XzsGjJISl2WZtuKj1JEIyA46Tz6MA559DqCJWGCYZCqJQq//uUo7ho7pN0EPujOOEy3BAVeiOwUB8WooQm3frQVwsnyLtynXdkw90K2E=
+	t=1708481603; cv=none; b=fHhvsNHP3Ps5fwF1cKOkE9M6p/1Sqx+HpG9YGPKezftb09CR82zOSP8hGJI28BgWU2ucK5JK/Mi7mRDMjFdhO0h8xyxdytZ0OMs4Xo4FiEApYXwZAS5dGeGdNzw0A7vBZhSQ18pi7+kNc+zZ6eywyQsyKbAadQzlPU419o8bGd8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708481427; c=relaxed/simple;
-	bh=j41BACY3bbl0dJLSj+GBS3NKl9wXXB4Sfy90HrTAWok=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Fp0ubp5ZdiznfU82/avSaRvYksHeVCQdVAX+Oid2WY03bLiuyeCTw/rYpNHElqnB3GFBkqdtvHGOp5bepuXQcQ6GQjU8R37gZBg4NPntk1WKeyfjjM/ybpWtkauqNptdcEbs2Ekrp0hFK4Nuw8AYIGKfe/y+9cCMWqmFMmI08mM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Fh5Q7uaR; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-608835a1febso488407b3.2
-        for <kvm@vger.kernel.org>; Tue, 20 Feb 2024 18:10:26 -0800 (PST)
+	s=arc-20240116; t=1708481603; c=relaxed/simple;
+	bh=VwMMVl1TDHBJEglnXRiz983bQqb39w+JHkpeXQTsGPI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PNsrdqajlgXDvaf2eKG3ea4mpwjKsf6zH5Yzxl0BDNv4CE41NYu5nhPJsO2eakd99SPeAGxyzmZiPRruCeGEdXDb/X4wqmqMpSTqYJCkdk5FB5Sucj1nDCIx8eN5LTNMyg5Ljkj7DBToH8yIK6dgY0/Gck/IOYTxVrJ9A4wWUxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LYuSwZmc; arc=none smtp.client-ip=209.85.167.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-5129e5b8cecso5200132e87.3;
+        Tue, 20 Feb 2024 18:13:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708481425; x=1709086225; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gKDDhVDI/caWn5TUGufa5pdgsoyIgpZ0Gl6DWfyCRzw=;
-        b=Fh5Q7uaRUFyhtMNW/LtWAS/w+WBOcLEMJXBhLKAuHPSYjInNYEhTUihpZ2yiFyAZHn
-         HWQ4+EmST8/QVPjIgViS91TZ1aOp9x7m67izw+IuDv0gSQcRajNu4gAmDgRzi697Xa19
-         sHI10FUJS0qQO3+UDNad5Sg3Pff2zduqlGMkNs7zfk8LKvpe00olcm96sUxTsyTZxBEd
-         He2KSJzmtiQliVd8ndpOUiAGKFRzZ+F7NACHg76fzqdxzEOVqT5UVCrBF/F3zzrRrSkn
-         90cXg+VB/XEmQpWXbHRBiF3Uv1/VyIuqSER+FBmsXBEJ5QpgikyQ3Gjuo94dY9DkKzqm
-         yBnA==
+        d=gmail.com; s=20230601; t=1708481600; x=1709086400; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MyL4+gid2LCVkf5A3UEC4DDd5q5l+TxrzdeM+WtCs/s=;
+        b=LYuSwZmckOk46uGDqRs1PXLYiFDI1DBwTEIszXdHZTR+KrHx6xH3LGaDS6OOBMUQaY
+         yPPTYEo4O7vFdAEcXuBaBJcNzohUQigLFScoajC9Zta02rAoMVmJGjGILa83x3v8KyJL
+         8WP5DH4v0YpBDiUh9x65MCkejfusMrOsWQ690baVviZ8dCfiC0DS2c4BO9lYxqHJfOgl
+         sMk5u0RCdsICPUqzeE180el8e6f6dAhi+hiehGxn0T0zYM7U62MkR9yH1fY8vnJ9mnrf
+         0KcFv2MG01QJJM7uZCrNqvxCujM2IYm37AvWQt3DjXougKZWv4v223WiAGYQ6Hz2VwXo
+         VyNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708481425; x=1709086225;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gKDDhVDI/caWn5TUGufa5pdgsoyIgpZ0Gl6DWfyCRzw=;
-        b=eOSQY468JlnrGYlBw/uasZkXwjNrUVe1zHNVmXJQuY4kVVaMkeAcqFWYYbAKVe3yh+
-         Q0AklJ2lGA7UJWMCqhFj4/VLbysIMz1ovzK1ViQerJw5piI0n8YvFCdqdXN1o3hLU0KR
-         bRICXo+1cbVNyZGbWpsPghouAlQv+HrPkgRFyZ0APq8+it2//i3njH/0LqgP1TBPaMK3
-         X3FcEny9CPDNARRXvSKx2woKdWrADhgwAJwPZmR7S5kmCzsmxowdHb/I8rrbkb8XeGx6
-         iIrfONTUdDCWf8+aonfWHKdiPev68Rr8W8KO7enx/++ou3r0KXTxAFJ2me5OmcF9JDhm
-         Nk6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUZ3J2fajaV7yqARk5ImTXmm1NJsJDRv38EGMnga3jUdoGdXb4T9l707meppp4VAs5Hs7vLIiXfuwyqvvaBfOrx4mst
-X-Gm-Message-State: AOJu0YyLF1D+v5jLWnb9Msnd/Y14+fedjsJsue+lE1obneYPdVt4VY6k
-	+UDDK/ihHBlmXZnT6RQrSwIjln3P8Qz9z27456IyKirUGNjwU2HVn/xwF45Z6i8hjtFf+wtkxDj
-	BMg==
-X-Google-Smtp-Source: AGHT+IH9tDjvnpoECriK92ZpQJXMS185w6jocKSNJWnIH+QG97spJ9w+fd4S7cImLl0dsTHDcu1hSiv3D5k=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:494c:0:b0:608:72fe:b8a1 with SMTP id
- w73-20020a81494c000000b0060872feb8a1mr495006ywa.4.1708481425305; Tue, 20 Feb
- 2024 18:10:25 -0800 (PST)
-Date: Tue, 20 Feb 2024 18:10:23 -0800
-In-Reply-To: <ZdRMwdkz1enYIgBM@yzhao56-desk.sh.intel.com>
+        d=1e100.net; s=20230601; t=1708481600; x=1709086400;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MyL4+gid2LCVkf5A3UEC4DDd5q5l+TxrzdeM+WtCs/s=;
+        b=qB+r3KTArnoHJwh29F80kgqdpe3fek59vl4WcTTFLI2r1Yh5YHvfYhhbDs3/TK9wmV
+         aFAD8vXdR4watCSu5tjkQ4cu9juJQxaeg5L/raSe8PkowZu5FZt/ugfGEHW6kPwh9+fr
+         lgl8YQEZGXWEczR1mbILXYLf9f4txuaPpZlD5+M3CmuZ1Nyr2UBQa9iTGmu1TBufyIu3
+         ab022j+E5/AEvINicOZzJKHe2C+aaxiyxk9NUyVW/cq1cOkrV3iYOzKfkhT+MDvaWlyE
+         60M5e42d41kry9l/Y3Ev0RAa9R9Xn+GuGJQP6WhZ+OL3A13ny4hqtZVfBjPsJUvKv8qc
+         mtoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV+oSO/irR+cvqh7K2Q24Rdu/QHrfjVavF+48VNYB/ZMmxYMxc29We6e+jjBYfMQWNOpUATUhgS8j3HgMsA8m3dLdOxMR7Rt6fX2TmNYrSBGm7jbULuc6WASv8aLeh067ibIUkMKbHvX1x3hGbtN/G+Eg0nOo+pwOR0uXOiKzZFu4Lr
+X-Gm-Message-State: AOJu0YxbKQsyLGJRYrcnQU8hWCXrk2WIwZP79lejHqSCX/bNBYu+Ry4X
+	0yzeYmWRgFDatjDjId2B0GyeYic+foi6Tv/FgHI3V9NQ8ghsmZyVgLgLHcTTWBrQa/HNLahM/Ye
+	Yliep3ZBG1mEMthe4JvTmDxjMlJ0=
+X-Google-Smtp-Source: AGHT+IHRdTziSrABqkKvSI9ZOcTbR2Q3vrcU+ABOUUUq5c2+ia7YA91JhISWBunQmlRCXavtuJjiR/cXOesvX0Bn5yk=
+X-Received: by 2002:a05:6512:ba6:b0:512:bebf:1a with SMTP id
+ b38-20020a0565120ba600b00512bebf001amr3977383lfv.57.1708481599992; Tue, 20
+ Feb 2024 18:13:19 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240209222858.396696-1-seanjc@google.com> <20240209222858.396696-4-seanjc@google.com>
- <ZdLOjuCP2pDjhsJl@yzhao56-desk.sh.intel.com> <ZdOvttFKP1VVgrsA@google.com> <ZdRMwdkz1enYIgBM@yzhao56-desk.sh.intel.com>
-Message-ID: <ZdVbj1F_7UlX_eAy@google.com>
-Subject: Re: [PATCH v4 3/4] KVM: x86/mmu: Move slot checks from
- __kvm_faultin_pfn() to kvm_faultin_pfn()
-From: Sean Christopherson <seanjc@google.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Friedrich Weber <f.weber@proxmox.com>, Kai Huang <kai.huang@intel.com>, 
-	Yuan Yao <yuan.yao@linux.intel.com>, Xu Yilun <yilun.xu@linux.intel.com>, 
-	Yu Zhang <yu.c.zhang@linux.intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Fuad Tabba <tabba@google.com>, Michael Roth <michael.roth@amd.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, David Matlack <dmatlack@google.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <cover.1705916069.git.haibo1.xu@intel.com> <68856b86a93a4188558e5d0ebac0dd6aac8e404c.1705916069.git.haibo1.xu@intel.com>
+ <CAOnJCULwRTSnrQkR2o1P53R=tJ3TAxX+y+XRBesW6OFEzgFv2g@mail.gmail.com>
+In-Reply-To: <CAOnJCULwRTSnrQkR2o1P53R=tJ3TAxX+y+XRBesW6OFEzgFv2g@mail.gmail.com>
+From: Haibo Xu <xiaobo55x@gmail.com>
+Date: Wed, 21 Feb 2024 10:13:08 +0800
+Message-ID: <CAJve8om2oOLg5-wKX7m7cBTgzwqiMcb35x=nDi1edY8evXjyMw@mail.gmail.com>
+Subject: Re: [PATCH v5 11/12] KVM: riscv: selftests: Change vcpu_has_ext to a
+ common function
+To: Atish Patra <atishp@atishpatra.org>
+Cc: Haibo Xu <haibo1.xu@intel.com>, ajones@ventanamicro.com, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Anup Patel <anup@brainfault.org>, Guo Ren <guoren@kernel.org>, 
+	Mayuresh Chitale <mchitale@ventanamicro.com>, 
+	Daniel Henrique Barboza <dbarboza@ventanamicro.com>, Conor Dooley <conor.dooley@microchip.com>, 
+	Samuel Holland <samuel@sholland.org>, Minda Chen <minda.chen@starfivetech.com>, 
+	Jisheng Zhang <jszhang@kernel.org>, Sean Christopherson <seanjc@google.com>, Peter Xu <peterx@redhat.com>, 
+	Like Xu <likexu@tencent.com>, Vipin Sharma <vipinsh@google.com>, Thomas Huth <thuth@redhat.com>, 
+	Aaron Lewis <aaronlewis@google.com>, 
+	Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>, linux-kernel@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 20, 2024, Yan Zhao wrote:
-> On Mon, Feb 19, 2024 at 11:44:54AM -0800, Sean Christopherson wrote:
-> > If KVM is using TDP, but L1 is using shadow paging for L2, then routing through
-> > kvm_handle_noslot_fault() will incorrectly cache the gfn as MMIO, and create an
-> > MMIO SPTE.  Creating an MMIO SPTE is ok, but only because kvm_mmu_page_role.guest_mode
-> > ensure KVM uses different roots for L1 vs. L2.  But mmio_gfn will remain valid,
-> > and could (quite theoretically) cause KVM to incorrectly treat an L1 access to
-> > the private TSS or identity mapped page tables as MMIO.
-> Why would KVM treat L1 access to the private TSS and identity mapped page
-> tables as MMIO even though mmio_gfn is valid?
-
-Because KVM doesn't need to take an EPT Violation or Misconfig to trigger emulation,
-those just happen to be (by far) the most common ways KVM gets into the emulator
-on modern CPUs.
-
-> It looks that (for Intel platform) EPT for L1 will only install normal SPTEs
-> (non-MMIO SPTEs) for the two private slots, so there would not have EPT
-> misconfiguration and would not go to emulation path incorrectly.
-> Am I missing something?
-
-...
-
-> > --
-> > Subject: [PATCH] KVM: x86/mmu: Don't force emulation of L2 accesses to
-> >  non-APIC internal slots
-> > 
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+On Wed, Feb 21, 2024 at 7:03=E2=80=AFAM Atish Patra <atishp@atishpatra.org>=
+ wrote:
+>
+> On Mon, Jan 22, 2024 at 1:48=E2=80=AFAM Haibo Xu <haibo1.xu@intel.com> wr=
+ote:
+> >
+> > Move vcpu_has_ext to the processor.c and rename it to __vcpu_has_ext
+> > so that other test cases can use it for vCPU extension check.
+> >
+> > Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
+> > Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
 > > ---
-> >  arch/x86/kvm/mmu/mmu.c | 17 +++++++++++++----
-> >  1 file changed, 13 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index 488f522f09c6..4ce824cec5b9 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -4341,8 +4341,18 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
-> >  	if (slot && (slot->flags & KVM_MEMSLOT_INVALID))
-> >  		return RET_PF_RETRY;
-> >  
-> > -	if (!kvm_is_visible_memslot(slot)) {
-> > -		/* Don't expose private memslots to L2. */
-> > +	if (slot && slot->id == APIC_ACCESS_PAGE_PRIVATE_MEMSLOT) {
-> > +		/*
-> > +		 * Don't map L1's APIC access page into L2, KVM doesn't support
-> > +		 * using APICv/AVIC to accelerate L2 accesses to L1's APIC,
-> > +		 * i.e. the access needs to be emulated.  Emulating access to
-> > +		 * L1's APIC is also correct if L1 is accelerating L2's own
-> > +		 * virtual APIC, but for some reason L1 also maps _L1's_ APIC
-> > +		 * into L2.  Note, vcpu_is_mmio_gpa() always treats access to
-> > +		 * the APIC as MMIO.  Allow an MMIO SPTE to be created, as KVM
-> > +		 * uses different roots for L1 vs. L2, i.e. there is no danger
-> > +		 * of breaking APICv/AVIC for L1.
-> > +		 */
-> >  		if (is_guest_mode(vcpu)) {
-> >  			fault->slot = NULL;
-> >  			fault->pfn = KVM_PFN_NOSLOT;
-> Checking fault->is_private before calling kvm_handle_noslot_fault()?
+> >  tools/testing/selftests/kvm/include/riscv/processor.h |  2 ++
+> >  tools/testing/selftests/kvm/lib/riscv/processor.c     | 10 ++++++++++
+> >  tools/testing/selftests/kvm/riscv/get-reg-list.c      | 11 +----------
+> >  3 files changed, 13 insertions(+), 10 deletions(-)
+> >
+> > diff --git a/tools/testing/selftests/kvm/include/riscv/processor.h b/to=
+ols/testing/selftests/kvm/include/riscv/processor.h
+> > index b68b1b731a34..bd27e1c67579 100644
+> > --- a/tools/testing/selftests/kvm/include/riscv/processor.h
+> > +++ b/tools/testing/selftests/kvm/include/riscv/processor.h
+> > @@ -42,6 +42,8 @@ static inline uint64_t __kvm_reg_id(uint64_t type, ui=
+nt64_t idx,
+> >  #define RISCV_ISA_EXT_REG(idx) __kvm_reg_id(KVM_REG_RISCV_ISA_EXT, \
+> >                                              idx, KVM_REG_SIZE_ULONG)
+> >
+> > +bool __vcpu_has_ext(struct kvm_vcpu *vcpu, int ext);
+> > +
+> >  struct ex_regs {
+> >         unsigned long ra;
+> >         unsigned long sp;
+> > diff --git a/tools/testing/selftests/kvm/lib/riscv/processor.c b/tools/=
+testing/selftests/kvm/lib/riscv/processor.c
+> > index 39a1e9902dec..dad73ce18164 100644
+> > --- a/tools/testing/selftests/kvm/lib/riscv/processor.c
+> > +++ b/tools/testing/selftests/kvm/lib/riscv/processor.c
+> > @@ -15,6 +15,16 @@
+> >
+> >  static vm_vaddr_t exception_handlers;
+> >
+> > +bool __vcpu_has_ext(struct kvm_vcpu *vcpu, int ext)
+> > +{
+> > +       unsigned long value =3D 0;
+> > +       int ret;
+> > +
+> > +       ret =3D __vcpu_get_reg(vcpu, RISCV_ISA_EXT_REG(ext), &value);
+> > +
+> > +       return !ret && !!value;
+> > +}
+> > +
+>
+> Not sure what was the base patch on which this was rebased. The actual
+> commit in the queue branch looks different.
+>
 
-Ya, the actual series will perform that check, this slots in halfway through.
+This patch set was based on 6.7-rc8.
 
-> And do we need a centralized check of fault->is_private in kvm_mmu_do_page_fault()
-> before returning RET_PF_EMULATE?
+> https://github.com/kvm-riscv/linux/commit/5563517cc2012e3326411b360c9924d=
+3f2706c8d
+>
+> Both seem to have the same bug though the tests fail now and require
+> the following fix.
+> The ext id should be uint64_t and we need to pass ext directly so that
+> SBI extension tests can also pass.
+>
 
-Oof, yes.
+It's weird that 6.7-rc8 has already included Andrew's change on the ISA ext=
+ reg,
+but this patch was not generated against his change.
 
-> > @@ -4355,8 +4365,7 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
-> >  		 * MMIO SPTE.  That way the cache doesn't need to be purged
-> >  		 * when the AVIC is re-enabled.
-> >  		 */
-> > -		if (slot && slot->id == APIC_ACCESS_PAGE_PRIVATE_MEMSLOT &&
-> > -		    !kvm_apicv_activated(vcpu->kvm))
-> > +		if (!kvm_apicv_activated(vcpu->kvm))
-> >  			return RET_PF_EMULATE;
-> Otherwise, here also needs a checking of fault->is_private?
-> Maybe also for where RET_PF_EMULATE is returned when page_fault_handle_page_track()
-> is true (though I know it's always false for TDX).
+commit bdf6aa328f137e184b0fce607fd585354c3742f1
+Author: Andrew Jones <ajones@ventanamicro.com>
+Date:   Wed Dec 13 18:09:58 2023 +0100
 
-Ya, and practically speaking it should always be false for functional setups
-(software-protected VMs don't yet play nice with shadow paging or any form of
-emulation), but it's easy enough to guard against RET_PF_EMULATE in
-kvm_mmu_do_page_fault().
+    RISC-V: KVM: selftests: Treat SBI ext regs like ISA ext regs
 
-I'm going to post _just_ patch 1 as v5 so that it can land in 6.8 (assuming I
-don't screw it up again).
+Anyway, your changes were right. Please go ahead to include them when mergi=
+ng.
 
-I'll post a separate series to tackle the refactor and is_private cleanups and
-fixes as that has ballooned to 17 patches :-/
+Thanks,
+Haibo
+
+>
+> --- a/tools/testing/selftests/kvm/include/riscv/processor.h
+> +++ b/tools/testing/selftests/kvm/include/riscv/processor.h
+> @@ -48,7 +48,7 @@ static inline uint64_t __kvm_reg_id(uint64_t type,
+> uint64_t subtype,
+> KVM_REG_RISCV_SBI_SINGLE, \
+> idx, KVM_REG_SIZE_ULONG)
+>
+> -bool __vcpu_has_ext(struct kvm_vcpu *vcpu, int ext);
+> +bool __vcpu_has_ext(struct kvm_vcpu *vcpu, uint64_t ext);
+>
+> struct ex_regs {
+> unsigned long ra;
+> diff --git a/tools/testing/selftests/kvm/lib/riscv/processor.c
+> b/tools/testing/selftests/kvm/lib/riscv/processor.c
+> index 282587cd4bbc..ec66d331a127 100644
+> --- a/tools/testing/selftests/kvm/lib/riscv/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/riscv/processor.c
+> @@ -15,12 +15,12 @@
+>
+> static vm_vaddr_t exception_handlers;
+>
+> -bool __vcpu_has_ext(struct kvm_vcpu *vcpu, int ext)
+> +bool __vcpu_has_ext(struct kvm_vcpu *vcpu, uint64_t ext)
+> {
+> unsigned long value =3D 0;
+> int ret;
+>
+> - ret =3D __vcpu_get_reg(vcpu, RISCV_ISA_EXT_REG(ext), &value);
+> + ret =3D __vcpu_get_reg(vcpu, ext, &value);
+>
+> return !ret && !!value;
+> }
+>
+> With the above the fix, Both SBI/ISA extension tests pass.
+> # ./get-reg-list
+> sbi-base: PASS
+> sbi-sta: PASS
+> sbi-pmu: PASS
+> sbi-dbcn: PASS
+> aia: PASS
+> fp_f: PASS
+> fp_d: PASS
+> 1..0 # SKIP - h not available, skipping tests
+> smstateen: PASS
+> sscofpmf: PASS
+> sstc: PASS
+> 1..0 # SKIP - svinval not available, skipping tests
+> 1..0 # SKIP - svnapot not available, skipping tests
+> 1..0 # SKIP - svpbmt not available, skipping tests
+> zba: PASS
+> zbb: PASS
+> zbc: PASS
+> 1..0 # SKIP - zbkb not available, skipping tests
+> 1..0 # SKIP - zbkc not available, skipping tests
+> 1..0 # SKIP - zbkx not available, skipping tests
+> zbs: PASS
+> zfa: PASS
+> 1..0 # SKIP - zfh not available, skipping tests
+> 1..0 # SKIP - zfhmin not available, skipping tests
+> zicbom: PASS
+> zicboz: PASS
+> zicntr: PASS
+> 1..0 # SKIP - zicond not available, skipping tests
+> zicsr: PASS
+> zifencei: PASS
+> zihintntl: PASS
+> zihintpause: PASS
+> zihpm: PASS
+>
+>
+> >  static uint64_t page_align(struct kvm_vm *vm, uint64_t v)
+> >  {
+> >         return (v + vm->page_size) & ~(vm->page_size - 1);
+> > diff --git a/tools/testing/selftests/kvm/riscv/get-reg-list.c b/tools/t=
+esting/selftests/kvm/riscv/get-reg-list.c
+> > index 25de4b8bc347..ed29ba45588c 100644
+> > --- a/tools/testing/selftests/kvm/riscv/get-reg-list.c
+> > +++ b/tools/testing/selftests/kvm/riscv/get-reg-list.c
+> > @@ -75,15 +75,6 @@ bool check_reject_set(int err)
+> >         return err =3D=3D EINVAL;
+> >  }
+> >
+> > -static inline bool vcpu_has_ext(struct kvm_vcpu *vcpu, int ext)
+> > -{
+> > -       int ret;
+> > -       unsigned long value;
+> > -
+> > -       ret =3D __vcpu_get_reg(vcpu, RISCV_ISA_EXT_REG(ext), &value);
+> > -       return (ret) ? false : !!value;
+> > -}
+> > -
+> >  void finalize_vcpu(struct kvm_vcpu *vcpu, struct vcpu_reg_list *c)
+> >  {
+> >         unsigned long isa_ext_state[KVM_RISCV_ISA_EXT_MAX] =3D { 0 };
+> > @@ -111,7 +102,7 @@ void finalize_vcpu(struct kvm_vcpu *vcpu, struct vc=
+pu_reg_list *c)
+> >                 __vcpu_set_reg(vcpu, RISCV_ISA_EXT_REG(s->feature), 1);
+> >
+> >                 /* Double check whether the desired extension was enabl=
+ed */
+> > -               __TEST_REQUIRE(vcpu_has_ext(vcpu, s->feature),
+> > +               __TEST_REQUIRE(__vcpu_has_ext(vcpu, s->feature),
+> >                                "%s not available, skipping tests\n", s-=
+>name);
+> >         }
+> >  }
+> > --
+> > 2.34.1
+> >
+>
+>
+> --
+> Regards,
+> Atish
 
