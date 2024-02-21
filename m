@@ -1,183 +1,249 @@
-Return-Path: <kvm+bounces-9251-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9252-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 600D185CED4
-	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 04:39:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7F2C85CF26
+	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 04:50:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2B98285764
-	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 03:39:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EAFD01C22A35
+	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 03:50:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 538A538DD2;
-	Wed, 21 Feb 2024 03:39:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0509C2837E;
+	Wed, 21 Feb 2024 03:49:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kShJV2WY"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="aMNpgLU2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E48E23C9
-	for <kvm@vger.kernel.org>; Wed, 21 Feb 2024 03:39:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FFE138DD2
+	for <kvm@vger.kernel.org>; Wed, 21 Feb 2024 03:49:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708486753; cv=none; b=sl8g3Sy4aiu70ciFldDbzCz4Ze4/foLuy0llG5IcQ/EjnqbFrRP4RHjH+c4ihKdZRYxQWVTfs4GJ3dRSW6AD8YcjpDekvwZwPUzLBE0+YzTgJyseAw18l85udlnKpVh+INS+RhJbozVAuBH9JvicoMEb69EwobZKMnvmyPxwZWU=
+	t=1708487367; cv=none; b=AdsPXK9Vpx6MyiTjVmDa0uf3l2U9BdYe1NrgCVsWI6NITFzJS9aUtYqdiVKhYYJWrrGRer+OCDQBgj+a5DeH2ynqf0iauK63PMGwKXTP0aPqV9zDs1qGbsQKQray8xgrJbINXrMCNWADjgZl5FFIAZrh4pXSC7i4UNdYJ40PP1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708486753; c=relaxed/simple;
-	bh=H4cTMnfp99W1KBlfzNlCqw0liwFSscXiSjeuPnAt9RU=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
-	 References:In-Reply-To; b=R4xQesHCIjnK4gXAkh6vLUvHl+GSnaU4Bigvg7MfU+rhyLHYV8WGGCFM/Qngjo9taeQh7FD2JKF7O4ZHQ8jk7kihBJSUdNfugl3PJ2TRi/o55UOaEC0LNCmKF7CdsCOoB5FkXeelUXlcureZ3Kzl5Fqxk+rRxJRTborULBiJKeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kShJV2WY; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6e46dcd8feaso1544740b3a.2
-        for <kvm@vger.kernel.org>; Tue, 20 Feb 2024 19:39:11 -0800 (PST)
+	s=arc-20240116; t=1708487367; c=relaxed/simple;
+	bh=y8O/mwaQ7Px8v+Frk1wcJy2nHkn8+at7VPWO9+3VbBs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cP/vNq+Xg/JnlwgEktfu45t+751JrYQcul0y+XZPYDcAD9BDSDjs3zVdJsT4BTEr43aYKKef/LNsna8mxUqTQfUM53anAvZ8nd0yqTq39zHBLK++KWCVRzIwQ53Z/3npx/HYFuRy+RoOn3j4rXfPfUo0PMUINoMepO5kK47cFnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=aMNpgLU2; arc=none smtp.client-ip=209.85.208.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2d0cdbd67f0so86820931fa.3
+        for <kvm@vger.kernel.org>; Tue, 20 Feb 2024 19:49:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708486751; x=1709091551; darn=vger.kernel.org;
-        h=in-reply-to:references:subject:cc:to:from:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+        d=ventanamicro.com; s=google; t=1708487363; x=1709092163; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Y6fl3OofbJfiG8irvpRvJAkMN/E77e4wsBS32CiwqYA=;
-        b=kShJV2WY4Wv2vB4FUTLqKrPIb8UeRZXBTIbupTvPBYvqUvR2VkKhDdnI8NvjUhTAU2
-         PA/v40NUZOLEnIDO9ea7poYq2jhvjgiq8iqrl/37puCXnsLLRxVycMhmjHAi0vMSTwjs
-         AymhKpUUSHeo6Aq4npkXQc+ddX/oa+zAaKGhsDtgcJE5wRbs8f6JUJveH5gUj1kbPxM+
-         FKKLkenY+3o5KpUPSREBO5Qvih7I6ZduUxi3qNQhHfzXo8eBSTD6/s5zTd9n4oUnM7BF
-         flKUKZ/jgjTVkpe2gdiUM6oYkgiB0xs0U0PuUum9pVrucDG2elE/B1OZ9huw0Vv5GhDy
-         1n7g==
+        bh=ejkDxgSv9Wy1s6DoDk6Rey43bdmMYQ0qUMcSL0mEarU=;
+        b=aMNpgLU2M3Fh1ICsznUfHlyJXBg0Lzyv5QTJW14maOn0QFBCs5k9NiFqsdt0SFgvRj
+         JO6R58om5RL+Awdhkhasg7RQknzPCMcR5UBDSnGGyf0y7nkxF2f8bShN4l3obIxVSoyb
+         +6tjINpoPAaLkEm3pf2vgvCFRu0F0pWg/KGgtW2U8hOTyw7QoEdp6UzU6rH9BdDQ/HYQ
+         J5eXas5M9zKWlW5O0NX0qd0ytuhZjfVoQdclokPNPm+qReJhtDMxocblMg6gnEoIKukE
+         8WBv8NuMKQrAaHKzenDeK6aqwsCBedwwSL26r+kAQW90uo5BfsOZWBnJ35JWKhP+UmE1
+         ehEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708486751; x=1709091551;
-        h=in-reply-to:references:subject:cc:to:from:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Y6fl3OofbJfiG8irvpRvJAkMN/E77e4wsBS32CiwqYA=;
-        b=G7sWNJlGhpr69p/17ouqjYSpd1cto9yG1L2ehSw//PBvzk105bgESH60ciq9PNKnb/
-         LEATSLSrj951yd4UMP1FH/InqFJVFCzoN//smSSoPWA5VkXVoWJh3zrnIvrYC5bQ3uEB
-         D7/nSom5hwXTgdq1eI4NcnQPnPDSBenCQU4vmM2KU8CljxV9Ecs6uo/46assAlzFjvXG
-         4pulAXh0sf0qWPpTVFH06vn8bpM0Xavn1+Le6d6X2JTYIqRaJPB90zDsE+fKirT8STbR
-         DIz/fiE4Ui6HsTelMY1/CkDcRvHq0eHs8iYjARZy5tcGTDPYGefjX58jROK7c5ICOTWv
-         W4Hg==
-X-Forwarded-Encrypted: i=1; AJvYcCVN+Bz/cRXqa1mZ5eU8PYU1HDcupBNtvsMWgyw6sErJyr6tiWAmQDwNJmqOy67tCdxKnh/+joD3JfFbSwpKFqI9jVDh
-X-Gm-Message-State: AOJu0YzAM1YUkDBEPCSXectZRp/c6aMmQNmtpk4sNKJ7z4O6CLmZQyJz
-	uI9q2YMStipHtWLIB6o/d7H4qh02VCjhf8gCObGQ0MkiA8CUosME
-X-Google-Smtp-Source: AGHT+IEgPYGjd00SGryCdnreRrXW62LjioerYcxGvnCvCc3B/u1pf7NqEr8VgV7nsB94Fkj4zvDt8g==
-X-Received: by 2002:a17:903:2b0d:b0:1dc:7ca:36de with SMTP id mc13-20020a1709032b0d00b001dc07ca36demr6812499plb.9.1708486751438;
-        Tue, 20 Feb 2024 19:39:11 -0800 (PST)
-Received: from localhost (220-235-194-103.tpgi.com.au. [220.235.194.103])
-        by smtp.gmail.com with ESMTPSA id iw20-20020a170903045400b001dbb86b88e5sm7011393plb.124.2024.02.20.19.39.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Feb 2024 19:39:11 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708487363; x=1709092163;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ejkDxgSv9Wy1s6DoDk6Rey43bdmMYQ0qUMcSL0mEarU=;
+        b=Glv9Retf5GdQr+8x0bEdi+cnjPxF46Dz81zjROmUHoDbhYpgJgPIRYKE9gJKirCX+/
+         zkoCJ8RmQZLJw7ptBhF0iILD71oblaQuIXEnrPtVTjIQn/kJXeDFJDqGf8tz3Xla264K
+         pWJRUWB3myImuuKY/jl+Nde6fhNdySCc1QjUf9hunfx9rpEsPh+ANl2VluSaJ0FW34qQ
+         BKP4v+eq/06KWOdKsSCa7hU4dlu3sqPCkqQG1tdRv0ZVVoLhECuNwz1WW6VS46TlhiDt
+         2jydkTsOpOfP8L6z/eCzPslV6MpjbKpaF2zpcoabXFiv/HMsBqTRMU7uH4VuWGNMfLiq
+         DYRg==
+X-Gm-Message-State: AOJu0YzHUgF8q4sQmIDmCgtSPX4tPsRziUrdCkEeLvVCCBAkB2V7vb1f
+	IYG1oCf66XJsKWJ+TSxTq9ZbeGFfbdPxpcc3xMGluI5HDD+hJWfkiwRoKPMs/7x08g0+XKFlXZ9
+	W3cAolMdHR5Fm6neafaOoAIq/xhs4gV/JecXkju7gVXAUt6XP1oI=
+X-Google-Smtp-Source: AGHT+IF00qdDY2SVx03Wa6LPc9UWgk5meVyN8jFzSLxISc318SPD+ipCGJJdFn/tTL6oBpo41VL38QU7btVEWW/ntC0=
+X-Received: by 2002:a2e:2a02:0:b0:2d2:4f67:ad7b with SMTP id
+ q2-20020a2e2a02000000b002d24f67ad7bmr1663585ljq.27.1708487363091; Tue, 20 Feb
+ 2024 19:49:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
+References: <20240206074931.22930-1-duchao@eswincomputing.com>
+ <20240206074931.22930-2-duchao@eswincomputing.com> <CAK9=C2VZ1t3ctTWKiqeKOALjLh0kJgzVEsZvM=xfc2j7yQOEcQ@mail.gmail.com>
+ <4a5a30cd.18c.18dc4734699.Coremail.duchao@eswincomputing.com>
+ <CAK9=C2XAEDfac+GQTD3jE2RLR+5ngNPedEE_G6tL4e2KByUZ1w@mail.gmail.com> <61f5b01b.323.18dc95f8d58.Coremail.duchao@eswincomputing.com>
+In-Reply-To: <61f5b01b.323.18dc95f8d58.Coremail.duchao@eswincomputing.com>
+From: Anup Patel <apatel@ventanamicro.com>
+Date: Wed, 21 Feb 2024 09:19:10 +0530
+Message-ID: <CAK9=C2Waz7iLx+8p9=QTQS5i4aomodn2G6Z2L8wn8UXOBm=qzQ@mail.gmail.com>
+Subject: Re: [PATCH v1 1/3] RISC-V: KVM: Implement kvm_arch_vcpu_ioctl_set_guest_debug()
+To: Chao Du <duchao@eswincomputing.com>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, anup@brainfault.org, 
+	atishp@atishpatra.org, pbonzini@redhat.com, shuah@kernel.org, 
+	dbarboza@ventanamicro.com, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, duchao713@qq.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 21 Feb 2024 13:39:06 +1000
-Message-Id: <CZAG089APSLA.2814EZST7N1DF@wheely>
-From: "Nicholas Piggin" <npiggin@gmail.com>
-To: "Thomas Huth" <thuth@redhat.com>, "Andrew Jones"
- <andrew.jones@linux.dev>, "Alexandru Elisei" <alexandru.elisei@arm.com>,
- "Eric Auger" <eric.auger@redhat.com>, <kvm@vger.kernel.org>
-Cc: <kvmarm@lists.linux.dev>
-Subject: Re: [kvm-unit-tests PATCH] lib/arm/io: Fix calling getchar()
- multiple times
-X-Mailer: aerc 0.15.2
-References: <20240216140210.70280-1-thuth@redhat.com>
-In-Reply-To: <20240216140210.70280-1-thuth@redhat.com>
 
-On Sat Feb 17, 2024 at 12:02 AM AEST, Thomas Huth wrote:
-> getchar() can currently only be called once on arm since the implementati=
-on
-> is a little bit too  na=C3=AFve: After the first character has arrived, t=
-he
-> data register never gets set to zero again. To properly check whether a
-> byte is available, we need to check the "RX fifo empty" on the pl011 UART
-> or the "RX data ready" bit on the ns16550a UART instead.
+On Wed, Feb 21, 2024 at 7:28=E2=80=AFAM Chao Du <duchao@eswincomputing.com>=
+ wrote:
 >
-> With this proper check in place, we can finally also get rid of the
-> ugly assert(count < 16) statement here.
+> On 2024-02-20 12:54, Anup Patel <apatel@ventanamicro.com> wrote:
+> >
+> > On Tue, Feb 20, 2024 at 8:31=E2=80=AFAM Chao Du <duchao@eswincomputing.=
+com> wrote:
+> > >
+> > > On 2024-02-14 21:19, Anup Patel <apatel@ventanamicro.com> wrote:
+> > > >
+> > > > On Tue, Feb 6, 2024 at 1:22=E2=80=AFPM Chao Du <duchao@eswincomputi=
+ng.com> wrote:
+> > > > >
+> > > > > kvm_vm_ioctl_check_extension(): Return 1 if KVM_CAP_SET_GUEST_DEB=
+UG is
+> > > > > being checked.
+> > > > >
+> > > > > kvm_arch_vcpu_ioctl_set_guest_debug(): Update the guest_debug fla=
+gs
+> > > > > from userspace accordingly. Route the breakpoint exceptions to HS=
+ mode
+> > > > > if the VM is being debugged by userspace, by clearing the corresp=
+onding
+> > > > > bit in hedeleg CSR.
+> > > > >
+> > > > > Signed-off-by: Chao Du <duchao@eswincomputing.com>
+> > > > > ---
+> > > > >  arch/riscv/include/uapi/asm/kvm.h |  1 +
+> > > > >  arch/riscv/kvm/vcpu.c             | 15 +++++++++++++--
+> > > > >  arch/riscv/kvm/vm.c               |  1 +
+> > > > >  3 files changed, 15 insertions(+), 2 deletions(-)
+> > > > >
+> > > > > diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/inclu=
+de/uapi/asm/kvm.h
+> > > > > index d6b7a5b95874..8890977836f0 100644
+> > > > > --- a/arch/riscv/include/uapi/asm/kvm.h
+> > > > > +++ b/arch/riscv/include/uapi/asm/kvm.h
+> > > > > @@ -17,6 +17,7 @@
+> > > > >
+> > > > >  #define __KVM_HAVE_IRQ_LINE
+> > > > >  #define __KVM_HAVE_READONLY_MEM
+> > > > > +#define __KVM_HAVE_GUEST_DEBUG
+> > > > >
+> > > > >  #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
+> > > > >
+> > > > > diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+> > > > > index b5ca9f2e98ac..6cee974592ac 100644
+> > > > > --- a/arch/riscv/kvm/vcpu.c
+> > > > > +++ b/arch/riscv/kvm/vcpu.c
+> > > > > @@ -475,8 +475,19 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct k=
+vm_vcpu *vcpu,
+> > > > >  int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
+> > > > >                                         struct kvm_guest_debug *d=
+bg)
+> > > > >  {
+> > > > > -       /* TODO; To be implemented later. */
+> > > > > -       return -EINVAL;
+> > > > > +       if (dbg->control & KVM_GUESTDBG_ENABLE) {
+> > > > > +               if (vcpu->guest_debug !=3D dbg->control) {
+> > > > > +                       vcpu->guest_debug =3D dbg->control;
+> > > > > +                       csr_clear(CSR_HEDELEG, BIT(EXC_BREAKPOINT=
+));
+> > > > > +               }
+> > > > > +       } else {
+> > > > > +               if (vcpu->guest_debug !=3D 0) {
+> > > > > +                       vcpu->guest_debug =3D 0;
+> > > > > +                       csr_set(CSR_HEDELEG, BIT(EXC_BREAKPOINT))=
+;
+> > > > > +               }
+> > > > > +       }
+> > > >
+> > > > This is broken because directly setting breakpoint exception delega=
+tion
+> > > > in CSR also affects other VCPUs running on the same host CPU.
+> > > >
+> > > > To address the above, we should do the following:
+> > > > 1) Add "unsigned long hedeleg" in "struct kvm_vcpu_config" which
+> > > >    is pre-initialized in kvm_riscv_vcpu_setup_config() without sett=
+ing
+> > > >    EXC_BREAKPOINT bit.
+> > > > 2) The kvm_arch_vcpu_ioctl_set_guest_debug() should only set/clear
+> > > >     EXC_BREAKPOINT bit in "hedeleg" of "struct kvm_vcpu_config".
+> > > > 3) The kvm_riscv_vcpu_swap_in_guest_state() must write the
+> > > >      HEDELEG csr before entering the Guest/VM.
+> > > >
+> > > > Regards,
+> > > > Anup
+> > > >
+> > >
+> > > Thanks for the review and detailed suggestion.
+> > > Maybe we could make it a bit easier:
+> > > 1) The kvm_arch_vcpu_ioctl_set_guest_debug() only update vcpu->guest_=
+debug
+> > >    accordingly.
+> > > 2) The kvm_riscv_vcpu_swap_in_guest_state() check vcpu->guest_debug a=
+nd
+> > >    set/clear the HEDELEG csr accordingly.
+> > >
+> > > Could you confirm if this is OK?
+> >
+> > Your suggestion will work but it adds an additional "if ()" check in
+> > kvm_riscv_vcpu_swap_in_guest_state() which is in the hot path.
+> >
 >
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Yes, it makes sense.
+> I will prepare a V2 patch.
 
-With the QEMU bug fix, the multi migration patches work well on
-arm64 with this patch for me (on TCG).
+I just realized that kvm_arch_vcpu_load() will be a much
+better place to add hedeleg CSR write instead of
+kvm_riscv_vcpu_swap_in_guest_state(). This way
+it will be only at the start hot-path (aka run-loop).
 
-Tested-by: Nicholas Piggin <npiggin@gmail.com>
+Regards,
+Anup
 
-Thanks,
-Nick
-
-> ---
->  lib/arm/io.c | 34 ++++++++++++++--------------------
->  1 file changed, 14 insertions(+), 20 deletions(-)
 >
-> diff --git a/lib/arm/io.c b/lib/arm/io.c
-> index c15e57c4..836fa854 100644
-> --- a/lib/arm/io.c
-> +++ b/lib/arm/io.c
-> @@ -28,6 +28,7 @@ static struct spinlock uart_lock;
->   */
->  #define UART_EARLY_BASE (u8 *)(unsigned long)CONFIG_UART_EARLY_BASE
->  static volatile u8 *uart0_base =3D UART_EARLY_BASE;
-> +bool is_pl011_uart;
-> =20
->  static void uart0_init_fdt(void)
->  {
-> @@ -59,7 +60,10 @@ static void uart0_init_fdt(void)
->  			abort();
->  		}
-> =20
-> +		is_pl011_uart =3D (i =3D=3D 0);
->  	} else {
-> +		is_pl011_uart =3D !fdt_node_check_compatible(dt_fdt(), ret,
-> +		                                           "arm,pl011");
->  		ret =3D dt_pbus_translate_node(ret, 0, &base);
->  		assert(ret =3D=3D 0);
->  	}
-> @@ -111,31 +115,21 @@ void puts(const char *s)
->  	spin_unlock(&uart_lock);
->  }
-> =20
-> -static int do_getchar(void)
-> +int __getchar(void)
->  {
-> -	int c;
-> +	int c =3D -1;
-> =20
->  	spin_lock(&uart_lock);
-> -	c =3D readb(uart0_base);
-> -	spin_unlock(&uart_lock);
-> -
-> -	return c ?: -1;
-> -}
-> -
-> -/*
-> - * Minimalist implementation for migration completion detection.
-> - * Without FIFOs enabled on the QEMU UART device we just read
-> - * the data register: we cannot read more than 16 characters.
-> - */
-> -int __getchar(void)
-> -{
-> -	int c =3D do_getchar();
-> -	static int count;
-> =20
-> -	if (c !=3D -1)
-> -		++count;
-> +	if (is_pl011_uart) {
-> +		if (!(readb(uart0_base + 6 * 4) & 0x10))  /* RX not empty? */
-> +			c =3D readb(uart0_base);
-> +	} else {
-> +		if (readb(uart0_base + 5) & 0x01)         /* RX data ready? */
-> +			c =3D readb(uart0_base);
-> +	}
-> =20
-> -	assert(count < 16);
-> +	spin_unlock(&uart_lock);
-> =20
->  	return c;
->  }
-
+> Thanks,
+> Chao
+>
+> > I am still leaning towards what I suggested.
+> >
+> > Regards,
+> > Anup
+> >
+> > > If yes, I will post another revision.
+> > >
+> > > Regards,
+> > > Chao
+> > >
+> > > > > +
+> > > > > +       return 0;
+> > > > >  }
+> > > > >
+> > > > >  static void kvm_riscv_vcpu_setup_config(struct kvm_vcpu *vcpu)
+> > > > > diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
+> > > > > index ce58bc48e5b8..7396b8654f45 100644
+> > > > > --- a/arch/riscv/kvm/vm.c
+> > > > > +++ b/arch/riscv/kvm/vm.c
+> > > > > @@ -186,6 +186,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *=
+kvm, long ext)
+> > > > >         case KVM_CAP_READONLY_MEM:
+> > > > >         case KVM_CAP_MP_STATE:
+> > > > >         case KVM_CAP_IMMEDIATE_EXIT:
+> > > > > +       case KVM_CAP_SET_GUEST_DEBUG:
+> > > > >                 r =3D 1;
+> > > > >                 break;
+> > > > >         case KVM_CAP_NR_VCPUS:
+> > > > > --
+> > > > > 2.17.1
+> > > > >
+> > > > >
+> > > > > --
+> > > > > kvm-riscv mailing list
+> > > > > kvm-riscv@lists.infradead.org
+> > > > > http://lists.infradead.org/mailman/listinfo/kvm-riscv
+> > > --
+> > > kvm-riscv mailing list
+> > > kvm-riscv@lists.infradead.org
+> > > http://lists.infradead.org/mailman/listinfo/kvm-riscv
 
