@@ -1,166 +1,170 @@
-Return-Path: <kvm+bounces-9267-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9256-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04FF385D004
-	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 06:46:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C56A85CFEA
+	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 06:43:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9A6C8B24546
-	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 05:46:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9DFBA1C22BCE
+	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 05:43:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B15043D577;
-	Wed, 21 Feb 2024 05:43:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DD8E3A1D1;
+	Wed, 21 Feb 2024 05:43:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RK/jSFpK"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lBJ3/FU4"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F49D3D3B3
-	for <kvm@vger.kernel.org>; Wed, 21 Feb 2024 05:43:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A348A39863;
+	Wed, 21 Feb 2024 05:43:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708494221; cv=none; b=vDA+M0uIMvQFUZeoCtzNLXgZ8RAxdJ11PI9AYvkrIlUPwxi+YrhVQZj813dLOI1bapBMrLW88IQ4Sswym4oG+61OcXKMF81cHv1u9nenAO/cwy4o2uW85OgqABLEjuE5QLCSDCnYMjK/VtkWoz66AjzLLHMqY+Zt9Y9oPo0CFhI=
+	t=1708494196; cv=none; b=vAJqJO8QPbEgWH45+NqPQXtwWEQTHEZTKjeCs3uNY8z820CEAIl48m97PG567V9c5MWVNo4NGe5ETrmhPVZQQdEcDegO77Uxng4RMRGebvTWp8k/UYnPC8MABHaA4yIeYpWk276wBMM8kKa6FXmCOFnRnhu1cjdqcHLG20OndO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708494221; c=relaxed/simple;
-	bh=huN1PqJtmqytpL0vyqUMZqGEJFXVuxAo91FZdlEJvZw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aUv8wFLSDFafv+lNC3z8AWGzTqCo++l0XgmgsHK5wasfnPFXbLuSMGMFW1P9t3qkN3jbHNgca77wdexcBuQTUIcKTBpQdNzWVkdR+2vAhVfxF0NSNKvHPNk70RUs1Il6GanmJ3vsBA7NbVnvKwH5HAE7zTpku3uVPEFTwTfnv1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RK/jSFpK; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1708494218;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7uZnxcLXKLqyPCNevo5l7NpGLhMeejXcsQuYRK9QxO0=;
-	b=RK/jSFpKYJqpDZ2ouKFiZ2I/rdOcsLx5lKza9bI7O/DEvmkWAWOwRt7MBFuz/AgkDXmv1z
-	1DsW4AldOgmJ72zxrmxbd18hjzeuCR1L2nPxHUhyTOjfZ4E7Nnk5ArYF9wBFEWr2ZBsot/
-	q64aIxAUJxhWVqMsKVznWHHqpDmDvVA=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: kvm@vger.kernel.org,
-	Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-kernel@vger.kernel.org,
-	Eric Auger <eric.auger@redhat.com>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v4 10/10] KVM: arm64: vgic: Don't acquire the lpi_list_lock in vgic_put_irq()
-Date: Wed, 21 Feb 2024 05:42:53 +0000
-Message-ID: <20240221054253.3848076-11-oliver.upton@linux.dev>
-In-Reply-To: <20240221054253.3848076-1-oliver.upton@linux.dev>
-References: <20240221054253.3848076-1-oliver.upton@linux.dev>
+	s=arc-20240116; t=1708494196; c=relaxed/simple;
+	bh=Uukhj9fpIxxRlYAD8QGrCgdODLB1OI42Ei20zSHeD8g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EHX9v/UiHYHo26z5U+F/ENbfiylEzvmwisqmaS7iWnMUJ5AvuY38wI3j/q4O0HyFtwhOHes9c/1xJq4cSa+USJ3Nnqv+t7FrmroSOGC/PoFG92YUaHq37TY0KBzuZFgLVXa+FULgrxCU7MARhmTrFOlJ77ODTk/doV/Jnw1ZB+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lBJ3/FU4; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708494194; x=1740030194;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=Uukhj9fpIxxRlYAD8QGrCgdODLB1OI42Ei20zSHeD8g=;
+  b=lBJ3/FU4zdM2qtfv4MG4jY9nYWqG9bDjAOuh4z3INi3B9ukwlEZY8O/E
+   BvA4TLXoQZAcnevUwdOYC7WdGo02IiohM0u+yVl642/2Jr2wErAm2xvpD
+   ZwZcE+qXwwLZaVizh8guwMIomCeWhoDH0TdXxfvnqIHhrHlXNmhdZqdjI
+   5d4j6e4de0GGv/JXwyFH65jHGu1zIW3zDGLFFBTStZaP7EzcsYQ68D9gs
+   7gp/SoY0Zu7BJEoudR/ecy5s11NStXGWlguyDrLxSjq4pA/sITetLhI/0
+   Q7De4xARpm0fVuEPkenBUW43osm4KEkgloFFpamW4y4jjSSGDCNS36Yer
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10990"; a="2749581"
+X-IronPort-AV: E=Sophos;i="6.06,174,1705392000"; 
+   d="scan'208";a="2749581"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2024 21:43:14 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,174,1705392000"; 
+   d="scan'208";a="28172586"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.93.18.46]) ([10.93.18.46])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2024 21:43:09 -0800
+Message-ID: <5749ff16-ca81-440d-85f0-62a1c3a572d0@linux.intel.com>
+Date: Wed, 21 Feb 2024 13:43:06 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v5 04/29] KVM: selftests: Refactor steps in vCPU
+ descriptor table initialization
+To: Sagi Shahar <sagis@google.com>
+Cc: linux-kselftest@vger.kernel.org, Ackerley Tng <ackerleytng@google.com>,
+ Ryan Afranji <afranji@google.com>, Erdem Aktas <erdemaktas@google.com>,
+ Isaku Yamahata <isaku.yamahata@intel.com>,
+ Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ Peter Gonda <pgonda@google.com>, Haibo Xu <haibo1.xu@intel.com>,
+ Chao Peng <chao.p.peng@linux.intel.com>,
+ Vishal Annapurve <vannapurve@google.com>, Roger Wang <runanwang@google.com>,
+ Vipin Sharma <vipinsh@google.com>, jmattson@google.com, dmatlack@google.com,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org
+References: <20231212204647.2170650-1-sagis@google.com>
+ <20231212204647.2170650-5-sagis@google.com>
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20231212204647.2170650-5-sagis@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The LPI xarray's xa_lock is sufficient for synchronizing writers when
-freeing a given LPI. Furthermore, readers can only take a new reference
-on an IRQ if it was already nonzero.
 
-Stop taking the lpi_list_lock unnecessarily and get rid of
-__vgic_put_lpi_locked().
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- arch/arm64/kvm/vgic/vgic-its.c |  4 ++--
- arch/arm64/kvm/vgic/vgic.c     | 28 +++++++++-------------------
- arch/arm64/kvm/vgic/vgic.h     |  1 -
- 3 files changed, 11 insertions(+), 22 deletions(-)
+On 12/13/2023 4:46 AM, Sagi Shahar wrote:
+> From: Ackerley Tng <ackerleytng@google.com>
+>
+> Split the vCPU descriptor table initialization process into a few
+> steps and expose them:
+>
+> + Setting up the IDT
+> + Syncing exception handlers into the guest
+>
+> In kvm_setup_idt(), we conditionally allocate guest memory for vm->idt
+> to avoid double allocation when kvm_setup_idt() is used after
+> vm_init_descriptor_tables().
+>
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> Signed-off-by: Ryan Afranji <afranji@google.com>
+> Signed-off-by: Sagi Shahar <sagis@google.com>
+> ---
+>   .../selftests/kvm/include/x86_64/processor.h  |  2 ++
+>   .../selftests/kvm/lib/x86_64/processor.c      | 19 ++++++++++++++++---
+>   2 files changed, 18 insertions(+), 3 deletions(-)
+>
+> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> index 0b8855d68744..5c4e9a27d9e2 100644
+> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
+> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> @@ -1089,6 +1089,8 @@ struct idt_entry {
+>   	uint32_t offset2; uint32_t reserved;
+>   };
+>   
+> +void kvm_setup_idt(struct kvm_vm *vm, struct kvm_dtable *dt);
+> +void sync_exception_handlers_to_guest(struct kvm_vm *vm);
+>   void vm_init_descriptor_tables(struct kvm_vm *vm);
+>   void vcpu_init_descriptor_tables(struct kvm_vcpu *vcpu);
+>   void vm_install_exception_handler(struct kvm_vm *vm, int vector,
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> index b6b9438e0a33..566d82829da4 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> @@ -1155,19 +1155,32 @@ void vm_init_descriptor_tables(struct kvm_vm *vm)
+>   			DEFAULT_CODE_SELECTOR);
+>   }
+>   
+> +void kvm_setup_idt(struct kvm_vm *vm, struct kvm_dtable *dt)
+> +{
+> +	if (!vm->idt)
+> +		vm->idt = vm_vaddr_alloc_page(vm);
 
-diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index dad6f0ee7c49..f6025886071c 100644
---- a/arch/arm64/kvm/vgic/vgic-its.c
-+++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -649,7 +649,7 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
- 	 * was in the cache, and increment it on the new interrupt.
- 	 */
- 	if (cte->irq)
--		__vgic_put_lpi_locked(kvm, cte->irq);
-+		vgic_put_irq(kvm, cte->irq);
- 
- 	/*
- 	 * The irq refcount is guaranteed to be nonzero while holding the
-@@ -686,7 +686,7 @@ void vgic_its_invalidate_cache(struct kvm *kvm)
- 		if (!cte->irq)
- 			break;
- 
--		__vgic_put_lpi_locked(kvm, cte->irq);
-+		vgic_put_irq(kvm, cte->irq);
- 		cte->irq = NULL;
- 	}
- 
-diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index df9e1aa1956c..f963f410788a 100644
---- a/arch/arm64/kvm/vgic/vgic.c
-+++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -111,22 +111,6 @@ static void vgic_irq_release(struct kref *ref)
- {
- }
- 
--/*
-- * Drop the refcount on the LPI. Must be called with lpi_list_lock held.
-- */
--void __vgic_put_lpi_locked(struct kvm *kvm, struct vgic_irq *irq)
--{
--	struct vgic_dist *dist = &kvm->arch.vgic;
--
--	if (!kref_put(&irq->refcount, vgic_irq_release))
--		return;
--
--	xa_erase(&dist->lpi_xa, irq->intid);
--	atomic_dec(&dist->lpi_count);
--
--	kfree_rcu(irq, rcu);
--}
--
- void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
- {
- 	struct vgic_dist *dist = &kvm->arch.vgic;
-@@ -135,9 +119,15 @@ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
- 	if (irq->intid < VGIC_MIN_LPI)
- 		return;
- 
--	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
--	__vgic_put_lpi_locked(kvm, irq);
--	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
-+	if (!kref_put(&irq->refcount, vgic_irq_release))
-+		return;
-+
-+	xa_lock_irqsave(&dist->lpi_xa, flags);
-+	__xa_erase(&dist->lpi_xa, irq->intid);
-+	xa_unlock_irqrestore(&dist->lpi_xa, flags);
-+
-+	atomic_dec(&dist->lpi_count);
-+	kfree_rcu(irq, rcu);
- }
- 
- void vgic_flush_pending_lpis(struct kvm_vcpu *vcpu)
-diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-index f874b9932c5a..0c2b82de8fa3 100644
---- a/arch/arm64/kvm/vgic/vgic.h
-+++ b/arch/arm64/kvm/vgic/vgic.h
-@@ -180,7 +180,6 @@ vgic_get_mmio_region(struct kvm_vcpu *vcpu, struct vgic_io_device *iodev,
- 		     gpa_t addr, int len);
- struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
- 			      u32 intid);
--void __vgic_put_lpi_locked(struct kvm *kvm, struct vgic_irq *irq);
- void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq);
- bool vgic_get_phys_line_level(struct vgic_irq *irq);
- void vgic_irq_set_phys_pending(struct vgic_irq *irq, bool pending);
--- 
-2.44.0.rc0.258.g7320e95886-goog
+IDT is allocated in DATA memslot in current code, but here, when using
+vm_vaddr_alloc_page(), it will be allocated in TEST_DATA memslot.
+
+Do we need to follow the current code to use
+__vm_vaddr_alloc_page(vm, MEM_REGION_DATA) instead?
+
+> +
+> +	dt->base = vm->idt;
+> +	dt->limit = NUM_INTERRUPTS * sizeof(struct idt_entry) - 1;
+> +}
+> +
+> +void sync_exception_handlers_to_guest(struct kvm_vm *vm)
+> +{
+> +	*(vm_vaddr_t *)addr_gva2hva(vm, (vm_vaddr_t)(&exception_handlers)) = vm->handlers;
+> +}
+> +
+>   void vcpu_init_descriptor_tables(struct kvm_vcpu *vcpu)
+>   {
+>   	struct kvm_vm *vm = vcpu->vm;
+>   	struct kvm_sregs sregs;
+>   
+>   	vcpu_sregs_get(vcpu, &sregs);
+> -	sregs.idt.base = vm->idt;
+> -	sregs.idt.limit = NUM_INTERRUPTS * sizeof(struct idt_entry) - 1;
+> +	kvm_setup_idt(vcpu->vm, &sregs.idt);
+>   	sregs.gdt.base = vm->gdt;
+>   	sregs.gdt.limit = getpagesize() - 1;
+>   	kvm_seg_set_kernel_data_64bit(NULL, DEFAULT_DATA_SELECTOR, &sregs.gs);
+>   	vcpu_sregs_set(vcpu, &sregs);
+> -	*(vm_vaddr_t *)addr_gva2hva(vm, (vm_vaddr_t)(&exception_handlers)) = vm->handlers;
+> +	sync_exception_handlers_to_guest(vm);
+>   }
+>   
+>   void vm_install_exception_handler(struct kvm_vm *vm, int vector,
 
 
