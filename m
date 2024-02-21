@@ -1,151 +1,170 @@
-Return-Path: <kvm+bounces-9316-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9317-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5778C85E0F0
-	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 16:24:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B23F85E15F
+	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 16:37:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83A111C22B05
-	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 15:24:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01F90285B27
+	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 15:37:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68C0E80627;
-	Wed, 21 Feb 2024 15:24:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C1FD80BE3;
+	Wed, 21 Feb 2024 15:37:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X43WiF5R"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="aeIrMP8P"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EA1A8060A
-	for <kvm@vger.kernel.org>; Wed, 21 Feb 2024 15:24:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3527280BE1;
+	Wed, 21 Feb 2024 15:36:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708529062; cv=none; b=X1HWJs0fdG/eoOZ9ptAeonldtpAO+a+PkDBKmeWHSnrokFaUwWa94EQd93y1tAQ4lgIdoS9p40MtWNt0L/o6tNvsDRdBW0sWb9LQLkqf+o0JVp5eBj3YPUss58gBjwNgv/TAeibMc+sjH9KQfN9eFkDUjI6tZ3SCQ1Tc5cpaMzI=
+	t=1708529819; cv=none; b=BrYkJ8zLcgAzlzi3tiXjbn1YAuqeYkYp/th1qk0nDuAYDdb9hTJoktl6+r0eE98809pxQilJhCRcCPi3QsNLxj07GJVAcy070fJBD4yyxOxjw2+nFhGYiJKIccP9ELQmnO0RrbYrFboQNvZyZWXYUTG2yvuCaEpyVrLMVwZomHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708529062; c=relaxed/simple;
-	bh=G1SI2A6tUC59YrjJyks6t8vsbhf0181tsF0nRbc+Gok=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Qc1DEsAsFsVc4w4gTAW+RhAmyfGJ4PU8iJDsNhTVpUuQcPBa7TGDzxQ9UTqMROySbeFgmi0a/47ouoF8XORYI5ooOq1vxpCfN0aIEaUuYOrWVN8I2N+9XesuD2IBnj6tEzhxGoq5rYKkFHROnsQ2bJzvH+9oA9ncstMBkaORuFU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=X43WiF5R; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc6b26783b4so6347530276.0
-        for <kvm@vger.kernel.org>; Wed, 21 Feb 2024 07:24:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708529060; x=1709133860; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BHHzhvHN0kTOVo3wOm3ee1AH8U5eQGWfBAmKM9n5eN0=;
-        b=X43WiF5RExkr9EECTADddb6evCbVDhimXJjF9Z8G1tBPIpqd42YzvkWgXqXe0pwiMP
-         XvFq8cY20TKg3kTMLcAbc8ZqzGgkm+9WBF4vbuaQ/pJVl8BGWzw3Ev62NzGohQAFDAm1
-         BTyeR98Ap8Ovku2X+RUA5RZjqO1UKH/0Rx3cQp71NPWIN/OGRVPBsJhL481LsWlZH/aI
-         xDnSkpMoAAnT+hOEr/T4oYJdci78npqM8m+Qb3rJBGTWmrvrHRzEonmfw0AIDghXQ4q2
-         zaCcKaaxAHBCf3ojozyQz4NSepuHajT/O3By5RDbtoUi/LqUCzTzeNfS0rirPuDl0vzz
-         8TgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708529060; x=1709133860;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BHHzhvHN0kTOVo3wOm3ee1AH8U5eQGWfBAmKM9n5eN0=;
-        b=DWvFEoHhnYJ96E0dJPjIA57WpYSxJAxBT6UIa7QiO0NcZK5mNSssmUACe0uDGmT7B7
-         ydQgevgmIrxpa14hnQHn2ynoeAPWTnT5m7TKwxE5xhwpWI161cj5FRUmPdk+UCMD2TP9
-         n2TUTPoGMA0+7NOmNcN3xHnrwMutVWDPfXGZ2waeQ6LItVwgRUxeQYREG/LmzI73jodu
-         cOC9Z5EW4RPdBDEvmtC0KExezySciyXbEa6+3xc6GSxKNqOvmXRuIy7tIiYL49Wy9Vra
-         Us7cJxTu8zSg81378RPRjfh+u9mOgquOG9dvk4PlSjyUT5mgziYtichi/WZyZM2uTUHU
-         xnnA==
-X-Forwarded-Encrypted: i=1; AJvYcCUCftQ/JyvssE/4jL7/Tz4NFf+CwOHDoYTAu3s4Ws1tIle482bFncyHy6NjtH5iCShJTGxZMZEuwhxlsdkl2SR1s4k/
-X-Gm-Message-State: AOJu0YxIn/Zn8gKD0M7OEeDU+BdZ3qXggGbISKA89FUtCXl/D5hvFjzS
-	V8WE9m/yYq7KyKNyBkrkCZzNia3cCcAdoGkS8Tdq2ipizC51AnPvhiIyeZRJ4HXtNUNrzedfZm0
-	ndw==
-X-Google-Smtp-Source: AGHT+IHIiqpo182eOydyp2kAE2MyaxiISahNsXsmBtUhUZTch3wVQ+TmxdSEWBoV3EtlCh1QkxcGWISraHk=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:114a:b0:dc6:b982:cfa2 with SMTP id
- p10-20020a056902114a00b00dc6b982cfa2mr703388ybu.8.1708529060015; Wed, 21 Feb
- 2024 07:24:20 -0800 (PST)
-Date: Wed, 21 Feb 2024 07:24:18 -0800
-In-Reply-To: <20240217055504.2059803-1-masahiroy@kernel.org>
+	s=arc-20240116; t=1708529819; c=relaxed/simple;
+	bh=emYipNS4bW71AHAbMX1Ox328mrRcyb8tQ6TqRGw1Qt4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=h7jK7JpHsZk4Guol6JugV1eVoX/6Noa7d2QFcKK2p+Oj9hU658F26+o26fZU5XWZ/j9BpjOsWTavgzhK308Dli84cbISMrr0R+8bd+GaNEflG8a/OcC8TUD0fiV6tPUB0PIbGtny9IlE/86h9f16UcPpRmRz5QgNt9XzOoxlf2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=aeIrMP8P; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41LFXnOU025484;
+	Wed, 21 Feb 2024 15:36:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=YP0mkk209LOeVWIguRPB07smQDxGaH5aYjxdGUbNi08=;
+ b=aeIrMP8PpdqV9lh5Db+Jqqsmk6wtJLSY2Yyn1U5C1WFNPzr1Q3nppUSIHUkPJGXs/fSc
+ NDUk4aSg1+OMZPAz0S1I/5De1p96A6abtfjOBMrLG5a35Qy/Hk+w87fT9Jx/Zn9M5B++
+ pJ6PrqDeeNOZj8GBhpLD1SogdfnJl/BReMVj1LhmsG7d0uVffQNSoSOawfvj0mueyCc8
+ QXgzgQKjzYchnlxe7CAQXLuPTquNDLhlvYKbpXDxmvUr6rV+xqq+8LGVKWWkIGmhfGxW
+ hUgDAoqRQj5j3SyjFK/gb4IBxmLh5ESF0K1TUZi8rYxswz8s0Vwa8Qk4QsxKhlCybbDm jA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wdkx082m3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 21 Feb 2024 15:36:55 +0000
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41LFa8ff000557;
+	Wed, 21 Feb 2024 15:36:55 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wdkx082kw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 21 Feb 2024 15:36:55 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 41LFFjSv017307;
+	Wed, 21 Feb 2024 15:36:54 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3wb8mmft9q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 21 Feb 2024 15:36:54 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 41LFan4w36045376
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 21 Feb 2024 15:36:51 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id EAD8F20040;
+	Wed, 21 Feb 2024 15:36:48 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 731E620043;
+	Wed, 21 Feb 2024 15:36:48 +0000 (GMT)
+Received: from [9.179.10.137] (unknown [9.179.10.137])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 21 Feb 2024 15:36:48 +0000 (GMT)
+Message-ID: <538ae248-d75d-435b-84a6-70268ccc4492@linux.ibm.com>
+Date: Wed, 21 Feb 2024 16:36:48 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240217055504.2059803-1-masahiroy@kernel.org>
-Message-ID: <ZdYVouaZX0AQF0V0@google.com>
-Subject: Re: [PATCH 1/2] kbuild: change tool coverage variables to take the
- path relative to $(obj)
-From: Sean Christopherson <seanjc@google.com>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: linux-kbuild@vger.kernel.org, Andy Lutomirski <luto@kernel.org>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	"H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, Nathan Chancellor <nathan@kernel.org>, 
-	Nicolas Schier <nicolas@fjasle.eu>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	x86@kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: s390: only deliver the set service event bits
+Content-Language: en-US
+To: Eric Farman <farman@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>
+Cc: Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+References: <20240205214300.1018522-1-farman@linux.ibm.com>
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; keydata=
+ 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
+In-Reply-To: <20240205214300.1018522-1-farman@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: lo_r4_frPNfbG5nZsnSuq1w4afkyjFSi
+X-Proofpoint-ORIG-GUID: irdgqFv05TFnMS_OzNNJDXmOMKmWKzLv
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-21_02,2024-02-21_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
+ mlxlogscore=870 clxscore=1015 priorityscore=1501 malwarescore=0
+ adultscore=0 impostorscore=0 suspectscore=0 bulkscore=0 lowpriorityscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2402210120
 
-On Sat, Feb 17, 2024, Masahiro Yamada wrote:
-> To maintain the current behavior, I made adjustments to two Makefiles:
+On 2/5/24 22:43, Eric Farman wrote:
+> The SCLP driver code masks off the last two bits of the parameter [1]
+> to determine if a read is required, but doesn't care about the
+> contents of those bits. Meanwhile, the KVM code that delivers
+> event interrupts masks off those two bits but sends both to the
+> guest, even if only one was specified by userspace [2].
 > 
->  - arch/x86/entry/vdso/Makefile, which compiles vclock_gettime.o and
->    vdso32/vclock_gettime.o
+> This works for the driver code, but it means any nuances of those
+> bits gets lost. Use the event pending mask as an actual mask, and
+> only send the bit(s) that were specified in the pending interrupt.
 > 
->  - arch/x86/kvm/Makefile, which compiles vmx/vmenter.o and svm/vmenter.o
-> 
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> ---
-> 
->  arch/x86/entry/vdso/Makefile |  2 ++
->  arch/x86/kvm/Makefile        |  3 ++-
->  scripts/Makefile.build       |  2 +-
->  scripts/Makefile.lib         | 16 ++++++++--------
->  4 files changed, 13 insertions(+), 10 deletions(-)
-> 
-> diff --git a/arch/x86/entry/vdso/Makefile b/arch/x86/entry/vdso/Makefile
-> index 7a97b17f28b7..148adfdb2325 100644
-> --- a/arch/x86/entry/vdso/Makefile
-> +++ b/arch/x86/entry/vdso/Makefile
-> @@ -9,7 +9,9 @@ include $(srctree)/lib/vdso/Makefile
->  # Sanitizer runtimes are unavailable and cannot be linked here.
->  KASAN_SANITIZE			:= n
->  KMSAN_SANITIZE_vclock_gettime.o := n
-> +KMSAN_SANITIZE_vdso32/vclock_gettime.o	:= n
->  KMSAN_SANITIZE_vgetcpu.o	:= n
-> +KMSAN_SANITIZE_vdso32/vgetcpu.o	:= n
->  
->  UBSAN_SANITIZE			:= n
->  KCSAN_SANITIZE			:= n
-> diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-> index 475b5fa917a6..a88bb14266b6 100644
-> --- a/arch/x86/kvm/Makefile
-> +++ b/arch/x86/kvm/Makefile
-> @@ -4,7 +4,8 @@ ccflags-y += -I $(srctree)/arch/x86/kvm
->  ccflags-$(CONFIG_KVM_WERROR) += -Werror
->  
->  ifeq ($(CONFIG_FRAME_POINTER),y)
-> -OBJECT_FILES_NON_STANDARD_vmenter.o := y
-> +OBJECT_FILES_NON_STANDARD_vmx/vmenter.o := y
-> +OBJECT_FILES_NON_STANDARD_svm/vmenter.o := y
->  endif
+> [1] Linux: sclp_interrupt_handler() (drivers/s390/char/sclp.c:658)
+> [2] QEMU: service_interrupt() (hw/s390x/sclp.c:360..363)
 
-I'm 99% certain only svm/vmenter.S "needs" to be compiled with OBJECT_FILES_NON_STANDARD,
-and that vmx/vmenter.S got caught in the crossfire off commit commit 7f4b5cde2409
-("kvm: Disable objtool frame pointer checking for vmenter.S").
-
-"Needs" in quotes because I don't see any reason when __svm_vcpu_run() can't play
-the same games as __vmx_vcpu_run() to make stack validation happy, and
-__svm_sev_es_vcpu_run() flat out shouldn't be touching RBP.
-
-I'll throw together a series to (hopefully) remove OBJECT_FILES_NON_STANDARD
-completely.
-
-But for this patch/series, I think it makes sense to do a 1:1 conversion.  That'll
-make it much more straightforward to resolve the eventual conflict, assuming I am
-successful in dropping OBJECT_FILES_NON_STANDARD.
-
-Which is a very long-winded way of saying:
-
-Acked-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 
