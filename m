@@ -1,101 +1,136 @@
-Return-Path: <kvm+bounces-9300-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9301-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5275885D742
-	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 12:41:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B302085D750
+	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 12:43:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C0AE282510
-	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 11:41:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 430DBB2548D
+	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 11:43:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 122F94C627;
-	Wed, 21 Feb 2024 11:39:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61BE547A70;
+	Wed, 21 Feb 2024 11:41:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hn8whl/y"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="QneGEIeJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89FEC487A7
-	for <kvm@vger.kernel.org>; Wed, 21 Feb 2024 11:39:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01FB241740;
+	Wed, 21 Feb 2024 11:41:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708515561; cv=none; b=IcEJWUBFxA1CqUVhmtNofmWnYrOuagzxPSWpThB0RCHN/0hmNzgqDUFLZzM6GffONaMEORPIq+JpMQ2CyXZyy0xWxxLXcPtZjCGZ6PTWp51212AFZRxXNFrup3N9ESo+e9iwgb9SFBE7ZYj/GMS6opiqMRRddKXjP9GaXEMum/w=
+	t=1708515715; cv=none; b=f/UQwkx2bgxr3KTlROXLdBvgxIhuuRLmF9NpsCP3SloQJxm+5emztHDyUropgaC6HhdftW5b8arlf2QjtGzvu/JCHu6Z2/SZfhza/s4/PtBSIA8PL3lpOBU8YFHD11Qayn+uaur4F4YbA4kZp7SA3MgS0GhWpXDJftV4PM/wvnQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708515561; c=relaxed/simple;
-	bh=WN29FhHIbaFhzOpidBbq2yPCWUFc+rFagYVzvFv0258=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Z4Vn5g6YQOMQDDoa9gwDAAjAIyilkycyaMz1IdhOpArouzq3Z65u318UNR9SRM3I/685Di/dZJGaCMAnea3wm67pAwulENyV1ZZmI/ZNrRhZZbutpZw8DF2gXtfjU3aooS6r3KEz9Vdqj+9toqNOElLdquJ0Y7OYH0szHRKPYbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hn8whl/y; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708515558;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=a2Dtr1oYPq5h+UmaIBvjfi/Gm7gWRD+25qD/vc/SHLA=;
-	b=hn8whl/yIaIw1DYfL2DzQKM+UpjBLXImRc2a+vXQPxCFUUpUcgsrVm6hZdpEyLAsfgP3hR
-	pPD+bLv7ayygUMLwjH/5gNmG5rYhtcGzzueRGZGvohSIXviGza4O1fzMPFBy55rARG90hP
-	ic7bQesujssRLp0hymw8NX4DoZzyAEY=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-533-xhTwOjeCPh6_F_GL_nOHXg-1; Wed,
- 21 Feb 2024 06:39:14 -0500
-X-MC-Unique: xhTwOjeCPh6_F_GL_nOHXg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6C38628EA6EB;
-	Wed, 21 Feb 2024 11:39:14 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 4E7694031FBF;
-	Wed, 21 Feb 2024 11:39:14 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: torvalds@linux-foundation.org
-Cc: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: [GIT PULL] KVM fixes for Linux 6.8-rc6
-Date: Wed, 21 Feb 2024 06:39:13 -0500
-Message-Id: <20240221113913.215306-1-pbonzini@redhat.com>
+	s=arc-20240116; t=1708515715; c=relaxed/simple;
+	bh=ILaW+tmU19Hc2hM6tJl9+D6rdU+hAvnyjOgyR8UveG4=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=s9GOvm3q4lrM9YxKr7ScWzKrCAuWDhKBUeV+EeJa/etDzXBA8fDgTVkzRPk7O56GJMzRUcxp0qT3ID7Fun6zO+42V5xQ6xDqXFcN2PG5wrUmtE6Qd1AmGcBb87GOVs7cMAQx9DZyO0mbxR9V6zqWA3WQhx54dZNMdbNbBfDmlE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=QneGEIeJ; arc=none smtp.client-ip=115.124.30.113
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1708515709; h=Message-ID:Subject:Date:From:To;
+	bh=0phsHgifgaYaoJTCL91u0y1uTS0FvlbXLUwQ30Yr5i8=;
+	b=QneGEIeJXIpMpaLXE6ZxGwFfr1l0qipg0DZzqwX2RD3yNtbDjcLG6RLa4jzJKxsGQXpfm0cJ3S0/mWvPyEvciRLImyCOaHAK+Ahmo0//g5U4JoBhfhfiW3LLW/VOwE31+zAOaLB6x3800StsQOA1H925x48wem+s05/ymdyWOvI=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0W0zjbGX_1708515708;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W0zjbGX_1708515708)
+          by smtp.aliyun-inc.com;
+          Wed, 21 Feb 2024 19:41:49 +0800
+Message-ID: <1708515555.2820647-2-xuanzhuo@linux.alibaba.com>
+Subject: Re: RE: [PATCH net-next 1/2] xsk: Remove non-zero 'dma_page' check in xp_assign_dev
+Date: Wed, 21 Feb 2024 19:39:15 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: wangyunjian <wangyunjian@huawei.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
+ xudingke <xudingke@huawei.com>,
+ "mst@redhat.com" <mst@redhat.com>,
+ "willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>,
+ "jasowang@redhat.com" <jasowang@redhat.com>,
+ "kuba@kernel.org" <kuba@kernel.org>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "magnus.karlsson@intel.com" <magnus.karlsson@intel.com>
+References: <1706089058-1364-1-git-send-email-wangyunjian@huawei.com>
+ <1708509152.9501102-1-xuanzhuo@linux.alibaba.com>
+ <0fce8b64808f4c6faa0eb60e44687c36@huawei.com>
+In-Reply-To: <0fce8b64808f4c6faa0eb60e44687c36@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 
-Linus,
+On Wed, 21 Feb 2024 11:37:22 +0000, wangyunjian <wangyunjian@huawei.com> wrote:
+> > -----Original Message-----
+> > From: Xuan Zhuo [mailto:xuanzhuo@linux.alibaba.com]
+> > Sent: Wednesday, February 21, 2024 5:53 PM
+> > To: wangyunjian <wangyunjian@huawei.com>
+> > Cc: netdev@vger.kernel.org; linux-kernel@vger.kernel.org;
+> > kvm@vger.kernel.org; virtualization@lists.linux.dev; xudingke
+> > <xudingke@huawei.com>; wangyunjian <wangyunjian@huawei.com>;
+> > mst@redhat.com; willemdebruijn.kernel@gmail.com; jasowang@redhat.com;
+> > kuba@kernel.org; davem@davemloft.net; magnus.karlsson@intel.com
+> > Subject: Re: [PATCH net-next 1/2] xsk: Remove non-zero 'dma_page' check in
+> > xp_assign_dev
+> >
+> > On Wed, 24 Jan 2024 17:37:38 +0800, Yunjian Wang
+> > <wangyunjian@huawei.com> wrote:
+> > > Now dma mappings are used by the physical NICs. However the vNIC maybe
+> > > do not need them. So remove non-zero 'dma_page' check in
+> > > xp_assign_dev.
+> >
+> > Could you tell me which one nic can work with AF_XDP without DMA?
+>
+> TUN will support AF_XDP Tx zero-copy, which does not require DMA mappings.
 
-The following changes since commit 9895ceeb5cd61092f147f8d611e2df575879dd6f:
 
-  Merge tag 'kvmarm-fixes-6.8-2' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD (2024-02-16 12:02:38 -0500)
+Great. Though I do not know how it works, but I think a new option or feature
+is better.
 
-are available in the Git repository at:
+Thanks.
 
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
 
-for you to fetch changes up to c48617fbbe831d4c80fe84056033f17b70a31136:
-
-  Merge tag 'kvmarm-fixes-6.8-3' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD (2024-02-21 05:18:56 -0500)
-
-----------------------------------------------------------------
-ARM: Two fixes for the ITS emulation.  Unmapped interrupts were
-used instead of ignored, causing NULL pointer dereferences.
-
-----------------------------------------------------------------
-Oliver Upton (2):
-      KVM: arm64: vgic-its: Test for valid IRQ in its_sync_lpi_pending_table()
-      KVM: arm64: vgic-its: Test for valid IRQ in MOVALL handler
-
-Paolo Bonzini (1):
-      Merge tag 'kvmarm-fixes-6.8-3' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD
-
- arch/arm64/kvm/vgic/vgic-its.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
+>
+> Thanks
+>
+> >
+> > Thanks.
+> >
+> >
+> > >
+> > > Signed-off-by: Yunjian Wang <wangyunjian@huawei.com>
+> > > ---
+> > >  net/xdp/xsk_buff_pool.c | 7 -------
+> > >  1 file changed, 7 deletions(-)
+> > >
+> > > diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c index
+> > > 28711cc44ced..939b6e7b59ff 100644
+> > > --- a/net/xdp/xsk_buff_pool.c
+> > > +++ b/net/xdp/xsk_buff_pool.c
+> > > @@ -219,16 +219,9 @@ int xp_assign_dev(struct xsk_buff_pool *pool,
+> > >  	if (err)
+> > >  		goto err_unreg_pool;
+> > >
+> > > -	if (!pool->dma_pages) {
+> > > -		WARN(1, "Driver did not DMA map zero-copy buffers");
+> > > -		err = -EINVAL;
+> > > -		goto err_unreg_xsk;
+> > > -	}
+> > >  	pool->umem->zc = true;
+> > >  	return 0;
+> > >
+> > > -err_unreg_xsk:
+> > > -	xp_disable_drv_zc(pool);
+> > >  err_unreg_pool:
+> > >  	if (!force_zc)
+> > >  		err = 0; /* fallback to copy mode */
+> > > --
+> > > 2.33.0
+> > >
+> > >
 
