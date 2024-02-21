@@ -1,136 +1,147 @@
-Return-Path: <kvm+bounces-9301-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9302-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B302085D750
-	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 12:43:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD19085D754
+	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 12:43:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 430DBB2548D
-	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 11:43:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8E6491F23C69
+	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 11:43:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61BE547A70;
-	Wed, 21 Feb 2024 11:41:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9133D44393;
+	Wed, 21 Feb 2024 11:43:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="QneGEIeJ"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="c6fEb7CJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01FB241740;
-	Wed, 21 Feb 2024 11:41:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78E7E4122C;
+	Wed, 21 Feb 2024 11:43:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708515715; cv=none; b=f/UQwkx2bgxr3KTlROXLdBvgxIhuuRLmF9NpsCP3SloQJxm+5emztHDyUropgaC6HhdftW5b8arlf2QjtGzvu/JCHu6Z2/SZfhza/s4/PtBSIA8PL3lpOBU8YFHD11Qayn+uaur4F4YbA4kZp7SA3MgS0GhWpXDJftV4PM/wvnQ=
+	t=1708515825; cv=none; b=VLTnQqW72n8YeUaBqcA1bXIexbsNOy9poMeVocdjbBHcyxfpcK2K7b460gNXwVUY4mEbXGmX700fZJUumffjnJ8el1wLyhf0LqzVe0u/lfmzbMEDny2nPTMLjNs9f/TFNaPnDRL9U1NgBAkzB6Svoce3kb4uwlKefxjfCn2FSXA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708515715; c=relaxed/simple;
-	bh=ILaW+tmU19Hc2hM6tJl9+D6rdU+hAvnyjOgyR8UveG4=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=s9GOvm3q4lrM9YxKr7ScWzKrCAuWDhKBUeV+EeJa/etDzXBA8fDgTVkzRPk7O56GJMzRUcxp0qT3ID7Fun6zO+42V5xQ6xDqXFcN2PG5wrUmtE6Qd1AmGcBb87GOVs7cMAQx9DZyO0mbxR9V6zqWA3WQhx54dZNMdbNbBfDmlE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=QneGEIeJ; arc=none smtp.client-ip=115.124.30.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1708515709; h=Message-ID:Subject:Date:From:To;
-	bh=0phsHgifgaYaoJTCL91u0y1uTS0FvlbXLUwQ30Yr5i8=;
-	b=QneGEIeJXIpMpaLXE6ZxGwFfr1l0qipg0DZzqwX2RD3yNtbDjcLG6RLa4jzJKxsGQXpfm0cJ3S0/mWvPyEvciRLImyCOaHAK+Ahmo0//g5U4JoBhfhfiW3LLW/VOwE31+zAOaLB6x3800StsQOA1H925x48wem+s05/ymdyWOvI=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0W0zjbGX_1708515708;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W0zjbGX_1708515708)
-          by smtp.aliyun-inc.com;
-          Wed, 21 Feb 2024 19:41:49 +0800
-Message-ID: <1708515555.2820647-2-xuanzhuo@linux.alibaba.com>
-Subject: Re: RE: [PATCH net-next 1/2] xsk: Remove non-zero 'dma_page' check in xp_assign_dev
-Date: Wed, 21 Feb 2024 19:39:15 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: wangyunjian <wangyunjian@huawei.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
- xudingke <xudingke@huawei.com>,
- "mst@redhat.com" <mst@redhat.com>,
- "willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>,
- "jasowang@redhat.com" <jasowang@redhat.com>,
- "kuba@kernel.org" <kuba@kernel.org>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "magnus.karlsson@intel.com" <magnus.karlsson@intel.com>
-References: <1706089058-1364-1-git-send-email-wangyunjian@huawei.com>
- <1708509152.9501102-1-xuanzhuo@linux.alibaba.com>
- <0fce8b64808f4c6faa0eb60e44687c36@huawei.com>
-In-Reply-To: <0fce8b64808f4c6faa0eb60e44687c36@huawei.com>
+	s=arc-20240116; t=1708515825; c=relaxed/simple;
+	bh=IRRpfo0N2xcpSAdFSoJMt3sPGsOjRi/HyC7JiD918Sw=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=uHMJE3dn0SDmpy3GlmOMMWnFknZyj9UlQPf4u8DK8nKU89GIoSh9AXqIA59TGX1GwtlhisGsJi7UaDU91Ix3M1I8+hOKJFhUZ4qF14c6LDEA1/bCXTzzFMBvxfda65gBbKofsXxbCvGuMg+YWX4NU93vgRyMWjnT9/4NtAyTILs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=c6fEb7CJ; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41L9rmFQ016405;
+	Wed, 21 Feb 2024 11:43:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=IRRpfo0N2xcpSAdFSoJMt3sPGsOjRi/HyC7JiD918Sw=;
+ b=c6fEb7CJda0YMRN+wjtGagvkXv1nu4pE3gXXj09cV2bQiDQ9Tjo5SsSerlVgZUoAZrNN
+ czmhKrc7ZaX2YTcnnkUUobB4zMtwF4VZOvksEhj2ZLDu5ZE3C6aE3O/uaY3UrkZkB+H1
+ ZFB/xa74tyYpNrfNI8LiuuU+h+jGYJtD8C78QfHtUi80Y463bTr5ur4/Pf6dzUFKAwcu
+ jTph9JDQe0GJyk1PZkOsndFGq7f/NeZshRShftL+b/rugG4iGTjmScs0Uru329RtdXT7
+ s25eI07DwLsI5CvJ+Mcij2v/wR6lvvwI4tZDRK08FUEO5HdhW1/Kfi7DcF3JBg8AQUng nw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wddp24jgc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 21 Feb 2024 11:43:41 +0000
+Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41LBRLKd028277;
+	Wed, 21 Feb 2024 11:43:41 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wddp24jg5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 21 Feb 2024 11:43:41 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 41LAKJGo031138;
+	Wed, 21 Feb 2024 11:43:40 GMT
+Received: from smtprelay06.wdc07v.mail.ibm.com ([172.16.1.73])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3wb9bkxcbr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 21 Feb 2024 11:43:40 +0000
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+	by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 41LBhaJw18416160
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 21 Feb 2024 11:43:38 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9223158057;
+	Wed, 21 Feb 2024 11:43:36 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9DD885805D;
+	Wed, 21 Feb 2024 11:43:35 +0000 (GMT)
+Received: from li-479af74c-31f9-11b2-a85c-e4ddee11713b.ibm.com (unknown [9.61.38.214])
+	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 21 Feb 2024 11:43:35 +0000 (GMT)
+Message-ID: <8c170301bf02a3889ca3c3f79ac48ee961217f41.camel@linux.ibm.com>
+Subject: Re: [PATCH v4 0/2] KVM: s390: Fix AR parameter in ioctl
+From: Eric Farman <farman@linux.ibm.com>
+To: Heiko Carstens <hca@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>
+Cc: Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda
+ <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Vasily
+ Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Date: Wed, 21 Feb 2024 06:43:35 -0500
+In-Reply-To: <20240221112600.7561-B-hca@linux.ibm.com>
+References: <20240220211211.3102609-1-farman@linux.ibm.com>
+	 <bbe1db67-386b-4738-83d5-6e02cd3c9d58@linux.ibm.com>
+	 <20240221112600.7561-B-hca@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: uUqJcSllguAw-9crn87dQxGwdDbMDYH3
+X-Proofpoint-ORIG-GUID: KyexTtdirze4GxtVktYqdD_j4t7ecKiG
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-20_06,2024-02-21_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 spamscore=0
+ priorityscore=1501 suspectscore=0 clxscore=1015 impostorscore=0
+ bulkscore=0 mlxscore=0 mlxlogscore=955 lowpriorityscore=0 adultscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2402210090
 
-On Wed, 21 Feb 2024 11:37:22 +0000, wangyunjian <wangyunjian@huawei.com> wrote:
-> > -----Original Message-----
-> > From: Xuan Zhuo [mailto:xuanzhuo@linux.alibaba.com]
-> > Sent: Wednesday, February 21, 2024 5:53 PM
-> > To: wangyunjian <wangyunjian@huawei.com>
-> > Cc: netdev@vger.kernel.org; linux-kernel@vger.kernel.org;
-> > kvm@vger.kernel.org; virtualization@lists.linux.dev; xudingke
-> > <xudingke@huawei.com>; wangyunjian <wangyunjian@huawei.com>;
-> > mst@redhat.com; willemdebruijn.kernel@gmail.com; jasowang@redhat.com;
-> > kuba@kernel.org; davem@davemloft.net; magnus.karlsson@intel.com
-> > Subject: Re: [PATCH net-next 1/2] xsk: Remove non-zero 'dma_page' check in
-> > xp_assign_dev
-> >
-> > On Wed, 24 Jan 2024 17:37:38 +0800, Yunjian Wang
-> > <wangyunjian@huawei.com> wrote:
-> > > Now dma mappings are used by the physical NICs. However the vNIC maybe
-> > > do not need them. So remove non-zero 'dma_page' check in
-> > > xp_assign_dev.
-> >
-> > Could you tell me which one nic can work with AF_XDP without DMA?
->
-> TUN will support AF_XDP Tx zero-copy, which does not require DMA mappings.
+On Wed, 2024-02-21 at 12:26 +0100, Heiko Carstens wrote:
+> On Wed, Feb 21, 2024 at 08:49:58AM +0100, Janosch Frank wrote:
+> > On 2/20/24 22:12, Eric Farman wrote:
+> > > Hi Janosch,
+> > >=20
+> > > Here is a new (final?) version for the AR/MEM_OP issue I'm
+> > > attempting to
+> > > address. Hopefully they can be picked up to whatever tree makes
+> > > sense.
+> > >=20
+> >=20
+> > I've got good and bad news for you :)
+> >=20
+> > You need to re-base this patch set on Heiko's feature branch once
+> > my kvm fpu
+> > patch is on there since the current version runs into conflicts
+> > with Heiko's
+> > fpu rework. We'll contact you once that's the case. The patch made
+> > it onto
+> > devel yesterday evening and I assumed you'd wait a bit until
+> > sending a new
+> > version but I was mistaken.
+>=20
+> I resolved the trivial merge conflict - no need to resend anything.
+>=20
+> Series applied, thanks!
 
-
-Great. Though I do not know how it works, but I think a new option or feature
-is better.
-
-Thanks.
-
-
->
-> Thanks
->
-> >
-> > Thanks.
-> >
-> >
-> > >
-> > > Signed-off-by: Yunjian Wang <wangyunjian@huawei.com>
-> > > ---
-> > >  net/xdp/xsk_buff_pool.c | 7 -------
-> > >  1 file changed, 7 deletions(-)
-> > >
-> > > diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c index
-> > > 28711cc44ced..939b6e7b59ff 100644
-> > > --- a/net/xdp/xsk_buff_pool.c
-> > > +++ b/net/xdp/xsk_buff_pool.c
-> > > @@ -219,16 +219,9 @@ int xp_assign_dev(struct xsk_buff_pool *pool,
-> > >  	if (err)
-> > >  		goto err_unreg_pool;
-> > >
-> > > -	if (!pool->dma_pages) {
-> > > -		WARN(1, "Driver did not DMA map zero-copy buffers");
-> > > -		err = -EINVAL;
-> > > -		goto err_unreg_xsk;
-> > > -	}
-> > >  	pool->umem->zc = true;
-> > >  	return 0;
-> > >
-> > > -err_unreg_xsk:
-> > > -	xp_disable_drv_zc(pool);
-> > >  err_unreg_pool:
-> > >  	if (!force_zc)
-> > >  		err = 0; /* fallback to copy mode */
-> > > --
-> > > 2.33.0
-> > >
-> > >
+Ah, sorry about that, I didn't notice the other fpu stuff go through.
+Thank you, Heiko!
 
