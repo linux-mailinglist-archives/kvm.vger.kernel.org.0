@@ -1,221 +1,209 @@
-Return-Path: <kvm+bounces-9341-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9342-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 988D985E909
-	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 21:29:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0C7185E9C9
+	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 22:16:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 107DE1F24C51
-	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 20:29:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A65C8284E77
+	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 21:16:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8682786ACE;
-	Wed, 21 Feb 2024 20:29:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15FA6126F3A;
+	Wed, 21 Feb 2024 21:16:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="O67kK4WF"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Q9kHMW7s"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CE428663A
-	for <kvm@vger.kernel.org>; Wed, 21 Feb 2024 20:29:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5037385927
+	for <kvm@vger.kernel.org>; Wed, 21 Feb 2024 21:16:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708547359; cv=none; b=EQmpV3DEymzD5hCSenlYusZiP4p0yTJcz02QRzkSg5S2g2O2a/c3BUHOwl33amU6wpcEIJ6lSJFeOMVNbkjI1u00ewGLRH4J/L1+zAUIvSOmMKCAOHtfmI1DLcWQ9Q6Qmu19MCpxGa8eYWgaod8InaerySex/xIsagWFjeLYQiw=
+	t=1708550206; cv=none; b=aMdafrmnwUh5sw6rkQiKOBJ4NE3at8hMAjC3DdYHcHwbAF0m8Be4fPrQVZxPv6FTHe6tI66FgK0JfdrT+WhN6Mt0Q05jXF9LfqQ73M5soebsgDeT8zB2zlQ5xTb9MqNU2f+3dtYc3Xzjcu390aukYungariDNQvRwjwToe5hGC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708547359; c=relaxed/simple;
-	bh=KgITQNa+cv8Wh8c0n2C2fUy/aaeCcLti0CzXRzvryps=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Good3z0iy3BFVfANyv1gv2F43ET8ZhTTyJX4Qm+9aRrTupv1i8iib3kFl5/LZ8XigZxPTn5YUJXkgXeuZ03lI5RtvZobjdCklS4E3ZKwq4nV5uOVGYa96Ah2S2IhXmp3CxAlet5S7rsvUw/g4l+m9IAUl1t/UxqTFYYVzfcdEmg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=O67kK4WF; arc=none smtp.client-ip=209.85.216.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-299b818d63aso145772a91.0
-        for <kvm@vger.kernel.org>; Wed, 21 Feb 2024 12:29:17 -0800 (PST)
+	s=arc-20240116; t=1708550206; c=relaxed/simple;
+	bh=Nman6J6nntuhSIWvoHa/yhkSJpHd7hSZDfmlCwMKDj4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MqaC96pEyApoNvPw0iloq+wiHL4n3fUP0qDEN+9nyH4FuZzY+nscuz+tg+eZ4hZ6B4QjEtutoRtDOt4ocDdLKzk6jsCCm4AXfcbjny0sP+4K7Nc95HoKH/S/w17ghZwph5iS+lQBwxRLxZY3ZuNvhQbXk+SpVXxGCwTQIe8vor0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Q9kHMW7s; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-33ce8cbf465so3658814f8f.3
+        for <kvm@vger.kernel.org>; Wed, 21 Feb 2024 13:16:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1708547357; x=1709152157; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=sTCGMEew0Fipe902SlrRK/D4WW/nSfSfZfwf/W230pM=;
-        b=O67kK4WFweUsPmYxrCTIK1TmK4E4xT4/zZZVo7Qb3ZTUjOucEE9Wxp+Y9+VgqVZTNd
-         Dz74+3IctO6TEKAhsxP+oVEoKQwNL1cFbrf77m6WjN+U3EpWBuBFe2J6yHcLuJhhWIiB
-         gVJeB/x1xY8I0tm8zFNIYVtpOH179Cki3k7ZYJELLL2Nvu4pOv0D3p6SX4rII0x3bxho
-         Fz+kFkmQmILbv5WOBZOBtX3F1JHm4+zOohvZcZgPs3OMXEoHg9beEMn+5+holdLhaC8t
-         wgrz3hAwbJ93WIPgbersrhJj1FQm72AEgTO/89Qdc8A/t5bNF+NrqXJtAWW+/9PVfZCo
-         ytAg==
+        d=linaro.org; s=google; t=1708550202; x=1709155002; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=krMCnSm7PN59WBp42omeBRDoSFldcCIH3sGDX1JOTwc=;
+        b=Q9kHMW7sCQFaIcmvM1JKA7b+76wASVjOA+FrJY4PlVeM2EPxFjX+Iv9H6smale6/Oy
+         z7s8W/a+spXxLkuIJ5D3NmsL95huF/AlJwEWzIwerIyBYcjJsFftyVOyHkYdSmoJHlR6
+         eNiy2Qbuapx2Sf3fphuerBc4uWGGGUsez5z0+PlXKHEcRA2c1VCsugcrYSVYfAhK3hNm
+         JhU2zecWFMxh5MBuk+sk6B0idPV68HdCIxuqKQDI7BNyl/D2Zq10TMMQQ2Us5rE3jGCu
+         GCikqe5SCnDRJxgP1K7Z4LKtOG1+3skzsH12JUA1BdRcIUVO/bLgQh6qc3DbWZOv5j2F
+         bzMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708547357; x=1709152157;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sTCGMEew0Fipe902SlrRK/D4WW/nSfSfZfwf/W230pM=;
-        b=eu/oVWAPYXTNnx0xegaCw2ZbM+tBhHmVnq5mQAK4jw9apuFNtYhKzihTtu+5Zsadjr
-         NpOMLXaVuhZybzPHa/bGnFKB3JGEAHN7/ZNe1Re4abwNhgE3Ujd2iKQt2iEW3MNW3rxE
-         70YOK0Idm02ukt402sF8STX70AnDBtqqVKJ5d60DjHuMwGDyMrp1tvz0IBEmRR207Ph9
-         IEVbVJN1xVrAsV7oULOvoiGbqk+4LWSoiUwOzHxgQClfAm0T9jja5ulztjM1lY6xdX8b
-         M/WSy9K4xKx4hSeSnnE4mLRm+HOl7zZ1LdGRFKbU0g+17JiY+lUAZb8ctTOONbtpVZEm
-         xmow==
-X-Forwarded-Encrypted: i=1; AJvYcCXyPwJamQeVftS8KAdxo8Ywei6K+vbwxPwmL4WPsEO/b6bKa7OMQ8dV/4UHfdesz4vdISOixNShuS2HqMGbXxrPEBMI
-X-Gm-Message-State: AOJu0YwgeGuXgLDLsQ/Yb5OuKuglerDnALEr9Ku7gwvTCgS+e1S4/5Nf
-	XPe8K/iX7xxVSHZgu51bYGQx273QWAg+J4KstDlpfB1anKYr7io6afxGjdzrTNU=
-X-Google-Smtp-Source: AGHT+IEv0rIXEEFymfbI7hv6WvIwIaG4wxAzbyU2mSU6ZNYe3WU2p1qg0ejBWvWUS0oTykMJfq8rng==
-X-Received: by 2002:a17:90b:3007:b0:299:8e05:4d7b with SMTP id hg7-20020a17090b300700b002998e054d7bmr783238pjb.4.1708547357279;
-        Wed, 21 Feb 2024 12:29:17 -0800 (PST)
-Received: from [172.16.0.69] (c-67-188-2-18.hsd1.ca.comcast.net. [67.188.2.18])
-        by smtp.gmail.com with ESMTPSA id pd18-20020a17090b1dd200b0029696f7f443sm2303021pjb.50.2024.02.21.12.29.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 21 Feb 2024 12:29:16 -0800 (PST)
-Message-ID: <b5673bce-09e7-4531-a074-e252aa9e38e8@rivosinc.com>
-Date: Wed, 21 Feb 2024 12:29:13 -0800
+        d=1e100.net; s=20230601; t=1708550202; x=1709155002;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=krMCnSm7PN59WBp42omeBRDoSFldcCIH3sGDX1JOTwc=;
+        b=Nmc6gNKA30RELVhkmH2582F+mAstxHAZVBIDgx3/kRGPB98L5orS8qnUsNHiTM1kkR
+         kTeJoYDMf4D/I5drHvPuZPm+/fdAWUMjYd7yl3VBnZkQiZfBxi9NvFajP+SRNVgV61Cr
+         JO+kvcTzaqbsuC+ZS6KnUASgeVpJ6hzRvsqVi1zhpQiLoGOpwZBOC/uN+FDP3Dp70vaM
+         aQChDIPnSyD083q5TStmPN/Ac+gdLSpDU/8eRy5GVjhcZMW9SAnTWx9l6VzCmtHj+6/l
+         wGzOrvZH6o6E/aqcak/uomzzz/rhb5LcXGq58sKCuwxhi2qHfslsHXRwkrVgqPUgXg5d
+         om4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXKE6yh5HB27RKQdkwWs3kW4pJTFcOcMPZrH5lfvrIDExTCODIKGAA432vzxGMzITWnTsdRtNDBU2XgMPbJ47Kbsu4I
+X-Gm-Message-State: AOJu0YxO5M19U4jH99SaHWZDsc+MIgDhqfdXu4QK6RIpw7MhfOqYx6Wv
+	B+P7YScsuUh5ffOvUHDLVpS3uWMe6+AYvcUNFUF49zG9hGUzO1zLj5S9p5Et4ak=
+X-Google-Smtp-Source: AGHT+IGZf8Qtrl4tZWmdwUIeSK1cDaEYgeGvhmoolrdmoUSN1r0xO5Kbs+SYa2GK0wYLV2zGb/OPJQ==
+X-Received: by 2002:a5d:648e:0:b0:33d:3bc2:7acc with SMTP id o14-20020a5d648e000000b0033d3bc27accmr9430955wri.11.1708550202692;
+        Wed, 21 Feb 2024 13:16:42 -0800 (PST)
+Received: from m1x-phil.lan ([176.187.211.34])
+        by smtp.gmail.com with ESMTPSA id ba20-20020a0560001c1400b0033d640c8942sm7735227wrb.10.2024.02.21.13.16.40
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Wed, 21 Feb 2024 13:16:42 -0800 (PST)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org,
+	qemu-block@nongnu.org,
+	qemu-ppc@nongnu.org,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	=?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	kvm@vger.kernel.org
+Subject: [PULL 02/25] hw/sysbus: Inline and remove sysbus_add_io()
+Date: Wed, 21 Feb 2024 22:16:02 +0100
+Message-ID: <20240221211626.48190-3-philmd@linaro.org>
+X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20240221211626.48190-1-philmd@linaro.org>
+References: <20240221211626.48190-1-philmd@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 11/12] KVM: riscv: selftests: Change vcpu_has_ext to a
- common function
-Content-Language: en-US
-To: Haibo Xu <xiaobo55x@gmail.com>, Anup Patel <anup@brainfault.org>
-Cc: Atish Patra <atishp@atishpatra.org>, Haibo Xu <haibo1.xu@intel.com>,
- ajones@ventanamicro.com, Paul Walmsley <paul.walmsley@sifive.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- James Morse <james.morse@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- Guo Ren <guoren@kernel.org>, Mayuresh Chitale <mchitale@ventanamicro.com>,
- Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
- Conor Dooley <conor.dooley@microchip.com>,
- Samuel Holland <samuel@sholland.org>,
- Minda Chen <minda.chen@starfivetech.com>, Jisheng Zhang
- <jszhang@kernel.org>, Sean Christopherson <seanjc@google.com>,
- Peter Xu <peterx@redhat.com>, Like Xu <likexu@tencent.com>,
- Vipin Sharma <vipinsh@google.com>, Thomas Huth <thuth@redhat.com>,
- Aaron Lewis <aaronlewis@google.com>,
- Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>,
- linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
- kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- kvm-riscv@lists.infradead.org
-References: <cover.1705916069.git.haibo1.xu@intel.com>
- <68856b86a93a4188558e5d0ebac0dd6aac8e404c.1705916069.git.haibo1.xu@intel.com>
- <CAOnJCULwRTSnrQkR2o1P53R=tJ3TAxX+y+XRBesW6OFEzgFv2g@mail.gmail.com>
- <CAJve8om2oOLg5-wKX7m7cBTgzwqiMcb35x=nDi1edY8evXjyMw@mail.gmail.com>
- <2c96c61a-2685-4cee-9cef-963ed833bf92@rivosinc.com>
- <CAJve8omCZxsiP1jF0n5SBh0_U6q7Exj5A1ACFahWpdBoxohaMA@mail.gmail.com>
-From: Atish Patra <atishp@rivosinc.com>
-In-Reply-To: <CAJve8omCZxsiP1jF0n5SBh0_U6q7Exj5A1ACFahWpdBoxohaMA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 2/21/24 05:08, Haibo Xu wrote:
-> On Wed, Feb 21, 2024 at 4:37 PM Atish Patra <atishp@rivosinc.com> wrote:
->>
->> On 2/20/24 18:13, Haibo Xu wrote:
->>> On Wed, Feb 21, 2024 at 7:03 AM Atish Patra <atishp@atishpatra.org> wrote:
->>>>
->>>> On Mon, Jan 22, 2024 at 1:48 AM Haibo Xu <haibo1.xu@intel.com> wrote:
->>>>>
->>>>> Move vcpu_has_ext to the processor.c and rename it to __vcpu_has_ext
->>>>> so that other test cases can use it for vCPU extension check.
->>>>>
->>>>> Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
->>>>> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
->>>>> ---
->>>>>    tools/testing/selftests/kvm/include/riscv/processor.h |  2 ++
->>>>>    tools/testing/selftests/kvm/lib/riscv/processor.c     | 10 ++++++++++
->>>>>    tools/testing/selftests/kvm/riscv/get-reg-list.c      | 11 +----------
->>>>>    3 files changed, 13 insertions(+), 10 deletions(-)
->>>>>
->>>>> diff --git a/tools/testing/selftests/kvm/include/riscv/processor.h b/tools/testing/selftests/kvm/include/riscv/processor.h
->>>>> index b68b1b731a34..bd27e1c67579 100644
->>>>> --- a/tools/testing/selftests/kvm/include/riscv/processor.h
->>>>> +++ b/tools/testing/selftests/kvm/include/riscv/processor.h
->>>>> @@ -42,6 +42,8 @@ static inline uint64_t __kvm_reg_id(uint64_t type, uint64_t idx,
->>>>>    #define RISCV_ISA_EXT_REG(idx) __kvm_reg_id(KVM_REG_RISCV_ISA_EXT, \
->>>>>                                                idx, KVM_REG_SIZE_ULONG)
->>>>>
->>>>> +bool __vcpu_has_ext(struct kvm_vcpu *vcpu, int ext);
->>>>> +
->>>>>    struct ex_regs {
->>>>>           unsigned long ra;
->>>>>           unsigned long sp;
->>>>> diff --git a/tools/testing/selftests/kvm/lib/riscv/processor.c b/tools/testing/selftests/kvm/lib/riscv/processor.c
->>>>> index 39a1e9902dec..dad73ce18164 100644
->>>>> --- a/tools/testing/selftests/kvm/lib/riscv/processor.c
->>>>> +++ b/tools/testing/selftests/kvm/lib/riscv/processor.c
->>>>> @@ -15,6 +15,16 @@
->>>>>
->>>>>    static vm_vaddr_t exception_handlers;
->>>>>
->>>>> +bool __vcpu_has_ext(struct kvm_vcpu *vcpu, int ext)
->>>>> +{
->>>>> +       unsigned long value = 0;
->>>>> +       int ret;
->>>>> +
->>>>> +       ret = __vcpu_get_reg(vcpu, RISCV_ISA_EXT_REG(ext), &value);
->>>>> +
->>>>> +       return !ret && !!value;
->>>>> +}
->>>>> +
->>>>
->>>> Not sure what was the base patch on which this was rebased. The actual
->>>> commit in the queue branch looks different.
->>>>
->>>
->>> This patch set was based on 6.7-rc8.
->>>
->>>> https://github.com/kvm-riscv/linux/commit/5563517cc2012e3326411b360c9924d3f2706c8d
->>>>
->>>> Both seem to have the same bug though the tests fail now and require
->>>> the following fix.
->>>> The ext id should be uint64_t and we need to pass ext directly so that
->>>> SBI extension tests can also pass.
->>>>
->>>
->>> It's weird that 6.7-rc8 has already included Andrew's change on the ISA ext reg,
->>> but this patch was not generated against his change.
->>>
->>> commit bdf6aa328f137e184b0fce607fd585354c3742f1
->>> Author: Andrew Jones <ajones@ventanamicro.com>
->>> Date:   Wed Dec 13 18:09:58 2023 +0100
->>>
->>>       RISC-V: KVM: selftests: Treat SBI ext regs like ISA ext regs
->>>
->>> Anyway, your changes were right. Please go ahead to include them when merging.
->>>
->>
->> I am not sure what happened. Probably, a merge conflict issue.
->>
->> I just realized I forgot to copy paste another fix in arch timer
->>
->> +++ b/tools/testing/selftests/kvm/riscv/arch_timer.c
->> @@ -85,7 +85,7 @@ struct kvm_vm *test_vm_create(void)
->>           int nr_vcpus = test_args.nr_vcpus;
->>
->>           vm = vm_create_with_vcpus(nr_vcpus, guest_code, vcpus);
->> -       __TEST_REQUIRE(__vcpu_has_ext(vcpus[0], KVM_RISCV_ISA_EXT_SSTC),
->> +       __TEST_REQUIRE(__vcpu_has_ext(vcpus[0],
->> RISCV_ISA_EXT_REG(KVM_RISCV_ISA_EXT_SSTC)),
->>
-> 
-> Right Fix!
-> Please let me know if I need to rebase this patch series on your tree
-> and resent it.
-> 
+sysbus_add_io(...) is a simple wrapper to
+memory_region_add_subregion(get_system_io(), ...).
+It is used in 3 places; inline it directly.
 
-That's Anup's call.
+Rationale: we want to move to an explicit I/O bus,
+rather that an implicit one. Besides in heterogeneous
+setup we can have more than one I/O bus.
 
-> Thanks,
-> Haibo
-> 
-> _______________________________________________
-> linux-riscv mailing list
-> linux-riscv@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-riscv
+Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Message-Id: <20240216150441.45681-1-philmd@linaro.org>
+---
+ include/hw/sysbus.h | 2 --
+ hw/core/sysbus.c    | 6 ------
+ hw/i386/kvmvapic.c  | 2 +-
+ hw/mips/mipssim.c   | 2 +-
+ hw/nvram/fw_cfg.c   | 5 +++--
+ 5 files changed, 5 insertions(+), 12 deletions(-)
+
+diff --git a/include/hw/sysbus.h b/include/hw/sysbus.h
+index 3564b7b6a2..14dbc22d0c 100644
+--- a/include/hw/sysbus.h
++++ b/include/hw/sysbus.h
+@@ -83,8 +83,6 @@ void sysbus_mmio_map(SysBusDevice *dev, int n, hwaddr addr);
+ void sysbus_mmio_map_overlap(SysBusDevice *dev, int n, hwaddr addr,
+                              int priority);
+ void sysbus_mmio_unmap(SysBusDevice *dev, int n);
+-void sysbus_add_io(SysBusDevice *dev, hwaddr addr,
+-                   MemoryRegion *mem);
+ MemoryRegion *sysbus_address_space(SysBusDevice *dev);
+ 
+ bool sysbus_realize(SysBusDevice *dev, Error **errp);
+diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
+index 35f902b582..9f1d5b2d6d 100644
+--- a/hw/core/sysbus.c
++++ b/hw/core/sysbus.c
+@@ -298,12 +298,6 @@ static char *sysbus_get_fw_dev_path(DeviceState *dev)
+     return g_strdup(qdev_fw_name(dev));
+ }
+ 
+-void sysbus_add_io(SysBusDevice *dev, hwaddr addr,
+-                       MemoryRegion *mem)
+-{
+-    memory_region_add_subregion(get_system_io(), addr, mem);
+-}
+-
+ MemoryRegion *sysbus_address_space(SysBusDevice *dev)
+ {
+     return get_system_memory();
+diff --git a/hw/i386/kvmvapic.c b/hw/i386/kvmvapic.c
+index f2b0aff479..3be64fba3b 100644
+--- a/hw/i386/kvmvapic.c
++++ b/hw/i386/kvmvapic.c
+@@ -727,7 +727,7 @@ static void vapic_realize(DeviceState *dev, Error **errp)
+     VAPICROMState *s = VAPIC(dev);
+ 
+     memory_region_init_io(&s->io, OBJECT(s), &vapic_ops, s, "kvmvapic", 2);
+-    sysbus_add_io(sbd, VAPIC_IO_PORT, &s->io);
++    memory_region_add_subregion(get_system_io(), VAPIC_IO_PORT, &s->io);
+     sysbus_init_ioports(sbd, VAPIC_IO_PORT, 2);
+ 
+     option_rom[nb_option_roms].name = "kvmvapic.bin";
+diff --git a/hw/mips/mipssim.c b/hw/mips/mipssim.c
+index a12427b6c8..57c8c33e2b 100644
+--- a/hw/mips/mipssim.c
++++ b/hw/mips/mipssim.c
+@@ -226,7 +226,7 @@ mips_mipssim_init(MachineState *machine)
+         qdev_prop_set_uint8(dev, "endianness", DEVICE_LITTLE_ENDIAN);
+         sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
+         sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, env->irq[4]);
+-        sysbus_add_io(SYS_BUS_DEVICE(dev), 0x3f8,
++        memory_region_add_subregion(get_system_io(), 0x3f8,
+                       sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0));
+     }
+ 
+diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+index e85493d513..6d6b17462d 100644
+--- a/hw/nvram/fw_cfg.c
++++ b/hw/nvram/fw_cfg.c
+@@ -1142,6 +1142,7 @@ FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
+     SysBusDevice *sbd;
+     FWCfgIoState *ios;
+     FWCfgState *s;
++    MemoryRegion *iomem = get_system_io();
+     bool dma_requested = dma_iobase && dma_as;
+ 
+     dev = qdev_new(TYPE_FW_CFG_IO);
+@@ -1155,7 +1156,7 @@ FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
+     sbd = SYS_BUS_DEVICE(dev);
+     sysbus_realize_and_unref(sbd, &error_fatal);
+     ios = FW_CFG_IO(dev);
+-    sysbus_add_io(sbd, iobase, &ios->comb_iomem);
++    memory_region_add_subregion(iomem, iobase, &ios->comb_iomem);
+ 
+     s = FW_CFG(dev);
+ 
+@@ -1163,7 +1164,7 @@ FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
+         /* 64 bits for the address field */
+         s->dma_as = dma_as;
+         s->dma_addr = 0;
+-        sysbus_add_io(sbd, dma_iobase, &s->dma_iomem);
++        memory_region_add_subregion(iomem, dma_iobase, &s->dma_iomem);
+     }
+ 
+     return s;
+-- 
+2.41.0
 
 
