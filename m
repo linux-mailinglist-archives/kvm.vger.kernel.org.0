@@ -1,108 +1,113 @@
-Return-Path: <kvm+bounces-9293-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9294-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CF6C85D4F8
-	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 11:00:21 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 870CB85D54A
+	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 11:17:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E802C1F22EE5
-	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 10:00:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2603FB2206E
+	for <lists+kvm@lfdr.de>; Wed, 21 Feb 2024 10:17:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A78E3F9E5;
-	Wed, 21 Feb 2024 09:53:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DAFF3D96B;
+	Wed, 21 Feb 2024 10:17:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="HIqycl3r"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GpsFCK1y"
 X-Original-To: kvm@vger.kernel.org
-Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3BBD3D0DB;
-	Wed, 21 Feb 2024 09:53:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C883A24B57;
+	Wed, 21 Feb 2024 10:17:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708509236; cv=none; b=HZTIVxJlO1hPazhTJxFyJWUlBlkPHjp8GO42NMY93hM3txVKhKLDvoT9Q0wUlOGQ2q8ho2wpGF2gkwPM1roiQVhopF6H3nvUzNqKrvsIBQZoxbsc0o0zqG7gKiAkTOUR961BeaJg2muzde0d2AGCoubMDOViytfldsds8DxSZZU=
+	t=1708510641; cv=none; b=kn0wXtFVnfmrOc96RMxdVREnKv/f8tQVD15RLVXnLqjVHguJVkAt9KH6HZe7yV7QFYEMZABtJfIG/5hRs5leX7qGHlrYbYDdwLybJEtMhKHlEVL+2wtccjChNMIr7UJptavk+eDjHz73QfbGS/uQVSlkmaekQrTcSG7NAunqxZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708509236; c=relaxed/simple;
-	bh=9rQKbf/XB71bS0VjPXbpawybpWP+a4gMQOoTUb1QXKM=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=X8bAumJGJhBBEbtKlG1628AP7KCs+cb98/cowTmCeWjfXQHPpfFouaaIv2creALy/X7W7rZDy3z6C0x4pe5sel8Qhvw9OPXXmfXBTZ+Ccjolu1XqUr7mAVjgTG4pWYMyZpGucSwc0EoQtCeO3HWxgod7U/C3go/38htvYFha/F4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=HIqycl3r; arc=none smtp.client-ip=115.124.30.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1708509230; h=Message-ID:Subject:Date:From:To;
-	bh=iMfzMLI+K5kpzH+OCBW/f2plocUmWvxeNdyqymsPQs0=;
-	b=HIqycl3r251f7rLtINT+YGG/9HaU2hZFuMUVmGmFV0Gf1ObUT7eTO5fMdraWUKUMdB45Hqe1Jr6xzvlz6RvKQ0siXSQ2M+YQ7LO5GJkCRLobBUC7sSjbpOl2bAhrus3cY3/+2KLTIwyiFTLaWdwJxVuWTe9j7+w5yQjBLV7DFpE=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0W0zZSyp_1708509229;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W0zZSyp_1708509229)
-          by smtp.aliyun-inc.com;
-          Wed, 21 Feb 2024 17:53:49 +0800
-Message-ID: <1708509152.9501102-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next 1/2] xsk: Remove non-zero 'dma_page' check in xp_assign_dev
-Date: Wed, 21 Feb 2024 17:52:32 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Yunjian Wang <wangyunjian@huawei.com>
-Cc: <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>,
- <kvm@vger.kernel.org>,
- <virtualization@lists.linux.dev>,
- <xudingke@huawei.com>,
- Yunjian Wang <wangyunjian@huawei.com>,
- <mst@redhat.com>,
- <willemdebruijn.kernel@gmail.com>,
- <jasowang@redhat.com>,
- <kuba@kernel.org>,
- <davem@davemloft.net>,
- <magnus.karlsson@intel.com>
-References: <1706089058-1364-1-git-send-email-wangyunjian@huawei.com>
-In-Reply-To: <1706089058-1364-1-git-send-email-wangyunjian@huawei.com>
+	s=arc-20240116; t=1708510641; c=relaxed/simple;
+	bh=rDihJ2qZsh4aBhB/KRNnvpywWBWh8t5oztOINSRoa38=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=I2DU8ZPdw8CtV95jkwvQb6gOsicS84wc6x+RGG6AhIDmS0pqN36CURUEqvm4dEUKYgujWmYi/3+pWGYVXtkmTYI9lrSpFla1MjwtSU+EFkCIeffLlfHZ43XKcbx3DbjEAlxZgZzuhOF6iyMVIY8xfdrttRqpFEaklE4aMA3XsPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GpsFCK1y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57A16C433F1;
+	Wed, 21 Feb 2024 10:17:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708510641;
+	bh=rDihJ2qZsh4aBhB/KRNnvpywWBWh8t5oztOINSRoa38=;
+	h=From:To:Cc:Subject:Date:From;
+	b=GpsFCK1yYRU3q/SBnYoNLYgIczXs5unldlH1uRU7bLeidcWgiB2uuMkxRDPu7bNjd
+	 BEQvzR0SteLSMgXv587r0fWqLm5kbqC38ZCgJRXTWaF4J6IUHx/dSV93fV3mXXSVCX
+	 BZ5M2m+bHRVoyIbChNfLzz7TsaRD/wvsJxttQB9pFDy0H3sEd6QHU4m0G/R//we22v
+	 rCcTR5ylb5t/SUJXBs28vePTTkSZ9LHBzPgsApef8ZN21/oaOQYBmBYWI0blvnSrwW
+	 Lx81uXZavK8C6mn/zCWV6dQKYIzvy2yWyGBT59pE3byXlsczAR/6Ib0eyPxW825lR3
+	 Z8EDQ5sJqkLMg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rcjfD-005CWP-44;
+	Wed, 21 Feb 2024 10:17:19 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: [GIT PULL] KVM/arm64 fixes for 6.8, take #3
+Date: Wed, 21 Feb 2024 10:17:11 +0000
+Message-Id: <20240221101711.2105066-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 24 Jan 2024 17:37:38 +0800, Yunjian Wang <wangyunjian@huawei.com> wrote:
-> Now dma mappings are used by the physical NICs. However the vNIC
-> maybe do not need them. So remove non-zero 'dma_page' check in
-> xp_assign_dev.
+Hey Paolo,
 
-Could you tell me which one nic can work with AF_XDP without DMA?
+Another week, another couple of fixes. This time, two fixes for the
+ITS emulation that could result in non-existent LPIs being used, with
+unpredictable consequences. Thanks to Oliver for spotting those as he
+was reworking the ITS translation cache.
 
-Thanks.
+Please pull,
 
+	M.
 
->
-> Signed-off-by: Yunjian Wang <wangyunjian@huawei.com>
-> ---
->  net/xdp/xsk_buff_pool.c | 7 -------
->  1 file changed, 7 deletions(-)
->
-> diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
-> index 28711cc44ced..939b6e7b59ff 100644
-> --- a/net/xdp/xsk_buff_pool.c
-> +++ b/net/xdp/xsk_buff_pool.c
-> @@ -219,16 +219,9 @@ int xp_assign_dev(struct xsk_buff_pool *pool,
->  	if (err)
->  		goto err_unreg_pool;
->
-> -	if (!pool->dma_pages) {
-> -		WARN(1, "Driver did not DMA map zero-copy buffers");
-> -		err = -EINVAL;
-> -		goto err_unreg_xsk;
-> -	}
->  	pool->umem->zc = true;
->  	return 0;
->
-> -err_unreg_xsk:
-> -	xp_disable_drv_zc(pool);
->  err_unreg_pool:
->  	if (!force_zc)
->  		err = 0; /* fallback to copy mode */
-> --
-> 2.33.0
->
->
+The following changes since commit c60d847be7b8e69e419e02a2b3d19c2842a3c35d:
+
+  KVM: arm64: Fix double-free following kvm_pgtable_stage2_free_unlinked() (2024-02-13 19:22:03 +0000)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.8-3
+
+for you to fetch changes up to 85a71ee9a0700f6c18862ef3b0011ed9dad99aca:
+
+  KVM: arm64: vgic-its: Test for valid IRQ in MOVALL handler (2024-02-21 10:06:41 +0000)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for 6.8, take #3
+
+- Check for the validity of interrupts handled by a MOVALL
+  command
+
+- Check for the validity of interrupts while reading the
+  pending state on enabling LPIs.
+
+----------------------------------------------------------------
+Oliver Upton (2):
+      KVM: arm64: vgic-its: Test for valid IRQ in its_sync_lpi_pending_table()
+      KVM: arm64: vgic-its: Test for valid IRQ in MOVALL handler
+
+ arch/arm64/kvm/vgic/vgic-its.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
