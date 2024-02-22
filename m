@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-9408-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9409-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3749085FDBF
-	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 17:12:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A10985FDC0
+	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 17:12:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A7D51C20E1D
-	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 16:12:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ADBD01F22042
+	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 16:12:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB369154C02;
-	Thu, 22 Feb 2024 16:11:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 330631552E0;
+	Thu, 22 Feb 2024 16:11:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SNWym13g"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MveOPm6P"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C12A154445
-	for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 16:11:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF7C8151CFE
+	for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 16:11:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708618282; cv=none; b=NHYXU4CCinAoHjEzcUohWGHli6JJGpPpUADoMMNoO4inp/AlG8RS9CDWwLHfHD0onGoPzU3VytUQ08KyEp9n27jvHx3F5C+5bPVmDBNYbDIAPsDdG9aN4+A+00eP9TGiQZ7U3t+zTk0JU8OOawScWnZVuzxzWhjr1ZpsPUpxz6c=
+	t=1708618285; cv=none; b=bneFfYx3w7aikO7yL+kPiFZY8nGPfK8I/Ttry8Ar2Xm4mWsKhK2XT2oGN0LmMwza0BBopnyuUGIdr+CzgiDpnQI6meM4noQy8DvVsWtfvHs+JpNU6xRuLba3DwMl4OWwMbRzh4CVaeDZ29d53CuDXjhG792c1J1f7dhY5QEi3nk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708618282; c=relaxed/simple;
-	bh=z/Ih8ZYT5NkMixOWg+Uyve5J68nFw5E7iGVbbYcEx3E=;
+	s=arc-20240116; t=1708618285; c=relaxed/simple;
+	bh=xoA6/QoNnISiMa1SzXuzX77CZKmuI5864LBCKgX+2hY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=BdjsuUG6oSYXc1vYyF41R7AxwnrBO84O8Oud1yuud9aH4H+HNI5+DfHLHezjWpUvJQGADFFe87qspvoMEUAm4PvCsdiiYOtOB+pqxnTztHWuv3TwzevYdp1TLePDePEY8Qyv9In5Cb+E2b47rEhHK4WPQgUyLG6g836Otpi9rRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SNWym13g; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=V8IQL3yMMXMAGYYH8gMTAsDD5bRF2DmQlqVTuo+cUpr5gTZgW/TSVlZ+RxRzGyUXu0LSFltfV5Ofx4rHqxgsLUaX6QUIY/7sPkzQXLNRhIK6sEOGFu0hammmNgxnj7JVatgDh+h+m+za4s1WDPkrSAMcNmKcIink2MgsZjjrfq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MveOPm6P; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dcbee93a3e1so10570705276.3
-        for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 08:11:20 -0800 (PST)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc6b26783b4so8125929276.0
+        for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 08:11:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708618280; x=1709223080; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1708618283; x=1709223083; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=R9jqiln8R3A9VFnaGPClstGN9r3EmzNYJZRGHFrLYA8=;
-        b=SNWym13gOGYjvg4dzYGqexNS+tYcWwBiw9R9Sa/odoIYK7EEpgsGMFQ+HkS/mSEyyU
-         8ul9VTDNSwJS5PYeI15ombcJ7OX0WYCnUCKhRTXGWn2ya0yEujP73EQajlzo9Qil2Klh
-         yWycSeS2M3DilF+TJjTl3UOYCIZ39QCzaWDcZEAcg0s2t1ph8beuoanVRkDuT1aLgML5
-         ygT2YrzaOhT0LdzD8YDsJQeZ7WXw7Mf+83Z+5lS9XX8lk5K8ivTOywtQfVq5k3p639T8
-         Xjq1IhEuuyFXBfGYnwm86EBkaYAzkWgXyyc1PcaAHr1ECeFysxr2Drdgu05uwRZmrC1O
-         Uslw==
+        bh=CeE6bcXPJ6+XfnAesbZJh5X/3MioJE5wiGBVIwsoMXY=;
+        b=MveOPm6Ps15ckSZnNay3zhkDd1Q5b12zgK9lHOdUks5D+OaFbD1/m+WcdmMD8izGz/
+         pRKLHQXwN3ccfiDaU3EOBXSfFt4yZ5sl/5tAobhXXmS/IC9XaOdssNyAao/wYaSQNpjG
+         sUBwJjpQPcRW3zhYESnx1qfPRLJBMqTFBWW+qURmOynHP0UcqGRq4KN4CZVpZkDc9ac0
+         jA8N8KZnZmeFWdH8QKvBtNKXe8wIrLewUNhHtFRwBLq3INsJh71uQPOsIMh3pMu7dHzP
+         lw41tX1LlyouIJ05wPz867C0lTIXcoq3uqEInSUHUZmkDaVlkS6gCjwOtO2vQ9fHNk/t
+         F1FA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708618280; x=1709223080;
+        d=1e100.net; s=20230601; t=1708618283; x=1709223083;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=R9jqiln8R3A9VFnaGPClstGN9r3EmzNYJZRGHFrLYA8=;
-        b=LbkG+LPcnBaTWc8fHxHRkO7BzlCse8DwLYqAeZICGZVZ+kN9nG4G0lwqsOtaRz/hBj
-         zSCh+YRrCuuiVFhgPMCSakyipKT679Vor//sIs6J3aQRLEN7FSqO7k183CXMzFBSc6HG
-         IQh3gAZ4aBiZ56AbcbzJJ8w2CLEgZBb6M9R/7HbjZU04w467lHmUi5pEvGTSviLdkRZz
-         UHsCYcIsnuklDppTe+jnsf4ewh/V0wcUVLLWEnLz8z0D8x/9ZuKzczrciLpC/p8eQQCv
-         7SF+4qIIgVksCGuQh4/MbuDfTpqMSb9ymc+TBJaIP/wtCXZvM+Z1MEbI7FY5lVdtud4a
-         1JRQ==
-X-Gm-Message-State: AOJu0Ywjkwee8WKl/cMDRvIZ8km45WbAHbvegKIRyxncIJLwNGv0eUoR
-	q+4HEQ5RF+R3qRJP1QWzrCiYWFGXfdNZYaDXyn1m4HYx0nkkNIRPZt2dfNOIzaP0eHUciri2qC4
-	8fWci4HxAY1nBrMaX5FXW1JBylyle/hJyvg5Ju7UjBxdUKEliTLO2MSzsDvNZEjadwdo4vPBnaF
-	hz80qDQkn3mUUpuSJK7uDWYr4=
-X-Google-Smtp-Source: AGHT+IGzluF9KV0uQ74p+P4M/V/9xG11z3AVlCw5UzMHVkr7rD/AoyFybmDhnZwJeOh0w7FWclLKEm9ISQ==
+        bh=CeE6bcXPJ6+XfnAesbZJh5X/3MioJE5wiGBVIwsoMXY=;
+        b=FefbJBGt3FX0ySkipv7essK2HzidjUyedUcuof44M3Nj+RtUOyRFIdN3ajHS7z07ME
+         IIfJLF1i3QVXQiSt2Vfd9fFoE8xKz6aUjTWo8qwkshZPTmzxD/aI8Au4QszdHuACwMl6
+         BWHw5QPpPu0phObpLD9v44HgQko5u1SoQSigMQ1sE/2+UwfKli+oy1iP6AnoCkIzW/X8
+         9GTh9TrzRYybcEsuMIclXNT9Twi+012gW426hx01qII6heZ3tnfU4k4kQrbvTKTdMHsP
+         eNkeyTrqGvqBgJ9J0dyFjA9v8bqDfz1+kDqCyB9rY19FdSSq7YdGf8OdBxmRYGv/rRLg
+         lOOw==
+X-Gm-Message-State: AOJu0YzVN+XQ0OY/EDdQ4zWehp68q5vTbLMW1HOOllqkAmBEG7lY5c0z
+	Gwfz+OYJoS1bY7Ud+zKwQLfwekgyKD6iC/0gJVhtUjVSqupUlez/y2t8BteZGdz/fqeVQIeY5RK
+	EVMUitAG/IvUvX7Dpapkj5soGVLh5LuQA2jzlZ/oJb66RaryVJCiPmDF0M92wuK4qgDJQBckJq3
+	eNUGcNwsJ51uxTh+w1sf8zgY8=
+X-Google-Smtp-Source: AGHT+IFstTNpKcDxQ2leE1X3c1ER9vVPby1ys0ufBrD4msybQfHDs42OffDOkXrhTSWHmYX9zR+v4HUSxA==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:6902:1081:b0:dc7:63e7:7a5c with SMTP id
- v1-20020a056902108100b00dc763e77a5cmr139205ybu.11.1708618279476; Thu, 22 Feb
- 2024 08:11:19 -0800 (PST)
-Date: Thu, 22 Feb 2024 16:10:33 +0000
+ (user=tabba job=sendgmr) by 2002:a05:6902:1008:b0:dbe:387d:a8ef with SMTP id
+ w8-20020a056902100800b00dbe387da8efmr90717ybt.1.1708618282006; Thu, 22 Feb
+ 2024 08:11:22 -0800 (PST)
+Date: Thu, 22 Feb 2024 16:10:34 +0000
 In-Reply-To: <20240222161047.402609-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,9 +74,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240222161047.402609-1-tabba@google.com>
 X-Mailer: git-send-email 2.44.0.rc1.240.g4c46232300-goog
-Message-ID: <20240222161047.402609-13-tabba@google.com>
-Subject: [RFC PATCH v1 12/26] KVM: arm64: Allow userspace to receive SHARE and
- UNSHARE notifications
+Message-ID: <20240222161047.402609-14-tabba@google.com>
+Subject: [RFC PATCH v1 13/26] KVM: arm64: Create hypercall return handler
 From: Fuad Tabba <tabba@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev
 Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
@@ -98,62 +97,71 @@ Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
 	tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-From: Will Deacon <will@kernel.org>
+Instead of handling the hypercall return to guest from host
+inline, create a handler function. More logic will be added to
+this handler in subsequent patches.
 
-Signed-off-by: Will Deacon <will@kernel.org>
+No functional change intended.
+
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/arm.c        | 3 ++-
- arch/arm64/kvm/hypercalls.c | 8 +++++++-
- 2 files changed, 9 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |  1 +
+ arch/arm64/kvm/arm.c              |  8 +++-----
+ arch/arm64/kvm/hypercalls.c       | 10 ++++++++++
+ 3 files changed, 14 insertions(+), 5 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index f6187526685a..fb7aff14fd1a 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1100,6 +1100,7 @@ void kvm_mmio_write_buf(void *buf, unsigned int len, unsigned long data);
+ unsigned long kvm_mmio_read_buf(const void *buf, unsigned int len);
+ 
+ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu);
++int kvm_handle_hypercall_return(struct kvm_vcpu *vcpu);
+ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa);
+ 
+ /*
 diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index cd6c4df27c7b..6bba6f1fee88 100644
+index 6bba6f1fee88..ab7e02acb17d 100644
 --- a/arch/arm64/kvm/arm.c
 +++ b/arch/arm64/kvm/arm.c
-@@ -61,7 +61,8 @@ static DEFINE_PER_CPU(unsigned char, kvm_hyp_initialized);
- DEFINE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
+@@ -1092,11 +1092,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 		if (ret <= 0)
+ 			return ret;
+ 	} else if (run->exit_reason == KVM_EXIT_HYPERCALL) {
+-		smccc_set_retval(vcpu,
+-				 vcpu->run->hypercall.ret,
+-				 vcpu->run->hypercall.args[0],
+-				 vcpu->run->hypercall.args[1],
+-				 vcpu->run->hypercall.args[2]);
++		ret = kvm_handle_hypercall_return(vcpu);
++		if (ret <= 0)
++			return ret;
+ 	}
  
- /* KVM "vendor" hypercalls which may be forwarded to userspace on request. */
--#define KVM_EXIT_HYPERCALL_VALID_MASK	(0)
-+#define KVM_EXIT_HYPERCALL_VALID_MASK	(BIT(ARM_SMCCC_KVM_FUNC_MEM_SHARE) |	\
-+					 BIT(ARM_SMCCC_KVM_FUNC_MEM_UNSHARE))
- 
- bool is_kvm_arm_initialised(void)
- {
+ 	vcpu_load(vcpu);
 diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-index 5e04be7c026a..b93546dd222f 100644
+index b93546dd222f..b08e18128de4 100644
 --- a/arch/arm64/kvm/hypercalls.c
 +++ b/arch/arm64/kvm/hypercalls.c
-@@ -83,6 +83,8 @@ static bool kvm_smccc_default_allowed(u32 func_id)
- 	 */
- 	case ARM_SMCCC_VERSION_FUNC_ID:
- 	case ARM_SMCCC_ARCH_FEATURES_FUNC_ID:
-+	case ARM_SMCCC_VENDOR_HYP_KVM_MEM_SHARE_FUNC_ID:
-+	case ARM_SMCCC_VENDOR_HYP_KVM_MEM_UNSHARE_FUNC_ID:
- 		return true;
- 	default:
- 		/* PSCI 0.2 and up is in the 0:0x1f range */
-@@ -132,7 +134,7 @@ static bool kvm_smccc_test_fw_bmap(struct kvm_vcpu *vcpu, u32 func_id)
- 	}
- }
+@@ -24,6 +24,16 @@
+ 	f;								\
+ })
  
--static int __maybe_unused kvm_vcpu_exit_hcall(struct kvm_vcpu *vcpu, u32 nr, u32 nr_args)
-+static int kvm_vcpu_exit_hcall(struct kvm_vcpu *vcpu, u32 nr, u32 nr_args)
++int kvm_handle_hypercall_return(struct kvm_vcpu *vcpu)
++{
++	smccc_set_retval(vcpu, vcpu->run->hypercall.ret,
++			 vcpu->run->hypercall.args[0],
++			 vcpu->run->hypercall.args[1],
++			 vcpu->run->hypercall.args[2]);
++
++	return 1;
++}
++
+ static void kvm_ptp_get_time(struct kvm_vcpu *vcpu, u64 *val)
  {
- 	u64 mask = vcpu->kvm->arch.hypercall_exit_enabled;
- 	u32 i;
-@@ -398,6 +400,10 @@ int kvm_smccc_call_handler(struct kvm_vcpu *vcpu)
- 		pkvm_host_reclaim_page(vcpu->kvm, smccc_get_arg1(vcpu));
- 		val[0] = SMCCC_RET_SUCCESS;
- 		break;
-+	case ARM_SMCCC_VENDOR_HYP_KVM_MEM_SHARE_FUNC_ID:
-+		return kvm_vcpu_exit_hcall(vcpu, ARM_SMCCC_KVM_FUNC_MEM_SHARE, 3);
-+	case ARM_SMCCC_VENDOR_HYP_KVM_MEM_UNSHARE_FUNC_ID:
-+		return kvm_vcpu_exit_hcall(vcpu, ARM_SMCCC_KVM_FUNC_MEM_UNSHARE, 3);
- 	case ARM_SMCCC_TRNG_VERSION:
- 	case ARM_SMCCC_TRNG_FEATURES:
- 	case ARM_SMCCC_TRNG_GET_UUID:
+ 	struct system_time_snapshot systime_snapshot;
 -- 
 2.44.0.rc1.240.g4c46232300-goog
 
