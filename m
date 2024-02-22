@@ -1,157 +1,130 @@
-Return-Path: <kvm+bounces-9424-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9425-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DE5685FE17
-	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 17:30:43 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7152B85FE93
+	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 18:00:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70A4A1C213B7
-	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 16:30:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D9BD4B25B7E
+	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 17:00:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B9AE14901A;
-	Thu, 22 Feb 2024 16:30:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RBba+5+C"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 426C1154BED;
+	Thu, 22 Feb 2024 16:59:50 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from proxmox-new.maurer-it.com (proxmox-new.maurer-it.com [94.136.29.106])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B434C1E522
-	for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 16:30:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74A1A153BCE;
+	Thu, 22 Feb 2024 16:59:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.136.29.106
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708619438; cv=none; b=MEOsTV3HSHX9nJKYw1nsebmcBmFTIJxVcvV9+YzXOBRcZ9bjdIlYXjN+GSSfDbJKmghBQGo/oX17XsDfgO3isMjAp0cXSHSp5pNYxY60JMemjO1j9n/fEjQrV9YCZYH7hmqhzQO7ffmGUsQubvsWNbAmCywwEbU9D7r/G6C3gLw=
+	t=1708621189; cv=none; b=qoFtupPngJHVGEXcnUGh+iQ5jItvmsuL8RNHCMQpleEwofYnAsdpgaqakgOuCO7ba5t1jLKGD1E/B6M+1Z8gZ5bgJBcdHLfHiBMYEdxM2xOW3fUEmVeKqUNzUTQbdJCsMaix3/Q9S/c68+8BWN32W23W9HV7PTBxwJgV8eMvx/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708619438; c=relaxed/simple;
-	bh=VTomngQKjpjtcByhLkt+bsZDNHeQ1SAaaTCzhSD/7LE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NDzChJMk40lIawKkaqSPFlGjgd9z0qT5z9lxlOCZ/dlQbQhhkkvm2aSPHcB1x8ePIo14rtPVYDbx5a8mibr2dWSLhZA0b7tUljypBuB36kuk3RV2cK5aRk4uiJ3JDY7vlvdXIupB4xxUJPkQC+F0QIDoljTB0lzOBSVqQjlU0+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RBba+5+C; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708619435;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:in-reply-to:in-reply-to:  references:references;
-	bh=z8rC1LqoNkicePhZz9xzu4X/hqhqdSwcsu80yXABdyY=;
-	b=RBba+5+CCcvTCinmJQTIqjw1rmpjM0tAhuFe3GD1YylUShQkr+h6+YPyiB0rcqkKEr+0yD
-	mLLaTU3VcpEtFZ65FqN55iwYcWuDFad7GuovRsl9S7By806VXIZVGeabsCzZRf2BSffhF6
-	08O947C55Y6V6b+rSVWglGK9FMCu+4M=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-644-A7dlertyPhSyMddUQbzr3Q-1; Thu, 22 Feb 2024 11:30:32 -0500
-X-MC-Unique: A7dlertyPhSyMddUQbzr3Q-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1A0F0811E81;
-	Thu, 22 Feb 2024 16:30:31 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.28.48])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 454D01121337;
-	Thu, 22 Feb 2024 16:30:27 +0000 (UTC)
-Date: Thu, 22 Feb 2024 16:30:25 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	David Hildenbrand <david@redhat.com>,
-	Igor Mammedov <imammedo@redhat.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Peter Xu <peterx@redhat.com>,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Cornelia Huck <cohuck@redhat.com>, Eric Blake <eblake@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
-	kvm@vger.kernel.org, Michael Roth <michael.roth@amd.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Claudio Fontana <cfontana@suse.de>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Isaku Yamahata <isaku.yamahata@gmail.com>,
-	Chenyi Qiang <chenyi.qiang@intel.com>
-Subject: Re: [PATCH v4 50/66] i386/tdx: handle TDG.VP.VMCALL<GetQuote>
-Message-ID: <Zdd2oSFOiIparDIe@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20240125032328.2522472-1-xiaoyao.li@intel.com>
- <20240125032328.2522472-51-xiaoyao.li@intel.com>
+	s=arc-20240116; t=1708621189; c=relaxed/simple;
+	bh=mFjlaeGN07dgGRzQB14f7xCSu7QrFn9u6AqzQ15Qs2M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PoL54RP0QvHuGz87/NEZnnshhremJAIctAIuCNDMECpD+oK3uq+B2KmWX4AshIrUVHHQr8wuvRxCASOphr7aCFgitCC1qIPiE+wtRsPs+OikF6dBET6MIPrwx7IT9ciCB2+u7nol3172wJhZhxRusnBiVtHoX8fahIKpYzInOZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com; spf=pass smtp.mailfrom=proxmox.com; arc=none smtp.client-ip=94.136.29.106
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proxmox.com
+Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
+	by proxmox-new.maurer-it.com (Proxmox) with ESMTP id E5CD544ADC;
+	Thu, 22 Feb 2024 17:59:43 +0100 (CET)
+Message-ID: <2b0ed3ba-d8da-401e-9495-6b6670d7b418@proxmox.com>
+Date: Thu, 22 Feb 2024 17:59:42 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240125032328.2522472-51-xiaoyao.li@intel.com>
-User-Agent: Mutt/2.2.12 (2023-09-09)
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5] KVM: x86/mmu: Retry fault before acquiring mmu_lock if
+ mapping is changing
+Content-Language: en-US
+To: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Yan Zhao <yan.y.zhao@intel.com>, Kai Huang <kai.huang@intel.com>,
+ Yuan Yao <yuan.yao@linux.intel.com>, Xu Yilun <yilun.xu@linux.intel.com>
+References: <20240222012640.2820927-1-seanjc@google.com>
+From: Friedrich Weber <f.weber@proxmox.com>
+In-Reply-To: <20240222012640.2820927-1-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jan 24, 2024 at 10:23:12PM -0500, Xiaoyao Li wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
+On 22/02/2024 02:26, Sean Christopherson wrote:
+> Retry page faults without acquiring mmu_lock, and without even faulting
+> the page into the primary MMU, if the resolved gfn is covered by an active
+> invalidation.  Contending for mmu_lock is especially problematic on
+> preemptible kernels as the mmu_notifier invalidation task will yield
+> mmu_lock (see rwlock_needbreak()), delay the in-progress invalidation, and
+> ultimately increase the latency of resolving the page fault.  And in the
+> worst case scenario, yielding will be accompanied by a remote TLB flush,
+> e.g. if the invalidation covers a large range of memory and vCPUs are
+> accessing addresses that were already zapped.
 > 
-> Add property "quote-generation-socket" to tdx-guest, which is a property
-> of type SocketAddress to specify Quote Generation Service(QGS).
+> Faulting the page into the primary MMU is similarly problematic, as doing
+> so may acquire locks that need to be taken for the invalidation to
+> complete (the primary MMU has finer grained locks than KVM's MMU), and/or
+> may cause unnecessary churn (getting/putting pages, marking them accessed,
+> etc).
 > 
-> On request of GetQuote, it connects to the QGS socket, read request
-> data from shared guest memory, send the request data to the QGS,
-> and store the response into shared guest memory, at last notify
-> TD guest by interrupt.
+> Alternatively, the yielding issue could be mitigated by teaching KVM's MMU
+> iterators to perform more work before yielding, but that wouldn't solve
+> the lock contention and would negatively affect scenarios where a vCPU is
+> trying to fault in an address that is NOT covered by the in-progress
+> invalidation.
 > 
-> command line example:
->   qemu-system-x86_64 \
->     -object '{"qom-type":"tdx-guest","id":"tdx0","quote-generation-socket":{"type": "vsock", "cid":"1","port":"1234"}}' \
->     -machine confidential-guest-support=tdx0
+> Add a dedicated lockess version of the range-based retry check to avoid
+> false positives on the sanity check on start+end WARN, and so that it's
+> super obvious that checking for a racing invalidation without holding
+> mmu_lock is unsafe (though obviously useful).
 > 
-> Note, above example uses vsock type socket because the QGS we used
-> implements the vsock socket. It can be other types, like UNIX socket,
-> which depends on the implementation of QGS.
-
-Can you confirm again exactly what QGS impl you are testing against ?
-
-I've tried the impl at
-
-   https://github.com/intel/SGXDataCenterAttestationPrimitives/tree/master/QuoteGeneration/quote_wrapper/qgs
-
-which supports UNIX sockets and VSOCK. In both cases, however, it
-appears to be speaking a different protocol than your QEMU impl
-below uses.
-
-Specifically here:
-
-  https://github.com/intel/SGXDataCenterAttestationPrimitives/blob/master/QuoteGeneration/quote_wrapper/qgs/qgs_server.cpp#L143
-
-it is reading 4 bytes of header, which are interpreted as the length
-of the payload which will then be read off the wire. IIUC the payload
-it expects is the TDREPORT struct.
-
-Your QEMU patches here meanwhile are just sending the payload from
-the GetQuote hypercall which is the TDREPORT struct.
-
-IOW, QEMU is not sending the 4 byte length header the QGS expects.
-and whole thing fails.
-
+> Wrap mmu_invalidate_in_progress in READ_ONCE() to ensure that pre-checking
+> invalidation in a loop won't put KVM into an infinite loop, e.g. due to
+> caching the in-progress flag and never seeing it go to '0'.
 > 
-> To avoid no response from QGS server, setup a timer for the transaction.
-> If timeout, make it an error and interrupt guest. Define the threshold of
-> time to 30s at present, maybe change to other value if not appropriate.
+> Force a load of mmu_invalidate_seq as well, even though it isn't strictly
+> necessary to avoid an infinite loop, as doing so improves the probability
+> that KVM will detect an invalidation that already completed before
+> acquiring mmu_lock and bailing anyways.
 > 
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> Codeveloped-by: Chenyi Qiang <chenyi.qiang@intel.com>
-> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
-> Codeveloped-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> Do the pre-check even for non-preemptible kernels, as waiting to detect
+> the invalidation until mmu_lock is held guarantees the vCPU will observe
+> the worst case latency in terms of handling the fault, and can generate
+> even more mmu_lock contention.  E.g. the vCPU will acquire mmu_lock,
+> detect retry, drop mmu_lock, re-enter the guest, retake the fault, and
+> eventually re-acquire mmu_lock.  This behavior is also why there are no
+> new starvation issues due to losing the fairness guarantees provided by
+> rwlocks: if the vCPU needs to retry, it _must_ drop mmu_lock, i.e. waiting
+> on mmu_lock doesn't guarantee forward progress in the face of _another_
+> mmu_notifier invalidation event.
+> 
+> Note, adding READ_ONCE() isn't entirely free, e.g. on x86, the READ_ONCE()
+> may generate a load into a register instead of doing a direct comparison
+> (MOV+TEST+Jcc instead of CMP+Jcc), but practically speaking the added cost
+> is a few bytes of code and maaaaybe a cycle or three.
+> 
+> Reported-by: Yan Zhao <yan.y.zhao@intel.com>
+> Closes: https://lore.kernel.org/all/ZNnPF4W26ZbAyGto@yzhao56-desk.sh.intel.com
+> Reported-by: Friedrich Weber <f.weber@proxmox.com>
+> Cc: Kai Huang <kai.huang@intel.com>
+> Cc: Yan Zhao <yan.y.zhao@intel.com>
+> Cc: Yuan Yao <yuan.yao@linux.intel.com>
+> Cc: Xu Yilun <yilun.xu@linux.intel.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
 
-With regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Couldn't find the base-commit 21dbc438 (might not have looked at the
+right place though), so I applied this patch on top of c48617fb ("Merge
+tag 'kvmarm-fixes-6.8-3' ...") from kvm/kvm.git. Can confirm the patch
+fixes the temporary guest hangs in combination with KSM and NUMA
+balancing [1]. Thanks!
+
+[1]
+https://lore.kernel.org/kvm/832697b9-3652-422d-a019-8c0574a188ac@proxmox.com/
 
 
