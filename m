@@ -1,63 +1,62 @@
-Return-Path: <kvm+bounces-9429-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9430-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C91F98601AE
-	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 19:41:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A8148602C3
+	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 20:37:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67CC31F2733F
-	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 18:41:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 31A87B28AAD
+	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 18:59:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3926C143C7D;
-	Thu, 22 Feb 2024 18:33:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE1531DFD9;
+	Thu, 22 Feb 2024 18:58:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XimWD4sc"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ANCs/h1r"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47A65143C70
-	for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 18:33:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84BD614B81D
+	for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 18:58:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708626789; cv=none; b=RGdnUC730ii/VZhtjNKPTdqETKpWdYPNUZcpcwO3/RY5eA+ZM1QVvZ81mJ7DRv5tBRAwmGxK6hqC1Zd36HuI9DpvKYXRtZY1nxMUYPBcoR3P5VUfwn11PWVTk6d1b+B2ABsCfFNKlUjtQv85nwx+cOAETHw15wrBJuprMCPsfHc=
+	t=1708628329; cv=none; b=PWqkh0Car6bJxjO62uC1N6if0spGRAPxMlh2/rmW9Epdr56c24LfEFFmYUIoJEqXbAn64Z+QdCSTJPm225zBv99qfI/hGWFcVnqq79rG/kQnDs4PAZx6YMHNIYWUTq5jHYlSmW3wvfc1W4HbgQwNVqbIvVcrpExRDw/AqsPY6zQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708626789; c=relaxed/simple;
-	bh=V7SjxDZvMzNR4ZyEN08FtuXtrKLpldcOW/wvppjFEbU=;
+	s=arc-20240116; t=1708628329; c=relaxed/simple;
+	bh=RAT48h2u3y3O5tYBBYYlc57OcpbSHfgGw0mrClbLdzc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nq8mxUVrSylH1WLsGD29W6GfvnfvJGn/RUr0qdBGeKa7m08SKCu3t3t6ByJ3jJwo2vgecPzA6KJdwTP4QgjWschLk3vD8uBVMlz4h0KHN4BE3F+DuVUpdiJTeEu4fNuiJ3hwQoapnAoeQpQX70roFFSHRGbE4jdiPhqJWrxMFGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XimWD4sc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 671C6C433F1;
-	Thu, 22 Feb 2024 18:33:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708626788;
-	bh=V7SjxDZvMzNR4ZyEN08FtuXtrKLpldcOW/wvppjFEbU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XimWD4scZoCwdyEkQWCd+Denl+bm6CA2XjJet2vrNHSVz1Q/hHmTiavgqIHd5go8S
-	 Odu/ppWgN8kmYxW2GWNEEbYftWIeDx87rXAFlxeVJnWPUis2wbRe81qpML79Aalx+h
-	 AfIZ675KV4H8FZsvIvT5iBlWsFT63J6beJdnjs69b2MDFgYJD6HHR0G5FYYrkmdjR9
-	 0bgrJFpta75pYs6kKaDaHJVIkK9u3s2m1XQYOEoFy+rkahJXxt40j2CIb2YtnGb6Ly
-	 G1qg2xre0QALC9Oqt3oS5cgp4BfyAv/D6ia8Y3D7oVRTss0sG+c2S1qklyTt1NZron
-	 PsIiq42LlEHHA==
-Date: Thu, 22 Feb 2024 20:33:04 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Yishai Hadas <yishaih@nvidia.com>, "jgg@nvidia.com" <jgg@nvidia.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
-	"maorg@nvidia.com" <maorg@nvidia.com>,
-	"Tian, Kevin" <kevin.tian@intel.com>
-Subject: Re: [PATCH V1 vfio 0/5] Improve mlx5 driver to better handle some
- error cases
-Message-ID: <20240222183304.GA54170@unreal>
-References: <20240205124828.232701-1-yishaih@nvidia.com>
- <BN9PR11MB527688453C0D5D4789ADDF968C462@BN9PR11MB5276.namprd11.prod.outlook.com>
- <1175d7ed-45f3-42d0-a3cb-90ef2df40dbb@nvidia.com>
- <244923bb-7732-4a9b-b5da-6a778ba4dd60@nvidia.com>
- <bdb66db6-cd41-4d0d-bc69-33390953f385@nvidia.com>
- <20240222110405.759b8971.alex.williamson@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=nYIcoa2mz5tYScJp+g/7qrsNR/uR2HIaX3YlrKzGci0/eLL3CZyRFsJL7Zv6VzgXqSWDbmCSCtcH4pBBLh+LFTtjfxgu4aiazadVp/A1Nk7ZjqaCvv5ylWDBq8VocP9rJTWK/yvXAcgdwC+ZsqxxOnqEGXKvD6nr7qnX3+IQ99U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ANCs/h1r; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Thu, 22 Feb 2024 18:58:39 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1708628324;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fXtbm9eYcFP/Qnaj9qL/VFl6ikfpqHd5JRVGugnAsRs=;
+	b=ANCs/h1ri9pxP0KeNYrihg5GVv0VHUel8sBuQbI3aM2899NJMo3u2CIKJfyhr9Kxo7aXo3
+	vdcLrXi7PBTvjOsZvDoH2eyLIsmTY65/YPJCmtDO/0pM7hEw3FSaSS9yNrmDwUWo0BhGc/
+	07/w1+p57kfkPkl2Iqrj2cy6HX4VySQ=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Christoffer Dall <cdall@cs.columbia.edu>, KVM <kvm@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: Re: linux-next: build failure after merge of the kvm-arm tree
+Message-ID: <ZdeZX34HpANzWKXj@linux.dev>
+References: <20240222220349.1889c728@canb.auug.org.au>
+ <20240222111129.GA946362@e124191.cambridge.arm.com>
+ <20240222224041.782761fd@canb.auug.org.au>
+ <b9d9a871-ba64-4c13-a186-0c60adc8d245@redhat.com>
+ <87frxka7ud.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -66,93 +65,69 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240222110405.759b8971.alex.williamson@redhat.com>
+In-Reply-To: <87frxka7ud.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Feb 22, 2024 at 11:04:05AM -0700, Alex Williamson wrote:
-> On Wed, 21 Feb 2024 09:45:14 +0200
-> Yishai Hadas <yishaih@nvidia.com> wrote:
-> 
-> > On 08/02/2024 10:16, Yishai Hadas wrote:
-> > > On 06/02/2024 10:06, Yishai Hadas wrote:  
-> > >> On 06/02/2024 9:35, Tian, Kevin wrote:  
-> > >>>> From: Yishai Hadas <yishaih@nvidia.com>
-> > >>>> Sent: Monday, February 5, 2024 8:48 PM
-> > >>>>
-> > >>>> This series improves the mlx5 driver to better handle some error cases
-> > >>>> as of below.
-> > >>>>
-> > >>>> The first two patches let the driver recognize whether the firmware
-> > >>>> moved the tracker object to an error state. In that case, the driver
-> > >>>> will skip/block any usage of that object.
-> > >>>>
-> > >>>> The next two patches (#3, #4), improve the driver to better include the
-> > >>>> proper firmware syndrome in dmesg upon a failure in some firmware
-> > >>>> commands.
-> > >>>>
-> > >>>> The last patch follows the device specification to let the firmware 
-> > >>>> know
-> > >>>> upon leaving PRE_COPY back to RUNNING. (e.g. error in the target,
-> > >>>> migration cancellation, etc.).
-> > >>>>
-> > >>>> This will let the firmware clean its internal resources that were 
-> > >>>> turned
-> > >>>> on upon PRE_COPY.
-> > >>>>
-> > >>>> Note:
-> > >>>> As the first patch should go to net/mlx5, we may need to send it as a
-> > >>>> pull request format to vfio before acceptance of the series, to avoid
-> > >>>> conflicts.
-> > >>>>
-> > >>>> Changes from V0: https://lore.kernel.org/kvm/20240130170227.153464-1-
-> > >>>> yishaih@nvidia.com/
-> > >>>> Patch #2:
-> > >>>> - Rename to use 'object changed' in some places to make it clearer.
-> > >>>> - Enhance the commit log to better clarify the usage/use case.
-> > >>>>
-> > >>>> The above was suggested by Tian, Kevin <kevin.tian@intel.com>.
-> > >>>>  
-> > >>>
-> > >>> this series looks good to me except a small remark on patch2:  
-> > >>
-> > >> We should be fine there, see my answer on V0.
-> > >>  
-> > >>>
-> > >>> Reviewed-by: Kevin Tian <kevin.tian@intel.com>  
-> > >>
-> > >> Thanks Kevin, for your reviewed-by.
-> > >>
-> > >> Yishai
-> > >>  
-> > > 
-> > > Alex
-> > > 
-> > > Are we OK here to continue with a PR for the first patch ?
-> > > 
-> > > It seems that we should be fine here.
-> > > 
-> > > Thanks,
-> > > Yishai
-> > >   
+On Thu, Feb 22, 2024 at 02:31:38PM +0000, Marc Zyngier wrote:
+> On Thu, 22 Feb 2024 13:11:59 +0000,
+> Paolo Bonzini <pbonzini@redhat.com> wrote:
 > > 
-> > Hi Alex,
-> > Any update here ?
+> > On 2/22/24 12:40, Stephen Rothwell wrote:
+> > >> This fails because https://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git/commit/?id=fdd867fe9b32
+> > >> added new fields to that register (ID_AA64DFR1_EL1)
+> > >> 
+> > >> and commit b80b701d5a6 ("KVM: arm64: Snapshot all non-zero RES0/RES1 sysreg fields for later checking")
+> > >> took a snapshot of the fields, so the RES0 (reserved 0) bits don't match anymore.
+> > >> 
+> > >> Not sure how to resolve it in the git branches though.
+> > > 
+> > > Thanks.  I will apply this patch to the merge of the kvm-arm tree from
+> > > tomorrow (and at the end of today's tree).
+> > 
+> > Marc, Oliver, can you get a topic branch from Catalin and friends for
+> > this sysreg patch, and apply the fixup directly to the kvm-arm branch
+> > in the merge commit?
+> > 
+> > Not _necessary_, as I can always ask Linus to do the fixup, but
+> > generally he prefers to have this sorted out by the maintainers if it
+> > is detected by linux-next.
 > 
-> Sure, if Leon wants to do a PR for struct
-> mlx5_ifc_query_page_track_obj_out_bits, that's fine.  The series looks
-> ok to me.  The struct definition is small enough to go through the vfio
-> tree with Leon's ack, but I'll leave it to you to do the right thing
-> relative to potential conflicts.  Thanks,
-
-Alex, you are right, there is no need to send a PR for the first patch.
-Please take it directly through your tree.
-
-We don't have anything in our shared branch this cycle.
-
-Acked-by: Leon Romanovsky <leon@kernel.org>
-
-Thanks
-
+> I think that's not the correct thing to do at this time. I should have
+> timed the introduction of these checks a bit later, after the merge
+> window.
 > 
-> Alex
+> But more to the point, the proposed patch is also not the best thing
+> to merge, because it hides that there is a discrepancy between what
+> the architecture describes, and what KVM knows. I really want to know
+> about it, or it will be yet another bug that we wont detect easily.
+> Specially for ID_AA64DFR*_EL1 which are a bloody mine-field.
 > 
+> So I'd rather we make the check optional, and we'll play catch up for
+> a bit longer. Something like the patch below.
+> 
+> Oliver, do you mind queuing this ASAP (also pushed out to my dev
+> branch)?
+> 
+> Thanks,
+> 
+> 	M.
+> 
+> From 85d861a6ca055c7681c826c580e7c90d74c26ac5 Mon Sep 17 00:00:00 2001
+> From: Marc Zyngier <maz@kernel.org>
+> Date: Thu, 22 Feb 2024 14:12:09 +0000
+> Subject: [PATCH] KVM: arm64: Make build-time check of RES0/RES1 bits optional
+> 
+> In order to ease the transition towards a state of absolute
+> paranoia where all RES0/RES1 bits gets checked against what
+> KVM know of them, make the checks optional and garded by a
+> config symbol (CONFIG_KVM_ARM64_RES_BITS_PARANOIA) default to n.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+
+Applied as commit 99101dda29e3 ("KVM: arm64: Make build-time check of
+RES0/RES1 bits optional") on the kvmarm/next branch.
+
+-- 
+Thanks,
+Oliver
 
