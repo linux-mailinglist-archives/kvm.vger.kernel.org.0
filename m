@@ -1,114 +1,158 @@
-Return-Path: <kvm+bounces-9428-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9429-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 071F4860075
-	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 19:09:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C91F98601AE
+	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 19:41:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9BC661F272F3
-	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 18:09:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67CC31F2733F
+	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 18:41:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30440157E7B;
-	Thu, 22 Feb 2024 18:08:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3926C143C7D;
+	Thu, 22 Feb 2024 18:33:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hO5NC54s"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XimWD4sc"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3A00157E96
-	for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 18:08:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47A65143C70
+	for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 18:33:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708625323; cv=none; b=qvVWhf/GIJDBQI3E2xzSN2JKMz2JQUCBlKKux//mCk4cZ6IvWec2HJvOWrVk/q1siwiWUAGI4OIs7kt39fgy2w9eEus9VyBQHIDbPzZIPE8wSrrnubwUH1kfJJRU91Rl/cJ0lwzmp+yk6CnPqTt+PYs3Da0s114ChjZm2+65XTo=
+	t=1708626789; cv=none; b=RGdnUC730ii/VZhtjNKPTdqETKpWdYPNUZcpcwO3/RY5eA+ZM1QVvZ81mJ7DRv5tBRAwmGxK6hqC1Zd36HuI9DpvKYXRtZY1nxMUYPBcoR3P5VUfwn11PWVTk6d1b+B2ABsCfFNKlUjtQv85nwx+cOAETHw15wrBJuprMCPsfHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708625323; c=relaxed/simple;
-	bh=fy4liYg48gPvnH1kE6+qcZ1q7Bfu0MU2FGcOfrrT0bk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bNyhWmGZPsYiSVvWgHOnvp+6aXgwhtaghoB6j13E6jVSi/zpI6uhNqtGVYCuzGFMOeYcUwj4CRIY39dji208f0UnDONadiCvpsipLy7A2SVnMR+HjNmjFekzro1a4MHoOpwtTcMOQI6Gi7l69tYIY0gpMws2nEiMtKiZaov8A38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hO5NC54s; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708625320;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1CJoex4NkBFusthzZP64VSRgiIqDu+jmbcl9OVx+65A=;
-	b=hO5NC54sIG8QvrNc5VY2jTYhxil+xWE3ysM/3ccy/aZGdz628LSrnYPJo15etDJBaUgw4g
-	h9QjX9JfYezel8SnvVHdUXVtOwS6fjmfaxLumRgk7muJo451C9yr4bMyp+un62IkifF0rF
-	+k+rkNiUQ0OMLLostP/Jm+wNTO7uF4Y=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-182-diTS3jccPIqacjJ4tnUZRA-1; Thu, 22 Feb 2024 13:08:39 -0500
-X-MC-Unique: diTS3jccPIqacjJ4tnUZRA-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-337a9795c5cso755f8f.2
-        for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 10:08:39 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708625318; x=1709230118;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1CJoex4NkBFusthzZP64VSRgiIqDu+jmbcl9OVx+65A=;
-        b=roUbWWfeDbl06WnKHJTufUXVI1voxkp3iF4FihG/wynIYQf5u4+wM+yK8ac+knmq15
-         w9DMD2g7SBUyVl0OR2WYkIDDyk8yqZ8luq1H0rxoEi6bHb1gTYmmAM0yFPPuKHpLFo3p
-         8tvmd1R5cpPjoqb7cx5JzYqVYqpbaSDDe8o7JQwUcYDibNAZt/YKLh8psFackZ3ijNJE
-         Ahhw0gDIUzNNxiY5RO7IYCmZDa9DvPwDnMHiZzDq0X08UN5dheEFH6S5IF5v/z5NIOtP
-         DoyxN8bLlZEOGOYaYXvP6mA8k2E3bgoyijRM7f36zJO7zt90T8du53v4l7hN6gDcqBIU
-         nxVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUUwT5vtgJjKWsI/PKwxEahiueCsh5woW3mb3PiF5XJwImQf6mylsSMaxu83DZtppCNtLaQbZitFk6LjZMbvJgs4EQE
-X-Gm-Message-State: AOJu0YyjuehHuTrL3b32JkBP5yotz64wM1Q7B4GQ+ilhGWVSeP/gwYMy
-	aAg62rc3YF6MvAem7yPn+RtbgTRbxMZl3wFfMtBiqh0uLEhfsmzJ2k5H3kyTQFT4RRN+qiKR67k
-	4eoGE6EXtMvOa+DjP8tsMhpskgHsp3uNhNLNUMbPZECUDdH4VaVNpOqolCTtXFR/i4slb7srgGX
-	7vazlf4uAdftxjiUVUERarqu5e
-X-Received: by 2002:a5d:55cb:0:b0:33d:8783:1e0e with SMTP id i11-20020a5d55cb000000b0033d87831e0emr2256751wrw.70.1708625318228;
-        Thu, 22 Feb 2024 10:08:38 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGIUQS8ouwPxlaKQVxX9DLq/Mvc03qLzRTc8yg50FNvecbYAl2IuBempcl7FEGw8G6iGj5LeAgPO9VoiSe7Mgg=
-X-Received: by 2002:a5d:55cb:0:b0:33d:8783:1e0e with SMTP id
- i11-20020a5d55cb000000b0033d87831e0emr2256741wrw.70.1708625317940; Thu, 22
- Feb 2024 10:08:37 -0800 (PST)
+	s=arc-20240116; t=1708626789; c=relaxed/simple;
+	bh=V7SjxDZvMzNR4ZyEN08FtuXtrKLpldcOW/wvppjFEbU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nq8mxUVrSylH1WLsGD29W6GfvnfvJGn/RUr0qdBGeKa7m08SKCu3t3t6ByJ3jJwo2vgecPzA6KJdwTP4QgjWschLk3vD8uBVMlz4h0KHN4BE3F+DuVUpdiJTeEu4fNuiJ3hwQoapnAoeQpQX70roFFSHRGbE4jdiPhqJWrxMFGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XimWD4sc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 671C6C433F1;
+	Thu, 22 Feb 2024 18:33:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708626788;
+	bh=V7SjxDZvMzNR4ZyEN08FtuXtrKLpldcOW/wvppjFEbU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XimWD4scZoCwdyEkQWCd+Denl+bm6CA2XjJet2vrNHSVz1Q/hHmTiavgqIHd5go8S
+	 Odu/ppWgN8kmYxW2GWNEEbYftWIeDx87rXAFlxeVJnWPUis2wbRe81qpML79Aalx+h
+	 AfIZ675KV4H8FZsvIvT5iBlWsFT63J6beJdnjs69b2MDFgYJD6HHR0G5FYYrkmdjR9
+	 0bgrJFpta75pYs6kKaDaHJVIkK9u3s2m1XQYOEoFy+rkahJXxt40j2CIb2YtnGb6Ly
+	 G1qg2xre0QALC9Oqt3oS5cgp4BfyAv/D6ia8Y3D7oVRTss0sG+c2S1qklyTt1NZron
+	 PsIiq42LlEHHA==
+Date: Thu, 22 Feb 2024 20:33:04 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Yishai Hadas <yishaih@nvidia.com>, "jgg@nvidia.com" <jgg@nvidia.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
+	"maorg@nvidia.com" <maorg@nvidia.com>,
+	"Tian, Kevin" <kevin.tian@intel.com>
+Subject: Re: [PATCH V1 vfio 0/5] Improve mlx5 driver to better handle some
+ error cases
+Message-ID: <20240222183304.GA54170@unreal>
+References: <20240205124828.232701-1-yishaih@nvidia.com>
+ <BN9PR11MB527688453C0D5D4789ADDF968C462@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <1175d7ed-45f3-42d0-a3cb-90ef2df40dbb@nvidia.com>
+ <244923bb-7732-4a9b-b5da-6a778ba4dd60@nvidia.com>
+ <bdb66db6-cd41-4d0d-bc69-33390953f385@nvidia.com>
+ <20240222110405.759b8971.alex.williamson@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240131230902.1867092-1-pbonzini@redhat.com> <2b5e6d68-007e-48bd-be61-9a354be2ccbf@intel.com>
- <CABgObfa_7ZAq1Kb9G=ehkzHfc5if3wnFi-kj3MZLE3oYLrArdQ@mail.gmail.com>
- <CABgObfbetwO=4whrCE+cFfCPJa0nsK=h6sQAaoamJH=UqaJqTg@mail.gmail.com>
- <CABgObfbUcG5NyKhLOnihWKNVM0OZ7zb9R=ADzq7mjbyOCg3tUw@mail.gmail.com>
- <eefbce80-18c5-42e7-8cde-3a352d5811de@intel.com> <CABgObfY=3msvJ2M-gHMqawcoaW5CDVDVxCO0jWi+6wrcrsEtAw@mail.gmail.com>
- <9c4ee2ca-007d-42f3-b23d-c8e67a103ad8@intel.com>
-In-Reply-To: <9c4ee2ca-007d-42f3-b23d-c8e67a103ad8@intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 22 Feb 2024 19:08:25 +0100
-Message-ID: <CABgObfYttER8yZBTReO+Cd5VqQCpEY9UdHH5E8BKuA1+2CsimA@mail.gmail.com>
-Subject: Re: [PATCH v2 0/2] x86/cpu: fix invalid MTRR mask values for SEV or TME
-To: Dave Hansen <dave.hansen@intel.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	Zixi Chen <zixchen@redhat.com>, Adam Dunlap <acdunlap@google.com>, 
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Kai Huang <kai.huang@intel.com>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>, x86@kernel.org, 
-	stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240222110405.759b8971.alex.williamson@redhat.com>
 
-On Thu, Feb 22, 2024 at 7:07=E2=80=AFPM Dave Hansen <dave.hansen@intel.com>=
- wrote:
-> > Ping, in the end are we applying these patches for either 6.8 or 6.9?
->
-> Let me poke at them and see if we can stick them in x86/urgent early
-> next week.  They do fix an actual bug that's biting people, right?
+On Thu, Feb 22, 2024 at 11:04:05AM -0700, Alex Williamson wrote:
+> On Wed, 21 Feb 2024 09:45:14 +0200
+> Yishai Hadas <yishaih@nvidia.com> wrote:
+> 
+> > On 08/02/2024 10:16, Yishai Hadas wrote:
+> > > On 06/02/2024 10:06, Yishai Hadas wrote:  
+> > >> On 06/02/2024 9:35, Tian, Kevin wrote:  
+> > >>>> From: Yishai Hadas <yishaih@nvidia.com>
+> > >>>> Sent: Monday, February 5, 2024 8:48 PM
+> > >>>>
+> > >>>> This series improves the mlx5 driver to better handle some error cases
+> > >>>> as of below.
+> > >>>>
+> > >>>> The first two patches let the driver recognize whether the firmware
+> > >>>> moved the tracker object to an error state. In that case, the driver
+> > >>>> will skip/block any usage of that object.
+> > >>>>
+> > >>>> The next two patches (#3, #4), improve the driver to better include the
+> > >>>> proper firmware syndrome in dmesg upon a failure in some firmware
+> > >>>> commands.
+> > >>>>
+> > >>>> The last patch follows the device specification to let the firmware 
+> > >>>> know
+> > >>>> upon leaving PRE_COPY back to RUNNING. (e.g. error in the target,
+> > >>>> migration cancellation, etc.).
+> > >>>>
+> > >>>> This will let the firmware clean its internal resources that were 
+> > >>>> turned
+> > >>>> on upon PRE_COPY.
+> > >>>>
+> > >>>> Note:
+> > >>>> As the first patch should go to net/mlx5, we may need to send it as a
+> > >>>> pull request format to vfio before acceptance of the series, to avoid
+> > >>>> conflicts.
+> > >>>>
+> > >>>> Changes from V0: https://lore.kernel.org/kvm/20240130170227.153464-1-
+> > >>>> yishaih@nvidia.com/
+> > >>>> Patch #2:
+> > >>>> - Rename to use 'object changed' in some places to make it clearer.
+> > >>>> - Enhance the commit log to better clarify the usage/use case.
+> > >>>>
+> > >>>> The above was suggested by Tian, Kevin <kevin.tian@intel.com>.
+> > >>>>  
+> > >>>
+> > >>> this series looks good to me except a small remark on patch2:  
+> > >>
+> > >> We should be fine there, see my answer on V0.
+> > >>  
+> > >>>
+> > >>> Reviewed-by: Kevin Tian <kevin.tian@intel.com>  
+> > >>
+> > >> Thanks Kevin, for your reviewed-by.
+> > >>
+> > >> Yishai
+> > >>  
+> > > 
+> > > Alex
+> > > 
+> > > Are we OK here to continue with a PR for the first patch ?
+> > > 
+> > > It seems that we should be fine here.
+> > > 
+> > > Thanks,
+> > > Yishai
+> > >   
+> > 
+> > Hi Alex,
+> > Any update here ?
+> 
+> Sure, if Leon wants to do a PR for struct
+> mlx5_ifc_query_page_track_obj_out_bits, that's fine.  The series looks
+> ok to me.  The struct definition is small enough to go through the vfio
+> tree with Leon's ack, but I'll leave it to you to do the right thing
+> relative to potential conflicts.  Thanks,
 
-Yes, I have gotten reports of {Sapphire,Emerald} Rapids machines that
-don't boot at all without either these patches or
-"disable_mtrr_cleanup".
+Alex, you are right, there is no need to send a PR for the first patch.
+Please take it directly through your tree.
 
-Paolo
+We don't have anything in our shared branch this cycle.
 
+Acked-by: Leon Romanovsky <leon@kernel.org>
+
+Thanks
+
+> 
+> Alex
+> 
 
