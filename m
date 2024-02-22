@@ -1,105 +1,119 @@
-Return-Path: <kvm+bounces-9366-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9367-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11EFD85F53A
-	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 11:04:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F26D285F54B
+	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 11:06:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC2401F25EA1
-	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 10:04:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9300EB26434
+	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 10:06:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 534C439AC3;
-	Thu, 22 Feb 2024 10:04:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BLFBAFuS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 625D139FE1;
+	Thu, 22 Feb 2024 10:06:12 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7962638DD9;
-	Thu, 22 Feb 2024 10:04:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 192F439875;
+	Thu, 22 Feb 2024 10:06:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708596259; cv=none; b=NzLnU9bC6t+ZWS2R1HXLT+2ZcYDDcBUntiirKGteE8hD9Vl/JMV5jEYUYdv+RwGHXcr0bIy66fVre85ZoQJF9u6gmi7u3X/DDFa+pHtwbiynoL/dveICUk8DP5/BAzdUCDrqr5hs1J6ztlmUQ4TRmulZakmY7PqHxUe0IPsJp8w=
+	t=1708596371; cv=none; b=L1iV842SbOxXXx5NL5CmPOcMcNNFT5x61kUkwGAL9S9S3dZ8JUwL5AuFGBEpMk5gcfAz1hxBw31D5gSC2s269izQa4Rn0tR5z+IIpfCVH2SDumWa/ISkoATj5WuGyIjKSf0+KBLDzLcUGQRAASDuEkhpk/JpFYg4MWEwlJ3sWZg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708596259; c=relaxed/simple;
-	bh=DY+laaDGWADlgjZ4aCk/y2nEJQIg6zplT0mKVagO2gE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lS97D8ngWiBiXsGfHeO6IpXaPe+VmfzfMEeRtPlpgE87wFV0nVeKwCaH/GObn768VtBqBZVRpEtxEDCtkImY5RXatwv27940GDJD+bhzXfqUMueADzR/I88wtYUzShfX488tLwaFG/AdjAy1QldRtDQ0CSwXTEuP2A/tAXyU1po=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BLFBAFuS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CB37C433F1;
-	Thu, 22 Feb 2024 10:04:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708596259;
-	bh=DY+laaDGWADlgjZ4aCk/y2nEJQIg6zplT0mKVagO2gE=;
-	h=From:To:Cc:Subject:Date:From;
-	b=BLFBAFuS1IqZtsu4OkQIujYD8nRbeCwV9jGbdUmQMen0qak0DD7GCeTMy/o92a6jR
-	 QeG2H/KO+xVYKuqf9XuyYY1IjgvMDAhzJgMIngXNJ8H9CwJHcN+nuee/C55+kXemL2
-	 VFxAPStbgXsHPBhbovrhsre+27Ku68taiwDZQ70gNT4NEfHnqYSd93mlIvsHeaHlBW
-	 HreItCp7zMUEGA5rJK6Lj6QSpohfJk77GuHoDmC2XtmdB1t2AeZNdonBBnx9NbcmHt
-	 V2ywIcxpAVu3ABiTXPPA9lDMZPnTmZHcXz3EhZpGx+nwz16SuhEUjhaEkGu6I4CtiK
-	 kC/MGvB3U6UQQ==
-From: Arnd Bergmann <arnd@kernel.org>
-To: David Woodhouse <dwmw2@infradead.org>,
-	Paul Durrant <paul@xen.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Jan Kara <jack@suse.cz>,
-	Christian Brauner <brauner@kernel.org>,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: x86/xen: fix 32-bit pointer cast
-Date: Thu, 22 Feb 2024 11:03:58 +0100
-Message-Id: <20240222100412.560961-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1708596371; c=relaxed/simple;
+	bh=72HRlj4wNG+uTgP9OOegzPNQJN5da4Rz0slrIrJJ5N8=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=rGcMIkptk50PkqAQmH+wFhkLJm4hT9BQI4T9GBB0r9sa0K4OhLE9LyNuzg4PzUCQ4zHlYYmVH3OyXSFk16/6aXh+R/xROZ3US0OFVhpQhOM7/IYnJeLyiRnqLB6F82910QkbX0yzXjFCZTWwOq+Gb/4OjBABNIUrnP5fPKZ+mC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.173])
+	by gateway (Coremail) with SMTP id _____8BxnuuKHNdlNSkQAA--.41380S3;
+	Thu, 22 Feb 2024 18:06:02 +0800 (CST)
+Received: from [10.20.42.173] (unknown [10.20.42.173])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8Cxf8+HHNdlC7I+AA--.31618S3;
+	Thu, 22 Feb 2024 18:06:01 +0800 (CST)
+Subject: Re: [PATCH v4 0/6] LoongArch: Add pv ipi support on LoongArch VM
+To: WANG Xuerui <kernel@xen0n.name>, Huacai Chen <chenhuacai@kernel.org>,
+ Tianrui Zhao <zhaotianrui@loongson.cn>, Juergen Gross <jgross@suse.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Cc: loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
+ virtualization@lists.linux.dev, kvm@vger.kernel.org
+References: <20240201031950.3225626-1-maobibo@loongson.cn>
+ <0f4d83e2-bff9-49d9-8066-9f194ce96306@xen0n.name>
+ <447f4279-aea9-4f35-b87e-a3fc8c6c20ac@xen0n.name>
+ <4a6e25ec-cdb6-887a-2c64-3df12d30c89a@loongson.cn>
+ <7867d9c8-22fb-4bfc-92dc-c782d29c56f9@xen0n.name>
+From: maobibo <maobibo@loongson.cn>
+Message-ID: <542a8f4e-cec3-92d0-1cdd-43d112eec605@loongson.cn>
+Date: Thu, 22 Feb 2024 18:06:05 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <7867d9c8-22fb-4bfc-92dc-c782d29c56f9@xen0n.name>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8Cxf8+HHNdlC7I+AA--.31618S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoW7urW5JFykZw15AFy3GrWUKFX_yoW8WFy3pF
+	WS9a4UKF4vyry0y392kw40gryYyr4xJr1SqrnYkryqk3y5XryavrsFqr9YgF9xu34fJw1Y
+	q3yUtayxXFWUZacCm3ZEXasCq-sJn29KB7ZKAUJUUUUr529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUB2b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	XVWUAwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
+	8JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_
+	Jr0_Gr1l4IxYO2xFxVAFwI0_Jrv_JF1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8Gjc
+	xK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0
+	cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8V
+	AvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E
+	14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU2MKZDUUUU
 
-From: Arnd Bergmann <arnd@arndb.de>
 
-shared_info.hva is a 64-bit variable, so casting to a pointer causes
-a warning in 32-bit builds:
 
-arch/x86/kvm/xen.c: In function 'kvm_xen_hvm_set_attr':
-arch/x86/kvm/xen.c:660:45: error: cast to pointer from integer of different size [-Werror=int-to-pointer-cast]
-  660 |                         void __user * hva = (void *)data->u.shared_info.hva;
+On 2024/2/22 下午5:34, WANG Xuerui wrote:
+> On 2/17/24 11:15, maobibo wrote:
+>> On 2024/2/15 下午6:25, WANG Xuerui wrote:
+>>> On 2/15/24 18:11, WANG Xuerui wrote:
+>>>> Sorry for the late reply (and Happy Chinese New Year), and thanks 
+>>>> for providing microbenchmark numbers! But it seems the more 
+>>>> comprehensive CoreMark results were omitted (that's also absent in 
+>>>> v3)? While the 
+>>>
+>>> Of course the benchmark suite should be UnixBench instead of 
+>>> CoreMark. Lesson: don't multi-task code reviews, especially not after 
+>>> consuming beer -- a cup of coffee won't fully cancel the influence. ;-)
+>>>
+>> Where is rule about benchmark choices like UnixBench/Coremark for ipi 
+>> improvement?
+> 
+> Sorry for the late reply. The rules are mostly unwritten, but in general 
+> you can think of the preference of benchmark suites as a matter of 
+> "effectiveness" -- the closer it's to some real workload in the wild, 
+> the better. Micro-benchmarks is okay for illustrating the points, but 
+> without demonstrating the impact on realistic workloads, a change could 
+> be "useless" in practice or even decrease various performance metrics 
+> (be that throughput or latency or anything that matters in the certain 
+> case), but get accepted without notice.
+yes, micro-benchmark cannot represent the real world, however it does 
+not mean that UnixBench/Coremark should be run. You need to point out 
+what is the negative effective from code, or what is the possible real 
+scenario which may benefit. And points out the reasonable benchmark 
+sensitive for IPIs rather than blindly saying UnixBench/Coremark.
 
-Replace the cast with a u64_to_user_ptr() call that does the right thing.
+Regards
+Bibo Mao
 
-Fixes: 01a871852b11 ("KVM: x86/xen: allow shared_info to be mapped by fixed HVA")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- arch/x86/kvm/xen.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index 01c0fd138d2f..8a04e0ae9245 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -657,7 +657,7 @@ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
- 						     gfn_to_gpa(gfn), PAGE_SIZE);
- 			}
- 		} else {
--			void __user * hva = (void *)data->u.shared_info.hva;
-+			void __user * hva = u64_to_user_ptr(data->u.shared_info.hva);
- 
- 			if (!PAGE_ALIGNED(hva) || !access_ok(hva, PAGE_SIZE)) {
- 				r = -EINVAL;
--- 
-2.39.2
+> 
 
 
