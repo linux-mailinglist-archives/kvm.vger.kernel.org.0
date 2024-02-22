@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-9417-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9418-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41A5185FDCA
-	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 17:13:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7966085FDCC
+	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 17:14:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CCA4E1F217A1
-	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 16:13:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E2D0283F0D
+	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 16:14:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9929615696E;
-	Thu, 22 Feb 2024 16:11:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83B9915698B;
+	Thu, 22 Feb 2024 16:11:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="seCL5QQ2"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lLlNbH0s"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EADC15531C
-	for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 16:11:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 488D3156964
+	for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 16:11:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708618303; cv=none; b=Ujaee9G2C2AT6ZEHgd1QJMqoNqAA1/n9H7Hv3Sg6iiBGK3gDsm7laIVLNgIhggsilPVXXy17dgFO59OIqIp98kRO4azIG4ZP4wazU5//b+DpLBHiBQqrPIK3fyoJkiLWQfqS2WChcWjPR1f9ALOJAsBYzANoVnCjh5Gk90lzmhs=
+	t=1708618305; cv=none; b=Cd4BZiqga/BIFIAqmyLZzTAInuqsgnW9qfCHKwhX9H2IbVGV++s0ad69E8w5WDnIJCFxTbZKF+RfeBdRo3XYYkk936/6ZQ6zHSr4Qy41VeiaBqgiWSrIkLjoTo3clLHSolxQQd1kfKsJIII1yNfVOvEDjSZxo/L5k97VATHAOYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708618303; c=relaxed/simple;
-	bh=npvYxmnOW8D70NS3ig9HnMx9N7r0Z+HXJuDOX7EAoRc=;
+	s=arc-20240116; t=1708618305; c=relaxed/simple;
+	bh=c7Tct6JEztEi1hIJsezP9trwKsf7ghqb+Z/TRUVlQe8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=HS68a1nr0BRXsOooiDxVjFhMzF86SklZvUssDuzC1zTEYJnK6qVWIpRNJQcEKJIMO6wNpKTwB6ia40YXWyw0g4GomnYNCrr46zmgkAHOvVngOpA3UvfzNkaKUaX+2Ogc0jX4+Tnbz2axISFkpaLqBbaHy74wSDR8fI50h7OSMrw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=seCL5QQ2; arc=none smtp.client-ip=209.85.128.74
+	 To:Cc:Content-Type; b=f3He1zLQZrsZllkzunSCrYBK3T+cXAHvF0sVqGTDxGN7NVrqQ/CijefLStRFv3BTHp/Ia5AI0acpFoUcdOy8ZcUriIhYVtnUy9LvkO3Uf/zPPg3RNzuTnXWI5uMJ7iRY2gvdMiWNU80y3TW9J3QXxXQWMlTMNPHFjgwvhFHwRgw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lLlNbH0s; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-40e4478a3afso5312845e9.1
-        for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 08:11:42 -0800 (PST)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc657e9bdc4so10641717276.0
+        for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 08:11:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708618301; x=1709223101; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1708618303; x=1709223103; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rSm6/qgBZCczn9Ke4uZTyz+5iwS2nAcQPMledMHWGz8=;
-        b=seCL5QQ2tYGGoFPLQxzu6TbhMU2DjHxfqV++HwJDh6gOj+mD3hSysXZ6PJkkG8g+75
-         zO5CQCehh2JdwCIYjozYshFJG4OiWCnElmc+MSh8NTnWAZ9JMygKcWCTgEHGzihDhlVz
-         3opZwsA8++fjLmWgRLw6sNcfu4RXiCP5Yw6RBbOvFoSx4X/AxJBhBLEltl3TpxZYcCZL
-         ju50YUpXW3H5Uh2vXkq8W+Fo45r9ppier/CAs1E3TYOR5Ap1/FzXZvg71c2JGFFm0GsU
-         ay75I4nyxpLQwWrXboO2yOOdIHrgBJHc+JxxzZOLMk5m4kecC1yL7RmHjCtZlM89oggW
-         ZeDg==
+        bh=XojbdHrJujzsZqAAPdXW/Ko7J3fwpP4NgmuzfEiqbUI=;
+        b=lLlNbH0s0AUwCzDq8qv5flVZ4m91ZNAuSETy1xjPhARKs4B23p64xK3EI+3yy72DdK
+         mDh2RfNC4z2B2ZbC9Nds5RmkZx7UAXg0yUo8pfvZBG9RPf+ku7l1FAD0dFxz+X3aTsmS
+         UwgXN98l+e/auMIiRm0/d8JYWxTrS8DV6nN/yXuuKEnSBVQqhhJGljCy+eY7AtJdU+ua
+         j57nwOp7Ttx+X0fwkFL3SriDlSCHGWjmirZb6BfeifA8Q+/7vikPQQ/ZHzOYMd/g3WWC
+         axCMn71iS4rDZb9GgEocnf6v3fRM/Urj8RB23sYZAo7XrY2PeZUdVmx/hqD/Um8cmkJ6
+         VECA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708618301; x=1709223101;
+        d=1e100.net; s=20230601; t=1708618303; x=1709223103;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rSm6/qgBZCczn9Ke4uZTyz+5iwS2nAcQPMledMHWGz8=;
-        b=tLOxDf9XCba/LZ2GfeC9KvoPDRm07B9uKtTGYcBQIsIf7jIbDfRbUMBAsskY4gEnMM
-         /3oW+7K7usb4i3VdCmHIa971zhT7+KK1Rx4858RYdv3AaB8Bdb6QXZpOCBRPdayG3i6+
-         L/Kk0i1Iit8MkZFT1l+kAZEXmw2PrlSJsILPvJ6ekROgtOw/EEBvHQdC9x5pxw2d6JHu
-         Auq53VfAG7fpPv6oJY39z+P+u8AHpVywujow6qYw8hcy7J8L+3LvPSKKDB1taF1W190Q
-         mjIDf1PpU4EtbpcZqqVBuMLyej1yAtC0nmp4NtkYNt8OgT4fFQ2/cHEC1z+VqC6uHQFL
-         ZMAQ==
-X-Gm-Message-State: AOJu0YzIxIeCrWtkIJvRIi0/umAWyGaHJ7Oli4PQO+pNFFSyX7O+Y0g0
-	or9SkQq6mssBrYdVO+8DwLPAQsGhLLKNrl47wPiPj/No9inteJ0JdYfNsMI0HR6kVUI+XgnQSst
-	8akhFf/zPSPjfBP21VMuPvtbB8lrud2DF6BhAIg6b8bnuoOofJ77KYGQIJ29fbP8EoBpe723GAh
-	ql73rdyfHoJW6wa0hfzobYCWI=
-X-Google-Smtp-Source: AGHT+IG/y8W3lb3JZO83cjx58GKuU0Lq2tsDnMqCffsClUcUdbIHBL/G3lXuTAChtYt/zyPvFkyCvnNNLw==
+        bh=XojbdHrJujzsZqAAPdXW/Ko7J3fwpP4NgmuzfEiqbUI=;
+        b=JdrOGh1qeFlgffxu9Nc9RWFw8N7vWqzwjLoBPcqSQe7Is4hI5bxD/MLhVRBBieEAhs
+         KIrmGAWi6K/+7ipVyR34aZVYVt5StywWWRPy44jbDtRJiif+mPzCuasnCdTzp4K13LB/
+         +uty8gjP/3PH0B89XCTvpCZfb7IPcERyp998+OsJI2lmMVlsIYyVT5DauR4srmSLDIab
+         n3DOwV/X6NbJHnHX01VSqVIZ3ztDOo2TZg92HlW9dA/O7HLAE31qH+zyBQm0CtAP62wV
+         Yn0LfcRpr1mCs6G6/G6km25Dks9NMTQh0F5Kuhfae0ChnFlZ3C21zj5n3XZUJ9/my0Lx
+         MKQQ==
+X-Gm-Message-State: AOJu0YznncF2PKoRzVKsea8os99aPzCnGC9Lif4I5lI9Z+H9haoghAnn
+	iO/uss6gYedGhAuVEMIa9pNeyj9W+IHoXAsSwv1WG2b/1hhdLnp/2/toBYltA8twl4K/UpiOfeS
+	003UP3QlMtL4/ykiaqu8cg7hsw4aATLY7QKowa8GMG8oXBcr0Ktk8/ASxwRvXGpE/aS9Dyany+6
+	OOsRIDU7Fsp00Tru2CkEOgwKQ=
+X-Google-Smtp-Source: AGHT+IESoqL0M6mjy/MJ8LmmLb1XdvlAFvZ0ur8xoV3cDuHAn304J5q5vh8m433MSg+rVYhI4cB/urFKYg==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:600c:1e8c:b0:412:8816:3723 with SMTP id
- be12-20020a05600c1e8c00b0041288163723mr76370wmb.3.1708618300751; Thu, 22 Feb
- 2024 08:11:40 -0800 (PST)
-Date: Thu, 22 Feb 2024 16:10:42 +0000
+ (user=tabba job=sendgmr) by 2002:a5b:b05:0:b0:dbd:73bd:e55a with SMTP id
+ z5-20020a5b0b05000000b00dbd73bde55amr139111ybp.4.1708618303039; Thu, 22 Feb
+ 2024 08:11:43 -0800 (PST)
+Date: Thu, 22 Feb 2024 16:10:43 +0000
 In-Reply-To: <20240222161047.402609-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,9 +74,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240222161047.402609-1-tabba@google.com>
 X-Mailer: git-send-email 2.44.0.rc1.240.g4c46232300-goog
-Message-ID: <20240222161047.402609-22-tabba@google.com>
-Subject: [RFC PATCH v1 21/26] KVM: arm64: Mark a protected VM's memory as
- unmappable at initialization
+Message-ID: <20240222161047.402609-23-tabba@google.com>
+Subject: [RFC PATCH v1 22/26] KVM: arm64: Handle unshare on way back to guest
+ entry rather than exit
 From: Fuad Tabba <tabba@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev
 Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
@@ -98,63 +98,105 @@ Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
 	tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-A protected VM's memory is private by default and not mappable by
-the host until explicitly shared by the guest. Therefore, start
-off with all the memory of a protected guest as NOT_MAPPABLE.
+Host might not be able to unmap memory that's unshared with it.
+If that happens, the host will deny the unshare, and the guest
+will be notified of its failure when returning from its unshare
+call.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/pkvm.c | 32 ++++++++++++++++++++++++++++++--
- 1 file changed, 30 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 24 ++++++++++++++++++++----
+ arch/arm64/kvm/hyp/nvhe/pkvm.c     | 22 ++++++++--------------
+ 2 files changed, 28 insertions(+), 18 deletions(-)
 
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index bfd4858a7bd1..75247a3ced3d 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -220,13 +220,41 @@ bool pkvm_is_hyp_created(struct kvm *host_kvm)
- 	return READ_ONCE(host_kvm->arch.pkvm.handle);
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index 1c93c225915b..2198a146e773 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -79,16 +79,32 @@ static void handle_pvm_entry_psci(struct pkvm_hyp_vcpu *hyp_vcpu)
+ 
+ static void handle_pvm_entry_hvc64(struct pkvm_hyp_vcpu *hyp_vcpu)
+ {
+-	u32 fn = smccc_get_function(&hyp_vcpu->vcpu);
++	struct kvm_vcpu *vcpu = &hyp_vcpu->vcpu;
++	u32 fn = smccc_get_function(vcpu);
+ 
+ 	switch (fn) {
+ 	case ARM_SMCCC_VENDOR_HYP_KVM_MEM_SHARE_FUNC_ID:
+ 		fallthrough;
+-	case ARM_SMCCC_VENDOR_HYP_KVM_MEM_UNSHARE_FUNC_ID:
+-		fallthrough;
+ 	case ARM_SMCCC_VENDOR_HYP_KVM_MEM_RELINQUISH_FUNC_ID:
+-		vcpu_set_reg(&hyp_vcpu->vcpu, 0, SMCCC_RET_SUCCESS);
++		vcpu_set_reg(vcpu, 0, SMCCC_RET_SUCCESS);
++		break;
++	case ARM_SMCCC_VENDOR_HYP_KVM_MEM_UNSHARE_FUNC_ID:
++	{
++		/*
++		 * Get the host vcpu view of whether the unshare is successful.
++		 * If the host wasn't able to unmap it first, hyp cannot unshare
++		 * it as the host would have a mapping to a private guest page.
++		 */
++		int smccc_ret = vcpu_get_reg(hyp_vcpu->host_vcpu, 0);
++		u64 ipa = smccc_get_arg1(vcpu);
++
++		if (smccc_ret != SMCCC_RET_SUCCESS ||
++		    __pkvm_guest_unshare_host(hyp_vcpu, ipa))
++			smccc_set_retval(vcpu, SMCCC_RET_INVALID_PARAMETER, 0, 0, 0);
++		else
++			smccc_set_retval(vcpu, SMCCC_RET_SUCCESS, 0, 0, 0);
+ 		break;
++	}
+ 	default:
+ 		handle_pvm_entry_psci(hyp_vcpu);
+ 		break;
+diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+index 4209c75e7fba..fa94b88fe9a8 100644
+--- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
++++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+@@ -1236,26 +1236,19 @@ static bool pkvm_memshare_call(struct pkvm_hyp_vcpu *hyp_vcpu, u64 *exit_code)
+ 	return false;
  }
  
-+static int pkvm_mark_protected_mem_not_mappable(struct kvm *kvm)
-+{
-+	struct kvm_memory_slot *memslot;
-+	struct kvm_memslots *slots;
-+	int bkt, r;
-+
-+	if (!IS_ENABLED(CONFIG_KVM_GENERIC_PRIVATE_MEM_MAPPABLE))
-+		return 0;
-+
-+	slots = kvm_memslots(kvm);
-+	kvm_for_each_memslot(memslot, bkt, slots) {
-+		if (!kvm_slot_can_be_private(memslot))
-+			continue;
-+
-+		r = kvm_vm_set_mem_attributes_kernel(kvm,
-+			memslot->base_gfn, memslot->base_gfn + memslot->npages,
-+			KVM_MEMORY_ATTRIBUTE_NOT_MAPPABLE);
-+		if (r)
-+			return r;
-+	}
-+
-+	return 0;
-+}
-+
- int pkvm_create_hyp_vm(struct kvm *host_kvm)
+-static bool pkvm_memunshare_call(struct pkvm_hyp_vcpu *hyp_vcpu)
++static bool pkvm_memunshare_check(struct pkvm_hyp_vcpu *hyp_vcpu)
  {
- 	int ret = 0;
+ 	struct kvm_vcpu *vcpu = &hyp_vcpu->vcpu;
+-	u64 ipa = smccc_get_arg1(vcpu);
++	u64 arg1 = smccc_get_arg1(vcpu);
+ 	u64 arg2 = smccc_get_arg2(vcpu);
+ 	u64 arg3 = smccc_get_arg3(vcpu);
+-	int err;
+-
+-	if (arg2 || arg3)
+-		goto out_guest_err;
  
- 	mutex_lock(&host_kvm->lock);
--	if (!pkvm_is_hyp_created(host_kvm))
--		ret = __pkvm_create_hyp_vm(host_kvm);
-+	if (!pkvm_is_hyp_created(host_kvm)) {
-+		if (kvm_vm_is_protected(host_kvm))
-+			ret = pkvm_mark_protected_mem_not_mappable(host_kvm);
-+		if (!ret)
-+			ret = __pkvm_create_hyp_vm(host_kvm);
+-	err = __pkvm_guest_unshare_host(hyp_vcpu, ipa);
+-	if (err)
+-		goto out_guest_err;
++	if (!arg1 || arg2 || arg3) {
++		smccc_set_retval(vcpu, SMCCC_RET_INVALID_PARAMETER, 0, 0, 0);
++		return true;
 +	}
- 	mutex_unlock(&host_kvm->lock);
  
- 	return ret;
+ 	return false;
+-
+-out_guest_err:
+-	smccc_set_retval(vcpu, SMCCC_RET_INVALID_PARAMETER, 0, 0, 0);
+-	return true;
+ }
+ 
+ static bool pkvm_meminfo_call(struct pkvm_hyp_vcpu *hyp_vcpu)
+@@ -1343,7 +1336,8 @@ bool kvm_handle_pvm_hvc64(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	case ARM_SMCCC_VENDOR_HYP_KVM_MEM_SHARE_FUNC_ID:
+ 		return pkvm_memshare_call(hyp_vcpu, exit_code);
+ 	case ARM_SMCCC_VENDOR_HYP_KVM_MEM_UNSHARE_FUNC_ID:
+-		return pkvm_memunshare_call(hyp_vcpu);
++		/* Handle unshare on guest return because it could be denied by the host. */
++		return pkvm_memunshare_check(hyp_vcpu);
+ 	case ARM_SMCCC_VENDOR_HYP_KVM_MEM_RELINQUISH_FUNC_ID:
+ 		return pkvm_memrelinquish_call(hyp_vcpu);
+ 	default:
 -- 
 2.44.0.rc1.240.g4c46232300-goog
 
