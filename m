@@ -1,133 +1,109 @@
-Return-Path: <kvm+bounces-9430-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9432-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A8148602C3
-	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 20:37:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53B7986023A
+	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 20:07:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 31A87B28AAD
-	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 18:59:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 852CF1C26C4B
+	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 19:07:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE1531DFD9;
-	Thu, 22 Feb 2024 18:58:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6EC26E61F;
+	Thu, 22 Feb 2024 19:06:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ANCs/h1r"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ufJbKBJn"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84BD614B81D
-	for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 18:58:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60CDB548E9
+	for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 19:06:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708628329; cv=none; b=PWqkh0Car6bJxjO62uC1N6if0spGRAPxMlh2/rmW9Epdr56c24LfEFFmYUIoJEqXbAn64Z+QdCSTJPm225zBv99qfI/hGWFcVnqq79rG/kQnDs4PAZx6YMHNIYWUTq5jHYlSmW3wvfc1W4HbgQwNVqbIvVcrpExRDw/AqsPY6zQ=
+	t=1708628792; cv=none; b=fiIgQC8VHaUR86kJtRoZ068OKzgsQIc1dKA/D2dSTEifBbLOmrzMNXaPRYCE+VLPim64zyD2Qf1RrHLtthLCk7exfcGqT6Lbu8FOFZsmvRlVAGWZ9r2BQExuFWmq/jkGpy/o2nr+uR09Sj8Oax5gS4kZqmy8hz4qJPFf7+QlYAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708628329; c=relaxed/simple;
-	bh=RAT48h2u3y3O5tYBBYYlc57OcpbSHfgGw0mrClbLdzc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nYIcoa2mz5tYScJp+g/7qrsNR/uR2HIaX3YlrKzGci0/eLL3CZyRFsJL7Zv6VzgXqSWDbmCSCtcH4pBBLh+LFTtjfxgu4aiazadVp/A1Nk7ZjqaCvv5ylWDBq8VocP9rJTWK/yvXAcgdwC+ZsqxxOnqEGXKvD6nr7qnX3+IQ99U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ANCs/h1r; arc=none smtp.client-ip=91.218.175.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Thu, 22 Feb 2024 18:58:39 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1708628324;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fXtbm9eYcFP/Qnaj9qL/VFl6ikfpqHd5JRVGugnAsRs=;
-	b=ANCs/h1ri9pxP0KeNYrihg5GVv0VHUel8sBuQbI3aM2899NJMo3u2CIKJfyhr9Kxo7aXo3
-	vdcLrXi7PBTvjOsZvDoH2eyLIsmTY65/YPJCmtDO/0pM7hEw3FSaSS9yNrmDwUWo0BhGc/
-	07/w1+p57kfkPkl2Iqrj2cy6HX4VySQ=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Stephen Rothwell <sfr@canb.auug.org.au>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Christoffer Dall <cdall@cs.columbia.edu>, KVM <kvm@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: Re: linux-next: build failure after merge of the kvm-arm tree
-Message-ID: <ZdeZX34HpANzWKXj@linux.dev>
-References: <20240222220349.1889c728@canb.auug.org.au>
- <20240222111129.GA946362@e124191.cambridge.arm.com>
- <20240222224041.782761fd@canb.auug.org.au>
- <b9d9a871-ba64-4c13-a186-0c60adc8d245@redhat.com>
- <87frxka7ud.wl-maz@kernel.org>
+	s=arc-20240116; t=1708628792; c=relaxed/simple;
+	bh=odNY7brJIrKGXbB0NYiJ5L+h7CgQvY8SV9Jl9b0OOjY=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=aNIw52BSAyadQ0yS8yeseU94imvQdi4EsI9sMs8l0Oaew7SNincMr6kYEqI2YnU3ZHtaNnFW0T2pW4ar5Q8d9v12gIhXwjMH4uR3EIf5ygl9xlweKb3JeA0LbXVzQbwrvPAcocGKNDDgi2XDoZsbUrv93uLpk7labJpp0qr2V1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ufJbKBJn; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-602dae507caso1556107b3.0
+        for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 11:06:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1708628774; x=1709233574; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gezQaNgBY+02TfMTErrgdnbl2WvP4PLw6JtipxuzYjc=;
+        b=ufJbKBJnbvcFgF3ydOn4HVlVCiRAGRQLPZ1ntzxGiIdTx9OzKstSArZB7f3NhS2/nE
+         SMXznTzQnjaRpGvNnbAhsaMLxlHzkfNBARGlSkOaN9qjTFvVg+z53Cxw0fOtdwEArdmJ
+         bG8iqxpErPjfZel2FupNvpPeQGp5WxOZHs3j0v5WyrvqBI1wxNOZ0KRTbScG/1dym85d
+         H7t3r4nSz6F7wFm7kNm3MQhzKSrhS3HcKMa3hGM4UoM8uSh4r3y0bcvryl2oHhq6tNN9
+         nnwEtgFJnM44/L4U1aw16gS5XHRKGuX3w/SiKxAhaatDKT0xFPqiNS5HEY0LN80+IKbu
+         Vx+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708628774; x=1709233574;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gezQaNgBY+02TfMTErrgdnbl2WvP4PLw6JtipxuzYjc=;
+        b=UYB9lsZpcox2iBzu9pBJAT5nHRNIr9d5pDjfGCnxf1AFP802m4EU/vDFZ0kPZCQ0Cu
+         8/PFz0+moK9Y9CA2Bhwpr0+kWBvDheldMMV6UTnkVtgfVE6NG+HLpbq/UAsNZe5ia0jS
+         kj1XSc+5txDe4QZcgdwBOTlG9oY5wFol2ENrgjEFxpG6CaIx2pfgGk7CASCrCLxZQ6Cm
+         1RscpefGFxY8Tf6U5mV9WOSiZzVJdDoIIUzfDcEoxHJ8M76a9bRDZ6JZQbcal3xvdu6z
+         +4HRzwAcVbgCJurpnn7MHJxnLHJEGUNKYZZJIyse7J7bkg9/plFcAQJal5EbIJqzZT0s
+         3KZA==
+X-Gm-Message-State: AOJu0YwNDQDLw7l8oz4pfMyvZhsAK/NM29JVx3vE/vYbgqd6Vb8G1qF8
+	bcrakxRif1Rc47meQHC7CQHRwI7fC84uAh/MDPcIvWAdcXmktN33bDzmnnoHAjVm2WT7RwyKsuQ
+	mpg==
+X-Google-Smtp-Source: AGHT+IGCEmm+bR6WbX74vZG4JukfcdEsqNN2Vrq+SSgVOGsL202tIGvg4gu4PSMs3fYUVbQ0dpd+lDjh9PA=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a0d:eb44:0:b0:608:4e77:9397 with SMTP id
+ u65-20020a0deb44000000b006084e779397mr10627ywe.2.1708628774709; Thu, 22 Feb
+ 2024 11:06:14 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Thu, 22 Feb 2024 11:06:07 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87frxka7ud.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.rc0.258.g7320e95886-goog
+Message-ID: <20240222190612.2942589-1-seanjc@google.com>
+Subject: [PATCH 0/5] KVM: GUEST_MEMFD fixes/restrictions
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Fuad Tabba <tabba@google.com>, Michael Roth <michael.roth@amd.com>, 
+	Isaku Yamahata <isaku.yamahata@gmail.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Chao Peng <chao.p.peng@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Feb 22, 2024 at 02:31:38PM +0000, Marc Zyngier wrote:
-> On Thu, 22 Feb 2024 13:11:59 +0000,
-> Paolo Bonzini <pbonzini@redhat.com> wrote:
-> > 
-> > On 2/22/24 12:40, Stephen Rothwell wrote:
-> > >> This fails because https://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git/commit/?id=fdd867fe9b32
-> > >> added new fields to that register (ID_AA64DFR1_EL1)
-> > >> 
-> > >> and commit b80b701d5a6 ("KVM: arm64: Snapshot all non-zero RES0/RES1 sysreg fields for later checking")
-> > >> took a snapshot of the fields, so the RES0 (reserved 0) bits don't match anymore.
-> > >> 
-> > >> Not sure how to resolve it in the git branches though.
-> > > 
-> > > Thanks.  I will apply this patch to the merge of the kvm-arm tree from
-> > > tomorrow (and at the end of today's tree).
-> > 
-> > Marc, Oliver, can you get a topic branch from Catalin and friends for
-> > this sysreg patch, and apply the fixup directly to the kvm-arm branch
-> > in the merge commit?
-> > 
-> > Not _necessary_, as I can always ask Linus to do the fixup, but
-> > generally he prefers to have this sorted out by the maintainers if it
-> > is detected by linux-next.
-> 
-> I think that's not the correct thing to do at this time. I should have
-> timed the introduction of these checks a bit later, after the merge
-> window.
-> 
-> But more to the point, the proposed patch is also not the best thing
-> to merge, because it hides that there is a discrepancy between what
-> the architecture describes, and what KVM knows. I really want to know
-> about it, or it will be yet another bug that we wont detect easily.
-> Specially for ID_AA64DFR*_EL1 which are a bloody mine-field.
-> 
-> So I'd rather we make the check optional, and we'll play catch up for
-> a bit longer. Something like the patch below.
-> 
-> Oliver, do you mind queuing this ASAP (also pushed out to my dev
-> branch)?
-> 
-> Thanks,
-> 
-> 	M.
-> 
-> From 85d861a6ca055c7681c826c580e7c90d74c26ac5 Mon Sep 17 00:00:00 2001
-> From: Marc Zyngier <maz@kernel.org>
-> Date: Thu, 22 Feb 2024 14:12:09 +0000
-> Subject: [PATCH] KVM: arm64: Make build-time check of RES0/RES1 bits optional
-> 
-> In order to ease the transition towards a state of absolute
-> paranoia where all RES0/RES1 bits gets checked against what
-> KVM know of them, make the checks optional and garded by a
-> config symbol (CONFIG_KVM_ARM64_RES_BITS_PARANOIA) default to n.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+A few minor-ish fixes related to GUEST_MEMFD that I am hoping to squeeze
+into 6.8 as the they affect KVM's ABI (especially patch 1).
 
-Applied as commit 99101dda29e3 ("KVM: arm64: Make build-time check of
-RES0/RES1 bits optional") on the kvmarm/next branch.
+Sean Christopherson (5):
+  KVM: Make KVM_MEM_GUEST_MEMFD mutually exclusive with KVM_MEM_READONLY
+  KVM: x86: Update KVM_SW_PROTECTED_VM docs to make it clear they're a
+    WIP
+  KVM: x86/mmu: Restrict KVM_SW_PROTECTED_VM to the TDP MMU
+  KVM: selftests: Create GUEST_MEMFD for relevant invalid flags
+    testcases
+  KVM: selftests: Add a testcase to verify GUEST_MEMFD and READONLY are
+    exclusive
 
+ Documentation/virt/kvm/api.rst                       |  5 +++++
+ arch/x86/kvm/Kconfig                                 |  7 ++++---
+ arch/x86/kvm/x86.c                                   |  2 +-
+ tools/testing/selftests/kvm/set_memory_region_test.c | 12 +++++++++++-
+ virt/kvm/kvm_main.c                                  |  8 +++++++-
+ 5 files changed, 28 insertions(+), 6 deletions(-)
+
+
+base-commit: 21dbc438dde69ff630b3264c54b94923ee9fcdcf
 -- 
-Thanks,
-Oliver
+2.44.0.rc0.258.g7320e95886-goog
+
 
