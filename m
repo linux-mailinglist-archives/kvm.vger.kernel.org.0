@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-9413-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9414-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04A0285FDC4
-	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 17:13:18 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85EA485FDC5
+	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 17:13:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 35DDB1C2353F
-	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 16:13:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0F1CCB26761
+	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 16:13:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F186B153501;
-	Thu, 22 Feb 2024 16:11:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6E73155A30;
+	Thu, 22 Feb 2024 16:11:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Pra2o31n"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2K5gDuy0"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7240155306
-	for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 16:11:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7529415531F
+	for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 16:11:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708618294; cv=none; b=kgJRH1j+Bp0tGNZu9Zzi2h/NaimFS13RD+DMboW9K57vK5iLZq7cW4RUUTwNTN6uhFCyuC3anhijzG76VYwHGV+7JZm56j0hJWKcBrPp8d7G6FCRMnAz4vtXOlWYsP6kV590nD9iCgFg4NJUqe/Pbte8n7RZjr887FMpGFF0M2U=
+	t=1708618297; cv=none; b=JCy9XlUDU2mV5v8TbiDh5zNk1DpKQ3IZvRwqI5QQu6M3yVxTK5g9x1H8JhAyR3EiKS1WnQ0folRrvj0tB5qhDVOVmumkKPlgORchcsOfpgtnCpgO0fiaswqdjV/z7KLTm+QsROW5A63e4bN46h2zvPPY56QLWerohUWU+ebzTaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708618294; c=relaxed/simple;
-	bh=6iVb08zKfzH5hJWQLjCXBzmY+3QGd9wO5l8hFYC0rUg=;
+	s=arc-20240116; t=1708618297; c=relaxed/simple;
+	bh=JOV+TEixxBnW38RYNc8zuei4nTFOo/1GSbfRHcogFxk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=cJATuQv+fXSlNUlXkYIU7XyUkxZe8sNjNaK4xLJb8XT2lIeHnreR/k1x7/WJqWkSwUIEb3yw8BYigieY0LOJ/sp3cxeSgJP66BvZsfeKc7O3jfRRj+pnY5yPC+4r47FvMskmBYm98HZ3aDuAUboXP/cBhrEyyTUClwd8c5V1fOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Pra2o31n; arc=none smtp.client-ip=209.85.221.74
+	 To:Cc:Content-Type; b=WtSn0FuH7Uyyr0Q7FwTQnnWT27GNOUhD5QuvwWUpxJpm7tkDMyJigCtIT+07PfwIijkll4QzvY5TiZhcmxO1GEqcPqSufoKcRGus2gnx8bektcR1BTb4y9tK85IHJE3nRtJxEhuAfba3qDl1hjsGZ8FE6M/94fNyDu3LpxxXCo0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2K5gDuy0; arc=none smtp.client-ip=209.85.221.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-33d30a3d6f8so745892f8f.3
-        for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 08:11:32 -0800 (PST)
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-33d36736772so2117030f8f.0
+        for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 08:11:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708618291; x=1709223091; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1708618294; x=1709223094; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Rlwq3mGjsbZmc2k1s/E60FvUuielQ8IuRYRmKjrhRfg=;
-        b=Pra2o31nKDs5pTi+NbHICuQEeHEJpLNYYK7+XQvN9cGrUBWkKKYtDu8XbILqYsbPCf
-         ciX/2j4ytxMP+8xriN6DNUNLWe7c0IzEjfy7UKAFRUFtE17+UFRzdetbt6bNgUdB6EoD
-         wsrjDLHypEqLeYbNq0gblxGqWZ3FTEkM/0UULg4KbJhAe+rvACXyzN6sKvAgCzoMewPz
-         PumFJiBN9ZTHppq8sepYHfncuQL4X18SbT88S/H4KA3tNAQ9meME8CJEHe3qcpHjF7+d
-         o8sSMJbuj88cN+U6QU588goYMGtHF8YDbHrd/V0XfLXMZqdVHYJdxSMyxbIXDgEG/v6S
-         BmwQ==
+        bh=vD9o5ECbAgPC1ivE6LlVq7cfQ2iwgRwXzAnUeOE4gIQ=;
+        b=2K5gDuy09vbFhveL2s4zV70DIqWiUC77SoTFtwKmtkxi8mqagpdA5Hmar4w9GG0+VR
+         ftc7QDO4Cu7v44zBUBcXFL9GwNhRf3hypTvyw772oUOuEsbqjZvC5wV4aWGz9Jrz225p
+         2Cg+fsoQpNDtdIRTgG57Y6C+GX7GQ1I7wx9ri9i9VGNeJUBd7jSiRnxWG2/AHMF4ugvB
+         tDsUmagZsnLcYlfnELeVKHuoKYGfH/VW3YkNxVPnzQ1n3w7havqRyTasjZYGKx4vQz6S
+         TQQMncni+eih6LPL6U5PiUlQRIJzaeo4CSz0mowQigrZ/d/W8HF2XNZLSEG2gl74RN9v
+         G+RQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708618291; x=1709223091;
+        d=1e100.net; s=20230601; t=1708618294; x=1709223094;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Rlwq3mGjsbZmc2k1s/E60FvUuielQ8IuRYRmKjrhRfg=;
-        b=LzLCXlZgSpjj3pz2YDU1RSonEKHKqheJ9kTHB57JV788n6TgT9T/yVyZd+pwVqK5o3
-         1oWiHYb+dSdJxJx7I5tGVNxP763U8XVi8WxeokpvtjsWmgY3SBlViXdRRvruK7nxS0wN
-         w3WulkWYsZjuwgFiNTTm/w/xz7ad/gae4mdGEt1xKYkFdytourozmgAiUIn6+wdYVxa0
-         u2tkxWPXW5GGLszPpgfab9yJNbJB5aIi35Lak+1p1mcSeRRI5rlQxZ5RcZDhgIRiUIxD
-         S3/vsWUBpRqYYHhqJrHLnVJqS6tqoqgTjajgxLw8vlvf1x6pc60OARwYrlcSZAq+kZED
-         YigQ==
-X-Gm-Message-State: AOJu0YxrxQ2oEaIDd6aRntRlWGs2n9hOKUp5djkPignKa+OttQQHO0BK
-	xm5N85h54noJ/DfAfXGBfq/LeQP5uQRZ7I33qLLqluqoVP6DJ4BrzEcKas7oTOpRjbOWcMl2nz4
-	pEKhlovLG26seRkrcKYkVUlSePIqzif/9DJ4WUnYwcAvHSZZVJlRaFH/uz8dI8t+WvtoMpEOTY1
-	zrQrqgo50LJKG2UsTRZYYen/E=
-X-Google-Smtp-Source: AGHT+IGPBlBEWHSVTXybSf5AXKW9r7iJYYYJVo0ATzUwHor8Yu6mnFaOUn7raP8SctTXcV/NU58hv2UYQg==
+        bh=vD9o5ECbAgPC1ivE6LlVq7cfQ2iwgRwXzAnUeOE4gIQ=;
+        b=C1lvAwqaB2C7E1f542c0Kx3g3DH0u4KQlsWLn17PTlRhzN8Z+NiZioEMuqNmC2oRaB
+         O0JjpVrSBOvYNcz+BbzO8JNjSkqhz1p/v10VwrFuEVPGyGSIdeQU3SiJfOV/YD3kZmhO
+         z7BdJO3l+RlYhDx+qrL51xFnEkWM0rjPsA7tQYb/ftU2AGgs264oAclf8LOKJ4Eq0X+0
+         S1ymUzR4uSHrGCG/EgMyShQ0XkOP0JmTkAFlvQVZOauAOD80P515bjtlAIfntqlr2u42
+         doCrJ8LjgAJAA6VUyLuPqpEouT7Ty21efIAvPkaVVrBSozjoAPUvko/GyXzjZgCTlMV3
+         zMhw==
+X-Gm-Message-State: AOJu0YwU+lRJys67zlMbOr6Y4SxUaJdcxZ8hrS3r43MzS5m3FhF2KzoS
+	A/uxcROK9nUE2zYz3ZDcSfkqcVgQlAKAuq3ArezawFRtmcsGjpfoHD2y8BuTtNBoIPsJvUYYJFj
+	SYy5al2lJ63SiMeAHoOJW6geJa7KwcXpetIGNEd1T/ICkgi5KrWLCp23a+mpVJcqwzE+QRXvpcS
+	/R9YowjI2W1t5tL33yoats0Rw=
+X-Google-Smtp-Source: AGHT+IFjuzbek5MC2iMiGgTGZbnIVe892XN4fprFxq4qMMBT6/xXDjSro1ZNWROfqjD/CCRCrpUqesTMRw==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a5d:6f18:0:b0:33d:9fc2:5e26 with SMTP id
- ay24-20020a5d6f18000000b0033d9fc25e26mr109wrb.9.1708618291025; Thu, 22 Feb
- 2024 08:11:31 -0800 (PST)
-Date: Thu, 22 Feb 2024 16:10:38 +0000
+ (user=tabba job=sendgmr) by 2002:a05:6000:a0f:b0:33d:3ad2:67b1 with SMTP id
+ co15-20020a0560000a0f00b0033d3ad267b1mr32305wrb.4.1708618293417; Thu, 22 Feb
+ 2024 08:11:33 -0800 (PST)
+Date: Thu, 22 Feb 2024 16:10:39 +0000
 In-Reply-To: <20240222161047.402609-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,9 +74,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240222161047.402609-1-tabba@google.com>
 X-Mailer: git-send-email 2.44.0.rc1.240.g4c46232300-goog
-Message-ID: <20240222161047.402609-18-tabba@google.com>
-Subject: [RFC PATCH v1 17/26] KVM: arm64: Do not allow changes to private
- memory slots
+Message-ID: <20240222161047.402609-19-tabba@google.com>
+Subject: [RFC PATCH v1 18/26] KVM: arm64: Skip VMA checks for slots without
+ userspace address
 From: Fuad Tabba <tabba@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev
 Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
@@ -98,30 +98,44 @@ Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
 	tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Handling changes to private memory slots can be difficult, since
-it would probably require some cooperation from the hypervisor
-and/or the guest. Do not allow such changes for now.
+Memory slots backed by guest memory might be created with no
+intention of being mapped by the host. These are recognized by
+not having a userspace address in the memory slot.
+
+VMA checks are neither possible nor necessary for this kind of
+slot, so skip them.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/mmu.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ arch/arm64/kvm/mmu.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 391d168e95d0..4d2881648b58 100644
+index 4d2881648b58..6ad79390b15c 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -2158,6 +2158,10 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 		}
- 	}
+@@ -973,6 +973,10 @@ static void stage2_unmap_memslot(struct kvm *kvm,
+ 	phys_addr_t size = PAGE_SIZE * memslot->npages;
+ 	hva_t reg_end = hva + size;
  
-+	if ((change == KVM_MR_MOVE || change == KVM_MR_FLAGS_ONLY) &&
-+	    ((kvm_slot_can_be_private(old)) || (kvm_slot_can_be_private(new))))
-+		return -EPERM;
++	/* Host will not map this private memory without a userspace address. */
++	if (kvm_slot_can_be_private(memslot) && !hva)
++		return;
 +
- 	if (change != KVM_MR_CREATE && change != KVM_MR_MOVE &&
- 			change != KVM_MR_FLAGS_ONLY)
- 		return 0;
+ 	/*
+ 	 * A memory region could potentially cover multiple VMAs, and any holes
+ 	 * between them, so iterate over all of them to find out if we should
+@@ -2176,6 +2180,10 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+ 	hva = new->userspace_addr;
+ 	reg_end = hva + (new->npages << PAGE_SHIFT);
+ 
++	/* Host will not map this private memory without a userspace address. */
++	if ((kvm_slot_can_be_private(new)) && !hva)
++		return 0;
++
+ 	mmap_read_lock(current->mm);
+ 	/*
+ 	 * A memory region could potentially cover multiple VMAs, and any holes
 -- 
 2.44.0.rc1.240.g4c46232300-goog
 
