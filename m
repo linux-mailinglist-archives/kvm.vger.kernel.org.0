@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-9409-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9410-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A10985FDC0
-	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 17:12:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17FE185FDC1
+	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 17:12:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ADBD01F22042
-	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 16:12:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C594F284002
+	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 16:12:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 330631552E0;
-	Thu, 22 Feb 2024 16:11:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9335E1552EF;
+	Thu, 22 Feb 2024 16:11:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MveOPm6P"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sH37pWqd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF7C8151CFE
-	for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 16:11:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 445251552E3
+	for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 16:11:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708618285; cv=none; b=bneFfYx3w7aikO7yL+kPiFZY8nGPfK8I/Ttry8Ar2Xm4mWsKhK2XT2oGN0LmMwza0BBopnyuUGIdr+CzgiDpnQI6meM4noQy8DvVsWtfvHs+JpNU6xRuLba3DwMl4OWwMbRzh4CVaeDZ29d53CuDXjhG792c1J1f7dhY5QEi3nk=
+	t=1708618287; cv=none; b=eO3mFGOnAv/mdNqP1qf4zjlV++YAu9CkVICClFlLbu4lLuJV8YG4hL2NueTYnKQepvS3qh9nJUVMHRy8R/w/9qVvC17PFKY6wk3+AkMcB97CJiokallxnQXLUOf5QmILN+WDhYrSofCmH+viEjGx+PZ8QyrYQtljnJZ31P/xJIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708618285; c=relaxed/simple;
-	bh=xoA6/QoNnISiMa1SzXuzX77CZKmuI5864LBCKgX+2hY=;
+	s=arc-20240116; t=1708618287; c=relaxed/simple;
+	bh=1fhJh/ibEAt9iibbZOz9A9qGlg/9anxYzd7bD0l9kms=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=V8IQL3yMMXMAGYYH8gMTAsDD5bRF2DmQlqVTuo+cUpr5gTZgW/TSVlZ+RxRzGyUXu0LSFltfV5Ofx4rHqxgsLUaX6QUIY/7sPkzQXLNRhIK6sEOGFu0hammmNgxnj7JVatgDh+h+m+za4s1WDPkrSAMcNmKcIink2MgsZjjrfq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MveOPm6P; arc=none smtp.client-ip=209.85.219.201
+	 To:Cc:Content-Type; b=Ked0GzRoePiRSoSGZLOASp927i8hxAsdW0nJUqCQvzvz7Ljyt4ragKD6gLNmQsUXZ9psvGBOspzjoh+8VQ1A+FvcgVlbkf85TGnA3z2j2LfNWHFEzvcaXq54s7VJfk0mKuYhGRd/TgSITTyquEjqn2eRkV2AAkGXB46K87eyaV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sH37pWqd; arc=none smtp.client-ip=209.85.128.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc6b26783b4so8125929276.0
-        for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 08:11:23 -0800 (PST)
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4128db855f3so1734895e9.0
+        for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 08:11:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708618283; x=1709223083; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1708618284; x=1709223084; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CeE6bcXPJ6+XfnAesbZJh5X/3MioJE5wiGBVIwsoMXY=;
-        b=MveOPm6Ps15ckSZnNay3zhkDd1Q5b12zgK9lHOdUks5D+OaFbD1/m+WcdmMD8izGz/
-         pRKLHQXwN3ccfiDaU3EOBXSfFt4yZ5sl/5tAobhXXmS/IC9XaOdssNyAao/wYaSQNpjG
-         sUBwJjpQPcRW3zhYESnx1qfPRLJBMqTFBWW+qURmOynHP0UcqGRq4KN4CZVpZkDc9ac0
-         jA8N8KZnZmeFWdH8QKvBtNKXe8wIrLewUNhHtFRwBLq3INsJh71uQPOsIMh3pMu7dHzP
-         lw41tX1LlyouIJ05wPz867C0lTIXcoq3uqEInSUHUZmkDaVlkS6gCjwOtO2vQ9fHNk/t
-         F1FA==
+        bh=JeXGqmOcCD6OWH01LjQYoqIdkS33u4slmuUVqoK/zr0=;
+        b=sH37pWqdFEi4XHn1W7YLO0yXfEBfkEa+wtUAhxvPa78BHWHfF+Sf8vxRYQw5H3Df9F
+         RW2GxBHtdjrwgMfzbv7IabvIrTTMXVN/n2zgE8DeA+osTpqbmAv1acPsgzGZDKUo3Yf3
+         yHDUtFDlwM1iuev7Z46vmN7o7GHxdlu4DXZHZZJX8+gD2xgqNZ8NPscV/fIdEg32yM81
+         hT+Ezc5KXHTMtQZ3ERPULyxsrwloKZUxvWeCtyYuGvzMm+42E3W1TztdBlEmFysA4+BW
+         k+OpveFlOEaNoTa9AZBZIO03lvea8Qq2AdKGvBTUCf4lEtCNM8+skWooM8i9YB65bNT6
+         2wVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708618283; x=1709223083;
+        d=1e100.net; s=20230601; t=1708618284; x=1709223084;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CeE6bcXPJ6+XfnAesbZJh5X/3MioJE5wiGBVIwsoMXY=;
-        b=FefbJBGt3FX0ySkipv7essK2HzidjUyedUcuof44M3Nj+RtUOyRFIdN3ajHS7z07ME
-         IIfJLF1i3QVXQiSt2Vfd9fFoE8xKz6aUjTWo8qwkshZPTmzxD/aI8Au4QszdHuACwMl6
-         BWHw5QPpPu0phObpLD9v44HgQko5u1SoQSigMQ1sE/2+UwfKli+oy1iP6AnoCkIzW/X8
-         9GTh9TrzRYybcEsuMIclXNT9Twi+012gW426hx01qII6heZ3tnfU4k4kQrbvTKTdMHsP
-         eNkeyTrqGvqBgJ9J0dyFjA9v8bqDfz1+kDqCyB9rY19FdSSq7YdGf8OdBxmRYGv/rRLg
-         lOOw==
-X-Gm-Message-State: AOJu0YzVN+XQ0OY/EDdQ4zWehp68q5vTbLMW1HOOllqkAmBEG7lY5c0z
-	Gwfz+OYJoS1bY7Ud+zKwQLfwekgyKD6iC/0gJVhtUjVSqupUlez/y2t8BteZGdz/fqeVQIeY5RK
-	EVMUitAG/IvUvX7Dpapkj5soGVLh5LuQA2jzlZ/oJb66RaryVJCiPmDF0M92wuK4qgDJQBckJq3
-	eNUGcNwsJ51uxTh+w1sf8zgY8=
-X-Google-Smtp-Source: AGHT+IFstTNpKcDxQ2leE1X3c1ER9vVPby1ys0ufBrD4msybQfHDs42OffDOkXrhTSWHmYX9zR+v4HUSxA==
+        bh=JeXGqmOcCD6OWH01LjQYoqIdkS33u4slmuUVqoK/zr0=;
+        b=i6QliUY8tLxLbRrHEjlJs9eH0fzz6iUv6EjjA+cpyjs/pDTz2g5zRDBOcehCQ6cOXk
+         c4yGiGvqy6Oxwe5vVAQgwNmdXu9SKw9Tq74KWeEq2OJz193bbJljGlP5HJeVNVQn4XCh
+         7OwMMqZcAyOUsUJ5JGqicIPxbJBNJjLZI7mTeQE8/3YL2JvrRll2iNIjt7D70bJsrfQG
+         NTe68xGUwYMvNSm+bv6+siZd3NLq8Ejpkf+iK0qd7ApkILk91ERBvA6gQRJGvBL0A9uk
+         aU6geWojiy3h4OHw7lFbaluFv1/LFlpe+UL/pSd4xUTQtrFmwzfQ+OB8CLqsMJJO1cdO
+         Qi6g==
+X-Gm-Message-State: AOJu0YzEAy3Ezyf0St7e+iU3CXO322bh6W5ruzyFl+hwwDpG6JYCrqmL
+	eZsreWnOocNLPZKLVGx2QKrQ0wXGA8y5rCaybWnHW2NleEBDPkdS9GCmDQXR2aN1WzsepK+kGWE
+	33/La56wyIJNUcyRt8tWZeDyk/ePlSHyHkej9UsxM+3CVUaenQDIBq027AQsTeDENhMBf2yaPUK
+	SuyzzjpsuKh7qwv4tCpmyoi+8=
+X-Google-Smtp-Source: AGHT+IHKd6JqGW6Vstnw5Qq8fNH5c73bty2H414xCAYg3AGlYLFMhVl1S0JC1GCtT88jjKDZLnmCrPVUzw==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:6902:1008:b0:dbe:387d:a8ef with SMTP id
- w8-20020a056902100800b00dbe387da8efmr90717ybt.1.1708618282006; Thu, 22 Feb
- 2024 08:11:22 -0800 (PST)
-Date: Thu, 22 Feb 2024 16:10:34 +0000
+ (user=tabba job=sendgmr) by 2002:a05:600c:1f17:b0:412:72d3:cfdb with SMTP id
+ bd23-20020a05600c1f1700b0041272d3cfdbmr24338wmb.2.1708618284296; Thu, 22 Feb
+ 2024 08:11:24 -0800 (PST)
+Date: Thu, 22 Feb 2024 16:10:35 +0000
 In-Reply-To: <20240222161047.402609-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,8 +74,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240222161047.402609-1-tabba@google.com>
 X-Mailer: git-send-email 2.44.0.rc1.240.g4c46232300-goog
-Message-ID: <20240222161047.402609-14-tabba@google.com>
-Subject: [RFC PATCH v1 13/26] KVM: arm64: Create hypercall return handler
+Message-ID: <20240222161047.402609-15-tabba@google.com>
+Subject: [RFC PATCH v1 14/26] KVM: arm64: Refactor code around handling return
+ from host to guest
 From: Fuad Tabba <tabba@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev
 Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
@@ -97,71 +98,50 @@ Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
 	tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Instead of handling the hypercall return to guest from host
-inline, create a handler function. More logic will be added to
-this handler in subsequent patches.
+Make the code more consistent and easier to read.
 
 No functional change intended.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/include/asm/kvm_host.h |  1 +
- arch/arm64/kvm/arm.c              |  8 +++-----
- arch/arm64/kvm/hypercalls.c       | 10 ++++++++++
- 3 files changed, 14 insertions(+), 5 deletions(-)
+ arch/arm64/kvm/arm.c | 14 +++++---------
+ 1 file changed, 5 insertions(+), 9 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index f6187526685a..fb7aff14fd1a 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1100,6 +1100,7 @@ void kvm_mmio_write_buf(void *buf, unsigned int len, unsigned long data);
- unsigned long kvm_mmio_read_buf(const void *buf, unsigned int len);
- 
- int kvm_handle_mmio_return(struct kvm_vcpu *vcpu);
-+int kvm_handle_hypercall_return(struct kvm_vcpu *vcpu);
- int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa);
- 
- /*
 diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 6bba6f1fee88..ab7e02acb17d 100644
+index ab7e02acb17d..0a6991ee9615 100644
 --- a/arch/arm64/kvm/arm.c
 +++ b/arch/arm64/kvm/arm.c
-@@ -1092,11 +1092,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 		if (ret <= 0)
- 			return ret;
- 	} else if (run->exit_reason == KVM_EXIT_HYPERCALL) {
--		smccc_set_retval(vcpu,
--				 vcpu->run->hypercall.ret,
--				 vcpu->run->hypercall.args[0],
--				 vcpu->run->hypercall.args[1],
--				 vcpu->run->hypercall.args[2]);
-+		ret = kvm_handle_hypercall_return(vcpu);
-+		if (ret <= 0)
-+			return ret;
- 	}
+@@ -1085,17 +1085,14 @@ static int noinstr kvm_arm_vcpu_enter_exit(struct kvm_vcpu *vcpu)
+ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_run *run = vcpu->run;
+-	int ret;
++	int ret = 1;
+ 
+-	if (run->exit_reason == KVM_EXIT_MMIO) {
++	if (run->exit_reason == KVM_EXIT_MMIO)
+ 		ret = kvm_handle_mmio_return(vcpu);
+-		if (ret <= 0)
+-			return ret;
+-	} else if (run->exit_reason == KVM_EXIT_HYPERCALL) {
++	else if (run->exit_reason == KVM_EXIT_HYPERCALL)
+ 		ret = kvm_handle_hypercall_return(vcpu);
+-		if (ret <= 0)
+-			return ret;
+-	}
++	if (ret <= 0)
++		return ret;
  
  	vcpu_load(vcpu);
-diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-index b93546dd222f..b08e18128de4 100644
---- a/arch/arm64/kvm/hypercalls.c
-+++ b/arch/arm64/kvm/hypercalls.c
-@@ -24,6 +24,16 @@
- 	f;								\
- })
  
-+int kvm_handle_hypercall_return(struct kvm_vcpu *vcpu)
-+{
-+	smccc_set_retval(vcpu, vcpu->run->hypercall.ret,
-+			 vcpu->run->hypercall.args[0],
-+			 vcpu->run->hypercall.args[1],
-+			 vcpu->run->hypercall.args[2]);
-+
-+	return 1;
-+}
-+
- static void kvm_ptp_get_time(struct kvm_vcpu *vcpu, u64 *val)
- {
- 	struct system_time_snapshot systime_snapshot;
+@@ -1106,7 +1103,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 
+ 	kvm_sigset_activate(vcpu);
+ 
+-	ret = 1;
+ 	run->exit_reason = KVM_EXIT_UNKNOWN;
+ 	run->flags = 0;
+ 	while (ret > 0) {
 -- 
 2.44.0.rc1.240.g4c46232300-goog
 
