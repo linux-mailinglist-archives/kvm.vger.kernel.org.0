@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-9421-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9422-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D06B85FDD6
-	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 17:15:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E539485FDD2
+	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 17:14:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A074FB2B5C2
-	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 16:14:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 223F61C23913
+	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 16:14:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E7DA157E90;
-	Thu, 22 Feb 2024 16:11:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 751BA157E9F;
+	Thu, 22 Feb 2024 16:11:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3zpILMvg"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4MvuR8OH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 231F0157E72
-	for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 16:11:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 446EC157E80
+	for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 16:11:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708618313; cv=none; b=iBzc4dUKH0Y6P5ZqbI+glXGhibhNRHmtZE7tx+3hUZUrr7I0RE4lTk98RxTi3VNYLbCnvR0yR3asb7/IW/PZldlKon3zLUmXbf1J+jS5YxHYeSsCzNI0c4b8bGNjH4n+C4P4QyvdYOq4OuGQFl9qJaYg/NBA3CQFVCyBhL8V6Zw=
+	t=1708618314; cv=none; b=p0UTpDaQZBScaZ+o/nZ42psNqnJtkS88HJskwhyLvratqleEs91J+hJUvZY1Aieg8TvhXtadoUOJstJLOH7KHiNl7bvYpI5D4VcNFDTXHQtIDWk/+1mBnNLehpi1ewCXzRQqxipVfaqdklCwqcptoLaOLfSXNb8trVswJ6ABWpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708618313; c=relaxed/simple;
-	bh=TUyoIAvN6Obzks9YjN2BA6l8SNXm7pOIcGDdO7heG78=;
+	s=arc-20240116; t=1708618314; c=relaxed/simple;
+	bh=X5CTKYo58HHafOhpr0rnGZtDOO9drroKYxobKreBkos=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=dITprpLUZoxlO6B+7L4gqumLU1QqD9FrXRmxrpx9TgNvrvaebjOFTRDd81OrKXSNGL5Q8pcGyN9iU68rjxRKa+foQL6x9zlp9qO3N6kxpONdizCZ72pXluXZcrewbg+I+jLVmvMEQLSOcLCxriGR5vdUYQ/FCL91Oa/vbbwndvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3zpILMvg; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=XCOgTsgDzlxuWHijVxxtpxO5O6Cbk5zJZNMiw6in3jQ6JyQ3iZcWetXuLtr9LGEeLZJCi3M2gyExDAWP9q7u7TqgolNen0ceIMbiFNFuPabgXIDKLH+F/V6/ZfosVvgZrGW9Q2tp3HLqjTcmykwFdNkNLToSDRvKiuCH2v8szf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4MvuR8OH; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-4125670e7d1so4900995e9.1
-        for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 08:11:51 -0800 (PST)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6083fbe9923so37382447b3.1
+        for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 08:11:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708618310; x=1709223110; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1708618312; x=1709223112; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2/q45XBasvpokurDmrqajFJwCgekoEBMYCvgW9GhGQo=;
-        b=3zpILMvgSgMMYiXB5eVXXqnjNoRBS6ECEdN6LnoJ20MYT5+QtvOlQpBW/tjwGUryW3
-         jfTLs3acLAueDqcyxHqLQ791x62azqHJZC0PzWk3LACdP6bNFkN7oSSLUga8GXaHY2T+
-         9AfmfARTW3Oecn/FH5lkUnt5QSX1leSUjNQbAV1PEmDMz+0f8JrLMQ9py19CNxvJnHsO
-         l8+XiMBjyRx9LVR1spuzhs8pXW7k/jAnojHsPKWapYirvpb1HOR3/yJwrg1/qI8NnK0l
-         /45cUDSaZaCAFi+z9n0Qdp0bdLtJSl9Y+CDMGiaU2fl0Ua3xhxske4hXqpdjVUl6cB5Z
-         73jA==
+        bh=x7q06n6+Cfi5piogEKrJk5NdgWbh3+ffeAar7OiRx3s=;
+        b=4MvuR8OHiYTMZi3QT11Oax3MwbvSrF1xCp73+IYs0Enoa0bJFD7/IaMwiyYVhI8c0Q
+         NdWzM7Rm4IineEkwZfFqLgtakNfK0gGdnDb9yXOBJpyfYxUrzdEyBGNkmDm6GGnv9kzN
+         Oxc9s4UKzQppILIitpGp8H8muider93DD6TGU35co5qAb6hsZ8rUQ7Reaj9NWlFRrfVH
+         6PPXnCudNUOuH2qMcIpCLO4RLIK1qhfqiKMJQ65u5YDhxxRiaTeHb+TjjucpAfkOieK7
+         Pjh2F7zPZzvjaL9fNJPATldOvcdGUTo0rL5ns8nAKnbsFQGdQuMFrr2HNruosXeh1PQ/
+         gGRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708618310; x=1709223110;
+        d=1e100.net; s=20230601; t=1708618312; x=1709223112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2/q45XBasvpokurDmrqajFJwCgekoEBMYCvgW9GhGQo=;
-        b=YNKjbpEqih6OBNHAo7FqL5zSCX4fIHHBrSu8C9gn6JGJjgfFyLK7JTbulvjrAca/wI
-         j1Vl4c/b2pz0DhSuTMidQO9711PQtN/7+bINcK19Gb4qSCr6rF2IdHwE7Reg9X6U1vXn
-         hujjFE+07Sn9Bd+BEuH8lmrF+8QJehlv9Jmf0xcroflfRxjeE17A0x3Hc38hW+dZi+Wh
-         XWO712nwE+1hHxYt15vaBzMFfX8gdK/5iE/RJKpDmxj+q0E0Q1Ak7Wu8B0mrZGTMzNEl
-         r0u4BS77WOsfbrQAF/KOqbitFLm+S5grbsG46xQJ68hdskKYiWTbwAYd3Vx+NKFNjRVM
-         UGPQ==
-X-Gm-Message-State: AOJu0Yzx44bqIovMKYRYa/R8tvxvW2rRGvutmEe2dlx4OAndm/jbuUFQ
-	8MV80UWYBdYvRRBWtjDYHaCqbu4acfZlKd7KuxVN0zfxQilk/O5HwDgFLK4arGv6XFDlQfoiYML
-	YSM++KPF5/MqB4qgAjO0G8HoxZEkEN4qjRSc7aAFzU9+C1mrWS3gEaRfLj8GOxqgdB6HEOMmEXS
-	GYrEGr0dUmObO7YmhLSsGudUE=
-X-Google-Smtp-Source: AGHT+IH2AJdryfzgBjtwoYEiaqYJq05TPCfxK/pLtpWJryi75TzpSiXs2AMbdpb+STC1Oqvl/vDFO15AKg==
+        bh=x7q06n6+Cfi5piogEKrJk5NdgWbh3+ffeAar7OiRx3s=;
+        b=r8Z0iFu0QTqpBZlfvRi8diTm0JT35KHOc2Wr1iaMg1jijEqqxXmQYS6ONHa3N4Iooz
+         svT+1JjDCSJvilOjmjyj91aMF6TUrkeC4tbgyHtZz6ExzT2yJ4gBOlu1nWrkhBmNcInv
+         bRyA3aTK027A+P/um4OQHitJmY6MY566049qVMNpOUBTr60U+XMcHcXe4uY+Gfx/E3Qg
+         stXsYQfKCnILexSbKjlbMj63II2qBaZpIv1/1c5cuXSkZSi2xF4kYFDZ64TNiNwT1fdK
+         5GRWtdTTuvtGERIKEFsfgAy5v7uf+SqfbvfUjtzWOjzYqfz5Sgb8tv0Al1FD2+7ssH2p
+         eg6g==
+X-Gm-Message-State: AOJu0YztBe6VzQhQWjW3PUR99anbJlD7nAy9N6Nar/RLIYzThW1fDXay
+	0QInopM0OLlT1UCEbAEYgqo159FNhYanJBlFTZRJLQ1hk2D9XN5fW4zvtZtzxdpvYRbt2q/xliY
+	0fi49wHB5a+qKAgUVdpJJndltOXjHx/RXz7qeT4j4P4Ro5ZWX8FeW0Q2EbeAS4f8j9jSLpKktg4
+	KKKmdmS3SQhq2Y/TLyJTzEJkw=
+X-Google-Smtp-Source: AGHT+IHMwP7mtHKT127TxYqntr8FVuJ7TVNM66KxywWU4Ngx0R+m7wXDu6r4saiVjzNmhTgu/W91QxWrOg==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:600c:a399:b0:412:7677:3e4f with SMTP id
- hn25-20020a05600ca39900b0041276773e4fmr136786wmb.4.1708618310147; Thu, 22 Feb
- 2024 08:11:50 -0800 (PST)
-Date: Thu, 22 Feb 2024 16:10:46 +0000
+ (user=tabba job=sendgmr) by 2002:a81:f101:0:b0:608:9758:e8b with SMTP id
+ h1-20020a81f101000000b0060897580e8bmr613552ywm.8.1708618312398; Thu, 22 Feb
+ 2024 08:11:52 -0800 (PST)
+Date: Thu, 22 Feb 2024 16:10:47 +0000
 In-Reply-To: <20240222161047.402609-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,9 +74,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240222161047.402609-1-tabba@google.com>
 X-Mailer: git-send-email 2.44.0.rc1.240.g4c46232300-goog
-Message-ID: <20240222161047.402609-26-tabba@google.com>
-Subject: [RFC PATCH v1 25/26] KVM: arm64: Enable private memory support when
- pKVM is enabled
+Message-ID: <20240222161047.402609-27-tabba@google.com>
+Subject: [RFC PATCH v1 26/26] KVM: arm64: Enable private memory kconfig for arm64
 From: Fuad Tabba <tabba@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev
 Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
@@ -98,29 +97,28 @@ Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
 	tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Mark the support for private memory in arm64 as being dependent
-on pKVM for now.
+Now that the infrastructure is in place for arm64 to support
+guest private memory, enable it in the arm64 kernel
+configuration.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/include/asm/kvm_host.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+ arch/arm64/kvm/Kconfig | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index ab61c3ecba0c..437509b5d881 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1263,4 +1263,10 @@ static inline void kvm_hyp_reserve(void) { }
- void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu);
- bool kvm_arm_vcpu_stopped(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index 6c3c8ca73e7f..559eb9d34447 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -40,6 +40,8 @@ menuconfig KVM
+ 	select SCHED_INFO
+ 	select GUEST_PERF_EVENTS if PERF_EVENTS
+ 	select XARRAY_MULTI
++	select KVM_GENERIC_PRIVATE_MEM
++	select KVM_GENERIC_PRIVATE_MEM_MAPPABLE
+ 	help
+ 	  Support hosting virtualized guest machines.
  
-+#ifdef CONFIG_KVM_PRIVATE_MEM
-+#define kvm_arch_has_private_mem(kvm) is_protected_kvm_enabled()
-+#else
-+#define kvm_arch_has_private_mem(kvm) false
-+#endif
-+
- #endif /* __ARM64_KVM_HOST_H__ */
 -- 
 2.44.0.rc1.240.g4c46232300-goog
 
