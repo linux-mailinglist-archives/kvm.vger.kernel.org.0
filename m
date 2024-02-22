@@ -1,197 +1,142 @@
-Return-Path: <kvm+bounces-9392-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9393-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C24E85FB48
-	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 15:31:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5164585FB67
+	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 15:37:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D77928294D
-	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 14:31:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E71591F22FC0
+	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 14:37:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81C1C1474D9;
-	Thu, 22 Feb 2024 14:31:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9871C1474D4;
+	Thu, 22 Feb 2024 14:37:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="St/l5Cmf"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Of0qbvK6"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F066134CC2;
-	Thu, 22 Feb 2024 14:31:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06BC636B15;
+	Thu, 22 Feb 2024 14:37:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708612303; cv=none; b=ffNDwqUYrmG7yGBc0JCVWnEowoPKmFCDN3T3Y6JQJluBM2VwNyTjjok9hsUZm+7Xh4+aTe4I+Y9KWQeNC4fJkCbVH+YhYSKIhgeUGBETzOwVpv3/aYFk0vIuILPqjcfprMu6KIjcisG9p+vC2nPOVHk4urNia9h2c1lZ9UBRQ9U=
+	t=1708612647; cv=none; b=ej++9jh0zxX9ceRVJpV5yFbnGP+/1lX5HvSRTMmrReFbM6UYDwgmEHO2/7+IqBDyZayPdGXoLHnZu/8BC9DbowQGd+hMATYonf57M+BroRyTF17EfJHEU52n9uNXp1dNbRT3dQz5aB+S11dW9rt65lL0NzRqEbBMX/IFomiFavo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708612303; c=relaxed/simple;
-	bh=fWM5/IIptB8qiMmDicnhEXv1YrCPrUbI/y/AmEvYnR4=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BH4Nsr2YwQvlvpiUSz3/hzma+aOugas5djYAmWsYWSvmx7NW+0414PTHRD+I7guhGdcJ+EwdFNBDB84C2ytxatYRes47GilVoEX/Hs6NRhDBZ8NRO0CxkDHl0PQV5mOIUulQXHw7gUBtYt4W7xZEnZVl0PGbQttMxCHGeZPbQXU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=St/l5Cmf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22F57C433C7;
-	Thu, 22 Feb 2024 14:31:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708612303;
-	bh=fWM5/IIptB8qiMmDicnhEXv1YrCPrUbI/y/AmEvYnR4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=St/l5Cmfq8JVGWmQlPPDcs0go0XirWQniOnrthUt/k7WDo+z5s8LNdUj8+m7PHqix
-	 rw+j0GpJNSUYfBgYUmlOliR2QN5VROEjgj4GKOOVoBED2LD8mcZ9kO9zSOKt9fv2Jp
-	 Mw4P8onpPP8o6enDqdvXx9qvD9IzbPVSjLCqloIDMgWsf6iuhLoa1pvjaNmcU9/im/
-	 Iv3ZJ6KqOs2JDB20SflQKX8YdCQF6x8USnsGMmSQlWVUtDkS0/O4LHaZO4/An25niG
-	 GEmXXg8hWckXwyAJ5uSKM0A2jQdnqq8kQsXKhIx9w9bsvgCwLbFOiTYOWxE/rypZyW
-	 mnD1YIh8oHTXg==
-Received: from 82-132-212-42.dab.02.net ([82.132.212.42] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rdA6u-005lAs-PH;
-	Thu, 22 Feb 2024 14:31:40 +0000
-Date: Thu, 22 Feb 2024 14:31:38 +0000
-Message-ID: <87frxka7ud.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>,
-    Oliver Upton <oliver.upton@linux.dev>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Christoffer Dall <cdall@cs.columbia.edu>,
-	KVM <kvm@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: Re: linux-next: build failure after merge of the kvm-arm tree
-In-Reply-To: <b9d9a871-ba64-4c13-a186-0c60adc8d245@redhat.com>
-References: <20240222220349.1889c728@canb.auug.org.au>
-	<20240222111129.GA946362@e124191.cambridge.arm.com>
-	<20240222224041.782761fd@canb.auug.org.au>
-	<b9d9a871-ba64-4c13-a186-0c60adc8d245@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1708612647; c=relaxed/simple;
+	bh=nA+GwPV8So810YxlOsuziJpf9lYOI6OtcvWyEM/PeAI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dwl84NuN6+a3w6GZejHcII+GsAoU9oOdvgMBKDs7jT9DGvJohcn4zsPQ+TzpSG82kkA94ogOneg3AvrVrRP+Z8BNIgF6c8PJ+9dV38ZlwPWB2f/qnl7yHC2HNYFZfjNwFp+lQQ32C9SowifGd0abIZHDEF+fwrCHO3rK/DAq/Zk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Of0qbvK6; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708612647; x=1740148647;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=nA+GwPV8So810YxlOsuziJpf9lYOI6OtcvWyEM/PeAI=;
+  b=Of0qbvK6jpIl1T63Paf5joZ8kWBW4UsFOERUsSYZUJaQl6z12GbD9AYQ
+   sRg3IgbHzlFzGiyFjrlP70f+N9A3DF6wh34Rl9QLWfz6NX+IQrQSdHd/k
+   OpKyj6aWOeS/DRIBKbT6hRmRWqfy8v/sCRYIOJOadktvXn0plnfVcOv4e
+   nNqbTKkrlUE4u/enBAIJWP+epjmydDfUAIbc9eOqRumk7DCk3+riMpWxs
+   1xNDWUNhCzUiS/PJO2L8uTQ0yaChryk/PeDXtTLeAwJP+zyEGbeLVcTFw
+   VaNRAY3VjMsYL25cudYJbaIsjs+ASFlJTbDtDqOu0x2A2xmFnxbFiazx6
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10991"; a="2961658"
+X-IronPort-AV: E=Sophos;i="6.06,179,1705392000"; 
+   d="scan'208";a="2961658"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Feb 2024 06:37:26 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,179,1705392000"; 
+   d="scan'208";a="5411770"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.93.18.46]) ([10.93.18.46])
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Feb 2024 06:37:22 -0800
+Message-ID: <a650200e-5fd9-4ae3-a1e0-d676e96b8490@linux.intel.com>
+Date: Thu, 22 Feb 2024 22:37:19 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 82.132.212.42
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, oliver.upton@linux.dev, sfr@canb.auug.org.au, joey.gouly@arm.com, cdall@cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-next@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-
-On Thu, 22 Feb 2024 13:11:59 +0000,
-Paolo Bonzini <pbonzini@redhat.com> wrote:
->=20
-> On 2/22/24 12:40, Stephen Rothwell wrote:
-> >> This fails because https://git.kernel.org/pub/scm/linux/kernel/git/arm=
-64/linux.git/commit/?id=3Dfdd867fe9b32
-> >> added new fields to that register (ID_AA64DFR1_EL1)
-> >>=20
-> >> and commit b80b701d5a6 ("KVM: arm64: Snapshot all non-zero RES0/RES1 s=
-ysreg fields for later checking")
-> >> took a snapshot of the fields, so the RES0 (reserved 0) bits don't mat=
-ch anymore.
-> >>=20
-> >> Not sure how to resolve it in the git branches though.
-> >=20
-> > Thanks.  I will apply this patch to the merge of the kvm-arm tree from
-> > tomorrow (and at the end of today's tree).
->=20
-> Marc, Oliver, can you get a topic branch from Catalin and friends for
-> this sysreg patch, and apply the fixup directly to the kvm-arm branch
-> in the merge commit?
->=20
-> Not _necessary_, as I can always ask Linus to do the fixup, but
-> generally he prefers to have this sorted out by the maintainers if it
-> is detected by linux-next.
-
-I think that's not the correct thing to do at this time. I should have
-timed the introduction of these checks a bit later, after the merge
-window.
-
-But more to the point, the proposed patch is also not the best thing
-to merge, because it hides that there is a discrepancy between what
-the architecture describes, and what KVM knows. I really want to know
-about it, or it will be yet another bug that we wont detect easily.
-Specially for ID_AA64DFR*_EL1 which are a bloody mine-field.
-
-So I'd rather we make the check optional, and we'll play catch up for
-a bit longer. Something like the patch below.
-
-Oliver, do you mind queuing this ASAP (also pushed out to my dev
-branch)?
-
-Thanks,
-
-	M.
-
-=46rom 85d861a6ca055c7681c826c580e7c90d74c26ac5 Mon Sep 17 00:00:00 2001
-From: Marc Zyngier <maz@kernel.org>
-Date: Thu, 22 Feb 2024 14:12:09 +0000
-Subject: [PATCH] KVM: arm64: Make build-time check of RES0/RES1 bits option=
-al
-
-In order to ease the transition towards a state of absolute
-paranoia where all RES0/RES1 bits gets checked against what
-KVM know of them, make the checks optional and garded by a
-config symbol (CONFIG_KVM_ARM64_RES_BITS_PARANOIA) default to n.
-
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/Kconfig          | 11 +++++++++++
- arch/arm64/kvm/check-res-bits.h |  4 ++++
- 2 files changed, 15 insertions(+)
-
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index 5c2a672c06a8..fa9389270cfe 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -67,4 +67,15 @@ config PROTECTED_NVHE_STACKTRACE
-=20
- 	  If unsure, or not using protected nVHE (pKVM), say N.
-=20
-+config KVM_ARM64_RES_BITS_PARANOIA
-+	bool "Build-time check of RES0/RES1 bits"
-+	depends on KVM
-+	default n
-+	help
-+	  Say Y here to validate that KVM's knowledge of most system
-+	  registers' RES0/RES1 bits matches when the rest of the kernel
-+	  defines. Expect the build to fail badly if you enable this.
-+
-+	  Just say N.
-+
- endif # VIRTUALIZATION
-diff --git a/arch/arm64/kvm/check-res-bits.h b/arch/arm64/kvm/check-res-bit=
-s.h
-index 967b5d171d53..2d98e60efc3c 100644
---- a/arch/arm64/kvm/check-res-bits.h
-+++ b/arch/arm64/kvm/check-res-bits.h
-@@ -21,6 +21,8 @@
-  */
- static inline void check_res_bits(void)
- {
-+#ifdef CONFIG_KVM_ARM64_RES_BITS_PARANOIA
-+
- 	BUILD_BUG_ON(OSDTRRX_EL1_RES0		!=3D (GENMASK_ULL(63, 32)));
- 	BUILD_BUG_ON(MDCCINT_EL1_RES0		!=3D (GENMASK_ULL(63, 31) | GENMASK_ULL(28=
-, 0)));
- 	BUILD_BUG_ON(MDSCR_EL1_RES0		!=3D (GENMASK_ULL(63, 36) | GENMASK_ULL(28, =
-28) | GENMASK_ULL(25, 24) | GENMASK_ULL(20, 20) | GENMASK_ULL(18, 16) | GEN=
-MASK_ULL(11, 7) | GENMASK_ULL(5, 1)));
-@@ -118,4 +120,6 @@ static inline void check_res_bits(void)
- 	BUILD_BUG_ON(TRBMAR_EL1_RES0		!=3D (GENMASK_ULL(63, 12)));
- 	BUILD_BUG_ON(TRBTRG_EL1_RES0		!=3D (GENMASK_ULL(63, 32)));
- 	BUILD_BUG_ON(TRBIDR_EL1_RES0		!=3D (GENMASK_ULL(63, 12) | GENMASK_ULL(7, =
-6)));
-+
-+#endif
- }
---=20
-2.39.2
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v18 074/121] KVM: TDX: complete interrupts after tdexit
+To: isaku.yamahata@intel.com
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+ erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+ Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
+ chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com
+References: <cover.1705965634.git.isaku.yamahata@intel.com>
+ <379b4d2e8995f0f8b5e6635010b4fd12f4c2571f.1705965635.git.isaku.yamahata@intel.com>
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <379b4d2e8995f0f8b5e6635010b4fd12f4c2571f.1705965635.git.isaku.yamahata@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
---=20
-Without deviation from the norm, progress is not possible.
+
+On 1/23/2024 7:53 AM, isaku.yamahata@intel.com wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+>
+> This corresponds to VMX __vmx_complete_interrupts().  Because TDX
+> virtualize vAPIC, KVM only needs to care NMI injection.
+
+Nit: complete -> Complete in shortlog.
+
+Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
+
+>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>   arch/x86/kvm/vmx/tdx.c | 10 ++++++++++
+>   arch/x86/kvm/vmx/tdx.h |  2 ++
+>   2 files changed, 12 insertions(+)
+>
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index 71c6fc10e8c4..3b2ba9f974be 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -585,6 +585,14 @@ void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>   	 */
+>   }
+>   
+> +static void tdx_complete_interrupts(struct kvm_vcpu *vcpu)
+> +{
+> +	/* Avoid costly SEAMCALL if no nmi was injected */
+> +	if (vcpu->arch.nmi_injected)
+> +		vcpu->arch.nmi_injected = td_management_read8(to_tdx(vcpu),
+> +							      TD_VCPU_PEND_NMI);
+> +}
+> +
+>   struct tdx_uret_msr {
+>   	u32 msr;
+>   	unsigned int slot;
+> @@ -713,6 +721,8 @@ fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu)
+>   	vcpu->arch.regs_avail &= ~VMX_REGS_LAZY_LOAD_SET;
+>   	trace_kvm_exit(vcpu, KVM_ISA_VMX);
+>   
+> +	tdx_complete_interrupts(vcpu);
+> +
+>   	return EXIT_FASTPATH_NONE;
+>   }
+>   
+> diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
+> index 883eb05d207f..9082a2604ec6 100644
+> --- a/arch/x86/kvm/vmx/tdx.h
+> +++ b/arch/x86/kvm/vmx/tdx.h
+> @@ -201,6 +201,8 @@ TDX_BUILD_TDVPS_ACCESSORS(16, VMCS, vmcs);
+>   TDX_BUILD_TDVPS_ACCESSORS(32, VMCS, vmcs);
+>   TDX_BUILD_TDVPS_ACCESSORS(64, VMCS, vmcs);
+>   
+> +TDX_BUILD_TDVPS_ACCESSORS(8, MANAGEMENT, management);
+> +
+>   static __always_inline u64 td_tdcs_exec_read64(struct kvm_tdx *kvm_tdx, u32 field)
+>   {
+>   	struct tdx_module_args out;
+
 
