@@ -1,130 +1,178 @@
-Return-Path: <kvm+bounces-9425-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9426-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7152B85FE93
-	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 18:00:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6945A860052
+	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 19:04:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D9BD4B25B7E
-	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 17:00:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D27C91F2702F
+	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 18:04:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 426C1154BED;
-	Thu, 22 Feb 2024 16:59:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4018715697D;
+	Thu, 22 Feb 2024 18:04:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VHXwExeS"
 X-Original-To: kvm@vger.kernel.org
-Received: from proxmox-new.maurer-it.com (proxmox-new.maurer-it.com [94.136.29.106])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74A1A153BCE;
-	Thu, 22 Feb 2024 16:59:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.136.29.106
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A28D14776E
+	for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 18:04:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708621189; cv=none; b=qoFtupPngJHVGEXcnUGh+iQ5jItvmsuL8RNHCMQpleEwofYnAsdpgaqakgOuCO7ba5t1jLKGD1E/B6M+1Z8gZ5bgJBcdHLfHiBMYEdxM2xOW3fUEmVeKqUNzUTQbdJCsMaix3/Q9S/c68+8BWN32W23W9HV7PTBxwJgV8eMvx/4=
+	t=1708625053; cv=none; b=sAqEQrCGtm9XnsnenEYenoDyf654zlr9E0svYXg0Gcn9fpTzp48zcAdYr6KTNPr61DMjzsFV0IPoUMTHMnQ4fk0EFlqfabOj0n0bb88wMUOmAObd0UPv1fK2fHgNvS8y0UVfBvpYyiaOoSuNNTMWGg5IotrG/7m0devesMJsEqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708621189; c=relaxed/simple;
-	bh=mFjlaeGN07dgGRzQB14f7xCSu7QrFn9u6AqzQ15Qs2M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PoL54RP0QvHuGz87/NEZnnshhremJAIctAIuCNDMECpD+oK3uq+B2KmWX4AshIrUVHHQr8wuvRxCASOphr7aCFgitCC1qIPiE+wtRsPs+OikF6dBET6MIPrwx7IT9ciCB2+u7nol3172wJhZhxRusnBiVtHoX8fahIKpYzInOZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com; spf=pass smtp.mailfrom=proxmox.com; arc=none smtp.client-ip=94.136.29.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proxmox.com
-Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
-	by proxmox-new.maurer-it.com (Proxmox) with ESMTP id E5CD544ADC;
-	Thu, 22 Feb 2024 17:59:43 +0100 (CET)
-Message-ID: <2b0ed3ba-d8da-401e-9495-6b6670d7b418@proxmox.com>
-Date: Thu, 22 Feb 2024 17:59:42 +0100
+	s=arc-20240116; t=1708625053; c=relaxed/simple;
+	bh=5JM51lAyTKNNT8747SUelX8YF8GWYoh+Aq4eyoy7oHw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lAyi52rhlG4djllfd8mZbQ2jKd7kRqGMFsojHx8vSNEQtaQvnZbHHU2hAA2q/wQeHsYOnxt/4mCeLBK0ycOvMQZBPZFtiJ6scj+nH1eSgyRMC5W1xjnVO5ri0aGZcxRjQb/f+Q6ZsYj3GV0EWtrZClPZSB+yAW3CC1kRF51g7JE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VHXwExeS; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1708625050;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DzRuqJN84+wxPErDVkI1xf9yBbIoQD9FUTVkULwvLxs=;
+	b=VHXwExeSkl/+cAc4EKXGKyAE/CpCBNwxm4ZJMxmRW1kF5ptncYuC8tAMv+g82whG1aCYYc
+	zr0cmagYQiHHHFXMW0yldEwDPOCtt6DD60Ll4twfAFRGk7gxc2nmTcoqdvXEIA1N8bJ2+Z
+	fpD6cMFD/wgesiOVadiAEPit3H6ap+o=
+Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
+ [209.85.167.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-639-gFBIKpZGN4S8-uKLSbsTlw-1; Thu, 22 Feb 2024 13:04:08 -0500
+X-MC-Unique: gFBIKpZGN4S8-uKLSbsTlw-1
+Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-3c03aefc499so1987562b6e.1
+        for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 10:04:08 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708625048; x=1709229848;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DzRuqJN84+wxPErDVkI1xf9yBbIoQD9FUTVkULwvLxs=;
+        b=P8C72ymzBY3Pcn4jj+06A5t4AacTcGhCBh/YDhz1cOZ3Jj6RpedxRihQtXS8K56Ie6
+         VQAFVSZfcpeI9mfU2oK10bxN9XuagsmN7uphFsCHUNn296HGYHBnGv9Fy2Gbm1FFqRyJ
+         UPxkIkwwys0SbD7vq1Wciq6H9vdXdxc1w5g7LrSqj+Qt5LjAR4uT1zultYlAN0yIU6E+
+         iVC4dIwZMqdgVZFB9VrNOjNt220V/4vxchuOt+Tx/XQo7Rvmbt1/kFL/NMSd1PR14GIh
+         Gs5Fem7t0+vhBLqDnUhXQvjzR48zUKJOAkLR4JEFJr+J8ixrbZkttWGNWPHlcq33yyl5
+         +noA==
+X-Forwarded-Encrypted: i=1; AJvYcCUUpaaepwDj7GBykro1jZk+43rhG4bYAtedpPY2HQzp/xt0BcRChPLZoyJOuDYbOykyL1efDMQW3uaCXQkvc7D6YKn2
+X-Gm-Message-State: AOJu0YxYG8nGTX6wDsJRSyYsl67LOVGzvXhMnijRqbrRKs6UV997/8Rd
+	9qPMuf5QKYn3RmbG7Kemzn9zzoECHSo3jYEr+/hr0Jx8ferU2juKzwUSW7gc9leW/H7yCCQ5zSY
+	YUYFsHFAUxbmrZz738L85C0IiTOk33BKOipV5u8siAWe6YyzCPQ==
+X-Received: by 2002:a05:6808:f8b:b0:3c1:7eac:a8a1 with SMTP id o11-20020a0568080f8b00b003c17eaca8a1mr2076341oiw.49.1708625048056;
+        Thu, 22 Feb 2024 10:04:08 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG/IWshRDtx/YpRYAWYsI9yk4t00sLhVrrVNyM2cwM2FGEyWfuhDHq8KZQdfgPcOJUpPwSp+g==
+X-Received: by 2002:a05:6808:f8b:b0:3c1:7eac:a8a1 with SMTP id o11-20020a0568080f8b00b003c17eaca8a1mr2076325oiw.49.1708625047781;
+        Thu, 22 Feb 2024 10:04:07 -0800 (PST)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id n16-20020a0568080a1000b003c03f08d619sm2047241oij.42.2024.02.22.10.04.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Feb 2024 10:04:07 -0800 (PST)
+Date: Thu, 22 Feb 2024 11:04:05 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Yishai Hadas <yishaih@nvidia.com>
+Cc: "jgg@nvidia.com" <jgg@nvidia.com>, "kvm@vger.kernel.org"
+ <kvm@vger.kernel.org>, "joao.m.martins@oracle.com"
+ <joao.m.martins@oracle.com>, "leonro@nvidia.com" <leonro@nvidia.com>,
+ "maorg@nvidia.com" <maorg@nvidia.com>, "Tian, Kevin" <kevin.tian@intel.com>
+Subject: Re: [PATCH V1 vfio 0/5] Improve mlx5 driver to better handle some
+ error cases
+Message-ID: <20240222110405.759b8971.alex.williamson@redhat.com>
+In-Reply-To: <bdb66db6-cd41-4d0d-bc69-33390953f385@nvidia.com>
+References: <20240205124828.232701-1-yishaih@nvidia.com>
+	<BN9PR11MB527688453C0D5D4789ADDF968C462@BN9PR11MB5276.namprd11.prod.outlook.com>
+	<1175d7ed-45f3-42d0-a3cb-90ef2df40dbb@nvidia.com>
+	<244923bb-7732-4a9b-b5da-6a778ba4dd60@nvidia.com>
+	<bdb66db6-cd41-4d0d-bc69-33390953f385@nvidia.com>
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5] KVM: x86/mmu: Retry fault before acquiring mmu_lock if
- mapping is changing
-Content-Language: en-US
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Yan Zhao <yan.y.zhao@intel.com>, Kai Huang <kai.huang@intel.com>,
- Yuan Yao <yuan.yao@linux.intel.com>, Xu Yilun <yilun.xu@linux.intel.com>
-References: <20240222012640.2820927-1-seanjc@google.com>
-From: Friedrich Weber <f.weber@proxmox.com>
-In-Reply-To: <20240222012640.2820927-1-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 22/02/2024 02:26, Sean Christopherson wrote:
-> Retry page faults without acquiring mmu_lock, and without even faulting
-> the page into the primary MMU, if the resolved gfn is covered by an active
-> invalidation.  Contending for mmu_lock is especially problematic on
-> preemptible kernels as the mmu_notifier invalidation task will yield
-> mmu_lock (see rwlock_needbreak()), delay the in-progress invalidation, and
-> ultimately increase the latency of resolving the page fault.  And in the
-> worst case scenario, yielding will be accompanied by a remote TLB flush,
-> e.g. if the invalidation covers a large range of memory and vCPUs are
-> accessing addresses that were already zapped.
-> 
-> Faulting the page into the primary MMU is similarly problematic, as doing
-> so may acquire locks that need to be taken for the invalidation to
-> complete (the primary MMU has finer grained locks than KVM's MMU), and/or
-> may cause unnecessary churn (getting/putting pages, marking them accessed,
-> etc).
-> 
-> Alternatively, the yielding issue could be mitigated by teaching KVM's MMU
-> iterators to perform more work before yielding, but that wouldn't solve
-> the lock contention and would negatively affect scenarios where a vCPU is
-> trying to fault in an address that is NOT covered by the in-progress
-> invalidation.
-> 
-> Add a dedicated lockess version of the range-based retry check to avoid
-> false positives on the sanity check on start+end WARN, and so that it's
-> super obvious that checking for a racing invalidation without holding
-> mmu_lock is unsafe (though obviously useful).
-> 
-> Wrap mmu_invalidate_in_progress in READ_ONCE() to ensure that pre-checking
-> invalidation in a loop won't put KVM into an infinite loop, e.g. due to
-> caching the in-progress flag and never seeing it go to '0'.
-> 
-> Force a load of mmu_invalidate_seq as well, even though it isn't strictly
-> necessary to avoid an infinite loop, as doing so improves the probability
-> that KVM will detect an invalidation that already completed before
-> acquiring mmu_lock and bailing anyways.
-> 
-> Do the pre-check even for non-preemptible kernels, as waiting to detect
-> the invalidation until mmu_lock is held guarantees the vCPU will observe
-> the worst case latency in terms of handling the fault, and can generate
-> even more mmu_lock contention.  E.g. the vCPU will acquire mmu_lock,
-> detect retry, drop mmu_lock, re-enter the guest, retake the fault, and
-> eventually re-acquire mmu_lock.  This behavior is also why there are no
-> new starvation issues due to losing the fairness guarantees provided by
-> rwlocks: if the vCPU needs to retry, it _must_ drop mmu_lock, i.e. waiting
-> on mmu_lock doesn't guarantee forward progress in the face of _another_
-> mmu_notifier invalidation event.
-> 
-> Note, adding READ_ONCE() isn't entirely free, e.g. on x86, the READ_ONCE()
-> may generate a load into a register instead of doing a direct comparison
-> (MOV+TEST+Jcc instead of CMP+Jcc), but practically speaking the added cost
-> is a few bytes of code and maaaaybe a cycle or three.
-> 
-> Reported-by: Yan Zhao <yan.y.zhao@intel.com>
-> Closes: https://lore.kernel.org/all/ZNnPF4W26ZbAyGto@yzhao56-desk.sh.intel.com
-> Reported-by: Friedrich Weber <f.weber@proxmox.com>
-> Cc: Kai Huang <kai.huang@intel.com>
-> Cc: Yan Zhao <yan.y.zhao@intel.com>
-> Cc: Yuan Yao <yuan.yao@linux.intel.com>
-> Cc: Xu Yilun <yilun.xu@linux.intel.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
+On Wed, 21 Feb 2024 09:45:14 +0200
+Yishai Hadas <yishaih@nvidia.com> wrote:
 
-Couldn't find the base-commit 21dbc438 (might not have looked at the
-right place though), so I applied this patch on top of c48617fb ("Merge
-tag 'kvmarm-fixes-6.8-3' ...") from kvm/kvm.git. Can confirm the patch
-fixes the temporary guest hangs in combination with KSM and NUMA
-balancing [1]. Thanks!
+> On 08/02/2024 10:16, Yishai Hadas wrote:
+> > On 06/02/2024 10:06, Yishai Hadas wrote:  
+> >> On 06/02/2024 9:35, Tian, Kevin wrote:  
+> >>>> From: Yishai Hadas <yishaih@nvidia.com>
+> >>>> Sent: Monday, February 5, 2024 8:48 PM
+> >>>>
+> >>>> This series improves the mlx5 driver to better handle some error cases
+> >>>> as of below.
+> >>>>
+> >>>> The first two patches let the driver recognize whether the firmware
+> >>>> moved the tracker object to an error state. In that case, the driver
+> >>>> will skip/block any usage of that object.
+> >>>>
+> >>>> The next two patches (#3, #4), improve the driver to better include the
+> >>>> proper firmware syndrome in dmesg upon a failure in some firmware
+> >>>> commands.
+> >>>>
+> >>>> The last patch follows the device specification to let the firmware 
+> >>>> know
+> >>>> upon leaving PRE_COPY back to RUNNING. (e.g. error in the target,
+> >>>> migration cancellation, etc.).
+> >>>>
+> >>>> This will let the firmware clean its internal resources that were 
+> >>>> turned
+> >>>> on upon PRE_COPY.
+> >>>>
+> >>>> Note:
+> >>>> As the first patch should go to net/mlx5, we may need to send it as a
+> >>>> pull request format to vfio before acceptance of the series, to avoid
+> >>>> conflicts.
+> >>>>
+> >>>> Changes from V0: https://lore.kernel.org/kvm/20240130170227.153464-1-
+> >>>> yishaih@nvidia.com/
+> >>>> Patch #2:
+> >>>> - Rename to use 'object changed' in some places to make it clearer.
+> >>>> - Enhance the commit log to better clarify the usage/use case.
+> >>>>
+> >>>> The above was suggested by Tian, Kevin <kevin.tian@intel.com>.
+> >>>>  
+> >>>
+> >>> this series looks good to me except a small remark on patch2:  
+> >>
+> >> We should be fine there, see my answer on V0.
+> >>  
+> >>>
+> >>> Reviewed-by: Kevin Tian <kevin.tian@intel.com>  
+> >>
+> >> Thanks Kevin, for your reviewed-by.
+> >>
+> >> Yishai
+> >>  
+> > 
+> > Alex
+> > 
+> > Are we OK here to continue with a PR for the first patch ?
+> > 
+> > It seems that we should be fine here.
+> > 
+> > Thanks,
+> > Yishai
+> >   
+> 
+> Hi Alex,
+> Any update here ?
 
-[1]
-https://lore.kernel.org/kvm/832697b9-3652-422d-a019-8c0574a188ac@proxmox.com/
+Sure, if Leon wants to do a PR for struct
+mlx5_ifc_query_page_track_obj_out_bits, that's fine.  The series looks
+ok to me.  The struct definition is small enough to go through the vfio
+tree with Leon's ack, but I'll leave it to you to do the right thing
+relative to potential conflicts.  Thanks,
+
+Alex
 
 
