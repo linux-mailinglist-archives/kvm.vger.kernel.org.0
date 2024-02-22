@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-9436-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9435-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C1CD860241
-	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 20:08:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A63A860240
+	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 20:07:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5533628D495
-	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 19:08:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BDE401F2AC6B
+	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 19:07:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1C676AF88;
-	Thu, 22 Feb 2024 19:06:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C88997174B;
+	Thu, 22 Feb 2024 19:06:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XSBf7+zj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qOFvn+gC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E5CF14B824
-	for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 19:06:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A89F514B810
+	for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 19:06:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708628806; cv=none; b=i35GhdEvtOuiKFi4XTUHXSvEU1p5L8hGq3OjWwcX49MgK4cwBU+NjdBMUQCouJo/oChICfMSqYl0r4jT+nivHUURtR/LP9Y2+/kv7ME2wtfYRkgMOSLXHyTN2lhTZo6Ldwb5mlsZqkHiwJYBo69iyTlahWPwwQd/4/obEaKFeCg=
+	t=1708628802; cv=none; b=jVGAXfERLM/sjeTV7MAgg2TCxQwnrGqPArCuy7T+meOEbEHbBlRicaa2lRsyMeL7o1EW8j3re+6zw0UaGGOCihGIS3TjXS4AFz8yyMghVbSLM8fvj4+2SBwv4JTytdqpwP+HriRVNEPL+06965WY+88SYbPT85VHiOmu+juM5jY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708628806; c=relaxed/simple;
-	bh=Lpr6OXMdJrHRiK6NwVBpGyZp/lhKwMDMfWMCx4WLc3E=;
+	s=arc-20240116; t=1708628802; c=relaxed/simple;
+	bh=tb6swG7G3wi3Bnp9LY5vlQD3q2JN5LX1r2DEbuv3v04=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Rmg2x5+PlGAXUxsd7JD3mAUVnliZnwHbuIi47/rWaGX7vTFSPdO/YPP2GhiG1LmYehwkHf/yn2IYjNRXSfK+0pB/Yl0rms941QRLUc1Eq3fvjbYZoI5H25VwHXz8298Xvp9Tu/QWDR1m+NVWNBlc/41YmX97Sfd7FvO0Myt9e6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XSBf7+zj; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=sRY9ovq9nPv9js6TIH08RNkM1UZsW69Enlj7BpVNuSI2qwz/foZHQazJa8E0FanZaJjMnao7iCQ/WW+rEoaZV9n4StQdbyXbMCxaZc6yip0+ZhLqyZo9LBHgMnK5zKIjliinCdBwqo6oOUD/isfGiuJvuE3E/Xnh+EjCH1sFKhY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qOFvn+gC; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-603c0e020a6so1176107b3.0
-        for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 11:06:22 -0800 (PST)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dbf216080f5so37340276.1
+        for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 11:06:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708628780; x=1709233580; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1708628782; x=1709233582; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=TYSivnN6sKEY4CZofc9WbYnjIg5hjEEjj41nwAaSQHo=;
-        b=XSBf7+zjqQSIdpqoyLdYZLXRBC8iVe9qqogTHUaBn57Ovayhzn94jJFmygn3Zcr4Ac
-         V81jFQbw9uesISW4op0RXFqQ5VdLV/HFSoQMgT2F9cyXbcgC41UpHUEuMTsrIOESuQ8y
-         tXXqOls0CCgznvtf0okfVtRp4miaFDLaNVNepblvY6Scs59lYYEy29yNVrwJF5fxGDpy
-         wU+9Wev99fJvjYZ1taG7kkLvXLU9vnb7mGQyFIJ/qr3VUX+KCGweZjS/Wz1vrtiYi95r
-         v0A5hzhGtLDUgKFWTwP6/5NKLqZrhp4TMNIpGvo+nihezpIBbEPgpDCLO+OELV9SDIlb
-         qPqw==
+        bh=7HiIqZU0XyHT/uY+W4Av8xeySFLdYEVlTDQAMpZzHAk=;
+        b=qOFvn+gCgVs5c7zcvBO86Q/trRj74+2+BepDqXj2zgB4OvFOSk5EMDS0OlFNOynVLY
+         cP9BSYBsueqjh8X+q7hUf+AT5WLlU9KtKRCB+wd/4m3L6XYsTs8n8vCjLesZnuyef2BW
+         VivgP4UtOk/Pz0BoEiFn8xecbpI7sydOb1FqsULlgEI36kuln9wD7dGqqmS09QVXteEh
+         X/QXo8iGK3rzO3tqGEfQsYWRyYAb7IeMYn5TDagw+R6YgjgmQeMgY3iT6RrnY3CUospJ
+         TCnGngq44ALF8XzTewAFhRJey8F6g4ABqeYkqb3sQAUuOFBS/1mZwBlZ/zGCEeXR/tox
+         rOYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708628780; x=1709233580;
+        d=1e100.net; s=20230601; t=1708628782; x=1709233582;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=TYSivnN6sKEY4CZofc9WbYnjIg5hjEEjj41nwAaSQHo=;
-        b=t/nuonwdwmg6rEPTdbkTO6WxAbUBIHD22sN3oki1zhAI9bz41qH1ELRM77bnlT92in
-         UPVdJg3UUe4c3igpNI+WSMYZppZCwOwFFYhQ8R6n9kWHqEeT2nfxHrNG2UJNCm/Eoo+A
-         GA8CKSvniGOHOZSFtOnQuAhZo0E0nCJoz5uEhVGMwETzIsaCkp2JpLYP1Rtr5icXdTfr
-         fFh5NzjrilRzpQ50dUKOhK5VjAFZB/9TEZeB+TFpfaakgTuBvY4bPGfo2046EOq2e50b
-         n8IZZQwuzbzbEnSRMci8Oz4cHsgCqaJqvshpPHUGb8tCfVlyx479P0zEYcbXK+pfrdwi
-         TDNA==
-X-Gm-Message-State: AOJu0YxFCKR/JlCUdIsejx/uT8DrNuvbdDFt6qij27nCwqoFwAFIKqYe
-	TPePBYu+oP434v+xsC8i36sKvwemJ1uiLd6zLZc8ok1RcA0fJk4Q35wlZUIXK8CGrRmXZc5nr2G
-	1uA==
-X-Google-Smtp-Source: AGHT+IF9Ke/e46sWIPIrRAm77GXHG7bR55ds8AD8pgXpkvpOO/ZmmJioMfPOuwxYZiWeh9v80/lCewALitw=
+        bh=7HiIqZU0XyHT/uY+W4Av8xeySFLdYEVlTDQAMpZzHAk=;
+        b=YwWviQs1zVjA9fcV31Cwh7kLQrDC3OjefDlWo5sxFHAM7mQ8schBTEXJKsDm/0jCRA
+         PnKVgG0gzGFX6S2PYlbY2ab4ooXBVBVYqA3JO5EOsdPG7BAT40ZtApofzMph7XjVd608
+         MVqK06C1fCu0DTFxuIolkCFn+q2xseIUOp2xtbpsxmo9R7z1rZKGfqZIwTTSh5NYDXN1
+         3KAbpeNl5x8PW88dULBK+Ro42iyghMNQmdHuib4yHek+Uyp4Hrx4o6nBSmfQs+1vU+2S
+         HUrUsgzYb2/djgK2sqX4e+wiMTM5HhwYCJvWqY3jqShKrXAiMMwHT6hBwCxrxWW2PoxO
+         ItJA==
+X-Gm-Message-State: AOJu0Yydaao4HtScRR4ZpbTw32StxooNT2qsjsMbrMGeKCHTt3boLqkz
+	g/hvHYnQbZfMvIyX4BDI5oWiNORJANG39kCmDG2xrNodI5Kj4ErOKuM2iSdWGtxz21YtYEcVo4/
+	09A==
+X-Google-Smtp-Source: AGHT+IGtR+RoDfHwSTIhzXm2i1nKg0wVcYuExVcXUmqMqdjbWwp02581SwhVU/j3/8LtxuOjiirmIuc48vY=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:18cc:b0:dc7:6f13:61d9 with SMTP id
- ck12-20020a05690218cc00b00dc76f1361d9mr1123ybb.4.1708628780537; Thu, 22 Feb
- 2024 11:06:20 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a05:6902:114a:b0:dc8:5e26:f4d7 with SMTP id
+ p10-20020a056902114a00b00dc85e26f4d7mr5931ybu.13.1708628782543; Thu, 22 Feb
+ 2024 11:06:22 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 22 Feb 2024 11:06:10 -0800
+Date: Thu, 22 Feb 2024 11:06:11 -0800
 In-Reply-To: <20240222190612.2942589-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,8 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240222190612.2942589-1-seanjc@google.com>
 X-Mailer: git-send-email 2.44.0.rc0.258.g7320e95886-goog
-Message-ID: <20240222190612.2942589-4-seanjc@google.com>
-Subject: [PATCH 3/5] KVM: x86/mmu: Restrict KVM_SW_PROTECTED_VM to the TDP MMU
+Message-ID: <20240222190612.2942589-5-seanjc@google.com>
+Subject: [PATCH 4/5] KVM: selftests: Create GUEST_MEMFD for relevant invalid
+ flags testcases
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -85,30 +86,39 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Chao Peng <chao.p.peng@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Advertise and support software-protected VMs if and only if the TDP MMU is
-enabled, i.e. disallow KVM_SW_PROTECTED_VM if TDP is enabled for KVM's
-legacy/shadow MMU.  TDP support for the shadow MMU is maintenance-only,
-e.g. support for TDX and SNP will also be restricted to the TDP MMU.
+Actually create a GUEST_MEMFD instance and pass it to KVM when doing
+negative tests for KVM_SET_USER_MEMORY_REGION2 + KVM_MEM_GUEST_MEMFD.
+Without a valid GUEST_MEMFD file descriptor, KVM_SET_USER_MEMORY_REGION2
+will always fail with -EINVAL, resulting in false passes for any and all
+tests of illegal combinations of KVM_MEM_GUEST_MEMFD and other flags.
 
-Fixes: 89ea60c2c7b5 ("KVM: x86: Add support for "protected VMs" that can utilize private memory")
+Fixes: 5d74316466f4 ("KVM: selftests: Add a memory region subtest to validate invalid flags")
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/x86.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tools/testing/selftests/kvm/set_memory_region_test.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 86d88bc7a6d0..1e0cc1906232 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4580,7 +4580,7 @@ static bool kvm_is_vm_type_supported(unsigned long type)
- {
- 	return type == KVM_X86_DEFAULT_VM ||
- 	       (type == KVM_X86_SW_PROTECTED_VM &&
--		IS_ENABLED(CONFIG_KVM_SW_PROTECTED_VM) && tdp_enabled);
-+		IS_ENABLED(CONFIG_KVM_SW_PROTECTED_VM) && tdp_mmu_enabled);
+diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
+index 40337f566eeb..9df4b61116bc 100644
+--- a/tools/testing/selftests/kvm/set_memory_region_test.c
++++ b/tools/testing/selftests/kvm/set_memory_region_test.c
+@@ -367,11 +367,15 @@ static void test_invalid_memory_region_flags(void)
+ 	}
+ 
+ 	if (supported_flags & KVM_MEM_GUEST_MEMFD) {
++		int guest_memfd = vm_create_guest_memfd(vm, MEM_REGION_SIZE, 0);
++
+ 		r = __vm_set_user_memory_region2(vm, 0,
+ 						 KVM_MEM_LOG_DIRTY_PAGES | KVM_MEM_GUEST_MEMFD,
+-						 0, MEM_REGION_SIZE, NULL, 0, 0);
++						 0, MEM_REGION_SIZE, NULL, guest_memfd, 0);
+ 		TEST_ASSERT(r && errno == EINVAL,
+ 			    "KVM_SET_USER_MEMORY_REGION2 should have failed, dirty logging private memory is unsupported");
++
++		close(guest_memfd);
+ 	}
  }
  
- int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
 -- 
 2.44.0.rc0.258.g7320e95886-goog
 
