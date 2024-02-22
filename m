@@ -1,117 +1,105 @@
-Return-Path: <kvm+bounces-9363-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9366-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DD4185F4E9
-	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 10:47:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 11EFD85F53A
+	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 11:04:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E774C1F22275
-	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 09:47:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC2401F25EA1
+	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 10:04:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5E563EA8B;
-	Thu, 22 Feb 2024 09:46:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 534C439AC3;
+	Thu, 22 Feb 2024 10:04:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=xen0n.name header.i=@xen0n.name header.b="eHXbV8aG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BLFBAFuS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mailbox.box.xen0n.name (mail.xen0n.name [115.28.160.31])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 787D83D99C;
-	Thu, 22 Feb 2024 09:45:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.28.160.31
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7962638DD9;
+	Thu, 22 Feb 2024 10:04:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708595161; cv=none; b=Oe0CG9L5UgvQiFhGqm9IrOZdkRjA6Rc6besU1uCFfUkiQM3LAsNlPAwFZ0hI8WLQBaUbSaQQsTsUH5sJXjrC7FMc69W6vnOOYz4MT7ofwIneDczjz8MNzFu0g1zWIGAhG9J0oCFq0jH8PljEk8c1X+JBzedNqo2zqd7jBMr9x70=
+	t=1708596259; cv=none; b=NzLnU9bC6t+ZWS2R1HXLT+2ZcYDDcBUntiirKGteE8hD9Vl/JMV5jEYUYdv+RwGHXcr0bIy66fVre85ZoQJF9u6gmi7u3X/DDFa+pHtwbiynoL/dveICUk8DP5/BAzdUCDrqr5hs1J6ztlmUQ4TRmulZakmY7PqHxUe0IPsJp8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708595161; c=relaxed/simple;
-	bh=OATWuTBcSrRQnsAQcEJVtWvg5kuTMiuCytgedBHWqcI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JoutQAYhJfQqs0yxR857Hmp2pjdJ6apy9hf1uYTudddwQG9Zm7DomUQz1OTMXHTAJpZYgb3neYA2ML2puKi7HRcagj5Nkveu/UNI2PfXO3Bn1BI5uJ4jMq3LAOPqhUTwhvUsIap4VAIqvxeCWvZtlntz5QwZ+tpoFPTC01WQTOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xen0n.name; spf=pass smtp.mailfrom=xen0n.name; dkim=pass (1024-bit key) header.d=xen0n.name header.i=@xen0n.name header.b=eHXbV8aG; arc=none smtp.client-ip=115.28.160.31
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xen0n.name
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xen0n.name
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xen0n.name; s=mail;
-	t=1708595157; bh=OATWuTBcSrRQnsAQcEJVtWvg5kuTMiuCytgedBHWqcI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=eHXbV8aGJB0ujrUWJGnfgMm6WOMvBvd3BoCoGQorjtnCQgvZNr5siYU8QCq8HHiYg
-	 nuJ2/PCENj+1bYr0jDK/3478D+blyJfmeAf43QnwnqUEVSAFZ3HYMyKuakuNXZWwlf
-	 vSCUFn/tH+H5+rkS5Oql+SFyKzP/h09m+MzM5Rsw=
-Received: from [IPV6:240e:688:100:1:5f9c:42f0:f9f2:a909] (unknown [IPv6:240e:688:100:1:5f9c:42f0:f9f2:a909])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits))
-	(No client certificate requested)
-	by mailbox.box.xen0n.name (Postfix) with ESMTPSA id 0376660094;
-	Thu, 22 Feb 2024 17:45:56 +0800 (CST)
-Message-ID: <4a12394a-8ebf-40b8-b0bc-65b5a66967cd@xen0n.name>
-Date: Thu, 22 Feb 2024 17:45:56 +0800
+	s=arc-20240116; t=1708596259; c=relaxed/simple;
+	bh=DY+laaDGWADlgjZ4aCk/y2nEJQIg6zplT0mKVagO2gE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lS97D8ngWiBiXsGfHeO6IpXaPe+VmfzfMEeRtPlpgE87wFV0nVeKwCaH/GObn768VtBqBZVRpEtxEDCtkImY5RXatwv27940GDJD+bhzXfqUMueADzR/I88wtYUzShfX488tLwaFG/AdjAy1QldRtDQ0CSwXTEuP2A/tAXyU1po=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BLFBAFuS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CB37C433F1;
+	Thu, 22 Feb 2024 10:04:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708596259;
+	bh=DY+laaDGWADlgjZ4aCk/y2nEJQIg6zplT0mKVagO2gE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=BLFBAFuS1IqZtsu4OkQIujYD8nRbeCwV9jGbdUmQMen0qak0DD7GCeTMy/o92a6jR
+	 QeG2H/KO+xVYKuqf9XuyYY1IjgvMDAhzJgMIngXNJ8H9CwJHcN+nuee/C55+kXemL2
+	 VFxAPStbgXsHPBhbovrhsre+27Ku68taiwDZQ70gNT4NEfHnqYSd93mlIvsHeaHlBW
+	 HreItCp7zMUEGA5rJK6Lj6QSpohfJk77GuHoDmC2XtmdB1t2AeZNdonBBnx9NbcmHt
+	 V2ywIcxpAVu3ABiTXPPA9lDMZPnTmZHcXz3EhZpGx+nwz16SuhEUjhaEkGu6I4CtiK
+	 kC/MGvB3U6UQQ==
+From: Arnd Bergmann <arnd@kernel.org>
+To: David Woodhouse <dwmw2@infradead.org>,
+	Paul Durrant <paul@xen.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Jan Kara <jack@suse.cz>,
+	Christian Brauner <brauner@kernel.org>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: x86/xen: fix 32-bit pointer cast
+Date: Thu, 22 Feb 2024 11:03:58 +0100
+Message-Id: <20240222100412.560961-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH for-6.8 v3 1/3] LoongArch: KVM: Fix input validation of
- _kvm_get_cpucfg and kvm_check_cpucfg
-Content-Language: en-US
-To: maobibo <maobibo@loongson.cn>, Paolo Bonzini <pbonzini@redhat.com>,
- Huacai Chen <chenhuacai@kernel.org>
-Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, kvm@vger.kernel.org,
- loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
- WANG Xuerui <git@xen0n.name>
-References: <20240216085822.3032984-1-kernel@xen0n.name>
- <20240216085822.3032984-2-kernel@xen0n.name>
- <412ea29b-7a53-1f91-1cdb-5a256e74826b@loongson.cn>
-From: WANG Xuerui <kernel@xen0n.name>
-In-Reply-To: <412ea29b-7a53-1f91-1cdb-5a256e74826b@loongson.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hi,
+From: Arnd Bergmann <arnd@arndb.de>
 
-On 2/17/24 11:03, maobibo wrote:
-> Hi Xuerui,
-> 
-> Good catch, and thank for your patch.
-> 
-> On 2024/2/16 下午4:58, WANG Xuerui wrote:
->> [snip]
->> @@ -324,31 +319,33 @@ static int _kvm_get_cpucfg(int id, u64 *v)
->>           if (cpu_has_lasx)
->>               *v |= CPUCFG2_LASX;
->> -        break;
->> +        return 0;
->> +    case 0 ... 1:
->> +    case 3 ... KVM_MAX_CPUCFG_REGS - 1:
->> +        /* no restrictions on other CPUCFG IDs' values */
->> +        *v = U64_MAX;
->> +        return 0;
-> how about something like this?
->      default:
->          /* no restrictions on other CPUCFG IDs' values */
->          *v = U64_MAX;
->          return 0;
+shared_info.hva is a 64-bit variable, so casting to a pointer causes
+a warning in 32-bit builds:
 
-I don't think this version correctly expresses the intent. Note that the 
-CPUCFG ID range check is squashed into the switch as well, so one switch 
-conveniently expresses the three intended cases at once:
+arch/x86/kvm/xen.c: In function 'kvm_xen_hvm_set_attr':
+arch/x86/kvm/xen.c:660:45: error: cast to pointer from integer of different size [-Werror=int-to-pointer-cast]
+  660 |                         void __user * hva = (void *)data->u.shared_info.hva;
 
-* the special treatment of CPUCFG2,
-* all-allow rules for other in-range CPUCFG IDs, and
-* rejection for out-of-range IDs.
+Replace the cast with a u64_to_user_ptr() call that does the right thing.
 
-Yet the suggestion here is conflating the latter two cases, with the 
-effect of allowing every ID that's not 2 to take any value (as expressed 
-by the U64_MAX mask), and *removing the range check* (because no return 
-path returns -EINVAL with this change).
+Fixes: 01a871852b11 ("KVM: x86/xen: allow shared_info to be mapped by fixed HVA")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ arch/x86/kvm/xen.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-So I'd like to stick to the current version, but thanks anyway for your 
-kind review and suggestion.
-
+diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+index 01c0fd138d2f..8a04e0ae9245 100644
+--- a/arch/x86/kvm/xen.c
++++ b/arch/x86/kvm/xen.c
+@@ -657,7 +657,7 @@ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
+ 						     gfn_to_gpa(gfn), PAGE_SIZE);
+ 			}
+ 		} else {
+-			void __user * hva = (void *)data->u.shared_info.hva;
++			void __user * hva = u64_to_user_ptr(data->u.shared_info.hva);
+ 
+ 			if (!PAGE_ALIGNED(hva) || !access_ok(hva, PAGE_SIZE)) {
+ 				r = -EINVAL;
 -- 
-WANG "xen0n" Xuerui
-
-Linux/LoongArch mailing list: https://lore.kernel.org/loongarch/
+2.39.2
 
 
