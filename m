@@ -1,195 +1,180 @@
-Return-Path: <kvm+bounces-9382-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9383-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5374085F75A
-	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 12:41:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D868C85F798
+	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 12:57:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD72F1F2A3F7
-	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 11:41:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A97F61C23C00
+	for <lists+kvm@lfdr.de>; Thu, 22 Feb 2024 11:57:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D6AD45BF0;
-	Thu, 22 Feb 2024 11:40:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="Ge/Y40e+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 009A24652D;
+	Thu, 22 Feb 2024 11:57:44 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C92753F9ED;
-	Thu, 22 Feb 2024 11:40:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A687E41212;
+	Thu, 22 Feb 2024 11:57:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708602047; cv=none; b=fvybAcNnx/Tqc71Lm/TFyOOaH+qXNg3+gkkL0SVTeNSfrIVQ+XorigakTZVERDczeNRQ2qtrtPdB9Pcx4gfXr7BU/dImBWBBJHOIxwp16oVAC+dzAmYXCUIX+cU3rBCBPefWh8RELrMh1s3ELjK3ARQ5qcRiAz7CKH5ZhrFoPqo=
+	t=1708603063; cv=none; b=Tlv1JsZ87hVJSv8U3XRperxugre7M4cgVA7CPTZmvZK9q70gsQLLtHaAglTKkmLCTf3HMBLEnQGqyH1/OiuJMwpE0+06eLvQwF8EIxhonWgYtGHtq1k8iV4qu5ZSZxS/QPXUwEsjgshHI4wg00jykJD3rywFj6suYM0nvXNHpxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708602047; c=relaxed/simple;
-	bh=qErhb31YfBBbfbwsXUA9smxLugNiT5kmyg/IG8Z2rbA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=j67xN8wjImr8ZDFbvvVb00rBB5mhqKPNH3nPVXLg/xmi5tDrCfx3N0wEtrT6LYA7kfj66HpgIJbabAcpgyk94Sad64h+zaKh1S2B2iYdEYuhpZmYoBhbtG3+fruONShqe2pKZLQolhLpWVsJiPU2HurLiC9NnuV5cYOtVXi3TDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=Ge/Y40e+; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1708602043;
-	bh=bJXOfG/Dk72N81ShHuOJUbjEwxeP53GZRuMDnBXS5rc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Ge/Y40e++eyOSiOWUCdFX0J57Zp12w08KgkZfld28dxOqN1K3L85Jym1O5bjFIUyL
-	 EnI79ZcpBZQOe8Q+zYq3/zloBlOu0VgQdGnR+ij/Yv9qeS/6AK2WvxjAgxB6EvsIwu
-	 Bvuod3hkNtIPcFnTvdoXkoZ15Q3cSR8rFh4XisolfkLgpgWZ1ENp/SFVYFtE78R3Dy
-	 aiq862/J/Cb7yfnuowHnO0p1ZcUlGNZ/McEgxtVkOgxhuOv1ngW3yGYBxrRG7Ir7lS
-	 S54T3qk89K4O/keOCe0zYAvWOQsy4b7CNcP2pgOxO3ZpS5RifJ9Nrk3k8KitLKsO40
-	 Ej4f+ydj8bmvQ==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4TgWRZ4Crzz4wb2;
-	Thu, 22 Feb 2024 22:40:42 +1100 (AEDT)
-Date: Thu, 22 Feb 2024 22:40:41 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Christoffer Dall
- <cdall@cs.columbia.edu>, Marc Zyngier <maz@kernel.org>, KVM
- <kvm@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: Re: linux-next: build failure after merge of the kvm-arm tree
-Message-ID: <20240222224041.782761fd@canb.auug.org.au>
-In-Reply-To: <20240222111129.GA946362@e124191.cambridge.arm.com>
-References: <20240222220349.1889c728@canb.auug.org.au>
-	<20240222111129.GA946362@e124191.cambridge.arm.com>
+	s=arc-20240116; t=1708603063; c=relaxed/simple;
+	bh=i1O0ek0muCYta3v4M3Z2ogeYhe937+UsWe85/PlS70A=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=gpSlj0igf6NLpd9BI6XmxvBEi4NpVaEXB4B1GU5COnKDud/QA3L9ZbbheKVbpqC3V93xLIRrI6A/hZxavvV2lNP0H/sZvVWfI9VPDbvyGNTA5VA/8kIcYcaAgjSKqNxnAORycZV+lQiC3/k1MPFZL6yjz7jFydtNFnKPVd1kGPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.173])
+	by gateway (Coremail) with SMTP id _____8Ax++ixNtdlODMQAA--.22333S3;
+	Thu, 22 Feb 2024 19:57:37 +0800 (CST)
+Received: from [10.20.42.173] (unknown [10.20.42.173])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8BxXs2sNtdlncg+AA--.28783S3;
+	Thu, 22 Feb 2024 19:57:35 +0800 (CST)
+Subject: Re: [PATCH for-6.8 v4 1/3] LoongArch: KVM: Fix input validation of
+ _kvm_get_cpucfg and kvm_check_cpucfg
+To: WANG Xuerui <kernel@xen0n.name>, Paolo Bonzini <pbonzini@redhat.com>,
+ Huacai Chen <chenhuacai@kernel.org>
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, kvm@vger.kernel.org,
+ loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
+ WANG Xuerui <git@xen0n.name>
+References: <20240222105109.2042732-1-kernel@xen0n.name>
+ <20240222105109.2042732-2-kernel@xen0n.name>
+From: maobibo <maobibo@loongson.cn>
+Message-ID: <e9bccf86-2ae0-64f1-7236-27278bf36c2e@loongson.cn>
+Date: Thu, 22 Feb 2024 19:57:38 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/AedWDBZ0=V+nKK0DvBL+JL8";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+In-Reply-To: <20240222105109.2042732-2-kernel@xen0n.name>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8BxXs2sNtdlncg+AA--.28783S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoWxXFWxAF4fCFyrJw13JF4DJrc_yoW5AF1fpF
+	43WF43XFW8Kr1xZasaq34DGw15urW8KrZ7ZFnYkasYvr47Jr4UGr48KFZaqryfC393Jr48
+	XF4UXa1akan0yacCm3ZEXasCq-sJn29KB7ZKAUJUUUU5529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUvab4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx
+	1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv
+	67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07
+	AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02
+	F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GF
+	ylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7Cj
+	xVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26F
+	4j6r4UJwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU
+	cVc_UUUUU
 
---Sig_/AedWDBZ0=V+nKK0DvBL+JL8
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
 
-Hi Joey,
 
-On Thu, 22 Feb 2024 11:11:29 +0000 Joey Gouly <joey.gouly@arm.com> wrote:
->
-> On Thu, Feb 22, 2024 at 10:03:49PM +1100, Stephen Rothwell wrote:
-> >=20
-> > After merging the kvm tree, today's linux-next build (arm64 defconfig)
-> > failed like this:
-> >=20
-> > In file included from <command-line>:
-> > In function 'check_res_bits',
-> >     inlined from 'kvm_sys_reg_table_init' at arch/arm64/kvm/sys_regs.c:=
-4109:2:
-> > include/linux/compiler_types.h:449:45: error: call to '__compiletime_as=
-sert_591' declared with attribute error: BUILD_BUG_ON failed: ID_AA64DFR1_E=
-L1_RES0 !=3D (GENMASK_ULL(63, 0))
-> >   449 |         _compiletime_assert(condition, msg, __compiletime_asser=
-t_, __COUNTER__)
-> >       |                                             ^
-> > include/linux/compiler_types.h:430:25: note: in definition of macro '__=
-compiletime_assert'
-> >   430 |                         prefix ## suffix();                    =
-         \
-> >       |                         ^~~~~~
-> > include/linux/compiler_types.h:449:9: note: in expansion of macro '_com=
-piletime_assert'
-> >   449 |         _compiletime_assert(condition, msg, __compiletime_asser=
-t_, __COUNTER__)
-> >       |         ^~~~~~~~~~~~~~~~~~~
-> > include/linux/build_bug.h:39:37: note: in expansion of macro 'compileti=
-me_assert'
-> >    39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond),=
- msg)
-> >       |                                     ^~~~~~~~~~~~~~~~~~
-> > include/linux/build_bug.h:50:9: note: in expansion of macro 'BUILD_BUG_=
-ON_MSG'
-> >    50 |         BUILD_BUG_ON_MSG(condition, "BUILD_BUG_ON failed: " #co=
-ndition)
-> >       |         ^~~~~~~~~~~~~~~~
-> > arch/arm64/kvm/check-res-bits.h:58:9: note: in expansion of macro 'BUIL=
-D_BUG_ON'
-> >    58 |         BUILD_BUG_ON(ID_AA64DFR1_EL1_RES0       !=3D (GENMASK_U=
-LL(63, 0)));
-> >       |         ^~~~~~~~~~~~
-> >=20
-> > I bisected this to the merge of the kvm-arm tree into linux-next but I
-> > could not figure out why it fails :-(
-> >=20
-> > --=20
-> > Cheers,
-> > Stephen Rothwell =20
->=20
-> This fails because https://git.kernel.org/pub/scm/linux/kernel/git/arm64/=
-linux.git/commit/?id=3Dfdd867fe9b32
-> added new fields to that register (ID_AA64DFR1_EL1)
->=20
-> and commit b80b701d5a6 ("KVM: arm64: Snapshot all non-zero RES0/RES1 sysr=
-eg fields for later checking")
-> took a snapshot of the fields, so the RES0 (reserved 0) bits don't match =
-anymore.
->=20
-> Not sure how to resolve it in the git branches though.
+On 2024/2/22 下午6:51, WANG Xuerui wrote:
+> From: WANG Xuerui <git@xen0n.name>
+> 
+> The range check for the CPUCFG ID is wrong (should have been a ||
+> instead of &&) and useless in effect, so fix the obvious mistake.
+> 
+> Furthermore, the juggling of the temp return value is unnecessary,
+> because it is semantically equivalent and more readable to just
+> return at every switch case's end. This is done too to avoid potential
+> bugs in the future related to the unwanted complexity.
+> 
+> Also, the return value of _kvm_get_cpucfg is meant to be checked, but
+> this was not done, so bad CPUCFG IDs wrongly fall back to the default
+> case and 0 is incorrectly returned; check the return value to fix the
+> UAPI behavior.
+> 
+> While at it, also remove the redundant range check in kvm_check_cpucfg,
+> because out-of-range CPUCFG IDs are already rejected by the -EINVAL
+> as returned by _kvm_get_cpucfg.
+> 
+> Fixes: db1ecca22edf ("LoongArch: KVM: Add LSX (128bit SIMD) support")
+> Fixes: 118e10cd893d ("LoongArch: KVM: Add LASX (256bit SIMD) support")
+> Signed-off-by: WANG Xuerui <git@xen0n.name>
+> ---
+>   arch/loongarch/kvm/vcpu.c | 35 ++++++++++++++++++-----------------
+>   1 file changed, 18 insertions(+), 17 deletions(-)
+> 
+> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+> index 27701991886d..7fd32de6656b 100644
+> --- a/arch/loongarch/kvm/vcpu.c
+> +++ b/arch/loongarch/kvm/vcpu.c
+> @@ -300,9 +300,7 @@ static int _kvm_setcsr(struct kvm_vcpu *vcpu, unsigned int id, u64 val)
+>   
+>   static int _kvm_get_cpucfg(int id, u64 *v)
+>   {
+> -	int ret = 0;
+> -
+> -	if (id < 0 && id >= KVM_MAX_CPUCFG_REGS)
+> +	if (id < 0 || id >= KVM_MAX_CPUCFG_REGS)
+>   		return -EINVAL;
+>   
+>   	switch (id) {
+> @@ -324,32 +322,35 @@ static int _kvm_get_cpucfg(int id, u64 *v)
+>   		if (cpu_has_lasx)
+>   			*v |= CPUCFG2_LASX;
+>   
+> -		break;
+> +		return 0;
+>   	default:
+> -		ret = -EINVAL;
+> -		break;
+> +		/*
+> +		 * No restrictions on other valid CPUCFG IDs' values, but
+> +		 * CPUCFG data is limited to 32 bits as the LoongArch ISA
+> +		 * manual says (Volume 1, Section 2.2.10.5 "CPUCFG").
+> +		 */
+> +		*v = U32_MAX;
+> +		return 0;
+>   	}
+> -	return ret;
+>   }
+>   
+>   static int kvm_check_cpucfg(int id, u64 val)
+>   {
+> -	u64 mask;
+> -	int ret = 0;
+> -
+> -	if (id < 0 && id >= KVM_MAX_CPUCFG_REGS)
+> -		return -EINVAL;
+> +	u64 mask = 0;
+> +	int ret;
+>   
+> -	if (_kvm_get_cpucfg(id, &mask))
+> +	ret = _kvm_get_cpucfg(id, &mask);
+> +	if (ret)
+>   		return ret;
+>   
+> +	if (val & ~mask)
+> +		/* Unsupported features and/or the higher 32 bits should not be set */
+> +		return -EINVAL;
+> +
+>   	switch (id) {
+>   	case 2:
+>   		/* CPUCFG2 features checking */
+> -		if (val & ~mask)
+> -			/* The unsupported features should not be set */
+> -			ret = -EINVAL;
+> -		else if (!(val & CPUCFG2_LLFTP))
+> +		if (!(val & CPUCFG2_LLFTP))
+>   			/* The LLFTP must be set, as guest must has a constant timer */
+>   			ret = -EINVAL;
+>   		else if ((val & CPUCFG2_FP) && (!(val & CPUCFG2_FPSP) || !(val & CPUCFG2_FPDP)))
+> 
 
-Thanks.  I will apply this patch to the merge of the kvm-arm tree from
-tomorrow (and at the end of today's tree).
+Thanks for your contributions -:)
 
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-Date: Thu, 22 Feb 2024 22:31:22 +1100
-Subject: [PATCH] fix up for "arm64/sysreg: Add register fields for ID_AA64D=
-FR1_EL1"
+Reviewed-by: Bibo Mao <maobibo@loongson.cn>
 
-interacting with "KVM: arm64: Snapshot all non-zero RES0/RES1 sysreg fields=
- for later checking"
-
-Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
----
- arch/arm64/kvm/check-res-bits.h | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/arch/arm64/kvm/check-res-bits.h b/arch/arm64/kvm/check-res-bit=
-s.h
-index 967b5d171d53..39f537875d17 100644
---- a/arch/arm64/kvm/check-res-bits.h
-+++ b/arch/arm64/kvm/check-res-bits.h
-@@ -55,7 +55,6 @@ static inline void check_res_bits(void)
- 	BUILD_BUG_ON(ID_AA64SMFR0_EL1_RES0	!=3D (GENMASK_ULL(62, 61) | GENMASK_UL=
-L(51, 49) | GENMASK_ULL(31, 31) | GENMASK_ULL(27, 0)));
- 	BUILD_BUG_ON(ID_AA64FPFR0_EL1_RES0	!=3D (GENMASK_ULL(63, 32) | GENMASK_UL=
-L(27, 2)));
- 	BUILD_BUG_ON(ID_AA64DFR0_EL1_RES0	!=3D (GENMASK_ULL(27, 24) | GENMASK_ULL=
-(19, 16)));
--	BUILD_BUG_ON(ID_AA64DFR1_EL1_RES0	!=3D (GENMASK_ULL(63, 0)));
- 	BUILD_BUG_ON(ID_AA64AFR0_EL1_RES0	!=3D (GENMASK_ULL(63, 32)));
- 	BUILD_BUG_ON(ID_AA64AFR1_EL1_RES0	!=3D (GENMASK_ULL(63, 0)));
- 	BUILD_BUG_ON(ID_AA64ISAR0_EL1_RES0	!=3D (GENMASK_ULL(3, 0)));
---=20
-2.43.0
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/AedWDBZ0=V+nKK0DvBL+JL8
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmXXMrkACgkQAVBC80lX
-0Gyb6wf/Y/9NIHRf5ckuf73aWrvP2Z3vSOrtciYwk1j77ut8ISRM9gkpZkYpk3IN
-dLyNfXMpuRZHXMfD0xT7KzdV8bgtAjP2IwOLqQdTbwxnDOvILVSUzfdeTKninGKf
-Tor1rMYB55PJxqu3yO1ToCl2wSXLWbari6DbZIA9K6NhSBrA6r0djmqK5pS2cChr
-VUkI3cN4PH9P+oZE6lw4+WphtrXDmUIUjfUHtbVT6VQE7E7qLQX1oqJsMkfJPCaG
-Bg0Zu/9KA6tDDwBoI5XU5U+OvpBOC9r+o9jX/AKAKmrm8DGpQc0Sw1zsDPwTumvK
-53Pi7MPtAz4t05LzcNWdr7gYcCTkkw==
-=aSyV
------END PGP SIGNATURE-----
-
---Sig_/AedWDBZ0=V+nKK0DvBL+JL8--
 
