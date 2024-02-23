@@ -1,107 +1,122 @@
-Return-Path: <kvm+bounces-9471-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9472-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D23E86085D
-	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 02:39:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58A3F860861
+	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 02:39:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23F16285B67
-	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 01:39:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4B86285BAE
+	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 01:39:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F015C12E5C;
-	Fri, 23 Feb 2024 01:36:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04E3B1643E;
+	Fri, 23 Feb 2024 01:37:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mMoszKoS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GaX+A1cq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEAC31426C
-	for <kvm@vger.kernel.org>; Fri, 23 Feb 2024 01:36:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB25E168B9
+	for <kvm@vger.kernel.org>; Fri, 23 Feb 2024 01:37:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708652215; cv=none; b=OjMhTr8bWK8BMDJlegWlygtCoIj2xgCkY7XB9iO8No9vt9K8jr6hMuGZSjpApY4YFXzcG0UfcGNdIXN33WrFgWqJaukRfWO/O4QKoshiq1HIdP+G6vLvQAIywxtu8zcbajkPrQi3KKoiUe3wLzg9rnaLyqrMD94qdcUqkuVDDwg=
+	t=1708652222; cv=none; b=hk/eV2LZTC3/eIzdKmrcj9ROKyv4Tv6xLZcnqZ4tyGhkYhRChVUlnea7mq3fkv7TF9yCjxf4VZmFRIGqpk8IdmuwNGfgp8sz1edOI8pV4y88YvHY/SL37lagywijRy2EyzPt4EgNP8a/fGo5Co266SlKbf8ReY+xq4pJhXIInx0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708652215; c=relaxed/simple;
-	bh=fI3ejT6Y2Z8uFS5y83UfDEJ92PnySLL/joA3XMKsaaI=;
+	s=arc-20240116; t=1708652222; c=relaxed/simple;
+	bh=VXpwlfK71J4KbEEFIeZ7tUQyBMbEOHN9OdsL7t/D7hk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=mOAfNV0NOj5tkX5sRn4VH8z9jeiUZT4sLHqS6nVg//ZrB0he6myGFF43CFdPwghq63JBfvTQ0R2Xj/EKZJQPqtqOWLScHfAlFpb7McXkF2hwgQ2HR46IqjNeAlkb6aC7FWrG0gB9oeebqvk8auwBsFfcARpS/BYh5CGuzC9r09w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mMoszKoS; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=uWDYUfjF/OOpmtjlxSwS+fhVSzjTCTCEB4trzuhR1ew7FCPPpXCOKUTvGlUD7qNg3XXVJAPMK/5u9xa3DaJTQF4/5ILAEsDkfpdlptTRdvwLWiTRyB7+ZxXHCWTSEfjkuyRhpJnAYZS0plD2RrIR+Hal9aw4TB2IqWgbHYJhP2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GaX+A1cq; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5dcbb769a71so315931a12.3
-        for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 17:36:53 -0800 (PST)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc6dbdcfd39so557197276.2
+        for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 17:37:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708652213; x=1709257013; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1708652220; x=1709257020; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LislQMo+ty6pik6/y36wdyvKCsWJplgKdipRzrWuMSw=;
-        b=mMoszKoSnwz3CuPc0dth9LHEDisi3RhwUk8o0B7zUKW1HreDHp/+jfZ5bb6CMvyC6X
-         Vge7/gq3q1ghOLeFQneJ6/yMiTt7pOBSg54tmMIIrDoWFeDJry1qkebtx4Ibfs5VAbzQ
-         V12n5uwsuBr2IwLgX46GSrt0a74M8rxloj0/oup8KLaxRW4J8S5pCQFwYq0UJfhomFfd
-         LLsR+HO07qmJAvIaT3he6nAmtkDU67IQloEW+PkzG8msBusZmiHaIHxxtAZaUHsPSVZ+
-         g7QHY/Eo+Tvl04cxKrVv1PIyxDEsx007oP7/royA7CEC1iVDmat9NII5CHwqFXPWeAKq
-         mjZg==
+        bh=g+GUOl5V+17CoJouuTsco7mvhC5Ywx7x7NMBcMgxpQI=;
+        b=GaX+A1cqEB/8VOjHGr4AHtPllv2dxCv5jCm957uGDtKL1T3Ka0Ypfcr4uk2L+GIjwT
+         5JHEVmTzjA7WuwphheJVCv+5MtljthjXv5dCkE2d6C78d5Whln54ELHes2zO6+kKRf+9
+         k3WyUYWrEtt/+khNw/Gg8zAMGBDQmL3G1X809d88NxD/rVwgyH4vD58Vgz/J5bkw77fs
+         h+Z9amKp2mqP9UnjTZ7BYXWuTOMOBMyLL8Hjs49ipV3iFlzMM1ojTZP7y4B8R8X08usm
+         xHX/aZvz+MUaRfdwDpGZNVhpTg8/M2WQlK69JIMDvaJI8eGjwpeZ7sf4TW5AT3REODIU
+         GAPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708652213; x=1709257013;
+        d=1e100.net; s=20230601; t=1708652220; x=1709257020;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LislQMo+ty6pik6/y36wdyvKCsWJplgKdipRzrWuMSw=;
-        b=D8D+Wet/sGzXRBVUtZ6AR7CubqppBRUiA1bgqeadfPQDPVNDG4VOeNkReqcVwtKapZ
-         0UwPZe6OJuLeVXE3HZcAGgFJHp5eBuqnd9Reo6wWq0tXzcpyEjgoQEXF7LbmSERMkxlN
-         rSqWIjBUFZLHmgsVMFb2WboPJj2ZLZ58+XoN8TR1D5h9PJfianhdzZicYP6AbLbA1KQ5
-         PPQ+bdv4+4BDcgrbliBx784DxVbzJYWZBnl68RAaJvjekdsxbayu4EpfuiyRrb8xOirr
-         yCUDMOKP6Ly5A7ikNGGLjOsgjbH90YMcKIKuGEAF2AmZTDRVCpeVEgJNc5mNrlmG1fDf
-         nHfg==
-X-Gm-Message-State: AOJu0Yx3IEbZEcPnq9Nzf7m1sISDodB/1ZNqUCjxXhNTECOqRFO1F8NC
-	1FKG1iiNNdV2VG+pCoYUZIJC9gOmIIZdDgsOsqHrMMISplutRUWZvE497nCJLpZEON50XYzvMVo
-	Whw==
-X-Google-Smtp-Source: AGHT+IEV4yYhuTiaX0bKMSzbKg9NeAK+kXUk9I8iM0XFxl1GMCmm4rxR7Pi7eAb62VnuUo7MIb3Dx4Dp+TY=
+        bh=g+GUOl5V+17CoJouuTsco7mvhC5Ywx7x7NMBcMgxpQI=;
+        b=dghkYtrtbUECEob/L9Co1HvLozWUCn0o9kPiWtv4Lad4ebyv3XlWfkLzEowXpuQI8Q
+         HQfHpd2UTU+11I/3kpL2NSp42z0UTQHsqxWZWDQh29tdcXLcmLqQ0XQA/EsPWBDFr33G
+         MGM7v8DiFE9+EOL/lkoUcLDMU2Qgmvy4gQtc98qYrqeofrLe3ovm93nwmfXNG2ajxHsI
+         u76f0ZMFuScCekMAMzbHQ3K2VuHy7P8Wd5sfrAfenBjbbUFabX7ReTpgCyWWyHvzIZw1
+         70BYb5gK9g8J25X4LIpGfIGMCare3zwYZJQEeJ37JNrTxbwmN3tLkDFwlQpsOXw/m5wQ
+         G1sA==
+X-Gm-Message-State: AOJu0Yzv7ekEgqiz623kAf45lTXl/HPPIKAN4tPczWKKTTUzAsTT3RAC
+	olXabvolCgMHspHBrvp0F6VdTOAokziutCWiiGPOq5dM1WOs7RKO6GG2Hj2+BsKtC1DnXFV2F0o
+	q1w==
+X-Google-Smtp-Source: AGHT+IE6j9Q8ldQJogtuiWU9nF0CUi0jjFOCBiv1P76aQruSkWj7RbwizXHz4RiGug8hb8qauQu2sf4lRzc=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a02:996:b0:5dc:8f83:ca2e with SMTP id
- cl22-20020a056a02099600b005dc8f83ca2emr1444pgb.0.1708652213216; Thu, 22 Feb
- 2024 17:36:53 -0800 (PST)
-Date: Thu, 22 Feb 2024 17:35:50 -0800
-In-Reply-To: <20240218043003.2424683-1-dapeng1.mi@linux.intel.com>
+ (user=seanjc job=sendgmr) by 2002:a25:b120:0:b0:dc2:466a:23c4 with SMTP id
+ g32-20020a25b120000000b00dc2466a23c4mr219620ybj.4.1708652219843; Thu, 22 Feb
+ 2024 17:36:59 -0800 (PST)
+Date: Thu, 22 Feb 2024 17:35:52 -0800
+In-Reply-To: <20240110002340.485595-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240218043003.2424683-1-dapeng1.mi@linux.intel.com>
+References: <20240110002340.485595-1-seanjc@google.com>
 X-Mailer: git-send-email 2.44.0.rc0.258.g7320e95886-goog
-Message-ID: <170853139870.2603264.8863273316877757640.b4-ty@google.com>
-Subject: Re: [Patch v2] KVM: selftests: Test top-down slots event
+Message-ID: <170864656017.3080257.14048100709856204250.b4-ty@google.com>
+Subject: Re: [PATCH] x86/cpu: Add a VMX flag to enumerate 5-level EPT support
+ to userspace
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Dapeng Mi <dapeng1.mi@linux.intel.com>
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Kan Liang <kan.liang@linux.intel.com>, Jim Mattson <jmattson@google.com>, 
-	Jinrong Liang <cloudliang@tencent.com>, Aaron Lewis <aaronlewis@google.com>, 
-	Dapeng Mi <dapeng1.mi@intel.com>
+	Yi Lai <yi1.lai@intel.com>, Tao Su <tao1.su@linux.intel.com>, 
+	Xudong Hao <xudong.hao@intel.com>
 Content-Type: text/plain; charset="utf-8"
 
-On Sun, 18 Feb 2024 12:30:03 +0800, Dapeng Mi wrote:
-> Although the fixed counter 3 and its exclusive pseudo slots event are
-> not supported by KVM yet, the architectural slots event is supported by
-> KVM and can be programed on any GP counter. Thus add validation for this
-> architectural slots event.
+On Tue, 09 Jan 2024 16:23:40 -0800, Sean Christopherson wrote:
+> Add a VMX flag in /proc/cpuinfo, ept_5level, so that userspace can query
+> whether or not the CPU supports 5-level EPT paging.  EPT capabilities are
+> enumerated via MSR, i.e. aren't accessible to userspace without help from
+> the kernel, and knowing whether or not 5-level EPT is supported is sadly
+> necessary for userspace to correctly configure KVM VMs.
 > 
-> Top-down slots event "counts the total number of available slots for an
-> unhalted logical processor, and increments by machine-width of the
-> narrowest pipeline as employed by the Top-down Microarchitecture
-> Analysis method."
+> When EPT is enabled, bits 51:49 of guest physical addresses are consumed
+> if and only if 5-level EPT is enabled.  For CPUs with MAXPHYADDR > 48, KVM
+> *can't* map all legal guest memory if 5-level EPT is unsupported, e.g.
+> creating a VM with RAM (or anything that gets stuffed into KVM's memslots)
+> above bit 48 will be completely broken.
 > 
 > [...]
 
-Applied to kvm-x86 pmu, with a very slight tweak to the shortlog.  Thanks
-a ton for the verbose changelog!
+Applied to kvm-x86 vmx, with a massaged changelog to avoid presenting this as a
+bug fix (and finally fixed the 51:49=>51:48 goof):
 
-[1/1] KVM: selftests: Test top-down slots event in x86's pmu_counters_test
-      https://github.com/kvm-x86/linux/commit/4a447b135e45
+    Add a VMX flag in /proc/cpuinfo, ept_5level, so that userspace can query
+    whether or not the CPU supports 5-level EPT paging.  EPT capabilities are
+    enumerated via MSR, i.e. aren't accessible to userspace without help from
+    the kernel, and knowing whether or not 5-level EPT is supported is useful
+    for debug, triage, testing, etc.
+    
+    For example, when EPT is enabled, bits 51:48 of guest physical addresses
+    are consumed by the CPU if and only if 5-level EPT is enabled.  For CPUs
+    with MAXPHYADDR > 48, KVM *can't* map all legal guest memory if 5-level
+    EPT is unsupported, making it more or less necessary to know whether or
+    not 5-level EPT is supported.
+
+[1/1] x86/cpu: Add a VMX flag to enumerate 5-level EPT support to userspace
+      https://github.com/kvm-x86/linux/commit/b1a3c366cbc7
 
 --
 https://github.com/kvm-x86/linux/tree/next
