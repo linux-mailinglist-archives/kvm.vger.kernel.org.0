@@ -1,93 +1,141 @@
-Return-Path: <kvm+bounces-9566-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9567-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F2FA861B5D
-	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 19:17:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09730861BCA
+	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 19:34:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0813428617E
-	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 18:17:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36D241C21F0C
+	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 18:34:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39B9D1448D6;
-	Fri, 23 Feb 2024 18:15:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46D671448EC;
+	Fri, 23 Feb 2024 18:34:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4K/GDrfG"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="SM1IU5a4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ADFF4C8C
-	for <kvm@vger.kernel.org>; Fri, 23 Feb 2024 18:15:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86DB4101DE;
+	Fri, 23 Feb 2024 18:33:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708712151; cv=none; b=rslN0htKspvzhOXmzXrMX8PJUOT+iZMZRL7XD39eDVp9AhaGhJeUSz7N70gnqVn/lnsU4VlxeeimGFP3GP70udB2T5oONdrYCLG9nkCOpPB7xdc9vH0nLFnKTufKfg2Iq6NcZRam7JbKW725OhGwyeBLe0x4txFQ/huo11jrhfQ=
+	t=1708713241; cv=none; b=L+a1ixt46PE1vFVncdz3W3G3T76RRan8AraljVk6FRQYyAxdD06ElLefZIXwxdwuMlG9aPxk/MNMVvDg3PSSZXGg15EnZGFnSUFi34rQYqMVB4Vw8zhKITXA+mHEaQiL3G7ZjVHAR3DzHbUO7CcK9IGsteUKrESiuduQGDBDeqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708712151; c=relaxed/simple;
-	bh=TmOB000kb/6C0zV1Tjn3FDWwgSTMgtlcQPywExWS40Y=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ab3Gew2sOfvbmOz+0cEWUQhOXTrRmCxQMiGYCL0gwUjXAYbMb/EnPjVIWm0DUugeLUbXIti6FPIeL0F5JNgY8nCF24S/TIKrhjwJP17XpHN4tmkq6CpZUVXj+WtiFBwGJLaXvpB3SkaKWRLw1AUcKPZlVzWQn4rp90TpocKuZYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4K/GDrfG; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6e476b2010cso700503b3a.2
-        for <kvm@vger.kernel.org>; Fri, 23 Feb 2024 10:15:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708712149; x=1709316949; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gofRIUedDT/xKc1ubX52tMH/cpYoaQz6NlKbBcrt6+o=;
-        b=4K/GDrfGXSy3PX2UnKUkv4g9jMc3Yw3IHr/gytYLl0sLA/v0UVdlaPNKJcXFMFaOrT
-         gARteDaNNhtoizZfN+Vf16rGmlFMoOTjnIelZ5Vjb/6cQBhlwNuBD48kB7Pv5ATIY/Nj
-         hfOIz3ZUxNt7I46Rqhp+IjSSGxVf80YZoMcoV30SPK9OD8azaco7cFPg8BNKE7DBdVdV
-         Ngef8Gm6GZy2lCqFWQU0pPcezitPPVHXWoPG8CwCjsDi+Ll8bj//BsG2t14P2zdUGgRI
-         upxJ8TK+X6HlVG2fvinx4o7QAkOzqHFNAQ4ftxxMWW2gI8CkhVoAGV3niV1oqJc3AFS8
-         JFDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708712149; x=1709316949;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gofRIUedDT/xKc1ubX52tMH/cpYoaQz6NlKbBcrt6+o=;
-        b=rksp+dN0cBOIoYUi0/3qgKvlzKn5u+ftoZg298p6yfR2t0E7/PBg6mZH1i3x0Y0KKP
-         g+ePehaqzRnbVWuEraKhSWApyxDOixzgkZFEyHMDzqA1/eBBKpfF08qqUdh8+5PPKasp
-         ifmyfxVTyxLWdiqhKrPJJsO3a2FzAxBZ65Q/u4stkYAONR39Ygt6mf+P5rhTg2+3uK7t
-         SnEnumhyynwHT8AU1Qh96fHdhQzhcLyfvVqIaSuIqoY+ZX8CqX67Iq27jovlgx3onIGh
-         v5E0PVO5kV+qINoQwujnIIpj7zjlCWRi/sEut0XaNSnwcdbJT6hmALo3POE0no4uhZ61
-         S7Vw==
-X-Forwarded-Encrypted: i=1; AJvYcCWR9Dbl27Usc8vEUVjEwB1UOkZ3Uco8ZCc3aYHJ4yPbn6Aq9tRV/U4srzcw4JXA2ffmo03NidQqQkG13GfONNB4Sq0/
-X-Gm-Message-State: AOJu0YzDlIzr4PQRfuH3z/11ah4PPYrFk/usDepk/3QVA3ANugqCmaHQ
-	H4b/LOWHuPlo2vLmeUT0KlixxoxZLEtIgbyz1HNMqlcZXwNSjKhJ45L2LGfJmff3RgWBK8c/YYP
-	RaA==
-X-Google-Smtp-Source: AGHT+IHA5qGOajgwwELgeACPaUAO9bYXI+j7cFhw6n4sGKQCPsx0kAV3xwWYpcshRjU31slvpCwO6XmpndI=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:9298:b0:6e4:67cf:fa03 with SMTP id
- jw24-20020a056a00929800b006e467cffa03mr42271pfb.4.1708712149448; Fri, 23 Feb
- 2024 10:15:49 -0800 (PST)
-Date: Fri, 23 Feb 2024 10:15:47 -0800
-In-Reply-To: <ZdgoYcteDOxazzWG@yzhao56-desk.sh.intel.com>
+	s=arc-20240116; t=1708713241; c=relaxed/simple;
+	bh=W16s7HsLRKeMogf+4P40NdsqJiCC7rUspv0L6Ekrt7w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=rl541vZPu4amQbSs75HuxToTVKYCMZbOcDJYuNHjxS3XEkAdVhQQOSPdYtx9dD3siUhliA4nZdULOlRQVDOij0Xw7GNPuhpcG8ploTi6VEoXeUf4TecdQsHDnuX4e6YfC6Bmxd7A11QAEEx+O/M9mRi+/s4AItagHNUg0Oc8zRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=SM1IU5a4; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41NEnafk007025;
+	Fri, 23 Feb 2024 18:30:50 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=Kfo/C8zqynWW3khr9w38fLA/juhM//M+1TSK7YbUzao=; b=SM
+	1IU5a4CNIWLmOnc+jXipb4Ga9eIJLWms0rnPxEXMwHDSoxe92W9Ew+cz2UneOT08
+	Iyi2XyxnbZDa1t3nXppWD2gBv5baFGSu5jpaJXHu6vAsxhujSo74jXQc1qhtrkyj
+	b1JYz/cxWMolVJrmsIH4767eZriXHsfPc1ASRZIKs+Vh4MImjLRwoZRf+c04IWja
+	WREgwfvGpnGGa1IxPu7qJXJNToVvZY2M73nvMYmrwiDnSM6QuEXhaYYJoUiQlYDP
+	AVkDtm/36vZFGTWQ5CsU0kJMULpTBDkWBl74wMVr5RZuQ0KaRJ0q/8gb9Xik4nP2
+	o7j3uPWaxue4GCbloFJw==
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3we3233ydp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 23 Feb 2024 18:30:49 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 41NIUm69006076
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 23 Feb 2024 18:30:48 GMT
+Received: from [10.110.104.142] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Fri, 23 Feb
+ 2024 10:30:46 -0800
+Message-ID: <0aed6cf2-17ae-45aa-b7ff-03da932ea4e0@quicinc.com>
+Date: Fri, 23 Feb 2024 10:30:45 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240222012640.2820927-1-seanjc@google.com> <ZdgoYcteDOxazzWG@yzhao56-desk.sh.intel.com>
-Message-ID: <Zdjg06QE14w2YDnf@google.com>
-Subject: Re: [PATCH v5] KVM: x86/mmu: Retry fault before acquiring mmu_lock if
- mapping is changing
-From: Sean Christopherson <seanjc@google.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Friedrich Weber <f.weber@proxmox.com>, Kai Huang <kai.huang@intel.com>, 
-	Yuan Yao <yuan.yao@linux.intel.com>, Xu Yilun <yilun.xu@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [FYI][PATCH] tracing/treewide: Remove second parameter of
+ __assign_str()
+Content-Language: en-US
+To: Steven Rostedt <rostedt@goodmis.org>, LKML <linux-kernel@vger.kernel.org>,
+        Linux Trace Kernel <linux-trace-kernel@vger.kernel.org>
+CC: Masami Hiramatsu <mhiramat@kernel.org>,
+        Mathieu Desnoyers
+	<mathieu.desnoyers@efficios.com>,
+        Linus Torvalds
+	<torvalds@linux-foundation.org>,
+        <linuxppc-dev@lists.ozlabs.org>, <kvm@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-cxl@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
+        <amd-gfx@lists.freedesktop.org>, <intel-gfx@lists.freedesktop.org>,
+        <intel-xe@lists.freedesktop.org>, <linux-arm-msm@vger.kernel.org>,
+        <freedreno@lists.freedesktop.org>, <virtualization@lists.linux.dev>,
+        <linux-rdma@vger.kernel.org>, <linux-pm@vger.kernel.org>,
+        <iommu@lists.linux.dev>, <linux-tegra@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-hyperv@vger.kernel.org>,
+        <ath10k@lists.infradead.org>, <linux-wireless@vger.kernel.org>,
+        <ath11k@lists.infradead.org>, <ath12k@lists.infradead.org>,
+        <brcm80211@lists.linux.dev>, <brcm80211-dev-list.pdl@broadcom.com>,
+        <linux-usb@vger.kernel.org>, <linux-bcachefs@vger.kernel.org>,
+        <linux-nfs@vger.kernel.org>, <ocfs2-devel@lists.linux.dev>,
+        <linux-cifs@vger.kernel.org>, <linux-xfs@vger.kernel.org>,
+        <linux-edac@vger.kernel.org>, <selinux@vger.kernel.org>,
+        <linux-btrfs@vger.kernel.org>, <linux-erofs@lists.ozlabs.org>,
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        <linux-hwmon@vger.kernel.org>, <io-uring@vger.kernel.org>,
+        <linux-sound@vger.kernel.org>, <bpf@vger.kernel.org>,
+        <linux-wpan@vger.kernel.org>, <dev@openvswitch.org>,
+        <linux-s390@vger.kernel.org>, <tipc-discussion@lists.sourceforge.net>,
+        Julia
+ Lawall <Julia.Lawall@inria.fr>
+References: <20240223125634.2888c973@gandalf.local.home>
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+In-Reply-To: <20240223125634.2888c973@gandalf.local.home>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: wCcVNA_rPgQQt00obewLDHJucphy8QWk
+X-Proofpoint-GUID: wCcVNA_rPgQQt00obewLDHJucphy8QWk
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-23_04,2024-02-23_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 bulkscore=0
+ impostorscore=0 priorityscore=1501 mlxscore=0 lowpriorityscore=0
+ clxscore=1011 suspectscore=0 malwarescore=0 mlxlogscore=793 adultscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2402120000 definitions=main-2402230136
 
-On Fri, Feb 23, 2024, Yan Zhao wrote:
-> Reviewed-by: Yan Zhao <yan.y.zhao@intel.com>
+On 2/23/2024 9:56 AM, Steven Rostedt wrote:
+> From: "Steven Rostedt (Google)" <rostedt@goodmis.org>
+> 
+> [
+>    This is a treewide change. I will likely re-create this patch again in
+>    the second week of the merge window of v6.9 and submit it then. Hoping
+>    to keep the conflicts that it will cause to a minimum.
+> ]
+> 
+> With the rework of how the __string() handles dynamic strings where it
+> saves off the source string in field in the helper structure[1], the
+> assignment of that value to the trace event field is stored in the helper
+> value and does not need to be passed in again.
 
-Squashed, new hash below.  Thanks!
-
-[1/1] KVM: x86/mmu: Retry fault before acquiring mmu_lock if mapping is changing
-      https://github.com/kvm-x86/linux/commit/d02c357e5bfa
+Just curious if this could be done piecemeal by first changing the
+macros to be variadic macros which allows you to ignore the extra
+argument. The callers could then be modified in their separate trees.
+And then once all the callers have be merged, the macros could be
+changed to no longer be variadic.
 
