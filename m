@@ -1,258 +1,167 @@
-Return-Path: <kvm+bounces-9549-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9550-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D773286185A
-	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 17:46:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67DFD861871
+	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 17:49:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C7BE283EC6
-	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 16:46:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CBD92848AD
+	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 16:49:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C4B81292D5;
-	Fri, 23 Feb 2024 16:46:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00874128815;
+	Fri, 23 Feb 2024 16:48:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="slKyzBlr"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bVBB2U3Z"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC36E22329
-	for <kvm@vger.kernel.org>; Fri, 23 Feb 2024 16:46:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 965DF12839B
+	for <kvm@vger.kernel.org>; Fri, 23 Feb 2024 16:48:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708706804; cv=none; b=CioXCicl3Ywkkrhs6sdTMDvbaFd4m2I/cGDsdZLYJsDNFtbrIFtjEEJbvwTzN28LxEKOJeSG5CB0L2rS5YNsfpOOh0qKqASIiuKWRBxtqzuS6Xv6Wn4IzzL5EBD7+HqYdaK+ZbmxTIqymQ2XLI8BUYu8zJD8fGcE2wFM6nVGwVs=
+	t=1708706929; cv=none; b=uZPh4a6fj//SNAhv8Wt8w+xy+Um9HCA5bz2oCK75nNAo0fDWw5mgAFBUTNUFncjKBjROuGAqPvPSU3iJZFXq0evWlF0tupCuymCCs39vMiXfi+H6t0kaQ/XyxEAQJg4QQ6c7XJY3i1PV7U6BZ7mkCYZc4bcREtYB3S0U5Fxqou0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708706804; c=relaxed/simple;
-	bh=UcvDafUh2QDdP5ODtPAmMXLmepE2Ecno7xfGvkqB9kI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=kWsIdED82vUzm6OEzj4wBJozCRSe7eU46htWb+6n+dvdvffFJeQjNML0P3F8GaMcDqs9mYKR2L3sXnTBNzkOmOQigoW6m1PMageE302cYEfzIF9Wu5jEiecUy4yh3vDh9eKzh3JxJ89RbsBS7nFUlYQVMksomE14H+eSDHs3boI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=slKyzBlr; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-608ab197437so17187447b3.1
-        for <kvm@vger.kernel.org>; Fri, 23 Feb 2024 08:46:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708706801; x=1709311601; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NDZLY+1R91be6hXCSYVgTQ61KoEqdDMYEkzpyOE6s74=;
-        b=slKyzBlr4+v7Ypr9+laD4EzDJngZ9dZhQBwNFeky4GMR/DEtDlrU70l6PSa47/711P
-         wdlxvaym8/hDLM3IlgN10LT3KXRdujTsrgO0bSUuFXjn0KDS+xHGwtBRP3SyqF6sHj+h
-         AA8BhD+JbdHAOd475bskI9ym9/pih6We6Dj8liP/iI2IwT5B3xfkOpF2JZoev4D0Xy+R
-         njlqguZyb9ZH5lhP92DEHdS5vUsAPQbvd5wGpq+DLr1PKjsy3w4Ue8L1jF8srCUB9io3
-         3J4RqgiVMxYRIf1cvfSSuQDp3KsTu/MwxGEb+/Bw8jA3ttZ6BHzsqA+F0CLQZ71vyUr8
-         Lmug==
+	s=arc-20240116; t=1708706929; c=relaxed/simple;
+	bh=NL6Poyql//ChqFYnAITXk/nlto//1JQfy0RIuysn5XY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RkBHw9wykEZ6csnXvQdC2qZJHytlWngzv9AUjF6iNDkg09JTZ6Ph1GDiXg1W2y/lXGRm/gFoO/lYM8j4W4Z95ZPmdLBl/l8n+3lscgq4v3oPLlGLOu8I/nZxMbocPKr9apCxqHI1Qq2eYWOv2JrKkzQ7l5bb8FiYsxOPJHD69jM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bVBB2U3Z; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1708706926;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lWTBT8l0r4+LfEgX4DGPyzuq25NZlKjkAYRK5GPaE0Y=;
+	b=bVBB2U3ZJcTcbYtXszi0oAmbH4VRoS0CkMQ1tdxfvyMxCJo7kvAcoKCBD0R4v5K7kUypQq
+	ojRfpwyO5StiL7hGcz+mqlHq+die8VNBqCtuFp/gV0o3Or42AKBwDGBfYg5l6xpcZCWolk
+	FZpD+S3Nd/TUwcsuQ7rWXgAV12YtS8w=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-402-hA2uSj0wNOqI9bZmWx_CoQ-1; Fri, 23 Feb 2024 11:48:45 -0500
+X-MC-Unique: hA2uSj0wNOqI9bZmWx_CoQ-1
+Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2d2654a942cso8107061fa.0
+        for <kvm@vger.kernel.org>; Fri, 23 Feb 2024 08:48:44 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708706801; x=1709311601;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NDZLY+1R91be6hXCSYVgTQ61KoEqdDMYEkzpyOE6s74=;
-        b=I5QMetXQ9FuTudn9us3nRVl9Pa+tG8f1DFo35QOzQNa2VBBSQSf0B24G2bQT6xTnLy
-         OxvHJwdkxEUgXJri2tnZ8bHPYl+QhgtXeUyCDh66tPmo1/l4hBfOLYC+mJjRaBwG14Ds
-         uKxVkwiWBwq4ofhQb55B1jJY6JMdUIhfVEGcG0CGboF9uS9JBFukHdV2FFUrvHnnDyNP
-         J5T+RIAo8UQZIcKIN0k3bGnz5qORBIHzwO1tZCAUQNGWIdTdaysuP3v59EYgotRLF1ER
-         JbGtq626vdIJpB6zgfKWEKv/5gPkBwqLjdNRXgM3l1ojEMUOcogKuYKJ6I82jd1WUKqP
-         T7gg==
-X-Forwarded-Encrypted: i=1; AJvYcCV+oNys51luFx+D6gfkMm635YgL4kWKRUrFuu5+RR1maOkQKU+OEpDlvMsJax6131FuS2134Imojmk7/mt6eyTTlmB3
-X-Gm-Message-State: AOJu0Yz0me5wiVAvGbUPuSzZeZHjKmCz1y9Jp7ewSe61knSU4vGzuhc0
-	PBQW/3X3FazLu3f861EauPJYrDvb3gyej8vUgnW8kVTXIHSzOnL2YBvBM5IgdGFC0DZQ4nGHJ1T
-	NZw==
-X-Google-Smtp-Source: AGHT+IHMhssa9VRUyAoJ+IUroeeIsCZaesVn8kPl1BvmvavzVCfKWZEmyKKDcXK+5cTrwrYcmNE2sWLeeFc=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a0d:d74d:0:b0:608:ba07:3093 with SMTP id
- z74-20020a0dd74d000000b00608ba073093mr79184ywd.1.1708706800867; Fri, 23 Feb
- 2024 08:46:40 -0800 (PST)
-Date: Fri, 23 Feb 2024 08:46:39 -0800
-In-Reply-To: <20240223104009.632194-8-pbonzini@redhat.com>
+        d=1e100.net; s=20230601; t=1708706903; x=1709311703;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lWTBT8l0r4+LfEgX4DGPyzuq25NZlKjkAYRK5GPaE0Y=;
+        b=LYwRgL9G2rtoFfCfHhh6fw+qSSyLb8zen+3/WcRV57/RruAt2WFW0/dxasVvUQzb63
+         Lvhz9omZbG1WuHozXOpZC4ES4GgG4LIDxeeQd7yIev51aFlrsjFnZx2rI9d+TQXnTRN3
+         0VPwzZozYylLaoyVT0rjfPKwU7LYzkmIMnXITkF46A1/gc2r3L2ln0LbNrpKYAL4Wj0b
+         bo8tGeQruxw2UygCP0c5UMkDU7kZXvRywJO57jeB2JzxTNBAOtaum+7iB0CZF+NolTWj
+         yZR+Cvljp2Owp5EYZCA7zfywm3sSMQ3Mp5XMpS263kDptZBlmbRtahxuvCk6nC9cqjnJ
+         THZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWFW1jLaJkanLURsuWolOxt1QNuoru6fgZtH0KZvTLFfSN9u9C6m4fIOslStab6+SJ7kHWRMz0AhflKGPNOMjQcRWfx
+X-Gm-Message-State: AOJu0YwUqw5gvlfKRu7St+AsewKg/n/nrzbZHFB24lWy+yaEhBsEx5oz
+	c551WNGTicIEbsVkKyxeS0TGnfWbMGwd2p4Z0gxjXuEEb6NrfWhh98adt1rCMsaNdQmfOgAOKsK
+	fOeT8lACuLcTWNwUA1Fhyh5gFV8SCv17Kk9x3pko+OQn2tPFSuc5H5THEIp2nDCbd5g2lmKDzsp
+	/GO0+Tah8WnEY5KdZI0893EvlMeyNMop/e
+X-Received: by 2002:a2e:97cf:0:b0:2d2:3b61:a2b with SMTP id m15-20020a2e97cf000000b002d23b610a2bmr240917ljj.11.1708706903115;
+        Fri, 23 Feb 2024 08:48:23 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF3L8Jq/Pr0xzR++9DOj5OHGNQPCSNmFwB1mlOHfr9+KdeJXsyxiieOyfL6BKk400aamUP6IrcyHDkdN1To+jY=
+X-Received: by 2002:a2e:97cf:0:b0:2d2:3b61:a2b with SMTP id
+ m15-20020a2e97cf000000b002d23b610a2bmr240905ljj.11.1708706902739; Fri, 23 Feb
+ 2024 08:48:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
 References: <20240223104009.632194-1-pbonzini@redhat.com> <20240223104009.632194-8-pbonzini@redhat.com>
-Message-ID: <ZdjL783FazB6V6Cy@google.com>
+ <ZdjL783FazB6V6Cy@google.com>
+In-Reply-To: <ZdjL783FazB6V6Cy@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 23 Feb 2024 17:48:10 +0100
+Message-ID: <CABgObfYF4pyUDpf0E98xqoJkDsjwXuViasoib-CbB0MUtRNBuQ@mail.gmail.com>
 Subject: Re: [PATCH v2 07/11] KVM: x86: define standard behavior for bits 0/1
  of VM type
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
+To: Sean Christopherson <seanjc@google.com>
 Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, michael.roth@amd.com, 
 	aik@amd.com
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 23, 2024, Paolo Bonzini wrote:
-> Some VM types have characteristics in common; in fact, the only use
-> of VM types right now is kvm_arch_has_private_mem and it assumes that
-> _all_ VM types have private memory.
-> 
-> So, let the low bits specify the characteristics of the VM type.  As
-> of we have two special things: whether memory is private, and whether
-> guest state is protected.  The latter is similar to
-> kvm->arch.guest_state_protected, but the latter is only set on a fully
-> initialized VM.  If both are set, ioctls to set registers will cause
-> an error---SEV-ES did not do so, which is a problematic API.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> Message-Id: <20240209183743.22030-7-pbonzini@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  arch/x86/include/asm/kvm_host.h |  9 +++-
->  arch/x86/kvm/x86.c              | 93 +++++++++++++++++++++++++++------
->  2 files changed, 85 insertions(+), 17 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 0bcd9ae16097..15db2697863c 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -2135,8 +2135,15 @@ void kvm_mmu_new_pgd(struct kvm_vcpu *vcpu, gpa_t new_pgd);
->  void kvm_configure_mmu(bool enable_tdp, int tdp_forced_root_level,
->  		       int tdp_max_root_level, int tdp_huge_page_level);
->  
-> +
-> +/* Low bits of VM types provide confidential computing capabilities.  */
-> +#define __KVM_X86_PRIVATE_MEM_TYPE	1
-> +#define __KVM_X86_PROTECTED_STATE_TYPE	2
-> +#define __KVM_X86_VM_TYPE_FEATURES	3
-> +static_assert((KVM_X86_SW_PROTECTED_VM & __KVM_X86_VM_TYPE_FEATURES) == __KVM_X86_PRIVATE_MEM_TYPE);
+On Fri, Feb 23, 2024 at 5:46=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> On Fri, Feb 23, 2024, Paolo Bonzini wrote:
+> > Some VM types have characteristics in common; in fact, the only use
+> > of VM types right now is kvm_arch_has_private_mem and it assumes that
+> > _all_ VM types have private memory.
+> >
+> > So, let the low bits specify the characteristics of the VM type.  As
+> > of we have two special things: whether memory is private, and whether
+> > guest state is protected.  The latter is similar to
+> > kvm->arch.guest_state_protected, but the latter is only set on a fully
+> > initialized VM.  If both are set, ioctls to set registers will cause
+> > an error---SEV-ES did not do so, which is a problematic API.
+> >
+> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> > Message-Id: <20240209183743.22030-7-pbonzini@redhat.com>
+> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> > ---
+> >  arch/x86/include/asm/kvm_host.h |  9 +++-
+> >  arch/x86/kvm/x86.c              | 93 +++++++++++++++++++++++++++------
+> >  2 files changed, 85 insertions(+), 17 deletions(-)
+> >
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm=
+_host.h
+> > index 0bcd9ae16097..15db2697863c 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -2135,8 +2135,15 @@ void kvm_mmu_new_pgd(struct kvm_vcpu *vcpu, gpa_=
+t new_pgd);
+> >  void kvm_configure_mmu(bool enable_tdp, int tdp_forced_root_level,
+> >                      int tdp_max_root_level, int tdp_huge_page_level);
+> >
+> > +
+> > +/* Low bits of VM types provide confidential computing capabilities.  =
+*/
+> > +#define __KVM_X86_PRIVATE_MEM_TYPE   1
+> > +#define __KVM_X86_PROTECTED_STATE_TYPE       2
+> > +#define __KVM_X86_VM_TYPE_FEATURES   3
+> > +static_assert((KVM_X86_SW_PROTECTED_VM & __KVM_X86_VM_TYPE_FEATURES) =
+=3D=3D __KVM_X86_PRIVATE_MEM_TYPE);
+>
+> Aliasing bit 0 to KVM_X86_SW_PROTECTED_VM is gross, e.g. this
+>
+>  #define KVM_X86_DEFAULT_VM     0
+>  #define KVM_X86_SW_PROTECTED_VM        1
+> +#define KVM_X86_SEV_VM         8
+> +#define KVM_X86_SEV_ES_VM      10
+>
+> is _super_ confusing and bound to cause problems.
+>
+> Oh, good gravy, you're also aliasing __KVM_X86_PROTECTED_STATE_TYPE into =
+SEV_ES_VM.
+> Curse you and your Rami Code induced decimal-based bitwise shenanigans!!!
 
-Aliasing bit 0 to KVM_X86_SW_PROTECTED_VM is gross, e.g. this
+v1 was less gross but Mike talked me into this one. :)
 
- #define KVM_X86_DEFAULT_VM     0
- #define KVM_X86_SW_PROTECTED_VM        1
-+#define KVM_X86_SEV_VM         8
-+#define KVM_X86_SEV_ES_VM      10
- 
-is _super_ confusing and bound to cause problems.
+> I don't see any reason to bleed the flags into KVM's ABI.  Even shoving t=
+he flags
+> into kvm->arch.vm_type is unncessary.  Aha!  As is storing vm_type as an =
+"unsigned
+> long", since (a) it can't ever be bigger than u32, and (b) in practice a =
+u8 will
+> suffice since as Mike pointed out we're effectively limited to 31 types b=
+efore
+> kvm_vm_ioctl_check_extension() starts returning error codes.
+>
+> So I vote to skip the aliasing and simply do:
 
-Oh, good gravy, you're also aliasing __KVM_X86_PROTECTED_STATE_TYPE into SEV_ES_VM.
-Curse you and your Rami Code induced decimal-based bitwise shenanigans!!!
+Fair enough.
 
-I don't see any reason to bleed the flags into KVM's ABI.  Even shoving the flags
-into kvm->arch.vm_type is unncessary.  Aha!  As is storing vm_type as an "unsigned
-long", since (a) it can't ever be bigger than u32, and (b) in practice a u8 will
-suffice since as Mike pointed out we're effectively limited to 31 types before
-kvm_vm_ioctl_check_extension() starts returning error codes.
+Paolo
 
-So I vote to skip the aliasing and simply do:
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index ff23712f1f3f..27265ff5fd29 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1279,7 +1279,9 @@ enum kvm_apicv_inhibit {
- };
- 
- struct kvm_arch {
--       unsigned long vm_type;
-+       u8 vm_type;
-+       bool has_private_memory;
-+       bool has_protected_state;
-        unsigned long n_used_mmu_pages;
-        unsigned long n_requested_mmu_pages;
-        unsigned long n_max_mmu_pages;
-
-and then just use straight incrementing values for types, i.e.
-
-#define KVM_X86_DEFAULT_VM	0
-#define KVM_X86_SW_PROTECTED_VM	1
-#define KVM_X86_SEV_VM		2
-#define KVM_X86_SEV_ES_VM	3
-
-It'll require a bit of extra work in kvm_arch_init_vm(), but I think the end result
-will be signifincatly easier to follow.
-
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 8746530930d5..e634e5b67516 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -5526,21 +5526,30 @@ static int kvm_vcpu_ioctl_x86_set_vcpu_events(struct kvm_vcpu *vcpu,
->  	return 0;
->  }
->  
-> -static void kvm_vcpu_ioctl_x86_get_debugregs(struct kvm_vcpu *vcpu,
-> -					     struct kvm_debugregs *dbgregs)
-> +static int kvm_vcpu_ioctl_x86_get_debugregs(struct kvm_vcpu *vcpu,
-> +					    struct kvm_debugregs *dbgregs)
->  {
->  	unsigned long val;
->  
-> +	if ((vcpu->kvm->arch.vm_type & __KVM_X86_PROTECTED_STATE_TYPE) &&
-> +	    vcpu->arch.guest_state_protected)
-> +		return -EINVAL;
-> +
->  	memset(dbgregs, 0, sizeof(*dbgregs));
->  	memcpy(dbgregs->db, vcpu->arch.db, sizeof(vcpu->arch.db));
->  	kvm_get_dr(vcpu, 6, &val);
->  	dbgregs->dr6 = val;
->  	dbgregs->dr7 = vcpu->arch.dr7;
-> +	return 0;
->  }
-
->  static int kvm_vcpu_ioctl_x86_set_xcrs(struct kvm_vcpu *vcpu,
-> @@ -5622,6 +5645,10 @@ static int kvm_vcpu_ioctl_x86_set_xcrs(struct kvm_vcpu *vcpu,
->  {
->  	int i, r = 0;
->  
-> +	if ((vcpu->kvm->arch.vm_type & __KVM_X86_PROTECTED_STATE_TYPE) &&
-> +	    vcpu->arch.guest_state_protected)
-> +		return -EINVAL;
-> +
->  	if (!boot_cpu_has(X86_FEATURE_XSAVE))
->  		return -EINVAL;
->  
-> @@ -6010,7 +6037,9 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
->  	case KVM_GET_DEBUGREGS: {
->  		struct kvm_debugregs dbgregs;
->  
-> -		kvm_vcpu_ioctl_x86_get_debugregs(vcpu, &dbgregs);
-> +		r = kvm_vcpu_ioctl_x86_get_debugregs(vcpu, &dbgregs);
-> +		if (r < 0)
-
-I would strongly prefer to just do
-
-		if (r)
-
-as "r < 0" implies that postive return values are possible/allowed.
-
-That said, rather than a mix of open coding checks in kvm_arch_vcpu_ioctl() versus
-burying checks in helpers, what about adding a dedicated helper to take care of
-everything in one shot?  E.g.
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 3bc69b0c9822..f5ca78e75eec 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -5864,6 +5864,16 @@ static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
-        }
- }
- 
-+static bool kvm_ioctl_accesses_guest_state(unsigned int ioctl)
-+{
-+       switch (ioctl) {
-+       case <...>:
-+               return true;
-+       default:
-+               return false:
-+       }
-+}
-+
- long kvm_arch_vcpu_ioctl(struct file *filp,
-                         unsigned int ioctl, unsigned long arg)
- {
-@@ -5878,6 +5888,11 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
-                void *buffer;
-        } u;
- 
-+       if (vcpu->kvm->arch.has_protected_state &&
-+           vcpu->arch.guest_state_protected &&
-+           kvm_ioctl_accesses_guest_state(ioctl))
-+               return -EINVAL;
-+
-        vcpu_load(vcpu);
- 
-        u.buffer = NULL;
-
-It'll be a much smaller diff, and hopefully easier to audit, too.
 
