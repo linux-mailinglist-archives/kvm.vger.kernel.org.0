@@ -1,69 +1,69 @@
-Return-Path: <kvm+bounces-9588-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9589-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEBCB861E9B
-	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 22:16:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C94F4861E9E
+	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 22:17:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ACBB0B24742
-	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 21:16:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84467288CD2
+	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 21:17:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D613A149391;
-	Fri, 23 Feb 2024 21:15:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCB45149398;
+	Fri, 23 Feb 2024 21:17:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HlbjI3CN"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ztmZdLIw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5F24143C7B
-	for <kvm@vger.kernel.org>; Fri, 23 Feb 2024 21:15:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0D891474C0
+	for <kvm@vger.kernel.org>; Fri, 23 Feb 2024 21:17:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708722954; cv=none; b=rMboEzx8+XXDyHn3mj5VN0dBJzf/QgKa5bRkUP32emt/QmbCrfpQ8laIbD+FjpWEwa4yZIyi0XeacLeSv23rSrr+XQiVEibBAo0o5uFEPqU9rlVxw+Hl7SsB6obgFuZLfmcIEArTZm6zHwRO47+SNxbEaILpGp0r67gHbRpJPFg=
+	t=1708723036; cv=none; b=LFa/Vg2APs2cvxjL5yx/jjB6tcD68Mho14fgS2bByLobpw2u+8iFqe3JJDp/4OYkgY6Gwm+LdgD3nhWFg84IiMUEArYCZUljx1ttTUWgHYCIgsG1cZopnFzMbRKezOUeAE7I7cn4zoswoNGS+hYalzL+1v2h8Dxo1IG9AN7i2uE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708722954; c=relaxed/simple;
-	bh=vgHxZxdMlXYTUmj6SGTpWgAAujf2GaWOR9BetERwlp4=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=OWW5qg0IouagT8J257dLFTHvIOkG1o1RwJmJk+yaePx88CZQgF0K4BYFrIRtbw+h4zz7KIHLLdD5UcVUo7aZW7+RYtbjkj3c/lp+WNHFwBCQ5BvWO/9ywwgO+9KrIkz3fBdUN1Shd9TD94X+V4aAptq3FN9ujlkuUQSwIw1EO3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HlbjI3CN; arc=none smtp.client-ip=209.85.214.202
+	s=arc-20240116; t=1708723036; c=relaxed/simple;
+	bh=LxisIv95tuvftO3gGiQktt0Eq+u0gN9VsyqvSkXAJe4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=V/uXhp4tXkhmIghP2Me9OmU8EyYBNdAmLJgFf9SC8DGjzfWmcvS7Zko7a53XTc1zbApaZFbV969xcmvXvfzNgIva30Bw0Ph3kVWNqSm6k1LA4nSWxvMEr3Smqp/oI+7rNtLDtyAi+mnmqBs9X22wj/mwacG2dxvr3vQbwHngxHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ztmZdLIw; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1dc6e067b22so5994085ad.3
-        for <kvm@vger.kernel.org>; Fri, 23 Feb 2024 13:15:52 -0800 (PST)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-607c9677a91so22466167b3.2
+        for <kvm@vger.kernel.org>; Fri, 23 Feb 2024 13:17:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708722952; x=1709327752; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1708723033; x=1709327833; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=WzAzDf1ZbW9X9RCNcoDXQaNNm7qLPyl0zY/VDFk5I2g=;
-        b=HlbjI3CNGSSAPTUGYpR0n8+ABBxVJEF4N8WpcTbdIM1WjEhuDlaBCqfBI8tuKx5rJv
-         7rYtFr8zdH80xhm/TT6eS/qKMhLXw3nQS0o/MZ4HBfGMbITHDNdmu+wXUTN6QfcwTPNT
-         BK+PbHTtjf+OemT4nFGZRMB5O/9+trRIB98RdiKC3EtCxYC4EYuFzXgey9M9+5Z15I0j
-         raIPo4/BEnAcaudlLL0BCHd7PTHT9qv4W+ZK63j+WSZmU3YqdxmcF+zuO26sMgWKbKH3
-         HV3lSdfWzq8wSagdtOELmtncLrzaPZbQdCxxb1IzSdpJm/aBvgh0r8aSBChaGQWy8lk2
-         CZOA==
+        bh=2XDFyxdBjQUJNu4zRViJQEh+44N1On/mabiEHEUEPoU=;
+        b=ztmZdLIwg8YfpJMxhAUzfJZEnwUFV3y9sE0uhfEM8JcMQDcCq9rbEoElyjEXx8N3BR
+         l4BaSZX+enW8V+Xxr2mkAGKAQxy/4K4lWJ+XwQaPWx+z7ynEIsfYlwJdClc12Iy62fdX
+         s1FVvnmmmuFLrmtpASan9HvF7bi8HCJEsy8KLUezdEcATeWdjiQompLMyD/pPKVyxfWB
+         RWmuX0U1dvp/4OzpjVphNbbmbsIBsKlNgtQev0W81GnAwWpHr+ttgdTyuGTAlaQr4mlC
+         IT/wxzDTSuZSY3L6B+tkNHqqouEC2yedGCAFDMnz5vmJs9QReBJjscuU7HBOvBPHDMYB
+         df/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708722952; x=1709327752;
+        d=1e100.net; s=20230601; t=1708723033; x=1709327833;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WzAzDf1ZbW9X9RCNcoDXQaNNm7qLPyl0zY/VDFk5I2g=;
-        b=hGL96lERsWiRiOHM4XoRlpkalaE3+VL8lB2XmW8qJpbioh1GpB4qpKfg+ZkaBAyEp7
-         oJu5O5hSjbuB8H4IzotC0NtTnoOtxd/V9cENO9pwtGb6gfcpZjPOGMfq2aJU7jC3/AIv
-         y4jyYXMHo2YHVNRDMTsk0mQN+zHuZXAcdt+5vPlNeTrrsYjxagex496mlzNptD2w9EKV
-         cpd4MWr4vubOZkBYI+pewmtv8ar00Ks06foDKoVBoaw2ZUg2KA0En3Hsoo7Acy+q3i4l
-         cln9vR5YbY+N+dYqz2FOOM+fQ23C75J6dQ5IckRrlpsw+9o6Q6Xz14Hy/vzA+1kLsqa1
-         cQfg==
-X-Gm-Message-State: AOJu0YxfezjI/dbjrfb1w8130wUk0e/i0/fzP5OflawqJzsvmFR3QbeF
-	z97IQcGsW/JNLd7T8+ikCt80JIMCdVJm8Z5uwTF7v11AjFYHFUHjqoYrjK1G5FOBy1qCKqXQLcJ
-	djw==
-X-Google-Smtp-Source: AGHT+IHXxYB9Bt9Iy9x5nV+0dv8ES3RsQ7Ivy1Tcf1t0D4/P73qHBKHakR11vGvruAvizlYJnpUH2KjapCM=
+        bh=2XDFyxdBjQUJNu4zRViJQEh+44N1On/mabiEHEUEPoU=;
+        b=fWMk8LaVqt3ijMHqBR8dh9ibkWxZV060KXJgnoSq4oCjfY5KIIi64O4AUTFhuby1s4
+         WTzqkcWB57ElmNjPT9Eo5RcpcChL/lnk3rpbxRl/Cot4P4u8s91qhUvlvPscAIUANt0z
+         jY1kgPni1FSv1YpRBXtag1KfAxj0pYIVrGsDXvw+PiHUvE5y0E1QVgkiquhXya80B5r/
+         bJMLx/LXCTMiGTcYm+fQnHJj6ixxhEW4gYroA1newenkFnPmWdjLck8E19KmhRm/Mu6u
+         pQaeh5lB3v2JC4Deyi+SHpkWpyQ4Ud5S9jXAjfbuum8Jm8E3841w3D5ejwOMabI1k9/C
+         RCgg==
+X-Gm-Message-State: AOJu0YzLmsITW1D4gIqAHyZenbVdbwwrPm6RLd2q2P7Tc1R3lLy2e0WG
+	LFve+MGHCld+CGiya9ylUFdJToeahHQfaN0taVCgQjJmyTZRSzZ8zJD6S/9OUESESVjCsM1X2dO
+	g1Q==
+X-Google-Smtp-Source: AGHT+IE34KxuSlwnjSNuZi+Gwb2PGg40d6LuI8hIXoHS9JKYn1aVmeC4NARWu4Wm4ebK2/qBz6VielbkT6E=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:2347:b0:1db:d7bf:45 with SMTP id
- c7-20020a170903234700b001dbd7bf0045mr3740plh.4.1708722951221; Fri, 23 Feb
- 2024 13:15:51 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a81:914b:0:b0:608:b3e0:3edd with SMTP id
+ i72-20020a81914b000000b00608b3e03eddmr232170ywg.3.1708723032945; Fri, 23 Feb
+ 2024 13:17:12 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 23 Feb 2024 13:15:47 -0800
+Date: Fri, 23 Feb 2024 13:16:23 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -71,60 +71,59 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.44.0.rc0.258.g7320e95886-goog
-Message-ID: <20240223211547.3348606-1-seanjc@google.com>
-Subject: [GIT PULL] KVM: GUEST_MEMFD fixes for 6.8
+Message-ID: <20240223211621.3348855-3-seanjc@google.com>
+Subject: [GIT PULL] x86/kvm: Clean up KVM's guest/host async #PF ABI, for 6.9
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Minor fixes related GUEST_MEMFD.  I _just_ posted these, and they've only
-been in -next for one night, but I am sending this now to ensure you see it
-asap, as patch 1 in particular affects KVM's ABI, i.e. really should land
-in 6.8 before GUEST_MEMFD support is officially released.
+An early(ish) pull request for 6.9 (not 6.8!) to clean up KVM's async #PF
+guest/host ABI.  Due to a goof many years ago, the structure shared between
+the guest and host was expanded to 68 bytes, not the intended 64 bytes (to
+fit in a cache line).
 
-The following changes since commit c48617fbbe831d4c80fe84056033f17b70a31136:
+Rather than document the goof, just drop the problematic 4 bytes from the
+ABI as KVM-the-host never actually used them.
 
-  Merge tag 'kvmarm-fixes-6.8-3' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD (2024-02-21 05:18:56 -0500)
+The following changes since commit 41bccc98fb7931d63d03f326a746ac4d429c1dd3:
+
+  Linux 6.8-rc2 (2024-01-28 17:01:12 -0800)
 
 are available in the Git repository at:
 
-  https://github.com/kvm-x86/linux.git tags/kvm-x86-guest_memfd_fixes-6.8
+  https://github.com/kvm-x86/linux.git tags/kvm-x86-asyncpf_abi-6.9
 
-for you to fetch changes up to 2dfd2383034421101300a3b7325cf339a182d218:
+for you to fetch changes up to df01f0a1165c35e95b5f52c7ba25c19020352ff9:
 
-  KVM: selftests: Add a testcase to verify GUEST_MEMFD and READONLY are exclusive (2024-02-22 17:07:06 -0800)
-
-----------------------------------------------------------------
-KVM GUEST_MEMFD fixes for 6.8:
-
- - Make KVM_MEM_GUEST_MEMFD mutually exclusive with KVM_MEM_READONLY to
-   avoid creating ABI that KVM can't sanely support.
-
- - Update documentation for KVM_SW_PROTECTED_VM to make it abundantly
-   clear that such VMs are purely a development and testing vehicle, and
-   come with zero guarantees.
-
- - Limit KVM_SW_PROTECTED_VM guests to the TDP MMU, as the long term plan
-   is to support confidential VMs with deterministic private memory (SNP
-   and TDX) only in the TDP MMU.
-
- - Fix a bug in a GUEST_MEMFD negative test that resulted in false passes
-   when verifying that KVM_MEM_GUEST_MEMFD memslots can't be dirty logged.
+  KVM: x86: Improve documentation of MSR_KVM_ASYNC_PF_EN (2024-02-06 10:59:52 -0800)
 
 ----------------------------------------------------------------
-Sean Christopherson (5):
-      KVM: Make KVM_MEM_GUEST_MEMFD mutually exclusive with KVM_MEM_READONLY
-      KVM: x86: Update KVM_SW_PROTECTED_VM docs to make it clear they're a WIP
-      KVM: x86/mmu: Restrict KVM_SW_PROTECTED_VM to the TDP MMU
-      KVM: selftests: Create GUEST_MEMFD for relevant invalid flags testcases
-      KVM: selftests: Add a testcase to verify GUEST_MEMFD and READONLY are exclusive
+Guest-side KVM async #PF ABI cleanup for 6.9
 
- Documentation/virt/kvm/api.rst                       |  5 +++++
- arch/x86/kvm/Kconfig                                 |  7 ++++---
- arch/x86/kvm/x86.c                                   |  2 +-
- tools/testing/selftests/kvm/set_memory_region_test.c | 12 +++++++++++-
- virt/kvm/kvm_main.c                                  |  8 +++++++-
- 5 files changed, 28 insertions(+), 6 deletions(-)
+Delete kvm_vcpu_pv_apf_data.enabled to fix a goof in KVM's async #PF ABI where
+the enabled field pushes the size of "struct kvm_vcpu_pv_apf_data" from 64 to
+68 bytes, i.e. beyond a single cache line.
+
+The enabled field is purely a guest-side flag that Linux-as-a-guest uses to
+track whether or not the guest has enabled async #PF support.  The actual flag
+that is passed to the host, i.e. to KVM proper, is a single bit in a synthetic
+MSR, MSR_KVM_ASYNC_PF_EN, i.e. is in a location completely unrelated to the
+shared kvm_vcpu_pv_apf_data structure.
+
+Simply drop the the field and use a dedicated guest-side per-CPU variable to
+fix the ABI, as opposed to fixing the documentation to match reality.  KVM has
+never consumed kvm_vcpu_pv_apf_data.enabled, so the odds of the ABI change
+breaking anything are extremely low.
+
+----------------------------------------------------------------
+Xiaoyao Li (2):
+      x86/kvm: Use separate percpu variable to track the enabling of asyncpf
+      KVM: x86: Improve documentation of MSR_KVM_ASYNC_PF_EN
+
+ Documentation/virt/kvm/x86/msr.rst   | 19 +++++++++----------
+ arch/x86/include/uapi/asm/kvm_para.h |  1 -
+ arch/x86/kernel/kvm.c                | 11 ++++++-----
+ 3 files changed, 15 insertions(+), 16 deletions(-)
 
