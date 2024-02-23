@@ -1,107 +1,135 @@
-Return-Path: <kvm+bounces-9586-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9587-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E60B6861E15
-	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 21:48:02 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A412861E98
+	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 22:15:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 240671C24F18
-	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 20:48:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9CC86B23BB6
+	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 21:15:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8E4414DFF3;
-	Fri, 23 Feb 2024 20:43:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8985A14938A;
+	Fri, 23 Feb 2024 21:15:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tln3zlM6"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92C27EAD2;
-	Fri, 23 Feb 2024 20:43:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FA3A143C7B
+	for <kvm@vger.kernel.org>; Fri, 23 Feb 2024 21:15:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708721026; cv=none; b=f/Wx12iSHfpF7xf7NqVy2JgaNi+1zMpqr74k9EAiQTvTG90cOikuv1K9QrFHVTkyIJmjYffky1mvG0CUJfF6mhSMsYbJlduk0w3zTvdAPSh2XM27CHGGBDyr5Ge+Q06YeH86zVWiAUNktCug5SZh+reGq0AkFHyxDodnovurm4A=
+	t=1708722913; cv=none; b=FFnnv7uGkDuLLAhyy6PhJ7S5j1+KV66T4VWfkOKVhKoUhblPCccFcCpm0Wb9DaQpEi9RsMJoWYPaGX6hot7e5KGZB2aUOiL/9MUBYMRX/idRzg0qYB1UZG7F7HAi6iCWBlMIlrP9xJuY3eK14ZVC3X55Iz/32i9/NjRuNwFMQpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708721026; c=relaxed/simple;
-	bh=PvtLspH93t1y4HSID2+UQ++sl1bnWl4rFM9++eE9Kiw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jjkj4An0NsVm9VFkk6dIH9AjZE1Eek+qJgxBeFZ5ctXoJvzPfS8XnInFF7aqDkSuPWQGn0frWL6Snv6tyi6Sj8RWOAXiWPXSwrq3dyoI/zvfcv4o9TmF2DdbRO7CQrnaEzovU79DIoqZCMd0gXOIMq2/kurKenWiqSZqyAS/iZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67DE0C43390;
-	Fri, 23 Feb 2024 20:43:39 +0000 (UTC)
-Date: Fri, 23 Feb 2024 15:45:32 -0500
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Jeff Johnson <quic_jjohnson@quicinc.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, Linux Trace Kernel
- <linux-trace-kernel@vger.kernel.org>, Masami Hiramatsu
- <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Linus Torvalds <torvalds@linux-foundation.org>,
- <linuxppc-dev@lists.ozlabs.org>, <kvm@vger.kernel.org>,
- <linux-block@vger.kernel.org>, <linux-cxl@vger.kernel.org>,
- <linux-media@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
- <amd-gfx@lists.freedesktop.org>, <intel-gfx@lists.freedesktop.org>,
- <intel-xe@lists.freedesktop.org>, <linux-arm-msm@vger.kernel.org>,
- <freedreno@lists.freedesktop.org>, <virtualization@lists.linux.dev>,
- <linux-rdma@vger.kernel.org>, <linux-pm@vger.kernel.org>,
- <iommu@lists.linux.dev>, <linux-tegra@vger.kernel.org>,
- <netdev@vger.kernel.org>, <linux-hyperv@vger.kernel.org>,
- <ath10k@lists.infradead.org>, <linux-wireless@vger.kernel.org>,
- <ath11k@lists.infradead.org>, <ath12k@lists.infradead.org>,
- <brcm80211@lists.linux.dev>, <brcm80211-dev-list.pdl@broadcom.com>,
- <linux-usb@vger.kernel.org>, <linux-bcachefs@vger.kernel.org>,
- <linux-nfs@vger.kernel.org>, <ocfs2-devel@lists.linux.dev>,
- <linux-cifs@vger.kernel.org>, <linux-xfs@vger.kernel.org>,
- <linux-edac@vger.kernel.org>, <selinux@vger.kernel.org>,
- <linux-btrfs@vger.kernel.org>, <linux-erofs@lists.ozlabs.org>,
- <linux-f2fs-devel@lists.sourceforge.net>, <linux-hwmon@vger.kernel.org>,
- <io-uring@vger.kernel.org>, <linux-sound@vger.kernel.org>,
- <bpf@vger.kernel.org>, <linux-wpan@vger.kernel.org>, <dev@openvswitch.org>,
- <linux-s390@vger.kernel.org>, <tipc-discussion@lists.sourceforge.net>,
- Julia Lawall <Julia.Lawall@inria.fr>
-Subject: Re: [FYI][PATCH] tracing/treewide: Remove second parameter of
- __assign_str()
-Message-ID: <20240223154532.76475d82@gandalf.local.home>
-In-Reply-To: <20240223134653.524a5c9e@gandalf.local.home>
-References: <20240223125634.2888c973@gandalf.local.home>
-	<0aed6cf2-17ae-45aa-b7ff-03da932ea4e0@quicinc.com>
-	<20240223134653.524a5c9e@gandalf.local.home>
-X-Mailer: Claws Mail 3.19.1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1708722913; c=relaxed/simple;
+	bh=+0WaxtfD1vqOSIN4udZF0ovEeRsC84FbHnJOBPb+zkE=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=R0sBkf7Gjf0cwX7jgjPKbKMCrCT0EpPU3RSxxBDbhgrMWxnjwSz26sFhW/mq2l2IqsFNoQU6kKXhkuY9yK4whfa3BFKZryWNwewRJ6JdLOabjyKVzpGJ/Ynat8n1NWyCAyxhDyjCv7nYo2ZqHamHobg/nv4XJwkG+FZSVsKCrX8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tln3zlM6; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6e4cce1df30so511872b3a.2
+        for <kvm@vger.kernel.org>; Fri, 23 Feb 2024 13:15:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1708722912; x=1709327712; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3ThK88zue8GNITt8rUbbFtND5su1NoXeP0vADQsaZtQ=;
+        b=tln3zlM6yedG2fyGP7nMd+jbK8gSWrs3EwusvIIDV+qjLeYUxfu9DUHz+q+7nHqfwN
+         FpbRBBJ15NnsWCjtjL6X91VsoBhkPGJhrPfWovTTqywDRn2FfLjngVa0n0lAJFm21ref
+         GUdYYH9Ytah76G6XNoAxN6d89KE3Z3c1QTTOQrIrxrt1wdaVMjxvDPzc/w8TRgvzM2nt
+         qlaiY9BGnm7nBESrhfHeBBr+5A9sYCfQR6k/0rVFSsI9xwyUQb1Hu0y+70gfy9v7zhRi
+         hJujoUNs5QaXBFT7lZuCot7nw6SuN6f/VJu7HibPwCsuFry5nO3Gd2EjyNljPJ3sQTEk
+         UwYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708722912; x=1709327712;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3ThK88zue8GNITt8rUbbFtND5su1NoXeP0vADQsaZtQ=;
+        b=xIB7G/awqIRHVLun3EPPvrFoEOumLjT3AxCF6VBB7sqpoU9tzpL9aKcBgjprrJERep
+         8aEUZefRD2v02yCFXRUjDuPqorVgimNAmHj4SvfkuImaQZhxGI4XZ2lu5e1cllDIEcxG
+         umEO3YA1mSv2t2EpwEVtp5sPGc70V6Sz6hNg5brpG2WKAbHvSghuKLlJvV9SV9PSNCjl
+         B34fs2bDM5vSMH9P9BA6bS1zcP1V2/95Awl16uN1KnOF9VV/VBqZKIoxQr9WC8HjjU1F
+         j5d946PSXX9fvRlrJgZRxT3nM892KzZC8ubGGCWGMTlgQsuizvXFyRbawv4met2qPvvo
+         IQLQ==
+X-Gm-Message-State: AOJu0YySEUA4flMuYupIqpxg5v0HnLYLi5UKfRanqvCjweXQPMe+TOLR
+	j+B3CLH1snjHZcW/OInwY8BRhS9klq1NhaPxEPaOoz8/YGUey2afXZgfVFLf/k0sytpEC0df5Rv
+	g5g==
+X-Google-Smtp-Source: AGHT+IFnRqQ9Ip4giF4SYFt4PQige1puzsn+4jMkz+howHVeOccb0ece5cfhr31wlJ/8Rq8OhiyjDY+RjPA=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:3c86:b0:6e4:8b79:f5c6 with SMTP id
+ lm6-20020a056a003c8600b006e48b79f5c6mr59831pfb.5.1708722911728; Fri, 23 Feb
+ 2024 13:15:11 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Fri, 23 Feb 2024 13:15:08 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.rc0.258.g7320e95886-goog
+Message-ID: <20240223211508.3348529-1-seanjc@google.com>
+Subject: [GIT PULL] KVM: x86: MMU(ish) fixes for 6.8
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 23 Feb 2024 13:46:53 -0500
-Steven Rostedt <rostedt@goodmis.org> wrote:
+Two more MMU-related fixes for 6.8.  The first, and worst, fixes a data
+corruption bug during live migration due to KVM failing to mark a memslot
+dirty when emulating an atomic access.  Luckily, our userspace caught the
+corruption during checksumming after the final pause, but I've no idea if
+QEMU-based VMs have such protection.
 
-> Now one thing I could do is to not remove the parameter, but just add:
-> 
-> 	WARN_ON_ONCE((src) != __data_offsets->item##_ptr_);
-> 
-> in the __assign_str() macro to make sure that it's still the same that is
-> assigned. But I'm not sure how useful that is, and still causes burden to
-> have it. I never really liked the passing of the string in two places to
-> begin with.
+The second fixes a long-standing, but recently exposed, issue where yielding
+mmu_lock to vCPUs attempting to fault in memory that is _currently_ being
+zapped/modified can bog down the invalidation task due it constantly yielding
+to vCPUS (which end up doing nothing).
 
-Hmm, maybe I'll just add this patch for 6.9 and then in 6.10 do the
-parameter removal.
+The following changes since commit 9895ceeb5cd61092f147f8d611e2df575879dd6f:
 
--- Steve
+  Merge tag 'kvmarm-fixes-6.8-2' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD (2024-02-16 12:02:38 -0500)
 
-diff --git a/include/trace/stages/stage6_event_callback.h b/include/trace/stages/stage6_event_callback.h
-index 0c0f50bcdc56..7372e2c2a0c4 100644
---- a/include/trace/stages/stage6_event_callback.h
-+++ b/include/trace/stages/stage6_event_callback.h
-@@ -35,6 +35,7 @@ #define __assign_str(dst, src)
- 	do {								\
- 		char *__str__ = __get_str(dst);				\
- 		int __len__ = __get_dynamic_array_len(dst) - 1;		\
-+		WARN_ON_ONCE((src) != __data_offsets.dst##_ptr_); 	\
- 		memcpy(__str__, __data_offsets.dst##_ptr_ ? :		\
- 		       EVENT_NULL_STR, __len__);			\
- 		__str__[__len__] = '\0';				\
+are available in the Git repository at:
+
+  https://github.com/kvm-x86/linux.git tags/kvm-x86-fixes-6.8-2
+
+for you to fetch changes up to d02c357e5bfa7dfd618b7b3015624beb71f58f1f:
+
+  KVM: x86/mmu: Retry fault before acquiring mmu_lock if mapping is changing (2024-02-23 10:14:34 -0800)
+
+----------------------------------------------------------------
+KVM x86 fixes for 6.8, round 2:
+
+ - When emulating an atomic access, mark the gfn as dirty in the memslot
+   to fix a bug where KVM could fail to mark the slot as dirty during live
+   migration, ultimately resulting in guest data corruption due to a dirty
+   page not being re-copied from the source to the target.
+
+ - Check for mmu_notifier invalidation events before faulting in the pfn,
+   and before acquiring mmu_lock, to avoid unnecessary work and lock
+   contention.  Contending mmu_lock is especially problematic on preemptible
+   kernels, as KVM may yield mmu_lock in response to the contention, which
+   severely degrades overall performance due to vCPUs making it difficult
+   for the task that triggered invalidation to make forward progress.
+
+   Note, due to another kernel bug, this fix isn't limited to preemtible
+   kernels, as any kernel built with CONFIG_PREEMPT_DYNAMIC=y will yield
+   contended rwlocks and spinlocks.
+
+   https://lore.kernel.org/all/20240110214723.695930-1-seanjc@google.com
+
+----------------------------------------------------------------
+Sean Christopherson (2):
+      KVM: x86: Mark target gfn of emulated atomic instruction as dirty
+      KVM: x86/mmu: Retry fault before acquiring mmu_lock if mapping is changing
+
+ arch/x86/kvm/mmu/mmu.c   | 42 ++++++++++++++++++++++++++++++++++++++++++
+ arch/x86/kvm/x86.c       | 10 ++++++++++
+ include/linux/kvm_host.h | 26 ++++++++++++++++++++++++++
+ 3 files changed, 78 insertions(+)
 
