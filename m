@@ -1,144 +1,161 @@
-Return-Path: <kvm+bounces-9476-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9477-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 826B5860913
-	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 03:59:12 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF46A860940
+	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 04:13:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 120C9B23423
-	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 02:59:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B771B23BE3
+	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 03:13:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 324D6BE7D;
-	Fri, 23 Feb 2024 02:59:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="J4Srvlmx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 101A6C8DD;
+	Fri, 23 Feb 2024 03:13:18 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from mx2.zhaoxin.com (mx2.zhaoxin.com [203.110.167.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9637653A1
-	for <kvm@vger.kernel.org>; Fri, 23 Feb 2024 02:59:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33684B67F
+	for <kvm@vger.kernel.org>; Fri, 23 Feb 2024 03:13:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.110.167.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708657143; cv=none; b=lsU9IGUxMAj4q/+18/OGQYoIb53waNv5Eo4832v6JjcPGieUsWBuVCamb/0AHYJFMbzxNzmhscKt6Ke6mMVLbWYhef4gDUzYns3W6a8DpSSYUcdN3bqyQar/zuVrILkHgFWduMGXDXSt0QJdwBbxpBBJWcVMMaY34KF/J7Zi/9w=
+	t=1708657997; cv=none; b=kkbXjopXVdShFgD6alC8IMytGbrOWykjicwmjHJzuNb90y8mv2Bv/t/tM8Kwnd+ed2pw1oshynrTJvXV9jDII5Z54IWMBtJytYUazAfBcM8UFMLdm29IJXbtWA5rKMnDJ+1eQky+a0ey5cKBAZx3GdLDqM9Bsj6KJ4Qn9fumTi4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708657143; c=relaxed/simple;
-	bh=lYf315eDkP0LzIDpbuMezRD5udJ+FvuHc99oYsTfVnI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u3NPgMMJJmmSuZId5+thjjOb8ifPNGtlyIVcmMPh3kcZNlbQa2u268pR0l7kV2Kx5wJaB/94vYhconDfWh1tNdxocfiWNiE1RS0vljBOB7sgqk1K2e8LTgVyk1BoUWG5nbHI49SzdmXppuCJCCR3NUxWo2uZRQtSH9ZmRILYxmw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=J4Srvlmx; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708657141; x=1740193141;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=lYf315eDkP0LzIDpbuMezRD5udJ+FvuHc99oYsTfVnI=;
-  b=J4SrvlmxF/6/xdhmCqn8BK7jHqNdjEozlEa/fBeXTQOrmfUMgRjw9sTA
-   rtudKSmYUwT/CYarPzTkMrGc6CoRvXaL3NR3/Td6EnR0oLL6gHl0lJrbl
-   TF0B5uJQbYiKU8VinQuOcron8E1B44CQ4Y4LvK4ICHa0kCjdE50Xgd3uQ
-   qifq/F/w7//XNzPqxFERnWSeZwdIMq8NuW59HDbjT8bVpbISTa6XFqBOb
-   TF3XRZgidytLfP7eLqVOJAETaTxtMDxsCrDMITzAt23B14LctN4UTZche
-   BXk4Mmy8SW3fzNtQ6NnSOmUH5/Hu5oaLA/T7/p2/Chsi7v/Bdwckw2/ml
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10992"; a="2838515"
-X-IronPort-AV: E=Sophos;i="6.06,179,1705392000"; 
-   d="scan'208";a="2838515"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Feb 2024 18:59:01 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10992"; a="936985813"
-X-IronPort-AV: E=Sophos;i="6.06,179,1705392000"; 
-   d="scan'208";a="936985813"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
-  by fmsmga001.fm.intel.com with ESMTP; 22 Feb 2024 18:58:59 -0800
-Date: Fri, 23 Feb 2024 11:12:40 +0800
-From: Zhao Liu <zhao1.liu@intel.com>
-To: Binbin Wu <binbin.wu@linux.intel.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, pbonzini@redhat.com,
-	xiaoyao.li@intel.com, chao.gao@intel.com, robert.hu@linux.intel.com
-Subject: Re: [PATCH v4 1/2] target/i386: add support for LAM in CPUID
- enumeration
-Message-ID: <ZdgNKDW+jTcXPvyH@intel.com>
-References: <20240112060042.19925-1-binbin.wu@linux.intel.com>
- <20240112060042.19925-2-binbin.wu@linux.intel.com>
+	s=arc-20240116; t=1708657997; c=relaxed/simple;
+	bh=xy1NIOleVVNZ5IfskXEX5ke9LM0Im+JhdEoL9vJuU7A=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
+	 In-Reply-To:Content-Type; b=WFduvWzbEilNwefgC/8ayL3rD0b7NGh0D/KJNCuUmjr54hmbUyJMOC8Vf8+L3+rpfCvgo4tEIwctmk5JsuNtl43zvBiLm+I0WM8B9W3lRJxWAq4iI3mKMtJuoueDV81pjR3xBOYG4bC83UiAuXXFI+KXg1EvHGxvMyHo812ViaE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com; spf=pass smtp.mailfrom=zhaoxin.com; arc=none smtp.client-ip=203.110.167.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zhaoxin.com
+X-ASG-Debug-ID: 1708657989-1eb14e0c7e46ae0001-HEqcsx
+Received: from ZXSHMBX2.zhaoxin.com (ZXSHMBX2.zhaoxin.com [10.28.252.164]) by mx2.zhaoxin.com with ESMTP id G3D2oEORI4UkFBrN (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Fri, 23 Feb 2024 11:13:09 +0800 (CST)
+X-Barracuda-Envelope-From: EwanHai-oc@zhaoxin.com
+X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.164
+Received: from zxbjmbx1.zhaoxin.com (10.29.252.163) by ZXSHMBX2.zhaoxin.com
+ (10.28.252.164) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Fri, 23 Feb
+ 2024 11:13:09 +0800
+Received: from [10.28.66.62] (10.28.66.62) by zxbjmbx1.zhaoxin.com
+ (10.29.252.163) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Fri, 23 Feb
+ 2024 11:13:08 +0800
+X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.164
+Message-ID: <c6e96802-4f68-4ba2-aa24-0a68ca412024@zhaoxin.com>
+X-Barracuda-RBL-Trusted-Forwarder: 10.28.66.62
+Date: Thu, 22 Feb 2024 22:13:07 -0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240112060042.19925-2-binbin.wu@linux.intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] target/i386/kvm: Refine VMX controls setting for
+ backward compatibility
+From: Ewan Hai <ewanhai-oc@zhaoxin.com>
+X-ASG-Orig-Subj: Re: [PATCH v2] target/i386/kvm: Refine VMX controls setting for
+ backward compatibility
+To: Xiaoyao Li <xiaoyao.li@intel.com>, <pbonzini@redhat.com>,
+	<mtosatti@redhat.com>, <kvm@vger.kernel.org>, <zhao1.liu@intel.com>
+CC: <qemu-devel@nongnu.org>, <cobechen@zhaoxin.com>, <ewanhai@zhaoxin.com>
+References: <20231127034326.257596-1-ewanhai-oc@zhaoxin.com>
+ <b041fdb3-5b08-4a85-913a-ebb3c7dfbe1d@intel.com>
+ <3cf7eac6-0a95-46dd-81b0-0ac12735349b@zhaoxin.com>
+Content-Language: en-US
+In-Reply-To: <3cf7eac6-0a95-46dd-81b0-0ac12735349b@zhaoxin.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: ZXSHCAS1.zhaoxin.com (10.28.252.161) To
+ zxbjmbx1.zhaoxin.com (10.29.252.163)
+X-Barracuda-Connect: ZXSHMBX2.zhaoxin.com[10.28.252.164]
+X-Barracuda-Start-Time: 1708657989
+X-Barracuda-Encrypted: ECDHE-RSA-AES128-GCM-SHA256
+X-Barracuda-URL: https://10.28.252.36:4443/cgi-mod/mark.cgi
+X-Virus-Scanned: by bsmtpd at zhaoxin.com
+X-Barracuda-Scan-Msg-Size: 3157
+X-Barracuda-BRTS-Status: 0
+X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
+X-Barracuda-Spam-Score: -2.02
+X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=9.0 tests=
+X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.121203
+	Rule breakdown below
+	 pts rule name              description
+	---- ---------------------- --------------------------------------------------
 
-On Fri, Jan 12, 2024 at 02:00:41PM +0800, Binbin Wu wrote:
-> Date: Fri, 12 Jan 2024 14:00:41 +0800
-> From: Binbin Wu <binbin.wu@linux.intel.com>
-> Subject: [PATCH v4 1/2] target/i386: add support for LAM in CPUID
->  enumeration
-> X-Mailer: git-send-email 2.25.1
-> 
-> From: Robert Hoo <robert.hu@linux.intel.com>
-> 
-> Linear Address Masking (LAM) is a new Intel CPU feature, which allows
-> software to use of the untranslated address bits for metadata.
-> 
-> The bit definition:
-> CPUID.(EAX=7,ECX=1):EAX[26]
-> 
-> Add CPUID definition for LAM.
-> 
-> Note LAM feature is not supported for TCG of target-i386, LAM CPIUD bit
-> will not be added to TCG_7_1_EAX_FEATURES.
-> 
-> More info can be found in Intel ISE Chapter "LINEAR ADDRESS MASKING(LAM)"
-> https://cdrdv2.intel.com/v1/dl/getContent/671368
-> 
-> Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
-> Co-developed-by: Binbin Wu <binbin.wu@linux.intel.com>
-> Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
-> Tested-by: Xuelian Guo <xuelian.guo@intel.com>
-> Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> ---
->  target/i386/cpu.c | 2 +-
->  target/i386/cpu.h | 2 ++
->  2 files changed, 3 insertions(+), 1 deletion(-)
 
-Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
 
-> 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 2524881ce2..fc862dfeb1 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -967,7 +967,7 @@ FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
->              "fsrc", NULL, NULL, NULL,
->              NULL, NULL, NULL, NULL,
->              NULL, "amx-fp16", NULL, "avx-ifma",
-> -            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, "lam", NULL,
->              NULL, NULL, NULL, NULL,
->          },
->          .cpuid = {
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index 7f0786e8b9..18ea755644 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -925,6 +925,8 @@ uint64_t x86_cpu_get_supported_feature_word(FeatureWord w,
->  #define CPUID_7_1_EAX_AMX_FP16          (1U << 21)
->  /* Support for VPMADD52[H,L]UQ */
->  #define CPUID_7_1_EAX_AVX_IFMA          (1U << 23)
-> +/* Linear Address Masking */
-> +#define CPUID_7_1_EAX_LAM               (1U << 26)
->  
->  /* Support for VPDPB[SU,UU,SS]D[,S] */
->  #define CPUID_7_1_EDX_AVX_VNNI_INT8     (1U << 4)
-> -- 
-> 2.25.1
-> 
-> 
+On 2/20/24 06:07, Ewan Hai wrote:
+> On 2/20/24 03:32, Xiaoyao Li wrote:
+>>> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+>>> index 11b8177eff..c8f6c0b531 100644
+>>> --- a/target/i386/kvm/kvm.c
+>>> +++ b/target/i386/kvm/kvm.c
+>>> @@ -2296,6 +2296,7 @@ void kvm_arch_do_init_vcpu(X86CPU *cpu)
+>>>   static int kvm_get_supported_feature_msrs(KVMState *s)
+>>>   {
+>>>       int ret = 0;
+>>> +    int i;
+>>>
+>>>       if (kvm_feature_msrs != NULL) {
+>>>           return 0;
+>>> @@ -2330,6 +2331,19 @@ static int 
+>>> kvm_get_supported_feature_msrs(KVMState *s)
+>>>           return ret;
+>>>       }
+>>>
+>>> +    /*
+>>> +     * Compatibility fix:
+>>> +     * Older Linux kernels(<5.3) include the 
+>>> MSR_IA32_VMX_PROCBASED_CTLS2
+>>
+>> we can be more accurate, that kernel version 4.17 to 5.2, reports
+>> MSR_IA32_VMX_PROCBASED_CTLS2 in KVM_GET_MSR_FEATURE_INDEX_LIST but not
+>> KVM_GET_MSR_INDEX_LIST.
+>>
+> Yeah, I'll add this more precise comment to the next patch.
+>>> +     * only in feature msr list, but not in regular msr list. This 
+>>> lead to
+>>> +     * an issue in older kernel versions where QEMU, through the 
+>>> regular
+>>> +     * MSR list check, assumes the kernel doesn't maintain this msr,
+>>> +     * resulting in incorrect settings by QEMU for this msr.
+>>> +     */
+>>> +    for (i = 0; i < kvm_feature_msrs->nmsrs; i++) {
+>>> +        if (kvm_feature_msrs->indices[i] == 
+>>> MSR_IA32_VMX_PROCBASED_CTLS2) {
+>>> +            has_msr_vmx_procbased_ctls2 = true;
+>>> +        }
+>>> +    }
+>>
+>> I'm wondering should we move all the initialization of has_msr_*, that
+>> associated with feature MSRs, to here. e.g., has_msr_arch_capabs,
+>> has_msr_vmx_vmfunc,...
+>>
+> I believe this is a more elegant way to fix the issue, which will be 
+> reflected in my next patch.
+When attempting to move the detection logic for feature MSRs (currently
+including VMX_VMFUNC, UCODE_REV, ARCH_CAPABILITIES,
+PROCBASED_CTLS2) from kvm_get_supported_msrs to
+kvm_get_supported_feature_msrs in the current QEMU,
+I encountered an "error: failed to set MSR 0x491 to 0x***" on kernel 
+4.19.67.
+This issue is due to commit 27c42a1bb ("KVM: nVMX: Enable VMFUNC for
+the L1 hypervisor", 2017-08-03) exposing VMFUNC to the QEMU guest
+without corresponding VMFUNC MSR modification code, leading to an error
+when QEMU proactively tries to set the VMFUNC MSR. This bug affects kernels
+from 4.14 to 5.2, with a fix introduced in 5.3 by Paolo (e8a70bd4e ("KVM:
+nVMX: allow setting the VMFUNC controls MSR", 2019-07-02)).
+
+Therefore, even if we were to move all feature MSRs to
+kvm_get_supported_feature_msrs,VMX_VMFUNC could not be moved due to
+the need to maintain compatibility with different kernel versions. This
+exception makes our move less elegant. Hence, I am wondering whether we
+need to move all feature MSRs to kvm_get_supported_feature_msrs. Perhaps
+we just need to simply move PROCBASED_CTLS2 to fix the "failed set 0x48b 
+..."
+type of bugs, and add a comment about it?
+
+
 
