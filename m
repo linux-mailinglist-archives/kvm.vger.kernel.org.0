@@ -1,161 +1,168 @@
-Return-Path: <kvm+bounces-9477-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9478-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF46A860940
-	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 04:13:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54889860954
+	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 04:22:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B771B23BE3
-	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 03:13:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7AB21F2298C
+	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 03:22:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 101A6C8DD;
-	Fri, 23 Feb 2024 03:13:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2A54C2C6;
+	Fri, 23 Feb 2024 03:22:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mVX8vBvM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx2.zhaoxin.com (mx2.zhaoxin.com [203.110.167.99])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33684B67F
-	for <kvm@vger.kernel.org>; Fri, 23 Feb 2024 03:13:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.110.167.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D82C2C2C4
+	for <kvm@vger.kernel.org>; Fri, 23 Feb 2024 03:22:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708657997; cv=none; b=kkbXjopXVdShFgD6alC8IMytGbrOWykjicwmjHJzuNb90y8mv2Bv/t/tM8Kwnd+ed2pw1oshynrTJvXV9jDII5Z54IWMBtJytYUazAfBcM8UFMLdm29IJXbtWA5rKMnDJ+1eQky+a0ey5cKBAZx3GdLDqM9Bsj6KJ4Qn9fumTi4=
+	t=1708658523; cv=none; b=VPoSLRhfEvYNJ3XvH1mzzfICAgd/t2Jex5+LFAcyuzy+u745HbC2j4X0ruRdliiAUJZQUeReMqcgOs78mMAYW4p1QzFRUTdbyt5oz189olnp9uEAYddbO/M1nUmLo6cra4guUBG+uKSEwrxNMMnPpR+G1x6riobNtBSddo20aI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708657997; c=relaxed/simple;
-	bh=xy1NIOleVVNZ5IfskXEX5ke9LM0Im+JhdEoL9vJuU7A=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
-	 In-Reply-To:Content-Type; b=WFduvWzbEilNwefgC/8ayL3rD0b7NGh0D/KJNCuUmjr54hmbUyJMOC8Vf8+L3+rpfCvgo4tEIwctmk5JsuNtl43zvBiLm+I0WM8B9W3lRJxWAq4iI3mKMtJuoueDV81pjR3xBOYG4bC83UiAuXXFI+KXg1EvHGxvMyHo812ViaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com; spf=pass smtp.mailfrom=zhaoxin.com; arc=none smtp.client-ip=203.110.167.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zhaoxin.com
-X-ASG-Debug-ID: 1708657989-1eb14e0c7e46ae0001-HEqcsx
-Received: from ZXSHMBX2.zhaoxin.com (ZXSHMBX2.zhaoxin.com [10.28.252.164]) by mx2.zhaoxin.com with ESMTP id G3D2oEORI4UkFBrN (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Fri, 23 Feb 2024 11:13:09 +0800 (CST)
-X-Barracuda-Envelope-From: EwanHai-oc@zhaoxin.com
-X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.164
-Received: from zxbjmbx1.zhaoxin.com (10.29.252.163) by ZXSHMBX2.zhaoxin.com
- (10.28.252.164) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Fri, 23 Feb
- 2024 11:13:09 +0800
-Received: from [10.28.66.62] (10.28.66.62) by zxbjmbx1.zhaoxin.com
- (10.29.252.163) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Fri, 23 Feb
- 2024 11:13:08 +0800
-X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.164
-Message-ID: <c6e96802-4f68-4ba2-aa24-0a68ca412024@zhaoxin.com>
-X-Barracuda-RBL-Trusted-Forwarder: 10.28.66.62
-Date: Thu, 22 Feb 2024 22:13:07 -0500
+	s=arc-20240116; t=1708658523; c=relaxed/simple;
+	bh=VBbAKL/s5QKKAzFQYg0xK0ZTO0fF09wSYm1fPY9nymc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Wc70ykVb2i7/JTzArv00hE4zIooG77eQ/wBEGWQG7VsWL1uYdcSek1zVTMbbBNBIofagRGUCAJKENWxMi8TAhNYYDWC/TBwvgpkgJlK1AI6YxIDegmAHjUvWWWYyDDr1s6m58J3t4kL00VLIZquQfdSwPxCG8qUXuSADIS5vdYc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mVX8vBvM; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708658522; x=1740194522;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=VBbAKL/s5QKKAzFQYg0xK0ZTO0fF09wSYm1fPY9nymc=;
+  b=mVX8vBvMiG8PmE9DS3wycVwwpxupxY5oObzzv7TS1Q8iuRtuO7fQ9c/B
+   KdKB4t96A6+R4TWY9UFFCgYh0p5ARLOiEJiqM2lgJij5DlseVlSx0S+cY
+   F7bIsCUh6yTyNWzwwvxVu3G1dzhtpGDdLjWls45ZXECjZjyWy7WA5huV7
+   aoEe0RfDN2MK4eMTMvO8XD6IHgRbQLpNYSD2faw9lOuOxD39Eg+zzoYT+
+   ATTnoTBc6U1zFcCpOIewrL5HXtJ7N/FZzCjR0M9IMSALEDXeSPdZZXIGk
+   0XTQfcLUtPoxlnkY3Vm5jXegtcjgtpVyvt96ultow+nRxbtVKjUiXK16S
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10992"; a="3113456"
+X-IronPort-AV: E=Sophos;i="6.06,179,1705392000"; 
+   d="scan'208";a="3113456"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Feb 2024 19:22:02 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,179,1705392000"; 
+   d="scan'208";a="36559813"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
+  by orviesa002.jf.intel.com with ESMTP; 22 Feb 2024 19:21:59 -0800
+Date: Fri, 23 Feb 2024 11:35:39 +0800
+From: Zhao Liu <zhao1.liu@intel.com>
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, pbonzini@redhat.com,
+	xiaoyao.li@intel.com, chao.gao@intel.com, robert.hu@linux.intel.com
+Subject: Re: [PATCH v4 2/2] target/i386: add control bits support for LAM
+Message-ID: <ZdgSi35/Lb9FeNoG@intel.com>
+References: <20240112060042.19925-1-binbin.wu@linux.intel.com>
+ <20240112060042.19925-3-binbin.wu@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] target/i386/kvm: Refine VMX controls setting for
- backward compatibility
-From: Ewan Hai <ewanhai-oc@zhaoxin.com>
-X-ASG-Orig-Subj: Re: [PATCH v2] target/i386/kvm: Refine VMX controls setting for
- backward compatibility
-To: Xiaoyao Li <xiaoyao.li@intel.com>, <pbonzini@redhat.com>,
-	<mtosatti@redhat.com>, <kvm@vger.kernel.org>, <zhao1.liu@intel.com>
-CC: <qemu-devel@nongnu.org>, <cobechen@zhaoxin.com>, <ewanhai@zhaoxin.com>
-References: <20231127034326.257596-1-ewanhai-oc@zhaoxin.com>
- <b041fdb3-5b08-4a85-913a-ebb3c7dfbe1d@intel.com>
- <3cf7eac6-0a95-46dd-81b0-0ac12735349b@zhaoxin.com>
-Content-Language: en-US
-In-Reply-To: <3cf7eac6-0a95-46dd-81b0-0ac12735349b@zhaoxin.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: ZXSHCAS1.zhaoxin.com (10.28.252.161) To
- zxbjmbx1.zhaoxin.com (10.29.252.163)
-X-Barracuda-Connect: ZXSHMBX2.zhaoxin.com[10.28.252.164]
-X-Barracuda-Start-Time: 1708657989
-X-Barracuda-Encrypted: ECDHE-RSA-AES128-GCM-SHA256
-X-Barracuda-URL: https://10.28.252.36:4443/cgi-mod/mark.cgi
-X-Virus-Scanned: by bsmtpd at zhaoxin.com
-X-Barracuda-Scan-Msg-Size: 3157
-X-Barracuda-BRTS-Status: 0
-X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
-X-Barracuda-Spam-Score: -2.02
-X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=9.0 tests=
-X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.121203
-	Rule breakdown below
-	 pts rule name              description
-	---- ---------------------- --------------------------------------------------
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240112060042.19925-3-binbin.wu@linux.intel.com>
 
+On Fri, Jan 12, 2024 at 02:00:42PM +0800, Binbin Wu wrote:
+> Date: Fri, 12 Jan 2024 14:00:42 +0800
+> From: Binbin Wu <binbin.wu@linux.intel.com>
+> Subject: [PATCH v4 2/2] target/i386: add control bits support for LAM
+> X-Mailer: git-send-email 2.25.1
+> 
+> LAM uses CR3[61] and CR3[62] to configure/enable LAM on user pointers.
+> LAM uses CR4[28] to configure/enable LAM on supervisor pointers.
+> 
+> For CR3 LAM bits, no additional handling needed:
+> - TCG
+>   LAM is not supported for TCG of target-i386.  helper_write_crN() and
+>   helper_vmrun() check max physical address bits before calling
+>   cpu_x86_update_cr3(), no change needed, i.e. CR3 LAM bits are not allowed
+>   to be set in TCG.
+> - gdbstub
+>   x86_cpu_gdb_write_register() will call cpu_x86_update_cr3() to update cr3.
+>   Allow gdb to set the LAM bit(s) to CR3, if vcpu doesn't support LAM,
+>   KVM_SET_SREGS will fail as other reserved bits.
+> 
+> For CR4 LAM bit, its reservation depends on vcpu supporting LAM feature or
+> not.
+> - TCG
+>   LAM is not supported for TCG of target-i386.  helper_write_crN() and
+>   helper_vmrun() check CR4 reserved bit before calling cpu_x86_update_cr4(),
+>   i.e. CR4 LAM bit is not allowed to be set in TCG.
+> - gdbstub
+>   x86_cpu_gdb_write_register() will call cpu_x86_update_cr4() to update cr4.
+>   Mask out LAM bit on CR4 if vcpu doesn't support LAM.
+> - x86_cpu_reset_hold() doesn't need special handling.
+> 
+> Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
+> Tested-by: Xuelian Guo <xuelian.guo@intel.com>
+> ---
+>  target/i386/cpu.h    | 7 ++++++-
+>  target/i386/helper.c | 4 ++++
+>  2 files changed, 10 insertions(+), 1 deletion(-)
 
+Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
 
-On 2/20/24 06:07, Ewan Hai wrote:
-> On 2/20/24 03:32, Xiaoyao Li wrote:
->>> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
->>> index 11b8177eff..c8f6c0b531 100644
->>> --- a/target/i386/kvm/kvm.c
->>> +++ b/target/i386/kvm/kvm.c
->>> @@ -2296,6 +2296,7 @@ void kvm_arch_do_init_vcpu(X86CPU *cpu)
->>>   static int kvm_get_supported_feature_msrs(KVMState *s)
->>>   {
->>>       int ret = 0;
->>> +    int i;
->>>
->>>       if (kvm_feature_msrs != NULL) {
->>>           return 0;
->>> @@ -2330,6 +2331,19 @@ static int 
->>> kvm_get_supported_feature_msrs(KVMState *s)
->>>           return ret;
->>>       }
->>>
->>> +    /*
->>> +     * Compatibility fix:
->>> +     * Older Linux kernels(<5.3) include the 
->>> MSR_IA32_VMX_PROCBASED_CTLS2
->>
->> we can be more accurate, that kernel version 4.17 to 5.2, reports
->> MSR_IA32_VMX_PROCBASED_CTLS2 in KVM_GET_MSR_FEATURE_INDEX_LIST but not
->> KVM_GET_MSR_INDEX_LIST.
->>
-> Yeah, I'll add this more precise comment to the next patch.
->>> +     * only in feature msr list, but not in regular msr list. This 
->>> lead to
->>> +     * an issue in older kernel versions where QEMU, through the 
->>> regular
->>> +     * MSR list check, assumes the kernel doesn't maintain this msr,
->>> +     * resulting in incorrect settings by QEMU for this msr.
->>> +     */
->>> +    for (i = 0; i < kvm_feature_msrs->nmsrs; i++) {
->>> +        if (kvm_feature_msrs->indices[i] == 
->>> MSR_IA32_VMX_PROCBASED_CTLS2) {
->>> +            has_msr_vmx_procbased_ctls2 = true;
->>> +        }
->>> +    }
->>
->> I'm wondering should we move all the initialization of has_msr_*, that
->> associated with feature MSRs, to here. e.g., has_msr_arch_capabs,
->> has_msr_vmx_vmfunc,...
->>
-> I believe this is a more elegant way to fix the issue, which will be 
-> reflected in my next patch.
-When attempting to move the detection logic for feature MSRs (currently
-including VMX_VMFUNC, UCODE_REV, ARCH_CAPABILITIES,
-PROCBASED_CTLS2) from kvm_get_supported_msrs to
-kvm_get_supported_feature_msrs in the current QEMU,
-I encountered an "error: failed to set MSR 0x491 to 0x***" on kernel 
-4.19.67.
-This issue is due to commit 27c42a1bb ("KVM: nVMX: Enable VMFUNC for
-the L1 hypervisor", 2017-08-03) exposing VMFUNC to the QEMU guest
-without corresponding VMFUNC MSR modification code, leading to an error
-when QEMU proactively tries to set the VMFUNC MSR. This bug affects kernels
-from 4.14 to 5.2, with a fix introduced in 5.3 by Paolo (e8a70bd4e ("KVM:
-nVMX: allow setting the VMFUNC controls MSR", 2019-07-02)).
-
-Therefore, even if we were to move all feature MSRs to
-kvm_get_supported_feature_msrs,VMX_VMFUNC could not be moved due to
-the need to maintain compatibility with different kernel versions. This
-exception makes our move less elegant. Hence, I am wondering whether we
-need to move all feature MSRs to kvm_get_supported_feature_msrs. Perhaps
-we just need to simply move PROCBASED_CTLS2 to fix the "failed set 0x48b 
-..."
-type of bugs, and add a comment about it?
-
-
+> 
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index 18ea755644..598a3fa140 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -261,6 +261,7 @@ typedef enum X86Seg {
+>  #define CR4_SMAP_MASK   (1U << 21)
+>  #define CR4_PKE_MASK   (1U << 22)
+>  #define CR4_PKS_MASK   (1U << 24)
+> +#define CR4_LAM_SUP_MASK (1U << 28)
+>  
+>  #define CR4_RESERVED_MASK \
+>  (~(target_ulong)(CR4_VME_MASK | CR4_PVI_MASK | CR4_TSD_MASK \
+> @@ -269,7 +270,8 @@ typedef enum X86Seg {
+>                  | CR4_OSFXSR_MASK | CR4_OSXMMEXCPT_MASK | CR4_UMIP_MASK \
+>                  | CR4_LA57_MASK \
+>                  | CR4_FSGSBASE_MASK | CR4_PCIDE_MASK | CR4_OSXSAVE_MASK \
+> -                | CR4_SMEP_MASK | CR4_SMAP_MASK | CR4_PKE_MASK | CR4_PKS_MASK))
+> +                | CR4_SMEP_MASK | CR4_SMAP_MASK | CR4_PKE_MASK | CR4_PKS_MASK \
+> +                | CR4_LAM_SUP_MASK))
+>  
+>  #define DR6_BD          (1 << 13)
+>  #define DR6_BS          (1 << 14)
+> @@ -2522,6 +2524,9 @@ static inline uint64_t cr4_reserved_bits(CPUX86State *env)
+>      if (!(env->features[FEAT_7_0_ECX] & CPUID_7_0_ECX_PKS)) {
+>          reserved_bits |= CR4_PKS_MASK;
+>      }
+> +    if (!(env->features[FEAT_7_1_EAX] & CPUID_7_1_EAX_LAM)) {
+> +        reserved_bits |= CR4_LAM_SUP_MASK;
+> +    }
+>      return reserved_bits;
+>  }
+>  
+> diff --git a/target/i386/helper.c b/target/i386/helper.c
+> index 2070dd0dda..1da7a7d315 100644
+> --- a/target/i386/helper.c
+> +++ b/target/i386/helper.c
+> @@ -219,6 +219,10 @@ void cpu_x86_update_cr4(CPUX86State *env, uint32_t new_cr4)
+>          new_cr4 &= ~CR4_PKS_MASK;
+>      }
+>  
+> +    if (!(env->features[FEAT_7_1_EAX] & CPUID_7_1_EAX_LAM)) {
+> +        new_cr4 &= ~CR4_LAM_SUP_MASK;
+> +    }
+> +
+>      env->cr[4] = new_cr4;
+>      env->hflags = hflags;
+>  
+> -- 
+> 2.25.1
+> 
+> 
 
