@@ -1,114 +1,183 @@
-Return-Path: <kvm+bounces-9448-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9449-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB83E8607C2
-	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 01:35:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70A148607C4
+	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 01:43:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6F405B2230A
-	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 00:35:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD66B1F23120
+	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 00:43:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A32579DC;
-	Fri, 23 Feb 2024 00:35:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 206698F51;
+	Fri, 23 Feb 2024 00:43:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="vx0lAI9O"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OSkTntJj"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0573D7F;
-	Fri, 23 Feb 2024 00:35:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ED052F2E
+	for <kvm@vger.kernel.org>; Fri, 23 Feb 2024 00:43:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708648533; cv=none; b=BaGMQK2GT19P3OBGKFDEQv0zeQ2srRiroCn5pv4Z0WituptNg7f/9wXIROOHuwSv+bWs/dOvkuoUvN1skqM6Gqp1GEMxsqVbEJ7bu1Oyv3PzabsGEGsaGO3BZrjFpnp5d6J7Yi+95grfy52aN8CPMwvhmq9JwmPL1wj7DG5nNUo=
+	t=1708648984; cv=none; b=OtxwKARbsz9ZTyq3ZWrsLr6VsC5FqqUOkN7uwG5VvRSXcPB7b8Y+8NGV+AvO9m6ds+5ZA0B0iDwJKXafWz5k9W+3df3oqXCAVQ86/HcV4VM669abXw/ILxuGHU0Wxw1WJ/v1GwKEJtFUKed+O75zy6qYpR1Bf68+FlJQfse8mqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708648533; c=relaxed/simple;
-	bh=UuyemN29n5uuhM3XDRw+M9OmUMLgiLVssyaJZggKbgk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XogQ7iGgEmd0nDSXjAqYTLftPahvBtlMTvWgEIT+idEm7GOM8Ah04mamgMF/GjN8zZz6KOXDT82l0i4ZNqHKyGwet3+Xx/veaPynMSFfCdljfeanjjwzMkjBA79dwRT8DCsh32R/JBw5HKnvAsU70DMVCdNJi4cFa8IxkUR9gNc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=vx0lAI9O; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=Jjp0B9J5MnbOQoNMfaQog5UT9Wod0mD1lECH/WlLFiA=; b=vx0lAI9OP3zaj26NbO7YK2kxuL
-	rxq6qOocccU9w2yUa/5HMJoRpmtWfr+tBtPwB+CGJECRTiFCjdwO5xc5UdSmb972zkdu7BjD+uqC5
-	ubiywajEuHOhv+hTCpDNgKXvOFPOegHcx3eRaKYh0dYMiRr3sKWWbb8Tcxj/kjKgeZAVrAS37kNCX
-	4XJgXKFYPlIOre4tzu+X3ZDzObpdTyMo+OiTSRoAwIFiQuempCYRJ0SD+navq/qnVcArmH06rzeed
-	1K6vfCbFRmKdh5tUX6xlnrSqGHaBX5Y4ZjeoAnodqK5ny8r16TpruMlihybbAJDlbb6QhIETbTUAl
-	/tcoXSJg==;
-Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rdJX5-00000005CET-0p6c;
-	Fri, 23 Feb 2024 00:35:19 +0000
-Date: Fri, 23 Feb 2024 00:35:19 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org,
-	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com,
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com,
-	viro@zeniv.linux.org.uk, brauner@kernel.org,
-	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com,
-	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com,
-	dmatlack@google.com, yu.c.zhang@linux.intel.com,
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
-	vannapurve@google.com, ackerleytng@google.com,
-	mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com,
-	wei.w.wang@intel.com, liam.merwick@oracle.com,
-	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com,
-	suzuki.poulose@arm.com, steven.price@arm.com,
-	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com,
-	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com,
-	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org,
-	qperret@google.com, keirf@google.com
-Cc: linux-mm@kvack.org
-Subject: folio_mmapped
-Message-ID: <ZdfoR3nCEP3HTtm1@casper.infradead.org>
-References: <20240222161047.402609-1-tabba@google.com>
- <20240222141602976-0800.eberman@hu-eberman-lv.qualcomm.com>
+	s=arc-20240116; t=1708648984; c=relaxed/simple;
+	bh=pRhaWQopgyeylx63BqxVOojIfSEkv0VhiWmUmKJ6n8U=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=PZGbrmrn7StcrCfJju3wNoiI+Gz/8BN6ME18zuHotpvLbLCZdVAHhT7Jz6Z2mHnTLQ+OF6UTKbhRLuCUEbRG7SUqo8Z0IkKy4jSEnvEkpFyMmE1CPNQB207JCtcFn+RluhKTVyGoGFnoXJ/3c6mKxfZ0tf317fcN4vrEs1sjuEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OSkTntJj; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc64e0fc7c8so399008276.2
+        for <kvm@vger.kernel.org>; Thu, 22 Feb 2024 16:43:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1708648981; x=1709253781; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Zjc59DluW49ttFqszZ9w9JOq4NwZpI0t2wGHcPtZrIc=;
+        b=OSkTntJjMiV/7KE+PSmxSTP+suksaP0o7Xaj5oPhU6mewsEkUbZ70Aq6Gk2ytT4s5q
+         PuhBV7FYpwGaX1rab6Ruw/wSLv3ORYXsfgmvVrGYQEb8AAO9UH1dD6IqzflS6ImMXcW3
+         37leqbl/MDbOlNFV1mm8sd4scmeiTDtDIjUoIJQI9SgmX5wTh8ZO0kDotk1244BgI32F
+         FV69bGkYvhc0Goj87Mj6Uw0ym8/26Oun9C04RvMayQILHvi5wySzITv1g3aW2KfMS7QK
+         c13cBpEz8UW+JJxXk+60PNGpej85KV9aLE9pzCYvQeQ+32XKTR97ntNAYyyb8OLpWMPl
+         7JJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708648981; x=1709253781;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Zjc59DluW49ttFqszZ9w9JOq4NwZpI0t2wGHcPtZrIc=;
+        b=Z6aezT+mpg2vNxQ32EW8HgtmvHgrOCmY+KU0SvltTN15e7tO/SdHvjknyKdGJ9XphR
+         MmFlEdy89AiY74rDQQGO65DMkKa1EaaN9WlH7Jol2yA6JhoCo3+3tw/mxFRxTMnjFcjw
+         gJ4cmGhzrnPmkBYOHX5k/Gn2DSCeExKql60WtGC2ZuNt50jTuiDDuI8f93AFJKg8eikj
+         elJDrfF8fB0c6rtodTj+Gy8ZMELMhHroOvcW/rLFm3U7vJqCB0ynH8igd/gnjRqPyfvo
+         f2Ve9NHx1OfELvHclazviko2Jb3GUq7orjR+3NSL8sr6+DVbzR3BDw8IxatI6AeAqYMJ
+         5bLQ==
+X-Gm-Message-State: AOJu0YxsHJGxc2zrocGRCfi+whOa4f3shbpORoErywcXEcuP2QNABJXg
+	chY2idCMtxVyDtsDUZ0j3VqH9gHVVanrkCmKQxJzgm6h9jz7cLopjM2n0Vj4ewV/nRfKA1fvtiD
+	7GA==
+X-Google-Smtp-Source: AGHT+IG1xzJWlosTep8wtCbhiO7612+88ajrhSavDwxiYQqemKwzSboM+bUS3n19nYfTfskN3+FLs1ydHTk=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:68d0:0:b0:dcd:c091:e86 with SMTP id
+ d199-20020a2568d0000000b00dcdc0910e86mr26998ybc.13.1708648981584; Thu, 22 Feb
+ 2024 16:43:01 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Thu, 22 Feb 2024 16:42:47 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240222141602976-0800.eberman@hu-eberman-lv.qualcomm.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.rc0.258.g7320e95886-goog
+Message-ID: <20240223004258.3104051-1-seanjc@google.com>
+Subject: [PATCH v9 00/11] KVM: selftests: Add SEV and SEV-ES smoke tests
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+	Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
+	Andrew Jones <andrew.jones@linux.dev>, Tom Lendacky <thomas.lendacky@amd.com>, 
+	Michael Roth <michael.roth@amd.com>, Carlos Bilbao <carlos.bilbao@amd.com>, 
+	Peter Gonda <pgonda@google.com>, Itaru Kitayama <itaru.kitayama@fujitsu.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Feb 22, 2024 at 03:43:56PM -0800, Elliot Berman wrote:
-> > This creates the situation where access to successfully mmap()'d
-> > memory might SIGBUS at page fault. There is precedence for
-> > similar behavior in the kernel I believe, with MADV_HWPOISON and
-> > the hugetlbfs cgroups controller, which could SIGBUS at page
-> > fault time depending on the accounting limit.
-> 
-> I added a test: folio_mmapped() [1] which checks if there's a vma
-> covering the corresponding offset into the guest_memfd. I use this
-> test before trying to make page private to guest and I've been able to
-> ensure that userspace can't even mmap() private guest memory. If I try
-> to make memory private, I can test that it's not mmapped and not allow
-> memory to become private. In my testing so far, this is enough to
-> prevent SIGBUS from happening.
-> 
-> This test probably should be moved outside Gunyah specific code, and was
-> looking for maintainer to suggest the right home for it :)
-> 
-> [1]: https://lore.kernel.org/all/20240222-gunyah-v17-20-1e9da6763d38@quicinc.com/
+Add basic SEV and SEV-ES smoke tests.  Unlike the intra-host migration tests,
+this one actually runs a small chunk of code in the guest.
 
-You, um, might have wanted to send an email to linux-mm, not bury it in
-the middle of a series of 35 patches?
+Unless anyone strongly objects to the quick and dirty approach I've taken for 
+SEV-ES, I'll get all of this queued for 6.9 soon-ish.
 
-So this isn't folio_mapped() because you're interested if anyone _could_
-fault this page, not whether the folio is currently present in anyone's
-page tables.
+As for _why_ I added the quick-and-dirty SEV-ES testcase, I have a series to
+cleanup __svm_sev_es_vcpu_run(), and found out that apparently I have a version
+of OVMF that doesn't quite have to the right <something> for SEV-ES, and so I
+could even get a "real" VM to reach KVM_RUN.  I assumed (correctly, yay!) that
+hacking together a selftest would be faster than figuring out what firmware
+magic I am missing.
 
-It's like walk_page_mapping() but with a trivial mm_walk_ops; not sure
-it's worth the effort to use walk_page_mapping(), but I would defer to
-David.
+v9:
+ - Drop is_kvm_sev_supported() and rely purely on KVM capabilities.
+ - Check X86_FEATURE_SEV to ensure SEV is actually enabled.
+ - Collect tags. [Carlos, Itaru]
+
+v8:
+ - https://lore.kernel.org/all/cc9a1951-e76c-470d-a4d1-8ad67bae5794@amd.com
+ - Undo the kvm.h uAPI breakage.
+ - Take advantage of "struct vm_shape", introduced by the guest_memfd
+   selftests, to simply tracking the SEV/SEV-ES subtypes.
+ - Rename the test to "sev_smoke_test" instead of "sev_all_boot_test",
+   as the "all" is rather nonsensical, and the test isn't booting anything
+   in the traditional sense of the word.
+ - Drop vm->protected and instead add an arch hook to query if the VM has
+   protected memory.
+ - Assert that the target memory region supports protected memory when
+   allocating protected memory.
+ - Allocate protected_phy_pages for memory regions if and only if the VM
+   supports protected memory.
+ - Rename kvm_host.h to kvm_util_arch.h, and move it to selftests/kvm where
+   it belongs.
+ - Fix up some SoB goofs.
+ - Convert the intrahost SEV/SEV-ES migration tests to use common ioctl()
+   wrappers.
+
+Ackerley Tng (1):
+  KVM: selftests: Add a macro to iterate over a sparsebit range
+
+Michael Roth (2):
+  KVM: selftests: Make sparsebit structs const where appropriate
+  KVM: selftests: Add support for protected vm_vaddr_* allocations
+
+Peter Gonda (5):
+  KVM: selftests: Add support for allocating/managing protected guest
+    memory
+  KVM: selftests: Explicitly ucall pool from shared memory
+  KVM: selftests: Allow tagging protected memory in guest page tables
+  KVM: selftests: Add library for creating and interacting with SEV
+    guests
+  KVM: selftests: Add a basic SEV smoke test
+
+Sean Christopherson (3):
+  KVM: selftests: Extend VM creation's @shape to allow control of VM
+    subtype
+  KVM: selftests: Use the SEV library APIs in the intra-host migration
+    test
+  KVM: selftests: Add a basic SEV-ES smoke test
+
+ tools/testing/selftests/kvm/Makefile          |   2 +
+ .../kvm/include/aarch64/kvm_util_arch.h       |   7 ++
+ .../selftests/kvm/include/kvm_util_base.h     |  50 +++++++-
+ .../kvm/include/riscv/kvm_util_arch.h         |   7 ++
+ .../kvm/include/s390x/kvm_util_arch.h         |   7 ++
+ .../testing/selftests/kvm/include/sparsebit.h |  56 ++++++---
+ .../kvm/include/x86_64/kvm_util_arch.h        |  23 ++++
+ .../selftests/kvm/include/x86_64/processor.h  |   8 ++
+ .../selftests/kvm/include/x86_64/sev.h        | 107 ++++++++++++++++
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  67 ++++++++--
+ tools/testing/selftests/kvm/lib/sparsebit.c   |  48 ++++----
+ .../testing/selftests/kvm/lib/ucall_common.c  |   3 +-
+ .../selftests/kvm/lib/x86_64/processor.c      |  32 ++++-
+ tools/testing/selftests/kvm/lib/x86_64/sev.c  | 114 ++++++++++++++++++
+ .../selftests/kvm/x86_64/sev_migrate_tests.c  |  67 ++++------
+ .../selftests/kvm/x86_64/sev_smoke_test.c     |  88 ++++++++++++++
+ 16 files changed, 583 insertions(+), 103 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/kvm_util_arch.h
+ create mode 100644 tools/testing/selftests/kvm/include/riscv/kvm_util_arch.h
+ create mode 100644 tools/testing/selftests/kvm/include/s390x/kvm_util_arch.h
+ create mode 100644 tools/testing/selftests/kvm/include/x86_64/kvm_util_arch.h
+ create mode 100644 tools/testing/selftests/kvm/include/x86_64/sev.h
+ create mode 100644 tools/testing/selftests/kvm/lib/x86_64/sev.c
+ create mode 100644 tools/testing/selftests/kvm/x86_64/sev_smoke_test.c
+
+
+base-commit: 60eedcfceda9db46f1b333e5e1aa9359793f04fb
+-- 
+2.44.0.rc0.258.g7320e95886-goog
+
 
