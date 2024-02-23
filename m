@@ -1,558 +1,189 @@
-Return-Path: <kvm+bounces-9474-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9475-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 669FD86088B
-	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 02:56:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 13E62860907
+	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 03:51:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C45C11F238B3
-	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 01:56:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9018B1F23D2E
+	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 02:51:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17BECC153;
-	Fri, 23 Feb 2024 01:55:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2A70C14F;
+	Fri, 23 Feb 2024 02:51:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PKFzPN1V"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Mhhbh9+7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2049.outbound.protection.outlook.com [40.107.93.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3896EBE68;
-	Fri, 23 Feb 2024 01:55:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E901628EB;
+	Fri, 23 Feb 2024 02:51:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.49
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708653347; cv=fail; b=qZWbBqxc3/ucRi4G6OMiXYSBs86I6zx3VPsxxXxlj4Un7srSHzjCkjWZSb30AzhOc5go0cgEskJVzimxlSrnYTpSdYmNoK/lgDNz7lgy/RheK7/dNyDJTgPexK+wvoKEYpw4Po6/uDIIAhmHLNaPXoLTRW4EOr6UEEF7Cq5iEMc=
+	t=1708656689; cv=fail; b=rHQPhZtIKVBuYkK/oQq/1eAk/caVvQ20EGDcbbbXxLKs+qMGrSXeu6tJgp/U6Md1+AXmIwk0A2o2RWQXFnW4exQ6U5sOb6QFiEYmPrs+5AUSV1gJSCqC4AKHg0hV/IEUt1xhsh1bxE89GoxkMImrez1lI6tZJza1C4avHnsfN48=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708653347; c=relaxed/simple;
-	bh=r8J7tzEJa4VhTrsYOG6FXhk4OxbGn+9GWaBZRKl5Ga0=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=dg/YgyVtNg7gOQ6WoX857Jbj/JCIO54Wuy6KMN+CfIivLO8sisEl0krmvJ1ZR0VhCJpqP/Z95e1XjmdJA1AVSVAdqHtt9NHQhQDuHNkKLtJPFVV6EoTMlSOhkIPT7SCnMkzW4KEpHt9tdR93lPyL4351AzDA2cp2yyQcB2+NtFw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PKFzPN1V; arc=fail smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708653329; x=1740189329;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=r8J7tzEJa4VhTrsYOG6FXhk4OxbGn+9GWaBZRKl5Ga0=;
-  b=PKFzPN1VAoc/QPK5ztCWZofEE792GSdszqHqfRdA7E+AEi6QGMNSNALT
-   TAE0o+5AdtRmXf21/RWhAxX3ejVsczaD47zPWe7jljv2CKhSm2CdMxxqx
-   fi/QHB8CabwS6UCDIVRnIqp6iIAlxWO9Nw+1n8vO4NEa7G1Z7+tcYU7KQ
-   nmeyhLTUsTOye853hBEg9NedWHjgGgJ0jv/a4QeiyMUmTM0YX411nO67Y
-   TV0nhgqsKjsAuKSZefFDprVlPERuJWMMmySSp55MY2qmCrJjPq9OBS+tQ
-   DPN+WG2eP6zmcU7wIpoi6V5nawTCS1GwWxHozu8uT1aONwMs7Vr4JqZhL
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10992"; a="13583591"
-X-IronPort-AV: E=Sophos;i="6.06,179,1705392000"; 
-   d="scan'208";a="13583591"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Feb 2024 17:55:28 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,179,1705392000"; 
-   d="scan'208";a="28913572"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 22 Feb 2024 17:55:27 -0800
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 22 Feb 2024 17:55:27 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 22 Feb 2024 17:55:26 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Thu, 22 Feb 2024 17:55:26 -0800
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.169)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 22 Feb 2024 17:55:26 -0800
+	s=arc-20240116; t=1708656689; c=relaxed/simple;
+	bh=jnwJDNfwx7HLqjw7CTBC083ygY7K2m9YyPqw/Hywlc8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Iua9ljY15OXSloLvx8elQP1DjJsDTIp6MjN+ECe5wQsrSRelzMP1UE9HYyv6zZq8nhX1UQAHMRyAthJu4efoHKMJ0H7fDMFKRTo82GXzv/ZDaibcnNtvET3l/L5ukZgNOnwq6JZQjX+OLSzTi3+FFFpJ60Yg+9+yEaykExE2jSY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Mhhbh9+7; arc=fail smtp.client-ip=40.107.93.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ogwFVX/+VFg3IEmNdLyGkLeuTyhIO/Y6GOFBErZL+FqIW3HSErrh9vy/oG+aEb+F7MHfnGMCYU+itIq1Ixeje9nbYoz39XzdRBEYYzYeePlXlpDf90YCccxqOJItcxCyM8N1EX6GJCzxsPSjckxrAyP7vkH/cqhdwpq4YpPp1AWXbgs4VTlPrgCByCKYLQAIEdkHeOrXllAwMuSCh1Hx0AncDeUFZKXJzGRvCGZ36q/CX/MprlKoRg5WFg3VQnAOawsqg1ZbTeN2z97LFhHKDzxuLYUMwc6XxIYmK5W79ne4BH5AMkRZVdj/zihbZsq7EvwAB96Rw7SfJkmK9FlcyQ==
+ b=bY7OozWsggbOp1MfapCSYQrRdz/z++hTs32HsxGhUOPUCyAY53kxDbYyLYMHrdVu1kboLo1h/kwfzgw6WcXHwa5oX8jneB1P96hUA246xAu8N/YZ/W71YBYS6PbIs4i9G8H7M1OhZy2Us7wis9NR7453LM4Kwsd1dNve+jHdXOd3LK0qZ9/UlTjUObW+1ltGigb7WmdMY21BJbpVHgmhtdJOqtfrigTX9C4VrFvFIEaKJnmabKkl7MSlrMecsIZ7bTpNlrG/nqumW7x+OCMF2YCDAz53s6XmnSrKO66noZ8N+65s6mojyZ2/Pnrz9PX1k21VvpxKgTpz5NcVxH/cXA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dR48VQNylwVA/julK0fl6GzRCdI7eVwRcEDQkeYEvgY=;
- b=Ll44hLDnrhPo0UkDLdVcFXwOsYRzbJ+B7tYiOdnRbEe7Ex7ZdiRGLh/m3MrEkciXVyXAp3pIaEvUpVqDlElCxVu7hM42PDFVaUUiFqiF70Yw6mx3a8LVS0D7YB50wOcUW3eRVkZk9nUCvVjfOfg7x6oYw/0kHk1+AXxABzxbNNf0n8+ui+qVwBz9Lzqy1/z3VycsWq73JT4mEf7KHKnIxHbjD9qQFnmpMkj4pVAVJsIHq08HfqtgPMqcoEOETHckqED2BD+SUa9PUgl1GFTQiUbbBWhaImI5/UEP5VzjO948WudcNAMjBQvFfhrj2qzvMSXWdEeBBxvI+jAANCLo3w==
+ bh=jnwJDNfwx7HLqjw7CTBC083ygY7K2m9YyPqw/Hywlc8=;
+ b=ImGkQuYL/U9BbTJamK3zMqU0s3STpL7Q+VSbRYwM9zcDw8iwsLl0gXSacWAMj8NfvGTK6usH4a+Lgfmognunx/FfN6FpimJGBeDhuaq3VzBhqnlwXuwZNedKFZL9J3NlP7zduXeuThY+26d7vwrI73aAzE45UKIlaZK5BvoogmLQXNSeTCINRTrN6qiEp2fu3Q1bGnjJNkHKxWPI53q/J2QEecOQdc8Mh954wXDKtHEqSc6ZK4EI9P6eozCJW/5P6kBr3gTcZN7XFq58+BUEoLevtySjU2bhGikfYPWvw/haILG1qCvJUxyMIXsldtuuou5MOYbIiZ1liSIhF63e1w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM4PR11MB6020.namprd11.prod.outlook.com (2603:10b6:8:61::19) by
- CH3PR11MB8444.namprd11.prod.outlook.com (2603:10b6:610:1ba::13) with
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jnwJDNfwx7HLqjw7CTBC083ygY7K2m9YyPqw/Hywlc8=;
+ b=Mhhbh9+7p7nCG9mxlAPvV8ROyTjaCtwW6TTARJR9CNIvzx4q7l4AaWo/2D9CjiHFg1aDjklIHbXgRGuA8NJr2EeT29AMpIdVm7Hy2gU3FFIiOx+Xcry4qsTeu8ndDsoGri1FvpzqyTKVtLrb+XRSWTyjWF08e1z44wNNbrWz1YYXtuIz2ug5TVMp/jc0tgQqDDtbyxBlbR0DGoUI+RMJhPX3wtpuF5O/gq1x/LC7QV9urzJnOTmY6aUMe7mYHJxJfyj90SbCNdga1sOQ9hvhqGjC0ZvcB3VCT6ottcMBp5Gmc0rDaH3YkDyc2eo5DqTGXLpCNxftG2Sw+UO8Zs415w==
+Received: from SA1PR12MB7199.namprd12.prod.outlook.com (2603:10b6:806:2bc::21)
+ by CO6PR12MB5489.namprd12.prod.outlook.com (2603:10b6:303:139::18) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.10; Fri, 23 Feb
- 2024 01:55:24 +0000
-Received: from DM4PR11MB6020.namprd11.prod.outlook.com
- ([fe80::7ab1:eed9:f084:6889]) by DM4PR11MB6020.namprd11.prod.outlook.com
- ([fe80::7ab1:eed9:f084:6889%4]) with mapi id 15.20.7339.009; Fri, 23 Feb 2024
- 01:55:24 +0000
-Date: Fri, 23 Feb 2024 09:55:06 +0800
-From: Chen Yu <yu.c.chen@intel.com>
-To: Sagi Shahar <sagis@google.com>
-CC: <linux-kselftest@vger.kernel.org>, Ackerley Tng <ackerleytng@google.com>,
-	Ryan Afranji <afranji@google.com>, Erdem Aktas <erdemaktas@google.com>, Isaku
- Yamahata <isaku.yamahata@intel.com>, Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Peter
- Gonda <pgonda@google.com>, Haibo Xu <haibo1.xu@intel.com>, Chao Peng
-	<chao.p.peng@linux.intel.com>, "Vishal Annapurve" <vannapurve@google.com>,
-	Roger Wang <runanwang@google.com>, "Vipin Sharma" <vipinsh@google.com>,
-	<jmattson@google.com>, <dmatlack@google.com>, <linux-kernel@vger.kernel.org>,
-	<kvm@vger.kernel.org>, <linux-mm@kvack.org>
-Subject: Re: [RFC PATCH v5 08/29] KVM: selftests: TDX: Add TDX lifecycle test
-Message-ID: <Zdf6+mvU0PqrPt3t@chenyu5-mobl2>
-References: <20231212204647.2170650-1-sagis@google.com>
- <20231212204647.2170650-9-sagis@google.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20231212204647.2170650-9-sagis@google.com>
-X-ClientProxiedBy: SI1PR02CA0046.apcprd02.prod.outlook.com
- (2603:1096:4:1f5::14) To DM4PR11MB6020.namprd11.prod.outlook.com
- (2603:10b6:8:61::19)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.24; Fri, 23 Feb
+ 2024 02:51:25 +0000
+Received: from SA1PR12MB7199.namprd12.prod.outlook.com
+ ([fe80::284c:211f:16dc:f7b2]) by SA1PR12MB7199.namprd12.prod.outlook.com
+ ([fe80::284c:211f:16dc:f7b2%5]) with mapi id 15.20.7316.018; Fri, 23 Feb 2024
+ 02:51:24 +0000
+From: Ankit Agrawal <ankita@nvidia.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+CC: Jason Gunthorpe <jgg@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>,
+	"shameerali.kolothum.thodi@huawei.com"
+	<shameerali.kolothum.thodi@huawei.com>, "kevin.tian@intel.com"
+	<kevin.tian@intel.com>, "mst@redhat.com" <mst@redhat.com>,
+	"eric.auger@redhat.com" <eric.auger@redhat.com>, "jgg@ziepe.ca"
+	<jgg@ziepe.ca>, "oleksandr@natalenko.name" <oleksandr@natalenko.name>,
+	"clg@redhat.com" <clg@redhat.com>, "satyanarayana.k.v.p@intel.com"
+	<satyanarayana.k.v.p@intel.com>, "brett.creeley@amd.com"
+	<brett.creeley@amd.com>, "horms@kernel.org" <horms@kernel.org>,
+	"shannon.nelson@amd.com" <shannon.nelson@amd.com>, Rahul Rameshbabu
+	<rrameshbabu@nvidia.com>, Zhi Wang <zhiw@nvidia.com>, Aniket Agashe
+	<aniketa@nvidia.com>, Neo Jia <cjia@nvidia.com>, Kirti Wankhede
+	<kwankhede@nvidia.com>, "Tarun Gupta (SW-GPU)" <targupta@nvidia.com>, Vikram
+ Sethi <vsethi@nvidia.com>, Andy Currid <acurrid@nvidia.com>, Alistair Popple
+	<apopple@nvidia.com>, John Hubbard <jhubbard@nvidia.com>, Dan Williams
+	<danw@nvidia.com>, "Anuj Aggarwal (SW-GPU)" <anuaggarwal@nvidia.com>, Matt
+ Ochs <mochs@nvidia.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"virtualization@lists.linux-foundation.org"
+	<virtualization@lists.linux-foundation.org>
+Subject: Re: [PATCH v19 0/3] vfio/nvgrace-gpu: Add vfio pci variant module for
+ grace hopper
+Thread-Topic: [PATCH v19 0/3] vfio/nvgrace-gpu: Add vfio pci variant module
+ for grace hopper
+Thread-Index: AQHaY/Mekx2WvnlRDEKdWWLWleC5bbEW5psAgABXBe0=
+Date: Fri, 23 Feb 2024 02:51:24 +0000
+Message-ID:
+ <SA1PR12MB71992D7E87AD9DA2C89669BAB0552@SA1PR12MB7199.namprd12.prod.outlook.com>
+References: <20240220115055.23546-1-ankita@nvidia.com>
+ <20240222143654.0ed77f85.alex.williamson@redhat.com>
+In-Reply-To: <20240222143654.0ed77f85.alex.williamson@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA1PR12MB7199:EE_|CO6PR12MB5489:EE_
+x-ms-office365-filtering-correlation-id: 028bb4f1-47f5-4488-37a2-08dc341a5330
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ ItwRBTbMHmtfT6jHr9pLqxCAlHm4TSp3HAfJLn+eFd8mTgnqe3MTi5GHvQ5/ptZ2idRws7CVMS3R7rhTAFCpRYiYvn39iMSY111t6WAwXH+reCRzUAXWqnBEc45Mdd7sYl1lt5Y/04gDtBkGbn+5Ruwid3cGLHHCOyHjk+ezqNvjDrP+ChRT1FVcw3qIjnsM2PFntyW3wNsw2jKQWyYiHTwKnsozmsQBTcxSkUduFOC6BkaZhBlPpirc+rY3FMkzuKCFd21BR4IFEuY/C0sfrOBJOWJr/4m3Xv+aPmgLjt+XIQ4coAaN41REXBH057LPzmsLwnvMKMlelSuiN34JSe85kIaQdxup7QwcvaAHw7LnR1sSsoOFdXOV/xsgwURPisDOwUAK6LTtUb15LzgYsBLqrzWKulLgLN7bcQg8Mz0mW+ZTiM7mdq8o9dF8T7Fr2hIYZFvoufTNIGml3mkpDL1Jn79QUYVXfmRkvM2BD2Xn7mYDVIdxySrCCZPbPpKX/o7DkXtONDcPlh9zRywnA6eTm1+YVr9SsH3dsEtVEwCsOxMDFoVFcsRvcg+65Fj5A7px4YQGm85m5qG6oj8fhRQwCmP3rA+RKWxlhJBT51xPnojI/f28rNH/Z886aPya
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR12MB7199.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-1?Q?jWIg48zdyQCOsy3FFrRq+3Ic7zk1Nq4QXgsxf0j+OjbzT3x7c/fhd5SpuH?=
+ =?iso-8859-1?Q?odgtkbBo95vdpQcjvEd0kCYIIbsdH5D8z40LsQETky5jrOErLjMTrfVyqb?=
+ =?iso-8859-1?Q?mTvQCfwuahSEYd28XVbqV2MM8Kcj4SSSt25ARfdigcz2OP452o7Z0G4WBJ?=
+ =?iso-8859-1?Q?AzrsKqHtsaJ06Ltd0xsxNMr2bpfdRvyy/JMCIBsePghlPVOlLJJ43P/BLp?=
+ =?iso-8859-1?Q?ySLRDDLqMmvZpKYtYdHDPC96b+4NBjLW+nOupAYsfl5dmo5XV1YA4Z5hvE?=
+ =?iso-8859-1?Q?nCYNwKYNI4SheGyP/hrc2tETHEYHwW26h4vafF/pwhqSVzM8pqY0wr6UZo?=
+ =?iso-8859-1?Q?YzPHcdbnHhwBcNUd/PloTWrnO5pR0UoimfFoC91OwzGEkAWagOcPuKt+u+?=
+ =?iso-8859-1?Q?4hSf6qPf85JJLokL5uv0Yed1eF+6f2qHG+FamemNVUFbOO+tWJ8ljO4uqS?=
+ =?iso-8859-1?Q?Cy/i2pwkuk0DNKSA+lGVp7g+hI2Ijz7tn+aPRziATxTARzxIAcQAAgk64e?=
+ =?iso-8859-1?Q?iS8rNzjKzDR9XXcAUAygkRywDFc+QWTZ1u/oqnZJZE86q+Vtaew57tzaJB?=
+ =?iso-8859-1?Q?ADD7Uv/e2Vk+HKAJMDaulImGbn/+OZhPcYez0SeV+DPx43z/F6Y7/xkz1g?=
+ =?iso-8859-1?Q?9VG/T7n+F/mgZuZJknunqW89Ka2tbC8SQTvxL8ic9ZrCnDBcRDMoDt1Ojv?=
+ =?iso-8859-1?Q?bphCJk3uLJYf/FysJmRU8Klgn/qomUaeQ7eWKH5duX9Q/9pVCVkWLqdYUj?=
+ =?iso-8859-1?Q?M9P3hucwxusyAhmnmU4G5zRXbR+WD3rDhcsvM5rZFK7YeHZA+xDKozwYsz?=
+ =?iso-8859-1?Q?90X7a0bQYi/SzH8DqhweTFx2YXlOS569FC49Z0C28VUmxyez3ZmfQlcHhH?=
+ =?iso-8859-1?Q?IezUDVvTCpaR8qHQ/wTxp+T1ueDIfQdlgUoRsapar9Df4Klevs9LILPpCk?=
+ =?iso-8859-1?Q?wWy3efhg5n+r0JTKB0UCJ/F63tIkweptIcwjXiCnoVOsdxcEfRS/shZ6tm?=
+ =?iso-8859-1?Q?0lPGrsAkNIkW49cnI6ARUBtzS4rB5ylpDuKqeTpChGkMlCXXBLEyDbxzla?=
+ =?iso-8859-1?Q?lVz+CUHhQ8mDi98tKQjQKp98XhZCpxG7SW+GWpSISWUjWNaeWII3Cxs6I2?=
+ =?iso-8859-1?Q?Q5RPK0azZNeuLp4WBZ8ex9xKhT9TcengykLtSiE++aXZgQN5USDxeZytcL?=
+ =?iso-8859-1?Q?YiaO6SLsYh6mVB1TK/PhlknoRlAx9IE3dcVNDvi0VlsobMsS63bYhRkWR+?=
+ =?iso-8859-1?Q?8FN9GmU1ijekFLUY5tjPrAYWooJLbjQSz387ayFKnMnPu8eEp61N76WAhg?=
+ =?iso-8859-1?Q?hASRnyTgwzfZffR7hrSjtRBGtCm/eENcyGQVIzqF8ACrdzJEaOhq0PURsT?=
+ =?iso-8859-1?Q?XbIH9BhHbPe1quI18NLeN03FJozHPBRqGUjv+hIKqpWGalgarXRz52ycRy?=
+ =?iso-8859-1?Q?e6BaZ7C2al4LXjt7haWn2O3vZ+8IWx2+Qhw2r23x1sGzdYI+d8+7le44R/?=
+ =?iso-8859-1?Q?A/hLqLQR8r0ptBpTGpGG2EkY08OAbW0Umo0u/h/fkDdtwQ/jDVCVOkxSgi?=
+ =?iso-8859-1?Q?rIBEcSCjvLSGxRRH3oNpoJ6N+y8trOdaoL3A+TjM/tTvZzw0cLDVqzH5U7?=
+ =?iso-8859-1?Q?YnLbjhJgSFWIo=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR11MB6020:EE_|CH3PR11MB8444:EE_
-X-MS-Office365-Filtering-Correlation-Id: 590bdcb5-d386-4c1c-3138-08dc34127fc7
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: SnYDK4W5hwRF+2Q8D2kf4Jn9byIIvtPIsYNUTw/CRGwYlapwIC4pSgTICSZZM4/ZNEexFQ8TvrkmX6yXwMLOoJW6GsZFyeaOvHpQsGRX7fMpAWAbD3IhufuxkdD/nKd+TlIwTPiNKI0SsuepDejT/bKdUhMU5i7hPd0rYJTJ0EKU8RtfWUrjKelI9y5SrNMUJyGctR5nLgxuCra+XEEEuFPfEfU1S9eSodw+7TqSHxKiLEfDigp0sgtFnlWJ3R1zhbHr10/TFPIfHo68gDFmfPwyiM1S4Wl7Px9mO3qokf/CECEiGpoTbmmiJB+TgtQ0DTlJfGnwWTYangn7hhdFLjuOz/ZhRYtw/PNBwNR7RUB8+a/1JtvYDTbWXJ5Rm/iWfrBDH5ja8mX/Fe/c7w4vyDgxOXBmmee+QMoyJSv1+wvXXkyRtiuF5rleEIpRfz2oplQWkG3cY+df8MLRl74lKQaYVMieSVJkKSGiNY2oBUq06eptFAa6jRceu1I/iQX8+c1jO2Oau1DUrF4s6mGdxP1x6RqGdJfcnUUTtNwm2ck=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6020.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?pPDsjZzIbPIeggSMFSEKm+MJSRz44tLE/4HHclyC1604ATq/CH/LZDC/mHF1?=
- =?us-ascii?Q?iTMtc21L0fnZ8/rEUtCpKINRyFtWkdhsRcYCSpqLAntMOwW1NB0MR4m7TEKf?=
- =?us-ascii?Q?YpSe8WKY1ugBTknTq6fk1PiM1e9sstVs9Kk+ZxgpB0ep2MBQ6khuoV23mG2v?=
- =?us-ascii?Q?2EcO+W1uXyqL57Dq1OacQ/9KOaVP09TpChNHljDalqTu+x/lU1FKDTJRY+fO?=
- =?us-ascii?Q?nv+b7XwqQUoaG4oSnTjXZPK81joG1eAZIkjExzdIf+rTTjLwyUV7rksenv2H?=
- =?us-ascii?Q?s/14Ytz1XR4viMrKhV5/svU/g9uODQS7D/OSBORO/cC2k/q7yWfpeEokBLYi?=
- =?us-ascii?Q?TxIdq2Mqoq5RbGrU6uAKkSpz9kLSZ63qOnHj1KLyfui3Km0FLKAhORYhGVgc?=
- =?us-ascii?Q?+gjbV1/FTJHTwDsHWUmMqWSDXGOE6WemAyZHj7Ais7HfPLeQ4llkVgSL24xG?=
- =?us-ascii?Q?rVF8HVzcTR2WbzznipMVLfFapKyx0738AiWEeYB8AUQpnZJhcaFvRNOQEuI8?=
- =?us-ascii?Q?jmTYUT8/rwGJKUDF4o2fLf42pN0UuY7HRR08QLRnG1/uvn9VRz9upnmGuROs?=
- =?us-ascii?Q?9ZPHn+fUQLhnWJ4KATYlI6XOk8XeV4LWIw5T4KnMp9qZ49huyaszobmG8nBp?=
- =?us-ascii?Q?rEJFDg9lKMJlKAicp+Z8R8W9l4VBwAbBe1CwBxyf/UbZ9u8atfms27Dhy+Tg?=
- =?us-ascii?Q?ZzhHF9cL9VDZWSSAmcf4n9Gd4ENtQANZFKBSmx+BtIl6sgqKjsQ52k3gpimU?=
- =?us-ascii?Q?0cRmZwRIrbxl114Jo17Hgwy812IWw3YjyDzDSwi/lA/oUoGZin+3ArfMsz5C?=
- =?us-ascii?Q?iF1YlrRT/VgDzzjTl7VyIH1PejqyLItEX9Eg+scAB7f0wnCew7k21iXarRvo?=
- =?us-ascii?Q?EBTMiY1bgZYLQ0uIefYAx2IeWfzmqNq97UB+9wKdVFIxiO4X3yNrUBlzTEjy?=
- =?us-ascii?Q?pkUwpg4RwEeOaw5ZeeDlNp7iPnP1n8/bi1K7xo5oTRruaGQLy93reL4V1PP8?=
- =?us-ascii?Q?4oinqjbJezg3E8L3LgZ6VbmAXBYVoj1yCxvLfB8C2HvnBmQkLfN7UEqByC4J?=
- =?us-ascii?Q?YGd+b6W+6e2gTOs6RCIOjdonTnAsOOfMYM/Wx5mu+3HErq0Jo9qVuf5q8zop?=
- =?us-ascii?Q?SfAM5LxPTPDTQ8nUzVtyX4jCZ+iaY+M1tK1iP7DkvEQkgSG2C0pIbxHKbUWX?=
- =?us-ascii?Q?2AbPPBhpsP3sHGz7FYhuBXe+WyzhzGOiA4elfsLIyW9VWiSYNA6hD6puCmvq?=
- =?us-ascii?Q?MOBThNjSQTzqHjEIcYCkRekqJJM5RJi2B/wclICPac4jWCP3lM8qAam5MF0F?=
- =?us-ascii?Q?O5M1tP8PRBt56WvhvyW4h90RWcKNpkXnHP/F1vIYNu6qDfH4hanoajw6gVp1?=
- =?us-ascii?Q?B7QxhSYZPV4m8iXa721uH9UruAIrPI5gqhXXbptsEsoHzjB2iXmVSBHszvct?=
- =?us-ascii?Q?9qDULGxon0qb87cyex3Txb2IgPP/nH4oSGNqRoiJcfQutC/1wRbFcXF2dxz7?=
- =?us-ascii?Q?So2qPc/4OWMB8xf/+hap8ioZq4LuGGFFCUryeOAH67QMB+ZOSc4wCL1i9K/M?=
- =?us-ascii?Q?Ql8A3bNFJ1UpGVSWnEmtPQtNwNTlKiA4dc0CYiAt?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 590bdcb5-d386-4c1c-3138-08dc34127fc7
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6020.namprd11.prod.outlook.com
+X-OriginatorOrg: Nvidia.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Feb 2024 01:55:23.9318
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR12MB7199.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 028bb4f1-47f5-4488-37a2-08dc341a5330
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Feb 2024 02:51:24.8913
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /VIRAdZ8Lg7b/Ka8r6FRvY0V8JtAV0y9FyIO9S3iWidjmeSgs6PiX0gk5cXP2eCq8o6+hIkITKmAG1t6QAH9Dw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8444
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 1QzOJ2FBkf7WuaJ0LLTHtDuHE+fOSD7uLZIbiygdCbBhstQcUiAcCfuyG/rjPNSrqZ7dpn0nR1LtwQqjPY5bRg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR12MB5489
 
-Hi Sagi,
-
-On 2023-12-12 at 12:46:23 -0800, Sagi Shahar wrote:
-> From: Erdem Aktas <erdemaktas@google.com>
-> 
-> Adding a test to verify TDX lifecycle by creating a TD and running a
-> dummy TDG.VP.VMCALL <Instruction.IO> inside it.
-> 
-> Signed-off-by: Erdem Aktas <erdemaktas@google.com>
-> Signed-off-by: Ryan Afranji <afranji@google.com>
-> Signed-off-by: Sagi Shahar <sagis@google.com>
-> Co-developed-by: Ackerley Tng <ackerleytng@google.com>
-> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-> ---
->  tools/testing/selftests/kvm/Makefile          |  4 +
->  .../selftests/kvm/include/x86_64/tdx/tdcall.h | 35 ++++++++
->  .../selftests/kvm/include/x86_64/tdx/tdx.h    | 12 +++
->  .../kvm/include/x86_64/tdx/test_util.h        | 52 +++++++++++
->  .../selftests/kvm/lib/x86_64/tdx/tdcall.S     | 90 +++++++++++++++++++
->  .../selftests/kvm/lib/x86_64/tdx/tdx.c        | 27 ++++++
->  .../selftests/kvm/lib/x86_64/tdx/tdx_util.c   |  1 +
->  .../selftests/kvm/lib/x86_64/tdx/test_util.c  | 34 +++++++
->  .../selftests/kvm/x86_64/tdx_vm_tests.c       | 45 ++++++++++
->  9 files changed, 300 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/include/x86_64/tdx/tdcall.h
->  create mode 100644 tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h
->  create mode 100644 tools/testing/selftests/kvm/include/x86_64/tdx/test_util.h
->  create mode 100644 tools/testing/selftests/kvm/lib/x86_64/tdx/tdcall.S
->  create mode 100644 tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c
->  create mode 100644 tools/testing/selftests/kvm/lib/x86_64/tdx/test_util.c
->  create mode 100644 tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
-> 
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index a35150ab855f..80d4a50eeb9f 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -52,6 +52,9 @@ LIBKVM_x86_64 += lib/x86_64/vmx.c
->  LIBKVM_x86_64 += lib/x86_64/sev.c
->  LIBKVM_x86_64 += lib/x86_64/tdx/tdx_util.c
->  LIBKVM_x86_64 += lib/x86_64/tdx/td_boot.S
-> +LIBKVM_x86_64 += lib/x86_64/tdx/tdcall.S
-> +LIBKVM_x86_64 += lib/x86_64/tdx/tdx.c
-> +LIBKVM_x86_64 += lib/x86_64/tdx/test_util.c
->  
->  LIBKVM_aarch64 += lib/aarch64/gic.c
->  LIBKVM_aarch64 += lib/aarch64/gic_v3.c
-> @@ -152,6 +155,7 @@ TEST_GEN_PROGS_x86_64 += set_memory_region_test
->  TEST_GEN_PROGS_x86_64 += steal_time
->  TEST_GEN_PROGS_x86_64 += kvm_binary_stats_test
->  TEST_GEN_PROGS_x86_64 += system_counter_offset_test
-> +TEST_GEN_PROGS_x86_64 += x86_64/tdx_vm_tests
->  
->  # Compiled outputs used by test targets
->  TEST_GEN_PROGS_EXTENDED_x86_64 += x86_64/nx_huge_pages_test
-> diff --git a/tools/testing/selftests/kvm/include/x86_64/tdx/tdcall.h b/tools/testing/selftests/kvm/include/x86_64/tdx/tdcall.h
-> new file mode 100644
-> index 000000000000..78001bfec9c8
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/include/x86_64/tdx/tdcall.h
-> @@ -0,0 +1,35 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/* Adapted from arch/x86/include/asm/shared/tdx.h */
-> +
-> +#ifndef SELFTESTS_TDX_TDCALL_H
-> +#define SELFTESTS_TDX_TDCALL_H
-> +
-> +#include <linux/bits.h>
-> +#include <linux/types.h>
-> +
-> +#define TDG_VP_VMCALL_INSTRUCTION_IO_READ 0
-> +#define TDG_VP_VMCALL_INSTRUCTION_IO_WRITE 1
-> +
-> +#define TDX_HCALL_HAS_OUTPUT BIT(0)
-> +
-> +#define TDX_HYPERCALL_STANDARD 0
-> +
-> +/*
-> + * Used in __tdx_hypercall() to pass down and get back registers' values of
-> + * the TDCALL instruction when requesting services from the VMM.
-> + *
-> + * This is a software only structure and not part of the TDX module/VMM ABI.
-> + */
-> +struct tdx_hypercall_args {
-> +	u64 r10;
-> +	u64 r11;
-> +	u64 r12;
-> +	u64 r13;
-> +	u64 r14;
-> +	u64 r15;
-> +};
-> +
-> +/* Used to request services from the VMM */
-> +u64 __tdx_hypercall(struct tdx_hypercall_args *args, unsigned long flags);
-> +
-> +#endif // SELFTESTS_TDX_TDCALL_H
-> diff --git a/tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h b/tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h
-> new file mode 100644
-> index 000000000000..a7161efe4ee2
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h
-> @@ -0,0 +1,12 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +#ifndef SELFTEST_TDX_TDX_H
-> +#define SELFTEST_TDX_TDX_H
-> +
-> +#include <stdint.h>
-> +
-> +#define TDG_VP_VMCALL_INSTRUCTION_IO 30
-> +
-> +uint64_t tdg_vp_vmcall_instruction_io(uint64_t port, uint64_t size,
-> +				      uint64_t write, uint64_t *data);
-> +
-> +#endif // SELFTEST_TDX_TDX_H
-> diff --git a/tools/testing/selftests/kvm/include/x86_64/tdx/test_util.h b/tools/testing/selftests/kvm/include/x86_64/tdx/test_util.h
-> new file mode 100644
-> index 000000000000..b570b6d978ff
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/include/x86_64/tdx/test_util.h
-> @@ -0,0 +1,52 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +#ifndef SELFTEST_TDX_TEST_UTIL_H
-> +#define SELFTEST_TDX_TEST_UTIL_H
-> +
-> +#include <stdbool.h>
-> +
-> +#include "tdcall.h"
-> +
-> +#define TDX_TEST_SUCCESS_PORT 0x30
-> +#define TDX_TEST_SUCCESS_SIZE 4
-> +
-> +/**
-> + * Assert that tdx_test_success() was called in the guest.
-> + */
-> +#define TDX_TEST_ASSERT_SUCCESS(VCPU)					\
-> +	(TEST_ASSERT(							\
-> +		((VCPU)->run->exit_reason == KVM_EXIT_IO) &&		\
-> +		((VCPU)->run->io.port == TDX_TEST_SUCCESS_PORT) &&	\
-> +		((VCPU)->run->io.size == TDX_TEST_SUCCESS_SIZE) &&	\
-> +		((VCPU)->run->io.direction ==				\
-> +			TDG_VP_VMCALL_INSTRUCTION_IO_WRITE),		\
-> +		"Unexpected exit values while waiting for test completion: %u (%s) %d %d %d\n", \
-> +		(VCPU)->run->exit_reason,				\
-> +		exit_reason_str((VCPU)->run->exit_reason),		\
-> +		(VCPU)->run->io.port, (VCPU)->run->io.size,		\
-> +		(VCPU)->run->io.direction))
-> +
-> +/**
-> + * Run a test in a new process.
-> + *
-> + * There might be multiple tests we are running and if one test fails, it will
-> + * prevent the subsequent tests to run due to how tests are failing with
-> + * TEST_ASSERT function. The run_in_new_process function will run a test in a
-> + * new process context and wait for it to finish or fail to prevent TEST_ASSERT
-> + * to kill the main testing process.
-> + */
-> +void run_in_new_process(void (*func)(void));
-> +
-> +/**
-> + * Verify that the TDX is supported by KVM.
-> + */
-> +bool is_tdx_enabled(void);
-> +
-> +/**
-> + * Report test success to userspace.
-> + *
-> + * Use TDX_TEST_ASSERT_SUCCESS() to assert that this function was called in the
-> + * guest.
-> + */
-> +void tdx_test_success(void);
-> +
-> +#endif // SELFTEST_TDX_TEST_UTIL_H
-> diff --git a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdcall.S b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdcall.S
-> new file mode 100644
-> index 000000000000..df9c1ed4bb2d
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdcall.S
-> @@ -0,0 +1,90 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/* Adapted from arch/x86/coco/tdx/tdcall.S */
-> +
-> +#define TDX_HYPERCALL_r10 0 /* offsetof(struct tdx_hypercall_args, r10) */
-> +#define TDX_HYPERCALL_r11 8 /* offsetof(struct tdx_hypercall_args, r11) */
-> +#define TDX_HYPERCALL_r12 16 /* offsetof(struct tdx_hypercall_args, r12) */
-> +#define TDX_HYPERCALL_r13 24 /* offsetof(struct tdx_hypercall_args, r13) */
-> +#define TDX_HYPERCALL_r14 32 /* offsetof(struct tdx_hypercall_args, r14) */
-> +#define TDX_HYPERCALL_r15 40 /* offsetof(struct tdx_hypercall_args, r15) */
-> +
-> +/*
-> + * Bitmasks of exposed registers (with VMM).
-> + */
-> +#define TDX_R10 0x400
-> +#define TDX_R11 0x800
-> +#define TDX_R12 0x1000
-> +#define TDX_R13 0x2000
-> +#define TDX_R14 0x4000
-> +#define TDX_R15 0x8000
-> +
-> +#define TDX_HCALL_HAS_OUTPUT 0x1
-> +
-> +/*
-> + * These registers are clobbered to hold arguments for each
-> + * TDVMCALL. They are safe to expose to the VMM.
-> + * Each bit in this mask represents a register ID. Bit field
-> + * details can be found in TDX GHCI specification, section
-> + * titled "TDCALL [TDG.VP.VMCALL] leaf".
-> + */
-> +#define TDVMCALL_EXPOSE_REGS_MASK	( TDX_R10 | TDX_R11 | \
-> +					  TDX_R12 | TDX_R13 | \
-> +					  TDX_R14 | TDX_R15 )
-> +
-> +.code64
-> +.section .text
-> +
-> +.globl __tdx_hypercall
-> +.type __tdx_hypercall, @function
-> +__tdx_hypercall:
-> +	/* Set up stack frame */
-> +	push %rbp
-> +	movq %rsp, %rbp
-> +
-> +	/* Save callee-saved GPRs as mandated by the x86_64 ABI */
-> +	push %r15
-> +	push %r14
-> +	push %r13
-> +	push %r12
-> +
-> +	/* Mangle function call ABI into TDCALL ABI: */
-> +	/* Set TDCALL leaf ID (TDVMCALL (0)) in RAX */
-> +	xor %eax, %eax
-> +
-> +	/* Copy hypercall registers from arg struct: */
-> +	movq TDX_HYPERCALL_r10(%rdi), %r10
-> +	movq TDX_HYPERCALL_r11(%rdi), %r11
-> +	movq TDX_HYPERCALL_r12(%rdi), %r12
-> +	movq TDX_HYPERCALL_r13(%rdi), %r13
-> +	movq TDX_HYPERCALL_r14(%rdi), %r14
-> +	movq TDX_HYPERCALL_r15(%rdi), %r15
-> +
-> +	movl $TDVMCALL_EXPOSE_REGS_MASK, %ecx
-> +
-> +	tdcall
-> +
-> +	/* TDVMCALL leaf return code is in R10 */
-> +	movq %r10, %rax
-> +
-> +	/* Copy hypercall result registers to arg struct if needed */
-> +	testq $TDX_HCALL_HAS_OUTPUT, %rsi
-> +	jz .Lout
-> +
-> +	movq %r10, TDX_HYPERCALL_r10(%rdi)
-> +	movq %r11, TDX_HYPERCALL_r11(%rdi)
-> +	movq %r12, TDX_HYPERCALL_r12(%rdi)
-> +	movq %r13, TDX_HYPERCALL_r13(%rdi)
-> +	movq %r14, TDX_HYPERCALL_r14(%rdi)
-> +	movq %r15, TDX_HYPERCALL_r15(%rdi)
-> +.Lout:
-> +	/* Restore callee-saved GPRs as mandated by the x86_64 ABI */
-> +	pop %r12
-> +	pop %r13
-> +	pop %r14
-> +	pop %r15
-> +
-> +	pop %rbp
-> +	ret
-> +
-> +/* Disable executable stack */
-> +.section .note.GNU-stack,"",%progbits
-> diff --git a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c
-> new file mode 100644
-> index 000000000000..c2414523487a
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c
-> @@ -0,0 +1,27 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +
-> +#include "tdx/tdcall.h"
-> +#include "tdx/tdx.h"
-> +
-> +uint64_t tdg_vp_vmcall_instruction_io(uint64_t port, uint64_t size,
-> +				      uint64_t write, uint64_t *data)
-> +{
-> +	uint64_t ret;
-> +	struct tdx_hypercall_args args = {
-> +		.r10 = TDX_HYPERCALL_STANDARD,
-> +		.r11 = TDG_VP_VMCALL_INSTRUCTION_IO,
-> +		.r12 = size,
-> +		.r13 = write,
-> +		.r14 = port,
-> +	};
-> +
-> +	if (write)
-> +		args.r15 = *data;
-> +
-> +	ret = __tdx_hypercall(&args, write ? 0 : TDX_HCALL_HAS_OUTPUT);
-> +
-> +	if (!write)
-> +		*data = args.r11;
-> +
-> +	return ret;
-> +}
-> diff --git a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx_util.c b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx_util.c
-> index 063ff486fb86..b302060049d5 100644
-> --- a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx_util.c
-> +++ b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx_util.c
-> @@ -224,6 +224,7 @@ static void tdx_enable_capabilities(struct kvm_vm *vm)
->  		      KVM_X2APIC_API_USE_32BIT_IDS |
->  			      KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK);
->  	vm_enable_cap(vm, KVM_CAP_SPLIT_IRQCHIP, 24);
-> +	vm_enable_cap(vm, KVM_CAP_MAX_VCPUS, 512);
->  }
->  
->  static void tdx_configure_memory_encryption(struct kvm_vm *vm)
-> diff --git a/tools/testing/selftests/kvm/lib/x86_64/tdx/test_util.c b/tools/testing/selftests/kvm/lib/x86_64/tdx/test_util.c
-> new file mode 100644
-> index 000000000000..6905d0ca3877
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/lib/x86_64/tdx/test_util.c
-> @@ -0,0 +1,34 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +
-> +#include <stdbool.h>
-> +#include <stdint.h>
-> +#include <stdlib.h>
-> +#include <sys/wait.h>
-> +#include <unistd.h>
-> +
-> +#include "kvm_util_base.h"
-> +#include "tdx/tdx.h"
-> +#include "tdx/test_util.h"
-> +
-> +void run_in_new_process(void (*func)(void))
-> +{
-> +	if (fork() == 0) {
-> +		func();
-> +		exit(0);
-> +	}
-> +	wait(NULL);
-> +}
-> +
-> +bool is_tdx_enabled(void)
-> +{
-> +	return !!(kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_TDX_VM));
-> +}
-> +
-> +void tdx_test_success(void)
-> +{
-> +	uint64_t code = 0;
-> +
-> +	tdg_vp_vmcall_instruction_io(TDX_TEST_SUCCESS_PORT,
-> +				     TDX_TEST_SUCCESS_SIZE,
-> +				     TDG_VP_VMCALL_INSTRUCTION_IO_WRITE, &code);
-> +}
-> diff --git a/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c b/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
-> new file mode 100644
-> index 000000000000..a18d1c9d6026
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
-> @@ -0,0 +1,45 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +
-> +#include <signal.h>
-> +#include "kvm_util_base.h"
-> +#include "tdx/tdx_util.h"
-> +#include "tdx/test_util.h"
-> +#include "test_util.h"
-> +
-> +void guest_code_lifecycle(void)
-> +{
-> +	tdx_test_success();
-> +}
-> +
-> +void verify_td_lifecycle(void)
-> +{
-> +	struct kvm_vm *vm;
-> +	struct kvm_vcpu *vcpu;
-> +
-> +	vm = td_create();
-> +	td_initialize(vm, VM_MEM_SRC_ANONYMOUS, 0);
-
-From a user point of view, this lifecycle test is very useful
-to me for vm creation/destruction time test, and I believe you
-have an enhanced version to specify the memory size. May I know if
-there is any plan to add that part too? And maybe allow the user
-to customize the memory size rather than a fixed size.
-
-thanks,
-Chenyu
+>> Ankit Agrawal (3):=0A=
+>>=A0=A0 vfio/pci: rename and export do_io_rw()=0A=
+>>=A0=A0 vfio/pci: rename and export range_intersect_range=0A=
+>>=A0=A0 vfio/nvgrace-gpu: Add vfio pci variant module for grace hopper=0A=
+>>=0A=
+>>=A0 MAINTAINERS=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0 |=A0 16 +-=0A=
+>>=A0 drivers/vfio/pci/Kconfig=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 |=A0=
+=A0 2 +=0A=
+>>=A0 drivers/vfio/pci/Makefile=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 |=A0=A0=
+ 2 +=0A=
+>>=A0 drivers/vfio/pci/nvgrace-gpu/Kconfig=A0 |=A0 10 +=0A=
+>>=A0 drivers/vfio/pci/nvgrace-gpu/Makefile |=A0=A0 3 +=0A=
+>>=A0 drivers/vfio/pci/nvgrace-gpu/main.c=A0=A0 | 879 +++++++++++++++++++++=
++++++=0A=
+>>=A0 drivers/vfio/pci/vfio_pci_config.c=A0=A0=A0 |=A0 42 ++=0A=
+>>=A0 drivers/vfio/pci/vfio_pci_rdwr.c=A0=A0=A0=A0=A0 |=A0 16 +-=0A=
+>>=A0 drivers/vfio/pci/virtio/main.c=A0=A0=A0=A0=A0=A0=A0 |=A0 72 +--=0A=
+>>=A0 include/linux/vfio_pci_core.h=A0=A0=A0=A0=A0=A0=A0=A0 |=A0 10 +-=0A=
+>>=A0 10 files changed, 993 insertions(+), 59 deletions(-)=0A=
+>>=A0 create mode 100644 drivers/vfio/pci/nvgrace-gpu/Kconfig=0A=
+>>=A0 create mode 100644 drivers/vfio/pci/nvgrace-gpu/Makefile=0A=
+>>=A0 create mode 100644 drivers/vfio/pci/nvgrace-gpu/main.c=0A=
+>>=0A=
+>=0A=
+> Applied to vfio next branch for v6.9.=A0 Thanks,=0A=
+>=0A=
+> Alex=0A=
+=0A=
+Thanks Alex! Appreciate this along with your guidance and help in the revie=
+ws.=
 
