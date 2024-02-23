@@ -1,102 +1,103 @@
-Return-Path: <kvm+bounces-9522-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-9523-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F377E8613DF
-	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 15:21:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFEA78613E9
+	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 15:23:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A496B285824
-	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 14:21:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F01471C2296D
+	for <lists+kvm@lfdr.de>; Fri, 23 Feb 2024 14:23:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 867A58061F;
-	Fri, 23 Feb 2024 14:20:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A1C9811F9;
+	Fri, 23 Feb 2024 14:23:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OB3PH38m"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q3/aUvmv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3220981ADB
-	for <kvm@vger.kernel.org>; Fri, 23 Feb 2024 14:20:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DC928003E;
+	Fri, 23 Feb 2024 14:23:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708698036; cv=none; b=KoXgBeXHjLQng6VOf+8RbyE1cfQWmWrZ+vtmHU3VJfV4wEOEwnfrI5hN7FlMQ7gSH3JyQf+z/N83O6zPIPS18gwkNdqul+oiRXOZ+fPcdXfPwJpmCQAB6yjldaFJuD0KxGIXZwxsXcWZJzvqFtWmxO+XgiNBRGqv0F+TaDjV+lI=
+	t=1708698226; cv=none; b=nQY/5cgP1vnoKIFoiXVRFPMC9f8+FUP4VcebyaWI6lXTi148mIJDn4YpZaS1Me3k2UWJs9oVm9nPC2QiCpKDFQbrvr4Ct1lv9OJ44xPxJwgQ/f27ffItc4Vyh7UCla8+wd7pgFYANXDKLayP7JiHNPZ4BEJ7SxNobQQc61aICyQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708698036; c=relaxed/simple;
-	bh=TV2TbTF5HNR+UtY5N1ayGaJ+DSc7ezRUbJP15SLdHEs=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Bt7BXhVNc3p/k6P+MPlF+WGz2Vxy0G+MKgB2T/0BokIHiczQDlzjh1SzzknMeTvYo50Ebyl66LGpTSHlgV+hRwBhi1F+Sf2Ikp9bNaMgMnvQTSGoe0feWipdwjn693U43b1irnqJZahQ61Lf36iYz3FUkE1WTRkKcnu7Y0iHSv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OB3PH38m; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6047fed0132so13375377b3.1
-        for <kvm@vger.kernel.org>; Fri, 23 Feb 2024 06:20:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708698034; x=1709302834; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vZuuePe5dJSpQ6kc+Papl7SiBSTZFtVsqxBtzBME+JE=;
-        b=OB3PH38ms84+EJDNBwr36sET2bW4ceLtNv9nCdqb2omIt12D/4M2vxSQUpi6Fboxfu
-         Fafz0Jgyg9syPxARJyz/IoaAxtU+dxFPf9R/Wgd3d4EwksPRd+KmY4w7BvWoo4+YST28
-         D4qNK5TMTUKXGCdnd4MShH3QYtooc4dE2PM9rsztuPgN/oFU99eDdE+kMnVipW0bsZk8
-         d+uDkZC/AjdnLADO/Nk6m55Bu9LuhyjeAcXPDWD9K8p2haVOjof67W5PrEJXJiVLlnEJ
-         58US+g4X56tgPFIoY2r5LhCoOampJGEvjObRdmYeH0gWupLYnMF1MCEJIfiXlNRYEk//
-         lmlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708698034; x=1709302834;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vZuuePe5dJSpQ6kc+Papl7SiBSTZFtVsqxBtzBME+JE=;
-        b=VHI9dV3mm6ML99ONxcHSsmLs/46QycDjx6HiOrQGY7QPYLX2K70NkQAwSCzERLg0ED
-         JUcFu1ff758cPpKZzwUDxBuHUYSikzlExM40j0Or70WwQ5WiHk9mCwJG+qNI4eTJAxyw
-         l1GAYFFHw48X9s3O47vJQ38ZMzEUhGlAW5XaAsvMwt+VamxybkrR1JvWFkjvIU5NLXKA
-         6iW+DkbHpKL+jjJCsWX9vHapKAm3Tsa4a+tX8Vryz16U7+eMVUtKYBfMTDGUNsibIpSZ
-         HP97AXVz5K2LAD9dJ45inRPw3TK/KVvKGKKckXC4zPn8F2vYlER+DvKd+1JBEk0WUKMj
-         eTIg==
-X-Forwarded-Encrypted: i=1; AJvYcCWdw+idFvcFhUUR2MmnVQ24QuXzFOjQ23dj+jnWrUCvxozBYkHTqx9HTm+XJHwsOYkrf2d88OJvs2kEInBh4j00ymWh
-X-Gm-Message-State: AOJu0YzGKT3FfkhcOxAQyMYUwijZzZ+9g7zE10ZtR9FItyoYWGAY1qIu
-	p3FmIiNKM9N+mpy815abHOD40HOQ3YzVrJfdLcywBsJTISL+lzYK4Ta5I+/H1sPbkz29YXzeLj+
-	Qwg==
-X-Google-Smtp-Source: AGHT+IEHTg6TFxiespYtA70wAjrucDCk6kM0ronxHGBqeoKErrvrpFr13f6qgnM/+6fcnCWep9y0WRDva5E=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a0d:d7d4:0:b0:608:788f:8cfa with SMTP id
- z203-20020a0dd7d4000000b00608788f8cfamr361155ywd.1.1708698034257; Fri, 23 Feb
- 2024 06:20:34 -0800 (PST)
-Date: Fri, 23 Feb 2024 06:20:32 -0800
-In-Reply-To: <20240223104009.632194-2-pbonzini@redhat.com>
+	s=arc-20240116; t=1708698226; c=relaxed/simple;
+	bh=oG6lGxWEEemBwIFT+DyX89qfDgrB0Bkcpa14XrnC2Ks=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=N/nFFY1nqUamf3mNRbAr3ldvfc8YsOY39wfRNAaW+poqLYAULSMe6nqDPxifoT3Wi/HS6iXb2YF5v1yJTqeDH+3Q6DFIwNCcqmb0nyKA3sOJwT/f5w2CNLXm2F5XK9fcQWClfu93YNqzrexaynY1vR7Nk3oWGSdpuw18AS06pdA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q3/aUvmv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE849C433F1;
+	Fri, 23 Feb 2024 14:23:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708698225;
+	bh=oG6lGxWEEemBwIFT+DyX89qfDgrB0Bkcpa14XrnC2Ks=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Q3/aUvmvLzINogZY+JvkRDxgprMN4ZCuIBHfT85X/0fTg2sRO+Jvm6wLmvMo8z7Cc
+	 a3IIutESGxnmRYIr0S1djg5HZji8M/uNTk3Fxm6rorHLb19e7pVsZWrhgLmLM4pB4e
+	 Nyig2p/vY35Ln+VfjuSIGh2zgvbo/qI2J9S8XzN0J+ZI1pNH/SD+xKf2dATcNPLRBf
+	 xe3rlxJcRyM3v2dZ+4qm5eswOGOqCS+CZbtHLatve78QEsuWOHs5ucPi8J9y/Ize76
+	 StUau5ku3dzKZulk13jo5MaExtKXz/oU3Ln24Qrx9BQ0Gmcha2BqWxHuf3Vv62rTOv
+	 xtbOug6ltAtVQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rdWSl-0066qh-Cf;
+	Fri, 23 Feb 2024 14:23:43 +0000
+Date: Fri, 23 Feb 2024 14:23:42 +0000
+Message-ID: <86le7b2r9t.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-kernel@vger.kernel.org,
+	Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH v4 00/10] KVM: arm64: Avoid serializing LPI get() / put()
+In-Reply-To: <20240221054253.3848076-1-oliver.upton@linux.dev>
+References: <20240221054253.3848076-1-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240223104009.632194-1-pbonzini@redhat.com> <20240223104009.632194-2-pbonzini@redhat.com>
-Message-ID: <ZdipaR9KZSreIrIh@google.com>
-Subject: Re: [PATCH v2 01/11] KVM: SEV: fix compat ABI for KVM_MEMORY_ENCRYPT_OP
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, michael.roth@amd.com, 
-	aik@amd.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-kernel@vger.kernel.org, eric.auger@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Feb 23, 2024, Paolo Bonzini wrote:
-> The data structs for KVM_MEMORY_ENCRYPT_OP have different sizes for 32- and 64-bit
-> kernels, but they do not make any attempt to convert from one ABI to the other.
-> Fix this by adding the appropriate padding.
-
-Maybe call out that SEV+ is 64-bit only, so this doesn't matter in practice?  Or
-does this affect .compat_ioctl()?
-
-> No functional change intended for 64-bit userspace.
+On Wed, 21 Feb 2024 05:42:43 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> Message-Id: <20240209183743.22030-2-pbonzini@redhat.com>
-> Reviewed-by: Michael Roth <michael.roth@amd.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Addressing a few more goofs that Zenghui was kind enough to point out.
+> Clearly all of the bugs have been found and addressed at this point.
+> 
+> v2: https://lore.kernel.org/kvmarm/20240213093250.3960069-1-oliver.upton@linux.dev/
+> v3: https://lore.kernel.org/kvmarm/20240216184153.2714504-1-oliver.upton@linux.dev/
+> 
+> v3 -> v4:
+>  - Actually walk the LPI INTID range in vgic_copy_lpi_list() (Zenghui)
+>  - Ensure xa_lock is taken w/ IRQs disabled, even after purging usage of
+>    the lpi_list_lock (Zenghui)
+>  - Document the lock ordering (Marc)
 
-Heh, you've double-stamped several of the patches in this series.
+This is looking good so far. I'll take it for a ride shortly, but in
+the meantime:
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Marc Zyngier <maz@kernel.org>
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
